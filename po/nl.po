@@ -5907,3 +5907,15 @@ msgstr "Omlaag"
 
 #~ msgid "Sorry, no semicolons are allowed in the name!\n"
 #~ msgstr "Sorry, er zijn geen dubbelepunten toegestaan in de naam!\n"
+
+msgid "Balsa E-mail reader"
+msgstr "Balsa e-mailprogramma"
+
+msgid "Program startup"
+msgstr "Programma starten"
+
+msgid "E-mail"
+msgstr "E-mail"
+
+msgid "New mail notification"
+msgstr "Nieuwe e-mail"

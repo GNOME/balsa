@@ -7353,3 +7353,15 @@ msgstr "Bajar"
 
 #~ msgid "Couldn't set protocol version to LDAPv3."
 #~ msgstr "No se pudo establecer la versión del protocolo a LDAPv3"
+
+msgid "Balsa E-mail reader"
+msgstr "Lector de correo Balsa"
+
+msgid "Program startup"
+msgstr "Inicio del programa"
+
+msgid "E-mail"
+msgstr "Correo-E"
+
+msgid "New mail notification"
+msgstr "Llegada de un nuevo mensaje"

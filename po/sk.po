@@ -5270,3 +5270,15 @@ msgstr "Dole"
 
 #~ msgid "Fi_lter"
 #~ msgstr "Fi_lter"
+
+msgid "Balsa E-mail reader"
+msgstr "Balsa - pr.ca s elektronickou poctou"
+
+msgid "Program startup"
+msgstr "Start programu"
+
+msgid "E-mail"
+msgstr "Elektronická pošta"
+
+msgid "New mail notification"
+msgstr "Oznámenie príchodu novej správy"

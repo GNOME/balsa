@@ -5292,3 +5292,15 @@ msgstr "Bas"
 
 #~ msgid "You have received 1 new message."
 #~ msgstr "Vous avez recu 1 nouveau message."
+
+msgid "Balsa E-mail reader"
+msgstr "Lecteur de courrier Balsa"
+
+msgid "Program startup"
+msgstr "D'marrage du programme"
+
+msgid "E-mail"
+msgstr "Courrier éléctronique"
+
+msgid "New mail notification"
+msgstr "Notification de nouveaux messages"

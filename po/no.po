@@ -4824,3 +4824,15 @@ msgstr "Opp"
 #: src/toolbar-prefs.c:506
 msgid "Down"
 msgstr "Ned"
+
+msgid "Balsa E-mail reader"
+msgstr "Balsa e-post leser"
+
+msgid "Program startup"
+msgstr "Programmoppstart"
+
+msgid "E-mail"
+msgstr "E-post"
+
+msgid "New mail notification"
+msgstr "Melding om ny e-post"

@@ -6204,3 +6204,15 @@ msgstr "S'està esperant per intentar un flock... %d"
 
 #~ msgid "Mail_boxes"
 #~ msgstr "_Bústies"
+
+msgid "Balsa E-mail reader"
+msgstr "Lector de correu Balsa"
+
+msgid "Program startup"
+msgstr "Inici del programa"
+
+msgid "E-mail"
+msgstr "Correu electrònic"
+
+msgid "New mail notification"
+msgstr "Notificació de nous missatges"

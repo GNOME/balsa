@@ -9,7 +9,7 @@ msgstr ""
 "Last-Translator: Marco Pozzato <marco_pozzato@linuxfan.com>\n"
 "Language-Team: Italian <it@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: libbalsa/address-book-ldap.c:188
@@ -26,7 +26,7 @@ msgid ""
 "Failed to bind to server: %s\n"
 "Check that the servername is valid."
 msgstr ""
-"Il collegamento al server %s Ë fallito.\n"
+"Il collegamento al server %s √® fallito.\n"
 "Controlla che il nome sia corretto."
 
 #: libbalsa/address-book-ldap.c:246
@@ -52,7 +52,7 @@ msgstr "Non riesco ad aprire la rubrica vCard %s"
 #: libbalsa/address-book-vcard.c:318
 #, c-format
 msgid "%s is already in address book."
-msgstr "%s Ë gi‡ nella rubrica."
+msgstr "%s √® gi√† nella rubrica."
 
 #: libbalsa/address-book-vcard.c:328
 #, c-format
@@ -172,7 +172,7 @@ msgid ""
 "You've successfully set up Balsa. Have fun!\n"
 "   -- The Balsa development team"
 msgstr ""
-"Balsa Ë stato configurato con successo. Buon divertimento!\n"
+"Balsa √® stato configurato con successo. Buon divertimento!\n"
 "   -- Il gruppo di sviluppo di Balsa"
 
 #: libinit_balsa/balsa-druid-page-finish.gob:57
@@ -225,7 +225,7 @@ msgstr ""
 "Sembra che tu stia eseguendo Balsa per la prima volta. Le fasi seguenti \n"
 "configureranno Balsa ponendoti poche semplici domande. Dopo che avrai \n"
 "terminato, potrai comunque modificare le impostazioni nelle Preferenze.\n"
-"Se occorrer‡ creare qualche file o directory, verr‡ fatto automaticamente. \n"
+"Se occorrer√† creare qualche file o directory, verr√† fatto automaticamente. \n"
 "Controlla la finestra \"Informazioni su...\" per maggiori informazioni\n"
 "su come contattare gli autori o segnalare malfunzionamenti."
 
@@ -234,7 +234,7 @@ msgid ""
 "This will exit Balsa. Do you\n"
 "really want to do this?"
 msgstr ""
-"Questo chiuder‡ Balsa. \n"
+"Questo chiuder√† Balsa. \n"
 "Vuoi farlo davvero?"
 
 #: libinit_balsa/balsa-initdruid.gob:119
@@ -256,7 +256,7 @@ msgstr ""
 #: libinit_balsa/helper.c:159 libinit_balsa/helper.c:176
 #, c-format
 msgid "The file with pathname \"%s\" is not a directory."
-msgstr "Il file con percorso \"%s\" non Ë una directory."
+msgstr "Il file con percorso \"%s\" non √® una directory."
 
 #: libinit_balsa/init_balsa.c:36
 msgid "Configure Balsa"
@@ -268,7 +268,7 @@ msgstr "Lettura di %s... %d (%d%%)"
 
 #: libmutt/mbox.c:158 libmutt/mbox.c:217
 msgid "Mailbox is corrupt!"
-msgstr "La casella Ë rovinata\""
+msgstr "La casella √® rovinata\""
 
 #: libmutt/mbox.c:666
 msgid "Mailbox was corrupted!"
@@ -346,7 +346,7 @@ msgstr "Waiting for flock attempt... %d"
 #: libmutt/mx.c:459 libmutt/mx.c:605
 #, c-format
 msgid "%s is not a mailbox."
-msgstr "%s non Ë una casella di posta."
+msgstr "%s non √® una casella di posta."
 
 #: libmutt/mx.c:542
 #, fuzzy, c-format
@@ -371,11 +371,11 @@ msgstr "Non riesco a sincronizzare la cartella %s!"
 #: libmutt/mx.c:848
 #, c-format
 msgid "Moving read messages to %s..."
-msgstr "Spostamento dei messaggi gi‡ letti su %s..."
+msgstr "Spostamento dei messaggi gi√† letti su %s..."
 
 #: libmutt/mx.c:899 libmutt/mx.c:1056
 msgid "Mailbox is unchanged."
-msgstr "La casella non Ë cambiata."
+msgstr "La casella non √® cambiata."
 
 #: libmutt/mx.c:929
 #, c-format
@@ -399,7 +399,7 @@ msgstr "Usa 'toggle-write' per ri-abilitare la scrittura!"
 #: libmutt/mx.c:1045
 #, c-format
 msgid "Mailbox is marked unwritable. %s"
-msgstr "La casella Ë marcata 'non scrivibile'. %s"
+msgstr "La casella √® marcata 'non scrivibile'. %s"
 
 #: libmutt/mx.c:1050
 msgid "Mailbox is read-only."
@@ -510,11 +510,11 @@ msgstr "[data non valida]"
 
 #: libmutt/imap/imap_ssl.c:372
 msgid "Server certificate is not yet valid"
-msgstr "Il certificato del server non Ë valido"
+msgstr "Il certificato del server non √® valido"
 
 #: libmutt/imap/imap_ssl.c:379
 msgid "Server certificate has expired"
-msgstr "Il certificato del server Ë scaduto"
+msgstr "Il certificato del server √® scaduto"
 
 #: libmutt/imap/imap_ssl.c:452
 msgid "This certificate belongs to:"
@@ -522,11 +522,11 @@ msgstr "Questo certificato appartiene a:"
 
 #: libmutt/imap/imap_ssl.c:462
 msgid "This certificate was issued by:"
-msgstr "Questo certificato Ë stato rilasciato da:"
+msgstr "Questo certificato √® stato rilasciato da:"
 
 #: libmutt/imap/imap_ssl.c:472
 msgid "This certificate is valid"
-msgstr "Questo certificato Ë valido"
+msgstr "Questo certificato √® valido"
 
 #: libmutt/imap/imap_ssl.c:473
 #, c-format
@@ -647,7 +647,7 @@ msgstr "Rubrica LDAP"
 
 #: src/address-book-config.c:292
 msgid "Balsa is not compiled with LDAP support"
-msgstr "Balsa non Ë stato compilato per l'uso di LDAP"
+msgstr "Balsa non √® stato compilato per l'uso di LDAP"
 
 #. mailbox name
 #: src/address-book-config.c:312 src/address-book-config.c:370
@@ -683,7 +683,7 @@ msgid ""
 "The address book file path '%s' is not correct.\n"
 "Do you want to correct the file name?"
 msgstr ""
-"Il percorso per il file delle rubrica '%s' non Ë corretto.\n"
+"Il percorso per il file delle rubrica '%s' non √® corretto.\n"
 "Vuoi correggere il nome del file?"
 
 #: src/balsa-app.c:72
@@ -838,7 +838,7 @@ msgstr "Fcc:"
 
 #: src/balsa-message.c:708
 msgid "Could not load image. It is most likely corrupted."
-msgstr "Non riesco a caricare l'immagine. Probabilmente Ë rovinata."
+msgstr "Non riesco a caricare l'immagine. Probabilmente √® rovinata."
 
 #: src/balsa-message.c:713
 msgid "Couldn't render image\n"
@@ -847,7 +847,7 @@ msgstr "Non riesco a visualizzare l'immagine\n"
 #: src/balsa-message.c:771
 msgid "No open or view action defined in GNOME MIME for this content type"
 msgstr ""
-"Non Ë stato definito un gestore MIME per visualizzare questo tipo di "
+"Non √® stato definito un gestore MIME per visualizzare questo tipo di "
 "contenuto"
 
 #: src/balsa-message.c:775
@@ -944,11 +944,11 @@ msgstr "Attivo"
 
 #: src/filter-edit-dialog.c:194
 msgid "Up"
-msgstr "S˘"
+msgstr "S√π"
 
 #: src/filter-edit-dialog.c:200
 msgid "Down"
-msgstr "Gi˘"
+msgstr "Gi√π"
 
 #: src/filter-edit-dialog.c:218
 msgid "New"
@@ -1074,7 +1074,7 @@ msgid ""
 "system.\n"
 "Are you sure you want to remove this mailbox?"
 msgstr ""
-"Questo rimuover‡ la casella %s e i suoi file in modo permanente dal "
+"Questo rimuover√† la casella %s e i suoi file in modo permanente dal "
 "sistema.\n"
 "Sei sicuro di voler rimuovere questa casella?"
 
@@ -1085,8 +1085,8 @@ msgid ""
 "You may use \"Add Mailbox\" later to access this mailbox again\n"
 "Are you sure you want to remove this mailbox?"
 msgstr ""
-"Questo rimuover‡ la casella %s dalla lista della caselle\n"
-"Puoi usare \"Aggiungi casella\" pi˘ tardi per accedervi nuovamente\n"
+"Questo rimuover√† la casella %s dalla lista della caselle\n"
+"Puoi usare \"Aggiungi casella\" pi√π tardi per accedervi nuovamente\n"
 "Sei sicuro di voler rimuovere questa casella?"
 
 #: src/mailbox-conf.c:184
@@ -1156,7 +1156,7 @@ msgid ""
 "This is a mailbox in your local directory.\n"
 "Change the path instead."
 msgstr ""
-"Questa Ë una casella nella tua directory locale.\n"
+"Questa √® una casella nella tua directory locale.\n"
 "Cambia il percorso."
 
 #: src/mailbox-conf.c:653
@@ -1551,7 +1551,7 @@ msgid ""
 "\n"
 "If you need to report bugs, please do so at: http://bugs.gnome.org/"
 msgstr ""
-"Il programma di posta Balsa Ë parte dell'ambiente GNOME.  Informazioni su "
+"Il programma di posta Balsa √® parte dell'ambiente GNOME.  Informazioni su "
 "Balsa possono essere trovate a http://www.balsa.net\n"
 "\n"
 "Se devi segnalare malfunzionamenti, fallo a http://bugs.gnome.org"
@@ -1635,7 +1635,7 @@ msgstr "Chiudi"
 
 #: src/mblist-window.c:473
 msgid "Properties..."
-msgstr "Propriet‡..."
+msgstr "Propriet√†..."
 
 #: src/mblist-window.c:479
 msgid "Mark as Inbox"
@@ -1716,7 +1716,7 @@ msgstr "Mentre riceve i messaggi"
 
 #: src/pref-manager.c:192
 msgid "Until Closed"
-msgstr "FinchÈ non Ë chiuso"
+msgstr "Finch√© non √® chiuso"
 
 #: src/pref-manager.c:193
 msgid "Never"
@@ -1740,7 +1740,7 @@ msgstr "Preferenze di Balsa"
 
 #: src/pref-manager.c:236 src/pref-manager.c:992
 msgid "Identity"
-msgstr "Identit‡"
+msgstr "Identit√†"
 
 #: src/pref-manager.c:241 src/pref-manager.c:1074 src/pref-manager.c:1157
 msgid "Signature"
@@ -1784,7 +1784,7 @@ msgstr "Avvio"
 
 #: src/pref-manager.c:930
 msgid "Yes"
-msgstr "SÏ"
+msgstr "S√¨"
 
 #: src/pref-manager.c:1016
 msgid "Your name:"
@@ -2003,7 +2003,7 @@ msgstr "Livello dei suggerimenti"
 
 #: src/pref-manager.c:1822
 msgid "Ignore words shorter than"
-msgstr "Ignora le parole pi˘ corte di"
+msgstr "Ignora le parole pi√π corte di"
 
 #. ignore signature check box
 #: src/pref-manager.c:1830
@@ -2129,7 +2129,7 @@ msgid ""
 "Printing is not possible"
 msgstr ""
 "Balsa non riesce a trovare il carattere %s\n"
-"Non Ë possibile stampare"
+"Non √® possibile stampare"
 
 #: src/print.c:503
 msgid "Print mesage"
@@ -2400,7 +2400,7 @@ msgstr "Non riesco a trovare informazioni sul file '%s': %s\n"
 #: src/sendmsg-window.c:628
 #, c-format
 msgid "Attachment is not a regular file or cannot be read: '%s'\n"
-msgstr "L'allegato non Ë un file corretto o non puÚ essere letto: '%s'\n"
+msgstr "L'allegato non √® un file corretto o non pu√≤ essere letto: '%s'\n"
 
 #: src/sendmsg-window.c:693
 msgid "Attach file"
@@ -2572,7 +2572,7 @@ msgstr "Informazioni"
 
 #: src/store-address.c:243
 msgid "No address book selected...."
-msgstr "Nessuna rubrica Ë stata selezionata..."
+msgstr "Nessuna rubrica √® stata selezionata..."
 
 #: src/store-address.c:255
 msgid "Sorry, no semicolons are allowed in the name!\n"

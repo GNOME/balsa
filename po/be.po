@@ -9,7 +9,7 @@ msgstr ""
 "Last-Translator: Vital Khilko <dojlid@mova.org>\n"
 "Language-Team: Belarusian <i18n@mova.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CP1251\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.0\n"
 
@@ -18,8 +18,8 @@ msgid ""
 "Failed to initialise LDAP server.\n"
 "Check that the servername is valid."
 msgstr ""
-"Ня атрымалася йніцыялізаваць сэрвэр LDAP.\n"
-"Праверьце правільнасьць імя сэрвэру."
+"РќСЏ Р°С‚СЂС‹РјР°Р»Р°СЃСЏ Р№РЅС–С†С‹СЏР»С–Р·Р°РІР°С†СЊ СЃСЌСЂРІСЌСЂ LDAP.\n"
+"РџСЂР°РІРµСЂСЊС†Рµ РїСЂР°РІС–Р»СЊРЅР°СЃСЊС†СЊ С–РјСЏ СЃСЌСЂРІСЌСЂСѓ."
 
 #: libbalsa/address-book-ldap.c:213
 #, c-format
@@ -27,102 +27,102 @@ msgid ""
 "Failed to bind to server: %s\n"
 "Check that the servername is valid."
 msgstr ""
-"Ня атрымалася падключыцца да сэрвэру: %s\n"
-"Праверце правільнасьць імя сэрвэру."
+"РќСЏ Р°С‚СЂС‹РјР°Р»Р°СЃСЏ РїР°РґРєР»СЋС‡С‹С†С†Р° РґР° СЃСЌСЂРІСЌСЂСѓ: %s\n"
+"РџСЂР°РІРµСЂС†Рµ РїСЂР°РІС–Р»СЊРЅР°СЃСЊС†СЊ С–РјСЏ СЃСЌСЂРІСЌСЂСѓ."
 
 #: libbalsa/address-book-ldap.c:261 libbalsa/address-book-ldap.c:517
 #, c-format
 msgid "Failed to do a search: %sCheck that the base name is valid."
-msgstr "Ня атрымалася выканаць пошук: %s Праверце правільнасьць асноўнага ймя."
+msgstr "РќСЏ Р°С‚СЂС‹РјР°Р»Р°СЃСЏ РІС‹РєР°РЅР°С†СЊ РїРѕС€СѓРє: %s РџСЂР°РІРµСЂС†Рµ РїСЂР°РІС–Р»СЊРЅР°СЃСЊС†СЊ Р°СЃРЅРѕСћРЅР°РіР° Р№РјСЏ."
 
 #: libbalsa/address-book-ldap.c:328 libbalsa/address-book-vcard.c:274
 msgid "No-Id"
-msgstr "Няма ID"
+msgstr "РќСЏРјР° ID"
 
 #: libbalsa/address-book-ldap.c:332 libbalsa/address-book-vcard.c:283
 msgid "No-Name"
-msgstr "Няма ймя"
+msgstr "РќСЏРјР° Р№РјСЏ"
 
 #: libbalsa/address-book-vcard.c:193
 #, c-format
 msgid "Could not stat vcard address book: %s"
-msgstr "Ня атрымалася адчыніць кнігу адрэсаў vCard: %s."
+msgstr "РќСЏ Р°С‚СЂС‹РјР°Р»Р°СЃСЏ Р°РґС‡С‹РЅС–С†СЊ РєРЅС–РіСѓ Р°РґСЂСЌСЃР°Сћ vCard: %s."
 
 #: libbalsa/address-book-vcard.c:252
 #, c-format
 msgid "Could not open vCard address book %s."
-msgstr "Ня атрымалася адчыніць кнігу адрэсаў vCard %s."
+msgstr "РќСЏ Р°С‚СЂС‹РјР°Р»Р°СЃСЏ Р°РґС‡С‹РЅС–С†СЊ РєРЅС–РіСѓ Р°РґСЂСЌСЃР°Сћ vCard %s."
 
 #: libbalsa/address-book-vcard.c:421
 #, c-format
 msgid "%s is already in address book."
-msgstr "%s ужо ёсьць у кнізе адрэсаў."
+msgstr "%s СѓР¶Рѕ С‘СЃСЊС†СЊ Сѓ РєРЅС–Р·Рµ Р°РґСЂСЌСЃР°Сћ."
 
 #: libbalsa/address-book-vcard.c:431
 #, c-format
 msgid "Cannot open vCard address book %s for saving\n"
-msgstr "Ня атрымалася адчыніць кнігу адрэсаў vCard %s для захаваньня\n"
+msgstr "РќСЏ Р°С‚СЂС‹РјР°Р»Р°СЃСЏ Р°РґС‡С‹РЅС–С†СЊ РєРЅС–РіСѓ Р°РґСЂСЌСЃР°Сћ vCard %s РґР»СЏ Р·Р°С…Р°РІР°РЅСЊРЅСЏ\n"
 
 #: libbalsa/address-book.c:176
 #, c-format
 msgid "Cannot load address book %s"
-msgstr "Немагчыма загрузіць кнігу адрэсаў %s"
+msgstr "РќРµРјР°РіС‡С‹РјР° Р·Р°РіСЂСѓР·С–С†СЊ РєРЅС–РіСѓ Р°РґСЂСЌСЃР°Сћ %s"
 
 #: libbalsa/address-book.c:184
 #, c-format
 msgid "No such address book type: %s"
-msgstr "Няма кнігі адрэсаў такога тыпу: %s"
+msgstr "РќСЏРјР° РєРЅС–РіС– Р°РґСЂСЌСЃР°Сћ С‚Р°РєРѕРіР° С‚С‹РїСѓ: %s"
 
 #: libbalsa/address-book.c:194
 #, c-format
 msgid "Could not create a address book of type %s"
-msgstr "Немагчыма стварыць кнігу адрэсаў тыпу %s"
+msgstr "РќРµРјР°РіС‡С‹РјР° СЃС‚РІР°СЂС‹С†СЊ РєРЅС–РіСѓ Р°РґСЂСЌСЃР°Сћ С‚С‹РїСѓ %s"
 
 #: libbalsa/mailbox.c:301
 #, c-format
 msgid "Cannot load mailbox %s"
-msgstr "Немагчыма загрузіць паштовую скрыню %s"
+msgstr "РќРµРјР°РіС‡С‹РјР° Р·Р°РіСЂСѓР·С–С†СЊ РїР°С€С‚РѕРІСѓСЋ СЃРєСЂС‹РЅСЋ %s"
 
 #: libbalsa/mailbox.c:309
 #, c-format
 msgid "No such mailbox type: %s"
-msgstr "Няма такога тыпу паштовае скрыні: %s"
+msgstr "РќСЏРјР° С‚Р°РєРѕРіР° С‚С‹РїСѓ РїР°С€С‚РѕРІР°Рµ СЃРєСЂС‹РЅС–: %s"
 
 #: libbalsa/mailbox.c:326
 #, c-format
 msgid "Could not create a mailbox of type %s"
-msgstr "Немагчыма стварыць паштовую скрыню тыпу %s"
+msgstr "РќРµРјР°РіС‡С‹РјР° СЃС‚РІР°СЂС‹С†СЊ РїР°С€С‚РѕРІСѓСЋ СЃРєСЂС‹РЅСЋ С‚С‹РїСѓ %s"
 
 #: libbalsa/mailbox_imap.c:290
 #, c-format
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxImap: Адчынена %s Колькасьць спасылак: %d\n"
+msgstr "LibBalsaMailboxImap: РђРґС‡С‹РЅРµРЅР° %s РљРѕР»СЊРєР°СЃСЊС†СЊ СЃРїР°СЃС‹Р»Р°Рє: %d\n"
 
 #: libbalsa/mailbox_local.c:290
 #, c-format
 msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxLocal: Адчынена %s Колькасьць спасылак: %d\n"
+msgstr "LibBalsaMailboxLocal: РђРґС‡С‹РЅРµРЅР° %s РљРѕР»СЊРєР°СЃСЊС†СЊ СЃРїР°СЃС‹Р»Р°Рє: %d\n"
 
 #: libbalsa/mailbox_maildir.c:114
 #, c-format
 msgid "Mailbox %s does not appear to be a Maildir mailbox."
-msgstr "Верагодна паштовая скрыня \"%s\" не зьяўляецца скрыняй Maildir."
+msgstr "Р’РµСЂР°РіРѕРґРЅР° РїР°С€С‚РѕРІР°СЏ СЃРєСЂС‹РЅСЏ \"%s\" РЅРµ Р·СЊСЏСћР»СЏРµС†С†Р° СЃРєСЂС‹РЅСЏР№ Maildir."
 
 #: libbalsa/mailbox_maildir.c:123
 #, c-format
 msgid "Could not create a MailDir directory at %s (%s)"
-msgstr "Немагчыма стварыць каталёг MailDir у %s (%s)"
+msgstr "РќРµРјР°РіС‡С‹РјР° СЃС‚РІР°СЂС‹С†СЊ РєР°С‚Р°Р»С‘Рі MailDir Сѓ %s (%s)"
 
 #: libbalsa/mailbox_maildir.c:130 libbalsa/mailbox_maildir.c:138
 #: libbalsa/mailbox_maildir.c:148
 #, c-format
 msgid "Could not create a MailDir at %s (%s)"
-msgstr "Немагчыма стварыць MailDir у %s (%s)"
+msgstr "РќРµРјР°РіС‡С‹РјР° СЃС‚РІР°СЂС‹С†СЊ MailDir Сѓ %s (%s)"
 
 #: libbalsa/mailbox_maildir.c:207 libbalsa/mailbox_mh.c:184
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
-msgstr "Збой адкрыцьця %s. Нумар памылкі - %d, "
+msgstr "Р—Р±РѕР№ Р°РґРєСЂС‹С†СЊС†СЏ %s. РќСѓРјР°СЂ РїР°РјС‹Р»РєС– - %d, "
 
 #: libbalsa/mailbox_maildir.c:225 libbalsa/mailbox_mh.c:201
 #, c-format
@@ -130,7 +130,7 @@ msgid ""
 "Could not remove contents of %s:\n"
 "%s"
 msgstr ""
-"Ня атрымалася выдаліць зьмест %s:\n"
+"РќСЏ Р°С‚СЂС‹РјР°Р»Р°СЃСЏ РІС‹РґР°Р»С–С†СЊ Р·СЊРјРµСЃС‚ %s:\n"
 "%s"
 
 #: libbalsa/mailbox_maildir.c:231 libbalsa/mailbox_mbox.c:180
@@ -140,33 +140,33 @@ msgid ""
 "Could not remove %s:\n"
 "%s"
 msgstr ""
-"Немагчыма выдаліць %s:\n"
+"РќРµРјР°РіС‡С‹РјР° РІС‹РґР°Р»С–С†СЊ %s:\n"
 "%s"
 
 #: libbalsa/mailbox_mbox.c:113
 #, c-format
 msgid "Mailbox %s does not appear to be an Mbox mailbox."
-msgstr "Верагодна паштовая скрыня \"%s\" ня ў фармаце Mbox."
+msgstr "Р’РµСЂР°РіРѕРґРЅР° РїР°С€С‚РѕРІР°СЏ СЃРєСЂС‹РЅСЏ \"%s\" РЅСЏ Сћ С„Р°СЂРјР°С†Рµ Mbox."
 
 #: libbalsa/mailbox_mh.c:112
 #, c-format
 msgid "Mailbox %s does not appear to be a Mh mailbox."
-msgstr "Верагодна паштовая скрыня \"%s\" ня ў фармаце MH."
+msgstr "Р’РµСЂР°РіРѕРґРЅР° РїР°С€С‚РѕРІР°СЏ СЃРєСЂС‹РЅСЏ \"%s\" РЅСЏ Сћ С„Р°СЂРјР°С†Рµ MH."
 
 #: libbalsa/mailbox_mh.c:122
 #, c-format
 msgid "Could not create MH directory at %s (%s)"
-msgstr "Немагчыма стварыць каталёг MH у %s (%s)"
+msgstr "РќРµРјР°РіС‡С‹РјР° СЃС‚РІР°СЂС‹С†СЊ РєР°С‚Р°Р»С‘Рі MH Сѓ %s (%s)"
 
 #: libbalsa/mailbox_mh.c:129
 #, c-format
 msgid "Could not create MH structure at %s (%s)"
-msgstr "немагчыма стварыць структуру MH у %s (%s)"
+msgstr "РЅРµРјР°РіС‡С‹РјР° СЃС‚РІР°СЂС‹С†СЊ СЃС‚СЂСѓРєС‚СѓСЂСѓ MH Сѓ %s (%s)"
 
 #: libbalsa/mailbox_pop3.c:200
 #, c-format
 msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxPop3: Адчынена %s Колькасьць спасылак: %d\n"
+msgstr "LibBalsaMailboxPop3: РђРґС‡С‹РЅРµРЅР° %s РљРѕР»СЊРєР°СЃСЊС†СЊ СЃРїР°СЃС‹Р»Р°Рє: %d\n"
 
 #: libbalsa/mailbox_pop3.c:250
 #, c-format
@@ -174,181 +174,181 @@ msgid ""
 "POP3 mailbox %s accessing error:\n"
 "%s"
 msgstr ""
-"Памылка доступу да паштовае скрыні POP3 %s:\n"
+"РџР°РјС‹Р»РєР° РґРѕСЃС‚СѓРїСѓ РґР° РїР°С€С‚РѕРІР°Рµ СЃРєСЂС‹РЅС– POP3 %s:\n"
 "%s"
 
 #: libbalsa/pop3.c:48
 msgid "connection error"
-msgstr "памылка злучэньня"
+msgstr "РїР°РјС‹Р»РєР° Р·Р»СѓС‡СЌРЅСЊРЅСЏ"
 
 #: libbalsa/pop3.c:49
 msgid "POP command exection failed"
-msgstr "Збой выкананьня каманды POP"
+msgstr "Р—Р±РѕР№ РІС‹РєР°РЅР°РЅСЊРЅСЏ РєР°РјР°РЅРґС‹ POP"
 
 #: libbalsa/pop3.c:50
 msgid "Could not write the message"
-msgstr "Немагчыма запісаць ліст"
+msgstr "РќРµРјР°РіС‡С‹РјР° Р·Р°РїС–СЃР°С†СЊ Р»С–СЃС‚"
 
 #: libbalsa/pop3.c:51
 msgid "Could not run the delivery program (procmail)"
-msgstr "Ня атрымалася запусьціць праграму дастаўкі (procmail)"
+msgstr "РќСЏ Р°С‚СЂС‹РјР°Р»Р°СЃСЏ Р·Р°РїСѓСЃСЊС†С–С†СЊ РїСЂР°РіСЂР°РјСѓ РґР°СЃС‚Р°СћРєС– (procmail)"
 
 #: libbalsa/pop3.c:52
 msgid "Could not open mailbox for spooling"
-msgstr "Ня атрымалася адчыніць паштовую скрыню для назапашваньня"
+msgstr "РќСЏ Р°С‚СЂС‹РјР°Р»Р°СЃСЏ Р°РґС‡С‹РЅС–С†СЊ РїР°С€С‚РѕРІСѓСЋ СЃРєСЂС‹РЅСЋ РґР»СЏ РЅР°Р·Р°РїР°С€РІР°РЅСЊРЅСЏ"
 
 #: libbalsa/pop3.c:53
 msgid "Could not append message"
-msgstr "Ня атрымалася дадаць паведамленьне"
+msgstr "РќСЏ Р°С‚СЂС‹РјР°Р»Р°СЃСЏ РґР°РґР°С†СЊ РїР°РІРµРґР°РјР»РµРЅСЊРЅРµ"
 
 #: libbalsa/pop3.c:54
 msgid "Host not found"
-msgstr "Кампутар ня адшуканы"
+msgstr "РљР°РјРїСѓС‚Р°СЂ РЅСЏ Р°РґС€СѓРєР°РЅС‹"
 
 #: libbalsa/pop3.c:55
 msgid "Connection refused"
-msgstr "Злучэньне адкінутае"
+msgstr "Р—Р»СѓС‡СЌРЅСЊРЅРµ Р°РґРєС–РЅСѓС‚Р°Рµ"
 
 #: libbalsa/pop3.c:56
 msgid "Authentication failed"
-msgstr "Збой ідэнтыфікацыі"
+msgstr "Р—Р±РѕР№ С–РґСЌРЅС‚С‹С„С–РєР°С†С‹С–"
 
 #: libbalsa/pop3.c:323
 #, c-format
 msgid "Retrieving Message %d of %d"
-msgstr "Атрыманьне паведамленьня %d з %d"
+msgstr "РђС‚СЂС‹РјР°РЅСЊРЅРµ РїР°РІРµРґР°РјР»РµРЅСЊРЅСЏ %d Р· %d"
 
 #: libbalsa/pop3.c:336
 #, c-format
 msgid "Received %d bytes of %d"
-msgstr "Атрымана %d байтаў з %d"
+msgstr "РђС‚СЂС‹РјР°РЅР° %d Р±Р°Р№С‚Р°Сћ Р· %d"
 
 #. We create here the progress bar
 #: libbalsa/send.c:273 libbalsa/send.c:276
 msgid "Sending Mail..."
-msgstr "Адпраўка пошты..."
+msgstr "РђРґРїСЂР°СћРєР° РїРѕС€С‚С‹..."
 
 #: libbalsa/send.c:273
 msgid "Hide"
-msgstr "Схаваць"
+msgstr "РЎС…Р°РІР°С†СЊ"
 
 #: libbalsa/send.c:416
 msgid ""
 "SMTP protocol error. Cannot relay.\n"
 "Your message is left in Outbox."
 msgstr ""
-"Памылка пратаколу SMTP. Дастаўка немагчыма.\n"
-"Вашае паведамленьне засталося ў \"Зыходзячых\". "
+"РџР°РјС‹Р»РєР° РїСЂР°С‚Р°РєРѕР»Сѓ SMTP. Р”Р°СЃС‚Р°СћРєР° РЅРµРјР°РіС‡С‹РјР°.\n"
+"Р’Р°С€Р°Рµ РїР°РІРµРґР°РјР»РµРЅСЊРЅРµ Р·Р°СЃС‚Р°Р»РѕСЃСЏ Сћ \"Р—С‹С…РѕРґР·СЏС‡С‹С…\". "
 
 #: libbalsa/send.c:834
 #, c-format
 msgid "Error: Could not find address for host %s."
-msgstr "Памылка: Ня атрымалася адшукаць адрэсу хосту %s."
+msgstr "РџР°РјС‹Р»РєР°: РќСЏ Р°С‚СЂС‹РјР°Р»Р°СЃСЏ Р°РґС€СѓРєР°С†СЊ Р°РґСЂСЌСЃСѓ С…РѕСЃС‚Сѓ %s."
 
 #: libbalsa/send.c:844
 #, c-format
 msgid "Connecting to %s"
-msgstr "Злучэньне з %s"
+msgstr "Р—Р»СѓС‡СЌРЅСЊРЅРµ Р· %s"
 
 #: libbalsa/send.c:850
 #, c-format
 msgid "Error connecting to %s."
-msgstr "Памылка злучэньня з %s."
+msgstr "РџР°РјС‹Р»РєР° Р·Р»СѓС‡СЌРЅСЊРЅСЏ Р· %s."
 
 #.
 #. ISPRIME(9)
 #.
 #: libinit_balsa/balsa-druid-page-directory.gob:60
 msgid "Inbox:"
-msgstr "Уваходныя:"
+msgstr "РЈРІР°С…РѕРґРЅС‹СЏ:"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:60
 msgid "Outbox:"
-msgstr "Зыходзячыя:"
+msgstr "Р—С‹С…РѕРґР·СЏС‡С‹СЏ:"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:60
 msgid "Sentbox:"
-msgstr "Адасланыя:"
+msgstr "РђРґР°СЃР»Р°РЅС‹СЏ:"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:60
 msgid "Draftbox:"
-msgstr "Чарнавікі:"
+msgstr "Р§Р°СЂРЅР°РІС–РєС–:"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:60
 msgid "Trash:"
-msgstr "Сьметніца:"
+msgstr "РЎСЊРјРµС‚РЅС–С†Р°:"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:78
 #, c-format
 msgid ""
 "The pathname \"%s\" must be specified canonically -- it must start with a "
 "'/'."
-msgstr "Шлях \"%s\" павінны быць указаны кананічна -- ён павінны пачынацца з '/'"
+msgstr "РЁР»СЏС… \"%s\" РїР°РІС–РЅРЅС‹ Р±С‹С†СЊ СѓРєР°Р·Р°РЅС‹ РєР°РЅР°РЅС–С‡РЅР° -- С‘РЅ РїР°РІС–РЅРЅС‹ РїР°С‡С‹РЅР°С†С†Р° Р· '/'"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:101
 #, c-format
 msgid "The mailbox \"%s\" does not appear to be valid."
-msgstr "Верагодна паштовая скрыня \"%s\" сапсаваная."
+msgstr "Р’РµСЂР°РіРѕРґРЅР° РїР°С€С‚РѕРІР°СЏ СЃРєСЂС‹РЅСЏ \"%s\" СЃР°РїСЃР°РІР°РЅР°СЏ."
 
 #: libinit_balsa/balsa-druid-page-directory.gob:151
 msgid ""
 "Please verify the locations of your default mail files.\n"
 "These will be created if necessary."
 msgstr ""
-"Калі ласка, падцьвердзіце разьмеркаваньне вашых паштовых файлаў.\n"
-"Яны будуць створаны калі неабходна."
+"РљР°Р»С– Р»Р°СЃРєР°, РїР°РґС†СЊРІРµСЂРґР·С–С†Рµ СЂР°Р·СЊРјРµСЂРєР°РІР°РЅСЊРЅРµ РІР°С€С‹С… РїР°С€С‚РѕРІС‹С… С„Р°Р№Р»Р°Сћ.\n"
+"РЇРЅС‹ Р±СѓРґСѓС†СЊ СЃС‚РІРѕСЂР°РЅС‹ РєР°Р»С– РЅРµР°Р±С…РѕРґРЅР°."
 
 #: libinit_balsa/balsa-druid-page-directory.gob:194
 msgid "Mail Files"
-msgstr "Файлы з поштай"
+msgstr "Р¤Р°Р№Р»С‹ Р· РїРѕС€С‚Р°Р№"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:267
 msgid "Problem Creating Mailboxes"
-msgstr "Праблема пры стварэньні паштовае скрыні"
+msgstr "РџСЂР°Р±Р»РµРјР° РїСЂС‹ СЃС‚РІР°СЂСЌРЅСЊРЅС– РїР°С€С‚РѕРІР°Рµ СЃРєСЂС‹РЅС–"
 
 #: libinit_balsa/balsa-druid-page-finish.gob:45
 msgid ""
 "You've successfully set up Balsa. Have fun!\n"
 "   -- The Balsa development team"
 msgstr ""
-"Вы пасьпяхова ўсталявалі Balsa. Атрымлівайце асалоду!\n"
-"  -- Каманда распрацоўкіF Balsa"
+"Р’С‹ РїР°СЃСЊРїСЏС…РѕРІР° СћСЃС‚Р°Р»СЏРІР°Р»С– Balsa. РђС‚СЂС‹РјР»С–РІР°Р№С†Рµ Р°СЃР°Р»РѕРґСѓ!\n"
+"  -- РљР°РјР°РЅРґР° СЂР°СЃРїСЂР°С†РѕСћРєС–F Balsa"
 
 #: libinit_balsa/balsa-druid-page-finish.gob:57
 msgid "All Done!"
-msgstr "Усё зроблена!"
+msgstr "РЈСЃС‘ Р·СЂРѕР±Р»РµРЅР°!"
 
 #: libinit_balsa/balsa-druid-page-user.gob:75
 msgid "Please enter information about yourself."
-msgstr "Калі ласка, увядзіце йнфармацыю пра сябе."
+msgstr "РљР°Р»С– Р»Р°СЃРєР°, СѓРІСЏРґР·С–С†Рµ Р№РЅС„Р°СЂРјР°С†С‹СЋ РїСЂР° СЃСЏР±Рµ."
 
 #: libinit_balsa/balsa-druid-page-user.gob:83
 msgid "Name:"
-msgstr "Імя:"
+msgstr "Р†РјСЏ:"
 
 #: libinit_balsa/balsa-druid-page-user.gob:87
 msgid "Email address:"
-msgstr "E-mail адрэса:"
+msgstr "E-mail Р°РґСЂСЌСЃР°:"
 
 #: libinit_balsa/balsa-druid-page-user.gob:91
 msgid "SMTP Server:"
-msgstr "SMTP сэрвэр:"
+msgstr "SMTP СЃСЌСЂРІСЌСЂ:"
 
 #: libinit_balsa/balsa-druid-page-user.gob:94
 msgid "Local Mail Directory:"
-msgstr "Каталёг мясцовае пошты:"
+msgstr "РљР°С‚Р°Р»С‘Рі РјСЏСЃС†РѕРІР°Рµ РїРѕС€С‚С‹:"
 
 #: libinit_balsa/balsa-druid-page-user.gob:104
 msgid "User Settings"
-msgstr "Наладкі карыстальніку"
+msgstr "РќР°Р»Р°РґРєС– РєР°СЂС‹СЃС‚Р°Р»СЊРЅС–РєСѓ"
 
 #: libinit_balsa/balsa-druid-page-user.gob:156
 msgid "Local Mail Problem"
-msgstr "Лякальная паштовая праблема"
+msgstr "Р›СЏРєР°Р»СЊРЅР°СЏ РїР°С€С‚РѕРІР°СЏ РїСЂР°Р±Р»РµРјР°"
 
 #: libinit_balsa/balsa-druid-page-welcome.gob:47
 msgid "Welcome to Balsa!"
-msgstr "Balsa вітае  вас!"
+msgstr "Balsa РІС–С‚Р°Рµ  РІР°СЃ!"
 
 #: libinit_balsa/balsa-druid-page-welcome.gob:50
 msgid ""
@@ -360,46 +360,46 @@ msgid ""
 "main window for more information about contacting the authors or\n"
 "reporting bugs."
 msgstr ""
-"Здаецца вы запускаеце Balsa ў першы раз. Наступныя крокі дазволяць\n"
-"усталяваць Balsa адказаўшы на некалькі простых пытаньняў.\n"
-"Пасьля прахаджэньня гэтых крокаў, вы заўсёды зможаце зьмяніць іх\n"
-"пазьней у наладках Balsa. Калі якіясь файлы ці каталёгі павінны быць\n"
-"створаны, гэта будзе зроблена аўтаматычна. Для атрыманьня кантактнае\n"
-"йнфармацыі й паведамленьняў пра памылкі адчыніце вакно \"Пра праграму\"\n"
-"у мэню галоўнага вакна Balsa."
+"Р—РґР°РµС†С†Р° РІС‹ Р·Р°РїСѓСЃРєР°РµС†Рµ Balsa Сћ РїРµСЂС€С‹ СЂР°Р·. РќР°СЃС‚СѓРїРЅС‹СЏ РєСЂРѕРєС– РґР°Р·РІРѕР»СЏС†СЊ\n"
+"СѓСЃС‚Р°Р»СЏРІР°С†СЊ Balsa Р°РґРєР°Р·Р°СћС€С‹ РЅР° РЅРµРєР°Р»СЊРєС– РїСЂРѕСЃС‚С‹С… РїС‹С‚Р°РЅСЊРЅСЏСћ.\n"
+"РџР°СЃСЊР»СЏ РїСЂР°С…Р°РґР¶СЌРЅСЊРЅСЏ РіСЌС‚С‹С… РєСЂРѕРєР°Сћ, РІС‹ Р·Р°СћСЃС‘РґС‹ Р·РјРѕР¶Р°С†Рµ Р·СЊРјСЏРЅС–С†СЊ С–С…\n"
+"РїР°Р·СЊРЅРµР№ Сѓ РЅР°Р»Р°РґРєР°С… Balsa. РљР°Р»С– СЏРєС–СЏСЃСЊ С„Р°Р№Р»С‹ С†С– РєР°С‚Р°Р»С‘РіС– РїР°РІС–РЅРЅС‹ Р±С‹С†СЊ\n"
+"СЃС‚РІРѕСЂР°РЅС‹, РіСЌС‚Р° Р±СѓРґР·Рµ Р·СЂРѕР±Р»РµРЅР° Р°СћС‚Р°РјР°С‚С‹С‡РЅР°. Р”Р»СЏ Р°С‚СЂС‹РјР°РЅСЊРЅСЏ РєР°РЅС‚Р°РєС‚РЅР°Рµ\n"
+"Р№РЅС„Р°СЂРјР°С†С‹С– Р№ РїР°РІРµРґР°РјР»РµРЅСЊРЅСЏСћ РїСЂР° РїР°РјС‹Р»РєС– Р°РґС‡С‹РЅС–С†Рµ РІР°РєРЅРѕ \"РџСЂР° РїСЂР°РіСЂР°РјСѓ\"\n"
+"Сѓ РјСЌРЅСЋ РіР°Р»РѕСћРЅР°РіР° РІР°РєРЅР° Balsa."
 
 #: libinit_balsa/balsa-initdruid.gob:97
 msgid ""
 "This will exit Balsa. Do you\n"
 "really want to do this?"
 msgstr ""
-"Вы жадаеце\n"
-"выйсьці з Balsa?"
+"Р’С‹ Р¶Р°РґР°РµС†Рµ\n"
+"РІС‹Р№СЃСЊС†С– Р· Balsa?"
 
 #: libinit_balsa/balsa-initdruid.gob:119
 msgid "GnomeCard Address Book"
-msgstr "Кніга адрэсаў GnomeCard"
+msgstr "РљРЅС–РіР° Р°РґСЂСЌСЃР°Сћ GnomeCard"
 
 #: libinit_balsa/helper.c:142
 #, c-format
 msgid "The path %s must be relative to the filesystem root (start with /)."
 msgstr ""
-"Шлях %s павінны быць указаны адносна карэню файлавай сыстэмы (пачынаецца з "
+"РЁР»СЏС… %s РїР°РІС–РЅРЅС‹ Р±С‹С†СЊ СѓРєР°Р·Р°РЅС‹ Р°РґРЅРѕСЃРЅР° РєР°СЂСЌРЅСЋ С„Р°Р№Р»Р°РІР°Р№ СЃС‹СЃС‚СЌРјС‹ (РїР°С‡С‹РЅР°РµС†С†Р° Р· "
 "/)."
 
 #: libinit_balsa/helper.c:152 libinit_balsa/helper.c:170
 #, c-format
 msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
-msgstr "Не атрымалася стварыць каталёг: mkdir() failed on pathname \"%s\"."
+msgstr "РќРµ Р°С‚СЂС‹РјР°Р»Р°СЃСЏ СЃС‚РІР°СЂС‹С†СЊ РєР°С‚Р°Р»С‘Рі: mkdir() failed on pathname \"%s\"."
 
 #: libinit_balsa/helper.c:159 libinit_balsa/helper.c:176
 #, c-format
 msgid "The file with pathname \"%s\" is not a directory."
-msgstr "Файл з назвай \"%s\" не зьяўляецца каталёгам."
+msgstr "Р¤Р°Р№Р» Р· РЅР°Р·РІР°Р№ \"%s\" РЅРµ Р·СЊСЏСћР»СЏРµС†С†Р° РєР°С‚Р°Р»С‘РіР°Рј."
 
 #: libinit_balsa/init_balsa.c:36
 msgid "Configure Balsa"
-msgstr "Наладка Balsa"
+msgstr "РќР°Р»Р°РґРєР° Balsa"
 
 #. didn't find anything that we could display!
 #: libmutt/handler.c:1028
@@ -409,22 +409,22 @@ msgstr ""
 #: libmutt/handler.c:1145
 #, c-format
 msgid "[-- Attachment #%d"
-msgstr "[-- Укладаньне #%d"
+msgstr "[-- РЈРєР»Р°РґР°РЅСЊРЅРµ #%d"
 
 #: libmutt/handler.c:1156
 #, c-format
 msgid "[-- Type: %s/%s, Encoding: %s, Size: %s --]\n"
-msgstr "[-- Тып: %s/%s, Кадаваньне: %s, Памер: %s --]\n"
+msgstr "[-- РўС‹Рї: %s/%s, РљР°РґР°РІР°РЅСЊРЅРµ: %s, РџР°РјРµСЂ: %s --]\n"
 
 #: libmutt/handler.c:1215
 #, c-format
 msgid "[-- Autoview using %s --]\n"
-msgstr "[-- Аўтапрагляд з дапамогаю %s --]\n"
+msgstr "[-- РђСћС‚Р°РїСЂР°РіР»СЏРґ Р· РґР°РїР°РјРѕРіР°СЋ %s --]\n"
 
 #: libmutt/handler.c:1216
 #, c-format
 msgid "Invoking autoview command: %s"
-msgstr "Выклік каманды аўтапрагляду: %s"
+msgstr "Р’С‹РєР»С–Рє РєР°РјР°РЅРґС‹ Р°СћС‚Р°РїСЂР°РіР»СЏРґСѓ: %s"
 
 #: libmutt/handler.c:1253 libmutt/handler.c:1271
 #, c-format
@@ -438,26 +438,26 @@ msgstr ""
 #: libmutt/handler.c:1320
 #, c-format
 msgid "[-- This %s/%s attachment "
-msgstr "[-- Гэтае %s/%s укладаньне "
+msgstr "[-- Р“СЌС‚Р°Рµ %s/%s СѓРєР»Р°РґР°РЅСЊРЅРµ "
 
 #: libmutt/handler.c:1327
 #, c-format
 msgid "(size %s bytes) "
-msgstr "(памерам %s байтаў)"
+msgstr "(РїР°РјРµСЂР°Рј %s Р±Р°Р№С‚Р°Сћ)"
 
 #: libmutt/handler.c:1329
 msgid "has been deleted --]\n"
-msgstr "было выдалена --]\n"
+msgstr "Р±С‹Р»Рѕ РІС‹РґР°Р»РµРЅР° --]\n"
 
 #: libmutt/handler.c:1332
 #, c-format
 msgid "[-- on %s --]\n"
-msgstr "[-- на %s --]\n"
+msgstr "[-- РЅР° %s --]\n"
 
 #: libmutt/handler.c:1334
 #, c-format
 msgid "[-- name: %s --]\n"
-msgstr "[-- імя: %s --]\n"
+msgstr "[-- С–РјСЏ: %s --]\n"
 
 #: libmutt/handler.c:1345
 #, c-format
@@ -466,8 +466,8 @@ msgid ""
 "[-- and the indicated external source has --]\n"
 "[-- expired. --]\n"
 msgstr ""
-"[-- Гэтае %s/%s укладаньне не ўключана, --]\n"
-"[-- і пазначаны indicated external source has --]\n"
+"[-- Р“СЌС‚Р°Рµ %s/%s СѓРєР»Р°РґР°РЅСЊРЅРµ РЅРµ СћРєР»СЋС‡Р°РЅР°, --]\n"
+"[-- С– РїР°Р·РЅР°С‡Р°РЅС‹ indicated external source has --]\n"
 "[-- expired. --]\n"
 
 #: libmutt/handler.c:1359
@@ -476,8 +476,8 @@ msgid ""
 "[-- This %s/%s attachment is not included, --]\n"
 "[-- and the indicated access-type %s is unsupported --]\n"
 msgstr ""
-"[-- Гэтае %s/%s укладаньне не уключана, --]\n"
-"[-- і пазначаны тып доступу %s не падтрымліваецца --]\n"
+"[-- Р“СЌС‚Р°Рµ %s/%s СѓРєР»Р°РґР°РЅСЊРЅРµ РЅРµ СѓРєР»СЋС‡Р°РЅР°, --]\n"
+"[-- С– РїР°Р·РЅР°С‡Р°РЅС‹ С‚С‹Рї РґРѕСЃС‚СѓРїСѓ %s РЅРµ РїР°РґС‚СЂС‹РјР»С–РІР°РµС†С†Р° --]\n"
 
 #: libmutt/handler.c:1469
 msgid "Error: multipart/signed has no protocol."
@@ -489,174 +489,174 @@ msgstr ""
 
 #: libmutt/handler.c:1524
 msgid "Unable to open temporary file!"
-msgstr "Немагчыма адчыніць часовы файл!"
+msgstr "РќРµРјР°РіС‡С‹РјР° Р°РґС‡С‹РЅС–С†СЊ С‡Р°СЃРѕРІС‹ С„Р°Р№Р»!"
 
 #: libmutt/handler.c:1583
 #, c-format
 msgid "[-- %s/%s is unsupported "
-msgstr "[-- %s/%s не падтрымліваецца "
+msgstr "[-- %s/%s РЅРµ РїР°РґС‚СЂС‹РјР»С–РІР°РµС†С†Р° "
 
 #: libmutt/imap/auth_anon.c:39
 msgid "Authenticating (anonymous)..."
-msgstr "Ідэнтыфікацыя (anonymous)..."
+msgstr "Р†РґСЌРЅС‚С‹С„С–РєР°С†С‹СЏ (anonymous)..."
 
 #: libmutt/imap/auth_anon.c:69
 msgid "Anonymous authentication failed."
-msgstr "Збой ідэнтыфікацыі ў якасьці anonymous."
+msgstr "Р—Р±РѕР№ С–РґСЌРЅС‚С‹С„С–РєР°С†С‹С– Сћ СЏРєР°СЃСЊС†С– anonymous."
 
 #: libmutt/imap/auth_cram.c:44
 msgid "Authenticating (CRAM-MD5)..."
-msgstr "Ідэнтыфікацыя (CRAM-MD5)..."
+msgstr "Р†РґСЌРЅС‚С‹С„С–РєР°С†С‹СЏ (CRAM-MD5)..."
 
 #: libmutt/imap/auth_cram.c:124
 msgid "CRAM-MD5 authentication failed."
-msgstr "Збой ідэнтыфікацыі CRAM-MD5."
+msgstr "Р—Р±РѕР№ С–РґСЌРЅС‚С‹С„С–РєР°С†С‹С– CRAM-MD5."
 
 #. now begin login
 #: libmutt/imap/auth_gss.c:87
 msgid "Authenticating (GSSAPI)..."
-msgstr "Ідэнтыфікацыя (GSSAPI)..."
+msgstr "Р†РґСЌРЅС‚С‹С„С–РєР°С†С‹СЏ (GSSAPI)..."
 
 #: libmutt/imap/auth_gss.c:262
 msgid "GSSAPI authentication failed."
-msgstr "Збой ідэнтыфікацыі GSSAPI."
+msgstr "Р—Р±РѕР№ С–РґСЌРЅС‚С‹С„С–РєР°С†С‹С– GSSAPI."
 
 #: libmutt/imap/auth_login.c:34
 msgid "LOGIN disabled on this server."
-msgstr "LOGIN выключаны на гэтым сэрвэры."
+msgstr "LOGIN РІС‹РєР»СЋС‡Р°РЅС‹ РЅР° РіСЌС‚С‹Рј СЃСЌСЂРІСЌСЂС‹."
 
 #: libmutt/imap/auth_login.c:43
 msgid "Logging in..."
-msgstr "Рэгістрацыя..."
+msgstr "Р СЌРіС–СЃС‚СЂР°С†С‹СЏ..."
 
 #: libmutt/imap/auth_login.c:66
 msgid "Login failed."
-msgstr "Збой рэгістрацыі."
+msgstr "Р—Р±РѕР№ СЂСЌРіС–СЃС‚СЂР°С†С‹С–."
 
 #: libmutt/imap/auth_sasl.c:118
 msgid "Authenticating (SASL)..."
-msgstr "Ідэнтыфікацыя (SASL)..."
+msgstr "Р†РґСЌРЅС‚С‹С„С–РєР°С†С‹СЏ (SASL)..."
 
 #: libmutt/imap/auth_sasl.c:196
 msgid "SASL authentication failed."
-msgstr "Збой ідэнтыфікацыі SASL."
+msgstr "Р—Р±РѕР№ С–РґСЌРЅС‚С‹С„С–РєР°С†С‹С– SASL."
 
 #: libmutt/imap/browse.c:95
 msgid "Getting namespaces..."
-msgstr "Атрыманьне прасторы ймёнаў..."
+msgstr "РђС‚СЂС‹РјР°РЅСЊРЅРµ РїСЂР°СЃС‚РѕСЂС‹ Р№РјС‘РЅР°Сћ..."
 
 #: libmutt/imap/browse.c:104
 msgid "Getting folder list..."
-msgstr "Атрыманьне сьпісу папак..."
+msgstr "РђС‚СЂС‹РјР°РЅСЊРЅРµ СЃСЊРїС–СЃСѓ РїР°РїР°Рє..."
 
 #: libmutt/imap/browse.c:281
 msgid "Create mailbox: "
-msgstr "Стварыць паштовую скрыню: "
+msgstr "РЎС‚РІР°СЂС‹С†СЊ РїР°С€С‚РѕРІСѓСЋ СЃРєСЂС‹РЅСЋ: "
 
 #: libmutt/imap/browse.c:287
 msgid "Mailbox created."
-msgstr "Паштовая скрыня створана."
+msgstr "РџР°С€С‚РѕРІР°СЏ СЃРєСЂС‹РЅСЏ СЃС‚РІРѕСЂР°РЅР°."
 
 #. something is wrong because the server reported fewer messages
 #. * than we previously saw
 #.
 #: libmutt/imap/command.c:305
 msgid "Fatal error.  Message count is out of sync!"
-msgstr "Фатальная памылка. Колькасьць паведамленьняў не сынхранізавана!"
+msgstr "Р¤Р°С‚Р°Р»СЊРЅР°СЏ РїР°РјС‹Р»РєР°. РљРѕР»СЊРєР°СЃСЊС†СЊ РїР°РІРµРґР°РјР»РµРЅСЊРЅСЏСћ РЅРµ СЃС‹РЅС…СЂР°РЅС–Р·Р°РІР°РЅР°!"
 
 #: libmutt/imap/command.c:346
 #, c-format
 msgid "One of IMAP connections has been closed: %s"
-msgstr "Адно з IMAP падключэньняў было зачынена: %s"
+msgstr "РђРґРЅРѕ Р· IMAP РїР°РґРєР»СЋС‡СЌРЅСЊРЅСЏСћ Р±С‹Р»Рѕ Р·Р°С‡С‹РЅРµРЅР°: %s"
 
 #: libmutt/imap/imap.c:89
 #, c-format
 msgid "Closing connection to %s..."
-msgstr "Закрыцьцё злучэньня з %s..."
+msgstr "Р—Р°РєСЂС‹С†СЊС†С‘ Р·Р»СѓС‡СЌРЅСЊРЅСЏ Р· %s..."
 
 #: libmutt/imap/imap.c:295
 msgid "This IMAP server is ancient. Balsa does not work with it."
-msgstr "Гэты IMAP сэрвэр застары. Balsa не працуе з ім."
+msgstr "Р“СЌС‚С‹ IMAP СЃСЌСЂРІСЌСЂ Р·Р°СЃС‚Р°СЂС‹. Balsa РЅРµ РїСЂР°С†СѓРµ Р· С–Рј."
 
 #: libmutt/imap/imap.c:498
 #, c-format
 msgid "Selecting %s..."
-msgstr "Вылучэньне %s..."
+msgstr "Р’С‹Р»СѓС‡СЌРЅСЊРЅРµ %s..."
 
 #. STATUS not supported
 #: libmutt/imap/imap.c:668
 msgid "Unable to append to IMAP mailboxes at this server"
-msgstr "Ня атрымалася дадаць паштовыя скрыні IMAP на гэтым сэрвэры"
+msgstr "РќСЏ Р°С‚СЂС‹РјР°Р»Р°СЃСЏ РґР°РґР°С†СЊ РїР°С€С‚РѕРІС‹СЏ СЃРєСЂС‹РЅС– IMAP РЅР° РіСЌС‚С‹Рј СЃСЌСЂРІСЌСЂС‹"
 
 #. command failed cause folder doesn't exist
 #: libmutt/imap/imap.c:677 libmutt/imap/message.c:577
 #, c-format
 msgid "Create %s?"
-msgstr "Стварыць %s?"
+msgstr "РЎС‚РІР°СЂС‹С†СЊ %s?"
 
 #: libmutt/imap/imap.c:714
 msgid "Closing connection to IMAP server..."
-msgstr "Закрыцьцё злучэньня з IMAP сэрвэрам..."
+msgstr "Р—Р°РєСЂС‹С†СЊС†С‘ Р·Р»СѓС‡СЌРЅСЊРЅСЏ Р· IMAP СЃСЌСЂРІСЌСЂР°Рј..."
 
 #: libmutt/imap/imap.c:877
 #, c-format
 msgid "Marking %d messages deleted..."
-msgstr "Пазначэньне %d паведамленьняў для выдаленьня..."
+msgstr "РџР°Р·РЅР°С‡СЌРЅСЊРЅРµ %d РїР°РІРµРґР°РјР»РµРЅСЊРЅСЏСћ РґР»СЏ РІС‹РґР°Р»РµРЅСЊРЅСЏ..."
 
 #: libmutt/imap/imap.c:896
 #, c-format
 msgid "Saving message status flags... [%d/%d]"
-msgstr "Захаваньне сьцягоў стану паведамленьня... [%d/%d]"
+msgstr "Р—Р°С…Р°РІР°РЅСЊРЅРµ СЃСЊС†СЏРіРѕСћ СЃС‚Р°РЅСѓ РїР°РІРµРґР°РјР»РµРЅСЊРЅСЏ... [%d/%d]"
 
 #: libmutt/imap/imap.c:953
 msgid "Expunging messages from server..."
-msgstr "Выкрэсьленьне паведамленьняў з сэрвэру..."
+msgstr "Р’С‹РєСЂСЌСЃСЊР»РµРЅСЊРЅРµ РїР°РІРµРґР°РјР»РµРЅСЊРЅСЏСћ Р· СЃСЌСЂРІСЌСЂСѓ..."
 
 #: libmutt/imap/imap.c:1229
 #, c-format
 msgid "Subscribing to %s..."
-msgstr "Падпіска на %s..."
+msgstr "РџР°РґРїС–СЃРєР° РЅР° %s..."
 
 #: libmutt/imap/imap.c:1231
 #, c-format
 msgid "Unsubscribing to %s..."
-msgstr "Адмова ад падпіскі на %s..."
+msgstr "РђРґРјРѕРІР° Р°Рґ РїР°РґРїС–СЃРєС– РЅР° %s..."
 
 #. Unable to fetch headers for lower versions
 #: libmutt/imap/message.c:74
 msgid "Unable to fetch headers from this IMAP server version."
-msgstr "Ня магчыма атрымаць загалоўкі ад гэтае вэрсыі сэрвэру IMAP."
+msgstr "РќСЏ РјР°РіС‡С‹РјР° Р°С‚СЂС‹РјР°С†СЊ Р·Р°РіР°Р»РѕСћРєС– Р°Рґ РіСЌС‚Р°Рµ РІСЌСЂСЃС‹С– СЃСЌСЂРІСЌСЂСѓ IMAP."
 
 #: libmutt/imap/message.c:92
 #, c-format
 msgid "Fetching message headers... [%d/%d]"
-msgstr "Атрыманьне загалоўкаў паведамленьняў... [%d/%d]"
+msgstr "РђС‚СЂС‹РјР°РЅСЊРЅРµ Р·Р°РіР°Р»РѕСћРєР°Сћ РїР°РІРµРґР°РјР»РµРЅСЊРЅСЏСћ... [%d/%d]"
 
 #: libmutt/imap/message.c:237
 msgid "Fetching message..."
-msgstr "Атрыманьне паведамленьня..."
+msgstr "РђС‚СЂС‹РјР°РЅСЊРЅРµ РїР°РІРµРґР°РјР»РµРЅСЊРЅСЏ..."
 
 #: libmutt/imap/message.c:276
 msgid "The message index is incorrect. Try reopening the mailbox."
-msgstr "Індэкс паведамленьня памылковы. Паспрабуйце адчыніць паштовую скрыню яшчэ раз."
+msgstr "Р†РЅРґСЌРєСЃ РїР°РІРµРґР°РјР»РµРЅСЊРЅСЏ РїР°РјС‹Р»РєРѕРІС‹. РџР°СЃРїСЂР°Р±СѓР№С†Рµ Р°РґС‡С‹РЅС–С†СЊ РїР°С€С‚РѕРІСѓСЋ СЃРєСЂС‹РЅСЋ СЏС€С‡СЌ СЂР°Р·."
 
 #: libmutt/imap/message.c:467
 msgid "Uploading message ..."
-msgstr "Адпраўленьне паведамленьня..."
+msgstr "РђРґРїСЂР°СћР»РµРЅСЊРЅРµ РїР°РІРµРґР°РјР»РµРЅСЊРЅСЏ..."
 
 #: libmutt/imap/message.c:555
 #, c-format
 msgid "Copying %d messages to %s..."
-msgstr "Капіяваньне %d паведамленьняў у %s..."
+msgstr "РљР°РїС–СЏРІР°РЅСЊРЅРµ %d РїР°РІРµРґР°РјР»РµРЅСЊРЅСЏСћ Сѓ %s..."
 
 #: libmutt/imap/message.c:559
 #, c-format
 msgid "Copying message %d to %s..."
-msgstr "Капіяваньне паведамленьня %d у %s..."
+msgstr "РљР°РїС–СЏРІР°РЅСЊРЅРµ РїР°РІРµРґР°РјР»РµРЅСЊРЅСЏ %d Сѓ %s..."
 
 #: libmutt/imap/util.c:43
 msgid "Continue?"
-msgstr "Працягваць?"
+msgstr "РџСЂР°С†СЏРіРІР°С†СЊ?"
 
 #: libmutt/imap/util.c:49
 #, c-format
@@ -665,27 +665,27 @@ msgstr "%s [%s]\n"
 
 #: libmutt/mbox.c:134 libmutt/mbox.c:292
 msgid "Reading %s... %d (%d%%)"
-msgstr "Чытаньне %s... %d (%d%%)"
+msgstr "Р§С‹С‚Р°РЅСЊРЅРµ %s... %d (%d%%)"
 
 #: libmutt/mbox.c:158 libmutt/mbox.c:217
 msgid "Mailbox is corrupt!"
-msgstr "Паштовая скрыня пашкоджана!"
+msgstr "РџР°С€С‚РѕРІР°СЏ СЃРєСЂС‹РЅСЏ РїР°С€РєРѕРґР¶Р°РЅР°!"
 
 #: libmutt/mbox.c:666
 msgid "Mailbox was corrupted!"
-msgstr "Паштовая скрыня была пашкоджана!"
+msgstr "РџР°С€С‚РѕРІР°СЏ СЃРєСЂС‹РЅСЏ Р±С‹Р»Р° РїР°С€РєРѕРґР¶Р°РЅР°!"
 
 #: libmutt/mbox.c:703 libmutt/mbox.c:978
 msgid "Fatal error!  Could not reopen mailbox!"
-msgstr "Фатальная памылка! Немагчыма адчыніць паштовую скрыню!"
+msgstr "Р¤Р°С‚Р°Р»СЊРЅР°СЏ РїР°РјС‹Р»РєР°! РќРµРјР°РіС‡С‹РјР° Р°РґС‡С‹РЅС–С†СЊ РїР°С€С‚РѕРІСѓСЋ СЃРєСЂС‹РЅСЋ!"
 
 #: libmutt/mbox.c:712
 msgid "Unable to lock mailbox!"
-msgstr "Немагчыма заблякаваць паштовую скрыню!"
+msgstr "РќРµРјР°РіС‡С‹РјР° Р·Р°Р±Р»СЏРєР°РІР°С†СЊ РїР°С€С‚РѕРІСѓСЋ СЃРєСЂС‹РЅСЋ!"
 
 #: libmutt/mbox.c:741
 msgid "Could not create temporary file!"
-msgstr "Немагчыма стварыць часовы файл!"
+msgstr "РќРµРјР°РіС‡С‹РјР° СЃС‚РІР°СЂС‹С†СЊ С‡Р°СЃРѕРІС‹ С„Р°Р№Р»!"
 
 #. this means ctx->changed or ctx->deleted was set, but no
 #. * messages were found to be changed or deleted.  This should
@@ -693,95 +693,95 @@ msgstr "Немагчыма стварыць часовы файл!"
 #.
 #: libmutt/mbox.c:758
 msgid "sync: mbox modified, but no modified messages! (report this bug)"
-msgstr "sync: mbox зьменены, але няма зьмененых паведамленьняў! (паведаміце пра гэтую памылку)"
+msgstr "sync: mbox Р·СЊРјРµРЅРµРЅС‹, Р°Р»Рµ РЅСЏРјР° Р·СЊРјРµРЅРµРЅС‹С… РїР°РІРµРґР°РјР»РµРЅСЊРЅСЏСћ! (РїР°РІРµРґР°РјС–С†Рµ РїСЂР° РіСЌС‚СѓСЋ РїР°РјС‹Р»РєСѓ)"
 
 #: libmutt/mbox.c:788
 msgid "Writing messages... %d (%d%%)"
-msgstr "Запіс паведамленьняў... %d (%d%%)"
+msgstr "Р—Р°РїС–СЃ РїР°РІРµРґР°РјР»РµРЅСЊРЅСЏСћ... %d (%d%%)"
 
 #: libmutt/mbox.c:962
 #, c-format
 msgid "Write failed!  Saved partial mailbox to %s"
-msgstr "Збой падчас запісу! Захавана частка паштовае скрыні ў %s"
+msgstr "Р—Р±РѕР№ РїР°РґС‡Р°СЃ Р·Р°РїС–СЃСѓ! Р—Р°С…Р°РІР°РЅР° С‡Р°СЃС‚РєР° РїР°С€С‚РѕРІР°Рµ СЃРєСЂС‹РЅС– Сћ %s"
 
 #: libmutt/mbox.c:1028
 msgid "Could not reopen mailbox!"
-msgstr "Ня атрымалася адчыніць паштовую скрыню!"
+msgstr "РќСЏ Р°С‚СЂС‹РјР°Р»Р°СЃСЏ Р°РґС‡С‹РЅС–С†СЊ РїР°С€С‚РѕРІСѓСЋ СЃРєСЂС‹РЅСЋ!"
 
 #: libmutt/mbox.c:1066
 msgid "Reopening mailbox..."
-msgstr "Адкрыцьцё паштовае скрыні..."
+msgstr "РђРґРєСЂС‹С†СЊС†С‘ РїР°С€С‚РѕРІР°Рµ СЃРєСЂС‹РЅС–..."
 
 #: libmutt/mutt_socket.c:203
 msgid "SSL is unavailable."
-msgstr "SSL недаступны."
+msgstr "SSL РЅРµРґР°СЃС‚СѓРїРЅС‹."
 
 #: libmutt/mutt_socket.c:239
 msgid "Preconnect command failed."
-msgstr "Збой выкананьня каманды перад злучэньнем."
+msgstr "Р—Р±РѕР№ РІС‹РєР°РЅР°РЅСЊРЅСЏ РєР°РјР°РЅРґС‹ РїРµСЂР°Рґ Р·Р»СѓС‡СЌРЅСЊРЅРµРј."
 
 #: libmutt/mutt_socket.c:328 libmutt/mutt_socket.c:368
 #, c-format
 msgid "Looking up %s..."
-msgstr "Прагляд %s..."
+msgstr "РџСЂР°РіР»СЏРґ %s..."
 
 #: libmutt/mutt_socket.c:333 libmutt/mutt_socket.c:372
 #, c-format
 msgid "Could not find the host \"%s\""
-msgstr "Ня атрымалася адшукаць хост \"%s\""
+msgstr "РќСЏ Р°С‚СЂС‹РјР°Р»Р°СЃСЏ Р°РґС€СѓРєР°С†СЊ С…РѕСЃС‚ \"%s\""
 
 #: libmutt/mutt_socket.c:337 libmutt/mutt_socket.c:377
 #, c-format
 msgid "Connecting to %s..."
-msgstr "Падключэньне да %s..."
+msgstr "РџР°РґРєР»СЋС‡СЌРЅСЊРЅРµ РґР° %s..."
 
 #: libmutt/mutt_socket.c:400
 #, c-format
 msgid "Could not connect to %s (%s)."
-msgstr "Ня атрымалася падключыцца да %s (%s)."
+msgstr "РќСЏ Р°С‚СЂС‹РјР°Р»Р°СЃСЏ РїР°РґРєР»СЋС‡С‹С†С†Р° РґР° %s (%s)."
 
 #: libmutt/mutt_socket.c:401
 msgid "unknown error"
-msgstr "невядомая памылка"
+msgstr "РЅРµРІСЏРґРѕРјР°СЏ РїР°РјС‹Р»РєР°"
 
 #: libmutt/mutt_ssl.c:105
 msgid "Failed to find enough entropy on your system"
-msgstr "Ня атрымалася дастатковае энтрапіі ў вашае сыстэме"
+msgstr "РќСЏ Р°С‚СЂС‹РјР°Р»Р°СЃСЏ РґР°СЃС‚Р°С‚РєРѕРІР°Рµ СЌРЅС‚СЂР°РїС–С– Сћ РІР°С€Р°Рµ СЃС‹СЃС‚СЌРјРµ"
 
 #: libmutt/mutt_ssl.c:120
 #, c-format
 msgid "Filling entropy pool: %s...\n"
-msgstr "Запаўнеьне пулу энтрапіі: %s...\n"
+msgstr "Р—Р°РїР°СћРЅРµСЊРЅРµ РїСѓР»Сѓ СЌРЅС‚СЂР°РїС–С–: %s...\n"
 
 #: libmutt/mutt_ssl.c:128
 #, c-format
 msgid "%s has insecure permissions!"
-msgstr "%s мае небясьпечныя правы!"
+msgstr "%s РјР°Рµ РЅРµР±СЏСЃСЊРїРµС‡РЅС‹СЏ РїСЂР°РІС‹!"
 
 #: libmutt/mutt_ssl.c:147
 msgid "SSL disabled due the lack of entropy"
-msgstr "SSL адключаны з-за недахопу энтрапіі"
+msgstr "SSL Р°РґРєР»СЋС‡Р°РЅС‹ Р·-Р·Р° РЅРµРґР°С…РѕРїСѓ СЌРЅС‚СЂР°РїС–С–"
 
 #: libmutt/mutt_ssl.c:234
 msgid "Unable to get certificate from peer"
-msgstr "Немагчыма атрымаць сэртыфікат ад партнэру"
+msgstr "РќРµРјР°РіС‡С‹РјР° Р°С‚СЂС‹РјР°С†СЊ СЃСЌСЂС‚С‹С„С–РєР°С‚ Р°Рґ РїР°СЂС‚РЅСЌСЂСѓ"
 
 #: libmutt/mutt_ssl.c:245
 #, c-format
 msgid "SSL connection using %s (%s)"
-msgstr "SSL-падключэньне з выкарыстаньнем %s (%s)"
+msgstr "SSL-РїР°РґРєР»СЋС‡СЌРЅСЊРЅРµ Р· РІС‹РєР°СЂС‹СЃС‚Р°РЅСЊРЅРµРј %s (%s)"
 
 #: libmutt/mutt_ssl.c:275
 msgid "Unknown"
-msgstr "Невядома"
+msgstr "РќРµРІСЏРґРѕРјР°"
 
 #: libmutt/mutt_ssl.c:300
 msgid "[unable to calculate]"
-msgstr "[ня атрымалася вылічыць]"
+msgstr "[РЅСЏ Р°С‚СЂС‹РјР°Р»Р°СЃСЏ РІС‹Р»С–С‡С‹С†СЊ]"
 
 #: libmutt/mutt_ssl.c:318
 msgid "[invalid date]"
-msgstr "[памылковая дата]"
+msgstr "[РїР°РјС‹Р»РєРѕРІР°СЏ РґР°С‚Р°]"
 
 #: libmutt/mutt_ssl.c:393
 msgid "Server certificate is not yet valid"
@@ -793,34 +793,34 @@ msgstr ""
 
 #: libmutt/mutt_ssl.c:476
 msgid "This certificate belongs to:"
-msgstr "Гэты сэртыфікат належыць:"
+msgstr "Р“СЌС‚С‹ СЃСЌСЂС‚С‹С„С–РєР°С‚ РЅР°Р»РµР¶С‹С†СЊ:"
 
 #: libmutt/mutt_ssl.c:486
 msgid "This certificate was issued by:"
-msgstr "Гэты сэртыфікат выдаў:"
+msgstr "Р“СЌС‚С‹ СЃСЌСЂС‚С‹С„С–РєР°С‚ РІС‹РґР°Сћ:"
 
 #: libmutt/mutt_ssl.c:496
 msgid "This certificate is valid"
-msgstr "Гэты сэртыфікат сапраўдны"
+msgstr "Р“СЌС‚С‹ СЃСЌСЂС‚С‹С„С–РєР°С‚ СЃР°РїСЂР°СћРґРЅС‹"
 
 #: libmutt/mutt_ssl.c:497
 #, c-format
 msgid "   from %s"
-msgstr "  з %s"
+msgstr "  Р· %s"
 
 #: libmutt/mutt_ssl.c:499
 #, c-format
 msgid "     to %s"
-msgstr "  па %s"
+msgstr "  РїР° %s"
 
 #: libmutt/mutt_ssl.c:505
 #, c-format
 msgid "Fingerprint: %s"
-msgstr "\"Адбітак пальцу\": %s"
+msgstr "\"РђРґР±С–С‚Р°Рє РїР°Р»СЊС†Сѓ\": %s"
 
 #: libmutt/mutt_ssl.c:507
 msgid "SSL Certificate check"
-msgstr "Праверка SSL-сэртыфікату"
+msgstr "РџСЂР°РІРµСЂРєР° SSL-СЃСЌСЂС‚С‹С„С–РєР°С‚Сѓ"
 
 #: libmutt/mutt_ssl.c:510
 msgid "(r)eject, accept (o)nce, (a)ccept always"
@@ -840,178 +840,178 @@ msgstr ""
 
 #: libmutt/mutt_ssl.c:520
 msgid "Exit  "
-msgstr "Выхад"
+msgstr "Р’С‹С…Р°Рґ"
 
 #: libmutt/mutt_ssl.c:522
 msgid "Help"
-msgstr "Даведка"
+msgstr "Р”Р°РІРµРґРєР°"
 
 #: libmutt/mutt_ssl.c:545
 msgid "Warning: Couldn't save certificate"
-msgstr "Увага: ня атрымалася захаваць сэртыфікат"
+msgstr "РЈРІР°РіР°: РЅСЏ Р°С‚СЂС‹РјР°Р»Р°СЃСЏ Р·Р°С…Р°РІР°С†СЊ СЃСЌСЂС‚С‹С„С–РєР°С‚"
 
 #: libmutt/mutt_ssl.c:547
 msgid "Certificate saved"
-msgstr "Сэртыфікат захаваны"
+msgstr "РЎСЌСЂС‚С‹С„С–РєР°С‚ Р·Р°С…Р°РІР°РЅС‹"
 
 #: libmutt/mx.c:119
 #, c-format
 msgid "Lock count exceeded, remove lock for %s?"
-msgstr "Перавышана колькасьць блякаваньняў, выдаліць блякаваньне з %s?"
+msgstr "РџРµСЂР°РІС‹С€Р°РЅР° РєРѕР»СЊРєР°СЃСЊС†СЊ Р±Р»СЏРєР°РІР°РЅСЊРЅСЏСћ, РІС‹РґР°Р»С–С†СЊ Р±Р»СЏРєР°РІР°РЅСЊРЅРµ Р· %s?"
 
 #: libmutt/mx.c:131
 #, c-format
 msgid "Can't dotlock %s.\n"
-msgstr "Немагчыма выканаць dotlock %s.\n"
+msgstr "РќРµРјР°РіС‡С‹РјР° РІС‹РєР°РЅР°С†СЊ dotlock %s.\n"
 
 #: libmutt/mx.c:189
 msgid "Timeout exceeded while attempting fcntl lock!"
-msgstr "Вычарпаны час чаканьня пры спробе выканаць fcntl lock!"
+msgstr "Р’С‹С‡Р°СЂРїР°РЅС‹ С‡Р°СЃ С‡Р°РєР°РЅСЊРЅСЏ РїСЂС‹ СЃРїСЂРѕР±Рµ РІС‹РєР°РЅР°С†СЊ fcntl lock!"
 
 #: libmutt/mx.c:195
 #, c-format
 msgid "Waiting for fcntl lock... %d"
-msgstr "Чаканьне fcntl lock... %d"
+msgstr "Р§Р°РєР°РЅСЊРЅРµ fcntl lock... %d"
 
 #: libmutt/mx.c:223
 msgid "Timeout exceeded while attempting flock lock!"
-msgstr "Вычарпаны час чаканьня пры спробе выканаць flock lock!"
+msgstr "Р’С‹С‡Р°СЂРїР°РЅС‹ С‡Р°СЃ С‡Р°РєР°РЅСЊРЅСЏ РїСЂС‹ СЃРїСЂРѕР±Рµ РІС‹РєР°РЅР°С†СЊ flock lock!"
 
 #: libmutt/mx.c:230
 #, c-format
 msgid "Waiting for flock attempt... %d"
-msgstr "Чаканьне заканчэньня спробы выканаць flock ... %d"
+msgstr "Р§Р°РєР°РЅСЊРЅРµ Р·Р°РєР°РЅС‡СЌРЅСЊРЅСЏ СЃРїСЂРѕР±С‹ РІС‹РєР°РЅР°С†СЊ flock ... %d"
 
 #: libmutt/mx.c:459 libmutt/mx.c:605
 #, c-format
 msgid "%s is not a mailbox."
-msgstr "%s не зьяўляецца паштовай скрыняй."
+msgstr "%s РЅРµ Р·СЊСЏСћР»СЏРµС†С†Р° РїР°С€С‚РѕРІР°Р№ СЃРєСЂС‹РЅСЏР№."
 
 #: libmutt/mx.c:542
 #, c-format
 msgid "Couldn't lock %s\n"
-msgstr "Немагчыма заблякаваць %s\n"
+msgstr "РќРµРјР°РіС‡С‹РјР° Р·Р°Р±Р»СЏРєР°РІР°С†СЊ %s\n"
 
 #: libmutt/mx.c:630
 #, c-format
 msgid "Reading %s..."
-msgstr "Чытаньне %s..."
+msgstr "Р§С‹С‚Р°РЅСЊРЅРµ %s..."
 
 #: libmutt/mx.c:719
 #, c-format
 msgid "Writing %s..."
-msgstr "Запіс %s..."
+msgstr "Р—Р°РїС–СЃ %s..."
 
 #: libmutt/mx.c:746
 #, c-format
 msgid "Could not synchronize mailbox %s!"
-msgstr "Немагчыма сынхранізаваць паштовую скрыню %s!"
+msgstr "РќРµРјР°РіС‡С‹РјР° СЃС‹РЅС…СЂР°РЅС–Р·Р°РІР°С†СЊ РїР°С€С‚РѕРІСѓСЋ СЃРєСЂС‹РЅСЋ %s!"
 
 #: libmutt/mx.c:848
 #, c-format
 msgid "Moving read messages to %s..."
-msgstr "Перамяшчэньне прачытаных паведамленьняў у %s..."
+msgstr "РџРµСЂР°РјСЏС€С‡СЌРЅСЊРЅРµ РїСЂР°С‡С‹С‚Р°РЅС‹С… РїР°РІРµРґР°РјР»РµРЅСЊРЅСЏСћ Сѓ %s..."
 
 #: libmutt/mx.c:899 libmutt/mx.c:1056
 msgid "Mailbox is unchanged."
-msgstr "Паштовая скрыня не зьмянялася."
+msgstr "РџР°С€С‚РѕРІР°СЏ СЃРєСЂС‹РЅСЏ РЅРµ Р·СЊРјСЏРЅСЏР»Р°СЃСЏ."
 
 #: libmutt/mx.c:929
 #, c-format
 msgid "%d kept, %d moved, %d deleted."
-msgstr "%d захавана, %d перенесена, %d выдалена."
+msgstr "%d Р·Р°С…Р°РІР°РЅР°, %d РїРµСЂРµРЅРµСЃРµРЅР°, %d РІС‹РґР°Р»РµРЅР°."
 
 #: libmutt/mx.c:932 libmutt/mx.c:1098
 #, c-format
 msgid "%d kept, %d deleted."
-msgstr "%d захавана, %d выдалена."
+msgstr "%d Р·Р°С…Р°РІР°РЅР°, %d РІС‹РґР°Р»РµРЅР°."
 
 #: libmutt/mx.c:1040
 #, c-format
 msgid " Press '%s' to toggle write"
-msgstr " Націсьніце \"%s\", каб пераключыць запіс"
+msgstr " РќР°С†С–СЃСЊРЅС–С†Рµ \"%s\", РєР°Р± РїРµСЂР°РєР»СЋС‡С‹С†СЊ Р·Р°РїС–СЃ"
 
 #: libmutt/mx.c:1043
 msgid "Use 'toggle-write' to re-enable write!"
-msgstr "Выкарыстоўвайце \"toggle-write\", каб паўторна дазволіць запіс!"
+msgstr "Р’С‹РєР°СЂС‹СЃС‚РѕСћРІР°Р№С†Рµ \"toggle-write\", РєР°Р± РїР°СћС‚РѕСЂРЅР° РґР°Р·РІРѕР»С–С†СЊ Р·Р°РїС–СЃ!"
 
 #: libmutt/mx.c:1045
 #, c-format
 msgid "Mailbox is marked unwritable. %s"
-msgstr "Паштовая скрыня адзначана як не для запісу. %s"
+msgstr "РџР°С€С‚РѕРІР°СЏ СЃРєСЂС‹РЅСЏ Р°РґР·РЅР°С‡Р°РЅР° СЏРє РЅРµ РґР»СЏ Р·Р°РїС–СЃСѓ. %s"
 
 #: libmutt/mx.c:1050
 msgid "Mailbox is read-only."
-msgstr "Паштовая скрыня толькі для чытаньня."
+msgstr "РџР°С€С‚РѕРІР°СЏ СЃРєСЂС‹РЅСЏ С‚РѕР»СЊРєС– РґР»СЏ С‡С‹С‚Р°РЅСЊРЅСЏ."
 
 #: libmutt/mx.c:1065
 #, c-format
 msgid "Purge %d deleted message?"
-msgstr "Выкінуць %d выдаленае паведамленьне?"
+msgstr "Р’С‹РєС–РЅСѓС†СЊ %d РІС‹РґР°Р»РµРЅР°Рµ РїР°РІРµРґР°РјР»РµРЅСЊРЅРµ?"
 
 #: libmutt/mx.c:1065
 #, c-format
 msgid "Purge %d deleted messages?"
-msgstr "Выкінуць %d выдаленых паведамленьняў?"
+msgstr "Р’С‹РєС–РЅСѓС†СЊ %d РІС‹РґР°Р»РµРЅС‹С… РїР°РІРµРґР°РјР»РµРЅСЊРЅСЏСћ?"
 
 #: libmutt/mx.c:1095
 #, c-format
 msgid "%d kept."
-msgstr "%d захавана."
+msgstr "%d Р·Р°С…Р°РІР°РЅР°."
 
 #: libmutt/mx.c:1375
 msgid "Can't write message"
-msgstr "Немагчыма запісаць ліст"
+msgstr "РќРµРјР°РіС‡С‹РјР° Р·Р°РїС–СЃР°С†СЊ Р»С–СЃС‚"
 
 #: src/address-book-config.c:100
 msgid "Address Book Configuration"
-msgstr "Наладка кнігі адрэсаў"
+msgstr "РќР°Р»Р°РґРєР° РєРЅС–РіС– Р°РґСЂСЌСЃР°Сћ"
 
 #: src/address-book-config.c:135 src/folder-conf.c:64 src/mailbox-conf.c:298
 msgid "Update"
-msgstr "Абнавіць"
+msgstr "РђР±РЅР°РІС–С†СЊ"
 
 #: src/address-book-config.c:256
 msgid "New Address Book type:"
-msgstr "Новы тып кнігі адрэсаў:"
+msgstr "РќРѕРІС‹ С‚С‹Рї РєРЅС–РіС– Р°РґСЂСЌСЃР°Сћ:"
 
 #: src/address-book-config.c:266
 msgid "VCard Address Book (GnomeCard)"
-msgstr "Кніга адрэсаў VCard (GnomeCard)"
+msgstr "РљРЅС–РіР° Р°РґСЂСЌСЃР°Сћ VCard (GnomeCard)"
 
 #: src/address-book-config.c:284
 msgid "LDAP Address Book"
-msgstr "Кніга адрэса LDAP"
+msgstr "РљРЅС–РіР° Р°РґСЂСЌСЃР° LDAP"
 
 #: src/address-book-config.c:293
 msgid "Balsa is not compiled with LDAP support"
-msgstr "Balsa скампілявана без падтрымкі LDAP"
+msgstr "Balsa СЃРєР°РјРїС–Р»СЏРІР°РЅР° Р±РµР· РїР°РґС‚СЂС‹РјРєС– LDAP"
 
 #. mailbox name
 #: src/address-book-config.c:313 src/address-book-config.c:371
 msgid "Address Book Name:"
-msgstr "Назва кнігі адрэсаў:"
+msgstr "РќР°Р·РІР° РєРЅС–РіС– Р°РґСЂСЌСЃР°Сћ:"
 
 #: src/address-book-config.c:322
 msgid "File name"
-msgstr "Назва файлу"
+msgstr "РќР°Р·РІР° С„Р°Р№Р»Сѓ"
 
 #: src/address-book-config.c:334 src/address-book-config.c:405
 msgid "Expand aliases as you type"
-msgstr "Пашыраць псэўданімы пры наборы"
+msgstr "РџР°С€С‹СЂР°С†СЊ РїСЃСЌСћРґР°РЅС–РјС‹ РїСЂС‹ РЅР°Р±РѕСЂС‹"
 
 #: src/address-book-config.c:382
 msgid "Host name"
-msgstr "Імя хосту"
+msgstr "Р†РјСЏ С…РѕСЃС‚Сѓ"
 
 #: src/address-book-config.c:393
 msgid "Base Domain Name"
-msgstr "Асноўнае домэнае ймя"
+msgstr "РђСЃРЅРѕСћРЅР°Рµ РґРѕРјСЌРЅР°Рµ Р№РјСЏ"
 
 #: src/address-book-config.c:460 src/filter-edit-dialog.c:379
 #: src/mailbox-conf.c:287 src/pref-manager.c:1228 src/pref-manager.c:1970
 msgid "Add"
-msgstr "Дадаць"
+msgstr "Р”Р°РґР°С†СЊ"
 
 #: src/address-book-config.c:507
 #, c-format
@@ -1019,50 +1019,50 @@ msgid ""
 "The address book file path '%s' is not correct.\n"
 "Do you want to correct the file name?"
 msgstr ""
-"Шлях да файлу кнігі адрэсу \"%s\" не карэктны.\n"
-"Жадаеце выправіць імя файлу?"
+"РЁР»СЏС… РґР° С„Р°Р№Р»Сѓ РєРЅС–РіС– Р°РґСЂСЌСЃСѓ \"%s\" РЅРµ РєР°СЂСЌРєС‚РЅС‹.\n"
+"Р–Р°РґР°РµС†Рµ РІС‹РїСЂР°РІС–С†СЊ С–РјСЏ С„Р°Р№Р»Сѓ?"
 
 #: src/address-book.c:161 src/filter-edit-dialog.c:130
 msgid "Name"
-msgstr "Імя"
+msgstr "Р†РјСЏ"
 
 #: src/address-book.c:161
 msgid "E-Mail Address"
-msgstr "Электронная адрэса"
+msgstr "Р­Р»РµРєС‚СЂРѕРЅРЅР°СЏ Р°РґСЂСЌСЃР°"
 
 #: src/address-book.c:164
 msgid "Address Book"
-msgstr "Кніга адрэсаў"
+msgstr "РљРЅС–РіР° Р°РґСЂСЌСЃР°Сћ"
 
 #. Entry widget for finding an address
 #: src/address-book.c:243
 msgid "Search for Name:"
-msgstr "Пошук імя:"
+msgstr "РџРѕС€СѓРє С–РјСЏ:"
 
 #: src/address-book.c:311
 msgid "Send-To"
-msgstr "Даслаць"
+msgstr "Р”Р°СЃР»Р°С†СЊ"
 
 #: src/address-book.c:330
 msgid "Run GnomeCard"
-msgstr "Запусьціць GnomeCard"
+msgstr "Р—Р°РїСѓСЃСЊС†С–С†СЊ GnomeCard"
 
 #: src/address-book.c:338
 msgid "Re-Import"
-msgstr "Рэймпартаваць"
+msgstr "Р СЌР№РјРїР°СЂС‚Р°РІР°С†СЊ"
 
 #. mode switching stuff
 #: src/address-book.c:347
 msgid "Treat multiple addresses as:"
-msgstr "Разглядаць мноственыя адрэсы як:"
+msgstr "Р Р°Р·РіР»СЏРґР°С†СЊ РјРЅРѕСЃС‚РІРµРЅС‹СЏ Р°РґСЂСЌСЃС‹ СЏРє:"
 
 #: src/address-book.c:351
 msgid "alternative addresses for the same person"
-msgstr "альтэрнатыўныя адрэсы для той жа асобы"
+msgstr "Р°Р»СЊС‚СЌСЂРЅР°С‚С‹СћРЅС‹СЏ Р°РґСЂСЌСЃС‹ РґР»СЏ С‚РѕР№ Р¶Р° Р°СЃРѕР±С‹"
 
 #: src/address-book.c:356
 msgid "a distribution list"
-msgstr "сьпіс рассылкі"
+msgstr "СЃСЊРїС–СЃ СЂР°СЃСЃС‹Р»РєС–"
 
 #: src/balsa-app.c:67
 #, c-format
@@ -1070,158 +1070,158 @@ msgid ""
 "Opening remote mailbox %s.\n"
 "The password for %s@%s:"
 msgstr ""
-"Адкрыцьцё аддаленае паштовае скрыні %s.\n"
-"Пароль для %s@%s:"
+"РђРґРєСЂС‹С†СЊС†С‘ Р°РґРґР°Р»РµРЅР°Рµ РїР°С€С‚РѕРІР°Рµ СЃРєСЂС‹РЅС– %s.\n"
+"РџР°СЂРѕР»СЊ РґР»СЏ %s@%s:"
 
 #: src/balsa-app.c:71
 #, c-format
 msgid "Mailbox password for %s@%s:"
-msgstr "Пароль для паштовае скрыні %s@%s:"
+msgstr "РџР°СЂРѕР»СЊ РґР»СЏ РїР°С€С‚РѕРІР°Рµ СЃРєСЂС‹РЅС– %s@%s:"
 
 #. FIXME:
 #: src/balsa-index.c:267
 msgid "From"
-msgstr "Адпраўляльнік"
+msgstr "РђРґРїСЂР°СћР»СЏР»СЊРЅС–Рє"
 
 #: src/balsa-index.c:268 src/filter-edit-dialog.c:326
 msgid "Subject"
-msgstr "Тэма"
+msgstr "РўСЌРјР°"
 
 #: src/balsa-index.c:269
 msgid "Date"
-msgstr "Дата"
+msgstr "Р”Р°С‚Р°"
 
 #: src/balsa-index.c:569
 #, c-format
 msgid "Opening mailbox %s. Please wait..."
-msgstr "Адкрыцьцё паштовае скрыні %s. Калі ласка, пачакайце..."
+msgstr "РђРґРєСЂС‹С†СЊС†С‘ РїР°С€С‚РѕРІР°Рµ СЃРєСЂС‹РЅС– %s. РљР°Р»С– Р»Р°СЃРєР°, РїР°С‡Р°РєР°Р№С†Рµ..."
 
 #: src/balsa-index.c:601
 msgid "To"
-msgstr "Каму"
+msgstr "РљР°РјСѓ"
 
 #: src/balsa-index.c:1806
 msgid "Cannot access the message's body\n"
-msgstr "Няма доступу да зьместу гэтага паведамленьня\n"
+msgstr "РќСЏРјР° РґРѕСЃС‚СѓРїСѓ РґР° Р·СЊРјРµСЃС‚Сѓ РіСЌС‚Р°РіР° РїР°РІРµРґР°РјР»РµРЅСЊРЅСЏ\n"
 
 #: src/balsa-index.c:1843
 msgid "Reply..."
-msgstr "Адказ..."
+msgstr "РђРґРєР°Р·..."
 
 #: src/balsa-index.c:1847
 msgid "Reply To All..."
-msgstr "Адказаць усім..."
+msgstr "РђРґРєР°Р·Р°С†СЊ СѓСЃС–Рј..."
 
 #: src/balsa-index.c:1851
 msgid "Reply To Group..."
-msgstr "Адказаць групе..."
+msgstr "РђРґРєР°Р·Р°С†СЊ РіСЂСѓРїРµ..."
 
 #: src/balsa-index.c:1855
 msgid "Forward..."
-msgstr "Пераслаць..."
+msgstr "РџРµСЂР°СЃР»Р°С†СЊ..."
 
 #: src/balsa-index.c:1860
 msgid "Undelete"
-msgstr "Аднавіць"
+msgstr "РђРґРЅР°РІС–С†СЊ"
 
 #: src/balsa-index.c:1863 src/filter-edit-dialog.c:224 src/mailbox-node.c:560
 #: src/main-window.c:550 src/pref-manager.c:1230 src/pref-manager.c:1972
 msgid "Delete"
-msgstr "Выдаліць"
+msgstr "Р’С‹РґР°Р»С–С†СЊ"
 
 #: src/balsa-index.c:1867
 msgid "Move To Trash"
-msgstr "Адправіць у сьметніцу"
+msgstr "РђРґРїСЂР°РІС–С†СЊ Сѓ СЃСЊРјРµС‚РЅС–С†Сѓ"
 
 #: src/balsa-index.c:1872
 msgid "Store Address..."
-msgstr "Захаваць адрэсу..."
+msgstr "Р—Р°С…Р°РІР°С†СЊ Р°РґСЂСЌСЃСѓ..."
 
 #: src/balsa-index.c:1875
 msgid "Toggle"
-msgstr "Пераключыць"
+msgstr "РџРµСЂР°РєР»СЋС‡С‹С†СЊ"
 
 #: src/balsa-index.c:1878 src/main-window.c:371
 msgid "Flagged"
-msgstr "Cыгналізуемае"
+msgstr "CС‹РіРЅР°Р»С–Р·СѓРµРјР°Рµ"
 
 #: src/balsa-index.c:1881 src/balsa-mblist.c:483
 msgid "Unread"
-msgstr "Непрачытанае"
+msgstr "РќРµРїСЂР°С‡С‹С‚Р°РЅР°Рµ"
 
 #: src/balsa-index.c:1892
 msgid "Transfer"
-msgstr "Перадаць"
+msgstr "РџРµСЂР°РґР°С†СЊ"
 
 #: src/balsa-mblist.c:483 src/mailbox-conf.c:850
 msgid "Mailbox"
-msgstr "Паштовая скрыня"
+msgstr "РџР°С€С‚РѕРІР°СЏ СЃРєСЂС‹РЅСЏ"
 
 #: src/balsa-mblist.c:483
 msgid "Total"
-msgstr "Агулам"
+msgstr "РђРіСѓР»Р°Рј"
 
 #: src/balsa-mblist.c:962
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
-msgstr "Паказана паштовая скрыня: %s з %ld паведамленьнямі, %ld новых"
+msgstr "РџР°РєР°Р·Р°РЅР° РїР°С€С‚РѕРІР°СЏ СЃРєСЂС‹РЅСЏ: %s Р· %ld РїР°РІРµРґР°РјР»РµРЅСЊРЅСЏРјС–, %ld РЅРѕРІС‹С…"
 
 #: src/balsa-message.c:303 src/balsa-message.c:306
 msgid "Save MIME Part"
-msgstr "Захаваць MIME-закадаваную частку"
+msgstr "Р—Р°С…Р°РІР°С†СЊ MIME-Р·Р°РєР°РґР°РІР°РЅСѓСЋ С‡Р°СЃС‚РєСѓ"
 
 #: src/balsa-message.c:304
 msgid "Save"
-msgstr "Захаваць"
+msgstr "Р—Р°С…Р°РІР°С†СЊ"
 
 #: src/balsa-message.c:304 src/folder-conf.c:191 src/mailbox-conf.c:165
 #: src/mailbox-conf.c:175 src/sendmsg-window.c:160 src/sendmsg-window.c:630
 msgid "Cancel"
-msgstr "Адмяніць"
+msgstr "РђРґРјСЏРЅС–С†СЊ"
 
 #: src/balsa-message.c:316
 msgid "Please choose a filename to save this part of the message as:"
-msgstr "Абярыце ймя файлу для захаваньня гэтае часткі паведамленьня:"
+msgstr "РђР±СЏСЂС‹С†Рµ Р№РјСЏ С„Р°Р№Р»Сѓ РґР»СЏ Р·Р°С…Р°РІР°РЅСЊРЅСЏ РіСЌС‚Р°Рµ С‡Р°СЃС‚РєС– РїР°РІРµРґР°РјР»РµРЅСЊРЅСЏ:"
 
 #: src/balsa-message.c:346
 msgid "File already exists. Overwrite?"
-msgstr "Файл ужо йснуе. Перапісаць?"
+msgstr "Р¤Р°Р№Р» СѓР¶Рѕ Р№СЃРЅСѓРµ. РџРµСЂР°РїС–СЃР°С†СЊ?"
 
 #: src/balsa-message.c:362
 #, c-format
 msgid " Could not save %s:%s "
-msgstr "Немагчыма захаваць %s:%s "
+msgstr "РќРµРјР°РіС‡С‹РјР° Р·Р°С…Р°РІР°С†СЊ %s:%s "
 
 #. Subject:
 #: src/balsa-message.c:672 src/print.c:166 src/sendmsg-window.c:960
 msgid "Subject:"
-msgstr "Тэма:"
+msgstr "РўСЌРјР°:"
 
 #: src/balsa-message.c:675 src/print.c:169
 msgid "Date:"
-msgstr "Дата:"
+msgstr "Р”Р°С‚Р°:"
 
 #. From:
 #: src/balsa-message.c:680 src/filter-edit-dialog.c:316 src/print.c:156
 #: src/sendmsg-window.c:951
 msgid "From:"
-msgstr "Ад:"
+msgstr "РђРґ:"
 
 #. To:
 #: src/balsa-message.c:684 src/filter-edit-dialog.c:306 src/print.c:161
 #: src/sendmsg-window.c:954
 msgid "To:"
-msgstr "Каму:"
+msgstr "РљР°РјСѓ:"
 
 #. cc:
 #: src/balsa-message.c:685 src/sendmsg-window.c:962
 msgid "Cc:"
-msgstr "Афіцыйныя копіі (Сс):"
+msgstr "РђС„С–С†С‹Р№РЅС‹СЏ РєРѕРїС–С– (РЎСЃ):"
 
 #. bcc:
 #: src/balsa-message.c:686 src/sendmsg-window.c:966
 msgid "Bcc:"
-msgstr "Схаваныя копіі:"
+msgstr "РЎС…Р°РІР°РЅС‹СЏ РєРѕРїС–С–:"
 
 #. fcc:
 #: src/balsa-message.c:689 src/sendmsg-window.c:970
@@ -1234,42 +1234,42 @@ msgstr ""
 
 #: src/balsa-message.c:762
 msgid "Could not load image. It is most likely corrupted."
-msgstr "Ня атрымалася загрузіць відарыс. Ён хутчэй за ўсё сапсавана."
+msgstr "РќСЏ Р°С‚СЂС‹РјР°Р»Р°СЃСЏ Р·Р°РіСЂСѓР·С–С†СЊ РІС–РґР°СЂС‹СЃ. РЃРЅ С…СѓС‚С‡СЌР№ Р·Р° СћСЃС‘ СЃР°РїСЃР°РІР°РЅР°."
 
 #: src/balsa-message.c:767
 msgid "Couldn't render image\n"
-msgstr "Ня атрымалася адрасаваць відарыс\n"
+msgstr "РќСЏ Р°С‚СЂС‹РјР°Р»Р°СЃСЏ Р°РґСЂР°СЃР°РІР°С†СЊ РІС–РґР°СЂС‹СЃ\n"
 
 #: src/balsa-message.c:778
 msgid "balsa/pixbuf: Could not load image. It is likely corrupted."
 msgstr ""
-"balsa/pixbuf: Ня атрымалася загрузіць відарыс. Ён хутчэй за ўсё "
-"сапсавана."
+"balsa/pixbuf: РќСЏ Р°С‚СЂС‹РјР°Р»Р°СЃСЏ Р·Р°РіСЂСѓР·С–С†СЊ РІС–РґР°СЂС‹СЃ. РЃРЅ С…СѓС‚С‡СЌР№ Р·Р° СћСЃС‘ "
+"СЃР°РїСЃР°РІР°РЅР°."
 
 #: src/balsa-message.c:827
 msgid "No open or view action defined in GNOME MIME for this content type"
 msgstr ""
-"Няма дзеяньня для прагляду вызначанага ў GNOME MIME для гэтага тыпу "
-"зьместу"
+"РќСЏРјР° РґР·РµСЏРЅСЊРЅСЏ РґР»СЏ РїСЂР°РіР»СЏРґСѓ РІС‹Р·РЅР°С‡Р°РЅР°РіР° Сћ GNOME MIME РґР»СЏ РіСЌС‚Р°РіР° С‚С‹РїСѓ "
+"Р·СЊРјРµСЃС‚Сѓ"
 
 #: src/balsa-message.c:831
 #, c-format
 msgid "Content Type: %s"
-msgstr "Тып зьместу: %s"
+msgstr "РўС‹Рї Р·СЊРјРµСЃС‚Сѓ: %s"
 
 #: src/balsa-message.c:836
 #, c-format
 msgid "Filename: %s"
-msgstr "Імя файлу: %s"
+msgstr "Р†РјСЏ С„Р°Р№Р»Сѓ: %s"
 
 #: src/balsa-message.c:844
 msgid "Save part"
-msgstr "Захаваць частку"
+msgstr "Р—Р°С…Р°РІР°С†СЊ С‡Р°СЃС‚РєСѓ"
 
 #: src/balsa-message.c:868
 #, c-format
 msgid "View part with %s"
-msgstr "Прагледзіць частку ў %s"
+msgstr "РџСЂР°РіР»РµРґР·С–С†СЊ С‡Р°СЃС‚РєСѓ Сћ %s"
 
 #: src/balsa-message.c:1146
 #, c-format
@@ -1277,26 +1277,26 @@ msgid ""
 "Error writing to temporary file %s.\n"
 "Check the directory permissions."
 msgstr ""
-"Памылка запісу ў часовы файл %s.\n"
-"Праверце правы на каталёг."
+"РџР°РјС‹Р»РєР° Р·Р°РїС–СЃСѓ Сћ С‡Р°СЃРѕРІС‹ С„Р°Р№Р» %s.\n"
+"РџСЂР°РІРµСЂС†Рµ РїСЂР°РІС‹ РЅР° РєР°С‚Р°Р»С‘Рі."
 
 #: src/balsa-message.c:1154
 #, c-format
 msgid "Cannot open temporary file %s."
-msgstr "Ня атрымалася адчыніць часовы файл %s."
+msgstr "РќСЏ Р°С‚СЂС‹РјР°Р»Р°СЃСЏ Р°РґС‡С‹РЅС–С†СЊ С‡Р°СЃРѕРІС‹ С„Р°Р№Р» %s."
 
 #: src/balsa-message.c:1471
 msgid "Save..."
-msgstr "Захаваць..."
+msgstr "Р—Р°С…Р°РІР°С†СЊ..."
 
 #: src/balsa-message.c:1528
 #, c-format
 msgid "could not create temporary file %s"
-msgstr "немагчыма стварыць часовы файл %s"
+msgstr "РЅРµРјР°РіС‡С‹РјР° СЃС‚РІР°СЂС‹С†СЊ С‡Р°СЃРѕРІС‹ С„Р°Р№Р» %s"
 
 #: src/balsa-message.c:2031
 msgid "reply to MDN?"
-msgstr "адказаць MDN?"
+msgstr "Р°РґРєР°Р·Р°С†СЊ MDN?"
 
 #: src/balsa-message.c:2043
 #, c-format
@@ -1308,232 +1308,232 @@ msgstr ""
 
 #: src/filter-edit-dialog.c:31
 msgid "Inbound"
-msgstr "Увахожыя"
+msgstr "РЈРІР°С…РѕР¶С‹СЏ"
 
 #: src/filter-edit-dialog.c:32
 msgid "Outbound"
-msgstr "Зыходзячыя"
+msgstr "Р—С‹С…РѕРґР·СЏС‡С‹СЏ"
 
 #: src/filter-edit-dialog.c:33
 msgid "Before Sending"
-msgstr "Перад адпраўкай"
+msgstr "РџРµСЂР°Рґ Р°РґРїСЂР°СћРєР°Р№"
 
 #: src/filter-edit-dialog.c:34
 msgid "Demand"
-msgstr "Патрабаваць"
+msgstr "РџР°С‚СЂР°Р±Р°РІР°С†СЊ"
 
 #: src/filter-edit-dialog.c:38
 msgid "Matches"
-msgstr "Супадзеньні"
+msgstr "РЎСѓРїР°РґР·РµРЅСЊРЅС–"
 
 #: src/filter-edit-dialog.c:39
 msgid "Doesn't Match"
-msgstr "Няма супадзеньняў"
+msgstr "РќСЏРјР° СЃСѓРїР°РґР·РµРЅСЊРЅСЏСћ"
 
 #: src/filter-edit-dialog.c:40 src/pref-manager.c:2222
 msgid "Always"
-msgstr "Заўсёды"
+msgstr "Р—Р°СћСЃС‘РґС‹"
 
 #: src/filter-edit-dialog.c:44
 msgid "Simple"
-msgstr "Простае"
+msgstr "РџСЂРѕСЃС‚Р°Рµ"
 
 #: src/filter-edit-dialog.c:45
 msgid "Regular Expression"
-msgstr "Сталы выраз"
+msgstr "РЎС‚Р°Р»С‹ РІС‹СЂР°Р·"
 
 #: src/filter-edit-dialog.c:46
 msgid "External Command"
-msgstr "Вонкавая каманда"
+msgstr "Р’РѕРЅРєР°РІР°СЏ РєР°РјР°РЅРґР°"
 
 #: src/filter-edit-dialog.c:50
 msgid "Copy to folder:"
-msgstr "Скапіяваць у тэчку:"
+msgstr "РЎРєР°РїС–СЏРІР°С†СЊ Сѓ С‚СЌС‡РєСѓ:"
 
 #: src/filter-edit-dialog.c:51
 msgid "Move to folder:"
-msgstr "Перанесьці ў тэчку:"
+msgstr "РџРµСЂР°РЅРµСЃСЊС†С– Сћ С‚СЌС‡РєСѓ:"
 
 #: src/filter-edit-dialog.c:52
 msgid "Print on printer:"
-msgstr "Раздрукаваць:"
+msgstr "Р Р°Р·РґСЂСѓРєР°РІР°С†СЊ:"
 
 #: src/filter-edit-dialog.c:53
 msgid "Run program:"
-msgstr "Запусьціць праграму:"
+msgstr "Р—Р°РїСѓСЃСЊС†С–С†СЊ РїСЂР°РіСЂР°РјСѓ:"
 
 #: src/filter-edit-dialog.c:54
 msgid "Send to Trash"
-msgstr "Адправіць у сьметніцу"
+msgstr "РђРґРїСЂР°РІС–С†СЊ Сѓ СЃСЊРјРµС‚РЅС–С†Сѓ"
 
 #: src/filter-edit-dialog.c:129
 msgid "On"
-msgstr "Укл."
+msgstr "РЈРєР»."
 
 #: src/filter-edit-dialog.c:194
 msgid "Up"
-msgstr "Угору"
+msgstr "РЈРіРѕСЂСѓ"
 
 #: src/filter-edit-dialog.c:200
 msgid "Down"
-msgstr "Уніз"
+msgstr "РЈРЅС–Р·"
 
 #: src/filter-edit-dialog.c:218 src/mailbox-node.c:541 src/main-window.c:378
 msgid "New"
-msgstr "Новы"
+msgstr "РќРѕРІС‹"
 
 #: src/filter-edit-dialog.c:263
 msgid "Match in:"
-msgstr "Параўнаць:"
+msgstr "РџР°СЂР°СћРЅР°С†СЊ:"
 
 #: src/filter-edit-dialog.c:276
 msgid "All"
-msgstr "Дзе заўгодна"
+msgstr "Р”Р·Рµ Р·Р°СћРіРѕРґРЅР°"
 
 #: src/filter-edit-dialog.c:286
 msgid "Header"
-msgstr "У загалоўке"
+msgstr "РЈ Р·Р°РіР°Р»РѕСћРєРµ"
 
 #: src/filter-edit-dialog.c:296
 msgid "Body"
-msgstr "У тэксце лісту"
+msgstr "РЈ С‚СЌРєСЃС†Рµ Р»С–СЃС‚Сѓ"
 
 #: src/filter-edit-dialog.c:337
 msgid "Match string:"
-msgstr "Радок для параўнаньня:"
+msgstr "Р Р°РґРѕРє РґР»СЏ РїР°СЂР°СћРЅР°РЅСЊРЅСЏ:"
 
 #: src/filter-edit-dialog.c:384 src/sendmsg-window.c:581
 msgid "Remove"
-msgstr "Выдаліць"
+msgstr "Р’С‹РґР°Р»С–С†СЊ"
 
 #: src/filter-edit-dialog.c:404
 msgid "Command:"
-msgstr "Каманда:"
+msgstr "РљР°РјР°РЅРґР°:"
 
 #. The name entry
 #: src/filter-edit-dialog.c:436
 msgid "Filter name:"
-msgstr "Імя фільтру:"
+msgstr "Р†РјСЏ С„С–Р»СЊС‚СЂСѓ:"
 
 #. The "Process when:" option menu
 #: src/filter-edit-dialog.c:451
 msgid "Process when:"
-msgstr "Выконваць падчас:"
+msgstr "Р’С‹РєРѕРЅРІР°С†СЊ РїР°РґС‡Р°СЃ:"
 
 #. The "Run on:" option menu
 #: src/filter-edit-dialog.c:472
 msgid "Run on:"
-msgstr "Што фільтраваць:"
+msgstr "РЁС‚Рѕ С„С–Р»СЊС‚СЂР°РІР°С†СЊ:"
 
 #. the type notebook's option menu
 #: src/filter-edit-dialog.c:491
 msgid "Search type:"
-msgstr "Тып пошуку:"
+msgstr "РўС‹Рї РїРѕС€СѓРєСѓ:"
 
 #. The notification area
 #: src/filter-edit-dialog.c:538
 msgid "Notification:"
-msgstr "Паведамленьне:"
+msgstr "РџР°РІРµРґР°РјР»РµРЅСЊРЅРµ:"
 
 #. Notification buttons
 #: src/filter-edit-dialog.c:547
 msgid "Play sound:"
-msgstr "Гукавы сыгнал:"
+msgstr "Р“СѓРєР°РІС‹ СЃС‹РіРЅР°Р»:"
 
 #: src/filter-edit-dialog.c:554
 msgid "Use Sound..."
-msgstr "Сыгнал..."
+msgstr "РЎС‹РіРЅР°Р»..."
 
 #: src/filter-edit-dialog.c:559
 msgid "Popup text:"
-msgstr "Паведамленьне:"
+msgstr "РџР°РІРµРґР°РјР»РµРЅСЊРЅРµ:"
 
 #. The action area
 #: src/filter-edit-dialog.c:574
 msgid "Action to perform:"
-msgstr "Дзеяньне:"
+msgstr "Р”Р·РµСЏРЅСЊРЅРµ:"
 
 #. The disposition area
 #: src/filter-edit-dialog.c:597
 msgid "Disposition:"
-msgstr "Дзеяньне:"
+msgstr "Р”Р·РµСЏРЅСЊРЅРµ:"
 
 #: src/filter-edit-dialog.c:608
 msgid "Place/leave in default folder"
-msgstr "Разьмесьціць/пакінуць у тыповай тэчцы"
+msgstr "Р Р°Р·СЊРјРµСЃСЊС†С–С†СЊ/РїР°РєС–РЅСѓС†СЊ Сѓ С‚С‹РїРѕРІР°Р№ С‚СЌС‡С†С‹"
 
 #: src/filter-edit-dialog.c:615
 msgid "Do not place/leave in default folder"
-msgstr "Не разьмяшчаць/не пакідаць у тыповай тэчцы"
+msgstr "РќРµ СЂР°Р·СЊРјСЏС€С‡Р°С†СЊ/РЅРµ РїР°РєС–РґР°С†СЊ Сѓ С‚С‹РїРѕРІР°Р№ С‚СЌС‡С†С‹"
 
 #: src/filter-edit-dialog.c:622
 msgid "Stop filtering here"
-msgstr "Спыніць фільтраваньне"
+msgstr "РЎРїС‹РЅС–С†СЊ С„С–Р»СЊС‚СЂР°РІР°РЅСЊРЅРµ"
 
 #: src/filter-edit-dialog.c:650
 msgid "Match"
-msgstr "Параўнаць"
+msgstr "РџР°СЂР°СћРЅР°С†СЊ"
 
 #: src/filter-edit-dialog.c:653
 msgid "Action"
-msgstr "Дзеяньне"
+msgstr "Р”Р·РµСЏРЅСЊРЅРµ"
 
 #: src/filter-edit-dialog.c:666
 msgid "Revert"
-msgstr "Аднавіць"
+msgstr "РђРґРЅР°РІС–С†СЊ"
 
 #: src/filter-edit-dialog.c:693
 msgid "Balsa Filters"
-msgstr "Фільтры Balsa"
+msgstr "Р¤С–Р»СЊС‚СЂС‹ Balsa"
 
 #: src/folder-conf.c:63
 msgid "Remote IMAP folder"
-msgstr "Аддалены IMAP сэрвэр"
+msgstr "РђРґРґР°Р»РµРЅС‹ IMAP СЃСЌСЂРІСЌСЂ"
 
 #: src/folder-conf.c:64
 msgid "Create"
-msgstr "Стварыць"
+msgstr "РЎС‚РІР°СЂС‹С†СЊ"
 
 #: src/folder-conf.c:73
 msgid "Remote IMAP folder set"
-msgstr "Набор тэчак аддаленага IMAP сэрвэру"
+msgstr "РќР°Р±РѕСЂ С‚СЌС‡Р°Рє Р°РґРґР°Р»РµРЅР°РіР° IMAP СЃСЌСЂРІСЌСЂСѓ"
 
 #. INPUT FIELD CREATION
 #: src/folder-conf.c:80
 msgid "Descriptive _Name:"
-msgstr "Апісальнае ймя:"
+msgstr "РђРїС–СЃР°Р»СЊРЅР°Рµ Р№РјСЏ:"
 
 #. pop server
 #: src/folder-conf.c:85 src/mailbox-conf.c:727 src/mailbox-conf.c:788
 msgid "_Server:"
-msgstr "Сэрвэр:"
+msgstr "РЎСЌСЂРІСЌСЂ:"
 
 #. pop port
 #: src/folder-conf.c:90 src/mailbox-conf.c:733 src/mailbox-conf.c:795
 msgid "_Port:"
-msgstr "Порт:"
+msgstr "РџРѕСЂС‚:"
 
 #: src/folder-conf.c:99
 msgid "_User name:"
-msgstr "Імя карыстальніку:"
+msgstr "Р†РјСЏ РєР°СЂС‹СЃС‚Р°Р»СЊРЅС–РєСѓ:"
 
 #: src/folder-conf.c:104
 msgid "_Password:"
-msgstr "Пароль:"
+msgstr "РџР°СЂРѕР»СЊ:"
 
 #: src/folder-conf.c:111
 msgid "_Subscribed folders only"
-msgstr "Толькі падпісаныя тэчкі"
+msgstr "РўРѕР»СЊРєС– РїР°РґРїС–СЃР°РЅС‹СЏ С‚СЌС‡РєС–"
 
 #: src/folder-conf.c:112
 msgid "_Prefix"
-msgstr "Прэфікс"
+msgstr "РџСЂСЌС„С–РєСЃ"
 
 #: src/folder-conf.c:177
 msgid ""
 "This folder is not stored in configuration.I do not yet know how to remove "
 "it from remote server."
-msgstr "Гэтая тэчка не захоўваецца ў канфігурацыі. Невядома як выдаліць яе з сэрвэру."
+msgstr "Р“СЌС‚Р°СЏ С‚СЌС‡РєР° РЅРµ Р·Р°С…РѕСћРІР°РµС†С†Р° Сћ РєР°РЅС„С–РіСѓСЂР°С†С‹С–. РќРµРІСЏРґРѕРјР° СЏРє РІС‹РґР°Р»С–С†СЊ СЏРµ Р· СЃСЌСЂРІСЌСЂСѓ."
 
 #: src/folder-conf.c:185
 #, c-format
@@ -1542,34 +1542,34 @@ msgid ""
 "You may use \"New IMAP Folder\" later to add this folder again.\n"
 "What would you like to do?"
 msgstr ""
-"Тэчка %s будзе выдалена са сьпісу.\n"
-"Вы здолееце нанова атрымаць да яе доступ пры дапамозе каманды \"Новая "
-"тэчка IMAP\"\n"
-"Што вы жадаеце зрабіць?"
+"РўСЌС‡РєР° %s Р±СѓРґР·Рµ РІС‹РґР°Р»РµРЅР° СЃР° СЃСЊРїС–СЃСѓ.\n"
+"Р’С‹ Р·РґРѕР»РµРµС†Рµ РЅР°РЅРѕРІР° Р°С‚СЂС‹РјР°С†СЊ РґР° СЏРµ РґРѕСЃС‚СѓРї РїСЂС‹ РґР°РїР°РјРѕР·Рµ РєР°РјР°РЅРґС‹ \"РќРѕРІР°СЏ "
+"С‚СЌС‡РєР° IMAP\"\n"
+"РЁС‚Рѕ РІС‹ Р¶Р°РґР°РµС†Рµ Р·СЂР°Р±С–С†СЊ?"
 
 #: src/folder-conf.c:190 src/mailbox-conf.c:163 src/mailbox-conf.c:174
 msgid "Remove from list"
-msgstr "Выдаліць са сьпісу"
+msgstr "Р’С‹РґР°Р»С–С†СЊ СЃР° СЃСЊРїС–СЃСѓ"
 
 #: src/information-dialog.c:153
 msgid "Balsa Information"
-msgstr "Інфармацыя Balsa"
+msgstr "Р†РЅС„Р°СЂРјР°С†С‹СЏ Balsa"
 
 #: src/information-dialog.c:210
 msgid "WARNING: "
-msgstr "УВАГА: "
+msgstr "РЈР’РђР“Рђ: "
 
 #: src/information-dialog.c:213
 msgid "ERROR: "
-msgstr "ПАМЫЛКА: "
+msgstr "РџРђРњР«Р›РљРђ: "
 
 #: src/information-dialog.c:216
 msgid "FATAL: "
-msgstr "ФАТАЛЬНА: "
+msgstr "Р¤РђРўРђР›Р¬РќРђ: "
 
 #: src/mailbox-conf.c:131
 msgid "No mailbox selected."
-msgstr "Паштовая скрыня ня абрана."
+msgstr "РџР°С€С‚РѕРІР°СЏ СЃРєСЂС‹РЅСЏ РЅСЏ Р°Р±СЂР°РЅР°."
 
 #: src/mailbox-conf.c:157
 #, c-format
@@ -1580,15 +1580,15 @@ msgid ""
 "mailbox again.\n"
 "What would you like to do?"
 msgstr ""
-"Паштовая скрыня %s будзе выдалена са сьпісу паштовых скрыняў.\n"
-"Вы можаце таксама выдаліць з дыску файл ці файлы зьвязаныя з гэтай скрыняй.\n"
-"Калі вы ня выдаліце файлы з дыску, тады здолееце нанова атрымаць да яго доступ "
-"пры дапамозе каманды \"Дадаць паштовую скрыню\"\n"
-"Што вы жадаеце зрабіць?"
+"РџР°С€С‚РѕРІР°СЏ СЃРєСЂС‹РЅСЏ %s Р±СѓРґР·Рµ РІС‹РґР°Р»РµРЅР° СЃР° СЃСЊРїС–СЃСѓ РїР°С€С‚РѕРІС‹С… СЃРєСЂС‹РЅСЏСћ.\n"
+"Р’С‹ РјРѕР¶Р°С†Рµ С‚Р°РєСЃР°РјР° РІС‹РґР°Р»С–С†СЊ Р· РґС‹СЃРєСѓ С„Р°Р№Р» С†С– С„Р°Р№Р»С‹ Р·СЊРІСЏР·Р°РЅС‹СЏ Р· РіСЌС‚Р°Р№ СЃРєСЂС‹РЅСЏР№.\n"
+"РљР°Р»С– РІС‹ РЅСЏ РІС‹РґР°Р»С–С†Рµ С„Р°Р№Р»С‹ Р· РґС‹СЃРєСѓ, С‚Р°РґС‹ Р·РґРѕР»РµРµС†Рµ РЅР°РЅРѕРІР° Р°С‚СЂС‹РјР°С†СЊ РґР° СЏРіРѕ РґРѕСЃС‚СѓРї "
+"РїСЂС‹ РґР°РїР°РјРѕР·Рµ РєР°РјР°РЅРґС‹ \"Р”Р°РґР°С†СЊ РїР°С€С‚РѕРІСѓСЋ СЃРєСЂС‹РЅСЋ\"\n"
+"РЁС‚Рѕ РІС‹ Р¶Р°РґР°РµС†Рµ Р·СЂР°Р±С–С†СЊ?"
 
 #: src/mailbox-conf.c:164
 msgid "Remove from list and disk"
-msgstr "Выдаліць са сьпісу й з дыску"
+msgstr "Р’С‹РґР°Р»С–С†СЊ СЃР° СЃСЊРїС–СЃСѓ Р№ Р· РґС‹СЃРєСѓ"
 
 #: src/mailbox-conf.c:169
 #, c-format
@@ -1597,23 +1597,23 @@ msgid ""
 "You may use \"Add Mailbox\" later to access this mailbox again\n"
 "What would you like to do?"
 msgstr ""
-"Паштовая скрыня %s будзе выдалена са сьпісу паштовых скрыняў.\n"
-"Вы зможаце нанова атрымаць да яе доступ пры дапамозе каманды \"Дадаць "
-"паштовую скрыню\"\n"
-"Што вы жадаеце зрабіць?"
+"РџР°С€С‚РѕРІР°СЏ СЃРєСЂС‹РЅСЏ %s Р±СѓРґР·Рµ РІС‹РґР°Р»РµРЅР° СЃР° СЃСЊРїС–СЃСѓ РїР°С€С‚РѕРІС‹С… СЃРєСЂС‹РЅСЏСћ.\n"
+"Р’С‹ Р·РјРѕР¶Р°С†Рµ РЅР°РЅРѕРІР° Р°С‚СЂС‹РјР°С†СЊ РґР° СЏРµ РґРѕСЃС‚СѓРї РїСЂС‹ РґР°РїР°РјРѕР·Рµ РєР°РјР°РЅРґС‹ \"Р”Р°РґР°С†СЊ "
+"РїР°С€С‚РѕРІСѓСЋ СЃРєСЂС‹РЅСЋ\"\n"
+"РЁС‚Рѕ РІС‹ Р¶Р°РґР°РµС†Рµ Р·СЂР°Р±С–С†СЊ?"
 
 #: src/mailbox-conf.c:211
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
-msgstr "Паштовая скрыня ня адшукана ў вузлах balsa_app.mailbox?\n"
+msgstr "РџР°С€С‚РѕРІР°СЏ СЃРєСЂС‹РЅСЏ РЅСЏ Р°РґС€СѓРєР°РЅР° Сћ РІСѓР·Р»Р°С… balsa_app.mailbox?\n"
 
 #: src/mailbox-conf.c:240
 msgid "Mailbox Configurator"
-msgstr "Канфігураваньне пашт. скрыні"
+msgstr "РљР°РЅС„С–РіСѓСЂР°РІР°РЅСЊРЅРµ РїР°С€С‚. СЃРєСЂС‹РЅС–"
 
 #: src/mailbox-conf.c:442
 #, c-format
 msgid "%s on %s"
-msgstr "%s на %s"
+msgstr "%s РЅР° %s"
 
 #: src/mailbox-conf.c:546
 #, c-format
@@ -1621,7 +1621,7 @@ msgid ""
 "Rename of %s to %s failed:\n"
 "%s"
 msgstr ""
-"Ня атрымалася зьмяніць імя %s на %s:\n"
+"РќСЏ Р°С‚СЂС‹РјР°Р»Р°СЃСЏ Р·СЊРјСЏРЅС–С†СЊ С–РјСЏ %s РЅР° %s:\n"
 "%s"
 
 #: src/mailbox-conf.c:564
@@ -1630,50 +1630,50 @@ msgid ""
 "Change the path instead.\n"
 "Mailbox not Updated.\n"
 msgstr ""
-"Гэтая паштовая скрыня ў вашым лякальным каталёгу.\n"
-"Замест гэтага зьмяніце шлях.\n"
-"Паштовая скрыня не абноўленая.\n"
+"Р“СЌС‚Р°СЏ РїР°С€С‚РѕРІР°СЏ СЃРєСЂС‹РЅСЏ Сћ РІР°С€С‹Рј Р»СЏРєР°Р»СЊРЅС‹Рј РєР°С‚Р°Р»С‘РіСѓ.\n"
+"Р—Р°РјРµСЃС‚ РіСЌС‚Р°РіР° Р·СЊРјСЏРЅС–С†Рµ С€Р»СЏС….\n"
+"РџР°С€С‚РѕРІР°СЏ СЃРєСЂС‹РЅСЏ РЅРµ Р°Р±РЅРѕСћР»РµРЅР°СЏ.\n"
 
 #. mailbox name
 #: src/mailbox-conf.c:683 src/mailbox-conf.c:721 src/mailbox-conf.c:782
 msgid "Mailbox _Name:"
-msgstr "Назва паштовае скрыні:"
+msgstr "РќР°Р·РІР° РїР°С€С‚РѕРІР°Рµ СЃРєСЂС‹РЅС–:"
 
 #. path to file
 #: src/mailbox-conf.c:689
 msgid "Mailbox _Path:"
-msgstr "Шлях да паштовае скрыні:"
+msgstr "РЁР»СЏС… РґР° РїР°С€С‚РѕРІР°Рµ СЃРєСЂС‹РЅС–:"
 
 #. username
 #: src/mailbox-conf.c:738 src/mailbox-conf.c:800
 msgid "_Username:"
-msgstr "Імя карыстальніку:"
+msgstr "Р†РјСЏ РєР°СЂС‹СЃС‚Р°Р»СЊРЅС–РєСѓ:"
 
 #. password field
 #: src/mailbox-conf.c:744 src/mailbox-conf.c:807
 msgid "Pass_word:"
-msgstr "Пароль:"
+msgstr "РџР°СЂРѕР»СЊ:"
 
 #. toggle for apop
 #: src/mailbox-conf.c:750
 msgid "Use _APOP Authentication"
-msgstr "Выкарыстоўваць APOP ідэнтыфікацыю"
+msgstr "Р’С‹РєР°СЂС‹СЃС‚РѕСћРІР°С†СЊ APOP С–РґСЌРЅС‚С‹С„С–РєР°С†С‹СЋ"
 
 #: src/mailbox-conf.c:755
 msgid "_Delete messages from server after download"
-msgstr "Выдаліць паведамленьні з сэрвэру пасьля загрузкі"
+msgstr "Р’С‹РґР°Р»С–С†СЊ РїР°РІРµРґР°РјР»РµРЅСЊРЅС– Р· СЃСЌСЂРІСЌСЂСѓ РїР°СЃСЊР»СЏ Р·Р°РіСЂСѓР·РєС–"
 
 #: src/mailbox-conf.c:760
 msgid "_Filter messages through procmail"
-msgstr "Фільтраваць паведамленьні праз procmail"
+msgstr "Р¤С–Р»СЊС‚СЂР°РІР°С†СЊ РїР°РІРµРґР°РјР»РµРЅСЊРЅС– РїСЂР°Р· procmail"
 
 #: src/mailbox-conf.c:765
 msgid "_Check this mailbox for new mail"
-msgstr "Праверыць пошту ў гэтае паштовае скрыні"
+msgstr "РџСЂР°РІРµСЂС‹С†СЊ РїРѕС€С‚Сѓ Сћ РіСЌС‚Р°Рµ РїР°С€С‚РѕРІР°Рµ СЃРєСЂС‹РЅС–"
 
 #: src/mailbox-conf.c:812
 msgid "F_older Path:"
-msgstr "Шлях да тэчкі:"
+msgstr "РЁР»СЏС… РґР° С‚СЌС‡РєС–:"
 
 #: src/mailbox-node.c:204
 msgid "The folder edition to be written."
@@ -1681,457 +1681,457 @@ msgstr ""
 
 #: src/mailbox-node.c:528 src/main-window.c:230
 msgid "Local mbox mailbox..."
-msgstr "Лякальная паштовая скрыня Mbox..."
+msgstr "Р›СЏРєР°Р»СЊРЅР°СЏ РїР°С€С‚РѕРІР°СЏ СЃРєСЂС‹РЅСЏ Mbox..."
 
 #: src/mailbox-node.c:530 src/main-window.c:235
 msgid "Local Maildir mailbox..."
-msgstr "Лякальная паштовая скрыня Maildir..."
+msgstr "Р›СЏРєР°Р»СЊРЅР°СЏ РїР°С€С‚РѕРІР°СЏ СЃРєСЂС‹РЅСЏ Maildir..."
 
 #: src/mailbox-node.c:532 src/main-window.c:240
 msgid "Local MH mailbox..."
-msgstr "Лякалная паштовая скрыня MH..."
+msgstr "Р›СЏРєР°Р»РЅР°СЏ РїР°С€С‚РѕРІР°СЏ СЃРєСЂС‹РЅСЏ MH..."
 
 #: src/mailbox-node.c:534 src/main-window.c:245
 msgid "Remote IMAP mailbox..."
-msgstr "Аддаленая паштовая скрыня IMAP..."
+msgstr "РђРґРґР°Р»РµРЅР°СЏ РїР°С€С‚РѕРІР°СЏ СЃРєСЂС‹РЅСЏ IMAP..."
 
 #: src/mailbox-node.c:537 src/main-window.c:251
 msgid "Remote IMAP folder..."
-msgstr "Аддаленая тэчка IMAP..."
+msgstr "РђРґРґР°Р»РµРЅР°СЏ С‚СЌС‡РєР° IMAP..."
 
 #: src/mailbox-node.c:555
 msgid "Open"
-msgstr "Адчыніць"
+msgstr "РђРґС‡С‹РЅС–С†СЊ"
 
 #: src/mailbox-node.c:557
 msgid "Close"
-msgstr "Зачыніць"
+msgstr "Р—Р°С‡С‹РЅС–С†СЊ"
 
 #: src/mailbox-node.c:559
 msgid "Properties..."
-msgstr "Уласьцівасьці..."
+msgstr "РЈР»Р°СЃСЊС†С–РІР°СЃСЊС†С–..."
 
 #: src/mailbox-node.c:566
 msgid "Subscribe"
-msgstr "Падпісацца"
+msgstr "РџР°РґРїС–СЃР°С†С†Р°"
 
 #: src/mailbox-node.c:567
 msgid "Unsubscribe"
-msgstr "Адмовіцца ад падпіскі"
+msgstr "РђРґРјРѕРІС–С†С†Р° Р°Рґ РїР°РґРїС–СЃРєС–"
 
 #: src/mailbox-node.c:572
 msgid "Mark as Inbox"
-msgstr "Пазначыць як уваходныя"
+msgstr "РџР°Р·РЅР°С‡С‹С†СЊ СЏРє СѓРІР°С…РѕРґРЅС‹СЏ"
 
 #: src/mailbox-node.c:574
 msgid "Mark as Sentbox"
-msgstr "Пазначыць як дасланыя"
+msgstr "РџР°Р·РЅР°С‡С‹С†СЊ СЏРє РґР°СЃР»Р°РЅС‹СЏ"
 
 #: src/mailbox-node.c:576
 msgid "Mark as Trash"
-msgstr "Пазначыць як у сьметніцы"
+msgstr "РџР°Р·РЅР°С‡С‹С†СЊ СЏРє Сѓ СЃСЊРјРµС‚РЅС–С†С‹"
 
 #: src/mailbox-node.c:578
 msgid "Mark as Draftbox"
-msgstr "Пазначыць  як чарнавікі"
+msgstr "РџР°Р·РЅР°С‡С‹С†СЊ  СЏРє С‡Р°СЂРЅР°РІС–РєС–"
 
 #: src/mailbox-node.c:580
 msgid "Rescan"
-msgstr "Перачытаць"
+msgstr "РџРµСЂР°С‡С‹С‚Р°С†СЊ"
 
 #: src/mailbox-node.c:686
 #, c-format
 msgid "Local mailbox loaded as: %s\n"
-msgstr "Лякальная паштовая скрыня загружана як: %s\n"
+msgstr "Р›СЏРєР°Р»СЊРЅР°СЏ РїР°С€С‚РѕРІР°СЏ СЃРєСЂС‹РЅСЏ Р·Р°РіСЂСѓР¶Р°РЅР° СЏРє: %s\n"
 
 #: src/main-window.c:224
 msgid "_Message..."
-msgstr "Ліст..."
+msgstr "Р›С–СЃС‚..."
 
 #: src/main-window.c:224
 msgid "Compose a new message"
-msgstr "Скласьці новы ліст"
+msgstr "РЎРєР»Р°СЃСЊС†С– РЅРѕРІС‹ Р»С–СЃС‚"
 
 #: src/main-window.c:231
 msgid "Add a new mbox style mailbox"
-msgstr "Дадаць новую паштовую скрыню ў стылі mbox"
+msgstr "Р”Р°РґР°С†СЊ РЅРѕРІСѓСЋ РїР°С€С‚РѕРІСѓСЋ СЃРєСЂС‹РЅСЋ Сћ СЃС‚С‹Р»С– mbox"
 
 #: src/main-window.c:236
 msgid "Add a new Maildir style mailbox"
-msgstr "Дадаць новую паштовую скрыню ў стылі Maildir"
+msgstr "Р”Р°РґР°С†СЊ РЅРѕРІСѓСЋ РїР°С€С‚РѕРІСѓСЋ СЃРєСЂС‹РЅСЋ Сћ СЃС‚С‹Р»С– Maildir"
 
 #: src/main-window.c:241
 msgid "Add a new MH style mailbox"
-msgstr "Дадаць новую паштовую скрыню ў стылі MH"
+msgstr "Р”Р°РґР°С†СЊ РЅРѕРІСѓСЋ РїР°С€С‚РѕРІСѓСЋ СЃРєСЂС‹РЅСЋ Сћ СЃС‚С‹Р»С– MH"
 
 #: src/main-window.c:246
 msgid "Add a new IMAP mailbox"
-msgstr "Дадаць новую паштовую скрыню IMAP"
+msgstr "Р”Р°РґР°С†СЊ РЅРѕРІСѓСЋ РїР°С€С‚РѕРІСѓСЋ СЃРєСЂС‹РЅСЋ IMAP"
 
 #: src/main-window.c:252
 msgid "Add a new IMAP folder"
-msgstr "Дадаць новую тэчку IMAP"
+msgstr "Р”Р°РґР°С†СЊ РЅРѕРІСѓСЋ С‚СЌС‡РєСѓ IMAP"
 
 #: src/main-window.c:260
 msgid "_New"
-msgstr "Новае"
+msgstr "РќРѕРІР°Рµ"
 
 #: src/main-window.c:264
 msgid "_Continue"
-msgstr "Працягваць"
+msgstr "РџСЂР°С†СЏРіРІР°С†СЊ"
 
 #: src/main-window.c:265
 msgid "Continue editing current message"
-msgstr "Працягваць рэдагаваньне бягучага лісту"
+msgstr "РџСЂР°С†СЏРіРІР°С†СЊ СЂСЌРґР°РіР°РІР°РЅСЊРЅРµ Р±СЏРіСѓС‡Р°РіР° Р»С–СЃС‚Сѓ"
 
 #: src/main-window.c:272
 msgid "_Get New Mail"
-msgstr "Праверыць пошту"
+msgstr "РџСЂР°РІРµСЂС‹С†СЊ РїРѕС€С‚Сѓ"
 
 #: src/main-window.c:272
 msgid "Fetch new incoming mail"
-msgstr "Узяць новую ўвахожую пошту"
+msgstr "РЈР·СЏС†СЊ РЅРѕРІСѓСЋ СћРІР°С…РѕР¶СѓСЋ РїРѕС€С‚Сѓ"
 
 #: src/main-window.c:278
 msgid "_Send Queued Mail"
-msgstr "Даслаць пошту з чаргі"
+msgstr "Р”Р°СЃР»Р°С†СЊ РїРѕС€С‚Сѓ Р· С‡Р°СЂРіС–"
 
 #: src/main-window.c:279
 msgid "Send mail from the outbox"
-msgstr "Даслаць пошту са скрыні \"Зыходзячыя\""
+msgstr "Р”Р°СЃР»Р°С†СЊ РїРѕС€С‚Сѓ СЃР° СЃРєСЂС‹РЅС– \"Р—С‹С…РѕРґР·СЏС‡С‹СЏ\""
 
 #: src/main-window.c:287
 msgid "_Address Book..."
-msgstr "Кніга адрэсаў..."
+msgstr "РљРЅС–РіР° Р°РґСЂСЌСЃР°Сћ..."
 
 #: src/main-window.c:288
 msgid "Open the address book"
-msgstr "Адчыніць кнігу адрэсаў"
+msgstr "РђРґС‡С‹РЅС–С†СЊ РєРЅС–РіСѓ Р°РґСЂСЌСЃР°Сћ"
 
 #: src/main-window.c:315
 msgid "_Filters..."
-msgstr "Фільтры..."
+msgstr "Р¤С–Р»СЊС‚СЂС‹..."
 
 #: src/main-window.c:315
 msgid "Manage filters"
-msgstr "Кіраваньне фільтрамі"
+msgstr "РљС–СЂР°РІР°РЅСЊРЅРµ С„С–Р»СЊС‚СЂР°РјС–"
 
 #: src/main-window.c:322 src/message-window.c:61
 msgid "N_o Headers"
-msgstr "Бяз загалоўкаў"
+msgstr "Р‘СЏР· Р·Р°РіР°Р»РѕСћРєР°Сћ"
 
 #: src/main-window.c:322
 msgid "Display no headers"
-msgstr "Не адлюстроўваць загалоўкі"
+msgstr "РќРµ Р°РґР»СЋСЃС‚СЂРѕСћРІР°С†СЊ Р·Р°РіР°Р»РѕСћРєС–"
 
 #: src/main-window.c:324
 msgid "S_elected Headers"
-msgstr "Абраныя загалоўкі"
+msgstr "РђР±СЂР°РЅС‹СЏ Р·Р°РіР°Р»РѕСћРєС–"
 
 #: src/main-window.c:325
 msgid "Display selected headers"
-msgstr "Адлюстраваць абраныя загалоўкі"
+msgstr "РђРґР»СЋСЃС‚СЂР°РІР°С†СЊ Р°Р±СЂР°РЅС‹СЏ Р·Р°РіР°Р»РѕСћРєС–"
 
 #: src/main-window.c:327 src/message-window.c:65
 msgid "All _Headers"
-msgstr "Усе загалоўкі"
+msgstr "РЈСЃРµ Р·Р°РіР°Р»РѕСћРєС–"
 
 #: src/main-window.c:327
 msgid "Display all headers"
-msgstr "Адлюстраваць усе загалоўкі"
+msgstr "РђРґР»СЋСЃС‚СЂР°РІР°С†СЊ СѓСЃРµ Р·Р°РіР°Р»РѕСћРєС–"
 
 #: src/main-window.c:334
 msgid "_Flat index"
-msgstr "Суцэльны йндэкс"
+msgstr "РЎСѓС†СЌР»СЊРЅС‹ Р№РЅРґСЌРєСЃ"
 
 #: src/main-window.c:334
 msgid "No threading at all"
-msgstr "Не разьбіраць па тэмах"
+msgstr "РќРµ СЂР°Р·СЊР±С–СЂР°С†СЊ РїР° С‚СЌРјР°С…"
 
 #: src/main-window.c:337
 msgid "S_imple threading"
-msgstr "Просты разбор па тэмах"
+msgstr "РџСЂРѕСЃС‚С‹ СЂР°Р·Р±РѕСЂ РїР° С‚СЌРјР°С…"
 
 #: src/main-window.c:338
 msgid "Simple threading algorithm"
-msgstr "Просты альгарытм разбору па тэмах"
+msgstr "РџСЂРѕСЃС‚С‹ Р°Р»СЊРіР°СЂС‹С‚Рј СЂР°Р·Р±РѕСЂСѓ РїР° С‚СЌРјР°С…"
 
 #: src/main-window.c:341
 msgid "_JWZ threading"
-msgstr "Разбор па тэмах JWZ"
+msgstr "Р Р°Р·Р±РѕСЂ РїР° С‚СЌРјР°С… JWZ"
 
 #: src/main-window.c:342
 msgid "Elaborate JWZ threading"
-msgstr "Разьвіцьцё разбору па тэмах JWZ"
+msgstr "Р Р°Р·СЊРІС–С†СЊС†С‘ СЂР°Р·Р±РѕСЂСѓ РїР° С‚СЌРјР°С… JWZ"
 
 #: src/main-window.c:349
 msgid "_Show Mailbox Tree"
-msgstr "Адлюстраваць дрэва паштовае скрыні"
+msgstr "РђРґР»СЋСЃС‚СЂР°РІР°С†СЊ РґСЂСЌРІР° РїР°С€С‚РѕРІР°Рµ СЃРєСЂС‹РЅС–"
 
 #: src/main-window.c:350
 msgid "Toggle display of mailbox and folder tree"
-msgstr "Пераключыць адлюстраваньне паштовае скрыні й дрэва тэчак"
+msgstr "РџРµСЂР°РєР»СЋС‡С‹С†СЊ Р°РґР»СЋСЃС‚СЂР°РІР°РЅСЊРЅРµ РїР°С€С‚РѕРІР°Рµ СЃРєСЂС‹РЅС– Р№ РґСЂСЌРІР° С‚СЌС‡Р°Рє"
 
 #: src/main-window.c:353
 msgid "Show Mailbox _Tabs"
-msgstr "Адлюстраваць закладкі паштовае скрыні"
+msgstr "РђРґР»СЋСЃС‚СЂР°РІР°С†СЊ Р·Р°РєР»Р°РґРєС– РїР°С€С‚РѕРІР°Рµ СЃРєСЂС‹РЅС–"
 
 #: src/main-window.c:354
 msgid "Toggle display of mailbox notebook tabs"
-msgstr "Пераключыць адлюстраваньне закладак паштовае скрыні"
+msgstr "РџРµСЂР°РєР»СЋС‡С‹С†СЊ Р°РґР»СЋСЃС‚СЂР°РІР°РЅСЊРЅРµ Р·Р°РєР»Р°РґР°Рє РїР°С€С‚РѕРІР°Рµ СЃРєСЂС‹РЅС–"
 
 #: src/main-window.c:358 src/message-window.c:94
 msgid "_Wrap"
-msgstr "Перанос"
+msgstr "РџРµСЂР°РЅРѕСЃ"
 
 #: src/main-window.c:358 src/sendmsg-window.c:213
 msgid "Wrap message lines"
-msgstr "Пераносіць радкі лісту"
+msgstr "РџРµСЂР°РЅРѕСЃС–С†СЊ СЂР°РґРєС– Р»С–СЃС‚Сѓ"
 
 #: src/main-window.c:371
 msgid "Toggle flagged"
-msgstr "Пераключыць сыгналіьнае"
+msgstr "РџРµСЂР°РєР»СЋС‡С‹С†СЊ СЃС‹РіРЅР°Р»С–СЊРЅР°Рµ"
 
 #: src/main-window.c:378
 msgid "Toggle New"
-msgstr "Пераключыць новы"
+msgstr "РџРµСЂР°РєР»СЋС‡С‹С†СЊ РЅРѕРІС‹"
 
 #: src/main-window.c:390 src/message-window.c:103
 msgid "_Reply..."
-msgstr "Адказаць..."
+msgstr "РђРґРєР°Р·Р°С†СЊ..."
 
 #: src/main-window.c:391
 msgid "Reply to the current message"
-msgstr "Адказаць на бягучы ліст"
+msgstr "РђРґРєР°Р·Р°С†СЊ РЅР° Р±СЏРіСѓС‡С‹ Р»С–СЃС‚"
 
 #: src/main-window.c:398 src/message-window.c:108
 msgid "Reply to _All..."
-msgstr "Адказаць усім..."
+msgstr "РђРґРєР°Р·Р°С†СЊ СѓСЃС–Рј..."
 
 #: src/main-window.c:399
 msgid "Reply to all recipients of the current message"
-msgstr "Адказаць усім адрасатам бягучага лісту"
+msgstr "РђРґРєР°Р·Р°С†СЊ СѓСЃС–Рј Р°РґСЂР°СЃР°С‚Р°Рј Р±СЏРіСѓС‡Р°РіР° Р»С–СЃС‚Сѓ"
 
 #: src/main-window.c:406
 msgid "Reply to _Group..."
-msgstr "Адказаць групе..."
+msgstr "РђРґРєР°Р·Р°С†СЊ РіСЂСѓРїРµ..."
 
 #: src/main-window.c:407
 msgid "Reply to mailing list"
-msgstr "Адказаць у сьпіс рассылкі"
+msgstr "РђРґРєР°Р·Р°С†СЊ Сѓ СЃСЊРїС–СЃ СЂР°СЃСЃС‹Р»РєС–"
 
 #: src/main-window.c:414 src/message-window.c:114
 msgid "_Forward..."
-msgstr "Пераслаць..."
+msgstr "РџРµСЂР°СЃР»Р°С†СЊ..."
 
 #: src/main-window.c:415
 msgid "Forward the current message"
-msgstr "Пераслаць бягучы ліст"
+msgstr "РџРµСЂР°СЃР»Р°С†СЊ Р±СЏРіСѓС‡С‹ Р»С–СЃС‚"
 
 #: src/main-window.c:422 src/message-window.c:119
 msgid "Next Part"
-msgstr "Наст. частка"
+msgstr "РќР°СЃС‚. С‡Р°СЃС‚РєР°"
 
 #: src/main-window.c:422
 msgid "Next part in message"
-msgstr "Наступная частка паведамленьня"
+msgstr "РќР°СЃС‚СѓРїРЅР°СЏ С‡Р°СЃС‚РєР° РїР°РІРµРґР°РјР»РµРЅСЊРЅСЏ"
 
 #: src/main-window.c:428 src/message-window.c:123
 msgid "Previous Part"
-msgstr "Папяр. частка"
+msgstr "РџР°РїСЏСЂ. С‡Р°СЃС‚РєР°"
 
 #: src/main-window.c:429
 msgid "Previous part in message"
-msgstr "Папярэдняя частка паведамленьня"
+msgstr "РџР°РїСЏСЂСЌРґРЅСЏСЏ С‡Р°СЃС‚РєР° РїР°РІРµРґР°РјР»РµРЅСЊРЅСЏ"
 
 #: src/main-window.c:435 src/message-window.c:128
 msgid "Save Current Part..."
-msgstr "Захаваць бягучую частку..."
+msgstr "Р—Р°С…Р°РІР°С†СЊ Р±СЏРіСѓС‡СѓСЋ С‡Р°СЃС‚РєСѓ..."
 
 #: src/main-window.c:436 src/message-window.c:129
 msgid "Save current part in message"
-msgstr "Захаваць бягучую частку паведамленьня"
+msgstr "Р—Р°С…Р°РІР°С†СЊ Р±СЏРіСѓС‡СѓСЋ С‡Р°СЃС‚РєСѓ РїР°РІРµРґР°РјР»РµРЅСЊРЅСЏ"
 
 #: src/main-window.c:444
 msgid "_Delete"
-msgstr "Выдаліць"
+msgstr "Р’С‹РґР°Р»С–С†СЊ"
 
 #: src/main-window.c:444
 msgid "Delete the current message"
-msgstr "Выдаліць бягучы ліст"
+msgstr "Р’С‹РґР°Р»С–С†СЊ Р±СЏРіСѓС‡С‹ Р»С–СЃС‚"
 
 #: src/main-window.c:451
 msgid "_Undelete"
-msgstr "Аднавіць"
+msgstr "РђРґРЅР°РІС–С†СЊ"
 
 #: src/main-window.c:451
 msgid "Undelete the message"
-msgstr "Аднавіць ліст"
+msgstr "РђРґРЅР°РІС–С†СЊ Р»С–СЃС‚"
 
 #. !
 #: src/main-window.c:458
 msgid "_Toggle"
-msgstr "Пераключыць"
+msgstr "РџРµСЂР°РєР»СЋС‡С‹С†СЊ"
 
 #: src/main-window.c:463
 msgid "_Store Address..."
-msgstr "Захаваць адрэсу..."
+msgstr "Р—Р°С…Р°РІР°С†СЊ Р°РґСЂСЌСЃСѓ..."
 
 #: src/main-window.c:464
 msgid "Store address of sender in addressbook"
-msgstr "Захаваць адрэсу адпраўляльніку ў кнізе адрэсаў"
+msgstr "Р—Р°С…Р°РІР°С†СЊ Р°РґСЂСЌСЃСѓ Р°РґРїСЂР°СћР»СЏР»СЊРЅС–РєСѓ Сћ РєРЅС–Р·Рµ Р°РґСЂСЌСЃР°Сћ"
 
 #: src/main-window.c:474
 msgid "Next Message"
-msgstr "Наступны ліст"
+msgstr "РќР°СЃС‚СѓРїРЅС‹ Р»С–СЃС‚"
 
 #: src/main-window.c:480
 msgid "Previous Message"
-msgstr "Папярэдні ліст"
+msgstr "РџР°РїСЏСЂСЌРґРЅС– Р»С–СЃС‚"
 
 #: src/main-window.c:486 src/main-window.c:487
 msgid "Next Unread Message"
-msgstr "Наступны нечытаны ліст"
+msgstr "РќР°СЃС‚СѓРїРЅС‹ РЅРµС‡С‹С‚Р°РЅС‹ Р»С–СЃС‚"
 
 #: src/main-window.c:493
 msgid "_Edit..."
-msgstr "Рэдагаваньне..."
+msgstr "Р СЌРґР°РіР°РІР°РЅСЊРЅРµ..."
 
 #: src/main-window.c:493
 msgid "Edit the selected mailbox"
-msgstr "Рэдагаваць абраную паштовую скрыню"
+msgstr "Р СЌРґР°РіР°РІР°С†СЊ Р°Р±СЂР°РЅСѓСЋ РїР°С€С‚РѕРІСѓСЋ СЃРєСЂС‹РЅСЋ"
 
 #: src/main-window.c:497
 msgid "_Delete..."
-msgstr "Выдаліць..."
+msgstr "Р’С‹РґР°Р»С–С†СЊ..."
 
 #: src/main-window.c:498
 msgid "Delete the selected mailbox"
-msgstr "Зьнішчыць абраную паштовую скрыню"
+msgstr "Р—СЊРЅС–С€С‡С‹С†СЊ Р°Р±СЂР°РЅСѓСЋ РїР°С€С‚РѕРІСѓСЋ СЃРєСЂС‹РЅСЋ"
 
 #: src/main-window.c:504
 msgid "Co_mmit Current"
-msgstr "Падцьвердзіць зьмены"
+msgstr "РџР°РґС†СЊРІРµСЂРґР·С–С†СЊ Р·СЊРјРµРЅС‹"
 
 #: src/main-window.c:505
 msgid "Commit the changes in the currently opened mailbox"
-msgstr "Зрабіць незваротнымі зьмены ў бягучай паштовай скрыні"
+msgstr "Р—СЂР°Р±С–С†СЊ РЅРµР·РІР°СЂРѕС‚РЅС‹РјС– Р·СЊРјРµРЅС‹ Сћ Р±СЏРіСѓС‡Р°Р№ РїР°С€С‚РѕРІР°Р№ СЃРєСЂС‹РЅС–"
 
 #: src/main-window.c:509
 msgid "_Close"
-msgstr "Зачыніць"
+msgstr "Р—Р°С‡С‹РЅС–С†СЊ"
 
 #: src/main-window.c:509
 msgid "Close mailbox"
-msgstr "Зачыніць паштовую скрыню"
+msgstr "Р—Р°С‡С‹РЅС–С†СЊ РїР°С€С‚РѕРІСѓСЋ СЃРєСЂС‹РЅСЋ"
 
 #: src/main-window.c:513
 msgid "Empty _Trash"
-msgstr "Ачысьціць сьметніцу"
+msgstr "РђС‡С‹СЃСЊС†С–С†СЊ СЃСЊРјРµС‚РЅС–С†Сѓ"
 
 #: src/main-window.c:514
 msgid "Delete messages from the Trash mailbox"
-msgstr "Выдаліць паведамленьні  са сьметніцы"
+msgstr "Р’С‹РґР°Р»С–С†СЊ РїР°РІРµРґР°РјР»РµРЅСЊРЅС–  СЃР° СЃСЊРјРµС‚РЅС–С†С‹"
 
 #: src/main-window.c:536
 msgid "_Message"
-msgstr "Ліст"
+msgstr "Р›С–СЃС‚"
 
 #: src/main-window.c:537
 msgid "Mail_box"
-msgstr "Паштовая скрыня"
+msgstr "РџР°С€С‚РѕРІР°СЏ СЃРєСЂС‹РЅСЏ"
 
 #: src/main-window.c:545
 msgid "Check"
-msgstr "Праверыць"
+msgstr "РџСЂР°РІРµСЂС‹С†СЊ"
 
 #: src/main-window.c:545
 msgid "Check Email"
-msgstr "Праверыць пошту"
+msgstr "РџСЂР°РІРµСЂС‹С†СЊ РїРѕС€С‚Сѓ"
 
 #: src/main-window.c:550
 msgid "Delete message"
-msgstr "Выдаліць паведамленьне"
+msgstr "Р’С‹РґР°Р»С–С†СЊ РїР°РІРµРґР°РјР»РµРЅСЊРЅРµ"
 
 #: src/main-window.c:555
 msgid "Compose"
-msgstr "Скласьці"
+msgstr "РЎРєР»Р°СЃСЊС†С–"
 
 #: src/main-window.c:555
 msgid "Compose message"
-msgstr "Скласьці паведамленьне"
+msgstr "РЎРєР»Р°СЃСЊС†С– РїР°РІРµРґР°РјР»РµРЅСЊРЅРµ"
 
 #: src/main-window.c:559
 msgid "Continue"
-msgstr "Працягнуць"
+msgstr "РџСЂР°С†СЏРіРЅСѓС†СЊ"
 
 #: src/main-window.c:563
 msgid "Reply"
-msgstr "Адказаць"
+msgstr "РђРґРєР°Р·Р°С†СЊ"
 
 #: src/main-window.c:567
 msgid ""
 "Reply\n"
 "to All"
 msgstr ""
-"Адказаць\n"
-"усім"
+"РђРґРєР°Р·Р°С†СЊ\n"
+"СѓСЃС–Рј"
 
 #: src/main-window.c:567
 msgid "Reply to all"
-msgstr "Адказаць усім"
+msgstr "РђРґРєР°Р·Р°С†СЊ СѓСЃС–Рј"
 
 #: src/main-window.c:571
 msgid "Forward"
-msgstr "Пераслаць"
+msgstr "РџРµСЂР°СЃР»Р°С†СЊ"
 
 #: src/main-window.c:577
 msgid "Previous"
-msgstr "Пяпярд."
+msgstr "РџСЏРїСЏСЂРґ."
 
 #: src/main-window.c:577
 msgid "Open previous message"
-msgstr "Адчыніць папярэдняе паведамленьне"
+msgstr "РђРґС‡С‹РЅС–С†СЊ РїР°РїСЏСЂСЌРґРЅСЏРµ РїР°РІРµРґР°РјР»РµРЅСЊРЅРµ"
 
 #: src/main-window.c:582
 msgid "Next"
-msgstr "Наступ."
+msgstr "РќР°СЃС‚СѓРї."
 
 #: src/main-window.c:582
 msgid "Open next message"
-msgstr "Адчыніць наступнае паведамленьне"
+msgstr "РђРґС‡С‹РЅС–С†СЊ РЅР°СЃС‚СѓРїРЅР°Рµ РїР°РІРµРґР°РјР»РµРЅСЊРЅРµ"
 
 #: src/main-window.c:586
 msgid ""
 "Next\n"
 "Unread"
 msgstr ""
-"Наст.\n"
-"нечытаны"
+"РќР°СЃС‚.\n"
+"РЅРµС‡С‹С‚Р°РЅС‹"
 
 #: src/main-window.c:586
 msgid "Open next unread message"
-msgstr "Адчыніць наступны нечытаны ліст"
+msgstr "РђРґС‡С‹РЅС–С†СЊ РЅР°СЃС‚СѓРїРЅС‹ РЅРµС‡С‹С‚Р°РЅС‹ Р»С–СЃС‚"
 
 #: src/main-window.c:590 src/sendmsg-window.c:157
 msgid "Print"
-msgstr "Надрукаваць"
+msgstr "РќР°РґСЂСѓРєР°РІР°С†СЊ"
 
 #: src/main-window.c:590
 msgid "Print current message"
-msgstr "Надрукаваць бягучы ліст"
+msgstr "РќР°РґСЂСѓРєР°РІР°С†СЊ Р±СЏРіСѓС‡С‹ Р»С–СЃС‚"
 
 #: src/main-window.c:1072
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
 msgstr ""
-"Немагчыма адчыніць паштовую скрыню!\n"
-"Праверце яго наладку."
+"РќРµРјР°РіС‡С‹РјР° Р°РґС‡С‹РЅС–С†СЊ РїР°С€С‚РѕРІСѓСЋ СЃРєСЂС‹РЅСЋ!\n"
+"РџСЂР°РІРµСЂС†Рµ СЏРіРѕ РЅР°Р»Р°РґРєСѓ."
 
 #: src/main-window.c:1349
 msgid "Copyright (C) 1997-2001"
-msgstr "Аўтарскае права (С) 1997-2001"
+msgstr "РђСћС‚Р°СЂСЃРєР°Рµ РїСЂР°РІР° (РЎ) 1997-2001"
 
 #: src/main-window.c:1352
 msgid ""
@@ -2140,25 +2140,25 @@ msgid ""
 "\n"
 "If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
 msgstr ""
-"Праграма для электроннае пошты Balsa зьяўляецца часткай працоўнага асяродьдзя "
-"GNOME. Падрабязьнейшае апісаньне Balsa можно адшукаць на http://www.balsa.net/\n"
+"РџСЂР°РіСЂР°РјР° РґР»СЏ СЌР»РµРєС‚СЂРѕРЅРЅР°Рµ РїРѕС€С‚С‹ Balsa Р·СЊСЏСћР»СЏРµС†С†Р° С‡Р°СЃС‚РєР°Р№ РїСЂР°С†РѕСћРЅР°РіР° Р°СЃСЏСЂРѕРґСЊРґР·СЏ "
+"GNOME. РџР°РґСЂР°Р±СЏР·СЊРЅРµР№С€Р°Рµ Р°РїС–СЃР°РЅСЊРЅРµ Balsa РјРѕР¶РЅРѕ Р°РґС€СѓРєР°С†СЊ РЅР° http://www.balsa.net/\n"
 "\n"
-"Паведаміць пра адшуканыя памылкі на http://bugzilla.gnome.org"
+"РџР°РІРµРґР°РјС–С†СЊ РїСЂР° Р°РґС€СѓРєР°РЅС‹СЏ РїР°РјС‹Р»РєС– РЅР° http://bugzilla.gnome.org"
 
 #: src/main-window.c:1724
 #, c-format
 msgid "Sending error: %s"
-msgstr "Памылка адпраўкі: %s"
+msgstr "РџР°РјС‹Р»РєР° Р°РґРїСЂР°СћРєС–: %s"
 
 #: src/main-window.c:2146
 #, c-format
 msgid "Commiting mailbox %s failed."
-msgstr "Падцьверджаньне паштовае скрыні %s ня атрымалася."
+msgstr "РџР°РґС†СЊРІРµСЂРґР¶Р°РЅСЊРЅРµ РїР°С€С‚РѕРІР°Рµ СЃРєСЂС‹РЅС– %s РЅСЏ Р°С‚СЂС‹РјР°Р»Р°СЃСЏ."
 
 #: src/main-window.c:2363
 #, c-format
 msgid "Balsa: %s (readonly)"
-msgstr "Balsa: %s (толькі для чытаньня)"
+msgstr "Balsa: %s (С‚РѕР»СЊРєС– РґР»СЏ С‡С‹С‚Р°РЅСЊРЅСЏ)"
 
 #: src/main-window.c:2365
 #, c-format
@@ -2167,15 +2167,15 @@ msgstr "Balsa: %s"
 
 #: src/main.c:108
 msgid "Get new mail on startup"
-msgstr "Праверыць пошту падчас запуску"
+msgstr "РџСЂР°РІРµСЂС‹С†СЊ РїРѕС€С‚Сѓ РїР°РґС‡Р°СЃ Р·Р°РїСѓСЃРєСѓ"
 
 #: src/main.c:110
 msgid "Compose a new email to EMAIL@ADDRESS"
-msgstr "Cкласьці новы ліст для EMAIL@ADRESS"
+msgstr "CРєР»Р°СЃСЊС†С– РЅРѕРІС‹ Р»С–СЃС‚ РґР»СЏ EMAIL@ADRESS"
 
 #: src/main.c:112
 msgid "Opens MAILBOXNAME"
-msgstr "Адчыняецца MAILBOXNAME"
+msgstr "РђРґС‡С‹РЅСЏРµС†С†Р° MAILBOXNAME"
 
 #: src/main.c:112
 msgid "MAILBOXNAME"
@@ -2183,5 +2183,5 @@ msgstr "MAILBOXNAME"
 
 #: src/main.c:115
 msgid "Opens first unread mailbox"
-msgstr "Адчыніць першую паштовую скрыню з нечытанымі лістамі"
+msgstr "РђРґС‡С‹РЅС–С†СЊ РїРµСЂС€СѓСЋ РїР°С€С‚РѕРІСѓСЋ СЃРєСЂС‹РЅСЋ Р· РЅРµС‡С‹С‚Р°РЅС‹РјС– Р»С–СЃС‚Р°РјС–"
 

@@ -7053,3 +7053,14 @@ msgstr "Ned"
 
 #~ msgid "Import all adresses"
 #~ msgstr "Läs in alla adresser"
+msgid "Balsa E-mail reader"
+msgstr "Balsa epostprogram"
+
+msgid "Program startup"
+msgstr "Programstart"
+
+msgid "E-mail"
+msgstr "Epost"
+
+msgid "New mail notification"
+msgstr "Besked om nytt meddelande"

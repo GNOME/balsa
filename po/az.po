@@ -5552,3 +5552,8 @@ msgstr "Yuxarı"
 msgid "Down"
 msgstr "Aşağı"
 
+msgid "E-mail"
+msgstr "ePoçt"
+
+msgid "New mail notification"
+msgstr "Təzə məktub xəbərdarı"

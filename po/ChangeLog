@@ -1,3 +1,12 @@
+2004-08-09  Pablo Saratxaga  <pablo@mandrakesoft.com>
+
+	* POTFILES.in: added *.soundlist.in files
+	* nn.po,tr.po: fixed mixed charset encoding
+	* ca.po,da.po,de.po,el.po,es.po,et.po,sr.po,sr@Latn.po,wa.po,
+	it.po,sv.po,sk.po,pt_BR.po,pl.po,nl.po,no.po,lv.po,lt.po,fr.po,
+	fi.po,az.po,tr.po: merged with translations from old *.soundlist
+	* en_GB.po,uk.po,be.po,bg.po,ko.po,pt.po: converted to UTF-8
+
 2004-08-08  Carlos Morgado  <chbm gnome.org>
 
 	* pt.po: slight update

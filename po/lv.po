@@ -5173,3 +5173,14 @@ msgstr "Augšup"
 msgid "Down"
 msgstr "Lejup"
 
+msgid "Balsa E-mail reader"
+msgstr "Balsa e-pasta programma"
+
+msgid "Program startup"
+msgstr "Program startup"
+
+msgid "E-mail"
+msgstr "E-pasts"
+
+msgid "New mail notification"
+msgstr "Jauna pasta pazińo¹ana"

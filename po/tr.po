@@ -9,7 +9,7 @@ msgstr ""
 "Language-Team: Turkish <gnome-turk@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit"
+"Content-Transfer-Encoding: 8bit\n"
 
 #. The externq database doesn't support Id's, sorry!
 #: libbalsa/address-book-extern.c:255 libbalsa/address-book-ldap.c:401
@@ -5641,299 +5641,11 @@ msgstr "Yukarı"
 msgid "Down"
 msgstr "Aşağı"
 
-#~ msgid ""
-#~ "Failed to initialise LDAP server.\n"
-#~ "Check that the servername is valid."
-#~ msgstr ""
-#~ "LDAP sunucusu baÃÂÃÂÃÂÃÂlatÃÂÃÂÃÂÃÂ±lamadÃÂÃÂÃÂÃÂ±.\n"
-#~ "LÃÂÃÂÃÂÃÂ¼tfen sunucu adÃÂÃÂÃÂÃÂ±nÃÂÃÂÃÂÃÂ±n doÃÂÃÂÃÂÃÂruluÃÂÃÂÃÂÃÂunu kontrol ediniz."
+msgid "Balsa E-mail reader"
+msgstr "Balsa ePosta uygulamas."
 
-#~ msgid ""
-#~ "Failed to bind to server: %s\n"
-#~ "Check that the servername is valid."
-#~ msgstr ""
-#~ "Sunucu %s'ye baÃÂÃÂÃÂÃÂlanÃÂÃÂÃÂÃÂ±lamadÃÂÃÂÃÂÃÂ±\n"
-#~ "LÃÂÃÂÃÂÃÂ¼tfen sunucu adÃÂÃÂÃÂÃÂ±nÃÂÃÂÃÂÃÂ±n doÃÂÃÂÃÂÃÂruluÃÂÃÂÃÂÃÂunu kontrol ediniz."
+msgid "E-mail"
+msgstr "ePosta"
 
-#~ msgid "Failed to do a search: %sCheck that the base name is valid."
-#~ msgstr ""
-#~ "%s aramasÃÂÃÂÃÂÃÂ± baÃÂÃÂÃÂÃÂarÃÂÃÂÃÂÃÂ±sÃÂÃÂÃÂÃÂ±z oldu. LÃÂÃÂÃÂÃÂ¼tfen ana isimin doÃÂÃÂÃÂÃÂruluÃÂÃÂÃÂÃÂunu kontrol ediniz."
-
-#~ msgid "Could not stat vcard address book: %s"
-#~ msgstr "%s vcard adres defteri aÃÂÃÂÃÂÃÂ§ÃÂÃÂÃÂÃÂ±lamadÃÂÃÂÃÂÃÂ±."
-
-#~ msgid "Could not open vCard address book %s."
-#~ msgstr "vCard adres defteri %s aÃÂÃÂÃÂÃÂ§ÃÂÃÂÃÂÃÂ±lamadÃÂÃÂÃÂÃÂ±."
-
-#~ msgid "Cannot open vCard address book %s for saving\n"
-#~ msgstr "vCard adres defteri %s kaydetmek iÃÂÃÂÃÂÃÂ§in aÃÂÃÂÃÂÃÂ§ÃÂÃÂÃÂÃÂ±lamadÃÂÃÂÃÂÃÂ±\n"
-
-#~ msgid "No such address book type: %s"
-#~ msgstr "%s gibi bir adres defteri tÃÂÃÂÃÂÃÂ¼rÃÂÃÂÃÂÃÂ¼ yoktur!"
-
-#~ msgid "Could not create a address book of type %s"
-#~ msgstr "%s tÃÂÃÂÃÂÃÂ¼rÃÂÃÂÃÂÃÂ¼nde bir adres defteri oluÃÂÃÂÃÂÃÂturulamadÃÂÃÂÃÂÃÂ±."
-
-#~ msgid "Set Default"
-#~ msgstr "ÃÂÃÂÃÂÃÂntanÃÂÃÂÃÂÃÂ±mlÃÂÃÂÃÂÃÂ± Yap"
-
-#~ msgid "Create Identity"
-#~ msgstr "Kimlik OluÃÂÃÂÃÂÃÂtur"
-
-#~ msgid "Append Signature"
-#~ msgstr "ÃÂÃÂÃÂÃÂ°mzayÃÂÃÂÃÂÃÂ± Ekle"
-
-#~ msgid "Cannot delete default profile, please make another default first."
-#~ msgstr ""
-#~ "ÃÂÃÂÃÂÃÂntanÃÂÃÂÃÂÃÂ±mlÃÂÃÂÃÂÃÂ± profili silemezsiniz, lÃÂÃÂÃÂÃÂ¼tfen ÃÂÃÂÃÂÃÂ¶nce baÃÂÃÂÃÂÃÂka bir ÃÂÃÂÃÂÃÂ¶ntanÃÂÃÂÃÂÃÂ±mlÃÂÃÂÃÂÃÂ± profil "
-#~ "oluÃÂÃÂÃÂÃÂturunuz."
-
-#~ msgid "Do"
-#~ msgstr "Yap"
-
-#~ msgid "Do Not"
-#~ msgstr "Yapma"
-
-#~ msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
-#~ msgstr "LibBalsaMailboxImap : %s aÃÂÃÂÃÂÃÂ§ÃÂÃÂÃÂÃÂ±lÃÂÃÂÃÂÃÂ±yor, referans sayÃÂÃÂÃÂÃÂ±sÃÂÃÂÃÂÃÂ± %d\n"
-
-#~ msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
-#~ msgstr "LibBalsaMailboxLocal : %s aÃÂÃÂÃÂÃÂ§ÃÂÃÂÃÂÃÂ±lÃÂÃÂÃÂÃÂ±yor, referans sayÃÂÃÂÃÂÃÂ±sÃÂÃÂÃÂÃÂ± %d\n"
-
-#~ msgid "Source mailbox (%s) is readonly. Cannot move message"
-#~ msgstr "Kaynak posta kutusu (%s) salt-okunur. ÃÂÃÂÃÂÃÂ°leti taÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ±namadÃÂÃÂÃÂÃÂ±."
-
-#~ msgid "Unknown POP socket family: %d"
-#~ msgstr "Bilinmeyen POP soket ailesi: %d"
-
-#~ msgid "From: %d <%s>"
-#~ msgstr "%d <%s>'den"
-
-#~ msgid "From %s: %d %s"
-#~ msgstr "%s: %d %s' den"
-
-#~ msgid "To: %d <%s>"
-#~ msgstr "%d <%s>' ye"
-
-#~ msgid "To %s: %d %s"
-#~ msgstr "%s %d %s' ye "
-
-#~ msgid "%d %s"
-#~ msgstr "%d %s"
-
-#~ msgid "[-- name: %s --]\n"
-#~ msgstr "[-- isim: %s --]\n"
-
-#~ msgid "Connecting with \"%s\"..."
-#~ msgstr "\"%s\" ye baÃÂÃÂÃÂÃÂlanÃÂÃÂÃÂÃÂ±lÃÂÃÂÃÂÃÂ±yor..."
-
-#~ msgid "Tunnel error talking to %s: %s"
-#~ msgstr "%s: %s gÃÂÃÂÃÂÃÂ¶rÃÂÃÂÃÂÃÂ¼ÃÂÃÂÃÂÃÂmesi sÃÂÃÂÃÂÃÂ±rasÃÂÃÂÃÂÃÂ±nda tÃÂÃÂÃÂÃÂ¼nel hatasÃÂÃÂÃÂÃÂ± oluÃÂÃÂÃÂÃÂtu"
-
-#~ msgid "Address Book Configuration"
-#~ msgstr "Adres Defteri AyarlarÃÂÃÂÃÂÃÂ±"
-
-#~ msgid "Address Book Name:"
-#~ msgstr "Adres Defterinin AdÃÂÃÂÃÂÃÂ±:"
-
-#~ msgid "Reply..."
-#~ msgstr "Cevapla..."
-
-#~ msgid "Undelete"
-#~ msgstr "SilinmiÃÂÃÂÃÂÃÂ ÃÂÃÂÃÂÃÂ¶geyi kurtar"
-
-#~ msgid "Store Address..."
-#~ msgstr "Adresi kaydet..."
-
-#~ msgid "Transfer"
-#~ msgstr "Transfer et"
-
-#~ msgid "Could not load image. It is most likely corrupted."
-#~ msgstr "Resim yÃÂÃÂÃÂÃÂ¼klenemedi. BÃÂÃÂÃÂÃÂ¼yÃÂÃÂÃÂÃÂ¼k olasÃÂÃÂÃÂÃÂ±lÃÂÃÂÃÂÃÂ±kla resim bozuk"
-
-#~ msgid "Couldn't render image\n"
-#~ msgstr "Resim ÃÂÃÂÃÂÃÂekillendirilemedi\n"
-
-#~ msgid "balsa/pixbuf: Could not load image. It is likely corrupted."
-#~ msgstr "balsa/pixbuf: Resim yÃÂÃÂÃÂÃÂ¼klenemedi. BozulmuÃÂÃÂÃÂÃÂ olma ihtimali var"
-
-#~ msgid "Inbound"
-#~ msgstr "Gelenler"
-
-#~ msgid "Outbound"
-#~ msgstr "Gidenler"
-
-#~ msgid "Before Sending"
-#~ msgstr "GÃÂÃÂÃÂÃÂ¶ndermeden ÃÂÃÂÃÂÃÂ¶nce"
-
-#~ msgid "Demand"
-#~ msgstr "ÃÂÃÂÃÂÃÂ°stek"
-
-#~ msgid "Matches"
-#~ msgstr "EÃÂÃÂÃÂÃÂleÃÂÃÂÃÂÃÂtirilir"
-
-#~ msgid "Doesn't Match"
-#~ msgstr "EÃÂÃÂÃÂÃÂleÃÂÃÂÃÂÃÂtirilemez"
-
-#~ msgid "On"
-#~ msgstr "AÃÂÃÂÃÂÃÂ§ÃÂÃÂÃÂÃÂ±k"
-
-#~ msgid "Match string:"
-#~ msgstr "Aranacak metin:"
-
-#~ msgid "Command:"
-#~ msgstr "Komut:"
-
-#~ msgid "Process when:"
-#~ msgstr "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂlem ÃÂÃÂÃÂÃÂartÃÂÃÂÃÂÃÂ±:"
-
-#~ msgid "Run on:"
-#~ msgstr "ÃÂÃÂÃÂÃÂalÃÂÃÂÃÂÃÂ±ÃÂÃÂÃÂÃÂtÃÂÃÂÃÂÃÂ±r:"
-
-#~ msgid "Disposition:"
-#~ msgstr "Reddet"
-
-#~ msgid "Place/leave in default folder"
-#~ msgstr "ÃÂÃÂÃÂÃÂn tanÃÂÃÂÃÂÃÂ±mlÃÂÃÂÃÂÃÂ± dizine yerleÃÂÃÂÃÂÃÂtir/dizinden uzaklaÃÂÃÂÃÂÃÂtÃÂÃÂÃÂÃÂ±r"
-
-#~ msgid "Do not place/leave in default folder"
-#~ msgstr "ÃÂÃÂÃÂÃÂntanÃÂÃÂÃÂÃÂ±mlÃÂÃÂÃÂÃÂ± dizine yerleÃÂÃÂÃÂÃÂtirme/dizinden uzaklaÃÂÃÂÃÂÃÂtÃÂÃÂÃÂÃÂ±rma"
-
-#~ msgid "Stop filtering here"
-#~ msgstr "Burada filtrelemeyi durdur"
-
-#~ msgid "_Port:"
-#~ msgstr "_Port:"
-
-#~ msgid "Balsa Information"
-#~ msgstr "Balsa HakkÃÂÃÂÃÂÃÂ±nda"
-
-#~ msgid ""
-#~ "This is a mailbox in your local directory.\n"
-#~ "Change the path instead.\n"
-#~ "Mailbox not Updated.\n"
-#~ msgstr ""
-#~ "Bu posta kutusu yerel dizinde varolan bir posta kutusudur.\n"
-#~ "Patika ismini deÃÂÃÂÃÂÃÂiÃÂÃÂÃÂÃÂtiriniz.\n"
-#~ "Posta kutusu gÃÂÃÂÃÂÃÂ¼ncellenmedi.\n"
-
-#~ msgid "_Check this mailbox for new mail"
-#~ msgstr "Bu posta kutusunu yeni posta var mÃÂÃÂÃÂÃÂ± diye _kontrol et."
-
-#~ msgid "_Customize..."
-#~ msgstr "_ÃÂÃÂÃÂÃÂzelleÃÂÃÂÃÂÃÂtir..."
-
-#~ msgid "Copyright (C) 1997-2001"
-#~ msgstr "Telif HakkÃÂÃÂÃÂÃÂ± (C) 1997-2001"
-
-#~ msgid "You have new mail waiting"
-#~ msgstr "Bekleyen yeni iletileriniz var."
-
-#~ msgid "OK"
-#~ msgstr "Tamam"
-
-#~ msgid "Next part in Message"
-#~ msgstr "MesajÃÂÃÂÃÂÃÂ±n sonraki bÃÂÃÂÃÂÃÂ¶lÃÂÃÂÃÂÃÂ¼mÃÂÃÂÃÂÃÂ¼"
-
-#~ msgid "Previous part in Message"
-#~ msgstr "ÃÂÃÂÃÂÃÂ°letinin ÃÂÃÂÃÂÃÂ¶nceki bÃÂÃÂÃÂÃÂ¶lÃÂÃÂÃÂÃÂ¼mÃÂÃÂÃÂÃÂ¼"
-
-#~ msgid "Text"
-#~ msgstr "DÃÂÃÂÃÂÃÂ¼zyazÃÂÃÂÃÂÃÂ±"
-
-#~ msgid "Icons"
-#~ msgstr "Simgeler"
-
-#~ msgid "Both"
-#~ msgstr "Her ikisi"
-
-#~ msgid "Yes"
-#~ msgstr "Evet"
-
-#~ msgid "Preview Font"
-#~ msgstr "YazÃÂÃÂÃÂÃÂ± tipi ÃÂÃÂÃÂÃÂ¶nizlemesi"
-
-#~ msgid "Preview pane"
-#~ msgstr "ÃÂÃÂÃÂÃÂnizleme penceresi"
-
-#~ msgid "Subject Header Font"
-#~ msgstr "Konu BaÃÂÃÂÃÂÃÂlÃÂÃÂÃÂÃÂ±ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ± YazÃÂÃÂÃÂÃÂ± Tipi"
-
-#~ msgid ""
-#~ "This version of balsa is compiled without gnome-print support.\n"
-#~ "Printing is not possible."
-#~ msgstr ""
-#~ "Balsa' nÃÂÃÂÃÂÃÂ±n bu sÃÂÃÂÃÂÃÂ¼rÃÂÃÂÃÂÃÂ¼mÃÂÃÂÃÂÃÂ¼ gnome-print desteÃÂÃÂÃÂÃÂi olmaksÃÂÃÂÃÂÃÂ±zÃÂÃÂÃÂÃÂ±n derlenmiÃÂÃÂÃÂÃÂ.\n"
-#~ "YazdÃÂÃÂÃÂÃÂ±rmak mÃÂÃÂÃÂÃÂ¼mkÃÂÃÂÃÂÃÂ¼n deÃÂÃÂÃÂÃÂildir"
-
-#~ msgid "Balsa could not find paper type \"%s\".\n"
-#~ msgstr "Balsa \"%s\" kaÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ±t tipini bulamadÃÂÃÂÃÂÃÂ±.\n"
-
-#~ msgid "Using paper type \"%s\" from /etc/paper.config instead\n"
-#~ msgstr "/etc/paper.config dosyasÃÂÃÂÃÂÃÂ±ndaki\"%s\" kaÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ±t tipi kullanÃÂÃÂÃÂÃÂ±lÃÂÃÂÃÂÃÂ±yor\n"
-
-#~ msgid ""
-#~ "Balsa could not find font %s\n"
-#~ "Printing is not possible"
-#~ msgstr ""
-#~ "Balsa %s yazÃÂÃÂÃÂÃÂ± tipini bulamadÃÂÃÂÃÂÃÂ±.\n"
-#~ "YazdÃÂÃÂÃÂÃÂ±rmak mÃÂÃÂÃÂÃÂ¼mkÃÂÃÂÃÂÃÂ¼n deÃÂÃÂÃÂÃÂildir"
-
-#~ msgid "_Reflow Paragraph"
-#~ msgstr "_Reflow Paragraph"
-
-#~ msgid "R_eflow Message"
-#~ msgstr "R_eflow Message"
-
-#~ msgid "_Comments"
-#~ msgstr "_Yorumlar"
-
-#~ msgid "English"
-#~ msgstr "ÃÂÃÂÃÂÃÂ°ngilizce"
-
-#~ msgid "_A-J"
-#~ msgstr "_A-J"
-
-#~ msgid "_K-Z"
-#~ msgstr "_K-Z"
-
-#~ msgid "_Always Queue Sent Mail"
-#~ msgstr "GÃÂÃÂÃÂÃÂ¶nderilmiÃÂÃÂÃÂÃÂ iletileri G_ÃÂÃÂÃÂÃÂ¶nderilen Dizininde SÃÂÃÂÃÂÃÂ±rala"
-
-#~ msgid ""
-#~ "The attachment pixmap (%s) cannot be used.\n"
-#~ " %s"
-#~ msgstr ""
-#~ "Pixmap (%s) eklentisi kullanÃÂÃÂÃÂÃÂ±lamadÃÂÃÂÃÂÃÂ±.\n"
-#~ " %s"
-
-#~ msgid ""
-#~ "Default attachment pixmap (balsa/attachment.png) cannot be found:\n"
-#~ "Your balsa installation is corrupted."
-#~ msgstr ""
-#~ "Eklenti simgesi ( balsa/attachment.png ) bulunamadÃÂÃÂÃÂÃÂ±.\n"
-#~ "Balsa kurulumunuz tamamlanamayacak."
-
-#~ msgid "In order to store an address, you must select a message.\n"
-#~ msgstr "Bir adresi kaydetmek iÃÂÃÂÃÂÃÂ§in ÃÂÃÂÃÂÃÂ¶ncelikle bir iletiyi seÃÂÃÂÃÂÃÂ§meniz lazÃÂÃÂÃÂÃÂ±m.\n"
-
-#~ msgid "You may only store one address at a time.\n"
-#~ msgstr "AynÃÂÃÂÃÂÃÂ± anda birden fazla adresi kaydedemezsiniz.\n"
-
-#~ msgid "This message doesn't contain an e-mail address.\n"
-#~ msgstr "Bu ileti bir posta adresi iÃÂÃÂÃÂÃÂ§ermiyor.\n"
-
-#~ msgid "Contact Information"
-#~ msgstr "ÃÂÃÂÃÂÃÂ°letiÃÂÃÂÃÂÃÂim Bilgileri"
-
-#~ msgid "Sorry, no semicolons are allowed in the name!\n"
-#~ msgstr "Ne yazÃÂÃÂÃÂÃÂ±k ki isim iÃÂÃÂÃÂÃÂ§inde noktalÃÂÃÂÃÂÃÂ± virgÃÂÃÂÃÂÃÂ¼l kullanamazsÃÂÃÂÃÂÃÂ±nÃÂÃÂÃÂÃÂ±z!\n"
-
-#~ msgid "Customize"
-#~ msgstr "ÃÂÃÂÃÂÃÂzelleÃÂÃÂÃÂÃÂtir"
-
-#~ msgid "-"
-#~ msgstr "..."
-
-#~ msgid "+"
-#~ msgstr "+"
+msgid "New mail notification"
+msgstr "Yeni ePosta geliş haber etmesi"

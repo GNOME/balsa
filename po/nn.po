@@ -273,7 +273,7 @@ msgstr ""
 #: libbalsa/mailbox_maildir.c:114
 #, fuzzy, c-format
 msgid "Mailbox %s does not appear to be a Maildir mailbox."
-msgstr "%1 ser ikkje ut til Ã¥ vera ein RPM-pakke"
+msgstr "%1 ser ikkje ut til å vera ein RPM-pakke"
 
 #: libbalsa/mailbox_maildir.c:123
 #, fuzzy, c-format
@@ -313,12 +313,12 @@ msgstr ""
 #: libbalsa/mailbox_mbox.c:113
 #, fuzzy, c-format
 msgid "Mailbox %s does not appear to be an Mbox mailbox."
-msgstr "%1 ser ikkje ut til Ã¥ vera ein RPM-pakke"
+msgstr "%1 ser ikkje ut til å vera ein RPM-pakke"
 
 #: libbalsa/mailbox_mh.c:112
 #, fuzzy, c-format
 msgid "Mailbox %s does not appear to be a Mh mailbox."
-msgstr "%1 ser ikkje ut til Ã¥ vera ein RPM-pakke"
+msgstr "%1 ser ikkje ut til å vera ein RPM-pakke"
 
 #: libbalsa/mailbox_mh.c:122
 #, fuzzy, c-format
@@ -635,7 +635,7 @@ msgid ""
 "really want to do this?"
 msgstr ""
 "Dette avsluttar spelet.\n"
-"Er du sikker pÃ¥ at du vil gjera dette?"
+"Er du sikker på at du vil gjera dette?"
 
 #: libinit_balsa/balsa-initdruid.gob:119
 #, fuzzy
@@ -974,7 +974,7 @@ msgstr ""
 #: libmutt/imap/message.c:523
 #, fuzzy
 msgid "Uploading message ..."
-msgstr "Les side pÃ¥ nytt ..."
+msgstr "Les side på nytt ..."
 
 #: libmutt/imap/message.c:633
 #, fuzzy, c-format
@@ -1109,7 +1109,7 @@ msgstr "Drep gjeldande prosess ..."
 #: libmutt/mutt_ssl.c:204
 #, fuzzy, c-format
 msgid "%s has insecure permissions!"
-msgstr "Ta vare pÃ¥ lÃ¸yve"
+msgstr "Ta vare på løyve"
 
 #: libmutt/mutt_ssl.c:223
 msgid "SSL disabled due the lack of entropy"
@@ -2159,7 +2159,7 @@ msgstr ""
 #: src/mailbox-conf.c:213
 #, fuzzy
 msgid "Remove from list and disk"
-msgstr "Fjern frÃ¥ depot (og disk)"
+msgstr "Fjern frå depot (og disk)"
 
 #: src/mailbox-conf.c:220
 #, c-format
@@ -2539,7 +2539,7 @@ msgstr "Graf"
 #: src/main-window.c:397 src/sendmsg-window.c:213
 #, fuzzy
 msgid "Wrap message lines"
-msgstr "TrÃ¥dordna meldingar"
+msgstr "Trådordna meldingar"
 
 #: src/main-window.c:405
 #, fuzzy

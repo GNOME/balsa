@@ -5024,3 +5024,15 @@ msgstr "Zeitüberschreitung beim Versuch ein flock-Lock zu erhalten!"
 #, c-format
 msgid "Waiting for flock attempt... %d"
 msgstr "Warten auf flock-Versuch... %d"
+
+msgid "Balsa E-mail reader"
+msgstr "Balsa E-Mail Programm"
+
+msgid "Program startup"
+msgstr "Programmstart"
+
+msgid "E-mail"
+msgstr "E-Mail"
+
+msgid "New mail notification"
+msgstr "Neue E-Mail eingetroffen"

@@ -5791,3 +5791,15 @@ msgstr "Доле"
 
 #~ msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
 #~ msgstr "LibBalsaMailboxLocal: Отварам %s Рефброј: %d\n"
+
+msgid "Balsa E-mail reader"
+msgstr "Читач епоште Балса"
+
+msgid "Program startup"
+msgstr "Покретање програма"
+
+msgid "E-mail"
+msgstr "Епошта"
+
+msgid "New mail notification"
+msgstr "Обавештење о новој пошти"

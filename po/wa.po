@@ -5567,3 +5567,14 @@ msgstr "Monter"
 msgid "Down"
 msgstr "Dischinde"
 
+msgid "Balsa E-mail reader"
+msgstr "Manaedjeu d' emilaedjes Balsa"
+
+msgid "Program startup"
+msgstr "Enondaedje do programe"
+
+msgid "E-mail"
+msgstr "Emilaedje"
+
+msgid "New mail notification"
+msgstr "Vos avoz des noveas emiles"

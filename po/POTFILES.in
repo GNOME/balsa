@@ -43,6 +43,8 @@ libinit_balsa/balsa-druid-page-welcome.c
 libinit_balsa/balsa-initdruid.c
 libinit_balsa/helper.c
 libinit_balsa/init_balsa.c
+sounds/balsa.soundlist.in
+sounds/email.soundlist.in
 src/ab-main.c
 src/ab-window.c
 src/address-book-config.c

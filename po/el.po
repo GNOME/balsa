@@ -6642,3 +6642,9 @@ msgstr "Κάτω"
 #
 #~ msgid "Mail_boxes"
 #~ msgstr "Γ_ραμματοκιβώτια"
+
+msgid "E-mail"
+msgstr "ΗλεκτρονικΒή Αλληλογραφία"
+
+msgid "New mail notification"
+msgstr "Γνωστοποίηση νέας αλληλογραφίας"

@@ -710,7 +710,7 @@ msgstr "Рассматривать множественные адреса как:"
 
 #: src/address-book.c:338
 msgid "alternative addresses for the same person"
-msgstr "алтернативные адреса для того же лица"
+msgstr "альтернативные адреса для того же лица"
 
 #: src/address-book.c:343
 msgid "a distribution list"

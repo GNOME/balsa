@@ -22,5 +22,5 @@ libbalsa_a_SOURCES = 		\
 
 libbalsa_a_LIBADD = @LIBOBJS@
 
-INCLUDES=-I. -I${top_srcdir}/src -I${top_srcdir} \
+INCLUDES=-I. -I${top_srcdir}/src -I${top_srcdir} -I${top_builddir}/libmutt \
 	$(GNOME_INCLUDEDIR)

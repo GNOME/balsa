@@ -37,7 +37,8 @@ balsa_SOURCES =	\
 	sendmsg-window.h
 
 
-INCLUDES=-I. -I${top_srcdir}/libbalsa -I${top_srcdir} $(GNOME_INCLUDEDIR)
+INCLUDES=-I. -I${top_srcdir}/libbalsa -I${top_srcdir} \
+    -I${top_builddir}/libmutt $(GNOME_INCLUDEDIR)
 
 balsa_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a \

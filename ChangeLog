@@ -1,3 +1,8 @@
+2004-11-04 Albrecht Dreß <albrecht.dress@arcor.de>
+
+	* libbalsa/: address-book-vcard.c, address-entry.c: small patch to
+	address two utf8 related problems.
+
 2004-11-04 08:12  PeterB
 
 	* libbalsa/address-entry.c: do not dequote address phrase.

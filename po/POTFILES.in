@@ -25,11 +25,11 @@ libbalsa/message.c
 libbalsa/pop3.c
 libbalsa/send.c
 libbalsa/source-viewer.c
-libinit_balsa/balsa-druid-page-directory.gob
-libinit_balsa/balsa-druid-page-finish.gob
-libinit_balsa/balsa-druid-page-user.gob
-libinit_balsa/balsa-druid-page-welcome.gob
-libinit_balsa/balsa-initdruid.gob
+libinit_balsa/balsa-druid-page-directory.c
+libinit_balsa/balsa-druid-page-finish.c
+libinit_balsa/balsa-druid-page-user.c
+libinit_balsa/balsa-druid-page-welcome.c
+libinit_balsa/balsa-initdruid.c
 libinit_balsa/helper.c
 libinit_balsa/init_balsa.c
 libmutt/account.c

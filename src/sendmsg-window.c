@@ -206,25 +206,6 @@ create_menu (BalsaSendmsg * bmsg)
   return menubar;
 }
 
-
-void
-new_message (GtkWidget * widget, gpointer data)
-{
-  sendmsg_window_new (widget, NULL, 0);
-}
-
-void
-replyto_message (GtkWidget * widget, gpointer data)
-{
-  sendmsg_window_new (widget, BALSA_INDEX (balsa_app.current_index), 1);
-}
-
-void
-forward_message (GtkWidget * widget, gpointer data)
-{
-  sendmsg_window_new (widget, BALSA_INDEX (balsa_app.current_index), 2);
-}
-
 void
 sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
 {

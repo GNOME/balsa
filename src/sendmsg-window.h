@@ -35,10 +35,6 @@ extern "C"
       GtkWidget *window;
     };
 
-  void new_message (GtkWidget *, gpointer);
-  void replyto_message (GtkWidget *, gpointer);
-  void forward_message (GtkWidget *, gpointer);
-
   void sendmsg_window_new (GtkWidget *, BalsaIndex *, gint);
 
 #ifdef __cplusplus

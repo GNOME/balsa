@@ -35,22 +35,22 @@
 
 typedef struct _MainWindow MainWindow;
 struct _MainWindow
-{
-  GtkWidget *window;
-  
-  GtkWidget *menubar;
-  
-  GtkWidget *toolbar;
-  GtkWidget *mailbox_option_menu;
-  GtkWidget *mailbox_menu;
-  GtkWidget *move_menu;
-  
-  GtkWidget *index;
-  
-  GtkWidget *message_area;
-  
-  GtkWidget *status_bar;
-};
+  {
+    GtkWidget *window;
+
+    GtkWidget *menubar;
+
+    GtkWidget *toolbar;
+    GtkWidget *mailbox_option_menu;
+    GtkWidget *mailbox_menu;
+    GtkWidget *move_menu;
+
+    GtkWidget *index;
+
+    GtkWidget *message_area;
+
+    GtkWidget *status_bar;
+  };
 
 static MainWindow *mw = NULL;
 static gint about_box_visible = FALSE;
@@ -74,9 +74,14 @@ static void show_about_box ();
 /* callbacks */
 static void move_resize_cb ();
 
-static void index_select_cb (GtkWidget * widget,  MAILSTREAM * stream, glong mesgno);
+static void index_select_cb (GtkWidget * widget, MAILSTREAM * stream, glong mesgno);
 static void next_message_cb (GtkWidget * widget);
 static void previous_message_cb (GtkWidget * widget);
+
+static void new_message_cb (GtkWidget * widget);
+static void replyto_message_cb (GtkWidget * widget);
+static void forward_message_cb (GtkWidget * widget);
+
 static void delete_message_cb (GtkWidget * widget);
 static void undelete_message_cb (GtkWidget * widget);
 
@@ -155,10 +160,10 @@ open_main_window ()
   hbox = gtk_hbox_new (TRUE, 0);
   mw->index = balsa_index_new ();
 
-  if (gdk_screen_width() > 640 && gdk_screen_height() > 480)
-    gtk_widget_set_usize(mw->index, 1, 200);
+  if (gdk_screen_width () > 640 && gdk_screen_height () > 480)
+    gtk_widget_set_usize (mw->index, 1, 200);
   else
-    gtk_widget_set_usize(mw->index, 1, 133);
+    gtk_widget_set_usize (mw->index, 1, 133);
 
   gtk_container_border_width (GTK_CONTAINER (mw->index), 2);
   gtk_box_pack_start (GTK_BOX (hbox), mw->index, TRUE, TRUE, 2);
@@ -238,7 +243,7 @@ refresh_main_window ()
   /*
    * set the toolbar style
    */
-   gtk_toolbar_set_style (GTK_TOOLBAR (mw->toolbar), balsa_app.toolbar_style);
+  gtk_toolbar_set_style (GTK_TOOLBAR (mw->toolbar), balsa_app.toolbar_style);
 
 
 
@@ -281,7 +286,7 @@ main_window_set_mailbox (Mailbox * mailbox)
   gint i;
   GtkWidget *menuitem;
   GList *children;
-  
+
   children = GTK_MENU_SHELL (mw->mailbox_menu)->children;
   while (children)
     {
@@ -299,7 +304,7 @@ main_window_set_mailbox (Mailbox * mailbox)
       g_print ("Error: Could not find menuitem for mailbox.\n");
       return;
     }
-  
+
   gtk_menu_item_activate (GTK_MENU_ITEM (menuitem));
 }
 
@@ -374,7 +379,7 @@ create_menu ()
 
   gtk_signal_connect (GTK_OBJECT (w),
 		      "activate",
-		      (GtkSignalFunc) new_message,
+		      (GtkSignalFunc) new_message_cb,
 		      NULL);
 
   gtk_menu_append (GTK_MENU (menu), w);
@@ -387,7 +392,7 @@ create_menu ()
 
   gtk_signal_connect (GTK_OBJECT (w),
 		      "activate",
-		      (GtkSignalFunc) replyto_message,
+		      (GtkSignalFunc) replyto_message_cb,
 		      NULL);
 
   gtk_menu_append (GTK_MENU (menu), w);
@@ -399,7 +404,7 @@ create_menu ()
 
   gtk_signal_connect (GTK_OBJECT (w),
 		      "activate",
-		      (GtkSignalFunc) forward_message,
+		      (GtkSignalFunc) forward_message_cb,
 		      NULL);
 
   gtk_menu_append (GTK_MENU (menu), w);
@@ -556,7 +561,7 @@ create_toolbar ()
 			     "Check",
 			     "Check Email",
 			     NULL,
-			     gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_RCV),
+	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_RCV),
 			     (GtkSignalFunc) current_mailbox_check,
 			     "Check Email");
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
@@ -570,7 +575,7 @@ create_toolbar ()
 			     "Delete",
 			     "Delete Message",
 			     NULL,
-			     gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_TRASH),
+	       gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_TRASH),
 			     (GtkSignalFunc) delete_message_cb,
 			     NULL);
   gtk_object_set_user_data (GTK_OBJECT (toolbarbutton), (gpointer) mw);
@@ -585,8 +590,8 @@ create_toolbar ()
 			     "Compose",
 			     "Compose Message",
 			     NULL,
-			     gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_NEW),
-			     (GtkSignalFunc) new_message,
+	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_NEW),
+			     (GtkSignalFunc) new_message_cb,
 			     "Compose Message");
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
@@ -596,8 +601,8 @@ create_toolbar ()
 			     "Reply",
 			     "Reply",
 			     NULL,
-			     gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_RPL),
-			     (GtkSignalFunc) replyto_message,
+	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_RPL),
+			     (GtkSignalFunc) replyto_message_cb,
 			     "Reply");
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
@@ -607,8 +612,8 @@ create_toolbar ()
 			     "Forward",
 			     "Forward",
 			     NULL,
-			     gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_FWD),
-			     (GtkSignalFunc) forward_message,
+	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_FWD),
+			     (GtkSignalFunc) forward_message_cb,
 			     "Forward");
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
@@ -621,7 +626,7 @@ create_toolbar ()
 			     "Previous",
 			     "Open Previous Message",
 			     NULL,
-			     gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_BACK),
+		gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_BACK),
 			     (GtkSignalFunc) previous_message_cb,
 			     "Open Previous Message");
   gtk_object_set_user_data (GTK_OBJECT (toolbarbutton), (gpointer) mw);
@@ -633,7 +638,7 @@ create_toolbar ()
 			     "Next",
 			     "Open Next Message",
 			     NULL,
-			     gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_FORWARD),
+	     gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_FORWARD),
 			     (GtkSignalFunc) next_message_cb,
 			     "Open Next Message");
   gtk_object_set_user_data (GTK_OBJECT (toolbarbutton), (gpointer) mw);
@@ -686,17 +691,17 @@ show_about_box ()
 static void
 move_resize_cb ()
 {
-  gdk_window_get_geometry (mw->window->window, 
-			   NULL, 
+  gdk_window_get_geometry (mw->window->window,
 			   NULL,
-			   &balsa_app.mw_width, 
-			   &balsa_app.mw_height, 
+			   NULL,
+			   &balsa_app.mw_width,
+			   &balsa_app.mw_height,
 			   NULL);
 }
 
 
 static void
-index_select_cb (GtkWidget * widget, 
+index_select_cb (GtkWidget * widget,
 		 MAILSTREAM * stream,
 		 glong mesgno)
 {
@@ -710,8 +715,32 @@ index_select_cb (GtkWidget * widget,
   balsa_message_set (BALSA_MESSAGE (mainwindow->message_area), stream, mesgno);
 }
 
+static void
+new_message_cb (GtkWidget * widget)
+{
+  g_return_if_fail (widget != NULL);
+  sendmsg_window_new (widget, NULL, 0);
+}
 
-static void 
+static void
+replyto_message_cb (GtkWidget * widget)
+{
+  g_return_if_fail (widget != NULL);
+  if (!balsa_app.current_index)
+    return;
+  sendmsg_window_new (widget, BALSA_INDEX (balsa_app.current_index), 1);
+}
+
+static void
+forward_message_cb (GtkWidget * widget)
+{
+  g_return_if_fail (widget != NULL);
+  if (!balsa_app.current_index)
+    return;
+  sendmsg_window_new (widget, BALSA_INDEX (balsa_app.current_index), 2);
+}
+
+static void
 next_message_cb (GtkWidget * widget)
 {
   MainWindow *mainwindow;

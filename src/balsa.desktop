@@ -1,6 +1,9 @@
 [Desktop Entry]
+Name=Balsa
+Comment=Gnome Email Client
 Exec=balsa
-Icon=gnome-balsa2.png
+Icon=balsa-icon.png
 Info=Gnome Email Client
-Terminal=0
+Terminal=false
 Type=Application
+

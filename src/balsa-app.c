@@ -72,10 +72,36 @@ balsa_error (const char *fmt,...)
   /* Don't do this - the window is already realized [ijc] */
   /*  gtk_window_set_wmclass (GTK_WINDOW (messagebox), "error", "Balsa"); */
 
-  gnome_dialog_run_and_close ( GNOME_DIALOG(messagebox) );
-
   balsa_exit();
 
+}
+
+/* ask_password:
+   asks the user for the password to the mailbox on given remote server.
+*/
+static void handle_password(gchar * string, gchar **target)
+{ *target = string; }
+gchar* ask_password(LibBalsaServer* server, LibBalsaMailbox *mbox) 
+{
+  GtkWidget *dialog;
+  gchar * prompt, *passwd = NULL;
+  
+  g_return_val_if_fail(server != NULL, NULL);
+  if(mbox) 
+    prompt = g_strdup_printf( 
+      _("Opening remote mailbox %s.\nThe password for %s@%s:"), 
+      mbox->name, server->user, server->host);
+  else 
+    prompt = g_strdup_printf( _("Mailbox password for %s@%s:"), 
+			      server->user, server->host);
+  dialog = gnome_request_dialog (TRUE, prompt, NULL,
+				 0,
+				 (GnomeStringCallback)handle_password,
+				 (gpointer)&passwd,
+				 GTK_WINDOW(balsa_app.main_window));
+  g_free(prompt);
+  gnome_dialog_run_and_close(GNOME_DIALOG(dialog));
+  return passwd;
 }
 
 /* Handle button clicks in the warning window */

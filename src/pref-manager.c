@@ -190,8 +190,11 @@ create_identity_page ()
 static void
 refresh_identity_data ()
 {
+  gchar *email;
+  email = g_malloc(strlen(balsa_app.username)+1+strlen(balsa_app.hostname)+2);
+  sprintf(email,"%s@%s\0",balsa_app.username,balsa_app.hostname);
   gtk_entry_set_text (GTK_ENTRY (pmw->real_name), balsa_app.real_name);
-  gtk_entry_set_text (GTK_ENTRY (pmw->email), balsa_app.username);
+  gtk_entry_set_text (GTK_ENTRY (pmw->email), email);
   gtk_entry_set_text (GTK_ENTRY (pmw->organization), balsa_app.organization);
+  g_free(email);
 }
-

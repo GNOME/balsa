@@ -25,25 +25,26 @@
 
 typedef struct _PreferencesManagerWindow PreferencesManagerWindow;
 struct _PreferencesManagerWindow
-  {
-    GtkWidget *window;
+{
+  GtkWidget *window;
+  
+  /* identity */
+  GtkWidget *real_name;
+  GtkWidget *email;
+  GtkWidget *organization;
+  
 
-    /* identity */
-    GtkWidget *real_name;
+  /* local */
+  GtkWidget *mail_directory;
 
-    GtkWidget *username;
-    GtkWidget *hostname;
+  
+  /* servers */
+  GtkWidget *smtp_server;
 
-    GtkWidget *organization;
 
-    /* local */
-    GtkWidget *mail_directory;
 
-    /* servers */
-    GtkWidget *smtp_server;
 
-  };
-
+};
 static PreferencesManagerWindow *pmw = NULL;
 
 
@@ -155,6 +156,7 @@ open_preferences_manager ()
   gtk_widget_show (pmw->window);
 }
 
+
 static void
 cancel_preferences_manager ()
 {
@@ -170,23 +172,50 @@ cancel_preferences_manager ()
 void
 ok_preferences_manager ()
 {
+  gchar *email, *c;
+
+
   g_free (balsa_app.real_name);
   balsa_app.real_name = g_strdup(gtk_entry_get_text (GTK_ENTRY (pmw->real_name)));
 
-  g_free (balsa_app.username);
-  balsa_app.username = g_strdup(gtk_entry_get_text (GTK_ENTRY (pmw->username)));
 
-  g_free (balsa_app.hostname);
-  balsa_app.hostname = g_strdup(gtk_entry_get_text (GTK_ENTRY (pmw->hostname)));
+  /* parse username/hostname from the email entry */
+  email = c = g_strdup (gtk_entry_get_text (GTK_ENTRY (pmw->email)));
+
+  while (*c != '\0' && *c != '@')
+    c++;
+
+  if (*c == '\0')
+    {
+      g_free (balsa_app.username);
+      balsa_app.username = g_strdup (email);
+    }
+  else
+    {
+      *c = '\0';
+      c++;
+
+      g_print ("email: %s\n", email);
+      g_print ("c: %s\n", c);
+
+      
+      g_free (balsa_app.username);
+      balsa_app.username = g_strdup (email);
+
+      g_free (balsa_app.hostname);
+      balsa_app.hostname = g_strdup (c);
+    }
+  g_free (email);
+
 
   g_free (balsa_app.organization);
-  balsa_app.organization = g_strdup(gtk_entry_get_text (GTK_ENTRY (pmw->organization)));
+  balsa_app.organization = g_strdup (gtk_entry_get_text (GTK_ENTRY (pmw->organization)));
 
   g_free (balsa_app.smtp_server);
-  balsa_app.smtp_server = g_strdup(gtk_entry_get_text (GTK_ENTRY (pmw->smtp_server)));
+  balsa_app.smtp_server = g_strdup (gtk_entry_get_text (GTK_ENTRY (pmw->smtp_server)));
 
   g_free (balsa_app.local_mail_directory);
-  balsa_app.local_mail_directory = g_strdup(gtk_entry_get_text (GTK_ENTRY (pmw->mail_directory)));
+  balsa_app.local_mail_directory = g_strdup (gtk_entry_get_text (GTK_ENTRY (pmw->mail_directory)));
 
   gtk_widget_destroy (pmw->window);
   save_global_settings ();
@@ -199,12 +228,19 @@ ok_preferences_manager ()
 void
 refresh_preferences_manager ()
 {
+  GString *str;
+
+
   gtk_entry_set_text (GTK_ENTRY (pmw->real_name), balsa_app.real_name);
 
   /* we're gonna display this as  USERNAME @ HOSTNAME 
    * for the From: header */
-  gtk_entry_set_text (GTK_ENTRY (pmw->username), balsa_app.username);
-  gtk_entry_set_text (GTK_ENTRY (pmw->hostname), balsa_app.hostname);
+  str = g_string_new (balsa_app.username);
+  g_string_append_c (str, '@');
+  g_string_append (str, balsa_app.hostname);
+  gtk_entry_set_text (GTK_ENTRY (pmw->email), str->str);
+  g_string_free (str, TRUE);
+
   gtk_entry_set_text (GTK_ENTRY (pmw->organization), balsa_app.organization);
   gtk_entry_set_text (GTK_ENTRY (pmw->smtp_server), balsa_app.smtp_server);
   gtk_entry_set_text (GTK_ENTRY (pmw->mail_directory), balsa_app.local_mail_directory);
@@ -219,7 +255,6 @@ static GtkWidget *
 create_identity_page ()
 {
   GtkWidget *vbox;
-  GtkWidget *hbox;
   GtkWidget *table;
   GtkWidget *label;
   GtkWidget *button;
@@ -261,21 +296,11 @@ create_identity_page ()
   gtk_widget_show (label);
 
 
-  pmw->username = gtk_entry_new ();
-  pmw->hostname = gtk_entry_new ();
-  hbox = gtk_hbox_new (FALSE, 0);
-  gtk_widget_show (hbox);
-  gtk_box_pack_start (GTK_BOX (hbox), pmw->username, TRUE, TRUE, 0);
-  gtk_widget_show (pmw->username);
-  label = gtk_label_new ("@");
-  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
-  gtk_widget_show (label);
-  gtk_box_pack_start (GTK_BOX (hbox), pmw->hostname, TRUE, TRUE, 0);
-  gtk_widget_show (pmw->hostname);
-
-  gtk_table_attach (GTK_TABLE (table), hbox, 1, 2, 1, 2,
+  pmw->email = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), pmw->email, 1, 2, 1, 2,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL,
 		    0, 10);
+  gtk_widget_show (pmw->email);
 
 
   /* organization */

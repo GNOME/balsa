@@ -2085,12 +2085,12 @@ set_icon(GnomeApp * app)
     GdkPixbuf *pb = NULL;
 #else
     GdkImlibImage *im = NULL;
+    GdkPixmap *pmap, *mask;
 #endif
     GdkWindow *ic_win, *w;
     GdkWindowAttr att;
     XIconSize *is;
     gint i, count, j;
-    GdkPixmap *pmap, *mask;
 
     w = GTK_WIDGET(app)->window;
 

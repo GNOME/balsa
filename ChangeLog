@@ -1,5 +1,18 @@
 2001-02-01  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* acconfig.h: add USE_PIXBUF
+	* configure.in: test for gdk_pixbuf
+	* libbalsa/server.c: fix destroy method.
+	* src/Makefile.am: add folder-conf.[hc]
+	* src/address-book.c: fix crash on toggling when no current book.
+	* src/balsa-app.[hc]: implement find_gnode_of_folder()
+	* src/mailbox-node.[hc]: add imap folder support+config saving
+	* src/main-window.c: fix pixbuf build.
+	* src/save-restore.[ch]: add config_folder_add() and
+	config_folder_update()
+	
+2001-02-01  Pawel Salek  <pawsa@theochem.kth.se>
+
 	* INSTALL: update info about gtkhtml and RH.
 	* README: descripbe --disable-more-warnings
 	* libbalsa/misc.[hc]: add  libbalsa_(de)?escape_specials to allow

@@ -129,6 +129,7 @@ libbalsa_server_init(LibBalsaServer * server)
     server->passwd = NULL;
 }
 
+/* leave object in sane state (NULLified fields) */
 static void
 libbalsa_server_destroy(GtkObject * object)
 {
@@ -138,9 +139,9 @@ libbalsa_server_destroy(GtkObject * object)
 
     server = LIBBALSA_SERVER(object);
 
-    g_free(server->host);
-    g_free(server->user);
-    g_free(server->passwd);
+    g_free(server->host);   server->host = NULL;
+    g_free(server->user);   server->user = NULL;
+    g_free(server->passwd); server->passwd = NULL;
 
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
 	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));

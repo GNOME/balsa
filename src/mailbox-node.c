@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,6 +24,7 @@
 #include <unistd.h>
 #include "balsa-app.h"
 #include "folder-scanners.h"
+#include "folder-conf.h"
 #include "mailbox-conf.h"
 #include "mailbox-node.h"
 #include "save-restore.h"
@@ -134,6 +135,8 @@ balsa_mailbox_node_init(BalsaMailboxNode * mn)
     mn->mailbox = NULL;
     mn->style = 0;
     mn->name = NULL;
+    mn->dir = NULL;
+    mn->config_prefix = NULL;
     mn->threading_type = BALSA_INDEX_THREADING_JWZ;
     mn->sort_type = GTK_SORT_DESCENDING;
     mn->sort_field = SORT_NO;
@@ -149,8 +152,9 @@ balsa_mailbox_node_destroy(GtkObject * object)
     /* FIXME: should we use references to mailboxes? */
     mn->parent  = NULL; 
     mn->mailbox = NULL;
-    g_free(mn->name);
-    mn->name = NULL;
+    g_free(mn->name);          mn->name = NULL;
+    g_free(mn->dir);           mn->dir = NULL;
+    g_free(mn->config_prefix); mn->config_prefix = NULL;
 
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
 	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
@@ -158,7 +162,13 @@ balsa_mailbox_node_destroy(GtkObject * object)
 
 static void
 balsa_mailbox_node_real_save_config(BalsaMailboxNode* mn, const gchar * prefix)
-{}
+{
+    if(mn->name)
+	printf("Saving mailbox node %s with prefix %s\n", mn->name, prefix);
+    libbalsa_server_save_config(mn->server);
+    gnome_config_set_string("Name",      mn->name);
+    gnome_config_set_string("Directory", mn->dir);
+}
 
 static void
 balsa_mailbox_node_real_load_config(BalsaMailboxNode* mn, const gchar * prefix)
@@ -272,6 +282,23 @@ balsa_mailbox_node_new_imap(LibBalsaServer* s, const char*p)
     return folder;
 }
 
+BalsaMailboxNode*
+balsa_mailbox_node_new_imap_folder(LibBalsaServer* s, const char*p)
+{
+    BalsaMailboxNode * folder = balsa_mailbox_node_new();
+    g_assert(s);
+
+    folder->server = s;
+    gtk_object_ref(GTK_OBJECT(s));
+    folder->dir = g_strdup(p);
+
+    gtk_signal_connect(GTK_OBJECT(folder), "show-prop-dialog", 
+		       folder_conf_edit_imap_cb, NULL);
+    gtk_signal_connect(GTK_OBJECT(folder), "append-subtree", 
+		       imap_dir_cb, NULL);
+    return folder;
+}
+
 void
 balsa_mailbox_node_show_prop_dialog(BalsaMailboxNode* mn)
 {
@@ -290,6 +317,12 @@ void
 balsa_mailbox_node_show_prop_dialog_cb(GtkWidget * widget, gpointer data)
 {
     balsa_mailbox_node_show_prop_dialog((BalsaMailboxNode*)data);
+}
+void
+balsa_mailbox_node_save_config(BalsaMailboxNode* mn, const gchar* prefix)
+{
+    gtk_signal_emit(GTK_OBJECT(mn),
+		    balsa_mailbox_node_signals[SAVE_CONFIG], prefix);
 }
 
 static void
@@ -394,6 +427,9 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
 		   mailbox_conf_add_mh_cb, NULL);
     add_menu_entry(submenu, _("Remote IMAP mailbox..."), 
 		   mailbox_conf_add_imap_cb, NULL);
+    add_menu_entry(submenu, NULL, NULL, mbnode);
+    add_menu_entry(submenu, _("Remote IMAP folder..."), 
+		   folder_conf_add_imap_cb, NULL);
     gtk_widget_show(submenu);
     
     menuitem = gtk_menu_item_new_with_label(_("New"));

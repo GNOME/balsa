@@ -19,6 +19,8 @@ balsa_BASE_SOURCES =	\
 	balsa-message.h		\
 	expand-alias.c		\
 	expand-alias.h		\
+	folder-conf.c		\
+	folder-conf.h		\
 	filter-edit.h		\
 	filter-edit-callbacks.c	\
 	filter-edit-dialog.c	\
@@ -65,7 +67,7 @@ INCLUDES = \
 	-I$(top_srcdir)/libmutt \
 	 $(GNOME_INCLUDEDIR)
 
-CFLAGS += $(GTKHTML_CFLAGS)
+CFLAGS += $(GTKHTML_CFLAGS) $(PIXBUF_FLAGS)
 
 balsa_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a	\
@@ -80,7 +82,8 @@ balsa_LDADD = \
 	$(INTLLIBS) \
 	$(PTHREAD_LIB) \
 	$(GNOME_PRINT_LIBS) \
-	$(GTKHTML_LIBS)	
+	$(GTKHTML_LIBS)	\
+	$(PIXBUF_LIBS)
 
 balsa_DEPENDENCIES = \
 	$(top_builddir)/libbalsa/libbalsa.a	\

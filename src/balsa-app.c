@@ -405,3 +405,33 @@ find_gnode_in_mbox_list(GNode * gnode_list, LibBalsaMailbox * mailbox)
     retval = d[1];
     return retval;
 }
+
+static gint
+find_by_mbnode(GNode * g1, gpointer data)
+{
+    BalsaMailboxNode *mbnode = (BalsaMailboxNode *) g1->data;
+    gpointer *d = data;
+    BalsaMailboxNode *mn = *(BalsaMailboxNode **) data;
+
+    if (!mbnode || mbnode != mn)
+        return FALSE;
+
+    *(++d) = g1;
+    return TRUE;
+}
+
+GNode*
+find_gnode_of_folder(GNode * gnode_list, BalsaMailboxNode* mbnode)
+{
+    gpointer d[2];
+    GNode *retval;
+
+    d[0] = mbnode;
+    d[1] = NULL;
+
+    g_node_traverse(gnode_list, G_IN_ORDER, G_TRAVERSE_LEAFS, -1,
+                    find_by_mbnode, d);
+    retval = d[1];
+    return retval;
+}
+

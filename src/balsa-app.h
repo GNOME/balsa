@@ -298,4 +298,5 @@ GtkWidget *gnome_stock_button_with_label(const char *icon,
 gboolean open_mailboxes_idle_cb(gchar * names[]);
 
 GNode *find_gnode_in_mbox_list(GNode * gnode_list, LibBalsaMailbox * mailbox);
+GNode *find_gnode_of_folder(GNode * gnode_list, BalsaMailboxNode* mbnode);
 #endif				/* __BALSA_APP_H__ */

@@ -21,14 +21,11 @@
 
 #include "config.h"
 
-#include "libbalsa.h"
-
 #include <gnome.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
 #include "balsa-app.h"
-#include "mailbox-node.h"
 #include "save-restore.h"
 #include "quote-color.h"
 
@@ -53,6 +50,11 @@ static void config_address_books_save(void);
 
 static void config_identities_load(void);
 static void config_identities_save(void);
+
+#define folder_section_path(mn) \
+    BALSA_MAILBOX_NODE(mn)->config_prefix ? \
+    g_strdup(BALSA_MAILBOX_NODE(mn)->config_prefix) : \
+    config_get_unused_section(FOLDER_SECTION_PREFIX)
 
 #define mailbox_section_path(mbox) \
     LIBBALSA_MAILBOX(mbox)->config_prefix ? \
@@ -168,14 +170,40 @@ gint config_mailbox_add(LibBalsaMailbox * mailbox, const char *key_arg)
 	tmp = g_strdup_printf(BALSA_CONFIG_PREFIX MAILBOX_SECTION_PREFIX
 			      "%s/", key_arg);
 
+    gnome_config_push_prefix(tmp);
     libbalsa_mailbox_save_config(mailbox, tmp);
+    gnome_config_pop_prefix();
     g_free(tmp);
 
     gnome_config_sync();
     return TRUE;
 }				/* config_mailbox_add */
 
-/* removes from the ocnfiguration only */
+/* config_folder_add:
+   adds the specifed folder to the configuration. If the folder does
+   not have the unique pkey assigned, find one.
+*/
+gint config_folder_add(BalsaMailboxNode * mbnode, const char *key_arg)
+{
+    gchar *tmp;
+    g_return_val_if_fail(mbnode, FALSE);
+
+    if (key_arg == NULL)
+	tmp = folder_section_path(mbnode);
+    else
+	tmp = g_strdup_printf(BALSA_CONFIG_PREFIX FOLDER_SECTION_PREFIX
+			      "%s/", key_arg);
+
+    gnome_config_push_prefix(tmp);
+    balsa_mailbox_node_save_config(mbnode, tmp);
+    gnome_config_pop_prefix();
+    g_free(tmp);
+
+    gnome_config_sync();
+    return TRUE;
+}				/* config_mailbox_add */
+
+/* removes from the configuration only */
 gint config_mailbox_delete(const LibBalsaMailbox * mailbox)
 {
     gchar *tmp;			/* the key in the mailbox section name */
@@ -202,6 +230,21 @@ gint config_mailbox_update(LibBalsaMailbox * mailbox)
     gnome_config_sync();
     return res;
 }				/* config_mailbox_update */
+
+/* Update the configuration information for the specified folder. */
+gint config_folder_update(BalsaMailboxNode * mbnode)
+{
+    gchar *key;			/* the key in the mailbox section name */
+    gint res;
+
+    key = folder_section_path(mbnode);
+    res = gnome_config_has_section(key);
+    gnome_config_push_prefix(key);
+    balsa_mailbox_node_save_config(mbnode, key);
+    gnome_config_pop_prefix();
+    gnome_config_sync();
+    return res;
+}				/* config_folder_update */
 
 /* This function initializes all the mailboxes internally, going through
    the list of all the mailboxes in the configuration file one by one. */
@@ -515,6 +558,7 @@ config_global_load(void)
 			    &open_mailbox_vector);
     if (balsa_app.remember_open_mboxes && open_mailbox_count > 0) {
 	/* FIXME: Open the mailboxes.... */
+	printf("Opening %d mailboxes on startup.\n", open_mailbox_count);
 	gtk_idle_add((GtkFunction) open_mailboxes_idle_cb,
 		     open_mailbox_vector);
     } else
@@ -673,14 +717,12 @@ gint config_save(void)
     gnome_config_set_bool("AutoCloseMailbox", balsa_app.close_mailbox_auto);
     gnome_config_set_int("AutoCloseMailboxTimeout", balsa_app.close_mailbox_timeout);
 
-
     open_mailboxes_vector =
 	mailbox_list_to_vector(balsa_app.open_mailbox_list);
     gnome_config_set_vector("OpenMailboxes",
 			    g_list_length(balsa_app.open_mailbox_list),
 			    (const char **) open_mailboxes_vector);
     g_strfreev(open_mailboxes_vector);
-
     gnome_config_set_bool("RememberOpenMailboxes",
 			  balsa_app.remember_open_mboxes);
     gnome_config_set_bool("EmptyTrash", balsa_app.empty_trash_on_exit);

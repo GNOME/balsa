@@ -1446,9 +1446,9 @@ mailbox_tab_size_request(GtkWidget * widget, GtkRequisition * requisition,
 }
 
 static void
-bw_notebook_label_style(LibBalsaMailbox * mailbox, GtkLabel * lab)
+bw_notebook_label_style(GtkLabel * lab, gboolean has_unread_messages)
 {
-    gchar *str = mailbox->has_unread_messages ?
+    gchar *str = has_unread_messages ?
 	g_strconcat("<b>", gtk_label_get_text(lab), "</b>", NULL) :
 	g_strdup(gtk_label_get_text(lab));
     gtk_label_set_markup(lab, str);
@@ -1462,6 +1462,37 @@ bw_notebook_label_notify(LibBalsaMailbox * mailbox, GtkLabel * lab)
 					 lab);
 }
 
+typedef struct {
+    GtkLabel *lab;
+    gboolean has_unread_messages;
+} BalsaWindowMailboxChangedInfo;
+
+static gboolean
+bw_mailbox_changed_idle(BalsaWindowMailboxChangedInfo *bwmci)
+{
+    gdk_threads_enter();
+    if (bwmci->lab) {
+	g_object_remove_weak_pointer(G_OBJECT(bwmci->lab),
+				     (gpointer) &bwmci->lab);
+	bw_notebook_label_style(bwmci->lab, bwmci->has_unread_messages);
+    }
+    g_free(bwmci);
+    gdk_threads_leave();
+    return FALSE;
+}
+
+static void
+bw_mailbox_changed(LibBalsaMailbox * mailbox, GtkLabel * lab)
+{
+    BalsaWindowMailboxChangedInfo *bwmci =
+	g_new(BalsaWindowMailboxChangedInfo, 1);
+
+    bwmci->lab = lab;
+    g_object_add_weak_pointer(G_OBJECT(bwmci->lab), (gpointer) &bwmci->lab);
+    bwmci->has_unread_messages = mailbox->has_unread_messages;
+    g_idle_add((GSourceFunc) bw_mailbox_changed_idle, bwmci);
+}
+
 static GtkWidget *
 balsa_notebook_label_new (BalsaMailboxNode* mbnode)
 {
@@ -1471,12 +1502,12 @@ balsa_notebook_label_new (BalsaMailboxNode* mbnode)
        GtkWidget *but = gtk_button_new();
        GtkWidget *ev = gtk_event_box_new();
 
-	bw_notebook_label_style(mbnode->mailbox, GTK_LABEL(lab));
-	g_signal_connect(mbnode->mailbox, "changed",
-			 G_CALLBACK(bw_notebook_label_style), lab);
-	g_object_weak_ref(G_OBJECT(lab),
-			  (GWeakNotify) bw_notebook_label_notify,
-			  mbnode->mailbox);
+    bw_notebook_label_style(GTK_LABEL(lab),
+			    mbnode->mailbox->has_unread_messages);
+    g_signal_connect(mbnode->mailbox, "changed",
+		     G_CALLBACK(bw_mailbox_changed), lab);
+    g_object_weak_ref(G_OBJECT(lab), (GWeakNotify) bw_notebook_label_notify,
+		      mbnode->mailbox);
 
        close_pix = gtk_image_new_from_stock(GTK_STOCK_CLOSE,
                                             GTK_ICON_SIZE_MENU);

@@ -174,7 +174,6 @@ mailbox_init (gchar * inbox_path, void (*error_func) (const char *fmt,...))
   snprintf (tmp, 17 + strlen (VERSION), "X-Mailer: Balsa %s", VERSION);
   UserHeader->data = g_strdup (tmp);
   g_free (tmp);
-
 }
 
 gint
@@ -217,81 +216,56 @@ check_all_pop3_hosts (Mailbox * to)
     }
 }
 
-#ifdef BUFFY_SIZE
-/*
- * Incoming is a global var in mutt, needs to be set for
- * mailbox_have_new_messages() to work correctly.
- */
-extern int test_new_folder (const char *);
 void
 add_mailboxes_for_checking (Mailbox * mailbox)
 {
   BUFFY **tmp;
-  struct stat sb;
+  gchar *path;
 
-  if (!mailbox)
+  if (mailbox->type == MAILBOX_POP3 ||
+      mailbox->type == MAILBOX_IMAP)
     return;
 
-  if (mailbox->type == MAILBOX_IMAP ||
-      mailbox->type == MAILBOX_POP3)
-    return;
+  path = MAILBOX_LOCAL (mailbox)->path;
 
   for (tmp = &Incoming; *tmp; tmp = &((*tmp)->next))
     {
-      if (strcmp (MAILBOX_LOCAL (mailbox)->path, (*tmp)->path) == 0)
-	break;
+      if (strcmp (path, (*tmp)->path) == 0)
+	return;
     }
 
   if (!*tmp)
     {
-      *tmp = (BUFFY *) g_malloc (sizeof (BUFFY));
-      (*tmp)->path = g_strdup (MAILBOX_LOCAL (mailbox)->path);
+      *tmp = (BUFFY *) g_new0 (BUFFY, 1);
+      (*tmp)->path = g_strdup (path);
       (*tmp)->next = NULL;
     }
+
   (*tmp)->new = 0;
   (*tmp)->notified = 1;
   (*tmp)->newly_created = 0;
 
-  /* for buffy_size, it is important that if the folder is new (tested
-   * by reading it), the size is set to 0 so that later when we check we see
-   * that it increased .  without buffy_size we probably don't care.
-   */
-  if (stat ((*tmp)->path, &sb) == 0 && !test_new_folder ((*tmp)->path))
+  return;
+}
+
+gint
+mailbox_have_new_messages (gchar * path)
+{
+  BUFFY *tmp = NULL;
+
+  mutt_buffy_notify ();
+
+  for (tmp = Incoming; tmp; tmp = tmp->next)
     {
-      /* some systems out there don't have an off_t type */
-      (*tmp)->size = (long) sb.st_size;
+      if (strcmp (tmp->path, path) == 0)
+	{
+	  if (tmp->new)
+	    return TRUE;
+	}
     }
-  else
-    (*tmp)->size = 0;
 
-  return;
-
-}
-
-gint
-mailbox_have_new_messages (gchar * path)
-{
-  BUFFY *buffy;
-  buffy = mutt_find_mailbox (path);
-  if (buffy)
-    return (buffy->new);
-  else
-    return FALSE;
-}
-#else
-void
-add_mailboxes_for_checking (Mailbox * mailbox)
-{
-  return;
-}
-
-gint
-mailbox_have_new_messages (gchar * path)
-{
   return FALSE;
 }
-#endif /* BUFFY_SIZE */
-
 
 /*
  * allocate a new mailbox
@@ -454,8 +428,8 @@ mailbox_open_ref (Mailbox * mailbox)
 
       /* FIXME */
 /*
-      mailbox_sort(mailbox, MAILBOX_SORT_DATE);
-*/
+   mailbox_sort(mailbox, MAILBOX_SORT_DATE);
+ */
       UNLOCK_MAILBOX ();
       return TRUE;
     }

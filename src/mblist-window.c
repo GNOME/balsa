@@ -298,8 +298,11 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
   if (!gnode || (!(mbnode = gnode->data)))
     return FALSE;
 
+
   if (mbnode->mailbox)
     {
+      add_mailboxes_for_checking (mbnode->mailbox);
+
       if (mbnode->mailbox->type == MAILBOX_IMAP)
 	{
 	  gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
@@ -330,17 +333,20 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 	  else
 	    {
 	      /* normal mailbox */
-	      add_mailboxes_for_checking (mbnode->mailbox);
 	      if (mailbox_have_new_messages (MAILBOX_LOCAL (mbnode->mailbox)->path))
-		gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
-					 NULL, NULL,
-					 tray_full, tray_full_mask,
-					 FALSE, TRUE);
+		{
+		  gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
+					   NULL, NULL,
+					   tray_full, tray_full_mask,
+					   FALSE, TRUE);
+		}
 	      else
-		gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
-					 NULL, NULL,
-					 tray_empty, tray_empty_mask,
-					 FALSE, TRUE);
+		{
+		  gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
+					   NULL, NULL,
+					   tray_empty, tray_empty_mask,
+					   FALSE, TRUE);
+		}
 
 #ifndef GTK_HAVE_FEATURES_1_1_2
 	      gtk_ctree_set_row_data (ctree, cnode, mbnode->mailbox);
@@ -433,10 +439,10 @@ close_mblist_window (GtkWidget * widget)
   if (!mblw)
     return;
 
-  gtk_widget_realize(mblw->window);
+  gtk_widget_realize (mblw->window);
   gdk_window_get_size (mblw->window->window,
 		       &balsa_app.mblist_width, &balsa_app.mblist_height);
-  gtk_widget_unrealize(mblw->window);
+  gtk_widget_unrealize (mblw->window);
   gtk_widget_destroy (mblw->window);
   gtk_widget_destroy (GTK_WIDGET (mblw->ctree));
 }

@@ -271,7 +271,7 @@ libbalsa_mailbox_dispose(GObject * object)
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(object);
 
     while (mailbox->open_ref > 0)
-        libbalsa_mailbox_close(mailbox);
+        libbalsa_mailbox_close(mailbox, FALSE);
 
     G_OBJECT_CLASS(parent_class)->dispose(object);
 }
@@ -523,7 +523,7 @@ libbalsa_mailbox_is_open(LibBalsaMailbox *mailbox)
 }
     
 void
-libbalsa_mailbox_close(LibBalsaMailbox * mailbox)
+libbalsa_mailbox_close(LibBalsaMailbox * mailbox, gboolean expunge)
 {
     g_return_if_fail(mailbox != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
@@ -533,7 +533,8 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox)
 
     if (--mailbox->open_ref == 0) {
 	mailbox->state = LB_MAILBOX_STATE_CLOSING;
-        LIBBALSA_MAILBOX_GET_CLASS(mailbox)->close_mailbox(mailbox);
+        LIBBALSA_MAILBOX_GET_CLASS(mailbox)->close_mailbox(mailbox,
+                                                           expunge);
         if(mailbox->msg_tree) {
             g_node_destroy(mailbox->msg_tree);
             mailbox->msg_tree = NULL;
@@ -550,16 +551,11 @@ void
 libbalsa_mailbox_set_unread_messages_flag(LibBalsaMailbox * mailbox,
                                           gboolean has_unread)
 {
-    gboolean old_state;
-
     g_return_if_fail(mailbox != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-    old_state = mailbox->has_unread_messages;
     mailbox->has_unread_messages = (has_unread != FALSE);
-    if (mailbox->has_unread_messages != old_state)
-        g_signal_emit(G_OBJECT(mailbox), libbalsa_mailbox_signals[CHANGED],
-                      0);
+    g_signal_emit(G_OBJECT(mailbox), libbalsa_mailbox_signals[CHANGED], 0);
 }
 
 /* libbalsa_mailbox_progress_notify:

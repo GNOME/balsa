@@ -62,7 +62,9 @@ static void libbalsa_mailbox_maildir_remove_files(LibBalsaMailboxLocal *mailbox)
 
 static gboolean libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox,
 					      GError **err);
-static void libbalsa_mailbox_maildir_close_mailbox(LibBalsaMailbox * mailbox);
+static void libbalsa_mailbox_maildir_close_mailbox(LibBalsaMailbox *
+                                                   mailbox,
+                                                   gboolean expunge);
 static void libbalsa_mailbox_maildir_check(LibBalsaMailbox * mailbox);
 static gboolean libbalsa_mailbox_maildir_sync(LibBalsaMailbox * mailbox,
                                               gboolean expunge);
@@ -575,18 +577,15 @@ free_message_info(struct message_info *msg_info)
 }
 
 static void
-libbalsa_mailbox_maildir_close_mailbox(LibBalsaMailbox * mailbox)
+libbalsa_mailbox_maildir_close_mailbox(LibBalsaMailbox * mailbox,
+                                       gboolean expunge)
 {
-    LibBalsaMailboxMaildir *mdir;
+    LibBalsaMailboxMaildir *mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
     guint len = 0;
-
-    g_return_if_fail (LIBBALSA_IS_MAILBOX_MAILDIR(mailbox));
-
-    mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
 
     if (mdir->msgno_2_msg_info)
 	len = mdir->msgno_2_msg_info->len;
-    libbalsa_mailbox_maildir_sync(mailbox, TRUE);
+    libbalsa_mailbox_maildir_sync(mailbox, expunge);
 
     if (mdir->messages_info) {
 	g_hash_table_destroy(mdir->messages_info);
@@ -599,7 +598,8 @@ libbalsa_mailbox_maildir_close_mailbox(LibBalsaMailbox * mailbox)
 	mdir->msgno_2_msg_info = NULL;
     }
     if (LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox)
-	LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox);
+        LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox,
+                                                            expunge);
 }
 
 static int libbalsa_mailbox_maildir_open_temp (const gchar *dest_path,

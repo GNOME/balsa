@@ -632,7 +632,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 	}
 	g_list_foreach(msg_list, (GFunc)g_object_unref, NULL);
 	g_list_free(msg_list);
-        libbalsa_mailbox_close(tmp_mailbox);
+        libbalsa_mailbox_close(tmp_mailbox, TRUE);
     }
     libbalsa_mailbox_pop3_config_changed(m);
     

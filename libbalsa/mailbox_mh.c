@@ -58,7 +58,8 @@ static void libbalsa_mailbox_mh_remove_files(LibBalsaMailboxLocal *mailbox);
 
 static gboolean libbalsa_mailbox_mh_open(LibBalsaMailbox * mailbox,
 					 GError **err);
-static void libbalsa_mailbox_mh_close_mailbox(LibBalsaMailbox * mailbox);
+static void libbalsa_mailbox_mh_close_mailbox(LibBalsaMailbox * mailbox,
+                                              gboolean expunge);
 static void libbalsa_mailbox_mh_check(LibBalsaMailbox * mailbox);
 static gboolean libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox,
                                          gboolean expunge);
@@ -627,14 +628,15 @@ libbalsa_mailbox_mh_check(LibBalsaMailbox * mailbox)
 }
 
 static void
-libbalsa_mailbox_mh_close_mailbox(LibBalsaMailbox * mailbox)
+libbalsa_mailbox_mh_close_mailbox(LibBalsaMailbox * mailbox,
+                                  gboolean expunge)
 {
     LibBalsaMailboxMh *mh = LIBBALSA_MAILBOX_MH(mailbox);
     guint len = 0;
 
     if (mh->msgno_2_msg_info)
 	len = mh->msgno_2_msg_info->len;
-    libbalsa_mailbox_mh_sync(mailbox, TRUE);
+    libbalsa_mailbox_mh_sync(mailbox, expunge);
 
     if (mh->messages_info) {
 	g_hash_table_destroy(mh->messages_info);
@@ -648,7 +650,8 @@ libbalsa_mailbox_mh_close_mailbox(LibBalsaMailbox * mailbox)
     }
 
     if (LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox)
-	LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox);
+        LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox,
+                                                            expunge);
 }
 
 static int
@@ -1003,6 +1006,10 @@ lbm_mh_update_sequences(LibBalsaMailboxMh * mh, gint fileno,
     FILE *fp;
 
     fp = fopen(mh->sequences_filename, "a");
+
+    if (!fp)
+	return;
+
     if (flags & LIBBALSA_MESSAGE_FLAG_NEW)
 	fprintf(fp, "unseen: %d\n", fileno);
     if (flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)

@@ -217,7 +217,7 @@ struct _LibBalsaMailboxClass {
 
     /* Virtual Functions */
     gboolean (*open_mailbox) (LibBalsaMailbox * mailbox, GError **err);
-    void (*close_mailbox) (LibBalsaMailbox * mailbox);
+    void (*close_mailbox) (LibBalsaMailbox * mailbox, gboolean expunge);
     LibBalsaMessage *(*get_message) (LibBalsaMailbox * mailbox, guint msgno);
     void (*prepare_threading)(LibBalsaMailbox *mailbox, guint lo, guint hi);
     void (*fetch_message_structure)(LibBalsaMailbox *mailbox,
@@ -273,7 +273,7 @@ LibBalsaMailbox *libbalsa_mailbox_new_from_config(const gchar * prefix);
 gboolean libbalsa_mailbox_open(LibBalsaMailbox * mailbox, GError **err);
 gboolean libbalsa_mailbox_is_valid(LibBalsaMailbox * mailbox);
 gboolean libbalsa_mailbox_is_open(LibBalsaMailbox *mailbox);
-void libbalsa_mailbox_close(LibBalsaMailbox * mailbox);
+void libbalsa_mailbox_close(LibBalsaMailbox * mailbox, gboolean expunge);
 
 void libbalsa_mailbox_check(LibBalsaMailbox * mailbox);
 void libbalsa_mailbox_set_unread_messages_flag(LibBalsaMailbox * mailbox,

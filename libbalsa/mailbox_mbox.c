@@ -68,7 +68,8 @@ static void libbalsa_mailbox_mbox_remove_files(LibBalsaMailboxLocal *mailbox);
 
 static gboolean libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox,
 					   GError **err);
-static void libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox);
+static void libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox,
+                                                gboolean expunge);
 static void libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox);
 static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox,
                                            gboolean expunge);
@@ -597,7 +598,8 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 }
 
 static void
-libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox)
+libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox,
+                                    gboolean expunge)
 {
     LibBalsaMailboxMbox *mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
 
@@ -605,7 +607,7 @@ libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox)
 	guint len;
 
 	len = mbox->messages_info->len;
-	libbalsa_mailbox_mbox_sync(mailbox, TRUE);
+        libbalsa_mailbox_mbox_sync(mailbox, expunge);
 	if (mbox->messages_info->len != len)
 	    g_signal_emit_by_name(mailbox, "changed");
 	free_messages_info(mbox->messages_info);
@@ -616,7 +618,8 @@ libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox)
 	mbox->gmime_stream = NULL;	/* chbm: is this correct? */
     }
     if (LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox)
-	LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox);
+        LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox,
+                                                            expunge);
 }
 
 static GMimeMessage *

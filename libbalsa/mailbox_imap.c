@@ -82,7 +82,8 @@ static void libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass *
 static void libbalsa_mailbox_imap_init(LibBalsaMailboxImap * mailbox);
 static gboolean libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox,
 					   GError **err);
-static void libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox);
+static void libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox,
+                                        gboolean expunge);
 static GMimeStream *libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox *
 							     mailbox,
 							     LibBalsaMessage *
@@ -283,8 +284,7 @@ libbalsa_mailbox_imap_finalize(GObject * object)
 
     mailbox = LIBBALSA_MAILBOX_IMAP(object);
 
-    while (LIBBALSA_MAILBOX(mailbox)->open_ref > 0)
-	libbalsa_mailbox_close(LIBBALSA_MAILBOX(object));
+    g_assert(LIBBALSA_MAILBOX(mailbox)->open_ref == 0);
 
     libbalsa_notify_unregister_mailbox(LIBBALSA_MAILBOX(mailbox));
 
@@ -833,7 +833,7 @@ free_messages_info(LibBalsaMailboxImap * mbox)
 }
 
 static void
-libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox)
+libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox, gboolean expunge)
 {
     LibBalsaMailboxImap *mbox = LIBBALSA_MAILBOX_IMAP(mailbox);
 
@@ -842,7 +842,10 @@ libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox)
 
     mbox->opened = FALSE;
 
-    imap_mbox_unselect(mbox->handle);
+    if (expunge)
+	imap_mbox_close(mbox->handle);
+    else
+	imap_mbox_unselect(mbox->handle);
     free_messages_info(mbox);
     libbalsa_mailbox_imap_release_handle(mbox);
 }

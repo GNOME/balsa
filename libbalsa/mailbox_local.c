@@ -53,7 +53,8 @@ static void libbalsa_mailbox_local_save_config(LibBalsaMailbox * mailbox,
 static void libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
 					       const gchar * prefix);
 
-static void libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox);
+static void libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox,
+                                                 gboolean expunge);
 static gboolean libbalsa_mailbox_local_message_match(LibBalsaMailbox *
 						     mailbox, guint msgno,
 						     LibBalsaMailboxSearchIter
@@ -345,9 +346,10 @@ libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
 }
 
 static void
-libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox)
+libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox,
+                                     gboolean expunge)
 {
-    LibBalsaMailboxLocal *local  = LIBBALSA_MAILBOX_LOCAL(mailbox);
+    LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(mailbox);
 
     if(local->sync_id) {
         g_source_remove(local->sync_id);
@@ -365,7 +367,8 @@ libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox)
     }
 
     if (LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox)
-	LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox);
+        LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox,
+                                                            expunge);
 }
 
 /* Search iters */

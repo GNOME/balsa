@@ -1,3 +1,8 @@
+2003-04-18 11:00  PeterB
+
+	* libbalsa/misc.h: Include LIBBALSA_NUM_CODESETS in LibBalsaCodeset
+	enum, instead of #defining it (Kang Jeong-Hee <Keizi@mail.co.kr>).
+
 2003-04-17 18:51  PeterB
 
 	* libbalsa/: mailbox.c, mailbox.h: Add LibBalsaMailboxShow *show

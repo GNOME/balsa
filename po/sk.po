@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2003-08-28 07:11+0200\n"
-"PO-Revision-Date: 2003-08-28 07:13+0200\n"
+"POT-Creation-Date: 2003-09-01 22:14+0200\n"
+"PO-Revision-Date: 2003-09-01 22:15+0200\n"
 "Last-Translator: Marcel Telka <marcel@telka.sk>\n"
 "Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
 "MIME-Version: 1.0\n"
@@ -15,70 +15,70 @@ msgstr ""
 
 #. The externq database doesn't support Id's, sorry!
 #: libbalsa/address-book-extern.c:255 libbalsa/address-book-ldap.c:401
-#: libbalsa/address-book-ldif.c:419 libbalsa/address-book-vcard.c:283
+#: libbalsa/address-book-ldif.c:439 libbalsa/address-book-vcard.c:283
 msgid "No-Id"
 msgstr "Bez identifikátora"
 
 #: libbalsa/address-book-extern.c:259 libbalsa/address-book-ldap.c:407
-#: libbalsa/address-book-ldif.c:422 libbalsa/address-book-ldif.c:654
-#: libbalsa/address-book-ldif.c:691 libbalsa/address-book-ldif.c:695
+#: libbalsa/address-book-ldif.c:442 libbalsa/address-book-ldif.c:612
+#: libbalsa/address-book-ldif.c:649 libbalsa/address-book-ldif.c:653
 #: libbalsa/address-book-vcard.c:301
 msgid "No-Name"
 msgstr "Bez mena"
 
-#: libbalsa/address-book.c:398 libbalsa/filter-error.c:45
+#: libbalsa/address-book.c:397 libbalsa/filter-error.c:45
 msgid "No error"
 msgstr "Bez chyby"
 
-#: libbalsa/address-book.c:399
+#: libbalsa/address-book.c:398
 msgid "Cannot read from address book"
 msgstr "Nemôžem čítať z adresára"
 
-#: libbalsa/address-book.c:400
+#: libbalsa/address-book.c:399
 msgid "Cannot write to address book"
 msgstr "Nemôžem zapísať do adresára"
 
-#: libbalsa/address-book.c:401
+#: libbalsa/address-book.c:400
 msgid "Cannot connect to server"
 msgstr "Nemôžem sa spojiť so serverom"
 
-#: libbalsa/address-book.c:402
+#: libbalsa/address-book.c:401
 msgid "Cannot search in the address book"
 msgstr "Nemôžem vyhľadávať v adresári"
 
-#: libbalsa/address-book.c:404
+#: libbalsa/address-book.c:403
 msgid "Cannot add duplicate entry"
 msgstr "Nemôžem pridať duplikátnu položku"
 
-#: libbalsa/address-book.c:405
+#: libbalsa/address-book.c:404
 msgid "Unknown error"
 msgstr "Neznáma chyba"
 
-#: libbalsa/address.c:753
+#: libbalsa/address.c:745
 msgid "_Displayed Name:"
 msgstr "_Zobrazené meno:"
 
-#: libbalsa/address.c:754
+#: libbalsa/address.c:746
 msgid "_First Name:"
 msgstr "_Prvé meno:"
 
-#: libbalsa/address.c:755
+#: libbalsa/address.c:747
 msgid "_Middle Name:"
 msgstr "P_rostredné meno:"
 
-#: libbalsa/address.c:756
+#: libbalsa/address.c:748
 msgid "_Last Name:"
 msgstr "_Priezvisko:"
 
-#: libbalsa/address.c:757
+#: libbalsa/address.c:749
 msgid "_Nickname:"
 msgstr "Pre_zývka:"
 
-#: libbalsa/address.c:758
+#: libbalsa/address.c:750
 msgid "O_rganization:"
 msgstr "_Organizácia:"
 
-#: libbalsa/address.c:759 libinit_balsa/balsa-druid-page-user.c:79
+#: libbalsa/address.c:751 libinit_balsa/balsa-druid-page-user.c:79
 msgid "_Email Address:"
 msgstr "Adresa _elektronickej pošty:"
 
@@ -907,7 +907,7 @@ msgstr "gpgme nemohlo vytvoriť nové údaje: %s"
 msgid "Sending Mail..."
 msgstr "Posielam správu..."
 
-#: libbalsa/send.c:221 src/main-window.c:1800
+#: libbalsa/send.c:221 src/main-window.c:1805
 msgid "_Hide"
 msgstr "_Skryť"
 
@@ -2041,35 +2041,35 @@ msgstr "Adresár"
 
 #. Entry widget for finding an address
 #: src/ab-window.c:264
-msgid "Search for Name:"
-msgstr "Vyhľadávať podľa mena:"
+msgid "_Search for Name:"
+msgstr "_Vyhľadávať podľa mena:"
 
-#: src/ab-window.c:323
+#: src/ab-window.c:324
 msgid "Send-To"
 msgstr "Príjemca"
 
-#: src/ab-window.c:343
+#: src/ab-window.c:344
 msgid "Run GnomeCard"
 msgstr "Spustiť Adresár Gnome"
 
-#: src/ab-window.c:351
+#: src/ab-window.c:352
 msgid "_Re-Import"
 msgstr "_Znova importovať"
 
 #. mode switching stuff
-#: src/ab-window.c:361
+#: src/ab-window.c:362
 msgid "Treat multiple addresses as:"
 msgstr "Viacnásobné adresy považovať za:"
 
-#: src/ab-window.c:365
+#: src/ab-window.c:366
 msgid "alternative addresses for the same person"
 msgstr "alternatívne adresy pre jednu osobu"
 
-#: src/ab-window.c:370
+#: src/ab-window.c:371
 msgid "a distribution list"
 msgstr "distribučný zoznam"
 
-#: src/ab-window.c:676
+#: src/ab-window.c:677
 #, c-format
 msgid ""
 "Error opening address book '%s':\n"
@@ -2615,17 +2615,17 @@ msgstr "_Všetky"
 msgid "C_lear"
 msgstr "V_yčistiť"
 
-#: src/filter-edit-callbacks.c:990 src/main-window.c:2731
+#: src/filter-edit-callbacks.c:990 src/main-window.c:2736
 msgid "_Body"
 msgstr "_Telo"
 
 #. To:
-#: src/filter-edit-callbacks.c:997 src/main-window.c:2732
+#: src/filter-edit-callbacks.c:997 src/main-window.c:2737
 #: src/sendmsg-window.c:1845
 msgid "_To:"
 msgstr "_Pre:"
 
-#: src/filter-edit-callbacks.c:1004 src/main-window.c:2733
+#: src/filter-edit-callbacks.c:1004 src/main-window.c:2738
 msgid "_From:"
 msgstr "_Od:"
 
@@ -2633,7 +2633,7 @@ msgstr "_Od:"
 msgid "_Subject"
 msgstr "Pre_dmet"
 
-#: src/filter-edit-callbacks.c:1019 src/main-window.c:2735
+#: src/filter-edit-callbacks.c:1019 src/main-window.c:2740
 msgid "_Cc:"
 msgstr "Kó_pia:"
 
@@ -3740,7 +3740,7 @@ msgstr ""
 "Balsa teraz odosiela poštu.\n"
 "Prerušiť odosielanie?"
 
-#: src/main-window.c:1401
+#: src/main-window.c:1406
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -3748,11 +3748,11 @@ msgstr ""
 "Nemôžem otvoriť poštovú schránku!\n"
 "Skontrolujte, prosím, nastavenia poštovej schránky."
 
-#: src/main-window.c:1680
+#: src/main-window.c:1685
 msgid "translator_credits"
 msgstr "Marcel Telka <marcel@telka.sk>"
 
-#: src/main-window.c:1695
+#: src/main-window.c:1700
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://balsa.gnome.org/\n"
@@ -3765,72 +3765,72 @@ msgstr ""
 "Ak potrebujete oznámiť chyby v programe, urobte tak, prosím, na adrese "
 "http://bugzilla.gnome.org/"
 
-#: src/main-window.c:1797
+#: src/main-window.c:1802
 msgid "Checking Mail..."
 msgstr "Kontrolujem poštu..."
 
-#: src/main-window.c:2095
+#: src/main-window.c:2100
 msgid "Finished Checking."
 msgstr "Kontrola ukončená."
 
-#: src/main-window.c:2159
+#: src/main-window.c:2164
 #, c-format
 msgid "Sending error: %s"
 msgstr "Chyba pri posielaní: %s"
 
-#: src/main-window.c:2255
+#: src/main-window.c:2260
 msgid "Balsa: New mail"
 msgstr "Balsa: Nová pošta"
 
-#: src/main-window.c:2267
+#: src/main-window.c:2272
 #, c-format
 msgid "You have received %d new messages."
 msgstr "Prijali ste %d nových správ."
 
-#: src/main-window.c:2268
+#: src/main-window.c:2273
 msgid "You have received 1 new message."
 msgstr "Prijali ste 1 novú správu."
 
-#: src/main-window.c:2691
+#: src/main-window.c:2696
 msgid "Search mailbox"
 msgstr "Vyhľadať v poštovej schránke"
 
-#: src/main-window.c:2704
+#: src/main-window.c:2709
 msgid "_Reverse search"
 msgstr "_Spätné vyhľadávanie"
 
-#: src/main-window.c:2707
+#: src/main-window.c:2712
 msgid "_Search for:"
 msgstr "_Vyhľadať:"
 
-#: src/main-window.c:2720
+#: src/main-window.c:2725
 msgid "In:"
 msgstr "V:"
 
-#: src/main-window.c:2734
+#: src/main-window.c:2739
 msgid "S_ubject"
 msgstr "_Predmet"
 
-#: src/main-window.c:2849
+#: src/main-window.c:2854
 msgid "You can apply filters only on mailbox\n"
 msgstr "Môžete aplikovať filtre len na poštovú schránku\n"
 
-#: src/main-window.c:2893 src/main-window.c:2912
+#: src/main-window.c:2898 src/main-window.c:2917
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Potvrdenie zmien v poštovej schránke %s zlyhalo."
 
-#: src/main-window.c:3041
+#: src/main-window.c:3046
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (len na čítanie)"
 
-#: src/main-window.c:3043
+#: src/main-window.c:3048
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: src/main-window.c:3141
+#: src/main-window.c:3146
 msgid "Cannot access the message's body\n"
 msgstr "Nemôžem získať telo správy\n"
 

@@ -1,4 +1,8 @@
-2001-10-16  Pavel Tcholakov <pavel@linux.zonebg.com
+2001-10-21  Carlos Morgado  <chbm@chbm.nu>
+
+	* pt.po: updated for 1.2.1
+
+2001-10-16  Pavel Tcholakov <pavel@linux.zonebg.com>
 
 	* bg.po: New file, thanks to Peter Dobrev
 

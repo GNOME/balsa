@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.8\n"
-"POT-Creation-Date: 2000-06-21 16:44+0300\n"
+"POT-Creation-Date: 2000-08-07 13:51+0300\n"
 "PO-Revision-Date: 1999-12-27 11:14+0200\n"
 "Last-Translator: Yuri Syrota <rasta@renome.rovno.ua>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
@@ -13,44 +13,34 @@ msgstr ""
 "Content-Type: text/plain; charset=koi8-u\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: libbalsa/mailbox.c:197
+#: libbalsa/mailbox.c:75
 msgid "Error: "
 msgstr "Помилка: "
-
-#: libbalsa/mailbox.c:647
-#, c-format
-msgid "Mailbox: Opening %s Refcount: %d\n"
-msgstr "Скринька: В╕дкриття %s Посилань: %d\n"
-
-#: libbalsa/mailbox.c:667
-#, c-format
-msgid "Mailbox: Closing %s Refcount: %d\n"
-msgstr "Скринька: Закриття %s Посилань: %d\n"
 
 #.
 #. ISPRIME(9)
 #.
-#: libinit_balsa/balsa-druid-page-directory.gob:58
+#: libinit_balsa/balsa-druid-page-directory.gob:60
 msgid "Inbox:"
 msgstr "Вх╕дн╕:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:58
+#: libinit_balsa/balsa-druid-page-directory.gob:60
 msgid "Outbox:"
 msgstr "Вих╕дн╕:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:58
+#: libinit_balsa/balsa-druid-page-directory.gob:60
 msgid "Sentbox:"
 msgstr "В╕д╕слан╕:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:58
+#: libinit_balsa/balsa-druid-page-directory.gob:60
 msgid "Draftbox:"
 msgstr "Чорновики:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:58
+#: libinit_balsa/balsa-druid-page-directory.gob:60
 msgid "Trash:"
 msgstr "См╕тник:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:78
+#: libinit_balsa/balsa-druid-page-directory.gob:77
 #, c-format
 msgid ""
 "The pathname \"%s\" must be specified canonically -- it must start with a "
@@ -59,17 +49,12 @@ msgstr ""
 "Шлях \"%s\" необх╕дно вказати в канон╕чн╕й форм╕ --в╕н мусить посинатися з "
 "\"/\"."
 
-#: libinit_balsa/balsa-druid-page-directory.gob:96
-#, c-format
-msgid "An error occurred when attempting to creat(2) the file \"%s\"."
-msgstr "Помилка на спроб╕ створення файлу \"%s\"."
-
-#: libinit_balsa/balsa-druid-page-directory.gob:104
+#: libinit_balsa/balsa-druid-page-directory.gob:100
 #, c-format
 msgid "The mailbox \"%s\" does not appear to be valid."
 msgstr "Поштова скринька \"%s\" -- нев╕рна."
 
-#: libinit_balsa/balsa-druid-page-directory.gob:159
+#: libinit_balsa/balsa-druid-page-directory.gob:152
 msgid ""
 "Please verify the locations of your default mail files.\n"
 "These will be created if necessary."
@@ -77,11 +62,11 @@ msgstr ""
 "Перев╕рте розм╕щення ваших типових поштових файл╕в.\n"
 "Вони будуть створен╕ при необх╕дност╕."
 
-#: libinit_balsa/balsa-druid-page-directory.gob:202
+#: libinit_balsa/balsa-druid-page-directory.gob:195
 msgid "Mail Files"
 msgstr "Поштов╕ файли"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:275
+#: libinit_balsa/balsa-druid-page-directory.gob:268
 msgid "Problem Creating Mailboxes"
 msgstr "Проблема створення поштових скриньок"
 
@@ -101,8 +86,8 @@ msgstr "Завершено!"
 msgid "Please enter information about yourself."
 msgstr "Будь ласка, введ╕ть ╕нформац╕ю про себе."
 
-#: libinit_balsa/balsa-druid-page-user.gob:83 src/address-book.c:205
-#: src/address-book.c:448
+#: libinit_balsa/balsa-druid-page-user.gob:83 src/address-book.c:206
+#: src/address-book.c:571
 msgid "Name:"
 msgstr "╤м'я:"
 
@@ -148,7 +133,7 @@ msgstr ""
 "автоматично. Щоб взнати ареси автор╕в, скористуйтесь кнопкою \"Про\" в\n"
 "головному в╕кн╕."
 
-#: libinit_balsa/balsa-initdruid.gob:91
+#: libinit_balsa/balsa-initdruid.gob:95
 msgid ""
 "This will exit Balsa. Do you\n"
 "really want to do this?"
@@ -173,94 +158,98 @@ msgstr "Файл \"%s\" не ╓ каталогом."
 msgid "Configure Balsa"
 msgstr "Конф╕гурувати Balsa"
 
-#: src/address-book.c:193
+#: src/address-book.c:194
 msgid "Add New Address"
 msgstr "Додати нову адресу"
 
-#: src/address-book.c:212
+#: src/address-book.c:213
 msgid "E-Mail Address:"
 msgstr "Адреса е-пошти:"
 
-#: src/address-book.c:291 src/balsa-index-page.c:873
+#: src/address-book.c:292
 #, c-format
 msgid ""
-"Unable to open ~/.gnome/GnomeCard.gcrd for read.\n"
+"Unable to open address book %s for reading.\n"
 " - %s\n"
 msgstr ""
-"Не вдалося в╕дкрити ~/.gnome/GnomeCard.gcrd для зчитування.\n"
+"Не вдалося в╕дкрити адресну книгу %s для зчитування.\n"
 " - %s\n"
 
-#: src/address-book.c:294 src/sendmsg-window.c:403
+#: src/address-book.c:295 src/sendmsg-window.c:420
 msgid "OK"
 msgstr "Гаразд"
 
-#: src/address-book.c:312
+#: src/address-book.c:315 src/address-book.c:418
 msgid "No-Id"
 msgstr "Без-╕дентиф╕катора"
 
-#: src/address-book.c:320
+#: src/address-book.c:323 src/address-book.c:426
 msgid "No-Name"
 msgstr "Без назви"
 
-#: src/address-book.c:413 src/filter-edit-dialog.c:135
+#: src/address-book.c:536 src/filter-edit-dialog.c:135
 msgid "Name"
 msgstr "Назва"
 
-#: src/address-book.c:413
+#: src/address-book.c:536
 msgid "E-Mail Address"
 msgstr "Адреса е-пошти:"
 
-#: src/address-book.c:420 src/address-book.c:458 src/main-window.c:178
+#. address book
+#: src/address-book.c:543 src/main-window.c:183 src/pref-manager.c:1503
 msgid "Address Book"
 msgstr "Адресна книга"
 
-#: src/address-book.c:490
+#: src/address-book.c:611
 msgid "Send-To"
 msgstr "В╕д╕слати до"
 
-#: src/address-book.c:504
+#: src/address-book.c:625
 msgid "Run GnomeCard"
 msgstr "Запустити GnomeCard"
 
-#: src/address-book.c:510
+#: src/address-book.c:631
 msgid "Re-Import"
 msgstr "Пере╕мпортувати"
 
-#: src/balsa-app.c:219
+#: src/address-book.c:639
+msgid "Import first address only"
+msgstr "╤мпортувати лише першу адресу"
+
+#: src/address-book.c:641
+msgid "Import all adresses"
+msgstr "╤мпортувати вс╕ адреси"
+
+#: src/balsa-app.c:244
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
 msgstr "Неможливо в╕дкрити вашу поштову скриньку \"%s\"."
 
-#: src/balsa-app.c:232
+#: src/balsa-app.c:257
 msgid "Inbox"
 msgstr "Вх╕дн╕"
 
-#: src/balsa-app.c:237
+#: src/balsa-app.c:262
 msgid "Outbox"
 msgstr "Вих╕дн╕"
 
-#: src/balsa-app.c:242
+#: src/balsa-app.c:267
 msgid "Sentbox"
 msgstr "В╕д╕слан╕"
 
-#: src/balsa-app.c:247
+#: src/balsa-app.c:272
 msgid "Draftbox"
 msgstr "Чернетки"
 
-#: src/balsa-app.c:252
+#: src/balsa-app.c:277
 msgid "Trash"
 msgstr "См╕тник"
 
-#: src/balsa-index-page.c:293
+#: src/balsa-index-page.c:276
 msgid "Mailbox password:"
 msgstr "Пароль до штово╖ скриньки:"
 
-#. password field
-#: src/balsa-index-page.c:301 src/mailbox-conf.c:995 src/mailbox-conf.c:1094
-msgid "Password:"
-msgstr "Пароль:"
-
-#: src/balsa-index-page.c:327
+#: src/balsa-index-page.c:299
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -268,52 +257,61 @@ msgstr ""
 "Не вдалося в╕дкрити поштову скриню!\n"
 "Перев╕рте установки поштово╖ скрин╕."
 
-#: src/balsa-index-page.c:608 src/filter-edit-dialog.c:222
+#: src/balsa-index-page.c:581 src/filter-edit-dialog.c:222
 msgid "New"
 msgstr "Новий"
 
-#: src/balsa-index-page.c:611 src/main-window.c:413
+#: src/balsa-index-page.c:584 src/main-window.c:417
 msgid "Reply"
 msgstr "В╕дпов╕сти"
 
-#: src/balsa-index-page.c:614 src/main-window.c:416
+#: src/balsa-index-page.c:587 src/main-window.c:420
 msgid "Reply to all"
 msgstr "В╕дпов╕сти ус╕м"
 
-#: src/balsa-index-page.c:617 src/main-window.c:419
+#: src/balsa-index-page.c:590 src/main-window.c:423
 msgid "Forward"
 msgstr "Переслати"
 
-#: src/balsa-index-page.c:620 src/filter-edit-dialog.c:228
-#: src/main-window.c:406 src/pref-manager.c:886
+#: src/balsa-index-page.c:593 src/filter-edit-dialog.c:228
+#: src/main-window.c:410 src/pref-manager.c:930
 msgid "Delete"
 msgstr "Видалити"
 
-#: src/balsa-index-page.c:623
+#: src/balsa-index-page.c:596
 msgid "Undelete"
 msgstr "В╕дновити"
 
-#: src/balsa-index-page.c:627 src/balsa-index-page.c:1236
+#: src/balsa-index-page.c:600 src/balsa-index-page.c:1209
 msgid "Store Address"
 msgstr "Зберегти адресу"
 
-#: src/balsa-index-page.c:630 src/main-window.c:314
+#: src/balsa-index-page.c:603 src/main-window.c:318
 msgid "Toggle flagged"
 msgstr "Встановити/зняти в╕дм╕тку"
 
-#: src/balsa-index-page.c:638
+#: src/balsa-index-page.c:611
 msgid "Transfer"
 msgstr "Передача"
 
-#: src/balsa-index-page.c:841
+#: src/balsa-index-page.c:814
 msgid "Sorry, no semicolons are allowed in the name!\n"
 msgstr "Вибачте, в ╕мен╕ не можна мати крапку з комою!\n"
 
-#: src/balsa-index-page.c:878
+#: src/balsa-index-page.c:846
+#, c-format
+msgid ""
+"Unable to open %s for read.\n"
+" - %s\n"
+msgstr ""
+"Не вдалося в╕дкрити %s для зчитування.\n"
+" - %s\n"
+
+#: src/balsa-index-page.c:851
 msgid "The Card Name field must be non-empty.\n"
 msgstr "Поле \"Назва картки\" не може бути порожн╕м.\n"
 
-#: src/balsa-index-page.c:884
+#: src/balsa-index-page.c:857
 #, c-format
 msgid ""
 "There is already an address book entry for %s.\n"
@@ -322,163 +320,150 @@ msgstr ""
 "Для %s вже ╓ запис в адресн╕й книз╕.\n"
 "Запуст╕ть GnomeCard якщо хочете в╕дредагувати записи в адресн╕й книз╕.\n"
 
-#: src/balsa-index-page.c:1148
+#: src/balsa-index-page.c:1121
 msgid "Card Name:"
 msgstr "назва картки:"
 
-#: src/balsa-index-page.c:1148
+#: src/balsa-index-page.c:1121
 msgid "First Name:"
 msgstr "╤м'я:"
 
-#: src/balsa-index-page.c:1149
+#: src/balsa-index-page.c:1122
 msgid "Last Name:"
 msgstr "Пр╕звище:"
 
-#: src/balsa-index-page.c:1149
+#: src/balsa-index-page.c:1122
 msgid "Organization:"
 msgstr "Орган╕зац╕я:"
 
-#: src/balsa-index-page.c:1150
+#: src/balsa-index-page.c:1123
 msgid "Email Address:"
 msgstr "Адреса е-пошти:"
 
-#: src/balsa-index-page.c:1165
+#: src/balsa-index-page.c:1138
 msgid "In order to store an address, you must select a message.\n"
 msgstr "Для збереження адреси, вам необх╕дно вибрати пов╕домлення.\n"
 
-#: src/balsa-index-page.c:1175
+#: src/balsa-index-page.c:1148
 msgid "You may only store one address at a time.\n"
 msgstr "Ви можете зберегти лише одну адресу за раз.\n"
 
-#: src/balsa-index-page.c:1188
+#: src/balsa-index-page.c:1161
 msgid "This message doesn't contain an e-mail address.\n"
 msgstr "Це пов╕домлення не м╕стить адрес е-пошти.\n"
 
-#: src/balsa-index-page.c:1239
+#: src/balsa-index-page.c:1212
 msgid "Contact Information"
 msgstr "Контактна ╕нформац╕я"
 
-#: src/balsa-index.c:252
+#: src/balsa-index.c:256
 msgid "From"
 msgstr "В╕д"
 
-#: src/balsa-index.c:253 src/filter-edit-dialog.c:349
+#: src/balsa-index.c:257 src/filter-edit-dialog.c:349
 msgid "Subject"
 msgstr "Тема"
 
-#: src/balsa-index.c:254
+#: src/balsa-index.c:258
 msgid "Date"
 msgstr "Дата"
 
-#: src/balsa-index.c:362
+#: src/balsa-index.c:369
 msgid "To"
 msgstr "До:"
 
-#: src/balsa-mblist.c:221 src/mailbox-conf.c:1188
+#: src/balsa-mblist.c:226 src/mailbox-conf.c:1197
 msgid "Mailbox"
 msgstr "Поштова скринька"
 
-#: src/balsa-mblist.c:221
+#: src/balsa-mblist.c:226
 msgid "Unread"
 msgstr "Непрочитане"
 
-#: src/balsa-mblist.c:221
+#: src/balsa-mblist.c:226
 msgid "Total"
 msgstr "Всього"
 
-#: src/balsa-mblist.c:824
+#: src/balsa-mblist.c:840
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr "Показано скриньку: %s, пов╕домлень: %ld, нових: %ld"
 
-#: src/balsa-message.c:213 src/balsa-message.c:217
+#: src/balsa-message.c:240 src/balsa-message.c:244
 msgid "Save MIME Part"
 msgstr "Зберегти закодовану MIME частину"
 
-#: src/balsa-message.c:214 src/balsa-message.c:1087
+#: src/balsa-message.c:241 src/balsa-message.c:1176
 msgid "Save"
 msgstr "Зберегти"
 
-#: src/balsa-message.c:214 src/mailbox-conf.c:680 src/sendmsg-window.c:130
-#: src/sendmsg-window.c:429 src/sendmsg-window.c:1101
-#: src/sendmsg-window.c:1408 src/sendmsg-window.c:1431
+#: src/balsa-message.c:241 src/sendmsg-window.c:132 src/sendmsg-window.c:446
+#: src/sendmsg-window.c:1196 src/sendmsg-window.c:1485
+#: src/sendmsg-window.c:1508
 msgid "Cancel"
 msgstr "В╕дм╕нити"
 
-#: src/balsa-message.c:215
+#: src/balsa-message.c:242
 msgid "Please choose a filename to save this part of the message as:"
 msgstr "Введ╕ть назву фалу щоб зберегти цю частину пов╕домлення:"
 
-#: src/balsa-message.c:263 src/balsa-message.c:283
+#: src/balsa-message.c:274
 #, c-format
-msgid " Open of %s failed:%s "
-msgstr " Не вдалося в╕дкрити %s:%s"
+msgid " Could not save %s:%s "
+msgstr " Неможливо зберегти %s:%s "
 
-#: src/balsa-message.c:266
-msgid "Error"
-msgstr "Помилка"
-
-#: src/balsa-message.c:266 src/balsa-message.c:285
-msgid "Ok"
-msgstr "Гаразд"
-
-#: src/balsa-message.c:531
+#: src/balsa-message.c:543
 msgid "Date:"
 msgstr "Дата:"
 
 #. From:
-#: src/balsa-message.c:535 src/filter-edit-dialog.c:337
-#: src/sendmsg-window.c:601
+#: src/balsa-message.c:548 src/filter-edit-dialog.c:337
+#: src/sendmsg-window.c:677
 msgid "From:"
 msgstr "В╕д:"
 
 #. To:
-#: src/balsa-message.c:539 src/filter-edit-dialog.c:325
-#: src/sendmsg-window.c:603
+#: src/balsa-message.c:552 src/filter-edit-dialog.c:325
+#: src/sendmsg-window.c:679
 msgid "To:"
 msgstr "До:"
 
-#: src/balsa-message.c:540
+#: src/balsa-message.c:553
 msgid "Cc:"
 msgstr "Cc:"
 
-#: src/balsa-message.c:541
+#: src/balsa-message.c:554
 msgid "Bcc:"
 msgstr "Bcc:"
 
-#: src/balsa-message.c:544
+#: src/balsa-message.c:557
 msgid "Fcc:"
 msgstr "Fcc:"
 
 #. Subject:
-#: src/balsa-message.c:545 src/sendmsg-window.c:609
+#: src/balsa-message.c:559 src/sendmsg-window.c:684
 msgid "Subject:"
 msgstr "Тема:"
 
-#: src/balsa-message.c:603
+#: src/balsa-message.c:627
 msgid "Couldn't render image\n"
 msgstr "Неможливо в╕зуал╕зувати зображення\n"
 
-#: src/balsa-message.c:651
+#: src/balsa-message.c:675
 msgid "Balsa does not know how to display this message part"
 msgstr "Balsa не може в╕добразити цю частину пов╕домлення"
 
-#: src/balsa-message.c:656
-#, c-format
-msgid "Content Type: %s/%s"
-msgstr "Тип вм╕сту: %s/%s"
-
-#: src/balsa-message.c:658
+#: src/balsa-message.c:680
 #, c-format
 msgid "Content Type: %s"
 msgstr "Тип вм╕сту: %s"
 
-#: src/balsa-message.c:665
+#: src/balsa-message.c:689
 #, c-format
 msgid "Filename: %s"
 msgstr "Назва файлу: %s"
 
-#: src/balsa-message.c:672
+#: src/balsa-message.c:696
 msgid "Save part"
 msgstr "Зберегти частину"
 
@@ -574,12 +559,12 @@ msgstr "В т╕л╕"
 msgid "Match string:"
 msgstr "Рядок для пор╕вняння:"
 
-#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:286 src/mailbox-conf.c:1153
-#: src/pref-manager.c:873
+#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:321 src/mailbox-conf.c:1162
+#: src/pref-manager.c:917
 msgid "Add"
 msgstr "Додати"
 
-#: src/filter-edit-dialog.c:425 src/sendmsg-window.c:350
+#: src/filter-edit-dialog.c:425 src/sendmsg-window.c:367
 msgid "Remove"
 msgstr "Вилучити"
 
@@ -663,7 +648,8 @@ msgstr "Повернути"
 msgid "Balsa Filters"
 msgstr "Ф╕льтри Balsa"
 
-#: src/mailbox-conf.c:163
+#. FIXME: Should prompt to remove file aswell
+#: src/mailbox-conf.c:181
 #, c-format
 msgid ""
 "This will remove the mailbox %s and it's files permanently from your "
@@ -673,7 +659,7 @@ msgstr ""
 "Це назвавжди видалить поштову скриньку %s та файли у н╕й з вашо╖ системи.\n"
 "Ви д╕йсно хочете видалити цю поштову скриньку?"
 
-#: src/mailbox-conf.c:168
+#: src/mailbox-conf.c:186
 #, c-format
 msgid ""
 "This will remove the mailbox %s from the list of mailboxes\n"
@@ -685,399 +671,399 @@ msgstr ""
 "\"Додати\"\n"
 "Ви впевнен╕, що хочете цього?"
 
-#: src/mailbox-conf.c:197
+#: src/mailbox-conf.c:214
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr "Йой! скриньку незайдено в balsa_app.mailbox.\n"
 
-#: src/mailbox-conf.c:241
+#: src/mailbox-conf.c:268
 msgid "Mailbox Configurator"
 msgstr "Конф╕гуратор поштово╖ скриньки"
 
-#: src/mailbox-conf.c:296 src/mailbox-conf.c:1147
+#: src/mailbox-conf.c:330 src/mailbox-conf.c:1156
 msgid "Update"
 msgstr "Поновити"
 
-#: src/mailbox-conf.c:436 src/mailbox-conf.c:442 src/mailbox-conf.c:466
+#: src/mailbox-conf.c:462 src/mailbox-conf.c:468 src/mailbox-conf.c:492
 msgid "You need to fill in the Mailbox Name field."
 msgstr "Вам потр╕бно заповнити поле з назвою поштово╖ скриньки"
 
-#: src/mailbox-conf.c:445
+#: src/mailbox-conf.c:471
 msgid "You need to fill in the folderpath field."
 msgstr "Вам потр╕бно заповнити поле з шляхом до фолдеру."
 
-#: src/mailbox-conf.c:447
+#: src/mailbox-conf.c:473
 msgid "You need to fill in the IMAP Server field"
 msgstr "Вам потр╕бно заповнити поле з сервером IMAP"
 
-#: src/mailbox-conf.c:449
+#: src/mailbox-conf.c:475
 msgid "You need to fill in the username field"
 msgstr "Вам потр╕бно заповнити поле з назвою користувача"
 
-#: src/mailbox-conf.c:451
-msgid "You need to fill in the password field"
-msgstr "Вам потр╕бно заповнити поле з паролем"
-
-#: src/mailbox-conf.c:453
+#: src/mailbox-conf.c:479
 msgid "You need to fill in the port field"
 msgstr "Вам необх╕дно заповнити поле з портом"
 
-#: src/mailbox-conf.c:470
+#: src/mailbox-conf.c:496
 msgid "You need to fill in the user field."
 msgstr "Вам необх╕дно заповнити поле з назвою користувача."
 
-#: src/mailbox-conf.c:474
-msgid "You need to fill in the password field."
-msgstr "Вам необх╕дно заповнити поле з паролем."
-
-#: src/mailbox-conf.c:478
+#: src/mailbox-conf.c:504
 msgid "You need to fill in the server field."
 msgstr "Вам необх╕дно заповнити поле з назвою сервера."
 
-#: src/mailbox-conf.c:482
+#: src/mailbox-conf.c:508
 msgid "You need to fill in the port field."
 msgstr "Вам необх╕дно заповнити поле з портом"
 
-#: src/mailbox-conf.c:486
+#: src/mailbox-conf.c:512
 msgid "Some of the fields are blank."
 msgstr "Деяк╕ з пол╕в порожн╕."
 
-#: src/mailbox-conf.c:639
+#: src/mailbox-conf.c:647
 #, c-format
 msgid "%s on %s"
 msgstr "%s на %s"
 
-#: src/mailbox-conf.c:679
-#, c-format
-msgid "Cannot create mailbox '%s': %s\n"
-msgstr "Неможливо створити поштову скриньку \"%s\": %s\n"
-
-#: src/mailbox-conf.c:838
+#: src/mailbox-conf.c:847
 msgid "New mailbox type:"
 msgstr "Тип ново╖ поштово╖ скриньки:"
 
 #. radio buttons
 #. local mailbox
-#: src/mailbox-conf.c:844
+#: src/mailbox-conf.c:853
 msgid "Local mailbox"
 msgstr "Локальна поштова скринька"
 
-#: src/mailbox-conf.c:854
+#: src/mailbox-conf.c:863
 msgid "Single IMAP folder"
 msgstr "Одна тека IMAP"
 
-#: src/mailbox-conf.c:863
+#: src/mailbox-conf.c:872
 msgid "IMAP folder set"
 msgstr "Встановлено теку IMAP"
 
 #. mailbox name
-#: src/mailbox-conf.c:888 src/mailbox-conf.c:923 src/mailbox-conf.c:1040
+#: src/mailbox-conf.c:897 src/mailbox-conf.c:932 src/mailbox-conf.c:1049
 msgid "Mailbox Name:"
 msgstr "Назва поштово╖ скриньки:"
 
 #. path to file
-#: src/mailbox-conf.c:898
+#: src/mailbox-conf.c:907
 msgid "Mailbox path:"
 msgstr "Шлях до штово╖ скриньки:"
 
 #. pop server
-#: src/mailbox-conf.c:940 src/mailbox-conf.c:1050
+#: src/mailbox-conf.c:949 src/mailbox-conf.c:1059
 msgid "Server:"
 msgstr "Сервер:"
 
 #. pop port
-#: src/mailbox-conf.c:959 src/mailbox-conf.c:1064
+#: src/mailbox-conf.c:968 src/mailbox-conf.c:1073
 msgid "Port:"
 msgstr "Порт:"
 
 #. username
-#: src/mailbox-conf.c:978 src/mailbox-conf.c:1079
+#: src/mailbox-conf.c:987 src/mailbox-conf.c:1088
 msgid "Username:"
 msgstr "Назва користувача:"
 
+#. password field
+#: src/mailbox-conf.c:1004 src/mailbox-conf.c:1103
+msgid "Password:"
+msgstr "Пароль:"
+
 #. toggle for check
-#: src/mailbox-conf.c:1010 src/main-window.c:402
+#: src/mailbox-conf.c:1019 src/main-window.c:406
 msgid "Check"
 msgstr "Перев╕рити"
 
 #. toggle for deletion from server
-#: src/mailbox-conf.c:1018
+#: src/mailbox-conf.c:1027
 msgid "Delete from server"
 msgstr "Усунути з сервера"
 
-#: src/mailbox-conf.c:1107
+#: src/mailbox-conf.c:1116
 msgid "Folder path:"
 msgstr "Шлях до фолдеру:"
 
-#: src/main-window.c:172
+#: src/main-window.c:171
 msgid "_Get new mail"
 msgstr "Отримати нову кореспонденц╕ю"
 
-#: src/main-window.c:172
+#: src/main-window.c:171
 msgid "Fetch new incoming mail"
 msgstr "Забрати нову кореспонденц╕ю"
 
-#: src/main-window.c:178
+#: src/main-window.c:177
+msgid "_Send queued mail"
+msgstr "В╕д╕слати кореспонденц╕ю з черз╕"
+
+#: src/main-window.c:177
+msgid "Send mail from the outbox"
+msgstr "В╕д╕слати коспенденц╕ю з Вих╕дних"
+
+#: src/main-window.c:183
 msgid "Opens the address book"
 msgstr "В╕дкрити адресну книгу"
 
-#: src/main-window.c:185
+#: src/main-window.c:190
 msgid "Pr_int"
 msgstr "Друкувати"
 
-#: src/main-window.c:185
+#: src/main-window.c:190
 msgid "Print current mail"
 msgstr "Друкувати поточну кореспонденц╕ю"
 
-#: src/main-window.c:210 src/message-window.c:54
+#: src/main-window.c:214 src/message-window.c:56
 msgid "N_o headers"
 msgstr "Без заголовк╕в"
 
-#: src/main-window.c:212 src/message-window.c:56
+#: src/main-window.c:216 src/message-window.c:58
 msgid "_Selected headers"
 msgstr "Вибран╕ заголовки"
 
-#: src/main-window.c:214 src/message-window.c:58
+#: src/main-window.c:218 src/message-window.c:60
 msgid "All _headers"
 msgstr "Вс╕ заголовки"
 
-#: src/main-window.c:223 src/main-window.c:432
+#: src/main-window.c:227 src/main-window.c:436
 msgid "Next"
 msgstr "Наступне"
 
-#: src/main-window.c:223
+#: src/main-window.c:227
 msgid "Next Message"
 msgstr "Наступне пов╕домлення"
 
-#: src/main-window.c:229 src/main-window.c:427
+#: src/main-window.c:233 src/main-window.c:431
 msgid "Previous"
 msgstr "Попередн╓"
 
-#: src/main-window.c:229
+#: src/main-window.c:233
 msgid "Preivous Message"
 msgstr "Попередн╓ пов╕домлення"
 
-#: src/main-window.c:235 src/main-window.c:437
+#: src/main-window.c:239 src/main-window.c:441
 msgid "Next Unread"
 msgstr "Наступне непрочитане"
 
-#: src/main-window.c:235
+#: src/main-window.c:239
 msgid "Next Unread Message"
 msgstr "Наступне непрочитане пов╕домлення"
 
-#: src/main-window.c:242 src/message-window.c:93
+#: src/main-window.c:246 src/message-window.c:95
 msgid "Next Part"
 msgstr "Наступна частина"
 
-#: src/main-window.c:242 src/message-window.c:93
+#: src/main-window.c:246 src/message-window.c:95
 msgid "Next Part in Message"
 msgstr "Наступна частина в пов╕домлен╕"
 
-#: src/main-window.c:248 src/message-window.c:98
+#: src/main-window.c:252 src/message-window.c:100
 msgid "Previous Part"
 msgstr "Попередня частина"
 
-#: src/main-window.c:248 src/message-window.c:98
+#: src/main-window.c:252 src/message-window.c:100
 msgid "Previous Part in Message"
 msgstr "Попередня частина в пов╕домленн╕"
 
-#: src/main-window.c:254 src/message-window.c:103
+#: src/main-window.c:258 src/message-window.c:105
 msgid "Save Current Part"
 msgstr "Зберегти поточну частину"
 
-#: src/main-window.c:255 src/message-window.c:104
+#: src/main-window.c:259 src/message-window.c:106
 msgid "Save Current Part in Message"
 msgstr "Зберегти поточну частину в пов╕домлен╕"
 
-#: src/main-window.c:263
+#: src/main-window.c:267
 msgid "_New"
 msgstr "Нове"
 
-#: src/main-window.c:263
+#: src/main-window.c:267
 msgid "Compose a new message"
 msgstr "Скласти нове пов╕домлення"
 
-#: src/main-window.c:270 src/message-window.c:74
+#: src/main-window.c:274 src/message-window.c:76
 msgid "_Reply"
 msgstr "В╕дпов╕сти"
 
-#: src/main-window.c:270
+#: src/main-window.c:274
 msgid "Reply to the current message"
 msgstr "В╕дпов╕сти на поточне пов╕домлення"
 
-#: src/main-window.c:277 src/message-window.c:80
+#: src/main-window.c:281 src/message-window.c:82
 msgid "Reply to _all"
 msgstr "В╕дпов╕сти вс╕м"
 
-#: src/main-window.c:278
+#: src/main-window.c:282
 msgid "Reply to all recipients of the current message"
 msgstr "В╕дпов╕сти вс╕м адресатам поточного пов╕домлення"
 
-#: src/main-window.c:285 src/message-window.c:87
+#: src/main-window.c:289 src/message-window.c:89
 msgid "_Forward"
 msgstr "Переслати"
 
-#: src/main-window.c:285
+#: src/main-window.c:289
 msgid "Forward the current message"
 msgstr "Переслати поточне пов╕домлення"
 
-#: src/main-window.c:292
+#: src/main-window.c:296
 msgid "_Continue"
 msgstr "Продовжити"
 
-#: src/main-window.c:292
+#: src/main-window.c:296
 msgid "Continue editing current message"
 msgstr "Продовжити редагування поточного пов╕домлення"
 
-#: src/main-window.c:300 src/main-window.c:353
+#: src/main-window.c:304 src/main-window.c:357
 msgid "_Delete"
 msgstr "Стерти"
 
-#: src/main-window.c:300
+#: src/main-window.c:304
 msgid "Delete the current message"
 msgstr "Стерти поточне пов╕домлення"
 
-#: src/main-window.c:307
+#: src/main-window.c:311
 msgid "_Undelete"
 msgstr "В╕дновити"
 
-#: src/main-window.c:307
+#: src/main-window.c:311
 msgid "Undelete the message"
 msgstr "В╕дновити пов╕домлення"
 
-#: src/main-window.c:314
+#: src/main-window.c:318
 msgid "_Toggle flagged"
 msgstr "Встановити/зняти в╕дм╕тку"
 
-#: src/main-window.c:322
+#: src/main-window.c:326
 msgid "_Store Address"
 msgstr "Зберегти адресу"
 
-#: src/main-window.c:322
+#: src/main-window.c:326
 msgid "Store address of sender in addressbook"
 msgstr "Зберегти адрусу в╕дправника в адресн╕й книз╕"
 
-#: src/main-window.c:328 src/message-window.c:110
+#: src/main-window.c:332 src/message-window.c:112
 msgid "_Wrap"
 msgstr "Перенос"
 
-#: src/main-window.c:345
+#: src/main-window.c:349
 msgid "List"
 msgstr "Список"
 
-#: src/main-window.c:349
+#: src/main-window.c:353
 msgid "_Add"
 msgstr "Додати"
 
-#: src/main-window.c:349
+#: src/main-window.c:353
 msgid "Add a new mailbox"
 msgstr "Додати нову поштову скриньку"
 
-#: src/main-window.c:351
+#: src/main-window.c:355
 msgid "_Edit"
 msgstr "Редагувати"
 
-#: src/main-window.c:351
+#: src/main-window.c:355
 msgid "Edit the selected mailbox"
 msgstr "Редагувати вибрану поштову скриньку"
 
-#: src/main-window.c:353
+#: src/main-window.c:357
 msgid "Delete the selected mailbox"
 msgstr "Стерти вибрану поштову скриньку"
 
-#: src/main-window.c:356
+#: src/main-window.c:360
 msgid "Co_mmit current"
 msgstr "Заф╕ксувати"
 
-#: src/main-window.c:356
+#: src/main-window.c:360
 msgid "Commit the changes in the currently opened mailbox"
 msgstr "Заф╕ксувати зм╕ни в поточн╕й поштов╕й скринц╕"
 
-#: src/main-window.c:358
+#: src/main-window.c:362
 msgid "_Close"
 msgstr "Закрити"
 
-#: src/main-window.c:358
+#: src/main-window.c:362
 msgid "Close mailbox"
 msgstr "Закрити поштову скриньку"
 
-#: src/main-window.c:361
+#: src/main-window.c:365
 msgid "Empty _Trash"
 msgstr "Спорожнити см╕тник"
 
-#: src/main-window.c:361
+#: src/main-window.c:365
 msgid "Delete Messages from the trash mailbox"
 msgstr "Стерти пов╕домлення з см╕тниково╖ поштово╖ скриньки"
 
-#: src/main-window.c:367
+#: src/main-window.c:371
 msgid "_Filters..."
 msgstr "Ф╕льтри..."
 
-#: src/main-window.c:367
+#: src/main-window.c:371
 msgid "Manage filters"
 msgstr "Керування ф╕льтрами"
 
-#: src/main-window.c:376
+#: src/main-window.c:380
 msgid "_Show mailbox tree"
 msgstr "Показати структуру поштово╖ скриньки:"
 
-#: src/main-window.c:379
+#: src/main-window.c:383
 msgid "Show mailbox _tabs"
 msgstr "Показати закладки скриньок"
 
-#: src/main-window.c:393
+#: src/main-window.c:397
 msgid "_Message"
 msgstr "Пов╕домлення"
 
-#: src/main-window.c:394
+#: src/main-window.c:398
 msgid "Mail_box"
 msgstr "Поштова скринька"
 
-#: src/main-window.c:402
+#: src/main-window.c:406
 msgid "Check Email"
 msgstr "Перев╕рити ел.пошту"
 
-#: src/main-window.c:406
+#: src/main-window.c:410
 msgid "Delete Message"
 msgstr "Стерти пов╕домлення"
 
-#: src/main-window.c:410
+#: src/main-window.c:414
 msgid "Compose"
 msgstr "Скласти"
 
-#: src/main-window.c:410
+#: src/main-window.c:414
 msgid "Compose Message"
 msgstr "Скласти пов╕домлення"
 
-#: src/main-window.c:422
+#: src/main-window.c:426
 msgid "Continue"
 msgstr "Продовжити"
 
-#: src/main-window.c:427
+#: src/main-window.c:431
 msgid "Open Previous message"
 msgstr "В╕дкрити попередн╓ пов╕домлення"
 
-#: src/main-window.c:432
+#: src/main-window.c:436
 msgid "Open Next message"
 msgstr "В╕дкрити наступне пов╕домлення"
 
-#: src/main-window.c:437
+#: src/main-window.c:441
 msgid "Open Next Unread Message"
 msgstr "В╕дкрити наступне непрочитане пов╕домлення"
 
-#: src/main-window.c:442 src/print.c:82 src/sendmsg-window.c:127
-#: src/sendmsg-window.c:155
+#: src/main-window.c:446 src/print.c:83 src/sendmsg-window.c:129
+#: src/sendmsg-window.c:157
 msgid "Print"
 msgstr "Друкувати"
 
-#: src/main-window.c:442
+#: src/main-window.c:446
 msgid "Print current message"
 msgstr "Друкувати поточне пов╕домлення"
 
-#: src/main-window.c:900
+#: src/main-window.c:933
 msgid "Copyright (C) 1997-2000"
 msgstr "Copyright © 1997-2000"
 
-#: src/main-window.c:902
+#: src/main-window.c:935
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://www.balsa.net/\n"
@@ -1089,391 +1075,397 @@ msgstr ""
 "\n"
 "В╕дсилайте пов╕домлення про помилки на: http://bugs.gnome.org/"
 
-#: src/main-window.c:1457
+#: src/main-window.c:1496
 msgid ""
 "In order to store an address, you must open a mailbox and select a message.\n"
 msgstr ""
-"Для збереження адреси, вам необх╕дно в╕дкрити поштову скриньку ╕ вибрати пов╕домлення.\n"
+"Для збереження адреси, вам необх╕дно в╕дкрити поштову скриньку ╕ вибрати "
+"пов╕домлення.\n"
 
-#: src/main.c:78
+#: src/main.c:80
 msgid "Get new mail on startup"
 msgstr "Отримати нову кореспонденц╕ю на початку"
 
-#: src/main.c:80
+#: src/main.c:82
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "П╕дготувати нове пов╕домлення до ЕПОШТА@АДРЕСА"
 
-#: src/main.c:82
+#: src/main.c:84
 msgid "Opens MAILBOXNAME"
 msgstr "В╕дкрива╓ НАЗВА_ПОШТОВО╥_СКРИНЬКИ"
 
-#: src/main.c:82
+#: src/main.c:84
 msgid "MAILBOXNAME"
 msgstr "НАЗВА_ПОШТОВО╥_СКРИНЬКИ"
 
-#: src/main.c:83
+#: src/main.c:85
 msgid "Opens first unread mailbox"
 msgstr "В╕дкрити вибрану поштову скриньку"
 
-#: src/mblist-window.c:412
+#: src/mblist-window.c:413
 msgid "Open Mailbox"
 msgstr "В╕дкрити поштову скриньку"
 
-#: src/mblist-window.c:413
+#: src/mblist-window.c:414
 msgid "Close Mailbox"
 msgstr "Закрити поштову скриньку"
 
-#: src/mblist-window.c:416
+#: src/mblist-window.c:417
 msgid "Add New Mailbox"
 msgstr "Додати нову поштову скриньку"
 
-#: src/mblist-window.c:420
+#: src/mblist-window.c:421
 msgid "Edit Mailbox Properties"
 msgstr "Зм╕нити властивост╕ поштово╖ скриньки"
 
-#: src/mblist-window.c:421
+#: src/mblist-window.c:422
 msgid "Delete Mailbox"
 msgstr "Стерти поштову скриньку"
 
-#: src/mblist-window.c:422
+#: src/mblist-window.c:423
 msgid "Mark as Inbox"
 msgstr "Помитити як Вх╕дн╕"
 
-#: src/mblist-window.c:423
+#: src/mblist-window.c:424
 msgid "Mark as Sentbox"
 msgstr "Пом╕тити як В╕д╕слан╕"
 
-#: src/mblist-window.c:424
+#: src/mblist-window.c:425
 msgid "Mark as Trash"
 msgstr "Пом╕тити як См╕тник"
 
-#: src/mblist-window.c:425
+#: src/mblist-window.c:426
 msgid "Mark as Draftbox"
 msgstr "Пом╕тити як Чорновики"
 
-#: src/mblist-window.c:448 src/mblist-window.c:464 src/mblist-window.c:482
-#: src/mblist-window.c:497
+#: src/mblist-window.c:446 src/mblist-window.c:462 src/mblist-window.c:481
+#: src/mblist-window.c:496
 msgid "No mailbox selected."
 msgstr "Нема╓ вибрано╖ поштово╖ скриньки."
 
-#: src/message-window.c:74
+#: src/message-window.c:76
 msgid "Reply to this message"
 msgstr "В╕дпов╕сти на це пов╕домлення"
 
-#: src/message-window.c:81
+#: src/message-window.c:83
 msgid "Reply to all recipients of this message"
 msgstr "В╕дпов╕сти ус╕м адресатам цього пов╕домлення"
 
-#: src/message-window.c:87
+#: src/message-window.c:89
 msgid "Forward this message"
 msgstr "Переслати це пов╕домлення"
 
-#: src/pref-manager.c:124
+#: src/pref-manager.c:129
 msgid "Text"
 msgstr "Написи"
 
-#: src/pref-manager.c:125
+#: src/pref-manager.c:130
 msgid "Icons"
 msgstr "П╕ктограми"
 
-#: src/pref-manager.c:126
+#: src/pref-manager.c:131
 msgid "Both"
 msgstr "Написи та п╕ктограми"
 
-#: src/pref-manager.c:138
+#: src/pref-manager.c:143
 msgid "7bits"
 msgstr "7б╕т╕в"
 
-#: src/pref-manager.c:139
+#: src/pref-manager.c:144
 msgid "8bits"
 msgstr "8б╕т╕в"
 
-#: src/pref-manager.c:140
+#: src/pref-manager.c:145
 msgid "quoted"
 msgstr "описово"
 
-#: src/pref-manager.c:152
+#: src/pref-manager.c:157
 msgid "While Retrieving Messages"
 msgstr "П╕д час забирання пов╕домлень"
 
-#: src/pref-manager.c:153
+#: src/pref-manager.c:158
 msgid "Until Closed"
 msgstr "Доки програму закрито"
 
-#: src/pref-manager.c:154
+#: src/pref-manager.c:159
 msgid "Never"
 msgstr "Н╕коли"
 
-#: src/pref-manager.c:179
+#: src/pref-manager.c:184
 msgid "Balsa Preferences"
 msgstr "Установки Balsa"
 
-#: src/pref-manager.c:187 src/pref-manager.c:653
+#: src/pref-manager.c:192 src/pref-manager.c:685
 msgid "Identity"
 msgstr "╤дентиф╕кац╕я"
 
-#: src/pref-manager.c:190 src/pref-manager.c:723 src/pref-manager.c:801
+#: src/pref-manager.c:195 src/pref-manager.c:767 src/pref-manager.c:845
 msgid "Signature"
 msgstr "П╕дпис"
 
-#: src/pref-manager.c:193
+#: src/pref-manager.c:198
 msgid "Mail Servers"
 msgstr "Поштов╕ сервери"
 
-#: src/pref-manager.c:196
+#: src/pref-manager.c:201
 msgid "Mail Options"
 msgstr "Параметри пошти"
 
-#: src/pref-manager.c:199 src/pref-manager.c:1223
+#: src/pref-manager.c:204 src/pref-manager.c:1254
 msgid "Display"
 msgstr "В╕дображення"
 
-#: src/pref-manager.c:202 src/pref-manager.c:1248 src/pref-manager.c:1293
+#: src/pref-manager.c:207 src/pref-manager.c:1279 src/pref-manager.c:1324
 msgid "Printing"
 msgstr "Друкування"
 
-#: src/pref-manager.c:205 src/pref-manager.c:1334 src/pref-manager.c:1352
+#: src/pref-manager.c:210 src/pref-manager.c:1365 src/pref-manager.c:1383
 msgid "Encoding"
 msgstr "Кодування"
 
-#: src/pref-manager.c:208 src/pref-manager.c:1379
+#: src/pref-manager.c:213 src/pref-manager.c:1412
 msgid "Misc"
 msgstr "╤нше"
 
-#: src/pref-manager.c:211
+#: src/pref-manager.c:216
 msgid "Startup"
 msgstr "Запуск"
 
-#: src/pref-manager.c:677
+#: src/pref-manager.c:709
 msgid "Your name:"
 msgstr "Ваше ╕м'я:"
 
-#: src/pref-manager.c:684
+#: src/pref-manager.c:716
 msgid "E-mail address:"
 msgstr "Адреса е-пошти:"
 
-#: src/pref-manager.c:690
+#: src/pref-manager.c:722
 msgid "Reply-to address:"
 msgstr "Зворотня адреса:"
 
-#: src/pref-manager.c:735
+#: src/pref-manager.c:734
+msgid "Default domain:"
+msgstr "Типовий домен:"
+
+#: src/pref-manager.c:779
 msgid "Select your signature file"
 msgstr "Вибер╕ть ваш файл п╕дпису"
 
-#: src/pref-manager.c:745
+#: src/pref-manager.c:789
 msgid "sending mail"
 msgstr "в╕дсилання пошти"
 
-#: src/pref-manager.c:751
+#: src/pref-manager.c:795
 msgid "replying to mail"
 msgstr "в╕дпов╕дь на пошту"
 
-#: src/pref-manager.c:757
+#: src/pref-manager.c:801
 msgid "forwarding mail"
 msgstr "пересилання пошти"
 
-#: src/pref-manager.c:772
+#: src/pref-manager.c:816
 msgid ">"
 msgstr ">"
 
-#: src/pref-manager.c:774
+#: src/pref-manager.c:818
 msgid "Signature file:"
 msgstr "Файл п╕дпису:"
 
-#: src/pref-manager.c:781
+#: src/pref-manager.c:825
 msgid "Reply prefix:"
 msgstr "Преф╕кс в╕дпов╕д╕:"
 
-#: src/pref-manager.c:788
+#: src/pref-manager.c:832
 msgid "Use signature file when:"
 msgstr "Використовувати файл п╕дпису коли:"
 
-#: src/pref-manager.c:795
+#: src/pref-manager.c:839
 msgid "enable signature separator"
 msgstr "╓ розд╕лювач п╕дпису"
 
-#: src/pref-manager.c:832
+#: src/pref-manager.c:876
 msgid "Remote Mailbox Servers"
 msgstr "В╕ддален╕ сервери поштових скриньок"
 
-#: src/pref-manager.c:857
+#: src/pref-manager.c:901
 msgid "Type"
 msgstr "Тип"
 
-#: src/pref-manager.c:861
+#: src/pref-manager.c:905
 msgid "Mailbox name"
 msgstr "Назва поштово╖ скриньки"
 
-#: src/pref-manager.c:880
+#: src/pref-manager.c:924
 msgid "Modify"
 msgstr "Зм╕нити"
 
-#: src/pref-manager.c:892
+#: src/pref-manager.c:936
 msgid "Local mail"
 msgstr "Локальна пошта"
 
-#: src/pref-manager.c:907
+#: src/pref-manager.c:951
 msgid "Select your local mail directory"
 msgstr "Вибер╕ть локальний поштовий каталог:"
 
-#: src/pref-manager.c:917
+#: src/pref-manager.c:961
 msgid "Outgoing mail"
 msgstr "Вих╕дна пошта"
 
-#: src/pref-manager.c:936
+#: src/pref-manager.c:980
 msgid "Remote SMTP Server"
 msgstr "В╕ддалений сервер SMTP"
 
-#: src/pref-manager.c:943
+#: src/pref-manager.c:987
 msgid "Local mail user agent"
 msgstr "Локальний поштовий посередник (MUA)"
 
-#: src/pref-manager.c:972
+#: src/pref-manager.c:1016
 msgid "Incoming"
 msgstr "Надходження"
 
-#: src/pref-manager.c:976
+#: src/pref-manager.c:1020
 msgid "Outgoing"
 msgstr "Вих╕д"
 
-#: src/pref-manager.c:995
+#: src/pref-manager.c:1039
 msgid "Checking"
 msgstr "Перев╕рка"
 
-#: src/pref-manager.c:1005
+#: src/pref-manager.c:1049
 msgid "Minutes"
 msgstr "хвилин"
 
-#: src/pref-manager.c:1019
+#: src/pref-manager.c:1063
 msgid "Check mail automatically every:"
 msgstr "Перев╕ряти пошту кожн╕:"
 
-#: src/pref-manager.c:1042
+#: src/pref-manager.c:1086
 msgid "Word Wrap"
 msgstr "Переносити слова"
 
-#: src/pref-manager.c:1053
+#: src/pref-manager.c:1097
 msgid "Wrap Outgoing Text at:"
 msgstr "Переносити вв╕дний текст на:"
 
-#: src/pref-manager.c:1068
+#: src/pref-manager.c:1112
 msgid "Characters"
 msgstr "символи"
 
-#: src/pref-manager.c:1074
+#: src/pref-manager.c:1118
 msgid "Other options"
 msgstr "╤нш╕ параметри"
 
-#: src/pref-manager.c:1085
+#: src/pref-manager.c:1129
 msgid "Default Bcc to:"
 msgstr "Типове Bcc до:"
 
-#: src/pref-manager.c:1122
+#: src/pref-manager.c:1166
 msgid "Main window"
 msgstr "Основне в╕кно"
 
-#: src/pref-manager.c:1130
+#: src/pref-manager.c:1174
 msgid "use preview pane"
 msgstr "використати панель попереднього перегляду"
 
-#.
-#. * This is not ready, yet!
-#. *
-#. * -Ragnar-
-#. *
-#. * pawels: is replaced by the code connected to "selected headers" field
-#. * below. To be removed.
-#.
-#: src/pref-manager.c:1143
-msgid "View all headers"
-msgstr "Показати ус╕ заголовки"
-
-#: src/pref-manager.c:1149
+#: src/pref-manager.c:1180
 msgid "Show mailbox statistics in left pane"
 msgstr "Показати статистику скриньки в л╕в╕й панел╕"
 
-#: src/pref-manager.c:1156
+#: src/pref-manager.c:1187
 msgid "Toolbars"
 msgstr "Панел╕ ╕нструмент╕в"
 
-#: src/pref-manager.c:1173
+#: src/pref-manager.c:1204
 msgid "Display progress dialog"
 msgstr "В╕дображати в╕кно поступу"
 
-#: src/pref-manager.c:1181
+#: src/pref-manager.c:1212
 msgid "Display Formats"
 msgstr "Формати в╕дображення"
 
-#: src/pref-manager.c:1188
+#: src/pref-manager.c:1219
 msgid "Date encoding (for strftime):"
 msgstr "Кодування дати (для strftime):"
 
-#: src/pref-manager.c:1200
+#: src/pref-manager.c:1231
 msgid "Selected headers:"
 msgstr "Вибран╕ заголовки:"
 
-#: src/pref-manager.c:1276
+#: src/pref-manager.c:1307
 msgid "characters"
 msgstr "символи"
 
-#: src/pref-manager.c:1280
+#: src/pref-manager.c:1311
 msgid "Print command:"
 msgstr "Команда друку:"
 
-#: src/pref-manager.c:1286
+#: src/pref-manager.c:1317
 msgid "Break line at:"
 msgstr "Розривати рядок на:"
 
-#: src/pref-manager.c:1320
+#: src/pref-manager.c:1351
 msgid "Charset"
 msgstr "Наб╕р символ╕в"
 
-#: src/pref-manager.c:1389
+#: src/pref-manager.c:1422
 msgid "Debug"
 msgstr "Налагодження"
 
-#: src/pref-manager.c:1393
+#: src/pref-manager.c:1426
 msgid "Empty trash on exit"
 msgstr "Спорожнити см╕тник на виход╕"
 
-#: src/pref-manager.c:1397
+#. font
+#: src/pref-manager.c:1432
 msgid "Font"
 msgstr "Шрифт"
 
-#: src/pref-manager.c:1425
+#: src/pref-manager.c:1460
 msgid "Select a font to use"
 msgstr "Вибер╕ть шрифт для використання"
 
-#: src/pref-manager.c:1429
+#: src/pref-manager.c:1464
 msgid "Browse..."
 msgstr "Перегляд..."
 
-#: src/pref-manager.c:1434
+#: src/pref-manager.c:1469
 msgid "Preview pane"
 msgstr "Панель попереднього перегляду"
 
 #. mblist unread colour
-#: src/pref-manager.c:1442
+#: src/pref-manager.c:1477
 msgid "Colours"
 msgstr "Кольори"
 
-#: src/pref-manager.c:1453 src/pref-manager.c:1460
+#: src/pref-manager.c:1488 src/pref-manager.c:1495
 msgid "Mailbox with unread messages colour"
 msgstr "Кол╕р скриньки з непрчитаними пов╕домленнями"
 
-#: src/pref-manager.c:1480
+#: src/pref-manager.c:1516
+msgid "Address book location"
+msgstr "Розм╕щення адресно╖ книги"
+
+#: src/pref-manager.c:1521
+msgid "Select your address book file"
+msgstr "Вибер╕ть ваш файл адресно╖ книги"
+
+#: src/pref-manager.c:1531
+msgid "Expand aliases as you type"
+msgstr "Розширювати псевдон╕ми при набор╕"
+
+#: src/pref-manager.c:1549
 msgid "Options"
 msgstr "Параметри"
 
-#: src/pref-manager.c:1491
+#: src/pref-manager.c:1560
 msgid "Check mail upon startup"
 msgstr "Перев╕рити пошту на початку"
 
-#: src/pref-manager.c:1496
+#: src/pref-manager.c:1565
 msgid "Remember open mailboxes between sessions"
 msgstr "Пам'ятати в╕дкрит╕ скриньк╕ м╕ж сеансами"
 
-#: src/print.c:95
+#: src/print.c:96
 #, c-format
 msgid ""
 "Enter print command below\n"
@@ -1482,175 +1474,175 @@ msgstr ""
 "Введ╕ть команду друку нижче\n"
 "Не забутьте включити \"%s\""
 
-#: src/print.c:103
+#: src/print.c:104
 msgid "Print Command:"
 msgstr "Команда друку:"
 
-#: src/sendmsg-window.c:111
+#: src/sendmsg-window.c:113
 msgid "Send"
 msgstr "В╕д╕слати"
 
-#: src/sendmsg-window.c:111
+#: src/sendmsg-window.c:113
 msgid "Send this mail"
 msgstr "В╕д╕слати цю кореспонденц╕ю"
 
-#: src/sendmsg-window.c:115
+#: src/sendmsg-window.c:117
 msgid "Attach"
 msgstr "Долучити"
 
-#: src/sendmsg-window.c:115
+#: src/sendmsg-window.c:117
 msgid "Add attachments to this message"
 msgstr "Додати долучення до цього пов╕домлення"
 
-#: src/sendmsg-window.c:119
+#: src/sendmsg-window.c:121
 msgid "Postpone"
 msgstr "В╕дкласти"
 
-#: src/sendmsg-window.c:119
+#: src/sendmsg-window.c:121
 msgid "Continue this message later"
 msgstr "Продовжити написання цього пов╕домлення п╕зн╕ше"
 
-#: src/sendmsg-window.c:123
+#: src/sendmsg-window.c:125
 msgid "Spelling"
 msgstr "Правопис"
 
-#: src/sendmsg-window.c:123
+#: src/sendmsg-window.c:125
 msgid "Check Spelling"
 msgstr "Перев╕рка правопису"
 
-#: src/sendmsg-window.c:138
+#: src/sendmsg-window.c:140
 msgid "_Include File..."
 msgstr "Включити файл..."
 
-#: src/sendmsg-window.c:142
+#: src/sendmsg-window.c:144
 msgid "_Attach file..."
 msgstr "Долучити файл..."
 
-#: src/sendmsg-window.c:147
+#: src/sendmsg-window.c:149
 msgid "_Send"
 msgstr "В╕д╕слати"
 
-#: src/sendmsg-window.c:147
+#: src/sendmsg-window.c:149
 msgid "Send the currently edited message"
 msgstr "В╕д╕слати поточне пов╕домлення"
 
-#: src/sendmsg-window.c:151
+#: src/sendmsg-window.c:153
 msgid "_Postpone"
 msgstr "В╕дкласти"
 
-#: src/sendmsg-window.c:155
+#: src/sendmsg-window.c:157
 msgid "Print the edited message"
 msgstr "Друкувати поточне пов╕домлення"
 
-#: src/sendmsg-window.c:173
+#: src/sendmsg-window.c:175
 msgid "_Wrap body"
 msgstr "Перенос в т╕л╕"
 
-#: src/sendmsg-window.c:173
+#: src/sendmsg-window.c:175
 msgid "Wrap message lines"
 msgstr "Перенос в рядках пов╕домлення"
 
-#: src/sendmsg-window.c:177
+#: src/sendmsg-window.c:179
 msgid "_Reflow paragraph"
 msgstr "Переформатувати параграф"
 
-#: src/sendmsg-window.c:180
+#: src/sendmsg-window.c:182
 msgid "R_eflow message"
 msgstr "Переформатувати пов╕домлення"
 
-#: src/sendmsg-window.c:189
+#: src/sendmsg-window.c:191
 msgid "Fr_om"
 msgstr "В╕д"
 
-#: src/sendmsg-window.c:191
+#: src/sendmsg-window.c:193
 msgid "_To"
 msgstr "До"
 
-#: src/sendmsg-window.c:193
+#: src/sendmsg-window.c:195
 msgid "_Subject"
 msgstr "Тема"
 
-#: src/sendmsg-window.c:195
+#: src/sendmsg-window.c:197
 msgid "_Cc"
 msgstr "_Cc"
 
-#: src/sendmsg-window.c:197
+#: src/sendmsg-window.c:199
 msgid "_Bcc"
 msgstr "_Bcc"
 
-#: src/sendmsg-window.c:199
+#: src/sendmsg-window.c:201
 msgid "_Fcc"
 msgstr "_Fcc"
 
-#: src/sendmsg-window.c:201
+#: src/sendmsg-window.c:203
 msgid "_Reply To"
 msgstr "В╕дпов╕сти"
 
-#: src/sendmsg-window.c:203
+#: src/sendmsg-window.c:205
 msgid "_Attachments"
 msgstr "Долучення"
 
-#: src/sendmsg-window.c:205
+#: src/sendmsg-window.c:207
 msgid "_Comments"
 msgstr "Коментар╕"
 
-#: src/sendmsg-window.c:207
+#: src/sendmsg-window.c:209
 msgid "_Keywords"
 msgstr "Ключов╕ слова"
 
-#: src/sendmsg-window.c:218
+#: src/sendmsg-window.c:220
 msgid "_Western (ISO-8859-1)"
 msgstr "Зах╕дний (ISO-8859-1)"
 
-#: src/sendmsg-window.c:220
+#: src/sendmsg-window.c:222
 msgid "W_estern (ISO-8859-15)"
 msgstr "Зах╕дний (ISO-8859-15)"
 
-#: src/sendmsg-window.c:222
+#: src/sendmsg-window.c:224
 msgid "_Central European (ISO-8859-2)"
 msgstr "Центрально╓вропейський (ISO-8859-2)"
 
-#: src/sendmsg-window.c:224
+#: src/sendmsg-window.c:226
 msgid "_South European (ISO-8859-3)"
 msgstr "Сх╕дно╓вропейський (ISO-8859-3)"
 
-#: src/sendmsg-window.c:226
+#: src/sendmsg-window.c:228
 msgid "_Baltic (ISO-8859-13)"
 msgstr "Балт╕йський (ISO-8859-13)"
 
-#: src/sendmsg-window.c:228
+#: src/sendmsg-window.c:230
 msgid "Cy_rillic (ISO-8859-5)"
 msgstr "Кирилиця (ISO-8859-5)"
 
-#: src/sendmsg-window.c:230
+#: src/sendmsg-window.c:232
 msgid "_Hebrew (ISO-8859-8)"
 msgstr "╢врейський (ISO-8859-8)"
 
-#: src/sendmsg-window.c:232
+#: src/sendmsg-window.c:234
 msgid "_Turkish (ISO-8859-9)"
 msgstr "Турецький (ISO-8859-9)"
 
-#: src/sendmsg-window.c:234
+#: src/sendmsg-window.c:236
 msgid "Ce_ltic (ISO-8859-14)"
 msgstr "Кельтський (ISO-8859-14)"
 
-#: src/sendmsg-window.c:236
+#: src/sendmsg-window.c:238
 msgid "Ru_ssian (KOI8-R)"
 msgstr "Рос╕йський (KOI8-R)"
 
-#: src/sendmsg-window.c:238
+#: src/sendmsg-window.c:240
 msgid "_Ukrainian (KOI8-U)"
 msgstr "Укра╖нський (KOI8-U)"
 
-#: src/sendmsg-window.c:278
+#: src/sendmsg-window.c:286
 msgid "_Show"
 msgstr "Показати"
 
-#: src/sendmsg-window.c:279
+#: src/sendmsg-window.c:287
 msgid "_ISO Charset"
 msgstr "Наб╕р символ╕в ISO"
 
-#: src/sendmsg-window.c:401
+#: src/sendmsg-window.c:418
 msgid ""
 "The attachment pixmap (balsa/attachment.png) cannot be found.\n"
 "This means you cannot attach any files.\n"
@@ -1658,101 +1650,274 @@ msgstr ""
 "Не знайдено п╕ктограми долучення (balsa/attachment.png).\n"
 "Нажаль, це означа╓ те, що ви не зможете долучати жодних файл╕в.\n"
 
-#: src/sendmsg-window.c:419
+#: src/sendmsg-window.c:436
 #, c-format
 msgid "Cannot get info on file '%s': %s\n"
 msgstr "Неможливо отримати ╕нформац╕ю про файл '%s': %s\n"
 
-#: src/sendmsg-window.c:423
+#: src/sendmsg-window.c:440
 #, c-format
 msgid "Attachment is not a regular file: '%s'\n"
 msgstr "Долучення не ╓ звичайним файл: \"%s\"\n"
 
-#: src/sendmsg-window.c:483
+#: src/sendmsg-window.c:500
 msgid "Attach file"
 msgstr "Долучити файл"
 
 #. cc:
-#: src/sendmsg-window.c:612
+#: src/sendmsg-window.c:688
 msgid "cc:"
 msgstr "cc:"
 
 #. bcc:
-#: src/sendmsg-window.c:615
+#: src/sendmsg-window.c:693
 msgid "bcc:"
 msgstr "bcc:"
 
 #. fcc:
-#: src/sendmsg-window.c:618
+#: src/sendmsg-window.c:697
 msgid "fcc:"
 msgstr "fcc:"
 
 #. Reply To:
-#: src/sendmsg-window.c:647
+#: src/sendmsg-window.c:727
 msgid "Reply To:"
 msgstr "В╕дпов╕сти:"
 
 #. Attachment list
-#: src/sendmsg-window.c:651
+#: src/sendmsg-window.c:733
 msgid "Attachments:"
 msgstr "Долучення:"
 
 #. Comments:
-#: src/sendmsg-window.c:694
+#: src/sendmsg-window.c:776
 msgid "Comments:"
 msgstr "Коментар╕:"
 
 #. Keywords:
-#: src/sendmsg-window.c:697
+#: src/sendmsg-window.c:779
 msgid "Keywords:"
 msgstr "Ключов╕ слова:"
 
-#: src/sendmsg-window.c:774
+#: src/sendmsg-window.c:860
 msgid "you"
 msgstr "ви"
 
-#: src/sendmsg-window.c:783
+#: src/sendmsg-window.c:870
 #, c-format
 msgid "On %s %s wrote:\n"
 msgstr "%s %s писали:\n"
 
-#: src/sendmsg-window.c:785
+#: src/sendmsg-window.c:873
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s писали:\n"
 
-#: src/sendmsg-window.c:855
+#: src/sendmsg-window.c:947
 msgid "Reply to "
 msgstr "В╕дпв╕сти "
 
-#: src/sendmsg-window.c:860
+#: src/sendmsg-window.c:952
 msgid "Forward message"
 msgstr "Переслати пов╕домлення"
 
-#: src/sendmsg-window.c:865
+#: src/sendmsg-window.c:957
 msgid "Continue message"
 msgstr "Продовжити написання пов╕домлення"
 
-#: src/sendmsg-window.c:870
+#: src/sendmsg-window.c:962
 msgid "New message"
 msgstr "Нове пов╕домлення"
 
-#: src/sendmsg-window.c:1100
+#: src/sendmsg-window.c:1195
 msgid "Could not open the file.\n"
 msgstr "Неможливо в╕дкрити файл.\n"
 
-#: src/sendmsg-window.c:1106
+#: src/sendmsg-window.c:1201
 msgid "Loading..."
 msgstr "Завантаження..."
 
-#: src/sendmsg-window.c:1131
+#: src/sendmsg-window.c:1226
 msgid "Include file"
 msgstr "Включити файл"
 
-#: src/sendmsg-window.c:1406
+#: src/sendmsg-window.c:1483
 msgid "Cannot execute print command."
 msgstr "Неможливо виконати команду друку."
 
-#: src/sendmsg-window.c:1430
+#: src/sendmsg-window.c:1507
 msgid "Error executing lpr"
 msgstr "Помилка виконання lpr"
+
+#: libbalsa/mailbox_imap.c:195
+#, c-format
+msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
+msgstr "LibBalsaMailboxImap: В╕дкривання %s Посилань: %d\n"
+
+#: libbalsa/mailbox_local.c:218
+#, c-format
+msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
+msgstr "LibBalsaMailboxLocal: В╕дкривання %s Посилань: %d\n"
+
+#: libbalsa/mailbox_pop3.c:168
+#, c-format
+msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
+msgstr "LibBalsaMailboxPop3: В╕дкривання %s Посилань: %d\n"
+
+#: libmutt/mbox.c:134 libmutt/mbox.c:292
+msgid "Reading %s... %d (%d%%)"
+msgstr "Зчитування %s... %d (%d%%)"
+
+#: libmutt/mbox.c:158 libmutt/mbox.c:217
+msgid "Mailbox is corrupt!"
+msgstr "Скриньку з╕псовано!"
+
+#: libmutt/mbox.c:665
+msgid "Mailbox was corrupted!"
+msgstr "Поштову скриньку було з╕псовано!"
+
+#: libmutt/mbox.c:702 libmutt/mbox.c:977
+msgid "Fatal error!  Could not reopen mailbox!"
+msgstr "Фатальна помилка!  Неможливо перев╕дкрити скриньку!"
+
+#: libmutt/mbox.c:711
+msgid "Unable to lock mailbox!"
+msgstr "Не вдалося заблокувати поштову скриньку!"
+
+#: libmutt/mbox.c:740
+msgid "Could not create temporary file!"
+msgstr "Неможливо в╕дкрити файл.!"
+
+#. this means ctx->changed or ctx->deleted was set, but no
+#. * messages were found to be changed or deleted.  This should
+#. * never happen, is we presume it is a bug in mutt.
+#.
+#: libmutt/mbox.c:757
+msgid "sync: mbox modified, but no modified messages! (report this bug)"
+msgstr "sync: mbox модиф╕ковано, але нема╓ модиф╕кованих пов╕домлень! (пов╕домте про цю помилку)"
+
+#: libmutt/mbox.c:787
+msgid "Writing messages... %d (%d%%)"
+msgstr "Запис пов╕домлень... %d (%d%%)"
+
+#: libmutt/mbox.c:961
+#, c-format
+msgid "Write failed!  Saved partial mailbox to %s"
+msgstr "Запис не вдався!  Збережено частину поштово╖ скриньки у %s"
+
+#: libmutt/mbox.c:1027
+msgid "Could not reopen mailbox!"
+msgstr "Неможливо перев╕дкрити поштову скриньку.!"
+
+#: libmutt/mbox.c:1065
+msgid "Reopening mailbox..."
+msgstr "Перев╕дкривання поштово╖ скриньки"
+
+#: libmutt/mx.c:119
+#, c-format
+msgid "Lock count exceeded, remove lock for %s?"
+msgstr "Досягнуто максимально╖ к╕лькост╕ блокувань, зняти блокування з %s?"
+
+#: libmutt/mx.c:131
+#, c-format
+msgid "Can't dotlock %s.\n"
+msgstr "Неможливо виконати dotlock %s.\n"
+
+#: libmutt/mx.c:189
+msgid "Timeout exceeded while attempting fcntl lock!"
+msgstr "Вичерпано час оч╕кування на спроб╕ виконати блокування через fcntl!"
+
+#: libmutt/mx.c:195
+#, c-format
+msgid "Waiting for fcntl lock... %d"
+msgstr "Оч╕кування блокування через fcntl... %d"
+
+#: libmutt/mx.c:223
+msgid "Timeout exceeded while attempting flock lock!"
+msgstr "Вичерпано час оч╕кування на спроб╕ виконати блокування через flock!"
+
+#: libmutt/mx.c:230
+#, c-format
+msgid "Waiting for flock attempt... %d"
+msgstr "Оч╕кування блокування через flock... %d"
+
+#: libmutt/mx.c:459 libmutt/mx.c:605
+#, c-format
+msgid "%s is not a mailbox."
+msgstr "%s не ╓ поштовою скринькою."
+
+#: libmutt/mx.c:542
+#, c-format
+msgid "Couldn't lock %s\n"
+msgstr "Неможливо заблокувати %s\n"
+
+#: libmutt/mx.c:630
+#, c-format
+msgid "Reading %s..."
+msgstr "Зчитування %s..."
+
+#: libmutt/mx.c:719
+#, c-format
+msgid "Writing %s..."
+msgstr "Запис %s..."
+
+#: libmutt/mx.c:746
+#, c-format
+msgid "Could not synchronize mailbox %s!"
+msgstr "Неможливо синхрон╕зувати поштову скриньку %s!"
+
+#: libmutt/mx.c:848
+#, c-format
+msgid "Moving read messages to %s..."
+msgstr "Перем╕щення прочитаних пов╕домлень у %s..."
+
+#: libmutt/mx.c:899 libmutt/mx.c:1056
+msgid "Mailbox is unchanged."
+msgstr "Поштова скринька не зм╕нилась."
+
+#: libmutt/mx.c:929
+#, c-format
+msgid "%d kept, %d moved, %d deleted."
+msgstr "%d збережено, %d перем╕щено, %d стерто."
+
+#: libmutt/mx.c:932 libmutt/mx.c:1098
+#, c-format
+msgid "%d kept, %d deleted."
+msgstr "%d збережено, %d стерто."
+
+#: libmutt/mx.c:1040
+#, c-format
+msgid " Press '%s' to toggle write"
+msgstr " Натисн╕ть \"%s\" для зм╕ни запису"
+
+#: libmutt/mx.c:1043
+msgid "Use 'toggle-write' to re-enable write!"
+msgstr "Використовуйте \"toggle-write\" щоб повторно дозволити запис!"
+
+#: libmutt/mx.c:1045
+#, c-format
+msgid "Mailbox is marked unwritable. %s"
+msgstr "Поштову скриньку позначено як таку, що не призначена для запису. %s"
+
+#: libmutt/mx.c:1050
+msgid "Mailbox is read-only."
+msgstr "Скринька лише для зчитування."
+
+#: libmutt/mx.c:1065
+#, c-format
+msgid "Purge %d deleted message?"
+msgstr "Викинути %d стерте пов╕домленя?"
+
+#: libmutt/mx.c:1065
+#, c-format
+msgid "Purge %d deleted messages?"
+msgstr "Викинути %d стертих пов╕домлень?"
+
+#: libmutt/mx.c:1095
+#, c-format
+msgid "%d kept."
+msgstr "%d збережено."
+
+#: libmutt/mx.c:1375
+msgid "Can't write message"
+msgstr "Неможливо записати пов╕домлення"

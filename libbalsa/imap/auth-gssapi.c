@@ -29,7 +29,6 @@
 
 #if defined(HAVE_GSSAPI)
 #include <gssapi/gssapi.h>
-#include <gssapi/gssapi_generic.h>
 
 
 #include "imap_private.h"
@@ -196,7 +195,7 @@ ag_get_target(const char *host, gss_name_t *target_name)
     snprintf (buf, sizeof (buf), "imap@%s", host);
     request.value = buf;
     request.length = strlen(buf) + 1;
-    maj_stat = gss_import_name(&min_stat, &request, gss_nt_service_name,
+    maj_stat = gss_import_name(&min_stat, &request, GSS_C_NT_HOSTBASED_SERVICE,
                                target_name);
     if(maj_stat != GSS_S_COMPLETE)
         return FALSE;

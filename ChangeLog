@@ -8,6 +8,7 @@
 	* libbalsa/imap/imap-handle.h: add ImapMboxHandle::can_fetch_body.
 	* libinit_balsa/balsa-initdruid.c: quit on destroy signal.
 	* src/expand-alias.c: expand addresses differently.
+	* libbalsa/imap/auth-gssapi.c: compile against heimdal (#151753). 
 
 2004-09-03 08:48  PeterB
 

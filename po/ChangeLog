@@ -1,3 +1,9 @@
+2001-04-30  Pablo Saratxaga  <pablo@mandrakesoft.com>
+
+	* az.po: updated Azeri file
+	* nn.po,tr.po: corrected charset headers
+	* hu.po: changed DOS end of lines to Unix ones
+
 2001-04-29  Akira TAGOH  <tagoh@gnome.gr.jp>
 
 	* ja.po: Updated Japanese translation

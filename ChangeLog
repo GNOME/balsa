@@ -1,5 +1,10 @@
 2001-06-20  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* src/balsa-mblist.c: clean up the code and fix #56454 partially
+	(the password issue remains).
+	
+2001-06-20  Pawel Salek  <pawsa@theochem.kth.se>
+
 	* README, NEWS, configure.in: release 1.1.6
 	
 2001-06-20  Pawel Salek  <pawsa@theochem.kth.se>

@@ -1342,15 +1342,15 @@ balsa_index_set_column_widths(BalsaIndex * index)
                                          (tree_view, LB_MBOX_SIZE_COL),
                                          40); /* get a better guess */ 
 #endif
-    /* I have no idea why we must add 3 pixels to the icon width - otherwise,
+    /* I have no idea why we must add 5 pixels to the icon width - otherwise,
        the icon will be clipped... */
     gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &icon_w, &icon_h);
     gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
                                          (tree_view, LB_MBOX_MARKED_COL),
-                                         icon_w + 3); 
+                                         icon_w + 5); 
     gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
                                          (tree_view, LB_MBOX_ATTACH_COL),
-                                         icon_w + 3);
+                                         icon_w + 5);
     gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
                                          (tree_view, LB_MBOX_FROM_COL),
                                          balsa_app.index_from_width);

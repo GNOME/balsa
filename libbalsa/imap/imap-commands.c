@@ -265,7 +265,7 @@ imap_mbox_list(ImapMboxHandle *handle, const char* what)
 ImapResponse
 imap_mbox_lsub(ImapMboxHandle *handle, const char* what)
 {
-  gchar * cmd = g_strdup_printf("LIST \"%s\" \"%%\"", what);
+  gchar * cmd = g_strdup_printf("LSUB \"%s\" \"%%\"", what);
   ImapResponse rc = imap_cmd_exec(handle, cmd);
   g_free(cmd);
   return rc;

@@ -160,3 +160,28 @@ GtkWidget *fe_type_regex_entry;
 /* Entry for the type notebook exec page */
 GtkWidget *fe_type_exec_label;
 GtkWidget *fe_type_exec_entry;
+
+/* widgets for the Action page */
+
+/* action field */
+GtkWidget *fe_action_frame;
+GtkWidget *fe_action_table;
+GtkWidget *fe_copy_button;
+GtkWidget *fe_copy_entry;
+GtkWidget *fe_move_button;
+GtkWidget *fe_move_entry;
+GtkWidget *fe_move_label;
+GtkWidget *fe_print_button;
+GtkWidget *fe_print_entry;
+GtkWidget *fe_run_button;
+GtkWidget *fe_run_entry;
+GtkWidget *fe_delete_button;
+GtkWidget *fe_delete_label;
+
+/* disposition field */
+GtkWidget *fe_disp_frame;
+GtkWidget *fe_disp_box;
+GtkWidget *fe_disp_place;
+GtkWidget *fe_disp_continue;
+GtkWidget *fe_disp_stop;
+

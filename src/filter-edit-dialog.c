@@ -574,13 +574,164 @@ void filter_edit_dialog(GList *filter_list)
 
     /* The action notebook page */
 
-    fe_notebook_action_page = gtk_table_new(10, 10, FALSE);
+    fe_notebook_action_page = gtk_table_new(10, 10, TRUE);
     fe_action_label = gtk_label_new("Action");
     gtk_notebook_append_page(GTK_NOTEBOOK(fe_notebook),
 			     fe_notebook_action_page,
 			     fe_action_label);
     gtk_widget_show(fe_notebook_action_page);
     gtk_widget_show(fe_action_label);
+
+    /* The action area */
+    
+    fe_action_frame = gtk_frame_new("Action to perform:");
+    gtk_frame_set_label_align(GTK_FRAME(fe_action_frame),
+			      GTK_POS_LEFT,
+			      GTK_POS_TOP);
+    gtk_frame_set_shadow_type(GTK_FRAME(fe_action_frame),
+			      GTK_SHADOW_ETCHED_IN);
+    gtk_table_attach(GTK_TABLE(fe_notebook_action_page),
+		     fe_action_frame,
+		     0, 10, 0, 7,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     5, 5);
+    gtk_widget_show(fe_action_frame);
+    fe_action_table = gtk_table_new(5, 5, TRUE);
+    gtk_container_add(GTK_CONTAINER(fe_action_frame),
+		      fe_action_table);
+    gtk_widget_show(fe_action_table);
+
+    fe_copy_button = gtk_radio_button_new_with_label(NULL,
+						     "Copy to folder:");
+    gtk_table_attach(GTK_TABLE(fe_action_table),
+		     fe_copy_button,
+		     0, 2, 0, 1,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_copy_button);
+    fe_copy_entry = gtk_entry_new_with_max_length(255);
+    gtk_table_attach(GTK_TABLE(fe_action_table),
+		     fe_copy_entry,
+		     2, 5, 0, 1,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_copy_entry);
+    fe_move_button = gtk_radio_button_new_with_label(
+	gtk_radio_button_group(GTK_RADIO_BUTTON(fe_copy_button)),
+			       "Move to folder:");
+    gtk_table_attach(GTK_TABLE(fe_action_table),
+		     fe_move_button,
+		     0, 2, 1, 2,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_move_button);
+    fe_move_entry = gtk_entry_new_with_max_length(1023);
+    gtk_table_attach(GTK_TABLE(fe_action_table),
+		     fe_move_entry,
+		     2, 5, 1, 2,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_move_entry);
+    fe_move_label = gtk_label_new(
+	"(\"Move\" implies \"Do not place/leave\" below)");
+    gtk_table_attach(GTK_TABLE(fe_action_table),
+		     fe_move_label,
+		     2, 5, 2, 3,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_move_label);
+    fe_run_button = gtk_radio_button_new_with_label(
+	gtk_radio_button_group(GTK_RADIO_BUTTON(fe_move_button)),
+			       "Run program:");
+    gtk_table_attach(GTK_TABLE(fe_action_table),
+		     fe_run_button,
+		     0, 2, 3, 4,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_run_button);
+    fe_run_entry = gtk_entry_new_with_max_length(1023);
+    gtk_table_attach(GTK_TABLE(fe_action_table),
+		     fe_run_entry,
+		     2, 5, 3, 4,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_run_entry);
+    fe_delete_button = gtk_radio_button_new_with_label(
+	gtk_radio_button_group(GTK_RADIO_BUTTON(fe_run_button)),
+			       "Send to Trash");
+    gtk_table_attach(GTK_TABLE(fe_action_table),
+		     fe_delete_button,
+		     0, 2, 4, 5,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_delete_button);
+    fe_delete_label = gtk_label_new(
+	"(Implies \"Stop filtering\" below)");
+    gtk_table_attach(GTK_TABLE(fe_action_table),
+		     fe_delete_label,
+		     2, 5, 4, 5,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_delete_label);
+
+    /* The disposition area */
+
+    fe_disp_frame = gtk_frame_new("Disposition");
+    gtk_frame_set_label_align(GTK_FRAME(fe_disp_frame),
+			      GTK_POS_LEFT,
+			      GTK_POS_TOP);
+    gtk_frame_set_shadow_type(GTK_FRAME(fe_disp_frame),
+			      GTK_SHADOW_ETCHED_IN);
+    gtk_table_attach(GTK_TABLE(fe_notebook_action_page),
+		     fe_disp_frame,
+		     0, 10, 7, 10,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_disp_frame);
+    fe_disp_box = gtk_vbox_new(TRUE, 5);
+    gtk_container_add(GTK_CONTAINER(fe_disp_frame),
+		      fe_disp_box);
+    gtk_widget_show(fe_disp_box);
+
+    fe_disp_place 
+	= gtk_radio_button_new_with_label(NULL,
+					  "Place/leave in default folder");
+    gtk_box_pack_start(GTK_BOX(fe_disp_box),
+		       fe_disp_place,
+		       TRUE,
+		       FALSE,
+		       2);
+    gtk_widget_show(fe_disp_place);
+    fe_disp_continue = gtk_radio_button_new_with_label(
+	gtk_radio_button_group(GTK_RADIO_BUTTON(fe_disp_place)),
+	"Do not place/leave in default folder");
+    gtk_box_pack_start(GTK_BOX(fe_disp_box),
+		       fe_disp_continue,
+		       TRUE,
+		       FALSE,
+		       2);
+    gtk_widget_show(fe_disp_continue);
+    fe_disp_stop = gtk_radio_button_new_with_label(
+	gtk_radio_button_group(GTK_RADIO_BUTTON(fe_disp_continue)),
+	"Stop filtering here");
+    gtk_box_pack_start(GTK_BOX(fe_disp_box),
+		       fe_disp_stop,
+		       TRUE,
+		       FALSE,
+		       2);
+    gtk_widget_show(fe_disp_stop);
+    
 
     gtk_widget_show(fe_dialog);
 }

@@ -2579,6 +2579,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     case SEND_CONTINUE:
 	window = gnome_app_new("balsa", _("Continue message"));
 	msg->orig_message = message;
+        
 	break;
 
     default:
@@ -3096,7 +3097,9 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 
     if (bsmsg->orig_message != NULL &&
 	!GTK_OBJECT_DESTROYED(bsmsg->orig_message)) {
-
+        
+        /* Add original message references, this works for new replies
+         * and propogates them through reply postponements */
 	if (bsmsg->orig_message->references != NULL) {
 	    for (list = bsmsg->orig_message->references; list;
 		 list = list->next) {
@@ -3105,19 +3108,33 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 				  g_strdup(list->data));
 	    }
 	}
+
+        /* Date for In Reply To header: */
 	footime = localtime(&bsmsg->orig_message->date);
 	strftime(recvtime, sizeof(recvtime),
 		 "%a, %b %d, %Y at %H:%M:%S %z", footime);
 
-	if (bsmsg->orig_message->message_id) {
-	  message->references = g_list_prepend(
-	    message->references, g_strdup(bsmsg->orig_message->message_id));
-	    message->in_reply_to =
-		g_strconcat(bsmsg->orig_message->message_id, "; from ",
-			    (gchar *) bsmsg->orig_message->
-			    from->address_list->data, " on ", recvtime,
-			    NULL);
-	}
+        /* If there's an original message make sure to set the In
+         * Reply To header and add it to the references */
+        if (bsmsg->type == SEND_CONTINUE &&
+            bsmsg->orig_message->in_reply_to) {
+            /* copy In Reply To from postponed message, references
+             * will already have been copied above */
+            message->in_reply_to = g_strdup(bsmsg->orig_message->in_reply_to);
+        } 
+
+        if (bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_GROUP || 
+            bsmsg->type == SEND_REPLY_ALL) {
+            message->references = g_list_prepend(
+                message->references, 
+                g_strdup(bsmsg->orig_message->message_id));
+            
+            message->in_reply_to =
+                g_strconcat(bsmsg->orig_message->message_id, "; from ",
+                            (gchar *) bsmsg->orig_message->
+                            from->address_list->data, " on ", recvtime,
+                            NULL);
+        }
     }
 
     body = libbalsa_message_body_new(message);
@@ -3270,14 +3287,14 @@ message_postpone(BalsaSendmsg * bsmsg)
     if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
         bsmsg->type == SEND_REPLY_GROUP))
 	successp = libbalsa_message_postpone(message, balsa_app.draftbox,
-				  bsmsg->orig_message,
-				  message->fcc_mailbox,
+                                             bsmsg->orig_message,
+                                             message->fcc_mailbox,
                                              balsa_app.encoding_style,
                                              bsmsg->flow);
     else
 	successp = libbalsa_message_postpone(message, balsa_app.draftbox, 
-                                  NULL,
-				  message->fcc_mailbox,
+                                             NULL,
+                                             message->fcc_mailbox,
                                              balsa_app.encoding_style,
                                              bsmsg->flow);
     if(successp) {

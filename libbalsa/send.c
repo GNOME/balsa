@@ -1198,6 +1198,43 @@ message2HEADER(LibBalsaMessage * message, HEADER * hdr) {
 
 }
 
+static void
+message_add_references(LibBalsaMessage* message, HEADER* msg) 
+{
+    LIST* in_reply_to;
+    LIST* references;
+    GList* list;
+
+    /* If the message has references set, add them to he envelope */
+    if (message->references != NULL) {
+        list = message->references;
+        libbalsa_lock_mutt();
+        msg->env->references = mutt_new_list();
+	references = msg->env->references;
+	references->data = g_strdup(list->data);
+	list = list->next;
+
+	while (list != NULL) {
+	    references->next = mutt_new_list();
+	    references = references->next;
+	    references->data = g_strdup(list->data);
+	    references->next = NULL;
+	    list = list->next;
+	}
+        
+
+	/* There's no specific header for In-Reply-To, just
+	 * add it to the user headers */ 
+        in_reply_to = mutt_new_list();
+	in_reply_to->next = msg->env->userhdrs;
+	in_reply_to->data =
+	    g_strconcat("In-Reply-To: ", message->in_reply_to, NULL);
+	msg->env->userhdrs = in_reply_to;
+        libbalsa_unlock_mutt();
+    }
+}
+
+
 gboolean
 libbalsa_message_postpone(LibBalsaMessage * message,
 			  LibBalsaMailbox * draftbox,
@@ -1215,6 +1252,7 @@ libbalsa_message_postpone(LibBalsaMessage * message,
     libbalsa_unlock_mutt();
 
     message2HEADER(message, msg);
+    message_add_references(message, msg);
 
     body = message->body_list;
 
@@ -1334,7 +1372,7 @@ libbalsa_message_postpone(LibBalsaMessage * message,
     return thereturn>=0;
 }
 
-/* balsa_create_msg:
+/* libbalsa_create_msg:
    copies message to msg.
    PS: seems to be broken when queu == 1 - further execution of
    mutt_free_header(mgs) leads to crash.
@@ -1346,41 +1384,12 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
     FILE *tempfp;
     HEADER *msg_tmp;
     MESSAGE *mensaje;
-    LIST *in_reply_to;
-    LIST *references;
     LibBalsaMessageBody *body;
-    GList *list;
     gchar **mime_type;
     gboolean res = TRUE;
 
     message2HEADER(message, msg);
-
-    /* If the message has references set, add them to he envelope */
-    if (message->references != NULL) {
-	list = message->references;
-        libbalsa_lock_mutt();
-	msg->env->references = mutt_new_list();
-	references = msg->env->references;
-	references->data = g_strdup(list->data);
-	list = list->next;
-
-	while (list != NULL) {
-	    references->next = mutt_new_list();
-	    references = references->next;
-	    references->data = g_strdup(list->data);
-	    references->next = NULL;
-	    list = list->next;
-	}
-        libbalsa_unlock_mutt();
-
-	/* There's no specific header for In-Reply-To, just
-	 * add it to the user headers */ in_reply_to = mutt_new_list();
-	in_reply_to->next = msg->env->userhdrs;
-	in_reply_to->data =
-	    g_strconcat("In-Reply-To: ", message->in_reply_to, NULL);
-	msg->env->userhdrs = in_reply_to;
-    }
-
+    message_add_references(message, msg);
 
     if (message->mailbox)
 	libbalsa_message_body_ref(message);

@@ -1,3 +1,12 @@
+2002-04-12  Matthew Guenther <guentherm@asme.org>
+
+	* libbalsa/message.c: read In-Reply-To header into LibBalsaMessage
+	(in a way that works)
+	* libbalsa/send.c: write In-Reply-To and References headers for
+	posponed messages
+	* src/sendmsg-window.c: for continued messages use In-Reply-To and
+	References information from the postponed message 
+
 2002-04-05 Steve Wall <hitched97@myrealbox.com>
 
 	* src/sendmsg-window.c: mark included messages as included, not

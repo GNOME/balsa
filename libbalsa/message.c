@@ -398,15 +398,19 @@ libbalsa_message_user_hdrs(LibBalsaMessage * message)
 
     if (env->message_id)
 	res =
-	    g_list_append(res,
-			  create_hdr_pair("Message-ID",
-					  g_strdup(env->message_id)));
+	    g_list_append(res, create_hdr_pair("Message-ID",
+                                               g_strdup(env->message_id)));
     
     for (tmp = env->references; tmp; tmp = tmp->next) {
 	res =
 	    g_list_append(res,
 			  create_hdr_pair("References",
 					  g_strdup(tmp->data)));
+    }
+
+    for (tmp = env->in_reply_to; tmp; tmp = tmp->next) {
+        res = g_list_append(res, create_hdr_pair("In-Reply-To:",
+                                                 g_strdup(tmp->data)));
     }
 
     for (tmp = env->userhdrs; tmp; tmp = tmp->next) {
@@ -1154,6 +1158,18 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
         }
     }
 
+    if (!message->in_reply_to && cenv->in_reply_to) {
+        gchar* p = g_strdup(cenv->in_reply_to->data);
+        
+        for (tmp = cenv->in_reply_to->next; tmp; tmp = tmp->next) {
+            message->in_reply_to = g_strconcat(p, tmp->data, NULL);
+            g_free(p);
+            p = message->in_reply_to;
+        }
+        
+        message->in_reply_to = p;
+    }
+
     /* Get fcc from message */
     for (tmp = cenv->userhdrs; tmp; tmp = tmp->next) {
         if (!message->fcc_mailbox
@@ -1171,19 +1187,6 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
 
             message->in_reply_to = g_strdup(p);
 #endif
-        } else if (!message->in_reply_to
-                   && g_strncasecmp("In-Reply-To:", tmp->data, 12) == 0) {
-            gchar *p = tmp->data + 12;
-            while (*p != '\0' && *p != '<')
-                p++;
-            if (*p != '\0') {
-                message->in_reply_to = g_strdup(p);
-                p = message->in_reply_to;
-                while (*p != '\0' && *p != '>')
-                    p++;
-                if (*p == '>')
-                    *(p + 1) = '\0';
-            }
         }
     }
 

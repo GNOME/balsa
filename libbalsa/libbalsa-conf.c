@@ -23,7 +23,7 @@
 #include <string.h>
 #include "libbalsa-conf.h"
 
-#if !BALSA_USE_G_KEY_FILE
+#if !GLIB_CHECK_VERSION(2, 6, 0)
 
 #define BALSA_CONFIG_PREFIX "balsa/"
 
@@ -82,20 +82,23 @@ libbalsa_conf_has_group(const char *group)
     return retval;
 }
 
-#else                           /* BALSA_USE_G_KEY_FILE */
+#else                           /* !GLIB_CHECK_VERSION(2, 6, 0) */
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <glib/gstdio.h>
 
 #include "libbalsa.h"
 #include "misc.h"
+#include "i18n.h"
 
 typedef struct {
     GKeyFile *key_file;
     gchar *path;
+    gchar *new_path;
     guint changes;
 } LibBalsaConf;
 
@@ -142,36 +145,44 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
     g_key_file_set_list_separator(conf->key_file, ' ');
     conf->path =
         g_build_filename(g_get_home_dir(), ".balsa", filename, NULL);
+    conf->new_path = g_strconcat(conf->path, ".new", NULL);
     libbalsa_assure_balsa_dir();
     error = NULL;
     if (!g_key_file_load_from_file
         (conf->key_file, conf->path, G_KEY_FILE_NONE, &error)) {
         gchar *old_path;
         gchar *buf;
+        static guint warned = 0;
 
+        old_path =
+            g_build_filename(g_get_home_dir(), old_dir, "balsa", NULL);
 #if DEBUG
-        g_message("Could not load config from \"%s\": %s", conf->path,
-                  error->message);
-        g_message("Trying ~/.gnome2.");
+        g_message("Could not load config from \"%s\":\n %s\n"
+                  " trying \"%s\"", conf->path, error->message, old_path);
 #endif                          /* DEBUG */
         g_error_free(error);
         error = NULL;
 
-        old_path =
-            g_build_filename(g_get_home_dir(), old_dir, "balsa", NULL);
         buf = lbc_readfile(old_path);
         g_key_file_load_from_data(conf->key_file, buf, -1, G_KEY_FILE_NONE,
                                   &error);
         g_free(buf);
         if (error) {
 #if DEBUG
-            g_message("Cannot load key file from file \"%s\": %s",
+            g_message("Could not load key file from file \"%s\": %s",
                       old_path, error->message);
 #endif                          /* DEBUG */
             g_error_free(error);
             error = NULL;
         }
         g_free(old_path);
+        if (!warned) {
+            libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                                 _("Your Balsa configuration "
+                                   "is now stored in "
+                                   "\"~/.balsa/config\"."));
+            ++warned;
+        }
     }
 }
 
@@ -433,6 +444,8 @@ lbc_drop_all(LibBalsaConf * conf)
     conf->key_file = NULL;
     g_free(conf->path);
     conf->path = NULL;
+    g_free(conf->new_path);
+    conf->new_path = NULL;
     conf->changes = 0;
 }
 
@@ -460,25 +473,56 @@ lbc_sync(LibBalsaConf * conf)
     buf = g_key_file_to_data(conf->key_file, &len, &error);
     if (error) {
 #if DEBUG
-        g_message("Failed to sync config file \"%s\": %s", conf->path,
-                  error->message);
+        g_message("Failed to sync config file \"%s\": %s\n"
+                  " changes not saved", conf->path, error->message);
 #endif                          /* DEBUG */
         g_error_free(error);
+        g_free(buf);
         return;
     }
 
-    fd = open(conf->path, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
-    if (fd >= 0) {
-        write(fd, buf, len);
-        close(fd);
+    fd = g_open(conf->new_path, O_WRONLY | O_CREAT | O_TRUNC,
+                S_IRUSR | S_IWUSR);
+    if (fd < 0) {
 #if DEBUG
-    } else {
-        g_message("Failed to rewrite config file \"%s\".", conf->path);
+        g_message("Failed to open temporary config file \"%s\"\n"
+                  " changes not saved", conf->new_path);
 #endif                          /* DEBUG */
+        g_free(buf);
+        return;
     }
+
+    if (write(fd, buf, len) < (gssize) len) {
+#if DEBUG
+        g_message("Failed to write temporary config file \"%s\"\n"
+                  " changes not saved", conf->new_path);
+#endif                          /* DEBUG */
+        close(fd);
+        g_unlink(conf->new_path);
+        g_free(buf);
+        return;
+    }
+    close(fd);
     g_free(buf);
 
-    conf->changes = 0;
+    if (g_unlink(conf->path) < 0
+        && g_file_error_from_errno(errno) != G_FILE_ERROR_NOENT) {
+#if DEBUG
+        g_message("Failed to unlink config file \"%s\"\n"
+                  " new config file saved as \"%s\"", conf->path,
+                  conf->new_path);
+        perror("Config");
+#endif                          /* DEBUG */
+        return;
+    }
+
+    if (g_rename(conf->new_path, conf->path) < 0) {
+#if DEBUG
+        g_message("Failed to rename temporary config file \"%s\"\n",
+                  conf->new_path);
+#endif                          /* DEBUG */
+        return;
+    }
 }
 
 void
@@ -490,4 +534,4 @@ libbalsa_conf_sync(void)
     lbc_unlock();
 }
 
-#endif                          /* BALSA_USE_G_KEY_FILE */
+#endif                          /* !GLIB_CHECK_VERSION(2, 6, 0) */

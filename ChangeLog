@@ -1,5 +1,9 @@
 1999-01-07  Nat Friedman  <nat@nat.org>
 
+	* src/index-child.c: Updated the copyright
+
+1999-01-07  Nat Friedman  <nat@nat.org>
+
 	* src/message-window.c: Updated the menu items for the message
  	window to reflect the standard.
 

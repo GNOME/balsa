@@ -1,3 +1,11 @@
+2000-08-06  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/balsa-mblist.c: use main_window as colormap source, needed for 
+	right mouse button menu.
+	* help/C/balsa.sgml,help/C/images/example-alias.png: alias doc 
+	from Berend De Schouwer.
+	* configure.in: increased version number to 0.9.1
+	
 2000-08-03  Berend De Schouwer  <bds@jhb.ucs.co.za>
 	Address alias expansion.
 	* src/Makefile.am: added expand-alias.[ch]

@@ -14,6 +14,7 @@ URL:       http://www.serv.net/~jpaint/balsa/
 BuildRoot: /tmp/balsa-%{PACKAGE_VERSION}-root
 Packager: Michael Fulbright <msf@redhat.com>
 Requires: gtk+ >= 0.99.5
+Requires: gnome-libs
 Docdir: %{prefix}/doc
 
 %description

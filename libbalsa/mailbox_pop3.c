@@ -189,22 +189,25 @@ move_from_msgdrop(LibBalsaMailbox *tmp_mailbox, LibBalsaMailbox *dest,
     GError *err = NULL;
     if (libbalsa_mailbox_open(tmp_mailbox, NULL)) {
 	guint msgno, total = libbalsa_mailbox_total_messages(tmp_mailbox);
-	GArray *messages = g_array_new(FALSE, FALSE, sizeof(guint));
-
-	for (msgno = 1; msgno <= total; msgno++)
-	    g_array_append_val(messages, msgno);
-
-        if (!libbalsa_mailbox_messages_change_flags
-            (tmp_mailbox, messages,
-             LIBBALSA_MESSAGE_FLAG_NEW | LIBBALSA_MESSAGE_FLAG_RECENT, 0) ||
-	    !libbalsa_mailbox_sync_storage(tmp_mailbox, FALSE))
-            libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                                 _("Error setting flags on messages "
-                                   "in mailbox %s"), tmp_mailbox->name);
-
-        success = libbalsa_mailbox_messages_move(tmp_mailbox, messages, dest,
-                                                 &err);
-	g_array_free(messages, TRUE);
+        if(total>0) { /* message might been already filtered away by
+                         procmail */
+            GArray *messages = g_array_new(FALSE, FALSE, sizeof(guint));
+            
+            for (msgno = 1; msgno <= total; msgno++)
+                g_array_append_val(messages, msgno);
+            
+            if (!libbalsa_mailbox_messages_change_flags
+                (tmp_mailbox, messages,
+                 LIBBALSA_MESSAGE_FLAG_NEW | LIBBALSA_MESSAGE_FLAG_RECENT, 0) ||
+                !libbalsa_mailbox_sync_storage(tmp_mailbox, FALSE))
+                libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                                     _("Error setting flags on messages "
+                                       "in mailbox %s"), tmp_mailbox->name);
+            
+            success = libbalsa_mailbox_messages_move(tmp_mailbox, messages,
+                                                     dest, &err);
+            g_array_free(messages, TRUE);
+        }
         libbalsa_mailbox_close(tmp_mailbox, TRUE);
     }
     if(!success)

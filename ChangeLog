@@ -1,3 +1,9 @@
+2004-12-24  Pawel Salek
+
+	* libbalsa/body.c: always call gdk_pixbuf_loader_close().
+	* libbalsa/mailbox_pop3.c: do not try to move messages filtered
+	out by procmail.
+
 2004-12-22 13:25  Albrecht Dreß <albrecht.dress@arcor.de>
 
 	* libbalsa/: body.c, mime.c: two minor gpg related fixes.

@@ -499,7 +499,7 @@ libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body, GError ** err)
     }
     g_object_unref(stream);
 
-    if (ok && !gdk_pixbuf_loader_close(loader, err))
+    if (!gdk_pixbuf_loader_close(loader, err))
 	ok = FALSE;
 
     if (ok) {

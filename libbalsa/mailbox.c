@@ -377,7 +377,7 @@ libbalsa_mailbox_is_valid(LibBalsaMailbox * mailbox)
     if(mailbox->open_ref == 0) return TRUE;
     if(CLIENT_CONTEXT_CLOSED(mailbox)) return FALSE;
     /* be cautious: implement second line of defence */
-    g_return_val_if_fail(CLIENT_CONTEXT(mailbox)->hdrs == NULL, FALSE);
+    g_return_val_if_fail(CLIENT_CONTEXT(mailbox)->hdrs != NULL, FALSE);
     return TRUE;
 }
 

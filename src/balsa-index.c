@@ -22,41 +22,22 @@
 #include <gnome.h>
 #include "balsa-app.h"
 #include "balsa-index.h"
-#include "mailbox.h"
-
-/* pixmaps */
-#include "pixmaps/gball.xpm"
 
 
 /* constants */
 #define BUFFER_SIZE 1024
 
-static int first_new_msgno;
 
 /* gtk widget */
 static void balsa_index_class_init (BalsaIndexClass * klass);
 static void balsa_index_init (BalsaIndex * bindex);
-static void balsa_index_size_request (GtkWidget * widget,
-				      GtkRequisition * requisition);
-static void balsa_index_size_allocate (GtkWidget * widget,
-				       GtkAllocation * allocation);
-
-
-/* internal functions */
-static void append_messages (BalsaIndex * bindex,
-			     glong first,
-			     glong last);
-/*
-   static void update_new_message_pixmap (BalsaIndex * bindex,
-   glong msgno);
- */
-static void update_message_flag (BalsaIndex * bindex,
-				 glong msgno, gchar * flag);
+static void balsa_index_size_request (GtkWidget * widget, GtkRequisition * requisition);
+static void balsa_index_size_allocate (GtkWidget * widget, GtkAllocation * allocation);
 
 
 /* clist callbacks */
-static void select_message (GtkWidget * widget,
-			    gint row,
+static void select_message (GtkWidget * widget, 
+			    gint row, 
 			    gint column,
 			    GdkEventButton * bevent,
 			    gpointer * data);
@@ -65,7 +46,6 @@ static void unselect_message (GtkWidget * widget,
 			      gint column,
 			      GdkEventButton * bevent,
 			      gpointer * data);
-
 
 
 /* signals */
@@ -78,8 +58,7 @@ enum
 
 /* marshallers */
 typedef void (*BalsaIndexSignal1) (GtkObject * object,
-				   Mailbox * arg1,
-				   glong arg2,
+				   Message * arg1,
 				   gpointer data);
 
 static void balsa_index_marshal_signal_1 (GtkObject * object,
@@ -87,10 +66,8 @@ static void balsa_index_marshal_signal_1 (GtkObject * object,
 					  gpointer func_data,
 					  GtkArg * args);
 
-
 static gint balsa_index_signals[LAST_SIGNAL] = {0};
 static GtkBinClass *parent_class = NULL;
-
 
 
 guint
@@ -160,11 +137,7 @@ balsa_index_marshal_signal_1 (GtkObject * object,
   BalsaIndexSignal1 rfunc;
 
   rfunc = (BalsaIndexSignal1) func;
-
-  (*rfunc) (object,
-	    GTK_VALUE_POINTER (args[0]),
-	    GTK_VALUE_LONG (args[1]),
-	    func_data);
+  (*rfunc) (object, GTK_VALUE_POINTER (args[0]), func_data);
 }
 
 
@@ -184,11 +157,6 @@ balsa_index_init (BalsaIndex * bindex)
 
   GTK_WIDGET_SET_FLAGS (bindex, GTK_NO_WINDOW);
   bindex->mailbox = NULL;
-  bindex->last_message = 0;
-  bindex->new_xpm = NULL;
-  bindex->new_xpm_mask = NULL;
-  bindex->progress_bar = NULL;
-
 
   /* create the clist */
   GTK_BIN (bindex)->child =
@@ -301,9 +269,7 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
   if (bindex->mailbox == NULL)
     return;
 
-  bindex->last_message = mailbox->messages;
-
-
+#if 0
   /* here we play a little trick on clist; in GTK_SELECTION_BROWSE mode
    * (the default for this index), the first row appended automagicly gets
    * selected.  this causes a delay in the index getting filled out, and
@@ -330,25 +296,31 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
 	}
     }
   gtk_clist_set_selection_mode (GTK_CLIST (GTK_BIN (bindex)->child), GTK_SELECTION_BROWSE);
+#endif
 }
 
 
 void
-balsa_index_append_new_messages (BalsaIndex * bindex)
+balsa_index_add (BalsaIndex * bindex, 
+		 Message * message)
 {
-  glong first;
+  gchar *text[5];
+  gint row;
 
   g_return_if_fail (bindex != NULL);
+  g_return_if_fail (message != NULL);
 
   if (bindex->mailbox == NULL)
     return;
 
-  if (bindex->mailbox->messages > bindex->last_message)
-    {
-      first = bindex->last_message + 1;
-      bindex->last_message = bindex->mailbox->messages;
-      append_messages (bindex, first, bindex->last_message);
-    }
+  text[0] = NULL;
+  text[1] = NULL;
+  text[2] = message->from->personal;
+  text[3] = message->subject;
+  text[4] = message->date;
+
+  row = gtk_clist_append (GTK_CLIST (GTK_BIN (bindex)->child), text);
+  gtk_clist_set_row_data (GTK_CLIST (GTK_BIN (bindex)->child), row, (gpointer) message);
 }
 
 
@@ -395,125 +367,10 @@ balsa_index_select_previous (BalsaIndex * bindex)
     gtk_clist_moveto (clist, row, 0, 0.0, 0.0);
 }
 
-
-void
-balsa_index_set_progress_bar (BalsaIndex * bindex,
-			      GtkProgressBar * progress_bar)
-{
-  g_return_if_fail (bindex != NULL);
-  g_return_if_fail (progress_bar != NULL);
-
-  if (bindex->progress_bar)
-    gtk_widget_unref (GTK_WIDGET (bindex->progress_bar));
-
-  gtk_widget_ref (GTK_WIDGET (progress_bar));
-  bindex->progress_bar = progress_bar;
-}
-
-
-GtkProgressBar *
-balsa_index_get_progress_bar (BalsaIndex * bindex)
-{
-  g_return_if_fail (bindex != NULL);
-
-  return bindex->progress_bar;
-}
-
-
-void
-balsa_index_delete_message (BalsaIndex * bindex)
-{
-  GtkCList *clist;
-  glong row;
-
-  clist = GTK_CLIST (GTK_BIN (bindex)->child);
-
-  if (!clist->selection)
-    return;
-
-  row = (glong) clist->selection->data;
-
-  update_message_flag (bindex, row + 1, "D");
-#if 0
-  mailbox_message_delete (bindex->mailbox, row + 1);
-#endif
-}
-
-void
-balsa_index_undelete_message (BalsaIndex * bindex)
-{
-  GtkCList *clist;
-  glong row;
-
-  clist = GTK_CLIST (GTK_BIN (bindex)->child);
-
-  if (!clist->selection)
-    return;
-
-  row = (glong) clist->selection->data;
-
-  update_message_flag (bindex, row + 1, " ");
-#if 0
-  mailbox_message_undelete (bindex->mailbox, row + 1);
-#endif
-}
-
-
-static void
-append_messages (BalsaIndex * bindex,
-		 glong first,
-		 glong last)
+void 
+balsa_index_set_flag (BalsaIndex * bindex, Message * message, gchar * flag)
 {
 #if 0
-  glong i;
-  MessageHeader *header;
-  gchar message[BUFFER_SIZE];
-  gchar *text[5];
-
-  first_new_msgno = 0;
-
-
-  text[0] = NULL;
-  text[1] = message;
-
-  gtk_clist_freeze (GTK_CLIST (GTK_BIN (bindex)->child));
-  for (i = first; i <= last; i++)
-    {
-      header = mailbox_message_header (bindex->mailbox, i, FALSE);
-
-      sprintf (text[1], "%d", i);
-      text[2] = header->from;
-      text[3] = header->subject;
-      text[4] = header->date;
-
-      gtk_clist_append (GTK_CLIST (GTK_BIN (bindex)->child), text);
-      update_message_flag (bindex, i, "N");
-
-
-      /* update progress bar */
-      if (bindex->progress_bar)
-	{
-	  gtk_progress_bar_update (bindex->progress_bar, (gfloat) i / last);
-	  gtk_widget_draw (GTK_WIDGET (bindex->progress_bar), NULL);
-	}
-
-      /* give time to gtk so the GUI isn't blocked */
-      while (gtk_events_pending ())
-	gtk_main_iteration ();
-    }
-  gtk_clist_thaw (GTK_CLIST (GTK_BIN (bindex)->child));
-
-
-  /* re-set the progress bar to 0.0 */
-  if (bindex->progress_bar)
-    gtk_progress_bar_update (bindex->progress_bar, 0.0);
-#endif
-}
-
-
-static void
-update_message_flag (BalsaIndex * bindex, glong msgno, gchar * flag)
-{
   switch (*flag)
     {
     case 'N':
@@ -528,6 +385,7 @@ update_message_flag (BalsaIndex * bindex, glong msgno, gchar * flag)
       gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), msgno - 1, 0, NULL);
       break;
     }
+#endif
 }
 
 
@@ -619,24 +477,15 @@ select_message (GtkWidget * widget,
 		gpointer * data)
 {
   BalsaIndex *bindex;
-  glong msgno;
+  Message *message;
 
   bindex = BALSA_INDEX (data);
-
-  /* the message number is going to be one more
-   * than the row selected -- until the message list
-   * starts getting sorted! */
-  msgno = row + 1;
+  message = (Message *) gtk_clist_get_row_data (GTK_CLIST (widget), row);
 
   gtk_signal_emit (GTK_OBJECT (bindex),
 		   balsa_index_signals[SELECT_MESSAGE],
-		   bindex->mailbox,
-		   msgno,
+		   message,
 		   NULL);
-
-  if (bevent)
-    if (bevent->button == 3)
-      gtk_menu_popup (GTK_MENU (create_menu (bindex, msgno)), NULL, NULL, NULL, NULL, 3, bevent->time);
 }
 
 
@@ -648,26 +497,8 @@ unselect_message (GtkWidget * widget,
 		  gpointer * data)
 {
   BalsaIndex *bindex;
-  glong msgno;
-  gchar *foo = g_malloc (sizeof (char *) * 2);
+  Message *message;
 
   bindex = BALSA_INDEX (data);
-
-  /* 
-   * the message number is going to be one more
-   * than the row selected -- until the message list
-   * starts getting sorted! 
-   */
-  msgno = row + 1;
-
-  /* 
-   * update the index to show any changes in the message
-   * state 
-   */
-  gtk_clist_get_text (GTK_CLIST (GTK_BIN (bindex)->child), row, 0, &foo);
-  if (foo)
-    {
-      if (*foo != 'D')
-	update_message_flag (bindex, msgno, " ");
-    }
+  message = (Message *) gtk_clist_get_row_data (GTK_CLIST (widget), row);
 }

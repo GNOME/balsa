@@ -202,7 +202,6 @@ open_main_window ()
   gtk_widget_show (mw->status_bar);
 
   progress_bar = gtk_progress_bar_new ();
-  balsa_index_set_progress_bar (BALSA_INDEX (mw->index), GTK_PROGRESS_BAR (progress_bar));
   gtk_box_pack_start (GTK_BOX (mw->status_bar), progress_bar, FALSE, FALSE, 0);
   gtk_widget_show (progress_bar);
 
@@ -791,9 +790,6 @@ delete_message_cb (GtkWidget * widget)
   g_return_if_fail (widget != NULL);
 
   mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
-
-  balsa_index_delete_message (BALSA_INDEX (mainwindow->index));
-
   balsa_index_select_next (BALSA_INDEX (mainwindow->index));
 }
 
@@ -806,9 +802,6 @@ undelete_message_cb (GtkWidget * widget)
   g_return_if_fail (widget != NULL);
 
   mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
-
-  balsa_index_undelete_message (BALSA_INDEX (mainwindow->index));
-
   balsa_index_select_next (BALSA_INDEX (mainwindow->index));
 }
 
@@ -837,6 +830,7 @@ mailbox_select_cb (GtkWidget * widget)
   if (mailbox == mainwindow->mailbox)
     return;
 
+  balsa_index_set_mailbox (BALSA_INDEX (mainwindow->index), mailbox);
   watcher_id = mailbox_watcher_set (mailbox,
 				    (MailboxWatcherFunc) mailbox_listener,
 				    MESSAGE_NEW_MASK,
@@ -845,8 +839,6 @@ mailbox_select_cb (GtkWidget * widget)
   /* try to open the new mailbox */
   if (mailbox_open_ref (mailbox))
     {
-      balsa_index_set_mailbox (BALSA_INDEX (mainwindow->index), mailbox);
-
       if (mainwindow->mailbox)
 	{
 	  mailbox_open_unref (mainwindow->mailbox);
@@ -883,10 +875,21 @@ about_box_destroy_cb ()
 }
 
 
-
 void
 mailbox_listener (MailboxWatcherMessage * mw_message)
 {
-  if (balsa_app.debug)
-    g_print ("%s\n", mw_message->message->subject);
+  MainWindow *mainwindow = (MainWindow *) mw_message->data;
+
+  switch (mw_message->type)
+    {
+    case MESSAGE_NEW:
+      balsa_index_add (BALSA_INDEX (mainwindow->index), mw_message->message);
+      break;
+
+    default:
+      break;
+    }
 }
+
+
+

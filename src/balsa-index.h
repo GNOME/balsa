@@ -20,7 +20,7 @@
 #ifndef __BALSA_INDEX_H__
 #define __BALSA_INDEX_H__
 
-#include <gtk/gtk.h>
+#include <gnome.h>
 #include "mailbox.h"
 
 #ifdef __cplusplus
@@ -40,29 +40,15 @@ typedef struct _BalsaIndexClass BalsaIndexClass;
 struct _BalsaIndex
 {
   GtkBin bin;
-  
   Mailbox *mailbox;
-  glong last_message;
-  
-  /* pixmap and icon for new messages */
-  GdkPixmap *new_xpm;
-  GdkBitmap *new_xpm_mask;
-  
-  /* progress bar to be updated while loading messages */
-  GtkProgressBar *progress_bar;
 };
-
 
 struct _BalsaIndexClass
 {
   GtkBinClass parent_class;
   
-  void (*select_message) (BalsaIndex *bindex,
-			  Mailbox *stream,
-			  glong mesgno);
+  void (*select_message) (BalsaIndex *bindex, Message *message);
 };
-
-
 
 
 guint balsa_index_get_type (void);
@@ -74,26 +60,14 @@ GtkWidget * balsa_index_new ();
 void balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox);
 
 
-/* appends any new messages in the stream to the index, 
- * XXX: maybe this should be re-named balsa_index_ping?? */
-void balsa_index_append_new_messages (BalsaIndex * bindex);
+/* adds a new message */
+void balsa_index_add (BalsaIndex * bindex, Message * message);
+void balsa_index_set_flag (BalsaIndex * bindex, Message * message, gchar * flag);
 
 
 /* select up/down the index */
 void balsa_index_select_next (BalsaIndex *);
 void balsa_index_select_previous (BalsaIndex *);
-
-
-/* set delete/undelete flag on message */
-void balsa_index_delete_message (BalsaIndex * bindex);
-void balsa_index_undelete_message (BalsaIndex * bindex);
-
-
-/* set the pointer to the progress bar that's used to show
- * progress loading images */
-void balsa_index_set_progress_bar (BalsaIndex * bindex, GtkProgressBar * progress_bar);
-GtkProgressBar * balsa_index_get_progress_bar (BalsaIndex * bindex);
-
 
 
 #ifdef __cplusplus

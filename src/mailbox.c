@@ -122,7 +122,11 @@ static glong new_messages = 0;
 static void load_messages (Mailbox * mailbox);
 static void free_messages (Mailbox * mailbox);
 
-static void send_watcher_new_message (Mailbox * mailbox, Message * message);
+static void send_watcher_mark_read_message (Mailbox * mailbox, Message * message);
+static void send_watcher_mark_delete_message (Mailbox * mailbox, Message * message);
+static void send_watcher_mark_undelete_message (Mailbox * mailbox, Message * message);
+static void send_watcher_new_message (Mailbox * mailbox, Message * message, gint remaining);
+static void send_watcher_delete_message (Mailbox * mailbox, Message * message);
 
 static Message * translate_message (ENVELOPE *cenv);
 static Address * translate_address (ADDRESS *caddr);
@@ -466,6 +470,8 @@ load_messages (Mailbox * mailbox)
   glong msgno;
   Message *message;
   ENVELOPE *envelope;
+  gint remaining = new_messages;
+
 
   for (msgno = mailbox->messages - new_messages + 1; msgno <= CLIENT_STREAM (mailbox)->nmsgs; msgno++)
     {
@@ -475,7 +481,7 @@ load_messages (Mailbox * mailbox)
       message->msgno = msgno;
 
       mailbox->message_list = g_list_append (mailbox->message_list, message);
-      send_watcher_new_message (mailbox, message);
+      send_watcher_new_message (mailbox, message, remaining--);
 
       /* 
        * give time to gtk so the GUI isn't blocked
@@ -498,6 +504,7 @@ free_messages (Mailbox * mailbox)
       message = list->data;
       list = list->next;
 
+      send_watcher_delete_message (mailbox, message);
       message_free (message);
     }
   g_list_free (mailbox->message_list);
@@ -505,14 +512,17 @@ free_messages (Mailbox * mailbox)
 }
   
 
+/*
+ * sending messages to watchers
+ */
 static void
-send_watcher_new_message (Mailbox * mailbox, Message * message)
+send_watcher_mark_read_message (Mailbox * mailbox, Message * message)
 {
   GList *list;
   MailboxWatcherMessage mw_message;
   MailboxWatcher *watcher;
 
-  mw_message.type = MESSAGE_NEW;
+  mw_message.type = MESSAGE_MARK_READ;
   mw_message.mailbox = mailbox;
   mw_message.message = message;
 
@@ -522,7 +532,103 @@ send_watcher_new_message (Mailbox * mailbox, Message * message)
       watcher = list->data;
       list = list->next;
 
+      if (watcher->mask & MESSAGE_MARK_READ_MASK)
+	(*watcher->func) (&mw_message);
+    }
+}
+
+static void
+send_watcher_mark_delete_message (Mailbox * mailbox, Message * message)
+{
+  GList *list;
+  MailboxWatcherMessage mw_message;
+  MailboxWatcher *watcher;
+
+  mw_message.type = MESSAGE_MARK_DELETE;
+  mw_message.mailbox = mailbox;
+  mw_message.message = message;
+
+  list = WATCHER_LIST (mailbox);
+  while (list)
+    {
+      watcher = list->data;
+      list = list->next;
+
+      if (watcher->mask & MESSAGE_MARK_DELETE_MASK)
+	(*watcher->func) (&mw_message);
+    }
+}
+
+
+static void
+send_watcher_mark_undelete_message (Mailbox * mailbox, Message * message)
+{
+  GList *list;
+  MailboxWatcherMessage mw_message;
+  MailboxWatcher *watcher;
+
+  mw_message.type = MESSAGE_MARK_UNDELETE;
+  mw_message.mailbox = mailbox;
+  mw_message.message = message;
+
+  list = WATCHER_LIST (mailbox);
+  while (list)
+    {
+      watcher = list->data;
+      list = list->next;
+
+      if (watcher->mask & MESSAGE_MARK_UNDELETE_MASK)
+	(*watcher->func) (&mw_message);
+    }
+}
+
+
+static void
+send_watcher_new_message (Mailbox * mailbox, Message * message, gint remaining)
+{
+  GList *list;
+  MailboxWatcherMessageNew mw_new_message;
+  MailboxWatcher *watcher;
+
+  mw_new_message.type = MESSAGE_NEW;
+  mw_new_message.mailbox = mailbox;
+  mw_new_message.message = message;
+
+  mw_new_message.remaining = remaining;
+
+  list = WATCHER_LIST (mailbox);
+  while (list)
+    {
+      watcher = list->data;
+      list = list->next;
+
       if (watcher->mask & MESSAGE_NEW_MASK)
+	{
+	  mw_new_message.data = watcher->data;
+	  (*watcher->func) ((MailboxWatcherMessage *) &mw_new_message);
+	}
+    }
+}
+
+
+static void
+send_watcher_delete_message (Mailbox * mailbox, Message * message)
+{
+  GList *list;
+  MailboxWatcherMessage mw_message;
+  MailboxWatcher *watcher;
+
+  mw_message.type = MESSAGE_DELETE;
+  mw_message.mailbox = mailbox;
+  mw_message.message = message;
+
+  list = WATCHER_LIST (mailbox);
+  while (list)
+    {
+      watcher = list->data;
+      list = list->next;
+
+      if (watcher->mask & MESSAGE_DELETE_MASK)
 	(*watcher->func) (&mw_message);
     }
 }
@@ -717,6 +823,7 @@ message_delete (Message * message)
 
   sprintf (tmp, "%ld", message->msgno);
   mail_setflag (CLIENT_STREAM (message->mailbox), tmp, "\\DELETED");
+  send_watcher_mark_delete_message (message->mailbox, message);
 
   UNLOCK_MAILBOX ();
 }
@@ -732,6 +839,7 @@ message_undelete (Message * message)
 
   sprintf (tmp, "%ld", message->msgno);
   mail_clearflag (CLIENT_STREAM (message->mailbox), tmp, "\\DELETED");
+   send_watcher_mark_undelete_message (message->mailbox, message);
 
   UNLOCK_MAILBOX ();
 }
@@ -818,6 +926,7 @@ body_new ()
   Body *body;
 
   body = g_malloc (sizeof (Body));
+  body->mime = NULL;
   body->buffer = NULL;
   return body;
 }
@@ -826,6 +935,7 @@ body_new ()
 void
 body_free (Body * body)
 {
+  g_free (body->mime);
   g_free (body->buffer);
   g_free (body);
 }

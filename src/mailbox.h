@@ -80,6 +80,7 @@ typedef struct _MailboxIMAP MailboxIMAP;
 typedef struct _MailboxNNTP MailboxNNTP;
 
 typedef struct _MailboxWatcherMessage MailboxWatcherMessage;
+typedef struct _MailboxWatcherMessageNew MailboxWatcherMessageNew;
 
 typedef struct _Message Message;
 typedef struct _Address Address;
@@ -139,6 +140,20 @@ struct _MailboxWatcherMessage
   MailboxWatcherMessageType type;
   Mailbox *mailbox;
   Message *message;
+  gpointer data;
+};
+
+
+struct _MailboxWatcherMessageNew
+{
+  /* common */
+  MailboxWatcherMessageType type;
+  Mailbox *mailbox;
+  Message *message;
+  gpointer data;
+  /* end common */
+
+  gint remaining;
 };
 
 

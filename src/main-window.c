@@ -100,8 +100,10 @@ static gint new_mail_dialog_visible = FALSE;
 static int quiet_check=0;
 
 static void check_messages_thread(gpointer data);
-static void count_unread_msgs_func(GtkCTree * ctree, GtkCTreeNode * node,
-				   gpointer data);
+static gboolean count_unread_msgs_func(GtkTreeModel * model,
+                                       GtkTreePath * path,
+                                       GtkTreeIter * iter,
+                                       gpointer data);
 static void display_new_mail_notification(int);
 
 #endif
@@ -131,8 +133,10 @@ static void balsa_window_unselect_all_messages_cb (GtkWidget* widget,
 
 
 static void check_mailbox_list(GList * list);
-static void mailbox_check_func(GtkCTree * ctree, GtkCTreeNode * node,
-			       gpointer data);
+static gboolean mailbox_check_func(GtkTreeModel * model,
+                                   GtkTreePath * path,
+                                   GtkTreeIter * iter,
+                                   gpointer data);
 static gboolean imap_check_test(const gchar * path);
 
 static void enable_mailbox_menus(BalsaMailboxNode * mbnode);
@@ -858,16 +862,18 @@ balsa_window_new()
 
     /* XXX */
     balsa_app.mblist =  BALSA_MBLIST(balsa_mblist_new());
-    window->mblist = gtk_scrolled_window_new(
-        GTK_CLIST(balsa_app.mblist)->hadjustment,
-        GTK_CLIST(balsa_app.mblist)->vadjustment);
+    window->mblist =
+        gtk_scrolled_window_new(gtk_tree_view_get_hadjustment
+                                (GTK_TREE_VIEW(balsa_app.mblist)),
+                                gtk_tree_view_get_vadjustment
+                                (GTK_TREE_VIEW(balsa_app.mblist)));
     gtk_container_add(GTK_CONTAINER(window->mblist), 
                       GTK_WIDGET(balsa_app.mblist));
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(window->mblist),
                                    GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_signal_connect(GTK_OBJECT(balsa_app.mblist), "size_allocate",
 		       GTK_SIGNAL_FUNC(size_allocate_cb), NULL);
-    mblist_default_signal_bindings(balsa_app.mblist);
+    balsa_mblist_default_signal_bindings(balsa_app.mblist);
     gtk_widget_show_all(window->mblist);
 
     gtk_paned_pack1(GTK_PANED(window->hpaned), window->mblist, TRUE, TRUE);
@@ -1276,7 +1282,6 @@ real_open_mbnode(BalsaMailboxNode* mbnode)
 #endif
     /* FIXME: the check is not needed in non-MT-mode */
     if(is_open_mailbox(mbnode->mailbox)) {
-        g_warning("mailbox %s is already open.", mbnode->mailbox->name);
 #ifdef BALSA_USE_THREADS
         pthread_mutex_unlock(&open_lock);
 #endif
@@ -1386,9 +1391,6 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
             balsa_message_clear(BALSA_MESSAGE(window->preview));
             gnome_appbar_set_default(balsa_app.appbar, "Mailbox closed");
 
-            /* Unselect any mailbox */
-            gtk_clist_unselect_all(GTK_CLIST(balsa_app.mblist));
-
             /* Disable menus */
             enable_mailbox_menus(NULL);
             enable_message_menus(NULL);
@@ -1400,10 +1402,10 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
        ugly conversion warning when balsa_window_find_current_index
        returns NULL. */
     index = balsa_window_find_current_index(window);
-
-    if (index != NULL)
-        balsa_mblist_focus_mailbox(balsa_app.mblist, 
-                                   BALSA_INDEX (index)->mailbox_node->mailbox);
+    balsa_mblist_focus_mailbox(balsa_app.mblist,
+                               index != NULL ?
+                               BALSA_INDEX(index)->mailbox_node-> mailbox
+                               : NULL);
 }
 
 static gboolean
@@ -1664,21 +1666,27 @@ check_mailbox_list(GList * mailbox_list)
 }
 
 /*Callback to check a mailbox in a balsa-mblist */
-static void
-mailbox_check_func(GtkCTree * ctree, GtkCTreeNode * node, gpointer data)
+static gboolean
+mailbox_check_func(GtkTreeModel * model, GtkTreePath * path,
+                   GtkTreeIter * iter, gpointer data)
 {
-    BalsaMailboxNode *mbnode = gtk_ctree_node_get_row_data(ctree, node);
-    g_return_if_fail(mbnode);
-    
-    if(mbnode->mailbox) { /* mailbox, not a folder */
+    BalsaMailboxNode *mbnode;
+
+    gtk_tree_model_get(model, iter, 0, &mbnode, -1);
+    g_return_val_if_fail(mbnode, FALSE);
+
+    if (mbnode->mailbox) {      /* mailbox, not a folder */
         if (!LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox) ||
             imap_check_test(mbnode->dir ? mbnode->dir :
-                            LIBBALSA_MAILBOX_IMAP(mbnode->mailbox)->path)) {
+                            LIBBALSA_MAILBOX_IMAP(mbnode->mailbox)->
+                            path)) {
             gdk_threads_enter();
             libbalsa_mailbox_check(mbnode->mailbox);
             gdk_threads_leave();
         }
     }
+
+    return FALSE;
 }
 
 /*
@@ -1810,8 +1818,8 @@ check_new_messages_real(GtkWidget *widget, gpointer data, int type)
     libbalsa_notify_start_check(imap_check_test);
     check_mailbox_list(balsa_app.inbox_input);
 
-    gtk_ctree_post_recursive(GTK_CTREE(balsa_app.mblist), NULL, 
-                             mailbox_check_func, NULL);
+    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
+                           mailbox_check_func, NULL);
     balsa_mblist_have_new(balsa_app.mblist);
 #endif
 }
@@ -1876,9 +1884,9 @@ check_messages_thread(gpointer data)
     /* and nothing else */
     
     int new_msgs_before=0, new_msgs_after=0;
-    gtk_ctree_post_recursive(GTK_CTREE(balsa_app.mblist), NULL, 
-                             count_unread_msgs_func, 
-                             (gpointer)&new_msgs_before);
+    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
+                           count_unread_msgs_func, 
+                           (gpointer)&new_msgs_before);
 
     MSGMAILTHREAD(threadmessage, MSGMAILTHREAD_SOURCE, NULL, "POP3", 0, 0);
         
@@ -1888,12 +1896,12 @@ check_messages_thread(gpointer data)
                   "Local Mail", 0, 0);
     libbalsa_notify_start_check(imap_check_test);
 
-    gtk_ctree_post_recursive(GTK_CTREE(balsa_app.mblist), NULL, 
-                             mailbox_check_func, NULL);
+    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
+                           mailbox_check_func, NULL);
 
-    gtk_ctree_post_recursive(GTK_CTREE(balsa_app.mblist), NULL, 
-                             count_unread_msgs_func, 
-                             (gpointer)&new_msgs_after);
+    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
+                           count_unread_msgs_func, 
+                           (gpointer)&new_msgs_after);
 
     new_msgs_after-=new_msgs_before;
     if(new_msgs_after < 0)
@@ -1942,7 +1950,7 @@ mail_progress_notify_cb()
             threadmessage = *currentpos;
             if(threadmessage->message_type == MSGMAILTHREAD_FINISHED) {
 		gdk_threads_enter();
-                balsa_mblist_have_new(balsa_app.mblist);
+                balsa_mblist_have_new(balsa_app.mblist_tree_store);
                 display_new_mail_notification(threadmessage->num_bytes);
 		gdk_threads_leave();
             }
@@ -2021,7 +2029,7 @@ mail_progress_notify_cb()
                 gnome_appbar_refresh(balsa_app.appbar);
                 gnome_appbar_set_progress_percentage(balsa_app.appbar, 0.0);
             }
-            balsa_mblist_have_new(balsa_app.mblist);
+            balsa_mblist_have_new(balsa_app.mblist_tree_store);
             display_new_mail_notification(threadmessage->num_bytes);
             break;
 
@@ -2136,16 +2144,20 @@ send_progress_notify_cb()
     return TRUE;
 }
 
-static void
-count_unread_msgs_func(GtkCTree * ctree, GtkCTreeNode * node, gpointer data)
+static gboolean
+count_unread_msgs_func(GtkTreeModel * model, GtkTreePath * path,
+                       GtkTreeIter * iter, gpointer data)
 {
-    int *val=(int *)data;
+    int *val = (int *) data;
+    BalsaMailboxNode *mbnode;
 
-    BalsaMailboxNode *mbnode = gtk_ctree_node_get_row_data(ctree, node);
-    g_return_if_fail(mbnode);
-    
-    if(mbnode->mailbox)
-        *val+=LIBBALSA_MAILBOX(mbnode->mailbox)->unread_messages;
+    gtk_tree_model_get(model, iter, 0, &mbnode, -1);
+    g_return_val_if_fail(mbnode, FALSE);
+
+    if (mbnode->mailbox)
+        *val += LIBBALSA_MAILBOX(mbnode->mailbox)->unread_messages;
+
+    return FALSE;
 }
 
 static void
@@ -2290,7 +2302,7 @@ continue_message_cb(GtkWidget * widget, gpointer data)
     if (index && BALSA_INDEX(index)->mailbox_node->mailbox == balsa_app.draftbox)
         balsa_message_continue(widget, BALSA_INDEX(index));
     else
-        mblist_open_mailbox(balsa_app.draftbox);
+        balsa_mblist_open_mailbox(balsa_app.draftbox);
 }
 
 
@@ -2799,7 +2811,8 @@ mailbox_close_cb(GtkWidget * widget, gpointer data)
     GtkWidget *index = balsa_window_find_current_index(BALSA_WINDOW(data));
 
     if (index)
-        mblist_close_mailbox(BALSA_INDEX(index)->mailbox_node->mailbox);
+        balsa_mblist_close_mailbox(BALSA_INDEX(index)->mailbox_node->
+                                   mailbox);
 }
 
 static void
@@ -2875,7 +2888,8 @@ empty_trash(void)
         message = message->next;
     }
     libbalsa_mailbox_close(balsa_app.trash);
-    balsa_mblist_update_mailbox(balsa_app.mblist, balsa_app.trash);
+    balsa_mblist_update_mailbox(balsa_app.mblist_tree_store,
+                                balsa_app.trash);
     enable_empty_trash(TRASH_EMPTY);
 }
 

@@ -173,7 +173,8 @@ mailbox_conf_add_imap_cb(GtkWidget * widget, gpointer data)
 void
 mailbox_conf_delete_cb(GtkWidget * widget, gpointer data)
 {
-    BalsaMailboxNode *mbnode = mblist_get_selected_node(balsa_app.mblist);
+    BalsaMailboxNode *mbnode =
+        balsa_mblist_get_selected_node(balsa_app.mblist);
 
     if (mbnode->mailbox == NULL) {
         GtkWidget *err_dialog =
@@ -191,7 +192,8 @@ mailbox_conf_delete_cb(GtkWidget * widget, gpointer data)
 void
 mailbox_conf_edit_cb(GtkWidget * widget, gpointer data)
 {
-    BalsaMailboxNode *mbnode = mblist_get_selected_node(balsa_app.mblist);
+    BalsaMailboxNode *mbnode = 
+        balsa_mblist_get_selected_node(balsa_app.mblist);
     balsa_mailbox_node_show_prop_dialog(mbnode);
 }
 
@@ -273,7 +275,7 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 
     /* Close the mailbox, in case it was open */
     if (!LIBBALSA_IS_MAILBOX_POP3(mailbox))
-	mblist_close_mailbox(mailbox);
+	balsa_mblist_close_mailbox(mailbox);
 
     /* Remove mailbox on IMAP server */
     if (LIBBALSA_IS_MAILBOX_IMAP(mailbox) && !mailbox->config_prefix) {
@@ -307,7 +309,8 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 		      "nodes?\n"));
 	    return;
 	} else {
-	    mblist_remove_mailbox_node(balsa_app.mblist, mbnode);
+            balsa_mblist_remove_mailbox_node(balsa_app.mblist_tree_store,
+                                             mbnode);
 	    g_node_unlink(gnode);
 	    g_node_destroy(gnode); /* this will remove mbnode */
  	}
@@ -713,7 +716,7 @@ mailbox_conf_update(MailboxConfWindow *mcw)
 	/* redraw the pop3 server list */
 	update_mail_servers();
     else /* redraw the main mailbox list */
-	balsa_mblist_repopulate(BALSA_MBLIST(balsa_app.mblist));
+	balsa_mblist_repopulate(balsa_app.mblist_tree_store);
 }
 
 /*
@@ -793,7 +796,7 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 	/* redraw the pop3 server list */
 	update_mail_servers();
     else /* redraw the main mailbox list */
-	balsa_mblist_repopulate(BALSA_MBLIST(balsa_app.mblist));
+	balsa_mblist_repopulate(balsa_app.mblist_tree_store);
 }
 
 /* Create a page for the type of mailbox... */

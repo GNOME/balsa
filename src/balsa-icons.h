@@ -71,18 +71,18 @@
 
 #define BALSA_PIXMAP_OTHER_CLOSE		"other_close"
 
+#define BALSA_PIXMAP_MBOX_DRAFT                 "mbox_draft"
+#define BALSA_PIXMAP_MBOX_IN                    "mbox_in"
+#define BALSA_PIXMAP_MBOX_OUT                   "mbox_out"
+#define BALSA_PIXMAP_MBOX_SENT                  "mbox_sent"
+#define BALSA_PIXMAP_MBOX_TRASH                 "mbox_trash"
+#define BALSA_PIXMAP_MBOX_TRAY_EMPTY            "mbox_tray_empty"
+#define BALSA_PIXMAP_MBOX_TRAY_FULL             "mbox_tray_full"
+#define BALSA_PIXMAP_MBOX_DIR_OPEN              "mbox_dir_open"
+#define BALSA_PIXMAP_MBOX_DIR_CLOSED            "mbox_dir_closed"
+
 typedef enum {
-    BALSA_ICON_MBOX_DRAFT,
-    BALSA_ICON_MBOX_IN,
-    BALSA_ICON_MBOX_OUT,
-    BALSA_ICON_MBOX_SENT,
     BALSA_ICON_MBOX_TRASH,
-
-    BALSA_ICON_MBOX_TRAY_EMPTY,
-    BALSA_ICON_MBOX_TRAY_FULL,
-
-    BALSA_ICON_MBOX_DIR_OPEN,
-    BALSA_ICON_MBOX_DIR_CLOSED,
 
     BALSA_ICON_INFO_REPLIED,
     BALSA_ICON_INFO_READ,

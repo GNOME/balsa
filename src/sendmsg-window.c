@@ -3130,7 +3130,8 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 
     message = bsmsg2message(bsmsg);
     fcc = message->fcc_mailbox && *(message->fcc_mailbox)
-	? mblist_find_mbox_by_name(balsa_app.mblist, message->fcc_mailbox)
+	? balsa_mblist_find_mbox_by_name(balsa_app.mblist_tree_store,
+                                         message->fcc_mailbox)
 	: NULL;
 
     if(queue_only)

@@ -470,12 +470,14 @@ open_mailboxes_idle_cb(gchar * names[])
     gdk_threads_enter();
 
     while (names[i]) {
-	mbox = mblist_find_mbox_by_name(balsa_app.mblist, names[i]);
+        mbox =
+            balsa_mblist_find_mbox_by_name(balsa_app.mblist_tree_store,
+                                           names[i]);
 	if (balsa_app.debug)
 	    fprintf(stderr, "open_mailboxes_idle_cb: opening %s => %p..\n",
 		    names[i], mbox);
 	if (mbox)
-	    mblist_open_mailbox(mbox);
+	    balsa_mblist_open_mailbox(mbox);
 	i++;
     }
     g_strfreev(names);
@@ -623,8 +625,8 @@ destroy_mailbox_node(GNode* node, GNode* root)
 	balsa_window_close_mbnode(balsa_app.main_window, mbnode);
         mbnode->mailbox = NULL;
     }
-    mblist_remove_mailbox_node(balsa_app.mblist, 
-			       mbnode);
+    balsa_mblist_remove_mailbox_node(balsa_app.mblist_tree_store, 
+                                     mbnode);
     gtk_object_destroy((GtkObject*)mbnode); 
     return FALSE;
 }
@@ -646,7 +648,6 @@ balsa_remove_children_mailbox_nodes(GNode* gnode)
 	printf("Destroying children of %p %s\n",
 	       gnode->data, BALSA_MAILBOX_NODE(gnode->data)->name
 	       ? BALSA_MAILBOX_NODE(gnode->data)->name : "");
-    gtk_clist_freeze(GTK_CLIST(balsa_app.mblist));
     for(walk = g_node_first_child(gnode); walk; walk = next_sibling) {
         BalsaMailboxNode *mbnode = BALSA_MAILBOX_NODE(walk->data);
         next_sibling = g_node_next_sibling(walk);
@@ -662,7 +663,6 @@ balsa_remove_children_mailbox_nodes(GNode* gnode)
 	g_node_unlink(walk);
 	g_node_destroy(walk);
     }
-    gtk_clist_thaw(GTK_CLIST(balsa_app.mblist));
 }
 
 /* create_label:

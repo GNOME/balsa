@@ -154,17 +154,7 @@ GdkPixmap *
 balsa_icon_get_pixmap(BalsaIconName name)
 {
     switch (name) {
-	case BALSA_ICON_MBOX_DRAFT:		return mbox_draft.p;
-	case BALSA_ICON_MBOX_IN:		return mbox_in.p;
-	case BALSA_ICON_MBOX_OUT:		return mbox_out.p;
-	case BALSA_ICON_MBOX_SENT:		return mbox_sent.p;
 	case BALSA_ICON_MBOX_TRASH:		return mbox_trash.p;
-
-	case BALSA_ICON_MBOX_TRAY_EMPTY:	return mbox_tray_empty.p;
-	case BALSA_ICON_MBOX_TRAY_FULL:		return mbox_tray_full.p;
-
-	case BALSA_ICON_MBOX_DIR_CLOSED:	return mbox_dir_closed.p;
-	case BALSA_ICON_MBOX_DIR_OPEN:		return mbox_dir_open.p;
 
 	case BALSA_ICON_INFO_REPLIED:		return info_replied.p;
 	case BALSA_ICON_INFO_READ:		return info_read.p;
@@ -181,17 +171,7 @@ GdkBitmap *
 balsa_icon_get_bitmap(BalsaIconName name)
 {
     switch (name) {
-	case BALSA_ICON_MBOX_DRAFT:		return mbox_draft.b;
-	case BALSA_ICON_MBOX_IN:		return mbox_in.b;
-	case BALSA_ICON_MBOX_OUT:		return mbox_out.b;
-	case BALSA_ICON_MBOX_SENT:		return mbox_sent.b;
 	case BALSA_ICON_MBOX_TRASH:		return mbox_trash.b;
-
-	case BALSA_ICON_MBOX_TRAY_EMPTY:	return mbox_tray_empty.b;
-	case BALSA_ICON_MBOX_TRAY_FULL:		return mbox_tray_full.b;
-
-	case BALSA_ICON_MBOX_DIR_CLOSED:	return mbox_dir_closed.b;
-	case BALSA_ICON_MBOX_DIR_OPEN:		return mbox_dir_open.b;
 
 	case BALSA_ICON_INFO_REPLIED:		return info_replied.b;
 	case BALSA_ICON_INFO_READ:		return info_read.b;
@@ -272,6 +252,17 @@ register_balsa_pixmaps(void)
 
 	/* Other icons */
 	{ BALSA_PIXMAP_OTHER_CLOSE,		other_close_xpm},
+
+        /* BalsaMBList icons */
+        { BALSA_PIXMAP_MBOX_DRAFT,      mbox_draft_xpm },
+        { BALSA_PIXMAP_MBOX_IN,         mbox_in_xpm },
+        { BALSA_PIXMAP_MBOX_OUT,        mbox_out_xpm },
+        { BALSA_PIXMAP_MBOX_SENT,       mbox_sent_xpm },
+        { BALSA_PIXMAP_MBOX_TRASH,      mbox_trash_xpm },
+        { BALSA_PIXMAP_MBOX_TRAY_EMPTY, mbox_tray_empty_xpm },
+        { BALSA_PIXMAP_MBOX_TRAY_FULL,  mbox_tray_full_xpm },
+        { BALSA_PIXMAP_MBOX_DIR_OPEN,   mbox_dir_open_xpm },
+        { BALSA_PIXMAP_MBOX_DIR_CLOSED, mbox_dir_closed_xpm },
     };
 
     unsigned i;

@@ -171,6 +171,7 @@ extern struct BalsaApplication {
 
     BalsaWindow *main_window;
     BalsaMBList *mblist;
+    GtkTreeStore *mblist_tree_store;
 
     LibBalsaMailbox *inbox;
     GList *inbox_input;		/* mailboxes such as POP3, etc that will be appending into inbox */

@@ -436,12 +436,12 @@ balsa_mailbox_node_rescan(BalsaMailboxNode* mn)
         balsa_mailbox_nodes_lock(TRUE);
 	balsa_remove_children_mailbox_nodes(gnode);
         balsa_mailbox_nodes_unlock(TRUE);
-       balsa_mailbox_node_append_subtree(mn, gnode);
+        balsa_mailbox_node_append_subtree(mn, gnode);
 	mn->expanded = expanded;
-	balsa_mblist_repopulate(balsa_app.mblist);
+	balsa_mblist_repopulate(balsa_app.mblist_tree_store);
         if (expanded)
             /* if this is an IMAP node, we must scan the children */
-	    mblist_scan_mailbox_node(balsa_app.mblist, mn);
+	    balsa_mblist_scan_mailbox_node(mn);
     } else g_warning("folder node %s (%p) not found in hierarchy.\n",
 		     mn->name, mn);
 }
@@ -467,7 +467,7 @@ static void
 mb_open_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 {
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox));
-    mblist_open_mailbox(mbnode->mailbox);
+    balsa_mblist_open_mailbox(mbnode->mailbox);
 }
 
 static void
@@ -475,7 +475,7 @@ mb_close_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 {
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox));
     balsa_window_close_mbnode(balsa_app.main_window, mbnode);
-    balsa_mblist_have_new(balsa_app.mblist);
+    balsa_mblist_have_new(balsa_app.mblist_tree_store);
 }
 
 static void
@@ -500,7 +500,7 @@ mb_inbox_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 {
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox));
     config_mailbox_set_as_special(mbnode->mailbox, SPECIAL_INBOX);
-    balsa_mblist_repopulate(BALSA_MBLIST(balsa_app.mblist));
+    balsa_mblist_repopulate(balsa_app.mblist_tree_store);
 }
 
 static void
@@ -508,7 +508,7 @@ mb_sentbox_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 {
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox));
     config_mailbox_set_as_special(mbnode->mailbox, SPECIAL_SENT);
-    balsa_mblist_repopulate(BALSA_MBLIST(balsa_app.mblist));
+    balsa_mblist_repopulate(balsa_app.mblist_tree_store);
 }
 
 static void
@@ -516,7 +516,7 @@ mb_trash_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 {
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox));
     config_mailbox_set_as_special(mbnode->mailbox, SPECIAL_TRASH);
-    balsa_mblist_repopulate(BALSA_MBLIST(balsa_app.mblist));
+    balsa_mblist_repopulate(balsa_app.mblist_tree_store);
 }
 
 static void
@@ -524,7 +524,7 @@ mb_draftbox_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 {
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox));
     config_mailbox_set_as_special(mbnode->mailbox, SPECIAL_DRAFT);
-    balsa_mblist_repopulate(BALSA_MBLIST(balsa_app.mblist));
+    balsa_mblist_repopulate(balsa_app.mblist_tree_store);
 }
 
 static void

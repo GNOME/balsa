@@ -867,7 +867,7 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
      * close window and free memory
      */
     config_save();
-    balsa_mblist_repopulate(balsa_app.mblist);
+    balsa_mblist_repopulate(balsa_app.mblist_tree_store);
     balsa_window =
 	GTK_WIDGET(gtk_object_get_data(GTK_OBJECT(pbox), "balsawindow"));
     balsa_window_refresh(BALSA_WINDOW(balsa_window)); 

@@ -181,7 +181,7 @@ libbalsa_identity_finalize(GObject * object)
 {
     LibBalsaIdentity *ident = LIBBALSA_IDENTITY(object);
 
-    gtk_object_destroy(GTK_OBJECT(ident->address));
+    g_object_unref(ident->address);
     g_free(ident->identity_name);
     g_free(ident->replyto);
     g_free(ident->domain);
@@ -208,7 +208,7 @@ libbalsa_identity_set_address(LibBalsaIdentity* ident, LibBalsaAddress* ad)
 {
     g_return_if_fail(ident != NULL);
     
-    gtk_object_destroy(GTK_OBJECT(ident->address));
+    g_object_unref(ident->address);
     ident->address = ad;
 }
 

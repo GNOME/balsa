@@ -382,27 +382,6 @@ const gchar* threading_type_label[NUM_THREADING_STYLES] = {
     N_("JWZ")
 };
 
-const gchar *codeset_label[LIBBALSA_NUM_CODESETS] = {
-    N_("west european (traditional)"),
-    N_("east european"),
-    N_("south european"),
-    N_("north european"),
-    N_("cyrillic (iso/windows)"),
-    N_("arabic"),
-    N_("greek"),
-    N_("hebrew"),
-    N_("turkish"),
-    N_("nordic"),
-    N_("thai"),
-    N_("baltic"),
-    N_("celtic"),
-    N_("west european (euro)"),
-    N_("russian (koi)"),
-    N_("ukranian (koi)"),
-    N_("japanese"),
-    N_("korean")
-};
-
 /* and now the important stuff: */
 void
 open_preferences_manager(GtkWidget * widget, gpointer data)
@@ -604,6 +583,13 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     /* multipart/alternative */
     g_signal_connect(G_OBJECT(pui->display_alt_plain), "toggled",
 		     G_CALLBACK(properties_modified_cb), property_box);
+
+#if NEW_CHARSET_WIDGET
+    /* convert 8-bit text with no charset header */
+    g_signal_connect(G_OBJECT(pui->convert_unknown_8bit_codeset),
+                     "changed", G_CALLBACK(properties_modified_cb),
+                     property_box);
+#endif /* NEW_CHARSET_WIDGET */
 
     /* message font */
 #if GTK_CHECK_VERSION(2, 4, 0)
@@ -1056,8 +1042,14 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.convert_unknown_8bit =
 	GTK_TOGGLE_BUTTON(pui->convert_unknown_8bit[1])->active;
 #if GTK_CHECK_VERSION(2, 4, 0)
+#if NEW_CHARSET_WIDGET
+    balsa_app.convert_unknown_8bit_codeset =
+        gtk_combo_box_get_active(GTK_COMBO_BOX
+                                 (pui->convert_unknown_8bit_codeset));
+#else /* NEW_CHARSET_WIDGET */
     balsa_app.convert_unknown_8bit_codeset =
         pm_combo_box_get_level(pui->convert_unknown_8bit_codeset);
+#endif /* NEW_CHARSET_WIDGET */
 #else /* GTK_CHECK_VERSION(2, 4, 0) */
     menu_item =
 	gtk_menu_get_active(GTK_MENU(gtk_option_menu_get_menu(GTK_OPTION_MENU(pui->convert_unknown_8bit_codeset))));
@@ -3357,20 +3349,24 @@ create_mdn_reply_menu(void)
 static GtkWidget *
 create_codeset_menu(void)
 {
+#if NEW_CHARSET_WIDGET
+    return libbalsa_charset_button_new();
+#else /* NEW_CHARSET_WIDGET */
     LibBalsaCodeset n;
 #if GTK_CHECK_VERSION(2, 4, 0)
-    GtkWidget *combo_box = pm_combo_box_new();
-    
-    for (n = WEST_EUROPE; n <= KOREA; n++)
-	add_show_menu(_(codeset_label[n]), n, combo_box);
-    return combo_box;
+    GtkWidget *menu = pm_combo_box_new();
 #else /* GTK_CHECK_VERSION(2, 4, 0) */
     GtkWidget *menu = gtk_menu_new();
-    
-    for (n = WEST_EUROPE; n <= KOREA; n++)
-	add_show_menu(_(codeset_label[n]), n, menu);
-    return menu;
 #endif /* GTK_CHECK_VERSION(2, 4, 0) */
+    
+    for (n = 0; n < LIBBALSA_NUM_CODESETS; n++) {
+	LibBalsaCodesetInfo *info = &libbalsa_codeset_info[n];
+        gchar *tmp = g_strdup_printf("%s (%s)", _(info->label), info->std);
+        add_show_menu(tmp, n, menu);
+        g_free(tmp);
+    }
+    return menu;
+#endif /* NEW_CHARSET_WIDGET */
 }
 
 void

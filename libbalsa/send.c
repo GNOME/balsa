@@ -331,10 +331,9 @@ add_mime_body_plain(LibBalsaMessageBody *body, gint encoding_style,
 						 "Format", "Flowed");
     }
 
-    if (!charset)
-	charset="us-ascii";
     if (g_ascii_strcasecmp(charset, "UTF-8")!=0 &&
-	g_ascii_strcasecmp(charset, "UTF8")!=0)
+	g_ascii_strcasecmp(charset, "UTF8")!=0 &&
+	g_ascii_strcasecmp(charset, "US-ASCII")!=0)
     {
 	GMimeStream *stream, *filter_stream;
 	GMimeFilter *filter;
@@ -376,8 +375,7 @@ static void dump_queue(const char*msg)
 #endif
 
 /* libbalsa_message_queue:
-   places given message in the outbox. If fcc message field is set, saves
-   it to fcc mailbox as well.
+   places given message in the outbox.
 */
 LibBalsaMsgCreateResult
 libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
@@ -539,7 +537,6 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 	send_unlock();
 	return FALSE;
     }
-    libbalsa_mailbox_check(outbox);
     if (!libbalsa_mailbox_total_messages(outbox)) {
 	libbalsa_mailbox_close(outbox, TRUE);
 	send_unlock();
@@ -1027,7 +1024,6 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, LibBalsaFccboxFinder finder,
 	send_unlock();
 	return FALSE;
     }
-    libbalsa_mailbox_check(outbox);
     for (msgno = libbalsa_mailbox_total_messages(outbox);
 	 msgno > 0; msgno--) {
         LibBalsaMsgCreateResult created;
@@ -1390,6 +1386,7 @@ get_mailbox_names(GList *list, GList *address_list)
 }
 #endif
 
+#if !NEW_CHARSET_WIDGET
 /* Check whether a file is all ascii or utf-8, and return charset
  * accordingly (NULL if it's neither).
  */
@@ -1445,6 +1442,7 @@ lbs_file_get_charset(const gchar * filename)
     else
 	return NULL;
 }
+#endif                          /* NEW_CHARSET_WIDGET */
 
 /* We could have used g_strsplit_set(s, "/;", 3) but it is not
  * available in older glib. */
@@ -1493,7 +1491,10 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 	    }
 
 	    if (body->attach_as_extbody) {
+		GMimeContentType *content_type =
+		    g_mime_content_type_new("message", "external-body");
 		mime_part=g_mime_object_new_type("message", "external-body");
+		g_mime_object_set_content_type(mime_part, content_type);
 		g_mime_part_set_encoding(GMIME_PART(mime_part),
 			                 GMIME_PART_ENCODING_7BIT);
 		if(!strncmp( body->filename, "URL", 3 )) {
@@ -1531,8 +1532,13 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 		GMimeDataWrapper *content;
 		int fd;
 
-		if (!strcasecmp(mime_type[0], "text")) {
+		if (!strcasecmp(mime_type[0], "text")
+		    && !(charset = body->charset)) {
+#if NEW_CHARSET_WIDGET
+		    charset = libbalsa_file_get_charset(body->filename);
+#else                           /* NEW_CHARSET_WIDGET */
 		    charset = lbs_file_get_charset(body->filename);
+#endif                          /* NEW_CHARSET_WIDGET */
 		    if (!charset) {
 			static const gchar default_type[] =
 			    "application/octet-stream";

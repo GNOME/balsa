@@ -647,6 +647,7 @@ static GnomeUIInfo main_menu[] = {
 typedef struct {
     gchar *filename;
     gchar *force_mime_type;
+    gchar *charset;
     gboolean delete_on_destroy;
     gboolean as_extbody;
 } attachment_t;
@@ -1395,6 +1396,7 @@ add_extbody_attachment(GnomeIconList *ilist,
     attach->force_mime_type = mime_type != NULL ? g_strdup(mime_type) : NULL;
     attach->delete_on_destroy = delete_on_destroy;
     attach->as_extbody = TRUE;
+    attach->charset = NULL;
 
     pix = libbalsa_icon_finder("message/external-body", attach->filename,NULL);
     label = g_strdup_printf ("%s (%s)", attach->filename, 
@@ -1438,12 +1440,11 @@ static void
 show_extbody_dialog(GtkWidget *widget, GnomeIconList *ilist)
 {
     GtkWidget *extbody_dialog;
-    GtkWidget *dialog_vbox, *parent;
-    GtkWidget *hbox;
+    GtkWidget *parent;
     gint num;
     attachment_t *attach;
     
-    parent = gtk_widget_get_ancestor(widget, GTK_TYPE_WINDOW);
+    parent = gtk_widget_get_ancestor(widget, GNOME_TYPE_APP);
 
     num = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(ilist),
                                             "selectednumbertoextbody"));
@@ -1466,11 +1467,6 @@ show_extbody_dialog(GtkWidget *widget, GnomeIconList *ilist)
     gtk_window_set_title(GTK_WINDOW(extbody_dialog),
                          _("Attach as Reference?"));
     g_object_set_data(G_OBJECT(extbody_dialog), "balsa-data", ilist);
-    
-    dialog_vbox = GTK_DIALOG (extbody_dialog)->vbox;
-    
-    hbox = gtk_hbox_new (FALSE, 10);
-    gtk_box_pack_start (GTK_BOX (dialog_vbox), hbox, TRUE, TRUE, 0);
     
     g_signal_connect(G_OBJECT(extbody_dialog), "response",
                      G_CALLBACK(response_cb), extbody_dialog);
@@ -1518,6 +1514,7 @@ file_attachment(GtkWidget * widget, GnomeIconList * ilist)
 	g_strdup(attach->force_mime_type) : NULL;
     attach->delete_on_destroy = oldattach->delete_on_destroy;
     attach->as_extbody = FALSE;
+    attach->charset = NULL;
     gnome_icon_list_remove(ilist, num);
     
     /* as this worked before, don't do too much (==any) error checking... */
@@ -1662,7 +1659,214 @@ destroy_attachment (gpointer data)
     /* clean up memory */
     g_free(attach->filename);
     g_free(attach->force_mime_type);
+    g_free(attach->charset);
     g_free(attach);
+}
+
+#if !NEW_CHARSET_WIDGET
+static const gchar* conv_charsets[] = {
+ "ISO-8859-1", "ISO-8859-15", "ISO-8859-2", "ISO-8859-9", "ISO-8859-13",
+ "EUC-KR", "ISO-2022-JP", "EUC-TW", "KOI8-R"
+};
+enum{
+    CHARSET_COLUMN,
+    N_COLUMNS
+};
+#endif                          /* NEW_CHARSET_WIDGET */
+
+/* Ask the user for a charset; returns ((LibBalsaCodeset) -1) on cancel. */
+#if NEW_CHARSET_WIDGET
+static void
+sw_charset_combo_box_changed(GtkComboBox * combo_box,
+                             GtkWidget * charset_button)
+{
+    gtk_widget_set_sensitive(charset_button,
+                             gtk_combo_box_get_active(combo_box) == 0);
+}
+#else                           /* NEW_CHARSET_WIDGET */
+static void
+sw_charset_button_toggled(GtkToggleButton * check_button, GtkWidget * tree)
+{
+    gtk_widget_set_sensitive(tree,
+                             gtk_toggle_button_get_active(check_button));
+}
+#endif                          /* NEW_CHARSET_WIDGET */
+
+static gboolean
+sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
+                    const gchar * mime_type)
+{
+#if NEW_CHARSET_WIDGET
+    GtkWidget *combo_box = NULL;
+#else                           /* NEW_CHARSET_WIDGET */
+    guint i;
+    GtkCellRenderer *renderer;
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+    GtkTreeViewColumn *column;
+    GtkTreeSelection *select;
+#endif                          /* NEW_CHARSET_WIDGET */
+    gint codeset = -1;
+    GtkWidget *dialog =
+        gtk_dialog_new_with_buttons(_("Choose charset"),
+                                    GTK_WINDOW(bsmsg->window),
+                                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                                    GTK_STOCK_OK, GTK_RESPONSE_OK,
+                                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                    NULL);
+#if NEW_CHARSET_WIDGET
+    GtkWidget *info =
+        gtk_label_new(_("This file is not encoded in US-ASCII or UTF-8.\n"
+                        "Please choose the charset used to encode the file."));
+    GtkWidget *charset_button = libbalsa_charset_button_new();
+
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), info,
+                       FALSE, TRUE, 5);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), charset_button,
+                       TRUE, TRUE, 5);
+    gtk_widget_show(info);
+    gtk_widget_show(charset_button);
+    gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
+
+    if (change_type) {
+        GtkWidget *label = gtk_label_new(_("Attach as MIME type:"));
+        GtkWidget *hbox = gtk_hbox_new(FALSE, 5);
+        combo_box = gtk_combo_box_new_text();
+
+        gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), hbox,
+                           TRUE, TRUE, 5);
+        gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, TRUE, 0);
+        gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box), mime_type);
+        gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box),
+                                  "application/octet-stream");
+        gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), 0);
+        g_signal_connect(G_OBJECT(combo_box), "changed",
+                         G_CALLBACK(sw_charset_combo_box_changed),
+                         charset_button);
+        gtk_box_pack_start(GTK_BOX(hbox), combo_box, TRUE, TRUE, 0);
+        gtk_widget_show_all(hbox);
+    }
+
+    if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
+        if (change_type)
+            *change_type =
+                gtk_combo_box_get_active(GTK_COMBO_BOX(combo_box)) != 0;
+        if (!change_type || !*change_type)
+	    codeset = gtk_combo_box_get_active(GTK_COMBO_BOX(charset_button));
+    }
+#else                           /* NEW_CHARSET_WIDGET */
+    GtkWidget *check_button = NULL;
+    GtkWidget *info =
+        gtk_label_new(_("This file is not encoded in US-ASCII or UTF-8.\n"
+                        "Please choose the charset used to encode the file.\n"));
+    GtkListStore *store;
+    GtkWidget *tree;
+    GtkWidget *scroll;
+
+    store = gtk_list_store_new(N_COLUMNS, G_TYPE_STRING);
+    tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+    g_object_unref(store);
+
+    renderer = gtk_cell_renderer_text_new();
+    column =
+        gtk_tree_view_column_new_with_attributes("Name", renderer,
+                                                 "text", CHARSET_COLUMN,
+						 NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
+
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), info,
+                       FALSE, TRUE, 5);
+
+    scroll = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
+				   GTK_POLICY_AUTOMATIC,
+				   GTK_POLICY_AUTOMATIC);
+    gtk_widget_set_size_request(scroll, -1, 160);
+    gtk_container_add(GTK_CONTAINER(scroll), tree);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), scroll,
+                       TRUE, TRUE, 5);
+
+    gtk_widget_show(info);
+    gtk_widget_show_all(scroll);
+    gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
+
+    for (i = 0; i < ELEMENTS(conv_charsets); i++) {
+        gtk_list_store_append(store, &iter);
+        gtk_list_store_set(store, &iter, CHARSET_COLUMN, conv_charsets[i],
+                           -1);
+    }
+
+    if (change_type) {
+        gchar *label = g_strdup_printf(_("_Attach as %s type \"%s\""),
+                                       "MIME", "application/octet-stream");
+        check_button = gtk_check_button_new_with_mnemonic(label);
+        g_free(label);
+        g_signal_connect(G_OBJECT(check_button), "toggled",
+                         G_CALLBACK(sw_charset_button_toggled), tree);
+        gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), check_button,
+                           TRUE, TRUE, 5);
+    }
+
+    if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
+        if (change_type)
+            *change_type =
+                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+                                             (check_button));
+        if (!change_type || !*change_type) {
+	    gchar *charset;
+
+            select = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
+            if (gtk_tree_selection_get_selected(select, &model, &iter))
+                gtk_tree_model_get(model, &iter, CHARSET_COLUMN, &charset,
+                                   -1);
+	    for (codeset = LIBBALSA_NUM_CODESETS; --codeset >= 0;)
+		if (!g_ascii_strcasecmp(charset,
+                                        libbalsa_codeset_info[codeset].std))
+		    break;
+	    g_free(charset);
+        }
+    }
+#endif                          /* NEW_CHARSET_WIDGET */
+
+    gtk_widget_destroy(dialog);
+    return (LibBalsaCodeset) codeset;
+}
+
+static gboolean
+sw_set_charset(BalsaSendmsg * bsmsg, const gchar * filename,
+               const gchar * content_type, gboolean * change_type,
+               gchar ** attach_charset)
+{
+    const gchar *charset;
+    LibBalsaTextAttribute attr = libbalsa_text_attr_file(filename);
+
+    if (attr == 0)
+        charset = "us-ascii";
+    else if (attr & LIBBALSA_TEXT_HI_UTF8)
+        charset = "utf-8";
+    else {
+        LibBalsaCodesetInfo *info;
+        LibBalsaCodeset codeset =
+            sw_get_user_codeset(bsmsg, change_type, content_type);
+        if (*change_type)
+            return TRUE;
+        if (codeset == (LibBalsaCodeset) (-1))
+            return FALSE;
+
+        info = &libbalsa_codeset_info[codeset];
+        charset = info->std;
+        if (!strncmp(charset, "iso-8859-", 9)
+            && (attr & LIBBALSA_TEXT_HI_CTRL)) {
+            charset = info->win;
+            libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                                 _("Character set for file %s changed "
+                                   "from \"%s\" to \"%s\"."), filename,
+                                 info->std, info->win);
+        }
+    }
+    *attach_charset = g_strdup(charset);
+
+    return TRUE;
 }
 
 /* add_attachment:
@@ -1670,7 +1874,7 @@ destroy_attachment (gpointer data)
    takes over the ownership of filename.
 */
 gboolean
-add_attachment(BalsaSendmsg * bsmsg, char *filename, 
+add_attachment(BalsaSendmsg * bsmsg, gchar *filename, 
                gboolean is_a_temp_file, const gchar *forced_mime_type)
 {
     GnomeIconList *iconlist = GNOME_ICON_LIST(bsmsg->attachments[1]);
@@ -1700,6 +1904,22 @@ add_attachment(BalsaSendmsg * bsmsg, char *filename,
         gchar *utf8name;
         gchar *basename;
         GError *err = NULL;
+
+	attach_data->charset = NULL;
+        if (!g_ascii_strncasecmp(content_type, "text/", 5)) {
+	    gboolean change_type = FALSE;
+            if (!sw_set_charset(bsmsg, filename, content_type,
+                                &change_type, &attach_data->charset)) {
+		g_free(content_type);
+		g_free(attach_data);
+		return FALSE;
+	    }
+	    if (change_type) {
+		forced_mime_type = "application/octet-stream";
+		g_free(content_type);
+		content_type = g_strdup(forced_mime_type);
+	    }
+        }
 
         basename = g_path_get_basename(filename);
         utf8name = g_filename_to_utf8(basename, -1, NULL, NULL, &err);
@@ -3507,73 +3727,31 @@ read_signature(BalsaSendmsg *bsmsg)
 
 /* opens the load file dialog box, allows selection of the file and includes
    it at current point */
-static const gchar* conv_charsets[] = {
- "ISO-8859-1", "ISO-8859-15", "ISO-8859-2", "ISO-8859-9", "ISO-8859-13",
- "EUC-KR", "EUC-JP", "EUC-TW", "KOI8-R"
-};
-enum{
-    CHARSET_COLUMN,
-    N_COLUMNS
-};
 
 static void
 do_insert_string_select_ch(BalsaSendmsg* bsmsg, GtkTextBuffer *buffer,
                            const gchar* string, size_t len)
 {
-    GError* err = NULL;
-    gsize bytes_read, bytes_written;
-    gchar* s;
-    guint i;
-    GtkCellRenderer *renderer;
-    GtkTreeModel *model;
-    GtkTreeIter iter;
-    GtkTreeViewColumn *column;
-    GtkWidget * dialog =
-        gtk_dialog_new_with_buttons(_("Choose charset"),
-                                    GTK_WINDOW(bsmsg->window),
-                                    GTK_DIALOG_DESTROY_WITH_PARENT,
-                                    GTK_STOCK_OK, GTK_RESPONSE_OK,
-                                    GTK_STOCK_CANCEL, GTK_STOCK_CANCEL,
-                                    NULL);
-    GtkWidget* info = 
-        gtk_label_new(_("This file is not encoded in US-ASCII or UTF-8.\n"
-                        "Please choose the charset used to encode the file.\n"
-			"(choose Generic UTF-8 if unsure)."));
-    GtkListStore* store = gtk_list_store_new(N_COLUMNS,
-                                             G_TYPE_STRING);
-    GtkWidget* tree = 
-        gtk_tree_view_new_with_model (GTK_TREE_MODEL(store));
-    g_object_unref(store);
-    
-    renderer = gtk_cell_renderer_text_new ();
-    column = gtk_tree_view_column_new_with_attributes("Name", renderer,
-                                                      "text", CHARSET_COLUMN,
-                                                      NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
-    
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), 
-                       info, FALSE, TRUE, 5);
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), 
-                       tree, TRUE, TRUE, 5);
-    gtk_widget_show(info);
-    gtk_widget_show(tree);
-    gtk_dialog_set_default_response(GTK_DIALOG(dialog),
-                                    GTK_RESPONSE_OK);
-    
-    for(i=0; i<ELEMENTS(conv_charsets); i++) {
-        gtk_list_store_append(store, &iter);
-        gtk_list_store_set(store, &iter, CHARSET_COLUMN, conv_charsets[i], -1);
-    }
-    
+    LibBalsaTextAttribute attr = libbalsa_text_attr_string(string);
+
     do {
-        const gchar* charset = NULL;
-        GtkTreeSelection *select;
-        
-        if(gtk_dialog_run(GTK_DIALOG(dialog)) != GTK_RESPONSE_OK)
+	LibBalsaCodeset codeset;
+	LibBalsaCodesetInfo *info;
+	gsize bytes_read, bytes_written;
+	gchar* s;
+	const gchar *charset;
+	GError* err = NULL;
+
+        if ((codeset = sw_get_user_codeset(bsmsg, NULL, NULL))
+            == (LibBalsaCodeset) (-1))
             break;
-        select = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
-        if (gtk_tree_selection_get_selected(select, &model, &iter))
-            gtk_tree_model_get(model, &iter, CHARSET_COLUMN, &charset, -1);
+        info = &libbalsa_codeset_info[codeset];
+
+	charset = info->std;
+        if (!strncmp(charset, "iso-8859-", 9)
+            && (attr & LIBBALSA_TEXT_HI_CTRL))
+            charset = info->win;
+
         g_print("Trying charset: %s\n", charset);
         s=g_convert(string, len, "UTF-8", charset,
                     &bytes_read, &bytes_written, &err);
@@ -3585,9 +3763,8 @@ do_insert_string_select_ch(BalsaSendmsg* bsmsg, GtkTextBuffer *buffer,
         g_free(s);
         g_error_free(err);
     } while(1);
-    
-    gtk_widget_destroy(dialog);
 }
+
 static void
 do_insert_file(GtkWidget * selector, GtkFileSelection * fs)
 {
@@ -3613,7 +3790,7 @@ do_insert_file(GtkWidget * selector, GtkFileSelection * fs)
     len = libbalsa_readfile(fl, &string);
     fclose(fl);
     
-    if(g_utf8_validate(string, -1, NULL)) {
+    if(g_utf8_validate(string, len, NULL)) {
 	libbalsa_insert_with_url(buffer, string, NULL, NULL, NULL);
     } else do_insert_string_select_ch(bsmsg, buffer, string, len);
     g_free(string);
@@ -3880,7 +4057,8 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     /* Disable undo and redo, because buffer2 was changed. */
     sw_buffer_set_undo(bsmsg, FALSE, FALSE);
 
-    body->charset = g_strdup(bsmsg->charset);
+    body->charset = g_strdup(libbalsa_text_attr_string(body->buffer) ?
+                             bsmsg->charset : "us-ascii");
     libbalsa_message_append_part(message, body);
 
     {                           /* handle attachments */
@@ -3907,6 +4085,8 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 	    body->filename = g_strdup(attach->filename);
 	    if (attach->force_mime_type)
 		body->content_type = g_strdup(attach->force_mime_type);
+	    if (attach->charset)
+		body->charset = g_strdup(attach->charset);
 	    body->attach_as_extbody = attach->as_extbody;
 	    libbalsa_message_append_part(message, body);
 	}

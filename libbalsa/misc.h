@@ -26,6 +26,10 @@
 #include <stdio.h>
 #include <gtk/gtk.h>
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+# define NEW_CHARSET_WIDGET TRUE
+#endif
+
 #if ENABLE_ESMTP
 #include <auth-client.h>
 #endif
@@ -56,10 +60,38 @@ enum _LibBalsaCodeset {
     WEST_EUROPE_EURO,   /* iso-8859-15 */
     RUSSIAN,            /* koi-8r */
     UKRAINE,            /* koi-8u */
-    JAPAN,              /* euc-jp */
+    JAPAN,              /* iso-2022-jp */
     KOREA,              /* euc-kr */
+    EAST_EUROPE_WIN,    /* windows-1250 */
+    CYRILLIC_WIN,       /* windows-1251 */
+    GREEK_WIN,          /* windows-1253 */
+    HEBREW_WIN,         /* windows-1255 */
+    ARABIC_WIN,         /* windows-1256 */
+    BALTIC_WIN,         /* windows-1257 */
     LIBBALSA_NUM_CODESETS
 };
+
+typedef enum _LibBalsaTextAttribute LibBalsaTextAttribute;
+enum _LibBalsaTextAttribute {
+    LIBBALSA_TEXT_ESC     = 1 << 0,     /* ESC char(s)     */
+    LIBBALSA_TEXT_HI_BIT  = 1 << 1,     /* 8-bit char(s)   */
+    LIBBALSA_TEXT_HI_CTRL = 1 << 2,     /* 0x80 - 0x9f     */
+    LIBBALSA_TEXT_HI_UTF8 = 1 << 3      /* 8-bit utf-8     */
+};
+
+typedef struct _LibBalsaCodesetInfo LibBalsaCodesetInfo;
+struct _LibBalsaCodesetInfo {
+    const gchar *label;
+    const gchar *std;
+    const gchar *win;
+};
+extern LibBalsaCodesetInfo libbalsa_codeset_info[];
+#if NEW_CHARSET_WIDGET
+GtkWidget *libbalsa_charset_button_new(void);
+#endif                          /* NEW_CHARSET_WIDGET */
+LibBalsaTextAttribute libbalsa_text_attr_string(const gchar * string);
+LibBalsaTextAttribute libbalsa_text_attr_file(const gchar * filename);
+const gchar *libbalsa_file_get_charset(const gchar * filename);
 
 gchar *libbalsa_lookup_mime_type(const gchar * path);
 gchar *libbalsa_make_string_from_list(const GList *);

@@ -1169,54 +1169,91 @@ gboolean
 libbalsa_utf8_sanitize(gchar **text, gboolean fallback,
 		       gchar const **target)
 {
+    gchar *p;
+
     if (target)
 	*target = NULL;
-    if (!*text)
-        return TRUE;
-
-    if (g_utf8_validate(*text, -1, NULL))
+    if (!*text || g_utf8_validate(*text, -1, NULL))
 	return TRUE;
-    if (!fallback) {
-	gchar *p = *text;
-	while (!g_utf8_validate(p, -1, (const gchar **) &p))
-	    *p = '?';
-    } else {
-	/* */
+
+    if (fallback) {
 	gsize b_written;
 	GError *conv_error = NULL;
 	const gchar *use_enc =
             libbalsa_get_codeset_name(*text, sanitize_fallback_codeset);
-	gchar *p = g_convert(*text, strlen(*text), "utf-8", use_enc, NULL,
-			     &b_written, &conv_error);
+	p = g_convert(*text, strlen(*text), "utf-8", use_enc, NULL,
+                      &b_written, &conv_error);
 
 	if (p) {
 	    g_free(*text);
 	    *text = p;
 	    if (target)
 		*target = use_enc;
-	} else {
-	    gchar *p = *text;
-	    while (!g_utf8_validate(p, -1, (const gchar **) &p))
-		*p = '?';
-	    g_message("conversion %s -> utf8 failed: %s", use_enc,
-		      conv_error->message);
-	    g_error_free(conv_error);
+	    return FALSE;
 	}
+	g_message("conversion %s -> utf8 failed: %s", use_enc,
+                  conv_error->message);
+	g_error_free(conv_error);
     }
+    p = *text;
+    while (!g_utf8_validate(p, -1, (const gchar **) &p))
+	*p++ = '?';
+
     return FALSE;
 }
 
-static gchar *std_codesets[LIBBALSA_NUM_CODESETS] = 
-     { "iso-8859-1", "iso-8859-2", "iso-8859-3", "iso-8859-4", "iso-8859-5", 
-       "iso-8859-6", "iso-8859-7", "iso-8859-8", "iso-8859-9", "iso-8859-10",
-       "iso-8859-11", "iso-8859-13", "iso-8859-14", "iso-8859-15", "koi-8r",
-       "koi-8u", "euc-jp", "euc-kr" };
-
-static gchar *win_codesets[LIBBALSA_NUM_CODESETS] =
-    { "windows-1252", "windows-1250", NULL, NULL, "windows-1251", 
-      "windows-1256", "windows-1253", "windows-1255", "windows-1254", NULL,
-      NULL, "windows-1257", NULL, NULL, NULL,
-      NULL, NULL, NULL };
+/* The LibBalsaCodeset enum is not used for anything currently, but this
+ * list must be the same length, and should probably be kept consistent: */
+LibBalsaCodesetInfo libbalsa_codeset_info[LIBBALSA_NUM_CODESETS] = {
+    {N_("west european"),       /* WEST_EUROPE          */
+     "iso-8859-1", "windows-1252"} ,
+    {N_("east european"),       /* EAST_EUROPE          */
+     "iso-8859-2", "windows-1250"} ,
+    {N_("south european"),      /* SOUTH_EUROPE         */
+     "iso-8859-3"} ,
+    {N_("north european"),      /* NORTH_EUROPE         */
+     "iso-8859-4"} ,
+    {N_("cyrillic"),            /* CYRILLIC             */
+     "iso-8859-5", "windows-1251"} ,
+    {N_("arabic"),              /* ARABIC               */
+     "iso-8859-6", "windows-1256"} ,
+    {N_("greek"),               /* GREEK                */
+     "iso-8859-7", "windows-1253"} ,
+    {N_("hebrew"),              /* HEBREW               */
+     "iso-8859-8", "windows-1255"} ,
+    {N_("turkish"),             /* TURKISH              */
+     "iso-8859-9", "windows-1254"} ,
+    {N_("nordic"),              /* NORDIC               */
+     "iso-8859-10"} ,
+    {N_("thai"),                /* THAI                 */
+     "iso-8859-11"} ,
+    {N_("baltic"),              /* BALTIC               */
+     "iso-8859-13", "windows-1257"} ,
+    {N_("celtic"),              /* CELTIC               */
+     "iso-8859-14"} ,
+    {N_("west europe (euro)"),  /* WEST_EUROPE_EURO     */
+     "iso-8859-15"} ,
+    {N_("russian"),             /* RUSSIAN              */
+     "koi-8r"} ,
+    {N_("ukranian"),            /* UKRAINE              */
+     "koi-8u"} ,
+    {N_("japanese"),            /* JAPAN                */
+     "iso-2022-jp"} ,
+    {N_("korean"),              /* KOREA                */
+     "euc-kr"} ,
+    {N_("east european"),       /* EAST_EUROPE_WIN      */
+     "windows-1250"} ,
+    {N_("cyrillic"),            /* CYRILLIC_WIN         */
+     "windows-1251"} ,
+    {N_("greek"),               /* GREEK_WIN            */
+     "windows-1253"} ,
+    {N_("hebrew"),              /* HEBREW_WIN           */
+     "windows-1255"} ,
+    {N_("arabic"),              /* ARABIC_WIN           */
+     "windows-1256"} ,
+    {N_("baltic"),              /* BALTIC_WIN           */
+     "windows-1257"} ,
+};
 
 /*
  * Return the name of a codeset according to Codeset. If txt is not NULL, is
@@ -1224,15 +1261,167 @@ static gchar *win_codesets[LIBBALSA_NUM_CODESETS] =
  * usually means that txt contains windows (not iso) characters.
  */
 static const gchar *
-libbalsa_get_codeset_name(const gchar *txt, LibBalsaCodeset Codeset)
+libbalsa_get_codeset_name(const gchar * txt, LibBalsaCodeset Codeset)
 {
-  if (txt && win_codesets[Codeset])
-    while (*txt) {
-      if (*(unsigned char *)txt >= 0x80 && *(unsigned char *)txt < 0x9f)
-	return win_codesets[Codeset];
-      txt++;
+    LibBalsaCodesetInfo *info = &libbalsa_codeset_info[Codeset];
+
+    if (txt && info->win) {
+        LibBalsaTextAttribute attr = libbalsa_text_attr_string(txt);
+        if (attr & LIBBALSA_TEXT_HI_CTRL)
+            return info->win;
     }
-  return std_codesets[Codeset];
+    return info->std;
+}
+
+#if NEW_CHARSET_WIDGET
+/* Create a GtkComboBox with the national charsets as options;
+ * called when some text is found to be neither US-ASCII nor UTF-8, so
+ * the list includes neither of these. */
+GtkWidget *
+libbalsa_charset_button_new(void)
+{
+    GtkWidget *combo_box;
+    LibBalsaCodeset n, active = WEST_EUROPE;
+    const gchar *locale_charset;
+
+    combo_box = gtk_combo_box_new_text();
+    locale_charset = g_mime_locale_charset();
+
+    for (n = 0; n < LIBBALSA_NUM_CODESETS; n++) {
+        LibBalsaCodesetInfo *info = &libbalsa_codeset_info[n];
+        gchar *tmp = g_strdup_printf("%s (%s)", _(info->label), info->std);
+        gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box), tmp);
+        g_free(tmp);
+
+	if (!g_ascii_strcasecmp(info->std, locale_charset))
+	    active = n;
+    }
+
+    /* locale_charset may be UTF-8, in which case it was not found,
+     * and the initial choice will be WEST_EUROPE (= 0). */
+    gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), active);
+
+    return combo_box;
+}
+#endif                          /* NEW_CHARSET_WIDGET */
+
+/* Helper */
+static void
+lb_text_attr(const gchar * text, gboolean * has_esc, gboolean * has_hi_bit,
+             gboolean * has_hi_ctrl)
+{
+    const guchar *p;
+
+    for (p = text; *p; p++) {
+        if (*p == 0x1b)
+            *has_esc = TRUE;
+        if (*p >= 0x80) {
+            *has_hi_bit = TRUE;
+            if (*p <= 0x9f)
+                *has_hi_ctrl = TRUE;
+        }
+    }
+}
+
+/* Return text attributes of a string. */
+LibBalsaTextAttribute
+libbalsa_text_attr_string(const gchar * string)
+{
+    LibBalsaTextAttribute attr;
+    gboolean has_esc = FALSE;
+    gboolean has_hi_bit = FALSE;
+    gboolean has_hi_ctrl = FALSE;
+    gboolean is_utf8 = TRUE;
+
+    lb_text_attr(string, &has_esc, &has_hi_bit, &has_hi_ctrl);
+    is_utf8 = g_utf8_validate(string, -1, NULL);
+
+    attr = 0;
+    if (has_esc)
+        attr |= LIBBALSA_TEXT_ESC;
+    if (has_hi_bit)
+        attr |= LIBBALSA_TEXT_HI_BIT;
+    if (has_hi_ctrl)
+        attr |= LIBBALSA_TEXT_HI_CTRL;
+    if (is_utf8 && has_hi_bit)
+        attr |= LIBBALSA_TEXT_HI_UTF8;
+
+    return attr;
+}
+
+/* Return text attributes of the contents of a file. */
+LibBalsaTextAttribute
+libbalsa_text_attr_file(const gchar * filename)
+{
+    LibBalsaTextAttribute attr;
+    FILE *fp;
+    gchar buf[80];
+    gchar *new_chars = buf;
+    gboolean has_esc = FALSE;
+    gboolean has_hi_bit = FALSE;
+    gboolean has_hi_ctrl = FALSE;
+    gboolean is_utf8 = TRUE;
+
+    fp = fopen(filename, "r");
+    if (!fp)
+        return 0;
+
+    while (fgets(new_chars, (sizeof buf) - (new_chars - buf), fp)) {
+	gboolean test_bits = !has_esc || !has_hi_bit || !has_hi_ctrl;
+
+	if (!test_bits && !is_utf8)
+	    break;
+
+        if (test_bits)
+            lb_text_attr(new_chars, &has_esc, &has_hi_bit, &has_hi_ctrl);
+
+        if (is_utf8) {
+            const gchar *end;
+
+            new_chars = buf;
+            if (!g_utf8_validate(buf, -1, &end)) {
+                if (g_utf8_get_char_validated(end, -1) == (gunichar) (-1))
+                    is_utf8 = FALSE;
+                else
+                    /* copy any remaining bytes, including the
+                     * terminating '\0', to start of buffer */
+                    while ((*new_chars = *end++) != '\0')
+                        new_chars++;
+            }
+        }
+    }
+
+    fclose(fp);
+
+    attr = 0;
+    if (has_esc)
+        attr |= LIBBALSA_TEXT_ESC;
+    if (has_hi_bit)
+        attr |= LIBBALSA_TEXT_HI_BIT;
+    if (has_hi_ctrl)
+        attr |= LIBBALSA_TEXT_HI_CTRL;
+    if (is_utf8 && has_hi_bit)
+        attr |= LIBBALSA_TEXT_HI_UTF8;
+
+    return attr;
+}
+
+/* Check whether a file is all ascii or utf-8, and return charset
+ * accordingly (NULL if it's neither).
+ * This function is called only as a last resort when a message is being
+ * prepared for sending.  The charset should always be set when the file
+ * is being attached.
+ */
+const gchar *
+libbalsa_file_get_charset(const gchar * filename)
+{
+    LibBalsaTextAttribute attr = libbalsa_text_attr_file(filename);
+
+    if (!(attr & LIBBALSA_TEXT_HI_BIT))
+	return "us-ascii";
+    if (attr & LIBBALSA_TEXT_HI_UTF8)
+	return "utf-8";
+    return NULL;
 }
 
 /* libbalsa_insert_with_url:

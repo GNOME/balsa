@@ -2510,6 +2510,13 @@ lbae_completion_match_selected(GtkEntryCompletion * completion,
     return TRUE;
 }
 
+static void
+lbae_entry_notify(GtkEntry * entry, GParamSpec * spec, gpointer data)
+{
+    if (!strcmp(spec->name, "cursor-position"))
+	g_signal_emit_by_name(entry, "changed");
+}
+
 /* Public API. */
 
 /*************************************************************
@@ -2542,6 +2549,8 @@ libbalsa_address_entry_new()
 
     entry = gtk_entry_new();
     g_signal_connect(entry, "changed", G_CALLBACK(lbae_entry_changed),
+                     NULL);
+    g_signal_connect(entry, "notify", G_CALLBACK(lbae_entry_notify),
                      NULL);
     gtk_entry_set_completion(GTK_ENTRY(entry), completion);
     g_object_unref(completion);

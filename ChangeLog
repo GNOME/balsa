@@ -1,3 +1,10 @@
+2002-12-13 09:40  PeterB
+
+	* src/balsa-mblist.c: (balsa_mblist_scan_mailbox_node) Remember
+	state of mbnode->mailbox->has_unread_messages instead of checking
+	all mailboxes; replace a GList with a GSList; add braces to fix an
+	indent problem.
+
 2002-12-12  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/sendmsg-window.c: switch signatures properly even if one of

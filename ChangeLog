@@ -1,6 +1,7 @@
-2004-08-16 08:41  PeterB
+2004-08-16 09:30  PeterB
 
-	* src/sendmsg-window.c: plug leak.
+	* libbalsa/mailbox_mbox.c:
+	* src/sendmsg-window.c: plug leaks.
 
 2004-08-15  Pawel Salek
 

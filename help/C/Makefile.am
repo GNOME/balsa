@@ -11,9 +11,7 @@ balsa_help_DATA = \
 	topic.dat \
 	index.html
 
-# For now we don't use pictures but if later we use we just need to uncomment
-# the comment lines and add the images dir to CVS like the images it self
-
+# Only build html by default
 all: index.html
 
 # This is where the SGML bit is cool
@@ -36,7 +34,7 @@ dist-hook:
 	mkdir $(distdir)/images
 	-cp $(srcdir)/images/*.png $(distdir)/images
 	mkdir $(distdir)/stylesheet-images
-	-cp balsa/stylesheet-images/*.gif $(distdir)/stylesheet-images
+	-cp $(srcdir)/stylesheet-images/*.gif $(distdir)/stylesheet-images
 
 install-data-local: index.html
 	$(mkinstalldirs) $(DESTDIR)$(balsa_helpdir)/images
@@ -49,7 +47,7 @@ install-data-local: index.html
 	basefile=`basename $$file`; \
 	$(INSTALL_DATA) $$file $(DESTDIR)$(balsa_helpdir)/images/$$basefile;\
 	done
-	-for file in balsa/stylesheet-images/*.gif ; do \
+	-for file in $(srcdir)/stylesheet-images/*.gif ; do \
 	basefile=`basename $$file`; \
 	$(INSTALL_DATA) $$file $(DESTDIR)$(balsa_helpdir)/stylesheet-images/$$basefile;\
 	done

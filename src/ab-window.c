@@ -257,7 +257,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_option_menu_set_menu(GTK_OPTION_MENU(ab_option), ab_menu);
     gtk_widget_show(ab_option);
 
-    gtk_box_pack_start(GTK_BOX(vbox), ab_option, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), ab_option, FALSE, FALSE, 0);
 
     /* Entry widget for finding an address */
     find_label = gtk_label_new(_("Search for Name:"));
@@ -270,12 +270,12 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     
     /* Horizontal layout */
     hbox = gtk_hbox_new(FALSE, 1);
-    gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
     gtk_widget_show(hbox);
 
     /* Column for address list */
     vbox2 = gtk_vbox_new(FALSE, 1);
-    gtk_box_pack_start(GTK_BOX(hbox), vbox2, FALSE, FALSE, 1);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox2, TRUE, TRUE, 1);
     gtk_widget_show(vbox2);
 
     /* Pack the find stuff into a box */
@@ -334,8 +334,8 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 
     /* Buttons ... */
     hbox = gtk_hbutton_box_new();
-    gtk_button_box_set_layout(GTK_BUTTON_BOX(hbox), GTK_BUTTONBOX_START);
-    gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
+    gtk_button_box_set_layout(GTK_BUTTON_BOX(hbox), GTK_BUTTONBOX_SPREAD);
+    gtk_box_pack_start(GTK_BOX(vbox2), hbox, FALSE, FALSE, 0);
     gtk_widget_show(GTK_WIDGET(hbox));
 
     w = balsa_stock_button_with_label(GTK_STOCK_OPEN,

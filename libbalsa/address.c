@@ -398,7 +398,9 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries,
     const static gchar *labels[NUM_FIELDS] = {
 	N_("_Displayed Name:"),
 	N_("_First Name:"),
+#if !defined(ENABLE_TOUCH_UI)
 	N_("_Middle Name:"),
+#endif
 	N_("_Last Name:"),
 	N_("_Nickname:"),
 	N_("O_rganization:"),
@@ -504,7 +506,9 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries,
 
     gtk_entry_set_text(GTK_ENTRY(entries[FULL_NAME]), new_name);
     gtk_entry_set_text(GTK_ENTRY(entries[FIRST_NAME]), first_name);
+#if !defined(ENABLE_TOUCH_UI)
     gtk_entry_set_text(GTK_ENTRY(entries[MIDDLE_NAME]), middle_name);
+#endif
     gtk_entry_set_text(GTK_ENTRY(entries[LAST_NAME]), last_name);
     gtk_entry_set_text(GTK_ENTRY(entries[EMAIL_ADDRESS]), new_email);
     gtk_entry_set_text(GTK_ENTRY(entries[ORGANIZATION]), new_organization);
@@ -541,7 +545,9 @@ libbalsa_address_new_from_edit_entries(GtkWidget **entries)
     address = libbalsa_address_new();
     SET_FIELD(address->full_name,   entries[FULL_NAME]);
     SET_FIELD(address->first_name,  entries[FIRST_NAME]);
+#if !defined(ENABLE_TOUCH_UI)
     SET_FIELD(address->middle_name, entries[MIDDLE_NAME]);
+#endif
     SET_FIELD(address->last_name,   entries[LAST_NAME]);
     SET_FIELD(address->nick_name,   entries[NICK_NAME]);
     SET_FIELD(address->organization,entries[ORGANIZATION]);

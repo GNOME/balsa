@@ -256,7 +256,8 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 
     ab_option = gtk_option_menu_new();
     gtk_option_menu_set_menu(GTK_OPTION_MENU(ab_option), ab_menu);
-    gtk_widget_show(ab_option);
+    if(g_list_length(balsa_app.address_book_list)>1)
+        gtk_widget_show(ab_option);
 
     gtk_box_pack_start(GTK_BOX(vbox), ab_option, FALSE, FALSE, 0);
 

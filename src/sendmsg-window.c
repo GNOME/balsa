@@ -3744,10 +3744,10 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     LibBalsaMessageBody *body;
     GList *list;
     gchar *tmp;
-    const gchar *ctmp;
     gchar recvtime[50];
     GtkTextIter start, end;
 #if OLD_FROM
+    const gchar *ctmp;
 #else
     gint active;
     LibBalsaIdentity *ident;

@@ -39,7 +39,9 @@ typedef enum _LibBalsaAddressField LibBalsaAddressField;
 enum _LibBalsaAddressField {
     FULL_NAME,
     FIRST_NAME,
+#if !defined(ENABLE_TOUCH_UI)
     MIDDLE_NAME,
+#endif
     LAST_NAME,
     NICK_NAME,
     ORGANIZATION,

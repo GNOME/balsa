@@ -1,3 +1,10 @@
+2004-10-20  Pawel Salek
+
+	* libbalsa/address.[hc]: try to slowly phase out MIDDLE_NAME
+	- it has very limited usefullness.
+	* src/ab-window.c: do not clutter UI with one-element address book list
+	* src/store-address.c: ditto.
+
 2004-10-19  Pawel Salek
 
 	* libbalsa/filter.c: display information provided by GError.

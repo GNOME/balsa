@@ -112,7 +112,7 @@ balsa_store_address(GList * messages)
 
     g_signal_connect(G_OBJECT(info->dialog), "response",
                      G_CALLBACK(store_address_response), info);
-    gtk_widget_show_all(GTK_WIDGET(info->dialog));
+    gtk_widget_show(GTK_WIDGET(info->dialog));
 }
 
 /* Weak notify that a message was deleted; remove it from our list. */
@@ -183,16 +183,20 @@ store_address_dialog(StoreAddressInfo * info)
                                     GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                     NULL);
     GtkWidget *vbox = GTK_DIALOG(dialog)->vbox;
-    GtkWidget *frame;
+    GtkWidget *frame, *label;
 
     frame = store_address_book_frame(info);
+    if(g_list_length(balsa_app.address_book_list)>1)
+        gtk_widget_show_all(frame);
     gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 0);
     frame = store_address_note_frame(info);
+    gtk_widget_show_all(frame);
     gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), 
-                       gtk_label_new(_("Save this address "
-                                       "and close the dialog?")),
+                       label = gtk_label_new(_("Save this address "
+                                               "and close the dialog?")),
                        TRUE, TRUE, 0);
+    gtk_widget_show(label);
     return dialog;
 }
 

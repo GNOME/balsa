@@ -1,126 +1,74 @@
 <html>
 <head>
 <title>Balsa -- Downloads</title>
-<link rel="stylesheet" type="text/css" href="@website_root@/style.css">
+<link rel="stylesheet" type="text/css" href="style.css">
+<style type="text/css">
+<!--
+body {margin-left: 50pt;}
+-->
+</style>
+
 </head>
-<body background="@website_root@/images/bg.jpg" bgcolor="#ffffff" text="#000000" link="#993300" vlink="#993300">
+<body background="images/bg.jpg" bgcolor="#ffffff" text="#000000" link="#993300" vlink="#993300">
 
-<table width="100%">
-<!-- one big row to offset from the background -->
-<tr>
-<td width="80">&nbsp;</td>
-<td>
+<h1>Balsa download</h1>
+<h2>Requirements</h2>
+<ol>
+<li>A basic <a href="http://www.gnome.org/start/">GNOME installation</a>.</li>
 
-<img src="@website_root@/images/balsa.jpg" alt="balsa" align="middle" width="476" height="122">
-<big><big><b>Download</b></big></big><br>
+<li>Balsa needs <samp>libPropList</samp>. Check if you don't have it already on your system, subsequently try to download suitable rpm. If you cannot do it for some reason, grab <a href="http://windowmaker.org/ftp/pub/beta/srcs/libPropList-0.10.1.tar.gz">libPropList.tar.gz</a>,
+It must be installed with a prefix of <samp>/usr</samp> if you
+wish to also use a Balsa RPM. Note, that in this last case you might need to ignore dependices warnings when installing rpm.</li>
+</ol>
 
-<table width="80%">
-<tr>
-	<td colspan="2"><p>&nbsp;</p></td>
-</tr>
-<tr>
-	<td colspan="2"><hr></td>
-</tr>
-<tr>
-	<th colspan="2" align="left"><big>Source</big></th>
-</tr>
-<tr>
-	<td colspan="2"><a href="http://www.newton.cx/balsa/balsa-0.8.1.tar.gz">http://www.newton.cx/balsa/balsa-0.8.1.tar.gz</a></td>
-</tr>
-<tr>
-	<td colspan="2"><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.1.tar.gz">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.1.tar.gz</a></td>
-</tr>
-<tr>
-	<td colspan="2"><p>&nbsp;</p></td>
-</tr>
-<tr>
-	<td colspan="2"><hr></td>
-</tr>
-<tr>
-	<th colspan="2" align="left"><big>Packages</big></th>
-</tr>
-<tr>
-	<td colspan="2">US East Coast source RPM: <a href="http://www.newton.cx/balsa/balsa-0.8.1-1.src.rpm">http://www.newton.cx/balsa/balsa-0.8.1-1.src.rpm</a></td>
-</tr>
-<tr>
-	<td colspan="2">Europe source RPM: <a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.1-1.src.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.1-1.src.rpm</a></td>
-</tr>
-<tr>
-	<td colspan="2"><p>&nbsp;</p></td>
-</tr>
-<tr>
-	<td colspan="2">US East Coast i386 binary RPM: <a href="http://www.newton.cx/balsa/balsa-0.8.1-1.i386.rpm">http://www.newton.cx/balsa/balsa-0.8.1-1.i386.rpm</a></td>
-</tr>
-<tr>
-	<td colspan="2">Europe i386 binary RPM: <a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.1-1.i386.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.1-1.i386.rpm</a></td>
-</tr>
-<tr>
-	<td colspan="2"><p>&nbsp;</p></td>
-</tr>
-<tr>
-	<td colspan="2"><a href="http://www.linuxmafia.org/pcentral/sview.php3?name=balsa">Most recent version for Slackware</a>.</td>
-</tr>
-<tr>
-	<td colspan="2"><p>&nbsp;</p></td>
-</tr>
-<tr>
-	<td colspan="2"><a href="http://www.cli.di.unipi.it/~cruciani/Package/">Daniele Cruciani's</a> or <a href="http://www.tvec.net/users/wabbit/">Randall Gibson's</a> Debian package (experimental).</td>
-</tr>
-<tr>
-	<td colspan="2"><p>&nbsp;</p></td>
-</tr>
-<tr>
-	<td colspan="2"><hr></td>
-</tr>
-<tr>
-	<th colspan="2" align=left><big>Experimental release</big></th>
-</tr>
-<tr>
-<td colspan="2"><b>2000.08.15</b>: This is pretty much all we have in CVS: new
-message browser, improved address book handling, more reliable mailbox
-backend, alias expansion. The code has however some experimental and unfinished
-features enabled so be warned! The POP problems some people
-experienced have been adressed only partially.</p>
-<ul>
-<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.2.tar.gz">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.2.tar.gz</a>
-<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.2-1.src.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.2-1.src.rpm</a>
-<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.2-1.i386.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.2-1.i386.rpm</a>
+<h2>Download</h2>
+
+<h3>Source</h3>
+<ul type=square>
+<li>US East Coast: <a href="http://www.newton.cx/balsa/balsa-0.8.1.tar.gz">http://www.newton.cx/balsa/balsa-0.8.1.tar.gz</a></li>
+<li>Europe (Sweden): <a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.1.tar.gz">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.1.tar.gz</a></li>
 </ul>
-</td>
-</tr>
 
-<tr>
-	<th colspan="2" align="left"><big>CVS source</big></th>
-</tr>
-<tr>
-	<td colspan="2">Balsa source is also available from GNOME 
-<a href="http://developer.gnome.org/tools/cvs.html">CVS 
-repository</a>. Check out <b>balsa</b> module. The CVS version
-is <em>sometimes</em> not sufficiently stable for everyday use it but has all
- the new features and is best starting point if you want to hack balsa.</td>
-</tr>
+<h3>Packages</h3> 
+<p>balsa-0.8.1 is a bit obsolete, if possible try balsa-0.9.1 or
+balsa-0.9.3 (balsa-0.9.2 has some nasty bugs).</p>
 
-<tr>
-	<td colspan="2"><hr></td>
-</tr>
-<tr>
-	<th colspan="2" align="left"><big>Requirements</big></th>
-</tr>
-<tr>
-	<td colspan="2">A basic <a href="http://www.gnome.org/start/">GNOME installation</a>.</td>
-</tr>
-<tr>
-	<td colspan="2"><p>&nbsp;</p></td>
-</tr>
-<tr>
-	<td colspan="2">Balsa needs <a href="http://windowmaker.org/ftp/pub/beta/srcs/libPropList-0.10.1.tar.gz">libPropList</a>.
-	It must be installed with a prefix of /usr if you wish to also use a Balsa RPM. Note that many Linux distributions have
-        this package included on CD, check it out first.</td>
-</tr>
-</table>
+<ul>
+<li>US East Coast source RPM: <a href="http://www.newton.cx/balsa/balsa-0.8.1-1.src.rpm">http://www.newton.cx/balsa/balsa-0.8.1-1.src.rpm</a></li>
+<li>Europe source RPM: <a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.1-1.src.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.1-1.src.rpm</a></li>
+</ul>
+<ul>
+<li>US East Coast i386 binary RPM: <a href="http://www.newton.cx/balsa/balsa-0.8.1-1.i386.rpm">http://www.newton.cx/balsa/balsa-0.8.1-1.i386.rpm</a></li>
+<li>Europe i386 binary RPM: <a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.1-1.i386.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.1-1.i386.rpm</a></li>
+</ul>
+<p><i>Independent</i> packagers:</p>
+<ul type=square>
+<li><a href="http://www.linuxmafia.org/pcentral/sview.php3?name=balsa">Most recent version for Slackware</a>.</li>
+<li><a href="http://www.cli.di.unipi.it/~cruciani/Package/">Daniele Cruciani's</a> or <a href="http://www.tvec.net/users/wabbit/">Randall Gibson's</a> Debian package (experimental).</li>
+</ul>
 
-</td>
-</tr>
-</table>
+<h3>Experimental release - 0.9.3</h3>
+
+<p><b>2000.08.28</b>: This is pretty much all we have in CVS: new
+message browser, improved address book handling, more reliable mailbox
+backend, alias expansion. The code has however some experimental and
+unfinished features enabled so be warned! The POP problems and message
+deletion crashes have been finally addressed.</p>
+
+<ul>
+<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.3.tar.gz">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.3.tar.gz</a>
+<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.3-1.src.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.3-1.src.rpm</a>
+<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.3-1.i386.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.3-1.i386.rpm</a>
+</ul>
+<h3>CVS source</h3>
+
+<p>Balsa source is also available from GNOME 
+<a href="http://developer.gnome.org/tools/cvs.html">CVS
+repository</a>. Check out <b>balsa</b> module. The CVS version is
+<em>sometimes</em> not sufficiently stable for everyday use it but has
+all the new features and is best starting point if you want to hack
+balsa.</p>
+<hr>
+<address><a href="mailto:balsa-maintainers@theochem.kth.se">balsa-maintainers@theochem.kth.se</a></address>
 </body>
 </html>

@@ -1,4 +1,6 @@
-
+h1 {font-size: x-large; }
+h2 {font-size: large; }
+h3 {font-size: medium; }
 body
 {
 	background: white;

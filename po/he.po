@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa.HEAD.he\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-06-21 11:49+0200\n"
-"PO-Revision-Date: 2003-06-25 13:43+0300\n"
+"POT-Creation-Date: 2003-06-25 19:55+0200\n"
+"PO-Revision-Date: 2003-06-26 00:38+0300\n"
 "Last-Translator: Gil 'Dolfin' Osher <dolfin@rpg.org.il>\n"
 "Language-Team: Hebrew <he@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -141,12 +141,12 @@ msgstr "שגיאה בעת העברת הודעות"
 
 #. should "re" be localized ?
 #: libbalsa/identity.c:88 src/balsa-index-threading.c:547
-#: src/balsa-index-threading.c:549 src/sendmsg-window.c:2412
-#: src/sendmsg-window.c:2413
+#: src/balsa-index-threading.c:549 src/sendmsg-window.c:2406
+#: src/sendmsg-window.c:2407
 msgid "Re:"
 msgstr "תש׃"
 
-#: libbalsa/identity.c:89 src/sendmsg-window.c:2441 src/sendmsg-window.c:2442
+#: libbalsa/identity.c:89 src/sendmsg-window.c:2435 src/sendmsg-window.c:2436
 msgid "Fwd:"
 msgstr "הע׃"
 
@@ -731,8 +731,8 @@ msgid ""
 "The OpenPGP encrypted message part contains 8-bit characters, but no header "
 "describing the used codeset (converted to %s)"
 msgstr ""
-"חלק ההודעה המוצפן על-ידי OpenPGP מכיל תווים של 8 סיביות,אבל לא כותרת שמתארת את "
-"ה-codeset (הומר ל-%s)"
+"חלק ההודעה המוצפן על-ידי OpenPGP מכיל תווים של 8 סיביות,אבל לא כותרת שמתארת "
+"את ה-codeset (הומר ל-%s)"
 
 #: libbalsa/rfc3156.c:1290
 #, c-format
@@ -900,7 +900,7 @@ msgstr "gpgme אינו יכול ליצור נתונים חדשים׃ %s"
 msgid "Sending Mail..."
 msgstr "שולח את הדואר..."
 
-#: libbalsa/send.c:221 src/main-window.c:1788
+#: libbalsa/send.c:221 src/main-window.c:1818
 msgid "_Hide"
 msgstr "_הסתר"
 
@@ -943,7 +943,7 @@ msgid "Connected to MTA"
 msgstr "התחברתי ל-MTA"
 
 #: libbalsa/send.c:886 src/balsa-message.c:1196 src/print.c:356
-#: src/sendmsg-window.c:797 src/sendmsg-window.c:2232 src/store-address.c:322
+#: src/sendmsg-window.c:791 src/sendmsg-window.c:2226 src/store-address.c:322
 msgid "From:"
 msgstr "מאת׃"
 
@@ -952,7 +952,7 @@ msgid "From"
 msgstr "השולח"
 
 #: libbalsa/send.c:897 src/balsa-message.c:1205 src/print.c:366
-#: src/sendmsg-window.c:796 src/sendmsg-window.c:2238 src/store-address.c:323
+#: src/sendmsg-window.c:790 src/sendmsg-window.c:2232 src/store-address.c:323
 msgid "To:"
 msgstr "אל׃"
 
@@ -974,8 +974,8 @@ msgid ""
 msgstr ""
 "שרת SMTP מסרב לקבל את הקשר.\n"
 "כברירת מחדל, בלזה משתמשת ב-submission service (587).\n"
-"אם ברצונך להגיש את הדואר ע\"י relay service (25), אנא ציין זאת "
-"במפורש באמצעות׃ \"host:smtp\".\n"
+"אם ברצונך להגיש את הדואר ע\"י relay service (25), אנא ציין זאת במפורש "
+"באמצעות׃ \"host:smtp\".\n"
 "ההודעה נשארת בתיבת הדואר היוצא."
 
 #: libbalsa/send.c:1139
@@ -991,11 +991,11 @@ msgstr ""
 msgid "This message will not be encrpyted for the BCC: recipient(s)."
 msgstr "הודעה זו לא תוצפן לנמען(י) ההעתק הסמוי."
 
-#: libbalsa/source-viewer.c:52 src/main-window.c:514
+#: libbalsa/source-viewer.c:52 src/main-window.c:531
 msgid "_Select Text"
 msgstr "_בחר טקסט"
 
-#: libbalsa/source-viewer.c:53 src/main-window.c:515
+#: libbalsa/source-viewer.c:53 src/main-window.c:532
 msgid "Select entire mail"
 msgstr "בחר את כל הדואר"
 
@@ -1142,10 +1142,10 @@ msgid ""
 "  Please check the about box in Balsa's main window for more information "
 "about contacting the authors or reporting bugs."
 msgstr ""
-"נראה שהינך משתמש(ת) בבלזה בפעם הראשונה. השלבים הבאים יובילו להתקנת "
-"בלזה באמצעות מספר שאלות פשוטות. אחרי השלמת שלבים אלו, תוכל(י) לשנות את ההגדרות "
-"באמצעות תפריט ההעדפות של בלזה. אם יהיה צורך ביצירת "
-"קבצים או ספריות כלשהם, יעשה הדבר באופן אוטומטי.\n"
+"נראה שהינך משתמש(ת) בבלזה בפעם הראשונה. השלבים הבאים יובילו להתקנת בלזה "
+"באמצעות מספר שאלות פשוטות. אחרי השלמת שלבים אלו, תוכל(י) לשנות את ההגדרות "
+"באמצעות תפריט ההעדפות של בלזה. אם יהיה צורך ביצירת קבצים או ספריות כלשהם, "
+"יעשה הדבר באופן אוטומטי.\n"
 "  תפריט ה\"אודות\" שבחלון הראשי של בלזה מכיל אינפורמציה נוספת כיצד ליצור קשר "
 "עם המחברים או כיצד לדווח על באגים."
 
@@ -1464,7 +1464,7 @@ msgstr "מבטל רישום ל %s..."
 msgid "Unable to fetch headers from this IMAP server version."
 msgstr "לא ניתן לקבל את הכותרות מגירסה זו של שרת IMAP."
 
-#: libmutt/imap/message.c:89 src/balsa-message.c:2724
+#: libmutt/imap/message.c:89 src/balsa-message.c:2762
 #, c-format
 msgid "Could not create temporary file %s"
 msgstr "לא ניתן ליצור את הקובץ הזמני %s"
@@ -2110,7 +2110,7 @@ msgstr "פותח את תיבת הדואר %s. נא המתן ..."
 msgid "_View Source"
 msgstr "צפה במקור (source)"
 
-#: src/balsa-index.c:1874 src/main-window.c:445 src/message-window.c:116
+#: src/balsa-index.c:1874 src/main-window.c:462 src/message-window.c:116
 msgid "_Reply..."
 msgstr "_השב..."
 
@@ -2130,16 +2130,16 @@ msgstr "העבר _חומר מצורף..."
 msgid "Forward _Inline..."
 msgstr "העבר ב_גוף ההודעה (inline)"
 
-#: src/balsa-index.c:1884 src/main-window.c:547
+#: src/balsa-index.c:1884 src/main-window.c:564
 msgid "_Store Address..."
 msgstr "_אחסן כתובת"
 
 #: src/balsa-index.c:1897 src/filter-edit-dialog.c:216 src/mailbox-node.c:952
-#: src/main-window.c:529 src/pref-manager.c:1572 src/pref-manager.c:2714
+#: src/main-window.c:546 src/pref-manager.c:1572 src/pref-manager.c:2714
 msgid "_Delete"
 msgstr "מחק"
 
-#: src/balsa-index.c:1902 src/main-window.c:536
+#: src/balsa-index.c:1902 src/main-window.c:553
 msgid "_Undelete"
 msgstr "בטל מחיקה"
 
@@ -2264,28 +2264,28 @@ msgstr ""
 "ההודעה שנשלחה על-ידי %s בנושא \"%s\" מכילה מספר חלקים/חלק מוצפן(\"multipart/"
 "encrypted\"), אבל המבנה אינו תקין."
 
-#: src/balsa-message.c:1187 src/print.c:338 src/sendmsg-window.c:802
-#: src/sendmsg-window.c:2227
+#: src/balsa-message.c:1187 src/print.c:338 src/sendmsg-window.c:796
+#: src/sendmsg-window.c:2221
 msgid "Subject:"
 msgstr "נושא׃"
 
-#: src/balsa-message.c:1191 src/print.c:345 src/sendmsg-window.c:2221
+#: src/balsa-message.c:1191 src/print.c:345 src/sendmsg-window.c:2215
 msgid "Date:"
 msgstr "תאריך׃"
 
-#: src/balsa-message.c:1202 src/sendmsg-window.c:798
+#: src/balsa-message.c:1202 src/sendmsg-window.c:792
 msgid "Reply-To:"
 msgstr "השב אל׃"
 
 #. cc:
-#: src/balsa-message.c:1206 src/print.c:367 src/sendmsg-window.c:800
-#: src/sendmsg-window.c:1948 src/sendmsg-window.c:2244 src/store-address.c:324
+#: src/balsa-message.c:1206 src/print.c:367 src/sendmsg-window.c:794
+#: src/sendmsg-window.c:1942 src/sendmsg-window.c:2238 src/store-address.c:324
 msgid "Cc:"
 msgstr "העתק׃"
 
 #. bcc:
-#: src/balsa-message.c:1207 src/print.c:368 src/sendmsg-window.c:799
-#: src/sendmsg-window.c:1953 src/store-address.c:325
+#: src/balsa-message.c:1207 src/print.c:368 src/sendmsg-window.c:793
+#: src/sendmsg-window.c:1947 src/store-address.c:325
 msgid "Bcc:"
 msgstr "העתק סמוי׃"
 
@@ -2381,7 +2381,7 @@ msgstr "צפה בחלק באמצעות %s"
 msgid "Calling URL %s..."
 msgstr "מעלה את %s..."
 
-#: src/balsa-message.c:1926 src/balsa-message.c:2643 src/balsa-message.c:3264
+#: src/balsa-message.c:1926 src/balsa-message.c:2681 src/balsa-message.c:3302
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "שגיאה בהצגת %s׃ %s\n"
@@ -2409,42 +2409,42 @@ msgstr ""
 "ההודעה נשלחה על-ידי %s עם הכותרת \"%s\" מכילה תווים ב 8 סיביות, אך אין כותרת "
 "המתארת את הקידוד בשימוש (מומר ל %s)"
 
-#: src/balsa-message.c:2307
+#: src/balsa-message.c:2345
 msgid "mixed parts"
 msgstr "חלקים מעורבבים"
 
-#: src/balsa-message.c:2309
+#: src/balsa-message.c:2347
 msgid "alternative parts"
 msgstr "חלקים חלופיים"
 
-#: src/balsa-message.c:2311
+#: src/balsa-message.c:2349
 msgid "signed parts"
 msgstr "חלקים חתומים"
 
-#: src/balsa-message.c:2313
+#: src/balsa-message.c:2351
 msgid "encrypted parts"
 msgstr "חלקים מוצפנים"
 
-#: src/balsa-message.c:2315
+#: src/balsa-message.c:2353
 #, c-format
 msgid "\"%s\" parts"
 msgstr "חלקים \"%s\""
 
-#: src/balsa-message.c:2417
+#: src/balsa-message.c:2455
 #, c-format
 msgid "Open with %s"
 msgstr "פתח באמצעות %s"
 
-#: src/balsa-message.c:2555
+#: src/balsa-message.c:2593
 msgid "Save..."
 msgstr "שמור..."
 
-#: src/balsa-message.c:2769
+#: src/balsa-message.c:2807
 #, c-format
 msgid "could not create temporary file %s"
 msgstr "לא ניתן ליצור קובץ זמני %s"
 
-#: src/balsa-message.c:3507
+#: src/balsa-message.c:3545
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2454,7 +2454,7 @@ msgstr ""
 "שולח הודעה זו, %s, ביקש אישור מסירה (MDN),\n"
 "שיוחזר אל '%s`. האם ברצונך לשלוח אישור זה?"
 
-#: src/balsa-message.c:3514
+#: src/balsa-message.c:3552
 msgid "Reply to MDN?"
 msgstr "להשיב לבקשת אישור מסירה (MDN)?"
 
@@ -2526,7 +2526,7 @@ msgstr "נמחק"
 msgid "Replied"
 msgstr "נענה"
 
-#: src/filter-edit-callbacks.c:781 src/main-window.c:427
+#: src/filter-edit-callbacks.c:781 src/main-window.c:444
 msgid "Flagged"
 msgstr "דגל"
 
@@ -2581,25 +2581,25 @@ msgstr "_הכל"
 msgid "C_lear"
 msgstr "_נקה"
 
-#: src/filter-edit-callbacks.c:990 src/main-window.c:2709
+#: src/filter-edit-callbacks.c:990 src/main-window.c:2748
 msgid "_Body"
 msgstr "_גוף"
 
 #. To:
-#: src/filter-edit-callbacks.c:997 src/main-window.c:2710
-#: src/sendmsg-window.c:1937
+#: src/filter-edit-callbacks.c:997 src/main-window.c:2749
+#: src/sendmsg-window.c:1931
 msgid "_To:"
 msgstr "_אל׃"
 
-#: src/filter-edit-callbacks.c:1004 src/main-window.c:2711
+#: src/filter-edit-callbacks.c:1004 src/main-window.c:2750
 msgid "_From:"
 msgstr "_מאת׃"
 
-#: src/filter-edit-callbacks.c:1012 src/sendmsg-window.c:314
+#: src/filter-edit-callbacks.c:1012 src/sendmsg-window.c:308
 msgid "_Subject"
 msgstr "_נושא"
 
-#: src/filter-edit-callbacks.c:1019 src/main-window.c:2713
+#: src/filter-edit-callbacks.c:1019 src/main-window.c:2752
 msgid "_Cc:"
 msgstr "ה_עתק:"
 
@@ -2690,7 +2690,7 @@ msgid "AND"
 msgstr "וגם"
 
 #. new button
-#: src/filter-edit-dialog.c:210 src/mailbox-node.c:924 src/main-window.c:285
+#: src/filter-edit-dialog.c:210 src/mailbox-node.c:924 src/main-window.c:287
 msgid "_New"
 msgstr "_חדש"
 
@@ -2821,7 +2821,9 @@ msgstr "מ_טה"
 msgid ""
 "The filters dialog is opened, close it before you can run filters on any "
 "mailbox"
-msgstr " חלון המסננים פתוח; עליך לסגור אותו בטרם תוכל להפעיל מסננים על תיבת דואר כלשהי"
+msgstr ""
+" חלון המסננים פתוח; עליך לסגור אותו בטרם תוכל להפעיל מסננים על תיבת דואר "
+"כלשהי"
 
 #: src/folder-conf.c:265
 msgid "Remote IMAP folder"
@@ -2955,7 +2957,8 @@ msgid ""
 "You may use \"New IMAP Folder\" later to add this folder again.\n"
 msgstr ""
 "פעולה זאת תמחק את התיקייה \"%s\" מהרשימה.\n"
-"מאוחר יותר, תוכל להשתמש ב-\"הוסף תיקיית-IMAP\" על מנת להוסיף תיקייה זו מחדש.\n"
+"מאוחר יותר, תוכל להשתמש ב-\"הוסף תיקיית-IMAP\" על מנת להוסיף תיקייה זו "
+"מחדש.\n"
 
 #: src/folder-conf.c:742
 msgid "Confirm"
@@ -3025,8 +3028,8 @@ msgid ""
 msgstr ""
 "פעולה זאת תמחק את תיבת הדואר \"%s\" על כל ההודעות שבה משרת ה-IMAP. אם ל-%s "
 "יש תת-תיקיות, היא עדיין תופיע כצומת בעץ התיקיות.\n"
-"מאוחר יותר, תוכל להשתמש ב-\"הוסף תת-תיקיית-IMAP\" על מנת להוסיף תיבת דואר בשם "
-"זה.\n"
+"מאוחר יותר, תוכל להשתמש ב-\"הוסף תת-תיקיית-IMAP\" על מנת להוסיף תיבת דואר "
+"בשם זה.\n"
 "מה ברצונך לעשות?"
 
 #: src/mailbox-conf.c:288
@@ -3052,7 +3055,7 @@ msgstr "ה_סר מהרשימה"
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr "אווופס! תיבת הדואר לא נמצאת בצמתים שב-balsa_app.mailbox?\n"
 
-#: src/mailbox-conf.c:406 src/sendmsg-window.c:942
+#: src/mailbox-conf.c:406 src/sendmsg-window.c:936
 msgid "Select Identity"
 msgstr "בחר זהות"
 
@@ -3150,7 +3153,7 @@ msgstr "הצג כתובת׃"
 msgid "_From"
 msgstr "_מאת"
 
-#: src/mailbox-conf.c:1149 src/sendmsg-window.c:312
+#: src/mailbox-conf.c:1149 src/sendmsg-window.c:306
 msgid "_To"
 msgstr "_אל"
 
@@ -3196,7 +3199,7 @@ msgstr "_סרוק מחדש"
 msgid "_Open"
 msgstr "_פתח"
 
-#: src/mailbox-node.c:943 src/main-window.c:613
+#: src/mailbox-node.c:943 src/main-window.c:630
 msgid "_Close"
 msgstr "_סגור"
 
@@ -3244,428 +3247,454 @@ msgstr "Local mailbox %s loaded as: %s\n"
 msgid "Local folder %s\n"
 msgstr "תיקייה מקומית %s\n"
 
-#: src/main-window.c:244
+#: src/main-window.c:246
 msgid "_Message..."
 msgstr "_הודעה..."
 
-#: src/main-window.c:244
+#: src/main-window.c:246
 msgid "Compose a new message"
 msgstr "יצירת הודעה חדשה"
 
-#: src/main-window.c:250
+#: src/main-window.c:252
 msgid "Local mbox mailbox..."
 msgstr "תיבת דואר מקומית מסוג mbox"
 
-#: src/main-window.c:251
+#: src/main-window.c:253
 msgid "Add a new mbox style mailbox"
 msgstr "הוסף תיבת דואר חדשה מסוג mbox"
 
-#: src/main-window.c:255
+#: src/main-window.c:257
 msgid "Local Maildir mailbox..."
 msgstr "תיבת דואר מקומית מסוג Maildir"
 
-#: src/main-window.c:256
+#: src/main-window.c:258
 msgid "Add a new Maildir style mailbox"
 msgstr "הוסף תיבת דואר חדשה מסוג Maildir"
 
-#: src/main-window.c:260
+#: src/main-window.c:262
 msgid "Local MH mailbox..."
 msgstr "תיבת דואר מקומית מסוג MH"
 
-#: src/main-window.c:261
+#: src/main-window.c:263
 msgid "Add a new MH style mailbox"
 msgstr "הוסף תיבת דואר חדשה מסוג MH"
 
-#: src/main-window.c:265 src/pref-manager.c:2877
+#: src/main-window.c:267 src/pref-manager.c:2877
 msgid "Remote IMAP mailbox..."
 msgstr "תיבת דואר מרוחקת מסוג IMAP"
 
-#: src/main-window.c:266
+#: src/main-window.c:268
 msgid "Add a new IMAP mailbox"
 msgstr "הוסף תיבת דואר חדשה מסוג IMAP"
 
-#: src/main-window.c:271 src/pref-manager.c:2882
+#: src/main-window.c:273 src/pref-manager.c:2882
 msgid "Remote IMAP folder..."
 msgstr "תיקיית IMAP מרוחקת..."
 
-#: src/main-window.c:272
+#: src/main-window.c:274
 msgid "Add a new IMAP folder"
 msgstr "הוסף תיקיית-IMAP חדשה"
 
-#: src/main-window.c:276
+#: src/main-window.c:278
 msgid "Remote IMAP subfolder..."
 msgstr "תת-תיקיית IMAP מרוחקת..."
 
-#: src/main-window.c:277
+#: src/main-window.c:279
 msgid "Add a new IMAP subfolder"
 msgstr "הוסף תת-תיקיית-IMAP חדשה"
 
-#: src/main-window.c:289
+#: src/main-window.c:291
 msgid "_Continue"
 msgstr "_המשך"
 
-#: src/main-window.c:290
+#: src/main-window.c:292
 msgid "Continue editing current message"
 msgstr "המשך לערוך את ההודעה הנוכחית"
 
-#: src/main-window.c:297
+#: src/main-window.c:299
 msgid "_Get New Mail"
 msgstr "_קבל דואר חדש"
 
-#: src/main-window.c:297
+#: src/main-window.c:299
 msgid "Fetch new incoming mail"
 msgstr "הבא דואר נכנס חדש"
 
-#: src/main-window.c:303
+#: src/main-window.c:305
 msgid "_Send Queued Mail"
 msgstr "_שלח דואר שממתין בתור"
 
-#: src/main-window.c:304
+#: src/main-window.c:306
 msgid "Send messages from the outbox"
 msgstr "שלח הודעות מתיבת הדואר היוצא"
 
-#: src/main-window.c:310
+#: src/main-window.c:312
 msgid "Send and _Receive Mail"
 msgstr "שלח ו_קבל דואר"
 
-#: src/main-window.c:311 src/toolbar-factory.c:123
+#: src/main-window.c:313 src/toolbar-factory.c:123
 msgid "Send and Receive messages"
 msgstr "שלח וקבל הודעות"
 
-#: src/main-window.c:316
+#: src/main-window.c:318
 msgid "_Print..."
 msgstr "_הדפס..."
 
-#: src/main-window.c:317 src/toolbar-factory.c:119
+#: src/main-window.c:319 src/toolbar-factory.c:119
 msgid "Print current message"
 msgstr "הדפס הודעה נוכחית"
 
-#: src/main-window.c:323
+#: src/main-window.c:325
 msgid "_Address Book..."
 msgstr "_ספר הכתובות..."
 
-#: src/main-window.c:324
+#: src/main-window.c:326
 msgid "Open the address book"
 msgstr "פתח את ספר הכתובות"
 
-#: src/main-window.c:351
+#: src/main-window.c:353
 msgid "F_ilters..."
 msgstr "_מסננים..."
 
-#: src/main-window.c:351
+#: src/main-window.c:353
 msgid "Manage filters"
 msgstr "נהל מסננים"
 
-#: src/main-window.c:353
+#: src/main-window.c:355
 msgid "_Export Filters"
 msgstr "_יצא מסננים"
 
-#: src/main-window.c:353
+#: src/main-window.c:355
 msgid "Export filters as Sieve scripts"
 msgstr "יצא מסננים כתסריטי Sieve"
 
-#: src/main-window.c:359 src/message-window.c:73
-msgid "N_o Headers"
+#: src/main-window.c:361
+msgid "_No Headers"
 msgstr "_ללא כותרות"
 
-#: src/main-window.c:359
+#: src/main-window.c:361
 msgid "Display no headers"
 msgstr "הצג ללא כותרות"
 
-#: src/main-window.c:361
+#: src/main-window.c:363
 msgid "S_elected Headers"
 msgstr "כותרות _נבחרות"
 
-#: src/main-window.c:362
+#: src/main-window.c:364
 msgid "Display selected headers"
 msgstr "הצג כותרות נבחרות"
 
-#: src/main-window.c:364 src/message-window.c:77
+#: src/main-window.c:366 src/message-window.c:77
 msgid "All _Headers"
 msgstr "כל ה_כותרות"
 
-#: src/main-window.c:364
+#: src/main-window.c:366
 msgid "Display all headers"
 msgstr "הצג את כל הכותרות"
 
-#: src/main-window.c:371
+#: src/main-window.c:373
 msgid "_Flat index"
 msgstr "אינדקס _שטוח"
 
-#: src/main-window.c:372
+#: src/main-window.c:374
 msgid "No threading at all"
 msgstr "ללא קיבוץ מסרים כלל"
 
-#: src/main-window.c:377
-msgid "S_imple threading"
-msgstr "קיבוץ מסרים פשוט"
+#: src/main-window.c:379
+msgid "Si_mple threading"
+msgstr "קיבוץ מסרים _פשוט"
 
-#: src/main-window.c:378
+#: src/main-window.c:380
 msgid "Simple threading algorithm"
 msgstr "אלגוריתם מקבץ מסרים פשוט"
 
-#: src/main-window.c:383
+#: src/main-window.c:385
 msgid "_JWZ threading"
 msgstr "_קיבוץ מסרים JWZ"
 
-#: src/main-window.c:384
+#: src/main-window.c:386
 msgid "Elaborate JWZ threading"
 msgstr "עבד קיבוץ מסרים ב JWZ"
 
-#: src/main-window.c:394
+#: src/main-window.c:396
 msgid "_Show Mailbox Tree"
 msgstr "ה_צג את עץ תיבות הדואר"
 
-#: src/main-window.c:395
+#: src/main-window.c:397
 msgid "Toggle display of mailbox and folder tree"
 msgstr "החלף את תצוגת עצי תיבות הדואר והתיקיות"
 
-#: src/main-window.c:398
+#: src/main-window.c:400
 msgid "Show Mailbox _Tabs"
 msgstr "הצג את תיבות הדואר ב_כרטיסיות"
 
-#: src/main-window.c:399
+#: src/main-window.c:401
 msgid "Toggle display of mailbox notebook tabs"
 msgstr "שנה את מצב התצוגה של הכרטיסיות של תיבות הדואר"
 
-#: src/main-window.c:403 src/message-window.c:107
+#: src/main-window.c:405 src/message-window.c:107
 msgid "_Wrap"
 msgstr "_גלישה"
 
-#: src/main-window.c:403 src/sendmsg-window.c:262
+#: src/main-window.c:405 src/sendmsg-window.c:261
 msgid "Wrap message lines"
 msgstr "גלישת שורות ההודעה"
 
-#: src/main-window.c:411
+#: src/main-window.c:413
 msgid "_Expand All"
 msgstr "ה_רחב הכל"
 
-#: src/main-window.c:412
+#: src/main-window.c:414
 msgid "Expand all threads"
 msgstr "הרחב את כל קבוצות המסרים"
 
-#: src/main-window.c:416
+#: src/main-window.c:418
 msgid "_Collapse All"
 msgstr "_צמצם הכל"
 
-#: src/main-window.c:417
+#: src/main-window.c:419
 msgid "Collapse all expanded threads"
 msgstr "צמצם את כל קבוצות המסרים המורחבות"
 
-#: src/main-window.c:427
+#: src/main-window.c:424
+msgid "Zoom _In"
+msgstr "הת_קרב"
+
+#: src/main-window.c:424
+msgid "Increase magnification"
+msgstr "הגדל קירוב"
+
+#: src/main-window.c:428
+msgid "Zoom _Out"
+msgstr "הת_רחק"
+
+#: src/main-window.c:428
+msgid "Decrease magnification"
+msgstr "הקטן קירוב"
+
+#. To warn msgfmt that the % sign isn't a format specifier:
+#: src/main-window.c:434
+#, no-c-format
+msgid "Zoom _100%"
+msgstr "התקרב ל _100%"
+
+#: src/main-window.c:434
+msgid "No magnification"
+msgstr "ללא קירוב"
+
+#: src/main-window.c:444
 msgid "Toggle flagged"
 msgstr "הרם/הורד דגל"
 
-#: src/main-window.c:434
+#: src/main-window.c:451
 msgid "New"
 msgstr "חדש"
 
-#: src/main-window.c:434
+#: src/main-window.c:451
 msgid "Toggle New"
 msgstr "שנה סימון \"חדש\""
 
-#: src/main-window.c:446 src/toolbar-factory.c:99
+#: src/main-window.c:463 src/toolbar-factory.c:99
 msgid "Reply to the current message"
 msgstr "השב להודעה הנוכחית"
 
-#: src/main-window.c:453 src/message-window.c:121
+#: src/main-window.c:470 src/message-window.c:121
 msgid "Reply to _All..."
 msgstr "השב ל_כולם..."
 
-#: src/main-window.c:454
+#: src/main-window.c:471
 msgid "Reply to all recipients of the current message"
 msgstr "השב לכל הנמענים של ההודעה הנוכחית"
 
-#: src/main-window.c:461 src/message-window.c:127
+#: src/main-window.c:478 src/message-window.c:127
 msgid "Reply to _Group..."
 msgstr "השב ל_קבוצה..."
 
-#: src/main-window.c:462 src/message-window.c:128 src/toolbar-factory.c:103
+#: src/main-window.c:479 src/message-window.c:128 src/toolbar-factory.c:103
 msgid "Reply to mailing list"
 msgstr "השב לרשימת תפוצה"
 
-#: src/main-window.c:469 src/message-window.c:133
+#: src/main-window.c:486 src/message-window.c:133
 msgid "_Forward attached..."
 msgstr "ה_עבר תצריף..."
 
-#: src/main-window.c:470
+#: src/main-window.c:487
 msgid "Forward the current message as attachment"
 msgstr "העבר את ההודעה הנוכחית כחומר מצורף"
 
-#: src/main-window.c:476
+#: src/main-window.c:493
 msgid "Forward _inline..."
 msgstr "העבר ב_גוף ההודעה..."
 
-#: src/main-window.c:477
+#: src/main-window.c:494
 msgid "Forward the current message inline"
 msgstr "העבר את ההודעה הנוכחית בגוף ההודעה"
 
-#: src/main-window.c:484 src/message-window.c:144
+#: src/main-window.c:501 src/message-window.c:144
 msgid "Next Part"
 msgstr "החלק הבא"
 
-#: src/main-window.c:484 src/message-window.c:144
+#: src/main-window.c:501 src/message-window.c:144
 msgid "Next part in message"
 msgstr "החלק הבא בהודעה"
 
-#: src/main-window.c:490 src/message-window.c:148
+#: src/main-window.c:507 src/message-window.c:148
 msgid "Previous Part"
 msgstr "החלק הקודם"
 
-#: src/main-window.c:491 src/message-window.c:149
+#: src/main-window.c:508 src/message-window.c:149
 msgid "Previous part in message"
 msgstr "החלק הקודם בהודעה"
 
-#: src/main-window.c:497 src/message-window.c:153
+#: src/main-window.c:514 src/message-window.c:153
 msgid "Save Current Part..."
 msgstr "שמור את החלק הנוכחי..."
 
-#: src/main-window.c:498 src/message-window.c:154
+#: src/main-window.c:515 src/message-window.c:154
 msgid "Save current part in message"
 msgstr "שמור את החלק הנוכחי בהודעה"
 
-#: src/main-window.c:504 src/message-window.c:158
+#: src/main-window.c:521 src/message-window.c:158
 msgid "_View Source..."
 msgstr "_צפה בקוד המקור..."
 
-#: src/main-window.c:505 src/message-window.c:159
+#: src/main-window.c:522 src/message-window.c:159
 msgid "View source form of the message"
 msgstr "צפה בקוד המקור של ההודעה"
 
-#: src/main-window.c:523
+#: src/main-window.c:540
 msgid "_Move to Trash"
 msgstr "_זרוק לאשפה"
 
-#: src/main-window.c:524
+#: src/main-window.c:541
 msgid "Move the current message to Trash mailbox"
 msgstr "זרוק את ההודעה הנוכחית לאשפה"
 
-#: src/main-window.c:530
+#: src/main-window.c:547
 msgid "Delete the current message"
 msgstr "מחק את ההודעה הנוכחית"
 
-#: src/main-window.c:536
+#: src/main-window.c:553
 msgid "Undelete the message"
 msgstr "בטל את מחיקת ההודעה"
 
 #. !
-#: src/main-window.c:542
+#: src/main-window.c:559
 msgid "_Toggle"
 msgstr "_שנה סימון"
 
-#: src/main-window.c:548
+#: src/main-window.c:565
 msgid "Store address of sender in addressbook"
 msgstr "שמור כתובת השולח בספר הכתובות"
 
-#: src/main-window.c:558
+#: src/main-window.c:575
 msgid "Next Message"
 msgstr "ההודעה הבאה"
 
-#: src/main-window.c:564
+#: src/main-window.c:581
 msgid "Previous Message"
 msgstr "ההודעה הקודמת"
 
-#: src/main-window.c:570 src/main-window.c:571
+#: src/main-window.c:587 src/main-window.c:588
 msgid "Next Unread Message"
 msgstr "ההודעה הבאה שלא נקראה"
 
-#: src/main-window.c:577 src/main-window.c:578
+#: src/main-window.c:594 src/main-window.c:595
 msgid "Next Flagged Message"
 msgstr "ההודעה המדוגלת הבאה"
 
-#: src/main-window.c:585
+#: src/main-window.c:602
 msgid "Select all"
 msgstr "בחר הכל"
 
-#: src/main-window.c:586
+#: src/main-window.c:603
 msgid "Select all messages in current mailbox"
 msgstr "בחר את כל ההודעות בתיבת הדואר הנוכחית"
 
-#: src/main-window.c:592
+#: src/main-window.c:609
 msgid "_Edit..."
 msgstr "_ערוך..."
 
-#: src/main-window.c:592
+#: src/main-window.c:609
 msgid "Edit the selected mailbox"
 msgstr "ערוך את תיבת הדואר שנבחרה"
 
-#: src/main-window.c:596
+#: src/main-window.c:613
 msgid "_Delete..."
 msgstr "_מחק..."
 
-#: src/main-window.c:597
+#: src/main-window.c:614
 msgid "Delete the selected mailbox"
 msgstr "מחק את תיבת הדואר שנבחרה"
 
-#: src/main-window.c:603
+#: src/main-window.c:620
 msgid "Co_mmit Current"
 msgstr "עדכן את הנוכחי"
 
-#: src/main-window.c:604
+#: src/main-window.c:621
 msgid "Commit the changes in the currently opened mailbox"
 msgstr "עדכן את השינויים בתיבת הדואר הפתוחה כעת"
 
-#: src/main-window.c:608
+#: src/main-window.c:625
 msgid "Commit _All"
 msgstr "עדכן את כל השינויים"
 
-#: src/main-window.c:609
+#: src/main-window.c:626
 msgid "Commit the changes in all mailboxes"
 msgstr "עדכן את השינויים בכל תיבות הדואר"
 
-#: src/main-window.c:613
+#: src/main-window.c:630
 msgid "Close mailbox"
 msgstr "סגור תיבת דואר"
 
-#: src/main-window.c:617
+#: src/main-window.c:634
 msgid "Empty _Trash"
 msgstr "רוקן _אשפה"
 
-#: src/main-window.c:618 src/toolbar-factory.c:141
+#: src/main-window.c:635 src/toolbar-factory.c:141
 msgid "Delete messages from the Trash mailbox"
 msgstr "מחק הודעות מהאשפה"
 
-#: src/main-window.c:622
+#: src/main-window.c:639
 msgid "Edit/Apply _Filters"
 msgstr "ערוך/החל _מסננים"
 
-#: src/main-window.c:623
+#: src/main-window.c:640
 msgid "Filter the content of the selected mailbox"
 msgstr "סנן את תוכן תיבת הדואר שנבחרה"
 
-#: src/main-window.c:627
+#: src/main-window.c:644
 msgid "_Remove Duplicates"
 msgstr "ה_סר כפולים"
 
-#: src/main-window.c:628
+#: src/main-window.c:645
 msgid "Remove duplicated messages from the selected mailbox"
 msgstr "מחק הודעות כפולות מתיבת הדואר שנבחרה"
 
-#: src/main-window.c:637
+#: src/main-window.c:654
 msgid "_Toolbars..."
 msgstr "_סרגלי כלים..."
 
-#: src/main-window.c:638
+#: src/main-window.c:655
 msgid "Customize toolbars"
 msgstr "התאם סרגלי כלים"
 
-#: src/main-window.c:641
+#: src/main-window.c:658
 msgid "_Identities..."
 msgstr "_זהויות..."
 
-#: src/main-window.c:642
+#: src/main-window.c:659
 msgid "Create and set current identities"
 msgstr "צור וקבע זהות נוכחית"
 
-#: src/main-window.c:658 src/message-window.c:175
+#: src/main-window.c:675 src/message-window.c:175
 msgid "_Message"
 msgstr "_הודעה"
 
-#: src/main-window.c:659
+#: src/main-window.c:676
 msgid "Mail_box"
 msgstr "_תיבת דואר"
 
-#: src/main-window.c:750
+#: src/main-window.c:767
 msgid ""
 "Balsa is sending a mail now.\n"
 "Abort sending?"
@@ -3673,7 +3702,7 @@ msgstr ""
 "בלזה שולח דואר כרגע.\n"
 "האם להפסיק?"
 
-#: src/main-window.c:1366
+#: src/main-window.c:1396
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -3681,84 +3710,84 @@ msgstr ""
 "לא ניתן לפתוח את תיבת הדואר!\n"
 "אנא בדוק את ההגדרות של התיבה."
 
-#: src/main-window.c:1658
+#: src/main-window.c:1688
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://balsa.gnome.org/\n"
 "\n"
 "If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
 msgstr ""
-"תוכנת הדואר האלקטרוני בלזה היא חלק מסביבת העבודה GNOME.  מידע על בלזה "
-"ניתן למצוא ב-/http://balsa.gnome.org\n"
+"תוכנת הדואר האלקטרוני בלזה היא חלק מסביבת העבודה GNOME.  מידע על בלזה ניתן "
+"למצוא ב-/http://balsa.gnome.org\n"
 "\n"
 "אם מצאת באגים, אנא דווח עליהם ב-/http://bugzilla.gnome.org"
 
-#: src/main-window.c:1785
+#: src/main-window.c:1815
 msgid "Checking Mail..."
 msgstr "בודק דואר..."
 
-#: src/main-window.c:2085
+#: src/main-window.c:2115
 msgid "Finished Checking."
 msgstr "הבדיקה הסתיימה."
 
-#: src/main-window.c:2149
+#: src/main-window.c:2179
 #, c-format
 msgid "Sending error: %s"
 msgstr "שגיאה במשלוח ההודעה׃ %s"
 
-#: src/main-window.c:2245
+#: src/main-window.c:2275
 msgid "Balsa: New mail"
 msgstr "בלזה: דואר חדש"
 
-#: src/main-window.c:2257
+#: src/main-window.c:2287
 #, c-format
 msgid "You have received %d new messages."
 msgstr "קיבלת %d הודעות חדשות."
 
-#: src/main-window.c:2258
+#: src/main-window.c:2288
 msgid "You have received 1 new message."
 msgstr "קיבלת הודעה חדשה אחת."
 
-#: src/main-window.c:2669
+#: src/main-window.c:2708
 msgid "Search mailbox"
 msgstr "חפש בתיבת דואר"
 
-#: src/main-window.c:2682
+#: src/main-window.c:2721
 msgid "_Reverse search"
 msgstr "חיפוש _הפוך"
 
-#: src/main-window.c:2685
+#: src/main-window.c:2724
 msgid "_Search for:"
 msgstr "_חפש את׃"
 
-#: src/main-window.c:2698
+#: src/main-window.c:2737
 msgid "In:"
 msgstr "ב׃"
 
-#: src/main-window.c:2712
+#: src/main-window.c:2751
 msgid "S_ubject"
 msgstr "_נושא"
 
-#: src/main-window.c:2827
+#: src/main-window.c:2866
 msgid "You can apply filters only on mailbox\n"
 msgstr "ניתן להפעיל מסננים רק על תיבות דואר\n"
 
-#: src/main-window.c:2871 src/main-window.c:2890
+#: src/main-window.c:2910 src/main-window.c:2929
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "עדכון תיבת דואר %s נכשל"
 
-#: src/main-window.c:3083
+#: src/main-window.c:3122
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "בלזה׃ %s (לקריאה בלבד)"
 
-#: src/main-window.c:3085
+#: src/main-window.c:3124
 #, c-format
 msgid "Balsa: %s"
 msgstr "בלזה׃ %s"
 
-#: src/main-window.c:3183
+#: src/main-window.c:3222
 msgid "Cannot access the message's body\n"
 msgstr "לא ניתן לגשת לגוף ההודעה\n"
 
@@ -3818,6 +3847,10 @@ msgstr "תיבת טיוטות"
 #: src/main.c:192
 msgid "Trash"
 msgstr "אשפה"
+
+#: src/message-window.c:73
+msgid "N_o Headers"
+msgstr "_ללא כותרות"
 
 #: src/message-window.c:75
 msgid "_Selected Headers"
@@ -4087,7 +4120,7 @@ msgstr "בצע בדיקה ברקע (בלי הודעות לסרגל המצב)"
 msgid "Quoted and Flowed Text"
 msgstr "טקסט מצוטט ומוזרם"
 
-#: src/pref-manager.c:1744
+#: src/pref-manager.c:1744 src/sendmsg-window.c:3793
 msgid "Quoted Text Regular Expression"
 msgstr "ביטוי סדיר לטקסט מצוטט"
 
@@ -4586,324 +4619,320 @@ msgstr "האפשרות לא לשלוח \"מבנה=זורם\" נמצאת כעת �
 msgid "The option to request a MDN is now on the Options menu of the compose window."
 msgstr "האפשרות לבקשת אישור שליחה (MDN) נמצאת כעת בתפריט האפשרויות של חלון המחבר."
 
-#: src/sendmsg-window.c:200
+#: src/sendmsg-window.c:199
 msgid "_Include File..."
 msgstr "ה_כנס קובץ..."
 
-#: src/sendmsg-window.c:203
+#: src/sendmsg-window.c:202
 msgid "_Attach File..."
 msgstr "_צרף קובץ..."
 
-#: src/sendmsg-window.c:206
+#: src/sendmsg-window.c:205
 msgid "_Include Message(s)"
 msgstr "_הכנס הודעה/ות"
 
-#: src/sendmsg-window.c:209
+#: src/sendmsg-window.c:208
 msgid "Attach _Message(s)"
 msgstr "צרף הו_דעה/ות"
 
-#: src/sendmsg-window.c:215
+#: src/sendmsg-window.c:214
 msgid "_Send"
 msgstr "_שלח"
 
-#: src/sendmsg-window.c:216 src/toolbar-factory.c:121
+#: src/sendmsg-window.c:215 src/toolbar-factory.c:121
 msgid "Send this message"
 msgstr "שלח הודעה זו"
 
-#: src/sendmsg-window.c:220
+#: src/sendmsg-window.c:219
 msgid "_Queue"
 msgstr "שים _בתור"
 
-#: src/sendmsg-window.c:221
+#: src/sendmsg-window.c:220
 msgid "Queue this message in Outbox for sending"
 msgstr "שים הודעה זו בתיבת הדואר היוצא לצורך משלוח"
 
-#: src/sendmsg-window.c:225
+#: src/sendmsg-window.c:224
 msgid "_Postpone"
 msgstr "_דחה למועד מאוחר יותר"
 
-#: src/sendmsg-window.c:228
+#: src/sendmsg-window.c:227
 msgid "_Save"
 msgstr "_שמור"
 
-#: src/sendmsg-window.c:229
+#: src/sendmsg-window.c:228
 msgid "Save this message"
 msgstr "שמור הודעה זו"
 
-#: src/sendmsg-window.c:233
+#: src/sendmsg-window.c:232
 msgid "Print..."
 msgstr "הדפס..."
 
-#: src/sendmsg-window.c:233
+#: src/sendmsg-window.c:232
 msgid "Print the edited message"
 msgstr "הדפס את ההודעה שנערכה"
 
-#: src/sendmsg-window.c:262
+#: src/sendmsg-window.c:261
 msgid "_Wrap Body"
 msgstr "_גלישת שורות בגוף ההודעה"
 
-#: src/sendmsg-window.c:267
+#: src/sendmsg-window.c:265
+msgid "_Reflow Selected Text"
+msgstr "ה_זרם מחדש טקסט נבחר"
+
+#: src/sendmsg-window.c:270
 msgid "Insert Si_gnature"
 msgstr "הכנס _חתימה"
 
-#: src/sendmsg-window.c:271
+#: src/sendmsg-window.c:274
 msgid "_Quote Message(s)"
 msgstr "_צטט הודעה/ות"
 
-#: src/sendmsg-window.c:276
-msgid "_Reflow Paragraph"
-msgstr "_עצב מחדש את הקטע"
-
-#: src/sendmsg-window.c:280
-msgid "R_eflow Message"
-msgstr "ע_צב מחדש את ההודעה"
-
-#: src/sendmsg-window.c:285
+#: src/sendmsg-window.c:279
 msgid "C_heck Spelling"
 msgstr "_בדוק איות"
 
-#: src/sendmsg-window.c:286
+#: src/sendmsg-window.c:280
 msgid "Check the spelling of the message"
 msgstr "בדוק את איות ההודעה"
 
-#: src/sendmsg-window.c:291
+#: src/sendmsg-window.c:285
 msgid "Select _Identity..."
 msgstr "בחר _זהות..."
 
-#: src/sendmsg-window.c:292
+#: src/sendmsg-window.c:286
 msgid "Select the Identity to use for the message"
 msgstr "בחר זהות עבור ההודעה"
 
-#: src/sendmsg-window.c:297
+#: src/sendmsg-window.c:291
 msgid "_Edit with Gnome-Editor"
 msgstr "_ערוך באמצעות עורך Gnome"
 
-#: src/sendmsg-window.c:298
+#: src/sendmsg-window.c:292
 msgid "Edit the current message with the default Gnome editor"
 msgstr "ערוך את ההודעה הנוכחית באמצעות העורך ברירת המחדל של Gnome"
 
-#: src/sendmsg-window.c:310
+#: src/sendmsg-window.c:304
 msgid "Fr_om"
 msgstr "_מאת"
 
-#: src/sendmsg-window.c:316
+#: src/sendmsg-window.c:310
 msgid "_Cc"
 msgstr "ה_עתק"
 
-#: src/sendmsg-window.c:318
+#: src/sendmsg-window.c:312
 msgid "_Bcc"
 msgstr "העתק _סמוי"
 
-#: src/sendmsg-window.c:320
+#: src/sendmsg-window.c:314
 msgid "_Fcc"
 msgstr "העתק ל_קובץ"
 
-#: src/sendmsg-window.c:322
+#: src/sendmsg-window.c:316
 msgid "_Reply To"
 msgstr "ה_שב אל"
 
-#: src/sendmsg-window.c:324
+#: src/sendmsg-window.c:318
 msgid "_Attachments"
 msgstr "_תצריפים"
 
-#: src/sendmsg-window.c:327
+#: src/sendmsg-window.c:321
 msgid "_Comments"
 msgstr "ה_ערות"
 
-#: src/sendmsg-window.c:330
+#: src/sendmsg-window.c:324
 msgid "_Keywords"
 msgstr "_מילות מפתח"
 
-#: src/sendmsg-window.c:347 src/sendmsg-window.c:418
+#: src/sendmsg-window.c:341 src/sendmsg-window.c:412
 msgid "Brazilian"
 msgstr "ברזילאית Brazilian"
 
-#: src/sendmsg-window.c:349 src/sendmsg-window.c:420
+#: src/sendmsg-window.c:343 src/sendmsg-window.c:414
 msgid "Catalan"
 msgstr "קטלאנית Catalan"
 
-#: src/sendmsg-window.c:351 src/sendmsg-window.c:422
+#: src/sendmsg-window.c:345 src/sendmsg-window.c:416
 msgid "Chinese Simplified"
 msgstr "סינית (מפושטת) (Chinese (Simplified"
 
-#: src/sendmsg-window.c:353 src/sendmsg-window.c:424
+#: src/sendmsg-window.c:347 src/sendmsg-window.c:418
 msgid "Chinese Traditional"
 msgstr "סינית (מסורתית) (Chinese (Traditional"
 
-#: src/sendmsg-window.c:355 src/sendmsg-window.c:426
+#: src/sendmsg-window.c:349 src/sendmsg-window.c:420
 msgid "Czech"
 msgstr "צ'כית Czech"
 
-#: src/sendmsg-window.c:357 src/sendmsg-window.c:428
+#: src/sendmsg-window.c:351 src/sendmsg-window.c:422
 msgid "Danish"
 msgstr "דנית Danish"
 
-#: src/sendmsg-window.c:359 src/sendmsg-window.c:440
+#: src/sendmsg-window.c:353 src/sendmsg-window.c:434
 msgid "German"
 msgstr "גרמנית German"
 
-#: src/sendmsg-window.c:361 src/sendmsg-window.c:430
+#: src/sendmsg-window.c:355 src/sendmsg-window.c:424
 msgid "Dutch"
 msgstr "הולנדית Dutch"
 
 #. English -> American English, argh...
-#: src/sendmsg-window.c:364 src/sendmsg-window.c:432
+#: src/sendmsg-window.c:358 src/sendmsg-window.c:426
 msgid "English"
 msgstr "אנגלית English"
 
-#: src/sendmsg-window.c:366 src/sendmsg-window.c:434
+#: src/sendmsg-window.c:360 src/sendmsg-window.c:428
 msgid "Esperanto"
 msgstr "אספרנטו Esperanto"
 
-#: src/sendmsg-window.c:368
+#: src/sendmsg-window.c:362
 msgid "Estonian"
 msgstr "אסטונית Estonian"
 
-#: src/sendmsg-window.c:370 src/sendmsg-window.c:436
+#: src/sendmsg-window.c:364 src/sendmsg-window.c:430
 msgid "Finnish"
 msgstr "פינית Finnish"
 
-#: src/sendmsg-window.c:372 src/sendmsg-window.c:438
+#: src/sendmsg-window.c:366 src/sendmsg-window.c:432
 msgid "French"
 msgstr "צרפתית French"
 
-#: src/sendmsg-window.c:374 src/sendmsg-window.c:442
+#: src/sendmsg-window.c:368 src/sendmsg-window.c:436
 msgid "Greek"
 msgstr "יוונית Greek"
 
-#: src/sendmsg-window.c:376 src/sendmsg-window.c:444
+#: src/sendmsg-window.c:370 src/sendmsg-window.c:438
 msgid "Hebrew"
 msgstr "עברית Hebrew"
 
-#: src/sendmsg-window.c:378 src/sendmsg-window.c:446
+#: src/sendmsg-window.c:372 src/sendmsg-window.c:440
 msgid "Hungarian"
 msgstr "הונגרית Hungarian"
 
-#: src/sendmsg-window.c:380 src/sendmsg-window.c:448
+#: src/sendmsg-window.c:374 src/sendmsg-window.c:442
 msgid "Italian"
 msgstr "איטלקית Italian"
 
-#: src/sendmsg-window.c:382 src/sendmsg-window.c:450
+#: src/sendmsg-window.c:376 src/sendmsg-window.c:444
 msgid "Japanese"
 msgstr "יפנית Japanese"
 
-#: src/sendmsg-window.c:384 src/sendmsg-window.c:456
+#: src/sendmsg-window.c:378 src/sendmsg-window.c:450
 msgid "Korean"
 msgstr "קוריאנית Korean"
 
-#: src/sendmsg-window.c:386 src/sendmsg-window.c:458
+#: src/sendmsg-window.c:380 src/sendmsg-window.c:452
 msgid "Latvian"
 msgstr "לטבית Latvian"
 
-#: src/sendmsg-window.c:388 src/sendmsg-window.c:460
+#: src/sendmsg-window.c:382 src/sendmsg-window.c:454
 msgid "Lithuanian"
 msgstr "ליטאית Lithuanian"
 
-#: src/sendmsg-window.c:390 src/sendmsg-window.c:462
+#: src/sendmsg-window.c:384 src/sendmsg-window.c:456
 msgid "Norwegian"
 msgstr "נורבגית Norwegian"
 
-#: src/sendmsg-window.c:392 src/sendmsg-window.c:464
+#: src/sendmsg-window.c:386 src/sendmsg-window.c:458
 msgid "Polish"
 msgstr "פולנית Polish"
 
-#: src/sendmsg-window.c:394 src/sendmsg-window.c:466
+#: src/sendmsg-window.c:388 src/sendmsg-window.c:460
 msgid "Portugese"
 msgstr "פורטוגזית Portugese"
 
-#: src/sendmsg-window.c:396 src/sendmsg-window.c:468
+#: src/sendmsg-window.c:390 src/sendmsg-window.c:462
 msgid "Romanian"
 msgstr "רומנית Romanian"
 
-#: src/sendmsg-window.c:398 src/sendmsg-window.c:470
+#: src/sendmsg-window.c:392 src/sendmsg-window.c:464
 msgid "Russian (ISO)"
 msgstr "רוסית (Russian (ISO"
 
-#: src/sendmsg-window.c:400 src/sendmsg-window.c:472
+#: src/sendmsg-window.c:394 src/sendmsg-window.c:466
 msgid "Russian (KOI)"
 msgstr "רוסית (Russiian (KOI"
 
-#: src/sendmsg-window.c:402 src/sendmsg-window.c:474
+#: src/sendmsg-window.c:396 src/sendmsg-window.c:468
 msgid "Slovak"
 msgstr "סלובקית Slovak"
 
-#: src/sendmsg-window.c:404 src/sendmsg-window.c:476
+#: src/sendmsg-window.c:398 src/sendmsg-window.c:470
 msgid "Spanish"
 msgstr "ספרדית Spanish"
 
-#: src/sendmsg-window.c:406 src/sendmsg-window.c:478
+#: src/sendmsg-window.c:400 src/sendmsg-window.c:472
 msgid "Swedish"
 msgstr "שבדית Swedish"
 
-#: src/sendmsg-window.c:408 src/sendmsg-window.c:480
+#: src/sendmsg-window.c:402 src/sendmsg-window.c:474
 msgid "Turkish"
 msgstr "טורקית Turkish"
 
-#: src/sendmsg-window.c:410 src/sendmsg-window.c:482
+#: src/sendmsg-window.c:404 src/sendmsg-window.c:476
 msgid "Ukrainian"
 msgstr "אוקראינית Ukrainian"
 
-#: src/sendmsg-window.c:412
+#: src/sendmsg-window.c:406
 msgid "Generic UTF-8"
 msgstr "UTF-8 כללי"
 
-#: src/sendmsg-window.c:484
+#: src/sendmsg-window.c:478
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: src/sendmsg-window.c:492
+#: src/sendmsg-window.c:486
 msgid "_A-J"
 msgstr "_A-J"
 
-#: src/sendmsg-window.c:493
+#: src/sendmsg-window.c:487
 msgid "_K-Z"
 msgstr "_K-Z"
 
-#: src/sendmsg-window.c:503
+#: src/sendmsg-window.c:497
 msgid "_GnuPG uses MIME mode"
 msgstr "_GnuPG משתמש במצב MIME"
 
-#: src/sendmsg-window.c:509
+#: src/sendmsg-window.c:503
 msgid "_GnuPG uses old OpenPGP mode"
 msgstr "_GnuPG משתמש במצב OpenPGP"
 
-#: src/sendmsg-window.c:520
+#: src/sendmsg-window.c:514
 msgid "_Request Disposition Notification"
 msgstr "_בקש אישור מסירה"
 
-#: src/sendmsg-window.c:523
+#: src/sendmsg-window.c:517
 msgid "_Format = Flowed"
 msgstr "_מבנה = זורם"
 
-#: src/sendmsg-window.c:528
+#: src/sendmsg-window.c:522
 msgid "_Sign Message"
 msgstr "_חתום את ההודעה"
 
-#: src/sendmsg-window.c:529
+#: src/sendmsg-window.c:523
 msgid "signs the message using GnuPG"
 msgstr "חתום את ההודעה באמצעות GnuPG"
 
-#: src/sendmsg-window.c:532
+#: src/sendmsg-window.c:526
 msgid "_Encrypt Message"
 msgstr "ה_צפן את ההודעה"
 
-#: src/sendmsg-window.c:533
+#: src/sendmsg-window.c:527
 msgid "signs the message using GnuPG for all To: and CC: recipients"
 msgstr "חתום על ההודעה באמצעות GnuPG לכל הנמענים ומקבלי ההעתקים"
 
-#: src/sendmsg-window.c:578
+#: src/sendmsg-window.c:572
 msgid "_Show"
 msgstr "ה_צג"
 
-#: src/sendmsg-window.c:580
+#: src/sendmsg-window.c:574
 msgid "_Language"
 msgstr "_שפה"
 
-#: src/sendmsg-window.c:582
+#: src/sendmsg-window.c:576
 msgid "_Options"
 msgstr "_אפשרויות"
 
-#: src/sendmsg-window.c:665
+#: src/sendmsg-window.c:659
 #, c-format
 msgid ""
 "The message to '%s' is modified.\n"
@@ -4913,11 +4942,11 @@ msgstr ""
 "לשמור הודעה בתיבת הטיוטות?"
 
 #. Comments:
-#: src/sendmsg-window.c:801 src/sendmsg-window.c:2041
+#: src/sendmsg-window.c:795 src/sendmsg-window.c:2035
 msgid "Comments:"
 msgstr "הערות׃"
 
-#: src/sendmsg-window.c:1249
+#: src/sendmsg-window.c:1243
 #, c-format
 msgid ""
 "Saying yes will not send the file `%s' itself, but just a MIME message/"
@@ -4927,48 +4956,48 @@ msgid ""
 "Do you really want to attach this file as reference?"
 msgstr ""
 "בחירת \"כן\" תגרום, שבמקום שישלח הקובץ `%s' עצמו, תשלח הודעת MIME עם "
-"התייחסות לגוף חיצוני. שים לב, שלנמען חייבות להיות "
-"הרשאות מתאימות כדי לראות את הקובץ ה'אמיתי'.\n"
+"התייחסות לגוף חיצוני. שים לב, שלנמען חייבות להיות הרשאות מתאימות כדי לראות "
+"את הקובץ ה'אמיתי'.\n"
 "\n"
 "האם באמת ברצונך לצרף את הקובץ כהתייחסות?"
 
-#: src/sendmsg-window.c:1260
+#: src/sendmsg-window.c:1254
 msgid "Attach as Reference?"
 msgstr "לצרף כהתייחסות?"
 
-#: src/sendmsg-window.c:1351
+#: src/sendmsg-window.c:1345
 msgid "Remove"
 msgstr "מחק"
 
-#: src/sendmsg-window.c:1362
+#: src/sendmsg-window.c:1356
 msgid "attach as reference"
 msgstr "צרף בתור התייחסות"
 
-#: src/sendmsg-window.c:1368
+#: src/sendmsg-window.c:1362
 msgid "attach as file"
 msgstr "צרף בתור קובץ"
 
-#: src/sendmsg-window.c:1516
+#: src/sendmsg-window.c:1510
 #, c-format
 msgid "Cannot get info on file '%s': %s"
 msgstr "לא ניתן לקבל מידע על קובץ `%s'׃ %s"
 
-#: src/sendmsg-window.c:1521
+#: src/sendmsg-window.c:1515
 #, c-format
 msgid "Attachment %s is not a regular file."
 msgstr "התצריף %s אינו קובץ רגיל."
 
-#: src/sendmsg-window.c:1524
+#: src/sendmsg-window.c:1518
 #, c-format
 msgid "File %s cannot be read\n"
 msgstr "לא ניתן לקרוא את הקובץ %s\n"
 
-#: src/sendmsg-window.c:1578
+#: src/sendmsg-window.c:1572
 msgid "Attach file"
 msgstr "צרף קובץ"
 
-#: src/sendmsg-window.c:1674 src/sendmsg-window.c:1736
-#: src/sendmsg-window.c:2913
+#: src/sendmsg-window.c:1668 src/sendmsg-window.c:1730
+#: src/sendmsg-window.c:2902
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -4977,68 +5006,68 @@ msgstr ""
 "סיבה אפשרית׃ אין מספיק מקום זמני פנוי"
 
 #. From:
-#: src/sendmsg-window.c:1932
+#: src/sendmsg-window.c:1926
 msgid "F_rom:"
 msgstr "_מאת׃"
 
 #. Subject:
-#: src/sendmsg-window.c:1944
+#: src/sendmsg-window.c:1938
 msgid "S_ubject:"
 msgstr "_נושא׃"
 
 #. fcc:
-#: src/sendmsg-window.c:1958
+#: src/sendmsg-window.c:1952
 msgid "F_cc:"
 msgstr "העתק ל_קובץ׃"
 
 #. Reply To:
-#: src/sendmsg-window.c:1987
+#: src/sendmsg-window.c:1981
 msgid "_Reply To:"
 msgstr "השב _אל׃"
 
 #. Attachment list
-#: src/sendmsg-window.c:1994
+#: src/sendmsg-window.c:1988
 msgid "_Attachments:"
 msgstr "_צירופים:"
 
 #. Keywords:
-#: src/sendmsg-window.c:2044
+#: src/sendmsg-window.c:2038
 msgid "Keywords:"
 msgstr "מילות מפתח׃"
 
-#: src/sendmsg-window.c:2206
+#: src/sendmsg-window.c:2200
 msgid "you"
 msgstr "אתה"
 
-#: src/sendmsg-window.c:2215
+#: src/sendmsg-window.c:2209
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------ %s-דואר מועבר מ ------\n"
 
-#: src/sendmsg-window.c:2248
+#: src/sendmsg-window.c:2242
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "מזהה הודעה׃ %s\n"
 
-#: src/sendmsg-window.c:2254
+#: src/sendmsg-window.c:2248
 msgid "References:"
 msgstr "התייחסויות׃"
 
-#: src/sendmsg-window.c:2264
+#: src/sendmsg-window.c:2258
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "ב- %s, %s כתב/ה׃\n"
 
-#: src/sendmsg-window.c:2266
+#: src/sendmsg-window.c:2260
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s כתב/ה׃\n"
 
-#: src/sendmsg-window.c:3075
+#: src/sendmsg-window.c:3064
 msgid "Choose charset"
 msgstr "בחר מערך תווים"
 
-#: src/sendmsg-window.c:3082
+#: src/sendmsg-window.c:3071
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file."
@@ -5046,16 +5075,16 @@ msgstr ""
 "קובץ זה לא מקודד ב US-ASCII או ב UTF-8.\n"
 "אנא בחר את הקידוד שבו מקודד קובץ זה."
 
-#: src/sendmsg-window.c:3148
+#: src/sendmsg-window.c:3137
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "לא ניתן לפתוח את הקובץ %s.\n"
 
-#: src/sendmsg-window.c:3170
+#: src/sendmsg-window.c:3159
 msgid "Include file"
 msgstr "הכנס קובץ"
 
-#: src/sendmsg-window.c:3428
+#: src/sendmsg-window.c:3417
 #, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
@@ -5064,37 +5093,42 @@ msgstr ""
 "ההודעה לא יכלה להיות מקודדת בקידוד %s.\n"
 "אנא בחר שפה להודעה זו."
 
-#: src/sendmsg-window.c:3447
+#: src/sendmsg-window.c:3436
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
 "if the complete message shall be protected. Do you really want to proceed?"
 msgstr ""
-"בחרת מצב OpenPGP להודעות עם תצריפים. במצב זה, רק "
-"החלק הראשון של ההודעה ייחתם ו/או יוצפן. אתה צריך לבחור מצב MIME "
-"אם כל ההודעה צריכה להיות מוגנת. האם ברצונך באמת להמשיך?"
+"בחרת מצב OpenPGP להודעות עם תצריפים. במצב זה, רק החלק הראשון של ההודעה ייחתם "
+"ו/או יוצפן. אתה צריך לבחור מצב MIME אם כל ההודעה צריכה להיות מוגנת. האם "
+"ברצונך באמת להמשיך?"
 
-#: src/sendmsg-window.c:3460
+#: src/sendmsg-window.c:3449
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "שולח הודעות עם מצב gpg %d"
 
-#: src/sendmsg-window.c:4354
+#: src/sendmsg-window.c:3792
+#, c-format
+msgid "Could not compile %s"
+msgstr "לא ניתן להדר את %s"
+
+#: src/sendmsg-window.c:4335
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "השב אל %s׃ %s"
 
-#: src/sendmsg-window.c:4359
+#: src/sendmsg-window.c:4340
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "העבר דואר אל %s׃ %s"
 
-#: src/sendmsg-window.c:4363
+#: src/sendmsg-window.c:4344
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "המשך את ההודעה אל %s׃ %s"
 
-#: src/sendmsg-window.c:4367
+#: src/sendmsg-window.c:4348
 #, c-format
 msgid "New message to %s: %s"
 msgstr "דואר חדש אל %s׃ %s"
@@ -5489,6 +5523,12 @@ msgstr "מעלה"
 #: src/toolbar-prefs.c:506
 msgid "Down"
 msgstr "מטה"
+
+#~ msgid "_Reflow Paragraph"
+#~ msgstr "_עצב מחדש את הקטע"
+
+#~ msgid "R_eflow Message"
+#~ msgstr "ע_צב מחדש את ההודעה"
 
 #~ msgid "could not retrieve key fingerprint for %s: %s"
 #~ msgstr "לא ניתן לשלוף את המפתח לטביעת האצבעות עבור %s׃ %s\n"

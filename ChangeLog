@@ -1,3 +1,10 @@
+2003-09-23 16:17  PeterB
+
+	* libbalsa/mailbox_imap.c, libbalsa/message.c, libbalsa/message.h,
+	libbalsa/send.c, src/sendmsg-window.c: Keep message-ids internally
+	without the angle brackets; fix In-Reply-To header syntax.
+	* libbalsa/imap/imap.h: Simplify macros.
+
 2003-09-23  Pawel Salek  <pawsa theochem.kth.se>
 
 	* src/expand-alias.c: reference used address before unrefing all.

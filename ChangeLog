@@ -1,5 +1,9 @@
 2000-09-11  Carlos Morgado  <chbm@chbm.nu>
 
+	* libbalsa/server.c: host and port made not private on server_load
+
+2000-09-11  Carlos Morgado  <chbm@chbm.nu>
+
 	* src/Makefile.am: balsa_SOURCE -> balsa_BASE_SOURCE, make way for 
 	balsa_IDL_SOURCE (inactive ATM)
 

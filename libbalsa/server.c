@@ -254,8 +254,8 @@ void
 libbalsa_server_load_config(LibBalsaServer *server, gint default_port)
 {
 	gboolean d;
-	server->host   = gnome_config_private_get_string ("Server");
-	server->port   = gnome_config_private_get_int_with_default("Port",&d);
+	server->host   = gnome_config_get_string ("Server");
+	server->port   = gnome_config_get_int_with_default("Port",&d);
 	if(d) server->port = default_port;
 	server->user   = gnome_config_private_get_string ("Username");
 	server->passwd = gnome_config_private_get_string ("Password");

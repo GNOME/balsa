@@ -39,9 +39,15 @@ load_local_mailboxes ()
   struct stat st;
   char filename[PATH_MAX + 1];
   DRIVER *drv = NIL;
+
   MailboxMBX *mbx;
+  MailboxMTX *mtx;
+  MailboxTENEX *tenex;
   MailboxMBox *mbox;
+  MailboxMMDF *mmdf;
   MailboxUNIX *unixmb;
+  MailboxMH *mh;
+
   gint i = 0;
 
 
@@ -67,27 +73,52 @@ load_local_mailboxes ()
 		      mbx = (MailboxMBX *) mailbox_new (MAILBOX_MBX);
 		      mbx->name = g_strdup (d->d_name);
 		      mbx->path = g_strdup (filename);
-
 		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbx);
 		    }
+		  else if (!strcmp (drv->name, "mtx"))
+		    {
+		      mtx = (MailboxMTX *) mailbox_new (MAILBOX_MTX);
+		      mtx->name = g_strdup (d->d_name);
+		      mtx->path = g_strdup (filename);
+		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mtx);
+		    }
 
+		  else if (!strcmp (drv->name, "tenex"))
+		    {
+		      tenex = (MailboxTENEX *) mailbox_new (MAILBOX_TENEX);
+		      tenex->name = g_strdup (d->d_name);
+		      tenex->path = g_strdup (filename);
+		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, tenex);
+		    }
 		  else if (!strcmp (drv->name, "mbox"))
 		    {
 		      mbox = (MailboxMBox *) mailbox_new (MAILBOX_MBOX);
 		      mbox->name = g_strdup (d->d_name);
 		      mbox->path = g_strdup (filename);
-
 		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbox);
 		    }
-
+		  else if (!strcmp (drv->name, "mmdf"))
+		    {
+		      mmdf = (MailboxMMDF *) mailbox_new (MAILBOX_MMDF);
+		      mmdf->name = g_strdup (d->d_name);
+		      mmdf->path = g_strdup (filename);
+		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mmdf);
+		    }
 		  else if (!strcmp (drv->name, "unix"))
 		    {
 		      unixmb = (MailboxUNIX *) mailbox_new (MAILBOX_UNIX);
 		      unixmb->name = g_strdup (d->d_name);
 		      unixmb->path = g_strdup (filename);
-
 		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, unixmb);
 		    }
+		  else if (!strcmp (drv->name, "mh"))
+		    {
+		      mh = (MailboxMH *) mailbox_new (MAILBOX_MH);
+		      mh->name = g_strdup (d->d_name);
+		      mh->path = g_strdup (filename);
+		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mh);
+		    }
+
 		  i++;
 		}
 	    }

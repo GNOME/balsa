@@ -1,29 +1,6 @@
-h1 {font-size: x-large; }
-h2 {font-size: large; }
-h3 {font-size: medium; }
-body
-{
-	background: white;
-	color: black;
-	font-size: 10pt;
-	font-family: lucida, helvetica, arial;
-}
-
-p
-{
-	font-size: 10pt;
-	font-family: lucida, helvetica, arial;
-}
-
-td
-{
-	font-size: 10pt;
-	font-family: lucida, helvetica, arial;
-}
-
-th
-{
-	font-size: 12pt;
-	font-family: lucida, helvetica, arial;
-	font-weight: bold;
-}
+body        {margin-left: 10%; margin-right: 10%; font: 0.9em Lucida, Helvetica, Arial, Sans-Serif;}
+.text       {font: 0.9em Lucida, Helvetica, Arial, Sans-Serif;}
+.navigation {font-size: 1.0em; font-weight: bold;}
+.heading    {font-size: 1.4em; font-weight: bold;}
+.copyright  {font-size: 0.7em;}
+dt          {font-weight: bold;}

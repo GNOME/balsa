@@ -443,12 +443,27 @@ AC_ARG_WITH(ssl, [  --with-ssl            Enable SSL [default=no]],[
 
 AC_MSG_CHECKING([whether to build SSL support])
 if test "x$with_ssl" != xno  ; then
+	if test -d $with_ssl && test -f "$with_ssl/include/openssl/ssl.h" ; then
+		ssldir=$with_ssl
+	else
+		for prefixdir in /usr /usr/local /usr/lib /usr/pkg /var /opt; do
+			for dir in $prefixdir $prefixdir/openssl $prefixdir/ssl; do
+				if test -f "$dir/include/openssl/ssl.h"; then
+					ssldir=$dir
+				fi
+			done
+		done
+	fi
+fi
+
+if test -z "$ssldir"; then
+	AC_MSG_RESULT([no])
+else
 	AC_MSG_RESULT([yes])
 	LIBS="$LIBS -lssl -lcrypto"
-	test "$with_ssl" != yes && LIBS="$LIBS -L$with_ssl/lib"
+	CPPFLAGS="-I${ssldir}/include $CPPFLAGS"
+	ac_cv_path_openssl=$ssldir
 	AC_DEFINE(USE_SSL)
-else
-	AC_MSG_RESULT([no])
 fi
 
 dnl ##########################################################################

@@ -450,7 +450,7 @@ balsa_message_init(BalsaMessage * bm)
      * text. */
     text_view = g_object_get_data(G_OBJECT(bm->header_container),
 				  BALSA_MESSAGE_TEXT_VIEW);
-    border_style = gtk_style_copy(gtk_rc_get_style(text_view));
+    border_style = gtk_style_copy(gtk_widget_get_style(text_view));
     border_style->bg[GTK_STATE_NORMAL] = border_style->base[GTK_STATE_NORMAL];
     gtk_widget_set_style(bm->cont_viewport, border_style);
     g_object_unref(border_style);

@@ -97,7 +97,8 @@ balsa_warning (const char *fmt,...)
   messagebox = gnome_warning_dialog_parented (outstr, GTK_WINDOW(balsa_app.main_window));
   g_free(outstr);
 
-  gtk_window_set_wmclass (GTK_WINDOW (messagebox), "warning", "Balsa");
+  /* shouldn't set wmclass after window is realized! 
+     gtk_window_set_wmclass (GTK_WINDOW (messagebox), "warning", "Balsa"); */
 
   gnome_dialog_run_and_close (GNOME_DIALOG (messagebox));
 
@@ -303,7 +304,7 @@ balsa_find_mbox_by_name (const gchar *name) {
   LibBalsaMailbox *res = NULL;
 
   
-  if (balsa_app.mailbox_nodes && name) {
+  if (balsa_app.mailbox_nodes && name && *name) {
       if (!strcmp (name, balsa_app.sentbox->name))
 	  res = balsa_app.sentbox;
       else if (!strcmp (name, balsa_app.draftbox->name))

@@ -1,4 +1,7 @@
-Balsa E-Mail Client 0.9.0
+Balsa E-Mail Client 0.9.2
+
+  This is a non-stable, development release. See ChangeLog for the list
+  of the recent changes.
 
 Copyright (C) 1997-2000 Jay Painter, Stuart Parmenter and others
 See 'COPYING' for licence information.
@@ -51,6 +54,10 @@ locking and use fcntl/lockf functions instead.
 --enable-fcntl
 	This enables alternative fcntl file locking scheme. This
 function is sometimes troublesome over NFS but is POSIX compatible.
+
+Libraries:
+	The binaries are compiled against gnome-libs-1.2.1, if you use
+older libraries, you will need to recompile balsa from the source.
 
 Website:
 	Balsa CVS source comes with the Balsa website in the

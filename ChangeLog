@@ -1,3 +1,15 @@
+2000-08-15  Pawel Salek <pawsa@theochem.kth.se>
+	* AUTHORS, NEWS, README, configure.in: updates for 0.9.2
+	* balsa.spec.in: require gnome-libs >= 1.2.0
+	* libbalsa/send.c: MessageQueueItem constructors/destructors,
+	handle sending errors nicely.
+	* libmutt/pop.c(mutt_fetchPopMail): fix for _some_ POP problems.
+	* src/balsa-app.c(balsa_warning): shouldn't set wmclass after 
+	window is realized.
+	* src/main-window.c: pop up a warning box on sending error.
+	* src/sendmsg-window.c: strdup dragged file name before handing it
+	over to add_attachment().
+	
 2000-08-14  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* HACKING: Added some guidelines.

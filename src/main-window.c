@@ -683,8 +683,6 @@ static void balsa_window_real_open_mailbox(BalsaWindow *window, LibBalsaMailbox 
 	GtkObject *page;
 	GtkWidget *label;
 
-/*  label = gtk_label_new("blah"); PKGW: dunno why this was here. */
-
 	page = balsa_index_page_new(window);
 	if( balsa_index_page_load_mailbox(BALSA_INDEX_PAGE(page), mailbox) ) {
 		/* The function will display a dialog on error */
@@ -911,6 +909,7 @@ show_about_box (void)
   const gchar *authors[] =
   {
     "Héctor García Álvarez <hector@scouts-es.org>",
+    "Ian Campbell <ijc25@cam.ac.uk>",
     "Bruno Pires Marinho <bapm@camoes.rnl.ist.utl.pt>",
     "Jay Painter <jpaint@gimp.org>",
     "Stuart Parmenter <pavlov@pavlov.net>",
@@ -1259,7 +1258,8 @@ send_progress_notify_cb( )
 	switch( threadmessage->message_type )  
 	  {
 	  case MSGSENDTHREADERROR:
-	    fprintf(stderr, "Send Error %s\n", threadmessage->message_string);
+	    balsa_warning( _("Sending error: %s"), 
+			  threadmessage->message_string);
 	    break;
 	    
 	  case MSGSENDTHREADLOAD:

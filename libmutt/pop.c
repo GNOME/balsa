@@ -175,6 +175,7 @@ void mutt_fetchPopMail (void)
   if (connect (s, (struct sockaddr *) &sin, sizeof (struct sockaddr_in)) == -1)
   {
     mutt_perror ("connect");
+    mx_fastclose_mailbox (&ctx);
     return;
   }
 

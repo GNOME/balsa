@@ -1,8 +1,16 @@
+Version 0.9.0:
+        Ian Campbell            <ijc25@cam.ac.uk>
+        Matthew Guenther        <mguenthe@attcanada.ca>
+        Pawel Salek             <pawsa@theochem.kth.se>
+        Peter Williams          <peter@newton.cx>
+	and others.
+
 Version 0.8.0:
 
 	Code from:
 
 	Héctor García Álvarez	<hector@scouts-es.org>
+        Ian Campbell            <ijc25@cam.ac.uk>
 	Matthew Guenther	<mguenthe@attcanada.ca>
 	Bruno Pires Marinho	<bapm@camoes.rnl.ist.utl.pt>
 	David Pickens		<dpickens@iaesthetic.com>
@@ -11,9 +19,6 @@ Version 0.8.0:
 
 	Special thanks to:
 
-	Ian Campbell		<ijc25@cam.ac.uk>
-		for nice new message viewer (coming soon to
-		a CVS tree near you....)
 	Anthony DeRobertis	<asd@suespammers.org>
 		for patches and ideas and bug-squashing
 	and our bug reporters and stompers

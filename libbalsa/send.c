@@ -65,6 +65,33 @@ struct _MessageQueueItem
 MessageQueueItem *last_message;
 int total_messages_left;
 
+static MessageQueueItem *
+msg_queue_item_new(LibBalsaMessage *message) 
+{
+  MessageQueueItem *mqi;
+
+  mqi = g_new(MessageQueueItem,1);
+  mqi->orig = message;
+  mqi->message = mutt_new_header ();
+  mqi->next_message = NULL;
+  mqi->fcc = g_strdup(message->fcc_mailbox);
+  mqi->delete = 0;
+  mqi->tempfile[0] = '\0';
+  return mqi;
+}
+
+static void 
+msg_queue_item_destroy(MessageQueueItem* mqi) 
+{
+  if(*mqi->tempfile)
+    unlink (mqi->tempfile);
+  if(mqi->message)
+    mutt_free_header (&mqi->message);
+  if(mqi->fcc)
+    g_free(mqi->fcc);
+  free(mqi);
+}
+
 /* prototype this so that this file doesn't whine.  this function isn't in
  * mutt any longer, so we had to provide it inside mutt for libmutt :-)
  */
@@ -144,89 +171,69 @@ libbalsa_message_send (LibBalsaMessage * message)
 
   if (message != NULL )
   {
-      first_message = g_new(MessageQueueItem,1);
-      first_message->orig = message;
-      first_message->next_message = NULL;
-      first_message->delete = 0;
-      first_message->message = mutt_new_header ();
-      balsa_create_msg (message,first_message->message,
-		            first_message->tempfile,0);
-      first_message->fcc = g_strdup(message->fcc_mailbox);
-      
-      message_number++;
+    first_message = msg_queue_item_new(message);
+    if(!balsa_create_msg (message,first_message->message,
+			  first_message->tempfile,0)) {
+      msg_queue_item_destroy(first_message);
+      return FALSE;
+    }
+    message_number++;
   }
   else
       first_message = NULL;
 
   current_message = first_message ;
   
-
-  /* We do messages in queu now only if where are not sending them already */
-
+  /* We do messages in queue now only if where are not sending them already */
 
 #ifdef BALSA_USE_THREADS
 
   pthread_mutex_lock( &send_messages_lock );
-  
   if (sending_mail == FALSE )
   {
-
 /* We create here the progress bar */
   	send_dialog = gnome_dialog_new("Sending Mail...", "Hide", NULL);
 
   	gnome_dialog_set_close(GNOME_DIALOG(send_dialog), TRUE);
-
   	send_dialog_source = gtk_label_new("Sending Mail....");
-
   	gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox), 
                          send_dialog_source, FALSE, FALSE, 0);
 
   	send_progress_message = gtk_label_new("");
-
   	gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox), 
                          send_progress_message, FALSE, FALSE, 0);
 
   	send_dialog_bar = gtk_progress_bar_new();
-
 	gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
                          send_dialog_bar, FALSE, FALSE, 0);
 							      
-
   	gtk_widget_show_all( send_dialog );
-
 /* Progress bar done */
 #endif
 
 	last_message = first_message;
 	libbalsa_mailbox_open (balsa_app.outbox, FALSE);
-	
 	lista = balsa_app.outbox->message_list;
 	
 	while (lista != NULL)
 	{
                 queu = LIBBALSA_MESSAGE(lista->data);
 
-                new_message = g_new(MessageQueueItem, 1);
-                new_message->message = mutt_new_header ();
-	        new_message->delete = 0;
-	 
-	        balsa_create_msg (queu,new_message->message,
-				      new_message->tempfile,1);
-
-	        new_message->fcc = g_strdup(queu->fcc_mailbox);
-	        new_message->orig = queu;
-	        new_message->next_message = NULL ;
-
-	        if(current_message)
-		      current_message->next_message = new_message ;
-	        else
-		      first_message = new_message;
-	 
-	        current_message = new_message;
-	        last_message = new_message;
-	 
+		new_message = msg_queue_item_new(queu);
+	        if(!balsa_create_msg (queu,new_message->message,
+				      new_message->tempfile,1)) 
+		  msg_queue_item_destroy(new_message);
+		else {
+		  if(current_message)
+		    current_message->next_message = new_message ;
+		  else
+		    first_message = new_message;
+		  
+		  current_message = new_message;
+		  last_message = new_message;
+		  message_number++;
+		}
 	        lista = lista->next ;  
-		message_number++;
 	 }
 	 
 	 libbalsa_mailbox_close (balsa_app.outbox);
@@ -272,8 +279,9 @@ balsa_send_message_real(MessageQueueItem *first_message)
   SendThreadMessage *threadmsg, *delete_message ;
 #endif
   MessageQueueItem *current_message, *next_message;
+  LibBalsaMailbox *save_box;
   int i;
-
+  
   if( !first_message ) {
 #ifdef BALSA_USE_THREADS
     sending_mail = FALSE;
@@ -287,146 +295,110 @@ balsa_send_message_real(MessageQueueItem *first_message)
   if (!balsa_app.smtp) 
   {	 
 #ifdef BALSA_USE_THREADS
-        pthread_mutex_lock( &send_messages_lock );
-        sending_mail = FALSE;
-        total_messages_left = 0;
-        pthread_mutex_unlock( &send_messages_lock );
+    pthread_mutex_lock( &send_messages_lock );
+    sending_mail = FALSE;
+    total_messages_left = 0;
+    pthread_mutex_unlock( &send_messages_lock );
 #endif
-		
-     i = mutt_invoke_sendmail (first_message->message->env->to, 
-		   first_message->message->env->cc, 
-		   first_message->message->env->bcc, first_message->tempfile,
-                   (first_message->message->content->encoding == ENC8BIT));
- 
-     if (i != 0 )
-     {
-            mutt_write_fcc (LIBBALSA_MAILBOX_LOCAL (balsa_app.outbox)->path, 
-			    first_message->message, NULL, 1, NULL);
-
-            if (balsa_app.outbox->open_ref > 0)
-            {
-	          libbalsa_mailbox_check_for_new_messages(balsa_app.outbox);
+    
+    i = mutt_invoke_sendmail (first_message->message->env->to, 
+			      first_message->message->env->cc, 
+			      first_message->message->env->bcc, 
+			      first_message->tempfile,
+			      (first_message->message->content->encoding == ENC8BIT));
+    
+    if (i != 0 ) 
+      save_box = balsa_app.outbox;
+    else
+      save_box = balsa_find_mbox_by_name(first_message->fcc);
+    
+    if(save_box && LIBBALSA_IS_MAILBOX_LOCAL(save_box) ) {
+      mutt_write_fcc (LIBBALSA_MAILBOX_LOCAL (save_box)->path, 
+		      first_message->message, NULL, 1, NULL);
+      
+      if (save_box->open_ref > 0) {
+	libbalsa_mailbox_check_for_new_messages(save_box);
 #ifdef BALSA_USE_THREADS
-	          MSGSENDTHREAD(threadmsg, MSGSENDTHREADLOAD, 
-				  "Load Sent/Outbox", NULL, 
-				  balsa_app.outbox,0 );
+	MSGSENDTHREAD(threadmsg, MSGSENDTHREADLOAD, 
+		      "Load Sent/Outbox", NULL, save_box, 0);
 #endif
-             }
-
-     }
-     else /*  return code i == 0 - success */
-     {	     
-     	if (first_message->fcc!=NULL) 
-	{
-	  LibBalsaMailbox *fcc_box = balsa_find_mbox_by_name(first_message->fcc);
-	  
-	  if ( LIBBALSA_IS_MAILBOX_LOCAL(fcc_box) )
-	  {
-            mutt_write_fcc (LIBBALSA_MAILBOX_LOCAL (fcc_box)->path, 
-			    first_message->message, NULL, 0, NULL);
-	    
-            if (fcc_box->open_ref > 0)
-	    {
-	      libbalsa_mailbox_check_for_new_messages( fcc_box );
+      }
+    }
+    msg_queue_item_destroy( first_message );
+    
 #ifdef BALSA_USE_THREADS
-	      MSGSENDTHREAD(threadmsg, MSGSENDTHREADLOAD, 
-			    "Load Sent/Outbox", NULL, fcc_box,0 );
+    MSGSENDTHREAD (threadmsg, MSGSENDTHREADFINISHED,"",NULL,NULL,0);
+    pthread_exit(0);
 #endif
-	    }
-	    
-	  }
-	}
-     }
-     
-     unlink (first_message->tempfile);
-     mutt_free_header (&first_message->message);
-     free( first_message );
-
-#ifdef BALSA_USE_THREADS
-       MSGSENDTHREAD (threadmsg, MSGSENDTHREADFINISHED,"",NULL,NULL,0);
-       pthread_exit(0);
-#endif
-     
-     return TRUE;
+    
+    return TRUE;
   }
-
+  
   /* The hell of SMTP only code follows below... */
   i = balsa_smtp_send (first_message,balsa_app.smtp_server);
   
 #ifdef BALSA_USE_THREADS
   if (i == -1)
   {
-      pthread_mutex_lock( &send_messages_lock );
-      sending_mail = FALSE;
-      total_messages_left = 0;
-      pthread_mutex_unlock( &send_messages_lock );
-      
-      MSGSENDTHREAD (threadmsg, MSGSENDTHREADFINISHED,"",NULL,NULL,0); 
+    pthread_mutex_lock( &send_messages_lock );
+    sending_mail = FALSE;
+    total_messages_left = 0;
+    pthread_mutex_unlock( &send_messages_lock );
+    
+    MSGSENDTHREAD (threadmsg, MSGSENDTHREADFINISHED,"",NULL,NULL,0); 
   }
 #endif
-
+  
   /* We give a message to the user because an error has ocurred in the protocol
    * A mistyped address? A server not allowing relay? We can pop a window to ask */
-       
+  
   if (i==-2)
-      fprintf(stderr,"SMTP protocol error (wrong address, relaying denied)\n");
-       
-  /*   return TRUE; */
-
-  /* We give back all the resources used and delete the messages send*/
-
+    fprintf(stderr,"SMTP protocol error (wrong address, relaying denied)\n");
+  
+  /* return TRUE; */
+  
+  /* We give back all the resources used and delete the sent messages */
+  
 #ifndef BALSA_USE_THREADS
   libbalsa_mailbox_open(balsa_app.outbox, FALSE);
 #endif
-    current_message = first_message;
-    
-    while (current_message != NULL)
+  current_message = first_message;
+  
+  while (current_message != NULL) {
+    if (current_message->delete == 1)
     {
-	
-	if (current_message->delete == 1)
-	{
-	  if ( current_message->fcc) {
-	    LibBalsaMailbox *fcc_box = balsa_find_mbox_by_name(
-	      current_message->fcc);
-	    if( LIBBALSA_IS_MAILBOX_LOCAL(fcc_box) )
-	      mutt_write_fcc (
-		LIBBALSA_MAILBOX_LOCAL (fcc_box)->path,
-		current_message->message, NULL, 0, NULL);
-	  }
+      save_box = balsa_find_mbox_by_name(current_message->fcc);
+      if( save_box && LIBBALSA_IS_MAILBOX_LOCAL(save_box) )
+	mutt_write_fcc (LIBBALSA_MAILBOX_LOCAL (save_box)->path,
+			current_message->message, NULL, 0, NULL);
+      
 #ifdef BALSA_USE_THREADS
-		 MSGSENDTHREAD(delete_message, MSGSENDTHREADDELETE," ",
-		                         current_message->orig, NULL, 0);
+      MSGSENDTHREAD(delete_message, MSGSENDTHREADDELETE," ",
+		    current_message->orig, NULL, 0);
 #else
-		 if(current_message->orig->mailbox)
-		     libbalsa_message_delete (current_message->orig);
+      if(current_message->orig->mailbox)
+	libbalsa_message_delete (current_message->orig);
 #endif
-	 }
-	 else
-         {
-		 if(current_message->orig->mailbox == NULL)
-	               mutt_write_fcc (
-			       LIBBALSA_MAILBOX_LOCAL (balsa_app.outbox)->path,
-			       current_message->message, NULL, 0, NULL);
-	 }
-	
-	unlink (current_message->tempfile); 
-        next_message = current_message->next_message;
-        mutt_free_header (&current_message->message);
-        g_free(current_message->fcc);
-
-	current_message = next_message;
+    } else {
+      if(current_message->orig->mailbox == NULL)
+	mutt_write_fcc (
+	  LIBBALSA_MAILBOX_LOCAL (balsa_app.outbox)->path,
+	  current_message->message, NULL, 0, NULL);
     }
     
+    next_message = current_message->next_message;
+    msg_queue_item_destroy(current_message);
+    current_message = next_message;
+  }
+  
 #ifdef BALSA_USE_THREADS
-    MSGSENDTHREAD(delete_message, MSGSENDTHREADDELETE, "LAST",
-                             NULL, NULL, 0);
-    
-    pthread_exit(0); 
-#else
+  MSGSENDTHREAD(delete_message, MSGSENDTHREADDELETE, "LAST",
+		NULL, NULL, 0);
   libbalsa_mailbox_close(balsa_app.outbox);
+  pthread_exit(0); 
 #endif
-
-   return TRUE;
+  
+  return TRUE;
 }
 
 static void
@@ -785,10 +757,10 @@ int balsa_smtp_send (MessageQueueItem *first_message, char *server)
     if ((he = gethostbyname (NONULL(balsa_app.smtp_server))) == NULL)
     {
 #ifdef BALSA_USE_THREADS
-     sprintf(error_msg,"Error: Could not find address for host %s.",server);
+     sprintf(error_msg, _("Could not find address for host %s."), server);
      MSGSENDTHREAD(error_message, MSGSENDTHREADERROR,error_msg,NULL,NULL,0); 
 #else
-     fprintf(stderr,"Error: Could not find address for host %s.\n", server);
+     balsa_warning(_("Error: Could not find address for host %s."), server);
 #endif
       return -1;
     }
@@ -938,15 +910,19 @@ balsa_create_msg (LibBalsaMessage *message, HEADER *msg, char *tmpfile, int queu
       newbdy = NULL;
 
       if (body->filename) {
-	newbdy = mutt_make_file_attach (body->filename);
+	if( (newbdy = mutt_make_file_attach (body->filename)) == NULL) 
+	  g_warning("Cannot attach file: %s.\nSending without it.", 
+			body->filename);
+	else {
 
-        /* Do this here because we don't want to use libmutt's mime
-         * types */
-        mime_type = balsa_lookup_mime_type ((const gchar*)body->filename);
-        newbdy->type = mutt_check_mime_type (mime_type[0]);
-        g_free (newbdy->subtype);
-        newbdy->subtype = g_strdup(mime_type[1]);
-        g_strfreev (mime_type);
+	  /* Do this here because we don't want to use libmutt's mime
+	   * types */
+	  mime_type = balsa_lookup_mime_type ((const gchar*)body->filename);
+	  newbdy->type = mutt_check_mime_type (mime_type[0]);
+	  g_free (newbdy->subtype);
+	  newbdy->subtype = g_strdup(mime_type[1]);
+	  g_strfreev (mime_type);
+	}
       }
 
       else if (body->buffer)

@@ -3,7 +3,7 @@
 %define rel      @BALSA_RELEASE@
 %define prefix   /usr
 
-%define config_opts --prefix=%{prefix} --sysconfdir=/etc --enable-threads --disable-system-install
+%define config_opts --prefix=%{prefix} --sysconfdir=/etc --enable-threads --disable-system-install --disable-more-warnings
 
 Summary:   Balsa Mail Client
 Name:      balsa
@@ -15,9 +15,9 @@ Source0:   balsa-%{PACKAGE_VERSION}.tar.gz
 Patch1:	   @srcdir@/rpm-po.patch
 URL:       http://www.balsa.net/
 BuildRoot: /tmp/balsa-%{PACKAGE_VERSION}-root
-Packager: Michael Fulbright <msf@redhat.com>
+Packager: Pawel Salek <pawsa@theochem.kth.se>
 Requires: gtk+ >= 1.2.0
-Requires: gnome-libs >= 1.0.0
+Requires: gnome-libs >= 1.2.0
 Provides: balsa
 Docdir: %{prefix}/doc
 
@@ -75,7 +75,11 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Thu Jun  1 2000 Peter Williams <oeter@newton.cx>
+* Tue Aug 15 2000 Pawel Salek <pawsa@theochem.kth.se>
+
+- added --disable-more-warning option - libmutt configure fails without it.
+
+* Thu Jun  1 2000 Peter Williams <peter@newton.cx>
 
 - Don't try to install IDL stuff as we have deleted it :-)
 

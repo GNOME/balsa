@@ -541,7 +541,6 @@ config_folder_init(const gchar * prefix)
 static gint
 config_global_load(void)
 {
-    gchar **open_mailbox_vector;
     gint open_mailbox_count;
 #if ENABLE_ESMTP
     gboolean def_used;
@@ -918,15 +917,14 @@ config_global_load(void)
     balsa_app.remember_open_mboxes =
 	gnome_config_get_bool("RememberOpenMailboxes=false");
     gnome_config_get_vector("OpenMailboxes", &open_mailbox_count,
-			    &open_mailbox_vector);
+			    &balsa_app.open_mailbox_vector);
     if (balsa_app.remember_open_mboxes && open_mailbox_count > 0
-        && **open_mailbox_vector) {
-	/* FIXME: Open the mailboxes.... */
+        && **balsa_app.open_mailbox_vector) {
 	printf("Opening %d mailboxes on startup.\n", open_mailbox_count);
-	gtk_idle_add((GtkFunction) open_mailboxes_idle_cb,
-		     open_mailbox_vector);
-    } else
-	g_strfreev(open_mailbox_vector);
+    } else {
+	g_strfreev(balsa_app.open_mailbox_vector);
+	balsa_app.open_mailbox_vector = NULL;
+    }
 
     balsa_app.empty_trash_on_exit =
 	gnome_config_get_bool("EmptyTrash=false");

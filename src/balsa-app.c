@@ -374,6 +374,9 @@ balsa_app_init(void)
     /* quote regex */
     balsa_app.quote_regex = g_strdup(DEFAULT_QUOTE_REGEX);
 
+    /* command line options */
+    balsa_app.open_mailbox_vector = NULL;
+
     /* font */
     balsa_app.message_font = NULL;
     balsa_app.subject_font = NULL;

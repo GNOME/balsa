@@ -301,9 +301,12 @@ extern struct BalsaApplication {
     gint open_inbox_upon_startup;
     gint check_mail_upon_startup;
     gint remember_open_mboxes;
+    gchar** open_mailbox_vector;
     gint open_unread_mailbox;
-    GList *open_mailbox_list;	/* data is a pointer to the mailbox */
 
+    /* list of currently open mailboxes */
+    GList *open_mailbox_list;  /* data is a pointer to the mailbox */
+    
     /* font used to display messages */
     gchar *message_font;
     gchar *subject_font;

@@ -1,3 +1,9 @@
+2003-01-10  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-app.[hc]: Add open_mailbox_vector.
+	* src/main.c: open mailboxes AFTER the folders are scanned.
+	* src/save-restore.c: do not attempt to open mailbes on config_load().
+
 2003-01-10  PeterB
 
 	* src/balsa-index.c (mailbox_messages_changed_status_cb):

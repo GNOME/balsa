@@ -312,6 +312,20 @@ scan_mailboxes_idle_cb()
                     append_subtree_f, NULL);
     balsa_mailbox_nodes_unlock(FALSE);
     gdk_threads_leave();
+
+    if (cmd_open_unread_mailbox || balsa_app.open_unread_mailbox)
+	gtk_idle_add((GtkFunction) initial_open_unread_mailboxes, NULL);
+
+    if (cmd_line_open_mailboxes) {
+	gchar **urls = g_strsplit(cmd_line_open_mailboxes, ";", 20);
+	gtk_idle_add((GtkFunction) open_mailboxes_idle_cb, urls);
+    }
+
+    if (balsa_app.open_mailbox_vector) {
+	gtk_idle_add((GtkFunction) open_mailboxes_idle_cb,
+		     balsa_app.open_mailbox_vector);
+	balsa_app.open_mailbox_vector = NULL;
+    }
     return FALSE; 
 }
 /* -------------------------- main --------------------------------- */
@@ -405,16 +419,9 @@ main(int argc, char *argv[])
     if (cmd_check_mail_on_startup || balsa_app.check_mail_upon_startup)
 	check_new_messages_cb(NULL, NULL);
 
-    if (cmd_open_unread_mailbox || balsa_app.open_unread_mailbox)
-	gtk_idle_add((GtkFunction) initial_open_unread_mailboxes, NULL);
-
     if (cmd_open_inbox || balsa_app.open_inbox_upon_startup)
 	gtk_idle_add((GtkFunction) initial_open_inbox, NULL);
 
-    if (cmd_line_open_mailboxes) {
-	gchar **urls = g_strsplit(cmd_line_open_mailboxes, ";", 20);
-	gtk_idle_add((GtkFunction) open_mailboxes_idle_cb, urls);
-    }
     signal( SIGPIPE, SIG_IGN );
     gtk_idle_add((GtkFunction) scan_mailboxes_idle_cb, NULL);
 

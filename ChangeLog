@@ -1,3 +1,7 @@
+2003-09-29 09:34  PeterB
+
+	* libbalsa/mailbox.c: Rewrite some of the tree-model code.
+
 2003-09-28  Carlos Morgado  <chbm gnome.org>
 
 	* libbalsa/mailbox_mh.c (libbalsa_mailbox_mh_add_message): 

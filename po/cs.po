@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-07-04 03:52+0200\n"
-"PO-Revision-Date: 2003-07-04 09:31+0200\n"
+"POT-Creation-Date: 2003-07-06 11:54+0200\n"
+"PO-Revision-Date: 2003-07-06 14:03+0200\n"
 "Last-Translator: Miloslav Trmac <mitr@volny.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -1498,7 +1498,7 @@ msgstr "Ruší se odběr %s..."
 msgid "Unable to fetch headers from this IMAP server version."
 msgstr "Nelze získat hlavičky zpráv z této verze IMAP serveru."
 
-#: libmutt/imap/message.c:89 src/balsa-message.c:2848
+#: libmutt/imap/message.c:89 src/balsa-message.c:2855
 #, c-format
 msgid "Could not create temporary file %s"
 msgstr "Nelze vytvořit dočasný soubor %s"
@@ -2425,7 +2425,7 @@ msgstr "Prohlédnout část pomocí %s"
 msgid "Calling URL %s..."
 msgstr "Volá se URL %s..."
 
-#: src/balsa-message.c:1988 src/balsa-message.c:2767 src/balsa-message.c:3388
+#: src/balsa-message.c:1988 src/balsa-message.c:2774 src/balsa-message.c:3395
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "Chyba při zobrazení %s: %s\n"
@@ -2478,21 +2478,26 @@ msgstr "zpráva rfc822"
 msgid "\"%s\" parts"
 msgstr "části \"%s\""
 
-#: src/balsa-message.c:2541
+#: src/balsa-message.c:2462
+#, c-format
+msgid "rfc822 message (from %s, subject \"%s\")"
+msgstr "zpráva rfc822 (od %s, předmět \"%s\")"
+
+#: src/balsa-message.c:2548
 #, c-format
 msgid "Open with %s"
 msgstr "Otevřít pomocí %s"
 
-#: src/balsa-message.c:2679
+#: src/balsa-message.c:2686
 msgid "Save..."
 msgstr "Uložit..."
 
-#: src/balsa-message.c:2893
+#: src/balsa-message.c:2900
 #, c-format
 msgid "could not create temporary file %s"
 msgstr "nelze vytvořit dočasný soubor %s"
 
-#: src/balsa-message.c:3633
+#: src/balsa-message.c:3640
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2503,7 +2508,7 @@ msgstr ""
 "zaslání oznámení o doručení zprávy (MDN) na adresu `%s'.\n"
 "Chcete poslat toto oznámení?"
 
-#: src/balsa-message.c:3640
+#: src/balsa-message.c:3647
 msgid "Reply to MDN?"
 msgstr "Odpovědět na MDN?"
 

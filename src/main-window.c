@@ -52,6 +52,8 @@ struct _MainWindow
 };
 
 static MainWindow *mw = NULL;
+static gint about_box_visible = FALSE;
+
 
 
 
@@ -76,6 +78,8 @@ static void delete_message_cb (GtkWidget * widget);
 static void undelete_message_cb (GtkWidget * widget);
 
 static void mailbox_select_cb (GtkWidget * widget, gpointer data);
+
+static void about_box_destroy_cb ();
 
 
 
@@ -293,39 +297,18 @@ create_menu ()
   gtk_menu_append (GTK_MENU (menu), w);
   gtk_widget_install_accelerator (w, accel, "activate", 'M', GDK_CONTROL_MASK);
 
-  gtk_signal_connect_object (GTK_OBJECT (w),
-			     "activate",
-			     (GtkSignalFunc) current_mailbox_check,
-			     NULL);
+  gtk_signal_connect (GTK_OBJECT (w),
+		      "activate",
+		      (GtkSignalFunc) current_mailbox_check,
+		      NULL);
 
   gtk_widget_show (w);
+
 
   menu_items[i++] = w;
   w = gtk_menu_item_new ();
   gtk_widget_show (w);
   gtk_menu_append (GTK_MENU (menu), w);
-
-
-
-#if 0
-   w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Save mailbox..."));
-   gtk_widget_show (w);
-   gtk_menu_append (GTK_MENU (menu), w);
-   menu_items[i++] = w;
-
-   w = gtk_menu_item_new ();
-   gtk_widget_show (w);
-   gtk_menu_append (GTK_MENU (menu), w);
-
-   w = gnome_stock_menu_item (GNOME_STOCK_MENU_PRINT, _ ("Print..."));
-   gtk_widget_show (w);
-   gtk_menu_append (GTK_MENU (menu), w);
-   menu_items[i++] = w;
-
-   w = gtk_menu_item_new ();
-   gtk_widget_show (w);
-   gtk_menu_append (GTK_MENU (menu), w);
-#endif
 
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_EXIT, _ ("Exit"));
@@ -354,10 +337,10 @@ create_menu ()
   gtk_widget_show (w);
   gtk_widget_install_accelerator (w, accel, "activate", 'N', GDK_CONTROL_MASK);
 
-  gtk_signal_connect_object (GTK_OBJECT (w),
-			     "activate",
-			     (GtkSignalFunc) new_message,
-			     NULL);
+  gtk_signal_connect (GTK_OBJECT (w),
+		      "activate",
+		      (GtkSignalFunc) new_message,
+		      NULL);
 
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
@@ -367,53 +350,25 @@ create_menu ()
   gtk_widget_show (w);
   gtk_widget_install_accelerator (w, accel, "activate", 'R', GDK_CONTROL_MASK);
 
-  gtk_signal_connect_object (GTK_OBJECT (w),
-			     "activate",
-			     (GtkSignalFunc) replyto_message,
-			     NULL);
+  gtk_signal_connect (GTK_OBJECT (w),
+		      "activate",
+		      (GtkSignalFunc) replyto_message,
+		      NULL);
 
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
-
-
-
-
-#if 0
-   w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Reply to All"));
-   gtk_widget_show (w);
-   gtk_menu_append (GTK_MENU (menu), w);
-   menu_items[i++] = w;
-#endif
-
-
 
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_FWD, _ ("Foward"));
   gtk_widget_show (w);
 
-  gtk_signal_connect_object (GTK_OBJECT (w),
-			     "activate",
-			     (GtkSignalFunc) forward_message,
-			     NULL);
+  gtk_signal_connect (GTK_OBJECT (w),
+		      "activate",
+		      (GtkSignalFunc) forward_message,
+		      NULL);
 
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
-
-
-
-
-#if 0
-   w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Redirect"));
-   gtk_widget_show (w);
-   gtk_menu_append (GTK_MENU (menu), w);
-   menu_items[i++] = w;
-
-   w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Send again"));
-   gtk_widget_show (w);
-   gtk_menu_append (GTK_MENU (menu), w);
-   menu_items[i++] = w;
-#endif
-
 
 
   w = gtk_menu_item_new ();
@@ -425,10 +380,10 @@ create_menu ()
 
   gtk_object_set_user_data (GTK_OBJECT (w), (gpointer) mw);
 
-  gtk_signal_connect_object (GTK_OBJECT (w),
-			     "activate",
-			     (GtkSignalFunc) delete_message_cb,
-			     NULL);
+  gtk_signal_connect (GTK_OBJECT (w),
+		      "activate",
+		      (GtkSignalFunc) delete_message_cb,
+		      NULL);
 
   gtk_widget_install_accelerator (w, accel, "activate", 'D', GDK_CONTROL_MASK);
   gtk_menu_append (GTK_MENU (menu), w);
@@ -441,10 +396,10 @@ create_menu ()
 
   gtk_object_set_user_data (GTK_OBJECT (w), (gpointer) mw);
 
-  gtk_signal_connect_object (GTK_OBJECT (w),
-			     "activate",
-			     (GtkSignalFunc) undelete_message_cb,
-			     NULL);
+  gtk_signal_connect (GTK_OBJECT (w),
+		      "activate",
+		      (GtkSignalFunc) undelete_message_cb,
+		      NULL);
 
   /* gtk_widget_install_accelerator (w, accel, "activate", 'D', GDK_CONTROL_MASK); */
   gtk_menu_append (GTK_MENU (menu), w);
@@ -498,10 +453,10 @@ create_menu ()
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_ABOUT, _ ("About"));
   gtk_widget_show (w);
 
-  gtk_signal_connect_object (GTK_OBJECT (w),
-			     "activate",
-			     (GtkSignalFunc) show_about_box,
-			     NULL);
+  gtk_signal_connect (GTK_OBJECT (w),
+		      "activate",
+		      (GtkSignalFunc) show_about_box,
+		      NULL);
 
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
@@ -582,26 +537,9 @@ create_toolbar ()
 			     NULL,
 			     gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_TRASH),
 			     (GtkSignalFunc) delete_message_cb,
-			     mw);
-
+			     NULL);
   gtk_object_set_user_data (GTK_OBJECT (toolbarbutton), (gpointer) mw);
-
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
-
-
-
-#if 0
-   toolbarbutton =
-   gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-   "UnDelete",
-   "UnDelete Message",
-   NULL,
-   gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_TRASH),
-   GTK_SIGNAL_FUNC (index_undelete_message),
-   mw);
-   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
-#endif
-
 
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
@@ -651,9 +589,7 @@ create_toolbar ()
 			     gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_BACK),
 			     (GtkSignalFunc) previous_message_cb,
 			     "Open Previous Message");
-  
   gtk_object_set_user_data (GTK_OBJECT (toolbarbutton), (gpointer) mw);
-
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
 
@@ -662,32 +598,11 @@ create_toolbar ()
 			     "Next",
 			     "Open Next Message",
 			     NULL,
-	     gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_FORWARD),
+			     gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_FORWARD),
 			     (GtkSignalFunc) next_message_cb,
 			     "Open Next Message");
-
   gtk_object_set_user_data (GTK_OBJECT (toolbarbutton), (gpointer) mw);
-
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
-
-
-  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
-
-
-
-#if 0
-   toolbarbutton =
-   gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-   "Addresses",
-   "Address Book",
-   NULL,
-   new_icon (p14_xpm, window),
-   GTK_SIGNAL_FUNC (addressbook_window_new),
-   "Address Book");
-   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
-
-   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
-#endif
 }
 
 
@@ -706,12 +621,25 @@ show_about_box ()
     NULL
   };
 
+
+  /* only show one about box at a time */
+  if (about_box_visible)
+    return;
+  else
+    about_box_visible = TRUE;
+
+
   about = gnome_about_new ("Balsa",
 			   BALSA_VERSION,
 			   "Copyright (C) 1997-98",
 			   authors,
 			   "Balsa is a E-Mail Client",
 			   NULL);
+
+  gtk_signal_connect (GTK_OBJECT (about),
+		      "destroy",
+		      (GtkSignalFunc) about_box_destroy_cb,
+		      NULL);
 
   gtk_widget_show (about);
 }
@@ -765,7 +693,6 @@ previous_message_cb (GtkWidget * widget)
 static void
 delete_message_cb (GtkWidget * widget)
 {
-/*
   MainWindow *mainwindow;
 
   g_return_if_fail (widget != NULL);
@@ -773,15 +700,12 @@ delete_message_cb (GtkWidget * widget)
   mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
 
   balsa_index_delete_message (BALSA_INDEX (mainwindow->index));
-*/
-  balsa_index_delete_message(BALSA_INDEX(mw->index));
 }
 
 
 static void
 undelete_message_cb (GtkWidget * widget)
 {
-/*
   MainWindow *mainwindow;
 
   g_return_if_fail (widget != NULL);
@@ -789,8 +713,6 @@ undelete_message_cb (GtkWidget * widget)
   mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
 
   balsa_index_undelete_message (BALSA_INDEX (mainwindow->index));
-*/
-  balsa_index_undelete_message(BALSA_INDEX(mw->index));
 }
 
 
@@ -817,4 +739,11 @@ mailbox_select_cb (GtkWidget * widget, gpointer data)
       balsa_index_set_stream (BALSA_INDEX (mainwindow->index), mailbox->stream);
       balsa_app.current_index = mainwindow->index;
     }
+}
+
+
+static void
+about_box_destroy_cb ()
+{
+  about_box_visible = FALSE;
 }

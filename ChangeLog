@@ -1,3 +1,7 @@
+2002-12-28  Daniel Yacob  <yacob@geez.org>
+
+	* configure.in: Added Amharic (am) in ALL_LINGUAS.
+
 2003-01-28  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/print.c: fix Bug 104586

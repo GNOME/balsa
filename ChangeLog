@@ -1,3 +1,8 @@
+2004-10-17 15:37  PeterB
+
+	* src/balsa-index.c: unref the message when clearing/changing
+	index->current_message, and do not use weak refs.
+
 2004-10-16 08:55  PeterB
 
 	* src/: balsa-index.c, balsa-index.h: set

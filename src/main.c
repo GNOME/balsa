@@ -152,8 +152,7 @@ main (int argc, char *argv[])
   config_mailboxes_init ();
   mailboxes_init ();
 
-  gnome_sound_init ("localhost");
-  gnome_sound_play (gnome_sound_file ("balsa/startup.wav"));
+  gnome_triggers_do("", "program", "balsa", "startup", NULL);
 
   main_window_init ();
 

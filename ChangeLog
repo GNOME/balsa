@@ -1,3 +1,9 @@
+2002-04-04  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-message.c: resize GtkTextView widget after a timeout;
+	use gdk_threads_[enter/leave] in timeout handlers.
+	* src/save-restore.c: handle obsolete rgb: color specification.
+
 2002-04-03  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/balsa-message.c: color quoted lines; handle urls in

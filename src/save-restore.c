@@ -1467,7 +1467,10 @@ load_color(gchar * key, GdkColor * color)
     gchar *str;
 
     str = gnome_config_get_string(key);
-    gdk_color_parse(str, color);
+    if (g_ascii_strncasecmp(str, "rgb:", 4)
+        || sscanf(str + 4, "%4hx/%4hx/%4hx", &color->red, &color->green,
+                  &color->blue) != 3)
+        gdk_color_parse(str, color);
     g_free(str);
 }
 

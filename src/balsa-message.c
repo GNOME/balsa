@@ -1537,6 +1537,22 @@ handle_url(const message_url_t* url)
 
 /* END OF HELPER FUNCTIONS ----------------------------------------------- */
 
+static gboolean
+text_view_timeout(GtkWidget * widget)
+{
+    gboolean retval = TRUE;
+    
+    gdk_threads_enter();
+    if (!(GTK_TEXT_VIEW(widget)->first_validate_idle
+          || GTK_TEXT_VIEW(widget)->incremental_validate_idle)) {
+        gtk_widget_queue_resize(widget);
+        retval = FALSE;
+    }
+    gdk_threads_leave();
+
+    return retval;
+}
+
 static void
 part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 {
@@ -1697,6 +1713,10 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         info->focus_widget = item;
         info->widget = item;
         info->can_display = TRUE;
+        /* size allocation may not be correct, so we'll check back later
+         */
+        gtk_timeout_add(1000, (GtkFunction) text_view_timeout,
+                        item);
     }
     g_free(ptr);
 
@@ -2518,13 +2538,17 @@ balsa_message_key_press_event(GtkWidget * widget, GdkEventKey * event,
 static gboolean
 html_size_request_timeout(GtkWidget * widget)
 {
-    if (HTML_VIEW(widget)->relayout_idle_id
-        || HTML_VIEW(widget)->relayout_timeout_id) {
-        /* still pending */
-        return TRUE;
+    gboolean retval = TRUE;
+    
+    gdk_threads_enter();
+    if (!(HTML_VIEW(widget)->relayout_idle_id
+          || HTML_VIEW(widget)->relayout_timeout_id)) {
+        gtk_widget_queue_resize(widget);
+        retval = FALSE;
     }
-    gtk_widget_queue_resize(widget);
-    return FALSE;
+    gdk_threads_leave();
+
+    return retval;
 }
 
 static void

@@ -9,6 +9,8 @@
 	* src/balsa-index-page.c:allow for configurable address book file,
 	* src/pref-manager.c: configurable ab_location
 	* src/save-restore.c: saving and restoring address book settings.
+	* src/mailbox-conf.c(conf_update_mailbox): interpret correctly
+	check_for_blank_fields() return code.
 	
 2000-06-30  Pawel Salek  <pawsa@theochem.kth.se>
 
@@ -17,7 +19,7 @@
 
 2000-06-29  Pawel Salek  <pawsa@theochem.kth.se>
 
-	* src/balsa-app.c: don't free Spoolfile, dummy head!
+	* src/balsa-app.c: don't free Spoolfile.
 	
 2000-06-28  Pawel Salek  <pawsa@theochem.kth.se>
 

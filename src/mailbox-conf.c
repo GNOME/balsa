@@ -520,7 +520,7 @@ conf_update_mailbox (Mailbox * mailbox, gchar * old_mbox_pkey)
 
   field_check = check_for_blank_fields(mcw->the_page);
   
-  if(field_check != 0) return field_check;
+  if(field_check != 1) return field_check;
   
   switch (mailbox->type)
     {
@@ -537,7 +537,6 @@ conf_update_mailbox (Mailbox * mailbox, gchar * old_mbox_pkey)
 	mailbox->name = g_strdup (gtk_entry_get_text (
 	    GTK_ENTRY (mcw->local_mailbox_name)));
 	MAILBOX_LOCAL (mailbox)->path = g_strdup (filename);
-
 	config_mailbox_update (mailbox, old_mbox_pkey);
       }
       break;

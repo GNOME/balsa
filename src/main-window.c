@@ -1,5 +1,5 @@
 /* Balsa E-Mail Client
- * Copyright (C) 1997-98 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1997-99 Jay Painter and Stuart Parmenter
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -90,6 +90,11 @@ static GnomeUIInfo file_menu[] =
  GNOME_APP_UI_ITEM, N_ ("_Get new mail"), NULL, check_new_messages_cb, NULL,
     NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_MAIL_RCV, 'M', GDK_CONTROL_MASK, NULL
   },
+
+  GNOMEUIINFO_SEPARATOR,
+
+  GNOMEUIINFO_ITEM_STOCK ("_Preferences...", NULL, open_preferences_manager, GNOME_STOCK_MENU_PROP),
+
   GNOMEUIINFO_SEPARATOR,
 
   GNOMEUIINFO_MENU_EXIT_ITEM(close_main_window, NULL), 
@@ -150,7 +155,7 @@ static GnomeUIInfo mailbox_menu[] =
 static GnomeUIInfo settings_menu[] =
 {
   GNOMEUIINFO_ITEM_STOCK ("_Filters...", NULL, filter_dlg_cb, GNOME_STOCK_MENU_PROP),
-  GNOMEUIINFO_ITEM_STOCK ("_Preferences...", NULL, open_preferences_manager, GNOME_STOCK_MENU_PROP),
+
   GNOMEUIINFO_END
 };
 static GnomeUIInfo help_menu[] =
@@ -259,6 +264,9 @@ main_window_init (void)
   /* we are forcing notebook mode. */
   gnome_mdi_set_mode (mdi, GNOME_MDI_NOTEBOOK);
   gnome_mdi_open_toplevel (mdi);
+
+  gnome_app_install_menu_hints(mdi->active_window,
+		       gnome_mdi_get_menubar_info(mdi->active_window));
 }
 
 static gint
@@ -313,6 +321,7 @@ app_created (GnomeMDI * mdi, GnomeApp * app)
   gtk_object_set_data (GTK_OBJECT (app), PROCESSBAR_KEY, pbar);
 
   refresh_main_window ();
+
 }
 
 /*
@@ -371,7 +380,7 @@ show_about_box (void)
   logo = gnome_unconditional_pixmap_file ("balsa/balsa_logo.png");
   about = gnome_about_new ("Balsa",
 			   BALSA_VERSION,
-			   "Copyright (C) 1997-98",
+			   "Copyright (C) 1997-99",
 			   authors,
 			   _ ("The Balsa email client is part of the GNOME desktop environment.  Information on Balsa can be found at http://www.balsa.net/\n\nIf you need to report bugs, please do so at: http://www.gnome.org/cgi-bin/bugs"),
 			   logo);
@@ -637,10 +646,6 @@ set_icon (GnomeApp * app)
   gdk_imlib_free_pixmap (pmap);
   gdk_imlib_destroy_image (im);
 }
-
-
-
-
 
 
 

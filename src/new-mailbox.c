@@ -35,14 +35,20 @@ struct _NewMailboxWindow
 static GList *open_mailbox_list = NULL;
 
 
-/* notebook pages */
 
+
+/* notebook pages */
+static GtkWidget * create_first_page (NewMailboxWindow * nmw);
+static GtkWidget * create_second_page ();
 
 
 /* callbacks */
 static void destroy_new_mailbox (GtkWidget * widget);
 static void close_new_mailbox (GtkWidget * widget);
 static void refresh_new_mailbox (NewMailboxWindow * nmw);
+
+static void back_cb (GtkWidget * widget);
+static void forward_cb (GtkWidget * widget);
 
 
 
@@ -97,10 +103,21 @@ open_new_mailbox (Mailbox * mailbox)
 
   /* notbook for action area of dialog */
   nmw->notebook = gtk_notebook_new ();
+  gtk_container_border_width (GTK_CONTAINER (nmw->notebook), 5);
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG (nmw->window)->vbox), nmw->notebook, TRUE, TRUE, 0);
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (nmw->notebook), FALSE);
   gtk_notebook_set_show_border ( GTK_NOTEBOOK(nmw->notebook), FALSE);
   gtk_widget_show (nmw->notebook);
+
+
+  /* notebook pages */
+  gtk_notebook_append_page (GTK_NOTEBOOK (nmw->notebook),
+			    create_first_page (nmw),
+			    NULL);
+
+  gtk_notebook_append_page (GTK_NOTEBOOK (nmw->notebook),
+			    create_second_page (nmw),
+			    NULL);
 
 
 
@@ -108,15 +125,41 @@ open_new_mailbox (Mailbox * mailbox)
   bbox = gtk_hbutton_box_new ();
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG (nmw->window)->action_area), bbox, TRUE, TRUE, 0);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (bbox), GTK_BUTTONBOX_END);
-  gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox),
-				 BALSA_BUTTON_WIDTH,
-				 BALSA_BUTTON_HEIGHT);
+  gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox), BALSA_BUTTON_WIDTH, BALSA_BUTTON_HEIGHT);
   gtk_widget_show (bbox);
 
 
-  button = gnome_stock_button (GNOME_STOCK_BUTTON_CLOSE);
+  /* back button */
+  button = gtk_button_new_with_label ("Back");
+  gtk_container_add (GTK_CONTAINER (bbox), button);
+  set_new_mailbox_data (GTK_OBJECT (button), nmw);
+
+  gtk_signal_connect (GTK_OBJECT (button),
+		      "clicked",
+		      (GtkSignalFunc) back_cb,
+		      NULL);
+
+  gtk_widget_show (button);
+
+
+  /* forward button */
+  button = gtk_button_new_with_label ("Forward");
   gtk_container_add (GTK_CONTAINER (bbox), button);
 
+  set_new_mailbox_data (GTK_OBJECT (button), nmw);
+
+  gtk_signal_connect (GTK_OBJECT (button),
+		      "clicked",
+		      (GtkSignalFunc) forward_cb,
+		      NULL);
+
+  gtk_widget_show (button);
+
+
+  /* close button */
+  button = gnome_stock_button (GNOME_STOCK_BUTTON_CLOSE); 
+  gtk_container_add (GTK_CONTAINER (bbox), button);
+  
   set_new_mailbox_data (GTK_OBJECT (button), nmw);
 
   gtk_signal_connect (GTK_OBJECT (button),
@@ -176,6 +219,138 @@ refresh_new_mailbox (NewMailboxWindow * nmw)
 
   /* cleanup */
   g_string_free (str, TRUE);
+}
+
+
+
+/*
+ * create notebook pages
+ */
+static GtkWidget *
+create_first_page (NewMailboxWindow * nmw)
+{
+  GtkWidget *vbox;
+  GtkWidget *table;
+  GtkWidget *label;
+  GtkWidget *button;
+  GtkWidget *optionmenu;
+
+
+  table = gtk_table_new (5, 2, FALSE);
+  gtk_widget_show (table);
+
+
+  /* your name */
+  label = gtk_label_new ("Mailbox Type");
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
+		    GTK_FILL, GTK_FILL,
+		    10, 10);
+  gtk_widget_show (label);
+
+
+  optionmenu = gtk_option_menu_new ();
+  gtk_widget_set_usize (optionmenu, 0, BALSA_BUTTON_HEIGHT);
+  gtk_table_attach (GTK_TABLE (table), optionmenu, 1, 2, 0, 1,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL,
+		    0, 10);
+  gtk_widget_show (optionmenu);
+
+
+  return table;
+}
+
+
+
+static GtkWidget *
+create_second_page (NewMailboxWindow * nmw)
+{
+  GtkWidget *vbox;
+  GtkWidget *hbox;
+  GtkWidget *table;
+  GtkWidget *entry;
+  GtkWidget *label;
+
+
+
+  table = gtk_table_new (3, 2, FALSE);
+  gtk_widget_show (table);
+
+
+
+  /* POP server name */
+  label = gtk_label_new ("POP3 server:");
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (label);
+
+
+  entry = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), entry, 1, 2, 0, 1,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (entry);
+
+
+  /* username on POP3 server */
+  label = gtk_label_new ("Username:");
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (label);
+
+
+  entry = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), entry, 1, 2, 1, 2,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (entry);
+
+
+  /* password on POP3 server */
+  label = gtk_label_new ("Password:");
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 2, 3,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (label);
+
+
+  entry = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), entry, 1, 2, 2, 3,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (entry);
+
+
+
+  return table;
+}
+
+
+/*
+ * callbacks
+ */
+static void
+back_cb (GtkWidget * widget)
+{
+  NewMailboxWindow *nmw = get_new_mailbox_data (GTK_OBJECT (widget));
+  gtk_notebook_prev_page (GTK_NOTEBOOK (nmw->notebook));
+}
+
+
+
+static void
+forward_cb (GtkWidget * widget)
+{
+  NewMailboxWindow *nmw = get_new_mailbox_data (GTK_OBJECT (widget));
+  gtk_notebook_next_page (GTK_NOTEBOOK (nmw->notebook));
 }
 
 

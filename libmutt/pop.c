@@ -82,7 +82,9 @@ void mutt_fetchPopMail (void)
   struct hostent *he;
   char buffer[2048];
   char msgbuf[SHORT_STRING];
-  int s, i, msgs, bytes, err = 0;
+  char uid[80], last_uid[80];
+  int s, i, msgs, bytes, tmp, err = 0;
+  int first_msg;
   CONTEXT ctx;
   MESSAGE *msg = NULL;
 
@@ -192,11 +194,61 @@ void mutt_fetchPopMail (void)
   if (mx_open_mailbox (NONULL(Spoolfile), M_APPEND, &ctx) == NULL)
     goto finish;
 
+ first_msg = 1;
+
+
+/*  
+ *  If Messages are left on the server, be sure that we don't retrieve
+ *  them a second time.  Do this by checking Unique IDs backward from the
+ *  last message, until a previously downloaded message is found.
+ *    -- David (dsp@rci.rutgers.edu)
+ */
+ 
+ if ( !option (OPTPOPDELETE) )
+ {
+
+  for( i = msgs; i > 0 ; i--) 
+  {
+  	snprintf( buffer, sizeof(buffer), "uidl %d\r\n", i);
+  	write( s, buffer, strlen(buffer) );
+
+  	getLine (s, buffer, sizeof (buffer));
+  	
+  	if (strncmp (buffer, "+OK", 3) != 0)
+  	{
+  		mutt_remove_trailing_ws( buffer);
+  		mutt_error (buffer);
+  		goto finish; // I'm following the convention of libmutt, not my coding style
+  	}
+  	sscanf( buffer, "+OK %d %s", &tmp, uid );
+
+	if( i == msgs )  
+	{
+	   strcpy( last_uid, uid ); // save uid of the last message for exit
+	   if( PopUID[0] == 0 )
+	   	  break;  // no previous UID set
+	 }
+
+    if( *PopUID && strcmp( uid, PopUID ) == 0 )  
+	{
+	  /* 
+	   * this message seen, so start w/ next in queue 			*
+	   * This will be larger than 'msgs' if no new messages     *
+	   * forcing the for loop below to skip retrieving messages *
+	   */
+	    
+      first_msg = i + 1; 
+      break;
+    }
+
+   }
+  } 
+    	 
   snprintf (msgbuf, sizeof (msgbuf),
-	    "Reading %d new message%s (%d bytes)...", msgs, msgs > 1 ? "s" : "", bytes);
+	    "Reading %d new message%s (%d bytes)...", msgs - first_msg, msgs > 1 ? "s" : "", bytes);
   mutt_message (msgbuf);
 
-  for (i = 1 ; i <= msgs ; i++)
+  for (i = first_msg ; i <= msgs ; i++)
   {
     snprintf (buffer, sizeof(buffer), "retr %d\r\n", i);
     write (s, buffer, strlen (buffer));
@@ -308,6 +360,7 @@ finish:
   write (s, "quit\r\n", 6);
   getLine (s, buffer, sizeof (buffer)); /* snarf the response */
   close (s);
+  strcpy( PopUID, last_uid );
   return;
 
   /* not reached */

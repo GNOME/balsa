@@ -203,6 +203,7 @@ check_all_pop3_hosts (Mailbox * to, GList *mailboxes)
 {
   GList *list;
   Mailbox *mailbox;
+  char uid[80];
 
   list = g_list_first (mailboxes);
 
@@ -221,6 +222,13 @@ check_all_pop3_hosts (Mailbox * to, GList *mailboxes)
 	  PopPass = g_strdup (MAILBOX_POP3 (mailbox)->passwd);
 	  PopUser = g_strdup (MAILBOX_POP3 (mailbox)->user);
 
+	  if( MAILBOX_POP3 (mailbox)->last_popped_uid == NULL)
+	    uid[0] = 0;
+	  else
+	    strcpy( uid, MAILBOX_POP3 (mailbox)->last_popped_uid );
+
+	  PopUID  = uid;
+
 	  /* Delete it if necessary */
 	  if (MAILBOX_POP3 (mailbox)->delete_from_server)
 	    {
@@ -235,6 +243,14 @@ check_all_pop3_hosts (Mailbox * to, GList *mailboxes)
 	  g_free (PopHost);
 	  g_free (PopPass);
 	  g_free (PopUser);
+
+	  if( strcmp( MAILBOX_POP3 (mailbox)->last_popped_uid, uid ) != 0 )
+	  {
+	      g_free ( MAILBOX_POP3 (mailbox)->last_popped_uid );
+		  MAILBOX_POP3 (mailbox)->last_popped_uid = g_strdup ( uid );
+		  config_mailbox_update( mailbox, MAILBOX_POP3 (mailbox)->mailbox.name );
+	  }
+
 	}
       list = list->next;
     }
@@ -315,6 +331,7 @@ mailbox_new (MailboxType type)
       MAILBOX_POP3 (mailbox)->server = NULL;
       MAILBOX_POP3 (mailbox)->check = FALSE;
       MAILBOX_POP3 (mailbox)->delete_from_server = FALSE;
+	  MAILBOX_POP3 (mailbox)->last_popped_uid = NULL;
       break;
 
     case MAILBOX_IMAP:
@@ -370,6 +387,7 @@ mailbox_free (Mailbox * mailbox)
       g_free (MAILBOX_POP3 (mailbox)->user);
       g_free (MAILBOX_POP3 (mailbox)->passwd);
       g_free (MAILBOX_POP3 (mailbox)->server);
+	  g_free (MAILBOX_POP3 (mailbox)->last_popped_uid);
       break;
 
     case MAILBOX_IMAP:

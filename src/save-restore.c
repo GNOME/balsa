@@ -224,6 +224,8 @@ config_mailbox_add (Mailbox * mailbox, char *key_arg)
 	pl_dict_add_str_str (mbox_dict, "Delete", tmp);
       }
 
+	  pl_dict_add_str_str (mbox_dict, "LastUID", MAILBOX_POP3 (mailbox)->last_popped_uid);
+	  
       break;
 
     case MAILBOX_IMAP:
@@ -505,6 +507,13 @@ config_mailbox_init (proplist_t mbox, gchar * key)
 	MAILBOX_POP3 (mailbox)->delete_from_server = FALSE;
       else
 	MAILBOX_POP3 (mailbox)->delete_from_server = atol (field);
+
+	  if ((field = pl_dict_get_str (mbox, "LastUID")) == NULL)
+	MAILBOX_POP3 (mailbox)->last_popped_uid = NULL;
+      else
+	MAILBOX_POP3 (mailbox)->last_popped_uid = g_strdup (field);
+
+
 
       balsa_app.inbox_input =
 	g_list_append (balsa_app.inbox_input, mailbox);

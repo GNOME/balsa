@@ -158,6 +158,7 @@ struct _MailboxPOP3
     gchar *server;
     gboolean check;
     gboolean delete_from_server;
+    gchar *last_popped_uid;
   };
 
 

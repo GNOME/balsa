@@ -1,3 +1,9 @@
+2004-12-06 13:04  PeterB
+
+	* libbalsa/: address.c, address.h, message.c: implement and use
+	libbalsa_address_new_list_from_gmime(); do not ignore RFC 2822
+	group addresses.
+
 2004-12-04 08:39  PeterB
 
 	* src/: balsa-index.c, balsa-index.h, message-window.c: remove

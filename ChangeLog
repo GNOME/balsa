@@ -1,5 +1,8 @@
 1999-12-17  Peter Williams  <peter@wgwill.ne.mediaone.net>
 
+	* libinit_balsa/balsa-druid-page-user.gob: Changed default
+	  local mail directory to ~/mail, not ~/balsa.
+
 	* src/balsa-index-page.c (transfer_messages_cb): Prevent
 	  transferring a message to its own folder, which was a
 	  coredump.

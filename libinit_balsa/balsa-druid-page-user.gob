@@ -89,7 +89,7 @@ class Balsa:Druid:Page:User from Balsa:Druid:Page {
 		preset = "localhost";
 		balsa_init_add_table_entry( table, 2, _("SMTP Server:"), preset, &( self->ed2 ), GTK_WIDGET( self ), &( self->smtp ) );
 
-		preset = g_strconcat( g_get_home_dir(), "/balsa", NULL );
+		preset = g_strconcat( g_get_home_dir(), "/mail", NULL );
 		balsa_init_add_table_entry( table, 3, _("Local Mail Directory:"), preset, &( self->ed3 ), GTK_WIDGET( self ), &( self->localmaildir ) );
 		g_free( preset );
 

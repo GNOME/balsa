@@ -26,3 +26,6 @@
 #undef SENDMAIL
 #undef USE_POP
 #undef USE_IMAP
+
+/* Shall we multithread? */
+#undef BALSA_USE_THREADS

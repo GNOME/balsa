@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <libgnome/libgnome.h>
-#include <libgnomeui/gnome-app.h>
+#include <libgnomeui/libgnomeui.h>
 
 #include "misc.h"
 #include "libbalsa.h"
@@ -36,6 +36,10 @@
 
 
 #if GTK_CHECK_VERSION(2, 4, 0)
+# define USE_GTK_ACTION TRUE
+#endif
+
+#if USE_GTK_ACTION
 static void close_cb(GtkAction * action, gpointer data);
 static void copy_cb(GtkAction * action, gpointer data);
 static void select_all_cb(GtkAction * action, gpointer data);
@@ -45,9 +49,9 @@ static void close_cb(GtkWidget* w, gpointer data);
 static void copy_cb(GtkWidget * w, gpointer data);
 static void select_all_cb(GtkWidget* w, gpointer data);
 static void lsv_escape_cb(GtkWidget * widget, gpointer data);
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
+#endif /* USE_GTK_ACTION */
 
-#if GTK_CHECK_VERSION(2, 4, 0)
+#if USE_GTK_ACTION
 /* Normal items */
 static GtkActionEntry entries[] = {
     /* Top level */
@@ -120,15 +124,15 @@ static GnomeUIInfo main_menu[] = {
     GNOMEUIINFO_MENU_VIEW_TREE(view_menu),
     GNOMEUIINFO_END
 };
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
+#endif /* USE_GTK_ACTION */
 
 
 static void 
-#if GTK_CHECK_VERSION(2, 4, 0)
+#if USE_GTK_ACTION
 select_all_cb(GtkAction * action, gpointer data)
 #else
 select_all_cb(GtkWidget * w, gpointer data)
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
+#endif /* USE_GTK_ACTION */
 {
     GtkTextView *text = g_object_get_data(G_OBJECT(data), "text");
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(text);
@@ -140,11 +144,11 @@ select_all_cb(GtkWidget * w, gpointer data)
 }
 
 static void
-#if GTK_CHECK_VERSION(2, 4, 0)
+#if USE_GTK_ACTION
 copy_cb(GtkAction * action, gpointer data)
 #else
 copy_cb(GtkWidget * w, gpointer data)
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
+#endif /* USE_GTK_ACTION */
 {
     GtkTextView *text = g_object_get_data(G_OBJECT(data), "text");
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(text);
@@ -154,11 +158,11 @@ copy_cb(GtkWidget * w, gpointer data)
 }
 
 static void
-#if GTK_CHECK_VERSION(2, 4, 0)
+#if USE_GTK_ACTION
 close_cb(GtkAction * action, gpointer data)
 #else
 close_cb(GtkWidget* w, gpointer data)
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
+#endif /* USE_GTK_ACTION */
 {
     gtk_widget_destroy(GTK_WIDGET(data));
 }
@@ -199,11 +203,11 @@ lsv_show_message(const char *message, LibBalsaSourceViewerInfo * lsvi,
 }
 
 static void
-#if GTK_CHECK_VERSION(2, 4, 0)
+#if USE_GTK_ACTION
 lsv_escape_cb(GtkAction * action, gpointer data)
 #else
 lsv_escape_cb(GtkWidget * widget, gpointer data)
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
+#endif /* USE_GTK_ACTION */
 {
     LibBalsaSourceViewerInfo *lsvi =
         g_object_get_data(G_OBJECT(data), "lsvi");
@@ -226,12 +230,12 @@ lsv_escape_cb(GtkWidget * widget, gpointer data)
     g_mime_stream_write(mem_stream, "", 1); /* close string */
     raw_message = GMIME_STREAM_MEM(mem_stream)->buffer->data;
 
-#if GTK_CHECK_VERSION(2, 4, 0)
+#if USE_GTK_ACTION
     *(lsvi->escape_specials) =
 	gtk_toggle_action_get_active(GTK_TOGGLE_ACTION(action));
 #else
     *(lsvi->escape_specials) = GTK_CHECK_MENU_ITEM(widget)->active;
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
+#endif /* USE_GTK_ACTION */
     lsv_show_message(raw_message, lsvi, *(lsvi->escape_specials));
 
     g_mime_stream_unref(msg_stream);
@@ -249,6 +253,7 @@ lsv_window_destroy_notify(LibBalsaSourceViewerInfo * lsvi)
    pops up a window containing the source of the message msg.
 */
 
+#if USE_GTK_ACTION
 static void
 lbsv_app_set_menus(GnomeApp * app, GtkAction ** action)
 {
@@ -293,6 +298,7 @@ lbsv_app_set_menus(GnomeApp * app, GtkAction ** action)
     *action =
         gtk_ui_manager_get_action(ui_manager, "/MainMenu/ViewMenu/Escape");
 }
+#endif /* USE_GTK_ACTION */
 
 void
 libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
@@ -302,9 +308,9 @@ libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
     PangoFontDescription *desc;
     GtkWidget *interior;
     GtkWidget *window;
-#if GTK_CHECK_VERSION(2, 4, 0)
+#if USE_GTK_ACTION
     GtkAction *escape_action = NULL;
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
+#endif /* USE_GTK_ACTION */
     LibBalsaSourceViewerInfo *lsvi;
 
     g_return_if_fail(msg);
@@ -331,11 +337,11 @@ libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
 
     window = gnome_app_new("balsa", _("Message Source"));
     g_object_set_data(G_OBJECT(window), "text", text);
-#if GTK_CHECK_VERSION(2, 4, 0)
+#if USE_GTK_ACTION
     lbsv_app_set_menus(GNOME_APP(window), &escape_action);
 #else
     gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, window);
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
+#endif /* USE_GTK_ACTION */
     gtk_window_set_wmclass(GTK_WINDOW(window), "message-source", "Balsa");
     gtk_window_set_default_size(GTK_WINDOW(window), 500, 400);
     gnome_app_set_contents(GNOME_APP(window), interior);
@@ -350,7 +356,7 @@ libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
                            (GDestroyNotify) lsv_window_destroy_notify);
 
     gtk_widget_show_all(window);
-#if GTK_CHECK_VERSION(2, 4, 0)
+#if USE_GTK_ACTION
     if (*escape_specials)
         gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(escape_action),
                                      TRUE);
@@ -363,7 +369,7 @@ libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
                                         widget), *escape_specials);
     else
         lsv_escape_cb(view_menu[MENU_VIEW_ESCAPE_POS].widget, window);
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
+#endif /* USE_GTK_ACTION */
 }
 
 

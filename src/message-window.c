@@ -69,6 +69,10 @@ static void next_flagged_cb(GtkWidget * widget, gpointer);
 static void print_cb(GtkWidget * widget, gpointer);
 static void trash_cb(GtkWidget * widget, gpointer);
 
+static void message_window_move_message (MessageWindow * mw,
+					 LibBalsaMailbox * mailbox);
+static void reset_show_all_headers(MessageWindow *mw);
+
 static GnomeUIInfo shown_hdrs_menu[] = {
     GNOMEUIINFO_RADIOITEM(N_("N_o Headers"), NULL,
 			  show_no_headers_cb, NULL),
@@ -187,13 +191,18 @@ struct _MessageWindow {
     guint idle_handler_id;
 };
 
-void reset_show_all_headers(MessageWindow *mw);
-
 static void
 mru_menu_cb(gchar * url, gpointer data)
 {
     LibBalsaMailbox *mailbox = balsa_find_mailbox_by_url(url);
     MessageWindow *mw = data;
+
+    message_window_move_message(mw, mailbox);
+}
+
+static void
+message_window_move_message(MessageWindow * mw, LibBalsaMailbox * mailbox)
+{
     GList *list;
     BalsaIndex* bindex;
 
@@ -682,12 +691,8 @@ static void print_cb(GtkWidget * widget, gpointer data)
 static void trash_cb(GtkWidget * widget, gpointer data)
 {
     MessageWindow *mw = (MessageWindow *) (data);
-    LibBalsaMailbox *mailbox = mw->message->mailbox;
 
-    balsa_message_move_to_trash(widget,
-                                balsa_find_index_by_mailbox(mailbox));
-
-    gtk_widget_destroy(mw->window);
+    message_window_move_message(mw, balsa_app.trash);
 }
 
 static void
@@ -709,7 +714,8 @@ show_all_headers_tool_cb(GtkWidget * widget, gpointer data)
     }
 }
 
-void reset_show_all_headers(MessageWindow *mw)
+static void
+reset_show_all_headers(MessageWindow *mw)
 {
     GtkWidget *toolbar =
         balsa_toolbar_get_from_gnome_app(GNOME_APP(mw->window));

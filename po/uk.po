@@ -372,29 +372,28 @@ msgstr ""
 #: libbalsa/message.c:423
 #, c-format
 msgid "Source mailbox (%s) is readonly. Cannot move message"
-msgstr ""
+msgstr "Вих╕дна скринька (%s) лише для зчитування. Неможливо зд╕йснити перенесення пов╕домлення."
 
 #: libbalsa/message.c:443
 #, c-format
 msgid "Source mailbox (%s) is readonly. Cannot move messages"
-msgstr ""
+msgstr "Вих╕дна скринька (%s) лише для зчитування. Неможливо зд╕йснити перенесення пов╕домлень."
 
 #: libbalsa/message.c:472
-#, fuzzy, c-format
+#, c-format
 msgid "Couldn't open destination mailbox (%s) for copying"
-msgstr "Неможливо в╕дкрити поштову скриньку для накопичення"
+msgstr "Не вдалося в╕дкрити скриньку призначення (%s) для коп╕ювання"
 
 #: libbalsa/message.c:530
-#, fuzzy, c-format
+#, c-format
 msgid "Couldn't open destination mailbox (%s) for writing"
-msgstr "Неможливо в╕дкрити поштову скриньку для накопичення"
+msgstr "Не вдалося в╕дкрити скриньку призначення (%s) для запису"
 
 #: libbalsa/pop3.c:55
 msgid "connection error"
 msgstr "помилка з'╓днання"
 
 #: libbalsa/pop3.c:56
-#, fuzzy
 msgid "POP command execution failed"
 msgstr "Зб╕й виконання команди POP"
 
@@ -456,9 +455,8 @@ msgid ""
 msgstr ""
 
 #: libbalsa/send.c:807
-#, fuzzy
 msgid "Connected to MTA"
-msgstr "З'╓днання з %s"
+msgstr "Встановлено з'╓днання з MTA"
 
 #: libbalsa/send.c:814
 #, c-format
@@ -481,23 +479,22 @@ msgid "To %s: %d %s"
 msgstr "До %s: %d %s"
 
 #: libbalsa/send.c:852
-#, fuzzy, c-format
+#, c-format
 msgid "%d %s"
-msgstr "%s [%s]\n"
+msgstr "%d %s"
 
 #: libbalsa/send.c:865
 msgid "Disconnected"
-msgstr ""
+msgstr "З'╓днання роз╕рвано"
 
 #: libbalsa/send.c:1031
-#, fuzzy, c-format
+#, c-format
 msgid "SMTP server problem: %s"
-msgstr "Сервер SMTP:"
+msgstr "Проблема з сервером SMTP: %s"
 
 #: libbalsa/source-viewer.c:46 src/main-window.c:517
-#, fuzzy
 msgid "_Select Text"
-msgstr "Вибрати все"
+msgstr "Вибрати текст"
 
 #: libbalsa/source-viewer.c:47 src/main-window.c:518
 #, fuzzy
@@ -835,18 +832,16 @@ msgid "Create mailbox: "
 msgstr "Створити скриньку: "
 
 #: libmutt/imap/browse.c:313
-#, fuzzy
 msgid "Mailbox must have a name."
-msgstr "Поштова скринька не зм╕нилась."
+msgstr "Поштова скринька ма╓ мати назву."
 
 #: libmutt/imap/browse.c:326
 msgid "Mailbox created."
 msgstr "Поштову скриньку створено."
 
 #: libmutt/imap/command.c:289
-#, fuzzy
 msgid "Mailbox closed"
-msgstr "Кольори поштово╖ скриньки"
+msgstr "Поштову скриньку закрити"
 
 #. something is wrong because the server reported fewer messages
 #. * than we previously saw
@@ -869,9 +864,9 @@ msgid "Secure connection with TLS?"
 msgstr ""
 
 #: libmutt/imap/imap.c:400
-#, fuzzy, c-format
+#, c-format
 msgid "Connecting to %s ..."
-msgstr "З'╓днання з %s..."
+msgstr "Встановлення з'╓днання з %s..."
 
 #: libmutt/imap/imap.c:410
 msgid "Could not negotiate TLS connection"
@@ -883,9 +878,8 @@ msgid "Selecting %s..."
 msgstr "В╕дб╕р %s..."
 
 #: libmutt/imap/imap.c:677
-#, fuzzy
 msgid "Error opening mailbox"
-msgstr "Перев╕дкривання поштово╖ скриньки"
+msgstr "Помилка в╕дкривання поштово╖ скриньки"
 
 #. STATUS not supported
 #: libmutt/imap/imap.c:730
@@ -921,9 +915,8 @@ msgid "Expunging messages from server..."
 msgstr "Викреслювання пов╕домлень з сервера..."
 
 #: libmutt/imap/imap.c:1085
-#, fuzzy
 msgid "CLOSE failed"
-msgstr "Ре╓страц╕я не пройшла."
+msgstr "Зб╕й команди CLOSE"
 
 #: libmutt/imap/imap.c:1352
 #, c-format
@@ -1954,12 +1947,11 @@ msgstr "Преф╕кс"
 
 #: src/folder-conf.c:217
 msgid "Use SSL (IMAPS)"
-msgstr ""
+msgstr "Застосовувати SSL (IMAPS)"
 
 #: src/folder-conf.c:312
-#, fuzzy
 msgid "Select parent folder"
-msgstr "Вибер╕ть шрифт для використання"
+msgstr "Вибрати батьк╕вську теку"
 
 #: src/folder-conf.c:367
 #, c-format
@@ -2299,9 +2291,8 @@ msgid "Add a new IMAP folder"
 msgstr "Додати нову теку IMAP"
 
 #: src/main-window.c:288
-#, fuzzy
 msgid "Add new IMAP subfolder"
-msgstr "Додати нову теку IMAP"
+msgstr "Додати нову п╕дтеку IMAP"
 
 #: src/main-window.c:296
 msgid "_New"

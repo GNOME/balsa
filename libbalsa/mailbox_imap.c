@@ -1762,6 +1762,7 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
 	    struct part_data dt;
 	    GMimePart *prefilt;
 	    GMimeStream *gms;
+	    GMimePartEncodingType gmt;
 	    LibBalsaMailboxImap* mimap;
 	    ImapMessage *im;
 	    ImapResponse rc;
@@ -1782,10 +1783,12 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
 		
 	    prefilt = g_mime_part_new_with_type (dt.body->media_basic_name,
 						 dt.body->media_subtype);
+	    gmt = dt.body->encoding == IMBENC_OTHER ?
+		GMIME_PART_ENCODING_DEFAULT : dt.body->encoding;
 	    g_mime_part_set_pre_encoded_content ( prefilt,
 						  dt.block,
 						  dt.body->octets,
-						  (GMimePartEncodingType)dt.body->encoding );
+						  gmt );
 	    g_free(dt.block);
 	    
 	    libbalsa_assure_balsa_dir();

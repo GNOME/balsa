@@ -1,5 +1,5 @@
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1997-2000 Stuart Parmenter and others
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -147,6 +147,9 @@ extern struct BalsaApplication
   gint mw_width;
   gint mw_height;
   gint mblist_width;
+
+  /* file paths */
+  gchar * attach_dir;
   
   /* Column width settings */
   gint index_num_width;

@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1997-2000 Stuart Parmenter and others
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -253,12 +253,14 @@ save_part (BalsaPartInfo *info)
   gtk_box_pack_start (GTK_BOX (GNOME_DIALOG (save_dialog)->vbox), file_entry, 
 		      FALSE, FALSE, 10);
 
-  gnome_dialog_set_parent(GNOME_DIALOG(save_dialog), GTK_WINDOW(balsa_app.main_window));
+  gnome_dialog_set_parent(GNOME_DIALOG(save_dialog), 
+			  GTK_WINDOW(balsa_app.main_window));
   gtk_window_set_modal (GTK_WINDOW (save_dialog), TRUE);
   gtk_window_set_wmclass (GTK_WINDOW (save_dialog), "save", "Balsa");
 
-  gtk_widget_grab_focus(file_entry);
   gtk_widget_show_all(save_dialog);
+  gtk_widget_grab_focus(gnome_file_entry_gtk_entry(
+    GNOME_FILE_ENTRY(file_entry)));
   button = gnome_dialog_run(GNOME_DIALOG (save_dialog));
 
   /* button 0 == OK */

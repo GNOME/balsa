@@ -487,7 +487,10 @@ attach_dialog_ok (GtkWidget * widget, gpointer data)
   }
 
   gtk_widget_destroy (GTK_WIDGET (fs));
-  g_free(dir);
+  if(balsa_app.attach_dir) 
+    g_free(balsa_app.attach_dir);
+
+  balsa_app.attach_dir = dir; /* steal the reference to the string */
 
   /* FIXME: show attachment list */
 }
@@ -511,6 +514,9 @@ attach_clicked (GtkWidget * widget, gpointer data)
   fs = GTK_FILE_SELECTION (fsw);
   gtk_clist_set_selection_mode(GTK_CLIST(fs->file_list), 
 			       GTK_SELECTION_EXTENDED);
+  if(balsa_app.attach_dir)
+    gtk_file_selection_set_filename(fs, balsa_app.attach_dir);
+    
 
   gtk_signal_connect (GTK_OBJECT (fs->ok_button), "clicked",
 		      (GtkSignalFunc) attach_dialog_ok,

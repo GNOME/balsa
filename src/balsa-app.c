@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1997-2000 Stuart Parmenter and others
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -159,6 +159,9 @@ balsa_app_init (void)
   balsa_app.index_from_width = FROM_DEFAULT_WIDTH;
   balsa_app.index_subject_width = SUBJECT_DEFAULT_WIDTH;
   balsa_app.index_date_width = DATE_DEFAULT_WIDTH;
+
+  /* file paths */
+  balsa_app.attach_dir = NULL;
 
 /* Mailbox list column width (not fully implemented) */
   balsa_app.mblist_name_width = MBNAME_DEFAULT_WIDTH;

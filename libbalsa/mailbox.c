@@ -476,15 +476,23 @@ libbalsa_mailbox_open(LibBalsaMailbox * mailbox, GError **err)
         mailbox->open_ref++;
         retval = TRUE;
     } else {
+	LibBalsaMailboxState saved_state;
+
         mailbox->stamp++;
         if(mailbox->mindex) g_warning("mindex set - I leak memory");
         mailbox->mindex = g_ptr_array_new();
+
+	saved_state = mailbox->state;
+	mailbox->state = LB_MAILBOX_STATE_OPENING;
         retval =
             LIBBALSA_MAILBOX_GET_CLASS(mailbox)->open_mailbox(mailbox, err);
-        if(retval)
+        if(retval) {
             mailbox->open_ref++;
-        else
+	    mailbox->state = LB_MAILBOX_STATE_OPEN;
+	} else {
+	    mailbox->state = saved_state;
             libbalsa_mailbox_free_mindex(mailbox);
+	}
     }
 
     libbalsa_unlock_mailbox(mailbox);
@@ -524,6 +532,7 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox)
     libbalsa_lock_mailbox(mailbox);
 
     if (--mailbox->open_ref == 0) {
+	mailbox->state = LB_MAILBOX_STATE_CLOSING;
         LIBBALSA_MAILBOX_GET_CLASS(mailbox)->close_mailbox(mailbox);
         if(mailbox->msg_tree) {
             g_node_destroy(mailbox->msg_tree);
@@ -531,6 +540,7 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox)
         }
         libbalsa_mailbox_free_mindex(mailbox);
         mailbox->stamp++;
+	mailbox->state = LB_MAILBOX_STATE_CLOSED;
     }
 
     libbalsa_unlock_mailbox(mailbox);
@@ -1231,6 +1241,7 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
     GtkTreeIter iter;
     GtkTreePath *path;
     gboolean unlock;
+    LibBalsaMailboxState saved_state;
     GNode *child, *parent, *node;
 
     if (!mailbox->msg_tree)
@@ -1253,6 +1264,8 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
     /* First promote any children to the node's parent; we'll insert
      * them all before the current node, to keep the path calculation
      * simple. */
+    saved_state = mailbox->state;
+    mailbox->state = LB_MAILBOX_STATE_TREECLEANING;
     parent = node->parent;
     while ((child = node->children)) {
         /* No need to notify the tree-view about unlinking the child--it
@@ -1271,6 +1284,7 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
                           0, path, &iter);
         gtk_tree_path_next(path);
     }
+    mailbox->state = saved_state;
 
     /* Now it's safe to destroy the node. */
     g_node_destroy(node);
@@ -1803,11 +1817,14 @@ lbm_set_threading(LibBalsaMailbox * mailbox,
                   LibBalsaMailboxThreadingType thread_type)
 {
     gboolean unlock;
+    LibBalsaMailboxState saved_state;
 
     g_return_if_fail(MAILBOX_OPEN(mailbox)); /* or perhaps it's legal? */
 
     libbalsa_lock_mailbox(mailbox);
     unlock = lbm_threads_enter();
+    saved_state = mailbox->state;
+    mailbox->state = LB_MAILBOX_STATE_TREECLEANING;
 
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->set_threading(mailbox,
                                                        thread_type);
@@ -1821,6 +1838,7 @@ lbm_set_threading(LibBalsaMailbox * mailbox,
 
     g_signal_emit(G_OBJECT(mailbox), libbalsa_mailbox_signals[CHANGED], 0);
 
+    mailbox->state = saved_state;
     lbm_threads_leave(unlock);
     libbalsa_unlock_mailbox(mailbox);
 }

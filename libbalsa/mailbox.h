@@ -122,6 +122,13 @@ typedef enum {
     LB_FETCH_STRUCTURE      = 1<<1  /* prepare message structure */
 } LibBalsaFetchFlag;
 
+typedef enum {
+    LB_MAILBOX_STATE_CLOSED,
+    LB_MAILBOX_STATE_OPENING,
+    LB_MAILBOX_STATE_OPEN,
+    LB_MAILBOX_STATE_TREECLEANING,
+    LB_MAILBOX_STATE_CLOSING
+} LibBalsaMailboxState;
 
 /*
  * structures
@@ -188,6 +195,7 @@ struct _LibBalsaMailbox {
     GSList * filters;
 
     LibBalsaMailboxView *view;
+    LibBalsaMailboxState state;
 };
 
 /* Search iter */

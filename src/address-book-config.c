@@ -531,6 +531,5 @@ add_button_cb(GtkWidget * button, AddressBookConfig * abc)
 static void
 update_button_cb(GtkWidget * button, AddressBookConfig * abc)
 {
-    printf("Update buttn cb\n");
     handle_close(abc);
 }

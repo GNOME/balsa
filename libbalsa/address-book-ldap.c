@@ -36,7 +36,10 @@
 #include "information.h"
 
 /* FIXME: Configurable... */
-#define LDAP_CACHE_TIMEOUT 300	/* Seconds */
+static const int LDAP_CACHE_TIMEOUT=300;	/* Seconds */
+/* don't search when prefix has length shorter than LDAP_MIN_LEN */
+static const int LDAP_MIN_LEN=2;
+/* End of FIXME */
 
 static GtkObjectClass *parent_class = NULL;
 
@@ -53,15 +56,12 @@ libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab);
 static void
 libbalsa_address_book_ldap_close_connection(LibBalsaAddressBookLdap * ab);
 
-static void libbalsa_address_book_ldap_add_from_server(LibBalsaAddressBook *ab,
-						       LDAPMessage * e);
-
 static void libbalsa_address_book_ldap_save_config(LibBalsaAddressBook *ab,
 						   const gchar * prefix);
 static void libbalsa_address_book_ldap_load_config(LibBalsaAddressBook *ab,
 						   const gchar * prefix);
 
-static GList *libbalsa_address_book_vcard_alias_complete(LibBalsaAddressBook * ab,
+static GList *libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
 							 const gchar * prefix, 
 							 gchar ** new_prefix);
 
@@ -112,7 +112,7 @@ libbalsa_address_book_ldap_class_init(LibBalsaAddressBookLdapClass * klass)
 	libbalsa_address_book_ldap_load_config;
 
     address_book_class->alias_complete = 
-	libbalsa_address_book_vcard_alias_complete;
+	libbalsa_address_book_ldap_alias_complete;
 }
 
 static void
@@ -130,12 +130,12 @@ libbalsa_address_book_ldap_destroy(GtkObject * object)
 
     addr_ldap = LIBBALSA_ADDRESS_BOOK_LDAP(object);
 
+    libbalsa_address_book_ldap_close_connection(addr_ldap);
+
     g_free(addr_ldap->host);
     addr_ldap->host = NULL;
     g_free(addr_ldap->base_dn);
     addr_ldap->base_dn = NULL;
-
-    libbalsa_address_book_ldap_close_connection(addr_ldap);
 
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
 	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
@@ -155,7 +155,6 @@ libbalsa_address_book_ldap_new(const gchar * name, const gchar * host,
     ab->name = g_strdup(name);
     ldap->host = g_strdup(host);
     ldap->base_dn = g_strdup(base_dn);
-
     /* We open on demand... */
     ldap->directory = NULL;
     return ab;
@@ -210,9 +209,8 @@ libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab)
 
 
 /*
- * ldap_load_addresses ()
- *
- * Load addresses in the LDAP server into a GList.
+ * ldap_load:
+ * opens the connection only, if needed.
  *
  * Side effects:
  *   Spits out balsa_information() when it deems necessary.
@@ -221,15 +219,12 @@ static void
 libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab)
 {
     LibBalsaAddressBookLdap *ldap_ab;
-    LDAPMessage *result, *e;
-    int rc, num_entries = 0;
 
     g_list_foreach(ab->address_list, (GFunc) gtk_object_unref, NULL);
     g_list_free(ab->address_list);
     ab->address_list = NULL;
 
     ldap_ab = LIBBALSA_ADDRESS_BOOK_LDAP(ab);
-
     /*
      * Connect to the server.
      */
@@ -237,72 +232,40 @@ libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab)
 	if (!libbalsa_address_book_ldap_open_connection(ldap_ab))
 	    return;
     }
-
-    /*
-     * Attempt to search for e-mail addresses.  It returns success
-     * or failure, but not all the matches.
-     */
-    rc = ldap_search_s(ldap_ab->directory, ldap_ab->base_dn,
-		       LDAP_SCOPE_SUBTREE, "(mail=*)", NULL, 0, &result);
-    if (rc != LDAP_SUCCESS) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("Failed to do a search: %s"
-			       "Check that the base name is valid."),
-			     ldap_err2string(rc));
-	return;
-    }
-
-    /*
-     * Now loop over all the results, and spit out the output.
-     */
-    num_entries = 0;
-    e = ldap_first_entry(ldap_ab->directory, result);
-    while (e != NULL) {
-	libbalsa_address_book_ldap_add_from_server(ab, e);
-
-	e = ldap_next_entry(ldap_ab->directory, e);
-    }
-    ldap_msgfree(result);
-
 }
 
-/*
- * ldap_add_from_server ()
- *
- * Load addresses from the server.  It loads a single address in an
- * LDAPMessage.
- *
+/* libbalsa_address_book_ldap_get_address:
+ * loads a single address from connection specified by LDAPMessage.
  */
-static void
-libbalsa_address_book_ldap_add_from_server(LibBalsaAddressBook * ab,
-					   LDAPMessage * e)
+static LibBalsaAddress* 
+libbalsa_address_book_ldap_get_address(LibBalsaAddressBook * ab,
+				       LDAPMessage * e)
 {
     LibBalsaAddressBookLdap *ldap_ab;
     gchar *name = NULL, *email = NULL, *id = NULL;
     gchar *first = NULL, *last = NULL;
     LibBalsaAddress *address = NULL;
-    char *a;
+    char *attr;
     char **vals;
     BerElement *ber = NULL;
     int i;
 
     ldap_ab = LIBBALSA_ADDRESS_BOOK_LDAP(ab);
 
-    for (a = ldap_first_attribute(ldap_ab->directory, e, &ber);
-	 a != NULL; a = ldap_next_attribute(ldap_ab->directory, e, ber)) {
+    for (attr = ldap_first_attribute(ldap_ab->directory, e, &ber);
+	 attr != NULL; attr = ldap_next_attribute(ldap_ab->directory, e, ber)) {
 	/*
-	 * For each attribute, print the attribute name
-	 * and values.
+	 * For each attribute, get the attribute name and values.
 	 */
-	if ((vals = ldap_get_values(ldap_ab->directory, e, a)) != NULL) {
+	if ((vals = ldap_get_values(ldap_ab->directory, e, attr)) != NULL) {
 	    for (i = 0; vals[i] != NULL; i++) {
-		if ((g_strcasecmp(a, "sn") == 0) && (!last))
+		if ((g_strcasecmp(attr, "sn") == 0) && (!last))
 		    last = g_strdup(vals[i]);
-		if ((g_strcasecmp(a, "cn") == 0) && (!id))
+		if ((g_strcasecmp(attr, "cn") == 0) && (!id))
 		    id = g_strdup(vals[i]);
-		if ((g_strcasecmp(a, "givenname") == 0) && (!first))
+		if ((g_strcasecmp(attr, "givenname") == 0) && (!first))
 		    first = g_strdup(vals[i]);
-		if ((g_strcasecmp(a, "mail") == 0) && (!email))
+		if ((g_strcasecmp(attr, "mail") == 0) && (!email))
 		    email = g_strdup(vals[i]);
 	    }
 	    ldap_value_free(vals);
@@ -311,31 +274,19 @@ libbalsa_address_book_ldap_add_from_server(LibBalsaAddressBook * ab,
     /*
      * Record will have e-mail (searched)
      */
+    g_return_val_if_fail(email != NULL, NULL);
     name = create_name(first, last);
 
     address = libbalsa_address_new();
-
-    address->first_name = first;
-    address->last_name = last;
-    address->address_list = g_list_append(address->address_list, email);
-
-    if (id)
-	address->id = id;
-    else
-	address->id = g_strdup(_("No-Id"));
-
+    address->id = id ? id : g_strdup(_("No-Id"));
     if (name)
 	address->full_name = name;
     else if (id)
-	address->full_name = g_strdup(id);
-    else
-	address->full_name = g_strdup(_("No-Name"));
+	address->full_name = g_strdup(id ? id : _("No-Name"));
+    address->first_name = first;
+    address->last_name = last;
+    address->address_list = g_list_prepend(address->address_list, email);
 
-    ab->address_list = g_list_append(ab->address_list, address);
-
-    name = NULL;
-    id = NULL;
-    email = NULL;
     /*
      * Man page says: please free this when done.
      * If I do, I get segfault.
@@ -343,6 +294,7 @@ libbalsa_address_book_ldap_add_from_server(LibBalsaAddressBook * ab,
      * this later anyway (documentation for older version?)
      if (ber != NULL) ber_free (ber, 0);
      */
+    return address;
 }
 
 /*
@@ -378,7 +330,7 @@ libbalsa_address_book_ldap_save_config(LibBalsaAddressBook * ab,
     ldap = LIBBALSA_ADDRESS_BOOK_LDAP(ab);
 
     gnome_config_set_string("Host", ldap->host);
-    gnome_config_set_string("BaseDN", ldap->base_dn);
+    if(ldap->base_dn) gnome_config_set_string("BaseDN", ldap->base_dn);
 
     if (LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->save_config)
 	LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->save_config(ab, prefix);
@@ -396,17 +348,63 @@ libbalsa_address_book_ldap_load_config(LibBalsaAddressBook * ab,
 
     ldap->host = gnome_config_get_string("Host");
     ldap->base_dn = gnome_config_get_string("BaseDN");
+    if(ldap->base_dn && *ldap->base_dn == 0) { 
+	g_free(ldap->base_dn); ldap->base_dn = NULL; 
+    }
 
     if (LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->load_config)
 	LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->load_config(ab, prefix);
 }
 
-static GList *libbalsa_address_book_vcard_alias_complete(LibBalsaAddressBook * ab,
+static GList *libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
 							 const gchar * prefix, 
 							 gchar ** new_prefix)
 {
+    LibBalsaAddressBookLdap *ldap_ab;
+    LibBalsaAddress *addr;
+    GList *res = NULL;
+    gchar* filter;
+    int rc, num_entries;
+    LDAPMessage * e, *result;
+
     g_return_val_if_fail ( LIBBALSA_ADDRESS_BOOK_LDAP(ab), NULL);
-    g_warning(_("Alias completion not supported for LDAP - Yet!\n"));
-    return NULL;
+
+    ldap_ab = LIBBALSA_ADDRESS_BOOK_LDAP(ab);
+
+    if (!ab->expand_aliases || strlen(prefix)<LDAP_MIN_LEN) return NULL;
+    *new_prefix = NULL;
+    /*
+     * Attempt to search for e-mail addresses.  It returns success
+     * or failure, but not all the matches.
+     */
+    filter = g_strdup_printf("(&(mail=*)(cn=%s*))", prefix);
+    /* printf("filter:%s baseDN: %s\n", filter, ldap_ab->base_dn); */
+    rc = ldap_search_s(ldap_ab->directory, ldap_ab->base_dn,
+		       LDAP_SCOPE_SUBTREE, filter, NULL, 0, &result);
+    g_free(filter);
+    if (rc != LDAP_SUCCESS) {
+	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+			     _("Failed to do a search: %s"
+			       "Check that the base name is valid."),
+			     ldap_err2string(rc));
+	return NULL;
+    }
+
+    /*
+     * Now loop over all the results, and spit out the output.
+     */
+    num_entries = 0;
+    e = ldap_first_entry(ldap_ab->directory, result);
+    while (e != NULL) {
+	addr = libbalsa_address_book_ldap_get_address(ab, e);
+	if(!*new_prefix) *new_prefix = libbalsa_address_to_gchar(addr);
+	res = g_list_prepend(res, addr);
+
+	e = ldap_next_entry(ldap_ab->directory, e);
+    }
+    ldap_msgfree(result);
+
+    res = g_list_reverse(res);
+    return res;
 }
 #endif				/*LDAP_ENABLED */

@@ -1,3 +1,8 @@
+2004-04-21 12:38  PeterB
+
+	* libbalsa/pop3.c, src/balsa-mblist.c, src/main-window.c: use
+	ngettext--fix for bug #116604, except libmutt strings.
+
 2004-04-14  Pawel Salek
 
 	* libbalsa/html.c: change op order to make gtkhtml2 happy (139607).

@@ -53,6 +53,10 @@
 
 #include "libinit_balsa/init_balsa.h"
 
+#include "Balsa.h"
+#include "balsa-bonobo.h"
+#include <bonobo-activation/bonobo-activation.h>
+
 #ifdef HAVE_GPGME
 #include <gpgme.h>
 #endif
@@ -109,16 +113,24 @@ balsa_handle_automation_options() {
    CORBA_Object factory;
    CORBA_Environment ev;
 
-   /* we only bonobo handle compose */
-   g_return_if_fail( opt_compose_email != NULL );
+   factory = bonobo_activation_activate_from_id 
+       ("OAFIID:GNOME_Balsa_Factory",
+	Bonobo_ACTIVATION_FLAG_EXISTING_ONLY,
+	NULL, &ev);
 
+   if (factory) {
+       /* there already is a server. good */
+       
+       /* we only do compose for the time being */
+       if (opt_compose_email != NULL) {
+	   
+       }
 
-   factory = bonobo_activation_activate_from_id ("OAFIID:GNOME_Balsa_Factory",
-						  Bonobo_ACTIVATION_FLAG_EXISTING_ONLY,
-						  NULL, &ev);
-   g_return_if_fail (factory != NULL);
+       exit(0);
+   }
    
-   /* there already is a server. good */
+      
+   balsa_composer_new ();
 
 #endif   
 }
@@ -174,7 +186,10 @@ balsa_init(int argc, char **argv)
 		       GNOME_PARAM_HUMAN_READABLE_NAME, _("The Balsa E-Mail Client"),
                        NULL);
 
+
+
     balsa_handle_automation_options();  
+    
 }
 
 /* check_special_mailboxes: 

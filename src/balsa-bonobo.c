@@ -20,16 +20,18 @@
  */
 
 
-
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-                                                                                
+
 #include <bonobo/bonobo-generic-factory.h>
 #include <bonobo/bonobo-main.h>
 #include <bonobo/bonobo-context.h>
+#include <bonobo/bonobo-object.h>
 
-#include <Balsa.h>
+#include "Balsa.h"
+#include "balsa-bonobo.h"
+
 
 static void balsa_composer_class_init (BalsaComposerClass *klass);
 static void balsa_composer_init (BalsaComposer *a);
@@ -41,53 +43,49 @@ static void impl_balsa_composer_sendMessage (PortableServer_Servant _servant,
 					     const CORBA_char *cc,
 					     const CORBA_char *subject, 
 					     const GNOME_Balsa_Composer_attachs *attachments,
-					     const CORBA_boolean nogui
+					     const CORBA_boolean nogui,
 					     CORBA_Environment * ev);
  
 static BonoboObject *
 balsa_composer_factory (BonoboGenericFactory *this_factory,
-                           const char *iid,
-                           gpointer user_data)
+			const char *iid,
+			gpointer user_data)
 {
-        BalsaComposer *a;
+    BalsaComposer *a;
          
-        a  = g_object_new (BALSA_COMPOSER_TYPE, NULL);
+    a  = g_object_new (BALSA_COMPOSER_TYPE, NULL);
  
-        return BONOBO_OBJECT (a);
+    return BONOBO_OBJECT (a);
 }
-                                                                                
+
 BonoboObject *
-balsa_composer_new ()
-{
-        BonoboGenericFactory *factory;
-        char                 *display_name;
-        char                 *registration_id;
-
-	registration_id = 
-	  bonobo_activation_make_registration_id ( "OAFIID:GNOME_Balsa_Factory",
-						   "0");
-
-        factory = bonobo_generic_factory_new (registration_id,
-                                              balsa_composer_factory,
-                                              NULL);
-
-        g_free (registration_id);
-                                                                                
-        return BONOBO_OBJECT (factory);
+balsa_composer_new () {
+    BonoboGenericFactory *factory;
+    char                 *registration_id;
+    
+    registration_id =  bonobo_activation_make_registration_id 
+	( "OAFIID:GNOME_Balsa_Composer",
+	  "0");
+    
+    factory = bonobo_generic_factory_new (registration_id,
+					  balsa_composer_factory,
+					  NULL);
+    
+    g_free (registration_id);
+    return BONOBO_OBJECT (factory);
 }
-                                                                                
-                                                                                
+
 static void
 balsa_composer_class_init (BalsaComposerClass *klass)
 {
-        GObjectClass *object_class = (GObjectClass *) klass;
-        POA_GNOME_Balsa_Composer__epv *epv = &klass->epv;
+    GObjectClass *object_class = (GObjectClass *) klass;
+    POA_GNOME_Balsa_Composer__epv *epv = &klass->epv;
         
-        balsa_composer_parent_class = g_type_class_peek_parent (klass);
-	object_class->finalize = balsa_composer_object_finalize;
+    balsa_composer_parent_class = g_type_class_peek_parent (klass);
+    object_class->finalize = balsa_composer_object_finalize;
  
-        /* connect implementation callbacks */
-	epv->sendMessage = impl_balsa_composer_sendMessage;
+    /* connect implementation callbacks */
+    epv->sendMessage = impl_balsa_composer_sendMessage;
 }
  
 static void
@@ -98,25 +96,27 @@ balsa_composer_init (BalsaComposer *c)
 GtkType
 balsa_composer_get_type (void)
 {
-        static GtkType type = 0;
+    static GType type = 0;
 
-        if (!type) {
-                GtkTypeInfo info = {
-                        "Foo",
-                        sizeof (BalsaComposer),
-                        sizeof (BalsaComposerClass),
-                        (GtkClassInitFunc) balsa_composer_class_init,
-                        NULL, NULL, NULL, NULL
-                };
+    if (!type) {
+	static const GTypeInfo info = {
+	    sizeof (BalsaComposerClass),
+	    NULL,
+	    NULL,
+	    (GClassInitFunc) balsa_composer_class_init,
+	    NULL,
+	    NULL,
+	    sizeof (BalsaComposer),
+	    0,
+	    (GInstanceInitFunc) balsa_composer_init,
+	};
 
-                type = bonobo_x_type_unique (
-                        BONOBO_X_OBJECT_TYPE,
-                        POA_GNOME_Balsa_Composer__init, NULL,
-                        GTK_STRUCT_OFFSET (BalsaComposerClass, epv),
-                        &info);
-        }
+	type = g_type_register_static (G_TYPE_OBJECT,
+				       "BalsaComposer",
+				       &info, 0);
 
-        return type;
+
+    return type;
 }
 
 
@@ -127,7 +127,7 @@ impl_balsa_composer_sendMessage (PortableServer_Servant _servant,
 				 const CORBA_char *cc,
 				 const CORBA_char *subject, 
 				 const GNOME_Balsa_Composer_attachs *attachments,
-				 const CORBA_boolean nogui
+				 const CORBA_boolean nogui,
 				 CORBA_Environment * ev)
 {
 }
@@ -137,13 +137,12 @@ impl_balsa_composer_sendMessage (PortableServer_Servant _servant,
 static void
 balsa_composer_object_finalize (GObject *object)
 {
-        BalsaComposer *a = BALSA_COMPOSER (object);
+    BalsaComposer *a = BALSA_COMPOSER (object);
  
-        balsa_composer_parent_class->finalize (G_OBJECT (a));
+    balsa_composer_parent_class->finalize (G_OBJECT (a));
 }
  
-BONOBO_TYPE_FUNC_FULL (
-        BalsaComposer,
-        GNOME_Balsa_Composer,
-        BONOBO_TYPE_OBJECT,
-        balsa_composer);
+BONOBO_TYPE_FUNC_FULL ( BalsaComposer,
+			GNOME_Balsa_Composer,
+			BONOBO_TYPE_OBJECT,
+			balsa_composer );

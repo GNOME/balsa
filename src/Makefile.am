@@ -61,7 +61,8 @@ balsa_BASE_SRCLIST =	\
 
 
 IDL_FILE = Balsa.idl
-balsa_IDL_SRCLIST = Balsa-common.c Balsa-skels.c Balsa-stubs.c Balsa.h
+balsa_IDL_SRCLIST = Balsa-common.c Balsa-skels.c Balsa-stubs.c Balsa.h \
+			balsa-bonobo.c balsa-bonobo.h
 
 $(balsa_IDL_SRCLIST): $(IDL_FILE) $(ORBIT_IDL)
 	$(ORBIT_IDL) -I $(LIBBONOBO_IDL) -I $(BONOBO_ACTIVATION_IDL) $(IDL_FILE)

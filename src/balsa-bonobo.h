@@ -22,22 +22,26 @@
 
 
 #ifndef __BALSA_BONOBO_H
-#define __BALSA_BONBO_H
- 
+#define __BALSA_BONOBO_H
+
+#include "Balsa.h" 
 #include <bonobo/bonobo-control.h>
 #include <bonobo/bonobo-object.h>
-#include <Balsa.h>
  
 G_BEGIN_DECLS
  
 #define BALSA_COMPOSER_TYPE         (balsa_composer_get_type ())
-#define BALSA_COMPOSER(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o),
-BALSA_COMPOSER_TYPE, BalsaComposerServer))
-#define BALSA_COMPOSER_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), BALSA_COMPOSER_TYPE, BalsaComposerServerClass))
-#define BALSA_COMPOSER_IS_OBJECT(o) (G_TYPE_CHECK_INSTANCE_TYPE ((o),
-BALSA_COMPOSER_TYPE))
-#define BALSA_COMPOSER_IS_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), BALSA_COMPOSER_TYPE))
-#define BALSA_COMPOSER_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), BALSA_COMPOSER_TYPE, BalsaComposerServerClass))
+#define BALSA_COMPOSER(o)           \
+    (G_TYPE_CHECK_INSTANCE_CAST ((o), BALSA_COMPOSER_TYPE, BalsaComposer))
+#define BALSA_COMPOSER_CLASS(k)     \
+    (G_TYPE_CHECK_CLASS_CAST((k), BALSA_COMPOSER_TYPE, BalsaComposerClass))
+#define BALSA_COMPOSER_IS_OBJECT(o) \
+    (G_TYPE_CHECK_INSTANCE_TYPE ((o), BALSA_COMPOSER_TYPE))
+#define BALSA_COMPOSER_IS_CLASS(k)  \
+    (G_TYPE_CHECK_CLASS_TYPE ((k), BALSA_COMPOSER_TYPE))
+#define BALSA_COMPOSER_GET_CLASS(o) \
+    (G_TYPE_INSTANCE_GET_CLASS ((o), BALSA_COMPOSER_TYPE, BalsaComposerClass))
+
  
 typedef struct
 {
@@ -52,7 +56,6 @@ typedef struct
 } BalsaComposerClass;
  
 GType          balsa_composer_get_type (void);
- 
 BonoboObject  *balsa_composer_new      ();
  
 G_END_DECLS

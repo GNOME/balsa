@@ -851,9 +851,11 @@ static int libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
     char *tmp;
     int fd;
     GMimeStream *out_stream;
+    GMimeStream *tmp_stream;
+    GMimeStream *in_stream;
+    GMimeFilter *crlffilter;
     char *new_filename;
     struct message_info *msg_info;
-    GMimeStream *in_stream;
     gint retval;
 
     /* open tempfile */
@@ -862,24 +864,34 @@ static int libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
     if (fd == -1)
 	return -1;
     out_stream = g_mime_stream_fs_new(fd);
-    {
-	GMimeStream *tmp = libbalsa_mailbox_get_message_stream( message->mailbox, message );
-	GMimeFilter *crlffilter = 
-	    g_mime_filter_crlf_new (  GMIME_FILTER_CRLF_DECODE,
-				      GMIME_FILTER_CRLF_MODE_CRLF_ONLY );
-	in_stream = g_mime_stream_filter_new_with_stream (tmp);
-	g_mime_stream_filter_add ( GMIME_STREAM_FILTER (in_stream), crlffilter );
-	g_object_unref (crlffilter);
-	g_mime_stream_unref (tmp);
-    }    
+
+    tmp_stream =
+        libbalsa_mailbox_get_message_stream(message->mailbox, message);
+    if (!tmp_stream) {
+        g_object_unref(out_stream);
+        unlink(tmp);
+        g_free(tmp);
+        return -1;
+    }
+    in_stream = g_mime_stream_filter_new_with_stream(tmp_stream);
+    g_object_unref(tmp_stream);
+
+    crlffilter =
+        g_mime_filter_crlf_new(GMIME_FILTER_CRLF_DECODE,
+                               GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+    g_mime_stream_filter_add(GMIME_STREAM_FILTER(in_stream), crlffilter);
+    g_object_unref(crlffilter);
+ 
     if (g_mime_stream_write_to_stream( in_stream, out_stream) == -1)
     {
-	g_mime_stream_unref(out_stream);
+	g_object_unref(in_stream);
+	g_object_unref(out_stream);
 	unlink (tmp);
 	g_free(tmp);
 	return -1;
     }
-    g_mime_stream_unref(out_stream);
+    g_object_unref(in_stream);
+    g_object_unref(out_stream);
 
     new_filename = strrchr(tmp, '/');
     if (new_filename)

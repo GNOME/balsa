@@ -15,6 +15,7 @@ libbalsa/filter.c
 libbalsa/folder-scanners.c
 libbalsa/gmime-gpgme-context.c
 libbalsa/identity.c
+libbalsa/imap-server.c
 libbalsa/libbalsa.c
 libbalsa/libbalsa_private.h
 libbalsa/mailbox.c
@@ -26,6 +27,7 @@ libbalsa/mailbox_mh.c
 libbalsa/mailbox_pop3.c
 libbalsa/message.c
 libbalsa/mime.c
+libbalsa/misc.c
 libbalsa/rfc3156.c
 libbalsa/send.c
 libbalsa/source-viewer.c
@@ -65,4 +67,3 @@ src/spell-check.c
 src/store-address.c
 src/toolbar-factory.c
 src/toolbar-prefs.c
-libbalsa/misc.c

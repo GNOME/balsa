@@ -1,3 +1,2 @@
-#keep it sorted alphabetically.
-# orbit not yet used.
-src/orbit-glue.c
+# List of source files that should NOT be translated.
+# Please keep this list in alphabetical order.

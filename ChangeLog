@@ -1,3 +1,7 @@
+2004-11-30 19:57  PeterB
+
+	* libbalsa/misc.c: for a GtkTreeView, expand-all before select-all.
+
 2004-11-28 16:55  PeterB
 
 	* src/sendmsg-window.c: drag'n'drop now passes the BalsaIndex of

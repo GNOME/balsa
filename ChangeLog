@@ -1,3 +1,17 @@
+2000-04-03  Peter Williams  <peter@beta.newton.cx>
+
+	* src/main-window.c (wrap_message_cb): Fixed
+	  cast to GTK_WIDGET to be after test for NULL
+	  to silence GTK+ warning on startup.
+
+	* libbalsa/misc.c (find_word): Fixed really
+	  nasty-looking logic and a bug where the 'to'
+	  field wouldn't show up in the compose window
+	  as a default.
+
+	* src/balsa-app.c (cantfind_notice): Made Balsa
+	  gracefully handle a missing 'special mailbox'
+
 2000-03-30  Matthew Guenther <mguenther@netcom.ca>
 	* src/main-window.c: changed reply to all to use reply_to_all.xpm, 
 	and reply_to_all_menu.xpm, pointer casting bug.

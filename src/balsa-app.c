@@ -41,8 +41,8 @@ struct BalsaApplication balsa_app;
 
 
 /* prototypes */
-static void special_mailboxes (void);
-
+static gboolean check_special_mailboxes (void);
+static void cantfind_notice( const gchar *name );
 
 static void
 error_exit_cb (GtkWidget * widget, gpointer data)
@@ -175,7 +175,8 @@ balsa_app_init (void)
 gint
 do_load_mailboxes (void)
 {
-  special_mailboxes ();
+	if( check_special_mailboxes () )
+		return FALSE;
 
   /* load_local_mailboxes does not work well without trash */
   if (!balsa_app.trash) 
@@ -208,9 +209,49 @@ do_load_mailboxes (void)
   return TRUE;
 }
 
-static void
-special_mailboxes (void)
+static void cantfind_notice( const gchar *name )
 {
+	gchar *msg;
+	GtkWidget *dialog;
+
+	msg = g_strdup_printf( _("Balsa cannot open your \"%s\" mailbox."), name );
+
+	dialog = gnome_error_dialog( msg );
+	gnome_dialog_run( GNOME_DIALOG( dialog ) );
+	g_free( msg );
+}
+
+static gboolean
+check_special_mailboxes (void)
+{
+	gboolean bomb = FALSE;
+
+	if( balsa_app.inbox == NULL ) {
+		cantfind_notice( _("Inbox") );
+		bomb = TRUE;
+	}
+
+	if( balsa_app.outbox == NULL ) {
+		cantfind_notice( _("Outbox") );
+		bomb = TRUE;
+	} 
+
+	if( balsa_app.sentbox == NULL ) {
+		cantfind_notice( _("Sentbox") );
+		bomb = TRUE;
+	}
+
+	if( balsa_app.draftbox == NULL ) {
+		cantfind_notice( _("Draftbox") );
+		bomb = TRUE;
+	}
+
+	if( balsa_app.trash == NULL ) {
+		cantfind_notice( _("Trash") );
+		bomb = TRUE;
+	}
+
+	return bomb;
 }
 
 void 

@@ -1390,11 +1390,11 @@ static void
 wrap_message_cb (GtkWidget * widget, gpointer data) 
 {
    GtkWidget *index;
-
+   
    balsa_app.browse_wrap = GTK_CHECK_MENU_ITEM(widget)->active;
 
    /* redisplay current message? */
-   index = GTK_WIDGET (balsa_window_find_current_index(BALSA_WINDOW (data)));
+   index = balsa_window_find_current_index(BALSA_WINDOW (data));
    if(index) 
       balsa_index_redraw_current ( BALSA_INDEX(index) );
 }

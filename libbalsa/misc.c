@@ -160,13 +160,26 @@ readfile (FILE * fp, char **buf)
 */
 gboolean
 find_word(const gchar * word, const gchar* str) {
-   char* ptr;
-   int len = strlen(word);
+	char *hit;
+	int len = strlen( word );
 
-   if( (ptr=strstr(str, word)) != NULL) {
-      return ( ptr==str || isspace((unsigned char)*(ptr-1)) ) && 
-	 ( isspace((unsigned char)*(ptr+len)) || *(ptr+len)=='\0' );
-   } return FALSE;
+	/* Look for a hit. */
+	hit = strstr( str, word );
+
+	/* Nope */
+	if( hit == NULL )
+		return FALSE;
+
+	/* Check for false in-the-middle-of-a-word hits -- before beginning. */
+	if( hit != str && ( ! isspace( *(hit - 1) ) ) )
+		return FALSE;
+
+	/* After end */
+	if( *(hit + len) != '\0' && ( ! isspace( *(hit + len) ) ) )
+		return FALSE;
+
+	/* Seems ok */
+	return TRUE;
 }
 
 /* wrap_string

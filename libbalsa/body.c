@@ -209,8 +209,10 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body,
 	mutt_mktemp(tmp_file_name);
 	libbalsa_unlock_mutt();
 
-	if (body->filename)
-	    dotpos = strchr(body->filename, '.');
+	if (body->filename) {
+	    gchar *seppos = strrchr(body->filename, G_DIR_SEPARATOR);
+	    dotpos = strchr(seppos ? seppos : body->filename, '.');
+	}
 	if (dotpos)
 	    body->temp_filename = g_strdup_printf("%s%s", tmp_file_name, dotpos);
 	else

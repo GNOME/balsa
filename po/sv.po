@@ -10,8 +10,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2001-11-27 14:56+0100\n"
-"PO-Revision-Date: 2001-11-27 14:56+0100\n"
+"POT-Creation-Date: 2001-12-02 13:14+0100\n"
+"PO-Revision-Date: 2001-12-02 13:15+0100\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -40,48 +40,48 @@ msgstr ""
 msgid "Failed to do a search: %s.Check that the base name is valid."
 msgstr "Misslyckades med att söka: %s.Kontrollera att basnamnet är giltigt."
 
-#: libbalsa/address-book-ldap.c:379 libbalsa/address-book-ldif.c:272
-#: libbalsa/address-book-vcard.c:274
+#: libbalsa/address-book-ldap.c:379 libbalsa/address-book-ldif.c:267
+#: libbalsa/address-book-vcard.c:262
 msgid "No-Id"
 msgstr "Inget-Id"
 
-#: libbalsa/address-book-ldap.c:383 libbalsa/address-book-ldif.c:275
-#: libbalsa/address-book-ldif.c:550 libbalsa/address-book-ldif.c:554
-#: libbalsa/address-book-vcard.c:283
+#: libbalsa/address-book-ldap.c:383 libbalsa/address-book-ldif.c:270
+#: libbalsa/address-book-ldif.c:545 libbalsa/address-book-ldif.c:549
+#: libbalsa/address-book-vcard.c:271
 msgid "No-Name"
 msgstr "Namnlös"
 
-#: libbalsa/address-book-vcard.c:193
+#: libbalsa/address-book-vcard.c:181
 #, c-format
 msgid "Could not stat vcard address book: %s"
 msgstr "Kunde inte ta status på vCard-adressboken: %s"
 
-#: libbalsa/address-book-vcard.c:252
+#: libbalsa/address-book-vcard.c:240
 #, c-format
 msgid "Could not open vCard address book %s."
 msgstr "Kunde inte öppna vCard-adressboken %s."
 
-#: libbalsa/address-book-ldif.c:568 libbalsa/address-book-vcard.c:421
+#: libbalsa/address-book-ldif.c:563 libbalsa/address-book-vcard.c:409
 #, c-format
 msgid "%s is already in address book."
 msgstr "%s finns redan i adressboken."
 
-#: libbalsa/address-book-vcard.c:431
+#: libbalsa/address-book-vcard.c:419
 #, c-format
 msgid "Cannot open vCard address book %s for saving\n"
 msgstr "Kan inte öppna vCard-adressboken %s för sparande\n"
 
-#: libbalsa/address-book-ldif.c:226
+#: libbalsa/address-book-ldif.c:221
 #, c-format
 msgid "Could not stat ldif address book: %s"
 msgstr "Kunde inte ta status på ldif-adressboken: %s"
 
-#: libbalsa/address-book-ldif.c:364
+#: libbalsa/address-book-ldif.c:359
 #, c-format
 msgid "Could not open LDIF address book %s."
 msgstr "Kunde inte öppna LDIF-adressboken %s."
 
-#: libbalsa/address-book-ldif.c:579
+#: libbalsa/address-book-ldif.c:574
 #, c-format
 msgid "Cannot open LDIF address book %s for saving\n"
 msgstr "Kan inte öppna LDIF-adressboken %s för sparande\n"
@@ -1305,84 +1305,92 @@ msgstr "%d behållda."
 msgid "Can't write message"
 msgstr "Kan inte skriva meddelande"
 
-#: src/address-book-config.c:121
+#: src/address-book-config.c:122
 msgid "Address Book Configuration"
 msgstr "Adressbokskonfiguration"
 
-#: src/address-book-config.c:150 src/folder-conf.c:160 src/folder-conf.c:474
+#: src/address-book-config.c:151 src/folder-conf.c:160 src/folder-conf.c:474
 #: src/mailbox-conf.c:390
 msgid "Update"
 msgstr "Uppdatera"
 
-#: src/address-book-config.c:316
+#: src/address-book-config.c:329
 msgid "New Address Book type:"
 msgstr "Typ av ny adressbok:"
 
-#: src/address-book-config.c:325
+#: src/address-book-config.c:338
 msgid "VCard Address Book (GnomeCard)"
 msgstr "VCard-adressbok (GnomeCard)"
 
-#: src/address-book-config.c:339
+#: src/address-book-config.c:352
 msgid "External query (a program)"
 msgstr "Extern fråga (ett program)"
 
-#: src/address-book-config.c:352
+#: src/address-book-config.c:365
 msgid "LDIF Address Book"
 msgstr "LDIF-adressbok"
 
-#: src/address-book-config.c:368
+#: src/address-book-config.c:381
 msgid "LDAP Address Book"
 msgstr "LDAP-adressbok"
 
-#: src/address-book-config.c:377
+#: src/address-book-config.c:390
 msgid "Balsa is not compiled with LDAP support"
 msgstr "Balsa är inte kompilerat med LDAP-stöd"
 
 #. mailbox name
-#: src/address-book-config.c:402 src/address-book-config.c:448
-#: src/address-book-config.c:493 src/address-book-config.c:552
+#: src/address-book-config.c:415 src/address-book-config.c:461
+#: src/address-book-config.c:521 src/address-book-config.c:580
 msgid "_Address Book Name"
 msgstr "_Adressboksnamn"
 
-#: src/address-book-config.c:407 src/address-book-config.c:499
+#: src/address-book-config.c:420 src/address-book-config.c:527
 msgid "File name"
 msgstr "Filnamn"
 
-#: src/address-book-config.c:414
+#: src/address-book-config.c:427
 msgid "Select path for VCARD address book"
 msgstr "Välj sökväg för VCARD-adressboken"
 
-#: src/address-book-config.c:419 src/address-book-config.c:465
-#: src/address-book-config.c:511 src/address-book-config.c:568
+#: src/address-book-config.c:432 src/address-book-config.c:489
+#: src/address-book-config.c:539 src/address-book-config.c:596
 msgid "_Expand aliases as you type"
 msgstr "_Expandera alias när du skriver"
 
-#: src/address-book-config.c:453
-msgid "Program location"
-msgstr "Programplats"
+#: src/address-book-config.c:466
+msgid "Load program location"
+msgstr "Plats för sparprogram"
 
-#: src/address-book-config.c:460
-msgid "Select program for address book"
-msgstr "Välj program för adressboken"
+#: src/address-book-config.c:471
+msgid "Save program location"
+msgstr "Plats för sparprogram"
 
-#: src/address-book-config.c:506
+#: src/address-book-config.c:478
+msgid "Select load program for address book"
+msgstr "Välj inläsningsprogram för adressboken"
+
+#: src/address-book-config.c:484
+msgid "Select save program for address book"
+msgstr "Välj sparprogram för adressboken"
+
+#: src/address-book-config.c:534
 msgid "Select path for LDIF address book"
 msgstr "Välj sökväg för LDIF-adressboken"
 
-#: src/address-book-config.c:557
+#: src/address-book-config.c:585
 msgid "_Host Name"
 msgstr "_Värdnamn"
 
-#: src/address-book-config.c:562
+#: src/address-book-config.c:590
 msgid "_Base Domain Name"
 msgstr "_Basdomännamn"
 
-#: src/address-book-config.c:624 src/mailbox-conf.c:379
+#: src/address-book-config.c:652 src/mailbox-conf.c:379
 #: src/pref-manager.c:1271 src/pref-manager.c:2183
 msgid "Add"
 msgstr "Lägg till"
 
-#: src/address-book-config.c:676 src/address-book-config.c:702
+#: src/address-book-config.c:704 src/address-book-config.c:730
 #, c-format
 msgid ""
 "The address book file path '%s' is not correct.\n"

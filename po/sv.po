@@ -11,40 +11,25 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2002-12-21 17:41+0100\n"
-"PO-Revision-Date: 2002-12-21 17:42+0100\n"
+"POT-Creation-Date: 2002-12-26 23:54+0100\n"
+"PO-Revision-Date: 2002-12-26 23:54+0100\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: libbalsa/address-book-extern.c:220
-#, c-format
-msgid ""
-"Could not open external query address book %s while trying to parse output "
-"from: %s"
-msgstr ""
-"Kunde inte öppna en extern frågeadressbok %s vid försök att tolka utdata "
-"från: %s"
-
 #. The externq database doesn't support Id's, sorry!
-#: libbalsa/address-book-extern.c:243 libbalsa/address-book-ldap.c:385
-#: libbalsa/address-book-ldif.c:271 libbalsa/address-book-vcard.c:270
+#: libbalsa/address-book-extern.c:242 libbalsa/address-book-ldap.c:382
+#: libbalsa/address-book-ldif.c:270 libbalsa/address-book-vcard.c:272
 msgid "No-Id"
 msgstr "Inget-Id"
 
-#: libbalsa/address-book-extern.c:247 libbalsa/address-book-ldap.c:389
-#: libbalsa/address-book-ldif.c:274 libbalsa/address-book-ldif.c:548
-#: libbalsa/address-book-ldif.c:552 libbalsa/address-book-vcard.c:288
+#: libbalsa/address-book-extern.c:246 libbalsa/address-book-ldap.c:386
+#: libbalsa/address-book-ldif.c:273 libbalsa/address-book-ldif.c:542
+#: libbalsa/address-book-ldif.c:546 libbalsa/address-book-vcard.c:290
 msgid "No-Name"
 msgstr "Namnlös"
-
-#: libbalsa/address-book-extern.c:275
-#, c-format
-msgid "Could not add address to address book %s while trying to execute: %s"
-msgstr ""
-"Kunde inte lägga till adress till adressboken %s vid försök att köra: %s"
 
 #: libbalsa/address-book-ldap.c:215
 msgid ""
@@ -63,49 +48,38 @@ msgstr ""
 "Misslyckades med att binda till servern: %s\n"
 "Kontrollera att servernamnet är giltigt."
 
-#: libbalsa/address-book-ldap.c:274 libbalsa/address-book-ldap.c:598
+#: libbalsa/address-book-ldap.c:595
 #, c-format
 msgid "Failed to do a search: %s.Check that the base name is valid."
 msgstr "Misslyckades med att söka: %s.Kontrollera att basnamnet är giltigt."
 
-#: libbalsa/address-book-ldif.c:225
-#, c-format
-msgid "Could not stat ldif address book: %s"
-msgstr "Kunde inte erhålla status på ldif-adressboken: %s"
-
-#: libbalsa/address-book-ldif.c:363
-#, c-format
-msgid "Could not open LDIF address book %s."
-msgstr "Kunde inte öppna LDIF-adressboken %s."
-
-#: libbalsa/address-book-ldif.c:566 libbalsa/address-book-vcard.c:426
-#, c-format
-msgid "%s is already in address book."
-msgstr "%s finns redan i adressboken."
-
-#: libbalsa/address-book-ldif.c:577
-#, c-format
-msgid "Cannot open LDIF address book %s for saving\n"
-msgstr "Kan inte öppna LDIF-adressboken %s för lagring\n"
-
-#: libbalsa/address-book-vcard.c:189
-#, c-format
-msgid "Could not stat vcard address book: %s"
-msgstr "Kunde inte erhålla status på vCard-adressboken: %s"
-
-#: libbalsa/address-book-vcard.c:248
-#, c-format
-msgid "Could not open vCard address book %s."
-msgstr "Kunde inte öppna vCard-adressboken %s."
-
-#: libbalsa/address-book-vcard.c:436
-#, c-format
-msgid "Cannot open vCard address book %s for saving\n"
-msgstr "Kan inte öppna vCard-adressboken %s för sparande\n"
-
-#: libbalsa/filter-error.c:45
+#: libbalsa/address-book.c:329 libbalsa/filter-error.c:45
 msgid "No error"
 msgstr "Inget fel"
+
+#: libbalsa/address-book.c:330
+msgid "Cannot read from address book"
+msgstr "Kan inte läsa från adressbok"
+
+#: libbalsa/address-book.c:331
+msgid "Cannot write to address book"
+msgstr "Kan inte skriva till adressbok"
+
+#: libbalsa/address-book.c:332
+msgid "Cannot connect to server"
+msgstr "Kan inte ansluta till server"
+
+#: libbalsa/address-book.c:333
+msgid "Cannot search in the address book"
+msgstr "Kan inte söka i adressboken"
+
+#: libbalsa/address-book.c:335
+msgid "Cannot add duplicate entry"
+msgstr "Kan inte lägga till dublettpost"
+
+#: libbalsa/address-book.c:336
+msgid "Unknown error"
+msgstr "Okänt fel"
 
 #: libbalsa/filter-error.c:46
 msgid "Syntax error in the filter configuration file"
@@ -132,25 +106,25 @@ msgstr "Ogiltiga filter %s för brevlådan %s"
 msgid "Unable to load message body to match filter"
 msgstr "Kan inte läsa in meddelandetexten för att matcha filter"
 
-#: libbalsa/filter.c:354
+#: libbalsa/filter.c:424
 #, c-format
 msgid "Invalid filter : %s"
 msgstr "Ogiltigt filter: %s"
 
-#: libbalsa/filter.c:436 libbalsa/filter.c:455
+#: libbalsa/filter.c:506 libbalsa/filter.c:525
 #, c-format
 msgid "Bad mailbox name for filter : %s"
 msgstr "Felaktigt brevlådenamn för filtret: %s"
 
-#: libbalsa/filter.c:440
+#: libbalsa/filter.c:510
 msgid "Error when copying messages"
 msgstr "Fel vid kopiering av meddelanden"
 
-#: libbalsa/filter.c:448
+#: libbalsa/filter.c:518
 msgid "Error when trashing messages"
 msgstr "Fel vid borttagning av meddelanden"
 
-#: libbalsa/filter.c:459
+#: libbalsa/filter.c:529
 msgid "Error when moving messages"
 msgstr "Fel vid flyttande av meddelanden"
 
@@ -190,7 +164,7 @@ msgid "Domain:"
 msgstr "Domän:"
 
 #. bcc:
-#: libbalsa/identity.c:667 src/balsa-message.c:742 src/print.c:355
+#: libbalsa/identity.c:667 src/balsa-message.c:787 src/print.c:355
 #: src/sendmsg-window.c:1847 src/store-address.c:275
 msgid "Bcc:"
 msgstr "Osynlig kopia:"
@@ -436,22 +410,22 @@ msgstr ""
 "Fel vid placering av meddelanden från %s på %s\n"
 "Meddelanden är kvar i %s\n"
 
-#: libbalsa/message.c:458
+#: libbalsa/message.c:477
 #, c-format
 msgid "Source mailbox (%s) is readonly. Cannot move message"
 msgstr "Källbrevlådan (%s) är skrivskyddad. Kan inte flytta meddelande"
 
-#: libbalsa/message.c:485
+#: libbalsa/message.c:504
 #, c-format
 msgid "Source mailbox (%s) is readonly. Cannot move messages"
 msgstr "Källbrevlådan (%s) är skrivskyddad. Kan inte flytta meddelanden"
 
-#: libbalsa/message.c:494 libbalsa/message.c:608
+#: libbalsa/message.c:513 libbalsa/message.c:627
 #, c-format
 msgid "Couldn't open destination mailbox (%s) for writing"
 msgstr "Kunde inte öppna målbrevlådan (%s) för skrivning"
 
-#: libbalsa/message.c:547
+#: libbalsa/message.c:566
 #, c-format
 msgid "Couldn't open destination mailbox (%s) for copying"
 msgstr "Kunde inte öppna målbrevlådan (%s) för kopiering"
@@ -592,24 +566,24 @@ msgid "Message Source"
 msgstr "Meddelandekällkod"
 
 #: libinit_balsa/balsa-druid-page-directory.c:38
-msgid "Inbox:"
-msgstr "Inkorg:"
+msgid "_Inbox:"
+msgstr "_Inkorg:"
 
 #: libinit_balsa/balsa-druid-page-directory.c:38
-msgid "Outbox:"
-msgstr "Utkorg:"
+msgid "_Outbox:"
+msgstr "_Utkorg:"
 
 #: libinit_balsa/balsa-druid-page-directory.c:38
-msgid "Sentbox:"
-msgstr "Skickatkorg:"
+msgid "_Sentbox:"
+msgstr "_Skickatkorg:"
 
 #: libinit_balsa/balsa-druid-page-directory.c:38
-msgid "Draftbox:"
-msgstr "Utkastkorg:"
+msgid "_Draftbox:"
+msgstr "Ut_kastkorg:"
 
 #: libinit_balsa/balsa-druid-page-directory.c:39
-msgid "Trash:"
-msgstr "Papperskorg:"
+msgid "_Trash:"
+msgstr "_Papperskorg:"
 
 #: libinit_balsa/balsa-druid-page-directory.c:64
 #, c-format
@@ -682,20 +656,20 @@ msgid "Please enter information about yourself."
 msgstr "Skriv in information om dig själv."
 
 #: libinit_balsa/balsa-druid-page-user.c:74
-msgid "Name:"
-msgstr "Namn:"
+msgid "_Name:"
+msgstr "_Namn:"
 
 #: libinit_balsa/balsa-druid-page-user.c:79
-msgid "Email address:"
-msgstr "E-postadress:"
+msgid "_Email address:"
+msgstr "_E-postadress:"
 
 #: libinit_balsa/balsa-druid-page-user.c:84
-msgid "Local Mail Directory:"
-msgstr "Lokal brevkatalog:"
+msgid "_Local Mail Directory:"
+msgstr "_Lokal brevkatalog:"
 
 #: libinit_balsa/balsa-druid-page-user.c:91
-msgid "SMTP Server:"
-msgstr "SMTP-server:"
+msgid "_SMTP Server:"
+msgstr "_SMTP-server:"
 
 #: libinit_balsa/balsa-druid-page-user.c:113
 msgid "User Settings"
@@ -743,17 +717,17 @@ msgstr ""
 msgid "Error loading %s: %s\n"
 msgstr "Fel vid läsning av %s: %s\n"
 
-#: libinit_balsa/helper.c:177
+#: libinit_balsa/helper.c:178
 #, c-format
 msgid "The path %s must be relative to the filesystem root (start with /)."
 msgstr "Sökvägen %s måste vara en absolut sökväg, dvs starta med \"/\"."
 
-#: libinit_balsa/helper.c:190 libinit_balsa/helper.c:214
+#: libinit_balsa/helper.c:191 libinit_balsa/helper.c:215
 #, c-format
 msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
 msgstr "Kunde inte skapa katalog: mkdir() misslyckades med sökvägen \"%s\"."
 
-#: libinit_balsa/helper.c:200 libinit_balsa/helper.c:223
+#: libinit_balsa/helper.c:201 libinit_balsa/helper.c:224
 #, c-format
 msgid "The file with pathname \"%s\" is not a directory."
 msgstr "Sökvägen \"%s\" är inte en katalog."
@@ -1593,49 +1567,58 @@ msgstr "Sökvägen \"%s\" är inte korrekt. %s"
 msgid "Do you want to correct the path?"
 msgstr "Vill du rätta till sökvägen?"
 
-#: src/ab-window.c:164 src/filter-edit-dialog.c:193
+#: src/ab-window.c:165 src/filter-edit-dialog.c:193
 #: src/filter-export-dialog.c:88 src/filter-run-dialog.c:219
 #: src/filter-run-dialog.c:291
 msgid "Name"
 msgstr "Namn"
 
-#: src/ab-window.c:172
+#: src/ab-window.c:173
 msgid "E-Mail Address"
 msgstr "E-postadress"
 
-#: src/ab-window.c:205
+#: src/ab-window.c:206
 msgid "Address Book"
 msgstr "Adressbok"
 
 #. Entry widget for finding an address
-#: src/ab-window.c:262
+#: src/ab-window.c:263
 msgid "Search for Name:"
 msgstr "Sök efter namn:"
 
-#: src/ab-window.c:321
+#: src/ab-window.c:322
 msgid "Send-To"
 msgstr "Skicka till"
 
-#: src/ab-window.c:341
+#: src/ab-window.c:342
 msgid "Run GnomeCard"
 msgstr "Kör GnomeCard"
 
-#: src/ab-window.c:349
+#: src/ab-window.c:350
 msgid "Re-Import"
 msgstr "Läs om"
 
 #. mode switching stuff
-#: src/ab-window.c:359
+#: src/ab-window.c:360
 msgid "Treat multiple addresses as:"
 msgstr "Betrakta flera adresser som:"
 
-#: src/ab-window.c:363
+#: src/ab-window.c:364
 msgid "alternative addresses for the same person"
 msgstr "alternativa adresser för samma person"
 
-#: src/ab-window.c:368
+#: src/ab-window.c:369
 msgid "a distribution list"
 msgstr "en distributionslista"
+
+#: src/ab-window.c:669
+#, c-format
+msgid ""
+"Error opening addres book '%s'\n"
+"%s"
+msgstr ""
+"Fel vid öppnande av adressboken \"%s\"\n"
+"%s"
 
 #: src/balsa-app.c:66
 #, c-format
@@ -1655,7 +1638,7 @@ msgstr "Brevlådelösenord för %s@%s:"
 msgid "Password needed"
 msgstr "Lösenord krävs"
 
-#: src/balsa-app.c:796
+#: src/balsa-app.c:797
 #, c-format
 msgid "Multiple mailboxes named \"%s\""
 msgstr "Flera brevlådor med namnet \"%s\""
@@ -1685,60 +1668,60 @@ msgstr "Öppnar brevlådan %s. Var vänlig vänta..."
 msgid "To"
 msgstr "Till"
 
-#: src/balsa-index.c:2088
+#: src/balsa-index.c:2075
 msgid "_View Source"
 msgstr "_Visa källa"
 
-#: src/balsa-index.c:2090 src/main-window.c:442 src/message-window.c:126
+#: src/balsa-index.c:2077 src/main-window.c:442 src/message-window.c:126
 msgid "_Reply..."
 msgstr "_Svara..."
 
-#: src/balsa-index.c:2092
+#: src/balsa-index.c:2079
 msgid "Reply To _All..."
 msgstr "Svara till _alla..."
 
-#: src/balsa-index.c:2094
+#: src/balsa-index.c:2081
 msgid "Reply To _Group..."
 msgstr "Svara till _grupp..."
 
-#: src/balsa-index.c:2096
+#: src/balsa-index.c:2083
 msgid "_Forward Attached..."
 msgstr "_Vidarebefordra bifogad..."
 
-#: src/balsa-index.c:2098
+#: src/balsa-index.c:2085
 msgid "Forward _Inline..."
 msgstr "Vidarebefordra _inuti..."
 
-#: src/balsa-index.c:2100 src/main-window.c:544
+#: src/balsa-index.c:2087 src/main-window.c:544
 msgid "_Store Address..."
 msgstr "_Lagra adress..."
 
-#: src/balsa-index.c:2113 src/mailbox-node.c:779 src/main-window.c:526
+#: src/balsa-index.c:2100 src/mailbox-node.c:779 src/main-window.c:526
 #: src/pref-manager.c:1510 src/pref-manager.c:2599
 msgid "_Delete"
 msgstr "_Ta bort"
 
-#: src/balsa-index.c:2118 src/main-window.c:533
+#: src/balsa-index.c:2105 src/main-window.c:533
 msgid "_Undelete"
 msgstr "_Återskapa"
 
-#: src/balsa-index.c:2123
+#: src/balsa-index.c:2110
 msgid "Move To _Trash"
 msgstr "Flytta till _papperskorgen"
 
-#: src/balsa-index.c:2127
+#: src/balsa-index.c:2114
 msgid "T_oggle"
 msgstr "Vä_xla"
 
-#: src/balsa-index.c:2130
+#: src/balsa-index.c:2117
 msgid "_Flagged"
 msgstr "_Flaggad"
 
-#: src/balsa-index.c:2133
+#: src/balsa-index.c:2120
 msgid "_Unread"
 msgstr "_Olästa"
 
-#: src/balsa-index.c:2141
+#: src/balsa-index.c:2128
 msgid "_Move to"
 msgstr "_Flytta till"
 
@@ -1784,139 +1767,139 @@ msgstr " Kunde inte spara %s: %s"
 msgid "Save MIME Part"
 msgstr "Spara MIME-delen"
 
-#: src/balsa-message.c:722 src/print.c:326
+#: src/balsa-message.c:767 src/print.c:326
 msgid "Subject:"
 msgstr "Ämne:"
 
-#: src/balsa-message.c:726 src/print.c:332
+#: src/balsa-message.c:771 src/print.c:332
 msgid "Date:"
 msgstr "Datum:"
 
-#: src/balsa-message.c:731 src/filter-edit-callbacks.c:995 src/print.c:343
+#: src/balsa-message.c:776 src/filter-edit-callbacks.c:995 src/print.c:343
 #: src/store-address.c:272
 msgid "From:"
 msgstr "Från:"
 
-#: src/balsa-message.c:737
+#: src/balsa-message.c:782
 msgid "Reply-To:"
 msgstr "Svara-till:"
 
-#: src/balsa-message.c:740 src/filter-edit-callbacks.c:988 src/print.c:353
+#: src/balsa-message.c:785 src/filter-edit-callbacks.c:988 src/print.c:353
 #: src/store-address.c:273
 msgid "To:"
 msgstr "Till:"
 
 #. cc:
-#: src/balsa-message.c:741 src/filter-edit-callbacks.c:1009 src/print.c:354
+#: src/balsa-message.c:786 src/filter-edit-callbacks.c:1009 src/print.c:354
 #: src/sendmsg-window.c:1842 src/store-address.c:274
 msgid "Cc:"
 msgstr "Kopia:"
 
-#: src/balsa-message.c:745 src/print.c:356
+#: src/balsa-message.c:790 src/print.c:356
 msgid "Fcc:"
 msgstr "Vidarebefordrad kopia:"
 
-#: src/balsa-message.c:750 src/print.c:362
+#: src/balsa-message.c:795 src/print.c:362
 msgid "Disposition-Notification-To:"
 msgstr "Dispositionsbekräftelse-till:"
 
-#: src/balsa-message.c:855 src/balsa-message.c:871 src/balsa-message.c:901
-#: src/balsa-message.c:954
+#: src/balsa-message.c:900 src/balsa-message.c:916 src/balsa-message.c:946
+#: src/balsa-message.c:999
 msgid "Content Type: external-body\n"
 msgstr "Innehållstyp: external-body\n"
 
-#: src/balsa-message.c:856
+#: src/balsa-message.c:901
 msgid "Access type: local-file\n"
 msgstr "Åtkomsttyp: local-file\n"
 
-#: src/balsa-message.c:857 src/balsa-message.c:908
+#: src/balsa-message.c:902 src/balsa-message.c:953
 #, c-format
 msgid "File name: %s"
 msgstr "Filnamn: %s"
 
-#: src/balsa-message.c:872
+#: src/balsa-message.c:917
 msgid "Access type: URL\n"
 msgstr "Åtkomsttyp: URL\n"
 
-#: src/balsa-message.c:873
+#: src/balsa-message.c:918
 #, c-format
 msgid "URL: %s"
 msgstr "URL: %s"
 
-#: src/balsa-message.c:902
+#: src/balsa-message.c:947
 #, c-format
 msgid "Access type: %s\n"
 msgstr "Åtkomsttyp: %s\n"
 
-#: src/balsa-message.c:905
+#: src/balsa-message.c:950
 #, c-format
 msgid "FTP site: %s\n"
 msgstr "FTP-plats: %s\n"
 
-#: src/balsa-message.c:907
+#: src/balsa-message.c:952
 #, c-format
 msgid "Directory: %s\n"
 msgstr "Katalog: %s\n"
 
-#: src/balsa-message.c:955
+#: src/balsa-message.c:1000
 msgid "Access type: mail-server\n"
 msgstr "Åtkomsttyp: e-postserver\n"
 
-#: src/balsa-message.c:956
+#: src/balsa-message.c:1001
 #, c-format
 msgid "Mail server: %s\n"
 msgstr "E-postserver: %s\n"
 
-#: src/balsa-message.c:958 src/sendmsg-window.c:2133
+#: src/balsa-message.c:1003 src/sendmsg-window.c:2133
 #, c-format
 msgid "Subject: %s\n"
 msgstr "Ärende: %s\n"
 
-#: src/balsa-message.c:969
+#: src/balsa-message.c:1014
 msgid "Send message to obtain this part"
 msgstr "Skicka meddelande för att få tag i denna del"
 
-#: src/balsa-message.c:1050
+#: src/balsa-message.c:1095
 msgid "No open or view action defined in GNOME MIME for this content type"
 msgstr ""
 "Ingen öppna- eller visa-åtgärder är definierader i GNOME MIME för denna "
 "innehållstyp"
 
-#: src/balsa-message.c:1055
+#: src/balsa-message.c:1100
 #, c-format
 msgid "Type: %s (%s)"
 msgstr "Typ: %s (%s)"
 
-#: src/balsa-message.c:1057
+#: src/balsa-message.c:1102
 #, c-format
 msgid "Content Type: %s"
 msgstr "Innehållstyp: %s"
 
-#: src/balsa-message.c:1063
+#: src/balsa-message.c:1108
 #, c-format
 msgid "Filename: %s"
 msgstr "Filnamn: %s"
 
-#: src/balsa-message.c:1071
+#: src/balsa-message.c:1116
 msgid "Save part"
 msgstr "Spara del"
 
-#: src/balsa-message.c:1094 src/balsa-message.c:1117
+#: src/balsa-message.c:1139 src/balsa-message.c:1162
 #, c-format
 msgid "View part with %s"
 msgstr "Visa del med %s"
 
-#: src/balsa-message.c:1505
+#: src/balsa-message.c:1550
 #, c-format
 msgid "Calling URL %s..."
 msgstr "Anropar URL:en %s..."
 
-#: src/balsa-message.c:1514 src/balsa-message.c:2024 src/balsa-message.c:2536
+#: src/balsa-message.c:1559 src/balsa-message.c:2069 src/balsa-message.c:2581
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "Fel vid visning av %s: %s\n"
 
-#: src/balsa-message.c:1545
+#: src/balsa-message.c:1590
 #, c-format
 msgid ""
 "Error writing to temporary file %s.\n"
@@ -1925,26 +1908,26 @@ msgstr ""
 "Fel vid skrivning till temporära filen %s.\n"
 "Kontrollera rättigheterna för katalogen."
 
-#: src/balsa-message.c:1553
+#: src/balsa-message.c:1598
 #, c-format
 msgid "Cannot open temporary file %s."
 msgstr "Kan inte öppna temporära filen %s."
 
-#: src/balsa-message.c:1827
+#: src/balsa-message.c:1872
 #, c-format
 msgid "Open with %s"
 msgstr "Öppna med %s"
 
-#: src/balsa-message.c:1965
+#: src/balsa-message.c:2010
 msgid "Save..."
 msgstr "Spara..."
 
-#: src/balsa-message.c:2105 src/balsa-message.c:2150
+#: src/balsa-message.c:2150 src/balsa-message.c:2195
 #, c-format
 msgid "could not create temporary file %s"
 msgstr "kunde inte skapa temporär fil %s"
 
-#: src/balsa-message.c:2821
+#: src/balsa-message.c:2866
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -1955,7 +1938,7 @@ msgstr ""
 "meddelandedispositionsbekräftelse (MDN) skickas tillbaka till \"%s\".\n"
 "Vill du skicka denna bekräftelse?"
 
-#: src/balsa-message.c:2828
+#: src/balsa-message.c:2873
 msgid "reply to MDN?"
 msgstr "svara till MDN?"
 
@@ -4775,14 +4758,80 @@ msgstr "Tillgängliga knappar"
 msgid "Current toolbar"
 msgstr "Anpassa verktygsrad"
 
+#~ msgid "Inbox:"
+#~ msgstr "Inkorg:"
+
+#~ msgid "Outbox:"
+#~ msgstr "Utkorg:"
+
+#~ msgid "Sentbox:"
+#~ msgstr "Skickatkorg:"
+
+#~ msgid "Draftbox:"
+#~ msgstr "Utkastkorg:"
+
+#~ msgid "Trash:"
+#~ msgstr "Papperskorg:"
+
+#~ msgid "Name:"
+#~ msgstr "Namn:"
+
+#~ msgid "Email address:"
+#~ msgstr "E-postadress:"
+
+#~ msgid "Local Mail Directory:"
+#~ msgstr "Lokal brevkatalog:"
+
+#~ msgid "SMTP Server:"
+#~ msgstr "SMTP-server:"
+
+#~ msgid ""
+#~ "Error opening address book '%s'\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Fel vid öppnande av adressboken \"%s\"\n"
+#~ "%s"
+
+#~ msgid "_Search for Name:"
+#~ msgstr "_Sök efter namn:"
+
+#~ msgid ""
+#~ "Could not open external query address book %s while trying to parse "
+#~ "output from: %s"
+#~ msgstr ""
+#~ "Kunde inte öppna en extern frågeadressbok %s vid försök att tolka utdata "
+#~ "från: %s"
+
+#~ msgid "Could not add address to address book %s while trying to execute: %s"
+#~ msgstr ""
+#~ "Kunde inte lägga till adress till adressboken %s vid försök att köra: %s"
+
+#~ msgid "Could not stat ldif address book: %s"
+#~ msgstr "Kunde inte erhålla status på ldif-adressboken: %s"
+
+#~ msgid "Could not open LDIF address book %s."
+#~ msgstr "Kunde inte öppna LDIF-adressboken %s."
+
+#~ msgid "%s is already in address book."
+#~ msgstr "%s finns redan i adressboken."
+
+#~ msgid "Cannot open LDIF address book %s for saving\n"
+#~ msgstr "Kan inte öppna LDIF-adressboken %s för lagring\n"
+
+#~ msgid "Could not stat vcard address book: %s"
+#~ msgstr "Kunde inte erhålla status på vCard-adressboken: %s"
+
+#~ msgid "Could not open vCard address book %s."
+#~ msgstr "Kunde inte öppna vCard-adressboken %s."
+
+#~ msgid "Cannot open vCard address book %s for saving\n"
+#~ msgstr "Kan inte öppna vCard-adressboken %s för sparande\n"
+
 #~ msgid "New message"
 #~ msgstr "Nytt meddelande"
 
 #~ msgid "_Filters..."
 #~ msgstr "_Filter..."
-
-#~ msgid "Cannot load address book %s"
-#~ msgstr "Kan inte läsa in adressboken %s"
 
 #~ msgid "No such address book type: %s"
 #~ msgstr "Det finns ingen sådan adressbokstyp: %s"
@@ -4966,9 +5015,6 @@ msgstr "Anpassa verktygsrad"
 #~ msgid "MIME type not defined.  Cannot view attachment."
 #~ msgstr "MIME-typ inte definierad. Kan inte visa bilaga."
 
-#~ msgid "Cannot create filter"
-#~ msgstr "Kan inte skapa filter"
-
 #~ msgid "Attachment saved."
 #~ msgstr "Bilagan sparad."
 
@@ -5131,9 +5177,6 @@ msgstr "Anpassa verktygsrad"
 
 #~ msgid "Bounce tagged messages to: "
 #~ msgstr "Studsa taggade meddelanden till: "
-
-#~ msgid "Error parsing address!"
-#~ msgstr "Fel vid tolkning av adress!"
 
 #~ msgid "Bounce messages to %s"
 #~ msgstr "Studsa meddelanden till %s"

@@ -214,7 +214,7 @@ config_mailbox_add (Mailbox * mailbox, char *key_arg)
 	  g_free (buff);
 	}
       pl_dict_add_str_str (mbox_dict, "Server",
-			   MAILBOX_POP3 (mailbox)->server);
+			   MAILBOX_POP3 (mailbox)->server->host);
       {
 	char tmp[32];
 

@@ -1348,6 +1348,10 @@ static gint insert_signature_cb(GtkWidget *widget, BalsaSendmsg *msg)
     return TRUE;
 }
 
+/* set_entry_to_subject:
+   set subject entry based on given replied/forwarded/continued message
+   and the compose type.
+*/
 static void
 set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message, SendType type)
 {
@@ -1355,6 +1359,7 @@ set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message, SendType type)
     gchar *newsubject = NULL;
     gint i;
 
+    if(!message) return;
     subject = LIBBALSA_MESSAGE_GET_SUBJECT(message);
 
     switch (type) {

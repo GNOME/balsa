@@ -83,7 +83,7 @@ static void help_button_cb(AddressBookConfig * abc);
 static void next_button_cb(AddressBookConfig * abc);
 static gboolean handle_close(AddressBookConfig * abc);
 static gboolean bad_path(GnomeFileEntry * entry, GtkWindow * window,
-                         const gchar * text);
+                         gint type);
 static void create_book(AddressBookConfig * abc);
 static void modify_book(AddressBookConfig * abc);
 
@@ -562,6 +562,12 @@ next_button_cb(AddressBookConfig * abc)
     gtk_widget_grab_focus(abc->name_entry);
 }
 
+enum {
+    ADDRESS_BOOK_CONFIG_PATH_FILE,
+    ADDRESS_BOOK_CONFIG_PATH_LOAD,
+    ADDRESS_BOOK_CONFIG_PATH_SAVE
+};
+
 /* handle_close:
    handle the request to add/update the address book data.
    NOTE: type cannot be made the switch select expression.
@@ -575,18 +581,22 @@ handle_close(AddressBookConfig * abc)
 {
     if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_VCARD) {
         if (bad_path(GNOME_FILE_ENTRY(abc->ab_specific.vcard.path),
-                     GTK_WINDOW(abc->window), _("address book file")))
+                     GTK_WINDOW(abc->window),
+                     ADDRESS_BOOK_CONFIG_PATH_FILE))
             return FALSE;
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_LDIF) {
         if (bad_path(GNOME_FILE_ENTRY(abc->ab_specific.ldif.path),
-                     GTK_WINDOW(abc->window), _("address book file")))
+                     GTK_WINDOW(abc->window),
+                     ADDRESS_BOOK_CONFIG_PATH_FILE))
             return FALSE;
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN) {
         if (bad_path(GNOME_FILE_ENTRY(abc->ab_specific.externq.load),
-                     GTK_WINDOW(abc->window), _("load program")))
+                     GTK_WINDOW(abc->window),
+                     ADDRESS_BOOK_CONFIG_PATH_LOAD))
             return FALSE;
         if (bad_path(GNOME_FILE_ENTRY(abc->ab_specific.externq.save),
-                     GTK_WINDOW(abc->window), _("save program")))
+                     GTK_WINDOW(abc->window),
+                     ADDRESS_BOOK_CONFIG_PATH_SAVE))
             return FALSE;
     }
 
@@ -603,9 +613,10 @@ handle_close(AddressBookConfig * abc)
  * Returns TRUE if the path is bad and the user wants to correct it
  */
 static gboolean
-bad_path(GnomeFileEntry * entry, GtkWindow * window, const gchar * text)
+bad_path(GnomeFileEntry * entry, GtkWindow * window, gint type)
 {
     const gchar *name;
+    gchar *message, *question;
     GtkWidget *ask;
     gint clicked_button;
     gchar *path = gnome_file_entry_get_full_path(entry, TRUE);
@@ -615,12 +626,26 @@ bad_path(GnomeFileEntry * entry, GtkWindow * window, const gchar * text)
         return FALSE;
     }
 
+    switch (type) {
+        case ADDRESS_BOOK_CONFIG_PATH_FILE:
+            message =
+                _("The address book file path \"%s\" is not correct. %s");
+            break;
+        case ADDRESS_BOOK_CONFIG_PATH_LOAD:
+            message = _("The load program path \"%s\" is not correct. %s");
+            break;
+        case ADDRESS_BOOK_CONFIG_PATH_SAVE:
+            message = _("The save program path \"%s\" is not correct. %s");
+            break;
+        default:
+            message = _("The path \"%s\" is not correct. %s");
+            break;
+    }
+    question = _("Do you want to correct the path?");
     name = gtk_entry_get_text(GTK_ENTRY(gnome_file_entry_gtk_entry(entry)));
     ask = gtk_message_dialog_new(window, GTK_DIALOG_DESTROY_WITH_PARENT,
                                  GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
-                                 _("The %s path '%s' is not correct.\n"
-                                   "Do you want to correct the path?"),
-                                 text, name);
+                                 message, name, question);
     gtk_dialog_set_default_response(GTK_DIALOG(ask), GTK_RESPONSE_YES);
     clicked_button = gtk_dialog_run(GTK_DIALOG(ask));
     gtk_widget_destroy(ask);

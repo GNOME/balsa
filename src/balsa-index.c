@@ -816,6 +816,7 @@ bndx_messages_remove(BalsaIndex * index, GList * messages)
             g_signal_handler_block(selection, index->selection_changed_id);
             gtk_tree_store_clear(GTK_TREE_STORE(model));
             g_signal_handler_unblock(selection, index->selection_changed_id);
+            g_signal_emit_by_name(selection, "changed");
             g_list_free(remove);
             return;
         }
@@ -878,6 +879,7 @@ bndx_messages_remove(BalsaIndex * index, GList * messages)
         if (bndx_find_message(index, NULL, &iter, list->data))
             gtk_tree_store_remove(GTK_TREE_STORE(model), &iter);
     g_signal_handler_unblock(selection, index->selection_changed_id);
+    g_signal_emit_by_name(selection, "changed");
     g_list_free(remove);
 
     /* select next message */

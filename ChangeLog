@@ -1,3 +1,11 @@
+2002-10-23  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-index.c: clear preview after deleting last message.
+	* src/address-book-config.c: do not use same strings in different
+	contexts (#96548).
+	* libbalsa/address-book-ldap.c: do not crash on severed LDAP
+	connections (PS).
+
 2002-10-20  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/balsa-index.[hc]: streamline message deletion and removal.

@@ -39,6 +39,7 @@
 #include "address-book-ldap.h"
 #include "information.h"
 
+static const int DEBUG_LDAP = 0;
 /* FIXME: Configurable... */
 static const int LDAP_CACHE_TIMEOUT=300;	/* Seconds */
 /* don't search when prefix has length shorter than LDAP_MIN_LEN */
@@ -143,7 +144,7 @@ libbalsa_address_book_ldap_init(LibBalsaAddressBookLdap * ab)
     ab->host = NULL;
     ab->base_dn = NULL;
     ab->directory = NULL;
-    LIBBALSA_ADDRESS_BOOK(ab)->is_expensive = TRUE;
+    LIBBALSA_ADDRESS_BOOK(ab)->is_expensive = FALSE;
 }
 
 static void
@@ -560,9 +561,13 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
     filter = g_strdup_printf("(&(mail=*)(|(cn=%s*)(sn=%s*)(mail=%s@*)))", 
 			     ldap, ldap, ldap);
     g_free(ldap);
+    result = NULL;
     rc = ldap_search_st(ldap_ab->directory, ldap_ab->base_dn,
 	   LDAP_SCOPE_SUBTREE, filter, attrs, 0, &timeout, &result);
-    g_print("Sent LDAP request: %s (basedn=%s)\n", filter, ldap_ab->base_dn);
+    
+    if(DEBUG_LDAP)
+        g_print("Sent LDAP request: %s (basedn=%s) res=0x%x\n", 
+                filter, ldap_ab->base_dn, rc);
     g_free(filter);
     switch (rc) {
     case LDAP_SUCCESS:
@@ -580,7 +585,11 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
 	 * Particularly SIZELIMIT can be nasty on big directories.
 	 */
 	break;
-	
+    case LDAP_SERVER_DOWN:
+        libbalsa_address_book_ldap_close_connection
+            (LIBBALSA_ADDRESS_BOOK_LDAP(ab));
+        g_print("Server down. Next attempt will try to reconnect.\n");
+        break;
     default:
 	/*
 	 * Until we know for sure, complain about all other errors.
@@ -593,7 +602,7 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
     }
 
     /* printf("ldap_alias_complete:: result=%p\n", result); */
-    ldap_msgfree(result);
+    if(result) ldap_msgfree(result);
 
     if(res) res = g_list_reverse(res);
     return res;

@@ -114,7 +114,7 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
     LibBalsaConditionRegex* regex;
     GString * body;
 
-    g_return_val_if_fail(cond,0); 
+    g_return_val_if_fail(cond, FALSE); 
 
     switch (cond->type) {
     case CONDITION_SIMPLE:
@@ -279,8 +279,21 @@ gint
 match_conditions(FilterOpType op, GSList * cond, LibBalsaMessage * message,
 		 gboolean mbox_locked)
 {
+    GSList * lst = cond;
     g_assert((op!=FILTER_NOOP) && cond && message);
-    
+
+    /* First let's see if we exclude deleted messages or not : for that we
+       look if the conditions contain an explicit match on the deleted flag */
+    while (lst) {
+	LibBalsaCondition * c = lst->data;
+
+	if ((c->type==CONDITION_FLAG) &&
+	    (c->match.flags & LIBBALSA_MESSAGE_FLAG_DELETED))
+	    break;
+	 lst = g_slist_next(lst);
+    }
+    if (!lst && LIBBALSA_MESSAGE_IS_DELETED(message)) return FALSE;
+
     if (op==FILTER_OP_OR) {
 	for (;cond &&!match_condition((LibBalsaCondition*)cond->data, message,
 				      mbox_locked);
@@ -317,7 +330,7 @@ libbalsa_filter_build_imap_query(FilterOpType op, GSList* condlist)
 {
     GString* query = g_string_new("");
     gchar* str;
-    gboolean first = TRUE;
+    gboolean first = TRUE, match_on_deleted = FALSE;
     gchar str_date[20];
     struct tm * date;
 
@@ -378,8 +391,12 @@ libbalsa_filter_build_imap_query(FilterOpType op, GSList* condlist)
 		continue;
 	    if (cond->match.flags & LIBBALSA_MESSAGE_FLAG_NEW)
 		extend_query(buffer, "NEW", NULL);
-	    if (cond->match.flags & LIBBALSA_MESSAGE_FLAG_DELETED)
+	    if (cond->match.flags & LIBBALSA_MESSAGE_FLAG_DELETED) {
+		/* Special case : for all others match we exclude
+		   deleted filters, but not for this one obviously */
+		match_on_deleted = TRUE;
 		extend_query(buffer, "DELETED", NULL);
+	    }
 	    if (cond->match.flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)
 		extend_query(buffer, "FLAGGED", NULL);
 	case CONDITION_NONE:
@@ -406,6 +423,8 @@ libbalsa_filter_build_imap_query(FilterOpType op, GSList* condlist)
 	g_string_prepend(query, "NOT (");
 	g_string_append_c(query, ')');
     }
+    if (!match_on_deleted)
+	g_string_prepend(query, "UNDELETED ");
     str = query->str;
     g_string_free(query, FALSE);
     return str;

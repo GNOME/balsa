@@ -155,22 +155,35 @@ GList *
 make_list_from_string (gchar * the_str)
 {
   GList *list = NULL;
-  gchar *str;
-  char *token;
-
+  gchar *buff;
+  gint len;
+  gint i, y;
   if (!the_str)
     return NULL;
-  if (strlen (the_str) < 3)
+
+  len = strlen (the_str);
+
+  buff = g_new (gchar, len + 1);
+
+  if (len < 3)
     return NULL;
 
-  str = g_strdup (the_str);
-  token = strtok (str, ",");
-  while (token)
+  for (i = y = 0; i < len; i++)
     {
-      list = g_list_append (list, token);
-      g_print ("\"%s\"\n", token);
-      token = strtok (NULL, ",");
+      switch (the_str[i])
+	{
+	case ',':
+	  list = g_list_append (list, buff);
+	  y = 0;
+	  break;
+	default:
+	  buff[y] = the_str[i];
+	  y++;
+	  break;
+	}
     }
-  g_free (str);
+  list = g_list_append (list, buff);
+
+  g_free (buff);
   return list;
 }

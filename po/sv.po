@@ -11,8 +11,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2003-04-14 12:01+0200\n"
-"PO-Revision-Date: 2003-04-14 12:02+0200\n"
+"POT-Creation-Date: 2003-04-18 11:59+0200\n"
+"PO-Revision-Date: 2003-04-18 12:01+0200\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -307,17 +307,17 @@ msgstr "*** FEL: Brevlådelås finns: %s ***\n"
 msgid "*** ERROR: Mailbox Stream Closed: %s ***\n"
 msgstr "*** FEL: Brevlådeström stängd: %s ***\n"
 
-#: libbalsa/mailbox.c:409
+#: libbalsa/mailbox.c:410
 #, c-format
 msgid "Cannot load mailbox %s"
 msgstr "Kan inte läsa in brevlådan %s"
 
-#: libbalsa/mailbox.c:416
+#: libbalsa/mailbox.c:417
 #, c-format
 msgid "No such mailbox type: %s"
 msgstr "Det finns ingen sådan brevlådetyp: %s"
 
-#: libbalsa/mailbox.c:433
+#: libbalsa/mailbox.c:434
 #, c-format
 msgid "Could not create a mailbox of type %s"
 msgstr "Kunde inte skapa en brevlåda av typen %s"
@@ -469,6 +469,16 @@ msgstr "Kunde inte öppna målbrevlådan (%s) för kopiering"
 msgid "(No subject)"
 msgstr "(Inget ämne)"
 
+#: libbalsa/mime.c:85 libbalsa/rfc3156.c:64
+msgid ""
+"\n"
+"--\n"
+"This is an OpenPGP signed message part:\n"
+msgstr ""
+"\n"
+"--\n"
+"Detta är en OpenPGP-signerad meddelandedel:\n"
+
 #: libbalsa/pop3.c:57
 msgid "connection error"
 msgstr "uppkopplingsfel"
@@ -514,16 +524,6 @@ msgstr "Hämtar meddelande %d av %d"
 #, c-format
 msgid "Received %d bytes of %d"
 msgstr "Mottog %d byte av %d"
-
-#: libbalsa/rfc3156.c:64
-msgid ""
-"\n"
-"--\n"
-"This is an OpenPGP signed message part:\n"
-msgstr ""
-"\n"
-"--\n"
-"Detta är en OpenPGP-signerad meddelandedel:\n"
 
 #: libbalsa/rfc3156.c:115
 #, c-format
@@ -844,7 +844,7 @@ msgstr "gpgme kunde inte skapa nya data: %s"
 msgid "Sending Mail..."
 msgstr "Skickar brev..."
 
-#: libbalsa/send.c:221 src/main-window.c:1790
+#: libbalsa/send.c:221 src/main-window.c:1789
 msgid "_Hide"
 msgstr "_Dölj"
 
@@ -879,7 +879,7 @@ msgstr "Från"
 msgid "To:"
 msgstr "Till:"
 
-#: libbalsa/send.c:865 src/balsa-index.c:847
+#: libbalsa/send.c:865 src/balsa-index.c:846
 msgid "To"
 msgstr "Till"
 
@@ -1894,12 +1894,12 @@ msgstr "_Lösenord"
 msgid "Enable _TLS"
 msgstr "Aktivera _TLS"
 
-#: src/address-book-config.c:555 src/folder-conf.c:93
+#: src/address-book-config.c:555 src/folder-conf.c:95
 #, c-format
 msgid "Error displaying %s: %s\n"
 msgstr "Fel vid visning: %s: %s\n"
 
-#: src/address-book-config.c:573 src/mailbox-conf.c:473
+#: src/address-book-config.c:573 src/mailbox-conf.c:466
 #: src/pref-manager.c:1570 src/pref-manager.c:2710
 msgid "_Add"
 msgstr "_Lägg till"
@@ -2025,60 +2025,60 @@ msgstr "Storlek"
 msgid "Opening mailbox %s. Please wait..."
 msgstr "Öppnar brevlådan %s. Var vänlig vänta..."
 
-#: src/balsa-index.c:1871
+#: src/balsa-index.c:1870
 msgid "_View Source"
 msgstr "_Visa källa"
 
-#: src/balsa-index.c:1873 src/main-window.c:444 src/message-window.c:126
+#: src/balsa-index.c:1872 src/main-window.c:444 src/message-window.c:126
 msgid "_Reply..."
 msgstr "_Svara..."
 
-#: src/balsa-index.c:1875
+#: src/balsa-index.c:1874
 msgid "Reply To _All..."
 msgstr "Svara till _alla..."
 
-#: src/balsa-index.c:1877
+#: src/balsa-index.c:1876
 msgid "Reply To _Group..."
 msgstr "Svara till _grupp..."
 
-#: src/balsa-index.c:1879
+#: src/balsa-index.c:1878
 msgid "_Forward Attached..."
 msgstr "_Vidarebefordra bifogad..."
 
-#: src/balsa-index.c:1881
+#: src/balsa-index.c:1880
 msgid "Forward _Inline..."
 msgstr "Vidarebefordra _inuti..."
 
-#: src/balsa-index.c:1883 src/main-window.c:546
+#: src/balsa-index.c:1882 src/main-window.c:546
 msgid "_Store Address..."
 msgstr "_Lagra adress..."
 
-#: src/balsa-index.c:1896 src/filter-edit-dialog.c:216 src/mailbox-node.c:868
+#: src/balsa-index.c:1895 src/filter-edit-dialog.c:216 src/mailbox-node.c:868
 #: src/main-window.c:528 src/pref-manager.c:1572 src/pref-manager.c:2714
 msgid "_Delete"
 msgstr "_Ta bort"
 
-#: src/balsa-index.c:1901 src/main-window.c:535
+#: src/balsa-index.c:1900 src/main-window.c:535
 msgid "_Undelete"
 msgstr "_Återskapa"
 
-#: src/balsa-index.c:1906
+#: src/balsa-index.c:1905
 msgid "Move To _Trash"
 msgstr "Flytta till _papperskorgen"
 
-#: src/balsa-index.c:1910
+#: src/balsa-index.c:1909
 msgid "T_oggle"
 msgstr "Vä_xla"
 
-#: src/balsa-index.c:1913
+#: src/balsa-index.c:1912
 msgid "_Flagged"
 msgstr "_Flaggad"
 
-#: src/balsa-index.c:1916
+#: src/balsa-index.c:1915
 msgid "_Unread"
 msgstr "_Olästa"
 
-#: src/balsa-index.c:1924
+#: src/balsa-index.c:1923
 msgid "_Move to"
 msgstr "_Flytta till"
 
@@ -2098,15 +2098,15 @@ msgstr "Totalt"
 msgid "Failed to find mailbox"
 msgstr "Misslyckades med att hitta brevlådan"
 
-#: src/balsa-mblist.c:1737
+#: src/balsa-mblist.c:1748
 msgid "_Other..."
 msgstr "_Annan..."
 
-#: src/balsa-mblist.c:1798
+#: src/balsa-mblist.c:1809
 msgid "Choose destination folder"
 msgstr "Välj destinationsmapp"
 
-#: src/balsa-mblist.c:2110
+#: src/balsa-mblist.c:2121
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr "Visad brevlåda: %s med %ld meddelanden, %ld nya"
@@ -2468,17 +2468,17 @@ msgstr "_Alla"
 msgid "C_lear"
 msgstr "T_öm"
 
-#: src/filter-edit-callbacks.c:986 src/main-window.c:2708
+#: src/filter-edit-callbacks.c:986 src/main-window.c:2707
 msgid "_Body"
 msgstr "_Meddelandetext"
 
 #. To:
-#: src/filter-edit-callbacks.c:993 src/main-window.c:2709
+#: src/filter-edit-callbacks.c:993 src/main-window.c:2708
 #: src/sendmsg-window.c:1886
 msgid "_To:"
 msgstr "_Till:"
 
-#: src/filter-edit-callbacks.c:1000 src/main-window.c:2710
+#: src/filter-edit-callbacks.c:1000 src/main-window.c:2709
 msgid "_From:"
 msgstr "_Från:"
 
@@ -2486,7 +2486,7 @@ msgstr "_Från:"
 msgid "_Subject"
 msgstr "_Ärende"
 
-#: src/filter-edit-callbacks.c:1015 src/main-window.c:2712
+#: src/filter-edit-callbacks.c:1015 src/main-window.c:2711
 msgid "_Cc:"
 msgstr "_Kopia:"
 
@@ -2713,70 +2713,66 @@ msgid ""
 msgstr ""
 "Filterdialogen är öppen, stäng den innan du kan köra filter på någon brevlåda"
 
-#: src/folder-conf.c:263
+#: src/folder-conf.c:265
 msgid "Remote IMAP folder"
 msgstr "IMAP-fjärrmapp"
 
-#: src/folder-conf.c:266 src/folder-conf.c:700 src/mailbox-conf.c:484
+#: src/folder-conf.c:268 src/folder-conf.c:658 src/mailbox-conf.c:477
 msgid "_Update"
 msgstr "_Uppdatera"
 
-#: src/folder-conf.c:266 src/folder-conf.c:700
+#: src/folder-conf.c:268 src/folder-conf.c:658
 msgid "_Create"
 msgstr "_Skapa"
 
-#: src/folder-conf.c:281
+#: src/folder-conf.c:283
 msgid "Remote IMAP folder set"
 msgstr "Samling med IMAP-fjärrmappar"
 
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:288
+#: src/folder-conf.c:290
 msgid "Descriptive _Name:"
 msgstr "Beskrivande _namn:"
 
 #. pop server
-#: src/folder-conf.c:294 src/mailbox-conf.c:952 src/mailbox-conf.c:1047
+#: src/folder-conf.c:296 src/mailbox-conf.c:918 src/mailbox-conf.c:1012
 msgid "_Server:"
 msgstr "_Server:"
 
 #. username
-#: src/folder-conf.c:300 src/mailbox-conf.c:959
+#: src/folder-conf.c:302 src/mailbox-conf.c:925
 msgid "Use_r name:"
 msgstr "Använda_rnamn:"
 
-#: src/folder-conf.c:306
+#: src/folder-conf.c:308
 msgid "_Remember password"
 msgstr "_Kom ihåg lösenord"
 
-#: src/folder-conf.c:311
+#: src/folder-conf.c:313
 msgid "_Password:"
 msgstr "_Lösenord:"
 
-#: src/folder-conf.c:316
+#: src/folder-conf.c:318
 msgid "Subscribed _folders only"
 msgstr "Endast prenumererade _mappar"
 
-#: src/folder-conf.c:318
+#: src/folder-conf.c:320
 msgid "_Always show INBOX"
 msgstr "_Visa alltid INBOX"
 
-#: src/folder-conf.c:321
+#: src/folder-conf.c:323
 msgid "Pr_efix"
 msgstr "Pr_efix"
 
-#: src/folder-conf.c:327 src/mailbox-conf.c:1096
+#: src/folder-conf.c:329 src/mailbox-conf.c:1061
 msgid "Use SS_L (IMAPS)"
 msgstr "Använd SS_L (IMAPS)"
 
-#: src/folder-conf.c:459
+#: src/folder-conf.c:461
 msgid "Select parent folder"
 msgstr "Välj föräldermapp"
 
-#: src/folder-conf.c:530 src/mailbox-conf.c:407 src/sendmsg-window.c:921
-msgid "Select Identity"
-msgstr "Välj identitet"
-
-#: src/folder-conf.c:558
+#: src/folder-conf.c:532
 #, c-format
 msgid ""
 "Renaming INBOX is special!\n"
@@ -2791,19 +2787,19 @@ msgstr ""
 "INBOX och dess undermappar kommer att\n"
 "finnas kvar. Vad vill du göra?"
 
-#: src/folder-conf.c:564
+#: src/folder-conf.c:538
 msgid "Question"
 msgstr "Fråga"
 
-#: src/folder-conf.c:569
+#: src/folder-conf.c:543
 msgid "Rename INBOX"
 msgstr "Byt namn på INBOX"
 
-#: src/folder-conf.c:571 src/toolbar-factory.c:132
+#: src/folder-conf.c:545 src/toolbar-factory.c:132
 msgid "Cancel"
 msgstr "Avbryt"
 
-#: src/folder-conf.c:672
+#: src/folder-conf.c:640
 msgid ""
 "An IMAP folder that is not a mailbox\n"
 "has no properties that can be changed."
@@ -2811,40 +2807,32 @@ msgstr ""
 "En IMAP-mapp som inte är en brevlåda\n"
 "har inga egenskaper som kan ändras."
 
-#: src/folder-conf.c:697
+#: src/folder-conf.c:655
 msgid "Remote IMAP subfolder"
 msgstr "IMAP-fjärrundermapp"
 
-#: src/folder-conf.c:719
+#: src/folder-conf.c:677
 msgid "Rename or move subfolder"
 msgstr "Byt namn på eller flytta undermapp"
 
-#: src/folder-conf.c:720
+#: src/folder-conf.c:678
 msgid "Create subfolder"
 msgstr "Skapa undermapp"
 
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:727
+#: src/folder-conf.c:685
 msgid "_Folder name:"
 msgstr "_Mappnamn:"
 
-#: src/folder-conf.c:733
+#: src/folder-conf.c:691
 msgid "_Subfolder of:"
 msgstr "_Undermapp till:"
 
-#: src/folder-conf.c:738
+#: src/folder-conf.c:696
 msgid "_Browse..."
 msgstr "_Bläddra..."
 
-#: src/folder-conf.c:746 src/mailbox-conf.c:918
-msgid "Identity:"
-msgstr "Identitet:"
-
-#: src/folder-conf.c:752 src/mailbox-conf.c:925 src/mailbox-conf.c:1106
-msgid "C_hange..."
-msgstr "_Ändra..."
-
-#: src/folder-conf.c:779
+#: src/folder-conf.c:728
 msgid ""
 "This folder is not stored in configuration. I do not yet know how to remove "
 "it from remote server."
@@ -2852,7 +2840,7 @@ msgstr ""
 "Denna mapp finns inte lagrad i konfigurationen. Jag vet ännu inte hur jag "
 "ska ta bort den från fjärrservern."
 
-#: src/folder-conf.c:788
+#: src/folder-conf.c:737
 #, c-format
 msgid ""
 "This will remove the folder \"%s\" from the list.\n"
@@ -2862,7 +2850,7 @@ msgstr ""
 "Du kan använda \"Ny IMAP-mapp\" senare för att lägga till denna\n"
 "mapp igen.\n"
 
-#: src/folder-conf.c:793
+#: src/folder-conf.c:742
 msgid "Confirm"
 msgstr "Bekräfta"
 
@@ -2882,11 +2870,11 @@ msgstr "FEL: "
 msgid "FATAL: "
 msgstr "ÖDESDIGER: "
 
-#: src/mailbox-conf.c:211
+#: src/mailbox-conf.c:218
 msgid "No mailbox selected."
 msgstr "Ingen brevlåda markerad."
 
-#: src/mailbox-conf.c:237
+#: src/mailbox-conf.c:244
 #, c-format
 msgid ""
 "Mailbox \"%s\" is used by Balsa and I cannot remove it.\n"
@@ -2897,7 +2885,7 @@ msgstr ""
 "Om du verkligen vill ta bort den bör du ge någon annan brevlåda\n"
 "dess funktion."
 
-#: src/mailbox-conf.c:247
+#: src/mailbox-conf.c:254
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.  You may "
@@ -2912,15 +2900,15 @@ msgstr ""
 "\"Lägg till brevlåda\" för att komma åt brevlådan igen.\n"
 "Vad vill du göra?"
 
-#: src/mailbox-conf.c:259
+#: src/mailbox-conf.c:266
 msgid "Remove from _list"
 msgstr "Ta bort från _listan"
 
-#: src/mailbox-conf.c:260
+#: src/mailbox-conf.c:267
 msgid "Remove from list and _disk"
 msgstr "Ta bort från listan och _disken"
 
-#: src/mailbox-conf.c:268
+#: src/mailbox-conf.c:275
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" and all its messages from your IMAP "
@@ -2937,11 +2925,11 @@ msgstr ""
 "med detta namn.\n"
 "Vad vill du göra?"
 
-#: src/mailbox-conf.c:281
+#: src/mailbox-conf.c:288
 msgid "_Remove from server"
 msgstr "_Ta bort från server"
 
-#: src/mailbox-conf.c:288
+#: src/mailbox-conf.c:295
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.\n"
@@ -2953,24 +2941,28 @@ msgstr ""
 "brevlåda igen\n"
 "Vad vill du göra?"
 
-#: src/mailbox-conf.c:297
+#: src/mailbox-conf.c:304
 msgid "_Remove from list"
 msgstr "_Ta bort från listan"
 
-#: src/mailbox-conf.c:348
+#: src/mailbox-conf.c:355
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr "Hoppsan! brevlådan inte funnen i balsa_app.mailbox-noder?\n"
 
-#: src/mailbox-conf.c:435
+#: src/mailbox-conf.c:406 src/sendmsg-window.c:921
+msgid "Select Identity"
+msgstr "Välj identitet"
+
+#: src/mailbox-conf.c:433
 msgid "Mailbox Configurator"
 msgstr "Brevlådekonfigurerare"
 
-#: src/mailbox-conf.c:640
+#: src/mailbox-conf.c:625
 #, c-format
 msgid "%s on %s"
 msgstr "%s på %s"
 
-#: src/mailbox-conf.c:763
+#: src/mailbox-conf.c:741
 #, c-format
 msgid ""
 "Rename of %s to %s failed:\n"
@@ -2980,68 +2972,84 @@ msgstr ""
 "%s"
 
 #. mailbox name
-#: src/mailbox-conf.c:891 src/mailbox-conf.c:945 src/mailbox-conf.c:1041
+#: src/mailbox-conf.c:869 src/mailbox-conf.c:913 src/mailbox-conf.c:1006
 msgid "Mailbox _Name:"
 msgstr "Brevlåde_namn:"
 
 #. path to file
-#: src/mailbox-conf.c:899
+#: src/mailbox-conf.c:877
 msgid "Mailbox _Path:"
 msgstr "Sökväg till _brevlådan:"
 
-#: src/mailbox-conf.c:901
+#: src/mailbox-conf.c:879
 msgid "Mailbox Path"
 msgstr "Sökväg till brevlådan"
 
-#: src/mailbox-conf.c:920
-msgid "No value set"
-msgstr "Inget värde angivet"
-
 #. password field
-#: src/mailbox-conf.c:965 src/mailbox-conf.c:1068
+#: src/mailbox-conf.c:931 src/mailbox-conf.c:1033
 msgid "Pass_word:"
 msgstr "_Lösenord:"
 
-#: src/mailbox-conf.c:972
+#: src/mailbox-conf.c:938
 msgid "Use _APOP Authentication"
 msgstr "Använd _APOP-autentisering"
 
-#: src/mailbox-conf.c:978
+#: src/mailbox-conf.c:944
 msgid "_Delete messages from server after download"
 msgstr "_Ta bort meddelanden från servern efter hämtning"
 
-#: src/mailbox-conf.c:983
+#: src/mailbox-conf.c:949
 msgid "_Filter messages through procmail"
 msgstr "_Filtrera meddelanden genom procmail"
 
-#: src/mailbox-conf.c:987
+#: src/mailbox-conf.c:953
 msgid "Fi_lter Command:"
 msgstr "Fi_lterkommando:"
 
-#: src/mailbox-conf.c:995
+#: src/mailbox-conf.c:961
 msgid "_Enable check for new mail"
 msgstr "_Använd kontroll av ny e-post"
 
-#: src/mailbox-conf.c:1005
+#: src/mailbox-conf.c:971
 msgid "Use SS_L (pop3s)"
 msgstr "Använd SS_L (pop3s)"
 
 #. username
-#: src/mailbox-conf.c:1054
+#: src/mailbox-conf.c:1019
 msgid "_Username:"
 msgstr "_Användarnamn:"
 
-#: src/mailbox-conf.c:1062
+#: src/mailbox-conf.c:1027
 msgid "_Remember Password"
 msgstr "_Kom ihåg lösenord"
 
-#: src/mailbox-conf.c:1073
+#: src/mailbox-conf.c:1038
 msgid "F_older Path:"
 msgstr "Sökväg till _mapp:"
 
-#: src/mailbox-conf.c:1101
-msgid "_Identity:"
-msgstr "_Identitet:"
+#: src/mailbox-conf.c:1115
+msgid "Identity:"
+msgstr "Identitet:"
+
+#: src/mailbox-conf.c:1120
+msgid "(No identity set)"
+msgstr "(Ingen identitet angiven)"
+
+#: src/mailbox-conf.c:1124
+msgid "C_hange..."
+msgstr "_Ändra..."
+
+#: src/mailbox-conf.c:1131
+msgid "Show address:"
+msgstr "Visa adress:"
+
+#: src/mailbox-conf.c:1134
+msgid "_From"
+msgstr "_Från"
+
+#: src/mailbox-conf.c:1140 src/sendmsg-window.c:292
+msgid "_To"
+msgstr "_Till"
 
 #: src/mailbox-node.c:235
 msgid "The folder edition to be written."
@@ -3545,15 +3553,15 @@ msgstr "_Identiteter..."
 msgid "Create and set current identities"
 msgstr "Skapa och ställ in aktuella identiteter"
 
-#: src/main-window.c:658 src/message-window.c:185
+#: src/main-window.c:657 src/message-window.c:185
 msgid "_Message"
 msgstr "_Meddelande"
 
-#: src/main-window.c:659
+#: src/main-window.c:658
 msgid "Mail_box"
 msgstr "_Brevlåda"
 
-#: src/main-window.c:750
+#: src/main-window.c:749
 msgid ""
 "Balsa is sending a mail now.\n"
 "Abort sending?"
@@ -3561,7 +3569,7 @@ msgstr ""
 "Balsa skickar ett brev nu.\n"
 "Avbryt skickande?"
 
-#: src/main-window.c:1374
+#: src/main-window.c:1373
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -3569,7 +3577,7 @@ msgstr ""
 "Kunde inte öppna brevlådan!\n"
 "Var vänlig och kontrollera inställningarna för brevlådan."
 
-#: src/main-window.c:1660
+#: src/main-window.c:1659
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://balsa.gnome.org/\n"
@@ -3581,72 +3589,72 @@ msgstr ""
 "\n"
 "Om du vill rapportera fel kan du göra det på: http://bugzilla.gnome.org/"
 
-#: src/main-window.c:1787
+#: src/main-window.c:1786
 msgid "Checking Mail..."
 msgstr "Kontrollerar e-post..."
 
-#: src/main-window.c:2087
+#: src/main-window.c:2086
 msgid "Finished Checking."
 msgstr "Slutförde kontroll."
 
-#: src/main-window.c:2151
+#: src/main-window.c:2150
 #, c-format
 msgid "Sending error: %s"
 msgstr "Fel vid sänding: %s"
 
-#: src/main-window.c:2246
+#: src/main-window.c:2245
 msgid "Balsa: New mail"
 msgstr "Balsa: Ny post"
 
-#: src/main-window.c:2256
+#: src/main-window.c:2255
 #, c-format
 msgid "You have received %d new messages."
 msgstr "Du har fått %d nya meddelanden."
 
-#: src/main-window.c:2257
+#: src/main-window.c:2256
 msgid "You have received 1 new message."
 msgstr "Du har fått 1 nytt meddelande."
 
-#: src/main-window.c:2668
+#: src/main-window.c:2667
 msgid "Search mailbox"
 msgstr "Sök i brevlåda"
 
-#: src/main-window.c:2681
+#: src/main-window.c:2680
 msgid "_Reverse search"
 msgstr "_Omvänd sökning"
 
-#: src/main-window.c:2684
+#: src/main-window.c:2683
 msgid "_Search for:"
 msgstr "_Sök efter:"
 
-#: src/main-window.c:2697
+#: src/main-window.c:2696
 msgid "In:"
 msgstr "I:"
 
-#: src/main-window.c:2711
+#: src/main-window.c:2710
 msgid "S_ubject"
 msgstr "_Ämne"
 
-#: src/main-window.c:2826
+#: src/main-window.c:2825
 msgid "You can apply filters only on mailbox\n"
 msgstr "Du kan endast tillämpa filter på brevlåda\n"
 
-#: src/main-window.c:2870 src/main-window.c:2889
+#: src/main-window.c:2869 src/main-window.c:2888
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Sparande av brevlådan %s misslyckades."
 
-#: src/main-window.c:3082
+#: src/main-window.c:3081
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (skrivskyddad)"
 
-#: src/main-window.c:3084
+#: src/main-window.c:3083
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: src/main-window.c:3182
+#: src/main-window.c:3181
 msgid "Cannot access the message's body\n"
 msgstr "Kan inte komma åt meddelandehuvudet\n"
 
@@ -4593,10 +4601,6 @@ msgstr "Redigera det aktuella meddelandet med Gnome-standardredigeraren"
 msgid "Fr_om"
 msgstr "Fr_ån"
 
-#: src/sendmsg-window.c:292
-msgid "_To"
-msgstr "_Till"
-
 #: src/sendmsg-window.c:296
 msgid "_Cc"
 msgstr "_Kopia"
@@ -5373,6 +5377,15 @@ msgstr "Upp"
 msgid "Down"
 msgstr "Ned"
 
+#~ msgid "No identity set"
+#~ msgstr "Ingen identitet angiven"
+
+#~ msgid "No value set"
+#~ msgstr "Inget värde angivet"
+
+#~ msgid "_Identity:"
+#~ msgstr "_Identitet:"
+
 #~ msgid "Enter passphrase to OpenPGP sign the first message part"
 #~ msgstr "Ange lösenfras för att OpenPGP-signera den första meddelandedelen"
 
@@ -5477,9 +5490,6 @@ msgstr "Ned"
 
 #~ msgid "Signed by: %s"
 #~ msgstr "Signerad av: %s"
-
-#~ msgid "Mail address:"
-#~ msgstr "E-postadress:"
 
 #~ msgid "Key fingerprint: %s"
 #~ msgstr "Nyckelfingeravtryck: %s"

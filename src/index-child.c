@@ -83,12 +83,69 @@ index_child_get_active (GnomeMDI * mdi)
   return INDEX_CHILD (mdi->active_child);
 }
 
+static void
+set_password (GtkWidget * widget, GtkWidget * entry)
+{
+  Mailbox *mailbox;
+
+  mailbox = gtk_object_get_data (GTK_OBJECT (entry), "mailbox");
+  if (!mailbox)
+    return;
+  if (mailbox->type == MAILBOX_IMAP)
+    MAILBOX_IMAP (mailbox)->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (entry)));
+  if (mailbox->type == MAILBOX_POP3)
+    MAILBOX_POP3 (mailbox)->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (entry)));
+  gtk_object_remove_data (GTK_OBJECT (entry), "mailbox");
+}
+
+
 IndexChild *
 index_child_new (GnomeMDI * mdi, Mailbox * mailbox)
 {
   IndexChild *child;
   GnomeMDIChild *mdichild;
   GtkWidget *messagebox;
+
+  {
+    GtkWidget *hbox;
+    GtkWidget *label;
+    GtkWidget *dialog;
+    GtkWidget *entry;
+
+    if ((mailbox->type == MAILBOX_IMAP && MAILBOX_IMAP (mailbox)->passwd == NULL)
+	||
+	(mailbox->type == MAILBOX_POP3 && MAILBOX_POP3 (mailbox)->passwd == NULL))
+      {
+
+	dialog = gnome_dialog_new (_ ("Mailbox password:"),
+		    GNOME_STOCK_BUTTON_OK, GNOME_STOCK_BUTTON_CANCEL, NULL);
+
+	hbox = gtk_hbox_new (FALSE, 0);
+	gtk_box_pack_start (GTK_BOX (GNOME_DIALOG (dialog)->vbox), hbox, FALSE, FALSE, 10);
+
+	label = gtk_label_new ("Password:");
+	gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 10);
+
+	entry = gtk_entry_new ();
+	gtk_entry_set_visibility (GTK_ENTRY (entry), FALSE);
+	gtk_object_set_data (GTK_OBJECT (entry), "mailbox", mailbox);
+	gtk_box_pack_start (GTK_BOX (hbox), entry, FALSE, FALSE, 10);
+
+	gtk_widget_show_all (dialog);
+	gnome_dialog_button_connect (GNOME_DIALOG (dialog), 0, set_password, entry);
+	gnome_dialog_set_modal (GNOME_DIALOG (dialog));
+	gnome_dialog_run_and_hide (GNOME_DIALOG (dialog));
+	gtk_widget_destroy (dialog);
+      }
+  }
+
+  /* check to see if its still null */
+  if ((mailbox->type == MAILBOX_IMAP && MAILBOX_IMAP (mailbox)->passwd == NULL)
+      ||
+  (mailbox->type == MAILBOX_POP3 && MAILBOX_POP3 (mailbox)->passwd == NULL))
+    {
+      return NULL;
+    }
 
   if (!mailbox_open_ref (mailbox))
     {

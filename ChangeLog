@@ -1,3 +1,8 @@
+2003-08-19 14:17  PeterB
+
+	* libmutt/imap/imap.c: Use value returned by
+	uid_search_parse_response() more carefully.
+
 2003-08-18  Pawel Salek  <pawsa theochem.kth.se>
 
 	* configure.in: improve aspell detection (120180).

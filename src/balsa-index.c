@@ -719,6 +719,7 @@ mailbox_listener (MailboxWatcherMessage * mw_message)
       balsa_index_update_flag (bindex, mw_message->message);
       break;
     case MESSAGE_NEW:
+      gnome_triggers_do ("You have new mail!", "newmail");
       balsa_index_add (bindex, mw_message->message);
       break;
     case MESSAGE_DELETE:

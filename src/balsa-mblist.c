@@ -151,51 +151,27 @@ balsa_mblist_class_init (BalsaMBListClass * klass)
 }
 
 static void
-balsa_mblist_init (BalsaMBList * tree)
+imlib_magic_stuff(gchar **data, GdkPixmap **pmap, GdkBitmap **bmap)
 {
   GdkImlibImage *im;
-
-  im = gdk_imlib_create_image_from_xpm_data (mini_dir_open_xpm);
+  im = gdk_imlib_create_image_from_xpm_data (data);
   gdk_imlib_render (im, im->rgb_width, im->rgb_height);
-  open_folder = gdk_imlib_copy_image (im);
-  open_mask = gdk_imlib_copy_mask (im);
+  *pmap = gdk_imlib_move_image (im);
+  *bmap = gdk_imlib_move_mask (im);
   gdk_imlib_destroy_image (im);
+  im = NULL;
+}
 
-  im = gdk_imlib_create_image_from_xpm_data (mini_dir_closed_xpm);
-  gdk_imlib_render (im, im->rgb_width, im->rgb_height);
-  closed_folder = gdk_imlib_copy_image (im);
-  closed_mask = gdk_imlib_copy_mask (im);
-  gdk_imlib_destroy_image (im);
-
-  im = gdk_imlib_create_image_from_xpm_data (plain_folder_xpm);
-  gdk_imlib_render (im, im->rgb_width, im->rgb_height);
-  tray_empty = gdk_imlib_copy_image (im);
-  tray_empty_mask = gdk_imlib_copy_mask (im);
-  gdk_imlib_destroy_image (im);
-
-  im = gdk_imlib_create_image_from_xpm_data (full_folder_xpm);
-  gdk_imlib_render (im, im->rgb_width, im->rgb_height);
-  tray_full = gdk_imlib_copy_image (im);
-  tray_full_mask = gdk_imlib_copy_mask (im);
-  gdk_imlib_destroy_image (im);
-
-  im = gdk_imlib_create_image_from_xpm_data (inbox_xpm);
-  gdk_imlib_render (im, im->rgb_width, im->rgb_height);
-  inboxpix = gdk_imlib_copy_image (im);
-  inbox_mask = gdk_imlib_copy_mask (im);
-  gdk_imlib_destroy_image (im);
-
-  im = gdk_imlib_create_image_from_xpm_data (outbox_xpm);
-  gdk_imlib_render (im, im->rgb_width, im->rgb_height);
-  outboxpix = gdk_imlib_copy_image (im);
-  outbox_mask = gdk_imlib_copy_mask (im);
-  gdk_imlib_destroy_image (im);
-
-  im = gdk_imlib_create_image_from_xpm_data (trash_xpm);
-  gdk_imlib_render (im, im->rgb_width, im->rgb_height);
-  trashpix = gdk_imlib_copy_image (im);
-  trash_mask = gdk_imlib_copy_mask (im);
-  gdk_imlib_destroy_image (im);
+static void
+balsa_mblist_init (BalsaMBList * tree)
+{
+  imlib_magic_stuff(mini_dir_open_xpm, &open_folder, &open_mask);
+  imlib_magic_stuff(mini_dir_closed_xpm, &closed_folder, &closed_mask);
+  imlib_magic_stuff(plain_folder_xpm, &tray_empty, &tray_empty_mask);
+  imlib_magic_stuff(full_folder_xpm, &tray_full, &tray_full_mask);
+  imlib_magic_stuff(inbox_xpm, &inboxpix, &inbox_mask);
+  imlib_magic_stuff(outbox_xpm, &outboxpix, &outbox_mask);
+  imlib_magic_stuff(trash_xpm, &trashpix, &trash_mask);
 
   gtk_widget_push_visual (gdk_imlib_get_visual ());
   gtk_widget_push_colormap (gdk_imlib_get_colormap ());
@@ -241,19 +217,19 @@ balsa_mblist_redraw (BalsaMBList * bmbl)
   /* inbox */
   text[0] = "Inbox";
   ctnode = gtk_ctree_insert_node (ctree, NULL, NULL, text, 5, inboxpix,
-			     inbox_mask, inboxpix, inbox_mask, FALSE, TRUE);
+			     inbox_mask, inboxpix, inbox_mask, FALSE, FALSE);
   gtk_ctree_node_set_row_data (ctree, ctnode, balsa_app.inbox);
 
   /* outbox */
   text[0] = "Outbox";
   ctnode = gtk_ctree_insert_node (ctree, NULL, NULL, text, 5, outboxpix,
-			  outbox_mask, outboxpix, outbox_mask, FALSE, TRUE);
+			  outbox_mask, outboxpix, outbox_mask, FALSE, FALSE);
   gtk_ctree_node_set_row_data (ctree, ctnode, balsa_app.outbox);
 
   /* trash */
   text[0] = "Trash";
   ctnode = gtk_ctree_insert_node (ctree, NULL, NULL, text, 5, trashpix,
-			     trash_mask, trashpix, trash_mask, FALSE, TRUE);
+			     trash_mask, trashpix, trash_mask, FALSE, FALSE);
   gtk_ctree_node_set_row_data (ctree, ctnode, balsa_app.trash);
 
   if (balsa_app.mailbox_nodes)

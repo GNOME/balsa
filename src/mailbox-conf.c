@@ -775,7 +775,6 @@ create_imap_mailbox_page (void)
   GtkWidget *return_widget;
   GtkWidget *table;
   GtkWidget *label;
-  char history_id[100];	/* how big? */
 
   return_widget = gtk_vbox_new (0, FALSE);
 
@@ -847,7 +846,7 @@ create_imap_mailbox_page (void)
                     GTK_FILL, GTK_FILL,
                     10, 10);
 
-  mcw->imap_folderpath= gnome_entry_new((char *)history_id);
+  mcw->imap_folderpath= gnome_entry_new("IMAP Folder History");
   gtk_entry_append_text(GTK_ENTRY(gnome_entry_gtk_entry(GNOME_ENTRY(mcw->imap_folderpath))), "INBOX");
 
   gnome_entry_append_history(GNOME_ENTRY(mcw->imap_folderpath), 1, "INBOX");

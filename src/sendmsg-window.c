@@ -422,6 +422,7 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 {
   GtkWidget *window;
   GtkWidget *vbox;
+  gchar *newsubject = NULL;
 
   BalsaSendmsg *msg = NULL;
 
@@ -498,19 +499,19 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 
 	if (!message->subject)
 	  {
-	    gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Re: ");
+	    newsubject = g_strdup ("Re: ");
 	    break;
 	  }
 
-	tmp = g_strdup (message->subject);
-
-	if (strlen (tmp) < 2)
-	  gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Re: ");
-	else if (!(toupper (tmp[0]) == 'R' &&
-		   toupper (tmp[1]) == 'E') &&
-		 tmp[2] == ':')
-	  gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Re: ");
-	g_free (tmp);
+	tmp = message->subject;
+	if ((strlen (tmp) < 2) ||
+	    (toupper (tmp[0]) != 'R' &&
+	     toupper (tmp[1]) != 'E' &&
+	     tmp[2] != ':'))
+	  {
+	    newsubject = g_strdup_printf ("Re: %s", message->subject);
+	    break;
+	  }
       }
       break;
 
@@ -520,24 +521,29 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 
 	if (!message->subject)
 	  {
-	    gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Fw: ");
+	    newsubject = g_strdup ("Fw: ");
 	    break;
 	  }
 
-	tmp = g_strdup (message->subject);
 
-	if (strlen (tmp) < 2)
-	  gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Fw: ");
-	else if (!(toupper (tmp[0]) == 'F' && toupper (tmp[1]) == 'W') && tmp[2] == ':')
-	  gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Fw: ");
-
-	g_free (tmp);
+	tmp = message->subject;
+	if ((strlen (tmp) < 2) ||
+	    (toupper (tmp[0]) != 'F' &&
+	     toupper (tmp[1]) != 'W' &&
+	     tmp[2] != ':'))
+	  {
+	    newsubject = g_strdup_printf ("Fw: %s", message->subject);
+	    break;
+	  }
       }
       break;
     default:
       break;
     }
 
+  gtk_entry_append_text (GTK_ENTRY (msg->subject), newsubject);
+  g_free (newsubject);
+  newsubject = NULL;
 
   if (type == SEND_REPLY_ALL)
     {
@@ -626,7 +632,7 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
     GtkWidget *toolbar;
 
     item = gnome_app_get_dock_item_by_name (GNOME_APP (window),
-                                            GNOME_APP_TOOLBAR_NAME);
+					    GNOME_APP_TOOLBAR_NAME);
     toolbar = gnome_dock_item_get_child (item);
 
     gtk_toolbar_set_style (GTK_TOOLBAR (toolbar), balsa_app.toolbar_style);

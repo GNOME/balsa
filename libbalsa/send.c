@@ -76,6 +76,7 @@ static void encode_descriptions (BODY * b);
 int balsa_smtp_send  (MessageQueueItem *first_message, char *server);
 int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg);
 gboolean balsa_create_msg (Message * message, HEADER *msg, char *tempfile, int queu);
+gchar** balsa_lookup_mime_type (const gchar* path);
 
 #ifdef BALSA_USE_THREADS
 void balsa_send_thread(MessageQueueItem *first_message);
@@ -145,7 +146,7 @@ balsa_send_message (Message * message)
 #endif  
 //  GtkWidget *send_dialog_message = NULL;
 
-fprintf(stderr,"Comienzo la funcion\n");
+  fprintf(stderr,"Comienzo la funcion\n");
 
   if (message != NULL )
   {
@@ -882,6 +883,30 @@ int balsa_smtp_send (MessageQueueItem *first_message, char *server)
 }  
 
 
+/* balsa_lookup_mime_type [MBG] 
+ *
+ * Description: This is a function to use the gnome mime functions to
+ * get the type and subtype for later use.  Returns the type, and the
+ * subtype in a gchar array, free using g_strfreev()
+ * */
+gchar** balsa_lookup_mime_type (const gchar* path)
+{
+        gchar* mime_type;
+        gchar** tmp;
+
+        mime_type = gnome_mime_type_or_default (path, "");
+
+        if (mime_type != "") {
+                tmp = g_strsplit (mime_type , "/", 2 );
+                g_free (mime_type);
+        } else {
+                tmp = g_strsplit ("application/octet-stream", "/", 2);
+        }                
+
+        return tmp;
+}
+
+
 gboolean balsa_create_msg (Message *message, HEADER *msg, char *tmpfile, int queu)
 {
   BODY *last, *newbdy;
@@ -891,7 +916,9 @@ gboolean balsa_create_msg (Message *message, HEADER *msg, char *tmpfile, int que
   HEADER *msg_tmp;
   MESSAGE *mensaje;
   LIST *in_reply_to;
-				
+
+  gchar** mime_type;
+
   if (!msg->env)
     msg->env = mutt_new_envelope ();
 
@@ -959,11 +986,18 @@ gboolean balsa_create_msg (Message *message, HEADER *msg, char *tmpfile, int que
       FILE *tempfp = NULL;
       Body *body;
       newbdy = NULL;
-
       body = list->data;
 
-      if (body->filename)
+      if (body->filename) {
 	newbdy = mutt_make_file_attach (body->filename);
+
+        /* Do this here because we don't want to use libmutt's mime
+         * types */
+        mime_type = balsa_lookup_mime_type ((const gchar*)body->filename);
+        newbdy->type = mutt_check_mime_type (mime_type[0]);
+        newbdy->subtype = g_strdup(mime_type[1]);
+        g_strfreev (mime_type);
+      }
 
       else if (body->buffer)
 	{
@@ -1051,6 +1085,4 @@ gboolean balsa_create_msg (Message *message, HEADER *msg, char *tmpfile, int que
  return TRUE;
         
 }
-
-
 

@@ -1,3 +1,7 @@
+2000-04-16  Matthew Guenther <mguenther@netcom.ca>
+	* libbalsa/send.c (balsa_create_msg): Added balsa mime lookup
+	function balsa_lookup_mime_type to fix bug #4821
+			 
 2000-04-12  Peter Williams  <peter@beta.newton.cx>
 
 	* src/mailbox-conf.c (conf_update_mailbox): Address

@@ -6,6 +6,7 @@ description[el]=Ηλεκτρονική Αλληλογραφία
 description[es]=Correo-E
 description[et]=Elektronpost
 description[fr]=Courrier ιlιctronique
+description[sv]=Epost
 description[wa]=Emilaedje
 
 [newmail]
@@ -17,4 +18,5 @@ description[el]=Γνωστοποίηση νέας αλληλογραφίας
 description[es]=Llegada de un nuevo mensaje
 description[et]=Teade uute kirjade saabumisest
 description[fr]=Notification de nouveaux messages
+description[sv]=Besked om nytt meddelande
 description[wa]=Vos avoz des noveas emiles

@@ -6,6 +6,7 @@ description[el]=Πρόγραμμα Ηλεκτρονικής Αλληλογραφίας Balsa
 description[es]=Lector de correo Balsa
 description[et]=Elektronpostiprogramm Balsa
 description[fr]=Lecteur de courrier Balsa
+description[sv]=Balsa epostprogram
 description[wa]=Manaedjeu d' emilaedjes Balsa
 
 [startup]
@@ -17,4 +18,5 @@ description[el]=Έναρξη του προγράμματος
 description[es]=Inicio del programa
 description[et]=Programmi kδivitamine
 description[fr]=Dιmarrage du programme
+description[sv]=Programstart
 description[wa]=Enondaedje do programe

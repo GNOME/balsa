@@ -1,5 +1,11 @@
 2001-10-21  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* src/balsa-index.c: update to #62737.
+	* src/sendmsg-window.c: Chinese support (ejoy@peoplemail.com.cn).
+	Identity guessing (Steve Wall).
+	
+2001-10-21  Pawel Salek  <pawsa@theochem.kth.se>
+
 	* configure.in, NEWS, AUTHORS: prepare 1.2.1 release.
 
 2001-10-21  Peter Bloomfield  <PeterBloomfield@MindSpring.com>

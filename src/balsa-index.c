@@ -892,7 +892,6 @@ struct balsa_index_scan_info {
     GtkCTreeNode *next_match;
     LibBalsaMessage *next_match_message;
     GtkCTreeNode *node;
-    gboolean looking;
     LibBalsaMessage *message;
 };
 
@@ -907,15 +906,13 @@ balsa_index_scan_for_flag(GtkCTree *ctree, GtkCTreeNode *node,
             b->first_match = node;
             b->first_match_message = message;
         }
-        if (b->looking && !b->next_match) {
+        if (b->node && !b->next_match) {
             b->next_match = node;
             b->next_match_message = message;
         }
     }
-    if (message == b->message) {
+    if (message == b->message)
         b->node = node;
-        b->looking = TRUE;
-    }
 }
 
 static void
@@ -941,8 +938,12 @@ balsa_index_select_next_by_flag(BalsaIndex * bindex,
     bi.flag = flag;
     bi.first_match = NULL;
     bi.next_match = NULL;
-    bi.looking = FALSE;
-    bi.message = LIBBALSA_MESSAGE(gtk_clist_get_row_data(clist, h));
+    bi.node = NULL;
+    if (h > 0)
+        bi.message =
+            LIBBALSA_MESSAGE(gtk_clist_get_row_data(clist, h - 1));
+    else
+        bi.message = NULL;
     gtk_ctree_pre_recursive(bindex->ctree, NULL, (GtkCTreeFunc)
                             balsa_index_scan_for_flag, &bi);
     if (bi.next_match) {

@@ -131,6 +131,20 @@ remember_cb(GtkToggleButton * button, FolderDialogData * fcw)
 }
 
 static void
+folder_cleanup_key(GObject *dialog, BalsaMailboxNode *mn)
+{
+    CommonDialogData *cdd = 
+        g_object_get_data(G_OBJECT(mn),
+                          BALSA_FOLDER_CONF_IMAP_KEY);
+    if(cdd) {
+        cdd->dialog = NULL; /* dialog has already been destroyed */
+        /* set data will call folder_conf_destroy_cdd(cdd); */
+        g_object_set_data(G_OBJECT(mn),
+                          BALSA_FOLDER_CONF_IMAP_KEY, NULL);
+    }
+}
+
+static void
 folder_conf_clicked_ok(FolderDialogData * fcw)
 {
     gboolean insert;
@@ -165,6 +179,8 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
         fcw->mbnode = balsa_mailbox_node_new_imap_folder(s, NULL);
         /* The mailbox node takes over ownership of the
          * FolderDialogData. */
+        g_signal_connect(G_OBJECT(fcw->dialog), "destroy",
+                         (GCallback)folder_cleanup_key, fcw->mbnode);
         g_object_set_data_full(G_OBJECT(fcw->mbnode),
                                BALSA_FOLDER_CONF_IMAP_KEY, fcw,
                                (GDestroyNotify) folder_conf_destroy_cdd);
@@ -188,20 +204,6 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
     } else {
         balsa_mailbox_node_rescan(fcw->mbnode);
         config_folder_update(fcw->mbnode);
-    }
-}
-
-static void
-folder_cleanup_key(GObject *dialog, BalsaMailboxNode *mn)
-{
-    CommonDialogData *cdd = 
-        g_object_get_data(G_OBJECT(mn),
-                          BALSA_FOLDER_CONF_IMAP_KEY);
-    if(cdd) {
-        cdd->dialog = NULL; /* dialog has already been destroyed */
-        /* set data will call folder_conf_destroy_cdd(cdd); */
-        g_object_set_data(G_OBJECT(mn),
-                          BALSA_FOLDER_CONF_IMAP_KEY, NULL);
     }
 }
 
@@ -229,7 +231,6 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     }
 
     s = mn ? mn->server : NULL;
-    default_server = libbalsa_guess_imap_server();
 
     fcw = g_new(FolderDialogData, 1);
     fcw->ok = (CommonDialogFunc) folder_conf_clicked_ok;
@@ -273,11 +274,13 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
                                    fcw, 0, mn ? mn->name : NULL, 
 				   label);
 
+    default_server = libbalsa_guess_imap_server();
     label = create_label(_("_Server:"), table, 1);
     fcw->server = create_entry(fcw->dialog, table,
                               GTK_SIGNAL_FUNC(validate_folder),
                               fcw, 1, s ? s->host : default_server,
 			      label);
+    g_free(default_server);
 
     label= create_label(_("Use_r name:"), table, 3);
     fcw->username = create_entry(fcw->dialog, table,
@@ -750,7 +753,6 @@ folder_conf_delete(BalsaMailboxNode* mbnode)
 
     /* Remove the node from balsa's mailbox list */
     balsa_mblist_mailbox_node_remove(mbnode);
-    g_object_unref(G_OBJECT(mbnode));
     update_mail_servers();
 }
 

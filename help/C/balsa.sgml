@@ -101,6 +101,32 @@
        accessible by expanding the tree. POP3 and IMAP mailboxes will also
        be displayed as being at the top level of the tree.</para>
     </sect2>
+
+    <sect2 id="subwin-msgindex">
+      <title>The Message Index</title>
+
+      <para>The message index displays the messages in the current folder,
+      and lets you choose which folder's messages to view. Click on the
+      notebook tabs, or double-click on a folder in the 
+      <link linkend="subwin-mblist">mailbox list</link> to bring it to the
+      front.</para>
+ 
+      <para>From the message index you can do a lot. Clicking on a message
+      will cause it to be displayed in the message view. Right-clicking on
+      it will give a popup menu letting you reply to the message (or forward
+      it, etc.) and move it to another folder (using the Transfer menu item).
+      Double-clicking on a message will open it in a separate window.</para>
+
+      <para>There are some useful hotkeys for the message index.</para>
+
+      <variablelist>
+        <varlistentry><term>n</term><listitem><para>Go to the next message</para>
+        </listitem></varlistentry>
+
+        <varlistentry><term>p</term><listitem><para>Go to the previous message</para>
+        </listitem></varlistentry>
+      </variablelist>
+    </sect2>
   </sect1>
 
   <sect1 id="common-tasks">
@@ -112,6 +138,13 @@
     <itemizedlist mark="bullet">
        <listitem><para><link linkend="ct-create-new-mb">Creating new mailboxes</link>
        </para></listitem>
+
+       <listitem><para><link linkend="ct-move-msg">Moving messages around</link>
+       </para></listitem>
+
+       <listitem><para><link linkend="ct-main-folder-imap">Making one of the main folders IMAP-based</link>
+       </para></listitem>
+
     </itemizedlist>
 
     <sect2 id="ct-create-new-mb">
@@ -123,11 +156,66 @@
 
       <para>To create a new POP3 mailbox, go to the configuration dialog, select
       the Mailboxes section, and click Add in the POP3 area. A dialog will be
-      displayed that will let you set up the new mailbox. (Note: under Sawmill, this
+      displayed that will let you set up the new mailbox.</para>
+
+      <note>Under Sawmill, this
       dialog may be obscured, causing the appearance that Balsa has locked up. Move
-      the configuration dialog and see if the new dialog was hidden.) The mailbox
+      the configuration dialog and see if the new dialog was hidden.</note> 
+
+      <note>The mailbox
       may not appear in the list immediately, or in the current session of Balsa at
-      all, but it exists. Yes, this is a bug.</para>
+      all, but it exists. Yes, this is a bug.</note>
+    </sect2>
+
+    <sect2 id="ct-move-msg">
+      <title>Moving Messages</title>
+
+      <para>The easiest way to move messages around is to select them in the
+        <link linkend="subwin-msgindex">message index</link> and use the Transfer
+        context menu. It will let you choose a mailbox in the 
+        <link linkend="subwin-mblist">mailbox list</link> and the messages will
+        be moved there. (Moving messages to the current folder used to be a coredump
+        but is now a noop)</para>
+    </sect2>
+
+    <sect2 id="ct-main-folder-imap">
+      <title>I want one of the main folders to be IMAP</title>
+
+      <para>This can be done. It's ugly, but possible.</para>
+
+      <para>First, create the IMAP folder as you want it configured. It will appear as
+      something like &quot;INBOX on host.domain.org&quot;. Exit Balsa. (I told you this
+      was bad.)</para>
+ 
+      <para>Open up ~/.balsarc in your favorite editor. There will be a visible organization
+      to the file; find the place called &quot;Accounts&quot;. There will be at least five
+      definitions that look like &quot;Inbox = {Type = local;Name = (etc.)&quot;. There will
+      also be one that says something like &quot;m1 = {Type = IMAP;Name = (etc.)&quot;. Edit
+      the file to replace &quot;m1&quot; (or whatever number) with &quot;Inbox&quot;, and
+      it would be wise to change the &quot;Name&quot; field to &quot;Inbox&quot;. Change the
+      Inbox entry to be the opposite; Inbox becomes m1 and Name becomes Local Inbox (for
+      example).</para>
+
+      <para>Close the .balsarc and restart <application>Balsa</application>. Your Inbox
+      will now be an IMAP mailbox. Hopefully you can figure out how to make your other mailboxes
+      IMAP-based from these instructions.</para>
+    </sect2>
+  </sect1>
+
+  <sect1 id="its-not-working">
+    <title>It's not Working!!!</title>
+
+    <para>This is a FAQ for when Balsa appears to lock up, or other things
+    that you think should be happening aren't. If you can't figure out how
+    to do something but Balsa lets you do it, that's a bug. Report it</para>
+
+    <itemizedlist mark="bullet">
+      <listitem><para><link linkend="inw-main-to-imap">I want one of the main folders to be IMAP
+      </link></para></listitem>
+    </itemizedlist>
+
+    <sect2 id="inw-main-to-imap">
+      <para>See <link linkend="ct-main-folder-imap">this section</link>.</para>
     </sect2>
   </sect1>
 

@@ -20,6 +20,8 @@
 	because the code includes user interface.
 	* src/main-window.c: check commit_changes return value.
 	* src/balsa-message.c: don't crash on corrupted images.
+	* src/mailbox-conf.c(conf_update_mailbox): double g_free().
+	* libmutt/{Makefile.am,socket.c}: removed old socket.c
 
 2000-09-02  Pawel Salek  <pawsa@theochem.kth.se>
 

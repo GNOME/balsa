@@ -600,7 +600,6 @@ conf_update_mailbox (LibBalsaMailbox * mailbox, gchar * old_mbox_pkey)
     server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
     
     g_free (mailbox->name);
-    g_free (mb_imap->path);
     
     mailbox->name = g_strdup(gtk_entry_get_text(GTK_ENTRY(mcw->imap_mailbox_name)));
     

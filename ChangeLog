@@ -1,3 +1,11 @@
+2004-10-27 06:31  PeterB
+
+	* src/store-address.c: migrate from deprecated GtkOptionMenu to
+	GtkComboBox.
+	* src/pref-manager.c: migrate from deprecated GnomeFontPicker,
+	GnomeColorPicker, and GtkOptionMenu to GtkFontButton,
+	GtkColorButton, and GtkComboBox.
+
 2004-10-26 06:48  PeterB
 
 	* libbalsa/: address-book-extern.c, address-book-ldif.c,

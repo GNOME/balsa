@@ -1524,7 +1524,8 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
 
 		if (result != LIBBALSA_MESSAGE_CREATE_OK) {
 		    g_object_unref(G_OBJECT(mime_part));
-		    g_object_unref(G_OBJECT(mime_root));
+		    if (mime_root)
+			g_object_unref(G_OBJECT(mime_root));
 		    return LIBBALSA_MESSAGE_CREATE_ERROR;
 		}
 	    }

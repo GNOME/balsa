@@ -208,7 +208,7 @@ libbalsa_condition_new_bool(gboolean negated, ConditionMatchType cmt,
     left = libbalsa_condition_new_from_string(string);
     if(left == NULL)
         return NULL;
-    if(**string != ' ' || 
+    if(*(*string)++ != ' ' || 
        (right = libbalsa_condition_new_from_string(string)) == NULL) {
         libbalsa_condition_free(left);
         return NULL;

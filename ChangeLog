@@ -1,15 +1,3046 @@
-1998-07-06  Jaka Mocnik  <jaka.mocnik@kiss.uni-lj.si>
+Tue Jul 28 04:01:40 1998  pavlov
 
-	* main-window.c (open_main_window): some changes to make MDI behave
-	well.
-	
-Mon Mar  9 19:31:23 1998  Tom Tromey  <tromey@cygnus.com>
+	* TODO, INSTALL, README:
+	Update of the documentation (or sad excuse for that).  Added the INSTALL file
+	to replace the one thats automagically generated if it doesn't exist.  This
+	way we get a file that accually applies to the installation of balsa, and not
+	generic stuff.  This should help, not that its hard to do now that c-client is
+	removed.
 
-	* Makefile.am (SUBDIRS): Don't build in support directory.
-	* configure.in: Don't call GNOME_SUPPORT_CHECKS.  Don't create
-	support/Makefile.
+	Updated the TODO file to note that local mailbox dir recursion now is
+	implimented but lacks a way to store the mailboxes in something other than a
+	list currently.  This will be GForest's use.
 
-1998-02-19  Federico Mena Quintero  <federico@nuclecu.unam.mx>
+	Updated README to remove INSTALL file info, and such.  Added a description,
+	etc.
 
-	* src/main.c (main): Added app_id "balsa".
+	* src/balsa-app.c, libbalsa/mailbox.c, libbalsa/Attic/gforrest.c, libbalsa/gforest.c, libbalsa/gforest.h, libbalsa/Makefile.am:
+	whoops, i really need a dictionary...  gnome dictionary interface?  hehe... :)
+
+	thanks to Tom Tromey for pointing out that forest is spelled with one r and
+	not two :)
+
+	a few minor cleanups, make a little bit more use of some g_get_* functions.
+
+	Stuart Parmenter <pavlov@pavlov.net>
+
+	* libbalsa/Attic/gforrest.c, libbalsa/gforrest.h:
+	whoops, I forgot to add gforrest.[ch].
+
+	This currently doesn't do anything useful, but will be used to store things in
+	a heirarchy.  Since GTree is already being used, i figured we'd just use
+	forrest (;
+
+	Once it does something useful, we'll probibly add it to glib.  If someone
+	wants to do this for me, or already has, please speak up :)
+
+	Stuart Parmenter <pavlov@pavlov.net>
+
+	* libbalsa/send.h, libbalsa/send.c, libbalsa/misc.h, libbalsa/misc.c, libbalsa/Attic/mbox.c, libbalsa/mailbox.h, libbalsa/mailbox.c, libbalsa/libbalsa.c, libbalsa/Attic/drivers.h, libbalsa/Makefile.am:
+	changed the licence of libbalsa back to GPL.
+	Removed some excess files from libbalsa that were no longer used.
+
+	* src/local-mailbox.c, src/balsa-init.c:
+	Fixed local-mailbox.c so that it loads mailboxes recursivly in your local mail
+	dir.
+
+	Fixed balsa-init.c so that it doesn't do a few weird things.
+
+	-pav
+
+Mon Jul 27 23:28:45 1998  pavlov
+
+	* src/Attic/single-window.c, src/new-mailbox.c:
+	hrm, made it stop crashing when trying to add a new mailbox..
+	-pav
+
+Mon Jul 27 18:37:15 1998  unammx
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-x-checks.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	1998-07-27  Federico Mena Quintero  <federico@nuclecu.unam.mx>
+
+		* gnome-x-checks.m4: Changed Gtk version test to use
+		GTK_HAVE_FEATURES_1_1_0.
+
+Mon Jul 27 15:55:22 1998  pavlov
+
+	* po/balsa.pot, debian/README.debian, debian/changelog, debian/control, debian/copyright, debian/crontab.ex, debian/dirs, debian/diversions.ex, debian/docs, debian/inetd.conf.ex, debian/info.ex, debian/init.d.ex, debian/manpage.1.ex, debian/menu.ex, debian/rules, debian/watch.ex:
+	initial addition of debian scripts.  Someone should be looking at these
+	shortly to advise me on what to remove/etc :)
+
+	-pav
+
+	* libmutt/snprintf.c, libmutt/rfc822.h, libmutt/Attic/muttconfig.h.in, libmutt/mutt.h, libmutt/Attic/linuxconfig.h, libmutt/Attic/configure.in, libmutt/Makefile.am, configure.in, config.h.in, acconfig.h:
+	hrm, i think this should make it work.. i'm testing n stuff
+	-pav
+
+	* libmutt/snprintf.c, libmutt/Attic/muttconfig.h.in, libmutt/rfc822.h, libmutt/Attic/configure.in, libmutt/mutt.h, configure.in:
+	added configure.in for libmutt, so that we can get all the needed info for it.
+	This should make Balsa compile for everyone other than me.
+
+	-pav
+
+	* balsa.spec: updated the spec file to reflect the removal of c-client.
+	Updated it to require gtk 1.1.0 or higher.
+
+	-pav
+
+	* libbalsa/misc.h, libbalsa/misc.c, libbalsa/mailbox.c:
+	fixed up so we weren't opening and closing and reopening then closing.  open
+	once, fflush, do magic reading, then close :)
+
+	-pav
+
+Sun Jul 26 21:55:40 1998  veillard
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-xml-check.m4, /debian/home/gnomecvs/gnome-common/macros/Makefile.am, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	Added gnome-xml-check.m4 for libxml detection, Daniel.
+
+Sun Jul 26 20:05:19 1998  pavlov
+
+	* src/balsa-message.c, libbalsa/misc.h, libbalsa/misc.c, libbalsa/mailbox.c:
+	AHHHHHHHHHH!
+
+	balsa works.. at least for me.. heh heh
+
+	I think that as soon as the autoconf stuff works for libmutt, that it should
+	compile and run without any problems.
+
+	I'm not currently sure how to handle attachments, and havn't even looked at
+	them, but thats on my todo list.
+
+	-pav
+
+	* libbalsa/mailbox.c, libbalsa/mailbackend.h:
+	more changes.. no, displaying message does not work yet.  I'm hoping alan cox
+	can take a look at this shortly.
+
+	-pav
+
+Fri Jul 24 14:49:06 1998  martin
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-libgtop-check.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	1998-07-24  Martin Baulig  <martin@home-of-linux.org>
+
+		* gnome-libgtop-check.m4: No longer requiring
+		`GNOME_LIBGTOP_SYSDEPS'.
+
+Fri Jul 24 06:50:18 1998  tromey
+
+	* /debian/home/gnomecvs/gnome-common/macros/linger.m4, /debian/home/gnomecvs/gnome-common/macros/Makefile.am, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	Fri Jul 24 00:45:38 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* Makefile.am (MACROS): Added linger.m4.
+		* linger.m4: New file.
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-undelfs.m4, /debian/home/gnomecvs/gnome-common/macros/gnome-vfs.m4:
+	Actually add files mentioned in last commit
+
+	* /debian/home/gnomecvs/gnome-common/macros/Makefile.am, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	Thu Jul 23 22:41:23 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* Makefile.am (MACROS): Added gnome-undelfs.m4, gnome-vfs.m4.
+		* gnome-undelfs.m4: New file.
+		* gnome-vfs.m4: New file.
+
+Fri Jul 24 00:56:43 1998  pavlov
+
+	* libmutt/rfc2047.c, libmutt/protos.h, libmutt/pop.c, libmutt/pattern.c, libmutt/parse.c, libmutt/mutt.h, libmutt/mime.h, libmutt/handler.c, libmutt/buffy.c:
+	updated to match with mutt 0.93.1
+
+	added some things to fix some core dumps, i'm emailed the mutt development
+	list to see why they are being caused in my version and not during normal mutt
+	stuff.
+
+	-pav
+
+Thu Jul 23 21:46:01 1998  pavlov
+
+	* libbalsa/mailbox.c: changes..
+
+	dates appear now. :)
+
+	i'm still trying to figure out message displaying
+	-pav
+
+	* libbalsa/mailbox.c: more changes.. *yawn*
+
+	i'm trying to get messages to display
+	-pav
+
+	* libbalsa/mailbox.c:
+	hey look, balsa loads mailboxes now.. hmm.. lets make it display the messages
+	now?
+
+	-pav
+
+	* libmutt/snprintf.c, libmutt/rfc822.h, libmutt/parse.c, libmutt/Attic/linuxconfig.h, libmutt/mutt.h, libmutt/Makefile.am, libbalsa/mailbox.c:
+	hacks hacks hacks... eek :)
+
+	ok, this is a major hack, but balsa runs and opens a mailbox... just doesn't
+	accually load it correctly.. next.. :)
+	-pav
+
+	* libmutt/sort.c, libmutt/pattern.c, libmutt/lib.c, libmutt/init.c, libmutt/handler.c, libmutt/Makefile.am:
+	hey look, balsa compiles.. heh heh...
+
+	no, it doesn't work.. i'm getting there ;)
+
+	-pav
+
+Wed Jul 22 17:19:01 1998  martin
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-libgtop-sysdeps.m4, /debian/home/gnomecvs/gnome-common/macros/gnome-fileutils.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	1998-07-22  Martin Baulig  <martin@home-of-linux.org>
+
+		* gnome-fileutils.m4: Added some reasonable defaults to allow
+		cross compiling; removed `mountlist.o' and `fsusage.o' from
+		LIBOBJS.
+
+Wed Jul 22 05:52:27 1998  tromey
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-guile-checks.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	Tue Jul 21 23:44:53 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* gnome-guile-checks.m4: If no build-guile, link against readline
+		before termcap.
+
+Sun Jul 19 18:12:38 1998  pavlov
+
+	* libmutt/sendlib.c, libmutt/score.c, libmutt/lib.c, libmutt/init.c, libmutt/flaglib.c, libmutt/filter.c, libmutt/attach.c, libmutt/Makefile.am, libbalsa/libbalsa.c:
+	more changes!!! :)
+
+	it should almost link now.. not quite though
+	-pav
+
+	* libmutt/pattern.c, libmutt/mx.c, libmutt/init.h, libmutt/init.c, libmutt/copy.c, libmutt/Makefile.am:
+	we're getting there.. i hope
+	-pav
+
+	* libmutt/lib.c, libmutt/init.c, libmutt/Makefile.am:
+	more stuff.. bleh!@#!
+	-pav
+
+	* src/Makefile.am, libmutt/copy.c, libmutt/Makefile.am, libbalsa/libbalsa.c:
+	some more cleanups i think... *shrug*
+	-pav
+
+Fri Jul 17 00:55:50 1998  pavlov
+
+	* libmutt/Attic/reldate.h, libmutt/globals.c, libbalsa/libbalsa.c, autogen.sh, TODO:
+	hm, changes changes, oh, and more changes
+	-pav
+
+	* src/save-restore.c: whoo wee!  lets remove some stuff too
+	-pav
+
+Thu Jul 16 23:59:11 1998  pavlov
+
+	* libmutt/.cvsignore: added a cvs ignore
+	-pav
+
+	* libmutt/Makefile.am: changed flags.c to flaglib.c
+	-pav
+
+Thu Jul 16 22:52:32 1998  alan
+
+	* libmutt/flaglib.c, libmutt/flags.c:
+	Split the flags backend from the GUI
+
+Thu Jul 16 22:33:14 1998  pavlov
+
+	* src/sendmsg-window.c, src/index-child.c, src/Makefile.am, po/balsa.pot, libbalsa/mailbox.c, libbalsa/libbalsa.c:
+	ok, down to about 4 errors now :)
+	-pav
+
+	* po/balsa.pot, libmutt/Makefile.am, libbalsa/mailbox.c:
+	more changes/fixes
+	-pav
+
+Thu Jul 16 19:33:18 1998  alan
+
+	* libmutt/Makefile.am: Add the filters/from stuff.
+
+	We still have a fair amount of noise and mixed up symbols. Someone on
+	the balsa side needs to make things like mutt_yesorno do something
+	meaningful
+
+	* libmutt/Makefile.am, libmutt/lib.c, libmutt/curs_lib.c:
+	Moved mutt_perror (portable routine) from curs_lib to lib
+	Added sendlib
+	Can an autoconf guru fix the Makefile.am to not harcode RETSIGTYPE and SHARE
+
+	* libmutt/sigblock.c:
+	sigblock needs to own the Sigset-t object as its the one that may be linked
+	alone
+
+	* libmutt/globals.h, libmutt/globals.c:
+	Ok this hopefully nails the global variable problem
+
+	* libmutt/Makefile.am, libmutt/sigblock.c, libmutt/signal.c:
+	Add more bits
+	Split signal.c into two files as it contains both library and gui related
+	pieces
+
+	* libmutt/globals.h, libmutt/globals.c: Missed a few
+
+	* libmutt/globals.c, libmutt/mutt.h, libmutt/main.c:
+	Move the global variables out of main.c into a seperate globals.c for the
+	library as well as mutt app
+
+	* libbalsa/Makefile.am: Need to pickup rx
+
+	* libmutt/Makefile.am: More support code that isnt a problem added
+
+	* libmutt/status.c, libmutt/protos.h, libmutt/pager.c, libmutt/mx.c, libmutt/lib.c, libmutt/keymap.h, libmutt/hdrline.c, libmutt/handler.c, libmutt/globals.h, libmutt/curs_main.c, libmutt/browser.c, libmutt/Makefile.am, libmutt/addrbook.c:
+	Ok some beginnings
+
+	mutt_FormatString passes the length so we can try and keep curses out
+	kermap.h - dropped keymap_defs
+	A couple of ifdef MUTT_FULL's dropped in - hits we need to split the code
+	a bit better eventually.
+
+	A subset now builds - can someone look at imap
+
+	* libmutt/rfc1524.c, libmutt/mutt.h:
+	Make mutt use "MUTT_TRUE/FALSE" for its internal stuff - avoids clashes
+
+Thu Jul 16 17:02:30 1998  pavlov
+
+	* libmutt/rx/rxunfa.h, libmutt/rx/rxunfa.c, libmutt/rx/rxsuper.h, libmutt/rx/rxsuper.c, libmutt/rx/rxstr.h, libmutt/rx/rxstr.c, libmutt/rx/rxspencer.h, libmutt/rx/rxspencer.c, libmutt/rx/rxsimp.h, libmutt/rx/rxsimp.c, libmutt/rx/rxproto.h, libmutt/rx/rxposix.h, libmutt/rx/rxposix.c, libmutt/rx/rxnode.h, libmutt/rx/rxnode.c, libmutt/rx/rxnfa.h, libmutt/rx/rxnfa.c, libmutt/rx/rxhash.h, libmutt/rx/rxhash.c, libmutt/rx/rxgnucomp.h, libmutt/rx/rxgnucomp.c, libmutt/rx/rxcset.h, libmutt/rx/rxcset.c, libmutt/rx/rxcontext.h, libmutt/rx/rxbitset.h, libmutt/rx/rxbitset.c, libmutt/rx/rxbasic.h, libmutt/rx/rxbasic.c, libmutt/rx/rxanal.h, libmutt/rx/rxanal.c, libmutt/rx/rxall.h, libmutt/rx/rx.h, libmutt/rx/rx.c, libmutt/rx/inst-rxposix.h, libmutt/rx/hashrexp.c, libmutt/rx/_rx.h, libmutt/rx/Makefile.in, libmutt/thread.c, libmutt/system.c, libmutt/strcasecmp.c, libmutt/status.c, libmutt/sort.h, libmutt/sort.c, libmutt/snprintf.c, libmutt/signal.c, libmutt/sendlib.c, libmutt/send.c, libmutt/score.c, libmutt/rfc822.h, libmutt/rfc822.c, libmutt/rfc2047.h, libmutt/rfc2047.c, libmutt/rfc1524.h, libmutt/rfc1524.c, libmutt/resize.c, libmutt/Attic/reldate.h, libmutt/recvattach.c, libmutt/protos.h, libmutt/postpone.c, libmutt/pop.c, libmutt/pattern.c, libmutt/parse.h, libmutt/parse.c, libmutt/pager.h, libmutt/pager.c, libmutt/mx.h, libmutt/mx.c, libmutt/mutt_regex.h, libmutt/mutt_menu.h, libmutt/mutt_curses.h, libmutt/mutt.h, libmutt/mime.types, libmutt/mime.h, libmutt/mh.c, libmutt/menu.c, libmutt/mbox.c, libmutt/mapping.h, libmutt/main.c, libmutt/mailbox.h, libmutt/lib.c, libmutt/keymap.h, libmutt/keymap.c, libmutt/init.h, libmutt/init.c, libmutt/imap.c, libmutt/hook.c, libmutt/help.c, libmutt/headers.c, libmutt/hdrline.c, libmutt/hash.h, libmutt/hash.c, libmutt/handler.c, libmutt/globals.h, libmutt/getdomain.c, libmutt/functions.h, libmutt/from.c, libmutt/flags.c, libmutt/filter.c, libmutt/enter.c, libmutt/edit.c, libmutt/date.c, libmutt/curs_main.c, libmutt/curs_lib.c, libmutt/copy.h, libmutt/copy.c, libmutt/compose.c, libmutt/complete.c, libmutt/commands.c, libmutt/color.c, libmutt/buffy.h, libmutt/buffy.c, libmutt/browser.c, libmutt/bind.c, libmutt/attach.h, libmutt/attach.c, libmutt/alias.c, libmutt/addrbook.c, libmutt/acconfig.h:
+	ok, well, readded all the files i just removed.. even though it said they were
+	just modified.. bleh
+	-pav
+
+	* libmutt/rx/rxunfa.h, libmutt/rx/rxunfa.c, libmutt/rx/rxsuper.h, libmutt/rx/rxsuper.c, libmutt/rx/rxstr.h, libmutt/rx/rxstr.c, libmutt/rx/rxspencer.h, libmutt/rx/rxspencer.c, libmutt/rx/rxsimp.h, libmutt/rx/rxsimp.c, libmutt/rx/rxproto.h, libmutt/rx/rxposix.h, libmutt/rx/rxposix.c, libmutt/rx/rxnode.h, libmutt/rx/rxnode.c, libmutt/rx/rxnfa.h, libmutt/rx/rxnfa.c, libmutt/rx/rxhash.h, libmutt/rx/rxhash.c, libmutt/rx/rxgnucomp.h, libmutt/rx/rxgnucomp.c, libmutt/rx/rxcset.h, libmutt/rx/rxcset.c, libmutt/rx/rxcontext.h, libmutt/rx/rxbitset.h, libmutt/rx/rxbitset.c, libmutt/rx/rxbasic.h, libmutt/rx/rxbasic.c, libmutt/rx/rxanal.h, libmutt/rx/rxanal.c, libmutt/rx/rxall.h, libmutt/rx/rx.h, libmutt/rx/rx.c, libmutt/rx/inst-rxposix.h, libmutt/rx/hashrexp.c, libmutt/rx/_rx.h, libmutt/rx/Makefile.in, libmutt/thread.c, libmutt/system.c, libmutt/strcasecmp.c, libmutt/status.c, libmutt/sort.h, libmutt/sort.c, libmutt/snprintf.c, libmutt/signal.c, libmutt/sendlib.c, libmutt/send.c, libmutt/score.c, libmutt/rfc822.h, libmutt/rfc822.c, libmutt/rfc2047.h, libmutt/rfc2047.c, libmutt/rfc1524.h, libmutt/rfc1524.c, libmutt/resize.c, libmutt/Attic/reldate.h, libmutt/query.c, libmutt/recvattach.c, libmutt/protos.h, libmutt/postpone.c, libmutt/pop.c, libmutt/Attic/pattern.h, libmutt/pattern.c, libmutt/parse.h, libmutt/parse.c, libmutt/pager.h, libmutt/pager.c, libmutt/mx.h, libmutt/mx.c, libmutt/mutt_regex.h, libmutt/mutt_menu.h, libmutt/mutt_curses.h, libmutt/mutt.h, libmutt/mime.types, libmutt/mime.h, libmutt/mh.c, libmutt/menu.c, libmutt/mbox.c, libmutt/mapping.h, libmutt/main.c, libmutt/mailbox.h, libmutt/lib.c, libmutt/keymap.h, libmutt/keymap.c, libmutt/init.h, libmutt/imap.h, libmutt/init.c, libmutt/imap.c, libmutt/hook.c, libmutt/help.c, libmutt/headers.c, libmutt/hdrline.c, libmutt/hash.h, libmutt/hash.c, libmutt/handler.c, libmutt/globals.h, libmutt/getdomain.c, libmutt/functions.h, libmutt/from.c, libmutt/flags.c, libmutt/filter.c, libmutt/enter.c, libmutt/edit.c, libmutt/date.c, libmutt/curs_main.c, libmutt/curs_lib.c, libmutt/copy.h, libmutt/copy.c, libmutt/compose.c, libmutt/complete.c, libmutt/commands.c, libmutt/color.c, libmutt/buffy.h, libmutt/buffy.c, libmutt/browser.c, libmutt/bind.c, libmutt/attach.h, libmutt/attach.c, libmutt/alias.c, libmutt/addrbook.c, libmutt/acconfig.h:
+	update mutt to more recent version
+	-pav
+
+	* configure.in, Makefile.am: fixes for alan :)
+	-pav
+
+Thu Jul 16 16:36:57 1998  alan
+
+	* src/Makefile.am:
+	Link with the (as yet unfinished) libmutt not c-client
+
+	* src/sendmsg-window.c, src/balsa-message.c, src/balsa-index.c:
+	Fix old from->user references up. Also swat a couple of potential buffer
+	overruns.
+
+	Please use snprintf people
+
+	* libbalsa/mailbox.c:
+	Missing argument on check_mailbox. Close doesnt work the libbalsa way
+	in libmutt. I think the change is right
+
+	* libbalsa/mailbackend.h:
+	Added libmutt/ to the includes otherwise the wrong mailbox.h is included
+	libbalse now almost compiles
+
+	* libmutt/globals.h, libmutt/init.c, libmutt/pager.c, libmutt/curs_main.c:
+	libmutt has a string called "Status" in its globals. X windows defines
+	Status to int. This is bad.
+
+	libmutt now has a string called StatusString, this is good.
+
+Thu Jul 16 13:01:35 1998  vinc
+
+	* po/fr.po: Thu, 16 Jul 1998 14:52:19 +0200  [Vincent]
+
+	* .FR translation updates...
+
+Thu Jul 16 02:39:21 1998  pavlov
+
+	* src/save-restore.c, src/new-mailbox.c, libbalsa/mailbox.h, libbalsa/mailbox.c, configure.in, Makefile.am:
+	more changes.. no, it doesn't compile yet, but i'm getting more stuff ready.
+	:)
+
+	-pav
+
+	* src/save-restore.c, src/new-mailbox.c, src/mailbox-manager.c:
+	removed NNTP support from balsa, since a) mutt doesn't do it and b) i see no
+	point in having nntp in a mail client :)
+
+	-pav
+
+Wed Jul 15 23:47:31 1998  harinath
+
+	* /debian/home/gnomecvs/gnome-common/macros/need-declaration.m4, /debian/home/gnomecvs/gnome-common/macros/gnome-support.m4, /debian/home/gnomecvs/gnome-common/macros/Makefile.am, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	* Makefile.am (MACROS): Add `need-declaration.m4'.
+
+	* gnome-support.m4 (AC_REPLACE_FUNCS): Add memmove, strtod,
+	strtol, strtoul.
+	(GCC_NEED_DECLARATIONS): New check.  Check whether `gethostname'
+	needs to be declared.
+
+	* need-declaration.m4: New file.  Stolen from EGCS.
+
+Wed Jul 15 23:34:29 1998  pavlov
+
+	* libmutt/mutt.h, libbalsa/send.c, libbalsa/misc.h, libbalsa/misc.c, libbalsa/mailbox.h, libbalsa/mailbox.c, libbalsa/mailbackend.h, libbalsa/Makefile.am:
+	*ATTENTION:*
+
+	Balsa is now BROKEN.  Do not checkout unless you have a really good reason.
+	It will probibly be broken for a few days.
+
+	-pav
+
+	* src/index-child.c, libmutt/rx/rxnode.h, libmutt/rx/rxposix.c, libmutt/rx/rxposix.h, libmutt/rx/rxproto.h, libmutt/rx/rxsimp.c, libmutt/rx/rxsimp.h, libmutt/rx/rxspencer.c, libmutt/rx/rxspencer.h, libmutt/rx/rxstr.c, libmutt/rx/rxstr.h, libmutt/rx/rxsuper.c, libmutt/rx/rxsuper.h, libmutt/rx/rxunfa.c, libmutt/rx/rxunfa.h, libmutt/rx/Makefile.in, libmutt/rx/_rx.h, libmutt/rx/hashrexp.c, libmutt/rx/inst-rxposix.h, libmutt/rx/rx.c, libmutt/rx/rx.h, libmutt/rx/rxall.h, libmutt/rx/rxanal.c, libmutt/rx/rxanal.h, libmutt/rx/rxbasic.c, libmutt/rx/rxbasic.h, libmutt/rx/rxbitset.c, libmutt/rx/rxbitset.h, libmutt/rx/rxcontext.h, libmutt/rx/rxcset.c, libmutt/rx/rxcset.h, libmutt/rx/rxgnucomp.c, libmutt/rx/rxgnucomp.h, libmutt/rx/rxhash.c, libmutt/rx/rxhash.h, libmutt/rx/rxnfa.c, libmutt/rx/rxnfa.h, libmutt/rx/rxnode.c, libmutt/Attic/pattern.h, libmutt/Attic/reldate.h, libmutt/headers.c, libmutt/help.c, libmutt/hook.c, libmutt/imap.c, libmutt/init.c, libmutt/init.h, libmutt/keymap.c, libmutt/keymap.h, libmutt/lib.c, libmutt/mailbox.h, libmutt/main.c, libmutt/mapping.h, libmutt/mbox.c, libmutt/menu.c, libmutt/mh.c, libmutt/mime.h, libmutt/mime.types, libmutt/mutt.h, libmutt/mutt_curses.h, libmutt/mutt_menu.h, libmutt/mutt_regex.h, libmutt/mx.c, libmutt/mx.h, libmutt/pager.c, libmutt/pager.h, libmutt/parse.c, libmutt/parse.h, libmutt/pattern.c, libmutt/pop.c, libmutt/postpone.c, libmutt/protos.h, libmutt/recvattach.c, libmutt/resize.c, libmutt/rfc1524.c, libmutt/rfc1524.h, libmutt/rfc2047.c, libmutt/rfc2047.h, libmutt/rfc822.c, libmutt/rfc822.h, libmutt/score.c, libmutt/send.c, libmutt/sendlib.c, libmutt/signal.c, libmutt/snprintf.c, libmutt/sort.c, libmutt/sort.h, libmutt/status.c, libmutt/strcasecmp.c, libmutt/system.c, libmutt/thread.c, libmutt/acconfig.h, libmutt/addrbook.c, libmutt/alias.c, libmutt/attach.c, libmutt/attach.h, libmutt/bind.c, libmutt/browser.c, libmutt/buffy.c, libmutt/buffy.h, libmutt/color.c, libmutt/commands.c, libmutt/complete.c, libmutt/compose.c, libmutt/copy.c, libmutt/copy.h, libmutt/curs_lib.c, libmutt/curs_main.c, libmutt/date.c, libmutt/edit.c, libmutt/enter.c, libmutt/filter.c, libmutt/flags.c, libmutt/from.c, libmutt/functions.h, libmutt/getdomain.c, libmutt/globals.h, libmutt/handler.c, libmutt/hash.c, libmutt/hash.h, libmutt/hdrline.c, libbalsa/misc.c, TODO:
+	uh, i just commited most of mutt to cvs :)
+
+	time to start hacking it into a library :)
+
+	-pav
+
+Tue Jul 14 11:32:31 1998  pavlov
+
+	* src/balsa-init.c: eek, c++ comments, yuk :P
+	-pav
+
+Tue Jul 14 07:02:47 1998  ttarrant
+
+	* src/balsa-init.c:
+	Removed recursive call to init_balsa_app. (Tristan Tarrant)
+
+Tue Jul 14 01:19:37 1998  pavlov
+
+	* src/local-mailbox.c, src/balsa-app.c:
+	made balsa-app call initialize_balsa() if balsa hasn't been run before.  shem
+	is gonna start working on this stuff.  yayaya!! :)
+
+	worked on local-mailbox.c, but i need to change some more stuff, cause its not
+	reading your local mail directory for mh mailboxes, etc... i'm working on it
+	:)
+
+	-pav
+
+Mon Jul 13 18:43:49 1998  pavlov
+
+	* src/save-restore.c:
+	bleh! compiler should be smart and notice that the thing is a char!!@
+
+	-pav
+
+	* src/save-restore.c: more mh support.
+	-pav
+
+	* src/local-mailbox.c: update to load mh folders on start (i think)
+	-pav
+
+Mon Jul 13 06:45:08 1998  harinath
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-support.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	* gnome-support.m4 (AC_REPLACE_FUNCS): Add check for `mkstemp'.
+
+Mon Jul 13 00:17:05 1998  pavlov
+
+	* libbalsa/mailbox.c: fixed a typo
+
+	* src/balsa-message.c, po/balsa.pot, libbalsa/mailbox.c: changes!#!@#
+	-pav
+
+Sun Jul 12 23:26:39 1998  pavlov
+
+	* src/sendmsg-window.c, src/save-restore.c, src/pref-manager.c, src/new-mailbox.c, src/message-window.c, src/mblist-window.c, src/main.c, src/main-window.c, src/mailbox-manager.c, src/local-mailbox.c, src/index-child.c, src/balsa-init.c, src/balsa-index.c, src/balsa-app.c, src/addrbook.c, src/addrbook-manager.c, po/balsa.pot, libbalsa/mailbox.h, libbalsa/mailbox.c, TODO, README, AUTHORS:
+	hee hee!!
+
+	made -Wall happy with balsa code.. (c-client is a mess.. don't even
+	bother compiling it with -Wall... balsa is ok.. mabey this fixed some bugs or
+	something)
+
+	:)
+
+	-pav
+
+	* src/index-child.c: more changes!!! :)
+	(trying to clean up all the stuff Jaka suggested)
+
+	-pav
+
+	* src/main-window.c: more changes...
+
+	some cleanups to main-window.c
+
+	-pav
+
+	* src/mblist-window.c, src/index-child.h, src/index-child.c:
+	more cleanups
+	-pav
+
+	* src/mblist-window.c, src/main-window.c, src/index-child.h, src/index-child.c:
+	whoo! more cleanups :)
+
+	stuff is lookin pretty spiffy :)
+
+	-pav
+
+	* src/sendmsg-window.c, src/index-child.c, po/balsa.pot, libbalsa/send.c, libbalsa/mailbox.h, libbalsa/mailbox.c:
+	cleanups cleanups lots and lots of cleanups
+	-pav
+
+	* src/mblist-window.c:
+	got the ctree working.. hopefully this will fix some problems that i've seen
+	with the normal gtktree
+	-pav
+
+	* src/mblist-window.c, src/main-window.c:
+	changing mblist-window over to a ctree.. should be less buggy
+	not working yet, am working on
+
+	-pav
+
+	* src/pref-manager.c, src/message-window.c, src/mblist-window.c, src/main-window.c, src/index-child.c, src/balsa-app.h, src/balsa-app.c, libbalsa/Attic/mbox.c:
+	more cleanups.. i really wanta release 0.4.0 tommorow :)
+
+	-pav
+
+	* src/mblist-window.c, src/index-child.h: fixed a typo or two...
+	-pav
+
+Sat Jul 11 18:47:38 1998  pavlov
+
+	* libbalsa/send.c, libbalsa/misc.h, libbalsa/Attic/mbox.c, libbalsa/misc.c, libbalsa/mailbox.h, libbalsa/Attic/drivers.h, libbalsa/mailbox.c, libbalsa/Makefile.am:
+	bleh, :)
+
+	take a look at libbalsa/mbox.c if you would like to help.. it needs to read
+	through the file, and put the headers for each message into the message
+	structure.. when that message is done, add it to the glist.  don't forget to
+	set mailbox->offset with the offset of each message.  at the end, return the
+	glist...  no, it won't work if you remove the #if 0's, but if someone puts
+	something together, i'll make it work.
+	-pav
+
+	* src/sendmsg-window.c, src/Attic/misc.h, src/Attic/misc.c, src/Attic/mailbackend.h, src/Makefile.am, libbalsa/mailbackend.h, libbalsa/misc.c, libbalsa/misc.h, libbalsa/send.c, libbalsa/send.h, po/balsa.pot, libbalsa/Makefile.am:
+	more changes :)
+	-pav
+
+	* src/Attic/mailbox.h, src/Attic/mailbox.c, libbalsa/mailbox.h, src/Makefile.am, libbalsa/.cvsignore, libbalsa/libbalsa.c, libbalsa/mailbox.c, configure.in, Makefile.am:
+	fun fun fun.. i'm gonna make libbalsa.. Balsa Mail Library :)
+
+	fun huh?
+
+	join in the fun!! write fun drivers for this fun project! ;)
+
+	Need um, all of them :)
+
+	i'm gonna put together something real quick for mbox mailboxes to start with,
+	you can all model after it :)
+
+	-pav
+
+Sat Jul 11 06:03:04 1998  yosh
+
+	* src/Makefile.am:
+	Ok, it builds now. But only correctly on Linux. Yes, this is bad. Pavlov
+	asked me to get it to work, and that's what I did. autoconfing this
+	c-client mess is a pain in the ass, and may not even be worth it
+	if Pavlov decided to ditch c-client altogether.
+
+	-Yosh
+
+Sat Jul 11 04:07:34 1998  pavlov
+
+	* src/Makefile.am, autogen.sh, TODO:
+	commited all my changes n stuff...  someone please fix up the c-client
+	makefile.am...
+
+	it needs to use the CFLAGS from the OSCFLAGS file...  and link all the .o
+	files to create c-client.a
+
+	thanks, bye.
+	sleep time:)
+	-pav
+
+	* src/Attic/misc.c, src/message-window.c, src/index-child.c, po/cat-id-tbl.c, po/balsa.pot, configure.in, Makefile.am:
+	I'm breaking stuff
+	-pav
+
+Thu Jul  9 18:01:38 1998  pavlov
+
+	* src/main-window.c:
+	make use of Jika's most recent changes to gnome-mdi
+	-pav
+
+	* src/main-window.c:
+	fixed the icons not displaying on init, not they are just displaced.. fun huh?
+	someone have any insite on why they are broken?
+	-pav
+
+Wed Jul  8 23:58:54 1998  pavlov
+
+	* src/message-window.c:
+	oops, this file was including a header that no longer existed.
+	-pav
+
+	* po/cat-id-tbl.c, po/balsa.pot, Attic/dotgnomeslashbalsa, configure.in, balsa.spec, README:
+	um, up'd balsa's version to 0.3.5:)
+	-pav
+
+Mon Jul  6 11:33:21 1998  pavlov
+
+	* src/main-window.c, src/Attic/index-window.h, src/Attic/index-window.c, src/index-child.h, src/index-child.c:
+	broke more stuff :)
+
+	added support for the child_changed (or changed_child, or whatever) signal, so
+	that i didn't have to get current, search a list, etc etc etc to get the
+	current indexchild.. i really need to impliment signal stuff in indexchild so
+	that it is done right.. (hintyoshhint) any volunteers? ;)  I would do it cept
+	i'm not really sure how :)
+
+	Ok, bbl
+	-pav
+
+Mon Jul  6 07:11:55 1998  jaka
+
+	* ChangeLog, src/main-window.c:
+	1998-07-06  Jaka Mocnik  <jaka.mocnik@kiss.uni-lj.si>
+
+		* main-window.c (open_main_window): some changes to make MDI behave
+		well.
+
+Sun Jul  5 21:00:21 1998  pavlov
+
+	* src/main-window.c, src/Attic/mailbox.c, src/index-child.h, src/index-child.c:
+	lots and lots of cleanups...  toolbar buttons do stuff when you push them
+	again.. menu items should work...
+
+	still weird gtk funkness going on...
+	-pav
+
+	* src/save-restore.c, src/main-window.c: fixed a typo
+	-pav
+
+	* src/save-restore.c, src/pref-manager.c, src/main-window.c, src/balsa-app.h, src/balsa-app.c:
+	changes changes lots and lots of changes... :)
+
+	ok.. i've added the MDI choices in preferences.. it saves them, etc.. i'm
+	testing to see how it behaves by default.. if it doesn't want to display your
+	mailbox, go into   Settings/Preferences/MDI and click Notebook (should be
+	checked) and then ok.. this should fix that...
+
+	If anyone has any idea why the icons are doing funky stuff, i'd love to hear
+	why :)
+
+	Um.. thats about it.. I like the tabbed stuff from gnome-mdi.. its cool :)
+
+	-pav
+
+	* src/balsa-app.c: removed the COLA mailbox hardcoded into balsa
+	-pav
+
+	* src/index-child.c:
+	few more changes.. be sure to get the most recent gnome-libs stuff that i just
+	commited
+	-pav
+
+Sat Jul  4 23:05:42 1998  pavlov
+
+	* src/index-child.c, src/index-child.h, src/mblist-window.c, src/Makefile.am:
+	more attempts...
+	-pav
+
+	* src/mblist-window.h, src/mblist-window.c, src/main-window.c, src/Attic/index-window.c, src/balsa-index.c:
+	broke stuff(tm)
+
+	um, i'm redoing balsa's UI (yes, again).  It doesn't work right now, so just
+	wait n stuff :)
+
+	-pav
+
+	* src/sendmsg-window.c, src/Attic/mailbackend.h, src/Attic/mailbox.c, src/Attic/c-client.h:
+	try and remove more traces of c-client for furture cleanups.
+	-pav
+
+Fri Jul  3 19:23:24 1998  pavlov
+
+	* src/sendmsg-window.c, src/main-window.c, src/Attic/mailbox.h, src/Attic/mailbox.c, src/Attic/index-window.c, src/balsa-index.c:
+	cleanups mostly.. trying to make it work um.. nicer with new gtk/gnome-libs...
+
+	-pav
+
+Fri Jul  3 17:19:08 1998  martin
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-libgtop-sysdeps.m4:
+	1998-07-03  Martin baulig  <martin@home-of-linux.org>
+
+		* macros/gnome-libgtop-sysdeps.m4: No longer use
+		`glibtop_machine.h' for Linux.
+
+		* sysdeps/linux/glibtop_machine.h: Removed.
+
+		* sysdeps/guile/guile.awk: Using `scm_append'
+		instead of `gh_append'.
+
+		* sysdeps/guile/names/guile-names.awk: dito.
+
+		* sysdeps/linux/*.c: Using code from stable branch again.
+
+		* include/glibtop/parameter.h: New file.
+
+		* lib/parameter.c: New file.
+
+		* lib/{open, init}.c: Done some more work on server
+		initialization
+
+Wed Jul  1 21:56:31 1998  sdh
+
+	* /debian/home/gnomecvs/gnome-common/macros/curses.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	yet another change to curses.m4 - documentation & formatting, remove unsed vars
+
+Tue Jun 30 00:13:24 1998  harinath
+
+	* /debian/home/gnomecvs/gnome-common/macros/Makefile.am, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	* Makefile.am (MACROS): Add all the `.m4' files here.
+
+Mon Jun 29 18:07:21 1998  sdh
+
+	* /debian/home/gnomecvs/gnome-common/macros/curses.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	curses.m4: Need AC_SUBST(CURSES_INCLUDEDIR) not CURSES_INCLUDES
+
+	* /debian/home/gnomecvs/gnome-common/macros/curses.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	was leaving conftest.* files lying around after tests.
+
+Sat Jun 27 14:36:13 1998  blizzard  <blizzard@pluto>
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-objc-checks.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	1998-06-27  Christopher Blizzard  <blizzard@foo.appliedtheory.com>
+
+	        * gnome-objc-checks.m4: Use egcs if it's available.  The gcc that
+	        ships with RedHat 5.1 doesn't do objc, egcs does.
+
+Fri Jun 26 22:28:02 1998  sdh
+
+	* /debian/home/gnomecvs/gnome-common/macros/curses.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	Autodetect curses for cyahtzee.
+
+Wed Jun 24 18:51:25 1998  harinath
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-fileutils.m4, /debian/home/gnomecvs/gnome-common/macros/Makefile.am, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	* gnome-fileutils.m4 (AM_FUNC_ERROR_AT_LINE): New check.
+	(vprintf): New check.
+	(ftruncate.c): Remove check.
+	This needs to be further cleaned up to only list what is
+	needed for gdiskfree.
+	* Makefile.am (MACROS): Add gnome-fileutils.m4.
+
+Mon Jun 22 10:46:59 1998  vinc
+
+	* src/balsa.desktop, po/fr.po:
+	Mon, 22 Jun 1998 12:38:50 +0200  [Vincent]
+
+	* .fr translation updates.
+
+Sun Jun 14 02:20:25 1998  martin
+
+	* /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	*** empty log message ***
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-libgtop-sysdeps.m4:
+	1998-06-14  Martin Baulig  <martin@home-of-linux.org>
+
+		* gnome-libgtop-sysdeps.m4 (LINUX_TABLE): New automake conditional;
+		also defines HAVE_LINUX_TABLE.
+
+	1998-06-13  Martin Baulig  <martin@home-of-linux.org>
+
+		* gnome-libgtop-sysdeps.m4: Added check for the table ()
+		system call in the linux kernel.
+
+	1998-06-11  Raja R Harinath  <harinath@cs.umn.edu>
+
+		* gnome-x-checks.m4 (USE_DEVGTK): Use AC_EGREP_CPP rather than
+		AC_CHECK_HEADER.  AC_CHECK_HEADER is fooled by warnings.
+
+		* gnome-support.m4 (AC_PROG_AWK): Look for awk.
+		(CROSS_COMPILING): Remove conditional.
+
+	Wed Jun 10 14:19:39 EDT 1998 Gregory McLean <gregm@comstar.net>
+
+		* gnome-x-checks.m4: More tweeks to make building against gtk 1.0
+		  and gtk1.1 less painful.
+
+	1998-06-08  Martin Baulig  <martin@home-of-linux.org>
+
+		* gnome-support.m4 (CROSS_COMPILING): New automake conditional;
+		(need_gnome_support): added `AC_SUBST(need_gnome_support)'.
+
+	1998-06-07  Martin Baulig  <martin@home-of-linux.org>
+
+		* gnome-guile-checks.m4 (GNOME_CHECK_GUILE): When
+		cross-compiling, we now check for `$host_alias-buile-guile'.
+
+	1998-06-03  Martin Baulig  <martin@home-of-linux.org>
+
+		* gnome-guile-checks.m4 (GNOME_CHECK_GUILE): Looks also
+		in $GNOME_LIBDIR; added failflag: GNOME_CHECK_GUILE(fail)
+		will abort if guile cannot be found.
+
+	1998-05-23  Martin Baulig  <martin@home-of-linux.org>
+
+		* gnome-libgtop-sysdeps.m4 (GNOME_LIBGTOP_HOOK):
+		(libgtop_use_machine_h): Set this to true on SunOS.
+
+	1998-05-22  Martin Baulig  <baulig@merkur.uni-trier.de>
+
+		* gnome-fileutils.m4 (GNOME_FILEUTILS_CHECKS): New file.
+		Imported from `configure.in' in GNU fileutils 3.16. It does
+		all the checks that are needed for the diskusage applet.
+
+	1998-05-22  Martin Baulig  <martin@home-of-linux.org>
+
+		* gnome-libgtop-check.m4 (GNOME_LIBGTOP_HOOK): New file.
+		Checks whether libgtop is installed and reads its `libgtopConf.sh'
+		file if it can be found. Defines HAVE_LIBGTOP on success and
+		provides HAVE_LIBGTOP automake conditional.
+
+	1998-05-21  Martin Baulig  <martin@home-of-linux.org>
+
+		* gnome-libgtop-sysdeps.m4 (GNOME_LIBGTOP_SYSDEPS): New file.
+		(libgtop_sysdeps_dir): sysdeps directory libgtop uses.
+		(libgtop_use_machine_h): define HAVE_GLIBTOP_MACHINE_H if this
+		is `yes'.
+		(libgtop_need_server): we only need the libgtop server, when
+		this has a value of `yes'. Defines NEED_LIBGTOP and NEED_LIBGTOP
+		automake conditional.
+
+	1998-05-19  Raja R Harinath  <harinath@cs.umn.edu>
+
+		* gnome-support.m4 (strerror): New check.
+		(sys_errlist): Check for this variable, needed for `strerror'.
+		(program_invocation_name, program_invocation_short_name): Change
+		method used to check for these.
+
+	1998-05-09  Raja R Harinath  <harinath@cs.umn.edu>
+
+		* autogen.sh: Remove simple-minded check for `gtk+'.
+
+	Fri Apr 24 16:43:38 1998  Owen Taylor  <otaylor@gtk.org>
+
+		* autogen.sh: Pass the results of the environment variable
+		ACLOCAL_FLAGS to aclocal. This allows, for instance,
+
+		 ACLOCAL_FLAGS="-I /home/owen/share/aclocal/" autogen.sh
+
+	Sun Apr 19 01:35:53 EDT 1998 Gregory McLean <gregm@comstar.net>
+
+	        * gnome-x-checks.m4: Updated the gtk check to check for 1.0.0.
+
+	1998-04-08  Raja R Harinath  <harinath@cs.umn.edu>
+
+		* autogen.sh: Update to list newer versions of packages.
+		* gnome-support.m4: Add `scandir' to AC_REPLACE_FUNCS.
+		Also run AC_HEADER_DIRENT.
+
+	1998-03-31  Raja R Harinath  <harinath@cs.umn.edu>
+
+		* gnome-support.m4 (AC_REPLACE_FUNCS): Look for vasprintf.
+
+	Thu Mar 19 23:23:30 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* gnome.m4: An empty true branch of an `if' statement is not valid
+		sh syntax.  If GNOME_INIT_HOOK argument $1 is empty, use ":"
+		instead.
+
+	1998-03-19  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+		* gnome.m4 (GNOME_INIT_HOOK): Provide a way to hook some code to
+		execute;  Accept a probe mode.
+
+		(GNOME_INIT): Define in terms of GNOME_INIT_HOOK.
+
+	Thu Mar 19 00:17:46 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* gnome-support.m4: Cache results of check for
+		program_invocation_short_name, program_invocation_name.  Check to
+		make sure argp functions are in a library.
+
+		* gnome-support.m4: Cache results of argp check.
+
+	Sun Mar 15 15:54:43 1998  Owen Taylor  <owt1@cornell.edu>
+
+		* gnome-x-checks.m4: Replaced checks for X and GTK
+		with AM_PATH_GTK. x_include, X_LIBS, etc, variables no longer
+		defined.
+
+	1998-03-12  Raja R Harinath  <harinath@cs.umn.edu>
+
+		* gnome-support.m4: Add a check for <linewrap.h> -- this enables
+		some optimizations when compiling `argp'.
+
+	Mon Mar  9 19:32:42 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* gnome-support.m4: Build vsnprintf.o, not vsnprint.o.
+
+	1998-03-09  Raja R Harinath  <harinath@cs.umn.edu>
+
+		* gnome-support.m4: Add check for `vsnprintf'.
+
+	Sun Mar  8 17:04:28 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* gnome-support.m4: Set need_gnome_support shell variable.  Define
+		BUILD_GNOME_SUPPORT automake conditional.  Define LTLIBOBJS.  Look
+		for argp_domain element in struct argp.
+
+	Sat Mar  7 00:04:22 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* gnome-support.m4 (GNOME_SUPPORT_CHECKS): Add argp-pvh.o to
+		LIBOBJS.
+
+		* gnome-support.m4 (GNOME_SUPPORT_CHECKS): Check for strnlen().
+
+	Wed Mar  4 01:02:55 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* gnome-support.m4 (GNOME_SUPPORT_CHECKS): Check for argp code,
+		strndup, program_invocation_name, program_invocation_short_name.
+
+	Mon Mar  2 15:27:44 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* gnome-x-checks.m4 (GNOME_X_CHECKS): Also check for SMlib.h; some
+		Solaris systems have -lSM but not SMlib.h.
+
+	Sun Mar  1 17:49:42 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* gnome.m4 (GNOME_INIT): Changed spacing so --help output looks
+		right.
+
+	Fri Feb 27 10:05:34 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* gnome-objc-checks.m4 (GNOME_CHECK_OBJC): Set OBJECTIVE_C shell
+		variable.
+
+	1998-02-26  Raja R Harinath  <harinath@cs.umn.edu>
+
+		* gnome-x-checks.m4 (CPPFLAGS): Put $X_CFLAGS here, not in
+		$CFLAGS.
+		(GNOME_HAVE_SM): New var.  `true' if we have libSM, `false'
+		otherwise.
+
+	1998-02-19  Raja R Harinath  <harinath@cs.umn.edu>
+
+		* gnome.m4: Remove `GNOME_CHECK_GNOME'.
+
+	1998-02-18  Raja R Harinath  <harinath@cs.umn.edu>
+
+		* gnome-support.m4 (GNOME_SUPPORT_CHECKS): Replace `strcasecmp' if
+		necessary.
+
+	1998-02-15  Raja R Harinath  <harinath@cs.umn.edu>
+
+		* Makefile.am (MACROS): Add `gnome-pthread-check.m4'.
+		* gnome-pthread-check.m4: New file.  Moved pthread check from
+		gnome-x-checks.m4 to here.
+		* gnome-objc-checks.m4: Use `gnome-pthread-check'.
+		(OBJC_LIBS): New config var.
+		* gnome-x-checks.m4: Add `AC_DEFINE(HAVE_LIBSM)' if `-lSM' is
+		already part of `$x_libs'.
+		Move pthread check to new file.
+
+	Sat Feb 14 12:45:35 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* Makefile.am (macros.dep): Use single quotes, not double quotes.
+		Otherwise bash will interpret `$(...)' incorrectly.
+		(EXTRA_DIST): Include macros.dep in distribution.
+
+	1998-02-14  Raja R Harinath  <harinath@cs.umn.edu>
+
+		* Makefile.am (macros.dep): Put back doubled `$'.  We want the
+		expansion to occur in the including Makefile, not here.
+		Otherwise, there will be an extra `../' in the rule.
+
+	Sat Feb 14 17:41:28 KST 1998  Changwoo Ryu  <cwryu@adam.kaist.ac.kr>
+
+		* autogen.sh: multilple aclocal -I directories.
+
+	Sat Feb 14 01:09:37 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* Makefile.am (macros.dep): Removed extra `$' from rule.
+
+		* gnome-x-checks.m4: Only check for -lSM if not already in
+		x_libs.
+
+	1998-02-13  Raja R Harinath  <harinath@cs.umn.edu>
+
+		* Makefile.am (EXTRA_DIST): Add `autogen.sh'.
+
+		* gnome-objc-checks.m4 (GNOME_INIT_OBJC): Solaris /bin/sh doesn't
+		understand `test -e'.
+
+		* autogen.sh: New file.
+
+		* gnome.m4 (GNOME_INIT): Look for gnomeConf.sh in $libdir, where
+		the installation actually installs it.
+
+		* Makefile.am (macros.dep): New maintainer rule for handling
+		automatic rebuilding of aclocal.m4 if any of the macros change.
+		(MACROS): New variable.  List of all `m4' macros in this
+		directory.
+
+	1998-02-12  Raja R Harinath  <harinath@cs.umn.edu>
+
+		* gnome-support.m4: New file.  Defines GNOME_SUPPORT_CHECKS for
+		libsupport.a support.
+
+	1998-02-10  Raja R Harinath  <harinath@cs.umn.edu>
+
+		* gnome.m4: New file.  Moved AC_CHECK_GNOME from `configure.in' to
+		here, and renamed macro to GNOME_CHECK_GNOME.
+		* gnome-x-checks.m4: Likewise, move and renaming AC_GNOME_X_CHECKS
+		to GNOME_X_CHECKS.
+
+		* aclocal-include.m4: New file.  Defines AM_ACLOCAL_INCLUDE macro
+		to provide extra search directories to `aclocal'.
+
+Sat Jun 13 21:26:18 1998  martin
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-libgtop-sysdeps.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	1998-06-13  Martin Baulig  <martin@home-of-linux.org>
+
+		* gnome-libgtop-sysdeps.m4: Added check for the table ()
+		system call in the linux kernel.
+
+Fri Jun 12 11:30:40 1998  pavlov
+
+	* src/Attic/index-window.c: more fun!
+	-pav
+
+	* src/Attic/index-window.c, src/balsa-index.c:
+	more changes, it cores now. fun
+	-pav
+
+	* src/main-window.c:
+	major cleanup of main-window.c removing lots of old excess stuff
+	-pav
+
+Fri Jun 12 00:51:31 1998  yosh
+
+	* src/Attic/index-window.c, src/balsa-index.c: fixes...
+
+	-Yosh
+
+Fri Jun 12 00:14:58 1998  pavlov
+
+	* src/Attic/index-window.c, src/balsa-index.c: more breakage!
+	-pav
+
+Thu Jun 11 22:06:06 1998  harinath
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-x-checks.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	* gnome-x-checks.m4 (USE_DEVGTK): Use AC_EGREP_CPP rather than
+	AC_CHECK_HEADER.  AC_CHECK_HEADER is fooled by warnings.
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-support.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	* gnome-support.m4 (AC_PROG_AWK): Look for awk.
+	(CROSS_COMPILING): Remove conditional.
+
+Thu Jun 11 04:55:09 1998  yosh
+
+	* src/balsa-index.c: fixed up signal marshaller
+
+	-Yosh
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-x-checks.m4:
+	changed things to use GTK_HAVE_ACCEL_GROUP instead of HAVE_DEVGTK...
+	installed headers depending on config.h stuff is bad.
+
+	-Yosh
+
+Wed Jun 10 23:36:51 1998  pavlov
+
+	* src/Attic/single-window.c:
+	this is the original main-window.c before i broke stuff
+	-pav
+
+	* src/mblist-window.c, src/main.c, src/main-window.c, src/Attic/index-window.c, src/balsa-index.c:
+	more cleanups
+	-pav
+
+Wed Jun 10 18:26:05 1998  gregm
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-x-checks.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	Gnome libs should compile against gtk 1.0.x and gtk 1.1 with a minimal amount
+	of fuss. I'm not an auto* guru by any stretch of anyones imagination so I'm
+	pretty confident that its not idiot proof. This should make the bulk of the
+	people happy now.
+
+	-- Greg
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-x-checks.m4:
+	Tue Jun  9 22:55:20 EDT 1998 Gregory McLean <gregm@comstar.net>
+
+	        * macros/gnome-x-checks.m4: quick and dirty check for devel gtk and
+	          define HAVE_DEVGTK if its found. This should save us a bunch of
+	          work next time we go to do a release we won't have to chase
+	          around code that only works on the devel version of gtk.
+	        * libgnomeui/* bracketed all code that requires the devel branch of
+	          gtk.. I think I got it all.
+	        * acconfig.h : new tag HAVE_DEVGTK, use this to mark your changes that
+	          require the dev branch of gtk.
+
+Tue Jun  9 23:00:47 1998  pavlov
+
+	* src/message-window.c, src/mblist-window.c, src/Attic/index-window.c:
+	fix core when closing a message and closing a mailbox
+
+	* src/main-window.c: i'm bored, lets break some stuff :)
+
+	-pav
+
+	* src/sendmsg-window.c:
+	added lots of checks to sendmsg-window.c so we don't do bad things with null
+	chars
+	-pav
+
+Mon Jun  8 00:33:51 1998  martin
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-guile-checks.m4:
+	Fixed typo.
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-support.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	1998-06-08  Martin Baulig  <martin@home-of-linux.org>
+
+		* gnome-support.m4 (CROSS_COMPILING): New automake conditional;
+		(need_gnome_support): added `AC_SUBST(need_gnome_support)'.
+
+Sun Jun  7 22:01:12 1998  martin
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-guile-checks.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	1998-06-07  Martin Baulig <martin@home-of-linux.org>
+
+		* gnome-guile-checks.m4 (GNOME_CHECK_GUILE): When
+		cross-compiling, we now check for `$host_alias-buile-guile'.
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-libgtop-sysdeps.m4:
+	1998-06-07  Martin Baulig  <martin@home-of-linux.org>
+
+		* macros/gnome-libgtop-sysdeps.m4: Include
+		`glibtop_machine.h' for Linux.
+
+Sun Jun  7 18:40:42 1998  pavlov
+
+	* src/sendmsg-window.c, src/main-window.c, src/addrbook-manager.c:
+	updates to make balsa gtk 1.1 compat! :)
+	-pav
+
+Fri Jun  5 20:55:25 1998  pavlov
+
+	* src/sendmsg-window.c: fixed reply and from
+	-pav
+
+Fri Jun  5 14:41:32 1998  martin
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-guile-checks.m4:
+	Copied from main trunk.
+
+Wed Jun  3 12:59:23 1998  martin
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-guile-checks.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	* gnome-guile-checks.m4 (GNOME_CHECK_GUILE): Looks also in $GNOME_LIBDIR;
+	added failflag: GNOME_CHECK_GUILE(fail) will abort if guile cannot be found.
+
+Tue Jun  2 23:11:51 1998  pavlov
+
+	* src/main-window.c: fix for menu item 'check new mail'
+	-pav
+
+	* src/balsa-message.c:
+	fix for really screwed up messages, i.e. ones without proper formatting, i.e.
+	date doesn't seem valid, from doesn't, subject doesn't, etc.. fun huh?  Yeah,
+	i have some really screwed up mail, but I AM NOT INSANE!@#!@$
+	-pav
+
+	* src/sendmsg-window.c, src/balsa-message.c:
+	fix for messages/reply/etc to messages without a subject
+	-pav
+
+	* src/Attic/mailbox.c, src/balsa-message.c, src/balsa-index.c:
+	undid previous commit and made translate_address return NULL.  Updated files
+	to check to see if (message->from) before using that info.  it works all happy
+	now :)
+
+	-pav
+
+Mon Jun  1 21:57:42 1998  pavlov
+
+	* src/Attic/mailbox.c:
+	added fix for translate_address (i think) so that if the address is null being
+	passed to it, it doesn't dump core ;)
+
+	i'm making it an Address * with "" inside each values.
+
+	I'm not really sure why emails would come with no address, but i've got a few,
+	and it was coring, so i fixed it :)
+
+	-pav
+
+Sun May 31 23:50:53 1998  vinc
+
+	* po/.cvsignore: Added *.mo, *.gmo, etc...
+
+	* po/fr.po, configure.in: Sun, 31 May 1998 21:57:08 +0200  [Vincent]
+
+	* .fr translations updates.
+
+Sun May 31 16:02:31 1998  pavlov
+
+	* src/balsa-index.c:
+	made balsa-index position itself at the first new message, or the bottom
+	(depending on if a new message existed)
+
+	it doesn't select the message, cause that would be bad for the new interface
+	and jay didn't have the current one doing it :)
+
+	-pav
+
+Sat May 30 20:48:37 1998  pavlov
+
+	* src/Attic/mailbox.c:
+	check to see if cenv is null in translate_message or not.
+
+	-pav
+
+	* src/message-window.h, src/message-window.c, src/Attic/index-window.c, src/Makefile.am:
+	more files that (your, muhaha) balsa doesn't use yet ;)
+	-pav
+
+Sat May 30 16:43:08 1998  jpaint
+
+	* src/main-window.c, src/Attic/mailbox.h, src/Attic/mailbox.c, src/balsa-index.h, src/balsa-index.c:
+	more fixes, checking mail works now!
+
+Fri May 29 16:56:49 1998  jpaint
+
+	* src/Attic/mailbox.h, src/Attic/mailbox.c, src/balsa-index.c: flags
+
+Thu May 28 22:28:11 1998  pavlov
+
+	* src/sendmsg-window.c:
+	uhm, forward doesn't core now, but it doesn't put the message into the window
+	either...
+	its using the *same* code as reply, and reply works...  i'm getting
+	message->body_list == NULL
+
+	I dunno why...
+
+	help me jay! :)
+
+	-pav
+
+	* src/sendmsg-window.c, src/mblist-window.c: fixed reply to message
+	-pav
+
+Thu May 28 21:14:13 1998  jpaint
+
+	* src/Attic/mailbox.h, src/Attic/mailbox.c, src/balsa-index.c:
+	Messages display again!
+
+	* src/main-window.c, src/Attic/mailbox.h, src/Attic/mailbox.c, src/balsa-message.h, src/balsa-message.c, src/balsa-index.c:
+	messages almost working again!
+
+Wed May 27 22:27:25 1998  pavlov
+
+	* src/mblist-window.c, src/mblist-window.h, src/Attic/index-window.h, src/Attic/index-window.c, src/Makefile.am:
+	added more files that do nothing in current version
+	-pav
+
+	* src/Attic/index-window.c: more changes :)
+	-pav
+
+	* src/main-window.c, src/Attic/index-window.c, src/Attic/index-window.h, src/Makefile.am:
+	working on new ui
+
+	it just compiles, doesn't "do" anything (yet)
+	-pav
+
+Mon May 25 19:54:38 1998  pavlov
+
+	* src/Attic/misc.c: ok, sending mail works again...
+
+	whos idea was it to make strings need to be null terminated? huhuh?
+	-pav
+
+	* src/Attic/misc.c: sending mail almost works! :)
+
+	-pav
+
+	* src/sendmsg-window.c, src/Attic/misc.h, src/Attic/misc.c:
+	moved some stuff into misc.[ch]
+
+Mon May 25 16:25:34 1998  jpaint
+
+	* src/Attic/mailbox.c: fixed watcher removal/memory leak!
+
+Mon May 25 03:37:39 1998  pavlov
+
+	* src/sendmsg-window.c, src/Attic/mailbox.c: dunno, misc stuff.
+
+	-pav
+
+Sun May 24 21:44:41 1998  pavlov
+
+	* src/Attic/mailbox.c:
+	ok, i went way overboard on the checks in mailbox.c... reverted most of them..
+	sendmsg-window is still broken
+	-pav
+
+	* src/sendmsg-window.c, src/Attic/mailbox.c:
+	fixed sendmsg-window, cept it doesn't want to connect to the server.. looking
+	into this...
+
+	mailbox.c   added lots of checks to make sure we didn't free unallocated
+	memory...
+
+	-pav
+
+	* src/sendmsg-window.c: i broke it.. whaaaa! :)
+	-pav
+
+	* src/sendmsg-window.c: broke sendmsg-window :)
+
+	should be fixed shortly.. made it use the Message structure like the rest of
+	the application
+	-pav
+
+	* src/sendmsg-window.c: change for removal of c-client.h
+	-pav
+
+	* src/sendmsg-window.c, src/balsa-app.c:
+	updated sendmsg-window to reflect jay's re-write of everything ;)
+
+	not fully functional yet, does not quote original message in body.
+
+	-pav
+
+	* src/balsa-index.c:
+	fixup so that people without names in their email address show in the index
+	-pav
+
+Sun May 24 16:58:03 1998  jpaint
+
+	* src/main-window.c, src/Attic/mailbox.h, src/Attic/mailbox.c, src/balsa-index.h, src/balsa-index.c:
+	Index is working again!
+
+Sun May 24 16:07:30 1998  martin
+
+	* /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	*** empty log message ***
+
+Sun May 24 00:33:57 1998  pavlov
+
+	* src/balsa-app.c:
+	ok, removed my thing from the main app so as not to confuse people
+	-pav
+
+Sat May 23 22:59:32 1998  martin
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-libgtop-sysdeps.m4:
+	* gnome-libgtop-sysdeps.m4 (GNOME_LIBGTOP_HOOK):
+	(libgtop_use_machine_h): Set this to true on SunOS.
+
+Sat May 23 20:03:09 1998  pavlov
+
+	* src/addrbook.c: almost got it how it should be...
+	-pav
+
+	* src/addrbook.c: mooooooooore stuff
+	-pav
+
+	* src/main.c, src/main-window.c, src/balsa-app.c, src/addrbook.h, src/addrbook.c:
+	changes to addrbook.c, added checks for jay's debuging messages to only appear
+	when debug is checked in preferences
+	-pav
+
+	* src/addrbook.c, src/addrbook.h: oops, forgot these two files
+	-pav
+
+	* src/addrbook-manager.h, src/addrbook-manager.c, src/Makefile.am:
+	begin work on making address book functional
+	-pav
+
+Sat May 23 17:41:21 1998  jpaint
+
+	* src/main.c, src/main-window.c, src/Attic/mailbox.h, src/Attic/mailbox.c, src/balsa-index.c:
+	Okay, still broken but better.
+
+	* docs/mailbox.txt: Initial revision
+
+	* docs/mailbox.txt: imported docs
+
+
+	* src/main.c, src/main-window.c, src/Attic/mailbox.h, src/Attic/mailbox.c, src/balsa-index.c:
+	sync up, too many changes to count.
+
+Sat May 23 03:58:04 1998  rhlabs
+
+	* balsa.spec: Should require gnome-libs
+	Dr Mike <msf@redhat.com>
+
+Fri May 22 17:20:52 1998  martin
+
+	* /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	*** empty log message ***
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-fileutils.m4:
+	* gnome-fileutils.m4 (GNOME_FILEUTILS_CHECKS): New file.
+	Imported from `configure.in' in GNU fileutils 3.16. It does
+	all the checks that are needed for the diskusage applet.
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-fileutils.m4:
+	Importing configure.in from GNU fileutils 3.16
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-fileutils.m4:
+	Initial revision
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-libgtop-check.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	* gnome-libgtop-check.m4 (GNOME_LIBGTOP_HOOK): New file.
+	Checks whether libgtop is installed and reads its `libgtopConf.sh'
+	file if it can be found. Defines HAVE_LIBGTOP on success and
+	provides HAVE_LIBGTOP automake conditional.
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-libgtop-sysdeps.m4:
+	Removed unwanted AC_WITH(sysdeps).
+
+Thu May 21 23:55:45 1998  martin
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-libgtop-sysdeps.m4:
+	Fixed typo.
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-libgtop-sysdeps.m4:
+	* gnome-libgtop-sysdeps.m4 (GNOME_LIBGTOP_SYSDEPS): New file.
+	(libgtop_sysdeps_dir): sysdeps directory libgtop uses.
+	(libgtop_use_machine_h): define HAVE_GLIBTOP_MACHINE_H if this
+	is `yes'.
+	(libgtop_need_server): we only need the libgtop server, when
+	this has a value of `yes'. Defines NEED_LIBGTOP and NEED_LIBGTOP
+	automake conditional.
+
+Wed May 20 00:16:02 1998  harinath
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-support.m4: Fix typo.
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-support.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	* gnome-support.m4 (strerror): New check.
+	(sys_errlist): Check for this variable, needed for `strerror'.
+	(program_invocation_name, program_invocation_short_name): Change
+	method used to check for these.
+
+Wed May 13 20:41:04 1998  unammx
+
+	* /debian/home/gnomecvs/gnome-common/macros/autogen.sh:
+	Support for NOCONFIGURE env variable -mig
+
+Sun May 10 03:49:23 1998  jpaint
+
+	* src/main-window.c, src/Attic/mailbox.h, src/Attic/mailbox.c, src/balsa-index.c, src/balsa-app.h, src/balsa-app.c:
+	The index is back, messages are still broke.  Fixed a couple of stupid
+	allocation bugs.
+
+Sun May 10 00:53:51 1998  harinath
+
+	* /debian/home/gnomecvs/gnome-common/macros/autogen.sh, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	* autogen.sh: Remove simple-minded check for `gtk+'.
+
+Sat May  9 23:09:29 1998  jpaint
+
+	* src/Attic/mailbox.c, src/Attic/c-client.c: removing c-client.c
+
+	* src/sendmsg-window.c, src/save-restore.c, src/new-mailbox.c, src/main.c, src/main-window.c, src/Attic/mailbox.h, src/Attic/mailbox.c, src/local-mailbox.c, src/Attic/c-client.h, src/balsa-message.h, src/balsa-message.c, src/balsa-index.h, src/balsa-index.c, src/balsa-app.h, src/balsa-app.c, src/Makefile.am:
+	Abstraction of c-client *UG*
+
+Sat May  9 00:30:02 1998  pavlov
+
+	* src/balsa-app.c: close fd on signature if fstat fails.
+	-pav
+
+Fri May  8 15:21:06 1998  pavlov
+
+	* src/sendmsg-window.c, src/balsa-app.c:
+	fixed annoying extra char on your signature, added check to see if signature
+	existed, etc etc etc...
+
+	-pav
+
+	* src/save-restore.c, src/new-mailbox.c: it now saves new mailboxes
+	-pav
+
+Fri May  8 08:53:34 1998  jpaint
+
+	* src/save-restore.c, src/pref-manager.c, src/new-mailbox.c, src/Attic/mailbox.h, src/Attic/mailbox.c, src/local-mailbox.c:
+	Massive re-working of the data structures involved with local mailboxes
+	(way sane-er).  The mailbox manager can now be used to create entries for
+	local mailboxes, but they don't seem to save.  Next is IMAP,POP3,NNTP.  Then
+	there has to be support for creating the local mailbox file...
+
+	* src/pref-manager.c, src/new-mailbox.c, src/Attic/misc.c, src/main-window.c, src/mailbox-manager.c:
+	more mm stuff; fixed optionmenu selection...
+
+Fri May  8 00:23:30 1998  pavlov
+
+	* src/Attic/mailbox.c: fixed silly core bug when no mailbox was loaded
+	-pav
+
+Thu May  7 21:20:24 1998  jpaint
+
+	* src/pref-manager.c, src/new-mailbox.c, src/mailbox-manager.c:
+	mailbox-manager and pref-manager now do auto-raise when you try to open
+	them when they are already open.  more work on the mailbox-manager.
+
+Thu May  7 17:40:12 1998  unammx
+
+	* po/ga.po:
+	Irish translations.
+
+Thu May  7 15:36:02 1998  pavlov
+
+	* src/sendmsg-window.c, src/balsa-app.h, src/balsa-app.c:
+	ok, balsa now reads your $HOME/.signature file and adds it to the bottom of
+	all messages in sendmsg-window
+
+	fun huh?
+
+	ok, bye n stuff
+	-pav
+
+Thu May  7 07:24:23 1998  jpaint
+
+	* src/new-mailbox.c, src/Attic/misc.h, src/Attic/misc.c, src/Attic/mailbox.h:
+	sleep
+
+Wed May  6 21:53:24 1998  jpaint
+
+	* src/new-mailbox.c: a little more, not much
+
+Wed May  6 21:43:22 1998  pavlov
+
+	* po/cat-id-tbl.c, po/balsa.pot, TODO: commit to make cvs quit whining
+	-pav
+
+	* src/sendmsg-window.c: reset point of text box to 0
+	-pav
+
+	* src/sendmsg-window.c:
+	made reply and forward quote the previos message you are replying to... it
+	gives you lots of warnings, not sure why...
+
+	ok, thats all
+
+	-pav
+
+Tue May  5 07:53:36 1998  jpaint
+
+	* src/new-mailbox.h, src/new-mailbox.c, src/mailbox-manager.c, src/Makefile.am:
+	grinding away at the mailbox manager
+
+Mon May  4 19:39:37 1998  pavlov
+
+	* src/main.c, src/local-mailbox.c:
+	added more mailbox types for loading when local-mailbox.c loads, and correctly
+	a typeing error in main.c causing it not to compile ;)
+
+	-pav
+
+	* src/main.c:
+	remove timers on exit to avoid updating mailboxes that no longer exist
+	-pav
+
+Mon May  4 19:10:37 1998  jpaint
+
+	* src/local-mailbox.c, src/local-mailbox.h, src/main.c, src/balsa-app.c, src/Makefile.am:
+	moved local mailbox checking, fixed a segfault or two.
+
+Mon May  4 18:45:14 1998  pavlov
+
+	* src/balsa-app.h, src/balsa-app.c:
+	added timer to check mail every 5 minutes back
+
+	-pav
+
+	* src/main-window.c, src/balsa-index.c:
+	made next message skipping on [un]deleteing messages less jumpy
+	(jay knows what i'm talking about)
+
+	-pav
+
+	* src/balsa-app.c:
+	made balsa not whine about gnome_config_get_vector if the path didn't exist
+	-pav
+
+	* src/sendmsg-window.h, src/sendmsg-window.c, src/main-window.c:
+	moved stuff around.. added check to see if replyto and forward were being done
+	inside a non-existant mailbox (i.e. you have no mailboxes)
+
+	-pav
+
+	* src/sendmsg-window.c:
+	have sendmsg check to see if a message already has a "Re:" or "Fw:" in the
+	subject when replying to to avoid multiple prefixes
+	-pav
+
+Mon May  4 07:29:30 1998  jpaint
+
+	* src/save-restore.c, src/main.c, src/main-window.c, src/balsa-app.h, src/balsa-app.c:
+	remembers and uses the size of the main window now
+
+Mon May  4 03:15:59 1998  pavlov
+
+	* src/Attic/c-client.c, src/balsa-app.h, src/balsa-app.c: there.
+
+	balsa no longer crashes when you try and check your email in an imap
+	mailbox...  if you are one of those who has debugging turned on, *please* let
+	me know if you ever get a message saying mailbox is locked, waiting
+
+	-pav
+
+Mon May  4 01:45:36 1998  jpaint
+
+	* src/Attic/misc.h, src/Attic/misc.c, src/main.c, src/main-window.h, src/main-window.c:
+	Added function to main-window to force the selection of a mailbox, this is
+	used in main.c to select the first mailbox.
+
+Mon May  4 00:16:50 1998  pavlov
+
+	* src/sendmsg-window.c: few minor changes n stuff
+	-pav
+
+Sun May  3 23:37:31 1998  yosh
+
+	* src/sendmsg-window.c: Minor interface nit
+
+	-Yosh
+
+Sun May  3 22:40:33 1998  pavlov
+
+	* src/Attic/c-client.c:
+	updated the debugging messages to make a lil more sense
+	-pav
+
+	* src/sendmsg-window.c:
+	made the menu item in the sendmsg window for send work
+	-pav
+
+Sun May  3 22:16:11 1998  jpaint
+
+	* src/main-window.c: Fixed singals for menuitems.
+
+Sun May  3 21:29:02 1998  pavlov
+
+	* src/save-restore.c:
+	ok, this fixes everything, so once loaded with the new version, your
+	~/.gnome/balsa will be updated to the new stuff automagically.
+
+	-pav
+
+	* src/save-restore.c, src/balsa-app.c, Attic/dotgnomeslashbalsa:
+	made save-restore verify the type of mailbox instead of relying on the config
+	file specified.  This shouldn't break backwards compat, since Type=0 for all
+	local mailboxes, but imap/pop3/nntp remaned the same.
+
+	-Pavlov
+
+	* src/save-restore.c, src/pref-manager.c, src/Attic/c-client.c, src/balsa-message.c, src/balsa-app.h, src/balsa-app.c:
+	looks like lots of changes huh?  basically, i just added a Debug checkbox
+	under view in preferences.  this will spit out lots of stuff to your screen
+	that may help if problems arise
+	-pav
+
+	* po/cat-id-tbl.c, po/balsa.pot, Attic/dotgnomeslashbalsa:
+	added a .gnome/balsa example that you can use until mailbox manager is
+	finished
+
+	-pav
+
+	* src/pref-manager.c:
+	this should launch the main window after the preference window pops up in the
+	case that the main window doesn't exist (i.e. the first time a user runs it)
+	-pav
+
+	* src/main.c, src/balsa-init.c, src/balsa-app.c:
+	more work on the initial setup screens.
+	-pav
+
+	* src/sendmsg-window.c, src/Attic/c-client.c:
+	added lots of #ifdef DEBUG's into c-client.c for debugging...
+	-pav
+
+	* src/balsa-index.c:
+	i think this should prevent a string compare with a null value
+	-pav
+
+	* src/balsa-init.c, src/balsa-init.h, src/save-restore.c, src/balsa-app.c, src/Makefile.am:
+	start of a initial setup process, fixed a warning in save-restore.c (thanks
+	yosh)
+	-pav
+
+Sat May  2 21:17:40 1998  pavlov
+
+	* src/sendmsg-window.c: changes changes lots and lots of changes
+	-pav
+
+	* src/sendmsg-window.c: some changes
+	-pav
+
+Sat May  2 20:48:40 1998  jpaint
+
+	* src/save-restore.c, src/Attic/misc.h, src/Attic/misc.c:
+	Toolbar style saves and restores now.
+
+Sat May  2 20:42:23 1998  pavlov
+
+	* src/sendmsg-window.c:
+	made compose window use the toolbar style that the main app is using.
+	-pav
+
+	* src/balsa-index.c: a make jay happy change :P
+	-pav
+
+Sat May  2 20:14:13 1998  jpaint
+
+	* src/pref-manager.c: Change toolbar viewing state now.
+
+Sat May  2 20:04:55 1998  pavlov
+
+	* configure.in: added de translation so that it'll work (mabey?)
+	-pav
+
+	* src/save-restore.h, src/save-restore.c:
+	added a change mailbox function
+	-pav
+
+	* src/main-window.c, src/balsa-app.c:
+	ok, message flags update correctly now.  also, it updates the N flag as soon
+	as you click on a message, instead of after you move off it.
+
+	thats all.
+	-pav
+
+	* src/balsa-index.c: hrm, changes.. flags thing almost fixed
+	-pav
+
+	* src/balsa-index.c: fix-ups on message flags (not finished)
+	-pav
+
+	* src/balsa-index.c: a few minor cleanups
+	-pav
+
+Sat May  2 16:49:12 1998  jpaint
+
+	* src/pref-manager.c, src/balsa-app.c:
+	Added parcing for e-mail address in the preferences manager so e-mail is
+	back to one line, but I didn't change any of the data structs.
+
+Sat May  2 16:40:44 1998  pavlov
+
+	* src/balsa-app.c: removed timer, causes problems with people with imap
+	-pav
+
+Sat May  2 15:31:34 1998  jpaint
+
+	* src/main-window.c, src/balsa-app.h, src/balsa-app.c:
+	things work better now
+
+	* src/sendmsg-window.c, src/Attic/misc.h, src/Attic/misc.c, src/main.c, src/main-window.h, src/main-window.c, src/Attic/mailbox.c, src/mailbox-manager.c, src/Attic/index.h, src/Attic/index.c, src/Attic/c-client.c, src/balsa-index.h, src/balsa-index.c, src/balsa-app.h, src/balsa-app.c, src/Makefile.am:
+	Looks like alot of fun, doesn't it???
+
+	The main-window reorganization is almost done, but I've broken even
+	more stuff.  Back to it tomorrow.
+
+Sat May  2 01:17:02 1998  pavlov
+
+	* src/save-restore.c:
+	made delete a lil more optimized.. prolly need to free some stuff at the end
+	here.. not sure, :)
+	-pav
+
+	* src/save-restore.h, src/save-restore.c:
+	added a delete function for mailboxes
+	(it could probibly be more optimized)
+	-pav
+
+	* src/sendmsg-window.c:
+	commented out attach file since it doesn't work.
+	-pav
+
+Fri May  1 23:40:44 1998  pavlov
+
+	* src/sendmsg-window.c, src/main.c, src/main-window.c, src/addrbook-manager.c:
+	changed ../config.h to config.h in the includes
+	-pav
+
+	* po/de.po, TODO: updated todo list?
+
+	added german translation... thanks sven! :)
+
+	-pav
+
+	* src/save-restore.h, src/save-restore.c, src/balsa-app.c:
+	i just broke every balsa users ~/.gnome/balsa ;)
+
+	you might wanta rm -f it and start over..
+
+	basically, under [General] there is an Accounts= which is a list of the
+	accounts (remove the [Accounts] ... 0=... 1=... etc) and have..
+
+	[General]
+	...
+	Accounts=foo bleh bleh1 bleh2
+
+	etc where foo, bleh* are the old accounts...
+
+	this should be more efficent
+
+	-pav
+
+	* src/save-restore.h, src/balsa-app.c:
+	it should compile now.. moving stuff around is fun! wee
+	-pav
+
+	* src/save-restore.c:
+	added some stuff, i'm going home.. this prolly breaks balsa's compile.. will
+	fix in a min.
+	-pav
+
+	* src/balsa-index.c:
+	oops, left an extra clist column on there.. removed
+	-pav
+
+	* src/balsa-index.c:
+	fixups to my last thingies... i'm at work, and unable to test my changes.. if
+	someone wants to look at them real quick and vereify that balsa works, that
+	would be nice :)
+
+	(the changes are in the clist in the main window ... it doesn't put a PIXMAP
+	for the new messages, instead it has 1 column for deleted or new, and they
+	should just have a N in them...
+	ook
+	)
+
+	-pav
+
+	* src/balsa-index.c: some changes :)
+	-pav
+
+Fri May  1 08:43:16 1998  jpaint
+
+	* src/save-restore.c, src/save-restore.h, src/Attic/misc.c, src/Attic/misc.h, src/pref-manager.c, src/balsa-message.c, src/balsa-app.h, src/balsa-app.c, src/Makefile.am:
+	Makefile.am: Added new files
+
+	balsa-app.[ch]: Moved balsa_app struct to balsa-app.c, delared it a global
+	                extern; began migrating save/resotre functions to
+	                save-restore.[ch]; moved get_string_set_default to misc.c
+			(I'll soon move that to libgnome)
+
+	pref-manager.c: fixed memory leak on saving new preferences; moved saving
+			of info to save-restore.c; fixed double-free on pmw structure
+
+Fri May  1 04:34:32 1998  pavlov
+
+	* src/Attic/mailbox.c:
+	fixed problem with imap mailboxes.. it was checking to see if pop3->stream
+	exist instead of imap->stream
+
+	oops
+
+	-pav
+
+	* src/balsa-app.c:
+	made it use "Path" instead of "path" for IMAP mailboxes in ~/.gnome/balsa
+	since that is what everything else used.
+	-pav
+
+	(any people that have added imap mailboxes to ~/.gnome/balsa will need to make
+	this change)
+
+Thu Apr 30 11:03:40 1998  pavlov
+
+	* src/pref-manager.c, src/balsa-app.h:
+	removed the usize from pref-manager.c (the size was defined in balsa-app.h)
+	since it looks silly at a set width/height with different font sizes, etc.
+	-pav
+
+Wed Apr 29 22:38:52 1998  pavlov
+
+	* src/sendmsg-window.c, src/main-window.c, src/addrbook-manager.c, po/cat-id-tbl.c, po/balsa.pot, po/POTFILES.in, TODO:
+	added some po stuff mabey?  *shrug* i  dunno crap about it :)
+
+	removed the:
+	 * bug tigert about getting new icons for toolbar
+	line from my TODO list.
+
+	-pav
+
+	* src/balsa.desktop, src/pref-manager.c, src/balsa-app.h:
+	i don't remember changing anything, but ok.
+	added a desktop file.. i doubt its right, but i dunno.. it doesn't do anything
+	during install (yet).
+
+	-pav
+
+	* src/main-window.c, src/balsa-index.c:
+	ok, i've got the message clist sizing itself so its a little bit larger than 2
+	rows now.. kinda helpful :)  Also, it auto-positions to the last message
+	(unless you have new messages, in which case it will put it on the first new
+	message)
+	-pav
+
+	* src/main-window.c:
+	made main-window use new gnome-stock icon (instead of included one)  made
+	main-window check your X resolution and set the usize of the window based on
+	it.. if someone has a good size to recommend, please let me know :)
+	-pav
+
+Tue Apr 28 02:28:59 1998  pavlov
+
+	* src/main-window.c:
+	damn size issues with the window.. the way i had it a min ago was too small.
+	is there any way to get the X resolution?  then mabey i can set it based on
+	that.. ok, bye
+	-pav
+
+	* src/main-window.c, src/balsa-index.c:
+	undelete works.  its a menu item only right now.  i plan on making it so when
+	you select a message marked for deletion, it will change the icon to undelete.
+	Also, delete/undelete will select the message below them once clicked, making
+	it easier to delete multiple messages.
+	-pav
+
+	* src/main-window.c: made it just a tad smaller
+
+	-pav
+
+	* src/main-window.c, src/Attic/index.h, src/Attic/index.c, src/balsa-index.c:
+	a few changes (working on implimenting undelete) i changed the usize of the
+	main window to 640x400 (from 660x400) for those 640x480 users out there (get a
+	new video card!@#!)
+	-pav
+
+Mon Apr 27 23:51:08 1998  pavlov
+
+	* src/balsa-index.c:
+	ok, it now positions the clist based on the first new message in the box.
+	-pav
+
+	* src/balsa-index.c:
+	attempt to get it to reposition the clist based on the first new message
+	recieved.. it doesn't work correctly.. i'll try and get this working tonight
+	-pav
+
+	* src/sendmsg-window.c, src/main-window.c:
+	more cleanups... mabey we are getting ready for a new release? :)
+
+	-pav
+
+	* src/balsa-index.c:
+	changed width of the D (for deleted) column so that it wasn't too small to fit
+	on the page thing (it should prolly be F or something for flag?)  and centered
+	the title for D and for N (new)
+	-pav
+
+	* src/main-window.c:
+	made it so it was possible to display on the toolbar: icons, text, or both
+	-pav
+
+	* src/main-window.c, src/Attic/index.h, src/Attic/index.c, src/balsa-index.h, src/balsa-index.c:
+	Delete works.
+
+	*NOTE* BE CAREFUL:
+	It does *not* undelete (yet).  So if you mark a message read, you had better
+	not exit through a normal means.. (so kill -9 it or something:)  or just be
+	careful.
+
+	It will (should) purge all messages marked delete upon exit or change in
+	mailbox.  I'll put a better way to do this after i've done undelete.
+
+	-pav
+
+	* configure.in, balsa.spec, README:
+	I updated the version of Balsa to v0.2.0.
+
+	This seems about accurate for all the changes that have been made witin the
+	last four months.  Jay, any comments on this?  This is not an offical release
+	yet, but its gettting there :)
+
+	-pav
+
+Sun Apr 26 23:06:28 1998  pavlov
+
+	* src/sendmsg-window.c, src/pref-manager.c:
+	uhm, like uhm.. i made sendmsg-window.c check the strlen of the cc thing so it
+	doesn't try and send something cc'd to nothing.  umh.. i made the ok button on
+	pref-manager.c work, but if you try it a few time, it does weird stuff.  i
+	dunno, so uhm.. like.. if you wanta fix it, go ahead (;
+
+	i'll try and figure it out in a min
+
+	-pav
+
+	* src/sendmsg-window.c, src/main-window.c, src/balsa-message.c:
+	nothing really noticable.  I made it take into account tabs.  I made it put
+	the headers into a table, but since xmhtml needs updating, and its table
+	support is kinda broken, i #ifdef 0'd it and left it the way it is currently
+	doing it.  *shrug*
+	-pav
+
+	* TODO: updated TODO list
+	-pav
+
+	* src/balsa-message.c:
+	oops, left in debugging stuff that made your screen a mess.
+	-pav
+
+	* src/balsa-message.c:
+	ok, fixed spacing issues so that we don't replace every space with a &nbsp;
+	because if we did, it produced non-wrapping lines.
+
+	I've got it checking to see if there are 3 spaces in a row, and replacing them
+	with "&nbsp; &nbsp;" and else if there are 2 spaces in a row, "&nbsp; "  I
+	think this should address all problems there may be.  Let me know if you can
+	think of a situation this wouldn't account for.  ok, thanks. bye :)
+
+	-pav
+
+	* src/balsa-message.c: more changes.. *yawn*
+	-pav
+
+	* src/balsa-message.c:
+	more changes (almost fixed spacing issues.. xmhtml does stupid stuff though,
+	so i need to have a little talk with miguel :))
+
+	-pav
+
+	* src/sendmsg-window.c, src/pref-manager.c, src/main-window.c, src/Attic/c-client.h, src/Attic/c-client.c, src/balsa-message.c, src/balsa-index.c, src/balsa-app.h, src/balsa-app.c:
+	wow, lots of changes i guess
+
+	c-client.c now has a get_header(char *, ...) function which lets you grab a
+	header from whatever you told it..  it returns "" if the header doesn't exist.
+
+	balsa-message.c doesn't use <pre></pre> anymore.  instead, i've got it
+	converting all \r\n's into <br>, \r's into <br>, and \n's into <br>s  This
+	allows for word wrapping!  Much nicer than scrolling over and over and over..
+	thats kinda dumb don'tcha think?
+
+	pre-manager.c was updated to support everything that it should have in it.  it
+	doesn't update the config files yet, but thats kinda easy to do.
+
+	balsa-app.c was updated to load mbx formated mailboxes from ~/Mail/* on load.
+	I'm not yet overly sold on this format, since it seems to be a little faster,
+	but more cpu and memory intensive.
+
+	balsa-app.h was updated to make the pre-manager width a little wider
+
+	sendmsg-window was updated to support the new get_header() function
+
+	balsa-index.c wasn't updated that i remember, except mabey for me widening the
+	message number column.
+
+	-pav
+
+Sat Apr 25 00:03:30 1998  pavlov
+
+	* TODO, README:
+	updated the readme... for anyone compiling balsa for the first time, PLEASE
+	PLEASE read the README :)
+	(it tells you what to do to compile it)
+
+	updated my todo list
+
+	-pav
+
+Fri Apr 24 23:52:23 1998  pavlov
+
+	* src/sendmsg-window.c, src/mailbox-manager.c, src/Attic/c-client.h, src/Attic/c-client.c, src/addrbook-manager.c:
+	ok, we can try this again. fun huh?
+	-pav
+
+Fri Apr 24 20:48:37 1998  owen
+
+	* /debian/home/gnomecvs/gnome-common/macros/autogen.sh, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	Fri Apr 24 16:43:38 1998  Owen Taylor  <otaylor@gtk.org>
+
+		* autogen.sh: Pass the results of the environment variable
+		ACLOCAL_FLAGS to aclocal. This allows, for instance,
+
+		 ACLOCAL_FLAGS="-I /home/owen/share/aclocal/" autogen.sh
+
+Fri Apr 24 15:18:30 1998  jpaint
+
+	* src/sendmsg-window.c:
+	fixed the way sendmsg-window gets deleted, no more seg faults
+	on that one pav ;)
+
+	* src/pref-manager.h, src/pref-manager.c, src/mailbox-manager.h, src/mailbox-manager.c, src/balsa-app.h, src/balsa-app.c:
+	UI cleanups only, I broke whatever was working in the mailbox
+	manager -- will fix tomorrow.
+
+Fri Apr 24 03:53:05 1998  pavlov
+
+	* src/main-window.c: updated to use the new TRASH icon in gnome-stock.
+	-pav
+
+Thu Apr 23 10:40:12 1998  pavlov
+
+	* TODO, .cvsignore: updated my TODO list
+	-pav
+
+	* src/sendmsg-window.c, src/Attic/c-client.h, src/Attic/c-client.c:
+	reply works kinda now.. it fills in the To: and subject based on the message
+	currently selected.. neat huh?  :)
+
+	-pav
+
+Wed Apr 22 23:41:44 1998  pavlov
+
+	* src/sendmsg-window.c:
+	more changes.. have it pop in the From name and Re:/Fw: to the subject thingy.
+
+	-pav
+
+	* src/sendmsg-window.c, src/main-window.c, src/Attic/c-client.c:
+	minor changes to forward/reply/new message
+	-pav
+
+Wed Apr 22 17:25:13 1998  unammx
+
+	* /debian/home/gnomecvs/gnome-common/macros/autogen.sh:
+	Use test -f instead of test -e;  As suggested by Sebastian Wilhelmi 0-mig
+
+	* /debian/home/gnomecvs/gnome-common/macros/autogen.sh:
+	Fix for gedit compilation -mig
+
+Wed Apr 22 02:13:57 1998  pavlov
+
+	* src/sendmsg-window.h, src/sendmsg-window.c, src/main-window.c, src/balsa-index.c:
+	i added a little layer so i can add reply/forward to the sendmsg-window a
+	little easier.. i'll do the accual implimenting that later n stuff.
+
+	-pav
+
+Tue Apr 21 23:32:23 1998  pavlov
+
+	* src/balsa-index.c:
+	non-functional changes working toward being able to delete messages..
+	-pav
+
+	* src/main-window.c, src/balsa-index.c:
+	changes changes we all fall down
+	-pav
+
+	i added some icons of tigerts to the toolbar so he will make the rest of them
+	(;
+
+Mon Apr 20 02:03:13 1998  pavlov
+
+	* src/pref-manager.c, src/balsa-index.c: updates.. wee
+	-pav
+
+	* src/main-window.c, src/balsa-index.c:
+	i'z having fun playing.. weeeeee
+	-pav
+
+	(nothing functional added.. just some misc changes n stuff)
+
+Sun Apr 19 18:35:53 1998  pavlov
+
+	* src/sendmsg-window.c, src/main-window.c:
+	lets try and commit this stuff again.. hmm... weeeeee
+
+	i really don't like to be 21 hops from va.debian.org
+	-pav
+
+	* src/pref-manager.c:
+	added that ever popular and very often requested close button into the pref
+	manager :)
+	-pav
+
+Sun Apr 19 13:33:37 1998  gregm
+
+	* /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	Sun Apr 19 09:38:36 EDT 1998 Gregory McLean <gregm@comstar.net>
+
+	        * ee/doc/.cvsignore: added to ignore generated files.
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-x-checks.m4:
+	Sun Apr 19 01:35:53 EDT 1998 Gregory McLean <gregm@comstar.net>
+
+	        * gnome-x-checks.m4: Updated the gtk check to check for 1.0.0
+
+Sun Apr 19 03:35:53 1998  pavlov
+
+	* src/sendmsg-window.c:
+	added GTK_ENTRY() around msg->from in gtk_entry_set_editable
+	:)
+	-pav
+
+Sat Apr 18 18:36:23 1998  pavlov
+
+	* src/sendmsg-window.c, src/main-window.c, src/Attic/mailbox.c, src/Attic/c-client.c, src/balsa-message.c:
+	*burp!*
+	-pav
+
+	* src/main.c, src/Attic/mailbox.h, src/Attic/mailbox.c, src/balsa-app.h, src/balsa-app.c:
+	more changes.. *yawn* nothing important.. just some basic sound foobar stuff
+	(;
+	-pav
+
+	* src/Attic/mailbox.c:
+	ok, yes, i'm bored.. so i added some sounds.. they don't work when they
+	should, and just when you click the check mail button, but its kinda fun ;)
+
+	-pav
+
+Mon Apr 13 07:39:37 1998  yosh
+
+	* src/pref-manager.c: silly gtk. don't have to realize notebook anymore
+
+	-Yosh
+
+Sun Apr 12 23:31:34 1998  pavlov
+
+	* src/sendmsg-window.c: moooooooooooooore changes! :)
+	-pav
+
+	* src/pref-manager.c: changes changes we all fall down...
+
+	sending email WORKS! :)
+	You can send to more than one person by either using
+	foo@bar.com,foo1@bar.com,etc in the To: field, or the cc: field, or a
+	combination of both.  bcc: doesn't work yet because I havn't implimented it...
+	(good reason huh?)
+
+Sun Apr 12 22:43:40 1998  yosh
+
+	* src/sendmsg-window.c: Cosmetic fixups
+
+	-Yosh
+
+	* src/pref-manager.c: Realize the notebook widget before adding pages.
+
+	-Yosh
+
+Sun Apr 12 22:05:32 1998  pavlov
+
+	* src/sendmsg-window.c: code cleanups..
+	-pav
+
+	* src/sendmsg-window.c, TODO: more changes! :)
+
+	-pav
+
+	(updated todo to remind me of something yosh told me, removed things that have
+	been done.)
+
+Sun Apr 12 21:46:11 1998  yosh
+
+	* src/.cvsignore, po/.cvsignore: Let's run cvs without being annoyed...
+
+	-Yosh
+
+Sun Apr 12 21:38:51 1998  pavlov
+
+	* src/balsa-app.c: fixed it for people that do not have a MAIL env var.
+	-pav
+
+	* src/sendmsg-window.c, src/pref-manager.c, src/balsa-app.h, src/balsa-app.c:
+	changes changes changes.. la la la
+	-pav
+
+	* src/sendmsg-window.h, src/sendmsg-window.c:
+	fixed sendmsg-window so it doesn't crash after use! :)
+	-pav
+
+Sat Apr 11 22:22:48 1998  pavlov
+
+	* src/sendmsg-window.h, src/sendmsg-window.c, src/balsa-app.c, src/addrbook-manager.c:
+	*shrug*  changes.. i kinda re-wrote sendmsg-window.c
+	-pav
+
+	* src/balsa-app.c:
+	it now creates ~/.gnome/balsa from the mail files in ~/Mail if ~/.gnome/balsa doesn't exists
+
+	* src/balsa-app.c:
+	some changes so that if ~/.gnome/balsa is created it will not load the things
+	in the mail thingy in the other dir... ok, that made no sense, but thats ok.
+	i know what i'm talking about!!!!!!
+
+Fri Apr 10 13:33:37 1998  pavlov
+
+	* src/balsa-app.c:
+	used mail_valid instead of mail_open to check for validation of the mailbox so
+	it doesn't have to load the entire mailbox to check its format... seems to
+	make it much faster :)
+
+	-pav
+
+	* src/Attic/c-client.c, src/balsa-app.c:
+	some misc changes... balsa-app now loads the mailboxes in ~/.gnome/balsa
+	specified in the mailbox directory thingy somewhat properly.  right now it
+	opens the mailbox before adding it to check the mailbox format, which is slow
+	as hell as is, and should probibly be done some other way, but it was just a
+	quick hack.  i made mm_exists check to make sure the main_window is created
+	since that callback seems to be called before the main window is initialized.
+	i didn't touch addrbook-manager.c that i know of, but what the hell.
+	-pav
+
+Thu Apr  9 00:20:07 1998  harinath
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-support.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	* gnome-support.m4: Also run AC_HEADER_DIRENT.
+
+Wed Apr  8 23:54:06 1998  harinath
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-support.m4, /debian/home/gnomecvs/gnome-common/macros/autogen.sh, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	* autogen.sh: Update to list newer versions of packages.
+	* gnome-support.m4 (AC_REPLACE_FUNCS): Add `scandir'.
+
+Mon Apr  6 00:32:05 1998  pavlov
+
+	* src/mailbox-manager.c:
+	minor changes to the ui.. just some spacing issues, etc.
+	-pav
+
+Sun Apr  5 15:45:27 1998  pavlov
+
+	* src/balsa-message.c:
+	*yawn*nothing useful.. added/removed some code, so its basically the same
+	thing it was a min ago
+
+	-pav
+
+	* src/main-window.c, src/mailbox-manager.c:
+	a few minor changes... since it appears that clist's have to be realized now,
+	i am realizing the mailbox-manager clist.. but the address book clists seem to
+	go waaaaaay foobar when i try and realize them.. i'm probibly missing
+	something here.. but i dunno
+	-pav
+
+Thu Apr  2 19:27:46 1998  rhlabs
+
+	* balsa.spec: Final (hopefull) tweak to spec file
+
+	* balsa.spec: Slight cleanup of spec file.
+
+	* balsa.spec: spec file for building balsa
+
+Thu Apr  2 01:30:50 1998  pavlov
+
+	* src/mailbox-manager.c:
+	not sure, gonna download a fresh copy, wanted to commit all changes :)
+	-pav
+
+Wed Apr  1 03:48:15 1998  harinath
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-support.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	* gnome-support.m4 (AC_REPLACE_FUNCS): Look for vasprintf.
+
+Tue Mar 31 18:50:07 1998  unammx
+
+	* /debian/home/gnomecvs/gnome-common/intl/intlh.inst.in, /debian/home/gnomecvs/gnome-common/intl/libintl.glibc:
+	Added missing files
+
+Sun Mar 29 18:37:39 1998  pavlov
+
+	* src/mailbox-manager.c:
+	i think boxes are complete.. need to add some functionality behind them now so
+	they are accually useful!
+
+	-pav
+
+	* src/mailbox-manager.c: and moooooooooore changes.. weeeeeeeeee
+	this is fuuuuuun...
+	-pav
+
+	* src/mailbox-manager.c:
+	more changes, option_menu in mailbox-manager looks foobar'd when you click on
+	it the first time, but seems to work fine after that first click... gtk bug
+	mabey?  i dunno, i'm on irc if anyone wants more details..
+	-pav
+
+	* src/mailbox-manager.c: more changes.. weeeee
+	-pav
+
+	* src/mailbox-manager.c, src/balsa-app.c:
+	begin adding edit/add/delete/etc boxes INTO the mailbox-manager
+	-pav
+
+Sun Mar 29 00:49:34 1998  jpaint
+
+	* src/main-window.h, src/main-window.c, src/balsa-index.h, src/balsa-index.c, src/balsa-app.c:
+	Put progress bar in the correct place.
+
+Sat Mar 28 22:42:33 1998  pavlov
+
+	* src/main-window.c, src/balsa-index.c, src/balsa-app.c:
+	changes are fun.. .re-added the gnome-config stuff for loading mailboxes with
+	new mailbox setup.  you will probibly want to rm -f ~/.gnome/balsa before
+	running this version if you had an old cvs version of balsa installed.
+	-pav
+
+	* src/balsa-index.c:
+	fixed balsa from segfaulting if you used the next or previous buttons in an
+	empty mailbox.
+	-pav
+
+	* TODO: updated todo list with some reminders...
+	-pav
+
+	* src/main-window.c, src/balsa-index.c:
+	added a progress bar for opening messages... needs to be worked on, the code
+	in balsa-index.c should be cleaned up a little probibly.  if anyone knows at
+	what point it is noticable for progress bars to be seen changing, that would
+	be nice too, so i can put in some checks to prevent xxxxx number of emails
+	being the same number of draws... 10000 redraws would be kinda wasteful :)
+
+	-pav
+
+Fri Mar 27 09:49:36 1998  jpaint
+
+	* src/pref-manager.c, src/main-window.c, src/mailbox-manager.c, src/balsa-app.h, src/balsa-app.c, src/Makefile.am:
+	Preferences manager opens now.
+
+Fri Mar 27 01:43:12 1998  pavlov
+
+	* src/Attic/mailbox.h, src/Attic/mailbox.c:
+	fixed compiling problem, thanks yosh :)
+	-pav
+
+	* src/Attic/mailbox.h, src/Attic/mailbox.c, src/balsa-app.c:
+	updated so that balsa supports every known mailbox format and then some (i.e.
+	all the ones that c-client supports minus one or two mabey...)  one of the
+	headers looks like its broken, but i'm not sure why.. i'm commiting so mabey
+	someone can take a look at it and tell me what i broke ;)
+
+	-pav
+
+	* src/main-window.c, src/Attic/mailbox.h, src/Attic/mailbox.c, src/balsa-app.c:
+	added support for mbx mailboxes (very very very fast support with c-client,
+	these should be the default mailbox format).
+	-pav
+	(oh yeah, mh sucks!@#!@#!@#!)
+	-pav
+
+Thu Mar 26 05:55:05 1998  jpaint
+
+	* src/pref-manager.c, src/pref-manager.h, src/mailbox-manager.c:
+	Started on preference manager, cleared up a bad declaration.
+
+Wed Mar 25 23:16:33 1998  pavlov
+
+	* src/main-window.c, src/Attic/mailbox.c, src/balsa-app.c:
+	oops, fixed it so that it will accually start without crashing.. ;)
+	-pav
+
+	* TODO: updated TODO list, working on mailbox formats...
+	-pav
+
+	* src/Attic/mailbox.c, src/balsa-app.c, TODO:
+	updated TODO with notes for myself, it will read mh mailboxes now.. wee! A few
+	other minor changes...
+	-pav
+
+Wed Mar 25 05:28:57 1998  unammx
+
+	* /debian/home/gnomecvs/gnome-common/intl/Makefile.in:
+	gratious last time fixes to the i18n code -mig
+
+Wed Mar 25 00:06:44 1998  pavlov
+
+	* src/balsa-app.c: more changes
+	-pav
+
+	* src/Attic/mailbox.h, src/Attic/mailbox.c, src/balsa-message.c, src/balsa-app.c:
+	updated stuff for an attempt to handle MH mailboxes
+	-pav
+
+Mon Mar 23 17:53:26 1998  jpaint
+
+	* src/main-window.c, src/balsa-message.c: minor changes...
+
+Sat Mar 21 17:53:25 1998  pavlov
+
+	* src/addrbook-manager.h, src/addrbook-manager.c:
+	more changes.. weeeeeeeeeeeeeeee
+	-pav
+
+	* src/addrbook-manager.c:
+	you can now remove email addresses from an address book entry on the list.. wee :)
+	-pav
+
+	* src/addrbook-manager.c: more changes..
+	-pav
+
+	* src/addrbook-manager.c: more updates to addrbook...
+	-pav
+
+	* src/main-window.c, src/Attic/addrbook-window.h, src/Attic/addrbook-window.c, src/addrbook-manager.c, src/addrbook-manager.h, src/Makefile.am:
+	renamed addrbook files
+
+Fri Mar 20 22:45:31 1998  pavlov
+
+	* src/Attic/addrbook-window.c: more more more changes.. what fun...
+	-pav
+
+	* src/Attic/addrbook-window.c:
+	fixed addy book so that it accually compiled.. hmm :)
+	-pav
+
+Fri Mar 20 18:14:06 1998  jpaint
+
+	* src/Attic/mailbox.h, src/Attic/mailbox.c, src/balsa-app.c:
+	Mailbox changes, open multiple mailbox types with authentication.
+
+Fri Mar 20 17:23:26 1998  pavlov
+
+	* src/Attic/addrbook-window.c:
+	more changes, make addressbook stuff update balsa-app and a few other things...
+	-pav
+
+Fri Mar 20 06:24:33 1998  tromey
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	Thu Mar 19 23:23:30 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* gnome.m4: An empty true branch of an `if' statement is not valid
+		sh syntax.  If GNOME_INIT_HOOK argument $1 is empty, use ":"
+		instead.
+
+Fri Mar 20 03:36:59 1998  pavlov
+
+	* src/Attic/addrbook-window.c:  a few more changes... :-)
+	-pav
+
+Fri Mar 20 02:54:16 1998  unammx
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	Weee!  gmc uses the gnome.m4 macros now and detects properly gnome installation - mig
+
+Fri Mar 20 02:00:13 1998  pavlov
+
+	* src/Attic/addrbook-window.c: mooooooooooooore changes.. weeeeee
+	-pav
+
+	* src/Attic/addrbook-window.c:
+	more more more changes.. *yesh*  stupid gtk_[hv]paned's are being butts though... *grrr*
+	-pav
+
+Fri Mar 20 00:46:38 1998  unammx
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-x-checks.m4:
+	1998-03-19  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+		* gnome-app.c (gnome_app_add): Add support for gtk_container_add
+		to GnomeApp widget.
+
+Fri Mar 20 00:42:05 1998  pavlov
+
+	* src/Attic/addrbook-window.c: more changes...
+	-pav
+
+	* src/main-window.c, src/Attic/addrbook-window.c:
+	hmm. i didn't change main-window.c, but it says i did.. .lots of changes to addrbook stuff
+	-pav
+
+Thu Mar 19 20:23:21 1998  tromey
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-support.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	Thu Mar 19 00:17:46 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* gnome-support.m4: Cache results of check for
+		program_invocation_short_name, program_invocation_name.  Check to
+		make sure argp functions are in a library.
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-support.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	Thu Mar 19 00:17:46 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* gnome-support.m4: Cache results of argp check.
+
+Tue Mar 17 23:14:50 1998  pavlov
+
+	* src/Attic/balsa.xpm: moved balsa.xpm icon thingy
+	-pav
+
+Tue Mar 17 17:01:03 1998  jpaint
+
+	* src/main.c, src/Attic/c-client.c, src/balsa-app.h, src/balsa-app.c:
+	Added authentication in c-client for remote mailboxes; useless right now
+	as you can't configure a remote mailbox :-)  I also fixed the exit function
+	to properly close all mailboxes.
+
+Mon Mar 16 09:22:17 1998  jpaint
+
+	* src/Attic/options.h, src/Attic/options.c, src/main.c, src/main-window.c, src/Attic/mailbox.h, src/Attic/mailbox.c, src/mailbox-manager.c, src/mailbox-manager.h, src/Attic/index.h, src/Attic/index.c, src/balsa-index.c, src/balsa-app.h, src/balsa-app.c, src/Attic/addrbook-window.h, src/Attic/addrbook-window.c, src/Makefile.am:
+	a whole bunch of stuff; work on global settings, mailbox management
+	moved to mailbox-manager (I cut quite a bit of code out I'm going to put
+	back in), next/previous toolbar buttons work (need to be bound now to the
+	'n' and 'p' keys) -Jay
+
+Mon Mar 16 01:29:48 1998  pavlov
+
+	* src/main-window.c, src/balsa-app.h, src/Attic/addressbook.h, src/Attic/addrbook-window.c, src/Attic/addrbook-window.h, src/Attic/addressbook.c, src/Makefile.am:
+	renamed files, got a small nowherenear finished ui for the addressbook-window.
+	updated balsa-app.h to change the name of the list for the addressbook list, and i think thats all.
+	-pav
+
+Mon Mar 16 00:01:47 1998  jpaint
+
+	* src/main-window.c, src/balsa-message.h, src/balsa-message.c, src/balsa-index.h, src/balsa-index.c, src/Makefile.am:
+	removed delete stuff, added some tracking of new messages
+
+Sun Mar 15 21:43:29 1998  pavlov
+
+	* src/sendmsg-window.c, src/Attic/options.c, src/main-window.c, src/balsa-app.h, src/Attic/addressbook.h, src/Attic/addressbook.c, src/Makefile.am, config.h.in:
+	nothing important.  start of addressbook stuff.
+	-pav
+
+Sun Mar 15 20:56:36 1998  owen
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-x-checks.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	Updates to use AM_PATH_GTK. See various ChangeLogs for details.
+
+Sat Mar 14 22:24:00 1998  pavlov
+
+	* src/sendmsg-window.c, src/main-window.h, src/main-window.c, src/balsa-message.h, src/balsa-message.c:
+	failed attempt to delete messages... jay, email me :)
+
+	-pav
+
+	* src/sendmsg-window.c, src/main-window.c, src/balsa-message.c, src/Attic/addressbook.c, src/Attic/addressbook.h, src/balsa-app.h:
+	dunno what i've changed... nothing important i don't think.
+	-pav
+
+Thu Mar 12 22:52:05 1998  harinath
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-support.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	* gnome-support.m4: Add a check for <linewrap.h> -- this enables
+	some optimizations when compiling `argp'.
+
+	- Hari
+
+Thu Mar 12 07:10:16 1998  pavlov
+
+	* src/sendmsg-window.h, src/sendmsg-window.c, src/Attic/options.h, src/Attic/options.c, src/main.c, src/main-window.h, src/main-window.c, src/Attic/mailbox.h, src/Attic/mailbox.c, src/Attic/index.h, src/Attic/index.c, src/Attic/c-client.h, src/Attic/c-client.c, src/balsa-message.h, src/balsa-message.c, src/balsa-index.h, src/balsa-index.c, src/balsa-app.h, src/balsa-app.c:
+	updated the copyright stuff to reflect the address change as pointed out by Tom Tromey.
+	-pav
+
+	* src/main-window.c, src/balsa-app.c:
+	forgot to realize the window in main-window.c... oops..
+
+	-pav
+
+Wed Mar 11 22:26:17 1998  sopwith
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-objc-checks.m4:
+	Much more work on the mailman - it is semi-functional, and also on girc.
+
+Wed Mar 11 09:49:42 1998  jpaint
+
+	* src/main-window.c: fixed up the main window & toolbar
+
+Wed Mar 11 01:50:00 1998  pavlov
+
+	* src/Attic/options.c:
+	attempt to clean up a few memleaks.. need more work,but...
+	-pav
+
+Tue Mar 10 21:24:48 1998  unammx
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome.m4:
+	Tue Mar 10 15:34:17 1998  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+		* obgnome/obgnomeApp.h: Made it conform to the new gnome_init parameters.
+
+Tue Mar 10 11:29:58 1998  pavlov
+
+	* config.h.in, TODO: updated my todo list again...
+	-pav
+
+Tue Mar 10 02:40:45 1998  tromey
+
+	* configure.in, config.h.in, Makefile.am, ChangeLog:
+	Mon Mar  9 19:31:23 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* Makefile.am (SUBDIRS): Don't build in support directory.
+		* configure.in: Don't call GNOME_SUPPORT_CHECKS.  Don't create
+		support/Makefile.
+
+Tue Mar 10 02:34:43 1998  pavlov
+
+	* TODO: updated TODO file some more, with various stuff...
+	-pav
+
+Tue Mar 10 02:34:27 1998  tromey
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-support.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	Mon Mar  9 19:32:42 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* gnome-support.m4: Build vsnprintf.o, not vsnprint.o.
+
+Tue Mar 10 02:31:35 1998  pavlov
+
+	* src/sendmsg-window.h, src/sendmsg-window.c, src/main.c, src/main-window.c:
+	*** empty log message ***
+
+	* src/main-window.c, config.h.in, TODO:
+	more UI changes, updated my todo list
+	Why does config.h.in not like me?
+
+	-pav
+
+	* src/main-window.c: few more changes to ui...
+	-pav
+
+Tue Mar 10 00:13:02 1998  harinath
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-support.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	* gnome-support.m4: Add check for `vsnprintf'.
+
+	- Hari
+
+Mon Mar  9 07:03:16 1998  jpaint
+
+	* src/main.c, src/Attic/mailbox.h, src/Attic/mailbox.c, src/balsa-app.c:
+	Okay, the new mailbox structures are up and woking now
+
+Mon Mar  9 03:44:22 1998  pavlov
+
+	* TODO:
+	updated the TODO file so that i can keep track of what I need to do, and bugs i'm aware of
+
+	-pav
+
+	* src/main-window.c: stuff for pretty toolbar.. weeeeeeeee
+	-pav
+
+Mon Mar  9 01:59:51 1998  tromey
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-support.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	Sun Mar  8 17:04:28 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* gnome-support.m4: Set need_gnome_support shell variable.  Define
+		BUILD_GNOME_SUPPORT automake conditional.  Define LTLIBOBJS.  Look
+		for argp_domain element in struct argp.
+
+Sun Mar  8 22:38:54 1998  pavlov
+
+	* src/main-window.c: gnomified balsa (not finished)
+	-pav
+
+Sun Mar  8 20:27:50 1998  jpaint
+
+	* src/Attic/mailbox.h, src/Attic/mailbox.c, src/balsa-app.h:
+	Malbox changes
+
+Sun Mar  8 18:33:38 1998  pavlov
+
+	* src/sendmsg-window.c, src/Attic/options.c:
+	got rid of some silly warnings, and fixed options editing.
+	-pav
+
+	* src/Attic/options.c:
+	you can now delete personalities, which are gonna be renamed sometime...
+
+	it appears that gnome-config is broke again, but i don't see any mention of "we broke gnome-config" in the changelog, so i'm not sure.. i'm getting funky warnings from it.  so if miguel is awake, please get on irc, and help me figure this out.. thanks :)
+
+	-pav
+
+Sat Mar  7 19:54:19 1998  pavlov
+
+	* src/sendmsg-window.c, src/Attic/options.c, TODO:
+	misc changes.. nothing really important.
+	-pav
+
+	* src/Attic/options.h, src/Attic/options.c: account stuff almost done.
+	-pav
+
+	* src/Attic/options.c: more changes...
+	-pav
+
+	* src/Attic/options.h, src/Attic/options.c: few more changes
+	-pav
+
+	* src/Attic/options.c:
+	personality UI changes (not complete, about same place as old box.)
+	-pav
+
+Sat Mar  7 07:07:45 1998  tromey
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-support.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	Sat Mar  7 00:04:22 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* gnome-support.m4 (GNOME_SUPPORT_CHECKS): Check for strnlen().
+
+Fri Mar  6 17:12:18 1998  pavlov
+
+	* src/sendmsg-window.c:
+	minute code changes so that i can play with some stuff here at work.
+	-pav
+
+	* src/sendmsg-window.c:
+	really messy smtp code, but it does work... (somewhat...)
+
+	-pav
+
+	* src/sendmsg-window.c:
+	messy smtp code... doesn't work right yet... am working on...
+	-pav
+
+	* config.h.in, acconfig.h:
+	fixed all of balsa config/make/etc stuff.. (finally)
+
+	-pav
+
+	* configure.in: update for config stuff.
+	-pav
+
+Thu Mar  5 18:10:18 1998  pavlov
+
+	* po/Makefile.in.in, po/POTFILES.in, po/balsa.pot, po/cat-id-tbl.c, po/ko.po, po/stamp-cat-id, src/Attic/balsa.xpm, src/Attic/c-client.c, src/Attic/c-client.h, src/Attic/index.c, src/Attic/index.h, src/Attic/mailbox.c, src/Attic/mailbox.h, src/Attic/options.c, src/Attic/options.h, src/Makefile.am, src/balsa-app.c, src/balsa-app.h, src/balsa-index.c, src/balsa-index.h, src/balsa-message.c, src/balsa-message.h, src/main-window.c, src/main-window.h, src/main.c, src/sendmsg-window.c, src/sendmsg-window.h:
+	Initial revision
+
+	* po/Makefile.in.in, po/POTFILES.in, po/balsa.pot, po/cat-id-tbl.c, po/ko.po, po/stamp-cat-id, src/Attic/balsa.xpm, src/Attic/c-client.c, src/Attic/c-client.h, src/Attic/index.c, src/Attic/index.h, src/Attic/mailbox.c, src/Attic/mailbox.h, src/Attic/options.c, src/Attic/options.h, src/Makefile.am, src/balsa-app.c, src/balsa-app.h, src/balsa-index.c, src/balsa-index.h, src/balsa-message.c, src/balsa-message.h, src/main-window.c, src/main-window.h, src/main.c, src/sendmsg-window.c, src/sendmsg-window.h:
+	fixed balsa source tree (i think...)
+
+	-pav
+
+	* .cvsignore, ABOUT-NLS, AUTHORS, COPYING, ChangeLog, Makefile.am, NEWS, README, acconfig.h, acinclude.m4, autogen.sh, configure.in, stamp-h.in:
+	Initial revision
+
+	* .cvsignore, ABOUT-NLS, AUTHORS, COPYING, ChangeLog, Makefile.am, NEWS, README, acconfig.h, acinclude.m4, autogen.sh, configure.in, stamp-h.in:
+	fixed balsa source tree (i think...)
+
+	-pav
+
+Wed Mar  4 08:14:23 1998  tromey
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-support.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	Wed Mar  4 01:02:55 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* gnome-support.m4 (GNOME_SUPPORT_CHECKS): Check for argp code,
+		strndup, program_invocation_name, program_invocation_short_name.
+
+Mon Mar  2 22:34:42 1998  tromey
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-x-checks.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	Mon Mar  2 15:27:44 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* gnome-x-checks.m4 (GNOME_X_CHECKS): Also check for SMlib.h; some
+		Solaris systems have -lSM but not SMlib.h.
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	Sun Mar  1 17:49:42 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* gnome.m4 (GNOME_INIT): Changed spacing so --help output looks
+		right.
+
+Fri Feb 27 17:11:38 1998  tromey
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-objc-checks.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	Fri Feb 27 10:05:34 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* gnome-objc-checks.m4 (GNOME_CHECK_OBJC): Set OBJECTIVE_C shell
+		variable.
+
+Thu Feb 26 20:57:44 1998  harinath
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-x-checks.m4:
+	Stupid mistake...  Forgot a `,'
+	- Hari
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-x-checks.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	* gnome-x-checks.m4 (CPPFLAGS): Put $X_CFLAGS here, not in
+	$CFLAGS.
+	(GNOME_HAVE_SM): New var.  `true' if we have libSM, `false'
+	otherwise.
+
+	- Hari
+
+Thu Feb 19 06:32:06 1998  harinath
+
+	* /debian/home/gnomecvs/gnome-common/macros/ChangeLog, /debian/home/gnomecvs/gnome-common/macros/gnome.m4:
+	* gnome.m4: Remove `GNOME_CHECK_GNOME'.
+
+	- Hari
+
+Thu Feb 19 00:40:37 1998  sopwith
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome.m4:
+	touchups for CVS gtk
+
+Wed Feb 18 21:36:45 1998  harinath
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-support.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	* gnome-support.m4 (GNOME_SUPPORT_CHECKS): Replace `strcasecmp' if
+	necessary.
+
+	- Hari
+
+Wed Feb 18 19:12:53 1998  sopwith
+
+	* /debian/home/gnomecvs/gnome-common/intl/Makefile.in:
+	removed autogenerated aclocal.m4
+
+Mon Feb 16 18:06:37 1998  unammx
+
+	* /debian/home/gnomecvs/gnome-common/macros/autogen.sh:
+	Added missing separator, from Ching Hui
+
+Sun Feb 15 23:13:49 1998  harinath
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-objc-checks.m4, /debian/home/gnomecvs/gnome-common/macros/gnome-pthread-check.m4, /debian/home/gnomecvs/gnome-common/macros/gnome-x-checks.m4, /debian/home/gnomecvs/gnome-common/macros/Makefile.am, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	* Makefile.am (MACROS): Add `gnome-pthread-check.m4'.
+	* gnome-pthread-check.m4: New file.  Moved pthread check from
+	gnome-x-checks.m4 to here.
+	* gnome-objc-checks.m4: Use `gnome-pthread-check'.
+	(OBJC_LIBS): New config var.
+	* gnome-x-checks.m4: Add `AC_DEFINE(HAVE_LIBSM)' if `-lSM' is
+	already part of `$x_libs'.
+	Move pthread check to new file.
+
+	- Hari
+
+Sun Feb 15 20:13:03 1998  timj
+
+	* /debian/home/gnomecvs/gnome-common/macros/autogen.sh:
+	check for shared gtk+ libraries also.
+	-timj
+
+Sat Feb 14 22:06:12 1998  tromey
+
+	* /debian/home/gnomecvs/gnome-common/macros/Makefile.am, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	Sat Feb 14 12:45:35 1998  Tom Tromey  <tromey@cygnus.com>
+
+	        * Makefile.am (macros.dep): Use single quotes, not double quotes.
+	        Otherwise bash will interpret `$(...)' incorrectly.
+	        (EXTRA_DIST): Include macros.dep in distribution.
+
+Sat Feb 14 17:40:00 1998  harinath
+
+	* /debian/home/gnomecvs/gnome-common/macros/ChangeLog, /debian/home/gnomecvs/gnome-common/macros/Makefile.am:
+	* Makefile.am (macros.dep): Put back doubled `$'.  We want the
+	expansion to occur in the including Makefile, not here.
+	Otherwise, there will be an extra `../' in the rule.
+
+	- Hari
+
+Sat Feb 14 17:22:36 1998  cwryu
+
+	* /debian/home/gnomecvs/gnome-common/macros/autogen.sh:
+	Remove debugging message, "hahaha $macrodirs".  :)
+
+	* /debian/home/gnomecvs/gnome-common/macros/ChangeLog, /debian/home/gnomecvs/gnome-common/macros/autogen.sh:
+	Sat Feb 14 17:41:28 KST 1998  Changwoo Ryu  <cwryu@adam.kaist.ac.kr>
+
+		* autogen.sh: multilple aclocal -I directories.
+
+Sat Feb 14 08:40:53 1998  tromey
+
+	* /debian/home/gnomecvs/gnome-common/macros/Makefile.am, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	Sat Feb 14 01:09:37 1998  Tom Tromey  <tromey@cygnus.com>
+
+		* Makefile.am (macros.dep): Removed extra `$' from rule.
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-x-checks.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	Sat Feb 14 01:09:37 1998  Tom Tromey  <tromey@cygnus.com>
+
+	        * gnome-x-checks.m4: Only check for -lSM if not already in
+	        x_libs.
+
+Sat Feb 14 05:42:53 1998  harinath
+
+	* /debian/home/gnomecvs/gnome-common/macros/ChangeLog, /debian/home/gnomecvs/gnome-common/macros/Makefile.am:
+	* Makefile.am (EXTRA_DIST): Add `autogen.sh'.
+
+	* /debian/home/gnomecvs/gnome-common/macros/ChangeLog, /debian/home/gnomecvs/gnome-common/macros/gnome-objc-checks.m4:
+	* gnome-objc-checks.m4 (GNOME_INIT_OBJC): Solaris /bin/sh doesn't
+	understand `test -e'.
+
+	- Hari
+
+	* /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	Checkin ChangeLog
+
+	* /debian/home/gnomecvs/gnome-common/macros/autogen.sh:
+	New `autogen.sh' that has most of the guts of $topdir/autogen.sh.
+
+Fri Feb 13 21:03:03 1998  harinath
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	* gnome.m4 (GNOME_INIT): Look for gnomeConf.sh in $libdir, where
+	the installation actually installs it.
+
+	- Hari
+
+Fri Feb 13 19:16:00 1998  unammx
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome.m4:
+	Gary Vaughan's fixes to gnome.m4
+
+Fri Feb 13 18:19:17 1998  harinath
+
+	* /debian/home/gnomecvs/gnome-common/macros/Makefile.am:
+	Add `gnome-support.m4' to MACROS
+
+	* /debian/home/gnomecvs/gnome-common/macros/Makefile.am, /debian/home/gnomecvs/gnome-common/macros/ChangeLog, /debian/home/gnomecvs/gnome-common/macros/.cvsignore:
+	* Makefile.am (macros.dep): New maintainer rule for handling
+	automatic rebuilding of aclocal.m4 if any of the macros change.
+	(MACROS): New variable.  List of all `m4' macros in this
+	directory.
+
+	- Hari
+
+Thu Feb 12 23:11:26 1998  harinath
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-support.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog:
+	* gnome-support.m4: New file.  Defines GNOME_SUPPORT_CHECKS for
+	libsupport.a support.
+
+Wed Feb 11 04:25:16 1998  unammx
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-objc-checks.m4, /debian/home/gnomecvs/gnome-common/macros/gnome.m4:
+	Gnome/Games shoudl work now
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-objc-checks.m4:
+	Gnome/Objc automake/autoconf setup
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-objc-checks.m4, /debian/home/gnomecvs/gnome-common/macros/gnome.m4:
+	Misc setup changes
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome.m4:
+	Gnome Core updates
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome-guile-checks.m4, /debian/home/gnomecvs/gnome-common/macros/gnome-objc-checks.m4:
+	Gnome Utils autoconf/automake setup is ready
+
+Tue Feb 10 20:21:54 1998  harinath
+
+	* /debian/home/gnomecvs/gnome-common/macros/gnome.m4, /debian/home/gnomecvs/gnome-common/macros/gnome-x-checks.m4, /debian/home/gnomecvs/gnome-common/macros/aclocal-include.m4, /debian/home/gnomecvs/gnome-common/macros/ChangeLog, /debian/home/gnomecvs/gnome-common/macros/Makefile.am:
+	* gnome.m4: New file.  Moved AC_CHECK_GNOME from `configure.in' to
+	here, and renamed macro to GNOME_CHECK_GNOME.
+	* gnome-x-checks.m4: Likewise, move and renaming AC_GNOME_X_CHECKS
+	to GNOME_X_CHECKS.
+
+	* aclocal-include.m4: New file.  Defines AM_ACLOCAL_INCLUDE macro
+	to provide extra search directories to `aclocal'.
+
+Sun Feb  8 17:44:13 1998  cwryu
+
+	* /debian/home/gnomecvs/gnome-common/intl/Makefile.in, /debian/home/gnomecvs/gnome-common/intl/VERSION, /debian/home/gnomecvs/gnome-common/intl/ChangeLog, /debian/home/gnomecvs/gnome-common/intl/loadinfo.h, /debian/home/gnomecvs/gnome-common/intl/loadmsgcat.c, /debian/home/gnomecvs/gnome-common/intl/localealias.c, /debian/home/gnomecvs/gnome-common/intl/textdomain.c, /debian/home/gnomecvs/gnome-common/intl/gettextP.h, /debian/home/gnomecvs/gnome-common/intl/hash-string.h, /debian/home/gnomecvs/gnome-common/intl/l10nflist.c, /debian/home/gnomecvs/gnome-common/intl/libgettext.h, /debian/home/gnomecvs/gnome-common/intl/finddomain.c, /debian/home/gnomecvs/gnome-common/intl/gettext.c, /debian/home/gnomecvs/gnome-common/intl/gettext.h, /debian/home/gnomecvs/gnome-common/intl/cat-compat.c, /debian/home/gnomecvs/gnome-common/intl/dcgettext.c, /debian/home/gnomecvs/gnome-common/intl/explodename.c, /debian/home/gnomecvs/gnome-common/intl/bindtextdom.c:
+	Use code in gettext 0.32.
+
+Wed Nov 26 00:35:48 1997  gnomecvs
+
+	* /debian/home/gnomecvs/gnome-common/intl/Makefile.in:
+	This Makefile should be here
+
+Mon Nov 24 22:32:04 1997  sopwith
+
+	* /debian/home/gnomecvs/gnome-common/intl/.cvsignore, /debian/home/gnomecvs/gnome-common/intl/po2tbl.sed.in, /debian/home/gnomecvs/gnome-common/intl/textdomain.c, /debian/home/gnomecvs/gnome-common/intl/xopen-msg.sed:
+	Initial revision
+
+	* /debian/home/gnomecvs/gnome-common/intl/.cvsignore, /debian/home/gnomecvs/gnome-common/intl/po2tbl.sed.in, /debian/home/gnomecvs/gnome-common/intl/textdomain.c, /debian/home/gnomecvs/gnome-common/intl/xopen-msg.sed:
+	gnome
+
+	* /debian/home/gnomecvs/gnome-common/intl/ChangeLog, /debian/home/gnomecvs/gnome-common/intl/VERSION, /debian/home/gnomecvs/gnome-common/intl/bindtextdom.c, /debian/home/gnomecvs/gnome-common/intl/cat-compat.c, /debian/home/gnomecvs/gnome-common/intl/dcgettext.c, /debian/home/gnomecvs/gnome-common/intl/dgettext.c, /debian/home/gnomecvs/gnome-common/intl/finddomain.c, /debian/home/gnomecvs/gnome-common/intl/gettext.c, /debian/home/gnomecvs/gnome-common/intl/gettext.h, /debian/home/gnomecvs/gnome-common/intl/gettextP.h, /debian/home/gnomecvs/gnome-common/intl/hash-string.h, /debian/home/gnomecvs/gnome-common/intl/intl-compat.c, /debian/home/gnomecvs/gnome-common/intl/libgettext.h, /debian/home/gnomecvs/gnome-common/intl/linux-msg.sed, /debian/home/gnomecvs/gnome-common/intl/loadmsgcat.c, /debian/home/gnomecvs/gnome-common/intl/localealias.c:
+	Initial revision
+
+	* /debian/home/gnomecvs/gnome-common/intl/ChangeLog, /debian/home/gnomecvs/gnome-common/intl/VERSION, /debian/home/gnomecvs/gnome-common/intl/bindtextdom.c, /debian/home/gnomecvs/gnome-common/intl/cat-compat.c, /debian/home/gnomecvs/gnome-common/intl/dcgettext.c, /debian/home/gnomecvs/gnome-common/intl/dgettext.c, /debian/home/gnomecvs/gnome-common/intl/finddomain.c, /debian/home/gnomecvs/gnome-common/intl/gettext.c, /debian/home/gnomecvs/gnome-common/intl/gettext.h, /debian/home/gnomecvs/gnome-common/intl/gettextP.h, /debian/home/gnomecvs/gnome-common/intl/hash-string.h, /debian/home/gnomecvs/gnome-common/intl/intl-compat.c, /debian/home/gnomecvs/gnome-common/intl/libgettext.h, /debian/home/gnomecvs/gnome-common/intl/linux-msg.sed, /debian/home/gnomecvs/gnome-common/intl/loadmsgcat.c, /debian/home/gnomecvs/gnome-common/intl/localealias.c:
+	gnome
 

@@ -574,4 +574,6 @@ typedef enum {
     LB_MBOX_N_COLS
 } LibBalsaMailboxColumn;
 
+extern gchar *libbalsa_mailbox_date_format;
+
 #endif				/* __LIBBALSA_MAILBOX_H__ */

@@ -678,6 +678,7 @@ config_global_load(void)
     g_free(balsa_app.date_string);
     balsa_app.date_string =
 	gnome_config_get_string("DateFormat=" DEFAULT_DATE_FORMAT);
+    libbalsa_mailbox_date_format = balsa_app.date_string;
 
     /* ... Headers to show */
     balsa_app.shown_headers = d_get_gint("ShownHeaders", HEADERS_SELECTED);

@@ -2345,6 +2345,7 @@ lbm_get_index_entry(LibBalsaMailbox *lmm, unsigned msgno)
 #if !GTK_CHECK_VERSION(2,4,0)
 #define g_value_take_string g_value_set_string_take_ownership
 #endif
+gchar *libbalsa_mailbox_date_format;
 static void
 mbox_model_get_value(GtkTreeModel *tree_model,
                      GtkTreeIter  *iter,
@@ -2425,7 +2426,8 @@ mbox_model_get_value(GtkTreeModel *tree_model,
         break;
     case LB_MBOX_DATE_COL:
         if(msg) {
-            tmp = libbalsa_date_to_gchar(&msg->msg_date, "%x %X");
+            tmp = libbalsa_date_to_gchar(&msg->msg_date,
+		                         libbalsa_mailbox_date_format);
             g_value_take_string(value, tmp);
         } else g_value_set_static_string(value, "unknown");
         break;

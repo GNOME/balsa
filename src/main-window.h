@@ -20,8 +20,11 @@
 #ifndef __main_window_h__
 #define __main_window_h__
 
+#include "mailbox.h"
+
 void open_main_window ();
 void close_main_window ();
 void refresh_main_window ();
+void main_window_set_mailbox (Mailbox * mailbox);
 
 #endif /* __main_window_h__ */

@@ -24,12 +24,13 @@
 #include "balsa-message.h"
 #include "balsa-index.h"
 #include "sendmsg-window.h"
-#include "mailbox.h"
 #include "pref-manager.h"
 #include "mailbox-manager.h"
 #include "addrbook-manager.h"
 #include "misc.h"
 
+
+#define MAILBOX_DATA "mailbox_data"
 
 
 typedef struct _MainWindow MainWindow;
@@ -77,7 +78,7 @@ static void previous_message_cb (GtkWidget * widget);
 static void delete_message_cb (GtkWidget * widget);
 static void undelete_message_cb (GtkWidget * widget);
 
-static void mailbox_select_cb (GtkWidget * widget, gpointer data);
+static void mailbox_select_cb (GtkWidget * widget);
 
 static void about_box_destroy_cb ();
 
@@ -254,6 +255,7 @@ refresh_main_window ()
       menuitem = gtk_menu_item_new_with_label (mailbox->name);
 
       gtk_object_set_user_data (GTK_OBJECT (menuitem), (gpointer) mw);
+      gtk_object_set_data (GTK_OBJECT (menuitem), MAILBOX_DATA, mailbox);
 
       gtk_signal_connect (GTK_OBJECT (menuitem),
 			  "activate",
@@ -267,6 +269,34 @@ refresh_main_window ()
   gtk_option_menu_set_menu (GTK_OPTION_MENU (mw->mailbox_option_menu), mw->mailbox_menu);
 }
 
+
+void
+main_window_set_mailbox (Mailbox * mailbox)
+{
+  gint i;
+  GtkWidget *menuitem;
+  GList *children;
+  
+  children = GTK_MENU_SHELL (mw->mailbox_menu)->children;
+  while (children)
+    {
+      menuitem = children->data;
+      children = children->next;
+
+      if (gtk_object_get_data (GTK_OBJECT (menuitem), MAILBOX_DATA) == mailbox)
+	break;
+
+      menuitem = NULL;
+    }
+
+  if (!menuitem)
+    {
+      g_print ("Error: Could not find menuitem for mailbox.\n");
+      return;
+    }
+  
+  gtk_menu_item_activate (GTK_MENU_ITEM (menuitem));
+}
 
 
 /*
@@ -717,7 +747,7 @@ undelete_message_cb (GtkWidget * widget)
 
 
 static void
-mailbox_select_cb (GtkWidget * widget, gpointer data)
+mailbox_select_cb (GtkWidget * widget)
 {
   MainWindow *mainwindow;
   Mailbox *mailbox;
@@ -726,7 +756,7 @@ mailbox_select_cb (GtkWidget * widget, gpointer data)
   g_return_if_fail (GTK_IS_MENU_ITEM (widget));
 
   mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
-  mailbox = (Mailbox *) data;
+  mailbox = (Mailbox *) gtk_object_get_data (GTK_OBJECT (widget), MAILBOX_DATA);
 
 
   /* return if the mailbox is already the currently open mailbox */

@@ -536,19 +536,22 @@ free_message_info(struct message_info *msg_info)
 }
 
 static gboolean lbm_maildir_sync_real(LibBalsaMailboxMaildir * mdir,
-				      gboolean expunge,
-				      gboolean closing);
+				      gboolean expunge);
 
 static void
 libbalsa_mailbox_maildir_close_mailbox(LibBalsaMailbox * mailbox)
 {
     LibBalsaMailboxMaildir *mdir;
+    guint len;
 
     g_return_if_fail (LIBBALSA_IS_MAILBOX_MAILDIR(mailbox));
 
     mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
 
-    lbm_maildir_sync_real(mdir, TRUE, TRUE);
+    len = mdir->msgno_2_msg_info->len;
+    lbm_maildir_sync_real(mdir, TRUE);
+    if (mdir->msgno_2_msg_info->len != len)
+	g_signal_emit_by_name(mailbox, "changed");
 
     if (mdir->messages_info) {
 	g_hash_table_destroy(mdir->messages_info);
@@ -588,7 +591,6 @@ struct sync_info {
     gchar *path;
     GSList *removed_list;
     gboolean expunge;
-    gboolean closing;
 };
     
 static void maildir_sync_add(struct message_info *msg_info,
@@ -603,8 +605,7 @@ maildir_sync(gchar *key, struct message_info *msg_info, struct sync_info *si)
 				      msg_info->filename);
 	unlink (orig);
 	g_free(orig);
-	if (!si->closing)
-	    si->removed_list = g_slist_prepend(si->removed_list, msg_info);
+	si->removed_list = g_slist_prepend(si->removed_list, msg_info);
 	return;
     }
      
@@ -658,9 +659,7 @@ maildir_renumber(gchar * key, struct message_info *msg_info,
 }
 
 static gboolean
-lbm_maildir_sync_real(LibBalsaMailboxMaildir * mdir,
-		      gboolean expunge,
-		      gboolean closing)
+lbm_maildir_sync_real(LibBalsaMailboxMaildir * mdir, gboolean expunge)
 {
     /*
      * foreach message_info
@@ -676,12 +675,8 @@ lbm_maildir_sync_real(LibBalsaMailboxMaildir * mdir,
 	g_strdup(libbalsa_mailbox_local_get_path(LIBBALSA_MAILBOX(mdir)));
     si.removed_list = NULL;
     si.expunge = expunge;
-    si.closing = closing;
     g_hash_table_foreach(mdir->messages_info, (GHFunc) maildir_sync, &si);
     g_free(si.path);
-
-    if (closing)
-	return TRUE;
 
     for (l = si.removed_list; l; l = l->next) {
 	struct message_info *removed = l->data;
@@ -707,7 +702,7 @@ libbalsa_mailbox_maildir_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     g_assert(LIBBALSA_IS_MAILBOX_MAILDIR(mailbox));
 
     return lbm_maildir_sync_real(LIBBALSA_MAILBOX_MAILDIR(mailbox),
-				 expunge, FALSE);
+				 expunge);
 }
 
 static struct message_info *message_info_from_msgno(

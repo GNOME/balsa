@@ -546,8 +546,12 @@ static void
 libbalsa_mailbox_mh_close_mailbox(LibBalsaMailbox * mailbox)
 {
     LibBalsaMailboxMh *mh = LIBBALSA_MAILBOX_MH(mailbox);
+    guint len;
 
+    len = mh->msgno_2_msg_info->len;
     libbalsa_mailbox_mh_sync(mailbox, TRUE);
+    if (mh->msgno_2_msg_info->len != len)
+	g_signal_emit_by_name(mailbox, "changed");
 
     if (mh->messages_info) {
 	g_hash_table_destroy(mh->messages_info);

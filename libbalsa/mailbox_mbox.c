@@ -491,7 +491,12 @@ libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox)
     LibBalsaMailboxMbox *mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
 
     if (mbox->messages_info) {
+	guint len;
+
+	len = mbox->messages_info->len;
 	lbm_mbox_sync_real(mailbox, TRUE, TRUE);
+	if (mbox->messages_info->len != len)
+	    g_signal_emit_by_name(mailbox, "changed");
 	free_messages_info(mbox->messages_info);
 	g_array_free(mbox->messages_info, TRUE);
 	mbox->messages_info = NULL;
@@ -881,8 +886,21 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
     unlink(tempfile); /* remove partial copy of the mailbox */
     g_free(tempfile);
 
-    if (closing)
+    if (closing) {
+	/* Just shorten the msg_info array. */
+	for (i = first, j = first; i < messages; i++) {
+	    msg_info = &g_array_index(mbox->messages_info,
+				      struct message_info, j);
+	    if (!expunge ||
+		(msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED) == 0) {
+		j++;
+	    } else {
+		free_message_info(msg_info);
+		g_array_remove_index(mbox->messages_info, j);
+	    }
+	}
 	return TRUE;
+    }
 
     /* update the rewritten messages */
     if (g_mime_stream_seek(mbox_stream, offset, GMIME_STREAM_SEEK_SET)

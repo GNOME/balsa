@@ -88,6 +88,7 @@ typedef struct _PropertyUI {
     GtkWidget *wordwrap;
     GtkWidget *wraplength;
     GtkWidget *send_rfc2646_format_flowed;
+    GtkWidget *open_inbox_upon_startup;
     GtkWidget *check_mail_upon_startup;
     GtkWidget *remember_open_mboxes;
     GtkWidget *mblist_show_mb_content_info;
@@ -432,6 +433,9 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 		       GTK_SIGNAL_FUNC(font_changed), property_box);
 
 
+    gtk_signal_connect(GTK_OBJECT(pui->open_inbox_upon_startup), "toggled",
+		       GTK_SIGNAL_FUNC(properties_modified_cb),
+		       property_box);
     gtk_signal_connect(GTK_OBJECT(pui->check_mail_upon_startup), "toggled",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
@@ -670,6 +674,8 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     balsa_app.recognize_rfc2646_format_flowed =
 	GTK_TOGGLE_BUTTON(pui->recognize_rfc2646_format_flowed)->active;
 
+    balsa_app.open_inbox_upon_startup =
+	GTK_TOGGLE_BUTTON(pui->open_inbox_upon_startup)->active;
     balsa_app.check_mail_upon_startup =
 	GTK_TOGGLE_BUTTON(pui->check_mail_upon_startup)->active;
     balsa_app.remember_open_mboxes =
@@ -922,6 +928,9 @@ set_prefs(void)
 		       balsa_app.subject_font);
     gtk_entry_set_position(GTK_ENTRY(pui->subject_font), 0);
 
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+				 (pui->open_inbox_upon_startup),
+				 balsa_app.open_inbox_upon_startup);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
 				 (pui->check_mail_upon_startup),
 				 balsa_app.check_mail_upon_startup);
@@ -2120,6 +2129,10 @@ create_startup_page(gpointer data)
 
     vb1 = vbox_in_container(frame);
 
+    pui->open_inbox_upon_startup =
+	gtk_check_button_new_with_label(_("Open Inbox upon startup"));
+    gtk_box_pack_start(GTK_BOX(vb1), pui->open_inbox_upon_startup,
+		       FALSE, FALSE, 0);
     pui->check_mail_upon_startup =
 	gtk_check_button_new_with_label(_("Check mail upon startup"));
     gtk_box_pack_start(GTK_BOX(vb1), pui->check_mail_upon_startup,

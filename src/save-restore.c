@@ -733,6 +733,8 @@ config_global_load(void)
     balsa_app.mailbox_nodes = g_node_new(balsa_mailbox_node_new_from_dir(
         balsa_app.local_mail_directory));
 
+    balsa_app.open_inbox_upon_startup =
+	gnome_config_get_bool("OpenInboxOnStartup=false");
     /* debugging enabled */
     balsa_app.debug = gnome_config_get_bool("Debug=false");
 
@@ -957,6 +959,8 @@ gint config_save(void)
 
     gnome_config_set_string("MailDir", balsa_app.local_mail_directory);
 
+    gnome_config_set_bool("OpenInboxOnStartup", 
+                          balsa_app.open_inbox_upon_startup);
     gnome_config_set_bool("Debug", balsa_app.debug);
 
     gnome_config_set_bool("AutoCloseMailbox", balsa_app.close_mailbox_auto);

@@ -380,7 +380,7 @@ main(int argc, char *argv[])
     if (cmd_open_unread_mailbox || balsa_app.open_unread_mailbox)
 	gtk_idle_add((GtkFunction) initial_open_unread_mailboxes, NULL);
 
-    if (cmd_open_inbox)
+    if (cmd_open_inbox || balsa_app.open_inbox_upon_startup)
 	gtk_idle_add((GtkFunction) initial_open_inbox, NULL);
 
     if (cmd_line_open_mailboxes) {

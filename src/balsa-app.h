@@ -280,6 +280,7 @@ extern struct BalsaApplication {
     gboolean forward_attached;
 
     /* command line options */
+    gint open_inbox_upon_startup;
     gint check_mail_upon_startup;
     gint remember_open_mboxes;
     gint open_unread_mailbox;

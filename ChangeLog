@@ -14,6 +14,8 @@
 	* src/mailbox-node.h: add fields for persistent sort order.
 	* src/main-window.c: aviod double sorting on balsa-index creation.
 	* src/pref-manager.c: use deescape_specials.
+	* src/mailbox-node.c (balsa_mailbox_node_init): initialize sort
+	order fields.
 	
 2001-01-31  Matthew Guenther  <guentherm@asme.org>
 

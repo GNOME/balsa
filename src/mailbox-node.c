@@ -135,6 +135,8 @@ balsa_mailbox_node_init(BalsaMailboxNode * mn)
     mn->style = 0;
     mn->name = NULL;
     mn->threading_type = BALSA_INDEX_THREADING_JWZ;
+    mn->sort_type = GTK_SORT_DESCENDING;
+    mn->sort_field = SORT_NO;
 }
 
 static void

@@ -1,3 +1,8 @@
+2003-11-10 05:36  PeterB
+
+	* libbalsa/: mailbox_maildir.c, mailbox_mbox.c, mailbox_mh.c:
+	Really close only when open_ref == 0.
+
 2003-11-09  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: be careful when doing noop.

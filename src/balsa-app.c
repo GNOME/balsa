@@ -172,7 +172,7 @@ options_init (void)
 	      imap->user = gnome_config_get_string ("username");
 	      imap->passwd = gnome_config_get_string ("password");
 	      imap->server = gnome_config_get_string ("server");
-	      imap->path = gnome_config_get_string ("path");
+	      imap->path = gnome_config_get_string ("Path");
 	      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, imap);
 	      break;
 	    case 9:		/*  NNTP  */

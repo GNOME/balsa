@@ -151,7 +151,7 @@ static void spelling_optionmenu_cb(GtkItem * menuitem, gpointer data);
 static void set_default_address_book_cb(GtkWidget * button, gpointer data);
 
 #ifndef HAVE_GNOME_PRINT
-static GtkWidget *create_printing_page(void);
+static GtkWidget *create_printing_page(gpointer);
 static void print_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 #endif
 

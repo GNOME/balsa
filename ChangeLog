@@ -1,3 +1,12 @@
+2001-01-14  Matthew Guenther  <guentherm@asme.org>
+
+	* website/screenshots.html.in: Add new screenshots from v1.0.1,
+	thumbnails.
+	* website/screenshots.html.in: New screenshot image files for
+	v1.0.1
+	* website/screens/thumbnails/: Add directory, thumbnails of
+	screenshots.
+	
 2001-01-13  Gediminas Paulauskas  <menesis@delfi.lt>
 
 	* libbalsa/send.c: (smtp_answer) always NULL-terminate code[], as

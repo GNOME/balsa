@@ -529,9 +529,6 @@ balsa_mblist_init(BalsaMBList * tree)
 	gtk_clist_column_titles_hide(GTK_CLIST(tree));
     } else gtk_clist_column_titles_show(GTK_CLIST(tree));
 
-    gtk_signal_connect(GTK_OBJECT(tree), "tree_select_row",
-		       GTK_SIGNAL_FUNC(select_mailbox), (gpointer) NULL);
-
 
 #if 0
     gtk_signal_connect(GTK_OBJECT(tree),
@@ -539,27 +536,40 @@ balsa_mblist_init(BalsaMBList * tree)
 		       (GtkSignalFunc) button_event_press_cb,
 		       (gpointer) NULL);
 #endif
-    gtk_signal_connect(GTK_OBJECT(tree),
+
+    balsa_mblist_repopulate(tree);
+}
+
+/* balsa_mblist_default_signal_bindings:
+   connect signals useful for the left-hand side mailbox tree
+   but useless for the transfer menu.
+*/
+void
+mblist_default_signal_bindings(BalsaMBList * mblist)
+{
+    gtk_signal_connect(GTK_OBJECT(mblist), "button_press_event",
+		       GTK_SIGNAL_FUNC(mblist_button_press_cb), NULL);
+    gtk_signal_connect(GTK_OBJECT(mblist), "key_press_event",
+		       GTK_SIGNAL_FUNC(mblist_key_press_cb), NULL);
+   gtk_signal_connect(GTK_OBJECT(mblist), "tree_select_row",
+		       GTK_SIGNAL_FUNC(select_mailbox), (gpointer) NULL);
+    gtk_signal_connect(GTK_OBJECT(mblist),
 		       "resize_column",
 		       GTK_SIGNAL_FUNC(balsa_mblist_column_resize),
 		       (gpointer) NULL);
-
-    gtk_signal_connect(GTK_OBJECT(tree),
+    gtk_signal_connect(GTK_OBJECT(mblist),
 		       "click_column",
 		       GTK_SIGNAL_FUNC(balsa_mblist_column_click),
-		       (gpointer) tree);
-
-    gtk_drag_dest_set (GTK_WIDGET (tree), GTK_DEST_DEFAULT_ALL,
+		       (gpointer) mblist);
+    gtk_drag_dest_set (GTK_WIDGET (mblist), GTK_DEST_DEFAULT_ALL,
                        mblist_drop_types,
                        ELEMENTS(mblist_drop_types),
                        GDK_ACTION_COPY );
-    gtk_signal_connect (GTK_OBJECT (tree),"drag-data-received",
+    gtk_signal_connect (GTK_OBJECT (mblist),"drag-data-received",
                         GTK_SIGNAL_FUNC (mblist_drag_cb), NULL);
-    gtk_signal_connect (GTK_OBJECT (tree), "drag-motion", 
+    gtk_signal_connect (GTK_OBJECT (mblist), "drag-motion", 
                         GTK_SIGNAL_FUNC (mblist_drag_motion_cb), 
                         (gpointer) NULL);
-
-    balsa_mblist_repopulate(tree);
 }
 
 #if 0
@@ -889,14 +899,6 @@ balsa_mblist_set_style(BalsaMBList * mblist)
 }
 
 
-void
-mblist_default_signal_bindings(BalsaMBList * tree)
-{
-    gtk_signal_connect(GTK_OBJECT(tree), "button_press_event",
-		       GTK_SIGNAL_FUNC(mblist_button_press_cb), NULL);
-    gtk_signal_connect(GTK_OBJECT(tree), "key_press_event",
-		       GTK_SIGNAL_FUNC(mblist_key_press_cb), NULL);
-}
 
 /* balsa_mblist_have_new [MBG]
  * 

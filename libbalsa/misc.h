@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -51,6 +51,8 @@ gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 #else
 gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding);
 #endif
+void libbalsa_marshal_POINTER__NONE(GtkObject *object, GtkSignalFunc func,
+				gpointer func_data, GtkArg *args);
 void libbalsa_marshal_POINTER__OBJECT(GtkObject * object,
 				      GtkSignalFunc func,
 				      gpointer func_data, GtkArg * args);

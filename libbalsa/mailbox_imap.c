@@ -41,8 +41,9 @@ static void libbalsa_mailbox_imap_destroy(GtkObject * object);
 static void libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass *
 					     klass);
 static void libbalsa_mailbox_imap_init(LibBalsaMailboxImap * mailbox);
-static void libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox,
-				       gboolean append);
+static void libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox);
+static LibBalsaMailboxAppendHandle* 
+libbalsa_mailbox_imap_append(LibBalsaMailbox * mailbox);
 static void libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox);
 static FILE *libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox *
 						      mailbox,
@@ -102,6 +103,7 @@ libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass * klass)
     object_class->destroy = libbalsa_mailbox_imap_destroy;
 
     libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_imap_open;
+    libbalsa_mailbox_class->open_mailbox_append = libbalsa_mailbox_imap_append;
     libbalsa_mailbox_class->close_mailbox = libbalsa_mailbox_imap_close;
     libbalsa_mailbox_class->get_message_stream =
 	libbalsa_mailbox_imap_get_message_stream;
@@ -209,6 +211,22 @@ server_host_settings_changed_cb(LibBalsaServer * server, gchar * host,
     server_settings_changed(server, mailbox);
 }
 
+static void
+reset_mutt_passwords(LibBalsaServer* server)
+{
+    if (ImapUser)
+	safe_free((void **) &ImapUser);	/* because mutt does so */
+    ImapUser = strdup(server->user);
+
+    if (ImapPass)
+	safe_free((void **) &ImapPass);	/* because mutt does so */
+    ImapPass = strdup(server->passwd);
+
+    if (ImapCRAMKey)
+	safe_free((void **) &ImapCRAMKey);
+    ImapCRAMKey = strdup(server->passwd);
+}
+
 /* libbalsa_mailbox_imap_open:
    opens IMAP mailbox. On failure leaves the object in sane state.
    FIXME:
@@ -216,11 +234,10 @@ server_host_settings_changed_cb(LibBalsaServer * server, gchar * host,
    ImapCRAMKey (for AuthCram) or do not set anything (for AuthGSS)
 */
 static void
-libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, gboolean append)
+libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
 {
     LibBalsaMailboxImap *imap;
     LibBalsaServer *server;
-
     gchar *tmp;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox));
@@ -228,18 +245,10 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, gboolean append)
     LOCK_MAILBOX(mailbox);
 
     if (CLIENT_CONTEXT_OPEN(mailbox)) {
-	if (append) {
-	    /* we need the mailbox to be opened fresh i think */
-	    libbalsa_lock_mutt();
-	    mx_close_mailbox(CLIENT_CONTEXT(mailbox), NULL);
-	    libbalsa_unlock_mutt();
-	} else {
-	    /* incriment the reference count */
-	    mailbox->open_ref++;
-
-	    UNLOCK_MAILBOX(mailbox);
-	    return;
-	}
+	/* increment the reference count */
+	mailbox->open_ref++;
+	UNLOCK_MAILBOX(mailbox);
+	return;
     }
 
     imap = LIBBALSA_MAILBOX_IMAP(mailbox);
@@ -253,22 +262,11 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, gboolean append)
     }
     gdk_threads_leave();
     libbalsa_lock_mutt();
-    if (ImapUser)
-	safe_free((void **) &ImapUser);	/* because mutt does so */
-    ImapUser = strdup(server->user);
-
-    if (ImapPass)
-	safe_free((void **) &ImapPass);	/* because mutt does so */
-    ImapPass = strdup(server->passwd);
-
-    if (ImapCRAMKey)
-	safe_free((void **) &ImapCRAMKey);
-    ImapCRAMKey = strdup(server->passwd);
+    reset_mutt_passwords(server);
 
     tmp = g_strdup_printf("{%s:%i}%s",
 			  server->host, server->port, imap->path);
-    CLIENT_CONTEXT(mailbox) = mx_open_mailbox(tmp,
-					      append ? M_APPEND : 0, NULL);
+    CLIENT_CONTEXT(mailbox) = mx_open_mailbox(tmp, 0, NULL);
     libbalsa_unlock_mutt();
     g_free(tmp);
 
@@ -294,6 +292,37 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, gboolean append)
 	UNLOCK_MAILBOX(mailbox);
 	gdk_threads_enter();
     }
+}
+
+static LibBalsaMailboxAppendHandle* 
+libbalsa_mailbox_imap_append(LibBalsaMailbox * mailbox)
+{
+    gchar* tmp;
+    LibBalsaServer *server;
+    LibBalsaMailboxAppendHandle* res = g_new0(LibBalsaMailboxAppendHandle,1);
+    server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+
+    libbalsa_lock_mutt();
+    reset_mutt_passwords(server);
+    tmp = g_strdup_printf("{%s:%i}%s",
+			  server->host, server->port, 
+			  LIBBALSA_MAILBOX_IMAP(mailbox)->path);
+    res->context = mx_open_mailbox(tmp, M_APPEND, NULL);
+    g_free(tmp);
+
+    if(res->context == NULL) {
+	g_free(res);
+	res = NULL;
+    } else if (res->context->readonly) {
+	g_warning("Cannot open dest local mailbox '%s' for writing.", 
+		  mailbox->name);
+	mx_close_mailbox(res->context, NULL);
+	g_free(res);
+	res = NULL;
+    }
+    libbalsa_unlock_mutt();
+    g_print("libbalsa_mailbox_imap_append: returning %p\n", res);
+    return res;
 }
 
 static void

@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -400,7 +400,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
        succeed before transferring a message.  */
     smtp_option_require_all_recipients (session, 1);
 
-    libbalsa_mailbox_open(outbox, FALSE);
+    libbalsa_mailbox_open(outbox);
     lista = outbox->message_list;
     while (lista != NULL) {
 	queu = LIBBALSA_MESSAGE(lista->data);
@@ -674,7 +674,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding)
 	gtk_widget_show_all(send_dialog);
 	/* Progress bar done */
 #endif
-	libbalsa_mailbox_open(outbox, FALSE);
+	libbalsa_mailbox_open(outbox);
 	lista = outbox->message_list;
 	
 	mqi = message_queue;

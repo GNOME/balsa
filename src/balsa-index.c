@@ -138,9 +138,8 @@ static void create_stock_menu_item(GtkWidget * menu, const gchar * type,
 
 static gint close_if_transferred_cb(BalsaMBList * bmbl, GdkEvent * event,
 				    BalsaIndex * bi);
-static void transfer_messages_cb(BalsaMBList *, LibBalsaMailbox *,
-				 GtkCTreeNode *, GdkEventButton *,
-				 gpointer *);
+static void transfer_messages_cb(GtkCTree * ctree, GtkCTreeNode * row, 
+				 gint column, gpointer data);
 
 static void sendmsg_window_destroy_cb(GtkWidget * widget, gpointer data);
 
@@ -570,7 +569,7 @@ balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
 			  mbnode->mailbox->name);
     gnome_appbar_push(balsa_app.appbar, msg);
     g_free(msg);
-    libbalsa_mailbox_open(mailbox, FALSE);
+    libbalsa_mailbox_open(mailbox);
     gnome_appbar_pop(balsa_app.appbar);
 
     if (mailbox->open_ref == 0)
@@ -1679,7 +1678,14 @@ balsa_message_toggle_new(GtkWidget * widget, gpointer user_data)
     libbalsa_mailbox_commit_changes(index->mailbox_node->mailbox);
 }
 
+/* balsa_index_reset:
+   reset the mailbox content the hard way.
+   DEPRECATED.
 
+   This function should NEVER be used because it it time-consuming and
+   flips the notebook pages. There are simpler ways to obtain
+   equivalent effect.  
+*/
 void
 balsa_index_reset(BalsaIndex * index)
 {
@@ -1904,7 +1910,7 @@ create_menu(BalsaIndex * bindex)
                                     GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
 
     bmbl = balsa_mblist_new();
-    gtk_signal_connect(GTK_OBJECT(bmbl), "select_mailbox",
+    gtk_signal_connect(GTK_OBJECT(bmbl), "tree_select_row",
 		       (GtkSignalFunc) transfer_messages_cb,
 		       (gpointer) bindex);
     
@@ -1960,51 +1966,43 @@ close_if_transferred_cb(BalsaMBList * bmbl, GdkEvent * event,
     }
 }
 
-
-/* this signal callback has different arguments than the signal
- * prototype in balsa-mblist.h, the row variable should be a gint */
 static void
-transfer_messages_cb(BalsaMBList * bmbl, LibBalsaMailbox * mailbox,
-		     GtkCTreeNode * row, GdkEventButton * event,
-		     gpointer * data)
+transfer_messages_cb(GtkCTree * ctree, GtkCTreeNode * row, gint column, 
+		     gpointer data)
 {
     GtkCList* clist;
     BalsaIndex* bindex = NULL;
-    BalsaIndex* dest_index = NULL;
-    GList* list;
+    GList *list, *messages;
     LibBalsaMessage* message;
+    BalsaMailboxNode *mbnode;
 
-    g_return_if_fail(bmbl != NULL);
     g_return_if_fail(data != NULL);
 
     bindex = BALSA_INDEX (data);
     clist = GTK_CLIST(bindex->ctree);
 
-    /*Transferring to same mailbox? */
-    if (bindex->mailbox_node->mailbox == mailbox)	
+    mbnode = gtk_ctree_node_get_row_data(ctree, row);
+
+    if(mbnode->mailbox == NULL) return;
+
+   /*Transferring to same mailbox? */
+    if (bindex->mailbox_node->mailbox == mbnode->mailbox)
 	return;
 
-    {
-	GList *messages=NULL;
-	list = clist->selection;
-
-	while (list) {
-	    message = gtk_ctree_node_get_row_data(GTK_CTREE(bindex->ctree), 
-                                                  list->data);
-	    messages=g_list_append(messages, message);
-	    list = list->next;
-	}
-
-	if(messages!=NULL){
- 	  balsa_messages_move(messages, mailbox);
-	  g_list_free(messages);
-	}
+    messages=NULL;
+    for (list = clist->selection; list;list = list->next) {
+	message = gtk_ctree_node_get_row_data(GTK_CTREE(bindex->ctree), 
+					      list->data);
+	messages=g_list_append(messages, message);
     }
 
-    libbalsa_mailbox_commit_changes(bindex->mailbox_node->mailbox);
+    if(messages!=NULL) {
+	balsa_messages_move(messages, mbnode->mailbox);
+	g_list_free(messages);
+    }
 
-    if ((dest_index = balsa_find_index_by_mailbox(mailbox)))
-	balsa_index_reset(dest_index);
+    g_print("transfer_messages_cb: commit...\n");
+    libbalsa_mailbox_commit_changes(bindex->mailbox_node->mailbox);
 
     gtk_object_set_data(GTK_OBJECT(bindex), "transferredp", (gpointer) 1);
 }

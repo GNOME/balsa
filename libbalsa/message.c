@@ -400,86 +400,15 @@ libbalsa_message_user_hdrs(LibBalsaMessage * message)
     return res;
 }
 
-/* FIXME: look at the flags for mutt_append_message */
-gboolean
-libbalsa_message_copy(LibBalsaMessage * message, LibBalsaMailbox * dest)
-{
-    HEADER *cur;
-
-    g_return_val_if_fail(message->mailbox, FALSE);
-    RETURN_VAL_IF_CONTEXT_CLOSED(message->mailbox, FALSE);
-
-    cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
-
-    libbalsa_mailbox_open(dest, FALSE);
-
-    if (!CLIENT_CONTEXT(dest) || dest->readonly == TRUE) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _
-			     ("Couldn't open destination mailbox (%s) for copying"),
-			     dest->name);
-	return FALSE;
-    }
-
-    libbalsa_lock_mutt();
-    mutt_append_message(CLIENT_CONTEXT(dest),
-			CLIENT_CONTEXT(message->mailbox), cur, 0, 0);
-    libbalsa_unlock_mutt();
-
-    dest->total_messages++;
-    if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)
-	dest->unread_messages++;
-
-    libbalsa_mailbox_close(dest);
-    return TRUE;
-}
 
 gboolean
 libbalsa_message_move(LibBalsaMessage * message, LibBalsaMailbox * dest)
 {
-    HEADER *cur;
-
-    g_return_val_if_fail(message != NULL, FALSE);
-    g_return_val_if_fail(dest != NULL, FALSE);
-    g_return_val_if_fail(message->mailbox,FALSE);
-    RETURN_VAL_IF_CONTEXT_CLOSED(message->mailbox, FALSE);
-
-    cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
-
-    libbalsa_mailbox_open(dest, TRUE);
-
-    if (!CLIENT_CONTEXT(dest) || dest->readonly == TRUE) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _
-			     ("Couldn't open destination mailbox (%s) for writing"),
-			     dest->name);
-	return FALSE;
-    }
-    if (message->mailbox->readonly == TRUE) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _
-			     ("Source mailbox (%s) is readonly. Cannot move message"),
-			     message->mailbox->name);
-	return FALSE;
-    }
-
-    libbalsa_lock_mutt();
-
-    mutt_parse_mime_message(CLIENT_CONTEXT(message->mailbox), cur);
-
-    mutt_append_message(CLIENT_CONTEXT(dest),
-			CLIENT_CONTEXT(message->mailbox), cur, 0, 0);
-
-    libbalsa_unlock_mutt();
-
-    dest->total_messages++;
-
-    if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)
-	dest->unread_messages++;
-
-    libbalsa_mailbox_close(dest);
-    libbalsa_message_delete(message);
-    return TRUE;
+    if (libbalsa_message_copy (message, dest)) {
+        libbalsa_message_delete (message);
+        return TRUE;
+    } else
+        return FALSE;
 }
 
 gboolean
@@ -493,58 +422,88 @@ libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
     }
 }
 
+/* FIXME: look at the flags for mutt_append_message */
+gboolean
+libbalsa_message_copy(LibBalsaMessage * message, LibBalsaMailbox * dest)
+{
+    HEADER *cur;
+    LibBalsaMailboxAppendHandle* handle;
+    g_return_val_if_fail(message->mailbox, FALSE);
+    RETURN_VAL_IF_CONTEXT_CLOSED(message->mailbox, FALSE);
+
+    cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
+
+    handle = libbalsa_mailbox_open_append(dest);
+
+    if (!handle) {
+	libbalsa_information(
+	    LIBBALSA_INFORMATION_WARNING,
+	    _("Couldn't open destination mailbox (%s) for copying"),
+	    dest->name);
+	return FALSE;
+    }
+
+    libbalsa_lock_mutt();
+    mutt_append_message(handle->context,
+			CLIENT_CONTEXT(message->mailbox), cur, 0, 0);
+    libbalsa_unlock_mutt();
+
+    dest->total_messages++;
+    if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)
+	dest->unread_messages++;
+
+    libbalsa_mailbox_close_append(handle);
+    libbalsa_mailbox_check(dest);
+    return TRUE;
+}
+
 gboolean
 libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
 {
     HEADER *cur;
     LibBalsaMessage *message;
     GList *p;
+    LibBalsaMailboxAppendHandle* handle;
 
     g_return_val_if_fail(messages != NULL, FALSE);
     g_return_val_if_fail(dest != NULL, FALSE);
     /*RETURN_VAL_IF_CONTEXT_CLOSED(message->mailbox, FALSE);*/
 
-    libbalsa_mailbox_open(dest, TRUE);
-
-    if (!CLIENT_CONTEXT(dest) || dest->readonly == TRUE) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _
-			     ("Couldn't open destination mailbox (%s) for writing"),
-			     dest->name);
+    if (message->mailbox->readonly == TRUE) {
+	libbalsa_information(
+	    LIBBALSA_INFORMATION_ERROR,
+	    _("Source mailbox (%s) is readonly. Cannot move messages"),
+	    message->mailbox->name);
 	return FALSE;
     }
 
-    message=(LibBalsaMessage *)(messages->data);
 
-    if (message->mailbox->readonly == TRUE) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _
-			     ("Source mailbox (%s) is readonly. Cannot move message"),
-			     message->mailbox->name);
+    handle = libbalsa_mailbox_open_append(dest);
+    if (!handle) {
+	libbalsa_information(
+	    LIBBALSA_INFORMATION_ERROR,
+	    _("Couldn't open destination mailbox (%s) for writing"),
+	    dest->name);
 	return FALSE;
     }
 
     libbalsa_lock_mutt();
-
-    p=messages;
-    while(p){
+    for(p=messages; p; 	p=g_list_next(p)) {
 	message=(LibBalsaMessage *)(p->data);
 	cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
 	mutt_parse_mime_message(CLIENT_CONTEXT(message->mailbox), cur);
-	mutt_append_message(CLIENT_CONTEXT(dest),
+	mutt_append_message(handle->context,
 			    CLIENT_CONTEXT(message->mailbox), cur, 0, 0);
 
 	dest->total_messages++;
 
 	if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)
 	    dest->unread_messages++;
-	p=g_list_next(p);
     }
-
     libbalsa_unlock_mutt();
 
-    libbalsa_mailbox_close(dest);
-    /* libbalsa_messages_delete(messages); */
+    libbalsa_mailbox_close_append(handle);
+    libbalsa_mailbox_check(dest);
     return TRUE;
 }
 

@@ -2179,7 +2179,7 @@ empty_trash(void)
     BalsaIndex *index;
     GList *message;
 
-    libbalsa_mailbox_open(balsa_app.trash, FALSE);
+    libbalsa_mailbox_open(balsa_app.trash);
 
     message = balsa_app.trash->message_list;
 

@@ -1,5 +1,24 @@
 2001-06-19  Pawel Salek  <pawsa@theochem.kth.se>
 
+	Fix the message index flipping on message transfer and deletion.
+	Do not parse mailboxes when opening them just for appending.
+
+	* src/balsa-index.c: remove append argument from 
+	libbalsa_mailbox_open() calls. Do not use balsa_index_reset()
+	* src/balsa-mblist.c: clean up signals.
+	* src/main-window.c: 
+	* src/sendmsg-window.c: use updated libbalsa_mailbox_open() API.
+	* libbalsa/mailbox.h: define LibBalsaMailboxAppendHandle
+	* libbalsa/mailbox.c: add OPEN_MAILBOX_APPEND signal and its handler.
+	* libbalsa/mailbox_imap.c: 
+	* libbalsa/mailbox_local.c: add OPEN_MAILBOX_APPEND handlers.
+	* libbalsa/mailbox_pop3.c: use updated libbalsa_mailbox_open() API.
+	* libbalsa/message.c: clean up message copy and move methods
+	* libbalsa/misc.[hc]: add new marschaller.
+	* libbalsa/send.c: use updated libbalsa_mailbox_open() API.
+	
+2001-06-19  Pawel Salek  <pawsa@theochem.kth.se>
+
 	Peter Bloomfield <bloomfld@eos.ncsu.edu>
 	* libbalsa/address-entry.c:
 	* src/balsa-app.c: 

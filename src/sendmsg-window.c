@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1998-2000 Stuart Parmenter and others, see AUTHORS file.
+ * Copyright (C) 1998-2001 Stuart Parmenter and others, see AUTHORS file.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1353,9 +1353,13 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     if (message) { /* ref message so we don't loose it even if it is deleted */
 	gtk_object_ref(GTK_OBJECT(message));
 	/* reference the original mailbox so we don't loose the
-	   mail even if the mailbox is closed */
+	   mail even if the mailbox is closed. Alternatively,
+	   one could try using weak references or destroy notification
+	   to take care of it. In such a case, the orig_message field
+	   would be cleared
+	*/
 	if (message->mailbox)
-	    libbalsa_mailbox_open(message->mailbox, FALSE);
+	    libbalsa_mailbox_open(message->mailbox);
     }
     msg->window = window;
     msg->type = type;

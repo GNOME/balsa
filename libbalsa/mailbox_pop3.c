@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -46,8 +46,7 @@ static void libbalsa_mailbox_pop3_class_init(LibBalsaMailboxPop3Class *
 					     klass);
 static void libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 * mailbox);
 
-static void libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox,
-				       gboolean append);
+static void libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox);
 static void libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox);
 
 static void libbalsa_mailbox_pop3_save_config(LibBalsaMailbox * mailbox,
@@ -146,7 +145,7 @@ libbalsa_mailbox_pop3_new(void)
 }
 
 static void
-libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox, gboolean append)
+libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox)
 {
     LibBalsaMailboxPop3 *pop;
 
@@ -159,31 +158,18 @@ libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox, gboolean append)
     LOCK_MAILBOX(mailbox);
 
     if (CLIENT_CONTEXT_OPEN(mailbox)) {
-	if (append) {
-	    /* we need the mailbox to be opened fresh i think */
-	    libbalsa_lock_mutt();
-	    mx_close_mailbox(CLIENT_CONTEXT(mailbox), NULL);
-	    libbalsa_unlock_mutt();
-	} else {
-	    /* incriment the reference count */
-	    mailbox->open_ref++;
-
-	    UNLOCK_MAILBOX(mailbox);
-	    return;
-	}
+	/* increment the reference count */
+	mailbox->open_ref++;
+	UNLOCK_MAILBOX(mailbox);
+	return;
     }
 
     pop = LIBBALSA_MAILBOX_POP3(mailbox);
 
     libbalsa_lock_mutt();
-    if (append)
-	CLIENT_CONTEXT(mailbox) =
-	    mx_open_mailbox(LIBBALSA_MAILBOX_REMOTE_SERVER(pop)->host,
-			    M_APPEND, NULL);
-    else
-	CLIENT_CONTEXT(mailbox) =
-	    mx_open_mailbox(LIBBALSA_MAILBOX_REMOTE_SERVER(pop)->host, 0,
-			    NULL);
+    CLIENT_CONTEXT(mailbox) =
+	mx_open_mailbox(LIBBALSA_MAILBOX_REMOTE_SERVER(pop)->host, 0,
+			NULL);
     libbalsa_unlock_mutt();
 
     if (CLIENT_CONTEXT_OPEN(mailbox)) {
@@ -204,7 +190,6 @@ libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox, gboolean append)
     }
 
     UNLOCK_MAILBOX(mailbox);
-
 }
 
 /* libbalsa_mailbox_pop3_check:

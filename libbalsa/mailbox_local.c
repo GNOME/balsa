@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -51,8 +51,9 @@ static void libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass *klass);
 static void libbalsa_mailbox_local_init(LibBalsaMailboxLocal * mailbox);
 static void libbalsa_mailbox_local_destroy(GtkObject * object);
 
-static void libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox,
-					gboolean append);
+static void libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox);
+static LibBalsaMailboxAppendHandle*
+libbalsa_mailbox_local_append(LibBalsaMailbox * mailbox);
 static void libbalsa_mailbox_local_check(LibBalsaMailbox * mailbox);
 
 static void libbalsa_mailbox_local_save_config(LibBalsaMailbox * mailbox,
@@ -109,6 +110,8 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
     object_class->destroy = libbalsa_mailbox_local_destroy;
 
     libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_local_open;
+    libbalsa_mailbox_class->open_mailbox_append 
+	= libbalsa_mailbox_local_append;
     libbalsa_mailbox_class->check = libbalsa_mailbox_local_check;
 
     libbalsa_mailbox_class->save_config =
@@ -229,7 +232,7 @@ libbalsa_mailbox_local_destroy(GtkObject * object)
    Order is crucial to avoid deadlocks.
 */
 static void
-libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox, gboolean append)
+libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox)
 {
     struct stat st;
     LibBalsaMailboxLocal *local;
@@ -242,18 +245,11 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox, gboolean append)
     local = LIBBALSA_MAILBOX_LOCAL(mailbox);
 
     if (CLIENT_CONTEXT_OPEN(mailbox)) {
-	if (append) {
-	    /* we need the mailbox to be opened fresh i think */
-	    libbalsa_lock_mutt();
-	    mx_close_mailbox(CLIENT_CONTEXT(mailbox), NULL);
-	    libbalsa_unlock_mutt();
-	} else {
-	    /* incriment the reference count */
-	    mailbox->open_ref++;
-	    UNLOCK_MAILBOX(mailbox);
-	    gdk_threads_enter();
-	    return;
-	}
+	/* incriment the reference count */
+	mailbox->open_ref++;
+	UNLOCK_MAILBOX(mailbox);
+	gdk_threads_enter();
+	return;
     }
 
     if (stat(local->path, &st) == -1) {
@@ -263,11 +259,7 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox, gboolean append)
     }
     
     libbalsa_lock_mutt();
-    if (append)
-	CLIENT_CONTEXT(mailbox) =
-	    mx_open_mailbox(local->path, M_APPEND, NULL);
-    else
-	CLIENT_CONTEXT(mailbox) = mx_open_mailbox(local->path, 0, NULL);
+    CLIENT_CONTEXT(mailbox) = mx_open_mailbox(local->path, 0, NULL);
     libbalsa_unlock_mutt();
     
     if (!CLIENT_CONTEXT_OPEN(mailbox)) {
@@ -290,6 +282,30 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox, gboolean append)
     g_print(_("LibBalsaMailboxLocal: Opening %s Refcount: %d\n"),
 	    mailbox->name, mailbox->open_ref);
 #endif
+}
+
+static LibBalsaMailboxAppendHandle*
+libbalsa_mailbox_local_append(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxAppendHandle* res;
+    g_return_val_if_fail(mailbox, NULL);
+
+    res = g_new0(LibBalsaMailboxAppendHandle,1);
+    libbalsa_lock_mutt();
+    res->context = mx_open_mailbox(LIBBALSA_MAILBOX_LOCAL(mailbox)->path, 
+				   M_APPEND, NULL);
+    if(res->context == NULL) {
+	g_free(res);
+	res = NULL;
+    } else if (res->context->readonly) {
+	g_warning("Cannot open dest local mailbox '%s' for writing.", 
+		  mailbox->name);
+	mx_close_mailbox(res->context, NULL);
+	g_free(res);
+	res = NULL;
+    }
+    libbalsa_unlock_mutt();
+    return res;
 }
 
 static void

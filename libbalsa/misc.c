@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -335,10 +335,24 @@ libbalsa_set_charset(const gchar * charset)
     return old_charset;
 }
 
+/* libbalsa_marshal_POINTER__NONE:
+   Marshalling function
+*/
+typedef gpointer(*GtkSignal_POINTER__NONE) (GtkObject *object, 
+					    gpointer user_data);
+void
+libbalsa_marshal_POINTER__NONE(GtkObject *object, GtkSignalFunc func,
+				gpointer func_data, GtkArg *args)
+{
+    GtkSignal_POINTER__NONE rfunc = (GtkSignal_POINTER__NONE) func;
+    gpointer *return_val = GTK_RETLOC_POINTER(args[0]);
+
+    *return_val = (*rfunc) (object, func_data);
+}
+
 /* libbalsa_marshal_POINTER__OBJECT:
    Marshalling function 
 */
-
 typedef gpointer(*GtkSignal_POINTER__OBJECT) (GtkObject * object,
 					      GtkObject * parm,
 					      gpointer user_data);
@@ -373,6 +387,7 @@ libbalsa_marshall_POINTER__POINTER_POINTER(GtkObject *object, GtkSignalFunc func
     rfunc = (GtkSignal_POINTER__POINTER_POINTER) func;
     *return_val = (*rfunc) (object, GTK_VALUE_POINTER(args[0]), GTK_VALUE_POINTER(args[1]), func_data);
 }
+
 
 /* Delete the contents of a directory (not the directory itself).
    Return TRUE if everything was OK.

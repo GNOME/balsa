@@ -59,6 +59,7 @@ static LibBalsaMessage *translate_message(HEADER * cur);
 
 enum {
     OPEN_MAILBOX,
+    OPEN_MAILBOX_APPEND,
     CLOSE_MAILBOX,
     MESSAGE_STATUS_CHANGED,
     MESSAGE_NEW,
@@ -123,8 +124,15 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
 		       object_class->type,
 		       GTK_SIGNAL_OFFSET(LibBalsaMailboxClass,
 					 open_mailbox),
-		       gtk_marshal_NONE__BOOL, GTK_TYPE_NONE, 1,
-		       GTK_TYPE_BOOL);
+		       gtk_marshal_NONE__NONE, GTK_TYPE_NONE, 0);
+
+    libbalsa_mailbox_signals[OPEN_MAILBOX_APPEND] =
+	gtk_signal_new("append-mailbox",
+		       GTK_RUN_LAST,
+		       object_class->type,
+		       GTK_SIGNAL_OFFSET(LibBalsaMailboxClass,
+					 open_mailbox_append),
+		       libbalsa_marshal_POINTER__NONE, GTK_TYPE_POINTER, 0);
 
     libbalsa_mailbox_signals[CLOSE_MAILBOX] =
 	gtk_signal_new("close-mailbox",
@@ -335,13 +343,13 @@ libbalsa_mailbox_new_from_config(const gchar * prefix)
 }
 
 void
-libbalsa_mailbox_open(LibBalsaMailbox * mailbox, gboolean append)
+libbalsa_mailbox_open(LibBalsaMailbox * mailbox)
 {
     g_return_if_fail(mailbox != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
     gtk_signal_emit(GTK_OBJECT(mailbox),
-		    libbalsa_mailbox_signals[OPEN_MAILBOX], append);
+		    libbalsa_mailbox_signals[OPEN_MAILBOX]);
 }
 
 void
@@ -352,6 +360,29 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox)
 
     gtk_signal_emit(GTK_OBJECT(mailbox),
 		    libbalsa_mailbox_signals[CLOSE_MAILBOX]);
+}
+
+LibBalsaMailboxAppendHandle* 
+libbalsa_mailbox_open_append(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxAppendHandle* res = NULL;
+    g_return_val_if_fail(mailbox != NULL, NULL);
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
+
+    gtk_signal_emit(GTK_OBJECT(mailbox),
+		    libbalsa_mailbox_signals[OPEN_MAILBOX_APPEND], &res);
+    return res;
+}
+
+int 
+libbalsa_mailbox_close_append(LibBalsaMailboxAppendHandle* handle)
+{
+    int ret;
+    g_return_val_if_fail(handle != NULL, -1);
+
+    ret = mx_close_mailbox(handle->context, NULL);
+    g_free(handle);
+    return ret;
 }
 
 void
@@ -631,10 +662,8 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
       g_list_free(messages);
     }
 
-    if (mailbox->unread_messages > 0)
-	libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
-    else
-	libbalsa_mailbox_set_unread_messages_flag(mailbox, FALSE);
+    libbalsa_mailbox_set_unread_messages_flag(mailbox,
+					      mailbox->unread_messages > 0);
 }
 
 /* libbalsa_mailbox_free_messages:
@@ -721,7 +750,9 @@ libbalsa_mailbox_commit_changes(LibBalsaMailbox * mailbox)
     LibBalsaMessage *current_message;
     gint res = 0;
 
-    libbalsa_mailbox_open(mailbox, FALSE);
+    /* only open mailboxes can be commited; lock it instead of opening */
+    g_return_val_if_fail(CLIENT_CONTEXT_OPEN(mailbox), 0);
+    LOCK_MAILBOX_RETURN_VAL(mailbox, 0);
 
     /* examine all the message in the mailbox */
     {
@@ -765,9 +796,10 @@ libbalsa_mailbox_commit_changes(LibBalsaMailbox * mailbox)
     }
     libbalsa_unlock_mutt();
 #endif
-    libbalsa_mailbox_close(mailbox);
+    UNLOCK_MAILBOX(mailbox);
     return res;
 }
+
 
 /* internal c-client translation:
  * mutt lists can cantain null adresses for address strings like

@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -57,8 +57,14 @@ typedef enum {
 /*
  * structures
  */
-typedef struct _LibBalsaMailboxClass LibBalsaMailboxClass;
 struct _CONTEXT;
+typedef struct _LibBalsaMailboxAppendHandle LibBalsaMailboxAppendHandle;
+
+struct _LibBalsaMailboxAppendHandle {
+    struct _CONTEXT* context;
+};
+
+typedef struct _LibBalsaMailboxClass LibBalsaMailboxClass;
 
 struct _LibBalsaMailbox {
     GtkObject object;
@@ -92,7 +98,9 @@ struct _LibBalsaMailboxClass {
     GtkObjectClass parent_class;
 
     /* Signals */
-    void (*open_mailbox) (LibBalsaMailbox * mailbox, gboolean append);
+    void (*open_mailbox) (LibBalsaMailbox * mailbox);
+    LibBalsaMailboxAppendHandle* (*open_mailbox_append)
+	(LibBalsaMailbox * mailbox);
     void (*close_mailbox) (LibBalsaMailbox * mailbox);
 
     void (*message_new) (LibBalsaMailbox * mailbox,
@@ -118,6 +126,7 @@ struct _LibBalsaMailboxClass {
     void (*load_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
 };
 
+
 GtkType libbalsa_mailbox_get_type(void);
 
 LibBalsaMailbox *libbalsa_mailbox_new_from_config(const gchar * prefix);
@@ -126,7 +135,10 @@ LibBalsaMailbox *libbalsa_mailbox_new_from_config(const gchar * prefix);
  * open and close a mailbox 
  */
 /* XXX these need to return a value if they failed */
-void libbalsa_mailbox_open(LibBalsaMailbox * mailbox, gboolean append);
+void libbalsa_mailbox_open(LibBalsaMailbox * mailbox);
+LibBalsaMailboxAppendHandle* 
+libbalsa_mailbox_open_append(LibBalsaMailbox * mailbox);
+int libbalsa_mailbox_close_append(LibBalsaMailboxAppendHandle* handle);
 void libbalsa_mailbox_close(LibBalsaMailbox * mailbox);
 void libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox);
 

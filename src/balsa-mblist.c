@@ -1753,8 +1753,6 @@ bmbl_mru_selected_cb(GtkTreeSelection * selection, gpointer data)
     GtkTreeView *tree_view;
     GtkTreePath *path;
     GtkTreeViewColumn *column;
-    GdkRectangle rect;
-    GValue expander_size = {0};
 
     if (!data)
         return;
@@ -1773,13 +1771,7 @@ bmbl_mru_selected_cb(GtkTreeSelection * selection, gpointer data)
         return;
     }
 
-    gtk_tree_view_get_cell_area(tree_view, path, column, &rect);
-    g_value_init(&expander_size, G_TYPE_INT);
-    gtk_widget_style_get_property((GtkWidget *) tree_view, "expander-size",
-                                  &expander_size);
-    if (event->button.x < rect.x + g_value_get_int(&expander_size))
-        gtk_tree_selection_unselect_all(selection);
-    else if (gtk_tree_selection_path_is_selected(selection, path)) {
+    if (gtk_tree_selection_path_is_selected(selection, path)) {
         GtkTreeModel *model;
         GtkTreeIter iter;
         BalsaMailboxNode *mbnode;

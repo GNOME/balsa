@@ -191,9 +191,10 @@ balsa_index_init (BalsaIndex * bindex)
   gtk_widget_set_parent (GTK_WIDGET (clist), GTK_WIDGET (bindex));
   gtk_clist_set_policy (clist, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_clist_set_selection_mode (clist, GTK_SELECTION_BROWSE);
-  gtk_clist_set_column_justification (clist, 1, GTK_JUSTIFY_RIGHT);
+  gtk_clist_set_column_justification (clist, 1, GTK_JUSTIFY_CENTER);
+  gtk_clist_set_column_justification (clist, 0, GTK_JUSTIFY_CENTER);
   gtk_clist_set_column_width (clist, 0, 16);
-  gtk_clist_set_column_width (clist, 1, 7);
+  gtk_clist_set_column_width (clist, 1, 9);
   gtk_clist_set_column_width (clist, 2, 30);
   gtk_clist_set_column_width (clist, 3, 150);
   gtk_clist_set_column_width (clist, 4, 250);

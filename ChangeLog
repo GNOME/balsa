@@ -1,3 +1,8 @@
+2001-09-23  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/sendmsg-window.c (quoteBody): make "forward quoted"
+	quote
+
 2001-09-22  Carlos Morgado  <chbm@chbm.nu>
 
 	* configure.in: patch from wil <wil@dready.org>

@@ -1399,7 +1399,8 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 	    str = g_strdup_printf(_("%s wrote:\n"), personStr);
 	body = content2reply(message,
 			     (type == SEND_REPLY || type == SEND_REPLY_ALL || 
-			      type == SEND_REPLY_GROUP) ?
+			      type == SEND_REPLY_GROUP || 
+			      type == SEND_FORWARD_QUOTE) ?
 			     balsa_app.quote_str : NULL,
 			     balsa_app.wordwrap ? balsa_app.wraplength : -1,
 			     balsa_app.reply_strip_html);

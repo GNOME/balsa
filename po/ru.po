@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 0.4\n"
 "POT-Creation-Date: 1999-02-24 00:50-0500\n"
-"PO-Revision-Date: 1999-02-19 08:40-0500\n"
+"PO-Revision-Date: 1999-02-24 08:40-0500\n"
 "Last-Translator: Alexander Kirillov <kirillov@math.ias.edu>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -152,33 +152,31 @@ msgstr "Удалить"
 
 #: src/filter-edit-dialog.c:233
 msgid "Match in:"
-msgstr ""
+msgstr "Сравнивать:"
 
 #: src/filter-edit-dialog.c:251
 msgid "All"
-msgstr ""
+msgstr "Где угодно"
 
 #: src/filter-edit-dialog.c:263
-#, fuzzy
 msgid "Header"
-msgstr "Заголовок"
+msgstr "В заголовке"
 
 #: src/filter-edit-dialog.c:275
-#, fuzzy
 msgid "Body"
-msgstr "Изменить"
+msgstr "В тексте письма"
 
 #: src/filter-edit-dialog.c:287
 msgid "To:"
-msgstr ""
+msgstr "В графе \"Кому:\" "
 
 #: src/filter-edit-dialog.c:299
 msgid "From:"
-msgstr "От:"
+msgstr "В графе \"Отправитель:\" "
 
 #: src/filter-edit-dialog.c:324
 msgid "Match string:"
-msgstr ""
+msgstr "Строка для сравнения:"
 
 #: src/filter-edit-dialog.c:376 src/mailbox-conf.c:281 src/mailbox-conf.c:900
 #: src/pref-manager.c:461
@@ -201,61 +199,61 @@ msgstr "Имя фильтра:"
 #. The "Process when:" option menu
 #: src/filter-edit-dialog.c:471
 msgid "Process when:"
-msgstr ""
+msgstr "Производить при:"
 
 #. The "Run on:" option menu
 #: src/filter-edit-dialog.c:502
 msgid "Run on:"
-msgstr ""
+msgstr "Что фильтровать:"
 
 #. the type notebook's option menu
 #: src/filter-edit-dialog.c:532
 msgid "Search type:"
-msgstr ""
+msgstr "Тип поиска:"
 
 #. The notification area
 #: src/filter-edit-dialog.c:588
 msgid "Notification:"
-msgstr ""
+msgstr "Уведомление:"
 
 #. Notification buttons
 #: src/filter-edit-dialog.c:597
 msgid "Play sound:"
-msgstr ""
+msgstr "Звуковой сигнал:"
 
 #: src/filter-edit-dialog.c:605
 msgid "Use Sound..."
-msgstr ""
+msgstr "Сигнал..."
 
 #: src/filter-edit-dialog.c:614
 msgid "Popup text:"
-msgstr ""
+msgstr "Сообщение:"
 
 #. The action area
 #: src/filter-edit-dialog.c:633
 msgid "Action to perform:"
-msgstr ""
+msgstr "Действие:"
 
 #. The disposition area
 #: src/filter-edit-dialog.c:654
 msgid "Disposition:"
-msgstr ""
+msgstr "Действие:"
 
 #: src/filter-edit-dialog.c:662
 msgid "Place/leave in default folder"
-msgstr ""
+msgstr "Поместить/оставить в стандартной папке"
 
 #: src/filter-edit-dialog.c:667
 msgid "Do not place/leave in default folder"
-msgstr ""
+msgstr "Не помещать/не оставлять  в стандартной папке"
 
 #: src/filter-edit-dialog.c:672
 msgid "Stop filtering here"
-msgstr ""
+msgstr "Прекратить фильтрование"
 
 #: src/filter-edit-dialog.c:700
 msgid "Match"
-msgstr ""
+msgstr "Сравнивать"
 
 #: src/filter-edit-dialog.c:703
 msgid "Action"
@@ -266,7 +264,6 @@ msgid "Revert"
 msgstr "Восстановить"
 
 #: src/filter-edit-dialog.c:745
-#, fuzzy
 msgid "Balsa Filters"
 msgstr "Управление фильтрами"
 
@@ -309,7 +306,7 @@ msgstr "Восстановить"
 #: src/local-mailbox.c:151
 #, c-format
 msgid "Local Mailbox Loaded as: %s\n"
-msgstr ""
+msgstr "Местный почтовый ящик загружен под именем: %s\n"
 
 #: src/mailbox-conf.c:161
 msgid ""
@@ -660,7 +657,7 @@ msgstr "Панели инструментов"
 #. Main window
 #: src/pref-manager.c:555
 msgid "Main window"
-msgstr ""
+msgstr "Главное окно"
 
 #: src/pref-manager.c:558
 msgid "Use preview pane"
@@ -745,6 +742,3 @@ msgstr ""
 #, c-format
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr ""
-
-#~ msgid "Mailboxes/<Separator>"
-#~ msgstr "Почтовые ящики/<Разделитель>"

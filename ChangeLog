@@ -1,5 +1,10 @@
 2000-12-12  Ian Campbell  <ijc25@cam.ac.uk>
 
+	* libbalsa/libbalsa.c (libbalsa_init): Need to register new
+	mailboxes at init time so that config loading will work
+
+2000-12-12  Ian Campbell  <ijc25@cam.ac.uk>
+
 	* libbalsa/mailbox_mbox.c:
 	* libbalsa/mailbox_mbox.h:
 	* libbalsa/mailbox_maildir.c:

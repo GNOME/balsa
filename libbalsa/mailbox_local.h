@@ -29,34 +29,32 @@
 #define LIBBALSA_IS_MAILBOX_LOCAL(obj)	       (GTK_CHECK_TYPE (obj, LIBBALSA_TYPE_MAILBOX_LOCAL))
 #define LIBBALSA_IS_MAILBOX_LOCAL_CLASS(klass) (GTK_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_MAILBOX_LOCAL))
 
-GtkType libbalsa_mailbox_local_get_type (void);
+GtkType libbalsa_mailbox_local_get_type(void);
 
 typedef enum _LibBalsaMailboxLocalType LibBalsaMailboxLocalType;
 typedef struct _LibBalsaMailboxLocal LibBalsaMailboxLocal;
 typedef struct _LibBalsaMailboxLocalClass LibBalsaMailboxLocalClass;
 
-enum _LibBalsaMailboxLocalType 
-{
+enum _LibBalsaMailboxLocalType {
     LIBBALSA_MAILBOX_LOCAL_MH,
     LIBBALSA_MAILBOX_LOCAL_MBOX,
     LIBBALSA_MAILBOX_LOCAL_MAILDIR
 };
 
-struct _LibBalsaMailboxLocal
-{
+struct _LibBalsaMailboxLocal {
     LibBalsaMailbox mailbox;
     LibBalsaMailboxLocalType type;
-    
+
     gchar *path;
 };
 
-struct _LibBalsaMailboxLocalClass
-{
+struct _LibBalsaMailboxLocalClass {
     LibBalsaMailboxClass klass;
 };
 
-GtkObject* libbalsa_mailbox_local_new(const gchar *path, gboolean create);
-gint libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal *mailbox, const gchar *path);
+GtkObject *libbalsa_mailbox_local_new(const gchar * path, gboolean create);
+gint libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
+				     const gchar * path);
 
 
-#endif /* __LIBBALSA_MAILBOX_LOCAL_H__ */
+#endif				/* __LIBBALSA_MAILBOX_LOCAL_H__ */

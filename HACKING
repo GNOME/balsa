@@ -24,7 +24,7 @@ Source files
 All files should have a magic emacs mode line at the top (note older
 files will have c-basic-offset as 2 or 8):
 
-/* -*-mode:c; c-style:bsd; c-basic-offset:4; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 
 following this a GPL copyright header. Copyright should be attributed as:
 
@@ -72,7 +72,8 @@ Coding Style
 The coding style used in Balsa currently is a bit of a mess. When
 adding a new file to Balsa, please use the standard GNOME indentation
 style, rather than the one used in the rest of Balsa. A good place to
-read is the file HACKING included with Gnumeric. Maybe at some point
-someone will update the existing source.
+read is the file HACKING included with Gnumeric. The magin emacs
+comment (as mentioned above) should help you to follow the formatting
+guidelines but you can indent explicitly your file with
 
-
+indent -kr -i4 -psl <filename>

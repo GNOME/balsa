@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -24,20 +24,19 @@
 #define __LIBBALSA_IMAPDIR_H__
 
 
-struct _ImapDir
-{
-	gchar *name;
-	gchar *path;
-	gchar *user;
-	gchar *passwd;
-	gchar *host;
-	gint port;
-	GNode* file_tree; /* GNode structure representing the IMAP directory */
-	int ignore_hidden:1;
+struct _ImapDir {
+    gchar *name;
+    gchar *path;
+    gchar *user;
+    gchar *passwd;
+    gchar *host;
+    gint port;
+    GNode *file_tree;		/* GNode structure representing the IMAP directory */
+    int ignore_hidden:1;
 };
 
 ImapDir *imapdir_new(void);
-void imapdir_destroy(ImapDir *imap_dir);
-const gchar* imapdir_scan(ImapDir * id);
+void imapdir_destroy(ImapDir * imap_dir);
+const gchar *imapdir_scan(ImapDir * id);
 
-#endif /* __LIBBALSA_IMAPDIR_H__ */
+#endif				/* __LIBBALSA_IMAPDIR_H__ */

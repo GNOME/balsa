@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -37,24 +37,20 @@
 #include "libbalsa.h"
 
 /* filter match types */
-typedef enum
-{
+typedef enum {
     FILTER_NONE,
     FILTER_SIMPLE,
     FILTER_REGEX,
     FILTER_EXEC
-}
-filter_match_type;
+} filter_match_type;
 
-typedef enum
-{
+typedef enum {
     FILTER_MATCHES,
     FILTER_NOMATCH,
     FILTER_ALWAYS,
 } filter_when_type;
 
-typedef enum
-{
+typedef enum {
     FILTER_NOTHING,
     FILTER_COPY,
     FILTER_MOVE,
@@ -62,7 +58,7 @@ typedef enum
     FILTER_RUN,
     FILTER_TRASH
 } filter_action_type;
-        
+
 /* filter_run_dialog() modes */
 #define FILTER_RUN_SINGLE    0
 #define FILTER_RUN_MULTIPLE  1
@@ -86,8 +82,7 @@ typedef enum
 gint filter_errno;
 
 /* filters */
-typedef struct _filter
-  {
+typedef struct _filter {
     gint group;
     gchar *name;
     filter_match_type type;
@@ -95,13 +90,11 @@ typedef struct _filter
     guint flags;
 
     /* The match type fields */
-    union _match
-      {
-        gchar string[1024];        /* for FILTER_SIMPLE */
-        gchar command[1024];        /* for FILTER_EXEC */
-      }
-    match;
-    guint match_fields;                /* for FILTER_SIMPLE filters */
+    union _match {
+	gchar string[1024];	/* for FILTER_SIMPLE */
+	gchar command[1024];	/* for FILTER_EXEC */
+    } match;
+    guint match_fields;		/* for FILTER_SIMPLE filters */
 
     /* The notification fields */
     gchar sound[PATH_MAX];
@@ -115,38 +108,31 @@ typedef struct _filter
 
     /* the regex list */
     GList *regex;
-  }
-filter;
+} filter;
 
 /*
  * Exported filter functions
  */
-GList *filter_init (gchar * filter_file);
-gint filter_load (GList * filter_list,
-                  gchar * filter_file);
-gint filter_save (GList * filter_list,
-                  gchar * filter_file);
-gint filter_run_all (GList * filter_list,
-                     LibBalsaMessage * message);
-gint filter_run_group (GList * filter_list,
-                       LibBalsaMessage * message, gint group);
-gint filter_run_nth (GList * filter_list,
-                     LibBalsaMessage * message, gint n);
-gint filter_run_single (filter * filt,
-                        LibBalsaMessage * message);
-void filter_free (filter * fil,
-                  gpointer throwaway);
+GList *filter_init(gchar * filter_file);
+gint filter_load(GList * filter_list, gchar * filter_file);
+gint filter_save(GList * filter_list, gchar * filter_file);
+gint filter_run_all(GList * filter_list, LibBalsaMessage * message);
+gint filter_run_group(GList * filter_list,
+		      LibBalsaMessage * message, gint group);
+gint filter_run_nth(GList * filter_list,
+		    LibBalsaMessage * message, gint n);
+gint filter_run_single(filter * filt, LibBalsaMessage * message);
+void filter_free(filter * fil, gpointer throwaway);
 /*
  * Dialog calls
  */
-void filter_edit_dialog (GList * filter_list);
-void filter_run_dialog (GList * filter_list,
-                        guint mode);
+void filter_edit_dialog(GList * filter_list);
+void filter_run_dialog(GList * filter_list, guint mode);
 
 /*
  * Error calls
  */
-gchar *filter_strerror (gint filter_errnum);
-void filter_perror (const gchar * s);
+gchar *filter_strerror(gint filter_errnum);
+void filter_perror(const gchar * s);
 
-#endif /* _FILTER_H */
+#endif				/* _FILTER_H */

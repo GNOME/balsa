@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -27,7 +27,7 @@
 
 #include "libbalsa.h"
 
-GString * content2reply (LibBalsaMessage * message,
-			 gchar *reply_prefix_str, gint llen);  /* arp */
+GString *content2reply(LibBalsaMessage * message,
+		       gchar * reply_prefix_str, gint llen);	/* arp */
 
-#endif /* __LIBBALSA_MIME_H__ */
+#endif				/* __LIBBALSA_MIME_H__ */

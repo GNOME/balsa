@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -45,19 +45,16 @@
 
 typedef struct _LibBalsaMailboxRemoteClass LibBalsaMailboxRemoteClass;
 
-struct _LibBalsaMailboxRemote
-{
-	LibBalsaMailbox mailbox;
-  
-	LibBalsaServer *server;
+struct _LibBalsaMailboxRemote {
+    LibBalsaMailbox mailbox;
+
+    LibBalsaServer *server;
 };
 
-struct _LibBalsaMailboxRemoteClass
-{
-	LibBalsaMailboxClass parent_class;
+struct _LibBalsaMailboxRemoteClass {
+    LibBalsaMailboxClass parent_class;
 };
 
-GtkType libbalsa_mailbox_remote_get_type (void);
+GtkType libbalsa_mailbox_remote_get_type(void);
 
-#endif /* __LIBBALSA_MAILBOX_REMOTE_H__ */
-
+#endif				/* __LIBBALSA_MAILBOX_REMOTE_H__ */

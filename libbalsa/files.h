@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -33,7 +33,8 @@
  * We ignore proper slashing of names. Ie, /prefix//splice//file won't be caught.
  */
 
-gchar *balsa_file_finder( const gchar *filename, const gchar *splice, const gchar **prefixes );
+gchar *balsa_file_finder(const gchar * filename, const gchar * splice,
+			 const gchar ** prefixes);
 
 #define balsa_pixmap_finder( filename ) (balsa_file_finder( filename, "pixmaps", NULL))
 

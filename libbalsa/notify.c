@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -30,119 +30,124 @@
 /* Holds all the mailboxes which are registered for checking */
 static GHashTable *notify_hash;
 
-void libbalsa_notify_init (void)
+void
+libbalsa_notify_init(void)
 {
-	/* Hash table uses the actual key as the hash */
-	notify_hash = g_hash_table_new (g_direct_hash, g_direct_equal);
+    /* Hash table uses the actual key as the hash */
+    notify_hash = g_hash_table_new(g_direct_hash, g_direct_equal);
 }
 
-void libbalsa_notify_register_mailbox (LibBalsaMailbox *mailbox)
+void
+libbalsa_notify_register_mailbox(LibBalsaMailbox * mailbox)
 {
-	BUFFY *tmp;
-	gchar *path = NULL, *user, *passwd;
-  
-	g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+    BUFFY *tmp;
+    gchar *path = NULL, *user, *passwd;
 
-	if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
-		path = g_strdup(LIBBALSA_MAILBOX_LOCAL (mailbox)->path);
-		user = passwd = NULL;
-	} else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
-		LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
-		/* imap notify is broken. Fix it first. */
-		return;
-		if ( server->user && server->passwd ) {
-			path = g_strdup_printf(
-				"{%s:%i}%s", server->host,server->port,
-				LIBBALSA_MAILBOX_IMAP(mailbox)->path);
-			user   = server->user;
-			passwd = server->passwd;
-		} else {
-			return;
-		}
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+
+    if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
+	path = g_strdup(LIBBALSA_MAILBOX_LOCAL(mailbox)->path);
+	user = passwd = NULL;
+    } else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
+	LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+	/* imap notify is broken. Fix it first. */
+	return;
+	if (server->user && server->passwd) {
+	    path = g_strdup_printf("{%s:%i}%s", server->host, server->port,
+				   LIBBALSA_MAILBOX_IMAP(mailbox)->path);
+	    user = server->user;
+	    passwd = server->passwd;
 	} else {
-		return;
+	    return;
 	}
+    } else {
+	return;
+    }
 
-	libbalsa_lock_mutt();
-	tmp = buffy_add_mailbox(path, user, passwd);
-	libbalsa_unlock_mutt();
+    libbalsa_lock_mutt();
+    tmp = buffy_add_mailbox(path, user, passwd);
+    libbalsa_unlock_mutt();
 
-	g_free(path);
+    g_free(path);
 
-	g_hash_table_insert (notify_hash, mailbox, tmp );
+    g_hash_table_insert(notify_hash, mailbox, tmp);
 }
 
-void libbalsa_notify_unregister_mailbox (LibBalsaMailbox *mailbox)
+void
+libbalsa_notify_unregister_mailbox(LibBalsaMailbox * mailbox)
 {
 
-	BUFFY *bf;
-	BUFFY ** tmp = &Incoming;
+    BUFFY *bf;
+    BUFFY **tmp = &Incoming;
 
-	g_return_if_fail ( LIBBALSA_IS_MAILBOX(mailbox) );
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-	bf = (BUFFY*) g_hash_table_lookup(notify_hash, mailbox);
-    
-	if ( bf == NULL )
-		return;
+    bf = (BUFFY *) g_hash_table_lookup(notify_hash, mailbox);
 
-	g_hash_table_remove (notify_hash, mailbox);
+    if (bf == NULL)
+	return;
 
-	/* For some reason buffy_mailbox_remove is not exported by libmutt.
-	 * So we do it ourselves. Cut-n-paste from buffy.c
-	 */ 
-	libbalsa_lock_mutt();
-	if(!*tmp) {
-		libbalsa_unlock_mutt();
-		return; /* strange error */
-	}
+    g_hash_table_remove(notify_hash, mailbox);
 
-	if(*tmp == bf) {
-
-		*tmp = (*tmp)->next;
-
-	} else {
-
-		while(*tmp && (*tmp)->next != bf) 
-			tmp = &(*tmp)->next;
-
-		if( !*tmp ) {
-			libbalsa_unlock_mutt();
-			return; /* not found again, critical error! */
-		}
-
-		(*tmp)->next = bf->next;
-	}
-  
-	safe_free((void **) &bf->user);
-	safe_free((void **) &bf->passwd);
-	safe_free((void **) &bf->path);
-	safe_free((void **) &bf);
-
+    /* For some reason buffy_mailbox_remove is not exported by libmutt.
+     * So we do it ourselves. Cut-n-paste from buffy.c
+     */
+    libbalsa_lock_mutt();
+    if (!*tmp) {
 	libbalsa_unlock_mutt();
+	return;			/* strange error */
+    }
+
+    if (*tmp == bf) {
+
+	*tmp = (*tmp)->next;
+
+    } else {
+
+	while (*tmp && (*tmp)->next != bf)
+	    tmp = &(*tmp)->next;
+
+	if (!*tmp) {
+	    libbalsa_unlock_mutt();
+	    return;		/* not found again, critical error! */
+	}
+
+	(*tmp)->next = bf->next;
+    }
+
+    safe_free((void **) &bf->user);
+    safe_free((void **) &bf->passwd);
+    safe_free((void **) &bf->path);
+    safe_free((void **) &bf);
+
+    libbalsa_unlock_mutt();
 }
 
-void libbalsa_notify_start_check (void)
+void
+libbalsa_notify_start_check(void)
 {
-	/* Might as well use check rather than notify. All notify does is */
-	/* write messages for each mailbox */
-	libbalsa_lock_mutt();
-	mutt_buffy_check(FALSE);
-	libbalsa_unlock_mutt();
+    /* Might as well use check rather than notify. All notify does is */
+    /* write messages for each mailbox */
+    libbalsa_lock_mutt();
+    mutt_buffy_check(FALSE);
+    libbalsa_unlock_mutt();
 }
 
-gint libbalsa_notify_check_mailbox (LibBalsaMailbox *mailbox)
+gint
+libbalsa_notify_check_mailbox(LibBalsaMailbox * mailbox)
 {
-	BUFFY *bf;
+    BUFFY *bf;
 
-	g_return_val_if_fail (LIBBALSA_IS_MAILBOX(mailbox), 0);
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), 0);
 
-	bf = g_hash_table_lookup (notify_hash, mailbox);
+    bf = g_hash_table_lookup(notify_hash, mailbox);
 
-	if ( bf == NULL ) {
-		g_warning("Did libbalsa_notify_check_mailbox on mailbox that isn't registered.");
-		return 0;
-	}
+    if (bf == NULL) {
+	g_warning
+	    ("Did libbalsa_notify_check_mailbox on mailbox that isn't registered.");
+	return 0;
+    }
 
-	return bf->new;
-  
+    return bf->new;
+
 }

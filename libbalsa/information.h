@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -26,23 +26,25 @@
 #include <glib.h>
 #include <stdarg.h>
 
-enum _LibBalsaInformationType
-{
-	LIBBALSA_INFORMATION_MESSAGE,
-	LIBBALSA_INFORMATION_WARNING,
-	LIBBALSA_INFORMATION_ERROR,
-	LIBBALSA_INFORMATION_DEBUG
+enum _LibBalsaInformationType {
+    LIBBALSA_INFORMATION_MESSAGE,
+    LIBBALSA_INFORMATION_WARNING,
+    LIBBALSA_INFORMATION_ERROR,
+    LIBBALSA_INFORMATION_DEBUG
 };
 
 typedef enum _LibBalsaInformationType LibBalsaInformationType;
 
-typedef void (*LibBalsaInformationFunc) (LibBalsaInformationType message_type, const gchar *fmt);
+typedef void (*LibBalsaInformationFunc) (LibBalsaInformationType
+					 message_type, const gchar * fmt);
 
 
 extern LibBalsaInformationFunc libbalsa_real_information_func;
 
-void libbalsa_information(LibBalsaInformationType type, const char *fmt, ...);
-void libbalsa_information_varg(LibBalsaInformationType type, const char *fmt, va_list ap);
+void libbalsa_information(LibBalsaInformationType type, const char *fmt,
+			  ...);
+void libbalsa_information_varg(LibBalsaInformationType type,
+			       const char *fmt, va_list ap);
 
 
 #endif

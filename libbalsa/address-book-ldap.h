@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -41,25 +41,24 @@
 typedef struct _LibBalsaAddressBookLdap LibBalsaAddressBookLdap;
 typedef struct _LibBalsaAddressBookLdapClass LibBalsaAddressBookLdapClass;
 
-struct _LibBalsaAddressBookLdap
-{
-	LibBalsaAddressBook parent;
+struct _LibBalsaAddressBookLdap {
+    LibBalsaAddressBook parent;
 
-	gchar *host;
-	gchar *base_dn;
+    gchar *host;
+    gchar *base_dn;
 
-	LDAP *directory;
+    LDAP *directory;
 };
 
-struct _LibBalsaAddressBookLdapClass
-{
-	LibBalsaAddressBookClass parent_class;
+struct _LibBalsaAddressBookLdapClass {
+    LibBalsaAddressBookClass parent_class;
 };
 
 GtkType libbalsa_address_book_ldap_get_type(void);
 
-LibBalsaAddressBook *libbalsa_address_book_ldap_new(const gchar *name, const gchar *host, const gchar *base_dn);
+LibBalsaAddressBook *libbalsa_address_book_ldap_new(const gchar * name,
+						    const gchar * host,
+						    const gchar * base_dn);
 
 
-#endif /* __LIBBALSA_ADDRESS_BOOK_LDAP_H__ */
-
+#endif				/* __LIBBALSA_ADDRESS_BOOK_LDAP_H__ */

@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -32,4 +32,4 @@
 #include "libmutt/mime.h"
 #include "libmutt/buffy.h"
 
-#endif /* __LIBBALSA_MAILBACKEND_H__ */
+#endif				/* __LIBBALSA_MAILBACKEND_H__ */

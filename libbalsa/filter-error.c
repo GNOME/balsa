@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -34,15 +34,14 @@
  * The filter_errlist is an array of strings indexed by filter_errno
  * for use in filter_perror() and filter_strerror()
  */
-gchar *filter_errlist[] =
-{
-  "No error",
-  "No filter configuration file found",
-  "Unable to read filter configuration file",
-  "Syntax error in the filter configuration file",
-  "No message to filter",
-  "Unable to allocate memory",
-  "Error in regular expression syntax"
+gchar *filter_errlist[] = {
+    "No error",
+    "No filter configuration file found",
+    "Unable to read filter configuration file",
+    "Syntax error in the filter configuration file",
+    "No message to filter",
+    "Unable to allocate memory",
+    "Error in regular expression syntax"
 };
 
 
@@ -60,10 +59,10 @@ gchar *filter_errlist[] =
  *    gchar * - pointer to the string in filter_errorlist
  */
 gchar *
-filter_strerror (gint error)
+filter_strerror(gint error)
 {
-  return (filter_errlist[(error > 0) ? error : -error]);
-}                                /* end filter_strerror() */
+    return (filter_errlist[(error > 0) ? error : -error]);
+}				/* end filter_strerror() */
 
 
 /*
@@ -75,11 +74,11 @@ filter_strerror (gint error)
  * Arguments
  *    gchar *s - string to be prepended to the error message.
  */
-void 
-filter_perror (const gchar * s)
+void
+filter_perror(const gchar * s)
 {
-  gchar *error_string;
+    gchar *error_string;
 
-  error_string = filter_strerror (filter_errno);
-  g_warning ("%s: %s\n", s, error_string);
-}                                /* end filter_perror */
+    error_string = filter_strerror(filter_errno);
+    g_warning("%s: %s\n", s, error_string);
+}				/* end filter_perror */

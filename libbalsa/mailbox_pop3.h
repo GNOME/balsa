@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -29,26 +29,24 @@
 #define LIBBALSA_IS_MAILBOX_POP3(obj)		        (GTK_CHECK_TYPE (obj, LIBBALSA_TYPE_MAILBOX_POP3))
 #define LIBBALSA_IS_MAILBOX_POP3_CLASS(klass)	        (GTK_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_MAILBOX_POP3))
 
-GtkType libbalsa_mailbox_pop3_get_type (void);
+GtkType libbalsa_mailbox_pop3_get_type(void);
 
 typedef struct _LibBalsaMailboxPop3 LibBalsaMailboxPop3;
 typedef struct _LibBalsaMailboxPop3Class LibBalsaMailboxPop3Class;
 
-struct _LibBalsaMailboxPop3
-{
-  LibBalsaMailboxRemote mailbox;
+struct _LibBalsaMailboxPop3 {
+    LibBalsaMailboxRemote mailbox;
 
-  gboolean check;
-  gboolean delete_from_server;
-  gchar *last_popped_uid;
-  gboolean use_apop;
+    gboolean check;
+    gboolean delete_from_server;
+    gchar *last_popped_uid;
+    gboolean use_apop;
 };
 
-struct _LibBalsaMailboxPop3Class
-{
-  LibBalsaMailboxRemoteClass klass;
+struct _LibBalsaMailboxPop3Class {
+    LibBalsaMailboxRemoteClass klass;
 };
 
 GtkObject *libbalsa_mailbox_pop3_new(void);
 
-#endif /* __LIBBALSA_MAILBOX_POP3_H__ */
+#endif				/* __LIBBALSA_MAILBOX_POP3_H__ */

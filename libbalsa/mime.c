@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -28,98 +28,113 @@
 
 /* FIXME: The content of this file could go to message.c */
 
-static GString* process_mime_multipart (LibBalsaMessage * message, LibBalsaMessageBody * body, gchar *reply_prefix_str, gint llen);
-static GString* process_mime_part (LibBalsaMessage * message, LibBalsaMessageBody * body, gchar *reply_prefix_str, gint llen);
+static GString *process_mime_multipart(LibBalsaMessage * message,
+				       LibBalsaMessageBody * body,
+				       gchar * reply_prefix_str,
+				       gint llen);
+static GString *process_mime_part(LibBalsaMessage * message,
+				  LibBalsaMessageBody * body,
+				  gchar * reply_prefix_str, gint llen);
 
-static GString*
-process_mime_part (LibBalsaMessage * message, LibBalsaMessageBody * body, 
-		   gchar *reply_prefix_str, gint llen)
+static GString *
+process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
+		  gchar * reply_prefix_str, gint llen)
 {
-	FILE *part;
-	size_t alloced;
-	gchar *res = NULL;
-	GString *reply = NULL;
+    FILE *part;
+    size_t alloced;
+    gchar *res = NULL;
+    GString *reply = NULL;
 
-	switch ( libbalsa_message_body_type (body) ) {
-	case LIBBALSA_MESSAGE_BODY_TYPE_OTHER:
-	case LIBBALSA_MESSAGE_BODY_TYPE_AUDIO:
-	case LIBBALSA_MESSAGE_BODY_TYPE_APPLICATION:
-	case LIBBALSA_MESSAGE_BODY_TYPE_IMAGE:
-	case LIBBALSA_MESSAGE_BODY_TYPE_MODEL:
-	case LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE:
-	case LIBBALSA_MESSAGE_BODY_TYPE_VIDEO:
-		break;
-	case LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART:
-		reply = process_mime_multipart (message, body, 
-						reply_prefix_str, llen);
-		break;
-	case LIBBALSA_MESSAGE_BODY_TYPE_TEXT:
-		libbalsa_message_body_save_temporary(body, NULL);
-    
-		part = fopen (body->temp_filename, "r");
-		if(!part) break;
-		alloced = libbalsa_readfile (part, &res);
-		fclose(part);
-		if(!res) break;
-		if(llen>0) {
-			if(reply_prefix_str) llen -= strlen(reply_prefix_str);
-			libbalsa_wrap_string(res, llen);
-		}
-		if(reply_prefix_str) {
-			gchar *str, *ptr;
-			/* prepend the prefix to all the lines */
-			
-			reply = g_string_new("");
-			str = res;
-			do {
-				ptr = strchr(str, '\n');
-				if(ptr) *ptr = '\0';
-				reply = g_string_append(reply, 
-							reply_prefix_str);
-				reply = g_string_append(reply, str);
-				reply = g_string_append_c(reply, '\n');
-				str = ptr;
-			} while(str++);
-		} else reply = g_string_new(res);
-		g_free(res);
-		break;
+    switch (libbalsa_message_body_type(body)) {
+    case LIBBALSA_MESSAGE_BODY_TYPE_OTHER:
+    case LIBBALSA_MESSAGE_BODY_TYPE_AUDIO:
+    case LIBBALSA_MESSAGE_BODY_TYPE_APPLICATION:
+    case LIBBALSA_MESSAGE_BODY_TYPE_IMAGE:
+    case LIBBALSA_MESSAGE_BODY_TYPE_MODEL:
+    case LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE:
+    case LIBBALSA_MESSAGE_BODY_TYPE_VIDEO:
+	break;
+    case LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART:
+	reply = process_mime_multipart(message, body,
+				       reply_prefix_str, llen);
+	break;
+    case LIBBALSA_MESSAGE_BODY_TYPE_TEXT:
+	libbalsa_message_body_save_temporary(body, NULL);
+
+	part = fopen(body->temp_filename, "r");
+	if (!part)
+	    break;
+	alloced = libbalsa_readfile(part, &res);
+	fclose(part);
+	if (!res)
+	    break;
+	if (llen > 0) {
+	    if (reply_prefix_str)
+		llen -= strlen(reply_prefix_str);
+	    libbalsa_wrap_string(res, llen);
 	}
-	return reply;
+	if (reply_prefix_str) {
+	    gchar *str, *ptr;
+	    /* prepend the prefix to all the lines */
+
+	    reply = g_string_new("");
+	    str = res;
+	    do {
+		ptr = strchr(str, '\n');
+		if (ptr)
+		    *ptr = '\0';
+		reply = g_string_append(reply, reply_prefix_str);
+		reply = g_string_append(reply, str);
+		reply = g_string_append_c(reply, '\n');
+		str = ptr;
+	    } while (str++);
+	} else
+	    reply = g_string_new(res);
+	g_free(res);
+	break;
+    }
+    return reply;
 }
 
-static GString*
-process_mime_multipart (LibBalsaMessage * message, LibBalsaMessageBody * body,
-			gchar *reply_prefix_str, gint llen)
+static GString *
+process_mime_multipart(LibBalsaMessage * message,
+		       LibBalsaMessageBody * body,
+		       gchar * reply_prefix_str, gint llen)
 {
-	LibBalsaMessageBody *part;
-	GString *res = NULL, *s;
+    LibBalsaMessageBody *part;
+    GString *res = NULL, *s;
 
-	for (part = body->parts; part; part = part->next) {
-		s = process_mime_part (message, part, reply_prefix_str, llen);
-		if(!s) continue;
-		if(res) {
-			res =  g_string_append(res, s->str);
-			g_string_free(s, TRUE);
-		} else res = s;
-	}
-	return res;
+    for (part = body->parts; part; part = part->next) {
+	s = process_mime_part(message, part, reply_prefix_str, llen);
+	if (!s)
+	    continue;
+	if (res) {
+	    res = g_string_append(res, s->str);
+	    g_string_free(s, TRUE);
+	} else
+	    res = s;
+    }
+    return res;
 }
 
 GString *
-content2reply (LibBalsaMessage * message, gchar *reply_prefix_str, gint llen)
+content2reply(LibBalsaMessage * message, gchar * reply_prefix_str,
+	      gint llen)
 {
-	LibBalsaMessageBody *body;
-	GString *reply = NULL, *res;
+    LibBalsaMessageBody *body;
+    GString *reply = NULL, *res;
 
-	body = message->body_list;
-	for(body = message->body_list; body; body = body->next)  {
-		res = process_mime_part(message, body, reply_prefix_str, llen);
-		if(!res) continue;
-		if(reply) {
-			reply =  g_string_append(reply, res->str);
-			g_string_free(res, TRUE);
-		} else reply = res;
-	}    
+    body = message->body_list;
+    for (body = message->body_list; body; body = body->next) {
+	res = process_mime_part(message, body, reply_prefix_str, llen);
+	if (!res)
+	    continue;
+	if (reply) {
+	    reply = g_string_append(reply, res->str);
+	    g_string_free(res, TRUE);
+	} else
+	    reply = res;
+    }
 
-	return reply;
+    return reply;
 }

@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -36,16 +36,12 @@
  * first.
  */
 
-void filter_free (filter *,
-		  gpointer);
-GList *filter_clear_filters (GList *);
-filter *filter_new (void);
-gint filter_append_regex (filter *,
-			  gchar *);
-void filter_delete_regex (filter_regex *,
-			  gpointer);
-void filter_regcomp (filter_regex *,
-		     gpointer);
-gint filter_compile_regexs (filter *);
+void filter_free(filter *, gpointer);
+GList *filter_clear_filters(GList *);
+filter *filter_new(void);
+gint filter_append_regex(filter *, gchar *);
+void filter_delete_regex(filter_regex *, gpointer);
+void filter_regcomp(filter_regex *, gpointer);
+gint filter_compile_regexs(filter *);
 
-#endif /* _FUNCS_H */
+#endif				/* _FUNCS_H */

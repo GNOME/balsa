@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -39,79 +39,77 @@
 typedef struct _LibBalsaMessageClass LibBalsaMessageClass;
 typedef enum _LibBalsaMessageFlag LibBalsaMessageFlag;
 
-enum _LibBalsaMessageFlag
-{
-	LIBBALSA_MESSAGE_FLAG_NEW     = 1 << 1,
-	LIBBALSA_MESSAGE_FLAG_DELETED = 1 << 2,
-	LIBBALSA_MESSAGE_FLAG_REPLIED = 1 << 3,
-	LIBBALSA_MESSAGE_FLAG_FLAGGED = 1 << 4
+enum _LibBalsaMessageFlag {
+    LIBBALSA_MESSAGE_FLAG_NEW = 1 << 1,
+    LIBBALSA_MESSAGE_FLAG_DELETED = 1 << 2,
+    LIBBALSA_MESSAGE_FLAG_REPLIED = 1 << 3,
+    LIBBALSA_MESSAGE_FLAG_FLAGGED = 1 << 4
 };
 
-struct _LibBalsaMessage
-{
-	GtkObject object;
+struct _LibBalsaMessage {
+    GtkObject object;
 
-	/* the mailbox this message belongs to */
-	LibBalsaMailbox *mailbox;
+    /* the mailbox this message belongs to */
+    LibBalsaMailbox *mailbox;
 
-	/* flags */
-	LibBalsaMessageFlag flags;
+    /* flags */
+    LibBalsaMessageFlag flags;
 
-	/* the ordered numberic index of this message in 
-	 * the mailbox beginning from 1, not 0 */
-	glong msgno;
+    /* the ordered numberic index of this message in 
+     * the mailbox beginning from 1, not 0 */
+    glong msgno;
 
-	/* remail header if any */
-	gchar *remail;
+    /* remail header if any */
+    gchar *remail;
 
-	/* message composition date */
-	time_t date;
+    /* message composition date */
+    time_t date;
 
-	/* from, sender, and reply addresses */
-	LibBalsaAddress *from;
-	LibBalsaAddress *sender;
-	LibBalsaAddress *reply_to;
+    /* from, sender, and reply addresses */
+    LibBalsaAddress *from;
+    LibBalsaAddress *sender;
+    LibBalsaAddress *reply_to;
 
-	/* subject line */
-	gchar *subject;
+    /* subject line */
+    gchar *subject;
 
-	/* primary, secondary, and blind recipent lists */
-	GList *to_list;
-	GList *cc_list;
-	GList *bcc_list;
+    /* primary, secondary, and blind recipent lists */
+    GList *to_list;
+    GList *cc_list;
+    GList *bcc_list;
 
-	/* File Carbon Copy Mailbox */
-	gchar *fcc_mailbox;
+    /* File Carbon Copy Mailbox */
+    gchar *fcc_mailbox;
 
-	/* replied message ID's */
-	GList *references;
+    /* replied message ID's */
+    GList *references;
 
-	/* replied message ID; from address on date*/
-	gchar *in_reply_to;
+    /* replied message ID; from address on date */
+    gchar *in_reply_to;
 
-	/* message ID */
-	gchar *message_id;
+    /* message ID */
+    gchar *message_id;
 
-	/* message body */
-	guint body_ref;
-	LibBalsaMessageBody *body_list;
-	/*  GList *body_list; */
+    /* message body */
+    guint body_ref;
+    LibBalsaMessageBody *body_list;
+    /*  GList *body_list; */
 };
 
-struct _LibBalsaMessageClass
-{
-	GtkObjectClass parent_class;
+struct _LibBalsaMessageClass {
+    GtkObjectClass parent_class;
 
-	/* deal with flags being set/unset */
-	/* Signal: */
-	void (* status_changed) (LibBalsaMessage *message, LibBalsaMessageFlag flag, gboolean);
+    /* deal with flags being set/unset */
+    /* Signal: */
+    void (*status_changed) (LibBalsaMessage * message,
+			    LibBalsaMessageFlag flag, gboolean);
 
-	/* Virtual Functions: */
-	void (* clear_flags)    (LibBalsaMessage *message);
-	void (* set_answered)   (LibBalsaMessage *message, gboolean set);
-	void (* set_read)       (LibBalsaMessage *message, gboolean set);
-	void (* set_deleted)    (LibBalsaMessage *message, gboolean set);
-	void (* set_flagged)	  (LibBalsaMessage *message, gboolean set);
+    /* Virtual Functions: */
+    void (*clear_flags) (LibBalsaMessage * message);
+    void (*set_answered) (LibBalsaMessage * message, gboolean set);
+    void (*set_read) (LibBalsaMessage * message, gboolean set);
+    void (*set_deleted) (LibBalsaMessage * message, gboolean set);
+    void (*set_flagged) (LibBalsaMessage * message, gboolean set);
 };
 
 
@@ -122,48 +120,53 @@ GtkType libbalsa_message_get_type(void);
  */
 LibBalsaMessage *libbalsa_message_new(void);
 
-gboolean libbalsa_message_copy (LibBalsaMessage * message, LibBalsaMailbox * dest);
-gboolean libbalsa_message_move (LibBalsaMessage * message, LibBalsaMailbox * mailbox);
-void libbalsa_message_clear_flags (LibBalsaMessage * message);
+gboolean libbalsa_message_copy(LibBalsaMessage * message,
+			       LibBalsaMailbox * dest);
+gboolean libbalsa_message_move(LibBalsaMessage * message,
+			       LibBalsaMailbox * mailbox);
+void libbalsa_message_clear_flags(LibBalsaMessage * message);
 
-void libbalsa_message_read (LibBalsaMessage * message);
-void libbalsa_message_unread (LibBalsaMessage * message);
-void libbalsa_message_delete (LibBalsaMessage * message);
-void libbalsa_message_undelete (LibBalsaMessage * message);
+void libbalsa_message_read(LibBalsaMessage * message);
+void libbalsa_message_unread(LibBalsaMessage * message);
+void libbalsa_message_delete(LibBalsaMessage * message);
+void libbalsa_message_undelete(LibBalsaMessage * message);
 
-void libbalsa_message_flag (LibBalsaMessage * message);
-void libbalsa_message_unflag (LibBalsaMessage * message);
+void libbalsa_message_flag(LibBalsaMessage * message);
+void libbalsa_message_unflag(LibBalsaMessage * message);
 
-void libbalsa_message_answer (LibBalsaMessage * message);
-void libbalsa_message_reply (LibBalsaMessage * message);
+void libbalsa_message_answer(LibBalsaMessage * message);
+void libbalsa_message_reply(LibBalsaMessage * message);
 
-void libbalsa_message_append_part (LibBalsaMessage *message, LibBalsaMessageBody *body);
+void libbalsa_message_append_part(LibBalsaMessage * message,
+				  LibBalsaMessageBody * body);
 
-void libbalsa_message_body_ref (LibBalsaMessage * message);
-void libbalsa_message_body_unref (LibBalsaMessage * message);
+void libbalsa_message_body_ref(LibBalsaMessage * message);
+void libbalsa_message_body_unref(LibBalsaMessage * message);
 
-gboolean balsa_send_message (LibBalsaMessage * message,
-			     LibBalsaMailbox *outbox, gint encoding);
-gboolean balsa_postpone_message (LibBalsaMessage * message, 
-				 LibBalsaMailbox *draftbox,
-				 LibBalsaMessage *reply_message,
-				 gchar * fcc);
-gboolean libbalsa_message_send(LibBalsaMessage *message,
-			       LibBalsaMailbox *outbox, gint encoding);
-gboolean libbalsa_message_postpone (LibBalsaMessage * message, 
-				    LibBalsaMailbox *draftbox,
-				    LibBalsaMessage * reply_message, 
-				    gchar * fcc, gint encoding);
+gboolean balsa_send_message(LibBalsaMessage * message,
+			    LibBalsaMailbox * outbox, gint encoding);
+gboolean balsa_postpone_message(LibBalsaMessage * message,
+				LibBalsaMailbox * draftbox,
+				LibBalsaMessage * reply_message,
+				gchar * fcc);
+gboolean libbalsa_message_send(LibBalsaMessage * message,
+			       LibBalsaMailbox * outbox, gint encoding);
+gboolean libbalsa_message_postpone(LibBalsaMessage * message,
+				   LibBalsaMailbox * draftbox,
+				   LibBalsaMessage * reply_message,
+				   gchar * fcc, gint encoding);
 
 /*
  * misc message releated functions
  */
-gchar *libbalsa_message_date_to_gchar (LibBalsaMessage * message, const gchar *date_string);
-const gchar *libbalsa_message_pathname (LibBalsaMessage * message);
-const gchar *libbalsa_message_charset  (LibBalsaMessage *message);
-gboolean libbalsa_message_has_attachment (LibBalsaMessage* message);
+gchar *libbalsa_message_date_to_gchar(LibBalsaMessage * message,
+				      const gchar * date_string);
+const gchar *libbalsa_message_pathname(LibBalsaMessage * message);
+const gchar *libbalsa_message_charset(LibBalsaMessage * message);
+gboolean libbalsa_message_has_attachment(LibBalsaMessage * message);
 
-GList *libbalsa_message_user_hdrs(LibBalsaMessage *message);
-gchar* libbalsa_message_get_text_content(LibBalsaMessage* msg, gint line_len);
+GList *libbalsa_message_user_hdrs(LibBalsaMessage * message);
+gchar *libbalsa_message_get_text_content(LibBalsaMessage * msg,
+					 gint line_len);
 
-#endif /* __LIBBALSA_MESSAGE_H__ */
+#endif				/* __LIBBALSA_MESSAGE_H__ */

@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -48,18 +48,18 @@
  *    Sets filter_errno on error.
  */
 GList *
-filter_init (gchar * filter_file)
+filter_init(gchar * filter_file)
 {
-  GList *list = NULL;
-  gint rc;
+    GList *list = NULL;
+    gint rc;
 
-  rc = filter_load (list, filter_file);
+    rc = filter_load(list, filter_file);
 
-  if (rc < 0)
-    filter_perror ("Error in filter initialization");
+    if (rc < 0)
+	filter_perror("Error in filter initialization");
 
-  return (list);
-}                                /* end filter_init() */
+    return (list);
+}				/* end filter_init() */
 
 
 /*
@@ -71,20 +71,19 @@ filter_init (gchar * filter_file)
  *    filter_regex *filter_reg - the filter_regex structure to clear
  *    gpointer throwaway - unused
  */
-void 
-filter_delete_regex (filter_regex * filter_reg,
-                     gpointer throwaway)
+void
+filter_delete_regex(filter_regex * filter_reg, gpointer throwaway)
 {
-  if (!filter_reg)
+    if (!filter_reg)
+	return;
+
+    if (filter_reg->string)
+	g_free(filter_reg->string);
+
+    regfree(filter_reg->compiled);
+
     return;
-
-  if (filter_reg->string)
-    g_free (filter_reg->string);
-
-  regfree (filter_reg->compiled);
-
-  return;
-}                                /* end filter_delete_regex() */
+}				/* end filter_delete_regex() */
 
 
 /*
@@ -96,26 +95,22 @@ filter_delete_regex (filter_regex * filter_reg,
  *    filter *fil - the filter to delete
  *    gpointer throwaway - unused
  */
-void 
-filter_free (filter * fil,
-             gpointer throwaway)
+void
+filter_free(filter * fil, gpointer throwaway)
 {
-  if (!fil)
-    return;
+    if (!fil)
+	return;
 
-  if (fil->name)
-    g_free (fil->name);
+    if (fil->name)
+	g_free(fil->name);
 
-  if (fil->regex)
-    {
-      g_list_foreach (fil->regex,
-                      (GFunc) filter_delete_regex,
-                      NULL);
-      g_list_free (fil->regex);
+    if (fil->regex) {
+	g_list_foreach(fil->regex, (GFunc) filter_delete_regex, NULL);
+	g_list_free(fil->regex);
     }
 
-  g_free (fil);
-}                                /* end filter_delete_filter() */
+    g_free(fil);
+}				/* end filter_delete_filter() */
 
 
 /*
@@ -130,18 +125,16 @@ filter_free (filter * fil,
  *    GList *NULL - a null value (we cleard it, eh?)
  */
 GList *
-filter_clear_filters (GList * filter_list)
+filter_clear_filters(GList * filter_list)
 {
-  if (!filter_list)
+    if (!filter_list)
+	return (NULL);
+
+    g_list_foreach(filter_list, (GFunc) filter_free, NULL);
+    g_list_free(filter_list);
+
     return (NULL);
-
-  g_list_foreach (filter_list,
-                  (GFunc) filter_free,
-                  NULL);
-  g_list_free (filter_list);
-
-  return (NULL);
-}                                /* end filter_clear_filters() */
+}				/* end filter_clear_filters() */
 
 
 /*
@@ -154,16 +147,15 @@ filter_clear_filters (GList * filter_list)
  *    filter* - pointer to the new filter
  */
 filter *
-filter_new (void)
+filter_new(void)
 {
-  filter *newfil;
+    filter *newfil;
 
-  newfil = (filter *) g_malloc (sizeof (filter));
+    newfil = (filter *) g_malloc(sizeof(filter));
 
-  if (!newfil)
-    {
-      filter_errno = FILTER_ENOMEM;
-      return (NULL);
+    if (!newfil) {
+	filter_errno = FILTER_ENOMEM;
+	return (NULL);
     }
 
     newfil->type = FILTER_NONE;
@@ -176,8 +168,8 @@ filter_new (void)
     newfil->action_string[0] = '\0';
     newfil->regex = NULL;
 
-  return (newfil);
-}                                /* end filter_new() */
+    return (newfil);
+}				/* end filter_new() */
 
 
 /*
@@ -194,29 +186,25 @@ filter_new (void)
  * Returns:
  *    gint - 0 for success, negative on error
  */
-gint 
-filter_append_regex (filter * fil,
-                     gchar * reg)
+gint filter_append_regex(filter * fil, gchar * reg)
 {
-  filter_regex *temp;
+    filter_regex *temp;
 
-  temp = (filter_regex *) g_malloc (sizeof (filter_regex));
-  if (!temp)
-    {
-      filter_errno = FILTER_ENOMEM;
-      return (-FILTER_ENOMEM);
+    temp = (filter_regex *) g_malloc(sizeof(filter_regex));
+    if (!temp) {
+	filter_errno = FILTER_ENOMEM;
+	return (-FILTER_ENOMEM);
     }
 
-  temp->string = g_strdup (reg);
-  temp->compiled = NULL;
+    temp->string = g_strdup(reg);
+    temp->compiled = NULL;
 
-  fil->regex = g_list_append (fil->regex,
-                              temp);
+    fil->regex = g_list_append(fil->regex, temp);
 
-  FILTER_SETFLAG (fil, FILTER_MODIFIED);
+    FILTER_SETFLAG(fil, FILTER_MODIFIED);
 
-  return (0);
-}                                /* end filter_append_regex() */
+    return (0);
+}				/* end filter_append_regex() */
 
 
 /*
@@ -227,29 +215,22 @@ filter_append_regex (filter * fil,
  * Arguments:
  *    filter_regex *fre - the filter_regex struct to compile
  */
-void 
-filter_regcomp (filter_regex * fre,
-                gpointer throwaway)
+void
+filter_regcomp(filter_regex * fre, gpointer throwaway)
 {
-  gint rc;
+    gint rc;
 
-  rc = regcomp (fre->compiled,
-                fre->string,
-                FILTER_REGCOMP);
+    rc = regcomp(fre->compiled, fre->string, FILTER_REGCOMP);
 
-  if (rc != 0)
-    {
-      gchar errorstring[256];
+    if (rc != 0) {
+	gchar errorstring[256];
 
-      regerror (rc,
-                fre->compiled,
-                errorstring,
-                256);
+	regerror(rc, fre->compiled, errorstring, 256);
 
-      filter_errno = FILTER_EREGSYN;
+	filter_errno = FILTER_EREGSYN;
     }
 
-}                                /* end filter_regcomp() */
+}				/* end filter_regcomp() */
 
 
 /*
@@ -263,29 +244,23 @@ filter_regcomp (filter_regex * fre,
  * Returns:
  *    gint - 0 for success, negative otherwise.
  */
-gint 
-filter_compile_regexs (filter * fil)
+gint filter_compile_regexs(filter * fil)
 {
-  /*
-   * Clear filter_errno, because it is
-   * the only way we know if a compile failed
-   */
-  filter_errno = FILTER_NOERR;
+    /*
+     * Clear filter_errno, because it is
+     * the only way we know if a compile failed
+     */
+    filter_errno = FILTER_NOERR;
 
-  /* ASSERT: we were only called if there were filters */
-  g_list_foreach (fil->regex,
-                  (GFunc) filter_regcomp,
-                  NULL);
-  if (filter_errno != 0)
-    {
-      gchar errorstring[1024];
-      g_snprintf (errorstring,
-                  1024,
-                  "Unable to compile filter %s",
-                  fil->name);
-      filter_perror (errorstring);
-      FILTER_CLRFLAG (fil, FILTER_ENABLED);
+    /* ASSERT: we were only called if there were filters */
+    g_list_foreach(fil->regex, (GFunc) filter_regcomp, NULL);
+    if (filter_errno != 0) {
+	gchar errorstring[1024];
+	g_snprintf(errorstring,
+		   1024, "Unable to compile filter %s", fil->name);
+	filter_perror(errorstring);
+	FILTER_CLRFLAG(fil, FILTER_ENABLED);
     }
 
-  return (0);
+    return (0);
 }

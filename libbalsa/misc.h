@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -27,9 +27,9 @@
 
 #include "libbalsa.h"
 
-gchar *libbalsa_make_string_from_list (const GList *);
+gchar *libbalsa_make_string_from_list(const GList *);
 
-size_t libbalsa_readfile (FILE * fp, char **buf);
+size_t libbalsa_readfile(FILE * fp, char **buf);
 
 /* MailboxNodeStyle [MBG] 
  * 
@@ -45,36 +45,38 @@ size_t libbalsa_readfile (FILE * fp, char **buf);
  * stuff.  Currently only MBNODE_STYLE_ICONFULL is really used, but
  * the others may be used later for more efficient style handling.
  * */
-typedef enum
-{
-	MBNODE_STYLE_ICONFULL = 1 << 1,
-	MBNODE_STYLE_UNREAD_MESSAGES = 1 << 2,
-	MBNODE_STYLE_TOTAL_MESSAGES = 1 << 3,
+typedef enum {
+    MBNODE_STYLE_ICONFULL = 1 << 1,
+    MBNODE_STYLE_UNREAD_MESSAGES = 1 << 2,
+    MBNODE_STYLE_TOTAL_MESSAGES = 1 << 3,
 } MailboxNodeStyle;
 
 
 typedef struct _MailboxNode MailboxNode;
-struct _MailboxNode
-{
-	GtkObject object;
-	gchar *name;
-	LibBalsaMailbox *mailbox;
-	gint IsDir;
-	gint expanded;
-	MailboxNodeStyle style;
+struct _MailboxNode {
+    GtkObject object;
+    gchar *name;
+    LibBalsaMailbox *mailbox;
+    gint IsDir;
+    gint expanded;
+    MailboxNodeStyle style;
 };
 
-MailboxNode *mailbox_node_new (const gchar * name, LibBalsaMailbox * mb, gint i);
-void mailbox_node_destroy(MailboxNode *mbn);
+MailboxNode *mailbox_node_new(const gchar * name, LibBalsaMailbox * mb,
+			      gint i);
+void mailbox_node_destroy(MailboxNode * mbn);
 
-gchar *libbalsa_get_hostname (void);
+gchar *libbalsa_get_hostname(void);
 
-gboolean libbalsa_find_word(const gchar * word, const gchar* str);
-void libbalsa_wrap_string(gchar* str, int width);
+gboolean libbalsa_find_word(const gchar * word, const gchar * str);
+void libbalsa_wrap_string(gchar * str, int width);
 
-void libbalsa_set_charset(const gchar* charset);
-void  libbalsa_marshal_POINTER__OBJECT (GtkObject * object, GtkSignalFunc func, gpointer func_data, GtkArg * args);
+void libbalsa_set_charset(const gchar * charset);
+void libbalsa_marshal_POINTER__OBJECT(GtkObject * object,
+				      GtkSignalFunc func,
+				      gpointer func_data, GtkArg * args);
 
-GNode *find_gnode_in_mbox_list (GNode * gnode_list, LibBalsaMailbox * mailbox);
+GNode *find_gnode_in_mbox_list(GNode * gnode_list,
+			       LibBalsaMailbox * mailbox);
 
-#endif /* __LIBBALSA_MISC_H__ */
+#endif				/* __LIBBALSA_MISC_H__ */

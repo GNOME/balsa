@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -24,40 +24,40 @@
 
 #include "libbalsa.h"
 
-static void libbalsa_mailbox_remote_class_init(LibBalsaMailboxRemoteClass *klass);
-static void libbalsa_mailbox_remote_init(LibBalsaMailboxRemote *mailbox);
+static void libbalsa_mailbox_remote_class_init(LibBalsaMailboxRemoteClass *
+					       klass);
+static void libbalsa_mailbox_remote_init(LibBalsaMailboxRemote * mailbox);
 
-GtkType
-libbalsa_mailbox_remote_get_type (void)
+GtkType libbalsa_mailbox_remote_get_type(void)
 {
-	static GtkType mailbox_type = 0;
+    static GtkType mailbox_type = 0;
 
-	if (!mailbox_type) {
-		static const GtkTypeInfo mailbox_info =	{
-			"LibBalsaMailboxRemote",
-			sizeof (LibBalsaMailbox),
-			sizeof (LibBalsaMailboxClass),
-			(GtkClassInitFunc) libbalsa_mailbox_remote_class_init,
-			(GtkObjectInitFunc) libbalsa_mailbox_remote_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
+    if (!mailbox_type) {
+	static const GtkTypeInfo mailbox_info = {
+	    "LibBalsaMailboxRemote",
+	    sizeof(LibBalsaMailbox),
+	    sizeof(LibBalsaMailboxClass),
+	    (GtkClassInitFunc) libbalsa_mailbox_remote_class_init,
+	    (GtkObjectInitFunc) libbalsa_mailbox_remote_init,
+	    /* reserved_1 */ NULL,
+	    /* reserved_2 */ NULL,
+	    (GtkClassInitFunc) NULL,
+	};
 
-		mailbox_type = gtk_type_unique(libbalsa_mailbox_get_type(), &mailbox_info);
-	}
+	mailbox_type =
+	    gtk_type_unique(libbalsa_mailbox_get_type(), &mailbox_info);
+    }
 
-	return mailbox_type;
+    return mailbox_type;
 }
 
 static void
-libbalsa_mailbox_remote_class_init(LibBalsaMailboxRemoteClass *klass)
+libbalsa_mailbox_remote_class_init(LibBalsaMailboxRemoteClass * klass)
 {
 }
 
 static void
-libbalsa_mailbox_remote_init(LibBalsaMailboxRemote *mailbox)
+libbalsa_mailbox_remote_init(LibBalsaMailboxRemote * mailbox)
 {
-	mailbox->server = NULL;
+    mailbox->server = NULL;
 }
-

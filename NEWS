@@ -1,3 +1,16 @@
+* Balsa-1.0.pre2 test release. Release date 2000-10-06.
+
+This is a second official pre-release. No new features, only bugs have
+been fixed:
+
+- don't crash on replying empty mails
+- fixes solaris build.
+- updated doc.
+- make install prefix=xxx should work now.
+- cancelled spell check outputting garbage bug.
+
+The interface has been polished a bit, too.
+
 * Balsa-1.0.pre1 test release. Release date 2000-09-27.
 
 This is the first official pre-release. The list of changes since

@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -65,12 +65,12 @@ typedef struct body MuttBody;
 /*
  * Initialize the library
  */
-void libbalsa_init (LibBalsaInformationFunc information_callback);
-void libbalsa_set_spool (gchar *spool);
+void libbalsa_init(LibBalsaInformationFunc information_callback);
+void libbalsa_set_spool(gchar * spool);
 
-gchar *libbalsa_guess_mail_spool( void );
+gchar *libbalsa_guess_mail_spool(void);
 
 void libbalsa_lock_mutt(void);
 void libbalsa_unlock_mutt(void);
 
-#endif /* __LIBBALSA_H__ */
+#endif				/* __LIBBALSA_H__ */

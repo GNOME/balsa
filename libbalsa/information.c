@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -26,10 +26,10 @@
 
 #include "information.h"
 
-static gboolean libbalsa_message_idle_handler(gchar *msg);
-static gboolean libbalsa_warning_idle_handler(gchar *msg);
-static gboolean libbalsa_error_idle_handler(gchar *msg);
-static gboolean libbalsa_debug_idle_handler(gchar *msg);
+static gboolean libbalsa_message_idle_handler(gchar * msg);
+static gboolean libbalsa_warning_idle_handler(gchar * msg);
+static gboolean libbalsa_error_idle_handler(gchar * msg);
+static gboolean libbalsa_debug_idle_handler(gchar * msg);
 
 LibBalsaInformationFunc libbalsa_real_information_func;
 
@@ -41,88 +41,92 @@ LibBalsaInformationFunc libbalsa_real_information_func;
  * loops active in two threads at one time. When the idle handler gets run it is 
  * from the main thread.
  *
- */ 
+ */
 void
-libbalsa_information_varg(LibBalsaInformationType type, const char *fmt, va_list ap)
+libbalsa_information_varg(LibBalsaInformationType type, const char *fmt,
+			  va_list ap)
 {
-	gchar *msg;
+    gchar *msg;
 
-	g_assert ( libbalsa_real_information_func != NULL );
+    g_assert(libbalsa_real_information_func != NULL);
 
-	/* We format the string here. It must be free()d in the idle
-	 * handler We parse the args here because by the time the idle
-	 * function runs we will no longer be in this stack frame. 
-	 */
-	msg = g_strdup_vprintf(fmt, ap);
+    /* We format the string here. It must be free()d in the idle
+     * handler We parse the args here because by the time the idle
+     * function runs we will no longer be in this stack frame. 
+     */
+    msg = g_strdup_vprintf(fmt, ap);
 
-	switch ( type ) {
-	case LIBBALSA_INFORMATION_MESSAGE:
-		gtk_idle_add ((GtkFunction)libbalsa_message_idle_handler, msg);
-		break;
-	case LIBBALSA_INFORMATION_WARNING:
-		gtk_idle_add ((GtkFunction)libbalsa_warning_idle_handler, msg);
-		break;
-	case LIBBALSA_INFORMATION_ERROR:
-		gtk_idle_add ((GtkFunction)libbalsa_error_idle_handler, msg);
-		break;
-	case LIBBALSA_INFORMATION_DEBUG:
-		gtk_idle_add ((GtkFunction)libbalsa_debug_idle_handler, msg);
-		break;
-	default:
-		g_assert_not_reached();
-	}
+    switch (type) {
+    case LIBBALSA_INFORMATION_MESSAGE:
+	gtk_idle_add((GtkFunction) libbalsa_message_idle_handler, msg);
+	break;
+    case LIBBALSA_INFORMATION_WARNING:
+	gtk_idle_add((GtkFunction) libbalsa_warning_idle_handler, msg);
+	break;
+    case LIBBALSA_INFORMATION_ERROR:
+	gtk_idle_add((GtkFunction) libbalsa_error_idle_handler, msg);
+	break;
+    case LIBBALSA_INFORMATION_DEBUG:
+	gtk_idle_add((GtkFunction) libbalsa_debug_idle_handler, msg);
+	break;
+    default:
+	g_assert_not_reached();
+    }
 }
 
 void
 libbalsa_information(LibBalsaInformationType type, const char *fmt, ...)
 {
-	va_list va_args;
+    va_list va_args;
 
-	va_start(va_args, fmt);
-	libbalsa_information_varg(type, fmt, va_args);
-	va_end(va_args);
+    va_start(va_args, fmt);
+    libbalsa_information_varg(type, fmt, va_args);
+    va_end(va_args);
 }
 
 /*
  * These are all idle handlers, so we need to grab the GDK lock 
  */
 static gboolean
-libbalsa_message_idle_handler(gchar *msg)
+libbalsa_message_idle_handler(gchar * msg)
 {
-	gdk_threads_enter();
-	libbalsa_real_information_func(LIBBALSA_INFORMATION_MESSAGE, msg);
-	gdk_threads_leave();
+    gdk_threads_enter();
+    libbalsa_real_information_func(LIBBALSA_INFORMATION_MESSAGE, msg);
+    gdk_threads_leave();
 
-	g_free(msg);
-	return FALSE;
+    g_free(msg);
+    return FALSE;
 }
-static gboolean
-libbalsa_warning_idle_handler(gchar *msg)
-{
-	gdk_threads_enter();
-	libbalsa_real_information_func(LIBBALSA_INFORMATION_WARNING, msg);
-	gdk_threads_leave();
 
-	g_free(msg);
-	return FALSE;
+static gboolean
+libbalsa_warning_idle_handler(gchar * msg)
+{
+    gdk_threads_enter();
+    libbalsa_real_information_func(LIBBALSA_INFORMATION_WARNING, msg);
+    gdk_threads_leave();
+
+    g_free(msg);
+    return FALSE;
 }
-static gboolean
-libbalsa_error_idle_handler(gchar *msg)
-{
-	gdk_threads_enter();
-	libbalsa_real_information_func(LIBBALSA_INFORMATION_ERROR, msg);
-	gdk_threads_leave();
 
-	g_free(msg);
-	return FALSE;
+static gboolean
+libbalsa_error_idle_handler(gchar * msg)
+{
+    gdk_threads_enter();
+    libbalsa_real_information_func(LIBBALSA_INFORMATION_ERROR, msg);
+    gdk_threads_leave();
+
+    g_free(msg);
+    return FALSE;
 }
-static gboolean
-libbalsa_debug_idle_handler(gchar *msg)
-{
-	gdk_threads_enter();
-	libbalsa_real_information_func(LIBBALSA_INFORMATION_DEBUG, msg);
-	gdk_threads_leave();
 
-	g_free(msg);
-	return FALSE;
+static gboolean
+libbalsa_debug_idle_handler(gchar * msg)
+{
+    gdk_threads_enter();
+    libbalsa_real_information_func(LIBBALSA_INFORMATION_DEBUG, msg);
+    gdk_threads_leave();
+
+    g_free(msg);
+    return FALSE;
 }

@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -25,15 +25,13 @@
 
 #include "files.h"
 
-static const gchar *permanent_prefixes[] =
-{
+static const gchar *permanent_prefixes[] = {
 /*	BALSA_DATA_PREFIX,
 	BALSA_STD_PREFIX,
 	GNOME_DATA_PREFIX
 	GNOME_STD_PREFIX,
 	GNOME_LIB_PREFIX,*/
-	BALSA_COMMON_PREFIXES
-	NULL
+    BALSA_COMMON_PREFIXES NULL
 };
 
 /* filename is the filename (naw!)
@@ -42,39 +40,49 @@ static const gchar *permanent_prefixes[] =
  *   tried.
  * We ignore proper slashing of names. Ie, /prefix//splice//file won't be caught.
  */
-gchar *balsa_file_finder( const gchar *filename, const gchar *splice, const gchar **prefixes )
+gchar *
+balsa_file_finder(const gchar * filename, const gchar * splice,
+		  const gchar ** prefixes)
 {
-	gchar *cat;
-	int i;
-	
-	g_return_val_if_fail( filename, NULL );
+    gchar *cat;
+    int i;
 
-	if( splice == NULL )
-		splice = "";
+    g_return_val_if_fail(filename, NULL);
 
-	for( i = 0; permanent_prefixes[i]; i++ ) {
-		cat = g_strconcat( permanent_prefixes[i], PATH_SEP_STR, splice, PATH_SEP_STR, filename, NULL );
-		
-		if( g_file_exists( cat ) )
-			return cat;
+    if (splice == NULL)
+	splice = "";
 
-		g_free( cat );
-	}
+    for (i = 0; permanent_prefixes[i]; i++) {
+	cat =
+	    g_strconcat(permanent_prefixes[i], PATH_SEP_STR, splice,
+			PATH_SEP_STR, filename, NULL);
 
-	if( prefixes == NULL ) {
-		g_warning( "Cannot find expected file \"%s\" (spliced with \"%s\") with no extra prefixes", filename, splice );
-		return NULL;
-	}
+	if (g_file_exists(cat))
+	    return cat;
 
-	for( i = 0; prefixes[i]; i++ ) {
-		cat = g_strconcat( prefixes[i], PATH_SEP_STR, splice, PATH_SEP_STR, filename, NULL );
-		
-		if( g_file_exists( cat ) )
-			return cat;
+	g_free(cat);
+    }
 
-		g_free( cat );
-	}
-
-	g_warning( "Cannot find expected file \"%s\" (spliced with \"%s\") even with extra prefixes", filename, splice );
+    if (prefixes == NULL) {
+	g_warning
+	    ("Cannot find expected file \"%s\" (spliced with \"%s\") with no extra prefixes",
+	     filename, splice);
 	return NULL;
+    }
+
+    for (i = 0; prefixes[i]; i++) {
+	cat =
+	    g_strconcat(prefixes[i], PATH_SEP_STR, splice, PATH_SEP_STR,
+			filename, NULL);
+
+	if (g_file_exists(cat))
+	    return cat;
+
+	g_free(cat);
+    }
+
+    g_warning
+	("Cannot find expected file \"%s\" (spliced with \"%s\") even with extra prefixes",
+	 filename, splice);
+    return NULL;
 }

@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -29,33 +29,32 @@
 #define LIBBALSA_IS_MAILBOX_IMAP(obj)		(GTK_CHECK_TYPE (obj, LIBBALSA_TYPE_MAILBOX_IMAP))
 #define LIBBALSA_IS_MAILBOX_IMAP_CLASS(klass)	(GTK_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_MAILBOX_IMAP))
 
-GtkType libbalsa_mailbox_imap_get_type (void);
+GtkType libbalsa_mailbox_imap_get_type(void);
 
 typedef struct _LibBalsaMailboxImap LibBalsaMailboxImap;
 typedef struct _LibBalsaMailboxImapClass LibBalsaMailboxImapClass;
 
 enum _ImapAuthType {
-	AuthLogin,
-	AuthCram,
-	AuthGSS
+    AuthLogin,
+    AuthCram,
+    AuthGSS
 };
 typedef enum _ImapAuthType ImapAuthType;
 
-struct _LibBalsaMailboxImap
-{
-	LibBalsaMailboxRemote mailbox;
+struct _LibBalsaMailboxImap {
+    LibBalsaMailboxRemote mailbox;
 
-	gchar *path;                  /* Imap path {host:port}mailbox */
-	ImapAuthType auth_type;       /* accepted authentication type */
+    gchar *path;		/* Imap path {host:port}mailbox */
+    ImapAuthType auth_type;	/* accepted authentication type */
 };
 
-struct _LibBalsaMailboxImapClass
-{
-	LibBalsaMailboxRemoteClass klass;
+struct _LibBalsaMailboxImapClass {
+    LibBalsaMailboxRemoteClass klass;
 };
 
 GtkObject *libbalsa_mailbox_imap_new(void);
 
-void libbalsa_mailbox_imap_set_path(LibBalsaMailboxImap *mailbox, gchar *path);
+void libbalsa_mailbox_imap_set_path(LibBalsaMailboxImap * mailbox,
+				    gchar * path);
 
-#endif /* __LIBBALSA_MAILBOX_IMAP_H__ */
+#endif				/* __LIBBALSA_MAILBOX_IMAP_H__ */

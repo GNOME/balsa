@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -27,7 +27,7 @@
 #ifndef __LIBBALSA_PRIVATE_H__
 #define __LIBBALSA_PRIVATE_H__
 
-LibBalsaAddress* libbalsa_address_new_from_libmutt(ADDRESS *caddr);
+LibBalsaAddress *libbalsa_address_new_from_libmutt(ADDRESS * caddr);
 
 
 #ifdef BALSA_USE_THREADS
@@ -63,7 +63,7 @@ do {\
       usleep( 250 );\
     }\
   } while ( 1 )
-  
+
 #define LOCK_MAILBOX_RETURN_VAL(mailbox, val)\
 do {\
   pthread_mutex_lock( &mailbox_lock );\
@@ -118,7 +118,7 @@ do {\
 #define UNLOCK_MAILBOX(mailbox)          mailbox->lock = FALSE;
 
 #endif
-  
+
 #define CLIENT_CONTEXT(mailbox)          ((CONTEXT*)mailbox->context)
 #define CLIENT_CONTEXT_OPEN(mailbox)     (CLIENT_CONTEXT (mailbox) != NULL)
 #define CLIENT_CONTEXT_CLOSED(mailbox)   (CLIENT_CONTEXT (mailbox) == NULL)
@@ -141,4 +141,4 @@ do {\
     }\
 } while (0)
 
-#endif /* __LIBBALSA_PRIVATE_H__ */
+#endif				/* __LIBBALSA_PRIVATE_H__ */

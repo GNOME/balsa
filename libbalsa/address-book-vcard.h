@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -36,23 +36,23 @@
 #define LIBBALSA_IS_ADDRESS_BOOK_VCARD_CLASS(klass)	(GTK_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_ADDRESS_BOOK_VCARD))
 
 typedef struct _LibBalsaAddressBookVcard LibBalsaAddressBookVcard;
-typedef struct _LibBalsaAddressBookVcardClass LibBalsaAddressBookVcardClass;
+typedef struct _LibBalsaAddressBookVcardClass
+    LibBalsaAddressBookVcardClass;
 
-struct _LibBalsaAddressBookVcard
-{
-	LibBalsaAddressBook parent;
+struct _LibBalsaAddressBookVcard {
+    LibBalsaAddressBook parent;
 
-	gchar *path;
+    gchar *path;
 };
 
-struct _LibBalsaAddressBookVcardClass
-{
-	LibBalsaAddressBookClass parent_class;
+struct _LibBalsaAddressBookVcardClass {
+    LibBalsaAddressBookClass parent_class;
 };
 
 GtkType libbalsa_address_book_vcard_get_type(void);
 
-LibBalsaAddressBook *libbalsa_address_book_vcard_new(const gchar *name, const gchar *path);
+LibBalsaAddressBook *libbalsa_address_book_vcard_new(const gchar * name,
+						     const gchar * path);
 
 
 #endif

@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -36,38 +36,41 @@
 typedef struct _LibBalsaAddressBook LibBalsaAddressBook;
 typedef struct _LibBalsaAddressBookClass LibBalsaAddressBookClass;
 
-struct _LibBalsaAddressBook
-{
-	GtkObject parent;
+struct _LibBalsaAddressBook {
+    GtkObject parent;
 
-	/* The gnome_config prefix where we save this address book */
-	gchar *config_prefix;
+    /* The gnome_config prefix where we save this address book */
+    gchar *config_prefix;
 
-	gchar *name;
-	gboolean expand_aliases;
+    gchar *name;
+    gboolean expand_aliases;
 
-	GList *address_list;
+    GList *address_list;
 };
 
-struct _LibBalsaAddressBookClass
-{
-	GtkObjectClass parent;
+struct _LibBalsaAddressBookClass {
+    GtkObjectClass parent;
 
-	void (*load)		(LibBalsaAddressBook *ab);
-	void (*store_address)	(LibBalsaAddressBook *ab, LibBalsaAddress *address);
+    void (*load) (LibBalsaAddressBook * ab);
+    void (*store_address) (LibBalsaAddressBook * ab,
+			   LibBalsaAddress * address);
 
-	void (*save_config)     (LibBalsaAddressBook *ab, const gchar *prefix);
-	void (*load_config)     (LibBalsaAddressBook *ab, const gchar *prefix);
+    void (*save_config) (LibBalsaAddressBook * ab, const gchar * prefix);
+    void (*load_config) (LibBalsaAddressBook * ab, const gchar * prefix);
 };
 
 GtkType libbalsa_address_book_get_type(void);
 
-LibBalsaAddressBook* libbalsa_address_book_new_from_config(const gchar* prefix);
+LibBalsaAddressBook *libbalsa_address_book_new_from_config(const gchar *
+							   prefix);
 
-void libbalsa_address_book_load(LibBalsaAddressBook *ab);
-void libbalsa_address_book_store_address(LibBalsaAddressBook *ab, LibBalsaAddress *address);
+void libbalsa_address_book_load(LibBalsaAddressBook * ab);
+void libbalsa_address_book_store_address(LibBalsaAddressBook * ab,
+					 LibBalsaAddress * address);
 
-void libbalsa_address_book_save_config(LibBalsaAddressBook *ab, const gchar *prefix);
-void libbalsa_address_book_load_config(LibBalsaAddressBook *ab, const gchar *prefix);
+void libbalsa_address_book_save_config(LibBalsaAddressBook * ab,
+				       const gchar * prefix);
+void libbalsa_address_book_load_config(LibBalsaAddressBook * ab,
+				       const gchar * prefix);
 
 #endif

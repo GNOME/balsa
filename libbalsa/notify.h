@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -24,16 +24,16 @@
 #define __LIBBALSA_NOTIFY_H__
 
 /* Initialize the notification system */
-void libbalsa_notify_init (void);
+void libbalsa_notify_init(void);
 
 /* Add a mailbox to the notification system */
-void libbalsa_notify_register_mailbox (LibBalsaMailbox *mailbox);
-void libbalsa_notify_unregister_mailbox (LibBalsaMailbox *mailbox);
+void libbalsa_notify_register_mailbox(LibBalsaMailbox * mailbox);
+void libbalsa_notify_unregister_mailbox(LibBalsaMailbox * mailbox);
 
 /* Call libbalsa_notify_start_check before checking each mailbox */
-void libbalsa_notify_start_check (void);
+void libbalsa_notify_start_check(void);
 
 /* Used by the mailboxes. */
-gint libbalsa_notify_check_mailbox (LibBalsaMailbox *mailbox);
+gint libbalsa_notify_check_mailbox(LibBalsaMailbox * mailbox);
 
-#endif /* __LIBBALSA_NOTIFY_H__ */
+#endif				/* __LIBBALSA_NOTIFY_H__ */

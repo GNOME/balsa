@@ -382,11 +382,11 @@ libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd)
     g_free(mime_type);
 
     buf = libbalsa_mailbox_get_message_part(body->message, body, &len);
-    if (buf) {
-	if (len > 0
-	    && g_mime_stream_write(stream, (char *) buf, len) == -1)
+    if (len > 0) {
+	if (g_mime_stream_write(stream, (char *) buf, len) == -1)
 	    retval = FALSE;
-    } else {
+    } else if (len < 0) {
+	/* Not a GMimePart... */
 	if (body->mime_part != NULL
 	    && g_mime_object_write_to_stream(body->mime_part, stream) == -1)
 	    retval = FALSE;

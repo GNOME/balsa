@@ -1,0 +1,146 @@
+<!doctype article PUBLIC "-//Davenport//DTD DocBook V3.1//EN" []>
+
+<article id="balsa">
+
+  <artheader>
+    <title>Balsa Documentation</title>
+    <author>
+      <firstname>Peter</firstname>
+      <surname>Williams</surname>
+      
+      <affiliation>
+	<address>
+          <email>peter@newton.cx</email>
+        </address>
+      </affiliation>
+    </author>
+
+    <pubdate>19 December 1999</pubdate>
+
+    <abstract>
+      <para>Balsa is a graphical mail client. While it is still in 
+      active development, Balsa has many features such as: IMAP and
+      POP3 support; sendmail or direct SMTP support; optional 
+      multithreaded retrieval and sending of messages; support for all
+      configurations of local mail folders; automatic mail checking;
+      mail printing; inline attachment viewing; and the proverbial
+      much, much more.
+      </para>
+    </abstract>
+  </artheader>
+
+  <sect1 id="introduction">
+    <title>Introduction</title>
+
+    <para>Balsa is a graphical mail client similar to Eudora on
+    Windows. It supports the standard features of any good reader and
+    has new features added continually.</para>
+
+    <para>Balsa is written using GTK+ and Gnome. It is based on libmutt,
+    the backend code to Mutt, but expands far beyond being a graphical
+    Mutt. Balsa supports: IMAP and POP3 accounts; sending mail via 
+    sendmail or direct SMTP; optional multithreaded mail retrieval and
+    sending; support for all configurations of local mail folders; 
+    automatic mail checking; mail printing; inline attachment viewing;
+    and the proverbial much, much more.</para>
+
+    <para>If you want to learn more about Balsa, your best bet is the
+    mailling list <email>balsa-list@gnome.org</email>, which can be 
+    subscribed to by sending a message with a subject of subscribe to
+    <email>balsa-list-request@gnome.org</email>. Bugs can be reported
+    via <application>bug-buddy</application>, <application>gnome-bug
+    </application> or to <email>submit@bugs.gnome.org</email>.</para>
+  </sect1>
+
+  <sect1 id="getting-started">
+    <title>Getting Started with Balsa</title>
+
+    <para>If you're starting Balsa for the first time, the first thing
+    you'll see is a druid that will set up Balsa's basic settings. Balsa
+    can guess most of what it needs to know about you. It will also 
+    create five standard local mailboxes: the Inbox, Outbox, Sentbox, Draftbox,
+    and Trash. (These can be changed to be IMAP or POP3 mailboxes 
+    later.)</para>
+
+    <para>There are many more settings in Balsa's 
+    <link linkend="deadend">preferences window</link>, but most of
+    them do not need to be changed.</para>
+
+    <para>Once Balsa is configured, you will proceed on to the 
+    <link linkend="win-main">main window</link>.</para>
+  </sect1>
+
+  <sect1 id="win-main">
+    <title>The Main Window</title>
+
+    <para>Balsa's main window has three major areas. To the left is the
+    mailbox list. This displays all the mailboxes Balsa knows about; it will
+    scan for ones in your local mail directory. (This means Balsa works well
+    with <application>procmail</application>.) It will also list IMAP or
+    POP3 mailboxes that you have configured.</para>
+
+    <para>At the top-right is a notebook view of all the currently open
+    mailboxes. You can browse messages, manipulate them, and switch between
+    open mailboxes here.</para>
+
+    <para>At the bottom-right of Balsa's main window is the message view. This
+    displays the message selected in the message listing. You can save attachments,
+    view attachments, and read incoming email here.</para>
+
+    <sect2 id="subwin-mblist">
+       <title>The Mailbox List</title>
+
+       <para>The mailbox list in the main window lists all of your mailboxes.
+       Balsa will automatically detect your local mailboxes by searching
+       for mailboxes under your local mail directory (probably ~/mail). This
+       lets Balsa coexist with <application>pine</application> and
+       <application>procmail</application> well.</para>
+  
+       <para>Your mailboxes will be displayed as a tree view, with mailboxes
+       in subdirectories of your local mail directory initially hidden but
+       accessible by expanding the tree. POP3 and IMAP mailboxes will also
+       be displayed as being at the top level of the tree.</para>
+    </sect2>
+  </sect1>
+
+  <sect1 id="common-tasks">
+    <title>Common Tasks with Balsa</title>
+
+    <para>This section explains many of the things you might want to do
+    with Balsa.</para>
+
+    <itemizedlist mark="bullet">
+       <listitem><para><link linkend="ct-create-new-mb">Creating new mailboxes</link>
+       </para></listitem>
+    </itemizedlist>
+
+    <sect2 id="ct-create-new-mb">
+      <title>Creating New Mailboxes</title>
+
+      <para>You can create new local and IMAP mailboxes by right-clicking in
+      the mailbox list and selecting New Mailbox. This will start a dialog that
+      will let you name the mailbox and specify its location.</para>
+
+      <para>To create a new POP3 mailbox, go to the configuration dialog, select
+      the Mailboxes section, and click Add in the POP3 area. A dialog will be
+      displayed that will let you set up the new mailbox. (Note: under Sawmill, this
+      dialog may be obscured, causing the appearance that Balsa has locked up. Move
+      the configuration dialog and see if the new dialog was hidden.) The mailbox
+      may not appear in the list immediately, or in the current session of Balsa at
+      all, but it exists. Yes, this is a bug.</para>
+    </sect2>
+  </sect1>
+
+  <sect1 id="deadend">
+    <title>Unfinished Documentation</title>
+    <para>This is a reference to something that doesn't exist yet. Oops.</para>
+  </sect1>
+
+  <glossary>
+    <glossentry>
+      <glossterm>mailbox list</glossterm>
+      <glossdef><para>The list of mailboxes found in Balsa's lefthand pane.</para></glossdef>
+    </glossentry>
+  </glossary>
+</article>
+

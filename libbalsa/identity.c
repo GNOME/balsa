@@ -542,15 +542,15 @@ identity_list_update(GtkCList* clist)
         }
 #else
         {
-            /* FIXME: nasty hack! */
-            GtkWidget *tmp =
-                gtk_image_new_from_stock(ident == *default_id ?
-                                         GNOME_STOCK_MENU_FORWARD :
-                                         GNOME_STOCK_MENU_BLANK,
-                                         GTK_ICON_SIZE_BUTTON);
-
-            gtk_image_get_pixmap(GTK_IMAGE(tmp), &pixmap, &bitmap);
-            gtk_widget_destroy(tmp);
+            GdkPixbuf *pixbuf =
+                gtk_widget_render_icon(GTK_WIDGET(clist),
+                                       ident == *default_id ?
+                                       GNOME_STOCK_MENU_FORWARD :
+                                       GNOME_STOCK_MENU_BLANK,
+                                       GTK_ICON_SIZE_BUTTON,
+                                       "Balsa");
+            gdk_pixbuf_render_pixmap_and_mask(pixbuf, &pixmap, &bitmap, 1);
+            gdk_pixbuf_unref(pixbuf);
             gtk_clist_set_pixmap(clist, i, 0, pixmap, bitmap);
         }
 #endif                          /* BALSA_MAJOR < 2 */

@@ -1,3 +1,18 @@
+2002-03-17  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-app.[hc]: add a convenience function
+	balsa_stock_hbox_with_label(), and use it in
+	balsa_stock_button_with_label().
+	* src/balsa-message.c: leave a destroyed BalsaMessage in a sane
+	state. Use new api for gtkhtml.
+	* src/balsa-index.c: use balsa_stock_hbox_with_label().
+	* src/toolbar-prefs.c: fix broken code for getting the pixmap and
+	mask for a stock icon, adding a wrapper to cut down on the #if's.
+	* libbalsa/identity.c: fix broken code for getting the pixmap and
+	bitmap for a stock icon.
+	* src/sendmsg-window.c: connect the "changed" signal to the
+	correct object.
+	
 2002-03-14  Pawel Salek <pawsa@theochem.kth.se>
 
 	* configure.in: gtkhtml support restored.

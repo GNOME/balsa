@@ -2744,8 +2744,9 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     msg->delete_sig_id = 
 	gtk_signal_connect(GTK_OBJECT(balsa_app.main_window), "delete-event",
 			   (GtkSignalFunc)delete_event_cb, msg);
-    gtk_signal_connect(GTK_OBJECT(msg->text), "changed",
-		       (GtkSignalFunc)text_changed, msg);
+    g_signal_connect(G_OBJECT
+                     (gtk_text_view_get_buffer(GTK_TEXT_VIEW(msg->text))),
+                     "changed", G_CALLBACK(text_changed), msg);
     return msg;
 }
 

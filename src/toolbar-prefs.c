@@ -108,6 +108,8 @@ static void get_toolbar_data(BalsaToolbarType toolbar);
 static void apply_toolbar_prefs(GtkWidget *widget, gpointer data);
 static void wrap_toggled_cb(GtkWidget *widget, gpointer data);
 static void page_active_cb(GtkWidget *widget, GdkEvent *event, gpointer data);
+static void clist_set_pixmap_from_stock(GtkCList * clist, gint row,
+                                        const gchar * stock_id);
 
 static void
 page_active_cb(GtkWidget *widget, GdkEvent *event, gpointer data)
@@ -264,7 +266,6 @@ recreate_preview(BalsaToolbarType toolbar, gboolean preview_only)
     char *text, *wrap;
     char *list_data[2];
     int row;
-    GdkPixmap *pixmap, *mask;
     
     list_data[0] = list_data[1] = NULL;
     bar=GTK_TOOLBAR(toolbar_pages[toolbar].preview);
@@ -306,31 +307,15 @@ recreate_preview(BalsaToolbarType toolbar, gboolean preview_only)
 
 	    toolbar_items[toolbar][i].widget=btn;
 	    if(!preview_only) {
-#if BALSA_MAJOR < 2
-#else
-                /* FIXME: nasty hack! */
-                GtkWidget *tmp =
-                    gtk_image_new_from_stock(toolbar_buttons[index].pixmap_id,
-                                             GTK_ICON_SIZE_BUTTON);
-#endif                          /* BALSA_MAJOR < 2 */
-
 		row=gtk_clist_append(
 		    GTK_CLIST(toolbar_pages[toolbar].destination),
 		    list_data);
 		gtk_clist_set_text(
 		    GTK_CLIST(toolbar_pages[toolbar].destination),
 		    row, 1, text);
-#if BALSA_MAJOR < 2
-		gnome_stock_pixmap_gdk(toolbar_buttons[index].pixmap_id,
-				       GNOME_STOCK_PIXMAP_REGULAR,
-				       &pixmap, &mask);
-#else
-                gtk_image_get_pixmap(GTK_IMAGE(tmp), &pixmap, &mask);
-                gtk_widget_destroy(tmp);
-#endif                          /* BALSA_MAJOR < 2 */
-		gtk_clist_set_pixmap(
+		clist_set_pixmap_from_stock(
 		    GTK_CLIST(toolbar_pages[toolbar].destination),
-		    row, 0, pixmap, mask);
+		    row, toolbar_buttons[index].pixmap_id);
 	    }
 	    g_free(text);
         } else {
@@ -576,8 +561,6 @@ static void
 populate_list(GtkWidget *list, int toolbar)
 {
     int i, j, row;
-    GdkPixmap *pixmap;
-    GdkPixmap *mask;
     char *tmp[2];
     char *text, *wrap;
     char **legal;
@@ -609,20 +592,8 @@ populate_list(GtkWidget *list, int toolbar)
 	tmp[1]=NULL;
 	row=gtk_clist_append(GTK_CLIST(list), tmp);
 	if(*(toolbar_buttons[i].pixmap_id)) {
-#if BALSA_MAJOR < 2
-	    gnome_stock_pixmap_gdk(toolbar_buttons[i].pixmap_id,
-				   GNOME_STOCK_PIXMAP_REGULAR,
-				   &pixmap, &mask);
-#else
-            /* FIXME: nasty hack! */
-            GtkWidget *tmp =
-                gtk_image_new_from_stock(toolbar_buttons[i].pixmap_id,
-                                         GTK_ICON_SIZE_BUTTON);
-            gtk_image_get_pixmap(GTK_IMAGE(tmp), &pixmap, &mask);
-            gtk_widget_destroy(tmp);
-#endif                          /* BALSA_MAJOR < 2 */
-
-	    gtk_clist_set_pixmap(GTK_CLIST(list), row, 0, pixmap, mask);
+	    clist_set_pixmap_from_stock(GTK_CLIST(list), row,
+                                        toolbar_buttons[i].pixmap_id);
 	}
 	text = wrap = g_strdup(_(toolbar_buttons[i].button_text));
 	while(*wrap) {
@@ -914,4 +885,24 @@ create_toolbar_page(BalsaToolbarType toolbar)
     recreate_preview(toolbar, FALSE);
 
     return outer_box;
+}
+
+static void
+clist_set_pixmap_from_stock(GtkCList * clist, gint row,
+                            const gchar * stock_id)
+{
+    GdkPixmap *pixmap, *mask;
+
+#if BALSA_MAJOR < 2
+    gnome_stock_pixmap_gdk(stock_buttons[i].pixmap_id,
+                           GNOME_STOCK_PIXMAP_REGULAR, &pixmap, &mask);
+#else
+    GdkPixbuf *pixbuf =
+        gtk_widget_render_icon(GTK_WIDGET(clist), stock_id,
+                               GTK_ICON_SIZE_BUTTON, "Balsa");
+
+    gdk_pixbuf_render_pixmap_and_mask(pixbuf, &pixmap, &mask, 1);
+    gdk_pixbuf_unref(pixbuf);
+#endif                          /* BALSA_MAJOR < 2 */
+    gtk_clist_set_pixmap(clist, row, 0, pixmap, mask);
 }

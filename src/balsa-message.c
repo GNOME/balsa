@@ -41,7 +41,7 @@
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
 #ifdef HAVE_GTKHTML
-#include <gtkhtml/gtkhtml.h>
+#include <libgtkhtml/gtkhtml.h>
 #endif
 
 #ifdef HAVE_PCRE
@@ -133,7 +133,7 @@ static void scroll_change(GtkAdjustment * adj, gint diff);
 static void balsa_gtk_html_size_request(GtkWidget * widget,
 					GtkRequisition * requisition,
 					gpointer data);
-static void balsa_gtk_html_link_clicked(GtkWidget *html, 
+static void balsa_gtk_html_link_clicked(GObject * obj, 
 					const gchar *url);
 #endif
 #if defined(TEXT_URL_HANDLING_CODE) || defined(HAVE_GTKHTML)
@@ -279,8 +279,11 @@ static void
 balsa_message_destroy(GtkObject * object)
 {
     BalsaMessage* bm = BALSA_MESSAGE(object);
-    balsa_message_set(bm, NULL);
-    gtk_widget_destroy(bm->part_list);
+    if (bm->part_list) {
+        balsa_message_set(bm, NULL);
+        gtk_widget_destroy(bm->part_list);
+        bm->part_list = NULL;
+    }
 
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
 	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
@@ -1903,26 +1906,28 @@ static void
 part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info, gchar * ptr,
 		    size_t len)
 {
-    GtkHTMLStream *stream;
     GtkWidget *html, *scroll;
+    HtmlDocument *document;
 
     scroll = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
 				   GTK_POLICY_NEVER, GTK_POLICY_NEVER);
 
-    html = gtk_html_new();
+    html = html_view_new();
+    document = html_document_new();
+    html_view_set_document(HTML_VIEW(html), document);
 
-    stream = gtk_html_begin(GTK_HTML(html));
-    gtk_html_write(GTK_HTML(html), stream, ptr, len);
-    gtk_html_end(GTK_HTML(html), stream, GTK_HTML_STREAM_OK);
-    gtk_html_set_editable(GTK_HTML(html), FALSE);
+    html_document_open_stream(document, "text/html");
+    html_document_write_stream(document, ptr, len);
+    html_document_close_stream (document);
+    /* gtk_html_set_editable(GTK_HTML(html), FALSE); */
 
     gtk_signal_connect(GTK_OBJECT(html), "size_request",
 		       (GtkSignalFunc) balsa_gtk_html_size_request,
 		       (gpointer) bm);
-    gtk_signal_connect(GTK_OBJECT(html), "link_clicked",
-		       GTK_SIGNAL_FUNC(balsa_gtk_html_link_clicked),
-		       bm);
+    g_signal_connect(G_OBJECT(document), "link_clicked",
+		     G_CALLBACK(balsa_gtk_html_link_clicked),
+		     NULL);
     gtk_signal_connect(GTK_OBJECT(html), "on_url",
 		       GTK_SIGNAL_FUNC(balsa_gtk_html_on_url),
 		       bm);
@@ -2719,7 +2724,7 @@ balsa_gtk_html_size_request(GtkWidget * widget,
 			    GtkRequisition * requisition, gpointer data)
 {
     g_return_if_fail(widget != NULL);
-    g_return_if_fail(GTK_IS_HTML(widget));
+    g_return_if_fail(HTML_IS_VIEW(widget));
     g_return_if_fail(requisition != NULL);
 
     requisition->width  = -(widget->style->xthickness + 1) * 2;
@@ -2731,9 +2736,12 @@ balsa_gtk_html_size_request(GtkWidget * widget,
 }
 
 static void
-balsa_gtk_html_link_clicked(GtkWidget *html, const gchar *url)
+balsa_gtk_html_link_clicked(GObject *obj, const gchar *url)
 {
     GError *err = NULL;
+
+    g_return_if_fail(HTML_IS_DOCUMENT(obj));
+
     gnome_url_show(url, &err);
     if (err) {
         g_print(_("Error showing %s: %s\n"), url, err->message);

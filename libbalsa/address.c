@@ -163,6 +163,10 @@ libbalsa_address_new_from_libmutt(ADDRESS * caddr)
 
     address = libbalsa_address_new();
 
+    /* it will be owned by the caller */
+    gtk_object_ref(GTK_OBJECT(address));
+    gtk_object_sink(GTK_OBJECT(address));
+
     address->full_name = g_strdup(caddr->personal);
     if (caddr->mailbox)
 	address->address_list = g_list_append(address->address_list,

@@ -17,7 +17,8 @@ config.status
 config.sub
 configure
 gmon.out
-intl
+intl/*
+intltool-*
 libtool
 ltconfig
 ltmain.sh

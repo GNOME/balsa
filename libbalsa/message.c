@@ -140,9 +140,6 @@ libbalsa_message_finalize(GObject * object)
 
     message = LIBBALSA_MESSAGE(object);
 
-    if (message->mailbox)
-	libbalsa_mailbox_release_message(message->mailbox, message);
-
     libbalsa_message_headers_destroy(message->headers);
     message->headers = NULL;
 
@@ -179,6 +176,11 @@ libbalsa_message_finalize(GObject * object)
 
     libbalsa_message_body_free(message->body_list);
     message->body_list = NULL;
+
+    if (message->mime_msg) {
+	g_mime_object_unref(GMIME_OBJECT(message->mime_msg));
+	message->mime_msg = NULL;
+    }
 
     g_list_free(message->references_for_threading);
     message->references_for_threading=NULL;

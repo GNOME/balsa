@@ -246,7 +246,7 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
 #ifdef BALSA_USE_THREADS
 	threadmsg = malloc( sizeof( MailThreadMessage ) );
 	threadmsg->message_type = MSGMAILTHREAD_UPDATECONFIG;
-	threadmsg->mailbox = mailbox;
+	threadmsg->mailbox = (void *) mailbox;
 	/*  MAILBOX_POP3(mailbox)->mailbox.name */
         write( mail_thread_pipes[1], (void *) &threadmsg, sizeof(void *) );
 #else

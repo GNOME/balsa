@@ -156,6 +156,8 @@ void
 mblist_open_mailbox (Mailbox * mailbox)
 {
   //  IndexChild *index_child;
+  GtkWidget *page;
+  int i;
 
   if (!mblw)
     return;
@@ -165,8 +167,26 @@ mblist_open_mailbox (Mailbox * mailbox)
      a window?
    */
   if( mailbox->open_ref ) {
-      /*Don't bother with an error message.*/
-      return;
+    i = 0;
+    /* This code is borrowed from the mailbox delete code:          *
+     * We need a consistent way of associating the page widget      *
+     * with the actual mailbox. --David                             */
+    while( TRUE ) {
+	/* This is the scrolled window. */
+	page = gtk_notebook_get_nth_page( GTK_NOTEBOOK( balsa_app.notebook ), i );
+	if( page == NULL ) {
+	    g_warning( "Can't find mailbox \"%s\" in notebook!", mailbox->name );
+	    return;
+	}
+	page = gtk_object_get_data( GTK_OBJECT( page ), "indexpage" );
+	if( (BALSA_INDEX_PAGE( page ))->mailbox == mailbox )
+	  {
+	    gtk_notebook_set_page(GTK_NOTEBOOK(balsa_app.notebook),i);
+	    return;
+	  }
+	i++;
+    }
+    return;
   }
 
   balsa_window_open_mailbox(BALSA_WINDOW(mblw->window), mailbox);

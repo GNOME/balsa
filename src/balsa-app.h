@@ -134,6 +134,7 @@ extern struct BalsaApplication
 
   /* appbar */
   GnomeAppBar* appbar;
+  GtkWidget* notebook;
   
 }
 balsa_app;

@@ -1,3 +1,22 @@
+/* Balsa E-Mail Client
+ * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option) 
+ * any later version.
+ *  
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * GNU General Public License for more details.
+ *  
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
+ * 02111-1307, USA.
+ */
+
 #ifndef __THREADS_H__
 #define __THREADS_H__
 
@@ -21,7 +40,7 @@ typedef struct
 {
   int message_type;
   char message_string[160];
-  int *mailbox; /*  Mailbox *  */
+  void *mailbox; /*  Mailbox *  */
 } MailThreadMessage;
   
 #define  MSGMAILTHREAD( message, type, string) \
@@ -30,12 +49,14 @@ typedef struct
   memcpy( message->message_string, string, strlen(string) + 1 ); \
   write( mail_thread_pipes[1], (void *) &message, sizeof(void *) );
 
-#define  MSGMAILTHREAD_SOURCE           0x0001
-#define  MSGMAILTHREAD_MSGINFO          0x0002
-#define  MSGMAILTHREAD_UPDATECONFIG     0x0003
-#define	 MSGMAILTHREAD_ERROR            0x0004
-#define  MSGMAILTHREAD_LOAD             0x0005
-#define  MSGMAILTHREAD_FINISHED         0x0006
+enum {
+  MSGMAILTHREAD_SOURCE,
+  MSGMAILTHREAD_MSGINFO,
+  MSGMAILTHREAD_UPDATECONFIG,
+  MSGMAILTHREAD_ERROR,
+  MSGMAILTHREAD_LOAD,
+  MSGMAILTHREAD_FINISHED
+};
 
 typedef struct
 {
@@ -53,9 +74,11 @@ typedef struct
   t_message->mbox = s_mbox; \
   write( send_thread_pipes[1], (void *) &t_message, sizeof(void *) );
 
-#define  MSGSENDTHREADERROR             0x0001
-#define  MSGSENDTHREADPOSTPONE          0x0002
-#define  MSGSENDTHREADLOAD              0x0003
+enum {
+  MSGSENDTHREADERROR,
+  MSGSENDTHREADPOSTPONE,
+  MSGSENDTHREADLOAD
+};
 
 #endif /* __THREADS_H__ */
 

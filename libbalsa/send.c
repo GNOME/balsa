@@ -53,7 +53,7 @@
 typedef struct
 {
   HEADER *message;
-  int *next_message;
+  void *next_message;
   Mailbox *fcc;
   char tempfile[_POSIX_PATH_MAX];
 } MessageQueueItem;
@@ -151,7 +151,7 @@ balsa_send_message (Message * message)
   if( sending_mail )
     {
       /* add to the queue of messages waiting to be sent */
-      last_message->next_message = new_message;
+      last_message->next_message = (void *) new_message;
       last_message = new_message;
       new_message->next_message = NULL;
       pthread_mutex_unlock( &send_messages_lock );
@@ -278,7 +278,7 @@ void balsa_send_thread(MessageQueueItem *first_message)
 			       current_message->fcc ); 
 
       pthread_mutex_lock( &send_messages_lock );
-      next_message = current_message->next_message;
+      next_message = (MessageQueueItem *) current_message->next_message;
       free( current_message );
       current_message = next_message;
     } while( current_message );
@@ -602,7 +602,7 @@ int balsa_smtp_send (HEADER *msg, char *tempfile, char *server)
   if ((balsa_smtp_protocol ( s, tempfile, msg)) == 0 )
   {
      error = 1;
-     snprintf (buffer, 512, "RSET\r\n", server);
+     snprintf (buffer, 512, "RSET %s\r\n", server);
      write (s, buffer, strlen (buffer));
      if (smtp_answer (s) == 0)
         return -1;

@@ -74,6 +74,7 @@ enum {
   GtkWidget *progress_dialog_message = NULL;
 
 extern void load_messages (Mailbox * mailbox, gint emit);
+extern void config_mailbox_update(Mailbox * mailbox, char * name);
 
 void progress_dialog_destroy_cb ( GtkWidget *, gpointer data);
 #endif
@@ -454,6 +455,8 @@ balsa_window_new ()
   gtk_notebook_set_show_border(GTK_NOTEBOOK(window->notebook), FALSE);
   gtk_signal_connect( GTK_OBJECT(window->notebook), "size_allocate", 
 		      GTK_SIGNAL_FUNC(notebook_size_alloc_cb), NULL );
+  balsa_app.notebook=window->notebook;
+
   /* this call will set window->preview */
   preview = balsa_window_create_preview_pane(window);
 
@@ -837,7 +840,7 @@ mail_progress_notify_cb( )
 {
     MailThreadMessage *threadmessage;
     MailThreadMessage **currentpos;
-    char *msgbuffer;
+    void *msgbuffer;
     uint count;
 
     msgbuffer = malloc( 2049 );
@@ -851,7 +854,7 @@ mail_progress_notify_cb( )
 	return TRUE;
       }
 
-    currentpos = msgbuffer;
+    currentpos = (MailThreadMessage *) msgbuffer;
 
     while( count ) 
       {
@@ -942,7 +945,7 @@ send_progress_notify_cb( )
 {
     SendThreadMessage *threadmessage;
     SendThreadMessage **currentpos;
-    char *msgbuffer;
+    void *msgbuffer;
     uint count;
 
     msgbuffer = malloc( 2049 );
@@ -956,7 +959,7 @@ send_progress_notify_cb( )
 	return TRUE;
       }
 
-    currentpos = msgbuffer;
+    currentpos = (SendThreadMessage *) msgbuffer;
 
     while( count ) 
       {

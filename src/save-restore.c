@@ -570,8 +570,8 @@ config_global_load(void)
 #warning 'default_quoted_color' array needs to be updated
 #endif
 	gchar *default_quoted_color[6] = {
-	    "rgb:0000/8000/8000", "rgb:8000/0000/0000", "rgb:0000/8000/0000",
-	    "rgb:0000/0000/8000", "rgb:8000/8000/0000", "rgb:8000/0000/8000"};
+	    "#088", "#800", "#080",
+	    "#008", "#880", "#808"};
 	for(i=0;i<MAX_QUOTED_COLOR;i++) {
 	    gchar *text = g_strdup_printf("QuotedColor%d=%s", i, i<6 ?
 			  default_quoted_color[i] : DEFAULT_QUOTED_COLOR);
@@ -1277,9 +1277,8 @@ save_color(gchar * key, GdkColor * color)
 {
     gchar *str;
 
-    str =
-	g_strdup_printf("rgb:%04x/%04x/%04x", color->red, color->green,
-			color->blue);
+    str = g_strdup_printf("#%04x%04x%04x", color->red, color->green,
+                          color->blue);
     gnome_config_set_string(key, str);
     g_free(str);
 }

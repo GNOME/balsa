@@ -66,18 +66,18 @@
 #define INFO_FIELD_LENGTH 10
 
 /* Default colour for mailboxes with unread messages */
-#define MBLIST_UNREAD_COLOR "rgb:FFFF/0000/0000"
+#define MBLIST_UNREAD_COLOR "dark green"
 
 /*
  * Default colour for quoted text
  * oh no, I used the US spelling.
  */
 #define MAX_QUOTED_COLOR 6
-#define DEFAULT_QUOTED_COLOR "rgb:0000/5000/5000"
+#define DEFAULT_QUOTED_COLOR "#055"
 #define DEFAULT_QUOTE_REGEX  "^(([ \tA-Z])\1*[|>:}#])"
 
-#define DEFAULT_URL_COLOR    "rgb:A000/0000/0000"
-#define DEFAULT_BAD_ADDRESS_COLOR    "rgb:8000/8000/0000"
+#define DEFAULT_URL_COLOR    "dark blue"
+#define DEFAULT_BAD_ADDRESS_COLOR    "red"
 
 #define MAILBOX_MANAGER_WIDTH 350
 #define MAILBOX_MANAGER_HEIGHT 400

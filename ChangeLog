@@ -1,3 +1,14 @@
+2002-04-03  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-message.c: color quoted lines; handle urls in
+	text/plain messages.
+	* src/balsa-app.h: change specifications for default colors.
+	* src/balsa-mblist.c: use Pango to set a bold font; clean up
+	unread_mailbox_color code; balsa_widget_get_bold_font() is
+	obsolete.
+	* src/save-restore.c: change specifications for default colors.
+	* src/sendmsg-window.c: allocate bad_address_color.
+
 2002-03-27  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/balsa-message.c:

@@ -613,6 +613,8 @@ destroy_event_cb(GtkWidget * widget, gpointer data)
 static void
 balsa_sendmsg_destroy_handler(BalsaSendmsg * bsm)
 {
+    gboolean quit_on_close;
+
     g_assert(bsm != NULL);
     g_assert(ELEMENTS(headerDescs) == ELEMENTS(bsm->view_checkitems));
 
@@ -632,20 +634,17 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsm)
     gtk_widget_destroy(bsm->window);
     g_list_free(bsm->spell_check_disable_list);
     if (bsm->bad_address_style)
-        gtk_style_unref(bsm->bad_address_style);
+        g_object_unref(G_OBJECT(bsm->bad_address_style));
+    quit_on_close = bsm->quit_on_close;
 
     g_free(bsm);
 
-
+    if (quit_on_close) {
 #ifdef BALSA_USE_THREADS
-    if (bsm->quit_on_close) {
         libbalsa_wait_for_sending_thread(-1);
+#endif
 	gtk_main_quit();
     }
-#else
-    if (bsm->quit_on_close)
-	gtk_main_quit();
-#endif
     if(balsa_app.debug) g_message("balsa_sendmsg_destroy(): Stop.");
 }
 
@@ -1784,10 +1783,18 @@ create_email_entry(GtkWidget * table, const gchar * label, int y_pos,
 
     if (!smw->bad_address_style) {
         /* set up the style for flagging bad/incomplete addresses */
+        GdkColor color = balsa_app.bad_address_color;
+
         smw->bad_address_style =
             gtk_style_copy(gtk_widget_get_style(GTK_WIDGET(arr[0])));
-        smw->bad_address_style->fg[GTK_STATE_NORMAL] =
-            balsa_app.bad_address_color;
+
+        if (gdk_colormap_alloc_color(balsa_app.colormap, &color, FALSE, TRUE)) {
+            smw->bad_address_style->fg[GTK_STATE_NORMAL] = color;
+        } else {
+            fprintf(stderr, "Couldn't allocate bad address color!\n");
+            fprintf(stderr, " red: %04x; green: %04x; blue: %04x.\n",
+               color.red, color.green, color.blue);
+        }
     }
 
     /* populate the info structure: */

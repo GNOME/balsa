@@ -98,7 +98,9 @@ static void balsa_mblist_update_node_style(GtkCTree * ctree,
 
 static void balsa_mblist_folder_style(GtkCTree * ctree,
 				      GtkCTreeNode * node, gpointer data);
+#if BALSA_MAJOR < 2
 static GdkFont *balsa_widget_get_bold_font(GtkWidget * widget); 
+#endif                          /* BALSA_MAJOR < 2 */
 static void balsa_mblist_set_style(BalsaMBList * mblist);
 static gint balsa_mblist_core_mailbox(LibBalsaMailbox* mailbox);
 static gint balsa_mblist_row_compare(GtkCList * clist, gconstpointer ptr1,
@@ -853,7 +855,9 @@ static void
 balsa_mblist_set_style(BalsaMBList * mblist)
 {
     GdkColor color;
+#if BALSA_MAJOR < 2
     GdkFont *font;
+#endif                          /* BALSA_MAJOR < 2 */
     GtkStyle *style;
 
     g_return_if_fail(mblist);
@@ -862,35 +866,32 @@ balsa_mblist_set_style(BalsaMBList * mblist)
     style = gtk_style_copy(gtk_widget_get_style(GTK_WIDGET(mblist)));
 
     /* Attempt to set the font to bold */
-    font = balsa_widget_get_bold_font(GTK_WIDGET(mblist));
 #if BALSA_MAJOR < 2
+    font = balsa_widget_get_bold_font(GTK_WIDGET(mblist));
     gdk_font_unref(style->font);
     style->font = font;		/*Now refed in get_bold_font */
 #else
-    gtk_style_set_font(style, font);
+    pango_font_description_set_weight(style->font_desc,
+                                      PANGO_WEIGHT_BOLD);
 #endif                          /* BALSA_MAJOR < 2 */
 
     /* Get and attempt to allocate the colour */
     color = balsa_app.mblist_unread_color;
 
-    /* colormap = gdk_window_get_colormap (GTK_WIDGET (&balsa_app.main_window->window)->window); */
-    if (!gdk_colormap_alloc_color(balsa_app.colormap, &color, FALSE, TRUE)
-        || color.pixel == 0) {
-	fprintf(stderr,
-		"Couldn't allocate colour for unread mailboxes!\n");
-        printf(" red: %d; green: %d; blue: %d.\n", color.red, color.green, color.blue);
-	gdk_color_black(balsa_app.colormap, &color);
+    if (gdk_colormap_alloc_color(balsa_app.colormap, &color, FALSE, TRUE)) {
+        /* Just put it in the normal state for now */
+        style->fg[GTK_STATE_NORMAL] = color;
+    } else {
+        fprintf(stderr,
+                "Couldn't allocate colour for unread mailboxes!\n");
+        fprintf(stderr, " red: %04x; green: %04x; blue: %04x.\n", color.red,
+                color.green, color.blue);
     }
-
-    /* Just put it in the normal state for now */
-#if 0
-    style->fg[GTK_STATE_NORMAL] = color;
-#endif
 
     /* Unref the old style (if it's already been set, and point to the
      * new style */
     if (mblist->unread_mailbox_style != NULL)
-	gtk_style_unref(mblist->unread_mailbox_style);
+        g_object_unref(G_OBJECT(mblist->unread_mailbox_style));
     mblist->unread_mailbox_style = style;
 }
 
@@ -1418,6 +1419,8 @@ mblist_remove_mailbox_node(BalsaMBList *mblist, BalsaMailboxNode* mbnode)
 
     return node != NULL;
 }
+
+#if BALSA_MAJOR < 2
 /* balsa_widget_get_bold_font [MBG]
  * 
  * Description: This function takes a widget and returns a bold
@@ -1433,7 +1436,6 @@ balsa_widget_get_bold_font(GtkWidget * widget)
     gchar **temp_xlfd;
     GdkFont *font;
     GtkStyle *style;
-#if BALSA_MAJOR < 2
     GSList *list;
     gint i = 0;
 
@@ -1446,22 +1448,6 @@ balsa_widget_get_bold_font(GtkWidget * widget)
 
     /* Split the XLFD into it's components */
     temp_xlfd = g_strsplit(old_xlfd, "-", 14);
-#else
-    gchar *tmp;
-    gint i = 0;
-
-    style = gtk_widget_get_style(widget);
-    font = gtk_style_get_font(style);
-
-    /* Get the current font XLFD */
-    old_xlfd = g_strdup(pango_font_description_get_family(style->font_desc));
-    if ((tmp = strchr(old_xlfd, ',')))
-                *tmp = '\0';
-
-    /* Split the XLFD into it's components */
-    temp_xlfd = g_strsplit(old_xlfd, "-", 14);
-    g_free(old_xlfd);
-#endif                          /* BALSA_MAJOR < 2 */
     while (i < 4 && temp_xlfd[i])
 	i++;
     if (i > 3) {
@@ -1483,16 +1469,13 @@ balsa_widget_get_bold_font(GtkWidget * widget)
 	font = gdk_font_load(old_xlfd);
 
 	if (font == NULL)
-#if BALSA_MAJOR < 2
 	    font = style->font;
-#else
-	    font = gtk_style_get_font(style);
-#endif                          /* BALSA_MAJOR < 2 */
     }
 
     gdk_font_ref(font);
     return font;
 }
+#endif                          /* BALSA_MAJOR < 2 */
 
 static void
 balsa_mblist_unread_messages_changed_cb(LibBalsaMailbox * mailbox,

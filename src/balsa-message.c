@@ -136,9 +136,7 @@ static void balsa_gtk_html_size_request(GtkWidget * widget,
 static void balsa_gtk_html_link_clicked(GObject * obj, 
 					const gchar *url);
 #endif
-#if defined(TEXT_URL_HANDLING_CODE) || defined(HAVE_GTKHTML)
 static void balsa_gtk_html_on_url(GtkWidget *html, const gchar *url);
-#endif
 static void balsa_icon_list_size_request(GtkWidget * widget,
 					 GtkRequisition * requisition,
 					 gpointer data);
@@ -184,6 +182,7 @@ static void send_mdn_reply (GtkWidget *widget, gpointer user_data);
 static BalsaPartInfo* part_info_new(LibBalsaMessageBody* body,
 				    LibBalsaMessage* msg);
 static void part_info_free(BalsaPartInfo* info);
+static GtkTextTag * quote_tag(GtkTextBuffer * buffer, gint level);
 
 guint balsa_message_get_type()
 {
@@ -1229,15 +1228,12 @@ reflow_string(gchar * str, gint mode, gint * cur_pos, int width)
 }
 
 typedef struct _message_url_t {
-    guint line, start, end;      /* text line and pos in the line */
+    gint start, end;             /* pos in the buffer */
     gchar *url;                  /* the link */
     gboolean is_mailto;          /* open sendmsg window or external URL call */
 } message_url_t;
 
-typedef struct _hotarea_t {
-    gint xul, yul, xlr, ylr;     /* positions within the text widget */
-    message_url_t *url;          /* the link */
-} hotarea_t;
+static void handle_url(const message_url_t* url);
 
 #define LINE_WRAP_ROOM           8      /* from gtk_text... */
 #define DEFAULT_TAB_STOP_WIDTH   8      /* chars per tab */
@@ -1249,10 +1245,8 @@ static const char *url_str = "(((https?|ftps?|nntp)://)|(mailto:|news:))(%[0-9A-
 #endif
 
 /* the cursors which are displayed over URL's and normal message text */
-#if defined(TEXT_URL_HANDLING_CODE) || defined(USE_GTKHTML)
 static GdkCursor *url_cursor_normal = NULL;
 static GdkCursor *url_cursor_over_url = NULL;
-#endif
 
 static void
 free_url_list(GList *l)
@@ -1271,21 +1265,6 @@ free_url_list(GList *l)
     }
 }
 
-static void
-free_hotarea_list(GList *l)
-{
-    if (l) {
-	GList *p = l;
-
-	while (p) {
-	    g_free(p->data);
-	    p = g_list_next(p);
-	}
-	g_list_free(l);
-    }
-}
-
-#ifdef TEXT_URL_HANDLING_CODE
 /* prescanner: 
  * used to find candidates for lines containing URL's.
  * Empirially, this approach is faster (by factor of 8) than scanning
@@ -1339,23 +1318,24 @@ prescanner(const gchar *s)
 
 /* do a gtk_text_insert, but mark URL's with balsa_app.url_color */
 static void
-gtk_text_insert_with_url(GtkTextView *text, GdkFont *font, GdkColor *dflt, 
-			 const char *chars, regex_t *url_reg,
-			 GList **url_list, gint textline)
+insert_with_url(GtkTextBuffer * buffer, GtkTextIter * insert,
+                GtkTextTag * quote_tag, const char *chars,
+                regex_t *url_reg, GList **url_list, gint textline)
 {
-    GtkTextBuffer *buffer = gtk_text_view_get_buffer(text);
-    GtkTextIter insert;
     GtkTextTagTable *table = gtk_text_buffer_get_tag_table(buffer);
-    GtkTextTag *url_tag = gtk_text_tag_table_lookup(table, "url-tag");
+    GtkTextTag *url_tag = gtk_text_tag_table_lookup(table, "url");
     gint match, offset = 0;
     regmatch_t url_match;
     gchar *p, *buf;
 
-    if (!url_tag)
-        url_tag = gtk_text_buffer_create_tag(buffer, "url-tag",
+    if (!url_tag) {
+        GdkColor color = balsa_app.url_color;
+        gdk_colormap_alloc_color(balsa_app.colormap, &color, FALSE, TRUE);
+        url_tag = gtk_text_buffer_create_tag(buffer, "url",
                                              "foreground-gdk", 
-                                             balsa_app.url_color,
+                                             &color,
                                              NULL);
+    }
 
     /* replace tabs with the correct number of spaces */
     if (strchr(chars,'\t')) { 
@@ -1377,8 +1357,6 @@ gtk_text_insert_with_url(GtkTextView *text, GdkFont *font, GdkColor *dflt,
     } else
 	buf = p = g_strdup(chars);
 
-    gtk_text_buffer_get_iter_at_mark(buffer, &insert, 
-                                     gtk_text_buffer_get_insert(buffer));
     if (prescanner(p)) {
 	match = regexec(url_reg, p, 1, &url_match, 0);
 	while (!match) {
@@ -1387,20 +1365,21 @@ gtk_text_insert_with_url(GtkTextView *text, GdkFont *font, GdkColor *dflt,
 	    
 	    if (url_match.rm_so) {
 		buf = g_strndup(p, url_match.rm_so);
-                gtk_text_buffer_insert(buffer, &insert, buf, -1); 
+                gtk_text_buffer_insert_with_tags(buffer, insert,
+                                                 buf, -1,
+                                                 quote_tag, NULL); 
 		g_free(buf);
 	    }
 	    
 	    buf = g_strndup(p + url_match.rm_so, 
 			    url_match.rm_eo - url_match.rm_so);
-            gtk_text_buffer_insert_with_tags(buffer, &insert, buf, -1,
-                                             url_tag, NULL);
-	    
 	    /* remember the URL and its position within the text */
 	    url_found = g_malloc(sizeof(message_url_t));
-	    url_found->line = textline;
-	    url_found->start = url_match.rm_so + offset;
-	    url_found->end = url_match.rm_eo + offset;
+            url_found->start = gtk_text_iter_get_offset(insert);
+            gtk_text_buffer_insert_with_tags(buffer, insert, buf, -1,
+                                             url_tag, NULL);
+            url_found->end = gtk_text_iter_get_offset(insert);
+	    
 	    url_found->url = buf;  /* gets freed later... */
 	    url_found->is_mailto = (tolower(*buf) == 'm');
 	    *url_list = g_list_append(*url_list, url_found);
@@ -1415,7 +1394,8 @@ gtk_text_insert_with_url(GtkTextView *text, GdkFont *font, GdkColor *dflt,
     }
 
     if (*p)
-        gtk_text_buffer_insert(buffer, &insert, p, -1);
+        gtk_text_buffer_insert_with_tags(buffer, insert, p, -1,
+                                         quote_tag, NULL);
     g_free(buf);
 }
 
@@ -1438,163 +1418,33 @@ fix_text_widget(GtkWidget *widget, gpointer data)
     return FALSE;
 }
 
-static void
-calc_text_end(const gchar *buf, gint *xpos, gint *linepos, GdkFont *fnt,
-	      gint winwidth, gboolean is_last, GList **hotarea_list,
-	      message_url_t *ref)
-{
-    gint width, rmargin;
-    hotarea_t *new_area;
-
-    rmargin = winwidth - LINE_WRAP_ROOM;
-    gdk_string_extents(fnt, buf, NULL, NULL, &width, NULL, NULL);
-
-    if (*xpos + width > rmargin) {
-	gchar *rempart, *p;
-	rempart = p = g_strdup(buf);
-	
-	while (*xpos + width > rmargin) {
-	    gchar *test;
-	    gint n;
-
-	    test = g_strdup(rempart);
-	    n = strlen(rempart);
-	    do {
-		n--;
-		test [n] = 0;
-		gdk_string_extents(fnt, test, NULL, NULL, &width, NULL, NULL);
-	    } while (n && *xpos + width > winwidth - LINE_WRAP_ROOM);
-	    g_free(test);
-	    rempart += n;
-	    
-	    if (ref) {
-		/* save this area */
-		new_area = g_malloc(sizeof(hotarea_t));
-		new_area->xul = *xpos;
-		new_area->yul = *linepos;
-		new_area->xlr = *xpos + width;
-		new_area->ylr = *linepos + fnt->ascent + fnt->descent;
-		new_area->url = ref;
-		*hotarea_list = g_list_append(*hotarea_list, new_area);
-	    }
-	    *xpos = 0;
-	    *linepos += fnt->ascent + fnt->descent;
-	    gdk_string_extents(fnt, rempart, NULL, NULL, &width, NULL, NULL);
-	}
-	g_free(p);
-    } 
-
-    if (ref) {
-	/* save this area */
-	new_area = g_malloc(sizeof(hotarea_t));
-	new_area->xul = *xpos;
-	new_area->yul = *linepos;
-	new_area->xlr = *xpos + width;
-	new_area->ylr = *linepos + fnt->ascent + fnt->descent;
-	new_area->url = ref;
-	*hotarea_list = g_list_append(*hotarea_list, new_area);
-    }
-    *xpos += width;
-}
-
-/* Upon text (re)draw, collect the URL positions and types in pixel coords */
-static gboolean
-mail_text_draw(GtkWidget *widget, GdkRectangle *area, gpointer data)
-{
-    GtkTextBuffer *buffer =
-        gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
-    GtkTextIter start, end;
-    guint winwidth, linepos, textline;
-    gchar **l = NULL, **lines = NULL, *buf;
-    GdkFont *fnt = (GdkFont *)data;
-    GList *hotarea_list = 
-	(GList *)gtk_object_get_data(GTK_OBJECT(widget), "hotarea-list");
-    GList *url_list = 
-	(GList *)gtk_object_get_data(GTK_OBJECT(widget), "url-list");
-    GdkWindow *window;
-
-    g_return_val_if_fail(url_list, FALSE); /* this should not happen... */
-
-    gtk_object_set_data(GTK_OBJECT(widget), "hotarea-list", NULL);
-    free_hotarea_list(hotarea_list);
-    hotarea_list = NULL;
-    
-    window = gtk_text_view_get_window(GTK_TEXT_VIEW(widget),
-                                      GTK_TEXT_WINDOW_TEXT);
-    gdk_window_get_size(window, &winwidth, NULL);
-    linepos = 0;
-    textline = 0;
-
-    gtk_text_buffer_get_bounds(buffer, &start, &end);
-    buf = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
-    lines = l = g_strsplit(buf, "\n", -1);
-    g_free(buf);
-    
-    for (buf = *lines; buf && url_list; buf = *(++lines), textline++) {
-	gint xpos = 0, last_end = 0;
-	gchar *part;
-
-	/* check if there is an URI (left) in this line */
-	while (url_list && 
-	       ((message_url_t *)url_list->data)->line == textline) {
-	    message_url_t *current_url = (message_url_t *)url_list->data;
-
-	    /* handle text in front of the uri */
-	    part = g_strndup(buf + last_end, current_url->start - last_end);
-	    calc_text_end(part, &xpos, &linepos, fnt, winwidth, FALSE, NULL,
-			  NULL);
-	    g_free(part);
-
-	    /* handle the uri itself */
-	    part = g_strndup(buf + current_url->start, 
-			     current_url->end - current_url->start);
-	    calc_text_end(part, &xpos, &linepos, fnt, winwidth, 
-			  current_url->end == strlen(buf), &hotarea_list, 
-			  current_url);
-	    g_free(part);
-
-	    last_end = current_url->end;
-
-	    url_list = g_list_next(url_list);
-	}
-
-	/* wrap the remaining part of the line */
-	part = g_strdup(buf + last_end);
-	calc_text_end(part, &xpos, &linepos, fnt, winwidth, TRUE, NULL, NULL);
-	g_free(part);
-	linepos += fnt->ascent + fnt->descent;
-    }
-
-    g_strfreev(l);
-
-    gtk_object_set_data(GTK_OBJECT(widget), "hotarea-list", hotarea_list);
-    return FALSE;
-}
-
 /* check if we are over an url and change the cursor in this case */
 static gboolean
-check_over_url(GtkWidget *widget, GdkEvent *event, gpointer data)
+check_over_url(GtkWidget *widget, GdkEventMotion *event, gpointer data)
 {
-    GList *hotarea_list = 
-	(GList *)gtk_object_get_data(GTK_OBJECT(widget), "hotarea-list");
+    GList *url_list = 
+	(GList *)gtk_object_get_data(GTK_OBJECT(widget), "url-list");
     gint x, y;
     GdkModifierType mask;
     static gboolean was_over_url = FALSE;
-    static hotarea_t *current_url = NULL;
+    static message_url_t *current_url = NULL;
     GdkWindow *window;
+    GtkTextIter iter;
+    gint offset;
 
-    if (!hotarea_list)
+    if (!url_list)
 	return FALSE;
 
     window = gtk_text_view_get_window(GTK_TEXT_VIEW(widget),
                                       GTK_TEXT_WINDOW_TEXT);
     gdk_window_get_pointer(window, &x, &y, &mask);
+    gtk_text_view_get_iter_at_location(GTK_TEXT_VIEW(widget), &iter, x, y);
+    offset = gtk_text_iter_get_offset(&iter);
 
-    while (hotarea_list) {
-	hotarea_t *hotarea_data = (hotarea_t *)hotarea_list->data;
+    while (url_list) {
+	message_url_t *url_data = (message_url_t *)url_list->data;
 
-	if (hotarea_data->xul <= x && x <= hotarea_data->xlr &&
-	    hotarea_data->yul <= y && y <= hotarea_data->ylr) {
+	if (url_data->start <= offset && offset < url_data->end) {
 	    if (!url_cursor_normal || !url_cursor_over_url) {
 		url_cursor_normal = gdk_cursor_new(GDK_LEFT_PTR);
 		url_cursor_over_url = gdk_cursor_new(GDK_HAND2);
@@ -1604,15 +1454,15 @@ check_over_url(GtkWidget *widget, GdkEvent *event, gpointer data)
 				      url_cursor_over_url);
 		was_over_url = TRUE;
 	    }
-	    if (hotarea_data != current_url) {
+	    if (url_data != current_url) {
 		if (current_url)
 		    balsa_gtk_html_on_url(NULL, NULL);
-		balsa_gtk_html_on_url(NULL, hotarea_data->url->url);
-		current_url = hotarea_data;
+		balsa_gtk_html_on_url(NULL, url_data->url);
+		current_url = url_data;
 	    }
 	    return FALSE;
 	}
-	hotarea_list = g_list_next(hotarea_list);
+	url_list = g_list_next(url_list);
     }
 
     if (was_over_url) {
@@ -1629,36 +1479,37 @@ check_over_url(GtkWidget *widget, GdkEvent *event, gpointer data)
 static gboolean 
 check_call_url(GtkWidget *widget, GdkEventButton *event, gpointer data)
 {
-    GList *hotarea_list = 
-	(GList *)gtk_object_get_data(GTK_OBJECT(widget), "hotarea-list");
+    GList *url_list = 
+	(GList *)gtk_object_get_data(GTK_OBJECT(widget), "url-list");
     
-    if (!hotarea_list)
+    if (!url_list)
 	return FALSE;
 
     if (event->type == GDK_BUTTON_RELEASE && event->button == 1) {
 	gint x;
 	gint y;
-	GdkModifierType mask;
-        GdkWindow *window =
-            gtk_text_view_get_window(GTK_TEXT_VIEW(widget),
-                                     GTK_TEXT_WINDOW_TEXT);
+        GtkTextIter iter;
+        gint offset;
 	
-	gdk_window_get_pointer(window, &x, &y, &mask);
-	while (hotarea_list) {
-	    hotarea_t *hotarea_data = (hotarea_t *)hotarea_list->data;
+        x = event->x;
+        y = event->y;
+        gtk_text_view_get_iter_at_location(GTK_TEXT_VIEW(widget), &iter, x, y);
+        offset = gtk_text_iter_get_offset(&iter);
 
-	    if (hotarea_data->xul <= x && x <= hotarea_data->xlr &&
-		hotarea_data->yul <= y && y <= hotarea_data->ylr) {
+	while (url_list) {
+	    message_url_t *url_data = (message_url_t *)url_list->data;
 
-		handle_url(hotarea_data->url);
+	    if (url_data->start <= offset && offset < url_data->end) {
+		handle_url(url_data);
 		break;
 	    }
-	    hotarea_list = g_list_next(hotarea_list);
+	    url_list = g_list_next(url_list);
 	}
     }
 
     return FALSE;
 }
+
 static void
 handle_url(const message_url_t* url)
 {
@@ -1683,7 +1534,6 @@ handle_url(const message_url_t* url)
         }
     }
 }
-#endif /* defined(TEXT_URL_HANDLING_CODE) */
 
 /* END OF HELPER FUNCTIONS ----------------------------------------------- */
 
@@ -1743,18 +1593,13 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
     } else {
         GtkWidget *item = NULL;
         GtkTextBuffer *buffer;
-#ifdef TEXT_URL_HANDLING_CODE
-        GdkFont *fnt = NULL;
         regex_t rex;
         GList *url_list = NULL;
-        gint quote_level = 0;
-        gchar **l = NULL, **lines = NULL, *line = NULL;
-#else
         int obuflen, ibuflen;
         char* obuf, *obufp, *ibuf;
         const char*charset;
         iconv_t conv;
-#endif
+
         if (bm->wrap_text) {
             if (balsa_app.recognize_rfc2646_format_flowed
                 && libbalsa_flowed_rfc2646(info->body)) {
@@ -1783,73 +1628,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         gtk_signal_connect(GTK_OBJECT(item), "focus_out_event",
                            (GtkSignalFunc) balsa_message_focus_out_part,
                            (gpointer) bm);
-#ifdef TEXT_URL_HANDLING_CODE
 
-        /* get the widget's default font for those people who did not set up a 
-           custom one */
-        fnt = find_body_font(info->body);
-        if (!fnt)
-            fnt = gdk_fontset_load(balsa_app.message_font);
-        if (!fnt)
-            fnt = gtk_style_get_font(item->style);
-
-        allocate_quote_colors(GTK_WIDGET(bm), balsa_app.quoted_color,
-                              0, MAX_QUOTED_COLOR - 1);
-        /* Grab colour from the Theme.
-           style = gtk_widget_get_style (GTK_WIDGET (bm));
-           color = (GdkColor) style->text[GTK_STATE_PRELIGHT];
-         */
-        if (regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED) != 0) {
-            g_warning
-                ("part_info_init_mimetext: quote regex compilation failed.");
-            gtk_text_buffer_insert_at_cursor(buffer, ptr, -1);
-        } else {
-            gint ypos = 0;
-
-            lines = l = g_strsplit(ptr, "\n", -1);
-            for (line = *lines; line != NULL; line = *(++lines), ypos++) {
-                line = g_strconcat(line, "\n", NULL);
-                quote_level = is_a_quote(line, &rex);
-                if (quote_level != 0) {
-                    /* Modulus the quote level by the max,
-                     * ie, always have "1 <= quote level <= MAX"
-                     * this allows cycling through the possible
-                     * quote colors over again as the quote level
-                     * grows arbitrarily deep. */
-                    quote_level = (quote_level - 1) % MAX_QUOTED_COLOR;
-                    gtk_text_insert_with_url(GTK_TEXT_VIEW(item), fnt,
-                                             &balsa_app.
-                                             quoted_color[quote_level],
-                                             line, url_reg, &url_list,
-                                             ypos);
-                } else
-                    gtk_text_insert_with_url(GTK_TEXT_VIEW(item), fnt,
-                                             NULL, line, url_reg,
-                                             &url_list, ypos);
-                g_free(line);
-            }
-            g_strfreev(l);
-            regfree(&rex);
-        }
-
-        gtk_signal_connect_after(GTK_OBJECT(item), "realize",
-                                 (GtkSignalFunc) fix_text_widget,
-                                 url_list);
-        if (url_list) {
-            gtk_object_set_data(GTK_OBJECT(item), "url-list",
-                                (gpointer) url_list);
-            gtk_object_set_data(GTK_OBJECT(item), "hotarea-list",
-                                (gpointer) NULL);
-            gtk_signal_connect_after(GTK_OBJECT(item),
-                                     "button_release_event",
-                                     (GtkSignalFunc) check_call_url, NULL);
-            gtk_signal_connect(GTK_OBJECT(item), "motion-notify-event",
-                               (GtkSignalFunc) check_over_url, NULL);
-            gtk_signal_connect_after(GTK_OBJECT(item), "draw",
-                                     (GtkSignalFunc) mail_text_draw, fnt);
-        }
-#else
-        /* this should not be an 'else, iconv should be done always. */
         obuflen = alloced * 4 +1;
 	obuf = obufp = g_malloc(obuflen);
         ibuf = ptr;
@@ -1867,9 +1646,51 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 #endif
 	iconv_close(conv);
 	*obuf = '\0';
-        gtk_text_buffer_insert_at_cursor(buffer, obufp, -1); 
+
+        allocate_quote_colors(GTK_WIDGET(bm), balsa_app.quoted_color,
+                              0, MAX_QUOTED_COLOR - 1);
+        if (regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED) != 0) {
+            g_warning
+                ("part_info_init_mimetext: quote regex compilation failed.");
+            gtk_text_buffer_insert_at_cursor(buffer, obufp, -1);
+        } else {
+            GtkTextIter insert;
+            gchar **lines;
+            gchar **l = g_strsplit(obufp, "\n", -1);
+
+            gtk_text_buffer_get_iter_at_mark(buffer, &insert, 
+                                             gtk_text_buffer_get_insert
+                                             (buffer));
+
+            for (lines = l; *lines; ++lines) {
+                gint quote_level = is_a_quote(*lines, &rex);
+                GtkTextTag *tag = quote_tag(buffer, quote_level);
+
+                /* tag is NULL if the line isn't quoted, but it causes
+                 * no harm */
+                insert_with_url(buffer, &insert, tag, *lines, url_reg,
+                                &url_list, lines - l);
+                gtk_text_buffer_insert(buffer, &insert, "\n", 1);
+            }
+            g_strfreev(l);
+            regfree(&rex);
+        }
+
+        gtk_signal_connect_after(GTK_OBJECT(item), "realize",
+                                 (GtkSignalFunc) fix_text_widget,
+                                 url_list);
+        if (url_list) {
+            gtk_object_set_data(GTK_OBJECT(item), "url-list",
+                                (gpointer) url_list);
+            gtk_signal_connect(GTK_OBJECT(item),
+                               "button_release_event",
+                               (GtkSignalFunc) check_call_url, NULL);
+            gtk_signal_connect(GTK_OBJECT(item), "motion-notify-event",
+                               (GtkSignalFunc) check_over_url, NULL);
+        }
+
         g_free(obufp);
-#endif /* TEXT_URL_HANDLING_CODE */
+
         gtk_text_view_set_editable(GTK_TEXT_VIEW(item), FALSE);
 
         gtk_widget_show(item);
@@ -2219,9 +2040,6 @@ part_info_free(BalsaPartInfo* info)
 	widget_list = 
 	    gtk_object_get_data(GTK_OBJECT(info->widget), "url-list");
  	free_url_list(widget_list);
-	widget_list = 
-	    gtk_object_get_data(GTK_OBJECT(info->widget), "hotarea-list");
- 	free_hotarea_list(widget_list);
         /* FIXME: Why unref will not do? */
 	gtk_object_destroy(GTK_OBJECT(info->widget));
     }
@@ -2745,9 +2563,8 @@ balsa_gtk_html_link_clicked(GObject *obj, const gchar *url)
         g_error_free(err);
     }
 }
-#endif
+#endif /* defined HAVE_GTKHTML */
 
-#if defined(TEXT_URL_HANDLING_CODE) || defined(HAVE_GTKHTML)
 static void
 balsa_gtk_html_on_url(GtkWidget *html, const gchar *url)
 {
@@ -2769,7 +2586,6 @@ balsa_gtk_html_on_url(GtkWidget *html, const gchar *url)
 	}
     }
 }
-#endif
 
 static void
 balsa_icon_list_size_request(GtkWidget * widget,
@@ -3140,4 +2956,39 @@ static void send_mdn_reply (GtkWidget *widget, gpointer user_data)
     gtk_object_destroy(GTK_OBJECT(send_msg));
     gtk_widget_hide (dialog);
     gtk_object_destroy(GTK_OBJECT(dialog));
+}
+
+/* quote_tag:
+ * lookup the GtkTextTag for coloring quoted lines of a given level;
+ * create the tag if it isn't found.
+ *
+ * returns NULL if the level is 0 (unquoted)
+ */
+static GtkTextTag *
+quote_tag(GtkTextBuffer * buffer, gint level)
+{
+    GtkTextTag *tag = NULL;
+
+    if (level > 0) {
+        GtkTextTagTable *table = gtk_text_buffer_get_tag_table(buffer);
+        gchar *name;
+
+        /* Modulus the quote level by the max,
+         * ie, always have "1 <= quote level <= MAX"
+         * this allows cycling through the possible
+         * quote colors over again as the quote level
+         * grows arbitrarily deep. */
+        level = (level - 1) % MAX_QUOTED_COLOR;
+        name = g_strdup_printf("quote-%d", level);
+        tag = gtk_text_tag_table_lookup(table, name);
+
+        if (!tag)
+            tag =
+                gtk_text_buffer_create_tag(buffer, name, "foreground-gdk",
+                                           &balsa_app.quoted_color[level],
+                                           NULL);
+        g_free(name);
+    }
+
+    return tag;
 }

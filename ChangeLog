@@ -1,3 +1,7 @@
+2003-10-09 12:09  PeterB
+
+	* src/main-window.c: Add accelerators for zoom in/out.
+
 2003-10-05  Carlos Morgado  <chbm gnome.org>
 
 	* src/sendmsg-window.c (do_insert_string_select_ch): #103639

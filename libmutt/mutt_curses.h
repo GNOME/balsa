@@ -16,6 +16,8 @@
  *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */ 
 
+#ifndef LIBMUTT
+
 #ifdef USE_SLANG_CURSES
 
 #ifndef unix /* this symbol is not defined by the hp-ux compiler (sigh) */
@@ -162,4 +164,6 @@ extern int wmove();
 extern int wclear();
 extern int waddstr();
 extern int wclrtoeol();
+#endif
+
 #endif

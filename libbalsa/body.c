@@ -437,10 +437,19 @@ libbalsa_message_body_is_inline(LibBalsaMessageBody * body)
     else
 	disposition = body->content_dsp;
 
-    return (disposition
-	    && g_ascii_strncasecmp(disposition,
-				   GMIME_DISPOSITION_INLINE,
-				   strlen(GMIME_DISPOSITION_INLINE)) == 0);
+    if (!disposition)
+	/* Default disposition is in-line for text/plain, and generally
+	 * attachment for other content types.  Default content type is
+	 * text/plain except in multipart/digest, where it is
+	 * message/rfc822; in either case, we want to in-line the part.
+	 */
+        return (body->content_type == NULL
+                || g_ascii_strcasecmp(body->content_type,
+                                      "text/plain") == 0);
+
+    return g_ascii_strncasecmp(disposition,
+                               GMIME_DISPOSITION_INLINE,
+                               strlen(GMIME_DISPOSITION_INLINE)) == 0;
 }
 
 /* libbalsa_message_body_is_flowed:

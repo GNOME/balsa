@@ -3448,6 +3448,18 @@ add_body(BalsaMessage *bm, LibBalsaMessageBody *body)
 }
 
 static LibBalsaMessageBody *
+add_multipart_digest(BalsaMessage * bm, LibBalsaMessageBody * body)
+{
+    LibBalsaMessageBody *retval = NULL;
+    /* Add all parts */
+    retval = add_body(bm, body);
+    for (body = body->next; body; body = body->next)
+        add_body(bm, body);
+
+    return retval;
+}
+
+static LibBalsaMessageBody *
 add_multipart_mixed(BalsaMessage * bm, LibBalsaMessageBody * body)
 {
     LibBalsaMessageBody * retval = NULL;
@@ -3496,6 +3508,8 @@ add_multipart(BalsaMessage *bm, LibBalsaMessageBody *body)
     } else if (g_mime_content_type_is_type(type, "multipart", "alternative")) {
             /* Add the most suitable part. */
         body = add_body(bm, preferred_part(body->parts));
+    } else if (g_mime_content_type_is_type(type, "multipart", "digest")) {
+	body = add_multipart_digest(bm, body->parts);
     } else { /* default to multipart/mixed */
 	body = add_multipart_mixed(bm, body->parts);
     }

@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-11-09 10:36+0100\n"
-"PO-Revision-Date: 2004-11-09 14:23+0100\n"
+"POT-Creation-Date: 2004-11-11 10:37+0100\n"
+"PO-Revision-Date: 2004-11-11 15:48+0100\n"
 "Last-Translator: Miloslav Trmac <mitr@volny.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -71,7 +71,7 @@ msgid "Cannot add duplicate entry"
 msgstr "Nelze přidat duplikátní záznam"
 
 #: libbalsa/address-book.c:407 src/main-window.c:2203 src/main-window.c:4191
-#: src/sendmsg-window.c:4159
+#: src/sendmsg-window.c:4180
 msgid "Unknown error"
 msgstr "Neznámá chyba"
 
@@ -261,12 +261,12 @@ msgstr "%s: více klíčů pro %s"
 
 #. should "re" be localized ?
 #: libbalsa/identity.c:92 libbalsa/mailbox_local.c:1111
-#: libbalsa/mailbox_local.c:1113 src/sendmsg-window.c:2709
-#: src/sendmsg-window.c:2710
+#: libbalsa/mailbox_local.c:1113 src/sendmsg-window.c:2711
+#: src/sendmsg-window.c:2712
 msgid "Re:"
 msgstr "Re:"
 
-#: libbalsa/identity.c:93 src/sendmsg-window.c:2739 src/sendmsg-window.c:2740
+#: libbalsa/identity.c:93 src/sendmsg-window.c:2741 src/sendmsg-window.c:2742
 msgid "Fwd:"
 msgstr "Fwd:"
 
@@ -1564,7 +1564,7 @@ msgstr "Nebylo možno vytvořit adresář \"%s\": volání funkce mkdir() selhal
 msgid "The file with pathname \"%s\" is not a directory."
 msgstr "Soubor s cestou \"%s\" není adresář."
 
-#: libinit_balsa/init_balsa.c:35
+#: libinit_balsa/init_balsa.c:42
 msgid "Configure Balsa"
 msgstr "Nastavení Balsy"
 
@@ -1878,27 +1878,27 @@ msgstr "_Přesunout do"
 msgid "_View Source"
 msgstr "Zobrazit zdro_j"
 
-#: src/balsa-index.c:2093
+#: src/balsa-index.c:2095
 #, c-format
 msgid "Failed to copy messages to mailbox \"%s\": %s"
 msgstr "Nemohu zkopírovat zprávy do poštovní schránky \"%s\": %s"
 
-#: src/balsa-index.c:2094
+#: src/balsa-index.c:2096
 #, c-format
 msgid "Failed to copy message to mailbox \"%s\": %s"
 msgstr "Nemohu zkopírovat zprávu do poštovní schránky \"%s\": %s"
 
-#: src/balsa-index.c:2106
+#: src/balsa-index.c:2108
 #, c-format
 msgid "Copied to \"%s\"."
 msgstr "Zkopírováno do \"%s\"."
 
-#: src/balsa-index.c:2107
+#: src/balsa-index.c:2109
 #, c-format
 msgid "Moved to \"%s\"."
 msgstr "Přesunuto do \"%s\"."
 
-#: src/balsa-index.c:2227
+#: src/balsa-index.c:2229
 #, c-format
 msgid "Committing mailbox %s failed."
 msgstr "Potvrzení změn v poštovní schránce %s selhalo."
@@ -1907,23 +1907,23 @@ msgstr "Potvrzení změn v poštovní schránce %s selhalo."
 msgid "Mailbox"
 msgstr "Poštovní schránka"
 
-#: src/balsa-mblist.c:1004 src/balsa-mblist.c:1040
+#: src/balsa-mblist.c:1004 src/balsa-mblist.c:1042
 msgid "Failed to find mailbox"
 msgstr "Nelze nalézt poštovní schránku"
 
-#: src/balsa-mblist.c:1623
+#: src/balsa-mblist.c:1625
 msgid "_Other..."
 msgstr "_Jiné..."
 
-#: src/balsa-mblist.c:1691
+#: src/balsa-mblist.c:1693
 msgid "Choose destination folder"
 msgstr "Vyberte cílovou složku"
 
-#: src/balsa-mblist.c:1893
+#: src/balsa-mblist.c:1895
 msgid "Other..."
 msgstr "Jiné..."
 
-#: src/balsa-mblist.c:2186
+#: src/balsa-mblist.c:2188
 #, c-format
 msgid "Shown mailbox: %s with %d message, "
 msgid_plural "Shown mailbox: %s with %d messages, "
@@ -1933,7 +1933,7 @@ msgstr[2] "Zobrazovaná poštovní schránka: %s s %d zprávami, "
 
 #. xgettext: this is the second part of the message
 #. * "Shown mailbox: %s with %d messages, %ld new".
-#: src/balsa-mblist.c:2192
+#: src/balsa-mblist.c:2194
 #, c-format
 msgid "%ld new"
 msgid_plural "%ld new"
@@ -3812,7 +3812,7 @@ msgstr ""
 "Balsa nyní odesílá zprávu.\n"
 "Přerušit odesílání?"
 
-#: src/main-window.c:1379
+#: src/main-window.c:1379 src/main-window.c:4877
 msgid "Subject or Sender _Contains:"
 msgstr "Předmět nebo odesílatel _obsahuje:"
 
@@ -3946,6 +3946,10 @@ msgstr "Balsa: %s (jen pro čtení)"
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
+
+#: src/main-window.c:4876
+msgid "Subject or Receiver _Contains:"
+msgstr "Předmět nebo příjemce _obsahuje:"
 
 #: src/main.c:217
 msgid "Get new mail on startup"
@@ -4340,7 +4344,7 @@ msgstr "MB"
 msgid "Quoted and Flowed Text"
 msgstr "Citovaný a tekoucí text"
 
-#: src/pref-manager.c:1937 src/sendmsg-window.c:4343
+#: src/pref-manager.c:1937 src/sendmsg-window.c:4364
 msgid "Quoted Text Regular Expression"
 msgstr "Regulární výraz pro citovaný text"
 
@@ -5253,7 +5257,7 @@ msgid "Attach file"
 msgstr "Připojit soubor"
 
 #: src/sendmsg-window.c:1894 src/sendmsg-window.c:1957
-#: src/sendmsg-window.c:3355
+#: src/sendmsg-window.c:3357
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -5314,11 +5318,35 @@ msgstr "Dne %s napsal %s:\n"
 msgid "%s wrote:\n"
 msgstr "%s napsal:\n"
 
-#: src/sendmsg-window.c:3511
+#: src/sendmsg-window.c:2670
+msgid "No signature found!"
+msgstr "Podpis nenalezen!"
+
+#: src/sendmsg-window.c:3475
+#, c-format
+msgid "Error executing signature generator %s"
+msgstr "Chyba při spouštění generátoru podpisů %s"
+
+#: src/sendmsg-window.c:3487
+#, c-format
+msgid "Cannot open signature file '%s' for reading"
+msgstr "Nemohu otevřít soubor s podpisem '%s' pro čtení"
+
+#: src/sendmsg-window.c:3497
+#, c-format
+msgid "Error reading signature from %s"
+msgstr "Chyba při čtení podpisu z %s"
+
+#: src/sendmsg-window.c:3501
+#, c-format
+msgid "Signature in %s is not a UTF-8 text."
+msgstr "Podpis v %s není text v UTF-8."
+
+#: src/sendmsg-window.c:3532
 msgid "Choose charset"
 msgstr "Vyberte znakovou sadu"
 
-#: src/sendmsg-window.c:3518
+#: src/sendmsg-window.c:3539
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file.\n"
@@ -5328,16 +5356,16 @@ msgstr ""
 "Vyberte prosím znakovou sadu, ve které je soubor kódován.\n"
 "(pokud si nejste jisti, vyberte Obecné UTF-8)"
 
-#: src/sendmsg-window.c:3585
+#: src/sendmsg-window.c:3606
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Nelze otevřít soubor %s.\n"
 
-#: src/sendmsg-window.c:3607
+#: src/sendmsg-window.c:3628
 msgid "Include file"
 msgstr "Vložit soubor"
 
-#: src/sendmsg-window.c:3926
+#: src/sendmsg-window.c:3947
 #, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
@@ -5348,7 +5376,7 @@ msgstr ""
 "Vyberte prosím pro tuto zprávu jazyk.\n"
 "Pro vícejazyčné zprávy zvolte UTF-8."
 
-#: src/sendmsg-window.c:3967
+#: src/sendmsg-window.c:3988
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
@@ -5358,70 +5386,70 @@ msgstr ""
 "podepsána a/nebo zašifrována jen první část. Pokud má být chráněna celá "
 "zpráva, měli byste zvolit režim MIME. Chcete opravdu pokračovat?"
 
-#: src/sendmsg-window.c:3983
+#: src/sendmsg-window.c:4004
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "odesílám zprávu s režimem gpg %d"
 
-#: src/sendmsg-window.c:4030
+#: src/sendmsg-window.c:4051
 msgid "Message could not be created"
 msgstr "Zprávu nelze vytvořit"
 
-#: src/sendmsg-window.c:4032
+#: src/sendmsg-window.c:4053
 msgid "Message could not be queued in outbox"
 msgstr "Zprávu nebylo možné zařadit do schránky 'Pošta k odeslání'"
 
-#: src/sendmsg-window.c:4034
+#: src/sendmsg-window.c:4055
 msgid "Message could not be saved in sentbox"
 msgstr "Zprávu nebylo možné uložit mezi odeslané"
 
-#: src/sendmsg-window.c:4036
+#: src/sendmsg-window.c:4057
 msgid "Message could not be sent"
 msgstr "Zprávu nelze odeslat"
 
-#: src/sendmsg-window.c:4040
+#: src/sendmsg-window.c:4061
 #, c-format
 msgid "Send failed: %s"
 msgstr "Odesílání selhalo: %s"
 
-#: src/sendmsg-window.c:4128
+#: src/sendmsg-window.c:4149
 msgid "Could not postpone message."
 msgstr "Nemohu odložit zprávu."
 
-#: src/sendmsg-window.c:4142
+#: src/sendmsg-window.c:4163
 msgid "Message postponed."
 msgstr "Zpráva odložena."
 
-#: src/sendmsg-window.c:4158
+#: src/sendmsg-window.c:4179
 #, c-format
 msgid "Could not open draftbox: %s"
 msgstr "Nemohu otevřít Rozepsanou poštu: %s"
 
-#: src/sendmsg-window.c:4180
+#: src/sendmsg-window.c:4201
 msgid "Message saved."
 msgstr "Zpráva uložena."
 
-#: src/sendmsg-window.c:4342
+#: src/sendmsg-window.c:4363
 #, c-format
 msgid "Could not compile %s"
 msgstr "Nemohu přeložit %s"
 
-#: src/sendmsg-window.c:4852
+#: src/sendmsg-window.c:4873
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Odpověď pro %s: %s"
 
-#: src/sendmsg-window.c:4857
+#: src/sendmsg-window.c:4878
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Přeposlat zprávu pro %s: %s"
 
-#: src/sendmsg-window.c:4861
+#: src/sendmsg-window.c:4882
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Pokračovat v psaní zprávy pro %s: %s"
 
-#: src/sendmsg-window.c:4865
+#: src/sendmsg-window.c:4886
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Nová zpráva pro %s: %s"
@@ -5864,9 +5892,6 @@ msgstr "Dolů"
 #~ msgstr ""
 #~ "Chyba při zápisu do dočasného souboru %s.\n"
 #~ "Ověřte přístupová práva adresáře."
-
-#~ msgid "Cannot open temporary file %s."
-#~ msgstr "Nelze otevřít dočasný soubor %s."
 
 #~ msgid ""
 #~ "SMTP server refused connection.\n"

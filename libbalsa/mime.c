@@ -95,10 +95,13 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
                  * message we're quoting was flowed
                  *
                  * we'll assume it's going to the screen */
-                reply =
-                    libbalsa_process_text_rfc2646(res, G_MAXINT, FALSE, TRUE,
-                                                  reply_prefix_str !=
-                                                  NULL);
+		gboolean delsp = libbalsa_message_body_is_delsp(body);
+
+		reply =
+		    libbalsa_process_text_rfc2646(res, G_MAXINT, FALSE,
+						  TRUE,
+						  reply_prefix_str != NULL,
+						  delsp);
                 g_free(res);
                 break;
             }

@@ -85,7 +85,7 @@ Get the sources from the home page or grab the RPM built on Redhat 7.3:</p>
 <dd>
 <a href="http://www.linuxmafia.org/pcentral/sview.php3?name=balsa">Slackware</a>
 <br>
-<a href="http://www.tvec.net/users/wabbit/">Debian</a> (courtesy of Randall Gibson; experimental)
+<a href="http://packages.debian.org/unstable/mail/balsa.html">official Debian</a> packages (<a href="http://ftp.debian.org/debian/pool/main/b/balsa/">download area</a>).
 </dd>
 </dl>
 
@@ -93,30 +93,36 @@ Get the sources from the home page or grab the RPM built on Redhat 7.3:</p>
 
 <a name="gnome2"></a>
 <dl>
-<dt>GNOME2 release - 2.0.4 - released on 2002.12.24</dt>
+<dt>GNOME2 release - 2.0.5 - released on 2003.01.05</dt>
 <dd>
 <ul>
 <li>
-<a href="http://balsa.gnome.org/balsa-2.0.4.tar.bz2">balsa-2.0.4.tar.bz2</a>
+<a href="http://balsa.gnome.org/balsa-2.0.5.tar.bz2">balsa-2.0.5.tar.bz2</a>
 </li>
 <li>
-<a href="http://balsa.gnome.org/balsa-2.0.4-1.i386.rpm">balsa-2.0.4-1.i386.rpm</a> built on RH 8.0</li>
+<a href="http://balsa.gnome.org/balsa-2.0.5-1.i386.rpm">balsa-2.0.5-1.i386.rpm</a> built on RH 8.0</li>
 <li>
-<a href="http://balsa.gnome.org/balsa-2.0.4-1.src.rpm">balsa-2.0.4 -1.src.rpm</a></li>
+<a href="http://balsa.gnome.org/balsa-2.0.5-1.src.rpm">balsa-2.0.5-1.src.rpm</a></li>
 </dd>
 </dl>
 
-<p>Balsa-2.0.4 is a quite mature GNOME2 port of balsa and has been
+<p>Balsa-2.0.5 is a quite mature GNOME2 port of balsa and has been
 used daily by many people. You may want to recompile balsa on your
 computer if you use different distribution. Try</p>
 
- <pre>rpmbuild --recompile balsa-2.0.4-1.src.rpm</pre>
+ <pre>rpmbuild --recompile balsa-2.0.5-1.src.rpm</pre>
 
 <p><b>Please note</b> also that pspell distributed with RH makes balsa
 hang on <tt>fork()</tt> call, i.e. when any external program is to be forked
 from balsa. The solution is to remove <tt>-lc</tt> from dependency_libs 
 in <tt>/usr/lib/libpspell.la</tt>.
 </p>
+<dl>
+<dt>Independent Packages</dt>
+<dd><a href="http://packages.debian.org/unstable/mail/balsa.html">official
+ Debian</a> packages (<a href="http://ftp.debian.org/debian/pool/main/b/balsa/">download area</a>).
+</dd>
+</dl>
 
 <a name="req"></a>
 <h2 class="heading">Requirements</h2>
@@ -146,10 +152,12 @@ Check out <tt>balsa</tt> module. The CVS version is sometimes not sufficiently
 stable for everyday use it but has all the new features and is the best 
 starting point if you want to hack Balsa.</p>
 
-<p>You will need <tt>pspell-devel</tt> (required) and <tt>gnome-print-devel</tt> 
-(optional) packages for building Balsa.  Also get 
-<tt><a href="http://people.redhat.com/dcm/software.html">gnome-doc-tools</a></tt>
-or install the <tt>png-support-3.?.dtd</tt> and <tt>gdp-both.dsl</tt> files yourself.
+<p>You will need <tt>pspell-devel</tt> (required) and
+<tt>gnome-print-devel</tt> (optional) packages for building Balsa.
+Also get <tt><a
+href="http://people.redhat.com/dcm/software.html">gnome-doc-tools</a></tt>
+or install the <tt>png-support-3.?.dtd</tt> and <tt>gdp-both.dsl</tt>
+files yourself.
 
 Most likely, it will be necessary to add to your
 <tt>/etc/sgml/docbook.cat</tt> (or whatever catalog file your db2html
@@ -162,9 +170,6 @@ Also, make sure your have <samp>libtool</samp> installed.</p>
 make sure your SGML catalog file contains paths to relevant
 packages. The frequent error is to omit PNG support files which
 results in seemingly unrelated errors.</p>
-
-<p>Note that <tt>gob</tt> is <em>not</em> any longer required to compile
-CVS source.</p>
 
 <ul>
 <li><a href="cvs-help.html">Detailed build instructions</a></li>

@@ -620,7 +620,7 @@ free_messages (Mailbox * mailbox)
   GList *list;
   Message *message;
 
-  list = mailbox->message_list;
+  list = g_list_first(mailbox->message_list);
   while (list)
     {
       message = list->data;

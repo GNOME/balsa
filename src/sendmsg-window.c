@@ -3778,6 +3778,32 @@ bsmsg_identities_changed_cb(BalsaSendmsg *bsmsg)
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_IDENTITY,
                                        g_list_length(balsa_app.identities)>1);
 }
+
+static void
+sw_cc_add_list(GString * cc, InternetAddressList * list)
+{
+    for (; list; list = list->next) {
+        InternetAddress *ia;
+
+        if ((ia = list->address)) {
+            GList *ident;
+            gchar *tmp;
+
+            /* do not insert any of my identities into the cc: list */
+            for (ident = balsa_app.identities; ident; ident = ident->next)
+                if (libbalsa_ia_rfc2821_equal
+                    (ia, LIBBALSA_IDENTITY(ident->data)->ia))
+                    break;
+            if (!ident && (tmp = internet_address_to_string(ia, FALSE))) {
+                if (cc->len > 0)
+                    g_string_append(cc, ", ");
+                g_string_append(cc, tmp);
+                g_free(tmp);
+            }
+        }
+    }
+}
+
 BalsaSendmsg *
 sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 		   SendType type)
@@ -3942,33 +3968,12 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     }
 
     if (type == SEND_REPLY_ALL) {
-	InternetAddressList *addr_lists[2] =
-	    { message->headers->to_list, message->headers->cc_list };
 	GString *new_cc = g_string_new("");
-	gint n;
 
-	for (n = 0; n < 2; n++) {
-	    InternetAddressList *this_list = addr_lists[n];
+	sw_cc_add_list(new_cc, message->headers->to_list);
+	sw_cc_add_list(new_cc, message->headers->cc_list);
 
-	    while (this_list) {
-		InternetAddress *addr = this_list->address;
-
-		/* do not insert my current identity into the cc: list */
-		if (addr &&
-		    !libbalsa_ia_rfc2821_equal(addr, bsmsg->ident->ia)) {
-		    if ((tmp = internet_address_to_string (addr, FALSE))) {
-			if (new_cc->len > 0)
-			    g_string_append(new_cc, ", ");
-			new_cc = g_string_append(new_cc, tmp);
-			g_free(tmp);
-		    }
-		}
-		this_list = this_list->next;
-	    }
-	}
-	 
-	tmp = new_cc->str;
-	g_string_free(new_cc, FALSE);
+	tmp = g_string_free(new_cc, FALSE);
 	libbalsa_utf8_sanitize(&tmp, balsa_app.convert_unknown_8bit,
 			       NULL);
 	gtk_entry_set_text(GTK_ENTRY(bsmsg->cc[1]), tmp);

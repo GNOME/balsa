@@ -73,8 +73,8 @@ AM_HDR_SIGSET
 dnl ORBit support
 AC_CHECK_PROG(ORBIT_CONFIG, orbit-config, orbit-config)
 if test -n "$ORBIT_CONFIG"; then
-	ORBIT_LIBS="`orbit-config --libs client server`"
-	ORBIT_CFLAGS="`orbit-config --cflags client server`"
+	ORBIT_LIBS="`orbit-config --libs client server --use-service=name`"
+	ORBIT_CFLAGS="`orbit-config --cflags client server --use-service=name`"
 fi
 AC_SUBST(ORBIT_CFLAGS)
 AC_SUBST(ORBIT_LIBS)

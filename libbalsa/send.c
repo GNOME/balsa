@@ -1158,7 +1158,6 @@ static guint
 balsa_send_message_real(SendMessageInfo* info)
 {
     MessageQueueItem *mqi, *next_message;
-    int i;
 #ifdef BALSA_USE_THREADS
     SendThreadMessage *threadmsg;
     send_lock();
@@ -1178,31 +1177,56 @@ balsa_send_message_real(SendMessageInfo* info)
 #endif
 
     while ( (mqi = get_msg2send()) != NULL) {
-#if FIXME
-	libbalsa_lock_mutt();
-	i = mutt_invoke_sendmail(mqi->message->env->from,
-				 mqi->message->env->to,
-				 mqi->message->env->cc,
-				 mqi->message->env->bcc,
-				 mqi->tempfile,
-				 (mqi->message->content->encoding
-				  == ENC8BIT));
-	libbalsa_unlock_mutt();
-  if (eightbit && option (OPTUSE8BITMIME))
-    args = add_option (args, &argslen, &argsmax, "-B8BITMIME");
+	GPtrArray *args = g_ptr_array_new();
+	LibBalsaMessage *msg = LIBBALSA_MESSAGE(mqi->orig);
+	GList *recip;
+	LibBalsaAddress *addy;
+	const gchar *mailbox;
+	gchar *cmd;
+	FILE *sendmail;
+	GMimeStream *out;
 
-  if (option (OPTENVFROM) && from && !from->next)
-  {
-    args = add_option (args, &argslen, &argsmax, "-f");
-    args = add_args   (args, &argslen, &argsmax, from);
-  }
-  args = add_option (args, &argslen, &argsmax, "--");
-  args = add_args (args, &argslen, &argsmax, to);
-  args = add_args (args, &argslen, &argsmax, cc);
-  args = add_args (args, &argslen, &argsmax, bcc);
-  send_msg() in libmutt/sendlib.c
-#endif
-	mqi->status = (i==0?MQI_SENT : MQI_FAILED);
+	g_ptr_array_add(args, SENDMAIL);
+	g_ptr_array_add(args, "--");
+	recip = g_list_first((GList *) msg->headers->to_list);
+	while (recip) {
+	    addy = recip->data;
+	    mailbox = libbalsa_address_get_mailbox(addy, 0);
+	    g_ptr_array_add(args, (char*)mailbox);
+	    recip = recip->next;
+	}
+	recip = g_list_first((GList *) msg->headers->cc_list);
+	while (recip) {
+	    addy = recip->data;
+	    mailbox = libbalsa_address_get_mailbox(addy, 0);
+	    g_ptr_array_add(args, (char*)mailbox);
+	    recip = recip->next;
+	}
+	recip = g_list_first((GList *) msg->headers->bcc_list);
+	while (recip) {
+	    addy = recip->data;
+	    mailbox = libbalsa_address_get_mailbox(addy, 0);
+	    g_ptr_array_add(args, (char*)mailbox);
+	    recip = recip->next;
+	}
+	g_ptr_array_add(args, NULL);
+	cmd = g_strjoinv(" ", (gchar**)args->pdata);
+	g_ptr_array_free(args, FALSE);
+	if ( (sendmail=popen(cmd, "w")) == NULL) {
+	    /* Error while sending */
+	    mqi->status = MQI_FAILED;
+	} else {
+	    out = g_mime_stream_file_new(sendmail);
+	    g_mime_stream_file_set_owner(GMIME_STREAM_FILE(out), FALSE);
+	    if (g_mime_stream_write_to_stream(mqi->stream, out) == -1)
+		mqi->status = MQI_FAILED;
+	    g_mime_stream_unref(out);
+	    if (pclose(sendmail) != 0)
+		mqi->status = MQI_FAILED;
+	    if (mqi->status != MQI_FAILED)
+		mqi->status = MQI_SENT;
+	}
+	g_free(cmd);
     }
 
     /* We give back all the resources used and delete the sent messages */
@@ -1673,6 +1697,7 @@ static LibBalsaMsgCreateResult
 libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage * message,
 				 MessageQueueItem *mqi)
 {
+    mqi->orig = message;
     mqi->stream = libbalsa_mailbox_get_message_stream(message->mailbox,
 						      message);
     if (mqi->stream == NULL)

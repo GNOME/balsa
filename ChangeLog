@@ -1,3 +1,16 @@
+2003-11-11 08:01  PeterB
+
+	* libbalsa/send.c, src/balsa-mblist.c, src/mailbox-node.c,
+	src/main-window.c: Use MAILBOX_OPEN() macro.
+	* libbalsa/: mailbox_local.c, mailbox_local.h:
+	libbalsa_mailbox_local_load_messages() is now called with mailbox
+	locked; implement new helper
+	_libbalsa_mailbox_local_get_message_stream()--common code from
+	maildir and mh.
+	* libbalsa/: mailbox.c, mailbox_imap.c, mailbox_maildir.c,
+	mailbox_mbox.c, mailbox_mh.c: Move locking and open-mailbox checks
+	from subclasses to mailbox.c.
+
 2003-11-10 11:57  PeterB
 
 	* libbalsa/: mailbox_maildir.c, mailbox_mbox.c, mailbox_mh.c: Don't

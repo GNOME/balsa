@@ -379,7 +379,7 @@ struct {
     {"tr_TR", "ISO-8859-9", N_("Turkish")},
 #define LOC_UKRAINIAN_POS   31
     {"uk_UK", "KOI8-U", N_("Ukrainian")},
-#define LOC_UTF8_POS        33
+#define LOC_UTF8_POS        32
     {"", "UTF-8", N_("Generic UTF-8")}
 };
 

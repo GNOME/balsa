@@ -1637,17 +1637,25 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
 {
     ImapResponse rc;
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
+    ImapFetchType ift = 0;
     g_return_if_fail(mimap->opened);
+    if(flags & LB_FETCH_RFC822_HEADERS) ift |= IMFETCH_RFC822HEADERS_SELECTED;
+    if(flags & LB_FETCH_STRUCTURE)      ift |= IMFETCH_BODYSTRUCT;
 
     rc = imap_mbox_handle_fetch_range(mimap->handle, message->msgno,
-                                      message->msgno,
-                                      IMFETCH_BODYSTRUCT);
+                                      message->msgno, ift);
     if(rc == IMR_OK) { /* translate ImapData to LibBalsaMessage */
+        gchar *hdr;
         ImapMessage *im = imap_mbox_handle_get_msg(mimap->handle,
                                                    message->msgno);
         LibBalsaMessageBody *body = libbalsa_message_body_new(message);
 	lbm_imap_construct_body(body, im->body);
         libbalsa_message_append_part(message, body);
+        if( (flags & LB_FETCH_RFC822_HEADERS) &&
+            (hdr = im->fetched_header_fields) && *hdr && *hdr != '\r') {
+            libbalsa_message_set_headers_from_string(message, hdr);
+            message->has_all_headers = 1;
+        }
     }
 }
 

@@ -544,7 +544,8 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
                                        LIBBALSA_MESSAGE_FLAG_DELETED)))
             continue;
 
-        libbalsa_message_body_ref(msg, TRUE);
+        libbalsa_message_body_ref(msg, TRUE, TRUE); /* FIXME: do we need 
+                                                     * all headers? */
 	new_message = msg_queue_item_new();
         created = libbalsa_fill_msg_queue_item_from_queu(msg, new_message);
         libbalsa_message_body_unref(msg);
@@ -948,7 +949,8 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gboolean debug)
                                        LIBBALSA_MESSAGE_FLAG_DELETED)))
             continue;
 
-        libbalsa_message_body_ref(queu, TRUE);
+        libbalsa_message_body_ref(queu, TRUE, TRUE); /* FIXME: do we need
+                                                      * all headers? */
 	new_message = msg_queue_item_new();
         created = libbalsa_fill_msg_queue_item_from_queu(queu, new_message);
         libbalsa_message_body_unref(queu);

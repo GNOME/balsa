@@ -1400,7 +1400,9 @@ print_info_new(CommonInfo * ci)
     
     /* now get the message contents... */
     if (!pi->message->mailbox 
-        || libbalsa_message_body_ref(pi->message, TRUE)) {
+        || libbalsa_message_body_ref(pi->message, TRUE,
+                                     balsa_app.show_all_headers ||
+                                     balsa_app.shown_headers = HEADERS_ALL)) {
 	prepare_message_header(pi, pi->message->body_list);
         scan_body(pi, pi->message->body_list);
         libbalsa_message_body_unref(pi->message);

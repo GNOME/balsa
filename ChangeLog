@@ -1,3 +1,14 @@
+2004-04-19  Pawel Salek
+
+	* libbalsa/filter.c: update argument list of message_body_ref().
+	* libbalsa/send.c: ditto.
+	* libbalsa/mailbox_imap.c: correctly fetch-headers on fetch-struct.
+	* libbalsa/mailbox_local.c: ditto.
+	* libbalsa/mailbox_mbox.c: set message length.
+	* libbalsa/message.[ch]: fetch msg structure and headers in one shot.
+	* src/balsa-message.c: update argument list of message_body_ref().
+	* src/{sendmsg-window,print}.c: ditto.
+
 2004-04-19 09:17  PeterB
 
 	* src/balsa-message.c: emit "row-changed" signal after updating the

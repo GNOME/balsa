@@ -304,7 +304,8 @@ gboolean libbalsa_message_set_msg_flags(LibBalsaMessage * message,
 void libbalsa_message_append_part(LibBalsaMessage * message,
 				  LibBalsaMessageBody * body);
 
-gboolean libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read);
+gboolean libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read,
+                                   gboolean fetch_all_headers);
 void libbalsa_message_body_unref(LibBalsaMessage * message);
 
 LibBalsaMsgCreateResult libbalsa_message_queue(LibBalsaMessage* message, 

@@ -204,7 +204,7 @@ libbalsa_condition_matches(LibBalsaCondition* cond,
 		return FALSE; /* We don't want to match if an error occured */
 	    if (mbox_locked)
 		UNLOCK_MAILBOX(message->mailbox);
-	    is_refed = libbalsa_message_body_ref(message, FALSE);
+	    is_refed = libbalsa_message_body_ref(message, FALSE, FALSE);
  	    if (mbox_locked)
  		LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
 	    if (!is_refed) {
@@ -284,7 +284,7 @@ libbalsa_condition_matches(LibBalsaCondition* cond,
 		    return FALSE;
 		if (mbox_locked)
 		    UNLOCK_MAILBOX(message->mailbox);
-		is_refed = libbalsa_message_body_ref(message, FALSE);
+		is_refed = libbalsa_message_body_ref(message, FALSE, FALSE);
 		if (mbox_locked)
 		    LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
 		if (!is_refed) {

@@ -483,6 +483,11 @@ libbalsa_mailbox_local_fetch_structure(LibBalsaMailbox *mailbox,
     libbalsa_message_append_part(message, body);
 
     libbalsa_message_headers_from_gmime(message->headers, mime_message);
+    if(flags & LB_FETCH_RFC822_HEADERS) {
+        message->headers->user_hdrs = 
+            libbalsa_message_user_hdrs_from_gmime(message->mime_msg);
+        message->has_all_headers = 1;
+    }
 }
 
 static void

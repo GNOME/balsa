@@ -325,6 +325,8 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
 		g_array_append_val(mbox->messages_info, msg_info);
 		msg_info.message->msgno = mbox->messages_info->len;
 		msg_info.message->mailbox = (LibBalsaMailbox *) mbox;
+                msg_info.message->length = msg_info.end - msg_info.start; 
+                /* FIXME: it is only approximate, isn't it? */
 	    }
 	}
 	g_mime_object_unref(GMIME_OBJECT(mime_message));

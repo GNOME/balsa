@@ -757,8 +757,10 @@ mime_content_type2str(int contenttype)
    message parts can be fetched later on.
 */
 gboolean
-libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
+libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read,
+                          gboolean fetch_all_headers)
 {
+    LibBalsaFetchFlag flags = LB_FETCH_STRUCTURE;
     g_return_val_if_fail(message, FALSE);
     if (!message->mailbox) return FALSE;
     g_return_val_if_fail(MAILBOX_OPEN(message->mailbox), FALSE);
@@ -771,9 +773,10 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
 	return TRUE;
     }
 
+    if(fetch_all_headers && !message->has_all_headers)
+        flags |=  LB_FETCH_RFC822_HEADERS;
     libbalsa_mailbox_fetch_message_structure(message->mailbox, message,
-					     LB_FETCH_RFC822_HEADERS
-					     |LB_FETCH_STRUCTURE);
+                                             flags);
     message->body_ref++;
     UNLOCK_MAILBOX(message->mailbox);
     

@@ -997,7 +997,9 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
                       (gpointer) bm);
 
     is_new = LIBBALSA_MESSAGE_IS_UNREAD(message);
-    if(!libbalsa_message_body_ref(bm->message, TRUE)) 
+    if(!libbalsa_message_body_ref(bm->message, TRUE, 
+                                  bm->show_all_headers||
+                                  bm->shown_headers == HEADERS_ALL)) 
         return FALSE;
 
 #ifdef HAVE_GPGME
@@ -1092,6 +1094,9 @@ balsa_message_set_displayed_headers(BalsaMessage * bmessage,
     bmessage->shown_headers = sh;
 
     if (bmessage->message) {
+        if(sh == HEADERS_ALL)
+            libbalsa_mailbox_set_msg_headers(bmessage->message->mailbox, 
+                                             bmessage->message);
         display_headers(bmessage);
         gtk_tree_model_foreach(gtk_tree_view_get_model(GTK_TREE_VIEW(bmessage->treeview)),
                                balsa_message_set_embedded_hdr, bmessage);

@@ -2864,10 +2864,8 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	/* reference the original mailbox so we don't loose the
 	 * mail even if the mailbox is closed.
 	 */
-	if (message->mailbox) {
+	if (message->mailbox)
 	    libbalsa_mailbox_open(message->mailbox);
-            libbalsa_mailbox_set_msg_headers(message->mailbox, message);
-        }
     }
 
     g_signal_connect(G_OBJECT(bsmsg->window), "delete-event",
@@ -3044,7 +3042,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     gnome_app_set_contents(GNOME_APP(window), paned);
 
     if (message)
-	libbalsa_message_body_ref(message, TRUE);
+	libbalsa_message_body_ref(message, TRUE, TRUE);
     /* set the menus - and language index */
     if (message && !bsmsg->charset)
 	bsmsg->charset = libbalsa_message_charset(message);

@@ -1,4 +1,9 @@
-2002-01-06  Carlos Morgado  <chbm@chbm.nu>
+2002-01-06  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox_imap.c: protect against libmutt fastclosing
+	imap mailbox.
+
+	2002-01-06  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/folder-conf.c (imap_use_ssl_cb): fix segfault 
 

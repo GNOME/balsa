@@ -538,6 +538,14 @@ clean_cache(LibBalsaMailbox* mailbox)
     GList *lst, *remove_list;
     ImapUID uid_validity = LIBBALSA_MAILBOX_IMAP(mailbox)->uid_validity;
 
+    /* libmutt sometimes forcibly fastclose's mailbox, take precautions */
+    RETURN_VAL_IF_CONTEXT_CLOSED(mailbox, FALSE);
+    if(CLIENT_CONTEXT(mailbox)->hdrs == NULL) {
+        g_warning("Client context for mailbox %s closed in an ugly way, why?",
+                  mailbox->name);
+        return FALSE;
+    }
+
     dbf = gdbm_open(fname, 0, GDBM_WRITER, S_IRUSR|S_IWUSR, NULL);
     g_free(fname);
     printf("Attempting to clean IMAP cache for '%s'\n", mailbox->name);
@@ -547,8 +555,8 @@ clean_cache(LibBalsaMailbox* mailbox)
     remove_list  = NULL;
 
     for(lst = mailbox->message_list; lst; lst = lst->next) {
-        ImapUID uid = IMAP_MESSAGE_UID(LIBBALSA_MESSAGE(lst->data));
-        g_hash_table_insert(present_uids, UID_TO_POINTER(uid), &present_uids);
+        ImapUID u = IMAP_MESSAGE_UID(LIBBALSA_MESSAGE(lst->data));
+        g_hash_table_insert(present_uids, UID_TO_POINTER(u), &present_uids);
     }
                             
     key = gdbm_firstkey(dbf);

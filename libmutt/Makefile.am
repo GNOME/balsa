@@ -18,7 +18,6 @@ libmutt_a_SOURCES = \
 	browser.h	\
 	buffy.c 	\
 	charset.c 	\
-	commands.c	\
 	copy.c 		\
 	date.c 		\
 	dotlock.c	\

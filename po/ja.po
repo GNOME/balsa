@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 1.1.6\n"
 "POT-Creation-Date: 2001-06-20 11:06+0200\n"
-"PO-Revision-Date: 2001-06-24 18:13+09:00\n"
-"Last-Translator: Takeshi Aihana <aihana@gnome.gr.jp>\n"
+"PO-Revision-Date: 2001-09-21 18:13+09:00\n"
+"Last-Translator: Yukihiro Nakai <nakai@gnome.gr.jp>\n"
 "Language-Team: Japan GNOME Users Group <translation@gnome.gr.jp>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=euc-jp\n"
@@ -1197,7 +1197,7 @@ msgstr "フラグ付け"
 
 #: src/balsa-index.c:1880 src/balsa-mblist.c:486
 msgid "Unread"
-msgstr "読み込み不可"
+msgstr "未読"
 
 #: src/balsa-index.c:1891
 msgid "Transfer"

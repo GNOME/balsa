@@ -471,9 +471,7 @@ libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox)
 	if (CLIENT_CONTEXT_OPEN(mailbox)) {
 	    /* We are careful to take/release locks in the correct order here */
 	    libbalsa_lock_mutt();
-	    while (
-		   (check =
-		    mx_close_mailbox(CLIENT_CONTEXT(mailbox), NULL))) {
+	    while ( (check = mx_close_mailbox(CLIENT_CONTEXT(mailbox), NULL))) {
 		libbalsa_unlock_mutt();
 		UNLOCK_MAILBOX(mailbox);
 		g_print
@@ -483,6 +481,7 @@ libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox)
 		libbalsa_lock_mutt();
 	    }
 	    libbalsa_unlock_mutt();
+	    
 	    free(CLIENT_CONTEXT(mailbox));
 	    CLIENT_CONTEXT(mailbox) = NULL;
 	}

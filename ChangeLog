@@ -1,5 +1,12 @@
 2000-12-20  Ian Campbell  <ijc25@cam.ac.uk>
 
+	* src/balsa-mblist.c: When an open mailbox has no unread messages,
+	display '0' instead of a blank.
+
+	* libbalsa/mailbox.c: Tidy some indentation.
+
+2000-12-20  Ian Campbell  <ijc25@cam.ac.uk>
+
 	* libbalsa/libbalsa.c (libbalsa_init): set_option(OPTMHPURGE) so
 	MH messages are really deleted rather than moved to ,<number>. (We
 	don't need to keep these , files, since we delete to trash)

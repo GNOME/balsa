@@ -806,10 +806,6 @@ balsa_mblist_repopulate(BalsaMBList * bmbl)
 		gtk_ctree_insert_gnode(ctree, NULL, NULL, walk,
 				       mailbox_nodes_to_ctree, NULL);
 
-	    if (node) {
-		gtk_ctree_node_set_text(ctree, node, 1, "");
-		gtk_ctree_node_set_text(ctree, node, 2, "");
-	    }
 	}
     }
     gtk_ctree_sort_recursive(ctree, NULL);
@@ -835,7 +831,7 @@ mailbox_nodes_to_ctree(GtkCTree * ctree, guint depth, GNode * gnode,
 	mbnode->IsDir = FALSE;
 	
 	if (LIBBALSA_IS_MAILBOX_POP3(mbnode->mailbox))
-	    return FALSE;
+	    g_assert_not_reached();
 	else {
 	    BalsaIconName in = (mbnode->mailbox->new_messages > 0)
 		? BALSA_ICON_TRAY_FULL : BALSA_ICON_TRAY_EMPTY;
@@ -846,7 +842,9 @@ mailbox_nodes_to_ctree(GtkCTree * ctree, guint depth, GNode * gnode,
 				    NULL, NULL,
 				    G_NODE_IS_LEAF(gnode), FALSE);
 	}
-    
+	gtk_ctree_node_set_text(ctree, cnode, 1, "");
+	gtk_ctree_node_set_text(ctree, cnode, 2, "");
+
 	gtk_ctree_node_set_row_data(ctree, cnode, mbnode);
 	gtk_signal_connect(GTK_OBJECT(mbnode->mailbox),
 			   "set-unread-messages-flag",
@@ -868,6 +866,8 @@ mailbox_nodes_to_ctree(GtkCTree * ctree, guint depth, GNode * gnode,
 				G_NODE_IS_LEAF(gnode), mbnode->expanded);
 	/* Make sure this gets set */
 	mbnode->IsDir = TRUE;
+	gtk_ctree_node_set_text(ctree, cnode, 1, "");
+	gtk_ctree_node_set_text(ctree, cnode, 2, "");
 	gtk_ctree_node_set_row_data(ctree, cnode, mbnode);
 	gtk_ctree_node_set_selectable(ctree, cnode, FALSE);
     }
@@ -1220,8 +1220,9 @@ balsa_mblist_mailbox_style(GtkCTree * ctree, GtkCTreeNode * node,
 	    g_free(text);
 
 	    mbnode->style |= MBNODE_STYLE_UNREAD_MESSAGES;
+	} else {
+	    gtk_ctree_node_set_text(ctree, node, 1, "");
 	}
-
     } else {
 	/* If the clist entry currently has the unread messages icon, set
 	 * it back, otherwise we can ignore this. */
@@ -1257,7 +1258,7 @@ balsa_mblist_mailbox_style(GtkCTree * ctree, GtkCTreeNode * node,
 	/* If we're showing unread column info, get rid of whatever's
 	 * there Also set the flag */
 	if (mblist->display_content_info) {
-	    gtk_ctree_node_set_text(ctree, node, 1, "");
+	    gtk_ctree_node_set_text(ctree, node, 1, "0");
 	    mbnode->style &= ~MBNODE_STYLE_UNREAD_MESSAGES;
 	}
     }
@@ -1273,7 +1274,7 @@ balsa_mblist_mailbox_style(GtkCTree * ctree, GtkCTreeNode * node,
 
 	    mbnode->style |= MBNODE_STYLE_TOTAL_MESSAGES;
 	} else {
-	    gtk_ctree_node_set_text(ctree, node, 2, "");
+	    gtk_ctree_node_set_text(ctree, node, 2, "0");
 	    mbnode->style &= ~MBNODE_STYLE_TOTAL_MESSAGES;
 	}
     }
@@ -1519,9 +1520,7 @@ balsa_mblist_unread_messages_changed_cb(LibBalsaMailbox * mailbox,
     gtk_clist_freeze(GTK_CLIST(mblist));
     balsa_mblist_mailbox_style(GTK_CTREE(mblist),
 			       node,
-			       gtk_ctree_node_get_row_data(GTK_CTREE
-							   (mblist),
-							   node));
+			       gtk_ctree_node_get_row_data(GTK_CTREE(mblist), node));
     gtk_clist_thaw(GTK_CLIST(mblist));
 
 }

@@ -923,6 +923,7 @@ update_mailbox_idle(struct update_mbox_data*umd)
         g_object_remove_weak_pointer(G_OBJECT(umd->store),
                                      (gpointer) &umd->store);
         bmbl_update_mailbox(umd->store, umd->mailbox, umd->total_messages);
+	check_new_messages_count(umd->mailbox);
     }
     g_object_set_data(G_OBJECT(umd->mailbox), "mblist-update", NULL);
     gdk_threads_leave();

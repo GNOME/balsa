@@ -100,10 +100,7 @@ GSList *list = NULL;
 static int quiet_check=0;
 
 static void check_messages_thread(gpointer data);
-static gboolean count_unread_msgs_func(GtkTreeModel * model,
-				       GtkTreePath * path,
-				       GtkTreeIter * iter, int *val);
-static void display_new_mail_notification(int);
+static void display_new_mail_notification(int num_new, int has_new);
 
 #endif
 
@@ -2185,6 +2182,37 @@ check_new_messages_cb(GtkWidget * widget, gpointer data)
     check_new_messages_real(widget, data, TYPE_CALLBACK);
 }
 
+void
+check_new_messages_count(LibBalsaMailbox * mailbox)
+{
+    struct count_info {
+        gint unread_messages;
+        gint has_unread_messages;
+    } *info;
+    static const gchar count_info_key[] = "balsa-window-count-info";
+    gint num_new, has_new;
+
+    info = g_object_get_data(G_OBJECT(mailbox), count_info_key);
+    if (!info) {
+        info = g_new0(struct count_info, 1);
+        g_object_set_data_full(G_OBJECT(mailbox), count_info_key, info,
+                               g_free);
+    }
+
+    num_new = mailbox->unread_messages - info->unread_messages;
+    if (num_new < 0)
+        num_new = 0;
+    has_new = mailbox->has_unread_messages - info->has_unread_messages;
+    if (has_new < 0)
+        has_new = 0;
+
+    if (num_new || has_new)
+        display_new_mail_notification(num_new, has_new);
+
+    info->unread_messages = mailbox->unread_messages;
+    info->has_unread_messages = mailbox->has_unread_messages;
+}
+
 /* send_outbox_messages_cb:
    tries again to send the messages queued in outbox.
 */
@@ -2222,35 +2250,6 @@ message_print_cb(GtkWidget * widget, gpointer data)
 
 /* this one is called only in the threaded code */
 #ifdef BALSA_USE_THREADS
-
-static gboolean
-check_messages_after(gpointer data)
-{
-    MailThreadMessage *threadmessage;
-    int new_msgs_before, new_msgs_after;
-
-    gdk_threads_enter();
-    if (!balsa_app.mblist_tree_store) {
-	gdk_threads_leave();
-        return FALSE;
-    }
-
-    new_msgs_before = GPOINTER_TO_INT(data);
-    new_msgs_after = 0;
-    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
-                           (GtkTreeModelForeachFunc)
-                           count_unread_msgs_func, &new_msgs_after);
-
-    new_msgs_after -= new_msgs_before;
-    if (new_msgs_after < 0)
-        new_msgs_after = 0;
-    MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_FINISHED, NULL, "Finished",
-                  new_msgs_after, 0);
-
-    gdk_threads_leave();
-    return FALSE;
-}
-
 static void
 check_messages_thread(gpointer data)
 {
@@ -2261,36 +2260,19 @@ check_messages_thread(gpointer data)
      */
     MailThreadMessage *threadmessage;
     
-    /* For recognizing new mail it is assumed, that new mail is */
-    /* _always_ unread and that nothing else will increase the */
-    /* number of unread messages except for actual new mail arriving */
-    /* It should be safe to assume that an upwards change of the */
-    /* total of all new messages in all mailboxes will be caused by new */
-    /* and nothing else */
-    
-    int new_msgs_before = 0;
-
     pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
-    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
-			   (GtkTreeModelForeachFunc) count_unread_msgs_func,
-			   &new_msgs_before);
 
     MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_SOURCE, NULL, "POP3", 0, 0);
-        
     check_mailbox_list(balsa_app.inbox_input);
-
     MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_SOURCE, NULL,
                   "Local Mail", 0, 0);
-    /* NOT USED: libbalsa_notify_start_check(imap_check_test); */
 
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
 			   (GtkTreeModelForeachFunc) mailbox_check_func,
 			   NULL);
 
-    /* Count unread messages in an idle callback, in case any mailbox
-     * updates its count in its own idle callback (currently, as of July
-     * 2004, imap mailboxes do). */
-    g_idle_add(check_messages_after, GINT_TO_POINTER(new_msgs_before));
+    MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_FINISHED, NULL, "Finished",
+                  0, 0);
     
     pthread_mutex_lock(&mailbox_lock);
     checking_mail = 0;
@@ -2328,11 +2310,6 @@ mail_progress_notify_cb()
         /* Eat messages */
         while (count) {
             threadmessage = *currentpos;
-            if(threadmessage->message_type == LIBBALSA_NTFY_FINISHED) {
-		gdk_threads_enter();
-                display_new_mail_notification(threadmessage->num_bytes);
-		gdk_threads_leave();
-            }
             g_free(threadmessage);
             currentpos++;
             count -= sizeof(void *);
@@ -2413,7 +2390,6 @@ mail_progress_notify_cb()
                 gnome_appbar_refresh(balsa_app.appbar);
                 gnome_appbar_set_progress_percentage(balsa_app.appbar, 0.0);
             }
-            display_new_mail_notification(threadmessage->num_bytes);
             break;
 
         case LIBBALSA_NTFY_ERROR:
@@ -2520,33 +2496,17 @@ send_progress_notify_cb()
     return TRUE;
 }
 
-static gboolean
-count_unread_msgs_func(GtkTreeModel *model, GtkTreePath *path,
-		       GtkTreeIter *iter, int * val)
-{
-    BalsaMailboxNode *mbnode;
-
-    gtk_tree_model_get(model, iter, 0, &mbnode, -1);
-    g_return_val_if_fail(mbnode, FALSE);
-
-    if (mbnode->mailbox && mbnode->mailbox != balsa_app.trash)
-        *val += LIBBALSA_MAILBOX(mbnode->mailbox)->unread_messages;
-    g_object_unref(mbnode);
-
-    return FALSE;
-}
-
 /* display_new_mail_notification:
    num_new is the number of the recently arrived messsages.
 */
 static void
-display_new_mail_notification(int num_new)
+display_new_mail_notification(int num_new, int has_new)
 {
     static GtkWidget *dlg = NULL;
     static gint num_total = 0;
     gchar *msg = NULL;
 
-    if (num_new <= 0)
+    if (num_new <= 0 && has_new <= 0)
         return;
 
     if (balsa_app.notify_new_mail_sound)
@@ -2579,9 +2539,11 @@ display_new_mail_notification(int num_new)
         gtk_widget_show_all(GTK_WIDGET(dlg));
     }
 
-    msg = g_strdup_printf(ngettext("You have received %d new message.",
-				   "You have received %d new messages.",
-				   num_total), num_total);
+    msg = num_new > 0 ?
+	g_strdup_printf(ngettext("You have received %d new message.",
+				 "You have received %d new messages.",
+				 num_total), num_total) :
+	g_strdup(_("You have new mail."));
     gtk_label_set_text(GTK_LABEL(GTK_MESSAGE_DIALOG(dlg)->label), msg);
     g_free(msg);
 }

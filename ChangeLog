@@ -1,3 +1,20 @@
+2005-01-17 13:41  PeterB
+
+	* src/balsa-message.c, src/message-window.c, src/print.c,
+	src/save-restore.c, src/sendmsg-window.c, src/store-address.c,
+	libbalsa/abook-completion.c, libbalsa/abook-completion.h,
+	libbalsa/address-book-ldif.c, libbalsa/address-book-vcard.c,
+	libbalsa/address-entry.c, libbalsa/address-entry.h,
+	libbalsa/address.c, libbalsa/address.h, libbalsa/body.h,
+	libbalsa/files.h, libbalsa/filter.c, libbalsa/identity.c,
+	libbalsa/identity.h, libbalsa/libbalsa.h,
+	libbalsa/libbalsa_private.h, libbalsa/mailbox.c,
+	libbalsa/mailbox.h, libbalsa/mailbox_imap.c,
+	libbalsa/mailbox_local.c, libbalsa/mailbox_mbox.c,
+	libbalsa/message.c, libbalsa/message.h, libbalsa/misc.c,
+	libbalsa/misc.h, libbalsa/send.c: use GMime's InternetAddress
+	instead of LibBalsaAddress, except for address-book entries.
+
 2005-01-17 10:36  PeterB
 
 	* src/: toolbar-factory.c, toolbar-prefs.c: remove redundant

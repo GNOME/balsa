@@ -180,7 +180,7 @@ server_settings_changed(LibBalsaServer * server, LibBalsaMailbox * mailbox)
 }
 
 void
-libbalsa_mailbox_imap_set_path(LibBalsaMailboxImap * mailbox, gchar * path)
+libbalsa_mailbox_imap_set_path(LibBalsaMailboxImap* mailbox, const gchar* path)
 {
     g_return_if_fail(mailbox);
     g_free(mailbox->path);

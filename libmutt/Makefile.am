@@ -5,6 +5,7 @@ noinst_LIBRARIES = libmutt.a
 libmutt_a_SOURCES = \
 	attach.c 	\
 	base64.c	\
+	browser.h	\
 	buffy.c 	\
 	charset.c 	\
 	copy.c 		\

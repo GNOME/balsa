@@ -1172,7 +1172,7 @@ fill_mailbox_passwords(GList * mailbox_list)
 
     list = g_list_first(mailbox_list);
     while (list) {
-	mailbox = LIBBALSA_MAILBOX(list->data);
+	mailbox = BALSA_MAILBOX_NODE(list->data)->mailbox;
 	if(LIBBALSA_IS_MAILBOX_POP3(mailbox) && 
 	   LIBBALSA_MAILBOX_POP3(mailbox)->check) {
 	    s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);

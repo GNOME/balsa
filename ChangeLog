@@ -16,6 +16,9 @@
 	are plain leaves from GtkCTree point of view).
 	* src/mailbox-node.[ch]: implement most of the folder scanner code.
 	* src/save-restore.c: add loading folders from config.
+
+	* src/main-window.c: treat balsa_app.input_inbox elements as 
+	MailboxNodes.
 	
 2001-01-07  Pawel Salek  <pawsa@theochem.kth.se>
 

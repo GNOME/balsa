@@ -1,6 +1,8 @@
 libbalsa/address-book-ldap.c
 libbalsa/address-book-vcard.c
 libbalsa/address-book.c
+libbalsa/address-entry.c
+libbalsa/folder-scanners.c
 libbalsa/libbalsa_private.h
 libbalsa/mailbox.c
 libbalsa/mailbox_imap.c
@@ -37,7 +39,6 @@ src/balsa-mblist.c
 src/balsa-message.c
 src/filter-edit-dialog.c
 src/information-dialog.c
-src/local-mailbox.c
 src/mailbox-conf.c
 src/mailbox-node.c
 src/main-window.c

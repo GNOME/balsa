@@ -419,10 +419,14 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
     if (mbnode->mailbox) {
 	add_menu_entry(menu, NULL, NULL, mbnode);
 	
-	add_menu_entry(menu, _("Mark as Inbox"),    mb_inbox_cb,    mbnode);
-	add_menu_entry(menu, _("Mark as Sentbox"),  mb_sentbox_cb,  mbnode);
-	add_menu_entry(menu, _("Mark as Trash"),    mb_trash_cb,    mbnode);
-	add_menu_entry(menu, _("Mark as Draftbox"), mb_draftbox_cb, mbnode);
+	if(mbnode->mailbox != balsa_app.inbox)
+	    add_menu_entry(menu, _("Mark as Inbox"),    mb_inbox_cb,    mbnode);
+	if(mbnode->mailbox != balsa_app.sentbox)
+	    add_menu_entry(menu, _("Mark as Sentbox"),  mb_sentbox_cb,  mbnode);
+	if(mbnode->mailbox != balsa_app.trash)
+	    add_menu_entry(menu, _("Mark as Trash"),    mb_trash_cb,    mbnode);
+	if(mbnode->mailbox != balsa_app.draftbox)
+	    add_menu_entry(menu, _("Mark as Draftbox"), mb_draftbox_cb, mbnode);
     }
     return menu;
 }

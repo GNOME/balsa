@@ -1,3 +1,10 @@
+2001-01-17  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/mailbox-node.c: (balsa_mailbox_node_get_context_menu)
+	returned to old behaviour, not show option to set special type
+	when box already is that special type. masks cosmetic bug when
+	setting a box to current special type 
+
 2001-01-16  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/balsa-index-page.c: (balsa_message_toggle_new) changed

@@ -1,5 +1,9 @@
 2000-05-20  Peter Williams  <peter@beta.newton.cx>
 
+	* Makefile.am: New balsa-dcheck target to not forget
+	the BALSA_DISTCHECK_HACK=yes thingie. @MAINT@ some
+	of those targets.
+	
 	* libinit_balsa/Makefile.am (gob rule): Put %.h in the
 	gob mathcing rule for include dependencies.
 

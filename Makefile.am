@@ -18,12 +18,15 @@ EXTRA_DIST = \
 dist-hook: balsa.spec
 	cp balsa.spec $(distdir)
 
-RPM: balsa.spec
-	$(MAKE) distdir="$(PACKAGE)-@BALSA_SHORT_VERSION@" dist
-	rpm -ta "./$(PACKAGE)-@BALSA_SHORT_VERSION@.tar.gz"
+@MAINT@RPM: balsa.spec
+@MAINT@	$(MAKE) distdir="$(PACKAGE)-@BALSA_SHORT_VERSION@" dist
+@MAINT@	rpm -ta "./$(PACKAGE)-@BALSA_SHORT_VERSION@.tar.gz"
 
-snapshot:
-	$(MAKE) distdir=$(PACKAGE)-`date +"%y%m%d"` dist
+@MAINT@snapshot:
+@MAINT@	$(MAKE) distdir=$(PACKAGE)-`date +"%y%m%d"` dist
+
+@MAINT@balsa-dcheck:
+@MAINT@	$(MAKE) BALSA_DISTCHECK_HACK=yes distcheck
 
 ## to automatically rebuild aclocal.m4 if any of the macros in
 ## `macros/' change

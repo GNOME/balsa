@@ -1700,7 +1700,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 	
 	    libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
 				   balsa_app.convert_unknown_8bit_codeset, NULL);
-	    libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
+	    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
 				 _("The message sent by %s with subject \"%s\" contains 8-bit characters, but no header describing the used codeset (converted to %s)"),
 				 from, subject,
 				 target_cs ? target_cs : "\"?\"");

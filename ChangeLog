@@ -1,3 +1,8 @@
+2003-05-11  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* NEWS, configure.in: release 2.0.11.
+	* src/balsa-message.c: be less verbose on message format errors.
+
 2003-05-09  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/address-book-ldap.c: handle large directories slightly

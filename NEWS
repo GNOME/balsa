@@ -1,3 +1,10 @@
+* Balsa-2.0.11 release. Release date 2003-06-11
+
+- text wrapping improvements.
+- charset encoding validation and conversion improvements.
+- several message signing and encryption improvelemts.
+- minor LDAP fixes (large directories, non-US-ASCII characters).
+
 * Balsa-2.0.10 release. Release date 2003-03-24
 
 - GPG support.

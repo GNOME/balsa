@@ -477,6 +477,7 @@ libbalsa_mailbox_open(LibBalsaMailbox * mailbox, GError **err)
 
     if (mailbox->open_ref > 0) {
         mailbox->open_ref++;
+	libbalsa_mailbox_check(mailbox);
         retval = TRUE;
     } else {
 	LibBalsaMailboxState saved_state;

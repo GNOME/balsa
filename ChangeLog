@@ -1,3 +1,11 @@
+2000-09-17  Matthew Guenther <guentherm@asme.org>
+
+	* src/balsa-index.c (balsa_index_select_next_unread): Fixed so it
+	properly wraps the search around the index.
+	* src/balsa-index.c: Added function balsa_index_select_row,
+	replaced relevent sections of balsa_index_select_next, _prev, and
+	_next_unread.
+	
 2000-09-17  Carlos Morgado  <chbm@chbm.nu>
 
 	* Makefile.am: made 'make dist' work without balsa.idl 

@@ -535,6 +535,43 @@ balsa_index_del (BalsaIndex * bindex,
 }
 
 
+/* balsa_index_select_row ()
+ * 
+ * Takes care of the actual selection, unselecting other messages and
+ * making sure the selected row is within bounds and made visible.
+ * */
+void
+balsa_index_select_row (BalsaIndex* bindex, gint row)
+{
+  GtkCList* clist;
+  
+  g_return_if_fail (bindex != NULL);
+  g_return_if_fail (BALSA_IS_INDEX (bindex));
+
+  clist = GTK_CLIST (bindex);
+  
+  if (row < 0) {
+    if (clist->rows > 0)
+      row = 0;
+    else
+      return;
+  }
+  
+  if (row >= clist->rows) {
+    if (clist->rows > 0)
+      row = clist->rows - 1;
+    else
+      return;
+  }
+    
+  gtk_clist_unselect_all (clist);
+  gtk_clist_select_row (clist, row, -1);
+  
+  if (gtk_clist_row_is_visible (clist, row) != GTK_VISIBILITY_FULL)
+    gtk_clist_moveto (clist, row, -1, 1.0, 0.0);
+}
+
+
 void
 balsa_index_select_next (BalsaIndex * bindex)
 {
@@ -548,12 +585,7 @@ balsa_index_select_next (BalsaIndex * bindex)
      || h + 1 >= clist->rows)
      return;
   
-  gtk_clist_unselect_all (clist);
-
-  gtk_clist_select_row (clist, h + 1, -1);
-
-  if (gtk_clist_row_is_visible (clist, h + 1) != GTK_VISIBILITY_FULL)
-    gtk_clist_moveto (clist, h + 1, 0, 1.0, 0.0);
+  balsa_index_select_row (bindex, h + 1);
 }
 
 /* balsa_index_select_next_unread:
@@ -565,7 +597,7 @@ balsa_index_select_next_unread (BalsaIndex * bindex)
 {
   GtkCList *clist;
   LibBalsaMessage* message;
-  gint h;
+  gint h, start_row;
 
   g_return_if_fail (bindex != NULL);
 
@@ -577,15 +609,27 @@ balsa_index_select_next_unread (BalsaIndex * bindex)
   if (h >= clist->rows) 
     h = 0;
 
+  start_row = h;
+
   while (h < clist->rows) {
     message = LIBBALSA_MESSAGE (gtk_clist_get_row_data (clist, h));
     if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW) {
-      gtk_clist_unselect_all (clist);
-      
-      gtk_clist_select_row (clist, h, -1);
-      
-      if (gtk_clist_row_is_visible (clist, h) != GTK_VISIBILITY_FULL)
-        gtk_clist_moveto (clist, h, 0, 1.0, 0.0);
+      balsa_index_select_row (bindex, h);
+      return;
+    }
+    ++h;
+  }
+  
+  /* We couldn't find it below our start position, try starting from
+   * the beginning.
+   * */
+  h = 0;
+
+  while (h < start_row) {
+    message = LIBBALSA_MESSAGE (gtk_clist_get_row_data (clist, h));
+    
+    if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW) {
+      balsa_index_select_row (bindex, h);
       return;
     }
     ++h;
@@ -624,12 +668,7 @@ balsa_index_select_previous (BalsaIndex * bindex)
     h = 1;
 
   /* FIXME, if it is already on row 1, we shouldn't unselect all/reselect */
-  gtk_clist_unselect_all (clist);
-
-  gtk_clist_select_row (clist, h - 1, -1);
-
-  if (gtk_clist_row_is_visible (clist, h - 1) != GTK_VISIBILITY_FULL)
-    gtk_clist_moveto (clist, h - 1, 0, 0.0, 0.0);
+  balsa_index_select_row (bindex, h - 1);
 }
 
 /* balsa_index_redraw_current redraws currently selected message,

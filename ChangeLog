@@ -1,5 +1,19 @@
 2000-11-08  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* README, balsa.1.in: document -m option better.
+	* AUTHORS: update for 1.0.0.
+	* src/main-window.[hc]: don't ignore -c cmd line option (it was always
+	overwritten by load_config()). make check_new_messages_cb() public.
+	* src/main.c: don't ignore -o cmd line option (see above). parse
+	URLs passed as argument to -m option.
+	* src/sendmsg-window.[hc]: provide sendmsg_window_set_field() to
+	set fields from -m option.
+
+	* configure.in: bump the version number to 1.0.0. 
+	Time for a glass of champagne! Thanks to everybody participating!
+	
+2000-11-08  Pawel Salek  <pawsa@theochem.kth.se>
+
 	* src/mailbox-conf.c: fix #30890: Adding POP mail box doesn't
 	appear until after refresh.
 	* libbalsa/send.c: save fcc (NOTE: append mode of

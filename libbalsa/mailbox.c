@@ -42,6 +42,8 @@
 
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
+#else
+#include "src/save-restore.h" /*config_mailbox_update*/
 #endif
 
 #define BUFFER_SIZE 1024
@@ -180,9 +182,10 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
 {
   GList *list;
   Mailbox *mailbox;
-  char uid[80], msgbuf[160];
+  char uid[80];
 
 #ifdef BALSA_USE_THREADS
+  char msgbuf[160];
   MailThreadMessage *threadmsg;
 
 /*  Only check if lock has been set */
@@ -1255,7 +1258,7 @@ void mailbox_commit_flagged_changes( Mailbox *mailbox )
     }
 
   mailbox_open_unref (mailbox);
-  mx_sync_mailbox( CLIENT_CONTEXT(mailbox)  );
+  //  mx_sync_mailbox( CLIENT_CONTEXT(mailbox)  );
 }
 
 /* internal c-client translation */

@@ -270,7 +270,7 @@ message_move (Message * message, Mailbox * dest)
   if (message->flags & MESSAGE_FLAG_NEW ) dest->unread_messages++;
   
   /*PKGW test: commented out why? */
-  //  send_watcher_append_message (dest, message);
+  //send_watcher_append_message (dest, message);
   
   mailbox_open_unref (dest);
   

@@ -949,6 +949,7 @@ bmbl_row_activated_cb(GtkTreeView * tree_view, GtkTreePath * path,
 struct update_mbox_data {
     LibBalsaMailbox *mailbox;
     GtkTreeStore *store;
+    gint total_messages; /* to be compatible with update_mailbox() arg. */
     gboolean notify;
 };
 static void bmbl_update_mailbox(GtkTreeStore * store,
@@ -965,10 +966,7 @@ update_mailbox_idle(struct update_mbox_data*umd)
         g_object_remove_weak_pointer(G_OBJECT(umd->store),
                                      (gpointer) &umd->store);
     if (umd->mailbox && umd->store) {
-        gint total_messages = 
-            GPOINTER_TO_INT(g_object_get_data(G_OBJECT(umd->mailbox),
-                                              "mblist-update"));
-        bmbl_update_mailbox(umd->store, umd->mailbox, total_messages);
+        bmbl_update_mailbox(umd->store, umd->mailbox, umd->total_messages);
 	check_new_messages_count(umd->mailbox, umd->notify);
 	g_object_set_data(G_OBJECT(umd->mailbox), "mblist-update", NULL);
     }
@@ -983,29 +981,23 @@ bmbl_mailbox_changed_cb(LibBalsaMailbox * mailbox, GtkTreeStore * store)
     struct update_mbox_data *umd;
     g_return_if_fail(mailbox);
     g_return_if_fail(store);
-    /* Take only the last message count update coming from an open
-       mailbox, otherwise do not update the message count, i.e. set
-       total_messages to -1; */
-    unsigned total_messages = libbalsa_mailbox_total_messages(mailbox);
-    if(!g_object_get_data(G_OBJECT(mailbox), "mblist-update")) {
-        umd = g_new(struct update_mbox_data,1);
-        umd->mailbox = mailbox;
-        g_object_add_weak_pointer(G_OBJECT(mailbox), (gpointer) &umd->mailbox);
-        umd->store = store;
-        g_object_add_weak_pointer(G_OBJECT(store), (gpointer) &umd->store);
-        
-        /* There subtle difference between _OPEN and _CLOSED since the
-           mailbox may be just being open or closed. */
-        umd->notify = (mailbox->state == LB_MAILBOX_STATE_OPEN
-                       || mailbox->state == LB_MAILBOX_STATE_CLOSED);
-        if(MAILBOX_CLOSED(mailbox))
-            g_object_set_data(G_OBJECT(mailbox), "mblist-update",
-                              GINT_TO_POINTER(-1));
-        g_idle_add((GSourceFunc)update_mailbox_idle, umd);
+    if( (umd = g_object_get_data(G_OBJECT(mailbox), "mblist-update")) ) {
+        if(!MAILBOX_CLOSED(mailbox))
+            umd->total_messages = libbalsa_mailbox_total_messages(mailbox);
+        return;
     }
-    if(!MAILBOX_CLOSED(mailbox))
-        g_object_set_data(G_OBJECT(mailbox), "mblist-update",
-                          GINT_TO_POINTER(total_messages));
+    umd = g_new(struct update_mbox_data,1);
+    g_object_set_data(G_OBJECT(mailbox), "mblist-update", umd);
+    umd->mailbox = mailbox;
+    g_object_add_weak_pointer(G_OBJECT(mailbox), (gpointer) &umd->mailbox);
+    umd->store = store;
+    g_object_add_weak_pointer(G_OBJECT(store), (gpointer) &umd->store);
+    umd->total_messages = 
+        !MAILBOX_CLOSED(mailbox) 
+        ? (gint)libbalsa_mailbox_total_messages(mailbox) : -1;
+    umd->notify = (mailbox->state == LB_MAILBOX_STATE_OPEN
+                   || mailbox->state == LB_MAILBOX_STATE_CLOSED);
+    g_idle_add((GSourceFunc)update_mailbox_idle, umd);
 }
 
 /* public methods */

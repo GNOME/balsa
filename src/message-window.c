@@ -58,11 +58,11 @@ static void select_part_cb(BalsaMessage * bm, gpointer data);
 static GHashTable *displayed_messages = NULL;
 
 static GnomeUIInfo shown_hdrs_menu[] = {
-    GNOMEUIINFO_RADIOITEM(N_("N_o headers"), NULL,
+    GNOMEUIINFO_RADIOITEM(N_("N_o Headers"), NULL,
 			  show_no_headers_cb, NULL),
-    GNOMEUIINFO_RADIOITEM(N_("_Selected headers"), NULL,
+    GNOMEUIINFO_RADIOITEM(N_("_Selected Headers"), NULL,
 			  show_selected_cb, NULL),
-    GNOMEUIINFO_RADIOITEM(N_("All _headers"), NULL,
+    GNOMEUIINFO_RADIOITEM(N_("All _Headers"), NULL,
 			  show_all_headers_cb, NULL),
     GNOMEUIINFO_END
 };
@@ -105,7 +105,7 @@ static GnomeUIInfo message_menu[] = {
      GNOME_STOCK_MENU_MAIL_RPL, 'R', 0, NULL},
     /* A */
     {
-     GNOME_APP_UI_ITEM, N_("Reply to _all..."),
+     GNOME_APP_UI_ITEM, N_("Reply to _All..."),
      N_("Reply to all recipients of this message"),
      replytoall_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
      GNOME_STOCK_MENU_MAIL_RPL, 'A', 0, NULL},
@@ -116,17 +116,17 @@ static GnomeUIInfo message_menu[] = {
      GNOME_STOCK_MENU_MAIL_FWD, 'F', 0, NULL},
     GNOMEUIINFO_SEPARATOR,
     {
-     GNOME_APP_UI_ITEM, N_("Next Part"), N_("Next Part in Message"),
+     GNOME_APP_UI_ITEM, N_("Next Part"), N_("Next part in Message"),
      next_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
      GNOME_STOCK_MENU_FORWARD, '.', GDK_CONTROL_MASK, NULL},
     {
      GNOME_APP_UI_ITEM, N_("Previous Part"),
-     N_("Previous Part in Message"),
+     N_("Previous part in Message"),
      previous_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
      GNOME_STOCK_MENU_BACK, ',', GDK_CONTROL_MASK, NULL},
     {
      GNOME_APP_UI_ITEM, N_("Save Current Part..."),
-     N_("Save Current Part in Message"),
+     N_("Save current part in message"),
      save_current_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
      GNOME_STOCK_MENU_SAVE, 's', GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_END

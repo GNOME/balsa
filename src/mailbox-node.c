@@ -384,13 +384,13 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
     menu = gtk_menu_new();
 
     submenu = gtk_menu_new();
-    add_menu_entry(submenu, _("Local Mbox Mailbox..."),  
+    add_menu_entry(submenu, _("Local mbox mailbox..."),  
 		   mailbox_conf_add_mbox_cb, NULL);
-    add_menu_entry(submenu, _("Local Maildir Mailbox..."), 
+    add_menu_entry(submenu, _("Local Maildir mailbox..."), 
 		   mailbox_conf_add_maildir_cb, NULL);
-    add_menu_entry(submenu, _("Local MH Mailbox..."),
+    add_menu_entry(submenu, _("Local MH mailbox..."),
 		   mailbox_conf_add_mh_cb, NULL);
-    add_menu_entry(submenu, _("Remote IMAP Mailbox..."), 
+    add_menu_entry(submenu, _("Remote IMAP mailbox..."), 
 		   mailbox_conf_add_imap_cb, NULL);
     gtk_widget_show(submenu);
     
@@ -527,7 +527,7 @@ add_local_mailbox(GNode *root, const gchar * name, const gchar * path)
     node = g_node_new(balsa_mailbox_node_new_from_mailbox(mailbox));
 
     if (balsa_app.debug)
-	g_print(_("Local Mailbox Loaded as: %s\n"),
+	g_print(_("Local mailbox loaded as: %s\n"),
 		gtk_type_name(GTK_OBJECT_TYPE(mailbox)));
     
     /* no type checking, parent is NULL for root */

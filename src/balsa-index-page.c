@@ -529,11 +529,11 @@ create_menu(BalsaIndex * bindex)
 			   balsa_message_reply, bindex, TRUE);
 
     create_stock_menu_item(menu, BALSA_PIXMAP_MAIL_RPL_ALL_MENU,
-			   _("Reply To All..."), balsa_message_replytoall,
+			   _("Reply to All..."), balsa_message_replytoall,
 			   bindex, TRUE);
 
     create_stock_menu_item(menu, BALSA_PIXMAP_MAIL_RPL_ALL_MENU,
-			   _("Reply To Group..."), balsa_message_replytogroup,
+			   _("Reply to Group..."), balsa_message_replytogroup,
 			   bindex, TRUE);
 
     create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_FWD,
@@ -549,7 +549,7 @@ create_menu(BalsaIndex * bindex)
 			       !bindex->mailbox->readonly);
     } else {
 	create_stock_menu_item(menu, GNOME_STOCK_MENU_TRASH,
-			       _("Move To Trash"), balsa_message_delete,
+			       _("Move to Trash"), balsa_message_delete,
 			       bindex, !bindex->mailbox->readonly);
     }
 

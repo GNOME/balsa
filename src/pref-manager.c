@@ -1165,8 +1165,8 @@ create_signature_page(gpointer data)
     pui->quote_str = attach_entry(_("Reply prefix:"), 4, table1);
 
 
-    pui->sig_separator=attach_check(_("enable signature separator"),5,table1);
-    pui->sig_prepend=attach_check(_("insert signature before quoted messages"),6,table1);
+    pui->sig_separator=attach_check(_("Enable signature separator"),5,table1);
+    pui->sig_prepend=attach_check(_("Insert signature before quoted messages"),6,table1);
 
     return vbox;
 }
@@ -1273,7 +1273,7 @@ create_mailserver_page(gpointer data)
 
     pui->rb_smtp_server = 
 	gtk_radio_button_new_with_label(table4_group,
-					_("Remote SMTP Server"));
+					_("Remote SMTP server"));
     table4_group =
 	gtk_radio_button_group(GTK_RADIO_BUTTON(pui->rb_smtp_server));
     gtk_table_attach(GTK_TABLE(table4), pui->rb_smtp_server, 0, 1, 0, 1,
@@ -1282,7 +1282,7 @@ create_mailserver_page(gpointer data)
 
     pui->rb_local_mua =
 	gtk_radio_button_new_with_label(table4_group,
-					_("Local mail user agent"));
+					_("Local mail transport agent"));
     table4_group =
 	gtk_radio_button_group(GTK_RADIO_BUTTON(pui->rb_local_mua));
     gtk_table_attach(GTK_TABLE(table4), pui->rb_local_mua, 0, 1, 1, 2,
@@ -1337,7 +1337,7 @@ incoming_page(gpointer data)
     gtk_container_add(GTK_CONTAINER(frame15), table7);
     gtk_container_set_border_width(GTK_CONTAINER(table7), 5);
 
-    label33 = gtk_label_new(_("Minutes"));
+    label33 = gtk_label_new(_("minutes"));
     gtk_table_attach(GTK_TABLE(table7), label33, 2, 3, 0, 1,
 		     (GtkAttachOptions) (0), (GtkAttachOptions) (0), 0, 0);
 
@@ -1474,7 +1474,7 @@ create_display_page(gpointer data)
 
     vbox7 = vbox_in_container(frame7);
 
-    pui->previewpane = box_start_check(_("use preview pane"), vbox7);
+    pui->previewpane = box_start_check(_("Use preview pane"), vbox7);
     pui->mblist_show_mb_content_info =	box_start_check(
 	_("Show mailbox statistics in left pane"), vbox7);
     pui->alternative_layout =	box_start_check(
@@ -1535,7 +1535,7 @@ create_display_page(gpointer data)
     /* gtk_table_set_row_spacings(GTK_TABLE(information_table), 1);
        gtk_table_set_col_spacings(GTK_TABLE(information_table), 5); */
 
-    label = gtk_label_new(_("Informational Messages"));
+    label = gtk_label_new(_("Information Messages"));
     gtk_table_attach(GTK_TABLE(information_table), label, 0, 1, 0, 1,
 		     GTK_FILL, 0, 0, 0);
 
@@ -1793,7 +1793,7 @@ create_misc_page(gpointer data)
     gtk_box_pack_start(GTK_BOX(vbox10), pui->debug, FALSE, FALSE, 0);
 
     pui->empty_trash =
-	gtk_check_button_new_with_label(_("Empty trash on exit"));
+	gtk_check_button_new_with_label(_("Empty Trash on exit"));
     gtk_box_pack_start(GTK_BOX(vbox10), pui->empty_trash, FALSE, FALSE, 0);
 
     hbox1 = gtk_hbox_new(FALSE, 0);
@@ -1812,7 +1812,7 @@ create_misc_page(gpointer data)
     gtk_widget_set_sensitive(pui->close_mailbox_minutes, FALSE);
     gtk_box_pack_start(GTK_BOX(hbox1), pui->close_mailbox_minutes, FALSE, FALSE, 0);
 
-    label33 = gtk_label_new(_("Minutes"));
+    label33 = gtk_label_new(_("minutes"));
     gtk_widget_show(label33);
     gtk_box_pack_start(GTK_BOX(hbox1), label33, FALSE, TRUE, 0);
 
@@ -1843,7 +1843,7 @@ create_misc_page(gpointer data)
     gnome_font_picker_set_mode(GNOME_FONT_PICKER(pui->font_picker),
 			       GNOME_FONT_PICKER_MODE_USER_WIDGET);
 
-    label = gtk_label_new(_("Browse..."));
+    label = gtk_label_new(_("Select..."));
     gnome_font_picker_uw_set_widget(GNOME_FONT_PICKER(pui->font_picker),
 				    GTK_WIDGET(label));
     gtk_object_set_user_data(GTK_OBJECT(pui->font_picker),
@@ -1886,7 +1886,7 @@ create_misc_page(gpointer data)
     gnome_font_picker_set_mode(GNOME_FONT_PICKER(pui->font_picker2),
 			       GNOME_FONT_PICKER_MODE_USER_WIDGET);
 
-    label9 = gtk_label_new(_("Browse..."));
+    label9 = gtk_label_new(_("Select..."));
     gnome_font_picker_uw_set_widget(GNOME_FONT_PICKER(pui->font_picker2),
 				    GTK_WIDGET(label9));
     gtk_object_set_user_data(GTK_OBJECT(pui->font_picker2),
@@ -1901,16 +1901,16 @@ create_misc_page(gpointer data)
     gtk_label_set_justify(GTK_LABEL(label927), GTK_JUSTIFY_RIGHT);
 
     /* mblist unread colour  */
-    color_frame = gtk_frame_new(_("Colours"));
+    color_frame = gtk_frame_new(_("Colors"));
     gtk_container_set_border_width(GTK_CONTAINER(color_frame), 5);
     gtk_box_pack_start(GTK_BOX(vbox9), color_frame, FALSE, FALSE, 0);
 
     vbox12 = vbox_in_container(color_frame);
 
     pui->unread_color = color_box(
-	GTK_BOX(vbox12), _("Mailbox with unread messages colour"));    
+	GTK_BOX(vbox12), _("Mailbox with unread messages color"));    
     pui->quoted_color_start = color_box(
-	GTK_BOX(vbox12), _("Quoted text primary colour"));
+	GTK_BOX(vbox12), _("Quoted text primary color"));
     pui->quoted_color_end = color_box(
 	GTK_BOX(vbox12), _("Quoted text secondary color"));
 
@@ -2241,9 +2241,9 @@ static GtkWidget *
 create_information_message_menu(void)
 {
     GtkWidget *menu = gtk_menu_new();
-    add_show_menu(_("Show Nothing"),     BALSA_INFORMATION_SHOW_NONE,   menu);
-    add_show_menu(_("Show Dialog"),      BALSA_INFORMATION_SHOW_DIALOG, menu);
-    add_show_menu(_("Show In List"),     BALSA_INFORMATION_SHOW_LIST,   menu);
+    add_show_menu(_("Show nothing"),     BALSA_INFORMATION_SHOW_NONE,   menu);
+    add_show_menu(_("Show dialog"),      BALSA_INFORMATION_SHOW_DIALOG, menu);
+    add_show_menu(_("Show in list"),     BALSA_INFORMATION_SHOW_LIST,   menu);
     add_show_menu(_("Print to console"), BALSA_INFORMATION_SHOW_STDERR, menu);
     return menu;
 }

@@ -1,3 +1,8 @@
+2001-01-22  Gediminas Paulauskas  <menesis@delfi.lt>
+	
+	* src/*.c: Changed some terminology and capitalization. Sorry
+	for breaking translations.
+
 2001-01-22  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* NEWS, configure.in: balsa-1.1.0 development release.
@@ -10,7 +15,6 @@
 	* libbalsa/message.c: (libbalsa_message_has_attachment) got	
 	a random seg fault there and added *message check and return false
 	if null (seems reasonable).
-	
 
 2001-01-20  Matthew Guenther  <guentherm@asme.org>
 

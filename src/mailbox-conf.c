@@ -874,7 +874,7 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
 					    table, 7);
 
     /* toggle for check */
-    mcw->mb_data.pop3.check = create_check(mcw, _("Periodically _Check This Mailbox For New Mail"), 
+    mcw->mb_data.pop3.check = create_check(mcw, _("Periodically _check this mailbox for new mail"), 
 					   table, 8);
 
     return table;

@@ -133,7 +133,7 @@ static void reflow_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 
 static GnomeUIInfo main_toolbar[] = {
 #define TOOL_SEND_POS 0
-    GNOMEUIINFO_ITEM_STOCK(N_("Send"), N_("Send this mail"),
+    GNOMEUIINFO_ITEM_STOCK(N_("Send"), N_("Send this message"),
 			   send_message_cb,
 			   GNOME_STOCK_PIXMAP_MAIL_SND),
     GNOMEUIINFO_SEPARATOR,
@@ -150,14 +150,14 @@ static GnomeUIInfo main_toolbar[] = {
 #define TOOL_SPELLING_POS 6
     GNOMEUIINFO_ITEM_STOCK(N_("Check Spelling"),
 			   N_
-			   ("Run a spelling check on the current message"),
+			   ("Run a spell check on the current message"),
 			   spell_check_cb, GNOME_STOCK_PIXMAP_SPELLCHECK),
     GNOMEUIINFO_SEPARATOR,
 #define TOOL_PRINT_POS 8
     GNOMEUIINFO_ITEM_STOCK(N_("Print"), N_("Print"),
 			   print_message_cb, GNOME_STOCK_PIXMAP_PRINT),
     GNOMEUIINFO_SEPARATOR,
-    GNOMEUIINFO_ITEM_STOCK(N_("Cancel"), N_("Cancel"),
+    GNOMEUIINFO_ITEM_STOCK(N_("Cancel"), N_("Cancel this message"),
 			   close_window, GNOME_STOCK_PIXMAP_CLOSE),
     GNOMEUIINFO_END
 };
@@ -175,12 +175,12 @@ static GnomeUIInfo file_menu[] = {
 
 #define MENU_FILE_SEND_POS 3
     GNOMEUIINFO_ITEM_STOCK(N_("_Send"),
-			   N_("Send the currently edited message"),
+			   N_("Send this message"),
 			   send_message_cb, GNOME_STOCK_MENU_MAIL_SND),
 
 #define MENU_FILE_QUEUE_POS 4
     GNOMEUIINFO_ITEM_STOCK(N_("_Queue"),
-			   N_("Queue this message in outbox for sending"),
+			   N_("Queue this message in Outbox for sending"),
 			   queue_message_cb, GNOME_STOCK_MENU_MAIL_SND),
 
 #define MENU_FILE_POSTPONE_POS 5
@@ -948,15 +948,15 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     /* Subject: */
     create_string_entry(table, _("Subject:"), 2, msg->subject);
     /* cc: */
-    create_email_entry(table, _("cc:"), 3, GNOME_STOCK_MENU_BOOK_YELLOW,
+    create_email_entry(table, _("Cc:"), 3, GNOME_STOCK_MENU_BOOK_YELLOW,
 		       msg, msg->cc);
 
     /* bcc: */
-    create_email_entry(table, _("bcc:"), 4, GNOME_STOCK_MENU_BOOK_GREEN,
+    create_email_entry(table, _("Bcc:"), 4, GNOME_STOCK_MENU_BOOK_GREEN,
 		       msg, msg->bcc);
 
     /* fcc: */
-    msg->fcc[0] = gtk_label_new(_("fcc:"));
+    msg->fcc[0] = gtk_label_new(_("Fcc:"));
     gtk_misc_set_alignment(GTK_MISC(msg->fcc[0]), 0.0, 0.5);
     gtk_misc_set_padding(GTK_MISC(msg->fcc[0]), GNOME_PAD_SMALL,
 			 GNOME_PAD_SMALL);
@@ -1320,7 +1320,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	    lst = libbalsa_message_user_hdrs(message);
 	    for (p = g_list_first(lst); p; p = g_list_next(p)) {
 		pair = p->data;
-		if ( libbalsa_find_word(pair[0], "x-beenthere x-mailing-list") )
+		if ( libbalsa_find_word(pair[0], "x-beenthere x-mailing-list to") )
 		    gtk_entry_set_text(GTK_ENTRY(msg->to[1]), pair[1]);
 		g_strfreev(pair);
 	    }
@@ -1865,7 +1865,7 @@ print_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 	GtkWidget *msgbox =
 	    gnome_message_box_new(_("Cannot execute print command."),
 				  GNOME_MESSAGE_BOX_ERROR,
-				  _("Cancel"), NULL);
+				  GNOME_STOCK_BUTTON_CANCEL, NULL);
 	gtk_window_set_modal(GTK_WINDOW(msgbox), TRUE);
 	gnome_dialog_run(GNOME_DIALOG(msgbox));
     }
@@ -1888,7 +1888,7 @@ print_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     if (pclose(lpr) != 0) {
 	GtkWidget *msgbox = gnome_message_box_new(_("Error executing lpr"),
 						  GNOME_MESSAGE_BOX_ERROR,
-						  _("Cancel"), NULL);
+						  GNOME_STOCK_BUTTON_CANCEL, NULL);
 	gtk_window_set_modal(GTK_WINDOW(msgbox), TRUE);
 	gnome_dialog_run(GNOME_DIALOG(msgbox));
     }

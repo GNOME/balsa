@@ -207,13 +207,13 @@ static GnomeUIInfo file_new_menu[] = {
     },
     GNOMEUIINFO_SEPARATOR,
 #define MENU_FILE_NEW_MBOX_POS 2
-    GNOMEUIINFO_ITEM_STOCK(N_("Local Mbox mailbox..."), 
+    GNOMEUIINFO_ITEM_STOCK(N_("Local mbox mailbox..."), 
 			   N_("Add a new mbox style mailbox"),
 			   mailbox_conf_add_mbox_cb, 
 			   GNOME_STOCK_PIXMAP_ADD),
 #define MENU_FILE_NEW_MAILDIR_POS 2
     GNOMEUIINFO_ITEM_STOCK(N_("Local Maildir mailbox..."), 
-			   N_("Add a new maildir style mailbox"),
+			   N_("Add a new Maildir style mailbox"),
 			   mailbox_conf_add_maildir_cb, 
 			   GNOME_STOCK_PIXMAP_ADD),
 #define MENU_FILE_NEW_MH_POS 3
@@ -259,7 +259,7 @@ static GnomeUIInfo file_menu[] = {
     GNOMEUIINFO_SEPARATOR,
     {
      GNOME_APP_UI_ITEM, N_("_Address Book..."),
-     N_("Opens the address book"),
+     N_("Open the address book"),
      address_book_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
      GNOME_STOCK_MENU_BOOK_RED, 'B', 0, NULL},
     GNOMEUIINFO_SEPARATOR,
@@ -352,7 +352,7 @@ static GnomeUIInfo message_menu[] = {
 #define MENU_MESSAGE_REPLY_ALL_POS 1
     /* A */
     {
-	GNOME_APP_UI_ITEM, N_("Reply To _All..."),
+	GNOME_APP_UI_ITEM, N_("Reply to _All..."),
 	N_("Reply to all recipients of the current message"),
 	replytoall_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
 	BALSA_PIXMAP_MAIL_RPL_ALL_MENU, 'A', 0, NULL
@@ -360,7 +360,7 @@ static GnomeUIInfo message_menu[] = {
 #define MENU_MESSAGE_REPLY_GROUP_POS 2
     /* G */
     {
-	GNOME_APP_UI_ITEM, N_("Reply To _Group..."),
+	GNOME_APP_UI_ITEM, N_("Reply to _Group..."),
 	N_("Reply to mailing list"),
 	replytogroup_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
 	BALSA_PIXMAP_MAIL_RPL_ALL_MENU, 'G', 0, NULL
@@ -376,21 +376,21 @@ static GnomeUIInfo message_menu[] = {
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MESSAGE_NEXT_PART_POS 5
     {
-	GNOME_APP_UI_ITEM, N_("Next Part"), N_("Next Part in Message"),
+	GNOME_APP_UI_ITEM, N_("Next Part"), N_("Next part in message"),
 	next_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
 	GNOME_STOCK_MENU_FORWARD, '.', GDK_CONTROL_MASK, NULL
     },
 #define MENU_MESSAGE_PREVIOUS_PART_POS 6
     {
 	GNOME_APP_UI_ITEM, N_("Previous Part"),
-	N_("Previous Part in Message"),
+	N_("Previous part in message"),
 	previous_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
 	GNOME_STOCK_MENU_BACK, ',', GDK_CONTROL_MASK, NULL
     },
 #define MENU_MESSAGE_SAVE_PART_POS 7
     {
 	GNOME_APP_UI_ITEM, N_("Save Current Part..."),
-	N_("Save Current Part in Message"),
+	N_("Save current part in message"),
 	save_current_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
 	GNOME_STOCK_MENU_SAVE, 's', GDK_CONTROL_MASK, NULL
     },
@@ -468,7 +468,7 @@ static GnomeUIInfo mailbox_menu[] = {
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_EMPTY_TRASH_POS 10
     GNOMEUIINFO_ITEM_STOCK(N_("Empty _Trash"),
-			   N_("Delete Messages from the trash mailbox"),
+			   N_("Delete messages from the Trash mailbox"),
 			   mailbox_empty_trash, GNOME_STOCK_PIXMAP_REMOVE),
     GNOMEUIINFO_END
 };
@@ -504,12 +504,12 @@ static GnomeUIInfo main_toolbar[] = {
 			   GNOME_STOCK_PIXMAP_MAIL_RCV),
     GNOMEUIINFO_SEPARATOR,
 #define TOOLBAR_DELETE_POS 2
-    GNOMEUIINFO_ITEM_STOCK(N_("Delete"), N_("Delete Message"),
+    GNOMEUIINFO_ITEM_STOCK(N_("Delete"), N_("Delete message"),
 			   delete_message_cb,
 			   GNOME_STOCK_PIXMAP_TRASH),
     GNOMEUIINFO_SEPARATOR,
 #define TOOLBAR_COMPOSE_POS 4
-    GNOMEUIINFO_ITEM_STOCK(N_("Compose"), N_("Compose Message"),
+    GNOMEUIINFO_ITEM_STOCK(N_("Compose"), N_("Compose message"),
 			   new_message_cb,
 			   GNOME_STOCK_PIXMAP_MAIL_NEW),
 #define TOOLBAR_CONTINUE_POS 5
@@ -521,7 +521,7 @@ static GnomeUIInfo main_toolbar[] = {
 			   replyto_message_cb,
 			   GNOME_STOCK_PIXMAP_MAIL_RPL),
 #define TOOLBAR_REPLY_ALL_POS 7
-    GNOMEUIINFO_ITEM_STOCK(N_("Reply\nTo All"), N_("Reply to all"),
+    GNOMEUIINFO_ITEM_STOCK(N_("Reply\nto All"), N_("Reply to all"),
 			   replytoall_message_cb,
 			   BALSA_PIXMAP_MAIL_RPL_ALL),
 #define TOOLBAR_FORWARD_POS 8
@@ -531,16 +531,16 @@ static GnomeUIInfo main_toolbar[] = {
     GNOMEUIINFO_SEPARATOR,
 #define TOOLBAR_PREVIOUS_POS 10
     {
-     GNOME_APP_UI_ITEM, N_("Previous"), N_("Open Previous message"),
+     GNOME_APP_UI_ITEM, N_("Previous"), N_("Open previous message"),
      previous_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
      GNOME_STOCK_PIXMAP_BACK, 0, 0, NULL},
 #define TOOLBAR_NEXT_POS 11
     {
-     GNOME_APP_UI_ITEM, N_("Next"), N_("Open Next message"),
+     GNOME_APP_UI_ITEM, N_("Next"), N_("Open next message"),
      next_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
      GNOME_STOCK_PIXMAP_FORWARD, 0, 0, NULL},
 #define TOOLBAR_NEXT_UNREAD_POS 12
-    GNOMEUIINFO_ITEM_STOCK(N_("Next\nUnread"), N_("Open Next Unread Message"),
+    GNOMEUIINFO_ITEM_STOCK(N_("Next\nUnread"), N_("Open next unread message"),
      next_unread_message_cb, BALSA_PIXMAP_NEXT_UNREAD),
     GNOMEUIINFO_SEPARATOR,
 #define TOOLBAR_PRINT_POS 14
@@ -1168,7 +1168,7 @@ show_about_box(void)
 
     about = gnome_about_new("Balsa",
 			    BALSA_VERSION,
-			    _("Copyright (C) 1997-2000"),
+			    _("Copyright (C) 1997-2001"),
 			    authors,
 			    _
 			    ("The Balsa email client is part of the GNOME desktop environment.  Information on Balsa can be found at http://www.balsa.net/\n\nIf you need to report bugs, please do so at: http://bugs.gnome.org/"),

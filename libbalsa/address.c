@@ -140,13 +140,13 @@ GList*
 libbalsa_address_new_list_from_string(const gchar * str)
 {
     LibBalsaAddress* addr;
-    InternetAddressList *list;
+    InternetAddressList *list, *l;
     GList* lst = NULL;
 
     gchar *tmp = g_strdup(str);
     
     libbalsa_utf8_sanitize(&tmp, FALSE, WEST_EUROPE, NULL);
-    list = internet_address_parse_string(tmp);
+    l = list = internet_address_parse_string(tmp);
     g_free(tmp);
     if (!list)
 	return NULL;
@@ -159,7 +159,7 @@ libbalsa_address_new_list_from_string(const gchar * str)
 	lst = g_list_append(lst, addr);
 	list = list->next;
     }
-    internet_address_list_destroy(list);
+    internet_address_list_destroy(l);
     return lst;
 }
 

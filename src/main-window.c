@@ -4155,7 +4155,6 @@ empty_trash(BalsaWindow * window)
     guint msgno, total;
     GArray *messages;
 
-    g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.trash));
     if (!libbalsa_mailbox_open(balsa_app.trash, NULL))
 	return;
 

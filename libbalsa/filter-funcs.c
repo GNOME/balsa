@@ -245,7 +245,9 @@ libbalsa_condition_new_from_string(gchar **string)
     };
     gboolean negated;
     unsigned i;
-    
+
+    if(!*string)  /* empty string -> no condition */
+        return NULL;
     if(strncmp(*string, "NOT ", 4) == 0) {
         negated = TRUE;
         string += 4;

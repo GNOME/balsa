@@ -1,3 +1,13 @@
+2002-03-19 Steve Wall <hitched97@myrealbox.com>
+
+	* configure.in: fix libesmtp test. make gdbm and gnome-vfs usage
+	optional. take care of non-portable isblank().
+
+	* libbalsa/libbalsa.c, misc.c
+	* src/balsa-message.c: optional GNOME-VFS
+	* libbalsa/mailbox_imap.c:
+	* src/Makefile.am: optional gdbm.
+
 2002-03-17  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox{,_local,_imap}.c, message.c: MT-lock mailbox.

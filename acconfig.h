@@ -51,3 +51,10 @@
 
 /* use pcre instead of `standard' rexexp's? */
 #undef HAVE_PCRE
+
+/* If Gnome-VFS available? */
+#undef HAVE_GNOME_VFS
+
+/* have isblank? */
+
+#undef isblank

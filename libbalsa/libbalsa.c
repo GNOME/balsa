@@ -103,10 +103,12 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
     struct utsname utsname;
     const char *p;
 
+#ifdef	HAVE_GNOME_VFS
     if (!gnome_vfs_init ()) {
         fprintf (stderr, "Cannot initialize the GNOME Virtual File System.\n");
         return;
     }
+#endif
     Spoolfile = libbalsa_guess_mail_spool();
 
 #ifdef BALSA_USE_THREADS

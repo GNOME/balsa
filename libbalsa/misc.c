@@ -29,8 +29,12 @@
 #include <errno.h>
 #include <dirent.h>
 
-#include <libgnomevfs/gnome-vfs-file-info.h>
-#include <libgnomevfs/gnome-vfs-ops.h>
+#ifdef HAVE_GNOME_VFS
+# include <libgnomevfs/gnome-vfs-file-info.h>
+# include <libgnomevfs/gnome-vfs-ops.h>
+#else
+# define GNOME_MIME_BUG_WORKAROUND 1
+#endif
 
 #include "misc.h"
 #include "libbalsa_private.h"
@@ -40,6 +44,7 @@
 gchar*
 libbalsa_lookup_mime_type(const gchar * path)
 {
+#ifdef HAVE_GNOME_VFS
     GnomeVFSFileInfo* vi = gnome_vfs_file_info_new();
     gchar* res;
     gchar* uri = g_strconcat("file://", path, NULL);
@@ -50,6 +55,23 @@ libbalsa_lookup_mime_type(const gchar * path)
     res = g_strdup(gnome_vfs_file_info_get_mime_type(vi));
     gnome_vfs_file_info_unref(vi);
     return res;
+#else
+    const gchar *mime_type;
+
+    mime_type =
+	gnome_mime_type_or_default_of_file(path, "application/octet-stream");
+# ifdef GNOME_MIME_BUG_WORKAROUND
+    /* the function above returns for certain files a string which is
+       not a proper MIME type, e.g. "PDF document". Surprizingly,
+       gnome_mime_type() does not fail in this case. This bug has been
+       filed in bugzilla. Still not fixed.
+    */
+    if(strchr(mime_type, '/') == NULL)
+	mime_type = 
+	    gnome_mime_type_or_default(path, "application/octet-stream");
+# endif
+    return (gchar *)mime_type;
+#endif
 }
 
 gchar *

@@ -1,3 +1,9 @@
+2001-01-13  Gediminas Paulauskas  <menesis@delfi.lt>
+
+	* src/sendmsg-window.c: with SEND_REPLY_GROUP messages act as with
+	other replies. Set the size not of the window, but just the text
+	widget. Use wraplength for size only when an option is on.
+
 2001-01-12  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/balsa-icons.h: BALSA_PIXMAP_ENVELOPE

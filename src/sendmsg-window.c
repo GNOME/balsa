@@ -1128,7 +1128,8 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 	str = g_strdup_printf(_("\n%s wrote:\n"), personStr);
 
     body = content2reply(message,
-			 (type == SEND_REPLY || type == SEND_REPLY_ALL) ?
+			 (type == SEND_REPLY || type == SEND_REPLY_ALL || 
+			  type == SEND_REPLY_GROUP) ?
 			 balsa_app.quote_str : NULL,
 			 balsa_app.wordwrap ? balsa_app.wraplength : -1);
 
@@ -1204,6 +1205,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     switch (type) {
     case SEND_REPLY:
     case SEND_REPLY_ALL:
+    case SEND_REPLY_GROUP:
 	window = gnome_app_new("balsa", _("Reply to "));
 	msg->orig_message = message;
 	break;
@@ -1370,8 +1372,8 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	break;
     }
 
-    if (type == SEND_REPLY ||
-	type == SEND_REPLY_ALL || type == SEND_FORWARD) {
+    if (type == SEND_REPLY || type == SEND_REPLY_ALL ||
+	type == SEND_REPLY_GROUP || type == SEND_FORWARD) {
 	gtk_entry_set_text(GTK_ENTRY(msg->subject[1]), newsubject);
 	g_free(newsubject);
 	newsubject = NULL;
@@ -1445,19 +1447,20 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
      * Set the size of the text widget according to the user
      * preferences (font and line_wrap).
      */
-    if (balsa_app.wraplength > 0)
+    if (balsa_app.wordwrap && (balsa_app.wraplength > 0))
 	/* Text of wrap + text of gtk_text next-line character */
-	width = balsa_app.wraplength + 1;
+	width = balsa_app.wraplength + 2;
     else
 	width = 82;
-    gtk_window_set_default_size(GTK_WINDOW(window),
-	    			/* Width of the text. */
-				(width * (gdk_char_width(msg->font, 'M'))) +
-				/* Width of the borders inside/outside box */
-				(2 * msg->text->style->klass->xthickness) +
-				/* Size of the scrollbar */
-				(24),
-				35 * (gdk_char_height(msg->font, 'M')));
+    gtk_widget_set_usize(msg->text,
+	    		 /* Width of the text. */
+			 (width * gdk_char_width(msg->font, 'M')) +
+			 /* Width of the borders inside/outside box */
+			 (2 * msg->text->style->klass->xthickness),
+	    		 /* Height of the text. */
+			 (20 * gdk_char_height(msg->font, 'M')) +
+			 /* Height of the borders inside/outside box */
+			 (2 * msg->text->style->klass->ythickness));
     gtk_window_set_wmclass(GTK_WINDOW(window), "compose", "Balsa");
 
     gtk_widget_show(window);
@@ -1752,7 +1755,8 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 					   balsa_app.smtp_server : NULL,
 					   balsa_app.smtp_port);
     if (successful) {
-	if (bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL) {
+	if (bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
+	    bsmsg->type == SEND_REPLY_GROUP) {
 	    if (bsmsg->orig_message)
 		libbalsa_message_reply(bsmsg->orig_message);
 	} else if (bsmsg->type == SEND_CONTINUE) {
@@ -1798,7 +1802,8 @@ postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 
     message = bsmsg2message(bsmsg);
 
-    if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL))
+    if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
+        bsmsg->type == SEND_REPLY_GROUP))
 	libbalsa_message_postpone(message, balsa_app.draftbox,
 				  bsmsg->orig_message,
 				  message->fcc_mailbox,

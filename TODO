@@ -11,8 +11,8 @@ Fix/update/make-sure-they-work:
 
 New features/unfinished things:
 -------------------------------
-- Filters
-- CORBA
+- [PARTIAL] Filters
+- [PARTIAL] CORBA
 - [MOSTLY] update libmutt
 - Check mail using external programs such as fetchmail
 
@@ -46,6 +46,9 @@ status, etc.
        		- copy
 
 - MIME supporting icons.  use the new gnome metadata stuff that gmc uses?
+	- Use mime icons for attachments for incoming & outgoing messages
+	- Index attachment indicator should have a different icon depending 
+	on the mime category (text/*, application/*, image/*, etc.)
 
 - [PARTIAL] New mail notification
 	- [PARTIAL] via sound
@@ -61,7 +64,17 @@ status, etc.
      	- [DONE] check for new mail every xx minutes
      	- load mail from local mail directory
 
-- [PARTIAL] spell checking in the send window
+- [MOSTLY] Spell checking in the send window.
+	- [DONE] Improve next word heuristics (don't check quoted
+	text)
+	- [DONE] Implement "Change All" button
+	- [DONE] Error handling (from pspell and widget)
+	- [DONE] Destroy signal handler
+	- [DONE] configure.in magic to check for pspell 
+	- [MOSTLY] Fix language selection
+	- Keep ignored words until message is sent or postponed
+	- Fix highlight colour, avoid potential theme conflict
+	- Automatically determine which modules are available
 
 - [DONE] menu and toolbar for message-window
 

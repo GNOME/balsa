@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -26,6 +26,7 @@
 #include "mailbox-conf.h"
 #include "main-window.h"
 #include "save-restore.h"
+#include "spell-check.h"
 /* FIXME: Mutt dependency */
 #include "../libmutt/mime.h"
 
@@ -91,16 +92,25 @@ typedef struct _PropertyUI {
 	GtkWidget *quoted_color_start;
 	GtkWidget *quoted_color_end;
 
+        /* quote regex */
+        GtkWidget* quote_pattern;
+
 	/* address book */
 	GtkWidget *ab_location;
 	GtkWidget *alias_find_flag;
+        
+        /* spell checking */
+        GtkWidget* module;
+        gint module_index;
+        GtkWidget* suggestion_mode;
+        gint suggestion_mode_index;
+        GtkWidget* ignore_length;
 
 #ifdef ENABLE_LDAP
 	/* ldap */
 	GtkWidget *ldap_host;
 	GtkWidget *base_dn;
 #endif /* ENABLE_LDAP */
-	  
 } PropertyUI;
 
 
@@ -117,6 +127,9 @@ static GtkWidget *create_printing_page ( void );
 static GtkWidget *create_encondig_page ( void );
 static GtkWidget *create_misc_page ( void );
 static GtkWidget *create_startup_page ( void );
+static GtkWidget *create_spelling_page (void);
+static GtkWidget* create_spelling_option_menu (const gchar* names[], gint size, gint* index);
+
 #ifdef ENABLE_LDAP
 static GtkWidget *create_ldap_page (void);
 #endif
@@ -138,47 +151,55 @@ static void pop3_del_cb (GtkWidget * widget, gpointer data);
 static void timer_modified_cb( GtkWidget *widget, GtkWidget *pbox);
 static void print_modified_cb( GtkWidget *widget, GtkWidget *pbox);
 static void wrap_modified_cb( GtkWidget *widget, GtkWidget *pbox);
+static void spelling_optionmenu_cb (GtkItem* menuitem, gpointer data);
 
 guint toolbar_type[NUM_TOOLBAR_MODES] =
 {
-  GTK_TOOLBAR_TEXT,
-  GTK_TOOLBAR_ICONS,
-  GTK_TOOLBAR_BOTH
+        GTK_TOOLBAR_TEXT,
+        GTK_TOOLBAR_ICONS,
+        GTK_TOOLBAR_BOTH
 };
 
 gchar *toolbar_type_label[NUM_TOOLBAR_MODES] =
 {
-  N_("Text"),
-  N_("Icons"),
-  N_("Both"),
+        N_("Text"),
+        N_("Icons"),
+        N_("Both"),
 };
 
 guint encoding_type[NUM_ENCODING_MODES] =
 {
-    ENC7BIT,
-    ENC8BIT,
-    ENCQUOTEDPRINTABLE
+        ENC7BIT,
+        ENC8BIT,
+        ENCQUOTEDPRINTABLE
 };
 
 gchar *encoding_type_label[NUM_ENCODING_MODES] =
 {
-    N_("7bits"),
-    N_("8bits"),
-    N_("quoted")
+        N_("7bits"),
+        N_("8bits"),
+        N_("quoted")
 };
 
 guint pwindow_type[NUM_PWINDOW_MODES] =
 {
-  WHILERETR,
-  UNTILCLOSED,
-  NEVER
+        WHILERETR,
+        UNTILCLOSED,
+        NEVER
 };
 
 gchar *pwindow_type_label[NUM_PWINDOW_MODES] =
 {
-  N_("While Retrieving Messages"),
-  N_("Until Closed"),
-  N_("Never")
+        N_("While Retrieving Messages"),
+        N_("Until Closed"),
+        N_("Never")
+};
+
+const gchar* spell_check_suggest_mode_label[NUM_SUGGEST_MODES] = 
+{
+        N_("Fast"),
+        N_("Normal"),
+        N_("Bad Spellers")
 };
 
 
@@ -227,6 +248,9 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 
 	page = create_printing_page ();
         gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Printing")) );
+
+        page = create_spelling_page ();
+        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Spelling")));
 
 	page = create_encondig_page();
         gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Encoding")) );
@@ -307,6 +331,10 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 	gtk_signal_connect (GTK_OBJECT (pui->quote_str), "changed",
 			    GTK_SIGNAL_FUNC (properties_modified_cb),
 			    property_box);
+        gtk_signal_connect (GTK_OBJECT (gnome_entry_gtk_entry (GNOME_ENTRY (pui->quote_pattern))), 
+                            "changed",
+                            GTK_SIGNAL_FUNC (properties_modified_cb),
+                            property_box);
 	
 	/* message font */
 	gtk_signal_connect (GTK_OBJECT (pui->message_font), "changed",
@@ -345,6 +373,19 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 
 	gtk_signal_connect (GTK_OBJECT (pui->empty_trash), "toggled",
 			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
+
+        /* spell checking */
+        gtk_signal_connect (GTK_OBJECT (pui->module), "clicked",
+                            GTK_SIGNAL_FUNC (properties_modified_cb), 
+                            property_box);
+        
+        gtk_signal_connect (GTK_OBJECT (pui->suggestion_mode), "clicked",
+                            GTK_SIGNAL_FUNC (properties_modified_cb), 
+                            property_box);
+        
+        gtk_signal_connect (GTK_OBJECT (pui->ignore_length), "changed",
+                            GTK_SIGNAL_FUNC (properties_modified_cb), 
+                            property_box);
 
 #ifdef ENABLE_LDAP
         gtk_signal_connect (GTK_OBJECT (pui->ldap_host), "changed",
@@ -416,6 +457,7 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
 {
 	gint i;
         GtkWidget *balsa_window;
+        GtkWidget* entry_widget;
 	GtkWidget *menu_item;
 
         if (page_num != -1)
@@ -496,7 +538,9 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
 	g_free (balsa_app.message_font);
 	balsa_app.message_font = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->message_font)));
 
-
+        g_free (balsa_app.quote_regex);
+        entry_widget = gnome_entry_gtk_entry(GNOME_ENTRY (pui->quote_pattern));
+        balsa_app.quote_regex = g_strdup (gtk_entry_get_text (GTK_ENTRY (entry_widget)));
 	/* charset*/
 	g_free (balsa_app.charset);
 	balsa_app.charset = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->charset)));
@@ -520,6 +564,11 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
 	balsa_app.remember_open_mboxes = GTK_TOGGLE_BUTTON(pui->remember_open_mboxes)->active;
 	balsa_app.empty_trash_on_exit = GTK_TOGGLE_BUTTON(pui->empty_trash)->active;
 
+        /* spell checking */
+        balsa_app.module = pui->module_index;
+        balsa_app.suggestion_mode = pui->suggestion_mode_index;
+        balsa_app.ignore_size = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (pui->ignore_length));
+        
 #ifdef ENABLE_LDAP
         balsa_app.ldap_host = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->ldap_host)));
         balsa_app.ldap_base_dn = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->base_dn)));
@@ -532,30 +581,30 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
 	/* selected headers */
 	g_free (balsa_app.selected_headers);
 	balsa_app.selected_headers = g_strdup (gtk_entry_get_text (
-	   GTK_ENTRY (pui->selected_headers)) );
+                GTK_ENTRY (pui->selected_headers)) );
 	g_strdown(balsa_app.selected_headers);
 
         /* unread mailbox color */
         gdk_colormap_free_colors (
-	  gdk_window_get_colormap (GTK_WIDGET(pbox)->window),
-	  &balsa_app.mblist_unread_color, 1);
+                gdk_window_get_colormap (GTK_WIDGET(pbox)->window),
+                &balsa_app.mblist_unread_color, 1);
         gnome_color_picker_get_i16 (GNOME_COLOR_PICKER(pui->unread_color), &(balsa_app.mblist_unread_color.red), &(balsa_app.mblist_unread_color.green), &(balsa_app.mblist_unread_color.blue), 0);
 
         /* quoted text color */
         gdk_colormap_free_colors (
-	  gdk_window_get_colormap (GTK_WIDGET(pbox)->window),
-	  &balsa_app.quoted_color[0], 1);
+                gdk_window_get_colormap (GTK_WIDGET(pbox)->window),
+                &balsa_app.quoted_color[0], 1);
         gnome_color_picker_get_i16 (GNOME_COLOR_PICKER(pui->quoted_color_start), &(balsa_app.quoted_color[0].red), &(balsa_app.quoted_color[0].green), &(balsa_app.quoted_color[0].blue), 0);
         gdk_colormap_free_colors (
-	  gdk_window_get_colormap (GTK_WIDGET(pbox)->window),
-	  &balsa_app.quoted_color[MAX_QUOTED_COLOR - 1], 1);
+                gdk_window_get_colormap (GTK_WIDGET(pbox)->window),
+                &balsa_app.quoted_color[MAX_QUOTED_COLOR - 1], 1);
         gnome_color_picker_get_i16 (GNOME_COLOR_PICKER(pui->quoted_color_end), &(balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].red), &(balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].green), &(balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].blue), 0);
 
 	/* address book */
 	g_free (balsa_app.ab_location);
 	balsa_app.ab_location = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->ab_location)));
 	balsa_app.alias_find_flag =
-	   GTK_TOGGLE_BUTTON(pui->alias_find_flag)->active;
+                GTK_TOGGLE_BUTTON(pui->alias_find_flag)->active;
 
 	/* Information dialogs */
 	menu_item = gtk_menu_get_active ( GTK_MENU(pui->information_message_menu) );
@@ -586,6 +635,7 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
 void
 set_prefs (void)
 {
+        GtkWidget* entry_widget;
 	gchar tmp[10];
 	gint i;
 
@@ -649,7 +699,9 @@ set_prefs (void)
 
 	/* arp */
 	gtk_entry_set_text (GTK_ENTRY (pui->quote_str), balsa_app.quote_str);
-
+        entry_widget = gnome_entry_gtk_entry(GNOME_ENTRY (pui->quote_pattern));
+        gtk_entry_set_text (GTK_ENTRY (entry_widget), balsa_app.quote_regex);
+        
 	/* message font */
 	gtk_entry_set_text (GTK_ENTRY (pui->message_font), balsa_app.message_font);
 	gtk_entry_set_position (GTK_ENTRY (pui->message_font), 0);
@@ -670,11 +722,21 @@ set_prefs (void)
 				      balsa_app.PrintCommand.breakline);
 
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (
-	    pui->check_mail_upon_startup), balsa_app.check_mail_upon_startup);
+                pui->check_mail_upon_startup), balsa_app.check_mail_upon_startup);
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (
-	    pui->remember_open_mboxes), balsa_app.remember_open_mboxes);
+                pui->remember_open_mboxes), balsa_app.remember_open_mboxes);
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (
-	    pui->empty_trash), balsa_app.empty_trash_on_exit);
+                pui->empty_trash), balsa_app.empty_trash_on_exit);
+
+        /* spelling */
+        pui->module_index = balsa_app.module;
+        gtk_option_menu_set_history (GTK_OPTION_MENU (pui->module), 
+                                     balsa_app.module);
+        pui->suggestion_mode_index = balsa_app.suggestion_mode;
+        gtk_option_menu_set_history (GTK_OPTION_MENU (pui->suggestion_mode), 
+                                     balsa_app.suggestion_mode);
+        gtk_spin_button_set_value (GTK_SPIN_BUTTON (pui->ignore_length), 
+                                   balsa_app.ignore_size);
 
 
 #ifdef ENABLE_LDAP
@@ -686,11 +748,11 @@ set_prefs (void)
 	
 	/* date format */
 	if(balsa_app.date_string) 
-	   gtk_entry_set_text (GTK_ENTRY (pui->date_format),
-			       balsa_app.date_string);
+                gtk_entry_set_text (GTK_ENTRY (pui->date_format),
+                                    balsa_app.date_string);
 	if(balsa_app.selected_headers) 
-	   gtk_entry_set_text (GTK_ENTRY (pui->selected_headers),
-			       balsa_app.selected_headers);
+                gtk_entry_set_text (GTK_ENTRY (pui->selected_headers),
+                                    balsa_app.selected_headers);
 
 	/* Colour */
         gnome_color_picker_set_i16 (GNOME_COLOR_PICKER(pui->unread_color), balsa_app.mblist_unread_color.red, balsa_app.mblist_unread_color.green, balsa_app.mblist_unread_color.blue, 0);
@@ -734,25 +796,25 @@ update_pop3_servers (void)
 	
 	gtk_clist_freeze (clist);
 	while (list) {
-	  mailbox = list->data;
-	  if (mailbox) {
-	    if ( LIBBALSA_IS_MAILBOX_POP3(mailbox) ) 
-	    {
-	      text[0] = "POP3"; 
-	    } 
-	    else if ( LIBBALSA_IS_MAILBOX_IMAP(mailbox) )
-	    {
-	      text[0] = "IMAP"; 
-	    } 
-	    else
-	    {
-	      text[0] = "????"; 
-	    }
-	    text[1] = mailbox->name;
-	    row = gtk_clist_append (clist, text);
-	    gtk_clist_set_row_data (clist, row, mailbox);
-	  }
-	  list = list->next;
+                mailbox = list->data;
+                if (mailbox) {
+                        if ( LIBBALSA_IS_MAILBOX_POP3(mailbox) ) 
+                        {
+                                text[0] = "POP3"; 
+                        } 
+                        else if ( LIBBALSA_IS_MAILBOX_IMAP(mailbox) )
+                        {
+                                text[0] = "IMAP"; 
+                        } 
+                        else
+                        {
+                                text[0] = "????"; 
+                        }
+                        text[1] = mailbox->name;
+                        row = gtk_clist_append (clist, text);
+                        gtk_clist_set_row_data (clist, row, mailbox);
+                }
+                list = list->next;
 	}
 	gtk_clist_select_row(clist, 0, 0);
 	gtk_clist_thaw (clist);
@@ -836,7 +898,7 @@ create_identity_page( )
 }
 
 
-	/*
+/*
 	 * finnished Identity, starting on signature
 	 */
 static GtkWidget *
@@ -924,7 +986,7 @@ create_signature_page ( )
 			  (GtkAttachOptions) (0), 0, 0);
 
 	pui->sig_separator = gtk_check_button_new_with_label (
-	   _("enable signature separator"));
+                _("enable signature separator"));
 	gtk_widget_show ( pui->sig_separator);
 	gtk_table_attach (GTK_TABLE (table1),  pui->sig_separator, 1, 2, 5, 6,
 			  (GtkAttachOptions) (GTK_FILL),
@@ -1004,7 +1066,7 @@ create_mailserver_page ( )
 	
 	button = gtk_button_new_with_label (_("Add"));
 	gtk_signal_connect_object (GTK_OBJECT (button), "clicked",
-			     GTK_SIGNAL_FUNC (pop3_add_cb), NULL);
+                                   GTK_SIGNAL_FUNC (pop3_add_cb), NULL);
 
 	gtk_widget_show (button);
 	gtk_box_pack_start (GTK_BOX (vbox1), button, FALSE, FALSE, 0);
@@ -1088,7 +1150,7 @@ create_mailserver_page ( )
 
 
 
-	/*
+/*
 	 * finnish mail servers, starting mail options
 	 */
 static GtkWidget *
@@ -1223,8 +1285,8 @@ outgoing_page ( )
 	pui->bcc = gtk_entry_new();
 	gtk_widget_show(pui->bcc);
 	gtk_table_attach(GTK_TABLE(table2), pui->bcc, 1, 3, 1, 3,
-				   (GtkAttachOptions) (0),
-				   (GtkAttachOptions) (0), 0, 0);
+                         (GtkAttachOptions) (0),
+                         (GtkAttachOptions) (0), 0, 0);
 	return vbox1;
 
 }
@@ -1331,8 +1393,8 @@ create_display_page ( )
 	group = NULL;
 	for (i = 0; i < NUM_PWINDOW_MODES; i++)  {
 		pui->pwindow_type[i] = GTK_RADIO_BUTTON (
-		   gtk_radio_button_new_with_label (group, 
-						    _(pwindow_type_label[i])));
+                        gtk_radio_button_new_with_label (group, 
+                                                         _(pwindow_type_label[i])));
 		gtk_box_pack_start (GTK_BOX (vbox4), 
 				    GTK_WIDGET (pui->pwindow_type[i]), 
 				    FALSE, TRUE, 0);
@@ -1469,6 +1531,85 @@ create_printing_page ( )
 
 }
 
+
+static GtkWidget* create_spelling_page (void)
+{
+        GtkWidget* frame;
+        GtkWidget* vbox0;
+        GtkWidget* vbox1;
+        GtkWidget* hbox0;
+        GtkWidget* hbox1;
+        GtkWidget* hbox2;
+        GtkWidget* table0;
+        GtkWidget* table1;
+        GtkWidget* label0;
+        GtkWidget* label1;
+        
+        GtkWidget* omenu;
+        GtkObject* ignore_adj;
+        GtkWidget* ignore_spin;
+        
+        const guint padding = 5;
+
+        vbox0 = gtk_vbox_new (FALSE, padding*2);
+
+        /* pspell frame */
+        frame = gtk_frame_new (_("Pspell Settings"));
+        gtk_box_pack_start (GTK_BOX (vbox0), frame, FALSE, FALSE, 0);
+        gtk_container_set_border_width (GTK_CONTAINER (frame), padding*2);
+        vbox1 = gtk_vbox_new (FALSE, padding);
+        
+        gtk_container_set_border_width (GTK_CONTAINER (vbox1), padding);
+        gtk_container_add (GTK_CONTAINER (frame), vbox1);
+        
+        /* do the module menu */
+        omenu = create_spelling_option_menu (spell_check_modules_name, 
+                                             NUM_PSPELL_MODULES,
+                                             &pui->module_index);
+        table0 = gtk_table_new (1, 2, TRUE);
+        gtk_table_attach_defaults (GTK_TABLE (table0), omenu, 0, 1, 0, 1);
+
+        hbox0 = gtk_hbox_new (FALSE, 0);
+        label0 = gtk_label_new (_("Spell Check Module"));
+        gtk_misc_set_padding (GTK_MISC (label0), padding, padding);
+        gtk_box_pack_start (GTK_BOX (hbox0), label0 , FALSE, FALSE, padding);
+        gtk_box_pack_start (GTK_BOX (hbox0), table0, TRUE, TRUE, padding);
+        gtk_box_pack_start (GTK_BOX (vbox1), hbox0, FALSE, FALSE, 0);
+        pui->module = omenu;
+        
+        /* do the suggestion modes menu */
+        omenu = create_spelling_option_menu (spell_check_suggest_mode_label,
+                                             NUM_SUGGEST_MODES, 
+                                             &pui->suggestion_mode_index);
+        table1 = gtk_table_new (1, 2, TRUE);
+        gtk_table_attach_defaults (GTK_TABLE (table1), omenu, 0, 1, 0, 1);
+        
+        hbox1 = gtk_hbox_new (FALSE, 0);
+        label1 = gtk_label_new (_("Suggestion Level"));
+        gtk_misc_set_padding (GTK_MISC (label1), padding, padding);
+        gtk_box_pack_start (GTK_BOX (hbox1),label1 , FALSE, FALSE, padding);
+        gtk_box_pack_start (GTK_BOX (hbox1), table1, TRUE, TRUE, padding);
+        gtk_box_pack_start (GTK_BOX (vbox1), hbox1, FALSE, FALSE, 0);
+        pui->suggestion_mode = omenu;
+
+        /* do the ignore length */
+        ignore_adj = gtk_adjustment_new (0.0, 0.0, 99.0, 1.0, 5.0, 0.0);
+        ignore_spin = gtk_spin_button_new (GTK_ADJUSTMENT (ignore_adj), 1, 0);
+        hbox2 = gtk_hbox_new (FALSE, 0);
+        gtk_box_pack_start (GTK_BOX (hbox2), gtk_label_new (_("Ignore words shorter than")), FALSE, FALSE, padding);
+        gtk_box_pack_start (GTK_BOX (hbox2), ignore_spin, FALSE, FALSE, padding);
+        gtk_box_pack_start (GTK_BOX (vbox1), hbox2, FALSE, FALSE, 0);
+        pui->ignore_length = ignore_spin;
+
+
+        /* ignore quoted check box */
+        
+        
+        gtk_widget_show_all (vbox0);
+        return vbox0;
+}
+
+
 static GtkWidget *
 create_encondig_page ( )
 {
@@ -1551,6 +1692,11 @@ create_misc_page ( )
         GtkWidget *quoted_color_label_end;
 	GtkWidget *vbox12;
         GtkWidget *ab_frame, *ab_box, *fileentry1;
+        GtkWidget* regex_frame;
+        GtkWidget* regex_hbox;
+        GtkWidget* regex_label;
+        GtkWidget* regex_entry;
+        
 
 	vbox9 = gtk_vbox_new (FALSE, 0);
 	gtk_widget_show (vbox9);
@@ -1639,7 +1785,7 @@ create_misc_page ( )
         gnome_color_picker_set_dither (GNOME_COLOR_PICKER (pui->unread_color) , TRUE);
         gtk_widget_show (pui->unread_color);
         gtk_box_pack_start (GTK_BOX (unread_color_box), pui->unread_color, 
-                          FALSE, FALSE, 5);
+                            FALSE, FALSE, 5);
         gtk_container_set_border_width (GTK_CONTAINER (pui->unread_color), 5);
 
         unread_color_label = gtk_label_new (_("Mailbox with unread messages colour"));
@@ -1657,44 +1803,60 @@ create_misc_page ( )
         gtk_box_pack_start_defaults (GTK_BOX (vbox12), quoted_color_box_start);
 	pui->quoted_color_start = gnome_color_picker_new ();
 	gnome_color_picker_set_title
-	   (GNOME_COLOR_PICKER (pui->quoted_color_start),
-	    _("Colour of quoted text"));
+                (GNOME_COLOR_PICKER (pui->quoted_color_start),
+                 _("Colour of quoted text"));
 	gnome_color_picker_set_dither
-	   (GNOME_COLOR_PICKER (pui->quoted_color_start), TRUE);
+                (GNOME_COLOR_PICKER (pui->quoted_color_start), TRUE);
 	gtk_widget_show (pui->quoted_color_start);
 	gtk_box_pack_start (GTK_BOX (quoted_color_box_start),
-	      pui->quoted_color_start, FALSE, FALSE, 5);
+                            pui->quoted_color_start, FALSE, FALSE, 5);
 	gtk_container_set_border_width
-	   (GTK_CONTAINER (pui->quoted_color_start), 5);
+                (GTK_CONTAINER (pui->quoted_color_start), 5);
 
 	quoted_color_label_start = gtk_label_new (_("Primary colour"));
 	gtk_widget_show (quoted_color_label_start);
 	gtk_box_pack_start (GTK_BOX (quoted_color_box_start),
-	      quoted_color_label_start, FALSE, FALSE, 5);
+                            quoted_color_label_start, FALSE, FALSE, 5);
 	gtk_label_set_justify (GTK_LABEL (quoted_color_label_start),
-	      GTK_JUSTIFY_LEFT);
+                               GTK_JUSTIFY_LEFT);
 
 	quoted_color_box_end = gtk_hbox_new (FALSE, 0);
 	gtk_widget_show (quoted_color_box_end);
         gtk_box_pack_start_defaults (GTK_BOX (vbox12), quoted_color_box_end);
 	pui->quoted_color_end = gnome_color_picker_new ();
 	gnome_color_picker_set_title
-	   (GNOME_COLOR_PICKER (pui->quoted_color_end),
-	    _("Colour of quoted text"));
+                (GNOME_COLOR_PICKER (pui->quoted_color_end),
+                 _("Colour of quoted text"));
 	gnome_color_picker_set_dither
-	   (GNOME_COLOR_PICKER (pui->quoted_color_end), TRUE);
+                (GNOME_COLOR_PICKER (pui->quoted_color_end), TRUE);
 	gtk_widget_show (pui->quoted_color_end);
 	gtk_box_pack_start (GTK_BOX (quoted_color_box_end),
-	      pui->quoted_color_end, FALSE, FALSE, 5);
+                            pui->quoted_color_end, FALSE, FALSE, 5);
 	gtk_container_set_border_width
-	   (GTK_CONTAINER (pui->quoted_color_end), 5);
+                (GTK_CONTAINER (pui->quoted_color_end), 5);
 
 	quoted_color_label_end = gtk_label_new (_("Secondary colour"));
 	gtk_widget_show (quoted_color_label_end);
 	gtk_box_pack_start (GTK_BOX (quoted_color_box_end),
-	      quoted_color_label_end, FALSE, FALSE, 5);
+                            quoted_color_label_end, FALSE, FALSE, 5);
 	gtk_label_set_justify (GTK_LABEL (quoted_color_label_end),
-	      GTK_JUSTIFY_LEFT);
+                               GTK_JUSTIFY_LEFT);
+
+        /* Quoted text regular expression */
+        regex_frame = gtk_frame_new (_ ("Quoted Text"));
+        gtk_container_set_border_width (GTK_CONTAINER (regex_frame), 2);
+        gtk_box_pack_start (GTK_BOX (vbox9), regex_frame, FALSE, FALSE, 0);
+        
+        regex_hbox = gtk_hbox_new (FALSE, 0);
+        gtk_container_add (GTK_CONTAINER (regex_frame), regex_hbox);
+        gtk_container_set_border_width (GTK_CONTAINER (regex_hbox), 5);
+        
+        regex_label = gtk_label_new (_ ("Quoted Text Regular Expression"));
+        gtk_box_pack_start(GTK_BOX (regex_hbox), regex_label, FALSE, FALSE, 5);
+        
+        regex_entry = gnome_entry_new ("quote-regex-history");
+        gtk_box_pack_start(GTK_BOX (regex_hbox), regex_entry, FALSE, FALSE, 0);
+        pui->quote_pattern = regex_entry;
 
 	/* address book */
         ab_frame = gtk_frame_new (_("Address Book"));
@@ -1725,14 +1887,18 @@ create_misc_page ( )
 		gnome_file_entry_gtk_entry (GNOME_FILE_ENTRY (fileentry1));
 
 	pui->alias_find_flag =
-	   gtk_check_button_new_with_label ( _("Expand aliases as you type"));
+                gtk_check_button_new_with_label ( _("Expand aliases as you type"));
 	gtk_widget_show(pui->alias_find_flag);
 	gtk_box_pack_start (GTK_BOX (vbox11), pui->alias_find_flag,
-	      FALSE, FALSE, 0);
+                            FALSE, FALSE, 0);
 
 	return vbox9;
 }
 
+
+
+
+        
 static GtkWidget *
 create_startup_page ( )
 {
@@ -1754,12 +1920,12 @@ create_startup_page ( )
 	gtk_container_set_border_width (GTK_CONTAINER (vb1), 5);	
 
 	pui->check_mail_upon_startup = gtk_check_button_new_with_label (
-	    _("Check mail upon startup"));
+                _("Check mail upon startup"));
 	gtk_widget_show (pui->check_mail_upon_startup);
 	gtk_box_pack_start (GTK_BOX (vb1), pui->check_mail_upon_startup, 
 			    FALSE, FALSE, 0);
 	pui->remember_open_mboxes = gtk_check_button_new_with_label (
-	    _("Remember open mailboxes between sessions"));
+                _("Remember open mailboxes between sessions"));
 	gtk_widget_show (pui->remember_open_mboxes);
 	gtk_box_pack_start (GTK_BOX (vb1), pui->remember_open_mboxes, 
 			    FALSE, FALSE, 0);
@@ -1919,10 +2085,10 @@ pop3_edit_cb (GtkWidget * widget, gpointer data)
 static void
 pop3_add_cb (GtkWidget * widget, gpointer data)
 {
-  LibBalsaMailbox *mb = LIBBALSA_MAILBOX(libbalsa_mailbox_pop3_new());
+        LibBalsaMailbox *mb = LIBBALSA_MAILBOX(libbalsa_mailbox_pop3_new());
 
-  /* If the user cancels this will be destroyed */
-  mailbox_conf_new (mb, TRUE);
+        /* If the user cancels this will be destroyed */
+        mailbox_conf_new (mb, TRUE);
 }
 
 static void
@@ -1986,6 +2152,48 @@ print_modified_cb( GtkWidget *widget, GtkWidget *pbox)
 	properties_modified_cb( widget, pbox );
 
 }
+
+
+static void spelling_optionmenu_cb (GtkItem* menuitem, gpointer data) 
+{
+        /* update the index number */
+        gint* index;
+        index = (gint*) data;
+        *index = GPOINTER_TO_INT (gtk_object_get_data (GTK_OBJECT (menuitem), "menu_index"));
+
+}
+
+
+static GtkWidget* create_spelling_option_menu (const gchar* names[], 
+                                               gint size, gint* index)
+{
+        GtkWidget* omenu;
+        GtkWidget* gmenu;
+        GtkWidget* menuitem;
+        gint i;
+        
+        omenu = gtk_option_menu_new ();
+        gmenu = gtk_menu_new ();
+
+        for (i = 0; i < size; i++) {
+                menuitem = gtk_menu_item_new_with_label (names[i]);
+                gtk_object_set_data (GTK_OBJECT (menuitem), "menu_index", 
+                                     GINT_TO_POINTER (i));
+                gtk_signal_connect (GTK_OBJECT (menuitem), "select",
+                                    GTK_SIGNAL_FUNC (spelling_optionmenu_cb), 
+                                    (gpointer) index);
+                gtk_signal_connect (GTK_OBJECT (menuitem), "select",
+                                    GTK_SIGNAL_FUNC (properties_modified_cb),
+                                    property_box);
+                
+                gtk_menu_append (GTK_MENU (gmenu), menuitem);
+        }
+
+        gtk_option_menu_set_menu (GTK_OPTION_MENU (omenu), gmenu);
+
+        return omenu;
+}
+
 
 static GtkWidget *
 create_information_message_menu (void)

@@ -84,6 +84,10 @@ AC_CHECK_LIB(PropList, PLGetProplistWithPath,,[
 	AC_MSG_ERROR([*** libPropList not found. Please check http://www.balsa.net for information on the required files.])
 ])
 
+AC_CHECK_LIB(pspell, new_pspell_manager,,[
+	AC_MSG_ERROR([*** libpspell not found.  Pleas check http://www.balsa.net for information on the required files.])
+])
+
 dnl Reset
 LDFLAGS="$balsa_save_LDFLAGS"
 LIBS="$balsa_save_LIBS"

@@ -202,6 +202,7 @@ mblist_close_mailbox (LibBalsaMailbox * mailbox)
   if (!mblw)
     return;
   balsa_window_close_mailbox(BALSA_WINDOW(mblw->window), mailbox);
+
   balsa_mblist_have_new (BALSA_MBLIST(mblw->ctree));
 }
  

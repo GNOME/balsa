@@ -863,6 +863,7 @@ show_about_box (void)
     "David Pickens <dpickens@iaesthetic.com>",
     "Pawel Salek <pawsa@theochem.kth.se>",
     "Peter Williams <peter@newton.cx>",
+    "Matthew Guenther <guentherm@asme.org>"
     "All the folks on Balsa-List <balsa-list-request@gnome.org>",
     NULL
   };

@@ -35,11 +35,25 @@
 #include "libbalsa.h"
 #include "save-restore.h"
 #include "balsa-index-page.h"
+#include "spell-check.h"
 #include "main-window.h"
 #include "information.h"
 
 /* Global application structure */
 struct BalsaApplication balsa_app;
+
+const gchar* pspell_modules[] = {
+  "ispell",
+  "aspell"
+};
+
+const gchar* pspell_suggest_modes[] = {
+  "fast",
+  "normal",
+  "bad-spellers"
+};
+
+
 
 /* prototypes */
 static gboolean check_special_mailboxes (void);
@@ -71,6 +85,7 @@ gchar* ask_password(LibBalsaServer* server, LibBalsaMailbox *mbox)
   gnome_dialog_run_and_close(GNOME_DIALOG(dialog));
   return passwd;
 }
+
 
 void
 balsa_app_init (void)
@@ -148,6 +163,9 @@ balsa_app_init (void)
   /* arp */
   balsa_app.quote_str = NULL;
 
+  /* quote regex */
+  balsa_app.quote_regex = g_strdup (DEFAULT_QUOTE_REGEX);
+
   /* font */
   balsa_app.message_font = NULL;
 
@@ -171,6 +189,14 @@ balsa_app_init (void)
   balsa_app.ab_dist_list_mode = FALSE;
   balsa_app.ab_location = 
       gnome_util_prepend_user_home(DEFAULT_ADDRESS_BOOK_PATH);
+
+  /* spell check */
+  balsa_app.module = SPELL_CHECK_MODULE_ASPELL;
+  balsa_app.suggestion_mode = SPELL_CHECK_SUGGEST_NORMAL;
+  balsa_app.ignore_size = 0;
+
+  spell_check_modules_name = pspell_modules;
+  spell_check_suggest_mode_name = pspell_suggest_modes;
 
   /* Information messages */
   balsa_app.information_message = 0;
@@ -308,4 +334,11 @@ balsa_find_mbox_by_name (const gchar *name) {
       }
   }
   return res;
+}
+
+
+GtkWidget* 
+gnome_stock_button_with_label (const char* icon, const char* label)
+{
+  return gnome_pixmap_button (gnome_stock_new_with_icon (icon), label);
 }

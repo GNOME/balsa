@@ -51,16 +51,16 @@ make_gradient (GdkColor colors[], gint first, gint last)
 /*
  * static gint is_a_quote (const gchar *str, const regex_t *rex)
  *
- * Returns how deep a quotation is nested in str.
- * It takes the same regexp as Mutt's default:
- *   ^([ \t]*[|>:}#])+
+ * Returns how deep a quotation is nested in str.  Uses quoted regex
+ * from balsa_app.quote_regex, which can be set by the user.
  * 
  * Input:
  *   str  - string to match the regexp.
  *   preg - the regular expression that matches the prefix. see regex(7).
+ * 
  * Output:
- *   an integer saying how many levels deep.
- */
+ *   an integer saying how many levels deep.  
+ * */
 gint
 is_a_quote (const gchar *str, const regex_t *rex)
 {
@@ -73,7 +73,7 @@ is_a_quote (const gchar *str, const regex_t *rex)
      return 0;
    
    off=0;
-   while(regexec(rex, str+off, 1, rm, 0) == 0) {
+   while (regexec(rex, str+off, 1, rm, 0) == 0) {
      off += rm[0].rm_eo;
      cnt++;
    }

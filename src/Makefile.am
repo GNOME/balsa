@@ -45,11 +45,11 @@ balsa_SOURCES =	\
 	quote-color.c		\
 	quote-color.h		\
 	threads.h		\
+	spell-check.c		\
+	spell-check.h		\
 	ldap-addressbook.c	\
 	ldap-addressbook.h 
 #	index-child.h		\
-#	spell-check.c		\
-#	spell-check.h		\
 
 INCLUDES = \
 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\" \
@@ -61,17 +61,17 @@ INCLUDES = \
 
 CFLAGS += $(GTKHTML_CFLAGS)
 
-#libbalsa appearing twice is not a bug -- it is mutually dependent with libmutt
 balsa_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a	\
 	$(top_builddir)/libmutt/libmutt.a	\
 	$(top_builddir)/libmutt/imap/libimap.a	\
 	$(top_builddir)/libmutt/libmutt.a	\
 	$(top_builddir)/libinit_balsa/libinit_balsa.a \
-	-lPropList	\
-	@LIBESD_LIB@	\
+	-lPropList \
+	-lpspell \
+	@LIBESD_LIB@ \
 	$(GNOME_LIBDIR) \
-	$(GNOMEUI_LIBS)  \
+	$(GNOMEUI_LIBS) \
 	$(INTLLIBS) \
 	$(PTHREAD_LIB) \
 	$(GTKHTML_LIBS)	

@@ -67,6 +67,7 @@ gboolean   send_progress_notify_cb(void);
 gint       check_new_messages_auto_cb( gpointer data );
 void       mblist_close_mailbox (LibBalsaMailbox * mailbox);
 
+
 #if defined(__FILE__) && defined(__LINE__)
 # ifdef __FUNCTION__
 #  define BALSA_DEBUG_MSG(message)  if (balsa_app.debug)  fprintf(stderr, "[%lu] %12s | %4d | %30s: %s\n", (unsigned long) time(NULL), __FILE__, __LINE__, __FUNCTION__, message)

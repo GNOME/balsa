@@ -827,6 +827,13 @@ config_global_load (void)
   else
     balsa_app.quote_str = g_strdup (field);
 
+  /* regular expression used in determining quoted text */
+  g_free (balsa_app.quote_regex);
+  if ((field = pl_dict_get_str (globals, "QuoteRegex")) == NULL)
+    balsa_app.quote_regex = g_strdup (DEFAULT_QUOTE_REGEX);
+  else
+    balsa_app.quote_regex = g_strdup (field);
+
   /* font used to display messages */
   if ((field = pl_dict_get_str (globals, "MessageFont")) == NULL)
     balsa_app.message_font = g_strdup (DEFAULT_MESSAGE_FONT);
@@ -879,11 +886,11 @@ config_global_load (void)
   balsa_app.empty_trash_on_exit = d_get_gint (globals, "EmptyTrash",FALSE);
 
   /* Here we load the unread mailbox colour for the mailbox list */
-  balsa_app.mblist_unread_color.red = d_get_gint (globals, "MBListUnreadColorRed",MBLIST_UNREAD_COLOR_RED);
+  balsa_app.mblist_unread_color.red = d_get_gint (globals, "MBListUnreadColorRed", MBLIST_UNREAD_COLOR_RED);
 
-  balsa_app.mblist_unread_color.green = d_get_gint (globals, "MBListUnreadColorGreen",MBLIST_UNREAD_COLOR_GREEN);
+  balsa_app.mblist_unread_color.green = d_get_gint (globals, "MBListUnreadColorGreen", MBLIST_UNREAD_COLOR_GREEN);
 
-  balsa_app.mblist_unread_color.blue = d_get_gint (globals, "MBListUnreadColorBlue",MBLIST_UNREAD_COLOR_BLUE);
+  balsa_app.mblist_unread_color.blue = d_get_gint (globals, "MBListUnreadColorBlue", MBLIST_UNREAD_COLOR_BLUE);
 
 
   /*
@@ -911,6 +918,15 @@ config_global_load (void)
   }
 
   balsa_app.alias_find_flag = d_get_gint (globals, "AliasFlag",FALSE);
+
+  /* spell checking */
+  balsa_app.module = d_get_gint (globals, "PspellModule", 
+                                 DEFAULT_PSPELL_MODULE);
+  balsa_app.suggestion_mode = d_get_gint (globals, "PspellSuggestMode", 
+                                          DEFAULT_PSPELL_SUGGEST_MODE);
+  balsa_app.ignore_size = d_get_gint (globals, "PspellIgnoreSize", 
+                                      DEFAULT_PSPELL_IGNORE_SIZE);
+
   /* How we format dates */
   if ((field = pl_dict_get_str (globals, "DateFormat")) != NULL) {
     g_free (balsa_app.date_string);
@@ -1031,6 +1047,13 @@ config_global_save (void)
   else
     pl_dict_add_str_str (globals, "LeadinStr", "> ");
 
+
+  /* quoted text regular expression */
+  if (balsa_app.quote_regex != NULL)
+    pl_dict_add_str_str (globals, "QuoteRegex", balsa_app.quote_regex);
+  else
+    pl_dict_add_str_str (globals, "QuoteRegex", DEFAULT_QUOTE_REGEX);
+
   /* message font */
   if (balsa_app.message_font != NULL)
     pl_dict_add_str_str (globals, "MessageFont", balsa_app.message_font);
@@ -1063,11 +1086,11 @@ config_global_save (void)
 			balsa_app.remember_open_mboxes); 
   d_add_gint (globals, "EmptyTrash", balsa_app.empty_trash_on_exit);
   
-  d_add_gint (globals, "MBListUnreadColorR", 
+  d_add_gint (globals, "MBListUnreadColorRed", 
 	      balsa_app.mblist_unread_color.red);
-  d_add_gint (globals, "MBListUnreadColorG", 
+  d_add_gint (globals, "MBListUnreadColorGreen", 
 	      balsa_app.mblist_unread_color.green);
-  d_add_gint (globals, "MBListUnreadColorB", 
+  d_add_gint (globals, "MBListUnreadColorBlue", 
 	      balsa_app.mblist_unread_color.blue);
 
   /*
@@ -1096,13 +1119,17 @@ config_global_save (void)
   if( balsa_app.date_string )
 	  pl_dict_add_str_str (globals, "DateFormat", balsa_app.date_string );
 
+  /* spell checking */
+  d_add_gint (globals, "PspellModule", balsa_app.module);
+  d_add_gint (globals, "PspellSuggestMode", balsa_app.suggestion_mode);
+  d_add_gint (globals, "PspellIgnoreSize", balsa_app.ignore_size);
+
 #ifdef ENABLE_LDAP
   if (balsa_app.ldap_host != NULL)
      pl_dict_add_str_str (globals, "LDAPHost", balsa_app.ldap_host);
   if (balsa_app.ldap_base_dn != NULL)
      pl_dict_add_str_str(globals, "BaseDN", balsa_app.ldap_base_dn);
 #endif /* ENABLE_LDAP */
-
 
   /* Add it to configuration file */
   temp_str = PLMakeString ("Globals");

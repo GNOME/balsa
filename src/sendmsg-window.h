@@ -41,18 +41,21 @@ extern "C"
 
    struct _BalsaSendmsg
    {
-	 GtkWidget *window;
-	 GtkWidget* to[3], *from[3], *subject[2], *cc[3], *bcc[3], *fcc[3],
-	    *reply_to[3];
-	 GtkWidget *comments[2], *keywords[2];
-	 GtkWidget *attachments[4];
-	 GtkWidget *text;
-	 GdkFont   *font;
-	 LibBalsaMessage *orig_message;
-	 SendType type;
-	 const gchar * charset;
-	 GtkWidget * ready_widgets[2];
-	 GtkWidget * view_checkitems[VIEW_MENU_LENGTH];
+           GtkWidget *window;
+           GtkWidget* to[3], *from[3], *subject[2], *cc[3], *bcc[3], *fcc[3],
+                   *reply_to[3];
+           GtkWidget *comments[2], *keywords[2];
+           GtkWidget *attachments[4];
+           GtkWidget *text;
+           GtkWidget *spell_checker;
+           GtkWidget *notebook;
+           GdkFont   *font;
+           LibBalsaMessage *orig_message;
+           SendType type;
+           const gchar * charset;
+           GtkWidget * ready_widgets[2];
+           GtkWidget * view_checkitems[VIEW_MENU_LENGTH];
+           GList* spell_check_disable_list;
    };
 
   BalsaSendmsg * sendmsg_window_new (GtkWidget *, LibBalsaMessage *, SendType);

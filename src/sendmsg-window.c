@@ -22,6 +22,7 @@
 
 #include "libbalsa.h"
 
+#include <langinfo.h>
 #include <stdio.h>
 #include <string.h>
 #include <gnome.h>
@@ -43,6 +44,8 @@
 #include "address-book.h"
 #include "expand-alias.h"
 #include "main.h"
+#include "spell-check.h"
+
 
 static gchar *read_signature (void);
 static gint include_file_cb (GtkWidget *, BalsaSendmsg *);
@@ -71,6 +74,10 @@ static gint toggle_attachments_cb (GtkWidget *, BalsaSendmsg *);
 static gint toggle_comments_cb (GtkWidget *, BalsaSendmsg *);
 static gint toggle_keywords_cb (GtkWidget *, BalsaSendmsg *);
 
+static void spell_check_cb (GtkWidget* widget, BalsaSendmsg*);
+static void spell_check_done_cb (BalsaSpellCheck* spell_check, BalsaSendmsg*);
+static void spell_check_set_sensitive (BalsaSendmsg* msg, gboolean state);
+
 static gint set_iso_charset(BalsaSendmsg*, gint , gint );
 static gint iso_1_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_2_cb(GtkWidget* , BalsaSendmsg *);
@@ -84,12 +91,13 @@ static gint iso_15_cb(GtkWidget* , BalsaSendmsg *);
 static gint koi8_r_cb(GtkWidget* , BalsaSendmsg *);
 static gint koi8_u_cb(GtkWidget* , BalsaSendmsg *);
 
+
 /* Standard DnD types */
 enum
-  {
+{
     TARGET_URI_LIST,
     TARGET_EMAIL,
-  };
+};
 
 static GtkTargetEntry drop_types[] =
 {
@@ -110,6 +118,7 @@ static void wrap_body_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
 static void reflow_par_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
 static void reflow_body_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
 
+
 static GnomeUIInfo main_toolbar[] =
 {
 #define TOOL_SEND_POS 0
@@ -124,12 +133,11 @@ static GnomeUIInfo main_toolbar[] =
   GNOMEUIINFO_ITEM_STOCK (N_ ("Postpone"), N_ ("Continue this message later"),
 			  postpone_message_cb, GNOME_STOCK_PIXMAP_SAVE),
   GNOMEUIINFO_SEPARATOR,
-/* FIXME: Implement spellcheck ;-) */
-#if 0
+#define TOOL_SPELLING_POS 6
   GNOMEUIINFO_ITEM_STOCK (N_ ("Spelling"), N_ ("Check Spelling"), 
-			  NULL, GNOME_STOCK_PIXMAP_SPELLCHECK),
+			  spell_check_cb, GNOME_STOCK_PIXMAP_SPELLCHECK),
   GNOMEUIINFO_SEPARATOR,
-#endif
+#define TOOL_PRINT_POS 8
   GNOMEUIINFO_ITEM_STOCK (N_ ("Print"), N_ ("Print"), 
 			  print_message_cb, GNOME_STOCK_PIXMAP_PRINT),
   GNOMEUIINFO_SEPARATOR,
@@ -176,16 +184,24 @@ static GnomeUIInfo edit_menu[] =
    GNOMEUIINFO_MENU_COPY_ITEM(copy_cb, NULL),
    GNOMEUIINFO_MENU_PASTE_ITEM(paste_cb, NULL),
    GNOMEUIINFO_SEPARATOR,
+#define EDIT_MENU_WRAP_BODY 4
    { GNOME_APP_UI_ITEM, N_ ("_Wrap body") ,N_ ("Wrap message lines"),
      (gpointer)wrap_body_cb, NULL, NULL,  GNOME_APP_PIXMAP_NONE, NULL, 
      GDK_z, GDK_CONTROL_MASK, NULL },
    GNOMEUIINFO_SEPARATOR,
+#define EDIT_MENU_REFLOW_PARA 6
    { GNOME_APP_UI_ITEM, N_ ("_Reflow paragraph") , NULL,
      (gpointer)reflow_par_cb, NULL, NULL,  GNOME_APP_PIXMAP_NONE, NULL, 
      GDK_r, GDK_CONTROL_MASK, NULL },
+#define EDIT_MENU_REFLOW_MESSAGE 7
    { GNOME_APP_UI_ITEM, N_ ("R_eflow message") , NULL,
      (gpointer)reflow_body_cb, NULL, NULL,  GNOME_APP_PIXMAP_NONE, NULL, 
      GDK_r, GDK_CONTROL_MASK | GDK_SHIFT_MASK, NULL },
+   GNOMEUIINFO_SEPARATOR,
+#define EDIT_MENU_SPELL_CHECK 9
+   GNOMEUIINFO_ITEM_STOCK (N_("Check Spelling"), 
+                           N_("Spell check the current message"), 
+                           spell_check_cb, GNOME_STOCK_MENU_SPELLCHECK),
    GNOMEUIINFO_END
 };
 
@@ -282,15 +298,24 @@ static GnomeUIInfo iso_menu[] = {
    GNOMEUIINFO_END
 };
 
-
+#define MAIN_MENUS_COUNT 4
 static GnomeUIInfo main_menu[] =
 {
+#define MAIN_FILE_MENU 0
   GNOMEUIINFO_MENU_FILE_TREE(file_menu),
+#define MAIN_EDIT_MENU 1
   GNOMEUIINFO_MENU_EDIT_TREE(edit_menu),
+#define MAIN_VIEW_MENU 2
   GNOMEUIINFO_SUBTREE(N_("_Show"), view_menu),
+#define MAIN_CHARSET_MENU 3
   GNOMEUIINFO_SUBTREE(N_("_ISO Charset"), iso_menu),
   GNOMEUIINFO_END
 };
+
+
+static gint mail_headers_page;
+static gint spell_check_page;
+
 
 
 /* the callback handlers */
@@ -688,7 +713,10 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   GtkWidget *sw;
   GtkWidget *table;
   GtkWidget *frame;
+  GtkWidget *sc;
+  GtkWidget *nb;
 
+  
   table = gtk_table_new (10, 3, FALSE);
   gtk_table_set_row_spacings (GTK_TABLE (table), 2);
   gtk_table_set_col_spacings (GTK_TABLE (table), 2);
@@ -793,15 +821,40 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
 
 
   /* Comments: */
-  create_string_entry(table, _("Comments:"), 8, msg->comments);
+  create_string_entry (table, _("Comments:"), 8, msg->comments);
 
   /* Keywords: */
-  create_string_entry(table, _("Keywords:"), 9, msg->keywords);
+  create_string_entry (table, _("Keywords:"), 9, msg->keywords);
 
-  gtk_widget_show_all( GTK_WIDGET(table) );
+  sc = balsa_spell_check_new ();
+  gtk_signal_connect (GTK_OBJECT (sc), "done-spell-check",
+                      GTK_SIGNAL_FUNC (spell_check_done_cb), msg);
+  msg->spell_checker = sc;
+  
+  nb = gtk_notebook_new ();
+  gtk_notebook_set_show_tabs (GTK_NOTEBOOK (nb), FALSE);
+  gtk_notebook_set_show_border (GTK_NOTEBOOK (nb), FALSE);
 
-  return table;
+  /* add the spell check widget to the notebook last */
+  gtk_notebook_append_page (GTK_NOTEBOOK (nb), GTK_WIDGET (sc), 
+                            gtk_label_new ("Spell Check"));
+  spell_check_page = gtk_notebook_page_num (GTK_NOTEBOOK (nb), sc);
+
+  /* add the mail headers table to the notebook first */
+  gtk_notebook_append_page (GTK_NOTEBOOK (nb), GTK_WIDGET (table), 
+                            gtk_label_new ("Mail Headers"));
+  mail_headers_page = gtk_notebook_page_num (GTK_NOTEBOOK (nb), table);
+
+  gtk_notebook_set_page (GTK_NOTEBOOK (nb), mail_headers_page);
+  msg->notebook = nb;
+
+  gtk_widget_show_all (sc);
+  gtk_widget_show_all (table);
+  gtk_widget_show_all (nb);
+
+  return nb;
 }
+
 
 /* create_text_area 
    Creates the text entry part of the compose window.
@@ -818,7 +871,9 @@ create_text_area (BalsaSendmsg * msg)
   msg->text = gtk_text_new (NULL, NULL);
   gtk_text_set_editable (GTK_TEXT (msg->text), TRUE);
   gtk_text_set_word_wrap (GTK_TEXT (msg->text), TRUE);
-
+  balsa_spell_check_set_text (BALSA_SPELL_CHECK (msg->spell_checker), 
+                              GTK_TEXT (msg->text));
+  
   /*gtk_widget_set_usize (msg->text, 
 			(82 * 7) + (2 * msg->text->style->klass->xthickness), 
 			-1); */
@@ -957,7 +1012,9 @@ sendmsg_window_new (GtkWidget * widget, LibBalsaMessage * message, SendType type
   GtkWidget *paned = gtk_vpaned_new ();
   gchar *newsubject = NULL, *tmp;
   BalsaSendmsg *msg = NULL;
-
+  GList* list;
+  gint i;
+  
   msg = g_malloc (sizeof (BalsaSendmsg));
   msg->font = NULL;
   msg->charset = NULL;
@@ -1008,15 +1065,38 @@ sendmsg_window_new (GtkWidget * widget, LibBalsaMessage * message, SendType type
   gnome_app_create_toolbar_with_data (GNOME_APP (window), main_toolbar, msg);
 
   msg->ready_widgets[0] = file_menu[MENU_FILE_SEND_POS].widget;
-  msg->ready_widgets[1] = main_toolbar[TOOL_SEND_POS  ].widget;
-/* create the top portion with the to, from, etc in it */
+  msg->ready_widgets[1] = main_toolbar[TOOL_SEND_POS].widget;
+
+  /* create spell checking disable widget list */
+  list = NULL;
+  
+  for (i = 0; i < MAIN_MENUS_COUNT; ++i) {
+    if (i != MAIN_FILE_MENU)
+      list = g_list_append (list, (gpointer) main_menu[i].widget);
+  }
+  
+  for (i = 0; i < MENU_FILE_CLOSE_POS; ++i) {
+    if (i != 2 && i != 6)
+      list = g_list_append (list, (gpointer) file_menu[i].widget);
+  }
+  
+  for (i = 0; i <= TOOL_PRINT_POS; i += 2) {
+    list = g_list_append (list, (gpointer) main_toolbar[i].widget);
+  }
+  
+  msg->spell_check_disable_list = list;
+  
+  /* create the top portion with the to, from, etc in it */
   gtk_paned_add1 (GTK_PANED(paned), create_info_pane (msg, type));
+
+  /* create text area for the message */
+  gtk_paned_add2 (GTK_PANED (paned), create_text_area (msg));
 
   /* fill in that info: */
 
   /* To: */
   if (type == SEND_REPLY || type == SEND_REPLY_ALL)
-    {
+  {
       LibBalsaAddress *addr = NULL;
 
       if (message->reply_to)
@@ -1027,7 +1107,7 @@ sendmsg_window_new (GtkWidget * widget, LibBalsaMessage * message, SendType type
       tmp = libbalsa_address_to_gchar (addr);
       gtk_entry_set_text (GTK_ENTRY (msg->to[1]), tmp);
       g_free (tmp);
-    }
+  }
     
   /* From: */
   {
@@ -1130,20 +1210,19 @@ sendmsg_window_new (GtkWidget * widget, LibBalsaMessage * message, SendType type
   if (type == SEND_REPLY_ALL)
     {
       tmp = libbalsa_make_string_from_list (message->to_list);
+
       gtk_entry_set_text (GTK_ENTRY (msg->cc[1]), tmp);
       g_free (tmp);
 
       if (message->cc_list)
-	{
+      {
 	  gtk_entry_append_text (GTK_ENTRY (msg->cc[1]), ", ");
 
 	  tmp = libbalsa_make_string_from_list (message->cc_list);
 	  gtk_entry_append_text (GTK_ENTRY (msg->cc[1]), tmp);
 	  g_free (tmp);
-	}
-    }
-
-  gtk_paned_add2 (GTK_PANED (paned),create_text_area (msg));
+      }
+  }
 
   gnome_app_set_contents (GNOME_APP (window), paned);
 
@@ -1168,7 +1247,8 @@ sendmsg_window_new (GtkWidget * widget, LibBalsaMessage * message, SendType type
   /* FIXME: this will also reset the font, copying the text back and 
      forth which is sub-optimal.
   */
-  set_menus(msg); 
+  set_menus (msg); 
+  gtk_notebook_set_page (GTK_NOTEBOOK (msg->notebook), mail_headers_page);
   gtk_window_set_default_size ( 
      GTK_WINDOW(window), 
      (82 * 7) + (2 * msg->text->style->klass->xthickness), 35*12);
@@ -1613,6 +1693,8 @@ static gint
 toggle_entry (BalsaSendmsg * bmsg, GtkWidget *entry[], int pos, int cnt)
 {
    GtkWidget* parent;
+
+
    if( GTK_CHECK_MENU_ITEM(bmsg->view_checkitems[pos])->active) {
       while(cnt--)
 	 gtk_widget_show( GTK_WIDGET(entry[cnt]) );
@@ -1621,9 +1703,9 @@ toggle_entry (BalsaSendmsg * bmsg, GtkWidget *entry[], int pos, int cnt)
 	 gtk_widget_hide( GTK_WIDGET(entry[cnt]) );
       
       /* force size recomputation if embedded in paned */
-      parent = GTK_WIDGET(GTK_WIDGET(entry[0])->parent)->parent;
+      parent = GTK_WIDGET (GTK_WIDGET (entry[0])->parent)->parent->parent;
       if(parent)
-	 gtk_paned_set_position(GTK_PANED(parent), -1);
+	 gtk_paned_set_position(GTK_PANED (parent), -1);
    }
    return TRUE;
 }
@@ -1679,7 +1761,7 @@ set_menus(BalsaSendmsg *msg)
 	    GTK_CHECK_MENU_ITEM(view_menu[i].widget), TRUE );
       } else {
 	 /* or hide... */
-	 GTK_SIGNAL_FUNC(view_menu[i].moreinfo)(view_menu[i].widget,msg);
+	 GTK_SIGNAL_FUNC(view_menu[i].moreinfo)(view_menu[i].widget, msg);
       }
    }
    /* set the charset:
@@ -1724,7 +1806,7 @@ set_iso_charset(BalsaSendmsg *msg, gint code, gint idx) {
    if(msg->font) gdk_font_unref(msg->font);
 
    if( !( msg->font = gdk_font_load (font_name)) ) {
-      printf("Cannot find fond: %s\n", font_name);
+      printf("Cannot find font: %s\n", font_name);
       g_free(font_name);
       return TRUE;
    }
@@ -1799,6 +1881,101 @@ set_koi8_charset(BalsaSendmsg *msg, const gchar *code, gint idx) {
 
 }
 
+/* spell_check_cb
+ * 
+ * Start the spell check, disable appropriate menu items so users
+ * can't screw up spell-check midway through 
+ * */
+static void 
+spell_check_cb (GtkWidget* widget, BalsaSendmsg* msg)
+{
+  BalsaSpellCheck* sc;
+  const gchar* language = NULL;
+  gchar* charset = NULL;
+  gint i = ELEMENTS (iso_charset_names);
+
+
+  sc = BALSA_SPELL_CHECK (msg->spell_checker);
+
+  /* configure the spell checker */
+  language = gnome_i18n_get_language ();
+  if (g_strcasecmp (language, "C") == 0) {
+    /* We've got the default locale, but pspell doesn't understand
+     * that, so put "en" instead.  This should be better, but should
+     * probably be done within pspell.  
+     * */
+    balsa_spell_check_set_language (sc, "en");
+  } else {
+    balsa_spell_check_set_language (sc, language);
+  }
+  
+  while (i) {
+    if (msg->charset == iso_charset_names[i])
+      break;
+    --i;
+  }
+  
+  if (i <= ISO_CHARSET_14_POS ) 
+    charset = g_strdup ("iso8859-*");
+  else if (i == KOI8_R_POS)
+    charset = g_strdup ("koi8-r");
+  else {
+    /* pspell doesn't know how to handle other charsts */
+    balsa_information (BALSA_INFORMATION_SHOW_DIALOG, 
+                       "Can't handle this character set");
+    return;
+  } 
+
+  balsa_spell_check_set_character_set (sc, charset);
+  g_free (charset);
+  balsa_spell_check_set_module(sc, spell_check_modules_name[balsa_app.module]);
+  balsa_spell_check_set_suggest_mode (sc, spell_check_suggest_mode_name[balsa_app.suggestion_mode]);
+  balsa_spell_check_set_ignore_length (sc, balsa_app.ignore_size);
+  balsa_spell_check_set_font (sc, msg->font);
+  gtk_notebook_set_page (GTK_NOTEBOOK (msg->notebook), spell_check_page);
+
+  /* disable menu and toolbar items so message can't be modified */
+  spell_check_set_sensitive (msg, FALSE);
+  
+  if (balsa_app.debug)
+    g_print ("BalsaSendmsg: switching page to %d\n", spell_check_page);
+
+  balsa_spell_check_start (BALSA_SPELL_CHECK (msg->spell_checker));
+}
+
+
+static void 
+spell_check_done_cb (BalsaSpellCheck* spell_check, BalsaSendmsg* msg)
+{
+  /* switch notebook page back to mail headers */  
+  gtk_notebook_set_page (GTK_NOTEBOOK (msg->notebook), mail_headers_page);
+
+  /* reactivate menu and toolbar items */
+  spell_check_set_sensitive (msg, TRUE);
+
+  if (balsa_app.debug)
+    g_print ("BalsaSendmsg: switching page to %d\n", mail_headers_page);
+}
+
+
+static void 
+spell_check_set_sensitive (BalsaSendmsg* msg, gboolean state)
+{
+  GList* list;
+  
+  list = msg->spell_check_disable_list;
+  
+  while (list) {
+    gtk_widget_set_sensitive (GTK_WIDGET (list->data), state);
+    list = list->next;
+  }
+
+  if (state)
+    check_readiness (NULL, msg);
+}
+
+
+
 static gint iso_1_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
 {return set_iso_charset(bsmsg,  1, ISO_CHARSET_1_POS); }
 static gint iso_2_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
@@ -1821,4 +1998,3 @@ static gint koi8_r_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
 {return set_koi8_charset(bsmsg, "r", KOI8_R_POS); }
 static gint koi8_u_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
 {return set_koi8_charset(bsmsg, "u", KOI8_U_POS); }
-

@@ -67,6 +67,7 @@
 #define QUOTED_COLOR_RED 0
 #define QUOTED_COLOR_BLUE 20480
 #define QUOTED_COLOR_GREEN 20480
+#define DEFAULT_QUOTE_REGEX "^(([ \t]|[A-Z])*[|>:}#])+"
 
 #define MAILBOX_MANAGER_WIDTH 350
 #define MAILBOX_MANAGER_HEIGHT 400
@@ -81,12 +82,19 @@
 #define DEFAULT_ENCODING ENC8BIT
 #define DEFAULT_LINESIZE 78
 #define DEFAULT_ADDRESS_BOOK_PATH ".gnome/GnomeCard.gcrd"
+
+#define DEFAULT_PSPELL_MODULE SPELL_CHECK_MODULE_ISPELL
+#define DEFAULT_PSPELL_SUGGEST_MODE SPELL_CHECK_SUGGEST_NORMAL
+#define DEFAULT_PSPELL_IGNORE_SIZE 0
+
+
 enum
 {
   WHILERETR,
   UNTILCLOSED,
   NEVER
 };
+
 
 typedef struct stPrinting Printing_t;
 struct stPrinting{
@@ -102,6 +110,33 @@ enum _ShownHeaders {
    HEADERS_SELECTED,
    HEADERS_ALL 
 };
+
+
+/* The different pspell modules available to the program. */
+#define NUM_PSPELL_MODULES 2
+typedef enum _SpellCheckModule SpellCheckModule;
+enum _SpellCheckModule
+{
+        SPELL_CHECK_MODULE_ISPELL,
+        SPELL_CHECK_MODULE_ASPELL
+};
+const gchar** spell_check_modules_name;
+
+
+/* The suggestion modes available to pspell.  If this is changed,
+ * don't forget to also update the array in pref-manager.c containing
+ * the labels us ed in the preferences dialog. 
+ * */
+#define NUM_SUGGEST_MODES 3
+typedef enum _SpellCheckSuggestMode SpellCheckSuggestMode;
+enum _SpellCheckSuggestMode
+{
+        SPELL_CHECK_SUGGEST_FAST,
+        SPELL_CHECK_SUGGEST_NORMAL,
+        SPELL_CHECK_SUGGEST_BAD_SPELLERS
+};
+const gchar** spell_check_suggest_mode_name;
+
 
 /* global balsa application structure */
 extern struct BalsaApplication
@@ -176,6 +211,7 @@ extern struct BalsaApplication
   GdkColor mblist_unread_color;
 
   /* Colour of quoted text. */
+        gchar* quote_regex;
   GdkColor quoted_color[MAX_QUOTED_COLOR];
   
   GtkToolbarStyle toolbar_style;
@@ -236,6 +272,11 @@ extern struct BalsaApplication
   gchar * ab_location;
   gboolean alias_find_flag;
 
+  /* spell checking */
+  SpellCheckModule module;
+  SpellCheckSuggestMode suggestion_mode;
+  guint ignore_size;
+
   /* Information messages */
   BalsaInformationShow information_message;
   BalsaInformationShow warning_message;
@@ -251,7 +292,7 @@ gboolean do_load_mailboxes (void);
 void update_timer( gboolean update, guint minutes );
 
 gchar* ask_password(LibBalsaServer* server, LibBalsaMailbox *mbox);
-
+GtkWidget* gnome_stock_button_with_label (const char* icon, const char* label);
 LibBalsaMailbox *balsa_find_mbox_by_name (const gchar *name);
 
 #endif /* __BALSA_APP_H__ */

@@ -974,7 +974,7 @@ part_info_init_mimetext (BalsaMessage *bm, BalsaPartInfo *info)
       GtkWidget *item = NULL;
       GdkFont *fnt = NULL;
       
-      if(regcomp(&rex, "^(([ \t]|[A-Z])*[|>:}#])", REG_EXTENDED) != 0) 
+      if(regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED) != 0) 
 	g_warning("part_info_init_mimetext: quote regex compilation failed.");
       font_name = find_body_font(info->body);
       if(bm->wrap_text) 

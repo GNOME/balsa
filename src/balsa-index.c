@@ -457,7 +457,6 @@ balsa_index_add (BalsaIndex * bindex,
   gint row;
   GList *list;
   LibBalsaAddress *addy = NULL;
-;
     
   g_return_if_fail (bindex != NULL);
   g_return_if_fail (message != NULL);

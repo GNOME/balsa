@@ -1917,9 +1917,10 @@ libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
        LIBBALSA_MAILBOX_REMOTE(mailbox)->server) {
         ImapMboxHandle *handle = 
             LIBBALSA_MAILBOX_IMAP(message->mailbox)->handle;
+        unsigned msgno = message->msgno;
         g_return_val_if_fail(handle, -1); /* message is there but
                                            * the source mailbox closed! */
-        rc = imap_mbox_handle_copy(handle, message->msgno,
+        rc = imap_mbox_handle_copy(handle, 1, &msgno,
                                    LIBBALSA_MAILBOX_IMAP(mailbox)->path);
         return rc == IMR_OK ? 1 : -1;
     }
@@ -2008,9 +2009,9 @@ libbalsa_mailbox_imap_change_message_flags(LibBalsaMailbox * mailbox,
 
     transform_flags(set, clear, &flag_set, &flag_clr);
     if(flag_set)
-        imap_mbox_store_flag(handle, msgno, flag_set, 1);
+        imap_mbox_store_flag(handle, 1, &msgno, flag_set, 1);
     if(flag_clr)
-        imap_mbox_store_flag(handle, msgno, flag_clr, 0);
+        imap_mbox_store_flag(handle, 1, &msgno, flag_clr, 0);
 }
 
 static gboolean
@@ -2034,11 +2035,11 @@ lbm_imap_change_msgs_flags(LibBalsaMailbox * mailbox,
     transform_flags(set, clear, &flag_set, &flag_clr);
 
     if(flag_set)
-        rc1 = imap_mbox_store_flag_m(LIBBALSA_MAILBOX_IMAP(mailbox)->handle,
-                                     msgcnt, seqno, flag_set, TRUE);
+        rc1 = imap_mbox_store_flag(LIBBALSA_MAILBOX_IMAP(mailbox)->handle,
+                                   msgcnt, seqno, flag_set, TRUE);
     if(flag_clr)
-        rc2 = imap_mbox_store_flag_m(LIBBALSA_MAILBOX_IMAP(mailbox)->handle,
-                                     msgcnt, seqno, flag_clr, FALSE);
+        rc2 = imap_mbox_store_flag(LIBBALSA_MAILBOX_IMAP(mailbox)->handle,
+                                   msgcnt, seqno, flag_clr, FALSE);
     return rc1 == IMR_OK && rc2 == IMR_OK;
 }
 

@@ -26,16 +26,6 @@
 #include "util.h"
 
 #define ELEMENTS(x) (sizeof (x) / sizeof(x[0]))
-struct msg_set {
-  unsigned msgcnt;
-  unsigned *seqno;
-};
-
-static unsigned
-cf_set(unsigned seqno, struct msg_set *csd)
-{
-  return csd->seqno[seqno-1];
-}
 
 typedef unsigned (*CoalesceFunc)(int, void*);
 static gchar*
@@ -90,6 +80,13 @@ coalesce_seq_range(int lo, int hi, CoalesceFunc incl, void *data)
   }
   return str;
 }
+
+static unsigned
+simple_coealesce_func(int i, unsigned msgno[])
+{
+  return msgno[i];
+}
+
 
 struct fetch_data {
   ImapMboxHandle* h;
@@ -664,19 +661,41 @@ imap_mbox_handle_fetch_structure(ImapMboxHandle* handle, unsigned seqno)
 
 
 /* 6.4.6 STORE Command */
+struct msg_set {
+  ImapMboxHandle *handle;
+  unsigned        msgcnt;
+  unsigned       *seqno;
+  ImapMsgFlag     flag;
+  gboolean        state;
+};
+
+static unsigned
+cf_flag(unsigned idx, struct msg_set *csd)
+{
+  unsigned seqno = csd->seqno[idx];
+  ImapMessage *imsg = imap_mbox_handle_get_msg(csd->handle, seqno);
+  if(imsg &&
+     ( (csd->state  && (imsg->flags & csd->flag)) || 
+       (!csd->state && !(imsg->flags & csd->flag))) )
+     return 0;
+     else return seqno;
+}
+
 ImapResponse
-imap_mbox_store_flag_m(ImapMboxHandle *h, unsigned msgcnt, unsigned*seqno,
-                       ImapMsgFlag flg, gboolean state)
+imap_mbox_store_flag(ImapMboxHandle *h, unsigned msgcnt, unsigned*seqno,
+                     ImapMsgFlag flg, gboolean state)
 {
   ImapResponse res;
   gchar* cmd, *seq, *str;
   struct msg_set csd;
   unsigned i;
 
-  csd.msgcnt = msgcnt; csd.seqno = seqno;
+  csd.handle = h; csd.msgcnt = msgcnt; csd.seqno = seqno;
+  csd.flag = flg; csd.state = state;
   if(msgcnt == 0) return IMR_OK;
+  seq = coalesce_seq_range(0, msgcnt-1, (CoalesceFunc)cf_flag, &csd);
+  if(!seq) return IMR_OK;
   str = enum_flag_to_str(flg);
-  seq = coalesce_seq_range(1, msgcnt, (CoalesceFunc)cf_set, &csd);
   for(i=0; i<msgcnt; i++) {
     ImapMessage *msg = imap_mbox_handle_get_msg(h, seqno[i]);
     if(msg) {
@@ -697,34 +716,20 @@ imap_mbox_store_flag_m(ImapMboxHandle *h, unsigned msgcnt, unsigned*seqno,
   return res;
 }
 
-ImapResponse
-imap_mbox_store_flag(ImapMboxHandle *h, unsigned seq, ImapMsgFlag flg, 
-                     gboolean state)
-{
-  ImapResponse rc;
-  gchar* cmd, *str;
-
-  str = enum_flag_to_str(flg);
-  cmd = g_strdup_printf("STORE %u %cFLAGS (%s)", seq,
-                        state ? '+' : '-', str);
-  g_free(str);
-  rc = imap_cmd_exec(h, cmd);
-  g_free(cmd);
-  return rc;
-}
-
 
 /* 6.4.7 COPY Command */
-/** imap_mbox_handle_copy() copies given seqno from the mailbox
+/** imap_mbox_handle_copy() copies given set of seqno from the mailbox
     selected in handle to given mailbox on same server. */
 ImapResponse
-imap_mbox_handle_copy(ImapMboxHandle* handle, unsigned seqno,
+imap_mbox_handle_copy(ImapMboxHandle* handle, unsigned cnt, unsigned *seqno,
                       const gchar *dest)
 {
   gchar *mbx7 = imap_utf8_to_mailbox(dest);
-  gchar *cmd = g_strdup_printf("COPY %u \"%s\"", seqno, mbx7);
+  char *seq = 
+    coalesce_seq_range(0, cnt-1,(CoalesceFunc)simple_coealesce_func, seqno);
+  gchar *cmd = g_strdup_printf("COPY %s \"%s\"", seq, mbx7);
   ImapResponse rc = imap_cmd_exec(handle, cmd);
-  g_free(mbx7); g_free(cmd);
+  g_free(seq); g_free(mbx7); g_free(cmd);
   return rc;
 }
 
@@ -803,12 +808,6 @@ imap_mbox_uid_search(ImapMboxHandle *handle, ImapSearchKey *key,
   return IMR_BAD;
 }
 
-static unsigned
-sort_coealesce_func(int i, unsigned msgno[])
-{
-  return msgno[i];
-}
-
 static const char*
 sort_code_to_string(ImapSortKey key)
 {
@@ -841,7 +840,8 @@ imap_mbox_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
   /* seq can be pretty long and g_strdup_printf has a limit on
    * string length so we create the command string in two steps. */
   keystr = sort_code_to_string(key);
-  seq = coalesce_seq_range(0, cnt-1,(CoalesceFunc)sort_coealesce_func, msgno);
+  seq = coalesce_seq_range(0, cnt-1,(CoalesceFunc)simple_coealesce_func,
+                           msgno);
   cmd= g_strdup_printf("SORT (%s%s) UTF-8 ", 
                        ascending ? "" : "REVERSE ",
                        keystr);

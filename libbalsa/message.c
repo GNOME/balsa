@@ -296,65 +296,6 @@ libbalsa_message_charset(LibBalsaMessage * message)
     return g_strdup(tmp);
 }
 
-#if NOT_USED
-static LibBalsaAddress *
-libbalsa_address_new_from_libmutt(ADDRESS * caddr)
-{
-    LibBalsaAddress *address;
-    if (!caddr || (caddr->personal==NULL && caddr->mailbox==NULL))
-	return NULL;
-
-    address = libbalsa_address_new();
-
-    /* it will be owned by the caller */
-
-    address->full_name = g_strdup(caddr->personal);
-    if (caddr->mailbox)
-	address->address_list = g_list_append(address->address_list,
-					      g_strdup(caddr->mailbox));
-
-    return address;
-}
-
-static GList*
-libbalsa_address_list_from_libmutt(ADDRESS *addy)
-{
-    GList *res = NULL;
-    LibBalsaAddress *addr = NULL;
-    int in_group = 0;
-        
-    for (; addy; addy = addy->next) {
-        if(in_group) {
-            g_return_val_if_fail(addr != NULL, res);
-            if(addy->mailbox) {
-                addr->address_list = 
-                    g_list_append(addr->address_list, 
-                                  g_strdup(addy->mailbox));
-            } else {
-                in_group = 0;
-                res = g_list_append(res, addr);
-                addr = NULL;
-            }
-        } else {
-            g_return_val_if_fail(addr == NULL,res);
-            addr = libbalsa_address_new();
-            if(addy->group) {
-                in_group = 1;
-                addr->full_name = g_strdup(addy->mailbox);
-            } else {
-                if(addy->personal)
-                    addr->full_name = g_strdup(addy->personal);
-                addr->address_list =
-                    g_list_append(addr->address_list, 
-                                  g_strdup(addy->mailbox));
-                res = g_list_prepend(res, addr);
-                addr = NULL;
-            }
-        }
-    }
-    return g_list_reverse(res);
-}
-#endif
 
 /* message_user_hdrs:
    returns allocated GList containing (header=>value) ALL headers pairs

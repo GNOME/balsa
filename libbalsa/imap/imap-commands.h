@@ -58,13 +58,11 @@ ImapResult imap_mbox_search(ImapMboxHandle *h, const char* query);
 ImapResponse imap_mbox_noop(ImapMboxHandle *r);
 ImapResponse imap_mbox_expunge(ImapMboxHandle* h);
 
-ImapResponse imap_mbox_store_flag(ImapMboxHandle *r, unsigned seq,
-                                  ImapMsgFlag flg, gboolean state);
-ImapResponse imap_mbox_store_flag_m(ImapMboxHandle* h, unsigned msgcnt,
-                                    unsigned *seqno, ImapMsgFlag flg, 
-                                    gboolean state);
-ImapResponse imap_mbox_handle_copy(ImapMboxHandle* handle, unsigned seqno,
-                                   const gchar *dest);
+ImapResponse imap_mbox_store_flag(ImapMboxHandle *r, unsigned cnt,
+                                  unsigned *seqno, ImapMsgFlag flg,
+                                  gboolean state);
+ImapResponse imap_mbox_handle_copy(ImapMboxHandle* handle, unsigned cnt,
+                                   unsigned *seqno, const gchar *dest);
 
 ImapResponse imap_mbox_handle_fetch_range(ImapMboxHandle* handle,
                                           unsigned lo, unsigned hi,

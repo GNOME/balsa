@@ -1,3 +1,8 @@
+2004-02-12 18:58  PeterB
+
+	* libbalsa/mailbox_mbox.c: set message->msgno and message->mailbox
+	when creating msg_info.message.
+
 2004-02-11 21:48  PeterB
 
 	* src/balsa-message.c: possible fix for bug #109252.

@@ -44,6 +44,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/utsname.h>
 #endif
 
 typedef struct _MessageQueueItem MessageQueueItem;
@@ -1666,6 +1667,38 @@ libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part)
 }
 #endif
 
+/* Create a message-id and set it on the mime message.
+ */
+static void
+libbalsa_set_message_id(GMimeMessage * mime_message)
+{
+    struct utsname utsbuf;
+    gchar *host = "localhost";
+    gchar *message_id;
+#ifdef _GNU_SOURCE
+    gchar *fqdn;
+    gchar *domain = "localdomain";
+
+    /* In an ideal world, uname() allows us to make a FQDN. */
+    if (uname(&utsbuf) == 0) {
+	if (*utsbuf.nodename)
+	    host = utsbuf.nodename;
+	if (*utsbuf.domainname)
+	    domain = utsbuf.domainname;
+    }
+    fqdn = g_strconcat(host, ".", domain, NULL);
+    message_id = g_mime_utils_generate_message_id(fqdn);
+    g_free(fqdn);
+#else				/* _GNU_SOURCE */
+
+    if (uname(&utsbuf) == 0 && *utsbuf.nodename)
+	host = utsbuf.nodename;
+    message_id = g_mime_utils_generate_message_id(host);
+#endif				/* _GNU_SOURCE */
+
+    g_mime_message_set_message_id(mime_message, message_id);
+    g_free(message_id);
+}
 
 /* balsa_create_msg:
    copies message to msg.
@@ -1684,8 +1717,12 @@ libbalsa_create_msg(LibBalsaMessage * message, MessageQueueItem *mqi,
 	return res;
     }
 
+    libbalsa_set_message_id(mime_message);
+
     mem_stream = g_mime_stream_mem_new();
     g_mime_message_write_to_stream(mime_message, mem_stream);
+    g_mime_object_unref(GMIME_OBJECT(mime_message));
+
     mqi->stream = mem_stream;
     if (mqi->stream == NULL)
 	return LIBBALSA_MESSAGE_CREATE_ERROR;

@@ -32,6 +32,8 @@ static void balsa_message_init (BalsaMessage * bmessage);
 static void balsa_message_size_request (GtkWidget * widget, GtkRequisition * requisition);
 static void balsa_message_size_allocate (GtkWidget * widget, GtkAllocation * allocation);
 
+void headers2canvas (BalsaMessage * bmessage, Message * message);
+
 /* static */
 
 static GnomeCanvasClass *parent_class = NULL;
@@ -131,15 +133,61 @@ void
 balsa_message_set (BalsaMessage * bmessage,
 		   Message * message)
 {
-  GnomeCanvasItem *item;
-
   g_return_if_fail (bmessage != NULL);
   g_return_if_fail (message != NULL);
 
   if (bmessage->message == message)
     return;
 
-  item = bm_item_new (bmessage);
-
-  bm_item_set (bmessage, item, message);
+  headers2canvas (bmessage, message);
 }
+
+void
+headers2canvas (BalsaMessage * bmessage, Message * message)
+{
+  double max_width=0;
+  double x1, x2, y1, y2;
+
+  GnomeCanvasGroup * bm_root;
+  GnomeCanvasItem *date_item=NULL, *date_data=NULL;
+  
+  bm_root = GNOME_CANVAS_GROUP (GNOME_CANVAS (bmessage)->root);
+
+  bmessage->headers = 
+    GNOME_CANVAS_GROUP (gnome_canvas_item_new (bm_root,
+					       GNOME_TYPE_CANVAS_GROUP, NULL));
+  
+  /* create header items */
+
+  if (message->date)
+    {
+      date_item = gnome_canvas_item_new (bmessage->headers,
+					 GNOME_TYPE_CANVAS_TEXT,
+					 "x", (double) 0.0,
+					 "y", (double) 0.0,
+					 "font", "fixed",
+					 "text", "Date", NULL);
+
+      gnome_canvas_item_get_bounds (date_item, &x1, &y1, &x2, &y2);
+
+      max_width = (x2 - x1);
+    }
+
+  /* create data items (second column) */
+
+  if (date_item)
+    {
+      date_data = gnome_canvas_item_new (bmessage->headers,
+					 GNOME_TYPE_CANVAS_TEXT,
+					 "x", (double) 0.0,
+					 "y", (double) 0.0,
+					 "font", "fixed",
+					 "text", message->date,
+					 NULL);
+
+      gnome_canvas_item_move (date_data, max_width + 10, 0);
+    }
+
+}
+  
+   

@@ -3006,8 +3006,6 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     GList *list;
     gchar *tmp;
     const gchar *ctmp;
-    gsize bytes_read, bytes_written;
-    GError * error = NULL;
     gchar recvtime[50];
     struct tm *footime;
     GtkTextBuffer *buffer =
@@ -3072,16 +3070,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     body = libbalsa_message_body_new(message);
     body->disposition = DISPINLINE; /* this is the main body */
     gtk_text_buffer_get_bounds(buffer, &start, &end);
-    tmp = gtk_text_iter_get_text(&start, &end);
-    body->buffer = g_convert(tmp, -1, 
-                             bsmsg->charset ? bsmsg->charset : "US-ASCII", 
-                             "UTF-8", &bytes_read, &bytes_written, &error);
-    if(error) {
-        g_warning("Charset conversion error on sending. setting to UTF-8\n");
-        g_error_free(error);
-        body->buffer = tmp; 
-        bsmsg->charset = "UTF-8";
-    } else { g_free(tmp); }
+    body->buffer = gtk_text_iter_get_text(&start, &end);
 
     if (bsmsg->flow) {
         body->buffer =

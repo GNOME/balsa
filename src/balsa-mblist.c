@@ -218,7 +218,13 @@ balsa_mblist_get_arg (GtkObject * object, GtkArg * arg, guint arg_id)
 static void
 balsa_mblist_init (BalsaMBList * tree)
 {
-  char *titles[3] = {"Mailbox", "Unread", "Total"};
+  char *titles[3] = {N_("Mailbox"), N_("Unread"), N_("Total")};
+#ifdef ENABLE_NLS
+  {
+	  int i;
+	  for (i=0;i<3;i++) titles[i]=_(titles[i]);
+  }
+#endif
 #ifdef BALSA_SHOW_INFO
   gtk_ctree_construct (GTK_CTREE (tree), 3, 0, titles);
 #else

@@ -71,13 +71,15 @@ static gint toggle_keywords_cb (GtkWidget *, BalsaSendmsg *);
 
 static gint set_iso_charset(BalsaSendmsg*, gint , gint );
 static gint iso_1_cb(GtkWidget* , BalsaSendmsg *);
-static gint iso_15_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_2_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_3_cb(GtkWidget* , BalsaSendmsg *);
+static gint iso_4_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_5_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_8_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_9_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_13_cb(GtkWidget* , BalsaSendmsg *);
+static gint iso_14_cb(GtkWidget* , BalsaSendmsg *);
+static gint iso_15_cb(GtkWidget* , BalsaSendmsg *);
 
 /* Standard DnD types */
 enum
@@ -227,6 +229,8 @@ static GnomeUIInfo iso_charset_menu[] = {
   GNOMEUIINFO_ITEM_NONE( N_ ("_Hebrew (ISO-8859-8)"), NULL, iso_8_cb),
 #define ISO_CHARSET_9_POS 7
   GNOMEUIINFO_ITEM_NONE( N_ ("_Turkish (ISO-8859-9)"), NULL, iso_9_cb),
+#define ISO_CHARSET_14_POS 4
+  GNOMEUIINFO_ITEM_NONE( N_ ("_Celtic (ISO-8859-14)"), NULL, iso_14_cb),
   GNOMEUIINFO_END
 };
 
@@ -1621,17 +1625,20 @@ set_iso_charset(BalsaSendmsg *msg, gint code, gint idx) {
 
 static gint iso_1_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
 {return set_iso_charset(bsmsg,  1, ISO_CHARSET_1_POS); }
-static gint iso_15_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
-{return set_iso_charset(bsmsg, 15, ISO_CHARSET_15_POS); }
 static gint iso_2_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
 {return set_iso_charset(bsmsg,  2, ISO_CHARSET_2_POS); }
 static gint iso_3_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
 {return set_iso_charset(bsmsg,  3, ISO_CHARSET_3_POS); }
-static gint iso_13_cb(GtkWidget* widget, BalsaSendmsg *bmsg)
-{return set_iso_charset(bmsg, 13, ISO_CHARSET_13_POS); }
 static gint iso_5_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
 {return set_iso_charset(bsmsg,  5, ISO_CHARSET_5_POS); }
 static gint iso_8_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
 {return set_iso_charset(bsmsg,  8, ISO_CHARSET_8_POS); }
 static gint iso_9_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
 {return set_iso_charset(bsmsg,  9, ISO_CHARSET_9_POS); }
+static gint iso_13_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
+{return set_iso_charset(bsmsg, 13, ISO_CHARSET_13_POS); }
+static gint iso_14_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
+{return set_iso_charset(bsmsg, 14, ISO_CHARSET_14_POS); }
+static gint iso_15_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
+{return set_iso_charset(bsmsg, 15, ISO_CHARSET_15_POS); }
+

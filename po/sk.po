@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2003-08-11 07:30+0200\n"
-"PO-Revision-Date: 2003-08-11 07:31+0200\n"
+"POT-Creation-Date: 2003-08-14 09:19+0200\n"
+"PO-Revision-Date: 2003-08-14 09:22+0200\n"
 "Last-Translator: Marcel Telka <marcel@telka.sk>\n"
 "Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
 "MIME-Version: 1.0\n"
@@ -14,74 +14,43 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. The externq database doesn't support Id's, sorry!
-#: libbalsa/address-book-extern.c:255 libbalsa/address-book-ldap.c:403
+#: libbalsa/address-book-extern.c:255 libbalsa/address-book-ldap.c:391
 #: libbalsa/address-book-ldif.c:419 libbalsa/address-book-vcard.c:283
 msgid "No-Id"
 msgstr "Bez identifikátora"
 
-#: libbalsa/address-book-extern.c:259 libbalsa/address-book-ldap.c:409
+#: libbalsa/address-book-extern.c:259 libbalsa/address-book-ldap.c:397
 #: libbalsa/address-book-ldif.c:422 libbalsa/address-book-ldif.c:654
 #: libbalsa/address-book-ldif.c:691 libbalsa/address-book-ldif.c:695
 #: libbalsa/address-book-vcard.c:301
 msgid "No-Name"
 msgstr "Bez mena"
 
-#: libbalsa/address-book-ldap.c:240
-msgid ""
-"Failed to initialise LDAP server.\n"
-"Check that the servername is valid."
-msgstr ""
-"Inicializácia servera LDAP zlyhala.\n"
-"Skontrolujte či je správne meno servera."
-
-#: libbalsa/address-book-ldap.c:257
-#, c-format
-msgid "Couldn't enable TLS on the LDAP connection: %s"
-msgstr "Nepodarilo sa povoliť TLS na LDAP spojení: %s"
-
-#: libbalsa/address-book-ldap.c:266
-msgid "TLS requested but TLS support not compiled in."
-msgstr "Je požadované TLS, ale podpora TLS nebola zahrnutá pri kompilácii."
-
-#: libbalsa/address-book-ldap.c:277
-#, c-format
-msgid ""
-"Failed to bind to server: %s\n"
-"Check that the server name is valid."
-msgstr ""
-"Zlyhalo pripojenie k serveru: %s\n"
-"Skontrolujte či je platné meno servera."
-
-#: libbalsa/address-book-ldap.c:862
-#, c-format
-msgid "Failed to do a search: %s.Check that the base name is valid."
-msgstr "Hľadanie zlyhalo: %s.Skontrolujte, či je základné meno platné."
-
-#: libbalsa/address-book.c:385 libbalsa/filter-error.c:45
+#: libbalsa/address-book.c:398 libbalsa/filter-error.c:45
 msgid "No error"
 msgstr "Bez chyby"
 
-#: libbalsa/address-book.c:386
+#: libbalsa/address-book.c:399
 msgid "Cannot read from address book"
 msgstr "Nemôžem čítať z adresára"
 
-#: libbalsa/address-book.c:387
+#: libbalsa/address-book.c:400
 msgid "Cannot write to address book"
 msgstr "Nemôžem zapísať do adresára"
 
-#: libbalsa/address-book.c:388
+#: libbalsa/address-book.c:401
 msgid "Cannot connect to server"
 msgstr "Nemôžem sa spojiť so serverom"
 
-#: libbalsa/address-book.c:389
+#: libbalsa/address-book.c:402
 msgid "Cannot search in the address book"
 msgstr "Nemôžem vyhľadávať v adresári"
 
-#: libbalsa/address-book.c:391
+#: libbalsa/address-book.c:404
 msgid "Cannot add duplicate entry"
 msgstr "Nemôžem pridať duplikátnu položku"
 
-#: libbalsa/address-book.c:392
+#: libbalsa/address-book.c:405
 msgid "Unknown error"
 msgstr "Neznáma chyba"
 
@@ -166,12 +135,12 @@ msgstr "Chyba pri presúvaní správ"
 
 #. should "re" be localized ?
 #: libbalsa/identity.c:88 src/balsa-index-threading.c:547
-#: src/balsa-index-threading.c:549 src/sendmsg-window.c:2320
-#: src/sendmsg-window.c:2321
+#: src/balsa-index-threading.c:549 src/sendmsg-window.c:2321
+#: src/sendmsg-window.c:2322
 msgid "Re:"
 msgstr "Odp:"
 
-#: libbalsa/identity.c:89 src/sendmsg-window.c:2350 src/sendmsg-window.c:2351
+#: libbalsa/identity.c:89 src/sendmsg-window.c:2351 src/sendmsg-window.c:2352
 msgid "Fwd:"
 msgstr "Posl:"
 
@@ -982,7 +951,7 @@ msgid "Connected to MTA"
 msgstr "Pripojený k MTA"
 
 #: libbalsa/send.c:888 src/balsa-message.c:1232 src/print.c:349
-#: src/sendmsg-window.c:667 src/sendmsg-window.c:2138 src/store-address.c:297
+#: src/sendmsg-window.c:668 src/sendmsg-window.c:2139 src/store-address.c:297
 msgid "From:"
 msgstr "Od:"
 
@@ -991,7 +960,7 @@ msgid "From"
 msgstr "Od"
 
 #: libbalsa/send.c:899 src/balsa-message.c:1241 src/print.c:353
-#: src/sendmsg-window.c:666 src/sendmsg-window.c:2145 src/store-address.c:298
+#: src/sendmsg-window.c:667 src/sendmsg-window.c:2146 src/store-address.c:298
 msgid "To:"
 msgstr "Pre:"
 
@@ -2100,13 +2069,13 @@ msgstr "alternatívne adresy pre jednu osobu"
 msgid "a distribution list"
 msgstr "distribučný zoznam"
 
-#: src/ab-window.c:673
+#: src/ab-window.c:676
 #, c-format
 msgid ""
-"Error opening address book '%s'\n"
+"Error opening address book '%s':\n"
 "%s"
 msgstr ""
-"Chyba pri otváraní adresára '%s'\n"
+"Chyba pri otváraní adresára '%s':\n"
 "%s"
 
 #: src/balsa-app.c:73
@@ -2318,28 +2287,28 @@ msgstr ""
 "Sprába odoslaná od %s s predmetom \"%s\" obsahuje časť \"multipart/encrypted"
 "\",ale jej štruktúra je neplatná."
 
-#: src/balsa-message.c:1224 src/print.c:338 src/sendmsg-window.c:672
-#: src/sendmsg-window.c:2133
+#: src/balsa-message.c:1224 src/print.c:338 src/sendmsg-window.c:673
+#: src/sendmsg-window.c:2134
 msgid "Subject:"
 msgstr "Predmet:"
 
-#: src/balsa-message.c:1227 src/print.c:344 src/sendmsg-window.c:2127
+#: src/balsa-message.c:1227 src/print.c:344 src/sendmsg-window.c:2128
 msgid "Date:"
 msgstr "Dátum:"
 
-#: src/balsa-message.c:1238 src/sendmsg-window.c:668
+#: src/balsa-message.c:1238 src/sendmsg-window.c:669
 msgid "Reply-To:"
 msgstr "Odpoveď-pre:"
 
 #. cc:
-#: src/balsa-message.c:1242 src/print.c:354 src/sendmsg-window.c:670
-#: src/sendmsg-window.c:1852 src/sendmsg-window.c:2152 src/store-address.c:299
+#: src/balsa-message.c:1242 src/print.c:354 src/sendmsg-window.c:671
+#: src/sendmsg-window.c:1853 src/sendmsg-window.c:2153 src/store-address.c:299
 msgid "Cc:"
 msgstr "Kópia:"
 
 #. bcc:
-#: src/balsa-message.c:1243 src/print.c:355 src/sendmsg-window.c:669
-#: src/sendmsg-window.c:1857 src/store-address.c:300
+#: src/balsa-message.c:1243 src/print.c:355 src/sendmsg-window.c:670
+#: src/sendmsg-window.c:1858 src/store-address.c:300
 msgid "Bcc:"
 msgstr "Skrytá kópia:"
 
@@ -2653,7 +2622,7 @@ msgstr "_Telo"
 
 #. To:
 #: src/filter-edit-callbacks.c:997 src/main-window.c:2732
-#: src/sendmsg-window.c:1841
+#: src/sendmsg-window.c:1842
 msgid "_To:"
 msgstr "_Pre:"
 
@@ -3126,7 +3095,7 @@ msgstr "_Odstrániť zo zoznamu"
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr "Aaaach! poštová schránka nenájdená medzi uzlami balsa_app.mailbox?\n"
 
-#: src/mailbox-conf.c:406 src/sendmsg-window.c:846
+#: src/mailbox-conf.c:406 src/sendmsg-window.c:847
 msgid "Select Identity"
 msgstr "Vybrať identitu"
 
@@ -4195,7 +4164,7 @@ msgstr "Kontrolovať na pozadí bez oznámenia (bez správ na stavovej lište)"
 msgid "Quoted and Flowed Text"
 msgstr "Citovaný a formátovaný text"
 
-#: src/pref-manager.c:1735 src/sendmsg-window.c:3787
+#: src/pref-manager.c:1735 src/sendmsg-window.c:3788
 msgid "Quoted Text Regular Expression"
 msgstr "Regulárny výraz pre citovaný text"
 
@@ -5007,7 +4976,7 @@ msgstr "_Jazyk"
 msgid "_Options"
 msgstr "V_oľby"
 
-#: src/sendmsg-window.c:549
+#: src/sendmsg-window.c:550
 #, c-format
 msgid ""
 "The message to '%s' is modified.\n"
@@ -5017,16 +4986,16 @@ msgstr ""
 "Uložiť správu do priečinka 'Nedokončená pošta'?"
 
 #. Comments:
-#: src/sendmsg-window.c:671 src/sendmsg-window.c:1946
+#: src/sendmsg-window.c:672 src/sendmsg-window.c:1947
 msgid "Comments:"
 msgstr "Komentáre:"
 
-#: src/sendmsg-window.c:797
+#: src/sendmsg-window.c:798
 msgid "Gnome editor is not defined in your preferred applications."
 msgstr ""
 "Gnome editor nie je definovaný vo vašich uprednostňovaných aplikáciách."
 
-#: src/sendmsg-window.c:1153
+#: src/sendmsg-window.c:1154
 #, c-format
 msgid ""
 "Saying yes will not send the file `%s' itself, but just a MIME message/"
@@ -5041,43 +5010,43 @@ msgstr ""
 "\n"
 "Chcete naozaj pripojiť tento súbor ako odkaz?"
 
-#: src/sendmsg-window.c:1164
+#: src/sendmsg-window.c:1165
 msgid "Attach as Reference?"
 msgstr "Pripojiť ako odkaz?"
 
-#: src/sendmsg-window.c:1255
+#: src/sendmsg-window.c:1256
 msgid "Remove"
 msgstr "Odstrániť"
 
-#: src/sendmsg-window.c:1266
+#: src/sendmsg-window.c:1267
 msgid "attach as reference"
 msgstr "pripojiť ako odkaz"
 
-#: src/sendmsg-window.c:1272
+#: src/sendmsg-window.c:1273
 msgid "attach as file"
 msgstr "pripojiť ako súbor"
 
-#: src/sendmsg-window.c:1420
+#: src/sendmsg-window.c:1421
 #, c-format
 msgid "Cannot get info on file '%s': %s"
 msgstr "Nemôžem získať informácie o súbore '%s': %s"
 
-#: src/sendmsg-window.c:1425
+#: src/sendmsg-window.c:1426
 #, c-format
 msgid "Attachment %s is not a regular file."
 msgstr "Príloha %s nie je bežný súbor."
 
-#: src/sendmsg-window.c:1428
+#: src/sendmsg-window.c:1429
 #, c-format
 msgid "File %s cannot be read\n"
 msgstr "Nemôžem prečítať súbor %s\n"
 
-#: src/sendmsg-window.c:1482
+#: src/sendmsg-window.c:1483
 msgid "Attach file"
 msgstr "Pripojiť súbor"
 
-#: src/sendmsg-window.c:1578 src/sendmsg-window.c:1640
-#: src/sendmsg-window.c:2890
+#: src/sendmsg-window.c:1579 src/sendmsg-window.c:1641
+#: src/sendmsg-window.c:2891
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -5086,68 +5055,68 @@ msgstr ""
 "Pravdepodobný dôvod: málo dočasného priestoru"
 
 #. From:
-#: src/sendmsg-window.c:1836
+#: src/sendmsg-window.c:1837
 msgid "F_rom:"
 msgstr "_Od:"
 
 #. Subject:
-#: src/sendmsg-window.c:1848
+#: src/sendmsg-window.c:1849
 msgid "S_ubject:"
 msgstr "_Predmet:"
 
 #. fcc: mailbox folder where the message copy will be written to
-#: src/sendmsg-window.c:1862
+#: src/sendmsg-window.c:1863
 msgid "F_cc:"
 msgstr "_Automatická kópia:"
 
 #. Reply To:
-#: src/sendmsg-window.c:1892
+#: src/sendmsg-window.c:1893
 msgid "_Reply To:"
 msgstr "Odpoveď p_re:"
 
 #. Attachment list
-#: src/sendmsg-window.c:1899
+#: src/sendmsg-window.c:1900
 msgid "_Attachments:"
 msgstr "Prí_lohy:"
 
 #. Keywords:
-#: src/sendmsg-window.c:1949
+#: src/sendmsg-window.c:1950
 msgid "Keywords:"
 msgstr "Kľúčové slová:"
 
-#: src/sendmsg-window.c:2112
+#: src/sendmsg-window.c:2113
 msgid "you"
 msgstr "vy"
 
-#: src/sendmsg-window.c:2121
+#: src/sendmsg-window.c:2122
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------spáva poslaná ďalej od %s------\n"
 
-#: src/sendmsg-window.c:2156
+#: src/sendmsg-window.c:2157
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "ID-správy: %s\n"
 
-#: src/sendmsg-window.c:2162
+#: src/sendmsg-window.c:2163
 msgid "References:"
 msgstr "Odkazy:"
 
-#: src/sendmsg-window.c:2172
+#: src/sendmsg-window.c:2173
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "Napísané dňa %s, (autor: %s):\n"
 
-#: src/sendmsg-window.c:2174
+#: src/sendmsg-window.c:2175
 #, c-format
 msgid "%s wrote:\n"
 msgstr "Napísané, (autor: %s):\n"
 
-#: src/sendmsg-window.c:3052
+#: src/sendmsg-window.c:3053
 msgid "Choose charset"
 msgstr "Vybrať znakovú sadu"
 
-#: src/sendmsg-window.c:3059
+#: src/sendmsg-window.c:3060
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file."
@@ -5155,16 +5124,16 @@ msgstr ""
 "Tento súbor nie je kódovaný v US-ASCII ani v UTF-8.\n"
 "Prosím zvoľte znakovú sadu na zakódovanie tohoto súboru."
 
-#: src/sendmsg-window.c:3125
+#: src/sendmsg-window.c:3126
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Nemôžem otvoriť súbor %s.\n"
 
-#: src/sendmsg-window.c:3147
+#: src/sendmsg-window.c:3148
 msgid "Include file"
 msgstr "Vložiť súbor"
 
-#: src/sendmsg-window.c:3443
+#: src/sendmsg-window.c:3444
 #, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
@@ -5173,7 +5142,7 @@ msgstr ""
 "Správa nemôže byť zakódovaná v znakovej sade %s.\n"
 "Prosím zvoľte jazyk pre túto správu."
 
-#: src/sendmsg-window.c:3462
+#: src/sendmsg-window.c:3463
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
@@ -5183,32 +5152,32 @@ msgstr ""
 "podpísaná a/alebo zašifrovaná len prvá časť správy. Ak má byť chránená celá "
 "správa, mali by ste si zvoliť režim MIME. Naozaj chcete pokračovať?"
 
-#: src/sendmsg-window.c:3475
+#: src/sendmsg-window.c:3476
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "odosielanie správy v režime gpg %d"
 
-#: src/sendmsg-window.c:3786
+#: src/sendmsg-window.c:3787
 #, c-format
 msgid "Could not compile %s"
 msgstr "Nepodarilo sa skompilovať %s"
 
-#: src/sendmsg-window.c:4304
+#: src/sendmsg-window.c:4305
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Odpoveď pre %s: %s"
 
-#: src/sendmsg-window.c:4309
+#: src/sendmsg-window.c:4310
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Poslať správu ďalej pre %s: %s"
 
-#: src/sendmsg-window.c:4313
+#: src/sendmsg-window.c:4314
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Pokračovať v písaní správy pre %s: %s"
 
-#: src/sendmsg-window.c:4317
+#: src/sendmsg-window.c:4318
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Nová správa pre %s: %s"

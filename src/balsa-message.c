@@ -280,7 +280,7 @@ balsa_message_class_init(BalsaMessageClass * klass)
 
     object_class->destroy = balsa_message_destroy;
 
-    parent_class = gtk_type_class(gtk_viewport_get_type());
+    parent_class = g_type_class_peek_parent(klass);
 
     klass->select_part = NULL;
 

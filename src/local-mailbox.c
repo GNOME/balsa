@@ -29,10 +29,43 @@
 #include "mailbox.h"
 #include "misc.h"
 
+static gboolean
+do_traverse (GNode * node, gpointer data)
+{
+  gpointer *d = data;
+  if (!node->data)
+    return FALSE;
+  if (strcmp (((MailboxNode *) node->data)->name, (gchar *) d))
+    return FALSE;
+  *(++d) = node;
+  return TRUE;
+}
+
+static GNode *
+find_my_node (GNode * root,
+	      GTraverseType order,
+	      GTraverseFlags flags,
+	      gpointer data)
+{
+  gpointer d[2];
+
+  g_return_val_if_fail (root != NULL, NULL);
+  g_return_val_if_fail (order <= G_LEVEL_ORDER, NULL);
+  g_return_val_if_fail (flags <= G_TRAVERSE_MASK, NULL);
+
+  d[0] = data;
+  d[1] = NULL;
+
+  g_node_traverse (root, order, flags, -1, do_traverse, d);
+
+  return d[1];
+}
+
 static void
 add_mailbox (gchar * name, gchar * path, MailboxType type, gint isdir)
 {
   Mailbox *mailbox;
+  GNode *rnode;
   GNode *node;
 
   if (!strcmp (path, balsa_app.inbox_path))
@@ -53,13 +86,21 @@ add_mailbox (gchar * name, gchar * path, MailboxType type, gint isdir)
       if (isdir && type == MAILBOX_MH)
 	{
 	  /*      g_strdup (g_basename (g_dirname (myfile))) */
-	  node = g_node_new (mailbox_node_new (g_strdup (name), mailbox, TRUE));
-	  g_node_append (balsa_app.mailbox_nodes, node);
+	  node = g_node_new (mailbox_node_new (g_strdup (path), mailbox, TRUE));
+	  rnode = find_my_node (balsa_app.mailbox_nodes, G_LEVEL_ORDER, G_TRAVERSE_ALL, g_dirname (path));
+	  if (rnode)
+	    g_node_append (rnode, node);
+	  else
+	    g_node_append (balsa_app.mailbox_nodes, node);
 	}
       else
 	{
-	  node = g_node_new (mailbox_node_new (g_strdup (name), mailbox, FALSE));
-	  g_node_append (balsa_app.mailbox_nodes, node);
+	  node = g_node_new (mailbox_node_new (g_strdup (path), mailbox, FALSE));
+	  rnode = find_my_node (balsa_app.mailbox_nodes, G_LEVEL_ORDER, G_TRAVERSE_ALL, g_dirname (path));
+	  if (rnode)
+	    g_node_append (rnode, node);
+	  else
+	    g_node_append (balsa_app.mailbox_nodes, node);
 	}
       if (balsa_app.debug)
 	g_print ("Local Mailbox Loaded as: %s\n", mailbox_type_description (mailbox->type));

@@ -336,6 +336,14 @@ fe_condition_changed_cb(GtkWidget * widget,gpointer throwaway)
     condition_has_changed = TRUE;
 }
 
+static void
+fe_match_field_user_header_cb(GtkWidget * widget)
+{
+    gtk_widget_set_sensitive(GTK_WIDGET(fe_user_header),
+			     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fe_matching_fields_us_head)));
+    condition_has_changed = TRUE;
+} /* end of fe_match_field_user_header_cb */
+
 /*
  *  void fe_match_fields_buttons_cb(GtkWidget * widget, gpointer data)
  *
@@ -346,7 +354,6 @@ fe_match_fields_buttons_cb(GtkWidget * widget, gpointer data)
 {
     gboolean active = GPOINTER_TO_INT(data)!=3;  /* 3== uncheck all buttons */
 
-    condition_has_changed = TRUE;
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_matching_fields_body),
 				 active);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_matching_fields_to),
@@ -357,15 +364,14 @@ fe_match_fields_buttons_cb(GtkWidget * widget, gpointer data)
 				 active);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_matching_fields_cc),
 				 active);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_matching_fields_us_head),
+				 active);
+    /* The callback fe_match_field_user_header_cb will be called automatically
+       and will make the user header combo box [in]sensitive depending on the new 
+       state of the user header check box.
+       Remark : condition_has_changed is set there.
+    */
 }                       /* end fe_match_fields_buttons_cb */
-
-static void
-fe_match_field_user_header_cb(GtkWidget * widget)
-{
-    gtk_widget_set_sensitive(GTK_WIDGET(fe_user_header),
-			     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fe_matching_fields_us_head)));
-    condition_has_changed = TRUE;
-}
 
 /* FIXME : to insure consistency and keep it simple I use a modal
  * dialog box for condition edition/creation but I have to avoid

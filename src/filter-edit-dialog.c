@@ -327,13 +327,13 @@ build_match_page()
 		     box,
 		     0, 5, 8, 9,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 6, 6);
-    fe_condition_edit_button = gtk_button_new_with_label(_("Edit"));
+    fe_condition_edit_button = gtk_button_new_with_label(_("Edit..."));
     gtk_widget_set_sensitive(fe_condition_edit_button,FALSE);
     gtk_box_pack_start(GTK_BOX(box), fe_condition_edit_button, TRUE, TRUE, 6);
     gtk_signal_connect(GTK_OBJECT(fe_condition_edit_button),
 		       "clicked", GTK_SIGNAL_FUNC(fe_edit_condition), 
                        GINT_TO_POINTER(0));
-    button = gtk_button_new_with_label(_("New"));
+    button = gtk_button_new_with_label(_("New..."));
     gtk_box_pack_start(GTK_BOX(box), button, TRUE, TRUE, 6);
     gtk_signal_connect(GTK_OBJECT(button),
 		       "clicked", GTK_SIGNAL_FUNC(fe_edit_condition), 

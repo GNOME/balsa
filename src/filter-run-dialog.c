@@ -207,11 +207,13 @@ balsa_filter_run_dialog_new(LibBalsaMailbox * mbox)
     }
 
     /* FIXME : The only way I found to have decent sizes */
-    width=0;
-    for (i=0;i<FILTER_WHEN_NB;i++) width+=gtk_clist_optimal_column_width(p->available_filters,i);
-    width=MIN(width,300);
-    gtk_widget_set_usize(GTK_WIDGET(p->available_filters),width,200);
-    gtk_widget_set_usize(GTK_WIDGET(p->selected_filters),width,200);
+    width = 90;
+    for (i = 1;i<FILTER_WHEN_NB;i++)
+	width += gtk_clist_optimal_column_width(p->selected_filters, i);
+    width = MIN(width, 300);
+    gtk_widget_set_usize(GTK_WIDGET(p->available_filters),
+			 gtk_clist_optimal_column_width(p->available_filters, 0), 200);
+			 gtk_widget_set_usize(GTK_WIDGET(p->selected_filters), width, 200);
 
     return GTK_WIDGET(p);
 }
@@ -219,9 +221,9 @@ balsa_filter_run_dialog_new(LibBalsaMailbox * mbox)
 static 
 void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
 {
-    GtkWidget * bbox, * hbox,* vbox;
+    GtkWidget * bbox;
     GtkWidget *button;
-    GtkWidget *sw;
+    GtkWidget *sw, *table;
     static gchar *titles_available[] = { N_("Name") };
     static gchar *titles_selected[] = { N_("Name"),N_("On reception"),N_("On exit") };
     GtkWidget *pixmap;
@@ -254,10 +256,10 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     gtk_signal_connect(GTK_OBJECT(p),
 		       "destroy",GTK_SIGNAL_FUNC(fr_destroy_window_cb),NULL);
 
-    hbox = gtk_hbox_new(FALSE,2);
+    table = gtk_table_new(2, 3, FALSE);
 
     gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(p)->vbox),
-		       hbox, TRUE, TRUE, 0);
+		       table, TRUE, TRUE, 0);
 
     gtk_widget_push_visual(gdk_rgb_get_visual());
     gtk_widget_push_colormap(gdk_rgb_get_cmap());
@@ -293,16 +295,15 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     gtk_clist_set_auto_sort(p->available_filters,TRUE);
 
     gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(p->available_filters));
-    gtk_box_pack_start(GTK_BOX(hbox),sw, TRUE, TRUE, 0);
+    gtk_table_attach(GTK_TABLE(table),
+                     sw,
+                     0, 1, 0, 1,
+                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 6, 6);
  
     /* Buttons between the 2 lists */
     bbox = gtk_vbutton_box_new();
-    gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 2);
+    gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 6);
     gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_SPREAD);
-    gtk_button_box_set_child_size(GTK_BUTTON_BOX(bbox),
-				  BALSA_BUTTON_WIDTH / 2,
-				  BALSA_BUTTON_HEIGHT / 2);
-
     /* FIXME : I saw a lot of different ways to create button with
        pixmaps, hope this one is correct*/
     /* Right/Add button */
@@ -320,11 +321,10 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
                               GTK_OBJECT(p));
     gtk_container_add(GTK_CONTAINER(bbox), button);
 
-    gtk_box_pack_start(GTK_BOX(hbox),bbox, TRUE, TRUE, 0);
-
-    vbox=gtk_vbox_new(FALSE,2);
-
-    gtk_box_pack_start(GTK_BOX(hbox),vbox, TRUE, TRUE, 0);
+    gtk_table_attach(GTK_TABLE(table),
+                     bbox,
+                     1, 2, 0, 1,
+                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 6, 6);
 
     sw = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
@@ -336,25 +336,25 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     gtk_clist_set_reorderable(p->selected_filters, TRUE);
     gtk_clist_set_use_drag_icons(p->selected_filters, FALSE);
     gtk_clist_column_titles_passive(p->selected_filters);
-    gtk_clist_set_column_auto_resize(p->selected_filters,0,TRUE);
-    for (i=1;i<=FILTER_WHEN_NB;i++) {
-	gtk_clist_set_column_auto_resize(p->selected_filters,i,TRUE);
+    gtk_clist_set_column_resizeable(p->selected_filters, 0, TRUE);
+    /*FIXME Arbitrary value */
+    gtk_clist_set_column_width(p->selected_filters, 0, 90);
+    for (i=1;i<=FILTER_WHEN_NB;i++)
 	gtk_clist_set_column_justification(p->selected_filters,i,GTK_JUSTIFY_CENTER);
-    }
 
     gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(p->selected_filters));
-
-    gtk_box_pack_start(GTK_BOX(vbox),sw, TRUE, TRUE, 0);
+    gtk_table_attach(GTK_TABLE(table),
+                     sw,
+                     2, 3, 0, 1,
+                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 6, 6);
 
     /* up down arrow buttons */
     bbox = gtk_hbutton_box_new();
     gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 2);
     gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_SPREAD);
-    gtk_button_box_set_child_size(GTK_BUTTON_BOX(bbox),
+    /*    gtk_button_box_set_child_size(GTK_BUTTON_BOX(bbox),
 				  BALSA_BUTTON_WIDTH / 2,
-				  BALSA_BUTTON_HEIGHT / 2);
-
-    gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 2);
+				  BALSA_BUTTON_HEIGHT / 2);*/
 
     /* up button */
     pixmap = gnome_stock_new_with_icon(GNOME_STOCK_MENU_UP);
@@ -368,6 +368,11 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     gtk_signal_connect(GTK_OBJECT(button), "clicked",
 		       GTK_SIGNAL_FUNC(fr_down_pressed), p);
     gtk_container_add(GTK_CONTAINER(bbox), button);
+
+    gtk_table_attach(GTK_TABLE(table),
+                     bbox,
+                     2, 3, 1, 2,
+                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 6, 6);
 
     gtk_widget_pop_colormap();
     gtk_widget_pop_visual();

@@ -795,12 +795,14 @@ create_local_mailbox_page(MailboxConfWindow *mcw)
     GtkWidget *table;
     GtkWidget *file;
     guint keyval;
+    LibBalsaMailboxLocal* mloc = (LibBalsaMailboxLocal*)mcw->mailbox;
     table = gtk_table_new(2, 2, FALSE);
 
     /* mailbox name */
     if(mcw->mailbox && 
        (BALSA_IS_MAILBOX_SPECIAL(mcw->mailbox) ||
-	strncmp(mcw->mailbox->name, balsa_app.local_mail_directory,
+	strncmp(libbalsa_mailbox_local_get_path(mcw->mailbox), 
+		balsa_app.local_mail_directory,
 		strlen(balsa_app.local_mail_directory)!=0)) ) {
         create_label(_("Mailbox _Name:"), table, 0, &keyval);
         mcw->mailbox_name = 

@@ -1,3 +1,14 @@
+2002-09-01  Emmanuel <e.allaud@wanadoo.fr>
+
+	* src/filter-edit-callbacks.c: make the two buttons "All/Clear"
+	in the condition edit dialog set/unset the user header check box,
+	too.
+	* src/filter-edit-dialog.c: add "..." to the "New" and "Edit"
+	buttons to match the HIG.
+	* src/filter-run-dialog.c: Try to "beautify the dialog", and also
+	make the list columns resizeable.
+	* src/mailbox-conf.c: truly fix local mailbox edition (PS, my fault).
+
 2002-08-29  Emmanuel <e.allaud@wanadoo.fr>
 
 	* src/filter-edit-{dialog,callbacks}.c: follow HIG closer.

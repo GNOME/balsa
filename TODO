@@ -89,6 +89,6 @@ Milestone 1.4 targets:
 ----------------------
 - Merge upcoming stable mutt into libmutt
 - Filters
-- pop3 treated like imap on servers that support it
+- have pop3 mailbox indexes on servers that support it
 - split server/mailbox configuration logically, redo secure connection 
   settings

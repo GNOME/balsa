@@ -79,15 +79,19 @@ void mutt_curs_set (int);
 
 #define ctrl(c) ((c)-'@')
 
+#ifdef KEY_ENTER
 #define CI_is_return(c) ((c) == '\r' || (c) == '\n' || (c) == KEY_ENTER)
+#else
+#define CI_is_return(c) ((c) == '\r' || (c) == '\n')
+#endif
 
-int mutt_getch (void);
+event_t mutt_getch (void);
 
 void mutt_endwin (const char *);
 void mutt_flushinp (void);
 void mutt_refresh (void);
 void mutt_resize_screen (void);
-void mutt_ungetch (int);
+void mutt_ungetch (int, int);
 
 /* ----------------------------------------------------------------------------
  * Support for color

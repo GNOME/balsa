@@ -67,9 +67,9 @@ void mblist_close_mailbox (Mailbox * mailbox);
 static void mailbox_select_cb (BalsaMBList *, Mailbox *, GtkCTreeNode *, GdkEventButton *);
 static GtkWidget *mblist_create_menu (GtkCTree * ctree, Mailbox * mailbox);
 
-static void mblist_drag_data_received (GtkWidget * widget, GdkDragContext * context, gint x, gint y, GtkSelectionData * selection_data, guint info, guint32 time, gpointer data);
+static void mblist_drag_data_received (GtkWidget * widget, GdkDragContext * context, gint x, gint y, GtkSelectionData * selection_data, guint info, guint32 time);
 static gboolean mblist_drag_motion (GtkWidget *widget, GdkDragContext *context, gint x, gint y, guint time);
-
+static gboolean mblist_drag_drop (GtkWidget *widget, GdkDragContext *context, gint x, gint y, guint time);
 
 static void mblist_open_cb (GtkWidget *, gpointer);
 static void mblist_close_cb (GtkWidget *, gpointer);
@@ -78,8 +78,10 @@ void
 mblist_open_window (GnomeMDI * mdi)
 {
   GtkWidget *dock_item;
+#if 0
   GtkWidget *bbox;
   GtkWidget *button;
+#endif
   gint height;
 
   GnomeApp *app = GNOME_APP (mdi->active_window);
@@ -132,21 +134,19 @@ mblist_open_window (GnomeMDI * mdi)
 
   gtk_drag_dest_set (GTK_WIDGET (mblw->ctree), GTK_DEST_DEFAULT_ALL,
 		     dnd_mb_target, ELEMENTS (dnd_mb_target),
-		     GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
-
-
+		     GDK_ACTION_MOVE ); 
+  
+  
   gtk_signal_connect (GTK_OBJECT (mblw->ctree), "select_mailbox",
 		      GTK_SIGNAL_FUNC (mailbox_select_cb), NULL);
 
-
+ /* callback when dragged object moves in the mblist window */
+  gtk_signal_connect (GTK_OBJECT (mblw->ctree), "drag_motion",
+		      GTK_SIGNAL_FUNC (mblist_drag_motion), NULL);
 
   /* callback when object dropped on a mailbox */
   gtk_signal_connect (GTK_OBJECT (mblw->ctree), "drag_data_received",
 		      GTK_SIGNAL_FUNC (mblist_drag_data_received), NULL);
-  /* callback when dragged object moves in the mblist window */
-    gtk_signal_connect (GTK_OBJECT (mblw->ctree), "drag_motion",
-                      GTK_SIGNAL_FUNC (mblist_drag_motion), NULL);
-
 
   
 #if 0
@@ -231,46 +231,7 @@ mblist_close_mailbox (Mailbox * mailbox)
     }
 }
 
-static void
-mblist_drag_data_received (GtkWidget * widget,
-			   GdkDragContext * context,
-			   gint x,
-			   gint y,
-			   GtkSelectionData * selection_data,
-			   guint info,
-			   guint32 time,
-			   gpointer data)
-{
-  GtkCList *clist = GTK_CLIST (widget);
-  gint row;
 
-  if (!gtk_clist_get_selection_info (clist, x, y, &row, NULL))
-    return;
-  g_print("clist received data\n");
-
-  /* FIXME what now... ? */
-}
-
-
-static gboolean
-mblist_drag_motion         (GtkWidget          *widget,
-                            GdkDragContext     *context,
-                            gint                x,
-                            gint                y,
-                            guint               time)
-{
-  GtkCList *clist = GTK_CLIST (widget);
-  GtkCTree *ctree = GTK_CTREE (widget);
-  gint row;
-  gint mb_selected;
-  GtkCTreeNode *node;
-
-
-  mb_selected = gtk_clist_get_selection_info (clist, x, y, &row, NULL);
-  node = gtk_ctree_node_nth( ctree, row );
-  gtk_ctree_select(ctree, node);
-  return TRUE;
-}
 
 
 static void
@@ -421,4 +382,85 @@ mblist_get_selected_mailbox (void)
   node = GTK_CTREE_NODE (GTK_CLIST (mblw->ctree)->selection->data);
 
   return gtk_ctree_node_get_row_data (GTK_CTREE (mblw->ctree), node);
+}
+
+
+
+/* DND stuff */
+
+
+
+/* receive the data from the source */
+static void
+mblist_drag_data_received (GtkWidget * widget,
+			   GdkDragContext * context,
+			   gint x,
+			   gint y,
+			   GtkSelectionData * selection_data,
+			   guint info,
+			   guint32 time)
+{
+  /*--*/
+  GtkCList *clist = GTK_CLIST (widget);
+  
+  Mailbox *target_mailbox;
+  
+  Message **received_message_list;
+  guint nb_received_messages;
+  guint received_message_count;
+  Message *current_message;
+
+  gint row;
+  /*--*/
+
+  /* find the mailbox on which the messages have been dropped */
+  if (!gtk_clist_get_selection_info (clist, x, y, &row, NULL))
+    return;
+  target_mailbox = gtk_clist_get_row_data (GTK_CLIST(widget), row);
+  if (!target_mailbox)
+    return;
+
+  if ((selection_data->length >= 0) )
+    {
+      nb_received_messages = (guint)(selection_data->length)/sizeof( Message *);
+      received_message_list =  (Message **)(selection_data->data);
+      
+      for (received_message_count=0; received_message_count<nb_received_messages; received_message_count++)
+	{
+	  current_message = received_message_list[received_message_count];
+	  message_move (current_message, target_mailbox);
+	}
+      gtk_drag_finish (context, TRUE, FALSE, time);
+      return;
+    }
+  
+  gtk_drag_finish (context, FALSE, FALSE, time);
+
+
+  
+
+}
+
+
+/* data moved in the window callback */
+static gboolean
+mblist_drag_motion         (GtkWidget          *widget,
+                            GdkDragContext     *context,
+                            gint                x,
+                            gint                y,
+                            guint               time)
+{
+  GtkCList *clist = GTK_CLIST (widget);
+  GtkCTree *ctree = GTK_CTREE (widget);
+  gint row;
+  gint mb_selected;
+  GtkCTreeNode *node;
+
+
+  mb_selected = gtk_clist_get_selection_info (clist, x, y, &row, NULL);
+  
+  node = gtk_ctree_node_nth( ctree, row );
+  if (node) gtk_ctree_select(ctree, node);
+    
+  return TRUE;
 }

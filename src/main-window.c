@@ -204,7 +204,7 @@ main_window_set_cursor (gint type)
   for (list = mdi->windows; list; list = list->next)
     {
       widget = GTK_WIDGET (GNOME_APP (list->data));
-      pbar = GTK_WIDGET (gtk_object_get_data (widget, PROCESSBAR_KEY));
+      pbar = GTK_WIDGET (gtk_object_get_data (GTK_OBJECT(widget), PROCESSBAR_KEY));
       if (type == -1)
 	{
 	  gtk_widget_set_sensitive (pbar, FALSE);

@@ -1,3 +1,25 @@
+1998-12-28  bertrand  <Bertrand.Guiheneuf@inria.fr>
+
+	* src/mblist-window.c (mblist_open_window): added the dnd reception
+	callback.
+	(mblist_drag_data_received): handle the received messages. For the 
+	moment, when a list of messages is dropped on a mailbox, it is moved
+	to that mailbox. Other actions should be easy to add.
+
+	* src/index-child.c (index_child_create_view): moved the dnd code to
+	a specific function : index_child_setup_dnd()
+	(index_child_setup_dnd): new function.
+	(index_child_drag_data_get): new function, pass the selected messages
+	in the clist to the X selection mechanism. This should be reviewed by 
+	a gtk+ expert. However, this does not work with the current version
+	of gtk+ (1.1.9). I had to remove the dnd class functions in gtkclist
+	to make all this work correctly.
+
+	* src/balsa-index.c (balsa_index_get_selected_rows): added this function
+	to get the currently selected messages. This is useful to the dnd stuff.
+
+	* src/main-window.c (main_window_set_cursor): removed a warning
+
 1998-12-27  Jaka Mocnik  <jaka.mocnik@kiss.uni-lj.si>
 
 	* src/main-window.c (destroy_window_cb): only save window size.

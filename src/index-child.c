@@ -33,6 +33,7 @@ static GnomeMDIChildClass *parent_class = NULL;
 static void index_child_class_init (IndexChildClass *);
 static void index_child_init (IndexChild *);
 
+/* DND declarations */
 enum
   {
     TARGET_MESSAGE,
@@ -44,6 +45,9 @@ static GtkTargetEntry drag_types[] =
 };
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
+static void index_child_setup_dnd ( GnomeMDIChild * child );
+
+/* -- end of DND declarations */
 
 guint
 index_child_get_type (void)
@@ -272,24 +276,11 @@ index_child_create_view (GnomeMDIChild * child, gpointer data)
 
 
   balsa_index_set_mailbox (BALSA_INDEX (ic->index), ic->mailbox);
-
   gtk_signal_connect (GTK_OBJECT (ic->index), "select_message",
 		      (GtkSignalFunc) index_select_cb, ic);
 
-  /* Make messages draggable */
-  /* we want to grab the clist and not the scrolled window */
-  gtk_drag_source_set (GTK_WIDGET (ic->index),
-		       GDK_BUTTON1_MASK, drag_types, ELEMENTS (drag_types),
-      GDK_ACTION_LINK | GDK_ACTION_MOVE | GDK_ACTION_COPY | GDK_ACTION_ASK);
-
-#if 0
-  /* FIXME */
-  /* Mouse is being moved over ourselves */
-  gtk_signal_connect (GTK_OBJECT (ic->index), "drag_motion",
-		      GTK_SIGNAL_FUNC (panel_tree_drag_motion), NULL);
-  gtk_signal_connect (GTK_OBJECT (ic->index), "drag_leave",
-		      GTK_SIGNAL_FUNC (panel_tree_drag_leave), NULL);
-#endif
+  /* setup the dnd stuff for the messages */
+  index_child_setup_dnd ( child );
 
   if (balsa_app.previewpane)
     return (vpane);
@@ -551,3 +542,91 @@ index_child_init (IndexChild * child)
 {
 
 }
+
+
+
+/* DND features                                              */
+
+/*--*/
+/* forward declaration of the dnd callbacks */
+static void index_child_drag_data_get (GtkWidget *widget, GdkDragContext *context,
+			  GtkSelectionData *selection_data, guint info, guint32 time);
+/*--*/
+
+/* 
+ * index_child_setup_dnd : 
+ *
+ * set the drag'n drop features up
+ *
+ * @child: the message index window to set the dnd ability up
+ */
+static void 
+index_child_setup_dnd ( GnomeMDIChild * child )
+{
+  IndexChild *ic;
+
+  ic = INDEX_CHILD(child);
+#if 0
+  gtk_drag_dest_set (GTK_WIDGET (ic->index), GTK_DEST_DEFAULT_ALL,
+		     drag_types, ELEMENTS (drag_types),
+		     GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
+#endif
+  gtk_signal_connect (GTK_OBJECT (ic->index), "drag_data_get",
+      GTK_SIGNAL_FUNC (index_child_drag_data_get), NULL);
+   
+  gtk_drag_source_set (GTK_WIDGET (ic->index), GDK_BUTTON1_MASK | GDK_BUTTON3_MASK,
+		       drag_types, ELEMENTS (drag_types),
+		       GDK_ACTION_MOVE );
+  
+
+
+}
+
+
+
+/**
+ * index_child_drag_data_get:
+ *
+ * Invoked when the message list is required to provide the dragged messages
+ * Finds the selected row in the index clist and create a list of selected message
+ * This list is then passed to the X selection system to be retrievd by the drop
+ * site.
+ */
+static void
+index_child_drag_data_get (GtkWidget *widget, GdkDragContext *context,
+			  GtkSelectionData *selection_data, guint info,
+			  guint32 time)
+{
+  /*--*/
+  guint *selected_rows;
+  guint nb_selected_rows;
+
+  GtkCList *clist;
+  BalsaIndex *bindex;
+
+  Message **message_list;
+  Message *current_message;
+  guint message_count;
+  /*--*/
+  
+  clist = GTK_CLIST (widget);
+  bindex = BALSA_INDEX (widget);
+
+  
+  /* retrieve the selected rows */
+  balsa_index_get_selected_rows (bindex, &selected_rows, &nb_selected_rows);
+  
+  /* retrieve the corresponding messages */
+  message_list = (Message **) g_malloc (nb_selected_rows * sizeof (Message *));
+  for (message_count=0; message_count<nb_selected_rows; message_count++)
+    {
+      current_message = (Message *) gtk_clist_get_row_data (clist, selected_rows[message_count]);
+      message_list[message_count] = current_message;
+   }
+  
+  /* pass the message list to the selection mechanism */
+  gtk_selection_data_set (selection_data,
+			  selection_data->target,
+			  8 * sizeof(Message *), (gchar *)message_list, nb_selected_rows * sizeof(Message *));
+}
+

@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <gnome.h>
+#include <glib.h>
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "balsa-index.h"
@@ -48,6 +49,10 @@ static void mailbox_listener (MailboxWatcherMessage * mw_message);
 /* clist callbacks */
 static void
   button_event_press_cb (GtkCList * clist,
+			 GdkEventButton * event,
+			 gpointer data);
+static void
+  button_event_release_cb (GtkCList * clist,
 			 GdkEventButton * event,
 			 gpointer data);
 static void select_message (GtkWidget * widget,
@@ -254,7 +259,7 @@ balsa_index_init (BalsaIndex * bindex)
   gtk_clist_set_column_width (clist, 4, 260);
   gtk_clist_set_column_width (clist, 5, 80);
   gtk_clist_set_row_height (clist, 16);
-
+  
   gtk_signal_connect (GTK_OBJECT (clist),
 		      "select_row",
 		      (GtkSignalFunc) select_message,
@@ -264,7 +269,12 @@ balsa_index_init (BalsaIndex * bindex)
 		      "button_press_event",
 		      (GtkSignalFunc) button_event_press_cb,
 		      (gpointer) bindex);
-
+  
+  gtk_signal_connect (GTK_OBJECT (clist),
+		      "button_release_event",
+		      (GtkSignalFunc) button_event_release_cb,
+		      (gpointer) bindex);
+  
   gtk_widget_show (GTK_WIDGET (clist));
   gtk_widget_ref (GTK_WIDGET (clist));
 }
@@ -538,7 +548,7 @@ button_event_press_cb (GtkCList * clist, GdkEventButton * event, gpointer data)
 
   if (!event || event->button != 3)
     return;
-
+  
   gtk_clist_get_selection_info (clist, event->x, event->y, &row, &column);
   bindex = BALSA_INDEX (data);
   message = (Message *) gtk_clist_get_row_data (clist, row);
@@ -550,7 +560,19 @@ button_event_press_cb (GtkCList * clist, GdkEventButton * event, gpointer data)
 		     balsa_index_signals[SELECT_MESSAGE],
 		     message,
 		     event);
+
 }
+
+static void
+button_event_release_cb (GtkCList * clist, GdkEventButton * event, gpointer data)
+{
+  gtk_grab_remove (GTK_WIDGET(clist));
+  gdk_pointer_ungrab (event->time);
+}
+
+
+
+
 
 static void
 select_message (GtkWidget * widget,
@@ -600,3 +622,65 @@ mailbox_listener (MailboxWatcherMessage * mw_message)
       break;
     }
 }
+
+/* 
+ * get_selected_rows :
+ *
+ * return the rows currently selected in the index
+ *
+ * @bindex : balsa index widget to retrieve the selection from
+ * @rows : a pointer on the return array of rows. This array will
+ *        contain tyhe selected rows.
+ * @nb_rows : a pointer on the returned number of selected rows  
+ *
+ */
+void 
+balsa_index_get_selected_rows( BalsaIndex *bindex, guint **rows, guint *nb_rows )
+{
+  GList *list_of_selected_rows;
+  GtkCList *clist;
+  guint nb_selected_rows;
+  guint *selected_rows;
+  guint row_count;
+
+  clist = GTK_CLIST(bindex);
+
+  /* retreive the selection  */
+  list_of_selected_rows = clist->selection;
+  nb_selected_rows = g_list_length( list_of_selected_rows );
+
+  selected_rows = (guint *)g_malloc( nb_selected_rows * sizeof(guint) );
+  for (row_count=0; row_count<nb_selected_rows; row_count++)
+    {
+      selected_rows[row_count] = (guint)(list_of_selected_rows->data);
+      list_of_selected_rows = list_of_selected_rows->next;
+    }
+
+  /* return the result of the search */
+  *nb_rows = nb_selected_rows;
+  *rows = selected_rows;
+
+  return;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

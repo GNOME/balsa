@@ -1,3 +1,9 @@
+2001-12-03  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Toralf Lund #66032:
+	* mutt_ssl.c: print SSL version as a message, not an error 
+	* imap/imap.c: print SSL connection server as a message not an error.
+
 2001-11-14  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* imap/message.c: reduce number of fetched headers. Parse them

@@ -397,7 +397,7 @@ int imap_open_connection (IMAP_DATA* idata)
         _("Secure connection with TLS?"))) == -1)
 	goto err_close_conn;
 #else
-      mutt_error  (_("Connecting to %s ..."), idata->conn->account.host);
+      mutt_message (_("Connecting to %s ..."), idata->conn->account.host);
       rc = M_YES;
 #endif
       if (rc == M_YES) {

@@ -1,3 +1,8 @@
+2001-12-03  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* help/C/balsa.sgml: & ->&amp; (Jelmer)
+	* libbalsa/libbalsa.c: check system SSL certificates (TL, #66032).
+
 2001-12-02  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* help/C/balsa.sgml: address book doc from Jelmer Vernooij

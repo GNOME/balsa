@@ -134,6 +134,9 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
     set_option(OPTSAVEEMPTY);
     set_option(OPTCHECKNEW);
     set_option(OPTMHPURGE);
+#ifdef USE_SSL
+    set_option(OPTSSLSYSTEMCERTS);
+#endif /* USE_SSL */
 
     FileMask.rx = (regex_t *) safe_malloc (sizeof (regex_t));
     REGCOMP(FileMask.rx,"!^\\.[^.]",0);

@@ -394,12 +394,9 @@ int ssl_negotiate (sslsockdata* ssldata)
   if (!ssl_check_certificate (ssldata))
     return -1;
 
-#ifdef LIBMUTT
-  mutt_error (_("SSL connection using %s (%s)"), 
-	      SSL_get_cipher_version (ssldata->ssl), SSL_get_cipher_name (ssldata->ssl));
-#else
   mutt_message (_("SSL connection using %s (%s)"), 
 		SSL_get_cipher_version (ssldata->ssl), SSL_get_cipher_name (ssldata->ssl));
+#ifndef LIBMUTT
   mutt_sleep (0);
 #endif
   return 0;

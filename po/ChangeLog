@@ -1,3 +1,8 @@
+2001-12-03  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* POTFILES.in: add libbalsa/address-book-extern.c
+	* nl.po: update from Jelmer Vernooij <jelmer@lintux.cx>
+
 2001-12-02  Christian Rose  <menthos@menthos.com>
 
 	* sv.po: Updated Swedish translation.

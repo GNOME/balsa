@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.8.0\n"
-"POT-Creation-Date: 2000-06-01 20:26-0400\n"
-"PO-Revision-Date: 2000-05-13 19:40+02:00\n"
+"POT-Creation-Date: 2000-06-02 11:22+0200\n"
+"PO-Revision-Date: 2000-06-02 11:25+02:00\n"
 "Last-Translator: Kjartan Maraas <kmaraas@online.no>\n"
 "Language-Team: Norwegian <no@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -296,9 +296,8 @@ msgid "Undelete"
 msgstr "Angre slett"
 
 #: src/balsa-index-page.c:638
-#, fuzzy
 msgid "Store Address"
-msgstr "Legg til ny adresse"
+msgstr "Lagre adresse"
 
 #: src/balsa-index-page.c:646
 msgid "Transfer"
@@ -306,7 +305,7 @@ msgstr "Overfør"
 
 #: src/balsa-index-page.c:1026
 msgid "You may only store one address at a time.\n"
-msgstr ""
+msgstr "Du kan kun lagre en adresse om gangen.\n"
 
 #: src/balsa-index-page.c:1082
 #, c-format
@@ -314,26 +313,28 @@ msgid ""
 "There is already an address book entry for %s.\n"
 "Run GnomeCard if you would like to edit your address book entries.\n"
 msgstr ""
+"Det finnes allerede en oppføring i adresseboken for %s.\n"
+"Kjør GnomeCard hvis du ønsker å redigere oppføringer i adresseboken.\n"
 
 #: src/balsa-index-page.c:1100
 msgid ""
 "\n"
 "BEGIN:VCARD\n"
-msgstr ""
+msgstr "\nSTART:VCARD\n"
 
 #: src/balsa-index-page.c:1101
 #, c-format
 msgid "FN:%s\n"
-msgstr ""
+msgstr "FN:%s\n"
 
 #: src/balsa-index-page.c:1102
 #, c-format
 msgid "EMAIL;INTERNET:%s\n"
-msgstr ""
+msgstr "E-POST;INTERNETT:%s\n"
 
 #: src/balsa-index-page.c:1103
 msgid "END:VCARD\n"
-msgstr ""
+msgstr "SLUTT;VCARD\n"
 
 #: src/balsa-index.c:252
 msgid "From"
@@ -432,7 +433,7 @@ msgstr "Emne:"
 #: src/balsa-message.c:734
 #, c-format
 msgid "other part: error writing to temporary file %s: %s"
-msgstr ""
+msgstr "andre del: feil under skriving til midlertidig fil %s: %s"
 
 #: src/balsa-message.c:788
 msgid ""
@@ -452,12 +453,12 @@ msgstr "<table border=0><tr><th>Attributt</th><th>Verdi</th></tr>\n"
 #: src/balsa-message.c:827
 #, c-format
 msgid "image: error writing to temporary file: %s"
-msgstr ""
+msgstr "bilde: feil under skriving til midlertidig fil: %s"
 
 #: src/balsa-message.c:1068
 #, c-format
 msgid "text part: error writing to temporary file %s: %s"
-msgstr ""
+msgstr "tekstdel: feil under skriving til midlertidig fil %s: %s"
 
 #: src/balsa-message.c:1214
 #, c-format

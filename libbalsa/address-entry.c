@@ -1338,7 +1338,7 @@ libbalsa_keystroke_home(LibBalsaAddressEntry *address_entry)
     addy = address_entry->input->active->data;
     if (addy->match != NULL)
 	libbalsa_alias_accept_match(addy);
-    address_entry->input->active = g_list_first(address_entry->input->list);
+    address_entry->input->active = address_entry->input->list;
     addy = address_entry->input->active->data;
     addy->cursor = 0;
 }
@@ -1551,6 +1551,11 @@ libbalsa_keystroke_add_key(LibBalsaAddressEntry *address_entry, gchar *add)
     g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry));
     g_return_if_fail(add != NULL);
 
+    editable = GTK_EDITABLE(address_entry);
+    if (editable->selection_start_pos != editable->selection_end_pos) {
+	libbalsa_cut_clipboard(address_entry);
+    }
+
     /*
      * User typed a key, so cancel any matches we may have had.
      */
@@ -1562,18 +1567,13 @@ libbalsa_keystroke_add_key(LibBalsaAddressEntry *address_entry, gchar *add)
      * If this is at the beginning, and the user pressed ' ',
      * ignore it.
      */
-    if ((addy->cursor == 0) && (add[0] == (gchar) ' ')) return;
+    if (!addy->cursor && *add == ' ') return;
     
-    editable = GTK_EDITABLE(address_entry);
-    if (editable->selection_start_pos != editable->selection_end_pos) {
-	libbalsa_cut_clipboard(address_entry);
-    }
-
-    /*
+     /*
      * Split the string at the correct cursor position.
      */
     left = g_strndup(addy->user, addy->cursor);
-    right = & addy->user[addy->cursor];
+    right = addy->user+addy->cursor;
     
     /*
      * Add the keystroke to the end of user input.
@@ -1751,8 +1751,9 @@ libbalsa_paste_clipboard(LibBalsaAddressEntry *address_entry)
 
 /*************************************************************
  * libbalsa_cut_clipboard:
- *     Cuts the current selection out of the
- *     LibBalsaAddressEntry.
+ *     Wraps around gtk_editable_paste_clipboard to ensure
+ *     that user data gets reloaded into the correct
+ *     data structures.
  *
  *   arguments:
  *     address_entry: the widget.
@@ -1764,101 +1765,12 @@ static void
 libbalsa_cut_clipboard(LibBalsaAddressEntry *address_entry)
 {
     GtkEditable *editable;
-    GList *start, *end, *list;
-    gint start_pos, end_pos;
-    gchar *str, *left, *right, *new;
-    emailData *addy;
-    gint i;
-    size_t tmp;
 
-    g_return_if_fail(address_entry != NULL);
-    g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry));
-    
     editable = GTK_EDITABLE(address_entry);
-    if (editable->selection_start_pos == editable->selection_end_pos)
-	return;
-    else if (editable->selection_start_pos < editable->selection_end_pos) {
-	start_pos = editable->selection_start_pos;
-	end_pos = editable->selection_end_pos;
-    } else {
-	start_pos = editable->selection_end_pos;
-	end_pos = editable->selection_start_pos;
-    }
-
-    /*
-     * First find out which addy selection_start|end_pos is in.
-     */
-    start = libbalsa_find_list_entry(address_entry, &start_pos);
-    end = libbalsa_find_list_entry(address_entry, &end_pos);
-    
-    g_assert(start != NULL);
-    g_assert(end != NULL);
-
-    if (start == end) {
-	addy = start->data;
-	str = libbalsa_make_address_string(addy);
-	libbalsa_force_no_match(addy);
-	left = g_strndup(str, start_pos);
-	right = str;
-	for (i = 0; i < end_pos; i++) right++;
-	new = g_strconcat(left, right, NULL);
-	g_free(str); /* also does g_free(right); */
-	g_free(left);
-	g_free(addy->user);
-	addy->user = new;
-	addy->cursor = start_pos;
-	if (addy->cursor > (tmp = strlen(addy->user)))
-	    addy->cursor = tmp;
-	if (addy->cursor < 0)
-	    addy->cursor = 0;
-    } else {
-	/*
-	 * Set the Start data.
-	 */
-	addy = start->data;
-	str = libbalsa_make_address_string(addy);
-	libbalsa_force_no_match(addy);
-	left = g_strndup(str, start_pos);
-	g_free(str);
-	g_free(addy->user);
-	addy->user = left;
-	addy->cursor = start_pos;
-	address_entry->input->active = start;
-	if (addy->cursor > (tmp = strlen(addy->user)))
-	    addy->cursor = tmp;
-	
-	/*
-	 * Set the end data.
-	 */
-	addy = end->data;
-	str = libbalsa_make_address_string(addy);
-	libbalsa_force_no_match(addy);
-	right = str;
-	for (i = 0; i < end_pos; i++) right++;
-	g_free(addy->user);
-	addy->user = g_strdup(right);
-	g_free(str);
-
-	/*
-	 * Set the right entry as active.
-	 */
-	addy = address_entry->input->active->data;
-	libbalsa_force_no_match(addy);
-	address_entry->input->active = start;
-
-	/*
-	 * Delete the GList inbetween(!)
-	 */
-	for (list = g_list_next(start);
-	     list != end;
-	     list = g_list_next(start)) {
-	    libbalsa_emailData_free(list->data);
-	    g_list_remove_link(address_entry->input->list, list);
-            g_list_free_1(list);
-	}
-    }
-
-    editable->selection_start_pos = editable->selection_end_pos = 0;
+    gtk_editable_cut_clipboard(editable);
+    if (address_entry->input)
+	libbalsa_inputData_free(address_entry->input);
+    address_entry->input = libbalsa_fill_input(address_entry);
 }
 
 
@@ -2144,8 +2056,8 @@ libbalsa_address_entry_show(LibBalsaAddressEntry *address_entry)
     show = g_string_new("");
     cursor = start = end = 0;
     found = FALSE;
-    for (list = g_list_first(input->list);
-	 list != NULL;
+    for (list = input->list;
+	 list;
 	 list = g_list_next(list)) {
 	/*
 	 * Is it a normal string, or is it a match that requires ()

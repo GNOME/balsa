@@ -1,3 +1,12 @@
+2002-02-07  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/address-entry.c: simplify the cut_clipboard() code
+	(Emmanuel).
+	* src/balsa-message.c: add font entries for koi8-[ru] (Albrecht
+	Dreﬂ).
+	* src/print.c: print properly multipart messages of different
+	content types (AD).
+
 2002-02-05  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* libbalsa/mailbox_imap.c: return open status (PS).

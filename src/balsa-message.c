@@ -1209,6 +1209,8 @@ static struct {
     {"euc-kr", "ksc5601.1987-0", TRUE}, 
     {"koi-8-r", "koi8-r", FALSE}, 
     {"koi-8-u", "koi8-u", FALSE}, 
+    {"koi8-r",  "koi8-r", FALSE}, 
+    {"koi8-u",  "koi8-u", FALSE}, 
     {"us-ascii", "iso8859-1", FALSE}
 };
 

@@ -112,10 +112,10 @@ typedef struct _mime_action_t {
  * helper function: try to print with the correct charset...
  */
 static void
-gnome_print_show_with_charset(PrintInfo * pi, char const * text)
+gnome_print_show_with_charset(PrintInfo * pi, char const * text, iconv_t conv)
 {
     /* if we can not convert to utf8, try to print "raw" (which might fail) */
-    if (pi->conv_data == (iconv_t)(-1))
+    if (conv == (iconv_t)(-1))
 	gnome_print_show(pi->pc, text);
     else {
 	gchar *conv_ibuf, *conv_ibufp, *conv_obuf, *conv_obufp;
@@ -125,14 +125,16 @@ gnome_print_show_with_charset(PrintInfo * pi, char const * text)
 	 * them... */
 	conv_ibuf = conv_ibufp = g_strdup (text);
 	ibuflen = strlen(conv_ibuf) + 1;
-	obuflen = ibuflen << 1; /* should be sufficient? */
+	obuflen = ibuflen * 4 + 1; /* should be sufficient? */
 	conv_obuf = conv_obufp = g_malloc(obuflen);
+	obuflen--;
 	/* the prototype of iconv() changed with glibc 2.2 */
 #if defined __GLIBC__ && __GLIBC__ && __GLIBC_MINOR__ <= 1 || (defined sun)
-	iconv(pi->conv_data, (const char **)&conv_ibuf, &ibuflen, &conv_obuf, &obuflen);
+	iconv(conv, (const char **)&conv_ibuf, &ibuflen, &conv_obuf, &obuflen);
 #else
-	iconv(pi->conv_data, &conv_ibuf, &ibuflen, &conv_obuf, &obuflen);
+	iconv(conv, &conv_ibuf, &ibuflen, &conv_obuf, &obuflen);
 #endif
+	*conv_obuf = '\0';
 	gnome_print_show(pi->pc, conv_obufp);
 	g_free (conv_ibufp);
 	g_free (conv_obufp);
@@ -213,7 +215,7 @@ print_wrap_string(gchar ** str, GnomeFont * font, gint width, gint tab_width)
    very long lines without spaces).
 */
 static gchar *
-print_line(PrintInfo * pi, gchar * pointer)
+print_line(PrintInfo * pi, gchar * pointer, iconv_t conv)
 {
     int pos = 0;
     gchar *linebuffer;
@@ -231,7 +233,7 @@ print_line(PrintInfo * pi, gchar * pointer)
     linebuffer[pos] = '\0';	/* make sure line has EOS */
 
     gnome_print_moveto(pi->pc, pi->margin_left, pi->ypos);
-    gnome_print_show_with_charset(pi, linebuffer);
+    gnome_print_show_with_charset(pi, linebuffer, conv);
     g_free(linebuffer);
     return pointer;
 }
@@ -252,7 +254,7 @@ print_foot_lines(PrintInfo * pi, GnomeFont * font, float y,
 	gnome_print_moveto(pi->pc, 
 			   pi->margin_left + (pi->printable_width - width) / 2.0,
 			   y);
-	gnome_print_show_with_charset(pi, ptr);
+	gnome_print_show_with_charset(pi, ptr, pi->conv_data);
 	ptr = eol;
 	if (eol) {
 	    *eol = '\n';
@@ -286,7 +288,7 @@ start_new_page(PrintInfo * pi)
     width = gnome_font_get_width_string(font, page_no);
     gnome_print_moveto(pi->pc, pi->page_width - pi->margin_left - width,
 		       ypos);
-    gnome_print_show_with_charset(pi, page_no);
+    gnome_print_show_with_charset(pi, page_no, pi->conv_data);
     g_free(page_no);
     gtk_object_unref(GTK_OBJECT(font));
     
@@ -478,7 +480,7 @@ print_header_val(PrintInfo * pi, gint x, float * y,
 	if (eol)
 	    *eol = '\0';
 	gnome_print_moveto(pi->pc, x, *y);
-	gnome_print_show_with_charset(pi, ptr);
+	gnome_print_show_with_charset(pi, ptr, pi->conv_data);
 	ptr = eol;
 	if (eol)
 	    ptr++;
@@ -512,7 +514,7 @@ print_header(PrintInfo * pi, gpointer * data)
 	if (pi->ypos < pi->margin_bottom)
 	    start_new_page(pi);
 	gnome_print_moveto(pi->pc, pi->margin_left, pi->ypos);
-	gnome_print_show_with_charset(pi, pair[0]);
+	gnome_print_show_with_charset(pi, pair[0], pi->conv_data);
 	print_header_val(pi, pi->margin_left + pdata->header_label_width,
 			 &pi->ypos, BALSA_PRINT_HEAD_SIZE, pair[1], font);
 	g_strfreev(pair);
@@ -572,6 +574,7 @@ typedef struct _PlainTextInfo {
     gchar *textbuf;
     gint lines;
     gint maxlength;
+    iconv_t conv;
 } PlainTextInfo;
 
 static void
@@ -579,6 +582,7 @@ prepare_plaintext(PrintInfo * pi, LibBalsaMessageBody * body)
 {
     PlainTextInfo *pdata;
     GnomeFont *font;
+    gchar *charset;
 
     pdata = g_malloc(sizeof(PlainTextInfo));
     pdata->id_tag = BALSA_PRINT_TYPE_PLAINTEXT;
@@ -597,6 +601,21 @@ prepare_plaintext(PrintInfo * pi, LibBalsaMessageBody * body)
 	    fclose(part);
 	    }
     }
+
+    /* get the necessary iconv structure, or use iso-8859-1 */
+    charset = libbalsa_message_body_get_parameter(body, "charset");
+
+    if (charset) {
+	pdata->conv = iconv_open("utf8", charset);
+	if (pdata->conv == (iconv_t)(-1)) {
+	    balsa_information(LIBBALSA_INFORMATION_ERROR,
+			      _("Can not convert %s, falling back to us-ascii.\nSome characters may be printed incorrectly."),
+			      charset);
+	    pdata->conv = iconv_open("utf8", "us-ascii");
+	}
+	g_free(charset);
+    } else
+	pdata->conv = iconv_open("utf8", "iso-8859-1");
 
     /* fake an empty buffer if textbuf is NULL */
     if (!pdata->textbuf)
@@ -644,8 +663,10 @@ print_plaintext(PrintInfo * pi, gpointer * data)
 	    start_new_page(pi);
 	    gnome_print_setfont(pi->pc, font);
 	}
-	ptr = print_line(pi, ptr);
+	ptr = print_line(pi, ptr, pdata->conv);
     }
+    if (pdata->conv != (iconv_t)(-1))
+	iconv_close(pdata->conv);
     gtk_object_unref(GTK_OBJECT(font));
     g_free (pdata->textbuf);
 }
@@ -756,7 +777,7 @@ print_default(PrintInfo * pi, gpointer data)
     offset = pi->margin_left + pdata->image_width + 10;
     for (i = 0; pdata->labels[i]; i += 2) {
 	gnome_print_moveto(pi->pc, offset, pi->ypos);
-	gnome_print_show_with_charset(pi, pdata->labels[i]);
+	gnome_print_show_with_charset(pi, pdata->labels[i], pi->conv_data);
 	print_header_val(pi, offset + pdata->label_width, &pi->ypos,
 			 BALSA_PRINT_HEAD_SIZE, pdata->labels[i + 1], font);
 	pi->ypos -= BALSA_PRINT_HEAD_SIZE;
@@ -933,9 +954,15 @@ print_info_new(const gchar * paper, LibBalsaMessage * msg,
     prepare_header(pi, NULL);
     
     the_charset = (gchar *)libbalsa_message_charset(msg);
-    if (the_charset)
+    if (the_charset) {
 	pi->conv_data = iconv_open("utf8", the_charset);
-    else
+	if (pi->conv_data == (iconv_t)(-1)) {
+	    balsa_information(LIBBALSA_INFORMATION_ERROR,
+			      _("Can not convert %s, falling back to us-ascii.\nSome characters may be printed incorrectly."),
+			      the_charset);
+	    pi->conv_data = iconv_open("utf8", "us-ascii");
+	}
+    } else
 	pi->conv_data = iconv_open("utf8", "iso-8859-1");
 
     /* now get the message contents... */

@@ -24,7 +24,7 @@ struct _ImapMboxHandle {
   ImapCapability capabilities[IMCAP_MAX];
   unsigned exists;
   unsigned recent;
-  unsigned unseen;
+  unsigned unseen; /* msgno of first unseen message */
   ImapUID  uidnext;
   ImapUID  uidval;
 

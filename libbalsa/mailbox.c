@@ -432,8 +432,10 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox)
 
     if (--mailbox->open_ref == 0) {
 	LIBBALSA_MAILBOX_GET_CLASS(mailbox)->close_mailbox(mailbox);
-	g_node_destroy(mailbox->msg_tree);
-	mailbox->msg_tree = NULL;
+        if(mailbox->msg_tree) {
+            g_node_destroy(mailbox->msg_tree);
+            mailbox->msg_tree = NULL;
+        }
 	mailbox->stamp++;
     }
 
@@ -776,16 +778,15 @@ lbm_threads_enter(void)
 #ifdef DEBUG
                 g_print("Sub thread must wait for lock...");
                 gdk_threads_enter();
-                holding_thread = current_thread;
                 g_print("got it!\n");
 #else
                 gdk_threads_enter();
 #endif
                 unlock = TRUE;
             } 
-            holding_thread = current_thread;
 	}
     }
+    holding_thread = current_thread;
     return unlock;
 }
 
@@ -1819,7 +1820,7 @@ mbox_model_iter_nth_child(GtkTreeModel	* tree_model,
 
     INVALIDATE_ITER(iter);
     g_return_val_if_fail(parent == NULL
-			 || VALID_ITER(parent, tree_model), FALSE);
+                         ||VALID_ITER(parent, tree_model), FALSE);
 
     node = parent ? parent->user_data
 		  : LIBBALSA_MAILBOX(tree_model)->msg_tree;

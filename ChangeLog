@@ -1,3 +1,12 @@
+2004-02-09  Pawel Salek
+
+	* libbalsa/mailbox.c: be more careful when destroying msg_tree.
+	Set holding_thread carefully.
+	* libbalsa/message.c: first check, then thread.
+	* libbalsa/imap/imap-commands.c: set unseen on reopening.
+	* src/balsa-index.[ch]: scroll to last if no unseen.
+	* src/main-window.[ch]: remove deadlocks in a brute way.
+
 2004-02-08  Pawel Salek
 
 	* libbalsa/mailbox.h: add first_unseen field.

@@ -625,10 +625,10 @@ libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
 	    rethread = TRUE;
     }
 
+    libbalsa_mailbox_check(dest);
     if (rethread)
 	libbalsa_mailbox_set_threading(dest, dest->view->threading_type);
 
-    libbalsa_mailbox_check(dest);
     return TRUE;
 }
 

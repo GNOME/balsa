@@ -72,6 +72,8 @@ typedef enum {
 GtkType balsa_window_get_type(void);
 GtkWidget *balsa_window_new(void);
 GtkWidget *balsa_window_find_current_index(BalsaWindow * window);
+void balsa_window_enable_mailbox_menus(BalsaIndex * index);
+LibBalsaCondition* balsa_window_get_view_filter(BalsaWindow *window);
 void balsa_window_refresh(BalsaWindow * window);
 void balsa_window_open_mbnode(BalsaWindow * window, BalsaMailboxNode*mbnode);
 void balsa_window_close_mbnode(BalsaWindow * window, BalsaMailboxNode*mbnode);

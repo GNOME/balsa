@@ -109,7 +109,6 @@ static void balsa_window_destroy(GtkObject * object);
 GtkWidget *balsa_window_find_current_index(BalsaWindow * window);
 static gboolean balsa_close_commit_mailbox_on_timer(GtkWidget * widget, 
 					     gpointer * data);
-static LibBalsaCondition* bw_get_view_filter(BalsaWindow *window);
 
 static void balsa_window_index_changed_cb(GtkWidget * widget,
                                           gpointer data);
@@ -123,7 +122,6 @@ static void check_mailbox_list(GList * list);
 static gboolean mailbox_check_func(GNode * node);
 static gboolean imap_check_test(const gchar * path);
 
-static void enable_mailbox_menus(BalsaIndex * index);
 static void enable_message_menus(LibBalsaMessage * message);
 static void enable_edit_menus(BalsaMessage * bm);
 #ifdef HAVE_GTKHTML
@@ -1078,7 +1076,7 @@ balsa_window_new()
                                        TRUE);
 
     /* Disable menu items at start up */
-    enable_mailbox_menus(NULL);
+    balsa_window_enable_mailbox_menus(NULL);
     enable_message_menus(NULL);
     enable_edit_menus(NULL);
 #ifdef HAVE_GTKHTML
@@ -1104,8 +1102,8 @@ balsa_window_new()
  * Enable or disable menu items/toolbar buttons which depend 
  * on if there is a mailbox open. 
  */
-static void
-enable_mailbox_menus(BalsaIndex * index)
+void
+balsa_window_enable_mailbox_menus(BalsaIndex * index)
 {
     const static int mailbox_menu_entries[] = {
         MENU_MAILBOX_NEXT_POS,        MENU_MAILBOX_PREV_POS,
@@ -1512,7 +1510,7 @@ real_open_mbnode(BalsaMailboxNode * mbnode)
 
     balsa_window_increase_activity(window);
     failurep = balsa_index_load_mailbox_node(BALSA_INDEX (index),
-                                             mbnode, NULL);
+                                             mbnode);
     balsa_window_decrease_activity(window);
 
     if(failurep) {
@@ -1555,23 +1553,10 @@ real_open_mbnode(BalsaMailboxNode * mbnode)
     gtk_notebook_set_current_page(GTK_NOTEBOOK
                                   (balsa_app.main_window->notebook),
                                   page_num);
-    register_open_mailbox(mbnode->mailbox);
-    balsa_mblist_update_mailbox(balsa_app.mblist_tree_store,
-                                index->mailbox_node->mailbox);
-
     /* Enable relavent menu items... */
-    enable_mailbox_menus(index);
-    libbalsa_mailbox_set_view_filter(mbnode->mailbox,
-                                     bw_get_view_filter(window), FALSE);
-    /* libbalsa functions must be called with gdk unlocked
-     * but balsa_index - locked!
-     */
-    gdk_flush();
-    gdk_threads_leave();
-    libbalsa_mailbox_set_threading(mbnode->mailbox,
-                                   mbnode->mailbox->view->threading_type);
-
-    gdk_threads_enter();
+    register_open_mailbox(mbnode->mailbox);
+    /* scroll may select the message and GtkTreeView does not like selecting
+     * without being shown first. */
     balsa_index_scroll_on_open(index);
     gdk_flush();
     gdk_threads_leave();    
@@ -1632,7 +1617,7 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
             gnome_appbar_set_default(balsa_app.appbar, "Mailbox closed");
 
             /* Disable menus */
-            enable_mailbox_menus(NULL);
+            balsa_window_enable_mailbox_menus(NULL);
             enable_message_menus(NULL);
             enable_edit_menus(NULL);
             window->current_index = NULL;
@@ -3012,8 +2997,8 @@ mailbox_tab_close_cb(GtkWidget * widget, gpointer data)
 }
 
 
-static LibBalsaCondition*
-bw_get_view_filter(BalsaWindow *window)
+LibBalsaCondition*
+balsa_window_get_view_filter(BalsaWindow *window)
 {
     static struct {
         LibBalsaMessageFlag flag;
@@ -3132,7 +3117,7 @@ hide_changed_cb(GtkWidget * widget, gpointer data)
     /* PART 2: do the job. */
     mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
 
-    filter = bw_get_view_filter(balsa_app.main_window);
+    filter = balsa_window_get_view_filter(balsa_app.main_window);
     /* libbalsa_mailbox_set_view_filter() will take the ownership of
      * filter.  We need also to rethread to take into account that
      * some messages might have been removed or added to the view.  We
@@ -3316,7 +3301,7 @@ notebook_switch_page_cb(GtkWidget * notebook,
     g_object_set_data(G_OBJECT(window), BALSA_INDEX_GRAB_FOCUS, index);
     balsa_window_idle_replace(window, index->current_message);
     enable_message_menus(index->current_message);
-    enable_mailbox_menus(index);
+    balsa_window_enable_mailbox_menus(index);
 
     balsa_mblist_focus_mailbox(balsa_app.mblist, mailbox);
     balsa_mblist_set_status_bar(mailbox);
@@ -3335,7 +3320,7 @@ balsa_window_index_changed_cb(GtkWidget * widget, gpointer data)
         return;
 
     index = BALSA_INDEX(widget);
-    enable_mailbox_menus(index);
+    balsa_window_enable_mailbox_menus(index);
     enable_message_menus(index->current_message);
     if(index->current_message == NULL) {
         enable_edit_menus(NULL);

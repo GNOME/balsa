@@ -664,11 +664,13 @@ balsa_index_scroll_on_open(BalsaIndex *index)
     LibBalsaMailbox *mailbox = index->mailbox_node->mailbox;
     GtkTreeIter iter;
     GtkTreePath *path = NULL;
+    unsigned msgno;
 
     balsa_index_update_tree(index, balsa_app.expand_tree);
-    if(mailbox->first_unread && 
-       libbalsa_mailbox_msgno_find(mailbox, mailbox->first_unread,
-                                   &path, &iter)) {
+    msgno = mailbox->first_unread 
+        ? mailbox->first_unread 
+        : libbalsa_mailbox_total_messages(mailbox);
+    if(libbalsa_mailbox_msgno_find(mailbox, msgno, &path, &iter)) {
         bndx_expand_to_row(index, path);
 	gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(index), path, NULL,
 				     FALSE, 0, 0);
@@ -693,8 +695,7 @@ balsa_index_scroll_on_open(BalsaIndex *index)
 
 gboolean
 balsa_index_load_mailbox_node (BalsaIndex * index,
-                               BalsaMailboxNode* mbnode,
-                               LibBalsaCondition *view_filter)
+                               BalsaMailboxNode* mbnode)
 {
     GtkTreeView *tree_view;
     LibBalsaMailbox* mailbox;
@@ -742,6 +743,21 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
     g_signal_connect_swapped(G_OBJECT(mailbox), "changed",
 			     G_CALLBACK(bndx_mailbox_changed_cb),
 			     (gpointer) index);
+
+    balsa_window_enable_mailbox_menus(index);
+    /* libbalsa functions must be called with gdk unlocked
+     * but balsa_index - locked!
+     */
+    gdk_flush();
+    gdk_threads_leave();
+    libbalsa_mailbox_set_view_filter(mailbox,
+                                     balsa_window_get_view_filter(balsa_app.main_window),
+                                     FALSE);
+    libbalsa_mailbox_set_threading(mailbox,
+                                   mailbox->view->threading_type);
+
+    gdk_threads_enter();
+
     /* Set the tree store*/
 #ifndef GTK2_FETCHES_ONLY_VISIBLE_CELLS
     g_object_set_data(G_OBJECT(mailbox), "tree-view", tree_view);

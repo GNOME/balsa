@@ -193,6 +193,7 @@ imap_mbox_select(ImapMboxHandle* handle, const char *mbox,
 
   imap_mbox_resize_cache(handle, 0);
   mbox_view_dispose(&handle->mbox_view);
+  handle->unseen = 0;
 
   cmd = g_strdup_printf("SELECT \"%s\"", mbox);
   rc= imap_cmd_exec(handle, cmd);

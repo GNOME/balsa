@@ -1,3 +1,8 @@
+2004-07-31  Pawel Salek
+
+	* libbalsa/imap-server.c: get the TLS mode right from the config.
+	* libbalsa/message.c: tune up libbalsa_message_has_attachment().
+
 2004-07-30  Pawel Salek
 
 	* README, NEWS, configure.in: release 2.2.1

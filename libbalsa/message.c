@@ -810,17 +810,14 @@ libbalsa_message_has_attachment(LibBalsaMessage * message)
        has Content-type: multipart/mixed AND members with
        Content-disposition: attachment. Unfortunately, part list may
        not be available at this stage. */
-    if( !message->headers->content_type ||
-        !g_mime_content_type_is_type(message->headers->content_type,
-                                     "multipart", "mixed"))
-        return FALSE;
-    if(!message->body_list)
-        /* We have no body list but the content type says it may have
-         * the attachment so we set the icon anyway. */
-        return TRUE;
-
-    /* use "exact" algorithm */
-    return has_attached_part(message->body_list);
+    if(!message->body_list) {
+        return message->headers->content_type &&
+            g_mime_content_type_is_type(message->headers->content_type,
+                                        "multipart", "mixed");
+    } else {
+        /* use "exact" algorithm */
+        return has_attached_part(message->body_list);
+    }
  }
 
 #ifdef HAVE_GPGME

@@ -423,7 +423,7 @@ libbalsa_imap_server_new_from_config(void)
     LibBalsaImapServer *imap_server;
     LibBalsaServer *server;
     gboolean d, d1;
-    gint conn_limit;
+    gint tls_mode, conn_limit;
 
     tmp_server.host = gnome_config_get_string("Server");
     if(strrchr(tmp_server.host, ':') == NULL) {
@@ -449,8 +449,8 @@ libbalsa_imap_server_new_from_config(void)
         server->host = tmp_server.host;
     }
     server->use_ssl |= gnome_config_get_bool("SSL=false");
-    server->tls_mode = gnome_config_get_int_with_default("TLSMode", &d);
-    if(!d) server->tls_mode = LIBBALSA_TLS_ENABLED;
+    tls_mode = gnome_config_get_int_with_default("TLSMode", &d);
+    if(!d) server->tls_mode = tls_mode;
     conn_limit = gnome_config_get_int_with_default("ConnectionLimit", &d);
     if(!d) imap_server->max_connections = conn_limit;
     d1 = gnome_config_get_bool_with_default("PersistentCache", &d);

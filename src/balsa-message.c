@@ -1913,7 +1913,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 #else
 	part_info_init_unknown(bm, info);
 #endif
-    } else {
+    } else { /* not html */
 	regex_t rex;
 	GtkWidget *item = NULL;
 	GdkFont *fnt = NULL;
@@ -1921,15 +1921,15 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 	
 	fnt = find_body_font(info->body);
 
-    if (bm->wrap_text) {
-        if (balsa_app.recognize_rfc2646_format_flowed
-            && libbalsa_flowed_rfc2646(info->body)) {
-            ptr =
-                libbalsa_wrap_rfc2646(ptr, balsa_app.browse_wrap_length,
-                                      FALSE, TRUE);
-        } else
-            libbalsa_wrap_string(ptr, balsa_app.browse_wrap_length);
-    }
+	if (bm->wrap_text) {
+	    if (balsa_app.recognize_rfc2646_format_flowed
+		&& libbalsa_flowed_rfc2646(info->body)) {
+		ptr =
+		    libbalsa_wrap_rfc2646(ptr, balsa_app.browse_wrap_length,
+					  FALSE, TRUE);
+	    } else
+		libbalsa_wrap_string(ptr, balsa_app.browse_wrap_length);
+	}
 
 	if (!fnt)
 	    fnt = gdk_fontset_load(balsa_app.message_font);
@@ -2026,11 +2026,7 @@ part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info, gchar * ptr,
 		    size_t len)
 {
     GtkHTMLStream *stream;
-    GtkWidget *html, *scroll;
-
-    scroll = gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
-				   GTK_POLICY_NEVER, GTK_POLICY_NEVER);
+    GtkWidget *html;
 
     html = gtk_html_new();
 
@@ -2038,7 +2034,7 @@ part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info, gchar * ptr,
     gtk_html_write(GTK_HTML(html), stream, ptr, len);
     gtk_html_end(GTK_HTML(html), stream, GTK_HTML_STREAM_OK);
     gtk_html_set_editable(GTK_HTML(html), FALSE);
-
+    
     gtk_signal_connect(GTK_OBJECT(html), "size_request",
 		       (GtkSignalFunc) balsa_gtk_html_size_request,
 		       (gpointer) bm);
@@ -2048,14 +2044,19 @@ part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info, gchar * ptr,
     gtk_signal_connect(GTK_OBJECT(html), "on_url",
 		       GTK_SIGNAL_FUNC(balsa_gtk_html_on_url),
 		       bm);
-
-    gtk_container_add(GTK_CONTAINER(scroll), html);
-
+    gtk_signal_connect(GTK_OBJECT(html), "key_press_event",
+		       (GtkSignalFunc)balsa_message_key_press_event,
+		       (gpointer) bm);
+    gtk_signal_connect(GTK_OBJECT(html), "focus_in_event",
+		       (GtkSignalFunc)balsa_message_focus_in_part,
+		       (gpointer) bm);
+    gtk_signal_connect(GTK_OBJECT(html), "focus_out_event",
+		       (GtkSignalFunc)balsa_message_focus_out_part,
+		       (gpointer) bm);
     gtk_widget_show(html);
-    gtk_widget_show(scroll);
 
     info->focus_widget = html;
-    info->widget = scroll;
+    info->widget = html;
     info->can_display = TRUE;
 }
 #endif
@@ -2866,8 +2867,8 @@ balsa_gtk_html_size_request(GtkWidget * widget,
     g_return_if_fail(GTK_IS_HTML(widget));
     g_return_if_fail(requisition != NULL);
 
-    requisition->width  = -(widget->style->klass->xthickness + 1) * 2;
-    requisition->height = -(widget->style->klass->ythickness + 1) * 2;
+    requisition->width  = (widget->style->klass->xthickness + 1) * 2;
+    requisition->height = (widget->style->klass->ythickness + 1) * 2;
 
     requisition->width  += GTK_LAYOUT(widget)->hadjustment->upper -1 /*EMP*/;
     requisition->height += GTK_LAYOUT(widget)->vadjustment->upper -1 /*EMP*/;

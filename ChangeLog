@@ -1,3 +1,8 @@
+2002-12-11  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/balsa-message.c: make html scroll work, 
+	slight indentation fixes
+
 2002-12-05  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/Makefile.am: remove threads.h

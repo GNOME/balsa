@@ -155,7 +155,6 @@ GtkWidget *balsa_mailbox_list_window_new(BalsaWindow *window)
 void
 mblist_open_mailbox (Mailbox * mailbox)
 {
-  GtkWidget *page;
   int i;
 
   if (!mblw)

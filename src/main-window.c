@@ -850,6 +850,7 @@ mail_progress_notify_cb( )
     MailThreadMessage **currentpos;
     void *msgbuffer;
     uint count;
+    gfloat percent;
 
     msgbuffer = malloc( 2049 );
 
@@ -913,6 +914,15 @@ mail_progress_notify_cb( )
 	    UNLOCK_MAILBOX (balsa_app.inbox);
 	    break;
 	  case MSGMAILTHREAD_PROGRESS:
+	    percent = (gfloat)threadmessage->num_bytes/
+	      (gfloat) threadmessage->tot_bytes;
+	    if( percent > 1.0 || percent < 0.0 )
+	      {
+		percent = 1.0;
+		if( balsa_app.debug )
+		  fprintf(stderr, "progress bar percentage out of range %f\n",
+			  percent);
+	      }
 	    if (progress_dialog && GTK_IS_WIDGET ( progress_dialog ) ) 
 	      gtk_progress_bar_update(GTK_PROGRESS_BAR(progress_dialog_bar),
 				      (gfloat)threadmessage->num_bytes/

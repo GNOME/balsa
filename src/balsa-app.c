@@ -120,6 +120,8 @@ balsa_app_init (void)
   balsa_app.mw_height = MW_DEFAULT_HEIGHT;
   balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
   balsa_app.pwindow_option = WHILERETR;
+  balsa_app.wordwrap = TRUE;
+  balsa_app.wraplength = 80;
 
   /* arp */
   balsa_app.quote_str = NULL;

@@ -47,6 +47,7 @@ static gint attach_clicked (GtkWidget *, gpointer);
 static gint close_window (GtkWidget *, gpointer);
 static gint check_if_regular_file (gchar *);
 static void balsa_sendmsg_destroy (BalsaSendmsg * bsm);
+void send_body_wrap (Body *body, GtkText *text);
 
 /* Standard DnD types */
 enum
@@ -886,10 +887,14 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 
   body = body_new ();
 
-  body->buffer = gtk_editable_get_chars (GTK_EDITABLE (bsmsg->text), 0,
+  if(balsa_app.wordwrap)
+    send_body_wrap (body, GTK_TEXT(bsmsg->text));
+  else
+    body->buffer = gtk_editable_get_chars (GTK_EDITABLE (bsmsg->text), 0,
 			      gtk_text_get_length (GTK_TEXT (bsmsg->text)));
 
   message->body_list = g_list_append (message->body_list, body);
+  
 
   {				/* handle attachments */
     gint i;
@@ -1001,3 +1006,81 @@ postpone_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 
   return TRUE;
 }
+
+void
+send_body_wrap (Body *body, GtkText *text)
+{
+  guint final_length, length;
+  int pos, tabspace, offset, minbreak, line_len;
+  char *last_break, *current_line, *current_char;
+  char buffer[512];
+  GList *body_list=NULL, *next_line=NULL;
+
+  minbreak = balsa_app.wraplength/2;
+  tabspace = 0;
+  
+  length = gtk_text_get_length(GTK_TEXT(text));
+  final_length = length;
+  current_line = gtk_editable_get_chars (GTK_EDITABLE (text),0,length);
+  last_break = current_line;
+  
+  /* while the remaining text is greater than screen width */
+  while(length > balsa_app.wraplength)
+    {
+      /* find last 'breaking' character */
+      for(pos=0; (offset=pos+tabspace) < balsa_app.wraplength; pos++)
+	{
+	  current_char = (char *)(current_line+pos);
+	  if(*current_char=='\n')
+	    {
+	      last_break=(char *) current_char;
+	      break;
+	    }
+	  else if(*current_char==' ')
+	    last_break = current_char;
+	  else if(*current_char=='\t')
+	    tabspace+=4; /* assume tabs are about 5 chars wide */
+	}
+      line_len = (int) (last_break - current_line + 1);
+
+      /* if first break is on left side of screen, don't bother */
+      if( line_len < minbreak && *last_break != '\n' )
+	{
+	  last_break = (char *)(current_line+balsa_app.wraplength);
+	  line_len = balsa_app.wraplength;
+	}
+      strncpy(buffer, current_line, line_len);
+      if(buffer[line_len-1]=='\n')
+	buffer[line_len] = 0;
+      else
+	{
+	/* add newline if we're breaking text, and account for added length*/
+	  buffer[line_len] = '\n';
+	  buffer[line_len+1] = 0;
+	  final_length++;
+	}
+      body_list = g_list_append(body_list,g_strdup(buffer));
+      length -= line_len;
+      tabspace = 0;
+      last_break++;
+      current_line = last_break;
+   }
+  if(length)
+    body_list = g_list_append(body_list,g_strndup(current_line,length));
+
+  body->buffer = malloc(final_length);
+  current_line = body->buffer;
+
+  /* use the list of wrapped lines to create message body */
+  next_line=body_list;
+  while(next_line)
+    {
+      strcpy(current_line, (char *)next_line->data);
+      current_line += strlen( next_line->data);
+      free(next_line->data);
+      next_line=next_line->next;
+    }
+  g_list_free(body_list);
+
+}
+

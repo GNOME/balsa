@@ -111,6 +111,8 @@ extern struct BalsaApplication
   GtkToolbarStyle toolbar_style;
   GnomeMDIMode mdi_style;
   gint pwindow_option;
+  gboolean wordwrap;
+  gint wraplength;
   
   gboolean previewpane;
   gboolean debug;

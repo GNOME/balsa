@@ -1,3 +1,10 @@
+2004-12-08 15:11  PeterB
+
+	* libbalsa/address.c: use InternetAddress methods to manage quoting
+	and stringifying.
+	* libbalsa/address-entry.c: use a hash table to hold
+	LibBalsaAddress objects; parse quoted strings more carefully.
+
 2004-12-07 18:57  PeterB
 
 	* src/sendmsg-window.c: use libbalsa_wrap_rfc2646() to ensure

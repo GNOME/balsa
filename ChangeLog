@@ -4,7 +4,6 @@
 	* libbalsa/misc.h: 
 	* libbalsa/misc.c (libbalsa_readfile_nostat): 
 	patch from Julian M Catchen <julian@catchen.org> with small tweaks
-	
 
 2001-05-10  Pawel Salek  <pawsa@theochem.kth.se>
 

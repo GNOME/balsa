@@ -216,7 +216,7 @@ size_t libbalsa_readfile_nostat(FILE * fp, char **buf)
     size_t size;
     GString *gstr;
     char rbuf[512];
-    size_t rlen = 512,
+    size_t rlen = 512;
     int r;
     int fd;
 

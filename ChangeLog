@@ -1,3 +1,7 @@
+2003-04-04 06:07  PeterB
+
+	* src/sendmsg-window.c: Fix Edit => Wrap Body.
+
 2003-04-04  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
 
 	* libbalsa/rfc3156.c: remove paranoia test.

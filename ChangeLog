@@ -1,3 +1,7 @@
+2004-08-05 00:17  PeterB
+
+	* libbalsa/mailbox.c: set validated state of iter on return.
+
 2004-08-04  Pawel Salek
 
 	* libbalsa/mailbox_imap.[hc]: retry on disconnects.

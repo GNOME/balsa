@@ -161,7 +161,9 @@ read_dir (gchar * prefix, struct dirent *d)
 
   snprintf (filename, PATH_MAX, "%s/%s", prefix, d->d_name);
 
-  if (stat (filename, &st) == -1)
+  /* ignore file if it can't be read. */
+     
+  if (stat (filename, &st) == -1 || access(filename, R_OK) == -1)
     return;
 
   if (S_ISDIR (st.st_mode))

@@ -112,18 +112,27 @@ balsa_handle_automation_options() {
    CORBA_Object factory;
    CORBA_Environment ev;
    BonoboObject *balsacomposer;
+   BonoboObject *balsaapp;
  
    CORBA_exception_init (&ev);
 
    factory = bonobo_activation_activate_from_id 
-       ("OAFIID:GNOME_Balsa_Composer_Factory",
+       ("OAFIID:GNOME_Balsa_Application_Factory",
 	Bonobo_ACTIVATION_FLAG_EXISTING_ONLY,
 	NULL, &ev);
 
    if (factory) {
        /* there already is a server. good */
-              
-       /* we only do compose for the time being */
+       CORBA_Object app;
+       app =  
+	   bonobo_activation_activate_from_id ("OAFIID:GNOME_Balsa_Application",
+						   0, NULL, &ev);
+
+       if (cmd_check_mail_on_startup) 
+	   GNOME_Balsa_Application_checkmail (app, &ev);
+
+
+
        if (opt_compose_email || opt_attach_list) {
 	   GNOME_Balsa_Composer_attachs *attachs;
 	   CORBA_Object server;
@@ -161,6 +170,7 @@ balsa_handle_automation_options() {
        exit(0);
    } else {
        balsacomposer = balsa_composer_new ();
+       balsaapp = balsa_application_new ();
    }
    
 }
@@ -178,7 +188,7 @@ balsa_init(int argc, char **argv)
 
 	{"checkmail", 'c', POPT_ARG_NONE,
 	 &(cmd_check_mail_on_startup), 0,
-	 N_("Get new mail on startup"), NULL},
+	 N_("Get new mail on staartup"), NULL},
 	{"compose", 'm', POPT_ARG_STRING, &(opt_compose_email),
 	 0, N_("Compose a new email to EMAIL@ADDRESS"), "EMAIL@ADDRESS"},
 	{"attach", 'a', POPT_ARG_STRING, &(attachment),

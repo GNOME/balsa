@@ -1,3 +1,14 @@
+2004-01-04  Carlos Morgado  <chbm gnome.org>
+
+	* src/Balsa.idl: 
+	* GNOME_Balsa.server.in: 
+	Balsa_Application
+	
+	* src/balsa-bonobo.h: 
+	* src/balsa-bonobo.c: 	
+	* src/main.c: 
+	implement -c
+	
 2004-01-03  Pawel Salek
 
 	* libbalsa/filter-funcs.c: implement {append,get}_quoted_string()

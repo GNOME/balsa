@@ -49,6 +49,27 @@ static void impl_balsa_composer_sendMessage (PortableServer_Servant _servant,
 					     const GNOME_Balsa_Composer_attachs *attachments,
 					     const CORBA_boolean nogui,
 					     CORBA_Environment * ev);
+
+
+static void balsa_application_class_init (BalsaApplicationClass *klass);
+static void balsa_application_init (BalsaApplication *a);
+static void balsa_application_object_finalize (GObject *object);
+static GObjectClass *balsa_application_parent_class;
+static void impl_balsa_application_checkmail (PortableServer_Servant _servant,
+					      CORBA_Environment * ev);
+static void impl_balsa_application_openMailbox (PortableServer_Servant _servant,
+						const CORBA_char * name,
+						CORBA_Environment * ev);
+static void impl_balsa_application_openUnread (PortableServer_Servant _servant,
+					       CORBA_Environment * ev);
+static void impl_balsa_application_openInbox (PortableServer_Servant _servant,
+					      CORBA_Environment * ev);
+
+/*
+ *
+ * Balsa Composer 
+ *
+ */
  
 static BonoboObject *
 balsa_composer_factory (BonoboGenericFactory *this_factory,
@@ -141,3 +162,95 @@ BONOBO_TYPE_FUNC_FULL ( BalsaComposer,
 			BONOBO_TYPE_OBJECT,
 			balsa_composer );
 
+/*
+ *
+ * Balsa Application 
+ *
+ */
+
+
+static BonoboObject *
+balsa_application_factory (BonoboGenericFactory *this_factory,
+			   const char *iid,
+			   gpointer user_data)
+{
+    BalsaComposer *a;
+         
+    a  = g_object_new (BALSA_APPLICATION_TYPE, NULL);
+ 
+    return BONOBO_OBJECT (a);
+}
+
+BonoboObject *
+balsa_application_new (void) {
+    BonoboGenericFactory *factory;
+        
+    factory = bonobo_generic_factory_new ("OAFIID:GNOME_Balsa_Application_Factory",
+					  balsa_application_factory,
+					  NULL);
+    
+    return BONOBO_OBJECT (factory);
+}
+
+static void
+balsa_application_class_init (BalsaApplicationClass *klass)
+{
+    GObjectClass *object_class = (GObjectClass *) klass;
+    POA_GNOME_Balsa_Application__epv *epv = &klass->epv;
+        
+    balsa_application_parent_class = g_type_class_peek_parent (klass);
+    object_class->finalize = balsa_application_object_finalize;
+ 
+    /* connect implementation callbacks */
+    epv->checkmail = impl_balsa_application_checkmail;
+    epv->openMailbox = impl_balsa_application_openMailbox;
+    epv->openUnread = impl_balsa_application_openUnread;
+    epv->openInbox = impl_balsa_application_openInbox;
+}
+
+
+static void
+impl_balsa_application_checkmail (PortableServer_Servant _servant,
+				  CORBA_Environment * ev) {
+    
+    check_new_messages_real (NULL, NULL, TYPE_CALLBACK);
+}
+
+static void
+impl_balsa_application_openMailbox (PortableServer_Servant _servant,
+				    const CORBA_char * name,
+				    CORBA_Environment * ev) {
+
+}
+
+static void
+impl_balsa_application_openUnread (PortableServer_Servant _servant,
+				   CORBA_Environment * ev) {
+
+}
+
+static void
+impl_balsa_application_openInbox (PortableServer_Servant _servant,
+				  CORBA_Environment * ev) {
+
+}
+ 
+static void
+balsa_application_init (BalsaApplication *c)
+{
+}
+
+
+static void
+balsa_application_object_finalize (GObject *object)
+{
+    BalsaApplication *a = BALSA_APPLICATION (object);
+ 
+    balsa_application_parent_class->finalize (G_OBJECT (a));
+}
+
+
+BONOBO_TYPE_FUNC_FULL ( BalsaApplication,
+			GNOME_Balsa_Application,
+			BONOBO_TYPE_OBJECT,
+			balsa_application );

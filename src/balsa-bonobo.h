@@ -42,7 +42,20 @@ G_BEGIN_DECLS
 #define BALSA_COMPOSER_GET_CLASS(o) \
     (G_TYPE_INSTANCE_GET_CLASS ((o), BALSA_COMPOSER_TYPE, BalsaComposerClass))
 
+#define BALSA_APPLICATION_TYPE         (balsa_application_get_type ())
+#define BALSA_APPLICATION(o)           \
+    (G_TYPE_CHECK_INSTANCE_CAST ((o), BALSA_APPLICATION_TYPE, BalsaApplication))
+#define BALSA_APPLICATION_CLASS(k)     \
+    (G_TYPE_CHECK_CLASS_CAST((k), BALSA_APPLICATION_TYPE, BalsaApplicationClass))
+#define BALSA_APPLICATION_IS_OBJECT(o) \
+    (G_TYPE_CHECK_INSTANCE_TYPE ((o), BALSA_APPLICATION_TYPE))
+#define BALSA_APPLICATION_IS_CLASS(k)  \
+    (G_TYPE_CHECK_CLASS_TYPE ((k), BALSA_APPLICATION_TYPE))
+#define BALSA_APPLICATION_GET_CLASS(o) \
+    (G_TYPE_INSTANCE_GET_CLASS ((o), BALSA_APPLICATION_TYPE, BalsaApplicationClass))
+
 G_END_DECLS
+
  
 typedef struct
 {
@@ -58,6 +71,22 @@ typedef struct
  
 GType          balsa_composer_get_type (void);
 BonoboObject  *balsa_composer_new      (void);
+
+
+typedef struct
+{
+        BonoboObject parent;
+} BalsaApplication;
+ 
+typedef struct
+{
+        BonoboObjectClass parent_class;
+ 
+        POA_GNOME_Balsa_Application__epv epv;
+} BalsaApplicationClass;
+ 
+GType          balsa_application_get_type (void);
+BonoboObject  *balsa_application_new      (void);
  
  
 #endif /* __BALSA_BONOBO_H */

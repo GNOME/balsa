@@ -1,3 +1,7 @@
+2004-11-05 08:51  PeterB
+
+	* libbalsa/address-entry.c: copy address from src to dest(!).
+
 2004-11-04 Albrecht Dreß <albrecht.dress@arcor.de>
 
 	* libbalsa/: address-book-vcard.c, address-entry.c: small patch to

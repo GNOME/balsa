@@ -606,7 +606,7 @@ main(int argc, char *argv[])
 
 
     g_idle_add((GSourceFunc) scan_mailboxes_idle_cb, NULL);
-    g_timeout_add(3600*1000, (GSourceFunc) periodic_expunge_cb, NULL);
+    g_timeout_add(1801*1000, (GSourceFunc) periodic_expunge_cb, NULL);
 
     gdk_threads_enter();
     gtk_main();

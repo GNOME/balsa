@@ -288,6 +288,8 @@ libbalsa_address_book_modify_address(LibBalsaAddressBook *ab,
     g_signal_emit(G_OBJECT(ab),
                   libbalsa_address_book_signals[MODIFY_ADDRESS], 0,
                   address, newval, &res);
+    if(res == LBABERR_OK)
+        libbalsa_address_set_copy(address, newval);
     return res;
 }
 

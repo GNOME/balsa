@@ -136,6 +136,29 @@ libbalsa_address_new_from_string(const gchar * str)
     return addr;
 }
 
+void
+libbalsa_address_set_copy(LibBalsaAddress *dest, LibBalsaAddress *src)
+{
+    GList *src_al;
+    if(dest == src) /* safety check */
+        return;
+    g_free(dest->nick_name); dest->nick_name = g_strdup(src->nick_name);
+    g_free(dest->full_name); dest->full_name = g_strdup(src->full_name);
+    g_free(dest->middle_name); dest->middle_name = g_strdup(src->middle_name);
+    g_free(dest->last_name); dest->last_name = g_strdup(src->last_name);
+    g_free(dest->organization);
+    dest->organization = g_strdup(src->organization);
+    g_list_foreach(dest->address_list, (GFunc)g_free, NULL);
+    g_list_free(dest->address_list);
+
+    dest->address_list = NULL;
+    for(src_al = src->address_list; src_al; src_al = src_al->next)
+        dest->address_list = 
+            g_list_prepend(dest->address_list, g_strdup(src_al->data));
+
+    dest->address_list = g_list_reverse(dest->address_list);
+}
+
 GList*
 libbalsa_address_new_list_from_string(const gchar * str)
 {
@@ -369,7 +392,8 @@ libbalsa_address_get_mailbox(LibBalsaAddress * address, gint n)
     and enumerated with LibBalsaAddressField constants
 */
 GtkWidget*
-libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries)
+libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries,
+                                 GCallback changed_cb, gpointer changed_data)
 {
     const static gchar *labels[NUM_FIELDS] = {
 	N_("_Displayed Name:"),
@@ -460,7 +484,11 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries)
 
     for (cnt = 0; cnt < NUM_FIELDS; cnt++) {
 	label = gtk_label_new_with_mnemonic(_(labels[cnt]));
-	entries[cnt] = gtk_entry_new();
+	gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
+        entries[cnt] = gtk_entry_new();
+        if(changed_cb)
+            g_signal_connect(G_OBJECT(entries[cnt]), "changed",
+                             changed_cb, changed_data);
 	gtk_label_set_mnemonic_widget(GTK_LABEL(label), entries[cnt]);
 
 	gtk_table_attach(GTK_TABLE(table), label, 0, 1, cnt + 1, cnt + 2,

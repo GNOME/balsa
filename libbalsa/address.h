@@ -89,7 +89,8 @@ GType libbalsa_address_get_type(void);
  
 LibBalsaAddress *libbalsa_address_new(void);
 LibBalsaAddress *libbalsa_address_new_from_string(const gchar * address);
-gchar * libbalsa_address_to_gchar(LibBalsaAddress * address, gint n);
+void libbalsa_address_set_copy(LibBalsaAddress *dest, LibBalsaAddress *src);
+gchar *libbalsa_address_to_gchar(LibBalsaAddress * address, gint n);
 GList *libbalsa_address_new_list_from_string(const gchar * address);
 
 /* get pointer to descriptive name (full name if available, or e-mail) */
@@ -118,6 +119,8 @@ const gchar *libbalsa_address_get_phrase(LibBalsaAddress * address);
     and enumerated with LibBalsaAddressField constants
 */
 GtkWidget *libbalsa_address_get_edit_widget(LibBalsaAddress *addr,
-                                            GtkWidget **entries);
+                                            GtkWidget **entries,
+                                            GCallback changed_cb,
+                                            gpointer changed_data);
 LibBalsaAddress *libbalsa_address_new_from_edit_entries(GtkWidget **widget);
 #endif				/* __LIBBALSA_ADDRESS_H__ */

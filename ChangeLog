@@ -1,3 +1,11 @@
+2004-08-11  Pawel Salek
+
+	* libbalsa/address-book.c: modify_address not only updates backend
+	data but also changes the address itself.
+	* libbalsa/address.[hc]: add set_copy() method.
+	* src/ab-main.c: make it work (probably has full functionality for
+	ldap).
+
 2004-08-10 09:00  PeterB
 
 	* src/: balsa-mblist.c, mailbox-node.c, mailbox-node.h,

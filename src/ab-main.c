@@ -41,7 +41,7 @@
 
 struct ABMainWindow {
     GtkWidget *entry_list; /* GtkListView widget */
-    GtkWidget *edit_box;
+    GtkWidget *edit_box, *apply_button, *remove_button, *cancel_button;
     GtkWidget *edit_widget;
     GtkWidget *entries[NUM_FIELDS];
 
@@ -58,6 +58,8 @@ static gint bab_save_session(GnomeClient * client, gint phase,
                              GnomeInteractStyle interact_style, gint is_fast,
                              gpointer client_data);
 static gint bab_kill_session(GnomeClient * client, gpointer client_data);
+
+static void ab_set_edit_widget(GtkWidget *w);
 
 #define BALSA_CONFIG_PREFIX "balsa/"
 #define ADDRESS_BOOK_SECTION_PREFIX "address-book-"
@@ -167,9 +169,13 @@ static void
 select_address_book_cb(gpointer callback_data, guint callback_action,
                        GtkWidget *w)
 {
-    GList *l = g_list_nth(contacts_app.address_book_list,
+    GList *l;
+
+    if(!GTK_CHECK_MENU_ITEM(w)->active) return;
+    l = g_list_nth(contacts_app.address_book_list,
                           GPOINTER_TO_INT(callback_data));
     if(!l) return;
+    ab_set_edit_widget(NULL);
     bab_set_address_book(LIBBALSA_ADDRESS_BOOK(l->data),
                          contacts_app.entry_list);
 }
@@ -242,13 +248,25 @@ get_main_menu(GtkWidget  *window, GtkWidget **menubar, GList* address_books)
 static void
 ab_set_edit_widget(GtkWidget *w)
 {
-    g_return_if_fail(w);
-
     if(contacts_app.edit_widget)
         gtk_widget_destroy(contacts_app.edit_widget);
     contacts_app.edit_widget = w;
-    gtk_container_add(GTK_CONTAINER(contacts_app.edit_box), w);
-    gtk_widget_show_all(w);
+    if(w) {
+        gtk_box_pack_start(GTK_BOX(contacts_app.edit_box), w,
+                           FALSE, FALSE, 1);
+        gtk_widget_show_all(w);
+    }
+    gtk_widget_set_sensitive(contacts_app.apply_button,  FALSE);
+    gtk_widget_set_sensitive(contacts_app.remove_button, w != NULL);
+    gtk_widget_set_sensitive(contacts_app.cancel_button, FALSE);
+}
+
+static void
+address_changed_cb(GtkWidget *w, gpointer data)
+{
+    struct ABMainWindow * aw = (struct ABMainWindow*)data;
+    gtk_widget_set_sensitive(aw->apply_button,  TRUE);
+    gtk_widget_set_sensitive(aw->cancel_button, TRUE);
 }
 
 static void
@@ -260,17 +278,18 @@ list_selection_changed_cb(GtkTreeSelection *selection, gpointer data)
     GtkWidget *ew;
     LibBalsaAddress *address;
 
-    gtk_tree_selection_get_selected(selection, &model, &iter);
+    if(!gtk_tree_selection_get_selected(selection, &model, &iter))
+        return;
     gtk_tree_model_get_value(model, &iter, LIST_COLUMN_ADDRESS, &gv);
     address = LIBBALSA_ADDRESS(g_value_get_object(&gv));
     if(address) {
-        ew = libbalsa_address_get_edit_widget(address, contacts_app.entries);
+        ew = libbalsa_address_get_edit_widget(address, contacts_app.entries,
+                                              G_CALLBACK(address_changed_cb),
+                                              data);
         ab_set_edit_widget(ew);
     } else ab_set_edit_widget(NULL);
     g_value_unset(&gv);
     contacts_app.displayed_address = address;
-    printf("selection_changed_cb: %s\n",
-           contacts_app.displayed_address->first_name);
 }
 
 
@@ -325,6 +344,8 @@ apply_button_cb(GtkWidget *w, gpointer data)
     libbalsa_address_book_modify_address(contacts_app.address_book,
                                          contacts_app.displayed_address,
                                          newval);
+    gtk_widget_set_sensitive(contacts_app.apply_button,  FALSE);
+    gtk_widget_set_sensitive(contacts_app.cancel_button, FALSE);
     /* FIXME: error handling here! */
     g_object_unref(newval);
 }
@@ -347,32 +368,78 @@ cancel_button_cb(GtkWidget *w, gpointer data)
 
 #define ELEMENTS(x) (sizeof(x)/sizeof((x)[0])) 
 static GtkWidget*
-bab_get_edit_button_box(void)
+bab_get_edit_button_box(struct ABMainWindow *abmw)
 {
-    GtkWidget *box, *button;
+    GtkWidget *box;
     box = gtk_hbutton_box_new();
     gtk_container_add(GTK_CONTAINER(box),
-                      button=gtk_button_new_from_stock(GTK_STOCK_APPLY));
-    g_signal_connect(G_OBJECT(button), "clicked",
+                      abmw->apply_button = 
+                      gtk_button_new_from_stock(GTK_STOCK_APPLY));
+    g_signal_connect(G_OBJECT(abmw->apply_button), "clicked",
                      G_CALLBACK(apply_button_cb), (gpointer) NULL);
-     gtk_container_add(GTK_CONTAINER(box),
-                      button=gtk_button_new_from_stock(GTK_STOCK_REMOVE));
-    g_signal_connect(G_OBJECT(button), "clicked",
+    gtk_container_add(GTK_CONTAINER(box),
+                      abmw->remove_button
+                      =gtk_button_new_from_stock(GTK_STOCK_REMOVE));
+    g_signal_connect(G_OBJECT(abmw->remove_button), "clicked",
                      G_CALLBACK(remove_button_cb), (gpointer) NULL);
     gtk_container_add(GTK_CONTAINER(box),
-                      button=gtk_button_new_from_stock(GTK_STOCK_CANCEL));
-    g_signal_connect(G_OBJECT(button), "clicked",
+                      abmw->cancel_button = 
+                      gtk_button_new_from_stock(GTK_STOCK_CANCEL));
+    g_signal_connect(G_OBJECT(abmw->cancel_button), "clicked",
                      G_CALLBACK(cancel_button_cb), (gpointer) NULL);
     return box;
 }
 
+static void
+bab_filter_entry_activate(GtkWidget *entry, GtkWidget *button)
+{
+    /* do search here */
+    gtk_widget_set_sensitive(button, FALSE);
+}
 
+static void
+bab_filter_entry_changed(GtkWidget *entry, GtkWidget *button)
+{
+    gtk_widget_set_sensitive(button, TRUE);
+}
+
+static GtkWidget*
+bab_get_filter_box(void)
+{
+    GtkWidget *search_hbox = gtk_hbox_new(FALSE, 1);
+    GtkWidget *find_label, *find_entry, *button;
+
+    gtk_widget_show(search_hbox);
+    find_label = gtk_label_new_with_mnemonic(_("F_ilter:"));
+    gtk_widget_show(find_label);
+    gtk_box_pack_start(GTK_BOX(search_hbox), find_label, FALSE, FALSE, 1);
+    find_entry = gtk_entry_new();
+    gtk_widget_show(find_entry);
+    gtk_box_pack_start(GTK_BOX(search_hbox), find_entry, TRUE, TRUE, 1);
+    gtk_widget_show(search_hbox);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(find_label), find_entry);
+    button = gtk_button_new();
+    gtk_container_add(GTK_CONTAINER(button),
+                      gtk_image_new_from_stock(GTK_STOCK_OK,
+                                               GTK_ICON_SIZE_BUTTON));
+    gtk_box_pack_start(GTK_BOX(search_hbox), button, FALSE, FALSE, 1);
+
+    g_signal_connect(G_OBJECT(find_entry), "activate",
+                     G_CALLBACK(bab_filter_entry_activate),
+                     button);
+    g_signal_connect_swapped(G_OBJECT(button), "clicked",
+                             G_CALLBACK(bab_filter_entry_activate),
+                             find_entry);
+    g_signal_connect(G_OBJECT(find_entry), "changed",
+                             G_CALLBACK(bab_filter_entry_changed),
+                             button);
+    return search_hbox;
+}
 
 static GtkWidget*
 bab_window_new()
 {
-    GtkWidget* menubar, *main_vbox, *search_hbox, *cont_box, *vbox, *scroll;
-    GtkWidget *find_label, *find_entry;
+    GtkWidget* menubar, *main_vbox, *cont_box, *vbox, *scroll;
     GtkWidget *wnd = gnome_app_new("Contacts", "Contacts");
     GList *first_ab;
 
@@ -382,19 +449,9 @@ bab_window_new()
     main_vbox = gtk_vbox_new(FALSE, 1);
 
     /* Entry widget for finding an address */
-    search_hbox = gtk_hbox_new(FALSE, 1);
-    gtk_widget_show(search_hbox);
-    gtk_box_pack_start(GTK_BOX(main_vbox), search_hbox, FALSE, FALSE, 1);
-
-    find_label = gtk_label_new_with_mnemonic(_("F_ilter:"));
-    gtk_widget_show(find_label);
-    gtk_box_pack_start(GTK_BOX(search_hbox), find_label, FALSE, FALSE, 1);
-    find_entry = gtk_entry_new();
-    gtk_widget_show(find_entry);
-    gtk_box_pack_start(GTK_BOX(search_hbox), find_entry, TRUE, TRUE, 1);
-    gtk_widget_show(search_hbox);
-    gtk_label_set_mnemonic_widget(GTK_LABEL(find_label), find_entry);
-
+    gtk_box_pack_start(GTK_BOX(main_vbox),
+                       bab_get_filter_box(), FALSE, FALSE, 1);
+ 
     cont_box = gtk_hbox_new(FALSE, 1);
     gtk_box_pack_start(GTK_BOX(main_vbox), cont_box, TRUE,TRUE, 1);
 
@@ -404,7 +461,7 @@ bab_window_new()
 				   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_box_pack_start(GTK_BOX(cont_box), scroll, TRUE,TRUE, 1);
     
-    contacts_app.entry_list = bab_window_list_new(NULL);
+    contacts_app.entry_list = bab_window_list_new(&contacts_app);
     gtk_container_add(GTK_CONTAINER(scroll), contacts_app.entry_list);
 
     vbox = gtk_vbox_new(FALSE, 1);
@@ -412,8 +469,9 @@ bab_window_new()
     contacts_app.edit_box = gtk_vbox_new(FALSE, 1);
     gtk_box_pack_start(GTK_BOX(vbox), contacts_app.edit_box,
                        TRUE,TRUE, 1);
-    gtk_box_pack_start(GTK_BOX(vbox), bab_get_edit_button_box(),
-                       TRUE,TRUE, 1);
+    gtk_box_pack_start(GTK_BOX(vbox),
+                       bab_get_edit_button_box(&contacts_app),
+                       FALSE, FALSE, 1);
     /*
     g_signal_connect(G_OBJECT(find_entry), "changed",
 		     G_CALLBACK(balsa_ab_window_find), ab);

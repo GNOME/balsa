@@ -339,7 +339,7 @@ store_address_add_address(StoreAddressInfo * info,
 
     entries = g_new(GtkWidget *, NUM_FIELDS);
     info->entries_list = g_list_append(info->entries_list, entries);
-    ew = libbalsa_address_get_edit_widget(address, entries);
+    ew = libbalsa_address_get_edit_widget(address, entries, NULL, NULL);
 
     text = libbalsa_address_to_gchar(address, 0);
     label_text = g_strconcat(lab, text, NULL);

@@ -1168,9 +1168,10 @@ msgstr "_Jo"
 msgid "Default Client"
 msgstr ""
 
+#. GRUT modified this item
 #: libinit_balsa/balsa-druid-page-directory.c:37
 msgid "_Inbox:"
-msgstr ""
+msgstr "_Inbox:"
 
 #: libinit_balsa/balsa-druid-page-directory.c:37
 msgid "_Outbox:"
@@ -1636,9 +1637,10 @@ msgstr ""
 msgid "_Other..."
 msgstr "_Tjetër..."
 
+#. GRUT modified this item
 #: src/balsa-mblist.c:1595
 msgid "Choose destination folder"
-msgstr ""
+msgstr "Zgjidh kartelën e destinuar"
 
 #: src/balsa-mblist.c:1930
 #, c-format
@@ -1741,10 +1743,11 @@ msgstr ""
 msgid "Access type: URL\n"
 msgstr ""
 
+#. GRUT modified this item
 #: src/balsa-message.c:1438
 #, c-format
 msgid "URL: %s"
-msgstr ""
+msgstr "URL: %s"
 
 #: src/balsa-message.c:1469
 #, c-format
@@ -2012,9 +2015,10 @@ msgstr ""
 msgid "Error displaying condition help: %s\n"
 msgstr ""
 
+#. GRUT modified this item
 #: src/filter-edit-callbacks.c:802
 msgid "Deleted"
-msgstr ""
+msgstr "Eleminuar"
 
 #: src/filter-edit-callbacks.c:802
 msgid "Replied"
@@ -2036,12 +2040,13 @@ msgstr ""
 msgid "_One of the regular expressions matches"
 msgstr ""
 
+#. GRUT modified this item
 #. FIXME : I saw a lot of different ways to create button with
 #. pixmaps, hope this one is correct
 #. Right/Add button
 #: src/filter-edit-callbacks.c:872 src/filter-run-dialog.c:313
 msgid "A_dd"
-msgstr ""
+msgstr "Sh_to"
 
 #. GRUT modified this item
 #. Left/Remove button
@@ -2154,9 +2159,10 @@ msgstr ""
 msgid "Simple"
 msgstr "E thjeshtë"
 
+#. GRUT modified this item
 #: src/filter-edit-dialog.c:89
 msgid "Regular Expression"
-msgstr ""
+msgstr "Shprehje të rregullta"
 
 #: src/filter-edit-dialog.c:90
 msgid "Date interval"
@@ -3432,13 +3438,15 @@ msgstr ""
 msgid "Balsa cannot open your \"%s\" mailbox."
 msgstr ""
 
+#. GRUT modified this item
 #: src/main.c:258
 msgid "Inbox"
-msgstr ""
+msgstr "Inbox"
 
+#. GRUT modified this item
 #: src/main.c:264
 msgid "Outbox"
-msgstr ""
+msgstr "Nisur"
 
 #: src/main.c:270
 msgid "Sentbox"
@@ -4955,13 +4963,15 @@ msgstr ""
 msgid "Print"
 msgstr "Printo"
 
+#. GRUT modified this item
 #: src/toolbar-factory.c:120
 msgid "Send"
-msgstr ""
+msgstr "Dërgo"
 
+#. GRUT modified this item
 #: src/toolbar-factory.c:122
 msgid "Exchange"
-msgstr ""
+msgstr "Exchange"
 
 #: src/toolbar-factory.c:124
 msgid "Attach"

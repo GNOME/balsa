@@ -178,3 +178,6 @@ Known issues:
         be displayed improperly. gtk+-1.2.8 seems to work OK. We had 
 	also some reports that turned out to be a problem with font server
 	configuration.
+
+* 	The printer media is assumed to be A4. If your printer uses Letter,
+	set PaperSize in ~/.gnome/balsa file to US-Letter.

@@ -31,6 +31,8 @@
 #define BALSA_PIXMAP_FLAGGED "flagged"
 #define BALSA_PIXMAP_ENVELOPE "envelope"
 
+#define BALSA_PIXMAP_SMALL_CLOSE "small_close"
+
 typedef enum {
     BALSA_ICON_INBOX,
     BALSA_ICON_OUTBOX,

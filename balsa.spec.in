@@ -18,7 +18,7 @@ Packager: Pawel Salek <pawsa@theochem.kth.se>
 Requires: gtk+ >= 1.2.7
 Requires: gnome-libs >= 1.2.0
 Provides: balsa
-Docdir: %{_docdir}/doc
+#Docdir: %{_docdir}/doc
 
 %description
 Balsa is an e-mail reader.  This client is part of the GNOME
@@ -55,7 +55,7 @@ fi
 %install
 rm -rf "$RPM_BUILD_ROOT"
 
-make sysconfdir=/etc  DESTDIR="$RPM_BUILD_ROOT" install
+make DESTDIR="$RPM_BUILD_ROOT" install
 
 %clean
 rm -rf $RPM_BUILD_ROOT

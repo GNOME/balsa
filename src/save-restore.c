@@ -97,7 +97,6 @@ void
 config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
 {
     LibBalsaMailbox **special;
-    GNode *node;
 
     g_return_if_fail(mailbox != NULL);
 
@@ -118,16 +117,12 @@ config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
 	return;
     }
     if (*special) {
+	g_free((*special)->config_prefix); 
+	(*special)->config_prefix = NULL;
 	config_mailbox_add(*special, NULL);
-	node = g_node_new(balsa_mailbox_node_new_from_mailbox(*special));
-	g_node_append(balsa_app.mailbox_nodes, node);
     }
     config_mailbox_delete(mailbox);
     config_mailbox_add(mailbox, specialNames[which]);
-
-    /* FIXME: hide it somehow
-       node = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, mailbox);
-       g_node_unlink(node);  */
 
     *special = mailbox;
 }

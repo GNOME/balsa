@@ -1,3 +1,10 @@
+* Balsa-1.1.2 development release. Release date 2001-02-06
+
+- IMAP folders
+- IMAP mailbox checking tested. Pings connections properly.
+- initial subscribe support IMAP mailboxes.
+- MT-enabled mailbox opening.
+
 * Balsa-1.1.1 development release. Release date 2001-02-06
 
 - IMAP folders semi-ofically working.

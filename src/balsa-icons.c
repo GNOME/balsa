@@ -49,6 +49,8 @@
 #include "pixmaps/next_unread.xpm"
 #include "pixmaps/next_unread_menu.xpm"
 
+#include "pixmaps/small-close.xpm"
+
 typedef struct _BalsaIcon BalsaIcon;
 struct _BalsaIcon {
     GdkPixmap *p;
@@ -204,4 +206,6 @@ register_balsa_pixmaps(void)
 
     register_balsa_pixmap (BALSA_PIXMAP_FLAGGED, flagged_xpm, 16, 16);
     register_balsa_pixmap (BALSA_PIXMAP_ENVELOPE, envelope_xpm, 16, 16);
+
+    register_balsa_pixmap (BALSA_PIXMAP_SMALL_CLOSE, small_close, 8, 9);
 }

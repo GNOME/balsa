@@ -166,13 +166,14 @@ libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 {
     int i;
 
+    g_return_val_if_fail(mailbox, -1);
     g_return_val_if_fail(path, -1);
 
-    if ( LIBBALSA_MAILBOX_LOCAL(mailbox)->path != NULL ) {
-	if (g_strcasecmp(path, LIBBALSA_MAILBOX_LOCAL(mailbox)->path) == 0)
-	    return(0);
+    if ( mailbox->path != NULL ) {
+	if (g_strcasecmp(path, mailbox->path) == 0)
+	    return 0;
 	else
-	    i = rename(LIBBALSA_MAILBOX_LOCAL(mailbox)->path, path);
+	    i = rename(mailbox->path, path);
     } else {
 	if(LIBBALSA_MAILBOX(mailbox)->is_directory)
 	    i = libbalsa_mailbox_maildir_create(path, TRUE);

@@ -37,10 +37,9 @@ typedef struct {
    modify it and update mailbox node accordingly.
    Creates the node when mn == NULL.
 */
-static void validate_folder(FolderDialogData * fcw)
+static void validate_folder(GtkWidget *w, FolderDialogData * fcw)
 {
     gboolean sensitive = TRUE;
-    
     if (!*gtk_entry_get_text(GTK_ENTRY(fcw->folder_name)))
 	sensitive = FALSE;
     else if (!*gtk_entry_get_text(GTK_ENTRY(fcw->server)))
@@ -130,6 +129,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     /* all the widgets are ready, set their values */
     if(mn && mn->subscribed)
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fcw.subscribed), TRUE);
+    validate_folder(NULL, &fcw);
 
     /* FIXME: I don't like this loop. */
     while( (button = gnome_dialog_run(fcw.dialog)) == 2) 

@@ -352,7 +352,7 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 
 	libbalsa_lock_mutt();
 	imap_allow_reopen(CLIENT_CONTEXT(mailbox));
-	timeout = Timeout; Timeout = 0;
+	timeout = Timeout; Timeout = -1;
 	i = mx_check_mailbox(CLIENT_CONTEXT(mailbox), &index_hint, 0);
 	Timeout = timeout;
 	libbalsa_unlock_mutt();

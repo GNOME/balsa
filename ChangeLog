@@ -4,13 +4,23 @@
 	multiple mailboxes in a row.
 	* src/folder-conf.c: 'subscribed' configuration accessed not-yet 
 	created widgets.
-	* src/mailbox-conf.c: remove old crap.
+	* src/mailbox-conf.c: remove old crap. Fix mailbox deletion.
 	* src/mailbox-node.c: add some debugging output for folder 
 	configuration.
 	* src/main.c: fix detection of inititial run.
 	* src/save-restore.c: same.
 	* src/sendmsg-window.c: armour file attachinng code. Russian 
 	language fixes from Dmitry G. Mastrukov <dmitry@taurussoft.org>
+	* NEWS, README: update for 1.1.2
+	* help/C/balsa.sgml: update IMAP help.
+	* libbalsa/mailbox_local.c: remove redundant casts.
+	* libbalsa/misc.[hc]: libbalsa_set_charset() returns old charset.
+	* libbalsa/server.c: handle properly missing passwords.
+	* src/save-restore.c: fix setting special mailboxes.
+	
+	* src/balsa-icons.[hc]: rached <rached@benmur.net>'s patch
+	* src/main-window.c:    for little close button on notebook's tabs.
+	* src/pixmaps/small-close.xpm: 
 	
 2001-02-28  Carlos Morgado  <chbm@chbm.nu>
 

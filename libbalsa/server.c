@@ -220,7 +220,9 @@ libbalsa_server_real_set_password(LibBalsaServer * server,
     g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
     g_free(server->passwd);
-    server->passwd = g_strdup(passwd);
+    if(passwd[0])
+	server->passwd = g_strdup(passwd);
+    else server->passwd = NULL;
 }
 
 static void
@@ -281,7 +283,11 @@ libbalsa_server_load_config(LibBalsaServer * server, gint default_port)
 	server->port = default_port;
     server->user = gnome_config_private_get_string("Username");
     server->passwd = gnome_config_private_get_string("Password");
-
+    if(server->passwd[0] == '\0') {
+	g_free(server->passwd);
+	server->passwd = NULL;
+    }
+	
     if (!server->user)
 	server->user = g_strdup(getenv("USER"));
 

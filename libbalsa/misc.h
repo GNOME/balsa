@@ -39,7 +39,7 @@ gchar *libbalsa_deescape_specials(const gchar* str);
 gboolean libbalsa_find_word(const gchar * word, const gchar * str);
 void libbalsa_wrap_string(gchar * str, int width);
 
-void libbalsa_set_charset(const gchar * charset);
+const char* libbalsa_set_charset(const gchar * charset);
 gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 				gchar* smtp_server, gint smtp_port);
 void libbalsa_marshal_POINTER__OBJECT(GtkObject * object,

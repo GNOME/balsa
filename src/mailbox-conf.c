@@ -167,7 +167,7 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 				    _("Remove from list"), 
 				    _("Remove from list and disk"),
 				    _("Cancel"), NULL);
-	cancel_button = 3;
+	cancel_button = 2;
 	g_free(msg);
     } else {
 	msg = g_strdup_printf(_("This will remove the mailbox %s from the list of mailboxes\n"
@@ -178,7 +178,7 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 				    _("Remove from list"),
 				    _("Cancel"),
 				    NULL);
-	cancel_button = 2;
+	cancel_button = 1;
 	g_free(msg);
     }
     

@@ -187,6 +187,8 @@ static void filter_dlg_cb(GtkWidget * widget, gpointer data);
 #endif
 
 static void mailbox_close_cb(GtkWidget * widget, gpointer data);
+static void mailbox_tab_close_cb(GtkWidget * widget, gpointer data);
+
 static void mailbox_commit_changes(GtkWidget * widget, gpointer data);
 static void mailbox_empty_trash(GtkWidget * widget, gpointer data);
 
@@ -212,6 +214,10 @@ static void notebook_drag_received_cb (GtkWidget* widget,
                                             GtkSelectionData* selection_data, 
                                             guint info, guint32 time, 
                                             gpointer data);
+
+
+static GtkWidget *balsa_notebook_label_new (BalsaMailboxNode* mbnode);
+
 
 static GnomeUIInfo file_new_menu[] = {
 #define MENU_FILE_NEW_MESSAGE_POS 0
@@ -1002,6 +1008,30 @@ balsa_window_close_mbnode(BalsaWindow * window, BalsaMailboxNode * mbnode)
 		    mbnode);
 }
 
+static GtkWidget *
+balsa_notebook_label_new (BalsaMailboxNode* mbnode)
+{
+       GtkWidget *close_pix;
+       GtkWidget *box = gtk_hbox_new(FALSE, 4);
+       GtkWidget *lab = gtk_label_new(mbnode->mailbox->name);
+       GtkWidget *but = gtk_button_new();
+
+       close_pix = gnome_stock_pixmap_widget(GTK_WIDGET(balsa_app.main_window),
+             BALSA_PIXMAP_SMALL_CLOSE);
+
+       gtk_button_set_relief(GTK_BUTTON (but), GTK_RELIEF_NONE);
+       gtk_container_add(GTK_CONTAINER (but), close_pix);
+
+       gtk_box_pack_start(GTK_BOX (box), lab, TRUE, TRUE, 0);
+       gtk_box_pack_start(GTK_BOX (box), but, FALSE, FALSE, 0);
+       gtk_widget_show_all(box);
+
+       gtk_signal_connect(GTK_OBJECT (but), "clicked", 
+	      GTK_SIGNAL_FUNC(mailbox_tab_close_cb), mbnode);
+											                           
+       return box;
+}
+
 static void
 real_open_mbnode(BalsaMailboxNode* mbnode)
 {
@@ -1014,9 +1044,12 @@ real_open_mbnode(BalsaMailboxNode* mbnode)
     static pthread_mutex_t open_lock = PTHREAD_MUTEX_INITIALIZER;
     pthread_mutex_lock(&open_lock);
 #endif
+    /* FIXME: the check is not needed in non-MT-mode */
     if(is_open_mailbox(mbnode->mailbox)) {
 	g_warning("mailbox %s is already open.", mbnode->mailbox->name);
+#ifdef BALSA_USE_THREADS
 	pthread_mutex_unlock(&open_lock);
+#endif
 	return;
     }
 
@@ -1050,7 +1083,9 @@ real_open_mbnode(BalsaMailboxNode* mbnode)
                        GTK_SIGNAL_FUNC(balsa_window_unselect_all_messages_cb),
                        balsa_app.main_window);
 
-    label = gtk_label_new(mbnode->mailbox->name);
+    /* if(config_short_label) label = gtk_label_new(mbnode->mailbox->name);
+       else */
+    label = balsa_notebook_label_new(mbnode);
 
     /* store for easy access */
     gtk_notebook_append_page(GTK_NOTEBOOK(balsa_app.main_window->notebook),
@@ -2081,6 +2116,12 @@ mailbox_close_cb(GtkWidget * widget, gpointer data)
 
     if (index)
 	mblist_close_mailbox(BALSA_INDEX(index)->mailbox_node->mailbox);
+}
+
+static void
+mailbox_tab_close_cb(GtkWidget * widget, gpointer data)
+{
+   balsa_window_real_close_mbnode(balsa_app.main_window, (BalsaMailboxNode *)data);
 }
 
 

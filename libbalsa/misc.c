@@ -270,12 +270,14 @@ libbalsa_wrap_string(gchar * str, int width)
    is a thin wrapper around mutt_set_charset() to get rid of mutt dependices
    in balsa.
 */
-void
+const char*
 libbalsa_set_charset(const gchar * charset)
 {
+    const char * old_charset = Charset;
     libbalsa_lock_mutt();
     mutt_set_charset((gchar *) charset);
     libbalsa_unlock_mutt();
+    return old_charset;
 }
 
 /* libbalsa_marshal_POINTER__OBJECT:

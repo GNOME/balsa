@@ -1,3 +1,12 @@
+2004-04-01 11:50  PeterB
+
+	* src/: balsa-index.c, balsa-index.h: desensitize menu items that
+	change flags in a readonly mailbox.
+	* libbalsa/message.c: warn if we try to change flags in a readonly
+	mailbox.
+	* libbalsa/mailbox.c: set theading only in an open mailbox; don't
+	try to change flags in a readonly mailbox.
+
 2004-04-01  Pawel Salek
 
 	* libbalsa/imap/*.c: compile without SSL and with gmime-2.1.3.

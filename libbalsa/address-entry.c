@@ -2154,6 +2154,7 @@ typedef struct {
     GSList *list;
     GSList *active;
     gchar *domain;
+    GHashTable *table;
 } LibBalsaAddressEntryInfo;
 
 #define LIBBALSA_ADDRESS_ENTRY_INFO "libbalsa-address-entry-info"
@@ -2167,45 +2168,11 @@ lbae_info_free(LibBalsaAddressEntryInfo * info)
     g_slist_foreach(info->list, (GFunc) g_free, NULL);
     g_slist_free(info->list);
     g_free(info->domain);
+    g_hash_table_destroy(info->table);
     g_free(info);
 }
 
 /* Helpers. */
-
-/*************************************************************
- *     Is the name in a row of the model?  If so, return the
- *     corresponding address, if requested.
- *************************************************************/
-static gboolean
-lbae_name_in_model(const gchar * name, GtkTreeModel * model,
-                   LibBalsaAddress ** address)
-{
-    GtkTreeIter iter;
-    gboolean valid;
-
-    if (!name)
-        return FALSE;
-
-    for (valid = gtk_tree_model_get_iter_first(model, &iter); valid;
-         valid = gtk_tree_model_iter_next(model, &iter)) {
-        gchar *this_name;
-        LibBalsaAddress *this_address;
-
-        gtk_tree_model_get(model, &iter,
-                           NAME_COL, &this_name,
-                           ADDRESS_COL, &this_address, -1);
-        if (this_name && strcmp(name, this_name) == 0) {
-	    *address = this_address;
-            g_free(this_name);
-            return TRUE;
-        }
-        g_free(this_name);
-        if (this_address)
-            g_object_unref(this_address);
-    }
-
-    return FALSE;
-}
 
 /*************************************************************
  *     Parse the entry's text and populate the
@@ -2240,19 +2207,21 @@ lbae_parse_entry(GtkEntry * entry, LibBalsaAddressEntryInfo * info)
             quoted = !quoted;
             continue;
         }
-        if (quoted)
+        if (quoted) {
+	    if (c == '\\')
+		q = g_utf8_next_char(q);
             continue;
+	}
 
-        if (in_group && c == ';') {
-            in_group = FALSE;
+        if (in_group) {
+	    if (c == ';')
+		in_group = FALSE;
             continue;
         }
         if (c == ':') {
             in_group = TRUE;
             continue;
         }
-        if (in_group)
-            continue;
 
         if (c == ',') {
             info->list =
@@ -2404,8 +2373,9 @@ lbae_completion_match_selected(GtkEntryCompletion * completion,
                                gpointer user_data)
 {
     LibBalsaAddressEntryInfo *info;
-    GSList *list;
+    LibBalsaAddress *address;
     gchar *name;
+    GSList *list;
     GtkEditable *editable;
     gint position, cursor;
 
@@ -2413,9 +2383,11 @@ lbae_completion_match_selected(GtkEntryCompletion * completion,
                              LIBBALSA_ADDRESS_ENTRY_INFO);
 
     /* Replace the partial address with the selected one. */
-    gtk_tree_model_get(model, iter, NAME_COL, &name, -1);
+    gtk_tree_model_get(model, iter, NAME_COL, &name, ADDRESS_COL, &address,
+                       -1);
     g_free(info->active->data);
     info->active->data = name;
+    g_hash_table_insert(info->table, g_strdup(name), address);
 
     /* Rewrite the entry. */
     editable = GTK_EDITABLE(gtk_entry_completion_get_entry(completion));
@@ -2470,6 +2442,8 @@ libbalsa_address_entry_new()
                      G_CALLBACK(lbae_completion_match_selected), NULL);
 
     info = g_new0(LibBalsaAddressEntryInfo, 1);
+    info->table = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
+                                        g_object_unref);
     g_object_set_data_full(G_OBJECT(completion),
                            LIBBALSA_ADDRESS_ENTRY_INFO, info,
                            (GDestroyNotify) lbae_info_free);
@@ -2523,7 +2497,10 @@ libbalsa_address_entry_get_list(GtkEntry * address_entry)
 	const gchar *name = list->data;
         LibBalsaAddress *address;
 
-        if (!lbae_name_in_model(name, model, &address) || !address)
+	address = g_hash_table_lookup(info->table, name);
+        if (address)
+	    g_object_ref(address);
+	else
             address = libbalsa_address_new_from_string(name);
         if (address)
             res = g_list_prepend(res, address);

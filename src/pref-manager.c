@@ -27,7 +27,7 @@
 #include "main-window.h"
 #include "save-restore.h"
 /* FIXME: Mutt dependency */
-#include "../libmutt/mime.h" 
+#include "../libmutt/mime.h"
 
 #define NUM_TOOLBAR_MODES 3
 #define NUM_MDI_MODES 4

@@ -28,8 +28,6 @@
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "balsa-mblist.h"
-/* mblist-window.h for mblist_open_mailbox */
-#include "mblist-window.h"
 
 #include "libbalsa.h"
 
@@ -159,6 +157,7 @@ balsa_mblist_class_init (BalsaMBListClass * klass)
 		    gtk_marshal_NONE__POINTER_POINTER_POINTER,
 		    GTK_TYPE_NONE, 3, GTK_TYPE_POINTER,
 		    GTK_TYPE_POINTER, GTK_TYPE_GDK_EVENT);
+
   gtk_object_class_add_signals (object_class, balsa_mblist_signals, LAST_SIGNAL);
 
   object_class->destroy = balsa_mblist_destroy;
@@ -166,9 +165,9 @@ balsa_mblist_class_init (BalsaMBListClass * klass)
   object_class->set_arg = balsa_mblist_set_arg;
   object_class->get_arg = balsa_mblist_get_arg;
 
-
   gtk_object_add_arg_type ("BalsaMBList::show_content_info", GTK_TYPE_BOOL,
 			   GTK_ARG_READWRITE, ARG_SHOW_CONTENT_INFO);
+
   klass->select_mailbox = NULL;
 }
 
@@ -813,7 +812,7 @@ balsa_mblist_mailbox_style (GtkCTree * ctree, GtkCTreeNode *node, MailboxNode *m
 
     /* If we have a count of the unread messages, and we are showing
        * columns, put the number in the unread column */
-    if (mblist->display_content_info && mailbox->unread_messages > 0 ) {
+    if (mblist->display_content_info && mailbox->has_unread_messages && mailbox->unread_messages > 0) {
       text = g_strdup_printf ("%ld", mailbox->unread_messages);
       gtk_ctree_node_set_text (ctree, node, 1, text);
       g_free(text);

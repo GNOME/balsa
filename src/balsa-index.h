@@ -42,7 +42,6 @@ extern "C"
       GtkCList clist;
 
       LibBalsaMailbox *mailbox;
-      guint watcher_id;
       guint first_new_message;
     };
 

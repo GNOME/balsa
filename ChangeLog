@@ -1,5 +1,19 @@
 2000-08-21  Ian Campbell  <ijc25@cam.ac.uk>
 
+	* libbalsa/send.c: Dont send MSGSENDTHEADLOAD messages to main
+	thread, these are done by libbalsa_mailbox_check now.
+	* libbalsa/threads.h, src/threads.h: Remove MSGMAILTHREAD_LOAD and
+	MSGSENDTHREADLOAD. They are no longer needed.
+	* src/balsa-index-page.c: Remove lots of cruft.
+	* src/balsa-index.h: Remove unused field from struct.
+	* src/main-window.c: Don't handle MSSENDTHREADLOAD messages. This
+	removes an include of libbalsa_private - which is nice. Remove
+	cruft.
+	* src/mblist-window.c: Remove cruft, cast some fields properly.
+	* src/Makefile.am: We don't need to include libbalsa.a twice.
+
+2000-08-21  Ian Campbell  <ijc25@cam.ac.uk>
+
 	* libbalsa/mailbox.c(libbalsa_mailbox_load_messages):
 	Clear the unread messages flag if there are no unread messages.
 

@@ -33,8 +33,6 @@
 #endif
 
 #include "libbalsa.h"
-/* FIXME: mutt dependency */
-#include "libbalsa_private.h"
 
 #include "balsa-app.h"
 #include "balsa-icons.h"
@@ -197,8 +195,6 @@ static GnomeUIInfo file_menu[] =
   GNOMEUIINFO_SEPARATOR,
   #endif
 
-  /* XXX 
-     GNOMEUIINFO_MENU_EXIT_ITEM(close_main_window, NULL), */
   GNOMEUIINFO_MENU_EXIT_ITEM(balsa_exit, NULL),
 
   GNOMEUIINFO_END
@@ -331,21 +327,8 @@ static GnomeUIInfo message_menu[] =
   GNOMEUIINFO_END
 };
 
-#if 0
-static GnomeUIInfo open_mailboxes[] =
-{
-  GNOMEUIINFO_END
-};
-#endif
-
 static GnomeUIInfo mailbox_menu[] =
 {
-#if 0
-  {
-    GNOME_APP_UI_ITEM, N_ ("List"), NULL, mblist_window_cb, NULL,
-    NULL, GNOME_APP_PIXMAP_NONE, GNOME_STOCK_MENU_PROP, 'C', 0, NULL
-  },
-#endif
   GNOMEUIINFO_ITEM_STOCK (N_ ("_Add"), N_("Add a new mailbox"),
 			  mblist_menu_add_cb, GNOME_STOCK_PIXMAP_ADD),
   GNOMEUIINFO_ITEM_STOCK (N_ ("_Edit"), N_("Edit the selected mailbox"),
@@ -519,15 +502,11 @@ balsa_window_class_init (BalsaWindowClass *klass)
 
   gtk_timeout_add(30000, (GtkFunction) balsa_close_mailbox_on_timer, NULL);
 
-/* widget_class->draw = gtk_window_draw; */
 }
 
 static void
 balsa_window_init (BalsaWindow *window)
 {
-  /* window->modal = FALSE; */
-  
-  /* gtk_container_register_toplevel (GTK_CONTAINER (window)); */
 }
 
 GtkWidget*
@@ -798,24 +777,8 @@ gboolean balsa_close_mailbox_on_timer(GtkWidget *widget, gpointer *data)
 static void balsa_window_destroy (GtkObject     *object)
 {
   BalsaWindow *window;
-  /*
-    gint x, y;
-    gchar *geometry;
-    XXX this is too late to get the right width and height
-    geometry = gnome_geometry_string(GTK_WIDGET(object)->window);
-    gnome_parse_geometry(geometry,
-                       &x, &y,
-                       &balsa_app.mw_width, 
-		       &balsa_app.mw_height);
-  g_free (geometry);
-  */
 
   window = BALSA_WINDOW(object);
-
-  /*
-  balsa_app.mw_width = GTK_WIDGET(object)->allocation.width;
-  balsa_app.mw_height = GTK_WIDGET(object)->allocation.height;
-  */
 
   if (GTK_OBJECT_CLASS(parent_class)->destroy)
     (*GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(object));
@@ -824,28 +787,6 @@ static void balsa_window_destroy (GtkObject     *object)
   balsa_app.notebook = NULL;
   balsa_exit();
 }
-
-/*FIXME unused
-static gint
-progress_timeout (gpointer data)
-{
-  GtkProgress *pbar;
-  GtkAdjustment *adj;
-  gfloat new_val;
-
-  pbar = GTK_PROGRESS(data);
-  adj = pbar->adjustment;
-
-  new_val = adj->value + 1;
-  if (new_val > adj->upper)
-    new_val = adj->lower;
-
-  gtk_progress_set_value (GTK_PROGRESS (data), new_val);
-
-  return TRUE;
-}
-*/
-
 
 /*
  * refresh data in the main window
@@ -1044,6 +985,7 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
   balsa_mblist_have_new (balsa_app.mblist);
 #endif
 }
+
 /* send_outbox_messages_cb:
    tries again to send the messages queued in outbox.
 */
@@ -1052,7 +994,6 @@ send_outbox_messages_cb (GtkWidget * widget, gpointer data)
 {
   libbalsa_message_send(NULL);
 }
-
 
 /* this one is called only in the threaded code */
 #ifdef BALSA_USE_THREADS
@@ -1174,14 +1115,6 @@ mail_progress_notify_cb( )
 		  g_free( pkey );
 		  break;
 
-	  case MSGMAILTHREAD_LOAD:
-	    LOCK_MAILBOX(threadmessage->mailbox);
-	    libbalsa_mailbox_load_messages(threadmessage->mailbox); /*1*/
-	    UNLOCK_MAILBOX(threadmessage->mailbox);
-	    if(mblist_get_selected_mailbox() == threadmessage->mailbox)
-	       balsa_mblist_update_mailbox(balsa_app.mblist, 
-					   threadmessage->mailbox); 
-	    break;
 	  case MSGMAILTHREAD_PROGRESS:
 	    percent = (gfloat)threadmessage->num_bytes/
 	      (gfloat) threadmessage->tot_bytes;
@@ -1290,15 +1223,6 @@ send_progress_notify_cb( )
 	  case MSGSENDTHREADERROR:
 	    balsa_warning( _("Sending error: %s"), 
 			  threadmessage->message_string);
-	    break;
-	    
-	  case MSGSENDTHREADLOAD:
-	    LOCK_MAILBOX (threadmessage->mbox);
-	    libbalsa_mailbox_load_messages (threadmessage->mbox); /*1*/
-	    UNLOCK_MAILBOX (threadmessage->mbox);
-	    if(mblist_get_selected_mailbox() == threadmessage->mbox)
-	       balsa_mblist_update_mailbox(balsa_app.mblist, 
-					   threadmessage->mbox); 
 	    break;
 	    
 	  case MSGSENDTHREADPOSTPONE:

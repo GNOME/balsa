@@ -306,10 +306,7 @@ balsa_send_message_real(MessageQueueItem *first_message)
       
 			if (save_box->open_ref > 0) {
 				libbalsa_mailbox_check(save_box);
-#ifdef BALSA_USE_THREADS
-				MSGSENDTHREAD(threadmsg, MSGSENDTHREADLOAD, 
-					      "Load Sent/Outbox", NULL, save_box, 0);
-#endif
+    
 			}
 		}
 		msg_queue_item_destroy( first_message );

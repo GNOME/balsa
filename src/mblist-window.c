@@ -92,15 +92,6 @@ GtkWidget *balsa_mailbox_list_window_new(BalsaWindow *window)
   balsa_app.mblist = BALSA_MBLIST (mblw->ctree);
   gtk_container_add(GTK_CONTAINER(widget), GTK_WIDGET(mblw->ctree));
 
-  /* PKGW TEST: what happens if we do this?
-   *  gtk_widget_set_usize (GTK_WIDGET (mblw->ctree), balsa_app.mblist_width, balsa_app.mblist_height);
-   */
-
-/*
-   gtk_ctree_show_stub (mblw->ctree, FALSE);
- */
-  /* gtk_ctree_set_line_style (mblw->ctree, GTK_CTREE_LINES_DOTTED); */
-
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(widget),
 				  GTK_POLICY_AUTOMATIC,
 				  GTK_POLICY_AUTOMATIC);
@@ -181,12 +172,12 @@ mblist_open_mailbox (LibBalsaMailbox * mailbox)
    need to get the reference to the index page, which gives us a reference to
    the index, which gives us the clist, which we then reference.  Looks ugly
    but works well. */
-	gtk_clist_set_column_width (GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), 0, balsa_app.index_num_width);
-	gtk_clist_set_column_width (GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), 1, balsa_app.index_status_width);
-	gtk_clist_set_column_width (GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), 2, balsa_app.index_attachment_width);
-	gtk_clist_set_column_width (GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), 3, balsa_app.index_from_width);
-	gtk_clist_set_column_width (GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), 4, balsa_app.index_subject_width);
-	gtk_clist_set_column_width (GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), 5, balsa_app.index_date_width);
+	gtk_clist_set_column_width (GTK_CLIST((BALSA_INDEX_PAGE(page)->index)), 0, balsa_app.index_num_width);
+	gtk_clist_set_column_width (GTK_CLIST((BALSA_INDEX_PAGE(page)->index)), 1, balsa_app.index_status_width);
+	gtk_clist_set_column_width (GTK_CLIST((BALSA_INDEX_PAGE(page)->index)), 2, balsa_app.index_attachment_width);
+	gtk_clist_set_column_width (GTK_CLIST((BALSA_INDEX_PAGE(page)->index)), 3, balsa_app.index_from_width);
+	gtk_clist_set_column_width (GTK_CLIST((BALSA_INDEX_PAGE(page)->index)), 4, balsa_app.index_subject_width);
+	gtk_clist_set_column_width (GTK_CLIST((BALSA_INDEX_PAGE(page)->index)), 5, balsa_app.index_date_width);
         
         balsa_mblist_have_new (BALSA_MBLIST(mblw->ctree));
 	return;

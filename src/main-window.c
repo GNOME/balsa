@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-99 Jay Painter and Stuart Parmenter
  *
@@ -577,7 +578,9 @@ balsa_window_new ()
 
   scroll = gtk_scrolled_window_new(NULL, NULL);
   gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+
   window->preview = balsa_message_create();
+
   gtk_container_add(GTK_CONTAINER(scroll), window->preview);
   gtk_widget_show(scroll);
 

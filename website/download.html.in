@@ -73,6 +73,20 @@
 	<td colspan="2"><hr></td>
 </tr>
 <tr>
+	<th colspan="2" align="left"><big>CVS source</big></th>
+</tr>
+<tr>
+	<td colspan="2">Balsa source is also available from GNOME 
+<a href="http://developer.gnome.org/tools/cvs.html">CVS 
+repository</a>. Check out <b>balsa</b> module. The CVS version
+is <em>sometimes</em> not sufficiently stable for everyday use it but has all
+ the new features and is best starting point if you want to hack balsa.</td>
+</tr>
+
+<tr>
+	<td colspan="2"><hr></td>
+</tr>
+<tr>
 	<th colspan="2" align="left"><big>Requirements</big></th>
 </tr>
 <tr>

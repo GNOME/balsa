@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1998-1999 Stuart Parmenter
  *
@@ -397,16 +398,12 @@ idle_handler_cb(GtkWidget * widget)
 		    NULL, NULL, NULL, NULL,
 		    bevent->button, bevent->time);
   }
-  if (bmsg) {
-    if (BALSA_MESSAGE(bmsg)) {
-      if(balsa_app.previewpane) {
-        if (message) 
-          balsa_message_set(BALSA_MESSAGE(bmsg), message);
-        else
-          balsa_message_clear (BALSA_MESSAGE (bmsg));
-      }
-    }
-  }
+
+  if (bmsg && BALSA_MESSAGE(bmsg))
+    if (message)
+      balsa_message_set(BALSA_MESSAGE(bmsg), message);
+    else
+      balsa_message_clear (BALSA_MESSAGE (bmsg));
   
   handler = 0;
 

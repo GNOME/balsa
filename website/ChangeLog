@@ -1,3 +1,7 @@
+2000-06-26  Pawel Salek <pawsa@theochem.kth.se>
+
+	* download.html.in: added link to CVS instructions and repository.
+	
 2000-06-23  Peter Williams <peter@newton.cx>
 
 	* main.html.in: Add a "Balsa Reviewed" section.

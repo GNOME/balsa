@@ -671,7 +671,7 @@ FILE *safe_fopen (const char *path, const char *mode)
   else
     return (fopen (path, mode));
 }
-
+#ifndef LIBMUTT
 /* return 0 on success, -1 on error */
 int mutt_check_overwrite (const char *attname, const char *path,
 				char *fname, size_t flen, int flags) 
@@ -707,7 +707,7 @@ int mutt_check_overwrite (const char *attname, const char *path,
   
   return 0;
 }
-
+#endif
 void mutt_remove_trailing_ws (char *s)
 {
   char *p;

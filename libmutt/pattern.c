@@ -518,7 +518,7 @@ void mutt_pattern_free (pattern_t **pat)
     safe_free ((void **) &tmp);
   }
 }
-#ifndef LIBMUTT
+
 pattern_t *mutt_pattern_comp (/* const */ char *s, int flags, BUFFER *err)
 {
   pattern_t *curlist = NULL;
@@ -673,6 +673,7 @@ pattern_t *mutt_pattern_comp (/* const */ char *s, int flags, BUFFER *err)
   return (curlist);
 }
 
+
 static int
 perform_and (pattern_t *pat, pattern_exec_flag flags, CONTEXT *ctx, HEADER *hdr)
 {
@@ -709,7 +710,7 @@ static int match_reference (regex_t *rx, LIST *refs)
       return 1;
   return 0;
 }
-
+#ifndef LIBMUTT
 static int match_user (ADDRESS *p)
 {
   for (; p; p = p->next)
@@ -717,9 +718,10 @@ static int match_user (ADDRESS *p)
       return 1;
   return 0;
 }
-
+#endif
 /* flags
    	M_MATCH_FULL_ADDRESS	match both personal and machine address */
+
 int
 mutt_pattern_exec (struct pattern_t *pat, pattern_exec_flag flags, CONTEXT *ctx, HEADER *h)
 {
@@ -793,6 +795,7 @@ mutt_pattern_exec (struct pattern_t *pat, pattern_exec_flag flags, CONTEXT *ctx,
       return (pat->not ^ (match_adrlist (pat->rx, flags & M_MATCH_FULL_ADDRESS, h->env->to) ||
 			  match_adrlist (pat->rx, flags & M_MATCH_FULL_ADDRESS, h->env->cc)));
       break;
+#ifndef LIBMUTT
     case M_LIST:
       return (pat->not ^ (mutt_is_list_recipient (h->env->to) ||
 			  mutt_is_list_recipient (h->env->cc)));
@@ -802,11 +805,12 @@ mutt_pattern_exec (struct pattern_t *pat, pattern_exec_flag flags, CONTEXT *ctx,
     case M_PERSONAL_FROM:
       return (pat->not ^ (match_user (h->env->from)));
       break;
+#endif
   }
   mutt_error ("error: unknown op %d (report this error).", pat->op);
   return (-1);
 }
-
+#ifndef LIBMUTT
 /* convert a simple search into a real request */
 void mutt_check_simple (char *s, size_t len, const char *simple)
 {

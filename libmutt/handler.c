@@ -614,8 +614,10 @@ void text_enriched_handler (BODY *a, STATE *s)
 
   memset (&stte, 0, sizeof (stte));
   stte.s = s;
+#ifndef LIBMUTT
   stte.WrapMargin = ((s->flags & M_DISPLAY) ? (COLS-4) : ((COLS-4)<72)?(COLS-4):72);
   stte.line_max = stte.WrapMargin * 4;
+#endif;
   stte.line = (char *) safe_calloc (1, stte.line_max + 1);
   stte.param = (char *) safe_calloc (1, STRING);
 

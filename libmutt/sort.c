@@ -89,9 +89,12 @@ char *mutt_get_name (ADDRESS *a)
 
   if (a)
   {
+#ifndef LIBMUTT
     if (option (OPTREVALIAS) && (ali = alias_reverse_lookup (a)) && ali->personal)
       return ali->personal;
     else if (a->personal)
+#endif
+    if (a->personal)
       return a->personal;
     else if (a->mailbox)
       return (a->mailbox);
@@ -246,9 +249,9 @@ void mutt_sort_headers (CONTEXT *ctx, int init)
     }
     ctx->hdrs[i]->msgno = i;
   }
-
+#ifndef LIBMUTT
   mutt_cache_index_colors(ctx);
-
+#endif
   if (!ctx->quiet)
     mutt_clear_error ();
 }

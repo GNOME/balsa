@@ -1192,6 +1192,7 @@ int mutt_command_complete (char *buffer, size_t len, int pos)
     return 0;
   return 1;
 }
+#endif
 
 char *mutt_getnamebyvalue (int val, const struct mapping_t *map)
 {
@@ -1213,6 +1214,7 @@ int mutt_getvaluebyname (const char *name, const struct mapping_t *map)
   return (-1);
 }
 
+#ifndef LIBMUTT
 #ifdef DEBUG
 static void start_debug (void)
 {

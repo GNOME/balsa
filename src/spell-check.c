@@ -26,12 +26,12 @@
 #include <gtk/gtk.h>
 #include <gnome.h>
 #include <ctype.h>
-#include "client.h"
+#include "sendmsg-window.h"
 
 /* Should be broken down into more structs one for doc and one for GUI stuff*/
-typedef struct _SpellPlugin SpellPlugin;
+typedef struct _SpellWindow SpellWindow;
 
-struct _SpellPlugin {
+struct _SpellWindow {
 	GtkWidget *window;
 	GtkWidget *hbox;
 	GtkWidget *done;
@@ -54,7 +54,7 @@ struct _SpellPlugin {
         int drift;
 };
 
-SpellPlugin *plugin;
+SpellWindow *plugin;
 
 /*Destroy handler: free the result buffer and tell gEdit to close the pipe*/ 
 void spell_destroy(GtkWidget *widget, gpointer data)
@@ -123,35 +123,37 @@ parse_text (gchar* text, guint *old_index ) {
 /*
  *Drawing magic! 
 */
-SpellPlugin *spell_dialog_new()
+static SpellWindow *
+spell_dialog_new()
 {
-	plugin = (SpellPlugin *) g_malloc(sizeof(SpellPlugin));
-	plugin->spell = gnome_spell_new();
-	plugin->hbox = gtk_hbox_new(TRUE,0);
-	plugin->done = gnome_stock_button ("Button_Close");
-	/* plugin->done = gtk_button_new_with_label ("Done"); */
-	plugin->window = gtk_dialog_new();
-	gtk_window_set_title (GTK_WINDOW(plugin->window), "Spell Check");
-	gtk_box_pack_start (GTK_BOX (plugin->hbox), plugin->done, FALSE,
+	SpellWindow *win = (SpellWindow *) g_malloc0(sizeof(SpellWindow));
+
+	win->spell = gnome_spell_new();
+	win->hbox = gtk_hbox_new(TRUE,0);
+	win->done = gnome_stock_button (GNOME_STOCK_BUTTON_CLOSE);
+
+	win->window = gnome_dialog_new();
+	gtk_window_set_title (GTK_WINDOW(win->window), _("Spell Check"));
+	gtk_box_pack_start (GTK_BOX (win->hbox), win->done, FALSE,
 				FALSE, 3);
-	gtk_box_pack_start (GTK_BOX (GTK_DIALOG (plugin->window)->vbox),
-				plugin->spell, FALSE, FALSE, 3);
+	gtk_box_pack_start (GTK_BOX (GTK_DIALOG (win->window)->vbox),
+				win->spell, FALSE, FALSE, 3);
 
-        gtk_box_pack_start (GTK_BOX (GTK_DIALOG (plugin->window)->vbox),
-				plugin->hbox, FALSE, FALSE, 3);
+        gtk_box_pack_start (GTK_BOX (GTK_DIALOG (win->window)->vbox),
+				win->hbox, FALSE, FALSE, 3);
 
-	gtk_signal_connect (GTK_OBJECT(plugin->window), "destroy",
+	gtk_signal_connect (GTK_OBJECT(win->window), "destroy",
 			 	(GtkSignalFunc) spell_destroy, NULL);	
 
-	gtk_signal_connect (GTK_OBJECT(plugin->done), "clicked",
+	gtk_signal_connect (GTK_OBJECT(win->done), "clicked",
                                 (GtkSignalFunc) spell_exit, NULL);
 
-	gtk_widget_show(plugin->done);
-	gtk_widget_show(plugin->hbox);
-	gtk_widget_show(plugin->spell);
-	gtk_widget_show(plugin->window);	
+	gtk_widget_show(win->done);
+	gtk_widget_show(win->hbox);
+	gtk_widget_show(win->spell);
+	gtk_widget_show(win->window);	
 
-	return plugin; 
+	return win; 
 }
 
 void spell_start_check()
@@ -215,7 +217,18 @@ void handled_word_callback(GtkWidget *spell, gpointer data)
 void
 spell_check_menu_cb (GtkWidget * widget, gpointer data)
 {
+  SpellWindow *win;
+  BalsaSendmsg *msg;
+
   g_assert(widget != NULL);
+  g_assert(data != NULL);
+
+  msg = (BalsaSendmsg *) data;
+
+  win = spell_dialog_new();
+  g_assert(win != NULL);
+
+  gtk_window_set_modal(win->window, TRUE);
 }
 
 

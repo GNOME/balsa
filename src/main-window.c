@@ -302,7 +302,7 @@ static GnomeUIInfo file_menu[] = {
       message_print_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK, 
       GNOME_STOCK_MENU_PRINT, 'P', GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
-#define MENU_FILE_PRINT_POS 8
+#define MENU_FILE_ADDRESS_POS 8
     {
      GNOME_APP_UI_ITEM, N_("_Address Book..."),
      N_("Open the address book"),

@@ -1,3 +1,7 @@
+2001-09-05  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/main-window.c: MENU_FILE_PRINT_POS was defined twice. eek.
+
 2001-09-04  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/folder-conf.c: unbreak folder set config window 

@@ -61,6 +61,8 @@ static gint size_compare(LibBalsaMessage * m1, LibBalsaMessage * m2);
 static void bndx_column_click(GtkTreeViewColumn * column, gpointer data);
 
 /* statics */
+static void bndx_load_and_thread(BalsaIndex * index, int thtype);
+static void bndx_set_threading_type(BalsaIndex * index, int thtype);
 static void bndx_set_sort_order(BalsaIndex * index,
 				LibBalsaMailboxSortFields field,
 				LibBalsaMailboxSortType order);
@@ -231,28 +233,13 @@ balsa_index_class_init(BalsaIndexClass * klass)
     klass->index_changed = NULL;
 }
 
+/* Set a tree store for the tree view, replacing the current one if
+ * there is one. */
 static void
-balsa_index_init(BalsaIndex * index)
+bndx_set_tree_store(BalsaIndex * index)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
-    GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     GtkTreeStore *tree_store;
-    GtkCellRenderer *renderer;
-    GtkTreeViewColumn *column;
-    
-    /* status
-     * priority
-     * attachments
-     */
-    static gchar *titles[] = {
-	"#",
-	"S",
-	"A",
-        N_("From"),
-        N_("Subject"),
-        N_("Date"),
-        N_("Size")
-    };
 
     tree_store =
         gtk_tree_store_new(BNDX_N_COLUMNS,
@@ -271,9 +258,36 @@ balsa_index_init(BalsaIndex * index)
     /* the BalsaIndex will hold the only ref on tree_store: */
     g_object_unref(tree_store);
 
+    gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(tree_store),
+                                    BNDX_TREE_COLUMN_NO,
+                                    bndx_row_compare,
+                                    GINT_TO_POINTER(BNDX_TREE_COLUMN_NO),
+                                    NULL);
+    gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(tree_store),
+                                    BNDX_TREE_COLUMN_DATE,
+                                    bndx_row_compare,
+                                    GINT_TO_POINTER(BNDX_TREE_COLUMN_DATE),
+                                    NULL);
+    gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(tree_store),
+                                    BNDX_TREE_COLUMN_SIZE,
+                                    bndx_row_compare,
+                                    GINT_TO_POINTER(BNDX_TREE_COLUMN_SIZE),
+                                    NULL);
+}
+
+/* Init a BalsaIndex; no tree store is set on the tree view--that's
+ * handled later, when the view is populated. */
+static void
+balsa_index_init(BalsaIndex * index)
+{
+    GtkTreeView *tree_view = GTK_TREE_VIEW(index);
+    GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
+    GtkCellRenderer *renderer;
+    GtkTreeViewColumn *column;
+    
     /* Index column */
     column = gtk_tree_view_column_new();
-    gtk_tree_view_column_set_title(column, _(titles[0]));
+    gtk_tree_view_column_set_title(column, "#");
     gtk_tree_view_column_set_alignment(column, 0.5);
     renderer = gtk_cell_renderer_text_new();
     g_object_set(renderer, "xalign", 1.0, NULL);
@@ -285,18 +299,12 @@ balsa_index_init(BalsaIndex * index)
                                             BNDX_TREE_COLUMN_NO);
     g_signal_connect(G_OBJECT(column), "clicked",
                      G_CALLBACK(bndx_column_click), index);
-    gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(tree_store),
-                                    BNDX_TREE_COLUMN_NO,
-                                    bndx_row_compare,
-                                    GINT_TO_POINTER(BNDX_TREE_COLUMN_NO),
-                                    NULL);
     gtk_tree_view_append_column(tree_view, column);
 
     /* Status icon column */
     renderer = gtk_cell_renderer_pixbuf_new();
     column =
-        gtk_tree_view_column_new_with_attributes(_(titles[1]),
-                                                 renderer,
+        gtk_tree_view_column_new_with_attributes("S", renderer,
                                                  "pixbuf", BNDX_STATUS_COLUMN,
                                                  NULL);
     gtk_tree_view_column_set_alignment(column, 0.5);
@@ -305,8 +313,7 @@ balsa_index_init(BalsaIndex * index)
     /* Attachment icon column */
     renderer = gtk_cell_renderer_pixbuf_new();
     column =
-        gtk_tree_view_column_new_with_attributes(_(titles[2]),
-                                                 renderer,
+        gtk_tree_view_column_new_with_attributes("A", renderer,
                                                  "pixbuf", BNDX_ATTACH_COLUMN,
                                                  NULL);
     gtk_tree_view_column_set_alignment(column, 0.5);
@@ -315,8 +322,7 @@ balsa_index_init(BalsaIndex * index)
     /* From/To column */
     renderer = gtk_cell_renderer_text_new();
     column = 
-        gtk_tree_view_column_new_with_attributes(_(titles[3]),
-                                                 renderer,
+        gtk_tree_view_column_new_with_attributes(_("From"), renderer,
                                                  "text", BNDX_FROM_COLUMN,
                                                  NULL);
     gtk_tree_view_column_set_alignment(column, 0.5);
@@ -331,8 +337,7 @@ balsa_index_init(BalsaIndex * index)
     /* Subject column--contains tree expanders */
     renderer = gtk_cell_renderer_text_new();
     column = 
-        gtk_tree_view_column_new_with_attributes(_(titles[4]),
-                                                 renderer,
+        gtk_tree_view_column_new_with_attributes(_("Subject"), renderer,
                                                  "text",
                                                  BNDX_SUBJECT_COLUMN,
                                                  "foreground-gdk",
@@ -353,8 +358,7 @@ balsa_index_init(BalsaIndex * index)
     /* Date column */
     renderer = gtk_cell_renderer_text_new();
     column = 
-        gtk_tree_view_column_new_with_attributes(_(titles[5]),
-                                                 renderer,
+        gtk_tree_view_column_new_with_attributes(_("Date"), renderer,
                                                  "text", BNDX_DATE_COLUMN,
                                                  NULL);
     gtk_tree_view_column_set_alignment(column, 0.5);
@@ -363,16 +367,11 @@ balsa_index_init(BalsaIndex * index)
                                             BNDX_TREE_COLUMN_DATE);
     g_signal_connect(G_OBJECT(column), "clicked",
                      G_CALLBACK(bndx_column_click), index);
-    gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(tree_store),
-                                    BNDX_TREE_COLUMN_DATE,
-                                    bndx_row_compare,
-                                    GINT_TO_POINTER(BNDX_TREE_COLUMN_DATE),
-                                    NULL);
     gtk_tree_view_append_column(tree_view, column);
 
     /* Size column */
     column = gtk_tree_view_column_new();
-    gtk_tree_view_column_set_title(column, _(titles[6]));
+    gtk_tree_view_column_set_title(column, _("Size"));
     gtk_tree_view_column_set_alignment(column, 0.5);
     renderer = gtk_cell_renderer_text_new();
     g_object_set(renderer, "xalign", 1.0, NULL);
@@ -384,11 +383,6 @@ balsa_index_init(BalsaIndex * index)
                                             BNDX_TREE_COLUMN_SIZE);
     g_signal_connect(G_OBJECT(column), "clicked",
                      G_CALLBACK(bndx_column_click), index);
-    gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(tree_store),
-                                    BNDX_TREE_COLUMN_SIZE,
-                                    bndx_row_compare,
-                                    GINT_TO_POINTER(BNDX_TREE_COLUMN_SIZE),
-                                    NULL);
     gtk_tree_view_append_column(tree_view, column);
 
     /* Initialize some other members */
@@ -586,7 +580,6 @@ balsa_index_load_mailbox_node (BalsaIndex * index, BalsaMailboxNode* mbnode)
     LibBalsaMailbox* mailbox;
     gchar *msg;
     gboolean successp;
-    GList *list;
 
     g_return_val_if_fail (index != NULL, TRUE);
     g_return_val_if_fail (mbnode != NULL, TRUE);
@@ -643,11 +636,8 @@ balsa_index_load_mailbox_node (BalsaIndex * index, BalsaMailboxNode* mbnode)
 			     G_CALLBACK(mailbox_messages_removed),
 			     (gpointer) index);
 
-    /* do threading */
-    for (list = mailbox->message_list; list; list = list->next)
-	balsa_index_add(index, list->data);
-    balsa_index_set_threading_type(index, mailbox->threading_type);
-    bndx_set_sort_order(index, mailbox->sort_field, mailbox->sort_type);
+    /* Set the tree store, load messages, and do threading */
+    bndx_load_and_thread(index, mailbox->threading_type);
 
     bndx_moveto(index);
 
@@ -2295,23 +2285,56 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
     g_signal_handler_unblock(index, handler);
 }
 
+/* Threading functions.
+ * balsa_index_set_threading_type:
+ *      the public method;
+ * bndx_load_and_thread:
+ *      initializes the tree store, loads it, then sets threading and
+ *      sort types;
+ * bndx_set_threading_type:
+ *      does some housekeeping and calls balsa_index_threading to do
+ *      the actual threading.
+ */
 void
 balsa_index_set_threading_type(BalsaIndex * index, int thtype)
 {
-    g_return_if_fail (index != NULL);
-    g_return_if_fail (index->mailbox_node != NULL);
-    g_return_if_fail (index->mailbox_node->mailbox != NULL);
+    LibBalsaMailbox *mailbox;
 
+    g_return_if_fail(index != NULL);
+    g_return_if_fail(index->mailbox_node != NULL);
+    mailbox = index->mailbox_node->mailbox;
+    g_return_if_fail(mailbox != NULL);
+
+    if (thtype == LB_MAILBOX_THREADING_FLAT
+        && mailbox->threading_type != LB_MAILBOX_THREADING_FLAT)
+        /* Changing to flat: it's faster to reload from scratch. */
+        bndx_load_and_thread(index, thtype);
+    else
+        bndx_set_threading_type(index, thtype);
+}
+
+static void
+bndx_load_and_thread(BalsaIndex * index, int thtype)
+{
+    LibBalsaMailbox *mailbox;
+    GList *list;
+
+    bndx_set_tree_store(index);
+    mailbox = index->mailbox_node->mailbox;
+    for (list = mailbox->message_list; list; list = list->next)
+        balsa_index_add(index, list->data);
+    bndx_set_threading_type(index, thtype);
+    bndx_set_sort_order(index, mailbox->sort_field, mailbox->sort_type);
+}
+
+static void
+bndx_set_threading_type(BalsaIndex * index, int thtype)
+{
     index->mailbox_node->mailbox->threading_type = thtype;
-
-    /* do threading */
     balsa_index_threading(index, thtype);
 
     /* expand tree if specified in config */
     balsa_index_update_tree(index, balsa_app.expand_tree);
-
-    /* reselect current message */
-    bndx_select_message(index, index->current_message);
 }
 
 static void

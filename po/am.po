@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "POT-Creation-Date: 2003-01-06 05:49+0100\n"
-"PO-Revision-Date: 2003-01-28 07:00+EDT\n"
+"PO-Revision-Date: 2003-02-01 08:13+EDT\n"
 "Last-Translator: Ge'ez Frontier Foundation <locales@geez.org>\n"
 "Language-Team: Amharic <locales@geez.org>\n"
 "MIME-Version: 1.0\n"
@@ -1549,7 +1549,7 @@ msgstr ""
 
 #: src/ab-window.c:322
 msgid "Send-To"
-msgstr ""
+msgstr "ለ... ላክ"
 
 #: src/ab-window.c:342
 msgid "Run GnomeCard"
@@ -2118,7 +2118,7 @@ msgstr "ፕሮግራምን አስኪድ፦"
 
 #: src/filter-edit-dialog.c:99
 msgid "Send to Trash"
-msgstr ""
+msgstr "ወደ የማይፈለግ ላክ"
 
 #: src/filter-edit-dialog.c:103
 msgid "OR"
@@ -3857,7 +3857,7 @@ msgstr "ላክ (_S)"
 
 #: src/sendmsg-window.c:194 src/toolbar-factory.c:121
 msgid "Send this message"
-msgstr ""
+msgstr "ይህን መልእክት ላክ"
 
 #: src/sendmsg-window.c:198
 msgid "_Queue"

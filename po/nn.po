@@ -1,16 +1,17 @@
-# Norwegian (Nynorsk) KDE translation.
+# Norwegian (Nynorsk) KDE translation
 # Copyright (C) 2000 Gaute Hvoslef Kvalnes.
-# Gaute Hvoslef Kvalnes <ai98ghk@stud.hib.no>, 2000.
-#
+# Gaute Hvoslef Kvalnes <ai98ghk@stud.hib.no>, 2000
+# Kjartan Maraas <kmaraas@gnome.org>, 2001.
+
 msgid ""
 msgstr ""
-"Project-Id-Version: KDE PIM/abbrowser\n"
-"POT-Creation-Date: 2001-04-30 16:23+0200\n"
-"PO-Revision-Date: 2000-09-07 20:17+02:00\n"
-"Last-Translator: Gaute Hvoslef Kvalnes <ai98ghk@stud.hib.no>\n"
+"Project-Id-Version: balsa 1.0.0\n"
+"POT-Creation-Date: 2001-07-13 10:27+0200\n"
+"PO-Revision-Date: 2001-06-25 18:55+02:00\n"
+"Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
 "Language-Team: Norwegian (Nynorsk)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: libbalsa/address-book-ldap.c:203
@@ -44,12 +45,14 @@ msgstr "Ingen namn"
 #: libbalsa/address-book-vcard.c:193
 #, fuzzy, c-format
 msgid "Could not stat vcard address book: %s"
-msgstr "Kunne ikkje laga katalog\n"
+msgstr ""
+"Kunne ikkje starta prosess\n"
+"%1"
 
 #: libbalsa/address-book-vcard.c:252
 #, fuzzy, c-format
 msgid "Could not open vCard address book %s."
-msgstr "Kan ikkje lesa adressebokoppfÃ¸ring"
+msgstr "Kan ikkje opna adresseboka."
 
 #: libbalsa/address-book-vcard.c:421
 #, fuzzy, c-format
@@ -59,46 +62,57 @@ msgstr "Kan ikkje opna adresseboka."
 #: libbalsa/address-book-vcard.c:431
 #, fuzzy, c-format
 msgid "Cannot open vCard address book %s for saving\n"
-msgstr "Kan ikkje lesa adressebokoppfÃ¸ring"
+msgstr "Kan ikkje lesa adressebokoppføring"
 
 #: libbalsa/address-book.c:176
 #, fuzzy, c-format
 msgid "Cannot load address book %s"
-msgstr "Kan ikkje lesa adressebokoppfÃ¸ring"
+msgstr "Kan ikkje lesa adressebokoppføring"
 
 #: libbalsa/address-book.c:184
-#, c-format
+#, fuzzy, c-format
 msgid "No such address book type: %s"
-msgstr ""
+msgstr "&Adressebok frå KDE 1"
 
 #: libbalsa/address-book.c:194
 #, fuzzy, c-format
 msgid "Could not create a address book of type %s"
-msgstr "Kunne ikkje laga katalog\n"
+msgstr "Kan ikkje lesa adressebokoppføring"
 
-#: libbalsa/mailbox.c:301
+#. Non-threaded locking mechanism
+#: libbalsa/libbalsa_private.h:99 libbalsa/libbalsa_private.h:111
+#, c-format
+msgid "*** ERROR: Mailbox Lock Exists: %s ***\n"
+msgstr ""
+
+#: libbalsa/libbalsa_private.h:129 libbalsa/libbalsa_private.h:138
+#, c-format
+msgid "*** ERROR: Mailbox Stream Closed: %s ***\n"
+msgstr ""
+
+#: libbalsa/mailbox.c:310
 #, fuzzy, c-format
 msgid "Cannot load mailbox %s"
-msgstr "Kan ikkje lasta inn 'pixmap'?"
+msgstr "Kan ikkje lesa postboksen %1"
 
-#: libbalsa/mailbox.c:309
+#: libbalsa/mailbox.c:318
 #, fuzzy, c-format
 msgid "No such mailbox type: %s"
 msgstr "Inga slik fil \"%s\"!"
 
-#: libbalsa/mailbox.c:326
+#: libbalsa/mailbox.c:335
 #, fuzzy, c-format
 msgid "Could not create a mailbox of type %s"
 msgstr ""
-"Kunne ikke importera fil av typen\n"
+"Kunne ikke eksportera fil av typen\n"
 "%1"
 
-#: libbalsa/mailbox_imap.c:290
+#: libbalsa/mailbox_imap.c:288
 #, c-format
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
 msgstr ""
 
-#: libbalsa/mailbox_local.c:290
+#: libbalsa/mailbox_local.c:282
 #, c-format
 msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
 msgstr ""
@@ -106,36 +120,32 @@ msgstr ""
 #: libbalsa/mailbox_maildir.c:114
 #, fuzzy, c-format
 msgid "Mailbox %s does not appear to be a Maildir mailbox."
-msgstr ""
-"Dei valde filnamna ser\n"
-"ikkje ut til Ã¥ vera gyldige."
+msgstr "%1 ser ikkje ut til Ã¥ vera ein RPM-pakke"
 
 #: libbalsa/mailbox_maildir.c:123
 #, fuzzy, c-format
 msgid "Could not create a MailDir directory at %s (%s)"
-msgstr ""
-"Kunne ikke importera fil av typen\n"
-"%1"
+msgstr "Kunne ikkje laga katalog\n"
 
 #: libbalsa/mailbox_maildir.c:130 libbalsa/mailbox_maildir.c:138
 #: libbalsa/mailbox_maildir.c:148
 #, fuzzy, c-format
 msgid "Could not create a MailDir at %s (%s)"
-msgstr ""
-"Kunne ikke importera fil av typen\n"
-"%1"
+msgstr "Kunne ikkje overføra fila til URL-en %1."
 
 #: libbalsa/mailbox_maildir.c:207 libbalsa/mailbox_mh.c:184
-#, c-format
+#, fuzzy, c-format
 msgid "Open of %s failed. Errno = %d, "
-msgstr ""
+msgstr "feil ved opning av %1"
 
 #: libbalsa/mailbox_maildir.c:225 libbalsa/mailbox_mh.c:201
 #, fuzzy, c-format
 msgid ""
 "Could not remove contents of %s:\n"
 "%s"
-msgstr "Kunne ikkje opna fila %1"
+msgstr ""
+"Kunne ikkje leia innhaldet til:\n"
+"%1"
 
 #: libbalsa/mailbox_maildir.c:231 libbalsa/mailbox_mbox.c:180
 #: libbalsa/mailbox_mh.c:207
@@ -144,22 +154,18 @@ msgid ""
 "Could not remove %s:\n"
 "%s"
 msgstr ""
-"Kunne ikkje lagra\n"
-"%1"
+"Kunne ikkje opna\n"
+"%s"
 
 #: libbalsa/mailbox_mbox.c:113
 #, fuzzy, c-format
 msgid "Mailbox %s does not appear to be an Mbox mailbox."
-msgstr ""
-"Dei valde filnamna ser\n"
-"ikkje ut til Ã¥ vera gyldige."
+msgstr "%1 ser ikkje ut til Ã¥ vera ein RPM-pakke"
 
 #: libbalsa/mailbox_mh.c:112
 #, fuzzy, c-format
 msgid "Mailbox %s does not appear to be a Mh mailbox."
-msgstr ""
-"Dei valde filnamna ser\n"
-"ikkje ut til Ã¥ vera gyldige."
+msgstr "%1 ser ikkje ut til Ã¥ vera ein RPM-pakke"
 
 #: libbalsa/mailbox_mh.c:122
 #, fuzzy, c-format
@@ -169,102 +175,131 @@ msgstr "Kunne ikkje laga katalog\n"
 #: libbalsa/mailbox_mh.c:129
 #, fuzzy, c-format
 msgid "Could not create MH structure at %s (%s)"
-msgstr "kunne ikkje laga aktiv fil"
+msgstr ""
+"\n"
+"Kunne ikkje laga påkravd røyr %1."
 
-#: libbalsa/mailbox_pop3.c:200
+#: libbalsa/mailbox_pop3.c:186
 #, c-format
 msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
 msgstr ""
 
-#: libbalsa/mailbox_pop3.c:250
+#: libbalsa/mailbox_pop3.c:235
 #, c-format
 msgid ""
 "POP3 mailbox %s accessing error:\n"
 "%s"
 msgstr ""
 
-#: libbalsa/pop3.c:48
-msgid "connection error"
-msgstr ""
-
-#: libbalsa/pop3.c:49
-msgid "POP command exection failed"
-msgstr ""
-
-#: libbalsa/pop3.c:50
-#, fuzzy
-msgid "Could not write the message"
-msgstr "Kan ikkje dekryptera melding:"
-
-#: libbalsa/pop3.c:51
-msgid "Could not run the delivery program (procmail)"
-msgstr ""
-
-#: libbalsa/pop3.c:52
-#, fuzzy
-msgid "Could not open mailbox for spooling"
-msgstr "Kunne ikkje opna fil"
-
-#: libbalsa/pop3.c:53
-#, fuzzy
-msgid "Could not append message"
-msgstr "Fann ikkje bilete %1"
-
-#: libbalsa/pop3.c:54
-msgid "Host not found"
-msgstr ""
-
 #: libbalsa/pop3.c:55
 #, fuzzy
-msgid "Connection refused"
-msgstr "Fortset"
+msgid "connection error"
+msgstr "IPP-sambandsfeil."
 
 #: libbalsa/pop3.c:56
 #, fuzzy
-msgid "Authentication failed"
-msgstr "Krevjer autentisering"
+msgid "POP command exection failed"
+msgstr "Ingen kommando oppgitt"
 
-#: libbalsa/pop3.c:323
+#: libbalsa/pop3.c:57
+#, fuzzy
+msgid "Could not write the message"
+msgstr "kunne ikkje skriva til mellomlager"
+
+#: libbalsa/pop3.c:58
+#, fuzzy
+msgid "Could not run the delivery program (procmail)"
+msgstr "Fann ikkje programmet 'passwd'."
+
+#: libbalsa/pop3.c:59
+#, fuzzy
+msgid "Could not open mailbox for spooling"
+msgstr "Kunne ikkje opna fil for skriving"
+
+#: libbalsa/pop3.c:60
+#, fuzzy
+msgid "Could not append message"
+msgstr "Kunne ikkje senda melding."
+
+#: libbalsa/pop3.c:61
+msgid "Host not found"
+msgstr "Fann ikkje vert"
+
+#: libbalsa/pop3.c:62
+#, fuzzy
+msgid "Connection refused"
+msgstr "Samband nekta"
+
+#: libbalsa/pop3.c:63
+#, fuzzy
+msgid "Authentication failed"
+msgstr "Mislukka autentisering."
+
+#: libbalsa/pop3.c:210
+#, fuzzy, c-format
+msgid "Unknown POP socket family: %d"
+msgstr "Ukjend innloggingsfeil: %1"
+
+#: libbalsa/pop3.c:409
 #, fuzzy, c-format
 msgid "Retrieving Message %d of %d"
-msgstr "Mottek meldingar frÃ¥ %1"
+msgstr "Mottek meldingar frå %1"
 
-#: libbalsa/pop3.c:336
-#, c-format
+#: libbalsa/pop3.c:423
+#, fuzzy, c-format
 msgid "Received %d bytes of %d"
-msgstr ""
+msgstr "Mottekne byte"
 
 #. We create here the progress bar
-#: libbalsa/send.c:273 libbalsa/send.c:276
+#: libbalsa/send.c:404 libbalsa/send.c:407 libbalsa/send.c:700
+#: libbalsa/send.c:703
 #, fuzzy
 msgid "Sending Mail..."
-msgstr "Sender post"
+msgstr " Sender e-post ..."
 
-#: libbalsa/send.c:273
-#, fuzzy
+#: libbalsa/send.c:404 libbalsa/send.c:700
 msgid "Hide"
-msgstr "Dekl."
+msgstr "Gøym"
 
-#: libbalsa/send.c:416
+#: libbalsa/send.c:604
 msgid ""
-"SMTP protocol error. Cannot relay.\n"
-"Your message is left in Outbox."
+"Message delivery problem, placing it into your outbox.\n"
+"System will attempt to redeliver the message until you delete it."
 msgstr ""
 
-#: libbalsa/send.c:834
-#, fuzzy, c-format
-msgid "Error: Could not find address for host %s."
-msgstr "Fann ikkje sendaren av denne meldinga"
+#: libbalsa/send.c:625
+#, fuzzy
+msgid "Connected to MTA"
+msgstr "Kopla til %1"
 
-#: libbalsa/send.c:844
+#: libbalsa/send.c:632
 #, fuzzy, c-format
-msgid "Connecting to %s"
-msgstr "%1 tilkoplingar"
+msgid "From: %d <%s>"
+msgstr "Frå: %1"
 
-#: libbalsa/send.c:850
+#: libbalsa/send.c:635
 #, fuzzy, c-format
-msgid "Error connecting to %s."
-msgstr "Feil ved kÃ¸yring av skrivarprogram!"
+msgid "From %s: %d %s"
+msgstr "Frå %1 til %2"
+
+#: libbalsa/send.c:643
+#, c-format
+msgid "To: %d <%s>"
+msgstr ""
+
+#: libbalsa/send.c:646
+#, c-format
+msgid "To %s: %d %s"
+msgstr ""
+
+#: libbalsa/send.c:656
+#, fuzzy, c-format
+msgid "%d %s"
+msgstr "%1 s"
+
+#: libbalsa/send.c:663
+msgid "Disconnected"
+msgstr "Fråkopla"
 
 #.
 #. ISPRIME(9)
@@ -287,12 +322,12 @@ msgstr "Sendt"
 #: libinit_balsa/balsa-druid-page-directory.gob:60
 #, fuzzy
 msgid "Draftbox:"
-msgstr "Kladd"
+msgstr "Lengd:"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:60
 #, fuzzy
 msgid "Trash:"
-msgstr "Sletta"
+msgstr "Papirkorg"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:78
 #, c-format
@@ -301,25 +336,35 @@ msgid ""
 "'/'."
 msgstr ""
 
-#: libinit_balsa/balsa-druid-page-directory.gob:101
+#: libinit_balsa/balsa-druid-page-directory.gob:102
+#, c-format
+msgid ""
+"The mailbox \"%s\" does not appear to be valid.\n"
+"Your system does not allow for creation of mailboxes\n"
+"in /var/spool/mail. Balsa wouldn't function properly\n"
+"until the system created the mailboxes. Please change\n"
+"the mailbox path or check your system configuration."
+msgstr ""
+
+#: libinit_balsa/balsa-druid-page-directory.gob:109
 #, fuzzy, c-format
 msgid "The mailbox \"%s\" does not appear to be valid."
 msgstr ""
 "Dei valde filnamna ser\n"
-"ikkje ut til Ã¥ vera gyldige."
+"ikkje ut til å vera gyldige."
 
-#: libinit_balsa/balsa-druid-page-directory.gob:151
+#: libinit_balsa/balsa-druid-page-directory.gob:160
 msgid ""
 "Please verify the locations of your default mail files.\n"
 "These will be created if necessary."
 msgstr ""
 
-#: libinit_balsa/balsa-druid-page-directory.gob:194
+#: libinit_balsa/balsa-druid-page-directory.gob:203
 #, fuzzy
 msgid "Mail Files"
 msgstr "Alle filer"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:267
+#: libinit_balsa/balsa-druid-page-directory.gob:276
 msgid "Problem Creating Mailboxes"
 msgstr ""
 
@@ -334,34 +379,34 @@ msgstr ""
 msgid "All Done!"
 msgstr "Godt gjort!"
 
-#: libinit_balsa/balsa-druid-page-user.gob:75
+#: libinit_balsa/balsa-druid-page-user.gob:80
 #, fuzzy
 msgid "Please enter information about yourself."
 msgstr "generer ekstra informasjon for gprof"
 
-#: libinit_balsa/balsa-druid-page-user.gob:83
+#: libinit_balsa/balsa-druid-page-user.gob:88
 msgid "Name:"
-msgstr "Navn:"
+msgstr "Namn:"
 
-#: libinit_balsa/balsa-druid-page-user.gob:87
+#: libinit_balsa/balsa-druid-page-user.gob:92
 msgid "Email address:"
 msgstr "E-post-adresse:"
 
-#: libinit_balsa/balsa-druid-page-user.gob:91
-msgid "SMTP Server:"
-msgstr ""
-
-#: libinit_balsa/balsa-druid-page-user.gob:94
+#: libinit_balsa/balsa-druid-page-user.gob:96
 #, fuzzy
 msgid "Local Mail Directory:"
 msgstr "'Spool'-katalog"
 
-#: libinit_balsa/balsa-druid-page-user.gob:104
+#: libinit_balsa/balsa-druid-page-user.gob:101
+msgid "SMTP Server:"
+msgstr "SMTP-tenar:"
+
+#: libinit_balsa/balsa-druid-page-user.gob:111
 #, fuzzy
 msgid "User Settings"
-msgstr "Brukarinnstillingar"
+msgstr "Andre innstillingar"
 
-#: libinit_balsa/balsa-druid-page-user.gob:156
+#: libinit_balsa/balsa-druid-page-user.gob:171
 #, fuzzy
 msgid "Local Mail Problem"
 msgstr "Lokal postboks"
@@ -394,7 +439,7 @@ msgstr ""
 #: libinit_balsa/balsa-initdruid.gob:119
 #, fuzzy
 msgid "GnomeCard Address Book"
-msgstr "Adressebok"
+msgstr "Name=Adressebok"
 
 #: libinit_balsa/helper.c:142
 #, c-format
@@ -409,12 +454,12 @@ msgstr ""
 #: libinit_balsa/helper.c:159 libinit_balsa/helper.c:176
 #, fuzzy, c-format
 msgid "The file with pathname \"%s\" is not a directory."
-msgstr "Den valte stien er ikkje rett."
+msgstr "Fila %1 er inga midi-fil"
 
 #: libinit_balsa/init_balsa.c:36
 #, fuzzy
 msgid "Configure Balsa"
-msgstr "Set opp e-post"
+msgstr "Set opp panel ..."
 
 #. didn't find anything that we could display!
 #: libmutt/handler.c:1028
@@ -424,7 +469,7 @@ msgstr ""
 #: libmutt/handler.c:1145
 #, fuzzy, c-format
 msgid "[-- Attachment #%d"
-msgstr "Vedlegg"
+msgstr "Vedlegg:"
 
 #: libmutt/handler.c:1156
 #, c-format
@@ -437,9 +482,9 @@ msgid "[-- Autoview using %s --]\n"
 msgstr ""
 
 #: libmutt/handler.c:1216
-#, c-format
+#, fuzzy, c-format
 msgid "Invoking autoview command: %s"
-msgstr ""
+msgstr "Startar make-kommandoen"
 
 #: libmutt/handler.c:1253 libmutt/handler.c:1271
 #, c-format
@@ -456,9 +501,9 @@ msgid "[-- This %s/%s attachment "
 msgstr ""
 
 #: libmutt/handler.c:1327
-#, c-format
+#, fuzzy, c-format
 msgid "(size %s bytes) "
-msgstr ""
+msgstr "Storleik [byte]:"
 
 #: libmutt/handler.c:1329
 msgid "has been deleted --]\n"
@@ -510,74 +555,75 @@ msgstr ""
 #: libmutt/imap/auth_anon.c:39
 #, fuzzy
 msgid "Authenticating (anonymous)..."
-msgstr "Autentisering"
+msgstr "Autentiseringsmetode"
 
 #: libmutt/imap/auth_anon.c:69
 #, fuzzy
 msgid "Anonymous authentication failed."
-msgstr "Feil ved autorisering, %1-autentisering er ikkje stÃ¸tta"
+msgstr "Mislukka autentisering."
 
 #: libmutt/imap/auth_cram.c:44
 #, fuzzy
 msgid "Authenticating (CRAM-MD5)..."
-msgstr "Autentisering"
+msgstr "Autentisering:"
 
 #: libmutt/imap/auth_cram.c:124
 #, fuzzy
 msgid "CRAM-MD5 authentication failed."
-msgstr "Krevjer autentisering"
+msgstr "Mislukka autentisering."
 
 #. now begin login
 #: libmutt/imap/auth_gss.c:87
 #, fuzzy
 msgid "Authenticating (GSSAPI)..."
-msgstr "Autentisering"
+msgstr "Autentisering:"
 
 #: libmutt/imap/auth_gss.c:262
 #, fuzzy
 msgid "GSSAPI authentication failed."
-msgstr "Krevjer autentisering"
+msgstr "Mislukka autentisering."
 
 #: libmutt/imap/auth_login.c:34
+#, fuzzy
 msgid "LOGIN disabled on this server."
-msgstr ""
+msgstr "' på tenaren."
 
 #: libmutt/imap/auth_login.c:43
 #, fuzzy
 msgid "Logging in..."
-msgstr "Lastar ..."
+msgstr "Opnar ..."
 
 #: libmutt/imap/auth_login.c:66
 #, fuzzy
 msgid "Login failed."
-msgstr "Feil ved innlogging!"
+msgstr "Mislukka innlogging"
 
 #: libmutt/imap/auth_sasl.c:118
 #, fuzzy
 msgid "Authenticating (SASL)..."
-msgstr "Autentisering"
+msgstr "Autentisering:"
 
 #: libmutt/imap/auth_sasl.c:196
 #, fuzzy
 msgid "SASL authentication failed."
-msgstr "Krevjer autentisering"
+msgstr "Mislukka autentisering."
 
 #: libmutt/imap/browse.c:95
 #, fuzzy
 msgid "Getting namespaces..."
-msgstr "Hentar farge frÃ¥ skjermen ..."
+msgstr "Utgåande meldingar ..."
 
 #: libmutt/imap/browse.c:104
 #, fuzzy
 msgid "Getting folder list..."
 msgstr "Hentar filliste"
 
-#: libmutt/imap/browse.c:281
+#: libmutt/imap/browse.c:297
 #, fuzzy
 msgid "Create mailbox: "
-msgstr "Ny postkasse"
+msgstr "Diskettnamn:"
 
-#: libmutt/imap/browse.c:287
+#: libmutt/imap/browse.c:307
 #, fuzzy
 msgid "Mailbox created."
 msgstr "Postkasse-type"
@@ -585,115 +631,121 @@ msgstr "Postkasse-type"
 #. something is wrong because the server reported fewer messages
 #. * than we previously saw
 #.
-#: libmutt/imap/command.c:305
+#: libmutt/imap/command.c:316
 msgid "Fatal error.  Message count is out of sync!"
 msgstr ""
 
-#: libmutt/imap/command.c:346
-#, c-format
-msgid "One of IMAP connections has been closed: %s"
-msgstr ""
-
-#: libmutt/imap/imap.c:89
+#: libmutt/imap/imap.c:136
 #, fuzzy, c-format
 msgid "Closing connection to %s..."
-msgstr "%1 tilkoplingar"
+msgstr "Koplar til %1 ..."
 
-#: libmutt/imap/imap.c:295
-msgid "This IMAP server is ancient. Balsa does not work with it."
+#: libmutt/imap/imap.c:294
+msgid "This IMAP server is ancient. Mutt does not work with it."
 msgstr ""
 
-#: libmutt/imap/imap.c:498
+#: libmutt/imap/imap.c:363
+#, fuzzy, c-format
+msgid "Connection to %s failed."
+msgstr "Kopla frå %1"
+
+#: libmutt/imap/imap.c:383
+#, fuzzy
+msgid "Secure connection with TLS?"
+msgstr "Sambandet er sikra med SSL."
+
+#: libmutt/imap/imap.c:535
 #, fuzzy, c-format
 msgid "Selecting %s..."
-msgstr "Les side pÃ¥ nytt ..."
+msgstr "&Innstillingar ..."
 
 #. STATUS not supported
-#: libmutt/imap/imap.c:668
+#: libmutt/imap/imap.c:705
 msgid "Unable to append to IMAP mailboxes at this server"
 msgstr ""
 
 #. command failed cause folder doesn't exist
-#: libmutt/imap/imap.c:677 libmutt/imap/message.c:577
+#: libmutt/imap/imap.c:714 libmutt/imap/message.c:595
 #, fuzzy, c-format
 msgid "Create %s?"
-msgstr "Teikn"
+msgstr "Laga"
 
-#: libmutt/imap/imap.c:714
+#: libmutt/imap/imap.c:750
+#, fuzzy
 msgid "Closing connection to IMAP server..."
-msgstr ""
+msgstr "Initialiserer tenarsamband ..."
 
-#: libmutt/imap/imap.c:877
+#: libmutt/imap/imap.c:913
 #, fuzzy, c-format
 msgid "Marking %d messages deleted..."
-msgstr "Sender meldingar til %1"
+msgstr "Markerer meldingar"
 
-#: libmutt/imap/imap.c:896
+#: libmutt/imap/imap.c:932
 #, c-format
 msgid "Saving message status flags... [%d/%d]"
 msgstr ""
 
-#: libmutt/imap/imap.c:953
+#: libmutt/imap/imap.c:989
 #, fuzzy
 msgid "Expunging messages from server..."
-msgstr "Sender meldingar til %1"
+msgstr "&Hent frå tenar ..."
 
-#: libmutt/imap/imap.c:1229
+#: libmutt/imap/imap.c:1269
 #, fuzzy, c-format
 msgid "Subscribing to %s..."
-msgstr "Skriv ut ..."
+msgstr "&Abonner på diskusjonsgrupper ..."
 
-#: libmutt/imap/imap.c:1231
+#: libmutt/imap/imap.c:1271
 #, fuzzy, c-format
 msgid "Unsubscribing to %s..."
-msgstr "Skriv ut ..."
+msgstr "abonner på"
 
 #. Unable to fetch headers for lower versions
 #: libmutt/imap/message.c:74
-#, fuzzy
 msgid "Unable to fetch headers from this IMAP server version."
-msgstr "Kan ikkje fÃ¥ tak i CDDB-tenarliste."
+msgstr ""
 
-#: libmutt/imap/message.c:92
-#, fuzzy, c-format
+#: libmutt/imap/message.c:93
+#, c-format
 msgid "Fetching message headers... [%d/%d]"
-msgstr "Mottek meldingar frÃ¥ %1"
+msgstr ""
 
-#: libmutt/imap/message.c:237
+#: libmutt/imap/message.c:239
 #, fuzzy
 msgid "Fetching message..."
-msgstr "Hentar farge frÃ¥ skjermen ..."
+msgstr "Hentar tuplar ..."
 
-#: libmutt/imap/message.c:276
+#: libmutt/imap/message.c:278
 msgid "The message index is incorrect. Try reopening the mailbox."
 msgstr ""
 
-#: libmutt/imap/message.c:467
+#: libmutt/imap/message.c:484
 #, fuzzy
 msgid "Uploading message ..."
-msgstr "Sender meldingar til %1"
+msgstr "Les side pÃ¥ nytt ..."
 
-#: libmutt/imap/message.c:555
+#: libmutt/imap/message.c:573
 #, fuzzy, c-format
 msgid "Copying %d messages to %s..."
 msgstr "Sender meldingar til %1"
 
-#: libmutt/imap/message.c:559
+#: libmutt/imap/message.c:577
 #, fuzzy, c-format
 msgid "Copying message %d to %s..."
 msgstr "Sender meldingar til %1"
 
-#: libmutt/imap/util.c:43
+#: libmutt/imap/util.c:215
 #, fuzzy
 msgid "Continue?"
 msgstr "Fortset"
 
-#: libmutt/imap/util.c:49
-#, fuzzy, c-format
+#: libmutt/imap/util.c:221
+#, c-format
 msgid "%s [%s]\n"
-msgstr "%1 vann %2"
+msgstr ""
 
 #: libmutt/mbox.c:134 libmutt/mbox.c:292
+#, c-format
 msgid "Reading %s... %d (%d%%)"
 msgstr ""
 
@@ -713,12 +765,12 @@ msgstr ""
 #: libmutt/mbox.c:712
 #, fuzzy
 msgid "Unable to lock mailbox!"
-msgstr "Kan ikkje lasta bilete."
+msgstr "Kan ikkje lasta innlegg."
 
 #: libmutt/mbox.c:741
 #, fuzzy
 msgid "Could not create temporary file!"
-msgstr "Kan ikkje laga mellombels fil."
+msgstr "Kunne ikkje overføra fila til URL-en %1."
 
 #. this means ctx->changed or ctx->deleted was set, but no
 #. * messages were found to be changed or deleted.  This should
@@ -729,9 +781,9 @@ msgid "sync: mbox modified, but no modified messages! (report this bug)"
 msgstr ""
 
 #: libmutt/mbox.c:788
-#, fuzzy
+#, fuzzy, c-format
 msgid "Writing messages... %d (%d%%)"
-msgstr "Mottek meldingar frÃ¥ %1"
+msgstr "Utgåande meldingar ..."
 
 #: libmutt/mbox.c:962
 #, c-format
@@ -748,159 +800,162 @@ msgstr "Kunne ikkje opna fil"
 msgid "Reopening mailbox..."
 msgstr " Sender e-post ..."
 
-#: libmutt/mutt_socket.c:203
+#: libmutt/mutt_socket.c:202
+#, fuzzy
 msgid "SSL is unavailable."
-msgstr ""
+msgstr "Tenesta er ikkje tilgjengeleg."
 
-#: libmutt/mutt_socket.c:239
+#: libmutt/mutt_socket.c:238
 #, fuzzy
 msgid "Preconnect command failed."
-msgstr "Skrivarkommando"
+msgstr "Fråkoplings-kommando :"
 
-#: libmutt/mutt_socket.c:328 libmutt/mutt_socket.c:368
+#: libmutt/mutt_socket.c:332 libmutt/mutt_socket.c:373
 #, fuzzy, c-format
 msgid "Looking up %s..."
-msgstr "Les side pÃ¥ nytt ..."
-
-#: libmutt/mutt_socket.c:333 libmutt/mutt_socket.c:372
-#, fuzzy, c-format
-msgid "Could not find the host \"%s\""
-msgstr "Fann ikkje sendaren av denne meldinga"
+msgstr "Lastar grupper ..."
 
 #: libmutt/mutt_socket.c:337 libmutt/mutt_socket.c:377
 #, fuzzy, c-format
-msgid "Connecting to %s..."
-msgstr "Les side pÃ¥ nytt ..."
+msgid "Could not find the host \"%s\""
+msgstr "Fann ikkje bilete %1"
 
-#: libmutt/mutt_socket.c:400
+#: libmutt/mutt_socket.c:341 libmutt/mutt_socket.c:382
+#, fuzzy, c-format
+msgid "Connecting to %s..."
+msgstr "Koplar til %1 ..."
+
+#: libmutt/mutt_socket.c:405
 #, fuzzy, c-format
 msgid "Could not connect to %s (%s)."
-msgstr "Kunne ikkje opna fila %1"
+msgstr ""
+"Kunne ikkje kopla til vert\n"
+"%1"
 
-#: libmutt/mutt_socket.c:401
-#, fuzzy
+#: libmutt/mutt_socket.c:406
 msgid "unknown error"
-msgstr "Ukjend"
+msgstr "ukjend feil"
 
-#: libmutt/mutt_ssl.c:105
+#: libmutt/mutt_ssl.c:172
 msgid "Failed to find enough entropy on your system"
 msgstr ""
 
-#: libmutt/mutt_ssl.c:120
+#: libmutt/mutt_ssl.c:196
 #, fuzzy, c-format
 msgid "Filling entropy pool: %s...\n"
-msgstr "&FyllverktÃ¸y"
+msgstr "Drep gjeldande prosess ..."
 
-#: libmutt/mutt_ssl.c:128
-#, c-format
+#: libmutt/mutt_ssl.c:204
+#, fuzzy, c-format
 msgid "%s has insecure permissions!"
-msgstr ""
+msgstr "Ta vare pÃ¥ lÃ¸yve"
 
-#: libmutt/mutt_ssl.c:147
+#: libmutt/mutt_ssl.c:223
 msgid "SSL disabled due the lack of entropy"
 msgstr ""
 
-#: libmutt/mutt_ssl.c:234
+#: libmutt/mutt_ssl.c:335
 #, fuzzy
 msgid "Unable to get certificate from peer"
-msgstr "Kunne ikkje motta fil"
+msgstr "Kan ikkje testa skrivaren: "
 
-#: libmutt/mutt_ssl.c:245
-#, fuzzy, c-format
+#: libmutt/mutt_ssl.c:343
+#, c-format
 msgid "SSL connection using %s (%s)"
-msgstr "%1 tilkoplingar"
+msgstr ""
 
-#: libmutt/mutt_ssl.c:275
+#: libmutt/mutt_ssl.c:373
 msgid "Unknown"
 msgstr "Ukjend"
 
-#: libmutt/mutt_ssl.c:300
+#: libmutt/mutt_ssl.c:398
 #, fuzzy
 msgid "[unable to calculate]"
 msgstr "Kunne ikkje laga konto"
 
-#: libmutt/mutt_ssl.c:318
+#: libmutt/mutt_ssl.c:416
 #, fuzzy
 msgid "[invalid date]"
 msgstr "Ugyldig sti"
 
-#: libmutt/mutt_ssl.c:393
+#: libmutt/mutt_ssl.c:491
 #, fuzzy
 msgid "Server certificate is not yet valid"
 msgstr "Sertifikatstatus:"
 
-#: libmutt/mutt_ssl.c:400
+#: libmutt/mutt_ssl.c:498
 #, fuzzy
 msgid "Server certificate has expired"
-msgstr "Sertifikatstatus:"
+msgstr "Sertifikatet er utgått."
 
-#: libmutt/mutt_ssl.c:476
+#: libmutt/mutt_ssl.c:574
+#, fuzzy
 msgid "This certificate belongs to:"
-msgstr ""
+msgstr "Sertifikatet er gyldig."
 
-#: libmutt/mutt_ssl.c:486
+#: libmutt/mutt_ssl.c:584
 #, fuzzy
 msgid "This certificate was issued by:"
-msgstr "Sertifikatstatus:"
+msgstr "Sertifikatet er gyldig."
 
-#: libmutt/mutt_ssl.c:496
+#: libmutt/mutt_ssl.c:594
 #, fuzzy
 msgid "This certificate is valid"
-msgstr "Sertifikatstatus:"
+msgstr "Sertifikatet er gyldig."
 
-#: libmutt/mutt_ssl.c:497
+#: libmutt/mutt_ssl.c:595
 #, fuzzy, c-format
 msgid "   from %s"
-msgstr "Melding frÃ¥ %s"
+msgstr "Melding frå %s"
 
-#: libmutt/mutt_ssl.c:499
+#: libmutt/mutt_ssl.c:597
 #, fuzzy, c-format
 msgid "     to %s"
 msgstr "    0 treff"
 
-#: libmutt/mutt_ssl.c:505
+#: libmutt/mutt_ssl.c:603
 #, fuzzy, c-format
 msgid "Fingerprint: %s"
 msgstr "Finger-venting: %1\""
 
-#: libmutt/mutt_ssl.c:507
+#: libmutt/mutt_ssl.c:605
 #, fuzzy
 msgid "SSL Certificate check"
-msgstr "Sertifikatstatus:"
+msgstr "Andre SSL-sertifikat"
 
-#: libmutt/mutt_ssl.c:510
+#: libmutt/mutt_ssl.c:608
 msgid "(r)eject, accept (o)nce, (a)ccept always"
 msgstr ""
 
-#: libmutt/mutt_ssl.c:511
+#: libmutt/mutt_ssl.c:609
 #, fuzzy
 msgid "roa"
 msgstr "roman"
 
-#: libmutt/mutt_ssl.c:515
+#: libmutt/mutt_ssl.c:613
 msgid "(r)eject, accept (o)nce"
 msgstr ""
 
-#: libmutt/mutt_ssl.c:516
+#: libmutt/mutt_ssl.c:614
 #, fuzzy
 msgid "ro"
 msgstr "rad"
 
-#: libmutt/mutt_ssl.c:520
+#: libmutt/mutt_ssl.c:618
 #, fuzzy
 msgid "Exit  "
 msgstr "Avslutt"
 
-#: libmutt/mutt_ssl.c:522
+#: libmutt/mutt_ssl.c:620
 msgid "Help"
 msgstr "Hjelp"
 
-#: libmutt/mutt_ssl.c:545
+#: libmutt/mutt_ssl.c:644
 #, fuzzy
 msgid "Warning: Couldn't save certificate"
-msgstr "Kunne ikkje lagra fil"
+msgstr "Åtvaring ved &tilbaketrekte sertifikat"
 
-#: libmutt/mutt_ssl.c:547
+#: libmutt/mutt_ssl.c:649
 #, fuzzy
 msgid "Certificate saved"
 msgstr "Sertifikatstatus:"
@@ -911,9 +966,9 @@ msgid "Lock count exceeded, remove lock for %s?"
 msgstr ""
 
 #: libmutt/mx.c:131
-#, c-format
+#, fuzzy, c-format
 msgid "Can't dotlock %s.\n"
-msgstr ""
+msgstr "Mutt dotlock"
 
 #: libmutt/mx.c:189
 msgid "Timeout exceeded while attempting fcntl lock!"
@@ -922,7 +977,7 @@ msgstr ""
 #: libmutt/mx.c:195
 #, fuzzy, c-format
 msgid "Waiting for fcntl lock... %d"
-msgstr "Ventar pÃ¥ svar ..."
+msgstr "Ventar på svar ..."
 
 #: libmutt/mx.c:223
 msgid "Timeout exceeded while attempting flock lock!"
@@ -931,92 +986,90 @@ msgstr ""
 #: libmutt/mx.c:230
 #, fuzzy, c-format
 msgid "Waiting for flock attempt... %d"
-msgstr "Ventar pÃ¥ svar ..."
+msgstr "Ventar på svar ..."
 
-#: libmutt/mx.c:459 libmutt/mx.c:605
+#: libmutt/mx.c:500 libmutt/mx.c:646
 #, fuzzy, c-format
 msgid "%s is not a mailbox."
-msgstr "Dette er inga lokal fil.\n"
+msgstr "%1 er ingen oe4-postboks"
 
-#: libmutt/mx.c:542
+#: libmutt/mx.c:583
 #, fuzzy, c-format
 msgid "Couldn't lock %s\n"
 msgstr "Kunne ikkje lasta %1"
 
-#: libmutt/mx.c:630
+#: libmutt/mx.c:671
 #, fuzzy, c-format
 msgid "Reading %s..."
-msgstr "Les side pÃ¥ nytt ..."
+msgstr "Opnar ..."
 
-#: libmutt/mx.c:719
+#: libmutt/mx.c:760
 #, fuzzy, c-format
 msgid "Writing %s..."
 msgstr "Skriv ut ..."
 
-#: libmutt/mx.c:746
+#: libmutt/mx.c:787
 #, fuzzy, c-format
 msgid "Could not synchronize mailbox %s!"
-msgstr "Kunne ikkje dÃ¸ypa om fila %1"
+msgstr "Kunne ikkje døypa om fila %1"
 
-#: libmutt/mx.c:848
+#: libmutt/mx.c:889
 #, fuzzy, c-format
 msgid "Moving read messages to %s..."
 msgstr "Sender meldingar til %1"
 
-#: libmutt/mx.c:899 libmutt/mx.c:1056
+#: libmutt/mx.c:947 libmutt/mx.c:1110
 #, fuzzy
 msgid "Mailbox is unchanged."
-msgstr "Pilotbrukar: "
+msgstr "Pilotbrukar endra"
 
-#: libmutt/mx.c:929
+#: libmutt/mx.c:983
 #, c-format
 msgid "%d kept, %d moved, %d deleted."
 msgstr ""
 
-#: libmutt/mx.c:932 libmutt/mx.c:1098
+#: libmutt/mx.c:986 libmutt/mx.c:1152
 #, fuzzy, c-format
 msgid "%d kept, %d deleted."
 msgstr "Bandindeks sletta."
 
-#: libmutt/mx.c:1040
+#: libmutt/mx.c:1094
 #, fuzzy, c-format
 msgid " Press '%s' to toggle write"
-msgstr "Trykk %1 for Ã¥ starta"
+msgstr "Trykk %1 for å starta"
 
-#: libmutt/mx.c:1043
+#: libmutt/mx.c:1097
 msgid "Use 'toggle-write' to re-enable write!"
 msgstr ""
 
-#: libmutt/mx.c:1045
+#: libmutt/mx.c:1099
 #, c-format
 msgid "Mailbox is marked unwritable. %s"
 msgstr ""
 
-#: libmutt/mx.c:1050
+#: libmutt/mx.c:1104
 #, fuzzy
 msgid "Mailbox is read-only."
 msgstr "Mappa kan berre lesast"
 
-#: libmutt/mx.c:1065
+#: libmutt/mx.c:1119
 #, fuzzy, c-format
 msgid "Purge %d deleted message?"
 msgstr ""
-"Lukk og slett\n"
-"denne meldinga?"
+"Lukk og forkast den\n"
+"redigerte meldinga?"
 
-#: libmutt/mx.c:1065
+#: libmutt/mx.c:1119
 #, fuzzy, c-format
 msgid "Purge %d deleted messages?"
-msgstr ""
-"Lukk og slett\n"
-"denne meldinga?"
+msgstr "Fjern automatisk sletta meldingar"
 
-#: libmutt/mx.c:1095
+#: libmutt/mx.c:1149
 #, c-format
 msgid "%d kept."
 msgstr ""
 
-#: libmutt/mx.c:1375
+#: libmutt/mx.c:1429
 #, fuzzy
 msgid "Can't write message"
 msgstr "Kan ikkje dekryptera melding:"
@@ -1024,9 +1077,9 @@ msgstr "Kan ikkje dekryptera melding:"
 #: src/address-book-config.c:100
 #, fuzzy
 msgid "Address Book Configuration"
-msgstr "Lyd-oppsett"
+msgstr "Adressebok"
 
-#: src/address-book-config.c:135 src/folder-conf.c:64 src/mailbox-conf.c:298
+#: src/address-book-config.c:135 src/folder-conf.c:66 src/mailbox-conf.c:332
 msgid "Update"
 msgstr "Oppdater"
 
@@ -1074,26 +1127,28 @@ msgstr "Vertsnamn:"
 msgid "Base Domain Name"
 msgstr "Domenenamn:"
 
-#: src/address-book-config.c:460 src/filter-edit-dialog.c:379
-#: src/mailbox-conf.c:287 src/pref-manager.c:1228 src/pref-manager.c:1970
+#: src/address-book-config.c:460 src/filter-edit-dialog.c:387
+#: src/mailbox-conf.c:321 src/pref-manager.c:1037 src/pref-manager.c:1801
 msgid "Add"
 msgstr "Legg til"
 
 #: src/address-book-config.c:507
-#, c-format
+#, fuzzy, c-format
 msgid ""
 "The address book file path '%s' is not correct.\n"
 "Do you want to correct the file name?"
 msgstr ""
+"Den valte fila er ikkje køyrbar.\n"
+"Vil du velja ei anna fil?"
 
-#: src/address-book.c:161 src/filter-edit-dialog.c:130
+#: src/address-book.c:161 src/filter-edit-dialog.c:133
 msgid "Name"
 msgstr "Namn"
 
 #: src/address-book.c:161
 #, fuzzy
 msgid "E-Mail Address"
-msgstr "E-postadresse"
+msgstr "E-postadresse:"
 
 #: src/address-book.c:164
 msgid "Address Book"
@@ -1103,35 +1158,37 @@ msgstr "Adressebok"
 #: src/address-book.c:243
 #, fuzzy
 msgid "Search for Name:"
-msgstr "SÃ¸ketekst:"
+msgstr "Søk etter:"
 
 #: src/address-book.c:311
 #, fuzzy
 msgid "Send-To"
-msgstr "Send"
+msgstr "Send-kø"
 
 #: src/address-book.c:330
 #, fuzzy
 msgid "Run GnomeCard"
-msgstr "KÃ¸yr kommando"
+msgstr "Køyr kommando"
 
 #: src/address-book.c:338
 #, fuzzy
 msgid "Re-Import"
-msgstr "&Importer"
+msgstr "Importer"
 
 #. mode switching stuff
 #: src/address-book.c:347
+#, fuzzy
 msgid "Treat multiple addresses as:"
-msgstr ""
+msgstr "E-postadresser:"
 
 #: src/address-book.c:351
 msgid "alternative addresses for the same person"
 msgstr ""
 
 #: src/address-book.c:356
+#, fuzzy
 msgid "a distribution list"
-msgstr ""
+msgstr "distribusjon"
 
 #: src/balsa-app.c:67
 #, c-format
@@ -1146,238 +1203,235 @@ msgid "Mailbox password for %s@%s:"
 msgstr "Oppgi passord for %1"
 
 #. FIXME:
-#: src/balsa-index.c:267
+#: src/balsa-index.c:269
 msgid "From"
-msgstr "FrÃ¥"
+msgstr "Frå"
 
-#: src/balsa-index.c:268 src/filter-edit-dialog.c:326
+#: src/balsa-index.c:270 src/filter-edit-dialog.c:334
 msgid "Subject"
 msgstr "Emne"
 
-#: src/balsa-index.c:269
+#: src/balsa-index.c:271
 msgid "Date"
 msgstr "Dato"
 
-#: src/balsa-index.c:569
+#: src/balsa-index.c:272
+msgid "Size"
+msgstr "Storleik"
+
+#: src/balsa-index.c:597
 #, fuzzy, c-format
 msgid "Opening mailbox %s. Please wait..."
-msgstr " Sender e-post ..."
+msgstr "Ryddar. Vent litt ..."
 
-#: src/balsa-index.c:601
+#: src/balsa-index.c:629
 msgid "To"
 msgstr "Til"
 
-#: src/balsa-index.c:1806
+#: src/balsa-index.c:1839
+#, fuzzy
 msgid "Cannot access the message's body\n"
-msgstr ""
+msgstr "Får ikkje tilgang til arkivet %1"
 
-#: src/balsa-index.c:1843
+#: src/balsa-index.c:1876
 msgid "Reply..."
 msgstr "Svar ..."
 
-#: src/balsa-index.c:1847
+#: src/balsa-index.c:1880
 #, fuzzy
 msgid "Reply To All..."
 msgstr "Svar til &alle ..."
 
-#: src/balsa-index.c:1851
+#: src/balsa-index.c:1884
 #, fuzzy
 msgid "Reply To Group..."
-msgstr "Svar til &alle ..."
+msgstr "Ny gruppe ..."
 
-#: src/balsa-index.c:1855
+#: src/balsa-index.c:1888
 #, fuzzy
 msgid "Forward..."
 msgstr "Send &vidare ..."
 
-#: src/balsa-index.c:1860
+#: src/balsa-index.c:1892 src/filter-edit-dialog.c:232 src/mailbox-node.c:573
+#: src/pref-manager.c:1039 src/pref-manager.c:1803
+msgid "Delete"
+msgstr "Slett"
+
+#: src/balsa-index.c:1896
 #, fuzzy
 msgid "Undelete"
 msgstr "slett"
 
-#: src/balsa-index.c:1863 src/filter-edit-dialog.c:224 src/mailbox-node.c:560
-#: src/main-window.c:550 src/pref-manager.c:1230 src/pref-manager.c:1972
-msgid "Delete"
-msgstr "Slett"
-
-#: src/balsa-index.c:1867
+#: src/balsa-index.c:1900
 msgid "Move To Trash"
 msgstr "Flytt til papirkorga"
 
-#: src/balsa-index.c:1872
+#: src/balsa-index.c:1905
 #, fuzzy
 msgid "Store Address..."
 msgstr "Gateadresse"
 
-#: src/balsa-index.c:1875
-#, fuzzy
+#: src/balsa-index.c:1908
 msgid "Toggle"
-msgstr "SlÃ¥ av/pÃ¥ rutenett"
+msgstr "Byt"
 
-#: src/balsa-index.c:1878 src/main-window.c:371
+#: src/balsa-index.c:1911 src/main-window.c:378
 #, fuzzy
 msgid "Flagged"
-msgstr "SlÃ¥ av/pÃ¥ rutenett"
+msgstr "Melding"
 
-#: src/balsa-index.c:1881 src/balsa-mblist.c:483
+#: src/balsa-index.c:1914 src/balsa-mblist.c:491
 msgid "Unread"
-msgstr "Uleste"
+msgstr "Ulesne"
 
-#: src/balsa-index.c:1892
+#: src/balsa-index.c:1925
 #, fuzzy
 msgid "Transfer"
-msgstr "&OverfÃ¸ring"
+msgstr "&Overføring"
 
-#: src/balsa-mblist.c:483 src/mailbox-conf.c:850
+#: src/balsa-mblist.c:491 src/mailbox-conf.c:884
 msgid "Mailbox"
 msgstr "Postkasse"
 
-#: src/balsa-mblist.c:483
+#: src/balsa-mblist.c:491
 msgid "Total"
 msgstr "Totalt"
 
-#: src/balsa-mblist.c:962
+#: src/balsa-mblist.c:969
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr ""
 
-#: src/balsa-message.c:303 src/balsa-message.c:306
+#: src/balsa-message.c:317
 #, fuzzy
-msgid "Save MIME Part"
-msgstr "Lagra prosjekt"
-
-#: src/balsa-message.c:304
-msgid "Save"
-msgstr "Lagra"
-
-#: src/balsa-message.c:304 src/folder-conf.c:191 src/mailbox-conf.c:165
-#: src/mailbox-conf.c:175 src/sendmsg-window.c:160 src/sendmsg-window.c:630
-msgid "Cancel"
-msgstr "Avbryt"
-
-#: src/balsa-message.c:316
-msgid "Please choose a filename to save this part of the message as:"
-msgstr ""
-
-#: src/balsa-message.c:346
 msgid "File already exists. Overwrite?"
-msgstr ""
+msgstr "Fila '%1' finst alt. Skriv over?"
 
-#: src/balsa-message.c:362
+#: src/balsa-message.c:331
 #, fuzzy, c-format
-msgid " Could not save %s:%s "
+msgid " Could not save %s: %s"
 msgstr ""
 "Kunne ikkje lagra\n"
 "%1"
 
+#: src/balsa-message.c:351
+#, fuzzy
+msgid "Save MIME Part"
+msgstr "Lagra prosjekt"
+
 #. Subject:
-#: src/balsa-message.c:672 src/print.c:166 src/sendmsg-window.c:960
+#: src/balsa-message.c:673 src/print.c:326 src/sendmsg-window.c:1071
 msgid "Subject:"
 msgstr "Emne:"
 
-#: src/balsa-message.c:675 src/print.c:169
+#: src/balsa-message.c:677 src/print.c:335
 msgid "Date:"
 msgstr "Dato:"
 
 #. From:
-#: src/balsa-message.c:680 src/filter-edit-dialog.c:316 src/print.c:156
-#: src/sendmsg-window.c:951
+#: src/balsa-message.c:682 src/filter-edit-dialog.c:324 src/print.c:314
+#: src/sendmsg-window.c:1061
 msgid "From:"
-msgstr "FrÃ¥:"
+msgstr "Frå:"
 
 #. To:
-#: src/balsa-message.c:684 src/filter-edit-dialog.c:306 src/print.c:161
-#: src/sendmsg-window.c:954
+#: src/balsa-message.c:686 src/filter-edit-dialog.c:314 src/print.c:320
+#: src/sendmsg-window.c:1065
 msgid "To:"
 msgstr "Til:"
 
 #. cc:
-#: src/balsa-message.c:685 src/sendmsg-window.c:962
+#: src/balsa-message.c:687 src/sendmsg-window.c:1073
 #, fuzzy
 msgid "Cc:"
-msgstr "&CC:"
+msgstr "Cc:"
 
 #. bcc:
-#: src/balsa-message.c:686 src/sendmsg-window.c:966
+#: src/balsa-message.c:688 src/sendmsg-window.c:1077
 #, fuzzy
 msgid "Bcc:"
-msgstr "&Bcc:"
+msgstr "Bcc:"
 
 #. fcc:
-#: src/balsa-message.c:689 src/sendmsg-window.c:970
+#: src/balsa-message.c:691 src/sendmsg-window.c:1081
 #, fuzzy
 msgid "Fcc:"
-msgstr "&Bcc:"
+msgstr "cc"
 
-#: src/balsa-message.c:694
+#: src/balsa-message.c:696
 #, fuzzy
 msgid "Disposition-Notification-To:"
-msgstr "PÃ¥minning"
+msgstr "Påminning"
 
-#: src/balsa-message.c:762
+#: src/balsa-message.c:764
 msgid "Could not load image. It is most likely corrupted."
 msgstr ""
 
-#: src/balsa-message.c:767
+#: src/balsa-message.c:769
 #, fuzzy
 msgid "Couldn't render image\n"
-msgstr "Fann ikkje bilete %1"
+msgstr "Kunne ikkje senda melding."
 
-#: src/balsa-message.c:778
+#: src/balsa-message.c:780
 msgid "balsa/pixbuf: Could not load image. It is likely corrupted."
 msgstr ""
 
-#: src/balsa-message.c:827
+#: src/balsa-message.c:829
 msgid "No open or view action defined in GNOME MIME for this content type"
 msgstr ""
 
-#: src/balsa-message.c:831
+#: src/balsa-message.c:833
 #, fuzzy, c-format
 msgid "Content Type: %s"
 msgstr "Innhaldstype"
 
-#: src/balsa-message.c:836
+#: src/balsa-message.c:838
 #, fuzzy, c-format
 msgid "Filename: %s"
 msgstr "Filnamn:"
 
-#: src/balsa-message.c:844
+#: src/balsa-message.c:846
 #, fuzzy
 msgid "Save part"
 msgstr "Lagra som"
 
-#: src/balsa-message.c:868
+#: src/balsa-message.c:870
 #, fuzzy, c-format
 msgid "View part with %s"
 msgstr "Delen som skal brukast"
 
-#: src/balsa-message.c:1146
+#: src/balsa-message.c:1251
+#, fuzzy, c-format
+msgid "Calling URL %s..."
+msgstr "Opnar URL ..."
+
+#: src/balsa-message.c:1280
 #, c-format
 msgid ""
 "Error writing to temporary file %s.\n"
 "Check the directory permissions."
 msgstr ""
 
-#: src/balsa-message.c:1154
+#: src/balsa-message.c:1288
 #, fuzzy, c-format
 msgid "Cannot open temporary file %s."
-msgstr "Kunne ikkje opna fila %1"
+msgstr "Kan ikkje opna fila %1"
 
-#: src/balsa-message.c:1471
+#: src/balsa-message.c:1621
 msgid "Save..."
 msgstr "Lagra ..."
 
-#: src/balsa-message.c:1528
+#: src/balsa-message.c:1692
 #, fuzzy, c-format
 msgid "could not create temporary file %s"
-msgstr "kunne ikkje laga aktiv fil"
+msgstr "Kunne ikkje overføra fila til URL-en %1."
 
-#: src/balsa-message.c:2031
+#: src/balsa-message.c:2201
 #, fuzzy
 msgid "reply to MDN?"
 msgstr "Svar til:"
 
-#: src/balsa-message.c:2043
+#: src/balsa-message.c:2213
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -1385,270 +1439,299 @@ msgid ""
 "Do you want to send this notification?"
 msgstr ""
 
-#: src/filter-edit-dialog.c:31
+#: src/filter-edit-dialog.c:34
 #, fuzzy
 msgid "Inbound"
-msgstr "InngÃ¥ande:"
+msgstr "Inngåande:"
 
-#: src/filter-edit-dialog.c:32
+#: src/filter-edit-dialog.c:35
 #, fuzzy
 msgid "Outbound"
-msgstr "UtgÃ¥ande:"
+msgstr "Utgåande:"
 
-#: src/filter-edit-dialog.c:33
+#: src/filter-edit-dialog.c:36
 #, fuzzy
 msgid "Before Sending"
 msgstr "Ingen overgang"
 
-#: src/filter-edit-dialog.c:34
+#: src/filter-edit-dialog.c:37
 #, fuzzy
 msgid "Demand"
-msgstr "Tysk"
+msgstr "og"
 
-#: src/filter-edit-dialog.c:38
+#: src/filter-edit-dialog.c:41
 #, fuzzy
 msgid "Matches"
-msgstr " treff"
+msgstr "Treff"
 
-#: src/filter-edit-dialog.c:39
+#: src/filter-edit-dialog.c:42
+#, fuzzy
 msgid "Doesn't Match"
-msgstr ""
+msgstr "&Dokumentsti:"
 
-#: src/filter-edit-dialog.c:40 src/pref-manager.c:2222
+#: src/filter-edit-dialog.c:43 src/pref-manager.c:2054
 msgid "Always"
 msgstr "Alltid"
 
-#: src/filter-edit-dialog.c:44
+#: src/filter-edit-dialog.c:47
 #, fuzzy
 msgid "Simple"
-msgstr "PrÃ¸ve"
+msgstr "Prøve"
 
-#: src/filter-edit-dialog.c:45
+#: src/filter-edit-dialog.c:48
 msgid "Regular Expression"
-msgstr "RegulÃ¦rt uttrykk"
+msgstr "Regulært uttrykk"
 
-#: src/filter-edit-dialog.c:46
+#: src/filter-edit-dialog.c:49
 #, fuzzy
 msgid "External Command"
 msgstr "Vel ekstern kommando"
 
-#: src/filter-edit-dialog.c:50
+#: src/filter-edit-dialog.c:53
 #, fuzzy
 msgid "Copy to folder:"
 msgstr "Kopier til mappe"
 
-#: src/filter-edit-dialog.c:51
+#: src/filter-edit-dialog.c:54
 #, fuzzy
 msgid "Move to folder:"
 msgstr "Flytt til mappe"
 
-#: src/filter-edit-dialog.c:52
+#: src/filter-edit-dialog.c:55
 #, fuzzy
 msgid "Print on printer:"
 msgstr "Utskrift til skrivar:"
 
-#: src/filter-edit-dialog.c:53
+#: src/filter-edit-dialog.c:56
 #, fuzzy
 msgid "Run program:"
 msgstr "Program:"
 
-#: src/filter-edit-dialog.c:54
+#: src/filter-edit-dialog.c:57
 #, fuzzy
 msgid "Send to Trash"
-msgstr "&Flytt til papirkorga"
+msgstr "Flytt til papirkorg"
 
-#: src/filter-edit-dialog.c:129
+#: src/filter-edit-dialog.c:132
 msgid "On"
-msgstr "PÃ¥"
+msgstr "På"
 
-#: src/filter-edit-dialog.c:194
+#: src/filter-edit-dialog.c:202
 msgid "Up"
 msgstr "Opp"
 
-#: src/filter-edit-dialog.c:200
+#: src/filter-edit-dialog.c:208
 msgid "Down"
 msgstr "Ned"
 
-#: src/filter-edit-dialog.c:218 src/mailbox-node.c:541 src/main-window.c:378
+#: src/filter-edit-dialog.c:226 src/mailbox-node.c:554 src/main-window.c:385
 msgid "New"
 msgstr "Ny"
 
-#: src/filter-edit-dialog.c:263
+#: src/filter-edit-dialog.c:271
 #, fuzzy
 msgid "Match in:"
 msgstr "Maskin:"
 
-#: src/filter-edit-dialog.c:276
+#: src/filter-edit-dialog.c:284
 msgid "All"
 msgstr "Alle"
 
-#: src/filter-edit-dialog.c:286
+#: src/filter-edit-dialog.c:294
 msgid "Header"
-msgstr "Dekl."
+msgstr "Deklarasjonsfil"
 
-#: src/filter-edit-dialog.c:296
+#: src/filter-edit-dialog.c:304
 msgid "Body"
 msgstr "Kropp"
 
-#: src/filter-edit-dialog.c:337
+#: src/filter-edit-dialog.c:345
 #, fuzzy
 msgid "Match string:"
 msgstr "SÃ¸ketekst:"
 
-#: src/filter-edit-dialog.c:384 src/sendmsg-window.c:581
+#: src/filter-edit-dialog.c:392 src/sendmsg-window.c:678
 msgid "Remove"
 msgstr "Fjern"
 
-#: src/filter-edit-dialog.c:404
+#: src/filter-edit-dialog.c:412
 msgid "Command:"
 msgstr "Kommando:"
 
 #. The name entry
-#: src/filter-edit-dialog.c:436
+#: src/filter-edit-dialog.c:444
 #, fuzzy
 msgid "Filter name:"
 msgstr "Filnamn:"
 
 #. The "Process when:" option menu
-#: src/filter-edit-dialog.c:451
+#: src/filter-edit-dialog.c:459
 #, fuzzy
 msgid "Process when:"
 msgstr "Prosessar"
 
 #. The "Run on:" option menu
-#: src/filter-edit-dialog.c:472
+#: src/filter-edit-dialog.c:480
 #, fuzzy
 msgid "Run on:"
-msgstr "KÃ¸yr kommando:"
+msgstr "Køyr kommando:"
 
 #. the type notebook's option menu
-#: src/filter-edit-dialog.c:491
+#: src/filter-edit-dialog.c:499
 #, fuzzy
 msgid "Search type:"
-msgstr "SÃ¸ketekst:"
+msgstr "Søketekst:"
 
 #. The notification area
-#: src/filter-edit-dialog.c:538
+#: src/filter-edit-dialog.c:546
 #, fuzzy
 msgid "Notification:"
-msgstr "PÃ¥minning"
+msgstr "Påminning"
 
 #. Notification buttons
-#: src/filter-edit-dialog.c:547
+#: src/filter-edit-dialog.c:555
 #, fuzzy
 msgid "Play sound:"
 msgstr "Spel lyd"
 
-#: src/filter-edit-dialog.c:554
+#: src/filter-edit-dialog.c:562
 #, fuzzy
 msgid "Use Sound..."
 msgstr "Bruk lydar"
 
-#: src/filter-edit-dialog.c:559
+#: src/filter-edit-dialog.c:567
 #, fuzzy
 msgid "Popup text:"
 msgstr "Oppsprettmeny"
 
 #. The action area
-#: src/filter-edit-dialog.c:574
+#: src/filter-edit-dialog.c:582
 #, fuzzy
 msgid "Action to perform:"
-msgstr " - Handlingar for: "
+msgstr "Opna adresse."
 
 #. The disposition area
-#: src/filter-edit-dialog.c:597
+#: src/filter-edit-dialog.c:605
 #, fuzzy
 msgid "Disposition:"
 msgstr "posisjon"
 
-#: src/filter-edit-dialog.c:608
+#: src/filter-edit-dialog.c:616
+#, fuzzy
 msgid "Place/leave in default folder"
-msgstr ""
+msgstr "Lagra i &kladdemappe"
 
-#: src/filter-edit-dialog.c:615
+#: src/filter-edit-dialog.c:623
 msgid "Do not place/leave in default folder"
 msgstr ""
 
-#: src/filter-edit-dialog.c:622
+#: src/filter-edit-dialog.c:630
 #, fuzzy
 msgid "Stop filtering here"
 msgstr "Vel kompilatorval her."
 
-#: src/filter-edit-dialog.c:650
-#, fuzzy
+#: src/filter-edit-dialog.c:658
 msgid "Match"
-msgstr "Treff:"
+msgstr "Treff"
 
-#: src/filter-edit-dialog.c:653
+#: src/filter-edit-dialog.c:661
 msgid "Action"
 msgstr "Handling"
 
-#: src/filter-edit-dialog.c:666
+#: src/filter-edit-dialog.c:674
 msgid "Revert"
-msgstr "GÃ¥ tilbake"
+msgstr "Gå tilbake"
 
-#: src/filter-edit-dialog.c:693
+#: src/filter-edit-dialog.c:701
 #, fuzzy
 msgid "Balsa Filters"
 msgstr " Filter"
 
-#: src/folder-conf.c:63
+#: src/folder-conf.c:65
 #, fuzzy
 msgid "Remote IMAP folder"
-msgstr "Vel mappe"
+msgstr "Fjern mappe"
 
-#: src/folder-conf.c:64
+#: src/folder-conf.c:66 src/folder-conf.c:327
 #, fuzzy
 msgid "Create"
-msgstr "Teikn"
+msgstr "Laga"
 
-#: src/folder-conf.c:73
+#: src/folder-conf.c:75
 #, fuzzy
 msgid "Remote IMAP folder set"
-msgstr "Lang mappeliste"
+msgstr "Fjern mappe"
 
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:80
+#: src/folder-conf.c:82
+#, fuzzy
 msgid "Descriptive _Name:"
-msgstr ""
+msgstr "Drivarnamn:"
 
 #. pop server
-#: src/folder-conf.c:85 src/mailbox-conf.c:727 src/mailbox-conf.c:788
+#: src/folder-conf.c:87 src/mailbox-conf.c:761 src/mailbox-conf.c:822
 #, fuzzy
 msgid "_Server:"
 msgstr "Tenar:"
 
 #. pop port
-#: src/folder-conf.c:90 src/mailbox-conf.c:733 src/mailbox-conf.c:795
+#: src/folder-conf.c:92 src/mailbox-conf.c:767 src/mailbox-conf.c:829
 #, fuzzy
 msgid "_Port:"
-msgstr "Port:"
+msgstr "P&ort:"
 
-#: src/folder-conf.c:99
+#: src/folder-conf.c:101
 #, fuzzy
 msgid "_User name:"
-msgstr "Brukarnamn:"
+msgstr "Bru&karnamn:"
 
-#: src/folder-conf.c:104
+#: src/folder-conf.c:106
 #, fuzzy
 msgid "_Password:"
 msgstr "Passord:"
 
-#: src/folder-conf.c:111
+#: src/folder-conf.c:113
+#, fuzzy
 msgid "_Subscribed folders only"
-msgstr ""
+msgstr "berre &abonnerte"
 
-#: src/folder-conf.c:112
+#: src/folder-conf.c:114
+#, fuzzy
 msgid "_Prefix"
-msgstr ""
+msgstr "Prefiks"
 
-#: src/folder-conf.c:177
+#: src/folder-conf.c:272
+#, fuzzy
+msgid "Select parent folder"
+msgstr "Vel målmappe"
+
+#: src/folder-conf.c:326 src/folder-conf.c:338
+#, fuzzy
+msgid "Remote IMAP subfolder"
+msgstr "Fjern mappe"
+
+#. INPUT FIELD CREATION
+#: src/folder-conf.c:345
+#, fuzzy
+msgid "_Subfolder of:"
+msgstr "Nytt filter"
+
+#: src/folder-conf.c:349
+msgid "Browse..."
+msgstr "Bla gjennom ..."
+
+#: src/folder-conf.c:356
+#, fuzzy
+msgid "_Folder name:"
+msgstr "Mappenamn:"
+
+#: src/folder-conf.c:395
 msgid ""
 "This folder is not stored in configuration.I do not yet know how to remove "
 "it from remote server."
 msgstr ""
 
-#: src/folder-conf.c:185
+#: src/folder-conf.c:403
 #, c-format
 msgid ""
 "This will remove the folder %s from the list.\n"
@@ -1656,9 +1739,15 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 
-#: src/folder-conf.c:190 src/mailbox-conf.c:163 src/mailbox-conf.c:174
+#: src/folder-conf.c:408 src/mailbox-conf.c:173 src/mailbox-conf.c:197
+#, fuzzy
 msgid "Remove from list"
-msgstr ""
+msgstr "Fjern frå påminningsliste"
+
+#: src/folder-conf.c:409 src/mailbox-conf.c:175 src/mailbox-conf.c:188
+#: src/mailbox-conf.c:198 src/sendmsg-window.c:178 src/sendmsg-window.c:739
+msgid "Cancel"
+msgstr "Avbryt"
 
 #: src/information-dialog.c:153
 #, fuzzy
@@ -1666,12 +1755,14 @@ msgid "Balsa Information"
 msgstr "Brukarinformasjon"
 
 #: src/information-dialog.c:210
+#, fuzzy
 msgid "WARNING: "
-msgstr ""
+msgstr "Ã…TVARING"
 
 #: src/information-dialog.c:213
+#, fuzzy
 msgid "ERROR: "
-msgstr ""
+msgstr "FEIL"
 
 #: src/information-dialog.c:216
 msgid "FATAL: "
@@ -1682,7 +1773,15 @@ msgstr ""
 msgid "No mailbox selected."
 msgstr "Ingen filer valt."
 
-#: src/mailbox-conf.c:157
+#: src/mailbox-conf.c:159
+#, c-format
+msgid ""
+"Mailbox '%s' is used by balsa and I cannot remove it.\n"
+"If you really want to remove it, assign its function\n"
+"to some other mailbox."
+msgstr ""
+
+#: src/mailbox-conf.c:167
 #, c-format
 msgid ""
 "This will remove the mailbox %s from the list of mailboxes.\n"
@@ -1692,11 +1791,27 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 
-#: src/mailbox-conf.c:164
+#: src/mailbox-conf.c:174
+#, fuzzy
 msgid "Remove from list and disk"
+msgstr "Fjern frÃ¥ depot (og disk)"
+
+#: src/mailbox-conf.c:181
+#, c-format
+msgid ""
+"This will remove the mailbox %s and all its messages from your IMAP server.\n"
+"If %s has subfolders, it will still appear as a node in the folder tree.\n"
+"You may use \"New IMAP subfolder\" later to add a mailbox with this name.\n"
+"What would you like to do?"
 msgstr ""
 
-#: src/mailbox-conf.c:169
+#: src/mailbox-conf.c:187
+#, fuzzy
+msgid "Remove from server"
+msgstr "&Hent frå tenar ..."
+
+#. deleting other remote mailbox
+#: src/mailbox-conf.c:192
 #, c-format
 msgid ""
 "This will remove the mailbox %s from the list of mailboxes\n"
@@ -1704,28 +1819,28 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 
-#: src/mailbox-conf.c:211
+#: src/mailbox-conf.c:245
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr ""
 
-#: src/mailbox-conf.c:240
+#: src/mailbox-conf.c:274
 #, fuzzy
 msgid "Mailbox Configurator"
 msgstr "KCalc-oppsett"
 
-#: src/mailbox-conf.c:442
+#: src/mailbox-conf.c:476
 #, fuzzy, c-format
 msgid "%s on %s"
 msgstr "%1 vann %2"
 
-#: src/mailbox-conf.c:546
+#: src/mailbox-conf.c:580
 #, fuzzy, c-format
 msgid ""
 "Rename of %s to %s failed:\n"
 "%s"
 msgstr "feil ved opning av %1\n"
 
-#: src/mailbox-conf.c:564
+#: src/mailbox-conf.c:598
 msgid ""
 "This is a mailbox in your local directory.\n"
 "Change the path instead.\n"
@@ -1733,589 +1848,637 @@ msgid ""
 msgstr ""
 
 #. mailbox name
-#: src/mailbox-conf.c:683 src/mailbox-conf.c:721 src/mailbox-conf.c:782
+#: src/mailbox-conf.c:717 src/mailbox-conf.c:755 src/mailbox-conf.c:816
 #, fuzzy
 msgid "Mailbox _Name:"
 msgstr "Postkasse:"
 
 #. path to file
-#: src/mailbox-conf.c:689
+#: src/mailbox-conf.c:723
 #, fuzzy
 msgid "Mailbox _Path:"
-msgstr "Postkasse:"
+msgstr "Mbox-sti"
 
 #. username
-#: src/mailbox-conf.c:738 src/mailbox-conf.c:800
+#: src/mailbox-conf.c:772 src/mailbox-conf.c:834
 #, fuzzy
 msgid "_Username:"
 msgstr "Brukarnamn:"
 
 #. password field
-#: src/mailbox-conf.c:744 src/mailbox-conf.c:807
+#: src/mailbox-conf.c:778 src/mailbox-conf.c:841
 #, fuzzy
 msgid "Pass_word:"
 msgstr "Passord:"
 
 #. toggle for apop
-#: src/mailbox-conf.c:750
+#: src/mailbox-conf.c:784
 #, fuzzy
 msgid "Use _APOP Authentication"
-msgstr "Krevjer autentisering"
+msgstr "PAP-autentisering"
 
-#: src/mailbox-conf.c:755
+#: src/mailbox-conf.c:789
 #, fuzzy
 msgid "_Delete messages from server after download"
-msgstr "Slett rada frÃ¥ tabellen."
+msgstr "Slett e-post frå tenaren"
 
-#: src/mailbox-conf.c:760
+#: src/mailbox-conf.c:794
 msgid "_Filter messages through procmail"
 msgstr ""
 
-#: src/mailbox-conf.c:765
+#: src/mailbox-conf.c:799
+#, fuzzy
 msgid "_Check this mailbox for new mail"
-msgstr ""
+msgstr "Berre sjekk for ny e-post."
 
-#: src/mailbox-conf.c:812
+#: src/mailbox-conf.c:846
 #, fuzzy
 msgid "F_older Path:"
 msgstr "Mappenamn:"
 
 #: src/mailbox-node.c:204
+#, fuzzy
 msgid "The folder edition to be written."
-msgstr ""
+msgstr "Problem ved redigering av fila ..."
 
-#: src/mailbox-node.c:528 src/main-window.c:230
+#: src/mailbox-node.c:539 src/main-window.c:232
 #, fuzzy
 msgid "Local mbox mailbox..."
 msgstr "&Lokal postboks"
 
-#: src/mailbox-node.c:530 src/main-window.c:235
+#: src/mailbox-node.c:541 src/main-window.c:237
 #, fuzzy
 msgid "Local Maildir mailbox..."
-msgstr "&Lokal postboks"
+msgstr "Lokal postboks"
 
-#: src/mailbox-node.c:532 src/main-window.c:240
+#: src/mailbox-node.c:543 src/main-window.c:242
 #, fuzzy
 msgid "Local MH mailbox..."
-msgstr "&Lokal postboks"
+msgstr "Lokal postboks"
 
-#: src/mailbox-node.c:534 src/main-window.c:245
+#: src/mailbox-node.c:545 src/main-window.c:247
 #, fuzzy
 msgid "Remote IMAP mailbox..."
-msgstr " Sender e-post ..."
+msgstr "Slett postkasse"
 
-#: src/mailbox-node.c:537 src/main-window.c:251
+#: src/mailbox-node.c:548 src/main-window.c:253
 #, fuzzy
 msgid "Remote IMAP folder..."
-msgstr "Vel mappe"
+msgstr "Fjern mappe"
 
-#: src/mailbox-node.c:555
+#: src/mailbox-node.c:550 src/main-window.c:258
+#, fuzzy
+msgid "Remote IMAP subfolder..."
+msgstr "Fjern mappe"
+
+#: src/mailbox-node.c:568
 msgid "Open"
 msgstr "Opna"
 
-#: src/mailbox-node.c:557
+#: src/mailbox-node.c:570
 msgid "Close"
 msgstr "Lukk"
 
-#: src/mailbox-node.c:559
+#: src/mailbox-node.c:572
 msgid "Properties..."
 msgstr "Eigenskapar ..."
 
-#: src/mailbox-node.c:566
+#: src/mailbox-node.c:579
+#, fuzzy
 msgid "Subscribe"
-msgstr ""
-
-#: src/mailbox-node.c:567
-msgid "Unsubscribe"
-msgstr ""
-
-#: src/mailbox-node.c:572
-#, fuzzy
-msgid "Mark as Inbox"
-msgstr "Mar&ker som ulesen"
-
-#: src/mailbox-node.c:574
-#, fuzzy
-msgid "Mark as Sentbox"
-msgstr "M&arker som lesen"
-
-#: src/mailbox-node.c:576
-#, fuzzy
-msgid "Mark as Trash"
-msgstr "M&arker som lesen"
-
-#: src/mailbox-node.c:578
-#, fuzzy
-msgid "Mark as Draftbox"
-msgstr "M&arker som lesen"
+msgstr "&Abonner"
 
 #: src/mailbox-node.c:580
+msgid "Unsubscribe"
+msgstr "Stopp abonnement"
+
+#: src/mailbox-node.c:581 src/mailbox-node.c:594
 #, fuzzy
 msgid "Rescan"
-msgstr "Russisk"
+msgstr "RecMon"
 
-#: src/mailbox-node.c:686
+#: src/mailbox-node.c:586
+#, fuzzy
+msgid "Mark as Inbox"
+msgstr "Marker som ulesen"
+
+#: src/mailbox-node.c:588
+#, fuzzy
+msgid "Mark as Sentbox"
+msgstr "Marker som svart på"
+
+#: src/mailbox-node.c:590
+#, fuzzy
+msgid "Mark as Trash"
+msgstr "Marker som lesen"
+
+#: src/mailbox-node.c:592
+#, fuzzy
+msgid "Mark as Draftbox"
+msgstr "Marker som lesen"
+
+#: src/mailbox-node.c:707
+#, c-format
+msgid "Local mailbox %s loaded as: %s\n"
+msgstr ""
+
+#: src/mailbox-node.c:732
 #, fuzzy, c-format
-msgid "Local mailbox loaded as: %s\n"
-msgstr "&Lokal postboks"
+msgid "Local folder %s\n"
+msgstr "Mapper"
 
-#: src/main-window.c:224
+#: src/main-window.c:226
 #, fuzzy
 msgid "_Message..."
 msgstr "Ny melding ..."
 
-#: src/main-window.c:224
+#: src/main-window.c:226
 #, fuzzy
 msgid "Compose a new message"
 msgstr "Comment=Usenet diskusjonsmelding"
 
-#: src/main-window.c:231
-#, fuzzy
+#: src/main-window.c:233
 msgid "Add a new mbox style mailbox"
-msgstr "Legg til ny tekst"
+msgstr ""
 
-#: src/main-window.c:236
-#, fuzzy
+#: src/main-window.c:238
 msgid "Add a new Maildir style mailbox"
-msgstr "Legg til ny tekst"
+msgstr ""
 
-#: src/main-window.c:241
+#: src/main-window.c:243
 #, fuzzy
 msgid "Add a new MH style mailbox"
 msgstr "Legg til ny tekst"
 
-#: src/main-window.c:246
+#: src/main-window.c:248
 #, fuzzy
 msgid "Add a new IMAP mailbox"
-msgstr "Legg til ny tekst"
+msgstr "Ny postkasse"
 
-#: src/main-window.c:252
+#: src/main-window.c:254
 #, fuzzy
 msgid "Add a new IMAP folder"
-msgstr "Vel mappe"
+msgstr "Legg til ei ny oppføring"
 
-#: src/main-window.c:260
+#: src/main-window.c:259
+#, fuzzy
+msgid "Add new IMAP subfolder"
+msgstr "Ny undermappe"
+
+#: src/main-window.c:267
 #, fuzzy
 msgid "_New"
 msgstr "Ny"
 
-#: src/main-window.c:264
+#: src/main-window.c:271
 #, fuzzy
 msgid "_Continue"
 msgstr "Fortset"
 
-#: src/main-window.c:265
+#: src/main-window.c:272
 #, fuzzy
 msgid "Continue editing current message"
 msgstr "finst i den opprinnelege meldinga"
 
-#: src/main-window.c:272
+#: src/main-window.c:279
 #, fuzzy
 msgid "_Get New Mail"
-msgstr "Ny post"
+msgstr "Ny e-post"
 
-#: src/main-window.c:272
+#: src/main-window.c:279
 #, fuzzy
 msgid "Fetch new incoming mail"
 msgstr "Vis innkommande samtalar"
 
-#: src/main-window.c:278
+#: src/main-window.c:285
 #, fuzzy
 msgid "_Send Queued Mail"
-msgstr "&Send meldingane i kÃ¸en"
+msgstr "Send meldingane i &køen"
 
-#: src/main-window.c:279
+#: src/main-window.c:286
 #, fuzzy
 msgid "Send mail from the outbox"
 msgstr "&Send e-post til:"
 
-#: src/main-window.c:287
+#: src/main-window.c:294
 #, fuzzy
 msgid "_Address Book..."
 msgstr "Adresse&bok ..."
 
-#: src/main-window.c:288
+#: src/main-window.c:295
 #, fuzzy
 msgid "Open the address book"
-msgstr "Legg adresse til adresseboka"
+msgstr "&Adressebok frå KDE 1"
 
-#: src/main-window.c:315
+#: src/main-window.c:322
 #, fuzzy
 msgid "_Filters..."
 msgstr "Filer ..."
 
-#: src/main-window.c:315
+#: src/main-window.c:322
 #, fuzzy
 msgid "Manage filters"
-msgstr "endra filer"
+msgstr "Endra filer"
 
-#: src/main-window.c:322 src/message-window.c:61
+#: src/main-window.c:329 src/message-window.c:61
 #, fuzzy
 msgid "N_o Headers"
-msgstr "Deklarasjonar"
+msgstr "Meldingshovud"
 
-#: src/main-window.c:322
+#: src/main-window.c:329
 #, fuzzy
 msgid "Display no headers"
 msgstr "Vis i &redigerar"
 
-#: src/main-window.c:324
+#: src/main-window.c:331
 #, fuzzy
 msgid "S_elected Headers"
 msgstr "Utvalte brukarar"
 
-#: src/main-window.c:325
+#: src/main-window.c:332
 #, fuzzy
 msgid "Display selected headers"
 msgstr "Vis for utvalte klassar:"
 
-#: src/main-window.c:327 src/message-window.c:65
+#: src/main-window.c:334 src/message-window.c:65
 #, fuzzy
 msgid "All _Headers"
 msgstr "&Alle meldingshovud"
 
-#: src/main-window.c:327
+#: src/main-window.c:334
 #, fuzzy
 msgid "Display all headers"
 msgstr "alle deklarasjonsfiler"
 
-#: src/main-window.c:334
+#: src/main-window.c:341
+#, fuzzy
 msgid "_Flat index"
-msgstr ""
+msgstr "Rotindeks"
 
-#: src/main-window.c:334
+#: src/main-window.c:341
+#, fuzzy
 msgid "No threading at all"
-msgstr ""
+msgstr "Inga autentisering i det heile"
 
-#: src/main-window.c:337
+#: src/main-window.c:344
+#, fuzzy
 msgid "S_imple threading"
-msgstr ""
+msgstr "Enkel autoretting"
 
-#: src/main-window.c:338
+#: src/main-window.c:345
 msgid "Simple threading algorithm"
 msgstr ""
 
-#: src/main-window.c:341
+#: src/main-window.c:348
 msgid "_JWZ threading"
 msgstr ""
 
-#: src/main-window.c:342
+#: src/main-window.c:349
 msgid "Elaborate JWZ threading"
 msgstr ""
 
-#: src/main-window.c:349
+#: src/main-window.c:356
 #, fuzzy
 msgid "_Show Mailbox Tree"
 msgstr "Ny postkasse"
 
-#: src/main-window.c:350
+#: src/main-window.c:357
+#, fuzzy
 msgid "Toggle display of mailbox and folder tree"
-msgstr ""
+msgstr "Vis / ikkje vis skjulte filer"
 
-#: src/main-window.c:353
+#: src/main-window.c:360
 #, fuzzy
 msgid "Show Mailbox _Tabs"
 msgstr "Ny postkasse"
 
-#: src/main-window.c:354
+#: src/main-window.c:361
+#, fuzzy
 msgid "Toggle display of mailbox notebook tabs"
-msgstr ""
+msgstr "Vis / ikkje vis skjulte filer"
 
-#: src/main-window.c:358 src/message-window.c:94
+#: src/main-window.c:365 src/message-window.c:94
 #, fuzzy
 msgid "_Wrap"
 msgstr "Graf"
 
-#: src/main-window.c:358 src/sendmsg-window.c:213
+#: src/main-window.c:365 src/sendmsg-window.c:236
 #, fuzzy
 msgid "Wrap message lines"
-msgstr "Broten linje"
-
-#: src/main-window.c:371
-#, fuzzy
-msgid "Toggle flagged"
-msgstr "SlÃ¥ av/pÃ¥ rutenett"
+msgstr "TrÃ¥dordna meldingar"
 
 #: src/main-window.c:378
 #, fuzzy
-msgid "Toggle New"
-msgstr "SlÃ¥ av/pÃ¥ rutenett"
+msgid "Toggle flagged"
+msgstr "Slå av/på rutenett"
 
-#: src/main-window.c:390 src/message-window.c:103
+#: src/main-window.c:385
+#, fuzzy
+msgid "Toggle New"
+msgstr "Byt"
+
+#: src/main-window.c:397 src/message-window.c:103
 #, fuzzy
 msgid "_Reply..."
 msgstr "Svar ..."
 
-#: src/main-window.c:391
+#: src/main-window.c:398
 #, fuzzy
 msgid "Reply to the current message"
-msgstr "Lastar sida om att"
+msgstr "Berre kontroller stavinga til denne programteksten."
 
-#: src/main-window.c:398 src/message-window.c:108
+#: src/main-window.c:405 src/message-window.c:108
 #, fuzzy
 msgid "Reply to _All..."
 msgstr "Svar til &alle ..."
 
-#: src/main-window.c:399
-msgid "Reply to all recipients of the current message"
-msgstr ""
-
 #: src/main-window.c:406
 #, fuzzy
-msgid "Reply to _Group..."
-msgstr "Svar til alle:"
+msgid "Reply to all recipients of the current message"
+msgstr "Berre kontroller stavinga til denne programteksten."
 
-#: src/main-window.c:407
+#: src/main-window.c:413
+#, fuzzy
+msgid "Reply to _Group..."
+msgstr "Svar til diskusjonsgruppe"
+
+#: src/main-window.c:414
 #, fuzzy
 msgid "Reply to mailing list"
-msgstr "Svar til alle:"
+msgstr "&Send til e-postliste"
 
-#: src/main-window.c:414 src/message-window.c:114
+#: src/main-window.c:421 src/message-window.c:114
 #, fuzzy
 msgid "_Forward..."
 msgstr "Send &vidare ..."
 
-#: src/main-window.c:415
+#: src/main-window.c:422
 #, fuzzy
 msgid "Forward the current message"
 msgstr "Vidaresendt melding"
 
-#: src/main-window.c:422 src/message-window.c:119
+#: src/main-window.c:429 src/message-window.c:119
 #, fuzzy
 msgid "Next Part"
-msgstr "Neste Ã¥r"
+msgstr "Neste år"
 
-#: src/main-window.c:422
+#: src/main-window.c:429
 #, fuzzy
 msgid "Next part in message"
 msgstr "Neste melding"
 
-#: src/main-window.c:428 src/message-window.c:123
+#: src/main-window.c:435 src/message-window.c:123
 #, fuzzy
 msgid "Previous Part"
-msgstr "FÃ¸rre Ã¥r"
+msgstr "Førre side"
 
-#: src/main-window.c:429
+#: src/main-window.c:436
 #, fuzzy
 msgid "Previous part in message"
-msgstr "FÃ¸rre melding"
+msgstr "Førre melding"
 
-#: src/main-window.c:435 src/message-window.c:128
+#: src/main-window.c:442 src/message-window.c:128
 #, fuzzy
 msgid "Save Current Part..."
 msgstr "Lagra dette biletet"
 
-#: src/main-window.c:436 src/message-window.c:129
+#: src/main-window.c:443 src/message-window.c:129
 #, fuzzy
 msgid "Save current part in message"
-msgstr "Lagra dette biletet"
+msgstr "Fjern biletet"
 
-#: src/main-window.c:444
+#: src/main-window.c:451
+#, fuzzy
+msgid "_Move to Trash"
+msgstr "Flytt til papirkorg"
+
+#: src/main-window.c:452
+#, fuzzy
+msgid "Move the current message to Trash mailbox"
+msgstr "Flytta alle meldingar til papirkorga"
+
+#: src/main-window.c:457
 #, fuzzy
 msgid "_Delete"
 msgstr "Slett"
 
-#: src/main-window.c:444
+#: src/main-window.c:458
 #, fuzzy
 msgid "Delete the current message"
 msgstr "Slettar klassen"
 
-#: src/main-window.c:451
+#: src/main-window.c:463
 #, fuzzy
 msgid "_Undelete"
 msgstr "slett"
 
-#: src/main-window.c:451
+#: src/main-window.c:463
 #, fuzzy
 msgid "Undelete the message"
 msgstr "Merk alle meldingane"
 
 #. !
-#: src/main-window.c:458
+#: src/main-window.c:469
 #, fuzzy
 msgid "_Toggle"
-msgstr "SlÃ¥ av/pÃ¥ rutenett"
+msgstr "Byt"
 
-#: src/main-window.c:463
+#: src/main-window.c:474
 #, fuzzy
 msgid "_Store Address..."
 msgstr "Gateadresse"
 
-#: src/main-window.c:464
+#: src/main-window.c:475
 #, fuzzy
 msgid "Store address of sender in addressbook"
 msgstr "Legg adresse til adresseboka"
 
-#: src/main-window.c:474
+#: src/main-window.c:485
 msgid "Next Message"
 msgstr "Neste melding"
 
-#: src/main-window.c:480
+#: src/main-window.c:491
 msgid "Previous Message"
-msgstr "FÃ¸rre melding"
+msgstr "Førre melding"
 
-#: src/main-window.c:486 src/main-window.c:487
+#: src/main-window.c:497 src/main-window.c:498
 msgid "Next Unread Message"
 msgstr "Neste uleste melding"
 
-#: src/main-window.c:493
+#: src/main-window.c:504
 #, fuzzy
 msgid "_Edit..."
 msgstr "Endra ..."
 
-#: src/main-window.c:493
+#: src/main-window.c:504
 #, fuzzy
 msgid "Edit the selected mailbox"
-msgstr "Rediger den valte oppgÃ¥va eller variabelen."
+msgstr "Rediger den valte oppgåva eller variabelen."
 
-#: src/main-window.c:497
+#: src/main-window.c:508
 #, fuzzy
 msgid "_Delete..."
 msgstr "&Slett ..."
 
-#: src/main-window.c:498
+#: src/main-window.c:509
 #, fuzzy
 msgid "Delete the selected mailbox"
 msgstr "Slettar den valte fila"
 
-#: src/main-window.c:504
+#: src/main-window.c:515
 #, fuzzy
 msgid "Co_mmit Current"
-msgstr "&UtfÃ¸r endringar"
+msgstr "Lukk &dokumentet"
 
-#: src/main-window.c:505
+#: src/main-window.c:516
 msgid "Commit the changes in the currently opened mailbox"
 msgstr ""
 
-#: src/main-window.c:509
+#: src/main-window.c:520
 #, fuzzy
 msgid "_Close"
 msgstr "Lukk"
 
-#: src/main-window.c:509
+#: src/main-window.c:520
 #, fuzzy
 msgid "Close mailbox"
-msgstr "Ny postkasse"
+msgstr "L&ukk faks"
 
-#: src/main-window.c:513
+#: src/main-window.c:524
 #, fuzzy
 msgid "Empty _Trash"
-msgstr "TÃ¸m papirkorga"
+msgstr "Tøm papirkorga"
 
-#: src/main-window.c:514
-#, fuzzy
+#: src/main-window.c:525
 msgid "Delete messages from the Trash mailbox"
-msgstr "Slett rada frÃ¥ tabellen."
+msgstr ""
 
-#: src/main-window.c:536
+#: src/main-window.c:533
+#, fuzzy
+msgid "Identities..."
+msgstr "Identifikator"
+
+#: src/main-window.c:534
+#, fuzzy
+msgid "Create and set current identities"
+msgstr "Omskriving og noverande vedlikehaldar"
+
+#: src/main-window.c:551
 #, fuzzy
 msgid "_Message"
 msgstr "Melding"
 
-#: src/main-window.c:537
+#: src/main-window.c:552
 #, fuzzy
 msgid "Mail_box"
 msgstr "Postkasse"
 
-#: src/main-window.c:545
+#: src/main-window.c:560
 msgid "Check"
 msgstr "Sjekk"
 
-#: src/main-window.c:545
+#: src/main-window.c:560
 #, fuzzy
 msgid "Check Email"
-msgstr "Sjekk &post ..."
+msgstr "Sjekk e-post"
 
-#: src/main-window.c:550
+#: src/main-window.c:565
 #, fuzzy
-msgid "Delete message"
-msgstr "Neste melding"
+msgid ""
+"Trash/\n"
+"Delete"
+msgstr "Omset"
 
-#: src/main-window.c:555
+#: src/main-window.c:565
+#, fuzzy
+msgid "Move to Trash or Delete the current message"
+msgstr "Berre kontroller stavinga til denne programteksten."
+
+#: src/main-window.c:570
 #, fuzzy
 msgid "Compose"
-msgstr "&Rediger"
+msgstr "Ny melding"
 
-#: src/main-window.c:555
+#: src/main-window.c:570
 #, fuzzy
 msgid "Compose message"
 msgstr "Lukk melding"
 
-#: src/main-window.c:559
+#: src/main-window.c:574
 msgid "Continue"
 msgstr "Fortset"
 
-#: src/main-window.c:563
+#: src/main-window.c:578
 msgid "Reply"
 msgstr "Svar"
 
-#: src/main-window.c:567
+#: src/main-window.c:582
 #, fuzzy
 msgid ""
 "Reply\n"
 "to All"
 msgstr "Svar til alle:"
 
-#: src/main-window.c:567
+#: src/main-window.c:582
 #, fuzzy
 msgid "Reply to all"
 msgstr "Svar til alle:"
 
-#: src/main-window.c:571
+#: src/main-window.c:586
 msgid "Forward"
-msgstr "Fram"
+msgstr ""
 
-#: src/main-window.c:577
+#: src/main-window.c:592
 msgid "Previous"
-msgstr "FÃ¸rre"
+msgstr "Førre"
 
-#: src/main-window.c:577
+#: src/main-window.c:592
 #, fuzzy
 msgid "Open previous message"
-msgstr "FÃ¸rre melding"
+msgstr "Førre melding"
 
-#: src/main-window.c:582
+#: src/main-window.c:597
 msgid "Next"
 msgstr "Neste"
 
-#: src/main-window.c:582
+#: src/main-window.c:597
 #, fuzzy
 msgid "Open next message"
 msgstr "Neste melding"
 
-#: src/main-window.c:586
+#: src/main-window.c:601
 #, fuzzy
 msgid ""
 "Next\n"
 "Unread"
 msgstr "Neste ulest"
 
-#: src/main-window.c:586
+#: src/main-window.c:601
 #, fuzzy
 msgid "Open next unread message"
 msgstr "Neste uleste melding"
 
-#: src/main-window.c:590 src/sendmsg-window.c:157
+#: src/main-window.c:605 src/sendmsg-window.c:175
 msgid "Print"
 msgstr "Skriv ut"
 
-#: src/main-window.c:590
+#: src/main-window.c:605
 #, fuzzy
 msgid "Print current message"
-msgstr "Merk denne sida"
+msgstr "&Denne programteksten"
 
-#: src/main-window.c:1072
+#: src/main-window.c:1089
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
 msgstr ""
 
-#: src/main-window.c:1349
+#: src/main-window.c:1379
 #, fuzzy
 msgid "Copyright (C) 1997-2001"
 msgstr "Opphavsrett (c), %1 1997-2000"
 
-#: src/main-window.c:1352
+#: src/main-window.c:1382
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://www.balsa.net/\n"
@@ -2323,74 +2486,84 @@ msgid ""
 "If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
 msgstr ""
 
-#: src/main-window.c:1724
+#: src/main-window.c:1758
 #, fuzzy, c-format
 msgid "Sending error: %s"
-msgstr "Sender melding: %1"
+msgstr "Sender %1"
 
-#: src/main-window.c:2146
+#: src/main-window.c:2190
 #, fuzzy, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Feil ved skriving av magisk streng."
 
-#: src/main-window.c:2363
+#: src/main-window.c:2400
 #, fuzzy, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Mappa kan berre lesast"
 
-#: src/main-window.c:2365
-#, c-format
+#: src/main-window.c:2402
+#, fuzzy, c-format
 msgid "Balsa: %s"
-msgstr ""
+msgstr "Bass"
 
-#: src/main.c:108
+#: src/main.c:110
 #, fuzzy
 msgid "Get new mail on startup"
 msgstr "Animasjon ved oppstart"
 
-#: src/main.c:110
+#: src/main.c:112
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr ""
 
-#: src/main.c:112
+#: src/main.c:114
+#, fuzzy
+msgid "Attach file at PATH"
+msgstr "Legg ved fil"
+
+#: src/main.c:116
 msgid "Opens MAILBOXNAME"
 msgstr ""
 
-#: src/main.c:112
+#: src/main.c:116
 msgid "MAILBOXNAME"
 msgstr ""
 
-#: src/main.c:115
+#: src/main.c:119
 #, fuzzy
 msgid "Opens first unread mailbox"
 msgstr "Kan ikkje finna postkasse"
 
-#: src/main.c:133 src/main.c:138 src/main.c:144 src/main.c:150 src/main.c:156
+#: src/main.c:121
+#, fuzzy
+msgid "Debug POP3 connection"
+msgstr "Sambandstype"
+
+#: src/main.c:139 src/main.c:144 src/main.c:150 src/main.c:156 src/main.c:162
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
 msgstr ""
 
-#: src/main.c:133
+#: src/main.c:139
 msgid "Inbox"
 msgstr "Innboks"
 
-#: src/main.c:139
+#: src/main.c:145
 msgid "Outbox"
 msgstr "Utboks"
 
-#: src/main.c:145
+#: src/main.c:151
 #, fuzzy
 msgid "Sentbox"
 msgstr "Sendt"
 
-#: src/main.c:151
+#: src/main.c:157
 #, fuzzy
 msgid "Draftbox"
 msgstr "Kladd"
 
-#: src/main.c:156
+#: src/main.c:162
 msgid "Trash"
-msgstr "Sletta"
+msgstr "Papirkorg"
 
 #: src/message-window.c:63
 #, fuzzy
@@ -2420,1033 +2593,1005 @@ msgstr "Neste melding"
 #: src/message-window.c:124
 #, fuzzy
 msgid "Previous part in Message"
-msgstr "FÃ¸rre melding"
+msgstr "Førre melding"
 
-#: src/pref-manager.c:169
+#: src/pref-manager.c:165
 msgid "Text"
-msgstr "Tekst"
+msgstr ""
 
-#: src/pref-manager.c:170
-#, fuzzy
+#: src/pref-manager.c:166
 msgid "Icons"
-msgstr "Ikon:"
+msgstr ""
 
-#: src/pref-manager.c:171
+#: src/pref-manager.c:167
 msgid "Both"
 msgstr "Begge"
 
-#: src/pref-manager.c:181
+#: src/pref-manager.c:177
 #, fuzzy
 msgid "7bits"
 msgstr "Treff"
 
-#: src/pref-manager.c:182
+#: src/pref-manager.c:178
 #, fuzzy
 msgid "8bits"
 msgstr "8 bit"
 
-#: src/pref-manager.c:183
+#: src/pref-manager.c:179
 #, fuzzy
 msgid "quoted"
-msgstr "Sitat"
+msgstr "Dempa"
 
-#: src/pref-manager.c:193
+#: src/pref-manager.c:189
 #, fuzzy
 msgid "While Retrieving Messages"
-msgstr "Mottek meldingar frÃ¥ %1"
+msgstr "Hent meldingar"
 
-#: src/pref-manager.c:194
+#: src/pref-manager.c:190
 #, fuzzy
 msgid "Until Closed"
 msgstr "Utan tittel"
 
-#: src/pref-manager.c:195 src/pref-manager.c:2220
+#: src/pref-manager.c:191 src/pref-manager.c:2052
 msgid "Never"
 msgstr "Aldri"
 
-#: src/pref-manager.c:199
+#: src/pref-manager.c:195
 msgid "Fast"
 msgstr "Rask"
 
-#: src/pref-manager.c:200
+#: src/pref-manager.c:196
 msgid "Normal"
-msgstr "Normal"
+msgstr "Vanleg"
 
-#: src/pref-manager.c:201
+#: src/pref-manager.c:197
 #, fuzzy
 msgid "Bad Spellers"
-msgstr "Ã˜ydelagd fil"
+msgstr "DB-spesial"
 
-#: src/pref-manager.c:225
+#: src/pref-manager.c:221
 #, fuzzy
 msgid "Balsa Preferences"
-msgstr "Kaiman-innstillingar"
+msgstr "Kasbar-innstillingar"
 
-#: src/pref-manager.c:236 src/pref-manager.c:1118
-msgid "Identity"
-msgstr "Identitet"
-
-#: src/pref-manager.c:240 src/pref-manager.c:1141
-#, fuzzy
-msgid "Signature"
-msgstr "Signaturfil:"
-
-#: src/pref-manager.c:244
+#: src/pref-manager.c:232
 #, fuzzy
 msgid "Mail Servers"
 msgstr "E-posttenar"
 
-#: src/pref-manager.c:248 src/pref-manager.c:1937
+#: src/pref-manager.c:236 src/pref-manager.c:1768
 #, fuzzy
 msgid "Address Books"
 msgstr "Adressebok"
 
-#: src/pref-manager.c:252
+#: src/pref-manager.c:240
 #, fuzzy
 msgid "Mail Options"
 msgstr "Make-val"
 
-#: src/pref-manager.c:256 src/pref-manager.c:1558
+#: src/pref-manager.c:244 src/pref-manager.c:1368
 msgid "Display"
-msgstr "Vis"
+msgstr "Vising"
 
-#: src/pref-manager.c:260 src/sendmsg-window.c:151
+#: src/pref-manager.c:248 src/sendmsg-window.c:169
 msgid "Spelling"
 msgstr "Stavekontroll"
 
-#: src/pref-manager.c:264 src/pref-manager.c:1860
+#: src/pref-manager.c:252 src/pref-manager.c:1691
 msgid "Misc"
 msgstr "Ymse"
 
-#: src/pref-manager.c:268
+#: src/pref-manager.c:256
+#, fuzzy
 msgid "Startup"
-msgstr "Oppstart"
+msgstr "&Oppstart"
 
-#: src/pref-manager.c:950
+#: src/pref-manager.c:844
 msgid "Yes"
 msgstr "Ja"
 
-#: src/pref-manager.c:1122
-msgid "Your name:"
-msgstr "Namnet ditt:"
-
-#: src/pref-manager.c:1123
-#, fuzzy
-msgid "E-mail address:"
-msgstr "E-post-adresse:"
-
-#: src/pref-manager.c:1124
-#, fuzzy
-msgid "Reply-to address:"
-msgstr "Svaradresse:"
-
-#: src/pref-manager.c:1125
-#, fuzzy
-msgid "Default domain:"
-msgstr "Standard sending:"
-
-#: src/pref-manager.c:1146
-#, fuzzy
-msgid "Use signature file when:"
-msgstr "Bruk signatur frÃ¥ fil"
-
-#: src/pref-manager.c:1150
-#, fuzzy
-msgid "sending mail"
-msgstr "Sender post"
-
-#: src/pref-manager.c:1151
-#, fuzzy
-msgid "replying to mail"
-msgstr "Svar til alle:"
-
-#: src/pref-manager.c:1152
-#, fuzzy
-msgid "forwarding mail"
-msgstr "Feil ved lasting"
-
-#: src/pref-manager.c:1154
-#, fuzzy
-msgid "Signature file:"
-msgstr "Signaturfil:"
-
-#: src/pref-manager.c:1161
-#, fuzzy
-msgid "Select your signature file"
-msgstr "Vel ei biletefil"
-
-#: src/pref-manager.c:1169
-#, fuzzy
-msgid "Reply prefix:"
-msgstr "svar-prefiks:"
-
-#: src/pref-manager.c:1172
-#, fuzzy
-msgid "Enable signature separator"
-msgstr "inkluder signatur"
-
-#: src/pref-manager.c:1173
-msgid "Insert signature before quoted messages"
-msgstr ""
-
-#: src/pref-manager.c:1198
+#: src/pref-manager.c:1007
 #, fuzzy
 msgid "Remote Mailbox Servers"
 msgstr "E-posttenar"
 
-#: src/pref-manager.c:1220 src/pref-manager.c:1959
+#: src/pref-manager.c:1029 src/pref-manager.c:1790
 msgid "Type"
 msgstr "Type"
 
-#: src/pref-manager.c:1223
+#: src/pref-manager.c:1032
 #, fuzzy
 msgid "Mailbox Name"
 msgstr "Postkasse-type"
 
-#: src/pref-manager.c:1229 src/pref-manager.c:1971
+#: src/pref-manager.c:1038 src/pref-manager.c:1802
 msgid "Modify"
 msgstr "Endra"
 
-#: src/pref-manager.c:1232
+#: src/pref-manager.c:1041
 #, fuzzy
 msgid "Local mail"
 msgstr "&Lokal postboks"
 
-#: src/pref-manager.c:1242
+#: src/pref-manager.c:1051
 #, fuzzy
 msgid "Select your local mail directory"
-msgstr "Velg ein katalog"
+msgstr "Vel ein katalog"
 
-#: src/pref-manager.c:1251
+#: src/pref-manager.c:1061
 #, fuzzy
 msgid "Outgoing mail"
-msgstr "Tenar for &utgÃ¥ande e-post:"
+msgstr "&Utgåande e-post"
 
-#: src/pref-manager.c:1273
+#: src/pref-manager.c:1073
 #, fuzzy
-msgid "Port"
-msgstr "Port:"
+msgid "Remote SMTP Server"
+msgstr "IPP-tenar over nettverk"
 
-#: src/pref-manager.c:1280
+#: src/pref-manager.c:1082
+msgid "User"
+msgstr "Brukar"
+
+#: src/pref-manager.c:1091
 #, fuzzy
-msgid "Remote SMTP server"
-msgstr "Name=FTP-tenar"
+msgid "Pass Phrase"
+msgstr "PGP-passordtekst"
 
-#: src/pref-manager.c:1289
-#, fuzzy
-msgid "Local mail transport agent"
-msgstr "Lokalt filnamn"
-
-#: src/pref-manager.c:1315
+#: src/pref-manager.c:1117
 #, fuzzy
 msgid "Incoming"
 msgstr "Innkommande samtale"
 
-#: src/pref-manager.c:1317
+#: src/pref-manager.c:1119
 #, fuzzy
 msgid "Outgoing"
 msgstr "Demping"
 
-#: src/pref-manager.c:1343
+#: src/pref-manager.c:1145
 #, fuzzy
 msgid "Checking"
 msgstr "Sjekk"
 
-#: src/pref-manager.c:1351 src/pref-manager.c:1889
-#, fuzzy
+#: src/pref-manager.c:1153 src/pref-manager.c:1720
 msgid "minutes"
-msgstr "Minutt"
+msgstr "minutt"
 
-#: src/pref-manager.c:1363
+#: src/pref-manager.c:1165
 #, fuzzy
 msgid "Check mail automatically every:"
-msgstr "sjÃ¥ automatisk etter nye artiklar"
+msgstr "Legg til sig&natur automatisk"
 
 #. Quoted text regular expression
-#: src/pref-manager.c:1369
+#: src/pref-manager.c:1171
 #, fuzzy
 msgid "Quoted Text"
 msgstr "Venstre sitatteikn"
 
-#: src/pref-manager.c:1377
+#: src/pref-manager.c:1179
 #, fuzzy
 msgid "Quoted Text Regular Expression"
-msgstr "RegulÃ¦rt uttrykk"
+msgstr "Regulært uttrykk"
 
 #. How to handle received MDN requests
-#: src/pref-manager.c:1385
+#: src/pref-manager.c:1187
 msgid "Message Disposition Notification requests"
 msgstr ""
 
-#: src/pref-manager.c:1393
+#: src/pref-manager.c:1195
 msgid ""
 "When I receive a message and its sender requested to return a\n"
 "Message Disposition Notification (MDN), send it in the following cases:"
 msgstr ""
 
-#: src/pref-manager.c:1404
+#: src/pref-manager.c:1206
 msgid ""
 "the message header looks clean\n"
 "(the notify-to address is equal to the return path, I am in the to or cc "
 "list)"
 msgstr ""
 
-#: src/pref-manager.c:1419
+#: src/pref-manager.c:1221
 msgid "the message header looks suspicious"
 msgstr ""
 
-#: src/pref-manager.c:1454
+#: src/pref-manager.c:1256
 #, fuzzy
 msgid "Word Wrap"
 msgstr "Tekstbryting:"
 
-#: src/pref-manager.c:1464
+#: src/pref-manager.c:1266
 msgid "Wrap Outgoing Text at:"
 msgstr ""
 
-#: src/pref-manager.c:1477
+#: src/pref-manager.c:1279
 msgid "Characters"
 msgstr "Teikn"
 
-#: src/pref-manager.c:1481
+#: src/pref-manager.c:1283
 msgid "Other options"
 msgstr "Andre val"
 
-#: src/pref-manager.c:1488
+#: src/pref-manager.c:1292
 #, fuzzy
-msgid "Default Bcc to:"
-msgstr "Standardkatalog"
+msgid "Reply prefix:"
+msgstr "svar-prefiks:"
 
-#: src/pref-manager.c:1489
-#, fuzzy
-msgid "Default Reply string:"
-msgstr "Standard sending:"
+#: src/pref-manager.c:1295
+msgid "Send button always queues outgoing mail in outbox"
+msgstr ""
 
-#: src/pref-manager.c:1490
-#, fuzzy
-msgid "Default Forward string:"
-msgstr "Standard sending:"
-
-#: src/pref-manager.c:1492
+#: src/pref-manager.c:1299
 msgid "Encoding"
 msgstr "Koding"
 
-#: src/pref-manager.c:1559
+#: src/pref-manager.c:1369
 #, fuzzy
 msgid "Main window"
 msgstr "Hovudvindauge"
 
-#: src/pref-manager.c:1565
+#: src/pref-manager.c:1375
 #, fuzzy
 msgid "Use preview pane"
-msgstr "FÃ¸rehandsvis i"
+msgstr "(inga førehandsvising)"
 
-#: src/pref-manager.c:1567
+#: src/pref-manager.c:1377
 msgid "Show mailbox statistics in left pane"
 msgstr ""
 
-#: src/pref-manager.c:1569
+#: src/pref-manager.c:1379
 msgid "Use alternative main window layout"
 msgstr ""
 
-#: src/pref-manager.c:1571
+#: src/pref-manager.c:1381
+#, fuzzy
 msgid "Automatically view message when mailbox opened"
-msgstr ""
+msgstr "Signer automatisk meldingar ved hjelp av PGP"
 
-#: src/pref-manager.c:1576
+#: src/pref-manager.c:1383
+#, fuzzy
+msgid "Display message size as number of lines"
+msgstr "Vis meldingstorleik"
+
+#: src/pref-manager.c:1388
 msgid "Toolbars"
-msgstr "VerktÃ¸ylinjer"
+msgstr "Verktøylinjer"
 
-#: src/pref-manager.c:1593
+#: src/pref-manager.c:1405
 #, fuzzy
 msgid "Display progress dialog"
-msgstr "Vis bilete pÃ¥ sida"
+msgstr "Framgangsdialog"
 
-#: src/pref-manager.c:1599
+#: src/pref-manager.c:1411
 #, fuzzy
 msgid "Display Formats"
 msgstr "Skrifttype i teiknruta"
 
-#: src/pref-manager.c:1607
+#: src/pref-manager.c:1419
 msgid "Date encoding (for strftime):"
 msgstr ""
 
-#: src/pref-manager.c:1608
+#: src/pref-manager.c:1420
 #, fuzzy
 msgid "Selected headers:"
 msgstr "Utvalte brukarar"
 
-#: src/pref-manager.c:1624
+#: src/pref-manager.c:1436
 #, fuzzy
 msgid "Status Messages"
-msgstr "Meldingar"
+msgstr "Lagra melding"
 
-#: src/pref-manager.c:1625 src/pref-manager.c:1635
+#: src/pref-manager.c:1437 src/pref-manager.c:1447
 #, fuzzy
 msgid "Information Messages"
-msgstr "Informasjon"
+msgstr "Informasjonsmeldingar"
 
-#: src/pref-manager.c:1639
+#: src/pref-manager.c:1451
 #, fuzzy
 msgid "Warning Messages"
 msgstr "Markerer meldingar"
 
-#: src/pref-manager.c:1643
+#: src/pref-manager.c:1455
 msgid "Error Messages"
 msgstr "Feilmeldingar"
 
-#: src/pref-manager.c:1647
+#: src/pref-manager.c:1459
 #, fuzzy
 msgid "Fatal Error Messages"
 msgstr "Feilmeldingar"
 
-#: src/pref-manager.c:1651
+#: src/pref-manager.c:1463
 #, fuzzy
 msgid "Debug Messages"
-msgstr "Meldingar"
+msgstr "Send meldingar"
 
-#: src/pref-manager.c:1658
-#, fuzzy
+#: src/pref-manager.c:1470
 msgid "Colors"
 msgstr "Fargar"
 
-#: src/pref-manager.c:1660
+#: src/pref-manager.c:1472
 #, fuzzy
 msgid "Mailbox Colors"
-msgstr "KCalc-oppsett"
+msgstr "Linux-fargar"
 
-#: src/pref-manager.c:1666
-#, fuzzy
+#: src/pref-manager.c:1478
 msgid "Mailbox with unread messages color"
-msgstr "Sender meldingar til %1"
-
-#: src/pref-manager.c:1668
-#, fuzzy
-msgid "Message Colors"
-msgstr "Melding"
-
-#: src/pref-manager.c:1674
-#, c-format
-msgid "Quote level %d color"
 msgstr ""
 
-#: src/pref-manager.c:1682
+#: src/pref-manager.c:1480
 #, fuzzy
-msgid "Fonts"
-msgstr "Skrifttype"
+msgid "Message Colors"
+msgstr "Meldingsklasse"
 
-#: src/pref-manager.c:1684
+#: src/pref-manager.c:1491
+#, fuzzy, c-format
+msgid "Quote level %d color"
+msgstr "X-etikettfarge"
+
+#: src/pref-manager.c:1503
+msgid "Link Color"
+msgstr "Lenkjefarge"
+
+#: src/pref-manager.c:1508
+#, fuzzy
+msgid "Hyperlink color"
+msgstr "Vekslande farge"
+
+#: src/pref-manager.c:1513
+msgid "Fonts"
+msgstr "Skrifttypar"
+
+#: src/pref-manager.c:1515
 #, fuzzy
 msgid "Preview Font"
-msgstr "FÃ¸rehandsvis i"
+msgstr "Førehandsvis i"
 
-#: src/pref-manager.c:1701 src/pref-manager.c:1735
+#: src/pref-manager.c:1532 src/pref-manager.c:1566
 #, fuzzy
 msgid "Select a font to use"
 msgstr "Velg skrifttypar"
 
-#: src/pref-manager.c:1704 src/pref-manager.c:1738
-#, fuzzy
+#: src/pref-manager.c:1535 src/pref-manager.c:1569
 msgid "Select..."
-msgstr "&Slett ..."
+msgstr "Velg ..."
 
-#: src/pref-manager.c:1711 src/pref-manager.c:1746
+#: src/pref-manager.c:1542 src/pref-manager.c:1577
 #, fuzzy
 msgid "Preview pane"
-msgstr "FÃ¸rehandsvis i"
+msgstr "Førehandsvis i"
 
 #. Subject Font
-#: src/pref-manager.c:1719
+#: src/pref-manager.c:1550
 #, fuzzy
 msgid "Subject Header Font"
-msgstr "Emne + &FrÃ¥"
+msgstr "Emne + &Frå"
 
 #. pspell frame
-#: src/pref-manager.c:1799
+#: src/pref-manager.c:1630
 #, fuzzy
 msgid "Pspell Settings"
-msgstr "Visingsinnstillingar"
+msgstr "Signalinnstillingar"
 
 #. do the module menu
-#: src/pref-manager.c:1805
+#: src/pref-manager.c:1636
 #, fuzzy
 msgid "Spell Check Module"
 msgstr "Stavekontroll"
 
-#: src/pref-manager.c:1811
+#: src/pref-manager.c:1642
 #, fuzzy
 msgid "Suggestion Level"
 msgstr "Forslag:"
 
-#: src/pref-manager.c:1819
+#: src/pref-manager.c:1650
 msgid "Ignore words shorter than"
 msgstr ""
 
 #. ignore signature check box
-#: src/pref-manager.c:1826
+#: src/pref-manager.c:1657
 #, fuzzy
 msgid "Misc Spelling Settings"
-msgstr "Visingsinnstillingar"
+msgstr "Ymse innstillingar"
 
-#: src/pref-manager.c:1832
+#: src/pref-manager.c:1663
 #, fuzzy
 msgid "Check signature"
-msgstr "Signaturfil:"
+msgstr "Vel signatur"
 
-#: src/pref-manager.c:1836
+#: src/pref-manager.c:1667
 #, fuzzy
 msgid "Check quoted"
-msgstr "Sitat"
+msgstr "Sjekk port"
 
-#: src/pref-manager.c:1866
+#: src/pref-manager.c:1697
 msgid "Debug"
-msgstr "Feilfinning"
+msgstr "Avlusing"
 
-#: src/pref-manager.c:1870
+#: src/pref-manager.c:1701
 #, fuzzy
 msgid "Empty Trash on exit"
 msgstr "TÃ¸m papirkorg ved avslutting"
 
-#: src/pref-manager.c:1878
+#: src/pref-manager.c:1709
 msgid "Automatically close mailbox if unused more than"
 msgstr ""
 
-#: src/pref-manager.c:1905
+#: src/pref-manager.c:1736
 msgid "Options"
 msgstr "Val"
 
-#: src/pref-manager.c:1912
+#: src/pref-manager.c:1743
 #, fuzzy
 msgid "Check mail upon startup"
 msgstr "Lag reservekopi ved oppstart"
 
-#: src/pref-manager.c:1917
+#: src/pref-manager.c:1748
 msgid "Remember open mailboxes between sessions"
 msgstr ""
 
-#: src/pref-manager.c:1962
+#: src/pref-manager.c:1793
 #, fuzzy
 msgid "Address Book Name"
 msgstr "Adressebok"
 
-#: src/pref-manager.c:1966
+#: src/pref-manager.c:1797
 #, fuzzy
 msgid "Expand aliases"
 msgstr "Utvid/komprimer"
 
-#: src/pref-manager.c:1973
+#: src/pref-manager.c:1804
 msgid "Set as default"
 msgstr "Bruk som standard"
 
-#: src/pref-manager.c:2208
+#: src/pref-manager.c:2040
 #, fuzzy
 msgid "Show nothing"
-msgstr "Gjer &ingenting"
+msgstr "Ikkje gjer &noko"
 
-#: src/pref-manager.c:2209
+#: src/pref-manager.c:2041
 #, fuzzy
 msgid "Show dialog"
-msgstr "Vis KDM-logo"
+msgstr "Vis logo"
 
-#: src/pref-manager.c:2210
+#: src/pref-manager.c:2042
 #, fuzzy
 msgid "Show in list"
-msgstr "Vis eining"
+msgstr "Vis filliste"
 
-#: src/pref-manager.c:2211
+#: src/pref-manager.c:2043
 #, fuzzy
 msgid "Print to console"
-msgstr "Utskrift til skrivar:"
+msgstr "Utskrift til fil"
 
-#: src/pref-manager.c:2221
+#: src/pref-manager.c:2053
+#, fuzzy
 msgid "Ask me"
-msgstr ""
+msgstr "Oppgåvenamn"
 
-#: src/print.c:41
+#: src/print.c:42
 msgid ""
 "This version of balsa is compiled without gnome-print support.\n"
 "Printing is not possible."
 msgstr ""
 
-#: src/print.c:283
+#. print the page number
+#: src/print.c:269
+#, fuzzy, c-format
+msgid "Page: %i/%i"
+msgstr "Side %1"
+
+#. gather some info about this part
+#. four fields, one terminator
+#: src/print.c:600
+msgid "Type:"
+msgstr "Type:"
+
+#: src/print.c:603
+msgid "Filename:"
+msgstr ""
+
+#: src/print.c:817
+#, fuzzy, c-format
+msgid "Balsa could not find paper type \"%s\".\n"
+msgstr ""
+"Kunne ikkje finna mime-type\n"
+"%1"
+
+#: src/print.c:819
+#, c-format
+msgid "Using paper type \"%s\" from /etc/paper.config instead\n"
+msgstr ""
+
+#: src/print.c:933
 #, c-format
 msgid ""
 "Balsa could not find font %s\n"
 "Printing is not possible"
 msgstr ""
 
-#: src/print.c:324
+#: src/print.c:974
 #, fuzzy
 msgid "Print message"
-msgstr "Skriv ut omrÃ¥de"
+msgstr "Signer melding"
 
-#: src/print.c:350
+#: src/print.c:1000
 #, fuzzy
 msgid "Balsa: message print preview"
 msgstr "Resultatvindauge"
 
-#: src/print.c:464
-#, fuzzy, c-format
-msgid "Page: %i/%i"
-msgstr "Side %1"
-
-#: src/sendmsg-window.c:136
+#: src/sendmsg-window.c:148
 msgid "Send"
-msgstr "Send"
+msgstr ""
 
-#: src/sendmsg-window.c:136 src/sendmsg-window.c:178
+#: src/sendmsg-window.c:148 src/sendmsg-window.c:201
 #, fuzzy
 msgid "Send this message"
-msgstr "Send e-post"
+msgstr "Sen melding"
 
-#: src/sendmsg-window.c:141
+#: src/sendmsg-window.c:153
 #, fuzzy
 msgid "Attach"
 msgstr "&Legg ved"
 
-#: src/sendmsg-window.c:142
+#: src/sendmsg-window.c:154
 #, fuzzy
 msgid "Add attachments to this message"
 msgstr "Vedleggseigenskapar"
 
-#: src/sendmsg-window.c:146
+#: src/sendmsg-window.c:158
 #, fuzzy
 msgid "Postpone"
 msgstr "Posisjon"
 
-#: src/sendmsg-window.c:147
+#: src/sendmsg-window.c:159
 #, fuzzy
 msgid "Continue this message later"
 msgstr "Ikkje vis denne meldinga igjen"
 
-#: src/sendmsg-window.c:153
+#: src/sendmsg-window.c:163 src/sendmsg-window.c:614
+#, fuzzy
+msgid "Select Identity"
+msgstr " Identitet"
+
+#: src/sendmsg-window.c:164
+#, fuzzy
+msgid "Set identity to use for this message"
+msgstr "Ikkje ha offentleg nøkkel for denne meldinga"
+
+#: src/sendmsg-window.c:171
 #, fuzzy
 msgid "Run a spell check on the current message"
-msgstr "Lastar sida om att"
+msgstr "Berre kontroller stavinga til denne programteksten."
 
-#: src/sendmsg-window.c:160
+#: src/sendmsg-window.c:178
 #, fuzzy
 msgid "Cancel this message"
-msgstr "Svar til avsendar:"
+msgstr "Lukk melding"
 
-#: src/sendmsg-window.c:167
+#: src/sendmsg-window.c:190
 #, fuzzy
 msgid "_Include File..."
 msgstr "Inkluder fil"
 
-#: src/sendmsg-window.c:171
+#: src/sendmsg-window.c:194
 #, fuzzy
 msgid "_Attach File..."
-msgstr "Legg ved fil"
+msgstr "Legg ved &fil ..."
 
-#: src/sendmsg-window.c:177
+#: src/sendmsg-window.c:200
 #, fuzzy
 msgid "_Send"
-msgstr "Send"
+msgstr "Avsendar"
 
-#: src/sendmsg-window.c:182
+#: src/sendmsg-window.c:205
+#, fuzzy
 msgid "_Queue"
-msgstr ""
+msgstr "Kø"
 
-#: src/sendmsg-window.c:183
+#: src/sendmsg-window.c:206
+#, fuzzy
 msgid "Queue this message in Outbox for sending"
-msgstr ""
+msgstr "denne meldinga er brukt, men ikkje definert i %s"
 
-#: src/sendmsg-window.c:187
+#: src/sendmsg-window.c:210
 #, fuzzy
 msgid "_Postpone"
 msgstr "Posisjon"
 
-#: src/sendmsg-window.c:191
+#: src/sendmsg-window.c:214
 #, fuzzy
 msgid "Print..."
 msgstr "Skriv &ut ..."
 
-#: src/sendmsg-window.c:191
+#: src/sendmsg-window.c:214
 #, fuzzy
 msgid "Print the edited message"
 msgstr "Skriv databasen"
 
-#: src/sendmsg-window.c:208
+#: src/sendmsg-window.c:231
 msgid "Select All"
 msgstr "Vel alle"
 
-#: src/sendmsg-window.c:213
+#: src/sendmsg-window.c:236
 msgid "_Wrap Body"
 msgstr ""
 
-#: src/sendmsg-window.c:218
+#: src/sendmsg-window.c:241
+#, fuzzy
+msgid "Insert _Signature"
+msgstr "Sett inn bilete"
+
+#: src/sendmsg-window.c:246
 #, fuzzy
 msgid "_Reflow Paragraph"
-msgstr "Avsnitt"
+msgstr "&Avsnitt ..."
 
-#: src/sendmsg-window.c:222
+#: src/sendmsg-window.c:250
 #, fuzzy
 msgid "R_eflow Message"
 msgstr "Ny melding"
 
-#: src/sendmsg-window.c:227
+#: src/sendmsg-window.c:255
 #, fuzzy
 msgid "Check Spelling"
 msgstr "Stavekontroll"
 
-#: src/sendmsg-window.c:236
+#: src/sendmsg-window.c:256
+#, fuzzy
+msgid "Check the spelling of the message"
+msgstr "Kontroller rettskriving"
+
+#: src/sendmsg-window.c:261
+#, fuzzy
+msgid "Select Identity..."
+msgstr "Vel modemtype ..."
+
+#: src/sendmsg-window.c:262
+msgid "Select the Identity to use for the message"
+msgstr ""
+
+#: src/sendmsg-window.c:270
 #, fuzzy
 msgid "Fr_om"
-msgstr "FrÃ¥"
+msgstr "Frå"
 
-#: src/sendmsg-window.c:238
+#: src/sendmsg-window.c:272
 #, fuzzy
 msgid "_To"
 msgstr "Til"
 
-#: src/sendmsg-window.c:240
+#: src/sendmsg-window.c:274
 #, fuzzy
 msgid "_Subject"
 msgstr "Emne"
 
-#: src/sendmsg-window.c:242
+#: src/sendmsg-window.c:276
 #, fuzzy
 msgid "_Cc"
 msgstr "&Cc"
 
-#: src/sendmsg-window.c:244
+#: src/sendmsg-window.c:278
 #, fuzzy
 msgid "_Bcc"
 msgstr "&Bcc"
 
-#: src/sendmsg-window.c:246
+#: src/sendmsg-window.c:280
+#, fuzzy
 msgid "_Fcc"
-msgstr ""
+msgstr "cc"
 
-#: src/sendmsg-window.c:248
+#: src/sendmsg-window.c:282
 #, fuzzy
 msgid "_Reply To"
 msgstr "&Svar til"
 
-#: src/sendmsg-window.c:250
+#: src/sendmsg-window.c:284
 #, fuzzy
 msgid "_Attachments"
 msgstr "Vedlegg"
 
-#: src/sendmsg-window.c:253
+#: src/sendmsg-window.c:287
 #, fuzzy
 msgid "_Comments"
 msgstr "Kommentar"
 
-#: src/sendmsg-window.c:256
+#: src/sendmsg-window.c:290
 #, fuzzy
 msgid "_Keywords"
-msgstr "&NÃ¸kkelord"
+msgstr "Stikkord"
 
-#: src/sendmsg-window.c:294 src/sendmsg-window.c:383
+#: src/sendmsg-window.c:328 src/sendmsg-window.c:422
 msgid "Brazilian"
 msgstr "Brasiliansk"
 
-#: src/sendmsg-window.c:295 src/sendmsg-window.c:385
+#: src/sendmsg-window.c:329 src/sendmsg-window.c:424
 #, fuzzy
 msgid "Catalan"
 msgstr "Name=Katalansk"
 
-#: src/sendmsg-window.c:296 src/sendmsg-window.c:387
+#: src/sendmsg-window.c:330 src/sendmsg-window.c:426
 msgid "Danish"
 msgstr "Dansk"
 
-#: src/sendmsg-window.c:297 src/sendmsg-window.c:391
+#: src/sendmsg-window.c:331 src/sendmsg-window.c:430
 #, fuzzy
 msgid "Dutch"
 msgstr "Name=Nederlandsk"
 
-#: src/sendmsg-window.c:298 src/sendmsg-window.c:393
+#: src/sendmsg-window.c:332 src/sendmsg-window.c:432
 msgid "English"
 msgstr "Engelsk"
 
-#: src/sendmsg-window.c:299 src/sendmsg-window.c:395
-#, fuzzy
+#: src/sendmsg-window.c:333 src/sendmsg-window.c:434
 msgid "Estonian"
-msgstr "Estland"
+msgstr "Estisk"
 
-#: src/sendmsg-window.c:300 src/sendmsg-window.c:397
+#: src/sendmsg-window.c:334 src/sendmsg-window.c:436
 msgid "Finnish"
 msgstr "Finsk"
 
-#: src/sendmsg-window.c:301 src/sendmsg-window.c:399
+#: src/sendmsg-window.c:335 src/sendmsg-window.c:438
 msgid "French"
 msgstr "Fransk"
 
-#: src/sendmsg-window.c:302 src/sendmsg-window.c:389
+#: src/sendmsg-window.c:336 src/sendmsg-window.c:428
 msgid "German"
 msgstr "Tysk"
 
-#: src/sendmsg-window.c:303 src/sendmsg-window.c:401
-#, fuzzy
+#: src/sendmsg-window.c:337 src/sendmsg-window.c:440
 msgid "Greek"
-msgstr "GrÃ¸n"
+msgstr "Gresk"
 
-#: src/sendmsg-window.c:304 src/sendmsg-window.c:403
+#: src/sendmsg-window.c:338 src/sendmsg-window.c:442
 msgid "Hungarian"
 msgstr "Ungarsk"
 
-#: src/sendmsg-window.c:305 src/sendmsg-window.c:405
+#: src/sendmsg-window.c:339 src/sendmsg-window.c:444
 msgid "Italian"
 msgstr "Italiensk"
 
-#: src/sendmsg-window.c:306 src/sendmsg-window.c:407
+#: src/sendmsg-window.c:340 src/sendmsg-window.c:446
 msgid "Japanese"
 msgstr "Japansk"
 
-#: src/sendmsg-window.c:311 src/sendmsg-window.c:409
-#, fuzzy
+#: src/sendmsg-window.c:345 src/sendmsg-window.c:448
 msgid "Korean"
-msgstr "Korn"
+msgstr "Koreansk"
 
-#: src/sendmsg-window.c:312 src/sendmsg-window.c:411
+#: src/sendmsg-window.c:346 src/sendmsg-window.c:450
 msgid "Latvian"
 msgstr ""
 
-#: src/sendmsg-window.c:313 src/sendmsg-window.c:413
+#: src/sendmsg-window.c:347 src/sendmsg-window.c:452
 msgid "Lithuanian"
-msgstr ""
+msgstr "Litauisk"
 
-#: src/sendmsg-window.c:314 src/sendmsg-window.c:415
+#: src/sendmsg-window.c:348 src/sendmsg-window.c:454
 msgid "Norwegian"
 msgstr "Norsk"
 
-#: src/sendmsg-window.c:315 src/sendmsg-window.c:417
+#: src/sendmsg-window.c:349 src/sendmsg-window.c:456
 msgid "Polish"
 msgstr "Polsk"
 
-#: src/sendmsg-window.c:316 src/sendmsg-window.c:419
+#: src/sendmsg-window.c:350 src/sendmsg-window.c:458
 msgid "Portugese"
 msgstr "Portugisisk"
 
-#: src/sendmsg-window.c:317 src/sendmsg-window.c:421
-#, fuzzy
+#: src/sendmsg-window.c:351 src/sendmsg-window.c:460
 msgid "Romanian"
-msgstr "Estland"
+msgstr "Rumensk"
 
-#: src/sendmsg-window.c:318 src/sendmsg-window.c:423
+#: src/sendmsg-window.c:352 src/sendmsg-window.c:462
 #, fuzzy
 msgid "Russian (ISO)"
 msgstr "Russisk"
 
-#: src/sendmsg-window.c:319 src/sendmsg-window.c:425
+#: src/sendmsg-window.c:353 src/sendmsg-window.c:464
 #, fuzzy
 msgid "Russian (KOI)"
 msgstr "Russisk"
 
-#: src/sendmsg-window.c:320 src/sendmsg-window.c:427
-#, fuzzy
+#: src/sendmsg-window.c:354 src/sendmsg-window.c:466
 msgid "Slovak"
-msgstr "Slovakia"
+msgstr "Slovakisk"
 
-#: src/sendmsg-window.c:321 src/sendmsg-window.c:429
+#: src/sendmsg-window.c:355 src/sendmsg-window.c:468
 msgid "Spanish"
 msgstr "Spansk"
 
-#: src/sendmsg-window.c:322 src/sendmsg-window.c:431
+#: src/sendmsg-window.c:356 src/sendmsg-window.c:470
 msgid "Swedish"
 msgstr "Svensk"
 
-#: src/sendmsg-window.c:323 src/sendmsg-window.c:433
-#, fuzzy
+#: src/sendmsg-window.c:357 src/sendmsg-window.c:472
 msgid "Turkish"
-msgstr "Name=Tyrkisk"
+msgstr ""
 
-#: src/sendmsg-window.c:324 src/sendmsg-window.c:435
+#: src/sendmsg-window.c:358 src/sendmsg-window.c:474
 #, fuzzy
 msgid "Ukrainian"
-msgstr "Name=Ukrainsk"
+msgstr "Brasiliansk"
 
-#: src/sendmsg-window.c:331
+#: src/sendmsg-window.c:365
 msgid "_A-J"
 msgstr ""
 
-#: src/sendmsg-window.c:332
+#: src/sendmsg-window.c:366
 msgid "_K-Z"
 msgstr ""
 
-#: src/sendmsg-window.c:341
+#: src/sendmsg-window.c:377
 msgid "_Request Disposition Notification"
 msgstr ""
 
-#: src/sendmsg-window.c:368
+#: src/sendmsg-window.c:379
+msgid "_Always Queue Sent Mail"
+msgstr ""
+
+#: src/sendmsg-window.c:407
 #, fuzzy
 msgid "_Show"
-msgstr "Vis"
+msgstr "Vis meny"
 
-#: src/sendmsg-window.c:370
+#: src/sendmsg-window.c:409
 #, fuzzy
 msgid "_Language"
-msgstr "SprÃ¥k"
+msgstr "Språk"
 
-#: src/sendmsg-window.c:372
+#: src/sendmsg-window.c:411
 #, fuzzy
 msgid "_Options"
 msgstr "Val"
 
-#: src/sendmsg-window.c:652
+#: src/sendmsg-window.c:761
 #, c-format
 msgid ""
 "The attachment pixmap (%s) cannot be used.\n"
 " %s"
 msgstr ""
 
-#: src/sendmsg-window.c:658
+#: src/sendmsg-window.c:767
 msgid ""
 "Default attachment pixmap (balsa/attachment.png) cannot be found:\n"
 "Your balsa installation is corrupted."
 msgstr ""
 
-#: src/sendmsg-window.c:671
+#: src/sendmsg-window.c:780
 #, fuzzy, c-format
 msgid "Cannot get info on file '%s': %s"
 msgstr ""
-"Kan ikkje endra lÃ¸yve for fila %1\n"
+"Kan ikkje endra løyve for fila %1\n"
 "Feil: %2"
 
-#: src/sendmsg-window.c:676
-#, fuzzy, c-format
+#: src/sendmsg-window.c:785
+#, c-format
 msgid "Attachment %s is not a regular file."
-msgstr "%1 finst, men er inga vanleg fil"
+msgstr "Vedlegg %s er inga vanleg fil."
 
-#: src/sendmsg-window.c:679
+#: src/sendmsg-window.c:788
 #, c-format
 msgid "File %s cannot be read\n"
-msgstr ""
+msgstr "Fil %s kan ikkje lesas\n"
 
-#: src/sendmsg-window.c:746
-#, fuzzy
+#: src/sendmsg-window.c:855
 msgid "Attach file"
 msgstr "Legg ved fil"
 
 #. Reply To:
-#: src/sendmsg-window.c:993
-#, fuzzy
+#: src/sendmsg-window.c:1104
 msgid "Reply To:"
-msgstr "&Svar til:"
-
-#. Attachment list
-#: src/sendmsg-window.c:997
-#, fuzzy
-msgid "Attachments:"
-msgstr "Vedlegg"
-
-#. Comments:
-#: src/sendmsg-window.c:1042
-#, fuzzy
-msgid "Comments:"
-msgstr "Kommentar:"
-
-#. Keywords:
-#: src/sendmsg-window.c:1045
-#, fuzzy
-msgid "Keywords:"
-msgstr "NÃ¸&kkelord:"
-
-#: src/sendmsg-window.c:1139
-#, fuzzy
-msgid "you"
-msgstr "Stil"
-
-#: src/sendmsg-window.c:1144
-#, fuzzy, c-format
-msgid "On %s %s wrote:\n"
-msgstr "%D, skreiv %F:"
-
-#: src/sendmsg-window.c:1147
-#, fuzzy, c-format
-msgid "%s wrote:\n"
-msgstr "%D, skreiv %F:"
-
-#: src/sendmsg-window.c:1238
-#, fuzzy
-msgid "Reply to "
 msgstr "Svar til:"
 
-#: src/sendmsg-window.c:1243
-#, fuzzy
+#. Attachment list
+#: src/sendmsg-window.c:1110
+msgid "Attachments:"
+msgstr "Vedlegg:"
+
+#. Comments:
+#: src/sendmsg-window.c:1155
+msgid "Comments:"
+msgstr "Kommentarar:"
+
+#. Keywords:
+#: src/sendmsg-window.c:1158
+msgid "Keywords:"
+msgstr "Nøkkelord:"
+
+#: src/sendmsg-window.c:1252
+msgid "you"
+msgstr "deg"
+
+#: src/sendmsg-window.c:1257
+#, c-format
+msgid "On %s %s wrote:\n"
+msgstr "%s, skreiv %s:\n"
+
+#: src/sendmsg-window.c:1260
+#, c-format
+msgid "%s wrote:\n"
+msgstr "%s skreiv:\n"
+
+#: src/sendmsg-window.c:1377 src/sendmsg-window.c:1378
+msgid "Re:"
+msgstr "Re:"
+
+#: src/sendmsg-window.c:1406 src/sendmsg-window.c:1407
+msgid "Fwd:"
+msgstr "Fwd:"
+
+#: src/sendmsg-window.c:1464
+msgid "Reply to "
+msgstr "Svar til "
+
+#: src/sendmsg-window.c:1469
 msgid "Forward message"
-msgstr "Vidaresendt melding"
+msgstr "Vidaresend melding"
 
-#: src/sendmsg-window.c:1248
-#, fuzzy
+#: src/sendmsg-window.c:1474
 msgid "Continue message"
-msgstr "Lukk melding"
+msgstr "Fortsett melding"
 
-#: src/sendmsg-window.c:1253
-#, fuzzy
+#: src/sendmsg-window.c:1479
 msgid "New message"
 msgstr "Ny melding"
 
-#: src/sendmsg-window.c:1378 src/sendmsg-window.c:1379
-msgid "Re:"
-msgstr ""
-
-#: src/sendmsg-window.c:1404 src/sendmsg-window.c:1405
-msgid "Fwd:"
-msgstr ""
-
-#: src/sendmsg-window.c:1586
-#, fuzzy, c-format
+#: src/sendmsg-window.c:1766
+#, c-format
 msgid "Could not open the file %s.\n"
-msgstr "Kunne ikkje opna fila %1"
+msgstr "Kunne ikkje opna fila %s.\n"
 
-#: src/sendmsg-window.c:1588
+#: src/sendmsg-window.c:1768
 msgid "Loading..."
 msgstr "Lastar ..."
 
-#: src/sendmsg-window.c:1615
-#, fuzzy
+#: src/sendmsg-window.c:1795
 msgid "Include file"
 msgstr "Inkluder fil"
 
-#: src/sendmsg-window.c:1890
+#: src/sendmsg-window.c:2100
 msgid ""
 "Balsa has been compiled without gnome-print support.\n"
 "Printing is not possible."
 msgstr ""
 
-#: src/spell-check.c:482
+#: src/spell-check.c:484
 #, fuzzy
 msgid "Replace the current word with the selected suggestion"
-msgstr "Slett den valte brukarklassen"
+msgstr "Oppgi det nye namnet på den valte samlinga"
 
-#: src/spell-check.c:489
-#, fuzzy
+#: src/spell-check.c:491
 msgid "Replace all occurences of the current word with the selected suggestion"
-msgstr "Slett den valte brukarklassen"
-
-#: src/spell-check.c:496
-#, fuzzy
-msgid "Skip the current word"
-msgstr "noverande pott"
-
-#: src/spell-check.c:501
-msgid "Skip all occurances of the current word"
 msgstr ""
 
-#: src/spell-check.c:507
+#: src/spell-check.c:498
+msgid "Skip the current word"
+msgstr "Hopp over noverande ord"
+
+#: src/spell-check.c:503
+#, fuzzy
+msgid "Skip all occurances of the current word"
+msgstr "Last alle bileta i katalogen"
+
+#: src/spell-check.c:509
 msgid "Add the current word to your personal dictionary"
 msgstr ""
 
-#: src/spell-check.c:513
+#: src/spell-check.c:515
 #, fuzzy
 msgid "Finish spell checking"
-msgstr "KDE stavekontroll"
+msgstr "Val for redigering"
 
-#: src/spell-check.c:518
+#: src/spell-check.c:520
 msgid "Revert all changes and finish spell checking"
 msgstr ""
 
 #: src/store-address.c:54
-#, fuzzy
 msgid "Card Name:"
-msgstr "Kort 0:"
+msgstr "Namn på kort:"
 
 #: src/store-address.c:54
 msgid "First Name:"
-msgstr "FÃ¸renamn:"
+msgstr "Førenamn:"
 
 #: src/store-address.c:55
 msgid "Last Name:"
@@ -3470,187 +3615,21 @@ msgstr ""
 
 #: src/store-address.c:103
 msgid "This message doesn't contain an e-mail address.\n"
-msgstr ""
+msgstr "Denne meldinga har inga e-postadresse.\n"
 
 #: src/store-address.c:151
-#, fuzzy
 msgid "Store Address"
-msgstr "Gateadresse"
+msgstr "Lagre adresse"
 
 #: src/store-address.c:154
 msgid "Contact Information"
 msgstr "Kontaktinformasjon"
 
 #: src/store-address.c:245
-#, fuzzy
 msgid "No address book selected...."
-msgstr "Inga oppgÃ¥ve valt"
+msgstr "Inga adressebok valt..."
 
 #: src/store-address.c:257
 msgid "Sorry, no semicolons are allowed in the name!\n"
 msgstr ""
 
-#, fuzzy
-#~ msgid "Skipping CRAM-MD5 authentication."
-#~ msgstr "CHAP-autentisering"
-
-#, fuzzy
-#~ msgid "Add New Address"
-#~ msgstr "Legg til e-post-adresse"
-
-#, fuzzy
-#~ msgid "E-Mail Address:"
-#~ msgstr "E-postadresse:"
-
-#, fuzzy
-#~ msgid "Import first address only"
-#~ msgstr "Adresseredigerar"
-
-#, fuzzy
-#~ msgid "Import all adresses"
-#~ msgstr "Ingen e-postadresser."
-
-#~ msgid "Path"
-#~ msgstr "Sti"
-
-#, fuzzy
-#~ msgid ""
-#~ "This will remove the mailbox %s and it's files permanently from your "
-#~ "system.\n"
-#~ "Are you sure you want to remove this mailbox?"
-#~ msgstr ""
-#~ "Dette avsluttar spelet.\n"
-#~ "Er du sikker pÃ¥ at du vil gjera dette?"
-
-#, fuzzy
-#~ msgid "You need to fill in the Mailbox Name field."
-#~ msgstr ""
-#~ "Du fylte ikkje ut 'Namn'-feltet.\n"
-#~ "Dette feltet er pÃ¥kravd."
-
-#, fuzzy
-#~ msgid "You need to fill in the Mailbox Path field."
-#~ msgstr ""
-#~ "Du fylte ikkje ut 'Namn'-feltet.\n"
-#~ "Dette feltet er pÃ¥kravd."
-
-#, fuzzy
-#~ msgid "You need to fill in the folderpath field."
-#~ msgstr ""
-#~ "Du fylte ikkje ut 'Namn'-feltet.\n"
-#~ "Dette feltet er pÃ¥kravd."
-
-#, fuzzy
-#~ msgid "You need to fill in the IMAP Server field"
-#~ msgstr ""
-#~ "Du fylte ikkje ut 'Bilete'-feltet.\n"
-#~ "Dette feltet er pÃ¥kravd."
-
-#, fuzzy
-#~ msgid "You need to fill in the username field"
-#~ msgstr "Du mÃ¥ skriva inn eit brukarnamn."
-
-#, fuzzy
-#~ msgid "You need to fill in the user field."
-#~ msgstr "Du mÃ¥ skriva inn eit brukarnamn."
-
-#, fuzzy
-#~ msgid "You need to fill in the server field."
-#~ msgstr ""
-#~ "Du fylte ikkje ut 'Namn'-feltet.\n"
-#~ "Dette feltet er pÃ¥kravd."
-
-#, fuzzy
-#~ msgid "Could not access mailbox '%s'"
-#~ msgstr ""
-#~ "Fekk ikkje tilgang til\n"
-#~ "%1"
-
-#, fuzzy
-#~ msgid "New mailbox type:"
-#~ msgstr "Postkasse-type"
-
-#, fuzzy
-#~ msgid "Delete from server"
-#~ msgstr "Slett e-post frÃ¥ tenaren"
-
-#, fuzzy
-#~ msgid "_Mailbox..."
-#~ msgstr "Postkasse"
-
-#, fuzzy
-#~ msgid "Add New Mailbox..."
-#~ msgstr "Ny postkasse"
-
-#, fuzzy
-#~ msgid "N_o headers"
-#~ msgstr "alle deklarasjonsfiler"
-
-#, fuzzy
-#~ msgid "_Selected headers"
-#~ msgstr "Utvalte brukarar"
-
-#, fuzzy
-#~ msgid "All _headers"
-#~ msgstr "alle deklarasjonsfiler"
-
-#~ msgid "Printing"
-#~ msgstr "Utskrift"
-
-#, fuzzy
-#~ msgid ">"
-#~ msgstr ">>"
-
-#, fuzzy
-#~ msgid "Informational Messages"
-#~ msgstr "Interne meldingar"
-
-#, fuzzy
-#~ msgid "characters"
-#~ msgstr "Teikn"
-
-#, fuzzy
-#~ msgid "Break line at:"
-#~ msgstr "Brotpunkt"
-
-#~ msgid "Charset"
-#~ msgstr "Teiknsett"
-
-#~ msgid "Browse..."
-#~ msgstr "Bla gjennom ..."
-
-#, fuzzy
-#~ msgid "Colour of quoted text"
-#~ msgstr "Farge for &siterte teikn:"
-
-#, fuzzy
-#~ msgid "Primary colour"
-#~ msgstr "PrimÃ¦rgruppe"
-
-#, fuzzy
-#~ msgid "Secondary colour"
-#~ msgstr "SekundÃ¦r tekst"
-
-#, fuzzy
-#~ msgid "Send the currently edited message"
-#~ msgstr "Slett den valte brukarklassen"
-
-#, fuzzy
-#~ msgid "Baltic"
-#~ msgstr "Analytisk"
-
-#, fuzzy
-#~ msgid "cc:"
-#~ msgstr "&Bcc:"
-
-#, fuzzy
-#~ msgid "bcc:"
-#~ msgstr "&Bcc:"
-
-#, fuzzy
-#~ msgid "fcc:"
-#~ msgstr "&Bcc:"
-
-#, fuzzy
-#~ msgid "Cannot execute print command."
-#~ msgstr "Kunne ikkje kÃ¸yra fÃ¸rkommando: %1"

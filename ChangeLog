@@ -1,3 +1,8 @@
+2000-11-19  Gediminas Paulauskas  <menesis@delfi.lt>
+
+	* src/spell-check.c: (balsa_spell_check_start) set current encoding
+	to pspell config.
+
 2000-11-19  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* Makefile.am: remove deprecated mblist-window.[hc] from the file list.

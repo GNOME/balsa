@@ -724,6 +724,16 @@ balsa_spell_check_start(BalsaSpellCheck * spell_check)
     pspell_config_replace(spell_check->spell_config,
 			  "sug-mode", spell_check->suggest_mode);
 
+    string = g_strdup(spell_check->character_set);
+    g_strdown(string);
+    if (!strncmp(string, "iso-", 4)) {
+	    /* pspell .map files are iso8859-* */
+	    memmove(&string[3], &string[4], strlen(string) - 3);
+    }
+    pspell_config_replace(spell_check->spell_config,
+			  "encoding", string);
+    g_free(string);
+
     string = g_strdup_printf("%d", spell_check->ignore_length);
     pspell_config_replace(spell_check->spell_config, "ignore", string);
     g_free(string);

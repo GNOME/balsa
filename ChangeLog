@@ -3,7 +3,8 @@
 	* libbalsa/mailbox_imap.c: be careful when doing noop.
 	* libbalsa/message.[ch]: clean up message changing code.
 	* libbalsa/send.c: ditto.
-	* src/balsa-index.[ch]: adapt to changed API.
+	* src/balsa-index.[ch]: adapt to changed API. 
+	Fix crash on expunging messages in hidden mailbox.
 	* src/{main,sendmsg}-window.c: ditto.
 
 2003-11-07 00:23  PeterB

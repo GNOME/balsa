@@ -528,6 +528,9 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
      * messages */
     if (sci.message || !gtk_tree_model_get_iter_first(model, &iter)) {
         index->current_message = sci.message;
+        if(index->current_message)
+            g_object_add_weak_pointer(G_OBJECT(index->current_message),
+                                      (gpointer)&index->current_message);
         bndx_changed_find_row(index);
     }
 }
@@ -1562,7 +1565,6 @@ balsa_index_toggle_flag(BalsaIndex* index, LibBalsaMessageFlag flag)
 {
     GList *list, *l;
     int is_all_flagged = TRUE;
-    gboolean new_flag;
 
     /* First see if we should set given flag or unset */
     l = balsa_index_selected_list(index);

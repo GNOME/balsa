@@ -202,7 +202,8 @@ static void remove_duplicates_cb(GtkWidget * widget, gpointer data);
 static void mailbox_close_cb(GtkWidget * widget, gpointer data);
 static void mailbox_tab_close_cb(GtkWidget * widget, gpointer data);
 
-static void view_menu_cb(GtkWidget * widget, gpointer data);
+static void show_menu_cb(GtkWidget * widget, gpointer data);
+static void hide_menu_cb(GtkWidget * widget, gpointer data);
 static void mailbox_commit_changes(GtkWidget * widget, gpointer data);
 static void mailbox_commit_all(GtkWidget * widget, gpointer data);
 
@@ -572,6 +573,39 @@ static GnomeUIInfo message_menu[] = {
     GNOMEUIINFO_END
 };
 
+
+static GnomeUIInfo mailbox_show_menu[] = {
+    GNOMEUIINFO_TOGGLEITEM_DATA
+    (N_("_Deleted"),  "",
+     show_menu_cb, GINT_TO_POINTER(LIBBALSA_MESSAGE_FLAG_DELETED), NULL),
+    GNOMEUIINFO_TOGGLEITEM_DATA
+    (N_("_Read"),     "",
+     show_menu_cb, GINT_TO_POINTER(LIBBALSA_MESSAGE_FLAG_NEW), NULL),
+    GNOMEUIINFO_TOGGLEITEM_DATA
+    (N_("_Flagged"),  "",
+     show_menu_cb, GINT_TO_POINTER(LIBBALSA_MESSAGE_FLAG_FLAGGED), NULL),
+    GNOMEUIINFO_TOGGLEITEM_DATA
+    (N_("_Answered"), "",
+     show_menu_cb, GINT_TO_POINTER(LIBBALSA_MESSAGE_FLAG_REPLIED), NULL),
+    GNOMEUIINFO_END
+};
+
+static GnomeUIInfo mailbox_hide_menu[] = {
+    GNOMEUIINFO_TOGGLEITEM_DATA
+    (N_("_Deleted"),  "",
+     hide_menu_cb, GINT_TO_POINTER(LIBBALSA_MESSAGE_FLAG_DELETED), NULL),
+    GNOMEUIINFO_TOGGLEITEM_DATA
+    (N_("_Read"),     "",
+     hide_menu_cb, GINT_TO_POINTER(LIBBALSA_MESSAGE_FLAG_NEW), NULL),
+    GNOMEUIINFO_TOGGLEITEM_DATA
+    (N_("_Flagged"),  "",
+     hide_menu_cb, GINT_TO_POINTER(LIBBALSA_MESSAGE_FLAG_FLAGGED), NULL),
+    GNOMEUIINFO_TOGGLEITEM_DATA
+    (N_("_Answered"), "",
+     hide_menu_cb, GINT_TO_POINTER(LIBBALSA_MESSAGE_FLAG_REPLIED), NULL),
+    GNOMEUIINFO_END
+};
+
 static GnomeUIInfo mailbox_menu[] = {
 #define MENU_MAILBOX_NEXT_POS 0
     {
@@ -618,21 +652,11 @@ static GnomeUIInfo mailbox_menu[] = {
                            mailbox_conf_delete_cb,
                            GTK_STOCK_REMOVE),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_VIEW_DELETED_POS 10
-    GNOMEUIINFO_TOGGLEITEM_DATA
-    (N_("_Deleted messages"),  "",
-     view_menu_cb, GINT_TO_POINTER(LIBBALSA_MESSAGE_FLAG_DELETED), NULL),
-    GNOMEUIINFO_TOGGLEITEM_DATA
-    (N_("_Read messages"),     "",
-     view_menu_cb, GINT_TO_POINTER(LIBBALSA_MESSAGE_FLAG_NEW), NULL),
-    GNOMEUIINFO_TOGGLEITEM_DATA
-    (N_("_Flagged messages"),  "",
-     view_menu_cb, GINT_TO_POINTER(LIBBALSA_MESSAGE_FLAG_FLAGGED), NULL),
-    GNOMEUIINFO_TOGGLEITEM_DATA
-    (N_("_Answered messages"), "",
-     view_menu_cb, GINT_TO_POINTER(LIBBALSA_MESSAGE_FLAG_REPLIED), NULL),
-    GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_COMMIT_POS 15
+#define MENU_MAILBOX_SHOW_POS 10
+    GNOMEUIINFO_SUBTREE(N_("_Show messages"), mailbox_show_menu),
+#define MENU_MAILBOX_HIDE_POS 11
+    GNOMEUIINFO_SUBTREE(N_("_Hide messages"), mailbox_hide_menu),
+#define MENU_MAILBOX_COMMIT_POS 12
     GNOMEUIINFO_ITEM_STOCK(
         N_("Co_mmit Current"),
         N_("Commit the changes in the currently opened mailbox"),
@@ -643,21 +667,21 @@ static GnomeUIInfo mailbox_menu[] = {
         N_("Commit the changes in all mailboxes"),
         mailbox_commit_all,
         GTK_STOCK_REFRESH),
-#define MENU_MAILBOX_CLOSE_POS 17
+#define MENU_MAILBOX_CLOSE_POS 14
     GNOMEUIINFO_ITEM_STOCK(N_("_Close"), N_("Close mailbox"),
                            mailbox_close_cb, GTK_STOCK_CLOSE),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_EMPTY_TRASH_POS 19
+#define MENU_MAILBOX_EMPTY_TRASH_POS 16
     GNOMEUIINFO_ITEM_STOCK(N_("Empty _Trash"),
                            N_("Delete messages from the Trash mailbox"),
                            empty_trash, GTK_STOCK_REMOVE),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_APPLY_FILTERS 21
+#define MENU_MAILBOX_APPLY_FILTERS 18
     GNOMEUIINFO_ITEM_STOCK(N_("Edit/Apply _Filters"),
                            N_("Filter the content of the selected mailbox"),
                            filter_run_cb, GTK_STOCK_PROPERTIES),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_REMOVE_DUPLICATES 23
+#define MENU_MAILBOX_REMOVE_DUPLICATES 20
     GNOMEUIINFO_ITEM_STOCK(N_("_Remove Duplicates"),
                            N_("Remove duplicated messages "
                               "from the selected mailbox"),
@@ -2916,9 +2940,14 @@ mailbox_tab_close_cb(GtkWidget * widget, gpointer data)
 }
 
 static void
-view_menu_cb(GtkWidget * widget, gpointer data)
+show_menu_cb(GtkWidget * widget, gpointer data)
 {
-    printf("%s\n", __func__);
+    printf("%s: %d\n", __func__, GPOINTER_TO_INT(data));
+}
+static void
+hide_menu_cb(GtkWidget * widget, gpointer data)
+{
+    printf("%s: %d\n", __func__, GPOINTER_TO_INT(data));
 }
 
 static void

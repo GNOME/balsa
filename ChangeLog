@@ -1,5 +1,11 @@
-2004-06-07 09:59  PeterB
+2004-06-07 16:51  PeterB
 
+	* libbalsa/: mailbox_maildir.c, mailbox_mbox.c, mailbox_mh.c:
+	manage `recent' flag.
+	* libbalsa/: message.c, message.h: drop
+	libbalsa_message_clear_recent--it's the driver's responsibility.
+	* libbalsa/mailbox.c, src/balsa-index.c: check message number when
+	searching.
 	* libbalsa/mailbox-filter.c: match URL exactly when looking up
 	filter section.
 	* libbalsa/mailbox_local.c: retrieve user headers more reliably.

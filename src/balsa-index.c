@@ -370,9 +370,9 @@ balsa_index_add (BalsaIndex * bindex,
   if (message->from)
     {
       if (message->from->personal)
-	sprintf (text[3], "%s", message->from->personal);
+	snprintf (text[3], 1024, "%s", message->from->personal);
       else
-	sprintf (text[3], "%s@%s", message->from->user, message->from->host);
+	snprintf (text[3], 1024, "%s", message->from->mailbox);
     }
   else
     text[3] = NULL;

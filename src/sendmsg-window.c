@@ -296,15 +296,15 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
     {
       if (message->reply_to->personal)
 	{
-	  tmp = g_malloc (strlen (message->from->personal) + 1 + 1 + strlen (message->from->user) + 1 + strlen (message->from->host) + 1 + 1);
-	  sprintf (tmp, "%s <%s@%s>", message->from->personal, message->from->user, message->from->host);
+	  tmp = g_malloc (strlen (message->from->personal) + 1 + 1 + strlen (message->from->mailbox) + 1 + 1);
+	  sprintf (tmp, "%s <>", message->from->personal, message->from->mailbox);
 	  gtk_entry_set_text (GTK_ENTRY (msg->to), tmp);
 	  g_free (tmp);
 	}
       else
 	{
-	  tmp = g_malloc (strlen (message->from->user) + 1 + strlen (message->from->host) + 1);
-	  sprintf (tmp, "%s@%s", message->from->user, message->from->host);
+	  tmp = g_malloc (strlen (message->from->mailbox) + 1);
+	  sprintf (tmp, "%s", message->from->mailbox);
 	  gtk_entry_set_text (GTK_ENTRY (msg->to), tmp);
 	  g_free (tmp);
 	}
@@ -490,9 +490,8 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 
   message->from = address_new ();
   message->from->personal = g_strdup (balsa_app.real_name);
-  message->from->user = g_strdup (balsa_app.username);
-  message->from->host = g_strdup (balsa_app.hostname);
-
+  message->from->mailbox = g_malloc(strlen(balsa_app.username)+strlen(balsa_app.hostname)+2);
+  sprintf(message->from->mailbox,"%s@%s", balsa_app.username, balsa_app.hostname);
   message->subject = g_strdup (gtk_entry_get_text (GTK_ENTRY (bsmsg->subject)));
 
   message->to_list = make_list_from_string (gtk_entry_get_text (GTK_ENTRY (bsmsg->to)));

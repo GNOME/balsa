@@ -233,12 +233,11 @@ message2html (Message * message)
 
       /* from */
       if (message->from->personal)
-	sprintf (tbuff, "%s <%s@%s>",
+	snprintf (tbuff, 1024, "%s <%s@%s>",
 		 message->from->personal,
-		 message->from->user,
-		 message->from->host);
+		 message->from->mailbox);
       else
-	sprintf (tbuff, "%s@%s", message->from->user, message->from->host);
+	snprintf (tbuff, 1024, "%s", message->from->mailbox);
 
       buff = text2html (tbuff);
       g_string_append (mbuff, buff);

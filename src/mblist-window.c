@@ -69,7 +69,7 @@ static GtkWidget *mblist_create_menu (GtkCTree * ctree, Mailbox * mailbox);
 
 static void mblist_drag_data_received (GtkWidget * widget, GdkDragContext * context, gint x, gint y, GtkSelectionData * selection_data, guint info, guint32 time);
 static gboolean mblist_drag_motion (GtkWidget *widget, GdkDragContext *context, gint x, gint y, guint time);
-static gboolean mblist_drag_drop (GtkWidget *widget, GdkDragContext *context, gint x, gint y, guint time);
+static gboolean mblist_drag_leave (GtkWidget *widget, GdkDragContext *context, guint time);
 
 static void mblist_open_cb (GtkWidget *, gpointer);
 static void mblist_close_cb (GtkWidget *, gpointer);
@@ -143,10 +143,12 @@ mblist_open_window (GnomeMDI * mdi)
  /* callback when dragged object moves in the mblist window */
   gtk_signal_connect (GTK_OBJECT (mblw->ctree), "drag_motion",
 		      GTK_SIGNAL_FUNC (mblist_drag_motion), NULL);
+  /* drag leave the window */
+  gtk_signal_connect (GTK_OBJECT (mblw->ctree), "drag_leave",
+		      GTK_SIGNAL_FUNC (mblist_drag_leave), NULL);
+
 
   /* callbacks when object dropped on a mailbox */
-  gtk_signal_connect (GTK_OBJECT (mblw->ctree), "drag_drop",
-		      GTK_SIGNAL_FUNC (mblist_drag_drop), NULL);
 
   gtk_signal_connect (GTK_OBJECT (mblw->ctree), "drag_data_received",
 		      GTK_SIGNAL_FUNC (mblist_drag_data_received), NULL);
@@ -415,12 +417,13 @@ mblist_drag_data_received (GtkWidget * widget,
 
   gint row;
   /*--*/
-  printf("flouf\n");
+  
   /* find the mailbox on which the messages have been dropped */
   if (!gtk_clist_get_selection_info (clist, x, y, &row, NULL))
     return;
+  
   target_mailbox = gtk_clist_get_row_data (GTK_CLIST(widget), row);
-  if (!target_mailbox)
+  if (!target_mailbox) 
     return;
 
   if ((selection_data->length >= 0) )
@@ -431,7 +434,8 @@ mblist_drag_data_received (GtkWidget * widget,
       for (received_message_count=0; received_message_count<nb_received_messages; received_message_count++)
 	{
 	  current_message = received_message_list[received_message_count];
-	  message_move (current_message, target_mailbox);
+	  if (current_message->mailbox != target_mailbox)
+	    message_move (current_message, target_mailbox);
 	}
       gtk_drag_finish (context, TRUE, FALSE, time);
       return;
@@ -459,28 +463,33 @@ mblist_drag_motion         (GtkWidget          *widget,
 
 
   mb_selected = gtk_clist_get_selection_info (clist, x, y, &row, NULL);
-  //printf("X=%d, Y=%d\n", x,y);
-  if (row<0) return FALSE;
+  if (mb_selected<1)
+    {
+      gtk_clist_unselect_all(clist);
+      return FALSE;
+    }
   node = gtk_ctree_node_nth( ctree, row );
-  if (node) gtk_ctree_select(ctree, node);
-
-  return TRUE;
+  if (node) 
+    {
+      gtk_ctree_select(ctree, node);
+      return TRUE;
+    }
+  else
+    {
+      gtk_clist_unselect_all(clist);
+      return FALSE;
+    }
+  
 }
-/* callback data dropped in the window */
+
+/* callback : drag leave the window */
 static gboolean
-mblist_drag_drop (GtkWidget          *widget,
-		  GdkDragContext     *context,
-		  gint                x,
-		  gint                y,
-		  guint               time)
+mblist_drag_leave (GtkWidget          *widget,
+		   GdkDragContext     *context,
+		   guint               time)
 {
+  GtkCList *clist = GTK_CLIST (widget);
 
-
-  printf("drop\n");
-  
-  gtk_drag_get_data (widget, context, 
-		     GPOINTER_TO_INT (context->targets->data), 
-		     time);
-  
+  gtk_clist_unselect_all(clist);
   return TRUE;
 }

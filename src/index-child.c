@@ -623,7 +623,6 @@ index_child_drag_data_get (GtkWidget *widget, GdkDragContext *context,
   
   clist = GTK_CLIST (widget);
   bindex = BALSA_INDEX (widget);
-  printf("flaf\n");
   
   /* retrieve the selected rows */
   balsa_index_get_selected_rows (bindex, &selected_rows, &nb_selected_rows);

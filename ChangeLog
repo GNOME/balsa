@@ -1,4 +1,14 @@
 1999-01-11  bertrand  <Bertrand.Guiheneuf@inria.fr>
+
+	
+	* src/mblist-window.c (mblist_drag_data_received): check if the source
+	mailbox is not the dest mailbox.
+	(mblist_drag_motion): when the drag pointer is not on a valid row, 
+	deselect all.
+	(mblist_drag_leave): when the drag pointer leave the window, unselect all
+
+	* removed the dnd trace
+	
 	* src/index-child.c (index_child_setup_dnd): changed the drag icon
 	(index_child_create_view): unset "use_drag_icons" & "reorderable"
 	clist flags. 

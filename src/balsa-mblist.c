@@ -1507,6 +1507,11 @@ bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter)
             mbnode->style &= ~MBNODE_STYLE_TOTAL_MESSAGES;
         }
     }
+    { /* FIXME: view update needed. Shouldn't store_set enforce this? */
+	GtkTreePath * path =  gtk_tree_model_get_path(model, iter);
+	gtk_tree_model_row_changed(model, path, iter);
+	gtk_tree_path_free(path);
+    }
 }
 
 /* bmbl_core_mailbox

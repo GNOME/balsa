@@ -24,16 +24,52 @@
 #ifndef __SEND_H__
 #define __SEND_H__
 
+typedef LibBalsaMailbox* (*LibBalsaFccboxFinder)(const gchar *url);
+typedef enum _LibBalsaMsgCreateResult LibBalsaMsgCreateResult;
+enum _LibBalsaMsgCreateResult {
+    LIBBALSA_MESSAGE_CREATE_OK,
+#ifdef HAVE_GPGME
+    LIBBALSA_MESSAGE_SIGN_ERROR,
+    LIBBALSA_MESSAGE_ENCRYPT_ERROR,
+#endif
+    LIBBALSA_MESSAGE_CREATE_ERROR,
+    LIBBALSA_MESSAGE_QUEUE_ERROR,
+    LIBBALSA_MESSAGE_SAVE_ERROR,
+    LIBBALSA_MESSAGE_SEND_ERROR
+};
+
+LibBalsaMsgCreateResult libbalsa_message_queue(LibBalsaMessage* message, 
+					       LibBalsaMailbox* outbox,
+                                               LibBalsaMailbox* fccbox,
+					       gint encoding, gboolean flow);
 #if ENABLE_ESMTP
 #include <libesmtp.h>
 
+LibBalsaMsgCreateResult libbalsa_message_send(LibBalsaMessage* message,
+					      LibBalsaMailbox* outbox,  
+					      LibBalsaMailbox* fccbox,
+					      gint encoding,
+                                              LibBalsaFccboxFinder finder, 
+                                              gchar* smtp_server,
+					      auth_context_t smtp_authctx,
+					      gint tls_mode, gboolean flow,
+                                              gboolean debug);
 gboolean libbalsa_process_queue(LibBalsaMailbox * outbox,
+                                LibBalsaFccboxFinder finder, 
                                 gchar * smtp_server,
                                 auth_context_t smtp_authctx,
                                 gint tls_mode, gboolean debug);
 #else
 
-gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gboolean debug);
+LibBalsaMsgCreateResult libbalsa_message_send(LibBalsaMessage* message,
+					      LibBalsaMailbox* outbox,  
+					      LibBalsaMailbox* fccbox,
+                                              LibBalsaFccboxFinder finder, 
+					      gint encoding, gboolean flow,
+                                              gboolean debug);
+gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, 
+                                LibBalsaFccboxFinder finder,
+                                gboolean debug);
 
 #endif
 

@@ -1753,7 +1753,7 @@ bmbl_mru_selected_cb(GtkTreeSelection * selection, gpointer data)
     GtkTreePath *path;
     GtkTreeViewColumn *column;
     GdkRectangle rect;
-    GValue expander_size;
+    GValue expander_size = {0};
 
     if (!data)
         return;

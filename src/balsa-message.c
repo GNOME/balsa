@@ -45,6 +45,7 @@
 #  include <regex.h>
 #endif
 
+#include "send.h"
 #include "quote-color.h"
 #include "sendmsg-window.h"
 
@@ -2409,7 +2410,9 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
             for (lines = l; *lines; ++lines) {
                 gint quote_level = is_a_quote(*lines, &rex);
                 GtkTextTag *tag = quote_tag(buffer, quote_level);
-
+                int len = strlen(*lines);
+                if(len>0 && (*lines)[len-1] == '\r')
+                    (*lines)[len-1] = '\0';
                 /* tag is NULL if the line isn't quoted, but it causes
                  * no harm */
                 libbalsa_insert_with_url(buffer, *lines, tag,
@@ -3143,15 +3146,15 @@ part_context_menu_mail(GtkWidget * menu_item, BalsaPartInfo * info)
 #if ENABLE_ESMTP
     libbalsa_message_send(message, balsa_app.outbox, NULL,
                           balsa_app.encoding_style,  
-                          balsa_app.smtp_server,
+                          balsa_find_sentbox_by_url, balsa_app.smtp_server,
                           (balsa_app.smtp_user && *balsa_app.smtp_user)
                           ? balsa_app.smtp_authctx : NULL,
                           balsa_app.smtp_tls_mode,
                           FALSE, balsa_app.debug);
 #else
     libbalsa_message_send(message, balsa_app.outbox, NULL,
-                          balsa_app.encoding_style,
-                          FALSE, balsa_app.debug);
+                          balsa_find_sentbox_by_url,
+                          balsa_app.encoding_style, FALSE, balsa_app.debug);
 #endif
     g_object_unref(G_OBJECT(message));    
 }
@@ -3959,13 +3962,16 @@ handle_mdn_request(LibBalsaMessage *message)
 #if ENABLE_ESMTP
         libbalsa_message_send(mdn, balsa_app.outbox, NULL,
                               balsa_app.encoding_style,  
+                              balsa_find_sentbox_by_url,
                               balsa_app.smtp_server,
                               (balsa_app.smtp_user && *balsa_app.smtp_user)
                               ? balsa_app.smtp_authctx : NULL,
                               balsa_app.smtp_tls_mode, TRUE, balsa_app.debug);
 #else
         libbalsa_message_send(mdn, balsa_app.outbox, NULL,
-                              balsa_app.encoding_style, TRUE, balsa_app.debug);
+                              balsa_find_sentbox_by_url,
+                              balsa_app.encoding_style,
+                              TRUE, balsa_app.debug);
 #endif
         g_object_unref(G_OBJECT(mdn));
     }
@@ -4087,13 +4093,16 @@ mdn_dialog_response(GtkWidget * dialog, gint response, gpointer user_data)
 #if ENABLE_ESMTP
         libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
                               balsa_app.encoding_style,
+                              balsa_find_sentbox_by_url,
                               balsa_app.smtp_server,
                               (balsa_app.smtp_user && *balsa_app.smtp_user)
                               ? balsa_app.smtp_authctx : NULL,
                               balsa_app.smtp_tls_mode, TRUE, balsa_app.debug);
 #else
         libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
-                              balsa_app.encoding_style, TRUE, balsa_app.debug);
+                              balsa_find_sentbox_by_url,
+                              balsa_app.encoding_style,
+                              TRUE, balsa_app.debug);
 #endif
     }
 

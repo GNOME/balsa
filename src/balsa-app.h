@@ -414,6 +414,7 @@ BalsaMailboxNode *balsa_find_mailbox(LibBalsaMailbox * mailbox);
 BalsaMailboxNode *balsa_find_dir(LibBalsaServer *server, const gchar * path);
 BalsaMailboxNode *balsa_find_url(const gchar * url);
 LibBalsaMailbox *balsa_find_mailbox_by_url(const gchar * url);
+LibBalsaMailbox *balsa_find_sentbox_by_url(const gchar * url);
 gboolean balsa_find_iter_by_data(GtkTreeIter * iter, gpointer data);
 BalsaIndex* balsa_find_index_by_mailbox(LibBalsaMailbox* mailbox);
 

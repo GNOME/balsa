@@ -775,6 +775,13 @@ balsa_find_mailbox_by_url(const gchar * url)
     return mailbox;
 }
 
+LibBalsaMailbox*
+balsa_find_sentbox_by_url(const gchar *url)
+{
+    LibBalsaMailbox *res = balsa_find_mailbox_by_url(url);
+    return res ? res : balsa_app.sentbox;
+}
+
 struct balsa_find_iter_by_data_info {
     GtkTreeIter *iter;
     gpointer data;

@@ -54,13 +54,12 @@
 typedef struct _MessageQueueItem MessageQueueItem;
 
 struct _MessageQueueItem {
+    char tempfile[_POSIX_PATH_MAX];
     LibBalsaMessage *orig;
     GMimeStream *stream;
+    LibBalsaFccboxFinder finder;
 #if !ENABLE_ESMTP
     MessageQueueItem *next_message;
-#endif
-    char tempfile[_POSIX_PATH_MAX];
-#if !ENABLE_ESMTP
     enum {MQI_WAITING, MQI_FAILED,MQI_SENT} status;
 #else
     long message_size;
@@ -80,6 +79,8 @@ struct _SendMessageInfo{
        needed to transfer the message to the SMTP server.  This structure
        is opaque to the application. */
     smtp_session_t session;
+#else
+    LibBalsaFccboxFinder finder;
 #endif
     gboolean debug;
 };
@@ -122,11 +123,12 @@ libbalsa_wait_for_sending_thread(gint max_time)
 
 
 static MessageQueueItem *
-msg_queue_item_new(void)
+msg_queue_item_new(LibBalsaFccboxFinder finder)
 {
     MessageQueueItem *mqi;
 
     mqi = g_new(MessageQueueItem, 1);
+    mqi->finder = finder;
 #if !ENABLE_ESMTP
     mqi->next_message = NULL;
     mqi->status = MQI_WAITING;
@@ -164,12 +166,14 @@ send_message_info_new(LibBalsaMailbox* outbox, smtp_session_t session,
 }
 #else
 static SendMessageInfo *
-send_message_info_new(LibBalsaMailbox* outbox, gboolean debug)
+send_message_info_new(LibBalsaMailbox* outbox,
+                      LibBalsaFccboxFinder finder, gboolean debug)
 {
     SendMessageInfo *smi;
 
     smi=g_new(SendMessageInfo,1);
     smi->outbox = outbox;
+    smi->finder = finder;
     smi->debug = debug;
 
     return smi;
@@ -198,7 +202,7 @@ static LibBalsaMsgCreateResult libbalsa_create_msg(LibBalsaMessage * message,
 				    gint encoding, gboolean flow);
 static LibBalsaMsgCreateResult
 libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage * message,
-				 MessageQueueItem *mqi);
+                                       MessageQueueItem *mqi);
 
 #ifdef BALSA_USE_THREADS
 void balsa_send_thread(MessageQueueItem * first_message);
@@ -367,27 +371,16 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 
     g_return_val_if_fail(message, LIBBALSA_MESSAGE_CREATE_ERROR);
 
-    if ((result = libbalsa_create_msg(message, encoding, flow)) ==
-	LIBBALSA_MESSAGE_CREATE_OK) {
-        if(libbalsa_mailbox_copy_message( message, outbox ) < 0)
-            return LIBBALSA_MESSAGE_QUEUE_ERROR;
-        
-	if (fccbox) {
-            if (LIBBALSA_IS_MAILBOX_LOCAL(fccbox) ||
-                LIBBALSA_IS_MAILBOX_IMAP(fccbox)) {
-                if(libbalsa_mailbox_copy_message(message, fccbox)<0)
-                    return LIBBALSA_MESSAGE_SAVE_ERROR;
-                    /* fcc perhaps does not know about this message yet! 
-                     * later check will discover it and thread. 
-		    libbalsa_mailbox_set_threading(fccbox,
-						   fccbox->view->
-						   threading_type);
-                    */
-            }
-	}
-    } 
+    if ((result = libbalsa_create_msg(message, encoding, flow)) !=
+	LIBBALSA_MESSAGE_CREATE_OK)
+        return result;
 
-    return result;
+    if (fccbox)
+        g_mime_message_set_header(message->mime_msg, "X-Balsa-Fcc",
+                                  fccbox->url);
+    if(libbalsa_mailbox_copy_message( message, outbox ) < 0)
+        return LIBBALSA_MESSAGE_QUEUE_ERROR;
+    return LIBBALSA_MESSAGE_CREATE_OK;
 }
 
 /* libbalsa_message_send:
@@ -397,7 +390,8 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 #if ENABLE_ESMTP
 LibBalsaMsgCreateResult
 libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
-                      LibBalsaMailbox * fccbox, gint encoding,
+                      LibBalsaMailbox *fccbox, gint encoding,
+                      LibBalsaFccboxFinder finder,
                       gchar * smtp_server, auth_context_t smtp_authctx,
                       gint tls_mode, gboolean flow, gboolean debug)
 {
@@ -407,7 +401,7 @@ libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
         result = libbalsa_message_queue(message, outbox, fccbox, encoding,
 					flow);
      if (result == LIBBALSA_MESSAGE_CREATE_OK)
-	 if (!libbalsa_process_queue(outbox, smtp_server,
+	 if (!libbalsa_process_queue(outbox, finder, smtp_server,
 				     smtp_authctx, tls_mode, debug))
 	     return LIBBALSA_MESSAGE_SEND_ERROR;
  
@@ -416,16 +410,16 @@ libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 #else
 LibBalsaMsgCreateResult
 libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
-		      LibBalsaMailbox* fccbox, gint encoding,
-		      gboolean flow, gboolean debug)
+		      LibBalsaMailbox* fccbox, LibBalsaFccboxFinder finder,
+                      gint encoding, gboolean flow, gboolean debug)
 {
     LibBalsaMsgCreateResult result = LIBBALSA_MESSAGE_CREATE_OK;
 
     if (message != NULL)
- 	result = libbalsa_message_queue(message, outbox, fccbox, encoding,
- 					flow);
+ 	result = libbalsa_message_queue(message, outbox, fccbox,
+                                        encoding, flow);
     if (result == LIBBALSA_MESSAGE_CREATE_OK)
- 	if (!libbalsa_process_queue(outbox, debug))
+ 	if (!libbalsa_process_queue(outbox, finder, debug))
  	    return LIBBALSA_MESSAGE_SEND_ERROR;
  
     return result;
@@ -496,7 +490,8 @@ add_recipients(smtp_message_t message, smtp_message_t bcc_message,
    sendmail version so don't get fooled by similar variable names.
  */
 gboolean
-libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
+libbalsa_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
+                       gchar * smtp_server,
                        auth_context_t smtp_authctx, gint tls_mode,
                        gboolean debug)
 {
@@ -560,7 +555,7 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
 
         libbalsa_message_body_ref(msg, TRUE, TRUE); /* FIXME: do we need 
                                                      * all headers? */
-	new_message = msg_queue_item_new();
+	new_message = msg_queue_item_new(finder);
         created = libbalsa_fill_msg_queue_item_from_queu(msg, new_message);
         libbalsa_message_body_unref(msg);
 
@@ -786,22 +781,31 @@ handle_successful_send (smtp_message_t message, void *be_verbose)
     if (mqi != NULL)
       mqi->refcount--;
 
+    messages = g_list_prepend(NULL, mqi->orig);
+    libbalsa_messages_change_flag(messages, LIBBALSA_MESSAGE_FLAG_FLAGGED,
+                                  FALSE);
+    g_list_free(messages);
     status = smtp_message_transfer_status (message);
     if (status->code / 100 == 2) {
-	if (mqi != NULL && mqi->orig != NULL && mqi->refcount <= 0) {
-	    if (mqi->orig->mailbox) {
-		messages = g_list_prepend(NULL, mqi->orig);
-		libbalsa_messages_change_flag(messages,
-                                              LIBBALSA_MESSAGE_FLAG_DELETED,
-                                              TRUE);
-		g_list_free(messages);
+	if (mqi != NULL && mqi->orig != NULL && mqi->refcount <= 0 &&
+            mqi->orig->mailbox) {
+            gboolean remove = TRUE;
+            GList* fcclist =
+                libbalsa_message_find_user_hdr(mqi->orig, "X-Balsa-Fcc");
+            const gchar **fccurl = fcclist ? fcclist->data : NULL;
+
+	    if (mqi->orig->mailbox && fccurl) {
+                LibBalsaMailbox *fccbox = mqi->finder(fccurl[1]);
+                remove = libbalsa_mailbox_copy_message(mqi->orig, fccbox)>=0;
+            }
+            if(remove) {
+                messages = g_list_prepend(NULL, mqi->orig);
+                libbalsa_messages_change_flag
+                    (messages, LIBBALSA_MESSAGE_FLAG_DELETED, TRUE);
+                g_list_free(messages);
 	    }
 	}
     } else {
-	messages = g_list_prepend(NULL, mqi->orig);
-        libbalsa_messages_change_flag(messages, LIBBALSA_MESSAGE_FLAG_FLAGGED,
-                                      FALSE);
-	g_list_free(messages);
 	/* XXX - Show the poor user the status codes and message. */
         if(*(gboolean*)be_verbose) {
             int cnt = 0;
@@ -961,7 +965,8 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
    handler does that.
 */
 gboolean 
-libbalsa_process_queue(LibBalsaMailbox* outbox, gboolean debug)
+libbalsa_process_queue(LibBalsaMailbox* outbox, LibBalsaFccboxFinder finder,
+                       gboolean debug)
 {
     MessageQueueItem *mqi = NULL, *new_message;
     SendMessageInfo *send_message_info;
@@ -999,7 +1004,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gboolean debug)
 
         libbalsa_message_body_ref(msg, TRUE, TRUE); /* FIXME: do we need
                                                       * all headers? */
-	new_message = msg_queue_item_new();
+	new_message = msg_queue_item_new(finder);
         created = libbalsa_fill_msg_queue_item_from_queu(msg, new_message);
         libbalsa_message_body_unref(msg);
 	
@@ -1020,7 +1025,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gboolean debug)
 	}
     }
 
-    send_message_info=send_message_info_new(outbox, debug);
+    send_message_info=send_message_info_new(outbox, finder, debug);
     
 #ifdef BALSA_USE_THREADS
     
@@ -1041,14 +1046,25 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gboolean debug)
 }
 
 static void
-handle_successful_send(MessageQueueItem *mqi)
+handle_successful_send(MessageQueueItem *mqi, LibBalsaFccboxFinder finder)
 {
     if (mqi->orig->mailbox) {
+        gboolean remove = TRUE;
 	GList * messages = g_list_prepend(NULL, mqi->orig);
+        libbalsa_messages_change_flag(messages, LIBBALSA_MESSAGE_FLAG_FLAGGED,
+                                  FALSE);
+        GList* fcclist =
+            libbalsa_message_find_user_hdr(mqi->orig, "X-Balsa-Fcc");
+        const gchar **fccurl = fcclist ? fcclist->data : NULL;
 
-	libbalsa_messages_change_flag(messages, 
-                                      LIBBALSA_MESSAGE_FLAG_DELETED,
-                                      TRUE);
+        if (mqi->orig->mailbox && fccurl) {
+            LibBalsaMailbox *fccbox = mqi->finder(fccurl[1]);
+            remove = libbalsa_mailbox_copy_message(mqi->orig, fccbox)>=0;
+        }
+        if(remove)
+            libbalsa_messages_change_flag(messages, 
+                                          LIBBALSA_MESSAGE_FLAG_DELETED,
+                                          TRUE);
 	g_list_free(messages);
     }
     mqi->status = MQI_SENT;
@@ -1266,7 +1282,7 @@ balsa_send_message_real(SendMessageInfo* info)
     
     while (mqi != NULL) {
 	if (mqi->status == MQI_SENT) 
-	    handle_successful_send(mqi);
+	    handle_successful_send(mqi, info->finder);
 	next_message = mqi->next_message;
 	msg_queue_item_destroy(mqi);
 	mqi = next_message;
@@ -1715,7 +1731,7 @@ libbalsa_create_msg(LibBalsaMessage * message,
 
 static LibBalsaMsgCreateResult
 libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage * message,
-				 MessageQueueItem *mqi)
+                                       MessageQueueItem *mqi)
 {
     mqi->orig = message;
     g_object_ref(mqi->orig);
@@ -1758,7 +1774,7 @@ libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part)
 					    message->headers->from->address_list->data);
 		if (message->headers->bcc_list)
 		    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-					 _("This message will not be encrpyted for the BCC: recipient(s)."));
+					 _("This message will not be encrypted for the BCC: recipient(s)."));
 
 		if (mode & LIBBALSA_PROTECT_SIGN)
 		    result = 

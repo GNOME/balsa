@@ -53,7 +53,6 @@
 
 typedef struct _LibBalsaMessageClass LibBalsaMessageClass;
 typedef enum _LibBalsaMessageFlag LibBalsaMessageFlag;
-typedef enum _LibBalsaMsgCreateResult LibBalsaMsgCreateResult;
 
 enum _LibBalsaMessageFlag {
     LIBBALSA_MESSAGE_FLAG_NEW     = 1 << 0,
@@ -63,17 +62,6 @@ enum _LibBalsaMessageFlag {
     LIBBALSA_MESSAGE_FLAG_RECENT  = 1 << 4
 };
 
-enum _LibBalsaMsgCreateResult {
-    LIBBALSA_MESSAGE_CREATE_OK,
-#ifdef HAVE_GPGME
-    LIBBALSA_MESSAGE_SIGN_ERROR,
-    LIBBALSA_MESSAGE_ENCRYPT_ERROR,
-#endif
-    LIBBALSA_MESSAGE_CREATE_ERROR,
-    LIBBALSA_MESSAGE_QUEUE_ERROR,
-    LIBBALSA_MESSAGE_SAVE_ERROR,
-    LIBBALSA_MESSAGE_SEND_ERROR
-};
 
 typedef enum _LibBalsaMessageStatus LibBalsaMessageStatus;
 enum _LibBalsaMessageStatus {
@@ -306,24 +294,6 @@ gboolean libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read,
                                    gboolean fetch_all_headers);
 void libbalsa_message_body_unref(LibBalsaMessage * message);
 
-LibBalsaMsgCreateResult libbalsa_message_queue(LibBalsaMessage* message, 
-					       LibBalsaMailbox* outbox, LibBalsaMailbox* fccbox,
-					       gint encoding, gboolean flow);
-#if ENABLE_ESMTP
-LibBalsaMsgCreateResult libbalsa_message_send(LibBalsaMessage* message,
-					      LibBalsaMailbox* outbox,  
-					      LibBalsaMailbox* fccbox,
-					      gint encoding, gchar* smtp_server,
-					      auth_context_t smtp_authctx,
-					      gint tls_mode, gboolean flow,
-                                              gboolean debug);
-#else
-LibBalsaMsgCreateResult libbalsa_message_send(LibBalsaMessage* message,
-					      LibBalsaMailbox* outbox,  
-					      LibBalsaMailbox* fccbox,
-					      gint encoding, gboolean flow,
-                                              gboolean debug);
-#endif
 gboolean libbalsa_message_postpone(LibBalsaMessage * message,
 				   LibBalsaMailbox * draftbox,
 				   LibBalsaMessage * reply_message,

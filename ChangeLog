@@ -1,3 +1,14 @@
+2004-08-31  Pawel Salek
+
+	* libbalsa/message.h, send.h: order sending related declarations.
+	* libbalsa/misc.c: do not get wrapping confused by '\r'.
+	* libbalsa/send.c: move messages to sentbox AFTER relaying.
+	* src/balsa-app.[hc]: define balsa_find_sentbox_by_url().
+	* src/balsa-mblist.c: GValue MUST be initialized.
+	* src/balsa-message.c: avoid double-spacing for nonwrapped text.
+	* src/main-window.c: changed sending API.
+	* src/sendmsg-window.c: ditto.
+
 2004-08-30  Pawel Salek
 
 	* libbalsa/imap-server.[hc]: some infrastructure for server bugs

@@ -49,6 +49,7 @@
 
 #include "libbalsa.h"
 #include "misc.h"
+#include "send.h"
 
 #include "balsa-app.h"
 #include "balsa-message.h"
@@ -3878,13 +3879,15 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 #if ENABLE_ESMTP
 	result = libbalsa_message_send
             (message, balsa_app.outbox, fcc,
-             balsa_app.encoding_style, balsa_app.smtp_server,
+             balsa_app.encoding_style, balsa_find_sentbox_by_url,
+             balsa_app.smtp_server,
              (balsa_app.smtp_user && *balsa_app.smtp_user)
              ? balsa_app.smtp_authctx : NULL,
              balsa_app.smtp_tls_mode,
              bsmsg->flow, balsa_app.debug);
 #else
         result = libbalsa_message_send(message, balsa_app.outbox, fcc,
+                                       balsa_find_sentbox_by_url,
 				       balsa_app.encoding_style,
 				       bsmsg->flow, balsa_app.debug); 
 #endif

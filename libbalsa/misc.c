@@ -484,6 +484,8 @@ unwrap_rfc2646(gchar * str, gboolean from_screen, gboolean delsp)
             if (*str)
                 str++;
 
+            if(len>0 && p[len-1] == '\r')
+                len--;  /* take care of '\r\n' line endings */
 	    flowed = (len > 0 && p[len - 1] == ' ' && !sig_sep);
 	    if (flowed && delsp)
 		/* Don't include the last space. */

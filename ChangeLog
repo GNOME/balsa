@@ -1,3 +1,15 @@
+2002-03-14  Pawel Salek <pawsa@theochem.kth.se>
+
+	* configure.in: gtkhtml support restored.
+	* libbalsa/address-entry.c: focus handling (Peter Bloomfield).
+	* src/balsa-message.[hc]: more proper message displaying (PS).
+	* src/sendmsg-window.c: first step to pangoization.
+
+	* Makefile.am, help/*: help ported by Jelmer to GNOME2.
+	* libbalsa/message.c: g_strsplit() to one more field (Peter B).
+	* src/pref-manager.c: use gnome_file_entry_set_directory_entry (PB).
+	* sound/Makefile.am: DESTDIR is not needed there after all.
+	
 2002-02-13  Jelmer Vernooij <jelmer@nl.linux.org>
 
 	* libbalsa/ (some): gnome-defs.h is deprecated in GNOME2 - remove refs.

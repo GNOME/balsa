@@ -481,8 +481,10 @@ libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
 {
     gboolean r = TRUE;
     LibBalsaMessage *message;
+    LibBalsaMailbox *mailbox;
     GList *d = NULL;
     GList *p;
+    GArray *msgnos;
 
     g_return_val_if_fail(messages, FALSE);
     g_return_val_if_fail(dest != NULL, FALSE);
@@ -495,23 +497,27 @@ libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
 	return FALSE;
     }
 
-    LOCK_MAILBOX_RETURN_VAL(LIBBALSA_MESSAGE(messages->data)->mailbox,
-			    FALSE);
+    mailbox = LIBBALSA_MESSAGE(messages->data)->mailbox;
+    LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
     
+    msgnos = g_array_new(FALSE, FALSE, sizeof(guint));
     for(p=messages; p; 	p=g_list_next(p)) {
 	message=LIBBALSA_MESSAGE(p->data);
 	if(message->mailbox==NULL) continue;
-	if (libbalsa_mailbox_copy_message(message, dest) != -1)
-	    d = g_list_prepend(d, message);
-	else
-	    r = FALSE;
+	g_array_append_val(msgnos, message->msgno);
+	d = g_list_prepend(d, message);
     }
+    r = libbalsa_mailbox_messages_move(mailbox, msgnos->len,
+				       (guint *) msgnos->data,
+				       dest, NULL);
+    g_array_free(msgnos, TRUE);
 
-    UNLOCK_MAILBOX(LIBBALSA_MESSAGE(messages->data)->mailbox);
+    UNLOCK_MAILBOX(mailbox);
 
     if (d) {
-        libbalsa_messages_change_flag (d, LIBBALSA_MESSAGE_FLAG_DELETED,
-                                       TRUE);
+	if (r)
+	    libbalsa_messages_change_flag(d, LIBBALSA_MESSAGE_FLAG_DELETED,
+					  TRUE);
 	g_list_free(d);
     }
 
@@ -554,29 +560,33 @@ gboolean
 libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
 {
     LibBalsaMessage *message;
+    LibBalsaMailbox *mailbox;
     GList *p;
-    gboolean rethread = FALSE;
+    GArray *msgnos;
+    gboolean retval;
 
     g_return_val_if_fail(messages != NULL, FALSE);
     g_return_val_if_fail(dest != NULL, FALSE);
 
-    LOCK_MAILBOX_RETURN_VAL(LIBBALSA_MESSAGE(messages->data)->mailbox,
-			    FALSE);
+    mailbox = LIBBALSA_MESSAGE(messages->data)->mailbox;
+    LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
 
+    msgnos = g_array_new(FALSE, FALSE, sizeof(guint));
     for(p=messages; p; 	p=g_list_next(p)) {
 	message=LIBBALSA_MESSAGE(p->data);
 	if(message->mailbox==NULL) continue;
-	if (libbalsa_mailbox_copy_message(message, dest) != -1)
-	    rethread = TRUE;
+	g_array_append_val(msgnos, message->msgno);
     }
+    retval = libbalsa_mailbox_messages_copy(mailbox, msgnos->len,
+					    (guint *) msgnos->data, dest,
+					    NULL) != -1;
+    g_array_free(msgnos, TRUE);
 
-    UNLOCK_MAILBOX(LIBBALSA_MESSAGE(messages->data)->mailbox);
+    UNLOCK_MAILBOX(mailbox);
 
     libbalsa_mailbox_check(dest);
-    if (rethread && MAILBOX_OPEN(dest))
-	libbalsa_mailbox_set_threading(dest, dest->view->threading_type);
 
-    return TRUE;
+    return retval;
 }
 
 static void

@@ -651,17 +651,16 @@ libbalsa_mailbox_real_messages_copy(LibBalsaMailbox * mailbox,
 				    LibBalsaMailbox * dest, 
 				    LibBalsaMailboxSearchIter * search_iter)
 {
-    GList *messages = NULL;
-    gboolean retval;
+    gboolean retval = TRUE;
+    guint i;
 
-    while (msgcnt > 0)
-	messages =
-	    g_list_prepend(messages,
-			   libbalsa_mailbox_get_message(mailbox,
-							msgnos[--msgcnt]));
+    for (i = 0; i < msgcnt; i++) {
+	LibBalsaMessage *message =
+	    libbalsa_mailbox_get_message(mailbox, msgnos[i]);
 
-    retval = libbalsa_messages_copy(messages, dest);
-    g_list_free(messages);
+	if (libbalsa_mailbox_copy_message(message, dest) < 0)
+	    retval = FALSE;
+    }
 
     return retval;
 }

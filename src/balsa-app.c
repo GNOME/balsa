@@ -32,7 +32,7 @@ static void load_global_settings ();
 static int options_init ();
 static void setup_local_mailboxes ();
 static void my_special_mailbox ();
-
+void mailbox_add_gnome_config (gint, gchar *, gchar *, gint);
 
 void
 init_balsa_app (int argc, char *argv[])
@@ -182,25 +182,11 @@ options_init (void)
 	{
 	  if (i == 0)
 	    {
-	      gnome_config_push_prefix ("/balsa/Accounts/");
-	      gnome_config_set_string ("0", "Default");
-	      gnome_config_pop_prefix ();
-
-	      gnome_config_push_prefix ("/balsa/Default/");
-	      gnome_config_set_string ("Name", "Default");
-	      gnome_config_set_string ("Path", "");
-	      gnome_config_set_int ("Type", 0);
-	      gnome_config_pop_prefix ();
-
-	      gnome_config_sync ();
-
+	      mailbox_add_gnome_config (0, "Default", getenv ("MAIL"), 0);
 	      mbx = (MailboxMBX *) mailbox_new (MAILBOX_MBX);
 	      mbx->name = "Default";
 	      mbx->path = getenv ("MAIL");
 	      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbx);
-
-	      gnome_config_pop_prefix ();
-	      gnome_config_sync ();
 	      g_string_free (gstring, 1);
 	      g_string_free (buffer, 1);
 	      return -1;
@@ -215,6 +201,32 @@ options_init (void)
   return i;
 }
 
+
+void
+mailbox_add_gnome_config (gint num, gchar * name, gchar * path, gint type)
+{
+  GString *gstring;
+
+  gstring = g_string_new (NULL);
+
+  gnome_config_push_prefix ("/balsa/Accounts/");
+  g_string_truncate (gstring, 0);
+  g_string_sprintf (gstring, "%i", num);
+  gnome_config_set_string (gstring->str, name);
+  gnome_config_pop_prefix ();
+
+  g_string_truncate (gstring, 0);
+  g_string_sprintf (gstring, "/balsa/%s/", name);
+  gnome_config_push_prefix (gstring->str);
+  gnome_config_set_string ("Name", name);
+  gnome_config_set_string ("Path", path);
+  gnome_config_set_int ("Type", type);
+  gnome_config_pop_prefix ();
+
+  gnome_config_sync ();
+  g_string_free (gstring, 1);
+}
+
 static void
 setup_local_mailboxes ()
 {
@@ -226,6 +238,7 @@ setup_local_mailboxes ()
   DRIVER *drv = NIL;
   MailboxMBox *mbox;
   MailboxUNIX *unixmb;
+  gint i = 0;
 
   /* check the MAIL environment variable for a spool directory */
 /* We'll make this the default if no other mailboxes are loaded... */
@@ -261,6 +274,7 @@ setup_local_mailboxes ()
 		      mbox->path = g_strdup (filename);
 
 		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbox);
+		      mailbox_add_gnome_config (i, mbox->name, mbox->path, 3);
 		    }
 		  if (!strcmp (drv->name, "unix"))
 		    {
@@ -269,8 +283,9 @@ setup_local_mailboxes ()
 		      unixmb->path = g_strdup (filename);
 
 		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, unixmb);
+		      mailbox_add_gnome_config (i, unixmb->name, unixmb->path, 5);
 		    }
-
+		  i++;
 		}
 	    }
 	}
@@ -362,7 +377,7 @@ load_global_settings ()
 
   /* directory */
   path = g_string_new (NULL);
-  g_string_sprintf (path, "%s/mail", pw->pw_dir);
+  g_string_sprintf (path, "%s/Mail", pw->pw_dir);
   balsa_app.local_mail_directory = get_string_set_default ("local mail directory", path->str);
   g_string_free (path, 1);
 

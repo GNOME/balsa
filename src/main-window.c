@@ -1453,6 +1453,15 @@ balsa_notebook_label_new (BalsaMailboxNode* mbnode)
        GtkWidget *lab = gtk_label_new(mbnode->mailbox->name);
        GtkWidget *but = gtk_button_new();
        GtkWidget *ev = gtk_event_box_new();
+
+	if (mbnode->mailbox->has_unread_messages) {
+	    gchar *tmp =
+		g_strconcat("<b>", gtk_label_get_text(GTK_LABEL(lab)),
+			    "</b>", NULL);
+	    gtk_label_set_markup(GTK_LABEL(lab), tmp);
+	    g_free(tmp);
+	}
+
        close_pix = gtk_image_new_from_stock(GTK_STOCK_CLOSE,
                                             GTK_ICON_SIZE_MENU);
        g_signal_connect(G_OBJECT(but), "size-request",

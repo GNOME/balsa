@@ -175,21 +175,21 @@ create_menu (BalsaSendmsg * bmsg)
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_CUT, _ ("Cut"));
   gtk_widget_show (w);
   gtk_widget_add_accelerator (w, "activate", accel,
-				  'X', GDK_CONTROL_MASK, 0);
+			      'X', GDK_CONTROL_MASK, 0);
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_COPY, _ ("Copy"));
   gtk_widget_show (w);
   gtk_widget_add_accelerator (w, "activate", accel,
-				  'C', GDK_CONTROL_MASK, 0);
+			      'C', GDK_CONTROL_MASK, 0);
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_PASTE, _ ("Paste"));
   gtk_widget_show (w);
   gtk_widget_add_accelerator (w, "activate", accel,
-				  'V', GDK_CONTROL_MASK, 0);
+			      'V', GDK_CONTROL_MASK, 0);
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
 
@@ -443,31 +443,42 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
 	  body = (Body *) message->body_list->data;
 	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "\n\n", 2);
 
-	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "On ", 4);
-
 	  c = message->date;
-	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
+	  if (c)
+	    {
+	      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "On ", 4);
+	      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
+	      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, " ", 1);
+	    }
 
-	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, " ", 1);
-
-	  if (message->from->personal)
-	    c = message->from->personal;
+	  if (message->from)
+	    {
+	      if (message->from->personal)
+		c = message->from->personal;
+	      else
+		c = "you";
+	    }
 	  else
 	    c = "you";
+
 	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
 	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, " wrote:\n", 8);
 
 	  c = body->buffer;
 
-	  c = gt_replys (c);
+	  if (c)
+	    {
+	      c = gt_replys (c);
 
-	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
-
+	      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
+	    }
 	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "\n\n", 2);
 	}
     }
+
   if (balsa_app.signature)
     gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, balsa_app.signature, strlen (balsa_app.signature));
+
   gtk_text_set_point (GTK_TEXT (msg->text), 0);
   gtk_text_thaw (GTK_TEXT (msg->text));
 }

@@ -113,11 +113,8 @@ open_main_window ()
   gtk_signal_connect (GTK_OBJECT (mw->mdi), "create_menus", GTK_SIGNAL_FUNC (create_menu), NULL);
   gtk_signal_connect (GTK_OBJECT (mw->mdi), "create_toolbar", GTK_SIGNAL_FUNC (create_toolbar), NULL);
 
-  gnome_mdi_set_child_menu_path(mw->mdi, _("Mailboxes/Mailbox List"));
-  gnome_mdi_set_child_list_path(mw->mdi, _("MDI"));
+  gnome_mdi_set_child_list_path(mw->mdi, _("Mailboxes/<Separator>"));
 
-  gnome_mdi_set_child_menu_label(mw->mdi, _("Mailboxes"));
-  
   gnome_mdi_set_mode (mw->mdi, balsa_app.mdi_style);
 
   refresh_main_window ();
@@ -251,7 +248,7 @@ static GtkMenuBar *create_menu (GnomeMDI * mdi)
   menu_items[i++] = w;
 
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_FWD, _ ("Foward"));
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_FWD, _ ("Forward"));
   gtk_widget_show (w);
 
   gtk_object_set_user_data (GTK_OBJECT (w), (gpointer) mw);
@@ -324,6 +321,10 @@ static GtkMenuBar *create_menu (GnomeMDI * mdi)
 
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
+
+  w = gtk_menu_item_new ();
+  gtk_widget_show (w);
+  gtk_menu_append (GTK_MENU (menu), w);
 
   w = gtk_menu_item_new_with_label (_ ("Mailboxes"));
   gtk_widget_show (w);

@@ -1,3 +1,8 @@
+1998-07-06  Jaka Mocnik  <jaka.mocnik@kiss.uni-lj.si>
+
+	* main-window.c (open_main_window): some changes to make MDI behave
+	well.
+	
 Mon Mar  9 19:31:23 1998  Tom Tromey  <tromey@cygnus.com>
 
 	* Makefile.am (SUBDIRS): Don't build in support directory.

@@ -1,3 +1,9 @@
+2000-11-06  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in: don't postfix BALSA_COMMON_PREFIXES with a comma.
+	Add sk to ALL_LINUGAS.
+	* libbalsa/files.c: change appriopriately.
+	
 2000-11-05  Matthew Guenther  <guentherm@asme.org>
 
 	* src/balsa-index-page.c (close_if_transferred_cb): Remove

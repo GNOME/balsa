@@ -38,10 +38,9 @@
 typedef struct _MessageWindow MessageWindow;
 
 /* callbacks */
-static void destroy_message_window(GtkWidget * widget, gpointer data);
+static void destroy_message_window(GtkWidget * widget, MessageWindow * mw);
+static void mw_message_destroy_notify(MessageWindow * mw);
 static void close_message_window(GtkWidget * widget, gpointer data);
-static void mw_message_weak_ref_cb(MessageWindow * mw,
-                                   LibBalsaMessage * message);
 
 static void replyto_message_cb(GtkWidget * widget, gpointer data);
 static void replytoall_message_cb(GtkWidget * widget, gpointer data);
@@ -60,6 +59,7 @@ static void show_selected_cb(GtkWidget * widget, gpointer data);
 static void show_all_headers_cb(GtkWidget * widget, gpointer data);
 static void show_all_headers_tool_cb(GtkWidget * widget, gpointer data);
 static void wrap_message_cb(GtkWidget * widget, gpointer data);
+static void size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
 
 static void copy_cb(GtkWidget * widget, gpointer data);
 static void select_all_cb(GtkWidget * widget, gpointer);
@@ -70,14 +70,6 @@ static void next_unread_cb(GtkWidget * widget, gpointer);
 static void next_flagged_cb(GtkWidget * widget, gpointer);
 static void print_cb(GtkWidget * widget, gpointer);
 static void trash_cb(GtkWidget * widget, gpointer);
-
-/* helper */
-static void weak_unref_and_destroy(MessageWindow * mw);
-
-/*
- * The list of messages which are being displayed.
- */
-static GHashTable *displayed_messages = NULL;
 
 static GnomeUIInfo shown_hdrs_menu[] = {
     GNOMEUIINFO_RADIOITEM(N_("N_o Headers"), NULL,
@@ -194,6 +186,7 @@ struct _MessageWindow {
     LibBalsaMessage *message;
     int headers_shown;
     int show_all_headers;
+    guint idle_handler_id;
 };
 
 void reset_show_all_headers(MessageWindow *mw);
@@ -220,9 +213,6 @@ mru_menu_cb(gchar * url, gpointer data)
     close_message_window(NULL, (gpointer) mw);
 }
 
-/* FIXME: any protection for destroying message window before idle
-   handler is called?
-*/
 static gboolean
 message_window_idle_handler(MessageWindow* mw)
 {
@@ -230,6 +220,9 @@ message_window_idle_handler(MessageWindow* mw)
     LibBalsaMessage *message;
 
     gdk_threads_enter();
+
+    mw->idle_handler_id = 0;
+
     message = g_object_get_data(G_OBJECT(msg), "message");
 
     balsa_message_set(msg, message);
@@ -246,8 +239,6 @@ message_window_idle_handler(MessageWindow* mw)
 	}
     }
 
-    g_object_weak_ref(G_OBJECT(message),
-                      (GWeakNotify) mw_message_weak_ref_cb, mw);
     g_object_unref(G_OBJECT(message)); 
 
     /* Update the style and message counts in the mailbox list */
@@ -325,6 +316,8 @@ message_window_get_toolbar_model(void)
     return model;
 }
 
+#define BALSA_MESSAGE_WINDOW_KEY "balsa-message-window"
+
 void
 message_window_new(LibBalsaMessage * message)
 {
@@ -342,29 +335,19 @@ message_window_new(LibBalsaMessage * message)
     /*
      * Check to see if this message is already displayed
      */
-    if (displayed_messages != NULL) {
-	mw = (MessageWindow *) g_hash_table_lookup(displayed_messages,
-						   message);
-	if (mw != NULL) {
-	    /*
-	     * The message is already displayed in a window, so just use
-	     * that one.
-	     */
-	    gdk_window_raise(GTK_WIDGET(mw->window)->window);
-	    return;
-	}
-    } else {
-	/*
-	 * We've never displayed a message before; initialize the hash
-	 * table.
-	 */
-	displayed_messages =
-	    g_hash_table_new(g_direct_hash, g_direct_equal);
+    mw = g_object_get_data(G_OBJECT(message), BALSA_MESSAGE_WINDOW_KEY);
+    if (mw != NULL) {
+        /*
+         * The message is already displayed in a window, so just use
+         * that one.
+         */
+        gdk_window_raise(mw->window->window);
+        return;
     }
 
     mw = g_malloc0(sizeof(MessageWindow));
-
-    g_hash_table_insert(displayed_messages, message, mw);
+    g_object_set_data_full(G_OBJECT(message), BALSA_MESSAGE_WINDOW_KEY, mw,
+                           (GDestroyNotify) mw_message_destroy_notify);
 
     mw->message = message;
 
@@ -391,6 +374,8 @@ message_window_new(LibBalsaMessage * message)
 
     g_signal_connect(G_OBJECT(mw->window), "destroy",
 		     G_CALLBACK(destroy_message_window), mw);
+    g_signal_connect(G_OBJECT(mw->window), "size_allocate",
+                     G_CALLBACK(size_alloc_cb), NULL);
     
     gnome_app_create_menus_with_data(GNOME_APP(mw->window), main_menu, mw);
 
@@ -428,32 +413,44 @@ message_window_new(LibBalsaMessage * message)
 	(GTK_CHECK_MENU_ITEM(view_menu[MENU_VIEW_WRAP_POS].widget),
 	 balsa_app.browse_wrap);
 
-    /* FIXME: set it to the size of the canvas, unless it is
-     * bigger than the desktop, in which case it should be at about a
-     * 2/3 proportional size based on the size of the desktop and the
-     * height and width of the canvas.  [save and restore window size too]
-     */
-
-    gtk_window_set_default_size(GTK_WINDOW(mw->window), 400, 500);
+    gtk_window_set_default_size(GTK_WINDOW(mw->window),
+                                balsa_app.message_window_width, 
+                                balsa_app.message_window_height);
 
     gtk_widget_show(mw->bmessage);
     gtk_widget_show(mw->window);
 
     g_object_set_data(G_OBJECT(mw->bmessage), "message", message);
     g_object_ref(G_OBJECT(message)); /* protect from destroying */
-    g_idle_add((GSourceFunc) message_window_idle_handler, mw);
+    mw->idle_handler_id =
+        g_idle_add((GSourceFunc) message_window_idle_handler, mw);
 }
 
+/* Handler for the "destroy" signal for mw->window. */
 static void
-destroy_message_window(GtkWidget * widget, gpointer data)
+destroy_message_window(GtkWidget * widget, MessageWindow * mw)
 {
-    MessageWindow *mw = (MessageWindow *) data;
+    if (mw->idle_handler_id) {
+        g_source_remove(mw->idle_handler_id);
+        if (mw->message)
+            g_object_unref(mw->message);
+    }
 
-    g_hash_table_remove(displayed_messages, mw->message);
-
-    gtk_widget_destroy(mw->bmessage);
+    mw->window = NULL;
+    if (mw->message)
+        g_object_set_data(G_OBJECT(mw->message), BALSA_MESSAGE_WINDOW_KEY,
+                          NULL);
 
     g_free(mw);
+}
+
+/* GDestroyNotify for mw->message. */
+static void
+mw_message_destroy_notify(MessageWindow * mw)
+{
+    mw->message = NULL;
+    if (mw->window)
+        gtk_widget_destroy(mw->window);
 }
 
 static void
@@ -557,17 +554,8 @@ view_msg_source_cb(GtkWidget * widget, gpointer data)
 static void
 close_message_window(GtkWidget * widget, gpointer data)
 {
-    weak_unref_and_destroy(data);
-}
-
-static void
-mw_message_weak_ref_cb(MessageWindow * mw, LibBalsaMessage * message)
-{
-    if (mw->message == message) {
-        /* mw->bmessage might not have been notified yet */
-        ((BalsaMessage *) mw->bmessage)->message = NULL;
-        gtk_widget_destroy(mw->window);
-    }
+    MessageWindow *mw = (MessageWindow *) data;
+    gtk_widget_destroy(mw->window);
 }
 
 static void
@@ -616,6 +604,13 @@ wrap_message_cb(GtkWidget * widget, gpointer data)
 }
 
 static void
+size_alloc_cb(GtkWidget * window, GtkAllocation * alloc)
+{
+    balsa_app.message_window_height = alloc->height;
+    balsa_app.message_window_width = alloc->width;
+}
+
+static void
 select_part_cb(BalsaMessage * bm, gpointer data)
 {
     gboolean enable;
@@ -656,7 +651,7 @@ static void next_unread_cb(GtkWidget * widget, gpointer data)
     GList *list;
     LibBalsaMessage *msg;
 
-    weak_unref_and_destroy(mw);
+    gtk_widget_destroy(mw->window);
 
     balsa_index_select_next_unread(
 	idx=BALSA_INDEX(
@@ -683,7 +678,7 @@ static void next_flagged_cb(GtkWidget * widget, gpointer data)
     GList *list;
     LibBalsaMessage *msg;
 
-    weak_unref_and_destroy(mw);
+    gtk_widget_destroy(mw->window);
 
     balsa_index_select_next_flagged(
 	idx=BALSA_INDEX(
@@ -721,7 +716,7 @@ static void trash_cb(GtkWidget * widget, gpointer data)
     balsa_message_move_to_trash(widget,
                                 balsa_find_index_by_mailbox(mailbox));
 
-    weak_unref_and_destroy(mw);
+    gtk_widget_destroy(mw->window);
 }
 
 static void
@@ -750,13 +745,4 @@ void reset_show_all_headers(MessageWindow *mw)
 
     mw->show_all_headers = FALSE;
     balsa_toolbar_set_button_active(toolbar, BALSA_PIXMAP_SHOW_HEADERS, FALSE);
-}
-
-/* helper */
-static void
-weak_unref_and_destroy(MessageWindow * mw)
-{
-    g_object_weak_unref(G_OBJECT(mw->message),
-                        (GWeakNotify) mw_message_weak_ref_cb, mw);
-    gtk_widget_destroy(mw->window);
 }

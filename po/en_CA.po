@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-01-03 18:30-0500\n"
-"PO-Revision-Date: 2005-01-03 14:48-0400\n"
+"POT-Creation-Date: 2005-01-06 17:42-0500\n"
+"PO-Revision-Date: 2005-01-06 14:48-0400\n"
 "Last-Translator: Adam Weinberger <adamw@gnome.org>\n"
 "Language-Team: en_CA <adamw@FreeBSD.org>\n"
 "MIME-Version: 1.0\n"
@@ -99,7 +99,7 @@ msgstr "O_rganization:"
 msgid "_Email Address:"
 msgstr "_Email Address:"
 
-#: libbalsa/body.c:115 libbalsa/mailbox_local.c:1136 libbalsa/message.c:835
+#: libbalsa/body.c:115 libbalsa/mailbox_local.c:1134 libbalsa/message.c:835
 msgid "(No subject)"
 msgstr "(No subject)"
 
@@ -261,8 +261,8 @@ msgid "%s: multiple keys for %s"
 msgstr "%s: multiple keys for %s"
 
 #. should "re" be localized ?
-#: libbalsa/identity.c:92 libbalsa/mailbox_local.c:1272
-#: libbalsa/mailbox_local.c:1274 src/sendmsg-window.c:3370
+#: libbalsa/identity.c:92 libbalsa/mailbox_local.c:1253
+#: libbalsa/mailbox_local.c:1255 src/sendmsg-window.c:3370
 #: src/sendmsg-window.c:3371
 msgid "Re:"
 msgstr "Re:"
@@ -551,12 +551,12 @@ msgstr "Uploading %ld kB"
 msgid "Server-side threading not supported."
 msgstr "Server-side threading not supported."
 
-#: libbalsa/mailbox_local.c:1421
+#: libbalsa/mailbox_local.c:1419
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Open of %s failed. Errno = %d, "
 
-#: libbalsa/mailbox_local.c:1443
+#: libbalsa/mailbox_local.c:1441
 #, c-format
 msgid "Failed to sync mailbox \"%s\""
 msgstr "Failed to sync mailbox \"%s\""
@@ -1487,7 +1487,7 @@ msgstr "GnomeCard Address Book"
 msgid "Address Book"
 msgstr "Address Book"
 
-#: libinit_balsa/balsa-druid-page-user.c:51
+#: libinit_balsa/balsa-druid-page-user.c:69
 msgid ""
 "The following settings are also needed (and you can find them later, if need "
 "be, in the Email application in the 'Preferences' and 'Identities' commands "
@@ -1497,7 +1497,7 @@ msgstr ""
 "be, in the Email application in the 'Preferences' and 'Identities' commands "
 "on the 'Tools' menu)"
 
-#: libinit_balsa/balsa-druid-page-user.c:56
+#: libinit_balsa/balsa-druid-page-user.c:74
 msgid ""
 " Whoever provides your email account should be able to give you the "
 "following information (if you have a Network Administrator, they may already "
@@ -1507,60 +1507,64 @@ msgstr ""
 "following information (if you have a Network Administrator, they may already "
 "have set this up for you):"
 
-#: libinit_balsa/balsa-druid-page-user.c:62
+#: libinit_balsa/balsa-druid-page-user.c:80
 msgid "Yes, remember it"
 msgstr "Yes, remember it"
 
-#: libinit_balsa/balsa-druid-page-user.c:62
+#: libinit_balsa/balsa-druid-page-user.c:80
 msgid "No, type it in every time"
 msgstr "No, type it in every time"
 
-#: libinit_balsa/balsa-druid-page-user.c:95
+#: libinit_balsa/balsa-druid-page-user.c:112
 msgid "Name of mail server for incoming _mail:"
 msgstr "Name of mail server for incoming _mail:"
 
-#: libinit_balsa/balsa-druid-page-user.c:100
+#: libinit_balsa/balsa-druid-page-user.c:117
 msgid "_Type of mail server:"
 msgstr "_Type of mail server:"
 
-#: libinit_balsa/balsa-druid-page-user.c:104
+#: libinit_balsa/balsa-druid-page-user.c:121
 msgid "Connect using _SSL:"
 msgstr "Connect using _SSL:"
 
-#: libinit_balsa/balsa-druid-page-user.c:107
-msgid "Your e-mail _login name:"
-msgstr "Your e-mail _login name:"
+#: libinit_balsa/balsa-druid-page-user.c:124
+msgid "Your email _login name:"
+msgstr "Your email _login name:"
 
-#: libinit_balsa/balsa-druid-page-user.c:110
+#: libinit_balsa/balsa-druid-page-user.c:127
 msgid "Your _password:"
 msgstr "Your _password:"
 
-#: libinit_balsa/balsa-druid-page-user.c:118
+#: libinit_balsa/balsa-druid-page-user.c:135
 msgid "_SMTP Server:"
 msgstr "_SMTP Server:"
 
 #. 2.1
-#: libinit_balsa/balsa-druid-page-user.c:123
+#: libinit_balsa/balsa-druid-page-user.c:140
 msgid "Your real _name:"
 msgstr "Your real _name:"
 
-#: libinit_balsa/balsa-druid-page-user.c:129
+#: libinit_balsa/balsa-druid-page-user.c:146
 msgid "Your _Email Address, for this email account:"
 msgstr "Your _Email Address, for this email account:"
 
-#: libinit_balsa/balsa-druid-page-user.c:134
+#: libinit_balsa/balsa-druid-page-user.c:151
 msgid "_Remember your password:"
 msgstr "_Remember your password:"
 
-#: libinit_balsa/balsa-druid-page-user.c:139
+#: libinit_balsa/balsa-druid-page-user.c:154
+msgid "_Refer to this account as:"
+msgstr "_Refer to this account as:"
+
+#: libinit_balsa/balsa-druid-page-user.c:162
 msgid "_Local mail directory:"
 msgstr "_Local mail directory:"
 
-#: libinit_balsa/balsa-druid-page-user.c:156
+#: libinit_balsa/balsa-druid-page-user.c:179
 msgid "User Settings"
 msgstr "User Settings"
 
-#: libinit_balsa/balsa-druid-page-user.c:302
+#: libinit_balsa/balsa-druid-page-user.c:325
 #, c-format
 msgid ""
 "Local Mail Problem\n"

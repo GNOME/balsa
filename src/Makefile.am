@@ -1,6 +1,6 @@
 bin_PROGRAMS = balsa
 
-balsa_SOURCES =	\
+balsa_BASE_SOURCES =	\
 	address-book.c		\
 	address-book.h		\
 	balsa-app.c		\
@@ -48,8 +48,16 @@ balsa_SOURCES =	\
 	spell-check.c		\
 	spell-check.h		\
 	ldap-addressbook.c	\
-	ldap-addressbook.h 
+	ldap-addressbook.h 	
 #	index-child.h		\
+
+balsa_IDL_SOURCES = \
+	balsa-common.c		\
+	balsa-skels.c		\
+	balsa-stubs.c		
+balsa_IDL_SOURCES = 
+
+balsa_SOURCES = $(balsa_BASE_SOURCES) $(balsa_IDL_SOURCES)
 
 INCLUDES = \
 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\" \
@@ -85,3 +93,17 @@ balsa_DEPENDENCIES = \
 dist-hook:
 	mkdir $(distdir)/pixmaps
 	cp $(srcdir)/pixmaps/*.xpm $(distdir)/pixmaps
+
+idldir = $(datadir)/idl
+
+idl_DATA = ../idl/balsa.idl
+
+CORBA_SRCLIST = balsa-common.c balsa-skels.c balsa-stubs.c \
+                balsa.h
+
+
+BALSA_ORB_SRCLIST = orbit-glue.c 
+
+
+$(CORBA_SRCLIST): $(idl_DATA)
+		$(ORBIT_IDL) $(idl_DATA)

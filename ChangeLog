@@ -1,3 +1,7 @@
+2000-04-10  Peter Williams  <peter@beta.newton.cx>
+
+	* configure.in: Add check for gob when using CVS source.
+
 2000-04-09  Matthew Guenther <mguenther@netcom.ca>
 	* src/address-book.c (ab_load): fix memory allocation bug, use more 
 	glib string functions, set ->name to ->id if no Id is present in the 

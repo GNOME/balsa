@@ -200,6 +200,18 @@ AC_DEFINE_UNQUOTED( GNOME_DATA_PREFIX, "$GNOME_DATA_PREFIX" )
 AC_DEFINE_UNQUOTED( BALSA_COMMON_PREFIXES, `echo $BALSA_COMMON_PREFIXES` ) dnl bleah
 
 dnl ######################################################################################
+dnl Things needed by CVS user
+dnl ######################################################################################
+
+if test x"$BALSA_FROM_CVS" = xyes ; then
+	AC_CHECK_PROG(HAS_GOB, gob, yes, no)
+
+	if test x"$HAS_GOB" = xno ; then
+		AC_MSG_ERROR([As a CVS user, you need to get gob to build Balsa. It is available from Gnome CVS in the module 'gob])
+	fi
+fi
+
+dnl ######################################################################################
 dnl Create files.
 dnl ######################################################################################
 

@@ -8,10 +8,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa HEAD\n"
-"POT-Creation-Date: 2003-03-21 15:43+0900\n"
-"PO-Revision-Date: 2003-03-21 15:42+0900\n"
-"Last-Translator: KAMAGASAKO Masatoshi <emerald@gnome.gr.jp>\n"
-"Language-Team:  <gnome-translation@gnome.gr.jp>\n"
+"POT-Creation-Date: 2003-03-27 00:08+0900\n"
+"PO-Revision-Date: 2003-03-27 00:06+0900\n"
+"Last-Translator: Takeshi AIHANA <aihana@gnome.gr.jp>\n"
+"Language-Team: Japanese <gnome-translation@gnome.gr.jp>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -141,12 +141,12 @@ msgstr "メッセージの移動中にエラーが発生しました"
 
 #. should "re" be localized ?
 #: libbalsa/identity.c:88 src/balsa-index-threading.c:547
-#: src/balsa-index-threading.c:549 src/sendmsg-window.c:2318
-#: src/sendmsg-window.c:2319
+#: src/balsa-index-threading.c:549 src/sendmsg-window.c:2324
+#: src/sendmsg-window.c:2325
 msgid "Re:"
 msgstr "Re:"
 
-#: libbalsa/identity.c:89 src/sendmsg-window.c:2347 src/sendmsg-window.c:2348
+#: libbalsa/identity.c:89 src/sendmsg-window.c:2353 src/sendmsg-window.c:2354
 msgid "Fwd:"
 msgstr "Fwd:"
 
@@ -488,6 +488,192 @@ msgstr "%d / %d のメッセージを取得中"
 msgid "Received %d bytes of %d"
 msgstr "%d バイト/ %d 受信済み"
 
+#: libbalsa/rfc3156.c:191 libbalsa/rfc3156.c:210 libbalsa/rfc3156.c:440
+#, c-format
+msgid "gpgme could not get data from mailbox file: %s"
+msgstr "gpgme はメールボックスからデータを取得できませんでした: %s"
+
+#: libbalsa/rfc3156.c:223
+#, c-format
+msgid "gpgme signature verification failed: %s"
+msgstr "gpgme 署名の検証に失敗: %s"
+
+#: libbalsa/rfc3156.c:423 libbalsa/rfc3156.c:849 libbalsa/rfc3156.c:959
+#, c-format
+msgid "could not create gpgme context: %s"
+msgstr "gpgme コンテキストを生成できませんでした: %s"
+
+#: libbalsa/rfc3156.c:429
+msgid "Enter passphrase to decrypt message"
+msgstr "メッセージを解読するパスフレーズの入力"
+
+#: libbalsa/rfc3156.c:450
+#, c-format
+msgid "gpgme could not create new data object: %s"
+msgstr "gpgme は新しいデータ・オブジェクトを生成できませんでした: %s"
+
+#: libbalsa/rfc3156.c:461
+#, c-format
+msgid "gpgme decryption failed: %s"
+msgstr "gpgme 解読に失敗: %s"
+
+#: libbalsa/rfc3156.c:475
+#, c-format
+msgid "could not get gpgme decrypted data: %s"
+msgstr "gpgme 暗号解読データを取得できませんでした: %s"
+
+#: libbalsa/rfc3156.c:605
+msgid "The signature is valid."
+msgstr "署名は有効です。"
+
+#: libbalsa/rfc3156.c:607
+msgid "The signature is valid but expired."
+msgstr "署名は有効ですが期限切れです。"
+
+#: libbalsa/rfc3156.c:609
+msgid ""
+"The signature is valid but the key used to verify the signature has expired."
+msgstr "署名は有効ですが、署名の検証に使用する鍵の有効期限が切れています。"
+
+#: libbalsa/rfc3156.c:611
+msgid "The signature is invalid."
+msgstr "署名は無効です。"
+
+#: libbalsa/rfc3156.c:613
+msgid "The signature could not be verified due to a missing key."
+msgstr "鍵が無いので署名を検証することができませんでした。"
+
+#: libbalsa/rfc3156.c:615
+msgid "This part is not a real PGP signature."
+msgstr "この部分は本当の PGP 署名ではありません。"
+
+#: libbalsa/rfc3156.c:617
+msgid "An error prevented the signature verification."
+msgstr "署名の検証でエラーが発生しました。"
+
+#: libbalsa/rfc3156.c:619
+msgid "This part contains at least two signatures with different status."
+msgstr ""
+"この部分には少なくとも異なるステータスをもつ二つの署名が含まれています。"
+
+#: libbalsa/rfc3156.c:622
+msgid "bad status"
+msgstr "不正なステータス"
+
+#: libbalsa/rfc3156.c:632
+msgid "The user ID is of unknown validity."
+msgstr "妥当性が不明なユーザ ID です。"
+
+#: libbalsa/rfc3156.c:634
+msgid "The validity of the user ID is undefined."
+msgstr "ユーザ ID の妥当性が定義されていません。"
+
+#: libbalsa/rfc3156.c:636
+msgid "The user ID is never valid."
+msgstr "ユーザ ID は妥当ではありません。"
+
+#: libbalsa/rfc3156.c:638
+msgid "The user ID is marginally valid."
+msgstr "ユーザ ID は少し有効です。"
+
+#: libbalsa/rfc3156.c:640
+msgid "The user ID is fully valid."
+msgstr "ユーザ ID は完全に有効です。"
+
+#: libbalsa/rfc3156.c:642
+msgid "The user ID is ultimately valid."
+msgstr "ユーザ ID は究極的に妥当です。"
+
+#: libbalsa/rfc3156.c:644
+msgid "bad validity"
+msgstr "不正な妥当性"
+
+#: libbalsa/rfc3156.c:725
+#, c-format
+msgid ""
+"The passphrase for this key was bad, please try again!\n"
+"\n"
+"Key: %s"
+msgstr ""
+"この鍵のパスフレーズが間違っています。再入力して下さい！\n"
+"\n"
+"鍵: %s"
+
+#: libbalsa/rfc3156.c:729
+#, c-format
+msgid ""
+"Please enter the passphrase for the secret key!\n"
+"\n"
+"Key: %s"
+msgstr ""
+"秘密鍵のパスワードを入力して下さい！\n"
+"\n"
+"鍵: %s"
+
+#: libbalsa/rfc3156.c:857 libbalsa/rfc3156.c:978
+#, c-format
+msgid "could not list keys for %s: %s"
+msgstr "%s の鍵をリスト化できませんでした: %s"
+
+#: libbalsa/rfc3156.c:864
+#, c-format
+msgid "could not retrieve key for %s: %s"
+msgstr "%s の鍵を取得できませんでした: %s"
+
+#: libbalsa/rfc3156.c:877
+msgid "Enter passsphrase to sign message"
+msgstr "メッセージに署名するパスフレーズの入力"
+
+#: libbalsa/rfc3156.c:882 libbalsa/rfc3156.c:1034
+#, c-format
+msgid "gpgme could not get data from file: %s"
+msgstr "gpgme はファイルからデータを取得できませんでした: %s"
+
+#: libbalsa/rfc3156.c:890 libbalsa/rfc3156.c:1042
+#, c-format
+msgid "gpgme could not create new data: %s"
+msgstr "gpgme は新しいデータを生成できませんでした: %s"
+
+#: libbalsa/rfc3156.c:900
+#, c-format
+msgid "gpgme signing failed: %s"
+msgstr "gpgme 署名に失敗: %s"
+
+#: libbalsa/rfc3156.c:920 libbalsa/rfc3156.c:1065
+#, c-format
+msgid "could not get gpgme data: %s"
+msgstr "gpgme データを取得できませんでした: %s"
+
+#: libbalsa/rfc3156.c:965
+#, c-format
+msgid "could not create gpgme recipients set: %s"
+msgstr "gpgme 受信者セットを生成できませんでした: %s"
+
+#: libbalsa/rfc3156.c:987
+#, c-format
+msgid "could not find a public key for %s"
+msgstr "%s の公開鍵が見つかりませんでした"
+
+#: libbalsa/rfc3156.c:991
+#, c-format
+msgid "could not get the public key for %s: %s"
+msgstr "%s の公開鍵を取得できませんでした: %s"
+
+#: libbalsa/rfc3156.c:1002
+#, c-format
+msgid "could not retrieve key fingerprint for %s: %s"
+msgstr "%s の鍵の指紋を取得できませんでした: %s"
+
+#: libbalsa/rfc3156.c:1016
+#, c-format
+msgid "could not add recipient %s: %s"
+msgstr "受信者 %s を追加できませんでした: %s"
+
+#: libbalsa/rfc3156.c:1051
+#, c-format
+msgid "gpgme encryption failed: %s"
+msgstr "gpgme 暗号化に失敗: %s"
+
 #: libbalsa/send.c:218 libbalsa/send.c:225
 msgid "Sending Mail..."
 msgstr "メールの送信中..."
@@ -512,8 +698,8 @@ msgstr ""
 msgid "Connected to MTA"
 msgstr "MTA へ接続済み"
 
-#: libbalsa/send.c:851 src/balsa-message.c:835 src/print.c:347
-#: src/sendmsg-window.c:746 src/sendmsg-window.c:2149 src/store-address.c:322
+#: libbalsa/send.c:851 src/balsa-message.c:875 src/print.c:347
+#: src/sendmsg-window.c:752 src/sendmsg-window.c:2155 src/store-address.c:322
 msgid "From:"
 msgstr "送信元:"
 
@@ -521,8 +707,8 @@ msgstr "送信元:"
 msgid "From"
 msgstr "送信元"
 
-#: libbalsa/send.c:862 src/balsa-message.c:844 src/print.c:357
-#: src/sendmsg-window.c:745 src/sendmsg-window.c:2155 src/store-address.c:323
+#: libbalsa/send.c:862 src/balsa-message.c:884 src/print.c:357
+#: src/sendmsg-window.c:751 src/sendmsg-window.c:2161 src/store-address.c:323
 msgid "To:"
 msgstr "送信先:"
 
@@ -556,6 +742,10 @@ msgid ""
 msgstr ""
 "SMTP サーバに問題があります (%d): %s\n"
 "メッセージは送信箱に残ったままです。"
+
+#: libbalsa/send.c:1645
+msgid "This message will not be encrpyted for the BCC: recipient(s)."
+msgstr "BCC に対してこのメッセージは暗号化されません: recipient(s)"
 
 #: libbalsa/source-viewer.c:46 src/main-window.c:513
 msgid "_Select Text"
@@ -1035,7 +1225,7 @@ msgstr "%s の取り消し中..."
 msgid "Unable to fetch headers from this IMAP server version."
 msgstr "この IMAP サーバのバージョンからヘッダを取得できません。"
 
-#: libmutt/imap/message.c:89 src/balsa-message.c:2312
+#: libmutt/imap/message.c:89 src/balsa-message.c:2322
 #, c-format
 msgid "Could not create temporary file %s"
 msgstr "作業ファイル %s を生成できませんでした"
@@ -1680,60 +1870,60 @@ msgstr "サイズ"
 msgid "Opening mailbox %s. Please wait..."
 msgstr "メールボックス %s を開いています。少々お待ち下さい..."
 
-#: src/balsa-index.c:1857
+#: src/balsa-index.c:1871
 msgid "_View Source"
 msgstr "ソースの表示(_V)"
 
-#: src/balsa-index.c:1859 src/main-window.c:444 src/message-window.c:126
+#: src/balsa-index.c:1873 src/main-window.c:444 src/message-window.c:126
 msgid "_Reply..."
 msgstr "返信(_R)..."
 
-#: src/balsa-index.c:1861
+#: src/balsa-index.c:1875
 msgid "Reply To _All..."
 msgstr "全員に返信(_A)..."
 
-#: src/balsa-index.c:1863
+#: src/balsa-index.c:1877
 msgid "Reply To _Group..."
 msgstr "グループに返信(_G)..."
 
-#: src/balsa-index.c:1865
+#: src/balsa-index.c:1879
 msgid "_Forward Attached..."
 msgstr "添付して転送(_F)..."
 
-#: src/balsa-index.c:1867
+#: src/balsa-index.c:1881
 msgid "Forward _Inline..."
 msgstr "インラインで転送(_I)..."
 
-#: src/balsa-index.c:1869 src/main-window.c:546
+#: src/balsa-index.c:1883 src/main-window.c:546
 msgid "_Store Address..."
 msgstr "アドレスの追加(_S)..."
 
-#: src/balsa-index.c:1882 src/filter-edit-dialog.c:216 src/mailbox-node.c:868
+#: src/balsa-index.c:1896 src/filter-edit-dialog.c:216 src/mailbox-node.c:868
 #: src/main-window.c:528 src/pref-manager.c:1526 src/pref-manager.c:2619
 msgid "_Delete"
 msgstr "削除(_D)"
 
-#: src/balsa-index.c:1887 src/main-window.c:535
+#: src/balsa-index.c:1901 src/main-window.c:535
 msgid "_Undelete"
 msgstr "元に戻す(_U)"
 
-#: src/balsa-index.c:1892
+#: src/balsa-index.c:1906
 msgid "Move To _Trash"
 msgstr "ゴミ箱に送る(_T)"
 
-#: src/balsa-index.c:1896
+#: src/balsa-index.c:1910
 msgid "T_oggle"
 msgstr "切り替え(_O)"
 
-#: src/balsa-index.c:1899
+#: src/balsa-index.c:1913
 msgid "_Flagged"
 msgstr "フラグ付け(_F)"
 
-#: src/balsa-index.c:1902
+#: src/balsa-index.c:1916
 msgid "_Unread"
 msgstr "未読(_U)"
 
-#: src/balsa-index.c:1910
+#: src/balsa-index.c:1924
 msgid "_Move to"
 msgstr "送る(_M)"
 
@@ -1779,12 +1969,11 @@ msgstr " %s を保存できませんでした: %s"
 msgid "Save MIME Part"
 msgstr "MIME パートの保存"
 
-#: src/balsa-message.c:578
-#, c-format
-msgid "The signature of the message sent by %s with subject \"%s\" is good."
-msgstr "%s が送信した件名 \"%s\" のメッセージの署名に問題はありません。"
+#: src/balsa-message.c:534
+msgid "detected a good signature"
+msgstr "妥当な署名を検出しました"
 
-#: src/balsa-message.c:582
+#: src/balsa-message.c:538
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" "
@@ -1794,58 +1983,48 @@ msgstr ""
 "%s が送信した件名 \"%s' のメッセージの署名チェックの結果:\n"
 "%s"
 
-#: src/balsa-message.c:587
+#: src/balsa-message.c:545
 #, c-format
 msgid ""
-"ckecking the signature of the message sent by %s with subject \"%s\" failed "
+"Checking the signature of the message sent by %s with subject \"%s\" failed "
 "with an error!"
 msgstr ""
 "%s が送信した件名 \"%s\" のメッセージの署名チェックでエラーが発生しました！"
 
-#: src/balsa-message.c:826 src/print.c:330 src/sendmsg-window.c:751
-#: src/sendmsg-window.c:2145
+#: src/balsa-message.c:866 src/print.c:330 src/sendmsg-window.c:757
+#: src/sendmsg-window.c:2151
 msgid "Subject:"
 msgstr "件名:"
 
-#: src/balsa-message.c:830 src/print.c:336 src/sendmsg-window.c:2141
+#: src/balsa-message.c:870 src/print.c:336 src/sendmsg-window.c:2147
 msgid "Date:"
 msgstr "日付:"
 
-#: src/balsa-message.c:841 src/sendmsg-window.c:747
+#: src/balsa-message.c:881 src/sendmsg-window.c:753
 msgid "Reply-To:"
 msgstr "返信先:"
 
 #. cc:
-#: src/balsa-message.c:845 src/print.c:358 src/sendmsg-window.c:749
-#: src/sendmsg-window.c:1863 src/sendmsg-window.c:2161 src/store-address.c:324
+#: src/balsa-message.c:885 src/print.c:358 src/sendmsg-window.c:755
+#: src/sendmsg-window.c:1869 src/sendmsg-window.c:2167 src/store-address.c:324
 msgid "Cc:"
 msgstr "Cc:"
 
 #. bcc:
-#: src/balsa-message.c:846 src/print.c:359 src/sendmsg-window.c:748
-#: src/sendmsg-window.c:1868 src/store-address.c:325
+#: src/balsa-message.c:886 src/print.c:359 src/sendmsg-window.c:754
+#: src/sendmsg-window.c:1874 src/store-address.c:325
 msgid "Bcc:"
 msgstr "Bcc:"
 
-#: src/balsa-message.c:849 src/print.c:360
+#: src/balsa-message.c:889 src/print.c:360
 msgid "Fcc:"
 msgstr "Fcc:"
 
-#: src/balsa-message.c:854 src/print.c:366
+#: src/balsa-message.c:894 src/print.c:366
 msgid "Disposition-Notification-To:"
 msgstr "配送通知先:"
 
-#: src/balsa-message.c:948
-msgid ""
-"\n"
-"\n"
-"Signature details:"
-msgstr ""
-"\n"
-"\n"
-"署名の詳細:"
-
-#: src/balsa-message.c:950
+#: src/balsa-message.c:958
 #, c-format
 msgid ""
 "\n"
@@ -1854,12 +2033,21 @@ msgstr ""
 "\n"
 "署名元: %s"
 
-#: src/balsa-message.c:956
+#: src/balsa-message.c:964
 #, c-format
 msgid "Mail address: %s"
-msgstr "E-Mailアドレス: %s"
+msgstr "E-Mail アドレス: %s"
 
-#: src/balsa-message.c:959
+#: src/balsa-message.c:966
+#, c-format
+msgid ""
+"\n"
+"Validity: %s"
+msgstr ""
+"\n"
+"妥当性: %s"
+
+#: src/balsa-message.c:969
 #, c-format
 msgid ""
 "\n"
@@ -1868,7 +2056,7 @@ msgstr ""
 "\n"
 "鍵の指紋: %s"
 
-#: src/balsa-message.c:965
+#: src/balsa-message.c:975
 #, c-format
 msgid ""
 "\n"
@@ -1877,7 +2065,7 @@ msgstr ""
 "\n"
 "鍵の生成元: %s"
 
-#: src/balsa-message.c:971
+#: src/balsa-message.c:981
 #, c-format
 msgid ""
 "\n"
@@ -1886,97 +2074,97 @@ msgstr ""
 "\n"
 "署名元: %s"
 
-#: src/balsa-message.c:1060 src/balsa-message.c:1076 src/balsa-message.c:1106
-#: src/balsa-message.c:1159
+#: src/balsa-message.c:1070 src/balsa-message.c:1086 src/balsa-message.c:1116
+#: src/balsa-message.c:1169
 msgid "Content Type: external-body\n"
 msgstr "MIME 型: external-body\n"
 
-#: src/balsa-message.c:1061
+#: src/balsa-message.c:1071
 msgid "Access type: local-file\n"
 msgstr "アクセス形式: ローカルのファイル\n"
 
-#: src/balsa-message.c:1062 src/balsa-message.c:1113 src/balsa-message.c:1246
+#: src/balsa-message.c:1072 src/balsa-message.c:1123 src/balsa-message.c:1256
 #, c-format
 msgid "File name: %s"
 msgstr "ファイル名: %s"
 
-#: src/balsa-message.c:1077
+#: src/balsa-message.c:1087
 msgid "Access type: URL\n"
 msgstr "アクセス形式: URL\n"
 
-#: src/balsa-message.c:1078
+#: src/balsa-message.c:1088
 #, c-format
 msgid "URL: %s"
 msgstr "URL: %s"
 
-#: src/balsa-message.c:1107
+#: src/balsa-message.c:1117
 #, c-format
 msgid "Access type: %s\n"
 msgstr "アクセス形式: %s\n"
 
-#: src/balsa-message.c:1110
+#: src/balsa-message.c:1120
 #, c-format
 msgid "FTP site: %s\n"
 msgstr "FTP サイト: %s\n"
 
-#: src/balsa-message.c:1112
+#: src/balsa-message.c:1122
 #, c-format
 msgid "Directory: %s\n"
 msgstr "ディレクトリ: %s\n"
 
-#: src/balsa-message.c:1160
+#: src/balsa-message.c:1170
 msgid "Access type: mail-server\n"
 msgstr "アクセス形式: メール・サーバ\n"
 
-#: src/balsa-message.c:1161
+#: src/balsa-message.c:1171
 #, c-format
 msgid "Mail server: %s\n"
 msgstr "メールサーバ: %s\n"
 
-#: src/balsa-message.c:1163
+#: src/balsa-message.c:1173
 #, c-format
 msgid "Subject: %s\n"
 msgstr "件名: %s\n"
 
-#: src/balsa-message.c:1174
+#: src/balsa-message.c:1184
 msgid "Send message to obtain this part"
 msgstr "この部分を取得するためにメッセージを送信"
 
-#: src/balsa-message.c:1254
+#: src/balsa-message.c:1264
 #, c-format
 msgid "Type: %s (%s)"
 msgstr "種類: %s (%s)"
 
-#: src/balsa-message.c:1257
+#: src/balsa-message.c:1267
 #, c-format
 msgid "Content Type: %s"
 msgstr "MIME 型: %s"
 
-#: src/balsa-message.c:1268
+#: src/balsa-message.c:1278
 msgid "No open or view action defined in GNOME MIME for this content type"
 msgstr ""
 "この MIME 型の動作 open または view は GNOME MIME として定義されていません"
 
-#: src/balsa-message.c:1274
+#: src/balsa-message.c:1284
 msgid "Save part"
 msgstr "MIME 型の保存"
 
-#: src/balsa-message.c:1298 src/balsa-message.c:1323
+#: src/balsa-message.c:1308 src/balsa-message.c:1333
 #, c-format
 msgid "View part with %s"
 msgstr "%s で表示する"
 
-#: src/balsa-message.c:1713
+#: src/balsa-message.c:1723
 #, c-format
 msgid "Calling URL %s..."
 msgstr "URL %s の読み込み中..."
 
-#: src/balsa-message.c:1722 src/balsa-message.c:2231 src/balsa-message.c:2779
+#: src/balsa-message.c:1732 src/balsa-message.c:2241 src/balsa-message.c:2789
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "%s の表示中にエラー: %s\n"
 
-#: src/balsa-message.c:1753
+#: src/balsa-message.c:1763
 #, c-format
 msgid ""
 "Error writing to temporary file %s.\n"
@@ -1985,26 +2173,26 @@ msgstr ""
 "作業用ファイル %s への書き込みでエラーが発生しました。\n"
 "ディレクトリの書き込み権限を確認して下さい。"
 
-#: src/balsa-message.c:1761
+#: src/balsa-message.c:1771
 #, c-format
 msgid "Cannot open temporary file %s."
 msgstr "作業用ファイル %s を開けませんでした。"
 
-#: src/balsa-message.c:2034
+#: src/balsa-message.c:2044
 #, c-format
 msgid "Open with %s"
 msgstr "%s で開く"
 
-#: src/balsa-message.c:2172
+#: src/balsa-message.c:2182
 msgid "Save..."
 msgstr "保存..."
 
-#: src/balsa-message.c:2357
+#: src/balsa-message.c:2367
 #, c-format
 msgid "could not create temporary file %s"
 msgstr "作業ファイル %s を作成できませんでした"
 
-#: src/balsa-message.c:3062
+#: src/balsa-message.c:3072
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2015,7 +2203,7 @@ msgstr ""
 " '%s' に返信するよう要求してきました。\n"
 "この通知を送信しても宜しいですか？"
 
-#: src/balsa-message.c:3069
+#: src/balsa-message.c:3079
 msgid "Reply to MDN?"
 msgstr "MDN に返信しますか？"
 
@@ -2148,7 +2336,7 @@ msgstr "本文(_B)"
 
 #. To:
 #: src/filter-edit-callbacks.c:993 src/main-window.c:2709
-#: src/sendmsg-window.c:1852
+#: src/sendmsg-window.c:1858
 msgid "_To:"
 msgstr "送信先(_T):"
 
@@ -2156,7 +2344,7 @@ msgstr "送信先(_T):"
 msgid "_From:"
 msgstr "送信元(_F):"
 
-#: src/filter-edit-callbacks.c:1008 src/sendmsg-window.c:288
+#: src/filter-edit-callbacks.c:1008 src/sendmsg-window.c:292
 msgid "_Subject"
 msgstr "件名(_S)"
 
@@ -2435,7 +2623,7 @@ msgstr "SSL (IMAP用) を利用する(_L)"
 msgid "Select parent folder"
 msgstr "親フォルダの選択"
 
-#: src/folder-conf.c:530 src/mailbox-conf.c:407 src/sendmsg-window.c:889
+#: src/folder-conf.c:530 src/mailbox-conf.c:407 src/sendmsg-window.c:895
 msgid "Select Identity"
 msgstr "身元情報"
 
@@ -2530,18 +2718,18 @@ msgid "Confirm"
 msgstr "確認"
 
 #: src/information-dialog.c:201
-msgid "Balsa Information"
-msgstr "Balsa 情報"
+msgid "Information - Balsa"
+msgstr "情報 - Balsa"
 
-#: src/information-dialog.c:263
+#: src/information-dialog.c:268
 msgid "WARNING: "
 msgstr "警告:"
 
-#: src/information-dialog.c:266
+#: src/information-dialog.c:271
 msgid "ERROR: "
 msgstr "エラー:"
 
-#: src/information-dialog.c:269
+#: src/information-dialog.c:274
 msgid "FATAL: "
 msgstr "致命的なエラー:"
 
@@ -2983,7 +3171,7 @@ msgstr "メールボックスのノートブック・タブの表示を切り替
 msgid "_Wrap"
 msgstr "ラップ(_W)"
 
-#: src/main-window.c:402 src/sendmsg-window.c:236
+#: src/main-window.c:402 src/sendmsg-window.c:240
 msgid "Wrap message lines"
 msgstr "メッセージ行をラップします"
 
@@ -3208,7 +3396,7 @@ msgstr "身元情報(_I)..."
 msgid "Create and set current identities"
 msgstr "現在の身元情報の作成と設定を行います"
 
-#: src/main-window.c:658
+#: src/main-window.c:658 src/message-window.c:185
 msgid "_Message"
 msgstr "メッセージ(_M)"
 
@@ -3231,10 +3419,6 @@ msgid ""
 msgstr ""
 "メールボックスが開けません!\n"
 "メールボックスの設定を確認して下さい。"
-
-#: src/main-window.c:1656
-msgid "Copyright (C) 1997-2002"
-msgstr "Copyright (C) 1997-2002"
 
 #: src/main-window.c:1660
 msgid ""
@@ -3397,6 +3581,10 @@ msgstr "インラインで転送..."
 #: src/message-window.c:149
 msgid "Forward this message inline"
 msgstr "このメッセージをインライン化して転送します"
+
+#: src/message-window.c:184
+msgid "M_ove"
+msgstr "移動(_O)"
 
 #: src/pref-manager.c:318
 msgid "7 Bits"
@@ -4067,312 +4255,312 @@ msgstr ""
 "MDN を要求するオプションがメール作成ウィンドウの \"オプション\" メニューにあ"
 "ります。"
 
-#: src/sendmsg-window.c:183
+#: src/sendmsg-window.c:187
 msgid "_Include File..."
 msgstr "ファイルの挿入(_I)..."
 
-#: src/sendmsg-window.c:186
+#: src/sendmsg-window.c:190
 msgid "_Attach File..."
 msgstr "ファイルの添付(_A)..."
 
-#: src/sendmsg-window.c:189
+#: src/sendmsg-window.c:193
 msgid "_Include Message(s)"
 msgstr "メッセージの挿入(_I)"
 
-#: src/sendmsg-window.c:192
+#: src/sendmsg-window.c:196
 msgid "Attach _Message(s)"
 msgstr "メッセージの添付(_M)"
 
-#: src/sendmsg-window.c:198
+#: src/sendmsg-window.c:202
 msgid "_Send"
 msgstr "送信(_S)"
 
-#: src/sendmsg-window.c:199 src/toolbar-factory.c:121
+#: src/sendmsg-window.c:203 src/toolbar-factory.c:121
 msgid "Send this message"
 msgstr "このメッセージを送信する"
 
-#: src/sendmsg-window.c:203
+#: src/sendmsg-window.c:207
 msgid "_Queue"
 msgstr "キュー(_Q)"
 
-#: src/sendmsg-window.c:204
+#: src/sendmsg-window.c:208
 msgid "Queue this message in Outbox for sending"
 msgstr "送信箱にあるこのメッセージをキューに格納します"
 
-#: src/sendmsg-window.c:208
+#: src/sendmsg-window.c:212
 msgid "_Postpone"
 msgstr "中断(_P)"
 
-#: src/sendmsg-window.c:211
+#: src/sendmsg-window.c:215
 msgid "_Save"
 msgstr "保存(_S)"
 
-#: src/sendmsg-window.c:212
+#: src/sendmsg-window.c:216
 msgid "Save this message"
 msgstr "このメッセージを保存する"
 
-#: src/sendmsg-window.c:216
+#: src/sendmsg-window.c:220
 msgid "Print..."
 msgstr "印刷..."
 
-#: src/sendmsg-window.c:216
+#: src/sendmsg-window.c:220
 msgid "Print the edited message"
 msgstr "編集済みのメッセージを印刷します"
 
-#: src/sendmsg-window.c:236
+#: src/sendmsg-window.c:240
 msgid "_Wrap Body"
 msgstr "本文のラップ(_W)"
 
-#: src/sendmsg-window.c:241
+#: src/sendmsg-window.c:245
 msgid "Insert Si_gnature"
 msgstr "署名の挿入(_G)"
 
-#: src/sendmsg-window.c:245
+#: src/sendmsg-window.c:249
 msgid "_Quote Message(s)"
 msgstr "メッセージの引用(_Q)"
 
-#: src/sendmsg-window.c:250
+#: src/sendmsg-window.c:254
 msgid "_Reflow Paragraph"
 msgstr "段落を逆順に(_R)"
 
-#: src/sendmsg-window.c:254
+#: src/sendmsg-window.c:258
 msgid "R_eflow Message"
 msgstr "メッセージを逆順にします"
 
-#: src/sendmsg-window.c:259
+#: src/sendmsg-window.c:263
 msgid "C_heck Spelling"
 msgstr "スペル・チェック(_H)"
 
-#: src/sendmsg-window.c:260
+#: src/sendmsg-window.c:264
 msgid "Check the spelling of the message"
 msgstr "メッセージのスペルをチェック"
 
-#: src/sendmsg-window.c:265
+#: src/sendmsg-window.c:269
 msgid "Select _Identity..."
 msgstr "身元情報の選択(_I)..."
 
-#: src/sendmsg-window.c:266
+#: src/sendmsg-window.c:270
 msgid "Select the Identity to use for the message"
 msgstr "メッセージに使用する身元情報の選択"
 
-#: src/sendmsg-window.c:271
+#: src/sendmsg-window.c:275
 msgid "_Edit with Gnome-Editor"
 msgstr "GNOME エディタで編集(_E)"
 
-#: src/sendmsg-window.c:272
+#: src/sendmsg-window.c:276
 msgid "Edit the current message with the default Gnome editor"
 msgstr "現在のメッセージをデフォルトの GNOME エディタで編集します"
 
-#: src/sendmsg-window.c:284
+#: src/sendmsg-window.c:288
 msgid "Fr_om"
 msgstr "送信元(_O)"
 
-#: src/sendmsg-window.c:286
+#: src/sendmsg-window.c:290
 msgid "_To"
 msgstr "送信先(_T)"
 
-#: src/sendmsg-window.c:290
+#: src/sendmsg-window.c:294
 msgid "_Cc"
 msgstr "Cc(_C)"
 
-#: src/sendmsg-window.c:292
+#: src/sendmsg-window.c:296
 msgid "_Bcc"
 msgstr "Bcc(_B)"
 
-#: src/sendmsg-window.c:294
+#: src/sendmsg-window.c:298
 msgid "_Fcc"
 msgstr "Fcc(_F)"
 
-#: src/sendmsg-window.c:296
+#: src/sendmsg-window.c:300
 msgid "_Reply To"
 msgstr "返信(_R)"
 
-#: src/sendmsg-window.c:298
+#: src/sendmsg-window.c:302
 msgid "_Attachments"
 msgstr "添付(_A)"
 
-#: src/sendmsg-window.c:301
+#: src/sendmsg-window.c:305
 msgid "_Comments"
 msgstr "コメント(_C)"
 
-#: src/sendmsg-window.c:304
+#: src/sendmsg-window.c:308
 msgid "_Keywords"
 msgstr "キーワード(_K)"
 
-#: src/sendmsg-window.c:321 src/sendmsg-window.c:392
+#: src/sendmsg-window.c:325 src/sendmsg-window.c:396
 msgid "Brazilian"
 msgstr "ブラジル語"
 
-#: src/sendmsg-window.c:323 src/sendmsg-window.c:394
+#: src/sendmsg-window.c:327 src/sendmsg-window.c:398
 msgid "Catalan"
 msgstr "カタラン語"
 
-#: src/sendmsg-window.c:325 src/sendmsg-window.c:396
+#: src/sendmsg-window.c:329 src/sendmsg-window.c:400
 msgid "Chinese Simplified"
 msgstr "簡体字中国語"
 
-#: src/sendmsg-window.c:327 src/sendmsg-window.c:398
+#: src/sendmsg-window.c:331 src/sendmsg-window.c:402
 msgid "Chinese Traditional"
 msgstr "繁体字中国語"
 
-#: src/sendmsg-window.c:329 src/sendmsg-window.c:400
+#: src/sendmsg-window.c:333 src/sendmsg-window.c:404
 msgid "Czech"
 msgstr "チェコ語"
 
-#: src/sendmsg-window.c:331 src/sendmsg-window.c:402
+#: src/sendmsg-window.c:335 src/sendmsg-window.c:406
 msgid "Danish"
 msgstr "デンマーク語"
 
-#: src/sendmsg-window.c:333 src/sendmsg-window.c:414
+#: src/sendmsg-window.c:337 src/sendmsg-window.c:418
 msgid "German"
 msgstr "ドイツ語"
 
-#: src/sendmsg-window.c:335 src/sendmsg-window.c:404
+#: src/sendmsg-window.c:339 src/sendmsg-window.c:408
 msgid "Dutch"
 msgstr "オランダ語"
 
 #. English -> American English, argh...
-#: src/sendmsg-window.c:338 src/sendmsg-window.c:406
+#: src/sendmsg-window.c:342 src/sendmsg-window.c:410
 msgid "English"
 msgstr "英語"
 
-#: src/sendmsg-window.c:340 src/sendmsg-window.c:408
+#: src/sendmsg-window.c:344 src/sendmsg-window.c:412
 msgid "Esperanto"
 msgstr "エスペラント語"
 
-#: src/sendmsg-window.c:342
+#: src/sendmsg-window.c:346
 msgid "Estonian"
 msgstr "エストニア語"
 
-#: src/sendmsg-window.c:344 src/sendmsg-window.c:410
+#: src/sendmsg-window.c:348 src/sendmsg-window.c:414
 msgid "Finnish"
 msgstr "フィンランド語"
 
-#: src/sendmsg-window.c:346 src/sendmsg-window.c:412
+#: src/sendmsg-window.c:350 src/sendmsg-window.c:416
 msgid "French"
 msgstr "フランス語"
 
-#: src/sendmsg-window.c:348 src/sendmsg-window.c:416
+#: src/sendmsg-window.c:352 src/sendmsg-window.c:420
 msgid "Greek"
 msgstr "ギリシア語"
 
-#: src/sendmsg-window.c:350 src/sendmsg-window.c:418
+#: src/sendmsg-window.c:354 src/sendmsg-window.c:422
 msgid "Hebrew"
 msgstr "ヘブライ語"
 
-#: src/sendmsg-window.c:352 src/sendmsg-window.c:420
+#: src/sendmsg-window.c:356 src/sendmsg-window.c:424
 msgid "Hungarian"
 msgstr "ハンガリー語"
 
-#: src/sendmsg-window.c:354 src/sendmsg-window.c:422
+#: src/sendmsg-window.c:358 src/sendmsg-window.c:426
 msgid "Italian"
 msgstr "イタリア語"
 
-#: src/sendmsg-window.c:356 src/sendmsg-window.c:424
+#: src/sendmsg-window.c:360 src/sendmsg-window.c:428
 msgid "Japanese"
 msgstr "日本語"
 
-#: src/sendmsg-window.c:358 src/sendmsg-window.c:430
+#: src/sendmsg-window.c:362 src/sendmsg-window.c:434
 msgid "Korean"
 msgstr "韓国語"
 
-#: src/sendmsg-window.c:360 src/sendmsg-window.c:432
+#: src/sendmsg-window.c:364 src/sendmsg-window.c:436
 msgid "Latvian"
 msgstr "ラトビア語"
 
-#: src/sendmsg-window.c:362 src/sendmsg-window.c:434
+#: src/sendmsg-window.c:366 src/sendmsg-window.c:438
 msgid "Lithuanian"
 msgstr "リトアニア語"
 
-#: src/sendmsg-window.c:364 src/sendmsg-window.c:436
+#: src/sendmsg-window.c:368 src/sendmsg-window.c:440
 msgid "Norwegian"
 msgstr "ノルウェー語"
 
-#: src/sendmsg-window.c:366 src/sendmsg-window.c:438
+#: src/sendmsg-window.c:370 src/sendmsg-window.c:442
 msgid "Polish"
 msgstr "ポーランド語"
 
-#: src/sendmsg-window.c:368 src/sendmsg-window.c:440
+#: src/sendmsg-window.c:372 src/sendmsg-window.c:444
 msgid "Portugese"
 msgstr "ポルトガル語"
 
-#: src/sendmsg-window.c:370 src/sendmsg-window.c:442
+#: src/sendmsg-window.c:374 src/sendmsg-window.c:446
 msgid "Romanian"
 msgstr "ルーマニア語"
 
-#: src/sendmsg-window.c:372 src/sendmsg-window.c:444
+#: src/sendmsg-window.c:376 src/sendmsg-window.c:448
 msgid "Russian (ISO)"
 msgstr "ロシア語 (ISO)"
 
-#: src/sendmsg-window.c:374 src/sendmsg-window.c:446
+#: src/sendmsg-window.c:378 src/sendmsg-window.c:450
 msgid "Russian (KOI)"
 msgstr "ロシア語 (KOI)"
 
-#: src/sendmsg-window.c:376 src/sendmsg-window.c:448
+#: src/sendmsg-window.c:380 src/sendmsg-window.c:452
 msgid "Slovak"
 msgstr "スロベキア語"
 
-#: src/sendmsg-window.c:378 src/sendmsg-window.c:450
+#: src/sendmsg-window.c:382 src/sendmsg-window.c:454
 msgid "Spanish"
 msgstr "スペイン語"
 
-#: src/sendmsg-window.c:380 src/sendmsg-window.c:452
+#: src/sendmsg-window.c:384 src/sendmsg-window.c:456
 msgid "Swedish"
 msgstr "スウェーデン語"
 
-#: src/sendmsg-window.c:382 src/sendmsg-window.c:454
+#: src/sendmsg-window.c:386 src/sendmsg-window.c:458
 msgid "Turkish"
 msgstr "トルコ語"
 
-#: src/sendmsg-window.c:384 src/sendmsg-window.c:456
+#: src/sendmsg-window.c:388 src/sendmsg-window.c:460
 msgid "Ukrainian"
 msgstr "ウクライナ語"
 
-#: src/sendmsg-window.c:386
+#: src/sendmsg-window.c:390
 msgid "Generic UTF-8"
 msgstr "一般的な UTF-8"
 
-#: src/sendmsg-window.c:458
+#: src/sendmsg-window.c:462
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: src/sendmsg-window.c:466
+#: src/sendmsg-window.c:470
 msgid "_A-J"
 msgstr "A-J(_A)"
 
-#: src/sendmsg-window.c:467
+#: src/sendmsg-window.c:471
 msgid "_K-Z"
 msgstr "K-Z(_K)"
 
-#: src/sendmsg-window.c:476
+#: src/sendmsg-window.c:480
 msgid "_Request Disposition Notification"
 msgstr "送信通知を要求する(_R)"
 
-#: src/sendmsg-window.c:479
+#: src/sendmsg-window.c:483
 msgid "_Format = Flowed"
 msgstr "Format = Flowed(_F)"
 
-#: src/sendmsg-window.c:483
+#: src/sendmsg-window.c:487
 msgid "_Sign Message"
 msgstr "メッセージの署名(_S)"
 
-#: src/sendmsg-window.c:485
+#: src/sendmsg-window.c:490
 msgid "_Encrypt Message"
 msgstr "メッセージの暗号化(_E)"
 
-#: src/sendmsg-window.c:528
+#: src/sendmsg-window.c:534
 msgid "_Show"
 msgstr "表示(_S)"
 
-#: src/sendmsg-window.c:530
+#: src/sendmsg-window.c:536
 msgid "_Language"
 msgstr "言語(_L)"
 
-#: src/sendmsg-window.c:532
+#: src/sendmsg-window.c:538
 msgid "_Options"
 msgstr "オプション(_O)"
 
-#: src/sendmsg-window.c:615
+#: src/sendmsg-window.c:621
 #, c-format
 msgid ""
 "The message to '%s' is modified.\n"
@@ -4382,11 +4570,11 @@ msgstr ""
 "メッセージを草案箱に保存しますか？"
 
 #. Comments:
-#: src/sendmsg-window.c:750 src/sendmsg-window.c:1956
+#: src/sendmsg-window.c:756 src/sendmsg-window.c:1962
 msgid "Comments:"
 msgstr "コメント:"
 
-#: src/sendmsg-window.c:1188
+#: src/sendmsg-window.c:1194
 #, c-format
 msgid ""
 "Saying yes will not send the file `%s' itself, but just a MIME message/"
@@ -4401,43 +4589,43 @@ msgstr ""
 "\n"
 "リファレンスとしてこのファイルを添付しても宜しいですか？"
 
-#: src/sendmsg-window.c:1199
+#: src/sendmsg-window.c:1205
 msgid "Attach as Reference?"
 msgstr "添付物を参照しますか？"
 
-#: src/sendmsg-window.c:1290
+#: src/sendmsg-window.c:1296
 msgid "Remove"
 msgstr "削除"
 
-#: src/sendmsg-window.c:1301
+#: src/sendmsg-window.c:1307
 msgid "attach as reference"
 msgstr "リファレンスとして添付"
 
-#: src/sendmsg-window.c:1307
+#: src/sendmsg-window.c:1313
 msgid "attach as file"
 msgstr "ファイルとして添付"
 
-#: src/sendmsg-window.c:1455
+#: src/sendmsg-window.c:1461
 #, c-format
 msgid "Cannot get info on file '%s': %s"
 msgstr "ファイル '%s' の情報を取得できません: %s"
 
-#: src/sendmsg-window.c:1460
+#: src/sendmsg-window.c:1466
 #, c-format
 msgid "Attachment %s is not a regular file."
 msgstr "添付ファイル %s は通常のファイルではありません。"
 
-#: src/sendmsg-window.c:1463
+#: src/sendmsg-window.c:1469
 #, c-format
 msgid "File %s cannot be read\n"
 msgstr "ファイル %s を読み込めませんでした\n"
 
-#: src/sendmsg-window.c:1517
+#: src/sendmsg-window.c:1523
 msgid "Attach file"
 msgstr "添付ファイル"
 
-#: src/sendmsg-window.c:1611 src/sendmsg-window.c:1648
-#: src/sendmsg-window.c:2732
+#: src/sendmsg-window.c:1617 src/sendmsg-window.c:1654
+#: src/sendmsg-window.c:2741
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -4446,68 +4634,68 @@ msgstr ""
 "考えられる原因: 作業領域が十分ではありません"
 
 #. From:
-#: src/sendmsg-window.c:1847
+#: src/sendmsg-window.c:1853
 msgid "F_rom:"
 msgstr "送信元(_R):"
 
 #. Subject:
-#: src/sendmsg-window.c:1859
+#: src/sendmsg-window.c:1865
 msgid "S_ubject:"
 msgstr "件名(_U):"
 
 #. fcc:
-#: src/sendmsg-window.c:1873
+#: src/sendmsg-window.c:1879
 msgid "F_cc:"
 msgstr "Fcc(_C):"
 
 #. Reply To:
-#: src/sendmsg-window.c:1902
+#: src/sendmsg-window.c:1908
 msgid "_Reply To:"
 msgstr "返信先(_R):"
 
 #. Attachment list
-#: src/sendmsg-window.c:1909
+#: src/sendmsg-window.c:1915
 msgid "_Attachments:"
 msgstr "添付(_A):"
 
 #. Keywords:
-#: src/sendmsg-window.c:1959
+#: src/sendmsg-window.c:1965
 msgid "Keywords:"
 msgstr "キーワード:"
 
-#: src/sendmsg-window.c:2128
+#: src/sendmsg-window.c:2134
 msgid "you"
 msgstr "あなた"
 
-#: src/sendmsg-window.c:2135
+#: src/sendmsg-window.c:2141
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------%s からの転送メッセージ------\n"
 
-#: src/sendmsg-window.c:2165
+#: src/sendmsg-window.c:2171
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "Message-ID: %s\n"
 
-#: src/sendmsg-window.c:2171
+#: src/sendmsg-window.c:2177
 msgid "References:"
 msgstr "リファレンス:"
 
-#: src/sendmsg-window.c:2181
+#: src/sendmsg-window.c:2187
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "%s に %s さんは書きました:\n"
 
-#: src/sendmsg-window.c:2183
+#: src/sendmsg-window.c:2189
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s さんは書きました:\n"
 
-#: src/sendmsg-window.c:2897
+#: src/sendmsg-window.c:2906
 msgid "Choose charset"
 msgstr "文字セットの選択"
 
-#: src/sendmsg-window.c:2904
+#: src/sendmsg-window.c:2913
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file."
@@ -4515,16 +4703,16 @@ msgstr ""
 "このファイルは US-ASCII または UTF-8 エンコーディングではありません。\n"
 "ファイルをエンコーディングする文字セットを選択して下さい。"
 
-#: src/sendmsg-window.c:2970
+#: src/sendmsg-window.c:2979
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "ファイル %s を開けませんでした。\n"
 
-#: src/sendmsg-window.c:2991
+#: src/sendmsg-window.c:3000
 msgid "Include file"
 msgstr "ファイルの挿入"
 
-#: src/sendmsg-window.c:3244
+#: src/sendmsg-window.c:3256
 #, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
@@ -4533,35 +4721,35 @@ msgstr ""
 "メッセージが文字セット %s でエンコーディングされていません。\n"
 "このメッセージを表示する言語を選択して下さい。"
 
-#: src/sendmsg-window.c:3304
+#: src/sendmsg-window.c:3268
 #, c-format
-msgid "%s the message failed."
-msgstr "%s メッセージに失敗しました。"
+msgid "sending message with gpg mode %d"
+msgstr "gpg モード %d でメッセージの送信中"
 
-#: src/sendmsg-window.c:3306
-msgid "Signing"
-msgstr "署名"
+#: src/sendmsg-window.c:3314
+msgid "Signing the message failed"
+msgstr "メッセージの署名に失敗"
 
-#: src/sendmsg-window.c:3306
-msgid "Encrypting"
-msgstr "暗号化"
+#: src/sendmsg-window.c:3315
+msgid "Encrypting the message failed."
+msgstr "メッセージの暗号化に失敗しました。"
 
-#: src/sendmsg-window.c:3989
+#: src/sendmsg-window.c:4017
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "%s に対する返信: %s"
 
-#: src/sendmsg-window.c:3994
+#: src/sendmsg-window.c:4022
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "%s に対するメッセージの転送: %s"
 
-#: src/sendmsg-window.c:3998
+#: src/sendmsg-window.c:4026
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "%s に対するメッセージ編集: %s"
 
-#: src/sendmsg-window.c:4002
+#: src/sendmsg-window.c:4030
 #, c-format
 msgid "New message to %s: %s"
 msgstr "%s に対する新規メッセージ: %s"
@@ -4872,8 +5060,8 @@ msgid "Unknown toolbar icon \"%s\""
 msgstr "ツールバーのアイコン \"%s\" が不明です"
 
 #: src/toolbar-prefs.c:136
-msgid "Customize"
-msgstr "カスタマイズ"
+msgid "Customize Toolbars"
+msgstr "ツールバーのカスタマイズ"
 
 #: src/toolbar-prefs.c:157
 msgid "Main window"

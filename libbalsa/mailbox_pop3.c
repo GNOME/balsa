@@ -545,6 +545,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     
     pop = pop_new();
     pop_set_option(pop, IMAP_POP_OPT_FILTER_CR, TRUE);
+    pop_set_option(pop, IMAP_POP_OPT_OVER_SSL, server->use_ssl);
     pop_set_option(pop, IMAP_POP_OPT_DISABLE_APOP, m->disable_apop);
     pop_set_tls_mode(pop, tls_mode);
     pop_set_timeout(pop, 60000); /* wait 1.5 minute for packets */

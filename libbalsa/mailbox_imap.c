@@ -2018,14 +2018,17 @@ is_child_of(LibBalsaMessageBody *body, LibBalsaMessageBody *child,
             GString *s, gboolean modify)
 {
     int i = 1;
+    gboolean do_mod;
     for(i=1; body; body = body->next) {
         if(body==child) {
             g_string_printf(s, "%u", i);
             return TRUE;
         }
-
-        if(is_child_of(body->parts, child, s,
-                       body->body_type != LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE)){
+        do_mod = !(body->body_type == LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE &&
+                   body->parts &&
+                   body->parts->body_type ==
+                   LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART);
+        if(is_child_of(body->parts, child, s, do_mod)){
             char buf[12];
             if(modify) {
                 snprintf(buf, sizeof(buf), "%u.", i);
@@ -2037,6 +2040,33 @@ is_child_of(LibBalsaMessageBody *body, LibBalsaMessageBody *child,
     }
     return FALSE;
 }
+
+#if 0
+static void
+print_structure(LibBalsaMessageBody *part, LibBalsaMessageBody* m, int ind)
+{
+    static const char *t[] = {
+        "LIBBALSA_MESSAGE_BODY_TYPE_OTHER",
+        "LIBBALSA_MESSAGE_BODY_TYPE_AUDIO",
+        "LIBBALSA_MESSAGE_BODY_TYPE_APPLICATION",
+        "LIBBALSA_MESSAGE_BODY_TYPE_IMAGE",
+        "LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE",
+        "LIBBALSA_MESSAGE_BODY_TYPE_MODEL",
+        "LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART",
+        "LIBBALSA_MESSAGE_BODY_TYPE_TEXT",
+        "LIBBALSA_MESSAGE_BODY_TYPE_VIDEO" };
+
+    int j,i=1;
+    while(part) {
+        for(j=0; j<ind; j++) putchar(' ');
+        printf("%d: %s%s\n", i++, t[part->body_type],
+               part == m ? " <--" : "");
+        if(part->parts)
+            print_structure(part->parts, m, ind+2);
+        part = part->next;
+    }
+}
+#endif
 static gchar*
 get_section_for(LibBalsaMessage *msg, LibBalsaMessageBody *part)
 {
@@ -2053,6 +2083,10 @@ get_section_for(LibBalsaMessage *msg, LibBalsaMessageBody *part)
         g_string_free(section, TRUE);
         return g_strdup("1");
     }
+#if 0
+    print_structure(msg->body_list, part, 0);
+    printf("section: %s\n", section->str);
+#endif
     return g_string_free(section, FALSE);
 }
 struct part_data { char *block; unsigned pos; ImapBody *body; };
@@ -2084,6 +2118,21 @@ encoding_names(ImapBodyEncoding enc)
     case IMBENC_QUOTED: return "quoted-printable";
     }
 }
+static LibBalsaMessageBody*
+get_parent(LibBalsaMessageBody *root, LibBalsaMessageBody *part,
+           LibBalsaMessageBody *parent)
+{
+    while(root) {
+        LibBalsaMessageBody *res;
+        if(root == part)
+            return parent;
+        if(root->parts &&
+           (res = get_parent(root->parts, part, root)) != NULL)
+            return res;
+        root = root->next;
+    }
+    return NULL;
+}
 static gboolean
 lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
                                  LibBalsaMessageBody * part)
@@ -2104,9 +2153,10 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
     if(!fp) { /* no cache element */
         struct part_data dt;
         LibBalsaMailboxImap* mimap;
+        ImapFetchBodyOptions ifbo;
         ImapMessage *im;
         ImapResponse rc;
-        
+
         libbalsa_lock_mailbox(msg->mailbox);
         mimap = LIBBALSA_MAILBOX_IMAP(msg->mailbox);
         im = mi_get_imsg(mimap, msg->msgno);
@@ -2121,18 +2171,29 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
 	/* Imap_mbox_handle_fetch_body fetches the MIME headers of the
          * section, followed by the text. We write this unfiltered to
          * the cache. The probably only exception is the main body
-         * which has no headers. In this case, we have to fake them.*/
+         * which has no headers. In this case, we have to fake them.
+         * We could and probably should dump there first the headers 
+         * that we have already fetched... */
+        if(strcmp(section, "1") == 0)
+            ifbo = IMFB_NONE;
+        else {
+            LibBalsaMessageBody *parent =
+                get_parent(msg->body_list, part, NULL);
+            if(parent->body_type == LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE)
+                ifbo = IMFB_HEADER;
+            else
+                ifbo = IMFB_MIME;
+        }
+        printf("ifbo=%d NONE=%d\n", ifbo, IMFB_NONE);
         II(rc,mimap->handle,
            imap_mbox_handle_fetch_body(mimap->handle, msg->msgno,
-                                       section, append_str, &dt));
+                                       section, ifbo, append_str, &dt));
         if(rc != IMR_OK)
-            g_warning("FIXME: error handling here!\n");
-        
+            g_warning("FIXME: consider adding FETCH error handling!\n");
         libbalsa_unlock_mailbox(msg->mailbox);
         
         libbalsa_assure_balsa_dir();
         mkdir(pair[0], S_IRUSR|S_IWUSR|S_IXUSR); /* ignore errors */
-        /* printf("%s path: %s\n", __FUNCTION__, part_name); */
         fp = fopen(part_name, "wb+");
         if(!fp) {
             g_free(section); 
@@ -2140,10 +2201,7 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
             g_free(part_name);
             return FALSE; /* something better ? */
         }
-        /* this has to match the condition in imap-commands.c */
-        if(strcmp(section, "1") == 0 && im && im->body &&
-           im->body->media_basic != IMBMEDIA_MESSAGE_RFC822 &&
-           im->body->media_basic != IMBMEDIA_MULTIPART) {
+        if(ifbo == IMFB_NONE) {
             fprintf(fp,"MIME-version: 1.0\r\ncontent-type: %s\r\n"
                     "Content-Transfer-Encoding: %s\r\n\r\n",
                     part->content_type ? part->content_type : "text/plain",

@@ -1,5 +1,14 @@
 2005-02-06  Pawel Salek
 
+	* libbalsa/mailbox_imap.c: fix some corner cases for
+	LibBalsaMessageBody-to-imap section transformation.
+	* libbalsa/mailbox_pop3.c: use backend SSL option.
+	* libbalsa/imap/imap-commands.[ch]: do not guess whether part headers
+	are to be fetched - say it clearly.
+	* libbalsa/imap/imap-handle.c: process all data in IDLE callback.
+
+2005-02-06  Pawel Salek
+
 	* libbalsa/body.[hc]: filter CRLF on saving text parts.
 	* src/balsa-message.c, sendmsg-window.c: adapt to changed API.
 	* libbalsa/html.c: HAVE_GNOME related fixes.

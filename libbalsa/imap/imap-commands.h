@@ -86,6 +86,7 @@ typedef void (*ImapFetchBodyCb)(const char *buf, int buflen, void* arg);
 ImapResponse imap_mbox_handle_fetch_body(ImapMboxHandle* handle, 
                                          unsigned seqno, 
                                          const char *section,
+                                         ImapFetchBodyOptions options,
                                          ImapFetchBodyCb body_handler,
                                          void *arg);
 

@@ -904,27 +904,38 @@ imap_mbox_handle_fetch_rfc822_uid(ImapMboxHandle* handle, unsigned uid,
 ImapResponse
 imap_mbox_handle_fetch_body(ImapMboxHandle* handle, 
                             unsigned seqno, const char *section,
+                            ImapFetchBodyOptions options,
                             ImapFetchBodyCb body_cb, void *arg)
 {
-  char cmd[80];
+  char cmd[160];
   ImapMessage *msg;
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
   handle->body_cb  = body_cb;
   handle->body_arg = arg;
-  /* We should use .MIME only for non-message parts but it tends to
-     work also for messages. Let's be clear: this is a stop gap
-     solution. The proper way to fix it is to provide extra arguments
-     to this function so that it clearly knows what is is supposed to
-     do instead of guessing. */
   msg = imap_mbox_handle_get_msg(handle, seqno);
-  if(strcmp(section, "1") == 0 && msg &&
-     msg->body && msg->body->media_basic != IMBMEDIA_MESSAGE_RFC822 &&
-     msg->body->media_basic != IMBMEDIA_MULTIPART)
+  if(options == IMFB_NONE)
     snprintf(cmd, sizeof(cmd), "FETCH %u BODY[%s]",
              seqno, section);
-  else
-    snprintf(cmd, sizeof(cmd), "FETCH %u (BODY[%s.MIME] BODY[%s])",
-             seqno, section, section);
+  else {
+    char prefix[160];
+    if(options == IMFB_HEADER) {
+      /* We have to strip last section part and replace it with HEADER */
+      unsigned sz;
+      char *last_dot = strrchr(section, '.');
+      strncpy(prefix, section, sizeof(prefix));
+
+      if(last_dot) {
+        sz = last_dot-section+1;
+        if(sz>sizeof(prefix)-1) sz = sizeof(prefix)-1;
+      } else sz = 0;
+      strncpy(prefix + sz, "HEADER", sizeof(prefix)-sz-1);
+      prefix[sizeof(prefix)-1] = '\0';
+    } else
+      snprintf(prefix, sizeof(prefix), "%s.MIME", section);
+
+    snprintf(cmd, sizeof(cmd), "FETCH %u (BODY[%s] BODY[%s])",
+             seqno, prefix, section);
+  }
   return imap_cmd_exec(handle, cmd);
 }
 

@@ -250,17 +250,10 @@ idle_process(GIOChannel *source, GIOCondition condition, gpointer data)
 {
   ImapMboxHandle *h = (ImapMboxHandle*)data;
   ImapResponse rc;
+  int retval;
 
-  do {
-    struct timeval tv;
-    fd_set rfds;
-    int retval;
-    FD_ZERO(&rfds);
-    FD_SET(h->sd, &rfds);
-    tv.tv_sec = 0; tv.tv_usec = 0;
-    retval = select(h->sd+1, &rfds, NULL, NULL, &tv);
-    if(retval == -1) perror("idle_process, select()");
-    if(!retval) break;
+  while( (retval = sio_poll(h->sio, TRUE, FALSE, TRUE)) != -1 &&
+         (retval & SIO_READ) != 0) {
     if ( (rc=imap_cmd_step(h, 0)) == IMR_UNKNOWN ||
          rc == IMR_SEVERED || rc == IMR_BYE || rc == IMR_PROTOCOL ||
          rc  == IMR_BAD) {
@@ -269,7 +262,7 @@ idle_process(GIOChannel *source, GIOCondition condition, gpointer data)
       /* FIXME: consider aborting connection here. */
       break;
     }
-  } while(1);
+  }
   return TRUE;
 }
 

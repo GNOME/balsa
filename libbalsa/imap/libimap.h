@@ -134,6 +134,7 @@ typedef struct ImapEnvelope_ {
   gchar *message_id;
 } ImapEnvelope;
 
+/* header fetching types */
 typedef enum {
   IMFETCH_BODYSTRUCT = 1<<0,
   IMFETCH_ENV        = 1<<1,
@@ -148,6 +149,13 @@ typedef enum {
   IMFETCH_HEADER_MASK  = (IMFETCH_CONTENT_TYPE | IMFETCH_REFERENCES |
                           IMFETCH_LIST_POST)
 } ImapFetchType;
+
+/* body fetching option */
+typedef enum {
+  IMFB_NONE,
+  IMFB_HEADER, /* preceed with BODY[section.HEADER] */
+  IMFB_MIME    /* preceed with BODY[section.MIME]   */
+} ImapFetchBodyOptions;
 
 typedef struct ImapBody_ ImapBody;
 

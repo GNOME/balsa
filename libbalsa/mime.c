@@ -51,7 +51,6 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
     GString *reply = NULL;
     gchar *mime_type;
     LibBalsaHTMLType html_type;
-    FILE *fp;
 
     switch (libbalsa_message_body_type(body)) {
     case LIBBALSA_MESSAGE_BODY_TYPE_OTHER:
@@ -75,21 +74,7 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	if (ignore_html && html_type)
 	    break;
 
-	if (!libbalsa_message_body_save_temporary(body)) {
-	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				 _("Error writing to temporary file %s.\n"
-				   "Check the directory permissions."),
-				 body->temp_filename);
-	    return NULL;
-	}
-	if (!(fp = fopen(body->temp_filename, "r"))) {
-	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				 _("Cannot open temporary file %s."),
-				 body->temp_filename);
-	    return NULL;
-	}
-	allocated = libbalsa_readfile(fp, &res);
-	fclose(fp);
+	allocated = libbalsa_message_body_get_content(body, &res);
 	if (!res)
 	    return NULL;
 

@@ -73,12 +73,13 @@ libbalsa_html_receiver_fn(gpointer engine, const gchar * data, size_t len,
 
 /* Widget-dependent helper. */
 static void
-libbalsa_html_write_file(GtkHTMLStream * stream, FILE * f)
+libbalsa_html_write_mime_stream(GtkHTMLStream * stream,
+                                GMimeStream * mime_stream)
 {
     gint i;
     char buf[4096];
 
-    while ((i = fread(buf, 1, sizeof(buf), f)) != 0)
+    while ((i = g_mime_stream_read(mime_stream, buf, sizeof(buf))) > 0)
 	gtk_html_stream_write(stream, buf, i);
     gtk_html_stream_close(stream, GTK_HTML_STREAM_OK);
 }
@@ -265,12 +266,13 @@ libbalsa_html_print_get_pages_num(GtkWidget * widget,
 
 /* Widget-dependent helper. */
 static void
-libbalsa_html_write_file(HtmlStream * stream, FILE * f)
+libbalsa_html_write_mime_stream(HtmlStream * stream, 
+                                GMimeStream * mime_stream)
 {
     gint i;
     char buf[4096];
 
-    while ((i = fread(buf, 1, sizeof(buf), f)) != 0)
+    while ((i = g_mime_stream_read(mime_stream, buf, sizeof(buf))) > 0)
 	html_stream_write(stream, buf, i);
     html_stream_close(stream);
 }
@@ -416,27 +418,28 @@ static gboolean
 libbalsa_html_url_requested(GtkWidget * html, const gchar * url,
 			    gpointer stream, LibBalsaMessage * msg)
 {
-    FILE *f;
+    GMimeStream *mime_stream;
 
     if (strncmp(url, "cid:", 4)) {
 	printf("non-local URL request ignored: %s\n", url);
 	return FALSE;
     }
-    if ((f = libbalsa_message_get_part_by_id(msg, url + 4)) == NULL) {
+    if ((mime_stream =
+         libbalsa_message_get_part_by_id(msg, url + 4)) == NULL) {
 	gchar *s = g_strconcat("<", url + 4, ">", NULL);
 
 	if (s == NULL)
 	    return FALSE;
 
-	f = libbalsa_message_get_part_by_id(msg, s);
+	mime_stream = libbalsa_message_get_part_by_id(msg, s);
 	g_free(s);
-	if (f == NULL)
+	if (mime_stream == NULL)
 	    return FALSE;
     }
 
-    libbalsa_html_write_file(stream, f);
+    libbalsa_html_write_mime_stream(stream, mime_stream);
 
-    fclose(f);
+    g_object_unref(mime_stream);
 
     return TRUE;
 }

@@ -646,7 +646,6 @@ prepare_html(PrintInfo * pi, LibBalsaMessageBody * body)
     GtkWidget *dialog;
     gint response;
     HtmlInfo *pdata;
-    FILE *fp;
     size_t len;
     gchar *html_text;
     gchar *conttype;
@@ -674,23 +673,7 @@ prepare_html(PrintInfo * pi, LibBalsaMessageBody * body)
 	return;
     }
 
-    if (!libbalsa_message_body_save_temporary(body)) {
-	balsa_information
-	    (LIBBALSA_INFORMATION_ERROR,
-	     _("Error writing to temporary file %s.\n"
-	       "Check the directory permissions."), body->temp_filename);
-	return;
-    }
-
-    if ((fp = fopen(body->temp_filename, "r")) == NULL) {
-	balsa_information(LIBBALSA_INFORMATION_ERROR,
-			  _("Cannot open temporary file %s."),
-			  body->temp_filename);
-	return;
-    }
-
-    len = libbalsa_readfile(fp, &html_text);
-    fclose(fp);
+    len = libbalsa_message_body_get_content(body, &html_text);
     if (!html_text)
 	return;
 
@@ -886,17 +869,8 @@ prepare_plaintext(PrintInfo * pi, LibBalsaMessageBody * body)
     /* copy the text body to a buffer */
     if (body->buffer)
 	textbuf = g_strdup(body->buffer);
-    else {
-	FILE *part;
-
-	textbuf = NULL;
-	libbalsa_message_body_save_temporary(body);
-	part = fopen(body->temp_filename, "r");
-	if (part) {
-	    libbalsa_readfile(part, &textbuf);
-	    fclose(part);
-	    }
-    }
+    else
+	libbalsa_message_body_get_content(body, &textbuf);
 
     /* fake an empty buffer if textbuf is NULL */
     if (!textbuf)
@@ -1127,10 +1101,9 @@ prepare_image(PrintInfo * pi, LibBalsaMessageBody * body)
     pdata = g_malloc(sizeof(ImageInfo));
     pdata->id_tag = BALSA_PRINT_TYPE_IMAGE;
 
-    libbalsa_message_body_save_temporary(body);
-    pdata->pixbuf = gdk_pixbuf_new_from_file(body->temp_filename, &err);
+    pdata->pixbuf = libbalsa_message_body_get_pixbuf(body, &err);
     if(err) {
-        g_warning("Error loading image from file.");
+        g_warning("Error loading image from file: %s", err->message);
         g_error_free(err);
     }
     /* fall back to default if the pixbuf could no be loaded */

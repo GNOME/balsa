@@ -1565,11 +1565,19 @@ img_check_size(GtkImage ** widget_p)
 	dst_w = orig_width;
     if (dst_w != curr_w) {
 	GdkPixbuf *pixbuf, *scaled_pixbuf;
+	GError *load_err = NULL;
 	gint dst_h;
 
-	libbalsa_message_body_save_temporary(info->body);
-	if (!(pixbuf = gdk_pixbuf_new_from_file (info->body->temp_filename, NULL)))
+	pixbuf = libbalsa_message_body_get_pixbuf(info->body, &load_err);
+        if (!pixbuf) {
+	    if (load_err) {
+		balsa_information(LIBBALSA_INFORMATION_ERROR,
+			          _("Error loading attached image: %s\n"),
+			          load_err->message);
+		g_error_free(load_err);
+	    }
 	    return FALSE;
+	}
 	dst_h = (gfloat)dst_w /
 	    (gfloat)orig_width * gdk_pixbuf_get_height(pixbuf);
 	scaled_pixbuf = gdk_pixbuf_scale_simple(pixbuf, dst_w, dst_h,
@@ -1591,8 +1599,7 @@ part_info_init_image(BalsaMessage * bm, BalsaPartInfo * info)
     GtkWidget *evbox;
     GError * load_err = NULL;
 
-    libbalsa_message_body_save_temporary(info->body);
-    pixbuf = gdk_pixbuf_new_from_file (info->body->temp_filename, &load_err);
+    pixbuf = libbalsa_message_body_get_pixbuf(info->body, &load_err);
     if (!pixbuf) {
 	if (load_err) {
             balsa_information(LIBBALSA_INFORMATION_ERROR,
@@ -2283,7 +2290,6 @@ text_view_populate_popup(GtkTextView *textview, GtkMenu *menu,
 static void
 part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 {
-    FILE *fp;
     LibBalsaHTMLType html_type;
     gchar *content_type;
     gchar *ptr = NULL;
@@ -2298,23 +2304,8 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 #endif
 
     /* proper code */
-    if (!libbalsa_message_body_save_temporary(info->body)) {
-        balsa_information
-            (LIBBALSA_INFORMATION_ERROR,
-             _("Error writing to temporary file %s.\n"
-               "Check the directory permissions."),
-             info->body->temp_filename);
-        return;
-    }
 
-    if ((fp = fopen(info->body->temp_filename, "r")) == NULL) {
-        balsa_information(LIBBALSA_INFORMATION_ERROR,
-                          _("Cannot open temporary file %s."),
-                          info->body->temp_filename);
-        return;
-    }
-
-    alloced = libbalsa_readfile(fp, &ptr);
+    alloced = libbalsa_message_body_get_content(info->body, &ptr);
     if (!ptr)
         return;
 
@@ -2500,9 +2491,8 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
     }
 
     g_free(ptr);
-
-    fclose(fp);
 }
+
 #ifdef HAVE_GTKHTML
 static void
 bm_zoom_in(BalsaMessage * bm)
@@ -3122,7 +3112,6 @@ part_context_menu_mail(GtkWidget * menu_item, BalsaPartInfo * info)
     LibBalsaMessage *message;
     LibBalsaMessageBody *body;
     gchar *data;
-    FILE *part;
 
     /* create a message */
     message = libbalsa_message_new();
@@ -3141,19 +3130,16 @@ part_context_menu_mail(GtkWidget * menu_item, BalsaPartInfo * info)
     /* the original body my have some data to be returned as commands... */
     body = libbalsa_message_body_new(message);
 
-    libbalsa_message_body_save_temporary(info->body);
-    part = fopen(info->body->temp_filename, "r");
-    if (part) {
+    libbalsa_message_body_get_content(info->body, &data);
+    if (data) {
         gchar *p;
 
-        libbalsa_readfile(part, &data);
         /* ignore everything before the first two newlines */
         if ((p = strstr (data, "\n\n")))
             body->buffer = g_strdup(p + 2);
         else
             body->buffer = g_strdup(data);
         g_free(data);
-        fclose(part);
     }
     if (info->body->charset)
         body->charset = g_strdup(info->body->charset);

@@ -161,8 +161,8 @@ libbalsa_message_body_set_mime_body(LibBalsaMessageBody * body,
 	    g_mime_message_part_get_message(message_part);
 	body->embhdrs =
 	    libbalsa_message_body_extract_embedded_headers(embedded_message);
-	body->next = libbalsa_message_body_new(body->message);
-	libbalsa_message_body_set_mime_body(body->next,
+	body->parts = libbalsa_message_body_new(body->message);
+	libbalsa_message_body_set_mime_body(body->parts,
 					    embedded_message->mime_part);
 	if (GMIME_IS_PART(embedded_message->mime_part))
 	    /* This part may not have a Content-Disposition header, but

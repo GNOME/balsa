@@ -1,12 +1,13 @@
-# BALSA  in Vietnamese.
-# Copyright (C) 1997-2002 Free Software Foundation, Inc.
-# Larry Nguyen <larry@vnlinux.org>; T.M.Thanh <tmthanh@yahoo.com>, 2002-2003.
+# Vietnamese Translation for BALSA.
+# Copyright (C) 1997-2003 Free Software Foundation, Inc.
+# Larry Nguyen <larry@vnlinux.org>
+# T.M.Thanh <tmthanh@yahoo.com>, 2002-2003.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Balsa for GNOME2.1.x\n"
-"POT-Creation-Date: 2003-01-27 03:44+0100\n"
-"PO-Revision-Date: 2003-01-27 21:38+0700\n"
+"Project-Id-Version: Balsa for GNOME v-2.2\n"
+"POT-Creation-Date: 2003-02-03 04:04+0100\n"
+"PO-Revision-Date: 2003-02-03 21:17+0700\n"
 "Last-Translator: Trinh Minh Thanh <tmthanh@yahoo.com>\n"
 "Language-Team: Gnome-Vi <Gnomevi-list@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -1483,8 +1484,8 @@ msgstr "Balsa không được biên dịch với hỗ trợ LDAP"
 #. mailbox name
 #: src/address-book-config.c:289 src/address-book-config.c:334
 #: src/address-book-config.c:396 src/address-book-config.c:456
-msgid "Address _Book Name"
-msgstr "Tên S_ổ Địa Chỉ"
+msgid "A_ddress Book Name"
+msgstr "Tên Sổ Địa _Chỉ"
 
 #: src/address-book-config.c:294
 msgid "_File Name"
@@ -1657,85 +1658,85 @@ msgstr "Mật khẩu cần dùng"
 msgid "Multiple mailboxes named \"%s\""
 msgstr "Đa hộp thư có tên  \"%s\""
 
-#: src/balsa-index.c:241
+#: src/balsa-index.c:325
 msgid "From"
 msgstr "Từ"
 
-#: src/balsa-index.c:242
+#: src/balsa-index.c:340
 msgid "Subject"
 msgstr "Chủ đề"
 
-#: src/balsa-index.c:243
+#: src/balsa-index.c:361
 msgid "Date"
 msgstr "Ngày"
 
-#: src/balsa-index.c:244
+#: src/balsa-index.c:374
 msgid "Size"
 msgstr "Kích thước"
 
-#: src/balsa-index.c:573
+#: src/balsa-index.c:589
 #, c-format
 msgid "Opening mailbox %s. Please wait..."
 msgstr "Đang mở hộp thư %s. Hãy đợi..."
 
-#: src/balsa-index.c:610
+#: src/balsa-index.c:626
 msgid "To"
 msgstr "Đến"
 
-#: src/balsa-index.c:2098
+#: src/balsa-index.c:2103
 msgid "_View Source"
 msgstr "_Xem Nguồn"
 
-#: src/balsa-index.c:2100 src/main-window.c:444 src/message-window.c:126
+#: src/balsa-index.c:2105 src/main-window.c:444 src/message-window.c:126
 msgid "_Reply..."
 msgstr "Trả Lời..."
 
-#: src/balsa-index.c:2102
+#: src/balsa-index.c:2107
 msgid "Reply To _All..."
 msgstr "Trả Lời Tất..."
 
-#: src/balsa-index.c:2104
+#: src/balsa-index.c:2109
 msgid "Reply To _Group..."
 msgstr "Trả Lời Nhóm..."
 
-#: src/balsa-index.c:2106
+#: src/balsa-index.c:2111
 msgid "_Forward Attached..."
 msgstr "Chuyển Tiếp Dạng Đính Kèm..."
 
-#: src/balsa-index.c:2108
+#: src/balsa-index.c:2113
 msgid "Forward _Inline..."
 msgstr "Chuyển Tiếp Dạng Trong Dòng..."
 
-#: src/balsa-index.c:2110 src/main-window.c:546
+#: src/balsa-index.c:2115 src/main-window.c:546
 msgid "_Store Address..."
 msgstr "Lưu giữ địa chỉ..."
 
-#: src/balsa-index.c:2123 src/filter-edit-dialog.c:216 src/mailbox-node.c:866
+#: src/balsa-index.c:2128 src/filter-edit-dialog.c:216 src/mailbox-node.c:866
 #: src/main-window.c:528 src/pref-manager.c:1525 src/pref-manager.c:2618
 msgid "_Delete"
 msgstr "Xóa"
 
-#: src/balsa-index.c:2128 src/main-window.c:535
+#: src/balsa-index.c:2133 src/main-window.c:535
 msgid "_Undelete"
 msgstr "Thôi xóa"
 
-#: src/balsa-index.c:2133
+#: src/balsa-index.c:2138
 msgid "Move To _Trash"
 msgstr "Chuyển vào _Sọt Rác"
 
-#: src/balsa-index.c:2137
+#: src/balsa-index.c:2142
 msgid "T_oggle"
 msgstr "Chốt"
 
-#: src/balsa-index.c:2140
+#: src/balsa-index.c:2145
 msgid "_Flagged"
 msgstr "Cắm Cờ"
 
-#: src/balsa-index.c:2143
+#: src/balsa-index.c:2148
 msgid "_Unread"
 msgstr "Chưa Đọc"
 
-#: src/balsa-index.c:2151
+#: src/balsa-index.c:2156
 msgid "_Move to"
 msgstr "Chuyển đến"
 
@@ -1781,15 +1782,15 @@ msgstr " Không thể lưu %s: %s"
 msgid "Save MIME Part"
 msgstr "Lưu phần MIME"
 
-#: src/balsa-message.c:767 src/print.c:327
+#: src/balsa-message.c:767 src/print.c:328
 msgid "Subject:"
 msgstr "Chủ đề:"
 
-#: src/balsa-message.c:771 src/print.c:333
+#: src/balsa-message.c:771 src/print.c:334
 msgid "Date:"
 msgstr "Ngày:"
 
-#: src/balsa-message.c:776 src/print.c:344 src/store-address.c:275
+#: src/balsa-message.c:776 src/print.c:345 src/store-address.c:275
 msgid "From:"
 msgstr "Từ:"
 
@@ -1797,27 +1798,27 @@ msgstr "Từ:"
 msgid "Reply-To:"
 msgstr "Trả Lời Tới:"
 
-#: src/balsa-message.c:785 src/print.c:354 src/store-address.c:276
+#: src/balsa-message.c:785 src/print.c:355 src/store-address.c:276
 msgid "To:"
 msgstr "Đến:"
 
 #. cc:
-#: src/balsa-message.c:786 src/print.c:355 src/sendmsg-window.c:1831
+#: src/balsa-message.c:786 src/print.c:356 src/sendmsg-window.c:1831
 #: src/store-address.c:277
 msgid "Cc:"
 msgstr "Đồng gửi:"
 
 #. bcc:
-#: src/balsa-message.c:787 src/print.c:356 src/sendmsg-window.c:1836
+#: src/balsa-message.c:787 src/print.c:357 src/sendmsg-window.c:1836
 #: src/store-address.c:278
 msgid "Bcc:"
 msgstr "Bản sao ẩn:"
 
-#: src/balsa-message.c:790 src/print.c:357
+#: src/balsa-message.c:790 src/print.c:358
 msgid "Fcc:"
 msgstr "Đồng chuyển tiếp:"
 
-#: src/balsa-message.c:795 src/print.c:363
+#: src/balsa-message.c:795 src/print.c:364
 msgid "Disposition-Notification-To:"
 msgstr "Xắp Xếp-Thông Báo-Đến:"
 
@@ -2083,26 +2084,25 @@ msgstr "To_àn Bộ"
 msgid "C_lear"
 msgstr "L_àm Sạch"
 
-#: src/filter-edit-callbacks.c:992 src/main-window.c:2708
+#: src/filter-edit-callbacks.c:992 src/main-window.c:2701
 msgid "_Body"
 msgstr "Thân"
 
 #. To:
-#: src/filter-edit-callbacks.c:999 src/main-window.c:2709
+#: src/filter-edit-callbacks.c:999 src/main-window.c:2702
 #: src/sendmsg-window.c:1820
 msgid "_To:"
 msgstr "Đến:"
 
-#: src/filter-edit-callbacks.c:1006 src/main-window.c:2710
+#: src/filter-edit-callbacks.c:1006 src/main-window.c:2703
 msgid "_From:"
 msgstr "Từ:"
 
-#: src/filter-edit-callbacks.c:1014 src/main-window.c:2711
-#: src/sendmsg-window.c:285
+#: src/filter-edit-callbacks.c:1014 src/sendmsg-window.c:285
 msgid "_Subject"
 msgstr "Chủ đề"
 
-#: src/filter-edit-callbacks.c:1021 src/main-window.c:2712
+#: src/filter-edit-callbacks.c:1021 src/main-window.c:2705
 msgid "_Cc:"
 msgstr "Đồng gửi:"
 
@@ -3199,42 +3199,46 @@ msgstr "Bạn nhận được %d thông điệp mới."
 msgid "You have received 1 new message."
 msgstr "Bạn nhận được 1 thông điệp mới."
 
-#: src/main-window.c:2663
+#: src/main-window.c:2661
 msgid "Search mailbox"
 msgstr "Tìm trong hộp thư"
 
-#: src/main-window.c:2681
+#: src/main-window.c:2674
 msgid "_Reverse search"
 msgstr "Tìm Ngược Lại"
 
-#: src/main-window.c:2684
+#: src/main-window.c:2677
 msgid "_Search for:"
 msgstr "Tìm cho:"
 
-#: src/main-window.c:2697
+#: src/main-window.c:2690
 msgid "In:"
 msgstr "Trong:"
 
-#: src/main-window.c:2834
+#: src/main-window.c:2704
+msgid "S_ubject"
+msgstr "C_hủ đề"
+
+#: src/main-window.c:2819
 msgid "You can apply filters only on mailbox\n"
 msgstr "Có thể áp dụng các bộ lọc chỉ cho hộp thư\n"
 
-#: src/main-window.c:2869 src/main-window.c:2888
+#: src/main-window.c:2854 src/main-window.c:2873
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Ủy thác hộp thư %s không được."
 
-#: src/main-window.c:3081
+#: src/main-window.c:3066
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (chỉ được đọc)"
 
-#: src/main-window.c:3083
+#: src/main-window.c:3068
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: src/main-window.c:3174
+#: src/main-window.c:3159
 msgid "Cannot access the message's body\n"
 msgstr "Không thể truy cập thân thông điệp\n"
 
@@ -3721,7 +3725,7 @@ msgid "Invalid or incomplete address label color"
 msgstr "Màu của nhãn địa chỉ không đầy đủ hay không hợp lệ"
 
 #. create a 2nd notebook page for the fonts
-#: src/pref-manager.c:2204 src/print.c:1215
+#: src/pref-manager.c:2204 src/print.c:1249
 msgid "Fonts"
 msgstr "Phông"
 
@@ -3895,43 +3899,60 @@ msgstr "Được yêu cầu"
 msgid "Error displaying link_id %s: %s\n"
 msgstr "Lỗi link_id hiển thị %s: %s\n"
 
-#: src/print.c:246
+#: src/print.c:247
 #, c-format
 msgid "Page: %i/%i"
 msgstr "Trang: %i/%i"
 
 #. gather some info about this part
 #. four fields, one terminator
-#: src/print.c:754
+#: src/print.c:755
 msgid "Type:"
 msgstr "Loại:"
 
-#: src/print.c:757
+#: src/print.c:758
 msgid "Filename:"
 msgstr "Tên tập tin:"
 
-#: src/print.c:1206
+#: src/print.c:1155
+msgid "Font available for printing"
+msgstr "Phông chữ hiện có để in"
+
+#: src/print.c:1161
+#, c-format
+msgid "Font <b>not</b> available for printing. Closest: %s"
+msgstr "Phông chữ hiện <b>không</b> có để in. Closest: %s"
+
+#: src/print.c:1174
+msgid "Select Font"
+msgstr "Chọn phông chữ"
+
+#: src/print.c:1207
+msgid "Change..."
+msgstr "Thay đổi..."
+
+#: src/print.c:1240
 msgid "Print message"
 msgstr "In thông điệp"
 
-#: src/print.c:1218
+#: src/print.c:1252
 msgid "Header font"
 msgstr "Phông cho Header"
 
-#: src/print.c:1220
+#: src/print.c:1254
 msgid "Body font"
 msgstr "Phông cho Thân"
 
-#: src/print.c:1222
+#: src/print.c:1256
 msgid "Footer font"
 msgstr "Phông cho Footer"
 
 #. highlight cited stuff
-#: src/print.c:1226
+#: src/print.c:1260
 msgid "Highlight cited text"
 msgstr "Nổi bật văn bản trích dẫn"
 
-#: src/print.c:1272
+#: src/print.c:1289
 #, c-format
 msgid ""
 "Balsa could not find font \"%s\".\n"
@@ -3940,7 +3961,7 @@ msgstr ""
 "Balsa không tìm thấy font \"%s\".\n"
 "Hãy dùng trang \"Fonts\" trên hộp thoại \"In thông điệp\" để thay đổi."
 
-#: src/print.c:1374
+#: src/print.c:1384
 msgid "Balsa: message print preview"
 msgstr "Balsa: xem trước trang in thông điệp"
 
@@ -4826,6 +4847,9 @@ msgstr "Lên"
 #: src/toolbar-prefs.c:506
 msgid "Down"
 msgstr "Xuống"
+
+#~ msgid "Address _Book Name"
+#~ msgstr "Tên S_ổ Địa Chỉ"
 
 #~ msgid "Connecting with \"%s\"..."
 #~ msgstr "Đang kết nối với \"%s\"..."

@@ -46,11 +46,11 @@ msgstr "Ingen feil"
 
 #: libbalsa/address-book.c:400
 msgid "Cannot read from address book"
-msgstr "Kan ikke lese fra addressebok"
+msgstr "Kan ikke lese fra adressebok"
 
 #: libbalsa/address-book.c:401
 msgid "Cannot write to address book"
-msgstr "Kan ikke skrive til addressebok"
+msgstr "Kan ikke skrive til adressebok"
 
 #: libbalsa/address-book.c:402
 msgid "Cannot connect to server"

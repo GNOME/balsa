@@ -138,6 +138,7 @@ struct ImapBody_ {
   ImapBodyDisposition content_dsp;
   GHashTable *dsp_params;
   char *content_dsp_other;
+  char *content_uri;
 
   union {
     ImapBodyExt1Part onepart;

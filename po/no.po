@@ -1,13 +1,13 @@
 # Norwegian (bokmål dialect) translation of balsa.
 # Copyright (C) 1998, 1999 Free Software Foundation, Inc.
-# Kjartan Maraas <kmaraas@fib.hl.no>, 1998, 1999.
+# Kjartan Maraas <kmaraas@online.no>, 1998, 1999.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.4.9\n"
-"POT-Creation-Date: 1999-03-11 11:30+0100\n"
-"PO-Revision-Date: 1998-03-02 19:51+0100\n"
-"Last-Translator: Kjartan Maraas <kmaraas@fib.hl.no>\n"
+"POT-Creation-Date: 1999-03-26 00:10+0100\n"
+"PO-Revision-Date: 1998-03-02 00:29+0100\n"
+"Last-Translator: Kjartan Maraas <kmaraas@online.no>\n"
 "Language-Team: Norwegian <no@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
@@ -110,6 +110,21 @@ msgstr ""
 "Hvis du ønsker å bruke IMAP til dette\n"
 "vær snill å endre dem i Balsa\n"
 
+#: src/balsa-init.c:471 src/balsa-init.c:478 src/balsa-init.c:485
+#, c-format
+msgid ""
+"Mailbox \"%s\" is not valid.\n"
+"\n"
+"Would you like to create it?"
+msgstr ""
+"Postboks \"%s\" er ikke gyldig.\n"
+"\n"
+"Ønsker du å opprette den?"
+
+#: src/balsa-init.c:512
+msgid "Unable to procede without a valid mailbox.  Please try again."
+msgstr "Kan ikke fortsette uten en gyldig postboks. Vennligst prøv igjen."
+
 #: src/balsa-init.c:533
 msgid "Finish"
 msgstr "Fullfør"
@@ -179,8 +194,7 @@ msgid ""
 "<tr><td bgcolor=\"#f0f0f0\"> You received an encoded file of type "
 "application/"
 msgstr ""
-"<tr><td bgcolor=\"#f0f0f0\"> Du mottok en kodet fil av type "
-"applikasjon/"
+"<tr><td bgcolor=\"#f0f0f0\"> Du mottok en kodet fil av type applikasjon/"
 
 #: src/balsa-message.c:591
 msgid "<P>The parameters of this message are:<BR>"
@@ -395,7 +409,7 @@ msgstr ""
 
 #: src/mailbox-conf.c:194
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
-msgstr ""
+msgstr "Oooops! postboks ikke funnet i balsa_app.mailbox noder?\n"
 
 #: src/mailbox-conf.c:238
 msgid "Mailbox Configurator"
@@ -662,7 +676,7 @@ msgstr "Postbokser/Åpnet/"
 
 #: src/main-window.c:407
 msgid "Copyright (C) 1997-1999"
-msgstr ""
+msgstr "Copyright (C) 1997-1999"
 
 #: src/main-window.c:409
 msgid ""
@@ -671,8 +685,8 @@ msgid ""
 "\n"
 "If you need to report bugs, please do so at: http://bugs.gnome.org/"
 msgstr ""
-"Balsa epostklienten er en del av GNOME skrivebordsmiljøet.  "
-"Informasjon om Balsa kan finnes på http://www.balsa.net/\n"
+"Balsa epostklienten er en del av GNOME skrivebordsmiljøet.  Informasjon om "
+"Balsa kan finnes på http://www.balsa.net/\n"
 "\n"
 "Vennligst rapporter feil på: http://bugs.gnome.org/"
 
@@ -846,12 +860,12 @@ msgstr "Legg ved fil"
 #. cc:
 #: src/sendmsg-window.c:337
 msgid "cc:"
-msgstr ""
+msgstr "cc:"
 
 #. bcc:
 #: src/sendmsg-window.c:355
 msgid "bcc:"
-msgstr ""
+msgstr "bcc:"
 
 #. Attachment list
 #: src/sendmsg-window.c:373
@@ -889,13 +903,12 @@ msgstr "du"
 msgid " wrote:\n"
 msgstr " skrev:\n"
 
-#: libbalsa/mailbox.c:475
+#: libbalsa/mailbox.c:476
 #, c-format
 msgid "Mailbox: Opening %s Refcount: %d\n"
 msgstr "Postboks: Åpning av %s referansetall: %d\n"
 
-#: libbalsa/mailbox.c:495
+#: libbalsa/mailbox.c:496
 #, c-format
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr "Postboks: Lukker %s referansetall: %d\n"
-

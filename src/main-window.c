@@ -78,7 +78,7 @@ static void about_box_destroy_cb (void);
 
 static void destroy_window_cb (GnomeMDI * mdi, gpointer data);
 
-static void set_icon (GdkWindow * window);
+static void set_icon (GnomeApp *app);
 
 static GnomeUIInfo file_menu[] =
 {
@@ -271,7 +271,10 @@ app_created (GnomeMDI * mdi, GnomeApp * app)
 {
   GtkWidget *statusbar;
 
-  set_icon (GTK_WIDGET (app)->window);
+  /* we can only set icon after realization, as we have no windows before. */
+  gtk_signal_connect(GTK_OBJECT(app), "realize",
+		     GTK_SIGNAL_FUNC(set_icon), NULL);
+
   statusbar = gtk_statusbar_new ();
   pbar = gtk_progress_bar_new ();
   gtk_progress_bar_set_activity_step (GTK_PROGRESS_BAR (pbar), 5);
@@ -546,15 +549,16 @@ about_box_destroy_cb (void)
 }
 
 static void
-set_icon (GdkWindow * w)
+set_icon (GnomeApp *app)
 {
   GdkImlibImage *im = NULL;
-  GdkWindow *ic_win;
+  GdkWindow *ic_win, *w;
   GdkWindowAttr att;
   XIconSize *is;
   gint i, count, j;
   GdkPixmap *pmap, *mask;
 
+  w = GTK_WIDGET(app)->window;
 
   if ((XGetIconSizes (GDK_DISPLAY (), GDK_ROOT_WINDOW (), &is, &count)) &&
       (count > 0))

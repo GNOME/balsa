@@ -1,3 +1,9 @@
+1998-12-12  Jaka Mocnik  <jaka.mocnik@kiss.uni-lj.si>
+
+	* src/main-window.c (app_created): connected set_icon() to
+	realize signal handler for app as MDI does not explicitly
+	realize GnomeApps anymore.
+	
 1998-12-10  Miguel de Icaza  <miguel@nuclecu.unam.mx>
 
 	* src/sendmsg-window.c (attachments_add): Add drag and drop

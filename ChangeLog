@@ -1,3 +1,13 @@
+2004-01-04  Pawel Salek
+
+	* libbalsa/mailbox.[hc]: add filt_in and filt_out methods in an
+	attempt to filter in and out message.
+	* libbalsa/mailbox_imap.c: do not mix sorting with threading - too
+	slow.
+	* libbalsa/message.h: do not waste flag bits.
+	* src/balsa-index.c: unbreak message searching.
+	* src/balsa-message.[hc]: bug 127776.
+
 2004-01-04  Francisco Javier F. Serrador  <serrador@cvs.gnome.org>
 
 	* src/main.c: Fixed typo staartup-->startup

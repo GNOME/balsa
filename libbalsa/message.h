@@ -55,11 +55,11 @@ typedef enum _LibBalsaMessageFlag LibBalsaMessageFlag;
 typedef enum _LibBalsaMsgCreateResult LibBalsaMsgCreateResult;
 
 enum _LibBalsaMessageFlag {
-    LIBBALSA_MESSAGE_FLAG_NEW = 1 << 1,
-    LIBBALSA_MESSAGE_FLAG_DELETED = 1 << 2,
-    LIBBALSA_MESSAGE_FLAG_REPLIED = 1 << 3,
-    LIBBALSA_MESSAGE_FLAG_FLAGGED = 1 << 4,
-    LIBBALSA_MESSAGE_FLAG_RECENT = 1 << 5
+    LIBBALSA_MESSAGE_FLAG_NEW     = 1 << 0,
+    LIBBALSA_MESSAGE_FLAG_DELETED = 1 << 1,
+    LIBBALSA_MESSAGE_FLAG_REPLIED = 1 << 2,
+    LIBBALSA_MESSAGE_FLAG_FLAGGED = 1 << 3,
+    LIBBALSA_MESSAGE_FLAG_RECENT  = 1 << 4
 };
 
 enum _LibBalsaMsgCreateResult {

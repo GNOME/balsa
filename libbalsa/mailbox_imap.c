@@ -1786,6 +1786,20 @@ lbmi_get_imap_sort_key(LibBalsaMailbox *mbox)
     }
     return key;
 }
+static gboolean
+insert_in_data(GNode *node, gpointer data)
+{
+    LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(data);
+    if(!g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
+                    node->data)) {
+        printf("Appending msgno=%u\n", GPOINTER_TO_UINT(node->data));
+        libbalsa_mailbox_msgno_filt_in(mailbox,
+                                       GPOINTER_TO_UINT(node->data));
+    }
+    return FALSE;
+}
+    
+     
 static void
 libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
 				    LibBalsaMailboxThreadingType thread_type)
@@ -1821,6 +1835,12 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
 	g_assert_not_reached();
 	new_tree = NULL;
     }
+    /* FIXME: remove msgs from the old tree if they do not exist in
+       the new one. */
+    
+    /* add messages that do exist in the new tree but not in the old one. */
+    g_node_traverse(new_tree, G_PRE_ORDER, G_TRAVERSE_ALL, -1,
+                    insert_in_data, mailbox);
     if (new_tree)
 	libbalsa_mailbox_set_msg_tree(mailbox, new_tree);
 }
@@ -1832,8 +1852,6 @@ lbm_imap_update_view_filter(LibBalsaMailbox   *mailbox,
     if(mailbox->view_filter)
         libbalsa_condition_free(mailbox->view_filter);
     mailbox->view_filter = view_filter;
-    g_node_destroy(mailbox->msg_tree);
-    mailbox->msg_tree = g_node_new(NULL);
     libbalsa_mailbox_imap_set_threading(mailbox,
                                         mailbox->view->threading_type);
 }
@@ -1862,7 +1880,10 @@ libbalsa_mailbox_imap_sort(LibBalsaMailbox *mbox, GArray *array)
                                                GTK_SORT_ASCENDING));
         return;
     }
-
+    if(mbox->view->threading_type != LB_MAILBOX_THREADING_FLAT)
+        return; /* IMAP threading has an own way of sorting messages.
+                 * We could possibly disable sort buttons if threading
+                 * is used. */
     msgno_arr = g_malloc(len*sizeof(unsigned));
     no_max = 0;
     for(i=0; i<len; i++) {

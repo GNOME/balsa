@@ -48,7 +48,9 @@ struct _BalsaMessage {
        GtkWidget *vbox;
  
 	/* Widget to hold headers */
+	GtkWidget *header_box;
 	GtkWidget *header_text;
+	GtkWidget *header_container;
 	ShownHeaders shown_headers;
 	gboolean show_all_headers;
 

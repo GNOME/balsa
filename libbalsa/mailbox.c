@@ -820,6 +820,28 @@ libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno)
     lbm_threads_leave(unlock);
 }
 
+void
+libbalsa_mailbox_msgno_filt_in(LibBalsaMailbox *mailbox, guint seqno)
+{
+    GtkTreeIter iter;
+    GtkTreePath *path;
+    gboolean unlock;
+
+    unlock = lbm_threads_enter();
+
+    /* Insert node into the message tree before getting path. */
+    iter.user_data = g_node_new(GUINT_TO_POINTER(seqno));
+    iter.stamp = mailbox->stamp;
+    g_node_prepend(mailbox->msg_tree, iter.user_data);
+
+    path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
+    g_signal_emit(mailbox, libbalsa_mbox_model_signals[ROW_INSERTED], 0,
+		  path, &iter);
+    gtk_tree_path_free(path);
+
+    lbm_threads_leave(unlock);
+}
+
 struct remove_data { unsigned seqno; GNode *node; };
 static gboolean
 decrease_post(GNode *node, gpointer data)
@@ -891,6 +913,68 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
 
     /* Now it's safe to destroy the node. */
     g_node_destroy(dt.node);
+    g_signal_emit(mailbox, libbalsa_mbox_model_signals[ROW_DELETED], 0, path);
+
+    if (parent->parent && !parent->children) {
+	gtk_tree_path_up(path);
+	iter.user_data = parent;
+	g_signal_emit(mailbox,
+		      libbalsa_mbox_model_signals[ROW_HAS_CHILD_TOGGLED], 0,
+		      path, &iter);
+    }
+    
+    gtk_tree_path_free(path);
+    mailbox->stamp++;
+
+    lbm_threads_leave(unlock);
+}
+
+void
+libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
+{
+    GtkTreeIter iter;
+    GtkTreePath *path;
+    gboolean unlock;
+    GNode *child, *parent, *node;
+
+    unlock = lbm_threads_enter();
+
+    node = g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL, 
+                       GUINT_TO_POINTER(seqno));
+    if (!node) {
+	g_warning("msgno %d not found", seqno);
+	lbm_threads_leave(unlock);
+	return;
+    }
+
+    iter.user_data = node;
+    iter.stamp = mailbox->stamp;
+    path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
+
+    /* First promote any children to the node's parent; we'll insert
+     * them all before the current node, to keep the path calculation
+     * simple. */
+    parent = node->parent;
+    while ((child = node->children)) {
+	/* No need to notify the tree-view about unlinking the child--it
+	 * will assume we already did that when we notify it about
+	 * destroying the parent. */
+	g_node_unlink(child);
+	g_node_insert_before(parent, node, child);
+
+	/* Notify the tree-view about the new location of the child. */
+	iter.user_data = child;
+	g_signal_emit(mailbox, libbalsa_mbox_model_signals[ROW_INSERTED], 0,
+		      path, &iter);
+	if (child->children)
+	    g_signal_emit(mailbox,
+			  libbalsa_mbox_model_signals[ROW_HAS_CHILD_TOGGLED],
+			  0, path, &iter);
+	gtk_tree_path_next(path);
+    }
+
+    /* Now it's safe to destroy the node. */
+    g_node_destroy(node);
     g_signal_emit(mailbox, libbalsa_mbox_model_signals[ROW_DELETED], 0, path);
 
     if (parent->parent && !parent->children) {

@@ -75,6 +75,15 @@ static gboolean bndx_find_row(BalsaIndex * index,
                               LibBalsaMessageFlag flag,
                               LibBalsaCondition *condition,
                               GList * exclude, gboolean threaded);
+static gboolean bndx_find_row_func(LibBalsaMessage * message,
+                                   LibBalsaMessageFlag flag,
+                                   LibBalsaCondition *condition,
+                                   GList * exclude,
+                                   gboolean viewable);
+static gboolean bndx_find_next(GtkTreeView * tree_view, GtkTreePath * path,
+                               GtkTreeIter * iter, gboolean wrap);
+static gboolean bndx_find_prev(GtkTreeView * tree_view, GtkTreePath * path,
+                               GtkTreeIter * iter);
 static void bndx_select_message(BalsaIndex * index,
                                 LibBalsaMessage * message);
 static void bndx_changed_find_row(BalsaIndex * index);
@@ -888,6 +897,10 @@ bndx_find_row_and_select(BalsaIndex * index,
 	retval = TRUE;
     }
 
+#if 0
+    /* WARNING: Chunk disabled: This must not happen - message will
+       not be read if we eg. have message preview disabled. */
+
     /* Mark as read; usually this will have been taken care of by
      * libbalsa_message_body_ref, but we should make sure here. */
     if (index->current_message &&
@@ -898,7 +911,7 @@ bndx_find_row_and_select(BalsaIndex * index,
 				      FALSE);
 	g_list_free(messages);
     }
-
+#endif
     return retval;
 }
 
@@ -915,7 +928,6 @@ bndx_find_row(BalsaIndex * index, GtkTreeIter * pos,
               LibBalsaCondition *condition, GList *exclude,
 	      gboolean threaded)
 {
-#if 0
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
     GtkTreePath *path;
@@ -930,7 +942,7 @@ bndx_find_row(BalsaIndex * index, GtkTreeIter * pos,
         /* The current_message is NULL (or we otherwise can't find
          * it); if we're looking for a plain next or prev, just return
          * FALSE. */
-        if (!(flag || conditions || exclude))
+        if (!(flag || condition || exclude))
             return FALSE;
 
         wrap = FALSE;
@@ -964,7 +976,7 @@ bndx_find_row(BalsaIndex * index, GtkTreeIter * pos,
             else
                 break;
         } else
-            found = bndx_find_row_func(message, flag, conditions, op, exclude,
+            found = bndx_find_row_func(message, flag, condition, exclude,
                                        threaded || 
 				       bndx_row_is_viewable(index, path));
     } while (!found &&
@@ -978,10 +990,9 @@ bndx_find_row(BalsaIndex * index, GtkTreeIter * pos,
             *pos = iter;
     } else if (!reverse_search && exclude)
         /* for next message when deleting or moving, fall back to previous */
-        return bndx_find_row(index, pos, TRUE, flag, op, conditions,
+        return bndx_find_row(index, pos, TRUE, flag, condition,
                              exclude, threaded);
     return found;
-#endif
     LibBalsaCondition cond_flag, cond_and;
     cond_flag.negate      = FALSE;
     cond_flag.type        = CONDITION_FLAG;
@@ -995,7 +1006,6 @@ bndx_find_row(BalsaIndex * index, GtkTreeIter * pos,
                                   !reverse_search, &cond_and, exclude);
 }
 
-#if 0
 static gboolean
 bndx_find_row_func(LibBalsaMessage * message,
                    LibBalsaMessageFlag flag,
@@ -1012,7 +1022,7 @@ bndx_find_row_func(LibBalsaMessage * message,
         if (LIBBALSA_MESSAGE_IS_DELETED(message)
 	    || !LIBBALSA_MESSAGE_HAS_FLAG(message, flag))
             return FALSE;
-    } else if (conditions) {
+    } else if (condition) {
 	if (!libbalsa_mailbox_message_match(message->mailbox, message,
 					    condition))
 	    return FALSE;
@@ -1116,7 +1126,7 @@ bndx_find_prev(GtkTreeView * tree_view, GtkTreePath * path,
     }
     return FALSE;
 }
-#endif
+
 /* bndx_expand_to_row_and_select:
  * make sure it's viewable, then pass it to bndx_select_row
  * no-op if it's NULL

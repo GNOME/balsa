@@ -402,6 +402,8 @@ void libbalsa_mailbox_view_free(LibBalsaMailboxView * view);
 void libbalsa_mailbox_msgno_changed(LibBalsaMailbox  *mailbox, guint seqno);
 void libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno);
 void libbalsa_mailbox_msgno_removed(LibBalsaMailbox  *mailbox, guint seqno);
+void libbalsa_mailbox_msgno_filt_in(LibBalsaMailbox * mailbox, guint seqno);
+void libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno);
 
 /* Search */
 gboolean libbalsa_mailbox_msgno_find(LibBalsaMailbox * mailbox,

@@ -1409,6 +1409,7 @@ mailbox_messages_changed_status(LibBalsaMailbox * mb,
     }
 
     bndx_changed_find_row(bindex);
+    g_get_current_time (&bindex->last_use);
 }
 
 /* mailbox_messages_changed_status_cb: 
@@ -1480,6 +1481,7 @@ bndx_messages_add(BalsaIndex * bindex, GList *messages)
     balsa_mblist_update_mailbox(balsa_app.mblist_tree_store, 
 				bindex->mailbox_node->mailbox);
     bndx_changed_find_row(bindex);
+    g_get_current_time (&bindex->last_use);
 }
 
 
@@ -2489,6 +2491,7 @@ bndx_messages_remove(BalsaIndex * index, GList * messages)
     balsa_index_threading(index,
                           index->mailbox_node->mailbox->threading_type);
     bndx_select_message(index, next_message);
+    g_get_current_time (&index->last_use);
 }
 
 static void

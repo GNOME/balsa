@@ -334,7 +334,8 @@ static void lang_chinese_traditional_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_danish_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_german_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_dutch_cb(GtkWidget *, BalsaSendmsg *);
-static void lang_english_cb(GtkWidget *, BalsaSendmsg *);
+static void lang_english_uk_cb(GtkWidget *, BalsaSendmsg *);
+static void lang_english_us_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_estonian_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_finnish_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_french_cb(GtkWidget *, BalsaSendmsg *);
@@ -365,7 +366,8 @@ static GnomeUIInfo locale_aj_menu[] = {
     GNOMEUIINFO_ITEM_NONE(N_("Catalan"), NULL, lang_catalan_cb),
     GNOMEUIINFO_ITEM_NONE(N_("Danish"), NULL, lang_danish_cb),
     GNOMEUIINFO_ITEM_NONE(N_("Dutch"), NULL, lang_dutch_cb),
-    GNOMEUIINFO_ITEM_NONE(N_("English"), NULL, lang_english_cb),
+    GNOMEUIINFO_ITEM_NONE(N_("English (UK)"), NULL, lang_english_uk_cb),
+    GNOMEUIINFO_ITEM_NONE(N_("English (US)"), NULL, lang_english_us_cb),
     GNOMEUIINFO_ITEM_NONE(N_("Estonian"), NULL, lang_estonian_cb),
     GNOMEUIINFO_ITEM_NONE(N_("Finnish"), NULL, lang_finnish_cb),
     GNOMEUIINFO_ITEM_NONE(N_("French"), NULL, lang_french_cb),
@@ -484,50 +486,51 @@ struct {
     {"de_DE", "ISO-8859-15", N_("German")},
 #define LOC_DUTCH_POS     6
     {"nl_NL", "ISO-8859-15", N_("Dutch")},
-#define LOC_ENGLISH_POS   7
-    /* English -> American English, argh... */
-    {"en_US", "ISO-8859-1", N_("English")}, 
-#define LOC_ESTONIAN_POS  8
+#define LOC_ENGLISH_UK_POS   7
+    {"en_GB", "ISO-8859-15", N_("English (UK)")}, 
+#define LOC_ENGLISH_US_POS   8
+    {"en_US", "ISO-8859-1", N_("English (US)")},
+#define LOC_ESTONIAN_POS  9
     {"et_EE", "ISO-8859-15", N_("Estonian")},
-#define LOC_FINNISH_POS   9
+#define LOC_FINNISH_POS   10
     {"fi_FI", "ISO-8859-15", N_("Finnish")},
-#define LOC_FRENCH_POS    10
+#define LOC_FRENCH_POS    11
     {"fr_FR", "ISO-8859-15", N_("French")},
-#define LOC_GREEK_POS     11 
+#define LOC_GREEK_POS     12 
     {"el_GR", "ISO-8859-7", N_("Greek")},
-#define LOC_HUNGARIAN_POS 12
+#define LOC_HUNGARIAN_POS 13
     {"hu_HU", "ISO-8859-2", N_("Hungarian")},
-#define LOC_ITALIAN_POS   13
+#define LOC_ITALIAN_POS   14
     {"it_IT", "ISO-8859-15", N_("Italian")},
-#define LOC_JAPANESE_POS  14
+#define LOC_JAPANESE_POS  15
     {"ja_JP", "euc-jp", N_("Japanese")},
-#define LOC_KOREAN_POS    15
+#define LOC_KOREAN_POS    16
     {"ko_KR", "euc-kr", N_("Korean")},
-#define LOC_LATVIAN_POS    16
+#define LOC_LATVIAN_POS    17
     {"lv_LV", "ISO-8859-13", N_("Latvian")},
-#define LOC_LITHUANIAN_POS    17
+#define LOC_LITHUANIAN_POS    18
     {"lt_LT", "ISO-8859-13", N_("Lithuanian")},
-#define LOC_NORWEGIAN_POS 18
+#define LOC_NORWEGIAN_POS 19
     {"no_NO", "ISO-8859-1", N_("Norwegian")},
-#define LOC_POLISH_POS    19
-    {"pl_PL", "ISO-8859-2", N_("Polish")},
-#define LOC_PORTUGESE_POS 20
+#define LOC_POLISH_POS    20
+    {"pl_PL", "ISO-8859-2",  N_("Polish")},
+#define LOC_PORTUGESE_POS 21
     {"pt_PT", "ISO-8859-15", N_("Portugese")},
-#define LOC_ROMANIAN_POS 21
+#define LOC_ROMANIAN_POS 22
     {"ro_RO", "ISO-8859-2", N_("Romanian")},
-#define LOC_RUSSIAN_ISO_POS   22
+#define LOC_RUSSIAN_ISO_POS   23
     {"ru_SU", "ISO-8859-5", N_("Russian (ISO)")},
-#define LOC_RUSSIAN_KOI_POS   23
+#define LOC_RUSSIAN_KOI_POS   24
     {"ru_RU", "KOI8-R", N_("Russian (KOI)")},
-#define LOC_SLOVAK_POS    24
+#define LOC_SLOVAK_POS    25
     {"sk_SK", "ISO-8859-2", N_("Slovak")},
-#define LOC_SPANISH_POS   25
+#define LOC_SPANISH_POS   26
     {"es_ES", "ISO-8859-15", N_("Spanish")},
-#define LOC_SWEDISH_POS   26
+#define LOC_SWEDISH_POS   27
     {"sv_SE", "ISO-8859-1", N_("Swedish")},
-#define LOC_TURKISH_POS   27
+#define LOC_TURKISH_POS   28
     {"tr_TR", "ISO-8859-9", N_("Turkish")},
-#define LOC_UKRAINIAN_POS 28
+#define LOC_UKRAINIAN_POS 29
     {"uk_UK", "KOI8-U", N_("Ukrainian")}
 };
 
@@ -683,7 +686,7 @@ find_locale_index_by_locale(const gchar * locale)
     unsigned i, j, maxfit = 0, maxpos = 0;
 
     if (!locale || strcmp(locale, "C") == 0)
-	return LOC_ENGLISH_POS;
+	return LOC_ENGLISH_UK_POS;
     for (i = 0; i < ELEMENTS(locales); i++) {
 	for (j = 0; locale[j] && locales[i].locale[j] == locale[j]; j++);
 	if (j > maxfit) {
@@ -3808,7 +3811,7 @@ init_menus(BalsaSendmsg * msg)
 	    ;
     }
     if (i == ELEMENTS(locales))
-	i = LOC_ENGLISH_POS;
+	i = LOC_ENGLISH_UK_POS;
     
     set_locale(NULL, msg, i);
 
@@ -3967,9 +3970,14 @@ lang_dutch_cb(GtkWidget * w, BalsaSendmsg * bsmsg)
     set_locale(w, bsmsg, LOC_DUTCH_POS);
 }
 static void
-lang_english_cb(GtkWidget * w, BalsaSendmsg * bsmsg)
+lang_english_uk_cb(GtkWidget * w, BalsaSendmsg * bsmsg)
 {
-    set_locale(w, bsmsg, LOC_ENGLISH_POS);
+    set_locale(w, bsmsg, LOC_ENGLISH_UK_POS);
+}
+static void
+lang_english_us_cb(GtkWidget * w, BalsaSendmsg * bsmsg)
+{
+    set_locale(w, bsmsg, LOC_ENGLISH_US_POS);
 }
 static void
 lang_estonian_cb(GtkWidget * w, BalsaSendmsg * bsmsg)

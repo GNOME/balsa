@@ -770,6 +770,8 @@ bndx_tree_expand_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
                 gtk_tree_selection_select_path(selection, current_path);
                 if (index->current_message
 		    && msgno == (guint) index->current_message->msgno) {
+		    gtk_tree_view_set_cursor(tree_view, current_path,
+			                     NULL, FALSE);
                     gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(index),
                                                  current_path, NULL, FALSE,
                                                  0, 0);

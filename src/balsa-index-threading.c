@@ -58,6 +58,7 @@
 
 struct ThreadingInfo {
     BalsaIndex *index;
+    GNode *root;
     GHashTable *id_table;
     GSList *message_list;
 };
@@ -67,9 +68,8 @@ static gboolean gen_container(GtkTreeModel * model, GtkTreePath * path,
                               GtkTreeIter * iter, gpointer data);
 static GNode *get_container(LibBalsaMessage * message,
                             GHashTable * id_table);
-static GNode* check_references(LibBalsaMessage* message,
-			       GHashTable *id_table);
-static void find_root_set(gpointer key, GNode* value, GNode * root);
+static GNode *check_references(LibBalsaMessage * message,
+                               struct ThreadingInfo * ti);
 static gboolean prune(GNode * node, GNode * root);
 static gboolean construct(GNode * node, struct ThreadingInfo * ti);
 static void subject_gather(GNode * node, GHashTable * subject_table);
@@ -93,37 +93,35 @@ balsa_index_threading(BalsaIndex* index, LibBalsaMailboxThreadingType th_type)
 static void
 threading_jwz(BalsaIndex * index)
 {
-    GNode *root;
     struct ThreadingInfo ti;
     GHashTable *subject_table;
 
     ti.index = index;
     ti.id_table = g_hash_table_new(g_str_hash, g_str_equal);
+    ti.root = g_node_new(NULL);
     gtk_tree_model_foreach(gtk_tree_view_get_model(GTK_TREE_VIEW(index)),
                            gen_container, &ti);
 
-    root = g_node_new(NULL);
-    g_hash_table_foreach(ti.id_table, (GHFunc) find_root_set, root);
-    g_node_traverse(root, G_POST_ORDER, G_TRAVERSE_ALL, -1,
-                    (GNodeTraverseFunc) prune, root);
+    g_node_traverse(ti.root, G_POST_ORDER, G_TRAVERSE_ALL, -1,
+                    (GNodeTraverseFunc) prune, ti.root);
 
     subject_table = g_hash_table_new(g_str_hash, g_str_equal);
-    g_node_children_foreach(root, G_TRAVERSE_ALL,
+    g_node_children_foreach(ti.root, G_TRAVERSE_ALL,
                             (GNodeForeachFunc) subject_gather,
                             subject_table);
-    g_node_children_foreach(root, G_TRAVERSE_ALL,
+    g_node_children_foreach(ti.root, G_TRAVERSE_ALL,
                             (GNodeForeachFunc) subject_merge,
                             subject_table);
 
     balsa_window_setup_progress(BALSA_WINDOW(index->window),
-                                g_node_n_children(root));
-    g_node_traverse(root, G_PRE_ORDER, G_TRAVERSE_ALL, -1,
+                                g_node_n_children(ti.root));
+    g_node_traverse(ti.root, G_PRE_ORDER, G_TRAVERSE_ALL, -1,
                     (GNodeTraverseFunc) construct, &ti);
     balsa_window_clear_progress(BALSA_WINDOW(index->window));
 
     g_hash_table_destroy(subject_table);
     g_hash_table_destroy(ti.id_table);
-    g_node_destroy(root);
+    g_node_destroy(ti.root);
 }
 
 static gboolean
@@ -161,17 +159,19 @@ gen_container(GtkTreeModel * model, GtkTreePath * path,
      * Note that at all times, the various ``parent'' and ``child''
      * fields must be kept inter-consistent.
      */
-        GNode* parent = check_references(message, ti->id_table);
+        /* In this implementation, check_references always returns a
+         * parent; if the message has no parent, it's the root of the
+         * whole mailbox tree. */
+        GNode* parent = check_references(message, ti);
         g_node_unlink(container);
-        if (parent)
-            g_node_prepend(parent, container);
+        g_node_prepend(parent, container);
     }
 
     return FALSE;
 }
 
 static GNode *
-check_references(LibBalsaMessage * message, GHashTable * id_table)
+check_references(LibBalsaMessage * message, struct ThreadingInfo * ti)
 {
     /*
      * For each element in the message's References field:
@@ -186,27 +186,29 @@ check_references(LibBalsaMessage * message, GHashTable * id_table)
      *       to see if A is reachable.
      */
 
-    GNode *parent = NULL;
+    /* The root of the mailbox tree is the default parent. */
+    GNode *parent = ti->root;
     GList *reference;
 
     for (reference = message->references_for_threading; reference;
          reference = g_list_next(reference)) {
         gchar *id = reference->data;
-        GNode *foo = g_hash_table_lookup(id_table, id);
+        GNode *foo = g_hash_table_lookup(ti->id_table, id);
 
         if (foo == NULL) {
             foo = g_node_new(NULL);
-            g_hash_table_insert(id_table, id, foo);
+            g_hash_table_insert(ti->id_table, id, foo);
         }
 
-        if (foo == parent) {
-            /* printf("duplicate!!\n"); */
-            continue;
+        /* Avoid nasty surprises. */
+        if (foo != parent && !g_node_is_ancestor(foo, parent)) {
+            if (foo->parent == ti->root)
+                /* foo has the default parent; we'll unlink it, so that
+                 * it can be linked to its rightful parent. */
+                g_node_unlink(foo);
+            if (G_NODE_IS_ROOT(foo))
+                g_node_prepend(parent, foo);
         }
-
-        if (parent && !g_node_is_ancestor(foo, parent)
-            && G_NODE_IS_ROOT(foo))
-            g_node_prepend(parent, foo);
 
         parent = foo;
     }
@@ -217,7 +219,7 @@ static GNode *
 get_container(LibBalsaMessage * message, GHashTable * id_table)
 {
     /*
-     * If id_table contains a Container for this ID:
+     * If id_table contains an *empty* Container for this ID:
      *   + Store this message in the Container's message slot.
      * else
      *   + Create a new Container object holding this message;
@@ -238,18 +240,6 @@ get_container(LibBalsaMessage * message, GHashTable * id_table)
     }
 
     return container;
-}
-
-static void
-find_root_set(gpointer key, GNode * value, GNode * root)
-{
-    /*
-     * Walk over the elements of id_table, and gather a list of the 
-     * Container objects that have no parents. 
-     */
-
-    if (value->parent == NULL)
-        g_node_prepend(root, value);
 }
 
 /* helper (why doesn't g_node_unlink return the node?!) */

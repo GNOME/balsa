@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 0.9.0\n"
-"POT-Creation-Date: 2000-08-12 17:41+0200\n"
+"POT-Creation-Date: 2000-08-14 14:10+0200\n"
 "PO-Revision-Date: 2000-07-15 00:45+02:00\n"
 "Last-Translator: Kai Lahmann <kl@linuxfaqs.de>\n"
 "Language-Team: german <de@li.org>\n"
@@ -481,8 +481,8 @@ msgstr "Speichere MIME-Abschnitt"
 
 #: src/balsa-message.c:1253
 #, c-format
-msgid "could not create temporary file"
-msgstr "Kann temporäre Datei nicht erstellen!"
+msgid "could not create temporary file %s"
+msgstr "Konnte temporäre Datei %s nicht erstellen!"
 
 #: src/filter-edit-dialog.c:30
 msgid "Inbound"
@@ -1851,21 +1851,21 @@ msgstr "Kann %s nicht sichern.\n"
 
 #: libmutt/mx.c:189
 msgid "Timeout exceeded while attempting fcntl lock!"
-msgstr ""
+msgstr "Zeitueberschreitung beim Versuch einen fcntl Lock zu erhalten"
 
 #: libmutt/mx.c:195
 #, c-format
 msgid "Waiting for fcntl lock... %d"
-msgstr ""
+msgstr "Warte auf fcntl Bestätigung... %d"
 
 #: libmutt/mx.c:223
 msgid "Timeout exceeded while attempting flock lock!"
-msgstr ""
+msgstr "Zeitueberschreitung beim Versuch einen flock Lock zu erhalten"
 
 #: libmutt/mx.c:230
 #, c-format
 msgid "Waiting for flock attempt... %d"
-msgstr ""
+msgstr "Warte auf flock Bestätigung... %d"
 
 #: libmutt/mx.c:459 libmutt/mx.c:605
 #, c-format

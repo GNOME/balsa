@@ -1,3 +1,13 @@
+* Balsa-2.0.10 release. Release date 2003-03-24
+
+- GPG support.
+- translation fixes and enhancements.
+- large set of UI fixes.
+- wrapping cleanups.
+- autocommit improvements.
+- (lib)mutt buffer overflow fix.
+- ...and lots of other bugs fixed.
+
 * Balsa-2.0.9 release. Release date 2003-02-23
 
 - some crashes and deadlocks fixed.

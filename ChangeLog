@@ -1,3 +1,9 @@
+2000-08-20  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/balsa-index.c: workaround for gtk_clist_sort() bug
+	(the bug fix has been yesterday included to gtk sources but it will 
+	take some time before people upgrade libraries).
+
 2000-08-17  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* libbalsa/mailbox_imap.[ch]: Implement

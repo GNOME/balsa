@@ -32,6 +32,12 @@
 /* constants */
 #define BUFFER_SIZE 1024
 
+#define CLIST_WORKAROUND
+#if defined(CLIST_WORKAROUND)
+#define DO_CLIST_WORKAROUND(s) if((s)->row_list) (s)->row_list->prev = NULL;
+#else
+#define DO_CLIST_WORKAROUND(s)
+#endif
 
 /* gtk widget */
 static void balsa_index_class_init (BalsaIndexClass * klass);
@@ -232,6 +238,7 @@ clist_click_column (GtkCList * clist, gint column, gpointer data)
   }
 
   gtk_clist_sort (clist);
+  DO_CLIST_WORKAROUND(clist)
 }
 
 static void
@@ -402,6 +409,7 @@ balsa_index_set_mailbox (BalsaIndex * bindex, LibBalsaMailbox * mailbox)
     i++;
   }
   gtk_clist_sort (GTK_CLIST (bindex));
+  DO_CLIST_WORKAROUND(GTK_CLIST (bindex))
   gtk_clist_thaw (GTK_CLIST (bindex));
 
   /* FIXME this might could be cleaned up some */
@@ -909,6 +917,7 @@ balsa_index_refresh (BalsaIndex * bindex)
         }
 
         gtk_clist_sort (GTK_CLIST (bindex));
+	DO_CLIST_WORKAROUND(GTK_CLIST (bindex))
 
         if (old_message)
                 newrow = gtk_clist_find_row_from_data (GTK_CLIST (bindex), old_message);

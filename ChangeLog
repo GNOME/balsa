@@ -1,3 +1,18 @@
+2005-03-23 Albrecht Dreß <albrecht dot dress at arcor dot de>
+
+	* src/balsa-message.c, libbalsa/gmime-gpgme-context.c,
+	libbalsa/gmime-gpgme-context.h, libbalsa/identity.c,
+	libbalsa/identity.h, libbalsa/rfc3156.c, libbalsa/rfc3156.h,
+	libbalsa/send.c: (1) plug a minor security problem when checking
+	the gpg subkey status; (2) improve dealing with low-validity uid's
+	for encryption; (3) several smaller fixes.
+
+2005-03-23 05:53  PeterB
+
+	* libbalsa/address-book-ldap.c, src/ab-main.c: complete migration
+	from GnomeConfig to LibbalsaConf.
+	* src/sendmsg-window.c: strip parameter variables from exec string.
+
 2005-03-22 22:07  PeterB
 
 	* libbalsa/: libbalsa-conf.c, libbalsa-conf.h: set up correctly for

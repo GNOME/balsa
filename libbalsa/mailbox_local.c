@@ -29,7 +29,6 @@
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
-#include "mailbackend.h"
 #include "mailbox-filter.h"
 
 #include <libgnome/gnome-config.h> 

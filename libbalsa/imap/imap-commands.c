@@ -1,6 +1,8 @@
+#include <string.h>
 #include "imap-handle.h"
 #include "imap-commands.h"
 #include "imap_private.h"
+#include "siobuf.h"
 
 /* RFC2060 */
 /* 6.1 Client Commands - Any State */
@@ -265,7 +267,7 @@ imap_mbox_append(ImapMboxHandle *handle, const char *mbox, ImapMsgFlags flags,
   }
 
   if (rc != IMR_OK)
-    g_warning("cmd '%s' failed.\n", cmd, IMAP_SUCCESS);
+    g_warning("cmd '%s' failed, returning: %d.\n", append_cmd, IMAP_SUCCESS);
   g_free(append_cmd);
   return IMAP_SUCCESS;
 }

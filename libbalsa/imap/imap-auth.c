@@ -8,6 +8,7 @@
 
 #include "imap-handle.h"
 #include "imap-auth.h"
+#include "util.h"
 
 /* ordered from strongest to weakest */
 ImapAuthenticator imap_authenticators_arr[] = {

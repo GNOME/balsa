@@ -39,8 +39,8 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <gnome.h>
+#include <gmime/md5-utils.h>
 
-#include "md5.h"
 #include "libbalsa.h"
 #include "pop3.h"
 
@@ -159,16 +159,16 @@ getApopStamp(char *buff, char *stamp)
 
 static void
 computeAuthHash(char *stamp, char *hash, const char *passwd) {
-    MD5_CTX mdContext;
+    MD5Context mdContext;
     register unsigned char *dp;
     register char *cp;
     unsigned char *ep;
     unsigned char digest[16];
     
-    MD5Init(&mdContext);
-    MD5Update(&mdContext, (unsigned char *)stamp, strlen(stamp));
-    MD5Update(&mdContext, (unsigned char *)passwd, strlen(passwd));
-    MD5Final(digest, &mdContext);
+    md5_init(&mdContext);
+    md5_update(&mdContext, (unsigned char *)stamp, strlen(stamp));
+    md5_update(&mdContext, (unsigned char *)passwd, strlen(passwd));
+    md5_final(&mdContext, digest);
     
     cp = hash;
     dp = digest;
@@ -184,6 +184,7 @@ static PopStatus
 pop_connect(int *s, const gchar *host)
 {
 #ifdef HAVE_GETADDRINFO
+  static const int USEIPV6 = 1;
 /* --- IPv4/6 --- */
 
   /* "65536\0" */
@@ -196,7 +197,7 @@ pop_connect(int *s, const gchar *host)
   /* we accept v4 or v6 STREAM sockets */
   memset (&hints, 0, sizeof (hints));
 
-  hints.ai_family = ( 1/*option (OPTUSEIPV6) */) ?  AF_UNSPEC : AF_INET;
+  hints.ai_family = USEIPV6 ?  AF_UNSPEC : AF_INET;
   hints.ai_socktype = SOCK_STREAM;
 
   hostname = g_strdup(host);

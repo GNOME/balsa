@@ -29,7 +29,7 @@
 #include <libgnome/gnome-i18n.h>
 
 #include "libbalsa.h"
-/* for safe_fopen and struct stat */
+/* for mutt_mktemp and safe_fopen */
 #include "mailbackend.h"
 
 LibBalsaMessageBody *
@@ -311,7 +311,7 @@ libbalsa_message_body_is_inline(LibBalsaMessageBody * body)
 
     mime_part = GMIME_PART(body->mime_part);
     disposition=g_mime_part_get_content_disposition(mime_part);
-    return (disposition && g_strcasecmp(disposition, GMIME_DISPOSITION_INLINE)==0);
+    return (disposition && g_ascii_strcasecmp(disposition, GMIME_DISPOSITION_INLINE)==0);
 }
 
 /* libbalsa_message_body_is_flowed:

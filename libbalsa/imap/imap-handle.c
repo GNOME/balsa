@@ -1,7 +1,6 @@
 
 #include "config.h"
 
-#define _POSIX_SOURCE 1
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -10,9 +9,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 #include "libimap-marshal.h"
 #include "imap.h"
 #include "imap-handle.h"
+#include "imap-auth.h"
 #include "siobuf.h"
 #include "util.h"
 
@@ -241,7 +243,7 @@ socket_open(const char* host, int iport)
   /* we accept v4 or v6 STREAM sockets */
   memset (&hints, 0, sizeof (hints));
 
-  hints.ai_family = AF_INET /*USEIPV6 ? AF_INET : AF_UNSPEC*/;
+  hints.ai_family = USEIPV6 ? AF_UNSPEC : AF_INET;
   hints.ai_socktype = SOCK_STREAM;
 
   snprintf (port, sizeof (port), "%d", iport);
@@ -272,7 +274,6 @@ static ImapResult
 imap_mbox_connect(ImapMboxHandle* handle)
 {
   static const int SIO_BUFSZ=8192;
-  char* ptr;
   handle->sd = socket_open(handle->host, handle->port);
   if(handle->sd<0) return IMAP_CONNECT_FAILED;
   
@@ -357,17 +358,6 @@ imap_cmd_get_tag(struct siobuf *sio, char* tag, size_t len)
   return c;
 }
 
-/* imap_send_cmd:
-   could use separate thread for sending commands, if needed.
-*/
-static int
-imap_send_cmd(ImapMboxHandle* handle, const gchar* cmd, gchar* prefix)
-{
-  ImapCmdTag tag;
-  imap_make_tag(tag);
-  return sio_printf(handle->sio, "%s %s\r\n", tag, cmd);
-}
-  
 ImapMboxHandleState
 imap_mbox_handle_get_state(ImapMboxHandle *h)
 {
@@ -472,24 +462,10 @@ imap_message_free(ImapMessage *msg)
 /* =================================================================== */
 /*                Imap command processing routines                     */
 /* =================================================================== */
-static ImapResponse
-imap_code(const gchar* resp)
-{
-  if(strncmp(resp+sizeof(ImapCmdTag)+1,"OK", 2) ==0)
-    return IMR_OK;
-  else if(strncmp(resp+sizeof(ImapCmdTag)+1,"NO", 2) ==0)
-    return IMR_NO;
-  else  if(strncmp(resp+sizeof(ImapCmdTag)+1,"BAD", 3) ==0) {
-    g_warning("Protocol error:\n");
-    return IMR_BAD;
-  } else return IMR_BAD; /* nothing known */
-}
-
 int
 imap_cmd_start(ImapMboxHandle* handle, const char* cmd, ImapCmdTag tag)
 {
   int rc;
-  gchar *out;
 
   g_return_val_if_fail(handle, -1);
   imap_make_tag(tag);
@@ -511,7 +487,6 @@ ImapResponse
 imap_cmd_step(ImapMboxHandle* handle, const gchar* cmd)
 {
   char tag[12];
-  unsigned int len = 0;
   int i;
   /* FIXME: sanity test */
   g_return_val_if_fail(handle, IMR_BAD);
@@ -567,7 +542,7 @@ imap_cmd_exec(ImapMboxHandle* handle, const char* cmd)
   } while (rc == IMR_UNTAGGED);
 
   if (rc != IMR_OK)
-    g_warning("cmd '%s' failed.\n", cmd, IMR_OK);
+    g_warning("cmd '%s' failed, rc=%d.\n", cmd, rc);
 
   return rc;
 }
@@ -575,12 +550,12 @@ imap_cmd_exec(ImapMboxHandle* handle, const char* cmd)
 int
 imap_handle_write(ImapMboxHandle *conn, const char *buf, size_t len)
 {
-  int rc;
+  int rc = 0;
   g_return_val_if_fail(conn, -1);
 
   sio_write(conn->sio, buf, len); /* why it is void? */
   sio_flush(conn->sio);
-  return 0;
+  return rc;
 }
 
 char*
@@ -647,17 +622,18 @@ imap_get_string_with_lookahead(struct siobuf* sio, int c)
 }
 
 /* see the spec for the definition of string */
+#if NOT_USED
 static char*
 imap_get_string(struct siobuf* sio)
 {
   return imap_get_string_with_lookahead(sio, sio_getc(sio));
 }
+#endif
 
 /* see the spec for the definition of nstring */
 static char*
 imap_get_nstring(struct siobuf* sio)
 {
-  char *res;
   int c = sio_getc(sio);
   if(toupper(c)=='N') { /* nil */
     sio_getc(sio); sio_getc(sio); /* ignore i and l */
@@ -1035,7 +1011,6 @@ imap_get_address(struct siobuf* sio)
     if( (c=sio_getc(sio)) != ' '); /* error but do nothing */
   }
   if(c == ')') {
-    int len = 0;
 #if 0
     if(addr[0]) len += strlen(addr[0])+1;
     if(addr[2] && addr[3]) 
@@ -1146,7 +1121,6 @@ static ImapResponse
 ir_msg_att_body(ImapMboxHandle *h, unsigned seqno)
 {
   int c;
-  unsigned i;
   ImapMessage *msg = h->msg_cache[seqno-1];
 
   printf("%d", seqno);

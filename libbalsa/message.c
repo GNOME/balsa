@@ -508,7 +508,6 @@ libbalsa_message_save(LibBalsaMessage * message, const gchar *filename)
     int res;
     GMimeStream *msg_stream;
     GMimeStream *out_stream;
-    char *raw_message;
 
     g_return_val_if_fail(message->mailbox, FALSE);
 

@@ -206,7 +206,6 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
     gchar *imap_path;
     GList *list, *el;
     gboolean browse;
-    int len;
 
     state->subfolders = NULL;
 
@@ -247,7 +246,6 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
 {
     struct browser_state state;
     int i;
-    ImapResult rc;
     ImapMboxHandle* handle;
     gulong handler_id;
 

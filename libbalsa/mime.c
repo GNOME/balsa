@@ -43,7 +43,6 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 		  gchar * reply_prefix_str, gint llen, gboolean ignore_html,
                   gboolean flow)
 {
-    FILE *part;
     gchar *res = NULL;
     const gchar *const_res;
     size_t allocated;

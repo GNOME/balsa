@@ -171,8 +171,10 @@ send_message_info_destroy(SendMessageInfo *smi)
 }
 
 
+#if HAVE_GPGME
 static gint
 libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part);
+#endif
 
 static guint balsa_send_message_real(SendMessageInfo* info);
 static LibBalsaMsgCreateResult
@@ -341,6 +343,7 @@ static void dump_queue(const char*msg)
 /* write_remote_fcc:
    return -1 on failure, 0 on success.
 */
+#if NOT_USED
 static int
 write_remote_fcc(LibBalsaMailbox* fccbox, HEADER* m_msg)
 {
@@ -370,6 +373,7 @@ write_remote_fcc(LibBalsaMailbox* fccbox, HEADER* m_msg)
     return mutt_write_fcc(LIBBALSA_MAILBOX(fccbox)->url,
                           m_msg, NULL, 0, NULL);
 }
+#endif
 
 /* libbalsa_message_queue:
    places given message in the outbox. If fcc message field is set, saves
@@ -496,7 +500,6 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
     smtp_message_t message, bcc_message;
     smtp_recipient_t recipient;
     const gchar *phrase, *mailbox, *subject;
-    struct stat st;
     long estimate;
 
     send_lock();
@@ -1288,7 +1291,6 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
     LibBalsaMessageBody *body;
     gchar *tmp;
     GList *list;
-    LibBalsaMsgCreateResult res = LIBBALSA_MESSAGE_CREATE_OK;
 #ifdef HAVE_GPGME
     gboolean can_create_rfc3156 = message->body_list != NULL;
     if (postponing)
@@ -1534,7 +1536,6 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 			  gchar * fcc, gint encoding,
 			  gboolean flow) {
     gchar *tmp;
-    LibBalsaServer *server;
     int thereturn; 
     GMimeMessage *mime_message;
     GMimeStream *mem_stream;

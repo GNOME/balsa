@@ -31,6 +31,9 @@
 #include <utime.h>
 
 #include "libbalsa.h"
+#include "libbalsa_private.h"
+/* for mx_lock_file and mx_unlock_file */
+#include "mailbackend.h"
 
 struct message_info {
     LibBalsaMessage *message;
@@ -41,9 +44,6 @@ struct message_info {
     LibBalsaMessageFlag flags;
     LibBalsaMessageFlag orig_flags;
 };
-
-#include "libbalsa_private.h"
-#include "mailbackend.h"
 
 static LibBalsaMailboxLocalClass *parent_class = NULL;
 

@@ -1,3 +1,30 @@
+2003-09-07  Bart Visscher <magick@Linux-Fan.com>
+
+	* libbalsa/imap/util.c (Repository): 
+	* libbalsa/imap/imap-handle.c (Repository): 
+	* libbalsa/imap/imap-fetch.c (Repository): 
+	* libbalsa/imap/imap-commands.c (Repository): 
+	* libbalsa/imap/imap-auth.c (Repository): 
+	* libbalsa/imap/Makefile.am (Repository): 
+	* libbalsa/send.c (Repository): 
+	* libbalsa/rfc3156.c (Repository): 
+	* libbalsa/pop3.c (Repository): 
+	* libbalsa/mime.c (Repository): 
+	* libbalsa/message.c (Repository): 
+	* libbalsa/mailbox_mbox.c (Repository): 
+	* libbalsa/mailbox_maildir.c (Repository): 
+	* libbalsa/mailbox_local.c (Repository): 
+	* libbalsa/mailbox_imap.c (Repository): 
+	* libbalsa/gmime-gpgme-context.c (Repository): 
+	* libbalsa/folder-scanners.c (Repository): 
+	* libbalsa/body.c (Repository): 
+	* configure.in (Repository): 
+	add check for getaddrinfo
+	pop3.c: use GMime's md5-utils
+	cleanup compile with -Wall
+	removed some mailbackend.h includes
+
+
 2003-09-07  Carlos Morgado  <chbm gnome.org>
 
 	* libbalsa/mailbox.c: free the message list only *after* closing 

@@ -30,6 +30,7 @@
 
 #include "libbalsa.h"
 #include "misc.h"
+#include "libbalsa_private.h"
 
 struct message_info {
     GMimeMessage *mime_message;
@@ -39,9 +40,6 @@ struct message_info {
     LibBalsaMessageFlag flags;
     LibBalsaMessageFlag orig_flags;
 };
-
-#include "libbalsa_private.h"
-#include "mailbackend.h"
 
 static LibBalsaMailboxLocalClass *parent_class = NULL;
 

@@ -29,7 +29,8 @@ INCLUDES= -I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \
 	-I${top_srcdir}/libbalsa/imap \
 	$(BALSA_CFLAGS)
 
-AM_CFLAGS   = $(LIBIMAP_CFLAGS) -pedantic -ansi
+AM_CFLAGS   = $(LIBIMAP_CFLAGS)
+#-pedantic -ansi
 #-Werror
 
 #Signal marshallers

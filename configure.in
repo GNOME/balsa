@@ -27,6 +27,8 @@ AC_PROG_CC
 AC_STDC_HEADERS
 AM_PROG_LIBTOOL
 
+AC_CHECK_FUNCS(getaddrinfo getnameinfo gai_strerror)
+
 AC_DEFINE_UNQUOTED(BALSA_MAJOR, $BALSA_MAJOR,
                    [Define to the Balsa major version])
 AC_DEFINE_UNQUOTED(BALSA_REVISION, $BALSA_REVISION,

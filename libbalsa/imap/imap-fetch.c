@@ -27,7 +27,6 @@ ImapResponse
 imap_mbox_handle_fetch_env(ImapMboxHandle* handle, const gchar *seq)
 {
   char* cmd;
-  int i;
   ImapResponse rc;
   
   cmd = g_strdup_printf("FETCH %s (ENVELOPE FLAGS UID)", seq);
@@ -40,7 +39,6 @@ ImapResponse
 imap_mbox_handle_fetch_body(ImapMboxHandle* handle, const gchar *seq)
 {
   char* cmd;
-  int i;
   ImapResponse rc;
   
   cmd = g_strdup_printf("FETCH %s (FLAGS BODY.PEEK[])", seq);

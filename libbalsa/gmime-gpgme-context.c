@@ -77,11 +77,13 @@ static int gpgme_encrypt (GMimeCipherContext *ctx, gboolean sign,
 static int gpgme_decrypt (GMimeCipherContext *ctx, GMimeStream *istream,
 			GMimeStream *ostream, GError **err);
 
+#if NOT_USED
 static int gpgme_import_keys (GMimeCipherContext *ctx, GMimeStream *istream,
 			    GError **err);
 
 static int gpgme_export_keys (GMimeCipherContext *ctx, GPtrArray *keys,
 			    GMimeStream *ostream, GError **err);
+#endif
 
 
 static GMimeCipherContextClass *parent_class = NULL;
@@ -573,10 +575,10 @@ gpgme_decrypt (GMimeCipherContext *context, GMimeStream *istream,
 	return 0;
 }
 
+#if NOT_USED
 static int
 gpgme_import_keys (GMimeCipherContext *context, GMimeStream *istream, GError **err)
 {
-#if 0
 	GMimeGpgMEContext *ctx = (GMimeGpgMEContext *) context;
 	struct _GpgMECtx *gpgme;
 
@@ -617,15 +619,15 @@ gpgme_import_keys (GMimeCipherContext *context, GMimeStream *istream, GError **e
 	}
 
 	gpgme_ctx_free (gpgme);
-#endif
 
 	return 0;
 }
+#endif
 
+#if NOT_USED
 static int
 gpgme_export_keys (GMimeCipherContext *context, GPtrArray *keys, GMimeStream *ostream, GError **err)
 {
-#if 0
 	GMimeGpgMEContext *ctx = (GMimeGpgMEContext *) context;
 	struct _GpgMECtx *gpgme;
 	int i;
@@ -672,10 +674,10 @@ gpgme_export_keys (GMimeCipherContext *context, GPtrArray *keys, GMimeStream *os
 	}
 
 	gpgme_ctx_free (gpgme);
-#endif
 
 	return 0;
 }
+#endif
 
 
 /**

@@ -39,6 +39,8 @@
 #include "filter.h"
 #include "mailbox-filter.h"
 #include "libbalsa.h"
+#include "libbalsa_private.h"
+#include "misc.h"
 #include "imap-handle.h"
 
 struct message_info {
@@ -52,17 +54,6 @@ struct message_info {
     LibBalsaMessageFlag orig_flags;
 };
 
-#include "libbalsa_private.h"
-#include "misc.h"
-#if MUTT
-#include "mx.h"
-#include "imap/message.h"
-#include "imap/imap_private.h"
-#include "mailbackend.h"
-
-#include "imap/imap.h"
-#include "mutt_socket.h"
-#endif
 #define IMAP_MESSAGE_UID(msg) ( message_info_from_msgno( \
 				 (msg)->mailbox, (msg)->msgno \
 				)->uid)
@@ -678,10 +669,12 @@ void run_filters_on_reception(LibBalsaMailboxImap * mbox)
 static void
 monitor_cb(const char *buffer, int length, int direction, void *arg)
 {
+#if 0
   int i;
   printf("%c: ", direction ? 'C' : 'S');
   for(i=0; i<length; i++) putchar(buffer[i]);
   fflush(NULL);
+#endif
 }
 
 static void

@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
 #include "util.h"
 
 #define SKIPWS(c) while (*(c) && isspace ((unsigned char) *(c))) c++;

@@ -56,7 +56,8 @@ extern struct BalsaApplication
   
   GtkWidget *current_index;
 
-
+  gchar *signature;
+  
   GList *mailbox_list;
   GList *addressbook_list;
 

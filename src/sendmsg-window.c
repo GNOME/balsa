@@ -387,12 +387,19 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
 		    GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
   gtk_widget_show (vscrollbar);
 
+  gnome_app_set_contents (GNOME_APP (msg->window), vbox);
+
+  gnome_app_set_menus (GNOME_APP (msg->window),
+		       GTK_MENU_BAR (create_menu (msg)));
+
+  gnome_app_set_toolbar (GNOME_APP (msg->window),
+			 GTK_TOOLBAR (create_toolbar (msg)));
+
+  gtk_widget_show (msg->window);
+
+  gtk_text_freeze (GTK_TEXT (msg->text));
   if (type != 0)
     {
-      gtk_widget_realize (msg->text);
-
-      gtk_text_freeze (GTK_TEXT (msg->text));
-
       gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "\n\n", 2);
 
       c = get_header ("from", bindex->stream, row);
@@ -410,21 +417,11 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
       c = gt_replys (c);
 
       gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
-      gtk_text_thaw (GTK_TEXT (msg->text));
-
-      gtk_text_set_point (GTK_TEXT (msg->text), 0);
     }
-
-
-  gnome_app_set_contents (GNOME_APP (msg->window), vbox);
-
-  gnome_app_set_menus (GNOME_APP (msg->window),
-		       GTK_MENU_BAR (create_menu (msg)));
-
-  gnome_app_set_toolbar (GNOME_APP (msg->window),
-			 GTK_TOOLBAR (create_toolbar (msg)));
-
-  gtk_widget_show (msg->window);
+  if (balsa_app.signature)
+    gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, balsa_app.signature, strlen (balsa_app.signature));
+  gtk_text_set_point (GTK_TEXT (msg->text), 0);
+  gtk_text_thaw (GTK_TEXT (msg->text));
 }
 
 

@@ -16,6 +16,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
+
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include "balsa-app.h"
 #include "balsa-index.h"
 #include "balsa-init.h"
@@ -35,6 +39,7 @@ static void load_global_settings ();
 static int mailboxes_init ();
 static void setup_local_mailboxes ();
 static void my_special_mailbox ();
+static gint read_signature ();
 
 
 static gint check_for_new_messages ();
@@ -73,16 +78,32 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
 
 
-
   restore_global_settings ();
   mailboxes_init ();
   load_local_mailboxes ();
   my_special_mailbox ();
-
+  read_signature ();
 
   /* start timers */
   balsa_app.new_messages_timer = gtk_timeout_add (5, check_for_new_messages, NULL);
-  balsa_app.check_mail_timer = gtk_timeout_add (5*60*1000, current_mailbox_check, NULL);
+  balsa_app.check_mail_timer = gtk_timeout_add (5 * 60 * 1000, current_mailbox_check, NULL);
+}
+
+static gint
+read_signature ()
+{
+  int fd, ret;
+  struct stat stats;
+  gchar path[PATH_MAX];
+  sprintf (path, "%s/.signature", getenv ("HOME"));
+  fd = open (path, O_RDONLY);
+  ret = fstat (fd, &stats);
+  if (ret != 0)
+    perror ("error doing fstat on signature:");
+  balsa_app.signature = g_new (gchar, stats.st_size);
+  read (fd, balsa_app.signature, stats.st_size);
+  close (fd);
+  return TRUE;
 }
 
 

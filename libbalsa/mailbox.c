@@ -1333,10 +1333,12 @@ libbalsa_mailbox_change_msgs_flags(LibBalsaMailbox * mailbox,
                                    LibBalsaMessageFlag set,
                                    LibBalsaMessageFlag clear)
 {
+    gboolean res;
+
     g_return_val_if_fail(mailbox != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
 
-    gboolean res = LIBBALSA_MAILBOX_GET_CLASS(mailbox)
+    res = LIBBALSA_MAILBOX_GET_CLASS(mailbox)
         ->change_msgs_flags(mailbox, messages, set, clear);
 
     while(messages) {
@@ -1675,10 +1677,15 @@ mbox_model_get_value(GtkTreeModel *tree_model,
     { GdkRectangle a, b, c, d; 
     /* assumed that only one view is showing the mailbox */
     GtkTreeView *tree = g_object_get_data(G_OBJECT(tree_model), "tree-view");
-    GtkTreePath *path = gtk_tree_model_get_path(tree_model, iter);
-    GtkTreeViewColumn *col =
-	gtk_tree_view_get_column(tree, (column == LB_MBOX_WEIGHT_COL
-					? LB_MBOX_FROM_COL : column));
+    GtkTreePath *path;
+    GtkTreeViewColumn *col;
+
+    if (!GTK_WIDGET_REALIZED(GTK_WIDGET(tree)))
+	return;
+
+    path = gtk_tree_model_get_path(tree_model, iter);
+    col = gtk_tree_view_get_column(tree, (column == LB_MBOX_WEIGHT_COL ?
+					  LB_MBOX_FROM_COL : column));
     gtk_tree_view_get_visible_rect(tree, &a);
     gtk_tree_view_get_cell_area(tree, path, col, &b);
     gtk_tree_view_widget_to_tree_coords(tree, b.x, b.y, &c.x, &c.y);
@@ -2583,8 +2590,9 @@ libbalsa_mailbox_try_reassemble(LibBalsaMailbox * mailbox,
 
     for (msgno = 1; msgno <= libbalsa_mailbox_total_messages(mailbox);
 	 msgno++) {
-	message = libbalsa_mailbox_get_message(mailbox, msgno);
 	gchar *tmp_id;
+
+	message = libbalsa_mailbox_get_message(mailbox, msgno);
 
 	if (!libbalsa_message_is_partial(message, &tmp_id)
 	    || LIBBALSA_MESSAGE_IS_FLAGGED(message))

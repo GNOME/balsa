@@ -168,7 +168,10 @@ typedef enum
 #define M_THREAD_GET_HIDDEN	(1<<2)
 #define M_THREAD_UNREAD		(1<<3)
 #define M_THREAD_NEXT_UNREAD	(1<<4)
-
+#if defined(LIBMUTT) && defined(M_READ)
+/* M_READ is declared by some of Solaris header files. */.
+#undef M_READ
+#endif
 enum
 {
   /* modes for mutt_view_attachment() */

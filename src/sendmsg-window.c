@@ -243,6 +243,7 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   GtkWidget *button;
   GtkWidget *frame;
   GtkStyle *style;
+  GdkColormap* colormap;
 
   table = gtk_table_new (6, 3, FALSE);
   gtk_table_set_row_spacings (GTK_TABLE (table), 2);
@@ -358,8 +359,9 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   gtk_widget_pop_colormap ();
 
   /* set bg of icon list to white */
-  style = gtk_widget_get_style (msg->attachments);
-  gdk_color_white (gdk_imlib_get_colormap (), &style->bg[GTK_STATE_NORMAL]);
+  style = style = gtk_style_new ();
+  colormap = gtk_widget_get_colormap (GTK_WIDGET (msg->attachments));
+  gdk_color_white (colormap, &style->bg[GTK_STATE_NORMAL]);
   gtk_widget_set_style (msg->attachments, style);
 
   gtk_widget_set_usize (msg->attachments, -1, 50);

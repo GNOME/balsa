@@ -257,18 +257,19 @@ balsa_message_new (void)
 {
   BalsaMessage *bmessage;
   GtkStyle *style;
-
+  GdkColormap* colormap;
+  
   gtk_widget_push_visual (gdk_imlib_get_visual ());
   gtk_widget_push_colormap (gdk_imlib_get_colormap ());
   bmessage = gtk_type_new (balsa_message_get_type ());
   gtk_widget_pop_visual ();
   gtk_widget_pop_colormap ();
 
-  style = gtk_widget_get_style (GTK_WIDGET (bmessage));
-
-  gdk_color_white (gdk_imlib_get_colormap (), &style->bg[GTK_STATE_NORMAL]);
-
+  style =  gtk_style_new ();
+  colormap = gtk_widget_get_colormap (GTK_WIDGET (bmessage));
+  gdk_color_white (colormap, &style->bg[GTK_STATE_NORMAL]);
   gtk_widget_set_style (GTK_WIDGET (bmessage), style);
+
 
   return GTK_WIDGET (bmessage);
 }

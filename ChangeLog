@@ -1,3 +1,13 @@
+1998-12-14  Jeff Garzik <jgarzik@pobox.com>
+
+	* libbalsa/mailbox.[ch]:
+	Added simple IMAP support stubs.
+
+	* src/main-window.c:
+	- include mailbox-conf.h to avoid warnings.
+	- Added menu items to add, edit, and delete mailboxes.
+	- Corrected typo.
+
 1998-12-13  Jeff Garzik <jgarzik@pobox.com>
 
 	* src/main-window.c:

@@ -190,6 +190,13 @@ set_imap_username (Mailbox * mb)
   return 1;
 }
 
+
+void
+check_all_imap_hosts (Mailbox * to, GList *mailboxes)
+{
+}
+
+
 void
 check_all_pop3_hosts (Mailbox * to, GList *mailboxes)
 {

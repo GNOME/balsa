@@ -262,6 +262,7 @@ void mailbox_init (gchar * inbox_path,
 
 gint set_imap_username (Mailbox * mb);
 void check_all_pop3_hosts (Mailbox *, GList *);
+void check_all_imap_hosts (Mailbox *, GList *);
 void add_mailboxes_for_checking (Mailbox *);
 gint mailbox_have_new_messages (gchar * path);
 GList *make_list_from_string (gchar *);

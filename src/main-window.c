@@ -37,6 +37,7 @@
 #include "message-window.h"
 #include "pref-manager.h"
 #include "sendmsg-window.h"
+#include "mailbox-conf.h"
 
 #define MAILBOX_DATA "mailbox_data"
 
@@ -72,7 +73,11 @@ static void undelete_message_cb (GtkWidget * widget, gpointer data);
 
 static void filter_dlg_cb (GtkWidget * widget, gpointer data);
 
+static void mblist_menu_add_cb (GtkWidget * widget, gpointer data);
+static void mblist_menu_edit_cb (GtkWidget * widget, gpointer data);
+static void mblist_menu_delete_cb (GtkWidget * widget, gpointer data);
 static void mblist_window_cb (GtkWidget * widget, gpointer data);
+static Mailbox *mblist_get_selected_mailbox(void);
 static void mailbox_close_child (GtkWidget * widget, gpointer data);
 
 static void about_box_destroy_cb (void);
@@ -137,9 +142,21 @@ static GnomeUIInfo mailbox_menu[] =
 #if 0
   {
     GNOME_APP_UI_ITEM, N_ ("List"), NULL, mblist_window_cb, NULL,
-    NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_PROP, 'C', 0, NULL
+    NULL, GNOME_APP_PIXMAP_NONE, GNOME_STOCK_MENU_PROP, 'C', 0, NULL
   },
 #endif
+  {
+    GNOME_APP_UI_ITEM, N_ ("Add"), NULL, mblist_menu_add_cb, NULL,
+    NULL, GNOME_APP_PIXMAP_NONE, GNOME_STOCK_MENU_PROP, 'A', 0, NULL
+  },
+  {
+    GNOME_APP_UI_ITEM, N_ ("Edit"), NULL, mblist_menu_edit_cb, NULL,
+    NULL, GNOME_APP_PIXMAP_NONE, GNOME_STOCK_MENU_PROP, 'E', 0, NULL
+  },
+  {
+    GNOME_APP_UI_ITEM, N_ ("Delete"), NULL, mblist_menu_delete_cb, NULL,
+    NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_TRASH, 'D', 0, NULL
+  },
   GNOMEUIINFO_ITEM_STOCK ("Close", NULL, mailbox_close_child, GNOME_STOCK_MENU_CLOSE),
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_END
@@ -374,6 +391,7 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
     mailbox_check_new_messages (BALSA_INDEX (balsa_app.current_index_child->index)->mailbox);
 
   check_all_pop3_hosts (balsa_app.inbox, balsa_app.inbox_input);
+  check_all_imap_hosts (balsa_app.inbox, balsa_app.inbox_input);
 }
 
 static void
@@ -632,6 +650,7 @@ struct _MBListWindow
     GtkCTree *ctree;
     GtkCTreeNode *parent;
   };
+static MBListWindow *mblw = NULL;
 
 enum
   {
@@ -645,7 +664,6 @@ static GtkTargetEntry drag_types[] =
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
 
-static MBListWindow *mblw = NULL;
 
 /* callbacks */
 void mblist_close_mailbox (Mailbox * mailbox);
@@ -876,7 +894,7 @@ mb_add_cb (GtkWidget * widget, Mailbox * mailbox)
 }
 
 static void
-mb_del_cb (GtkWidget * wifget, Mailbox * mailbox)
+mb_del_cb (GtkWidget * widget, Mailbox * mailbox)
 {
   if (mailbox->type == MAILBOX_UNKNOWN)
     return;
@@ -910,3 +928,47 @@ mblist_create_menu (GtkCTree * ctree, Mailbox * mailbox)
 
   return menu;
 }
+
+
+static void
+mblist_menu_add_cb (GtkWidget * widget, gpointer data)
+{
+  Mailbox *mailbox = mblist_get_selected_mailbox();
+
+  mailbox_conf_new (mailbox, TRUE, MAILBOX_UNKNOWN);
+}
+
+
+static void
+mblist_menu_edit_cb (GtkWidget * widget, gpointer data)
+{
+  Mailbox *mailbox = mblist_get_selected_mailbox();
+
+  mailbox_conf_new (mailbox, FALSE, MAILBOX_UNKNOWN);
+}
+
+
+static void
+mblist_menu_delete_cb (GtkWidget * widget, gpointer data)
+{
+  Mailbox *mailbox = mblist_get_selected_mailbox();
+
+  if (mailbox->type == MAILBOX_UNKNOWN)
+    return;
+  mailbox_conf_delete (mailbox);
+}
+
+
+static Mailbox *
+mblist_get_selected_mailbox(void)
+{
+    GtkCTreeNode *node;
+
+    if (! GTK_CLIST(mblw->ctree)->selection)
+        return NULL;
+
+    node = GTK_CTREE_NODE(GTK_CLIST(mblw->ctree)->selection->data);
+
+    return gtk_ctree_node_get_row_data(GTK_CTREE (mblw->ctree), node);
+}
+

@@ -52,6 +52,9 @@ gint config_mailbox_add (LibBalsaMailbox * mailbox, const char *key_arg);
 gint config_mailbox_delete (const LibBalsaMailbox *mailbox);
 gint config_mailbox_update (LibBalsaMailbox * mailbox);
 
+void config_address_book_save(LibBalsaAddressBook *ab);
+void config_address_book_delete(LibBalsaAddressBook *ab);
+
 gint config_imapdir_add(ImapDir *dir);
 
 #endif /* __SAVE_RESTORE_H__ */

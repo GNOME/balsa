@@ -12,8 +12,12 @@ libbalsa_a_SOURCES = 		\
 	body.c			\
 	address.h		\
 	address.c		\
-	contact.h		\
-	contact.c		\
+	address-book.h		\
+	address-book.c		\
+	address-book-ldap.h	\
+	address-book-ldap.c 	\
+	address-book-vcard.h	\
+	address-book-vcard.c	\
 	mime.h			\
 	misc.h			\
 	notify.c		\

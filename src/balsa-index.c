@@ -483,9 +483,14 @@ balsa_index_add (BalsaIndex * bindex,
 	  addy = message->from;
   }
 
-  if(addy)
-      text[3] = addy->personal ? addy->personal : addy->mailbox;
-  else
+  if(addy) {
+    if ( addy->full_name )
+      text[3] = addy->full_name;
+    else if ( addy->address_list )
+	text[3] = addy->address_list->data;
+    else 
+      text[3] = "";
+  } else
       text[3] = "";
   
   text[4] = message->subject;

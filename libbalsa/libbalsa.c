@@ -126,6 +126,10 @@ libbalsa_init (LibBalsaInformationFunc information_callback)
 	LIBBALSA_TYPE_MAILBOX_POP3;
 	LIBBALSA_TYPE_MAILBOX_IMAP;
 
+	LIBBALSA_TYPE_ADDRESS_BOOK_VCARD;
+#if ENABLE_LDAP
+	LIBBALSA_TYPE_ADDRESS_BOOK_LDAP;
+#endif
 }
 
 void

@@ -23,16 +23,8 @@
 extern "C" {
 #endif /* __cplusplus */
 
-typedef struct {
-	gchar          *name;
-	gchar          *addy;
-	gchar          *upper;
-	gchar          *id;
-} AddressData;
-
 extern gint address_book_cb(GtkWidget * widget, gpointer data);
 extern GList* ab_load_addresses (gboolean);
-extern void address_data_free (AddressData * address, gpointer ignore);
 
 
 #ifdef __cplusplus

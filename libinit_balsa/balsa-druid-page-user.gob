@@ -130,13 +130,16 @@ class Balsa:Druid:Page:User from Balsa:Druid:Page {
 		gchar *uhoh;
 		BalsaDruidPageUser *self = BALSA_DRUID_PAGE_USER( _self );
 
-		if( balsa_app.address->personal )
-			g_free( balsa_app.address->personal );
-		balsa_app.address->personal = g_strdup( gtk_entry_get_text( GTK_ENTRY( self->_priv->name ) ) );
+		if( balsa_app.address->full_name )
+			g_free( balsa_app.address->full_name );
+		balsa_app.address->full_name = g_strdup( gtk_entry_get_text( GTK_ENTRY( self->_priv->name ) ) );
 
-		if( balsa_app.address->mailbox )
-			g_free( balsa_app.address->mailbox );
-		balsa_app.address->mailbox = g_strdup( gtk_entry_get_text( GTK_ENTRY( self->_priv->email ) ) );
+		if( balsa_app.address->address_list ) {
+			g_list_foreach(balsa_app.address->address_list, (GFunc)g_free, NULL);
+			g_list_free(balsa_app.address->address_list);
+		}
+		balsa_app.address->address_list = g_list_append(balsa_app.address->address_list, 
+								g_strdup( gtk_entry_get_text( GTK_ENTRY( self->_priv->email ) ) ) );
 
 		if( balsa_app.smtp_server );
 			g_free( balsa_app.smtp_server );

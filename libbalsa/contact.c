@@ -27,35 +27,80 @@
 
 #include "libbalsa.h"
 
+static GtkObjectClass *parent_class = NULL;
+
+static void libbalsa_contact_class_init(LibBalsaContactClass *klass);
+static void libbalsa_contact_init(LibBalsaContact *contact);
+static void libbalsa_contact_destroy (GtkObject *object);
+
+GtkType
+libbalsa_contact_get_type (void)
+{
+	static GtkType contact_type = 0;
+
+	if (!contact_type) {
+		static const GtkTypeInfo contact_info = {
+			"LibBalsaContact",
+			sizeof (LibBalsaContact),
+			sizeof (LibBalsaContactClass),
+			(GtkClassInitFunc) libbalsa_contact_class_init,
+			(GtkObjectInitFunc) libbalsa_contact_init,
+			/* reserved_1 */ NULL,
+			/* reserved_2 */ NULL,
+			(GtkClassInitFunc) NULL,
+		};
+
+		contact_type = gtk_type_unique(gtk_object_get_type(), &contact_info);
+	}
+
+	return contact_type;
+}
+
 LibBalsaContact *
 libbalsa_contact_new (void)
 {
 	LibBalsaContact *contact;
 
-	contact = g_new (LibBalsaContact, 1);
+	contact = gtk_type_new(libbalsa_contact_get_type());
 
+	return contact;
+}
+
+static void libbalsa_contact_class_init(LibBalsaContactClass *klass)
+{
+	GtkObjectClass *object_class;
+
+	parent_class = gtk_type_class(GTK_TYPE_OBJECT);
+
+	object_class = GTK_OBJECT_CLASS(klass);
+
+	object_class->destroy = libbalsa_contact_destroy;
+}
+
+static void libbalsa_contact_init(LibBalsaContact *contact)
+{
 	contact->card_name = NULL;
 	contact->first_name = NULL;
 	contact->last_name = NULL;
 	contact->organization = NULL;
 	contact->email_address = NULL;
-  
-	return contact;
 }
 
-
-void
-libbalsa_contact_free (LibBalsaContact * contact)
+static void libbalsa_contact_destroy (GtkObject *object)
 {
-	g_return_if_fail ( contact != NULL );
+	LibBalsaContact *contact;
 
-	g_free(contact->card_name);
-	g_free(contact->first_name);
-	g_free(contact->last_name);  
-	g_free(contact->organization);
-	g_free(contact->email_address);
+	contact = LIBBALSA_CONTACT(object);
 
-	g_free(contact);
+	g_free(contact->card_name);	contact->card_name = NULL;
+	g_free(contact->first_name);	contact->first_name = NULL;
+	g_free(contact->last_name);	contact->last_name = NULL;
+	g_free(contact->organization);	contact->organization = NULL;
+	g_free(contact->email_address);	contact->email_address = NULL;
+
+	if (GTK_OBJECT_CLASS(parent_class)->destroy)
+		(*GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(object));
+
 }
 
 void
@@ -65,7 +110,7 @@ libbalsa_contact_list_free(GList * contact_list)
 
 	for (list = g_list_first (contact_list); list; list = g_list_next (list)) {
 		if(list->data) 
-			libbalsa_contact_free (list->data);
+			gtk_object_destroy(GTK_OBJECT(list->data));
 	}
 
 	g_list_free (contact_list);

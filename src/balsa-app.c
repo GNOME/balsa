@@ -179,9 +179,9 @@ balsa_app_init (void)
   balsa_app.date_string = g_strdup(DEFAULT_DATE_FORMAT);
 
   /* address book */
+  balsa_app.address_book_list = NULL;
+  balsa_app.default_address_book = NULL;
   balsa_app.ab_dist_list_mode = FALSE;
-  balsa_app.ab_location = 
-      gnome_util_prepend_user_home(DEFAULT_ADDRESS_BOOK_PATH);
 
   /* spell check */
   balsa_app.module = SPELL_CHECK_MODULE_ASPELL;
@@ -197,10 +197,6 @@ balsa_app_init (void)
   balsa_app.error_message = 0;
   balsa_app.debug_message = 0;
 
-#ifdef ENABLE_LDAP
-  balsa_app.ldap_host = NULL;
-  balsa_app.ldap_base_dn = NULL;
-#endif /* ENABLE_LDAP */
 }
 
 gboolean
@@ -224,7 +220,6 @@ do_load_mailboxes (void)
 
   return TRUE;
 }
-
 
 void 
 update_timer( gboolean update, guint minutes )

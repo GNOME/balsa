@@ -17,37 +17,37 @@
  * 02111-1307, USA.
  */
 
-#include <config.h>
+#include "config.h"
+
 #include <gnome.h>
 #include <gtk/gtk.h>
 #include <stdio.h>
 #include <errno.h>
 #include "balsa-app.h"
+
 #include "address-book.h"
-#include "ldap-addressbook.h"
 
 static GtkWidget *book_clist;
 static GtkWidget *add_clist;
 static GtkWidget *ab_entry;
 gint            composing;
+static LibBalsaAddressBook *current_address_book;
 
 gint address_book_cb(GtkWidget * widget, gpointer data);
-GList* ab_load_addresses(gboolean);
 
 static gint ab_gnomecard_cb(GtkWidget * widget, gpointer data);
 static gint ab_cancel_cb(GtkWidget * widget, gpointer data);
 static gint ab_okay_cb(GtkWidget * widget, gpointer data);
 static void ab_clear_clist(GtkCList * clist);
-static gint ab_delete_compare(gconstpointer a, gconstpointer b);
-static gint ab_switch_cb(GtkWidget * widget, gpointer data);
+static void ab_switch_cb(GtkWidget * widget, gpointer data);
 /*#define AB_ADD_CB_USED*/
 #ifdef AB_ADD_CB_USED
 static gint ab_add_cb(GtkWidget * widget, gpointer data);
 #endif
 static void ab_load(GtkWidget * widget, gpointer data);
 static void ab_find(GtkWidget * group_entry) ;
-GList* ab_load_addresses_gnomecard (GList *, gboolean); 
 
+static void address_book_menu_cb(GtkWidget *widget, gpointer data);
 
 static gint
 ab_gnomecard_cb(GtkWidget * widget, gpointer data)
@@ -73,6 +73,20 @@ ab_cancel_cb(GtkWidget * widget, gpointer data)
 	return FALSE;
 }
 
+static void
+address_list_to_string(gchar *addr, gchar **string)
+{
+	gchar *tmp;
+
+	if ( strlen(*string) > 0 )
+		tmp = g_strconcat(*string, ", ", addr, NULL);
+	else 
+		tmp = g_strconcat(*string, addr, NULL);
+	g_print ("Add to str: %s (result %s)\n", addr, tmp);
+	g_free(*string);
+	*string = tmp;
+}
+
 /* ab_okay_cb:
    processes the OK button pressed event. 
    keep watch on memory leaks.
@@ -89,17 +103,16 @@ ab_okay_cb(GtkWidget * widget, gpointer data)
 	g_strchomp(addr_str);
 	
 	while ((row = gtk_clist_get_row_data(GTK_CLIST(add_clist), 0))) {
-	    AddressData    *addy = (AddressData *) row;
+	    LibBalsaAddress    *addy = LIBBALSA_ADDRESS(row);
 	
-	    if(strchr(addy->addy,',') != NULL)
-		str = addy->addy;
-	    else {
-		str = g_strdup_printf("%s <%s>", addy->name, addy->addy);
-		g_free(addy->addy);
+	    if(g_list_length(addy->address_list) > 1) {
+		    str = g_strdup("");
+		    g_list_foreach(addy->address_list, (GFunc)address_list_to_string, &str);
+	    } else {
+		str = g_strdup_printf("%s <%s>", addy->full_name, (gchar*)addy->address_list->data);
 	    }
-	    g_free (addy->name);
-	    g_free (addy->id);
-	    g_free (addy);
+
+	    gtk_object_unref(GTK_OBJECT(addy));
 	    gtk_clist_remove(GTK_CLIST(add_clist), 0);
 	    
 	    if(*addr_str) {
@@ -125,63 +138,48 @@ static void
 ab_clear_clist(GtkCList * clist)
 {
 	gpointer        row;
+	
+	gtk_clist_freeze(GTK_CLIST(clist));
 	while ((row = gtk_clist_get_row_data(clist, 0))) {
-		AddressData    *addy = (AddressData *) row;
-                g_free (addy->id);
-		g_free (addy->name);
-		g_free (addy->addy);
-		g_free (addy);
+		
+		LibBalsaAddress    *addy = LIBBALSA_ADDRESS(row);
+		gtk_object_unref(GTK_OBJECT(addy));
 		gtk_clist_remove(GTK_CLIST(clist), 0);
 	}
+	gtk_clist_thaw(GTK_CLIST(clist));
+
 }
 
-static gint
-ab_delete_compare(gconstpointer a, gconstpointer b)
-{
-	if (GPOINTER_TO_INT(a) > GPOINTER_TO_INT(b))
-		return 1;
-	else if (GPOINTER_TO_INT(a) == GPOINTER_TO_INT(b))
-		return 0;
-	else
-		return -1;
-}
 
-static gint
+static void
 ab_switch_cb(GtkWidget * widget, gpointer data)
 {
 	GtkWidget      *from = GTK_WIDGET(data);
 	GtkWidget      *to = (data == book_clist) ? add_clist : book_clist;
 	GList          *glist = GTK_CLIST(from)->selection;
-	GList          *deletelist = NULL, *pointer;
+	GList          *pointer;
 
 	for (pointer = g_list_first(glist); pointer != NULL; 
 	     pointer = g_list_next(pointer)) {
 		gint            num;
-		gchar          *listdata[2];
-		AddressData    *addy_data;
+		gchar           *listdata[2];
+		LibBalsaAddress *addy_data;
 		
 		num = GPOINTER_TO_INT(pointer->data);
 		
-		addy_data = gtk_clist_get_row_data(GTK_CLIST(from), num);
+		addy_data = LIBBALSA_ADDRESS(gtk_clist_get_row_data(GTK_CLIST(from), num));
+
 		listdata[0] = addy_data->id;
-		listdata[1] = addy_data->addy;
+		if ( addy_data->address_list )
+			listdata[1] = addy_data->address_list->data;
+		else
+			listdata[1] = "";
 		
-		deletelist = g_list_append(deletelist, GINT_TO_POINTER(num));
+		gtk_clist_remove(GTK_CLIST(from), num);
 
 		num = gtk_clist_append(GTK_CLIST(to), listdata);
 		gtk_clist_set_row_data(GTK_CLIST(to), num,(gpointer)addy_data);
 	}
-
-	deletelist = g_list_sort(deletelist, (GCompareFunc) ab_delete_compare);
-
-	for (pointer = g_list_last(deletelist); pointer != NULL; 
-	     pointer = g_list_previous(pointer))
-	   gtk_clist_remove(GTK_CLIST(from), GPOINTER_TO_INT(pointer->data));
-	
-
-	g_list_free(deletelist);
-
-	return FALSE;
 }
 
 #ifdef AB_ADD_CB_USED
@@ -223,78 +221,6 @@ ab_add_cb(GtkWidget * widget, gpointer data)
 }
 #endif
 
-
-static gchar * 
-extract_name(const gchar *string)
-/* Extract full name in order from <string> that has GnomeCard format
-   and returns the pointer to the allocated memory chunk.
-*/
-{
-   enum GCardFieldOrder { LAST=0, FIRST, MIDDLE, PREFIX, SUFFIX };
-   gint cpt, j;
-   gchar ** fld, **name_arr;
-   gchar * res = NULL;
-
-   fld = g_strsplit(string, ";", 5);
-
-   cpt = 0;
-   while(fld[cpt] != NULL)
-      cpt++;
-
-   if(cpt==0) /* insane empty name */ return NULL;
-
-   name_arr = g_malloc((cpt+1)*sizeof(gchar*));
-
-   j = 0;
-   if(cpt>PREFIX && strlen (fld[PREFIX]) != 0)
-      name_arr[j++] = g_strdup(fld[PREFIX]);
-      
-   if(cpt>FIRST && strlen (fld[FIRST]) != 0)
-      name_arr[j++] = g_strdup(fld[FIRST]);
-
-   if(cpt>MIDDLE && strlen (fld[MIDDLE]) != 0)
-      name_arr[j++] = g_strdup(fld[MIDDLE]);
-
-   if(cpt>LAST && strlen (fld[LAST]) != 0)
-      name_arr[j++] = g_strdup(fld[LAST]);
-
-   if(cpt>SUFFIX && strlen (fld[SUFFIX]) != 0)
-      name_arr[j++] = g_strdup(fld[SUFFIX]);
-
-   name_arr[j] = NULL;
-
-   g_strfreev(fld);
-
-   /* collect the data to one string */
-   res = g_strjoinv(" ", name_arr);
-   while(j-- > 0)
-      g_free(name_arr[j]);
-   g_free(name_arr);
-
-   return res;
-}
-
-
-/*
- * address_data_free ()
- *
- * Input: None.
- * Input: None.
- *
- * Frees a single AddressData structure.
- * Move to src/address-book.c?
- */
-void
-address_data_free (AddressData * address, gpointer ignore)
-{
-    g_free (address->name);
-    g_free (address->addy);
-    g_free (address->upper);
-    g_free (address->id);
-    g_free (address);
-}
-
-
 /*
  * ab_load()
  *
@@ -306,17 +232,20 @@ static void
 ab_load(GtkWidget * widget, gpointer data) 
 { 
 	gchar *listdata[2];
-	GList *list, *addresses;
-	AddressData *addr, *copy;
+	GList *list;
+	LibBalsaAddress *addr;
 	gint rownum; 
 
 	/*
 	 * Load the addressbooks
 	 */
 	ab_clear_clist(GTK_CLIST(book_clist)); 
+
 	if (composing) 
 		ab_clear_clist(GTK_CLIST(add_clist)); 
-	addresses = list = ab_load_addresses (FALSE);
+
+	libbalsa_address_book_load(current_address_book);
+	list =  current_address_book->address_list;
 
 	/*
 	 * Add the GList to a gtk_clist()
@@ -324,16 +253,18 @@ ab_load(GtkWidget * widget, gpointer data)
 	gtk_clist_freeze (GTK_CLIST (book_clist)); 
 	while (list != NULL)
 	{ 
-		addr = (AddressData *)(list->data);
-		copy = g_malloc (sizeof (AddressData) );
-		copy->id = g_strdup (addr->id);
-		copy->addy = g_strdup (addr->addy);
-		copy->name = g_strdup (addr->name);
-		listdata[0] = copy->id;
-		listdata[1] = copy->addy;
+		addr = LIBBALSA_ADDRESS(list->data);
+		listdata[0] = addr->id;
+		if ( addr->address_list ) 
+			listdata[1] = (gchar*)addr->address_list->data;
+		else
+			listdata[1] = "";
+
+		gtk_object_ref(GTK_OBJECT(addr));
+
 		rownum = gtk_clist_append (GTK_CLIST (book_clist), listdata); 
 		gtk_clist_set_row_data (GTK_CLIST (book_clist),
-					rownum, (gpointer) copy); 
+					rownum, addr); 
 		list = g_list_next (list);
 	}	 
 
@@ -344,139 +275,7 @@ ab_load(GtkWidget * widget, gpointer data)
 	gtk_clist_optimal_column_width(GTK_CLIST(book_clist),0)); 
 	gtk_clist_thaw(GTK_CLIST(book_clist)); 
 
-	/*
-	 * Cleanup
-	 */
-	if (addresses)
-	{
-		g_list_foreach (addresses, (GFunc) address_data_free, NULL);
-		g_list_free (addresses);
-	}
 }
-
-
-/*
- * ab_load_addresses_gnomecard (GList *current, gboolean multiples)
- *
- * Loads all the addresses in the GnomeCard addressbook, and returns an
- * GList* structure.  Returns current if no addresses
- * found, or the addressbook is invalid.
- *
- * GList*->data will be an AddressData* structure.
- */
-GList*
-ab_load_addresses_gnomecard (GList *current, gboolean multiples) 
-{ 
-   FILE *gc; 
-   gchar string[LINE_LEN];
-   gchar *name = NULL, *email = NULL, *id = NULL;
-   gint in_vcard = FALSE;
-   GList* list;
-
-   list = current;
-   
-   gc = fopen(balsa_app.ab_location,"r"); 
-   if (!gc) return current;
-
-   while (fgets (string, sizeof(string), gc)) 
-   { 
-      /*
-       * Check if it is a card.
-       */
-      if (g_strncasecmp (string, "BEGIN:VCARD", 11) == 0 ) {
-	 in_vcard = TRUE;
-	 continue;
-      }
-
-      /*
-       * We are done loading a card.
-       */
-      if (g_strncasecmp (string, "END:VCARD", 9) == 0) {
-	 AddressData *data;
-	 if (email) {
-	    data = g_malloc (sizeof(AddressData)); 
-	    data->id = id ? id : g_strdup(_("No-Id"));
-	    data->addy = email;
-            
-            if (name)
-              data->name = name;
-            else if (id) 
-              data->name = g_strdup (id);
-            else
-              data->name = g_strdup( _("No-Name") );
-
-	    data->upper = g_strdup (data->name);
-		g_strup (data->upper);
-	    list = g_list_append (list, data);
-
-	 } else { /* record without e-mail address, ignore */
-	    g_free (name);
-	    g_free (id);
-	 } 
-	 email = NULL;
-	 name = NULL;
-	 id = NULL;
-	 in_vcard = FALSE;
-	 continue;
-      }
-
-      if (!in_vcard) continue;
-
-      g_strchomp(string);
-
-      if (g_strncasecmp(string, "FN:", 3) == 0)
-      {
-        id = g_strdup(string+3);
-        continue;
-      }
-      if (g_strncasecmp(string, "N:", 2) == 0) {
-	 name = extract_name(string+2);
-	 continue;
-      }
-      /*
-       * fetch all e-mail fields
-       */
-      if (g_strncasecmp (string, "EMAIL;",6) == 0) {
-	  gchar * ptr = strchr(string,':');
-	  if(ptr) {
-	      if ((email) && (multiples)) {
-		  if(balsa_app.ab_dist_list_mode) {
-		      gchar * new = g_strconcat(email,", ", ptr+1, NULL);
-		      g_free (email); 
-		      email = new;
-		  } /* else ignore other addresses */
-	      } else if (!(email))
-		  email = g_strdup (ptr+1);
-	  }
-      }
-   }	 
-   fclose(gc); 
-
-   return list;
-}
-	
-
-/*
- * ab_load_addresses (gboolean multiples)
- *
- * Loads all the addresses in all the addressbooks, and returns an
- * GList* structure.  Returns NULL if no addresses
- * found, or the addressbook is invalid.
- *
- * GList*->data will be an AddressData* structure.
- */
-GList*
-ab_load_addresses (gboolean multiples) 
-{
-   GList *tmp = NULL;
-
-#ifdef ENABLE_LDAP
-   tmp = ldap_load_addresses (tmp, multiples);
-#endif /* ENABLE_LDAP */
-   tmp = ab_load_addresses_gnomecard (tmp, multiples);
-   return tmp;
-}
-
 
 static void 
 ab_find(GtkWidget * group_entry) 
@@ -531,7 +330,12 @@ address_book_cb(GtkWidget * widget, gpointer data)
 		*hbox, 
 		*box2, 
 		*scrolled_window,
-	        *radio1, *radio2; 
+	        *radio1, *radio2,
+		*ab_option, *ab_menu,
+		*menu_item;
+	GList *ab_list;
+	LibBalsaAddressBook *address_book;
+	guint default_offset = 0;
 
 	static gchar *titles[2] = {N_("Name"), N_("E-Mail Address")}; 
 
@@ -539,11 +343,12 @@ address_book_cb(GtkWidget * widget, gpointer data)
 	titles[0]=_(titles[0]);
 	titles[1]=_(titles[1]);
 #endif
-	
+
 	dialog = gnome_dialog_new(_("Address Book"), GNOME_STOCK_BUTTON_CANCEL, GNOME_STOCK_BUTTON_OK, NULL); 
 
         /* If we have something in the data, then the addressbook was opened
          * from a message window */
+	/* FIXE: (widget->parent->parent->parent->parent->parent) could be more elegant ;-) */
         if (GTK_IS_BUTTON (widget))
                 gnome_dialog_set_parent (GNOME_DIALOG (dialog), 
                                          GTK_WINDOW (widget->parent->parent->parent->parent->parent));
@@ -563,6 +368,33 @@ address_book_cb(GtkWidget * widget, gpointer data)
 	gtk_clist_set_selection_mode(GTK_CLIST(add_clist), GTK_SELECTION_MULTIPLE); 
 	gtk_clist_column_titles_passive(GTK_CLIST(add_clist)); 
 
+	ab_menu = gtk_menu_new ();	
+	if ( balsa_app.address_book_list ) {
+		current_address_book = balsa_app.default_address_book;
+		
+		ab_list = balsa_app.address_book_list;
+		while (ab_list) {
+			address_book = LIBBALSA_ADDRESS_BOOK(ab_list->data);
+			menu_item = gtk_menu_item_new_with_label ( address_book->name );
+			gtk_widget_show ( menu_item );
+			gtk_menu_append(GTK_MENU(ab_menu), menu_item);
+			
+			gtk_signal_connect(GTK_OBJECT(menu_item), "activate",
+					   address_book_menu_cb, address_book);
+			if ( address_book == balsa_app.default_address_book) {
+				gtk_menu_set_active(GTK_MENU(ab_menu), default_offset);
+			}
+			default_offset++;
+	
+			ab_list = g_list_next(ab_list);
+		}
+		gtk_widget_show(ab_menu);
+	}
+	ab_option = gtk_option_menu_new();
+	gtk_option_menu_set_menu(GTK_OPTION_MENU(ab_option), ab_menu);
+	gtk_widget_show(ab_option);
+	gtk_box_pack_start( GTK_BOX(vbox), ab_option, TRUE, TRUE, 0);
+	
 	ab_entry = (GtkWidget *) data; 
 
 	find_entry = gtk_entry_new(); 
@@ -665,3 +497,8 @@ address_book_cb(GtkWidget * widget, gpointer data)
 	return FALSE; 
 } 
 
+static void address_book_menu_cb(GtkWidget *widget, gpointer data)
+{
+	current_address_book = LIBBALSA_ADDRESS_BOOK(data);
+	ab_load(widget, data);
+}

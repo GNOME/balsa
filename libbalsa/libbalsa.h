@@ -26,9 +26,7 @@
 typedef struct _LibBalsaMailbox LibBalsaMailbox;
 typedef struct _LibBalsaMailboxRemote LibBalsaMailboxRemote;
 typedef struct _LibBalsaMessage LibBalsaMessage;
-typedef struct _LibBalsaContact LibBalsaContact;
 typedef struct _LibBalsaMessageBody LibBalsaMessageBody;
-typedef struct _LibBalsaAddress LibBalsaAddress;
 typedef struct _ImapDir ImapDir;
 typedef struct _LibBalsaServer LibBalsaServer;
 
@@ -37,7 +35,6 @@ typedef struct body MuttBody;
 
 #include "address.h"
 #include "message.h"
-#include "contact.h"
 #include "imapdir.h"
 #include "body.h"
 #include "files.h"
@@ -48,6 +45,12 @@ typedef struct body MuttBody;
 #include "information.h"
 
 #include "server.h"
+
+#include "address-book.h"
+#include "address-book-vcard.h"
+#if ENABLE_LDAP
+#include "address-book-ldap.h"
+#endif
 
 #include "mailbox.h"
 #include "mailbox_local.h"

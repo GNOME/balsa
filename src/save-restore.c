@@ -36,6 +36,7 @@
 
 #define BALSA_CONFIG_PREFIX "balsa/"
 #define MAILBOX_SECTION_PREFIX "mailbox-"
+#define ADDRESS_BOOK_SECTION_PREFIX "address-book-"
 
 static gint config_mailboxes_init (void);
 static gint config_global_load (void);
@@ -56,6 +57,11 @@ static void config_identities_save(void);
     LIBBALSA_MAILBOX(mbox)->config_prefix ? \
     g_strdup(LIBBALSA_MAILBOX(mbox)->config_prefix) : \
     config_get_unused_section(MAILBOX_SECTION_PREFIX)
+
+#define address_book_section_path(ab) \
+    LIBBALSA_ADDRESS_BOOK(ab)->config_prefix ? \
+    g_strdup(LIBBALSA_ADDRESS_BOOK(ab)->config_prefix) : \
+    config_get_unused_section(ADDRESS_BOOK_SECTION_PREFIX)
 
 gint
 config_load(void) {
@@ -110,6 +116,29 @@ config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
     *special = mailbox;
 }
 
+void 
+config_address_book_save(LibBalsaAddressBook *ab)
+{
+  gchar *prefix;
+  
+  prefix = address_book_section_path(ab);
+  
+  libbalsa_address_book_save_config(ab, prefix);
+  
+  g_free(prefix);
+  
+  gnome_config_sync();
+}
+
+void
+config_address_book_delete(LibBalsaAddressBook *ab)
+{
+  if ( ab->config_prefix ) {
+    gnome_config_clean_section(ab->config_prefix);
+    gnome_config_private_clean_section(ab->config_prefix);
+    gnome_config_sync();
+  }
+}
 /* config_mailbox_add:
    adds the specifed mailbox to the configuration. If the mailbox does
    not have the unique pkey assigned, find one.
@@ -410,7 +439,6 @@ config_global_load (void)
 
   balsa_app.empty_trash_on_exit = gnome_config_get_bool("EmptyTrash=false");
   balsa_app.ab_dist_list_mode = gnome_config_get_bool("AddressBookDistMode=false");
-  balsa_app.alias_find_flag = gnome_config_get_bool ("AliasFlag=false");
 
   gnome_config_pop_prefix();
   return TRUE;
@@ -546,16 +574,20 @@ config_save (void)
 
   gnome_config_set_bool ("RememberOpenMailboxes", balsa_app.remember_open_mboxes); 
   gnome_config_set_bool ("EmptyTrash",            balsa_app.empty_trash_on_exit);
-  
+
+  if ( balsa_app.default_address_book ) {
+    gnome_config_set_string("DefaultAddressBook", balsa_app.default_address_book->config_prefix+strlen(BALSA_CONFIG_PREFIX));
+  } else {
+    gnome_config_clean_key("DefaultAddressBook");
+  }
+
   /* address book */
   gnome_config_set_bool ("AddressBookDistMode", balsa_app.ab_dist_list_mode);
-
-  gnome_config_set_bool ("AliasFlag", balsa_app.alias_find_flag);
-  
 
   gnome_config_sync();
   return TRUE;
 }				/* config_global_save */
+
 
 /* must use a sensible prefix, or this goes weird */
 static gchar*
@@ -576,7 +608,7 @@ config_get_unused_section (const gchar *prefix)
 	max = curr;
     }
   }
-  name =  g_strdup_printf(BALSA_CONFIG_PREFIX "%s%d/", prefix, max+1);
+  name =  g_strdup_printf(BALSA_CONFIG_PREFIX "%s%d/", prefix, max);
   if(balsa_app.debug)
     g_print("config_mailbox_get_highest_number: name='%s'\n", name);
   return name;
@@ -585,53 +617,53 @@ config_get_unused_section (const gchar *prefix)
 static void
 config_address_books_load(void)
 {
+  LibBalsaAddressBook *address_book;
+  gchar *default_address_book_prefix;
+  void *iterator;
+  gchar *key, *val, *tmp;
+  int pref_len =   strlen(ADDRESS_BOOK_SECTION_PREFIX);
 
-  gnome_config_push_prefix(BALSA_CONFIG_PREFIX "address-book-default-vcard/");
-
-  g_free (balsa_app.ab_location);
-  balsa_app.ab_location = gnome_config_get_string("Path=" DEFAULT_ADDRESS_BOOK_PATH);
-
+  gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Globals/");
+  tmp = gnome_config_get_string("DefaultAddressBook");
+  default_address_book_prefix = g_strconcat(BALSA_CONFIG_PREFIX, tmp, NULL);
+  g_free(tmp);
   gnome_config_pop_prefix();
 
-#ifdef ENABLE_LDAP
-  gnome_config_push_prefix(BALSA_CONFIG_PREFIX "address-book-default-LDAP/");
+  iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
+  while( (iterator = gnome_config_iterator_next(iterator, &key, &val)) ) {
 
-  /*
-   * LDAP can set a host, and a base Domain name.
-   */
-  g_free (balsa_app.ldap_host);
-  balsa_app.ldap_host = gnome_config_get_string("Host");
+    if(strncmp(key, ADDRESS_BOOK_SECTION_PREFIX, pref_len) == 0) {
+      tmp = g_strconcat(BALSA_CONFIG_PREFIX, key, "/",NULL);
 
-  g_free (balsa_app.ldap_base_dn);
-  balsa_app.ldap_base_dn = gnome_config_get_string("BaseDN");
+      address_book = libbalsa_address_book_new_from_config(tmp);
 
-  gnome_config_pop_prefix();
-#endif /* ENABLE_LDAP */
+      if ( address_book ) {
+	balsa_app.address_book_list = g_list_append(balsa_app.address_book_list, address_book);
+	
+	if ( default_address_book_prefix && strcmp(tmp, default_address_book_prefix) == 0 ) {
+	  balsa_app.default_address_book = address_book;
+	}
+      }
 
+      g_free(tmp);
+    }
+  }
 }
 
 static void
 config_address_books_save(void)
 {
-  gnome_config_push_prefix(BALSA_CONFIG_PREFIX "address-book-default-vcard/");
+  GList *list;
+  LibBalsaAddressBook *ab;
 
-  gnome_config_set_string("Type", "LibBalsaAddressBookVcard");
-  gnome_config_set_string("Name", "Default Address Book");
-  gnome_config_set_string("Path", balsa_app.ab_location);
+  list = balsa_app.address_book_list;
+  while(list) {
+    ab = LIBBALSA_ADDRESS_BOOK(list->data);
 
-  gnome_config_pop_prefix();
-
-#if ENABLE_LDAP
-  gnome_config_push_prefix(BALSA_CONFIG_PREFIX "address-book-default-ldap/");
-
-  gnome_config_set_string("Type", "LibBalsaAddressBookLdap");
-  gnome_config_set_string("Name", "Default LDAP Address Book");
-  gnome_config_set_string ("Host", balsa_app.ldap_host);
-  gnome_config_set_string ("BaseDN", balsa_app.ldap_base_dn);
-
-  gnome_config_pop_prefix();
-
-#endif /* ENABLE_LDAP */
+    config_address_book_save(ab);
+    list = g_list_next(list);
+    
+  }
 }
 
 static void
@@ -639,28 +671,27 @@ config_identities_load(void)
 {
   gnome_config_push_prefix(BALSA_CONFIG_PREFIX "identity-default/");
 
+  if ( balsa_app.address )
+    gtk_object_destroy(GTK_OBJECT(balsa_app.address));
+  balsa_app.address = libbalsa_address_new();
+
   /* user's real name */
-  g_free(balsa_app.address->personal);
-  balsa_app.address->personal = gnome_config_get_string("FullName");
+  balsa_app.address->full_name = gnome_config_get_string("FullName");
 
   /* user's email address */
-  g_free(balsa_app.address->mailbox);
-  balsa_app.address->mailbox = gnome_config_get_string("Address");
+  balsa_app.address->address_list = g_list_append(balsa_app.address->address_list,
+						  gnome_config_get_string("Address"));
 
   /* users's replyto address */
-  g_free(balsa_app.replyto);
   balsa_app.replyto =  gnome_config_get_string("ReplyTo");
 
   /* users's domain */
-  g_free(balsa_app.domain);
   balsa_app.domain = gnome_config_get_string("Domain");
 
   /* bcc field for outgoing mails; optional */
-  g_free(balsa_app.bcc);
   balsa_app.bcc = gnome_config_get_string("Bcc");
 
   /* signature file path */
-  g_free(balsa_app.signature_path);
   balsa_app.signature_path = gnome_config_get_string("SignaturePath");
   if ( balsa_app.signature_path == NULL ) {
     balsa_app.signature_path = gnome_util_prepend_user_home(".signature");
@@ -679,8 +710,8 @@ config_identities_save(void)
 {
   gnome_config_push_prefix(BALSA_CONFIG_PREFIX "identity-default/");
 
-  gnome_config_set_string ("FullName", balsa_app.address->personal);
-  gnome_config_set_string("Address", balsa_app.address->mailbox);
+  gnome_config_set_string ("FullName", balsa_app.address->full_name);
+  gnome_config_set_string("Address", balsa_app.address->address_list->data);
   gnome_config_set_string("ReplyTo", balsa_app.replyto);
   gnome_config_set_string("Domain", balsa_app.domain);
   gnome_config_set_string("Bcc", balsa_app.bcc);

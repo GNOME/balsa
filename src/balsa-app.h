@@ -76,7 +76,6 @@
 #define DEFAULT_CHARSET "ISO-8859-1"
 #define DEFAULT_ENCODING ENC8BIT
 #define DEFAULT_LINESIZE 78
-#define DEFAULT_ADDRESS_BOOK_PATH ".gnome/GnomeCard.gcrd"
 
 #define DEFAULT_PSPELL_MODULE SPELL_CHECK_MODULE_ISPELL
 #define DEFAULT_PSPELL_SUGGEST_MODE SPELL_CHECK_SUGGEST_NORMAL
@@ -248,12 +247,6 @@ extern struct BalsaApplication
   /* printing */
   Printing_t PrintCommand;
 
-#ifdef ENABLE_LDAP
-	/* LDAP (only one) */
-	gchar *ldap_host;
-	gchar *ldap_base_dn;
-#endif /* ENABLE_LDAP */
-  
   /* compose: shown headers */
   gchar* compose_headers; 
 
@@ -262,9 +255,10 @@ extern struct BalsaApplication
   GtkWidget* notebook;
 
   /* address book */
+  GList *address_book_list;
+  LibBalsaAddressBook *default_address_book;
+	
   gboolean ab_dist_list_mode;
-  gchar * ab_location;
-  gboolean alias_find_flag;
 
   /* spell checking */
   SpellCheckModule module;

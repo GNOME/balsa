@@ -23,21 +23,70 @@
 #ifndef __LIBBALSA_ADDRESS_H__
 #define __LIBBALSA_ADDRESS_H__
 
-#include <glib.h>
+#include <gtk/gtkobject.h>
+
+#define LIBBALSA_TYPE_ADDRESS				(libbalsa_address_get_type())
+#define LIBBALSA_ADDRESS(obj)				(GTK_CHECK_CAST (obj, LIBBALSA_TYPE_ADDRESS, LibBalsaAddress))
+#define LIBBALSA_ADDRESS_CLASS(klass)			(GTK_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_ADDRESS, LibBalsaAddressClass))
+#define LIBBALSA_IS_ADDRESS(obj)			(GTK_CHECK_TYPE (obj, LIBBALSA_TYPE_ADDRESS))
+#define LIBBALSA_IS_ADDRESS_CLASS(klass)		(GTK_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_ADDRESS))
+
+typedef struct _LibBalsaAddress LibBalsaAddress;
+typedef struct _LibBalsaAddressClass LibBalsaAddressClass;
+
+typedef enum _LibBalsaAddressField LibBalsaAddressField;
+
+enum _LibBalsaAddressField
+{
+	FULL_NAME,
+	FIRST_NAME,
+	LAST_NAME,
+	ORGANIZATION,
+	EMAIL_ADDRESS,
+	NUM_FIELDS
+};
 
 struct _LibBalsaAddress
 {
-	gchar *personal;	/* full text name */
-	gchar *mailbox;		/* user name and host (mailbox name) on remote system */
+	GtkObject parent;
+
+	/*
+	 * ID
+	 * VCard FN: Field
+	 * An ldap feature..
+	 */
+	gchar *id;
+
+	/* First and last names
+	 * VCard: N: field
+	 * Full name is the bit in <> in an rfc822 address
+	 */
+	gchar *full_name;
+	gchar *first_name;
+	gchar *last_name;
+
+	/* Organisation
+	 * VCard: ORG: field
+	 */
+	gchar *organization;
+
+	/* Email addresses
+	 * A list of user@domain.
+	 */
+	GList *address_list;
 };
+
+struct _LibBalsaAddressClass
+{
+	GtkObjectClass parent_class;
+};
+
+GtkType libbalsa_address_get_type(void);
 
 LibBalsaAddress *libbalsa_address_new(void);
 LibBalsaAddress *libbalsa_address_new_from_string (gchar *address);
 GList *libbalsa_address_new_list_from_string (gchar *address);
 
 gchar *libbalsa_address_to_gchar (LibBalsaAddress * addr);
-
-void libbalsa_address_free(LibBalsaAddress *address);
-void libbalsa_address_list_free(GList *address_list);
 
 #endif /* __LIBBALSA_ADDRESS_H__ */

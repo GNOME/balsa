@@ -325,7 +325,7 @@ libbalsa_mailbox_save_config (LibBalsaMailbox *mailbox, const gchar *prefix)
 	g_return_if_fail (mailbox != NULL);
 	g_return_if_fail (LIBBALSA_IS_MAILBOX(mailbox));
 
-	/* These are incase this seciton was used for another
+	/* These are incase this section was used for another
 	 * type of mailbox that has now been deleted...
 	 */
 	gnome_config_private_clean_section(prefix);
@@ -428,6 +428,9 @@ libbalsa_mailbox_real_save_config(LibBalsaMailbox *mailbox, const gchar *prefix)
 
 	gnome_config_set_string("Type", gtk_type_name(GTK_OBJECT_TYPE(mailbox)));
 	gnome_config_set_string("Name", mailbox->name);
+
+	g_free(mailbox->config_prefix);
+	mailbox->config_prefix = g_strdup(prefix);
 				
 }
 

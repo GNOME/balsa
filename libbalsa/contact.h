@@ -23,11 +23,21 @@
 #ifndef __LIBBALSA_CONTACT_H__
 #define __LIBBALSA_CONTACT_H__
 
-#include <glib.h>
+#include <gtk/gtkobject.h>
 
-#include "libbalsa.h"
+#define LIBBALSA_TYPE_CONTACT			(libbalsa_contact_get_type())
+#define LIBBALSA_CONTACT(obj)			(GTK_CHECK_CAST (obj, LIBBALSA_TYPE_CONTACT, LibBalsaContact))
+#define LIBBALSA_CONTACT_CLASS(klass)		(GTK_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_CONTACT, LibBalsaContactClass))
+#define LIBBALSA_IS_CONTACT(obj)			(GTK_CHECK_TYPE (obj, LIBBALSA_TYPE_CONTACT))
+#define LIBBALSA_IS_CONTACT_CLASS(klass)		(GTK_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_CONTACT))
 
-enum
+typedef struct _LibBalsaContact LibBalsaContact;
+typedef struct _LibBalsaContactClass LibBalsaContactClass;
+
+typedef enum _LibBalsaContactField LibBalsaContactField;
+typedef enum _LibBalsaContactError LibBalsaContactError;
+
+enum _LibBalsaContactField
 {
 	CARD_NAME,
 	FIRST_NAME,
@@ -38,7 +48,7 @@ enum
 };
 
 /* possible error values obtained while trying to store a contact vCard */
-enum
+enum _LibBalsaContactError
 {
 	LIBBALSA_CONTACT_CARD_STORED_SUCCESSFULLY,
 	LIBBALSA_CONTACT_UNABLE_TO_OPEN_GNOMECARD_FILE,
@@ -48,6 +58,8 @@ enum
 
 struct _LibBalsaContact
 {
+	GtkObject parent;
+
 	gchar *card_name;
 	gchar *first_name;
 	gchar *last_name;
@@ -55,9 +67,16 @@ struct _LibBalsaContact
 	gchar *email_address;
 };
 
+struct _LibBalsaContactClass
+{
+	GtkObjectClass parent_class;
+};
+
+GtkType libbalsa_contact_get_type(void);
+
 LibBalsaContact *libbalsa_contact_new(void);
-void libbalsa_contact_free(LibBalsaContact *contact);
 void libbalsa_contact_list_free(GList *contact_list);
 gint libbalsa_contact_store(LibBalsaContact *contact, const gchar *fname);
 
 #endif /* __LIBBALSA_CONTACT_H__ */
+

@@ -27,15 +27,91 @@
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 
+static GtkObjectClass *parent_class;
+
+static void libbalsa_address_class_init(LibBalsaAddressClass *klass);
+static void libbalsa_address_init(LibBalsaAddress *ab);
+static void libbalsa_address_destroy (GtkObject *object);
+
+GtkType
+libbalsa_address_get_type(void)
+{
+	static GtkType address_type = 0;
+	
+	if (!address_type) {
+		static const GtkTypeInfo address_info = {
+			"LibBalsaAddress",
+			sizeof (LibBalsaAddress),
+			sizeof (LibBalsaAddressClass),
+			(GtkClassInitFunc) libbalsa_address_class_init,
+			(GtkObjectInitFunc) libbalsa_address_init,
+			/* reserved_1 */ NULL,
+			/* reserved_2 */ NULL,
+			(GtkClassInitFunc) NULL,
+		};
+
+		address_type = gtk_type_unique(gtk_object_get_type(), &address_info);
+	}
+
+	return address_type;
+}
+
+static void libbalsa_address_class_init(LibBalsaAddressClass *klass)
+{
+	GtkObjectClass *object_class;
+
+	parent_class = gtk_type_class(gtk_object_get_type());
+
+	object_class = GTK_OBJECT_CLASS(klass);
+	object_class->destroy = libbalsa_address_destroy;
+}
+
+static void libbalsa_address_init(LibBalsaAddress *addr)
+{
+	addr->id = NULL;
+	addr->full_name = NULL;
+	addr->first_name = NULL;
+	addr->last_name = NULL;
+	addr->organization = NULL;
+	addr->address_list = NULL;
+}
+
+static void libbalsa_address_destroy (GtkObject *object)
+{
+	LibBalsaAddress *addr;
+
+	g_return_if_fail( object != NULL );
+
+	addr = LIBBALSA_ADDRESS(object);
+
+	g_free(addr->id);
+	addr->id = NULL;
+
+	g_free(addr->full_name);
+	addr->full_name = NULL;
+
+	g_free(addr->first_name);
+	addr->first_name = NULL;
+	g_free(addr->last_name);
+	addr->last_name = NULL;
+
+	g_free(addr->organization);
+	addr->organization = NULL;
+
+	g_list_foreach(addr->address_list, (GFunc)g_free, NULL);
+	g_list_free(addr->address_list);
+	addr->address_list = NULL;
+
+	if (GTK_OBJECT_CLASS(parent_class)->destroy)
+		(*GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(object));
+}
+
 LibBalsaAddress *
 libbalsa_address_new (void)
 {
 	LibBalsaAddress *address;
-
-	address = g_new(LibBalsaAddress, 1);
-
-	address->personal = NULL;
-	address->mailbox = NULL;
+	
+	address = gtk_type_new(LIBBALSA_TYPE_ADDRESS);
 
 	return address;
 }
@@ -86,8 +162,9 @@ libbalsa_address_new_from_libmutt (ADDRESS * caddr)
 		return NULL;
 
 	address = libbalsa_address_new ();
-	address->personal = g_strdup (caddr->personal);
-	address->mailbox = g_strdup (caddr->mailbox);
+
+	address->full_name = g_strdup (caddr->personal);
+	address->address_list = g_list_append(address->address_list, g_strdup(caddr->mailbox));
 
 	return address;
 }
@@ -97,39 +174,19 @@ libbalsa_address_to_gchar (LibBalsaAddress * addr)
 {
 	gchar *retc = NULL;
 
-	if (addr->personal) {
-		if(addr->mailbox)
-			retc= g_strdup_printf("%s <%s>", addr->personal, addr->mailbox);
-		else 
-			retc = g_strdup(addr->personal);
+	if (addr->full_name) {
+		if(addr->address_list) {
+			gchar *email = addr->address_list->data;
+			retc= g_strdup_printf("%s <%s>", addr->full_name, email);
+		} else {
+			retc = g_strdup(addr->full_name);
+		}
 	} else {
-		if(addr->mailbox)
-			retc = g_strdup(addr->mailbox);
+		if(addr->address_list) {
+			gchar *email = addr->address_list->data;
+			retc = g_strdup(email);
+		}
 	}
 
 	return retc;
-}
-
-void
-libbalsa_address_free (LibBalsaAddress * address)
-{
-
-	if (!address)
-		return;
-
-	g_free (address->personal);
-	g_free (address->mailbox);
-
-	g_free (address);
-}
-
-void libbalsa_address_list_free(GList * address_list)
-{
-	GList *list;
-	for (list = g_list_first (address_list); list; list = g_list_next (list)) {
-		if(list->data) 
-			libbalsa_address_free (list->data);
-	}
-
-	g_list_free (address_list);
 }

@@ -1,3 +1,35 @@
+2000-09-13  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/address.[ch]: Make into a proper Gtk object.
+	* libbalsa/address-book.[ch]: Implement LibBalsaAddressBook.
+	* libbalsa/contact.[ch]: Removed. Functionality now in
+	LibBalsaAddress.
+	* libbalsa/libbalsa.[ch]: Register address book types. Add
+	includes for address books.
+	* libbalsa/mailbox.c: Fix spelling, save config_prefix when
+	loading.
+	* libbalsa/message.c: Free addresses with gtk_object_destroy.
+	* libbalsa/Makefile.am: Add new files.
+	* libinit_balsa/balsa-druid-page-user.gob: Update for
+	LibBalsaAddressBook.
+	* src/address-book.[ch]: Update for LibBalsaAddressBook, select
+	mailbox. Remove AddressData - functionality now in LibBalsaAddress.
+	* src/Makefile.am: Add new files.
+	* src/balsa-app.[ch]: Replace addressbook related fields with
+	address_book_list and default_address_book.
+	* src/store_dialog.[ch]: Move store dialog here, implement address
+	book selection.
+	* src/balsa-index-page.[ch]: Remove store dialog.
+	* src/expand-alias.c: Use all address books which have there
+	expand_alias flag setto look for completions in.
+	* src/main-window.c: Update for moved store dialog.
+	* src/main.c: Update for LibBalsaAddressBook.
+	* src/pref-manager.c: Add address book configuration page.
+	* src/address-book-config.[ch]: New address book configuration
+	dialog.
+	* src/save-restore.[ch]: Save and restore address book list.
+	* src/sendmsg-window.c: Update for LibBalsaAddressBook.
+
 2000-09-11  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/save-restore.c: fixed a couple of off-by-1 errors in 

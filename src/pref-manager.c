@@ -27,12 +27,10 @@
 #include "main-window.h"
 #include "save-restore.h"
 #include "spell-check.h"
+#include "address-book-config.h"
+
 /* FIXME: Mutt dependency */
 #include "../libmutt/mime.h"
-
-#ifdef ENABLE_LDAP
-#include <ldap-addressbook.h>
-#endif /* ENABLE_LDAP */
 
 #define NUM_TOOLBAR_MODES 3
 #define NUM_MDI_MODES 4
@@ -45,6 +43,8 @@ typedef struct _PropertyUI {
 	GtkWidget *sig_whenforward, *sig_whenreply, *sig_sending;
         GtkWidget *sig_separator;
 	
+	GtkWidget *address_books;
+
 	GtkWidget *pop3servers, *smtp_server, *mail_directory;
 	GtkWidget *rb_local_mua, *rb_smtp_server;
 	GtkWidget *check_mail_auto;
@@ -94,10 +94,6 @@ typedef struct _PropertyUI {
 
         /* quote regex */
         GtkWidget* quote_pattern;
-
-	/* address book */
-	GtkWidget *ab_location;
-	GtkWidget *alias_find_flag;
         
         /* spell checking */
         GtkWidget* module;
@@ -106,11 +102,6 @@ typedef struct _PropertyUI {
         gint suggestion_mode_index;
         GtkWidget* ignore_length;
 
-#ifdef ENABLE_LDAP
-	/* ldap */
-	GtkWidget *ldap_host;
-	GtkWidget *base_dn;
-#endif /* ENABLE_LDAP */
 } PropertyUI;
 
 
@@ -128,11 +119,8 @@ static GtkWidget *create_encondig_page ( void );
 static GtkWidget *create_misc_page ( void );
 static GtkWidget *create_startup_page ( void );
 static GtkWidget *create_spelling_page (void);
-static GtkWidget* create_spelling_option_menu (const gchar* names[], gint size, gint* index);
-
-#ifdef ENABLE_LDAP
-static GtkWidget *create_ldap_page (void);
-#endif
+static GtkWidget *create_spelling_option_menu (const gchar* names[], gint size, gint* index);
+static GtkWidget *create_address_book_page ( void );
 
 static GtkWidget *create_information_message_menu (void);
 
@@ -142,16 +130,21 @@ static void destroy_pref_window_cb (GtkWidget *pbox, PropertyUI *property_struct
 static void set_prefs (void);
 static void apply_prefs (GnomePropertyBox* pbox, gint page_num);
 void update_pop3_servers (void);
+static void update_address_books (void);
 static void smtp_changed (void);
 static void properties_modified_cb (GtkWidget * widget, GtkWidget * pbox);
 static void font_changed (GtkWidget * widget, GtkWidget * pbox);
 static void pop3_edit_cb (GtkWidget * widget, gpointer data);
 static void pop3_add_cb (GtkWidget * widget, gpointer data);
 static void pop3_del_cb (GtkWidget * widget, gpointer data);
+static void address_book_edit_cb (GtkWidget * widget, gpointer data);
+static void address_book_add_cb (GtkWidget * widget, gpointer data);
+static void address_book_delete_cb (GtkWidget * widget, gpointer data);
 static void timer_modified_cb( GtkWidget *widget, GtkWidget *pbox);
 static void print_modified_cb( GtkWidget *widget, GtkWidget *pbox);
 static void wrap_modified_cb( GtkWidget *widget, GtkWidget *pbox);
 static void spelling_optionmenu_cb (GtkItem* menuitem, gpointer data);
+static void set_default_address_book_cb(GtkWidget *button , gpointer data);
 
 guint toolbar_type[NUM_TOOLBAR_MODES] =
 {
@@ -240,6 +233,9 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 	page = create_mailserver_page ();
         gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Mail Servers")) );
 
+	page = create_address_book_page ();
+	gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Address Books")) );
+
 	page = create_mailoptions_page ();
         gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Mail Options")) );
 
@@ -260,11 +256,6 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 
 	page = create_startup_page ();
         gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Startup")) );
-
-#ifdef ENABLE_LDAP
-        page = create_ldap_page ();
-        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("LDAP")) );
-#endif /* ENABLE_LDAP */
 
 
 	set_prefs ();
@@ -387,14 +378,6 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
                             GTK_SIGNAL_FUNC (properties_modified_cb), 
                             property_box);
 
-#ifdef ENABLE_LDAP
-        gtk_signal_connect (GTK_OBJECT (pui->ldap_host), "changed",
-                            GTK_SIGNAL_FUNC (properties_modified_cb),
-                            property_box);
-        gtk_signal_connect (GTK_OBJECT (pui->base_dn), "changed",
-                            GTK_SIGNAL_FUNC (properties_modified_cb),
-                            property_box);
-#endif /* ENABLE_LDAP */
 
 	/* Date format */
 	gtk_signal_connect (GTK_OBJECT (pui->date_format), "changed",
@@ -409,12 +392,6 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
                             GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
         gtk_signal_connect (GTK_OBJECT (pui->quoted_color_end), "released",
                             GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
-	/* address book */
-	gtk_signal_connect (GTK_OBJECT (pui->ab_location), "changed",
-			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
-
-	gtk_signal_connect (GTK_OBJECT (pui->alias_find_flag), "toggled",
-			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 
         /* Gnome Property Box Signals */
         gtk_signal_connect (GTK_OBJECT (property_box), "destroy",
@@ -466,11 +443,11 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
 	/*
 	 * identity page
 	 */
-	g_free (balsa_app.address->personal);
-	balsa_app.address->personal = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->real_name)));
+	gtk_object_destroy(GTK_OBJECT(balsa_app.address));
+	balsa_app.address = libbalsa_address_new();
 
-	g_free (balsa_app.address->mailbox);
-	balsa_app.address->mailbox = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->email)));
+	balsa_app.address->full_name = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->real_name)));
+	balsa_app.address->address_list = g_list_append(balsa_app.address->address_list, g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->email))));
 
 	g_free (balsa_app.replyto);
 	balsa_app.replyto = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->replyto)));
@@ -570,11 +547,6 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
         balsa_app.suggestion_mode = pui->suggestion_mode_index;
         balsa_app.ignore_size = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (pui->ignore_length));
         
-#ifdef ENABLE_LDAP
-        balsa_app.ldap_host = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->ldap_host)));
-        balsa_app.ldap_base_dn = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->base_dn)));
-#endif /* ENABLE_LDAP */
-
 	/* date format */
 	g_free (balsa_app.date_string);
 	balsa_app.date_string = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->date_format)));
@@ -600,12 +572,6 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
                 gdk_window_get_colormap (GTK_WIDGET(pbox)->window),
                 &balsa_app.quoted_color[MAX_QUOTED_COLOR - 1], 1);
         gnome_color_picker_get_i16 (GNOME_COLOR_PICKER(pui->quoted_color_end), &(balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].red), &(balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].green), &(balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].blue), 0);
-
-	/* address book */
-	g_free (balsa_app.ab_location);
-	balsa_app.ab_location = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->ab_location)));
-	balsa_app.alias_find_flag =
-                GTK_TOGGLE_BUTTON(pui->alias_find_flag)->active;
 
 	/* Information dialogs */
 	menu_item = gtk_menu_get_active ( GTK_MENU(pui->information_message_menu) );
@@ -649,9 +615,14 @@ set_prefs (void)
 			break;
 		}
 	
-	gtk_entry_set_text (GTK_ENTRY (pui->real_name), balsa_app.address->personal);
+	gtk_entry_set_text (GTK_ENTRY (pui->real_name), balsa_app.address->full_name);
 
-	gtk_entry_set_text (GTK_ENTRY (pui->email), balsa_app.address->mailbox);
+	if ( balsa_app.address->address_list ) {
+	  gtk_entry_set_text (GTK_ENTRY (pui->email), balsa_app.address->address_list->data);
+	} else {
+	  gtk_entry_set_text (GTK_ENTRY (pui->email), "");
+	}
+
 	gtk_entry_set_text (GTK_ENTRY (pui->replyto), balsa_app.replyto);
 	gtk_entry_set_text (GTK_ENTRY (pui->domain), balsa_app.domain);
 
@@ -735,15 +706,6 @@ set_prefs (void)
                                      balsa_app.suggestion_mode);
         gtk_spin_button_set_value (GTK_SPIN_BUTTON (pui->ignore_length), 
                                    balsa_app.ignore_size);
-
-
-#ifdef ENABLE_LDAP
-        if (balsa_app.ldap_host)
-            gtk_entry_set_text (GTK_ENTRY(pui->ldap_host), balsa_app.ldap_host);
-        if (balsa_app.ldap_base_dn)
-            gtk_entry_set_text (GTK_ENTRY(pui->base_dn),balsa_app.ldap_base_dn);
-#endif /* ENABLE_LDAP */
-	
 	/* date format */
 	if(balsa_app.date_string) 
                 gtk_entry_set_text (GTK_ENTRY (pui->date_format),
@@ -757,12 +719,6 @@ set_prefs (void)
         gnome_color_picker_set_i16 (GNOME_COLOR_PICKER(pui->quoted_color_start), balsa_app.quoted_color[0].red, balsa_app.quoted_color[0].green, balsa_app.quoted_color[0].blue, 0);
         gnome_color_picker_set_i16 (GNOME_COLOR_PICKER(pui->quoted_color_end), balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].red, balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].green, balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].blue, 0);
 
-	/* address book */
-	gtk_entry_set_text (GTK_ENTRY (pui->ab_location), 
-			    balsa_app.ab_location);
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (
-	    pui->alias_find_flag), balsa_app.alias_find_flag);
-
 	/* Information Message */
 	gtk_menu_set_active(GTK_MENU(pui->information_message_menu),
 			    balsa_app.information_message);
@@ -773,6 +729,52 @@ set_prefs (void)
 	gtk_menu_set_active(GTK_MENU(pui->debug_message_menu),
 			    balsa_app.debug_message);
 
+}
+
+static void
+update_address_books(void)
+{
+	gchar *text[2];
+	GList *list = balsa_app.address_book_list;
+	LibBalsaAddressBook *address_book;
+	gint row;
+	GtkCList *clist;
+
+	clist = GTK_CLIST(pui->address_books);
+
+	gtk_clist_clear(clist);
+	gtk_clist_freeze(clist);
+
+	while (list) {
+		address_book = LIBBALSA_ADDRESS_BOOK(list->data);
+
+		g_assert(address_book != NULL);
+
+		if ( LIBBALSA_IS_ADDRESS_BOOK_VCARD(address_book) )
+			text[0] = "VCARD";
+#if ENABLE_LDAP
+		else if ( LIBBALSA_IS_ADDRESS_BOOK_LDAP(address_book) )
+			text[0] = "LDAP";
+#endif
+		else
+			text[0] = "UNKNOWN";
+
+		if ( address_book == balsa_app.default_address_book ) {
+			text[1] = g_strdup_printf("%s (default)", address_book->name);
+		} else {
+			text[1] = g_strdup(address_book->name);
+		}
+
+		row = gtk_clist_append(clist, text);
+
+		g_free(text[1]);
+
+		gtk_clist_set_row_data(clist, row, address_book);
+
+		list = g_list_next(list);
+	}
+	gtk_clist_select_row(clist, 0, 0);
+	gtk_clist_thaw (clist);
 }
 
 void
@@ -1050,7 +1052,7 @@ create_mailserver_page ( )
 	gtk_widget_show (label14);
 	gtk_clist_set_column_widget (GTK_CLIST (pui->pop3servers), 0, label14);
 	
-	label15 = gtk_label_new (_("Mailbox name"));
+	label15 = gtk_label_new (_("Mailbox Name"));
 	gtk_widget_show (label15);
 	gtk_clist_set_column_widget (GTK_CLIST (pui->pop3servers), 1, label15);
 	gtk_label_set_justify (GTK_LABEL (label15), GTK_JUSTIFY_LEFT);
@@ -1697,7 +1699,6 @@ create_misc_page ( )
 	GtkWidget *vbox9;
 	GtkWidget *frame13;
 	GtkWidget *vbox10;
-	GtkWidget *vbox11;
 	GtkWidget *frame14;
 	GtkWidget *table6;
 	GtkWidget *label27;
@@ -1710,8 +1711,6 @@ create_misc_page ( )
         GtkWidget *quoted_color_box_end;
         GtkWidget *quoted_color_label_end;
 	GtkWidget *vbox12;
-        GtkWidget *ab_frame, *ab_box, *fileentry1;
-
 
 	vbox9 = gtk_vbox_new (FALSE, 0);
 	gtk_widget_show (vbox9);
@@ -1857,41 +1856,6 @@ create_misc_page ( )
 	gtk_label_set_justify (GTK_LABEL (quoted_color_label_end),
                                GTK_JUSTIFY_LEFT);
 
-
-	/* address book */
-        ab_frame = gtk_frame_new (_("Address Book"));
-        gtk_widget_show (GTK_WIDGET (ab_frame));
-        gtk_container_set_border_width (GTK_CONTAINER (ab_frame), 5);
-	gtk_box_pack_start (GTK_BOX (vbox9), ab_frame, FALSE, FALSE, 0);
-
-	vbox11 = gtk_vbox_new (FALSE, 0);
-	gtk_widget_show (vbox11);
-	gtk_container_add (GTK_CONTAINER (ab_frame), vbox11);
-	gtk_container_set_border_width (GTK_CONTAINER (vbox11), 5);
-
-        ab_box = gtk_hbox_new (FALSE, 0);
-	gtk_box_pack_start_defaults (GTK_BOX (vbox11), ab_box);
-        gtk_widget_show (ab_box);
-        label = gtk_label_new (_("Address book location"));
-        gtk_widget_show (label);
-        gtk_box_pack_start (GTK_BOX (ab_box), label, FALSE, FALSE, 5);
-
-	fileentry1 = gnome_file_entry_new ("ADDRESS-BOOK-FILE", 
-					   _("Select your address book file"));
-	gtk_widget_show (fileentry1);
-	gnome_file_entry_set_modal (GNOME_FILE_ENTRY (fileentry1), TRUE);
-        gtk_box_pack_start (GTK_BOX (ab_box), fileentry1, 
-                            TRUE, TRUE, 5);
-	
-	pui->ab_location = 
-		gnome_file_entry_gtk_entry (GNOME_FILE_ENTRY (fileentry1));
-
-	pui->alias_find_flag =
-                gtk_check_button_new_with_label ( _("Expand aliases as you type"));
-	gtk_widget_show(pui->alias_find_flag);
-	gtk_box_pack_start (GTK_BOX (vbox11), pui->alias_find_flag,
-                            FALSE, FALSE, 0);
-
 	return vbox9;
 }
 
@@ -1934,105 +1898,87 @@ create_startup_page ( )
 
 }
 
-
-#ifdef ENABLE_LDAP
-static void
-ldap_changed_cb(GtkWidget* widget, gpointer button)
+static GtkWidget *create_address_book_page ( void )
 {
-  gchar * host, *dn;
-  gint nstate;
-  host = gtk_editable_get_chars(GTK_EDITABLE(pui->ldap_host), 0, -1);
-  g_strstrip(host);
-  dn   = gtk_editable_get_chars(GTK_EDITABLE(pui->base_dn), 0, -1);
-  g_strstrip(dn);
-  nstate = *host && *dn;
-  if(!!GTK_WIDGET_IS_SENSITIVE(GTK_WIDGET(button)) != !!nstate)
-     gtk_widget_set_sensitive(GTK_WIDGET(button), nstate);
-  g_free(dn);
-  g_free(host);
-}
-
-static void
-ldap_test_wrapper_cb(GtkWidget* widget, gpointer data)
-{
-  gchar * host, *dn;
-  host = gtk_editable_get_chars(GTK_EDITABLE(pui->ldap_host), 0, -1);
-  g_strstrip(host);
-  dn   = gtk_editable_get_chars(GTK_EDITABLE(pui->base_dn), 0, -1);
-  g_strstrip(dn);
-
-  ldap_test(host, dn);
-  g_free(host);
-  g_free(dn);
-}
-
-static GtkWidget *
-create_ldap_page()
-{
-	GtkWidget *label;
-	GtkWidget *vbox1;
-	GtkWidget *frame;
 	GtkWidget *table;
+	GtkWidget *frame;
+	GtkWidget *hbox;
+	GtkWidget *scrolledwindow;
+	GtkWidget *label;
+	GtkWidget *vbox;
 	GtkWidget *button;
 
-	vbox1 = gtk_vbox_new ( FALSE, 0);
-	gtk_widget_show(vbox1);
-
-	frame = gtk_frame_new (_("LDAP Configuration"));
-	gtk_widget_show (frame);
-	gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
-	gtk_box_pack_start( GTK_BOX(vbox1), frame, FALSE, FALSE, 0);
-
-	table = gtk_table_new (3, 2, FALSE);
+	table = gtk_table_new (2, 1, FALSE);
 	gtk_widget_show (table);
-	gtk_container_add (GTK_CONTAINER (frame), table);
-	gtk_container_set_border_width (GTK_CONTAINER (table), 10);
-	gtk_table_set_row_spacings (GTK_TABLE (table), 10);
-	gtk_table_set_col_spacings (GTK_TABLE (table), 10);
 
-	label = gtk_label_new (_("LDAP Server:"));
-	gtk_widget_show (label);
-	gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
-	                  (GtkAttachOptions) (GTK_FILL),
-	                  (GtkAttachOptions) (0), 0, 0);
-	gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_RIGHT);
-
-	pui->ldap_host = gtk_entry_new ();
-	gtk_widget_show (pui->ldap_host);
-	gtk_table_attach (GTK_TABLE (table), pui->ldap_host, 1, 2, 0, 1,
-	                  (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-	                  (GtkAttachOptions) (0), 0, 0);
-
-	label = gtk_label_new (_("Base DN:"));
-	gtk_widget_show (label);
-	gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
-	                  (GtkAttachOptions) (GTK_FILL),
-	                  (GtkAttachOptions) (0), 0, 0);
-	gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_RIGHT);
-
-	pui->base_dn = gtk_entry_new ();
-	gtk_widget_show (pui->base_dn);
-	gtk_table_attach (GTK_TABLE (table), pui->base_dn, 1, 2, 1, 2,
-	                  (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-	                  (GtkAttachOptions) (0), 0, 0);
-
-	button = gtk_button_new_with_label (_("Test"));
-	gtk_widget_show (button);
-	gtk_table_attach (GTK_TABLE (table), button, 1, 2, 2, 3,
-	                  (GtkAttachOptions) (GTK_FILL),
-			  (GtkAttachOptions) (0), 0, 0);
-	gtk_signal_connect (GTK_OBJECT (button), "clicked",
-	                    ldap_test_wrapper_cb, NULL);
-	gtk_signal_connect(GTK_OBJECT(pui->ldap_host), "changed",
-				      ldap_changed_cb, button);
-	gtk_signal_connect(GTK_OBJECT(pui->base_dn), "changed",
-				      ldap_changed_cb, button);
+	frame = gtk_frame_new (_("Address Books"));
+	gtk_widget_show (frame);
+	gtk_table_attach (GTK_TABLE (table), frame, 0, 1, 0, 1,
+			  GTK_EXPAND | GTK_FILL,
+			  GTK_EXPAND | GTK_FILL, 0, 0);
+	gtk_widget_set_usize (frame, -2, 115);
+	gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 	
-	ldap_changed_cb(pui->ldap_host, button);
-	return vbox1;
+	hbox = gtk_hbox_new (FALSE, 0);
+	gtk_widget_show (hbox);
+	gtk_container_add (GTK_CONTAINER (frame), hbox);
+	
+	scrolledwindow = gtk_scrolled_window_new (NULL, NULL);
+	gtk_widget_show (scrolledwindow);
+	gtk_box_pack_start (GTK_BOX (hbox), scrolledwindow, TRUE, TRUE, 0);
+	gtk_container_set_border_width (GTK_CONTAINER (scrolledwindow), 5);
+	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow), GTK_POLICY_NEVER, GTK_POLICY_NEVER);
+	
+	pui->address_books = gtk_clist_new (2);
+	gtk_widget_show (pui->address_books);
+	gtk_container_add (GTK_CONTAINER (scrolledwindow), pui->address_books);
+	gtk_clist_set_column_width (GTK_CLIST (pui->address_books), 0, 48);
+	gtk_clist_set_column_width (GTK_CLIST (pui->address_books), 1, 80);
+	gtk_clist_column_titles_show (GTK_CLIST (pui->address_books));
+	
+	label = gtk_label_new (_("Type"));
+	gtk_widget_show (label);
+	gtk_clist_set_column_widget (GTK_CLIST (pui->address_books), 0, label);
+	
+	label = gtk_label_new (_("Address Book Name"));
+	gtk_widget_show (label);
+	gtk_clist_set_column_widget (GTK_CLIST (pui->address_books), 1, label);
+	gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_LEFT);
+
+	update_address_books ();
+	
+	vbox = gtk_vbox_new (FALSE, 6);
+	gtk_widget_show (vbox);
+	gtk_box_pack_start (GTK_BOX (hbox), vbox, FALSE, FALSE, 0);
+	gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);
+	
+	button = gtk_button_new_with_label (_("Add"));
+	gtk_signal_connect_object (GTK_OBJECT (button), "clicked",
+                                   GTK_SIGNAL_FUNC (address_book_add_cb), NULL);
+	gtk_widget_show (button);
+	gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 0);
+
+	button = gtk_button_new_with_label (_("Modify"));
+	gtk_signal_connect_object (GTK_OBJECT (button), "clicked",
+				   GTK_SIGNAL_FUNC (address_book_edit_cb), NULL);
+	gtk_widget_show (button);
+	gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 0);
+
+	button = gtk_button_new_with_label (_("Delete"));
+	gtk_signal_connect_object (GTK_OBJECT (button), "clicked",
+				   GTK_SIGNAL_FUNC (address_book_delete_cb), NULL);
+	gtk_widget_show (button);
+	gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 0);
+
+	button = gtk_button_new_with_label(_("Set as default"));
+	gtk_signal_connect(GTK_OBJECT(button), "clicked",
+			   GTK_SIGNAL_FUNC(set_default_address_book_cb), NULL);
+	gtk_widget_show(button);
+	gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 0);
+
+	return table;
+
 }
-#endif /* ENABLE_LDAP */
- 
 
 /*
  * callbacks
@@ -2081,6 +2027,88 @@ pop3_edit_cb (GtkWidget * widget, gpointer data)
 
 	mailbox_conf_new (mailbox, FALSE);
 }
+
+static void
+address_book_edit_cb (GtkWidget * widget, gpointer data)
+{
+	LibBalsaAddressBook *address_book;
+	GtkCList *clist = GTK_CLIST(pui->address_books);
+	gint row;
+
+	if (!clist->selection)
+		return;
+
+	row = GPOINTER_TO_INT (clist->selection->data);
+
+	address_book = LIBBALSA_ADDRESS_BOOK(gtk_clist_get_row_data (clist, row));
+
+	g_assert(address_book != NULL);
+
+	address_book = balsa_address_book_config_new(address_book);
+	if ( address_book ) {
+		config_address_book_save(address_book);
+		update_address_books();
+	}
+}
+
+static void
+set_default_address_book_cb(GtkWidget *button , gpointer data)
+{
+	LibBalsaAddressBook *address_book;
+	GtkCList *clist = GTK_CLIST(pui->address_books);
+	gint row;
+
+	if (!clist->selection)
+		return;
+
+	row = GPOINTER_TO_INT (clist->selection->data);
+
+	address_book = LIBBALSA_ADDRESS_BOOK(gtk_clist_get_row_data (clist, row));
+
+	g_assert(address_book != NULL);
+
+	balsa_app.default_address_book = address_book;
+
+	update_address_books();
+}
+
+static void
+address_book_add_cb (GtkWidget * widget, gpointer data)
+{
+	LibBalsaAddressBook *address_book;
+	address_book = balsa_address_book_config_new(NULL);
+	
+	if ( address_book != NULL ) {
+		balsa_app.address_book_list = g_list_append(balsa_app.address_book_list,address_book);
+		config_address_book_save(address_book);
+		update_address_books();
+	}
+}
+
+static void
+address_book_delete_cb (GtkWidget * widget, gpointer data)
+{
+	LibBalsaAddressBook *address_book;
+	GtkCList *clist = GTK_CLIST(pui->address_books);
+	gint row;
+
+	if (!clist->selection)
+		return;
+
+	row = GPOINTER_TO_INT (clist->selection->data);
+
+	address_book = LIBBALSA_ADDRESS_BOOK(gtk_clist_get_row_data (clist, row));
+
+	g_assert(address_book != NULL);
+
+	config_address_book_delete(address_book);
+	balsa_app.address_book_list = g_list_remove(balsa_app.address_book_list,address_book);
+
+	gtk_object_unref(GTK_OBJECT(address_book));
+
+	update_address_books();
+}
+
 
 static void
 pop3_add_cb (GtkWidget * widget, gpointer data)
@@ -2223,3 +2251,4 @@ create_information_message_menu (void)
 
   return menu;
 }
+

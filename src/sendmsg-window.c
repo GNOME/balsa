@@ -676,20 +676,11 @@ create_email_entry(GtkWidget* table, const gchar * label, int y_pos,
    gtk_drag_dest_set (GTK_WIDGET (arr[1]), GTK_DEST_DEFAULT_ALL,
 		     email_field_drop_types, ELEMENTS (email_field_drop_types),
 		     GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
-   /*
-    * These will make sure that we know about every key pressed.
-    */
-#if 0
-   gtk_signal_connect (GTK_OBJECT (arr[1]), "activate",
-		     GTK_SIGNAL_FUNC (to_check), arr[1]);
-#endif
-   if (balsa_app.alias_find_flag)
-   {
-      gtk_signal_connect (GTK_OBJECT (arr[1]), "key-press-event",
-                          GTK_SIGNAL_FUNC (key_pressed_cb), arr[1]);
-      gtk_signal_connect (GTK_OBJECT (arr[1]), "button-press-event",
-                          GTK_SIGNAL_FUNC (button_pressed_cb), arr[1]);
-   }
+
+   gtk_signal_connect (GTK_OBJECT (arr[1]), "key-press-event",
+		       GTK_SIGNAL_FUNC (key_pressed_cb), arr[1]);
+   gtk_signal_connect (GTK_OBJECT (arr[1]), "button-press-event",
+		       GTK_SIGNAL_FUNC (button_pressed_cb), arr[1]);
    /*
     * And these make sure we rescan the input if the user plays
     * around.
@@ -931,8 +922,8 @@ quoteBody(BalsaSendmsg *msg, LibBalsaMessage * message, SendType type)
 
    libbalsa_message_body_ref (message);
    
-   personStr = (message->from && message->from->personal) ?
-      message->from->personal : "you"; /* don't translate "you" here */
+   personStr = (message->from && message->from->full_name) ?
+      message->from->full_name : "you"; /* don't translate "you" here */
    
       /* Should use instead something like:
        * 	strftime( buf, sizeof(buf), _("On %A %B %d %Y etc"),
@@ -942,13 +933,13 @@ quoteBody(BalsaSendmsg *msg, LibBalsaMessage * message, SendType type)
        */
    if(message->date) {
       date = libbalsa_message_date_to_gchar (message, balsa_app.date_string);
-      if(message->from && message->from->personal)
+      if(message->from && message->from->full_name)
          str = g_strdup_printf (_("On %s %s wrote:\n"), date, personStr);
       else
          str = g_strdup_printf (_("On %s you wrote:\n"), date);
       g_free(date);
    } else
-      if(message->from && message->from->personal)
+      if(message->from && message->from->full_name)
          str = g_strdup_printf (_("%s wrote:\n"), personStr); 
       else
          str = g_strdup_printf (_("You wrote:\n"));
@@ -1020,8 +1011,7 @@ sendmsg_window_new (GtkWidget * widget, LibBalsaMessage * message, SendType type
   msg->charset = NULL;
 
 
-   if (balsa_app.alias_find_flag)
-      alias_load_addressbook();
+  alias_load_addressbook();
   
   switch (type)
     {
@@ -1112,8 +1102,8 @@ sendmsg_window_new (GtkWidget * widget, LibBalsaMessage * message, SendType type
   /* From: */
   {
     gchar *from;
-    from = g_strdup_printf ("%s <%s>", balsa_app.address->personal, 
-			    balsa_app.address->mailbox);
+    from = g_strdup_printf ("%s <%s>", balsa_app.address->full_name, 
+			    (gchar*)balsa_app.address->address_list->data);
     gtk_entry_set_text (GTK_ENTRY (msg->from[1]), from);
     g_free (from);
   }
@@ -1160,15 +1150,15 @@ sendmsg_window_new (GtkWidget * widget, LibBalsaMessage * message, SendType type
 	
      case SEND_FORWARD:
 	if (!message->subject) {
-	   if (message->from && message->from->mailbox)
+	   if (message->from && message->from->address_list)
 	      newsubject = g_strdup_printf ("Forwarded message from %s", 
-					    message->from->mailbox);
+					    (gchar*)message->from->address_list->data);
 	   else
 	      newsubject = g_strdup ("Forwarded message");	  
 	} else {
-	   if (message->from && message->from->mailbox)
+	   if (message->from && message->from->address_list)
 	      newsubject = g_strdup_printf ("[%s: %s]", 
-					    message->from->mailbox, 
+					    (gchar*)message->from->address_list->data, 
 					    message->subject);
 	   else
 	      newsubject = g_strdup_printf ("Fwd: %s", message->subject);
@@ -1438,7 +1428,7 @@ bsmsg2message(BalsaSendmsg *bsmsg)
     strftime (recvtime, sizeof (recvtime), "%a, %b %d, %Y at %H:%M:%S %z", footime);
     message->in_reply_to = g_strconcat (bsmsg->orig_message->message_id, 
                                         "; from ", 
-                                        bsmsg->orig_message->from->mailbox, 
+                                        (gchar*)bsmsg->orig_message->from->address_list->data, 
                                         " on ", 
                                         recvtime, 
                                         NULL);

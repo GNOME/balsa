@@ -42,7 +42,8 @@
 #include "main.h"
 #include "expand-alias.h"
 
-#define CASE_INSENSITIVE_NAME
+/* FIXME: Reimplement Case insensitive stuff */
+/*  #define CASE_INSENSITIVE_NAME */
 #define PRESERVE_CASE TRUE
 #define OVERWRITE_CASE FALSE
 
@@ -85,8 +86,8 @@ typedef struct {
 /*
  * Function prototypes or something...
  */
-static gchar* extract_name_from_address (AddressData* data);
-static gchar* extract_alias_from_address (AddressData* data);
+static gchar* extract_name_from_address (LibBalsaAddress* data);
+static gchar* extract_alias_from_address (LibBalsaAddress* data);
 static gchar* expand_input(gchar **input, gint *tabs);
 static void clip_expand_cursor (inputData *input);
 static void expand_input_wrapper (inputData *input, gboolean preserve);
@@ -119,22 +120,14 @@ static GCompletion* complete_alias = NULL;
 /*
  * extract_name_from_address()
  *
- * Takes an AddressData* and returns the name associated with that.
+ * Takes an LibBalsaAddress* and returns the name associated with that.
  * This callback is called from GCompletion.
  */
 static gchar*
-extract_name_from_address(AddressData* data)
+extract_name_from_address(LibBalsaAddress* data)
 {
-   AddressData *tmp;
-
-   tmp = (AddressData *)data;
-#ifdef CASE_INSENSITIVE_NAME
-   return tmp->upper;
-#else
-   return tmp->name;
-#endif /* CASE_INSENSITIVE_NAME */
+   return data->full_name;
 }
-
 
 /*
  * extract_name_from_address()
@@ -143,12 +136,9 @@ extract_name_from_address(AddressData* data)
  * This callback is called from GCompletion.
  */
 static gchar*
-extract_alias_from_address(AddressData* data)
+extract_alias_from_address(LibBalsaAddress* data)
 {
-   AddressData *tmp;
-
-   tmp = (AddressData *)data;
-   return tmp->id;
+   return data->id;
 }
 
 
@@ -203,9 +193,8 @@ expand_input(gchar **input, gint *tabs)
    GList *match = NULL;      /* A list of matches.         */
    GList *search = NULL;     /* Used to search the list.   */
    gchar *output = NULL;     /* We return this.            */
-   AddressData *addr = NULL; /* Process the list data.     */
+   LibBalsaAddress *addr = NULL; /* Process the list data.     */
    gint i;                   /* A counter for the tabs.    */
-   gchar *str = NULL;
 
    if (strlen(*input) > 0)
    {
@@ -224,8 +213,8 @@ expand_input(gchar **input, gint *tabs)
 	 i = *tabs;
 	 if ((i == 1) && (strlen(prefix) > strlen(*input)))
 	 {
-	    addr = (AddressData *)match->data;
-            output = g_strdup_printf("%s <%s>", addr->name, addr->addy);
+	    addr = LIBBALSA_ADDRESS(match->data);
+            output = g_strdup_printf("%s <%s>", addr->full_name, (gchar*)addr->address_list->data);
 	    g_free (*input);
 	    if (g_list_next (match))
 	       *input = g_strndup (output, strlen (prefix));
@@ -241,8 +230,8 @@ expand_input(gchar **input, gint *tabs)
 	          search = match;
 	       }
 	    }
-	    addr = (AddressData *)search->data;
-            output = g_strdup_printf("%s <%s>", addr->name, addr->addy);
+	    addr = LIBBALSA_ADDRESS(search->data);
+            output = g_strdup_printf("%s <%s>", addr->full_name, (gchar*)addr->address_list->data);
 	 }
       } else {
 	 output = NULL;
@@ -959,27 +948,14 @@ destroy_cb(GtkWidget *widget,
    gtk_object_set_data (GTK_OBJECT (widget), "old_input", (gpointer) data);
 }
 
-
-/*
- * alias_free_addressbook ()
- *
- * Input: None.
- * Output: None.
- * 
- * Frees all the data allocated for the GCompletion functions/
- * Move to src/adddress-book.c?
- */
 void
-alias_free_addressbook (void)
+alias_free_addressbook(void)
 {
-    if (addresses)
-    {
-       g_list_foreach (addresses, (GFunc) address_data_free, NULL);
-       g_list_free (addresses);
-    }
-    addresses = NULL;
+	if ( addresses )
+		g_list_foreach(addresses, (GFunc)gtk_object_unref, NULL);
+	g_list_free(addresses);
+	addresses = NULL;
 }
-
 
 /*
  * alias_load_addressbook ()
@@ -987,9 +963,9 @@ alias_free_addressbook (void)
  * Input: None.
  * Output: None.
  * 
- * Load the addresses.  This means that if the addressbook is modified
- * while we the user composes a messages, the old addressbook is used
- * for alias expansion.
+ * Load the addresses. We take a copy of the list - This means that if
+ * the addressbook is modified while we the user composes a messages, 
+ * the old addressbook is used for alias expansion.
  *
  * The alternative is to load it with every keystroke (really slow)
  * or program the addresses with a caching structure (lots of work)
@@ -997,15 +973,44 @@ alias_free_addressbook (void)
 void
 alias_load_addressbook (void)
 {
-    alias_free_addressbook ();
-    addresses = ab_load_addresses (FALSE);
-    if (complete_name) g_completion_free (complete_name);
-    if (complete_alias) g_completion_free (complete_alias);
+    GList *list;
+    LibBalsaAddressBook *address_book;
+
+    alias_free_addressbook();
+
+    addresses = NULL;
+
+    list = balsa_app.address_book_list;
+    while(list) {
+	    address_book = LIBBALSA_ADDRESS_BOOK(list->data);
+
+	    if ( address_book->expand_aliases ) {
+		    GList *l;
+
+		    libbalsa_address_book_load(address_book);
+		    l = g_list_copy(address_book->address_list);
+		    addresses = g_list_concat(addresses, l);
+	    }
+	    list = g_list_next(list);
+    }
+
+    if ( addresses )
+	    g_list_foreach(addresses, (GFunc)gtk_object_ref, NULL);
+
+    if (complete_name)
+	    g_completion_free (complete_name);
+
+    if (complete_alias)
+	    g_completion_free (complete_alias);
+
     complete_name = g_completion_new (
                     (GCompletionFunc) extract_name_from_address);
+
     g_completion_add_items(complete_name, addresses);
+
     complete_alias = g_completion_new (
                      (GCompletionFunc) extract_alias_from_address);
+
     g_completion_add_items(complete_alias, addresses);
 }
   

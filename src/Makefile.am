@@ -3,6 +3,8 @@ bin_PROGRAMS = balsa
 balsa_BASE_SOURCES =	\
 	address-book.c		\
 	address-book.h		\
+	address-book-config.c	\
+	address-book-config.h	\
 	balsa-app.c		\
 	balsa-app.h		\
 	balsa-icons.c		\
@@ -42,14 +44,13 @@ balsa_BASE_SOURCES =	\
 	save-restore.h		\
 	sendmsg-window.c	\
 	sendmsg-window.h	\
+	store-address.h		\
+	store-address.c		\
 	quote-color.c		\
 	quote-color.h		\
 	threads.h		\
 	spell-check.c		\
-	spell-check.h		\
-	ldap-addressbook.c	\
-	ldap-addressbook.h 	
-#	index-child.h		\
+	spell-check.h		
 
 balsa_IDL_SOURCES = \
 	balsa-common.c		\

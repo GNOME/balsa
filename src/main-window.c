@@ -50,6 +50,7 @@
 #include "print.h"
 #include "address-book.h"
 #include "save-restore.h" /*mailbox_get_pkey*/
+#include "store-address.h"
 
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
@@ -1467,7 +1468,7 @@ store_address_cb(GtkWidget * widget, gpointer data)
        g_free(msg);
        return;
     }
-    balsa_message_store_address(widget, balsa_window_find_current_index (BALSA_WINDOW (data)));
+    balsa_store_address(widget, balsa_window_find_current_index (BALSA_WINDOW (data)));
 }
 
 static void

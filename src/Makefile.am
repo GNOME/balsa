@@ -16,9 +16,26 @@ balsa_SOURCES =	\
 	message-window.c	\
 	pref-manager.c		\
 	save-restore.c		\
-	sendmsg-window.c
+	sendmsg-window.c	\
+	balsa-app.h		\
+	balsa-index.h		\
+	balsa-init.h		\
+	balsa-message.h		\
+	filter-edit.h		\
+	index-child.h		\
+	local-mailbox.h		\
+	mailbox-conf.h		\
+	mailbox-manager.h	\
+	main-window.h		\
+	main.h			\
+	mblist-window.h		\
+	message-window.h	\
+	pref-manager.h		\
+	save-restore.h		\
+	sendmsg-window.h
 
-INCLUDES=-I. -I${top_srcdir}/libbalsa -I${top_srcdir}/libmutt $(GNOME_INCLUDEDIR)
+
+INCLUDES=-I. -I${top_srcdir}/libbalsa -I${top_srcdir} $(GNOME_INCLUDEDIR)
 
 balsa_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a \
@@ -29,3 +46,7 @@ balsa_LDADD = \
 	$(GNOMEUI_LIBS) \
 	$(GTKXMHTML_LIBS) \
 	$(INTLLIBS)
+
+dist-hook:
+	mkdir $(distdir)/pixmaps
+	cp $(srcdir)/pixmaps/*.xpm $(distdir)/pixmaps

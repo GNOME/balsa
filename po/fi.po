@@ -2,7 +2,7 @@
 # Copyright (C) YEAR Free Software Foundation, Inc.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
+# , fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -16,7 +16,7 @@ msgstr ""
 
 #: src/balsa-index.c:184
 msgid "From"
-msgstr "Lähettäjä"
+msgstr "L\344hett\344j\344"
 
 #: src/balsa-index.c:185
 msgid "Subject"
@@ -24,7 +24,7 @@ msgstr "Otsikko"
 
 #: src/balsa-index.c:186
 msgid "Date"
-msgstr "Päiväys"
+msgstr "P\344iv\344ys"
 
 #: src/balsa-init.c:101
 msgid "Welcome To Balsa!"
@@ -38,8 +38,8 @@ msgstr "Edellinen..."
 msgid "Next..."
 msgstr "Seuraava..."
 
+# , fuzzy
 #: src/balsa-init.c:179
-#, fuzzy
 msgid ""
 "Welcome to Balsa!\n"
 "\n"
@@ -50,20 +50,15 @@ msgid "You seem to be running Balsa for the first time.\n"
 msgstr ""
 
 #: src/balsa-init.c:182
-msgid ""
-"The following steps will setup Balsa by asking a few simple questions.  "
+msgid "The following steps will setup Balsa by asking a few simple questions.  "
 msgstr ""
 
 #: src/balsa-init.c:183
-msgid ""
-"Once you have completed these steps, you can always change them at a later "
-"time through Balsa's preferences.  "
+msgid "Once you have completed these steps, you can always change them at a later time through Balsa's preferences.  "
 msgstr ""
 
 #: src/balsa-init.c:184
-msgid ""
-"Please check the about box in Balsa's main window for more information on "
-"contacting the authors or reporting bugs."
+msgid "Please check the about box in Balsa's main window for more information on contacting the authors or reporting bugs."
 msgstr ""
 
 #. your name
@@ -74,7 +69,7 @@ msgstr "Nimesi:"
 #. email address
 #: src/balsa-init.c:246 src/pref-manager.c:325
 msgid "E-Mail address:"
-msgstr "Sähköpostiosoitteesi:"
+msgstr "S\344hk\366postiosoitteesi:"
 
 #. smtp server
 #: src/balsa-init.c:261 src/pref-manager.c:335
@@ -87,7 +82,7 @@ msgstr "Hakemistopolku saapuville viesteille:"
 
 #: src/balsa-init.c:315
 msgid "Outbox Path:"
-msgstr "Hakemistopolku lähtevälle viesteille:"
+msgstr "Hakemistopolku l\344htev\344lle viesteille:"
 
 #: src/balsa-init.c:327
 msgid "Trash Path:"
@@ -115,9 +110,10 @@ msgstr ""
 msgid "Unable to Open Mailbox!"
 msgstr "Postilaatikkoa ei saatu auki!"
 
+#. FIXME
 #: src/index-child.c:218
 msgid "Transfer"
-msgstr "Siirrä"
+msgstr "Siirr\344"
 
 #: src/index-child.c:234
 msgid "Change Status"
@@ -137,7 +133,7 @@ msgstr "Vastattu"
 
 #: src/index-child.c:255
 msgid "Forwarded"
-msgstr "Edelleenlähetetty"
+msgstr "Edelleenl\344hetetty"
 
 #: src/index-child.c:264 src/main-window.c:245 src/main-window.c:408
 msgid "Delete"
@@ -147,8 +143,8 @@ msgstr "Poista"
 msgid "Undelete"
 msgstr "Palauta poistettu"
 
+# , c-format
 #: src/local-mailbox.c:125
-#, c-format
 msgid "Local Mailbox Loaded as: %s\n"
 msgstr "Paikallinen postilaatikko ladattu: %s\n"
 
@@ -165,13 +161,13 @@ msgid ""
 "Are you sure you want to remove this mailbox?"
 msgstr ""
 
+# , fuzzy
 #: src/mailbox-conf.c:227
-#, fuzzy
 msgid "Mailbox Configurator"
-msgstr "Postilaatikon käsittelijä"
+msgstr "Postilaatikon k\344sittelij\344"
 
+# , c-format
 #: src/mailbox-conf.c:449
-#, c-format
 msgid "Cannot create mailbox '%s': %s\n"
 msgstr ""
 
@@ -193,7 +189,7 @@ msgstr "Palvelin"
 
 #: src/mailbox-manager.c:86
 msgid "Mailbox Manager"
-msgstr "Postilaatikon käsittelijä"
+msgstr "Postilaatikon k\344sittelij\344"
 
 #. edit account button
 #: src/mailbox-manager.c:140
@@ -205,7 +201,6 @@ msgstr "Muokkaa tunnusta..."
 msgid "New..."
 msgstr "Uusi tunnus..."
 
-#. delete account button
 #: src/mailbox-manager.c:166
 msgid "Delete..."
 msgstr "Tuhoa tunnus..."
@@ -240,7 +235,7 @@ msgstr "Vastaa"
 
 #: src/main-window.c:229 src/main-window.c:444 src/main-window.c:445
 msgid "Forward"
-msgstr "Lähetä edelleen"
+msgstr "L\344het\344 edelleen"
 
 #: src/main-window.c:272 src/sendmsg-window.c:166
 msgid "Message"
@@ -291,8 +286,8 @@ msgstr "Ohje"
 msgid "Check"
 msgstr "Tarkista"
 
+# , fuzzy
 #: src/main-window.c:395
-#, fuzzy
 msgid "Check Email"
 msgstr "Tarkista"
 
@@ -326,34 +321,31 @@ msgstr "Avaa Seuraava Viesti"
 
 #: src/main-window.c:507
 msgid ""
-"The Balsa email client is part of the GNOME desktop environment.  "
-"Information on Balsa can be found at http://www.balsa.net/\n"
+"The Balsa email client is part of the GNOME desktop environment.  Information on Balsa can be found at http://www.balsa.net/\n"
 "\n"
-"If you need to report bugs, please do so at: "
-"http://www.gnome.org/cgi-bin/bugs"
+"If you need to report bugs, please do so at: http://www.gnome.org/cgi-bin/bugs"
 msgstr ""
 
+# , fuzzy
 #: src/mblist-window.c:488
-#, fuzzy
 msgid "Add Mailbox"
 msgstr "Postilaatikot"
 
+# , fuzzy
 #: src/mblist-window.c:494
-#, fuzzy
 msgid "Edit Mailbox"
 msgstr "Postilaatikot"
 
+# , fuzzy
 #: src/mblist-window.c:500
-#, fuzzy
 msgid "Delete Mailbox"
 msgstr "Postilaatikkoa ei saatu auki!"
 
 #. identity page
 #: src/pref-manager.c:123
 msgid "Identity"
-msgstr "Henkilötiedot"
+msgstr "Henkil\366tiedot"
 
-#. view page
 #: src/pref-manager.c:137
 msgid "View"
 msgstr "Tarkemmat tiedot"
@@ -370,19 +362,19 @@ msgstr "Paikallinen hakemisto viesteille:"
 #. Toolbars
 #: src/pref-manager.c:393
 msgid "Toolbars"
-msgstr "Työkalut"
+msgstr "Ty\366kalut"
 
 #: src/pref-manager.c:413
 msgid "Debug"
-msgstr "Virheenetsintä"
+msgstr "Virheenetsint\344"
 
 #: src/sendmsg-window.c:71 src/sendmsg-window.c:136
 msgid "Send"
-msgstr "Lähetä"
+msgstr "L\344het\344"
 
 #: src/sendmsg-window.c:147
 msgid "Attach File"
-msgstr "Liitä tiedosto"
+msgstr "Liit\344 tiedosto"
 
 #: src/sendmsg-window.c:173
 msgid "Cut"
@@ -402,7 +394,7 @@ msgstr "Muokkaa"
 
 #: src/sendmsg-window.c:202
 msgid "Contents"
-msgstr "Sisällys"
+msgstr "Sis\344llys"
 
 #: src/sendmsg-window.c:253
 msgid "New message"
@@ -410,66 +402,23 @@ msgstr "Uusi viesti"
 
 #: src/sendmsg-window.c:266
 msgid "Reply to "
-msgstr "Vastaukset lähetetään "
+msgstr "Vastaukset l\344hetet\344\344n "
 
 #: src/sendmsg-window.c:279
 msgid "Forward message"
-msgstr "lähetä viesti edelleen"
+msgstr "l\344het\344 viesti edelleen"
 
+# , c-format
 #: libbalsa/mailbox.c:452
-#, c-format
 msgid "Mailbox: Opening %s Refcount: %d\n"
 msgstr "Avaamassa postilaatikkoa %s, viittauksia %d\n"
 
+# , c-format
 #: libbalsa/mailbox.c:478
-#, c-format
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr "Sulkemassa postilaatikkoa %s, viittauksia %d\n"
 
+# , c-format
 #: libbalsa/mailbox.c:1340
-#, c-format
 msgid "Loading message: %s/%s\n"
-msgstr "Lataan viestiä: %s/%s\n"
-
-#~ msgid ""
-#~ "Welcome to Balsa!  The following steps will help you get setup to use Balsa."
-#~ msgstr "Tervetuloa Balsaan! Täytä seuraavat tiedot käyttääksesi Balsaa."
-
-#~ msgid "Balsa is now ready to run.  Click finish to save your settings"
-#~ msgstr "Balsa on nyt valmiina. Paina 'tallenna' jatkaaksesi"
-
-#~ msgid "Finish"
-#~ msgstr "Tallenna"
-
-#~ msgid "we are deleting the window, not saving, lets quit now\n"
-#~ msgstr "Ikkunaa ollaan tuhoamassa tallentamatta, poistutaan heti\n"
-
-#~ msgid "Mailbox Manager..."
-#~ msgstr "Postilaatikon käsittelijä..."
-
-#~ msgid "Balsa is a E-Mail Client"
-#~ msgstr "Balsa on sähköpostiohjelma"
-
-#~ msgid "Preferences"
-#~ msgstr "Valinnat"
-
-#~ msgid "Organization:"
-#~ msgstr "Organisaatio:"
-
-#~ msgid "Show as Text"
-#~ msgstr "Näytä tekstinä"
-
-#~ msgid "Show as Images"
-#~ msgstr "Näytä kuvina"
-
-#~ msgid "Show as Text and Images"
-#~ msgstr "Näytä tekstinä ja kuvina"
-
-#~ msgid "Notebook"
-#~ msgstr "Muistikirja"
-
-#~ msgid "Toplevel"
-#~ msgstr "Ylin taso"
-
-#~ msgid "Modal"
-#~ msgstr "Modaali"
+msgstr "Lataan viesti\344: %s/%s\n"

@@ -19,7 +19,7 @@
 
 #include "config.h"
 
-#include "mutt.h"
+#include "libmutt/mutt.h"
 
 #define obstack_chunk_alloc g_malloc
 #define obstack_chunk_free  g_free

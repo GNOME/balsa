@@ -2,7 +2,7 @@
 # Copyright (C) 1998 Free Software Foundation, Inc.
 # Sung-Hyun Nam <namsh@lgic.co.kr>
 #
-#, fuzzy
+# , fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.4.0\n"
@@ -20,66 +20,61 @@ msgstr ""
 
 #: src/balsa-index.c:185
 msgid "Subject"
-msgstr "제목"
+msgstr "\301\246\270\361"
 
 #: src/balsa-index.c:186
 msgid "Date"
-msgstr "날짜"
+msgstr "\263\257\302\245"
 
 #: src/balsa-init.c:101
 msgid "Welcome To Balsa!"
-msgstr "Balsa 사용을 환영합니다!"
+msgstr "Balsa \273\347\277\353\300\273 \310\257\277\265\307\325\264\317\264\331!"
 
 #: src/balsa-init.c:151
 msgid "Previous..."
-msgstr "이전..."
+msgstr "\300\314\300\374..."
 
 #: src/balsa-init.c:162
 msgid "Next..."
-msgstr "다음..."
+msgstr "\264\331\300\275..."
 
+# , fuzzy
 #: src/balsa-init.c:179
-#, fuzzy
 msgid ""
 "Welcome to Balsa!\n"
 "\n"
-msgstr "Balsa 사용을 환영합니다!"
+msgstr "Balsa \273\347\277\353\300\273 \310\257\277\265\307\325\264\317\264\331!"
 
 #: src/balsa-init.c:181
 msgid "You seem to be running Balsa for the first time.\n"
 msgstr ""
 
 #: src/balsa-init.c:182
-msgid ""
-"The following steps will setup Balsa by asking a few simple questions.  "
+msgid "The following steps will setup Balsa by asking a few simple questions.  "
 msgstr ""
 
 #: src/balsa-init.c:183
-msgid ""
-"Once you have completed these steps, you can always change them at a later "
-"time through Balsa's preferences.  "
+msgid "Once you have completed these steps, you can always change them at a later time through Balsa's preferences.  "
 msgstr ""
 
 #: src/balsa-init.c:184
-msgid ""
-"Please check the about box in Balsa's main window for more information on "
-"contacting the authors or reporting bugs."
+msgid "Please check the about box in Balsa's main window for more information on contacting the authors or reporting bugs."
 msgstr ""
 
 #. your name
 #: src/balsa-init.c:232 src/pref-manager.c:315
 msgid "Your name:"
-msgstr "성명:"
+msgstr "\274\272\270\355:"
 
 #. email address
 #: src/balsa-init.c:246 src/pref-manager.c:325
 msgid "E-Mail address:"
-msgstr "전자우편 주소:"
+msgstr "\300\374\300\332\277\354\306\355 \301\326\274\322:"
 
 #. smtp server
 #: src/balsa-init.c:261 src/pref-manager.c:335
 msgid "SMTP server:"
-msgstr "SMTP 서버:"
+msgstr "SMTP \274\255\271\366:"
 
 #: src/balsa-init.c:303
 msgid "Inbox Path:"
@@ -113,8 +108,9 @@ msgstr ""
 
 #: src/index-child.c:95
 msgid "Unable to Open Mailbox!"
-msgstr "메일박스를 열수 없습니다!"
+msgstr "\270\336\300\317\271\332\275\272\270\246 \277\255\274\366 \276\370\275\300\264\317\264\331!"
 
+#. FIXME
 #: src/index-child.c:218
 msgid "Transfer"
 msgstr ""
@@ -147,8 +143,8 @@ msgstr ""
 msgid "Undelete"
 msgstr ""
 
+# , c-format
 #: src/local-mailbox.c:125
-#, c-format
 msgid "Local Mailbox Loaded as: %s\n"
 msgstr ""
 
@@ -165,13 +161,13 @@ msgid ""
 "Are you sure you want to remove this mailbox?"
 msgstr ""
 
+# , fuzzy
 #: src/mailbox-conf.c:227
-#, fuzzy
 msgid "Mailbox Configurator"
-msgstr "메일박스 관리자"
+msgstr "\270\336\300\317\271\332\275\272 \260\374\270\256\300\332"
 
+# , c-format
 #: src/mailbox-conf.c:449
-#, c-format
 msgid "Cannot create mailbox '%s': %s\n"
 msgstr ""
 
@@ -189,30 +185,29 @@ msgstr ""
 
 #: src/mailbox-manager.c:71
 msgid "Server"
-msgstr "서버"
+msgstr "\274\255\271\366"
 
 #: src/mailbox-manager.c:86
 msgid "Mailbox Manager"
-msgstr "메일박스 관리자"
+msgstr "\270\336\300\317\271\332\275\272 \260\374\270\256\300\332"
 
 #. edit account button
 #: src/mailbox-manager.c:140
 msgid "Edit..."
-msgstr "편집..."
+msgstr "\306\355\301\375..."
 
 #. edit account button
 #: src/mailbox-manager.c:153
 msgid "New..."
-msgstr "새 메일박스..."
+msgstr "\273\365 \270\336\300\317\271\332\275\272..."
 
-#. delete account button
 #: src/mailbox-manager.c:166
 msgid "Delete..."
-msgstr "삭제..."
+msgstr "\273\350\301\246..."
 
 #: src/main-window.c:88
 msgid "Mailboxes/<Separator>"
-msgstr "메일박스/<Separator>"
+msgstr "\270\336\300\317\271\332\275\272/<Separator>"
 
 #: src/main-window.c:149
 msgid "Get New Mail"
@@ -224,15 +219,15 @@ msgstr ""
 
 #: src/main-window.c:181
 msgid "Exit"
-msgstr "끝내기"
+msgstr "\263\241\263\273\261\342"
 
 #: src/main-window.c:193
 msgid "File"
-msgstr "파일"
+msgstr "\306\304\300\317"
 
 #: src/main-window.c:203
 msgid "New"
-msgstr "새 메시지"
+msgstr "\273\365 \270\336\275\303\301\366"
 
 #: src/main-window.c:216 src/main-window.c:433 src/main-window.c:434
 msgid "Reply"
@@ -244,24 +239,24 @@ msgstr ""
 
 #: src/main-window.c:272 src/sendmsg-window.c:166
 msgid "Message"
-msgstr "메시지"
+msgstr "\270\336\275\303\301\366"
 
 #: src/main-window.c:280
 msgid "Mailbox List"
-msgstr "메일박스 목록"
+msgstr "\270\336\300\317\271\332\275\272 \270\361\267\317"
 
 #: src/main-window.c:291 src/sendmsg-window.c:158
 msgid "Close"
-msgstr "닫기"
+msgstr "\264\335\261\342"
 
 #. mailboxes page
 #: src/main-window.c:306 src/pref-manager.c:130
 msgid "Mailboxes"
-msgstr "메일박스"
+msgstr "\270\336\300\317\271\332\275\272"
 
 #: src/main-window.c:315
 msgid "Preferences..."
-msgstr "속성..."
+msgstr "\274\323\274\272..."
 
 #.
 #. w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Mailbox Manager..."));
@@ -277,15 +272,15 @@ msgstr "속성..."
 #.
 #: src/main-window.c:338
 msgid "Settings"
-msgstr "설정"
+msgstr "\274\263\301\244"
 
 #: src/main-window.c:346
 msgid "About"
-msgstr "이 프로그램은"
+msgstr "\300\314 \307\301\267\316\261\327\267\245\300\272"
 
 #: src/main-window.c:359 src/sendmsg-window.c:207
 msgid "Help"
-msgstr "도움말"
+msgstr "\265\265\277\362\270\273"
 
 #: src/main-window.c:394
 msgid "Check"
@@ -309,50 +304,47 @@ msgstr ""
 
 #: src/main-window.c:458
 msgid "Previous"
-msgstr "이전"
+msgstr "\300\314\300\374"
 
 #: src/main-window.c:459
 msgid "Open Previous Message"
-msgstr "이전 메시지 열기"
+msgstr "\300\314\300\374 \270\336\275\303\301\366 \277\255\261\342"
 
 #: src/main-window.c:469
 msgid "Next"
-msgstr "다음"
+msgstr "\264\331\300\275"
 
 #: src/main-window.c:470
 msgid "Open Next Message"
-msgstr "다음 메시지 열기"
+msgstr "\264\331\300\275 \270\336\275\303\301\366 \277\255\261\342"
 
 #: src/main-window.c:507
 msgid ""
-"The Balsa email client is part of the GNOME desktop environment.  "
-"Information on Balsa can be found at http://www.balsa.net/\n"
+"The Balsa email client is part of the GNOME desktop environment.  Information on Balsa can be found at http://www.balsa.net/\n"
 "\n"
-"If you need to report bugs, please do so at: "
-"http://www.gnome.org/cgi-bin/bugs"
+"If you need to report bugs, please do so at: http://www.gnome.org/cgi-bin/bugs"
 msgstr ""
 
+# , fuzzy
 #: src/mblist-window.c:488
-#, fuzzy
 msgid "Add Mailbox"
-msgstr "메일박스"
+msgstr "\270\336\300\317\271\332\275\272"
 
+# , fuzzy
 #: src/mblist-window.c:494
-#, fuzzy
 msgid "Edit Mailbox"
-msgstr "메일박스"
+msgstr "\270\336\300\317\271\332\275\272"
 
+# , fuzzy
 #: src/mblist-window.c:500
-#, fuzzy
 msgid "Delete Mailbox"
-msgstr "메일박스를 열수 없습니다!"
+msgstr "\270\336\300\317\271\332\275\272\270\246 \277\255\274\366 \276\370\275\300\264\317\264\331!"
 
 #. identity page
 #: src/pref-manager.c:123
 msgid "Identity"
 msgstr ""
 
-#. view page
 #: src/pref-manager.c:137
 msgid "View"
 msgstr ""
@@ -369,7 +361,7 @@ msgstr ""
 #. Toolbars
 #: src/pref-manager.c:393
 msgid "Toolbars"
-msgstr "툴바"
+msgstr "\305\370\271\331"
 
 #: src/pref-manager.c:413
 msgid "Debug"
@@ -385,19 +377,19 @@ msgstr ""
 
 #: src/sendmsg-window.c:173
 msgid "Cut"
-msgstr "자르기"
+msgstr "\300\332\270\243\261\342"
 
 #: src/sendmsg-window.c:180
 msgid "Copy"
-msgstr "복사"
+msgstr "\272\271\273\347"
 
 #: src/sendmsg-window.c:187
 msgid "Paste"
-msgstr "붙이기"
+msgstr "\272\331\300\314\261\342"
 
 #: src/sendmsg-window.c:194
 msgid "Edit"
-msgstr "편집"
+msgstr "\306\355\301\375"
 
 #: src/sendmsg-window.c:202
 msgid "Contents"
@@ -405,7 +397,7 @@ msgstr ""
 
 #: src/sendmsg-window.c:253
 msgid "New message"
-msgstr "새 메시지"
+msgstr "\273\365 \270\336\275\303\301\366"
 
 #: src/sendmsg-window.c:266
 msgid "Reply to "
@@ -415,51 +407,17 @@ msgstr ""
 msgid "Forward message"
 msgstr ""
 
+# , c-format
 #: libbalsa/mailbox.c:452
-#, c-format
 msgid "Mailbox: Opening %s Refcount: %d\n"
 msgstr ""
 
+# , c-format
 #: libbalsa/mailbox.c:478
-#, c-format
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr ""
 
+# , c-format
 #: libbalsa/mailbox.c:1340
-#, c-format
 msgid "Loading message: %s/%s\n"
 msgstr ""
-
-#~ msgid ""
-#~ "Welcome to Balsa!  The following steps will help you get setup to use Balsa."
-#~ msgstr ""
-#~ "Balsa 사용을 환영합니다. 다음 단계에서 balsa 사용을 위해 설정을 도와줄 "
-#~ "겁니다."
-
-#~ msgid "Balsa is now ready to run.  Click finish to save your settings"
-#~ msgstr ""
-#~ "Balsa가 실행될 준비가 끝났읍니다. 설정 저장을 위해 끝 버튼을 누르세요"
-
-#~ msgid "Finish"
-#~ msgstr "끝"
-
-#~ msgid "we are deleting the window, not saving, lets quit now\n"
-#~ msgstr "저장하지 않은 상태에서 창을 닫는 중입니다. 이제 종료합니다\n"
-
-#~ msgid "Mailbox Manager..."
-#~ msgstr "메일박스 관리자..."
-
-#~ msgid "Balsa is a E-Mail Client"
-#~ msgstr "Balsa는 전자우편 클라이언트입니다"
-
-#~ msgid "Preferences"
-#~ msgstr "속성"
-
-#~ msgid "Show as Text"
-#~ msgstr "텍스트로 표시"
-
-#~ msgid "Show as Images"
-#~ msgstr "그림으로 표시"
-
-#~ msgid "Show as Text and Images"
-#~ msgstr "텍스트와 그림으로 표시"

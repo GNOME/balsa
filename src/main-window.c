@@ -256,7 +256,7 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
 
 
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_UNDELETE, _ ("Undelete"));
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_TRASH, _ ("Undelete"));
   gtk_widget_show (w);
 
   gtk_signal_connect (GTK_OBJECT (w),

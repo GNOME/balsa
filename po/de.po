@@ -2,7 +2,7 @@
 # Copyright (C) 1998 Free Software Foundation, Inc.
 # Jay Painter, Stuart Parmenter, Sven Neumann, 1998.
 #
-#, fuzzy
+# , fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa E-Mail Client 0.2.0\n"
@@ -22,10 +22,10 @@ msgstr ""
 msgid "Subject"
 msgstr ""
 
+# , fuzzy
 #: src/balsa-index.c:186
-#, fuzzy
 msgid "Date"
-msgstr "Einfügen"
+msgstr "Einf\374gen"
 
 #: src/balsa-init.c:101
 msgid "Welcome To Balsa!"
@@ -50,20 +50,15 @@ msgid "You seem to be running Balsa for the first time.\n"
 msgstr ""
 
 #: src/balsa-init.c:182
-msgid ""
-"The following steps will setup Balsa by asking a few simple questions.  "
+msgid "The following steps will setup Balsa by asking a few simple questions.  "
 msgstr ""
 
 #: src/balsa-init.c:183
-msgid ""
-"Once you have completed these steps, you can always change them at a later "
-"time through Balsa's preferences.  "
+msgid "Once you have completed these steps, you can always change them at a later time through Balsa's preferences.  "
 msgstr ""
 
 #: src/balsa-init.c:184
-msgid ""
-"Please check the about box in Balsa's main window for more information on "
-"contacting the authors or reporting bugs."
+msgid "Please check the about box in Balsa's main window for more information on contacting the authors or reporting bugs."
 msgstr ""
 
 #. your name
@@ -115,6 +110,7 @@ msgstr ""
 msgid "Unable to Open Mailbox!"
 msgstr ""
 
+#. FIXME
 #: src/index-child.c:218
 msgid "Transfer"
 msgstr ""
@@ -131,26 +127,26 @@ msgstr ""
 msgid "Read"
 msgstr ""
 
+# , fuzzy
 #: src/index-child.c:249
-#, fuzzy
 msgid "Replied"
 msgstr "Beantworten"
 
+# , fuzzy
 #: src/index-child.c:255
-#, fuzzy
 msgid "Forwarded"
 msgstr "Weitersenden"
 
 #: src/index-child.c:264 src/main-window.c:245 src/main-window.c:408
 msgid "Delete"
-msgstr "Löschen"
+msgstr "L\366schen"
 
 #: src/index-child.c:272 src/main-window.c:259
 msgid "Undelete"
 msgstr "Wiederherstellen"
 
+# , c-format
 #: src/local-mailbox.c:125
-#, c-format
 msgid "Local Mailbox Loaded as: %s\n"
 msgstr ""
 
@@ -171,8 +167,8 @@ msgstr ""
 msgid "Mailbox Configurator"
 msgstr ""
 
+# , c-format
 #: src/mailbox-conf.c:449
-#, c-format
 msgid "Cannot create mailbox '%s': %s\n"
 msgstr ""
 
@@ -180,10 +176,10 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+# , fuzzy
 #: src/mailbox-manager.c:69
-#, fuzzy
 msgid "Account"
-msgstr "Über"
+msgstr "\334ber"
 
 #: src/mailbox-manager.c:70
 msgid "Type"
@@ -193,28 +189,27 @@ msgstr ""
 msgid "Server"
 msgstr ""
 
+# , fuzzy
 #: src/mailbox-manager.c:86
-#, fuzzy
 msgid "Mailbox Manager"
 msgstr "Mailbox Verwalter..."
 
+# , fuzzy
 #. edit account button
 #: src/mailbox-manager.c:140
-#, fuzzy
 msgid "Edit..."
-msgstr "Ändern"
+msgstr "\304ndern"
 
+# , fuzzy
 #. edit account button
 #: src/mailbox-manager.c:153
-#, fuzzy
 msgid "New..."
 msgstr "Neu"
 
-#. delete account button
+# , fuzzy
 #: src/mailbox-manager.c:166
-#, fuzzy
 msgid "Delete..."
-msgstr "Löschen"
+msgstr "L\366schen"
 
 #: src/main-window.c:88
 msgid "Mailboxes/<Separator>"
@@ -244,8 +239,8 @@ msgstr "Neu"
 msgid "Reply"
 msgstr "Beantworten"
 
+# , fuzzy
 #: src/main-window.c:229 src/main-window.c:444 src/main-window.c:445
-#, fuzzy
 msgid "Forward"
 msgstr "Weitersenden"
 
@@ -259,7 +254,7 @@ msgstr ""
 
 #: src/main-window.c:291 src/sendmsg-window.c:158
 msgid "Close"
-msgstr "Schließen"
+msgstr "Schlie\337en"
 
 #. mailboxes page
 #: src/main-window.c:306 src/pref-manager.c:130
@@ -288,7 +283,7 @@ msgstr "Einstellungen"
 
 #: src/main-window.c:346
 msgid "About"
-msgstr "Über"
+msgstr "\334ber"
 
 #: src/main-window.c:359 src/sendmsg-window.c:207
 msgid "Help"
@@ -302,18 +297,18 @@ msgstr ""
 msgid "Check Email"
 msgstr ""
 
+# , fuzzy
 #: src/main-window.c:409
-#, fuzzy
 msgid "Delete Message"
 msgstr "Nachricht"
 
+# , fuzzy
 #: src/main-window.c:422
-#, fuzzy
 msgid "Compose"
-msgstr "Schließen"
+msgstr "Schlie\337en"
 
+# , fuzzy
 #: src/main-window.c:423
-#, fuzzy
 msgid "Compose Message"
 msgstr "Nachricht"
 
@@ -325,8 +320,8 @@ msgstr ""
 msgid "Open Previous Message"
 msgstr ""
 
+# , fuzzy
 #: src/main-window.c:469
-#, fuzzy
 msgid "Next"
 msgstr "Text"
 
@@ -336,11 +331,9 @@ msgstr ""
 
 #: src/main-window.c:507
 msgid ""
-"The Balsa email client is part of the GNOME desktop environment.  "
-"Information on Balsa can be found at http://www.balsa.net/\n"
+"The Balsa email client is part of the GNOME desktop environment.  Information on Balsa can be found at http://www.balsa.net/\n"
 "\n"
-"If you need to report bugs, please do so at: "
-"http://www.gnome.org/cgi-bin/bugs"
+"If you need to report bugs, please do so at: http://www.gnome.org/cgi-bin/bugs"
 msgstr ""
 
 #: src/mblist-window.c:488
@@ -351,8 +344,8 @@ msgstr ""
 msgid "Edit Mailbox"
 msgstr ""
 
+# , fuzzy
 #: src/mblist-window.c:500
-#, fuzzy
 msgid "Delete Mailbox"
 msgstr "Neue Nachrichten holen"
 
@@ -361,7 +354,6 @@ msgstr "Neue Nachrichten holen"
 msgid "Identity"
 msgstr ""
 
-#. view page
 #: src/pref-manager.c:137
 msgid "View"
 msgstr "Anschauen"
@@ -375,11 +367,11 @@ msgstr ""
 msgid "Local mail directory:"
 msgstr ""
 
+# , fuzzy
 #. Toolbars
 #: src/pref-manager.c:393
-#, fuzzy
 msgid "Toolbars"
-msgstr "Menüleiste"
+msgstr "Men\374leiste"
 
 #: src/pref-manager.c:413
 msgid "Debug"
@@ -391,7 +383,7 @@ msgstr "Senden"
 
 #: src/sendmsg-window.c:147
 msgid "Attach File"
-msgstr "Datei hinzufügen"
+msgstr "Datei hinzuf\374gen"
 
 #: src/sendmsg-window.c:173
 msgid "Cut"
@@ -403,23 +395,23 @@ msgstr "Kopieren"
 
 #: src/sendmsg-window.c:187
 msgid "Paste"
-msgstr "Einfügen"
+msgstr "Einf\374gen"
 
 #: src/sendmsg-window.c:194
 msgid "Edit"
-msgstr "Ändern"
+msgstr "\304ndern"
 
 #: src/sendmsg-window.c:202
 msgid "Contents"
 msgstr "Inhalt"
 
+# , fuzzy
 #: src/sendmsg-window.c:253
-#, fuzzy
 msgid "New message"
 msgstr "Nachricht"
 
+# , fuzzy
 #: src/sendmsg-window.c:266
-#, fuzzy
 msgid "Reply to "
 msgstr "Beantworten"
 
@@ -427,23 +419,17 @@ msgstr "Beantworten"
 msgid "Forward message"
 msgstr ""
 
+# , c-format
 #: libbalsa/mailbox.c:452
-#, c-format
 msgid "Mailbox: Opening %s Refcount: %d\n"
 msgstr ""
 
+# , c-format
 #: libbalsa/mailbox.c:478
-#, c-format
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr ""
 
+# , c-format
 #: libbalsa/mailbox.c:1340
-#, c-format
 msgid "Loading message: %s/%s\n"
 msgstr ""
-
-#~ msgid "Icons"
-#~ msgstr "Symbole"
-
-#~ msgid "Both"
-#~ msgstr "Beides"

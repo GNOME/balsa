@@ -20,7 +20,7 @@
 #ifndef __MAILBOX_H__
 #define __MAILBOX_H__
 
-#include "mutt.h"
+#include "libmutt/mutt.h"
 
 /*
  * public macros

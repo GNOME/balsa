@@ -39,11 +39,21 @@ extern "C" {
 
 #define VIEW_MENU_LENGTH 10
     typedef struct _BalsaSendmsg BalsaSendmsg;
+    typedef struct _BalsaSendmsgAddress BalsaSendmsgAddress;
+
+    struct _BalsaSendmsgAddress {
+        BalsaSendmsg *msg;
+        GtkWidget *label;
+        gint min_addresses, max_addresses;
+        gboolean ready;
+    };
 
     struct _BalsaSendmsg {
 	GtkWidget *window;
 	GtkWidget *to[3], *from[3], *subject[2], *cc[3], *bcc[3], *fcc[3],
 	    *reply_to[3];
+        BalsaSendmsgAddress to_info, from_info, cc_info, bcc_info,
+            reply_to_info;
 	GtkWidget *comments[2], *keywords[2];
 	GtkWidget *attachments[4];
 	GtkWidget *text;
@@ -68,6 +78,9 @@ extern "C" {
 	guint delete_sig_id;
 	gboolean modified;
 	gboolean flow;          /* send format=flowed */ 
+        /* style for changing the color of address labels when the
+         * address isn't valid: */
+        GtkStyle *bad_address_style;  
     };
 
     BalsaSendmsg *sendmsg_window_new(GtkWidget *, LibBalsaMessage *,

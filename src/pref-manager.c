@@ -124,6 +124,7 @@ typedef struct _PropertyUI {
     GtkWidget *unread_color;
     GtkWidget *quoted_color[MAX_QUOTED_COLOR];
     GtkWidget *url_color;
+    GtkWidget *bad_address_color;
 
     /* quote regex */
     GtkWidget *quote_pattern;
@@ -498,6 +499,10 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
 
+    gtk_signal_connect(GTK_OBJECT(pui->bad_address_color), "released",
+		       GTK_SIGNAL_FUNC(properties_modified_cb),
+		       property_box);
+
     /* Gnome Property Box Signals */
     gtk_signal_connect(GTK_OBJECT(property_box), "destroy",
 		       GTK_SIGNAL_FUNC(destroy_pref_window_cb), pui);
@@ -757,6 +762,15 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
 			       &(balsa_app.url_color.blue),
 			       0);			       
 
+    /* bad address color */
+    gdk_colormap_free_colors(gdk_window_get_colormap(GTK_WIDGET(pbox)->window),
+			     &balsa_app.bad_address_color, 1);
+    gnome_color_picker_get_i16(GNOME_COLOR_PICKER(pui->bad_address_color),
+			       &(balsa_app.bad_address_color.red),
+			       &(balsa_app.bad_address_color.green),
+			       &(balsa_app.bad_address_color.blue),
+			       0);			       
+
     /* Information dialogs */
     menu_item =
 	gtk_menu_get_active(GTK_MENU(pui->information_message_menu));
@@ -1009,6 +1023,11 @@ set_prefs(void)
 			       balsa_app.url_color.red,
 			       balsa_app.url_color.green,
 			       balsa_app.url_color.blue, 0);
+
+    gnome_color_picker_set_i16(GNOME_COLOR_PICKER(pui->bad_address_color),
+			       balsa_app.bad_address_color.red,
+			       balsa_app.bad_address_color.green,
+			       balsa_app.bad_address_color.blue, 0);
 
     /* Information Message */
     gtk_menu_set_active(GTK_MENU(pui->information_message_menu),
@@ -1918,6 +1937,16 @@ create_display_page(gpointer data)
     vbox9 = vbox_in_container(color_frame);
 
     pui->url_color = color_box(GTK_BOX(vbox9), _("Hyperlink color"));
+    
+    {
+        GtkWidget *frame = gtk_frame_new(_("Composition Window"));
+        GtkWidget *vbox = vbox_in_container(frame);
+        gtk_container_set_border_width(GTK_CONTAINER(frame), 5);
+        gtk_box_pack_start(GTK_BOX(vbox8), frame, FALSE, FALSE, 0);
+        pui->bad_address_color =
+            color_box(GTK_BOX(vbox),
+                      _("Invalid or incomplete address label color"));
+    }
 
     /* Fonts Preferences Page */
     vbox9 = gtk_vbox_new(FALSE, 0);

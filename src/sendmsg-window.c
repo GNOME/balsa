@@ -100,7 +100,7 @@ static gint include_message_cb(GtkWidget *, BalsaSendmsg *);
 static void close_window_cb(GtkWidget *, gpointer);
 static gchar* check_if_regular_file(const gchar *);
 static void balsa_sendmsg_destroy_handler(BalsaSendmsg * bsm);
-static void check_readiness(GtkEditable * w, BalsaSendmsg * bsmsg);
+static void check_readiness(BalsaSendmsg * bsmsg);
 static void init_menus(BalsaSendmsg *);
 static gint toggle_from_cb(GtkWidget *, BalsaSendmsg *);
 static gint toggle_to_cb(GtkWidget *, BalsaSendmsg *);
@@ -134,6 +134,8 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type);
 static void set_list_post_address(BalsaSendmsg * msg);
 static gboolean set_list_post_rfc2369(BalsaSendmsg * msg, GList * p);
 static gchar *rfc2822_skip_comments(gchar * str);
+static void address_changed_cb(GtkEditable * w, BalsaSendmsgAddress *sma);
+static void set_ready(GtkEditable * w, BalsaSendmsgAddress *sma);
 
 /* Standard DnD types */
 enum {
@@ -609,6 +611,9 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsm)
 	gdk_font_unref(bsm->font);
 	bsm->font = NULL;
     }
+    if (bsm->bad_address_style)
+        gtk_style_unref(bsm->bad_address_style);
+
     g_free(bsm);
 
 
@@ -1525,15 +1530,25 @@ create_string_entry(GtkWidget * table, const gchar * label, int y_pos,
  *         int y_pos          - How far down in the table to put label.
  *         const gchar *icon  - icon for the button.
  *         BalsaSendmsg *smw  - The send message window
+ *         gint min_addresses - The minimum acceptable number of
+ *                              addresses.
+ *         gint max_addresses - If not -1, the maximum acceptable number
+ *                              of addresses.
  * 
  * Output: GtkWidget *arr[]   - An array of GtkWidgets, as follows:
  *            arr[0]          - the label.
  *            arr[1]          - the entrybox.
  *            arr[2]          - the button.
+ *         BalsaSendmsgAddress *sma
+ *                            - a structure with info about the
+ *                              address, passed to the "changed" signal
+ *                              callback.
  */
 static void
 create_email_entry(GtkWidget * table, const gchar * label, int y_pos,
-		   const gchar * icon, BalsaSendmsg *smw, GtkWidget * arr[])
+		   const gchar * icon, BalsaSendmsg *smw, GtkWidget * arr[],
+                   BalsaSendmsgAddress *sma, gint min_addresses,
+                   gint max_addresses)
 {
     create_address_entry(table, label, y_pos, arr);
 
@@ -1571,6 +1586,26 @@ create_email_entry(GtkWidget * table, const gchar * label, int y_pos,
 		       expand_alias_find_match);
     libbalsa_address_entry_set_domain(LIBBALSA_ADDRESS_ENTRY(arr[1]),
 		       balsa_app.current_ident->domain);
+    gtk_signal_connect(GTK_OBJECT(arr[1]), "changed",
+                       GTK_SIGNAL_FUNC(address_changed_cb), sma);
+
+    if (!smw->bad_address_style) {
+        /* set up the style for flagging bad/incomplete addresses */
+        smw->bad_address_style =
+            gtk_style_copy(gtk_widget_get_style(GTK_WIDGET(arr[0])));
+        smw->bad_address_style->fg[GTK_STATE_NORMAL] =
+            balsa_app.bad_address_color;
+    }
+
+    /* populate the info structure: */
+    sma->msg = smw;
+    sma->label = arr[0];
+    sma->min_addresses = min_addresses;
+    sma->max_addresses = max_addresses;
+    sma->ready = TRUE;
+
+    /* set initial label style: */
+    set_ready(GTK_EDITABLE(arr[1]), sma);
 }
 
 
@@ -1594,27 +1629,30 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     gtk_table_set_row_spacings(GTK_TABLE(table), 2);
     gtk_table_set_col_spacings(GTK_TABLE(table), 2);
 
+    /* msg->bad_address_style will be set in create_email_entry: */
+    msg->bad_address_style = NULL;
+
     /* From: */
     create_email_entry(table, _("From:"), 0, GNOME_STOCK_MENU_BOOK_BLUE,
-                       msg, msg->from);
-    gtk_signal_connect(GTK_OBJECT(msg->from[1]), "changed",
-                       GTK_SIGNAL_FUNC(check_readiness), msg);
+                       msg, msg->from,
+                       &msg->from_info, 1, 1);
 
     /* To: */
     create_email_entry(table, _("To:"), 1, GNOME_STOCK_MENU_BOOK_RED,
-		       msg, msg->to);
-    gtk_signal_connect(GTK_OBJECT(msg->to[1]), "changed",
-		       GTK_SIGNAL_FUNC(check_readiness), msg);
+                       msg, msg->to,
+                       &msg->to_info, 1, -1);
 
     /* Subject: */
     create_string_entry(table, _("Subject:"), 2, msg->subject);
     /* cc: */
     create_email_entry(table, _("Cc:"), 3, GNOME_STOCK_MENU_BOOK_YELLOW,
-		       msg, msg->cc);
+                       msg, msg->cc,
+                       &msg->cc_info, 0, -1);
 
     /* bcc: */
     create_email_entry(table, _("Bcc:"), 4, GNOME_STOCK_MENU_BOOK_GREEN,
-		       msg, msg->bcc);
+                       msg, msg->bcc,
+                       &msg->bcc_info, 0, -1);
 
     /* fcc: */
     msg->fcc[0] = gtk_label_new(_("Fcc:"));
@@ -1645,7 +1683,8 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
 
     /* Reply To: */
     create_email_entry(table, _("Reply To:"), 6, GNOME_STOCK_MENU_BOOK_BLUE,
-		       msg, msg->reply_to);
+                       msg, msg->reply_to,
+                       &msg->reply_to_info, 0, -1);
 
 
 
@@ -2663,51 +2702,59 @@ include_file_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 
 
 /* is_ready_to_send returns TRUE if the message is ready to send or 
-   postpone. It tests currently only the "To" and "From" fields
+   postpone.
 */
 static gboolean
 is_ready_to_send(BalsaSendmsg * bsmsg)
 {
-    GList* list = NULL;
-    GList* l;
-    gchar *tmp;
-    size_t len;
+    gboolean ready;
+    ready = bsmsg->from_info.ready && bsmsg->to_info.ready
+        && bsmsg->cc_info.ready && bsmsg->bcc_info.ready
+        && bsmsg->reply_to_info.ready;
+    return ready;
+}
 
-    list = g_list_append(list, gtk_entry_get_text(GTK_ENTRY(bsmsg->to[1])));
-    l = list =
-        g_list_append(list, gtk_entry_get_text(GTK_ENTRY(bsmsg->from[1])));
+static void
+address_changed_cb(GtkEditable * w, BalsaSendmsgAddress *sma)
+{
+    set_ready(w, sma);
+    check_readiness(sma->msg);
+}
 
-    while (list) {
-        tmp = (gchar*) list->data;
-        len = strlen(tmp);
-        
-        if (len < 1) {		/* empty */
-            g_list_free(l);
-            return FALSE;
+static void
+set_ready(GtkEditable * w, BalsaSendmsgAddress *sma)
+{
+    gint len = 0;
+    gchar *tmp = gtk_editable_get_chars(w, 0, -1);
+
+    if (tmp && *tmp) {
+        GList *list = libbalsa_address_new_list_from_string(tmp);
+
+        if (list) {
+            len = g_list_length(list);
+
+            g_list_foreach(list, (GFunc) gtk_object_unref, NULL);
+            g_list_free(list);
+        } else {
+            /* error */
+            len = -1;
         }
         
-
-        if (tmp[len - 1] == '@') {	/* this shouldn't happen */
-            g_list_free(l);
-            return FALSE;
-        }
-        
-        if (len < 4) {
-            if (strchr(tmp, '@')) {	
-                /* you won't have an @ in an address less than 4
-                   characters */
-                g_list_free(l);
-                return FALSE;
-            }
-            
-            /* assume they are mailing it to someone in their local domain */
-        }
-
-        list = g_list_next(list);
     }
-    
-    g_list_free(l);
-    return TRUE;
+    g_free(tmp);
+
+    if (len < sma->min_addresses
+        || (sma->max_addresses >= 0 && len > sma->max_addresses)) {
+        if (sma->ready) {
+            sma->ready = FALSE;
+            gtk_widget_set_style(sma->label, sma->msg->bad_address_style);
+        }
+    } else {
+        if (!sma->ready) {
+            sma->ready = TRUE;
+            gtk_widget_set_rc_style(sma->label);
+        }
+    }
 }
 
 static void
@@ -2855,17 +2902,6 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 	fprintf(stderr, "sending with charset: %s\n", bsmsg->charset);
 
     message = bsmsg2message(bsmsg);
-    if (!LIBBALSA_IS_ADDRESS(message->from)) {
-        gnome_ok_dialog_parented(_("Missing or invalid `From' address"),
-                                 GTK_WINDOW(balsa_app.main_window));
-        return FALSE;
-    }
-    if (message->to_list == NULL
-        || !LIBBALSA_IS_ADDRESS(message->to_list->data)) {
-        gnome_ok_dialog_parented(_("Missing or invalid `To' address"),
-                                 GTK_WINDOW(balsa_app.main_window));
-        return FALSE;
-    }
     fcc = message->fcc_mailbox && *(message->fcc_mailbox)
 	? mblist_find_mbox_by_name(balsa_app.mblist, message->fcc_mailbox)
 	: NULL;
@@ -3114,7 +3150,7 @@ reflow_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 
 /* To field "changed" signal callback. */
 static void
-check_readiness(GtkEditable * w, BalsaSendmsg * msg)
+check_readiness(BalsaSendmsg * msg)
 {
     unsigned i;
     gboolean state = is_ready_to_send(msg);
@@ -3281,7 +3317,7 @@ init_menus(BalsaSendmsg * msg)
     set_locale(NULL, msg, i);
 
     /* gray 'send' and 'postpone' */
-    check_readiness(GTK_EDITABLE(msg->to[1]), msg);
+    check_readiness(msg);
 }
 
 /* set_locale:
@@ -3392,7 +3428,7 @@ spell_check_set_sensitive(BalsaSendmsg * msg, gboolean state)
 	gtk_widget_set_sensitive(GTK_WIDGET(list->data), state);
 
     if (state)
-	check_readiness(NULL, msg);
+	check_readiness(msg);
 }
 
 

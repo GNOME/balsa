@@ -77,6 +77,7 @@
 #define DEFAULT_QUOTE_REGEX  "^(([ \tA-Z])\1*[|>:}#])"
 
 #define DEFAULT_URL_COLOR    "rgb:A000/0000/0000"
+#define DEFAULT_BAD_ADDRESS_COLOR    "rgb:8000/8000/0000"
 
 #define MAILBOX_MANAGER_WIDTH 350
 #define MAILBOX_MANAGER_HEIGHT 400
@@ -249,6 +250,9 @@ extern struct BalsaApplication {
 
     /* text color of URL's */
     GdkColor url_color;
+
+    /* label color of bad addresses */
+    GdkColor bad_address_color;
 
     GtkToolbarStyle toolbar_style;
     GnomeMDIMode mdi_style;

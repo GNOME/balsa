@@ -97,7 +97,7 @@ dist-hook:
 
 idldir = $(datadir)/idl
 
-idl_DATA = ../idl/balsa.idl
+idl_DATA = #../idl/balsa.idl
 
 CORBA_SRCLIST = balsa-common.c balsa-skels.c balsa-stubs.c \
                 balsa.h

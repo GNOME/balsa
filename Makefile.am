@@ -15,8 +15,8 @@ EXTRA_DIST = \
 	balsa.desktop \
 	gnome-balsa2.png \
 	HACKING			\
-	docs/mh-mail-HOWTO	\
-	idl/balsa.idl
+	docs/mh-mail-HOWTO	
+#	idl/balsa.idl
 
 dist-hook: balsa.spec
 	cp balsa.spec $(distdir)

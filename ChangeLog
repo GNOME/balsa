@@ -1,3 +1,8 @@
+2000-09-17  Carlos Morgado  <chbm@chbm.nu>
+
+	* Makefile.am: made 'make dist' work without balsa.idl 
+	* src/Makefile.am: made 'make dist' work without balsa.idl
+
 2000-09-16  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/print.c: wrap headers too.

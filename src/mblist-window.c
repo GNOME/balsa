@@ -345,8 +345,11 @@ open_cb (GtkWidget * widget, gpointer data)
     return;
 
   ctnode = GTK_CLIST (mblw->ctree)->selection->data;
+#ifndef GTK_HAVE_FEATURES_1_1_2
   mailbox = gtk_ctree_get_row_data (mblw->ctree, ctnode);
-
+#else
+  mailbox = gtk_ctree_node_get_row_data (mblw->ctree, ctnode);
+#endif
   if (!mailbox)
     return;
 
@@ -369,7 +372,11 @@ close_cb (GtkWidget * widget, gpointer data)
     return;
 
   ctnode = GTK_CLIST (mblw->ctree)->selection->data;
+#ifndef GTK_HAVE_FEATURES_1_1_2
   mailbox = gtk_ctree_get_row_data (mblw->ctree, ctnode);
+#else
+  mailbox = gtk_ctree_node_get_row_data (mblw->ctree, ctnode);
+#endif
 
   if (mailbox)
     {
@@ -409,7 +416,11 @@ mailbox_select_cb (GtkCTree * ctree, GtkCTreeNode * row, gint column)
 
   if (bevent && bevent->button == 1 && bevent->type == GDK_2BUTTON_PRESS)
     {
+#ifndef GTK_HAVE_FEATURES_1_1_2
       mailbox = gtk_ctree_get_row_data (ctree, row);
+#else
+      mailbox = gtk_ctree_node_get_row_data (ctree, row);
+#endif
 
       /* bail now if the we've been called without a valid
        * mailbox */

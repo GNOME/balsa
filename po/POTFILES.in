@@ -30,6 +30,7 @@ libbalsa/pop3.c
 libbalsa/rfc3156.c
 libbalsa/send.c
 libbalsa/source-viewer.c
+libinit_balsa/balsa-druid-page-defclient.c
 libinit_balsa/balsa-druid-page-directory.c
 libinit_balsa/balsa-druid-page-finish.c
 libinit_balsa/balsa-druid-page-user.c

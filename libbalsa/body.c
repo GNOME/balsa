@@ -363,6 +363,7 @@ libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd)
     gchar *mime_type = NULL;
     const char *charset;
     GMimeFilter *filter;
+    gboolean retval = TRUE;
 
     stream = g_mime_stream_fs_new(fd);
     /* convert text bodies but HTML - gtkhtml does conversion on its own. */
@@ -381,16 +382,20 @@ libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd)
     g_free(mime_type);
 
     buf = libbalsa_mailbox_get_message_part(body->message, body, &len);
-    if (len && (g_mime_stream_write(stream, (char*)buf, len) == -1
-		|| g_mime_stream_flush(stream) == -1)) {
-	g_object_unref(stream);
-	/* FIXME: unlink??? */
-	return FALSE;
+    if (buf) {
+	if (len > 0
+	    && g_mime_stream_write(stream, (char *) buf, len) == -1)
+	    retval = FALSE;
+    } else {
+	if (body->mime_part != NULL
+	    && g_mime_object_write_to_stream(body->mime_part, stream) == -1)
+	    retval = FALSE;
     }
-
+    if (retval && g_mime_stream_flush(stream) == -1)
+	retval = FALSE;
     g_object_unref(stream);
 
-    return TRUE;
+    return retval;
 }
 
 gchar *

@@ -481,7 +481,12 @@ libbalsa_mailbox_local_get_msg_part(LibBalsaMessage *msg,
                                     LibBalsaMessageBody *part, ssize_t *len)
 {
     g_return_val_if_fail(part->mime_part, NULL);
-    return g_mime_part_get_content(GMIME_PART(part->mime_part), len);
+
+    if (GMIME_IS_PART(part->mime_part))
+	return g_mime_part_get_content(GMIME_PART(part->mime_part), len);
+
+    *len = -1;
+    return NULL;
 }
 
 /*--------------------------------*/

@@ -1645,8 +1645,6 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
                                    LibBalsaMessageBody *part,
                                    ssize_t *sz)
 {
-    const char *bod = NULL;
-    size_t len;  
     GMimeStream *partstream = NULL;
 
     if(!part->mime_part) { /* !part->mime_part */
@@ -1741,10 +1739,12 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
         g_free(cache_name);
         g_free(part_name);
     }
-    bod = g_mime_part_get_content (GMIME_PART(part->mime_part), &len);
 
-    *sz = len;
-    return bod;
+    if (GMIME_IS_PART(part->mime_part))
+	return g_mime_part_get_content(GMIME_PART(part->mime_part), sz);
+
+    *sz = -1;
+    return NULL;
 }
 
 /* libbalsa_mailbox_imap_add_message: 

@@ -81,6 +81,7 @@ options_init (void)
   gint i = 0;
   gint type;
   gchar *name;
+  gchar *envmail;
 
   GString *gstring, *buffer;
 
@@ -184,11 +185,16 @@ options_init (void)
 	{
 	  if (i == 0)
 	    {
-	      mailbox_add_gnome_config (0, "Default", getenv ("MAIL"), 0);
-	      mbx = (MailboxMBX *) mailbox_new (MAILBOX_MBX);
-	      mbx->name = "Default";
-	      mbx->path = getenv ("MAIL");
-	      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbx);
+		    envmail=getenv("MAIL");
+	      if (envmail)
+		{
+		  mailbox_add_gnome_config (0, "Default", envmail, 0);
+
+		  mbx = (MailboxMBX *) mailbox_new (MAILBOX_MBX);
+		  mbx->name = "Default";
+		  mbx->path = envmail;
+		  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbx);
+		}
 	      g_string_free (gstring, 1);
 	      g_string_free (buffer, 1);
 	      return -1;

@@ -497,7 +497,7 @@ ask_cert_real(X509 *cert)
     char *part[] =
         {"/CN=", "/Email=", "/O=", "/OU=", "/L=", "/ST=", "/C="};
     char buf[SHORT_STRING];
-    char *name = NULL, *c;
+    char *name = NULL, *c, *valid_from;
     GtkWidget* dialog, *label;
     unsigned i;
     int ret;
@@ -519,14 +519,16 @@ ask_cert_real(X509 *cert)
 
     buf[0] = '\0';
     x509_fingerprint (buf, sizeof (buf), cert);
+    valid_from = g_strdup(asn1time_to_string(X509_get_notBefore(cert)));
     c = g_strdup_printf(_("<b>This certificate is valid</b>\n"
                           "from %s\n"
                           "to %s\n"
                           "<b>Fingerprint:</b> %s"),
-                        asn1time_to_string(X509_get_notBefore(cert)),
+                        valid_from,
                         asn1time_to_string(X509_get_notAfter(cert)),
                         buf);
     g_string_append(str, c); g_free(c);
+    g_free(valid_from);
 
     dialog = gtk_dialog_new_with_buttons(_("IMAP TLS certificate"), NULL,
                                          GTK_DIALOG_MODAL,

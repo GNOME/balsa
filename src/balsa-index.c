@@ -255,10 +255,9 @@ bndx_destroy(GtkObject * obj)
         index->popup_menu = NULL;
     }
 
-    if (index->ref_table) {
-        g_hash_table_destroy(index->ref_table);
-        index->ref_table = NULL;
-    }
+    if (index->current_message)
+	g_object_remove_weak_pointer(G_OBJECT(index->current_message),
+				     (gpointer)&index->current_message);
 
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
         (*GTK_OBJECT_CLASS(parent_class)->destroy) (obj);
@@ -389,11 +388,6 @@ bndx_instance_init(BalsaIndex * index)
     index->popup_menu = bndx_popup_menu_create(index);
     g_object_ref(index->popup_menu);
     gtk_object_sink(GTK_OBJECT(index->popup_menu));
-    /* The ref table will be populated in the initial threading. */
-    index->ref_table =
-        g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL,
-                              (GDestroyNotify)
-                              gtk_tree_row_reference_free);
     
     gtk_tree_selection_set_mode(selection, GTK_SELECTION_MULTIPLE);
 
@@ -528,6 +522,9 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
     /* we don't clear the current message if the tree contains any
      * messages */
     if (sci.message || !gtk_tree_model_get_iter_first(model, &iter)) {
+	if (index->current_message)
+	    g_object_remove_weak_pointer(G_OBJECT(index->current_message),
+					 (gpointer)&index->current_message);
         index->current_message = sci.message;
         if(index->current_message)
             g_object_add_weak_pointer(G_OBJECT(index->current_message),
@@ -804,8 +801,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index, BalsaMailboxNode* mbnode)
 			     G_CALLBACK(mailbox_messages_removed_cb),
 			     (gpointer) index);
 
-    /* Set the tree store, load messages, and do threading. The ref
-     * table will be populated during this threading. */
+    /* Set the tree store, load messages, and do threading. */
     bndx_load_and_thread(index, mailbox->view->threading_type);
 #if 0
     bndx_moveto(index);
@@ -2016,33 +2012,11 @@ bndx_changed_find_row(BalsaIndex * index)
  */
 static gboolean
 bndx_find_message(BalsaIndex * index, GtkTreePath ** path,
-                  GtkTreeIter * iter, LibBalsaMessage * message)
+		  GtkTreeIter * iter, LibBalsaMessage * message)
 {
-    GtkTreeRowReference *reference;
-    GtkTreeModel *model;
-    GtkTreePath *tmp_path;
-    GtkTreeIter tmp_iter;
-
-    reference = g_hash_table_lookup(index->ref_table, message);
-    if (!reference)
-        return FALSE;
-
-    model = gtk_tree_view_get_model(GTK_TREE_VIEW(index));
-    tmp_path = gtk_tree_row_reference_get_path(reference);
-    if (!tmp_path)
-        return FALSE;
-
-    gtk_tree_model_get_iter(model, &tmp_iter, tmp_path);
-
-    if (path)
-        *path = tmp_path;
-    else
-        gtk_tree_path_free(tmp_path);
-
-    if (iter)
-        *iter = tmp_iter;
-
-    return TRUE;
+    return message
+	&& libbalsa_mailbox_msgno_find(index->mailbox_node->mailbox,
+				       message->msgno, path, iter);
 }
 
 /* Make the actual selection, unselecting other messages and

@@ -69,9 +69,6 @@ extern "C" {
         gulong selection_changed_id;
         gulong row_expanded_id;
         gulong row_collapsed_id;
-
-        /* A table with a row reference for each message. */
-        GHashTable *ref_table;
     };
 
     struct _BalsaIndexClass {

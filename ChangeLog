@@ -1,3 +1,8 @@
+2001-06-12  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/send.c (libbalsa_message_cb): update to libesmtp-0.8 
+	types
+
 2001-06-11  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/balsa-app.c: 

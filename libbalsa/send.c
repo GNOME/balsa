@@ -281,8 +281,8 @@ libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
  */
 #define BUFLEN  8192
 
-static char *
-libbalsa_message_cb (char **buf, int *len, void *arg)
+static const char *
+libbalsa_message_cb (void **buf, int *len, void *arg)
 {
     MessageQueueItem *current_message = arg;
     struct ctx { FILE *fp; char buf[BUFLEN - sizeof (FILE *)]; } *ctx;

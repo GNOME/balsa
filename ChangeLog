@@ -3,7 +3,9 @@
 	* src/sendmsg-window.c: fix the multithreaded mode compose-only 
 	execution.
 	* src/main-window.c: second part of the fix.
-	* NEWS, README, configure.in: updated for balsa-0.9.5
+	* NEWS, README, INSTALL: updated for balsa-0.9.5
+	* configure.in: updated for balsa-0.9.5, removed
+	hopefully last dependences on libPropList.
 	* balsa.spec.in: include translation files only, not the whole
 	directories. 
 

@@ -10,7 +10,6 @@ Please make sure you have the following things:
 	GTK         >= 1.2.1
 	Imlib       >= 1.9.2
 	gnome-libs  >= 1.0.8
-	libPropList >= 0.9.1
 	libpspell   >= 0.11.2 (and at least one spell check module)
 	
 	If you do not have these, please check:

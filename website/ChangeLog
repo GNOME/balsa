@@ -1,3 +1,7 @@
+2000-09-05  Pawel Salek <pawsa@theochem.kth.se>
+
+	* main.html, download.html: updated appropriately for balsa-0.9.5
+	
 2000-09-09  Matthew Guenther <guentherm@asme.org>
 
 	* download.html: Add comments about new libpspell dependency.

@@ -16,7 +16,8 @@ body {margin-left: 50pt;}
 <ol>
 <li>A basic <a href="http://www.gnome.org/start/">GNOME installation</a>.</li>
 
-<li>Balsa needs <samp>libPropList</samp>. Check if you don't have it
+<li>Balsa needs <b>not</b> <samp>libPropList</samp> any more (true for 0.9.5
+ and higher). If you needed it for an older version, check if you don't have it
 already on your system, subsequently try to download suitable rpm. If
 you cannot do it for some reason, grab <a
 href="http://windowmaker.org/ftp/pub/beta/srcs/libPropList-0.10.1.tar.gz">libPropList.tar.gz</a>,
@@ -24,15 +25,20 @@ It must be installed with a prefix of <samp>/usr</samp> if you wish to
 also use a Balsa RPM. Note, that in this last case you might need to
 ignore dependices warnings when installing rpm.</li>
 
-<li>Balsa v0.9.5 and greater also uses the <samp>libpspell</samp>
+<li>Balsa 0.9.5 and greater also uses the <samp>libpspell</samp>
 library for spell checking, which is available in both rpm and deb
 format as well as plain source.  You can find the library and modules at the
 pspell <a href="http://pspell.sourceforge.net">website.</a> The same
 comment above about using Balsa rpms with self-compliled libraries
 applies here as well.</li>
 
-<li>balsa-0.9.4 binary rpms are compiled on RH-6.2 with update
-packages installed. The binaries come with GSS authorisation
+<li>balsa-0.9.5 binary rpms are compiled on RH-6.2 with update
+packages installed with <samp>gnome-print-0.20</samp> (available from 
+<a href="http://www.helixcode.com/">HelixCode</a>). You can get rid of
+ this dependency by recompiling balsa.</li>
+
+<li>
+ The binaries come with GSS authorization
 enabled. You need Kerberos libraries (<samp>krb5-libs</samp> and
 <samp>krb5-config</samp>) provided with RH-6.2 and up, for
 example. Alternatively, you can recompile balsa from the source
@@ -49,7 +55,7 @@ example. Alternatively, you can recompile balsa from the source
 </ul>
 
 <h3>Packages</h3> 
-<p>balsa-0.8.1 is a bit obsolete, if possible try balsa-0.9.4.</p>
+<p>balsa-0.8.1 is a bit obsolete, if possible try balsa-0.9.5.</p>
 
 <ul>
 <li>US East Coast source RPM: <a href="http://www.newton.cx/balsa/balsa-0.8.1-1.src.rpm">http://www.newton.cx/balsa/balsa-0.8.1-1.src.rpm</a></li>
@@ -65,20 +71,30 @@ example. Alternatively, you can recompile balsa from the source
 <li><a href="http://www.cli.di.unipi.it/~cruciani/Package/">Daniele Cruciani's</a> or <a href="http://www.tvec.net/users/wabbit/">Randall Gibson's</a> Debian package (experimental).</li>
 </ul>
 
-<h3>Experimental release - 0.9.4</h3>
+<h3>Experimental release - 0.9.5</h3>
 
-<p><b>2000.09.05</b>: This is pretty much all we have in CVS: new
+<p><b>2000.09.18</b>: This is pretty much all we have in CVS: new
 message browser, improved address book handling, more reliable mailbox
-backend, alias expansion. The code has however some experimental and
-unfinished features enabled so be warned! The POP problems and message
-deletion crashes have been finally addressed. We have also now GSS and
-CRAM-MD5 authorization for IMAP, and APOP for POP3.</p>
-
+backend, alias expansion. We have also now GSS and
+CRAM-MD5 authorization for IMAP, and APOP for POP3. New 0.9.5 features 
+include:</p>
 <ul>
-<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.4.tar.gz">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.4.tar.gz</a>
-<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.4-1.src.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.4-1.src.rpm</a>
-<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.4-1.i386.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.4-1.i386.rpm</a>
+<li> improved multi-threading.</li>
+<li> new warning/error reporting code.</li>
+<li> LDAP support.</li>
+<li> spell check (pspell package required tu compile and use balsa).</li>
+<li> gnome-config used for storing/reading configuration.</li>
+<li> multiple address book support. vCard- and LDAP-types implemented.</li>
+<li> manual updates</li>
+<li> gnome-print used for printing.</li>
 </ul>
+<p>You can download it from:</p>
+<ul>
+<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.5.tar.gz">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.5.tar.gz</a>
+<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.5-1.src.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.5-1.src.rpm</a>
+<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.5-1.i386.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.5-1.i386.rpm</a>
+</ul>
+
 <h3>CVS source</h3>
 
 <p>Balsa source is also available from GNOME 

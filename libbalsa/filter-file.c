@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -45,12 +45,14 @@
 
 /* Helper functions */
 
-/* libbalsa_condition_new_from_config() positions filter_errno on error
- * Remark : we return the newly allocated condition even on error (but the allocation error of
- * the condition itself obviously), because the calling function is reponsible of testing
- * filter_errno to clean-up the whole thing (indeed the calling function, 
- * ie libbalsa_filter_new_from_config will be able to do the whole clean-up on error)
- */
+/* libbalsa_condition_new_from_config() positions filter_errno on
+ * error Remark : we return the newly allocated condition even on
+ * error (but the allocation error of the condition itself obviously),
+ * because the calling function is reponsible of testing filter_errno
+ * to clean-up the whole thing (indeed the calling function, ie
+ * libbalsa_filter_new_from_config will be able to do the whole
+ * clean-up on error).
+*/
 
 static LibBalsaCondition*
 libbalsa_condition_new_from_config()
@@ -122,6 +124,27 @@ libbalsa_condition_new_from_config()
  * Position filter_errno
  */
 
+/* Temporary struct used to ensure that we keep the same order for conditions
+   as specified by the user */
+
+typedef struct {
+    LibBalsaCondition * cnd;
+    gint order;
+} LibBalsaTempCondition;
+
+/* You'll note that this comparison function is inversed
+   That's for a purpose ;-)
+   I use it to avoid a g_list_reverse call (because the order
+   will already be reversed because of the choice of the reversed
+   comparison func) */
+
+static gint compare_conditions_order(gconstpointer  a,gconstpointer  b)
+{
+    const LibBalsaTempCondition * t1=a;
+    const LibBalsaTempCondition * t2=b;
+    return t2->order-t1->order;
+}
+
 void
 libbalsa_conditions_new_from_config(gchar * prefix,
                                     gchar * filter_section_name,
@@ -132,6 +155,7 @@ libbalsa_conditions_new_from_config(gchar * prefix,
     gchar *tmp,* condprefix,*key;
     gint pref_len=strlen(CONDITION_SECTION_PREFIX)+strlen(filter_section_name);
     gint err=FILTER_NOERR;
+    GList * tmp_list=NULL;
 
     FILTER_SETFLAG(fil,FILTER_VALID);
     FILTER_SETFLAG(fil,FILTER_COMPILED);
@@ -158,15 +182,13 @@ libbalsa_conditions_new_from_config(gchar * prefix,
 		    filter_errno=FILTER_NOERR;
 		    libbalsa_condition_free(cond);
 		}
-		/* FIXME: Ugly hack to preserve condition order in a
-		   filter. It seems that gnome section iterator always
-		   retrieve section in reverse order so I prepend the
-		   conditions to have good order at the end for now
-		   this hack works, but we'll have to fix that in the
-		   future (gnome_config could change and break our
-		   assumption) and use order of condition section key
-		   to insure order of condition */
-		else libbalsa_filter_prepend_condition(fil,cond);
+		else {
+		    LibBalsaTempCondition * tmp=g_new(LibBalsaTempCondition,1);
+		    
+		    tmp->cnd=cond;
+		    tmp->order=atoi(strrchr(key,':')+1);
+		    tmp_list=g_list_prepend(tmp_list,tmp);
+		}
 	    }
 	    else FILTER_CLRFLAG(fil,FILTER_VALID);
 	    gnome_config_pop_prefix();
@@ -175,8 +197,23 @@ libbalsa_conditions_new_from_config(gchar * prefix,
     }
     g_free(tmp);
     /* We position filter_errno to the last non-critical error */
-    if (filter_errno==FILTER_NOERR)
+    if (filter_errno==FILTER_NOERR) {
+	LibBalsaTempCondition * tmp;
+
 	filter_errno=err;
+	/* We sort the list of temp conditions, then
+	   we populate the conditions list of the filter */
+	tmp_list=g_list_sort(tmp_list,compare_conditions_order);
+	for (;tmp_list;) {
+	    tmp=(LibBalsaTempCondition *)(tmp_list->data);
+	    libbalsa_filter_prepend_condition(fil,tmp->cnd);
+	    g_free(tmp);
+	    tmp_list=g_list_remove_link(tmp_list,tmp_list);
+	}
+	/* We don't do a g_list_reverse because the comparison func
+	   which dictate the order of the list after the sort is already
+	   reversed */
+    }
 }
 
 /* End of helper functions */
@@ -228,11 +265,13 @@ libbalsa_condition_save_config(LibBalsaCondition * cond)
     gnome_config_set_int("Match-fields",cond->match_fields);
 
     /* We clean all other keys, to have a clean config file */
-    gnome_config_clean_key("Match-string");
-    gnome_config_clean_key("Reg-exps");
-    gnome_config_clean_key("Low-date");
-    gnome_config_clean_key("High-date");
-    gnome_config_clean_key("Flags");
+    if (cond->type!=CONDITION_SIMPLE) gnome_config_clean_key("Match-string");
+    if (cond->type!=CONDITION_REGEX) gnome_config_clean_key("Reg-exps");
+    if (cond->type!=CONDITION_DATE) {
+	gnome_config_clean_key("Low-date");
+	gnome_config_clean_key("High-date");
+    }
+    if (cond->type!=CONDITION_FLAG) gnome_config_clean_key("Flags");
 
     switch(cond->type) {
     case CONDITION_SIMPLE:
@@ -267,47 +306,71 @@ libbalsa_condition_save_config(LibBalsaCondition * cond)
     }
 }
 
-/* End of helper functions */
-/*
- * libbalsa_conditions_save_config saves a list of conditions using prefix and filter_section_name
- * to create the name of the section
- * We clean all preceding saved conditions to keep the config file clean and coherent
- */
-void libbalsa_conditions_save_config(GSList * conds,gchar * prefix,gchar * filter_section_name)
+static void
+libbalsa_real_clean_condition_sections(gchar * buffer,gchar * num_pointer,
+				       gint num_len, gint begin)
 {
-    gint nb=0;
-    gchar * tmp;
-    for (;conds;conds=g_slist_next(conds),nb++) {
-	tmp=g_strdup_printf("%s" CONDITION_SECTION_PREFIX "%s" ":%d/",prefix,filter_section_name,nb);
-	gnome_config_push_prefix(tmp);
-	g_free(tmp);
-	libbalsa_condition_save_config((LibBalsaCondition*) conds->data);
-	gnome_config_pop_prefix();
+    while (TRUE) {
+	snprintf(num_pointer,num_len,"%d/",begin++);
+	if (gnome_config_has_section(buffer)) {
+	    g_print("Cleaning section %s\n",buffer);
+	    gnome_config_clean_section(buffer);
+	}
+	else break;
     }
 }
 
-/* Clean the old conditions section for a given filter section */
+#define CONDITION_SECTION_MAX "999"
+
+/* libbalsa_clean_condition_sections:
+ */
+void
+libbalsa_clean_condition_sections(const gchar * prefix,
+				  const gchar * filter_section_name)
+{
+    gint nb=0,tmp_len=strlen(CONDITION_SECTION_MAX)+2;
+    gchar * buffer,* tmp;
+    
+    /* We allocate once for all a buffer to store conditions sections names */
+    buffer = g_strdup_printf("%s"  CONDITION_SECTION_PREFIX 
+			     "%s:" CONDITION_SECTION_MAX "/",
+			     prefix, filter_section_name);
+    tmp=strrchr(buffer,':')+1;
+    libbalsa_real_clean_condition_sections(buffer,tmp,tmp_len,0);
+    g_free(buffer);
+}
+
+/* End of helper functions */
+
+/*
+ * libbalsa_conditions_save_config saves a list of conditions using
+ * prefix and filter_section_name to create the name of the section We
+ * clean all preceding saved conditions to keep the config file clean
+ * and coherent. */
 
 void
-libbalsa_filter_clean_conditions(gchar *prefix,gchar * filter_section_name)
+libbalsa_conditions_save_config(GSList * conds, const gchar * prefix,
+				const gchar * filter_section_name)
 {
-    void * iterator;
-    gchar *tmp,* condprefix,*key;
-    gint pref_len=strlen(CONDITION_SECTION_PREFIX)+strlen(filter_section_name);
-    
-    tmp=g_strconcat(CONDITION_SECTION_PREFIX,filter_section_name,NULL);
-    iterator = gnome_config_init_iterator_sections(prefix);
+    gint nb=0,tmp_len=strlen(CONDITION_SECTION_MAX)+2;
+    gchar * buffer,* tmp;
 
-    while ((iterator = gnome_config_iterator_next(iterator, &key, NULL))) {
-	
-	if (strncmp(key,tmp,pref_len)==0) {
-	    condprefix=g_strconcat(prefix,key,"/",NULL);
-	    gnome_config_clean_section(condprefix);
-	    g_free(condprefix);
-	}
-	g_free(key);
+    /* We allocate once for all a buffer to store conditions sections names */
+    buffer = g_strdup_printf("%s"  CONDITION_SECTION_PREFIX 
+			     "%s:" CONDITION_SECTION_MAX "/",
+			     prefix,filter_section_name);
+    tmp=strrchr(buffer,':')+1;
+    for (;conds;conds=g_slist_next(conds),nb++) {
+	snprintf(tmp,tmp_len,"%d/",nb);
+	g_print("Saving condition : %s \n", buffer, filter_section_name);
+	gnome_config_push_prefix(buffer);
+	libbalsa_condition_save_config((LibBalsaCondition*) conds->data);
+	gnome_config_pop_prefix();
     }
-}                           /* End of libbalsa_filter_clean_conditions() */
+    libbalsa_real_clean_condition_sections(buffer,tmp,tmp_len,nb);
+    g_free(buffer);
+}
+
 /*
  * void libbalsa_filter_save_config(filter * f)
  *
@@ -321,12 +384,12 @@ libbalsa_filter_clean_conditions(gchar *prefix,gchar * filter_section_name)
 void
 libbalsa_filter_save_config(LibBalsaFilter * fil)
 {
-    gnome_config_set_string("Name",fil->name);
-    gnome_config_set_int("Operation",fil->conditions_op);
-    gnome_config_set_string("Sound",fil->sound);
-    gnome_config_set_string("Popup-text",fil->popup_text);
-    gnome_config_set_int("Action-type",fil->action);
-    gnome_config_set_string("Action-string",fil->action_string);
+    gnome_config_set_string("Name",          fil->name);
+    gnome_config_set_int("Operation",        fil->conditions_op);
+    gnome_config_set_string("Sound",         fil->sound);
+    gnome_config_set_string("Popup-text",    fil->popup_text);
+    gnome_config_set_int("Action-type",      fil->action);
+    gnome_config_set_string("Action-string", fil->action_string);
 }
 
 /* Loads the filters associated to the mailbox
@@ -344,12 +407,10 @@ libbalsa_mailbox_filters_load_config(LibBalsaMailbox* mbox)
     GSList * lst;
 
     /* We load the associated filters */
-    g_print("Loading filters to mailbox %s\n",mbox->name);
-    gnome_config_get_vector_with_default(MAILBOX_FILTERS_KEY,&nb_filters,&filters_names,&def);
+    gnome_config_get_vector_with_default(MAILBOX_FILTERS_KEY,&nb_filters,
+					 &filters_names,&def);
     if (!def) {
 	for(i=0;i<nb_filters;i++) {
-	    g_print("Loading filter %s to mailbox %s\n",
-                    filters_names[i], mbox->name);
 	    fil = libbalsa_filter_get_by_name(filters_names[i]);
 	    if (fil) {
 		LibBalsaMailboxFilter* mf = g_new(LibBalsaMailboxFilter,1);
@@ -362,7 +423,7 @@ libbalsa_mailbox_filters_load_config(LibBalsaMailbox* mbox)
 	    }
 	    else
 		libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-				     "Invalid filters %s for mailbox %s",
+				     _("Invalid filters %s for mailbox %s"),
                                      filters_names[i], mbox->name);
 	}
 	mbox->filters=g_slist_reverse(mbox->filters);
@@ -408,9 +469,8 @@ void libbalsa_mailbox_filters_save_config(LibBalsaMailbox * mbox)
     /* Second we construct the vector of gchar * */
     filters_names=g_new(gchar *,nb_filters);
     lst=names;
-    for(i=0;i<nb_filters;i++) {
+    for(i=0; i<nb_filters; i++) {
 	filters_names[i]=(gchar*)lst->data;
-	g_print("Saving filter %s to mailbox %s\n",filters_names[i],mbox->name);
 	lst=g_slist_next(lst);
     }
     g_slist_free(names);

@@ -1,3 +1,10 @@
+2001-11-27  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Emmanuel <e.allaud@wanadoo.fr> cvs-6.patch (modified):
+	* libbalsa/filter-file.[ch]: updated section cleaning functions.
+	* src/filter-edit-callbacks.c: use them.
+	* src/save-restore.c: here, too.
+
 2001-11-27  Abel Cheung  <maddog@linux.org.hk>
 
 	* configure.in: add "zh_TW" to the ALL_LINGUAS.

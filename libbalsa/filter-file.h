@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -41,27 +41,24 @@ void libbalsa_conditions_new_from_config(gchar* prefix,
                                          gchar * filter_section_name,
                                          LibBalsaFilter* fil);
 
-/* Save conditions list using filter_section_name as prefix to create sections */
+/* Save conditions list using filter_section_name as prefix to create
+ * sections. */
 
-void libbalsa_conditions_save_config(GSList * conds,gchar* prefix,
-                                     gchar * filter_section_name);
+void libbalsa_clean_condition_sections(const gchar * prefix,
+				       const gchar * filter_section_name);
+
+void libbalsa_conditions_save_config(GSList * conds,const gchar * prefix,
+                                     const gchar * filter_section_name);
 
 void libbalsa_filter_save_config(LibBalsaFilter * f);
 
 /* libbalsa_filter_new_from_config can position filter_errno on error */
-
 LibBalsaFilter* libbalsa_filter_new_from_config(void);
 
 /* Loads the filters associated to the mailbox */
-
 void libbalsa_mailbox_filters_load_config(LibBalsaMailbox * mbox);
 
 /* Saves the filters associated to the mailbox */
-
 void libbalsa_mailbox_filters_save_config(LibBalsaMailbox * mbox);
-
-/* Cleans all condition sections for a given filter section */
-
-void libbalsa_filter_clean_conditions(gchar *prefix,gchar* filter_section_name);
 
 #endif  /* __FILTER_FILE_H__ */

@@ -1285,32 +1285,54 @@ config_filters_load(void)
 	filter_errno=non_critical_error;
 }
 
+#define FILTER_SECTION_MAX "9999"
+
 void
 config_filters_save(void)
 {
     GSList *list;
     LibBalsaFilter* fil;
-    gchar * tmp,* section_name;
-    gint i=0;
+    gchar * buffer,* tmp,* section_name;
+    gint i,nb=0,tmp_len=strlen(FILTER_SECTION_MAX)+2;
+
+    /* We allocate once for all a buffer to store conditions sections names */
+    buffer=g_strdup_printf(BALSA_CONFIG_PREFIX FILTER_SECTION_PREFIX "%s/",FILTER_SECTION_MAX);
+    /* section_name points to the beginning of the filter section name */
+    section_name=buffer+strlen(BALSA_CONFIG_PREFIX);
+    /* tmp points to the space where filter number is appended */
+    tmp=section_name+strlen(FILTER_SECTION_PREFIX);
 
     for(list = balsa_app.filters; list; list = g_slist_next(list)) {
 	fil = (LibBalsaFilter*)(list->data);
-	section_name=g_strdup_printf(FILTER_SECTION_PREFIX"%d",i);
-	tmp=g_strconcat(BALSA_CONFIG_PREFIX,section_name,"/",NULL);
-	gnome_config_push_prefix(tmp);
-	g_free(tmp);
+	i=snprintf(tmp,tmp_len,"%d/",nb++);
+	gnome_config_push_prefix(buffer);
 	libbalsa_filter_save_config(fil);
 	gnome_config_pop_prefix();
 
-	libbalsa_filter_clean_conditions(BALSA_CONFIG_PREFIX,section_name);
-
-	if (fil->conditions)
-	    libbalsa_conditions_save_config(fil->conditions,BALSA_CONFIG_PREFIX,section_name);
-
-	g_free(section_name);
-	gnome_config_sync();
-	i++;
+	/* We suppress the final "/", this is necessary in order that
+	 * libbalsa_conditions_save_config can construct the condition
+	 * section name */
+	tmp[i-1]='\0';
+	libbalsa_conditions_save_config(fil->conditions,
+					BALSA_CONFIG_PREFIX,section_name);
     }
+    gnome_config_sync();
+    /* This loop takes care of cleaning up old filter sections */
+    while (TRUE) {
+	i=snprintf(tmp,tmp_len,"%d/",nb++);
+	if (gnome_config_has_section(buffer)) {
+	    gnome_config_clean_section(buffer);
+	    /* We suppress the final "/", this is necessary in order
+	     * that libbalsa_clean_condition_sections can construct
+	     * the condition section name */
+	    tmp[i-1]='\0';
+	    libbalsa_clean_condition_sections(BALSA_CONFIG_PREFIX,
+					      section_name);
+	}
+	else break;
+    }
+    gnome_config_sync();
+    g_free(buffer);
 }
 
 /* Looks for a mailbox filters section with MBOX_URL field equals to mbox->url
@@ -1318,8 +1340,7 @@ config_filters_save(void)
  * The returned string has to be freed by the caller
  */
 
-gchar*
-mailbox_filters_section_lookup(const gchar * url)
+gchar * mailbox_filters_section_lookup(const gchar * url)
 {
     gint pref_len=strlen(MAILBOX_FILTERS_SECTION_PREFIX);
     guint url_len;
@@ -1347,41 +1368,7 @@ mailbox_filters_section_lookup(const gchar * url)
     return NULL;
 }
 
-
-/* Clean the section holding the content of filter and all conditions sections related to it
- */
-void
-clean_filter_config_section(const gchar* name)
-{
-    void *iterator;
-    gchar * key,* section,* fil_name;
-    gint pref_len = strlen(FILTER_SECTION_PREFIX);
-    gboolean found=FALSE;
-
-    iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
-    while (!found && 
-           (iterator = gnome_config_iterator_next(iterator, &key, NULL))) {
-
-	if (strncmp(key, FILTER_SECTION_PREFIX, pref_len) == 0) {
-	    section=g_strconcat(BALSA_CONFIG_PREFIX,key,"/",NULL);
-	    gnome_config_push_prefix(section);
-	    fil_name=gnome_config_get_string("Name");
-	    gnome_config_pop_prefix();
-	    if (strcmp(fil_name,name)==0) {
-		libbalsa_filter_clean_conditions(BALSA_CONFIG_PREFIX,key);
-		gnome_config_clean_section(section);
-		found=TRUE;
-	    }
-	    g_free(section);
-	    g_free(fil_name);
-	}
-	g_free(key);
-    }
-	
-}
-
-void
-config_mailbox_filters_save(LibBalsaMailbox * mbox)
+void config_mailbox_filters_save(LibBalsaMailbox * mbox)
 {
     gchar * tmp;
 
@@ -1410,8 +1397,7 @@ config_mailbox_filters_save(LibBalsaMailbox * mbox)
     gnome_config_sync();
 }
 
-void
-config_mailbox_filters_load(LibBalsaMailbox * mbox)
+void config_mailbox_filters_load(LibBalsaMailbox * mbox)
 {
     gchar * section;
 
@@ -1498,6 +1484,4 @@ check_for_old_sigs(GList * id_list_tmp)
             printf("Setting converted signature as executable.\n");
         }
     }
-} 
-                                                               
-
+}

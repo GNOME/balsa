@@ -572,6 +572,17 @@ config_global_load (void)
   else
     balsa_app.debug = atoi (field);
 
+  /* window sizes */
+  if ((field = pl_dict_get_str (globals, "MainWindowWidth")) == NULL)
+    balsa_app.mw_width = 670;
+  else
+    balsa_app.mw_width = atoi (field);
+
+  if ((field = pl_dict_get_str (globals, "MainWindowHeight")) == NULL)
+    balsa_app.mw_height = 435;
+  else
+    balsa_app.mw_height = atoi (field);
+
   return TRUE;
 }				/* config_global_load */
 
@@ -617,6 +628,12 @@ config_global_save (void)
 
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.previewpane);
     pl_dict_add_str_str (globals, "UsePreviewPane", tmp);
+
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.mw_width);
+  pl_dict_add_str_str (globals, "MainWindowWidth", tmp);
+
+  snprintf (tmp, sizeof (tmp), "%d", balsa_app.mw_height);
+  pl_dict_add_str_str (globals, "MainWindowHeight", tmp);
   }
 
   /* Add it to configuration file */

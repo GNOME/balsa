@@ -74,6 +74,15 @@ static void mailbox_close_child (GtkWidget * widget, gpointer data);
 
 static void about_box_destroy_cb (void);
 
+static void destroy_window_cb (GnomeMDI * mdi, gpointer data);
+
+static void
+destroy_window_cb (GnomeMDI * mdi, gpointer data)
+{
+  gdk_window_get_size (GTK_WIDGET (mdi->active_window)->window, &balsa_app.mw_width, &balsa_app.mw_height);
+  balsa_exit ();
+}
+
 void
 open_main_window (void)
 {
@@ -82,7 +91,7 @@ open_main_window (void)
 
   gtk_signal_connect (GTK_OBJECT (mdi),
 		      "destroy",
-		      (GtkSignalFunc) balsa_exit,
+		      (GtkSignalFunc) destroy_window_cb,
 		      NULL);
 
   /* meubar and toolbar */
@@ -93,7 +102,8 @@ open_main_window (void)
 
   gnome_mdi_set_mode (mdi, balsa_app.mdi_style);
 
-  gtk_widget_set_usize (GTK_WIDGET (mdi->active_window), 670, 435);
+  gtk_window_set_policy (GTK_WINDOW (mdi->active_window), TRUE, TRUE, FALSE);
+  gtk_widget_set_usize (GTK_WIDGET (mdi->active_window), balsa_app.mw_width, balsa_app.mw_height);
 
   refresh_main_window ();
 }

@@ -1,3 +1,9 @@
+2003-09-12 09:29  PeterB
+
+	* src/balsa-mblist.c: Do balsa_mblist_update_mailbox() in an idle
+	handler--the signal handler may be called w/o the gdk
+	lock--possible fix for bug #121962.
+
 2003-09-11 Darko Obradovic <dobradovic gmx.de>
 
 	* src/balsa-app.[hc]: remove balsa_app.drag_default_is_move

@@ -881,12 +881,13 @@ balsa_window_new()
 
     gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, window);
 
+#ifdef HAVE_GTKHTML
     /* Use Ctrl+= as an alternative accelerator for zoom-in, because
      * Ctrl++ is a 3-key combination. */
     gtk_widget_add_accelerator(view_menu[MENU_VIEW_ZOOM_IN].widget,
 			       "activate", GNOME_APP(window)->accel_group,
 			       '=', GDK_CONTROL_MASK, (GtkAccelFlags) 0);
-
+#endif				/* HAVE_GTKHTML */
 
     model = balsa_window_get_toolbar_model();
     toolbar = balsa_toolbar_new(model);

@@ -243,6 +243,7 @@ if test x"$gpgmecfg" != xno ; then
 	if test $gpgme_ve -eq 0 ; then
 		if test $gpgme_ma -lt 9 ; then
 			gpgmecfg=no
+			have_smime=no
 		fi
 	fi
 	if test x"$gpgmecfg" != xno ; then
@@ -261,13 +262,8 @@ if test x"$gpgmecfg" != xno ; then
 		fi
 		AC_MSG_CHECKING(whether to include experimental S/MIME support)
 		if test x"$have_smime" = xyes ; then
-dnl			if test $gpgme_ve -eq 0 -a $gpgme_ma -eq 4 -a $gpgme_mi -eq 3 ; then
-dnl				AC_MSG_WARN(S/MIME support may fail with gpgme 0.4.3)
-dnl				AC_MSG_WARN(you should upgrade to gpgme 0.4.4 or newer)
-dnl			fi
-dnl			AC_MSG_RESULT([yes])
-dnl			AC_DEFINE(HAVE_SMIME,1,[Defined when supporting S/MIME])
-			AC_MSG_WARN(S/MIME support is not yet available with gmime)
+			AC_MSG_RESULT([yes])
+			AC_DEFINE(HAVE_SMIME,1,[Defined when supporting S/MIME])
 		else
 			AC_MSG_RESULT([no])
 		fi
@@ -276,8 +272,10 @@ dnl			AC_DEFINE(HAVE_SMIME,1,[Defined when supporting S/MIME])
 	fi
 else
 	AC_MSG_RESULT(no)
+	have_smime=no
 fi
 AM_CONDITIONAL([BUILD_WITH_GPGME], [test $gpgmecfg = "yes"])
+AM_CONDITIONAL([BUILD_WITH_SMIME], [test $have_smime = "yes"])
 
 
 dnl ###########################################################################

@@ -1,3 +1,9 @@
+2000-07-25  Stuart Parmenter <pavlov@netscape.com>
+	* src/mailbox-conf.c
+
+	Fixed crash when you cancel out of creating a mailbox due to an
+	uninitialized pointer.
+
 2000-07-15  Robert Brady  <rwb197@zepler.org>
 
 	* configure.in: added en_GB.po to ALL_LINGUAS

@@ -1,3 +1,11 @@
+2002-12-13 17:24  PeterB
+
+	* src/balsa-mblist.c: (balsa_mblist_mru_option_menu) Correctly
+	initialize the option menu; use a GDestroyNotify to destroy data,
+	instead of the widget's "destroy" signal.  (bmbl_mru_menu) Use a
+	GClosureNotify to destroy data, instead of the widget's "destroy"
+	signal.
+
 2002-12-13 13:36  PeterB
 
 	* src/main-window.c: (balsa_window_real_close_mbnode) Clear the

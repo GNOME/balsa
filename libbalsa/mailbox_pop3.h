@@ -42,6 +42,7 @@ struct _LibBalsaMailboxPop3 {
     gchar *last_popped_uid;
     gboolean use_apop;
     gboolean filter; /* filter through procmail? */
+    LibBalsaMailbox *inbox;
 };
 
 struct _LibBalsaMailboxPop3Class {
@@ -49,5 +50,6 @@ struct _LibBalsaMailboxPop3Class {
 };
 
 GtkObject *libbalsa_mailbox_pop3_new(void);
+void libbalsa_mailbox_pop3_set_inbox(LibBalsaMailbox *mailbox, LibBalsaMailbox *inbox);
 
 #endif				/* __LIBBALSA_MAILBOX_POP3_H__ */

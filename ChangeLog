@@ -1,3 +1,11 @@
+2001-08-22  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/main-window.c: 
+	* libbalsa/mailbox_pop3.c: 
+	* libbalsa/mailbox_pop3.h: 
+	use tmp mbox to download files and copy them to inbox. 
+	allows inbox in imap.
+
 2001-08-21  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Ali Akcaagac <ali.akcaagac@stud.fh-wilhelmshaven.de>'s patch:

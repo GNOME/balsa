@@ -1450,6 +1450,7 @@ check_mailbox_list(GList * mailbox_list)
 	mailbox = BALSA_MAILBOX_NODE(list->data)->mailbox;
 
 	gdk_threads_enter();
+	libbalsa_mailbox_pop3_set_inbox(mailbox, balsa_app.inbox);
 	libbalsa_mailbox_check(mailbox);
 	gdk_threads_leave();
 

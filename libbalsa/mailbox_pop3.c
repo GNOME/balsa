@@ -30,6 +30,10 @@
 #include "libbalsa_private.h"
 #include "mailbackend.h"
 #include "pop3.h"
+#include "mailbox.h"
+#include <stdio.h>
+#include <fcntl.h>
+#include <errno.h>
 
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
@@ -109,6 +113,7 @@ libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 * mailbox)
     LibBalsaMailboxRemote *remote;
     mailbox->check = FALSE;
     mailbox->delete_from_server = FALSE;
+	mailbox->inbox = NULL;
 
     remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
     remote->server =
@@ -194,12 +199,14 @@ libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox)
 
 /* libbalsa_mailbox_pop3_check:
    checks=downloads POP3 mail. 
-   FIXME: uses mutt's Spoolfile.
 */
 static void
 libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 {
     gchar uid[80];
+    gchar *tmp_path;
+    gint tmp_file;
+    LibBalsaMailbox *tmp_mailbox;
     PopStatus status;
     LibBalsaMailboxPop3 *m = LIBBALSA_MAILBOX_POP3(mailbox);
     LibBalsaServer *server;
@@ -226,9 +233,27 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 	strncpy(uid, m->last_popped_uid, sizeof(uid));
     else uid[0] = '\0';
 
+    do {
+	tmp_path = g_strdup("/tmp/pop-XXXXXX");
+	tmp_file = mkstemp(tmp_path);
+    } while ((tmp_file < 0) && (errno == EEXIST));
+
+    /* newer glibc does this for us */
+    fchmod(tmp_file,  S_IRUSR | S_IWUSR );
+
+    if(tmp_file < 0) {
+	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+			     _("POP3 mailbox %s temp file error:\n%s"), 
+			     mailbox->name,
+			     sys_errlist[errno]);
+	g_free(tmp_path);
+	return;
+    }
+    close(tmp_file);
+
     status =  LIBBALSA_MAILBOX_POP3(mailbox)->filter 
 	? libbalsa_fetch_pop_mail_filter (m, progress_cb, uid)
-	: libbalsa_fetch_pop_mail_direct (m, Spoolfile, progress_cb, uid);
+	: libbalsa_fetch_pop_mail_direct (m, tmp_path, progress_cb, uid);
 
     if(status != POP_OK)
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
@@ -258,6 +283,36 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 
     /* Regrab the gdk lock before leaving */
     gdk_threads_enter();
+
+    tmp_mailbox = (LibBalsaMailbox *)libbalsa_mailbox_local_new((const gchar *)tmp_path, FALSE);
+    if(!tmp_mailbox)  {
+	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+			     _("POP3 mailbox %s temp mailbox error:\n"), 
+			     mailbox->name);
+	g_free(tmp_path);
+	return;
+    }	
+    libbalsa_mailbox_open(tmp_mailbox);
+    /* chbm: fixme - make this more linear */
+    if((m->inbox) && (tmp_mailbox->messages)) {
+	if(libbalsa_messages_move(tmp_mailbox->message_list, m->inbox)) {    
+	    libbalsa_mailbox_close(tmp_mailbox);
+	    unlink((const char*)tmp_path);
+	    gtk_object_destroy(GTK_OBJECT(tmp_mailbox));
+	} else {
+	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+				 _("Error placing messages from %s on %s\n"
+				   "Messages are left in %s\n"),
+				 mailbox->name, 
+				 LIBBALSA_MAILBOX(m->inbox)->name,
+				 tmp_path);
+	    libbalsa_mailbox_close(tmp_mailbox);
+	    gtk_object_destroy(GTK_OBJECT(tmp_mailbox));
+	}
+    } else {
+	unlink((const char*)tmp_path);
+    }
+    g_free(tmp_path);
 }
 
 
@@ -337,4 +392,16 @@ libbalsa_mailbox_pop3_load_config(LibBalsaMailbox * mailbox,
     if (LIBBALSA_MAILBOX_CLASS(parent_class)->load_config)
 	LIBBALSA_MAILBOX_CLASS(parent_class)->load_config(mailbox, prefix);
 
+}
+void
+libbalsa_mailbox_pop3_set_inbox(LibBalsaMailbox *mailbox,
+		LibBalsaMailbox *inbox)
+{
+    LibBalsaMailboxPop3 *pop;
+
+    g_return_if_fail(LIBBALSA_IS_MAILBOX_POP3(mailbox));
+
+    pop = LIBBALSA_MAILBOX_POP3(mailbox);
+
+	pop->inbox=inbox;
 }

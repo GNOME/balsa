@@ -136,9 +136,9 @@ This is version 2.719 of the Balsa manual.
 
 <para>
   &Balsa; is written using <acronym>GTK+</acronym> and
-  <acronym>GNOME</acronym>. It is based on libmutt, the back end code
-  to &Mutt;, but expands far beyond being a
-  graphical Mutt.
+  <acronym>GNOME</acronym>. Originally based on libmutt, the back end code
+  to &Mutt;, &Balsa; now uses a combination of GMime for handling Mime
+  messages, and its own drivers for local and remote mailstores.
 </para>
 
 <para>
@@ -641,7 +641,7 @@ This is version 2.719 of the Balsa manual.
 	    <guimenuitem>Save Current Part...</guimenuitem>
 	  </menuchoice> &mdash; 
 
-	  Save the currently selected part of the message to disk.
+	  Save the currently selected part of the message to a file.
 	</para>
       </listitem>
 
@@ -769,11 +769,11 @@ This is version 2.719 of the Balsa manual.
 	<para>
 	  <menuchoice>
 	    <guimenu>Mailbox</guimenu>
-	    <guimenuitem>Commit Current</guimenuitem>
+	    <guimenuitem>Expunge Deleted Messages</guimenuitem>
 	  </menuchoice> &mdash; 
 
-	  Synchronize changes between the currently selected mailbox
-	  and the mailbox file on disk.
+	  Physically remove from the backing mailstore all messages
+	  marked as deleted.
 	</para>
       </listitem>
 
@@ -2665,8 +2665,57 @@ This is version 2.719 of the Balsa manual.
 <varlistentry>
   <term><guilabel>Empty Trash on Exit</guilabel></term>
   <listitem>
-    <para>Set Balsa to delete all messages in the
+    <para>Set &Balsa; to delete all messages in the
       <symbol>Trash</symbol> mailbox when &Balsa; exits.</para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+    <term><guilabel>Automatically close mailbox</guilabel></term>
+  <listitem>
+      <para>Set &Balsa; to close any mailbox that is unused for
+	  more than the specified time. The currently displayed mailbox
+	  is never automatically closed.
+      </para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+    <term><guilabel>Hide messages marked as deleted</guilabel></term>
+  <listitem>
+      <para>When a message is moved to another mailbox, including the
+	  <symbol>Trash</symbol> mailbox, it is actually copied to the
+	  destination, and the original is marked as deleted. Deleted
+	  messages may either be shown in the mailbox index, with the
+	  trashcan icon indicating that they are deleted, or hidden.
+	  This item controls which of those actions is taken.
+      </para>
+      <para>A message may also be simply marked as deleted, without
+	  copying it to another mailbox:
+	    <menuchoice>
+	      <guimenu>Message</guimenu>
+ 	      <guisubmenu>Toggle flag</guisubmenu>
+	      <guimenuitem>Deleted</guimenuitem>
+	    </menuchoice>.
+	  Again, this item controls whether such a message is hidden.
+      </para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+    <term><guilabel>Expunge deleted messages on close</guilabel></term>
+  <listitem>
+      <para><q>Expunging</q> is the act of physically removing from the
+	  backing mailstore all messages marked as deleted. You can
+	  expunge messages manually:
+	  <menuchoice>
+	      <guimenu>Mailbox</guimenu>
+	      <guimenuitem>Expunge deleted messages</guimenuitem>
+	  </menuchoice>
+	  or you can set &Balsa; to expunge deleted messages when the
+	  mailbox is closed (all mailboxes are closed when you exit
+	  &Balsa;).
+      </para>
   </listitem>
 </varlistentry>
 
@@ -3836,26 +3885,6 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
       </itemizedlist>
     </sect2>
 
-    <sect2 id="inw-didnt-delete">
-      <title>I thought I deleted that message!</title>
-
-      <para>There are some problems with libmutt and deleting
-	messages. We believe them to be solved now, but they may be
-	lingering. Known causes of messages seeming to be deleted but
-	not really are:</para>
-
-      <itemizedlist mark="bullet">
-        <listitem><para>Mail arrives in the folder before the deletion
-         is committed.  This is believed to be
-         solved.</para></listitem>
-
-        <listitem><para>Many messages were deleted and the folder was
-         closed and reopened quickly. This is also believed to be
-         solved.</para></listitem>
-
-      </itemizedlist>
-    </sect2>
-
     <sect2 id="inw-spooky-win">
       <title>What's that window that flashed on the screen?</title>
 
@@ -3981,6 +4010,7 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
 </sect1>
 
   <glossary id="glossary">
+  <title>Glossary</title>
 
     <glossentry id="glossary-pop">
       <glossterm>POP</glossterm>
@@ -4031,8 +4061,8 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
 
     <glossentry id="glossary-libmutt">
       <glossterm>libmutt</glossterm> <glossdef><para>The library based
-	  on Mutt's code used by &Balsa; to
-	  handle local mail.</para></glossdef>
+	  on Mutt's code and used by previous versions of &Balsa; to
+	  handle local mail and IMAP servers.</para></glossdef>
     </glossentry>
     
     <glossentry id="glossary-mailbox-list">

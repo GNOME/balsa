@@ -45,6 +45,9 @@ static void libbalsa_mailbox_destroy (GtkObject *object);
 static void libbalsa_mailbox_real_close(LibBalsaMailbox *mailbox);
 static void libbalsa_mailbox_real_set_unread_messages_flag(LibBalsaMailbox *mailbox, gboolean flag);
 
+static void libbalsa_mailbox_real_save_config(LibBalsaMailbox *mailbox, const gchar *prefix);
+static void libbalsa_mailbox_real_load_config(LibBalsaMailbox *mailbox, const gchar *prefix);
+
 /* Callbacks */
 static void message_status_changed_cb (LibBalsaMessage *message, LibBalsaMailbox *mb );
 
@@ -60,6 +63,7 @@ enum {
 	CHECK,
 	SET_UNREAD_MESSAGES_FLAG,
 	SAVE_CONFIG,
+	LOAD_CONFIG,
 	LAST_SIGNAL
 };
 
@@ -170,8 +174,16 @@ libbalsa_mailbox_class_init (LibBalsaMailboxClass *klass)
 				GTK_RUN_LAST,
 				object_class->type,
 				GTK_SIGNAL_OFFSET (LibBalsaMailboxClass, save_config),
-				gtk_marshal_NONE__NONE,
-				GTK_TYPE_NONE, 0);
+				gtk_marshal_NONE__POINTER,
+				GTK_TYPE_NONE, 1, GTK_TYPE_POINTER);
+
+	libbalsa_mailbox_signals[LOAD_CONFIG] =
+		gtk_signal_new ("load-config",
+				GTK_RUN_LAST,
+				object_class->type,
+				GTK_SIGNAL_OFFSET (LibBalsaMailboxClass, load_config),
+				gtk_marshal_NONE__POINTER,
+				GTK_TYPE_NONE, 1, GTK_TYPE_POINTER);
 
 	gtk_object_class_add_signals (object_class, libbalsa_mailbox_signals, LAST_SIGNAL);
 
@@ -187,7 +199,8 @@ libbalsa_mailbox_class_init (LibBalsaMailboxClass *klass)
 
 	klass->get_message_stream = NULL;
 	klass->check = NULL;
-	klass->save_config = NULL;
+	klass->save_config = libbalsa_mailbox_real_save_config;
+	klass->load_config = libbalsa_mailbox_real_load_config;
 }
 
 static void
@@ -196,7 +209,7 @@ libbalsa_mailbox_init(LibBalsaMailbox *mailbox)
 	mailbox->lock = FALSE;
 	mailbox->is_directory = FALSE;
 
-	mailbox->pkey = NULL;
+	mailbox->config_prefix = NULL;
 	mailbox->name = NULL;
 	CLIENT_CONTEXT (mailbox) = NULL;
 
@@ -224,11 +237,50 @@ libbalsa_mailbox_destroy (GtkObject *object)
 		while (mailbox->open_ref > 0)
 			libbalsa_mailbox_close(mailbox);
 
-	g_free(mailbox->name);     mailbox->name = NULL;	
-	g_free(mailbox->pkey);     mailbox->pkey = NULL;	
+	g_free(mailbox->name);              mailbox->name = NULL;	
+	g_free(mailbox->config_prefix);     mailbox->config_prefix = NULL;	
 
 	if (GTK_OBJECT_CLASS(parent_class)->destroy)
 		(*GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(object));
+}
+
+/* Create a new mailbox by loading it from a config entry... */
+LibBalsaMailbox* 
+libbalsa_mailbox_new_from_config(const gchar *prefix)
+{
+	gchar *type_str;
+	GtkType type;
+	gboolean got_default;
+	LibBalsaMailbox *mailbox;
+
+	gnome_config_push_prefix(prefix);
+	type_str = gnome_config_get_string_with_default("Type", &got_default);
+
+	if ( got_default == TRUE ) {
+		libbalsa_information(LIBBALSA_INFORMATION_WARNING, _("Cannot load mailbox %s"), prefix);
+		return NULL;
+	}
+	
+	type = gtk_type_from_name(type_str);
+	if ( type == 0 ) {
+		libbalsa_information(LIBBALSA_INFORMATION_WARNING, _("No such mailbox type: %s"), type_str);
+		g_free(type_str);
+		return NULL;
+	}
+	
+	mailbox = gtk_type_new(type);
+	if ( mailbox == NULL ) {
+		libbalsa_information(LIBBALSA_INFORMATION_WARNING, _("Could not create a mailbox of type %s"), type_str);
+		g_free(type_str);
+		return NULL;
+	}
+
+	libbalsa_mailbox_load_config(mailbox, prefix);
+
+	gnome_config_pop_prefix();
+	g_free(type_str);
+
+	return mailbox;
 }
 
 void 
@@ -268,12 +320,31 @@ libbalsa_mailbox_check (LibBalsaMailbox *mailbox)
 }
 
 void
-libbalsa_mailbox_save_config (LibBalsaMailbox *mailbox)
+libbalsa_mailbox_save_config (LibBalsaMailbox *mailbox, const gchar *prefix)
 {
 	g_return_if_fail (mailbox != NULL);
 	g_return_if_fail (LIBBALSA_IS_MAILBOX(mailbox));
 
-	gtk_signal_emit (GTK_OBJECT(mailbox), libbalsa_mailbox_signals[SAVE_CONFIG]);
+	/* These are incase this seciton was used for another
+	 * type of mailbox that has now been deleted...
+	 */
+	gnome_config_private_clean_section(prefix);
+	gnome_config_clean_section(prefix);
+
+	gnome_config_push_prefix(prefix);
+	gtk_signal_emit (GTK_OBJECT(mailbox), libbalsa_mailbox_signals[SAVE_CONFIG], prefix);
+	gnome_config_pop_prefix();
+}
+
+void
+libbalsa_mailbox_load_config (LibBalsaMailbox *mailbox, const gchar *prefix)
+{
+	g_return_if_fail (mailbox != NULL);
+	g_return_if_fail (LIBBALSA_IS_MAILBOX(mailbox));
+
+	gnome_config_push_prefix(prefix);
+	gtk_signal_emit (GTK_OBJECT(mailbox), libbalsa_mailbox_signals[LOAD_CONFIG], prefix);
+	gnome_config_pop_prefix();
 }
 
 FILE*
@@ -348,6 +419,28 @@ libbalsa_mailbox_sort (LibBalsaMailbox * mailbox, LibBalsaMailboxSort sort)
 	libbalsa_lock_mutt();
 	mutt_sort_headers (CLIENT_CONTEXT (mailbox), sort);
 	libbalsa_unlock_mutt();
+}
+
+static void
+libbalsa_mailbox_real_save_config(LibBalsaMailbox *mailbox, const gchar *prefix)
+{
+	g_return_if_fail ( LIBBALSA_IS_MAILBOX(mailbox) );
+
+	gnome_config_set_string("Type", gtk_type_name(GTK_OBJECT_TYPE(mailbox)));
+	gnome_config_set_string("Name", mailbox->name);
+				
+}
+
+static void
+libbalsa_mailbox_real_load_config(LibBalsaMailbox *mailbox, const gchar *prefix)
+{
+	g_return_if_fail ( LIBBALSA_IS_MAILBOX(mailbox) );
+	
+	g_free(mailbox->config_prefix);
+	mailbox->config_prefix = g_strdup(prefix);
+
+	g_free(mailbox->name);
+	mailbox->name = gnome_config_get_string("Name=Mailbox");
 }
 
 /*

@@ -63,7 +63,6 @@ CFLAGS += $(GTKHTML_CFLAGS)
 
 balsa_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a	\
-	$(top_builddir)/libmutt/libmutt.a	\
 	$(top_builddir)/libmutt/imap/libimap.a	\
 	$(top_builddir)/libmutt/libmutt.a	\
 	$(top_builddir)/libinit_balsa/libinit_balsa.a \

@@ -45,7 +45,9 @@ static void libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 *mailbox);
 
 static void libbalsa_mailbox_pop3_open (LibBalsaMailbox *mailbox, gboolean append);
 static void libbalsa_mailbox_pop3_check (LibBalsaMailbox *mailbox);
-static void libbalsa_mailbox_pop3_save_conf (LibBalsaMailbox *mailbox);
+
+static void libbalsa_mailbox_pop3_save_config (LibBalsaMailbox *mailbox, const gchar *prefix);
+static void libbalsa_mailbox_pop3_load_config (LibBalsaMailbox *mailbox, const gchar *prefix);
 
 static void progress_cb ( char *msg, int prog, int tot );
 
@@ -87,7 +89,9 @@ libbalsa_mailbox_pop3_class_init (LibBalsaMailboxPop3Class *klass)
 
 	libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_pop3_open;
 	libbalsa_mailbox_class->check = libbalsa_mailbox_pop3_check;
-	libbalsa_mailbox_class->save_config = libbalsa_mailbox_pop3_save_conf;
+
+	libbalsa_mailbox_class->save_config = libbalsa_mailbox_pop3_save_config;
+	libbalsa_mailbox_class->load_config = libbalsa_mailbox_pop3_load_config;
 
 }
 
@@ -293,15 +297,46 @@ static void progress_cb ( char *msg, int prog, int tot )
 #endif
 }
 
-static void libbalsa_mailbox_pop3_save_conf (LibBalsaMailbox *mailbox)
+static void libbalsa_mailbox_pop3_save_config (LibBalsaMailbox *mailbox, const gchar *prefix)
 {
-    gnome_config_private_set_string("type", "LibBalsaMailboxPop3");
-    gnome_config_private_set_string("name", mailbox->name);
-    libbalsa_server_save_conf(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox));
+	LibBalsaMailboxPop3 *pop;
 
-    gnome_config_private_set_bool("check", LIBBALSA_MAILBOX_POP3(mailbox)->check); 
-    gnome_config_private_set_bool("delete", LIBBALSA_MAILBOX_POP3(mailbox)->delete_from_server);
-    gnome_config_private_set_bool("apop", LIBBALSA_MAILBOX_POP3(mailbox)->use_apop);
+	g_return_if_fail ( LIBBALSA_IS_MAILBOX_POP3(mailbox) );
+	
+	pop = LIBBALSA_MAILBOX_POP3(mailbox);
+
+	libbalsa_server_save_config(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox));
+
+	gnome_config_set_bool("Check", pop->check); 
+	gnome_config_set_bool("Delete", pop->delete_from_server);
+	gnome_config_set_bool("Apop", pop->use_apop);
     
-    gnome_config_private_set_string("lastuid", LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid);
+	gnome_config_set_string("Lastuid", pop->last_popped_uid);
+
+	if ( LIBBALSA_MAILBOX_CLASS(parent_class)->save_config )
+		LIBBALSA_MAILBOX_CLASS(parent_class)->save_config(mailbox, prefix);
+
+}
+
+static void
+libbalsa_mailbox_pop3_load_config (LibBalsaMailbox *mailbox, const gchar *prefix)
+{
+	LibBalsaMailboxPop3 *pop;
+
+	g_return_if_fail ( LIBBALSA_IS_MAILBOX_POP3(mailbox) );
+	
+	pop = LIBBALSA_MAILBOX_POP3(mailbox);
+
+	libbalsa_server_load_config(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox), 110);
+
+	pop->check = gnome_config_get_bool ("Check=false");
+	pop->delete_from_server = gnome_config_get_bool ("Delete=false");
+	pop->use_apop = gnome_config_get_bool ("Apop=false");
+
+	g_free(pop->last_popped_uid);
+	pop->last_popped_uid = gnome_config_get_string("Lastuid");
+
+	if ( LIBBALSA_MAILBOX_CLASS(parent_class)->load_config )
+		LIBBALSA_MAILBOX_CLASS(parent_class)->load_config(mailbox, prefix);
+
 }

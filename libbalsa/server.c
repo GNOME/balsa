@@ -250,16 +250,18 @@ static gchar * rot (gchar * pass)
   return buff;
 }
 
-gboolean libbalsa_server_load_conf(LibBalsaServer *server, gint port)
+void
+libbalsa_server_load_config(LibBalsaServer *server, gint default_port)
 {
 	gboolean d;
-	server->host   = gnome_config_private_get_string ("server");
-	server->port   = gnome_config_private_get_int_with_default("port",&d);
-	if(d) server->port = port;
-	server->user   = gnome_config_private_get_string ("username");
-	server->passwd = gnome_config_private_get_string ("password");
+	server->host   = gnome_config_private_get_string ("Server");
+	server->port   = gnome_config_private_get_int_with_default("Port",&d);
+	if(d) server->port = default_port;
+	server->user   = gnome_config_private_get_string ("Username");
+	server->passwd = gnome_config_private_get_string ("Password");
 
-	if(!(server->host && server->port && server->user) ) return FALSE;
+	if(!(server->host && server->port && server->user) ) 
+		return;
 	
 	if (server->passwd != NULL) {
 		gchar *buff;
@@ -267,19 +269,19 @@ gboolean libbalsa_server_load_conf(LibBalsaServer *server, gint port)
 		g_free (server->passwd);
 		server->passwd = buff;
 	}
-	return TRUE;
 }
 
-void libbalsa_server_save_conf(LibBalsaServer *server)
+void
+libbalsa_server_save_config(LibBalsaServer *server)
 {
-	gnome_config_private_set_string ("server",   server->host);
-	gnome_config_private_set_int (   "port",     server->port);
-	gnome_config_private_set_string ("username", server->user);
+	gnome_config_set_string ("Server", server->host);
+	gnome_config_set_int ("Port", server->port);
+	gnome_config_private_set_string ("Username", server->user);
 	
 	if (server->passwd != NULL) {
 		gchar *buff;
 		buff = rot (server->passwd);
-		gnome_config_private_set_string ("password", buff);
+		gnome_config_private_set_string ("Password", buff);
 		g_free (buff);
 	}
 }

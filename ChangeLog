@@ -1,3 +1,20 @@
+2000-09-10  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/mailbox.[ch], src/mailbox_*.c, src/server.[ch]: Implement
+	loading config as a function of the mailbox alongside saving. Push
+	saving of relavent properties into the parent classes and make
+	sure to chain the save_config and load_config calls. Use
+	non-private settings where appropriate. Add a function
+	libbalsa_mailbox_new_from_config which will create a mailbox from
+	a config section.
+	* src/libbalsa.c: Register mailbox types at intialization, to be
+	sure they exist when we try to load the mailboxes.
+	* src/Makefile.am: Don't need libmutt twice in LDADD.
+	* src/main.c: Save configuration before exiting.
+	* src/save-restore.c: Take advantage of mailboxes loading
+	themselves. Use non-private settings where appropriate. Split the
+	large Global section into smaller ones. Rename some keys to not be abbriviated.
+	
 2000-09-10  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/sendmsg-window.c: SelectAll by Michael Duelli <m.duelli@web.de>

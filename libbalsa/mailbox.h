@@ -74,7 +74,7 @@ struct _LibBalsaMailbox
 {
 	GtkObject object;
 
-	gchar * pkey; /* unique string identifying mailbox in the config file*/
+	gchar * config_prefix; /* unique string identifying mailbox in the config file*/
 	gchar *name;
 	gpointer context;
 	guint open_ref;
@@ -115,10 +115,13 @@ struct _LibBalsaMailboxClass
 	FILE* (* get_message_stream)     (LibBalsaMailbox *mailbox,
 					  LibBalsaMessage *message);
 	void  (* check)                  (LibBalsaMailbox *mailbox);
-	void  (* save_config)            (LibBalsaMailbox *mailbox);
+	void  (* save_config)            (LibBalsaMailbox *mailbox, const gchar *prefix);
+	void  (* load_config)            (LibBalsaMailbox *mailbox, const gchar *prefix);
 };
 
 GtkType libbalsa_mailbox_get_type (void);
+
+LibBalsaMailbox* libbalsa_mailbox_new_from_config(const gchar *prefix);
 
 /* 
  * open and close a mailbox 
@@ -142,7 +145,9 @@ void libbalsa_mailbox_sort (LibBalsaMailbox * mailbox, LibBalsaMailboxSort sort)
 gint libbalsa_mailbox_commit_changes( LibBalsaMailbox *mailbox );
 
 void libbalsa_mailbox_check (LibBalsaMailbox *mailbox);
-void libbalsa_mailbox_save_config (LibBalsaMailbox *mailbox);
+
+void libbalsa_mailbox_save_config (LibBalsaMailbox *mailbox, const gchar *prefix);
+void libbalsa_mailbox_load_config (LibBalsaMailbox *mailbox, const gchar *prefix);
 
 /*
  * misc mailbox releated functions

@@ -119,6 +119,13 @@ libbalsa_init (LibBalsaInformationFunc information_callback)
 	set_option(OPTCHECKNEW);
 
 	libbalsa_notify_init();
+
+	/* Register our types */
+	/* So that libbalsa_mailbox_new_from_config will work... */
+	LIBBALSA_TYPE_MAILBOX_LOCAL;
+	LIBBALSA_TYPE_MAILBOX_POP3;
+	LIBBALSA_TYPE_MAILBOX_IMAP;
+
 }
 
 void

@@ -47,8 +47,10 @@ static void libbalsa_mailbox_local_destroy (GtkObject *object);
 
 static void libbalsa_mailbox_local_open(LibBalsaMailbox *mailbox, gboolean append);
 static void libbalsa_mailbox_local_check (LibBalsaMailbox *mailbox);
-static void libbalsa_mailbox_local_save_conf (LibBalsaMailbox *mailbox);
 static FILE* libbalsa_mailbox_local_get_message_stream(LibBalsaMailbox *mailbox, LibBalsaMessage *message);
+
+static void libbalsa_mailbox_local_save_config (LibBalsaMailbox *mailbox, const gchar *prefix);
+static void libbalsa_mailbox_local_load_config (LibBalsaMailbox *mailbox, const gchar *prefix);
 
 GtkType
 libbalsa_mailbox_local_get_type (void)
@@ -89,7 +91,9 @@ libbalsa_mailbox_local_class_init (LibBalsaMailboxLocalClass *klass)
 	libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_local_open;
 	libbalsa_mailbox_class->get_message_stream = libbalsa_mailbox_local_get_message_stream;
 	libbalsa_mailbox_class->check = libbalsa_mailbox_local_check;
-	libbalsa_mailbox_class->save_config = libbalsa_mailbox_local_save_conf;
+
+	libbalsa_mailbox_class->save_config = libbalsa_mailbox_local_save_config;
+	libbalsa_mailbox_class->load_config = libbalsa_mailbox_local_load_config;
 }
 
 static void
@@ -298,10 +302,36 @@ static void libbalsa_mailbox_local_check (LibBalsaMailbox *mailbox)
 	}
 }
 
-static void libbalsa_mailbox_local_save_conf (LibBalsaMailbox *mailbox)
+static void libbalsa_mailbox_local_save_config (LibBalsaMailbox *mailbox, const gchar *prefix)
 {
-    gnome_config_private_set_string ("type", "LibBalsaMailboxLocal");
-    gnome_config_private_set_string ("name", mailbox->name);
-    gnome_config_private_set_string ("path", 
-				     LIBBALSA_MAILBOX_LOCAL (mailbox)->path);
+	LibBalsaMailboxLocal *local;
+
+	g_return_if_fail ( LIBBALSA_IS_MAILBOX_LOCAL(mailbox) );
+	
+	local = LIBBALSA_MAILBOX_LOCAL(mailbox);
+
+	gnome_config_set_string ("Path", local->path);
+	
+	if ( LIBBALSA_MAILBOX_CLASS(parent_class)->save_config )
+		LIBBALSA_MAILBOX_CLASS(parent_class)->save_config(mailbox, prefix);
 }
+
+static void libbalsa_mailbox_local_load_config (LibBalsaMailbox *mailbox, const gchar *prefix)
+{
+	LibBalsaMailboxLocal *local;
+
+	g_return_if_fail ( LIBBALSA_IS_MAILBOX_LOCAL(mailbox) );
+	
+	local = LIBBALSA_MAILBOX_LOCAL(mailbox);
+
+	g_free(local->path);
+	
+	local->path = gnome_config_get_string ("Path");
+
+	if ( LIBBALSA_MAILBOX_CLASS(parent_class)->load_config )
+		LIBBALSA_MAILBOX_CLASS(parent_class)->load_config(mailbox, prefix);
+
+	libbalsa_notify_register_mailbox(mailbox);
+
+}
+

@@ -407,6 +407,8 @@ balsa_exit (void)
   force_close_mailbox(balsa_app.draftbox);
   force_close_mailbox(balsa_app.trash);
 
+  config_save();
+
   gnome_sound_shutdown ();
   gtk_main_quit();
 }

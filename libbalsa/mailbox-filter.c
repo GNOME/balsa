@@ -29,9 +29,11 @@
 
 #include "config.h"
 #include <string.h>
-#include <gnome.h>
+#include <libgnome/gnome-config.h> 
+
 #include "filter-file.h"
 #include "mailbox-filter.h"
+#include "misc.h"
 
 /* FIXME : double definition : first is in save-restore.c */
 #define BALSA_CONFIG_PREFIX "balsa/"

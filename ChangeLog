@@ -1,3 +1,9 @@
+2004-06-08  Pawel Salek
+
+	* libbalsa/mailbox-filter.c: compile.
+	* libbalsa/imap/imap-commands.c: set the readonly argument
+	also when the handle has been already selected.
+
 2004-06-07 16:51  PeterB
 
 	* libbalsa/: mailbox_maildir.c, mailbox_mbox.c, mailbox_mh.c:

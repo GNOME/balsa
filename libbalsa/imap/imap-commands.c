@@ -212,7 +212,8 @@ imap_mbox_handle_noop(ImapMboxHandle *handle)
 /* 6.3 Client Commands - Authenticated State */
 
 
-/* 6.3.1 SELECT Command */
+/* 6.3.1 SELECT Command
+ * readonly_mbox can be NULL. */
 ImapResponse
 imap_mbox_select(ImapMboxHandle* handle, const char *mbox,
                  gboolean *readonly_mbox)
@@ -220,9 +221,11 @@ imap_mbox_select(ImapMboxHandle* handle, const char *mbox,
   gchar* cmd, *mbx7;
   ImapResponse rc;
 
-  if (handle->state == IMHS_SELECTED && strcmp(handle->mbox, mbox) == 0)
-      return IMR_OK;
-
+  if (handle->state == IMHS_SELECTED && strcmp(handle->mbox, mbox) == 0) {
+    if(readonly_mbox)
+      *readonly_mbox = handle->readonly_mbox;
+    return IMR_OK;
+  }
   imap_mbox_resize_cache(handle, 0);
   mbox_view_dispose(&handle->mbox_view);
   handle->unseen = 0;

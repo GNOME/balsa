@@ -286,26 +286,40 @@ balsa_message_class_init(BalsaMessageClass * klass)
 
 }
 
+static void
+bm_scroll_realized(GtkWidget * scroll, BalsaMessage * bm)
+{
+    gtk_widget_modify_bg(scroll, GTK_STATE_NORMAL,
+			 &GTK_WIDGET(bm)->style->dark[GTK_STATE_NORMAL]);
+}
+
+static void
+bm_text_view_realized(GtkWidget * text_view, BalsaMessage * bm)
+{
+    gtk_widget_modify_base(text_view, GTK_STATE_NORMAL,
+			   &GTK_WIDGET(bm)->style->mid[GTK_STATE_NORMAL]);
+}
+
+
 #define BALSA_MESSAGE_TEXT_VIEW "balsa-message-text-view"
-#define BALSA_MESSAGE_CONTENT   "balsa-message-content"
+#define bm_header_widget_get_text_view(header_widget) \
+    g_object_get_data(G_OBJECT(header_widget), BALSA_MESSAGE_TEXT_VIEW)
 static void bm_modify_font_from_string(GtkWidget * widget,
 				       const char *font);
 
 static GtkWidget *
-bm_header_widget(BalsaMessage * bm)
+bm_header_widget_new(BalsaMessage * bm)
 {
     GtkWidget *widget;
     GtkWidget *text_view;
-    GdkColor color;
 
     widget = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),
 				   GTK_POLICY_NEVER, GTK_POLICY_NEVER);
     gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(widget),
 					GTK_SHADOW_IN);
-
-    gdk_color_parse("MediumBlue", &color);
-    gtk_widget_modify_bg(GTK_WIDGET(widget), GTK_STATE_NORMAL, &color);
+    g_signal_connect_after(widget, "realize",
+			   G_CALLBACK(bm_scroll_realized), bm);
 
     text_view = gtk_text_view_new();
     bm_modify_font_from_string(text_view, balsa_app.message_font);
@@ -314,11 +328,10 @@ bm_header_widget(BalsaMessage * bm)
     gtk_text_view_set_right_margin(GTK_TEXT_VIEW(text_view), 15);
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text_view), GTK_WRAP_WORD);
 
-    gdk_color_parse("grey85", &color);
-    gtk_widget_modify_base(text_view, GTK_STATE_NORMAL, &color);
-
     g_signal_connect(text_view, "key_press_event",
 		     G_CALLBACK(balsa_message_key_press_event), bm);
+    g_signal_connect_after(text_view, "realize",
+			   G_CALLBACK(bm_text_view_realized), bm);
     gtk_container_add(GTK_CONTAINER(widget), text_view);
 
     g_object_set_data(G_OBJECT(widget), BALSA_MESSAGE_TEXT_VIEW,
@@ -328,10 +341,13 @@ bm_header_widget(BalsaMessage * bm)
     return widget;
 }
 
+#define BALSA_MESSAGE_CONTENT   "balsa-message-content"
+#define bm_message_widget_get_content_box(message_widget) \
+    g_object_get_data(G_OBJECT(message_widget), BALSA_MESSAGE_CONTENT)
 #define PADDING      6
 #define BIG_PADDING 10
 static GtkWidget *
-bm_message_widget(GtkWidget * headers, gboolean embedded)
+bm_message_widget_new(GtkWidget * headers, gboolean embedded)
 {
     GtkWidget *message_box;
     GtkWidget *content;
@@ -372,7 +388,7 @@ balsa_message_init(BalsaMessage * bm)
     GtkTreeStore *model;
     GtkCellRenderer *renderer;
     GtkTreeSelection *selection;
-    GtkStyle * text_style;
+    GtkStyle *border_style;
 
     /* Notebook to hold content + structure */
     bm->notebook = gtk_notebook_new();
@@ -394,22 +410,20 @@ balsa_message_init(BalsaMessage * bm)
     gtk_container_add(GTK_CONTAINER(scroll), bm->cont_viewport);
 
     /* Widget to hold headers */
-    bm->header_container = bm_header_widget(bm);
+    bm->header_container = bm_header_widget_new(bm);
 
     /* Make background of the view-port the same as the base color of the
-     * text (well, usually). */
-    text_view = g_object_get_data(G_OBJECT(bm->header_container),
-				  BALSA_MESSAGE_TEXT_VIEW);
-    text_style = gtk_style_copy(text_view->style);
-    text_style->bg[GTK_STATE_NORMAL] = text_style->base[GTK_STATE_NORMAL];
-    gtk_widget_set_style(bm->cont_viewport, text_style);
-    g_object_unref(text_style);
+     * text. */
+    text_view = bm_header_widget_get_text_view(bm->header_container);
+    border_style = gtk_style_copy(gtk_rc_get_style(text_view));
+    border_style->bg[GTK_STATE_NORMAL] = border_style->base[GTK_STATE_NORMAL];
+    gtk_widget_set_style(bm->cont_viewport, border_style);
+    g_object_unref(border_style);
 
     /* Widget to hold message */
-    message_widget = bm_message_widget(bm->header_container, FALSE);
+    message_widget = bm_message_widget_new(bm->header_container, FALSE);
     gtk_container_add(GTK_CONTAINER(bm->cont_viewport), message_widget);
-    bm->content = g_object_get_data(G_OBJECT(message_widget),
-				    BALSA_MESSAGE_CONTENT);
+    bm->content = bm_message_widget_get_content_box(message_widget);
 
     /* structure view */
     model = gtk_tree_store_new (NUM_COLUMNS,
@@ -1272,8 +1286,7 @@ display_headers_real(BalsaMessage * bm, LibBalsaMessageHeaders * headers,
                      LibBalsaMessageBody * sig_body, const gchar * subject,
                      GtkWidget * widget)
 {
-    GtkTextView *view =
-	g_object_get_data(G_OBJECT(widget), BALSA_MESSAGE_TEXT_VIEW);
+    GtkTextView *view = bm_header_widget_get_text_view(widget);
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(view);
     GList *p;
     gchar *date;
@@ -1652,7 +1665,7 @@ part_info_init_message(BalsaMessage * bm, BalsaPartInfo * info)
         }
         g_free(access_type);
     } else if (!g_ascii_strcasecmp("message/rfc822", body_type)) {
-        GtkWidget *emb_hdrs = bm_header_widget(bm);
+        GtkWidget *emb_hdrs = bm_header_widget_new(bm);
         
         display_embedded_headers(bm, info->body, emb_hdrs);
         
@@ -3299,11 +3312,10 @@ add_part(BalsaMessage * bm, BalsaPartInfo * info)
 	    libbalsa_message_body_get_content_type(info->body);
 	if (strcmp(content_type, "message/rfc822") == 0) {
 	    GtkWidget *message_widget =
-		bm_message_widget(info->widget, TRUE);
+		bm_message_widget_new(info->widget, TRUE);
 	    gtk_container_add(GTK_CONTAINER(bm->content), message_widget);
 	    save = bm->content;
-	    bm->content = g_object_get_data(G_OBJECT(message_widget),
-					    BALSA_MESSAGE_CONTENT);
+	    bm->content = bm_message_widget_get_content_box(message_widget);
 	} else
 	    gtk_container_add(GTK_CONTAINER(bm->content), info->widget);
 	g_free(content_type);

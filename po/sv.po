@@ -11,8 +11,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2003-09-24 11:24+0200\n"
-"PO-Revision-Date: 2003-09-24 11:26+0200\n"
+"POT-Creation-Date: 2003-10-06 12:20+0200\n"
+"PO-Revision-Date: 2003-10-06 12:22+0200\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -4175,7 +4175,7 @@ msgstr "Gör tyst kontroll i bakgrunden (inga meddelanden i statusraden)"
 msgid "Quoted and Flowed Text"
 msgstr "Citerad text och flödestext"
 
-#: src/pref-manager.c:1728 src/sendmsg-window.c:3797
+#: src/pref-manager.c:1728 src/sendmsg-window.c:3798
 msgid "Quoted Text Regular Expression"
 msgstr "Reguljärt uttryck med citerad text"
 
@@ -5148,21 +5148,23 @@ msgstr "Välj teckentabell"
 #: src/sendmsg-window.c:3064
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
-"Please choose the charset used to encode the file."
+"Please choose the charset used to encode the file.\n"
+"(if unsure chose Generic UTF-8)"
 msgstr ""
 "Denna fil är inte kodad i US-ASCII eller UTF-8.\n"
-"Välj teckentabellen som ska användas för kodning av filen."
+"Välj teckentabellen som ska användas för kodning av filen.\n"
+"(Om du är osäker bör du välja allmän UTF-8)"
 
-#: src/sendmsg-window.c:3130
+#: src/sendmsg-window.c:3131
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Kunde inte öppna filen %s.\n"
 
-#: src/sendmsg-window.c:3152
+#: src/sendmsg-window.c:3153
 msgid "Include file"
 msgstr "Inkludera fil"
 
-#: src/sendmsg-window.c:3452
+#: src/sendmsg-window.c:3453
 #, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
@@ -5173,7 +5175,7 @@ msgstr ""
 "Välj ett språk för detta meddelande.\n"
 "Välj UTF-8 för meddelanden med flera språk."
 
-#: src/sendmsg-window.c:3472
+#: src/sendmsg-window.c:3473
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
@@ -5183,32 +5185,32 @@ msgstr ""
 "endast den första delen att signeras och/eller krypteras. Du bör välja MIME-"
 "läge om hela meddelandet ska skyddas. Vill du verkligen fortsätta?"
 
-#: src/sendmsg-window.c:3485
+#: src/sendmsg-window.c:3486
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "skickar meddelande med gpg-läge %d"
 
-#: src/sendmsg-window.c:3796
+#: src/sendmsg-window.c:3797
 #, c-format
 msgid "Could not compile %s"
 msgstr "Kunde inte kompilera %s"
 
-#: src/sendmsg-window.c:4314
+#: src/sendmsg-window.c:4315
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Svara till %s: %s"
 
-#: src/sendmsg-window.c:4319
+#: src/sendmsg-window.c:4320
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Vidarebefordra meddelande till %s: %s"
 
-#: src/sendmsg-window.c:4323
+#: src/sendmsg-window.c:4324
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Fortsätt meddelande till %s: %s"
 
-#: src/sendmsg-window.c:4327
+#: src/sendmsg-window.c:4328
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Nytt meddelande till %s: %s"
@@ -5592,6 +5594,13 @@ msgstr "Upp"
 #: src/toolbar-prefs.c:508
 msgid "Down"
 msgstr "Ned"
+
+#~ msgid ""
+#~ "This file is not encoded in US-ASCII or UTF-8.\n"
+#~ "Please choose the charset used to encode the file."
+#~ msgstr ""
+#~ "Denna fil är inte kodad i US-ASCII eller UTF-8.\n"
+#~ "Välj teckentabellen som ska användas för kodning av filen."
 
 #~ msgid "Drag-and-drop moves messages by default"
 #~ msgstr "Dra-och-släpp flyttar meddelanden som standard"

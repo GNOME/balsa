@@ -931,8 +931,14 @@ libbalsa_mailbox_view_free(LibBalsaMailboxView * view)
  * do not forget to modify LibBalsaMailbox::stamp on each modification
  * of the message list.
  * =================================================================== */
-#define VALID_ITER(iter, tree_store) (iter!= NULL && iter->user_data != NULL\
-                                      && tree_store->stamp == iter->stamp)
+#define VALID_ITER(iter, tree_model) \
+    ((iter)!= NULL && \
+     (iter)->user_data != NULL && \
+     LIBBALSA_IS_MAILBOX(tree_model) && \
+     ((LibBalsaMailbox *) tree_model)->stamp == (iter)->stamp)
+#define VALIDATE_ITER(iter, tree_model) \
+    ((iter)->stamp = ((LibBalsaMailbox *) tree_model)->stamp)
+#define INVALIDATE_ITER(iter) ((iter)->stamp = 0)
 
 static GtkTreeModelFlags mbox_model_get_flags  (GtkTreeModel      *tree_model);
 static gint         mbox_model_get_n_columns   (GtkTreeModel      *tree_model);
@@ -1019,83 +1025,57 @@ mbox_model_get_iter(GtkTreeModel *tree_model,
 {
     LibBalsaMailbox* mbox = (LibBalsaMailbox*)tree_model;
     GtkTreeIter parent;
-    gint *indices;
+    const gint *indices;
     gint depth, i;
 
-    g_return_val_if_fail (LIBBALSA_IS_MAILBOX(tree_model), FALSE);
+    INVALIDATE_ITER(iter);
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(tree_model), FALSE);
 
-    indices = gtk_tree_path_get_indices (path);
-    depth = gtk_tree_path_get_depth (path);
+    indices = gtk_tree_path_get_indices(path);
+    depth = gtk_tree_path_get_depth(path);
 
-    parent.stamp     = mbox->stamp;
-    parent.user_data = mbox->msg_tree;
+    g_return_val_if_fail(depth > 0, FALSE);
 
-    if (! gtk_tree_model_iter_nth_child (tree_model, iter, 
-					 &parent, indices[0]))
-	return FALSE;
-    
-    for (i = 1; i < depth; i++) {
+    iter->user_data = mbox->msg_tree;
+    VALIDATE_ITER(iter, tree_model);
+
+    for (i = 0; i < depth; i++) {
 	parent = *iter;
-	if (! gtk_tree_model_iter_nth_child (tree_model, iter,
-					     &parent, indices[i]))
+	if (!mbox_model_iter_nth_child(tree_model, iter, &parent,
+				       indices[i]))
 	    return FALSE;
     }
 
     return TRUE;
 }
 
-static GtkTreePath*
-mbox_model_get_path(GtkTreeModel *tree_model, GtkTreeIter  *iter)
+static GtkTreePath *
+mbox_model_get_path(GtkTreeModel	* tree_model,
+		    GtkTreeIter		* iter)
 {
+    GNode *node;
+    GtkTreeIter parent_iter;
     GtkTreePath *retval;
-    GNode *tmp_node;
-    gint i = 0;
 
-    g_return_val_if_fail (iter != NULL, NULL);
-    g_return_val_if_fail (iter->user_data != NULL, NULL);
-    g_return_val_if_fail (iter->stamp == LIBBALSA_MAILBOX(tree_model)->stamp,
-                          NULL);
+    g_return_val_if_fail(VALID_ITER(iter, tree_model), NULL);
 
-    if (((GNode*)iter->user_data)->parent == NULL &&
-        ((GNode*)iter->user_data) == LIBBALSA_MAILBOX(tree_model)->msg_tree)
-        return gtk_tree_path_new ();
-    g_assert ( ((GNode*)iter->user_data)->parent != NULL);
-
-    if ( ((GNode*)iter->user_data)->parent == 
-         LIBBALSA_MAILBOX(tree_model)->msg_tree) {
-        retval = gtk_tree_path_new ();
-        tmp_node = LIBBALSA_MAILBOX(tree_model)->msg_tree->children;
-    } else {
-        GtkTreeIter tmp_iter = *iter;
-        tmp_iter.user_data = ((GNode*)iter->user_data)->parent;
-        
-        retval = mbox_model_get_path(tree_model, &tmp_iter);
-	tmp_node = ((GNode*)iter->user_data)->parent->children;
+    node = iter->user_data;
+    if (node->parent == NULL) {
+	if (node == LIBBALSA_MAILBOX(tree_model)->msg_tree)
+	    return gtk_tree_path_new();
+	else
+	    return NULL;
     }
-    
+
+    parent_iter.user_data = node->parent;
+    VALIDATE_ITER(&parent_iter, tree_model);
+    retval = mbox_model_get_path(tree_model, &parent_iter);
     if (retval == NULL)
-        return NULL;
-    
-    if (tmp_node == NULL) {
-        gtk_tree_path_free (retval);
-        return NULL;
-    }
-    
-    for (; tmp_node; tmp_node = tmp_node->next)  {
-        if (tmp_node == iter->user_data)
-            break;
-        i++;
-    }
-    
-    if (tmp_node == NULL) {
-        /* We couldn't find node, meaning it's prolly not ours */
-        /* Perhaps I should do a g_return_if_fail here. */
-        gtk_tree_path_free (retval);
-        return NULL;
-    }
-    
-    gtk_tree_path_append_index (retval, i);
-    
+	return NULL;
+
+    gtk_tree_path_append_index(retval,
+			       g_node_child_position(node->parent, node));
+
     return retval;
 }
 
@@ -1110,9 +1090,9 @@ mbox_model_get_value(GtkTreeModel *tree_model,
     guint msgno;
     gchar *tmp;
     
-    g_return_if_fail (iter != NULL);
-    g_return_if_fail (iter->stamp == LIBBALSA_MAILBOX(tree_model)->stamp);
-    g_return_if_fail(column<(int)ELEMENTS(mbox_model_col_type));
+    g_return_if_fail(VALID_ITER(iter, tree_model));
+    g_return_if_fail(column >= 0 &&
+		     column < (int) ELEMENTS(mbox_model_col_type));
  
     msgno = GPOINTER_TO_UINT( ((GNode*)iter->user_data)->data );
     msg = libbalsa_mailbox_get_message(lmm, msgno);
@@ -1147,16 +1127,19 @@ static gboolean
 mbox_model_iter_next(GtkTreeModel      *tree_model,
 		     GtkTreeIter       *iter)
 {
-    GList* lst;
-    g_return_val_if_fail(iter != NULL, FALSE);
-    g_return_val_if_fail(iter->stamp==LIBBALSA_MAILBOX(tree_model)->stamp,
-                         FALSE);
+    GNode *node;
 
-    lst = (GList*)iter->user_data;
-    if(lst && lst->next) {
-	iter->user_data = lst->next;
+    g_return_val_if_fail(VALID_ITER(iter, tree_model), FALSE);
+
+    node = iter->user_data;
+    if(node && (node = node->next)) {
+	iter->user_data = node;
+	VALIDATE_ITER(iter, tree_model);
 	return TRUE;
-    } else return FALSE;
+    } else {
+	INVALIDATE_ITER(iter);
+	return FALSE;
+    }
 }
 
 static gboolean
@@ -1164,32 +1147,35 @@ mbox_model_iter_children(GtkTreeModel      *tree_model,
 			 GtkTreeIter       *iter,
 			 GtkTreeIter       *parent)
 {
-    GNode *children;
-    
-    g_return_val_if_fail(parent->stamp==LIBBALSA_MAILBOX(tree_model)->stamp,
-                         FALSE);
+    GNode *node;
 
-    if (parent)
-        children = ((GNode*)parent->user_data)->children;
-    else
-        children = LIBBALSA_MAILBOX(tree_model)->msg_tree->children;
-    
-    if (children) {
-        iter->stamp = LIBBALSA_MAILBOX(tree_model)->stamp;
-        iter->user_data = children;
-        return TRUE;
+    INVALIDATE_ITER(iter);
+    g_return_val_if_fail(parent == NULL ||
+			 VALID_ITER(parent, tree_model), FALSE);
+
+    node = parent ? parent->user_data
+		  : LIBBALSA_MAILBOX(tree_model)->msg_tree;
+    node = node->children;
+    if (node) {
+	iter->user_data = node;
+	VALIDATE_ITER(iter, tree_model);
+	return TRUE;
     } else
-        return FALSE;
+	return FALSE;
 }
 
 static gboolean
-mbox_model_iter_has_child(GtkTreeModel      *tree_model,
-			  GtkTreeIter       *iter)
+mbox_model_iter_has_child(GtkTreeModel	* tree_model,
+			  GtkTreeIter	* iter)
 {
-    g_return_val_if_fail (iter != NULL, FALSE);
-    g_return_val_if_fail (iter->stamp == LIBBALSA_MAILBOX(tree_model)->stamp,
-                          FALSE);
-    return (!iter  || iter->user_data==NULL);
+    GNode *node;
+
+    g_return_val_if_fail(VALID_ITER(iter, LIBBALSA_MAILBOX(tree_model)),
+			 FALSE);
+
+    node = iter->user_data;
+
+    return (node->children != NULL);
 }
 
 static gint
@@ -1197,56 +1183,56 @@ mbox_model_iter_n_children(GtkTreeModel      *tree_model,
 			   GtkTreeIter       *iter)
 {
     GNode *node;
-    int i = 0;
-    g_return_val_if_fail (iter == NULL || iter->user_data != NULL, FALSE);
 
-    if (iter == NULL)
-        node = LIBBALSA_MAILBOX(tree_model)->msg_tree->children;
-    else
-        node = ((GNode*)iter->user_data)->children;
-    
-    while (node) {
-        i++;
-        node = node->next;
-    }
-    return i;
+    g_return_val_if_fail(iter == NULL || VALID_ITER(iter, tree_model), 0);
+
+    node = iter ? iter->user_data
+		: LIBBALSA_MAILBOX(tree_model)->msg_tree;
+
+    return g_node_n_children(node);
 }
 
 static gboolean
-mbox_model_iter_nth_child(GtkTreeModel      *tree_model,
-			  GtkTreeIter       *iter,
-			  GtkTreeIter       *parent,
-			  gint               n)
+mbox_model_iter_nth_child(GtkTreeModel	* tree_model,
+			  GtkTreeIter	* iter,
+			  GtkTreeIter	* parent,
+			  gint		  n)
 {
-    GNode *parent_node;
-    GNode *child;
+    GNode *node;
 
-    if (parent == NULL)
-        parent_node = LIBBALSA_MAILBOX(tree_model)->msg_tree;
-    else
-        parent_node = parent->user_data;
-    
-    child = g_node_nth_child (parent_node, n);
-    
-    if (child) {
-        iter->user_data = child;
-        iter->stamp = LIBBALSA_MAILBOX(tree_model)->stamp;
-        return TRUE;
+    INVALIDATE_ITER(iter);
+    g_return_val_if_fail(parent == NULL
+			 || VALID_ITER(parent, tree_model), FALSE);
+
+    node = parent ? parent->user_data
+		  : LIBBALSA_MAILBOX(tree_model)->msg_tree;
+    node = g_node_nth_child(node, n);
+
+    if (node) {
+	iter->user_data = node;
+	VALIDATE_ITER(iter, tree_model);
+	return TRUE;
     } else
-        return FALSE;
+	return FALSE;
 }
 
 static gboolean
-mbox_model_iter_parent(GtkTreeModel      *tree_model,
-		       GtkTreeIter       *iter,
-		       GtkTreeIter       *child)
+mbox_model_iter_parent(GtkTreeModel	* tree_model,
+		       GtkTreeIter	* iter,
+		       GtkTreeIter	* child)
 {
+    GNode *node;
 
+    INVALIDATE_ITER(iter);
     g_return_val_if_fail(iter != NULL, FALSE);
-    g_return_val_if_fail(child != NULL, FALSE);
-    g_return_val_if_fail(child->stamp==LIBBALSA_MAILBOX(tree_model)->stamp,
-			 FALSE);
+    g_return_val_if_fail(VALID_ITER(child, tree_model), FALSE);
 
-    return FALSE;
+    node = child->user_data;
+    node = node->parent;
+    if (node && node != LIBBALSA_MAILBOX(tree_model)->msg_tree) {
+	iter->user_data = node;
+	VALIDATE_ITER(iter, tree_model);
+	return TRUE;
+    } else
+	return FALSE;
 }
-

@@ -1272,3 +1272,73 @@ libbalsa_window_select_all(GtkWindow * window)
             gtk_tree_selection_select_all(selection);
     }
 }
+
+void
+libbalsa_unwrap_selection(GtkTextBuffer * buffer, regex_t * rex)
+{
+    GtkTextIter start, end;
+    gchar *line;
+    guint quote_depth;
+    guint index;
+    GtkTextMark *selection_end;
+
+    gtk_text_buffer_get_selection_bounds(buffer, &start, &end);
+    gtk_text_iter_order(&start, &end);
+    selection_end = gtk_text_buffer_create_mark(buffer, NULL, &end, FALSE);
+
+    /* Find quote depth and index of first non-quoted character. */
+    line = get_line(buffer, &start);
+    if (libbalsa_match_regex(line, rex, &quote_depth, &index)) {
+	/* Replace quote string with standard form. */
+	end = start;
+	gtk_text_iter_set_line_index(&end, index);
+	gtk_text_buffer_delete(buffer, &start, &end);
+	do
+	    gtk_text_buffer_insert(buffer, &start, ">", 1);
+	while (--quote_depth);
+	gtk_text_buffer_insert(buffer, &start, " ", 1);
+    }
+    g_free(line);
+
+    /* Unwrap remaining lines. */
+    while (gtk_text_iter_ends_line(&start)
+	   || gtk_text_iter_forward_to_line_end(&start)) {
+	gtk_text_buffer_get_iter_at_mark(buffer, &end, selection_end);
+	if (gtk_text_iter_compare(&start, &end) >= 0)
+	    break;
+	end = start;
+	if (!gtk_text_iter_forward_line(&end))
+	    break;
+	line = get_line(buffer, &end);
+	libbalsa_match_regex(line, rex, NULL, &index);
+	g_free(line);
+	gtk_text_iter_set_line_index(&end, index);
+	gtk_text_buffer_delete(buffer, &start, &end);
+	/* Insert a space, if the line didn't end with one. */
+	if (!gtk_text_iter_starts_line(&start)) {
+	    gtk_text_iter_backward_char(&start);
+	    if (gtk_text_iter_get_char(&start) != ' ') {
+		start = end;
+		gtk_text_buffer_insert(buffer, &start, " ", 1);
+	    }
+	}
+    }
+}
+
+gboolean
+libbalsa_match_regex(const gchar * line, regex_t * rex, guint * count,
+		     guint * index)
+{
+    regmatch_t rm;
+    gint c;
+    const gchar *p;
+
+    c = 0;
+    for (p = line; regexec(rex, p, 1, &rm, 0) == 0; p += rm.rm_eo)
+	c++;
+    if (count)
+	*count = c;
+    if (index)
+	*index = p - line;
+    return c > 0;
+}

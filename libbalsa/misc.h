@@ -1,5 +1,4 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
-/* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2003 Stuart Parmenter and others,
@@ -34,6 +33,13 @@ pthread_t libbalsa_get_main_thread(void);
 
 #if ENABLE_ESMTP
 #include <auth-client.h>
+#endif
+
+#ifdef HAVE_PCRE
+#  include <pcreposix.h>
+#else
+#  include <sys/types.h>
+#  include <regex.h>
 #endif
 
 typedef enum _LibBalsaCodeset LibBalsaCodeset;
@@ -101,6 +107,9 @@ void libbalsa_insert_with_url(GtkTextBuffer * buffer,
                                                 gpointer),
                               gpointer callback_data);
 void libbalsa_window_select_all(GtkWindow * window);
+void libbalsa_unwrap_selection(GtkTextBuffer * buffer, regex_t * rex);
+gboolean libbalsa_match_regex(const gchar * line, regex_t * rex,
+			      guint * count, guint * index);
 
 
 #endif				/* __LIBBALSA_MISC_H__ */

@@ -1,3 +1,7 @@
+2003-02-18 23:02  PeterB
+
+	* src/: balsa-app.c, balsa-app.h: Clean up sort utilities api.
+
 2003-02-18  Emmanuel <e.allaud@wanadoo.fr>
 
 	* libalsa/send.c: fix --without-estmp (bug 106377).

@@ -30,20 +30,11 @@
 #include "config.h"
 #include <string.h>
 
-#ifdef HAVE_GETTEXT
-#include <libintl.h>
-#ifndef _
-#define _(x)  gettext(x)
-#endif
-#else
-#define _(x)  (x)
-#endif
-#define N_(x) (x)
-
 #include "filter-file.h"
 #include "libbalsa-conf.h"
 #include "mailbox-filter.h"
 #include "misc.h"
+#include "i18n.h"
 
 /* FIXME : double definition : first is in save-restore.c */
 #define BALSA_CONFIG_PREFIX "balsa/"

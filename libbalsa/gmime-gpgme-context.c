@@ -25,16 +25,7 @@
 #include <gmime/gmime.h>
 #include <gpgme.h>
 #include "gmime-gpgme-context.h"
-
-#ifdef HAVE_GETTEXT
-#include <libintl.h>
-#ifndef _
-#define _(x)  gettext(x)
-#endif
-#else
-#define _(x)  (x)
-#endif
-
+#include "i18n.h"
 
 #define GPGME_ERROR_QUARK (g_quark_from_static_string ("gmime-gpgme"))
 

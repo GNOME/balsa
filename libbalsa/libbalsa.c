@@ -33,16 +33,6 @@
 #include <stdarg.h>
 #include <unistd.h>
 
-#ifdef HAVE_GETTEXT
-#include <libintl.h>
-#ifndef _
-#define _(x)  gettext(x)
-#endif
-#else
-#define _(x)  (x)
-#endif
-#define N_(x) (x)
-
 #if ENABLE_LDAP
 #include <ldap.h>
 #endif
@@ -50,6 +40,7 @@
 #include "address-book-gpe.h"
 #include "libbalsa.h"
 #include "misc.h"
+#include "i18n.h"
 
 #ifdef BALSA_USE_THREADS
 static pthread_t main_thread_id;

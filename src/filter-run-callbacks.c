@@ -26,11 +26,14 @@
 #include "config.h"
 
 #include <string.h>
+
 #include "mailbox-filter.h"
 #include "filter-funcs.h"
 #include "filter-run.h"
 #include "balsa-app.h"
 #include "save-restore.h"
+
+#include "i18n.h"	/* Must come after balsa-app.h. */
 
 /* Global vars */
 

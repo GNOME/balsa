@@ -23,6 +23,7 @@
 
 #include "balsa-druid-page-directory.h"
 
+#include "i18n.h"
 #include "balsa-app.h"
 #include "save-restore.h"
 #include "misc.h"

@@ -32,6 +32,8 @@
 #include "balsa-app.h"
 #include "filter-export.h"
 
+#include "i18n.h"	/* Must come after balsa-app.h. */
+
 /* To prevent user from silmultaneously edit/export filters */
 extern gboolean fex_already_open;
 

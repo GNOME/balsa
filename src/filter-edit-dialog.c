@@ -26,6 +26,7 @@
 #include "filter-edit.h"
 #include "filter-funcs.h"
 #include "message.h"
+#include "i18n.h"
 
 #define FILTER_EDIT_ENTRY_MAX_LENGTH 256
 #define FILTER_EDIT_PADDING 6
@@ -352,8 +353,14 @@ build_action_page(GtkWindow * window)
 		     0, 1, 0, 1,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
 
+#if GTK_CHECK_VERSION(2, 6, 0)
+    fe_sound_entry =
+        gtk_file_chooser_button_new(_("Use Sound..."),
+                                    GTK_FILE_CHOOSER_ACTION_OPEN);
+#else /* GTK_CHECK_VERSION(2, 6, 0) */
     fe_sound_entry =
 	gnome_file_entry_new("filter_sounds", _("Use Sound..."));
+#endif /* GTK_CHECK_VERSION(2, 6, 0) */
     gtk_table_attach(GTK_TABLE(table), fe_sound_entry, 1, 2, 0, 1,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
     /* fe_sound_entry is initially sensitive, so to be consistent 
@@ -361,10 +368,15 @@ build_action_page(GtkWindow * window)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_sound_button), TRUE);
     g_signal_connect(G_OBJECT(fe_sound_button), "toggled",
                      G_CALLBACK(fe_button_toggled), fe_sound_entry);
+#if GTK_CHECK_VERSION(2, 6, 0)
+    g_signal_connect(G_OBJECT(fe_sound_entry), "selection-changed",
+                     G_CALLBACK(fe_action_changed), NULL);
+#else /* GTK_CHECK_VERSION(2, 6, 0) */
     g_signal_connect(G_OBJECT
                      (gnome_file_entry_gtk_entry
                       (GNOME_FILE_ENTRY(fe_sound_entry))), "changed",
                      G_CALLBACK(fe_action_changed), NULL);
+#endif /* GTK_CHECK_VERSION(2, 6, 0) */
 
     fe_popup_button = gtk_check_button_new_with_label(_("Popup text:"));
     gtk_table_attach(GTK_TABLE(table),

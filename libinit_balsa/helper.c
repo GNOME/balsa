@@ -30,6 +30,7 @@
 #include <unistd.h>
 
 #include "helper.h"
+#include "i18n.h"
 #include "libbalsa.h"
 #include "url.h"
 

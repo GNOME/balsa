@@ -24,6 +24,7 @@
 #include "balsa-druid-page-directory.h"
 #include "balsa-druid-page-finish.h"
 
+#include "i18n.h"
 #include "save-restore.h"
 #include "balsa-app.h"
 

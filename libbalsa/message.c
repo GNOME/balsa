@@ -38,21 +38,12 @@
 #include <fcntl.h>
 #include <glib.h>
 
-#ifdef HAVE_GETTEXT
-#include <libintl.h>
-#ifndef _
-#define _(x)  gettext(x)
-#endif
-#else
-#define _(x)  (x)
-#endif
-#define N_(x) (x)
-
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 
 /* needed for truncate_string */
 #include "misc.h"
+#include "i18n.h"
 
 #include <gmime/gmime.h>
 

@@ -21,6 +21,8 @@
 
 #include "balsa-initdruid.h"
 
+#include "i18n.h"
+#include "libbalsa-conf.h"
 #include "save-restore.h"
 
 #include "balsa-druid-page-welcome.h"
@@ -83,7 +85,7 @@ balsa_initdruid_cancel(GnomeDruid * druid)
     gtk_widget_destroy(dialog);
 
     if (reply == GTK_RESPONSE_YES) {
-        gnome_config_drop_all();
+        libbalsa_conf_drop_all();
         exit(0);
     }
 }

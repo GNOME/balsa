@@ -38,21 +38,12 @@
 /* we include time because pthread.h may require it when compiled with c89 */
 #include <time.h>
 
-#ifdef HAVE_GETTEXT
-#include <libintl.h>
-#ifndef _
-#define _(x)  gettext(x)
-#endif
-#else
-#define _(x)  (x)
-#endif
-#define N_(x) (x)
-
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 #include "misc.h"
 /* for mx_lock_file and mx_unlock_file */
 #include "mailbackend.h"
+#include "i18n.h"
 
 struct message_info {
     off_t start;

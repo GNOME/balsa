@@ -36,18 +36,10 @@
 #include "address-book-extern.h"
 #include "information.h"
 #include "abook-completion.h"
+#include "i18n.h"
 
 /* FIXME: Arbitrary constant */
 #define LINE_LEN 256
-
-#ifdef HAVE_GETTEXT
-#include <libintl.h>
-#ifndef _
-#define _(x)  gettext(x)
-#endif
-#else
-#define _(x)  (x)
-#endif
 
 static LibBalsaAddressBookClass *parent_class = NULL;
 

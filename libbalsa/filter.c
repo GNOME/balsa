@@ -38,16 +38,6 @@
 #include <libgnome/gnome-sound.h>
 #endif
 
-#ifdef HAVE_GETTEXT
-#include <libintl.h>
-#ifndef _
-#define _(x)  gettext(x)
-#endif
-#else
-#define _(x)  (x)
-#endif
-#define N_(x) (x)
-
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 
@@ -55,6 +45,7 @@
 #include "filter-funcs.h"
 #include "filter-private.h"
 #include "misc.h"
+#include "i18n.h"
 
 /* from libmutt */
 #define REGCOMP(X,Y,Z) regcomp(X, Y, REG_WORDS|REG_EXTENDED|(Z))

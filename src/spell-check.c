@@ -30,6 +30,7 @@
 #include <pspell/pspell.h>
 #include <stdio.h>
 #include <string.h>
+#include "i18n.h"
 
 #ifdef HAVE_PCRE
 #  include <pcre.h>

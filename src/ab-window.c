@@ -23,6 +23,7 @@
 
 #include <gnome.h>
 #include <string.h>
+#include "i18n.h"
 #include "balsa-app.h"
 #include "sendmsg-window.h"
 #include "ab-window.h"

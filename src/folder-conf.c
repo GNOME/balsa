@@ -30,6 +30,7 @@
 #include "save-restore.h"
 #include "pref-manager.h"
 #include "imap-server.h"
+#include "i18n.h"
 
 typedef struct _CommonDialogData CommonDialogData;
 typedef struct _FolderDialogData FolderDialogData;
@@ -757,11 +758,8 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     sdd->folder_name = create_entry(sdd->dialog, table,
                                    GTK_SIGNAL_FUNC(validate_sub_folder),
 				   sdd, 0, sdd->old_folder, label);
-    puts("A");
 
-    puts("B");
     subtable = gtk_table_new(1, 3, FALSE);
-    puts("C");
     label = create_label(_("Host:"), table, 1);
     sdd->host_label = 
         gtk_label_new(sdd->mbnode && sdd->mbnode->server
@@ -775,7 +773,6 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 	GTK_FILL, GTK_FILL, 5, 5);
     gtk_table_attach(GTK_TABLE(table), subtable, 1, 2, 1, 2,
 	GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
-    puts("D");
 
     label = create_label(_("_Subfolder of:"), table, 2);
     sdd->parent_folder = create_entry(sdd->dialog, table,

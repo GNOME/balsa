@@ -29,16 +29,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#ifdef HAVE_GETTEXT
-#include <libintl.h>
-#ifndef _
-#define _(x)  gettext(x)
-#endif
-#else
-#define _(x)  (x)
-#endif
-#define N_(x) (x)
-
 #include "libbalsa-marshal.h"
 #include "libbalsa.h"
 #include "libbalsa-conf.h"
@@ -46,8 +36,7 @@
 #include "message.h"
 #include "misc.h"
 #include "libbalsa_private.h"
-
-#include "libbalsa-marshal.h"
+#include "i18n.h"
 
 /* Class functions */
 static void libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass);

@@ -1,6 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others
+ *
+ * Copyright (C) 1997-2005 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,17 +19,20 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
-#ifndef __ADDRESS_BOOK_CONFIG_H__
-#define __ADDRESS_BOOK_CONFIG_H__
 
-#include "libbalsa.h"
+#ifndef LIBBALSA_I18N_H
 
-typedef void BalsaAddressBookCallback(LibBalsaAddressBook * address_book,
-                                      gboolean append);
-void balsa_address_book_config_new(LibBalsaAddressBook * address_book,
-				   BalsaAddressBookCallback callback,
-                                   GtkWindow * parent);
-GtkWidget *balsa_address_book_add_menu(BalsaAddressBookCallback callback,
-                                       GtkWindow * parent);
+#define LIBBALSA_I18N_H
 
-#endif				/* __ADDRESS_BOOK_CONFIG_H__ */
+#undef _
+#undef N_
+
+#ifdef HAVE_GETTEXT
+# include <libintl.h>
+# define _(x)  gettext(x)
+#else
+# define _(x)  (x)
+#endif
+#define N_(x) (x)
+
+#endif /* LIBBALSA_I18N_H */

@@ -33,6 +33,7 @@
 #include <gnome.h>
 #include <libgnomevfs/gnome-vfs-uri.h>
 #include <libgnomevfs/gnome-vfs-mime-handlers.h>
+#include "i18n.h"
 #include <ctype.h>
 #include <glib.h>
 
@@ -2348,7 +2349,7 @@ to_add(GtkWidget * widget,
        gint x,
        gint y,
        GtkSelectionData * selection_data,
-       guint info, guint32 time, GnomeIconList * iconlist)
+       guint info, guint32 time)
 {
     append_comma_separated(GTK_EDITABLE(widget), selection_data->data);
     gtk_drag_finish(context, TRUE, FALSE, time);

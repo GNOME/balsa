@@ -25,22 +25,13 @@
 #include <libgnome/gnome-help.h>
 #endif
 
-#ifdef HAVE_GETTEXT
-#include <libintl.h>
-#ifndef _
-#define _(x)  gettext(x)
-#endif
-#else
-#define _(x)  (x)
-#endif
-#define N_(x) (x)
-
 #ifdef HAVE_GPGME
 #  include "rfc3156.h"
 #endif
 #include "identity.h"
 #include "information.h"
 #include "libbalsa-conf.h"
+#include "i18n.h"
 
 /*
  * The class.

@@ -35,16 +35,6 @@
 
 #include <string.h>
 
-#ifdef HAVE_GETTEXT
-#include <libintl.h>
-#ifndef _
-#define _(x)  gettext(x)
-#endif
-#else
-#define _(x)  (x)
-#endif
-#define N_(x) (x)
-
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 
@@ -59,6 +49,8 @@
 #include <sys/stat.h>
 #endif
 #include <sys/utsname.h>
+
+#include "i18n.h"
 
 typedef struct _MessageQueueItem MessageQueueItem;
 

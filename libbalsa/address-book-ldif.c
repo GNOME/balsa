@@ -36,15 +36,7 @@
 #include "address-book-ldif.h"
 #include "information.h"
 #include "libbalsa-conf.h"
-
-#ifdef HAVE_GETTEXT
-#include <libintl.h>
-#ifndef _
-#define _(x)  gettext(x)
-#endif
-#else
-#define _(x)  (x)
-#endif
+#include "i18n.h"
 
 /* FIXME: Make an option */
 #define CASE_INSENSITIVE_NAME

@@ -25,6 +25,7 @@
 #include <string.h>
 #include <gconf/gconf-client.h>
 #include <gnome.h>
+#include "i18n.h"
 #include "balsa-app.h"
 #include "save-restore.h"
 #include "quote-color.h"
@@ -34,6 +35,7 @@
 #include "filter-file.h"
 #include "filter-funcs.h"
 #include "mailbox-filter.h"
+#include "libbalsa-conf.h"
 
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
@@ -98,7 +100,7 @@ static gint
 d_get_gint(const gchar * key, gint def_val)
 {
     gint def;
-    gint res = gnome_config_get_int_with_default(key, &def);
+    gint res = libbalsa_conf_get_int_with_default(key, &def);
     return def ? def_val : res;
 }
 
@@ -119,28 +121,28 @@ save_toolbars(void)
 {
     guint i, j;
 
-    gnome_config_clean_section(BALSA_CONFIG_PREFIX "Toolbars/");
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Toolbars/");
-    gnome_config_set_int("WrapButtonText",
+    libbalsa_conf_clean_section(BALSA_CONFIG_PREFIX "Toolbars/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Toolbars/");
+    libbalsa_conf_set_int("WrapButtonText",
                          balsa_app.toolbar_wrap_button_text);
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
     for (i = 0; i < ELEMENTS(toolbars); i++) {
         GSList *list;
         gchar *key;
 
         key = g_strconcat(BALSA_CONFIG_PREFIX, toolbars[i].key, "/", NULL);
-        gnome_config_clean_section(key);
-        gnome_config_push_prefix(key);
+        libbalsa_conf_clean_section(key);
+        libbalsa_conf_push_prefix(key);
         g_free(key);
 
         for (j = 0, list = *toolbars[i].current; list;
              j++, list = g_slist_next(list)) {
             key = g_strdup_printf("Item%d", j);
-            gnome_config_set_string(key, list->data);
+            libbalsa_conf_set_string(key, list->data);
             g_free(key);
         }
-        gnome_config_pop_prefix();
+        libbalsa_conf_pop_prefix();
     }
 }
 
@@ -152,14 +154,14 @@ load_toolbars(void)
     gchar *key;
     GSList **list;
 
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Toolbars/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Toolbars/");
     balsa_app.toolbar_wrap_button_text = d_get_gint("WrapButtonText", 1);
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
     items = 0;
     for (i = 0; i < ELEMENTS(toolbars); i++) {
         key = g_strconcat(BALSA_CONFIG_PREFIX, toolbars[i].key, "/", NULL);
-        gnome_config_push_prefix(key);
+        libbalsa_conf_push_prefix(key);
         g_free(key);
 
         list = toolbars[i].current;
@@ -167,7 +169,7 @@ load_toolbars(void)
             gchar *item;
 
             key = g_strdup_printf("Item%d", j);
-            item = gnome_config_get_string(key);
+            item = libbalsa_conf_get_string(key);
             g_free(key);
 
             if (!item)
@@ -175,7 +177,7 @@ load_toolbars(void)
             *list = g_slist_append(*list, item);
             items++;
         }
-        gnome_config_pop_prefix();
+        libbalsa_conf_pop_prefix();
     }
 
     if (items)
@@ -183,7 +185,7 @@ load_toolbars(void)
 
     /* We didn't find new-style toolbar configs, so we'll try the old
      * style */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Toolbars/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Toolbars/");
     for (i = 0; i < ELEMENTS(toolbars); i++) {
         guint type;
 
@@ -202,11 +204,11 @@ load_toolbars(void)
             gchar *item;
 
             sprintf(tmpkey, "Toolbar%dItem%d", i, j);
-            item = gnome_config_get_string(tmpkey);
+            item = libbalsa_conf_get_string(tmpkey);
             *list = g_slist_append(*list, item);
         }
     }
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 }
 
 /* config_mailbox_set_as_special:
@@ -302,16 +304,16 @@ config_address_book_save(LibBalsaAddressBook * ab)
 
     g_free(prefix);
 
-    gnome_config_sync();
+    libbalsa_conf_sync();
 }
 
 void
 config_address_book_delete(LibBalsaAddressBook * ab)
 {
     if (ab->config_prefix) {
-	gnome_config_clean_section(ab->config_prefix);
-	gnome_config_private_clean_section(ab->config_prefix);
-	gnome_config_sync();
+	libbalsa_conf_clean_section(ab->config_prefix);
+	libbalsa_conf_private_clean_section(ab->config_prefix);
+	libbalsa_conf_sync();
     }
 }
 
@@ -330,13 +332,13 @@ gint config_mailbox_add(LibBalsaMailbox * mailbox, const char *key_arg)
 	tmp = g_strdup_printf(BALSA_CONFIG_PREFIX MAILBOX_SECTION_PREFIX
 			      "%s/", key_arg);
 
-    gnome_config_clean_section(tmp);
-    gnome_config_push_prefix(tmp);
+    libbalsa_conf_clean_section(tmp);
+    libbalsa_conf_push_prefix(tmp);
     libbalsa_mailbox_save_config(mailbox, tmp);
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
     g_free(tmp);
 
-    gnome_config_sync();
+    libbalsa_conf_sync();
     return TRUE;
 }				/* config_mailbox_add */
 
@@ -355,12 +357,12 @@ gint config_folder_add(BalsaMailboxNode * mbnode, const char *key_arg)
 	tmp = g_strdup_printf(BALSA_CONFIG_PREFIX FOLDER_SECTION_PREFIX
 			      "%s/", key_arg);
 
-    gnome_config_push_prefix(tmp);
+    libbalsa_conf_push_prefix(tmp);
     balsa_mailbox_node_save_config(mbnode, tmp);
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
     g_free(tmp);
 
-    gnome_config_sync();
+    libbalsa_conf_sync();
     return TRUE;
 }				/* config_mailbox_add */
 
@@ -370,9 +372,9 @@ gint config_mailbox_delete(const LibBalsaMailbox * mailbox)
     gchar *tmp;			/* the key in the mailbox section name */
     gint res;
     tmp = mailbox_section_path(mailbox);
-    res = gnome_config_has_section(tmp);
-    gnome_config_clean_section(tmp);
-    gnome_config_sync();
+    res = libbalsa_conf_has_section(tmp);
+    libbalsa_conf_clean_section(tmp);
+    libbalsa_conf_sync();
     g_free(tmp);
     return res;
 }				/* config_mailbox_delete */
@@ -383,9 +385,9 @@ config_folder_delete(const BalsaMailboxNode * mbnode)
     gchar *tmp;			/* the key in the mailbox section name */
     gint res;
     tmp = folder_section_path(mbnode);
-    res = gnome_config_has_section(tmp);
-    gnome_config_clean_section(tmp);
-    gnome_config_sync();
+    res = libbalsa_conf_has_section(tmp);
+    libbalsa_conf_clean_section(tmp);
+    libbalsa_conf_sync();
     g_free(tmp);
     return res;
 }				/* config_folder_delete */
@@ -397,14 +399,14 @@ gint config_mailbox_update(LibBalsaMailbox * mailbox)
     gint res;
 
     key = mailbox_section_path(mailbox);
-    res = gnome_config_has_section(key);
-    gnome_config_clean_section(key);
-    gnome_config_private_clean_section(key);
-    gnome_config_push_prefix(key);
+    res = libbalsa_conf_has_section(key);
+    libbalsa_conf_clean_section(key);
+    libbalsa_conf_private_clean_section(key);
+    libbalsa_conf_push_prefix(key);
     libbalsa_mailbox_save_config(mailbox, key);
     g_free(key);
-    gnome_config_pop_prefix();
-    gnome_config_sync();
+    libbalsa_conf_pop_prefix();
+    libbalsa_conf_sync();
     return res;
 }				/* config_mailbox_update */
 
@@ -415,14 +417,14 @@ gint config_folder_update(BalsaMailboxNode * mbnode)
     gint res;
 
     key = folder_section_path(mbnode);
-    res = gnome_config_has_section(key);
-    gnome_config_clean_section(key);
-    gnome_config_private_clean_section(key);
-    gnome_config_push_prefix(key);
+    res = libbalsa_conf_has_section(key);
+    libbalsa_conf_clean_section(key);
+    libbalsa_conf_private_clean_section(key);
+    libbalsa_conf_push_prefix(key);
     balsa_mailbox_node_save_config(mbnode, key);
     g_free(key);
-    gnome_config_pop_prefix();
-    gnome_config_sync();
+    libbalsa_conf_pop_prefix();
+    libbalsa_conf_sync();
     return res;
 }				/* config_folder_update */
 
@@ -436,8 +438,8 @@ config_section_init(const char* section_prefix, gint (*cb)(const char*))
     gchar *key, *val, *tmp;
     int pref_len = strlen(section_prefix);
 
-    iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
-    while ((iterator = gnome_config_iterator_next(iterator, &key, &val))) {
+    iterator = libbalsa_conf_init_iterator_sections(BALSA_CONFIG_PREFIX);
+    while ((iterator = libbalsa_conf_iterator_next(iterator, &key, &val))) {
 	if (strncmp(key, section_prefix, pref_len) == 0) {
 	    tmp = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
 	    cb(tmp);
@@ -608,7 +610,7 @@ config_global_load(void)
     check_for_old_sigs(balsa_app.identities);
 
     /* Section for the balsa_information() settings... */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "InformationMessages/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "InformationMessages/");
 
     balsa_app.information_message =
 	d_get_gint("ShowInformationMessages", BALSA_INFORMATION_SHOW_BAR);
@@ -621,10 +623,10 @@ config_global_load(void)
     balsa_app.fatal_message = 
 	d_get_gint("ShowFatalMessages", BALSA_INFORMATION_SHOW_DIALOG);
 
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
     /* Section for geometry ... */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Geometry/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Geometry/");
 
     /* ... column width settings */
     balsa_app.mblist_name_width =
@@ -650,34 +652,34 @@ config_global_load(void)
 	d_get_gint("IndexSizeWidth", SIZE_DEFAULT_WIDTH);
 
     /* ... window sizes */
-    balsa_app.mw_width = gnome_config_get_int("MainWindowWidth=640");
-    balsa_app.mw_height = gnome_config_get_int("MainWindowHeight=480");
-    balsa_app.mblist_width = gnome_config_get_int("MailboxListWidth=130");
+    balsa_app.mw_width = libbalsa_conf_get_int("MainWindowWidth=640");
+    balsa_app.mw_height = libbalsa_conf_get_int("MainWindowHeight=480");
+    balsa_app.mblist_width = libbalsa_conf_get_int("MailboxListWidth=130");
     /* sendmsg window sizes */
-    balsa_app.sw_width = gnome_config_get_int("SendMsgWindowWidth=640");
-    balsa_app.sw_height = gnome_config_get_int("SendMsgWindowHeight=480");
+    balsa_app.sw_width = libbalsa_conf_get_int("SendMsgWindowWidth=640");
+    balsa_app.sw_height = libbalsa_conf_get_int("SendMsgWindowHeight=480");
     balsa_app.message_window_width =
-        gnome_config_get_int("MessageWindowWidth=400");
+        libbalsa_conf_get_int("MessageWindowWidth=400");
     balsa_app.message_window_height =
-        gnome_config_get_int("MessageWindowHeight=500");
+        libbalsa_conf_get_int("MessageWindowHeight=500");
     /* FIXME: PKGW: why comment this out? Breaks my Transfer context menu. */
     if (balsa_app.mblist_width < 100)
 	balsa_app.mblist_width = 170;
 
-    balsa_app.notebook_height = gnome_config_get_int("NotebookHeight=170");
+    balsa_app.notebook_height = libbalsa_conf_get_int("NotebookHeight=170");
     /*FIXME: Why is this here?? */
     if (balsa_app.notebook_height < 100)
 	balsa_app.notebook_height = 200;
 
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
     /* Message View options ... */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "MessageDisplay/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "MessageDisplay/");
 
     /* ... How we format dates */
     g_free(balsa_app.date_string);
     balsa_app.date_string =
-	gnome_config_get_string("DateFormat=" DEFAULT_DATE_FORMAT);
+	libbalsa_conf_get_string("DateFormat=" DEFAULT_DATE_FORMAT);
     libbalsa_mailbox_date_format = balsa_app.date_string;
 
     /* ... Headers to show */
@@ -685,21 +687,21 @@ config_global_load(void)
 
     g_free(balsa_app.selected_headers);
     {                           /* scope */
-        gchar *tmp = gnome_config_get_string("SelectedHeaders="
+        gchar *tmp = libbalsa_conf_get_string("SelectedHeaders="
                                              DEFAULT_SELECTED_HDRS);
         balsa_app.selected_headers = g_ascii_strdown(tmp, -1);
         g_free(tmp);
     }
 
-    balsa_app.expand_tree = gnome_config_get_bool("ExpandTree=false");
+    balsa_app.expand_tree = libbalsa_conf_get_bool("ExpandTree=false");
 
     {                             /* scope */
         guint type =
-            gnome_config_get_int_with_default("SortField", &def_used);
+            libbalsa_conf_get_int_with_default("SortField", &def_used);
         if (!def_used)
             libbalsa_mailbox_set_sort_field(NULL, type);
         type =
-            gnome_config_get_int_with_default("ThreadingType", &def_used);
+            libbalsa_conf_get_int_with_default("ThreadingType", &def_used);
         if (!def_used)
             libbalsa_mailbox_set_threading_type(NULL, type);
     }
@@ -707,10 +709,10 @@ config_global_load(void)
     /* ... Quote colouring */
     g_free(balsa_app.quote_regex);
     balsa_app.quote_regex =
-	gnome_config_get_string("QuoteRegex=" DEFAULT_QUOTE_REGEX);
+	libbalsa_conf_get_string("QuoteRegex=" DEFAULT_QUOTE_REGEX);
 
     /* Obsolete. */
-    gnome_config_get_bool_with_default("RecognizeRFC2646FormatFlowed=true",
+    libbalsa_conf_get_bool_with_default("RecognizeRFC2646FormatFlowed=true",
                                        &def_used);
     if (!def_used)
         g_idle_add((GSourceFunc) config_warning_idle,
@@ -738,48 +740,48 @@ config_global_load(void)
     /* ... font used to display messages */
     g_free(balsa_app.message_font);
     balsa_app.message_font =
-	gnome_config_get_string("MessageFont=" DEFAULT_MESSAGE_FONT);
+	libbalsa_conf_get_string("MessageFont=" DEFAULT_MESSAGE_FONT);
     g_free(balsa_app.subject_font);
     balsa_app.subject_font =
-	gnome_config_get_string("SubjectFont=" DEFAULT_SUBJECT_FONT);
+	libbalsa_conf_get_string("SubjectFont=" DEFAULT_SUBJECT_FONT);
 
     /* ... wrap words */
-    balsa_app.browse_wrap = gnome_config_get_bool("WordWrap=true");
-    balsa_app.browse_wrap_length = gnome_config_get_int("WordWrapLength=79");
+    balsa_app.browse_wrap = libbalsa_conf_get_bool("WordWrap=true");
+    balsa_app.browse_wrap_length = libbalsa_conf_get_int("WordWrapLength=79");
     if (balsa_app.browse_wrap_length < 40)
 	balsa_app.browse_wrap_length = 40;
 
     /* ... handling of Multipart/Alternative */
     balsa_app.display_alt_plain = 
-	gnome_config_get_bool("DisplayAlternativeAsPlain=false");
+	libbalsa_conf_get_bool("DisplayAlternativeAsPlain=false");
 
     /* ... handling of broken mails with 8-bit chars */
     balsa_app.convert_unknown_8bit = 
-	gnome_config_get_bool("ConvertUnknown8Bit=false");
+	libbalsa_conf_get_bool("ConvertUnknown8Bit=false");
     balsa_app.convert_unknown_8bit_codeset =
-	gnome_config_get_int("ConvertUnknown8BitCodeset=" DEFAULT_BROKEN_CODESET);
+	libbalsa_conf_get_int("ConvertUnknown8BitCodeset=" DEFAULT_BROKEN_CODESET);
     libbalsa_set_fallback_codeset(balsa_app.convert_unknown_8bit_codeset);
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
     /* Interface Options ... */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Interface/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Interface/");
 
     /* ... interface elements to show */
-    balsa_app.previewpane = gnome_config_get_bool("ShowPreviewPane=true");
-    balsa_app.show_mblist = gnome_config_get_bool("ShowMailboxList=true");
-    balsa_app.show_notebook_tabs = gnome_config_get_bool("ShowTabs=false");
+    balsa_app.previewpane = libbalsa_conf_get_bool("ShowPreviewPane=true");
+    balsa_app.show_mblist = libbalsa_conf_get_bool("ShowMailboxList=true");
+    balsa_app.show_notebook_tabs = libbalsa_conf_get_bool("ShowTabs=false");
 
     /* ... alternative layout of main window */
-    balsa_app.alternative_layout = gnome_config_get_bool("AlternativeLayout=false");
-    balsa_app.view_message_on_open = gnome_config_get_bool("ViewMessageOnOpen=true");
-    balsa_app.pgdownmod = gnome_config_get_bool("PageDownMod=false");
-    balsa_app.pgdown_percent = gnome_config_get_int("PageDownPercent=50");
+    balsa_app.alternative_layout = libbalsa_conf_get_bool("AlternativeLayout=false");
+    balsa_app.view_message_on_open = libbalsa_conf_get_bool("ViewMessageOnOpen=true");
+    balsa_app.pgdownmod = libbalsa_conf_get_bool("PageDownMod=false");
+    balsa_app.pgdown_percent = libbalsa_conf_get_int("PageDownPercent=50");
     if (balsa_app.pgdown_percent < 10)
 	balsa_app.pgdown_percent = 10;
 #if defined(ENABLE_TOUCH_UI)
     balsa_app.do_file_format_check =
-        gnome_config_get_bool("FileFormatCheck=true");
-    balsa_app.enable_view_filter = gnome_config_get_bool("ViewFilter=false");
+        libbalsa_conf_get_bool("FileFormatCheck=true");
+    balsa_app.enable_view_filter = libbalsa_conf_get_bool("ViewFilter=false");
 #endif /* ENABLE_TOUCH_UI */
 
     /* ... Progress Window Dialog */
@@ -787,75 +789,75 @@ config_global_load(void)
 
     /* ... deleting messages: defaults enshrined here */
     tmp = libbalsa_mailbox_get_filter(NULL);
-    if (gnome_config_get_bool("HideDeleted=true"))
+    if (libbalsa_conf_get_bool("HideDeleted=true"))
 	tmp |= (1 << 0);
     else
 	tmp &= ~(1 << 0);
     libbalsa_mailbox_set_filter(NULL, tmp);
 
     balsa_app.expunge_on_close =
-        gnome_config_get_bool("ExpungeOnClose=true");
-    balsa_app.expunge_auto = gnome_config_get_bool("AutoExpunge=true");
+        libbalsa_conf_get_bool("ExpungeOnClose=true");
+    balsa_app.expunge_auto = libbalsa_conf_get_bool("AutoExpunge=true");
     /* timeout in munutes (was hours, so fall back if needed) */
     balsa_app.expunge_timeout =
-        gnome_config_get_int("AutoExpungeMinutes") * 60;
+        libbalsa_conf_get_int("AutoExpungeMinutes") * 60;
     if (!balsa_app.expunge_timeout)
 	balsa_app.expunge_timeout = 
-	    gnome_config_get_int("AutoExpungeHours=2") * 3600;
+	    libbalsa_conf_get_int("AutoExpungeHours=2") * 3600;
 
-    balsa_app.mw_action_after_move = gnome_config_get_int(
+    balsa_app.mw_action_after_move = libbalsa_conf_get_int(
         "MessageWindowActionAfterMove");
 
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
     /* Source browsing ... */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "SourcePreview/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "SourcePreview/");
     balsa_app.source_escape_specials = 
-        gnome_config_get_bool("EscapeSpecials=true");
-    gnome_config_pop_prefix();
+        libbalsa_conf_get_bool("EscapeSpecials=true");
+    libbalsa_conf_pop_prefix();
 
     /* Printing options ... */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Printing/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Printing/");
 
     /* ... Printing */
     g_free(balsa_app.paper_size);
     balsa_app.paper_size =
-	gnome_config_get_string("PaperSize=" DEFAULT_PAPER_SIZE);
+	libbalsa_conf_get_string("PaperSize=" DEFAULT_PAPER_SIZE);
     g_free(balsa_app.margin_left);
-    balsa_app.margin_left   = gnome_config_get_string("LeftMargin");
+    balsa_app.margin_left   = libbalsa_conf_get_string("LeftMargin");
     g_free(balsa_app.margin_top);
-    balsa_app.margin_top    = gnome_config_get_string("TopMargin");
+    balsa_app.margin_top    = libbalsa_conf_get_string("TopMargin");
     g_free(balsa_app.margin_right);
-    balsa_app.margin_right  = gnome_config_get_string("RightMargin");
+    balsa_app.margin_right  = libbalsa_conf_get_string("RightMargin");
     g_free(balsa_app.margin_bottom);
-    balsa_app.margin_bottom = gnome_config_get_string("BottomMargin");
+    balsa_app.margin_bottom = libbalsa_conf_get_string("BottomMargin");
     g_free(balsa_app.print_unit);
-    balsa_app.print_unit    = gnome_config_get_string("PrintUnit");
+    balsa_app.print_unit    = libbalsa_conf_get_string("PrintUnit");
     g_free(balsa_app.print_layout);
-    balsa_app.print_layout  = gnome_config_get_string("PrintLayout");
+    balsa_app.print_layout  = libbalsa_conf_get_string("PrintLayout");
     g_free(balsa_app.paper_orientation);
-    balsa_app.paper_orientation  = gnome_config_get_string("PaperOrientation");
+    balsa_app.paper_orientation  = libbalsa_conf_get_string("PaperOrientation");
     g_free(balsa_app.page_orientation);
-    balsa_app.page_orientation   = gnome_config_get_string("PageOrientation");
+    balsa_app.page_orientation   = libbalsa_conf_get_string("PageOrientation");
 
     g_free(balsa_app.print_header_font);
     balsa_app.print_header_font =
-        gnome_config_get_string("PrintHeaderFont="
+        libbalsa_conf_get_string("PrintHeaderFont="
                                 DEFAULT_PRINT_HEADER_FONT);
     g_free(balsa_app.print_footer_font);
     balsa_app.print_footer_font =
-        gnome_config_get_string("PrintFooterFont="
+        libbalsa_conf_get_string("PrintFooterFont="
                                 DEFAULT_PRINT_FOOTER_FONT);
     g_free(balsa_app.print_body_font);
     balsa_app.print_body_font =
-        gnome_config_get_string("PrintBodyFont="
+        libbalsa_conf_get_string("PrintBodyFont="
                                 DEFAULT_PRINT_BODY_FONT);
     balsa_app.print_highlight_cited =
-        gnome_config_get_bool("PrintHighlightCited=false");
-    gnome_config_pop_prefix();
+        libbalsa_conf_get_bool("PrintHighlightCited=false");
+    libbalsa_conf_pop_prefix();
 
     /* Spelling options ... */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Spelling/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Spelling/");
 
     balsa_app.module = d_get_gint("PspellModule", DEFAULT_PSPELL_MODULE);
     balsa_app.suggestion_mode =
@@ -867,28 +869,28 @@ config_global_load(void)
     balsa_app.check_quoted =
 	d_get_gint("SpellCheckQuoted", DEFAULT_CHECK_QUOTED);
 
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
     /* Mailbox checking ... */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "MailboxList/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "MailboxList/");
 
     /* ... show mailbox content info */
     balsa_app.mblist_show_mb_content_info =
-	gnome_config_get_bool("ShowMailboxContentInfo=true");
+	libbalsa_conf_get_bool("ShowMailboxContentInfo=true");
 
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
     /* Maibox checking options ... */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "MailboxChecking/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "MailboxChecking/");
 
     balsa_app.notify_new_mail_dialog =
 	d_get_gint("NewMailNotificationDialog", 0);
     balsa_app.notify_new_mail_sound =
 	d_get_gint("NewMailNotificationSound", 1);
     balsa_app.check_mail_upon_startup =
-	gnome_config_get_bool("OnStartup=false");
-    balsa_app.check_mail_auto = gnome_config_get_bool("Auto=false");
-    balsa_app.check_mail_timer = gnome_config_get_int("AutoDelay=10");
+	libbalsa_conf_get_bool("OnStartup=false");
+    balsa_app.check_mail_auto = libbalsa_conf_get_bool("Auto=false");
+    balsa_app.check_mail_timer = libbalsa_conf_get_int("AutoDelay=10");
     if (balsa_app.check_mail_timer < 1)
 	balsa_app.check_mail_timer = 10;
     if (balsa_app.check_mail_auto)
@@ -897,36 +899,36 @@ config_global_load(void)
     balsa_app.check_imap_inbox=d_get_gint("CheckIMAPInbox", 0);
     balsa_app.quiet_background_check=d_get_gint("QuietBackgroundCheck", 0);
     balsa_app.msg_size_limit=d_get_gint("POPMsgSizeLimit", 20000);
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
     /* folder scanning */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "FolderScanning/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "FolderScanning/");
     balsa_app.local_scan_depth = d_get_gint("LocalScanDepth", 1);
     balsa_app.imap_scan_depth = d_get_gint("ImapScanDepth", 1);
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
     /* how to react if a message with MDN request is displayed */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "MDNReply/");
-    balsa_app.mdn_reply_clean = gnome_config_get_int("Clean=1");
-    balsa_app.mdn_reply_notclean = gnome_config_get_int("Suspicious=0");
-    gnome_config_pop_prefix();
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "MDNReply/");
+    balsa_app.mdn_reply_clean = libbalsa_conf_get_int("Clean=1");
+    balsa_app.mdn_reply_notclean = libbalsa_conf_get_int("Suspicious=0");
+    libbalsa_conf_pop_prefix();
 
     /* Sending options ... */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Sending/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Sending/");
 
 #if ENABLE_ESMTP
     /* ... SMTP server */
     g_free(balsa_app.smtp_server);
     balsa_app.smtp_server =
-	gnome_config_get_string_with_default("ESMTPServer=localhost:25", 
+	libbalsa_conf_get_string_with_default("ESMTPServer=localhost:25", 
 					     &def_used);
     if(def_used) {
 	/* we need to check for old format, 1.1.4-compatible settings and
 	   convert them if needed.
 	*/
-	gchar* old_server = gnome_config_get_string("SMTPServer");
+	gchar* old_server = libbalsa_conf_get_string("SMTPServer");
 	if(old_server) {
-	    int port = gnome_config_get_int("SMTPPort=25");
+	    int port = libbalsa_conf_get_int("SMTPPort=25");
 	    g_free(balsa_app.smtp_server);
 	    balsa_app.smtp_server = g_strdup_printf("%s:%d",
 						    old_server, port);
@@ -935,10 +937,10 @@ config_global_load(void)
 	}
     }
     g_free(balsa_app.smtp_user);
-    balsa_app.smtp_user = gnome_config_get_string("ESMTPUser");
+    balsa_app.smtp_user = libbalsa_conf_get_string("ESMTPUser");
     g_free(balsa_app.smtp_passphrase);
     balsa_app.smtp_passphrase = 
-        gnome_config_private_get_string("ESMTPPassphrase");
+        libbalsa_conf_private_get_string("ESMTPPassphrase");
     if(balsa_app.smtp_passphrase) {
         gchar* tmp = libbalsa_rot(balsa_app.smtp_passphrase);
         g_free(balsa_app.smtp_passphrase); 
@@ -947,13 +949,13 @@ config_global_load(void)
 #ifndef BREAK_BACKWARD_COMPATIBILITY_AT_14
     if(!balsa_app.smtp_passphrase)
         balsa_app.smtp_passphrase = 
-            gnome_config_get_string("ESMTPPassphrase");
+            libbalsa_conf_get_string("ESMTPPassphrase");
 #endif
     /* default set to "Use TLS if possible" */
-    balsa_app.smtp_tls_mode = gnome_config_get_int("ESMTPTLSMode=1");
+    balsa_app.smtp_tls_mode = libbalsa_conf_get_int("ESMTPTLSMode=1");
 #if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     balsa_app.smtp_certificate_passphrase = 
-        gnome_config_private_get_string("ESMTPCertificatePassphrase");
+        libbalsa_conf_private_get_string("ESMTPCertificatePassphrase");
     if(balsa_app.smtp_certificate_passphrase) {
         gchar* tmp = libbalsa_rot(balsa_app.smtp_certificate_passphrase);
         g_free(balsa_app.smtp_certificate_passphrase);
@@ -962,17 +964,17 @@ config_global_load(void)
 #endif
 #endif
     /* ... outgoing mail */
-    balsa_app.encoding_style = gnome_config_get_int("EncodingStyle=2");
+    balsa_app.encoding_style = libbalsa_conf_get_int("EncodingStyle=2");
     /* convert libmutt Quoted Printable to GMime type, for compatible */
     if (balsa_app.encoding_style==3)
         balsa_app.encoding_style = GMIME_PART_ENCODING_QUOTEDPRINTABLE;
-    balsa_app.wordwrap = gnome_config_get_bool("WordWrap=true");
-    balsa_app.wraplength = gnome_config_get_int("WrapLength=72");
+    balsa_app.wordwrap = libbalsa_conf_get_bool("WordWrap=true");
+    balsa_app.wraplength = libbalsa_conf_get_int("WrapLength=72");
     if (balsa_app.wraplength < 40)
 	balsa_app.wraplength = 40;
 
     /* Obsolete. */
-    gnome_config_get_bool_with_default("SendRFC2646FormatFlowed=true",
+    libbalsa_conf_get_bool_with_default("SendRFC2646FormatFlowed=true",
                                        &def_used);
     if (!def_used)
         g_idle_add((GSourceFunc) config_warning_idle,
@@ -980,31 +982,31 @@ config_global_load(void)
                      "on the Options menu of the compose window."));
 
     balsa_app.autoquote = 
-	gnome_config_get_bool("AutoQuote=true");
+	libbalsa_conf_get_bool("AutoQuote=true");
     balsa_app.reply_strip_html = 
-	gnome_config_get_bool("StripHtmlInReply=true");
+	libbalsa_conf_get_bool("StripHtmlInReply=true");
     balsa_app.forward_attached = 
-	gnome_config_get_bool("ForwardAttached=true");
+	libbalsa_conf_get_bool("ForwardAttached=true");
 
 	balsa_app.always_queue_sent_mail = d_get_gint("AlwaysQueueSentMail", 0);
 	balsa_app.copy_to_sentbox = d_get_gint("CopyToSentbox", 1);
 
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
     /* Compose window ... */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Compose/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Compose/");
 
     balsa_app.edit_headers = 
-        gnome_config_get_bool("ExternEditorEditHeaders=false");
+        libbalsa_conf_get_bool("ExternEditorEditHeaders=false");
 
     g_free(balsa_app.quote_str);
-    balsa_app.quote_str = gnome_config_get_string("QuoteString=> ");
+    balsa_app.quote_str = libbalsa_conf_get_string("QuoteString=> ");
     g_free(balsa_app.compose_headers);
     balsa_app.compose_headers =
-	gnome_config_get_string("ComposeHeaders=to subject cc");
+	libbalsa_conf_get_string("ComposeHeaders=to subject cc");
 
     /* Obsolete. */
-    gnome_config_get_bool_with_default("RequestDispositionNotification=false",
+    libbalsa_conf_get_bool_with_default("RequestDispositionNotification=false",
                                        &def_used);
     if (!def_used)
         g_idle_add((GSourceFunc) config_warning_idle,
@@ -1012,17 +1014,17 @@ config_global_load(void)
                      "the Options menu of the compose window."));
 
 
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
     /* Global config options ... */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Globals/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Globals/");
 
     /* directory */
     g_free(balsa_app.local_mail_directory);
-    balsa_app.local_mail_directory = gnome_config_get_string("MailDir");
+    balsa_app.local_mail_directory = libbalsa_conf_get_string("MailDir");
 
     if(!balsa_app.local_mail_directory) {
-	gnome_config_pop_prefix();
+	libbalsa_conf_pop_prefix();
 	return FALSE;
     }
     balsa_app.root_node =
@@ -1030,49 +1032,49 @@ config_global_load(void)
 
 #if defined(ENABLE_TOUCH_UI)
      balsa_app.open_inbox_upon_startup =
-	gnome_config_get_bool("OpenInboxOnStartup=true");
+	libbalsa_conf_get_bool("OpenInboxOnStartup=true");
 #else
      balsa_app.open_inbox_upon_startup =
-	gnome_config_get_bool("OpenInboxOnStartup=false");
+	libbalsa_conf_get_bool("OpenInboxOnStartup=false");
 #endif /* ENABLE_TOUCH_UI */
     /* debugging enabled */
-    balsa_app.debug = gnome_config_get_bool("Debug=false");
+    balsa_app.debug = libbalsa_conf_get_bool("Debug=false");
 
-    balsa_app.close_mailbox_auto = gnome_config_get_bool("AutoCloseMailbox=true");
+    balsa_app.close_mailbox_auto = libbalsa_conf_get_bool("AutoCloseMailbox=true");
     /* timeouts in minutes in config file for backwards compat */
-    balsa_app.close_mailbox_timeout = gnome_config_get_int("AutoCloseMailboxTimeout=10") * 60;
+    balsa_app.close_mailbox_timeout = libbalsa_conf_get_int("AutoCloseMailboxTimeout=10") * 60;
     
     balsa_app.remember_open_mboxes =
-	gnome_config_get_bool("RememberOpenMailboxes=false");
+	libbalsa_conf_get_bool("RememberOpenMailboxes=false");
 
     balsa_app.empty_trash_on_exit =
-	gnome_config_get_bool("EmptyTrash=false");
+	libbalsa_conf_get_bool("EmptyTrash=false");
 
     /* This setting is now per address book */
-    gnome_config_clean_key("AddressBookDistMode");
+    libbalsa_conf_clean_key("AddressBookDistMode");
 
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
     
     /* Toolbars */
     load_toolbars();
 
     /* Last used paths options ... */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Paths/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Paths/");
     g_free(balsa_app.attach_dir);
-    balsa_app.attach_dir = gnome_config_get_string("AttachDir");
+    balsa_app.attach_dir = libbalsa_conf_get_string("AttachDir");
     g_free(balsa_app.save_dir);
-    balsa_app.save_dir = gnome_config_get_string("SavePartDir");
-    gnome_config_pop_prefix();
+    balsa_app.save_dir = libbalsa_conf_get_string("SavePartDir");
+    libbalsa_conf_pop_prefix();
 
 	/* Folder MRU */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "FolderMRU/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "FolderMRU/");
     load_mru(&balsa_app.folder_mru);
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
 	/* FCC MRU */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "FccMRU/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "FccMRU/");
     load_mru(&balsa_app.fcc_mru);
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
     return TRUE;
 }				/* config_global_load */
@@ -1086,65 +1088,65 @@ config_save(void)
     config_identities_save();
 
     /* Section for the balsa_information() settings... */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "InformationMessages/");
-    gnome_config_set_int("ShowInformationMessages",
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "InformationMessages/");
+    libbalsa_conf_set_int("ShowInformationMessages",
 			 balsa_app.information_message);
-    gnome_config_set_int("ShowWarningMessages", balsa_app.warning_message);
-    gnome_config_set_int("ShowErrorMessages", balsa_app.error_message);
-    gnome_config_set_int("ShowDebugMessages", balsa_app.debug_message);
-    gnome_config_set_int("ShowFatalMessages", balsa_app.fatal_message);
-    gnome_config_pop_prefix();
+    libbalsa_conf_set_int("ShowWarningMessages", balsa_app.warning_message);
+    libbalsa_conf_set_int("ShowErrorMessages", balsa_app.error_message);
+    libbalsa_conf_set_int("ShowDebugMessages", balsa_app.debug_message);
+    libbalsa_conf_set_int("ShowFatalMessages", balsa_app.fatal_message);
+    libbalsa_conf_pop_prefix();
 
     /* Section for geometry ... */
     /* FIXME: Saving window sizes is the WM's job?? */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Geometry/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Geometry/");
 
     /* ... column width settings */
-    gnome_config_set_int("MailboxListNameWidth",
+    libbalsa_conf_set_int("MailboxListNameWidth",
 			 balsa_app.mblist_name_width);
-    gnome_config_set_int("MailboxListNewMsgWidth",
+    libbalsa_conf_set_int("MailboxListNewMsgWidth",
 			 balsa_app.mblist_newmsg_width);
-    gnome_config_set_int("MailboxListTotalMsgWidth",
+    libbalsa_conf_set_int("MailboxListTotalMsgWidth",
 			 balsa_app.mblist_totalmsg_width);
-    gnome_config_set_int("IndexNumWidth", balsa_app.index_num_width);
-    gnome_config_set_int("IndexStatusWidth", balsa_app.index_status_width);
-    gnome_config_set_int("IndexAttachmentWidth",
+    libbalsa_conf_set_int("IndexNumWidth", balsa_app.index_num_width);
+    libbalsa_conf_set_int("IndexStatusWidth", balsa_app.index_status_width);
+    libbalsa_conf_set_int("IndexAttachmentWidth",
 			 balsa_app.index_attachment_width);
-    gnome_config_set_int("IndexFromWidth", balsa_app.index_from_width);
-    gnome_config_set_int("IndexSubjectWidth",
+    libbalsa_conf_set_int("IndexFromWidth", balsa_app.index_from_width);
+    libbalsa_conf_set_int("IndexSubjectWidth",
 			 balsa_app.index_subject_width);
-    gnome_config_set_int("IndexDateWidth", balsa_app.index_date_width);
-    gnome_config_set_int("IndexSizeWidth", balsa_app.index_size_width);
-    gnome_config_set_int("MainWindowWidth", balsa_app.mw_width);
-    gnome_config_set_int("MainWindowHeight", balsa_app.mw_height);
-    gnome_config_set_int("MailboxListWidth", balsa_app.mblist_width);
-    gnome_config_set_int("SendMsgWindowWidth", balsa_app.sw_width);
-    gnome_config_set_int("SendMsgWindowHeight", balsa_app.sw_height);
-    gnome_config_set_int("MessageWindowWidth",
+    libbalsa_conf_set_int("IndexDateWidth", balsa_app.index_date_width);
+    libbalsa_conf_set_int("IndexSizeWidth", balsa_app.index_size_width);
+    libbalsa_conf_set_int("MainWindowWidth", balsa_app.mw_width);
+    libbalsa_conf_set_int("MainWindowHeight", balsa_app.mw_height);
+    libbalsa_conf_set_int("MailboxListWidth", balsa_app.mblist_width);
+    libbalsa_conf_set_int("SendMsgWindowWidth", balsa_app.sw_width);
+    libbalsa_conf_set_int("SendMsgWindowHeight", balsa_app.sw_height);
+    libbalsa_conf_set_int("MessageWindowWidth",
                          balsa_app.message_window_width);
-    gnome_config_set_int("MessageWindowHeight",
+    libbalsa_conf_set_int("MessageWindowHeight",
                          balsa_app.message_window_height);
-    gnome_config_set_int("NotebookHeight", balsa_app.notebook_height);
+    libbalsa_conf_set_int("NotebookHeight", balsa_app.notebook_height);
 
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
     /* Message View options ... */
-    gnome_config_clean_section(BALSA_CONFIG_PREFIX "MessageDisplay/");
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "MessageDisplay/");
+    libbalsa_conf_clean_section(BALSA_CONFIG_PREFIX "MessageDisplay/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "MessageDisplay/");
 
-    gnome_config_set_string("DateFormat", balsa_app.date_string);
-    gnome_config_set_int("ShownHeaders", balsa_app.shown_headers);
-    gnome_config_set_string("SelectedHeaders", balsa_app.selected_headers);
-    gnome_config_set_bool("ExpandTree", balsa_app.expand_tree);
-    gnome_config_set_int("SortField",
+    libbalsa_conf_set_string("DateFormat", balsa_app.date_string);
+    libbalsa_conf_set_int("ShownHeaders", balsa_app.shown_headers);
+    libbalsa_conf_set_string("SelectedHeaders", balsa_app.selected_headers);
+    libbalsa_conf_set_bool("ExpandTree", balsa_app.expand_tree);
+    libbalsa_conf_set_int("SortField",
 			 libbalsa_mailbox_get_sort_field(NULL));
-    gnome_config_set_int("ThreadingType",
+    libbalsa_conf_set_int("ThreadingType",
 			 libbalsa_mailbox_get_threading_type(NULL));
-    gnome_config_set_string("QuoteRegex", balsa_app.quote_regex);
-    gnome_config_set_string("MessageFont", balsa_app.message_font);
-    gnome_config_set_string("SubjectFont", balsa_app.subject_font);
-    gnome_config_set_bool("WordWrap", balsa_app.browse_wrap);
-    gnome_config_set_int("WordWrapLength", balsa_app.browse_wrap_length);
+    libbalsa_conf_set_string("QuoteRegex", balsa_app.quote_regex);
+    libbalsa_conf_set_string("MessageFont", balsa_app.message_font);
+    libbalsa_conf_set_string("SubjectFont", balsa_app.subject_font);
+    libbalsa_conf_set_bool("WordWrap", balsa_app.browse_wrap);
+    libbalsa_conf_set_int("WordWrapLength", balsa_app.browse_wrap_length);
 
     for(i=0;i<MAX_QUOTED_COLOR;i++) {
 	gchar *text = g_strdup_printf("QuotedColor%d", i);
@@ -1156,215 +1158,215 @@ config_save(void)
     save_color("BadAddressColor", &balsa_app.bad_address_color);
 
     /* ... handling of Multipart/Alternative */
-    gnome_config_set_bool("DisplayAlternativeAsPlain",
+    libbalsa_conf_set_bool("DisplayAlternativeAsPlain",
 			  balsa_app.display_alt_plain);
 
     /* ... handling of broken mails with 8-bit chars */
-    gnome_config_set_bool("ConvertUnknown8Bit", balsa_app.convert_unknown_8bit);
-    gnome_config_set_int("ConvertUnknown8BitCodeset", 
+    libbalsa_conf_set_bool("ConvertUnknown8Bit", balsa_app.convert_unknown_8bit);
+    libbalsa_conf_set_int("ConvertUnknown8BitCodeset", 
 			    balsa_app.convert_unknown_8bit_codeset);
 
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
     /* Interface Options ... */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Interface/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Interface/");
 
-    gnome_config_set_bool("ShowPreviewPane", balsa_app.previewpane);
-    gnome_config_set_bool("ShowMailboxList", balsa_app.show_mblist);
-    gnome_config_set_bool("ShowTabs", balsa_app.show_notebook_tabs);
-    gnome_config_set_int("ProgressWindow", balsa_app.pwindow_option);
-    gnome_config_set_bool("AlternativeLayout", balsa_app.alternative_layout);
-    gnome_config_set_bool("ViewMessageOnOpen", balsa_app.view_message_on_open);
-    gnome_config_set_bool("PageDownMod", balsa_app.pgdownmod);
-    gnome_config_set_int("PageDownPercent", balsa_app.pgdown_percent);
+    libbalsa_conf_set_bool("ShowPreviewPane", balsa_app.previewpane);
+    libbalsa_conf_set_bool("ShowMailboxList", balsa_app.show_mblist);
+    libbalsa_conf_set_bool("ShowTabs", balsa_app.show_notebook_tabs);
+    libbalsa_conf_set_int("ProgressWindow", balsa_app.pwindow_option);
+    libbalsa_conf_set_bool("AlternativeLayout", balsa_app.alternative_layout);
+    libbalsa_conf_set_bool("ViewMessageOnOpen", balsa_app.view_message_on_open);
+    libbalsa_conf_set_bool("PageDownMod", balsa_app.pgdownmod);
+    libbalsa_conf_set_int("PageDownPercent", balsa_app.pgdown_percent);
 #if defined(ENABLE_TOUCH_UI)
-    gnome_config_set_bool("FileFormatCheck", balsa_app.do_file_format_check);
-    gnome_config_set_bool("ViewFilter",      balsa_app.enable_view_filter);
+    libbalsa_conf_set_bool("FileFormatCheck", balsa_app.do_file_format_check);
+    libbalsa_conf_set_bool("ViewFilter",      balsa_app.enable_view_filter);
 #endif /* ENABLE_TOUCH_UI */
-    gnome_config_set_bool("HideDeleted", libbalsa_mailbox_get_filter(NULL) & 1);
-    gnome_config_set_bool("ExpungeOnClose", balsa_app.expunge_on_close);
-    gnome_config_set_bool("AutoExpunge", balsa_app.expunge_auto);
-    gnome_config_set_int("AutoExpungeMinutes",
+    libbalsa_conf_set_bool("HideDeleted", libbalsa_mailbox_get_filter(NULL) & 1);
+    libbalsa_conf_set_bool("ExpungeOnClose", balsa_app.expunge_on_close);
+    libbalsa_conf_set_bool("AutoExpunge", balsa_app.expunge_auto);
+    libbalsa_conf_set_int("AutoExpungeMinutes",
                          balsa_app.expunge_timeout / 60);
-    gnome_config_set_int("MessageWindowActionAfterMove",
+    libbalsa_conf_set_int("MessageWindowActionAfterMove",
         balsa_app.mw_action_after_move);
 
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
     /* Source browsing ... */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "SourcePreview/");
-    gnome_config_set_bool("EscapeSpecials",
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "SourcePreview/");
+    libbalsa_conf_set_bool("EscapeSpecials",
                           balsa_app.source_escape_specials);
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
     /* Printing options ... */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Printing/");
-    gnome_config_set_string("PaperSize",balsa_app.paper_size);
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Printing/");
+    libbalsa_conf_set_string("PaperSize",balsa_app.paper_size);
     if(balsa_app.margin_left)
-	gnome_config_set_string("LeftMargin",   balsa_app.margin_left);
+	libbalsa_conf_set_string("LeftMargin",   balsa_app.margin_left);
     if(balsa_app.margin_top)
-	gnome_config_set_string("TopMargin",    balsa_app.margin_top);
+	libbalsa_conf_set_string("TopMargin",    balsa_app.margin_top);
     if(balsa_app.margin_bottom)
-	gnome_config_set_string("RightMargin",  balsa_app.margin_right);
+	libbalsa_conf_set_string("RightMargin",  balsa_app.margin_right);
     if(balsa_app.margin_bottom)
-	gnome_config_set_string("BottomMargin", balsa_app.margin_bottom);
+	libbalsa_conf_set_string("BottomMargin", balsa_app.margin_bottom);
     if(balsa_app.print_unit)
-	gnome_config_set_string("PrintUnit",    balsa_app.print_unit);
+	libbalsa_conf_set_string("PrintUnit",    balsa_app.print_unit);
     if(balsa_app.print_layout)
-	gnome_config_set_string("PrintLayout", balsa_app.print_layout);
+	libbalsa_conf_set_string("PrintLayout", balsa_app.print_layout);
     if(balsa_app.margin_bottom)
-	gnome_config_set_string("PaperOrientation", 
+	libbalsa_conf_set_string("PaperOrientation", 
 				balsa_app.paper_orientation);
     if(balsa_app.margin_bottom)
-	gnome_config_set_string("PageOrientation", balsa_app.page_orientation);
+	libbalsa_conf_set_string("PageOrientation", balsa_app.page_orientation);
 
-    gnome_config_set_string("PrintHeaderFont",
+    libbalsa_conf_set_string("PrintHeaderFont",
                             balsa_app.print_header_font);
-    gnome_config_set_string("PrintBodyFont", balsa_app.print_body_font);
-    gnome_config_set_string("PrintFooterFont",
+    libbalsa_conf_set_string("PrintBodyFont", balsa_app.print_body_font);
+    libbalsa_conf_set_string("PrintFooterFont",
                             balsa_app.print_footer_font);
-    gnome_config_set_bool("PrintHighlightCited",
+    libbalsa_conf_set_bool("PrintHighlightCited",
                           balsa_app.print_highlight_cited);
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
     /* Spelling options ... */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Spelling/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Spelling/");
 
-    gnome_config_set_int("PspellModule", balsa_app.module);
-    gnome_config_set_int("PspellSuggestMode", balsa_app.suggestion_mode);
-    gnome_config_set_int("PspellIgnoreSize", balsa_app.ignore_size);
-    gnome_config_set_int("SpellCheckSignature", balsa_app.check_sig);
-    gnome_config_set_int("SpellCheckQuoted", balsa_app.check_quoted);
+    libbalsa_conf_set_int("PspellModule", balsa_app.module);
+    libbalsa_conf_set_int("PspellSuggestMode", balsa_app.suggestion_mode);
+    libbalsa_conf_set_int("PspellIgnoreSize", balsa_app.ignore_size);
+    libbalsa_conf_set_int("SpellCheckSignature", balsa_app.check_sig);
+    libbalsa_conf_set_int("SpellCheckQuoted", balsa_app.check_quoted);
 
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
     /* Mailbox list options */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "MailboxList/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "MailboxList/");
 
-    gnome_config_set_bool("ShowMailboxContentInfo",
+    libbalsa_conf_set_bool("ShowMailboxContentInfo",
 			  balsa_app.mblist_show_mb_content_info);
 
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
     /* Maibox checking options ... */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "MailboxChecking/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "MailboxChecking/");
 
-	gnome_config_set_int("NewMailNotificationDialog",
+	libbalsa_conf_set_int("NewMailNotificationDialog",
 				balsa_app.notify_new_mail_dialog);
-	gnome_config_set_int("NewMailNotificationSound",
+	libbalsa_conf_set_int("NewMailNotificationSound",
 				balsa_app.notify_new_mail_sound);
-    gnome_config_set_bool("OnStartup", balsa_app.check_mail_upon_startup);
-    gnome_config_set_bool("Auto", balsa_app.check_mail_auto);
-    gnome_config_set_int("AutoDelay", balsa_app.check_mail_timer);
-    gnome_config_set_int("CheckIMAP", balsa_app.check_imap);
-    gnome_config_set_int("CheckIMAPInbox", balsa_app.check_imap_inbox);
-    gnome_config_set_int("QuietBackgroundCheck",
+    libbalsa_conf_set_bool("OnStartup", balsa_app.check_mail_upon_startup);
+    libbalsa_conf_set_bool("Auto", balsa_app.check_mail_auto);
+    libbalsa_conf_set_int("AutoDelay", balsa_app.check_mail_timer);
+    libbalsa_conf_set_int("CheckIMAP", balsa_app.check_imap);
+    libbalsa_conf_set_int("CheckIMAPInbox", balsa_app.check_imap_inbox);
+    libbalsa_conf_set_int("QuietBackgroundCheck",
 			 balsa_app.quiet_background_check);
-    gnome_config_set_int("POPMsgSizeLimit", balsa_app.msg_size_limit);
+    libbalsa_conf_set_int("POPMsgSizeLimit", balsa_app.msg_size_limit);
 
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
     /* folder scanning */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "FolderScanning/");
-    gnome_config_set_int("LocalScanDepth", balsa_app.local_scan_depth);
-    gnome_config_set_int("ImapScanDepth", balsa_app.imap_scan_depth);
-    gnome_config_pop_prefix();
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "FolderScanning/");
+    libbalsa_conf_set_int("LocalScanDepth", balsa_app.local_scan_depth);
+    libbalsa_conf_set_int("ImapScanDepth", balsa_app.imap_scan_depth);
+    libbalsa_conf_pop_prefix();
 
     /* how to react if a message with MDN request is displayed */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "MDNReply/");
-    gnome_config_set_int("Clean", balsa_app.mdn_reply_clean);
-    gnome_config_set_int("Suspicious", balsa_app.mdn_reply_notclean);
-    gnome_config_pop_prefix();
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "MDNReply/");
+    libbalsa_conf_set_int("Clean", balsa_app.mdn_reply_clean);
+    libbalsa_conf_set_int("Suspicious", balsa_app.mdn_reply_notclean);
+    libbalsa_conf_pop_prefix();
 
     /* Sending options ... */
-    gnome_config_clean_section(BALSA_CONFIG_PREFIX "Sending/");
-    gnome_config_private_clean_section(BALSA_CONFIG_PREFIX "Sending/");
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Sending/");
+    libbalsa_conf_clean_section(BALSA_CONFIG_PREFIX "Sending/");
+    libbalsa_conf_private_clean_section(BALSA_CONFIG_PREFIX "Sending/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Sending/");
 #if ENABLE_ESMTP
-    gnome_config_set_string("ESMTPServer", balsa_app.smtp_server);
-    gnome_config_set_string("ESMTPUser", balsa_app.smtp_user);
+    libbalsa_conf_set_string("ESMTPServer", balsa_app.smtp_server);
+    libbalsa_conf_set_string("ESMTPUser", balsa_app.smtp_user);
     if(balsa_app.smtp_passphrase) {
         gchar* tmp = libbalsa_rot(balsa_app.smtp_passphrase);
-        gnome_config_private_set_string("ESMTPPassphrase", tmp);
+        libbalsa_conf_private_set_string("ESMTPPassphrase", tmp);
         g_free(tmp);
     }
-    gnome_config_set_int("ESMTPTLSMode", balsa_app.smtp_tls_mode);
+    libbalsa_conf_set_int("ESMTPTLSMode", balsa_app.smtp_tls_mode);
 #if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     if(balsa_app.smtp_certificate_passphrase) {
         gchar* tmp = libbalsa_rot(balsa_app.smtp_certificate_passphrase);
-        gnome_config_private_set_string("ESMTPCertificatePassphrase", tmp);
+        libbalsa_conf_private_set_string("ESMTPCertificatePassphrase", tmp);
         g_free(tmp);
     }
 #endif 
 #endif 
-    gnome_config_set_int("EncodingStyle", balsa_app.encoding_style);
-    gnome_config_set_bool("WordWrap", balsa_app.wordwrap);
-    gnome_config_set_int("WrapLength", balsa_app.wraplength);
-    gnome_config_set_bool("AutoQuote", balsa_app.autoquote);
-    gnome_config_set_bool("StripHtmlInReply", balsa_app.reply_strip_html);
-    gnome_config_set_bool("ForwardAttached", balsa_app.forward_attached);
+    libbalsa_conf_set_int("EncodingStyle", balsa_app.encoding_style);
+    libbalsa_conf_set_bool("WordWrap", balsa_app.wordwrap);
+    libbalsa_conf_set_int("WrapLength", balsa_app.wraplength);
+    libbalsa_conf_set_bool("AutoQuote", balsa_app.autoquote);
+    libbalsa_conf_set_bool("StripHtmlInReply", balsa_app.reply_strip_html);
+    libbalsa_conf_set_bool("ForwardAttached", balsa_app.forward_attached);
 
-	gnome_config_set_int("AlwaysQueueSentMail", balsa_app.always_queue_sent_mail);
-	gnome_config_set_int("CopyToSentbox", balsa_app.copy_to_sentbox);
-    gnome_config_pop_prefix();
+	libbalsa_conf_set_int("AlwaysQueueSentMail", balsa_app.always_queue_sent_mail);
+	libbalsa_conf_set_int("CopyToSentbox", balsa_app.copy_to_sentbox);
+    libbalsa_conf_pop_prefix();
 
     /* Compose window ... */
-    gnome_config_clean_section(BALSA_CONFIG_PREFIX "Compose/");
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Compose/");
+    libbalsa_conf_clean_section(BALSA_CONFIG_PREFIX "Compose/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Compose/");
 
-    gnome_config_set_string("ComposeHeaders", balsa_app.compose_headers);
-    gnome_config_set_bool("ExternEditorEditHeaders", balsa_app.edit_headers);
-    gnome_config_set_string("QuoteString", balsa_app.quote_str);
+    libbalsa_conf_set_string("ComposeHeaders", balsa_app.compose_headers);
+    libbalsa_conf_set_bool("ExternEditorEditHeaders", balsa_app.edit_headers);
+    libbalsa_conf_set_string("QuoteString", balsa_app.quote_str);
 
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
     /* Global config options ... */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Globals/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Globals/");
 
-    gnome_config_set_string("MailDir", balsa_app.local_mail_directory);
+    libbalsa_conf_set_string("MailDir", balsa_app.local_mail_directory);
 
-    gnome_config_set_bool("OpenInboxOnStartup", 
+    libbalsa_conf_set_bool("OpenInboxOnStartup", 
                           balsa_app.open_inbox_upon_startup);
-    gnome_config_set_bool("Debug", balsa_app.debug);
+    libbalsa_conf_set_bool("Debug", balsa_app.debug);
 
-    gnome_config_set_bool("AutoCloseMailbox", balsa_app.close_mailbox_auto);
-    gnome_config_set_int("AutoCloseMailboxTimeout", balsa_app.close_mailbox_timeout/60);
+    libbalsa_conf_set_bool("AutoCloseMailbox", balsa_app.close_mailbox_auto);
+    libbalsa_conf_set_int("AutoCloseMailboxTimeout", balsa_app.close_mailbox_timeout/60);
 
-    gnome_config_set_bool("RememberOpenMailboxes",
+    libbalsa_conf_set_bool("RememberOpenMailboxes",
 			  balsa_app.remember_open_mboxes);
-    gnome_config_set_bool("EmptyTrash", balsa_app.empty_trash_on_exit);
+    libbalsa_conf_set_bool("EmptyTrash", balsa_app.empty_trash_on_exit);
 
     if (balsa_app.default_address_book) {
-	gnome_config_set_string("DefaultAddressBook",
+	libbalsa_conf_set_string("DefaultAddressBook",
 				balsa_app.default_address_book->
 				config_prefix +
 				strlen(BALSA_CONFIG_PREFIX));
     } else {
-	gnome_config_clean_key("DefaultAddressBook");
+	libbalsa_conf_clean_key("DefaultAddressBook");
     }
 
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
     /* Toolbars */
     save_toolbars();
 
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Paths/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Paths/");
     if(balsa_app.attach_dir)
-	gnome_config_set_string("AttachDir", balsa_app.attach_dir);
+	libbalsa_conf_set_string("AttachDir", balsa_app.attach_dir);
     if(balsa_app.save_dir)
-	gnome_config_set_string("SavePartDir", balsa_app.save_dir);
-    gnome_config_pop_prefix();
+	libbalsa_conf_set_string("SavePartDir", balsa_app.save_dir);
+    libbalsa_conf_pop_prefix();
 
 	
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "FolderMRU/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "FolderMRU/");
     save_mru(balsa_app.folder_mru);
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "FccMRU/");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "FccMRU/");
     save_mru(balsa_app.fcc_mru);
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
-    gnome_config_sync();
+    libbalsa_conf_sync();
     return TRUE;
 }				/* config_global_save */
 
@@ -1378,10 +1380,10 @@ config_get_unused_section(const gchar * prefix)
     gchar *name, *key, *val;
     int pref_len = strlen(prefix);
 
-    iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
+    iterator = libbalsa_conf_init_iterator_sections(BALSA_CONFIG_PREFIX);
 
     max = 0;
-    while ((iterator = gnome_config_iterator_next(iterator, &key, &val))) {
+    while ((iterator = libbalsa_conf_iterator_next(iterator, &key, &val))) {
 	if (strncmp(key, prefix, pref_len) == 0) {
 	    if (strlen(key + (pref_len - 1)) > 1
 		&& (curr = atoi(key + pref_len) + 1) && curr > max)
@@ -1404,8 +1406,8 @@ config_clean_sections(const gchar* section_prefix)
     int pref_len = strlen(section_prefix);
     GList* old_sections = NULL, *list;
 
-    iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
-    while ((iterator = gnome_config_iterator_next(iterator, &key, &val))) {
+    iterator = libbalsa_conf_init_iterator_sections(BALSA_CONFIG_PREFIX);
+    while ((iterator = libbalsa_conf_iterator_next(iterator, &key, &val))) {
 	if (strncmp(key, section_prefix, pref_len) == 0) {
 	    prefix = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
 	    old_sections = g_list_prepend(old_sections, prefix);
@@ -1414,7 +1416,7 @@ config_clean_sections(const gchar* section_prefix)
 	g_free(val);
     }
     for(list=old_sections; list; list = g_list_next(list)) {
-	gnome_config_clean_section(list->data);
+	libbalsa_conf_clean_section(list->data);
 	g_free(list->data);
     }
     g_list_free(old_sections);
@@ -1429,12 +1431,12 @@ config_address_books_load(void)
     gchar *key, *val, *tmp;
     int pref_len = strlen(ADDRESS_BOOK_SECTION_PREFIX);
 
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Globals/");
-    tmp = gnome_config_get_string("DefaultAddressBook");
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Globals/");
+    tmp = libbalsa_conf_get_string("DefaultAddressBook");
     default_address_book_prefix =
 	g_strconcat(BALSA_CONFIG_PREFIX, tmp, NULL);
     g_free(tmp);
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
     /* Free old data in case address books were set by eg. config druid. */
     if(balsa_app.address_book_list) {
@@ -1443,8 +1445,8 @@ config_address_books_load(void)
         g_list_free(balsa_app.address_book_list);
         balsa_app.address_book_list = NULL;
     }
-    iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
-    while ((iterator = gnome_config_iterator_next(iterator, &key, &val))) {
+    iterator = libbalsa_conf_init_iterator_sections(BALSA_CONFIG_PREFIX);
+    while ((iterator = libbalsa_conf_iterator_next(iterator, &key, &val))) {
 
 	if (strncmp(key, ADDRESS_BOOK_SECTION_PREFIX, pref_len) == 0) {
 	    tmp = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
@@ -1495,12 +1497,12 @@ config_identities_load()
         g_list_free(balsa_app.identities);
         balsa_app.identities = NULL;
     }
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "identity/");
-    default_ident = gnome_config_get_string("CurrentIdentity");
-    gnome_config_pop_prefix();
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "identity/");
+    default_ident = libbalsa_conf_get_string("CurrentIdentity");
+    libbalsa_conf_pop_prefix();
 
-    iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
-    while ((iterator = gnome_config_iterator_next(iterator, &key, &val))) {
+    iterator = libbalsa_conf_init_iterator_sections(BALSA_CONFIG_PREFIX);
+    while ((iterator = libbalsa_conf_iterator_next(iterator, &key, &val))) {
 	if (strncmp(key, IDENTITY_SECTION_PREFIX, pref_len) == 0) {
 	    tmp = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
 	    ident = libbalsa_identity_new_config(tmp, key+pref_len);
@@ -1543,10 +1545,10 @@ config_identities_save(void)
 
     g_assert(conf_vec != NULL);
     
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "identity/");
-    gnome_config_set_string("CurrentIdentity", 
+    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "identity/");
+    libbalsa_conf_set_string("CurrentIdentity", 
                             balsa_app.current_ident->identity_name);
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
     g_free(conf_vec);
 
     config_clean_sections(IDENTITY_SECTION_PREFIX);
@@ -1569,15 +1571,15 @@ config_views_load_with_prefix(const gchar * prefix, gboolean compat)
     int pref_len = strlen(prefix);
     int def;
 
-    iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
-    while ((iterator = gnome_config_iterator_next(iterator, &key, &val))) {
+    iterator = libbalsa_conf_init_iterator_sections(BALSA_CONFIG_PREFIX);
+    while ((iterator = libbalsa_conf_iterator_next(iterator, &key, &val))) {
 	if (strncmp(key, prefix, pref_len) == 0) {
 	    gchar *url;
 	    tmp = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
-	    gnome_config_push_prefix(tmp);
+	    libbalsa_conf_push_prefix(tmp);
 	    g_free(tmp);
 	    url = compat
-		? gnome_config_get_string_with_default("URL", &def)
+		? libbalsa_conf_get_string_with_default("URL", &def)
 		: libbalsa_urldecode(&key[pref_len]);
 	    if (!compat || !def) {
                 LibBalsaMailboxView *view;
@@ -1592,48 +1594,48 @@ config_views_load_with_prefix(const gchar * prefix, gboolean compat)
                                     g_strdup(url), view);
 
                 address =
-                    gnome_config_get_string_with_default
+                    libbalsa_conf_get_string_with_default
                     ("MailingListAddress", &def);
                 view->mailing_list_address =
                     def ? NULL : internet_address_parse_string(address);
                 g_free(address);
 
-                view->identity_name = gnome_config_get_string("Identity");
+                view->identity_name = libbalsa_conf_get_string("Identity");
 
-		tmp = gnome_config_get_int_with_default("Threading", &def);
+		tmp = libbalsa_conf_get_int_with_default("Threading", &def);
                 if (!def)
 		    view->threading_type = tmp;
 
-		tmp = gnome_config_get_int_with_default("GUIFilter", &def);
+		tmp = libbalsa_conf_get_int_with_default("GUIFilter", &def);
                 if (!def)
 		    view->filter = tmp;
 
-		tmp = gnome_config_get_int_with_default("SortType", &def);
+		tmp = libbalsa_conf_get_int_with_default("SortType", &def);
                 if (!def)
 		    view->sort_type = tmp;
 
-		tmp = gnome_config_get_int_with_default("SortField", &def);
+		tmp = libbalsa_conf_get_int_with_default("SortField", &def);
                 if (!def)
 		    view->sort_field = tmp;
 
-		tmp = gnome_config_get_int_with_default("Show", &def);
+		tmp = libbalsa_conf_get_int_with_default("Show", &def);
                 if (!def)
 		    view->show = tmp;
 
-		tmp = gnome_config_get_bool_with_default("Exposed", &def);
+		tmp = libbalsa_conf_get_bool_with_default("Exposed", &def);
                 if (!def)
 		    view->exposed = tmp;
 
-		tmp = gnome_config_get_bool_with_default("Open", &def);
+		tmp = libbalsa_conf_get_bool_with_default("Open", &def);
                 if (!def)
 		    view->open = tmp;
 #ifdef HAVE_GPGME
-		tmp = gnome_config_get_int_with_default("CryptoMode", &def);
+		tmp = libbalsa_conf_get_int_with_default("CryptoMode", &def);
                 if (!def)
 		    view->gpg_chk_mode = tmp;
 #endif
             }
-            gnome_config_pop_prefix();
+            libbalsa_conf_pop_prefix();
             g_free(url);
         }
         g_free(key);
@@ -1667,8 +1669,8 @@ save_view(const gchar * url, LibBalsaMailboxView * view)
 			 url_enc, "/", NULL);
     g_free(url_enc);
 
-    gnome_config_clean_section(prefix);
-    gnome_config_push_prefix(prefix);
+    libbalsa_conf_clean_section(prefix);
+    libbalsa_conf_push_prefix(prefix);
     g_free(prefix);
 
     if (view->mailing_list_address !=
@@ -1676,33 +1678,33 @@ save_view(const gchar * url, LibBalsaMailboxView * view)
        gchar* tmp =
 	   internet_address_list_to_string(view->mailing_list_address,
 		                           FALSE);
-       gnome_config_set_string("MailingListAddress", tmp);
+       libbalsa_conf_set_string("MailingListAddress", tmp);
        g_free(tmp);
     }
     if (view->identity_name  != libbalsa_mailbox_get_identity_name(NULL))
-	gnome_config_set_string("Identity", view->identity_name);
+	libbalsa_conf_set_string("Identity", view->identity_name);
     if (view->threading_type != libbalsa_mailbox_get_threading_type(NULL))
-	gnome_config_set_int("Threading",   view->threading_type);
+	libbalsa_conf_set_int("Threading",   view->threading_type);
     if (view->filter         != libbalsa_mailbox_get_filter(NULL))
-	gnome_config_set_int("GUIFilter",   view->filter);
+	libbalsa_conf_set_int("GUIFilter",   view->filter);
     if (view->sort_type      != libbalsa_mailbox_get_sort_type(NULL))
-	gnome_config_set_int("SortType",    view->sort_type);
+	libbalsa_conf_set_int("SortType",    view->sort_type);
     if (view->sort_field     != libbalsa_mailbox_get_sort_field(NULL))
-	gnome_config_set_int("SortField",   view->sort_field);
+	libbalsa_conf_set_int("SortField",   view->sort_field);
     /* initial value for show is UNSET, but that's always replaced, 
      * and we want it to default to FROM. */
     if (view->show           != LB_MAILBOX_SHOW_FROM)
-	gnome_config_set_int("Show",	    view->show);
+	libbalsa_conf_set_int("Show",	    view->show);
     if (view->exposed        != libbalsa_mailbox_get_exposed(NULL))
-	gnome_config_set_bool("Exposed",    view->exposed);
+	libbalsa_conf_set_bool("Exposed",    view->exposed);
     if (view->open           != libbalsa_mailbox_get_open(NULL))
-	gnome_config_set_bool("Open",	    view->open);
+	libbalsa_conf_set_bool("Open",	    view->open);
 #ifdef HAVE_GPGME
     if (view->gpg_chk_mode   != libbalsa_mailbox_get_crypto_mode(NULL))
-	gnome_config_set_int("CryptoMode",  view->gpg_chk_mode);
+	libbalsa_conf_set_int("CryptoMode",  view->gpg_chk_mode);
 #endif
 
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 }
 
 void
@@ -1721,7 +1723,7 @@ save_color(gchar * key, GdkColor * color)
 
     str = g_strdup_printf("#%04x%04x%04x", color->red, color->green,
                           color->blue);
-    gnome_config_set_string(key, str);
+    libbalsa_conf_set_string(key, str);
     g_free(str);
 }
 
@@ -1735,24 +1737,24 @@ config_filters_load(void)
     guint save = 0;
 
     filter_errno=FILTER_NOERR;
-    iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
+    iterator = libbalsa_conf_init_iterator_sections(BALSA_CONFIG_PREFIX);
     while ((filter_errno==FILTER_NOERR) &&
-	   (iterator = gnome_config_iterator_next(iterator, &key, NULL))) {
+	   (iterator = libbalsa_conf_iterator_next(iterator, &key, NULL))) {
 
 	if (strncmp(key, FILTER_SECTION_PREFIX, pref_len) == 0) {
 	    tmp=g_strconcat(BALSA_CONFIG_PREFIX,key,"/",NULL);
-	    gnome_config_push_prefix(tmp);
+	    libbalsa_conf_push_prefix(tmp);
 	    g_free(tmp);	    
 	    fil = libbalsa_filter_new_from_config();
 	    if (!fil->condition) {
 		/* Try pre-2.1 style: */
-		FilterOpType op = gnome_config_get_int("Operation");
+		FilterOpType op = libbalsa_conf_get_int("Operation");
 		ConditionMatchType cmt =
 		    op == FILTER_OP_OR ? CONDITION_OR : CONDITION_AND;
-		gnome_config_pop_prefix();
+		libbalsa_conf_pop_prefix();
 		fil->condition =
 		    libbalsa_condition_new_2_0(BALSA_CONFIG_PREFIX, key, cmt);
-		gnome_config_push_prefix(tmp);
+		libbalsa_conf_push_prefix(tmp);
 		if (fil->condition)
 		    ++save;
 	    }
@@ -1765,7 +1767,7 @@ config_filters_load(void)
 		FILTER_SETFLAG(fil,FILTER_COMPILED);
 		balsa_app.filters = g_slist_prepend(balsa_app.filters, fil);
 	    }
-	    gnome_config_pop_prefix();
+	    libbalsa_conf_pop_prefix();
 	}
 	g_free(key);	
     }
@@ -1793,20 +1795,20 @@ config_filters_save(void)
     for(list = balsa_app.filters; list; list = g_slist_next(list)) {
 	fil = (LibBalsaFilter*)(list->data);
 	i=snprintf(tmp,tmp_len,"%d/",nb++);
-	gnome_config_push_prefix(buffer);
+	libbalsa_conf_push_prefix(buffer);
 	libbalsa_filter_save_config(fil);
-	gnome_config_pop_prefix();
+	libbalsa_conf_pop_prefix();
     }
-    gnome_config_sync();
+    libbalsa_conf_sync();
     /* This loop takes care of cleaning up old filter sections */
     while (TRUE) {
 	i=snprintf(tmp,tmp_len,"%d/",nb++);
-	if (gnome_config_has_section(buffer)) {
-	    gnome_config_clean_section(buffer);
+	if (libbalsa_conf_has_section(buffer)) {
+	    libbalsa_conf_clean_section(buffer);
 	}
 	else break;
     }
-    gnome_config_sync();
+    libbalsa_conf_sync();
     g_free(buffer);
 }
 
@@ -1819,7 +1821,7 @@ config_mailbox_filters_save(LibBalsaMailbox * mbox)
     tmp = mailbox_filters_section_lookup(mbox->url ? mbox->url : mbox->name);
     if (!mbox->filters) {
 	if (tmp) {
-	    gnome_config_clean_section(tmp);
+	    libbalsa_conf_clean_section(tmp);
 	    g_free(tmp);
 	}
 	return;
@@ -1827,17 +1829,17 @@ config_mailbox_filters_save(LibBalsaMailbox * mbox)
     if (!tmp) {
 	/* If there was no existing filters section for this mailbox we create one */
 	tmp=config_get_unused_section(MAILBOX_FILTERS_SECTION_PREFIX);
-	gnome_config_push_prefix(tmp);
+	libbalsa_conf_push_prefix(tmp);
 	g_free(tmp);
-	gnome_config_set_string(MAILBOX_FILTERS_URL_KEY,mbox->url);
+	libbalsa_conf_set_string(MAILBOX_FILTERS_URL_KEY,mbox->url);
     }
     else {
-	gnome_config_push_prefix(tmp);
+	libbalsa_conf_push_prefix(tmp);
 	g_free(tmp);
     }
     libbalsa_mailbox_filters_save_config(mbox);
-    gnome_config_pop_prefix();
-    gnome_config_sync();
+    libbalsa_conf_pop_prefix();
+    libbalsa_conf_sync();
 }
 
 static void
@@ -1845,7 +1847,7 @@ load_color(gchar * key, GdkColor * color)
 {
     gchar *str;
 
-    str = gnome_config_get_string(key);
+    str = libbalsa_conf_get_string(key);
     if (g_ascii_strncasecmp(str, "rgb:", 4)
         || sscanf(str + 4, "%4hx/%4hx/%4hx", &color->red, &color->green,
                   &color->blue) != 3)
@@ -1863,7 +1865,7 @@ load_mru(GList **mru)
     for(i=0;i<count;i++) {
         gchar *val;
 	sprintf(tmpkey, "MRU%d", i+1);
-        if( (val = gnome_config_get_string(tmpkey)) != NULL )
+        if( (val = libbalsa_conf_get_string(tmpkey)) != NULL )
             (*mru)=g_list_append((*mru), val);
     }
 }
@@ -1878,9 +1880,9 @@ save_mru(GList *mru)
     for(ltmp=g_list_first(mru),i=0;
 	ltmp; ltmp=g_list_next(ltmp),i++) {
 	sprintf(tmpkey, "MRU%d", i+1);
-	gnome_config_set_string(tmpkey, (gchar *)(ltmp->data));
+	libbalsa_conf_set_string(tmpkey, (gchar *)(ltmp->data));
     }
-    gnome_config_set_int("MRUCount", i);
+    libbalsa_conf_set_int("MRUCount", i);
 }
 
 /* check_for_old_sigs:

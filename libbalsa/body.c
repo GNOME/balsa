@@ -28,18 +28,10 @@
 #include <string.h>
 #include <glib.h>
 #include <fcntl.h>
-#ifdef HAVE_GETTEXT
-#include <libintl.h>
-#ifndef _
-#define _(x)  gettext(x)
-#endif
-#else
-#define _(x)  (x)
-#endif
-#define N_(x) (x)
 
 #include "libbalsa.h"
 #include "misc.h"
+#include "i18n.h"
 
 LibBalsaMessageBody *
 libbalsa_message_body_new(LibBalsaMessage * message)

@@ -26,20 +26,11 @@
 
 #include <stdio.h>
 
-#ifdef HAVE_GETTEXT
-#include <libintl.h>
-#ifndef _
-#define _(x)  gettext(x)
-#endif
-#else
-#define _(x)  (x)
-#endif
-#define N_(x) (x)
-
 #include "misc.h"
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 #include "misc.h"
+#include "i18n.h"
 
 static void close_cb(GtkAction * action, gpointer data);
 static void copy_cb(GtkAction * action, gpointer data);

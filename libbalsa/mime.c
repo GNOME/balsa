@@ -27,15 +27,7 @@
 #include "libbalsa.h"
 #include "misc.h"
 #include "html.h"
-#ifdef HAVE_GETTEXT
-#include <libintl.h>
-#ifndef _
-#define _(x)  gettext(x)
-#endif
-#else
-#define _(x)  (x)
-#endif
-#define N_(x) (x)
+#include "i18n.h"
 
 /* FIXME: The content of this file could go to message.c */
 

@@ -39,6 +39,8 @@
 #include <locale.h>
 #endif
 
+#include "i18n.h"
+
 #include "address-entry.h"
 
 #include "balsa-app.h"
@@ -559,10 +561,12 @@ main(int argc, char *argv[])
     bindtextdomain(PACKAGE, GNOMELOCALEDIR);
     bind_textdomain_codeset(PACKAGE, "UTF-8");
     textdomain(PACKAGE);
+#if 0	/* FIXME replacement? */
     /* FIXME: gnome_i18n_get_language seems to have gone away; 
      * is this a reasonable replacement? */
     setlocale(LC_CTYPE,
               (const char *) gnome_i18n_get_language_list("LC_CTYPE")->data);
+#endif
 #endif
 
 
@@ -610,7 +614,9 @@ main(int argc, char *argv[])
 
     default_icon = balsa_pixmap_finder("balsa_icon.png");
     if(default_icon) { /* may be NULL for developer installations */
+#if 0	/* FIXME replacement? */
         gnome_window_icon_set_default_from_file(default_icon);
+#endif
         g_free(default_icon);
     }
 

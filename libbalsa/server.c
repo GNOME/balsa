@@ -29,20 +29,11 @@
 #include <openssl/err.h>
 #endif
 
-#ifdef HAVE_GETTEXT
-#include <libintl.h>
-#ifndef _
-#define _(x)  gettext(x)
-#endif
-#else
-#define _(x)  (x)
-#endif
-#define N_(x) (x)
-
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 #include "libbalsa-marshal.h"
 #include "libbalsa-conf.h"
+#include "i18n.h"
 
 static GObjectClass *parent_class = NULL;
 static void libbalsa_server_class_init(LibBalsaServerClass * klass);

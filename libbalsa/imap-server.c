@@ -8,21 +8,12 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#ifdef HAVE_GETTEXT
-#include <libintl.h>
-#ifndef _
-#define _(x)  gettext(x)
-#endif
-#else
-#define _(x)  (x)
-#endif
-#define N_(x) (x)
-
 #include "libbalsa.h"
 #include "libbalsa-conf.h"
 #include "imap-handle.h"
 #include "imap-server.h"
 #include "imap-commands.h"
+#include "i18n.h"
 
 #ifdef USE_TLS
 #define REQ_SSL(s) (LIBBALSA_SERVER(s)->use_ssl)

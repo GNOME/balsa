@@ -28,15 +28,7 @@
 #include "libbalsa-marshal.h"
 
 #include "libbalsa-conf.h"
-
-#ifdef HAVE_GETTEXT
-#include <libintl.h>
-#ifndef _
-#define _(x)  gettext(x)
-#endif
-#else
-#define _(x)  (x)
-#endif
+#include "i18n.h"
 
 static GObjectClass *parent_class = NULL;
 

@@ -37,6 +37,8 @@
 #include "save-restore.h"
 #include "filter.h"
 #include "imap-server.h"
+#include "i18n.h"
+#include "libbalsa-conf.h"
 
 /* MailboxNode object is a GUI representation of a mailbox, or entire 
    set of them. It can read itself from the configuration, save its data,
@@ -233,10 +235,10 @@ balsa_mailbox_node_real_save_config(BalsaMailboxNode* mn, const gchar * prefix)
     if(mn->name)
 	printf("Saving mailbox node %s with prefix %s\n", mn->name, prefix);
     libbalsa_imap_server_save_config(LIBBALSA_IMAP_SERVER(mn->server));
-    gnome_config_set_string("Name",      mn->name);
-    gnome_config_set_string("Directory", mn->dir);
-    gnome_config_set_bool("Subscribed",  mn->subscribed);
-    gnome_config_set_bool("ListInbox",   mn->list_inbox);
+    libbalsa_conf_set_string("Name",      mn->name);
+    libbalsa_conf_set_string("Directory", mn->dir);
+    libbalsa_conf_set_bool("Subscribed",  mn->subscribed);
+    libbalsa_conf_set_bool("ListInbox",   mn->list_inbox);
     
     g_free(mn->config_prefix);
     mn->config_prefix = g_strdup(prefix);
@@ -248,7 +250,7 @@ balsa_mailbox_node_real_load_config(BalsaMailboxNode* mn, const gchar * prefix)
     g_free(mn->config_prefix);
     mn->config_prefix = g_strdup(prefix);
     g_free(mn->name);
-    mn->name = gnome_config_get_string("Name");
+    mn->name = libbalsa_conf_get_string("Name");
 }
 
 BalsaMailboxNode *
@@ -538,7 +540,7 @@ BalsaMailboxNode*
 balsa_mailbox_node_new_from_config(const gchar* prefix)
 {
     BalsaMailboxNode * folder = balsa_mailbox_node_new();
-    gnome_config_push_prefix(prefix);
+    libbalsa_conf_push_prefix(prefix);
 
     folder->server = LIBBALSA_SERVER(libbalsa_imap_server_new_from_config());
 
@@ -553,12 +555,12 @@ balsa_mailbox_node_new_from_config(const gchar* prefix)
                                     G_CALLBACK(ask_password), NULL);
     balsa_mailbox_node_load_config(folder, prefix);
 
-    folder->dir = gnome_config_get_string("Directory");
+    folder->dir = libbalsa_conf_get_string("Directory");
     folder->subscribed =
-	gnome_config_get_bool("Subscribed"); 
+	libbalsa_conf_get_bool("Subscribed"); 
     folder->list_inbox =
-	gnome_config_get_bool("ListInbox=true"); 
-    gnome_config_pop_prefix();
+	libbalsa_conf_get_bool("ListInbox=true"); 
+    libbalsa_conf_pop_prefix();
 
     return folder;
 }

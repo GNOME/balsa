@@ -47,16 +47,6 @@
 #include <pthread.h>
 #endif
 
-#ifdef HAVE_GETTEXT
-#include <libintl.h>
-#ifndef _
-#define _(x)  gettext(x)
-#endif
-#else
-#define _(x)  (x)
-#endif
-#define N_(x) (x)
-
 #include "libimap.h"
 #include "filter-funcs.h"
 #include "filter.h"
@@ -68,6 +58,7 @@
 #include "imap-commands.h"
 #include "imap-server.h"
 #include "libbalsa-conf.h"
+#include "i18n.h"
 
 struct _LibBalsaMailboxImap {
     LibBalsaMailboxRemote mailbox;

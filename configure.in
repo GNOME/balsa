@@ -239,8 +239,12 @@ fi
 AC_MSG_CHECKING(whether to use GtkHTML)
 
 if test x"$use_gtkhtml" = xyes ; then 
-    if $PKG_CONFIG --exists libgtkhtml-3.1 ; then
-	PKG_CHECK_MODULES(HTML, [ libgtkhtml-3.1 ])
+    if $PKG_CONFIG --exists libgtkhtml-3.6 ; then
+	PKG_CHECK_MODULES(HTML, [ libgtkhtml-3.6 ])
+        AC_DEFINE(HAVE_GTKHTML3,1,[Defined when GtkHtml-3 can be used.])
+        AC_DEFINE(HAVE_GTKHTML,1,[Defined when GtkHtml can be used.])
+    elif $PKG_CONFIG --exists libgtkhtml-3.1 ; then
+	PKG_CHECK_MODULES(HTML, [libgtkhtml-3.1	])
         AC_DEFINE(HAVE_GTKHTML3,1,[Defined when GtkHtml-3 can be used.])
         AC_DEFINE(HAVE_GTKHTML,1,[Defined when GtkHtml can be used.])
     elif $PKG_CONFIG --exists libgtkhtml-3.0 ; then

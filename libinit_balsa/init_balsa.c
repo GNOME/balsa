@@ -28,17 +28,9 @@
 #include "helper.h"
 #include "balsa-initdruid.h"
 #include "balsa-druid-page-welcome.h"
-#else
-#ifdef HAVE_GETTEXT
-#include <libintl.h>
-#ifndef _
-#define _(x)  gettext(x)
-#endif
-#else
-#define _(x)  (x)
-#endif
-#define N_(x) (x)
 #endif /* HAVE_GNOME */
+
+#include "i18n.h"	/* Must come after helper.h. */
 
 static gboolean
 dismiss_the_wizard(GtkWidget *wizard)

@@ -39,21 +39,12 @@
 #include <libgnomevfs/gnome-vfs.h>
 #endif
 
-#ifdef HAVE_GETTEXT
-#include <libintl.h>
-#ifndef _
-#define _(x)  gettext(x)
-#endif
-#else
-#define _(x)  (x)
-#endif
-#define N_(x) (x)
-
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 #include "misc.h"
 #include "html.h"
+#include "i18n.h"
 
 static const gchar *libbalsa_get_codeset_name(const gchar *txt, 
 					      LibBalsaCodeset Codeset);

@@ -41,6 +41,8 @@
 #include "balsa-app.h"
 #include "save-restore.h"
 #include "mailbox-filter.h"
+#include "i18n.h"
+#include "libbalsa-conf.h"
 
 /* Defined in filter-edit-dialog.c*/
 extern option_list fe_search_type[4];
@@ -1286,8 +1288,8 @@ update_filters_mailbox(GtkTreeModel * model, GtkTreePath * path,
 	gboolean def;
 	guint nb_filters;
 
-	gnome_config_push_prefix(tmp);
-	gnome_config_get_vector_with_default(MAILBOX_FILTERS_KEY,
+	libbalsa_conf_push_prefix(tmp);
+	libbalsa_conf_get_vector_with_default(MAILBOX_FILTERS_KEY,
 					     &nb_filters, &filters_names,
 					     &def);
 	if (!def) {
@@ -1325,12 +1327,12 @@ update_filters_mailbox(GtkTreeModel * model, GtkTreePath * path,
 	}
 
 	if (nb_filters) {
-	    gnome_config_set_vector(MAILBOX_FILTERS_KEY, nb_filters,
+	    libbalsa_conf_set_vector(MAILBOX_FILTERS_KEY, nb_filters,
 				    (const gchar **) filters_names);
-	    gnome_config_pop_prefix();
+	    libbalsa_conf_pop_prefix();
 	} else {
-	    gnome_config_pop_prefix();
-	    gnome_config_clean_section(tmp);
+	    libbalsa_conf_pop_prefix();
+	    libbalsa_conf_clean_section(tmp);
 	}
 	g_strfreev(filters_names);
 	g_free(tmp);
@@ -1714,7 +1716,12 @@ fe_delete_pressed(GtkWidget * widget, gpointer data)
         gtk_entry_set_text(GTK_ENTRY(fe_name_entry),"");
         gtk_entry_set_text(GTK_ENTRY(fe_popup_entry),"");
         /*gtk_option_menu_set_history(GTK_OPTION_MENU(fe_mailboxes), 0); */
+#if GTK_CHECK_VERSION(2, 6, 0)
+        gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(fe_sound_entry),
+                                      "");
+#else /* GTK_CHECK_VERSION(2, 6, 0) */
         gtk_entry_set_text(GTK_ENTRY(gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(fe_sound_entry))),"");
+#endif /* GTK_CHECK_VERSION(2, 6, 0) */
         gtk_list_store_clear(GTK_LIST_STORE
                              (gtk_tree_view_get_model
                               (fe_conditions_list)));
@@ -1938,8 +1945,13 @@ fe_filters_list_selection_changed(GtkTreeSelection * selection,
                        ? fil->popup_text : "");
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_sound_button),
                                  fil->sound!=NULL);
+#if GTK_CHECK_VERSION(2, 6, 0)
+    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(fe_sound_entry),
+                                  fil->sound != NULL ? fil->sound : "");
+#else /* GTK_CHECK_VERSION(2, 6, 0) */
     gtk_entry_set_text(GTK_ENTRY(gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(fe_sound_entry))),
                        fil->sound!=NULL ? fil->sound : "");
+#endif /* GTK_CHECK_VERSION(2, 6, 0) */
     
     gtk_combo_box_set_active(GTK_COMBO_BOX(fe_action_option_menu),
                              fil->action - 1);

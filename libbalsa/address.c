@@ -24,18 +24,10 @@
 
 #include <string.h>
 #include <gmime/gmime.h>
-#ifdef HAVE_GETTEXT
-#include <libintl.h>
-#ifndef _
-#define _(x)  gettext(x)
-#endif
-#else
-#define _(x)  (x)
-#endif
-#define N_(x) (x)
 
 #include "address.h"
 #include "misc.h"
+#include "i18n.h"
 
 static GObjectClass *parent_class;
 

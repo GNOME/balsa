@@ -43,21 +43,12 @@
 #include <time.h>
 #include <sys/types.h>
 
-#ifdef HAVE_GETTEXT
-#include <libintl.h>
-#ifndef _
-#define _(x)  gettext(x)
-#endif
-#else
-#define _(x)  (x)
-#endif
-#define N_(x) (x)
-
 #include "filter-file.h"
 #include "filter-private.h"
 #include "filter-funcs.h"
 #include "libbalsa-conf.h"
 #include "mailbox-filter.h"
+#include "i18n.h"
 
 /* Load the header of a filter filter (you have to separately load the
  * associated conditions) Filter is marked as invalid Position

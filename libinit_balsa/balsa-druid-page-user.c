@@ -27,6 +27,7 @@
 #include <sys/stat.h>
 #include <string.h>
 
+#include "i18n.h"
 #include "imap-server.h"
 #include "balsa-app.h"
 #include "save-restore.h"

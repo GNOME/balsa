@@ -38,15 +38,7 @@
 #include "address-book-vcard.h"
 #include "abook-completion.h"
 #include "libbalsa-conf.h"
-
-#ifdef HAVE_GETTEXT
-#include <libintl.h>
-#ifndef _
-#define _(x)  gettext(x)
-#endif
-#else
-#define _(x)  (x)
-#endif
+#include "i18n.h"
 
 /* FIXME: Perhaps the whole thing could be rewritten to use a g_scanner ?? */
 

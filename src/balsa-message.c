@@ -35,6 +35,7 @@
 #include "mime.h"
 #include "misc.h"
 #include "html.h"
+#include "i18n.h"
 
 #include <gdk-pixbuf/gdk-pixbuf.h>
 

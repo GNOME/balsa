@@ -32,20 +32,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#ifdef HAVE_GETTEXT
-#include <libintl.h>
-#ifndef _
-#define _(x)  gettext(x)
-#endif
-#else
-#define _(x)  (x)
-#endif
-#define N_(x) (x)
-
 #include "libbalsa.h"
 #include "libbalsa-conf.h"
 #include "misc.h"
 #include "libbalsa_private.h"
+#include "i18n.h"
 
 struct message_info {
     char *key;

@@ -306,6 +306,6 @@ void body_free (Body * body);
 MailboxType mailbox_type_from_description (gchar * description);
 gchar *mailbox_type_description (MailboxType type);
 MailboxType mailbox_valid (gchar * filename);
-
+gchar *message_pathname(Message *message);
 
 #endif /* __MAILBOX_H__ */

@@ -73,7 +73,6 @@ send_message (Message * message, gchar * smtp_server, glong debug)
 
   mutt_update_encoding (msg->content);
 
-  /* FIXME */
   switch (balsa_app.outbox->type)
     {
     case MAILBOX_MAILDIR:
@@ -82,8 +81,9 @@ send_message (Message * message, gchar * smtp_server, glong debug)
       mutt_send_message (msg, MAILBOX_LOCAL(balsa_app.outbox)->path);
       break;
     case MAILBOX_IMAP:
+      mutt_send_message (msg, MAILBOX_IMAP(balsa_app.outbox)->path);
       break;
-    case MAILBOX_POP3:
+    default:
       break;
     }
 

@@ -19,11 +19,11 @@
 #include "mutt.h"
 #include "mutt_curses.h"
 
+#include <string.h>
+#include <sys/wait.h>
 #include <signal.h>
 #include <sigaction.h>
 #include <sigset.h>
-#include <string.h>
-#include <sys/wait.h>
 
 sigset_t Sigset;
 

@@ -1,28 +1,3 @@
-From kirillov@math.ias.edu  Thu Feb  4 10:57:46 1999
-Return-Path: <kirillov@math.ias.edu>
-Received: from IAS.EDU (mailgate.ias.edu [192.16.204.20])
-	by rwf.lms.mit.edu (8.8.7/8.8.7) with SMTP id KAA18669
-	for <sipan@rwf.lms.mit.edu>; Thu, 4 Feb 1999 10:57:45 -0500
-Received: from sevilla.math.ias.edu (sevilla.math.ias.edu [192.108.106.26]) by IAS.EDU (8.6.12/8.6.12) with ESMTP id KAA14534; Thu, 4 Feb 1999 10:59:19 -0500
-Received: from xmonaco.math.ias.edu (xmonaco.math.ias.edu [192.108.106.37]) by sevilla.math.ias.edu (8.6.12/8.6.12) with ESMTP id KAA09432; Thu, 4 Feb 1999 10:59:19 -0500
-Received: (from kirillov@localhost)
-	by xmonaco.math.ias.edu (8.8.8+Sun/8.8.8) id KAA15619;
-	Thu, 4 Feb 1999 10:59:19 -0500 (EST)
-Date: Thu, 4 Feb 1999 10:59:19 -0500 (EST)
-Message-Id: <199902041559.KAA15619@xmonaco.math.ias.edu>
-From: Alexander A Kirillov <kirillov@IAS.EDU>
-To: sipan@rwf.lms.mit.edu, sipan@sipan.ne.mediaone.net
-In-reply-to: <199902041549.KAA18568@rwf.lms.mit.edu> (sipan@mit.edu)
-Subject: once more
-Status: RO
-
-
-Damn!
-Let me try once more; if it doesn't work, I'll send
-MIME-encoded.
-
-	Shurik
--------------
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) 1999 Free Software Foundation, Inc.
 # Alexander Kirillov <kirillov@math.ias.edu>, 1999.

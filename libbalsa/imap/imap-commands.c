@@ -699,9 +699,10 @@ imap_assure_needed_flags(ImapMboxHandle *h, ImapMsgFlag needed_flags)
       case IMSGF_DELETED:  flg = "DELETED"; break;
       case IMSGF_DRAFT:    flg = "DRAFT"; break;
       case IMSGF_RECENT:   flg = "RECENT"; break;
-      default: continue;
+      default: g_free(seqno); continue;
       }
       cmd = g_strdup_printf("SEARCH %s %s", seqno, flg);
+      g_free(seqno);
       flag[issued_cmd] = fnd.flag;
       ics = imap_cmd_start(h, cmd, &cmdno[issued_cmd++]);
       g_free(cmd);

@@ -1,5 +1,6 @@
-2003-02-03 15:26  PeterB
+2003-02-03 17:37  PeterB
 
+	* src/balsa-message.c: Rearrange part_info_init_unknown display.
 	* libbalsa/: mailbox.c, message.c: Code cleanup (Manu).
 	* src/: balsa-index-threading.c, balsa-index.c, balsa-index.h: Add
 	a hash table of GtkTreeRowReferences to BalsaIndex, and use it in

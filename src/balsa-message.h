@@ -65,6 +65,8 @@ struct _BalsaMessage {
 	BalsaPartInfo *current_part;
 
 	LibBalsaMessage *message;
+
+	gboolean close_with_msg;
 };
 
 struct _BalsaMessageClass {
@@ -75,6 +77,8 @@ struct _BalsaMessageClass {
 
 GtkType balsa_message_get_type(void);
 GtkWidget *balsa_message_new(void);
+void balsa_message_set_close(BalsaMessage * bmessage,
+			     gboolean close_with_msg);
 
 gboolean balsa_message_set(BalsaMessage * bmessage,
 			   LibBalsaMessage * message);

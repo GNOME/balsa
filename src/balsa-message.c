@@ -515,6 +515,7 @@ balsa_message_init(BalsaMessage * bm)
     bm->wrap_text = balsa_app.browse_wrap;
     bm->shown_headers = balsa_app.shown_headers;
     bm->show_all_headers = FALSE;
+    bm->close_with_msg = FALSE;
 }
 
 static void
@@ -647,6 +648,12 @@ balsa_message_new(void)
     bm = g_object_new(BALSA_TYPE_MESSAGE, NULL);
 
     return GTK_WIDGET(bm);
+}
+
+void
+balsa_message_set_close(BalsaMessage * bm, gboolean close_with_msg)
+{
+    bm->close_with_msg = close_with_msg;
 }
 
 static BalsaPartInfo *
@@ -848,8 +855,11 @@ static void
 bm_message_weak_ref_cb(BalsaMessage * bm, LibBalsaMessage * message)
 {
     if (bm->message == message) {
-        bm->message = NULL;
-        balsa_message_set(bm, NULL);
+	bm->message = NULL;
+	if (bm->close_with_msg)
+	    gtk_widget_destroy(GTK_WIDGET(bm));
+	else
+	    balsa_message_set(bm, NULL);
     }
 }
 

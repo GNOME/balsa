@@ -17,23 +17,31 @@
 
 /* filter match types */
 typedef enum
-  {
+{
     FILTER_NONE = 0,
     FILTER_SIMPLE,
     FILTER_REGEX,
     FILTER_EXEC
-  }
+}
 filter_match_type;
 
 typedef enum
-  {
+{
     FILTER_MATCHES,
     FILTER_NOMATCH,
     FILTER_ALWAYS,
-  }
-filter_when_type;
+} filter_when_type;
 
-
+typedef enum
+{
+    FILTER_NOTHING = 0,
+    FILTER_COPY,
+    FILTER_MOVE,
+    FILTER_PRINT,
+    FILTER_RUN,
+    FILTER_TRASH
+} filter_action_type;
+        
 /* filter_run_dialog() modes */
 #define FILTER_RUN_SINGLE    0
 #define FILTER_RUN_MULTIPLE  1
@@ -68,15 +76,19 @@ typedef struct _filter
     /* The match type fields */
     union _match
       {
-	gchar string[1024];	/* for FILTER_SIMPLE */
-	gchar command[1024];	/* for FILTER_EXEC */
+        gchar string[1024];        /* for FILTER_SIMPLE */
+        gchar command[1024];        /* for FILTER_EXEC */
       }
     match;
-    guint match_fields;		/* for FILTER_SIMPLE filters */
+    guint match_fields;                /* for FILTER_SIMPLE filters */
 
     /* The notification fields */
     gchar sound[PATH_MAX];
     gchar popup_text[256];
+
+    /* The action */
+    filter_action_type action;
+    gchar action_string[PATH_MAX];
 
     /* other options I haven't thought of yet */
 
@@ -90,25 +102,25 @@ filter;
  */
 GList *filter_init (gchar * filter_file);
 gint filter_load (GList * filter_list,
-		  gchar * filter_file);
+                  gchar * filter_file);
 gint filter_save (GList * filter_list,
-		  gchar * filter_file);
+                  gchar * filter_file);
 gint filter_run_all (GList * filter_list,
-		     Message * message);
+                     Message * message);
 gint filter_run_group (GList * filter_list,
-		       Message * message, gint group);
+                       Message * message, gint group);
 gint filter_run_nth (GList * filter_list,
-		     Message * message, gint n);
+                     Message * message, gint n);
 gint filter_run_single (filter * filt,
-			Message * message);
+                        Message * message);
 void filter_free (filter * fil,
-		  gpointer throwaway);
+                  gpointer throwaway);
 /*
  * Dialog calls
  */
 void filter_edit_dialog (GList * filter_list);
 void filter_run_dialog (GList * filter_list,
-			guint mode);
+                        guint mode);
 
 /*
  * Error calls

@@ -11,8 +11,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2003-07-14 13:48+0200\n"
-"PO-Revision-Date: 2003-07-14 13:48+0200\n"
+"POT-Creation-Date: 2003-07-14 15:11+0200\n"
+"PO-Revision-Date: 2003-07-14 15:20+0200\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -3256,7 +3256,7 @@ msgstr "_Öppna"
 
 #: src/mailbox-node.c:943 src/main-window.c:630
 msgid "_Close"
-msgstr "_Stäng"
+msgstr "S_täng"
 
 #: src/mailbox-node.c:949
 msgid "_Properties..."
@@ -4732,7 +4732,7 @@ msgstr "Senareläg_g"
 
 #: src/sendmsg-window.c:227
 msgid "_Save"
-msgstr "_Spara"
+msgstr "S_para"
 
 #: src/sendmsg-window.c:228
 msgid "Save this message"
@@ -4764,7 +4764,7 @@ msgstr "_Citera meddelande(n)"
 
 #: src/sendmsg-window.c:279
 msgid "C_heck Spelling"
-msgstr "_Kontrollera stavning"
+msgstr "Kontrollera sta_vning"
 
 #: src/sendmsg-window.c:280
 msgid "Check the spelling of the message"
@@ -4780,7 +4780,7 @@ msgstr "Välj identiteten att använda för meddelandet"
 
 #: src/sendmsg-window.c:291
 msgid "_Edit with Gnome-Editor"
-msgstr "_Redigera med Gnome-redigerare"
+msgstr "Redigera med _Gnome-redigerare"
 
 #: src/sendmsg-window.c:292
 msgid "Edit the current message with the default Gnome editor"
@@ -5077,7 +5077,7 @@ msgstr ""
 #. From:
 #: src/sendmsg-window.c:1800
 msgid "F_rom:"
-msgstr "F_rån:"
+msgstr "_Från:"
 
 #. Subject:
 #: src/sendmsg-window.c:1812
@@ -5087,7 +5087,7 @@ msgstr "_Ämne:"
 #. fcc:
 #: src/sendmsg-window.c:1826
 msgid "F_cc:"
-msgstr "_Vidarebefordra kopia:"
+msgstr "Fi_lkopia:"
 
 #. Reply To:
 #: src/sendmsg-window.c:1856

@@ -657,7 +657,6 @@ balsa_mblist_repopulate(BalsaMBList * bmbl)
 	GNode *walk;
 	GtkCTreeNode *node;
 
-	walk = g_node_last_child(balsa_app.mailbox_nodes);
 	for(walk = g_node_last_child(balsa_app.mailbox_nodes);
 	    walk; walk = walk->prev) {
 	    node =
@@ -725,7 +724,7 @@ mailbox_nodes_to_ctree(GtkCTree * ctree, guint depth, GNode * gnode,
 				(BALSA_ICON_DIR_CLOSED),
 				balsa_icon_get_pixmap(BALSA_ICON_DIR_OPEN),
 				balsa_icon_get_bitmap(BALSA_ICON_DIR_OPEN),
-				mbnode->mailbox!=NULL, mbnode->expanded);
+				FALSE, mbnode->expanded);
 	gtk_ctree_node_set_selectable(ctree, cnode, FALSE);
     }
     gtk_ctree_node_set_text(ctree, cnode, 1, "");

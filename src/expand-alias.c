@@ -51,14 +51,11 @@
 static gchar *
 make_rfc822(gchar *full_name, gchar *address)
 {
-    gboolean found_comma;
     gchar *new_str;
     gint i;
 
-    found_comma = FALSE;
-    for (i=0; full_name[i]; i++)
-	if (full_name[i] == ',') found_comma = TRUE;
-    if (found_comma) {
+    for (i=0; full_name[i] && (full_name[i] != ','); i++);
+    if (full_name[i]) {
 	new_str = g_strdup_printf("\042%s\042 <%s>", full_name, address);
 	g_message("make_rfc822(): New str [%s]", new_str);
     } else

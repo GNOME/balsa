@@ -898,7 +898,8 @@ bndx_find_row_and_select(BalsaIndex * index,
 
     /* Mark as read; usually this will have been taken care of by
      * libbalsa_message_body_ref, but we should make sure here. */
-    if ((LIBBALSA_MESSAGE_IS_UNREAD(index->current_message))) {
+    if (index->current_message &&
+	LIBBALSA_MESSAGE_IS_UNREAD(index->current_message)) {
 	GList *messages = g_list_prepend(NULL, index->current_message);
 
 	libbalsa_messages_change_flag(messages, LIBBALSA_MESSAGE_FLAG_NEW,
@@ -1244,24 +1245,30 @@ bndx_mailbox_changed_cb(BalsaIndex * bindex)
 }
 
 static void
-bndx_view_source_func(GtkTreeModel *model, GtkTreePath *path,
-                      GtkTreeIter *iter, gpointer data)
-{
-    LibBalsaMessage *message = NULL;
-
-    gtk_tree_model_get(model, iter, LB_MBOX_MESSAGE_COL, &message, -1);
-    libbalsa_show_message_source(message, balsa_app.message_font,
-                                 &balsa_app.source_escape_specials);
-}
-
-static void
 bndx_view_source(GtkWidget * widget, gpointer data)
 {
-    GtkTreeSelection *selection =
-        gtk_tree_view_get_selection(GTK_TREE_VIEW(data));
-    
-    gtk_tree_selection_selected_foreach(selection, bndx_view_source_func,
-                                        NULL);
+    GtkTreeSelection *selection;
+    GtkTreeModel *model;
+    GList *rows;
+    GList *list;
+
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(data));
+    rows = gtk_tree_selection_get_selected_rows(selection, &model);
+
+    for (list = rows; list; list = list->next) {
+	GtkTreePath *path;
+	GtkTreeIter iter;
+	LibBalsaMessage *message;
+
+	path = list->data;
+	gtk_tree_model_get_iter(model, &iter, path);
+	gtk_tree_model_get(model, &iter, LB_MBOX_MESSAGE_COL, &message, -1);
+	libbalsa_show_message_source(message, balsa_app.message_font,
+				     &balsa_app.source_escape_specials);
+	gtk_tree_path_free(path);
+    }
+
+    g_list_free(rows);
 }
 
 static void
@@ -1726,13 +1733,19 @@ void
 balsa_index_set_threading_type(BalsaIndex * index, int thtype)
 {
     LibBalsaMailbox *mailbox;
+    GtkTreeSelection *selection;
 
     g_return_if_fail(index != NULL);
     g_return_if_fail(index->mailbox_node != NULL);
     mailbox = index->mailbox_node->mailbox;
     g_return_if_fail(mailbox != NULL);
 
-    bndx_load_and_thread(index, thtype);
+    mailbox->view->threading_type = thtype;
+
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(index));
+    g_signal_handler_block(selection, index->selection_changed_id);
+    libbalsa_mailbox_set_threading(mailbox, thtype);
+    g_signal_handler_unblock(selection, index->selection_changed_id);
 }
 
 /* Find messages with the same ID, and remove all but one of them; if
@@ -1953,8 +1966,11 @@ bndx_load_and_thread(BalsaIndex * index, int thtype)
 {
     LibBalsaMailbox *mailbox = index->mailbox_node->mailbox;
 
-    gtk_tree_view_set_model(GTK_TREE_VIEW(index), NULL);
+    g_object_ref(index);
+    g_object_ref(mailbox);
+    gdk_threads_leave();
     libbalsa_mailbox_set_threading(mailbox, thtype);
+    gdk_threads_enter();
 #ifndef GTK2_FETCHES_ONLY_VISIBLE_CELLS
     g_object_set_data(G_OBJECT(mailbox), "tree-view",
 		      GTK_TREE_VIEW(index));
@@ -1963,7 +1979,8 @@ bndx_load_and_thread(BalsaIndex * index, int thtype)
                             GTK_TREE_MODEL(mailbox));
     bndx_set_sort_info(index, mailbox->view->sort_field,
 		       mailbox->view->sort_type);
-
+    g_object_unref(index);
+    g_object_unref(mailbox);
 }
 
 /* Helper for bndx_load_and_thread. */

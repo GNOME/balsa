@@ -1,3 +1,16 @@
+2000-08-29  Pawel Salek  <pawsa@theochem.kth.se>
+
+        Imported IMAP support from mutt-1.2.5. Compiles but is not plugged in.
+	* imap/*: added.
+	* Makefile.am,acconfig.h,configure.in: support for imap
+	configuration.
+	* globals.h,mutt.h,protos.h: header files modified in order to
+	compile new IMAP support.
+	* imap.c: this file will be removed, but some variables wer to be 
+	renamed for compilation.
+	* buffy.c: ImapCheckTime -> ImapCheckTimeout
+	* lib.c: mutt_stristr() func imported.
+	
 2000-08-10  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* pop.c: Add BALSA comment to bugfix.

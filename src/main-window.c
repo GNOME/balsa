@@ -1442,9 +1442,12 @@ real_open_mbnode(BalsaMailboxNode * mbnode)
                                   (balsa_app.main_window->notebook),
                                   page_num);
     register_open_mailbox(mbnode->mailbox);
+    balsa_mblist_update_mailbox(balsa_app.mblist_tree_store,
+                                index->mailbox_node->mailbox);
 
     /* Enable relavent menu items... */
     enable_mailbox_menus(index);
+    gdk_flush();
     gdk_threads_leave();
 #ifdef BALSA_USE_THREADS
     pthread_mutex_unlock(&open_lock);

@@ -556,6 +556,7 @@ static gboolean libbalsa_mailbox_mh_close_backend(LibBalsaMailbox * mailbox)
 {
     g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MH(mailbox), FALSE);
     g_array_free(LIBBALSA_MAILBOX_MH(mailbox)->msgno_2_index, TRUE);
+    LIBBALSA_MAILBOX_MH(mailbox)->msgno_2_index = NULL;
 
     return TRUE;
 }

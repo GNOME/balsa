@@ -41,8 +41,10 @@
 #define LIBBALSA_IS_MAILBOX_CLASS(klass) \
     (G_TYPE_CHECK_CLASS_TYPE ((klass), LIBBALSA_TYPE_MAILBOX))
 
-#define MAILBOX_OPEN(mailbox)     (mailbox != NULL)
-#define MAILBOX_CLOSED(mailbox)   (mailbox == NULL)
+#define MAILBOX_OPEN(mailbox)     libbalsa_mailbox_is_open(mailbox)
+
+#define MAILBOX_CLOSED(mailbox)   (!libbalsa_mailbox_is_open(mailbox))
+
 #define RETURN_IF_MAILBOX_CLOSED(mailbox)\
 do {\
   if (MAILBOX_CLOSED (mailbox))\
@@ -225,6 +227,7 @@ LibBalsaMailbox *libbalsa_mailbox_new_from_config(const gchar * prefix);
 /* XXX these need to return a value if they failed */
 gboolean libbalsa_mailbox_open(LibBalsaMailbox * mailbox);
 gboolean libbalsa_mailbox_is_valid(LibBalsaMailbox * mailbox);
+gboolean libbalsa_mailbox_is_open(LibBalsaMailbox *mailbox);
 void libbalsa_mailbox_close(LibBalsaMailbox * mailbox);
 void libbalsa_mailbox_link_message(LibBalsaMailbox * mbx, LibBalsaMessage*msg);
 void libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox);

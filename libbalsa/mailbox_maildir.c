@@ -534,11 +534,14 @@ static void free_message_info(struct message_info *msg_info)
 static gboolean libbalsa_mailbox_maildir_close_backend(LibBalsaMailbox * mailbox)
 {
     g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MAILDIR(mailbox), FALSE);
+
     g_hash_table_destroy(LIBBALSA_MAILBOX_MAILDIR(mailbox)->messages_info);
     g_ptr_array_free(LIBBALSA_MAILBOX_MAILDIR(mailbox)->msgno_2_msg_info, TRUE);
+    LIBBALSA_MAILBOX_MAILDIR(mailbox)->msgno_2_msg_info = NULL;
     g_free(LIBBALSA_MAILBOX_MAILDIR(mailbox)->curdir);
+    LIBBALSA_MAILBOX_MAILDIR(mailbox)->curdir = NULL;
     g_free(LIBBALSA_MAILBOX_MAILDIR(mailbox)->newdir);
-  
+    LIBBALSA_MAILBOX_MAILDIR(mailbox)->newdir = NULL;
     return TRUE;
 }
 

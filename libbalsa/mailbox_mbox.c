@@ -479,7 +479,8 @@ static gboolean libbalsa_mailbox_mbox_close_backend(LibBalsaMailbox * mailbox)
 
     free_messages_info(mbox->messages_info);
     g_mime_stream_unref(mbox->gmime_stream);
-   
+    mbox->gmime_stream = NULL; // chbm: is this correct ?
+
     return TRUE;
 }
 

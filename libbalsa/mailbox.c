@@ -518,6 +518,33 @@ libbalsa_mailbox_is_valid(LibBalsaMailbox * mailbox)
     return TRUE;
 }
 
+gboolean
+libbalsa_mailbox_is_open(LibBalsaMailbox *mailbox)
+{
+    g_return_val_if_fail(mailbox != NULL, FALSE);
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+    
+    if(LIBBALSA_IS_MAILBOX_MBOX(mailbox)) {
+	LibBalsaMailboxMbox *mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
+	
+	return (mbox->gmime_stream != NULL);
+    } else if(LIBBALSA_IS_MAILBOX_MH(mailbox)) {
+	LibBalsaMailboxMh *mh = LIBBALSA_MAILBOX_MH(mailbox);
+	
+	return (mh->msgno_2_index != NULL);
+    } else if(LIBBALSA_IS_MAILBOX_MAILDIR(mailbox)) {
+	LibBalsaMailboxMaildir *mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
+	
+	return (mdir->msgno_2_msg_info != NULL);
+    } else if(LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
+	LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
+	
+	return(mimap->handle != NULL);
+    };
+
+    return FALSE; // this will break unlisted mailbox types
+}
+    
 void
 libbalsa_mailbox_close(LibBalsaMailbox * mailbox)
 {
@@ -756,7 +783,7 @@ libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox)
 	    UNLOCK_MAILBOX(mailbox);
 	    g_print
 		("libbalsa_mailbox_real_close: %d trial failed.\n", cnt);
-	    usleep(100000); /* wait tenth second */
+//	    usleep(100000); /* wait tenth second */
 	    libbalsa_mailbox_check(mailbox);
 	    LOCK_MAILBOX(mailbox);
 	    cnt++;

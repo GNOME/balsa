@@ -798,9 +798,7 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
     }
 
     mimap->handle = handle;
-    imap_mbox_select(handle, mimap->path);
-
-    if (MAILBOX_OPEN(mailbox)) {
+    if(imap_mbox_select(handle, mimap->path) == IMAP_SUCCESS) {
 	mimap->msgno_2_msg_info = g_ptr_array_new();
 	mailbox->readonly = 0;//mimap->readonly;
 	mailbox->messages = 0;
@@ -1177,13 +1175,13 @@ static void
 libbalsa_mailbox_imap_save_config(LibBalsaMailbox * mailbox,
 				  const gchar * prefix)
 {
-    LibBalsaMailboxImap *imap;
+    LibBalsaMailboxImap *mimap;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox));
 
-    imap = LIBBALSA_MAILBOX_IMAP(mailbox);
+    mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
 
-    gnome_config_set_string("Path", imap->path);
+    gnome_config_set_string("Path", mimap->path);
 
     libbalsa_server_save_config(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox));
 
@@ -1390,6 +1388,9 @@ libbalsa_imap_url(LibBalsaServer * server, const gchar * path)
 gboolean libbalsa_mailbox_imap_close_backend(LibBalsaMailbox * mailbox)
 {
     g_object_unref(G_OBJECT(LIBBALSA_MAILBOX_IMAP(mailbox)->handle));
+    LIBBALSA_MAILBOX_IMAP(mailbox)->handle = NULL; 
+    // chbm: unref ? do we ever keep more than ref to this ? 
+    
     return TRUE;
 }
 

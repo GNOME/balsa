@@ -429,7 +429,10 @@ static int tls_close (CONNECTION* conn)
 }
 
 
-static char *x509_get_part (char *line, const char *ndx)
+#ifndef LIBMUTT
+static
+#endif
+char *x509_get_part (char *line, const char *ndx)
 {
   static char ret[SHORT_STRING];
   char *c, *c2;
@@ -451,7 +454,10 @@ static char *x509_get_part (char *line, const char *ndx)
   return ret;
 }
 
-static void x509_fingerprint (char *s, int l, X509 * cert)
+#ifndef LIBMUTT
+static
+#endif
+void x509_fingerprint (char *s, int l, X509 * cert)
 {
   unsigned char md[EVP_MAX_MD_SIZE];
   unsigned int n;
@@ -472,7 +478,10 @@ static void x509_fingerprint (char *s, int l, X509 * cert)
   }
 }
 
-static char *asn1time_to_string (ASN1_UTCTIME *tm)
+#ifndef LIBMUTT
+static
+#endif
+char *asn1time_to_string (ASN1_UTCTIME *tm)
 {
   static char buf[64];
   BIO *bio;
@@ -625,13 +634,27 @@ static int ssl_check_certificate (sslsockdata * data)
   }
 
 #ifdef LIBMUTT
-  /* we always accept the certificate BAD BAD BAD !
-     how do we get a dialog in here ?
-  */
-  mutt_error(X509_NAME_oneline (X509_get_subject_name (data->cert),
-				buf, sizeof (buf)) );
-  mutt_error(_("This certificate accepted but not verified !!!"));
-  return 1;
+  done = 0;
+  switch(libmutt_ask_for_cert_acceptance(data->cert)) {
+  case OP_EXIT:  break;
+  case OP_SAVE:		/* save certificate and accept */
+    done = 0;
+    if ((fp = fopen (SslCertFile, "a")))
+      {
+        if (PEM_write_X509 (fp, data->cert))
+          done = 1;
+        fclose (fp);
+      }
+    if (!done)
+      mutt_error (_("Warning: Couldn't save certificate"));
+    else
+      mutt_message (_("Certificate saved"));
+    /* fall through */
+  case OP_MAX:		/* accept once */
+    done = 2;
+    break;
+  }
+  return (done == 2);
 #else
   /* interactive check from user */
   menu = mutt_new_menu ();

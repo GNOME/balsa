@@ -147,9 +147,6 @@ static GtkTargetEntry index_drag_types[] = {
     {"x-application/x-message-list", GTK_TARGET_SAME_APP, TARGET_MESSAGES}
 };
 
-#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
-
-
 static gboolean idle_handler_cb(GtkWidget * widget);
 static void balsa_index_drag_cb(GtkWidget* widget,
                                 GdkDragContext* drag_context,

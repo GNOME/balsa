@@ -117,8 +117,6 @@ extern GtkWidget * fe_condition_delete_button;
 extern GtkWidget * fe_condition_edit_button;
 GtkWidget * fe_regex_remove_button;
 
-#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
-
 /* condition_has_changed allows us to be smart enough not to make the
  * whole process of building a new condition when editing condition
  * has not leaded to any modification */

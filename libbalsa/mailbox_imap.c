@@ -283,14 +283,6 @@ reset_mutt_passwords(LibBalsaServer* server)
     ImapPass = strdup(server->passwd);
 }
 
-static void
-assure_balsa_dir(void)
-{
-    gchar* dir = gnome_util_prepend_user_home(".balsa");
-    mkdir(dir, S_IRUSR|S_IWUSR|S_IXUSR);
-    g_free(dir);
-}
-
 static gchar*
 get_cache_name(LibBalsaMailboxImap* mailbox, const gchar* type)
 {
@@ -507,7 +499,7 @@ save_to_cache(LibBalsaMailbox* mailbox)
         return TRUE;
     }
     fname = get_cache_name(LIBBALSA_MAILBOX_IMAP(mailbox), "headers");
-    assure_balsa_dir();
+    libbalsa_assure_balsa_dir();
 
     printf("Cache file: %s\n", fname);
     dbf = gdbm_open(fname, 0, GDBM_WRITER, S_IRUSR| S_IWUSR, NULL);
@@ -740,7 +732,7 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
 	FREE(&msg);
 	if(stream) { /* don't cache negatives */
             FILE * cache;
-            assure_balsa_dir();
+            libbalsa_assure_balsa_dir();
             mkdir(cache_name, S_IRUSR|S_IWUSR|S_IXUSR); /* ignore errors */
             cache = fopen(msg_name,"wb");
             if(! (cache && mutt_copy_stream(stream, cache) ==0) ) 

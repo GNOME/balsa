@@ -1,3 +1,12 @@
+2002-06-23  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/folder-conf.c: fix IMAP subfolder creation (broken on 06-09).
+	* libbalsa/folder-scanners.c: do not lock GDK when scanning imap.
+	* src/mailbox-node.c: Adjust accordingly.
+	* libbalsa/libbalsa.[hc]: set certificates file. GUI for cert
+	acceptance.
+	* src/mailbox-conf.c: IMAP mailboxes do need name entry.
+	
 2002-06-23  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* libbalsa/address.c: don't mangle the heap when full_name is empty.

@@ -235,10 +235,12 @@ static void
 imap_dir_cb(BalsaMailboxNode* mb, GNode* r)
 {
     g_return_if_fail(mb->server);
+    gdk_threads_leave();
     libbalsa_scanner_imap_dir(r, mb->server, mb->dir, mb->subscribed,
                               mb->list_inbox, 
                               balsa_app.imap_scan_depth,
 			      add_imap_folder, add_imap_mailbox);
+    gdk_threads_enter();
     /* register whole tree */
     if(BALSA_MAILBOX_NODE(r->data)->name)
         printf("imap_dir_cb:  main mailbox node %s mailbox is %p\n", 

@@ -62,6 +62,8 @@ typedef struct header MuttHeader;
 #include "mailbox_mh.h"
 #include "mailbox_maildir.h"
 
+#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
+
 /*
  * Initialize the library
  */
@@ -93,5 +95,6 @@ void libbalsa_lock_mutt(void);
 void libbalsa_unlock_mutt(void);
 
 void libbalsa_mktemp (char *);
+void libbalsa_assure_balsa_dir(void);
 
 #endif				/* __LIBBALSA_H__ */

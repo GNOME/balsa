@@ -120,7 +120,9 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
     Realname   = (char*)g_get_real_name();
     Hostname   = (char*)libbalsa_get_hostname();
     Domainname = (char*)libbalsa_get_domainname();
-
+#ifdef USE_SSL
+    SslCertFile = gnome_util_prepend_user_home(".balsa/certificates");
+#endif
     libbalsa_real_information_func = information_callback;
 
     mutt_error = libbalsa_mutt_error;
@@ -438,6 +440,13 @@ gboolean libbalsa_ldap_exists(const gchar *server)
     return FALSE;
 }
 
+void
+libbalsa_assure_balsa_dir(void)
+{
+    gchar* dir   = gnome_util_prepend_user_home(".balsa");
+    mkdir(dir, S_IRUSR|S_IWUSR|S_IXUSR);
+    g_free(dir);
+}
 
 /*
  * This function is hooked into the mutt_error callback
@@ -459,3 +468,127 @@ libbalsa_mktemp (char *s) {
     mutt_mktemp(s);
 }
 
+
+#ifdef USE_SSL
+#include "keymap_defs.h"
+#include <openssl/ssl.h>
+#include <openssl/x509.h>
+#include <openssl/err.h>
+int libmutt_ask_for_cert_acceptance(X509 *cert);
+char *asn1time_to_string (ASN1_UTCTIME *tm);
+char *x509_get_part (char *line, const char *ndx);
+void x509_fingerprint (char *s, int l, X509 * cert);
+
+/* libmutt_ask_for_cert_acceptance:
+   returns:
+   OP_EXIT on reject.
+   OP_SAVE - on accept and save.
+   OP_MAX - on accept once.
+   TODO: check treading issues.
+*/
+static int
+ask_cert_real(X509 *cert)
+{
+    char *part[] =
+        {"/CN=", "/Email=", "/O=", "/OU=", "/L=", "/ST=", "/C="};
+    char buf[SHORT_STRING];
+    char *name = NULL, *c;
+    GtkWidget* dialog, *label;
+    unsigned i;
+    int ret;
+
+    GString* str = g_string_new(_("This certificate belongs to:\n"));
+
+    name = X509_NAME_oneline(X509_get_subject_name (cert), buf, sizeof (buf));
+    for (i = 0; i < ELEMENTS(part); i++) {
+        g_string_append(str, x509_get_part (name, part[i]));
+        g_string_append_c(str, '\n');
+    }
+
+    g_string_append(str, _("\nThis certificate was issued by:\n"));
+    name = X509_NAME_oneline(X509_get_issuer_name(cert), buf, sizeof (buf));
+    for (i = 0; i < ELEMENTS(part); i++) {
+        g_string_append(str, x509_get_part (name, part[i]));
+        g_string_append_c(str, '\n');
+    }
+
+    buf[0] = '\0';
+    x509_fingerprint (buf, sizeof (buf), cert);
+    c = g_strdup_printf(_("This certificate is valid\n"
+                          "from %s\n"
+                          "to %s\n"
+                          "Fingerprint: %s"),
+                        asn1time_to_string(X509_get_notBefore(cert)),
+                        asn1time_to_string(X509_get_notAfter(cert)),
+                        buf);
+    g_string_append(str, c); g_free(c);
+
+    dialog = gnome_dialog_new(_("IMAP TLS certificate"), 
+                              _("Accept Once"),_("Accept&Save"),
+                              _("Reject"), NULL);
+    label = gtk_label_new(str->str);
+    g_string_free(str, TRUE);
+
+    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(dialog)->vbox),
+                       label, TRUE, TRUE, 1);
+    gtk_widget_show(label);
+
+    switch(gnome_dialog_run_and_close(GNOME_DIALOG(dialog))) {
+    case 0: ret = OP_MAX; break;
+    case 1: ret = OP_SAVE; libbalsa_assure_balsa_dir(); break;
+    case 2:
+    default: ret = OP_EXIT; break;
+    }
+    return ret;
+}
+
+#ifdef BALSA_USE_THREADS
+#include <pthread.h>
+typedef struct {
+    pthread_cond_t cond;
+    X509 *cert;
+    int res;
+} AskCertData;
+/* ask_cert_idle:
+   called in MT mode by the main thread.
+ */
+static gboolean
+ask_cert_idle(gpointer data)
+{
+    AskCertData* acd = (AskCertData*)data;
+    gdk_threads_enter();
+    acd->res = ask_cert_real(acd->cert);
+    gdk_threads_leave();
+    pthread_cond_signal(&acd->cond);
+    return FALSE;
+}
+/* libmutt_ask_for_cert_acceptance:
+   executed with GDK UNLOCKED. see mailbox_imap_open() and
+   imap_folder_imap_dir().
+*/
+int
+libmutt_ask_for_cert_acceptance(X509 *cert)
+{
+    static pthread_mutex_t ask_cert_lock = PTHREAD_MUTEX_INITIALIZER;
+    AskCertData acd;
+
+    pthread_mutex_lock(&ask_cert_lock);
+    pthread_cond_init(&acd.cond, NULL);
+    acd.cert = cert;
+    gtk_idle_add(ask_cert_idle, &acd);
+    pthread_cond_wait(&acd.cond, &ask_cert_lock);
+    
+    pthread_cond_destroy(&acd.cond);
+    pthread_mutex_unlock(&ask_cert_lock);
+    pthread_mutex_destroy(&ask_cert_lock);
+    return acd.res;
+}
+#else /* BALSA_USE_THREADS */
+int
+libmutt_ask_for_cert_acceptance(X509 *cert)
+{
+    return ask_cert_real(cert);
+}
+#endif /* BALSA_USE_THREADS */
+
+#endif /* WITH_SSL */

@@ -36,8 +36,6 @@
 #include "libbalsa_private.h"
 #include "misc.h"
 
-#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
-
 /* libbalsa_lookup_mime_type:
    find out mime type of a file. Must work for both relative and absolute
    paths.

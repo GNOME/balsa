@@ -2929,7 +2929,6 @@ find_real(BalsaIndex * bindex, gboolean again)
     }
 
     balsa_index_find(bindex, cnd, reverse);
-    libbalsa_condition_free(cnd);
 }
 
 static void

@@ -47,8 +47,6 @@ static pthread_t main_thread_id;
 
 
 static gchar *qualified_hostname(const char *name);
-static int libbalsa_ask_for_cert_acceptance(X509 *cert,
-					    const char *explanation);
 
 void
 libbalsa_message(const char *fmt, ...)
@@ -340,6 +338,8 @@ libbalsa_assure_balsa_dir(void)
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
 #include <openssl/err.h>
+static int libbalsa_ask_for_cert_acceptance(X509 *cert,
+					    const char *explanation);
 static char*
 asn1time_to_string(ASN1_UTCTIME *tm)
 {

@@ -895,7 +895,10 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
 		      NULL, NULL, 0);
         break;
 
-        /* SMTP_TLS related things */
+#ifdef USE_TLS
+        /* SMTP_TLS related things. Observe that we need to have SSL
+	 * enabled in balsa to properly interpret libesmtp
+	 * messages. */
     case SMTP_EV_INVALID_PEER_CERTIFICATE: {
         long vfy_result;
 	SSL  *ssl;
@@ -913,17 +916,21 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
     }
     case SMTP_EV_NO_PEER_CERTIFICATE:
     case SMTP_EV_WRONG_PEER_CERTIFICATE:
-    case SMTP_EV_NO_CLIENT_CERTIFICATE: {
+#if LIBESMTP_1_0_3_AVAILABLE
+    case SMTP_EV_NO_CLIENT_CERTIFICATE:
+#endif
+    {
 	int *ok;
 	printf("SMTP-TLS event_no=%d\n", event_no);
 	ok = va_arg(ap, int*);
 	*ok = 1;
 	break;
     }
+#endif /* USE_TLS */
     }
     va_end (ap);
 }
-#endif
+#endif /* BALSA_USE_THREADS */
 
 #else /* ESMTP */
 

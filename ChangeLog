@@ -1,3 +1,8 @@
+2004-04-20  Pawel Salek
+
+	* libbalsa/libbalsa.c: no-SSL build fixes.
+	* libbalsa/send.c: libesmtp-1.0.3 release delayed.
+
 2004-04-21 12:42  PeterB
 
 	* libbalsa/mailbox_imap.c: map IMBENC_OTHER to

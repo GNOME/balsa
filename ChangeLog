@@ -1,3 +1,7 @@
+2001-04-30  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/print.c: handle cases when conversion to utf-8 fails.
+
 2001-04-17  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* configure.in, NEWS: release balsa-1.1.4

@@ -496,14 +496,18 @@ gnome_print_show_with_charset(PrintInfo * pi, char const * text)
 {
     gchar *conv_ibuf, *conv_ibufp, *conv_obuf, *conv_obufp;
     size_t ibuflen, obuflen;
-    g_return_if_fail(pi->conv_data != (iconv_t)(-1));
+
+    if (pi->conv_data == (iconv_t)(-1)) {
+	gnome_print_show(pi->pc, text);
+	return;
+    }
 
     /* as iconv() changes all supplied pointers, we have to remember them... */
     conv_ibuf = conv_ibufp = g_strdup (text);
     ibuflen = strlen(conv_ibuf) + 1;
     obuflen = ibuflen << 1; /* should be sufficient? */
     conv_obuf = conv_obufp = g_malloc(obuflen);
-    iconv(pi->conv_data, (const char **)&conv_ibuf, &ibuflen, &conv_obuf, &obuflen);
+    iconv(pi->conv_data, (const char**)&conv_ibuf, &ibuflen, &conv_obuf, &obuflen);
     gnome_print_show(pi->pc, conv_obufp);
     g_free (conv_ibufp);
     g_free (conv_obufp);

@@ -1,6 +1,24 @@
 The following are some general guidelines for adding code to Balsa:
 -------------------------------------------------------------------
 
+The code has generally three layers:
+
+  |--------------------|
+  |        src         |
+  |    |---------------|
+  |    |    libbalsa   |
+  |    |  |------------|
+  |    |  |  libmutt   |
+  ----------------------
+
+- src contains balsa specific code.  
+
+- libbalsa contains object definitions code that in principle can be
+  reused. Good examples are address books, or AddressEntries.
+
+- libmutt is a mailbox backend code.
+
+
 Use FIXME in comments to make a note of things which need looking at.
 
 All GtkObject derivatives should live in there own .c and .h files. In

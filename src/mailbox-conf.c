@@ -345,7 +345,6 @@ static void
 conf_response_cb(GtkDialog* dialog, gint response, gpointer data)
 {
     MailboxConfWindow *mcw =(MailboxConfWindow*)data;
-    printf("here: %d\n", response);
     switch(response) {
     case GTK_RESPONSE_OK: mcw->ok_handler(mcw); 
         /* fall through */

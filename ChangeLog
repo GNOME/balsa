@@ -2,6 +2,13 @@
 
 	* libbalsa/pop3.c: msg count instead of byte count (HEAD:20020623)
 	* libbalsa/send.c: gdk_threads lock operations that can trigger GDK.
+	* Makefile.am: place balsa icon properly.
+	* balsa.desktop: define category.
+	* balsa.spec.in: adapt to a proper location.
+	* doc/xmldocs.make: change doc location to the standard one.
+	* doc/C/balsa-manual-C.omf: define relation tag.
+	* libbalsa/mailbox.c, src/mailbox-conf.c: remove debug output.
+	* libbalsa/send.c, src/main-window.c: define proper shortcuts.
 
 2002-09-17  Carlos Morgado  <chbm@chbm.nu>
 

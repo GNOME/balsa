@@ -854,7 +854,6 @@ libbalsa_mailbox_commit(LibBalsaMailbox* mailbox)
         UNLOCK_MAILBOX(mailbox);
     }
 
-    printf("libbalsa_mailbox_commit: synced, res=%i\n", rc);
     return rc ==0;
 }
 

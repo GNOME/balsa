@@ -483,7 +483,7 @@ static GnomeUIInfo message_menu[] = {
     },
 #define MENU_MESSAGE_FORWARD_INLINE_POS 4
     {
-        GNOME_APP_UI_ITEM, N_("Forward inline..."),
+        GNOME_APP_UI_ITEM, N_("Forward _inline..."),
         N_("Forward the current message inline"),
         forward_message_inline_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
         BALSA_PIXMAP_MENU_FORWARD, 'F', GDK_CONTROL_MASK, NULL
@@ -647,7 +647,7 @@ static GnomeUIInfo settings_menu[] = {
 static GnomeUIInfo help_menu[] = {
     GNOMEUIINFO_MENU_ABOUT_ITEM(show_about_box, NULL),
     GNOMEUIINFO_SEPARATOR,
-    GNOMEUIINFO_HELP("balsa"),
+    GNOMEUIINFO_HELP("balsa-manual"),
     GNOMEUIINFO_END
 };
 
@@ -1754,7 +1754,7 @@ ensure_check_mail_dialog(void)
 	gtk_dialog_new_with_buttons(_("Checking Mail..."),
                                     GTK_WINDOW(balsa_app.main_window),
                                     GTK_DIALOG_DESTROY_WITH_PARENT,
-                                    _("Hide"), GTK_RESPONSE_CLOSE,
+                                    _("_Hide"), GTK_RESPONSE_CLOSE,
                                     NULL);
     gtk_window_set_wmclass(GTK_WINDOW(progress_dialog), 
 			   "progress_dialog", "Balsa");

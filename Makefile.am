@@ -3,7 +3,7 @@ SUBDIRS = intl po sounds images doc libmutt libbalsa libinit_balsa src
 
 man_MANS=balsa.1
 
-pixmapdir = $(datadir)/balsa/pixmaps
+pixmapdir = $(datadir)/pixmaps
 pixmap_DATA = gnome-balsa2.png
 
 desktopdir = $(datadir)/applications

@@ -2831,7 +2831,7 @@ balsa_help_pbox_display(GnomePropertyBox * property_box, gint page_num)
     gchar *file_name = g_strdup_printf("preferences-%d.html", page_num);
     GError *err = NULL;
 
-    gnome_help_display(file_name, NULL, &err);
+    gnome_help_display("balsa-manual", NULL, &err);
     if (err) {
         g_print(_("Error displaying %s: %s\n"), file_name, err->message);
         g_error_free(err);

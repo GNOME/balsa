@@ -216,8 +216,8 @@ ensure_send_progress_dialog()
     send_dialog = gtk_dialog_new_with_buttons(_("Sending Mail..."), 
                                               NULL,
                                               GTK_DIALOG_DESTROY_WITH_PARENT,
-                                              _("Hide"), 
-                                              GTK_RESPONSE_NONE,
+                                              _("_Hide"), 
+                                              GTK_RESPONSE_CLOSE,
                                               NULL);
     gtk_window_set_wmclass(GTK_WINDOW(send_dialog), "send_dialog", "Balsa");
     label = gtk_label_new(_("Sending Mail..."));

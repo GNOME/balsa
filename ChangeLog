@@ -1,3 +1,9 @@
+2001-06-27  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/balsa-mblist.c: return to old DnD behaviour.
+	revert a rather unfortunate mblist update bug introduced
+	by commit mistake on 06-17
+
 2001-06-26  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/mailbox-node.c: don't segfault on root=NULL in 

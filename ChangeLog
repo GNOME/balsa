@@ -1,3 +1,24 @@
+2004-09-11 17:30  PeterB
+
+	* libbalsa/send.c: use GMimeMessagePart for an attached message.
+	* libbalsa/: mailbox_imap.c, imap/imap-commands.c,
+	imap/imap-handle.c: use "FETCH %u BODY[%s.MIME]" to fetch part
+	headers verbatim; fetch complete multipart/signed and
+	multipart/encrypted parts.
+
+2004-09-11 Albrecht Dreß <albrecht dot dress at arcor dot de>
+
+	* src/balsa-icons.c, src/balsa-icons.h, src/balsa-message.c,
+	src/mailbox-conf.c, src/save-restore.c, libbalsa/mailbox.c,
+	libbalsa/mailbox.h, src/pixmaps/balsa_gpg_recheck.xpm:
+	- reorganise the crypto calls in src/balsa-message.c into only
+	one function to simplify the treatment of (in particular, but not
+	only imap) messages;
+	- make the automatic crypto ops user-configurabe on a per-mailbox
+	basis;
+	- add a button to manually force checking/decryption of a message;
+	- implement proper handling of enigmail multipart/encrypted messages.
+
 2004-09-10  Pawel Salek
 
 	* libbalsa/address-entry.[hc]: make fill_input() public.

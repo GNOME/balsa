@@ -1,3 +1,31 @@
+2002-12-19 12:46  PeterB
+
+	* src/: Makefile.am, sendmsg-window.c (file_menu):
+        Final (?) deprecation cleanup; add *_DISABLE_DEPRECATED DEFS
+        in Makefile.am.
+
+2002-12-19 12:44  PeterB
+
+	* src/: main-window.c (help_menu),
+        pref-manager.c (balsa_help_pbox_display): Change help file from
+	"balsa-manual" to "balsa".
+
+2002-12-19 12:42  PeterB
+
+	* doc/C/balsa.xml: file balsa.xml was initially added on branch
+	BALSA_2.
+
+2002-12-19 12:42  PeterB
+
+	* doc/C/balsa-C.omf: file balsa-C.omf was initially added on branch
+	BALSA_2.
+
+2002-12-19 12:42  PeterB
+
+	* doc/C/: Makefile.am, balsa-C.omf, balsa-manual-C.omf,
+	balsa-manual.xml, balsa.xml: Replace "balsa-manual" with "balsa"
+	everywhere.
+
 2002-12-18 09:32  PeterB
 
 	* src/balsa-message.c (store_button_coords, check_call_url,

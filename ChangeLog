@@ -1,3 +1,13 @@
+2003-05-05  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
+
+	* libbalsa/identity.c: add gpg_sign and gpg_encrypt fields, and 
+	respective UI support.
+	* libbalsa/rfc3156.[hc]: enable passphrase caching.
+	* src/balsa-icons.[hc]: add balsa_gpg_{encrypt,sign}.xpm 
+	* src/balsa-message.c: adapt to changed rfc3156 API.
+	* src/sendmsg-window.c: add tools for encrypt/sign.
+	* src/toolbar-factory.c: support for configuring encrypt/sign tools.
+	
 2003-05-04 23:40  PeterB
 
 	* src/sendmsg-window.c: Fix #111958 (Albrecht Dreﬂ

@@ -29,6 +29,7 @@
 #include <gnome.h>
 #include <gpgme.h>
 #include "libbalsa.h"
+#include "misc.h"
 
 #define LIBBALSA_GPG_SIGN      (1 << 0)
 #define LIBBALSA_GPG_ENCRYPT   (1 << 1)
@@ -85,6 +86,8 @@ gchar *libbalsa_rfc2440_encrypt_buffer(const gchar *buffer,
 				       GtkWindow *parent);
 GpgmeSigStat libbalsa_rfc2440_decrypt_buffer(gchar **buffer,
 					     const gchar *charset,
+					     gboolean fallback,
+					     LibBalsaCodeset codeset,
 					     gboolean append_info,
 					     LibBalsaSignatureInfo **sig_info,
 					     const gchar *date_string,

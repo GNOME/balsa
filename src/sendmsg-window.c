@@ -107,7 +107,9 @@ static void toggle_format_cb(GtkCheckMenuItem * check_menu_item,
                              BalsaSendmsg * bsmsg);
 #ifdef HAVE_GPGME
 static void toggle_sign_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
+static void toggle_sign_tb_cb(GtkToggleButton * widget, BalsaSendmsg * bsmsg);
 static void toggle_encrypt_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
+static void toggle_encrypt_tb_cb(GtkToggleButton * widget, BalsaSendmsg * bsmsg);
 static void toggle_gpg_mode_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 #endif
 
@@ -1091,6 +1093,13 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
         }
         g_strfreev(message_split);
     }
+    
+#ifdef HAVE_GPGME
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(msg->gpg_sign_menu_item),
+				   ident->gpg_sign);
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(msg->gpg_encrypt_menu_item),
+				   ident->gpg_encrypt);
+#endif
     
     g_free(old_sig);
     g_free(new_sig);
@@ -2584,7 +2593,11 @@ static const struct callback_item {
     {BALSA_PIXMAP_SAVE, BALSA_TOOLBAR_FUNC(save_message_cb)},
     {BALSA_PIXMAP_SEND, BALSA_TOOLBAR_FUNC(send_message_toolbar_cb)},
     {GTK_STOCK_CLOSE, BALSA_TOOLBAR_FUNC(close_window_cb)},
-    {GTK_STOCK_SPELL_CHECK, BALSA_TOOLBAR_FUNC(spell_check_cb)}
+    {GTK_STOCK_SPELL_CHECK, BALSA_TOOLBAR_FUNC(spell_check_cb)},
+#ifdef HAVE_GPGME
+    {BALSA_PIXMAP_GPG_SIGN, BALSA_TOOLBAR_FUNC(toggle_sign_tb_cb)},
+    {BALSA_PIXMAP_GPG_ENCRYPT, BALSA_TOOLBAR_FUNC(toggle_encrypt_tb_cb)},
+#endif
 };
 
 /* Standard buttons; "" means a separator. */
@@ -2727,19 +2740,34 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
                                    (opts_menu[OPTS_MENU_FORMAT_POS].
                                     widget), balsa_app.wordwrap);
 
-#ifdef HAVE_GPGME
-    gtk_widget_set_sensitive(gpg_mode_list[OPTS_MENU_GPG_3156_POS].widget,
-			     FALSE);
-    gtk_widget_set_sensitive(gpg_mode_list[OPTS_MENU_GPG_2440_POS].widget,
-			     FALSE);
-    bsmsg->gpg_radio[0] = gpg_mode_list[OPTS_MENU_GPG_3156_POS].widget;
-    bsmsg->gpg_radio[1] = gpg_mode_list[OPTS_MENU_GPG_2440_POS].widget;    
-#endif
-
     /* Set up the default identity */
     if(!set_identity_from_mailbox(bsmsg))
         /* Get the identity from the To: field of the original message */
         guess_identity(bsmsg);
+#ifdef HAVE_GPGME
+    msg->gpg_sign_menu_item = opts_menu[OPTS_MENU_SIGN_POS].widget;
+    g_object_set_data(G_OBJECT(bsmsg->gpg_sign_menu_item), "toolbar", toolbar);
+    g_object_set_data(G_OBJECT(bsmsg->gpg_sign_menu_item), "radbut-1", 
+		      gpg_mode_list[OPTS_MENU_GPG_3156_POS].widget);
+    g_object_set_data(G_OBJECT(bsmsg->gpg_sign_menu_item), "radbut-2", 
+		      gpg_mode_list[OPTS_MENU_GPG_2440_POS].widget);
+    msg->gpg_encrypt_menu_item = opts_menu[OPTS_MENU_ENCRYPT_POS].widget;
+    g_object_set_data(G_OBJECT(bsmsg->gpg_encrypt_menu_item), "toolbar", 
+                      toolbar);
+    g_object_set_data(G_OBJECT(bsmsg->gpg_encrypt_menu_item), "radbut-1", 
+		      gpg_mode_list[OPTS_MENU_GPG_3156_POS].widget);
+    g_object_set_data(G_OBJECT(bsmsg->gpg_encrypt_menu_item), "radbut-2", 
+		      gpg_mode_list[OPTS_MENU_GPG_2440_POS].widget);
+    gtk_widget_set_sensitive(gpg_mode_list[OPTS_MENU_GPG_3156_POS].widget,
+			     FALSE);
+    gtk_widget_set_sensitive(gpg_mode_list[OPTS_MENU_GPG_2440_POS].widget,
+			     FALSE);
+    /* preset sign/encrypt according to current identity */
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(msg->gpg_sign_menu_item),
+				   bsmsg->ident->gpg_sign);
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(msg->gpg_encrypt_menu_item),
+				   bsmsg->ident->gpg_encrypt);
+#endif
 
     /* create the top portion with the to, from, etc in it */
     gtk_paned_add1(GTK_PANED(paned), create_info_pane(bsmsg, type));
@@ -3839,32 +3867,68 @@ toggle_format_cb(GtkCheckMenuItem * check_menu_item, BalsaSendmsg * bsmsg)
 static void 
 toggle_sign_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    gboolean radio_on;
+    gboolean butval, radio_on;
+    GtkWidget *toolbar = g_object_get_data(G_OBJECT(widget), "toolbar");
+    GtkWidget *rb1 = g_object_get_data(G_OBJECT(widget), "radbut-1");
+    GtkWidget *rb2 = g_object_get_data(G_OBJECT(widget), "radbut-2");
 
-    if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)))
+    g_return_if_fail(toolbar != NULL);
+    g_return_if_fail(rb1 != NULL);
+    g_return_if_fail(rb2 != NULL);
+    butval = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget));
+    if (butval)
 	bsmsg->gpg_mode |= LIBBALSA_GPG_SIGN;
     else
 	bsmsg->gpg_mode &= ~LIBBALSA_GPG_SIGN;
 
     radio_on = (bsmsg->gpg_mode & ~LIBBALSA_GPG_RFC2440) > 0;
-    gtk_widget_set_sensitive(bsmsg->gpg_radio[0], radio_on);
-    gtk_widget_set_sensitive(bsmsg->gpg_radio[1], radio_on);
+    gtk_widget_set_sensitive(rb1, radio_on);
+    gtk_widget_set_sensitive(rb2, radio_on);
+
+    balsa_toolbar_set_button_active(toolbar, BALSA_PIXMAP_GPG_SIGN, butval);
 }
+
+
+static void 
+toggle_sign_tb_cb(GtkToggleButton * widget, BalsaSendmsg * bsmsg)
+{
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_sign_menu_item),
+				   gtk_toggle_button_get_active(widget));
+}
+
 
 static void 
 toggle_encrypt_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    gboolean radio_on;
+    gboolean butval, radio_on;
+    GtkWidget *toolbar = g_object_get_data(G_OBJECT(widget), "toolbar");
+    GtkWidget *rb1 = g_object_get_data(G_OBJECT(widget), "radbut-1");
+    GtkWidget *rb2 = g_object_get_data(G_OBJECT(widget), "radbut-2");
 
-    if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)))
+    g_return_if_fail(toolbar != NULL);
+    g_return_if_fail(rb1 != NULL);
+    g_return_if_fail(rb2 != NULL);
+    butval = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget));
+    if (butval)
 	bsmsg->gpg_mode |= LIBBALSA_GPG_ENCRYPT;
     else
 	bsmsg->gpg_mode &= ~LIBBALSA_GPG_ENCRYPT;
 
     radio_on = (bsmsg->gpg_mode & ~LIBBALSA_GPG_RFC2440) > 0;
-    gtk_widget_set_sensitive(bsmsg->gpg_radio[0], radio_on);
-    gtk_widget_set_sensitive(bsmsg->gpg_radio[1], radio_on);
+    gtk_widget_set_sensitive(rb1, radio_on);
+    gtk_widget_set_sensitive(rb2, radio_on);
+
+    balsa_toolbar_set_button_active(toolbar, BALSA_PIXMAP_GPG_ENCRYPT, butval);
 }
+
+
+static void 
+toggle_encrypt_tb_cb(GtkToggleButton * widget, BalsaSendmsg * bsmsg)
+{
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_encrypt_menu_item),
+				   gtk_toggle_button_get_active(widget));
+}
+
 
 static void
 toggle_gpg_mode_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)

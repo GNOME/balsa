@@ -142,7 +142,13 @@ button_data toolbar_buttons[]={
     {BALSA_PIXMAP_CLOSE_MBOX, N_("Close"),
      N_("Close current mailbox"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {BALSA_PIXMAP_SHOW_PREVIEW, N_("Msg Preview"),
-     N_("Show preview pane"), TOOLBAR_BUTTON_TYPE_TOGGLE}
+     N_("Show preview pane"), TOOLBAR_BUTTON_TYPE_TOGGLE},
+#ifdef HAVE_GPGME
+    {BALSA_PIXMAP_GPG_SIGN, N_("Sign"),
+     N_("Sign message using GPG"), TOOLBAR_BUTTON_TYPE_TOGGLE},
+    {BALSA_PIXMAP_GPG_ENCRYPT, N_("Encrypt"),
+     N_("Encrypt message using GPG"), TOOLBAR_BUTTON_TYPE_TOGGLE},
+#endif
 };
 
 const int toolbar_button_count =

@@ -63,6 +63,57 @@ struct _PassphraseCB {
     
 #define RFC2440_SEPARATOR _("\n--\nThis is an OpenPGP signed message part:\n")
 
+#ifndef USE_SSL
+#  undef ENABLE_PCACHE
+#else
+/* 
+ * local stuff for remembering the last passphrase (needs OpenSSL)
+ */
+#define ENABLE_PCACHE
+#include <openssl/ssl.h>
+#include <openssl/evp.h>
+#include <openssl/md5.h>
+#include <openssl/rand.h>
+#include <signal.h>
+
+/* FIXME: this is an evil hack to get a public function from libmutt which
+ * is never defined in a header file... */
+extern int ssl_init(void);
+
+typedef struct _bf_key_T bf_key_T;
+typedef struct _bf_crypt_T bf_crypt_T;
+typedef struct _pcache_elem_T pcache_elem_T;
+typedef struct _pcache_T pcache_T;
+
+struct _bf_key_T {
+    unsigned char key[16];   /* blowfish key */
+    unsigned char iv[8];
+};
+
+struct _bf_crypt_T {
+    unsigned char *buf;      /* encrypted buffer */
+    gint len;                /* length of buf */
+};
+
+struct _pcache_elem_T {
+    unsigned char name[MD5_DIGEST_LENGTH];  /* md5sum of name */
+    bf_crypt_T *passphrase;  /* encrypted passphrase */
+    time_t expires;          /* expiry time */
+};
+
+struct _pcache_T {
+    gboolean enable;         /* using the cache is allowed */
+    gint max_mins;           /* max minutes allowed to cache data */
+    bf_key_T bf_key;         /* the (random) blowfish key */
+    GList *cache;            /* list of pcache_elem_T elements */
+};
+
+static pcache_T *pcache = NULL;
+static void (*segvhandler)(int);
+
+#endif
+
+
 /* local prototypes */
 static const gchar *get_passphrase_cb(void *opaque, const char *desc,
 				      void **r_hd);
@@ -1074,6 +1125,7 @@ libbalsa_rfc2440_encrypt_buffer(const gchar *buffer, const gchar *sign_for,
  */
 GpgmeSigStat
 libbalsa_rfc2440_decrypt_buffer(gchar **buffer, const gchar *charset,
+				gboolean fallback, LibBalsaCodeset codeset,
 				gboolean append_info, 
 				LibBalsaSignatureInfo **sig_info,
 				const gchar *date_string, GtkWindow *parent)
@@ -1163,20 +1215,30 @@ libbalsa_rfc2440_decrypt_buffer(gchar **buffer, const gchar *charset,
     /* convert the result back to utf-8 if necessary */
     /* FIXME: remove \r's if the message came from a winbloze mua? */
     if (charset && g_ascii_strcasecmp(charset, "utf-8")) {
-	/* be sure to handle wrongly encoded messages... */
-	GError *err = NULL;
-	gsize bytes_read;
+	if (!g_ascii_strcasecmp(charset, "us-ascii")) {
+	    gchar const *target = NULL;
+	    result = g_strndup(plain_buffer, datasize);
 
-	result = g_convert_with_fallback(plain_buffer, datasize,
-					 "utf-8", charset, "?",
-					 &bytes_read, NULL, &err);
-	while (err) {
-	    plain_buffer[bytes_read] = '?';
-	    g_error_free(err);
-	    err = NULL;
+	    if (!libbalsa_utf8_sanitize(&result, fallback, codeset, &target))
+		libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
+				     _("The OpenPGP encrypted message part contains 8-bit characters, but no header describing the used codeset (converted to %s)"),
+				     target ? target : "\"?\"");
+	} else {
+	    /* be sure to handle wrongly encoded messages... */
+	    GError *err = NULL;
+	    gsize bytes_read;
+	    
 	    result = g_convert_with_fallback(plain_buffer, datasize,
 					     "utf-8", charset, "?",
 					     &bytes_read, NULL, &err);
+	    while (err) {
+		plain_buffer[bytes_read] = '?';
+		g_error_free(err);
+		err = NULL;
+		result = g_convert_with_fallback(plain_buffer, datasize,
+						 "utf-8", charset, "?",
+						 &bytes_read, NULL, &err);
+	    }
 	}
     } else
 	result = g_strndup(plain_buffer, datasize);
@@ -1569,16 +1631,289 @@ read_cb_MailDataBuffer(void *hook, char *buffer, size_t count, size_t *nread)
 }
 
 
+#ifdef ENABLE_PCACHE
+/* helper functions for the passphrase cache */
+/*
+ * destroy a bf_crypt_T data object by first overwriting the encrypted data
+ * with random crap and then freeing all allocated stuff
+ */
+static bf_crypt_T *
+bf_destroy(bf_crypt_T *crypt)
+{
+    if (crypt) {
+	unsigned char *p = crypt->buf;
+
+	if (p) {
+	    while (crypt->len--)
+		*p++ = random();
+	    g_free(crypt->buf);
+	}
+	g_free(crypt);
+    }
+    return NULL;
+}
+
+
+/*
+ * Encrypt cleartext using the key bf_key and return the encrypted stuff as
+ * a pointer to a bf_crypt_T struct or NULL on error
+ */
+static bf_crypt_T *
+bf_encrypt(const gchar *cleartext, bf_key_T *bf_key)
+{
+    EVP_CIPHER_CTX ctx;
+    unsigned char *outbuf;
+    gint outlen, tmplen;
+    bf_crypt_T *result;
+
+    if (!cleartext)
+	return NULL;
+
+    EVP_CIPHER_CTX_init(&ctx);
+    EVP_EncryptInit(&ctx, EVP_bf_cbc(), bf_key->key, bf_key->iv);
+    outbuf = g_malloc(strlen(cleartext) + 9);  /* FIXME: correct/safe? */
+    if (!EVP_EncryptUpdate(&ctx, outbuf, &outlen, (unsigned char *)cleartext,
+			  strlen(cleartext) + 1)) {
+	g_free(outbuf);
+	EVP_CIPHER_CTX_cleanup(&ctx);
+	return NULL;
+    }
+    if (!EVP_EncryptFinal(&ctx, outbuf + outlen, &tmplen)) {
+	g_free(outbuf);
+	EVP_CIPHER_CTX_cleanup(&ctx);
+	return NULL;
+    }
+    outlen += tmplen;
+    EVP_CIPHER_CTX_cleanup(&ctx);
+
+    result = g_malloc(sizeof(bf_crypt_T));
+    result->buf = outbuf;
+    result->len = outlen;
+    return result;
+}
+
+
+/*
+ * decrypt crypttext using bf_key and return the string on success or NULL
+ * on error
+ */
 static gchar *
+bf_decrypt(bf_crypt_T *crypttext, bf_key_T *bf_key)
+{
+    EVP_CIPHER_CTX ctx;
+    gchar *outbuf;
+    gint outlen, tmplen;
+
+    if (!crypttext)
+	return NULL;
+
+    EVP_CIPHER_CTX_init(&ctx);
+    EVP_DecryptInit(&ctx, EVP_bf_cbc(), bf_key->key, bf_key->iv);
+    outbuf = g_malloc(crypttext->len);  /* FIXME: correct/safe? */
+    if (!EVP_DecryptUpdate(&ctx, outbuf, &outlen, crypttext->buf,
+			  crypttext->len)) {
+	g_free(outbuf);
+	EVP_CIPHER_CTX_cleanup(&ctx);
+	return NULL;
+    }
+    if (!EVP_DecryptFinal(&ctx, outbuf + outlen, &tmplen))  {
+	g_free(outbuf);
+	EVP_CIPHER_CTX_cleanup(&ctx);
+	return NULL;
+    }
+    EVP_CIPHER_CTX_cleanup(&ctx);
+    
+    return outbuf;
+}
+
+
+/*
+ * timeout function to check for expired cached passphrases
+ */
+static gboolean
+pcache_timeout(pcache_T *cache)
+{
+    time_t now = time(NULL);
+    GList *list = cache->cache;
+
+    while (list) {
+	pcache_elem_T *elem = (pcache_elem_T *)list->data;
+
+	if (elem->expires <= now) {
+	    GList *next = list->next;
+
+	    elem->passphrase = bf_destroy(elem->passphrase);
+	    g_free(elem);
+	    cache->cache = g_list_delete_link(cache->cache, list);
+	    list = next;
+	} else
+	    list = g_list_next(list);
+    }
+	
+    return TRUE;
+}
+
+
+/*
+ * Check if the passphrase requested for desc is already in cache. If it is
+ * there and gpgme complained about a bad passphrase, erase it and return
+ * NULL, otherwise return the passphrase. If it is not in the cache, the
+ * routine also returns NULL.
+ */
+static gchar *
+check_cache(pcache_T *cache, const gchar *desc)
+{
+    gchar *p;
+    gchar **desc_parts;
+    unsigned char tofind[MD5_DIGEST_LENGTH];
+    GList *list;
+
+    /* exit immediately if no data is present */
+    if (!cache->enable || !cache->cache)
+	return NULL;
+
+    /* try to find the name in the cache */
+    desc_parts = g_strsplit(desc, "\n", 3);
+    p = strchr(desc_parts[1], ' ');   /* skip the fingerprint */
+    if (!p) {
+	g_strfreev(desc_parts);
+	return NULL;
+    }
+    MD5(p, strlen(p), tofind);
+    g_strfreev(desc_parts);
+
+    list = cache->cache;
+    while (list) {
+	pcache_elem_T *elem = (pcache_elem_T *)list->data;
+
+	if (!memcmp(tofind, elem->name, MD5_DIGEST_LENGTH)) {
+	    /* check if the last entry was bad */
+	    if (!strncmp(desc, "TRY_AGAIN", 9)) {
+		elem->passphrase = bf_destroy(elem->passphrase);
+		g_free(elem);
+		cache->cache = g_list_delete_link(cache->cache, list);
+		return NULL;
+	    } else
+		return bf_decrypt(elem->passphrase, &cache->bf_key);
+	}
+	list = g_list_next(list);
+    }
+
+    /* not found */
+    return NULL;
+}
+
+
+/*
+ * Try to destroy the cache info (called upon SIGSEGV)
+ */
+static void
+destroy_cache(int signo)
+{
+    if (pcache) {
+	int n;
+
+	fprintf(stderr, "caught signal %d, destroy passphrase cache...\n",
+		signo);
+	for (n = 0; n < 16; n++)
+	    pcache->bf_key.key[n] = 0;
+	for (n = 0; n < 8; n++)
+	    pcache->bf_key.iv[n] = 0;
+	pcache->cache = NULL;
+    }
+    segvhandler(signo);
+}
+
+
+/*
+ * initialise the passphrase cache
+ */
+static pcache_T *
+init_pcache()
+{
+    pcache_T *cache;
+    struct stat cfg_stat;
+
+    /* be sure that openssl is initialised */
+    ssl_init();  /* from libmutt */
+
+    /* initialise the internal passphrase cache stuff */
+    cache = g_new0(pcache_T, 1);
+
+    /* the cfg file must be owned by root and not group/world writable */
+    if (stat(BALSA_DATA_PREFIX "/gpg-cache", &cfg_stat) == -1) {
+	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+			     "file %s/gpg-cache not found, disable passphrase cache",
+			     BALSA_DATA_PREFIX);
+	return cache;
+    }
+    if (cfg_stat.st_uid != 0 || !S_ISREG(cfg_stat.st_mode) ||
+	(cfg_stat.st_mode & (S_IWGRP | S_IWOTH)) != 0) {
+	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+			     "%s/gpg-cache must be a regular file, owened by root with (max) permissions 0644",
+			     BALSA_DATA_PREFIX);
+	return cache;
+    }
+
+    /* get the passphrase cache config */
+    gnome_config_push_prefix("=" BALSA_DATA_PREFIX "/gpg-cache=/PassphraseCache/");
+    cache->enable =
+	gnome_config_get_bool_with_default("enable", &cache->enable);
+    cache->max_mins =
+	gnome_config_get_int_with_default("minutesMax", &cache->max_mins);
+    if (cache->max_mins <= 0)
+	cache->enable = FALSE;
+    gnome_config_pop_prefix();
+    libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+			 "passphrase cache is %s",
+			 (cache->enable) ? "enabled" : "disabled");
+
+    if (cache->enable) {
+	/* generate a random blowfish key */
+	RAND_bytes(cache->bf_key.key, 16);
+	RAND_bytes(cache->bf_key.iv, 8);
+	
+	/* install a segv handler to destroy the cache on crash */
+	segvhandler = signal(SIGSEGV, destroy_cache);
+	
+	/* add a timeout function (called every 5 secs) to erase expired
+	   passphrases */
+	g_timeout_add(5000, (GSourceFunc)pcache_timeout, cache);
+    }
+
+    return cache;
+}
+
+
+/*
+ * callback for (de)activating the timeout spinbutton
+ */
+static void
+activate_mins(GtkToggleButton *btn, GtkWidget *target)
+{
+    gtk_widget_set_sensitive(target, gtk_toggle_button_get_active(btn));
+}
+#endif
+
+
+/*
+ * display a dialog to read the passphrase
+ */
+static gchar *
+#ifdef ENABLE_PCACHE
+get_passphrase_real(PassphraseCB *cb_data, const gchar *desc, pcache_T *pcache)
+#else
 get_passphrase_real(PassphraseCB *cb_data, const gchar *desc)
+#endif
 {
     gchar **desc_parts;
-    gboolean was_bad;
     GtkWidget *dialog, *entry;
     gchar *prompt, *passwd;
+#ifdef ENABLE_PCACHE
+    GtkWidget *cache_but = NULL, *cache_min = NULL;
+#endif
     
     desc_parts = g_strsplit(desc, "\n", 3);
-    was_bad = !strcmp(desc_parts[0], "TRY_AGAIN");
 
     /* FIXME: create dialog according to the Gnome HIG */
     dialog = gtk_dialog_new_with_buttons(cb_data->title,
@@ -1587,7 +1922,8 @@ get_passphrase_real(PassphraseCB *cb_data, const gchar *desc)
                                          GTK_STOCK_OK, GTK_RESPONSE_OK,
                                          GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                          NULL);
-    if (was_bad)
+    gtk_box_set_spacing(GTK_BOX(GTK_DIALOG(dialog)->vbox), 12);
+    if (!strcmp(desc_parts[0], "TRY_AGAIN"))
 	prompt = 
 	    g_strdup_printf(_("The passphrase for this key was bad, please try again!\n\nKey: %s"),
 			    desc_parts[1]);
@@ -1598,9 +1934,28 @@ get_passphrase_real(PassphraseCB *cb_data, const gchar *desc)
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),
                       gtk_label_new(prompt));
     g_free(prompt);
-    g_strfreev(desc_parts);
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),
                       entry = gtk_entry_new());
+
+#ifdef ENABLE_PCACHE
+    if (pcache->enable) {
+	GtkWidget *hbox;
+
+	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),
+			  hbox = gtk_hbox_new(FALSE, 12));
+	cache_but = 
+	    gtk_check_button_new_with_label(_("remember passphrase for"));
+	gtk_box_pack_start(GTK_BOX(hbox), cache_but, FALSE, FALSE, 0);
+	cache_min = gtk_spin_button_new_with_range(1.0, pcache->max_mins, 1.0);
+	gtk_widget_set_sensitive(cache_min, FALSE);
+	gtk_box_pack_start(GTK_BOX(hbox), cache_min, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("minutes")),
+			   FALSE, FALSE, 0);
+	g_signal_connect(G_OBJECT(cache_but), "clicked", 
+			 (GCallback)activate_mins, cache_min);
+    }
+#endif
+
     gtk_widget_show_all(GTK_WIDGET(GTK_DIALOG(dialog)->vbox));
     gtk_entry_set_width_chars(GTK_ENTRY(entry), 40);
     gtk_entry_set_visibility(GTK_ENTRY(entry), FALSE);
@@ -1613,6 +1968,26 @@ get_passphrase_real(PassphraseCB *cb_data, const gchar *desc)
         passwd = g_strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
     else
 	passwd = NULL;
+
+#ifdef ENABLE_PCACHE
+    if (pcache->enable) {
+	if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(cache_but))) {
+	    gchar *p = strchr(desc_parts[1], ' ');
+	    
+	    if (p) {
+		pcache_elem_T *elem = g_new(pcache_elem_T, 1);
+
+		MD5(p, strlen(p), elem->name);
+		elem->passphrase = bf_encrypt(passwd, &pcache->bf_key);
+		elem->expires = time(NULL) + 
+		    60 * gtk_spin_button_get_value(GTK_SPIN_BUTTON(cache_min));
+		pcache->cache = g_list_append(pcache->cache, elem);
+	    }
+	}
+    }
+#endif
+
+    g_strfreev(desc_parts);
     gtk_widget_destroy(dialog);
 
     return passwd;
@@ -1625,6 +2000,9 @@ typedef struct {
     pthread_cond_t cond;
     PassphraseCB *cb_data;
     const gchar *desc;
+#ifdef ENABLE_PCACHE
+    pcache_T *pcache;
+#endif
     gchar* res;
 } AskPassphraseData;
 
@@ -1637,7 +2015,11 @@ get_passphrase_idle(gpointer data)
     AskPassphraseData* apd = (AskPassphraseData*)data;
 
     gdk_threads_enter();
+#ifdef ENABLE_PCACHE
+    apd->res = get_passphrase_real(apd->cb_data, apd->desc, apd->pcache);
+#else
     apd->res = get_passphrase_real(apd->cb_data, apd->desc);
+#endif
     gdk_threads_leave();
     pthread_cond_signal(&apd->cond);
     return FALSE;
@@ -1669,9 +2051,24 @@ get_passphrase_cb(void *opaque, const char *desc, void **r_hd)
         return NULL;
     }
     
+#ifdef ENABLE_PCACHE    
+    if (!pcache)
+	pcache = init_pcache();
+
+    /* check if we have the passphrase already cached... */
+    if ((passwd = check_cache(pcache, desc))) {
+	*r_hd = passwd;
+	return passwd;
+    }
+#endif
+
 #ifdef BALSA_USE_THREADS
     if (pthread_self() == libbalsa_get_main_thread())
+#ifdef ENABLE_PCACHE
+	passwd = get_passphrase_real(cb_data, desc, pcache);
+#else
 	passwd = get_passphrase_real(cb_data, desc);
+#endif
     else {
 	static pthread_mutex_t get_passphrase_lock = PTHREAD_MUTEX_INITIALIZER;
 	AskPassphraseData apd;
@@ -1680,6 +2077,9 @@ get_passphrase_cb(void *opaque, const char *desc, void **r_hd)
 	pthread_cond_init(&apd.cond, NULL);
 	apd.cb_data = cb_data;
 	apd.desc = desc;
+#ifdef ENABLE_PCACHE
+	apd.pcache = pcache;
+#endif
 	g_idle_add(get_passphrase_idle, &apd);
 	pthread_cond_wait(&apd.cond, &get_passphrase_lock);
     
@@ -1689,8 +2089,12 @@ get_passphrase_cb(void *opaque, const char *desc, void **r_hd)
 	passwd = apd.res;
     }
 #else
+#ifdef ENABLE_PCACHE
+    passwd = get_passphrase_real(cb_data, desc, pcache);
+#else
     passwd = get_passphrase_real(cb_data, desc);
-#endif
+#endif /* ENABLE_PCACHE */
+#endif /* BALSA_USE_THREADS */
 
     if (!passwd)
 	gpgme_cancel(cb_data->ctx);

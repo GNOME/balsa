@@ -1715,6 +1715,8 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 	    else
 		sig_res = 
 		    libbalsa_rfc2440_decrypt_buffer(&ptr, charset, 
+						    balsa_app.convert_unknown_8bit,
+						    balsa_app.convert_unknown_8bit_codeset,
 						    TRUE, &info->body->sig_info,
 						    balsa_app.date_string, NULL);
 	    if (sig_res == GPGME_SIG_STAT_GOOD)

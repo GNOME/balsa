@@ -69,6 +69,8 @@
 #include "pixmaps/info_new.xpm"
 #include "pixmaps/info_attachment.xpm"
 #ifdef HAVE_GPGME
+#  include "pixmaps/balsa_gpg_sign.xpm"
+#  include "pixmaps/balsa_gpg_encrypt.xpm"
 #  include "pixmaps/info_lock.xpm"
 #  include "pixmaps/info_lock_good.xpm"
 #  include "pixmaps/info_lock_bad.xpm"
@@ -151,6 +153,10 @@ register_balsa_pixmaps(void)
 	{ BALSA_PIXMAP_MARKED_ALL,	    balsa_marked_all_xpm},
 	{ BALSA_PIXMAP_IDENTITY,	    balsa_identity_xpm},
 	{ BALSA_PIXMAP_CLOSE_MBOX,	    balsa_close_mbox_xpm},
+#ifdef HAVE_GPGME
+	{ BALSA_PIXMAP_GPG_SIGN,            balsa_gpg_sign_xpm},
+	{ BALSA_PIXMAP_GPG_ENCRYPT,         balsa_gpg_encrypt_xpm},
+#endif
 
 	/* Menu icons */
 	{ BALSA_PIXMAP_MENU_NEW,	    menu_new_xpm},

@@ -94,6 +94,10 @@ libbalsa_identity_init(LibBalsaIdentity* ident)
     ident->sig_whenreply = TRUE;
     ident->sig_separator = TRUE;
     ident->sig_prepend = FALSE;
+#ifdef HAVE_GPGME
+    ident->gpg_sign = FALSE;
+    ident->gpg_encrypt = FALSE;
+#endif
 }
 
 /* 
@@ -273,6 +277,24 @@ libbalsa_identity_set_sig_prepend(LibBalsaIdentity* ident, gboolean prepend)
     g_return_if_fail(ident != NULL);
     ident->sig_prepend = prepend;
 }
+
+
+#ifdef HAVE_GPGME
+void
+libbalsa_identity_set_gpg_sign(LibBalsaIdentity* ident, gboolean sign)
+{
+    g_return_if_fail(ident != NULL);
+    ident->gpg_sign = sign;
+}
+
+
+void
+libbalsa_identity_set_gpg_encrypt(LibBalsaIdentity* ident, gboolean encrypt)
+{
+    g_return_if_fail(ident != NULL);
+    ident->gpg_encrypt = encrypt;
+}
+#endif
 
 /* Used by both dialogs: */
 
@@ -776,6 +798,21 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
                                  _("Prepend Si_gnature"),
                                  "identity-sigprepend");
 
+#ifdef HAVE_GPGME
+    ident_dialog_add_checkbutton(table, row++, dialog, 
+                                 _("GPG sign by default"),
+                                 "identity-gpgsign");
+    gtk_widget_set_sensitive(GTK_WIDGET(g_object_get_data(G_OBJECT(dialog),
+							  "identity-gpgsign")),
+			     TRUE);
+    ident_dialog_add_checkbutton(table, row++, dialog,
+                                 _("GPG encrypt by default"),
+                                 "identity-gpgencrypt");
+    gtk_widget_set_sensitive(GTK_WIDGET(g_object_get_data(G_OBJECT(dialog),
+							  "identity-gpgencrypt")),
+			     TRUE);
+#endif
+
     sig_path = g_object_get_data(G_OBJECT(dialog), "identity-sigpath");
     g_signal_connect(sig_path, "changed",
                      G_CALLBACK(md_sig_path_changed), dialog);
@@ -796,7 +833,7 @@ md_sig_path_changed(GtkEntry * sig_path, GObject * dialog)
         "identity-whenforward",
         "identity-whenreply",
         "identity-sigseparator",
-        "identity-sigprepend"
+        "identity-sigprepend",
     };
     gboolean has_sig = *gtk_entry_get_text(sig_path);
 
@@ -951,6 +988,11 @@ ident_dialog_update(GtkDialog* dlg)
     id->sig_whenreply   = ident_dialog_get_bool(dlg, "identity-whenreply");
     id->sig_separator   = ident_dialog_get_bool(dlg, "identity-sigseparator");
     id->sig_prepend     = ident_dialog_get_bool(dlg, "identity-sigprepend");
+   
+#ifdef HAVE_GPGME
+    id->gpg_sign        = ident_dialog_get_bool(dlg, "identity-gpgsign");
+    id->gpg_encrypt     = ident_dialog_get_bool(dlg, "identity-gpgencrypt");
+#endif
    
     return TRUE;
 }
@@ -1240,6 +1282,13 @@ display_frame_update(GtkDialog * dialog, LibBalsaIdentity* ident)
                               ident->sig_separator);    
     display_frame_set_boolean(dialog, "identity-sigprepend", 
                               ident->sig_prepend);    
+
+#ifdef HAVE_GPGME
+    display_frame_set_boolean(dialog, "identity-gpgsign", 
+                              ident->gpg_sign);    
+    display_frame_set_boolean(dialog, "identity-gpgencrypt", 
+                              ident->gpg_encrypt);    
+#endif
 }
 
 
@@ -1309,6 +1358,12 @@ libbalsa_identity_new_config(const gchar* prefix, const gchar* name)
     ident->sig_whenreply = gnome_config_get_bool("SigReply");
     ident->sig_separator = gnome_config_get_bool("SigSeparator");
     ident->sig_prepend = gnome_config_get_bool("SigPrepend");
+
+#ifdef HAVE_GPGME
+    ident->gpg_sign = gnome_config_get_bool("GpgSign");
+    ident->gpg_encrypt = gnome_config_get_bool("GpgEncrypt");
+#endif
+
     gnome_config_pop_prefix();
 
     return ident;
@@ -1338,6 +1393,11 @@ libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* prefix)
     gnome_config_set_bool("SigReply", ident->sig_whenreply);
     gnome_config_set_bool("SigSeparator", ident->sig_separator);
     gnome_config_set_bool("SigPrepend", ident->sig_prepend);
+
+#ifdef HAVE_GPGME
+    gnome_config_set_bool("GpgSign", ident->gpg_sign);
+    gnome_config_set_bool("GpgEncrypt", ident->gpg_encrypt);
+#endif
 
     gnome_config_pop_prefix();
 }

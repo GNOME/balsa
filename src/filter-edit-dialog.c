@@ -625,6 +625,10 @@ void build_action_page()
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     GTK_SHRINK,
 		     5, 5);
+    gtk_signal_connect_object(GTK_OBJECT(fe_sound_browse),
+			      "clicked",
+			      GTK_SIGNAL_FUNC(fe_sound_browse_clicked),
+			      NULL);
     gtk_widget_show(fe_sound_browse);
     fe_popup_button = gtk_check_button_new_with_label("Popup text:");
     gtk_table_attach(GTK_TABLE(fe_notification_table),

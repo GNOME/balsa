@@ -24,6 +24,12 @@
 				     a filter can be disabled because
 				     of user selection or an error in the
 				     regex */
+#define FILTER_SOUND         1<<4 /* play a sound when matches */
+#define FILTER_POPUP         1<<5 /* popup text when matches */
+#define FILTER_PLACE         1<<6 /* "Place" disposition */
+#define FILTER_NOPLACE       1<<7 /* "Do not Place" disposition */
+#define FILTER_STOP          1<<8 /* "Stop" disposition */
+
 /* flag operation macros */
 #define FILTER_SETFLAG(x, y) ((((filter*)(x))->flags) |= (y))
 #define FILTER_CLRFLAG(x, y) ((((filter*)(x))->flags) &= ~(y))
@@ -46,7 +52,7 @@
 typedef struct _filter_regex
 {
     gchar *string;
-    regex_t compiled;
+    regex_t *compiled;
 } filter_regex;
 
 

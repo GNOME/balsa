@@ -195,16 +195,20 @@ GtkWidget *fe_type_exec_entry;
 
 /* widgets for the Action page */
 
-/* action field */
+/* notification field */
 GtkWidget *fe_notification_frame;
 GtkWidget *fe_notification_table;
-GtkWidget *fe_action_frame;
-GtkWidget *fe_action_table;
 GtkWidget *fe_sound_button;
 GtkWidget *fe_sound_entry;
 GtkWidget *fe_sound_browse;
 GtkWidget *fe_popup_button;
 GtkWidget *fe_popup_entry;
+/* callback for browse */
+void fe_sound_browse_clicked(GtkWidget *widget,
+			     gpointer throwaway);
+/* action field */
+GtkWidget *fe_action_frame;
+GtkWidget *fe_action_table;
 GtkWidget *fe_copy_button;
 GtkWidget *fe_copy_entry;
 GtkWidget *fe_move_button;

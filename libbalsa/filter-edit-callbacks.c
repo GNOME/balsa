@@ -188,3 +188,50 @@ void fe_type_simple_toggled(GtkWidget *widget,
 	}
     }
 } /* end fe_type_simple_toggled() */
+
+
+/*
+ * browse_fileselect_clicked()
+ *
+ * Callback for the fileselection dialog buttons of the 
+ * sound browse function.
+ */
+void browse_fileselect_clicked(GtkWidget *widget,
+			       gpointer data)
+{
+    gtk_entry_set_text(GTK_ENTRY(fe_sound_entry),
+		       gtk_file_selection_get_filename(
+			   GTK_FILE_SELECTION(data)));
+    gtk_widget_destroy(GTK_WIDGET(data));
+} /* end browse_fileselect_clicked */
+
+
+/*
+ * fe_sound_browse_clicked()
+ *
+ * Callback when the "Browse..." button is clicked
+ */
+void fe_sound_browse_clicked(GtkWidget *widget,
+			     gpointer throwaway)
+{
+    GtkWidget *filesel;
+    gchar *current;
+
+    filesel = gtk_file_selection_new("Play sound...");
+
+    current = gtk_entry_get_text(GTK_ENTRY(fe_sound_entry));
+    if ((current != NULL) && (strlen(current) != 0))
+	gtk_file_selection_set_filename(GTK_FILE_SELECTION(filesel),
+					current);
+
+    gtk_signal_connect(GTK_OBJECT(GTK_FILE_SELECTION(filesel)->ok_button),
+		       "clicked",
+		       GTK_SIGNAL_FUNC(browse_fileselect_clicked),
+		       GTK_OBJECT(filesel));
+    gtk_signal_connect_object(
+	GTK_OBJECT(GTK_FILE_SELECTION(filesel)->cancel_button),
+	"clicked",
+	(GtkSignalFunc) gtk_widget_destroy,
+	GTK_OBJECT (filesel));
+    gtk_widget_show(filesel);
+} /* end fe_sound_browse_clicked */

@@ -63,24 +63,21 @@ typedef struct _filter
     filter_when_type match_when;
     guint flags;
 
-    /*
-     * This should perhaps be a union, especially to 
-     * share the string areas.
-     * Also, I am tempted to provide limits for match_string
-     * and exec_command, sort of like this:
-     * union
-     * {
-     *     gchar match_string[1024];
-     *     gchar exec_command[1024];
-     * } _filter_strings;
-     */
+    /* The match type fields */
+    union _match
+    {
+	gchar string[1024];  /* for FILTER_SIMPLE */
+	gchar command[1024]; /* for FILTER_EXEC */
+    } match;
     guint match_fields; /* for FILTER_SIMPLE filters */
-    gchar *match_string; /* for FILTER_SIMPLE filters */
 
-    gchar *exec_command; /* for FILTER_EXEC filters */
+    /* The notification fields */
+    gchar sound[1024];
+    gchar popup_text[256];
 
     /* other options I haven't thought of yet */
 
+    /* the regex list */
     GList *regex;
 } filter;
 

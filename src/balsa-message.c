@@ -1550,7 +1550,8 @@ select_part(BalsaMessage * bm, gint part)
     BalsaPartInfo *info;
 
     if (bm->current_part && bm->current_part->widget) {
-	if(GTK_IS_EDITABLE(bm->current_part->widget))
+	if(GTK_IS_EDITABLE(bm->current_part->widget) && 
+	   GTK_WIDGET_REALIZED(bm->current_part->widget))
 	    gtk_editable_claim_selection(
 		GTK_EDITABLE(bm->current_part->widget), FALSE, 
 		GDK_CURRENT_TIME);

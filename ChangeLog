@@ -1,3 +1,21 @@
+2000-11-19  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* Makefile.am: remove deprecated mblist-window.[hc] from the file list.
+	* src/balsa-mblist.[hc]: transfer all the used functions from 
+	mblist-window in order to clean up the code a bit. Remove old crust.
+	* src/balsa-message.c: don't call gtk_editable_claim_selection()
+	for unrealized widgets.
+	* src/mailbox-conf.c: rename balsa_mblist_redraw() to more apriopriate
+	balsa_mblist_repopulate().
+	* src/main-window.c: insert mailbox tree in the scrolled window.
+	* src/pref-manager.c: balsa_mblist_redraw()-> repopulate(). 
+	Remove some crust.
+	* src/sendmsg-window.c: changes to remove libbalsa/send.c dependency
+	on balsa-app
+	* libbalsa/{misc,message}.h: same. API changes.
+	* libbalsa/send.c: remove dependency on balsa-app. Use 
+	libbalsa_information for error messages.
+	
 2000-11-16  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/main.c (main): ignore SIGPIPE so we don't die when pop 

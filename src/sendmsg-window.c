@@ -1660,21 +1660,27 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 {
     gboolean successful = TRUE;
     LibBalsaMessage *message;
+    LibBalsaMailbox *fcc = NULL;
+
     if (!is_ready_to_send(bsmsg))
 	return FALSE;
 
     libbalsa_set_charset(bsmsg->charset);
+
     if (balsa_app.debug)
 	fprintf(stderr, "sending with charset: %s\n", bsmsg->charset);
 
     message = bsmsg2message(bsmsg);
-
+   fcc = message->fcc_mailbox 
+       ? balsa_find_mbox_by_name(message->fcc_mailbox) : NULL;
     if(queue_only)
-	libbalsa_message_queue(message, balsa_app.outbox, 
+	libbalsa_message_queue(message, balsa_app.outbox, fcc,
 			       balsa_app.encoding_style);
     else 
-	successful = libbalsa_message_send(message, balsa_app.outbox,
-					   balsa_app.encoding_style);
+	successful = libbalsa_message_send(message, balsa_app.outbox, fcc,
+					   balsa_app.encoding_style,  
+					   balsa_app.smtp ? 
+					   balsa_app.smtp_server : NULL);
     if (successful) {
 	if (bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL) {
 	    if (bsmsg->orig_message)

@@ -635,7 +635,15 @@ balsa_window_new()
     gnome_app_set_contents(GNOME_APP(window), hpaned);
 
     /* XXX */
-    window->mblist = balsa_mailbox_list_window_new(window);
+    balsa_app.mblist =  BALSA_MBLIST(balsa_mblist_new());
+    window->mblist = gtk_scrolled_window_new(
+	GTK_CLIST(balsa_app.mblist)->hadjustment,
+	GTK_CLIST(balsa_app.mblist)->vadjustment);
+    gtk_container_add(GTK_CONTAINER(window->mblist), 
+		      GTK_WIDGET(balsa_app.mblist));
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(window->mblist),
+				   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    gtk_widget_show_all(window->mblist);
     gtk_paned_pack1(GTK_PANED(hpaned), window->mblist, TRUE, TRUE);
     gtk_paned_pack2(GTK_PANED(hpaned), vpaned, TRUE, TRUE);
     /*PKGW: do it this way, without the usizes. */
@@ -1263,7 +1271,8 @@ check_new_messages_cb(GtkWidget * widget, gpointer data)
 static void
 send_outbox_messages_cb(GtkWidget * widget, gpointer data)
 {
-    libbalsa_process_queue(balsa_app.outbox, balsa_app.encoding_style);
+    libbalsa_process_queue(balsa_app.outbox, balsa_app.encoding_style,
+			   balsa_app.smtp ? balsa_app.smtp_server : NULL);
 }
 
 /* this one is called only in the threaded code */

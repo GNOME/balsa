@@ -72,7 +72,8 @@ gboolean libbalsa_find_word(const gchar * word, const gchar * str);
 void libbalsa_wrap_string(gchar * str, int width);
 
 void libbalsa_set_charset(const gchar * charset);
-gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding);
+gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
+				const gchar* smtp_server);
 void libbalsa_marshal_POINTER__OBJECT(GtkObject * object,
 				      GtkSignalFunc func,
 				      gpointer func_data, GtkArg * args);

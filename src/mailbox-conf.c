@@ -203,7 +203,7 @@ mailbox->name);
     if (LIBBALSA_IS_MAILBOX_POP3(mailbox))
 	update_pop3_servers();
     else
-	balsa_mblist_redraw(BALSA_MBLIST(balsa_app.mblist));
+	balsa_mblist_repopulate(BALSA_MBLIST(balsa_app.mblist));
 }
 
 /*
@@ -745,7 +745,7 @@ mailbox_conf_close(GtkWidget * widget, gboolean save)
 	    /* redraw the pop3 server list */
 	    update_pop3_servers();
 	else			/* redraw the main mailbox list */
-	    balsa_mblist_redraw(BALSA_MBLIST(balsa_app.mblist));
+	    balsa_mblist_repopulate(BALSA_MBLIST(balsa_app.mblist));
 	if (return_value == MC_RET_RETRY)
 	    return;
     } else {

@@ -673,7 +673,7 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
      * close window and free memory
      */
     config_save();
-    balsa_mblist_redraw(balsa_app.mblist);
+    balsa_mblist_repopulate(balsa_app.mblist);
     balsa_window =
 	GTK_WIDGET(gtk_object_get_data(GTK_OBJECT(pbox), "balsawindow"));
     balsa_window_refresh(BALSA_WINDOW(balsa_window));
@@ -1117,7 +1117,6 @@ create_mailserver_page(gpointer data)
     GtkWidget *vbox1;
     GtkWidget *frame4;
     GtkWidget *box2;
-    GtkWidget *label16;
     GtkWidget *fileentry2;
     GtkWidget *frame5;
     GtkWidget *table4;
@@ -1167,9 +1166,6 @@ create_mailserver_page(gpointer data)
 
     box2 = gtk_hbox_new(FALSE, 0);
     gtk_container_add(GTK_CONTAINER(frame4), box2);
-
-    label16 = gtk_label_new("");
-    gtk_box_pack_start(GTK_BOX(box2), label16, FALSE, FALSE, 0);
 
     fileentry2 = gnome_file_entry_new("MAIL-DIR",
 				      _("Select your local mail directory"));

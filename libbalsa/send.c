@@ -35,9 +35,6 @@
 
 #include <sys/socket.h>
 
-/* FIXME: This balsa dependency must go... */
-#include "../src/balsa-app.h"
-
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 
@@ -58,8 +55,13 @@ struct _MessageQueueItem {
     enum {MQI_WAITING, MQI_FAILED,MQI_SENT} status;
 };
 
-MessageQueueItem *message_queue;
-int total_messages_left;
+/* Variables storing the state of the sending thread.
+ * These variables are protected in MT by send_messages_lock mutex */
+static MessageQueueItem *message_queue;
+static int total_messages_left;
+static gchar * send_smtp_server;
+/* end of state variables section */
+
 
 static MessageQueueItem *
 msg_queue_item_new(LibBalsaMessage * message)
@@ -91,7 +93,7 @@ msg_queue_item_destroy(MessageQueueItem * mqi)
 
 static guint balsa_send_message_real(LibBalsaMailbox* outbox);
 static void encode_descriptions(BODY * b);
-static int libbalsa_smtp_send(char *server);
+static int libbalsa_smtp_send(const char *server);
 static int libbalsa_smtp_protocol(int s, char *tempfile, HEADER * msg);
 static gboolean libbalsa_create_msg(LibBalsaMessage * message,
 				    HEADER * msg, char *tempfile,
@@ -171,13 +173,11 @@ static void dump_queue(const char*msg)
    places given message in the outbox. If fcc message field is set, saves
    it to fcc mailbox as well.
 */
-
 void
-libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
-		      gint encoding)
+libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * fccbox,
+		       LibBalsaMailbox * outbox, gint encoding)
 {
     MessageQueueItem *mqi;
-    LibBalsaMailbox*fccbox;
 
     g_return_if_fail(message);
 
@@ -189,8 +189,6 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 	mutt_write_fcc(LIBBALSA_MAILBOX_LOCAL(outbox)->path,
 		       mqi->message, NULL, 0, NULL);
 	libbalsa_unlock_mutt();
-	fccbox = balsa_find_mbox_by_name(mqi->fcc);
-	
 	if (fccbox && LIBBALSA_IS_MAILBOX_LOCAL(fccbox)) {
 	    libbalsa_lock_mutt();
 	    mutt_write_fcc(LIBBALSA_MAILBOX_LOCAL(fccbox)->path,
@@ -210,12 +208,13 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 */
 gboolean
 libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
-		      gint encoding)
+		      LibBalsaMailbox* fccbox, gint encoding, 
+		      const gchar* smtp_server)
 {
 
     if (message != NULL)
-	libbalsa_message_queue(message, outbox, encoding);
-    return libbalsa_process_queue(outbox, encoding);
+	libbalsa_message_queue(message, outbox, fccbox, encoding);
+    return libbalsa_process_queue(outbox, encoding, smtp_server);
 }
 
 /* libbalsa_process_queue:
@@ -225,11 +224,13 @@ libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
    handler does that.
 */
 gboolean 
-libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding)
+libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding, 
+		       const gchar* smtp_server)
 {
     MessageQueueItem *mqi, *new_message;
     GList *lista;
     LibBalsaMessage *queu;
+    gboolean start_thread;
     /* We do messages in queue now only if where are not sending them already */
 
 #ifdef BALSA_USE_THREADS
@@ -280,24 +281,23 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding)
 	}
 #ifdef BALSA_USE_THREADS
     }
-    if (sending_mail) {
-	/* add to the queue of messages waiting to be sent */
-	pthread_mutex_unlock(&send_messages_lock);
-    } else {
-	/* start queue of messages to send and initiate thread */
-	sending_mail = TRUE;
-	pthread_mutex_unlock(&send_messages_lock);
-	pthread_create(&send_mail,
-		       NULL,
+    
+    start_thread = !sending_mail;
+    sending_mail = TRUE;
+
+    if (start_thread) {
+	g_free(send_smtp_server); send_smtp_server = g_strdup(smtp_server);
+	pthread_create(&send_mail, NULL,
 		       (void *) &balsa_send_message_real, outbox);
 	/* Detach so we don't need to pthread_join
 	 * This means that all resources will be
 	 * reclaimed as soon as the thread exits
 	 */
 	pthread_detach(send_mail);
-	
     }
+    pthread_mutex_unlock(&send_messages_lock);
 #else				/*non-threaded code */
+    g_free(send_smtp_server); send_smtp_server = g_strdup(smtp_server);
     balsa_send_message_real(outbox);
 #endif
     return TRUE;
@@ -334,9 +334,6 @@ static MessageQueueItem* get_msg2send()
    This function may be called as a thread and should therefore do
    proper gdk_threads_{enter/leave} stuff around GTK,libbalsa or
    libmutt calls.
-   FIXME: translate error messages AFTER 1.0.0 release. balsa didn't print 
-   them before so it doesn't matter much and I don't want to confuse 
-   translation people.
 */
 static guint balsa_send_message_real(LibBalsaMailbox* outbox) {
     MessageQueueItem *mqi, *next_message;
@@ -355,7 +352,7 @@ static guint balsa_send_message_real(LibBalsaMailbox* outbox) {
     if(!message_queue) return TRUE;
 #endif
 
-    if (!balsa_app.smtp) {	
+    if (!send_smtp_server) {	
 	while ( (mqi = get_msg2send()) != NULL) {
 	    libbalsa_lock_mutt();
 	    i = mutt_invoke_sendmail(mqi->message->env->to,
@@ -369,23 +366,15 @@ static guint balsa_send_message_real(LibBalsaMailbox* outbox) {
 	    total_messages_left--; /* whatever the status is, one less to do*/
 	}
     } else {
-	i = libbalsa_smtp_send(balsa_app.smtp_server);
+	i = libbalsa_smtp_send(send_smtp_server);
 	
 /* We give a message to the user because an error has ocurred in the protocol
  * A mistyped address? A server not allowing relay? We can pop a window to ask
  */
-	if (i == -2) {
-#if 0
-	    MSGSENDTHREAD(
-		threadmsg, MSGSENDTHREADERROR, 
-		_("SMTP protocol error. Cannot relay.\n"
-		  "Your message is left in Outbox."), NULL, NULL, 0);
-#else
+	if (i == -2)
 	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 				 _("SMTP protocol error. Cannot relay.\n"
 				   "Your message is left in Outbox."));
-#endif
-	}
     }
     /* We give back all the resources used and delete the sent messages */
     
@@ -748,7 +737,7 @@ static int libbalsa_smtp_protocol(int s, char *tempfile,
  * -2    Error during protocol 
  * 1     Everything when perfect */
 /* Does not expect the GDK lock to be held */
-static int libbalsa_smtp_send(char *server) {
+static int libbalsa_smtp_send(const char *server) {
 
     struct sockaddr_in sin;
     struct hostent *he;
@@ -756,10 +745,10 @@ static int libbalsa_smtp_send(char *server) {
     int n, s, error = 0, SmtpPort = 25;
     MessageQueueItem *current_message;
 #ifdef BALSA_USE_THREADS
-    SendThreadMessage *error_message, *finish_message;
-    char error_msg[256];
+    SendThreadMessage *finish_message;
 #endif
 
+    g_return_val_if_fail(server, -1);
     /* Here we make the conecction */
     s = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
 
@@ -767,21 +756,12 @@ static int libbalsa_smtp_send(char *server) {
     sin.sin_family = AF_INET;
     sin.sin_port = htons(SmtpPort);
 
-    if ((n = inet_addr(NONULL(server))) == -1) {
+    if ((n = inet_addr(server)) == -1) {
 	/* Must be a DNS name */
-	if ((he = gethostbyname(NONULL(balsa_app.smtp_server))) ==
-	    NULL) {
-#ifdef BALSA_USE_THREADS
-	    sprintf(error_msg,
-		    _("Could not find address for host %s."), server);
-	    MSGSENDTHREAD(error_message, MSGSENDTHREADERROR, error_msg,
-			  NULL, NULL, 0);
-#else
-	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-				 _
-				 ("Error: Could not find address for host %s."),
-				 server);
-#endif
+	if ((he = gethostbyname(server)) == NULL) {
+	    libbalsa_information(
+		LIBBALSA_INFORMATION_WARNING,
+		_("Error: Could not find address for host %s."), server);
 	    return -1;
 	}
 	memcpy((void *) &sin.sin_addr, *(he->h_addr_list),
@@ -791,18 +771,13 @@ static int libbalsa_smtp_send(char *server) {
     }
 
     libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
-			 "Connecting to %s", inet_ntoa(sin.sin_addr));
+			 _("Connecting to %s"), inet_ntoa(sin.sin_addr));
 
     if (connect
 	(s, (struct sockaddr *) &sin,
 	 sizeof(struct sockaddr_in)) == -1) {
-#ifdef BALSA_USE_THREADS
-	sprintf(error_msg, "Error connecting to %s.", server);
-	MSGSENDTHREAD(error_message, MSGSENDTHREADERROR, error_msg,
-		      NULL, NULL, 0);
-#else
-	fprintf(stderr, "Error connecting to host\n\n");
-#endif
+	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+			     _("Error connecting to %s."), server);
 	return -1;
     }
 
@@ -837,14 +812,9 @@ static int libbalsa_smtp_send(char *server) {
 
 #ifdef BALSA_USE_THREADS
 	pthread_mutex_lock(&send_messages_lock);
-
 	total_messages_left--;
-	if (current_message->next_message == NULL)
-	    sending_mail = FALSE;
-
 	pthread_mutex_unlock(&send_messages_lock);
 #endif
-	current_message = current_message->next_message;
     }
 
 /* We close the conection */
@@ -859,11 +829,8 @@ static int libbalsa_smtp_send(char *server) {
 		  NULL, 0);
 #endif
 
-
     if (error == 1)
 	return -2;
-
-
     return 1;
 
 }

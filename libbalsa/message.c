@@ -1291,26 +1291,27 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
      * message structure with it, and allocate memory for another set of
      * g_strdup's? */
 
-    if (!message->references_for_threading) 
-        message->references_for_threading = 
-            g_list_reverse(g_list_copy(message->references));
-#if 0
-    /* According to  RFC 1036 (section 2.2.5), MessageIDs in References header
-     * must be in the oldest first order; the direct parent should be last. 
-     * It seems, however, some MUAs ignore this rule.
-     * For example, one of them adds the direct parent to the head of
-     * the References header.
-     */
-    if (message->in_reply_to != NULL &&
-        message->references_for_threading != NULL &&
-        1 < g_list_length(message->references_for_threading) &&
-        strcmp(message->in_reply_to,
-               (g_list_first(message->references_for_threading))->data) ==
-        0) {
-        GList *foo = message->references_for_threading;
-        message->references_for_threading = g_list_remove(foo, foo->data);
+   if (!message->references_for_threading) {
+       GList *tmp = g_list_copy(message->references);
+
+       if (message->in_reply_to) {
+           /* some mailers provide in_reply_to but no references, and
+            * some apparently provide both but with the references in
+            * the wrong order; we'll just make sure it's the first item
+            * of this list (which will be the last after reversing it,
+            * below) */
+           GList *foo =
+               g_list_find_custom(tmp, message->in_reply_to,
+                                  (GCompareFunc) strcmp);
+               
+           if (foo) {
+               tmp = g_list_remove_link(tmp, foo);
+               g_list_free_1(foo);
+           }
+	   tmp = g_list_prepend(tmp, message->in_reply_to);
+       }
+       message->references_for_threading = g_list_reverse(tmp);
     }
-#endif
 }
 
 /* libbalsa_message_title:

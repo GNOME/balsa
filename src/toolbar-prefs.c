@@ -301,7 +301,7 @@ recreate_preview(BalsaToolbarType toolbar, gboolean preview_only)
 					  toolbar_buttons[index].pixmap_id),
 #else
                 gtk_image_new_from_stock(toolbar_buttons[index].pixmap_id,
-                                         GTK_ICON_SIZE_BUTTON),
+                                         GTK_ICON_SIZE_LARGE_TOOLBAR),
 #endif                          /* BALSA_MAJOR < 2 */
 		NULL,
 		NULL);
@@ -894,7 +894,7 @@ clist_set_pixmap_from_stock(GtkCList * clist, gint row,
 #else
     GdkPixbuf *pixbuf =
         gtk_widget_render_icon(GTK_WIDGET(clist), stock_id,
-                               GTK_ICON_SIZE_BUTTON, "Balsa");
+                               GTK_ICON_SIZE_LARGE_TOOLBAR, "Balsa");
 
     gdk_pixbuf_render_pixmap_and_mask(pixbuf, &pixmap, &mask, 1);
     gdk_pixbuf_unref(pixbuf);

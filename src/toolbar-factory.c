@@ -579,7 +579,7 @@ get_toolbar(GtkWidget *window, BalsaToolbarType toolbar)
 			window, toolbar_buttons[button].pixmap_id),
 #else
                     gtk_image_new_from_stock(toolbar_buttons[button].pixmap_id,
-                                             GTK_ICON_SIZE_BUTTON),
+                                             GTK_ICON_SIZE_LARGE_TOOLBAR),
 #endif                          /* BALSA_MAJOR < 2 */
 		    GTK_SIGNAL_FUNC(tmpdata[i].callback),
 		    tmpdata[i].data != NULL ? tmpdata[i].data : window);

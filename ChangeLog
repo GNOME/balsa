@@ -1,3 +1,9 @@
+2002-08-11  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/toolbar-factory.c, src/toolbar-prefs.c: use
+	GTK_ICON_SIZE_LARGE_TOOLBAR
+	* libbalsa/message.c: port threading fix from HEAD.
+	
 2002-08-06  Pawel Salek <pawsa@theochem.kth.se>
 
 	Compile with updated auto*build tools.

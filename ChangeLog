@@ -1,3 +1,12 @@
+2001-01-06  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/mailbox-conf.c: append POP mailbox nodes to 
+	balsa_app.input_inbox instead of just mailboxes. MailboxNodes
+	handle configuration and other UI issues.
+	* src/pref-manager.c:the POP 'mailboxes' are not in mailbox_nodes 
+	any more.
+	* src/save-restore.c: update accordingly.
+
 2001-01-06  Pablo Saratxaga <pablo@mandrakesoft.com>
 
 	* *.desktop,sounds/*.soundlist: added Azeri strings

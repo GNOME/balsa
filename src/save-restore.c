@@ -245,7 +245,8 @@ config_mailbox_init(const gchar * prefix)
 
     if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
 	balsa_app.inbox_input =
-	    g_list_append(balsa_app.inbox_input, mailbox);
+	    g_list_append(balsa_app.inbox_input, 
+			  balsa_mailbox_node_new_from_mailbox(mailbox));
     } else if (strcmp("Inbox/", key) == 0)
 	balsa_app.inbox = mailbox;
     else if (strcmp("Outbox/", key) == 0)

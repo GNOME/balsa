@@ -969,12 +969,11 @@ void
 update_pop3_servers(void)
 {
     GtkCList *clist;
-    GNode *node;
     GList *list = balsa_app.inbox_input;
     gchar *text[2];
     gint row;
 
-    LibBalsaMailbox *mailbox;
+    BalsaMailboxNode *mbnode;
 
     if (!pui)
 	return;
@@ -985,19 +984,18 @@ update_pop3_servers(void)
 
     gtk_clist_freeze(clist);
     while (list) {
-	mailbox = list->data;
-	if (mailbox) {
-	    if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
+	mbnode = list->data;
+	if (mbnode) {
+	    if (LIBBALSA_IS_MAILBOX_POP3(mbnode->mailbox))
 		text[0] = "POP3";
-	    } else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
+	    else if (LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox))
 		text[0] = "IMAP";
-	    } else {
+	    else 
 		text[0] = "????";
-	    }
-	    text[1] = mailbox->name;
+
+	    text[1] = mbnode->mailbox->name;
 	    row = gtk_clist_append(clist, text);
-	    node = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, mailbox);
-	    gtk_clist_set_row_data(clist, row, BALSA_MAILBOX_NODE(node->data));
+	    gtk_clist_set_row_data(clist, row, mbnode);
 	}
 	list = list->next;
     }

@@ -215,7 +215,7 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
     /* Remove the node from balsa's mailbox list */
     if (LIBBALSA_IS_MAILBOX_POP3(mailbox))
 	balsa_app.inbox_input = g_list_remove(balsa_app.inbox_input, 
-					      mailbox);
+					      mbnode);
     else {
 	gnode = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, mailbox);
 	if (!gnode) {
@@ -644,27 +644,29 @@ static void
 mailbox_conf_add(MailboxConfWindow *mcw)
 {
     GNode *node;
+    BalsaMailboxNode * mbnode;
 
     mcw->mailbox = gtk_type_new(mcw->mailbox_type);
     mcw->mailbox->name = g_strdup(gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name)));
 
+    mbnode = balsa_mailbox_node_new_from_mailbox(mcw->mailbox);
     if ( LIBBALSA_IS_MAILBOX_LOCAL(mcw->mailbox) ) {
 	gchar *path;
 
 	path = gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.local.path));
 	libbalsa_mailbox_local_set_path(LIBBALSA_MAILBOX_LOCAL(mcw->mailbox), path);
 
-	node =g_node_new(balsa_mailbox_node_new_from_mailbox(mcw->mailbox));
+	node =g_node_new(mbnode);
 	g_node_append(balsa_app.mailbox_nodes, node);
     } else if ( LIBBALSA_IS_MAILBOX_POP3(mcw->mailbox) ) {
 	/* POP3 Mailboxes */
 	update_pop_mailbox(mcw);
 	balsa_app.inbox_input =
-	    g_list_append(balsa_app.inbox_input, mcw->mailbox);
+	    g_list_append(balsa_app.inbox_input, mbnode);
     } else if ( LIBBALSA_IS_MAILBOX_IMAP(mcw->mailbox) ) {
 	update_imap_mailbox(mcw);
 
-	node = g_node_new(balsa_mailbox_node_new_from_mailbox(mcw->mailbox));
+	node = g_node_new(mbnode);
 	g_node_append(balsa_app.mailbox_nodes, node);
     } else {
 	g_assert_not_reached();

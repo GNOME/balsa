@@ -1,5 +1,7 @@
-2002-12-20 08:36  PeterB
+2002-12-20 09:46  PeterB
 
+	* doc/C/balsa.xml, src/toolbar-prefs.c: Add help text for the
+	Settings => Toolbars... dialog.
 	* libbalsa/misc.c (libbalsa_make_string_from_list_p,
         * libbalsa_readfile_nostat, unwrap_rfc2646, dowrap_rfc2646,
         * libbalsa_wrap_rfc2646): Streamline use of GString.

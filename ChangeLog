@@ -1,5 +1,9 @@
 2001-06-20  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* README, NEWS, configure.in: release 1.1.6
+	
+2001-06-20  Pawel Salek  <pawsa@theochem.kth.se>
+
 	Rename libbalsa_mailbox_commit_changes() to more apriopriate
 	libbalsa_mailbox_sync_backend() (When I think about it now,
 	sync_with_libmutt() would be more specific...). And also:

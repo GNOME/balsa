@@ -1,9 +1,17 @@
+* Balsa-1.1.6 development release. Release date 2001-06-21
+
+- multiple identity support (Matthew Guenther).
+- message deletion optimizations.
+- mailbox index flipping on message deletion or transfer fixed.
+- more IMAP Cyrus fixes (Peter Bloomfield)
+- MH nested mailboxes support (Gordon Oliver).
+
 * Balsa-1.1.5 development release. Release date 2001-05-21
 
 - libESMTP used for message submission: AUTH and PIPELINE extension available.
-- active URLs in text messages.
-- pipe signature support.
-- printing rewritten: printing images etc.
+- active URLs in text messages. (Albrecht Dreﬂ)
+- pipe signature support. (Julian M Catchen)
+- printing rewritten: printing images etc. (Albrecht Dreﬂ)
 
 * Balsa-1.1.4 development release. Release date 2001-04-20
 

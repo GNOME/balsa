@@ -1,3 +1,9 @@
+2001-02-07  Matthew Guenther  <guentherm@asme.org>
+
+	* src/balsa-mblist.c: change sorting function to automatically
+	place "core" mailboxes (i.e. Inbox, Sentbox...) at the top of the
+	mailbox list when sorting by name.
+
 2001-02-06  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* README,INSTALL,NEWS, configure.in: bump version number to 1.1.1

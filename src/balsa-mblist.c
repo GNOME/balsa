@@ -99,9 +99,9 @@ static void balsa_mblist_folder_style(GtkCTree * ctree,
 				      GtkCTreeNode * node, gpointer data);
 static GdkFont *balsa_widget_get_bold_font(GtkWidget * widget); 
 static void balsa_mblist_set_style(BalsaMBList * mblist);
-
-static gint numeric_compare(GtkCList * clist, gconstpointer ptr1,
-			    gconstpointer ptr2);
+static gint balsa_mblist_core_mailbox(LibBalsaMailbox* mailbox);
+static gint balsa_mblist_row_compare(GtkCList * clist, gconstpointer ptr1,
+                                     gconstpointer ptr2);
 static gint mblist_mbnode_compare(gconstpointer a, gconstpointer b);
 static void mblist_drag_cb (GtkWidget* widget,
                             GdkDragContext* context, gint x, gint y,
@@ -514,7 +514,7 @@ balsa_mblist_init(BalsaMBList * tree)
 
     gtk_clist_set_sort_column(GTK_CLIST(tree), 0);
     gtk_clist_set_sort_type(GTK_CLIST(tree), GTK_SORT_ASCENDING);
-    gtk_clist_set_compare_func(GTK_CLIST(tree), NULL);
+    gtk_clist_set_compare_func(GTK_CLIST(tree), balsa_mblist_row_compare);
 
     if (!tree->display_info) {
 	gtk_clist_set_column_visibility(GTK_CLIST(tree), 1, FALSE);
@@ -850,11 +850,6 @@ balsa_mblist_column_click(GtkCList * clist, gint column, gpointer data)
 	gtk_clist_set_sort_type(clist, GTK_SORT_ASCENDING);
     }
 
-    if (column == 0)
-	gtk_clist_set_compare_func(clist, NULL);
-    else 
-	gtk_clist_set_compare_func(clist, numeric_compare);
-
     gtk_ctree_sort_recursive(GTK_CTREE(data), NULL);
 }
 
@@ -1175,34 +1170,109 @@ balsa_mblist_folder_style(GtkCTree * ctree, GtkCTreeNode * node,
     }
 }
 
-/* numeric_compare [MBG]
+
+/* balsa_mblist_core_mailbox
  * 
- * Description: this is for sorting mailboxes by number of unread or
- * total messages.
+ * Simple function, if the mailbox is one of the five "core" mailboxes
+ * (i.e. Inbox, Sentbox...) it returns an integer representing it's
+ * place in the desired heirarchy in the mblist.  If the mailbox is
+ * not a core mailbox it returns zero. 
  * */
 static gint
-numeric_compare(GtkCList * clist, gconstpointer ptr1, gconstpointer ptr2)
+balsa_mblist_core_mailbox(LibBalsaMailbox* mailbox)
 {
-    LibBalsaMailbox *m1;
-    LibBalsaMailbox *m2;
-
-    GtkCListRow *row1 = (GtkCListRow *) ptr1;
-    GtkCListRow *row2 = (GtkCListRow *) ptr2;
-
-    m1 = ((BalsaMailboxNode*)row1->data)->mailbox;
-    m2 = ((BalsaMailboxNode*)row2->data)->mailbox;
-
-    g_return_val_if_fail(m1, 0);
-    g_return_val_if_fail(m2, 0);
-
-    switch(clist->sort_column) {
-    case 1:
-	return m2->unread_messages-m1->unread_messages; 
-    case 2:
-	return m2->total_messages-m1->total_messages; 
+    static const int num_core_mailboxes = 5;
+    LibBalsaMailbox* core_mailbox[] = {
+        balsa_app.inbox,
+        balsa_app.sentbox,
+        balsa_app.draftbox,
+        balsa_app.outbox,
+        balsa_app.trash
+    };
+    gint i = 0;
+    
+    for (i = 0; i < num_core_mailboxes; ++i) {
+        if (mailbox == core_mailbox[i]) {
+            /* we want to return as if from a base-1 array */
+            return num_core_mailboxes - i + 1;
+        }
     }
+    
+    /* if we couldn't find the mailbox, return 0 */
     return 0;
 }
+
+
+/* balsa_mblist_row_compare
+ * 
+ * This function determines the sorting order of the clist, depending
+ * on what column is selected.  The first column sorts by name, with
+ * exception given to the five "core" mailboxes (Inbox, Draftbox,
+ * Sentbox, Outbox, Trash).  The second sorts by number of unread
+ * messages, and the third by total number of messages.
+ * */
+static gint
+balsa_mblist_row_compare(GtkCList* clist, gconstpointer ptr1, 
+                         gconstpointer ptr2)
+{
+        LibBalsaMailbox* m1 = NULL;
+        LibBalsaMailbox* m2 = NULL;
+        BalsaMailboxNode* node1 = NULL;
+        BalsaMailboxNode* node2 = NULL;
+        GtkCListRow* row1 = NULL;
+        GtkCListRow* row2 = NULL;
+        gint core1 = 0;
+        gint core2 = 0;
+
+
+        row1 = (GtkCListRow*) ptr1;
+        row2 = (GtkCListRow*) ptr2;
+        
+        g_return_val_if_fail(row1, -1);
+        g_return_val_if_fail(row2, 1);
+        
+        m1 = ((BalsaMailboxNode*)row1->data)->mailbox;
+        m2 = ((BalsaMailboxNode*)row2->data)->mailbox;
+
+        switch (clist->sort_column) {
+        case 0:
+            if (!m1 || !m2) {
+                /* compare using names, potentially mailboxnodes */
+                node1 = (BalsaMailboxNode*)row1->data;
+                node2 = (BalsaMailboxNode*)row2->data;
+
+                if (!m1 && !m2) {
+                    return g_strcasecmp(node1->name, node2->name);
+                } else if (m1) {
+                    if (balsa_mblist_core_mailbox(m1))
+                        return -1;
+                    else
+                        return g_strcasecmp(m1->name, g_basename(node2->name));
+                } else {
+                    if (balsa_mblist_core_mailbox(m2)) 
+                        return 1;
+                    else
+                        return g_strcasecmp(g_basename(node1->name), m2->name);
+                }
+            } else if (balsa_mblist_core_mailbox(m1) || 
+                       balsa_mblist_core_mailbox(m2)) {
+                core1 = balsa_mblist_core_mailbox(m1);
+                core2 = balsa_mblist_core_mailbox(m2);
+                return core2 - core1;
+            } else {
+                return g_strcasecmp(m1->name, m2->name);
+            } 
+        case 1:
+            return m2->unread_messages - m1->unread_messages;
+
+        case 2:
+            return m2->total_messages - m1->total_messages;
+    
+        default:
+            return 0;
+        }
+}
+
 
 /* mblist_mbnode_compare [MBG]
  *   (GtkCTreeCompareFunc)

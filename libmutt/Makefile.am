@@ -5,10 +5,15 @@ SSLSOURCES = mutt_ssl.c mutt_ssl.h
 endif
 
 if USE_SASL
-SASLSOURCES = 	mutt_sasl.c
+SASLSOURCES = mutt_sasl.c
+endif
+
+if USE_NSS
+NSSSOURCES = mutt_ssl_nss.c
 endif
 
 noinst_LIBRARIES = libmutt.a
+
 
 libmutt_a_SOURCES = \
 	account.c	\
@@ -21,7 +26,6 @@ libmutt_a_SOURCES = \
 	copy.c 		\
 	date.c 		\
 	dotlock.c	\
-	filter.c 	\
 	flags.c 	\
 	from.c 		\
 	getdomain.c	\
@@ -35,19 +39,16 @@ libmutt_a_SOURCES = \
 	mh.c 		\
 	mx.c 		\
 	mutt_socket.c	\
-	mutt_tunnel.c	\
 	muttlib.c	\
 	parse.c 	\
 	pattern.c 	\
-	rfc1524.c 	\
+	recvattach.c	\
 	rfc2047.c 	\
+	rfc2231.c	\
 	rfc822.c 	\
-	score.c 	\
 	sendlib.c 	\
 	signal.c 	\
 	sort.c 		\
-	system.c 	\
-	thread.c	\
 	url.c		\
 	acconfig.h	\
 	account.h	\
@@ -63,6 +64,7 @@ libmutt_a_SOURCES = \
 	history.h	\
 	init.h		\
 	keymap.h	\
+	keymap_defs.h	\
 	lib.h		\
 	mailbox.h	\
 	mapping.h	\
@@ -81,10 +83,11 @@ libmutt_a_SOURCES = \
 	protos.h	\
 	rfc1524.h	\
 	rfc2047.h	\
+	rfc2231.h	\
 	rfc822.h	\
 	sort.h		\
 	url.h		\
-	$(SSLSOURCES)	$(SASLSOURCES)
+	$(SSLSOURCES)	$(SASLSOURCES)  $(NSSSOURCES)
 
 SUBDIRS = imap
 

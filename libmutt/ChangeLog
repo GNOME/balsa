@@ -1,3 +1,11 @@
+2002-05-31  Carlos Morgado  <chbm@chbm.nu>
+
+	* Makefile.am:
+	* rfc1524.c:
+	* rfc2231.c:
+	* rfc2231.h
+	sync with HEAD
+	
 2002-05-30  Carlos Morgado  <chbm@chbm.nu>
 
 	copied libmutt from HEAD to BALSA2, there were some changes

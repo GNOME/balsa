@@ -246,16 +246,21 @@ run_filters_on_reception(LibBalsaMailbox * mailbox)
 
     /* Load associated filters if needed */
     if (!mailbox->filters)
-	config_mailbox_filters_load(LIBBALSA_MAILBOX(mailbox));
+	config_mailbox_filters_load(mailbox);
 
-    filters = libbalsa_mailbox_filters_when(LIBBALSA_MAILBOX(mailbox)->filters,FILTER_WHEN_INCOMING);
-    
+    filters = libbalsa_mailbox_filters_when(mailbox->filters,FILTER_WHEN_INCOMING);
     /* We apply filter if needed */
-
-    new_messages=libbalsa_extract_new_messages(mailbox->message_list);
-    filters_run_on_messages(filters, new_messages);
-    g_list_free(new_messages);
-    g_slist_free(filters);
+    if (filters) {
+	new_messages=libbalsa_extract_new_messages(mailbox->message_list);
+	if (new_messages) {
+	    if (filters_prepare_to_run(filters))
+		filters_run_on_messages(filters, new_messages);
+	    /* FIXME : do better error report */
+	    else g_warning("Filter error\n");
+	    g_list_free(new_messages);
+	}
+	g_slist_free(filters);
+    }
 }
 #endif /*BALSA_SHOW_ALL*/    
 

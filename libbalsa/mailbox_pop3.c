@@ -310,11 +310,16 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 	/* Load associated filters if needed */
 	if (!mailbox->filters)
 	    libbalsa_mailbox_filters_load_config(mailbox);
- 
+	
 	filters = libbalsa_mailbox_filters_when(mailbox->filters,
-					      FILTER_WHEN_INCOMING);
-	filters_run_on_messages(filters, tmp_mailbox->message_list);
-	g_slist_free(filters);
+						FILTER_WHEN_INCOMING);
+	if (filters) {
+	    if (filters_prepare_to_run(filters))
+		filters_run_on_messages(filters, tmp_mailbox->message_list);
+	    /* FIXME : do better error report */
+	    else g_warning("Filter error\n");
+	    g_slist_free(filters);
+	}
 #endif /*BALSA_SHOW_ALL*/
 
 	if (!libbalsa_messages_move(tmp_mailbox->message_list, m->inbox)) {    

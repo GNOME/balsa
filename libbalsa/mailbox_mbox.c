@@ -396,8 +396,7 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox, GError **err)
 	return FALSE;
     }
 
-    if (!mailbox->readonly)
-	mailbox->readonly = access (path, W_OK) ? 1 : 0;
+    mailbox->readonly = access (path, W_OK);
     fd = open(path, mailbox->readonly ? O_RDONLY : O_RDWR);
     if (fd == -1) {
 	g_set_error(err, LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_OPEN_ERROR,

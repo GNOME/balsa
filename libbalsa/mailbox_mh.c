@@ -491,8 +491,7 @@ libbalsa_mailbox_mh_open(LibBalsaMailbox * mailbox, GError **err)
     mh->msgno_2_msg_info = g_ptr_array_new();
     mh->last_fileno = 0;
     
-    if (!mailbox->readonly)
-	mailbox->readonly = access (path, W_OK) ? 1 : 0;
+    mailbox->readonly = access (path, W_OK);
     mailbox->unread_messages = 0;
     lbm_mh_parse_both(mh);
 

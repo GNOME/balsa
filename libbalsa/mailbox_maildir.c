@@ -466,11 +466,10 @@ libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox, GError **err)
 	mdir->mtime_new = st.st_mtime;
     }
 
-    if (!mailbox->readonly
-	&& (access(mdir->curdir, W_OK) < 0
-	    || access(mdir->newdir, W_OK) < 0
-	    || access(mdir->tmpdir, W_OK) < 0))
-	mailbox->readonly = TRUE;
+    mailbox->readonly = 
+	!(access(mdir->curdir, W_OK) == 0 &&
+          access(mdir->newdir, W_OK) == 0 &&
+          access(mdir->tmpdir, W_OK) == 0);
 
     mailbox->unread_messages = 0;
     parse_mailbox_subdirs(mailbox);

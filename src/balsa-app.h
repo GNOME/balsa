@@ -53,12 +53,9 @@ extern struct BalsaApplication
   IndexChild *current_index_child;
 
   Mailbox *inbox;
-  gchar *inbox_path;
   GList *inbox_input; /* mailboxes such as POP3, etc that will be appending into inbox */
   Mailbox *outbox;
-  gchar *outbox_path;
   Mailbox *trash;
-  gchar *trash_path;
   
   GNode *mailbox_nodes;
 

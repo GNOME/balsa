@@ -73,7 +73,19 @@ send_message (Message * message, gchar * smtp_server, glong debug)
 
   mutt_update_encoding (msg->content);
 
-  mutt_send_message (msg, balsa_app.outbox_path);
+  /* FIXME */
+  switch (balsa_app.outbox->type)
+    {
+    case MAILBOX_MAILDIR:
+    case MAILBOX_MH:
+    case MAILBOX_MBOX:
+      mutt_send_message (msg, MAILBOX_LOCAL(balsa_app.outbox)->path);
+      break;
+    case MAILBOX_IMAP:
+      break;
+    case MAILBOX_POP3:
+      break;
+    }
 
   unlink (msg->content->filename);
 

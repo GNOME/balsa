@@ -72,13 +72,15 @@ add_mailbox (gchar * name, gchar * path, MailboxType type, gint isdir)
   Mailbox *mailbox;
   GNode *rnode;
   GNode *node;
-
+/* FIXME */
+#if 0
   if (!strcmp (path, balsa_app.inbox_path))
     return;
   if (!strcmp (path, balsa_app.outbox_path))
     return;
   if (!strcmp (path, balsa_app.trash_path))
     return;
+#endif
 
   if (isdir && type == MAILBOX_UNKNOWN)
     {

@@ -205,11 +205,27 @@ load_mailboxes (gchar * name)
 	  mailbox = mailbox_new (mailbox_type);
 	  mailbox->name = g_strdup (name);
 	  MAILBOX_LOCAL (mailbox)->path = g_strdup (path);
-	  if (mailbox_type == MAILBOX_MH)
-	    node = g_node_new (mailbox_node_new (g_strdup (mailbox->name), mailbox, TRUE));
+
+	  if (strcmp ("Inbox", name) == 0)
+	    {
+	      balsa_app.inbox = mailbox;
+	    }
+	  else if (strcmp ("Outbox", name) == 0)
+	    {
+	      balsa_app.outbox = mailbox;
+	    }
+	  else if (strcmp ("Trash", name) == 0)
+	  {
+	    balsa_app.trash = mailbox;
+	  }
 	  else
-	    node = g_node_new (mailbox_node_new (g_strdup (mailbox->name), mailbox, FALSE));
-	  g_node_append (balsa_app.mailbox_nodes, node);
+	  {
+	    if (mailbox_type == MAILBOX_MH)
+	      node = g_node_new (mailbox_node_new (g_strdup (mailbox->name), mailbox, TRUE));
+	    else
+	      node = g_node_new (mailbox_node_new (g_strdup (mailbox->name), mailbox, FALSE));
+	    g_node_append (balsa_app.mailbox_nodes, node);
+	  }
 	}
       break;
 
@@ -273,26 +289,9 @@ restore_global_settings ()
   g_string_sprintf (path, "%s/Mail", g_get_home_dir ());
   balsa_app.local_mail_directory = get_string_set_default ("local mail directory", path->str);
 
-  /* important mailboxes */
-  balsa_app.inbox_path = gnome_config_get_string ("inbox");
-  if (!balsa_app.inbox_path)
-    {
-      g_snprintf (tmp, PATH_MAX, "%s/%s", MAILPATH, g_get_user_name());
-      balsa_app.inbox_path = g_strdup (tmp);
-    }
-  balsa_app.outbox_path = gnome_config_get_string ("outbox");
-  if (!balsa_app.outbox_path)
-    {
-      g_snprintf (tmp, PATH_MAX, "%s/Mail/outbox", path->str);
-      balsa_app.outbox_path = g_strdup (tmp);
-    }
-  balsa_app.trash_path = gnome_config_get_string ("trash");
-  if (!balsa_app.trash_path)
-    {
-      g_snprintf (tmp, PATH_MAX, "%s/Mail/trash", path->str);
-      balsa_app.trash_path = g_strdup (tmp);
-    }
-  g_string_free (path, TRUE);
+  load_mailboxes ("Inbox");
+  load_mailboxes ("Outbox");
+  load_mailboxes ("Trash");
 
   /* smtp server */
   balsa_app.smtp_server = get_string_set_default ("smtp server", "localhost");
@@ -327,15 +326,12 @@ save_global_settings ()
   gnome_config_set_string ("host name", balsa_app.hostname);
   gnome_config_set_string ("smtp server", balsa_app.smtp_server);
 
-  gnome_config_set_string ("inbox", balsa_app.inbox_path);
-  gnome_config_set_string ("outbox", balsa_app.outbox_path);
-  gnome_config_set_string ("trash", balsa_app.trash_path);
   gnome_config_set_string ("local mail directory", balsa_app.local_mail_directory);
   gnome_config_set_int ("main window width", (gint) balsa_app.mw_width);
   gnome_config_set_int ("main window height", (gint) balsa_app.mw_height);
   gnome_config_set_int ("toolbar style", (gint) balsa_app.toolbar_style);
-  gnome_config_set_int ("debug", (gint) balsa_app.debug);
   gnome_config_set_int ("mdi style", (gint) balsa_app.mdi_style);
+  gnome_config_set_int ("debug", (gint) balsa_app.debug);
 
   gnome_config_pop_prefix ();
   gnome_config_sync ();

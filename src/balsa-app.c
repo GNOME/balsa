@@ -50,7 +50,7 @@ void
 init_balsa_app (int argc, char *argv[])
 {
   gchar *tmp;
-	
+
   /* 
    * initalize application structure before ALL ELSE 
    * to some reasonable defaults
@@ -62,12 +62,9 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.smtp_server = NULL;
 
   balsa_app.inbox = NULL;
-  balsa_app.inbox_path = NULL;
   balsa_app.inbox_input = NULL;
   balsa_app.outbox = NULL;
-  balsa_app.outbox_path = NULL;
   balsa_app.trash = NULL;
-  balsa_app.trash_path = NULL;
 
   balsa_app.mailbox_nodes = g_node_new (NULL);
   balsa_app.current_index_child = NULL;
@@ -81,23 +78,31 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.mw_width = MW_DEFAULT_WIDTH;
   balsa_app.mw_height = MW_DEFAULT_HEIGHT;
   balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
-  balsa_app.mdi_style = GNOME_MDI_NOTEBOOK;
+  balsa_app.mdi_style = GNOME_MDI_DEFAULT_MODE;
 
   /* initalize our mailbox access crap */
   restore_global_settings ();
 
-  mailbox_init (balsa_app.inbox_path);
+  switch (balsa_app.inbox->type)
+    {
+    case MAILBOX_MAILDIR:
+    case MAILBOX_MBOX:
+    case MAILBOX_MH:
+      mailbox_init (MAILBOX_LOCAL (balsa_app.inbox)->path);
+      break;
+
+    case MAILBOX_IMAP:
+      break;
+
+    case MAILBOX_POP3:
+      break;
+    }
 
   read_signature ();
 
   /* Check to see if this is the first time we've run balsa */
 
-  if (!(tmp = gnome_config_get_string("/balsa/Global/inbox")))
-    {
-      initialize_balsa (argc, argv);
-      return;
-    }
-  else if (strcmp(tmp, "") == 0)
+  if (!balsa_app.inbox)
     {
       initialize_balsa (argc, argv);
       return;
@@ -131,8 +136,8 @@ read_signature ()
   gchar path[PATH_MAX];
   sprintf (path, "%s/.signature", g_get_home_dir ());
   if (!(fp = fopen (path, "r")))
-	  return FALSE;
-  len = readfile(fp, &balsa_app.signature);
+    return FALSE;
+  len = readfile (fp, &balsa_app.signature);
   if (len != 0)
     balsa_app.signature[len - 1] = '\0';
   fclose (fp);
@@ -187,15 +192,4 @@ mailboxes_init (void)
 static void
 special_mailboxes ()
 {
-  balsa_app.inbox = mailbox_new (MAILBOX_MBOX);
-  balsa_app.inbox->name = g_strdup ("Inbox");
-  MAILBOX_LOCAL (balsa_app.inbox)->path = balsa_app.inbox_path;
-
-  balsa_app.outbox = mailbox_new (MAILBOX_MBOX);
-  balsa_app.outbox->name = g_strdup ("Outbox");
-  MAILBOX_LOCAL (balsa_app.outbox)->path = balsa_app.outbox_path;
-
-  balsa_app.trash = mailbox_new (MAILBOX_MBOX);
-  balsa_app.trash->name = g_strdup ("Trash");
-  MAILBOX_LOCAL (balsa_app.trash)->path = balsa_app.trash_path;
 }

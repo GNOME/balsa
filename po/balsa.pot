@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1998-08-16 13:05-0400\n"
+"POT-Creation-Date: 1998-08-16 20:05-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -38,57 +38,57 @@ msgstr ""
 msgid "Next..."
 msgstr ""
 
-#: src/balsa-init.c:189
+#: src/balsa-init.c:191
 msgid ""
 "Welcome to Balsa!\n"
 "\n"
 msgstr ""
 
-#: src/balsa-init.c:190
+#: src/balsa-init.c:192
 msgid "You seem to be running Balsa for the first time.\n"
 msgstr ""
 
-#: src/balsa-init.c:191
+#: src/balsa-init.c:193
 msgid "The following steps will setup Balsa by asking a few simple questions."
 msgstr ""
 
-#: src/balsa-init.c:192
+#: src/balsa-init.c:194
 msgid ""
 "Once you have completed these steps, you can always change them at a later "
 "time through Balsa's preferences."
 msgstr ""
 
-#: src/balsa-init.c:194
+#: src/balsa-init.c:196
 msgid ""
 "Please check the about box in Balsa's main window for more information on "
 "contacting the authors or reporting bugs."
 msgstr ""
 
-#: src/balsa-init.c:208
+#: src/balsa-init.c:210
 msgid ""
 "Welcome to Balsa!  The following steps will help you get setup to use Balsa."
 msgstr ""
 
 #. your name
-#: src/balsa-init.c:234 src/pref-manager.c:318
+#: src/balsa-init.c:236 src/pref-manager.c:315
 msgid "Your name:"
 msgstr ""
 
 #. email address
-#: src/balsa-init.c:248 src/pref-manager.c:328
+#: src/balsa-init.c:250 src/pref-manager.c:325
 msgid "E-Mail address:"
 msgstr ""
 
 #. smtp server
-#: src/balsa-init.c:263 src/pref-manager.c:338
+#: src/balsa-init.c:265 src/pref-manager.c:335
 msgid "SMTP server:"
 msgstr ""
 
-#: src/balsa-init.c:310
+#: src/balsa-init.c:312
 msgid "Balsa is now ready to run.  Click finish to save your settings"
 msgstr ""
 
-#: src/balsa-init.c:314
+#: src/balsa-init.c:316
 msgid "Finish"
 msgstr ""
 
@@ -128,7 +128,7 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#: src/local-mailbox.c:118
+#: src/local-mailbox.c:120
 #, c-format
 msgid "Local Mailbox Loaded as: %s\n"
 msgstr ""
@@ -309,20 +309,20 @@ msgid "View"
 msgstr ""
 
 #. MDI page
-#: src/pref-manager.c:145 src/pref-manager.c:438
+#: src/pref-manager.c:145 src/pref-manager.c:435
 msgid "MDI"
 msgstr ""
 
-#: src/pref-manager.c:367
+#: src/pref-manager.c:364
 msgid "Local mail directory:"
 msgstr ""
 
 #. Toolbars
-#: src/pref-manager.c:397
+#: src/pref-manager.c:394
 msgid "Toolbars"
 msgstr ""
 
-#: src/pref-manager.c:417
+#: src/pref-manager.c:414
 msgid "Debug"
 msgstr ""
 
@@ -376,7 +376,7 @@ msgstr ""
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr ""
 
-#: libbalsa/mailbox.c:1357
+#: libbalsa/mailbox.c:1362
 #, c-format
 msgid "Loading message: %s/%s\n"
 msgstr ""

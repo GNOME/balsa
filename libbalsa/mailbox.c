@@ -247,7 +247,7 @@ add_mailboxes_for_checking (Mailbox * mailbox)
 {
   BUFFY **tmp;
   struct stat sb;
-  
+
   if (!mailbox)
     return;
 
@@ -257,14 +257,14 @@ add_mailboxes_for_checking (Mailbox * mailbox)
 
   for (tmp = &Incoming; *tmp; tmp = &((*tmp)->next))
     {
-      if (strcmp (MAILBOX_LOCAL(mailbox)->path, (*tmp)->path) == 0)
+      if (strcmp (MAILBOX_LOCAL (mailbox)->path, (*tmp)->path) == 0)
 	break;
     }
 
   if (!*tmp)
     {
       *tmp = (BUFFY *) g_malloc (sizeof (BUFFY));
-      (*tmp)->path = g_strdup (MAILBOX_LOCAL(mailbox)->path);
+      (*tmp)->path = g_strdup (MAILBOX_LOCAL (mailbox)->path);
       (*tmp)->next = NULL;
     }
   (*tmp)->new = 0;
@@ -996,6 +996,11 @@ mailbox_type_description (MailboxType type)
 MailboxType
 mailbox_valid (gchar * filename)
 {
+  struct stat st;
+
+  if (stat (filename, &st) == -1)
+    return MAILBOX_UNKNOWN;
+
   switch (mx_get_magic (filename))
     {
     case M_MBOX:

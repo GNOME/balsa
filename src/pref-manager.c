@@ -225,7 +225,6 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
       balsa_app.hostname = g_strdup (c);
     }
   g_free (email);
-  g_free (c);
 
   g_free (balsa_app.smtp_server);
   balsa_app.smtp_server = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->smtp_server)));
@@ -238,7 +237,6 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
     if (GTK_TOGGLE_BUTTON (pui->toolbar_type[i])->active)
       {
 	balsa_app.toolbar_style = toolbar_type[i];
-	refresh_main_window ();
 	break;
       }
 
@@ -246,15 +244,15 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
     if (GTK_TOGGLE_BUTTON (pui->mdi_type[i])->active)
       {
 	balsa_app.mdi_style = mdi_type[i];
-	refresh_main_window ();
 	break;
       }
-#if 0
+
+  refresh_main_window ();
+
   /*
    * close window and free memory
    */
   save_global_settings ();
-#endif
 }
 
 

@@ -13,6 +13,7 @@ For 0.4.5 release:
 
  * inbox/outbox/trash should be able to be something other than mbox.  Need to
    add support for IMAP, mh or maildir ones.  (mh and/or maildir might work)
+     UPDATE: this is somewhat working.
 
  * fix it under solaris.  test under aix, hpux, and osf (digital unix i fink?)
      UPDATE: solaris seems to be ok now.  need to test other platforms.

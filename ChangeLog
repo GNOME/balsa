@@ -1,3 +1,8 @@
+2000-09-23  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/information.c: idle functions must unregister
+	themselves. this somehow worked on linux but failed on FreeBSD.
+	
 2000-09-21  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/balsa-message.c: Patch from Timothy Alan Chandler

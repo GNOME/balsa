@@ -26,10 +26,10 @@
 
 #include "information.h"
 
-static void libbalsa_message_idle_handler(gchar *msg);
-static void libbalsa_warning_idle_handler(gchar *msg);
-static void libbalsa_error_idle_handler(gchar *msg);
-static void libbalsa_debug_idle_handler(gchar *msg);
+static gboolean libbalsa_message_idle_handler(gchar *msg);
+static gboolean libbalsa_warning_idle_handler(gchar *msg);
+static gboolean libbalsa_error_idle_handler(gchar *msg);
+static gboolean libbalsa_debug_idle_handler(gchar *msg);
 
 LibBalsaInformationFunc libbalsa_real_information_func;
 
@@ -86,7 +86,7 @@ libbalsa_information(LibBalsaInformationType type, const char *fmt, ...)
 /*
  * These are all idle handlers, so we need to grab the GDK lock 
  */
-static void
+static gboolean
 libbalsa_message_idle_handler(gchar *msg)
 {
 	gdk_threads_enter();
@@ -94,8 +94,9 @@ libbalsa_message_idle_handler(gchar *msg)
 	gdk_threads_leave();
 
 	g_free(msg);
+	return FALSE;
 }
-static void
+static gboolean
 libbalsa_warning_idle_handler(gchar *msg)
 {
 	gdk_threads_enter();
@@ -103,8 +104,9 @@ libbalsa_warning_idle_handler(gchar *msg)
 	gdk_threads_leave();
 
 	g_free(msg);
+	return FALSE;
 }
-static void
+static gboolean
 libbalsa_error_idle_handler(gchar *msg)
 {
 	gdk_threads_enter();
@@ -112,8 +114,9 @@ libbalsa_error_idle_handler(gchar *msg)
 	gdk_threads_leave();
 
 	g_free(msg);
+	return FALSE;
 }
-static void
+static gboolean
 libbalsa_debug_idle_handler(gchar *msg)
 {
 	gdk_threads_enter();
@@ -121,4 +124,5 @@ libbalsa_debug_idle_handler(gchar *msg)
 	gdk_threads_leave();
 
 	g_free(msg);
+	return FALSE;
 }

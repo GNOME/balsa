@@ -229,6 +229,11 @@ struct _LibBalsaMailboxClass {
     void (*change_message_flags) (LibBalsaMailbox * mailbox, guint msgno,
                                   LibBalsaMessageFlag set,
                                   LibBalsaMessageFlag clear);
+    gboolean (*change_msgs_flags) (LibBalsaMailbox * mailbox,
+                                   GList *messages, /* change to list
+                                                     * of MSGNOs? */
+                                   LibBalsaMessageFlag set,
+                                   LibBalsaMessageFlag clear);
     void (*set_threading) (LibBalsaMailbox * mailbox,
 			   LibBalsaMailboxThreadingType thread_type);
     void (*update_view_filter) (LibBalsaMailbox * mailbox,
@@ -363,6 +368,11 @@ void libbalsa_mailbox_change_message_flags(LibBalsaMailbox * mailbox,
 					   guint msgno,
 					   LibBalsaMessageFlag set,
 					   LibBalsaMessageFlag clear);
+/* */
+gboolean libbalsa_mailbox_change_msgs_flags(LibBalsaMailbox * mailbox,
+                                            GList *messages,
+                                            LibBalsaMessageFlag set,
+                                            LibBalsaMessageFlag clear);
 
                                
 /*

@@ -58,7 +58,7 @@ struct _ImapMboxHandle {
   unsigned readonly_mbox:1;
 };
 
-extern const char* msg_flags[];
+extern const char* msg_flags[6];
 
 void imap_mbox_resize_cache(ImapMboxHandle *h, unsigned new_size);
 
@@ -70,5 +70,6 @@ int imap_cmd_start(ImapMboxHandle* handle, const char* cmd, unsigned* cmdno);
 ImapResponse imap_cmd_step(ImapMboxHandle* handle, unsigned cmdno);
 int imap_handle_write(ImapMboxHandle *conn, const char *buf, size_t len);
 void imap_handle_flush(ImapMboxHandle *handle);
+void mbox_view_append_no(MboxView *mv, unsigned seqno);
 
 #endif /* __IMAP_PRIVATE_H__ */

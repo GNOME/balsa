@@ -132,6 +132,10 @@ void libbalsa_mailbox_imap_change_message_flags(LibBalsaMailbox * mailbox,
 						guint msgno,
 						LibBalsaMessageFlag set,
 						LibBalsaMessageFlag clear);
+static gboolean lbm_imap_change_msgs_flags(LibBalsaMailbox * mailbox,
+                                           GList *messages,
+                                           LibBalsaMessageFlag set,
+                                           LibBalsaMessageFlag clear);
 static void libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
 						LibBalsaMailboxThreadingType
 						thread_type);
@@ -236,6 +240,8 @@ libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass * klass)
     libbalsa_mailbox_class->add_message = libbalsa_mailbox_imap_add_message;
     libbalsa_mailbox_class->change_message_flags =
 	libbalsa_mailbox_imap_change_message_flags;
+    libbalsa_mailbox_class->change_msgs_flags =
+	lbm_imap_change_msgs_flags;
     libbalsa_mailbox_class->set_threading =
 	libbalsa_mailbox_imap_set_threading;
     libbalsa_mailbox_class->update_view_filter =
@@ -1427,6 +1433,7 @@ static void
 lbm_imap_construct_body(LibBalsaMessageBody *lbbody, ImapBody *imap_body)
 {
     int i;
+    const char *str;
     g_return_if_fail(lbbody);
     g_return_if_fail(imap_body);
 
@@ -1460,7 +1467,10 @@ lbm_imap_construct_body(LibBalsaMessageBody *lbbody, ImapBody *imap_body)
     lbbody->mime_type = imap_body_get_mime_type(imap_body);
     for(i=0; lbbody->mime_type[i]; i++)
         lbbody->mime_type[i] = tolower(lbbody->mime_type[i]);
-    lbbody->filename  = g_strdup(imap_body_get_param(imap_body, "name"));
+    /* get the name in the same way as g_mime_part_get_filename() does */
+    str = imap_body_get_dsp_param(imap_body, "filename");
+    if(!str) str = imap_body_get_param(imap_body, "name");
+    lbbody->filename  = g_strdup(str);
     lbbody->charset   = g_strdup(imap_body_get_param(imap_body, "charset"));
     if(imap_body->envelope) {
         lbbody->embhdrs = g_new0(LibBalsaMessageHeaders, 1);
@@ -1471,17 +1481,10 @@ lbm_imap_construct_body(LibBalsaMessageBody *lbbody, ImapBody *imap_body)
         lbm_imap_construct_body(body, imap_body->next);
         lbbody->next = body;
     }
-    /* message/rfc822 requires special treatment for compatibility with
-     * rest of balsa. If the first child of the message/rfc822 is a multipart,
-     * we append it as a sibling of message/rfc822. */
     if(imap_body->child) {
         LibBalsaMessageBody *body = libbalsa_message_body_new(lbbody->message);
         lbm_imap_construct_body(body, imap_body->child);
-        if(imap_body->media_basic == IMBMEDIA_MESSAGE_RFC822 &&
-           imap_body->child->media_basic == IMBMEDIA_MULTIPART) {
-            body->next = lbbody->next;
-            lbbody->next = body;
-        } else lbbody->parts = body;
+        lbbody->parts = body;
     }
 }
 
@@ -1506,22 +1509,25 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
 
 static gboolean
 is_child_of(LibBalsaMessageBody *body, LibBalsaMessageBody *child,
-            GString *s)
+            GString *s, gboolean modify)
 {
     int i = 1;
-    for(i=1; body;  body = body->next) {
+    for(i=1; body; body = body->next) {
         if(body==child) {
             g_string_printf(s, "%u", i);
             return TRUE;
         }
-        if(is_child_of(body->parts, child, s)) {
+
+        if(is_child_of(body->parts, child, s,
+                       body->body_type != LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE)){
             char buf[12];
-            snprintf(buf, sizeof(buf), "%u.", i);
-            g_string_prepend(s, buf);
+            if(modify) {
+                snprintf(buf, sizeof(buf), "%u.", i);
+                g_string_prepend(s, buf);
+            }
             return TRUE;
         }
-        if(body->body_type != LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE)
-            i++;
+        i++;
     }
     return FALSE;
 }
@@ -1535,7 +1541,7 @@ get_section_for(LibBalsaMessage *msg, LibBalsaMessageBody *part)
     if (libbalsa_message_body_is_multipart(parent))
 	parent = parent->parts;
 
-    if(!is_child_of(parent, part, section)) {
+    if(!is_child_of(parent, part, section, TRUE)) {
         g_warning("Internal error, part not found.\n");
         g_string_free(section, TRUE);
         return g_strdup("1");
@@ -1730,6 +1736,31 @@ libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
     return rc == IMR_OK ? 1 : -1;
 }
 
+static void
+transform_flags(LibBalsaMessageFlag set, LibBalsaMessageFlag clr,
+                ImapMsgFlag *flg_set, ImapMsgFlag *flg_clr)
+{
+    *flg_set = 0;
+    *flg_clr = 0;
+
+    if (set & LIBBALSA_MESSAGE_FLAG_REPLIED)
+        *flg_set |= IMSGF_ANSWERED;
+    if (clr & LIBBALSA_MESSAGE_FLAG_REPLIED)
+	*flg_clr |= IMSGF_ANSWERED;
+    if (set & LIBBALSA_MESSAGE_FLAG_NEW)
+	*flg_clr |= IMSGF_SEEN;
+    if (clr & LIBBALSA_MESSAGE_FLAG_NEW)
+	*flg_set |= IMSGF_SEEN;
+    if (set & LIBBALSA_MESSAGE_FLAG_FLAGGED)
+	*flg_set |= IMSGF_FLAGGED;
+    if (clr & LIBBALSA_MESSAGE_FLAG_FLAGGED)
+	*flg_clr |= IMSGF_FLAGGED;
+    if (set & LIBBALSA_MESSAGE_FLAG_DELETED)
+	*flg_set |= IMSGF_DELETED;
+    if (clr & LIBBALSA_MESSAGE_FLAG_DELETED)
+	*flg_clr |= IMSGF_DELETED;
+}
+
 void
 libbalsa_mailbox_imap_change_message_flags(LibBalsaMailbox * mailbox,
                                            guint msgno,
@@ -1738,35 +1769,42 @@ libbalsa_mailbox_imap_change_message_flags(LibBalsaMailbox * mailbox,
 {
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     ImapMboxHandle *handle = mimap->handle;
+    ImapMsgFlag flag_set, flag_clr;
 
-    if (set & LIBBALSA_MESSAGE_FLAG_REPLIED)
-	imap_mbox_store_flag(handle, msgno, IMSGF_ANSWERED, 1);
-    if (clear & LIBBALSA_MESSAGE_FLAG_REPLIED)
-	imap_mbox_store_flag(handle, msgno, IMSGF_ANSWERED, 0);
+    transform_flags(set, clear, &flag_set, &flag_clr);
+    if(flag_set)
+        imap_mbox_store_flag(handle, msgno, flag_set, 1);
+    if(flag_clr)
+        imap_mbox_store_flag(handle, msgno, flag_clr, 0);
+}
 
-    if (set & LIBBALSA_MESSAGE_FLAG_NEW)
-	imap_mbox_store_flag(handle, msgno, IMSGF_SEEN, 0);
-    if (clear & LIBBALSA_MESSAGE_FLAG_NEW)
-	imap_mbox_store_flag(handle, msgno, IMSGF_SEEN, 1);
+static gboolean
+lbm_imap_change_msgs_flags(LibBalsaMailbox * mailbox,
+                           GList *messages,
+                           LibBalsaMessageFlag set,
+                           LibBalsaMessageFlag clear)
+{
+    unsigned msgcnt = g_list_length(messages);
+    unsigned *seqno = g_malloc(msgcnt*sizeof(unsigned));
+    unsigned i = 0;
+    ImapMsgFlag flag_set, flag_clr;
+    ImapResponse rc1 = IMR_OK, rc2 = IMR_OK;
 
-    if (set & LIBBALSA_MESSAGE_FLAG_FLAGGED)
-	imap_mbox_store_flag(handle, msgno, IMSGF_FLAGGED, 1);
-    if (clear & LIBBALSA_MESSAGE_FLAG_FLAGGED)
-	imap_mbox_store_flag(handle, msgno, IMSGF_FLAGGED, 0);
+    while(messages) {
+        LibBalsaMessage * msg = LIBBALSA_MESSAGE(messages->data);
+        seqno[i++] = msg->msgno;
+        messages = g_list_next(messages);
+    }
+    qsort(seqno, msgcnt, sizeof(seqno[0]), cmp_msgno);
+    transform_flags(set, clear, &flag_set, &flag_clr);
 
-    if (set & LIBBALSA_MESSAGE_FLAG_DELETED)
-	imap_mbox_store_flag(handle, msgno, IMSGF_DELETED, 1);
-    if (clear & LIBBALSA_MESSAGE_FLAG_DELETED)
-	imap_mbox_store_flag(handle, msgno, IMSGF_DELETED, 0);
-
-#if 0
-    /* This flag can't be turned on again. */
-    if (set & LIBBALSA_MESSAGE_FLAG_RECENT)
-	imap_mbox_store_flag(handle, msgno, IMSGF_RECENT, 1);
-    /* ...or turned off. */
-    if (clear & LIBBALSA_MESSAGE_FLAG_RECENT)
-	imap_mbox_store_flag(handle, msgno, IMSGF_RECENT, 0);
-#endif
+    if(flag_set)
+        rc1 = imap_mbox_store_flag_m(LIBBALSA_MAILBOX_IMAP(mailbox)->handle,
+                                     msgcnt, seqno, flag_set, TRUE);
+    if(flag_clr)
+        rc2 = imap_mbox_store_flag_m(LIBBALSA_MAILBOX_IMAP(mailbox)->handle,
+                                     msgcnt, seqno, flag_clr, FALSE);
+    return rc1 == IMR_OK && rc2 == IMR_OK;
 }
 
 static ImapSortKey
@@ -1776,7 +1814,7 @@ lbmi_get_imap_sort_key(LibBalsaMailbox *mbox)
 
     switch (mbox->sort_column_id) {
     default:
-    case LB_MBOX_MSGNO_COL:   /* FIXME */ break;
+    case LB_MBOX_MSGNO_COL:   key = IMSO_MSGNO;   break;
     case LB_MBOX_FROM_COL:    
         key = mbox->view->show == LB_MAILBOX_SHOW_TO
             ? IMSO_TO : IMSO_FROM;                break;
@@ -1792,7 +1830,6 @@ insert_in_data(GNode *node, gpointer data)
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(data);
     if(!g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
                     node->data)) {
-        printf("Appending msgno=%u\n", GPOINTER_TO_UINT(node->data));
         libbalsa_mailbox_msgno_filt_in(mailbox,
                                        GPOINTER_TO_UINT(node->data));
     }

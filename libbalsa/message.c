@@ -712,15 +712,11 @@ libbalsa_messages_change_flag(GList * messages,
 
 	LOCK_MAILBOX(mbox);
 	RETURN_IF_MAILBOX_CLOSED(mbox);
-	while (lst) {
-	    message = LIBBALSA_MESSAGE(lst->data);	    
-	    if (set)
-		libbalsa_message_set_flag(message, flag, 0);
-	    else
-		libbalsa_message_set_flag(message, 0, flag);
-	    lst = g_list_next(lst);
-	}
-
+        /* set flags for entire set in one transaction */
+        if(set)
+            libbalsa_mailbox_change_msgs_flags(mbox, lst, flag, 0);
+        else
+            libbalsa_mailbox_change_msgs_flags(mbox, lst, 0, flag);
 	UNLOCK_MAILBOX(mbox);
 	/* Emission of notification to the owning mailbox */
 	libbalsa_mailbox_messages_status_changed(mbox, notif_list,

@@ -55,6 +55,10 @@ static void libbalsa_mailbox_real_set_unread_messages_flag(LibBalsaMailbox
 							   gboolean flag);
 static void libbalsa_mailbox_real_release_message (LibBalsaMailbox * mailbox,
 						   LibBalsaMessage * message);
+static gboolean libbalsa_mailbox_real_change_msgs_flags(LibBalsaMailbox *mbox,
+                                                      GList *messages,
+                                                      LibBalsaMessageFlag set,
+                                                      LibBalsaMessageFlag clr);
 static void libbalsa_mailbox_real_sort(LibBalsaMailbox* mbox,
                                        GArray *sort_array);
 static gboolean libbalsa_mailbox_real_can_match(LibBalsaMailbox  *mailbox,
@@ -236,6 +240,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
     klass->get_message_part = NULL;
     klass->get_message_stream = NULL;
     klass->change_message_flags = NULL;
+    klass->change_msgs_flags    = libbalsa_mailbox_real_change_msgs_flags;
     klass->set_threading = NULL;
     klass->update_view_filter = NULL;
     klass->sort = libbalsa_mailbox_real_sort;
@@ -631,6 +636,23 @@ libbalsa_mailbox_real_release_message(LibBalsaMailbox * mailbox,
 				      LibBalsaMessage * message)
 {
     /* Default is noop. */
+}
+
+/* libbalsa_mailbox_real_change_msgs_flags() default implementation uses
+   non-transactional interface.
+*/
+static gboolean
+libbalsa_mailbox_real_change_msgs_flags(LibBalsaMailbox *mbox,
+                                        GList *messages,
+                                        LibBalsaMessageFlag set,
+                                        LibBalsaMessageFlag clr)
+{
+    while(messages) {
+        LibBalsaMessage * message = LIBBALSA_MESSAGE(messages->data);
+        libbalsa_mailbox_change_message_flags(mbox, message->msgno, set, clr);
+        messages = g_list_next(messages);
+    }
+    return TRUE;
 }
 
 static gint mbox_compare_func(const SortTuple * a,
@@ -1046,9 +1068,9 @@ messages_status_changed_cb(LibBalsaMailbox * mb, GList * messages,
         /* Deleted state has changed, update counts */
         new_state = (LIBBALSA_MESSAGE_IS_DELETED(messages->data));
 
-        for (; messages; messages = g_list_next(messages)) {
+        for (lst = messages; lst; lst = g_list_next(lst)) {
             nb_in_list++;
-	    if (LIBBALSA_MESSAGE_IS_UNREAD(messages->data))
+	    if (LIBBALSA_MESSAGE_IS_UNREAD(lst->data))
                 new_in_list++;
         }
 
@@ -1280,6 +1302,35 @@ libbalsa_mailbox_change_message_flags(LibBalsaMailbox * mailbox,
 							      msgno, set,
 							      clear);
     libbalsa_mailbox_msgno_changed(mailbox, msgno);
+}
+
+/* libbalsa_mailbox_change_msgs_flags() changes stored message flags
+   and is to be used only internally by libbalsa and it assumes that
+   the mailbox is already locked.  FIXME: pass a list of msgno's
+   instead of messages: we do not need that much information to flip
+   just the message flag (think of "Select All+Toggle Deleted").
+   Returns TRUE on success, FALSE on failure.
+*/
+gboolean
+libbalsa_mailbox_change_msgs_flags(LibBalsaMailbox * mailbox,
+                                   GList *messages,
+                                   LibBalsaMessageFlag set,
+                                   LibBalsaMessageFlag clear)
+{
+    g_return_val_if_fail(mailbox != NULL, FALSE);
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+
+    gboolean res = LIBBALSA_MAILBOX_GET_CLASS(mailbox)
+        ->change_msgs_flags(mailbox, messages, set, clear);
+
+    while(messages) {
+        LibBalsaMessage *msg = LIBBALSA_MESSAGE(messages->data);
+        msg->flags |= set;
+        msg->flags &= ~clear;
+        libbalsa_mailbox_msgno_changed(mailbox, msg->msgno);
+        messages = g_list_next(messages);
+    }
+    return res;
 }
 
 /*

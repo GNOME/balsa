@@ -52,6 +52,7 @@ typedef unsigned ImapMsgFlags;
 #define IMAP_FLAGS_EMPTY (0)
 
 typedef enum {
+  IMSO_MSGNO,
   IMSO_ARRIVAL,
   IMSO_CC,
   IMSO_DATE,

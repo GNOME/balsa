@@ -6,6 +6,7 @@
 #include "imap_private.h"
 #include "siobuf.h"
 
+#define ELEMENTS(x) (sizeof (x) / sizeof(x[0]))
 struct msg_set {
   unsigned msgcnt;
   unsigned *seqno;
@@ -607,15 +608,20 @@ imap_mbox_store_flag_m(ImapMboxHandle *h, unsigned msgcnt, unsigned*seqno,
   unsigned idx;
   gchar* cmd, *seq;
   struct msg_set csd;
+  GString *flags_str = g_string_new("");
 
   csd.msgcnt = msgcnt; csd.seqno = seqno;
-
   if(msgcnt == 0) return IMR_OK;
-  for(idx=0; (flg & (1<<idx)) ==0; idx++)
-    ;
+  for(idx=0; idx < ELEMENTS(msg_flags); idx++) {
+    if((flg & (1<<idx)) == 0) continue;
+    if(*flags_str->str) g_string_append_c(flags_str, ' ');
+    g_string_append_c(flags_str, '\\');
+    g_string_append(flags_str, msg_flags[idx]);
+  }
   seq = coalesce_seq_range(1, msgcnt, (CoalesceFunc)cf_set, &csd);
-  cmd = g_strdup_printf("STORE %s %cFLAGS.SILENT (\\%s)", seq,
-                        state ? '+' : '-', msg_flags[idx]);
+  cmd = g_strdup_printf("Store %s %cFlags.Silent (%s)", seq,
+                        state ? '+' : '-', flags_str->str);
+  g_string_free(flags_str, TRUE);
   g_free(seq);
   res = imap_cmd_exec(h, cmd);
   g_free(cmd);
@@ -629,10 +635,17 @@ imap_mbox_store_flag(ImapMboxHandle *h, unsigned seq, ImapMsgFlag flg,
   ImapResponse rc;
   unsigned idx;
   gchar* cmd;
-  for(idx=0; (flg & (1<<idx)) ==0; idx++)
-    ;
-  cmd = g_strdup_printf("STORE %d %cFLAGS (\\%s)", seq,
-                        state ? '+' : '-', msg_flags[idx]);
+  GString *flags_str = g_string_new("");
+
+  for(idx=0; idx < ELEMENTS(msg_flags); idx++) {
+    if((flg & (1<<idx)) == 0) continue;
+    if(*flags_str->str) g_string_append_c(flags_str, ' ');
+    g_string_append_c(flags_str, '\\');
+    g_string_append(flags_str, msg_flags[idx]);
+  }
+  cmd = g_strdup_printf("STORE %d %cFLAGS (%s)", seq,
+                        state ? '+' : '-', flags_str->str);
+  g_string_free(flags_str, TRUE);
   rc = imap_cmd_exec(h, cmd);
   g_free(cmd);
   return rc;
@@ -757,6 +770,12 @@ imap_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
   return rc;
 }
 
+static void
+append_no(ImapMboxHandle *handle, unsigned seqno, void *arg)
+{
+  mbox_view_append_no(&handle->mbox_view, seqno);
+}
+
 ImapResponse
 imap_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
                  char *filter)
@@ -766,25 +785,52 @@ imap_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
   char *cmd;
   unsigned i;
 
-  if(!imap_mbox_handle_can_do(handle, IMCAP_SORT)) 
-    return IMR_NO;
-
-  keystr = sort_code_to_string(key);
-  cmd= g_strdup_printf("SORT (%s%s) UTF-8 %s", 
+  if(key == IMSO_MSGNO) {
+    if(filter) {
+      ImapSearchCb cb;
+      cmd= g_strdup_printf("SEARCH %s", filter);
+      handle->mbox_view.entries = 0; /* FIXME: I do not like this! 
+                                      * we should not be doing such 
+                                      * low level manipulations here */
+      cb  = handle->search_cb;  handle->search_cb  = (ImapSearchCb)append_no;
+      rc = imap_cmd_exec(handle, cmd);
+      handle->search_cb = cb;
+      g_free(cmd);
+    } else {
+      if(handle->thread_root)
+        g_node_destroy(handle->thread_root);
+      handle->thread_root = g_node_new(NULL);
+      
+      for(i=1; i<=handle->exists; i++) {
+        if(ascending)
+          g_node_append_data(handle->thread_root,
+                             GUINT_TO_POINTER(i));
+        else
+          g_node_prepend_data(handle->thread_root,
+                              GUINT_TO_POINTER(i));
+      }
+      return IMR_OK;
+    }
+  } else { /* Nontrivial (ie. not over msgno) sort requires an extension */
+    if(!imap_mbox_handle_can_do(handle, IMCAP_SORT)) 
+      return IMR_NO;
+    
+    keystr = sort_code_to_string(key);
+    cmd= g_strdup_printf("SORT (%s%s) UTF-8 %s", 
                        ascending ? "" : "REVERSE ",
-                       keystr, filter);
-
-  handle->mbox_view.entries = 0; /* FIXME: I do not like this! 
-                                  * we should not be doing such 
-                                  * low level manipulations here */
-  rc = imap_cmd_exec(handle, cmd);
-  g_free(cmd);
-
+                         keystr, filter);
+    
+    handle->mbox_view.entries = 0; /* FIXME: I do not like this! 
+                                    * we should not be doing such 
+                                    * low level manipulations here */
+    rc = imap_cmd_exec(handle, cmd);
+    g_free(cmd);
+  }
   if(rc == IMR_OK) {
     if(handle->thread_root)
       g_node_destroy(handle->thread_root);
     handle->thread_root = g_node_new(NULL);
-
+      
     for(i=0; i<handle->mbox_view.entries; i++)
       g_node_append_data(handle->thread_root,
                          GUINT_TO_POINTER(handle->mbox_view.arr[i]));

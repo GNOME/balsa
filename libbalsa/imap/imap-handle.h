@@ -142,6 +142,7 @@ GNode *imap_mbox_handle_get_thread_root(ImapMboxHandle* handle);
 
 /* ================ BEGIN OF BODY STRUCTURE FUNCTIONS ================== */
 const gchar *imap_body_get_param(ImapBody *body, const gchar *param);
+const gchar *imap_body_get_dsp_param(ImapBody *body, const gchar *key);
 gchar *imap_body_get_mime_type(ImapBody *body);
 ImapBody *imap_message_get_body_from_section(ImapMessage *msg,
                                              const char *section);
@@ -159,6 +160,7 @@ unsigned mbox_view_cnt(MboxView *mv);
 unsigned mbox_view_get_msg_no(MboxView *mv, unsigned msgno);
 unsigned mbox_view_get_rev_no(MboxView *mv, unsigned seqno);
 const char *mbox_view_get_str(MboxView *mv);
+
 /* ================ END OF MBOX_VIEW FUNCTIONS ========================= */
 
 /* possibly private functions... */

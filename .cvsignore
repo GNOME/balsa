@@ -25,5 +25,5 @@ ltmain.sh
 missing
 mkinstalldirs
 omf-install
-stamp-h
-stamp-h.in
+stamp-h?
+stamp-h?.in

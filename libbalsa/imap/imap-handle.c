@@ -47,8 +47,6 @@ FILE *debug_stream = NULL;
     (G_TYPE_CHECK_CLASS_TYPE(klass, LIT_TYPE_HANDLE))
 
 
-static void mbox_view_append_no(MboxView *mv, unsigned seqno);
-
 struct _ImapMboxHandleClass {
   GObjectClass parent_class;
   /* Signal */
@@ -289,10 +287,9 @@ imap_mbox_handle_reconnect(ImapMboxHandle* h, gboolean *readonly)
   return rc;
 }
 
-const char* msg_flags[] = { 
+const char* msg_flags[6] = { 
   "seen", "answered", "flagged", "deleted", "draft", "recent"
 };
-
 
 struct ListData { 
   ImapListCb cb;
@@ -792,6 +789,12 @@ imap_body_get_param(ImapBody *body, const gchar *key)
   return g_hash_table_lookup(body->params, key);
 }
 
+const gchar*
+imap_body_get_dsp_param(ImapBody *body, const gchar *key)
+{
+  return body->dsp_params ? g_hash_table_lookup(body->dsp_params, key) : NULL;
+}
+
 gchar*
 imap_body_get_mime_type(ImapBody *body)
 {
@@ -812,20 +815,48 @@ imap_body_get_mime_type(ImapBody *body)
   return g_strconcat(type, "/", body->media_subtype, NULL);
 }
 
+static void
+do_indent(int indent)
+{ int i; for(i=0; i<indent; i++) putchar(' '); }
+static void
+print_body_structure(ImapBody *body, int indent)
+{
+  while(body) {
+    gchar *type = imap_body_get_mime_type(body);
+    do_indent(indent); printf("%s\n", type);
+    g_free(type);
+    if(body->child)
+      print_body_structure(body->child, indent+3);
+    body = body->next;
+  }
+}
+
 static ImapBody*
 get_body_from_section(ImapBody *body, const char *section)
 {
   char * dot;
-  int no = atoi(section);
-  if(body && body->media_basic == IMBMEDIA_MULTIPART)
-    body = body->child;
-  while(--no && body)
-    body = body->next;
+  int is_parent_a_message = 1;
+  do {
+    int no = atoi(section);
 
-  if(!body) return NULL; /* non-existing section */
-  dot = strchr(section, '.');
-  if(dot) return get_body_from_section(body->child, dot+1);
-  else return body;
+    /* printf("Section: %s\n", section); print_body_structure(body, 0); */
+    if(body &&
+       (body->media_basic == IMBMEDIA_MULTIPART && is_parent_a_message))
+      body = body->child;
+    while(--no && body)
+      body = body->next;
+    
+    if(!body) return NULL; /* non-existing section */
+    dot = strchr(section, '.');
+    if(dot) { 
+      section = dot+1;
+      is_parent_a_message =
+        (body->media_basic == IMBMEDIA_MESSAGE_RFC822 ||
+         body->media_basic == IMBMEDIA_MESSAGE_OTHER);
+      body = body->child;
+    }
+  } while(dot);
+  return body;
 }
 
 ImapBody*
@@ -1404,9 +1435,11 @@ ir_search(ImapMboxHandle *h)
   int c;
   char seq[12];
 
-  while ((c=imap_get_atom(h->sio, seq, sizeof(seq))), seq[0])
+  while ((c=imap_get_atom(h->sio, seq, sizeof(seq))), seq[0]) {
     if(h->search_cb)
       h->search_cb(h, atoi(seq), h->search_arg);
+    if(c == '\r') break;
+  }
   return ir_check_crlf(h, c);
 }
 
@@ -2619,7 +2652,7 @@ mbox_view_init(MboxView *mv)
 
 /* mbox_view_resize:
    When new messages appear in the mailbox, we need to resize the view
-   as well. We assume that the new messages fulfillthe filtering
+   as well. We assume that the new messages fulfill the filtering
    condition which does not have to be true. In principle, we should
    apply the filter for them as well. We do it next time.
 */
@@ -2677,7 +2710,7 @@ mbox_view_dispose(MboxView *mv)
   g_free(mv->filter_str); mv->filter_str = NULL;
 }
 
-static void
+void
 mbox_view_append_no(MboxView *mv, unsigned seqno)
 {
   if(mv->allocated == mv->entries) {

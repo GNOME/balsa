@@ -1,3 +1,8 @@
+2003-05-04 23:40  PeterB
+
+	* src/sendmsg-window.c: Fix #111958 (Albrecht Dreﬂ
+	<albrecht.dress@arcor.de>)
+
 2003-05-03 03:50  PeterB
 
 	* src/: balsa-app.c, balsa-app.h, balsa-mblist.c, mailbox-node.c,

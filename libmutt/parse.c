@@ -1200,10 +1200,11 @@ ENVELOPE *mutt_read_rfc822_header (FILE *f, HEADER *hdr)
       regmatch_t pmatch[1];
 
       rfc2047_decode (e->subject, e->subject, strlen (e->subject) + 1);
-
+#ifndef LIBMUTT
       if (regexec (ReplyRegexp.rx, e->subject, 1, pmatch, 0) == 0)
 	e->real_subj = e->subject + pmatch[0].rm_eo;
       else
+#endif
 	e->real_subj = e->subject;
     }
 

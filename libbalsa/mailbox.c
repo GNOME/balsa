@@ -766,6 +766,7 @@ mailbox_valid (gchar * filename)
   else
     return MAILBOX_UNKNOWN;
 #endif
+  return MAILBOX_MBOX;
 }
 
 

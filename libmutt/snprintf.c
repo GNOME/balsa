@@ -40,7 +40,7 @@
  *
  **************************************************************/
 
-#include "config.h"
+#include "linuxconfig.h"
 
 #if !defined(HAVE_SNPRINTF) || !defined(HAVE_VSNPRINTF)
 

@@ -1,3 +1,10 @@
+2004-05-05  Pawel Salek
+
+	* libbalsa/mailbox.[ch]: be more compatible with --disable-threads.
+	* libbalsa/mailbox_mbox.c: fix old and new bugs.
+	* src/balsa-mblist.c: gtk can pass empty list of selected messages
+	for d&d.
+
 2004-05-04  Pawel Salek
 
 	* libbalsa/folder-scanners.c: report IMAP server messages.

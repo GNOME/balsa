@@ -342,6 +342,13 @@ libbalsa_mailbox_index_entry_new_from_msg(LibBalsaMessage *msg)
 }
 
 void
+libbalsa_mailbox_index_entry_set_no(LibBalsaMailboxIndexEntry *entry,
+                                    unsigned no)
+{
+    entry->msgno = no;
+}
+
+void
 libbalsa_mailbox_index_entry_free(LibBalsaMailboxIndexEntry *entry)
 {
     if(entry) {
@@ -1465,13 +1472,15 @@ libbalsa_mailbox_total_messages(LibBalsaMailbox * mailbox)
 gboolean
 libbalsa_mailbox_sync_storage(LibBalsaMailbox * mailbox, gboolean expunge)
 {
-    gboolean retval = TRUE;
+    gboolean retval = TRUE, locked;
 
     g_return_val_if_fail(mailbox != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
     g_return_val_if_fail(!mailbox->readonly, TRUE);
 
-    LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
+    
+    if (!(locked = HAVE_MAILBOX_LOCKED(mailbox)) )
+        LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
 
     /* When called in an idle handler, the mailbox might have been
      * closed, so we must check (with the mailbox locked). */
@@ -1490,7 +1499,8 @@ libbalsa_mailbox_sync_storage(LibBalsaMailbox * mailbox, gboolean expunge)
                           libbalsa_mailbox_signals[CHANGED], 0);
     }
 
-    UNLOCK_MAILBOX(mailbox);
+    if(!locked)
+        UNLOCK_MAILBOX(mailbox);
 
     return retval;
 }

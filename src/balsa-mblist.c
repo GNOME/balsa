@@ -781,9 +781,13 @@ bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
 
     /* convert pointer array to GList */
     for (message = (LibBalsaMessage **) selection_data->data; *message;
-         message++)
+         message++) {
         messages = g_list_prepend(messages, *message);
-    g_return_if_fail(messages);
+    }
+    if(!messages) /* it is actually possible to drag from GtkTreeView
+                   * * when no rows are selected: Disable preview for
+                   * that. */
+       return; 
 
     orig_mailbox = ((LibBalsaMessage *) messages->data)->mailbox;
 

@@ -399,6 +399,8 @@ guint libbalsa_mailbox_total_messages(LibBalsaMailbox * mailbox);
 typedef struct LibBalsaMailboxIndexEntry_ LibBalsaMailboxIndexEntry;
 LibBalsaMailboxIndexEntry* libbalsa_mailbox_index_entry_new_from_msg
                            (LibBalsaMessage *msg);
+void libbalsa_mailbox_index_entry_set_no(LibBalsaMailboxIndexEntry *entry,
+                                         unsigned no);
 void libbalsa_mailbox_index_entry_free(LibBalsaMailboxIndexEntry *entry);
 void libbalsa_mailbox_index_set_flags(LibBalsaMailbox *mailbox,
 				      unsigned msgno, LibBalsaMessageFlag f);

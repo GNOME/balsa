@@ -31,7 +31,7 @@ typedef struct {
 } AddressData;
 
 extern gint address_book_cb(GtkWidget * widget, gpointer data);
-extern GList* ab_load_addresses (void);
+extern GList* ab_load_addresses (gboolean);
 
 #ifdef __cplusplus
 }

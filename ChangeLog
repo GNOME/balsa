@@ -6,6 +6,9 @@
 	* src/save-restore.c(config_mailbox_init): same.
 	* src/sendmsg-window.c(attachments_add): accept attachment drops to
 	entire compose window.
+
+	* src/address-book.[hc],src/expand-alias.c: multiple compose window
+	alias expansion bug fix from Berend De Schouwer <bds@jhb.ucs.co.za>
 	
 2000-08-07  Ian Campbell  <ijc25@cam.ac.uk>
 	* src/main-window.c: Set progress_dialog and friends to NULL in

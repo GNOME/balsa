@@ -117,7 +117,6 @@ static GList* addresses = NULL;
 static GCompletion* complete_name = NULL;
 static GCompletion* complete_alias = NULL;
 
-
 /*
  * extract_name_from_address()
  *
@@ -810,6 +809,15 @@ key_pressed_cb(GtkWidget *widget,
    gint *i;
    
    /*
+    * Check if GCompletion is valid - we reload the addressbook
+    * if someone closed it.
+    *
+    * This fixes multiple compose windows.
+    */
+   if (!addresses)
+      alias_load_addressbook ();
+      
+   /*
     * Grab the old information from the widget - this way the user
     * can switch back and forth between To: and Cc:
     */
@@ -997,7 +1005,7 @@ void
 alias_load_addressbook (void)
 {
     alias_free_addressbook ();
-    addresses = ab_load_addresses();
+    addresses = ab_load_addresses (FALSE);
     complete_name = g_completion_new (
                     (GCompletionFunc) extract_name_from_address);
     g_completion_add_items(complete_name, addresses);

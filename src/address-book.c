@@ -31,7 +31,7 @@ static GtkWidget *ab_entry;
 gint            composing;
 
 gint address_book_cb(GtkWidget * widget, gpointer data);
-GList* ab_load_addresses(void);
+GList* ab_load_addresses(gboolean);
 
 static gint ab_gnomecard_cb(GtkWidget * widget, gpointer data);
 static gint ab_cancel_cb(GtkWidget * widget, gpointer data);
@@ -376,7 +376,7 @@ ab_load(GtkWidget * widget, gpointer data)
 
 
 /*
- * ab_load_addresses (void)
+ * ab_load_addresses (gboolean multiples)
  *
  * Loads all the addresses in the addressbook, and returns an
  * GSList* structure.  Returns NULL if no addresses
@@ -385,7 +385,7 @@ ab_load(GtkWidget * widget, gpointer data)
  * GSList*->data will be an AddressData* structure.
  */
 GList*
-ab_load_addresses (void) 
+ab_load_addresses (gboolean multiples) 
 { 
    FILE *gc; 
    gchar string[LINE_LEN];
@@ -459,13 +459,13 @@ ab_load_addresses (void)
       if (g_strncasecmp (string, "EMAIL;",6) == 0) {
 	  gchar * ptr = strchr(string,':');
 	  if(ptr) {
-	      if(email) {
+	      if ((email) && (multiples)) {
 		  if(balsa_app.ab_dist_list_mode) {
 		      gchar * new = g_strconcat(email,", ", ptr+1, NULL);
 		      g_free (email); 
 		      email = new;
 		  } /* else ignore other addresses */
-	      } else 
+	      } else if (!(email))
 		  email = g_strdup (ptr+1);
 	  }
       }

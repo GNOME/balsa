@@ -1,3 +1,8 @@
+2004-05-24 18:59  PeterB
+
+	* src/: mailbox-conf.c, main-window.c, main-window.h: update the
+	display when a special mailbox name is changed.
+
 2004-05-24 17:34  PeterB
 
 	* libbalsa/folder-scanners.c, libbalsa/folder-scanners.h,

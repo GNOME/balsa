@@ -35,6 +35,8 @@ libbalsa_a_SOURCES = 		\
 	folder-scanners.h	\
 	gmime-gpgme-context.c   \
 	gmime-gpgme-context.h   \
+	html.c                  \
+	html.h                  \
 	identity.c		\
 	identity.h		\
 	information.c		\

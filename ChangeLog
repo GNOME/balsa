@@ -1,3 +1,12 @@
+2004-08-26 11:59  PeterB
+
+	* libbalsa/: mailbox_imap.c, mailbox_imap.h: use "imap://..." url
+	even when server->use_ssl is set.
+	* libbalsa/mailbox_mbox.c: be a little more careful when parsing.
+	* src/balsa-index.c: re-expand thread when a message is added, if
+	balsa_app.expand_tree is set; code for
+	balsa_app.expand_to_new_unread in place but disabled.
+
 2004-08-23 23:04  Pawel Salek
 
 	* libbalsa/imap/imap-{commands,search}.c:Debian report #266298.

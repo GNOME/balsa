@@ -640,7 +640,7 @@ config_mailbox_init (proplist_t mbox, gchar * key)
       libbalsa_server_set_username (s, user);
       libbalsa_server_set_password (s, passwd);
       libbalsa_server_set_host (s, host, port);
-      m->path = g_strdup(path);
+      libbalsa_mailbox_imap_set_path(m, path);
       
       g_free(user);
       g_free(passwd);

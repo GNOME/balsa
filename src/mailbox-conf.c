@@ -591,6 +591,8 @@ conf_update_mailbox (LibBalsaMailbox * mailbox, gchar * old_mbox_pkey)
   } 
   else if ( LIBBALSA_IS_MAILBOX_IMAP (mailbox) )
   {
+    gchar *path;
+
     mb_imap = LIBBALSA_MAILBOX_IMAP(mailbox);
     server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
     
@@ -609,18 +611,14 @@ conf_update_mailbox (LibBalsaMailbox * mailbox, gchar * old_mbox_pkey)
     libbalsa_server_set_host(server,
 			     gtk_entry_get_text(GTK_ENTRY(mcw->imap_server)),
 			     atoi(gtk_entry_get_text(GTK_ENTRY(mcw->imap_port))));
-    
-    mb_imap->path =  g_strdup(gtk_entry_get_text(
-			       GTK_ENTRY(gnome_entry_gtk_entry(GNOME_ENTRY(mcw->imap_folderpath))) ));
-    
-    if ( mb_imap->path == NULL ) 
-      mb_imap->path = g_strdup ("INBOX");
-    /* FIXME: IMAPDir will not like it */
-    else if( mb_imap->path[0] == '\0' ) {
-      g_free (mb_imap->path);
-      mb_imap->path = g_strdup ("INBOX");
-    }
-    
+
+    path = gtk_entry_get_text(GTK_ENTRY(gnome_entry_gtk_entry(GNOME_ENTRY(mcw->imap_folderpath))));
+
+    if ( path == NULL || path[0] == '\0' )
+      libbalsa_mailbox_imap_set_path(mb_imap, "INBOX");
+    else
+      libbalsa_mailbox_imap_set_path(mb_imap, path);
+				       
     config_mailbox_update (mailbox, old_mbox_pkey);
   } 
   else 
@@ -726,11 +724,13 @@ conf_add_mailbox (LibBalsaMailbox **mbox)
     }
     case MC_PAGE_IMAP:
     {
-	LibBalsaMailboxImap * m;
+      LibBalsaMailboxImap * m;
+      gchar *path;
+
 	mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_imap_new());
 	m = LIBBALSA_MAILBOX_IMAP(mailbox);
 
-	fill_in_imap_data(&mailbox->name, &m->path);
+	fill_in_imap_data(&mailbox->name, &path);
 
 	libbalsa_server_set_username(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
 				      gtk_entry_get_text(GTK_ENTRY(mcw->imap_username)));
@@ -740,13 +740,15 @@ conf_add_mailbox (LibBalsaMailbox **mbox)
 				  gtk_entry_get_text(GTK_ENTRY(mcw->imap_server)),
 				  atol(gtk_entry_get_text(GTK_ENTRY(mcw->imap_port))));
 
-	if (!LIBBALSA_MAILBOX_IMAP (mailbox)->path[0]) 
+	if (path == NULL || path[0] == '\0' )
 	    /* FIXME: disable when IMAPDir stuff becomes functional */
 	{
-	    g_free (LIBBALSA_MAILBOX_IMAP (mailbox)->path);
-	    LIBBALSA_MAILBOX_IMAP (mailbox)->path = g_strdup ("INBOX");
+	  libbalsa_mailbox_imap_set_path(m, "INBOX");
+	} else {
+	  libbalsa_mailbox_imap_set_path(m, path);
 	}
-	
+	g_free(path);
+
 	node = g_node_new (mailbox_node_new (mailbox->name, mailbox, FALSE));
 	g_node_append (balsa_app.mailbox_nodes, node);
 

@@ -324,12 +324,19 @@ balsa_index_new (void)
   return GTK_WIDGET (bindex);
 }
 
+/* 
+ * This is an idle handler. Be sure to use gdk_threads_{enter/leave}
+ */
 static gboolean
 moveto_handler (BalsaIndex * bindex)
 {
   if (!GTK_WIDGET_VISIBLE (GTK_WIDGET (bindex)))
     return TRUE;
+
+  gdk_threads_enter();
   gtk_clist_moveto (GTK_CLIST (bindex), bindex->first_new_message - 1, -1, 0.0, 0.0);
+  gdk_threads_leave();
+
   return FALSE;
 }
 

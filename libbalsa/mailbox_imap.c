@@ -159,6 +159,14 @@ server_settings_changed(LibBalsaServer *server, LibBalsaMailbox *mailbox)
     libbalsa_notify_register_mailbox(mailbox);
 }
 
+void libbalsa_mailbox_imap_set_path(LibBalsaMailboxImap *mailbox, gchar *path)
+{
+  g_free(mailbox->path);
+  mailbox->path = g_strdup(path);
+
+  server_settings_changed(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox), LIBBALSA_MAILBOX(mailbox));
+}
+
 static void 
 server_user_settings_changed_cb(LibBalsaServer *server, gchar* string, LibBalsaMailbox *mailbox)
 {
@@ -253,7 +261,8 @@ static void libbalsa_mailbox_imap_check (LibBalsaMailbox *mailbox)
 {
   if ( mailbox->open_ref == 0 )
   {
-    mailbox->new_messages = libbalsa_notify_check_mailbox(mailbox);
+    if ( libbalsa_notify_check_mailbox(mailbox) )
+      libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
   }
   else
   {
@@ -261,32 +270,18 @@ static void libbalsa_mailbox_imap_check (LibBalsaMailbox *mailbox)
     gint index_hint;
 
     LOCK_MAILBOX(mailbox);
-    
+
     index_hint = CLIENT_CONTEXT (mailbox)->vcount;
 
     if ((i = mx_check_mailbox (CLIENT_CONTEXT (mailbox), &index_hint, 0)) < 0)
     {
-      UNLOCK_MAILBOX (mailbox);
-      g_print ("error or something\n");
+      g_print ("mx_check_mailbox() failed on %s\n", mailbox->name);
     }
     else if (i == M_NEW_MAIL || i == M_REOPENED)
     {
-      /* g_print ("got new mail! yippie!\n"); */
       mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount - mailbox->messages;
-      
-      if (mailbox->new_messages > 0)
-      {
-#ifndef BALSA_USE_THREADS
-	libbalsa_mailbox_load_messages (mailbox);
-#endif
-      }
-    UNLOCK_MAILBOX (mailbox);
+      libbalsa_mailbox_load_messages (mailbox);
     }
+    UNLOCK_MAILBOX (mailbox);
   }
-
-  /* FIXME: Could emit a signal here. To signify that there are new messages in this mailbox
-   * If the mailbox if open there is a signal for each new message, but if it is closed then
-   * is no signal 
-   */
-
 }

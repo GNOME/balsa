@@ -1,3 +1,18 @@
+2000-08-17  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/mailbox_imap.[ch]: Implement
+	libbalsa_mailbox_imap_check properly. Implement
+	libbalsa_mailbox_imap_set_path.
+	* libbalsa/notify.c: Fix an eronious cast.
+
+	* src/balsa-index-page.c(idle_handler_cb): 
+	* src/balsa-index.c(moveto_handler): Use
+	gdk_threads_{enter/leave}.
+
+	* src/mailbox_conf.c:
+	* src/save-restore.c: Use libbalsa_mailbox_imap_set_path instead
+	of setting directly.
+
 2000-08-16  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* libbalsa/message.c (libbalsa_message_body_ref): Add support for

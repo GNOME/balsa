@@ -348,6 +348,9 @@ void balsa_index_page_close_and_destroy( GtkObject *obj )
 static gint handler = 0;
 
 
+/*
+ * This is an idle handler, be sure to call use gdk_threads_{enter/leave}
+ */
 static gboolean
 idle_handler_cb(GtkWidget * widget)
 {
@@ -356,12 +359,15 @@ idle_handler_cb(GtkWidget * widget)
   LibBalsaMessage *message;
   gpointer data;
 
+  gdk_threads_enter();
+
   bevent = gtk_object_get_data(GTK_OBJECT (widget), "bevent");
   message = gtk_object_get_data(GTK_OBJECT (widget), "message");
   data = gtk_object_get_data(GTK_OBJECT (widget), "data");
   
   if (!data) {
     handler = 0;
+    gdk_threads_leave();
     return FALSE;
   }
   
@@ -393,6 +399,7 @@ idle_handler_cb(GtkWidget * widget)
   gtk_object_remove_data (GTK_OBJECT (widget), "message");
   gtk_object_remove_data (GTK_OBJECT (widget), "data");
 
+  gdk_threads_leave();
   return FALSE;
 }
 

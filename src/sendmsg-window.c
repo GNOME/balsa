@@ -881,18 +881,14 @@ repl_identity_signature(BalsaSendmsg* msg, LibBalsaIdentity* new_ident,
     gtk_editable_delete_text(GTK_EDITABLE(msg->text), *replace_offset,
                              *replace_offset + siglen);
 
-    if (!new_sig) 
-        return;
-    else 
-        newsiglen = strlen(new_sig);
-    
-    
     /* check to see if this is a reply or forward and compare identity
      * settings to determine whether to add signature */
-    if ((reply_type && !new_ident->sig_whenreply) ||
+    if (!new_sig || (reply_type && !new_ident->sig_whenreply) ||
         (forward_type && !new_ident->sig_whenforward)) {
         return;
     } 
+
+    newsiglen = strlen(new_sig);
 
     /* see if sig location is probably going to be the same */
     if (new_ident->sig_prepend == old_ident->sig_prepend) {
@@ -1035,79 +1031,80 @@ update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
     new_sig = prep_signature(ident, new_sig);
     old_sig = prep_signature(old_ident, old_sig);
 
-    if (old_sig)
-        siglen = strlen(old_sig);
-    else 
-        siglen = 0;
-
     /* split on sig separator */
     message_text = gtk_editable_get_chars(GTK_EDITABLE(msg->text), 0, -1);
-    message_split = g_strsplit(message_text, "\n-- \n", 0);
-    gtk_text_freeze(GTK_TEXT(msg->text));
+    if(!old_sig) {
+        replace_offset = msg->ident->sig_prepend ? 0 : strlen(message_text);
+        repl_identity_signature(msg, ident, old_ident, &replace_offset,
+                                0, new_sig);
+    } else {
+        message_split = g_strsplit(message_text, "\n-- \n", 0);
+        gtk_text_freeze(GTK_TEXT(msg->text));
+        siglen = strlen(old_sig);
 
-    while (message_split[i]) {
-        /* put sig separator back to search */
-        compare_str = g_strconcat("\n-- \n", message_split[i], NULL);
-
-        /* try to find occurance of old signature */        
-        if (g_strncasecmp(old_sig, compare_str, siglen) == 0) {
-            repl_identity_signature(msg, ident, old_ident, &replace_offset, 
-                                    siglen, new_sig);
-            changed_sig = TRUE;
-        } else if (i == 0) {
-            /* check the special case of starting a message with a
-             * sig */
-            g_free(compare_str);
-            compare_str = g_strconcat("\n", message_split[i], NULL);
+        while (message_split[i]) {
+            /* put sig separator back to search */
+            compare_str = g_strconcat("\n-- \n", message_split[i], NULL);
             
+            /* try to find occurance of old signature */        
             if (g_strncasecmp(old_sig, compare_str, siglen) == 0) {
-                repl_identity_signature(msg, ident, old_ident, &replace_offset,
-                                        siglen - 1, new_sig);
-                changed_sig = TRUE;
-            }
-        }
-
-        if (i == 0) {
-            replace_offset += strlen(message_split[i]);
-        } else {
-            replace_offset += strlen(compare_str);
-        }
-
-        g_free(compare_str);
-        ++i;
-    }
-
-
-    /* if we haven't found/switched the signature yet, do a slower
-     * brute force approach */
-    if (!changed_sig) {
-        compare_str = message_text;
-        replace_offset = 0;
-        
-        while (*compare_str) {
-            if (g_strncasecmp(old_sig, compare_str, siglen) == 0) {
-                repl_identity_signature(msg, ident, old_ident, &replace_offset,
+                repl_identity_signature(msg, ident, old_ident, &replace_offset, 
                                         siglen, new_sig);
-            } else if (compare_str == message_text) {
-                /* check for a signature starting the message */
-                tmpstr = g_strconcat("\n", message_text, NULL);
+                changed_sig = TRUE;
+            } else if (i == 0) {
+                /* check the special case of starting a message with a
+                 * sig */
+                g_free(compare_str);
+                compare_str = g_strconcat("\n", message_split[i], NULL);
                 
-                if (g_strncasecmp(old_sig, tmpstr, siglen) == 0) {
-                    repl_identity_signature(msg, ident, old_ident, 
+                if (g_strncasecmp(old_sig, compare_str, siglen) == 0) {
+                    repl_identity_signature(msg, ident, old_ident,
                                             &replace_offset, siglen - 1, 
                                             new_sig);
+                    changed_sig = TRUE;
                 }
-                
-                g_free(tmpstr);
             }
             
-            ++replace_offset;
-            ++compare_str;
+            if (i == 0) {
+                replace_offset += strlen(message_split[i]);
+            } else {
+                replace_offset += strlen(compare_str);
+            }
+            
+            g_free(compare_str);
+            ++i;
         }
+        /* if we haven't found/switched the signature yet, do a slower
+         * brute force approach */
+        if (!changed_sig) {
+            compare_str = message_text;
+            replace_offset = 0;
+            
+            while (*compare_str) {
+                if (g_strncasecmp(old_sig, compare_str, siglen) == 0) {
+                    repl_identity_signature(msg, ident, old_ident,
+                                            &replace_offset, siglen, new_sig);
+                } else if (compare_str == message_text) {
+                    /* check for a signature starting the message */
+                    tmpstr = g_strconcat("\n", message_text, NULL);
+                    
+                    if (g_strncasecmp(old_sig, tmpstr, siglen) == 0) {
+                        repl_identity_signature(msg, ident, old_ident, 
+                                                &replace_offset, siglen - 1, 
+                                                new_sig);
+                    }
+                    
+                    g_free(tmpstr);
+                }
+            
+                ++replace_offset;
+                ++compare_str;
+            }
+        }
+        g_strfreev(message_split);
     }
 
     gtk_text_thaw(GTK_TEXT(msg->text));
-    g_strfreev(message_split);
     g_free(old_sig);
     g_free(new_sig);
     g_free(message_text);

@@ -1,3 +1,8 @@
+2002-12-12  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/sendmsg-window.c: switch signatures properly even if one of
+	them is empty.
+
 2002-12-11  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/balsa-message.c: make html scroll work, 

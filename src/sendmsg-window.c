@@ -716,6 +716,7 @@ address_book_response(GtkWidget * ab, gint response,
     g_object_set_data(G_OBJECT(parent), BALSA_SENDMSG_ADDRESS_BOOK_KEY,
                       NULL);
     gtk_widget_set_sensitive(GTK_WIDGET(address_entry), TRUE);
+    libbalsa_address_entry_fill_input(address_entry);
 }
 
 static gint

@@ -26,7 +26,8 @@
 
 #include "config.h"
 
-#include <gnome.h>
+#include <gdk/gdkkeysyms.h>
+#include <gtk/gtk.h>
 #include <string.h>
 
 /*
@@ -609,7 +610,8 @@ lbae_filter(gchar * p)
  *   results:
  *     Sets list and active fields of the LibBalsaAddressEntry
  *************************************************************/
-static void
+#define libbalsa_fill_input libbalsa_address_entry_fill_input
+void
 libbalsa_fill_input(LibBalsaAddressEntry *address_entry)
 {
     gint cursor, size = 0, prev;

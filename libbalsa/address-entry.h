@@ -104,6 +104,7 @@ void libbalsa_address_entry_set_find_match(LibBalsaAddressEntry *, void *);
 void libbalsa_address_entry_set_domain(LibBalsaAddressEntry *, void *);
 void libbalsa_address_entry_clear_to_send(LibBalsaAddressEntry *
                                           address_entry);
+void libbalsa_address_entry_fill_input(LibBalsaAddressEntry *address_entry);
 gboolean libbalsa_address_entry_matching(LibBalsaAddressEntry *
                                          address_entry);
 

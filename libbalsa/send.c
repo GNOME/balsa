@@ -696,6 +696,8 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 	    /* Prohibit status headers. */
 	    smtp_set_header_option(message, "Status", Hdr_PROHIBIT, 1);
 	    smtp_set_header_option(message, "X-Status", Hdr_PROHIBIT, 1);
+            /* ... and FCC header. */
+            smtp_set_header_option(message, "X-Balsa-Fcc", Hdr_PROHIBIT, 1);
 
 
 	    /* Estimate the size of the message.  This need not be exact

@@ -51,7 +51,7 @@ extern "C"
 	 Message *orig_message;
 	 SendType type;
 	 const gchar * charset;
-	 GtkWidget * ready_widgets[4];
+	 GtkWidget * ready_widgets[2];
 	 GtkWidget * view_checkitems[VIEW_MENU_LENGTH];
    };
 

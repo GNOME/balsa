@@ -842,10 +842,8 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
   gnome_app_create_menus_with_data (GNOME_APP (window), main_menu, msg);
   gnome_app_create_toolbar_with_data (GNOME_APP (window), main_toolbar, msg);
 
-  msg->ready_widgets[0] = file_menu[MENU_FILE_SEND_POS    ].widget;
-  msg->ready_widgets[1] = file_menu[MENU_FILE_POSTPONE_POS].widget;
-  msg->ready_widgets[2] = main_toolbar[TOOL_SEND_POS      ].widget;
-  msg->ready_widgets[3] = main_toolbar[TOOL_POSTPONE_POS  ].widget;
+  msg->ready_widgets[0] = file_menu[MENU_FILE_SEND_POS].widget;
+  msg->ready_widgets[1] = main_toolbar[TOOL_SEND_POS  ].widget;
 /* create the top portion with the to, from, etc in it */
   gtk_paned_add1 (GTK_PANED(paned), create_info_pane (msg, type));
 
@@ -1288,8 +1286,6 @@ static gint
 postpone_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
   Message *message;
-
-  if(! is_ready_to_send(bsmsg) ) return FALSE;
 
   message = bsmsg2message(bsmsg);
 

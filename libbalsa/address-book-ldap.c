@@ -270,7 +270,7 @@ libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab)
 
 /*
  * ldap_load:
- * opens the connection only, if needed.
+ * opens the connection only if needed.
  */
 static LibBalsaABErr
 libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab,
@@ -281,7 +281,7 @@ libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab,
     LibBalsaAddressBookLdap *ldap_ab;
     LibBalsaAddress *address;
     LDAPMessage *msg, *result;
-    int msgid, rc;
+    int msgid, rc, attempt;
     gchar *ldap_filter;
 
     g_return_val_if_fail ( LIBBALSA_IS_ADDRESS_BOOK_LDAP(ab), LBABERR_OK);
@@ -293,50 +293,60 @@ libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab,
     /*
      * Connect to the server.
      */
-    if (ldap_ab->directory == NULL) {
-	if ((rc=libbalsa_address_book_ldap_open_connection(ldap_ab))
-	    != LDAP_SUCCESS) {
-	    libbalsa_address_book_set_status(ab,
-					     g_strdup(ldap_err2string(rc)));
-	    return LBABERR_CANNOT_CONNECT;
+    for(attempt=0; attempt<2; attempt++) {
+        if (ldap_ab->directory == NULL) {
+            if ((rc=libbalsa_address_book_ldap_open_connection(ldap_ab))
+                != LDAP_SUCCESS) {
+                libbalsa_address_book_set_status
+                    (ab, g_strdup(ldap_err2string(rc)));
+                return LBABERR_CANNOT_CONNECT;
+            }
+        }
+        
+        /* 
+         * Attempt to search for e-mail addresses. It returns success 
+         * or failure, but not all the matches. 
+         * we use the asynchronous lookup to fetch the results in chunks
+         * in case we exceed administrative limits.
+         */ 
+        /* g_print("Performing full lookup...\n"); */
+        ldap_filter = filter 
+            ? g_strdup_printf("(&(objectClass=inetOrgPerson)"
+                              "(|(cn=%s*)(sn=%s*)(mail=%s@*)))",
+                              filter, filter, filter)
+            : g_strdup("(objectClass=inetOrgPerson)");
+        msgid = ldap_search(ldap_ab->directory, ldap_ab->base_dn,
+                            LDAP_SCOPE_SUBTREE, 
+                            ldap_filter, attrs, 0);
+        if (msgid == -1) {
+            libbalsa_address_book_ldap_close_connection(ldap_ab);
+            continue; /* try again */
+        }
+        /* 
+         * Now loop over all the results, and spit out the output.
+         */
+        
+        while((rc=ldap_result(ldap_ab->directory, msgid, 
+                              LDAP_MSG_ONE, NULL, &result))>0) {
+            msg = ldap_first_entry(ldap_ab->directory, result);
+            if (!msg || ldap_msgtype( msg ) == LDAP_RES_SEARCH_RESULT)
+                break;
+            address = libbalsa_address_book_ldap_get_address(ab, msg);
+            callback(ab, address, closure);
+            g_object_unref(address);
+        }
+        if(rc == -1) { /* try again */
+            libbalsa_address_book_ldap_close_connection(ldap_ab);
+            continue;
 	}
+        callback(ab, NULL, closure);
+        ldap_msgfree(result);
+        libbalsa_address_book_set_status(ab, NULL);
+        return LBABERR_OK;
     }
-    
-    /* 
-     * Attempt to search for e-mail addresses. It returns success 
-     * or failure, but not all the matches. 
-     * we use the asynchronous lookup to fetch the results in chunks
-     * in case we exceed administrative limits.
-     */ 
-    /* g_print("Performing full lookup...\n"); */
-    ldap_filter = filter 
-        ? g_strdup_printf("(&(objectClass=inetOrgPerson)"
-                          "(|(cn=%s*)(sn=%s*)(mail=%s@*)))",
-                          filter, filter, filter)
-        : g_strdup("(objectClass=inetOrgPerson)");
-    msgid = ldap_search(ldap_ab->directory, ldap_ab->base_dn,
-                        LDAP_SCOPE_SUBTREE, 
-                        ldap_filter, attrs, 0);
-    if (msgid == -1) {
-        libbalsa_address_book_ldap_close_connection(ldap_ab);
-	return LBABERR_CANNOT_SEARCH;
-    }
-    /* 
-     * Now loop over all the results, and spit out the output.
-     */
-    while((rc=ldap_result(ldap_ab->directory, msgid, 
-                          LDAP_MSG_ONE, NULL, &result))>0) {
-        msg = ldap_first_entry(ldap_ab->directory, result);
-        if (!msg || ldap_msgtype( msg ) == LDAP_RES_SEARCH_RESULT)
-            break;
-        address = libbalsa_address_book_ldap_get_address(ab, msg);
-        callback(ab, address, closure);
-        g_object_unref(address);
-    }
-    callback(ab, NULL, closure);
-    ldap_msgfree(result);
-    libbalsa_address_book_set_status(ab, NULL);
-    return LBABERR_OK;
+    /* we have tried and failed... */
+    /* extended status? */
+    return LBABERR_CANNOT_SEARCH;
 }
 
 
@@ -430,7 +440,7 @@ create_name(gchar * first, gchar * last)
 #define SETMOD(mods,modarr,op,attr,strv,val) \
    do { (mods) = &(modarr); (modarr).mod_type=attr; (modarr).mod_op=op;\
         (strv)[0]=(val); (modarr).mod_values=strv; \
-        printf("%s set to %s\n", attr, strv[0]);} while(0)
+      } while(0)
 
 static LibBalsaABErr
 libbalsa_address_book_ldap_add_address(LibBalsaAddressBook *ab,
@@ -663,7 +673,6 @@ libbalsa_address_book_ldap_modify_address(LibBalsaAddressBook *ab,
     cnt = 0;
     do {
         rc = ldap_modify_s(ldap_ab->directory, dn, mods);
-        printf("rc=%d\n", rc);
         switch(rc) {
         case LDAP_SUCCESS: return LBABERR_OK;
         case LDAP_SERVER_DOWN:

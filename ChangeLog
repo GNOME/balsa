@@ -1,3 +1,8 @@
+2003-08-22  Pawel Salek  <pawsa theochem.kth.se>
+
+	* libbalsa/address-book-ldap.c: handle better broken connections.
+	* src/store-address.c: more detailed error reporting.
+
 2003-08-18  Pawel Salek  <pawsa theochem.kth.se>
 
 	* configure.in: improve aspell detection (120180).

@@ -204,7 +204,6 @@ store_address_from_entries(GtkWindow *window, StoreAddressInfo * info,
 {
     LibBalsaAddress *address;
     LibBalsaABErr rc;
-    gchar *msg;
 
     if (info->current_address_book == NULL) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
@@ -215,21 +214,28 @@ store_address_from_entries(GtkWindow *window, StoreAddressInfo * info,
     address = libbalsa_address_new_from_edit_entries(entries);
     rc = libbalsa_address_book_add_address(info->current_address_book,
                                            address);
-    switch(rc) {
-    case LBABERR_OK: msg = NULL; break; 
-    case LBABERR_CANNOT_WRITE: 
-        msg = _("Address could not be written to this address book."); break;
-    case LBABERR_CANNOT_CONNECT:
-        msg = _("Address book could not be accessed."); break;
-    case LBABERR_DUPLICATE:
-        msg = _("This mail address is already in this address book."); break;
-    default:
-        msg = _("Unexpected address book error. Report it."); break;
-    }
-    if(msg)
+    if(rc != LBABERR_OK) {
+        const gchar *msg =
+            libbalsa_address_book_strerror(info->current_address_book, rc);
+        if(!msg) {
+            switch(rc) {
+            case LBABERR_CANNOT_WRITE: 
+                msg = _("Address could not be written to this address book.");
+                break;
+            case LBABERR_CANNOT_CONNECT:
+                msg = _("Address book could not be accessed."); break;
+            case LBABERR_DUPLICATE:
+                msg = _("This mail address is already in this address book.");
+                break;
+            default:
+                msg = _("Unexpected address book error. Report it."); break;
+            }
+        }
         balsa_information_parented(window, LIBBALSA_INFORMATION_ERROR, msg);
+    }
+    
     g_object_unref(address);
-    return msg == NULL;
+    return rc == LBABERR_OK;
 }
 
 /* store_address_book_frame:

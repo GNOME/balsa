@@ -307,6 +307,7 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
       gchar* old_mbox_name = g_strdup(mailbox->name);
       conf_update_mailbox (mcw->mailbox, old_mbox_name);
       g_free(old_mbox_name);
+      mblist_redraw();
       /* TODO cleanup */
       return;
     }
@@ -369,6 +370,7 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 	add_mailbox_config (mailbox);
 	break;
       }
+  mblist_redraw();
 
   /* close the new mailbox window */
   gtk_widget_destroy (mcw->window);

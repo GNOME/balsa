@@ -1,5 +1,10 @@
-2003-11-11 08:01  PeterB
+2003-11-11 12:45  PeterB
 
+	* libbalsa/: mailbox.c, mailbox_imap.c, mailbox_maildir.c,
+	mailbox_mbox.c, mailbox_mh.c: Move more checking and locking from
+	subclasses to mailbox.c; clear message->mailbox when closing
+	mailbox.
+	* libbalsa/mailbox_mh.c: Fix editing error.
 	* libbalsa/send.c, src/balsa-mblist.c, src/mailbox-node.c,
 	src/main-window.c: Use MAILBOX_OPEN() macro.
 	* libbalsa/: mailbox_local.c, mailbox_local.h:

@@ -1,3 +1,8 @@
+2004-03-19 15:18  PeterB
+
+	* libbalsa/: mailbox_maildir.c, mailbox_mh.c: be more careful
+	dereferencing message info array.
+
 2004-03-18  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: process flags in batches.

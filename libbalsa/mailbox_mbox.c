@@ -225,9 +225,6 @@ libbalsa_mailbox_mbox_get_message_stream(LibBalsaMailbox *mailbox,
 
 	msg_info = &g_array_index(mbox->messages_info,
 				  struct message_info, message->msgno - 1);
-	if (!msg_info)
-	    return NULL;
-
 	stream = g_mime_stream_substream(mbox->gmime_stream,
 					 msg_info->start
 					 + strlen(msg_info->from) + 1,
@@ -346,16 +343,28 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
 }
 
 static void
+mbox_msg_unref(gpointer data, GObject *msg)
+{
+    LibBalsaMailboxMbox *mbox = LIBBALSA_MAILBOX_MBOX(data);
+    unsigned msgno = LIBBALSA_MESSAGE(msg)->msgno;
+    struct message_info *msg_info =
+	&g_array_index(mbox->messages_info, struct message_info, msgno - 1);
+    msg_info->message = NULL;
+}
+
+static void
 free_message_info(struct message_info *msg_info)
 {
     g_free(msg_info->from);
-    if(msg_info->message) {
+    msg_info->from = NULL;
+    if (msg_info->message) {
+	g_object_weak_unref(G_OBJECT(msg_info->message), mbox_msg_unref,
+			    msg_info->message->mailbox);
 	msg_info->message->mailbox = NULL;
-	g_object_remove_weak_pointer(G_OBJECT(msg_info->message),
-				     (gpointer) &msg_info->message);
+	msg_info->message->msgno   = 0;
+	msg_info->message = NULL;
     }
 }
-
 
 static void
 free_messages_info(GArray * messages_info)
@@ -1186,28 +1195,22 @@ libbalsa_mailbox_mbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
 
     msg_info = &g_array_index(mbox->messages_info,
 			      struct message_info, msgno-1);
-    if(msg_info->message)
-	g_object_ref(msg_info->message);
-    else {
-	LibBalsaMessage * message;
-
+    if(!msg_info->message) {
 	g_mime_stream_seek(mbox->gmime_stream, msg_info->start,
 			   GMIME_STREAM_SEEK_SET);
 	gmime_parser = g_mime_parser_new_with_stream(mbox->gmime_stream);
 	g_mime_parser_set_scan_from(gmime_parser, TRUE);
 	g_mime_parser_set_respect_content_length(gmime_parser, TRUE);
 	mime_message = g_mime_parser_construct_message(gmime_parser);
-	msg_info->message = message = 
-	    lbm_mbox_message_new(mime_message, msg_info);
-	message->flags   = msg_info->flags;
-	message->mailbox = mailbox;
-	message->msgno   = msgno;
+	msg_info->message = lbm_mbox_message_new(mime_message, msg_info);
+	msg_info->message->mailbox = mailbox;
+	msg_info->message->msgno   = msgno;
+	msg_info->message->flags   = msg_info->flags;
 	g_object_unref(mime_message);
 	g_object_unref(gmime_parser);
-	g_object_add_weak_pointer(G_OBJECT(message),
-				  (gpointer) &msg_info->message);
-    }
-
+	g_object_weak_ref(G_OBJECT(msg_info->message), mbox_msg_unref,
+			  mbox);
+    } else g_object_ref(msg_info->message);
     return msg_info->message;
 }
 

@@ -731,6 +731,7 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     g_free(balsa_app.subject_font);
     balsa_app.subject_font =
         g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->subject_font)));
+    libbalsa_set_charset(balsa_charset_from_message_font());
 
     g_free(balsa_app.quote_regex);
     entry_widget = gnome_entry_gtk_entry(GNOME_ENTRY(pui->quote_pattern));

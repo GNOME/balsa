@@ -709,10 +709,7 @@ const char*
 libbalsa_set_charset(const gchar * charset)
 {
     const char * old_charset = Charset;
-    libbalsa_lock_mutt();
-    mutt_set_charset((gchar *) charset);
-    SendCharset = (char*)charset;
-    libbalsa_unlock_mutt();
+    mutt_set_charset(g_strdup(charset)); /*small leak*/
     return old_charset;
 }
 
@@ -869,3 +866,4 @@ libbalsa_truncate_string(const gchar *str, gint length, gint dots)
 
     return res;
 }
+

@@ -32,6 +32,8 @@
 #include "filter-funcs.h"
 #include "mailbox-filter.h"
 
+#include "libbalsa/misc.h"
+
 #define BALSA_CONFIG_PREFIX "balsa/"
 #define FOLDER_SECTION_PREFIX "folder-"
 #define MAILBOX_SECTION_PREFIX "mailbox-"
@@ -605,6 +607,8 @@ config_global_load(void)
     g_free(balsa_app.subject_font);
     balsa_app.subject_font =
 	gnome_config_get_string("SubjectFont=" DEFAULT_SUBJECT_FONT);
+
+    libbalsa_set_charset(balsa_charset_from_message_font());
 
     /* ... wrap words */
     balsa_app.browse_wrap = gnome_config_get_bool("WordWrap=true");

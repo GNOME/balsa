@@ -881,3 +881,27 @@ balsa_find_index_by_mailbox(LibBalsaMailbox * mailbox)
     /* didn't find a matching mailbox */
     return NULL;
 }
+
+/*
+ * parse the font name to find the encoding. i feel so dirty.
+ * -*-fixed-bold-r-normal-*-*-*-*-*-c-*-iso8859-1
+ */
+gchar *
+balsa_charset_from_message_font(void) {
+    gchar *s = balsa_app.message_font;
+    gint i = 0;
+
+    do {
+	if(*s == '\0')
+	    break;
+	if(*s == '-')
+	    i++;
+	s++;
+    } while(i < 13); 
+    
+    fprintf(stderr, "FONT: %s\n",s);
+    
+    if(i<13)
+	return NULL;
+    return s;
+}

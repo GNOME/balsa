@@ -399,5 +399,7 @@ GtkWidget *create_entry(GnomeDialog *mcw, GtkWidget * table,
 			const gchar * initval, const guint keyval);
 GtkWidget *create_check(GnomeDialog *mcw, const gchar * label, 
 			GtkWidget * table, gint row, gboolean initval);
+gchar *balsa_charset_from_message_font(void);
+
 
 #endif				/* __BALSA_APP_H__ */

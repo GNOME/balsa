@@ -60,18 +60,18 @@ extern struct BalsaApplication
   GList *mailbox_list;
   GList *addressbook_list;
 
+  /* timer for mm_exists callback */
+  gint new_messages_timer;
+  gint new_messages;
 
-  /* timer for periodic mail checking */
-  gint timer;
-
+  /* timer for checking mail every xx minutes */
+  gint check_mail_timer;
 
   /* GUI settings */
   gint mw_width;
   gint mw_height;
   GtkToolbarStyle toolbar_style;
 
-
-  gint new_messages;
   gint debug;
 }
 balsa_app;

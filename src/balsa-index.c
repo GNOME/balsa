@@ -495,10 +495,15 @@ bndx_filt_check(BalsaIndex * index)
 		GtkTreePath *path;
 		if (bndx_find_message(index, &path, NULL,
 				      index->current_message)) {
-		    bndx_expand_to_row(index, path);
-		    bndx_select_row(index, path);
+		    GtkTreeSelection *selection =
+			gtk_tree_view_get_selection(GTK_TREE_VIEW(index));
+		    if (!gtk_tree_selection_path_is_selected(selection,
+							     path)) {
+			bndx_expand_to_row(index, path);
+			bndx_select_row(index, path);
+		    }
 		    gtk_tree_path_free(path);
-		}
+		} /* else ??? */
 		g_object_unref(index->current_message);
 	    }
             libbalsa_mailbox_search_iter_free(iter_view);

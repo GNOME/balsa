@@ -342,7 +342,7 @@ create_menu ()
 		      "activate",
 		      (GtkSignalFunc) check_new_messages_cb,
 		      NULL);
-
+  gtk_object_set_user_data (GTK_OBJECT (w), mw);
   gtk_widget_show (w);
 
 

@@ -908,15 +908,23 @@ libbalsa_mailbox_imap_message_match(LibBalsaMailbox* mailbox, guint msgno,
     mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     msg_info = message_info_from_msgno(mimap, msgno);
 
-    if (!msg_info->message
-	&& imap_mbox_handle_get_msg(mimap->handle, msgno)
-	&& imap_mbox_handle_get_msg(mimap->handle, msgno)->envelope) 
-	libbalsa_mailbox_imap_get_message(mailbox, msgno);
+    if (msg_info->message)
+        g_object_ref(msg_info->message);
+    else if (imap_mbox_handle_get_msg(mimap->handle, msgno)
+             && imap_mbox_handle_get_msg(mimap->handle, msgno)->envelope)
+        libbalsa_mailbox_imap_get_message(mailbox, msgno);
 
-    if (libbalsa_condition_can_match(search_iter->condition,
-				     msg_info->message))
-	return libbalsa_condition_matches(search_iter->condition,
-					  msg_info->message);
+    if (msg_info->message) {
+        if (libbalsa_condition_can_match(search_iter->condition,
+                                         msg_info->message)) {
+            gboolean retval =
+                libbalsa_condition_matches(search_iter->condition,
+                                           msg_info->message);
+            g_object_unref(msg_info->message);
+            return retval;
+        }
+        g_object_unref(msg_info->message);
+    }
 
     if (search_iter->stamp != mimap->search_stamp && search_iter->mailbox
 	&& LIBBALSA_MAILBOX_GET_CLASS(search_iter->mailbox)->

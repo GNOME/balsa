@@ -79,14 +79,16 @@ gchar *libbalsa_urlencode(const gchar* str);
 gboolean libbalsa_find_word(const gchar * word, const gchar * str);
 void libbalsa_wrap_string(gchar * str, int width);
 GString *libbalsa_process_text_rfc2646(gchar * par, gint width,
-                                       gboolean from_screen,
-                                       gboolean to_screen,
-                                       gboolean quote);
+				       gboolean from_screen,
+				       gboolean to_screen, gboolean quote,
+				       gboolean delsp);
 gchar *libbalsa_wrap_rfc2646(gchar * par, gint width,
-                             gboolean from_screen, gboolean to_screen);
+                             gboolean from_screen, gboolean to_screen,
+			     gboolean delsp);
 void libbalsa_wrap_view(GtkTextView * view, gint length);
 void libbalsa_unwrap_buffer(GtkTextBuffer * buffer, GtkTextIter * iter,
                             gint lines);
+void libbalsa_prepare_delsp(GtkTextBuffer * buffer);
 
 const char* libbalsa_set_charset(const gchar * charset);
 const char* libbalsa_set_send_charset(const gchar * charset);

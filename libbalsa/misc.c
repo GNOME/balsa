@@ -361,7 +361,7 @@ typedef struct {
 } rfc2646text;
 
 static GList *
-unwrap_rfc2646(gchar * str, gboolean from_screen)
+unwrap_rfc2646(gchar * str, gboolean from_screen, gboolean delsp)
 {
     GList *list = NULL;
 
@@ -369,11 +369,11 @@ unwrap_rfc2646(gchar * str, gboolean from_screen)
         /* make a line of output */
         rfc2646text *text = g_new(rfc2646text, 1);
         GString *string = g_string_new(NULL);
-        gboolean chomp = TRUE;
+        gboolean flowed;
 
         text->quote_depth = -1;
 
-        while (*str) {
+        for (flowed = TRUE; flowed && *str; ) {
             /* process a line of input */
             gboolean sig_sep;
             gchar *p;
@@ -404,14 +404,16 @@ unwrap_rfc2646(gchar * str, gboolean from_screen)
             if (*str)
                 str++;
 
+	    flowed = (len > 0 && p[len - 1] == ' ' && !sig_sep);
+	    if (flowed && delsp)
+		/* Don't include the last space. */
+		--len;
+
             g_string_append_len(string, p, len);
-            if (len == 0 || p[--len] != ' ' || sig_sep) {
-                chomp = FALSE;
-                break;
-            }
         }
         text->str = g_string_free(string, FALSE);
-        if (chomp) {
+        if (flowed) {
+	    /* Broken: remove trailing spaces. */
             gchar *p = text->str;
             while (*p)
                 p++;
@@ -551,13 +553,14 @@ dowrap_rfc2646(GList * list, gint width, gboolean to_screen,
 GString *
 libbalsa_process_text_rfc2646(gchar * par, gint width,
                               gboolean from_screen,
-                              gboolean to_screen, gboolean quote)
+                              gboolean to_screen, gboolean quote,
+			      gboolean delsp)
 {
     gint len = strlen(par);
     GString *result = g_string_sized_new(len);
     GList *list;
 
-    list = unwrap_rfc2646(par, from_screen);
+    list = unwrap_rfc2646(par, from_screen, delsp);
     dowrap_rfc2646(list, width, to_screen, quote, result);
     g_list_free(list);
 
@@ -571,12 +574,12 @@ libbalsa_process_text_rfc2646(gchar * par, gint width,
 */
 gchar *
 libbalsa_wrap_rfc2646(gchar * par, gint width, gboolean from_screen,
-                      gboolean to_screen)
+                      gboolean to_screen, gboolean delsp)
 {
     GString *result;
 
     result = libbalsa_process_text_rfc2646(par, width, from_screen,
-                                           to_screen, FALSE);
+                                           to_screen, FALSE, delsp);
     g_free(par);
 
     return g_string_free(result, FALSE);
@@ -592,8 +595,6 @@ libbalsa_wrap_rfc2646(gchar * par, gint width, gboolean from_screen,
 static GtkTextTag *get_quote_tag(GtkTextIter * iter);
 static gint get_quote_depth(GtkTextIter * iter, gchar ** quote_string);
 static gchar *get_line(GtkTextBuffer * buffer, GtkTextIter * iter);
-static void prepare_log_attrs(PangoLogAttr * log_attrs, gint attrs_len,
-                              GtkWidget * widget, gchar * line);
 static gboolean is_in_url(GtkTextIter * iter, gint offset,
                           GtkTextTag * url_tag);
 
@@ -605,81 +606,97 @@ libbalsa_wrap_view(GtkTextView * view, gint length)
     GtkTextTag *url_tag = gtk_text_tag_table_lookup(table, "url");
     GtkTextTag *soft_tag = gtk_text_tag_table_lookup(table, "soft");
     GtkTextIter iter;
+    PangoContext *context = gtk_widget_get_pango_context(GTK_WIDGET(view));
+    PangoLanguage *language = pango_context_get_language(context);
     PangoLogAttr *log_attrs = NULL;
 
     gtk_text_buffer_get_start_iter(buffer, &iter);
 
     /* Loop over original lines. */
     while (!gtk_text_iter_is_end(&iter)) {
-        GtkTextTag *quote_tag;
-        gchar *quote_string;
-        gint quote_len;
+	GtkTextTag *quote_tag;
+	gchar *quote_string;
+	gint quote_len;
 
-        quote_tag = get_quote_tag(&iter);
-        quote_len = get_quote_depth(&iter, &quote_string);
-        if (quote_string && quote_string[quote_len])
-            quote_len++;
+	quote_tag = get_quote_tag(&iter);
+	quote_len = get_quote_depth(&iter, &quote_string);
+	if (quote_string) {
+	    if (quote_string[quote_len])
+		quote_len++;
+	    else {
+		gchar *tmp = g_strconcat(quote_string, " ", NULL);
+		g_free(quote_string);
+		quote_string = tmp;
+	    }
+	}
 
-        /* Loop over breaks within the original line. */
-        while (!gtk_text_iter_ends_line(&iter)) {
-            gchar *line;
-            gint num_chars;
-            gint attrs_len;
-            gint offset;
-            gint len;
-            gint brk_offset = 0;
-            gunichar c = 0;
+	/* Loop over breaks within the original line. */
+	while (!gtk_text_iter_ends_line(&iter)) {
+	    gchar *line;
+	    gint num_chars;
+	    gint attrs_len;
+	    gint offset;
+	    gint len;
+	    gint brk_offset = 0;
+	    gunichar c = 0;
+	    gboolean in_space = FALSE;
 
-            line = get_line(buffer, &iter);
-            num_chars = g_utf8_strlen(line, -1);
-            attrs_len = num_chars + 1;
-            log_attrs = g_renew(PangoLogAttr, log_attrs, attrs_len);
-            prepare_log_attrs(log_attrs, attrs_len, GTK_WIDGET(view),
-                              line);
-            g_free(line);
+	    line = get_line(buffer, &iter);
+	    num_chars = g_utf8_strlen(line, -1);
+	    attrs_len = num_chars + 1;
+	    log_attrs = g_renew(PangoLogAttr, log_attrs, attrs_len);
+	    pango_get_log_attrs(line, -1, -1, language, log_attrs, attrs_len);
+	    g_free(line);
 
-            for (len = offset = quote_len;
-                 len < length && offset < num_chars; offset++) {
-                gtk_text_iter_set_line_offset(&iter, offset);
-                c = gtk_text_iter_get_char(&iter);
-                if (c == '\t')
-                    len = ((len + 8)/8)*8;
-                else if (g_unichar_isprint(c))
-                    len++;
+	    for (len = offset = quote_len;
+		 len < length && offset < num_chars; offset++) {
+		gtk_text_iter_set_line_offset(&iter, offset);
+		c = gtk_text_iter_get_char(&iter);
+		if (c == '\t')
+		    len = ((len + 8) / 8) * 8;
+		else if (g_unichar_isprint(c))
+		    len++;
 
-                if (log_attrs[offset].is_line_break
-                    && !is_in_url(&iter, offset, url_tag))
-                    brk_offset = offset;
-            }
+		if (log_attrs[offset].is_line_break
+		    && !is_in_url(&iter, offset, url_tag))
+		    brk_offset = offset;
+	    }
 
-            if (len < length)
-                break;
+	    if (len < length)
+		break;
 
-            if (brk_offset > quote_len && !g_unichar_isspace(c))
-                /* Break at the last break we saw. */
-                gtk_text_iter_set_line_offset(&iter, brk_offset);
-            else {
-                /* Break at the next line break. */
-                if (offset <= quote_len)
-                    offset = quote_len + 1;
-                while (offset < num_chars
-                       && !(log_attrs[offset].is_line_break
-                            && !is_in_url(&iter, offset, url_tag)))
-                    offset++;
-                if (offset >= num_chars)
-                    /* No next line break. */
-                    break;
-            }
+	    in_space = g_unichar_isspace(c);
+	    if (brk_offset > quote_len && !in_space)
+		/* Break at the last break we saw. */
+		gtk_text_iter_set_line_offset(&iter, brk_offset);
+	    else {
+		/* Break at the next line break. */
+		if (offset <= quote_len)
+		    offset = quote_len + 1;
+		while (offset < num_chars
+		       && (is_in_url(&iter, offset, url_tag)
+			   || !log_attrs[offset].is_line_break)) {
+		    gboolean next_is_space =
+			g_unichar_isspace(gtk_text_iter_get_char(&iter));
+		    if (FALSE && in_space && !next_is_space)
+			break;
+		    in_space = next_is_space;
+		    offset++;
+		}
+		if (offset >= num_chars)
+		    /* No next line break. */
+		    break;
+	    }
 
-            gtk_text_buffer_insert_with_tags(buffer, &iter, "\n", 1,
-                                             soft_tag, NULL);
-            if (quote_string)
-                gtk_text_buffer_insert_with_tags(buffer, &iter,
-                                                 quote_string, -1,
-                                                 quote_tag, NULL);
-        }
-        g_free(quote_string);
-        gtk_text_iter_forward_line(&iter);
+	    gtk_text_buffer_insert_with_tags(buffer, &iter, "\n", 1,
+					     soft_tag, NULL);
+	    if (quote_string)
+		gtk_text_buffer_insert_with_tags(buffer, &iter,
+						 quote_string, -1,
+						 quote_tag, NULL);
+	}
+	g_free(quote_string);
+	gtk_text_iter_forward_line(&iter);
     }
     g_free(log_attrs);
 }
@@ -750,48 +767,6 @@ get_line(GtkTextBuffer * buffer, GtkTextIter * iter)
     return gtk_text_buffer_get_slice(buffer, iter, &end, TRUE);
 }
 
-static void
-prepare_log_attrs(PangoLogAttr * log_attrs, gint attrs_len,
-                  GtkWidget * widget, gchar * line)
-{
-    /* Use pango_break to find possible breaks. First we need a
-     * PangoAnalysis, which is provided by pango_itemize.
-     * However, to do that we need a PangoAttrList, which
-     * presumably should come from the GtkTextView widget; I
-     * can't see how to do that, so we'll create an empty list
-     * and use that. */
-    PangoContext *context;
-    PangoAttrList *attrs;
-    GList *item_list, *l;
-    gint num_chars = 0;
-
-    context = gtk_widget_get_pango_context(widget);
-    attrs = pango_attr_list_new();
-    item_list = pango_itemize(context, line, 0, strlen(line), attrs, NULL);
-    pango_attr_list_unref(attrs);
-
-    for (l = item_list; l; l = g_list_next(l)) {
-        PangoItem *pango_item = l->data;
-        gchar *p, *q;
-
-        pango_break(&line[pango_item->offset],
-                    pango_item->length, &pango_item->analysis,
-                    &log_attrs[num_chars], attrs_len - num_chars);
-
-        /* We'll assume that it's OK to break at the start of a new
-         * item, if it's preceded by a space. */
-        q = &line[pango_item->offset];
-        p = g_utf8_find_prev_char(line, q);
-        if (p && g_unichar_isspace(g_utf8_get_char(p))
-            && !g_unichar_isspace(g_utf8_get_char(q)))
-            log_attrs[num_chars].is_line_break = TRUE;
-        num_chars += pango_item->num_chars;
-    }
-
-    g_list_foreach(item_list, (GFunc) pango_item_free, NULL);
-    g_list_free(item_list);
-}
-
 /* Move the iter to position offset in the current line, and test
  * whether it's in an URL. */
 static gboolean
@@ -814,73 +789,89 @@ static regex_t *get_url_reg(void);
 
 void
 libbalsa_unwrap_buffer(GtkTextBuffer * buffer, GtkTextIter * iter,
-                       gint num_paras)
+		       gint num_paras)
 {
     GtkTextTagTable *table = gtk_text_buffer_get_tag_table(buffer);
     GtkTextTag *soft_tag = gtk_text_tag_table_lookup(table, "soft");
     GtkTextTag *url_tag = gtk_text_tag_table_lookup(table, "url");
-    gboolean soft;
 
     /* Check whether the previous line flowed into this one. */
     gtk_text_iter_set_line_offset(iter, 0);
-    soft = gtk_text_iter_ends_tag(iter, soft_tag);
-
-    if (gtk_text_iter_backward_line(iter) && !soft
-        && !gtk_text_iter_ends_line(iter)) {
-        /* Remove spaces preceding a hard newline. */
-        GtkTextIter end;
-
-        gtk_text_iter_forward_to_line_end(iter);
-        end = *iter;
-        while (!gtk_text_iter_starts_line(iter)) {
-            gtk_text_iter_backward_char(iter);
-            if (gtk_text_iter_get_char(iter) != ' ') {
-                gtk_text_iter_forward_char(iter);
-                break;
-            }
-        }
-        gtk_text_buffer_delete(buffer, iter, &end);
-        gtk_text_iter_forward_line(iter);
-    }
+    if (gtk_text_iter_ends_tag(iter, soft_tag))
+	gtk_text_iter_backward_line(iter);
 
     for (; num_paras; num_paras--) {
-        gint quote_depth;
-        GtkTextIter start;
-        gchar *line;
+	gint quote_depth;
+	gint qd;
+	GtkTextIter start;
+	gchar *line;
 
-        gtk_text_iter_set_line_offset(iter, 0);
-        quote_depth = get_quote_depth(iter, NULL);
+	gtk_text_iter_set_line_offset(iter, 0);
+	quote_depth = get_quote_depth(iter, NULL);
 
-        for (;;) {
-            gint qd;
-            gchar *quote_string;
+	for (;;) {
+	    gchar *quote_string;
+	    gboolean stuffed;
 
-            if (!gtk_text_iter_forward_to_line_end(iter))
-                return;
-            start = *iter;
-            if (!gtk_text_iter_forward_line(iter))
-                return;
+	    /* Move to the end of the line, if not there already. */
+	    if (!gtk_text_iter_ends_line(iter)
+		&& !gtk_text_iter_forward_to_line_end(iter))
+		return;
+	    /* Save this iter as the start of a possible deletion. */
+	    start = *iter;
+	    /* Move to the start of the next line. */
+	    if (!gtk_text_iter_forward_line(iter))
+		return;
 
-            qd = get_quote_depth(iter, &quote_string);
-            if (!gtk_text_iter_has_tag(&start, soft_tag)
-                || qd != quote_depth)
-                break;
+	    qd = get_quote_depth(iter, &quote_string);
+	    stuffed = quote_string && quote_string[qd];
+	    g_free(quote_string);
 
-            if (qd > 0 && quote_string[qd] != ' ') {
-                /* User deleted the space following the '>' chars; we'll
-                 * delete the space at the end of the previous line, if
-                 * there was one. */
-                gtk_text_iter_backward_char(&start);
-                if (gtk_text_iter_get_char(&start) != ' ')
-                    gtk_text_iter_forward_char(&start);
-            }
-            gtk_text_buffer_delete(buffer, &start, iter);
-        }
+	    if (gtk_text_iter_has_tag(&start, soft_tag)) {
+		if (qd != quote_depth) {
+		    /* Broken: use quote-depth-wins. */
+		    GtkTextIter end = start;
+		    gtk_text_iter_forward_to_tag_toggle(&end, soft_tag);
+		    gtk_text_buffer_remove_tag(buffer, soft_tag,
+					       &start, &end);
+		    break;
+		}
+	    } else
+		/* Hard newline. */
+		break;
 
-        line = get_line(buffer, &start);
-        if (prescanner(line))
-            mark_urls(buffer, &start, url_tag, line);
-        g_free(line);
+	    if (qd > 0 && !stuffed) {
+		/* User deleted the space following the '>' chars; we'll
+		 * delete the space at the end of the previous line, if
+		 * there was one. */
+		gtk_text_iter_backward_char(&start);
+		if (gtk_text_iter_get_char(&start) != ' ')
+		    gtk_text_iter_forward_char(&start);
+	    }
+	    gtk_text_buffer_delete(buffer, &start, iter);
+	}
+
+	if (num_paras < 0) {
+	    /* This is a wrap_body call, not a continuous wrap, so we'll
+	     * remove spaces before a hard newline. */
+	    *iter = start;
+	    while (gtk_text_iter_get_line_offset(&start) >
+		   (qd ? qd + 1 : 0)) {
+		gtk_text_iter_backward_char(&start);
+		if (gtk_text_iter_get_char(&start) != ' ') {
+		    gtk_text_iter_forward_char(&start);
+		    break;
+		}
+	    }
+	    gtk_text_buffer_delete(buffer, &start, iter);
+	    if (!gtk_text_iter_forward_line(iter))
+		return;
+	}
+
+	line = get_line(buffer, &start);
+	if (prescanner(line))
+	    mark_urls(buffer, &start, url_tag, line);
+	g_free(line);
     }
 }
 
@@ -906,6 +897,20 @@ mark_urls(GtkTextBuffer * buffer, GtkTextIter * iter, GtkTextTag * tag,
         if (!prescanner(p))
             break;
     }
+}
+
+/* Prepare the buffer for sending with DelSp=Yes. */
+void
+libbalsa_prepare_delsp(GtkTextBuffer * buffer)
+{
+    GtkTextTagTable *table = gtk_text_buffer_get_tag_table(buffer);
+    GtkTextTag *soft_tag = gtk_text_tag_table_lookup(table, "soft");
+    GtkTextIter iter;
+
+    gtk_text_buffer_get_start_iter(buffer, &iter);
+    while (gtk_text_iter_forward_to_line_end(&iter))
+	if (gtk_text_iter_has_tag(&iter, soft_tag))
+	    gtk_text_buffer_insert(buffer, &iter, " ", 1);
 }
 
 /*

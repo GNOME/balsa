@@ -10,7 +10,7 @@ msgstr ""
 "Last-Translator: Peter Dobrev <p.dobrev@softhome.net>\n"
 "Language-Team: Bulgarian <dict@linux.zonebg.com>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=windows-1251\n"
+"Content-Type: text/plain; charset=CP1251\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: libbalsa/address-book-ldap.c:203

@@ -26,6 +26,9 @@
 #include <stdio.h>
 
 #include "libbalsa.h"
+#if ENABLE_ESMTP
+#include <auth-client.h>
+#endif
 
 gchar *libbalsa_make_string_from_list(const GList *);
 
@@ -41,8 +44,13 @@ gboolean libbalsa_find_word(const gchar * word, const gchar * str);
 void libbalsa_wrap_string(gchar * str, int width);
 
 const char* libbalsa_set_charset(const gchar * charset);
+#if ENABLE_ESMTP
 gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
-				gchar* smtp_server, gint smtp_port);
+				gchar* smtp_server,
+				auth_context_t smtp_authctx);
+#else
+gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding);
+#endif
 void libbalsa_marshal_POINTER__OBJECT(GtkObject * object,
 				      GtkSignalFunc func,
 				      gpointer func_data, GtkArg * args);

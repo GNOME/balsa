@@ -22,18 +22,11 @@
 
 #include "config.h"
 
-/* #include <radlib.h>  */
-/* FreeBSD 4.1-STABLE FreeBSD 4.1-STABLE */
-#include <arpa/inet.h>
-#include <netdb.h>
-
 #include <fcntl.h>
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
 #endif
-
-#include <sys/socket.h>
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
@@ -42,6 +35,14 @@
 
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
+#endif
+
+#if ENABLE_ESMTP
+#include <stdarg.h>
+#include <libesmtp.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
 #endif
 
 typedef struct _MessageQueueItem MessageQueueItem;
@@ -59,14 +60,22 @@ typedef struct _SendMessageInfo SendMessageInfo;
 
 struct _SendMessageInfo{
     LibBalsaMailbox* outbox;
-    char* server;
-    int port;
+#if ENABLE_ESMTP
+    /* [BCS] - The smtp_session_t structure holds all the information
+       needed to transfer the message to the SMTP server.  This structure
+       is opaque to the application. */
+    smtp_session_t session;
+#endif
 };
 
 /* Variables storing the state of the sending thread.
  * These variables are protected in MT by send_messages_lock mutex */
+#if ENABLE_ESMTP
+#else
 static MessageQueueItem *message_queue;
+#endif
 static int total_messages_left;
+
 /* end of state variables section */
 
 
@@ -98,24 +107,34 @@ msg_queue_item_destroy(MessageQueueItem * mqi)
     g_free(mqi);
 }
 
+#if ENABLE_ESMTP
 static SendMessageInfo *
-send_message_info_new(LibBalsaMailbox* outbox, const gchar* smtp_server, 
-		      gint smtp_port)
+send_message_info_new(LibBalsaMailbox* outbox, smtp_session_t session)
 {
     SendMessageInfo *smi;
 
     smi=g_new(SendMessageInfo,1);
-    smi->server = g_strdup(smtp_server);
-    smi->port = smtp_port;
+    smi->session = session;
     smi->outbox = outbox;
 
     return smi;
 }
+#else
+static SendMessageInfo *
+send_message_info_new(LibBalsaMailbox* outbox)
+{
+    SendMessageInfo *smi;
+
+    smi=g_new(SendMessageInfo,1);
+    smi->outbox = outbox;
+
+    return smi;
+}
+#endif
 
 static void
 send_message_info_destroy(SendMessageInfo *smi)
 {
-    g_free(smi->server);
     g_free(smi);
 }
 
@@ -123,8 +142,6 @@ send_message_info_destroy(SendMessageInfo *smi)
 
 static guint balsa_send_message_real(SendMessageInfo* info);
 static void encode_descriptions(BODY * b);
-static int libbalsa_smtp_send(const char *server, const int port);
-static int libbalsa_smtp_protocol(int s, char *tempfile, HEADER * msg);
 static gboolean libbalsa_create_msg(LibBalsaMessage * message,
 				    HEADER * msg, char *tempfile,
 				    gint encoding, int queu);
@@ -236,15 +253,82 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
    send the given messsage (if any, it can be NULL) and all the messages
    in given outbox.
 */
+#if ENABLE_ESMTP
 gboolean
 libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
-		      LibBalsaMailbox* fccbox, gint encoding, 
-		      gchar* smtp_server, gint smtp_port)
+		      LibBalsaMailbox* fccbox, gint encoding,
+		      gchar* smtp_server, auth_context_t smtp_authctx)
 {
-
     if (message != NULL)
 	libbalsa_message_queue(message, outbox, fccbox, encoding);
-    return libbalsa_process_queue(outbox, encoding, smtp_server, smtp_port);
+    return libbalsa_process_queue(outbox, encoding, smtp_server, smtp_authctx);
+}
+#else
+gboolean
+libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
+		      LibBalsaMailbox* fccbox, gint encoding)
+{
+    if (message != NULL)
+	libbalsa_message_queue(message, outbox, fccbox, encoding);
+    return libbalsa_process_queue(outbox, encoding);
+}
+#endif
+
+
+#if ENABLE_ESMTP
+/* [BCS] - libESMTP uses a callback function to read the message from the
+   application to the SMTP server.
+ */
+#define BUFLEN  8192
+
+static char *
+libbalsa_message_cb (char **buf, int *len, void *arg)
+{
+    MessageQueueItem *current_message = arg;
+    struct ctx { FILE *fp; char buf[BUFLEN - sizeof (FILE *)]; } *ctx;
+    size_t octets;
+
+    if (*buf == NULL)
+      *buf = calloc (sizeof (struct ctx), 1);
+    ctx = (struct ctx *) *buf;
+
+    if (len == NULL) {
+	if (ctx->fp == NULL)
+	    ctx->fp = fopen (current_message->tempfile, "r");
+	else
+	    rewind (ctx->fp);
+	return NULL;
+    }
+
+    /* The message needs to be read a line at a time and the newlines
+       converted to \r\n because libmutt foolishly terminates lines with
+       the Unix \n despite RFC 822 calling for \r\n.  Furthermore RFC
+       822 states that bare \n and \r are acceptable in messages and
+       that individually they do not constitute a line termination.
+       This requirement cannot be reconciled with storing messages
+       with Unix line terminations.
+
+       The following code cannot therefore work correctly in all
+       situations.  Furthermore it is very inefficient since it must
+       search for the \n.
+     */
+    if (ctx->fp == NULL) {
+        octets = 0;
+    } else if (fgets (ctx->buf, sizeof ctx->buf - 1, ctx->fp) == NULL) {
+	fclose (ctx->fp);
+	ctx->fp = NULL;
+        octets = 0;
+    } else {
+	char *p = strchr (ctx->buf, '\0');
+
+	if (p[-1] == '\n' && p[-2] != '\r') {
+	    strcpy (p - 1, "\r\n");
+	    p++;
+	}
+	octets = p - ctx->buf;
+    }
+    *len = octets;
+    return ctx->buf;
 }
 
 /* libbalsa_process_queue:
@@ -253,9 +337,306 @@ libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
    NOTE that we do not close outbox after reading. send_real/thread message 
    handler does that.
 */
+/* This version uses libESMTP
+ */
 gboolean 
 libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding, 
-		       gchar* smtp_server, gint smtp_port)
+		       gchar* smtp_server, auth_context_t smtp_authctx)
+{
+    MessageQueueItem *new_message;
+    SendMessageInfo *send_message_info;
+    GList *lista, *recip;
+    LibBalsaMessage *queu;
+    LibBalsaAddress *addy; 
+    smtp_session_t session;
+    smtp_message_t message;
+    smtp_recipient_t recipient;
+#if 0
+    const smtp_status_t *status;
+#endif
+    const gchar *phrase, *mailbox;
+#ifdef BALSA_USE_THREADS
+    GtkWidget *send_dialog_source = NULL;
+
+    pthread_mutex_lock(&send_messages_lock);
+
+    /* We create here the progress bar */
+    send_dialog = gnome_dialog_new(_("Sending Mail..."), _("Hide"), NULL);
+    gtk_window_set_wmclass(GTK_WINDOW(send_dialog), "send_dialog", "Balsa");
+    gnome_dialog_set_close(GNOME_DIALOG(send_dialog), TRUE);
+    send_dialog_source = gtk_label_new(_("Sending Mail..."));
+    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
+		       send_dialog_source, FALSE, FALSE, 0);
+
+    send_progress_message = gtk_label_new("");
+    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
+		       send_progress_message, FALSE, FALSE, 0);
+
+    /* [BCS] - I've left the progress bar in the dialogue box for now,
+       but the code to advance it hasn't been done yet. */
+    send_dialog_bar = gtk_progress_bar_new();
+    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
+		       send_dialog_bar, FALSE, FALSE, 0);
+
+    gtk_widget_show_all(send_dialog);
+    /* Progress bar done */
+#endif
+
+    /* We do messages in queue now only if where are not sending them already */
+
+    /* Create the libESMTP session.  Loop over the out box and add the
+       messages to the session. */
+
+    /* FIXME - check for failure returns in the smtp_xxx() calls */
+
+    session = smtp_create_session ();
+    smtp_set_server (session, smtp_server);
+ 
+    /* Now tell libESMTP it can use the SMTP AUTH extension.  */
+    smtp_auth_set_context (session, smtp_authctx);
+ 
+    /* At present Balsa can't handle one recipient only out of many
+       failing.  Make libESMTP require all specified recipients to
+       succeed before transferring a message.  */
+    smtp_option_require_all_recipients (session, 1);
+
+    libbalsa_mailbox_open(outbox, FALSE);
+    lista = outbox->message_list;
+    while (lista != NULL) {
+	queu = LIBBALSA_MESSAGE(lista->data);
+
+	new_message = msg_queue_item_new(queu);
+	if (!libbalsa_create_msg(queu, new_message->message,
+				 new_message->tempfile, encoding, 1)) {
+	    msg_queue_item_destroy(new_message);
+	} else {
+	    total_messages_left++;
+	    message = smtp_add_message (session);
+
+	    /* The mail and its attachments should probably be made into
+	       a MIME document at this point (if not already)  Ideally
+	       the message is fully prepared in RFC 822 format so that
+	       all the callback needs to do is open and read the temporary
+	       file. */
+
+	    smtp_message_set_application_data (message, queu);
+	    smtp_set_messagecb (message, libbalsa_message_cb, new_message);
+
+
+	    /* Estimate the size of the message.  This need not be exact
+	       but its better to err on the large side.  Some message
+	       headers may be altered during the transfer. */
+	    {
+	      struct stat st;
+	      long estimate;
+
+	      if (stat (new_message->tempfile, &st) == 0)
+	        {
+	          estimate = st.st_size;
+	          estimate += 1024 - (estimate % 1024);
+		  smtp_size_set_estimate (message, estimate);
+		}
+            }
+
+#define LIBESMTP_ADDS_HEADERS
+#ifdef LIBESMTP_ADDS_HEADERS
+	    /* XXX - The following calls to smtp_set_header() probably
+	       arent necessary since they should already be in the
+	       message. */
+
+	    smtp_set_header (message, "Date", &queu->date);
+
+	    /* RFC 822 does not require a message to have a subject.
+	               I assume this is NULL if not present */
+	    if (queu->subject)
+	    	smtp_set_header (message, "Subject", queu->subject);
+
+	    /* Add the sender info */
+	    phrase = libbalsa_address_get_phrase(queu->from);
+	    mailbox = libbalsa_address_get_mailbox(queu->from, 0);
+	    smtp_set_reverse_path (message, mailbox);
+	    smtp_set_header (message, "From", phrase, mailbox);
+
+	    if (queu->reply_to) {
+		phrase = libbalsa_address_get_phrase(queu->reply_to);
+		mailbox = libbalsa_address_get_mailbox(queu->reply_to, 0);
+		smtp_set_header (message, "Reply-To", phrase, mailbox);
+	    }
+
+	    if (queu->dispnotify_to) {
+		phrase = libbalsa_address_get_phrase(queu->dispnotify_to);
+		mailbox = libbalsa_address_get_mailbox(queu->dispnotify_to, 0);
+		smtp_set_header (message, "Disposition-Notification-To",
+				 phrase, mailbox);
+	    }
+#endif
+
+	    /* Now need to add the recipients to the message */
+
+	    recip = g_list_first((GList *) queu->to_list);
+	    while (recip) {
+        	addy = recip->data;
+		phrase = libbalsa_address_get_phrase(addy);
+		mailbox = libbalsa_address_get_mailbox(addy, 0);
+		recipient = smtp_add_recipient (message, mailbox);
+		/* XXX  - this is where to add DSN requests.  It would be
+			  cool if LibBalsaAddress could contain DSN options
+			  for a particular recipient. */
+#ifdef LIBESMTP_ADDS_HEADERS
+		smtp_set_header (message, "To", phrase, mailbox);
+#endif
+	    	recip = recip->next;
+	    }
+
+	    recip = g_list_first((GList *) queu->cc_list);
+	    while (recip) {
+        	addy = recip->data;
+		phrase = libbalsa_address_get_phrase(addy);
+		mailbox = libbalsa_address_get_mailbox(addy, 0);
+		recipient = smtp_add_recipient (message, mailbox);
+		/* XXX  -  DSN */
+#ifdef LIBESMTP_ADDS_HEADERS
+		smtp_set_header (message, "Cc", phrase, mailbox);
+#endif
+	    	recip = recip->next;
+	    }
+
+	    recip = g_list_first((GList *) queu->bcc_list);
+	    while (recip) {
+        	addy = recip->data;
+		phrase = libbalsa_address_get_phrase(addy);
+		mailbox = libbalsa_address_get_mailbox(addy, 0);
+		recipient = smtp_add_recipient (message, mailbox);
+		/* XXX  -  DSN */
+#ifdef LIBESMTP_ADDS_HEADERS
+		/* XXX - interesting question. Should the Bcc header be added
+		         and let the MTA deal with it or not? */
+		/*smtp_set_header (message, "Bcc", phrase, mailbox);*/
+	    	recip = recip->next;
+#endif
+	    }
+	}
+	lista = lista->next;
+    }
+
+   /* At this point the session is ready to be sent.  As I've written the
+      code, a new smtp session is created for every call here.  Therefore
+      a new thread is always required to dispatch it.  When libESMTP gets
+      full pthread support, it should be possible to append a message to
+      a session that is currently being sent to the SMTP server, assuming
+      the QUIT command has not yet been issued.  That said, my gut feeling
+      is that its safer to always create a new server connection.
+    */
+
+    send_message_info=send_message_info_new(outbox, session);
+#ifdef BALSA_USE_THREADS
+    pthread_create(&send_mail, NULL,
+		   (void *) &balsa_send_message_real, send_message_info);
+    /* Detach so we don't need to pthread_join
+     * This means that all resources will be
+     * reclaimed as soon as the thread exits
+     */
+    pthread_detach(send_mail);
+    pthread_mutex_unlock(&send_messages_lock);
+#else				/*non-threaded code */
+    balsa_send_message_real(send_message_info);
+#endif
+    return TRUE;
+}
+
+
+static void
+handle_successful_send (smtp_message_t message, void *arg)
+{
+    LibBalsaMessage * msg;
+    const smtp_status_t *status;
+
+    status = smtp_message_transfer_status (message);
+    if (status->code / 100 == 2) {
+	msg = smtp_message_get_application_data (message);
+	libbalsa_message_delete(msg);
+    } else {
+	/* XXX - Show the poor user the status codes and message. */
+	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+			     _("SMTP message transfer error.\n"
+			       "Your message is left in Outbox."));
+    }
+}
+
+#ifdef BALSA_USE_THREADS
+static void
+libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
+{
+    SendThreadMessage *threadmsg;
+    char buf[1024];
+    va_list ap;
+    const char *mailbox;
+    smtp_message_t message;
+    smtp_recipient_t recipient;
+    const smtp_status_t *status;
+
+    va_start (ap, arg);
+    switch (event_no) {
+    case SMTP_EV_CONNECT:
+	MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS,
+		      _("Connected to MTA"),
+		      NULL, NULL, 0);
+        break;
+    case SMTP_EV_MAILSTATUS:
+        mailbox = va_arg (ap, const char *);
+        message = va_arg (ap, smtp_message_t);
+	status = smtp_reverse_path_status (message);
+	snprintf (buf, sizeof buf, _("From: %d <%s>"), status->code, mailbox);
+	MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS, buf, NULL, NULL, 0);
+
+	snprintf (buf, sizeof buf, _("From %s: %d %s"),
+	          mailbox, status->code, status->text);
+	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, buf);
+        break;
+    case SMTP_EV_RCPTSTATUS:
+        mailbox = va_arg (ap, const char *);
+        recipient = va_arg (ap, smtp_recipient_t);
+	status = smtp_recipient_status (recipient);
+	snprintf (buf, sizeof buf, _("To: %d <%s>"), status->code, mailbox);
+	MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS, buf, NULL, NULL, 0);
+
+	snprintf (buf, sizeof buf, _("To %s: %d %s"),
+	          mailbox, status->code, status->text);
+	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, buf);
+        break;
+    case SMTP_EV_MESSAGEDATA:
+        /* XXX - update the progress bar here */
+        break;
+    case SMTP_EV_MESSAGESENT:
+        message = va_arg (ap, smtp_message_t);
+        status = smtp_message_transfer_status (message);
+	snprintf (buf, sizeof buf, _("%d %s"),
+		  status->code, status->text);
+	MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS, buf, NULL, NULL, 0);
+	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, buf);
+        break;
+    case SMTP_EV_DISCONNECT:
+	MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS,
+		      _("Disconnected"),
+		      NULL, NULL, 0);
+        break;
+    }
+    va_end (ap);
+}
+#endif
+
+#else /* ESMTP */
+
+/* CHBM: non-esmtp version */
+
+/* libbalsa_process_queue:
+   treats given mailbox as a set of messages to send. Loads them up and
+   launches sending thread/routine.
+   NOTE that we do not close outbox after reading. send_real/thread message 
+   handler does that.
+*/
+gboolean 
+libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding)
 {
     MessageQueueItem *mqi, *new_message;
     SendMessageInfo *send_message_info;
@@ -318,7 +699,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 
     if (start_thread) {
 
-	send_message_info=send_message_info_new(outbox, smtp_server, smtp_port);
+	send_message_info=send_message_info_new(outbox);
 
 	pthread_create(&send_mail, NULL,
 		       (void *) &balsa_send_message_real, send_message_info);
@@ -331,7 +712,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
     pthread_mutex_unlock(&send_messages_lock);
 #else				/*non-threaded code */
     
-    send_message_info=send_message_info_new(outbox, smtp_server, smtp_port);
+    send_message_info=send_message_info_new(outbox);
     balsa_send_message_real(send_message_info);
 #endif
     return TRUE;
@@ -363,6 +744,30 @@ static MessageQueueItem* get_msg2send()
     return res;
 }
 
+#endif /* ESMTP */
+
+#if ENABLE_ESMTP
+
+#ifdef DEBUG
+static void
+monitor_cb (const char *buf, int buflen, int writing, void *arg)
+{
+  FILE *fp = arg;
+
+  if (writing == SMTP_CB_HEADERS)
+    {
+      fputs ("H: ", fp);
+      fwrite (buf, 1, buflen, fp);
+      return;
+    }
+
+ fputs (writing ? "C: " : "S: ", fp);
+ fwrite (buf, 1, buflen, fp);
+ if (buf[buflen - 1] != '\n')
+   putc ('\n', fp);
+}
+#endif
+
 /* balsa_send_message_real:
    does the acutal message sending. 
    This function may be called as a thread and should therefore do
@@ -370,6 +775,67 @@ static MessageQueueItem* get_msg2send()
    libmutt calls. Also, structure info should be freed before exiting.
 */
 
+/* [BCS] radically different since it uses the libESMTP interface.
+ */
+static guint balsa_send_message_real(SendMessageInfo* info) {
+
+#ifdef BALSA_USE_THREADS
+    SendThreadMessage *threadmsg;
+
+    /* The event callback is used to write messages to the the progress
+       dialog shown when transferring a message to the SMTP server. */
+    smtp_set_eventcb (info->session, libbalsa_smtp_event_cb, NULL);
+#endif
+#ifdef DEBUG
+    /* Add a protocol monitor when compiled with DEBUG.  This is somewhat
+       unsatisfactory, it would be better handled at run time with an
+       option in the preferences dialogue.  I don't know how to access
+       app level options within libbalsa however without breaking the
+       current modularity of the code. */
+    smtp_set_monitorcb (info->session, monitor_cb, stderr, 1);
+#endif
+
+    /* Kick off the connection with the MTA.  When this returns, all
+       messages with valid recipients have been sent. */
+    smtp_start_session (info->session);
+	
+
+    /* We give back all the resources used and delete the sent messages */
+    
+#ifdef BALSA_USE_THREADS
+    pthread_mutex_lock(&send_messages_lock);
+#endif
+
+    /* Quite a bit of status info has been gathered about messages and
+       their recipients.  The following will do a libbalsa_message_delete()
+       on the messages with a 2xx status recorded against them.  However
+       its possible for individual recipients to fail too.  Need a way to
+       report it all.  */
+    smtp_enumerate_messages (info->session, handle_successful_send, NULL);
+
+    gdk_threads_enter();
+    libbalsa_mailbox_close(info->outbox);
+    libbalsa_mailbox_commit_changes(info->outbox);
+    gdk_threads_leave();
+
+    total_messages_left = 0;
+#ifdef BALSA_USE_THREADS
+    pthread_mutex_unlock(&send_messages_lock);
+    MSGSENDTHREAD(threadmsg, MSGSENDTHREADFINISHED, "", NULL, NULL, 0);
+#endif
+    smtp_destroy_session (info->session);
+    send_message_info_destroy(info);	
+    return TRUE;
+}
+
+#else /* ESMTP */
+
+/* balsa_send_message_real:
+   does the acutal message sending. 
+   This function may be called as a thread and should therefore do
+   proper gdk_threads_{enter/leave} stuff around GTK,libbalsa or
+   libmutt calls. Also, structure info should be freed before exiting.
+*/
 
 static guint balsa_send_message_real(SendMessageInfo* info) {
     MessageQueueItem *mqi, *next_message;
@@ -392,30 +858,19 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
     }	
 #endif
 
-    if (!info->server) {	
-	while ( (mqi = get_msg2send()) != NULL) {
-	    libbalsa_lock_mutt();
-	    i = mutt_invoke_sendmail(mqi->message->env->to,
-				     mqi->message->env->cc,
-				     mqi->message->env->bcc,
-				     mqi->tempfile,
-				     (mqi->message->content->encoding
-				      == ENC8BIT));
-	    libbalsa_unlock_mutt();
-	    mqi->status = (i==0?MQI_SENT : MQI_FAILED);
-	    total_messages_left--; /* whatever the status is, one less to do*/
-	}
-    } else {
-	i = libbalsa_smtp_send(info->server, info->port);
-	
-/* We give a message to the user because an error has ocurred in the protocol
- * A mistyped address? A server not allowing relay? We can pop a window to ask
- */
-	if (i == -2)
-	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-				 _("SMTP protocol error. Cannot relay.\n"
-				   "Your message is left in Outbox."));
+    while ( (mqi = get_msg2send()) != NULL) {
+	libbalsa_lock_mutt();
+	i = mutt_invoke_sendmail(mqi->message->env->to,
+				 mqi->message->env->cc,
+				 mqi->message->env->bcc,
+				 mqi->tempfile,
+				 (mqi->message->content->encoding
+				  == ENC8BIT));
+	libbalsa_unlock_mutt();
+	mqi->status = (i==0?MQI_SENT : MQI_FAILED);
+	total_messages_left--; /* whatever the status is, one less to do*/
     }
+
     /* We give back all the resources used and delete the sent messages */
     
 #ifdef BALSA_USE_THREADS
@@ -446,6 +901,9 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
     send_message_info_destroy(info);	
     return TRUE;
 }
+
+#endif /* ESMTP */
+
 
 static void
 message2HEADER(LibBalsaMessage * message, HEADER * hdr) {
@@ -606,9 +1064,9 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 
     if (reply_message != NULL)
 	/* Just saves the message ID, mailbox type and mailbox name. We could
-	     * search all mailboxes for the ID but that would not be too fast. We
-	     * could also add more stuff ID like path, server, ... without this
-	     * if you change the name of the mailbox the flag will not be set. */
+	 * search all mailboxes for the ID but that would not be too fast. We
+	 * could also add more stuff ID like path, server, ... without this
+	 * if you change the name of the mailbox the flag will not be set. */
 	tmp = g_strdup_printf("%s\r%s",
 			      reply_message->message_id,
 			      reply_message->mailbox->name);
@@ -626,285 +1084,6 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 
     return TRUE;
 }
-
-/* In smtp_answer the check the answer and give back 1 if is a positive answer
- * or a 0 if it is negative, in that case we need to copy the message to be 
- * send later. The error will be shown to the user from this funtion */
-
-static int smtp_answer(int fd) {
-    char buffer[512];	/* Maximum allowed by RFC */
-    char code[4];	/* we use the 3 number code to check the answer */
-
-    read(fd, buffer, sizeof(buffer));
-
-    /* now we check the posible answers */
-    code[3] = 0;
-    strncpy(code, buffer, 3);
-
-    /* I have to check all posible positive code in RFC. Maybe it can be use an
-     * if sentence */
-
-    switch (atoi(code)) {
-    case 354:
-    case 220:
-    case 250:
-    case 251:
-	return 1;
-    default:
-	fprintf(stderr, "%s", buffer);
-	return 0;
-    }
-}
-
-/* This funtion recives as arguments the message (to use headers),
- * a file were the message is in MIME format (converted using libmutt)
- * and the server (so it will be easier to add support for multiple 
- * personalityes) and it returns 1 if everything is ok or 0 if something
- * went wrong. */
-static int libbalsa_smtp_protocol(int s, char *tempfile,
-				  HEADER * msg) {
-    char message[500], buffer[525];	/* Maximum allow by RFC */
-    int fp, left, len;
-    char *tmp, *tmpbuffer;
-    ADDRESS *address;
-#ifdef BALSA_USE_THREADS
-    int total, sent = 0;
-    struct stat st;
-    float percent = 0;
-    SendThreadMessage *progress_message;
-    char send_message[100];
-#endif
-
-    snprintf(buffer, 512, "MAIL FROM:<%s>\r\n", msg->env->from->mailbox);
-    write(s, buffer, strlen(buffer));
-
-    if (smtp_answer(s) == 0) {
-	fprintf(stderr, "%s", buffer);
-	return 0;
-    }
-
-    address = msg->env->to;
-    while (address != NULL) {
-	snprintf(buffer, 512, "RCPT TO:<%s>\r\n", address->mailbox);
-	write(s, buffer, strlen(buffer));
-	address = address->next;
-	/* We check for a positive answer */
-
-	if (smtp_answer(s) == 0) {
-	    fprintf(stderr, "%s", buffer);
-	    return 0;
-	}
-
-	/*  let's go to the next address */
-
-    }
-
-    address = msg->env->cc;
-    while (address != NULL) {
-	snprintf(buffer, sizeof(buffer), "RCPT TO:<%s>\r\n",
-		 address->mailbox);
-	write(s, buffer, strlen(buffer));
-	address = address->next;
-
-	if (smtp_answer(s) == 0) {
-	    fprintf(stderr, "%s", buffer);
-	    return 0;
-	}
-    }
-
-    address = msg->env->bcc;
-    while (address != NULL) {
-	snprintf(buffer, sizeof(buffer), "RCPT TO:<%s>\r\n",
-		 address->mailbox);
-	write(s, buffer, strlen(buffer));
-	address = address->next;
-
-	if (smtp_answer(s) == 0) {
-	    fprintf(stderr, "%s", buffer);
-	    return 0;
-	}
-    }
-
-
-    /* Now we are ready to send the message */
-
-#ifdef BALSA_USE_THREADS
-    sprintf(send_message, "Messages to be sent: %d ", total_messages_left);
-    MSGSENDTHREAD(progress_message, MSGSENDTHREADPROGRESS,
-		  send_message, NULL, NULL, 0);
-#endif
-
-    snprintf(buffer, 512, "DATA\r\n");
-    write(s, buffer, strlen(buffer));
-    if (smtp_answer(s) == 0) {
-	fprintf(stderr, "%s", buffer);
-	return 0;
-    }
-
-    if ((fp = open(tempfile, O_RDONLY)) == -1)
-	return -1;
-
-#ifdef BALSA_USE_THREADS
-    lstat(tempfile, &st);
-
-    total = (int) st.st_size;
-#endif
-
-    while ((left = (int) read(fp, message, 499)) > 0) {
-	message[left] = '\0';
-	tmpbuffer = message;
-	while ((tmp = strstr(tmpbuffer, "\n")) != NULL) {
-	    if (strncmp(tmpbuffer, ".\n", 2) == 0)
-		write(s, ".", 1);	/* make sure dots won't hurt */
-	    len = (int) strcspn(tmpbuffer, "\n");
-
-	    if (*(tmp - 1) != '\r') {
-		write(s, tmpbuffer, len);
-		write(s, "\r\n", 2);
-	    } else {
-		write(s, tmpbuffer, len);
-		write(s, "\n", 1);
-	    }
-#ifdef BALSA_USE_THREADS
-	    sent += len;
-#endif
-	    tmpbuffer = tmp + 1;
-	    left = left - (len + 1);
-	    if (left <= 0)
-		break;
-	}
-
-	write(s, tmpbuffer, left);
-
-#ifdef BALSA_USE_THREADS
-	sent += left;
-	percent = ((float) sent) / (float) total;
-	MSGSENDTHREAD(progress_message, MSGSENDTHREADPROGRESS, "",
-		      NULL, NULL, percent);
-#endif
-    }
-
-    snprintf(buffer, sizeof(buffer), "\r\n.\r\n");
-    write(s, buffer, strlen(buffer));
-
-    if (smtp_answer(s) == 0) {
-	fprintf(stderr, "%s", buffer);
-	return 0;
-    }
-
-    close(fp);
-
-    return 1;
-}
-
-/* The code of returning answer is the following:
- * -1    Error when conecting to the smtp server (this includes until
- *        salutation is over and we are ready to start with smtp protocol)
- * -2    Error during protocol 
- * 1     Everything when perfect */
-/* Does not expect the GDK lock to be held */
-static int libbalsa_smtp_send(const char *server, const int port) {
-
-    struct sockaddr_in sin;
-    struct hostent *he;
-    char buffer[525];	/* Maximum allow by RFC */
-    int n, s, error = 0;
-    MessageQueueItem *current_message;
-#ifdef BALSA_USE_THREADS
-    SendThreadMessage *finish_message;
-#endif
-
-    g_return_val_if_fail(server, -1);
-    /* Here we make the conecction */
-    s = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
-
-    memset((char *) &sin, 0, sizeof(sin));
-    sin.sin_family = AF_INET;
-
-    if (port > 0)
-	sin.sin_port = htons(port);
-    else 	    
-	sin.sin_port = htons(25);
-
-    if ((n = inet_addr(server)) == -1) {
-	/* Must be a DNS name */
-	if ((he = gethostbyname(server)) == NULL) {
-	    libbalsa_information(
-		LIBBALSA_INFORMATION_WARNING,
-		_("Error: Could not find address for host %s."), server);
-	    return -1;
-	}
-	memcpy((void *) &sin.sin_addr, *(he->h_addr_list),
-	       he->h_length);
-    } else {
-	memcpy((void *) &sin.sin_addr, (void *) &n, sizeof(n));
-    }
-
-    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
-			 _("Connecting to %s"), inet_ntoa(sin.sin_addr));
-
-    if (connect
-	(s, (struct sockaddr *) &sin,
-	 sizeof(struct sockaddr_in)) == -1) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("Error connecting to %s."), server);
-	return -1;
-    }
-
-    /* Here we have to receive whatever is the initial salutation of the smtp server, 
-	 * since now we are not going to make use of the server being esmtp, we don´t care 
-	 * about this salutation 
-	 */
-
-    if (smtp_answer(s) == 0)
-	return -1;
-
-	/* Here I just follow the RFC */
-
-    snprintf(buffer, 512, "HELO %s\r\n", server);
-    write(s, buffer, strlen(buffer));
-
-    if (smtp_answer(s) == 0)
-	return -2;
-
-    while ( (current_message = get_msg2send())!= NULL) {
-	if (libbalsa_smtp_protocol(s, current_message->tempfile,
-				   current_message->message) == 0) {
-	    current_message->status = MQI_FAILED;
-	    error = 1;
-	    snprintf(buffer, 512, "RSET %s\r\n", server);
-	    write(s, buffer, strlen(buffer));
-	    if (smtp_answer(s) == 0)
-		return -2;
-	} else {
-	    current_message->status = MQI_SENT;
-	}
-
-#ifdef BALSA_USE_THREADS
-	pthread_mutex_lock(&send_messages_lock);
-	total_messages_left--;
-	pthread_mutex_unlock(&send_messages_lock);
-#endif
-    }
-
-/* We close the conection */
-
-    snprintf(buffer, sizeof(buffer), "QUIT\r\n");
-    write(s, buffer, strlen(buffer));
-
-    close(s);
-
-#ifdef BALSA_USE_THREADS
-    MSGSENDTHREAD(finish_message, MSGSENDTHREADFINISHED, "", NULL,
-		  NULL, 0);
-#endif
-
-    if (error == 1)
-	return -2;
-    return 1;
-
-}
-
 
 /* balsa_lookup_mime_type [MBG] 
  *

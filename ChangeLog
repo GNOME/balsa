@@ -1,14 +1,52 @@
+2001-05-22  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Merge libESMTP branch to HEAD. Affected file list:
+	* NEWS, README, acconfig.h, balsa.spec.in, configure.in,
+	* help/C/Makefile.am, help/C/README, help/C/balsa.sgml, 
+	* libbalsa/address.[hc], libbalsa/message.h, libbalsa/misc.h,
+	* libbalsa/send.c, libinit_balsa/balsa-druid-page-user.gob,
+	* src/balsa-app.[hc], src/balsa-message.c, src/main-window.c,
+	* src/pref-manager.c, src/print.c, src/save-restore.c, 
+	* src/sendmsg-window.c.
+
+2001-05-22  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* balsa.spec.in: new, RH-7.1 compatible spec file.
+	* src/save-restore.c: convert old SMTP config.
+	* NEWS, README, configure.in: release 1.1.5.
+
+2001-05-18  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/print.c: don't crash when encountering empty lines.
+	* src/balsa-message.c: use elaborate but relatively strict
+	regex for URLs.
+
 2001-05-18  Carlos Morgado  <chbm@chbm.nu>
 
-	* src/balsa-message.c: dingus-click-pointer patch from
-	Albrecht Dreﬂ <albrecht.dress@arcormail.de>
+	* src/balsa-message.c:  dingus-click-pointer patch from
+        Albrecht Dreﬂ <albrecht.dress@arcormail.de>
+
+2001-05-16  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* help/C/balsa.sgml: signature doc updates from 
+	Julian M Catchen <julian@catchen.org>.
+	* help/C/README: some updates relevant to RH 7.1.
+	* help/C/Makefile.am: do not force particular stylesheet location.
+
+2001-05-15  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/pref-manager.c (open_preferences_manager): fix typo in ifdef
 
 2001-05-15  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Daniel Foster <daniel-l@34SP.com>:
 	* libbalsa/address-entry.c: more natural address pasting.
-	* src/sendmsg-window.c: menu entry for signature insertion.
-	
+	* src/sendmsg-window.c: menu entry for appending the signature
+
+2001-05-14  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/send.c (libbalsa_process_queue): small patch from Brian 
+
 2001-05-13  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/sendmsg-window.c (read_signature): 
@@ -16,13 +54,35 @@
 	* libbalsa/misc.c (libbalsa_readfile_nostat): 
 	patch from Julian M Catchen <julian@catchen.org> with small tweaks
 
-2001-05-10  Pawel Salek  <pawsa@theochem.kth.se>
 
+2001-05-13  Carlos Morgado  <chbm@chbm.nu>
+
+	* libinit_balsa/balsa-druid-page-user.gob:
+	* src/sendmsg-window.c:
+	* src/save-restore.c: 
+	* src/pref-manager.c:
+	* src/main-window.c:
+	* src/balsa-message.c:
+	* src/balsa-app.h: 
+	* src/balsa-app.c: 
+	* libbalsa/send.c: 
+	* libbalsa/misc.h: 
+	* libbalsa/message.h: 
+	* libbalsa/address.h: 
+	* libbalsa/address.c: 
+	* acconfig.h: 
+	* configure.in: 
+	added --with-esmtp configure option. --with-esmtp=no totally
+	disables the (e)smtp capacities and uses local sendmail
+	
+2001-05-11  Pawel Salek  <pawsa@theochem.kth.se>
+
+	(bugfix from AD)
 	* libbasa/message.c (libbalsa_message_charset): 
 	* src/print.c: don't free strings you don't own. 
-	
+       
 2001-05-10  Pawel Salek  <pawsa@theochem.kth.se>
-
+	
 	From Albrecht Dreﬂ <albrecht.dress@arcormail.de>:
 	* src/print.c: compute the number of pages properly.
 	* src/balsa-app.h: added field for url color
@@ -33,6 +93,13 @@
 	From Jacob Ils¯ Christensen <firelake@mail1.stofanet.dk>:
 	* src/balsa-mblist.c: upate the mailbox message count column properly.
 	
+2001-05-07  Carlos Morgado  <chbm@chbm.nu>
+
+	Applied libESMTP patch from Brian Stafford. 
+	created branch 'libESMTP'.
+	
+	* src/save-restore.c: changed SMTP* to ESMTP* on .gnome/balsa 
+
 2001-05-05  Pawel Salek  <pawsa@theochem.kth.se>
 
 	A set of patches from Albrecht Dreﬂ <albrecht.dress@arcormail.de>

@@ -2,10 +2,10 @@
 Balsa Documentation
 ===================
 
-September 10, 2000
+September 10, 2000 by Matthew Guenther.
 
-by Matthew Guenther
-
+Updated 2001.05.16 by Pawel Salek <pawsa@theochem.kth.se>. If you find
+some information outdated, please report it to Balsa Team.
 
 Building SGML:
 =============
@@ -30,6 +30,17 @@ available from the GDP website:
 
 http://people.redhat.com/dcm/img2eps
 
+On RH 7.1, it may be necessary to supply following -c options to db2html:
+
+-c /usr/share/sgml/docbook/sgml-dtd-3.1/catalog
+-c /usr/share/sgml/docbook/png-support-3.1/catalog
+
+It may be simpler though to add these directories to
+/etc/sgml/sgml-docbook.cat (the system wide SGML catalog; the location
+may be different on other distributions).
+Basically, it depends on your configuration. If you get plenty of errors
+transforming balsa.sgml, it often means that there is a mistake in
+the system settings.
 
 Writing SGML:
 ============

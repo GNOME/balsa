@@ -230,3 +230,36 @@ libbalsa_address_get_name(const LibBalsaAddress * addr)
     return addr->full_name ? addr->full_name :
 	(addr->address_list ? addr->address_list->data : NULL);
 }
+
+#if ENABLE_ESMTP
+
+/* XXX - added by Brian Stafford <brian@stafford.uklinux.net> */
+
+/* libESMTP works with the RFC 821 mailbox and the RFC 822 phrase and 
+   mailbox as seperate entities.  Because of this it is useful to add
+   these extra methods. */
+
+/* Extract the RFC 822 phrase from the address.  Almost the same
+   as libbalsa_address_get_name() except returns NULL if no phrase. */
+const gchar *
+libbalsa_address_get_phrase(LibBalsaAddress * address)
+{
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
+
+    return address->full_name;
+}
+
+/* Extract the nth RFC 821/RFC 822 mailbox from the address. */
+const gchar *
+libbalsa_address_get_mailbox(LibBalsaAddress * address, gint n)
+{
+    GList *nth_address;
+
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
+
+    nth_address = g_list_nth(address->address_list, n);
+    g_return_val_if_fail(nth_address != NULL, NULL);
+    return (gchar*)nth_address->data;
+}
+
+#endif

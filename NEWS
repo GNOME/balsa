@@ -1,3 +1,10 @@
+* Balsa-1.1.5 development release. Release date 2001-05-21
+
+- libESMTP used for message submission: AUTH and PIPELINE extension available.
+- active URLs in text messages.
+- pipe signature support.
+- printing rewritten: printing images etc.
+
 * Balsa-1.1.4 development release. Release date 2001-04-20
 
 - GDK locking problems resolved.

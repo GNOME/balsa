@@ -29,6 +29,10 @@
 #include "main-window.h"
 #include "information-dialog.h"
 
+#if ENABLE_ESMTP
+#include <auth-client.h>		/* part of libESMTP */
+#endif
+
 /* Work around nonprivileged installs so we can find icons */
 #ifdef BALSA_LOCAL_INSTALL
 #define gnome_pixmap_file( s ) g_strdup( g_strconcat( BALSA_RESOURCE_PREFIX, "/pixmaps/", s, NULL ) )
@@ -151,8 +155,12 @@ extern struct BalsaApplication {
     gchar *forward_string;
 
     gchar *local_mail_directory;
+#if ENABLE_ESMTP
     gchar *smtp_server;
-    gint smtp_port;
+    gchar *smtp_user;
+    gchar *smtp_passphrase;
+    auth_context_t smtp_authctx;
+#endif
 
     /* signature stuff */
     gboolean sig_sending;
@@ -242,7 +250,6 @@ extern struct BalsaApplication {
     gboolean empty_trash_on_exit;
     gboolean previewpane;
     gboolean debug;
-    gboolean smtp;
 
     /* arp --- string to prefix "replied to" messages. */
     gchar *quote_str;

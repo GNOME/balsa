@@ -1307,7 +1307,8 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 #endif
     } else {
 	regex_t rex, url_reg;
-	const char *url_str = "\\<((ht|f)tp[s]?://[^[:blank:]]+)\\>";
+	const char *url_str = 
+	    "(http|ftp)s?://(%[0-9A-F]{2}|[-_.!~*';/?:@&=+$,[:alnum:]])+";
 
 	GtkWidget *item = NULL;
 	GdkFont *fnt = NULL;
@@ -1343,7 +1344,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 	   style = gtk_widget_get_style (GTK_WIDGET (bm));
 	   color = (GdkColor) style->text[GTK_STATE_PRELIGHT];
 	*/
-	if (regcomp(&url_reg, url_str, REG_EXTENDED) != 0)
+	if (regcomp(&url_reg, url_str, REG_EXTENDED|REG_ICASE) != 0)
 	    g_warning
 		("part_info_init_mimetext: url regex compilation failed.");
 	if (regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED) != 0) {
@@ -2129,10 +2130,15 @@ handle_mdn_request(LibBalsaMessage *message)
 	g_free (reply_to);
 	g_free (sender);
     } else {
+#if ENABLE_ESMTP
 	libbalsa_message_send(mdn, balsa_app.outbox, NULL,
 			      balsa_app.encoding_style,  
-			      balsa_app.smtp ? balsa_app.smtp_server : NULL,
-			      balsa_app.smtp_port);
+			      balsa_app.smtp_server,
+			      balsa_app.smtp_authctx);
+#else
+	libbalsa_message_send(mdn, balsa_app.outbox, NULL,
+			      balsa_app.encoding_style);
+#endif
 	gtk_object_destroy(GTK_OBJECT(mdn));
     }
 }
@@ -2282,10 +2288,15 @@ static void send_mdn_reply (GtkWidget *widget, gpointer user_data)
 
     send_msg = 
 	LIBBALSA_MESSAGE(gtk_object_get_user_data (GTK_OBJECT (dialog)));
+#if ENABLE_ESMTP
     libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
 			  balsa_app.encoding_style,  
-			  balsa_app.smtp ? balsa_app.smtp_server : NULL,
-			  balsa_app.smtp_port);
+			  balsa_app.smtp_server,
+			  balsa_app.smtp_authctx);
+#else
+    libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
+			  balsa_app.encoding_style);  
+#endif
     gtk_object_destroy(GTK_OBJECT(send_msg));
     gtk_widget_hide (dialog);
     gtk_object_destroy(GTK_OBJECT(dialog));

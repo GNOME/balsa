@@ -1933,8 +1933,26 @@
 	<varlistentry>
 	  <term><guilabel>Signature file</guilabel></term>
 	  <listitem>
-	    <para>The file to append to all your messages.  You also
-	      get to control when the signature is appended.</para>
+	    <para>The text to append to all your messages. This text can
+             come from one of three places:
+             <itemizedlist>
+		<listitem><para>From a regular file.  List the path to
+                any regular file, and the text from that file will be
+                appended to your messages.</para></listitem>
+
+                <listitem><para>A named pipe or FIFO.  In this case,
+                to Balsa, the file looks normal, but in reality, it is
+                a pipe to a program that is generating the content.
+                List the path to the pipe.  </para></listitem>
+
+                <listitem><para>An executable program. Balsa will execute
+                the program and read its output, appending that text
+                to the message.  List the path to the program with a
+                "|" prepended to it.  For example:</para>
+                <para>|/home/user/dynsig.pl</para></listitem>
+                </itemizedlist>
+            </para>
+            <para>You also get to control when the signature is appended.</para>
 	  </listitem>
 	</varlistentry>
 

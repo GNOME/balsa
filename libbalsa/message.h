@@ -29,6 +29,10 @@
 
 #include "libbalsa.h"
 
+#if ENABLE_ESMTP
+#include <auth-client.h>
+#endif
+
 #define LIBBALSA_TYPE_MESSAGE                      (libbalsa_message_get_type())
 #define LIBBALSA_MESSAGE(obj)                      (GTK_CHECK_CAST(obj, LIBBALSA_TYPE_MESSAGE, LibBalsaMessage))
 #define LIBBALSA_MESSAGE_CLASS(klass)              (GTK_CHECK_CLASS_CAST(klass, LIBBALSA_TYPE_MESSAGE, LibBalsaMessageClass))
@@ -158,11 +162,18 @@ gboolean balsa_postpone_message(LibBalsaMessage * message,
 void libbalsa_message_queue(LibBalsaMessage* message, 
 			    LibBalsaMailbox* outbox, LibBalsaMailbox* fccbox,
 			    gint encoding);
+#if ENABLE_ESMTP
 gboolean libbalsa_message_send(LibBalsaMessage* message,
 			       LibBalsaMailbox* outbox,  
 			       LibBalsaMailbox* fccbox,
 			       gint encoding, gchar* smtp_server,
-			       gint smtp_port);
+			       auth_context_t smtp_authctx);
+#else
+gboolean libbalsa_message_send(LibBalsaMessage* message,
+			       LibBalsaMailbox* outbox,  
+			       LibBalsaMailbox* fccbox,
+			       gint encoding);
+#endif
 gboolean libbalsa_message_postpone(LibBalsaMessage * message,
 				   LibBalsaMailbox * draftbox,
 				   LibBalsaMessage * reply_message,

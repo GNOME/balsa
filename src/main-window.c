@@ -1512,12 +1512,16 @@ check_new_messages_cb(GtkWidget * widget, gpointer data)
 /* send_outbox_messages_cb:
    tries again to send the messages queued in outbox.
 */
+
 static void
 send_outbox_messages_cb(GtkWidget * widget, gpointer data)
 {
+#if ENABLE_ESMTP
     libbalsa_process_queue(balsa_app.outbox, balsa_app.encoding_style,
-			   balsa_app.smtp ? balsa_app.smtp_server : NULL, 
-			   balsa_app.smtp_port);
+			   balsa_app.smtp_server, balsa_app.smtp_authctx);
+#else
+    libbalsa_process_queue(balsa_app.outbox, balsa_app.encoding_style);
+#endif
 }
 
 /* this one is called only in the threaded code */

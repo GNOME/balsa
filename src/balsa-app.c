@@ -150,6 +150,39 @@ ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
 	return password;
 }
 
+#if ENABLE_ESMTP
+static void
+authapi_exit (void)
+{
+    if (balsa_app.smtp_authctx != NULL)
+        auth_destroy_context (balsa_app.smtp_authctx);
+    auth_client_exit ();
+}
+
+
+/* Callback to get user/password info from SMTP server preferences.
+   This is adequate for simple username / password requests but does
+   not adequately cope with all SASL mechanisms.  */
+static int
+authinteract (auth_client_request_t request, char **result, int fields,
+              void *arg)
+{
+    int i;
+
+    for (i = 0; i < fields; i++) {
+	if (request[i].flags & AUTH_PASS)
+	    result[i] = balsa_app.smtp_passphrase;
+	else if (request[i].flags & AUTH_USER)
+	    result[i] = balsa_app.smtp_user;
+
+    	/* Fail the AUTH exchange if something was requested
+    	   but not supplied. */
+    	if (result[i] == NULL)
+    	    return 0;
+    }
+    return 1;
+}
+#endif /* ESMTP */
 
 void
 balsa_app_init(void)
@@ -166,8 +199,19 @@ balsa_app_init(void)
     balsa_app.local_mail_directory = NULL;
     balsa_app.signature_path = NULL;
     balsa_app.sig_separator = TRUE;
+#if ENABLE_ESMTP
     balsa_app.smtp_server = NULL;
-    balsa_app.smtp_port = 25;
+    balsa_app.smtp_user = NULL;
+    balsa_app.smtp_passphrase = NULL;
+
+    /* Do what's needed at application level to allow libESMTP
+       to use authentication.  */
+    auth_client_init ();
+    atexit (authapi_exit);
+    balsa_app.smtp_authctx = auth_create_context ();
+    auth_set_mechanism_flags (balsa_app.smtp_authctx, AUTH_PLUGIN_PLAIN, 0);
+    auth_set_interact_cb (balsa_app.smtp_authctx, authinteract, NULL);
+#endif
 
     balsa_app.inbox = NULL;
     balsa_app.inbox_input = NULL;

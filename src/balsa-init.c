@@ -61,17 +61,16 @@ struct _Prefs
 static Prefs *prefs = NULL;
 
 
-void balsa_init_window_new ();
-static gint delete_init_window (GtkWidget *);
+void balsa_init_window_new (void);
+static gint delete_init_window (GtkWidget *, gpointer);
 
-static void next_cb (GtkWidget *);
-static void prev_cb (GtkWidget *);
-static void complete_cb (GtkWidget *);
+static void next_cb (GtkWidget *, gpointer);
+static void prev_cb (GtkWidget *, gpointer);
+static void complete_cb (GtkWidget *, gpointer);
 
 static GtkWidget *create_welcome_page (void);
 static GtkWidget *create_general_page (void);
 static GtkWidget *create_mailboxes_page (void);
-static GtkWidget *create_finished_page (void);
 
 
 /*
@@ -136,12 +135,6 @@ balsa_init_window_new (void)
 			    create_mailboxes_page (),
 			    label);
 
-  label = gtk_label_new ("finished");
-  gtk_notebook_append_page (GTK_NOTEBOOK (iw->notebook),
-			    create_finished_page (),
-			    label);
-
-
   bbox = gtk_hbutton_box_new ();
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG (iw->window)->action_area), bbox, TRUE, TRUE, 0);
   gtk_button_box_set_spacing (GTK_BUTTON_BOX (bbox), 5);
@@ -200,18 +193,18 @@ create_welcome_page (void)
   gtk_text_freeze (GTK_TEXT (text));
   gtk_text_set_editable (GTK_TEXT (text), TRUE);
   gtk_text_set_word_wrap (GTK_TEXT (text), TRUE);
-  gtk_widget_realize(text);
-  gtk_text_insert (GTK_TEXT (text), NULL, NULL, NULL, buf, strlen(buf));
+  gtk_widget_realize (text);
+  gtk_text_insert (GTK_TEXT (text), NULL, NULL, NULL, buf, strlen (buf));
   g_free (buf);
-  gtk_text_thaw (GTK_TEXT(text));
+  gtk_text_thaw (GTK_TEXT (text));
   /*
-  vbox = gtk_vbox_new (FALSE, 0);
-  gtk_widget_show (vbox);
+     vbox = gtk_vbox_new (FALSE, 0);
+     gtk_widget_show (vbox);
 
-  label = gtk_label_new (_ ("Welcome to Balsa!  The following steps will help you get setup to use Balsa."));
-  gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 5);
-  gtk_widget_show (label);
-*/
+     label = gtk_label_new (_ ("Welcome to Balsa!  The following steps will help you get setup to use Balsa."));
+     gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 5);
+     gtk_widget_show (label);
+   */
   return vbox;
 }
 
@@ -277,14 +270,14 @@ create_general_page (void)
 		    0, 10);
   gtk_widget_show (prefs->smtp_server);
 
-  str = g_string_new (g_get_user_name());
+  str = g_string_new (g_get_user_name ());
   g_string_append_c (str, '@');
   /* FIXME */
   g_string_append (str, balsa_app.hostname);
   gtk_entry_set_text (GTK_ENTRY (prefs->email), str->str);
   g_string_free (str, TRUE);
 
-  gtk_entry_set_text (GTK_ENTRY (prefs->real_name), g_get_real_name());
+  gtk_entry_set_text (GTK_ENTRY (prefs->real_name), g_get_real_name ());
   gtk_entry_set_text (GTK_ENTRY (prefs->smtp_server), "localhost");
 
   return vbox;
@@ -310,36 +303,36 @@ create_mailboxes_page (void)
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
 		    GTK_FILL, GTK_FILL, 10, 10);
   prefs->inbox = gtk_entry_new ();
-  gtk_entry_set_text(GTK_ENTRY(prefs->inbox), getenv("MAIL"));
+  gtk_entry_set_text (GTK_ENTRY (prefs->inbox), getenv ("MAIL"));
   gtk_table_attach (GTK_TABLE (table), prefs->inbox, 1, 2, 0, 1,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
-  gs = g_string_new(g_get_home_dir());
-  gs = g_string_append(gs, "/Mail/outbox");
+  gs = g_string_new (g_get_home_dir ());
+  gs = g_string_append (gs, "/Mail/outbox");
 
   label = gtk_label_new (_ ("Outbox Path:"));
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
 		    GTK_FILL, GTK_FILL, 10, 10);
   prefs->outbox = gtk_entry_new ();
-  gtk_entry_set_text(GTK_ENTRY(prefs->outbox), gs->str);
+  gtk_entry_set_text (GTK_ENTRY (prefs->outbox), gs->str);
   gtk_table_attach (GTK_TABLE (table), prefs->outbox, 1, 2, 1, 2,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
-  gs = g_string_truncate(gs,0);
-  gs = g_string_append(gs, g_get_home_dir());
-  gs = g_string_append(gs, "/Mail/outbox");
+  gs = g_string_truncate (gs, 0);
+  gs = g_string_append (gs, g_get_home_dir ());
+  gs = g_string_append (gs, "/Mail/outbox");
   label = gtk_label_new (_ ("Trash Path:"));
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 2, 3,
 		    GTK_FILL, GTK_FILL, 10, 10);
   prefs->trash = gtk_entry_new ();
-  gtk_entry_set_text(GTK_ENTRY(prefs->trash), gs->str);
+  gtk_entry_set_text (GTK_ENTRY (prefs->trash), gs->str);
   gtk_table_attach (GTK_TABLE (table), prefs->trash, 1, 2, 2, 3,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
-  g_string_free(gs, TRUE);
-  
+  g_string_free (gs, TRUE);
+
   label = gtk_label_new (_ ("If you wish to use IMAP for these\nplease change them inside Balsa\n"));
   gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 0);
 
@@ -348,36 +341,8 @@ create_mailboxes_page (void)
   return vbox;
 }
 
-static GtkWidget *
-create_finished_page (void)
-{
-  GtkWidget *vbox;
-  GtkWidget *button;
-  GtkWidget *label;
-
-  vbox = gtk_vbox_new (FALSE, 0);
-  gtk_widget_show (vbox);
-
-  label = gtk_label_new (_ ("Balsa is now ready to run.  Click finish to save your settings"));
-  gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 5);
-  gtk_widget_show (label);
-
-  button = gtk_button_new_with_label (_ ("Finish"));
-  gtk_widget_set_usize (button, BALSA_BUTTON_WIDTH, BALSA_BUTTON_HEIGHT);
-  gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 5);
-  gtk_widget_show (button);
-
-  gtk_signal_connect (GTK_OBJECT (button),
-		      "clicked",
-		      (GtkSignalFunc) complete_cb,
-		      NULL);
-
-
-  return vbox;
-}
-
 static gint
-delete_init_window (GtkWidget * widget)
+delete_init_window (GtkWidget * widget, gpointer data)
 {
   printf ("we are deleting the window, not saving, lets quit now\n");
   balsa_exit ();
@@ -385,24 +350,36 @@ delete_init_window (GtkWidget * widget)
 }
 
 static void
-next_cb (GtkWidget * widget)
+next_cb (GtkWidget * widget, gpointer data)
 {
   GtkWidget *messagebox;
+  gchar *errstr;
 
   switch (gtk_notebook_current_page (GTK_NOTEBOOK (iw->notebook)) + 1)
     {
     case IW_PAGE_FINISHED:
       if (mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->inbox))) == MAILBOX_UNKNOWN)
-	goto BADMAILBOX;
-      else if (mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->outbox))) == MAILBOX_UNKNOWN)
-	goto BADMAILBOX;
-      else if (mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->trash))) == MAILBOX_UNKNOWN)
-	goto BADMAILBOX;
-      else
 	{
-	  gtk_widget_set_sensitive (iw->next, FALSE);
-	  gtk_notebook_next_page (GTK_NOTEBOOK (iw->notebook));
+	  errstr = g_strdup (_ ("Inbox path is invalid."));
+	  goto BADMAILBOX;
 	}
+      else if (mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->outbox))) == MAILBOX_UNKNOWN)
+	{
+	  errstr = g_strdup (_ ("Outbox path is invalid."));
+	  goto BADMAILBOX;
+	}
+      else if (mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->trash))) == MAILBOX_UNKNOWN)
+	{
+	  errstr = g_strdup (_ ("Trash path is invalid."));
+	  goto BADMAILBOX;
+	}
+      else
+	complete_cb (widget, NULL);
+      break;
+
+    case IW_PAGE_MBOXS:
+      gtk_label_set (GTK_LABEL (GTK_BIN (iw->next)->child), "Finish");
+      gtk_notebook_next_page (GTK_NOTEBOOK (iw->notebook));
       break;
 
     default:
@@ -414,7 +391,7 @@ next_cb (GtkWidget * widget)
 
 
 BADMAILBOX:
-  messagebox = gnome_message_box_new (_ ("Invalid Mailbox!"),
+  messagebox = gnome_message_box_new (errstr,
 				      GNOME_MESSAGE_BOX_ERROR,
 				      GNOME_STOCK_BUTTON_OK,
 				      NULL);
@@ -425,7 +402,7 @@ BADMAILBOX:
 }
 
 static void
-prev_cb (GtkWidget * widget)
+prev_cb (GtkWidget * widget, gpointer data)
 {
   gtk_notebook_prev_page (GTK_NOTEBOOK (iw->notebook));
   gtk_widget_set_sensitive (iw->next, TRUE);
@@ -434,7 +411,7 @@ prev_cb (GtkWidget * widget)
 }
 
 static void
-complete_cb (GtkWidget * widget)
+complete_cb (GtkWidget * widget, gpointer data)
 {
   gchar *email, *c;
   GString *gs;
@@ -470,10 +447,10 @@ complete_cb (GtkWidget * widget)
   g_free (balsa_app.smtp_server);
   balsa_app.smtp_server = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->smtp_server)));
 
-  gs = g_string_new(g_get_home_dir());
-  gs = g_string_append(gs, "/Mail");
-  balsa_app.local_mail_directory = g_strdup( gs->str );
-  g_string_free(gs,TRUE);
+  gs = g_string_new (g_get_home_dir ());
+  gs = g_string_append (gs, "/Mail");
+  balsa_app.local_mail_directory = g_strdup (gs->str);
+  g_string_free (gs, TRUE);
 
   type = mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->inbox)));
   mailbox = mailbox_new (type);
@@ -518,5 +495,5 @@ complete_cb (GtkWidget * widget)
   do_load_mailboxes ();
   open_main_window ();
 #endif
-  init_balsa_app(0, NULL);
+  init_balsa_app (0, NULL);
 }

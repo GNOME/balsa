@@ -1,3 +1,18 @@
+2004-10-16 08:55  PeterB
+
+	* src/: balsa-index.c, balsa-index.h: set
+	LIBBALSA_MESSAGE_FLAG_SELECTED user flag to block message from
+	being filtered out of the view; handle selecting deleted message;
+	use BalsaIndex::search_iter when possible.
+	* libbalsa/: mailbox.c, mailbox_imap.c, mailbox_maildir.c,
+	mailbox_mbox.c, mailbox_mh.c, message.h: implement
+	LIBBALSA_MESSAGE_FLAG_SELECTED user flag, manage it in backends,
+	and test it before filtering message out of the view.
+	* libbalsa/filter.c: do not call
+	libbalsa_mailbox_search_iter_free--view filtering is now managed by
+	mailbox code.
+	* libbalsa/body.c: check for NULL body.
+
 2004-10-15 15:06  PeterB
 
 	* src/main-window.c: add mnemonics for next/previous part menu

@@ -468,12 +468,7 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox *mailbox,
      * LB_MAILBOX_THREADING_FLAT. The threading code can actually handle
      * starting with a threaded list, which should be faster when we're
      * making only incremental changes, but we'll leave it this way for
-     * now. 
-     *
-     * An advantage is that for LB_MAILBOX_THREADING_FLAT, the code
-     * below isn't called, so we don't make all those calls to
-     * libbalsa_mailbox_get_message().
-     */
+     * now.  */
     if (thread_type == LB_MAILBOX_THREADING_JWZ)
         lbml_threading_jwz(mailbox);
     else if (thread_type == LB_MAILBOX_THREADING_SIMPLE)
@@ -562,7 +557,6 @@ lbml_threading_jwz(LibBalsaMailbox * mailbox)
 static gboolean
 lbml_gen_container(GNode * msg_tree_node, ThreadingInfo * ti)
 {
-    guint msgno;
     LibBalsaMessage *message;
     ThreadingMessage *tm;
     GNode *node;
@@ -571,8 +565,9 @@ lbml_gen_container(GNode * msg_tree_node, ThreadingInfo * ti)
     if (G_NODE_IS_ROOT(msg_tree_node))
 	return FALSE;
 
-    msgno = GPOINTER_TO_UINT(msg_tree_node->data);
-    message = libbalsa_mailbox_get_message(ti->mailbox, msgno);
+    message =
+	g_list_nth_data(LIBBALSA_MAILBOX_LOCAL(ti->mailbox)->msg_list,
+			GPOINTER_TO_UINT(msg_tree_node->data));
     if (!message || !message->message_id)
 	return FALSE;
 
@@ -769,7 +764,7 @@ lbml_check_parent(ThreadingInfo * ti, ThreadingMessage * parent,
     child_msg_tree_node = child->msg_tree_node;
 
     if (child_msg_tree_node->parent != parent_msg_tree_node
-	    /* Sanity checks: */
+	/* Sanity checks: */
 	&& child_msg_tree_node != parent_msg_tree_node
 	&& !g_node_is_ancestor(child_msg_tree_node, parent_msg_tree_node))
 	g_node_append(parent_msg_tree_node,
@@ -1093,7 +1088,6 @@ lbml_threading_simple(LibBalsaMailbox * mailbox,
 static gboolean
 lbml_add_message(GNode * msg_tree_node, gpointer data)
 {
-    guint msgno;
     LibBalsaMessage *message;
     ThreadingInfo *ti = data;
     ThreadingMessage *tm;
@@ -1101,8 +1095,9 @@ lbml_add_message(GNode * msg_tree_node, gpointer data)
     if (G_NODE_IS_ROOT(msg_tree_node))
 	return FALSE;
 
-    msgno = GPOINTER_TO_UINT(msg_tree_node->data);
-    message = libbalsa_mailbox_get_message(ti->mailbox, msgno);
+    message =
+	g_list_nth_data(LIBBALSA_MAILBOX_LOCAL(ti->mailbox)->msg_list,
+			GPOINTER_TO_UINT(msg_tree_node->data));
     if (!message)
 	return FALSE;
 

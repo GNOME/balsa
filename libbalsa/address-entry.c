@@ -2341,7 +2341,6 @@ lbae_entry_setup_matches(GtkEntry * entry, GtkEntryCompletion * completion,
     const gchar *prefix;
     GList *match;
 
-    lbae_parse_entry(entry, info);
     prefix = info->active->data;
     if (!*prefix)
         return;
@@ -2373,14 +2372,14 @@ lbae_entry_changed(GtkEntry * entry, gpointer data)
     GtkEntryCompletion *completion;
     LibBalsaAddressEntryInfo *info;
 
-    if (!GTK_WIDGET_REALIZED(GTK_WIDGET(entry)))
-	return;
-
     completion = gtk_entry_get_completion(entry);
     info = g_object_get_data(G_OBJECT(completion),
                              LIBBALSA_ADDRESS_ENTRY_INFO);
-    lbae_entry_setup_matches(entry, completion, info,
-                             LIBBALSA_ADDRESS_ENTRY_MATCH_FAST);
+    lbae_parse_entry(entry, info);
+
+    if (GTK_WIDGET_REALIZED(GTK_WIDGET(entry)))
+        lbae_entry_setup_matches(entry, completion, info,
+                                 LIBBALSA_ADDRESS_ENTRY_MATCH_FAST);
 }
 
 /*************************************************************

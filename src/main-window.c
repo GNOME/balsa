@@ -2034,6 +2034,7 @@ display_new_mail_notification(int num_new)
     gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
     
     ok_button=gtk_button_new_with_label(_("OK"));
+    GTK_WIDGET_SET_FLAGS (GTK_WIDGET (ok_button), GTK_CAN_DEFAULT);
     gtk_box_pack_start(GTK_BOX(dlg->action_area), ok_button, FALSE, FALSE, 0);
     gtk_widget_grab_default(ok_button);
     

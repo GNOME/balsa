@@ -892,6 +892,11 @@ attach_clicked(GtkWidget * widget, gpointer data)
     iconlist = GNOME_ICON_LIST(bsm->attachments[1]);
 
     fsw = gtk_file_selection_new(_("Attach file"));
+    /* start workaround for prematurely realized widget returned
+     * by some GTK+ versions */
+    if(GTK_WIDGET_REALIZED(fsw))
+        gtk_widget_unrealize(fsw);
+    /* end workaround for prematurely realized widget */
     gtk_window_set_wmclass(GTK_WINDOW(fsw), "file", "Balsa");
     gtk_object_set_user_data(GTK_OBJECT(fsw), bsm);
 

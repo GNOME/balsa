@@ -1,5 +1,8 @@
 2001-09-22  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* src/main-window.c: make sure new mail button CAN_DEFAULT
+	* src/sendmsg-window.c: fix warning due to prematurely realized widget.
+
 	Nicolas Evrard <nicoe@wanadoo.be> - "next flagged" button.
 	* src/balsa-icons.[hc]: add "next flagged" icons.
 	* src/balsa-index.c: implement select_next_flagged().

@@ -37,7 +37,7 @@
 #include <auth-client.h>
 #endif
 
-/* #define MESSAGE_COPY_CONTENT 1 */
+#define MESSAGE_COPY_CONTENT 1
 #define LIBBALSA_TYPE_MESSAGE \
     (libbalsa_message_get_type())
 #define LIBBALSA_MESSAGE(obj) \
@@ -163,7 +163,11 @@ struct _LibBalsaMessage {
 
     /* signature status (received message) */
     gint sig_state;
+    gboolean is_pgp_signed;
+    gboolean is_pgp_encrypted;
 #endif
+    gboolean has_attachment;
+    gboolean is_multipart;
 
     /* a forced multipart subtype or NULL for mixed */
     gchar *subtype;
@@ -176,7 +180,7 @@ struct _LibBalsaMessage {
     LibBalsaMessageBody *body_list;
     /*  GList *body_list; */
 
-    gint msgno;     /* message no; always copy for faster sorting. */
+    glong msgno;     /* message no; always copy for faster sorting. */
 #if MESSAGE_COPY_CONTENT
 #define LIBBALSA_MESSAGE_GET_NO(m)      ((m)->msgno)
     glong length;   /* byte len */
@@ -312,4 +316,11 @@ glong libbalsa_message_get_length(LibBalsaMessage* msg);
 #endif
 glong libbalsa_message_get_no(LibBalsaMessage* msg);
 void libbalsa_message_headers_update(LibBalsaMessage * message);
+
+gboolean libbalsa_message_load_envelope_from_file(LibBalsaMessage *message,
+						  const char *filename);
+gboolean libbalsa_message_set_header_from_string(LibBalsaMessage *message,
+						 gchar *line);
+void libbalsa_message_set_references_from_string(LibBalsaMessage * message,
+						 const gchar *str);
 #endif				/* __LIBBALSA_MESSAGE_H__ */

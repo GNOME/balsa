@@ -44,6 +44,8 @@ typedef enum
   IMCAP_AUTH_ANON, 	        /*           AUTH=ANONYMOUS */
   IMCAP_STARTTLS,		/* RFC 2595: STARTTLS */
   IMCAP_LOGINDISABLED,		/*           LOGINDISABLED */
+  IMCAP_THREAD_ORDEREDSUBJECT,
+  IMCAP_THREAD_REFERENCES,
   IMCAP_MAX
 } ImapCapability;
 
@@ -95,6 +97,7 @@ typedef void(*ImapListCallback)(const char* mbox, gboolean *flags, void*);
 /* int below is a boolean */
 int      imap_mbox_handle_can_do(ImapMboxHandle* handle, ImapCapability cap);
 unsigned imap_mbox_handle_get_exists(ImapMboxHandle* handle);
+GNode *imap_mbox_handle_get_thread_root(ImapMboxHandle* handle);
 
 void imap_mbox_handle_connect_notify(ImapMboxHandle* handle,
                                      ImapMboxNotifyCb cb,

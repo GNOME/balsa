@@ -34,6 +34,7 @@
 
 #include <ctype.h>
 #include <string.h>
+#include <fcntl.h>
 
 #include <glib.h>
 #include <libgnome/gnome-i18n.h> 
@@ -265,7 +266,8 @@ libbalsa_message_charset(LibBalsaMessage * message)
         if (!charset)
             return NULL;
     }
-    tmp = g_mime_charset_canon_name(charset);
+    /* FIXME: use function g_mime_charset_canon_name from gmime-2.2 */
+    tmp = g_mime_charset_name(charset);
     return g_strdup(tmp);
 }
 
@@ -772,9 +774,28 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
     if (message->mime_msg) {
 	msg = message->mime_msg;
     } else {
-	g_warning("uninitialized mime_msg, initializing\n");
 	message->mime_msg = msg = libbalsa_mailbox_get_message( message->mailbox,
 						message->msgno);
+	/* clean up potentialy prefetched headers, use headers from mime_msg */
+	libbalsa_message_headers_destroy(message->headers);
+	message->headers = g_new0(LibBalsaMessageHeaders, 1);
+	if (message->sender) {
+	    g_object_unref(message->sender);
+	    message->sender = NULL;
+	}
+#if MESSAGE_COPY_CONTENT
+	g_free(message->subj);
+	message->subj = NULL;
+#endif
+	g_list_foreach(message->references, (GFunc) g_free, NULL);
+	g_list_free(message->references);
+	message->references = NULL;
+
+	g_free(message->in_reply_to);
+	message->in_reply_to = NULL;
+	g_free(message->message_id);
+	message->message_id = NULL;
+	libbalsa_message_headers_update(message);
     }
 
     if (msg != NULL) {
@@ -849,6 +870,8 @@ libbalsa_message_is_multipart(LibBalsaMessage * message)
     gboolean res;
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
     g_return_val_if_fail(message->mailbox, FALSE);
+    if (message->mime_msg == NULL)
+	return message->is_multipart;
     g_return_val_if_fail(message->mime_msg, FALSE);
 
     LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
@@ -866,6 +889,8 @@ libbalsa_message_has_attachment(LibBalsaMessage * message)
 
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
     g_return_val_if_fail(message->mailbox, FALSE);
+    if (message->mime_msg == NULL)
+	return message->has_attachment;
     g_return_val_if_fail(message->mime_msg, FALSE);
 
     LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
@@ -889,6 +914,8 @@ libbalsa_message_is_pgp_signed(LibBalsaMessage * message)
     gboolean res;
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
     g_return_val_if_fail(message->mailbox, FALSE);
+    if (message->mime_msg == NULL)
+	return message->is_pgp_signed;
     g_return_val_if_fail(message->mime_msg, FALSE);
 
     LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
@@ -905,6 +932,8 @@ libbalsa_message_is_pgp_encrypted(LibBalsaMessage * message)
     gboolean res;
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
     g_return_val_if_fail(message->mailbox, FALSE);
+    if (message->mime_msg == NULL)
+	return message->is_pgp_encrypted;
     g_return_val_if_fail(message->mime_msg, FALSE);
 
     LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
@@ -1023,7 +1052,10 @@ guint
 libbalsa_message_get_lines(LibBalsaMessage* msg)
 {
     /* set the line count */
-    const char *value = g_mime_message_get_header(msg->mime_msg, "Lines");
+    const char *value;
+    if (!msg->mime_msg)
+	return 0;
+    value = g_mime_message_get_header(msg->mime_msg, "Lines");
     if (!value)
 	return 0;
     return atoi(value);
@@ -1032,7 +1064,10 @@ glong
 libbalsa_message_get_length(LibBalsaMessage* msg)
 {
     /* set the length */
-    const char *value = g_mime_message_get_header(msg->mime_msg, "Content-Length");
+    const char *value;
+    if (!msg->mime_msg)
+	return 0;
+    value = g_mime_message_get_header(msg->mime_msg, "Content-Length");
     if (!value)
 	return 0;
     return atoi(value);
@@ -1142,8 +1177,10 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
     int offset;
   
     g_return_if_fail(message != NULL);
-    g_return_if_fail(message->mime_msg != NULL);
     g_return_if_fail(message->headers != NULL);
+
+    if (message->mime_msg == NULL)
+	return;
 
     libbalsa_message_headers_from_gmime(message->headers, message->mime_msg);
 
@@ -1178,18 +1215,8 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
 	const char *value = g_mime_message_get_header(
 				message->mime_msg, "References");
 	if (value) {
-	    GMimeReferences *references, *reference;
-	    reference = references = g_mime_references_decode(value);
-	    while (reference) {
-		message->references =
-		    g_list_prepend(message->references,
-				   g_strdup_printf("<%s>",
-						   reference->msgid));
-		reference = reference->next;
-	    }
-	    g_mime_references_clear(&references);
+	    libbalsa_message_set_references_from_string(message, value);
 	}
-	message->references = g_list_reverse(message->references);	
     }
     /* more! */
     if (!message->references_for_threading) {
@@ -1214,6 +1241,34 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
 
         message->references_for_threading = g_list_reverse(tmp);
     }
+
+    if (message->mailbox) {
+	message->has_attachment = libbalsa_message_has_attachment(message);
+	message->is_multipart = libbalsa_message_is_multipart(message);
+#ifdef HAVE_GPGME
+	message->is_pgp_encrypted = libbalsa_message_is_pgp_encrypted(message);
+	message->is_pgp_signed = libbalsa_message_is_pgp_signed(message);
+#endif
+    }
+}
+
+void
+libbalsa_message_set_references_from_string(LibBalsaMessage * message,
+					    const gchar *str)
+{
+    GMimeReferences *references, *reference;
+
+    g_return_if_fail(message->references == NULL);
+    g_return_if_fail(str != NULL);
+
+    reference = references = g_mime_references_decode(str);
+    while (reference) {
+	message->references = g_list_prepend(message->references,
+					     g_strdup(reference->msgid));
+	reference = reference->next;
+    }
+    g_mime_references_clear(&references);
+    message->references = g_list_reverse(message->references);	
 }
 
 /* libbalsa_message_title:
@@ -1300,5 +1355,145 @@ libbalsa_message_title(LibBalsaMessage * message, const gchar * format)
     tmp = string->str;
     g_string_free(string, FALSE);
     return tmp;
+}
+
+gboolean
+libbalsa_message_set_header_from_string(LibBalsaMessage *message, gchar *line)
+{
+    gchar *name, *value;
+
+    value = strchr(line, ':');
+    if (!value) {
+	g_warning("Bad header line: %s", line);
+	return FALSE;
+    }
+
+    *value++ = '\0';
+    name = g_strstrip(line);
+    value = g_strstrip(value);
+    if (g_ascii_strcasecmp(name, "Subject") == 0) {
+	if (!strcmp(value, "DON'T DELETE THIS MESSAGE -- FOLDER INTERNAL DATA"))
+	    return FALSE;
+        message->subj = g_mime_utils_8bit_header_decode(value);
+    } else
+    if (g_ascii_strcasecmp(name, "Date") == 0) {
+	message->headers->date = g_mime_utils_header_decode_date(value, NULL);
+    } else
+    if (g_ascii_strcasecmp(name, "From") == 0) {
+        message->headers->from = libbalsa_address_new_from_string(value);
+    } else
+    if (g_ascii_strcasecmp(name, "Reply-To") == 0) {
+        message->headers->reply_to = libbalsa_address_new_from_string(value);
+    } else
+    if (g_ascii_strcasecmp(name, "To") == 0) {
+	message->headers->to_list =
+	    libbalsa_address_new_list_from_string(value);
+    } else
+    if (g_ascii_strcasecmp(name, "Cc") == 0) {
+	message->headers->cc_list =
+	    libbalsa_address_new_list_from_string(value);
+    } else
+    if (g_ascii_strcasecmp(name, "Bcc") == 0) {
+	message->headers->bcc_list =
+	    libbalsa_address_new_list_from_string(value);
+    } else
+    if (g_ascii_strcasecmp(name, "In-Reply-To") == 0) {
+	gchar *tmp;
+        message->in_reply_to = g_mime_utils_8bit_header_decode(value);
+	if (message->in_reply_to && (tmp = strchr(message->in_reply_to, ';')))
+	    tmp[0] = 0;
+    } else
+    if (g_ascii_strcasecmp(name, "Message-ID") == 0) {
+	gchar *message_id = g_mime_utils_decode_message_id(value);
+	message->message_id = g_strdup_printf("<%s>", message_id);
+	g_free(message_id);
+    } else
+    if (g_ascii_strcasecmp(name, "References") == 0) {
+	libbalsa_message_set_references_from_string(message, value);
+    } else
+    if (g_ascii_strcasecmp(name, "Content-Type") == 0) {
+	/* check sign/encrypt/attachment */
+	GMimeContentType* content_type =
+	    g_mime_content_type_new_from_string(value);
+
+	message->is_multipart =
+	    g_mime_content_type_is_type(content_type, "multipart", "*");
+	message->has_attachment =
+	    g_mime_content_type_is_type(content_type, "multipart", "mixed");
+#ifdef HAVE_GPGME
+	message->is_pgp_encrypted =
+	    g_mime_content_type_is_type(content_type, "multipart", "encrypted");
+	message->is_pgp_signed =
+	    g_mime_content_type_is_type(content_type, "multipart", "signed");
+#endif
+	g_mime_content_type_destroy(content_type);
+    } else
+
+
+#ifdef MESSAGE_COPY_CONTENT
+    if (g_ascii_strcasecmp(name, "Content-Length") == 0) {
+	    message->length = atoi(value);
+    } else
+
+    if (g_ascii_strcasecmp(name, "Lines") == 0) {
+	    message->lines_len = atoi(value);
+    } else
+#endif
+    /* do nothing */;
+    return TRUE;
+}
+
+gboolean
+libbalsa_message_load_envelope_from_file(LibBalsaMessage *message,
+					 const char *filename)
+{
+    int fd;
+    GMimeStream *gmime_stream;
+    GMimeStream *gmime_stream_buffer;
+    GByteArray *line;
+    char lookahead;
+    gboolean ret = FALSE;
+
+    fd = open(filename, O_RDONLY);
+    gmime_stream = g_mime_stream_fs_new(fd);
+    gmime_stream_buffer = g_mime_stream_buffer_new(gmime_stream,
+					GMIME_STREAM_BUFFER_BLOCK_READ);
+    g_mime_stream_unref(gmime_stream);
+    line = g_byte_array_new();
+    do {
+	g_mime_stream_buffer_readln(gmime_stream_buffer, line);
+	while (!g_mime_stream_eos(gmime_stream_buffer)
+	       && g_mime_stream_read(gmime_stream_buffer, &lookahead, 1) == 1)
+	{
+		if (lookahead == ' ' || lookahead == '\t') {
+		    g_byte_array_append(line, &lookahead, 1);
+		    g_mime_stream_buffer_readln(gmime_stream_buffer, line);
+		} else
+		    break;
+	}
+	if (line->len == 0 || line->data[line->len-1]!='\n') {
+	    /* read error */
+	    ret = FALSE;
+	    break;
+	}
+	line->data[line->len-1]='\0'; /* terminate line by overwriting '\n' */
+	if (libbalsa_message_set_header_from_string(message,
+						    line->data) == FALSE) {
+	    ret = FALSE;
+	    break;
+	}
+	if (lookahead == '\n') {/* end of headers */
+	    ret = TRUE;
+	    break;
+	}
+	line->len = 0;
+	g_byte_array_append(line, &lookahead, 1);
+    } while (!g_mime_stream_eos(gmime_stream_buffer));
+    if (ret) {
+	/* calculate size */
+    }
+    g_mime_stream_unref(gmime_stream_buffer);
+    g_byte_array_free(line, TRUE);
+    return ret;
 }
 

@@ -32,8 +32,6 @@
 #include <libgnome/gnome-i18n.h>
 
 #include "libbalsa.h"
-/* for safe_open */
-#include "mailbackend.h"
 
 LibBalsaMessageBody *
 libbalsa_message_body_new(LibBalsaMessage * message)
@@ -242,7 +240,8 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body)
 }
 
 /* libbalsa_message_body_save:
-   NOTE: has to use safe_open to set the file access privileges to safe.
+   NOTE: has to use libbalsa_safe_open to set the file access privileges
+   to safe.
 */
 gboolean
 libbalsa_message_body_save(LibBalsaMessageBody * body,

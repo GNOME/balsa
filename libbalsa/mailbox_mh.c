@@ -28,6 +28,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <utime.h>
+#include <string.h>
 
 #include "libbalsa.h"
 #include "misc.h"
@@ -38,6 +39,7 @@ struct message_info {
     char *filename;
     LibBalsaMessageFlag flags;
     LibBalsaMessageFlag orig_flags;
+    LibBalsaMessage *message;
 };
 
 static LibBalsaMailboxLocalClass *parent_class = NULL;
@@ -939,6 +941,8 @@ static LibBalsaMessage *libbalsa_mailbox_mh_load_message(
 {
     LibBalsaMessage *message;
     struct message_info *msg_info;
+    const gchar *path;
+    gchar *filename;
 
     g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MH(mailbox), NULL);
     g_return_val_if_fail (MAILBOX_OPEN(mailbox), NULL);
@@ -952,29 +956,14 @@ static LibBalsaMessage *libbalsa_mailbox_mh_load_message(
 
     mailbox->messages++;
 
-    if (libbalsa_mailbox_mh_get_message(mailbox, msgno) == NULL)
+    msg_info->message = message = libbalsa_message_new();
+    path = libbalsa_mailbox_local_get_path(mailbox);
+    filename = g_build_filename(path, msg_info->filename, NULL);
+    if (libbalsa_message_load_envelope_from_file(message, filename) == FALSE) {
+	g_free(filename);
 	return NULL;
-
-    if (msg_info->mime_message->subject &&
-	!strcmp(msg_info->mime_message->subject,
-		"DON'T DELETE THIS MESSAGE -- FOLDER INTERNAL DATA"))
-	return NULL;
-
-    message = libbalsa_message_new();
-    message->mime_msg = msg_info->mime_message;
-
-#ifdef MESSAGE_COPY_CONTENT
-    header =
-	g_mime_message_get_header(msg_info->mime_message, "Content-Length");
-    msg_info->length = 0;
-    if (header)
-	    msg_info->length=atoi(header);
-
-    header = g_mime_message_get_header(msg_info->mime_message, "Lines");
-    msg_info->lines = 0;
-    if (header)
-	    msg_info->lines=atoi(header);
-#endif
+    }
+    g_free(filename);
 
     message->flags = msg_info->flags = msg_info->orig_flags;
 

@@ -47,15 +47,22 @@ typedef char ImapMsgFlags[IMSGF_LAST];
 typedef guint32 ImapUID;
 typedef time_t ImapDate;
 
+typedef struct ImapAddress_ {
+    char *addr_name;
+    char *addr_adl;
+    char *addr_mailbox;
+    char *addr_host;
+} ImapAddress;
+
 typedef struct ImapEnvelope_ {
   ImapDate date;
   gchar *subject; /* mime encoded, 7-bit subject as fetched from server */
-  gchar *from;
-  gchar *sender;
-  gchar *replyto;
-  gchar *to;
-  gchar *cc;
-  gchar *bcc;
+  ImapAddress *from;
+  ImapAddress *sender;
+  ImapAddress *replyto;
+  GList *to_list;
+  GList *cc_list;
+  GList *bcc_list;
   gchar *in_reply_to;
   gchar *message_id;
 } ImapEnvelope;
@@ -69,6 +76,7 @@ typedef struct ImapMessage_ {
      section have yet to be implemented. Currently, they will be ignored 
   */
   gchar *body;
+  gchar *fetched_header_fields;
 } ImapMessage;
 
 typedef struct _ImapMboxHandle      ImapMboxHandle;

@@ -23,6 +23,7 @@
 #ifdef HAVE_GPGME
 
 #include <gnome.h>
+#include <string.h>
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"

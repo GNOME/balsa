@@ -31,7 +31,6 @@
 
 #include "helper.h"
 #include "libbalsa.h"
-#include "mutt.h"
 #include "url.h"
 
 /*

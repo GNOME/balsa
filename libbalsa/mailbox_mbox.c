@@ -29,6 +29,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <utime.h>
+#include <string.h>
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
@@ -796,14 +797,14 @@ static LibBalsaMessage *libbalsa_mailbox_mbox_load_message(
 #ifdef MESSAGE_COPY_CONTENT
     header =
 	g_mime_message_get_header(msg_info->mime_message, "Content-Length");
-    msg_info->length = 0;
+    message->length = 0;
     if (header)
-	    msg_info->length=atoi(header);
+	    message->length = atoi(header);
 
     header = g_mime_message_get_header(msg_info->mime_message, "Lines");
-    msg_info->lines = 0;
+    message->lines_len = 0;
     if (header)
-	    msg_info->lines=atoi(header);
+	    message->lines_len = atoi(header);
 #endif
 
     header = g_mime_message_get_header (msg_info->mime_message, "Status");

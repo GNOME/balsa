@@ -34,9 +34,6 @@
 #include "quote-color.h"
 #include "misc.h"
 
-/* FIXME: Mutt dependency for ENC7BIT ENC8BIT ENCQUOTEDPRINTABLE consts*/
-#include "../libmutt/mime.h"
-
 #if ENABLE_ESMTP
 #include <libesmtp.h>
 #endif

@@ -78,8 +78,7 @@ balsa_LDADD = \
 	-lltdl	\
 	$(INTLLIBS) \
         $(BALSA_LIBS)
-#	$(top_builddir)/libmutt/libmutt.a	\
-#	$(top_builddir)/libmutt/imap/libimap.a	
+
 
 
 balsa_ab_SOURCES =	ab-main.c
@@ -87,7 +86,6 @@ balsa_ab_SOURCES =	ab-main.c
 balsa_ab_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a	\
 	$(top_builddir)/libbalsa/imap/libimap.a	\
-	$(top_builddir)/libmutt/libmutt.a	\
 	$(BALSA_LIBS)
 
 dist-hook:

@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <gmime/gmime-utils.h> 
 #include "libimap-marshal.h"
 #include "imap.h"
 #include "imap-handle.h"
@@ -377,6 +378,12 @@ imap_mbox_handle_get_exists(ImapMboxHandle* handle)
   return handle->exists;
 }
 
+GNode *imap_mbox_handle_get_thread_root(ImapMboxHandle* handle)
+{
+  g_return_val_if_fail(handle, NULL);
+  return handle->thread_root;
+}
+
 void
 imap_mbox_handle_connect_notify(ImapMboxHandle* handle,
                                 ImapMboxNotifyCb cb, void *data)
@@ -425,15 +432,22 @@ imap_envelope_new()
 static void
 imap_envelope_free_data(ImapEnvelope* env)
 {
-  if(env->subject)     g_free(env->subject);
-  if(env->from)        g_free(env->from);
-  if(env->sender)      g_free(env->sender);
-  if(env->replyto)     g_free(env->replyto);
-  if(env->to)          g_free(env->to);
-  if(env->cc)          g_free(env->cc);
-  if(env->bcc)         g_free(env->bcc);
-  if(env->in_reply_to) g_free(env->in_reply_to);
-  if(env->message_id)  g_free(env->message_id);
+  g_free(env->subject);
+  g_free(env->from);
+  g_free(env->sender);
+  g_free(env->replyto);
+
+  g_list_foreach(env->to_list, (GFunc)g_free, NULL);
+  g_list_free(env->to_list);
+
+  g_list_foreach(env->cc_list, (GFunc)g_free, NULL);
+  g_list_free(env->cc_list);
+
+  g_list_foreach(env->bcc_list, (GFunc)g_free, NULL);
+  g_list_free(env->bcc_list);
+
+  g_free(env->in_reply_to);
+  g_free(env->message_id);
 }
 void
 imap_envelope_free(ImapEnvelope *env)
@@ -455,6 +469,7 @@ imap_message_free(ImapMessage *msg)
   g_return_if_fail(msg);
   if(msg->envelope) imap_envelope_free(msg->envelope);
   g_free(msg->body);
+  g_free(msg->fetched_header_fields);
   g_free(msg);
 }
 
@@ -699,7 +714,8 @@ ir_capability_data(ImapMboxHandle *handle)
   /* ordered identically as ImapCapability constants */
   static const char* capabilities[] = {
     "IMAP4", "IMAP4rev1", "STATUS", "ACL", "NAMESPACE", "AUTH=CRAM-MD5", 
-    "AUTH=GSSAPI", "AUTH=ANONYMOUS", "STARTTLS", "LOGINDISABLED"
+    "AUTH=GSSAPI", "AUTH=ANONYMOUS", "STARTTLS", "LOGINDISABLED",
+    "THREAD=ORDEREDSUBJECT", "THREAD=REFERENCES"
   };
   unsigned x;
   int c;
@@ -998,61 +1014,44 @@ ir_msg_att_flags(ImapMboxHandle *h, unsigned seqno)
 /* imap_get_address: returns null if no beginning of address is found
    (eg., when end of list is found instead).
 */
-static char*
+static ImapAddress*
 imap_get_address(struct siobuf* sio)
 {
-  char *addr[4], *res = NULL;
-  int i, c;
+  ImapAddress *address;
+  int c;
 
   if(sio_getc(sio) != '(') return NULL;
   
-  for(i=0; i<4; i++) {
-    addr[i] = imap_get_nstring(sio);
-    if( (c=sio_getc(sio)) != ' '); /* error but do nothing */
-  }
-  if(c == ')') {
-#if 0
-    if(addr[0]) len += strlen(addr[0])+1;
-    if(addr[2] && addr[3]) 
-      len += strlen(addr[2]) + strlen(addr[3]) + 3;
-    res = g_malloc(len+1);
-    if(addr[0]) { strcpy(res, addr[0]); strcat(res, " "); }
-    else res[0] = '\0';
-    if(addr[2] && addr[3]) {
-      strcat(res, "<");
-      strcat(res, addr[2]);
-      strcat(res, "@");
-      strcat(res, addr[3]);
-      strcat(res, ">");
-    }
-#else
-    if(addr[0]) {
-      res = addr[0]; addr[0] = NULL;
-    } else if (addr[2] && addr[3]) {
-      res = g_strconcat(addr[2], "@", addr[3], NULL);
-    }
-#endif
-  }
-  for(i=0; i<4; i++)
-    if(addr[i]) g_free(addr[i]);
-  return res;
+  address = g_new0(ImapAddress, 1);
+
+  address->addr_name = imap_get_nstring(sio);
+  if( (c=sio_getc(sio)) != ' '); /* error but do nothing */
+  address->addr_adl = imap_get_nstring(sio);
+  if( (c=sio_getc(sio)) != ' '); /* error but do nothing */
+  address->addr_mailbox = imap_get_nstring(sio);
+  if( (c=sio_getc(sio)) != ' '); /* error but do nothing */
+  address->addr_host = imap_get_nstring(sio);
+  if( (c=sio_getc(sio)) != ')'); /* error but do nothing */
+
+  return address;
 }
-static char*
+static GList*
 imap_get_addr_list(struct siobuf *sio)
 {
-  char *res = NULL, *addr;
+  GList *list=NULL;
+  ImapAddress *addr;
+
   int c=sio_getc(sio);
   if( c == '(') {
     while( (addr=imap_get_address(sio)) != NULL) {
-      if(!res) res = addr;
-      else g_free(addr);
+      list = g_list_prepend(list, addr);
     }
     /* assert(c==')'); */
   } else { /* nil; FIXME: error checking */
     sio_getc(sio); /* i */
     sio_getc(sio); /* l */
   }
-  return res;
+  return g_list_reverse(list);
 }
 
 static ImapResponse
@@ -1061,6 +1060,7 @@ ir_msg_att_envelope(ImapMboxHandle *h, unsigned seqno)
   int c;
   char *date;
   ImapMessage *msg = h->msg_cache[seqno-1];
+  GList *address_list;
 
   if( (c=sio_getc(h->sio)) != '(') return IMR_PROTOCOL;
   if(!msg->envelope)
@@ -1068,27 +1068,51 @@ ir_msg_att_envelope(ImapMboxHandle *h, unsigned seqno)
   else
     imap_envelope_free_data(msg->envelope);
   date = imap_get_nstring(h->sio);
-  if(date) g_free(date);
-  msg->envelope->date = 0;
+  if(date) {
+      msg->envelope->date = g_mime_utils_header_decode_date(date, NULL);
+      g_free(date);
+  }
   if( (c=sio_getc(h->sio)) != ' ') return IMR_PROTOCOL;
+
   msg->envelope->subject = imap_get_nstring(h->sio);
   if( (c=sio_getc(h->sio)) != ' ') return IMR_PROTOCOL;
-  msg->envelope->from = imap_get_addr_list(h->sio);
+
+  address_list = imap_get_addr_list(h->sio);
+  msg->envelope->from = address_list->data;
+  address_list = g_list_delete_link(address_list, address_list);
+  g_list_foreach(address_list, (GFunc)g_free, NULL);
+  g_list_free(address_list);
   if( (c=sio_getc(h->sio)) != ' ') return IMR_PROTOCOL;
-  msg->envelope->sender = imap_get_addr_list(h->sio);
+
+  address_list = imap_get_addr_list(h->sio);
+  msg->envelope->sender = address_list->data;
+  address_list = g_list_delete_link(address_list, address_list);
+  g_list_foreach(address_list, (GFunc)g_free, NULL);
+  g_list_free(address_list);
   if( (c=sio_getc(h->sio)) != ' ') return IMR_PROTOCOL;
-  msg->envelope->replyto = imap_get_addr_list(h->sio);
+
+  address_list = imap_get_addr_list(h->sio);
+  msg->envelope->replyto = address_list->data;
+  address_list = g_list_delete_link(address_list, address_list);
+  g_list_foreach(address_list, (GFunc)g_free, NULL);
+  g_list_free(address_list);
   if( (c=sio_getc(h->sio)) != ' ') return IMR_PROTOCOL;
-  msg->envelope->to = imap_get_addr_list(h->sio);
+
+  msg->envelope->to_list = imap_get_addr_list(h->sio);
   if( (c=sio_getc(h->sio)) != ' ') return IMR_PROTOCOL;
-  msg->envelope->cc = imap_get_addr_list(h->sio);
+
+  msg->envelope->cc_list = imap_get_addr_list(h->sio);
   if( (c=sio_getc(h->sio)) != ' ') return IMR_PROTOCOL;
-  msg->envelope->bcc = imap_get_addr_list(h->sio);
+
+  msg->envelope->bcc_list = imap_get_addr_list(h->sio);
   if( (c=sio_getc(h->sio)) != ' ') return IMR_PROTOCOL;
+
   msg->envelope->in_reply_to = imap_get_nstring(h->sio);
   if( (c=sio_getc(h->sio)) != ' ') { printf("c=%c\n",c); return IMR_PROTOCOL;}
+
   msg->envelope->message_id = imap_get_nstring(h->sio);
   if( (c=sio_getc(h->sio)) != ')') { printf("c=%d\n",c);return IMR_PROTOCOL;}
+
   return IMR_OK;
 }
 
@@ -1130,8 +1154,26 @@ ir_msg_att_body(ImapMboxHandle *h, unsigned seqno)
 	  printf("%c", c);
 		  ;
   }
-	  printf("%c<\n", c);
+  printf("%c<\n", c);
+  g_free(msg->body);
   msg->body = imap_get_nstring(h->sio);
+  return IMR_OK;
+}
+static ImapResponse
+ir_msg_att_body_header_fields(ImapMboxHandle *h, unsigned seqno)
+{
+  int c;
+  ImapMessage *msg = h->msg_cache[seqno-1];
+
+  if(sio_getc(h->sio) != '(') return IMR_PROTOCOL;
+
+  while (imap_get_astring(h->sio, &c) && c != ')')
+      /* nothing (yet?) */;
+  if(c != ')') return IMR_PROTOCOL;
+  if(sio_getc(h->sio) != ']') return IMR_PROTOCOL;
+  if(sio_getc(h->sio) != ' ') return IMR_PROTOCOL;
+  g_free(msg->fetched_header_fields);
+  msg->fetched_header_fields = imap_get_nstring(h->sio);
   return IMR_OK;
 }
 static ImapResponse
@@ -1160,8 +1202,9 @@ ir_fetch_seq(ImapMboxHandle *h, unsigned seqno)
     { "RFC822.HEADER", ir_msg_att_rfc822_header }, 
     { "RFC822.TEXT",   ir_msg_att_rfc822_text }, 
     { "RFC822.SIZE",   ir_msg_att_rfc822_size }, 
-    { "BODY[",         ir_msg_att_body }, 
     { "BODY",          ir_msg_att_body }, 
+    { "BODY[",         ir_msg_att_body }, 
+    { "BODY[HEADER.FIELDS",         ir_msg_att_body_header_fields }, 
     { "UID",           ir_msg_att_uid }
   };
   char atom[LONG_STRING];
@@ -1202,6 +1245,95 @@ ir_fetch(ImapMboxHandle *h)
   return ir_fetch_seq(h, seqno);
 }
 
+/*
+   Example:    S: * THREAD (2)(3 6 (4 23)(44 7 96))
+
+      The first thread consists only of message 2.  The second thread
+      consists of the messages 3 (parent) and 6 (child), after which it
+      splits into two subthreads; the first of which contains messages 4
+      (child of 6, sibling of 44) and 23 (child of 4), and the second of
+      which contains messages 44 (child of 6, sibling of 4), 7 (child of
+      44), and 96 (child of 7).  Since some later messages are parents
+      of earlier messages, the messages were probably moved from some
+      other mailbox at different times.
+
+      -- 2
+
+      -- 3
+         \-- 6
+             |-- 4
+             |   \-- 23
+             |
+             \-- 44
+                  \-- 7
+                      \-- 96
+*/
+static ImapResponse
+ir_thread_sub(ImapMboxHandle *h, GNode *parent, int last)
+{
+  char buf[12];
+  unsigned seqno;
+  int c;
+  GNode *item;
+  ImapResponse rc = IMR_OK;
+
+  c = imap_get_atom(h->sio, buf, sizeof(buf));
+  seqno = atoi(buf);
+  if(seqno == 0 && c == '(') {
+      while (c == '(') {
+	  rc = ir_thread_sub(h, parent, c);
+	  if (rc!=IMR_OK) {
+	      return rc;
+	  }
+	  c=sio_getc(h->sio);
+      }
+      return rc;
+  }
+  if(seqno == 0) return IMAP_PROTOCOL_ERROR;
+  printf("%d ", seqno);
+  item = g_node_append_data(parent, GUINT_TO_POINTER(seqno));
+  if (c == ' ') {
+#if DEBUG
+      printf(">");
+#endif
+      rc = ir_thread_sub(h, item, c);
+#if DEBUG
+      printf("<");
+#endif
+  }
+
+  return rc;
+}
+static ImapResponse
+ir_thread(ImapMboxHandle *h)
+{
+  GNode *root;
+  int c;
+  ImapResponse rc = IMR_OK;
+  
+  c=sio_getc(h->sio);
+  g_node_destroy(h->thread_root);
+  h->thread_root = NULL;
+  root = g_node_new(NULL);
+  while (c == '(') {
+      rc=ir_thread_sub(h, root, c);
+      if (rc!=IMR_OK) {
+	  return rc;
+      }
+      printf("\n");
+      c=sio_getc(h->sio);
+  }
+  if( c != 0x0d) {printf("CR:%d\n",c); rc = IMR_PROTOCOL;}
+  if( (c=sio_getc(h->sio)) != 0x0a) {printf("LF:%d\n",c); rc = IMR_PROTOCOL;}
+
+  if (rc != IMR_OK)
+      g_node_destroy(root);
+  else
+      h->thread_root = root;
+
+  return rc;
+}
+
 /* response dispatch code */
 static const struct {
   const gchar *response;
@@ -1219,7 +1351,8 @@ static const struct {
   { "STATUS",     6, ir_status },
   { "SEARCH",     6, ir_search },
   { "FLAGS",      5, ir_flags },
-  { "FETCH",      5, ir_fetch }
+  { "FETCH",      5, ir_fetch },
+  { "THREAD",     6, ir_thread },
 };
 static const struct {
   const gchar *response;

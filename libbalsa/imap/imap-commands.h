@@ -32,4 +32,5 @@ ImapResult imap_mbox_store_flag(ImapMboxHandle *r, int seq,
 
 /* Experimental/Expansion */
 ImapResult imap_mbox_scan(ImapMboxHandle *r, const char*what, const char*str);
+ImapResult imap_mbox_thread(ImapMboxHandle *h, const char *how);
 #endif /* __IMAP_COMMANDS_H__ */

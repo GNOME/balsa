@@ -39,6 +39,7 @@ struct _ImapMboxHandle {
 
   ImapInfoCb alert_cb;
   void *alert_arg;
+  GNode *thread_root;
 };
 
 extern const char* msg_flags[];

@@ -1,3 +1,29 @@
+2003-09-09  Carlos Morgado  <chbm chbm.net>
+
+	* src/pref-manager.c (Repository): 
+	* libinit_balsa/helper.c (Repository): 
+	* libinit_balsa/balsa-druid-page-directory.c (Repository): 
+	* libinit_balsa/Makefile.am (Repository): 
+	* src/Makefile.am (Repository): 
+	* libbalsa/imap/imap_private.h (Repository): 
+	* libbalsa/imap/imap.h (Repository): 
+	* libbalsa/imap/imap-handle.h (Repository): 
+	* libbalsa/imap/imap-handle.c (Repository): 
+	* libbalsa/imap/imap-commands.h (Repository): 
+	* libbalsa/imap/imap-commands.c (Repository): 
+	* libbalsa/server.c (Repository): 
+	* libbalsa/send.c (Repository): 
+	* libbalsa/rfc3156.c (Repository): 
+	* libbalsa/mailbox_pop3.c (Repository): 
+	* libbalsa/mailbox_mh.c (Repository): 
+	* libbalsa/mailbox_mbox.c (Repository): 
+	* libbalsa/mailbox_maildir.c (Repository): 
+	* libbalsa/mailbox_imap.c (Repository): 
+	* libbalsa/body.c (Repository): 
+	Patches from Bart: more cleanups, imap threading, maildir/mh
+	envelope parser
+	The envelope parser will be replaced by the gmime incremental parser
+
 2003-09-08 19:00  PeterB
 
 	* libbalsa/message.c: Restore "<...>" to references.

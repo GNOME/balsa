@@ -47,16 +47,15 @@
 struct message_info {
     GMimeMessage *mime_message;
     ImapMessage *msg;
-    char *key;
     ImapUID uid;
-    const char *subdir;
-    char *filename;
     LibBalsaMessageFlag flags;
     LibBalsaMessageFlag orig_flags;
+    LibBalsaMessage *message;
 };
 
 #define IMAP_MESSAGE_UID(msg) ( message_info_from_msgno( \
-				 (msg)->mailbox, (msg)->msgno \
+				 LIBBALSA_MAILBOX_IMAP((msg)->mailbox), \
+				 (msg)->msgno \
 				)->uid)
 #define IMAP_MAILBOX_UID_VALIDITY(mailbox) (LIBBALSA_MAILBOX_IMAP(mailbox)->uid_validity)
 
@@ -124,11 +123,10 @@ static void server_host_settings_changed_cb(LibBalsaServer * server,
 					    LibBalsaMailbox * mailbox);
 
 static struct message_info *message_info_from_msgno(
-						  LibBalsaMailbox * mailbox,
+						  LibBalsaMailboxImap * mimap,
 						  guint msgno)
 {
     struct message_info *msg_info = NULL;
-    LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
 
     if (msgno >= mimap->msgno_2_msg_info->len) {
 	g_ptr_array_set_size(mimap->msgno_2_msg_info,
@@ -670,7 +668,7 @@ void run_filters_on_reception(LibBalsaMailboxImap * mbox)
 static void
 monitor_cb(const char *buffer, int length, int direction, void *arg)
 {
-#if 0
+#if 1
   int i;
   printf("%c: ", direction ? 'C' : 'S');
   for(i=0; i<length; i++) putchar(buffer[i]);
@@ -881,14 +879,14 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
 	GMimeStream *filter_stream;
 	GMimeFilter *filter;
 	struct message_info *msg_info;
-	msg_info = message_info_from_msgno(mailbox, message->msgno);
+	msg_info = message_info_from_msgno(mimap, message->msgno);
 
 	if (!msg_info->msg) {
 	    char *seq;
 
 	    imap_mbox_select(mimap->handle, mimap->path, &mailbox->readonly);
 
-	    seq = g_strdup_printf("%d", message->msgno+1);
+	    seq = g_strdup_printf("%ld", message->msgno+1);
 	    rc = imap_mbox_handle_fetch_body(mimap->handle, seq);
 	    msg_info->msg =
 		imap_mbox_handle_get_msg(mimap->handle,
@@ -1416,10 +1414,12 @@ gboolean libbalsa_mailbox_imap_sync(LibBalsaMailbox * mailbox)
 GMimeMessage *libbalsa_mailbox_imap_get_message(LibBalsaMailbox * mailbox, guint msgno)
 {
     struct message_info *msg_info;
+    LibBalsaMailboxImap *mimap;
 
     g_return_val_if_fail (LIBBALSA_IS_MAILBOX_IMAP(mailbox), NULL);
 
-    msg_info = message_info_from_msgno(mailbox, msgno);
+    mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
+    msg_info = message_info_from_msgno(mimap, msgno);
 
     if (!msg_info)
 	return NULL;
@@ -1459,32 +1459,120 @@ GMimeMessage *libbalsa_mailbox_imap_get_message(LibBalsaMailbox * mailbox, guint
     return msg_info->mime_message;
 }
 
+static LibBalsaAddress *
+libbalsa_address_new_from_imap_address(ImapAddress *addr)
+{
+    LibBalsaAddress *address;
+
+    if (!addr || (addr->addr_name==NULL && addr->addr_mailbox==NULL))
+       return NULL;
+
+    address = libbalsa_address_new();
+
+    /* it will be owned by the caller */
+
+    address->full_name = g_strdup(addr->addr_name);
+    if (addr->addr_mailbox)
+       address->address_list = g_list_append(address->address_list,
+                                     g_strdup_printf("%s@%s",
+                                                     addr->addr_mailbox,
+                                                     addr->addr_host));
+
+    return address;
+}
+
+static GList*
+libbalsa_address_new_list_from_imap_address_list(GList *list)
+{
+    LibBalsaAddress* addr;
+    GList* lst = NULL;
+
+    for (; list; list = list->next) {
+       addr = libbalsa_address_new_from_imap_address(list->data);
+       if (addr)
+           lst = g_list_prepend(lst, addr);
+    }
+    return g_list_reverse(lst);
+}
+
+static void
+libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
+				    LibBalsaMessage *message)
+{
+    struct message_info *msg_info;
+    char *seq;
+    ImapResponse rc;
+    ImapEnvelope *envelope;
+
+    msg_info = message_info_from_msgno(mimap, message->msgno);
+    seq = g_strdup_printf("%ld", message->msgno+1);
+    rc = imap_mbox_select(mimap->handle, mimap->path,
+			  &(LIBBALSA_MAILBOX(mimap)->readonly));
+    rc = imap_mbox_handle_fetch_env(mimap->handle, seq);
+    g_free(seq);
+
+    msg_info->msg = imap_mbox_handle_get_msg(mimap->handle, message->msgno+1);
+
+    if (!IMSG_FLAG_SEEN(msg_info->msg->flags))
+        message->flags |= LIBBALSA_MESSAGE_FLAG_NEW;
+    if (IMSG_FLAG_DELETED(msg_info->msg->flags))
+        message->flags |= LIBBALSA_MESSAGE_FLAG_DELETED;
+    if (IMSG_FLAG_FLAGGED(msg_info->msg->flags))
+        message->flags |= LIBBALSA_MESSAGE_FLAG_FLAGGED;
+    if (IMSG_FLAG_ANSWERED(msg_info->msg->flags))
+        message->flags |= LIBBALSA_MESSAGE_FLAG_REPLIED;
+    if (IMSG_FLAG_RECENT(msg_info->msg->flags))
+	message->flags |= LIBBALSA_MESSAGE_FLAG_RECENT;
+    message->flags = msg_info->flags = msg_info->orig_flags;
+
+    envelope = msg_info->msg->envelope;
+    message->subj = g_mime_utils_8bit_header_decode(envelope->subject);
+    message->headers->date = envelope->date;
+    message->headers->from =
+	libbalsa_address_new_from_imap_address(envelope->from);
+    message->sender =
+	libbalsa_address_new_from_imap_address(envelope->sender);
+    message->headers->reply_to =
+	libbalsa_address_new_from_imap_address(envelope->replyto);
+    message->headers->to_list =
+	libbalsa_address_new_list_from_imap_address_list(envelope->to_list);
+    message->headers->cc_list =
+	libbalsa_address_new_list_from_imap_address_list(envelope->cc_list);
+    message->headers->bcc_list =
+	libbalsa_address_new_list_from_imap_address_list(envelope->bcc_list);
+    message->in_reply_to =
+	g_mime_utils_8bit_header_decode(envelope->in_reply_to);
+    if (envelope->message_id) {
+	gchar *message_id;
+	message_id = g_mime_utils_decode_message_id(envelope->message_id);
+	message->message_id = g_strdup_printf("<%s>", message_id);
+	g_free(message_id);
+    }
+}
+
 LibBalsaMessage *libbalsa_mailbox_imap_load_message(LibBalsaMailbox * mailbox, guint msgno)
 {
     LibBalsaMessage *message;
     struct message_info *msg_info;
-    ImapMessage *msg;
+    LibBalsaMailboxImap *mimap;
 
     g_return_val_if_fail (LIBBALSA_IS_MAILBOX_IMAP(mailbox), NULL);
 
     mailbox->new_messages--;
 
-    msg_info = message_info_from_msgno(mailbox, msgno);
+    mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
+    msg_info = message_info_from_msgno(mimap, msgno);
 
     if (!msg_info)
 	return NULL;
 
     mailbox->messages++;
 
-    if (libbalsa_mailbox_imap_get_message(mailbox, msgno) == NULL)
-	return NULL;
-
-    if (msg_info->mime_message->subject &&
-	!strcmp(msg_info->mime_message->subject,
-		"DON'T DELETE THIS MESSAGE -- FOLDER INTERNAL DATA"))
-	return NULL;
-
     message = libbalsa_message_new();
+    message->msgno = msgno;
+    libbalsa_mailbox_imap_load_envelope(mimap, message);
+
+#if 0
     message->mime_msg = msg_info->mime_message;
 
 #ifdef MESSAGE_COPY_CONTENT
@@ -1499,23 +1587,8 @@ LibBalsaMessage *libbalsa_mailbox_imap_load_message(LibBalsaMailbox * mailbox, g
     if (header)
 	    msg_info->lines=atoi(header);
 #endif
-
-    msg = imap_mbox_handle_get_msg(LIBBALSA_MAILBOX_IMAP(mailbox)->handle, msgno+1);
-    if (!IMSG_FLAG_SEEN(msg->flags))
-        message->flags |= LIBBALSA_MESSAGE_FLAG_NEW;
-    if (IMSG_FLAG_DELETED(msg->flags))
-        message->flags |= LIBBALSA_MESSAGE_FLAG_DELETED;
-    if (IMSG_FLAG_FLAGGED(msg->flags))
-        message->flags |= LIBBALSA_MESSAGE_FLAG_FLAGGED;
-    if (IMSG_FLAG_ANSWERED(msg->flags))
-        message->flags |= LIBBALSA_MESSAGE_FLAG_REPLIED;
-    if (IMSG_FLAG_RECENT(msg->flags))
-	message->flags |= LIBBALSA_MESSAGE_FLAG_RECENT;
-#if FIXME
-    message->flags = msg_info->flags = msg_info->orig_flags;
 #endif
 
-    message->msgno = msgno;
     return message;
 }
 

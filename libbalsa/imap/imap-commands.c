@@ -349,3 +349,18 @@ imap_mbox_scan(ImapMboxHandle *handle, const char*what, const char*str)
   return rc;
 }
 
+/*
+ * THREAD Command
+ * see draft-ietf-imapext-thread-12.txt
+ */
+ImapResult
+imap_mbox_thread(ImapMboxHandle *h, const char *how)
+{
+  gchar * cmd = g_strdup_printf("THREAD %s UTF-8 ALL", how);
+  ImapResult rc = 
+    imap_cmd_exec(h, cmd) == IMR_OK 
+    ? IMAP_SUCCESS : IMAP_PROTOCOL_ERROR;  
+  g_free(cmd);
+  return rc;
+}
+

@@ -820,6 +820,7 @@ config_identities_load(void)
     balsa_app.sig_whenreply = gnome_config_get_bool("SigReply=true");
     balsa_app.sig_whenforward = gnome_config_get_bool("SigForward=true");
     balsa_app.sig_separator = gnome_config_get_bool("SigSeparator=true");
+    balsa_app.sig_prepend = gnome_config_get_bool("SigPrepend=false");
 
     gnome_config_pop_prefix();
 }
@@ -841,6 +842,7 @@ config_identities_save(void)
     gnome_config_set_bool("SigForward", balsa_app.sig_whenforward);
     gnome_config_set_bool("SigReply", balsa_app.sig_whenreply);
     gnome_config_set_bool("SigSeparator", balsa_app.sig_separator);
+    gnome_config_set_bool("SigPrepend", balsa_app.sig_prepend);
 
     gnome_config_pop_prefix();
 

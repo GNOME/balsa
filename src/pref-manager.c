@@ -44,6 +44,7 @@ typedef struct _PropertyUI {
     GtkWidget *real_name, *email, *replyto, *domain, *signature;
     GtkWidget *sig_whenforward, *sig_whenreply, *sig_sending;
     GtkWidget *sig_separator;
+    GtkWidget *sig_prepend;
 
     GtkWidget *address_books;
 
@@ -325,6 +326,9 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     gtk_signal_connect(GTK_OBJECT(pui->sig_separator), "toggled",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
+    gtk_signal_connect(GTK_OBJECT(pui->sig_prepend), "toggled",
+		       GTK_SIGNAL_FUNC(properties_modified_cb),
+		       property_box);
 
     gtk_signal_connect(GTK_OBJECT(pui->rb_smtp_server), "toggled",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
@@ -543,6 +547,8 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
 	GTK_TOGGLE_BUTTON(pui->sig_whenreply)->active;
     balsa_app.sig_separator =
 	GTK_TOGGLE_BUTTON(pui->sig_separator)->active;
+    balsa_app.sig_prepend =
+	GTK_TOGGLE_BUTTON(pui->sig_prepend)->active;
 
     /* 
      * display page 
@@ -763,6 +769,8 @@ set_prefs(void)
 				 balsa_app.sig_whenreply);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->sig_separator),
 				 balsa_app.sig_separator);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->sig_prepend),
+				 balsa_app.sig_prepend);
 
     if (balsa_app.smtp_server)
 	gtk_entry_set_text(GTK_ENTRY(pui->smtp_server),
@@ -1158,6 +1166,7 @@ create_signature_page(gpointer data)
 
 
     pui->sig_separator=attach_check(_("enable signature separator"),5,table1);
+    pui->sig_prepend=attach_check(_("insert signature before quoted messages"),6,table1);
 
     return vbox;
 }

@@ -151,6 +151,7 @@ extern struct BalsaApplication {
     gboolean sig_whenforward;
     gboolean sig_whenreply;
     gboolean sig_separator;
+    gboolean sig_prepend;
     gchar *signature_path;
 
     BalsaWindow *main_window;

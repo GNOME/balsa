@@ -1122,10 +1122,10 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
     if (message->date) {
 	date =
 	    libbalsa_message_date_to_gchar(message, balsa_app.date_string);
-	str = g_strdup_printf(_("\nOn %s %s wrote:\n"), date, personStr);
+	str = g_strdup_printf(_("On %s %s wrote:\n"), date, personStr);
 	g_free(date);
     } else
-	str = g_strdup_printf(_("\n%s wrote:\n"), personStr);
+	str = g_strdup_printf(_("%s wrote:\n"), personStr);
 
     body = content2reply(message,
 			 (type == SEND_REPLY || type == SEND_REPLY_ALL || 
@@ -1147,7 +1147,8 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 
 /* fillBody --------------------------------------------------------------
    fills the body of the message to be composed based on the given message.
-   First quotes the original one and then adds the signature
+   First quotes the original one and then adds the signature.
+   Optionally prepends the signature to quoted text.
 */
 static void
 fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
@@ -1166,13 +1167,22 @@ fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 	     balsa_app.sig_whenreply) ||
 	    ((type == SEND_FORWARD) && balsa_app.sig_whenforward) ||
 	    ((type == SEND_NORMAL) && balsa_app.sig_sending)) {
-	    body = g_string_append_c(body, '\n');
 
 	    if (balsa_app.sig_separator
 		&& g_strncasecmp(signature, "--\n", 3)
-		&& g_strncasecmp(signature, "-- \n", 4))
-		body = g_string_append(body, "-- \n");
-	    body = g_string_append(body, signature);
+		&& g_strncasecmp(signature, "-- \n", 4)) {
+		gchar * tmp = g_strconcat("-- \n", signature, NULL);
+		g_free(signature);
+		signature = tmp;
+	    }
+
+	    if (balsa_app.sig_prepend && type != SEND_NORMAL) {
+	    	body = g_string_prepend(body, "\n\n");
+	    	body = g_string_prepend(body, signature);
+	    } else {
+	    	body = g_string_append(body, signature);
+	    }
+	    body = g_string_prepend_c(body, '\n');
 	}
 	g_free(signature);
     }
@@ -1507,8 +1517,7 @@ read_signature(void)
 	return NULL;
     len = libbalsa_readfile(fp, &ret);
     fclose(fp);
-    if (len > 0 && ret[len - 1] == '\n')
-	ret[len - 1] = '\0';
+    if(ret) ret = g_strstrip(ret);
 
     return ret;
 }

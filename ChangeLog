@@ -1,3 +1,18 @@
+2002-05-31  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/misc.c: 
+	* libbalsa/Makefile.am: 
+	* libbalsa/libbalsa_private.h: 
+	* libbalsa/libbalsa.h: 
+	* libbalsa/libbalsa.c: 
+	* libbalsa/send.c:
+	* libbalsa/send.h:
+	* libbalsa/message.h: 
+	* libbalsa/message.c: 
+	* libbalsa/body.c: 
+	* libbalsa/mailbox_imap.c: 
+	More stuff from HEAD
+	
 2002-05-28  Carlos Morgado  <chbm@chbm.nu>
 
 	* libbalsa/message.c: 

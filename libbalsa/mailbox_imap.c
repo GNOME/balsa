@@ -221,17 +221,12 @@ reset_mutt_passwords(LibBalsaServer* server)
     if (ImapPass)
 	safe_free((void **) &ImapPass);	/* because mutt does so */
     ImapPass = strdup(server->passwd);
-
-    if (ImapCRAMKey)
-	safe_free((void **) &ImapCRAMKey);
-    ImapCRAMKey = strdup(server->passwd);
 }
 
 /* libbalsa_mailbox_imap_open:
    opens IMAP mailbox. On failure leaves the object in sane state.
    FIXME:
-   should intelligently use auth_type field to set ImapPass (for AuthLogin),
-   ImapCRAMKey (for AuthCram) or do not set anything (for AuthGSS)
+   should intelligently use auth_type field 
 */
 static void
 libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)

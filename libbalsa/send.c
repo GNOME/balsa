@@ -155,24 +155,22 @@ void balsa_send_thread(MessageQueueItem * first_message);
 
 
 /* from mutt's send.c */
-static void
-encode_descriptions(BODY * b)
+static void 
+encode_descriptions (BODY *b)
 {
     BODY *t;
-    char tmp[LONG_STRING];
-
-    for (t = b; t; t = t->next) {
-	if (t->description) {
-	    libbalsa_lock_mutt();
-	    rfc2047_encode_string(tmp, sizeof(tmp),
-				  (unsigned char *) t->description);
-	    safe_free((void **) &t->description);
-	    t->description = safe_strdup(tmp);
-	    libbalsa_unlock_mutt();
+    
+    for (t = b; t; t = t->next)
+	{
+	    if (t->description)
+		{
+		    libbalsa_lock_mutt();
+		    rfc2047_encode_string (&t->description);
+		    libbalsa_unlock_mutt();
+		}
+	    if (t->parts)
+		encode_descriptions (t->parts);
 	}
-	if (t->parts)
-	    encode_descriptions(t->parts);
-    }
 }
 
 static BODY *

@@ -34,6 +34,8 @@
 #include "libbalsa.h"
 #include "folder-scanners.h"
 #include "mutt.h"
+/* FIXME: libbalsa/mailbox.h" name colision */
+#include "../libmutt/mailbox.h"
 #include "imap/imap.h"
 #include "imap/imap_private.h"
 #include "browser.h"
@@ -167,7 +169,6 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     libbalsa_lock_mutt();
     safe_free((void **)&ImapUser);   ImapUser = safe_strdup(server->user);
     safe_free((void **)&ImapPass);   ImapPass = safe_strdup(server->passwd);
-    safe_free((void **)&ImapCRAMKey);ImapCRAMKey = safe_strdup(server->passwd);
 
     /* subscribed triggers a bug in libmutt, disable it now */
     if(subscribed)

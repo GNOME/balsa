@@ -1,3 +1,13 @@
+2001-07-18  Carlos Morgado  <chbm@chbm.nu>
+
+	* configure.in:
+	* acconfig.h: USE_SASL
+
+	* libbalsa/send.c: new libmutt/rfc2047
+
+	* libbalsa/mailbox_imap.c: 
+	* libbalsa/folder-scanners.c: removed ImapCRAM. was it ever used ?
+
 2001-07-18  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Perl Compatible Regular Expressions by 

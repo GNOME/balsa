@@ -361,7 +361,7 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   /* set bg of icon list to white */
   style = style = gtk_style_new ();
   colormap = gtk_widget_get_colormap (GTK_WIDGET (msg->attachments));
-  gdk_color_white (colormap, &style->bg[GTK_STATE_NORMAL]);
+  gdk_color_white (colormap, &style->bg[GTK_STATE_NORMAL]);  
   gtk_widget_set_style (msg->attachments, style);
 
   gtk_widget_set_usize (msg->attachments, -1, 50);

@@ -269,8 +269,8 @@ balsa_message_new (void)
   colormap = gtk_widget_get_colormap (GTK_WIDGET (bmessage));
   gdk_color_white (colormap, &style->bg[GTK_STATE_NORMAL]);
   gtk_widget_set_style (GTK_WIDGET (bmessage), style);
-
-
+ 
+ 
   return GTK_WIDGET (bmessage);
 }
 

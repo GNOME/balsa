@@ -1,0 +1,17 @@
+/* -*- Mode: IDL; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*- */
+
+#include <Bonobo.idl>
+ 
+module GNOME {
+  module Balsa {
+    interface Composer : Bonobo::Unknown {
+
+      typedef sequence<string> attachs;
+
+      void sendMessage (in string from, in string to, in string cc,
+			in string subject, in attachs attachments,
+			in boolean nogui );
+      
+    };
+  };
+};

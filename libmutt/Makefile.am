@@ -29,6 +29,7 @@ libmutt_a_SOURCES = \
 	score.c 	\
 	sendlib.c 	\
 	sigblock.c 	\
+	socket.c	\
 	sort.c 		\
 	system.c 	\
 	thread.c	\

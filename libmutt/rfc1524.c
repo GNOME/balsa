@@ -138,7 +138,8 @@ static int get_field_text (char *field, char **entry,
   {
     if (entry)
     {
-      field = mutt_skip_whitespace (++field);
+      field++;
+      field = mutt_skip_whitespace (field);
       safe_free ((void **) entry);
       *entry = safe_strdup (field);
     }
@@ -289,7 +290,7 @@ static int rfc1524_mailcap_parse (BODY *a,
 	      /* a non-zero exit code means test failed */
 	      found = MUTT_FALSE;
 	    }
-	    free (test_command);
+	    FREE (&test_command);
 	  }
 	}
       } /* while (ch) */
@@ -338,14 +339,9 @@ static int rfc1524_mailcap_parse (BODY *a,
   return found;
 }
 
-rfc1524_entry *rfc1524_new_entry()
+rfc1524_entry *rfc1524_new_entry(void)
 {
-  rfc1524_entry *tmp;
-
-  tmp = (rfc1524_entry *)safe_malloc(sizeof(rfc1524_entry));
-  memset(tmp,0,sizeof(rfc1524_entry));
-
-  return tmp;
+  return (rfc1524_entry *)safe_calloc(1, sizeof(rfc1524_entry));
 }
 
 void rfc1524_free_entry(rfc1524_entry **entry)
@@ -420,7 +416,7 @@ int rfc1524_mailcap_lookup (BODY *a, char *type, rfc1524_entry *entry, int opt)
  * Renamed to mutt_adv_mktemp so I only have to change where it's
  * called, and not all possible cases.
  */
-void mutt_adv_mktemp (char *s)
+void mutt_adv_mktemp (char *s, size_t l)
 {
   char buf[_POSIX_PATH_MAX];
   char tmp[_POSIX_PATH_MAX];
@@ -430,18 +426,18 @@ void mutt_adv_mktemp (char *s)
   mutt_expand_path (buf, sizeof (buf));
   if (s[0] == '\0')
   {
-    sprintf (s, "%s/muttXXXXXX", buf);
+    snprintf (s, l, "%s/muttXXXXXX", buf);
     mktemp (s);
   }
   else
   {
     strfcpy (tmp, s, sizeof (tmp));
-    sprintf (s, "%s/%s", buf, tmp);
+    snprintf (s, l, "%s/%s", buf, tmp);
     if (access (s, F_OK) != 0)
       return;
     if ((period = strrchr (tmp, '.')) != NULL)
       *period = 0;
-    sprintf (s, "%s/%s.XXXXXX", buf, tmp);
+    snprintf (s, l, "%s/%s.XXXXXX", buf, tmp);
     mktemp (s);
     if (period != NULL)
     {
@@ -490,7 +486,7 @@ int rfc1524_expand_filename (char *nametemplate,
   {
     if (oldfile)
       strfcpy (newfile, oldfile, nflen);
-    mutt_adv_mktemp (newfile);
+    mutt_adv_mktemp (newfile, nflen);
     return 0;
   }
 
@@ -498,7 +494,7 @@ int rfc1524_expand_filename (char *nametemplate,
   if (!oldfile)
   {
     snprintf (newfile, nflen, nametemplate, "mutt");
-    mutt_adv_mktemp (newfile);
+    mutt_adv_mktemp (newfile, nflen);
     return 0;
   }
 

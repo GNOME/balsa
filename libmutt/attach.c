@@ -23,12 +23,17 @@
 #include "rfc1524.h"
 #include "mime.h"
 #include "pager.h"
+#include "mailbox.h"
+#include "copy.h"
+#include "mx.h"
+
 
 #include <ctype.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 #include <string.h>
 #include <errno.h>
 
@@ -40,7 +45,7 @@ int mutt_compose_attachment (BODY *a)
   char command[STRING];
   rfc1524_entry *entry = rfc1524_new_entry ();
 
-  snprintf (type, sizeof (type), "%s/%s", TYPE (a->type), a->subtype);
+  snprintf (type, sizeof (type), "%s/%s", TYPE (a), a->subtype);
   if (rfc1524_mailcap_lookup (a, type, entry, M_COMPOSE))
   {
     if (entry->composecommand || entry->composetypecommand)
@@ -152,13 +157,13 @@ int mutt_compose_attachment (BODY *a)
  * Returns 1 if editor found, 0 if not (useful to tell calling menu to
  * redraw)
  */
-int mutt_edit_attachment (BODY *a, int opt)
+int mutt_edit_attachment (BODY *a)
 {
   char type[STRING];
   char command[STRING];
   rfc1524_entry *entry = rfc1524_new_entry ();
 
-  snprintf (type, sizeof (type), "%s/%s", TYPE (a->type), a->subtype);
+  snprintf (type, sizeof (type), "%s/%s", TYPE (a), a->subtype);
   if (rfc1524_mailcap_lookup (a, type, entry, M_EDIT))
   {
     if (entry->editcommand)
@@ -199,8 +204,8 @@ int mutt_edit_attachment (BODY *a, int opt)
   else if (a->type == TYPETEXT)
   {
     /* On text, default to editor */
-    mutt_edit_file (strcmp ("builtin", Editor) == 0 ? Visual : Editor, 
-		    a->filename);
+    mutt_edit_file ((!Editor || strcmp ("builtin", Editor) == 0) ? 
+		    NONULL(Visual) : NONULL(Editor), a->filename);
   }
   else
   {
@@ -243,15 +248,14 @@ int mutt_view_attachment (FILE *fp, BODY *a, int flag)
   char type[STRING];
   char command[STRING];
   char descrip[STRING];
+  char *fname;
   rfc1524_entry *entry = NULL;
   int rc = -1;
 
-  is_message = (a->type == TYPEMESSAGE && a->subtype &&
-		  (!strcasecmp (a->subtype,"rfc822") ||
-		   !strcasecmp (a->subtype, "news")));
+  is_message = mutt_is_message_type(a->type, a->subtype);
   use_mailcap = (flag == M_MAILCAP ||
 		(flag == M_REGULAR && mutt_needs_mailcap (a)));
-  snprintf (type, sizeof (type), "%s/%s", TYPE (a->type), a->subtype);
+  snprintf (type, sizeof (type), "%s/%s", TYPE (a), a->subtype);
   
   if (use_mailcap)
   {
@@ -280,7 +284,15 @@ int mutt_view_attachment (FILE *fp, BODY *a, int flag)
     }
     strfcpy (command, entry->command, sizeof (command));
     
-    if (rfc1524_expand_filename (entry->nametemplate, a->filename,
+    if (fp)
+    {
+      fname = safe_strdup (a->filename);
+      mutt_sanitize_filename (fname);
+    }
+    else
+      fname = a->filename;
+
+    if (rfc1524_expand_filename (entry->nametemplate, fname,
 				 tempfile, sizeof (tempfile)))
     {
       if (fp == NULL)
@@ -302,11 +314,12 @@ int mutt_view_attachment (FILE *fp, BODY *a, int flag)
     }
     else if (fp == NULL) /* send case */
       strfcpy (tempfile, a->filename, sizeof (tempfile));
-
+    
     if (fp)
     {
       /* recv case: we need to save the attachment to a file */
-      if (mutt_save_attachment (fp, a, tempfile, 0) == -1)
+      FREE (&fname);
+      if (mutt_save_attachment (fp, a, tempfile, 0, NULL) == -1)
 	goto return_error;
     }
 
@@ -321,7 +334,7 @@ int mutt_view_attachment (FILE *fp, BODY *a, int flag)
     {
       /* recv case */
       strfcpy (pagerfile, a->filename, sizeof (pagerfile));
-      mutt_adv_mktemp (pagerfile);
+      mutt_adv_mktemp (pagerfile, sizeof(pagerfile));
     }
     else
       mutt_mktemp (pagerfile);
@@ -403,7 +416,7 @@ int mutt_view_attachment (FILE *fp, BODY *a, int flag)
     if (flag == M_AS_TEXT)
     {
       /* just let me see the raw data */
-      if (mutt_save_attachment (fp, a, pagerfile, 0))
+      if (mutt_save_attachment (fp, a, pagerfile, 0, NULL))
 	goto return_error;
     }
     else
@@ -458,15 +471,13 @@ int mutt_view_attachment (FILE *fp, BODY *a, int flag)
 /* returns 1 on success, 0 on error */
 int mutt_pipe_attachment (FILE *fp, BODY *b, const char *path, char *outfile)
 {
-  STATE o;
   pid_t thepid;
-
-  memset (&o, 0, sizeof (STATE));
+  int out = -1;
 
   if (outfile && *outfile)
-    if ((o.fpout = safe_fopen (outfile, "w")) == NULL)
+    if ((out = safe_open (outfile, O_CREAT | O_EXCL | O_WRONLY)) < 0)
     {
-      mutt_perror ("fopen");
+      mutt_perror ("open");
       return 0;
     }
 
@@ -481,7 +492,7 @@ int mutt_pipe_attachment (FILE *fp, BODY *b, const char *path, char *outfile)
     memset (&s, 0, sizeof (STATE));
 
     if (outfile && *outfile)
-      thepid = mutt_create_filter (path, &s.fpout, &o.fpin, NULL);
+      thepid = mutt_create_filter_fd (path, &s.fpout, NULL, NULL, -1, out, -1);
     else
       thepid = mutt_create_filter (path, &s.fpout, NULL, NULL);
 
@@ -498,12 +509,16 @@ int mutt_pipe_attachment (FILE *fp, BODY *b, const char *path, char *outfile)
     if ((ifp = fopen (b->filename, "r")) == NULL)
     {
       mutt_perror ("fopen");
-      fclose (o.fpout);
+      if (outfile && *outfile)
+      {
+	close (out);
+	unlink (outfile);
+      }
       return 0;
     }
 
     if (outfile && *outfile)
-      thepid = mutt_create_filter (path, &ofp, &o.fpin, NULL);
+      thepid = mutt_create_filter_fd (path, &ofp, NULL, NULL, -1, out, -1);
     else
       thepid = mutt_create_filter (path, &ofp, NULL, NULL);
 
@@ -513,11 +528,7 @@ int mutt_pipe_attachment (FILE *fp, BODY *b, const char *path, char *outfile)
   }
 
   if (outfile && *outfile)
-  {
-    mutt_copy_stream (o.fpin, o.fpout);
-    fclose (o.fpin);
-    fclose (o.fpout);
-  }
+    close (out);
 
   if (mutt_wait_filter (thepid) != 0 || option (OPTWAITKEY))
     mutt_any_key_to_continue (NULL);
@@ -525,31 +536,76 @@ int mutt_pipe_attachment (FILE *fp, BODY *b, const char *path, char *outfile)
 }
 
 /* returns 0 on success, -1 on error */
-int mutt_save_attachment (FILE *fp, BODY *m, char *path, int flags)
+int mutt_save_attachment (FILE *fp, BODY *m, char *path, int flags, HEADER *hdr)
 {
   if (fp)
   {
-    /* In recv mode, extract from folder and decode */
+    
+    /* recv mode */
 
-    STATE s;
-  
-    memset (&s, 0, sizeof (s));
-    if (flags == M_SAVE_APPEND)
-      s.fpout = safe_fopen (path, "a");
-    else
-      s.fpout = fopen (path, "w");
-    if (s.fpout == NULL)
+    if(hdr &&
+	m->hdr &&
+	m->encoding != ENCBASE64 &&
+	m->encoding != ENCQUOTEDPRINTABLE &&
+	mutt_is_message_type(m->type, m->subtype))
     {
-      mutt_perror ("fopen");
-      return (-1);
+      /* message type attachments are written to mail folders. */
+
+      char buf[HUGE_STRING];
+      HEADER *hn;
+      CONTEXT ctx;
+      MESSAGE *msg;
+      int chflags = 0;
+      int r = -1;
+      
+      hn = m->hdr;
+      hn->msgno = hdr->msgno; /* required for MH/maildir */
+      hn->read = 1;
+
+      fseek (fp, m->offset, 0);
+      if (fgets (buf, sizeof (buf), fp) == NULL)
+	return -1;
+      if (mx_open_mailbox(path, M_APPEND | M_QUIET, &ctx) == NULL)
+	return -1;
+      if ((msg = mx_open_new_message (&ctx, hn, is_from (buf, NULL, 0) ? 0 : M_ADD_FROM)) == NULL)
+      {
+	mx_close_mailbox(&ctx);
+	return -1;
+      }
+      if (ctx.magic == M_MBOX || ctx.magic == M_MMDF)
+	chflags = CH_FROM;
+      chflags |= (ctx.magic == M_MAILDIR ? CH_NOSTATUS : CH_UPDATE);
+      if ((r = _mutt_copy_message (msg->fp, fp, hn, hn->content, 0, chflags)) == 0)
+	mutt_message("Attachment saved.");
+	
+      mx_close_message (&msg);
+      mx_close_mailbox(&ctx);
+      return r;
     }
-    fseek ((s.fpin = fp), m->offset, 0);
-    mutt_decode_attachment (m, &s);
-
-    if (fclose (s.fpout) != 0)
+    else
     {
-      mutt_perror ("fclose");
-      return (-1);
+      /* In recv mode, extract from folder and decode */
+      
+      STATE s;
+      
+      memset (&s, 0, sizeof (s));
+      if (flags == M_SAVE_APPEND)
+	s.fpout = safe_fopen (path, "a");
+      else
+	s.fpout = fopen (path, "w");
+      if (s.fpout == NULL)
+      {
+	mutt_perror ("fopen");
+	return (-1);
+      }
+      fseek ((s.fpin = fp), m->offset, 0);
+      mutt_decode_attachment (m, &s);
+      
+      if (fclose (s.fpout) != 0)
+      {
+	mutt_perror ("fclose");
+	return (-1);
+      }
     }
   }
   else
@@ -591,6 +647,8 @@ int mutt_decode_save_attachment (FILE *fp, BODY *m, char *path,
 {
   STATE s;
   unsigned int saved_encoding = 0;
+  BODY *saved_parts = NULL;
+  HEADER *saved_hdr = NULL;
 
   memset (&s, 0, sizeof (s));
   s.flags = displaying ? M_DISPLAY : 0;
@@ -628,10 +686,12 @@ int mutt_decode_save_attachment (FILE *fp, BODY *m, char *path,
     m->length = st.st_size;
     m->encoding = ENC8BIT;
     m->offset = 0;
-    if (m->type == TYPEMESSAGE && m->subtype &&
-		  (!strcasecmp (m->subtype,"rfc822") ||
-		   !strcasecmp (m->subtype, "news")))
+    if (mutt_is_message_type(m->type, m->subtype))
+    {
+      saved_parts = m->parts;
+      saved_hdr = m->hdr;
       m->parts = mutt_parse_messageRFC822 (s.fpin, m);
+    }
   }
   else
     s.fpin = fp;
@@ -643,8 +703,12 @@ int mutt_decode_save_attachment (FILE *fp, BODY *m, char *path,
   {
     m->length = 0;
     m->encoding = saved_encoding;
-    if (m->parts)
-      mutt_free_body (&m->parts);
+    if (saved_parts)
+    {
+      mutt_free_header (&m->hdr);
+      m->parts = saved_parts;
+      m->hdr = saved_hdr;
+    }
     fclose (s.fpin);
   }
 
@@ -665,13 +729,13 @@ int mutt_print_attachment (FILE *fp, BODY *a)
   pid_t thepid;
   FILE *ifp, *fpout;
 
-  snprintf (type, sizeof (type), "%s/%s", TYPE (a->type), a->subtype);
+  snprintf (type, sizeof (type), "%s/%s", TYPE (a), a->subtype);
 
   if (rfc1524_mailcap_lookup (a, type, NULL, M_PRINT)) 
   {
     char command[_POSIX_PATH_MAX+STRING];
     rfc1524_entry *entry;
-    int piped = FALSE;
+    int piped = MUTT_FALSE;
 
     entry = rfc1524_new_entry ();
     rfc1524_mailcap_lookup (a, type, entry, M_PRINT);
@@ -701,7 +765,7 @@ int mutt_print_attachment (FILE *fp, BODY *a)
 
     /* in recv mode, save file to newfile first */
     if (fp)
-      mutt_save_attachment (fp, a, newfile, 0);
+      mutt_save_attachment (fp, a, newfile, 0, NULL);
 
     strfcpy (command, entry->printcommand, sizeof (command));
     piped = rfc1524_expand_command (a, newfile, type, command, sizeof (command));
@@ -740,7 +804,7 @@ int mutt_print_attachment (FILE *fp, BODY *a)
 
   if (!strcasecmp ("text/plain", a->subtype) ||
       !strcasecmp ("application/postscript", a->subtype))
-    return (mutt_pipe_attachment (fp, a, PrintCmd, NULL));
+    return (mutt_pipe_attachment (fp, a, NONULL(PrintCmd), NULL));
   else if (mutt_can_decode (a))
   {
     /* decode and print */
@@ -753,7 +817,7 @@ int mutt_print_attachment (FILE *fp, BODY *a)
       if ((ifp = fopen (newfile, "r")) != NULL)
       {
 	endwin ();
-	thepid = mutt_create_filter (PrintCmd, &fpout, NULL, NULL);
+	thepid = mutt_create_filter (NONULL(PrintCmd), &fpout, NULL, NULL);
 	mutt_copy_stream (ifp, fpout);
 	fclose (ifp);
 	fclose (fpout);

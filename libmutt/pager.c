@@ -21,6 +21,7 @@
 #include "mutt_regex.h"
 #include "keymap.h"
 #include "mutt_menu.h"
+#include "mapping.h"
 #include "sort.h"
 #include "pager.h"
 #include "attach.h"
@@ -1244,7 +1245,8 @@ upNLines (int nlines, struct line_t *info, int cur, int hiding)
    is there so that we can do operations on the current message without the
    need to pop back out to the main-menu.  */
 int 
-mutt_pager (const char *banner, const char *fname, int do_color, pager_t *extra)
+mutt_pager (const char *banner, const char *fname, int do_color, pager_t *extra,
+            const char *attach_msg_status /* invoked while attaching a message */)
 {
   static char searchbuf[STRING];
   char buffer[LONG_STRING];
@@ -1479,6 +1481,11 @@ mutt_pager (const char *banner, const char *fname, int do_color, pager_t *extra)
       menu_redraw_current (index);
 
       /* print out the index status bar */
+      if (*attach_msg_status)
+        snprintf (buffer, sizeof (buffer), M_MODEFMT, attach_msg_status);
+      else
+        menu_status_line (buffer, sizeof (buffer), index, NONULL(Status));
+
       menu_status_line (buffer, sizeof (buffer), index, StatusString);
       move (indexoffset + (option (OPTSTATUSONTOP) ? 0 : (indexlen - 1)), 0);
       SETCOLOR (MT_COLOR_STATUS);
@@ -1840,7 +1847,7 @@ mutt_pager (const char *banner, const char *fname, int do_color, pager_t *extra)
 	break;
 
       case OP_REDRAW:
-	clearok (stdscr, TRUE);
+	clearok (stdscr, MUTT_TRUE);
 	redraw = REDRAW_FULL;
 	break;
 
@@ -1873,7 +1880,7 @@ mutt_pager (const char *banner, const char *fname, int do_color, pager_t *extra)
 	{
 	  ch = -1;
 	  rc = OP_MAIN_NEXT_UNDELETED;
-	};
+	}
 	break;
 
       case OP_DELETE_THREAD:
@@ -2047,7 +2054,7 @@ mutt_pager (const char *banner, const char *fname, int do_color, pager_t *extra)
       case OP_SAVE:
 	if (IsAttach (extra))
 	{
-	  mutt_save_attachment_list (extra->fp, 0, extra->bdy);
+	  mutt_save_attachment_list (extra->fp, 0, extra->bdy, extra->hdr);
 	  break;
 	}
 	/* fall through */

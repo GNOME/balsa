@@ -79,6 +79,9 @@ struct option_t MuttVars[] = {
   { "ascii_chars",	DT_BOOL, R_BOTH, OPTASCIICHARS, 0 },
   { "askbcc",		DT_BOOL, R_NONE, OPTASKBCC, 0 },
   { "askcc",		DT_BOOL, R_NONE, OPTASKCC, 0 },
+  { "attach_format",	DT_STR,  R_NONE, UL &AttachFormat, UL "%u%D%t%2n %T%.40d%> [%.7m/%.10M, %.6e, %s] " },
+  { "attach_split",	DT_BOOL, R_NONE, OPTATTACHSPLIT, 1 },
+  { "attach_sep",	DT_STR,	 R_NONE, UL &AttachSep, UL "\n" },
   { "attribution",	DT_STR,	 R_NONE, UL &Attribution, UL "On %d, %n wrote:" },
   { "autoedit",		DT_BOOL, R_NONE, OPTAUTOEDIT, 0 },
   { "auto_tag",		DT_BOOL, R_NONE, OPTAUTOTAG, 0 },
@@ -115,6 +118,7 @@ struct option_t MuttVars[] = {
   { "hdrs",		DT_BOOL, R_NONE, OPTHDRS, 1 },
   { "header",		DT_BOOL, R_NONE, OPTHEADER, 0 },
   { "help",		DT_BOOL, R_BOTH, OPTHELP, 1 },
+  { "hidden_host",	DT_BOOL, R_NONE, OPTHIDDENHOST, 0 },
   { "history",		DT_NUM,	 R_NONE, UL &HistSize, 10 },
   { "hostname",		DT_STR,	 R_NONE, UL &Fqdn, 0 },
 #ifdef USE_IMAP
@@ -134,7 +138,7 @@ struct option_t MuttVars[] = {
   { "mailcap_path",	DT_STR,	 R_NONE, UL &MailcapPath, 0 },
   { "mark_old",		DT_BOOL, R_BOTH, OPTMARKOLD, 1 },
   { "markers",		DT_BOOL, R_PAGER, OPTMARKERS, 1 },
-  { "mask",		DT_RX,	 R_NONE, UL &Mask, UL "^(\\.\\.$|[^.])" },
+  { "mask",		DT_RX,	 R_NONE, UL &Mask, UL "!^\\.[^.]" },
   { "mbox",		DT_PATH, R_BOTH, UL &Inbox, UL "~/mbox" },
   { "mbox_type",	DT_MAGIC,R_NONE, UL &DefaultMagic, M_MBOX },
   { "metoo",		DT_BOOL, R_NONE, OPTMETOO, 0 },
@@ -222,6 +226,7 @@ struct option_t MuttVars[] = {
   { "wait_key",		DT_BOOL, R_NONE, OPTWAITKEY, 1 },
   { "wrap_search",	DT_BOOL, R_NONE, OPTWRAPSEARCH, 1 },
   { "write_inc",	DT_NUM,	 R_NONE, UL &WriteInc, 10 },
+  { "write_bcc",	DT_BOOL, R_NONE, OPTWRITEBCC, 1},
   { NULL }
 };
 
@@ -303,8 +308,10 @@ struct command_t Commands[] = {
   { "source",		parse_source,		0 },
   { "toggle",		parse_set,		M_SET_INV },
   { "unalias",		parse_unalias,		0 },
+  { "unhdr_order",	parse_unlist,		UL &HeaderOrderList },
   { "unignore",		parse_unignore,		0 },
   { "unlists",		parse_unlist,		UL &MailLists },
+  { "unmono",		mutt_parse_unmono,	0 },
   { "unmy_hdr",		parse_unmy_hdr,		0 },
   { "unscore",		mutt_parse_unscore,	0 },
   { "unset",		parse_set,		M_SET_UNSET },

@@ -17,9 +17,10 @@
  */ 
 
 #include "mutt.h"
+#include "mapping.h"
 #include "mutt_curses.h"
 #include "mutt_regex.h"
-
+#include "history.h"
 
 
 
@@ -629,18 +630,36 @@ static void mutt_restore_default (struct option_t *p)
     case DT_RX:
       {
 	REGEXP *pp = (REGEXP *) p->data;
+	int flags = 0;
+
 	FREE (&pp->pattern);
+	if (pp->rx)
+	{
+	  regfree (pp->rx);
+	  FREE (&pp->rx);
+	}
 	if (p->init)
 	{
-	  if (pp->rx)
-	    regfree (pp->rx);
-	  else
-	    pp->rx = safe_calloc (1, sizeof (regex_t));
+	  char *s = (char *) p->init;
+
+	  pp->rx = safe_calloc (1, sizeof (regex_t));
 	  pp->pattern = safe_strdup ((char *) p->init);
-	  if (REGCOMP (pp->rx, pp->pattern, mutt_which_case (pp->pattern)) != 0)
+	  if (strcmp (p->option, "alternates") == 0)
+	    flags |= REG_ICASE;
+	  else if (strcmp (p->option, "mask") != 0)
+	    flags |= mutt_which_case ((const char *) p->init);
+	  if (strcmp (p->option, "mask") == 0 && *s == '!')
+	  {
+	    s++;
+	    pp->not = 1;
+	  }
+	  if (REGCOMP (pp->rx, s, flags) != 0)
 	  {
 	    fprintf (stderr, "mutt_restore_default: error in regexp: %s\n",
 		     pp->pattern);
+	    FREE (&pp->pattern);
+	    regfree (pp->rx);
+	    FREE (&pp->rx);
 	  }
 	}
       }
@@ -794,15 +813,27 @@ static int parse_set (BUFFER *tmp, BUFFER *s, unsigned long data, BUFFER *err)
 
       if (!ptr->pattern || strcmp (ptr->pattern, tmp->data) != 0)
       {
+	int not = 0;
+
 	/* $alternates is case-insensitive,
 	   $mask is case-sensitive */
 	if (strcmp (MuttVars[idx].option, "alternates") == 0)
 	  flags |= REG_ICASE;
 	else if (strcmp (MuttVars[idx].option, "mask") != 0)
 	  flags |= mutt_which_case (tmp->data);
-	
+
+	p = tmp->data;
+	if (strcmp (MuttVars[idx].option, "mask") == 0)
+	{
+	  if (*p == '!')
+	  {
+	    not = 1;
+	    p++;
+	  }
+	}
+	  
 	rx = (regex_t *) safe_malloc (sizeof (regex_t));
-	if ((e = REGCOMP (rx, tmp->data, flags)) != 0)
+	if ((e = REGCOMP (rx, p, flags)) != 0)
 	{
 	  regerror (e, rx, err->data, err->dsize);
 	  regfree (rx);
@@ -820,6 +851,7 @@ static int parse_set (BUFFER *tmp, BUFFER *s, unsigned long data, BUFFER *err)
 
 	ptr->pattern = safe_strdup (tmp->data);
 	ptr->rx = rx;
+	ptr->not = not;
 
 	/* $reply_regexp requires special treatment */
 	if (Context && Context->msgcount &&
@@ -1174,16 +1206,46 @@ int mutt_command_complete (char *buffer, size_t len, int pos)
       return 0;
     strncpy (buffer, completed, len);
   }
-  else if (!strncasecmp (cmd, "set", 3)
-	   || !strncasecmp (cmd, "unset", 5)
-	   || !strncasecmp (cmd, "toggle", 6))
+  else if (!strcasecmp (cmd, "set")
+	   || !strcasecmp (cmd, "unset")
+	   || !strcasecmp (cmd, "reset")
+	   || !strcasecmp (cmd, "toggle"))
   { 		/* complete variables */
+    char *prefixes[] = { "no", "inv", "?", "&", 0 };
+    int  prefix_index;
+    char tmpbuffer[STRING];
+    int  prefix_len;
+
+    /* remember if the command is set to decide whether we want to attempt the
+     * prefixes */
+    int  cmd_is_set = !strcasecmp (cmd, "set"); 
+    
     pt++;
     if (*pt == 0)
       return 0;
     strncpy (cmd, pt, sizeof (cmd));
     for (num = 0; MuttVars[num].option; num++)
       candidate (completed, cmd, MuttVars[num].option, sizeof (completed));
+  
+    if ( cmd_is_set ) {
+      /* loop through all the possible prefixes (no, inv, ...) */
+      for ( prefix_index = 0; prefixes[prefix_index]; prefix_index++ )
+      {
+        prefix_len = strlen(prefixes[prefix_index]);
+        strncpy( tmpbuffer, prefixes[prefix_index], sizeof(tmpbuffer) );
+  
+        /* if the current option is prepended with the prefix */
+        if ( !strncasecmp(cmd, tmpbuffer, prefix_len )) {
+          for (num = 0; MuttVars[num].option; num++) {
+            strncpy( &tmpbuffer[prefix_len], 
+                     MuttVars[num].option, 
+                     sizeof(tmpbuffer) - prefix_len );
+            candidate (completed, cmd, tmpbuffer, sizeof (completed));
+          }
+        }
+      }
+    }
+
     if (completed[0] == 0)
       return 0;
     strncpy (pt, completed, buffer + len - pt);
@@ -1226,8 +1288,8 @@ static void start_debug (void)
   /* rotate the old debug logs */
   for (i=3; i>=0; i--)
   {
-    snprintf (buf, sizeof(buf), "%s/.muttdebug%d", Homedir, i);
-    snprintf (buf2, sizeof(buf2), "%s/.muttdebug%d", Homedir, i+1);
+    snprintf (buf, sizeof(buf), "%s/.muttdebug%d", NONULL(Homedir), i);
+    snprintf (buf2, sizeof(buf2), "%s/.muttdebug%d", NONULL(Homedir), i+1);
     rename (buf, buf2);
   }
   if ((debugfile = safe_fopen(buf, "w")) != NULL)
@@ -1334,12 +1396,8 @@ void mutt_init (int skip_sys_rc, LIST *commands)
   else
 #endif /* DOMAIN */
   {
-# ifdef HIDDEN_HOST
-    Fqdn = safe_strdup (DOMAIN);
-# else
-    Fqdn = safe_malloc (strlen (DOMAIN) + strlen (Hostname) + 2);
-    sprintf (Fqdn, "%s.%s", Hostname, DOMAIN);
-# endif /* HIDDEN_HOST */
+    Fqdn = safe_malloc (strlen (DOMAIN) + strlen (NONULL(Hostname)) + 2);
+    sprintf (Fqdn, "%s.%s", NONULL(Hostname), DOMAIN);
   }
 
   if ((p = getenv ("MAIL")))
@@ -1347,9 +1405,9 @@ void mutt_init (int skip_sys_rc, LIST *commands)
   else
   {
 #ifdef HOMESPOOL
-    snprintf (buffer, sizeof (buffer), "%s/%s", Homedir, MAILPATH);
+    snprintf (buffer, sizeof (buffer), "%s/%s", NONULL(Homedir), MAILPATH);
 #else
-    snprintf (buffer, sizeof (buffer), "%s/%s", MAILPATH, Username);
+    snprintf (buffer, sizeof (buffer), "%s/%s", MAILPATH, NONULL(Username));
 #endif
     Spoolfile = safe_strdup (buffer);
   }
@@ -1407,9 +1465,9 @@ void mutt_init (int skip_sys_rc, LIST *commands)
 
   if (!Muttrc)
   {
-    snprintf (buffer, sizeof (buffer), "%s/.muttrc-%s", Homedir, VERSION);
+    snprintf (buffer, sizeof (buffer), "%s/.muttrc-%s", NONULL(Homedir), VERSION);
     if (access (buffer, F_OK) == -1)
-      snprintf (buffer, sizeof (buffer), "%s/.muttrc", Homedir);
+      snprintf (buffer, sizeof (buffer), "%s/.muttrc", NONULL(Homedir));
     default_rc = 1;
     Muttrc = safe_strdup (buffer);
   }
@@ -1421,7 +1479,7 @@ void mutt_init (int skip_sys_rc, LIST *commands)
     Muttrc = safe_strdup (buffer);
   }
   FREE (&AliasFile);
-  AliasFile = safe_strdup (Muttrc);
+  AliasFile = safe_strdup (NONULL(Muttrc));
 
   /* Process the global rc file if it exists and the user hasn't explicity
      requested not to via "-n".  */

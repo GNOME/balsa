@@ -1,3 +1,8 @@
+2003-02-01 10:56  PeterB
+
+	* src/main-window.c: Grey the body button in the search dialog if
+	the mailbox is IMAP (IMAP does not support search in body). (Manu)
+
 2003-02-01  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* README: info about libesmtp cert location (bug 102566).

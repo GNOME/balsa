@@ -155,47 +155,48 @@ check_all_pop3_hosts (Mailbox * to, GList *mailboxes)
   Spoolfile = MAILBOX_LOCAL (to)->path;
 
   while (list)
+  {
+    mailbox = list->data;
+    if (MAILBOX_POP3 (mailbox)->check)
     {
-      mailbox = list->data;
-      if (MAILBOX_POP3 (mailbox)->check)
-	{
-	  PopHost = g_strdup (MAILBOX_POP3(mailbox)->server->host);
-	  PopPort = 110;
-	  PopPass = g_strdup (MAILBOX_POP3(mailbox)->server->passwd);
-	  PopUser = g_strdup (MAILBOX_POP3(mailbox)->server->user);
+      PopHost = g_strdup (MAILBOX_POP3(mailbox)->server->host);
+      PopPort = 110;
+      PopPass = g_strdup (MAILBOX_POP3(mailbox)->server->passwd);
+      PopUser = g_strdup (MAILBOX_POP3(mailbox)->server->user);
 
-	  if( MAILBOX_POP3 (mailbox)->last_popped_uid == NULL)
-	    uid[0] = 0;
-	  else
-	    strcpy( uid, MAILBOX_POP3 (mailbox)->last_popped_uid );
+      if( MAILBOX_POP3 (mailbox)->last_popped_uid == NULL)
+        uid[0] = 0;
+      else
+        strcpy( uid, MAILBOX_POP3 (mailbox)->last_popped_uid );
 
-	  PopUID  = uid;
+      PopUID = uid;
 
-	  /* Delete it if necessary */
-	  if (MAILBOX_POP3 (mailbox)->delete_from_server)
-	    {
-	      set_option(OPTPOPDELETE);
-	    }
-	  else
-	    {
-	      unset_option(OPTPOPDELETE);
-	    }
+      /* Delete it if necessary */
+      if (MAILBOX_POP3 (mailbox)->delete_from_server)
+      {
+        set_option(OPTPOPDELETE);
+      }
+      else
+      {
+        unset_option(OPTPOPDELETE);
+      }
 
-	  mutt_fetchPopMail ();
-	  g_free (PopHost);
-	  g_free (PopPass);
-	  g_free (PopUser);
+      mutt_fetchPopMail ();
+      g_free (PopHost);
+      g_free (PopPass);
+      g_free (PopUser);
 
-	  if( strcmp( MAILBOX_POP3 (mailbox)->last_popped_uid, uid ) != 0 )
-	  {
-	      g_free ( MAILBOX_POP3 (mailbox)->last_popped_uid );
-		  MAILBOX_POP3 (mailbox)->last_popped_uid = g_strdup ( uid );
-		  config_mailbox_update( mailbox, MAILBOX_POP3 (mailbox)->mailbox.name );
-	  }
+      if(MAILBOX_POP3(mailbox)->last_popped_uid != NULL &&
+         strcmp(MAILBOX_POP3(mailbox)->last_popped_uid, uid) != 0)
+      {
+        g_free ( MAILBOX_POP3 (mailbox)->last_popped_uid );
+        MAILBOX_POP3 (mailbox)->last_popped_uid = g_strdup ( uid );
+        config_mailbox_update( mailbox, MAILBOX_POP3 (mailbox)->mailbox.name );
+      }
 
-	}
-      list = list->next;
     }
+    list = list->next;
+  }
 }
 
 void

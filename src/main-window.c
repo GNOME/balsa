@@ -613,7 +613,7 @@ static GnomeUIInfo message_menu[] = {
         GNOME_APP_UI_ITEM, N_("Forward _inline..."),
         N_("Forward the current message inline"),
         forward_message_inline_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-        BALSA_PIXMAP_FORWARD, 'F', GDK_CONTROL_MASK, NULL
+        BALSA_PIXMAP_FORWARD, 0, 0, NULL
     },
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MESSAGE_NEXT_PART_POS 6

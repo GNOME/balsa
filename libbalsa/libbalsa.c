@@ -130,7 +130,9 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
     Realname   = (char*)g_get_real_name();
     Hostname   = (char*)libbalsa_get_hostname();
     Domainname = (char*)libbalsa_get_domainname();
+#ifdef USE_SSL
     SslCertFile = gnome_util_prepend_user_home(".balsa/certificates");
+#endif
     libbalsa_real_information_func = information_callback;
 
     mutt_error = libbalsa_mutt_error;

@@ -1,9 +1,10 @@
 2002-06-23  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/folder-scanners.c: do not lock GDK when scanning imap.
+	Corrected for proper locking order.
 	* src/mailbox-node.c: adjust accordingly.
 	* libbalsa/libbalsa.[hc]: set certificates file. GUI for cert
-	acceptance.
+	acceptance. Corrected to compile without SSL.
 	* libbalsa/mailbox_imap.c: assure_balsa_dir() moved to libbalsa.c
 	* src/information-dialog.c: missing i18n string.
 	

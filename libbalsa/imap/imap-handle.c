@@ -267,7 +267,7 @@ idle_process(GIOChannel *source, GIOCondition condition, gpointer data)
          rc == IMR_SEVERED || rc == IMR_BYE || rc == IMR_PROTOCOL ||
          rc  == IMR_BAD) {
       printf("idle_process() got unexpected response %i!\n"
-             "Last message was: "%s" - shuttong down idle listener\n",
+             "Last message was: \"%s\" - shutting down idle listener\n",
              rc, h->last_msg);
       /* FIXME: consider aborting connection here. */
       return FALSE;

@@ -198,8 +198,9 @@ static GtkWidget *mdn_group(GtkWidget * page);
 
 static GtkWidget *outgoing_subpage(gpointer);
 static GtkWidget *word_wrap_group(GtkWidget * page);
-static GtkWidget *other_options_group(GtkWidget * page);
+static GtkWidget *toolbar_buttons_group(GtkWidget * page);
 static GtkWidget *encoding_group(GtkWidget * page);
+static GtkWidget *other_options_group(GtkWidget * page);
 
 /* Display page */
 static GtkWidget *create_display_page(gpointer);
@@ -1885,8 +1886,9 @@ outgoing_subpage(gpointer data)
     GtkWidget *page = pm_page_new();
 
     pm_page_add(page, word_wrap_group(page));
-    pm_page_add(page, other_options_group(page));
+    pm_page_add(page, toolbar_buttons_group(page));
     pm_page_add(page, encoding_group(page));
+    pm_page_add(page, other_options_group(page));
 
     return page;
 }
@@ -1927,34 +1929,23 @@ word_wrap_group(GtkWidget * page)
 }
 
 static GtkWidget *
-other_options_group(GtkWidget * page)
+toolbar_buttons_group(GtkWidget * page)
 {
     GtkWidget *group;
     GtkWidget *table;
 
-    group = pm_group_new(_("Other Options"));
+    group = pm_group_new(_("Toolbar Buttons"));
 
     table = create_table(1, 2, page);
     pm_group_add(group, table);
 
-    pui->quote_str = attach_entry(_("Reply Prefix:"), 1, GTK_TABLE(table));
-
-    pui->edit_headers =
-        pm_group_add_check(group, _("Edit headers in external editor"));
-    pui->autoquote =
-        pm_group_add_check(group, _("Automatically quote original "
-                                    "when replying"));
-    pui->reply_strip_html_parts =
-        pm_group_add_check(group, _("Don't include HTML parts as text "
-                                    "when replying or forwarding mail"));
     pui->forward_attached =
-        pm_group_add_check(group, _("Forward a mail as attachment "
+        pm_group_add_check(group, _("Forward button attaches mail "
                                     "instead of quoting it"));
     pui->always_queue_sent_mail =
-        pm_group_add_check(group, _("Send button always queues "
-                                    "outgoing mail in outbox"));
-    pui->copy_to_sentbox =
-        pm_group_add_check(group, _("Copy outgoing messages to sentbox"));
+        pm_group_add_check(group, _("Send button queues "
+                                    "outgoing mail in outbox "
+				    "instead of sending it"));
 
     return group;
 }
@@ -1981,6 +1972,33 @@ encoding_group(GtkWidget * page)
 	    gtk_option_menu_set_history (GTK_OPTION_MENU (optionmenu), i);
 	    break;
 	}
+
+    return group;
+}
+
+static GtkWidget *
+other_options_group(GtkWidget * page)
+{
+    GtkWidget *group;
+    GtkWidget *table;
+
+    group = pm_group_new(_("Other Options"));
+
+    table = create_table(1, 2, page);
+    pm_group_add(group, table);
+
+    pui->quote_str = attach_entry(_("Reply Prefix:"), 1, GTK_TABLE(table));
+
+    pui->edit_headers =
+        pm_group_add_check(group, _("Edit headers in external editor"));
+    pui->autoquote =
+        pm_group_add_check(group, _("Automatically quote original "
+                                    "when replying"));
+    pui->reply_strip_html_parts =
+        pm_group_add_check(group, _("Don't include HTML parts as text "
+                                    "when replying or forwarding mail"));
+    pui->copy_to_sentbox =
+        pm_group_add_check(group, _("Copy outgoing mail to sentbox"));
 
     return group;
 }

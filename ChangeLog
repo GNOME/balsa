@@ -1,3 +1,11 @@
+2000-05-22  Peter Williams  <peter@beta.newton.cx>
+
+	* libinit_balsa/balsa-druid-page.gob, 
+	libinit_balsa/balsa-druid-page-welcome.gob: Enable
+	multibyte fontsets when appropriate. I have no clue
+	what it all means, but Yukihiro Nakai <ynakai@redhat.com>
+	seems to know what he's talking about.
+
 2000-05-20  Peter Williams  <peter@beta.newton.cx>
 
 	* libinit_balsa/Makefile.am: @MAINT@ the gob rule,

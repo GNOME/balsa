@@ -1,5 +1,7 @@
-2004-02-29 00:20  PeterB
+2004-02-29 11:22  PeterB
 
+	* src/balsa-index.c: emit "changed" signal even when no message is
+	selected.
 	* src/main-window.c: implement persistent search-iters.
 	* src/: balsa-index.c, balsa-index.h: implement persistent
 	search-iters; rearrange search code.

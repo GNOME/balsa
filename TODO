@@ -28,7 +28,6 @@ UI:
      P Attachments in new mail
      * move/copy messages via DND
  * MIME supporting icons.  use the new gnome metadata stuff that gmc uses?
- * Use useful sounds
  * New mail notification
      P via sound
      * change icon window incase Balsa is minimized to a different icon

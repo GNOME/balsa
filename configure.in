@@ -61,9 +61,10 @@ AC_DEFINE_UNQUOTED(BALSA_VERSION, "$BALSA_VERSION")
 
 AC_CHECK_LIB(crypt, crypt)
 
-AC_CHECK_LIB(des, des_encrypt)
-AC_CHECK_LIB(krb, krb_sendauth)
-AC_CHECK_LIB(acap, acap_OpenConnection)
+dnl these may be used later.
+dnl AC_CHECK_LIB(des, des_encrypt)
+dnl AC_CHECK_LIB(krb, krb_sendauth)
+dnl AC_CHECK_LIB(acap, acap_OpenConnection)
 
 
 AM_HDR_SIGACTION

@@ -166,8 +166,7 @@ static struct message_info *message_info_from_msgno(
 }
 
 #define IMAP_MESSAGE_UID(msg) \
-        (imap_mbox_handle_get_msg \
-                (LIBBALSA_MAILBOX_IMAP((msg)->mailbox)->handle,\
+        (mi_get_imsg(LIBBALSA_MAILBOX_IMAP((msg)->mailbox),\
                  (msg)->msgno)->uid)
 
 #define IMAP_MAILBOX_UID_VALIDITY(mailbox) (LIBBALSA_MAILBOX_IMAP(mailbox)->uid_validity)
@@ -469,6 +468,15 @@ clean_cache(LibBalsaMailbox* mailbox)
     return TRUE;
 }
 
+/* ImapIssue macro handles reconnecting. We might issue a
+   LIBBALSA_INFORMATION_MMESSAGE here but it would be overwritten by
+   login information... */
+#define II(rc,h,line) \
+   {int trials=2;do{rc=line; if(rc!= IMR_SEVERED) break;\
+    libbalsa_information(LIBBALSA_INFORMATION_WARNING, \
+    _("IMAP connection has been severed. Reconnecting..."));\
+    imap_mbox_handle_reconnect(h, NULL);}while(trials-->0);}
+
 static ImapMboxHandle *
 libbalsa_mailbox_imap_get_handle(LibBalsaMailboxImap *mimap, GError **err)
 {
@@ -510,6 +518,75 @@ lbimap_update_flags(LibBalsaMessage *message, ImapMessage *imsg)
 	message->flags |= LIBBALSA_MESSAGE_FLAG_RECENT;
 }
 
+/* mi_get_imsg is a thin wrapper around imap_mbox_handle_get_msg().
+   We wrap around imap_mbox_handle_get_msg() in case the libimap data
+   was invalidated by eg. disconnect.
+*/
+struct collect_seq_data {
+    unsigned *msgno_arr;
+    unsigned cnt;
+    unsigned needed_msgno;
+    unsigned has_it;
+};
+
+static const unsigned MAX_CHUNK_LENGTH = 40; 
+static gboolean
+collect_seq_cb(GNode *node, gpointer data)
+{
+    /* We prefetch envelopes in chunks to save on RTTs.
+     * Try to get the messages both before and after the message. */
+    struct collect_seq_data *csd = (struct collect_seq_data*)data;
+    unsigned msgno = GPOINTER_TO_UINT(node->data);
+    if(msgno==0) /* root node */
+        return FALSE;
+    csd->msgno_arr[(csd->cnt++) % MAX_CHUNK_LENGTH] = msgno;
+    if(csd->has_it>0) csd->has_it++;
+    if(csd->needed_msgno == msgno)
+        csd->has_it = 1;
+    /* quit if we have enough messages and at least half of them are
+     * after message in question. */
+    return csd->cnt >= MAX_CHUNK_LENGTH && csd->has_it*2>MAX_CHUNK_LENGTH;
+}
+
+static int
+cmp_msgno(const void* a, const void *b)
+{
+    return (*(unsigned*)a) - (*(unsigned*)b);
+}
+
+static ImapMessage*
+mi_get_imsg(LibBalsaMailboxImap *mimap, unsigned msgno)
+{
+    ImapMessage* imsg;
+    struct collect_seq_data csd;
+    ImapResponse rc;
+
+    if( (imsg = imap_mbox_handle_get_msg(mimap->handle, msgno)) 
+        != NULL) return imsg;
+    csd.needed_msgno = msgno;
+    csd.msgno_arr    = g_malloc(MAX_CHUNK_LENGTH*sizeof(csd.msgno_arr[0]));
+    csd.cnt          = 0;
+    csd.has_it       = 0;
+    g_node_traverse(LIBBALSA_MAILBOX(mimap)->msg_tree,
+                    G_PRE_ORDER, G_TRAVERSE_ALL, -1, collect_seq_cb,
+                    &csd);
+    if(csd.cnt>MAX_CHUNK_LENGTH) csd.cnt = MAX_CHUNK_LENGTH;
+    qsort(csd.msgno_arr, csd.cnt, sizeof(csd.msgno_arr[0]), cmp_msgno);
+    II(rc,mimap->handle,
+       imap_mbox_handle_fetch_set(mimap->handle, csd.msgno_arr,
+                                  csd.cnt,
+                                  IMFETCH_FLAGS |
+                                  IMFETCH_UID |
+                                  IMFETCH_ENV |
+                                  IMFETCH_RFC822SIZE |
+                                  IMFETCH_CONTENT_TYPE));
+    g_free(csd.msgno_arr);
+    if (rc != IMR_OK)
+        return FALSE;
+    return imap_mbox_handle_get_msg(mimap->handle, msgno);
+}
+
+
 /** imap_flags_cb() is called by the imap backend when flags are
    fetched. Note that we may not have yet the preprocessed data in
    LibBalsaMessage.  We ignore the info in this case.
@@ -524,8 +601,7 @@ imap_flags_cb(unsigned cnt, const unsigned seqno[], LibBalsaMailboxImap *mimap)
     for(i=0; i<cnt; i++) {
         struct message_info *msg_info = 
             message_info_from_msgno(mimap, seqno[i]);
-        ImapMessage *imsg  = 
-            imap_mbox_handle_get_msg(mimap->handle, seqno[i]);
+        ImapMessage *imsg  = mi_get_imsg(mimap, seqno[i]);
         if(msg_info->message) {
             LibBalsaMessageFlag old_flags = msg_info->message->flags;
             GList *list;
@@ -676,8 +752,9 @@ libbalsa_mailbox_imap_get_selected_handle(LibBalsaMailboxImap *mimap,
         if (!mimap->handle)
             return NULL;
     }
-    rc = imap_mbox_select(mimap->handle, mimap->path,
-			  &(LIBBALSA_MAILBOX(mimap)->readonly));
+    II(rc,mimap->handle,
+       imap_mbox_select(mimap->handle, mimap->path,
+                        &(LIBBALSA_MAILBOX(mimap)->readonly)));
     if (rc != IMR_OK) {
 	gchar *msg = imap_mbox_handle_get_last_msg(mimap->handle);
 	g_set_error(err, LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_OPEN_ERROR,
@@ -813,6 +890,7 @@ libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox, gboolean expunge)
 
     mbox->opened = FALSE;
 
+    /* we do not attempt to reconnect here */
     if (expunge)
 	imap_mbox_close(mbox->handle);
     else
@@ -842,7 +920,8 @@ get_cache_stream(LibBalsaMailbox *mailbox, unsigned uid)
         mkdir(pair[0], S_IRUSR|S_IWUSR|S_IXUSR); /* ignore errors */
         /* printf("%s path: %s\n", __FUNCTION__, path); */
         cache = fopen(path, "wb");
-        rc = imap_mbox_handle_fetch_rfc822_uid(mimap->handle, uid, cache);
+        II(rc,mimap->handle,
+           imap_mbox_handle_fetch_rfc822_uid(mimap->handle, uid, cache));
         fclose(cache);
 
 	stream = fopen(path,"rb");
@@ -951,16 +1030,18 @@ libbalsa_mailbox_imap_message_match(LibBalsaMailbox* mailbox, guint msgno,
     LibBalsaMailboxImap *mimap;
     struct message_info *msg_info;
     GHashTable *matchings;
+    ImapMessage *imsg;
 
     mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     msg_info = message_info_from_msgno(mimap, msgno);
 
     if (msg_info->message)
         g_object_ref(msg_info->message);
-    else if (imap_mbox_handle_get_msg(mimap->handle, msgno)
-             && imap_mbox_handle_get_msg(mimap->handle, msgno)->envelope)
+    else {
+        imsg = mi_get_imsg(mimap, msgno);
+        if (imsg && imsg->envelope)
         libbalsa_mailbox_imap_get_message(mailbox, msgno);
-
+    }
     if (msg_info->message) {
         if (libbalsa_condition_can_match(search_iter->condition,
                                          msg_info->message)) {
@@ -986,7 +1067,8 @@ libbalsa_mailbox_imap_message_match(LibBalsaMailbox* mailbox, guint msgno,
 
 	matchings = g_hash_table_new(NULL, NULL);
 	query = lbmi_build_imap_query(search_iter->condition, NULL);
-	rc = imap_mbox_filter_msgnos(mimap->handle, query, matchings);
+	II(rc,mimap->handle,
+           imap_mbox_filter_msgnos(mimap->handle, query, matchings));
 	imap_search_key_free(query);
 	if (rc != IMR_OK) {
 	    g_hash_table_destroy(matchings);
@@ -1185,9 +1267,10 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
 #else	
         g_warning("Search results ignored. Fixme!");
 #endif
-        rc = imap_mbox_uid_search(mbox->handle, query,
-                                  (void(*)(unsigned,void*))imap_matched,
-                                  cbdata);
+        II(rc,mbox->handle,
+           imap_mbox_uid_search(mbox->handle, query,
+                                (void(*)(unsigned,void*))imap_matched,
+                                cbdata));
         imap_search_key_free(query);
     }
     g_hash_table_destroy(cbdata->uids);
@@ -1276,7 +1359,8 @@ libbalsa_mailbox_imap_subscribe(LibBalsaMailboxImap * mailbox,
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox), FALSE);
 
-    rc = imap_mbox_subscribe(mailbox->handle, mailbox->path, subscribe);
+    II(rc,mailbox->handle,
+       imap_mbox_subscribe(mailbox->handle, mailbox->path, subscribe));
 
     return rc == IMR_OK;
 }
@@ -1295,7 +1379,7 @@ libbalsa_mailbox_imap_noop(LibBalsaMailboxImap* mimap)
 {
     g_return_if_fail(mimap != NULL);
 
-    if (mimap->handle)
+    if (mimap->handle) /* we do not attempt to reconnect here */
 	if (imap_mbox_handle_noop(mimap->handle) != IMR_OK)
 	    /* FIXME: report error... */
 	    ;
@@ -1327,7 +1411,8 @@ libbalsa_imap_rename_subfolder(LibBalsaMailboxImap* imap,
     if (!handle)
 	return FALSE;
 
-    imap_mbox_subscribe(handle, imap->path, FALSE);
+    II(rc,handle,
+       imap_mbox_subscribe(handle, imap->path, FALSE));
     /* FIXME: should use imap server folder separator */ 
     new_path = g_strjoin("/", new_parent, folder, NULL);
     rc = imap_mbox_rename(handle, imap->path, new_path);
@@ -1356,7 +1441,8 @@ libbalsa_imap_new_subfolder(const gchar *parent, const gchar *folder,
     delim[0] = imap_mbox_handle_get_delim(handle, parent);
     delim[1] = '\0';
     new_path = g_strjoin(delim, parent, folder, NULL);
-    rc = imap_mbox_create(handle, new_path);
+    II(rc,handle,
+       imap_mbox_create(handle, new_path));
     if (subscribe && rc == IMR_OK)
 	rc = imap_mbox_subscribe(handle, new_path, TRUE);
     g_free(new_path);
@@ -1364,23 +1450,26 @@ libbalsa_imap_new_subfolder(const gchar *parent, const gchar *folder,
     libbalsa_imap_server_release_handle(LIBBALSA_IMAP_SERVER(server), handle);
 }
 
-void
+gboolean
 libbalsa_imap_delete_folder(LibBalsaMailboxImap *mailbox)
 {
+    ImapResponse rc;
     ImapMboxHandle* handle;
 
     handle = libbalsa_mailbox_imap_get_handle(mailbox, NULL);
     if (!handle)
-	return;
+	return FALSE;
 
     /* Some IMAP servers (UW2000) do not like removing subscribed mailboxes:
      * they do not remove the mailbox from the subscription list since 
      * the subscription list should be treated as a list of bookmarks,
      * not a list of physically existing mailboxes. */
     imap_mbox_subscribe(handle, mailbox->path, FALSE);
-    imap_mbox_delete(handle, mailbox->path);
+    II(rc,handle,
+       imap_mbox_delete(handle, mailbox->path));
 
     libbalsa_mailbox_imap_release_handle(mailbox);
+    return rc == IMR_OK;
 }
 
 gchar *
@@ -1431,7 +1520,10 @@ libbalsa_mailbox_imap_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     g_return_val_if_fail(mimap->opened, FALSE);
     /* we are always in sync, we need only to do expunge now and then */
     if(expunge) {
-        res =  imap_mbox_expunge(mimap->handle) == IMR_OK;
+        ImapResponse rc;
+        II(rc,mimap->handle,
+           imap_mbox_expunge(mimap->handle));
+        res = (rc == IMR_OK);
     }
     return res;
 }
@@ -1498,72 +1590,16 @@ lb_set_headers(LibBalsaMessageHeaders *headers, ImapEnvelope *  envelope,
     }
 }
 
-struct collect_seq_data {
-    unsigned *msgno_arr;
-    unsigned cnt;
-    unsigned needed_msgno;
-    unsigned has_it;
-};
-
-static const unsigned MAX_CHUNK_LENGTH = 40; 
-static gboolean
-collect_seq_cb(GNode *node, gpointer data)
-{
-    /* We prefetch envelopes in chunks to save on RTTs.
-     * Try to get the messages both before and after the message. */
-    struct collect_seq_data *csd = (struct collect_seq_data*)data;
-    unsigned msgno = GPOINTER_TO_UINT(node->data);
-    if(msgno==0) /* root node */
-        return FALSE;
-    csd->msgno_arr[(csd->cnt++) % MAX_CHUNK_LENGTH] = msgno;
-    if(csd->has_it>0) csd->has_it++;
-    if(csd->needed_msgno == msgno)
-        csd->has_it = 1;
-    /* quit if we have enough messages and at least half of them are
-     * after message in question. */
-    return csd->cnt >= MAX_CHUNK_LENGTH && csd->has_it*2>MAX_CHUNK_LENGTH;
-}
-
-static int
-cmp_msgno(const void* a, const void *b)
-{
-    return (*(unsigned*)a) - (*(unsigned*)b);
-}
-
 static gboolean
 libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
 				    LibBalsaMessage *message)
 {
-    ImapResponse rc;
     ImapEnvelope *envelope;
-    struct collect_seq_data csd;
     ImapMessage* imsg;
     gchar *hdr;
     
     g_return_val_if_fail(mimap->opened, FALSE);
-    if( (imsg = imap_mbox_handle_get_msg(mimap->handle, message->msgno)) 
-        == NULL) {
-        csd.needed_msgno = message->msgno;
-        csd.msgno_arr    = g_malloc(MAX_CHUNK_LENGTH*sizeof(csd.msgno_arr[0]));
-        csd.cnt          = 0;
-        csd.has_it       = 0;
-        g_node_traverse(LIBBALSA_MAILBOX(mimap)->msg_tree,
-                        G_PRE_ORDER, G_TRAVERSE_ALL, -1, collect_seq_cb,
-                        &csd);
-        if(csd.cnt>MAX_CHUNK_LENGTH) csd.cnt = MAX_CHUNK_LENGTH;
-        qsort(csd.msgno_arr, csd.cnt, sizeof(csd.msgno_arr[0]), cmp_msgno);
-        rc = imap_mbox_handle_fetch_set(mimap->handle, csd.msgno_arr,
-                                        csd.cnt,
-                                        IMFETCH_FLAGS |
-                                        IMFETCH_UID |
-                                        IMFETCH_ENV |
-					IMFETCH_RFC822SIZE |
-					IMFETCH_CONTENT_TYPE);
-        g_free(csd.msgno_arr);
-        if (rc != IMR_OK)
-            return FALSE;
-        imsg = imap_mbox_handle_get_msg(mimap->handle, message->msgno);
-    }
+    imsg = mi_get_imsg(mimap, message->msgno);
 
     g_return_val_if_fail(imsg, FALSE);
     g_return_val_if_fail(imsg->envelope, FALSE);
@@ -1693,8 +1729,9 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
     if(flags & LB_FETCH_RFC822_HEADERS) ift |= IMFETCH_RFC822HEADERS_SELECTED;
     if(flags & LB_FETCH_STRUCTURE)      ift |= IMFETCH_BODYSTRUCT;
 
-    rc = imap_mbox_handle_fetch_range(mimap->handle, message->msgno,
-                                      message->msgno, ift);
+    II(rc, mimap->handle,
+       imap_mbox_handle_fetch_range(mimap->handle, message->msgno,
+                                    message->msgno, ift));
     if(rc == IMR_OK) { /* translate ImapData to LibBalsaMessage */
         gchar *hdr;
         ImapMessage *im = imap_mbox_handle_get_msg(mimap->handle,
@@ -1718,11 +1755,13 @@ libbalsa_mailbox_imap_fetch_headers(LibBalsaMailbox *mailbox,
                                     LibBalsaMessage *message)
 {
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
-    ImapResponse rc =
-        imap_mbox_handle_fetch_range(mimap->handle,
-                                     message->msgno,
-                                     message->msgno,
-                                     IMFETCH_RFC822HEADERS_SELECTED);
+    ImapResponse rc;
+
+    II(rc,mimap->handle,
+       imap_mbox_handle_fetch_range(mimap->handle,
+                                    message->msgno,
+                                    message->msgno,
+                                    IMFETCH_RFC822HEADERS_SELECTED));
     if(rc == IMR_OK) { /* translate ImapData to LibBalsaMessage */
         const gchar *hdr;
         ImapMessage *im = imap_mbox_handle_get_msg(mimap->handle,
@@ -1817,13 +1856,14 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
 
 	    libbalsa_lock_mailbox(msg->mailbox);
 	    mimap = LIBBALSA_MAILBOX_IMAP(msg->mailbox);
-	    im = imap_mbox_handle_get_msg(mimap->handle, msg->msgno);
+	    im = mi_get_imsg(mimap, msg->msgno);
 
 	    dt.body  = imap_message_get_body_from_section(im, section);
 	    dt.block = g_malloc(dt.body->octets+1);
 	    dt.pos   = 0;
-	    rc = imap_mbox_handle_fetch_body(mimap->handle, msg->msgno,
-                                             section, append_str, &dt);
+            II(rc,mimap->handle,
+               imap_mbox_handle_fetch_body(mimap->handle, msg->msgno,
+                                           section, append_str, &dt));
 	    if(rc != IMR_OK)
 		g_error("FIXME: error handling here!\n");
 	    
@@ -1925,6 +1965,8 @@ libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
         unsigned msgno = message->msgno;
         g_return_val_if_fail(handle, -1); /* message is there but
                                            * the source mailbox closed! */
+        /* FIXME: reconnect? The msgno number might have changed.
+         * we should probably reconnect and return a retriable error. */
         rc = imap_mbox_handle_copy(handle, 1, &msgno,
                                    LIBBALSA_MAILBOX_IMAP(mailbox)->path);
         return rc == IMR_OK ? 1 : -1;
@@ -2031,18 +2073,21 @@ lbm_imap_messages_change_flags(LibBalsaMailbox * mailbox, GArray * seqno,
 {
     ImapMsgFlag flag_set, flag_clr;
     ImapResponse rc1 = IMR_OK, rc2 = IMR_OK;
+    ImapMboxHandle *handle = LIBBALSA_MAILBOX_IMAP(mailbox)->handle;
 
     g_array_sort(seqno, cmp_msgno);
     transform_flags(set, clear, &flag_set, &flag_clr);
 
     if(flag_set)
-        rc1 = imap_mbox_store_flag(LIBBALSA_MAILBOX_IMAP(mailbox)->handle,
-                                   seqno->len, (guint *) seqno->data,
-				   flag_set, TRUE);
+        II(rc1,handle,
+           imap_mbox_store_flag(handle,
+                                seqno->len, (guint *) seqno->data,
+                                flag_set, TRUE));
     if(flag_clr)
-        rc2 = imap_mbox_store_flag(LIBBALSA_MAILBOX_IMAP(mailbox)->handle,
-                                   seqno->len, (guint *) seqno->data,
-				   flag_clr, FALSE);
+        II(rc2,handle,
+           imap_mbox_store_flag(LIBBALSA_MAILBOX_IMAP(mailbox)->handle,
+                                seqno->len, (guint *) seqno->data,
+                                flag_clr, FALSE));
 
     if (rc1 == IMR_OK && rc2 == IMR_OK) {
 	LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
@@ -2095,12 +2140,15 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
     GNode * new_tree;
     guint msgno;
     ImapSearchKey *filter = lbmi_build_imap_query(mailbox->view_filter, NULL);
+    ImapResponse rc;
     
     mailbox->view->threading_type = thread_type;
     switch(thread_type) {
     case LB_MAILBOX_THREADING_SIMPLE:
     case LB_MAILBOX_THREADING_JWZ:
-	if(imap_mbox_thread(mimap->handle, "REFERENCES", filter) == IMR_OK) {
+        II(rc,mimap->handle,
+           imap_mbox_thread(mimap->handle, "REFERENCES", filter));
+        if(rc == IMR_OK) {
             new_tree =
                 g_node_copy(imap_mbox_handle_get_thread_root(mimap->handle));
             break;
@@ -2110,11 +2158,12 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
         /* fall through */
     case LB_MAILBOX_THREADING_FLAT:
         if(filter) {
-            imap_mbox_sort_filter(mimap->handle,
-                                  lbmi_get_imap_sort_key(mailbox),
-                                  mailbox->view->sort_type ==
-                                  LB_MAILBOX_SORT_TYPE_ASC,
-                                  filter);
+            II(rc,mimap->handle,
+               imap_mbox_sort_filter(mimap->handle,
+                                     lbmi_get_imap_sort_key(mailbox),
+                                     mailbox->view->sort_type ==
+                                     LB_MAILBOX_SORT_TYPE_ASC,
+                                     filter));
             new_tree =
                 g_node_copy(imap_mbox_handle_get_thread_root(mimap->handle));
         } else {
@@ -2161,6 +2210,7 @@ libbalsa_mailbox_imap_sort(LibBalsaMailbox *mbox, GArray *array)
     unsigned *msgno_arr, *msgno_map, len, i, no_max;
     GArray *tmp;
     len = array->len;
+    ImapResponse rc;
 
     if(mbox->view->sort_field == LB_MAILBOX_SORT_NO) {
         g_array_sort_with_data(array, (GCompareDataFunc)lbmi_compare_func,
@@ -2185,11 +2235,12 @@ libbalsa_mailbox_imap_sort(LibBalsaMailbox *mbox, GArray *array)
         msgno_map[msgno_arr[i]-1] = i;
 
     qsort(msgno_arr, len, sizeof(msgno_arr[0]), cmp_msgno);
-    imap_mbox_sort_msgno(LIBBALSA_MAILBOX_IMAP(mbox)->handle,
-                         lbmi_get_imap_sort_key(mbox),
-                         mbox->view->sort_type == LB_MAILBOX_SORT_TYPE_ASC,
-                         msgno_arr, len); /* ignore errors */
-    
+    II(rc,LIBBALSA_MAILBOX_IMAP(mbox)->handle,
+       imap_mbox_sort_msgno(LIBBALSA_MAILBOX_IMAP(mbox)->handle,
+                            lbmi_get_imap_sort_key(mbox),
+                            mbox->view->sort_type == LB_MAILBOX_SORT_TYPE_ASC,
+                            msgno_arr, len)); /* ignore errors */
+       
     tmp = g_array_new(FALSE,FALSE, sizeof(SortTuple));
     g_array_append_vals(tmp, array->data, array->len);
     g_array_set_size(array, 0);    /* truncate */

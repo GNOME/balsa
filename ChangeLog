@@ -1,3 +1,11 @@
+2004-08-04  Pawel Salek
+
+	* libbalsa/mailbox_imap.[hc]: retry on disconnects.
+	* libbalsa/server.c: inform explicitely about used auth method.
+	* libbalsa/imap/imap-commands.c: make sure ImapMessage has always
+	right UID and Flags.
+	* src/balsa-index.c: inform the user if the move/copy was successful.
+
 2004-08-03 11:47  PeterB
 
 	* libbalsa/Makefile.am, libbalsa/libbalsa.c, libbalsa/libbalsa.h,

@@ -107,7 +107,13 @@ need_fetch(unsigned seqno, struct fetch_data* fd)
   ImapFetchType available_headers;
 
   g_return_val_if_fail(seqno>=1 && seqno<=fd->h->exists, 0);
-  if(fd->h->msg_cache[seqno-1] == NULL) return seqno;
+  if(fd->h->msg_cache[seqno-1] == NULL) {
+    /* We know nothing of that message, we need to fetch at least UID
+     * and FLAGS if we are supposed to create ImapMessage structure
+     * later. */
+    fd->req_fetch_type |= IMFETCH_UID|IMFETCH_FLAGS;
+    return seqno;
+  }
   if( (fd->ift & IMFETCH_ENV) 
       && fd->h->msg_cache[seqno-1]->envelope == NULL) return seqno;
   if( (fd->ift & IMFETCH_BODYSTRUCT) 

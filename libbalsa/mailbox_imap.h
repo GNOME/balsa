@@ -69,7 +69,7 @@ gboolean libbalsa_imap_rename_subfolder(LibBalsaMailboxImap* mbox,
                                         const gchar *new_parent,
                                         const gchar *folder, gboolean subscr);
 
-void libbalsa_imap_delete_folder(LibBalsaMailboxImap * mailbox);
+gboolean libbalsa_imap_delete_folder(LibBalsaMailboxImap * mailbox);
 
 gchar *libbalsa_imap_path(LibBalsaServer * server, const gchar * path);
 gchar *libbalsa_imap_url(LibBalsaServer * server, const gchar * path);

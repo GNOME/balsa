@@ -1950,6 +1950,9 @@ balsa_index_transfer(BalsaIndex *index, GList * messages,
         enable_empty_trash(balsa_app.main_window, TRASH_CHECK);
     else if (to_mailbox == balsa_app.trash)
         enable_empty_trash(balsa_app.main_window, TRASH_FULL);
+    balsa_information(LIBBALSA_INFORMATION_MESSAGE,
+                      copy ? _("Copied to \"%s\".") 
+                      : _("Moved to \"%s\"."), to_mailbox->name);
 }
 
 /* General helpers. */

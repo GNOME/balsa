@@ -1,5 +1,7 @@
-2003-07-31 16:28  PeterB
+2003-07-31 16:43  PeterB
 
+	* src/: balsa-message.c, balsa-message.h, main-window.c: Make all
+	the zoom code conditional on HAVE_GTKHTML.
 	* src/print.c: Add missing "break" in a switch.
 
 2003-07-29  Pawel Salek  <pawsa theochem.kth.se>

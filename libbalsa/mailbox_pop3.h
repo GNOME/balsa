@@ -47,10 +47,11 @@ struct _LibBalsaMailboxPop3 {
     gboolean check;
     gboolean delete_from_server;
     gchar *last_popped_uid;
-    gboolean use_apop;
-    gboolean filter; /* filter through procmail/filter_cmd? */
     gchar *filter_cmd;
     LibBalsaMailbox *inbox;
+    unsigned filter:1; /* filter through procmail/filter_cmd? */
+    unsigned disable_apop:1; /* Some servers claim to support it but
+                              * they do not. */
 };
 
 struct _LibBalsaMailboxPop3Class {

@@ -134,6 +134,7 @@ unsigned imap_mbox_handle_get_exists(ImapMboxHandle* handle);
 unsigned imap_mbox_handle_get_validity(ImapMboxHandle* handle);
 int      imap_mbox_handle_get_delim(ImapMboxHandle* handle,
                                     const char *namespace);
+char* imap_mbox_handle_get_last_msg(ImapMboxHandle *handle);
 
 void imap_mbox_handle_connect_notify(ImapMboxHandle* handle,
                                      ImapMboxNotifyCb cb,

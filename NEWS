@@ -1,3 +1,11 @@
+* Balsa-2.1.3 release. Release date 2004-05-22
+
+- GPGME fixes.
+- Reduce memory usage of local mailbox drivers.
+- numerous i18n fixes.
+- more careful error checking.
+- user configuration of TLS, APOP settings to work around broken servers.
+
 * Balsa-2.1.2 release. Release date 2004-04-05
 
 - POP3 with TLS and PIPELINING.

@@ -119,6 +119,7 @@ which scrollkeeper-update>/dev/null 2>&1 && scrollkeeper-update
 %{_datadir}/gnome/help/balsa/*
 %{_datadir}/omf/balsa/*
 %{_datadir}/balsa/pixmaps/*
+%{_datadir}/idl/Balsa.idl
 %{_datadir}/sounds/balsa/*
 %{_mandir}/man1/balsa.1*
 %config %{_sysconfdir}/sound/events/*

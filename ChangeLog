@@ -1,5 +1,11 @@
 2004-05-22  Pawel Salek
 
+	* balsa.spec.in: Balsa.idl should be distributed.
+	* configure.in, NEWS: release 2.1.3.
+	* src/Makefile.am: proper location of Balsa.idl
+
+2004-05-22  Pawel Salek
+
 	* libbalsa/imap-server.c. libinit_balsa/balsa-druid-page-directory.c:
 	compile without SSL.
 	* Makefile.am, balsa.desktop.in: 

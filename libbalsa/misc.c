@@ -123,9 +123,11 @@ address_to_gchar (Address * addr)
     }
   if (addr->mailbox)
     {
-      gs = g_string_append_c (gs, '<');
+      if (addr->personal)
+	gs = g_string_append_c (gs, '<');
       gs = g_string_append (gs, addr->mailbox);
-      gs = g_string_append_c (gs, '>');
+      if (addr->personal)
+	gs = g_string_append_c (gs, '>');
     }
   retc = g_strdup (gs->str);
   g_string_free (gs, TRUE);
@@ -191,7 +193,7 @@ readfile (FILE * fp, char **buf)
       r = read (fd, *buf + offset, size - offset);
       if (r == 0)
 	return offset;
-      
+
       if (r > 0)
 	{
 	  offset += r;
@@ -202,6 +204,6 @@ readfile (FILE * fp, char **buf)
 	  return -1;
 	}
     }
-  
+
   return size;
 }

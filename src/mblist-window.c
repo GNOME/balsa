@@ -33,23 +33,26 @@
 #include "pixmaps/mini_dir_closed.xpm"
 #include "pixmaps/mini_dir_open.xpm"
 #include "pixmaps/plain-folder.xpm"
+#include "pixmaps/full-folder.xpm"
 #include "pixmaps/inbox.xpm"
 #include "pixmaps/outbox.xpm"
 #include "pixmaps/trash.xpm"
 
-GdkPixmap *open_folder;
-GdkPixmap *closed_folder;
-GdkPixmap *mailboxpix;
-GdkPixmap *inboxpix;
-GdkPixmap *outboxpix;
-GdkPixmap *trashpix;
+static GdkPixmap *open_folder;
+static GdkPixmap *closed_folder;
+static GdkPixmap *tray_empty;
+static GdkPixmap *tray_full;
+static GdkPixmap *inboxpix;
+static GdkPixmap *outboxpix;
+static GdkPixmap *trashpix;
 
-GdkBitmap *open_mask;
-GdkBitmap *closed_mask;
-GdkBitmap *mailbox_mask;
-GdkBitmap *inbox_mask;
-GdkBitmap *outbox_mask;
-GdkBitmap *trash_mask;
+static GdkBitmap *open_mask;
+static GdkBitmap *closed_mask;
+static GdkBitmap *tray_empty_mask;
+static GdkBitmap *tray_full_mask;
+static GdkBitmap *inbox_mask;
+static GdkBitmap *outbox_mask;
+static GdkBitmap *trash_mask;
 
 typedef struct _MBListWindow MBListWindow;
 struct _MBListWindow
@@ -85,7 +88,10 @@ mblist_open_window (GnomeMDI * mdi)
   {"Balsa"};
 
   if (mblw)
-    return;
+    {
+      gdk_window_raise (mblw->window->window);
+      return;
+    }
 
   mblw = g_malloc (sizeof (MBListWindow));
 
@@ -100,8 +106,11 @@ mblist_open_window (GnomeMDI * mdi)
   closed_folder = gdk_pixmap_create_from_xpm_d (mblw->window->window,
 			    &closed_mask, transparent, mini_dir_closed_xpm);
 
-  mailboxpix = gdk_pixmap_create_from_xpm_d (mblw->window->window,
-			      &mailbox_mask, transparent, plain_folder_xpm);
+  tray_empty = gdk_pixmap_create_from_xpm_d (mblw->window->window,
+			   &tray_empty_mask, transparent, plain_folder_xpm);
+
+  tray_full = gdk_pixmap_create_from_xpm_d (mblw->window->window,
+			     &tray_full_mask, transparent, full_folder_xpm);
 
   inboxpix = gdk_pixmap_create_from_xpm_d (mblw->window->window,
 				       &inbox_mask, transparent, inbox_xpm);
@@ -236,10 +245,17 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 	  else
 	    {
 	      /* normal mailbox */
-	      gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
-				       mailboxpix, mailbox_mask,
-				       mailboxpix, mailbox_mask,
-				       FALSE, TRUE);
+	      if (mailbox_have_new_messages (MAILBOX_LOCAL (mbnode->mailbox)->path))
+		gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
+					 NULL, NULL,
+					 tray_empty, tray_empty_mask,
+					 FALSE, TRUE);
+	      else
+		gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
+					 NULL, NULL,
+					 tray_full, tray_full_mask,
+					 FALSE, TRUE);
+
 	      gtk_ctree_set_row_data (ctree, cnode, mbnode->mailbox);
 	    }
 	}

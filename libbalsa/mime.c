@@ -434,6 +434,14 @@ content2html (Message * message)
       text2html (make_string_from_list (message->to_list), html_buffer);
     }
 
+  if (message->cc_list)
+    {
+      obstack_append_string (html_buffer, "<br><b>cc: </b>");
+
+      /* cc */
+      text2html (make_string_from_list (message->cc_list), html_buffer);
+    }
+
   if (message->from)
     {
       obstack_append_string (html_buffer, "<br><b>From: </b>");

@@ -240,8 +240,8 @@ mailbox_have_new_messages (gchar * path)
 {
   return 1;
   /*
-     return test_new_folder(path);
-   */
+  return test_new_folder(path);
+*/
 }
 
 /*
@@ -987,22 +987,60 @@ message_pathname (Message * message)
   return CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno]->path;
 }
 
-
+/* TODO and/or FIXME look at the flags for mutt_append_message */ 
 void
-message_move (Message * message, Mailbox * mailbox)
+message_copy (Message * message, Mailbox * dest)
 {
+  HEADER *cur;
+  
   LOCK_MAILBOX (message->mailbox);
   RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
+
+  cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
+
+  mailbox_open_ref(dest);
+
+  mutt_append_message(CLIENT_CONTEXT(dest),
+		  CLIENT_CONTEXT(message->mailbox),
+		  cur, 0, 0);
+
+  mailbox_open_unref(dest);
+
   UNLOCK_MAILBOX ();
+}
+
+void
+message_move (Message * message, Mailbox * dest)
+{
+  HEADER *cur;
+  
+  LOCK_MAILBOX (message->mailbox);
+  RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
+
+  cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
+
+  mailbox_open_ref(dest);
+
+  mutt_append_message(CLIENT_CONTEXT(dest),
+		  CLIENT_CONTEXT(message->mailbox),
+		  cur, 0, 0);
+
+  mailbox_open_unref(dest);
+
+  UNLOCK_MAILBOX ();
+
+  message_delete(message);
 }
 
 void
 message_reply (Message * message)
 {
-  HEADER *cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
+  HEADER *cur;
 
   LOCK_MAILBOX (message->mailbox);
   RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
+
+  cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
 
   mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_REPLIED, TRUE);
 

@@ -121,7 +121,7 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message)
 	    if (match) break;
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY)) {
-	    gboolean read = !(message->flags && LIBBALSA_MESSAGE_FLAG_NEW);
+	    gboolean is_new = (message->flags & LIBBALSA_MESSAGE_FLAG_NEW);
 	    if (!libbalsa_message_body_ref(message)) {
 		libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                      _("Unable to load message body to "
@@ -129,7 +129,7 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message)
                 return FALSE;  /* We don't want to match if an error occured */
 	    }
 	    body=content2reply(message,NULL,0,FALSE,FALSE);
-	    libbalsa_message_read(message, read);
+	    if(is_new) libbalsa_message_read(message, FALSE);
 	    libbalsa_message_body_unref(message);
 	    if (body) {
 		if (body->str) match=in_string(body->str,cond->match.string);
@@ -167,6 +167,7 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message)
 		if (match) break;
 	    }
 	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY)) {
+                gboolean is_new = (message->flags & LIBBALSA_MESSAGE_FLAG_NEW);
 		if (!libbalsa_message_body_ref(message)) {
 		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                          _("Unable to load message body "
@@ -174,6 +175,7 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message)
 		    return FALSE;
 		}
 		body=content2reply(message,NULL,0,FALSE,FALSE);
+                if(is_new) libbalsa_message_read(message, FALSE);
 		libbalsa_message_body_unref(message);
 		if (body && body->str) 
                     match = REGEXEC(*(regex->compiled),body->str)==0;

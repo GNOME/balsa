@@ -1,9 +1,22 @@
-* Balsa-1.3.5 release. Release date 2002-04-16
+* Balsa-1.3.6 release. Release date 2002-05-15
+
+- reasonable searching in message bodies held in IMAP mailboxes.
+- few portability fixes for Solaris.
+- do not crash when called with -a.
+- minor filter UI improvements (sensitive).
+- more verbose on common SMTP errors.
+- RFC-compliant header encoding (Carlos).
+- password privacy fixes.
+- build fixes (--without-esmtp, --disable-threads)
+- filter-on-receive fixes.
+- general cleanup and other small bug fixes (Peter, Carlos, Emmanuel, me).
+
+* Balsa-1.3.5 release. Release date 2002-04-24
 
 - protect ESMTP passwords and pass-phrases.
 - new mailboxes scanned in a thread.
 - improved message include function.
-- preserve References: headers over message postpone.
+- preserve References: headers over message postpone (Matthew).
 - number of crashes and other bugs fixed.
 - portability fixes.
 

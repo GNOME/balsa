@@ -41,6 +41,19 @@ add_mailbox (gchar * name, gchar * path, MailboxType type)
     g_print ("Local Mailbox Loaded as: %s\n", mailbox_type_description (mailbox->type));
 }
 
+static int
+strisnum (gchar * str)
+{
+  gint i, len;
+  len = strlen (str);
+  for (len = 0; i <= len; i++)
+    {
+      if (!isdigit (str[i]))
+	return 0;
+    }
+  return 1;
+}
+
 static void
 read_dir (gchar * prefix, struct dirent *d)
 {
@@ -61,15 +74,17 @@ read_dir (gchar * prefix, struct dirent *d)
 
   if (S_ISDIR (st.st_mode))
     {
+      mailbox_type = mailbox_valid (filename);
+	if (mailbox_type == MAILBOX_MH)
+	add_mailbox (d->d_name, filename, mailbox_type);
       dpc = opendir (filename);
       if (!dpc)
 	return;
       while ((dc = readdir (dpc)) != NULL)
 	{
-	  if (!strcmp (dc->d_name, "."))
+	  if (!strncmp (dc->d_name, ".", 1))
 	    continue;
-	  if (!strcmp (dc->d_name, ".."))
-	    continue;
+
 	  read_dir (filename, dc);
 	}
       closedir (dpc);
@@ -77,6 +92,8 @@ read_dir (gchar * prefix, struct dirent *d)
 
   else
     {
+      if (!strisnum (d->d_name))
+	continue;
       mailbox_type = mailbox_valid (filename);
       if (mailbox_type != MAILBOX_UNKNOWN)
 	add_mailbox (d->d_name, filename, mailbox_type);

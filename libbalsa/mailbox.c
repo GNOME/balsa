@@ -140,14 +140,14 @@ mailbox_init ()
   struct utsname utsname;
   char *p;
 
-  
+
   uname (&utsname);
- 
-  Username = g_get_user_name();
 
-  Homedir = g_get_home_dir();
+  Username = g_get_user_name ();
 
-  Realname = g_get_real_name();
+  Homedir = g_get_home_dir ();
+
+  Realname = g_get_real_name ();
 
   /* some systems report the FQDN instead of just the hostname */
   if ((p = strchr (utsname.nodename, '.')))
@@ -156,7 +156,7 @@ mailbox_init ()
     Hostname = g_strdup (utsname.nodename);
 
   Shell = g_strdup ((p = getenv ("SHELL")) ? p : "/bin/sh");
-  Tempdir = g_get_tmp_dir();
+  Tempdir = g_get_tmp_dir ();
 }
 
 
@@ -783,26 +783,27 @@ mailbox_type_description (MailboxType type)
 MailboxType
 mailbox_valid (gchar * filename)
 {
-#if 0
-  DRIVER *drv = NULL;
-
-  drv = mail_valid (NULL, filename, NIL);
-
-  if (balsa_app.debug)
+  switch (mx_get_magic (filename))
     {
-      if (drv)
-	g_print ("mailbox_vaild: %s type %s\n", filename, drv->name);
-      else
-	g_print ("mailbox_valid: %s invalid mailbox\n", filename);
+    case M_MBOX:
+      return MAILBOX_MBOX;
+      break;
+    case M_MMDF:
+      return MAILBOX_MBOX;
+      break;
+    case M_MH:
+      return MAILBOX_MH;
+      break;
+    case M_MAILDIR:
+      return MAILBOX_MBOX;
+      break;
+    case M_IMAP:
+      return MAILBOX_IMAP;
+      break;
+    default:
+      return MAILBOX_UNKNOWN;
+      break;
     }
-
-
-  if (drv)
-    return mailbox_type_from_description (drv->name);
-  else
-    return MAILBOX_UNKNOWN;
-#endif
-  return MAILBOX_MBOX;
 }
 
 

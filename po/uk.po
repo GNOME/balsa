@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.8\n"
-"POT-Creation-Date: 2001-04-26 04:26-0400\n"
+"POT-Creation-Date: 2001-04-28 04:07-0400\n"
 "PO-Revision-Date: 1999-12-27 11:14+0200\n"
 "Last-Translator: Yuri Syrota <rasta@renome.rovno.ua>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
@@ -631,7 +631,8 @@ msgstr "Отримання пов╕домлення..."
 
 #: libmutt/imap/message.c:276
 msgid "The message index is incorrect. Try reopening the mailbox."
-msgstr "╤ндекс пов╕домлення не коректний. Спробуйте перев╕дкрити поштову скриньку."
+msgstr ""
+"╤ндекс пов╕домлення не коректний. Спробуйте перев╕дкрити поштову скриньку."
 
 #: libmutt/imap/message.c:467
 msgid "Uploading message ..."
@@ -1237,7 +1238,8 @@ msgstr "Неможливо в╕зуал╕зувати зображення\n"
 
 #: src/balsa-message.c:778
 msgid "balsa/pixbuf: Could not load image. It is likely corrupted."
-msgstr "balsa/pixbuf: Не вдалося завантажити зображення. Напевно воно з╕псоване."
+msgstr ""
+"balsa/pixbuf: Не вдалося завантажити зображення. Напевно воно з╕псоване."
 
 #: src/balsa-message.c:827
 msgid "No open or view action defined in GNOME MIME for this content type"
@@ -1530,16 +1532,18 @@ msgid ""
 "This folder is not stored in configuration.I do not yet know how to remove "
 "it from remote server."
 msgstr ""
+"Ця тека не збер╕га╓ться в конф╕╜урац╕╖. Я ще не вм╕ю видаляти "
+"╖╖ з в╕ддаленого сервера."
 
 #: src/folder-conf.c:185
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "This will remove the folder %s from the list.\n"
 "You may use \"New IMAP Folder\" later to add this folder again.\n"
 "What would you like to do?"
 msgstr ""
-"Цим ви вилучите поштову скриньку %s з списку скриньок.\n"
-"Ви зможете знову отримати до не╖ доступ п╕зн╕ше додавши ╖╖\n"
+"Цим ви вилучите теку %s з списку.\n"
+"Ви зможете додати цю теку п╕зн╕ше.\n"
 "Ви впевнен╕, що хочете цього?"
 
 #: src/folder-conf.c:190 src/mailbox-conf.c:163 src/mailbox-conf.c:174
@@ -2129,7 +2133,6 @@ msgid "Copyright (C) 1997-2001"
 msgstr "Copyright © 1997-2001"
 
 #: src/main-window.c:1352
-#, fuzzy
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://www.balsa.net/\n"
@@ -2137,9 +2140,9 @@ msgid ""
 "If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
 msgstr ""
 "Кл╕╓нт електронно╖ пошти Balsa - частина середовища GNOME.  ╤нформац╕ю про "
-"Balsa ви зм╕жете в╕дшукати на http://www.balsa.net/\n"
+"Balsa ви зможете в╕дшукати на http://www.balsa.net/\n"
 "\n"
-"В╕дсилайте пов╕домлення про помилки на: http://bugs.gnome.org/"
+"Якщо ви бажа╓те пов╕домити нам про помилку, то зроб╕ть це на: http://bugzilla.gnome.org/"
 
 #: src/main-window.c:1724
 #, c-format

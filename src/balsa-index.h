@@ -120,6 +120,7 @@ extern "C" {
     void balsa_index_select_next_unread(BalsaIndex * bindex);
     void balsa_index_select_next_flagged(BalsaIndex * bindex);
     void balsa_index_select_previous(BalsaIndex *);
+    void balsa_index_select(BalsaIndex * index, LibBalsaMessage * message);
 
     void balsa_index_find(BalsaIndex * bindex,
 			  LibBalsaMailboxSearchIter * search_iter,
@@ -158,15 +159,6 @@ extern "C" {
 
     /* Expunge deleted messages. */
     void balsa_index_expunge(BalsaIndex * index);
-
-    /* Message window */
-    guint balsa_index_next_msgno(BalsaIndex * index, guint current_msgno);
-    guint balsa_index_previous_msgno(BalsaIndex * index,
-                                     guint current_msgno);
-    guint balsa_index_next_unread_msgno(BalsaIndex * index,
-                                        guint current_msgno);
-    guint balsa_index_next_flagged_msgno(BalsaIndex * index,
-                                         guint current_msgno);
 
 #ifdef __cplusplus
 }

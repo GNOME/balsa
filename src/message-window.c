@@ -790,7 +790,6 @@ mw_set_buttons_sensitive(MessageWindow * mw)
     GtkWidget *toolbar =
         balsa_toolbar_get_from_gnome_app(GNOME_APP(mw->window));
     LibBalsaMailbox *mailbox = mw->message->mailbox;
-    guint current_msgno = mw->message->msgno;
     BalsaIndex *index = mw->bindex;
     gboolean enable;
 
@@ -799,25 +798,24 @@ mw_set_buttons_sensitive(MessageWindow * mw)
         return;
     }
 
-    enable = index && balsa_index_next_msgno(index, current_msgno) > 0;
+    enable = index && index->next_message;
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT, enable);
     gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_NEXT_POS].widget,
                              enable);
 
-    enable = index && balsa_index_previous_msgno(index, current_msgno) > 0;
+    enable = index && index->prev_message;
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_PREVIOUS,
                                        enable);
     gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_PREVIOUS_POS].
                              widget, enable);
 
-    enable = index
-        && balsa_index_next_unread_msgno(index, current_msgno) > 0;
+    enable = index && index->mailbox_node->mailbox->unread_messages > 0;
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT_UNREAD,
                                        enable);
     gtk_widget_set_sensitive(mw->next_unread, enable);
 
     enable = index
-        && balsa_index_next_flagged_msgno(index, current_msgno) > 0;
+        && libbalsa_mailbox_total_messages(index->mailbox_node->mailbox) > 0;
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT_FLAGGED,
                                        enable);
     gtk_widget_set_sensitive(mw->next_flagged, enable);
@@ -844,14 +842,16 @@ select_all_cb(GtkWidget * widget, gpointer data)
 }
 
 static void
-mw_set_msgno(MessageWindow * mw, guint msgno)
+mw_set_selected(MessageWindow * mw, void (*select_func)(BalsaIndex *))
 {
     LibBalsaMessage *message;
     MessageWindow *tmp;
 
-    message =
-        libbalsa_mailbox_get_message(mw->bindex->mailbox_node->mailbox,
-                                     msgno);
+    balsa_index_select(mw->bindex, mw->message);
+    select_func(mw->bindex);
+
+    message = mw->bindex->current_message;
+    g_object_ref(message);
     tmp = g_object_get_data(G_OBJECT(message), BALSA_MESSAGE_WINDOW_KEY);
     if (tmp) {
         /*
@@ -876,39 +876,25 @@ mw_set_msgno(MessageWindow * mw, guint msgno)
 static void
 next_message_cb(GtkWidget * widget, gpointer data)
 {
-    MessageWindow *mw = (MessageWindow *) (data);
-
-    mw_set_msgno(mw,
-                 balsa_index_next_msgno(mw->bindex, mw->message->msgno));
+    mw_set_selected((MessageWindow *) data, balsa_index_select_next);
 }
 
 static void
 previous_message_cb(GtkWidget * widget, gpointer data)
 {
-    MessageWindow *mw = (MessageWindow *) (data);
-
-    mw_set_msgno(mw,
-                 balsa_index_previous_msgno(mw->bindex,
-                                            mw->message->msgno));
+    mw_set_selected((MessageWindow *) data, balsa_index_select_previous);
 }
 
 static void
 next_unread_cb(GtkWidget * widget, gpointer data)
 {
-    MessageWindow *mw = (MessageWindow *) (data);
-
-    mw_set_msgno(mw,
-                 balsa_index_next_unread_msgno(mw->bindex,
-                                               mw->message->msgno));
+    mw_set_selected((MessageWindow *) data, balsa_index_select_next_unread);
 }
 
-static void next_flagged_cb(GtkWidget * widget, gpointer data)
+static void
+next_flagged_cb(GtkWidget * widget, gpointer data)
 {
-    MessageWindow *mw = (MessageWindow *) (data);
-
-    mw_set_msgno(mw,
-                 balsa_index_next_flagged_msgno(mw->bindex,
-                                                mw->message->msgno));
+    mw_set_selected((MessageWindow *) data, balsa_index_select_next_flagged);
 }
 
 

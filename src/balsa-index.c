@@ -1313,6 +1313,17 @@ balsa_index_select_next_flagged(BalsaIndex * index)
     bndx_select_next_with_flag(index, LIBBALSA_MESSAGE_FLAG_FLAGGED);
 }
 
+void
+balsa_index_select(BalsaIndex * index, LibBalsaMessage * message)
+{
+    GtkTreePath *path;
+
+    if (bndx_find_message(index, &path, NULL, message)) {
+        bndx_select_row(index, path);
+        gtk_tree_path_free(path);
+    }
+}
+
 /* bndx_expand_to_row_and_select:
  * make sure it's viewable, then pass it to bndx_select_row
  * no-op if it's NULL
@@ -2255,85 +2266,4 @@ balsa_index_expunge(BalsaIndex * index)
 			  mailbox->name);
     g_signal_handler_unblock(selection, index->selection_changed_id);
     g_signal_emit_by_name(G_OBJECT(selection), "changed");
-}
-
-/* Message window */
-static guint
-bndx_next_msgno(BalsaIndex * index, guint current_msgno,
-	        LibBalsaMailboxSearchIter * search_iter,
-                BndxSearchDirection direction, BndxSearchViewable viewable,
-                BndxSearchWrap wrap)
-{
-    LibBalsaMailbox *mailbox = index->mailbox_node->mailbox;
-    GtkTreeModel *model = GTK_TREE_MODEL(mailbox);
-    GtkTreeIter iter;
-    guint msgno = 0;
-    guint stop_msgno;
-
-    if (!libbalsa_mailbox_msgno_find(mailbox, current_msgno, NULL, &iter))
-        return msgno;
-
-    stop_msgno = 0;
-    if (wrap == BNDX_SEARCH_WRAP_YES)
-        stop_msgno = current_msgno;
-    if (bndx_search_iter(index, search_iter, &iter, direction, viewable,
-                         stop_msgno))
-        gtk_tree_model_get(model, &iter, LB_MBOX_MSGNO_COL, &msgno, -1);
-
-    return msgno;
-}
-
-guint
-balsa_index_next_msgno(BalsaIndex * index, guint current_msgno)
-{
-    return bndx_next_msgno(index, current_msgno, index->search_iter,
-                           BNDX_SEARCH_DIRECTION_NEXT,
-                           BNDX_SEARCH_VIEWABLE_ONLY, BNDX_SEARCH_WRAP_NO);
-}
-
-guint
-balsa_index_previous_msgno(BalsaIndex * index, guint current_msgno)
-{
-    return bndx_next_msgno(index, current_msgno, index->search_iter,
-                           BNDX_SEARCH_DIRECTION_PREV,
-                           BNDX_SEARCH_VIEWABLE_ONLY, BNDX_SEARCH_WRAP_NO);
-}
-
-static guint
-bndx_next_msgno_with_flag(BalsaIndex * index, guint current_msgno,
-                          LibBalsaMessageFlag flag)
-{
-    LibBalsaCondition *condition;
-    LibBalsaMailboxSearchIter *search_iter;
-    guint msgno;
-
-    condition = libbalsa_condition_new_flag_enum(FALSE, flag);
-    condition =
-        libbalsa_condition_new_bool_ptr(FALSE, CONDITION_AND, condition,
-                                        libbalsa_condition_clone
-                                        (&cond_undeleted));
-    search_iter = libbalsa_mailbox_search_iter_new(condition);
-    libbalsa_condition_free(condition);
-
-    msgno =
-        bndx_next_msgno(index, current_msgno, search_iter,
-		        BNDX_SEARCH_DIRECTION_NEXT,
-                        BNDX_SEARCH_VIEWABLE_ANY, BNDX_SEARCH_WRAP_YES);
-    libbalsa_mailbox_search_iter_free(search_iter);
-
-    return msgno;
-}
-
-guint
-balsa_index_next_unread_msgno(BalsaIndex * index, guint current_msgno)
-{
-    return bndx_next_msgno_with_flag(index, current_msgno,
-                                     LIBBALSA_MESSAGE_FLAG_NEW);
-}
-
-guint
-balsa_index_next_flagged_msgno(BalsaIndex * index, guint current_msgno)
-{
-    return bndx_next_msgno_with_flag(index, current_msgno,
-                                     LIBBALSA_MESSAGE_FLAG_FLAGGED);
 }

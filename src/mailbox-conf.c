@@ -52,6 +52,7 @@
 #include "save-restore.h"
 
 #include "libbalsa.h"
+#include "imap-server.h"
 
 struct _BalsaMailboxConfView {
     GtkWindow *window;
@@ -687,6 +688,11 @@ update_imap_mailbox(MailboxConfWindow *mcw)
 
     mailbox = LIBBALSA_MAILBOX_IMAP(mcw->mailbox);
     server  = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+    if (!server) {
+	server = LIBBALSA_SERVER(libbalsa_imap_server_new("",""));
+	libbalsa_mailbox_remote_set_server(LIBBALSA_MAILBOX_REMOTE(mailbox),
+					   server);
+    }
     g_free(LIBBALSA_MAILBOX(mailbox)->name);
     fill_in_imap_data(mcw, &LIBBALSA_MAILBOX(mailbox)->name, &path);
     libbalsa_server_set_username(server,

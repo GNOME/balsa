@@ -1,3 +1,7 @@
+2003-04-05  Emmanuel Allaud
+
+	* src/mailbox-conf.c: fix crash on IMAP mailbox configuration.
+
 2004-04-05  Pawel Salek
 
 	* NEWS, configure.in: release balsa-2.1.2

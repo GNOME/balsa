@@ -1,5 +1,7 @@
-2004-10-22 15:07  PeterB
+2004-10-22 20:08  PeterB
 
+	* src/balsa-index.c: don't blank preview when thread is collapsed;
+	be more careful when thread is expanded.
 	* src/balsa-index.c: take care not to lose current message; use
 	binary search to find msgno in array.
 

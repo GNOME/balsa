@@ -54,8 +54,25 @@ send_message (Message * message, gchar * smtp_server, glong debug)
   msg->content->filename = g_strdup (buffer);
   tempfp = safe_fopen (buffer, "w+");
 
+  msg->env->userhdrs = mutt_new_list ();
+  {
+    LIST* sptr = UserHeader;
+    LIST* dptr = msg->env->userhdrs;
+    LIST* delptr = 0;
+    while (sptr)
+      {
+	dptr->data = g_strdup(sptr->data);
+	sptr       = sptr->next;
+	delptr     = dptr;
+	dptr->next = mutt_new_list();
+	dptr       = dptr->next;
+      }
+    g_free(delptr->next);
+    delptr->next = 0;
+  }
+#if 0  
   msg->env->userhdrs = UserHeader;
-
+#endif
   tmp = address_to_gchar (message->from);
   msg->env->from = rfc822_parse_adrlist (msg->env->from, tmp);
   g_free (tmp);

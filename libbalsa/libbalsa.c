@@ -537,6 +537,7 @@ libbalsa_lock_mailbox(LibBalsaMailbox * mailbox)
     gboolean is_main_thread =
 	(thread_id == libbalsa_get_main_thread());
 
+    pthread_mutex_lock(&mailbox_lock);
     while (mailbox->lock && mailbox->thread_id != thread_id) {
         if(is_main_thread) gdk_threads_leave();
 	pthread_cond_wait(&mailbox_cond, &mailbox_lock);

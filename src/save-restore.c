@@ -998,7 +998,6 @@ config_global_load(void)
     }
     balsa_app.root_node =
         balsa_mailbox_node_new_from_dir(balsa_app.local_mail_directory);
-    balsa_app.root_node->expanded = TRUE;
 
 #if defined(ENABLE_TOUCH_UI)
      balsa_app.open_inbox_upon_startup =

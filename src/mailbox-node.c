@@ -339,10 +339,6 @@ load_mailbox_view(BalsaMailboxNode * mbnode)
 	/* We are rescanning. */
 	balsa_window_open_mbnode(balsa_app.main_window, mbnode);
     libbalsa_mailbox_set_frozen(mailbox, FALSE);
-
-    if (libbalsa_mailbox_get_exposed(mailbox))
-	while ((mbnode = mbnode->parent))
-	    mbnode->expanded = TRUE;
 }
 
 static gboolean
@@ -492,6 +488,8 @@ balsa_mailbox_node_new_from_mailbox(LibBalsaMailbox * mb)
     g_signal_connect(G_OBJECT(mbn), "show-prop-dialog", 
 		     G_CALLBACK(mailbox_conf_edit), NULL);
     if (LIBBALSA_IS_MAILBOX_MH(mb) || LIBBALSA_IS_MAILBOX_MAILDIR(mb)) {
+	/* Mh and Maildir mailboxes are directories, and may be nested,
+	 * so we need to be able to append a subtree. */
 	mbn->name = g_strdup(libbalsa_mailbox_local_get_path(mb));
 	mbn->dir = g_strdup(mbn->name);
 	g_signal_connect(G_OBJECT(mbn), "append-subtree", 
@@ -504,17 +502,8 @@ BalsaMailboxNode *
 balsa_mailbox_node_new_from_dir(const gchar* dir)
 {
     BalsaMailboxNode *mbn;
-    gchar *tmppath;
 
     mbn = BALSA_MAILBOX_NODE(balsa_mailbox_node_new());
-
-    /* FIXME: Balsa now uses the `exposed' state of mailboxes to set
-     * initial expansion. This code is kept only for the transition
-     * after an upgrade. All "%s/.expanded" files are removed when Balsa
-     * exits. */
-    tmppath = g_strdup_printf("%s/.expanded", dir);
-    mbn->expanded = (access(tmppath, F_OK) != -1);
-    g_free(tmppath);
 
     mbn->name = g_strdup(dir);
     mbn->dir  = g_strdup(dir);
@@ -689,16 +678,9 @@ balsa_mailbox_node_rescan(BalsaMailboxNode * mn)
     gnode = balsa_find_mbnode(balsa_app.mailbox_nodes, mn);
 
     if(gnode) {
-	/* the expanded state needs to be preserved; it would 
-	   be reset when all the children are removed */
-	gboolean expanded = mn->expanded;
 	balsa_remove_children_mailbox_nodes(gnode);
 	balsa_mailbox_node_append_subtree(mn, gnode);
-	mn->expanded = expanded;
         mn->scanned = TRUE;
-        if (expanded)
-            /* if this is an IMAP node, we must scan the children */
-	    mblist_scan_mailbox_node(balsa_app.mblist, mn);
     } else {
         g_warning("folder node %s (%p) not found in hierarchy.\n",
 		     mn->name, mn);
@@ -973,6 +955,11 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
     if (mbnode->mailbox || mbnode->config_prefix)
 	add_menu_entry(menu, _("_Delete"), 
                        G_CALLBACK(mb_del_cb),  mbnode);
+    if (g_signal_has_handler_pending(G_OBJECT(mbnode),
+		                     balsa_mailbox_node_signals
+				     [APPEND_SUBTREE], 0, FALSE))
+	add_menu_entry(menu, _("_Rescan"),
+		       GTK_SIGNAL_FUNC(mb_rescan_cb), mbnode);
 
     
     if (mbnode->mailbox) {
@@ -982,9 +969,6 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
                            GTK_SIGNAL_FUNC(mb_subscribe_cb),   mbnode);
 	    add_menu_entry(menu, _("_Unsubscribe"), 
                            GTK_SIGNAL_FUNC(mb_unsubscribe_cb), mbnode);
-	    add_menu_entry(menu, _("_Rescan"),	   
-                           GTK_SIGNAL_FUNC(mb_rescan_cb),      mbnode);
-	    add_menu_entry(menu, NULL, NULL, mbnode);
 	}
 	
 	if(mbnode->mailbox != balsa_app.inbox)
@@ -1002,9 +986,6 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
 	/* FIXME : No test on mailbox type is made yet, should we ? */
 	add_menu_entry(menu, _("_Edit/Apply filters"), 
                        GTK_SIGNAL_FUNC(mb_filter_cb), mbnode);
-    } else {
-	add_menu_entry(menu, _("_Rescan"),   
-                       GTK_SIGNAL_FUNC(mb_rescan_cb), mbnode);
     }
 
     return menu;

@@ -72,7 +72,6 @@ struct _BalsaMailboxNode {
     gchar* dir;      
     int remote:1;   /* is dirname or server field used in data union.
 		     * If there is a need for more types, make a subclass. */
-    int expanded:1; 
     /* mailbox data */
     LibBalsaServer * server; /* Used only by remote; is referenced */
     gboolean subscribed;     /* Used only by remote */

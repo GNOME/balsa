@@ -72,7 +72,6 @@ static GtkTreeViewClass *parent_class = NULL;
 
 /* class methods */
 static void bmbl_class_init(BalsaMBListClass * klass);
-static void bmbl_destroy(GtkObject * obj);
 static void bmbl_set_property(GObject * object, guint prop_id,
                               const GValue * value, GParamSpec * pspec);
 static void bmbl_get_property(GObject * object, guint prop_id,
@@ -95,9 +94,6 @@ static void bmbl_tree_expand(GtkTreeView * tree_view, GtkTreeIter * iter,
                              GtkTreePath * path, gpointer data);
 static void bmbl_tree_collapse(GtkTreeView * tree_view, GtkTreeIter * iter,
                                GtkTreePath * path, gpointer data);
-static void bmbl_child_toggled_cb(GtkTreeModel * model, GtkTreePath * path,
-				  GtkTreeIter * iter,
-				  GtkTreeView * tree_view);
 static gint bmbl_row_compare(GtkTreeModel * model,
                              GtkTreeIter * iter1,
                              GtkTreeIter * iter2, gpointer data);
@@ -180,9 +176,6 @@ bmbl_class_init(BalsaMBListClass * klass)
     o_class->set_property = bmbl_set_property;
     o_class->get_property = bmbl_get_property;
 
-    /* GtkObject signals */
-    object_class->destroy = bmbl_destroy;
-
     /* GtkWidget signals */
     widget_class->drag_motion = bmbl_drag_motion;
     widget_class->popup_menu = bmbl_popup_menu;
@@ -192,23 +185,6 @@ bmbl_class_init(BalsaMBListClass * klass)
                                     g_param_spec_boolean
                                     ("show_content_info", NULL, NULL,
                                      FALSE, G_PARAM_READWRITE));
-}
-
-static void
-bmbl_destroy(GtkObject * obj)
-{
-    GtkTreeView *tree_view = GTK_TREE_VIEW(obj);
-    GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
-    BalsaMBList *mblist = BALSA_MBLIST(obj);
-
-    if (mblist->toggled_handler_id) {
-        g_signal_handler_disconnect(G_OBJECT(model),
-                                    mblist->toggled_handler_id);
-        mblist->toggled_handler_id = 0;
-    }
-
-    /* chain up ... */
-    GTK_OBJECT_CLASS(parent_class)->destroy(obj);
 }
 
 static void
@@ -384,10 +360,6 @@ bmbl_init(BalsaMBList * mblist)
                            G_CALLBACK(bmbl_tree_expand), NULL);
     g_signal_connect(G_OBJECT(tree_view), "row-collapsed",
                      G_CALLBACK(bmbl_tree_collapse), NULL);
-    mblist->toggled_handler_id =
-        g_signal_connect(G_OBJECT(store), "row-has-child-toggled",
-                         G_CALLBACK(bmbl_child_toggled_cb),
-                         tree_view);
 
     g_object_set(G_OBJECT(mblist),
                  "show_content_info",
@@ -480,13 +452,8 @@ balsa_mblist_new()
 
 /* callbacks */
 
-/* bmbl_tree_expand
- * bmbl_tree_collapse
- *
- * These are callbacks that sets the expanded flag on the mailbox node, we use
- * this to save whether the folder was expanded or collapsed between
- * sessions. 
- * */
+/* "row-expanded" */
+
 static void
 bmbl_tree_expand(GtkTreeView * tree_view, GtkTreeIter * iter,
                     GtkTreePath * path, gpointer data)
@@ -496,7 +463,6 @@ bmbl_tree_expand(GtkTreeView * tree_view, GtkTreeIter * iter,
     GtkTreeIter child_iter;
 
     gtk_tree_model_get(model, iter, MBNODE_COLUMN, &mbnode, -1);
-    mbnode->expanded = TRUE;
     balsa_mailbox_node_scan_children(mbnode);
 
     if (!mbnode->mailbox)
@@ -516,11 +482,18 @@ bmbl_tree_expand(GtkTreeView * tree_view, GtkTreeIter * iter,
 	    current_index ?
 	    BALSA_INDEX(current_index)->mailbox_node->mailbox :
 	    NULL;
+	gboolean first_mailbox = TRUE;
+
         do {
             gtk_tree_model_get(model, &child_iter,
                                MBNODE_COLUMN, &mbnode, -1);
             if (mbnode && mbnode->mailbox) {
-		libbalsa_mailbox_set_exposed(mbnode->mailbox, TRUE);
+		/* Mark only one mailbox as exposed. */
+		if (first_mailbox) {
+		    libbalsa_mailbox_set_exposed(mbnode->mailbox, TRUE);
+		    first_mailbox = FALSE;
+		} else
+		    libbalsa_mailbox_set_exposed(mbnode->mailbox, FALSE);
 		if (mbnode->mailbox == current_mailbox) {
 		    GtkTreeSelection *selection =
 			gtk_tree_view_get_selection(tree_view);
@@ -538,6 +511,7 @@ bmbl_tree_expand(GtkTreeView * tree_view, GtkTreeIter * iter,
     }
 }
 
+/* "row-collapsed" */
 static void
 bmbl_tree_collapse_helper(GtkTreeModel * model, GtkTreeIter * iter)
 {
@@ -565,7 +539,6 @@ bmbl_tree_collapse(GtkTreeView * tree_view, GtkTreeIter * iter,
     BalsaMailboxNode *mbnode;
 
     gtk_tree_model_get(model, iter, MBNODE_COLUMN, &mbnode, -1);
-    mbnode->expanded = FALSE;
 
     if (!mbnode->mailbox)
         gtk_tree_store_set(GTK_TREE_STORE(model), iter,
@@ -578,34 +551,6 @@ bmbl_tree_collapse(GtkTreeView * tree_view, GtkTreeIter * iter,
     g_object_unref(mbnode);
 
     bmbl_tree_collapse_helper(model, iter);
-}
-
-/*
- * bmbl_child_toggled_cb: callback for the
- * "row-has-child-toggled" signal.
- *
- * If the mbnode is supposed to be expanded, and the row now has a
- * child, we can actually expand it.
- */
-static void
-bmbl_child_toggled_cb(GtkTreeModel * model, GtkTreePath * path,
-		      GtkTreeIter * iter, GtkTreeView * tree_view)
-{
-    BalsaMailboxNode *mbnode;
-
-    gtk_tree_model_get(model, iter, MBNODE_COLUMN, &mbnode, -1);
-    if (gtk_tree_model_iter_has_child(model, iter)) {
-	if (mbnode->expanded
-	    && !gtk_tree_view_row_expanded(tree_view, path)) {
-#if GTK_CHECK_VERSION(2, 2, 0)
-	    gtk_tree_view_expand_to_path(tree_view, path);
-#else
-	    gtk_tree_view_expand_row(tree_view, path, FALSE);
-#endif
-	}
-    } else
-	mbnode->expanded = FALSE;
-    g_object_unref(mbnode);
 }
 
 /* bmbl_row_compare
@@ -1213,6 +1158,7 @@ bmbl_store_redraw_mbnode(GtkTreeIter * iter, BalsaMailboxNode * mbnode)
 {
     const gchar *in;
     gchar *name;
+    gboolean expose = FALSE;
 
     g_return_val_if_fail(mbnode, FALSE);
 
@@ -1257,14 +1203,18 @@ bmbl_store_redraw_mbnode(GtkTreeIter * iter, BalsaMailboxNode * mbnode)
 	    mailbox_changed_signal =
 		g_signal_lookup("changed", LIBBALSA_TYPE_MAILBOX);
 	if (!g_signal_has_handler_pending(G_OBJECT(mbnode->mailbox),
-                                          mailbox_changed_signal, 0, TRUE))
+                                          mailbox_changed_signal, 0, TRUE)) {
+	    /* Now we have a mailbox: */
 	    g_signal_connect(mbnode->mailbox, "changed",
 			     G_CALLBACK(bmbl_mailbox_changed_cb),
 			     balsa_app.mblist_tree_store);
+	    /* If necessary, expand rows to expose this mailbox after
+	     * setting its mbnode in the tree-store. */
+	    expose = libbalsa_mailbox_get_exposed(mbnode->mailbox);
+	}
     } else {
 	/* new directory, but not a mailbox */
-        in = mbnode->expanded ? BALSA_PIXMAP_MBOX_DIR_OPEN :
-            BALSA_PIXMAP_MBOX_DIR_CLOSED;
+	in = BALSA_PIXMAP_MBOX_DIR_CLOSED;
         name = g_path_get_basename(mbnode->name);
     }
 
@@ -1281,9 +1231,17 @@ bmbl_store_redraw_mbnode(GtkTreeIter * iter, BalsaMailboxNode * mbnode)
                        TOTAL_COLUMN,  "",
                        -1);
     g_free(name);
-    if (mbnode->mailbox)
-	bmbl_node_style(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
-			iter, -1);    
+
+    if (mbnode->mailbox) {
+	GtkTreeModel *model = GTK_TREE_MODEL(balsa_app.mblist_tree_store);
+	if (expose) {
+	    GtkTreePath *path = gtk_tree_model_get_path(model, iter);
+	    bmbl_expand_to_row(balsa_app.mblist, path);
+	    gtk_tree_path_free(path);
+	}
+	bmbl_node_style(model, iter, -1);
+    }
+
     return TRUE;
 }
 
@@ -2119,33 +2077,16 @@ balsa_mblist_mailbox_node_append(BalsaMailboxNode * root,
     GtkTreeModel *model;
     GtkTreeIter parent;
     GtkTreeIter *parent_iter = NULL;
-    gboolean first_child = FALSE;
     GtkTreeIter iter;
 
     if (is_sub_thread)
 	gdk_threads_enter();
 
     model = GTK_TREE_MODEL(balsa_app.mblist_tree_store);
-    if (root && balsa_find_iter_by_data(&parent, root)) {
+    if (root && balsa_find_iter_by_data(&parent, root))
 	parent_iter = &parent;
-	/* If this is the first child row for the parent, we'll signal
-	 * the parent after the row is drawn. */
-	first_child = !gtk_tree_model_iter_has_child(model, parent_iter);
-	if (first_child)
-	    g_signal_handler_block(balsa_app.mblist_tree_store,
-				   balsa_app.mblist->toggled_handler_id);
-    }
     gtk_tree_store_append(balsa_app.mblist_tree_store, &iter, parent_iter);
-
     bmbl_store_redraw_mbnode(&iter, mbnode);
-
-    if (first_child) {
-	GtkTreePath *path = gtk_tree_model_get_path(model, parent_iter);
-	g_signal_handler_unblock(balsa_app.mblist_tree_store,
-				 balsa_app.mblist->toggled_handler_id);
-	gtk_tree_model_row_has_child_toggled(model, path, parent_iter);
-	gtk_tree_path_free(path);
-    }
 
     /* The tree-store owns mbnode. */
     g_object_unref(mbnode);

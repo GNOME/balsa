@@ -94,10 +94,6 @@ static GnomeUIInfo file_menu[] =
 
   GNOMEUIINFO_SEPARATOR,
 
-  GNOMEUIINFO_MENU_PREFERENCES_ITEM(open_preferences_manager, NULL),
-
-  GNOMEUIINFO_SEPARATOR,
-
   GNOMEUIINFO_MENU_EXIT_ITEM(close_main_window, NULL), 
 
   GNOMEUIINFO_END
@@ -167,6 +163,8 @@ static GnomeUIInfo settings_menu[] =
 {
   GNOMEUIINFO_ITEM_STOCK ("_Filters...", NULL, filter_dlg_cb, GNOME_STOCK_MENU_PROP),
 
+  GNOMEUIINFO_MENU_PREFERENCES_ITEM(open_preferences_manager, NULL),
+
   GNOMEUIINFO_END
 };
 static GnomeUIInfo help_menu[] =
@@ -182,7 +180,7 @@ static GnomeUIInfo main_menu[] =
   GNOMEUIINFO_MENU_FILE_TREE(file_menu),
   GNOMEUIINFO_SUBTREE ("_Message", message_menu),
   GNOMEUIINFO_SUBTREE ("Mail_boxes", mailbox_menu),
-  GNOMEUIINFO_SUBTREE ("_Settings", settings_menu),
+  GNOMEUIINFO_MENU_SETTINGS_TREE(settings_menu),
   GNOMEUIINFO_MENU_HELP_TREE(help_menu),
   GNOMEUIINFO_END
 };

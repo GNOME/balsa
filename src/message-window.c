@@ -189,6 +189,8 @@ message_window_new(LibBalsaMessage * message)
 
     mw->window = gnome_app_new("balsa", "Message");
 
+    gtk_window_set_wmclass(GTK_WINDOW(mw->window), "message", "Balsa");
+
     gtk_signal_connect(GTK_OBJECT(mw->window),
 		       "destroy",
 		       GTK_SIGNAL_FUNC(destroy_message_window), mw);

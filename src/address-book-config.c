@@ -101,6 +101,7 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
     gnome_dialog_set_parent(GNOME_DIALOG(abc->window),
 			    GTK_WINDOW(balsa_app.main_window));
     gnome_dialog_close_hides(GNOME_DIALOG(abc->window), TRUE);
+    gtk_window_set_wmclass(GTK_WINDOW(abc->window), "address_book_config_dialog", "Balsa");
 
     abc->notebook = gtk_notebook_new();
     gtk_container_set_border_width(GTK_CONTAINER(abc->window), 5);

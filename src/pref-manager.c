@@ -226,7 +226,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
     gtk_window_set_title(GTK_WINDOW(property_box), _("Balsa Preferences"));
     gtk_window_set_policy(GTK_WINDOW(property_box), FALSE, FALSE, FALSE);
-
+    gtk_window_set_wmclass(GTK_WINDOW(property_box), "preferences", "Balsa");
     gnome_dialog_set_parent(GNOME_DIALOG(property_box),
 			    GTK_WINDOW(active_win));
     gtk_object_set_data(GTK_OBJECT(property_box), "balsawindow",

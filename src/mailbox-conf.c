@@ -199,6 +199,7 @@ mailbox_conf_new(GtkType mailbox_type)
 
     mcw->window = gnome_dialog_new(_("Mailbox Configurator"),
 				   NULL);
+    gtk_window_set_wmclass(GTK_WINDOW(mcw->window), "mailbox_config_dialog", "Balsa");
 
     gnome_dialog_close_hides(GNOME_DIALOG(mcw->window), TRUE);
 
@@ -253,6 +254,7 @@ mailbox_conf_edit(LibBalsaMailbox *mailbox)
 
     mcw->window = gnome_dialog_new(_("Mailbox Configurator"), 
 				   NULL);
+    gtk_window_set_wmclass(GTK_WINDOW(mcw->window), "mailbox_config_dialog", "Balsa");
 
     gnome_dialog_close_hides(GNOME_DIALOG(mcw->window), TRUE);
 

@@ -271,7 +271,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
     if (sending_mail == FALSE) {
 	/* We create here the progress bar */
 	send_dialog = gnome_dialog_new("Sending Mail...", "Hide", NULL);
-	
+	gtk_window_set_wmclass(GTK_WINDOW(send_dialog), "send_dialog", "Balsa");
 	gnome_dialog_set_close(GNOME_DIALOG(send_dialog), TRUE);
 	send_dialog_source = gtk_label_new("Sending Mail....");
 	gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),

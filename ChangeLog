@@ -1,5 +1,15 @@
 2000-12-22  Ian Campbell  <ijc25@cam.ac.uk>
 
+	* libbalsa/send.c
+	* src/address-book-config.c:
+	* src/mailbox-conf.c:
+	* src/main-window.c:
+	* src/message-window.c:
+	* src/pref-manager.c:
+	Set wmclass for a bunch of windows to useful values.
+
+2000-12-22  Ian Campbell  <ijc25@cam.ac.uk>
+
 	* libbalsa/mailbox_local.[ch]: New signal "remove-files".
 	* libbalsa/mailbox_mbox.c: Implement "remove-files".
 	* libbalsa/mailbox_mh.c: Implement "remove-files".

@@ -1266,6 +1266,8 @@ check_new_messages_cb(GtkWidget * widget, gpointer data)
 
 	progress_dialog =
 	    gnome_dialog_new("Checking Mail...", "Hide", NULL);
+	gtk_window_set_wmclass(GTK_WINDOW(progress_dialog), "progress_dialog", "Balsa");
+
 	if (balsa_app.main_window)
 	    gnome_dialog_set_parent(GNOME_DIALOG(progress_dialog),
 				    GTK_WINDOW(balsa_app.main_window));

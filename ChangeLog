@@ -1,3 +1,8 @@
+2003-12-08 22:32  PeterB
+
+	* src/message-window.c: Set a new message in the same
+	message-window, instead of destroying it and creating a new one.
+
 2003-12-07 19:27  PeterB
 
 	* src/message-window.c: Manage sensitivity of next-unread toolbar

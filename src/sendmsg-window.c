@@ -234,7 +234,7 @@ struct SendLocales {
     {"he_IL", "UTF-8",         N_("_Hebrew")},
     {"hu_HU", "ISO-8859-2",    N_("_Hungarian")},
     {"it_IT", "ISO-8859-15",   N_("_Italian")},
-    {"ja_JP", "euc-jp",        N_("_Japanese")},
+    {"ja_JP", "ISO-2022-JP",   N_("_Japanese (JIS)")},
     {"ko_KR", "euc-kr",        N_("_Korean")},
     {"lv_LV", "ISO-8859-13",   N_("_Latvian")},
     {"lt_LT", "ISO-8859-13",   N_("_Lithuanian")},

@@ -102,22 +102,6 @@ folder_conf_response(GtkDialog * dialog, int response,
         cdd->ok(cdd);
         /* Fall over */
     default:
-#ifdef FIXME
-        /* We cannot destroy widget in response handler!  This may way
-        * work with one version of GTK and won't with other. */
-        gtk_widget_destroy(GTK_WIDGET(cdd->dialog));
-        cdd->dialog = NULL;
-        if (cdd->mbnode)
-            /* Clearing the data signifies that the dialog has been
-             * destroyed. It also triggers a call to
-             * folder_conf_destroy_cdd. */
-            g_object_set_data(G_OBJECT(cdd->mbnode),
-                              BALSA_FOLDER_CONF_IMAP_KEY, NULL);
-        else
-            /* Cancelling, without creating a mailbox node. Nobody owns
-             * the xDialogData, so we'll free it here. */
-            g_free(cdd);
-#endif
         break;
     }
 }
@@ -207,6 +191,19 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
     }
 }
 
+static void
+folder_cleanup_key(GObject *dialog, BalsaMailboxNode *mn)
+{
+    CommonDialogData *cdd = 
+        g_object_get_data(G_OBJECT(mn),
+                          BALSA_FOLDER_CONF_IMAP_KEY);
+    if(cdd) {
+        cdd->dialog = NULL; /* dialog has already been destroyed */
+        /* set data will call folder_conf_destroy_cdd(cdd); */
+        g_object_set_data(G_OBJECT(mn),
+                          BALSA_FOLDER_CONF_IMAP_KEY, NULL);
+    }
+}
 
 /* folder_conf_imap_node:
    show the IMAP Folder configuration dialog for given mailbox node.
@@ -220,6 +217,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     static FolderDialogData *fcw_new;
     LibBalsaServer *s;
     gchar *default_server;
+    int response;
 
     /* Allow only one dialog per mailbox node, and one with mn == NULL
      * for creating a new folder. */
@@ -246,11 +244,13 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
                     GTK_STOCK_HELP, GTK_RESPONSE_HELP, NULL));
     gtk_window_set_wmclass(GTK_WINDOW(fcw->dialog), 
 			   "folder_config_dialog", "Balsa");
-    if (mn)
+    if (mn) {
+        g_signal_connect(G_OBJECT(fcw->dialog), "destroy",
+                         (GCallback)folder_cleanup_key, mn);
         g_object_set_data_full(G_OBJECT(mn),
                                BALSA_FOLDER_CONF_IMAP_KEY, fcw, 
                                (GDestroyNotify) folder_conf_destroy_cdd);
-    else {
+    } else {
         fcw_new = fcw;
         g_object_add_weak_pointer(G_OBJECT(fcw->dialog),
                                   (gpointer) &fcw_new);
@@ -314,9 +314,12 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
                                     : GTK_RESPONSE_CANCEL);
     gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 0);
 
-    g_signal_connect(G_OBJECT(fcw->dialog), "response",
-                     G_CALLBACK(folder_conf_response), fcw);
-    gtk_widget_show_all(GTK_WIDGET(fcw->dialog));
+    do {
+        folder_conf_response(fcw->dialog, 
+                             response = gtk_dialog_run(fcw->dialog),
+                             (CommonDialogData*)fcw);
+    } while(response == GTK_RESPONSE_HELP);
+    gtk_widget_destroy(GTK_WIDGET(fcw->dialog));
 }
 
 /* folder_conf_imap_sub_node:
@@ -396,7 +399,6 @@ browse_button_response(GtkDialog * dialog, gint response,
     }
 
     gtk_widget_set_sensitive(bbd->button, TRUE);
-    gtk_widget_destroy(GTK_WIDGET(dialog));
 }
 
 static gboolean
@@ -487,9 +489,12 @@ browse_button_cb(GtkWidget * widget, SubfolderDialogData * sdd)
     /* OK button is insensitive until some row is selected. */
     gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog),
                                       GTK_RESPONSE_OK, FALSE);
-    g_signal_connect(G_OBJECT(dialog), "response",
-                     G_CALLBACK(browse_button_response), bbd);
+
     gtk_widget_show_all(GTK_WIDGET(dialog));
+    browse_button_response(GTK_DIALOG(dialog),
+                           gtk_dialog_run(GTK_DIALOG(dialog)),
+                           bbd);
+    gtk_widget_destroy(dialog);
 }
 
 static void
@@ -609,6 +614,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     GtkWidget *frame, *table, *subtable, *button, *label;
     SubfolderDialogData *sdd;
     static SubfolderDialogData *sdd_new = NULL;
+    int response;
 
     /* Allow only one dialog per mailbox node, and one with mn == NULL
      * for creating a new subfolder. */
@@ -653,11 +659,13 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     gtk_window_set_wmclass(GTK_WINDOW(sdd->dialog), 
 			   "subfolder_config_dialog", "Balsa");
 
-    if (sdd->mbnode)
+    if (sdd->mbnode) {
+        g_signal_connect(G_OBJECT(sdd->dialog), "destroy",
+                         (GCallback)folder_cleanup_key, sdd->mbnode);
         g_object_set_data_full(G_OBJECT(sdd->mbnode),
                                BALSA_FOLDER_CONF_IMAP_KEY, sdd, 
                                (GDestroyNotify) folder_conf_destroy_cdd);
-    else {
+        } else {
         sdd_new = sdd;
         g_object_add_weak_pointer(G_OBJECT(sdd->dialog),
                                   (gpointer) &sdd_new);
@@ -700,9 +708,12 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     validate_sub_folder(NULL, sdd);
     gtk_widget_grab_focus(sdd->folder_name);
 
-    g_signal_connect(G_OBJECT(sdd->dialog), "response",
-                     G_CALLBACK(folder_conf_response), sdd);
-    gtk_widget_show_all(GTK_WIDGET(sdd->dialog));
+    do {
+        folder_conf_response(sdd->dialog, 
+                             response = gtk_dialog_run(sdd->dialog),
+                             (CommonDialogData*)sdd);
+    } while(response == GTK_RESPONSE_HELP);
+    gtk_widget_destroy(GTK_WIDGET(sdd->dialog));
 }
 
 void

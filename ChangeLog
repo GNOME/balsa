@@ -1,3 +1,8 @@
+2004-06-10  Pawel Salek
+
+	* src/balsa-message.c: proper msg popup menus (Albrecht Dreß).
+	* src/folder-conf.c: use gtk_dialog_run as required by spec.
+
 2004-06-08  Pawel Salek
 
 	* libbalsa/mailbox-filter.c: compile.

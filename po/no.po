@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.8.0\n"
-"POT-Creation-Date: 2000-05-07 13:40+0200\n"
+"POT-Creation-Date: 2000-05-10 09:02+0200\n"
 "PO-Revision-Date: 2000-05-07 13:42+02:00\n"
 "Last-Translator: Kjartan Maraas <kmaraas@online.no>\n"
 "Language-Team: Norwegian <no@li.org>\n"
@@ -101,8 +101,8 @@ msgstr "Ferdig!"
 msgid "Please enter information about yourself."
 msgstr "Vennligst skriv inn informasjon om deg selv."
 
-#: libinit_balsa/balsa-druid-page-user.gob:82 src/address-book.c:187
-#: src/address-book.c:422
+#: libinit_balsa/balsa-druid-page-user.gob:82 src/address-book.c:204
+#: src/address-book.c:445
 msgid "Name:"
 msgstr "Navn:"
 
@@ -174,15 +174,15 @@ msgstr "Filen med stinavn \"%s\" er ikke en katalog."
 msgid "Configure Balsa"
 msgstr "Konfigurér Balsa"
 
-#: src/address-book.c:175
+#: src/address-book.c:192
 msgid "Add New Address"
 msgstr "Legg til ny adresse"
 
-#: src/address-book.c:194
+#: src/address-book.c:211
 msgid "E-Mail Address:"
 msgstr "E-post adresse:"
 
-#: src/address-book.c:273
+#: src/address-book.c:290
 #, c-format
 msgid ""
 "Unable to open ~/.gnome/GnomeCard.gcrd for read.\n"
@@ -191,39 +191,39 @@ msgstr ""
 "Kunne ikke åpne ~/.gnome/GnomeCard.gcrd for lesing.\n"
 " - %s\n"
 
-#: src/address-book.c:276 src/sendmsg-window.c:393
+#: src/address-book.c:293 src/sendmsg-window.c:393
 msgid "OK"
 msgstr "OK"
 
-#: src/address-book.c:295
+#: src/address-book.c:312
 msgid "No-Id"
 msgstr "Ingen id"
 
-#: src/address-book.c:303
+#: src/address-book.c:320
 msgid "No-Name"
 msgstr "Uten navn"
 
-#: src/address-book.c:392 src/filter-edit-dialog.c:137
+#: src/address-book.c:415 src/filter-edit-dialog.c:137
 msgid "Name"
 msgstr "Navn"
 
-#: src/address-book.c:392
+#: src/address-book.c:415
 msgid "E-Mail Address"
 msgstr "E-post adresse"
 
-#: src/address-book.c:394 src/address-book.c:432 src/main-window.c:173
+#: src/address-book.c:417 src/address-book.c:455 src/main-window.c:173
 msgid "Address Book"
 msgstr "Adressebok"
 
-#: src/address-book.c:464
+#: src/address-book.c:487
 msgid "Send-To"
 msgstr "Send-til"
 
-#: src/address-book.c:478
+#: src/address-book.c:501
 msgid "Run GnomeCard"
 msgstr "Kjør GnomeKort"
 
-#: src/address-book.c:484
+#: src/address-book.c:507
 msgid "Re-Import"
 msgstr "Re-importer"
 

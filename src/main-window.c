@@ -113,7 +113,12 @@ open_main_window ()
   gtk_signal_connect (GTK_OBJECT (mw->mdi), "create_menus", GTK_SIGNAL_FUNC (create_menu), NULL);
   gtk_signal_connect (GTK_OBJECT (mw->mdi), "create_toolbar", GTK_SIGNAL_FUNC (create_toolbar), NULL);
 
-  gnome_mdi_set_mode (mw->mdi, GNOME_MDI_NOTEBOOK);
+  gnome_mdi_set_child_menu_path(mw->mdi, _("Mailboxes"));
+/*  gnome_mdi_set_child_list_path(mw->mdi, _("MDI"));
+*/
+  gnome_mdi_set_child_menu_label(mw->mdi, _("Mailboxes"));
+  
+  gnome_mdi_set_mode (mw->mdi, balsa_app.mdi_style);
 
   refresh_main_window ();
 }
@@ -150,11 +155,13 @@ refresh_main_window ()
    * set the toolbar style
    */
   gtk_toolbar_set_style (GTK_TOOLBAR (mw->toolbar), balsa_app.toolbar_style);
+  gnome_mdi_set_mode(mw->mdi,balsa_app.mdi_style);
 }
 
 /*
  * the menubar for the main window
  */
+
 static GtkMenuBar *create_menu (GnomeMDI * mdi)
 {
   gint i = 0;
@@ -292,8 +299,8 @@ static GtkMenuBar *create_menu (GnomeMDI * mdi)
   w = gtk_menu_item_new_with_label (_ ("Message"));
   gtk_widget_show (w);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), menu);
-  gtk_menu_item_right_justify (GTK_MENU_ITEM (w));
-  gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
+ /* gtk_menu_item_right_justify (GTK_MENU_ITEM (w));
+*/  gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
 
 
   /* Settings Menu */
@@ -341,7 +348,6 @@ static GtkMenuBar *create_menu (GnomeMDI * mdi)
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), menu);
   gtk_menu_item_right_justify (GTK_MENU_ITEM (w));
   gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
-
 
   /* HELP Menu */
   menu = gtk_menu_new ();

@@ -36,7 +36,6 @@ struct _PreferencesManagerWindow
   GtkWidget *mail_directory;
   GtkWidget *smtp_server;
 
-
   /* view */
      /* toolbar */
   GtkWidget *toolbar_text;
@@ -47,7 +46,13 @@ struct _PreferencesManagerWindow
      /* misc */
   GtkWidget *debug;
 
+  /* MDI */
+  GtkWidget *mdi_notebook;
+  GtkWidget *mdi_toplevel;
+  GtkWidget *mdi_modal;
+
   /* non-widgets */
+  guint mdi_style;
   GtkToolbarStyle toolbar_style;
 };
 static PreferencesManagerWindow *pmw = NULL;
@@ -57,6 +62,7 @@ static PreferencesManagerWindow *pmw = NULL;
 /* notebook pages */
 static GtkWidget *create_identity_page ();
 static GtkWidget *create_view_page ();
+static GtkWidget *create_mdi_page ();
 
 
 /* callbacks */
@@ -65,6 +71,7 @@ static void cancel_preferences_manager ();
 
 static void set_toolbar_style_cb (GtkWidget * widget, gpointer data);
 static void set_debug_cb (GtkWidget * widget, gpointer data);
+static void set_mdi_style_cb (GtkWidget * widget, gpointer data);
 
 
 
@@ -136,6 +143,11 @@ open_preferences_manager ()
 			    create_view_page (),
 			    label);
 
+  /* MDI page */
+  label = gtk_label_new ("MDI");
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
+			    create_mdi_page (),
+			    label);
 
   /* ok/cancel buttons (bottom dialog) */
   bbox = gtk_hbutton_box_new ();
@@ -246,6 +258,15 @@ ok_preferences_manager ()
 
 
   /*
+   * MDI page 
+   */
+  if (balsa_app.mdi_style != pmw->mdi_style)
+    {
+      balsa_app.mdi_style = pmw->mdi_style;
+      refresh_main_window ();
+    }
+
+  /*
    * close window and free memory
    */
   gtk_widget_destroy (pmw->window);
@@ -301,7 +322,26 @@ refresh_preferences_manager ()
       break;
     }
 
-    gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (pmw->debug), balsa_app.debug);
+  gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (pmw->debug), balsa_app.debug);
+
+  /*
+   * MDI
+   */
+  pmw->mdi_style = balsa_app.mdi_style;
+  switch (pmw->mdi_style)
+    {
+    case GNOME_MDI_NOTEBOOK:
+      gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (pmw->mdi_notebook), TRUE);
+      break;
+
+    case GNOME_MDI_MODAL:
+      gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (pmw->mdi_modal), TRUE);
+      break;
+
+    case GNOME_MDI_TOPLEVEL:
+      gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (pmw->mdi_toplevel), TRUE);
+      break;
+    }
 
 }
 
@@ -517,11 +557,101 @@ create_view_page ()
   return vbox;
 }
 
+/*
+ * MDI notebook page
+ */
+static GtkWidget *
+create_mdi_page ()
+{
+  GtkWidget *vbox;
+  GtkWidget *table;
+  GtkWidget *label;
+  GtkWidget *button;
+  GtkWidget *frame;
+
+
+  vbox = gtk_vbox_new (FALSE, 0);
+  gtk_container_border_width (GTK_CONTAINER (vbox), 10);
+  gtk_widget_show (vbox);
+
+  /* MDI */
+  frame = gtk_frame_new ("MDI");
+  gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
+  gtk_widget_show (frame);
+
+
+  table = gtk_table_new (2, 3, FALSE);
+  gtk_container_border_width (GTK_CONTAINER (table), 5);
+  gtk_container_add (GTK_CONTAINER (frame), table);
+  gtk_widget_show (table);
+
+
+  pmw->mdi_notebook = gtk_radio_button_new_with_label (NULL, "Notebook");
+  gtk_table_attach (GTK_TABLE (table), pmw->mdi_notebook, 0, 1, 0, 1,
+		    GTK_FILL, GTK_FILL | GTK_EXPAND, 
+		    0, 0);
+
+  gtk_object_set_user_data (GTK_OBJECT (pmw->mdi_notebook), (gpointer) pmw);
+
+  gtk_signal_connect (GTK_OBJECT (pmw->mdi_notebook),
+		      "clicked",
+		      (GtkSignalFunc) set_mdi_style_cb,
+		      (gpointer) GNOME_MDI_NOTEBOOK);
+
+  gtk_widget_show (pmw->mdi_notebook);
+  
+
+  pmw->mdi_toplevel = gtk_radio_button_new_with_label 
+    (gtk_radio_button_group (GTK_RADIO_BUTTON (pmw->mdi_notebook)), "Toplevel");
+  gtk_table_attach (GTK_TABLE (table), pmw->mdi_toplevel, 0, 1, 1, 2,
+		    GTK_FILL, GTK_FILL | GTK_EXPAND, 
+		    0, 0);
+
+  gtk_object_set_user_data (GTK_OBJECT (pmw->mdi_toplevel), (gpointer) pmw);
+
+  gtk_signal_connect (GTK_OBJECT (pmw->mdi_toplevel),
+		      "clicked",
+		      (GtkSignalFunc) set_mdi_style_cb,
+		      (gpointer) GNOME_MDI_TOPLEVEL);
+
+  gtk_widget_show (pmw->mdi_toplevel);
+
+
+  pmw->mdi_modal = gtk_radio_button_new_with_label 
+    (gtk_radio_button_group (GTK_RADIO_BUTTON (pmw->mdi_notebook)), "Modal");
+  gtk_table_attach (GTK_TABLE (table), pmw->mdi_modal, 0, 1, 2, 3,
+		    GTK_FILL, GTK_FILL | GTK_EXPAND, 
+		    0, 0);
+
+  gtk_object_set_user_data (GTK_OBJECT (pmw->mdi_modal), (gpointer) pmw);
+
+  gtk_signal_connect (GTK_OBJECT (pmw->mdi_modal),
+		      "clicked",
+		      (GtkSignalFunc) set_mdi_style_cb,
+		      (gpointer) GNOME_MDI_MODAL);
+
+  gtk_widget_show (pmw->mdi_modal);
+
+
+  return vbox;
+}
 
 
 /*
  * callbacks
  */
+static void
+set_mdi_style_cb (GtkWidget * widget, gpointer data)
+{
+  PreferencesManagerWindow *pref;
+
+  g_return_if_fail (widget != NULL);
+  
+  pref = (PreferencesManagerWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
+
+  pref->mdi_style = (guint) data;
+}
+
 static void
 set_toolbar_style_cb (GtkWidget * widget, gpointer data)
 {

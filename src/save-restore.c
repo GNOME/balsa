@@ -245,6 +245,9 @@ restore_global_settings ()
   /* debuging */
   balsa_app.debug = get_int_set_default ("debug", (gint) balsa_app.debug);
 
+  /* mdi style */
+  balsa_app.toolbar_style = get_int_set_default ("mdi style", (gint) balsa_app.mdi_style);
+
 
   /* save changes */
   gnome_config_pop_prefix ();
@@ -267,6 +270,7 @@ save_global_settings ()
   gnome_config_set_int ("main window height", (gint) balsa_app.mw_height);
   gnome_config_set_int ("toolbar style", (gint) balsa_app.toolbar_style);
   gnome_config_set_int ("debug", (gint) balsa_app.debug);
+  gnome_config_set_int ("mdi style", (gint) balsa_app.mdi_style);
 
   gnome_config_pop_prefix ();
   gnome_config_sync ();

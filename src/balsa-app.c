@@ -74,6 +74,7 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.mw_width = MW_DEFAULT_WIDTH;
   balsa_app.mw_height = MW_DEFAULT_HEIGHT;
   balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
+  balsa_app.mdi_style = GNOME_MDI_NOTEBOOK;
 
 
 

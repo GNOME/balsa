@@ -56,7 +56,7 @@ static int getLine (int fd, char *s, int len)
   *s = 0;
   return (-1);
 }
-
+#ifndef LIBMUTT
 static int getPass (void)
 {
   if (!PopPass)
@@ -70,7 +70,7 @@ static int getPass (void)
   }
   return 1;
 }
-
+#endif
 void mutt_fetchPopMail (void)
 {
   struct sockaddr_in sin;
@@ -97,9 +97,9 @@ void mutt_fetchPopMail (void)
     mutt_error ("No POP username is defined.");
     return;
   }
-    
+#ifndef LIBMUTT   
   if (!getPass ()) return;
-
+#endif
   s = socket (AF_INET, SOCK_STREAM, IPPROTO_IP);
 
   memset ((char *) &sin, 0, sizeof(sin));

@@ -55,23 +55,20 @@ extern struct BalsaApplication
 
   Mailbox *inbox;
   gchar *inbox_path;
+  GList *inbox_input; /* mailboxes such as POP3, etc that will be appending into inbox */
   Mailbox *outbox;
   gchar *outbox_path;
   Mailbox *trash;
   gchar *trash_path;
   
   GNode *mailbox_nodes;
-  GList *addressbook_list;
-
 
   /* timer for mm_exists callback */
   gint new_messages_timer;
   gint new_messages;
 
-
   /* timer for checking mail every xx minutes */
   gint check_mail_timer;
-
 
   /* GUI settings */
   gint mw_width;

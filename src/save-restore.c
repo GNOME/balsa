@@ -166,8 +166,7 @@ load_mailboxes (gchar * name)
       MAILBOX_POP3 (mailbox)->user = gnome_config_get_string ("username");
       MAILBOX_POP3 (mailbox)->passwd = gnome_config_get_string ("password");
       MAILBOX_POP3 (mailbox)->server = gnome_config_get_string ("server");
-      node = g_node_new (mailbox_node_new (mailbox->name, mailbox, FALSE));
-      g_node_append (balsa_app.mailbox_nodes, node);
+      balsa_app.inbox_input = g_list_append(balsa_app.inbox_input,mailbox);
       break;
 
       /*  IMAP  */

@@ -135,7 +135,7 @@ static Address *translate_address (ADDRESS * caddr);
 
 /* We're gonna set Mutt global vars here */
 void
-mailbox_init (gchar *inbox_path)
+mailbox_init (gchar * inbox_path)
 {
   struct utsname utsname;
   char *p;
@@ -170,6 +170,34 @@ set_imap_username (Mailbox * mb)
   ImapPass = MAILBOX_IMAP (mb)->passwd;
 
   return 1;
+}
+
+void
+check_all_pop3_hosts (Mailbox * to)
+{
+  GList *list;
+  Mailbox *mailbox;
+
+  list = g_list_first (balsa_app.inbox_input);
+
+  if (to->type != MAILBOX_MBOX)
+    return;
+
+  Spoolfile = MAILBOX_LOCAL (to)->path;
+
+  while (list)
+    {
+      mailbox = list->data;
+      PopHost = g_strdup (MAILBOX_POP3 (mailbox)->server);
+      PopPort = 110;
+      PopPass = g_strdup (MAILBOX_POP3 (mailbox)->passwd);
+      PopUser = g_strdup (MAILBOX_POP3 (mailbox)->user);
+      mutt_fetchPopMail ();
+      g_free (PopHost);
+      g_free (PopPass);
+      g_free (PopUser);
+      list = list->next;
+    }
 }
 /*
  * allocate a new mailbox
@@ -289,11 +317,11 @@ mailbox_open_ref (Mailbox * mailbox)
       break;
 
     case MAILBOX_MH:
-      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (MAILBOX_LOCAL (mailbox)->path, M_QUIET, NULL);
+      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (MAILBOX_LOCAL (mailbox)->path, 0, NULL);
       break;
 
     case MAILBOX_POP3:
-      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (MAILBOX_POP3 (mailbox)->server, M_QUIET, NULL);
+      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (MAILBOX_POP3 (mailbox)->server, 0, NULL);
       break;
 
     case MAILBOX_IMAP:
@@ -302,7 +330,7 @@ mailbox_open_ref (Mailbox * mailbox)
       g_string_append (tmp, MAILBOX_IMAP (mailbox)->server);
       g_string_append_c (tmp, '}');
       g_string_append (tmp, MAILBOX_IMAP (mailbox)->path);
-      set_imap_username(mailbox);
+      set_imap_username (mailbox);
       CLIENT_CONTEXT (mailbox) = mx_open_mailbox (tmp->str, 0, NULL);
       g_string_free (tmp, TRUE);
       break;
@@ -360,7 +388,6 @@ mailbox_open_unref (Mailbox * mailbox)
 
   UNLOCK_MAILBOX ();
 }
-
 
 gint
 mailbox_check_new_messages (Mailbox * mailbox)

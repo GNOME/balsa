@@ -241,6 +241,7 @@ typedef void (*MailboxWatcherFunc) (MailboxWatcherMessage * arg1);
 void mailbox_init (gchar *inbox);
 
 gint set_imap_username(Mailbox *mb);
+void check_all_pop3_hosts(Mailbox *);
 
 /* 
  * open and close a mailbox 

@@ -1,3 +1,8 @@
+2003-04-26  Kang Jeong-Hee  <Keizi@mail.co.kr>
+
+	* balsa.desktop: replace broken Name[ko] and Comment[ko]
+	with proper UTF-8 string.
+
 2003-04-26 06:35  PeterB
 
 	* libbalsa/folder-scanners.c: When list_inbox is specified, add

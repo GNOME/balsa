@@ -75,7 +75,7 @@ else
   AC_CHECK_FUNC(snprintf, [AC_DEFINE(HAVE_SNPRINTF)], [mutt_cv_snprintf=yes])
   AC_CHECK_FUNC(vsnprintf, [AC_DEFINE(HAVE_VSNPRINTF)], [mutt_cv_snprintf=yes])
   if test $mutt_cv_snprintf = yes; then
-    LIBOBJS="$LIBOBJS snprintf.o"
+    AC_LIBOBJ([snprintf])
   fi
 fi
 
@@ -87,33 +87,6 @@ AC_CHECK_FUNCS(strftime, break, [AC_CHECK_LIB(intl, strftime)])
 
 dnl AIX may not have fchdir()
 AC_CHECK_FUNCS(fchdir, [AC_DEFINE(HAVE_FCHDIR)], [mutt_cv_fchdir=no])
-
-
-mutt_cv_regex=yes
-AC_ARG_WITH(rx, [  --with-rx[=DIR]            Use GNU rx ],
-	[if test $withval != yes; then
-		if test -d $withval/lib; then
-			LIBS="$LIBS -L$withval/lib -lrx"
-			CPPFLAGS="-I$withval/include $CPPFLAGS"
-		else
-			LIBS="$LIBS -L$withval -lrx"
-			CPPFLAGS="-I$withval $CPPFLAGS"
-		fi
-		AC_DEFINE(USE_GNU_RX)
-		mutt_cv_regex=no
-	fi],
-	[AC_CHECK_FUNCS(regcomp, mutt_cv_regex=no)])
-
-if test $mutt_cv_regex = yes; then
-	if test -d ../rx-1.5; then
-		LIBS="$LIBS ../rx-1.5/rx/librx.a"
-		CPPFLAGS="-I../rx-1.5/rx $CPPFLAGS"
-	else
-		LIBOBJS="$LIBOBJS rx/librx.a"
-		CPPFLAGS="-I\$(srcdir)/rx $CPPFLAGS"
-	fi
-	AC_DEFINE(USE_GNU_RX)
-fi
 
 AC_ARG_WITH(homespool, [  --with-homespool[=FILE]    file in user's directory where new mail is spooled], with_homespool=${withval})
 if test x$with_homespool != x; then
@@ -224,7 +197,8 @@ AC_DEFINE(USE_SOCKET)
 LIBIMAP="-Limap -limap"
 LIBIMAPDEPS="\$(top_srcdir)/imap/imap.h imap/libimap.a"
 AM_CONDITIONAL(BUILD_IMAP, test x$need_imap = xyes)
-LIBOBJS="$LIBOBJS account.o mutt_socket.o"
+AC_LIBOBJ([account.o])
+AC_LIBOBJ([mutt_socket.o])
 
 dnl ##########################################################################
 dnl Enable GSS?

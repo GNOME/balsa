@@ -1,3 +1,7 @@
+2002-08-06  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in: build with autoconf-2.53
+
 2002-06-09  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* imap/browse.c: imap_mailbox_rename() return status.

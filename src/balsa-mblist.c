@@ -1151,33 +1151,44 @@ bmbl_store_add_mbnode(GtkTreeStore * store, GtkTreeIter * iter,
     g_return_val_if_fail(mbnode, FALSE);
 
     if (mbnode->mailbox) {
-	if (LIBBALSA_IS_MAILBOX_POP3(mbnode->mailbox)) {
+        LibBalsaMailbox *mailbox = mbnode->mailbox;
+
+	if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
 	    g_assert_not_reached();
             in = NULL;
             name = NULL;
         } else {
-	    if(mbnode->mailbox == balsa_app.draftbox)
+	    if(mailbox == balsa_app.draftbox)
 		in = BALSA_PIXMAP_MBOX_DRAFT;
-	    else if(mbnode->mailbox == balsa_app.inbox)
+	    else if(mailbox == balsa_app.inbox)
 		in = BALSA_PIXMAP_MBOX_IN;
-	    else if(mbnode->mailbox == balsa_app.outbox)
+	    else if(mailbox == balsa_app.outbox)
 		in = BALSA_PIXMAP_MBOX_OUT;
-	    else if(mbnode->mailbox == balsa_app.sentbox)
+	    else if(mailbox == balsa_app.sentbox)
 		in = BALSA_PIXMAP_MBOX_SENT;
-	    else if(mbnode->mailbox == balsa_app.trash)
+	    else if(mailbox == balsa_app.trash)
 		in = BALSA_PIXMAP_MBOX_TRASH;
 	    else
-		in = (mbnode->mailbox->new_messages > 0)
+		in = (mailbox->new_messages > 0)
 		? BALSA_PIXMAP_MBOX_TRAY_FULL
                 : BALSA_PIXMAP_MBOX_TRAY_EMPTY;
 
-            name = g_strdup(mbnode->mailbox->name);
+            name = g_strdup(mailbox->name);
+
+            /* Make sure the show column is set before showing the
+             * mailbox in the list. */
+            if (mailbox->show == LB_MAILBOX_SHOW_UNSET)
+                mailbox->show = ((   mailbox == balsa_app.sentbox
+                                  || mailbox == balsa_app.draftbox
+                                  || mailbox == balsa_app.outbox)
+                                 ? LB_MAILBOX_SHOW_TO
+                                 : LB_MAILBOX_SHOW_FROM);
 	}
-	g_signal_connect(G_OBJECT(mbnode->mailbox),
+	g_signal_connect(G_OBJECT(mailbox),
 			 "set-unread-messages-flag",
 			 G_CALLBACK(bmbl_unread_messages_changed_cb),
 			 store);
-	g_signal_connect(G_OBJECT(mbnode->mailbox),
+	g_signal_connect(G_OBJECT(mailbox),
 			 "messages-status-changed",
 			 G_CALLBACK(bmbl_messages_status_changed_cb),
 			 store);

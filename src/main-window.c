@@ -1079,8 +1079,8 @@ enable_mailbox_menus(BalsaIndex * index)
     for(i=0; i < ELEMENTS(view_menu_entries); i++)
         gtk_widget_set_sensitive(view_menu[view_menu_entries[i]].widget, enable);
 
-    if(mbnode)
-        balsa_window_set_threading_menu(mbnode->mailbox->threading_type);
+    if (mailbox)
+        balsa_window_set_threading_menu(mailbox->view->threading_type);
 }
 
 /*
@@ -1609,6 +1609,8 @@ static void register_open_mailbox(LibBalsaMailbox *m)
     balsa_app.open_mailbox_list =
         g_list_prepend(balsa_app.open_mailbox_list, m);
     UNLOCK_OPEN_LIST;
+    if (m->view)
+        m->view->open = TRUE;
 }
 static void unregister_open_mailbox(LibBalsaMailbox *m)
 {
@@ -1616,6 +1618,8 @@ static void unregister_open_mailbox(LibBalsaMailbox *m)
     balsa_app.open_mailbox_list =
         g_list_remove(balsa_app.open_mailbox_list, m);
     UNLOCK_OPEN_LIST;
+    if (m->view)
+        m->view->open = FALSE;
 }
 static gboolean is_open_mailbox(LibBalsaMailbox *m)
 {
@@ -1635,7 +1639,7 @@ show_about_box(void)
     static GtkWidget *about = NULL;
     const gchar *authors[] = {
         "Balsa Maintainers <balsa-maintainer@theochem.kth.se>:",
-        "Peter Bloomfield <PeterBloomfield@mindspring.com>",
+        "Peter Bloomfield <PeterBloomfield@bellsouth.net>",
         "Carlos Morgado <chbm@chbm.nu>",
         "Pawel Salek <pawsa@theochem.kth.se>",
         "and many others (see AUTHORS file)",

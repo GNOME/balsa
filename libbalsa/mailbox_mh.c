@@ -307,9 +307,7 @@ lbm_mh_parse_mailbox(LibBalsaMailboxMh * mh)
     if ((dir = g_dir_open(path, 0, NULL)) == NULL)
 	return;
 
-    while ((filename = g_dir_read_name(dir)) != NULL)
-    {
-	struct message_info *msg_info;
+    while ((filename = g_dir_read_name(dir)) != NULL) {
 	guint fileno;
 
 	if (lbm_mh_check_filename(filename) == FALSE)
@@ -319,20 +317,25 @@ lbm_mh_parse_mailbox(LibBalsaMailboxMh * mh)
 	if (fileno > mh->last_fileno)
 	    mh->last_fileno = fileno;
 
-	msg_info = g_hash_table_lookup(mh->messages_info,
-				       GINT_TO_POINTER(fileno));
-	if (!msg_info) {
-	    msg_info = g_new0(struct message_info, 1);
-	    g_hash_table_insert(mh->messages_info, GINT_TO_POINTER(fileno),
-		    		msg_info);
-	    g_ptr_array_add(mh->msgno_2_msg_info, msg_info);
-	    msg_info->fileno = fileno;
-	    LIBBALSA_MAILBOX(mh)->new_messages++;
+	if (mh->messages_info) {
+	    struct message_info *msg_info =
+		g_hash_table_lookup(mh->messages_info,
+				    GINT_TO_POINTER(fileno));
+	    if (!msg_info) {
+		msg_info = g_new0(struct message_info, 1);
+		g_hash_table_insert(mh->messages_info,
+				    GINT_TO_POINTER(fileno), msg_info);
+		g_ptr_array_add(mh->msgno_2_msg_info, msg_info);
+		msg_info->fileno = fileno;
+		LIBBALSA_MAILBOX(mh)->new_messages++;
+	    }
 	}
     }
     g_dir_close(dir);
-    g_ptr_array_sort(mh->msgno_2_msg_info,
-		     (GCompareFunc) lbm_mh_compare_fileno);
+
+    if (mh->msgno_2_msg_info)
+	g_ptr_array_sort(mh->msgno_2_msg_info,
+			 (GCompareFunc) lbm_mh_compare_fileno);
 }
 
 static const gchar *LibBalsaMailboxMhUnseen = "unseen:";
@@ -433,8 +436,10 @@ static void
 lbm_mh_parse_both(LibBalsaMailboxMh * mh)
 {
     lbm_mh_parse_mailbox(mh);
-    lbm_mh_parse_sequences(mh);
-    LIBBALSA_MAILBOX(mh)->total_messages = mh->msgno_2_msg_info->len;
+    if (mh->msgno_2_msg_info) {
+	lbm_mh_parse_sequences(mh);
+	LIBBALSA_MAILBOX(mh)->total_messages = mh->msgno_2_msg_info->len;
+    }
 }
 
 static void
@@ -992,6 +997,8 @@ libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
 	/* FIXME: report error ... */
 	return -1;
     }
+
+    mh->last_fileno = fileno;
 
     if (MAILBOX_OPEN(mailbox)) {
 	msg_info = g_new0(struct message_info, 1);

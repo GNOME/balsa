@@ -356,6 +356,14 @@ imap_mbox_append(ImapMboxHandle *handle, const char *mbox,
       if(s+delta>sz) delta = sz-s;
       sio_write(handle->sio, buf, delta);
     }
+
+    /* It has been though observed that "Cyrus IMAP4 v2.0.16-p1
+     * server" can hang if this isn't done under following conditions:
+     * a). TLS is enabled, b). message contains NUL characters.  NUL
+     * characters are forbidden (RFC3501, sect. 4.3.1) and we probably
+     * should make sure on a higher level that they are not sent.
+     */
+    sio_flush(handle->sio);
     sio_write(handle->sio, "\r\n", 2);
     sio_flush(handle->sio);
     do {

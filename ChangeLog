@@ -1,3 +1,8 @@
+2004-01-28  Pawel Salek
+
+	* libbalsa/imap/imap-commands.c: temporary workaround for
+	appending messages containing NUL characters.
+
 2004-01-27 22:48  PeterB
 
 	* libbalsa/pop3.c: copy uid to caller's buffer only if it's valid.

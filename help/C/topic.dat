@@ -1,7 +1,7 @@
-t1.htm	Introduction
-x24.htm	Getting Started
-x35.htm The Main Window
-x188.htm	The Preferences Window
-x244.htm	Common Tasks (How do I...)
-x277.htm	It's not Working!
-g327.htm	Glossary
+balsa.html              Introduction
+getting-started.html    Getting Started
+win-main.html           The Main Window
+win-config.html         The Preferences Window
+common-tasks.html       Common Tasks (How do I...)
+its-not-working.html    It's not Working!
+g327.htm                Glossary

@@ -42,7 +42,6 @@ struct BalsaApplication balsa_app;
 
 /* prototypes */
 static void special_mailboxes (void);
-static gint read_signature (void);
 
 
 static void
@@ -92,6 +91,7 @@ balsa_app_init (void)
    */
   balsa_app.address = address_new ();
   balsa_app.replyto = NULL;
+  balsa_app.bcc = NULL;
 
   balsa_app.local_mail_directory = NULL;
   balsa_app.signature_path = NULL;
@@ -144,7 +144,6 @@ gint
 do_load_mailboxes (void)
 {
   load_local_mailboxes ();
-  read_signature ();
   special_mailboxes ();
 
   if (!balsa_app.inbox)
@@ -170,30 +169,6 @@ do_load_mailboxes (void)
       break;
     }
 
-  return TRUE;
-}
-
-static gint
-read_signature (void)
-{
-  FILE *fp;
-  size_t len;
-
-  g_free (balsa_app.signature);
-
-  if (!(fp = fopen (balsa_app.signature_path, "r")))
-    return FALSE;
-  len = readfile (fp, &balsa_app.signature);
-  if (len != 0) {
-/*    balsa_app.signature[len - 1] = '\0'; This may strip the last 
-      character of the user's sig if it does not end with a newline.
- */
-      if( balsa_app.signature[len - 1] == '\n' ) 
-	  balsa_app.signature[len - 1] = '\0';
-      else
-	  balsa_app.signature[len] = '\0';
-  }
-  fclose (fp);
   return TRUE;
 }
 

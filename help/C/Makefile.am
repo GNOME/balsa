@@ -1,57 +1,49 @@
-#Stolen from gnorpm.
-#What's up with this naming scheme???
-
-HTML_FILES = \
-	t1.htm \
-	x24.htm \
-	x35.htm \
-	x188.htm \
-	x244.htm \
-	x277.htm \
-	x324.htm \
-	g327.htm
+SGML_FILES = \
+	balsa.sgml
 
 EXTRA_DIST = \
-	balsa.sgml		\
-	topic.dat		\
-	$(HTML_FILES)
-
-$(HTML_FILES): html-stamp
-	@short=`echo $@ |sed -e "s,^.*/,,"` ; \
-	if test ! -f "$(srcdir)/$${short}" ; then \
-		echo Warning: documentation Makefile.am needs updating: $${short} does not exist 1>&2 ; \
-		if test -z "`cat $(srcdir)/topic.dat |grep $${short}`" ; then \
-			echo Warning: topic.dat references old file $short 1>&2 ; \
- 		fi ; \
-	fi
-
-if HAVE_DB2HTML
-html-stamp: balsa.sgml
-	rm -f $(srcdir)/*.htm
-	(cd $(srcdir) && db2html balsa.sgml) 1>/dev/null
-	mv $(srcdir)/balsa/*.htm $(srcdir)
-	rm -rf $(srcdir)/balsa/
-	@for f in $(srcdir)/*.htm ; do \
-		short=`echo $$f |sed -e "s,^.*/,,"` ; \
-		if test -z "`echo "${HTML_FILES}" | grep "$${short}"`" ; then \
-			echo Warning: documentation Makefile.am needs updating: $${short} is not listed in HTML_FILES 1>&2 ; \
-		fi ; \
-	done
-	touch html-stamp
-else
-html-stamp: balsa.sgml
-	touch html-stamp
-endif
+	topic.dat
 
 if sys_install
-helpdir = $(gnomedatadir)/gnome/help/balsa/C
+balsa_helpdir = $(gnomedatadir)/gnome/help/balsa/C
 else
-helpdir = $(datadir)/gnome/help/balsa/C
+balsa_helpdir = $(datadir)/gnome/help/balsa/C
 endif
 
-help_DATA = topic.dat $(HTML_FILES)
+balsa_help_DATA = \
+	topic.dat \
+	balsa.html
 
-install-data-local:
-	-rm -f $(helpdir)/index.html
-	cd $(helpdir) ; $(LN_S) t1.html index.html || cp -f t1.html index.html
+# For now we don't use pictures but if later we use we just need to uncomment
+# the comment lines and add the images dir to CVS like the images it self
 
+all: 
+
+balsa.html: balsa/balsa.html
+	-cd $(srcdir) && cp balsa/balsa.html .
+
+balsa/balsa.html: $(SGML_FILES)
+	-cd $(srcdir) && db2html balsa.sgml
+
+dist-hook:
+	mkdir $(distdir)/balsa
+	-cp $(srcdir)/balsa/*.html $(distdir)/balsa
+	-cp $(srcdir)/balsa.html $(distdir)
+#	mkdir $(distdir)/images
+#	-cp $(srcdir)/images/*.gif $(srcdir)/images/*.jpg $(distdir)/images
+
+install-data-local: balsa.html
+#	$(mkinstalldirs) $(DESTDIR)$(balsa_helpdir)/images
+	-for file in $(srcdir)/balsa/*.html; do \
+	basefile=`basename $$file`; \
+	$(INSTALL_DATA) $$file $(DESTDIR)$(balsa_helpdir)/$$basefile; \
+	done
+#	-for file in $(srcdir)/images/*.jpg $(srcdir)/images/*.gif; do \
+#	$(INSTALL_DATA) $$file $(DESTDIR)$(balsa_helpdir)/images;\
+#	done
+
+balsa.ps: balsa.sgml
+	-db2ps $<
+
+balsa.rtf: balsa.sgml	
+	-db2rtf $<

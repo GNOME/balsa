@@ -41,6 +41,7 @@
 #include "sendmsg-window.h"
 #include "address-book.h"
 
+static gchar *read_signature (void);
 static gint send_message_cb (GtkWidget *, BalsaSendmsg *);
 static gint postpone_message_cb (GtkWidget *, BalsaSendmsg *);
 static gint attach_clicked (GtkWidget *, gpointer);
@@ -550,6 +551,7 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
   GtkWidget *window;
   GtkWidget *paned = gtk_vpaned_new ();
   gchar *newsubject = NULL;
+  gchar *signature;
 
   BalsaSendmsg *msg = NULL;
 
@@ -614,6 +616,12 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
     from = g_strdup_printf ("%s <%s>", balsa_app.address->personal, balsa_app.address->mailbox);
     gtk_entry_set_text (GTK_ENTRY (msg->from), from);
     g_free (from);
+  }
+
+  /* Bcc: */
+  {
+    if (balsa_app.bcc)
+      gtk_entry_set_text (GTK_ENTRY (msg->bcc), balsa_app.bcc);
   }
 
   /* Subject: */
@@ -784,11 +792,12 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
       message_body_unref (message);
     }
 
-  if (balsa_app.signature && type != SEND_CONTINUE) {
+  if ((signature = read_signature()) != NULL && type != SEND_CONTINUE) {
      if ( ((type == SEND_REPLY || type == SEND_REPLY_ALL) && balsa_app.sig_whenreply) ||
 	  ( (type == SEND_FORWARD) && balsa_app.sig_whenforward) ||
 	  ( (type == SEND_NORMAL) && balsa_app.sig_sending) )
-	      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, balsa_app.signature, strlen (balsa_app.signature));
+	      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, signature, strlen (signature));
+     g_free (signature);
     }
   gtk_text_set_point (GTK_TEXT (msg->text), 0);
   gtk_text_thaw (GTK_TEXT (msg->text));
@@ -807,6 +816,27 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 
   /* display the window */
   gtk_widget_show_all (window);
+}
+
+static gchar *
+read_signature (void)
+{
+  FILE *fp;
+  size_t len;
+  gchar *ret;
+
+  if (balsa_app.signature_path == NULL
+      || !(fp = fopen (balsa_app.signature_path, "r")))
+    return NULL;
+  len = readfile (fp, &ret);
+  fclose (fp);
+  if (len > 0) {
+    if (ret[len - 1] == '\n')
+      ret[len - 1] = '\0';
+    else
+      ret[len] = '\0';
+  }
+  return ret;
 }
 
 static gint

@@ -50,6 +50,7 @@ typedef struct _PropertyUI
     GtkRadioButton *pwindow_type[NUM_PWINDOW_MODES];
     GtkWidget *wordwrap;
     GtkWidget *wraplength;
+    GtkWidget *bcc;
 
 #ifdef BALSA_SHOW_INFO
     GtkWidget *mblist_show_mb_content_info;
@@ -284,6 +285,8 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 		      GTK_SIGNAL_FUNC (wrap_modified_cb), pui->pbox);
   gtk_signal_connect (GTK_OBJECT (pui->wraplength), "changed",
 		      GTK_SIGNAL_FUNC (wrap_modified_cb), pui->pbox);
+  gtk_signal_connect (GTK_OBJECT (pui->bcc), "changed",
+		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
 
   /* arp */
   gtk_signal_connect (GTK_OBJECT (pui->quote_str), "changed",
@@ -412,6 +415,9 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
   balsa_app.wordwrap = GTK_TOGGLE_BUTTON(pui->wordwrap)->active;
   balsa_app.wraplength = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(pui->wraplength));
 
+  g_free (balsa_app.bcc);
+  balsa_app.bcc = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->bcc)));
+
 
   /* arp */
   g_free (balsa_app.quote_str);
@@ -513,6 +519,9 @@ set_prefs (void)
 				balsa_app.wordwrap);
   gtk_spin_button_set_value (GTK_SPIN_BUTTON (pui->wraplength), 
 		(float) balsa_app.wraplength );
+
+  gtk_entry_set_text (GTK_ENTRY (pui->bcc),
+                      balsa_app.bcc ? balsa_app.bcc : "");
 
   gtk_widget_set_sensitive (pui->wraplength,
 			    GTK_TOGGLE_BUTTON(pui->wordwrap)->active);
@@ -909,6 +918,16 @@ create_misc_page ()
 
   pui->quote_str = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), pui->quote_str, 1, 2, 0, 1,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
+
+  /* bcc address */
+  label = gtk_label_new (_ ("Default Bcc to:"));
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 2, 3,
+		    GTK_FILL, GTK_FILL, 10, 10);
+
+  pui->bcc = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), pui->bcc, 1, 2, 2, 3,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
   gtk_box_pack_start (GTK_BOX (vbox1), GTK_WIDGET (table), TRUE, TRUE, 2);

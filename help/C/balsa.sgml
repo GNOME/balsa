@@ -1,4 +1,4 @@
-<!doctype article PUBLIC "-//Davenport//DTD DocBook V3.1//EN" []>
+<!doctype article PUBLIC "-//Davenport//DTD DocBook V3.0//EN" []>
 
 <article id="balsa">
 
@@ -249,7 +249,7 @@
 
     <para>Balsa has many more options than the initial druid reveals. To access the configuration
     window, select <guimenu>Settings</><guimenuitem>preferences</>. You will see a notebook. The
-    tabs and options are explained below</.
+    tabs and options are explained below.</>
 
     <sect2 id="cfgtab-identity">
       <title>Identity</>

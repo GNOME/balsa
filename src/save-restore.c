@@ -638,6 +638,13 @@ config_global_load (void)
   else
     balsa_app.replyto = g_strdup (field);
 
+  /* bcc field for outgoing mails */
+  g_free (balsa_app.bcc);
+  if ((field = pl_dict_get_str (globals, "Bcc")) == NULL)
+    ;  /* optional */
+  else
+    balsa_app.bcc = g_strdup (field);
+
   /* directory */
   if ((field = pl_dict_get_str (globals, "LocalMailDir")) == NULL)
     return FALSE;
@@ -845,6 +852,8 @@ config_global_save (void)
     pl_dict_add_str_str (globals, "Email", balsa_app.address->mailbox);
   if (balsa_app.replyto != NULL)
     pl_dict_add_str_str (globals, "ReplyTo", balsa_app.replyto);
+  if (balsa_app.bcc != NULL)
+    pl_dict_add_str_str (globals, "Bcc", balsa_app.bcc);
 
   if (balsa_app.local_mail_directory != NULL)
     pl_dict_add_str_str (globals, "LocalMailDir",

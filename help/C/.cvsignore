@@ -1,4 +1,6 @@
-html-stamp
 Makefile
-Makefile.am
+Makefile.in
 *~
+balsa
+balsa.junk
+balsa.html

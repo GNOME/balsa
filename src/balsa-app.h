@@ -72,6 +72,7 @@ extern struct BalsaApplication
   /* personal information */
   Address *address;
   gchar *replyto;
+  gchar *bcc;
   
   gchar *local_mail_directory;
   gchar *smtp_server;
@@ -81,7 +82,6 @@ extern struct BalsaApplication
   gboolean sig_whenforward;
   gboolean sig_whenreply;
   gchar *signature_path;
-  gchar *signature;
   
   BalsaMBList *mblist;
   

@@ -165,10 +165,6 @@ else
 fi
 AM_CONDITIONAL(USE_GOB,[test x"$BALSA_USE_GOB" = "xtrue"])
 
-dnl For the docs!
-AC_CHECK_PROG(have_db2html, db2html, true, false)
-AM_CONDITIONAL(HAVE_DB2HTML, $have_db2html)
-
 dnl Create files.
 AC_OUTPUT([
 Makefile 

@@ -701,7 +701,7 @@ balsa_window_refresh(BalsaWindow *window)
 
   /* I don't know if this is a bug of gtk or not but if this is not here
      it doesn't properly resize after a toolbar style change */
-  gtk_widget_queue_resize (GNOME_APP(balsa_window));
+  gtk_widget_queue_resize (GTK_WIDGET (balsa_window));
 }
 
 /*

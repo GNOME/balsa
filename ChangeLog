@@ -1,3 +1,32 @@
+1999-12-28  Bruno Pires Marinho  <bapm@camoes.rnl.ist.utl.pt>
+
+	* src/balsa-app.h, src/balsa-app.c, src/sendmsg-window.c: Changed
+	to read signature file every time it is needed, to let the user
+	edit the signature without restarting Balsa. (Patch from Sverre
+	H. Huseby  <sverrehu@online.no>)
+
+	* src/balsa-app.h, src/save-restore.c, src/balsa-app.c,
+	src/sendmsg-window.c, src/pref-manager.c: Added user settable
+	default Bcc field for outgoing mails. (Patch from Sverre H. Huseby
+	<sverrehu@online.no>)
+
+	* configure.in: Removed the detection of docbook since it is not
+	needed now.
+
+	* help/C/Makefile.am:
+	* help/C/topic.dat: I don't know how the .htm files show up but my
+	system generates .html files. Peter also put some section names so
+	the files changed their names. All fixed now. Also removed the
+	generated files from CVS and they are put on the distributed
+	tar.gz file when the file is built.
+
+	* help/C/balsa.sgml: Corrected the file. A > was missing and a
+	. was out of a paragraph. Also changed the file from version 3.1
+	to 3.0. More people have the old version and I think Peter doesn't
+	use any new feature off 3.1.
+
+	* help/C/.cvsignore: Makefile.am was ignored instead of Makefile.in.
+
 1999-12-27  Yuri Syrota <rasta@renome.rovno.ua>
 
 	* configure.in: added "uk" to ALL_LINGUAS.

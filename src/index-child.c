@@ -222,6 +222,9 @@ index_child_create_view (GnomeMDIChild * child)
       vpane = gtk_vpaned_new ();
 
       ic->index = balsa_index_new ();
+
+      gtk_widget_set_usize (ic->index, 1, 200);
+
       gtk_paned_add1 (GTK_PANED (vpane), ic->index);
 
       table = gtk_table_new (2, 2, FALSE);
@@ -242,7 +245,6 @@ index_child_create_view (GnomeMDIChild * child)
 
       gtk_paned_add2 (GTK_PANED (vpane), table);
       gtk_widget_set_usize (vpane, 1, 250);
-
       gtk_widget_show_all (vpane);
 
     }

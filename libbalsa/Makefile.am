@@ -73,7 +73,9 @@ libbalsa_a_SOURCES = 		\
 	send.h			\
 	server.c		\
 	server.h		\
-	source-viewer.c
+	source-viewer.c		\
+	rfc3156.c		\
+	rfc3156.h
 
 EXTRA_DIST = \
 	libbalsa-marshal.list

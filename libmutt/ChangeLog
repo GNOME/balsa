@@ -1,3 +1,7 @@
+2003-03-18  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	* protos.h, sendlib.c: add forced multipart subtype.
+
 2003-03-16  Christian Neumair  <chris@gnome-de.org>
 
 	* edit.c, main.c: Fixed unmatched quotes.

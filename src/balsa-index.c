@@ -1250,6 +1250,15 @@ bndx_set_col_images(BalsaIndex * index, GtkTreeIter * iter,
             gtk_widget_render_icon(GTK_WIDGET(index->window),
                                    BALSA_PIXMAP_INFO_ATTACHMENT,
                                    GTK_ICON_SIZE_MENU, NULL);
+#ifdef HAVE_GPGME
+    else if (libbalsa_message_is_pgp_signed(message) ||
+	     libbalsa_message_is_pgp_encrypted(message))
+	/* FIXME: provide different icons for signed and encrypted */
+        attach_pixbuf =
+            gtk_widget_render_icon(GTK_WIDGET(index->window),
+                                   BALSA_PIXMAP_INFO_LOCK,
+                                   GTK_ICON_SIZE_MENU, NULL);
+#endif
 
     gtk_tree_store_set(GTK_TREE_STORE(model), iter,
                        BNDX_STATUS_COLUMN, status_pixbuf,
@@ -2468,6 +2477,7 @@ bndx_messages_remove(BalsaIndex * index, GList * messages)
     GtkTreePath *path;
 
     g_return_if_fail(index != NULL);
+    g_return_if_fail(index->mailbox_node != NULL);
 
     if (index->mailbox_node->mailbox == NULL)
         return;

@@ -22,6 +22,8 @@
 #include <gnome.h>
 #include <gdk/gdkx.h>
 
+#include "config.h"
+
 #include "balsa-icons.h"
 
 #include "pixmaps/balsa_attachment.xpm"
@@ -66,6 +68,9 @@
 #include "pixmaps/info_flagged.xpm"
 #include "pixmaps/info_new.xpm"
 #include "pixmaps/info_attachment.xpm"
+#ifdef HAVE_GPGME
+#  include "pixmaps/info_lock.xpm"
+#endif
 
 #include "pixmaps/menu_flagged.xpm"
 #include "pixmaps/menu_new.xpm"
@@ -185,6 +190,9 @@ register_balsa_pixmaps(void)
         { BALSA_PIXMAP_INFO_REPLIED,    info_replied_xpm },
         { BALSA_PIXMAP_INFO_NEW,        info_new_xpm },
         { BALSA_PIXMAP_INFO_ATTACHMENT, info_attachment_xpm },
+#ifdef HAVE_GPGME
+        { BALSA_PIXMAP_INFO_LOCK,       info_lock_xpm },
+#endif
     };
 
     unsigned i;

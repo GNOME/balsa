@@ -1,0 +1,68 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
+/* Balsa E-Mail Client
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option) 
+ * any later version.
+ *  
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * GNU General Public License for more details.
+ *  
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
+ * 02111-1307, USA.
+ */
+
+#ifndef __RFC3156_H__
+#define __RFC3156_H__
+
+#include "config.h"
+
+#ifdef HAVE_GPGME
+
+#include <gnome.h>
+#include <gpgme.h>
+#include "libbalsa.h"
+
+#define LIBBALSA_GPG_SIGN      (1 << 0)
+#define LIBBALSA_GPG_ENCRYPT   (1 << 1)
+
+typedef struct _LibBalsaSignatureInfo LibBalsaSignatureInfo;
+
+struct _LibBalsaSignatureInfo {
+    GpgmeSigStat gpgme_status;
+    gchar *sign_name;
+    gchar *sign_email;
+    gchar *fingerprint;
+    time_t key_created;
+    time_t sign_time;
+};
+
+gboolean libbalsa_is_pgp_signed(LibBalsaMessageBody *body);
+gboolean libbalsa_is_pgp_encrypted(LibBalsaMessageBody *body);
+
+gboolean libbalsa_sign_mutt_body(MuttBody **sign_body, const gchar *rfc822_for,
+				 gchar **micalg, GtkWindow *parent);
+gboolean libbalsa_encrypt_mutt_body(MuttBody **encrypt_body,
+				    const gchar *rfc822_for);
+gboolean libbalsa_sign_encrypt_mutt_body(MuttBody **se_body,
+					 const gchar *rfc822_signer,
+					 const gchar *rfc822_for,
+					 GtkWindow *parent);
+
+gboolean libbalsa_body_check_signature(LibBalsaMessageBody *body);
+LibBalsaMessageBody *libbalsa_body_decrypt(LibBalsaMessageBody *body,
+					   GtkWindow *parent);
+
+LibBalsaSignatureInfo *libbalsa_signature_info_destroy(LibBalsaSignatureInfo* info);
+const gchar *libbalsa_gpgme_sig_stat_to_gchar(GpgmeSigStat stat);
+
+#endif /* HAVE_GPGME */
+
+#endif /* __RFC3156_GPG_H__ */

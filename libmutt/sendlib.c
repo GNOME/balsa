@@ -1469,6 +1469,7 @@ static int get_toplevel_encoding (BODY *a)
   return (e);
 }
 
+#ifndef LIBMUTT
 BODY *mutt_make_multipart (BODY *b)
 {
   BODY *new;
@@ -1484,6 +1485,24 @@ BODY *mutt_make_multipart (BODY *b)
 
   return new;
 }
+#else
+/* balsa: can force multipart subtype... */
+BODY *mutt_make_multipart (BODY *b, char *subtype)
+{
+  BODY *new;
+
+  new = mutt_new_body ();
+  new->type = TYPEMULTIPART;
+  new->subtype = safe_strdup (subtype ? subtype : "mixed");
+  new->encoding = get_toplevel_encoding (b);
+  mutt_generate_boundary (&new->parameter);
+  new->use_disp = 0;  
+  new->disposition = DISPINLINE;
+  new->parts = b;
+
+  return new;
+}
+#endif
 
 /* remove the multipart body if it exists */
 BODY *mutt_remove_multipart (BODY *b)

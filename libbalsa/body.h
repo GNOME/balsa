@@ -27,6 +27,12 @@
 
 #include <glib.h>
 
+#include "config.h"
+
+#ifdef HAVE_GPGME
+#include "rfc3156.h"
+#endif
+
 typedef enum _LibBalsaMessageBodyType LibBalsaMessageBodyType;
 
 enum _LibBalsaMessageBodyType {
@@ -51,6 +57,11 @@ struct _LibBalsaMessageBody {
     gchar *temp_filename;	/* Holds the filename of a the temporary file where this part is saved */
     gchar *charset;		/* the charset, used for sending, replying. */
     guint disposition;      /* content-disposition */
+
+#ifdef HAVE_GPGME
+    gchar *decrypt_file;        /* temp file for a decrypted body */
+    LibBalsaSignatureInfo* sig_info;  /* info about a pgp signature body */
+#endif
 
     LibBalsaMessageBody *next;	/* Next part in the message */
     LibBalsaMessageBody *parts;	/* The parts of a multipart or message/rfc822 message */

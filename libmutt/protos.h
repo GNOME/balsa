@@ -89,7 +89,12 @@ ADDRESS *mutt_parse_adrlist (ADDRESS *, const char *);
 BODY *mutt_make_file_attach (const char *);
 BODY *mutt_make_message_attach (CONTEXT *, HEADER *, int);
 BODY *mutt_remove_multipart (BODY *);
+#ifndef LIBMUTT
 BODY *mutt_make_multipart (BODY *);
+#else
+/* balsa: can force multipart subtype... */
+BODY *mutt_make_multipart (BODY *b, char *subtype);
+#endif
 BODY *mutt_new_body (void);
 BODY *mutt_parse_multipart (FILE *, const char *, long, int);
 BODY *mutt_parse_messageRFC822 (FILE *, BODY *);

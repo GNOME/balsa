@@ -27,6 +27,10 @@
 #include <stdio.h>
 #include <time.h>
 
+#ifdef HAVE_GPGME
+#include "rfc3156.h"
+#endif
+
 #if ENABLE_ESMTP
 #include <auth-client.h>
 #endif
@@ -46,6 +50,7 @@
 
 typedef struct _LibBalsaMessageClass LibBalsaMessageClass;
 typedef enum _LibBalsaMessageFlag LibBalsaMessageFlag;
+typedef enum _LibBalsaMsgCreateResult LibBalsaMsgCreateResult;
 
 enum _LibBalsaMessageFlag {
     LIBBALSA_MESSAGE_FLAG_NEW = 1 << 1,
@@ -53,6 +58,17 @@ enum _LibBalsaMessageFlag {
     LIBBALSA_MESSAGE_FLAG_REPLIED = 1 << 3,
     LIBBALSA_MESSAGE_FLAG_FLAGGED = 1 << 4
 };
+
+enum _LibBalsaMsgCreateResult {
+    LIBBALSA_MESSAGE_CREATE_OK,
+#ifdef HAVE_GPGME
+    LIBBALSA_MESSAGE_SIGN_ERROR,
+    LIBBALSA_MESSAGE_ENCRYPT_ERROR,
+#endif
+    LIBBALSA_MESSAGE_CREATE_ERROR,
+    LIBBALSA_MESSAGE_SEND_ERROR
+};
+
 
 struct _LibBalsaMessage {
     GObject object;
@@ -108,6 +124,17 @@ struct _LibBalsaMessage {
 
     /* message ID */
     gchar *message_id;
+
+#ifdef HAVE_GPGME
+    /* GPG sign and/or encrypt message */
+    guint gpg_mode;
+#endif
+
+    /* a forced multipart subtype or NULL for mixed */
+    gchar *subtype;
+
+    /* additional message content type parameters */
+    GList *parameters;
 
     /* message body */
     guint body_ref;
@@ -178,21 +205,21 @@ void libbalsa_message_append_part(LibBalsaMessage * message,
 gboolean libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read);
 void libbalsa_message_body_unref(LibBalsaMessage * message);
 
-void libbalsa_message_queue(LibBalsaMessage* message, 
-			    LibBalsaMailbox* outbox, LibBalsaMailbox* fccbox,
-			    gint encoding, gboolean flow);
+LibBalsaMsgCreateResult libbalsa_message_queue(LibBalsaMessage* message, 
+					       LibBalsaMailbox* outbox, LibBalsaMailbox* fccbox,
+					       gint encoding, gboolean flow);
 #if ENABLE_ESMTP
-gboolean libbalsa_message_send(LibBalsaMessage* message,
-			       LibBalsaMailbox* outbox,  
-			       LibBalsaMailbox* fccbox,
-			       gint encoding, gchar* smtp_server,
-			       auth_context_t smtp_authctx,
-			       gint tls_mode, gboolean flow);
+LibBalsaMsgCreateResult libbalsa_message_send(LibBalsaMessage* message,
+					      LibBalsaMailbox* outbox,  
+					      LibBalsaMailbox* fccbox,
+					      gint encoding, gchar* smtp_server,
+					      auth_context_t smtp_authctx,
+					      gint tls_mode, gboolean flow);
 #else
-gboolean libbalsa_message_send(LibBalsaMessage* message,
-			       LibBalsaMailbox* outbox,  
-			       LibBalsaMailbox* fccbox,
-			       gint encoding, gboolean flow);
+LibBalsaMsgCreateResult libbalsa_message_send(LibBalsaMessage* message,
+					      LibBalsaMailbox* outbox,  
+					      LibBalsaMailbox* fccbox,
+					      gint encoding, gboolean flow);
 #endif
 gboolean libbalsa_message_postpone(LibBalsaMessage * message,
 				   LibBalsaMailbox * draftbox,
@@ -216,6 +243,10 @@ gchar *libbalsa_message_charset(LibBalsaMessage * message);
 const gchar *libbalsa_message_body_charset(LibBalsaMessageBody * body);
 gboolean libbalsa_message_is_multipart(LibBalsaMessage * message);
 gboolean libbalsa_message_has_attachment(LibBalsaMessage * message);
+#ifdef HAVE_GPGME
+gboolean libbalsa_message_is_pgp_signed(LibBalsaMessage * message);
+gboolean libbalsa_message_is_pgp_encrypted(LibBalsaMessage * message);
+#endif
 
 GList *libbalsa_message_user_hdrs(LibBalsaMessage * message);
 GList *libbalsa_message_find_user_hdr(LibBalsaMessage * message, 

@@ -45,6 +45,11 @@ libbalsa_message_body_new(LibBalsaMessage * message)
     body->charset = NULL;
     body->disposition = DISPINLINE; /* reasonable ? */
 
+#ifdef HAVE_GPGME
+    body->decrypt_file = NULL;
+    body->sig_info = NULL;
+#endif
+
     body->next = NULL;
     body->parts = NULL;
 
@@ -67,6 +72,11 @@ libbalsa_message_body_free(LibBalsaMessageBody * body)
     g_free(body->temp_filename);
 
     g_free(body->charset);
+
+#ifdef HAVE_GPGME
+    g_free(body->decrypt_file);
+    body->sig_info = libbalsa_signature_info_destroy(body->sig_info);
+#endif
 
     libbalsa_message_body_free(body->next);
     libbalsa_message_body_free(body->parts);
@@ -184,6 +194,11 @@ libbalsa_message_body_save(LibBalsaMessageBody * body,
     FILE *stream;
     STATE s;
 
+#ifdef HAVE_GPGME
+    if (body->decrypt_file)
+	stream = fopen(body->decrypt_file, "r");
+    else
+#endif
     stream =
 	libbalsa_mailbox_get_message_stream(body->message->mailbox,
 					    body->message);

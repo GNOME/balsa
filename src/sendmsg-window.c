@@ -478,6 +478,12 @@ static GnomeUIInfo opts_menu[] = {
 #define OPTS_MENU_FORMAT_POS 1
     GNOMEUIINFO_TOGGLEITEM(N_("_Format = Flowed"), NULL, 
 			   toggle_format_cb, NULL),
+#ifdef HAVE_GPGME
+#define OPTS_MENU_SIGN_POS 2
+    GNOMEUIINFO_TOGGLEITEM(N_("_Sign Message"), NULL, NULL, NULL),
+#define OPTS_MENU_ENCRYPT_POS 3
+    GNOMEUIINFO_TOGGLEITEM(N_("_Encrypt Message"), NULL, NULL, NULL),
+#endif
     GNOMEUIINFO_END
 };
 
@@ -3210,7 +3216,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 static gint
 send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 {
-    gboolean successful = TRUE;
+    LibBalsaMsgCreateResult result;
     LibBalsaMessage *message;
     LibBalsaMailbox *fcc;
     const gchar* ctmp;
@@ -3245,24 +3251,32 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
     message = bsmsg2message(bsmsg);
     fcc = balsa_find_mailbox_by_url(bsmsg->fcc_url);
 
+#ifdef HAVE_GPGME
+    if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(opts_menu[OPTS_MENU_SIGN_POS].widget)))
+	message->gpg_mode |= LIBBALSA_GPG_SIGN;
+    if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(opts_menu[OPTS_MENU_ENCRYPT_POS].widget)))
+       message->gpg_mode |= LIBBALSA_GPG_ENCRYPT;
+    g_message("sending message with gpg mode %d", message->gpg_mode);
+#endif
+
     if(queue_only)
-	libbalsa_message_queue(message, balsa_app.outbox, fcc,
-                               balsa_app.encoding_style,
-                               bsmsg->flow);
+	result = libbalsa_message_queue(message, balsa_app.outbox, fcc,
+					balsa_app.encoding_style,
+					bsmsg->flow);
     else 
 #if ENABLE_ESMTP
-	successful = libbalsa_message_send(message, balsa_app.outbox, fcc,
-					   balsa_app.encoding_style,  
-			   		   balsa_app.smtp_server,
-			   		   balsa_app.smtp_authctx,
-                                           balsa_app.smtp_tls_mode,
-                                           bsmsg->flow);
+	result = libbalsa_message_send(message, balsa_app.outbox, fcc,
+				       balsa_app.encoding_style,  
+				       balsa_app.smtp_server,
+				       balsa_app.smtp_authctx,
+				       balsa_app.smtp_tls_mode,
+				       bsmsg->flow);
 #else
-        successful = libbalsa_message_send(message, balsa_app.outbox, fcc,
-					   balsa_app.encoding_style,
-					   bsmsg->flow); 
+        result = libbalsa_message_send(message, balsa_app.outbox, fcc,
+				       balsa_app.encoding_style,
+				       bsmsg->flow); 
 #endif
-    if (successful && bsmsg->orig_message
+    if (result == LIBBALSA_MESSAGE_CREATE_OK && bsmsg->orig_message
         && bsmsg->orig_message->mailbox) {
 	if (bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
 	    bsmsg->type == SEND_REPLY_GROUP) {
@@ -3276,7 +3290,36 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
     }
 
     g_object_unref(G_OBJECT(message));
+
+#ifdef HAVE_GPGME
+    switch (result)
+	{
+	case LIBBALSA_MESSAGE_SIGN_ERROR:
+	case LIBBALSA_MESSAGE_ENCRYPT_ERROR:
+	    {
+		gchar *err_msg;
+		GtkWidget *msgbox;
+
+		err_msg =
+		    g_strdup_printf(_("%s the message failed."),
+				    result == LIBBALSA_MESSAGE_SIGN_ERROR ?
+				    _("Signing") : _("Encrypting"));
+		msgbox = gtk_message_dialog_new(GTK_WINDOW(bsmsg->window),
+						GTK_DIALOG_MODAL,
+						GTK_MESSAGE_ERROR,
+						GTK_BUTTONS_OK,
+						err_msg);
+		gtk_dialog_run(GTK_DIALOG(msgbox));
+		gtk_widget_destroy(msgbox);
+		g_free(err_msg);
+	    }
+	    return FALSE;
+	default:
+	    gtk_widget_destroy(bsmsg->window);
+	}
+#else
     gtk_widget_destroy(bsmsg->window);
+#endif
 
     return TRUE;
 }

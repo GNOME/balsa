@@ -104,6 +104,8 @@ libbalsa_message_init(LibBalsaMessage * message)
     message->in_reply_to = NULL;
     message->user_headers = NULL;
     message->message_id = NULL;
+    message->subtype = 0;
+    message->parameters = NULL;
     message->body_ref = 0;
     message->body_list = NULL;
     message->references_for_threading = NULL;
@@ -191,6 +193,13 @@ libbalsa_message_finalize(GObject * object)
     message->in_reply_to = NULL;
     g_free(message->message_id);
     message->message_id = NULL;
+
+    g_free(message->subtype);
+    message->subtype = NULL;
+
+    g_list_foreach(message->parameters, (GFunc) g_strfreev, NULL);
+    g_list_free(message->parameters);
+    message->parameters = NULL;
 
 
     libbalsa_message_body_free(message->body_list);
@@ -881,6 +890,24 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
 }
 
 
+#ifdef HAVE_GPGME
+static const gchar *
+scan_decrypt_file(LibBalsaMessageBody *body)
+{
+    for (; body; body = body->next) {
+	if (body->decrypt_file)
+	    return body->decrypt_file;
+	if (body->parts) {
+	    const gchar *res;
+	    if ((res = scan_decrypt_file(body->parts)))
+		return res;
+	}
+    }
+    return NULL;
+}
+#endif
+
+
 void
 libbalsa_message_body_unref(LibBalsaMessage * message)
 {
@@ -891,6 +918,15 @@ libbalsa_message_body_unref(LibBalsaMessage * message)
 
    if(message->mailbox) { LOCK_MAILBOX(message->mailbox); }
    if (--message->body_ref == 0) {
+#ifdef HAVE_GPGME
+       /* find tmp files containing a decrypted body */
+       const gchar *decrypt_file = scan_decrypt_file(message->body_list);
+       if (decrypt_file) {
+	   /* FIXME: maybe we should overwrite the tmp file containing the
+	      decrypted message parts to really wipe it? */
+	   unlink(decrypt_file);
+       }
+#endif
 	libbalsa_message_body_free(message->body_list);
 	message->body_list = NULL;
    }
@@ -940,6 +976,50 @@ libbalsa_message_has_attachment(LibBalsaMessage * message)
     UNLOCK_MAILBOX(message->mailbox);
     return res;
 }
+
+#ifdef HAVE_GPGME
+gboolean 
+libbalsa_message_is_pgp_signed(LibBalsaMessage * message)
+{
+    HEADER *msg_header;
+    gboolean res;
+
+    g_return_val_if_fail(message, FALSE);
+    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
+    g_return_val_if_fail(message->mailbox, FALSE);
+    g_return_val_if_fail(CLIENT_CONTEXT(message->mailbox), FALSE);
+    g_return_val_if_fail(CLIENT_CONTEXT(message->mailbox)->hdrs, FALSE);
+
+    LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
+    msg_header = message->header;
+    res = (msg_header->content->type == TYPEMULTIPART &&
+	   g_ascii_strcasecmp("signed", msg_header->content->subtype) == 0);
+
+    UNLOCK_MAILBOX(message->mailbox);
+    return res;
+}
+
+gboolean 
+libbalsa_message_is_pgp_encrypted(LibBalsaMessage * message)
+{
+    HEADER *msg_header;
+    gboolean res;
+
+    g_return_val_if_fail(message, FALSE);
+    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
+    g_return_val_if_fail(message->mailbox, FALSE);
+    g_return_val_if_fail(CLIENT_CONTEXT(message->mailbox), FALSE);
+    g_return_val_if_fail(CLIENT_CONTEXT(message->mailbox)->hdrs, FALSE);
+
+    LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
+    msg_header = message->header;
+    res = (msg_header->content->type == TYPEMULTIPART &&
+	   g_ascii_strcasecmp("encrypted", msg_header->content->subtype) == 0);
+
+    UNLOCK_MAILBOX(message->mailbox);
+    return res;
+}
+#endif
 
 gchar *
 libbalsa_message_date_to_gchar(LibBalsaMessage * message,

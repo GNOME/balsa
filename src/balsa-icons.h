@@ -22,6 +22,8 @@
 #ifndef __BALSA_ICONS_H__
 #define __BALSA_ICONS_H__
 
+#include "config.h"
+
 #define BALSA_PIXMAP_ATTACHMENT			"balsa_attachment"
 #define BALSA_PIXMAP_NEW			"balsa_compose"
 #define BALSA_PIXMAP_CONTINUE			"balsa_continue"
@@ -85,6 +87,9 @@
 #define BALSA_PIXMAP_INFO_REPLIED               "balsa_info_replied"
 #define BALSA_PIXMAP_INFO_NEW                   "balsa_info_new"
 #define BALSA_PIXMAP_INFO_ATTACHMENT            "balsa_info_attachment"
+#ifdef HAVE_GPGME
+#  define BALSA_PIXMAP_INFO_LOCK                "balsa_info_lock"
+#endif
 
 void register_balsa_pixmaps(void);
 void balsa_icon_create(const gchar ** data, GdkPixmap ** pmap,

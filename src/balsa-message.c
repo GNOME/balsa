@@ -554,6 +554,42 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
     if(!libbalsa_message_body_ref(bm->message, TRUE)) 
 	return FALSE;
 
+#ifdef HAVE_GPGME
+    /* FIXME: not checking for body_ref == 1 leads to a crash if we have both
+     * the encrypted and the unencrypted version open as the body chain of the
+     * first one will be unref'd. */
+    if (message->body_ref == 1 && 
+	libbalsa_is_pgp_encrypted(message->body_list))
+	/* try to decrypt the message... */
+	message->body_list->parts =
+	    libbalsa_body_decrypt(message->body_list->parts, NULL);
+
+    if (libbalsa_is_pgp_signed(message->body_list)) {
+	LibBalsaSignatureInfo *checkResult;
+	gchar *sender = libbalsa_address_to_gchar(message->from, -1);
+
+	if (!message->body_list->parts->next->sig_info)
+	    libbalsa_body_check_signature(message->body_list->parts);
+	checkResult = message->body_list->parts->next->sig_info;
+
+	if (checkResult) {
+	    if (checkResult->gpgme_status == GPGME_SIG_STAT_GOOD)
+		libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+				     _("The signature of the message sent by %s with subject \"%s\" is good."), 
+				     sender, LIBBALSA_MESSAGE_GET_SUBJECT(message));
+	    else
+		libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+				     _("Checking the signature of the message sent by %s with subject \"%s\" returned:\n%s"),
+				     sender, LIBBALSA_MESSAGE_GET_SUBJECT(message),
+				     libbalsa_gpgme_sig_stat_to_gchar(checkResult->gpgme_status));
+	} else
+	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+				 _("ckecking the signature of the message sent by %s with subject \"%s\" failed with an error!"),
+				 sender, LIBBALSA_MESSAGE_GET_SUBJECT(message));
+	g_free(sender);
+    }
+#endif
+
     display_headers(bm);
     display_content(bm);
 
@@ -734,6 +770,40 @@ add_header_glist(BalsaMessage * bm, gchar * header, gchar * label,
     g_free(value);
 }
 
+#ifdef HAVE_GPGME
+static void
+add_header_sigstate(BalsaMessage * bm, LibBalsaSignatureInfo *siginfo)
+{
+    GtkTextBuffer *buffer;
+    GtkTextIter insert;
+    GtkTextTag *color_tag;
+    GdkColor sigStateCol;
+    
+    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bm->header_text));
+    gtk_text_buffer_get_iter_at_mark(buffer, &insert,
+                                     gtk_text_buffer_get_insert(buffer));
+    if (gtk_text_buffer_get_char_count(buffer))
+        gtk_text_buffer_insert(buffer, &insert, "\n", 1);
+    /* FIXME: do we want to have these colors selectable by the user? */
+    if (siginfo->gpgme_status == GPGME_SIG_STAT_GOOD) {
+	sigStateCol.red = 0x0;
+	sigStateCol.green = 0x8000;
+	sigStateCol.blue = 0x0;
+    } else {
+	sigStateCol.red = 0xf000;
+	sigStateCol.green = 0x0;
+	sigStateCol.blue = 0x0;
+    }
+    color_tag = gtk_text_buffer_create_tag(buffer, NULL,
+					   "foreground-gdk", 
+					   &sigStateCol,
+					   NULL);
+    gtk_text_buffer_insert_with_tags(buffer, &insert,
+                                     libbalsa_gpgme_sig_stat_to_gchar(siginfo->gpgme_status),
+				     -1, color_tag, NULL);
+}
+#endif
+
 static void
 display_headers(BalsaMessage * bm)
 {
@@ -796,6 +866,15 @@ display_headers(BalsaMessage * bm)
     }
     g_list_free(lst);
 
+#ifdef HAVE_GPGME
+    if (libbalsa_is_pgp_signed(message->body_list)) {
+	if (!message->body_list->parts->next->sig_info)
+	    libbalsa_body_check_signature(message->body_list->parts);
+	if (message->body_list->parts->next->sig_info)
+	    add_header_sigstate(bm, message->body_list->parts->next->sig_info);
+    }
+#endif
+
     gtk_widget_queue_resize(GTK_WIDGET(bm->header_text));
 
 }
@@ -822,9 +901,101 @@ part_info_init_audio(BalsaMessage * bm, BalsaPartInfo * info)
     part_info_init_unknown(bm, info);
 }
 
+#ifdef HAVE_GPGME
+static LibBalsaMessageBody *
+find_signature_parent(LibBalsaMessageBody *start, LibBalsaMessageBody *sigBody)
+{
+    for (; start; start = start->next) {
+	if (start->parts && start->parts->next && start->parts->next == sigBody)
+	    return start;
+	if (start->parts) {
+	    LibBalsaMessageBody *result = 
+		find_signature_parent(start->parts, sigBody);
+	    if (result)
+		return result;
+	}
+    }
+    return NULL;
+}
+
+
+static void
+part_info_init_pgp_signature(BalsaMessage * bm, BalsaPartInfo * info)
+{
+    GString *msg;
+    GtkWidget *hbox;
+    LibBalsaSignatureInfo *sig_info = info->body->sig_info;
+
+    if (!sig_info) {
+	/* the signatures of embedded messages are not yet checked */
+	LibBalsaMessageBody *prevbdy =
+	    find_signature_parent(info->body->message->body_list, info->body);
+
+	if (!prevbdy || !libbalsa_is_pgp_signed(prevbdy)) {
+	    part_info_init_unknown(bm, info);
+	    return;
+	}
+	libbalsa_body_check_signature(prevbdy->parts);
+	sig_info = info->body->sig_info;
+	if (!sig_info) {
+	    part_info_init_unknown(bm, info);
+	    return;
+	}
+    }
+
+    msg = g_string_new(libbalsa_gpgme_sig_stat_to_gchar(sig_info->gpgme_status));
+    if (sig_info->sign_name || sig_info->sign_email || sig_info->fingerprint) {
+	msg = g_string_append(msg, _("\n\nSignature details:"));
+	if (sig_info->sign_name) {
+	    g_string_append_printf(msg, _("\nSigned by: %s"),
+				   sig_info->sign_name);
+	    if (sig_info->sign_email)
+		g_string_append_printf(msg, " <%s>",
+				       sig_info->sign_email);
+	} else if (sig_info->sign_email)
+	    g_string_append_printf(msg, _("Mail address: %s"),
+				       sig_info->sign_email);
+	if (sig_info->fingerprint)
+	    g_string_append_printf(msg, _("\nKey fingerprint: %s"),
+				   sig_info->fingerprint);
+	if (sig_info->key_created) {
+	    gchar buf[128];
+	    strftime(buf, 127, balsa_app.date_string,
+		     localtime(&sig_info->key_created));
+	    g_string_append_printf(msg, _("\nKey created on: %s"), buf);
+	}
+	if (sig_info->sign_time) {
+	    gchar buf[128];
+	    strftime(buf, 127, balsa_app.date_string,
+		     localtime(&sig_info->sign_time));
+	    g_string_append_printf(msg, _("\nSigned on: %s"), buf);
+	}
+    }
+    
+    hbox = gtk_hbox_new(FALSE, 2);
+    gtk_container_set_border_width(GTK_CONTAINER(hbox), 10);
+    gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(msg->str), FALSE, FALSE, 0);
+    gtk_widget_show_all(hbox);
+    info->widget = hbox;
+    info->focus_widget = hbox;
+    info->can_display = FALSE;
+    g_string_free(msg, TRUE);
+}
+#endif
+
 static void
 part_info_init_application(BalsaMessage * bm, BalsaPartInfo * info)
 {
+#ifdef HAVE_GPGME
+    gchar *body_type = libbalsa_message_body_get_content_type(info->body);
+
+    if (!g_ascii_strcasecmp("application/pgp-signature", body_type)) {
+	part_info_init_pgp_signature(bm, info);
+	g_free(body_type);
+	return;
+    }
+    g_free(body_type);
+#endif
     g_print("TODO: part_info_init_application\n");
     part_info_init_unknown(bm, info);
 }

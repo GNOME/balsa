@@ -180,10 +180,10 @@ send_message_info_destroy(SendMessageInfo *smi)
 
 static guint balsa_send_message_real(SendMessageInfo* info);
 static void encode_descriptions(BODY * b);
-static gboolean libbalsa_create_msg(LibBalsaMessage * message,
-				    HEADER * msg, char *tempfile,
-				    gint encoding, gboolean flow,
-				    int queu);
+static LibBalsaMsgCreateResult libbalsa_create_msg(LibBalsaMessage * message,
+						   HEADER * msg, char *tempfile,
+						   gint encoding, gboolean flow,
+						   int queu);
 
 #ifdef BALSA_USE_THREADS
 void balsa_send_thread(MessageQueueItem * first_message);
@@ -387,19 +387,21 @@ write_remote_fcc(LibBalsaMailbox* fccbox, HEADER* m_msg)
    places given message in the outbox. If fcc message field is set, saves
    it to fcc mailbox as well.
 */
-void
+LibBalsaMsgCreateResult
 libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 		       LibBalsaMailbox * fccbox, gint encoding,
 		       gboolean flow)
 {
     MessageQueueItem *mqi;
+    LibBalsaMsgCreateResult result;
 
-    g_return_if_fail(message);
+    g_return_val_if_fail(message, LIBBALSA_MESSAGE_CREATE_ERROR);
 
     mqi = msg_queue_item_new(message);
     set_option(OPTWRITEBCC);
-    if (libbalsa_create_msg(message, mqi->message,
-			    mqi->tempfile, encoding, flow, 0)) {
+    if ((result = libbalsa_create_msg(message, mqi->message,
+				      mqi->tempfile, encoding, flow, 0)) ==
+	LIBBALSA_MESSAGE_CREATE_OK) {
 	libbalsa_lock_mutt();
 	mutt_write_fcc(libbalsa_mailbox_local_get_path(outbox),
 		       mqi->message, NULL, 0, NULL);
@@ -417,6 +419,8 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
     } 
     unset_option(OPTWRITEBCC);
     msg_queue_item_destroy(mqi);
+
+    return result;
 }
 
 /* libbalsa_message_send:
@@ -424,26 +428,40 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
    in given outbox.
 */
 #if ENABLE_ESMTP
-gboolean
+LibBalsaMsgCreateResult
 libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
                       LibBalsaMailbox * fccbox, gint encoding,
                       gchar * smtp_server, auth_context_t smtp_authctx,
                       gint tls_mode, gboolean flow)
 {
+    LibBalsaMsgCreateResult result = LIBBALSA_MESSAGE_CREATE_OK;
+
     if (message != NULL)
-        libbalsa_message_queue(message, outbox, fccbox, encoding, flow);
-    return libbalsa_process_queue(outbox, smtp_server, smtp_authctx,
-                                  tls_mode);
+        result = libbalsa_message_queue(message, outbox, fccbox, encoding,
+					flow);
+     if (result == LIBBALSA_MESSAGE_CREATE_OK)
+	 if (!libbalsa_process_queue(outbox, smtp_server,
+				     smtp_authctx, tls_mode))
+	     return LIBBALSA_MESSAGE_SEND_ERROR;
+ 
+     return result;
 }
 #else
-gboolean
+LibBalsaMsgCreateResult
 libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
 		      LibBalsaMailbox* fccbox, gint encoding,
 		      gboolean flow)
 {
+    LibBalsaMsgCreateResult result = LIBBALSA_MESSAGE_CREATE_OK;
+
     if (message != NULL)
-	libbalsa_message_queue(message, outbox, fccbox, encoding, flow);
-    return libbalsa_process_queue(outbox);
+ 	result = libbalsa_message_queue(message, outbox, fccbox, encoding,
+ 					flow);
+    if (result == LIBBALSA_MESSAGE_CREATE_OK)
+ 	if (!libbalsa_process_queue(outbox))
+ 	    return LIBBALSA_MESSAGE_SEND_ERROR;
+ 
+    return result;
 }
 #endif
 
@@ -563,7 +581,7 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
     for (lista = outbox->message_list; lista; lista = lista->next) {
         gint encoding;
         gboolean flow;
-        gboolean created;
+        LibBalsaMsgCreateResult created;
 
 	msg = LIBBALSA_MESSAGE(lista->data);
         if (LIBBALSA_MESSAGE_HAS_FLAG(msg,
@@ -580,7 +598,7 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
                                 new_message->tempfile, encoding, flow, 1);
         libbalsa_message_body_unref(msg);
 
-	if (!created) {
+	if (created != LIBBALSA_MESSAGE_CREATE_OK) {
 	    msg_queue_item_destroy(new_message);
 	} else {
 	    GList * messages = g_list_prepend(NULL, msg);
@@ -932,7 +950,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox)
     while (lista != NULL) {
         gint encoding;
         gboolean flow;
-        gboolean created;
+        LibBalsaMsgCreateResult created;
 
 	queu = LIBBALSA_MESSAGE(lista->data);
         if (LIBBALSA_MESSAGE_HAS_FLAG(queu,
@@ -949,7 +967,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox)
                                 new_message->tempfile, encoding, flow, 1);
         libbalsa_message_body_unref(queu);
 	
-	if (!created) {
+	if (created != LIBBALSA_MESSAGE_CREATE_OK) {
 	    msg_queue_item_destroy(new_message);
 	} else {
 	    if (mqi)
@@ -1399,7 +1417,7 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 	libbalsa_lock_mutt();
 	if (msg->content) {
 	    if (msg->content->next)
-		msg->content = mutt_make_multipart(msg->content);
+		msg->content = mutt_make_multipart(msg->content, message->subtype);
 	}
 	mutt_prepare_envelope(msg->env, FALSE);
 	encode_descriptions(msg->content);
@@ -1436,12 +1454,13 @@ libbalsa_message_postpone(LibBalsaMessage * message,
     return thereturn>=0;
 }
 
+
 /* libbalsa_create_msg:
    copies message to msg.
    PS: seems to be broken when queu == 1 - further execution of
    mutt_free_header(mgs) leads to crash.
 */ 
-static gboolean
+static LibBalsaMsgCreateResult
 libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 		    gint encoding, gboolean flow, int queu) {
     BODY *last, *newbdy;
@@ -1450,8 +1469,11 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
     MESSAGE *mensaje;
     LibBalsaMessageBody *body;
     gchar **mime_type;
-    gboolean res = TRUE;
-
+    LibBalsaMsgCreateResult res = LIBBALSA_MESSAGE_CREATE_OK;
+#ifdef HAVE_GPGME
+    gboolean can_create_rfc3156 = message->body_list != NULL;
+#endif
+      
     message2HEADER(message, msg);
     message_add_references(message, msg);
 
@@ -1511,7 +1533,16 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 		}
 	    }
 	} else if (body->buffer) {
-	    newbdy = add_mutt_body_plain(body->charset, encoding, flow);
+#ifdef HAVE_GPGME
+	    /* force quoted printable encoding if signing is requested */
+	    newbdy =
+		add_mutt_body_plain(body->charset,
+				    (message->gpg_mode & LIBBALSA_GPG_SIGN) ?
+				    ENCQUOTEDPRINTABLE : encoding, flow);
+#else
+	    newbdy =
+		add_mutt_body_plain(body->charset, encoding, flow);
+#endif
 	    if (body->mime_type) {
 		/* change the type and subtype within the mutt body */
 		gchar *type, *subtype;
@@ -1550,10 +1581,93 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 	body = body->next;
     }
     
+#ifdef HAVE_GPGME
+    if (can_create_rfc3156 && message->gpg_mode > 0) {
+	switch (message->gpg_mode)
+	    {
+	    case LIBBALSA_GPG_SIGN:   /* sign message */
+		{
+		    gchar *micalg;
+		    if (libbalsa_sign_mutt_body(&msg->content,
+						msg->env->from->mailbox, &micalg, NULL)) {
+			/* signing was successful, update the message parameters */
+			gchar **params;
+			
+			g_free(message->subtype);
+			message->subtype = g_strdup("signed");
+			
+			params = g_new(gchar *, 3);
+			params[0] = g_strdup("micalg"); 
+			params[1] = micalg;
+			params[2] = NULL;
+			message->parameters = 
+			    g_list_prepend(message->parameters, params);
+			params = g_new(gchar *, 3);
+			params[0] = g_strdup("protocol"); 
+			params[1] = g_strdup("application/pgp-signature");
+			params[2] = NULL;
+			message->parameters = 
+			    g_list_prepend(message->parameters, params);
+		    } else {
+			/* FIXME: do we have to free any resources here??? */
+			return LIBBALSA_MESSAGE_SIGN_ERROR;
+		    }
+		    break;
+		}
+	    case LIBBALSA_GPG_ENCRYPT:
+	    case LIBBALSA_GPG_ENCRYPT | LIBBALSA_GPG_SIGN:
+		/* FIXME: what to do if we have *multiple* recipients? */
+		{
+		    gboolean success;
+
+		    if (message->gpg_mode & LIBBALSA_GPG_SIGN)
+			success = 
+			    libbalsa_sign_encrypt_mutt_body(&msg->content,
+							    msg->env->from->mailbox, 
+							    msg->env->to->mailbox,
+							    NULL);
+		    else
+			success = 
+			    libbalsa_encrypt_mutt_body(&msg->content,
+						       msg->env->to->mailbox);
+			
+		    if (success) {
+			/* encryption was successful, update the message parameters */
+			gchar **params;
+			
+			g_free(message->subtype);
+			message->subtype = g_strdup("encrypted");
+			
+			params = g_new(gchar *, 3);
+			params[0] = g_strdup("protocol"); 
+			params[1] = g_strdup("application/pgp-encrypted");
+			params[2] = NULL;
+			message->parameters = 
+			    g_list_prepend(message->parameters, params);
+		    } else {
+			/* FIXME: do we have to free any resources here??? */
+			return LIBBALSA_MESSAGE_ENCRYPT_ERROR;
+		    }
+		    break;
+		}
+	    default:
+		g_error("illegal gpg_mode %d (" __FILE__ " line %d)",
+		    message->gpg_mode, __LINE__);
+	    }
+    }
+#endif
+    
     { /* scope */
+	GList *param = message->parameters;
 	libbalsa_lock_mutt();
 	if (msg->content && msg->content->next)
-	    msg->content = mutt_make_multipart(msg->content);
+	    msg->content = mutt_make_multipart(msg->content, message->subtype);
+ 	while (param) {
+ 	    gchar **vals = (gchar **)param->data;
+ 
+ 	    mutt_set_parameter(vals[0], vals[1], &msg->content->parameter);
+ 	    param = param->next;
+ 	}
 	mutt_prepare_envelope(msg->env, TRUE);
 	encode_descriptions(msg->content);
 	libbalsa_unlock_mutt();
@@ -1566,7 +1680,7 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 	mutt_mktemp(tmpfile);
 	if ((tempfp = safe_fopen(tmpfile, "w")) == NULL) {
             libbalsa_unlock_mutt();
-            return FALSE;
+            return LIBBALSA_MESSAGE_CREATE_ERROR;
         }
 
 	mutt_write_rfc822_header(tempfp, msg->env, msg->content, -1,0);
@@ -1576,14 +1690,14 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 	    fclose(tempfp);
 	    unlink(tmpfile);
             libbalsa_unlock_mutt();
-            return FALSE;
+            return LIBBALSA_MESSAGE_CREATE_ERROR;
 	}
         libbalsa_unlock_mutt();
 	fputc('\n', tempfp);	/* tie off the body. */
 	if (fclose(tempfp) != 0) {
 	    mutt_perror(tmpfile);
             unlink(tmpfile);
-            return FALSE;
+            return LIBBALSA_MESSAGE_CREATE_ERROR;
 	}
 
     } else { /* the message is in the queue */
@@ -1598,7 +1712,7 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 	mutt_mktemp(tmpfile);
 	if ((tempfp = safe_fopen(tmpfile, "w")) == NULL) {
             libbalsa_unlock_mutt();
-            return FALSE;
+            return LIBBALSA_MESSAGE_CREATE_ERROR;
         }
 	_mutt_copy_message(tempfp, mensaje->fp, msg_tmp,
 			   msg_tmp->content, 0, CH_NOSTATUS);
@@ -1606,7 +1720,7 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 	if (fclose(tempfp) != 0) {
 	    mutt_perror(tmpfile);
 	    unlink(tmpfile);
-            res = FALSE;
+            res = LIBBALSA_MESSAGE_CREATE_ERROR;
 	}
         libbalsa_unlock_mutt();
     }    

@@ -54,6 +54,10 @@
 
 #include "libinit_balsa/init_balsa.h"
 
+#ifdef HAVE_GPGME
+#include <gpgme.h>
+#endif
+
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
 
@@ -352,6 +356,11 @@ main(int argc, char *argv[])
      * is this a reasonable replacement? */
     setlocale(LC_CTYPE,
               (const char *) gnome_i18n_get_language_list(LC_CTYPE)->data);
+#endif
+
+#ifdef HAVE_GPGME
+    /* initialise the gpgme library */
+    g_message("init gpgme version %s", gpgme_check_version(NULL));
 #endif
 
 #ifdef BALSA_USE_THREADS

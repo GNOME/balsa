@@ -8,8 +8,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2003-09-06 15:56+0200\n"
-"PO-Revision-Date: 2003-09-06 15:56+0200\n"
+"POT-Creation-Date: 2003-09-07 14:44+0200\n"
+"PO-Revision-Date: 2003-09-07 14:43+0200\n"
 "Last-Translator: Strahinja Radić <mr99164@alas.matf.bg.ac.yu>\n"
 "Language-Team: Serbian (sr) <serbiangnome-lista@nongnu.org>\n"
 "MIME-Version: 1.0\n"
@@ -85,7 +85,7 @@ msgstr "Organi_zacija:"
 msgid "_Email Address:"
 msgstr "Adresa _epošte:"
 
-#: libbalsa/body.c:112
+#: libbalsa/body.c:112 libbalsa/message.c:1023
 msgid "(No subject)"
 msgstr "(bez naslova)"
 
@@ -135,6 +135,122 @@ msgstr "Greška pri odbacivanju poruka"
 #: libbalsa/filter.c:617
 msgid "Error when moving messages"
 msgstr "Greška pri premeštanju poruka"
+
+#: libbalsa/gmime-gpgme-context.c:155
+#, c-format
+msgid "Cannot sign message: could not create gpgme context: %s"
+msgstr ""
+"Ne mogu da potpišem poruku: nisam mogao da stvorim gpgme-ov kontekst: %s"
+
+#: libbalsa/gmime-gpgme-context.c:306
+#, c-format
+msgid "Cannot sign message: could not get gpgme data from istream: %s"
+msgstr ""
+"Ne mogu da potpišem poruku: nisam uspeo da dobavim podatke iz istream-a: %s"
+
+#: libbalsa/gmime-gpgme-context.c:314
+#, c-format
+msgid "Cannot sign message: gpgme could not create new data: %s"
+msgstr ""
+"Ne mogu da potpišem poruku: gpgme nije mogao da stvori nove podatke: %s"
+
+#: libbalsa/gmime-gpgme-context.c:324
+#, c-format
+msgid "Cannot sign message: gpgme signing failed: %s"
+msgstr "Ne mogu da potpišem poruku: potpisivanje gpgme-om nije uspelo: %s"
+
+#: libbalsa/gmime-gpgme-context.c:343
+#, c-format
+msgid "Cannot sign message: could not get gpgme data: %s"
+msgstr ""
+"Ne mogu da potpišem poruku: nisam mogao da dobavim gpgme-ove podatke: %s"
+
+#: libbalsa/gmime-gpgme-context.c:373
+#, c-format
+msgid ""
+"Cannot verify message signature: could not get gpgme data from istream: %s"
+msgstr ""
+"Ne mogu da proverim potpis poruke: nisam uspeo da dobavim podatke iz istream-"
+"a: %s"
+
+#: libbalsa/gmime-gpgme-context.c:382
+#, c-format
+msgid ""
+"Cannot verify message signature: could not get gpgme data from sigstream: %s"
+msgstr ""
+"Ne mogu da proverim potpis poruke: nisam uspeo da dobavim podatke iz "
+"sigstream-a: %s"
+
+#: libbalsa/gmime-gpgme-context.c:391 libbalsa/rfc3156.c:763
+#, c-format
+msgid "gpgme signature verification failed: %s"
+msgstr "provera potpisa pomoću gpgme-a nije uspela: %s"
+
+#: libbalsa/gmime-gpgme-context.c:440
+#, c-format
+msgid "Cannot encrypt message: could not create gpgme recipients set: %s"
+msgstr ""
+"Ne mogu da šifrujem poruku: nisam mogao da stvorim gpgme-ov skup primalaca: %"
+"s"
+
+#: libbalsa/gmime-gpgme-context.c:466
+#, c-format
+msgid "Cannot encrypt message: could not get gpgme data from istream: %s"
+msgstr ""
+"Ne mogu da šifrujem poruku: nisam mogao da dobavim gpgme podatke iz istream-"
+"a: %s"
+
+#: libbalsa/gmime-gpgme-context.c:475
+#, c-format
+msgid "Cannot encrypt message: gpgme could not create new data: %s"
+msgstr ""
+"Ne mogu da šifrujem poruku: gpgme nije mogao da stvori nove podatke: %s"
+
+#: libbalsa/gmime-gpgme-context.c:486
+#, c-format
+msgid "Cannot encrypt message: gpgme encryption failed: %s"
+msgstr "Ne mogu da šifrujem poruku: šifrovanje pomoću gpgme-a nije uspelo: %s"
+
+#: libbalsa/gmime-gpgme-context.c:501
+#, c-format
+msgid "Cannot encrypt message: could not get gpgme data: %s"
+msgstr ""
+"Ne mogu da šifrujem poruku: nisam mogao da dobavim gpgme-ove podatke: %s"
+
+#: libbalsa/gmime-gpgme-context.c:532
+#, c-format
+msgid "Cannot decrypt message: could not get gpgme data from istream: %s"
+msgstr ""
+"Ne mogu da dešifrujem poruku: nisam mogao da dobavim gpgme podatke iz "
+"istream-a: %s"
+
+#: libbalsa/gmime-gpgme-context.c:540
+#, c-format
+msgid "Cannot decrypt message: gpgme could not create new data: %s"
+msgstr ""
+"Ne mogu da dešifrujem poruku: gpgme nije mogao da stvori nove podatke: %s"
+
+#: libbalsa/gmime-gpgme-context.c:550
+#, c-format
+msgid "Cannot decrypt message: gpgme decrypting failed: %s"
+msgstr ""
+"Ne mogu da dešifrujem poruku: nije uspelo dešifrovanje pomoću gpgme-a: %s"
+
+#: libbalsa/gmime-gpgme-context.c:561
+#, c-format
+msgid "Cannot decrypt message: could not get gpgme data: %s"
+msgstr ""
+"Ne mogu da dešifrujem poruku: nisam mogao da dobavim gpgme-ove podatke: %s"
+
+#: libbalsa/gmime-gpgme-context.c:589 libbalsa/gmime-gpgme-context.c:644
+#, c-format
+msgid "Failed to execute gpgme: %s"
+msgstr "Nisam uspeo da izvršim gpgme: %s"
+
+#: libbalsa/gmime-gpgme-context.c:590 libbalsa/gmime-gpgme-context.c:645
+#: libmutt/mutt_ssl.c:440 src/pref-manager.c:1267 src/pref-manager.c:1366
+msgid "Unknown"
+msgstr "Nepoznato"
 
 #. should "re" be localized ?
 #: libbalsa/identity.c:88 src/balsa-index-threading.c:547
@@ -324,7 +440,7 @@ msgstr "Loša putanja lokalnog sandučeta „%s“"
 msgid "Could not create a mailbox of type %s"
 msgstr "Nisam mogao da stvorim sanduče vrste %s"
 
-#: libbalsa/mailbox_imap.c:664 libbalsa/mailbox_imap.c:1152
+#: libbalsa/mailbox_imap.c:664 libbalsa/mailbox_imap.c:1150
 #, c-format
 msgid ""
 "IMAP SEARCH command failed for mailbox %s\n"
@@ -335,12 +451,12 @@ msgstr ""
 "ili upit nije saglasan sa IMAP-om (možda koristite regularne izraze)\n"
 "vraćam se na podrazumevani način pretrage"
 
-#: libbalsa/mailbox_imap.c:821
+#: libbalsa/mailbox_imap.c:819
 #, c-format
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxImap: Otvaram %s Refbroj: %d\n"
 
-#: libbalsa/mailbox_imap.c:1019
+#: libbalsa/mailbox_imap.c:1017
 #, c-format
 msgid ""
 "IMAP SEARCH command failed for mailbox %s\n"
@@ -460,10 +576,6 @@ msgstr ""
 #, c-format
 msgid "Source mailbox (%s) is readonly. Cannot move messages"
 msgstr "Izvorno sanduče (%s) je samo za čitanje. Ne mogu da premestim poruke"
-
-#: libbalsa/message.c:1023
-msgid "(No sibject)"
-msgstr "(bez naslova)"
 
 #: libbalsa/mime.c:100 libbalsa/rfc3156.c:64
 msgid ""
@@ -691,11 +803,6 @@ msgstr "potpisivanje gpgme-om nije uspelo: %s"
 #, c-format
 msgid "could not get gpgme data: %s"
 msgstr "nisam mogao da dobavim gpgme-ove podatke: %s"
-
-#: libbalsa/rfc3156.c:763
-#, c-format
-msgid "gpgme signature verification failed: %s"
-msgstr "provera potpisa pomoću gpgme-a nije uspela: %s"
 
 #: libbalsa/rfc3156.c:900
 #, c-format
@@ -998,7 +1105,7 @@ msgstr "Istakni _naročite znake"
 msgid "Escape special and non-ASCII characters"
 msgstr "Istakni naročite znake i ne-engleske znake"
 
-#: libbalsa/source-viewer.c:206
+#: libbalsa/source-viewer.c:207
 msgid "Message Source"
 msgstr "Izvor poruke"
 
@@ -1562,6 +1669,11 @@ msgstr "Nisam mogao da ponovo otvorim sanduče!"
 msgid "Reopening mailbox..."
 msgstr "Ponovo otvaram sanduče..."
 
+#: libmutt/mh.c:608
+#, c-format
+msgid "Reading %s... %d"
+msgstr "Čitam %s... %d"
+
 #: libmutt/mutt_socket.c:85 libmutt/mutt_socket.c:141
 #, c-format
 msgid "Connection to %s closed"
@@ -1639,10 +1751,6 @@ msgstr "Ne mogu da dobavim potvrdu od premca"
 #, c-format
 msgid "SSL connection using %s (%s)"
 msgstr "SSL povezivanje uz pomoć %s (%s)"
-
-#: libmutt/mutt_ssl.c:440 src/pref-manager.c:1267 src/pref-manager.c:1366
-msgid "Unknown"
-msgstr "Nepoznato"
 
 #: libmutt/mutt_ssl.c:468
 msgid "[unable to calculate]"
@@ -1722,11 +1830,6 @@ msgstr "Izlaz  "
 #: libmutt/mutt_ssl.c:715
 msgid "Help"
 msgstr "Pomoć"
-
-#: libmutt/mh.c:608
-#, c-format
-msgid "Reading %s... %d"
-msgstr "Čitam %s... %d"
 
 #: libmutt/mx.c:119
 #, c-format
@@ -1879,6 +1982,63 @@ msgstr "Greška pri slanju poruke, dete je izašlo %d (%s)."
 msgid "Output of the delivery process"
 msgstr "Izlaz procesa slanja"
 
+#: src/ab-main.c:304 src/ab-window.c:167 src/filter-edit-dialog.c:193
+#: src/filter-export-dialog.c:88 src/filter-run-dialog.c:220
+#: src/filter-run-dialog.c:292
+msgid "Name"
+msgstr "Ime"
+
+#: src/ab-main.c:389
+msgid "F_ilter:"
+msgstr "F_ilter:"
+
+#: src/ab-window.c:175
+msgid "E-Mail Address"
+msgstr "Adresa epošte"
+
+#: src/ab-window.c:207
+msgid "Address Book"
+msgstr "Adresar"
+
+#. Entry widget for finding an address
+#: src/ab-window.c:264
+msgid "_Search for Name:"
+msgstr "_Traži ime:"
+
+#: src/ab-window.c:324
+msgid "Send-To"
+msgstr "Šalji-na"
+
+#: src/ab-window.c:344
+msgid "Run GnomeCard"
+msgstr "Pokreni GnomeCard"
+
+#: src/ab-window.c:352
+msgid "_Re-Import"
+msgstr "Ponovni uvo_z"
+
+#. mode switching stuff
+#: src/ab-window.c:362
+msgid "Treat multiple addresses as:"
+msgstr "Posmatraj više adresa kao:"
+
+#: src/ab-window.c:366
+msgid "alternative addresses for the same person"
+msgstr "alternativne adrese iste osobe"
+
+#: src/ab-window.c:371
+msgid "a distribution list"
+msgstr "spisak primalaca"
+
+#: src/ab-window.c:677
+#, c-format
+msgid ""
+"Error opening address book '%s':\n"
+"%s"
+msgstr ""
+"Greška pri pristupu adresaru „%s“\n"
+"%s"
+
 #: src/address-book-config.c:147
 msgid "Add Address Book"
 msgstr "Dodaj adresar"
@@ -2003,63 +2163,6 @@ msgstr "Putanja „%s“ nije ispravna. %s"
 #: src/address-book-config.c:665
 msgid "Do you want to correct the path?"
 msgstr "Želite li da ispravite putanju?"
-
-#: src/ab-main.c:304 src/ab-window.c:167 src/filter-edit-dialog.c:193
-#: src/filter-export-dialog.c:88 src/filter-run-dialog.c:220
-#: src/filter-run-dialog.c:292
-msgid "Name"
-msgstr "Ime"
-
-#: src/ab-main.c:389
-msgid "F_ilter:"
-msgstr "F_ilter:"
-
-#: src/ab-window.c:175
-msgid "E-Mail Address"
-msgstr "Adresa epošte"
-
-#: src/ab-window.c:207
-msgid "Address Book"
-msgstr "Adresar"
-
-#. Entry widget for finding an address
-#: src/ab-window.c:264
-msgid "_Search for Name:"
-msgstr "_Traži ime:"
-
-#: src/ab-window.c:324
-msgid "Send-To"
-msgstr "Šalji-na"
-
-#: src/ab-window.c:344
-msgid "Run GnomeCard"
-msgstr "Pokreni GnomeCard"
-
-#: src/ab-window.c:352
-msgid "_Re-Import"
-msgstr "Ponovni uvo_z"
-
-#. mode switching stuff
-#: src/ab-window.c:362
-msgid "Treat multiple addresses as:"
-msgstr "Posmatraj više adresa kao:"
-
-#: src/ab-window.c:366
-msgid "alternative addresses for the same person"
-msgstr "alternativne adrese iste osobe"
-
-#: src/ab-window.c:371
-msgid "a distribution list"
-msgstr "spisak primalaca"
-
-#: src/ab-window.c:677
-#, c-format
-msgid ""
-"Error opening address book '%s':\n"
-"%s"
-msgstr ""
-"Greška pri pristupu adresaru „%s“\n"
-"%s"
 
 #: src/balsa-app.c:73
 #, c-format
@@ -5574,6 +5677,9 @@ msgstr "Gore"
 msgid "Down"
 msgstr "Dole"
 
+#~ msgid "(No sibject)"
+#~ msgstr "(bez naslova)"
+
 #~ msgid "*** ERROR: Mailbox Stream Closed: %s ***\n"
 #~ msgstr "*** GREŠKA: Tok sandučeta je zatvoren: %s ***\n"
 
@@ -5588,9 +5694,6 @@ msgstr "Dole"
 
 #~ msgid "gpgme could not get data from mailbox file: %s"
 #~ msgstr "gpgme nije mogao da dobavi podatke iz datoteke sandučeta: %s"
-
-#~ msgid "gpgme decryption failed: %s"
-#~ msgstr "nije uspelo dešifrovanje pomoću gpgme-a: %s"
 
 #~ msgid "could not get gpgme decrypted data: %s"
 #~ msgstr "nisam uspeo da dobavim dešifrovane podatke od gpgme-a: %s"

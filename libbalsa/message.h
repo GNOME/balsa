@@ -289,8 +289,6 @@ gchar *libbalsa_message_headers_date_to_gchar(LibBalsaMessageHeaders * headers,
         libbalsa_message_headers_date_to_gchar((m)->headers,s)
 gchar *libbalsa_message_size_to_gchar(LibBalsaMessage * message,
                                       gboolean lines);
-gchar *libbalsa_message_title(LibBalsaMessage * message,
-                              const gchar * format);
 gchar **libbalsa_create_hdr_pair(const gchar * name, gchar * value);
 
 const gchar *libbalsa_message_pathname(LibBalsaMessage * message);

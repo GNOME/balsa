@@ -262,16 +262,25 @@ message_window_idle_handler(MessageWindow* mw)
 {
     BalsaMessage *msg = BALSA_MESSAGE(mw->bmessage);
     LibBalsaMessage *message = mw->message;
+    gchar *title_format;
     gchar *title;
+    gchar *from;
+    gchar *subject;
 
     gdk_threads_enter();
 
     mw->idle_handler_id = 0;
 
-    title = libbalsa_message_title(message,
-				   balsa_app.message_title_format);
+    /* set window title */
+	title_format = _("Message from %s: %s");
+	from = libbalsa_address_to_gchar(message->headers->from, 0);
+	subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
+	title = g_strdup_printf(title_format, from, subject);
+	g_free(from);
+	g_free(subject);
     gtk_window_set_title(GTK_WINDOW(mw->window), title);
     g_free(title);
+
     balsa_message_set(msg, message);
 
     if(msg && msg->treeview) {

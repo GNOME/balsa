@@ -41,7 +41,6 @@
 #include <libesmtp.h>
 #endif
 
-#define NUM_TOOLBAR_MODES 3
 #define NUM_ENCODING_MODES 3
 #define NUM_PWINDOW_MODES 3
 #define NUM_THREADING_STYLES 3
@@ -131,7 +130,6 @@ typedef struct _PropertyUI {
     GtkWidget *date_format;
 
     GtkWidget *selected_headers;
-    GtkWidget *message_title_format;
 
     /* colours */
     GtkWidget *unread_color;
@@ -613,10 +611,6 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     g_signal_connect(G_OBJECT(pui->selected_headers), "changed",
 		     G_CALLBACK(properties_modified_cb), property_box);
 
-    /* Format for the title of the message window */
-    g_signal_connect(G_OBJECT(pui->message_title_format), "changed",
-		     G_CALLBACK(properties_modified_cb), property_box);
-
     /* Colour */
     g_signal_connect(G_OBJECT(pui->unread_color), "released",
 		     G_CALLBACK(properties_modified_cb), property_box);
@@ -877,13 +871,6 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.selected_headers =
 	g_ascii_strdown(gtk_entry_get_text(GTK_ENTRY(pui->selected_headers)),
                         -1);
-
-    /* message window title format */
-    g_free(balsa_app.message_title_format);
-    balsa_app.message_title_format =
-        gtk_editable_get_chars(GTK_EDITABLE(pui->message_title_format),
-                               0, -1);
-
     /* unread mailbox color */
     gdk_colormap_free_colors(gdk_drawable_get_colormap
 			     (GTK_WIDGET(pbox)->window),
@@ -1178,11 +1165,6 @@ set_prefs(void)
     if (balsa_app.selected_headers)
 	gtk_entry_set_text(GTK_ENTRY(pui->selected_headers),
 			   balsa_app.selected_headers);
-
-    /* message window title format */
-    if (balsa_app.message_title_format)
-	gtk_entry_set_text(GTK_ENTRY(pui->message_title_format),
-			   balsa_app.message_title_format);
 
     /* Colour */
     gnome_color_picker_set_i16(GNOME_COLOR_PICKER(pui->unread_color),
@@ -2117,8 +2099,6 @@ display_formats_group(GtkWidget * page)
         attach_entry(_("Date encoding (for strftime):"), 0, GTK_TABLE(table));
     pui->selected_headers =
         attach_entry(_("Selected headers:"), 1, GTK_TABLE(table));
-    pui->message_title_format =
-        attach_entry(_("Message window title format:"), 2, GTK_TABLE(table));
 
     return group;
 }

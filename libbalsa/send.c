@@ -1298,7 +1298,11 @@ balsa_send_message_real(SendMessageInfo* info)
     
     gdk_threads_enter();
     libbalsa_mailbox_close(info->outbox, TRUE);
+#if GTK_CHECK_VERSION(2, 4, 0)
+    gdk_display_flush(gdk_display_get_default());
+#else
     gdk_flush();
+#endif
     gdk_threads_leave();
 
     message_queue = NULL;

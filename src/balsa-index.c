@@ -1001,7 +1001,11 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
     /* libbalsa functions must be called with gdk unlocked
      * but balsa_index - locked!
      */
+#if GTK_CHECK_VERSION(2, 4, 0)
+    gdk_display_flush(gdk_display_get_default());
+#else
     gdk_flush();
+#endif
     gdk_threads_leave();
     libbalsa_mailbox_set_view_filter(mailbox,
                                      balsa_window_get_view_filter

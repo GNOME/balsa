@@ -90,7 +90,20 @@ add_mailbox (gchar * name, gchar * path, MailboxType type, gint isdir)
 
   if (isdir && type == MAILBOX_UNKNOWN)
     {
-      node = g_node_new (mailbox_node_new (g_strdup (path), NULL, TRUE));
+      gchar *tmppath;
+      MailboxNode *mbnode;
+
+      mbnode = mailbox_node_new (g_strdup (path), NULL, TRUE);
+      tmppath = g_strdup_printf ("%s/.expanded", path);
+
+      if (access (tmppath, F_OK) != -1)
+	mbnode->expanded = TRUE;
+      else
+	mbnode->expanded = FALSE;
+      node = g_node_new (mbnode);
+
+      g_free(tmppath);
+
       rnode = find_my_node (balsa_app.mailbox_nodes, G_LEVEL_ORDER, G_TRAVERSE_ALL, g_dirname (path));
       if (rnode)
 	g_node_append (rnode, node);

@@ -1,3 +1,10 @@
+2004-11-03 13:33  PeterB
+
+	* src/expand-alias.c, src/expand-alias.h, src/main.c,
+	src/sendmsg-window.c, libbalsa/address-entry.c,
+	libbalsa/address-entry.h: reimplement LibBalsaAddressEntry using
+	GtkEntryCompletion.
+
 2004-11-02 15:30  PeterB
 
 	* src/ab-window.c: connect to "changed" signal after initializing

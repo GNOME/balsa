@@ -1,3 +1,10 @@
+2004-08-18 13:51  PeterB
+
+	* src/main-window.c: verify balsa_app.mblist_tree_store in
+	mail-check thread.
+	* libbalsa/mailbox_imap.c: disconnect signal handler when
+	finalizing mailbox.
+
 2004-08-17 22:14  PeterB
 
 	* src/: balsa-app.h, main.c, pref-manager.c, save-restore.c: make

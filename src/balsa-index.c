@@ -256,9 +256,11 @@ bndx_destroy(GtkObject * obj)
         index->popup_menu = NULL;
     }
 
-    if (index->current_message)
+    if (index->current_message) {
 	g_object_remove_weak_pointer(G_OBJECT(index->current_message),
 				     (gpointer)&index->current_message);
+	index->current_message = NULL;
+    }
 
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
         (*GTK_OBJECT_CLASS(parent_class)->destroy) (obj);

@@ -1,3 +1,13 @@
+2003-03-14 10:32  PeterB
+
+	* src/: balsa-app.c, balsa-app.h, balsa-message.c, pref-manager.c,
+	save-restore.c, sendmsg-window.c, sendmsg-window.h: Take the MDN
+	and "format-flowed" options out of the config, and take the
+	send/queue option out of the compose window's Options menu.
+	* libbalsa/: body.c, body.h, mime.c, misc.c, misc.h, send.c: Rename
+	libbalsa_flowed_rfc2646 as libbalsa_message_body_is_flowed, and
+	move it from libbalsa/misc.[ch] to libbalsa/body.[ch].
+
 2003-03-13 13:23  PeterB
 
 	* src/sendmsg-window.c: Use translated strings for headers when

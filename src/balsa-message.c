@@ -3697,3 +3697,33 @@ prepare_url_offsets(GtkTextBuffer * buffer, GList * url_list)
         url->start = gtk_text_iter_get_offset(&iter);
     }
 }
+
+/* Does the current part support zoom? */
+gboolean
+balsa_message_can_zoom(BalsaMessage * bm)
+{
+    return (bm && bm->current_part
+	    && HTML_IS_VIEW(bm->current_part->widget));
+}
+
+/* Zoom an HtmlView item. */
+void
+balsa_message_zoom(BalsaMessage * bm, gint in_out)
+{
+    if (!balsa_message_can_zoom(bm))
+	return;
+
+    switch (in_out) {
+    case +1:
+	html_view_zoom_in(HTML_VIEW(bm->current_part->widget));
+	break;
+    case -1:
+	html_view_zoom_out(HTML_VIEW(bm->current_part->widget));
+	break;
+    case 0:
+	html_view_zoom_reset(HTML_VIEW(bm->current_part->widget));
+	break;
+    default:
+	break;
+    }
+}

@@ -97,6 +97,8 @@ gboolean balsa_message_can_select(BalsaMessage * bmessage);
 gboolean balsa_message_grab_focus(BalsaMessage * bmessage);
 
 void reflow_string(gchar * str, gint mode, gint * cur_pos, int width);
+gboolean balsa_message_can_zoom(BalsaMessage * bm);
+void balsa_message_zoom(BalsaMessage * bm, gint in_out);
 
 #ifdef __cplusplus
 }

@@ -215,23 +215,23 @@ send_smtp_message (GtkWidget * widget, BalsaSendmsg * bsmsg)
   GString *text;
   gchar *textbuf;
 
-  curusr = cpystr (myusername ());
-  curhst = cpystr (mylocalhost ());
+  curusr = (char *)cpystr (myusername ());
+  curhst = (char *)cpystr (mylocalhost ());
 
   msg->from = mail_newaddr ();
-  msg->from->personal = cpystr (personalname);
-  msg->from->mailbox = cpystr (curusr);
-  msg->from->host = cpystr (curhst);
+  msg->from->personal = (char *)cpystr (personalname);
+  msg->from->mailbox = (char *)cpystr (curusr);
+  msg->from->host = (char *)cpystr (curhst);
   msg->return_path = mail_newaddr ();
-  msg->return_path->mailbox = cpystr (curusr);
-  msg->return_path->host = cpystr (curhst);
+  msg->return_path->mailbox = (char *)cpystr (curusr);
+  msg->return_path->host = (char *)cpystr (curhst);
 
   rfc822_parse_adrlist (&msg->to, gtk_entry_get_text (GTK_ENTRY (bsmsg->to)), curhst);
   if (msg->to)
     {
       rfc822_parse_adrlist (&msg->cc, gtk_entry_get_text (GTK_ENTRY (bsmsg->cc)), curhst);
     }
-  msg->subject = cpystr (gtk_entry_get_text (GTK_ENTRY (bsmsg->subject)));
+  msg->subject = (char *)cpystr (gtk_entry_get_text (GTK_ENTRY (bsmsg->subject)));
   body->type = TYPETEXT;
 
   textbuf = gtk_editable_get_chars (GTK_EDITABLE (bsmsg->text), 0, gtk_text_get_length (GTK_TEXT (bsmsg->text)));

@@ -697,6 +697,8 @@ libbalsa_address_to_gchar(LibBalsaAddress * address, gint n)
 const gchar *
 libbalsa_address_get_name(const LibBalsaAddress * addr)
 {
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS(addr), NULL);
+
     return addr->full_name ? addr->full_name :
 	(addr->address_list ? addr->address_list->data : NULL);
 }

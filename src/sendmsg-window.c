@@ -220,7 +220,7 @@ sendmsg_window_new (GtkWidget * widget, gpointer data)
   GtkWidget *hscrollbar;
   GtkWidget *vscrollbar;
   BalsaSendmsg *msg = NULL;
-  GString *gs = g_string_new (NULL);
+  gchar *from;
 
   msg = g_malloc (sizeof (BalsaSendmsg));
 
@@ -257,10 +257,16 @@ sendmsg_window_new (GtkWidget * widget, gpointer data)
   gtk_widget_show (label);
   msg->from = gtk_entry_new ();
   gtk_table_attach_defaults (GTK_TABLE (table), msg->from, 1, 2, 1, 2);
-  g_string_truncate (gs, 0);
-  g_string_sprintf (gs, "%s <%s@%s>", balsa_app.real_name, balsa_app.username, balsa_app.hostname);
-  gtk_entry_set_text (GTK_ENTRY (msg->from), gs->str);
+
+  from = g_malloc (strlen (balsa_app.real_name) + 2 + strlen (balsa_app.username) + 1 + strlen (balsa_app.hostname) + 2);
+  sprintf (from, "%s <%s@%s>\0",
+	   balsa_app.real_name,
+	   balsa_app.username,
+	   balsa_app.hostname);
+
+  gtk_entry_set_text (GTK_ENTRY (msg->from), from);
   gtk_widget_show (msg->from);
+  g_free (from);
 
   label = gtk_label_new ("Subject:");
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
@@ -320,7 +326,6 @@ sendmsg_window_new (GtkWidget * widget, gpointer data)
 			 GTK_TOOLBAR (create_toolbar (msg)));
 
   gtk_widget_show (msg->window);
-  g_string_free (gs, 1);
 }
 
 
@@ -380,15 +385,21 @@ send_smtp_message (GtkWidget * widget, BalsaSendmsg * bsmsg)
   msg->return_path->mailbox = g_strdup (balsa_app.username);
   msg->return_path->host = g_strdup (balsa_app.hostname);
 
-  rfc822_parse_adrlist (&msg->to, gtk_entry_get_text (GTK_ENTRY (bsmsg->to)), balsa_app.hostname);
+  rfc822_parse_adrlist (&msg->to,
+			gtk_entry_get_text (GTK_ENTRY (bsmsg->to)),
+			balsa_app.hostname);
   if (msg->to)
     {
-      rfc822_parse_adrlist (&msg->cc, gtk_entry_get_text (GTK_ENTRY (bsmsg->cc)), balsa_app.hostname);
+      rfc822_parse_adrlist (&msg->cc,
+			    gtk_entry_get_text (GTK_ENTRY (bsmsg->cc)),
+			    balsa_app.hostname);
     }
   msg->subject = g_strdup (gtk_entry_get_text (GTK_ENTRY (bsmsg->subject)));
   body->type = TYPETEXT;
 
-  textbuf = gtk_editable_get_chars (GTK_EDITABLE (bsmsg->text), 0, gtk_text_get_length (GTK_TEXT (bsmsg->text)));
+  textbuf = gtk_editable_get_chars (GTK_EDITABLE (bsmsg->text),
+				    0,
+			      gtk_text_get_length (GTK_TEXT (bsmsg->text)));
   text = gtk_text_to_email (textbuf);
   text = g_string_append (text, "\015\012");
 

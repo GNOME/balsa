@@ -100,9 +100,9 @@ extern "C" {
     void balsa_index_select_row(BalsaIndex * bindex, gint row);
 
 /* retrieve the selection */
-    extern void balsa_index_get_selected_rows(BalsaIndex * bindex,
-					      GtkCTreeNode *** rows,
-					      guint * nb_rows);
+    void balsa_index_get_selected_rows(BalsaIndex * bindex,
+				       GtkCTreeNode *** rows,
+				       guint * nb_rows);
 
 
 /* balsa index page stuff */
@@ -132,6 +132,7 @@ extern "C" {
 				   gint, gpointer);
     void balsa_index_refresh_size (GtkNotebook *, GtkNotebookPage *,
 				   gint, gpointer);
+    gint balsa_index_get_largest_selected(GtkCList *clist);
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

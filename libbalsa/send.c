@@ -346,11 +346,13 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 gboolean
 libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
 		      LibBalsaMailbox* fccbox, gint encoding,
-		      gchar* smtp_server, auth_context_t smtp_authctx)
+		      gchar* smtp_server, auth_context_t smtp_authctx,
+		      gint tls_mode)
 {
     if (message != NULL)
 	libbalsa_message_queue(message, outbox, fccbox, encoding);
-    return libbalsa_process_queue(outbox, encoding, smtp_server, smtp_authctx);
+    return libbalsa_process_queue(outbox, encoding, smtp_server, smtp_authctx,
+                                  tls_mode);
 }
 #else
 gboolean
@@ -430,7 +432,8 @@ libbalsa_message_cb (void **buf, int *len, void *arg)
  */
 gboolean 
 libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding, 
-		       gchar* smtp_server, auth_context_t smtp_authctx)
+		       gchar* smtp_server, auth_context_t smtp_authctx,
+		       gint tls_mode)
 {
     MessageQueueItem *new_message;
     SendMessageInfo *send_message_info;
@@ -459,10 +462,8 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
     session = smtp_create_session ();
     smtp_set_server (session, smtp_server);
 
-#if HAVE_SMTP_STARTTLS
-    /* Tell libESMTP it can use the SMTP STARTTLS extension.  */
-    smtp_starttls_enable (session, Starttls_ENABLED);
-#endif
+    /* Tell libESMTP how to use the SMTP STARTTLS extension.  */
+    smtp_starttls_enable (session, tls_mode);
 
     /* Now tell libESMTP it can use the SMTP AUTH extension.  */
     smtp_auth_set_context (session, smtp_authctx);

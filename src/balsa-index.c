@@ -58,6 +58,19 @@
 #define DO_CLIST_WORKAROUND(s)
 #endif
 
+struct FolderMRUEntry
+{
+    gchar           *name;    /* FIXME: meaning? NOT NULL *
+			       * shortcut to mailbox->name (i.e not owned) */
+    gchar           *url;     /* FIXME: meaning? allowed values? *
+			       * shortcut to mailbox->url  (i.e not owned) */
+    LibBalsaMailbox *mailbox; /* FIXME: meaning? allowed values? */
+    BalsaIndex      *bindex;  /* FIXME: meaning? allowed values? */
+};
+
+/* mru_list - recently-used mailbox list */
+static GList *mru_list=NULL;
+
 /* gtk widget */
 static void balsa_index_class_init(BalsaIndexClass * klass);
 static void balsa_index_init(BalsaIndex * bindex);
@@ -75,6 +88,7 @@ static void clist_click_column(GtkCList * clist, gint column,
 /* statics */
 static void balsa_index_set_col_images(BalsaIndex *, GtkCTreeNode*,
 				       LibBalsaMessage *);
+static void populate_mru(GtkWidget *menu, BalsaIndex *bindex);
 
 /* mailbox callbacks */
 static void balsa_index_del (BalsaIndex * bindex, LibBalsaMessage * message);
@@ -104,6 +118,9 @@ static void unselect_all_messages (GtkCList* clist, gpointer user_data);
 static void resize_column_event_cb(GtkCList * clist, gint column,
 				   gint width, gpointer data);
 
+/* Callbacks */
+static gint mru_search_cb(GNode *node, struct FolderMRUEntry *entry);
+static void mru_select_cb(GtkWidget *widget, struct FolderMRUEntry *entry);
 
 /* formerly balsa-index-page stuff */
 enum {
@@ -451,12 +468,12 @@ size_compare(GtkCList * clist, gconstpointer ptr1, gconstpointer ptr2)
     return t2-t1;
 }
 
-/* bi_get_largest_selected:
+/* balsa_index_get_largest_selected:
    helper function, finds the message with largest number among selected and
    fails with -1, if the selection is empty.
 */
-static gint
-bi_get_largest_selected(GtkCList * clist)
+gint
+balsa_index_get_largest_selected(GtkCList * clist)
 {
     GList *list;
     gint i = 0;
@@ -491,7 +508,7 @@ clist_click_column(GtkCList * clist, gint column, gpointer data)
     gtk_clist_sort(clist);
     DO_CLIST_WORKAROUND(clist);
 
-    if ((h = bi_get_largest_selected(clist)) >= 0 &&
+    if ((h = balsa_index_get_largest_selected(clist)) >= 0 &&
 	gtk_clist_row_is_visible(clist, h) != GTK_VISIBILITY_FULL)
 	gtk_clist_moveto(clist, h, 0, 1.0, 0.0);
 }
@@ -861,7 +878,7 @@ balsa_index_select_next(BalsaIndex * bindex)
     clist = GTK_CLIST(bindex->ctree);
 
     /* [MBG] check this part, it might need to be h - 2 instead */
-    if ((h = bi_get_largest_selected(clist)) < 0 || h + 1 >= clist->rows)
+    if ((h = balsa_index_get_largest_selected(clist)) < 0 || h + 1 >= clist->rows)
 	h = clist->rows - 1;
 
     balsa_index_select_row(bindex, h + 1);
@@ -909,7 +926,7 @@ balsa_index_select_next_unread(BalsaIndex * bindex)
     g_return_if_fail(bindex != NULL);
     clist = GTK_CLIST(bindex->ctree);
 
-    if ((h = bi_get_largest_selected(clist) + 1) <= 0)
+    if ((h = balsa_index_get_largest_selected(clist) + 1) <= 0)
 	h = 0;
 
     if (h >= clist->rows)
@@ -1337,7 +1354,7 @@ balsa_index_refresh(BalsaIndex * bindex)
     gtk_clist_freeze(clist);
 
     old_message = 
-        gtk_clist_get_row_data(clist, bi_get_largest_selected(clist));
+        gtk_clist_get_row_data(clist, balsa_index_get_largest_selected(clist));
     gtk_clist_unselect_all(clist);
     gtk_clist_clear(clist);
 
@@ -1548,7 +1565,7 @@ do_delete(BalsaIndex* index, gboolean move_to_trash)
 
     /* select the previous message if we're at the bottom of the index */
     if (GTK_CLIST(index->ctree)->rows - 1 == 
-        bi_get_largest_selected(GTK_CLIST(index->ctree)))
+        balsa_index_get_largest_selected(GTK_CLIST(index->ctree)))
         select_next = FALSE;
 
     
@@ -1769,7 +1786,7 @@ balsa_index_update_message(BalsaIndex * index)
     GtkCList *list;
 
     list = GTK_CLIST(index->ctree);
-    row = bi_get_largest_selected (list);
+    row = balsa_index_get_largest_selected (list);
 
     if (row < 0)
 	message = NULL;
@@ -1888,10 +1905,11 @@ idle_handler_cb(GtkWidget * widget)
 static GtkWidget *
 create_menu(BalsaIndex * bindex)
 {
-    GtkWidget *menu, *menuitem, *submenu, *smenuitem;
+    GtkWidget *menu, *menuitem, *submenu, *smenuitem, *mrumenu, *mruitem;
     GtkWidget *bmbl, *scroll;
     GtkRequisition req;
     LibBalsaMailbox* mailbox;
+    GList *tmp;
     
 
     BALSA_DEBUG();
@@ -1948,9 +1966,28 @@ create_menu(BalsaIndex * bindex)
 
     gtk_menu_append(GTK_MENU(menu), menuitem);
     
-    menuitem = gtk_menu_item_new_with_label(_("Transfer"));
+    g_list_foreach(mru_list, (GFunc)g_free, NULL);
+    g_list_free(mru_list);
+    mru_list=NULL;
+
+    menuitem = gtk_menu_item_new_with_label(_("Move"));
     gtk_widget_set_sensitive(menuitem, !mailbox->readonly);
+    gtk_menu_append(GTK_MENU(menu), menuitem);
+    gtk_widget_show(menuitem);
+
+    mrumenu = gtk_menu_new();
+    gtk_widget_show(mrumenu);
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), mrumenu);
+
+    populate_mru(mrumenu, bindex);
+
+    mruitem = gtk_menu_item_new_with_label(_("Folder"));
+    gtk_widget_show(mruitem);
+
+    gtk_menu_append(GTK_MENU(mrumenu), mruitem);
+
     submenu = gtk_menu_new();
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(mruitem), submenu);
 
     smenuitem = gtk_menu_item_new();
     gtk_signal_connect (GTK_OBJECT(smenuitem), "button_release_event",
@@ -1984,9 +2021,6 @@ create_menu(BalsaIndex * bindex)
     gtk_widget_show(scroll);
     gtk_widget_show(smenuitem);
 
-    gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), submenu);
-    gtk_menu_append(GTK_MENU(menu), menuitem);
-    gtk_widget_show(menuitem);
 
     return menu;
 }
@@ -2046,7 +2080,7 @@ transfer_messages_cb(GtkCTree * ctree, GtkCTreeNode * row, gint column,
 	return;
 
     /* select the previous message if we're at the bottom of the index */
-    if (clist->rows - 1 == bi_get_largest_selected(clist))
+    if (clist->rows - 1 == balsa_index_get_largest_selected(clist))
         select_next = FALSE;
 
 
@@ -2074,6 +2108,8 @@ transfer_messages_cb(GtkCTree * ctree, GtkCTreeNode * row, gint column,
 
     libbalsa_mailbox_sync_backend(bindex->mailbox_node->mailbox);
 
+    balsa_remove_from_folder_mru(mbnode->mailbox->url);
+    balsa_add_to_folder_mru(mbnode->mailbox->url);
     gtk_object_set_data(GTK_OBJECT(bindex), "transferredp", (gpointer) 1);
 }
 
@@ -2272,5 +2308,119 @@ balsa_index_refresh_date (GtkNotebook *notebook,
 	    j++;
 	}
     }
+}
+
+static gint
+mru_search_cb(GNode *gnode, struct FolderMRUEntry *entry)
+{
+    BalsaMailboxNode *node;
+
+    node=gnode->data;
+    if(!node || !BALSA_IS_MAILBOX_NODE(node))
+        return FALSE;
+
+    if(!node->mailbox)
+        return FALSE;
+
+    if(!strcmp(LIBBALSA_MAILBOX(node->mailbox)->url, entry->url)) {
+        entry->url     = LIBBALSA_MAILBOX(node->mailbox)->url;
+        entry->name    = LIBBALSA_MAILBOX(node->mailbox)->name;
+        entry->mailbox = LIBBALSA_MAILBOX(node->mailbox);
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+static void
+populate_mru(GtkWidget * menu, BalsaIndex * bindex)
+{
+    struct FolderMRUEntry *mru_entry;
+    GList *mru, *tmp;
+    GtkWidget *item;
+
+    mru = balsa_app.folder_mru;
+    while (mru) {
+        mru_entry = g_malloc(sizeof(struct FolderMRUEntry));
+        if (!mru_entry)
+            return;
+
+        mru_entry->url = mru->data;
+        mru_entry->mailbox = NULL;
+        mru_entry->bindex = bindex;
+        g_node_traverse(balsa_app.mailbox_nodes, G_IN_ORDER,
+                        G_TRAVERSE_ALL, -1,
+                        (gint(*)(GNode *, gpointer)) mru_search_cb,
+                        mru_entry);
+        if (mru_entry->mailbox == NULL) {
+            g_free(mru_entry);
+            tmp = g_list_next(mru);
+            g_free(mru->data);
+            balsa_app.folder_mru =
+                g_list_remove(balsa_app.folder_mru, mru->data);
+            mru = tmp;
+        } else {
+            mru_list = g_list_append(mru_list, mru_entry);
+            item = gtk_menu_item_new_with_label(mru_entry->name);
+            gtk_widget_show(item);
+            gtk_menu_append(GTK_MENU(menu), item);
+            gtk_signal_connect(GTK_OBJECT(item), "activate",
+                               GTK_SIGNAL_FUNC(mru_select_cb), mru_entry);
+            mru = g_list_next(mru);
+        }
+    }
+}
+
+static void
+mru_select_cb(GtkWidget *widget, struct FolderMRUEntry *entry)
+{
+    GtkCList* clist;
+    BalsaIndex* bindex = NULL;
+    GList *list, *messages;
+    LibBalsaMessage* message;
+    gboolean select_next = TRUE;
+    gint message_count = 0;
+
+    g_return_if_fail(entry != NULL);
+
+    bindex = entry->bindex;
+    clist = GTK_CLIST(bindex->ctree);
+
+   /*Transferring to same mailbox? */
+    if (bindex->mailbox_node->mailbox == entry->mailbox)
+	return;
+
+    /* select the previous message if we're at the bottom of the index */
+    if (clist->rows - 1 == balsa_index_get_largest_selected(clist))
+        select_next = FALSE;
+
+
+    messages=NULL;
+    for (list = clist->selection; list;list = list->next) {
+	message = gtk_ctree_node_get_row_data(GTK_CTREE(bindex->ctree), 
+					      list->data);
+	messages=g_list_append(messages, message);
+	++message_count;
+    }
+
+    if(messages!=NULL) {
+	libbalsa_messages_move(messages, entry->mailbox);
+	g_list_free(messages);
+    }
+   
+    /* select another message depending on where we are in the list */
+    if (clist->rows > message_count) {
+        if (select_next)
+            balsa_index_select_next(bindex);
+        else
+            balsa_index_select_previous(bindex);
+    }
+
+
+    libbalsa_mailbox_sync_backend(bindex->mailbox_node->mailbox);
+
+	balsa_remove_from_folder_mru(entry->mailbox->url);
+	balsa_add_to_folder_mru(entry->mailbox->url);
+    gtk_object_set_data(GTK_OBJECT(bindex), "transferredp", (gpointer) 1);
 }
 

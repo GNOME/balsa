@@ -160,6 +160,7 @@ extern struct BalsaApplication {
     gchar *smtp_user;
     gchar *smtp_passphrase;
     auth_context_t smtp_authctx;
+    gint smtp_tls_mode;
     gchar *smtp_certificate_passphrase;
 #endif
 
@@ -328,6 +329,9 @@ extern struct BalsaApplication {
     BalsaMDNReply mdn_reply_clean;
     BalsaMDNReply mdn_reply_notclean;
 #endif
+
+    GList *folder_mru;
+    gint drag_default_is_move;
 
 } balsa_app;
 

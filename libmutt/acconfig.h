@@ -1,6 +1,7 @@
 
 /* Enable debugging info */
-#define DEBUG
+#undef DEBUG
+#define NDEBUG
 
 /* Disable the X-Mailer header? */
 #undef NO_XMAILER

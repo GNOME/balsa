@@ -103,7 +103,12 @@ safe_read_char(int fd, char *ch)
     return retval;
 }
 
-static int getLine (int fd, char *s, int len)
+/* getLine: 
+   get one line from a file descriptor.
+   return -1 on error. number of bytes read on success.
+*/
+static int
+getLine (int fd, char *s, int len)
 {
     char ch;
     int bytes = 0;
@@ -200,18 +205,7 @@ pop_connect(int *s, const gchar *host, gint port)
       *s = socket (cur->ai_family, cur->ai_socktype, cur->ai_protocol);
       fcntl(*s, F_SETFD,FD_CLOEXEC);
       if(*s<0) continue;
-
-      if (cur->ai_addr->sa_family == AF_INET)
-	  sa_size = sizeof (struct sockaddr_in);
-      else if (cur->ai_addr->sa_family == AF_INET6)
-	  sa_size = sizeof (struct sockaddr_in6);
-      else {
-	  libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			       _("Unknown POP socket family: %d"), 
-			       cur->ai_addr->sa_family);
-	  return POP_CONNECT_FAILED;
-      }
-      if((rc = connect(*s, cur->ai_addr, sa_size)) == 0) break;
+      if((rc = connect(*s, cur->ai_addr, cur->ai_addrlen)) == 0) break;
       close(*s);   
   }
   freeaddrinfo (res);
@@ -414,7 +408,7 @@ fetch_single_msg(int s, FILE *msg, int msgno, int first_msg, int msgs,
     /* Now read the actual message. */
     while(1) {
 	char *p;
-	size_t chunk;
+	int chunk;
 	
 	if ((chunk = getLine (s, buffer, sizeof (buffer))) == -1) 
 	    return POP_CONN_ERR;
@@ -453,7 +447,7 @@ fetch_single_msg(int s, FILE *msg, int msgno, int first_msg, int msgs,
 	    p = buffer;
 	
 	/* fwrite(p, 1, chunk, stdout); */
-	if(fwrite (p, 1, chunk, msg) != chunk) return POP_WRITE_ERR;
+	if(fwrite (p, 1, (size_t)chunk, msg) != chunk) return POP_WRITE_ERR;
     } /* end of while */
     
     DM("POP3: Message %d retrieved", msgno);

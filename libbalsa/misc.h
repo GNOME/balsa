@@ -47,7 +47,7 @@ const char* libbalsa_set_charset(const gchar * charset);
 #if ENABLE_ESMTP
 gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 				gchar* smtp_server,
-				auth_context_t smtp_authctx);
+				auth_context_t smtp_authctx, gint tls_mode);
 #else
 gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding);
 #endif

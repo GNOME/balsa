@@ -25,5 +25,7 @@
 #include "libbalsa.h"
 
 void message_window_new(LibBalsaMessage * message);
+void balsa_remove_from_folder_mru(const gchar *url);
+void balsa_add_to_folder_mru(const gchar *url);
 
 #endif				/* __MESSAGE_WINDOW_H__ */

@@ -37,6 +37,10 @@
 /* FIXME: Mutt dependency for ENC7BIT ENC8BIT ENCQUOTEDPRINTABLE consts*/
 #include "../libmutt/mime.h"
 
+#if ENABLE_ESMTP
+#include <libesmtp.h>
+#endif
+
 #define NUM_TOOLBAR_MODES 3
 #define NUM_ENCODING_MODES 3
 #define NUM_PWINDOW_MODES 3
@@ -49,7 +53,8 @@ typedef struct _PropertyUI {
     GtkWidget *mail_servers;
 #if ENABLE_ESMTP
     GtkWidget *smtp_server, *smtp_user, *smtp_passphrase;
-#if HAVE_SMTP_STARTTLS
+    GtkWidget *smtp_tls_mode_menu;
+#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     GtkWidget *smtp_certificate_passphrase;
 #endif
 #endif
@@ -66,6 +71,7 @@ typedef struct _PropertyUI {
 #endif
 
     GtkWidget *close_mailbox_auto;
+    GtkWidget *drag_default_is_move;
     GtkWidget *close_mailbox_minutes;
 
     GtkWidget *previewpane;
@@ -144,6 +150,9 @@ static GtkWidget *create_information_message_menu(void);
 #ifdef BALSA_MDN_REPLY
 static GtkWidget *create_mdn_reply_menu(void);
 #endif
+#if ENABLE_ESMTP
+static GtkWidget *create_tls_mode_menu(void);
+#endif
 
 static GtkWidget *incoming_page(gpointer);
 static GtkWidget *outgoing_page(gpointer);
@@ -209,7 +218,6 @@ const gchar *spell_check_suggest_mode_label[NUM_SUGGEST_MODES] = {
     N_("Normal"),
     N_("Bad Spellers")
 };
-
 
 /* and now the important stuff: */
 void
@@ -324,7 +332,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
 
-#if HAVE_SMTP_STARTTLS
+#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     gtk_signal_connect(GTK_OBJECT(pui->smtp_certificate_passphrase), "changed",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
@@ -358,6 +366,9 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
     gtk_signal_connect(GTK_OBJECT(pui->close_mailbox_auto), "toggled",
 		       GTK_SIGNAL_FUNC(mailbox_timer_modified_cb), property_box);
+
+    gtk_signal_connect(GTK_OBJECT(pui->drag_default_is_move), "toggled",
+		       GTK_SIGNAL_FUNC(properties_modified_cb), property_box);
 
     gtk_signal_connect(GTK_OBJECT(pui->close_mailbox_minutes), "changed",
 		       GTK_SIGNAL_FUNC(mailbox_timer_modified_cb), property_box);
@@ -497,7 +508,11 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     balsa_app.smtp_passphrase =
 	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->smtp_passphrase)));
 
-#if HAVE_SMTP_STARTTLS
+    menu_item = gtk_menu_get_active(GTK_MENU(pui->smtp_tls_mode_menu));
+    balsa_app.smtp_tls_mode =
+	GPOINTER_TO_INT(gtk_object_get_user_data(GTK_OBJECT(menu_item)));
+
+#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     g_free(balsa_app.smtp_certificate_passphrase);
     balsa_app.smtp_certificate_passphrase =
 	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->smtp_certificate_passphrase)));
@@ -586,6 +601,8 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
 
     balsa_app.close_mailbox_auto =
 	GTK_TOGGLE_BUTTON(pui->close_mailbox_auto)->active;
+    balsa_app.drag_default_is_move =
+	GTK_TOGGLE_BUTTON(pui->drag_default_is_move)->active;
     balsa_app.close_mailbox_timeout =
 	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
 					 (pui->close_mailbox_minutes));
@@ -728,7 +745,9 @@ set_prefs(void)
 	gtk_entry_set_text(GTK_ENTRY(pui->smtp_passphrase),
 			   balsa_app.smtp_passphrase);
 
-#if HAVE_SMTP_STARTTLS
+    gtk_menu_set_active(GTK_MENU(pui->smtp_tls_mode_menu),
+			balsa_app.smtp_tls_mode);
+#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     if (balsa_app.smtp_certificate_passphrase)
 	gtk_entry_set_text(GTK_ENTRY(pui->smtp_certificate_passphrase),
 			   balsa_app.smtp_certificate_passphrase);
@@ -792,6 +811,8 @@ set_prefs(void)
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->close_mailbox_auto),
 				 balsa_app.close_mailbox_auto);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->drag_default_is_move),
+				 balsa_app.drag_default_is_move);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->close_mailbox_minutes),
 			      (float) balsa_app.close_mailbox_timeout);
 
@@ -1123,9 +1144,10 @@ create_mailserver_page(gpointer data)
     GtkWidget *box2;
     GtkWidget *fileentry2;
 #if ENABLE_ESMTP
-    GtkWidget *frame5, *table4, *label16, *label17, *label18;
-#if HAVE_SMTP_STARTTLS
-    GtkWidget *label19;
+    GtkWidget *frame5, *table4, *label16, *label17, *label18, *label19;
+    GtkWidget *optionmenu;
+#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
+    GtkWidget *label20;
 #endif
 #endif
 
@@ -1191,12 +1213,7 @@ create_mailserver_page(gpointer data)
 		     (GtkAttachOptions) (GTK_FILL), 0, 0);
     gtk_container_set_border_width(GTK_CONTAINER(frame5), 5);
 
-#if HAVE_SMTP_STARTTLS
     table4 = gtk_table_new(3, 4, FALSE);
-#else
-    table4 = gtk_table_new(2, 4, FALSE);
-#endif
-    table4 = gtk_table_new(2, 4, FALSE);
     gtk_table_set_row_spacings(GTK_TABLE(table4), 3);
     gtk_table_set_col_spacings(GTK_TABLE(table4), 3);
     gtk_container_add(GTK_CONTAINER(frame5), table4);
@@ -1232,10 +1249,24 @@ create_mailserver_page(gpointer data)
 		     (GtkAttachOptions) (0), 0, 0);
 
     /* STARTTLS */
-#if HAVE_SMTP_STARTTLS
+    label19 = gtk_label_new(_("Use TLS"));
+    gtk_table_attach(GTK_TABLE(table4), label19, 0, 1, 2, 3,
+		     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+		     (GtkAttachOptions) (0), 0, 0);
 
-    label19 = gtk_label_new(_("Certificate Pass Phrase"));
-    gtk_table_attach(GTK_TABLE(table4), label19, 2, 3, 2, 3,
+    optionmenu = gtk_option_menu_new ();
+    pui->smtp_tls_mode_menu = create_tls_mode_menu();
+    gtk_option_menu_set_menu (GTK_OPTION_MENU (optionmenu),
+			      pui->smtp_tls_mode_menu);
+    gtk_option_menu_set_history (GTK_OPTION_MENU (optionmenu),
+				 balsa_app.smtp_tls_mode);
+    gtk_table_attach(GTK_TABLE(table4), optionmenu, 1, 2, 2, 3,
+		     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+		     (GtkAttachOptions) (0), 0, 0);
+
+#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
+    label20 = gtk_label_new(_("Certificate Pass Phrase"));
+    gtk_table_attach(GTK_TABLE(table4), label20, 2, 3, 2, 3,
 		     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
 		     (GtkAttachOptions) (0), 0, 0);
     pui->smtp_certificate_passphrase = gtk_entry_new();
@@ -1921,6 +1952,12 @@ create_misc_page(gpointer data)
     gtk_widget_show(label33);
     gtk_box_pack_start(GTK_BOX(hbox1), label33, FALSE, TRUE, 0);
 
+    pui->drag_default_is_move =
+	gtk_check_button_new_with_label(_("Drag-and-drop moves messages by default"));
+    gtk_widget_show(pui->drag_default_is_move);
+    gtk_box_pack_start(GTK_BOX(vbox10), pui->drag_default_is_move, 
+		       FALSE, FALSE, 0);
+
     return vbox9;
 }
 
@@ -2318,3 +2355,16 @@ static void imap_toggled_cb(GtkWidget * widget, GtkWidget * pbox)
 	gtk_widget_set_sensitive(GTK_WIDGET(pui->check_imap_inbox), FALSE);
     }
 }
+
+#if ENABLE_ESMTP
+static GtkWidget *
+create_tls_mode_menu(void)
+{
+    GtkWidget *menu = gtk_menu_new();
+    add_show_menu(_("Never"),       Starttls_DISABLED, menu);
+    add_show_menu(_("If Possible"), Starttls_ENABLED,  menu);
+    add_show_menu(_("Required"),    Starttls_REQUIRED, menu);
+    return menu;
+}
+#endif
+

@@ -2453,7 +2453,8 @@ handle_mdn_request(LibBalsaMessage *message)
 	libbalsa_message_send(mdn, balsa_app.outbox, NULL,
 			      balsa_app.encoding_style,  
 			      balsa_app.smtp_server,
-			      balsa_app.smtp_authctx);
+			      balsa_app.smtp_authctx,
+			      balsa_app.smtp_tls_mode);
 #else
 	libbalsa_message_send(mdn, balsa_app.outbox, NULL,
 			      balsa_app.encoding_style);
@@ -2612,7 +2613,8 @@ static void send_mdn_reply (GtkWidget *widget, gpointer user_data)
     libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
 			  balsa_app.encoding_style,  
 			  balsa_app.smtp_server,
-			  balsa_app.smtp_authctx);
+			  balsa_app.smtp_authctx,
+			  balsa_app.smtp_tls_mode);
 #else
     libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
 			  balsa_app.encoding_style);  

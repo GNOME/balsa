@@ -2042,7 +2042,8 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 	successful = libbalsa_message_send(message, balsa_app.outbox, fcc,
 					   balsa_app.encoding_style,  
 			   		   balsa_app.smtp_server,
-			   		   balsa_app.smtp_authctx);
+			   		   balsa_app.smtp_authctx,
+			   		   balsa_app.smtp_tls_mode);
 #else
         successful = libbalsa_message_send(message, balsa_app.outbox, fcc,
 					   balsa_app.encoding_style); 

@@ -183,7 +183,7 @@ authinteract (auth_client_request_t request, char **result, int fields,
     return 1;
 }
 
-#if HAVE_SMTP_STARTTLS
+#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
 static int
 tlsinteract (char *buf, int buflen, int rwflag, void *arg)
 {
@@ -224,7 +224,7 @@ balsa_app_init(void)
     auth_set_mechanism_flags (balsa_app.smtp_authctx, AUTH_PLUGIN_PLAIN, 0);
     auth_set_interact_cb (balsa_app.smtp_authctx, authinteract, NULL);
 
-#if HAVE_SMTP_STARTTLS
+#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     /* Use our callback for X.509 certificate passwords.  If STARTTLS is
        not in use or disabled in configure, the following is harmless. */
     balsa_app.smtp_certificate_passphrase = NULL;
@@ -347,6 +347,10 @@ balsa_app_init(void)
     /* IMAP */
     balsa_app.check_imap = 1;
     balsa_app.check_imap_inbox = 0;
+
+    /* Message filing */
+    balsa_app.folder_mru=NULL;
+    balsa_app.drag_default_is_move=0;
 }
 
 static gint

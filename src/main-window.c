@@ -1264,6 +1264,9 @@ balsa_window_destroy(GtkObject * object)
 
     window = BALSA_WINDOW(object);
 
+    if(show_all_headers_save != -1)
+	balsa_app.shown_headers=show_all_headers_save;
+
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
 	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
 
@@ -1600,7 +1603,8 @@ send_outbox_messages_cb(GtkWidget * widget, gpointer data)
 {
 #if ENABLE_ESMTP
     libbalsa_process_queue(balsa_app.outbox, balsa_app.encoding_style,
-			   balsa_app.smtp_server, balsa_app.smtp_authctx);
+			   balsa_app.smtp_server, balsa_app.smtp_authctx,
+			   balsa_app.smtp_tls_mode);
 #else
     libbalsa_process_queue(balsa_app.outbox, balsa_app.encoding_style);
 #endif

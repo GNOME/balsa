@@ -43,6 +43,8 @@ static gchar *config_get_unused_section(const gchar * prefix);
 static gchar **mailbox_list_to_vector(GList * mailbox_list);
 static void save_color(gchar * key, GdkColor * color);
 static void load_color(gchar * key, GdkColor * color);
+static void save_mru(GList *mru);
+static void load_mru(GList **mru);
 
 static void config_address_books_load(void);
 static void config_address_books_save(void);
@@ -548,6 +550,7 @@ config_global_load(void)
     balsa_app.toolbar_style = d_get_gint("ToolbarStyle", GTK_TOOLBAR_BOTH);
     /* ... Progress Window Dialog */
     balsa_app.pwindow_option = d_get_gint("ProgressWindow", WHILERETR);
+    balsa_app.drag_default_is_move = d_get_gint("DragDefaultIsMove", 0);
 
     gnome_config_pop_prefix();
 
@@ -641,7 +644,8 @@ config_global_load(void)
     }
     balsa_app.smtp_user = gnome_config_get_string("ESMTPUser");
     balsa_app.smtp_passphrase = gnome_config_get_string("ESMTPPassphrase");
-#if HAVE_SMTP_STARTTLS
+    balsa_app.smtp_tls_mode = gnome_config_get_int("ESMTPTLSMode=0");
+#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     balsa_app.smtp_certificate_passphrase = gnome_config_get_string("ESMTPCertificatePassphrase");
 #endif
 #endif
@@ -720,6 +724,11 @@ config_global_load(void)
     balsa_app.attach_dir = gnome_config_get_string("AttachDir");
     g_free(balsa_app.save_dir);
     balsa_app.save_dir = gnome_config_get_string("SavePartDir");
+    gnome_config_pop_prefix();
+
+	/* Folder MRU */
+    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "FolderMRU/");
+	load_mru(&balsa_app.folder_mru);
     gnome_config_pop_prefix();
 
     return TRUE;
@@ -808,6 +817,7 @@ gint config_save(void)
     gnome_config_set_bool("MsgSizeAsLines", balsa_app.line_length);
     gnome_config_set_bool("PageDownMod", balsa_app.pgdownmod);
     gnome_config_set_int("PageDownPercent", balsa_app.pgdown_percent);
+    gnome_config_set_int("DragDefaultIsMove", balsa_app.drag_default_is_move);
 
     gnome_config_pop_prefix();
 
@@ -868,7 +878,8 @@ gint config_save(void)
     gnome_config_set_string("ESMTPServer", balsa_app.smtp_server);
     gnome_config_set_string("ESMTPUser", balsa_app.smtp_user);
     gnome_config_set_string("ESMTPPassphrase", balsa_app.smtp_passphrase);
-#if HAVE_SMTP_STARTTLS
+    gnome_config_set_int("ESMTPTLSMode", balsa_app.smtp_tls_mode);
+#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     gnome_config_set_string("ESMTPCertificatePassphrase", balsa_app.smtp_certificate_passphrase);
 #endif 
 #endif 
@@ -950,6 +961,11 @@ gint config_save(void)
 	gnome_config_set_string("AttachDir", balsa_app.attach_dir);
     if(balsa_app.save_dir)
 	gnome_config_set_string("SavePartDir", balsa_app.save_dir);
+    gnome_config_pop_prefix();
+
+	
+    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "FolderMRU/");
+    save_mru(balsa_app.folder_mru);
     gnome_config_pop_prefix();
 
     gnome_config_sync();
@@ -1175,4 +1191,32 @@ load_color(gchar * key, GdkColor * color)
     str = gnome_config_get_string(key);
     gdk_color_parse(str, color);
     g_free(str);
+}
+
+static void
+load_mru(GList **mru)
+{
+    int count, i;
+    char tmpkey[32];
+    
+    count=d_get_gint("MRUCount", 0);
+    for(i=0;i<count;i++) {
+	sprintf(tmpkey, "MRU%d", i+1);
+	(*mru)=g_list_append((*mru), gnome_config_get_string(tmpkey));
+    }
+}
+
+static void
+save_mru(GList *mru)
+{
+    int i;
+    char tmpkey[32];
+    GList *ltmp;
+    
+    for(ltmp=g_list_first(balsa_app.folder_mru),i=0;
+	ltmp; ltmp=g_list_next(ltmp),i++) {
+	sprintf(tmpkey, "MRU%d", i+1);
+	gnome_config_set_string(tmpkey, (gchar *)(ltmp->data));
+    }
+    gnome_config_set_int("MRUCount", i);
 }

@@ -25,13 +25,26 @@
 #include "balsa-app.h"
 #include "balsa-message.h"
 #include "balsa-icons.h"
+#include "balsa-index.h"
 #include "main-window.h"
 #include "sendmsg-window.h"
 #include "message-window.h"
 #include "print.h"
 #include "toolbar-factory.h"
+#include "mailbox-node.h"
 
 #include "libbalsa.h"
+
+/* FOLDER_MRU_LENGTH: max length of the recently used mailbox list */
+const static guint FOLDER_MRU_LENGTH = 10;
+
+struct BalsaMRUEntry
+{
+    LibBalsaMailbox *mailbox;
+    gchar *url; /* FIXME: purpose (copied from mailbox?) */
+    char *name; /* FIXME: purpose (copied from mailbox?) */
+    gpointer mw; /* FIXME: purpose? more descriptive name? */
+};
 
 /* callbacks */
 static void destroy_message_window(GtkWidget * widget, gpointer data);
@@ -59,6 +72,9 @@ static void select_part_cb(BalsaMessage * bm, gpointer data);
 static void next_unread_cb(GtkWidget * widget, gpointer);
 static void print_cb(GtkWidget * widget, gpointer);
 static void trash_cb(GtkWidget * widget, gpointer);
+
+static gint find_url_cb(GNode *node, struct BalsaMRUEntry *data);
+static void mru_select_cb(GtkWidget *widget, struct BalsaMRUEntry *entry);
 
 /*
  * The list of messages which are being displayed.
@@ -140,10 +156,16 @@ static GnomeUIInfo message_menu[] = {
     GNOMEUIINFO_END
 };
 
+static GnomeUIInfo move_menu[]={
+    GNOMEUIINFO_END
+};
+
 static GnomeUIInfo main_menu[] = {
     GNOMEUIINFO_MENU_FILE_TREE(file_menu),
     GNOMEUIINFO_MENU_EDIT_TREE(edit_menu),
     GNOMEUIINFO_MENU_VIEW_TREE(view_menu),
+#define MAIN_MENU_MOVE_POS 3
+    GNOMEUIINFO_SUBTREE("M_ove", move_menu),
     GNOMEUIINFO_SUBTREE("_Message", message_menu),
     GNOMEUIINFO_END
 };
@@ -156,10 +178,19 @@ struct _MessageWindow {
 
     LibBalsaMessage *message;
     int show_all_headers_save;
-	int headers_shown;
+    int headers_shown;
+    GtkWidget *move_menu;
+    gint transferred;
+    GList *mru_list;
 };
 
 void reset_show_all_headers(MessageWindow *mw);
+static void populate_move_menu(MessageWindow *mw);
+static gint close_if_transferred_cb(BalsaMBList * bmbl, GdkEvent * event,
+            MessageWindow * mw);
+static void transfer_message_cb(GtkCTree * ctree, GtkCTreeNode * row,
+			 gint column, MessageWindow * mw);
+static void load_mru(MessageWindow * mw);
 
 void
 message_window_new(LibBalsaMessage * message)
@@ -199,6 +230,7 @@ message_window_new(LibBalsaMessage * message)
     g_hash_table_insert(displayed_messages, message, mw);
 
     mw->message = message;
+    mw->mru_list= NULL;
 
     mw->window = gnome_app_new("balsa", "Message");
 
@@ -244,13 +276,17 @@ message_window_new(LibBalsaMessage * message)
 		       GTK_SIGNAL_FUNC(destroy_message_window), mw);
     
     gnome_app_create_menus_with_data(GNOME_APP(mw->window), main_menu, mw);
+
+    mw->move_menu = main_menu[MAIN_MENU_MOVE_POS].widget;
+    populate_move_menu(mw);
+    mw->bmessage = balsa_message_new();
+    mw->transferred = 0;
     
     scroll = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
 				   GTK_POLICY_AUTOMATIC,
 				   GTK_POLICY_AUTOMATIC);
 
-    mw->bmessage = balsa_message_new();
 
     gtk_signal_connect(GTK_OBJECT(mw->bmessage), "select-part",
 		       GTK_SIGNAL_FUNC(select_part_cb), mw);
@@ -306,6 +342,11 @@ destroy_message_window(GtkWidget * widget, gpointer data)
 
     gtk_widget_destroy(mw->window);
     gtk_widget_destroy(mw->bmessage);
+
+    if(mw->mru_list) {
+	g_list_foreach(mw->mru_list, (GFunc)g_free, NULL);
+	g_list_free(mw->mru_list);
+    }
 
     g_free(mw);
 }
@@ -583,3 +624,261 @@ void reset_show_all_headers(MessageWindow *mw)
     if(btn)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(btn), FALSE);
 }
+
+static void populate_move_menu(MessageWindow *mw)
+{
+    GtkWidget *item;
+    GtkWidget *scroller;
+    GtkWidget *bmbl;
+    GtkWidget *submenu, *smenuitem;
+    GtkRequisition req;
+    
+    if(mw->message->mailbox->readonly) {
+	gtk_widget_set_sensitive(mw->move_menu, FALSE);
+	return;
+    }
+
+    /* Load Folder MRU */
+    load_mru(mw);
+    
+    item=gtk_menu_item_new();
+    gtk_menu_append(GTK_MENU(GTK_MENU_ITEM(mw->move_menu)->submenu), item);
+    gtk_widget_show(item);
+    
+    /* Create standard entry */
+    item=gtk_menu_item_new_with_label(_("Folder"));
+    
+    gtk_menu_append(GTK_MENU(GTK_MENU_ITEM(mw->move_menu)->submenu), item);
+    gtk_widget_show(item);
+    
+    submenu=gtk_menu_new();
+    smenuitem=gtk_menu_item_new();
+
+    scroller=gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(scroller),
+                                    GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    bmbl = balsa_mblist_new();
+    
+    gtk_widget_size_request(bmbl, &req);
+    
+    if ( req.height > balsa_app.mw_height )
+	req.height = balsa_app.mw_height;
+    
+    req.width=balsa_app.mblist_width;
+    gtk_widget_set_usize(GTK_WIDGET(bmbl), req.width, req.height);
+    
+    gtk_container_add(GTK_CONTAINER(scroller), bmbl);
+    gtk_container_add(GTK_CONTAINER(smenuitem), scroller);
+    
+    gtk_menu_append(GTK_MENU(submenu), smenuitem);
+    gtk_widget_show(bmbl);
+    gtk_widget_show(scroller);
+    gtk_widget_show(smenuitem);
+    gtk_widget_show(submenu);
+    
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(item), submenu);
+    
+    gtk_signal_connect (GTK_OBJECT(smenuitem), "button_release_event",
+                        (GtkSignalFunc) close_if_transferred_cb,
+                        (gpointer) mw);
+    
+    gtk_signal_connect(GTK_OBJECT(bmbl), "tree_select_row",
+               (GtkSignalFunc) transfer_message_cb,
+		       (gpointer) mw);
+}
+
+static gint
+close_if_transferred_cb(BalsaMBList * bmbl, GdkEvent * event,
+            MessageWindow * mw)
+{
+    return  !(mw->transferred);
+}
+
+static void
+transfer_message_cb(GtkCTree * ctree, GtkCTreeNode * row, gint column,
+			 MessageWindow * mw)
+{
+    GtkCList* clist=NULL;
+    BalsaIndex* bindex = NULL;
+    BalsaMailboxNode *mbnode;
+    gboolean select_next = TRUE;
+
+    g_return_if_fail(mw != NULL);
+
+    bindex = balsa_find_index_by_mailbox(mw->message->mailbox);
+
+    mbnode = gtk_ctree_node_get_row_data(ctree, row);
+
+    if(mbnode->mailbox == NULL) return;
+
+   /*Transferring to same mailbox? */
+    if (mw->message->mailbox == mbnode->mailbox)
+	return;
+    
+    if(bindex != NULL && bindex->ctree != NULL) {
+	clist = GTK_CLIST(bindex->ctree);
+	
+	/* select the previous message if we're at the bottom of the index */
+	if (clist->rows - 1 == balsa_index_get_largest_selected(clist))
+	    select_next = FALSE;
+    }
+    
+    mw->transferred = TRUE;
+    libbalsa_message_move(mw->message, mbnode->mailbox);
+    
+    if(bindex != NULL && bindex->ctree != NULL) {
+	/* select another message depending on where we are in the list */
+	if (clist->rows > 1) {
+	    if (select_next)
+		balsa_index_select_next(bindex);
+	    else
+		balsa_index_select_previous(bindex);
+	}
+	libbalsa_mailbox_sync_backend(bindex->mailbox_node->mailbox);
+    }
+    
+    balsa_remove_from_folder_mru(mbnode->mailbox->url);
+    balsa_add_to_folder_mru(mbnode->mailbox->url);
+    
+    close_message_window(NULL, (gpointer) mw);
+}
+
+static gint
+find_url_cb(GNode *gnode, struct BalsaMRUEntry *data)
+{
+    BalsaMailboxNode *node;
+    
+    node=gnode->data;
+    if(!node || !BALSA_IS_MAILBOX_NODE(node))
+	return(FALSE);
+    
+    if(!node->mailbox)
+	return(FALSE);
+    
+    if(!strcmp(LIBBALSA_MAILBOX(node->mailbox)->url, data->url)) {
+	data->url=LIBBALSA_MAILBOX(node->mailbox)->url;
+	data->name=LIBBALSA_MAILBOX(node->mailbox)->name;
+	data->mailbox=LIBBALSA_MAILBOX(node->mailbox);
+	return TRUE;
+    }
+	
+    return FALSE;
+}
+
+static void
+load_mru(MessageWindow * mw)
+{
+    GList *mru;
+    GList *tmp;
+    struct BalsaMRUEntry *mru_entry;
+    GtkWidget *item;
+    
+    
+    for(mru=balsa_app.folder_mru; mru; mru = g_list_next(mru)) {
+	mru_entry=g_malloc(sizeof(struct BalsaMRUEntry));
+	
+	mru_entry->url=mru->data;
+	mru_entry->mailbox=NULL;
+	mru_entry->mw=mw;
+	g_node_traverse(balsa_app.mailbox_nodes, G_IN_ORDER, G_TRAVERSE_ALL,
+			-1, (gint (*)(GNode *, gpointer))find_url_cb, 
+			mru_entry);
+
+	if(mru_entry->mailbox == NULL) {
+	    /* could not find mailbox of given URL; *
+	     * this is really an internal error.    *
+	     * FIXME: check for memory leaks        *
+	     * FIXME2: this is not the right place  *
+	     * to check the integrity of folder_mru */
+	    g_error(__FILE__ "mru_folder integrity compromised.\n");
+	    g_free(mru_entry);
+	}
+	
+	mw->mru_list = g_list_append(mw->mru_list, mru_entry);
+	item = gtk_menu_item_new_with_label(mru_entry->name);
+	gtk_widget_show(item);
+	gtk_menu_append(GTK_MENU(GTK_MENU_ITEM(mw->move_menu)->submenu), item);
+	gtk_signal_connect(GTK_OBJECT(item), "activate",
+			   GTK_SIGNAL_FUNC(mru_select_cb), mru_entry);
+    }
+}
+
+static void
+mru_select_cb(GtkWidget *widget, struct BalsaMRUEntry *entry)
+{
+    MessageWindow *mw=entry->mw;
+    
+    LibBalsaMailbox *mailbox=entry->mailbox;
+    
+    GtkCList* clist=NULL;
+    BalsaIndex* bindex = NULL;
+    gboolean select_next = TRUE;
+
+    bindex = balsa_find_index_by_mailbox(mw->message->mailbox);
+
+   /*Transferring to same mailbox? */
+    if (mw->message->mailbox == mailbox)
+	return;
+
+    if(bindex != NULL && bindex->ctree != NULL) {
+	clist = GTK_CLIST(bindex->ctree);
+	
+	/* select the previous message if we're at the bottom of the index */
+	if (clist->rows - 1 == balsa_index_get_largest_selected(clist))
+	    select_next = FALSE;
+    }
+    
+    mw->transferred = TRUE;
+    libbalsa_message_move(mw->message, mailbox);
+    
+    if(bindex != NULL && bindex->ctree != NULL) {
+	/* select another message depending on where we are in the list */
+	if (clist->rows > 1) {
+	    if (select_next)
+		balsa_index_select_next(bindex);
+	    else
+		balsa_index_select_previous(bindex);
+	}
+	libbalsa_mailbox_sync_backend(bindex->mailbox_node->mailbox);
+    }
+    
+    balsa_remove_from_folder_mru(mailbox->url);
+    balsa_add_to_folder_mru(mailbox->url);
+
+    close_message_window(NULL, (gpointer) mw);
+}
+
+/* balsa_add_to_folder_mru:
+   add given folder to mailbox-recently-used list.
+*/
+void
+balsa_add_to_folder_mru(const gchar *url)
+{
+    if(g_list_length(balsa_app.folder_mru) >= FOLDER_MRU_LENGTH) {
+	void* tmp = g_list_last(balsa_app.folder_mru)->data;
+	balsa_app.folder_mru = 
+	    g_list_remove(balsa_app.folder_mru, tmp);
+	g_free(tmp);
+    }
+    balsa_app.folder_mru = 
+	g_list_prepend(balsa_app.folder_mru, g_strdup(url));
+}
+
+/* balsa_remove_from_folder_mru:
+   remove given url from the mailbox-recently-used list.
+*/
+void
+balsa_remove_from_folder_mru(const gchar *url)
+{
+    GList *tmp;
+    
+    for(tmp=balsa_app.folder_mru; tmp; tmp=g_list_next(tmp)) {
+	if(!strcmp((char *)tmp->data, url)) {
+	    g_free(tmp->data);
+	    balsa_app.folder_mru = 
+		g_list_remove(balsa_app.folder_mru, tmp->data);
+	    break;
+	}
+    }
+}
+

@@ -187,7 +187,8 @@ gboolean libbalsa_message_send(LibBalsaMessage* message,
 			       LibBalsaMailbox* outbox,  
 			       LibBalsaMailbox* fccbox,
 			       gint encoding, gchar* smtp_server,
-			       auth_context_t smtp_authctx);
+			       auth_context_t smtp_authctx,
+			       gint tls_mode);
 #else
 gboolean libbalsa_message_send(LibBalsaMessage* message,
 			       LibBalsaMailbox* outbox,  

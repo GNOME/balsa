@@ -143,8 +143,16 @@ static void
 balsa_mblist_destroy(GtkObject * obj)
 {
     BalsaMBList *del;
+    GtkCTree *ctree;
 
     del = BALSA_MBLIST(obj);
+
+    ctree = GTK_CTREE(del);
+
+    gtk_ctree_post_recursive(GTK_CTREE(del), NULL,
+			     balsa_mblist_disconnect_mailbox_signals,
+			     NULL); 
+
     /* chain up ... */
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
 	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(del));
@@ -1514,17 +1522,15 @@ mblist_drag_cb (GtkWidget* widget, GdkDragContext* context,
 
         /* cannot transfer to the originating mailbox */
         if (mailbox != orig_mailbox) {
-            switch (context->suggested_action) {
+            switch (context->action) {
             case GDK_ACTION_MOVE:
                 libbalsa_messages_move (messages, mailbox);
-                context->action = context->suggested_action;
                 break;
 
             case GDK_ACTION_DEFAULT:
             case GDK_ACTION_COPY:
             default:
                 libbalsa_messages_copy (messages, mailbox);
-		context->action = context->suggested_action;
                 break;
             }
             
@@ -1551,11 +1557,11 @@ mblist_drag_motion_cb (GtkWidget* mblist, GdkDragContext* context,
     
     if (flag) {
         adjust +=GTK_CLIST(mblist)->column_title_area.height;
-
-    y-=adjust;
-    gtk_clist_get_selection_info (GTK_CLIST (mblist), x, y, 
-                                  &row, &col);
-
+	
+	y-=adjust;
+	gtk_clist_get_selection_info (GTK_CLIST (mblist), x, y, 
+				      &row, &col);
+	
 	gtk_signal_handler_block_by_func(GTK_OBJECT (mblist),
 					 GTK_SIGNAL_FUNC (select_mailbox), 
 					 NULL);
@@ -1565,5 +1571,11 @@ mblist_drag_motion_cb (GtkWidget* mblist, GdkDragContext* context,
 					   NULL);
     }
 #endif
+    if(balsa_app.drag_default_is_move) {
+	gdk_drag_status(context,
+			(context->actions == GDK_ACTION_COPY)
+			? GDK_ACTION_COPY : GDK_ACTION_MOVE,
+			time);
+    }
     return FALSE;
 }

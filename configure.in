@@ -306,6 +306,7 @@ else
         AC_MSG_RESULT(not found)
 fi
 
+
 dnl ##########################################################################
 dnl Install into gnome locations? (may require priveliges that we don't have)
 dnl ##########################################################################
@@ -403,7 +404,7 @@ else
 fi	  
 
 AC_CHECK_LIB(esmtp, smtp_starttls_set_password_cb,
-	     AC_DEFINE(HAVE_SMTP_STARTLS),,-lesmtp)
+	     AC_DEFINE(HAVE_SMTP_TLS_CLIENT_CERTIFICATE), , -lesmtp)
 
 dnl ##########################################################################
 dnl Enable GSS?

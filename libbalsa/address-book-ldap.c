@@ -28,6 +28,7 @@
 #if ENABLE_LDAP
 
 #include <gnome.h>
+#include <sys/time.h>
 #include <lber.h>
 #include <ldap.h>
 

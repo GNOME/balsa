@@ -1,3 +1,32 @@
+2001-08-28  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Brian Stafford <brian@stafford.uklinux.net> ESMTP TLS patch extended.
+	* acconfig.h: rename 
+	HAVE_SMTP_STARTLS->HAVE_SMTP_TLS_CLIENT_CERTIFICATE
+	* configure.in: use renamed #define.
+	* libbalsa/address-book-ldap.c: add <sys/time.h>
+	* libbalsa/message.[ch]: add tls_mode flag to message_send.
+	* libbalsa/misc.h: add tls_mode flag to process queue.
+	* libbalsa/pop3.c: simplify getaddrinfo() part.
+	* libbalsa/send.c: enable/disable TLS.
+	* src/balsa-app.[hc]: certificate_passphrase field.
+	* src/balsa-message.c: pass user TLS choice to libbalsa_message_send().
+	* src/pref-manager.c: configure TLS and the passphrase.
+	* src/save-restore.c: save and restore TLS settings.
+	* src/sendmsg-window.c: use TLS setting to libbalsa_message_send().
+	* README: some instructions.
+
+	Melanie Thielker <balsa@t-data.com> recently-used mailbox (MRU)
+	patch.
+	* src/balsa-app.[hc]: folder_mru and drag_default_is_move fields.
+	* src/balsa-index.c: populate transfer menu with MRU list.
+	* src/balsa-mblist.c: disconnect mailbox signals on destroy. 
+	Use default Move/Copy action.
+	* src/main-window.c: restore all headers option before saving.
+	* src/message-window.c: populate Move menu with MRU list.
+	* src/pref-manager.c: configure default d&d action.
+	* src/save-restore.c: save&restore default d&d action.
+	
 2001-08-27  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/sendmsg-window.c: fix ##59535 introduced two days ago.

@@ -493,13 +493,9 @@ changequote([, ])dnl
         LIBS="$mutt_save_LIBS",
 	[ AC_MSG_ERROR("Cannot cross compile libmutt. Yet")] )
 if test "$mutt_cv_iconv_nontrans" = yes; then
-  AC_DEFINE(ICONV_NONTRANS, 1)
-else
-  AC_DEFINE(ICONV_NONTRANS, 0)
+  AC_DEFINE(ICONV_NONTRANS, 1, [Iconv bug detection])
 fi
 
-else # "$mutt_cv_iconv" != no
-  AC_DEFINE(ICONV_NONTRANS, 0)
 fi
 
 

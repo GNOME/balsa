@@ -147,6 +147,28 @@ Pass Phrase:
 	password.  Limitations on the length of the pass phrase depend
 	on the SMTP server.
 
+
+TLS extension in SMTP mail submission:
+--------------------------------------
+
+    If you have libESMTP 0.8.5{preX} there will be a box for entry of
+    the client certificate's password.  The client certificate should
+    be stored in PEM format in the file
+    $HOME/.authenticate/private/smtp-starttls.pem Both the certificate and
+    the private key are stored in the same file.  The permissions on
+    the certificate file *must* be 0600 or 0400 otherwise libESMTP
+    will ignore it.
+
+    libESMTP 0.8.4 will establish an encrypted connection with servers
+    supporting STARTTLS but there is no certificate support.  If the
+    remote SMTP server requires a certificate, you will have to set
+    "Use TLS" to "Never".
+
+    Note that libESMTP 0.8.5 will only negotiate a TLS connection.  It
+    will not use SSLv2 or SSLv3 which are subject to downgrade
+    attacks.
+
+
 Help System:
 -----------
 	In order to compile the help files, you need to have the
@@ -162,24 +184,24 @@ balsa -m "%s".
 
 Mailbox locking:
 ---------------
-	Balsa uses flock+dotfile for mailbox file locking. It does not
-use fcntl (although it can be enabled) since this locking method is
-very fragile and often not portable (see for example
-http://www.washington.edu/pine/tech-notes/low-level.html#locking).
+    Balsa uses flock+dotfile for mailbox file locking. It does not
+    use fcntl (although it can be enabled) since this locking method is
+    very fragile and often not portable (see for example
+    http://www.washington.edu/pine/tech-notes/low-level.html#locking).
 
-Make sure that your spool directory has drwxrwxrwt (01777) access
-privileges. Presently, dotfile locking requires this unconditionally
-In the future, we may relax this requirement and will allow you to
-shoot yourself in your leg.
+    Make sure that your spool directory has drwxrwxrwt (01777) access
+    privileges. Presently, dotfile locking requires this unconditionally
+    In the future, we may relax this requirement and will allow you to
+    shoot yourself in your leg.
 
 POP3 mail filtering:
 -------------------
 
-When the respective POP3 'mailbox' has the 'filter' box checked, the
-downloaded mail is passed on to procmail which will use ~/.procmailrc
-file as its configuration, so you can share it between balsa and
-fetchmail and get consistent behavior no matter you use balsa or
-fetchmail for downloading.
+    When the respective POP3 'mailbox' has the 'filter' box checked, the
+    downloaded mail is passed on to procmail which will use
+    ~/.procmailrc file as its configuration, so you can share it between
+    balsa and fetchmail and get consistent behavior no matter you use
+    balsa or fetchmail for downloading.
 
 Simple example ~/.procmailrc file:
 --------- cut here ----------------
@@ -195,6 +217,7 @@ real-life examples and syntax explanation.
 Reporting Bugs: --------------
 	See http://www.balsa.net/bugs.html for instructions.  Do not
 report bugs with GtkHTML - it is quite unstable. Patches are welcome.
+
 
 
 Known issues:

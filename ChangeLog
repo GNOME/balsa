@@ -1,3 +1,10 @@
+1999-12-14  Ragnar Henriksen <ragnar@juniks.org>
+	* removed a newline tag after name in addressbook.
+	  It could cause strange things, I didn't see this the
+	  first time I updated address-book.c. But after upgrading
+	  to the latest gnome-pim it showed. (Maybe they did something
+	  with the layout of GnomeGard.gcrd?)
+
 1999-12-12  Peter Williams  <peter@wgwill.ne.mediaone.net>
 
 	* libbalsa/filter-file.c: Removed compile warnings

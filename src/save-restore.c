@@ -196,15 +196,6 @@ load_mailboxes (gchar * name)
       MAILBOX_IMAP (mailbox)->path = gnome_config_get_string ("Path");
       balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mailbox);
       break;
-
-      /*  NNTP  */
-    case 3:
-      mailbox = mailbox_new (MAILBOX_NNTP);
-      mailbox->name = g_strdup (name);
-      MAILBOX_NNTP (mailbox)->server = gnome_config_get_string ("server");
-      MAILBOX_NNTP (mailbox)->newsgroup = gnome_config_get_string ("newsgroup");
-      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mailbox);
-      break;
     }
 
 

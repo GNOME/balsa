@@ -246,10 +246,6 @@ refresh_mailbox_manager ()
 	  list_items[2] = ((MailboxIMAP *) mailbox)->server;
 	  break;
 	  
-	case MAILBOX_NNTP:
-	  list_items[2] = ((MailboxNNTP *) mailbox)->server;
-	  break;
-
 	default:
 	  list_items[2] = NULL;
 	  break;

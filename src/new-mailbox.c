@@ -33,7 +33,6 @@ typedef enum
   NM_PAGE_LOCAL,
   NM_PAGE_POP3,
   NM_PAGE_IMAP,
-  NM_PAGE_NNTP
 } NewMailboxPageType;
 
 
@@ -267,9 +266,6 @@ ok_new_mailbox (GtkWidget * widget)
       
     case NM_PAGE_IMAP:
       break;
-      
-    case NM_PAGE_NNTP:
-      break;
     }
 
 
@@ -422,25 +418,6 @@ create_new_page (NewMailboxWindow * nmw)
 		      NULL);
 
   gtk_widget_show (radio_button);
-
-
-
-  radio_button = gtk_radio_button_new_with_label 
-    (gtk_radio_button_group (GTK_RADIO_BUTTON (radio_button)), "NNTP");
-  gtk_table_attach (GTK_TABLE (table), radio_button, 0, 1, 3, 4,
-		    GTK_FILL, GTK_FILL | GTK_EXPAND, 
-		    0, 0);
-
-  set_new_mailbox_data (GTK_OBJECT (radio_button), nmw);
-  gtk_object_set_user_data (GTK_OBJECT (radio_button), (gpointer) NM_PAGE_NNTP);
-
-  gtk_signal_connect (GTK_OBJECT (radio_button),
-		      "clicked",
-		      (GtkSignalFunc) local_mailbox_type_cb,
-		      NULL);
-
-  gtk_widget_show (radio_button);
-
 
   return hbox;
 }
@@ -647,9 +624,6 @@ next_cb (GtkWidget * widget)
       break;
 
     case NM_PAGE_IMAP:
-      break;
-
-    case NM_PAGE_NNTP:
       break;
     }
 

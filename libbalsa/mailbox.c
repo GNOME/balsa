@@ -541,6 +541,12 @@ mailbox_check_new_messages (Mailbox * mailbox)
 
       if (mailbox->new_messages > 0)
 	{
+
+	  mailbox->unread_messages += mailbox->new_messages ;
+	  mailbox->total_messages += mailbox->new_messages ;
+	  /* TODO:the preceeding two lines should be put in load_messages 
+	     but I don't want to rely on the 'emit' flag to know if there is REALLY 
+	     new mail in the mailbox. -bertrand */
 	  load_messages (mailbox, 1);
 	  UNLOCK_MAILBOX (mailbox);
 	  return TRUE;
@@ -693,10 +699,11 @@ load_messages (Mailbox * mailbox, gint emit)
 
       mailbox->message_list = g_list_append (mailbox->message_list, message);
       mailbox->new_messages--;
-
+     
       if (emit)
-	send_watcher_new_message (mailbox, message, mailbox->new_messages);
-
+	{
+	  send_watcher_new_message (mailbox, message, mailbox->new_messages);
+	}
       /* 
        * give time to gtk so the GUI isn't blocked
        * this is kinda a hack right now
@@ -1051,6 +1058,43 @@ mailbox_valid (gchar * filename)
     }
 }
 
+/**
+ * mailbox_gather_content_info:
+ *
+ * @mailbox : the mailbox to scan
+ *
+ * gather informations about the content of a mailbox such as the
+ * total nuber of messages, the number of unread messages 
+ * 
+ *
+ * Return value: if the mailbox could be scanned, returns true. 
+ **/
+gboolean
+mailbox_gather_content_info( Mailbox *mailbox )
+{
+  GList *message_list;
+  Message *current_message;
+
+
+  mailbox_open_ref (mailbox);
+
+  mailbox->total_messages = 0;
+  mailbox->unread_messages = 0;
+  /* examine all the message in the mailbox */
+  message_list = mailbox->message_list;
+  while (message_list)
+    {
+      current_message = (Message *) message_list->data;
+      if ( current_message->flags & MESSAGE_FLAG_NEW ) mailbox->unread_messages++ ;
+      mailbox->total_messages++ ;
+      message_list = message_list->next;
+      
+    }
+
+  mailbox_open_unref (mailbox);
+  return TRUE;
+}
+
 
 /*
  * messages
@@ -1115,45 +1159,45 @@ void
 message_copy (Message * message, Mailbox * dest)
 {
   HEADER *cur;
-  gint new_opened;
 
   RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
 
   cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
 
-  /* if the mailbox is not already opened, open it */
-  new_opened = mailbox_open_ref (dest);
+  mailbox_open_ref (dest);
 
   mutt_append_message (CLIENT_CONTEXT (dest),
 		       CLIENT_CONTEXT (message->mailbox),
 		       cur, 0, 0);
+
+  dest->total_messages++;
+  if (message->flags & MESSAGE_FLAG_NEW ) dest->unread_messages++;
   send_watcher_append_message (dest, message);
-  /* if we opened the mail box, close it */
-  if (new_opened) mailbox_open_unref (dest);
+  mailbox_open_unref (dest);
 }
 
 void
 message_move (Message * message, Mailbox * dest)
 {
   HEADER *cur;
-  gint new_opened;
 
   RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
   
   cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
 
-  /* if the mailbox is not already opened, open it */
-  new_opened = mailbox_open_append (dest);
+  mailbox_open_append (dest);
 
   mutt_parse_mime_message (CLIENT_CONTEXT (message->mailbox), cur);
 
   mutt_append_message (CLIENT_CONTEXT (dest),
 		       CLIENT_CONTEXT (message->mailbox),
 		       cur, 0, CH_UPDATE_LEN);
+  
+  dest->total_messages++;
+  if (message->flags & MESSAGE_FLAG_NEW ) dest->unread_messages++;
   send_watcher_append_message (dest, message);
- 
-  /* if we opened the mail box, close it */
-  if (new_opened) mailbox_open_unref (dest);
+  
+  mailbox_open_unref (dest);
   
   message_delete (message);
 }
@@ -1210,6 +1254,7 @@ message_read (Message * message)
   mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_OLD, FALSE);
 
   message->flags &= ~MESSAGE_FLAG_NEW;
+  message->mailbox->unread_messages-- ;
   send_watcher_mark_read_message (message->mailbox, message);
 
   UNLOCK_MAILBOX (message->mailbox);
@@ -1226,6 +1271,7 @@ message_unread (Message * message)
   mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, MFLAG_READ, TRUE);
 
   message->flags |= MESSAGE_FLAG_NEW;
+  message->mailbox->unread_messages++ ;
   send_watcher_mark_unread_message (message->mailbox, message);
 
   UNLOCK_MAILBOX (message->mailbox);
@@ -1242,6 +1288,8 @@ message_delete (Message * message)
   mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_DELETE, TRUE);
 
   message->flags |= MESSAGE_FLAG_DELETED;
+  if (message->flags & MESSAGE_FLAG_NEW ) message->mailbox->unread_messages--;
+  message->mailbox->total_messages--;
   send_watcher_mark_delete_message (message->mailbox, message);
 
   UNLOCK_MAILBOX (message->mailbox);
@@ -1259,6 +1307,8 @@ message_undelete (Message * message)
   mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_DELETE, FALSE);
 
   message->flags &= ~MESSAGE_FLAG_DELETED;
+  if (message->flags & MESSAGE_FLAG_NEW ) message->mailbox->unread_messages++;
+  message->mailbox->total_messages++;
   send_watcher_mark_undelete_message (message->mailbox, message);
 
   UNLOCK_MAILBOX (message->mailbox);

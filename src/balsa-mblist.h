@@ -30,6 +30,7 @@ typedef struct _BalsaMBListClass BalsaMBListClass;
 struct _BalsaMBList
   {
     GtkCTree ctree;
+    GList *watched_mailbox; /* list of mailbox watched */
   };
 
 struct _BalsaMBListClass

@@ -45,7 +45,8 @@ static gint balsa_mblist_signals[LAST_SIGNAL] =
 
 static void select_mailbox (GtkCTree * ctree, GtkCTreeNode * row, gint column);
 static void button_event_press_cb (GtkCList * clist, GdkEventButton * event, gpointer data);
-
+static void balsa_mblist_release_watchers (BalsaMBList *bmbl);
+static void balsa_mblist_add_watched_mailbox (BalsaMBList *bmbl, Mailbox *mailbox);
 
 static BalsaMBListClass *parent_class = NULL;
 
@@ -57,6 +58,7 @@ static void balsa_mblist_init (BalsaMBList * tree);
 
 static void mailbox_tree_expand (GtkCTree *, GtkCTreeNode *, gpointer);
 static void mailbox_tree_collapse (GtkCTree *, GtkCTreeNode *, gpointer);
+static void mailbox_listener (MailboxWatcherMessage * mw_message);
 
 guint
 balsa_mblist_get_type (void)
@@ -98,7 +100,8 @@ balsa_mblist_destroy (GtkObject * obj)
   BalsaMBList *del;
 
   del = BALSA_MBLIST (obj);
-
+  balsa_mblist_release_watchers (del);
+  
   if (GTK_OBJECT_CLASS (parent_class)->destroy)
     (*GTK_OBJECT_CLASS (parent_class)->destroy) (GTK_OBJECT (del));
 }
@@ -132,7 +135,7 @@ balsa_mblist_class_init (BalsaMBListClass * klass)
 static void
 balsa_mblist_init (BalsaMBList * tree)
 {
-  char *titles[3]={"name", "unread", "total"};
+  char *titles[3]={"mailbox", "unread", "total"};
   gtk_widget_push_visual (gdk_imlib_get_visual ());
   gtk_widget_push_colormap (gdk_imlib_get_colormap ());
   
@@ -151,8 +154,8 @@ balsa_mblist_init (BalsaMBList * tree)
   gtk_ctree_set_expander_style (GTK_CTREE (tree), GTK_CTREE_EXPANDER_CIRCULAR);
   gtk_clist_set_row_height (GTK_CLIST (tree), 16);
   gtk_clist_set_column_width (GTK_CLIST (tree), 0, 80);
-  gtk_clist_set_column_width (GTK_CLIST (tree), 1, 40);
-  gtk_clist_set_column_width (GTK_CLIST (tree), 2, 40);
+  gtk_clist_set_column_width (GTK_CLIST (tree), 1, 45);
+  gtk_clist_set_column_width (GTK_CLIST (tree), 2, 45);
 
   gtk_signal_connect (GTK_OBJECT (tree), "tree_select_row",
 		      GTK_SIGNAL_FUNC (select_mailbox),
@@ -166,52 +169,129 @@ balsa_mblist_init (BalsaMBList * tree)
   balsa_mblist_redraw (tree);
 }
 
+
+static void
+balsa_mblist_add_watched_mailbox (BalsaMBList *bmbl, Mailbox *mailbox)
+{
+  bmbl->watched_mailbox = g_list_append(  bmbl->watched_mailbox, mailbox );
+  mailbox_watcher_set (mailbox,
+		       (MailboxWatcherFunc) mailbox_listener,
+		       MESSAGE_MARK_READ_MASK |
+		       MESSAGE_MARK_UNREAD_MASK |
+		       MESSAGE_MARK_DELETE_MASK |
+		       MESSAGE_MARK_UNDELETE_MASK |
+		       MESSAGE_DELETE_MASK |
+		       MESSAGE_NEW_MASK |
+		       MESSAGE_APPEND_MASK,
+		       (gpointer) bmbl );
+}
+
+
+static void
+balsa_mblist_release_watchers (BalsaMBList *bmbl)
+{
+  GList *wmb;
+  GList *new_wmb;
+  guint nb_wmb;
+  guint cur_mb_num;
+  Mailbox *cur_mb;
+  
+  new_wmb = bmbl->watched_mailbox;
+  if (!new_wmb) return;
+  nb_wmb = g_list_length(new_wmb);
+  for (cur_mb_num=0; cur_mb_num<nb_wmb; cur_mb_num++)
+    {
+      wmb = new_wmb;
+      cur_mb = wmb->data;
+      mailbox_watcher_remove_by_data(cur_mb, (gpointer) bmbl);
+      new_wmb=wmb->next;
+    }
+
+  g_list_free(bmbl->watched_mailbox);
+  bmbl->watched_mailbox = NULL;
+}
+
+#define INFO_FIELD_LENGTH 6
+static void 
+balsa_mblist_set_row_info_fields (BalsaMBList *bmbl, GtkCTreeNode *cnode, Mailbox *mailbox)
+{
+  gchar *info_field_text;
+  GtkCTree *ctree;
+
+  info_field_text = g_new(gchar, INFO_FIELD_LENGTH);
+  ctree = GTK_CTREE (bmbl);
+
+  g_snprintf( info_field_text, INFO_FIELD_LENGTH, "%ld", mailbox->unread_messages );
+  gtk_ctree_node_set_text (ctree, cnode, 1, info_field_text);
+
+  g_snprintf( info_field_text, INFO_FIELD_LENGTH, "%ld", mailbox->total_messages );
+  gtk_ctree_node_set_text (ctree, cnode, 2, info_field_text);
+
+  g_free(info_field_text);
+}
+
 void
 balsa_mblist_redraw (BalsaMBList * bmbl)
 {
   GtkCTreeNode *ctnode;
   gchar *text[3];
   GtkCTree *ctree;
-
+  
   if (!BALSA_IS_MBLIST (bmbl))
     return;
 
   ctree = GTK_CTREE (bmbl);
 
   gtk_clist_clear (GTK_CLIST (ctree));
+  balsa_mblist_release_watchers (bmbl);
 
   gtk_clist_freeze (GTK_CLIST (ctree));
 
-  text[1] = "";
-  text[2] = "";
+  text[1] = g_new(gchar, INFO_FIELD_LENGTH);
+  text[2] = g_new(gchar, INFO_FIELD_LENGTH);
   /* inbox */
   text[0] = "Inbox";
-  
+  mailbox_gather_content_info( balsa_app.inbox );
+  g_snprintf( text[1], INFO_FIELD_LENGTH, "%ld",  (balsa_app.inbox)->unread_messages );
+  g_snprintf( text[2], INFO_FIELD_LENGTH, "%ld",  (balsa_app.inbox)->total_messages );
   ctnode = gtk_ctree_insert_node (ctree, NULL, NULL, text, 5,
 				  balsa_icon_get_pixmap (BALSA_ICON_INBOX),
 				  balsa_icon_get_bitmap (BALSA_ICON_INBOX),
 				  NULL, NULL,
 				  FALSE, FALSE);
   gtk_ctree_node_set_row_data (ctree, ctnode, balsa_app.inbox);
+  balsa_mblist_add_watched_mailbox(bmbl, balsa_app.inbox);
 
   /* outbox */
   text[0] = "Outbox";
+  mailbox_gather_content_info( balsa_app.outbox );
+  g_snprintf( text[1], INFO_FIELD_LENGTH, "%ld",  (balsa_app.outbox)->unread_messages );
+  g_snprintf( text[2], INFO_FIELD_LENGTH, "%ld",  (balsa_app.outbox)->total_messages );
   ctnode = gtk_ctree_insert_node (ctree, NULL, NULL, text, 5,
 				  balsa_icon_get_pixmap (BALSA_ICON_OUTBOX),
 				  balsa_icon_get_bitmap (BALSA_ICON_OUTBOX),
 				  NULL, NULL,
 				  FALSE, FALSE);
   gtk_ctree_node_set_row_data (ctree, ctnode, balsa_app.outbox);
+  balsa_mblist_add_watched_mailbox(bmbl, balsa_app.outbox);
 
   /* trash */
   text[0] = "Trash";
+  mailbox_gather_content_info( balsa_app.trash );
+  g_snprintf( text[1], INFO_FIELD_LENGTH, "%ld",  (balsa_app.trash)->unread_messages );
+  g_snprintf( text[2], INFO_FIELD_LENGTH, "%ld",  (balsa_app.trash)->total_messages );
   ctnode = gtk_ctree_insert_node (ctree, NULL, NULL, text, 5,
 				  balsa_icon_get_pixmap (BALSA_ICON_TRASH),
 				  balsa_icon_get_bitmap (BALSA_ICON_TRASH),
 				  NULL, NULL,
 				  FALSE, FALSE);
   gtk_ctree_node_set_row_data (ctree, ctnode, balsa_app.trash);
+  balsa_mblist_add_watched_mailbox(bmbl, balsa_app.trash);
 
+
+  g_free( text[1] );
+  g_free( text[2] );
+  
   if (balsa_app.mailbox_nodes)
     {
       GNode *walk;
@@ -236,7 +316,10 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 			gpointer data)
 {
   MailboxNode *mbnode;
-
+  gchar *info_field_text;
+  
+  info_field_text = g_new(gchar, INFO_FIELD_LENGTH);
+  
   if (!gnode || (!(mbnode = gnode->data)))
     return FALSE;
 
@@ -279,7 +362,6 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 		  style->font = font;
 
 		  gtk_ctree_node_set_row_style (ctree, cnode, style);
-
 		  gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
 			       balsa_icon_get_pixmap (BALSA_ICON_TRAY_FULL),
 			       balsa_icon_get_bitmap (BALSA_ICON_TRAY_FULL),
@@ -289,15 +371,20 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 		}
 	      else
 		{
-		  gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
-			      balsa_icon_get_pixmap (BALSA_ICON_TRAY_EMPTY),
-			      balsa_icon_get_bitmap (BALSA_ICON_TRAY_EMPTY),
+		  gtk_ctree_set_node_info (ctree, cnode,mbnode->mailbox->name, 5,
+					   balsa_icon_get_pixmap (BALSA_ICON_TRAY_EMPTY),
+					   balsa_icon_get_bitmap (BALSA_ICON_TRAY_EMPTY),
 					   NULL, NULL,
 					   FALSE,
 					   FALSE);
 		}
-
+	      /* get and display the information fields for this mailbox */
+	      mailbox_gather_content_info(mbnode->mailbox);
+	      balsa_mblist_set_row_info_fields (BALSA_MBLIST(ctree), cnode, mbnode->mailbox);
 	      gtk_ctree_node_set_row_data (ctree, cnode, mbnode->mailbox);
+	      balsa_mblist_add_watched_mailbox(BALSA_MBLIST(ctree), mbnode->mailbox);
+
+      
 	    }
 	}
     }
@@ -313,6 +400,7 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 			       mbnode->expanded);
       gtk_ctree_node_set_row_data (ctree, cnode, mbnode);
     }
+  g_free( info_field_text );
   return TRUE;
 }
 
@@ -382,3 +470,47 @@ mailbox_tree_collapse (GtkCTree * ctree, GtkCTreeNode * node, gpointer data)
   mbnode = gtk_ctree_node_get_row_data (ctree, node);
   mbnode->expanded = FALSE;
 }
+
+
+/**
+ * mailbox_listener:
+ * @mw_message: data field sent by the watched mailbox
+ *
+ * listen for mailbox messages and react accordingly 
+ */
+static void
+mailbox_listener (MailboxWatcherMessage * mw_message)
+{
+  BalsaMBList *mbl = (BalsaMBList *)mw_message->data;
+  GtkCTree *ctree;
+  Mailbox *sender_mailbox;
+  GtkCTreeNode *cnode;
+
+  /* retrieve the mailbox who sent the message */
+  sender_mailbox = mw_message->mailbox;
+  ctree = GTK_CTREE (mbl);
+  /* find the row concerned by this message */
+  cnode = gtk_ctree_find_by_row_data ( ctree, NULL, sender_mailbox);
+  /* the row may not be found (for example when the mblist 
+     ctree is not constructed yet), in this case exit */
+  if (!cnode) return;
+  
+  switch (mw_message->type)
+    {
+    case MESSAGE_MARK_READ:
+    case MESSAGE_MARK_UNREAD:
+    case MESSAGE_MARK_DELETE:
+    case MESSAGE_MARK_UNDELETE:
+    case MESSAGE_NEW:
+    case MESSAGE_DELETE:
+    case MESSAGE_APPEND:
+      balsa_mblist_set_row_info_fields (mbl, cnode, sender_mailbox);
+
+      break;     
+    default:
+      break;
+    }
+}
+
+
+

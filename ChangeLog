@@ -1,3 +1,31 @@
+1999-01-10  bertrand  <Bertrand.Guiheneuf@inria.fr>
+
+	added the code to view infos about the mailboxes in the mailbox list
+	it roughly works but the possibility to show or not show info fields
+	must still be added.
+	
+	* src/balsa-mblist.c (balsa_mblist_set_row_info_fields): new function
+	to display informations about a mailbox.
+	(balsa_mblist_release_watchers): free the list of mailbox the mailbox
+	list is watching.
+	(balsa_mblist_add_watched_mailbox): add a mailbox to the list of
+	watched mailboxes.
+	(balsa_mblist_redraw): when creating the mailbox row, add the info fields
+	(mailbox_nodes_to_ctree): idem on normal mailboxes.
+	(mailbox_listener): when notified there is a change, upadte the
+	information field of the concerned row.
+
+	* libbalsa/mailbox.c: new function (mailbox_gather_content_info)
+	the name tells everything about it.
+	(message_copy): update the mailbox info fields
+	(message_move): idem
+	(message_read): idem
+	(message_unread): idem
+	(mailbox_check_new_messages): idem
+
+	* libbalsa/mailbox.h: added the unread_message field.
+	also added the total_messages field.
+	
 1999-01-08  bertrand  <Bertrand.Guiheneuf@inria.fr>
 
 	* src/balsa-mblist.c (balsa_mblist_redraw): start to add 

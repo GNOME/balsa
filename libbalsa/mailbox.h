@@ -134,6 +134,11 @@ struct _Mailbox
     glong messages;
     glong new_messages;
     GList *message_list;
+
+    /* info fields */
+    glong unread_messages; /* number of unread messages in the mailbox */
+    glong total_messages;  /* total number of messages in the mailbox  */
+
   };
 
 
@@ -339,6 +344,7 @@ MailboxType mailbox_type_from_description (gchar * description);
 gchar *mailbox_type_description (MailboxType type);
 MailboxType mailbox_valid (gchar * filename);
 gchar *message_pathname (Message * message);
+gboolean mailbox_gather_content_info( Mailbox *mailbox );
 
 char *mime_content_type2str (int contenttype);
 

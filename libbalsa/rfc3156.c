@@ -1204,7 +1204,7 @@ check_gpg_child(gpointer data)
 {
     spawned_gpg_T *spawned_gpg = (spawned_gpg_T *) data;
     int status;
-    unsigned int bytes_read;
+    ssize_t bytes_read;
     gchar buffer[1024], *gpg_message;
     GtkWidget *dialog;
 

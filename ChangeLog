@@ -1,3 +1,7 @@
+2005-03-24 Albrecht Dreß <albrecht dot dress at arcor dot de>
+
+	* libbalsa/rfc3156.c: plug in recently introduced DoS.
+
 2005-03-24 06:59  PeterB
 
 	* src/ab-main.c: set all locales.

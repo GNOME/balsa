@@ -1,3 +1,9 @@
+2003-09-24 09:47  PeterB
+
+	* libbalsa/folder-scanners.c, libbalsa/folder-scanners.h,
+	src/mailbox-node.c: Pass noselect and noinferiors to mailbox
+	handler.
+
 2003-09-23 23:19  PeterB
 
 	* src/balsa-mblist.c: Be paranoid about dereferencing view pointer.

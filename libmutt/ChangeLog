@@ -1,3 +1,7 @@
+2002-08-29  Carlos Morgado  <chbm@chbm.nu>
+
+	* rx/: removed. it wasn't used
+
 2002-08-06  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* configure.in, Makefile.am: build with autoconf-2.53

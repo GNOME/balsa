@@ -565,10 +565,6 @@ update_message_flag (BalsaIndex * bindex,
 	  if (first_new_mesgno == 0)
 	    first_new_mesgno = mesgno;
 	}
-      else
-      {
-          gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), mesgno - 1, 0, NULL);
-      }
       break;
     case 'D':
       gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), mesgno - 1, 0, flag);
@@ -687,6 +683,7 @@ select_message (GtkWidget * widget,
 {
   BalsaIndex *bindex;
   glong mesgno;
+  gchar *foo=g_malloc(sizeof(char *)*2);
 
   bindex = BALSA_INDEX (data);
 
@@ -695,11 +692,16 @@ select_message (GtkWidget * widget,
    * starts getting sorted! */
   mesgno = row + 1;
 
+  gtk_clist_get_text(GTK_CLIST (GTK_BIN (bindex)->child),row,0,&foo);
+  if (*foo!='D')
+  update_message_flag (bindex, mesgno, " ");
+
   gtk_signal_emit (GTK_OBJECT (bindex),
 		   balsa_index_signals[SELECT_MESSAGE],
 		   bindex->stream,
 		   mesgno,
 		   NULL);
+
   if (bevent)
     {
       if (bevent->button == 3)
@@ -728,5 +730,4 @@ unselect_message (GtkWidget * widget,
 
   /* update the index to show any changes in the message
    * state */
-  update_message_flag (bindex, mesgno, "N");
 }

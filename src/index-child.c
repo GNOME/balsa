@@ -124,9 +124,9 @@ index_child_destroy (GtkObject * obj)
   IndexChild *ic;
 
   ic = INDEX_CHILD (obj);
-
+  
+  mailbox_watcher_remove(ic->mailbox, BALSA_INDEX(ic->index)->watcher_id);
   mailbox_open_unref (ic->mailbox);
-
   if (GTK_OBJECT_CLASS (parent_class)->destroy)
     (*GTK_OBJECT_CLASS (parent_class)->destroy) (GTK_OBJECT (ic));
 }

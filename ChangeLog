@@ -1,3 +1,7 @@
+2005-02-22 19:53  PeterB
+
+	* src/main-window.c: remove ctrl+F accelerator from forward-inline.
+
 2005-02-20 Kacper Wysocki <kacperw at online dot no>
 
 	* libbalsa/imap/pop3.c: const char *service should not be static.

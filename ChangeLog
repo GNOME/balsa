@@ -1,3 +1,7 @@
+2001-02-26  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/main/window.c: fix "-o" option
+
 2001-02-25  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/main-window.c: (real_open_mbnode) fix nasty gdk deadlock
@@ -17,6 +21,16 @@
 	* src/mailbox-conf.[hc]: use mblist_remove_mailbox_node() instead of 
 	mblist_repopulate(). callaback for mailbox edition from menu fixed.
 	* src/main-window.c: fix mailbox edition from menu; release gdk_lock
+	
+2001-02-23  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/send.c:  remove redundant pthread_exit().
+	* src/balsa-index.c: 
+	* src/main-window.c: improve MT mailbox opening so the signals are 
+	handled in correct order.
+	* src/balsa-message.c: armouring gdk_pixbuf.
+	* src/sendmsg-window.c: check if the sending thread exited before
+	quitting when handling "--compose" option"
 	
 2001-02-22  Pawel Salek  <pawsa@theochem.kth.se>
 

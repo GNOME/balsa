@@ -136,6 +136,7 @@ static void enable_message_menus(LibBalsaMessage * message);
 static void enable_edit_menus(BalsaMessage * bm);
 static void register_open_mailbox(LibBalsaMailbox *m);
 static void unregister_open_mailbox(LibBalsaMailbox *m);
+static gboolean is_open_mailbox(LibBalsaMailbox *m);
 
 static gint about_box_visible = FALSE;
 
@@ -1008,14 +1009,17 @@ real_open_mbnode(BalsaMailboxNode* mbnode)
     GtkWidget *label;
     gint page_num;
     gboolean failurep;
-    
+
 #ifdef BALSA_USE_THREADS
     static pthread_mutex_t open_lock = PTHREAD_MUTEX_INITIALIZER;
-    if(pthread_mutex_trylock(&open_lock) != 0){
-	printf("already opening another mailbox.\n");
+    pthread_mutex_lock(&open_lock);
+#endif
+    if(is_open_mailbox(mbnode->mailbox)) {
+	g_warning("mailbox %s is already open.", mbnode->mailbox->name);
+	pthread_mutex_unlock(&open_lock);
 	return;
     }
-#endif
+
     index = BALSA_INDEX(balsa_index_new());
     index->window = GTK_WIDGET(balsa_app.main_window);
 
@@ -1248,33 +1252,35 @@ balsa_window_refresh(BalsaWindow * window)
 */
 #ifdef BALSA_USE_THREADS
 static pthread_mutex_t open_list_lock = PTHREAD_MUTEX_INITIALIZER;
-
-static void register_open_mailbox(LibBalsaMailbox *m)
-{
-    pthread_mutex_lock(&open_list_lock);
-    balsa_app.open_mailbox_list =
-	g_list_prepend(balsa_app.open_mailbox_list, m);
-    pthread_mutex_unlock(&open_list_lock);
-}
-static void unregister_open_mailbox(LibBalsaMailbox *m)
-{
-    pthread_mutex_lock(&open_list_lock);
-	balsa_app.open_mailbox_list =
-	    g_list_remove(balsa_app.open_mailbox_list, m);
-    pthread_mutex_unlock(&open_list_lock);
-}
+#define LOCK_OPEN_LIST pthread_mutex_lock(&open_list_lock)
+#define UNLOCK_OPEN_LIST pthread_mutex_unlock(&open_list_lock)
 #else
+#define LOCK_OPEN_LIST 
+#define UNLOCK_OPEN_LIST
+#endif
 static void register_open_mailbox(LibBalsaMailbox *m)
 {
+    LOCK_OPEN_LIST;
     balsa_app.open_mailbox_list =
 	g_list_prepend(balsa_app.open_mailbox_list, m);
+    UNLOCK_OPEN_LIST;
 }
 static void unregister_open_mailbox(LibBalsaMailbox *m)
 {
+    LOCK_OPEN_LIST;
     balsa_app.open_mailbox_list =
 	g_list_remove(balsa_app.open_mailbox_list, m);
+    UNLOCK_OPEN_LIST;
 }
-#endif
+static gboolean is_open_mailbox(LibBalsaMailbox *m)
+{
+    GList *res;
+    LOCK_OPEN_LIST;
+    res= g_list_find(balsa_app.open_mailbox_list, m);
+    UNLOCK_OPEN_LIST;
+    return (res != NULL);
+}
+
 /*
  * show the about box for Balsa
  */

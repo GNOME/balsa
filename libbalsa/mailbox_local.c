@@ -392,19 +392,15 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
 
     switch (cond->type) {
     case CONDITION_STRING:
-        if(CONDITION_CHKMATCH(cond,
-                              CONDITION_MATCH_CC|CONDITION_MATCH_BODY|
-                              CONDITION_MATCH_US_HEAD))
+        if (CONDITION_CHKMATCH
+            (cond, (CONDITION_MATCH_CC | CONDITION_MATCH_BODY))) {
             message = libbalsa_mailbox_get_message(mailbox, msgno);
-
-        if(CONDITION_CHKMATCH(cond,CONDITION_MATCH_CC) ||
-           CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY)) {
             is_refed = libbalsa_message_body_ref(message, FALSE, FALSE);
             if (!is_refed) {
                 libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                      _("Unable to load message body to "
                                        "match filter"));
-                return FALSE; /* We don't want to match if an error occured */
+                return FALSE;   /* We don't want to match if an error occured */
             }
         }
 
@@ -414,8 +410,8 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
                 match = libbalsa_utf8_strstr(entry->from,
                                              cond->match.string.string);
             else {
-                g_return_val_if_fail(!message, FALSE);
-                message = libbalsa_mailbox_get_message(mailbox, msgno);
+                if (!message)
+		    message = libbalsa_mailbox_get_message(mailbox, msgno);
                 str =
                     internet_address_list_to_string(message->headers->
                                                     to_list, FALSE);
@@ -424,19 +420,27 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
             }
             if(match) break;
 	}
-	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_FROM)) {
-            if(mailbox->view && mailbox->view->show == LB_MAILBOX_SHOW_FROM)
-                match = libbalsa_utf8_strstr(entry->from,
+        if (CONDITION_CHKMATCH(cond, CONDITION_MATCH_FROM)) {
+            if (mailbox->view
+                && mailbox->view->show == LB_MAILBOX_SHOW_FROM)
+                match =
+                    libbalsa_utf8_strstr(entry->from,
+                                         cond->match.string.string);
+            else {
+                if (!message)
+                    message = libbalsa_mailbox_get_message(mailbox, msgno);
+                if (message->headers->from) {
+                    str =
+                        internet_address_list_to_string(message->headers->
+                                                        from, FALSE);
+                    match =
+                        libbalsa_utf8_strstr(str,
                                              cond->match.string.string);
-            else if(message->headers->from) {
-                g_return_val_if_fail(message, FALSE);
-                str =
-                    internet_address_list_to_string(message->headers->
-                                                    from, FALSE);
-                match = libbalsa_utf8_strstr(str,cond->match.string.string);
-                g_free(str);
+                    g_free(str);
+                }
             }
-	    if (match) break;
+            if (match)
+                break;
         }
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_SUBJECT)) {
 	    if (libbalsa_utf8_strstr(entry->subject,
@@ -446,7 +450,7 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
             }
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_CC)) {
-            g_return_val_if_fail(is_refed, FALSE);
+            g_assert(is_refed);
             str =
                 internet_address_list_to_string(message->headers->cc_list,
                                                 FALSE);
@@ -472,7 +476,7 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY)) {
             GString *body;
-            g_return_val_if_fail(is_refed, FALSE);
+            g_assert(is_refed);
 	    if (!message->mailbox)
 		return FALSE; /* We don't want to match if an error occured */
 	    body = content2reply(message,NULL,0,FALSE,FALSE);

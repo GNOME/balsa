@@ -243,6 +243,97 @@ imap_handle_set_timeout(ImapMboxHandle *h, int milliseconds)
     sio_set_timeout(h->sio, milliseconds);
 }
 
+/* imap_handle_idle_enable: enables calling IDLE command after seconds
+   of inactivity. */
+static gboolean
+idle_process(GIOChannel *source, GIOCondition condition, gpointer data)
+{
+  ImapMboxHandle *h = (ImapMboxHandle*)data;
+  ImapResponse rc;
+
+  do {
+    struct timeval tv;
+    fd_set rfds;
+    int retval;
+    FD_ZERO(&rfds);
+    FD_SET(h->sd, &rfds);
+    tv.tv_sec = 0; tv.tv_usec = 0;
+    retval = select(h->sd+1, &rfds, NULL, NULL, &tv);
+    if(retval == -1) perror("idle_process, select()");
+    if(!retval) break;
+    if ( (rc=imap_cmd_step(h, 0)) == IMR_UNKNOWN ||
+         rc == IMR_SEVERED || rc == IMR_BYE || rc == IMR_PROTOCOL ||
+         rc  == IMR_BAD) {
+      printf("idle got unexpected response %i!\n"
+             "Last message was: %s!\n", rc, h->last_msg);
+      /* FIXME: consider aborting connection here. */
+      break;
+    }
+  } while(1);
+  return TRUE;
+}
+
+static gboolean
+idle_start(gpointer data)
+{
+  ImapMboxHandle *h = (ImapMboxHandle*)data;
+  ImapResponse rc;
+  int c;
+
+  /* The test below can probably be weaker since it is ok for the
+     channel to get disconnected before IDLE gets activated */
+  IMAP_REQUIRED_STATE3(h, IMHS_CONNECTED, IMHS_AUTHENTICATED,
+                       IMHS_SELECTED, FALSE);
+
+  sio_write(h->sio, "0 IDLE\r\n", 8); sio_flush(h->sio);
+  do { /* FIXME: we could at this stage just as well watch for
+          response instead of polling. */
+    rc = imap_cmd_step (h, 0);
+  } while (rc == IMR_UNTAGGED);
+  if(rc != IMR_RESPOND) {
+    g_warning("Expected IMR_RESPOND but got %d\n", rc);
+    return FALSE;
+  }
+  while( (c=sio_getc(h->sio)) != -1 && c != '\n');
+  if(!h->iochannel) {
+    h->iochannel = g_io_channel_unix_new(h->sd);
+    g_io_channel_set_encoding(h->iochannel, NULL, NULL);
+  }
+  h->idle_watch_id = g_io_add_watch(h->iochannel, G_IO_IN, idle_process, h);
+  h->idle_enable_id = 0;
+  return FALSE;
+}
+
+gboolean
+imap_handle_idle_enable(ImapMboxHandle *h, int seconds)
+{
+  if( !imap_mbox_handle_can_do(h, IMCAP_IDLE))
+    return FALSE;
+  if(h->idle_watch_id) {
+    fprintf(stderr, "idle already enabled\n");
+    return FALSE;
+  }
+  if(!h->idle_enable_id)
+    h->idle_enable_id = g_timeout_add(seconds*1000, idle_start, h);
+  return TRUE;
+}
+
+gboolean
+imap_handle_idle_disable(ImapMboxHandle *h)
+{
+  if(h->idle_enable_id) {
+    g_source_remove(h->idle_enable_id);
+    h->idle_enable_id = 0;
+  }
+  if(h->idle_watch_id) {
+    g_source_remove(h->idle_watch_id);
+    h->idle_watch_id = 0;
+    sio_write(h->sio,"DONE\r\n",6); sio_flush(h->sio);
+    /* tagged OK will be ignored */
+  }
+  return FALSE;
+}
+
 int imap_mbox_is_disconnected (ImapMboxHandle *h)
 { return IMAP_MBOX_IS_DISCONNECTED(h); }
 int imap_mbox_is_connected    (ImapMboxHandle *h)
@@ -1276,6 +1367,7 @@ imap_cmd_exec(ImapMboxHandle* handle, const char* cmd)
     return IMR_SEVERED;
 
   /* create sequence for command */
+  imap_handle_idle_disable(handle);
   if (imap_cmd_start(handle, cmd, &cmdno)<0)
     return IMR_SEVERED;  /* irrecoverable connection error. */
 
@@ -1285,7 +1377,9 @@ imap_cmd_exec(ImapMboxHandle* handle, const char* cmd)
   } while (rc == IMR_UNTAGGED);
 
   if (rc != IMR_OK) /* we should be silent here */
-    printf("cmd '%s' failed, rc=%d.\n", cmd, rc);
+    printf("cmd '%6s' failed, rc=%d.\n", cmd, rc);
+
+  imap_handle_idle_enable(handle, 30);
 
   return rc;
 }
@@ -1454,7 +1548,7 @@ ir_capability_data(ImapMboxHandle *handle)
     "IMAP4", "IMAP4rev1", "STATUS", "ACL", "NAMESPACE", "AUTH=CRAM-MD5", 
     "AUTH=GSSAPI", "AUTH=ANONYMOUS", "STARTTLS", "LOGINDISABLED", "SORT",
     "THREAD=ORDEREDSUBJECT", "THREAD=REFERENCES", "UNSELECT", "SCAN",
-    "CHILDREN", "LITERAL+", "SASL-IR"
+    "CHILDREN", "LITERAL+", "IDLE", "SASL-IR"
   };
   unsigned x;
   int c;

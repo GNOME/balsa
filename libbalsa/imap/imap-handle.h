@@ -73,6 +73,7 @@ typedef enum
   IMCAP_SCAN,                   /* FIXME: RFC? */
   IMCAP_CHILDREN,               /* RFC 3348 */
   IMCAP_LITERAL,                /* RFC 2088 */
+  IMCAP_IDLE,                   /* RFC 2177 */
   IMCAP_SASLIR,                 /* imap-sasl-initial-response: SASL-IR */
   IMCAP_FETCHBODY,              /* basic imap implemented correctly by
                                  * most imap servers but not all. We
@@ -110,6 +111,8 @@ void imap_handle_set_infocb(ImapMboxHandle* h, ImapInfoCb cb, void*);
 void imap_handle_set_usercb(ImapMboxHandle* h, ImapUserCb cb, void*);
 void imap_handle_set_flagscb(ImapMboxHandle* h, ImapFlagsCb cb, void*);
 void imap_handle_set_timeout(ImapMboxHandle *, int milliseconds);
+gboolean imap_handle_idle_enable(ImapMboxHandle *, int seconds);
+gboolean imap_handle_idle_disable(ImapMboxHandle *);
 
 ImapResult imap_mbox_handle_connect(ImapMboxHandle* r, const char *hst, 
                                     int over_ssl);

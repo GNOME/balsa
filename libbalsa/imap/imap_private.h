@@ -82,6 +82,11 @@ struct _ImapMboxHandle {
 
   ImapSearchCb search_cb;
   void *search_arg;
+
+  GIOChannel *iochannel; /* IO channel used for monitoring the connection */
+  guint idle_enable_id; /* callback to issue IDLE after a period of
+                           inactivity */
+  guint idle_watch_id;  /* callback to process incoming data */
   ImapTlsMode tls_mode; /* disabled, enabled, required */
 #ifdef USE_TLS
   unsigned over_ssl:1; /* transmission is to be made over SSL-protected

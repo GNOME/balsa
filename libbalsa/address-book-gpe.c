@@ -519,25 +519,13 @@ struct gpe_completion_closure {
     gchar **new_prefix;
     GList *res;
 };
-static void
-strip_superflous_addresses(LibBalsaAddress *a)
-{
-    if(a->address_list) {
-        /* a person has several matching addresses of the same kind! */
-        GList *l, *tmp;
-        for(l=a->address_list->next; l; l = tmp){
-            tmp = l->next;
-            g_free(l->data);
-            a->address_list = g_list_delete_link(a->address_list, l);
-        }
-    }
-}
 
 static int
 gpe_read_completion(void *arg, int argc, char **argv, char **names)
 {
     struct gpe_completion_closure *gc = arg;
     LibBalsaAddress * a= libbalsa_address_new();
+    InternetAddress *ia;
     guint uid = atoi(argv[0]);
     gchar *tag = argv[1];
 
@@ -559,14 +547,13 @@ gpe_read_completion(void *arg, int argc, char **argv, char **names)
         g_object_unref(a);
         return 0;
     }
-    strip_superflous_addresses(a);
     if(!a->full_name)
         a->full_name = create_name(a->first_name, a->last_name);
-    g_object_set_data(G_OBJECT(a), "urn", GUINT_TO_POINTER(uid));
+    ia = internet_address_new_name(a->full_name, a->address_list->data);
     if(gc->new_prefix && !*gc->new_prefix)
         *gc->new_prefix = libbalsa_address_to_gchar(a, 0);
-    gc->res = g_list_prepend(gc->res, a);
-
+    gc->res = g_list_prepend(gc->res, ia);
+    g_object_unref(G_OBJECT(a));
     return 0;
 }
 

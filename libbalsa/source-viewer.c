@@ -266,9 +266,9 @@ libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
     gtk_window_set_wmclass(GTK_WINDOW(window), "message-source", "Balsa");
     gtk_window_set_default_size(GTK_WINDOW(window), 500, 400);
     vbox = gtk_vbox_new(FALSE, 1);
-    gtk_box_pack_start_defaults(GTK_BOX(vbox), 
-				lbsv_app_set_menus(GTK_WINDOW(window),
-						   &escape_action));
+    gtk_box_pack_start(GTK_BOX(vbox), 
+                       lbsv_app_set_menus(GTK_WINDOW(window),
+                                          &escape_action), FALSE, TRUE, 1);
     gtk_box_pack_start_defaults(GTK_BOX(vbox), interior);
     gtk_container_add(GTK_CONTAINER(window), vbox);
 

@@ -1,3 +1,12 @@
+2005-02-02  Pawel Salek
+
+	* configure.in: minor reordering fixes.
+	* libbalsa/address-book-gpe.c:  fix InternerAddress regression.
+	* libbalsa/source-viewer.c: do not expand menu (regression fixed).
+	* libbalsa/imap/imap-commands.c: enable/disable IDLE.
+	* libbalsa/imap/imap-{handle,search}.c: ditto.
+	* libbalsa/imap/imap_private.h: add IDLE related fields.
+
 2005-01-29  Pawel Salek
 
 	* configure.in: do it by the book (literally).

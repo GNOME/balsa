@@ -4,6 +4,7 @@ dnl
 dnl 1. Boilerplate.
 dnl
 AC_PREREQ(2.53)
+AC_INIT(src/balsa-app.h)
 dnl ###########################################################################
 dnl Boilerplace and versioning
 dnl ###########################################################################
@@ -19,7 +20,6 @@ AC_SUBST(BALSA_REVISION)
 AC_SUBST(BALSA_PATCHLEVEL)
 AC_SUBST(BALSA_VERSION)
 
-AC_INIT(src/balsa-app.h)
 AM_INIT_AUTOMAKE(balsa, "$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}")
 AC_CONFIG_SRCDIR([src/main.c])
 AM_CONFIG_HEADER([config.h])

@@ -436,6 +436,7 @@ imap_mbox_append(ImapMboxHandle *handle, const char *mbox,
   size_t s, delta;
   int c;
 
+  imap_handle_idle_disable(handle);
   if(flags) {
     gchar *str = enum_flag_to_str(flags);
     cmd = g_strdup_printf("APPEND \"%s\" (%s) {%u%s}", mbx7, str,
@@ -478,6 +479,7 @@ imap_mbox_append(ImapMboxHandle *handle, const char *mbox,
     rc = imap_cmd_step (handle, cmdno);
   } while (rc == IMR_UNTAGGED);
 
+  imap_handle_idle_enable(handle, 30);
   return rc;
   }
 }
@@ -701,6 +703,7 @@ imap_assure_needed_flags(ImapMboxHandle *h, ImapMsgFlag needed_flags)
       case IMSGF_RECENT:   flg = "RECENT"; break;
       default: g_free(seqno); continue;
       }
+      if(!cmd) imap_handle_idle_disable(h);
       cmd = g_strdup_printf("SEARCH %s %s", seqno, flg);
       g_free(seqno);
       flag[issued_cmd] = fnd.flag;
@@ -719,6 +722,7 @@ imap_assure_needed_flags(ImapMboxHandle *h, ImapMsgFlag needed_flags)
       } while (rc == IMR_UNTAGGED);
     }
   }
+  imap_handle_idle_enable(h, 30);
   h->search_cb = cb; h->search_arg = arg;
   if(rc == IMR_OK) {
     for(i=0; i<h->flag_cache->len; i++) {
@@ -1064,6 +1068,7 @@ imap_mbox_thread(ImapMboxHandle *h, const char *how, ImapSearchKey *filter)
 
     cmdno = imap_make_tag(tag);
     
+    imap_handle_idle_disable(h);
     sio_printf(h->sio, "%s THREAD %s UTF-8 ", tag, how);
     if(!filter)
       sio_write(h->sio, "ALL", 3);
@@ -1075,6 +1080,7 @@ imap_mbox_thread(ImapMboxHandle *h, const char *how, ImapSearchKey *filter)
     do
       rc = imap_cmd_step(h, cmdno);
     while(rc == IMR_UNTAGGED);
+    imap_handle_idle_enable(h, 30);
     return rc;
   } else
     return IMR_NO;
@@ -1203,6 +1209,7 @@ imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
     
     cmdno =  imap_make_tag(tag);
     keystr = sort_code_to_string(key);
+    imap_handle_idle_disable(handle);
     sio_printf(handle->sio, "%s SORT (%s%s) UTF-8 ", tag,
                ascending ? "" : "REVERSE ", keystr);
     
@@ -1214,6 +1221,7 @@ imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
     else
       imap_write_key(handle, filter, cmdno, can_do_literals);
     sio_write(handle->sio, "\r\n", 2);
+    imap_handle_idle_enable(handle, 30);
     imap_handle_flush(handle);
     do
       rc = imap_cmd_step(handle, cmdno);

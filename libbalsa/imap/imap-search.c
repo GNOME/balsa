@@ -357,6 +357,7 @@ imap_search_exec(ImapMboxHandle *h, ImapSearchKey *s,
   ocb  = h->search_cb;  h->search_cb  = (ImapSearchCb)cb;
   oarg = h->search_arg; h->search_arg = cb_arg;
   
+  imap_handle_idle_disable(h);
   cmdno = imap_make_tag(tag);
   sio_printf(h->sio, "%s Search ", tag);
   if( (ir=imap_write_key(h, s, cmdno, can_do_literals)) == IMR_OK) {
@@ -368,6 +369,7 @@ imap_search_exec(ImapMboxHandle *h, ImapSearchKey *s,
   }
   h->search_cb  = ocb;
   h->search_arg = oarg;
+  imap_handle_idle_enable(h, 30);
   /* Set disconnected state here if necessary? */
   return ir;
 }

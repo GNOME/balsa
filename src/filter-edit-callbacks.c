@@ -1570,13 +1570,14 @@ fe_revert_pressed(GtkWidget * widget, gpointer data)
  * so that we can refresh the notebook page
  */
 
-void fe_clist_select_row(GtkWidget * widget, gint row, gint column, 
-                         GdkEventButton *event, gpointer data)
+void
+fe_clist_select_row(GtkWidget * widget, gint row, gint column, 
+                    GdkEventButton *event, gpointer data)
 {
     LibBalsaFilter* fil;
     LibBalsaCondition* cnd;
     GSList *list;
-    gint new_row;
+    gint new_row, i;
 
     fil=(LibBalsaFilter*)gtk_clist_get_row_data(fe_filters_list,row);
     
@@ -1639,18 +1640,17 @@ void fe_clist_select_row(GtkWidget * widget, gint row, gint column,
     if (filter_errno!=FILTER_NOERR)
         gnome_dialog_close(fe_window);
 
-    if (fe_conditions_list->rows) {
+    if (fe_conditions_list->rows)
         gtk_clist_select_row(fe_conditions_list,0,-1);
-        gtk_widget_set_sensitive(fe_condition_delete_button,TRUE);
-        gtk_widget_set_sensitive(fe_condition_edit_button,TRUE);
-    }
-    else {
-        gtk_widget_set_sensitive(fe_condition_delete_button,FALSE);
-        gtk_widget_set_sensitive(fe_condition_edit_button,FALSE);
-    }
+    gtk_widget_set_sensitive(fe_condition_delete_button,
+                             fe_conditions_list->rows !=0);
+    gtk_widget_set_sensitive(fe_condition_edit_button,
+                             fe_conditions_list->rows !=0);
 
     /* We make the filters delete,revert,apply buttons sensitive */
     gtk_widget_set_sensitive(fe_delete_button, TRUE);
     gtk_widget_set_sensitive(fe_apply_button,  TRUE);
     gtk_widget_set_sensitive(fe_revert_button, TRUE);
+    fe_enable_right_page(TRUE);
 }                      /* end fe_clist_select_row */
+

@@ -88,5 +88,6 @@ void fe_condition_remove_pressed(GtkWidget * widget, gpointer data);
 
 /* action callback */
 void fe_action_selected(GtkWidget * widget, gpointer data);
+void fe_enable_right_page(gboolean enabled);
 
 #endif /*__FILTER_EDIT_H__ */

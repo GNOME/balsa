@@ -575,6 +575,10 @@ libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
     for(p=messages; p; 	p=g_list_next(p)) {
 	message=(LibBalsaMessage *)(p->data);
 	if(CLIENT_CONTEXT_CLOSED(message->mailbox)) continue;
+	if(!CLIENT_CONTEXT(message->mailbox)->hdrs) {
+            printf("Ugly libmutt error, why did it fastclose mailbox!?");
+            break;
+        }
 	cur = message->header;
 	mutt_parse_mime_message(CLIENT_CONTEXT(message->mailbox), cur); 
 	mutt_append_message(handle->context,

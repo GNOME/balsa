@@ -131,6 +131,7 @@ static char *toolbar2_legal[]={
 
 static char **toolbar_legal[]={toolbar0_legal, toolbar1_legal, toolbar2_legal};
 
+/* The descriptions must be SHORT */
 button_data toolbar_buttons[]={
     {"", N_("Separator"), "", 0},
     {BALSA_PIXMAP_RECEIVE, N_("Check"),
@@ -163,13 +164,13 @@ button_data toolbar_buttons[]={
      N_("Print current message"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {BALSA_PIXMAP_SEND, N_("Send"),
      N_("Send this message"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_SEND_RECEIVE, N_("Send /\nReceive"),
+    {BALSA_PIXMAP_SEND_RECEIVE, N_("Exchange"),
      N_("Send and Receive messages"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {BALSA_PIXMAP_ATTACHMENT, N_("Attach"),
      N_("Add attachments to this message"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {BALSA_PIXMAP_SAVE, N_("Save"),
      N_("Save the current item"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_IDENTITY, N_("Select Identity"),
+    {BALSA_PIXMAP_IDENTITY, N_("Identity"),
      N_("Set identity to use for this message"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {GNOME_STOCK_PIXMAP_SPELLCHECK, N_("Spelling"),
      N_("Run a spell check"), TOOLBAR_BUTTON_TYPE_BUTTON},
@@ -185,7 +186,7 @@ button_data toolbar_buttons[]={
      N_("Delete messages from the trash mailbox"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {BALSA_PIXMAP_CLOSE_MBOX, N_("Close"),
      N_("Close current mailbox"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_SHOW_PREVIEW, N_("Preview\npane"),
+    {BALSA_PIXMAP_SHOW_PREVIEW, N_("Msg Preview"),
      N_("Show preview pane"), TOOLBAR_BUTTON_TYPE_TOGGLE}
 };
 

@@ -4144,23 +4144,22 @@ mailbox_expunge_cb(GtkWidget * widget, gpointer data)
 void
 empty_trash(BalsaWindow * window)
 {
-    guint msgno;
-    GList *msg_list = NULL;
+    guint msgno, total;
+    GArray *messages;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.trash));
     if (!libbalsa_mailbox_open(balsa_app.trash, NULL))
 	return;
 
-    for (msgno = libbalsa_mailbox_total_messages(balsa_app.trash);
-	 msgno > 0; msgno--)
-	msg_list =
-	    g_list_prepend(msg_list,
-			   libbalsa_mailbox_get_message(balsa_app.trash,
-							msgno));
-    libbalsa_messages_change_flag(msg_list, LIBBALSA_MESSAGE_FLAG_DELETED,
-				  TRUE);
-    g_list_foreach(msg_list, (GFunc)g_object_unref, NULL);
-    g_list_free(msg_list);
+    messages = g_array_new(FALSE, FALSE, sizeof(guint));
+    total = libbalsa_mailbox_total_messages(balsa_app.trash);
+    for (msgno = 1; msgno <= total; msgno++)
+        g_array_append_val(messages, msgno);
+    libbalsa_mailbox_messages_change_flags(balsa_app.trash, messages,
+                                           LIBBALSA_MESSAGE_FLAG_DELETED,
+                                           0);
+    g_array_free(messages, TRUE);
+
     /* We want to expunge deleted messages: */
     libbalsa_mailbox_close(balsa_app.trash, TRUE);
     enable_empty_trash(window, TRASH_EMPTY);
@@ -4420,6 +4419,10 @@ balsa_window_notebook_find_page (GtkNotebook* notebook, gint x, gint y)
     gint label_width;
     gint label_height;
     
+    /* x and y are relative to the notebook, but the label allocations
+     * are relative to the main window. */
+    x += GTK_WIDGET(notebook)->allocation.x;
+    y += GTK_WIDGET(notebook)->allocation.y;
 
     while ((page = gtk_notebook_get_nth_page (notebook, page_num)) != NULL) {
         label = gtk_notebook_get_tab_label (notebook, page);
@@ -4456,31 +4459,28 @@ notebook_drag_received_cb (GtkWidget* widget, GdkDragContext* context,
 {
     BalsaIndex* index;
     LibBalsaMailbox* mailbox;
+    BalsaIndex *orig_index;
     LibBalsaMailbox* orig_mailbox;
-    GList* messages = NULL;
-    LibBalsaMessage **message;
 
+    orig_index = *(BalsaIndex **) selection_data->data;
+    g_free(data);
+    if (orig_index->selected->len == 0)
+        /* it is actually possible to drag from GtkTreeView when no rows
+         * are selected: Disable preview for that. */
+        return;
 
-    index = balsa_window_notebook_find_page (GTK_NOTEBOOK (widget), x, y);
-    
+    orig_mailbox = orig_index->mailbox_node->mailbox;
+
+    index = balsa_window_notebook_find_page (GTK_NOTEBOOK(widget), x, y);
+
     if (index == NULL)
         return;
     
     mailbox = index->mailbox_node->mailbox;
 
-    for (message = (LibBalsaMessage **) selection_data->data; *message;
-         message++)
-        messages = g_list_append (messages, *message);
-    g_return_if_fail(messages != NULL);
-        
-    orig_mailbox = ((LibBalsaMessage*) messages->data)->mailbox;
-    
     if (mailbox != NULL && mailbox != orig_mailbox)
-        balsa_index_transfer(balsa_find_index_by_mailbox(orig_mailbox),
-                             messages, mailbox,
+        balsa_index_transfer(orig_index, orig_index->selected, mailbox,
                              context->action != GDK_ACTION_MOVE);
-
-    g_list_free (messages);
 }
 
 static gboolean

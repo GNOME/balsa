@@ -45,11 +45,15 @@ libmutt/imap/command.c
 libmutt/imap/imap.c
 libmutt/imap/message.c
 libmutt/imap/util.c
+libmutt/lib.c
 libmutt/mbox.c
 libmutt/mutt_socket.c
 libmutt/mutt_ssl.c
 libmutt/mutt_tunnel.c
+libmutt/mh.c
 libmutt/mx.c
+libmutt/parse.c
+libmutt/sendlib.c
 src/address-book-config.c
 src/address-book.c
 src/balsa-app.c

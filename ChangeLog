@@ -1,3 +1,8 @@
+2002-06-03  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox_imap.c: access cache in binary mode to preserve
+	message sizes.
+
 2002-06-01  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/balsa-mblist.[ch]: replace GtkCTree with GtkTreeView and

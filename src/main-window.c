@@ -403,9 +403,9 @@ create_toolbar (GnomeMDI * mdi, GtkWidget * app)
 			     (GtkSignalFunc) next_message_cb,
 			     NULL);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
-/*
-   gtk_toolbar_set_button_relief(GTK_TOOLBAR(toolbar), GTK_RELIEF_NONE);
- */
+
+  gtk_toolbar_set_style (GTK_TOOLBAR (toolbar), balsa_app.toolbar_style);
+
   return GTK_TOOLBAR (toolbar);
 }
 

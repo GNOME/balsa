@@ -468,7 +468,7 @@ balsa_index_add (BalsaIndex * bindex,
 
   if (bindex->first_new_message == 0)
     if (message->flags & MESSAGE_FLAG_NEW)
-      bindex->first_new_message = row;
+      bindex->first_new_message = row + 1;
 }
 
 

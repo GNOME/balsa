@@ -166,7 +166,7 @@ load_toolbars(void)
 
             if (!item)
                 break;
-            *list = g_slist_append(*list, g_strdup(item));
+            *list = g_slist_append(*list, item);
             items++;
         }
         gnome_config_pop_prefix();
@@ -197,7 +197,7 @@ load_toolbars(void)
 
             sprintf(tmpkey, "Toolbar%dItem%d", i, j);
             item = gnome_config_get_string(tmpkey);
-            *list = g_slist_append(*list, g_strdup(item));
+            *list = g_slist_append(*list, item);
         }
     }
     gnome_config_pop_prefix();
@@ -860,6 +860,7 @@ config_global_load(void)
 
 #if ENABLE_ESMTP
     /* ... SMTP server */
+    g_free(balsa_app.smtp_server);
     balsa_app.smtp_server =
 	gnome_config_get_string_with_default("ESMTPServer=localhost:25", 
 					     &def_used);
@@ -877,7 +878,9 @@ config_global_load(void)
 	g_warning("Converted old SMTP server config to ESMTP format. Verify the correctness.");
 	}
     }
+    g_free(balsa_app.smtp_user);
     balsa_app.smtp_user = gnome_config_get_string("ESMTPUser");
+    g_free(balsa_app.smtp_passphrase);
     balsa_app.smtp_passphrase = 
         gnome_config_private_get_string("ESMTPPassphrase");
     if(balsa_app.smtp_passphrase) {

@@ -3237,10 +3237,13 @@ hide_all_parts(BalsaMessage * bm)
 static void
 select_part(BalsaMessage * bm, BalsaPartInfo *info)
 {
+    PangoFontDescription *desc;
+
     hide_all_parts(bm);
-    gtk_widget_modify_font(bm->header_text,
-                           pango_font_description_from_string
-                           (balsa_app.message_font));
+
+    desc = pango_font_description_from_string(balsa_app.message_font);
+    gtk_widget_modify_font(bm->header_text, desc);
+    pango_font_description_free(desc);
 
     bm->current_part = add_part(bm, info);
 

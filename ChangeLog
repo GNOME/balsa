@@ -1,3 +1,10 @@
+2005-03-10 10:42  PeterB
+
+	* libbalsa/body.c, libbalsa/filter.c, libbalsa/mailbox_local.c,
+	libbalsa/message.c, libbalsa/mime.c, libbalsa/mime.h,
+	src/sendmsg-window.c, src/sendmsg-window.h: keep track of charset
+	instead of using g_mime_charset_best().
+
 2005-03-08 18:40 Albrecht Dreß <albrecht dot dress at arcor dot de>
 
 	* libbalsa/gmime-part-rfc2440.c: replace use of

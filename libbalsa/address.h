@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -85,6 +85,7 @@ GType libbalsa_address_get_type(void);
  
 LibBalsaAddress *libbalsa_address_new(void);
 LibBalsaAddress *libbalsa_address_new_from_string(const gchar * address);
+gchar * libbalsa_address_to_gchar(LibBalsaAddress * address, gint n);
 GList *libbalsa_address_new_list_from_string(const gchar * address);
 
 gchar *libbalsa_address_to_gchar(LibBalsaAddress * addr, gint n);

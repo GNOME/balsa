@@ -1,3 +1,21 @@
+2002-12-25  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in: find out glib-genmarshal location (Emmanuel).
+	* libbalsa/Makefile.am: collect all marshallers (Emmanuel).
+	* libbalsa/address-book-extern.[hc]: return error codes on IO errors.
+	* libbalsa/address-book-{ldap,ldif,vcard}.[hc]: ditto.
+	* libbalsa/address-book.[hc]: ditto.
+	* libbalsa/address.[ch]: parse email addresses on our own (bit rough).
+
+	* libbalsa/libbalsa.c: add .addressbook.ldif to the list of
+	automatically recognized address book names.
+	* libbalsa/mailbox.c: use new marshallers.
+	* libbalsa/message.c: move here libmutt-specific address conversion.
+	* libbalsa/misc.[hc]: remove hand-coded marshallers.
+	* libbalsa/server.c: use generated marshallers.
+	* src/ab-main.c: add menu.
+	* src/ab-window.c: process IO errors here.
+
 2002-12-24  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* configure.in, INSTALL, README, NEWS: release 2.0.4

@@ -24,7 +24,7 @@
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
-#include "misc.h"
+#include "libbalsa-marshal.h"
 
 #include <libgnome/gnome-config.h> 
 #include <libgnome/gnome-i18n.h> 
@@ -121,7 +121,7 @@ libbalsa_server_class_init(LibBalsaServerClass * klass)
                                      set_host),
                      NULL, NULL,
 #ifdef USE_SSL
-                     libbalsa_marshal_VOID__POINTER_INT,
+                     libbalsa_VOID__POINTER_INT,
                      G_TYPE_NONE, 2,
                      G_TYPE_POINTER, G_TYPE_INT
 #else
@@ -139,7 +139,7 @@ libbalsa_server_class_init(LibBalsaServerClass * klass)
 		     G_STRUCT_OFFSET(LibBalsaServerClass,
 			             get_password),
                      NULL, NULL,
-		     libbalsa_marshal_POINTER__OBJECT,
+		     libbalsa_POINTER__OBJECT,
                      G_TYPE_POINTER, 1,
                      LIBBALSA_TYPE_MAILBOX);
 

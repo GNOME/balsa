@@ -106,6 +106,7 @@ balsa_ab_window_get_type(void)
     return ab_type;
 }
 
+
 GtkWidget *
 balsa_ab_window_new(gboolean composing, GtkWindow* parent)
 {
@@ -651,7 +652,7 @@ static void
 balsa_ab_window_load(BalsaAbWindow *ab)
 {
     GtkTreeModel *model;
-    
+    LibBalsaABErr err;
     g_return_if_fail(BALSA_IS_AB_WINDOW(ab));
 
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(ab->address_list));
@@ -660,10 +661,15 @@ balsa_ab_window_load(BalsaAbWindow *ab)
     if (ab->current_address_book == NULL)
 	return;
 
-    libbalsa_address_book_load(ab->current_address_book, 
-			       (LibBalsaAddressBookLoadFunc)
-			       balsa_ab_window_load_cb,
-			       ab);
+    if( (err=libbalsa_address_book_load(ab->current_address_book, 
+                                        (LibBalsaAddressBookLoadFunc)
+                                        balsa_ab_window_load_cb,
+                                        ab)) != LBABERR_OK) {
+        balsa_information(LIBBALSA_INFORMATION_ERROR,
+                          _("Error opening addres book '%s'\n%s"),
+                          ab->current_address_book->name,
+                          libbalsa_address_book_strerror(err));
+    }
 }
 
 /*

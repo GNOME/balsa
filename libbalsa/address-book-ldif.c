@@ -49,11 +49,12 @@ static void libbalsa_address_book_ldif_class_init(LibBalsaAddressBookLdifClass *
 static void libbalsa_address_book_ldif_init(LibBalsaAddressBookLdif *ab);
 static void libbalsa_address_book_ldif_finalize(GObject * object);
 
-static void libbalsa_address_book_ldif_load(LibBalsaAddressBook * ab,
-					     LibBalsaAddressBookLoadFunc callback,
-					     gpointer closure);
-static void libbalsa_address_book_ldif_store_address(LibBalsaAddressBook *ab,
-						      LibBalsaAddress *new_address);
+static LibBalsaABErr libbalsa_address_book_ldif_load(LibBalsaAddressBook * ab,
+                                                     LibBalsaAddressBookLoadFunc 
+                                                     callback,
+                                                     gpointer closure);
+static LibBalsaABErr libbalsa_address_book_ldif_store_address(LibBalsaAddressBook *ab,
+                                                              LibBalsaAddress *new_address);
 
 static void libbalsa_address_book_ldif_save_config(LibBalsaAddressBook *ab,
 						    const gchar * prefix);
@@ -71,7 +72,7 @@ static void completion_data_free(CompletionData * data);
 static gchar *completion_data_extract(CompletionData * data);
 static gint address_compare(LibBalsaAddress *a, LibBalsaAddress *b);*/
 
-static void load_ldif_file(LibBalsaAddressBook *ab);
+static gboolean load_ldif_file(LibBalsaAddressBook *ab);
 
 static gboolean ldif_address_book_need_reload(LibBalsaAddressBookLdif *ab);
 
@@ -220,12 +221,9 @@ ldif_address_book_need_reload(LibBalsaAddressBookLdif *ab)
 {
     struct stat stat_buf;
 
-    if ( stat(ab->path, &stat_buf) == -1 ) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
-			     _("Could not stat ldif address book: %s"), 
-			     ab->path);
-	return FALSE;
-    }
+    if ( stat(ab->path, &stat_buf) == -1 )
+	return TRUE;
+
     if ( stat_buf.st_mtime > ab->mtime ) {
 	ab->mtime = stat_buf.st_mtime;
 	return TRUE;
@@ -233,21 +231,22 @@ ldif_address_book_need_reload(LibBalsaAddressBookLdif *ab)
 	return FALSE;
 }
 
-static void
+static LibBalsaABErr
 libbalsa_address_book_ldif_load(LibBalsaAddressBook * ab, 
 				LibBalsaAddressBookLoadFunc callback, 
 				gpointer closure)
 {
     GList *lst;
 
-    load_ldif_file(ab);
+    if(!load_ldif_file(ab)) return LBABERR_CANNOT_READ;
 
     for (lst = LIBBALSA_ADDRESS_BOOK_LDIF(ab)->address_list; 
 	 lst; lst = g_list_next(lst)) {
-	if ( callback )
+	if (callback)
 	    callback(ab, LIBBALSA_ADDRESS(lst->data), closure);
     }
-    callback(ab, NULL, closure);
+    if(callback) callback(ab, NULL, closure);
+    return LBABERR_OK;
 }
 
 /* address_new_prefill:
@@ -333,7 +332,7 @@ static void expand_ldif_addr(GList *ab_list)
     }
 }
     
-static void
+static gboolean
 load_ldif_file(LibBalsaAddressBook *ab)
 {
     FILE *gc;
@@ -349,21 +348,15 @@ load_ldif_file(LibBalsaAddressBook *ab)
     LibBalsaAddressBookLdif *addr_ldif = LIBBALSA_ADDRESS_BOOK_LDIF(ab);
 
     if ( !ldif_address_book_need_reload(addr_ldif) )
-	return;
+	return TRUE;
 
     ab_ldif_clear(addr_ldif);
     
     g_completion_clear_items(addr_ldif->name_complete);
     g_completion_clear_items(addr_ldif->alias_complete);
     
-    gc = fopen(addr_ldif->path, "r");
-
-    if (gc == NULL) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
-			     _("Could not open LDIF address book %s."),
-			     ab->name);
-	return;
-    }
+    if( (gc = fopen(addr_ldif->path, "r")) == NULL)
+        return FALSE;
 
     for (; (line=read_line(gc)) != NULL; g_free(line) ) {
 	/*
@@ -490,6 +483,7 @@ load_ldif_file(LibBalsaAddressBook *ab)
     g_completion_add_items(addr_ldif->alias_complete, completion_list);
     g_list_free(completion_list);
     ab->dist_list_mode = FALSE; /* *** Clean up later */
+    return TRUE;
 }
 
 /* build_name:
@@ -526,9 +520,9 @@ build_name(gchar *id, gchar *givenname, gchar *surname)
     return name;
 }
 
-static void
+static LibBalsaABErr
 libbalsa_address_book_ldif_store_address(LibBalsaAddressBook * ab,
-					  LibBalsaAddress * new_address)
+                                         LibBalsaAddress * new_address)
 {
     GList *list;
     gchar *id;
@@ -555,29 +549,24 @@ libbalsa_address_book_ldif_store_address(LibBalsaAddressBook * ab,
 	}
     }
 
-    load_ldif_file(ab);
+    if(!load_ldif_file(ab)) 
+        return LBABERR_CANNOT_READ;
 
     list = LIBBALSA_ADDRESS_BOOK_LDIF(ab)->address_list;
     while (list) {
 	address = LIBBALSA_ADDRESS(list->data);
 
-	if (g_ascii_strcasecmp(address->full_name, new_address->full_name) == 0) {
-	    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
-				 _("%s is already in address book."),
-				 new_address->full_name);
+	if (g_ascii_strcasecmp(address->full_name, new_address->full_name)==0){
 	    g_free(id);
-	    return;
+	    return LBABERR_DUPLICATE;
 	}
 	list = g_list_next(list);
     }
 
     fp = fopen(LIBBALSA_ADDRESS_BOOK_LDIF(ab)->path, "a");
     if (fp == NULL) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("Cannot open LDIF address book %s for saving\n"),
-			     ab->name);
 	g_free(id);
-	return;
+	return LBABERR_CANNOT_WRITE;
     }
 
     fprintf(fp, "\ndn: cn=%s", id);
@@ -605,6 +594,7 @@ libbalsa_address_book_ldif_store_address(LibBalsaAddressBook * ab,
     }
     fprintf(fp, "\n");
     fclose(fp);
+    return LBABERR_OK;
 }
 
 static void

@@ -26,7 +26,7 @@
 
 #include "libbalsa.h"
 #include "mailbackend.h"
-#include "misc.h"
+#include "libbalsa-marshal.h"
 #include "message.h"
 
 #include <libgnome/gnome-config.h> 
@@ -134,7 +134,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
                      G_STRUCT_OFFSET(LibBalsaMailboxClass,
                                      open_mailbox),
                      NULL, NULL,
-                     libbalsa_marshal_BOOLEAN__VOID, G_TYPE_BOOLEAN, 0);
+                     libbalsa_BOOLEAN__VOID, G_TYPE_BOOLEAN, 0);
 
     libbalsa_mailbox_signals[OPEN_MAILBOX_APPEND] =
 	g_signal_new("append-mailbox",
@@ -143,7 +143,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
                      G_STRUCT_OFFSET(LibBalsaMailboxClass,
                                      open_mailbox_append),
                      NULL, NULL,
-                     libbalsa_marshal_POINTER__VOID, G_TYPE_POINTER, 0);
+                     libbalsa_POINTER__VOID, G_TYPE_POINTER, 0);
 
     libbalsa_mailbox_signals[CLOSE_MAILBOX] =
 	g_signal_new("close-mailbox",
@@ -211,7 +211,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
                      G_STRUCT_OFFSET(LibBalsaMailboxClass,
                                      progress_notify),
                      NULL, NULL,
-                     libbalsa_marshal_VOID__INT_INT_INT_STRING, G_TYPE_NONE,
+                     libbalsa_VOID__INT_INT_INT_STRING, G_TYPE_NONE,
                      4, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_STRING);
 
     /* Virtual functions. Use G_SIGNAL_NO_HOOKS
@@ -223,7 +223,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
                      G_STRUCT_OFFSET(LibBalsaMailboxClass,
                                      get_message_stream),
                      NULL, NULL,
-                     libbalsa_marshal_POINTER__OBJECT, G_TYPE_POINTER, 1,
+                     libbalsa_POINTER__OBJECT, G_TYPE_POINTER, 1,
                      LIBBALSA_TYPE_MESSAGE);
 
     libbalsa_mailbox_signals[CHECK] =
@@ -242,7 +242,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
                      G_STRUCT_OFFSET(LibBalsaMailboxClass,
                                      get_matching),
                      NULL, NULL,
-                     libbalsa_marshal_POINTER__INT_POINTER, 
+                     libbalsa_POINTER__INT_POINTER, 
                      G_TYPE_POINTER, 2, G_TYPE_INT, G_TYPE_POINTER);
 
     libbalsa_mailbox_signals[SAVE_CONFIG] =

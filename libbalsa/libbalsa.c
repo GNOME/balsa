@@ -417,6 +417,7 @@ gchar *libbalsa_guess_ldif_file()
 	".address.ldif",
 	"address-book.ldif",
 	".address-book.ldif",
+	".addressbook.ldif",
 	NULL
     };
 
@@ -474,7 +475,6 @@ void
 libbalsa_mktemp (char *s) {
     mutt_mktemp(s);
 }
-
 
 #ifdef USE_SSL
 #include "keymap_defs.h"

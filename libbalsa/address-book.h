@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -31,10 +31,21 @@
 #define LIBBALSA_IS_ADDRESS_BOOK(obj)			(G_TYPE_CHECK_INSTANCE_TYPE (obj, LIBBALSA_TYPE_ADDRESS_BOOK))
 #define LIBBALSA_IS_ADDRESS_BOOK_CLASS(klass)		(G_TYPE_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_ADDRESS_BOOK))
 
+typedef enum {
+    LBABERR_OK = 0,
+    LBABERR_CANNOT_READ,
+    LBABERR_CANNOT_WRITE,
+    LBABERR_CANNOT_CONNECT,
+    LBABERR_CANNOT_SEARCH,
+    LBABERR_DUPLICATE
+} LibBalsaABErr;
+    
 typedef struct _LibBalsaAddressBook LibBalsaAddressBook;
 typedef struct _LibBalsaAddressBookClass LibBalsaAddressBookClass;
 
-typedef void (*LibBalsaAddressBookLoadFunc)(LibBalsaAddressBook *ab, LibBalsaAddress *address, gpointer closure);
+typedef LibBalsaABErr (*LibBalsaAddressBookLoadFunc)(LibBalsaAddressBook *ab,
+                                                     LibBalsaAddress *address,
+                                                     gpointer closure);
 
 struct _LibBalsaAddressBook {
     GObject parent;
@@ -52,15 +63,18 @@ struct _LibBalsaAddressBook {
 struct _LibBalsaAddressBookClass {
     GObjectClass parent;
 
-    void (*load) (LibBalsaAddressBook * ab, LibBalsaAddressBookLoadFunc callback, gpointer closure);
+    LibBalsaABErr (*load) (LibBalsaAddressBook * ab,
+                           LibBalsaAddressBookLoadFunc callback,
+                           gpointer closure);
 
-    void (*store_address) (LibBalsaAddressBook * ab,
-			   LibBalsaAddress * address);
+    LibBalsaABErr (*store_address) (LibBalsaAddressBook * ab,
+                                    LibBalsaAddress * address);
 
     void (*save_config) (LibBalsaAddressBook * ab, const gchar * prefix);
     void (*load_config) (LibBalsaAddressBook * ab, const gchar * prefix);
 
-    GList* (*alias_complete) (LibBalsaAddressBook * ab, const gchar *prefix, gchar ** new_prefix);
+    GList* (*alias_complete) (LibBalsaAddressBook * ab, const gchar *prefix,
+                              gchar ** new_prefix);
 };
 
 GType libbalsa_address_book_get_type(void);
@@ -77,17 +91,19 @@ LibBalsaAddressBook *libbalsa_address_book_new_from_config(const gchar *
   After all addresses are loaded the callback will be called with
   address==NULL.  
 */
-void libbalsa_address_book_load(LibBalsaAddressBook * ab,
-				LibBalsaAddressBookLoadFunc callback,
-				gpointer closure);
+LibBalsaABErr libbalsa_address_book_load(LibBalsaAddressBook * ab,
+                                         LibBalsaAddressBookLoadFunc callback,
+                                         gpointer closure);
 
-void libbalsa_address_book_store_address(LibBalsaAddressBook * ab,
-					 LibBalsaAddress * address);
+LibBalsaABErr libbalsa_address_book_store_address(LibBalsaAddressBook * ab,
+                                                  LibBalsaAddress * address);
 
 void libbalsa_address_book_save_config(LibBalsaAddressBook * ab,
 				       const gchar * prefix);
 void libbalsa_address_book_load_config(LibBalsaAddressBook * ab,
 				       const gchar * prefix);
+
+const gchar* libbalsa_address_book_strerror(LibBalsaABErr err);
 
 /*
 
@@ -101,5 +117,6 @@ GList *libbalsa_address_book_alias_complete(LibBalsaAddressBook * ab,
 					    gchar **new_prefix);
 gboolean libbalsa_address_is_dist_list(const LibBalsaAddressBook *ab,
 				       const LibBalsaAddress *address);
+
 #endif
 

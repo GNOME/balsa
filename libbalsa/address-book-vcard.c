@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,6 @@
 
 #include "address-book.h"
 #include "address-book-vcard.h"
-#include "information.h"
 #include "abook-completion.h"
 
 /* FIXME: Perhaps the whole thing could be rewritten to use a g_scanner ?? */
@@ -52,11 +51,12 @@ static void libbalsa_address_book_vcard_class_init(LibBalsaAddressBookVcardClass
 static void libbalsa_address_book_vcard_init(LibBalsaAddressBookVcard *ab);
 static void libbalsa_address_book_vcard_finalize(GObject * object);
 
-static void libbalsa_address_book_vcard_load(LibBalsaAddressBook * ab, 
-					     LibBalsaAddressBookLoadFunc callback, 
-					     gpointer closure);
-static void libbalsa_address_book_vcard_store_address(LibBalsaAddressBook *ab,
-						      LibBalsaAddress *new_address);
+static LibBalsaABErr libbalsa_address_book_vcard_load(LibBalsaAddressBook* ab,
+                                                      LibBalsaAddressBookLoadFunc
+                                                      callback, 
+                                                      gpointer closure);
+static LibBalsaABErr libbalsa_address_book_vcard_store_address(LibBalsaAddressBook *ab,
+                                                               LibBalsaAddress *new_address);
 
 static void libbalsa_address_book_vcard_save_config(LibBalsaAddressBook *ab,
 						    const gchar * prefix);
@@ -66,7 +66,7 @@ static GList *libbalsa_address_book_vcard_alias_complete(LibBalsaAddressBook * a
 							 const gchar * prefix,
 							 gchar ** new_prefix);
 
-static void load_vcard_file(LibBalsaAddressBook *ab);
+static gboolean load_vcard_file(LibBalsaAddressBook *ab);
 
 static gchar *
 extract_name(const gchar * string);
@@ -180,15 +180,15 @@ libbalsa_address_book_vcard_new(const gchar * name, const gchar * path)
     return ab;
 }
 
+/* returns true if the book has changed or there is an error */
 static gboolean 
 vcard_address_book_need_reload(LibBalsaAddressBookVcard *ab)
 {
     struct stat stat_buf;
 
-    if ( stat(ab->path, &stat_buf) == -1 ) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING, _("Could not stat vcard address book: %s"), ab->path);
-	return FALSE;
-    }
+    if ( stat(ab->path, &stat_buf) == -1 )
+	return TRUE;
+
     if ( stat_buf.st_mtime > ab->mtime ) {
 	ab->mtime = stat_buf.st_mtime;
 	return TRUE;
@@ -197,12 +197,14 @@ vcard_address_book_need_reload(LibBalsaAddressBookVcard *ab)
     }
 }
 
-static void
-libbalsa_address_book_vcard_load(LibBalsaAddressBook * ab, LibBalsaAddressBookLoadFunc callback, gpointer closure)
+static LibBalsaABErr
+libbalsa_address_book_vcard_load(LibBalsaAddressBook * ab,
+                                 LibBalsaAddressBookLoadFunc callback,
+                                 gpointer closure)
 {
     GList *lst;
 
-    load_vcard_file(ab);
+    if(!load_vcard_file(ab)) return LBABERR_CANNOT_READ;
 
     lst = LIBBALSA_ADDRESS_BOOK_VCARD(ab)->address_list;
     while (lst) {
@@ -210,11 +212,14 @@ libbalsa_address_book_vcard_load(LibBalsaAddressBook * ab, LibBalsaAddressBookLo
 	    callback(ab, LIBBALSA_ADDRESS(lst->data), closure);
 	lst = g_list_next(lst);
     }
-    callback(ab, NULL, closure);
+    if(callback) callback(ab, NULL, closure);
+    return LBABERR_OK;
 }
 
-/* FIXME: Could stat the file to see if it has changed since last time we read it */
-static void load_vcard_file(LibBalsaAddressBook *ab)
+/* FIXME: Could stat the file to see if it has changed since last time
+   we read it */
+static gboolean
+load_vcard_file(LibBalsaAddressBook *ab)
 {
     FILE *gc;
     gchar string[LINE_LEN];
@@ -229,26 +234,23 @@ static void load_vcard_file(LibBalsaAddressBook *ab)
 
     addr_vcard = LIBBALSA_ADDRESS_BOOK_VCARD(ab);
 
-    if ( vcard_address_book_need_reload(addr_vcard) == FALSE ) 
-	return;
+    if (!vcard_address_book_need_reload(addr_vcard)) 
+	return TRUE;
 
     g_list_foreach(addr_vcard->address_list, (GFunc) g_object_unref, NULL);
     g_list_free(addr_vcard->address_list);
     addr_vcard->address_list = NULL;
 
-    g_list_foreach(addr_vcard->name_complete->items, (GFunc)completion_data_free, NULL);
-    g_list_foreach(addr_vcard->alias_complete->items, (GFunc)completion_data_free, NULL);
+    g_list_foreach(addr_vcard->name_complete->items,
+                   (GFunc)completion_data_free, NULL);
+    g_list_foreach(addr_vcard->alias_complete->items,
+                   (GFunc)completion_data_free, NULL);
 
     g_completion_clear_items(addr_vcard->name_complete);
     g_completion_clear_items(addr_vcard->alias_complete);
 
-    gc = fopen(addr_vcard->path, "r");
-
-    if (gc == NULL) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING, _("Could not open vCard address book %s."), 
-			     ab->name);
-	return;
-    }
+    if( (gc = fopen(addr_vcard->path, "r")) == NULL)
+	return FALSE;
 
     while (fgets(string, sizeof(string), gc)) {
 	/*
@@ -353,6 +355,7 @@ static void load_vcard_file(LibBalsaAddressBook *ab)
     completion_list = g_list_reverse(completion_list);
     g_completion_add_items(addr_vcard->alias_complete, completion_list);
     g_list_free(completion_list);
+    return TRUE;
 }
 
 static gchar *
@@ -407,7 +410,7 @@ extract_name(const gchar * string)
     return res;
 }
 
-static void
+static LibBalsaABErr
 libbalsa_address_book_vcard_store_address(LibBalsaAddressBook * ab,
 					  LibBalsaAddress * new_address)
 {
@@ -415,28 +418,20 @@ libbalsa_address_book_vcard_store_address(LibBalsaAddressBook * ab,
     LibBalsaAddress *address;
     FILE *fp;
 
-    load_vcard_file(ab);
+    if(!load_vcard_file(ab)) return LBABERR_CANNOT_READ;
 
     list = LIBBALSA_ADDRESS_BOOK_VCARD(ab)->address_list;
     while (list) {
 	address = LIBBALSA_ADDRESS(list->data);
 
-	if (g_ascii_strcasecmp(address->full_name, new_address->full_name) == 0) {
-	    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
-				 _("%s is already in address book."),
-				 new_address->full_name);
-	    return;
-	}
+	if (g_ascii_strcasecmp(address->full_name, new_address->full_name)==0)
+	    return LBABERR_DUPLICATE;
 	list = g_list_next(list);
     }
 
     fp = fopen(LIBBALSA_ADDRESS_BOOK_VCARD(ab)->path, "a");
-    if (fp == NULL) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("Cannot open vCard address book %s for saving\n"),
-			     ab->name);
-	return;
-    }
+    if (fp == NULL) 
+        return LBABERR_CANNOT_WRITE;
 
     fprintf(fp, "BEGIN:VCARD\n");
     if (*new_address->full_name != '\0')
@@ -460,6 +455,7 @@ libbalsa_address_book_vcard_store_address(LibBalsaAddressBook * ab,
 
     fprintf(fp, "END:VCARD\n\n");
     fclose(fp);
+    return LBABERR_OK;
 }
 
 static void

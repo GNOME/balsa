@@ -65,9 +65,9 @@ libbalsa_address_book_ldap_class_init(LibBalsaAddressBookLdapClass *
 static void libbalsa_address_book_ldap_init(LibBalsaAddressBookLdap * ab);
 static void libbalsa_address_book_ldap_finalize(GObject * object);
 
-static void libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab, 
-					    LibBalsaAddressBookLoadFunc callback, 
-					    gpointer closure);
+static LibBalsaABErr libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab, 
+                                                     LibBalsaAddressBookLoadFunc callback, 
+                                                     gpointer closure);
 static gboolean
 libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab);
 static void
@@ -236,22 +236,21 @@ libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab)
 /*
  * ldap_load:
  * opens the connection only, if needed.
- *
- * Side effects:
- *   Spits out balsa_information() when it deems necessary.
  */
-static void
-libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab, LibBalsaAddressBookLoadFunc callback, gpointer closure)
+static LibBalsaABErr
+libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab,
+                                LibBalsaAddressBookLoadFunc callback,
+                                gpointer closure)
 {
     LibBalsaAddressBookLdap *ldap_ab;
     LibBalsaAddress *address;
     LDAPMessage *e, *result;
     int rc;
 
-    g_return_if_fail ( LIBBALSA_IS_ADDRESS_BOOK_LDAP(ab));
+    g_return_val_if_fail ( LIBBALSA_IS_ADDRESS_BOOK_LDAP(ab), LBABERR_OK);
 
     if (callback == NULL)
-	return;
+	return LBABERR_OK;
 
     ldap_ab = LIBBALSA_ADDRESS_BOOK_LDAP(ab);
     /*
@@ -259,7 +258,7 @@ libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab, LibBalsaAddressBookLoa
      */
     if (ldap_ab->directory == NULL) {
 	if (!libbalsa_address_book_ldap_open_connection(ldap_ab))
-	    return;
+	    return LBABERR_CANNOT_CONNECT;
     }
     
     /* 
@@ -269,13 +268,8 @@ libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab, LibBalsaAddressBookLoa
     /* g_print("Performing full lookup...\n"); */
     rc = ldap_search_s(ldap_ab->directory, ldap_ab->base_dn,
 		       LDAP_SCOPE_SUBTREE, "(mail=*)", NULL, 0, &result);
-    if (rc != LDAP_SUCCESS) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("Failed to do a search: %s."
-			       "Check that the base name is valid."),
-			     ldap_err2string(rc));
-	return;
-    }
+    if (rc != LDAP_SUCCESS)
+	return LBABERR_CANNOT_SEARCH;
     
     /* 
      * Now loop over all the results, and spit out the output.
@@ -290,6 +284,7 @@ libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab, LibBalsaAddressBookLoa
     callback(ab, NULL, closure);
     /* printf("ldap_load:: result=%p\n", result); */
     ldap_msgfree(result);
+    return LBABERR_OK;
 }
 
 /* ldap_get_string:
@@ -297,7 +292,8 @@ libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab, LibBalsaAddressBookLoa
  
  */
 
-static gchar *ldap_get_string(const gchar *ldap_string)
+static gchar*
+ldap_get_string(const gchar *ldap_string)
 {
     char *in=(char *)ldap_string;
     size_t len=strlen(in), outlen=len;
@@ -319,7 +315,8 @@ static gchar *ldap_get_string(const gchar *ldap_string)
    Return native LDAP encoded version of string.
  */
 
-static gchar *ldap_set_string(const gchar *native_string)
+static gchar*
+ldap_set_string(const gchar *native_string)
 {
     char *in=(char *)native_string;
     size_t len=strlen(in), outlen=2*len; /* Worst case */

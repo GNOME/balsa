@@ -68,54 +68,6 @@ gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 				gboolean rfc2646);
 #endif
-void libbalsa_marshal_BOOLEAN__VOID(GClosure *closure,
-                                    GValue *return_value,
-                                    guint n_param_values,
-                                    const GValue *param_values,
-                                    gpointer invocation_hint,
-                                    gpointer marshal_data);
-void libbalsa_marshal_POINTER__VOID(GClosure *closure,
-                                    GValue *return_value,
-                                    guint n_param_values,
-                                    const GValue *param_values,
-                                    gpointer invocation_hint,
-                                    gpointer marshal_data);
-void libbalsa_marshal_POINTER__OBJECT(GClosure *closure,
-                                      GValue *return_value,
-                                      guint n_param_values,
-                                      const GValue *param_values,
-                                      gpointer invocation_hint,
-                                      gpointer marshal_data);
-void libbalsa_marshal_POINTER__POINTER_POINTER(GClosure *closure,
-                                               GValue *return_value,
-                                               guint n_param_values,
-                                               const GValue *param_values,
-                                               gpointer invocation_hint,
-                                               gpointer marshal_data);
-void libbalsa_marshal_POINTER__INT_POINTER (GClosure     *closure,
-                                            GValue       *return_value,
-                                            guint         n_param_values,
-                                            const GValue *param_values,
-                                            gpointer      invocation_hint,
-                                            gpointer      marshal_data);
-void libbalsa_marshal_VOID__POINTER_INT     (GClosure     *closure,
-                                             GValue       *return_value,
-                                             guint         n_param_values,
-                                             const GValue *param_values,
-                                             gpointer      invocation_hint,
-                                             gpointer      marshal_data);
-void libbalsa_marshal_VOID__POINTER_POINTER (GClosure     *closure,
-                                             GValue       *return_value,
-                                             guint         n_param_values,
-                                             const GValue *param_values,
-                                             gpointer      invocation_hint,
-                                             gpointer      marshal_data);
-void libbalsa_marshal_VOID__INT_INT_INT_STRING(GClosure     *closure,
-                                               GValue       *return_value,
-                                               guint         n_param_values,
-                                               const GValue *param_values,
-                                               gpointer      invocation_hint,
-                                               gpointer      marshal_data);
 
 gboolean libbalsa_delete_directory_contents(const gchar *path);
 gchar *libbalsa_truncate_string(const gchar * str, gint length, gint dots);

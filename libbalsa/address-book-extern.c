@@ -45,20 +45,21 @@ static void libbalsa_address_book_externq_class_init(LibBalsaAddressBookExternCl
 static void libbalsa_address_book_externq_init(LibBalsaAddressBookExtern *ab);
 static void libbalsa_address_book_externq_finalize(GObject * object);
 
-static void libbalsa_address_book_externq_load(LibBalsaAddressBook * ab, 
-					       LibBalsaAddressBookLoadFunc 
-                                               callback, 
-                                               gpointer closure);
-static void libbalsa_address_book_externq_store_address(LibBalsaAddressBook *ab,
-                                                        LibBalsaAddress *new_address);
+static LibBalsaABErr libbalsa_address_book_externq_load(LibBalsaAddressBook* ab, 
+                                                        LibBalsaAddressBookLoadFunc 
+                                                        callback, 
+                                                        gpointer closure);
+static LibBalsaABErr libbalsa_address_book_externq_store_address(LibBalsaAddressBook *ab,
+                                                                 LibBalsaAddress *new_address);
 
 static void libbalsa_address_book_externq_save_config(LibBalsaAddressBook *ab,
                                                       const gchar * prefix);
 static void libbalsa_address_book_externq_load_config(LibBalsaAddressBook *ab,
                                                       const gchar * prefix);
-static void load_externq_file(LibBalsaAddressBook *ab);
+static gboolean load_externq_file(LibBalsaAddressBook *ab);
 
-static GList *parse_externq_file(LibBalsaAddressBookExtern *addr_externq, gchar *pattern);
+static gboolean parse_externq_file(LibBalsaAddressBookExtern *addr_externq,
+                                   gchar *pattern, GList** res);
 
 static GList *libbalsa_address_book_externq_alias_complete(LibBalsaAddressBook *ab, 
                                                            const gchar * prefix,
@@ -170,24 +171,25 @@ libbalsa_address_book_externq_new(const gchar * name, const gchar * load,
     return ab;
 }
 
-static void
+static LibBalsaABErr
 libbalsa_address_book_externq_load(LibBalsaAddressBook * ab, 
                                    LibBalsaAddressBookLoadFunc callback, 
                                    gpointer closure)
 {
     GList *lst;
 
-    load_externq_file(ab);
+    if(!load_externq_file(ab)) return LBABERR_CANNOT_READ;
 
     for (lst = LIBBALSA_ADDRESS_BOOK_EXTERN(ab)->address_list; 
 	 lst; lst = g_list_next(lst)) {
-	if ( callback ) 
+	if (callback) 
 	    callback(ab, LIBBALSA_ADDRESS(lst->data), closure);
     }
-    callback(ab, NULL, closure);
+    if(callback) callback(ab, NULL, closure);
+    return LBABERR_OK;
 }
 
-static void
+static gboolean
 load_externq_file(LibBalsaAddressBook *ab)
 {
     LibBalsaAddressBookExtern *addr_externq;
@@ -196,32 +198,29 @@ load_externq_file(LibBalsaAddressBook *ab)
     /* Erase the current address list */
     g_list_foreach(addr_externq->address_list, (GFunc) g_object_unref, NULL);
     g_list_free(addr_externq->address_list);
-    addr_externq->address_list = parse_externq_file(addr_externq, " ");
+    return parse_externq_file(addr_externq, " ", &addr_externq->address_list);
 }
 
-static GList*
-parse_externq_file(LibBalsaAddressBookExtern *addr_externq, gchar *pattern)
+static gboolean
+parse_externq_file(LibBalsaAddressBookExtern *addr_externq,
+                   gchar *pattern, GList** list)
 {
     FILE *gc;
     gchar string[LINE_LEN];
     char name[LINE_LEN], email[LINE_LEN], tmp[LINE_LEN];
     gchar command[LINE_LEN];
-    GList *list = NULL;
     GList *address_list = NULL;
 
+    list = NULL;
     /* Start the program */
     g_snprintf(command, sizeof(command), "%s \"%s\"", 
                addr_externq->load, pattern);
     
     gc = popen(command,"r");
 
-    if (gc == NULL) {
-        libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
-                             _("Could not open external query address book %s "
-                               "while trying to parse output from: %s"), 
-                             addr_externq->parent.name, command); 
-        return NULL;
-    }
+    if (gc == NULL) 
+        return FALSE;
+
     fgets(string, sizeof(string), gc);
     /* The first line should be junk, just debug output */
 #ifdef DEBUG
@@ -245,22 +244,22 @@ parse_externq_file(LibBalsaAddressBookExtern *addr_externq, gchar *pattern)
 
         if (name)address->full_name = g_strdup(name);
         else address->full_name = g_strdup(_("No-Name"));
-        list = g_list_prepend(list,address);
+        *list = g_list_prepend(*list, address);
     }
     fclose(gc);
     
-    list = g_list_sort(list, (GCompareFunc)address_compare);
-    return list;
+    *list = g_list_sort(*list, (GCompareFunc)address_compare);
+    return TRUE;
 }
 
-static void
+static LibBalsaABErr
 libbalsa_address_book_externq_store_address(LibBalsaAddressBook * ab,
                                             LibBalsaAddress * new_address)
 {
     gchar command[LINE_LEN];
     LibBalsaAddressBookExtern *ex;
     FILE *gc; 
-    g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK_EXTERN(ab));
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK_EXTERN(ab), LBABERR_OK);
 
     ex = LIBBALSA_ADDRESS_BOOK_EXTERN(ab);
 
@@ -269,15 +268,11 @@ libbalsa_address_book_externq_store_address(LibBalsaAddressBook * ab,
                (gchar *)g_list_first(new_address->address_list)->data, 
                new_address->full_name, "TODO");
 
-    gc = popen(command, "r");
-    if(gc == NULL) {
-        libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
-                             _("Could not add address to address book %s "
-                               "while trying to execute: %s"), 
-                             ex->parent.name, command); 
-        return;
-    }
-    fclose(gc);
+    if( (gc = popen(command, "r")) == NULL)
+        return LBABERR_CANNOT_WRITE;
+    if(fclose(gc) != 0) 
+        return LBABERR_CANNOT_WRITE;
+    return LBABERR_OK;
 }
 
 static void
@@ -328,10 +323,11 @@ libbalsa_address_book_externq_alias_complete(LibBalsaAddressBook * ab,
 
     ex = LIBBALSA_ADDRESS_BOOK_EXTERN(ab);
 
-    if ( ab->expand_aliases == FALSE )
+    if ( !ab->expand_aliases )
 	return NULL;
 
-    res = parse_externq_file(ex, (gchar *)prefix);
+    if(!parse_externq_file(ex, (gchar *)prefix, &res))
+        return NULL;
 	
     g_list_reverse(res);
 

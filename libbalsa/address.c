@@ -22,10 +22,9 @@
 
 #include "config.h"
 
-#include <glib.h>
+#include <string.h>
 
-#include "libbalsa.h"
-#include "libbalsa_private.h"
+#include "address.h"
 
 static GObjectClass *parent_class;
 
@@ -116,67 +115,434 @@ libbalsa_address_new(void)
     return g_object_new(LIBBALSA_TYPE_ADDRESS, NULL);
 }
 
+
+#define ENABLE_OBSOLETED_CODE 1
+
+/*  based on mutt code. GPL, Copyright (C) 1996-8 Michael R. Elkins
+  <me@cs.hmc.edu>
+*/
+
+#if ENABLE_OBSOLETED_CODE
+#include <ctype.h>
+
+#define terminate_string(a, b, c) do { if ((b) < (c)) a[(b)] = 0; else \
+       a[(c)] = 0; } while (0)
+
+#define terminate_buffer(a, b) terminate_string(a, b, sizeof (a) - 1)
+
+static const char RFC822Specials[] = "@.,:;<>[]\\\"()";
+#define is_special(x) strchr(RFC822Specials,x)
+
+typedef enum {
+    RFC822_OK = 0,
+    RFC822_ERR_MEMORY,                /* "out of memory" */
+    RFC822_ERR_MISMATCH_PAREN,        /* "mismatched parenthesis" */
+    RFC822_ERR_MISMATCH_QUOTE,        /* "mismatched quotes"      */
+    RFC822_ERR_BAD_ROUTE,             /* "bad route in <>",       */
+    RFC822_ERR_BAD_ROUTE_ADDR,        /* "bad address in <>",     */
+    RFC822_ERR_BAD_ADDR_SPEC          /* "bad address spec"       */
+} RFC822Error;
+
+
+#define SKIPWS(c) while (*(c) && isspace ((unsigned char) *(c))) c++;
+
+typedef struct RFC822Address_ {
+    char *comment, *mailbox;
+    struct RFC822Address_ *next; 
+    int group:1;
+} RFC822Address;
+
+static void
+rfc822_address_free(RFC822Address* addr)
+{
+    RFC822Address* next;
+    while(addr) {
+        next = addr->next;
+        g_free(addr->comment);
+        g_free(addr->mailbox);
+        g_free(addr);
+        addr = next;
+    }
+}
+         
+static void
+rfc822_dequote_comment (GString *string)
+{
+    char* str = string->str;
+    int w = 0, s;
+    
+    for (s=0; str[s]; s++) {
+        if (str[s] == '\\') {
+            if (!str[++s])
+                break; /* error? */
+            str[w++] = str[s];
+        } else if (str[s] != '\"') {
+            if (w != s)
+                str[w] = str[s];
+            w++;
+        }
+    }
+    str[w] = '\0';
+    string->len = w;
+}
+
+static const char *
+parse_comment (const char *s, GString* comment, RFC822Error* err)
+{
+    int level = 1;
+  
+    while (*s && level) {
+        if (*s == '(')
+            level++;
+        else if (*s == ')') {
+            if (--level == 0) {
+                s++;
+                break;
+            }
+        } else if (*s == '\\') {
+            if (!*++s)
+                break;
+        }
+        g_string_append_c(comment, *s);
+        s++;
+    }
+    if (level) {
+        *err = RFC822_ERR_MISMATCH_PAREN;
+        return NULL;
+    }
+    return s;
+}
+
+static const char *
+parse_quote(const char *s, GString *token, RFC822Error* err)
+{
+    g_string_append_c(token, '"');
+    while (*s) {
+        g_string_append_c(token, *s);
+        if (*s == '"')
+            return (s + 1);
+        if (*s == '\\') {
+            if (!*++s)
+                break;
+            else {
+                token->str[token->len-1] = *s;
+            }
+            s++;
+        }
+    }
+    *err = RFC822_ERR_MISMATCH_QUOTE;
+    return NULL;
+}
+
+static const char *
+next_token(const char *s, GString *token, RFC822Error* err)
+{
+    if (*s == '(')
+        return (parse_comment (s + 1, token, err));
+    if (*s == '"')
+        return (parse_quote (s + 1, token, err));
+    if (is_special (*s)) {
+        g_string_append_c(token, *s);
+        return (s + 1);
+    }
+    while (*s) {
+        if (isspace(*s) || is_special(*s))
+            break;
+        g_string_append_c(token, *s);
+        s++;
+    }
+    return s;
+}
+
+static const char *
+parse_mailboxdomain (const char *s, const char *nonspecial,
+		     GString *mailbox, GString *comment, RFC822Error* err)
+{
+    const char *ps;
+    
+    while (*s) {
+        SKIPWS (s);
+        if (strchr (nonspecial, *s) == NULL && is_special (*s))
+            return s;
+        
+        if (*s == '(') {
+            g_string_append_c(comment, ' ');
+            ps = next_token(s, comment, err);
+        } else
+            ps = next_token(s, mailbox, err);
+        if (!ps)
+            return NULL;
+        s = ps;
+    }
+    
+    return s;
+}
+static const char *
+parse_address (const char *s, GString *token, GString *comment, 
+               RFC822Address *addr, RFC822Error* err)
+{
+    s = parse_mailboxdomain (s, ".\"(\\", token, comment, err);
+    if (!s)
+        return NULL;
+
+    if (*s == '@') {
+        g_string_append_c(token, '@');
+        s = parse_mailboxdomain (s + 1, ".([]\\", token,  comment, err);
+        if (!s)
+            return NULL;
+    }
+    
+    if (token->len > 0 && token->str[0] != '@' && 
+        token->str[token->len-1] != '@' &&
+        (token->len >= 4 || !strchr(token->str, '@')))
+        addr->mailbox = g_strdup(token->str);
+    
+    if (comment->len && !addr->comment)
+        addr->comment = g_strdup(comment->str);
+    
+    return s;
+}
+
+static const char *
+parse_route_addr (const char *s, GString* comment,
+		  RFC822Address *addr, RFC822Error* err)
+{
+    GString* token = g_string_new("");
+
+    SKIPWS (s);
+
+    /* find the end of the route */
+    if (*s == '@') {
+        while (s && *s == '@') {
+            g_string_append_c(token, '@');
+            s = parse_mailboxdomain (s + 1, ".\\[](", token, comment, err);
+        }
+        if (!s || *s != ':') {
+            *err = RFC822_ERR_BAD_ROUTE;
+            g_string_free(token, TRUE);
+            return NULL; /* invalid route */
+        }
+        g_string_append_c(token, ':');
+        s++;
+    }
+    
+    if ((s = parse_address (s, token, comment, addr, err)) == NULL) {
+        g_string_free(token, TRUE);
+        return NULL;
+    }
+    
+    if (*s != '>' || !addr->mailbox) {
+        *err = RFC822_ERR_BAD_ROUTE_ADDR;
+        g_string_free(token, TRUE);
+        return NULL;
+    }
+    
+    s++;
+    g_string_free(token, TRUE);
+    return s;
+}
+
+static const char *
+parse_addr_spec(const char *s,GString *comment, 
+		 RFC822Address *addr, RFC822Error* err)
+{
+    GString *token = g_string_new("");
+    
+    s = parse_address(s, token, comment, addr, err);
+    g_string_free(token, TRUE);
+
+    if (s && *s && *s != ',' && *s != ';') {
+        *err = RFC822_ERR_BAD_ADDR_SPEC;
+        return NULL;
+    }
+    return s;
+}
+
+/* see rfc2822, 3.4.1 for definition of addr-spec */
+static void
+add_addrspec (RFC822Address **top, RFC822Address **last, const char *phrase,
+	      GString *comment, RFC822Error* err)
+{
+    RFC822Address *cur = g_new0(RFC822Address,1);
+  
+    if (parse_addr_spec(phrase, comment, cur, err) == NULL) {
+        rfc822_address_free(cur);
+        return;
+    }
+    
+    if (*last)
+        (*last)->next = cur;
+    else
+        *top = cur;
+    *last = cur;
+}
+
+static RFC822Address*
+rfc822_parse_adrlist(RFC822Address *top, const char *s, RFC822Error* err)
+{
+    const char *begin, *ps;
+    GString* comment, *phrase;
+    RFC822Address *cur, *last = NULL;
+  
+    *err = 0;
+    
+    last = top;
+    while (last && last->next)
+        last = last->next;
+    
+    /* last-ditch sanity check: */
+    if (s == NULL)
+        return top;
+    comment = g_string_new("");
+    phrase  = g_string_new("");
+    
+    SKIPWS (s);
+    begin = s;
+    while (*s) {
+        if (*s == ',') {
+            if (phrase->len) {
+                add_addrspec (&top, &last, phrase->str, comment, err);
+            } else if (comment->len && last && !last->comment) {
+                last->comment = g_strdup(comment->str);
+            }
+            g_string_truncate(comment, 0);
+            g_string_truncate(phrase,  0);
+            s++;
+            begin = s;
+            SKIPWS (begin);
+        } else if (*s == '(') {
+            if (comment->len)
+                g_string_append_c(comment, ' ');
+            if ((ps = next_token (s, comment, err)) == NULL) {
+                rfc822_address_free(top);
+                return NULL;
+            }
+            s = ps;
+        } else if (*s == ':') {
+            cur = g_new0(RFC822Address,1);
+            cur->mailbox = g_strdup(phrase->str);
+            cur->group = 1;
+            
+            if (last)
+                last->next = cur;
+            else
+                top = cur;
+            last = cur;
+            
+            g_string_truncate(comment, 0);
+            g_string_truncate(phrase,  0);
+            s++;
+            begin = s;
+            SKIPWS (begin);
+        } else if (*s == ';') {
+            if (phrase->len) {
+                add_addrspec (&top, &last, phrase->str, comment, err);
+            } else if (comment->len && last && !last->comment) {
+                last->comment = g_strdup (comment->str);
+            }
+
+            /* add group terminator */
+            cur = g_new0(RFC822Address,1);
+            if (last) {
+                last->next = cur;
+                last = cur;
+            }
+
+            g_string_truncate(comment, 0);
+            g_string_truncate(phrase,  0);
+            s++;
+            begin = s;
+            SKIPWS (begin);
+        } else if (*s == '<') {
+            cur = g_new0(RFC822Address,1);
+            if (phrase->len) {
+                /* if we get something like "Michael R. Elkins" remove the quotes -
+                   - but only in the case it would not introduce ambiguities.
+                   The forbidden character set might be too narrow...*/
+                if(strpbrk(phrase->str, ",;") == NULL)
+                    rfc822_dequote_comment (phrase);
+                g_free(cur->comment);
+                cur->comment = g_strdup(phrase->str);
+            }
+            if ((ps = parse_route_addr (s + 1, comment, cur, err)) == NULL) {
+                rfc822_address_free(top);
+                rfc822_address_free(cur);
+                return NULL;
+            }
+            
+            if (last)
+                last->next = cur;
+            else
+                top = cur;
+            last = cur;
+            
+            g_string_truncate(comment, 0);
+            g_string_truncate(phrase,  0);
+            s = ps;
+        } else {
+            if (phrase->len && *s != '.')
+                g_string_append_c(phrase, ' ');
+            if ((ps = next_token (s, phrase, err)) == NULL) {
+                rfc822_address_free(top);
+                return NULL;
+            }
+            s = ps;
+        }
+        SKIPWS(s);
+    }
+
+    if (phrase->len) {
+        add_addrspec (&top, &last, phrase->str, comment, err);
+    } else if (comment->len && last && !last->comment) {
+        last->comment = g_strdup(comment->str);
+    }
+
+    return top;
+}
+
+#endif
+
+
 /* returns only first address on the list; ignores remaining ones */
 LibBalsaAddress *
 libbalsa_address_new_from_string(const gchar * str)
 {
-    ADDRESS *address = NULL;
-    LibBalsaAddress *addr = NULL;
+    RFC822Error err;
+    RFC822Address* top = NULL, *list;
+    LibBalsaAddress* addr;
 
-    libbalsa_lock_mutt();
-    address = rfc822_parse_adrlist(address, str);
-    addr = libbalsa_address_new_from_libmutt(address);
-    rfc822_free_address(&address);
-    libbalsa_unlock_mutt();
-
+    list = rfc822_parse_adrlist(top, str, &err);
+    if(!list) return NULL;
+    addr = libbalsa_address_new();
+    addr->full_name = g_strdup(list->comment);
+    addr->address_list = g_list_append(addr->address_list, 
+                                       g_strdup(list->mailbox));
+    rfc822_address_free(top);
     return addr;
 }
 
-GList *
-libbalsa_address_new_list_from_string(const gchar * the_str)
+GList*
+libbalsa_address_new_list_from_string(const gchar * str)
 {
-    ADDRESS *address = NULL;
-    LibBalsaAddress *addr = NULL;
-    GList *list = NULL;
+    RFC822Error err;
+    RFC822Address* top = NULL, *list;
+    LibBalsaAddress* addr;
+    GList* lst = NULL;
 
-    libbalsa_lock_mutt();
-    address = rfc822_parse_adrlist(address, the_str);
-
-    while (address) {
-        if (address->mailbox && !address->group) { /* *** For now */
-            addr = libbalsa_address_new_from_libmutt(address);
-            list = g_list_prepend(list, addr);
-        }
-        address = address->next;
+    list = rfc822_parse_adrlist(top, str, &err);
+    while(list) {
+        addr = libbalsa_address_new();
+        addr->full_name = g_strdup(list->comment);
+        addr->address_list = g_list_append(addr->address_list, 
+                                           g_strdup(list->mailbox));
+        list = list->next;
     }
-    rfc822_free_address(&address);
-    libbalsa_unlock_mutt();
-
-    return g_list_reverse(list);
+    rfc822_address_free(top);
+    return lst;
 }
 
-LibBalsaAddress *
-libbalsa_address_new_from_libmutt(ADDRESS * caddr)
-{
-    LibBalsaAddress *address;
-
-    if (!caddr || (caddr->personal==NULL && caddr->mailbox==NULL))
-	return NULL;
-
-    address = libbalsa_address_new();
-
-    /* it will be owned by the caller */
-
-    address->full_name = g_strdup(caddr->personal);
-    if (caddr->mailbox)
-	address->address_list = g_list_append(address->address_list,
-					      g_strdup(caddr->mailbox));
-
-    return address;
-}
-
-
-static gboolean needs_quotes(const gchar *str)
+static gboolean
+needs_quotes(const gchar *str)
 {
     gboolean quoted = FALSE;
 
@@ -197,7 +563,8 @@ static gboolean needs_quotes(const gchar *str)
     return FALSE;
 }
 
-static gchar *rfc2822_mailbox(const gchar *full_name, gchar *address)
+static gchar*
+rfc2822_mailbox(const gchar *full_name, gchar *address)
 {
     gchar *new_str;
 
@@ -284,18 +651,9 @@ static gchar *rfc2822_list(GList *list)
     return retc;
 }
 
-/* 
-   Get a string version of this address.
-
-   If n == -1 then return all addresses, else return the n'th one.
-   If n > the number of addresses, will cause an error.
-*/
-gchar *
-libbalsa_address_to_gchar(LibBalsaAddress * address, gint n)
-{
-    return libbalsa_address_to_gchar_p(address, n);
-}
 /* private version */
+gchar *
+libbalsa_address_to_gchar_p(LibBalsaAddress * address, gint n);
 gchar *
 libbalsa_address_to_gchar_p(LibBalsaAddress * address, gint n)
 {
@@ -318,6 +676,18 @@ libbalsa_address_to_gchar_p(LibBalsaAddress * address, gint n)
     }
     
     return retc;
+}
+
+/* 
+   Get a string version of this address.
+
+   If n == -1 then return all addresses, else return the n'th one.
+   If n > the number of addresses, will cause an error.
+*/
+gchar *
+libbalsa_address_to_gchar(LibBalsaAddress * address, gint n)
+{
+    return libbalsa_address_to_gchar_p(address, n);
 }
 
 const gchar *

@@ -431,6 +431,13 @@ fi
 AC_MSG_CHECKING([for CVS information])
 AC_MSG_RESULT($BALSA_FROM_CVS)
 
+dnl ###########################################################################
+dnl Retrieve the command to generate marshallers from marshallers list files
+dnl ###########################################################################
+
+AC_SUBST(GLIB_GENMARSHAL)
+GLIB_GENMARSHAL=`pkg-config --variable=glib_genmarshal glib-2.0`
+
 dnl ##########################################################################
 dnl Create files.
 dnl ##########################################################################

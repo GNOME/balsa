@@ -350,7 +350,7 @@ main(int argc, char *argv[])
     /* FIXME: gnome_i18n_get_language seems to have gone away; 
      * is this a reasonable replacement? */
     setlocale(LC_CTYPE,
-              (const char *) gnome_i18n_get_language_list(LC_CTYPE)->data);
+              (const char *) gnome_i18n_get_language_list("LC_CTYPE")->data);
 #endif
 
 #ifdef HAVE_GPGME

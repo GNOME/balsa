@@ -232,7 +232,8 @@ balsa_information_list(LibBalsaInformationType type, char *msg)
                                  gtk_text_buffer_get_insert(buffer),
                                  0, FALSE, 0, 0);
 
-    gnome_appbar_set_status(balsa_app.appbar, msg);
+    if (balsa_app.appbar)
+	gnome_appbar_set_status(balsa_app.appbar, msg);
 }
 
 static void 

@@ -332,6 +332,9 @@ load_vcard_file(LibBalsaAddressBook *ab)
     }
     fclose(gc);
 
+    if (!list)
+        return TRUE;
+
     list = g_list_sort(list, (GCompareFunc)address_compare);
     addr_vcard->address_list = list;
 

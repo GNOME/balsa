@@ -52,7 +52,7 @@ do {\
   if (MAILBOX_CLOSED (mailbox))\
     {\
       g_print (_("*** ERROR: Mailbox Stream Closed: %s ***\n"), __PRETTY_FUNCTION__);\
-      UNLOCK_MAILBOX (mailbox);\
+      libbalsa_unlock_mailbox (mailbox);\
       return;\
     }\
 } while (0)
@@ -61,7 +61,7 @@ do {\
   if (MAILBOX_CLOSED (mailbox))\
     {\
       g_print (_("*** ERROR: Mailbox Stream Closed: %s ***\n"), __PRETTY_FUNCTION__);\
-      UNLOCK_MAILBOX (mailbox);\
+      libbalsa_unlock_mailbox (mailbox);\
       return (val);\
     }\
 } while (0)
@@ -465,6 +465,13 @@ void libbalsa_mailbox_register_msgnos(LibBalsaMailbox * mailbox,
 				      GArray * msgnos);
 void libbalsa_mailbox_unregister_msgnos(LibBalsaMailbox * mailbox,
 					GArray * msgnos);
+
+/* Accessors for LibBalsaMailboxIndexEntry */
+LibBalsaMessageStatus libbalsa_mailbox_msgno_get_status(LibBalsaMailbox *
+							mailbox,
+							guint msgno);
+const gchar *libbalsa_mailbox_msgno_get_subject(LibBalsaMailbox * mailbox,
+						guint msgno);
 
 /* columns ids */
 typedef enum {

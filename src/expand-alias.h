@@ -26,7 +26,7 @@
 extern "C" {
 #endif				/* __cplusplus */
 
-	void expand_alias_find_match(emailData *addy);
+	void expand_alias_find_match(emailData *addy, gboolean fastp);
 
 #ifdef __cplusplus
 }

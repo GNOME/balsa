@@ -1,3 +1,7 @@
+2001-08-11  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/expand-alias.h: expand_alias_find_match() proto fixup
+
 2001-08-11  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/address-book.[hc]: distinguish fast and slow=expensive

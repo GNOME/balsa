@@ -41,7 +41,7 @@
 #include "browser.h"
 
 static void
-libbalsa_scanner_mh_dir(GNode *rnode,
+libbalsa_scanner_mdir(GNode *rnode,
 	       		const gchar * prefix, 
 			LocalHandler folder_handler, 
 			LocalHandler mailbox_handler)
@@ -73,12 +73,14 @@ libbalsa_scanner_mh_dir(GNode *rnode,
 	     * if we think that this looks like a mailbox, include it as such.
 	     * otherwise we'll lose the mail in this folder
 	     */
-	    if (libbalsa_mailbox_type_from_path(filename) == LIBBALSA_TYPE_MAILBOX_MH) {
+	    GType foo = libbalsa_mailbox_type_from_path(filename);
+	    if( (foo == LIBBALSA_TYPE_MAILBOX_MH) ||
+		(foo == LIBBALSA_TYPE_MAILBOX_MAILDIR ) ) {
 		parent_node = mailbox_handler(rnode, de->d_name, filename);
-		libbalsa_scanner_mh_dir(parent_node, filename, 
-					folder_handler, mailbox_handler);
+		libbalsa_scanner_mdir(parent_node, filename, 
+				      folder_handler, mailbox_handler);
 	    }
-	}
+	} 
 	/* ignore regular files */
     }
     closedir(dpc);
@@ -112,12 +114,11 @@ libbalsa_scanner_local_dir(GNode *rnode, const gchar * prefix,
 	if (S_ISDIR(st.st_mode)) {
 	    mailbox_type = libbalsa_mailbox_type_from_path(filename);
 
-	    if (mailbox_type == LIBBALSA_TYPE_MAILBOX_MH) {
+	    if ( (mailbox_type == LIBBALSA_TYPE_MAILBOX_MH) ||
+		 (mailbox_type == LIBBALSA_TYPE_MAILBOX_MAILDIR) ) {
 		current_node = mailbox_handler(rnode, de->d_name, filename);
-		libbalsa_scanner_mh_dir(current_node, filename, 
+		libbalsa_scanner_mdir(current_node, filename, 
 				        folder_handler, mailbox_handler);
-	    } else if (mailbox_type == LIBBALSA_TYPE_MAILBOX_MAILDIR) {
-		mailbox_handler(rnode, de->d_name, filename);
 	    } else {
                 gchar *name = g_path_get_basename(prefix);
 

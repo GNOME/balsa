@@ -430,7 +430,9 @@ fetch_single_msg(int s, FILE *msg, int msgno, int first_msg, int msgs,
 	if ((chunk = getLine (s, buffer, sizeof (buffer))) == -1) 
 	    return POP_CONN_ERR;
 	if(last_update_time+2<time(NULL)) {
-	    sprintf(threadbuf,_("Received %d bytes of %d"), 
+	    sprintf(threadbuf, ngettext("Received %d byte of %d",
+					"Received %d bytes of %d",
+					*num_bytes), 
 		    *num_bytes, tot_bytes);
 	    prog_cb (prog_data, threadbuf, *num_bytes, tot_bytes);
 	    last_update_time = time(NULL);

@@ -2181,10 +2181,11 @@ void
 balsa_mblist_set_status_bar(LibBalsaMailbox * mailbox)
 {
     gchar *desc =
-        g_strdup_printf(_
-                        ("Shown mailbox: %s with %ld messages, %ld new"),
-                        mailbox->name, mailbox->total_messages,
-                        mailbox->unread_messages);
+	g_strdup_printf(ngettext
+			("Shown mailbox: %s with %ld message, %ld new",
+			 "Shown mailbox: %s with %ld messages, %ld new",
+			 mailbox->total_messages), mailbox->name,
+			mailbox->total_messages, mailbox->unread_messages);
 
     gnome_appbar_set_default(balsa_app.appbar, desc);
     g_free(desc);

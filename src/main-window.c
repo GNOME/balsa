@@ -2290,10 +2290,9 @@ display_new_mail_notification(int num_new)
         gtk_widget_show_all(GTK_WIDGET(dlg));
     }
 
-    msg = g_strdup_printf(num_total > 1
-                          ? _("You have received %d new messages.")
-                          : _("You have received 1 new message."),
-                          num_total);
+    msg = g_strdup_printf(ngettext("You have received %d new message.",
+				   "You have received %d new messages.",
+				   num_total), num_total);
     gtk_label_set_text(GTK_LABEL(GTK_MESSAGE_DIALOG(dlg)->label), msg);
     g_free(msg);
 }

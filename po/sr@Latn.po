@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-09-27 12:13+0200\n"
-"PO-Revision-Date: 2003-09-27 12:08+0200\n"
+"POT-Creation-Date: 2003-10-06 14:14+0200\n"
+"PO-Revision-Date: 2003-10-06 14:48+0200\n"
 "Last-Translator: Strahinja Radić <mr99164@alas.matf.bg.ac.yu>\n"
 "Language-Team: Serbian (sr) <serbiangnome-lista@nongnu.org>\n"
 "MIME-Version: 1.0\n"
@@ -4174,7 +4174,7 @@ msgstr "Tiha provera u pozadini (bez poruka u liniji stanja)"
 msgid "Quoted and Flowed Text"
 msgstr "Citirani i uključeni tekst"
 
-#: src/pref-manager.c:1728 src/sendmsg-window.c:3797
+#: src/pref-manager.c:1728 src/sendmsg-window.c:3798
 msgid "Quoted Text Regular Expression"
 msgstr "Regularni izraz za citirani tekst"
 
@@ -5139,21 +5139,23 @@ msgstr "Izaberite skup znakova:"
 #: src/sendmsg-window.c:3064
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
-"Please choose the charset used to encode the file."
+"Please choose the charset used to encode the file.\n"
+"(if unsure chose Generic UTF-8)"
 msgstr ""
 "Ova datoteka nije kodirana u US-ASCII ili UTF-8.\n"
-"Molim izaberite skup znakova kojim je kodirana ova datoteka."
+"Molim izaberite skup znakova kojim je kodirana ova datoteka.\n"
+"(ukoliko niste sigurni, izaberite obični UTF-8)"
 
-#: src/sendmsg-window.c:3130
+#: src/sendmsg-window.c:3131
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Ne mogu da otvorim datoteku %s.\n"
 
-#: src/sendmsg-window.c:3152
+#: src/sendmsg-window.c:3153
 msgid "Include file"
 msgstr "Uključi datoteku"
 
-#: src/sendmsg-window.c:3452
+#: src/sendmsg-window.c:3453
 #, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
@@ -5164,7 +5166,7 @@ msgstr ""
 "Molim izaberite jezik za ovu poruku.\n"
 "Za višejezičke poruke, koristite UTF-8."
 
-#: src/sendmsg-window.c:3472
+#: src/sendmsg-window.c:3473
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
@@ -5174,32 +5176,32 @@ msgstr ""
 "deo poruke se potpisuje i/ili šifruje. Ukoliko je potrebno zaštititi celu "
 "poruku, treba da izaberete režim „MIME“. Da li zaista želite da nastavim?"
 
-#: src/sendmsg-window.c:3485
+#: src/sendmsg-window.c:3486
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "šaljem poruku u režimu GPG-a %d"
 
-#: src/sendmsg-window.c:3796
+#: src/sendmsg-window.c:3797
 #, c-format
 msgid "Could not compile %s"
 msgstr "Ne mogu da prevedem %s"
 
-#: src/sendmsg-window.c:4314
+#: src/sendmsg-window.c:4315
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Odgovor za %s: %s"
 
-#: src/sendmsg-window.c:4319
+#: src/sendmsg-window.c:4320
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Prosledi poruku za %s: %s"
 
-#: src/sendmsg-window.c:4323
+#: src/sendmsg-window.c:4324
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Nastavi poruku za %s: %s"
 
-#: src/sendmsg-window.c:4327
+#: src/sendmsg-window.c:4328
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Nova poruka za %s: %s"

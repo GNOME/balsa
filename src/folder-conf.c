@@ -175,8 +175,6 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
                          G_CALLBACK(ask_password), NULL);
     }
 
-    libbalsa_server_set_host(s, host, 
-                             balsa_server_conf_get_use_ssl(&fcw->bsc));
     s->tls_mode = balsa_server_conf_get_tls_mode(&fcw->bsc);
     libbalsa_imap_server_set_max_connections
         (LIBBALSA_IMAP_SERVER(s),
@@ -193,6 +191,10 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
     libbalsa_server_set_password(s,
                                  gtk_entry_get_text(GTK_ENTRY
                                                     (fcw->password)));
+    /* Set host after all other server changes, as it triggers
+     * save-to-config for any folder or mailbox using this server. */
+    libbalsa_server_set_host(s, host, 
+                             balsa_server_conf_get_use_ssl(&fcw->bsc));
 
     if (!fcw->mbnode) {
         fcw->mbnode = balsa_mailbox_node_new_imap_folder(s, NULL);
@@ -219,10 +221,15 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
 	balsa_mblist_mailbox_node_append(NULL, fcw->mbnode);
         balsa_mailbox_node_append_subtree(fcw->mbnode);
         config_folder_add(fcw->mbnode, NULL);
+	g_signal_connect_swapped(s, "set-host",
+		                 G_CALLBACK(config_folder_update),
+				 fcw->mbnode);
         update_mail_servers();
     } else {
         balsa_mailbox_node_rescan(fcw->mbnode);
-        config_folder_update(fcw->mbnode);
+	/* Calling libbalsa_server_set_host already triggered an update,
+	 * so we do not need to here:
+	 * config_folder_update(fcw->mbnode); */
 	balsa_mblist_mailbox_node_redraw(fcw->mbnode);
     }
 }

@@ -779,6 +779,9 @@ update_imap_mailbox(MailboxConfWindow *mcw)
 	server = LIBBALSA_SERVER(libbalsa_imap_server_new("",""));
 	libbalsa_mailbox_remote_set_server(LIBBALSA_MAILBOX_REMOTE(mailbox),
 					   server);
+	g_signal_connect_swapped(server, "set-host",
+                                 G_CALLBACK(config_mailbox_update),
+				 mailbox);
     }
     g_free(LIBBALSA_MAILBOX(mailbox)->name);
     fill_in_imap_data(mcw, &LIBBALSA_MAILBOX(mailbox)->name, &path);
@@ -788,11 +791,6 @@ update_imap_mailbox(MailboxConfWindow *mcw)
     server->remember_passwd = 
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->
                                                        mb_data.imap.remember));
-    libbalsa_server_set_host(server,
-			     gtk_entry_get_text(GTK_ENTRY
-						(mcw->mb_data.imap.bsc.server)),
-                             balsa_server_conf_get_use_ssl
-                             (&mcw->mb_data.imap.bsc));
     server->tls_mode = balsa_server_conf_get_tls_mode(&mcw->mb_data.imap.bsc);
     libbalsa_server_set_password(server,
 				 gtk_entry_get_text(GTK_ENTRY
@@ -803,6 +801,13 @@ update_imap_mailbox(MailboxConfWindow *mcw)
          gtk_toggle_button_get_active
          GTK_TOGGLE_BUTTON(mcw->mb_data.imap.enable_persistent));
 #endif
+    /* Set host after all other server changes, as it triggers
+     * save-to-config for any folder or mailbox using this server. */
+    libbalsa_server_set_host(server,
+			     gtk_entry_get_text(GTK_ENTRY
+						(mcw->mb_data.imap.bsc.server)),
+                             balsa_server_conf_get_use_ssl
+                             (&mcw->mb_data.imap.bsc));
 
     g_signal_connect(G_OBJECT(server), "get-password",
                      G_CALLBACK(ask_password), mailbox);
@@ -888,6 +893,9 @@ mailbox_conf_update(MailboxConfWindow *mcw)
 	update_pop_mailbox(mcw);
     } else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
 	update_imap_mailbox(mcw);
+	/* Calling libbalsa_server_set_host already triggered an update,
+	 * so we do not need to here: */
+	return;
     }
 
     if (mailbox->config_prefix)

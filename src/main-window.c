@@ -122,7 +122,6 @@ static gint about_box_visible = FALSE;
 static void show_about_box(void);
 
 /* callbacks */
-static void check_new_messages_cb(GtkWidget *, gpointer data);
 static void send_outbox_messages_cb(GtkWidget *, gpointer data);
 
 static void new_message_cb(GtkWidget * widget, gpointer data);
@@ -664,9 +663,6 @@ balsa_window_new()
     /* set the toolbar style */
     balsa_window_refresh(window);
 
-    if (balsa_app.check_mail_upon_startup)
-	check_new_messages_cb(NULL, NULL);
-
     if (balsa_app.browse_wrap)
 	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
 				       (view_menu[MENU_VIEW_WRAP_POS].widget),
@@ -1188,7 +1184,7 @@ check_new_messages_auto_cb(gpointer data)
    check new messages the data argument is the BalsaWindow pointer
    or NULL.
 */
-static void
+void
 check_new_messages_cb(GtkWidget * widget, gpointer data)
 {
     libbalsa_notify_start_check();

@@ -63,7 +63,8 @@ extern "C" {
 
     BalsaSendmsg *sendmsg_window_new(GtkWidget *, LibBalsaMessage *,
 				     SendType);
-
+    void sendmsg_window_set_field(BalsaSendmsg *bsmsg, const gchar* key,
+				  const gchar* val);
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

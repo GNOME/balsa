@@ -98,6 +98,12 @@ GNOME DocBook documentation system. Very good documentation
 can be found at: http://www.gnome.org/gdp/gdp-handbook/gettingstarted.html
 
 
+Balsa as mailto protocol handler:
+---------------------------------
+	Balsa can be used as mailto protocol handler. You have to edit
+the GNOME URL handlers and add mailto protocol with command 
+balsa -m "%s".
+
 Mailbox locking:
 ---------------
 	Balsa uses flock+dotfile for mailbox file locking. It does not
@@ -141,5 +147,5 @@ Known issues:
 *	Older versions of GtkText are buggy and use sometimes wide
         characters for single byte charsets: some european charsets may
         be displayed improperly. gtk+-1.2.8 seems to work OK. We had 
-	also some reports that turned out to be problem with font server
+	also some reports that turned out to be a problem with font server
 	configuration.

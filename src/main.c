@@ -89,7 +89,14 @@ static gint balsa_save_session(GnomeClient * client, gint phase,
 			       GnomeSaveStyle save_style, gint is_shutdown,
 			       GnomeInteractStyle interact_style,
 			       gint is_fast, gpointer client_data);
+
+/* We need separate variable for storing command line requests to check the 
+   mail because such selection cannot be stored in balsa_app and later 
+   saved to the configuration file.
+*/
 static gchar *cmd_line_open_mailboxes;
+static gboolean cmd_check_mail_on_startup,
+     cmd_open_unread_mailbox;
 
 static void
 balsa_init(int argc, char **argv)
@@ -97,15 +104,14 @@ balsa_init(int argc, char **argv)
     static struct poptOption options[] = {
 
 	{"checkmail", 'c', POPT_ARG_NONE,
-	 &(balsa_app.check_mail_upon_startup), 0,
+	 &(cmd_check_mail_on_startup), 0,
 	 N_("Get new mail on startup"), NULL},
 	{"compose", 'm', POPT_ARG_STRING, &(balsa_app.compose_email),
 	 0, N_("Compose a new email to EMAIL@ADDRESS"), "EMAIL@ADDRESS"},
 	{"open-mailbox", 'o', POPT_ARG_STRING, &(cmd_line_open_mailboxes),
 	 0, N_("Opens MAILBOXNAME"), N_("MAILBOXNAME")},
-
 	{"open-unread-mailbox", 'u', POPT_ARG_NONE,
-	 &(balsa_app.open_unread_mailbox), 0,
+	 &(cmd_open_unread_mailbox), 0,
 	 N_("Opens first unread mailbox"), NULL},
 	{NULL, '\0', 0, NULL, 0}	/* end the list */
     };
@@ -237,6 +243,65 @@ initial_open_unread_mailboxes()
     return FALSE;
 }
 
+/* decode_and_strdup:
+   decodes given URL string up to the delimiter and places the
+   eos pointer in newstr if supplied (eos==NULL if end of string was reached)
+*/
+typedef void (*field_setter)(BalsaSendmsg *d, const gchar*, const gchar*);
+static gchar* decode_and_strdup(const gchar*str, int delim, gchar** newstr)
+{
+    gchar num[3];
+    GString *s = g_string_new(NULL);
+    /* eos points to the character after the last to parse */
+    gchar *eos = strchr(str, delim); 
+
+    if(!eos) eos = (gchar*)str + strlen(str);
+    while(str<eos) {
+	switch(*str) {
+	case '+':
+	    s = g_string_append_c(s, ' ');
+	    str++;
+	    break;
+	case '%':
+	    if(str+2<eos) {
+		strncpy(num, str+1, 2); num[2] = 0;
+		s = g_string_append_c(s, strtol(num,NULL,16));
+	    }
+	    str+=3;
+	    break;
+	default:
+	    s = g_string_append_c(s, *str++);
+	}
+    }
+    if(newstr) *newstr = *eos ? eos+1 : NULL;
+    eos = s->str;
+    g_string_free(s,FALSE);
+    return eos;
+}
+    
+/* process_url:
+   extracts all characters until NUL or question mark; parse later fields
+   of format 'key'='value' with ampersands as separators.
+*/ 
+static void process_url(const char *url, field_setter func, void *data)
+{
+    gchar * ptr, *to, *key, *val;
+
+    to = decode_and_strdup(url,'?', &ptr);
+    func(data, "to", to);
+    g_free(to);
+    while(ptr) {
+	key = decode_and_strdup(ptr,'=', &ptr);
+	if(ptr) {
+	    val = decode_and_strdup(ptr,'&', &ptr);
+	    func(data, key, val);
+	    g_free(val);
+	}
+	g_free(key);
+    }
+}
+
+/* -------------------------- main --------------------------------- */
 int
 main(int argc, char *argv[])
 {
@@ -314,17 +379,17 @@ main(int argc, char *argv[])
     if (balsa_app.compose_email) {
 	BalsaSendmsg *snd;
 	snd = sendmsg_window_new(window, NULL, SEND_NORMAL);
-	if (strncmp(balsa_app.compose_email, "mailto:", 7) == 0)
-	    memmove(balsa_app.compose_email, balsa_app.compose_email + 7,
-		    strlen(balsa_app.compose_email) - 7 + 1);	/* copy the NUL */
-	gtk_entry_set_text(GTK_ENTRY(snd->to[1]), balsa_app.compose_email);
-	gtk_widget_grab_focus(balsa_app.compose_email[0]
-			      ? snd->subject[1] : snd->to[1]);
+	if(strncmp(balsa_app.compose_email, "mailto:", 7) == 0)
+	    process_url(balsa_app.compose_email+7, 
+			sendmsg_window_set_field, snd);
+	else sendmsg_window_set_field(snd,"to", balsa_app.compose_email);
     } else
 	gtk_widget_show(window);
 
+    if (cmd_check_mail_on_startup || balsa_app.check_mail_upon_startup)
+	check_new_messages_cb(NULL, NULL);
 
-    if (balsa_app.open_unread_mailbox)
+    if (cmd_open_unread_mailbox || balsa_app.open_unread_mailbox)
 	gtk_idle_add((GtkFunction) initial_open_unread_mailboxes, NULL);
 
     if (cmd_line_open_mailboxes) {

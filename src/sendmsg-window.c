@@ -1158,7 +1158,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     msg->charset = NULL;
     msg->locale = NULL;
 
-
     alias_load_addressbook();
 
     switch (type) {
@@ -1183,7 +1182,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	msg->orig_message = NULL;
 	break;
     }
-    if (message) {		/* ref message so we don't loose it ieven if it is deleted */
+    if (message) { /* ref message so we don't loose it even if it is deleted */
 	gtk_object_ref(GTK_OBJECT(message));
 	/* reference the original mailbox so we don't loose the
 	   mail even if the mailbox is closed */
@@ -1400,6 +1399,27 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	gtk_widget_grab_focus(msg->text);
 
     return msg;
+}
+
+/* sendmsg_window_set_field:
+   sets given field of the compose window to the specified value.
+*/
+void
+sendmsg_window_set_field(BalsaSendmsg *bsmsg, const gchar* key,
+			      const gchar* val)
+{
+    GtkWidget* entry;
+    g_return_if_fail(bsmsg);
+ 
+    printf("sendmsg_window_set_field: %20s =>%s\n", key, val);
+    if     (g_strcasecmp(key, "to")     ==0) entry = bsmsg->to[1];
+    else if(g_strcasecmp(key, "subject")==0) entry = bsmsg->subject[1];
+    else if(g_strcasecmp(key, "cc")     ==0) entry = bsmsg->cc[1];
+    else if(g_strcasecmp(key, "bcc")    ==0) entry = bsmsg->bcc[1];
+    else if(g_strcasecmp(key, "replyto")==0) entry = bsmsg->reply_to[1];
+    else return;
+
+    gtk_entry_set_text(GTK_ENTRY(entry), val);
 }
 
 static gchar *

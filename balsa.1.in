@@ -1,4 +1,4 @@
-.TH Balsa 1 "20 May 2000" Version @VERSION@
+.TH Balsa 1 "11 November 2000" Version @VERSION@
 .SH NAME
 Balsa - the GNOME email client.
 
@@ -30,7 +30,11 @@ Balsa will immediately check for new mail when the program is launched
 
 .TP
 .BI \-m " USER@HOST.TLD" "\fR,\fP \-\^\-compose=" USER@HOST.TLD
-When invoked with this option, balsa will open a new message with the specified address in the To: field.
+When invoked with this option, balsa will open a new message with the
+specified address in the To: field. The parameter can be specified
+also in URL format - it makes it possible to use balsa as mailto
+protocol handler by setting the mailto protocol command to balsa -m
+"%s" in URL handlers section of GNOME control center.
 
 .TP
 .BI \-o " MAILBOX" "\fR,\fP \-\^\-open-mailbox=" MAILBOX
@@ -47,7 +51,7 @@ http://www.balsa.net/
 Any bugs found should be reported to the Balsa Developer mailing list
 at balsa-list@gnome.org or you may want to make use of the online
 bug-tracking system available on the web at
-http://www.gnome.org/cgi-bin/bugs. See http://www.balsa.net/bugs.html
+http://bugs.gnome.org/. See http://www.balsa.net/bugs.html
 for more information on reporting bugs.
 
 Before reporting bugs, please check to see if the bug is mentioned 
@@ -68,8 +72,11 @@ See the AUTHORS file included with Balsa, probably at
 /usr/doc/balsa-@VERSION@/AUTHORS
 
 .SH FILES
-.BR ~/.balsarc
+.BR ~/.gnome/balsa
 Balsa's preferences file.
+
+.BR ~/.gnome_private/balsa
+Balsa's POP and IMAP passwords file.
 
 .SH SEE ALSO
 .BR mailcap (5)
@@ -77,7 +84,7 @@ Balsa's preferences file.
 .BR sendmail (8)
 
 .SH COPYRIGHT
-Copyright \(co 1997-2000 Stuart Parmenter and Jay Painter
+(c) 1997-2000 Stuart Parmenter and others, see AUTHORS for a list of people.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted,

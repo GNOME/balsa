@@ -2141,8 +2141,6 @@ continueBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message)
 	}
     }
 
-    if (!bsmsg->charset)
-	bsmsg->charset = libbalsa_message_charset(message);
     libbalsa_message_body_unref(message);
 }
 
@@ -2255,8 +2253,6 @@ quoteBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message, SendType type)
     g_free(date);
     g_free(personStr);
 
-    if (!bsmsg->charset)
-	bsmsg->charset = libbalsa_message_charset(message);
     libbalsa_message_body_unref(message);
     return body;
 }
@@ -2957,6 +2953,11 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
                            2 * paned->style->ythickness);
     gnome_app_set_contents(GNOME_APP(window), paned);
 
+    /* set the menus - and language index */
+    if (message && !bsmsg->charset)
+	bsmsg->charset = libbalsa_message_charset(message);
+    init_menus(bsmsg);
+
     /* Connect to "text-changed" here, so that we catch the initial text
      * and wrap it... */
     sw_buffer_signals_connect(bsmsg);
@@ -2969,9 +2970,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     bsmsg->modified = FALSE;
     /* Save the initial state, so that `undo' will restore it. */
     sw_buffer_save(bsmsg);
-
-    /* set the menus - and language index */
-    init_menus(bsmsg);
 
     /* set the initial window title */
     sendmsg_window_set_title(bsmsg);
@@ -2989,14 +2987,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
                                      _("Attaching message failed.\n"
                                        "Possible reason: not enough temporary space"));
     }
-
-    if (type == SEND_CONTINUE
-        && gnome_icon_list_get_num_icons(GNOME_ICON_LIST
-                                         (bsmsg->attachments[1])))
-        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
-                                       (bsmsg->view_checkitems
-                                        [MENU_TOGGLE_ATTACHMENTS_POS]),
-                                       TRUE);
 
     bsmsg->update_config = TRUE;
  

@@ -1,3 +1,8 @@
+2004-03-12  Pawel Salek
+
+	* src/sendmsg-window.c: disentangle charset/attachment
+	initialization order.
+
 2004-03-10 11:39  PeterB
 
 	* configure.in: when $prefix is `NONE', replace with correct

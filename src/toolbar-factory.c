@@ -196,7 +196,7 @@ static void populate_stock_toolbar(int bar, BalsaToolbarType id);
 static int get_toolbar_button_slot(BalsaToolbarType toolbar, const char *id);
 static GtkToolbar *get_bar_instance(GtkWidget *window, 
 				    BalsaToolbarType toolbar);
-static int get_position_value(BalsaToolbarType toolbar, char *id);
+static int get_position_value(BalsaToolbarType toolbar, const char *id);
 
 #ifdef NEW_GTK
 #define balsa_toolbar_remove_all(bar,j) gtk_toolbar_remove_all(bar)
@@ -231,7 +231,7 @@ balsa_toolbar_remove_all(GtkToolbar *toolbar)
 #endif
 
 static int
-get_position_value(BalsaToolbarType toolbar, char *id)
+get_position_value(BalsaToolbarType toolbar, const char *id)
 {
     int i;
 
@@ -257,7 +257,7 @@ get_position_value(BalsaToolbarType toolbar, char *id)
    		GtkWidget *, or NULL if error / not found
 */
 GtkWidget *
-get_tool_widget(GtkWidget *window, BalsaToolbarType toolbar, char *id)
+get_tool_widget(GtkWidget *window, BalsaToolbarType toolbar, const char *id)
 {
     GtkToolbar *bar;
     GList *children;
@@ -668,7 +668,7 @@ set_toolbar_button_callback(BalsaToolbarType toolbar, const char *id,
 */
 void
 set_toolbar_button_sensitive(GtkWidget *window, BalsaToolbarType toolbar, 
-			     char *id, int sensitive)
+			     const char *id, int sensitive)
 {
     int slot;
     GtkWidget *widget;

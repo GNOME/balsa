@@ -15,6 +15,11 @@
 	- highlight a bad word by selecting it; - use GtkTextIter to find
 	words, instead of a regex (Peter B.).
 
+	* src/main-window.c: disable menus on removing last message from index.
+	* src/toolbar-factory.[ch]: releated cleanup.
+	* libbalsa/mailbox.[hc]: per-mailbox identity by
+	* src/sendmsg-window.c:  Brian Stafford <brian@stafford.uklinux.net>
+
 2002-04-12  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/print.c: make print work with new API (still some warnings

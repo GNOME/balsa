@@ -2439,6 +2439,37 @@ setup_headers_from_message(BalsaSendmsg* cw, LibBalsaMessage *message)
 
 
 /* 
+ * set_identity_from_mailbox
+ * 
+ * Attempt to determine the default identity from the mailbox containing
+ * the message.
+ **/
+static gboolean
+set_identity_from_mailbox(BalsaSendmsg* msg)
+{
+    gchar *identity;
+    LibBalsaMessage *message = msg->orig_message;
+    LibBalsaIdentity* ident;
+    GList *ilist;
+
+    if( message && message->mailbox && balsa_app.identities) {
+        identity = message->mailbox->identity_name;
+        if(!identity) return FALSE;
+        for (ilist = balsa_app.identities;
+             ilist != NULL;
+             ilist = g_list_next(ilist)) {
+            ident = LIBBALSA_IDENTITY(ilist->data);
+            if (!g_strcasecmp(identity, ident->identity_name)) {
+                msg->ident = ident;
+                return TRUE;
+            }
+        }
+    }
+
+    return FALSE; /* use default */
+}
+
+/* 
  * guess_identity
  * 
  * Attempt to determine if a message should be associated with a
@@ -2633,8 +2664,10 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	    list, get_tool_widget(window, 1, main_toolbar_spell_disable[i]));
     msg->spell_check_disable_list = list;
 
-    /* Get the identity from the To: field of the original message */
-    guess_identity(msg);
+    /* Set up the default identity */
+    if(!set_identity_from_mailbox(msg))
+        /* Get the identity from the To: field of the original message */
+        guess_identity(msg);
 
     /* create the top portion with the to, from, etc in it */
     gtk_paned_add1(GTK_PANED(paned), create_info_pane(msg, type));

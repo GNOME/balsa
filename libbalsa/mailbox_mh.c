@@ -609,8 +609,8 @@ static gboolean libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox)
     GByteArray *line;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_MH(mailbox), FALSE);
-    g_return_val_if_fail(MAILBOX_OPEN(mailbox), FALSE);
     mh = LIBBALSA_MAILBOX_MH(mailbox);
+    g_return_val_if_fail( mh->messages_info != NULL, FALSE );
 
     /* build new sequence file lines */
     first_unseen = last_unseen = -1;

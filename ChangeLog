@@ -1,3 +1,7 @@
+2003-10-12  Carlos Morgado  <chbm gnome.org>
+
+	* libbalsa/mailbox_mh.c: make _sync work on _close
+
 2003-10-11 23:02  PeterB
 
 	* libbalsa/: mailbox.c, mailbox.h: Implement GtkTreeSortable

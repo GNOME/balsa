@@ -158,6 +158,11 @@ balsa_send_message (Message * message)
   else
       first_message = NULL;
 
+  current_message = first_message ;
+  this_last = first_message; 
+  
+#if 0
+  /* this is disabled until we have time to go through libmutt */
 
   /* We do messages in queu now */
    
@@ -167,9 +172,6 @@ balsa_send_message (Message * message)
       lista = balsa_app.outbox->message_list ;
   else
       lista = NULL ;
-  
-  current_message = first_message ;
-  this_last = first_message; 
   
   while (lista != NULL)
   {
@@ -206,6 +208,7 @@ balsa_send_message (Message * message)
   }
     
   balsa_mailbox_close (balsa_app.outbox);
+#endif
 
 #ifdef BALSA_USE_THREADS
 
@@ -249,6 +252,8 @@ balsa_send_message_real(MessageQueueItem *first_message)
 #endif
   int i;
 
+  if( !first_message )
+    return TRUE;
   
   if (balsa_app.smtp) 
      i = balsa_smtp_send (first_message,balsa_app.smtp_server);

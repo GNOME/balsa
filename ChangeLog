@@ -1,3 +1,9 @@
+2000-10-09  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/balsa-index-page.c: Disconnect signals from the mailbox when
+	destroying the index page. Spotted by Atsuhiko Yamanaka
+	<ymnk@jcraft.com>
+
 2000-10-08  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/balsa-app.h: define DEFAULT_SUBJECT_FONT as the bold verison

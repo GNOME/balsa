@@ -1986,7 +1986,8 @@ handle_url(const message_url_t* url)
         g_free(notice);
         gnome_url_show(url->url, &err);
         if (err) {
-            g_print(_("Error showing %s: %s\n"), url->url,
+            balsa_information(LIBBALSA_INFORMATION_WARNING,
+		    _("Error showing %s: %s\n"), url->url,
                     err->message);
             g_error_free(err);
         }
@@ -2773,7 +2774,8 @@ part_context_menu_call_url(GtkWidget * menu_item, BalsaPartInfo * info)
     g_return_if_fail(url);
     gnome_url_show(url, &err);
     if (err) {
-        g_print(_("Error showing %s: %s\n"), url, err->message);
+	balsa_information(LIBBALSA_INFORMATION_WARNING,
+		_("Error showing %s: %s\n"), url, err->message);
         g_error_free(err);
     }
 }
@@ -3394,7 +3396,8 @@ balsa_gtk_html_link_clicked(GObject *obj, const gchar *url)
 
     gnome_url_show(url, &err);
     if (err) {
-        g_print(_("Error showing %s: %s\n"), url, err->message);
+	balsa_information(LIBBALSA_INFORMATION_WARNING,
+		_("Error showing %s: %s\n"), url, err->message);
         g_error_free(err);
     }
 }

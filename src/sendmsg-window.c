@@ -1381,7 +1381,8 @@ add_attachment(GnomeIconList * iconlist, char *filename,
         basename = g_path_get_basename(filename);
         utf8name = g_filename_to_utf8(basename, -1, NULL, NULL, &err);
         if (err) {
-            g_print("Error converting \"%s\" to UTF-8: %s\n",
+            balsa_information(LIBBALSA_INFORMATION_WARNING,
+		    _("Error converting \"%s\" to UTF-8: %s\n"),
                     basename, err->message);
             g_error_free(err);
         }

@@ -92,7 +92,8 @@ folder_conf_response(GtkDialog * dialog, int response,
     case GTK_RESPONSE_HELP:
         gnome_help_display("balsa", folder_config_section, &err);
         if (err) {
-            g_print(_("Error displaying %s: %s\n"), folder_config_section,
+            balsa_information(LIBBALSA_INFORMATION_WARNING,
+		    _("Error displaying %s: %s\n"), folder_config_section,
                     err->message);
             g_error_free(err);
         }

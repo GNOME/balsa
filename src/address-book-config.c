@@ -552,8 +552,9 @@ help_button_cb(AddressBookConfig * abc)
     gnome_help_display("ab-conf.html", abc->link_id, &err);
 
     if (err) {
-        g_print(_("Error displaying %s: %s\n"), abc->link_id,
-                err->message);
+	balsa_information(LIBBALSA_INFORMATION_WARNING,
+		_("Error displaying %s: %s\n"), abc->link_id,
+		err->message);
         g_error_free(err);
     }
 #endif                          /* BALSA_MAJOR < 2 */

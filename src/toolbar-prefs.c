@@ -373,7 +373,9 @@ tp_dialog_response_cb(GtkDialog * dialog, gint response, gpointer data)
     case GTK_RESPONSE_HELP:
         gnome_help_display("balsa", "toolbar-prefs", &err);
         if (err) {
-            g_print(_("Error displaying toolbar help: %s\n"), err->message);
+            balsa_information(LIBBALSA_INFORMATION_WARNING,
+		    _("Error displaying toolbar help: %s\n"),
+		    err->message);
             g_error_free(err);
         }
         break;

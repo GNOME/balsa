@@ -150,7 +150,8 @@ void fr_dialog_response(GtkWidget * widget, gint response,
 	err = NULL;
 	gnome_help_display("balsa", "win-run-filters", &err);
 	if (err) {
-	    g_print(_("Error displaying run filters help: %s\n"),
+	    balsa_information(LIBBALSA_INFORMATION_WARNING,
+		    _("Error displaying run filters help: %s\n"),
 		    err->message);
 	    g_error_free(err);
 	}

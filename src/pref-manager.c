@@ -3120,7 +3120,9 @@ balsa_help_pbox_display(gint page_num)
 
     gnome_help_display("balsa", link_id, &err);
     if (err) {
-        g_print(_("Error displaying link_id %s: %s\n"), link_id, err->message);
+        balsa_information(LIBBALSA_INFORMATION_WARNING,
+		_("Error displaying link_id %s: %s\n"),
+		link_id, err->message);
         g_error_free(err);
     }
 

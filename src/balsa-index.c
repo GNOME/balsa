@@ -280,7 +280,12 @@ balsa_index_init (BalsaIndex * bindex)
   gtk_clist_set_column_width (clist, 4, balsa_app.index_subject_width);
   gtk_clist_set_column_width (clist, 5, balsa_app.index_date_width);
   gtk_clist_set_row_height (clist, 16);
-  
+
+  /* Set default sorting behaviour */
+  gtk_clist_set_sort_column (clist, 5);
+  gtk_clist_set_compare_func (clist, date_compare);
+  gtk_clist_set_sort_type (clist, GTK_SORT_DESCENDING);
+    
   gtk_signal_connect (GTK_OBJECT (clist),
 		      "select_row",
 		      (GtkSignalFunc) select_message,
@@ -389,7 +394,8 @@ balsa_index_set_mailbox (BalsaIndex * bindex, LibBalsaMailbox * mailbox)
     list = list->next;
     i++;
   }
-  gtk_clist_thaw(GTK_CLIST (bindex));
+  gtk_clist_sort (GTK_CLIST (bindex));
+  gtk_clist_thaw (GTK_CLIST (bindex));
 
   /* FIXME this might could be cleaned up some */
   if (bindex->first_new_message == 0)
@@ -732,7 +738,6 @@ select_message (GtkWidget * widget,
 
   bindex = BALSA_INDEX (data);
   message = LIBBALSA_MESSAGE(gtk_clist_get_row_data (GTK_CLIST (widget), row));
-
   
   if (message){
     gtk_signal_emit (GTK_OBJECT (bindex),
@@ -858,4 +863,60 @@ balsa_index_get_selected_rows( BalsaIndex *bindex, guint **rows, guint *nb_rows 
   *rows = selected_rows;
 
   return;
+}
+
+
+/* balsa_index_refresh [MBG]
+ * 
+ * bindex:  The BalsaIndex that is to be updated
+ * 
+ * Description: This function updates the mailbox index, used in
+ * situations such as when we are loading a number of new messages
+ * into a mailbox that is already open.
+ * 
+ * */
+void
+balsa_index_refresh (BalsaIndex * bindex)
+{
+        GList* list;
+        gint i;
+        gint newrow;
+        LibBalsaMessage* old_message;
+        
+        g_return_if_fail (bindex != NULL);
+        g_return_if_fail (bindex->mailbox != NULL);        
+
+        gtk_clist_freeze (GTK_CLIST (bindex));
+
+        old_message = gtk_clist_get_row_data (GTK_CLIST (bindex),  bi_get_largest_selected (GTK_CLIST (bindex)) );
+        gtk_clist_unselect_all (GTK_CLIST (bindex));
+        gtk_clist_clear (GTK_CLIST (bindex));
+
+        list = bindex->mailbox->message_list;
+        i = 0;
+        while (list)
+        {
+                balsa_index_add(bindex, LIBBALSA_MESSAGE(list->data));
+                list = list->next;
+                i++;
+        }
+
+        gtk_clist_sort (GTK_CLIST (bindex));
+
+        if (old_message)
+                newrow = gtk_clist_find_row_from_data (GTK_CLIST (bindex), old_message);
+        else
+                newrow = -1;
+
+        if (newrow >= 0) {
+                gtk_clist_select_row (GTK_CLIST (bindex), gtk_clist_find_row_from_data (GTK_CLIST (bindex), old_message), -1);
+                i = newrow;
+        } else {
+                gtk_clist_select_row (GTK_CLIST (bindex), i, -1);
+        }
+
+        if (gtk_clist_row_is_visible (GTK_CLIST (bindex), i) != GTK_VISIBILITY_FULL)
+          gtk_clist_moveto (GTK_CLIST (bindex), i, 0, 0.0, 0.0);
+        
+        gtk_clist_thaw(GTK_CLIST (bindex));
 }

@@ -1,3 +1,33 @@
+2000-08-11  Matthew Guenther <mguenthe@attcanada.ca>
+
+	* libbalsa/libbalsa.c: Set OPTCHECKNEW option.
+	* src/balsa-app.[hc]: Add application colormap, visual variables.
+
+	* src/balsa-index.c (balsa_index_init): Added a default sorting
+	style; Descending by date.
+
+	* src/balsa-index.[hc]: Added balsa_index_refresh for updating
+	mailbox indexes when new messages are loaded.  
+
+	* src/balsa-mblist.[hc]: Added support for threaded updating of
+	mailbox list.  New function balsa_mblist_thread.  Extensive
+	changes to balsa_mblist_have_new, balsa_mblist_check_new,
+	balsa_mblist_update_mailbox.
+
+	* src/balsa-mblist.c (balsa_mblist_init): Removed setting of
+	expander and line style, this should be set by the theme or
+	library.  Should look more consistent in HeliX Code installations.
+
+	* src/main-window.c: (mail_progress_notify_cb): Removed call to
+	balsa_mblist_have_new, doesn't work due to thread locking now.
+
+	* src/main.c (main): Added calls to gdk_threads_enter/leave, moved
+	colormap stuff around to avoid a warning.  Added thread variables
+	for mailbox updating thread.
+
+	* src/threads.h: Added mblist_thread thread, updating_mblist
+	semaphore.
+
 2000-08-10  Ian Campbell  <ijc25@cam.ac.uk>
  
 	* src/balsa-message.c: Fix save_part to properly destroy dialogs

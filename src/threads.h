@@ -22,10 +22,12 @@
 
 /*  define thread globals */
 extern  pthread_t               get_mail_thread;
+extern  pthread_t               mblist_thread;
 extern  pthread_t               send_mail;
 extern  pthread_mutex_t         mailbox_lock;
 extern  pthread_mutex_t         send_messages_lock;
 extern  int                     checking_mail;
+extern  int                     updating_mblist;
 extern  int                     sending_mail;
 extern  int                     mail_thread_pipes[2];
 extern  int                     send_thread_pipes[2];

@@ -62,6 +62,7 @@ extern "C"
 /* sets the mail stream; if it's a new stream, then it's 
  * contents is loaded into the index */
   void balsa_index_set_mailbox (BalsaIndex * bindex, LibBalsaMailbox * mailbox);
+  void balsa_index_refresh (BalsaIndex* bindex);
 
 
 /* adds a new message */

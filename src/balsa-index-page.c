@@ -172,13 +172,13 @@ balsa_index_page_window_init(BalsaIndexPage *bip)
   gtk_widget_show(index);
   gtk_widget_show(sw);
 
-  gtk_signal_connect(GTK_OBJECT(index), "select_message",
+  gtk_signal_connect (GTK_OBJECT(index), "select_message",
 		     (GtkSignalFunc) index_select_cb, bip);
   
-  gtk_signal_connect(GTK_OBJECT(index), "unselect_message",
+  gtk_signal_connect (GTK_OBJECT(index), "unselect_message",
 		     (GtkSignalFunc) index_unselect_cb, bip);
   
-  gtk_signal_connect(GTK_OBJECT (index), "button_press_event",
+  gtk_signal_connect (GTK_OBJECT (index), "button_press_event",
 		     (GtkSignalFunc) index_button_press_cb, bip);
   
   /* setup the dnd stuff for the messages */
@@ -212,8 +212,7 @@ balsa_index_page_reset(BalsaIndexPage *page)
   balsa_window_close_mailbox(BALSA_WINDOW(window), mailbox);
   balsa_window_open_mailbox(BALSA_WINDOW(window), mailbox);
 
-  gtk_notebook_set_page(GTK_NOTEBOOK(balsa_app.notebook), 
-       balsa_find_notebook_page_num(BALSA_INDEX_PAGE(current_page)->mailbox));
+  gtk_notebook_set_page(GTK_NOTEBOOK(balsa_app.notebook), balsa_find_notebook_page_num(BALSA_INDEX_PAGE(current_page)->mailbox));
 
 }
 
@@ -360,33 +359,38 @@ idle_handler_cb(GtkWidget * widget)
   bevent = gtk_object_get_data(GTK_OBJECT (widget), "bevent");
   message = gtk_object_get_data(GTK_OBJECT (widget), "message");
   data = gtk_object_get_data(GTK_OBJECT (widget), "data");
-
+  
+  if (!data) {
+    handler = 0;
+    gdk_threads_leave ();
+    return FALSE;
+  }
+  
   /* get the preview pane from the index page's BalsaWindow parent */
   bmsg = BALSA_MESSAGE(BALSA_WINDOW(BALSA_INDEX_PAGE(data)->window)->preview);
-
-  if (bevent && bevent->button == 3)
-  {
+  
+  if (bevent && bevent->button == 3) {
     gtk_menu_popup (GTK_MENU(create_menu(BALSA_INDEX(widget))),
-		    NULL, NULL, NULL, NULL,
-		    bevent->button, bevent->time);
+                    NULL, NULL, NULL, NULL,
+                    bevent->button, bevent->time);
+  } else if (bmsg && BALSA_MESSAGE(bmsg)) {
+      if (message)
+        balsa_message_set(BALSA_MESSAGE(bmsg), message);
+      else
+        balsa_message_clear (BALSA_MESSAGE (bmsg));
   }
-
-  if (bmsg && BALSA_MESSAGE(bmsg)) {
-    if (message)
-      balsa_message_set(BALSA_MESSAGE(bmsg), message);
-    else
-      balsa_message_clear (BALSA_MESSAGE (bmsg));
-  }
-
+  
   handler = 0;
 
   /* Update the style and message counts in the mailbox list */
+  balsa_mblist_have_new (balsa_app.mblist);
   balsa_mblist_update_mailbox (balsa_app.mblist, 
-			       BALSA_INDEX(widget)->mailbox);
-
+                               BALSA_INDEX(widget)->mailbox);
+  
   gtk_object_remove_data (GTK_OBJECT (widget), "bevent");
   gtk_object_remove_data (GTK_OBJECT (widget), "message");
   gtk_object_remove_data (GTK_OBJECT (widget), "data");
+
   return FALSE;
 }
 
@@ -409,7 +413,11 @@ balsa_index_update_message (BalsaIndexPage *index_page)
 
     /* this way we only display one message, not lots and lots, and
        we also avoid flicker due to consecutive unselect/select */
-    if (!handler)
+    /* [MBG] FIXME: Commented this out to solve problem with
+     * multi-threaded mailbox updating.  Doesn't seem to have an
+     * adverse affect as described above
+     * */
+    /* if (!handler) */
 	handler = gtk_idle_add ((GtkFunction) idle_handler_cb, index);
 }
 
@@ -434,7 +442,11 @@ index_select_cb (GtkWidget * widget,
 
     /* this way we only display one message, not lots and lots, and
        we also avoid flicker due to consecutive unselect/select */
-    if (!handler)
+    /* [MBG] FIXME: Commented this out to solve problem with
+     * multi-threaded mailbox updating.  Doesn't seem to have an
+     * adverse affect as described above
+     * */
+/*     if (!handler) */
 	handler = gtk_idle_add ((GtkFunction) idle_handler_cb, widget);
 }
 
@@ -458,7 +470,11 @@ index_unselect_cb (GtkWidget * widget,
 
     /* this way we only display one message, not lots and lots, and
        we also avoid flicker due to consecutive unselect/select */
-    if (!handler)
+    /* [MBG] FIXME: Commented this out to solve problem with
+     * multi-threaded mailbox updating.  Doesn't seem to have an
+     * adverse affect as described above
+     * */
+/*     if (!handler) */
 	handler = gtk_idle_add ((GtkFunction) idle_handler_cb, widget);
 }
 
@@ -473,13 +489,14 @@ index_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer data)
   LibBalsaMailbox *mailbox;
 
   clist = GTK_CLIST(widget);
-  on_message=gtk_clist_get_selection_info (clist, event->x, event->y, &row, &column);
+  on_message = gtk_clist_get_selection_info (clist, event->x, event->y, &row, &column);
   
   if (on_message)
   {
     mailbox = gtk_clist_get_row_data (clist, row);
     current_message = LIBBALSA_MESSAGE(gtk_clist_get_row_data (clist, row));
-    if (event && event->type == GDK_2BUTTON_PRESS)
+
+    if (event && event->button == 1 && event->type == GDK_2BUTTON_PRESS)
     {
       message_window_new (current_message);
       return;

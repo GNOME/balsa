@@ -110,8 +110,8 @@ libbalsa_init ( void (*error_func) (const char *fmt,...) )
   g_free (tmp);
   
   set_option(OPTSAVEEMPTY);
+  set_option (OPTCHECKNEW);
 }
-
 
 void
 libbalsa_set_spool (gchar *spool)

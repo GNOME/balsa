@@ -1189,9 +1189,6 @@ mail_progress_notify_cb( )
 		gnome_appbar_refresh(balsa_app.appbar);
 		gnome_appbar_set_progress(balsa_app.appbar,0.0);
 	      }
-	    /* messages were loaded by the thread, we only check them here */
-	    balsa_mblist_have_new (balsa_app.mblist);
-
 	    break;
 
 	  case MSGMAILTHREAD_ERROR:

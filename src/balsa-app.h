@@ -158,7 +158,11 @@ extern struct BalsaApplication
   gint mblist_newmsg_width;
   gint mblist_totalmsg_width;
 #endif
+
+
   /* Colour of mailboxes with unread messages in mailbox list */
+        GdkVisual* visual;
+        GdkColormap* colormap;
   GdkColor mblist_unread_color;
   
   GtkToolbarStyle toolbar_style;

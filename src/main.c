@@ -36,6 +36,7 @@
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "mblist-window.h"
+#include "balsa-mblist.h"
 #include "main-window.h"
 #include "libbalsa.h"
 #include "misc.h"
@@ -60,6 +61,11 @@ GIOChannel 		*mail_thread_msg_send;
 GIOChannel 		*mail_thread_msg_receive;
 GIOChannel              *send_thread_msg_send;
 GIOChannel              *send_thread_msg_receive;
+
+pthread_t mblist_thread;
+/* we use the mailbox_lock pthread_mutex */
+int updating_mblist;
+/* pipe for messaging to the thread */
 
 static void threads_init( gboolean init );
 #endif /* BALSA_USE_THREADS */
@@ -136,6 +142,7 @@ threads_init( gboolean init )
     pthread_mutex_init( &mailbox_lock, NULL );
     pthread_mutex_init( &send_messages_lock, NULL );
     checking_mail = 0;
+    updating_mblist = 0;
     sending_mail = 0;
 	if( pipe( mail_thread_pipes) < 0 )
 	{
@@ -156,7 +163,6 @@ threads_init( gboolean init )
 	g_io_add_watch ( send_thread_msg_receive, G_IO_IN,
 					(GIOFunc) send_progress_notify_cb,
 					NULL );
-					
   }
   else
   {
@@ -180,6 +186,18 @@ main (int argc, char *argv[])
   balsa_init (argc, argv);
 
   balsa_app_init ();
+
+#ifdef USE_PIXBUF
+  gtk_widget_set_default_colormap(gdk_rgb_get_cmap());
+  gtk_widget_set_default_visual(gdk_rgb_get_visual());
+#else
+  gtk_widget_set_default_colormap(gdk_imlib_get_colormap());
+  gtk_widget_set_default_visual(gdk_imlib_get_visual());
+#endif
+  
+  /* Allocate the best colormap we can get */
+  balsa_app.visual = gdk_visual_get_best ();
+  balsa_app.colormap = gdk_colormap_new (balsa_app.visual, TRUE);
 
   /* checking for valid config files */
   config_init ();
@@ -227,13 +245,7 @@ main (int argc, char *argv[])
   } else gtk_widget_show(window);
 
 
-#ifdef USE_PIXBUF
-  gtk_widget_set_default_colormap(gdk_rgb_get_cmap());
-  gtk_widget_set_default_visual(gdk_rgb_get_visual());
-#else
-  gtk_widget_set_default_colormap(gdk_imlib_get_colormap());
-  gtk_widget_set_default_visual(gdk_imlib_get_visual());
-#endif
+
 
   /* open mailboxes if requested so */
   if (balsa_app.open_unread_mailbox) {
@@ -263,8 +275,12 @@ main (int argc, char *argv[])
   if(gtk_notebook_get_current_page( GTK_NOTEBOOK(balsa_app.notebook) ) >=0 ) 
      gtk_notebook_set_page( GTK_NOTEBOOK(balsa_app.notebook), 0);
 
+  gdk_threads_enter();
   gtk_main();
-
+  gdk_threads_leave();
+  
+  gdk_colormap_unref (balsa_app.colormap);
+  
 #ifdef BALSA_USE_THREADS
   threads_init( FALSE );
 #endif

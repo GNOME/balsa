@@ -29,14 +29,21 @@ typedef struct _BalsaMBListClass BalsaMBListClass;
 
 struct _BalsaMBList
   {
-    GtkCTree ctree;
+          GtkCTree ctree;
 
-    GList *watched_mailbox; /* list of mailbox watched */
-    GtkStyle *unread_mailbox_style; /* store the style of unread mailboxes */
+          /* list of mailbox watched */
+          GList *watched_mailbox; 
+          /* store the style of unread mailboxes */
+          GtkStyle *unread_mailbox_style; 
 #ifdef BALSA_SHOW_INFO
-    gboolean display_content_info; /* shall the number of messages be displayed ? */
+          /* shall the number of messages be displayed ? */
+          gboolean display_content_info; 
 #endif
-    gboolean needs_update;
+
+#ifdef BALSA_USE_THREADS
+          /* list of mailboxes for the updating thread */
+          GList* update_list;
+#endif
   };
 
 struct _BalsaMBListClass
@@ -54,4 +61,5 @@ void balsa_mblist_redraw (BalsaMBList * bmbl);
 guint balsa_mblist_get_type (void);
 void balsa_mblist_have_new (BalsaMBList * bmbl);
 void balsa_mblist_update_mailbox (BalsaMBList * mblist, LibBalsaMailbox * mailbox);
+
 #endif

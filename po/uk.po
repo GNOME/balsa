@@ -131,12 +131,11 @@ msgstr "Неможливо записати пов╕домлення"
 
 #: libbalsa/pop3.c:51
 msgid "Could not run the delivery program (procmail)"
-msgstr ""
+msgstr "Не вдалось запустити програму достачання (procmail)"
 
 #: libbalsa/pop3.c:52
-#, fuzzy
 msgid "Could not open mailbox for spooling"
-msgstr "Неможливо в╕дкрити поштову скриньку.!"
+msgstr "Неможливо в╕дкрити поштову скриньку для накопичення"
 
 #: libbalsa/pop3.c:53
 msgid "Could not append message"
@@ -2271,11 +2270,11 @@ msgstr "В╕д╕слати поточне пов╕домлення"
 
 #: src/sendmsg-window.c:180
 msgid "_Queue"
-msgstr ""
+msgstr "Черга"
 
 #: src/sendmsg-window.c:181
 msgid "Queue this message in outbox for sending"
-msgstr ""
+msgstr "Поставити це пов╕домлення у чергу на в╕дправлення"
 
 #: src/sendmsg-window.c:185
 msgid "_Postpone"
@@ -2586,7 +2585,6 @@ msgid "Replace the current word with the selected suggestion"
 msgstr "Зам╕нити поточне слово вибраним"
 
 #: src/spell-check.c:489
-#, fuzzy
 msgid "Replace all occurences of the current word with the selected suggestion"
 msgstr "Зам╕нити вс╕ входження поточного слова вибраним"
 

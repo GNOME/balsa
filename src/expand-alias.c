@@ -139,6 +139,10 @@ expand_alias_find_match(emailData *addy, gboolean fastp)
      * Now look through all the matches the above code generated, and
      * find the one we want.
      */
+    if(addy->address) {
+        g_object_unref(addy->address);
+        addy->address = NULL;
+    }
     if (match) {
 	i = tab;
 	if ((i == 0) && (strlen(prefix) > strlen(input))) {
@@ -155,6 +159,8 @@ expand_alias_find_match(emailData *addy, gboolean fastp)
 	    addr = LIBBALSA_ADDRESS(search->data);
 	}
 	output=libbalsa_address_to_gchar(addr, -1);
+        addy->address = addr;
+        g_object_ref(addy->address);
 
 	if(balsa_app.debug)
             g_message("expand_alias_find_match(): Found [%s]", 
@@ -169,10 +175,5 @@ expand_alias_find_match(emailData *addy, gboolean fastp)
     if (prefix) g_free(prefix);
 
     addy->match = output;
-    if(addy->address)
-        g_object_unref(addy->address);
-    addy->address = addr;
-    if(addy->address)
-        g_object_ref(addy->address);
 }
 

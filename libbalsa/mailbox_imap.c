@@ -1454,40 +1454,64 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
                                    LibBalsaMessageBody *part,
                                    ssize_t *sz)
 {
-    struct part_data dt;
-    const char *foo;
-    size_t len;  
+    const char *bod = NULL;
+    size_t flen;  
 
-    LOCK_MAILBOX_RETURN_VAL(msg->mailbox,NULL);
-    if(!part->buffer) {
-	LibBalsaMailboxImap* mimap = LIBBALSA_MAILBOX_IMAP(msg->mailbox);
-        gchar *section = get_section_for(msg, part);
-        ImapMessage *im = imap_mbox_handle_get_msg(mimap->handle, msg->msgno);
-        ImapResponse rc;
-        dt.body  = imap_message_get_body_from_section(im, section);
-        dt.block = g_malloc(dt.body->octets+1);
-        dt.pos   = 0;
-        rc = imap_mbox_handle_fetch_body(mimap->handle, msg->msgno, section,
-                                         append_str, &dt);
-        if(rc != IMR_OK)
-            g_error("FIXME: error handling here!\n");
-        g_free(section);
+    if(!part->mime_part) {
+	struct part_data dt;
+	GMimePart *prefilt;
+	GMimeFilter *crlffilter; 	    
+	char *foo, *bar;
+	size_t len, flen, pre;
+
+	LOCK_MAILBOX_RETURN_VAL(msg->mailbox,NULL);
+	if(!part->buffer) {
+	    LibBalsaMailboxImap* mimap = LIBBALSA_MAILBOX_IMAP(msg->mailbox);
+	    gchar *section = get_section_for(msg, part);
+	    ImapMessage *im = imap_mbox_handle_get_msg(mimap->handle, msg->msgno);
+	    ImapResponse rc;
+	    dt.body  = imap_message_get_body_from_section(im, section);
+	    dt.block = g_malloc(dt.body->octets+1);
+	    dt.pos   = 0;
+	    rc = imap_mbox_handle_fetch_body(mimap->handle, msg->msgno, section,
+					     append_str, &dt);
+	    if(rc != IMR_OK)
+		g_error("FIXME: error handling here!\n");
+	    g_free(section);
+	}
+	
+	prefilt = g_mime_part_new_with_type (dt.body->media_basic_name,
+					     dt.body->media_subtype);
+	g_mime_part_set_pre_encoded_content ( prefilt,
+					      dt.block,
+					      dt.body->octets,
+					      (GMimePartEncodingType)dt.body->encoding );
+	UNLOCK_MAILBOX(msg->mailbox);
+	g_free(dt.block);
+	
+	crlffilter = 	    
+	    g_mime_filter_crlf_new (  GMIME_FILTER_CRLF_DECODE,
+				      GMIME_FILTER_CRLF_MODE_CRLF_ONLY );
+	
+	foo = (char *)g_mime_part_get_content (prefilt, &len);
+
+	g_mime_filter_complete ( crlffilter,
+				 foo, len, 0,
+				 &bar, &flen, &pre );
+
+	part->mime_part = 
+	    GMIME_OBJECT(g_mime_part_new_with_type (dt.body->media_basic_name,
+						    dt.body->media_subtype) );
+	g_mime_part_set_content (GMIME_PART(part->mime_part),
+				 bar, flen );
+	
+	g_object_unref (prefilt);
+	g_object_unref (crlffilter);
     }
+    bod = g_mime_part_get_content (GMIME_PART(part->mime_part), &flen);
 
-    part->mime_part = GMIME_OBJECT(g_mime_part_new_with_type 
-				   (dt.body->media_basic_name,
-				    dt.body->media_subtype ));
-    g_mime_part_set_pre_encoded_content ( GMIME_PART(part->mime_part),
-					  dt.block,
-					  dt.body->octets,
-					  (GMimePartEncodingType)dt.body->encoding );
-    g_free(dt.block);
-    
-    foo = g_mime_part_get_content (GMIME_PART(part->mime_part), &len);    
-    
-    *sz = len;
-    UNLOCK_MAILBOX(msg->mailbox);
-    return foo;
+    *sz = flen;
+    return bod;
 }
 
 /* libbalsa_mailbox_imap_add_message: 

@@ -1,3 +1,9 @@
+2003-10-19  Carlos Morgado  <chbm gnome.org>
+
+	* libbalsa/mailbox_imap.c (libbalsa_mailbox_imap_get_msg_part): 
+	do crlf conversion, adhere to mailbox_local return
+	this sucks. it won't stop sucking till we have part cache.
+	
 2003-10-18 09:04  PeterB
 
 	* libbalsa/mailbox_imap.c: Populate

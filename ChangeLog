@@ -1,3 +1,8 @@
+2001-09-06  Carlos Morgado  <chbm@cprm.net>
+
+	* src/sendmsg-window.c: removed autopostpone_message_cb. no longer
+	needed
+
 2001-09-06  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* configure.in: add -Werror for CVS users.

@@ -80,7 +80,6 @@ static gint include_file_cb(GtkWidget *, BalsaSendmsg *);
 static gint send_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint send_message_toolbar_cb(GtkWidget *, BalsaSendmsg *);
 static gint queue_message_cb(GtkWidget *, BalsaSendmsg *);
-static gint autopostpone_message( gpointer bsmsg );
 static gint postpone_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint print_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint attach_clicked(GtkWidget *, gpointer);
@@ -2178,11 +2177,6 @@ queue_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     return send_message_handler(bsmsg, TRUE);
 }
 
-static gint
-autopostpone_message( gpointer bsmsg )
-{
-    return postpone_message_cb( NULL, (BalsaSendmsg *)bsmsg );
-}
 
 /* "postpone message" menu and toolbar callback */
 static gint

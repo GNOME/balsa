@@ -1,3 +1,7 @@
+2003-03-09 07:38  PeterB
+
+	* src/print.c: Close print dialog when compose window is closed.
+
 2003-03-08 00:26  PeterB
 
 	* src/: main-window.c, message-window.c, print.c, print.h,

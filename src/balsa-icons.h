@@ -53,9 +53,6 @@
 #define BALSA_OLD_PIXMAP_TRASH			"balsa_trash"
 #define BALSA_OLD_PIXMAP_CLOSE_MBOX		"balsa_close_mbox"
 
-#define BALSA_PIXMAP_MENU_NEW			BALSA_PIXMAP_CONTINUE
-#define BALSA_PIXMAP_MENU_FLAGGED		BALSA_PIXMAP_INFO_FLAGGED
-
 #define BALSA_PIXMAP_MBOX_DRAFT                 "balsa_mbox_draft"
 #define BALSA_PIXMAP_MBOX_IN                    "balsa_mbox_in"
 #define BALSA_PIXMAP_MBOX_OUT                   "balsa_mbox_out"

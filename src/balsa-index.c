@@ -1813,7 +1813,7 @@ bndx_popup_menu_create(BalsaIndex * index)
     menuitem = gtk_menu_item_new_with_mnemonic(_("T_oggle"));
     index->toggle_item = menuitem;
     submenu = gtk_menu_new();
-    create_stock_menu_item(submenu, BALSA_PIXMAP_MENU_FLAGGED,
+    create_stock_menu_item(submenu, BALSA_PIXMAP_INFO_FLAGGED,
                            _("_Flagged"),
                            GTK_SIGNAL_FUNC(bi_toggle_flagged_cb),
                            index);

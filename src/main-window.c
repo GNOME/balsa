@@ -357,7 +357,7 @@ static GnomeUIInfo message_toggle_menu[] = {
     {
         GNOME_APP_UI_ITEM, N_("_Flagged"), N_("Toggle flagged"),
         toggle_flagged_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-        BALSA_PIXMAP_MENU_FLAGGED, 'X', 0, NULL
+        BALSA_PIXMAP_INFO_FLAGGED, 'X', 0, NULL
     },
 #define MENU_MESSAGE_TOGGLE_DELETED_POS 1
     { GNOME_APP_UI_ITEM, N_("_Deleted"), 

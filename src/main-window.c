@@ -987,10 +987,6 @@ balsa_window_new()
     enable_message_menus(NULL);
     enable_edit_menus(NULL);
     balsa_window_enable_continue();
-    /* gdk_threads_*() is needed, or balsa hangs on startup. */
-    /* gdk_threads_enter();
-    enable_empty_trash(TRASH_CHECK);
-    gdk_threads_leave();*/
 
     /* set initial state of toggle preview pane button */
     balsa_toolbar_set_button_active(toolbar, BALSA_PIXMAP_SHOW_PREVIEW,
@@ -1948,9 +1944,6 @@ check_messages_thread(gpointer data)
 
     MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_SOURCE, NULL, "POP3", 0, 0);
         
-    /* Lock gdk to be thread safe (check funcs assume gdk lock HELD) */
-    gdk_threads_enter();
-
     check_mailbox_list(balsa_app.inbox_input);
 
     MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_SOURCE, NULL,
@@ -1964,7 +1957,6 @@ check_messages_thread(gpointer data)
                     -1, (GNodeTraverseFunc) count_unread_msgs_func,
                     &new_msgs_after);
     balsa_mailbox_nodes_unlock(FALSE);
-    gdk_threads_leave();
 
     new_msgs_after-=new_msgs_before;
     if(new_msgs_after < 0)

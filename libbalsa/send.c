@@ -260,6 +260,10 @@ libbalsa_message_send (LibBalsaMessage * message)
    One of them: local MDA mode, more than one messages to send (some of
    them loaded from outbox). Only first one will be sent and memory released.
    FIXME ...
+
+   This function may be called as a thread and should therefore do
+   proper gdk_threads_{enter/leave} stuff around GTK,libbalsa or
+   libmutt calls
 */
 static guint
 balsa_send_message_real(MessageQueueItem *first_message)
@@ -288,13 +292,17 @@ balsa_send_message_real(MessageQueueItem *first_message)
 		total_messages_left = 0;
 		pthread_mutex_unlock( &send_messages_lock );
 #endif
-    
+
+#ifdef BALSA_USE_THREADS
+		gdk_threads_enter();
+#endif
+
 		i = mutt_invoke_sendmail (first_message->message->env->to, 
 					  first_message->message->env->cc, 
 					  first_message->message->env->bcc, 
 					  first_message->tempfile,
 					  (first_message->message->content->encoding == ENC8BIT));
-    
+
 		if (i != 0 ) 
 			save_box = balsa_app.outbox;
 		else
@@ -310,18 +318,31 @@ balsa_send_message_real(MessageQueueItem *first_message)
 			}
 		}
 		msg_queue_item_destroy( first_message );
+
+#ifdef BALSA_USE_THREADS
+		gdk_threads_leave();
+#endif
     
 #ifdef BALSA_USE_THREADS
 		MSGSENDTHREAD (threadmsg, MSGSENDTHREADFINISHED,"",NULL,NULL,0);
 		pthread_exit(0);
 #endif
+
     
 		return TRUE;
 	}
+
+#ifdef BALSA_USE_THREADS
+	gdk_threads_enter();
+#endif
   
 	/* The hell of SMTP only code follows below... */
 	i = balsa_smtp_send (first_message,balsa_app.smtp_server);
-  
+
+#ifdef BALSA_USE_THREADS
+	gdk_threads_leave();
+#endif
+
 #ifdef BALSA_USE_THREADS
 	if (i == -1) {
 		pthread_mutex_lock( &send_messages_lock );
@@ -348,11 +369,17 @@ balsa_send_message_real(MessageQueueItem *first_message)
   
 	while (current_message != NULL) {
 		if (current_message->delete == 1) {
+#ifdef BALSA_USE_THREADS
+			gdk_threads_enter();
+#endif
 			save_box = balsa_find_mbox_by_name(current_message->fcc);
 			if( save_box && LIBBALSA_IS_MAILBOX_LOCAL(save_box) )
 				mutt_write_fcc (LIBBALSA_MAILBOX_LOCAL (save_box)->path,
 						current_message->message, NULL, 0, NULL);
-      
+#ifdef BALSA_USE_THREADS
+			gdk_threads_leave();
+#endif 
+
 #ifdef BALSA_USE_THREADS
 			MSGSENDTHREAD(delete_message, MSGSENDTHREADDELETE," ",
 				      current_message->orig, NULL, 0);
@@ -361,10 +388,17 @@ balsa_send_message_real(MessageQueueItem *first_message)
 				libbalsa_message_delete (current_message->orig);
 #endif
 		} else {
-			if(current_message->orig->mailbox == NULL)
+			if(current_message->orig->mailbox == NULL) {
+#ifdef BALSA_USE_THREADS
+				gdk_threads_enter();
+#endif
 				mutt_write_fcc (
 					LIBBALSA_MAILBOX_LOCAL (balsa_app.outbox)->path,
 					current_message->message, NULL, 0, NULL);
+#ifdef BALSA_USE_THREADS
+				gdk_threads_leave();
+#endif
+			}
 		}
 		
 		next_message = current_message->next_message;
@@ -375,7 +409,9 @@ balsa_send_message_real(MessageQueueItem *first_message)
 #ifdef BALSA_USE_THREADS
 	MSGSENDTHREAD(delete_message, MSGSENDTHREADDELETE, "LAST",
 		      NULL, NULL, 0);
+	gdk_threads_enter();
 	libbalsa_mailbox_close(balsa_app.outbox);
+	gdk_threads_leave();
 	pthread_exit(0); 
 #endif
   

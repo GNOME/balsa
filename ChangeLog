@@ -1,5 +1,6 @@
 2000-08-22  Ian Campbell  <ijc25@cam.ac.uk>
 
+	* libmutt/send.c: Add locking for threading.
 	* src/main-window.c: Add gdk_threads_enter() to calls to LibBalsa
 	within the thread.
 	* src/main.c: call g_thread_init before calling gtk_init so the

@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -98,5 +98,8 @@ void balsa_mailbox_node_append_subtree(BalsaMailboxNode * mbnode, GNode *r);
 void balsa_mailbox_node_load_config(BalsaMailboxNode* mn, const gchar* prefix);
 void balsa_mailbox_node_save_config(BalsaMailboxNode* mn, const gchar* prefix);
 void balsa_mailbox_node_show_prop_dialog_cb(GtkWidget * widget, gpointer data);
+
+/* applicable only to folders (mailbox collections) */
+void balsa_mailbox_node_rescan(BalsaMailboxNode* mn);
 
 #endif

@@ -372,6 +372,33 @@ balsa_mailbox_node_save_config(BalsaMailboxNode* mn, const gchar* prefix)
 		    balsa_mailbox_node_signals[SAVE_CONFIG], prefix);
 }
 
+/* balsa_mailbox_node_rescan:
+   rescans given folders. It can be called on configuration update or just
+   to discover mailboxes that did not exist when balsa was initially 
+   started.
+   NOTE: applicable only to folders (mailbox collections).
+   the expansion state preservation is not perfect, only top level is
+   preserved.
+*/
+void balsa_mailbox_node_rescan(BalsaMailboxNode* mn)
+{
+    GNode *gnode;
+
+    g_return_if_fail(mn->mailbox == NULL);
+    gnode = balsa_find_mbnode(balsa_app.mailbox_nodes, mn);
+
+    if(gnode) {
+	/* the expanded state needs to be preserved; it would 
+	   be reset when all the children are removed */
+	gboolean expanded = mn->expanded;
+	balsa_remove_children_mailbox_nodes(gnode);
+	balsa_mailbox_node_append_subtree(mn, gnode);
+	mn->expanded = expanded;
+	balsa_mblist_repopulate(balsa_app.mblist);
+    } else g_warning("folder node %s (%p) not found in hierarchy.\n",
+		     mn->name, mn);
+}
+
 static void
 add_menu_entry(GtkWidget * menu, const gchar * label, GtkSignalFunc cb,
 	       BalsaMailboxNode * mbnode)
@@ -469,6 +496,13 @@ mb_unsubscribe_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 				     FALSE);
 }
 
+static void
+mb_rescan_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
+{
+    g_return_if_fail(mbnode->mailbox == NULL);
+    balsa_mailbox_node_rescan(mbnode);
+}
+
 GtkWidget *
 balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
 {
@@ -518,9 +552,11 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
     
     if (mbnode->mailbox) {
 	add_menu_entry(menu, NULL, NULL, mbnode);
-	add_menu_entry(menu, _("Subscribe"),   mb_subscribe_cb,   mbnode);
-	add_menu_entry(menu, _("Unsubscribe"), mb_unsubscribe_cb, mbnode);
-	add_menu_entry(menu, NULL, NULL, mbnode);
+	if(LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox)) {
+	    add_menu_entry(menu, _("Subscribe"),   mb_subscribe_cb,   mbnode);
+	    add_menu_entry(menu, _("Unsubscribe"), mb_unsubscribe_cb, mbnode);
+	    add_menu_entry(menu, NULL, NULL, mbnode);
+	}
 	
 	if(mbnode->mailbox != balsa_app.inbox)
 	    add_menu_entry(menu, _("Mark as Inbox"),    mb_inbox_cb,    mbnode);
@@ -530,7 +566,10 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
 	    add_menu_entry(menu, _("Mark as Trash"),    mb_trash_cb,    mbnode);
 	if(mbnode->mailbox != balsa_app.draftbox)
 	    add_menu_entry(menu, _("Mark as Draftbox"), mb_draftbox_cb, mbnode);
+    } else {
+	add_menu_entry(menu, _("Rescan"),   mb_rescan_cb,   mbnode);
     }
+
     return menu;
 }
 

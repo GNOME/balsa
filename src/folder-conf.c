@@ -154,21 +154,12 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 	if(insert) {
 	    g_node_append(balsa_app.mailbox_nodes, gnode = g_node_new(mn));
 	    balsa_mailbox_node_append_subtree(mn, gnode);
+	    balsa_mblist_repopulate(balsa_app.mblist);
 	    config_folder_add(mn, NULL);
 	} else {
-	    gnode = balsa_find_mbnode(balsa_app.mailbox_nodes, mn);
-	    if(gnode) {
-		/* the expanded state needs to be preserved; it would 
-		   be reset when all the children are removed */
-		gboolean expanded = mn->expanded;
-		balsa_remove_children_mailbox_nodes(gnode);
-		balsa_mailbox_node_append_subtree(mn, gnode);
-		mn->expanded = expanded;
-	    } else g_warning("folder node %s (%p) not found in hierarchy.\n",
-			     mn->name, mn);
+	    balsa_mailbox_node_rescan(mn);
 	    config_folder_update(mn);
 	}
-	balsa_mblist_repopulate(balsa_app.mblist);
     }
 
     gtk_widget_destroy(GTK_WIDGET(fcw.dialog));

@@ -1,3 +1,9 @@
+2001-03-14  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/folder-conf.c: use balsa_mailbox_node_rescan()
+	* src/mailbox-node.[hc]: define balsa_mailbox_node_rescan().
+	Add "Rescan" option to right mouse button folder menu.
+	
 2001-03-12  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Patch from rached ben mustapha <rbenmustapha@cvf.fr>:

@@ -1,5 +1,8 @@
 2000-06-11  Peter Williams  <peter@beta.newton.cx>
 
+	* src/mblist-window.c (mblist_create_context_menu): Fix typo
+	(to draftbox was to sentbox in context menu).
+
 	* libbalsa/send.c (balsa_lookup_mime_type): Constify
 	a pointer to quiet a compiler warning.
 

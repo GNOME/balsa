@@ -422,7 +422,7 @@ mblist_create_context_menu (GtkCTree * ctree, Mailbox * mailbox)
       add_menu_entry(menu, _("Mark as Inbox"),    mb_inbox_cb,   mailbox);
       add_menu_entry(menu, _("Mark as Sentbox"),  mb_sentbox_cb, mailbox);
       add_menu_entry(menu, _("Mark as Trash"),    mb_trash_cb,   mailbox);
-      add_menu_entry(menu, _("Mark as Draftbox"), mb_sentbox_cb, mailbox);
+      add_menu_entry(menu, _("Mark as Draftbox"), mb_draftbox_cb, mailbox);
     }
 
   return menu;

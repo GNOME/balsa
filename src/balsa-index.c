@@ -57,15 +57,6 @@
 #define DO_CLIST_WORKAROUND(s)
 #endif
 
-struct FolderMRUEntry
-{
-    LibBalsaMailbox *mailbox; /* FIXME: meaning? allowed values? */
-    BalsaIndex      *bindex;  /* FIXME: meaning? allowed values? */
-};
-
-/* mru_list - recently-used mailbox list */
-static GList *mru_list=NULL;
-
 /* gtk widget */
 static void balsa_index_class_init(BalsaIndexClass * klass);
 static void balsa_index_init(BalsaIndex * bindex);
@@ -95,7 +86,6 @@ static void balsa_index_set_col_images(BalsaIndex *, GtkCTreeNode*,
 static void balsa_index_set_style(BalsaIndex * bindex, GtkCTreeNode *node);
 static void balsa_index_set_style_recursive(BalsaIndex * bindex, GtkCTreeNode *node);
 static void balsa_index_set_parent_style(BalsaIndex *bindex, GtkCTreeNode *node);
-static void populate_mru(GtkWidget *menu, BalsaIndex *bindex);
 static void balsa_index_check_visibility(GtkCList * clist,
                                          GtkCTreeNode * node,
                                          gfloat row_align);
@@ -150,9 +140,6 @@ static void tree_collapse_cb(GtkCTree * ctree, GList * node,
                            gpointer user_data);
 static void hide_deleted(BalsaIndex * bindex, gboolean hide);
 
-/* Callbacks */
-static void mru_select_cb(GtkWidget *widget, struct FolderMRUEntry *entry);
-
 /* formerly balsa-index-page stuff */
 enum {
     TARGET_MESSAGES
@@ -181,13 +168,6 @@ static void create_stock_menu_item(GtkWidget * menu, const gchar * type,
 
 /* static void index_button_press_cb(GtkWidget * widget, */
 /* 				  GdkEventButton * event, gpointer data); */
-
-/* menu item callbacks */
-
-static gint close_if_transferred_cb(BalsaMBList * bmbl, GdkEvent * event,
-				    BalsaIndex * bi);
-static void transfer_messages_cb(GtkCTree * ctree, GtkCTreeNode * row, 
-				 gint column, gpointer data);
 
 static void sendmsg_window_destroy_cb(GtkWidget * widget, gpointer data);
 
@@ -2032,6 +2012,16 @@ idle_handler_cb(GtkWidget * widget)
     return FALSE;
 }
 
+static void
+mru_menu_cb(gchar * url, gpointer data)
+{
+    LibBalsaMailbox *mailbox = balsa_find_mailbox_by_url(url);
+    
+    g_return_if_fail(mailbox != NULL);
+    balsa_index_transfer_messages(data, mailbox);
+}
+
+
 static GtkWidget *
 create_menu(BalsaIndex * bindex)
 {
@@ -2053,9 +2043,7 @@ create_menu(BalsaIndex * bindex)
           balsa_message_forward_inline },
         { GNOME_STOCK_MENU_BOOK_RED,     N_("Store Address..."), 
           balsa_store_address } };
-    GtkWidget *menu, *menuitem, *submenu, *smenuitem, *mrumenu, *mruitem;
-    GtkWidget *bmbl, *scroll;
-    GtkRequisition req;
+    GtkWidget *menu, *menuitem, *submenu;
     LibBalsaMailbox* mailbox;
     unsigned i;
     GList *list;
@@ -2102,75 +2090,24 @@ create_menu(BalsaIndex * bindex)
 
     menuitem = gtk_menu_item_new_with_label(_("Toggle"));
     submenu = gtk_menu_new();
-
     create_stock_menu_item( submenu, BALSA_PIXMAP_MENU_FLAGGED, _("Flagged"),
 			    balsa_message_toggle_flagged, bindex, TRUE);
-
     create_stock_menu_item( submenu, BALSA_PIXMAP_MENU_NEW, _("Unread"),
 			    balsa_message_toggle_new, bindex, TRUE);
-
-    gtk_widget_show(submenu);
-    gtk_widget_show(menuitem);
-
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), submenu);
-
     gtk_menu_append(GTK_MENU(menu), menuitem);
-
-    g_list_foreach(mru_list, (GFunc)g_free, NULL);
-    g_list_free(mru_list);
-    mru_list=NULL;
 
     menuitem = gtk_menu_item_new_with_label(_("Move"));
     gtk_widget_set_sensitive(menuitem, !mailbox->readonly);
     gtk_menu_append(GTK_MENU(menu), menuitem);
-    gtk_widget_show(menuitem);
 
-    mrumenu = gtk_menu_new();
-    gtk_widget_show(mrumenu);
-    gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), mrumenu);
+    submenu = balsa_mblist_mru_menu(GTK_WINDOW(balsa_app.main_window),
+                                    &balsa_app.folder_mru,
+                                    GTK_SIGNAL_FUNC(mru_menu_cb),
+                                    bindex);
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), submenu);
 
-    populate_mru(mrumenu, bindex);
-
-    mruitem = gtk_menu_item_new_with_label(_("Folder"));
-    gtk_widget_show(mruitem);
-
-    gtk_menu_append(GTK_MENU(mrumenu), mruitem);
-
-    submenu = gtk_menu_new();
-    gtk_menu_item_set_submenu(GTK_MENU_ITEM(mruitem), submenu);
-
-    smenuitem = gtk_menu_item_new();
-    gtk_signal_connect (GTK_OBJECT(smenuitem), "button_release_event",
-                        (GtkSignalFunc) close_if_transferred_cb,
-                        (gpointer) bindex);
-
-    scroll = gtk_scrolled_window_new (NULL, NULL);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(scroll), 
-                                    GTK_POLICY_AUTOMATIC, 
-                                    GTK_POLICY_AUTOMATIC);
-
-    bmbl = balsa_mblist_new();
-    gtk_signal_connect(GTK_OBJECT(bmbl), "tree_select_row",
-		       (GtkSignalFunc) transfer_messages_cb,
-		       (gpointer) bindex);
-
-    /* Force the mailbox list to be a reasonable size. */
-    gtk_widget_size_request(bmbl, &req);
-    if ( req.height > balsa_app.mw_height )
-	req.height = balsa_app.mw_height;
-	/* For the mailbox list width, we use the one used on the main window
-	 * This is the user choice and required because the mblist widget
-	 *  save the size in balsa_app.mblist_width */
-	req.width=balsa_app.mblist_width;
-    gtk_widget_set_usize(GTK_WIDGET(bmbl), req.width, req.height);
-
-    gtk_container_add(GTK_CONTAINER(scroll), bmbl);
-    gtk_container_add(GTK_CONTAINER(smenuitem), scroll);
-    gtk_menu_append(GTK_MENU(submenu), smenuitem);
-
-    gtk_widget_show(bmbl);
-    gtk_widget_show(scroll);
-    gtk_widget_show(smenuitem);
+    gtk_widget_show_all(menu);
 
     return menu;
 }
@@ -2232,24 +2169,6 @@ balsa_index_transfer_messages(BalsaIndex * bindex,
     balsa_index_transfer(messages, bindex->mailbox_node->mailbox,
                          mailbox, bindex, FALSE);
     g_list_free(messages);
-   
-    balsa_remove_from_folder_mru(mailbox->url);
-    balsa_add_to_folder_mru(mailbox->url);
-    gtk_object_set_data(GTK_OBJECT(bindex), "transferredp", (gpointer) 1);
-}
-
-static void
-transfer_messages_cb(GtkCTree * ctree, GtkCTreeNode * row, gint column, 
-		     gpointer data)
-{
-    BalsaIndex* bindex;
-    BalsaMailboxNode *mbnode;
-
-    g_return_if_fail(data != NULL);
-
-    bindex = BALSA_INDEX (data);
-    mbnode = gtk_ctree_node_get_row_data(ctree, row);
-    balsa_index_transfer_messages(bindex, mbnode->mailbox);
 }
 
 static void
@@ -2493,49 +2412,6 @@ balsa_index_refresh_date (GtkNotebook *notebook,
 				NULL,
 				refresh_date,
 				bindex->date_string);
-}
-
-static void
-populate_mru(GtkWidget * menu, BalsaIndex * bindex)
-{
-    struct FolderMRUEntry *mru_entry;
-    GList *mru, *tmp;
-    GtkWidget *item;
-
-    mru = balsa_app.folder_mru;
-    while (mru) {
-        mru_entry = g_malloc(sizeof(struct FolderMRUEntry));
-        if (!mru_entry)
-            return;
-
-        mru_entry->bindex = bindex;
-        mru_entry->mailbox = 
-            balsa_find_mailbox_by_url(mru->data);
-
-        if (mru_entry->mailbox == NULL) {
-            g_free(mru_entry);
-            tmp = g_list_next(mru);
-            g_free(mru->data);
-            balsa_app.folder_mru =
-                g_list_remove(balsa_app.folder_mru, mru->data);
-            mru = tmp;
-        } else {
-            mru_list = g_list_append(mru_list, mru_entry);
-            item = gtk_menu_item_new_with_label(mru_entry->mailbox->name);
-            gtk_widget_show(item);
-            gtk_menu_append(GTK_MENU(menu), item);
-            gtk_signal_connect(GTK_OBJECT(item), "activate",
-                               GTK_SIGNAL_FUNC(mru_select_cb), mru_entry);
-            mru = g_list_next(mru);
-        }
-    }
-}
-
-static void
-mru_select_cb(GtkWidget *widget, struct FolderMRUEntry *entry)
-{
-    g_return_if_fail(entry != NULL);
-    balsa_index_transfer_messages(entry->bindex, entry->mailbox);
 }
 
 /* idle handler wrappers

@@ -89,8 +89,8 @@ struct _LibBalsaMessage {
     GList *cc_list;
     GList *bcc_list;
 
-    /* File Carbon Copy Mailbox */
-    gchar *fcc_mailbox;
+    /* File Carbon Copy Mailbox URL */
+    gchar *fcc_url;
 
     /* replied message ID's */
     GList *references;

@@ -132,7 +132,7 @@ libbalsa_message_init(LibBalsaMessage * message)
     message->to_list = NULL;
     message->cc_list = NULL;
     message->bcc_list = NULL;
-    message->fcc_mailbox = NULL;
+    message->fcc_url = NULL;
     message->references = NULL;
     message->in_reply_to = NULL;
     message->user_headers = NULL;
@@ -262,6 +262,8 @@ libbalsa_message_destroy(GtkObject * object)
     g_list_foreach(message->bcc_list, (GFunc) gtk_object_unref, NULL);
     g_list_free(message->bcc_list);
     message->bcc_list = NULL;
+
+    g_free(message->fcc_url);
 
 #if MESSAGE_COPY_CONTENT
     g_free(message->subj);
@@ -1255,13 +1257,13 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
 
     /* Get fcc from message */
     for (tmp = cenv->userhdrs; tmp; tmp = tmp->next) {
-        if (!message->fcc_mailbox
+        if (!message->fcc_url
             && g_strncasecmp("X-Mutt-Fcc:", tmp->data, 11) == 0) {
             gchar *p = tmp->data + 11;
             SKIPWS(p);
 
             if (p)
-                message->fcc_mailbox = g_strdup(p);
+                message->fcc_url = g_strdup(p);
 #if 0                           /* this looks bogus! */
         } else if (g_strncasecmp("X-Mutt-Fcc:", tmp->data, 18) == 0) {
             /* Is X-Mutt-Fcc correct? */

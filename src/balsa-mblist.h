@@ -72,4 +72,12 @@ gboolean mblist_remove_mailbox_node(BalsaMBList *mblist,
 				    BalsaMailboxNode* mbnode);
 void mblist_scan_mailbox_node(BalsaMBList *mblist,
                                   BalsaMailboxNode* mbnode);
+GtkWidget *balsa_mblist_mru_menu(GtkWindow * window, GList ** url_list,
+                                 GtkSignalFunc user_func,
+                                 gpointer user_data);
+void balsa_mblist_mru_add(GList ** url_list, const gchar * url);
+void balsa_mblist_mru_drop(GList ** url_list, const gchar * url);
+GtkWidget *balsa_mblist_mru_option_menu(GtkWindow * window, 
+                                        GList ** url_list,
+                                        gchar ** url);
 #endif

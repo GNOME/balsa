@@ -739,8 +739,8 @@ display_headers(BalsaMessage * bm)
     add_header_glist(bm, "cc", _("Cc:"), message->cc_list);
     add_header_glist(bm, "bcc", _("Bcc:"), message->bcc_list);
 
-    if (message->fcc_mailbox)
-	add_header_gchar(bm, "fcc", _("Fcc:"), message->fcc_mailbox);
+    if (message->fcc_url)
+	add_header_gchar(bm, "fcc", _("Fcc:"), message->fcc_url);
 
     if (message->dispnotify_to) {
 	gchar *mdn_to = libbalsa_address_to_gchar(message->dispnotify_to, 0);

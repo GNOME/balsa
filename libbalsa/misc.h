@@ -60,15 +60,6 @@ gboolean libbalsa_flowed_rfc2646(LibBalsaMessageBody * body);
 
 const char* libbalsa_set_charset(const gchar * charset);
 const char* libbalsa_set_send_charset(const gchar * charset);
-#if ENABLE_ESMTP
-gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
-				gchar* smtp_server,
-				auth_context_t smtp_authctx, gint tls_mode,
-				gboolean rfc2646);
-#else
-gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
-				gboolean rfc2646);
-#endif
 
 gboolean libbalsa_delete_directory_contents(const gchar *path);
 gchar *libbalsa_truncate_string(const gchar * str, gint length, gint dots);

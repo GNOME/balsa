@@ -178,12 +178,6 @@ void libbalsa_message_append_part(LibBalsaMessage * message,
 gboolean libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read);
 void libbalsa_message_body_unref(LibBalsaMessage * message);
 
-gboolean balsa_send_message(LibBalsaMessage * message,
-			    LibBalsaMailbox * outbox, gint encoding);
-gboolean balsa_postpone_message(LibBalsaMessage * message,
-				LibBalsaMailbox * draftbox,
-				LibBalsaMessage * reply_message,
-				gchar * fcc);
 void libbalsa_message_queue(LibBalsaMessage* message, 
 			    LibBalsaMailbox* outbox, LibBalsaMailbox* fccbox,
 			    gint encoding, gboolean flow);

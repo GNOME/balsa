@@ -425,16 +425,15 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 */
 #if ENABLE_ESMTP
 gboolean
-libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
-		      LibBalsaMailbox* fccbox, gint encoding,
-		      gchar* smtp_server, auth_context_t smtp_authctx,
-		      gint tls_mode, gboolean flow)
+libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
+                      LibBalsaMailbox * fccbox, gint encoding,
+                      gchar * smtp_server, auth_context_t smtp_authctx,
+                      gint tls_mode, gboolean flow)
 {
     if (message != NULL)
-	libbalsa_message_queue(message, outbox, fccbox, encoding,
-			       flow);
-    return libbalsa_process_queue(outbox, encoding, smtp_server,
-				  smtp_authctx, tls_mode, flow);
+        libbalsa_message_queue(message, outbox, fccbox, encoding, flow);
+    return libbalsa_process_queue(outbox, smtp_server, smtp_authctx,
+                                  tls_mode);
 }
 #else
 gboolean
@@ -443,9 +442,8 @@ libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
 		      gboolean flow)
 {
     if (message != NULL)
-	libbalsa_message_queue(message, outbox, fccbox, encoding,
-			       flow);
-    return libbalsa_process_queue(outbox, encoding, flow);
+	libbalsa_message_queue(message, outbox, fccbox, encoding, flow);
+    return libbalsa_process_queue(outbox);
 }
 #endif
 
@@ -516,10 +514,9 @@ libbalsa_message_cb (void **buf, int *len, void *arg)
 /* This version uses libESMTP. It has slightly different semantics than
    sendmail version so don't get fooled by similar variable names.
  */
-gboolean 
-libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding, 
-		       gchar* smtp_server, auth_context_t smtp_authctx,
-		       gint tls_mode, gboolean flow)
+gboolean
+libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
+                       auth_context_t smtp_authctx, gint tls_mode)
 {
     MessageQueueItem *new_message;
     SendMessageInfo *send_message_info;
@@ -564,17 +561,26 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
     smtp_option_require_all_recipients (session, 1);
 
     for (lista = outbox->message_list; lista; lista = lista->next) {
-	msg = LIBBALSA_MESSAGE(lista->data);
+        gint encoding;
+        gboolean flow;
+        gboolean created;
 
+	msg = LIBBALSA_MESSAGE(lista->data);
         if (LIBBALSA_MESSAGE_HAS_FLAG(msg,
                                       (LIBBALSA_MESSAGE_FLAG_FLAGGED |
                                        LIBBALSA_MESSAGE_FLAG_DELETED)))
             continue;
 
+        libbalsa_message_body_ref(msg, TRUE);
 	new_message = msg_queue_item_new(msg);
-	if (!libbalsa_create_msg(msg, new_message->message,
-				 new_message->tempfile, encoding, 
-				 flow, 1)) {
+        encoding = msg->body_list->mutt_body->encoding;
+        flow = libbalsa_flowed_rfc2646(msg->body_list);
+        created =
+            libbalsa_create_msg(msg, new_message->message,
+                                new_message->tempfile, encoding, flow, 1);
+        libbalsa_message_body_unref(msg);
+
+	if (!created) {
 	    msg_queue_item_destroy(new_message);
 	} else {
 	    GList * messages = g_list_prepend(NULL, msg);
@@ -894,8 +900,7 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
    handler does that.
 */
 gboolean 
-libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding, 
-		       gboolean flow)
+libbalsa_process_queue(LibBalsaMailbox* outbox)
 {
     MessageQueueItem *mqi, *new_message;
     SendMessageInfo *send_message_info;
@@ -926,12 +931,26 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 	
     mqi = message_queue;
     while (lista != NULL) {
+        gint encoding;
+        gboolean flow;
+        gboolean created;
+
 	queu = LIBBALSA_MESSAGE(lista->data);
-	
+        if (LIBBALSA_MESSAGE_HAS_FLAG(queu,
+                                      (LIBBALSA_MESSAGE_FLAG_FLAGGED |
+                                       LIBBALSA_MESSAGE_FLAG_DELETED)))
+            continue;
+
+        libbalsa_message_body_ref(queu, TRUE);
 	new_message = msg_queue_item_new(queu);
-	if (!libbalsa_create_msg(queu, new_message->message,
-				 new_message->tempfile, 
-				 encoding, flow, 1)) {
+        flow = libbalsa_flowed_rfc2646(queu->body_list);
+        encoding = queu->body_list->mutt_body->encoding;
+        created =
+            libbalsa_create_msg(queu, new_message->message,
+                                new_message->tempfile, encoding, flow, 1);
+        libbalsa_message_body_unref(queu);
+	
+	if (!created) {
 	    msg_queue_item_destroy(new_message);
 	} else {
 	    if (mqi)

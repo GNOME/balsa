@@ -27,13 +27,13 @@
 #if ENABLE_ESMTP
 #include <libesmtp.h>
 
-gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding, 
-				gchar* smtp_server, auth_context_t smtp_authctx,
-				gint tls_mode, gboolean flow);
+gboolean libbalsa_process_queue(LibBalsaMailbox * outbox,
+                                gchar * smtp_server,
+                                auth_context_t smtp_authctx,
+                                gint tls_mode);
 #else
 
-gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding, 
-				gboolean flow);
+gboolean libbalsa_process_queue(LibBalsaMailbox* outbox);
 
 #endif
 

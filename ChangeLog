@@ -1,7 +1,8 @@
 2003-02-01 12:06  PeterB
 
 	* src/balsa-index.c: Add sorting by sender and subject; use gtk+
-	methods to do the work. Simplify bndx_moveto (Manu).
+	methods to do the work. Simplify bndx_moveto (Manu). Fix a
+        memory leak in bndx_copy_tree.
 
 2003-02-01  Pawel Salek  <pawsa@theochem.kth.se>
 

@@ -2606,6 +2606,16 @@ bndx_copy_tree(GNode * node, GtkTreeModel * model,
                        BNDX_SIZE_COLUMN, size,
                        BNDX_COLOR_COLUMN, color,
                        BNDX_WEIGHT_COLUMN, weight, -1);
+    if (status)
+        g_object_unref(status);
+    if (attach)
+        g_object_unref(attach);
+    g_free(from);
+    g_free(subject);
+    g_free(date);
+    g_free(size);
+    if (color)
+        gdk_color_free(color);
 
     path = gtk_tree_model_get_path(model, &new_iter);
     if (ref_table)

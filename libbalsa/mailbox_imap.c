@@ -468,6 +468,10 @@ libbalsa_imap_close_all_connections(void)
     imap_logout_all();
 }
 
+/* libbalsa_imap_rename_subfolder:
+   dir+parent determine current name. 
+   folder - new name.
+ */
 void
 libbalsa_imap_rename_subfolder(const gchar *dir, const gchar *parent,
 			       const gchar *folder, gboolean subscribe, 
@@ -492,6 +496,11 @@ libbalsa_imap_new_subfolder(const gchar *parent, const gchar *folder,
 void
 libbalsa_imap_delete_folder(LibBalsaMailboxImap *mailbox)
 {
+
+    /* Some IMAP servers (UW2000) do not like removing subscribed mailboxes:
+     * they do not remove the mailbox from the subscription list. */
+    imap_subscribe(LIBBALSA_MAILBOX(mailbox)->url, FALSE);
+
     /*
 	should be able to do this using the existing public method
 	from libmutt/imap/imap.h:

@@ -593,6 +593,10 @@ static int browse_verify_namespace (IMAP_DATA* idata,
 /*
 BALSA: rename capability
 Doesn't really belong here, but it goes with create.
+NOTE: the correct renaming sequence according to Mark Crispin is
+1. unsubscribe (if needed).
+2. rename.
+3. subscribe again (if neeeded).
 */
 
 int imap_mailbox_rename (const char* prefix, const char* dir,
@@ -630,6 +634,7 @@ int imap_mailbox_rename (const char* prefix, const char* dir,
   
   strfcpy (buf + n, subfolder, sizeof (buf) - n);
 
+  imap_subscribe(folder, 0);
   if (imap_rename_mailbox (idata, mx.mbox, buf) < 0)
     goto fail;
 

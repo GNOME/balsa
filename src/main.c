@@ -320,7 +320,7 @@ main(int argc, char *argv[])
     GnomeClient *client;
     gchar *default_icon;
 #ifdef GTKHTML_HAVE_GCONF
-    GConfError *gconf_error;
+    GError *gconf_error;
 #endif
 
 #ifdef ENABLE_NLS

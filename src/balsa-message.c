@@ -130,9 +130,6 @@ static void add_header_glist(BalsaMessage * bm, gchar * header,
 static void scroll_set(GtkAdjustment * adj, gint value);
 static void scroll_change(GtkAdjustment * adj, gint diff);
 
-static void balsa_gtk_text_size_request(GtkWidget * widget,
-					GtkRequisition * requisition,
-                                        BalsaMessage * bm);
 #ifdef HAVE_GTKHTML
 static void balsa_gtk_html_size_request(GtkWidget * widget,
 					GtkRequisition * requisition,
@@ -251,9 +248,6 @@ balsa_message_init(BalsaMessage * bm)
     bm->header_text = gtk_text_view_new();
     gtk_signal_connect(GTK_OBJECT(bm->header_text), "key_press_event",
 		       (GtkSignalFunc) balsa_message_key_press_event,
-		       (gpointer) bm);
-    gtk_signal_connect(GTK_OBJECT(bm->header_text), "size_request",
-		       (GtkSignalFunc) balsa_gtk_text_size_request,
 		       (gpointer) bm);
 
     gtk_table_attach(GTK_TABLE(bm->table), bm->header_text, 0, 1, 0, 1,
@@ -618,14 +612,23 @@ add_header_gchar(BalsaMessage * bm, const gchar *header, const gchar *label,
     gchar *wrapped_value;
     const gchar *msgcharset;
 
-    if (!(bm->shown_headers == HEADERS_ALL || libbalsa_find_word(header, balsa_app.selected_headers))) 
+    if (!(bm->shown_headers == HEADERS_ALL || 
+          libbalsa_find_word(header, balsa_app.selected_headers))) 
 	return;
 
+    /* always display the label in the predefined font */
+#ifdef OLD_HEADER_FONT_CODE
     /* always display the label in the predefined font */
     if (strcmp(header, "subject") != 0)
         fontname = balsa_app.message_font;
     else
 	fontname = balsa_app.subject_font;
+#else
+    if (strcmp(header, "subject") != 0)
+        fontname = "Sans 10";
+    else
+	fontname = "Sans 12";
+#endif
     tag = gtk_text_buffer_create_tag(buffer, NULL,
                                      "font", fontname,
                                      NULL);
@@ -635,6 +638,7 @@ add_header_gchar(BalsaMessage * bm, const gchar *header, const gchar *label,
     gtk_text_buffer_insert_with_tags(buffer, &insert, label, -1, 
                                      tag, NULL);
     
+#ifdef OLD_HEADER_FONT_CODE
     /* select the font for the value according to the msg charset */
     if ((msgcharset = libbalsa_message_charset(bm->message))) {
 	if (strcmp(header, "subject") != 0)
@@ -649,7 +653,7 @@ add_header_gchar(BalsaMessage * bm, const gchar *header, const gchar *label,
                                          NULL);
         g_free(fontname);
     }
-	
+#endif	
     if (value && *value != '\0') {
         gint pad_chars = 15 - strlen(label);
 
@@ -819,7 +823,6 @@ part_info_init_image(BalsaMessage * bm, BalsaPartInfo * info)
 
     if (pixmap) {
 	image = gtk_pixmap_new(pixmap, mask);
-
 	info->widget = image;
 	info->focus_widget = image;
 	info->can_display = TRUE;
@@ -1235,6 +1238,7 @@ get_font_name(const gchar * base, const gchar * charset,
     g_return_val_if_fail(base != NULL, NULL);
     g_return_val_if_fail(charset != NULL, NULL);
 
+    return g_strdup("Courier 11");
     for (i = ELEMENTS(charset2font) - 1; i >= 0; i--)
 	if (g_strcasecmp(charset, charset2font[i].charset) == 0) {
 	    postfix = charset2font[i].font_postfix;
@@ -1941,11 +1945,6 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         item = gtk_text_view_new();
         buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(item));
 
-        /* get the widget's default font for those people who did not set up a 
-           custom one */
-        if (!fnt)
-            fnt = gtk_style_get_font(item->style);
-
         gtk_signal_connect(GTK_OBJECT(item), "key_press_event",
                            (GtkSignalFunc) balsa_message_key_press_event,
                            (gpointer) bm);
@@ -1955,9 +1954,12 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         gtk_signal_connect(GTK_OBJECT(item), "focus_out_event",
                            (GtkSignalFunc) balsa_message_focus_out_part,
                            (gpointer) bm);
-        gtk_signal_connect(GTK_OBJECT(item), "size_request",
-                           (GtkSignalFunc) balsa_gtk_text_size_request,
-                           (gpointer) bm);
+#ifdef OLD_STYLE_CODE
+
+        /* get the widget's default font for those people who did not set up a 
+           custom one */
+        if (!fnt)
+            fnt = gtk_style_get_font(item->style);
 
         allocate_quote_colors(GTK_WIDGET(bm), balsa_app.quoted_color,
                               0, MAX_QUOTED_COLOR - 1);
@@ -2014,7 +2016,9 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
             gtk_signal_connect_after(GTK_OBJECT(item), "draw",
                                      (GtkSignalFunc) mail_text_draw, fnt);
         }
-
+#else
+        gtk_text_buffer_insert_at_cursor(buffer, ptr, -1);
+#endif /* OLD_STYLE_CODE */
         gtk_text_view_set_editable(GTK_TEXT_VIEW(item), FALSE);
 
         gtk_widget_show(item);
@@ -2124,8 +2128,10 @@ part_info_init(BalsaMessage * bm, BalsaPartInfo * info)
     }
 
     /* The widget is unref'd in part_info_free */
-    if (info->widget)
+    if(info->widget) {
 	gtk_object_ref(GTK_OBJECT(info->widget));
+	gtk_object_sink(GTK_OBJECT(info->widget));
+    }
 
     return;
 }
@@ -2364,10 +2370,11 @@ part_info_free(BalsaPartInfo* info)
 	widget_list = 
 	    gtk_object_get_data(GTK_OBJECT(info->widget), "hotarea-list");
  	free_hotarea_list(widget_list);
-	gtk_object_unref(GTK_OBJECT(info->widget));
+        /* FIXME: Why unref will not do? */
+	gtk_object_destroy(GTK_OBJECT(info->widget));
     }
     if (info->popup_menu)
-	gtk_object_unref(GTK_OBJECT(info->popup_menu));
+	gtk_object_destroy(GTK_OBJECT(info->popup_menu));
 
     g_free(info);
 }
@@ -2829,28 +2836,6 @@ balsa_message_key_press_event(GtkWidget * widget, GdkEventKey * event,
     return TRUE;
 }
 
-static void
-balsa_gtk_text_size_request(GtkWidget * widget,
-			    GtkRequisition * requisition,
-                            BalsaMessage * bm)
-{
-    GtkTextView *text;
-
-    g_return_if_fail(widget != NULL);
-    g_return_if_fail(GTK_IS_TEXT_VIEW(widget));
-    g_return_if_fail(requisition != NULL);
-
-    text = GTK_TEXT_VIEW(widget);
-
-    requisition->width = (widget->style->xthickness + 1) * 2;
-    requisition->height = (widget->style->ythickness + 1) * 2;
-
-    requisition->width +=
-        gtk_viewport_get_hadjustment(GTK_VIEWPORT(bm))->upper;
-    requisition->height +=
-        gtk_viewport_get_hadjustment(GTK_VIEWPORT(bm))->upper;
-
-}
 
 #ifdef HAVE_GTKHTML
 /* balsa_gtk_html_size_request:

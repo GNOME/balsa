@@ -1,5 +1,6 @@
-2005-02-09 18:40  PeterB
+2005-02-09 20:33  PeterB
 
+	* libbalsa/mailbox.c: don't lock mailbox to change a pseudo-flag.
 	* src/main-window.c: fix the About dialog.
 
 2005-02-08 17:33  PeterB

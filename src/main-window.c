@@ -209,7 +209,7 @@ create_toolbar (MainWindow *mw)
 			     "Delete", 
 			     "Delete Message", 
 			     NULL,
-			     new_icon (p1_xpm, window),
+			     gnome_stock_pixmap_widget(window,GNOME_STOCK_PIXMAP_TRASH),
 			     NULL,
 			     mw);
   GTK_WIDGET_UNSET_FLAGS(toolbarbutton, GTK_CAN_FOCUS);
@@ -433,7 +433,7 @@ create_menu (GtkWidget * window)
   gtk_widget_show (w);
   gtk_menu_append (GTK_MENU (menu), w);
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Delete"));
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_TRASH, _ ("Delete"));
   gtk_widget_show (w);
   gtk_widget_install_accelerator (w, accel, "activate", 'D', GDK_CONTROL_MASK);
   gtk_menu_append (GTK_MENU (menu), w);

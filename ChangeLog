@@ -1,3 +1,8 @@
+2003-02-19 Steve Wall  <hitched97@myrealbox.com>
+
+	* src/balsa-message.c: add '<' brackets to content-ID.
+
+
 2003-02-18 23:02  PeterB
 
 	* src/: balsa-app.c, balsa-app.h: Clean up sort utilities api.

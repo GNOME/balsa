@@ -2588,8 +2588,17 @@ balsa_gtk_html_url_requested(GtkWidget *html, const gchar *url,
 	printf("non-local URL request ignored: %s\n", url);
 	return FALSE;
     }
-    if( (f=libbalsa_message_get_part_by_id(msg,url+4)) == NULL)
-	return FALSE;
+    if( (f=libbalsa_message_get_part_by_id(msg,url+4)) == NULL) {
+	gchar *s = g_strconcat("<",url+4,">",NULL);
+	
+	if( s == NULL )
+	    return FALSE;
+
+	f = libbalsa_message_get_part_by_id(msg,s);
+	g_free(s);
+	if( f == NULL )
+	    return FALSE;
+    }
 
     while ((i = fread (buf, 1, sizeof(buf), f)) != 0)
 	html_stream_write (stream, buf, i);

@@ -486,8 +486,8 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
 	g_free (balsa_app.ab_location);
 	balsa_app.ab_location = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->ab_location)));
 
-	// XXX
-	//  refresh_main_window ();
+	/* XXX */
+	/*  refresh_main_window (); */
 	
 	/*
 	 * close window and free memory

@@ -19,6 +19,8 @@
 
 #ifndef __THREAD_MSGS_H__
 #define __THREAD_MSGS_H__
+#include <stdlib.h>		/* for malloc() */
+
 
 extern int    mail_thread_pipes[2];
 

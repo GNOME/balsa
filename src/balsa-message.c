@@ -860,7 +860,7 @@ void
 reflow_string(gchar* str, gint mode, gint *cur_pos, int width) 
 {
    gchar *l, *u, *sppos, *lnbeg, *iidx;
-   gint lnl = 0, lspace = 0; // 1 -> skip leading spaces
+   gint lnl = 0, lspace = 0; /* 1 -> skip leading spaces */
 
    if(mode<0) {
       l = str; u = str + strlen(str);

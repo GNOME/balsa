@@ -38,6 +38,8 @@ static void libbalsa_mailbox_local_class_init (LibBalsaMailboxLocalClass *klass)
 static void libbalsa_mailbox_local_init(LibBalsaMailboxLocal *mailbox);
 static void libbalsa_mailbox_local_destroy (GtkObject *object);
 
+/*static guint mailbox_signals[LAST_SIGNAL] = { 0 };*/
+
 static void libbalsa_mailbox_local_open(LibBalsaMailbox *mailbox, gboolean append);
 
 GtkType

@@ -288,7 +288,7 @@ void mutt_fetchPopMail (void)
 
 	if( i == msgs )  
 	{
-	   strcpy( last_uid, uid ); // save uid of the last message for exit
+	   strcpy( last_uid, uid ); /* save uid of the last message for exit */
 	   if( PopUID[0] == 0 )
 	     break;  /* no previous UID set */
 	 }

@@ -1,3 +1,11 @@
+2000-07-10  Matthew Guenther <mguenthe@attcanada.ca>
+
+	Applied IRIX compatibility patch by David Kaelbling
+	<drk@owl.hudson.sgi.com> to fix bug #16873
+	* changed to use C comments in code only, not C++ style comments
+	* avoid use of gcc-specific switches and extensions
+	* include neccessary system headers for threading	
+
 2000-07-08  Peter Williams  <peter@beta.newton.cx>
 
 	* src/mailbox-conf.c: Set the page manually for new
@@ -14,6 +22,14 @@
 	* libbalsa/send.c(libbalsa_send_message_real): quick bug fix against
 	the original patch.
 	
+2000-07-10  Matthew Guenther <mguenthe@attcanada.ca>
+
+	Applied IRIX compatibility patch by David Kaelbling
+	<drk@owl.hudson.sgi.com> to fix bug #16873
+	* changed to use C comments in code only, not C++ style comments
+	* avoid use of gcc-specific switches and extensions
+	* include neccessary system headers for threading	
+
 2000-07-04  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/save-restore.c: renaming 'special' mboxes fixed 

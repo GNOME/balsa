@@ -125,7 +125,7 @@ balsa_index_page_class_init(BalsaIndexPageClass *class)
 
   parent_class = gtk_type_class(GTK_TYPE_OBJECT);
 
-  //  object_class->destroy = index_child_destroy;
+  /*  object_class->destroy = index_child_destroy; */
   /*PKGW*/
   object_class->destroy = balsa_index_page_close_and_destroy;
 
@@ -164,7 +164,7 @@ balsa_index_page_window_init(BalsaIndexPage *bip)
 				 GTK_POLICY_AUTOMATIC,
 				 GTK_POLICY_AUTOMATIC);
   index = balsa_index_new ();
-  //  gtk_widget_set_usize (index, -1, 200);
+  /*  gtk_widget_set_usize (index, -1, 200); */
   gtk_container_add(GTK_CONTAINER(sw), index);
 
   gtk_widget_show(index);
@@ -273,7 +273,7 @@ gboolean balsa_index_page_load_mailbox(BalsaIndexPage *page, LibBalsaMailbox * m
   page->mailbox = mailbox;
 
 #if 0
-  // XXX
+  /* XXX */
   cursor = gdk_cursor_new(GDK_WATCH);
   balsa_window_set_cursor(page, cursor);
   gdk_cursor_destroy(cursor);

@@ -367,7 +367,7 @@ balsa_send_message_real(MessageQueueItem *first_message)
   if (i==-2)
       fprintf(stderr,"SMTP protocol error (wrong address, relaying denied)\n");
        
-//   return TRUE;
+  /*   return TRUE; */
 
   /* We give back all the resources used and delete the messages send*/
 

@@ -36,11 +36,12 @@ static LibBalsaMailboxClass *parent_class = NULL;
 static void libbalsa_mailbox_imap_destroy (GtkObject *object);
 static void libbalsa_mailbox_imap_class_init (LibBalsaMailboxImapClass *klass);
 static void libbalsa_mailbox_imap_init(LibBalsaMailboxImap *mailbox);
-
 static void libbalsa_mailbox_imap_open (LibBalsaMailbox *mailbox, gboolean append);
 static void libbalsa_mailbox_imap_set_username (LibBalsaMailbox *mailbox, const gchar *username);
 static void libbalsa_mailbox_imap_set_passwd (LibBalsaMailbox *mailbox, const gchar *passwd);
 static void libbalsa_mailbox_imap_set_host (LibBalsaMailbox *mailbox, const gchar *host, gint port);
+
+/*static guint mailbox_signals[LAST_SIGNAL] = { 0 };*/
 
 static void set_mutt_username (LibBalsaMailboxImap *mailbox);
 

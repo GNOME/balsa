@@ -51,7 +51,7 @@
 void file_print_cb(GtkWidget *widget, gpointer cbdata);
 
 static void print_destroy(GtkWidget *widget, gpointer data);
-static void file_print_execute(); //GtkWidget *w, gpointer cbdata);
+static void file_print_execute(); /*GtkWidget *w, gpointer cbdata);*/
 static void print_message(GtkWidget *widget, gpointer data);
 
 static GtkWidget *print_dialog = NULL;

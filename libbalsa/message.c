@@ -324,6 +324,10 @@ libbalsa_message_copy (LibBalsaMessage * message, LibBalsaMailbox * dest)
   if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW ) dest->unread_messages++;
 
   libbalsa_mailbox_close (dest);
+
+  /*PKGW test: commented out why? */
+  /*send_watcher_append_message (dest, message);*/
+  /* mailbox_open_unref (dest); */
 }
 
 void
@@ -344,7 +348,11 @@ libbalsa_message_move (LibBalsaMessage * message, LibBalsaMailbox * dest)
 		       cur, 0, 0);
 
   dest->total_messages++;
+
   if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW ) dest->unread_messages++;
+
+  /*PKGW test: commented out why? */
+  /*send_watcher_append_message (dest, message);*/
   
   libbalsa_mailbox_close (dest);
   

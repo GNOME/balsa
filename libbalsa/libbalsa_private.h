@@ -14,6 +14,10 @@ LibBalsaAddress* libbalsa_address_new_from_libmutt(ADDRESS *caddr);
 #define DMSG2(a,b)
 #endif
 
+#ifndef __GNUC__
+#define __PRETTY_FUNCTION__	__FILE__
+#endif
+
 #define LOCK_MAILBOX(mailbox)\
 do {\
   pthread_mutex_lock( &mailbox_lock );\

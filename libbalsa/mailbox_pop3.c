@@ -28,6 +28,8 @@
 #include "libbalsa_private.h"
 #include "mailbackend.h"
 
+/*static guint mailbox_signals[LAST_SIGNAL] = { 0 };*/
+
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
 #endif

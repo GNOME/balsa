@@ -473,7 +473,7 @@ address_book_cb(GtkWidget * widget, gpointer data)
 
 	box2 = gtk_vbox_new(FALSE, 0); 
 	gtk_box_pack_start(GTK_BOX(hbox), box2, FALSE, FALSE, 0); 
-	//gtk_box_pack_start(GTK_BOX(box2), gtk_label_new(_("Address Book")), FALSE, FALSE, 0); 
+	/*gtk_box_pack_start(GTK_BOX(box2), gtk_label_new(_("Address Book")), FALSE, FALSE, 0); */
 	gtk_box_pack_start(GTK_BOX(box2), find_label, FALSE, FALSE, 0); 
 	gtk_box_pack_start(GTK_BOX(box2), find_entry, FALSE, FALSE, 0); 
 	

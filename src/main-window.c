@@ -84,7 +84,7 @@ enum {
   GtkWidget *send_progress_message = NULL;
   GtkWidget *send_dialog = NULL;
   GtkWidget *send_dialog_bar = NULL;
-//  int total_messages_left;
+/*  int total_messages_left;*/
   GSList *list = NULL;
   
 void progress_dialog_destroy_cb ( GtkWidget *, gpointer data);

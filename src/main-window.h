@@ -37,7 +37,7 @@ struct _BalsaWindow
   GtkWidget *progress_bar;
   GtkWidget *mblist;
   GtkWidget *notebook;
-  GtkWidget *preview; // message is child
+  GtkWidget *preview; /* message is child */
 };
 
 struct _BalsaWindowClass

@@ -1,5 +1,3 @@
-CFLAGS += -Wall -Wmissing-prototypes -Wpointer-arith
-
 noinst_HEADERS =				\
 	balsa-initdruid-private.h		\
 	balsa-druid-page-private.h		\

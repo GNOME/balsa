@@ -30,6 +30,7 @@ struct _MBListWindow
     GtkWidget *window;
     GnomeMDI *mdi;
     GtkCTree *ctree;
+    GList *parent;
   };
 
 static MBListWindow *mblw = NULL;
@@ -42,16 +43,14 @@ void mblist_remove_mailbox (Mailbox * mailbox);
 /* callbacks */
 static void destroy_mblist_window (GtkWidget * widget);
 static void close_mblist_window (GtkWidget * widget);
-static void mailbox_select_cb (GtkTree * tree);
+static void mailbox_select_cb (GtkCTree * ctree, GList * row, gint column);
 
 void
-mblist_open_window (GnomeMDI *mdi)
+mblist_open_window (GnomeMDI * mdi)
 {
   GtkWidget *vbox;
-  GtkWidget *scrolled_win;
-  GtkWidget *tree_item;
-
-  gchar *title[] = { "#" , "Mailbox" };
+  gchar *text[] =
+  {"Balsa"};
 
   guint handler;
 
@@ -77,23 +76,18 @@ mblist_open_window (GnomeMDI *mdi)
   gnome_app_set_contents (GNOME_APP (mblw->window), vbox);
   gtk_widget_show (vbox);
 
-  mblw->ctree = GTK_CTREE(gtk_ctree_new_with_titles (2, 0, title));
+  mblw->ctree = GTK_CTREE (gtk_ctree_new (1, 0));
   gtk_ctree_set_line_style (mblw->ctree, GTK_CTREE_LINES_DOTTED);
-  gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET(mblw->ctree), TRUE, TRUE, 0);
-  gtk_widget_show (GTK_WIDGET(mblw->ctree));
-/*
-  tree_item = gtk_tree_item_new_with_label ("Balsa");
-  gtk_tree_append (GTK_TREE (tree), tree_item);
-  gtk_widget_show (tree_item);
+  gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (mblw->ctree), TRUE, TRUE, 0);
+  gtk_widget_show (GTK_WIDGET (mblw->ctree));
 
-  mblw->tree = gtk_tree_new ();
-  gtk_tree_item_set_subtree (GTK_TREE_ITEM (tree_item), mblw->tree);
-  gtk_signal_connect (GTK_OBJECT (mblw->tree), "selection_changed",
+  mblw->parent = gtk_ctree_insert (mblw->ctree, NULL, NULL, text, 1, NULL,
+				   NULL, NULL, NULL, FALSE, TRUE);
+
+  gtk_signal_connect (GTK_OBJECT (mblw->ctree), "tree_select_row",
 		      (GtkSignalFunc) mailbox_select_cb,
 		      (gpointer) NULL);
 
-  gtk_widget_show (mblw->tree);
-*/
   gtk_widget_show (mblw->window);
 }
 
@@ -101,13 +95,12 @@ mblist_open_window (GnomeMDI *mdi)
 void
 mblist_add_mailbox (Mailbox * mailbox)
 {
-#if 0
-  GtkWidget *tree_item;
-  tree_item = gtk_tree_item_new_with_label (mailbox->name);
-  gtk_tree_append (GTK_TREE (mblw->tree), tree_item);
-  gtk_widget_show (tree_item);
-  gtk_object_set_user_data (GTK_OBJECT (tree_item), mailbox);
-#endif
+  GList *sibling;
+  gchar *text[1];
+  text[0] = mailbox->name;
+  sibling = gtk_ctree_insert (mblw->ctree, mblw->parent, NULL, text, 1, NULL,
+			      NULL, NULL, NULL, FALSE, TRUE);
+  gtk_ctree_set_row_data (mblw->ctree, sibling, mailbox);
 }
 
 void
@@ -120,7 +113,7 @@ static void
 close_mblist_window (GtkWidget * widget)
 {
   gtk_widget_destroy (mblw->window);
-  gtk_widget_destroy (GTK_WIDGET(mblw->ctree));
+  gtk_widget_destroy (GTK_WIDGET (mblw->ctree));
 }
 
 static void
@@ -132,35 +125,22 @@ destroy_mblist_window (GtkWidget * widget)
 }
 
 static void
-mailbox_select_cb (GtkTree * tree)
+mailbox_select_cb (GtkCTree * ctree, GList * row, gint column)
 {
-#if 0
   IndexChild *index_child;
   Mailbox *mailbox;
-  GList *selected;
-  GtkTreeItem *selected_item;
-  gint nb_selected;
 
-
-  selected = tree->selection;
-  nb_selected = g_list_length (selected);
-  if (nb_selected != 1)
-    return;
-
-
-  selected_item = GTK_TREE_ITEM (selected->data);
-  mailbox = gtk_object_get_user_data (GTK_OBJECT (selected_item));
+  mailbox = gtk_ctree_get_row_data (ctree, row);
 
   /* bail now if the we've been called without a valid
    * mailbox */
   if (!mailbox)
     return;
 
-  index_child = index_child_new(mailbox);
+  index_child = index_child_new (mailbox);
   if (index_child)
-  {
-    gnome_mdi_add_child(mblw->mdi, GNOME_MDI_CHILD(index_child));
-    gnome_mdi_add_view(mblw->mdi, GNOME_MDI_CHILD(index_child));
-  }
-#endif
+    {
+      gnome_mdi_add_child (mblw->mdi, GNOME_MDI_CHILD (index_child));
+      gnome_mdi_add_view (mblw->mdi, GNOME_MDI_CHILD (index_child));
+    }
 }

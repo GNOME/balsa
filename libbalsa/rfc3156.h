@@ -67,6 +67,10 @@ struct _LibBalsaSignatureInfo {
     gchar *issuer_name;
     gchar *chain_id;
     time_t key_created;
+    gboolean key_revoked;
+    gboolean key_expired;
+    gboolean key_disabled;
+    gboolean key_invalid;
     time_t sign_time;
 };
 

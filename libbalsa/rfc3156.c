@@ -259,6 +259,36 @@ libbalsa_signature_info_to_gchar(LibBalsaSignatureInfo * info,
 	strftime(buf, 127, date_string, localtime(&info->key_created));
 	g_string_append_printf(msg, _("\nKey created on: %s"), buf);
     }
+    if (info->key_revoked || info->key_expired || info->key_disabled ||
+	info->key_invalid) {
+	GString * attrs = g_string_new("");
+	int count = 0;
+
+	if (info->key_revoked) {
+	    count++;
+	    attrs = g_string_append(attrs, _(" revoked"));
+	}
+	if (info->key_expired) {
+	    if (count++)
+		attrs = g_string_append_c(attrs, ',');
+	    attrs = g_string_append(attrs, _(" expired"));
+	}
+	if (info->key_disabled) {
+	    if (count)
+		attrs = g_string_append_c(attrs, ',');
+	    attrs = g_string_append(attrs, _(" disabled"));
+	}
+	if (info->key_invalid) {
+	    if (count)
+		attrs = g_string_append_c(attrs, ',');
+	    attrs = g_string_append(attrs, _(" invalid"));
+	}
+	if (count > 1)
+	    g_string_append_printf(msg, _("\nKey attributes:%s"), attrs->str);
+	else
+	    g_string_append_printf(msg, _("\nKey attribute:%s"), attrs->str);
+	g_string_free(attrs, TRUE);
+    }
     if (info->issuer_name)
 	g_string_append_printf(msg, _("\nIssuer name: %s"),
 			       info->issuer_name);
@@ -655,10 +685,14 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, GtkWindow *parent)
 	gpgme_release(ctx);
 	return body;
     }
-    cb_data.ctx = ctx;
-    cb_data.parent = parent;
-    cb_data.title = _("Enter passphrase to decrypt message");
-    gpgme_set_passphrase_cb(ctx, get_passphrase_cb, &cb_data);
+
+    /* set the passphrase callback only if no gpg-agent is running */
+    if (!g_getenv("GPG_AGENT_INFO")) {
+	cb_data.ctx = ctx;
+	cb_data.parent = parent;
+	cb_data.title = _("Enter passphrase to decrypt message");
+	gpgme_set_passphrase_cb(ctx, get_passphrase_cb, &cb_data);
+    }
     
     /*
      * create the cipher data stream using the callback function set to avoid
@@ -855,6 +889,8 @@ libbalsa_gpgme_sig_stat_to_gchar(gpgme_error_t stat)
 	    return _("The signature is valid but expired.");
 	case GPG_ERR_KEY_EXPIRED:
 	    return _("The signature is valid but the key used to verify the signature has expired.");
+	case GPG_ERR_CERT_REVOKED:
+	    return _("The signature is valid but the key used to verify the signature has been revoked.");
 	case GPG_ERR_BAD_SIGNATURE:
 	    return _("The signature is invalid.");
 	case GPG_ERR_NO_PUBKEY:
@@ -963,11 +999,16 @@ libbalsa_rfc2440_sign_buffer(const gchar *buffer, const gchar *sign_for,
   
     /* let gpgme create the signature */
     gpgme_set_armor(ctx, 1);
-    cb_data.ctx = ctx;
-    cb_data.title =
-	_("Enter passsphrase to OpenPGP sign the first message part");
-    cb_data.parent = parent;
-    gpgme_set_passphrase_cb(ctx, get_passphrase_cb, &cb_data);
+
+    /* set the passphrase callback only if no gpg-agent is running */
+    if (!g_getenv("GPG_AGENT_INFO")) {
+	cb_data.ctx = ctx;
+	cb_data.title =
+	    _("Enter passsphrase to OpenPGP sign the first message part");
+	cb_data.parent = parent;
+	gpgme_set_passphrase_cb(ctx, get_passphrase_cb, &cb_data);
+    }
+
     inbuf.ptr = (gchar *)buffer;
     inbuf.last_was_cr = FALSE;
     if ((err = gpgme_data_new_from_cbs(&in, &cbs, &inbuf)) != GPG_ERR_NO_ERROR) {
@@ -1202,11 +1243,14 @@ libbalsa_rfc2440_encrypt_buffer(const gchar *buffer, const gchar *sign_for,
 	    gpgme_release(ctx);
 	    return NULL;
 	}
-	cb_data.ctx = ctx;
-	cb_data.title =
-	    _("Enter passsphrase to OpenPGP sign the first message part");
-	cb_data.parent = parent;
-	gpgme_set_passphrase_cb(ctx, get_passphrase_cb, &cb_data);
+	/* set the passphrase callback only if no gpg-agent is running */
+	if (!g_getenv("GPG_AGENT_INFO")) {
+	    cb_data.ctx = ctx;
+	    cb_data.title =
+		_("Enter passsphrase to OpenPGP sign the first message part");
+	    cb_data.parent = parent;
+	    gpgme_set_passphrase_cb(ctx, get_passphrase_cb, &cb_data);
+	}
     }
     
     /* Let gpgme encrypt the data. RFC2440 doesn't request to convert line
@@ -1288,7 +1332,7 @@ libbalsa_rfc2440_decrypt_buffer(gchar **buffer, const gchar *charset,
     gpgme_error_t err, retval;
     gpgme_data_t in, out;
     PassphraseCB cb_data;
-    gchar *plain_buffer, *info, *result;
+    gchar *plain_buffer, *info, *result, *crlf;
     size_t datasize;
     LibBalsaSignatureInfo *tmp_siginfo;
 
@@ -1331,10 +1375,15 @@ libbalsa_rfc2440_decrypt_buffer(gchar **buffer, const gchar *charset,
 	gpgme_release(ctx);
 	return GPG_ERR_GENERAL;
     }
-    cb_data.ctx = ctx;
-    cb_data.title = _("Enter passsphrase to decrypt message part");
-    cb_data.parent = parent;
-    gpgme_set_passphrase_cb(ctx, get_passphrase_cb, &cb_data);
+
+    /* set the passphrase callback only if no gpg-agent is running */
+    if (!g_getenv("GPG_AGENT_INFO")) {
+	cb_data.ctx = ctx;
+	cb_data.title = _("Enter passsphrase to decrypt message part");
+	cb_data.parent = parent;
+	gpgme_set_passphrase_cb(ctx, get_passphrase_cb, &cb_data);
+    }
+
     if ((err = gpgme_op_decrypt_verify(ctx, in, out))
 	!= GPG_ERR_NO_ERROR) {
 	if (err != GPG_ERR_CANCELED)
@@ -1377,7 +1426,6 @@ libbalsa_rfc2440_decrypt_buffer(gchar **buffer, const gchar *charset,
     gpgme_release(ctx);
 
     /* convert the result back to utf-8 if necessary */
-    /* FIXME: remove \r's if the message came from a winbloze mua? */
     if (charset && g_ascii_strcasecmp(charset, "utf-8")) {
 	if (!g_ascii_strcasecmp(charset, "us-ascii")) {
 	    gchar const *target = NULL;
@@ -1408,6 +1456,19 @@ libbalsa_rfc2440_decrypt_buffer(gchar **buffer, const gchar *charset,
 	result = g_strndup(plain_buffer, datasize);
     g_free(plain_buffer);
     g_free(*buffer);
+
+    /* replace \r\n and \n\r (encrypted stuff comes from a [spit] Microsnot
+     * MUA) by just \n */
+    crlf = strstr(result, "\r\n");
+    while (crlf) {
+	memmove (crlf, crlf + 1, strlen(crlf));
+	crlf = strstr(crlf, "\r\n");
+    }
+    crlf = strstr(result, "\n\r");
+    while (crlf) {
+	memmove (crlf + 1, crlf + 2, strlen(crlf) - 1);
+	crlf = strstr(crlf, "\n\r");
+    }
 
     if (info) {
 	*buffer = g_strconcat(result, RFC2440_SEPARATOR, info, NULL);
@@ -1628,8 +1689,13 @@ get_sig_info_from_ctx(LibBalsaSignatureInfo* info, gpgme_ctx_t ctx)
 	    info->sign_uid = g_strdup(uid->uid);
 	uid = uid->next;
     }
-    if (key->subkeys)
+    if (key->subkeys) {
 	info->key_created = key->subkeys->timestamp;
+	info->key_revoked = key->subkeys->revoked;
+	info->key_expired = key->subkeys->expired;
+	info->key_disabled = key->subkeys->disabled;
+	info->key_invalid = key->subkeys->invalid;
+    }
     gpgme_key_unref(key);
 }
 
@@ -2513,10 +2579,15 @@ gpgme_signature(MailDataMBox *mailData, const gchar *sign_for, gchar **micalg,
   
     /* let gpgme create the signature */
     gpgme_set_armor(ctx, 1);
-    cb_data.ctx = ctx;
-    cb_data.parent = parent;
-    cb_data.title = _("Enter passsphrase to sign message");
-    gpgme_set_passphrase_cb(ctx, get_passphrase_cb, &cb_data);
+
+    /* set the passphrase callback only if no gpg-agent is running */
+    if (!g_getenv("GPG_AGENT_INFO")) {
+	cb_data.ctx = ctx;
+	cb_data.parent = parent;
+	cb_data.title = _("Enter passsphrase to sign message");
+	gpgme_set_passphrase_cb(ctx, get_passphrase_cb, &cb_data);
+    }
+
     if ((err = gpgme_data_new_from_cbs(&in, &cbs, mailData)) != GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 			     _("%s: could not get data from file: %s"), 

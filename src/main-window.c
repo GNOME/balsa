@@ -1356,15 +1356,15 @@ balsa_notebook_label_new (BalsaMailboxNode* mbnode)
        GtkWidget *lab = gtk_label_new(mbnode->mailbox->name);
        GtkWidget *but = gtk_button_new();
        GtkWidget *ev = gtk_event_box_new();
-#if BALSA_MAJOR < 2
-       close_pix = gnome_stock_pixmap_widget(GTK_WIDGET(balsa_app.main_window),
-               BALSA_PIXMAP_OTHER_CLOSE);
-#else
+
        close_pix = gtk_image_new_from_stock(GTK_STOCK_CLOSE,
                                             GTK_ICON_SIZE_MENU);
        g_signal_connect(G_OBJECT(but), "size-request",
                         G_CALLBACK(mailbox_tab_size_request), NULL);
-#endif                          /* BALSA_MAJOR < 2 */
+
+#if GTK_CHECK_VERSION(2, 4, 0)
+       gtk_event_box_set_visible_window(GTK_EVENT_BOX(ev), FALSE);
+#endif
 
        gtk_button_set_relief(GTK_BUTTON (but), GTK_RELIEF_NONE);
        gtk_container_add(GTK_CONTAINER (but), close_pix);

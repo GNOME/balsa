@@ -792,6 +792,14 @@ bm_focus_on_first_child(BalsaMessage * bm)
     g_list_free(children);
 }
 
+static gchar *
+bm_sender_to_gchar(LibBalsaAddress * address, gint which)
+{
+    return (address
+	    ? libbalsa_address_to_gchar(address, which)
+	    : g_strdup(_("(No sender)")));
+}
+
 #ifdef HAVE_GPGME
 static gint
 balsa_message_scan_signatures(LibBalsaMessageBody *body, LibBalsaMessage * message)
@@ -802,9 +810,7 @@ balsa_message_scan_signatures(LibBalsaMessageBody *body, LibBalsaMessage * messa
 
     g_return_val_if_fail(message->headers != NULL, result);
 
-    sender = message->headers->from
-        ? libbalsa_address_to_gchar(message->headers->from, -1)
-        : g_strdup(_("(No sender)"));
+    sender = bm_sender_to_gchar(message->headers->from, -1);
 
     for (; body; body = body->next) {
 	gint signres = libbalsa_is_pgp_signed(body);
@@ -949,9 +955,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 	    message->body_list->parts =
 		libbalsa_body_decrypt(message->body_list->parts, NULL);
 	else if (encrres < 0) {
-	    gchar *sender = message->headers && message->headers->from
-                ? libbalsa_address_to_gchar(message->headers->from, -1)
-                : g_strdup(_("(No sender)"));
+	    gchar *sender = bm_sender_to_gchar(message->headers->from, -1);
 	    gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
 	
 	    libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
@@ -2049,9 +2053,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 
         if (!libbalsa_utf8_sanitize(&ptr, balsa_app.convert_unknown_8bit,
 				    balsa_app.convert_unknown_8bit_codeset, &target_cs)) {
-	    gchar *from = bm->message->headers && bm->message->headers->from
-                ? libbalsa_address_to_gchar(bm->message->headers->from, 0)
-                : g_strdup(_("(No sender)"));
+	    gchar *from = bm_sender_to_gchar(bm->message->headers->from, 0);
 	    gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));
 	
 	    libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
@@ -2105,9 +2107,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 					     _("detected a good signature with insufficient validity/trust"));
 		}
 	    } else if (sig_res != GPGME_SIG_STAT_NONE) {
-		gchar *sender = bm->message->headers && bm->message->headers->from 
-                    ? libbalsa_address_to_gchar(bm->message->headers->from, -1)
-                    : g_strdup(_("(No sender)"));
+		gchar *sender = bm_sender_to_gchar(bm->message->headers->from, -1);
 		gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));
 	
 		libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
@@ -2455,7 +2455,7 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
 
 	if (g_ascii_strcasecmp(content_type, "message/rfc822") == 0 &&
 	    body->embhdrs) {
-	    gchar *from = libbalsa_address_to_gchar(body->embhdrs->from, 0);
+	    gchar *from = bm_sender_to_gchar(body->embhdrs->from, 0);
 	    icon_title = 
 		g_strdup_printf(_("rfc822 message (from %s, subject \"%s\")"),
 				from, body->embhdrs->subject);

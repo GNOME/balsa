@@ -1386,8 +1386,10 @@ add_attachment(GnomeIconList * iconlist, char *filename,
         g_free(content_type);
 	return FALSE;
     }
+
     pix = libbalsa_icon_finder(forced_mime_type, filename, &content_type);
-    if (pix && (err_msg=check_if_regular_file(pix)) == NULL) {
+
+    {   /* scope */
 	gint pos;
 	gchar *label;
 	attachment_t *attach_data = g_malloc(sizeof(attachment_t));
@@ -1424,20 +1426,8 @@ add_attachment(GnomeIconList * iconlist, char *filename,
         g_free(basename);
         g_free(utf8name);
 	g_free(label);
-
-    } else { 
-	if(pix) {
-	    balsa_information
-		(LIBBALSA_INFORMATION_ERROR,
-		 _("The attachment pixmap (%s) cannot be used.\n %s"),
-		 pix, err_msg);
-	    g_free(err_msg);
-	} else
-	    balsa_information
-		(LIBBALSA_INFORMATION_ERROR,
-		 _("Default attachment pixmap (attachment.png) cannot be found:\n"
-		   "Your balsa installation is corrupted."));
     }
+
     g_free(pix) ;
     g_free(content_type);
     return TRUE;

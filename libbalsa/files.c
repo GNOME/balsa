@@ -68,7 +68,7 @@ balsa_file_finder(const gchar * filename, const gchar * splice,
 	    g_strconcat(permanent_prefixes[i], PATH_SEP_STR, splice,
 			PATH_SEP_STR, filename, NULL);
 
-	if (g_file_test(cat, G_FILE_TEST_EXISTS))
+	if (g_file_test(cat, G_FILE_TEST_IS_REGULAR))
 	    return cat;
 
 	g_free(cat);
@@ -87,7 +87,7 @@ balsa_file_finder(const gchar * filename, const gchar * splice,
 	    g_strconcat(prefixes[i], PATH_SEP_STR, splice, PATH_SEP_STR,
 			filename, NULL);
 
-	if (g_file_test(cat, G_FILE_TEST_EXISTS))
+	if (g_file_test(cat, G_FILE_TEST_IS_REGULAR))
 	    return cat;
 
 	g_free(cat);
@@ -129,7 +129,7 @@ libbalsa_icon_finder(const char *mime_type, const char *filename,
     if ( icon_file ) 
 	icon = g_strdup (icon_file);
 
-    if (!icon || !g_file_test (icon, G_FILE_TEST_EXISTS)) {
+    if (!icon || !g_file_test (icon, G_FILE_TEST_IS_REGULAR)) {
 	gchar *gnome_icon, *p_gnome_icon, *tmp;
 	
 	gnome_icon = g_strdup_printf ("gnome-%s.png", content_type);   

@@ -235,26 +235,6 @@ fe_regexs_select_row(GtkWidget * widget, gint row, gint column,
     else gtk_entry_set_text(GTK_ENTRY(fe_type_regex_entry),"");
 }
 
-/*
- * fe_typesmenu_cb()
- *
- * Handles toggling of the type checkbuttons.
- * When they are toggled, the notebook page must change
- */
-static void
-fe_typesmenu_cb(GtkWidget* widget, gpointer data)
-{
-    ConditionMatchType type = GPOINTER_TO_INT(data);
-
-    condition_has_changed = TRUE;
-    gtk_notebook_set_page(GTK_NOTEBOOK(fe_type_notebook), type-1);
-    /* For certain types (date, flag)
-     * match fields have no meaning so we disable them
-     */
-    gtk_widget_set_sensitive(fe_match_frame,
-                             (type!=CONDITION_DATE && type!=CONDITION_FLAG));
-}                       /* end fe_typesmenu_cb() */
-
 typedef struct {
     const gchar * normal_str, *negate_str;
 } LabelDescs;
@@ -279,6 +259,36 @@ fe_update_label(GtkWidget* label, const LabelDescs* labels)
                        _(labels->negate_str) : _(labels->normal_str));
 }                      /* end fe_update_label */
 
+static ConditionMatchType
+get_condition_type(void)
+{
+    GtkWidget * menu;
+
+    /* Retrieve the selected item in the search type menu */
+    menu = 
+	gtk_menu_get_active(GTK_MENU(gtk_option_menu_get_menu(GTK_OPTION_MENU(fe_search_option_menu))));
+    /* Set the type associated with the selected item */
+    return GPOINTER_TO_INT(gtk_object_get_data(GTK_OBJECT(menu), "value"));
+}
+
+static void 
+update_current_label()
+{
+    switch (get_condition_type()) {
+    case CONDITION_SIMPLE: 
+        fe_update_label(fe_type_simple_label, &simple_label); break;
+    case CONDITION_REGEX:  
+        fe_update_label(fe_type_regex_label,  &regex_label);  break;
+    case CONDITION_DATE:   
+        fe_update_label(fe_type_date_label,   &date_label);   break;
+    case CONDITION_FLAG:   
+        fe_update_label(fe_type_flag_label,   &flags_label);
+    case CONDITION_NONE:
+        /* to avoid warnings */
+	break;
+    }
+}
+
 static void
 update_condition_list_label(void)
 {
@@ -295,36 +305,33 @@ update_condition_list_label(void)
                        _(fe_search_type[cond->type-1].text));
 }                      /* end fe_update_condition_list_label */
 
-static ConditionMatchType
-get_condition_type(void)
+/*
+ * fe_typesmenu_cb()
+ *
+ * Handles toggling of the type checkbuttons.
+ * When they are toggled, the notebook page must change
+ */
+static void
+fe_typesmenu_cb(GtkWidget* widget, gpointer data)
 {
-    GtkWidget * menu;
+    ConditionMatchType type = GPOINTER_TO_INT(data);
 
-    /* Retrieve the selected item in the search type menu */
-    menu = 
-	gtk_menu_get_active(GTK_MENU(gtk_option_menu_get_menu(GTK_OPTION_MENU(fe_search_option_menu))));
-    /* Set the type associated with the selected item */
-    return GPOINTER_TO_INT(gtk_object_get_data(GTK_OBJECT(menu), "value"));
-}
+    condition_has_changed = TRUE;
+    gtk_notebook_set_page(GTK_NOTEBOOK(fe_type_notebook), type-1);
+    /* For certain types (date, flag)
+     * match fields have no meaning so we disable them
+     */
+    gtk_widget_set_sensitive(fe_match_frame,
+                             (type!=CONDITION_DATE && type!=CONDITION_FLAG));
+    update_current_label();
+}                       /* end fe_typesmenu_cb() */
 
 /* fe_negate_condition :handle pressing on the "Contain/Does not Contain"... buttons */
 static void
 fe_negate_condition(GtkWidget * widget, gpointer data)
 {
     condition_not = !condition_not;
-    switch (get_condition_type()) {
-    case CONDITION_SIMPLE: 
-        fe_update_label(fe_type_simple_label, &simple_label); break;
-    case CONDITION_REGEX:  
-        fe_update_label(fe_type_regex_label,  &regex_label);  break;
-    case CONDITION_DATE:   
-        fe_update_label(fe_type_date_label,   &date_label);   break;
-    case CONDITION_FLAG:   
-        fe_update_label(fe_type_flag_label,   &flags_label);
-    case CONDITION_NONE:
-        /* to avoid warnings */
-	break;
-    }
+    update_current_label();
     condition_has_changed = TRUE;
 }                      /* end fe_negate_condition */
 
@@ -1682,6 +1689,7 @@ fe_clist_select_row(GtkWidget * widget, gint row, gint column,
     if (fil->action!=FILTER_TRASH && fil->action_string)
         balsa_mblist_mru_option_menu_set(fe_mailboxes,
                                          fil->action_string);
+    fe_action_selected(NULL, GINT_TO_POINTER(fil->action));
     /* We free the conditions */
     fe_free_associated_conditions();
 

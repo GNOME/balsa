@@ -1,3 +1,7 @@
+2002-09-28  Emmanuel <e.allaud@wanadoo.fr>
+
+	* src/filter-edit-callbacks.c: fix sensitivity problems.
+
 2002-09-23  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* libbalsa/send.c: do not send deleted messages in outbox (#93666).

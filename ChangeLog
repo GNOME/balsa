@@ -1,8 +1,16 @@
+2003-12-16  Carlos Morgado  <chbm gnome.org>
+
+	* src/balsa-bonobo.c (Message): 
+	* src/main.c (Message): 
+	-a works, change behaviour on first -m invocation. 
+	maybe the old behaviour was better.
+	
 2003-12-15  Carlos Morgado  <chbm gnome.org>
 
 	* GNOME_Balsa.server.in (Repository): 
 	* Makefile.am (Message): 
 	* src/main.c (Message): 
+
 	* src/balsa-bonobo.h (Message): 
 	* src/balsa-bonobo.c (Message): 
 	* src/Makefile.am (Message): 

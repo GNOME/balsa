@@ -109,12 +109,10 @@ static gchar *opt_compose_email = NULL;
 
 static void
 balsa_handle_automation_options() {
-#if 1
    CORBA_Object factory;
    CORBA_Environment ev;
    BonoboObject *balsacomposer;
-   gint i;
-
+ 
    CORBA_exception_init (&ev);
 
    factory = bonobo_activation_activate_from_id 
@@ -135,12 +133,14 @@ balsa_handle_automation_options() {
 	       bonobo_activation_activate_from_id ("OAFIID:GNOME_Balsa_Composer",
 						   0, NULL, &ev);
 	   if(opt_attach_list) {
-	       i = g_slist_length(opt_attach_list);
-	       attachs->_buffer=CORBA_sequence_CORBA_string_allocbuf(i);
-	       attachs->_length = i;
+	       gint i,l;
+	       l = g_slist_length(opt_attach_list);
+	       attachs->_buffer = 
+		   CORBA_sequence_CORBA_string_allocbuf(l);
+	       attachs->_length = l;
 	       
 	       
-	       for( ; i > 0; i--) {
+	       for( i = 0 ; i < l; i++) {
 		   attachs->_buffer[i] = 
 		       g_slist_nth_data( opt_attach_list, i );
 	       }
@@ -163,7 +163,6 @@ balsa_handle_automation_options() {
        balsacomposer = balsa_composer_new ();
    }
    
-#endif   
 }
 
 /* balsa_init:
@@ -479,6 +478,23 @@ main(int argc, char *argv[])
     g_signal_connect(G_OBJECT(client), "die",
 		     G_CALLBACK(balsa_kill_session), NULL);
     
+    if (opt_compose_email || opt_attach_list) {
+        BalsaSendmsg *snd;
+        GSList *lst;
+        gdk_threads_enter();
+        snd = sendmsg_window_new(window, NULL, SEND_NORMAL);
+        gdk_threads_leave();
+        if(opt_compose_email) {
+            if(g_ascii_strncasecmp(opt_compose_email, "mailto:", 7) == 0)
+                sendmsg_window_process_url(opt_compose_email+7,
+                        sendmsg_window_set_field, snd);
+            else sendmsg_window_set_field(snd,"to", opt_compose_email);
+        }
+        for(lst = opt_attach_list; lst; lst = g_slist_next(lst))
+            add_attachment(GNOME_ICON_LIST(snd->attachments[1]),
+                           lst->data, FALSE, NULL);
+	snd->quit_on_close = FALSE;
+    };
     gtk_widget_show(window);
 
     if (cmd_check_mail_on_startup || balsa_app.check_mail_upon_startup)

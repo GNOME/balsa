@@ -470,7 +470,7 @@ append_comma_separated(GtkEditable *editable, const gchar * text)
 {
     gint position;
 
-    if (!text)
+    if (!text || !*text)
         return;
 
     gtk_editable_set_position(editable, -1);
@@ -967,7 +967,11 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
     g_free(tmpstr);
 
     gtk_entry_set_text(GTK_ENTRY(bsmsg->reply_to[1]), ident->replyto);
-    gtk_entry_set_text(GTK_ENTRY(bsmsg->bcc[1]), ident->bcc);
+
+    /* Add ident->bcc to the list--the sender might have already set
+     * some. FIXME: first remove any bcc entry that matches
+     * old_ident->bcc? */
+    append_comma_separated(GTK_EDITABLE(bsmsg->bcc[1]), ident->bcc);
     
     /* change the subject to use the reply/forward strings */
     subject = gtk_entry_get_text(GTK_ENTRY(bsmsg->subject[1]));
@@ -1015,8 +1019,23 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
     /* switch identities in bsmsg here so we can use read_signature
      * again */
     bsmsg->ident = ident;
-    new_sig = read_signature(bsmsg);
-    new_sig = prep_signature(ident, new_sig);
+    if ((new_sig = read_signature(bsmsg)) != NULL) {
+	SendType type = bsmsg->type;
+	gboolean reply_any = (type == SEND_REPLY ||
+			      type == SEND_REPLY_ALL ||
+			      type == SEND_REPLY_GROUP);
+	gboolean forwd_any = (type == SEND_FORWARD_ATTACH ||
+			      type == SEND_FORWARD_INLINE);
+
+	if ((reply_any && bsmsg->ident->sig_whenreply)
+	    || (forwd_any && bsmsg->ident->sig_whenforward)
+	    || (type == SEND_NORMAL && bsmsg->ident->sig_sending))
+	    new_sig = prep_signature(ident, new_sig);
+	else {
+	    g_free(new_sig);
+	    new_sig = NULL;
+	}
+    }
     if(!new_sig) new_sig = g_strdup("");
 
     gtk_text_buffer_get_bounds(buffer, &start, &end);

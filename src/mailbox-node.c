@@ -354,8 +354,13 @@ imap_scan_attach_mailbox(BalsaMailboxNode * mbnode, imap_scan_item * isi)
 {
     LibBalsaMailboxImap *m;
 
-    g_signal_connect(G_OBJECT(mbnode), "show-prop-dialog",
-                     G_CALLBACK(folder_conf_imap_sub_node), NULL);
+    /* If the mailbox was added from the config file, it is already
+     * connected to "show-prop-dialog". */
+    if (!g_signal_has_handler_pending(G_OBJECT(mbnode),
+                                      balsa_mailbox_node_signals
+                                      [SHOW_PROP_DIALOG], 0, FALSE))
+	g_signal_connect(G_OBJECT(mbnode), "show-prop-dialog",
+                         G_CALLBACK(folder_conf_imap_sub_node), NULL);
     if (LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox))
         /* it already has a mailbox */
         return FALSE;

@@ -379,6 +379,9 @@ config_global_load(void)
     balsa_app.show_mblist = gnome_config_get_bool("ShowMailboxList=true");
     balsa_app.show_notebook_tabs = gnome_config_get_bool("ShowTabs=false");
 
+    /* ... alternative layout of main window */
+    balsa_app.alternative_layout = gnome_config_get_bool("AlternativeLayout=false");
+
     /* ... style */
     balsa_app.toolbar_style = d_get_gint("ToolbarStyle", GTK_TOOLBAR_BOTH);
     /* ... Progress Window Dialog */
@@ -566,6 +569,7 @@ gint config_save(void)
     gnome_config_set_bool("ShowTabs", balsa_app.show_notebook_tabs);
     gnome_config_set_int("ToolbarStyle", balsa_app.toolbar_style);
     gnome_config_set_int("ProgressWindow", balsa_app.pwindow_option);
+    gnome_config_set_bool("AlternativeLayout", balsa_app.alternative_layout);
 
     gnome_config_pop_prefix();
 

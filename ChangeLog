@@ -1,3 +1,11 @@
+2000-12-01  Pawel Salek  <pawsa@theochem.kth.se>
+	Lubomir Gelo's <slon@slon.sk> patch for alternative layout.
+	* src/balsa-app.h: add alternative_layout field
+	* src/main-window.c: do the layout manipulation
+	* src/main-window.h: fields for storing panes for layout manipulation
+	* src/pref-manager.c: alternative layout configuration (ALC)
+	* src/save-restore.c: save&restore ALC
+
 2000-11-30  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Lubomir Gelo's <slon@slon.sk> patch for configuring SMTP port.

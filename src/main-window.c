@@ -548,8 +548,6 @@ balsa_window_new()
 {
     BalsaWindow *window;
     GnomeAppBar *appbar;
-    GtkWidget *hpaned;
-    GtkWidget *vpaned;
     GtkWidget *scroll;
 
     /* Call to register custom balsa pixmaps with GNOME_STOCK_PIXMAPS - allows for grey out */
@@ -586,8 +584,8 @@ balsa_window_new()
     gtk_window_set_default_size(GTK_WINDOW(window), balsa_app.mw_width,
 				balsa_app.mw_height);
 
-    vpaned = gtk_vpaned_new();
-    hpaned = gtk_hpaned_new();
+    window->vpaned = gtk_vpaned_new();
+    window->hpaned = gtk_hpaned_new();
     window->notebook = gtk_notebook_new();
     gtk_notebook_set_show_tabs(GTK_NOTEBOOK(window->notebook),
 			       balsa_app.show_notebook_tabs);
@@ -611,8 +609,6 @@ balsa_window_new()
     gtk_container_add(GTK_CONTAINER(scroll), window->preview);
     gtk_widget_show(scroll);
 
-    gnome_app_set_contents(GNOME_APP(window), hpaned);
-
     /* XXX */
     balsa_app.mblist =  BALSA_MBLIST(balsa_mblist_new());
     window->mblist = gtk_scrolled_window_new(
@@ -624,27 +620,37 @@ balsa_window_new()
 				   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     mblist_default_signal_bindings(balsa_app.mblist);
     gtk_widget_show_all(window->mblist);
-    gtk_paned_pack1(GTK_PANED(hpaned), window->mblist, TRUE, TRUE);
-    gtk_paned_pack2(GTK_PANED(hpaned), vpaned, TRUE, TRUE);
+
+    if  (balsa_app.alternative_layout){
+ 	gnome_app_set_contents(GNOME_APP(window), window->vpaned);
+ 	gtk_paned_pack1(GTK_PANED(window->hpaned), window->mblist, TRUE, TRUE);
+ 	gtk_paned_pack2(GTK_PANED(window->hpaned), window->notebook, TRUE, TRUE);
+ 	gtk_paned_pack1(GTK_PANED(window->vpaned), window->hpaned, TRUE, TRUE);
+ 	gtk_paned_pack2(GTK_PANED(window->vpaned), scroll, TRUE, TRUE);
+    } else {
+ 	gnome_app_set_contents(GNOME_APP(window), window->hpaned);
+        gtk_paned_pack1(GTK_PANED(window->hpaned), window->mblist, TRUE, TRUE);
+        gtk_paned_pack2(GTK_PANED(window->hpaned), window->vpaned, TRUE, TRUE);
+ 	gtk_paned_pack1(GTK_PANED(window->vpaned), window->notebook, TRUE, TRUE);
+	gtk_paned_pack2(GTK_PANED(window->vpaned), scroll, TRUE, TRUE);
+    }
+
     /*PKGW: do it this way, without the usizes. */
     if (balsa_app.show_mblist)
 	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
 				       (view_menu[MENU_VIEW_MAILBOX_LIST_POS].widget),
 				       balsa_app.show_mblist);
 
-    gtk_paned_pack1(GTK_PANED(vpaned), window->notebook, TRUE, TRUE);
-    gtk_paned_pack2(GTK_PANED(vpaned), scroll, TRUE, TRUE);
-
     /*PKGW: do it this way, without the usizes. */
     if (balsa_app.previewpane)
-	gtk_paned_set_position(GTK_PANED(vpaned),
+ 	gtk_paned_set_position(GTK_PANED(window->vpaned),
 			       balsa_app.notebook_height);
     else
 	/* Set it to something really high */
-	gtk_paned_set_position(GTK_PANED(vpaned), G_MAXINT);
+  	gtk_paned_set_position(GTK_PANED(window->vpaned), G_MAXINT);
 
-    gtk_widget_show(vpaned);
-    gtk_widget_show(hpaned);
+    gtk_widget_show(window->vpaned);
+    gtk_widget_show(window->hpaned);
     gtk_widget_show(window->notebook);
     gtk_widget_show(window->preview);
 
@@ -1011,7 +1017,12 @@ balsa_window_refresh(BalsaWindow * window)
 
     index = balsa_window_find_current_index(window);
     if (index) {
-	paned = GTK_WIDGET(balsa_app.notebook)->parent;
+
+	if (balsa_app.alternative_layout)
+	    paned = GTK_WIDGET(balsa_app.notebook)->parent->parent;
+	else    
+	    paned = GTK_WIDGET(balsa_app.notebook)->parent;
+	g_assert(paned != NULL);
 
 	if (balsa_app.previewpane) {
 	    balsa_index_redraw_current(BALSA_INDEX(index));
@@ -1857,6 +1868,43 @@ show_mbtabs_cb(GtkWidget * widget, gpointer data)
     balsa_app.show_notebook_tabs = GTK_CHECK_MENU_ITEM(widget)->active;
     gtk_notebook_set_show_tabs(GTK_NOTEBOOK(balsa_app.notebook),
 			       balsa_app.show_notebook_tabs);
+}
+
+void
+balsa_change_window_layout(BalsaWindow *window)
+{
+
+    gtk_widget_ref(window->notebook);
+    gtk_widget_ref(window->vpaned);
+    gtk_widget_ref(window->hpaned);
+ 
+    gtk_container_remove(GTK_CONTAINER(window->notebook->parent), window->notebook);
+    gtk_container_remove(GTK_CONTAINER(window->vpaned->parent), window->vpaned);
+    gtk_container_remove(GTK_CONTAINER(window->hpaned->parent), window->hpaned);
+
+    if (balsa_app.alternative_layout) {
+ 	gnome_app_set_contents(GNOME_APP(window), window->vpaned);
+ 	gtk_paned_pack2(GTK_PANED(window->hpaned), window->notebook, TRUE, TRUE);
+ 	gtk_paned_pack1(GTK_PANED(window->vpaned), window->hpaned, TRUE, TRUE);
+    } else {
+ 	gnome_app_set_contents(GNOME_APP(window), window->hpaned);
+ 	gtk_paned_pack2(GTK_PANED(window->hpaned), window->vpaned, TRUE, TRUE);
+ 	gtk_paned_pack1(GTK_PANED(window->vpaned), window->notebook, TRUE, TRUE);
+    }
+
+    gtk_widget_unref(window->notebook);
+    gtk_widget_unref(window->vpaned);
+    gtk_widget_unref(window->hpaned);
+ 
+    if (balsa_app.show_mblist) {
+	gtk_paned_set_position(GTK_PANED(window->hpaned), balsa_app.mblist_width);
+    } else {
+	gtk_paned_set_position(GTK_PANED(window->hpaned), 0);
+    }
+
+    gtk_widget_show(window->vpaned);
+    gtk_widget_show(window->hpaned);
+
 }
 
 static void

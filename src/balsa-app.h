@@ -224,6 +224,7 @@ extern struct BalsaApplication {
     gchar *selected_headers;
     gboolean show_mblist;
     gboolean show_notebook_tabs;
+    gboolean alternative_layout;
 
     gboolean empty_trash_on_exit;
     gboolean previewpane;

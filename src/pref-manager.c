@@ -57,6 +57,7 @@ typedef struct _PropertyUI {
     GtkWidget *close_mailbox_minutes;
 
     GtkWidget *previewpane;
+    GtkWidget *alternative_layout;
     GtkWidget *view_allheaders;
     GtkWidget *debug;		/* enable/disable debugging */
     GtkWidget *empty_trash;
@@ -285,6 +286,9 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     }
 
     gtk_signal_connect(GTK_OBJECT(pui->previewpane), "toggled",
+		       GTK_SIGNAL_FUNC(properties_modified_cb),
+		       property_box);
+    gtk_signal_connect(GTK_OBJECT(pui->alternative_layout), "toggled",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
     gtk_signal_connect(GTK_OBJECT(pui->debug), "toggled",
@@ -556,6 +560,11 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     
     balsa_app.debug = GTK_TOGGLE_BUTTON(pui->debug)->active;
     balsa_app.previewpane = GTK_TOGGLE_BUTTON(pui->previewpane)->active;
+    balsa_app.alternative_layout = GTK_TOGGLE_BUTTON(pui->alternative_layout)->active;
+    
+//    if (balsa_app.alt_layout_is_active != balsa_app.alternative_layout)
+	balsa_change_window_layout(balsa_app.main_window);
+    
     balsa_app.smtp = GTK_TOGGLE_BUTTON(pui->rb_smtp_server)->active;
     for (i = 0; i < NUM_ENCODING_MODES; i++)
 	if (GTK_TOGGLE_BUTTON(pui->encoding_type[i])->active) {
@@ -771,6 +780,8 @@ set_prefs(void)
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->previewpane),
 				 balsa_app.previewpane);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->alternative_layout),
+				 balsa_app.alternative_layout);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->debug),
 				 balsa_app.debug);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->rb_smtp_server),
@@ -1456,6 +1467,8 @@ create_display_page(gpointer data)
     pui->previewpane = box_start_check(_("use preview pane"), vbox7);
     pui->mblist_show_mb_content_info =	box_start_check(
 	_("Show mailbox statistics in left pane"), vbox7);
+    pui->alternative_layout =	box_start_check(
+	_("Use alternative main window layout"), vbox7);
 
     hbox4 = gtk_hbox_new(TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox2), hbox4, FALSE, FALSE, 0);

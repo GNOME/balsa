@@ -1,3 +1,18 @@
+2003-10-25 10:35  PeterB
+
+	* libbalsa/: mailbox.c, mailbox.h: Implement release_message
+	method.
+	* libbalsa/: mailbox_maildir.c, mailbox_mh.c: Add
+	fetch_message_structure method and move creation of mime_msg to it
+	from get_message; fetch_message_structure chains up to its parent's
+	method; add release_message method, to unref message->mime_msg;
+	make the mailbox's pointer to the mime_message a weak pointer.
+	* libbalsa/: mailbox_local.c, mailbox_local.h: Implement
+	_libbalsa_mailbox_local_get_mime_message, a helper for maildir and
+	mh.
+	* libbalsa/message.c: Use libbalsa_mailbox_release_message(); plug
+	one memory leak.
+
 2003-10-24 08:59  PeterB
 
 	* libbalsa/imap/imap-handle.c: Remove always_has_data field and let

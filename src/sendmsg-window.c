@@ -3246,11 +3246,12 @@ bsmsg2message(BalsaSendmsg * bsmsg)
             message->in_reply_to = g_strdup(bsmsg->orig_message->in_reply_to);
         } 
 
-        if (bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_GROUP || 
-            bsmsg->type == SEND_REPLY_ALL) {
-            message->references = g_list_prepend(
-                message->references, 
-                g_strdup(bsmsg->orig_message->message_id));
+        if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_GROUP || 
+            bsmsg->type == SEND_REPLY_ALL) &&
+            bsmsg->orig_message->message_id) {
+            message->references = 
+                g_list_prepend(message->references, 
+                               g_strdup(bsmsg->orig_message->message_id));
             
             message->in_reply_to =
                 g_strconcat(bsmsg->orig_message->message_id, "; from ",

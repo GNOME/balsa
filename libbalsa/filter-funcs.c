@@ -46,6 +46,8 @@ get_quoted_string(gchar **pstr)
             if(*str == '\\') str++;
             g_string_append_c(res, *str);
         }
+	if(*str == '"')
+	  ++str;
     } else {
         while(*++str && !isspace((int)*str))
             g_string_append_c(res, *str);

@@ -784,7 +784,7 @@ static int libbalsa_smtp_send (MessageQueueItem *first_message, char *server)
 			sprintf(error_msg, _("Could not find address for host %s."), server);
 			MSGSENDTHREAD(error_message, MSGSENDTHREADERROR,error_msg,NULL,NULL,0); 
 #else
-			balsa_warning(_("Error: Could not find address for host %s."), server);
+			libbalsa_information( LIBBALSA_INFORMATION_WARNING, _("Error: Could not find address for host %s."), server);
 #endif
 			return -1;
 		}
@@ -793,7 +793,7 @@ static int libbalsa_smtp_send (MessageQueueItem *first_message, char *server)
 		memcpy ((void *)&sin.sin_addr, (void *)&n, sizeof(n));
 	}
 
-	mutt_message ("Connecting to %s", inet_ntoa (sin.sin_addr));
+	libbalsa_information ( LIBBALSA_INFORMATION_MESAGE, "Connecting to %s", inet_ntoa (sin.sin_addr));
 
 	if (connect (s, (struct sockaddr *) &sin, sizeof (struct sockaddr_in)) == -1) {
 #ifdef BALSA_USE_THREADS

@@ -265,6 +265,10 @@ static void libbalsa_mailbox_pop3_check (LibBalsaMailbox *mailbox)
 
 static void progress_cb ( char *msg, int prog, int tot )
 {
+/* FIXME: We don't update progress in non threaded version?
+ * I can't see how it used to work...
+ */
+#ifdef BALSA_USE_THREADS
 	MailThreadMessage *message;
 
 	message = g_new(MailThreadMessage,1);
@@ -285,4 +289,5 @@ static void progress_cb ( char *msg, int prog, int tot )
 	libbalsa_unlock_mutt();
 	write(mail_thread_pipes[1], (void*)&message, sizeof(void*));
 	libbalsa_lock_mutt();
+#endif
 }

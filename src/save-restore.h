@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -45,6 +45,7 @@ gint config_mailbox_delete(const LibBalsaMailbox * mailbox);
 gint config_mailbox_update(LibBalsaMailbox * mailbox);
 
 gint config_folder_add(BalsaMailboxNode * mbnode, const char *key_arg);
+gint config_folder_delete(const BalsaMailboxNode * mbnode);
 gint config_folder_update(BalsaMailboxNode * mbnode);
 
 void config_address_book_save(LibBalsaAddressBook * ab);

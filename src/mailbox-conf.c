@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -203,8 +203,6 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 	libbalsa_mailbox_local_remove_files(LIBBALSA_MAILBOX_LOCAL(
              mailbox));
 
-    gtk_object_unref(GTK_OBJECT(mailbox));
-
     /* Remove the node from balsa's mailbox list */
     if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
 	balsa_app.inbox_input = g_list_remove(balsa_app.inbox_input, 
@@ -216,12 +214,14 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 	    fprintf(stderr,
 		    _("Oooop! mailbox not found in balsa_app.mailbox "
 		      "nodes?\n"));
+	    return;
 	} else {
 	    mblist_remove_mailbox_node(balsa_app.mblist, mbnode);
 	    g_node_unlink(gnode);
 	    g_node_destroy(gnode); /* this will remove mbnode */
  	}
     }
+    gtk_object_destroy(GTK_OBJECT(mbnode));
 }
 
 static void

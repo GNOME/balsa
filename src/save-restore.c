@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -211,6 +211,19 @@ gint config_mailbox_delete(const LibBalsaMailbox * mailbox)
     g_free(tmp);
     return res;
 }				/* config_mailbox_delete */
+
+gint
+config_folder_delete(const BalsaMailboxNode * mbnode)
+{
+    gchar *tmp;			/* the key in the mailbox section name */
+    gint res;
+    tmp = folder_section_path(mbnode);
+    res = gnome_config_has_section(tmp);
+    gnome_config_clean_section(tmp);
+    gnome_config_sync();
+    g_free(tmp);
+    return res;
+}				/* config_folder_delete */
 
 /* Update the configuration information for the specified mailbox. */
 gint config_mailbox_update(LibBalsaMailbox * mailbox)

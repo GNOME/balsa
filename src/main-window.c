@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -41,8 +41,8 @@
 #include "balsa-index.h"
 #include "balsa-mblist.h"
 #include "balsa-message.h"
+#include "folder-conf.h"
 #include "mailbox-conf.h"
-#include "mailbox-node.h"
 #include "main-window.h"
 #include "main.h"
 #include "message-window.h"
@@ -246,6 +246,12 @@ static GnomeUIInfo file_new_menu[] = {
     GNOMEUIINFO_ITEM_STOCK(N_("Remote IMAP mailbox..."), 
 			   N_("Add a new IMAP mailbox"),
 			   mailbox_conf_add_imap_cb, 
+			   GNOME_STOCK_PIXMAP_ADD),
+    GNOMEUIINFO_SEPARATOR,
+#define MENU_FILE_NEW_IMAP_FOLDER_POS 6
+    GNOMEUIINFO_ITEM_STOCK(N_("Remote IMAP folder..."), 
+			   N_("Add a new IMAP folder"),
+			   folder_conf_add_imap_cb, 
 			   GNOME_STOCK_PIXMAP_ADD),
     GNOMEUIINFO_END
 };

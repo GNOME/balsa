@@ -408,14 +408,14 @@ static void
 mb_conf_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 {
     balsa_mailbox_node_show_prop_dialog(mbnode);
-    /* mailbox_conf_edit (mbnode); */
 }
 
 static void
 mb_del_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 {
-    g_return_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox));
-    mailbox_conf_delete(mbnode);
+    if(mbnode->mailbox)
+	mailbox_conf_delete(mbnode);
+    else folder_conf_delete(mbnode);
 }
 
 /* mb_inbox_cb:
@@ -703,13 +703,18 @@ static GNode* add_imap_entry(GNode*root, const char* fn,
     gchar * parent_name = get_parent_folder_name(fn, delim);
 
     parent = get_parent_by_name(root, parent_name);
+    g_free(parent_name);
+
     g_return_val_if_fail(parent, NULL);
     if(mailbox)
 	mbnode = 
 	    balsa_mailbox_node_new_from_mailbox(LIBBALSA_MAILBOX(mailbox));
     else {
+	const gchar *basename = strrchr(fn, delim);
+	if(!basename) basename = fn;
+	else basename++;
 	mbnode = balsa_mailbox_node_new();
-	mbnode->name = g_strdup(fn);
+	mbnode->name = g_strdup(basename);
     }
     mbnode->dir = g_strdup(fn);
     return g_node_append(parent, g_node_new(mbnode));

@@ -120,6 +120,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     if(mn && mn->subscribed)
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fcw.subscribed), TRUE);
     validate_folder(NULL, &fcw);
+    gtk_widget_grab_focus(fcw.folder_name);
 
     /* FIXME: I don't like this loop. */
     while( (button = gnome_dialog_run(fcw.dialog)) == 2) 
@@ -174,6 +175,55 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 }
 
 void
+folder_conf_delete(BalsaMailboxNode* mbnode)
+{
+    gchar* msg;
+    GtkWidget* ask;
+    GNode* gnode;
+
+    if(!mbnode->config_prefix) {
+	ask = gnome_warning_dialog_parented(
+	    _("This folder is not stored in configuration."
+	      "I do not yet know how to remove it from remote server."),
+	    GTK_WINDOW(balsa_app.main_window));
+	gnome_dialog_run_and_close(GNOME_DIALOG(ask));
+	return;
+    }
+	
+    msg = g_strdup_printf
+	(_("This will remove the folder %s from the list.\n"
+	   "You may use \"New IMAP Folder\" later to add this folder again.\n"
+	   "What would you like to do?"),
+	 mbnode->name);
+    ask = gnome_message_box_new(msg, GNOME_MESSAGE_BOX_QUESTION,
+				_("Remove from list"),
+				_("Cancel"),
+				NULL);
+    g_free(msg);
+    
+    gnome_dialog_set_parent(GNOME_DIALOG(ask), 
+			    GTK_WINDOW(balsa_app.main_window));
+    gtk_window_set_modal(GTK_WINDOW(ask), TRUE);
+
+    if(1 == gnome_dialog_run_and_close(GNOME_DIALOG(ask)))
+	return;
+
+    /* Delete it from the config file and internal nodes */
+    config_folder_delete(mbnode);
+
+    /* Remove the node from balsa's mailbox list */
+    gnode = balsa_find_mbnode(balsa_app.mailbox_nodes, mbnode);
+    if(gnode) {
+	balsa_remove_children_mailbox_nodes(gnode);
+	mblist_remove_mailbox_node(balsa_app.mblist, mbnode);
+	g_node_unlink(gnode);
+	g_node_destroy(gnode);
+	gtk_object_destroy(GTK_OBJECT(mbnode));
+    } else g_warning("folder node %s (%p) not found in hierarchy.\n",
+		     mbnode->name, mbnode);
+}
+
+void
 folder_conf_add_imap_cb(GtkWidget * widget, gpointer data)
 {
     folder_conf_imap_node(NULL);
@@ -188,6 +238,5 @@ folder_conf_edit_imap_cb(GtkWidget * widget, gpointer data)
 void
 folder_conf_delete_cb(GtkWidget * widget, gpointer data)
 {
-    balsa_information(LIBBALSA_INFORMATION_WARNING,
-		      _("Delete this remote IMAP folder requested"));
+    folder_conf_delete(BALSA_MAILBOX_NODE(data));
 }

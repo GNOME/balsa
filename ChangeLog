@@ -1,3 +1,11 @@
+2001-03-06  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/folder-conf.[hc]: IMAP folder deletion support.
+	* src/mailbox-node.c: 
+	* src/save-restore.[hc]: same.
+	* src/mailbox-conf.c: fix #51769.
+	* src/main-window.c: add "New Imap folder" to the File menu.
+	
 2001-03-05  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/main-window.c: update open_mailbox_list on timeout mbox close

@@ -1,3 +1,9 @@
+2004-02-20 12:19  PeterB
+
+	* src/sendmsg-window.c: use accessor function
+	libbalsa_message_find_user_hdr() instead of accessing
+	message->headers->user_hdrs directly.
+
 2004-02-18  Pawel Salek
 
 	* libbalsa/imap-server.c: compare agains a number of certificates.

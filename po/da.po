@@ -446,7 +446,7 @@ msgstr "Du er nødt til at udfylde mappesti-feltet"
 
 #: src/mailbox-conf.c:423
 msgid "You need to fill in the IMAP Server field"
-msgstr "Du er nødt til at udfylde IMAP server feltet" 
+msgstr "Du er nødt til at udfylde IMAP server feltet"
 
 #: src/mailbox-conf.c:427
 msgid "You need to fill in the username field"
@@ -846,7 +846,7 @@ msgstr "Diverse"
 #. Misc page
 #: src/pref-manager.c:193 src/pref-manager.c:760
 msgid "Encoding"
-msgstr ""
+msgstr "Indkodning"
 
 #. reply-to address
 #: src/pref-manager.c:480
@@ -975,7 +975,7 @@ msgstr "_Vedhæft bilag..."
 
 #: src/sendmsg-window.c:101
 msgid "_Postpone"
-msgstr ""
+msgstr "Udsæt"
 
 #: src/sendmsg-window.c:199
 #, c-format

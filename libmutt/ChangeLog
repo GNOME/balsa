@@ -1,3 +1,7 @@
+2002-01-29  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* imap/imap.c: remove UIDVALIDITY debugging output.
+
 2002-01-08  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* rfc822.c: check if an address consists of all three parts:

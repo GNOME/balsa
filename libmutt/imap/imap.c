@@ -610,7 +610,6 @@ int imap_open_mailbox (CONTEXT* ctx)
       /* safe to call on NULL */
       /* skip "OK [PERMANENT" so syntax is the same as FLAGS */
       idata->uid_validity = atoi(pc+15);
-      printf("Got: %s (UIDVALIDITY: %d)\n", pc, idata->uid_validity);
     }
 #endif
   }

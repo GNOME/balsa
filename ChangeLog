@@ -1,3 +1,9 @@
+2000-10-12  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/sendmsg-window.c: fix #27784 (crash on replying a message that
+	has no message-id field). Internationalization fixes from
+	Nerijus Baliunas <nerijus@users.sourceforge.net>
+
 2000-10-11  Matthew Guenther  <guentherm@asme.org>
 
 	* src/Makefile.am: Add link to libltdl on command line to improve

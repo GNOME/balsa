@@ -264,7 +264,8 @@ static void lang_hungarian_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_italian_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_japanese_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_korean_cb(GtkWidget *, BalsaSendmsg *);
-static void lang_baltic_cb(GtkWidget *, BalsaSendmsg *);
+static void lang_latvian_cb(GtkWidget *, BalsaSendmsg *);
+static void lang_lithuanian_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_norwegian_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_polish_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_portugese_cb(GtkWidget *, BalsaSendmsg *);
@@ -275,8 +276,7 @@ static void lang_swedish_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_turkish_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_ukrainian_cb(GtkWidget *, BalsaSendmsg *);
 
-static GnomeUIInfo locale_ah_menu[] = {
-    GNOMEUIINFO_ITEM_NONE(N_("Baltic"), NULL, lang_baltic_cb),
+static GnomeUIInfo locale_aj_menu[] = {
     GNOMEUIINFO_ITEM_NONE(N_("Brazilian"), NULL, lang_brazilian_cb),
     GNOMEUIINFO_ITEM_NONE(N_("Catalan"), NULL, lang_catalan_cb),
     GNOMEUIINFO_ITEM_NONE(N_("Danish"), NULL, lang_danish_cb),
@@ -288,13 +288,15 @@ static GnomeUIInfo locale_ah_menu[] = {
     GNOMEUIINFO_ITEM_NONE(N_("German"), NULL, lang_german_cb),
     GNOMEUIINFO_ITEM_NONE(N_("Greek"), NULL, lang_greek_cb),
     GNOMEUIINFO_ITEM_NONE(N_("Hungarian"), NULL, lang_hungarian_cb),
+    GNOMEUIINFO_ITEM_NONE(N_("Italian"), NULL, lang_italian_cb),
+    GNOMEUIINFO_ITEM_NONE(N_("Japanese"), NULL, lang_japanese_cb),
     GNOMEUIINFO_END
 };
 
-static GnomeUIInfo locale_iz_menu[] = {
-    GNOMEUIINFO_ITEM_NONE(N_("Italian"), NULL, lang_italian_cb),
-    GNOMEUIINFO_ITEM_NONE(N_("Japanese"), NULL, lang_japanese_cb),
+static GnomeUIInfo locale_kz_menu[] = {
     GNOMEUIINFO_ITEM_NONE(N_("Korean"), NULL, lang_korean_cb),
+    GNOMEUIINFO_ITEM_NONE(N_("Latvian"), NULL, lang_latvian_cb),
+    GNOMEUIINFO_ITEM_NONE(N_("Lithuanian"), NULL, lang_lithuanian_cb),
     GNOMEUIINFO_ITEM_NONE(N_("Norwegian"), NULL, lang_norwegian_cb),
     GNOMEUIINFO_ITEM_NONE(N_("Polish"), NULL, lang_polish_cb),
     GNOMEUIINFO_ITEM_NONE(N_("Portugese"), NULL, lang_portugese_cb),
@@ -310,8 +312,8 @@ static GnomeUIInfo locale_iz_menu[] = {
 /* two sections plus one place-holder for the current language.
 */
 static GnomeUIInfo lang_menu[] = {
-    GNOMEUIINFO_SUBTREE(N_("_A-H"), locale_ah_menu),
-    GNOMEUIINFO_SUBTREE(N_("_I-Z"), locale_iz_menu),
+    GNOMEUIINFO_SUBTREE(N_("_A-J"), locale_aj_menu),
+    GNOMEUIINFO_SUBTREE(N_("_K-Z"), locale_kz_menu),
     GNOMEUIINFO_SEPARATOR,
 #define LANG_CURRENT_POS 3
     GNOMEUIINFO_ITEM_NONE(NULL, NULL, NULL),
@@ -375,10 +377,10 @@ struct {
     "en_GB", "ISO-8859-1", N_("English"), FALSE},
 #define LOC_ESTONIAN_POS  6
     {
-    "et_EE", "ISO-8859-1", N_("Estonian"), FALSE},
+    "et_EE", "ISO-8859-15", N_("Estonian"), FALSE},
 #define LOC_FINNISH_POS   7
     {
-    "fi_FI", "ISO-8859-1", N_("Finnish"), FALSE},
+    "fi_FI", "ISO-8859-15", N_("Finnish"), FALSE},
 #define LOC_FRENCH_POS    8
     {
     "fr_FR", "ISO-8859-1", N_("French"), FALSE},
@@ -397,34 +399,37 @@ struct {
 #define LOC_KOREAN_POS    13
     {
     "ko_OK", "euc-kr", N_("Korean"), TRUE},
-#define LOC_BALTIC_POS    14
+#define LOC_LATVIAN_POS    14
     {
-    "lt_LT", "ISO-8859-13", N_("Baltic"), FALSE},
-#define LOC_NORWEGIAN_POS 15
+    "lv_LV", "ISO-8859-13", N_("Latvian"), FALSE},
+#define LOC_LITHUANIAN_POS    15
+    {
+    "lt_LT", "ISO-8859-13", N_("Lithuanian"), FALSE},
+#define LOC_NORWEGIAN_POS 16
     {
     "no_NO", "ISO-8859-1", N_("Norwegian"), FALSE},
-#define LOC_POLISH_POS    16
+#define LOC_POLISH_POS    17
     {
     "pl_PL", "ISO-8859-2", N_("Polish"), FALSE},
-#define LOC_PORTUGESE_POS 17
+#define LOC_PORTUGESE_POS 18
     {
     "pt_PT", "ISO-8859-1", N_("Portugese"), FALSE},
-#define LOC_RUSSIAN_POS   18
+#define LOC_RUSSIAN_POS   19
     {
     "ru_RU", "ISO-8859-5", N_("Russian"), FALSE},
-#define LOC_SLOVAK_POS    19
+#define LOC_SLOVAK_POS    20
     {
     "sl_SI", "ISO-8859-2", N_("Slovak"), FALSE},
-#define LOC_SPANISH_POS   20
+#define LOC_SPANISH_POS   21
     {
     "es_ES", "ISO-8859-1", N_("Spanish"), FALSE},
-#define LOC_SWEDISH_POS   21
+#define LOC_SWEDISH_POS   22
     {
     "sv_SE", "ISO-8859-1", N_("Swedish"), FALSE},
-#define LOC_TURKISH_POS   22
+#define LOC_TURKISH_POS   23
     {
     "tr_TR", "ISO-8859-9", N_("Turkish"), FALSE},
-#define LOC_UKRAINIAN_POS 23
+#define LOC_UKRAINIAN_POS 24
     {
     "uk_UK", "KOI-8-U", N_("Ukrainian"), FALSE}
 };
@@ -1603,20 +1608,19 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 				  g_strdup(list->data));
 	    }
 	}
-	message->references = g_list_prepend(message->references,
-					     g_strdup(bsmsg->
-						      orig_message->message_id));
-
 	footime = localtime(&bsmsg->orig_message->date);
 	strftime(recvtime, sizeof(recvtime),
 		 "%a, %b %d, %Y at %H:%M:%S %z", footime);
 
-	if (bsmsg->orig_message->message_id)
+	if (bsmsg->orig_message->message_id) {
+	  message->references = g_list_prepend(
+	    message->references, g_strdup(bsmsg->orig_message->message_id));
 	    message->in_reply_to =
 		g_strconcat(bsmsg->orig_message->message_id, "; from ",
 			    (gchar *) bsmsg->orig_message->
 			    from->address_list->data, " on ", recvtime,
 			    NULL);
+	}
     }
 
     body = libbalsa_message_body_new(message);
@@ -2197,9 +2201,14 @@ lang_korean_cb(GtkWidget * w, BalsaSendmsg * bsmsg)
     set_locale(w, bsmsg, LOC_KOREAN_POS);
 }
 static void
-lang_baltic_cb(GtkWidget * w, BalsaSendmsg * bsmsg)
+lang_latvian_cb(GtkWidget * w, BalsaSendmsg * bsmsg)
 {
-    set_locale(w, bsmsg, LOC_BALTIC_POS);
+    set_locale(w, bsmsg, LOC_LATVIAN_POS);
+}
+static void
+lang_lithuanian_cb(GtkWidget * w, BalsaSendmsg * bsmsg)
+{
+    set_locale(w, bsmsg, LOC_LITHUANIAN_POS);
 }
 static void
 lang_norwegian_cb(GtkWidget * w, BalsaSendmsg * bsmsg)

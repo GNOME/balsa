@@ -7,6 +7,8 @@
 
 2003-01-16  PeterB
 
+        * src/main.c: Get an exclusive mailbox nodes lock before
+        appending subtrees.
 	* src/: balsa-mblist.c, balsa-mblist.h, mailbox-node.c,
 	mailbox-node.h: Move balsa_mblist_scan_mailbox_node
 	from balsa-mblist.c to mailbox-node.c and rename it as

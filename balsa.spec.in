@@ -36,6 +36,8 @@ BuildRequires:  pspell-devel
 %if %mdk
 BuildRequires:  libgnome-vfs0-devel
 BuildRequires:  libpspell4-devel
+BuildRequires:  libltdl3-devel
+BuildRequires:  libpcre0-devel
 %endif
 
 %description

@@ -1,4 +1,13 @@
-* Balsa-2.0.3 release. Release date 2002-09-15
+* Balsa-2.0.4 release. Release date 2002-12-24
+
+- do not use any deprecated GNOME API.
+- compile against aspell>=0.50 and gnome-2.2
+- do not crash on concurrent access to local mailboxes.
+- finally working help.
+- update titles of compose windows.
+- numerous bug fixes.
+
+* Balsa-2.0.3 release. Release date 2002-10-28
 
 - preference manager adapted to HIG.
 - new translations.

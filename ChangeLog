@@ -1,3 +1,8 @@
+2002-12-24  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in, INSTALL, README, NEWS: release 2.0.4
+	* balsa.spec.in: mandrake-specific build requirements.
+	
 2002-12-23  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* balsa.spec.in: update.

@@ -1,23 +1,25 @@
-Balsa E-Mail Client 1.1.x
+Balsa E-Mail Client 2.0.x
 
-Copyright (C) 1997-2001 Stuart Parmenter and others, see AUTHORS file.
+Copyright (C) 1997-2002 Stuart Parmenter and others, see AUTHORS file.
 
-See 'COPYING' for license information.
+See 'COPYING' for license information.  Please note linking against
+OpenSSL libraries is explicitely allowed.
+
 See 'AUTHORS' for a list of contributors.
 
 Please make sure you have the following things:
 
-	Glib        >= 1.2.1
-	GTK         >= 1.2.1
-	Imlib       >= 1.9.2
-	gnome-libs  >= 1.2.1  (see notes below)
+	Glib        >= 2.0.0
+	GTK         >= 2.0.0
+	gnome-libs  >= 2.0.0  (see notes below)
 	gnome-print >= 0.25
 	libpspell   >= 0.11.2 (and at least one spell check module)
-	libesmtp    >= 0.8.3   http://www.stafford.uklinux.net/libesmtp/
+                              alternatively libapsell >= 0.50
+	libesmtp    >= 0.8.11   http://www.stafford.uklinux.net/libesmtp/
 	
 	If you do not have these, please check:
 
-	http://www.balsa.net/download.html
+	http://balsa.gnome.org/download.html
 
 	for links to these packages. Or try http://www.gnome.org, 
 	http://www.gtk.org, and http://www.enlightenment.org.

@@ -67,7 +67,8 @@ struct _BalsaMailboxNode {
     gchar* dir;      
     int expanded:1; 
     /* mailbox data */
-    enum { SORT_NO=0,  SORT_FROM=3, SORT_SUBJECT=4,SORT_DATE=5 } sort_field;
+    enum { BALSA_SORT_NO=0,     BALSA_SORT_FROM=3,
+	   BALSA_SORT_SUBJECT=4,BALSA_SORT_DATE=5 } sort_field;
     GtkSortType sort_type;
     LibBalsaServer * server; /* Used only by remote; is referenced */
 };

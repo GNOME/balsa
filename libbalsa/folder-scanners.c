@@ -139,8 +139,6 @@ scanner_local_dir(GNode *rnode, const gchar * prefix,
  * --------------------------------------------------------------------- */
 void imap_add_folder (char delim, char *folder, int noselect, int noinferiors,
 		      struct browser_state *state, short isparent);
-int debuglevel;
-FILE *debugfile;
 void
 scanner_imap_dir(GNode *rnode, LibBalsaServer * server, 
 		 const gchar* path, int depth,
@@ -158,7 +156,6 @@ scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     state.mailbox_handler = (void(*)())mailbox_handler;
     state.folder_handler = (void(*)())folder_handler;
     unset_option(OPTIMAPLSUB);
-    debuglevel = 0; debugfile = stderr;
     libbalsa_lock_mutt();
     safe_free((void **)&ImapUser);   ImapUser = safe_strdup(server->user);
     safe_free((void **)&ImapPass);   ImapPass = safe_strdup(server->passwd);

@@ -225,6 +225,8 @@ get_container(LibBalsaMessage * message, GHashTable * id_table)
      *   + Create a new Container object holding this message;
      *   + Index the Container by Message-ID in id_table.
      */
+    /* We'll make sure that we thread off a replied-to message, if there
+     * is one. */
 
     GNode *container;
 
@@ -232,9 +234,22 @@ get_container(LibBalsaMessage * message, GHashTable * id_table)
         return NULL;
 
     container = g_hash_table_lookup(id_table, message->message_id);
-    if (container && !container->data)
-        container->data = message;
-    else {
+    if (container) {
+        LibBalsaMessage *previous_message = container->data;
+        /* If this message has not been replied to, or if the container
+         * is empty, store it in the container. If there was a message
+         * in the container already, swap it with this one, otherwise
+         * set the current one to NULL. */
+        if (!LIBBALSA_MESSAGE_IS_REPLIED(message) || !previous_message) {
+            container->data = message;
+            message = previous_message;
+        }
+    }
+    /* If we already stored the message in a previously empty container,
+     * message is NULL. If either the previous message or the current
+     * one has been replied to, message now points to a replied-to
+     * message. */
+    if (message) {
         container = g_node_new(message);
         g_hash_table_insert(id_table, message->message_id, container);
     }

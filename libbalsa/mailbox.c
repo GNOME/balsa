@@ -308,7 +308,13 @@ mailbox_open_unref (Mailbox * mailbox)
       /* now close the mail stream and expunge deleted
        * messages -- the expunge may not have to be done */
       if (CLIENT_CONTEXT_OPEN (mailbox))
-	CLIENT_CONTEXT (mailbox) = mx_close_mailbox (CLIENT_CONTEXT (mailbox));
+      {
+        /* If it closed we have no context. If it didnt close right
+           don't ask me what to do - AC */
+           
+        if(mx_close_mailbox (CLIENT_CONTEXT (mailbox))==0)
+		CLIENT_CONTEXT (mailbox) = NULL;
+      }
     }
 
   UNLOCK_MAILBOX ();
@@ -321,7 +327,7 @@ mailbox_check_new_messages (Mailbox * mailbox)
   LOCK_MAILBOX_RETURN_VAL (mailbox, FALSE);
   RETURN_VAL_IF_CLIENT_STRAM_CLOSED (mailbox, FALSE);
 
-  mx_check_mailbox (CLIENT_CONTEXT (mailbox));
+  mx_check_mailbox (CLIENT_CONTEXT (mailbox), NULL);
 
   UNLOCK_MAILBOX ();
 

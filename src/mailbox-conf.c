@@ -724,7 +724,7 @@ mailbox_conf_add(MailboxConfWindow *mcw)
     BalsaMailboxNode * mbnode;
     gboolean save_to_config = TRUE;
 
-    mcw->mailbox = gtk_type_new(mcw->mailbox_type);
+    mcw->mailbox = g_object_new(mcw->mailbox_type, NULL);
 
     mbnode = balsa_mailbox_node_new_from_mailbox(mcw->mailbox);
     if ( LIBBALSA_IS_MAILBOX_LOCAL(mcw->mailbox) ) {

@@ -854,8 +854,9 @@ lbml_set_parent(GNode * node, ThreadingInfo * ti)
                 &g_array_index(threading_info, LibBalsaMailboxLocalInfo,
                                msgno - 1);
 
-            if (g_list_find_custom(refs, info->message_id,
-                                   (GCompareFunc) strcmp))
+            if (info->message_id
+                && g_list_find_custom(refs, info->message_id,
+                                      (GCompareFunc) strcmp))
                 break;
         }
         if (!list)

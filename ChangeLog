@@ -1,5 +1,10 @@
 2003-09-09  Carlos Morgado  <chbm chbm.net>
 
+	* libmutt:
+	bye bye libmutt. you served us well
+
+2003-09-09  Carlos Morgado  <chbm chbm.net>
+
 	* src/pref-manager.c (Repository): 
 	* libinit_balsa/helper.c (Repository): 
 	* libinit_balsa/balsa-druid-page-directory.c (Repository): 

@@ -1,26 +1,17 @@
 TODO LIST:
 
-little things:
- * make mailbox-conf pretty
-
-
-later stuff:
 
  * inbox/outbox/trash should be able to be IMAP
     this can be done by editing ~/.balsarc
 
  * fix checking for new mail inside mailboxes.
-     we have a full mail tray and an empty one.  full should be used to show
-     messages with new mail.  the mailbox name should also be in bold.
+     The mailbox name should be in bold.
 
  * digest/undigest mail.
 
  * add mutt keybindings
 
 Nat's ideas:
- * Make it so that clicking on the name of a field in the folder view sorts
-   the folder by that field.
-
  * It is possible to get a context menu off a notebook page/tab thing.
    Make it so that right clicking on a folder tab gives you a context
    menu which gives you the option of closing the folder.

@@ -24,6 +24,7 @@
 #include "balsa-app.h"
 #include "balsa-index.h"
 #include "balsa-message.h"
+#include "filter.h"
 #include "index-child.h"
 #include "mailbox.h"
 #include "misc.h"
@@ -52,21 +53,23 @@ static void show_about_box (void);
 
 
 /* callbacks */
-static void check_new_messages_cb (GtkWidget *);
-static void check_pop3_cb (GtkWidget * widget);
+static void check_new_messages_cb (GtkWidget *, gpointer data);
+static void check_pop3_cb (GtkWidget * widget, gpointer data);
 
-static void new_message_cb (GtkWidget * widget);
-static void replyto_message_cb (GtkWidget * widget);
-static void forward_message_cb (GtkWidget * widget);
+static void new_message_cb (GtkWidget * widget, gpointer data);
+static void replyto_message_cb (GtkWidget * widget, gpointer data);
+static void forward_message_cb (GtkWidget * widget, gpointer data);
 
-static void next_message_cb (GtkWidget * widget);
-static void previous_message_cb (GtkWidget * widget);
+static void next_message_cb (GtkWidget * widget, gpointer data);
+static void previous_message_cb (GtkWidget * widget, gpointer data);
 
-static void delete_message_cb (GtkWidget * widget);
-static void undelete_message_cb (GtkWidget * widget);
+static void delete_message_cb (GtkWidget * widget, gpointer data);
+static void undelete_message_cb (GtkWidget * widget, gpointer data);
 
-static void mblist_window_cb (GtkWidget * widget);
-static void mailbox_close_child (GtkWidget * widget);
+static void filter_dlg_cb (GtkWidget * widget, gpointer data);
+
+static void mblist_window_cb (GtkWidget * widget, gpointer data);
+static void mailbox_close_child (GtkWidget * widget, gpointer data);
 
 static void about_box_destroy_cb (void);
 
@@ -133,7 +136,7 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
   GtkWidget *menubar;
   GtkWidget *w;
   GtkWidget *menu;
-  GtkWidget *menu_items[14];
+  GtkWidget *menu_items[15];
   GtkAccelGroup *accel;
 
 
@@ -312,6 +315,17 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
   /* Settings Menu */
   menu = gtk_menu_new ();
 
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_PROP, _ ("Filters..."));
+  gtk_widget_show (w);
+
+  gtk_signal_connect (GTK_OBJECT (w),
+		      "activate",
+		      GTK_SIGNAL_FUNC (filter_dlg_cb),
+		      NULL);
+
+  gtk_menu_append (GTK_MENU (menu), w);
+  menu_items[i++] = w;
+
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_PROP, _ ("Preferences..."));
   gtk_widget_show (w);
 
@@ -322,18 +336,6 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
 
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
-/*
-   w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Mailbox Manager..."));
-   gtk_widget_show (w);
-
-   gtk_signal_connect (GTK_OBJECT (w),
-   "activate",
-   (GtkSignalFunc) open_mailbox_manager,
-   NULL);
-
-   gtk_menu_append (GTK_MENU (menu), w);
-   menu_items[i++] = w;
- */
 
   w = gtk_menu_item_new_with_label (_ ("Settings"));
   gtk_widget_show (w);
@@ -522,7 +524,7 @@ show_about_box (void)
  */
 
 static void
-check_new_messages_cb (GtkWidget * widget)
+check_new_messages_cb (GtkWidget * widget, gpointer data)
 {
   if (!balsa_app.current_index_child)
     return;
@@ -531,13 +533,13 @@ check_new_messages_cb (GtkWidget * widget)
 }
 
 static void
-check_pop3_cb (GtkWidget * widget)
+check_pop3_cb (GtkWidget * widget, gpointer data)
 {
   check_all_pop3_hosts (balsa_app.inbox);
 }
 
 static void
-new_message_cb (GtkWidget * widget)
+new_message_cb (GtkWidget * widget, gpointer data)
 {
   g_return_if_fail (widget != NULL);
 
@@ -546,7 +548,7 @@ new_message_cb (GtkWidget * widget)
 
 
 static void
-replyto_message_cb (GtkWidget * widget)
+replyto_message_cb (GtkWidget * widget, gpointer data)
 {
   g_return_if_fail (widget != NULL);
 
@@ -558,7 +560,7 @@ replyto_message_cb (GtkWidget * widget)
 
 
 static void
-forward_message_cb (GtkWidget * widget)
+forward_message_cb (GtkWidget * widget, gpointer data)
 {
   g_return_if_fail (widget != NULL);
 
@@ -570,7 +572,7 @@ forward_message_cb (GtkWidget * widget)
 
 
 static void
-next_message_cb (GtkWidget * widget)
+next_message_cb (GtkWidget * widget, gpointer data)
 {
   g_return_if_fail (widget != NULL);
 
@@ -582,7 +584,7 @@ next_message_cb (GtkWidget * widget)
 
 
 static void
-previous_message_cb (GtkWidget * widget)
+previous_message_cb (GtkWidget * widget, gpointer data)
 {
   g_return_if_fail (widget != NULL);
 
@@ -594,7 +596,7 @@ previous_message_cb (GtkWidget * widget)
 
 
 static void
-delete_message_cb (GtkWidget * widget)
+delete_message_cb (GtkWidget * widget, gpointer data)
 {
   GtkCList *clist;
   GList *list;
@@ -617,7 +619,7 @@ delete_message_cb (GtkWidget * widget)
 
 
 static void
-undelete_message_cb (GtkWidget * widget)
+undelete_message_cb (GtkWidget * widget, gpointer data)
 {
   GtkCList *clist;
   GList *list;
@@ -638,13 +640,19 @@ undelete_message_cb (GtkWidget * widget)
 }
 
 static void
-mblist_window_cb (GtkWidget * widget)
+filter_dlg_cb (GtkWidget * widget, gpointer data)
+{
+  filter_edit_dialog (NULL);
+}
+
+static void
+mblist_window_cb (GtkWidget * widget, gpointer data)
 {
   mblist_open_window (mdi);
 }
 
 static void
-mailbox_close_child (GtkWidget * widget)
+mailbox_close_child (GtkWidget * widget, gpointer data)
 {
   if (balsa_app.current_index_child)
     gnome_mdi_remove_child (mdi, GNOME_MDI_CHILD (balsa_app.current_index_child),

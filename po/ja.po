@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 1.3.6\n"
 "POT-Creation-Date: 2002-04-26 20:37+0900\n"
-"PO-Revision-Date: 2002-04-26 20:42+0900\n"
+"PO-Revision-Date: 2002-04-26 23:42+0900\n"
 "Last-Translator: Takeshi Aihana <aihana@gnome.gr.jp>\n"
 "Language-Team: Japan GNOME Users Group <translation@gnome.gr.jp>\n"
 "MIME-Version: 1.0\n"
@@ -654,8 +654,8 @@ msgid ""
 "You've successfully set up Balsa. Have fun!\n"
 "   -- The Balsa development team"
 msgstr ""
-"バルサのセットアップが無事終了しました。ではどうぞ!\n"
-"   -- バルサ・開発チーム"
+"Balsa のセットアップが無事終了しました。ではどうぞ！\n"
+"   -- Balsa 開発チーム"
 
 #: libinit_balsa/balsa-druid-page-finish.c:82
 msgid "GnomeCard Address Book"
@@ -691,7 +691,7 @@ msgstr "ローカルメール問題"
 
 #: libinit_balsa/balsa-druid-page-welcome.c:37
 msgid "Welcome to Balsa!"
-msgstr "バルサへようこそ！"
+msgstr "Balsa へようこそ！"
 
 #: libinit_balsa/balsa-druid-page-welcome.c:40
 msgid ""
@@ -703,12 +703,12 @@ msgid ""
 "main window for more information about contacting the authors or\n"
 "reporting bugs."
 msgstr ""
-"バルサを初めて起動しているようです。\n"
-"次のステップではいくつかの簡単な質問に答えながらバルサの設定をします。\n"
+"Balsa を初めて起動しているようです。\n"
+"次のステップでは、いくつかの簡単な質問に答えながら Balsa の設定を行います。\n"
 "設定はあとからいつでも変更することができます。\n"
 "ファイルやディレクトリを作成する必要があるときは自動的に行われます。\n"
 "作者たちとの連絡やバグの報告の仕方については、\n"
-"バルサのメインウィンドウにある情報ダイアログを\n"
+"Balsa のメインウィンドウにある情報ダイアログを\n"
 "チェックしてください。"
 
 #: libinit_balsa/balsa-initdruid.c:71
@@ -716,7 +716,7 @@ msgid ""
 "This will exit Balsa.\n"
 "Do you really want to do this?"
 msgstr ""
-"バルサを終了します。\n"
+"Balsa を終了します。\n"
 "本当に終了しても宜しいですか？"
 
 #: libinit_balsa/helper.c:79
@@ -745,7 +745,7 @@ msgstr "パス名 \"%s\" はディレクトリではありませんでした。"
 
 #: libinit_balsa/init_balsa.c:35
 msgid "Configure Balsa"
-msgstr "バルサの設定"
+msgstr "Balsa の設定"
 
 #: libmutt/attach.c:111 libmutt/attach.c:238 libmutt/attach.c:432
 #: libmutt/attach.c:918
@@ -3332,7 +3332,7 @@ msgstr "JWZ"
 
 #: src/pref-manager.c:281
 msgid "Balsa Preferences"
-msgstr "バルサの設定"
+msgstr "Balsa の設定"
 
 #: src/pref-manager.c:292
 msgid "Mail Servers"

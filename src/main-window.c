@@ -1436,6 +1436,7 @@ balsa_window_real_open_mbnode(BalsaWindow * window, BalsaMailboxNode * mbnode)
    this function overloads libbalsa_mailbox_close_mailbox.
 
 */
+#define BALSA_INDEX_GRAB_FOCUS "balsa-index-grab-focus"
 static void
 balsa_window_real_close_mbnode(BalsaWindow * window,
                                BalsaMailboxNode * mbnode)
@@ -1469,6 +1470,9 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
             enable_message_menus(NULL);
             enable_edit_menus(NULL);
             window->current_index = NULL;
+
+            /* Just in case... */
+            g_object_set_data(G_OBJECT(window), BALSA_INDEX_GRAB_FOCUS, NULL);
         }
     }
 
@@ -3031,7 +3035,6 @@ mw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc)
 /* When page is switched we change the preview window and the selected 
    mailbox in the mailbox tree.
  */
-#define BALSA_INDEX_GRAB_FOCUS "balsa-index-grab-focus"
 static void
 notebook_switch_page_cb(GtkWidget * notebook,
                         GtkNotebookPage * notebookpage, guint page_num)

@@ -1,5 +1,6 @@
-2004-10-15 07:05  PeterB
+2004-10-15 07:21  PeterB
 
+	* src/balsa-message.c: test for missing body_list.
 	* src/main-window.c: allow remote trashbox to be emptied.
 
 2004-10-14 22:34  PeterB

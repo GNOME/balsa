@@ -1,5 +1,6 @@
-2004-01-14 17:24  PeterB
+2004-01-14 17:53  PeterB
 
+	* src/balsa-bonobo.c: use new api for add_attachment.
 	* src/: main.c, sendmsg-window.c, sendmsg-window.h: fix GNOME
 	bugzilla #126379: show attachments when invoked with `-a' (Mike
 	Petullo <mike@flyn.org>).

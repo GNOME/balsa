@@ -1,5 +1,6 @@
 2003-01-18  PeterB
 
+	* src/folder-conf.c: Non-modal IMAP folder dialog.
 	* src/balsa-index.c: Use gtk_tree_model_get_iter_first to test for
 	any messages, instead of gtk_tree_model_iter_n_children, which
 	could be time-consuming (Manu).

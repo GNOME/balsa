@@ -46,7 +46,7 @@ static GtkWidget *build_option_menu(option_list options[],
             options[i].text);
         gtk_object_set_data(GTK_OBJECT(options[i].widget),
                             "value",
-                            GINT_TO_POINTER(options[1].value));
+                            GINT_TO_POINTER(options[1].text));
         group = gtk_radio_menu_item_group(
             GTK_RADIO_MENU_ITEM(options[i].widget));
         gtk_menu_append(GTK_MENU(menu), options[i].widget);
@@ -54,7 +54,7 @@ static GtkWidget *build_option_menu(option_list options[],
             gtk_signal_connect(GTK_OBJECT(options[i].widget),
                                "toggled",
                                func,
-                               GINT_TO_POINTER(options[i].value));
+                               GINT_TO_POINTER(options[i].text));
         gtk_widget_show(options[i].widget);
     }
 

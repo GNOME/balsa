@@ -1,3 +1,15 @@
+2000-07-03  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/{contact.h,mailbox.c}(contact_store): pass address book 
+	file name.
+	* src/address-book.c: allow for configurable address book file,
+	import data in two modes.
+	* src/balsa-app.{c,h}: address book configuration: ab_location and
+	ab_dist_list_mode.
+	* src/balsa-index-page.c:allow for configurable address book file,
+	* src/pref-manager.c: configurable ab_location
+	* src/save-restore.c: saving and restoring address book settings.
+	
 2000-06-30  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox.c: use updated mutt API. 

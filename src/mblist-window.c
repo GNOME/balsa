@@ -249,12 +249,20 @@ mailbox_select_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row, Gd
 
   if (event && event->button == 1 && event->type == GDK_2BUTTON_PRESS)
     {
+      GdkCursor *cursor;
+      cursor = gdk_cursor_new (GDK_WATCH);
+      gdk_window_set_cursor (mblw->window->window, cursor);
+      gdk_cursor_destroy (cursor);
+
       index_child = index_child_new (mblw->mdi, mailbox);
       if (index_child)
 	{
 	  gnome_mdi_add_child (mblw->mdi, GNOME_MDI_CHILD (index_child));
 	  gnome_mdi_add_view (mblw->mdi, GNOME_MDI_CHILD (index_child));
 	}
+
+      gdk_window_set_cursor (mblw->window->window, NULL);
+
       main_window_set_cursor (-1);
 
       if (!strcmp (mailbox->name, "Inbox") ||

@@ -187,7 +187,7 @@ fr_add_pressed(BalsaFilterRunDialog* p)
             gtk_clist_get_row_data(p->available_filters,
                                    GPOINTER_TO_INT(lst->data));
 	if (fil->action==FILTER_RUN || fil->action==FILTER_TRASH || 
-            strcmp(fil->action_string,p->mbox->name)!=0) {
+            strcmp(fil->action_string,p->mbox->url)!=0) {
 	    /* Ok we can add the filter to this mailbox, there is no recursion problem */
 	    LibBalsaMailboxFilter* mf = g_new(LibBalsaMailboxFilter,1);
 	    mf->actual_filter=fil;

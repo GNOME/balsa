@@ -101,7 +101,7 @@ libbalsa_condition_new(void)
     newc->condition_not = FALSE;
     newc->match.string = NULL;
     newc->user_header = NULL;
-    filter_errno=FILTER_NOERR;
+    filter_errno = FILTER_NOERR;
 
     return newc;
 }                      /* end libbalsa_condition_new() */
@@ -112,9 +112,9 @@ libbalsa_condition_regex_new(void)
     LibBalsaConditionRegex * new_reg;
 
     new_reg = g_new(LibBalsaConditionRegex,1);
-    new_reg->string=NULL;
-    new_reg->compiled=NULL;
-    filter_errno=FILTER_NOERR;
+    new_reg->string = NULL;
+    new_reg->compiled = NULL;
+    filter_errno = FILTER_NOERR;
 
     return new_reg;
 }
@@ -135,18 +135,19 @@ libbalsa_condition_clone(LibBalsaCondition* cnd)
     new_cnd->condition_not = cnd->condition_not;
     new_cnd->match_fields  = cnd->match_fields;
     new_cnd->type          = cnd->type;
-    new_cnd->user_header   = g_strdup(cnd->user_header);
+    if (cnd->user_header)
+	new_cnd->user_header = g_strdup(cnd->user_header);
     switch (new_cnd->type) {
     case CONDITION_SIMPLE:
-        new_cnd->match.string=g_strdup(cnd->match.string);
+        new_cnd->match.string = g_strdup(cnd->match.string);
         break;
     case CONDITION_REGEX:
-        for (regex=cnd->match.regexs;regex && (filter_errno==FILTER_NOERR);
-             regex=g_slist_next(regex)) {
+        for (regex = cnd->match.regexs;regex && (filter_errno==FILTER_NOERR);
+             regex = g_slist_next(regex)) {
             new_reg = libbalsa_condition_regex_new();
             new_reg->string = 
                 g_strdup(((LibBalsaConditionRegex*)regex->data)->string);
-            new_cnd->match.regexs = 
+            new_cnd->match.regexs =
                 g_slist_prepend(new_cnd->match.regexs, new_reg);
         }
         new_cnd->match.regexs = g_slist_reverse(new_cnd->match.regexs);
@@ -156,7 +157,7 @@ libbalsa_condition_clone(LibBalsaCondition* cnd)
         new_cnd->match.interval.date_high = cnd->match.interval.date_high;
         break;
     case CONDITION_FLAG:
-        new_cnd->match.flags=cnd->match.flags;
+        new_cnd->match.flags = cnd->match.flags;
     case CONDITION_NONE:
         /* to avoid warnings */
         break;
@@ -167,7 +168,7 @@ libbalsa_condition_clone(LibBalsaCondition* cnd)
     return new_cnd;
 }
 
-/* BIG FIXME : result of certain function of regex compilation are useless
+/* FIXME : result of certain function of regex compilation are useless
  * and we should have a way to tell which regexs we were unable to compile
  * that's for later
  */
@@ -217,9 +218,9 @@ libbalsa_condition_compile_regexs(LibBalsaCondition* cond)
     GSList * regex;
 
     if (cond->type==CONDITION_REGEX)
-	for(regex=cond->match.regexs;
+	for(regex = cond->match.regexs;
             regex && condition_regcomp((LibBalsaConditionRegex*)regex->data);
-            regex=g_slist_next(regex));
+            regex = g_slist_next(regex));
 }                       /* end of condition_compile_regexs */
 
 /* Filters */
@@ -235,8 +236,10 @@ static void
 filter_condition_validity(LibBalsaFilter* fil, LibBalsaCondition* cond)
 {
     /* Test validity of condition */
-    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_US_HEAD) && (!cond->user_header || cond->user_header[0]=='\0'))
+    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_US_HEAD) && (!cond->user_header || cond->user_header[0]=='\0')) {
 	FILTER_CLRFLAG(fil,FILTER_VALID);
+	return;
+    }
     switch (cond->type) {
     case CONDITION_SIMPLE:
 	if (!cond->match.string)
@@ -257,15 +260,15 @@ filter_condition_validity(LibBalsaFilter* fil, LibBalsaCondition* cond)
 void
 libbalsa_filter_append_condition(LibBalsaFilter* fil, LibBalsaCondition* cond)
 {
-    filter_condition_validity(fil,cond);
-    fil->conditions=g_slist_append(fil->conditions,cond);
+    filter_condition_validity(fil, cond);
+    fil->conditions = g_slist_append(fil->conditions, cond);
 }
 
 void
 libbalsa_filter_prepend_condition(LibBalsaFilter* fil, LibBalsaCondition* cond)
 {
-    filter_condition_validity(fil,cond);
-    fil->conditions=g_slist_prepend(fil->conditions,cond);
+    filter_condition_validity(fil, cond);
+    fil->conditions = g_slist_prepend(fil->conditions, cond);
 }
 
 /*
@@ -286,7 +289,8 @@ libbalsa_filter_compile_regexs(LibBalsaFilter* fil)
 
     if (fil->conditions) {
 	GSList * lst;
-	for (lst=fil->conditions;lst && filter_errno==FILTER_NOERR;lst=g_slist_next(lst))
+	for (lst = fil->conditions;lst && filter_errno==FILTER_NOERR;
+	     lst = g_slist_next(lst))
 	    libbalsa_condition_compile_regexs((LibBalsaCondition*) lst->data);
 	if (filter_errno != FILTER_NOERR) {
 	    gchar * errorstring =
@@ -366,7 +370,7 @@ libbalsa_filter_new(void)
 
     newfil = g_new(LibBalsaFilter,1);
 
-    newfil->name=NULL;
+    newfil->name = NULL;
     newfil->flags = FILTER_EMPTY;    /* In particular filter is INVALID */
     newfil->conditions = NULL;
     newfil->sound = NULL;
@@ -375,48 +379,48 @@ libbalsa_filter_new(void)
     newfil->action_string = NULL;
     newfil->matching_messages=NULL;
 
-    filter_errno=FILTER_NOERR;
-    return (newfil);
+    filter_errno = FILTER_NOERR;
+    return newfil;
 }				/* end filter_new() */
 
 static GString*
 match_field_decode(LibBalsaCondition* cnd,GString * buffer,gchar * str_format)
 {
-    GString * str=g_string_new("[");
-    gboolean coma=FALSE;
+    GString * str = g_string_new("[");
+    gboolean coma = FALSE;
 
     /* FIXME : what to do with body match ? */
 
-    if (CONDITION_CHKMATCH(cnd,CONDITION_MATCH_TO)) {
-	str=g_string_append(str,"\"To\"");
-	coma=TRUE;
+    if (CONDITION_CHKMATCH(cnd, CONDITION_MATCH_TO)) {
+	str = g_string_append(str,"\"To\"");
+	coma = TRUE;
     }
-    if (CONDITION_CHKMATCH(cnd,CONDITION_MATCH_FROM)) {
-	str=g_string_append(str,coma ? ",\"From\"" : "\"From\"");
-	coma=TRUE;
+    if (CONDITION_CHKMATCH(cnd, CONDITION_MATCH_FROM)) {
+	str = g_string_append(str, coma ? ",\"From\"" : "\"From\"");
+	coma = TRUE;
     }
-    if (CONDITION_CHKMATCH(cnd,CONDITION_MATCH_CC)) {
-	str=g_string_append(str,coma ? ",\"Cc\"" : "\"Cc\"");
-	coma=TRUE;
+    if (CONDITION_CHKMATCH(cnd, CONDITION_MATCH_CC)) {
+	str = g_string_append(str, coma ? ",\"Cc\"" : "\"Cc\"");
+	coma = TRUE;
     }
-    if (CONDITION_CHKMATCH(cnd,CONDITION_MATCH_SUBJECT)) {
-	str=g_string_append(str,coma ? ",\"Subject\"" : "\"Subject\"");
-	coma=TRUE;
+    if (CONDITION_CHKMATCH(cnd, CONDITION_MATCH_SUBJECT)) {
+	str = g_string_append(str, coma ? ",\"Subject\"" : "\"Subject\"");
+	coma = TRUE;
     }
-    if (CONDITION_CHKMATCH(cnd,CONDITION_MATCH_US_HEAD) && cnd->user_header) {
+    if (CONDITION_CHKMATCH(cnd, CONDITION_MATCH_US_HEAD) && cnd->user_header) {
 	if (coma)
-	    str=g_string_append_c(str,',');
-	str=g_string_append_c(str,'\"');
-	str=g_string_append(str,cnd->user_header);
-	str=g_string_append_c(str,'\"');
+	    str = g_string_append_c(str, ',');
+	str = g_string_append_c(str, '\"');
+	str = g_string_append(str, cnd->user_header);
+	str = g_string_append_c(str, '\"');
     }
-    g_string_append(str,"] ");
+    g_string_append(str, "] ");
     if (str->len>3) {
-	gchar * temp=g_strdup_printf(str_format,"header",str->str);
-	buffer=g_string_append(buffer,temp);
+	gchar * temp = g_strdup_printf(str_format, "header", str->str);
+	buffer = g_string_append(buffer,temp);
 	g_free(temp);
     }
-    g_string_free(str,TRUE);
+    g_string_free(str, TRUE);
     return buffer;
 }
 
@@ -428,40 +432,40 @@ export_condition(LibBalsaCondition* cnd, GString * buffer)
     gboolean parent;
 
     if (cnd->condition_not)
-	buffer=g_string_append(buffer,"not ");
+	buffer = g_string_append(buffer,"not ");
 
     switch (cnd->type) {
     case CONDITION_SIMPLE:
-	str=g_strconcat("%s :contains %s ","\"",cnd->match.string,"\"",NULL);
-	buffer=match_field_decode(cnd,buffer,str);
+	str = g_strconcat("%s :contains %s ", "\"", cnd->match.string, "\"", NULL);
+	buffer = match_field_decode(cnd,buffer,str);
 	g_free(str);
 	break;
     case CONDITION_REGEX:
 	if (cnd->match.regexs->next) {
-	    buffer=g_string_append(buffer,"ANYOF(");
-	    parent=TRUE;
+	    buffer = g_string_append(buffer,"ANYOF(");
+	    parent = TRUE;
 	}
-	else parent=FALSE;
-	for (lst=cnd->match.regexs;lst;) {
+	else parent = FALSE;
+	for (lst = cnd->match.regexs;lst;) {
 	    /* This is not in RFC 3028, consider it as an extension :) */
-	    str=g_strconcat("%s :regex %s ",
-                            ((LibBalsaConditionRegex*)lst->data)->string,NULL);
-	    buffer=match_field_decode(cnd, buffer, str);
+	    str = g_strconcat("%s :regex %s ",
+			      ((LibBalsaConditionRegex*)lst->data)->string, NULL);
+	    buffer = match_field_decode(cnd, buffer, str);
 	    g_free(str);
-	    lst=g_slist_next(lst);
+	    lst = g_slist_next(lst);
 	    if (lst)
-		buffer=g_string_append_c(buffer,',');
+		buffer = g_string_append_c(buffer, ',');
 	}
-	if (parent) buffer = g_string_append_c(buffer,')');
+	if (parent) buffer = g_string_append_c(buffer, ')');
 	break;
     case CONDITION_FLAG:
 	/* FIXME */
-	buffer=g_string_append(buffer,"TRUE");
+	buffer = g_string_append(buffer, "TRUE");
     case CONDITION_DATE:
 	/*FIXME */
     case CONDITION_NONE:
 	/* Should not occur */
-	buffer=g_string_append(buffer,"TRUE");
+	buffer = g_string_append(buffer, "TRUE");
     }
     return buffer;
 }
@@ -476,50 +480,52 @@ libbalsa_filter_export_sieve(LibBalsaFilter* fil, gchar* filename)
     gchar * temp;
     gboolean parent;
 
-    fp=fopen(filename,"w");
+    fp = fopen(filename,"w");
     if (!fp) return FALSE;
-    buffer=g_string_new("# Sieve script automatically generated by Balsa (Exporting a Balsa filter)\n");
+    buffer =
+	g_string_new("# Sieve script automatically generated by Balsa"
+		     " (Exporting a Balsa filter)\n");
     if (fil->conditions) {
-	buffer=g_string_append(buffer,"IF ");
+	buffer = g_string_append(buffer, "IF ");
 	if (fil->conditions->next) {
 	    if (fil->conditions_op==FILTER_OP_OR)
-		buffer=g_string_append(buffer,"ANYOF(");    
-	    else buffer=g_string_append(buffer,"ALLOF(");
-	    parent=TRUE;
+		buffer = g_string_append(buffer, "ANYOF(");    
+	    else buffer = g_string_append(buffer, "ALLOF(");
+	    parent = TRUE;
 	}
-	else parent=FALSE;
-	for (conds=fil->conditions;conds;) {
-	    LibBalsaCondition* cnd=(LibBalsaCondition*)conds->data;
-	    buffer=export_condition(cnd,buffer);
-	    conds=g_slist_next(conds);
+	else parent = FALSE;
+	for (conds = fil->conditions;conds;) {
+	    LibBalsaCondition* cnd = (LibBalsaCondition*)conds->data;
+	    buffer = export_condition(cnd, buffer);
+	    conds = g_slist_next(conds);
 	    if (conds)
-		buffer=g_string_append(buffer,",\n");
+		buffer = g_string_append(buffer, ",\n");
 	}
 	if (parent) 
-	    buffer=g_string_append(buffer,")\n{\n");
+	    buffer = g_string_append(buffer, ")\n{\n");
 	else
-	    buffer=g_string_append(buffer,"\n{\n");
+	    buffer = g_string_append(buffer,"\n{\n");
 	switch (fil->action) {
 	case FILTER_COPY:
 	    /* FIXME : I translate COPY to a keep;fileinto sequence, don't know if it's OK */
-	    buffer=g_string_append(buffer,"keep;\n");
+	    buffer = g_string_append(buffer, "keep;\n");
 	case FILTER_MOVE:
-	    temp=g_strconcat("fileinto \"",fil->action_string,"\";\n",NULL);
-	    buffer=g_string_append(buffer,temp);
+	    temp = g_strconcat("fileinto \"", fil->action_string, "\";\n", NULL);
+	    buffer = g_string_append(buffer, temp);
 	    g_free(temp);
 	    break;
 	case FILTER_TRASH:
-	    buffer=g_string_append(buffer,"discard;\n");
+	    buffer = g_string_append(buffer, "discard;\n");
 	    break;
 	    /* FIXME how to code other actions */
         case FILTER_NOTHING: break;
         case FILTER_PRINT:   break;
         case FILTER_RUN:     break;
 	}
-	buffer=g_string_append(buffer,"}\n");
+	buffer = g_string_append(buffer, "}\n");
     }
-    nb=fwrite(buffer->str,buffer->len,1,fp);
-    g_string_free(buffer,TRUE);
-    if (fclose(fp)!=0) nb=0;
+    nb = fwrite(buffer->str, buffer->len, 1, fp);
+    g_string_free(buffer, TRUE);
+    if (fclose(fp)!=0) nb = 0;
     return nb==1 ? TRUE : FALSE;
 }             /* end of filter_export_sieve */

@@ -85,5 +85,5 @@ filter_perror(const gchar * s)
     gchar *error_string;
 
     error_string = filter_strerror(filter_errno);
-    g_warning("%s: %s\n", s,error_string);
+    g_warning("%s: %s\n", s, error_string);
 }				/* end filter_perror */

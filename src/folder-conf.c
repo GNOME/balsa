@@ -313,6 +313,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
                               GTK_SIGNAL_FUNC(validate_folder),
                               fcw, 1, s ? s->host : default_server,
 			      label);
+    fcw->bsc.default_ports = IMAP_DEFAULT_PORTS;
     g_free(default_server);
 
     label= create_label(_("Use_r name:"), table, 3);

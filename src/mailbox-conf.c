@@ -156,9 +156,15 @@ bsc_ssl_toggled_cb(GtkWidget * widget, BalsaServerConf * bsc)
     gtk_widget_set_sensitive(bsc->tls_option, newstate);
 
     host = gtk_entry_get_text(GTK_ENTRY(bsc->server));
-    if ((colon = strchr(host, ':')) != NULL)
-        gtk_editable_delete_text(GTK_EDITABLE(bsc->server), colon - host,
-                                 -1);
+    if ((colon = strchr(host, ':')) != NULL) {
+	/* A port was specified... */
+	gchar *port = g_ascii_strdown(colon + 1, -1);
+        if (strstr(bsc->default_ports, port) != NULL)
+	    /* and it is one of the default ports, so strip it. */
+	    gtk_editable_delete_text(GTK_EDITABLE(bsc->server),
+                                     colon - host, -1);
+	g_free(port);
+    }
 }
 
 GtkWidget*
@@ -1056,6 +1062,7 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
     mcw->mb_data.pop3.bsc.server = create_entry(mcw->window, table,
 				     GTK_SIGNAL_FUNC(check_for_blank_fields),
 				     mcw, 1, "localhost", label);
+    mcw->mb_data.pop3.bsc.default_ports = POP3_DEFAULT_PORTS;
 
 
     /* username  */
@@ -1148,6 +1155,7 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
 	create_entry(mcw->window, table,
 		     GTK_SIGNAL_FUNC(check_for_blank_fields),
 		     mcw, row, "localhost", label);
+    mcw->mb_data.imap.bsc.default_ports = IMAP_DEFAULT_PORTS;
 
     /* username  */
     label = create_label(_("_Username:"), table, ++row);

@@ -52,8 +52,11 @@ typedef struct {
     GtkTable  *table;      /* internal */
     GtkWidget *tls_option; /* internal */
     GtkWidget *server;     /* internal */
+    const gchar *default_ports;
     unsigned   used_rows;  /* internal */
 } BalsaServerConf;
+#define IMAP_DEFAULT_PORTS "143 993 imap imaps"
+#define POP3_DEFAULT_PORTS "110 995 pop3 pop3s"
 
 GtkWidget* balsa_server_conf_get_advanced_widget(BalsaServerConf *bsc,
                                                  LibBalsaServer *s,

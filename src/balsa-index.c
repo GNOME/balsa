@@ -106,6 +106,9 @@ static void bndx_column_resize(GtkWidget * widget,
 static void bndx_tree_expand_cb(GtkTreeView * tree_view,
                                 GtkTreeIter * iter, GtkTreePath * path,
                                 gpointer user_data);
+static void bndx_tree_collapse_cb(GtkTreeView * tree_view,
+                                  GtkTreeIter * iter, GtkTreePath * path,
+                                  gpointer user_data);
 
 /* formerly balsa-index-page stuff */
 enum {
@@ -421,6 +424,9 @@ bndx_instance_init(BalsaIndex * index)
     index->row_expanded_id =
         g_signal_connect_after(tree_view, "row-expanded",
                                G_CALLBACK(bndx_tree_expand_cb), NULL);
+    index->row_collapsed_id =
+        g_signal_connect_after(tree_view, "row-collapsed",
+                               G_CALLBACK(bndx_tree_collapse_cb), NULL);
 
     /* We want to catch column resize attempts to store the new value */
     g_signal_connect_after(tree_view, "size-allocate",
@@ -781,6 +787,18 @@ bndx_tree_expand_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
         }
     }
     g_signal_handler_unblock(selection, index->selection_changed_id);
+    bndx_changed_find_row(index);
+}
+
+/* callback on collapse events;
+ * the next message may have become invisible, so we must check whether
+ * a next message still exists. */
+static void
+bndx_tree_collapse_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
+                      GtkTreePath * path, gpointer user_data)
+{
+    BalsaIndex *index = BALSA_INDEX(tree_view);
+    bndx_changed_find_row(index);
 }
 
 /* When a column is resized, store the new size for later use */
@@ -1930,8 +1948,11 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
 	g_signal_handler_block(index, index->row_expanded_id);
         gtk_tree_view_expand_all(tree_view);
 	g_signal_handler_unblock(index, index->row_expanded_id);
-    } else
+    } else {
+	g_signal_handler_block(index, index->row_collapsed_id);
         gtk_tree_view_collapse_all(tree_view);
+	g_signal_handler_unblock(index, index->row_collapsed_id);
+    }
 
     /* Re-expand msg_node's thread; cf. Remarks */
     /* expand_to_row is redundant in the expand_all case, but the
@@ -1940,6 +1961,7 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
      * deselected the current message */
     if (bndx_find_message(index, NULL, &iter, index->current_message))
         bndx_expand_to_row_and_select(index, &iter);
+    bndx_changed_find_row(index);
 }
 
 /* balsa_index_set_threading_type: public method. */

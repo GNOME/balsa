@@ -68,6 +68,7 @@ extern "C" {
         /* signal handler ids */
         gulong selection_changed_id;
         gulong row_expanded_id;
+        gulong row_collapsed_id;
 
 	LibBalsaMailboxSearchIter *search_iter;
     };

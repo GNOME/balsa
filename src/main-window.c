@@ -182,7 +182,7 @@ static GnomeUIInfo file_menu[] =
   /* Ctrl-I */
   {
     GNOME_APP_UI_ITEM, N_ ("Pr_int"), N_("Print current mail"),
-    file_print_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    message_print_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_PRINT, 'I', GDK_CONTROL_MASK, NULL
   },
   GNOMEUIINFO_SEPARATOR,
@@ -421,7 +421,8 @@ static GnomeUIInfo main_toolbar[] =
     GNOME_STOCK_PIXMAP_FORWARD, 0, 0, NULL
   },
   GNOMEUIINFO_SEPARATOR,
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Print"), N_ ("Print current message"), file_print_cb, GNOME_STOCK_PIXMAP_PRINT),
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Print"), N_ ("Print current message"), 
+			  message_print_cb, GNOME_STOCK_PIXMAP_PRINT),
 
   GNOMEUIINFO_END
 };

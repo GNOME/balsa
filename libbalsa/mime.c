@@ -60,10 +60,13 @@ process_mime_part (LibBalsaMessage * message, LibBalsaMessageBody * body,
 		part = fopen (body->temp_filename, "r");
 		alloced = libbalsa_readfile (part, &res);
 		if(llen>0) {
+			if(reply_prefix_str) llen -= strlen(reply_prefix_str);
+			libbalsa_wrap_string(res, llen);
+		}
+		if(reply_prefix_str) {
 			gchar *str, *ptr;
-			libbalsa_wrap_string(res, 
-					     llen-strlen(reply_prefix_str));
 			/* prepend the prefix to all the lines */
+			
 			reply = g_string_new("");
 			str = res;
 			do {
@@ -75,7 +78,7 @@ process_mime_part (LibBalsaMessage * message, LibBalsaMessageBody * body,
 				reply = g_string_append_c(reply, '\n');
 				str = ptr;
 			} while(str++);
-		}
+		} else reply = g_string_new(res);
 		g_free(res);
 		break;
 	}

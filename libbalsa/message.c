@@ -237,7 +237,8 @@ libbalsa_message_destroy(GtkObject *object)
                 if (list->data)
                         g_free (list->data);
         }
-        
+        g_list_free(message->references);
+
         message->references = NULL;
 
 	g_free (message->in_reply_to);                 		message->in_reply_to = NULL;

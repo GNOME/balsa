@@ -99,6 +99,15 @@ AC_CHECK_HEADERS(libgnomeui/gnome-window-icon.h)
 AC_SUBST(HAVE_LIBGNOMEUI_GNOME_WINDOW_ICON_H)
 
 dnl ######################################################################################
+dnl Check for gnome-print
+dnl ######################################################################################
+
+AM_PATH_GNOME_PRINT([0.20.0], [
+	AC_DEFINE(HAVE_GNOME_PRINT)
+])
+
+
+dnl ######################################################################################
 dnl All the linguas, all the time.
 dnl ######################################################################################
 
@@ -364,7 +373,6 @@ if test "x$with_gss" != xno  ; then
 	AC_MSG_RESULT([yes])
 	CFLAGS="$CFLAGS -I$with_gss/include"
 	LIBS="$LIBS -L$with_gss/lib -lgssapi_krb5"
-        echo "with_gss=$with_gss"
 else
 	AC_MSG_RESULT([no])
 fi

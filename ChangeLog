@@ -1,3 +1,18 @@
+2000-09-15  Pawel Salek  <pawsa@theochem.kth.se>
+	use gnome-print if available.
+	* acconfig.h: HAVE_GNOME_PRINT added.
+	* configure.in: search for gnome-print.
+	* libbalsa/mailbox.c: fix message->references double free hang.
+	* libbalsa/mailbox_pop3.c: fix compilation with disabled threads.
+	* libbalsa/message.c: double free problem fixed.
+	* libbalsa/mime.c: fix some special cases of line wrapping 
+	(hopefully I got it right this time).
+	* libbalsa/misc.c: ditto.
+	* libbalsa/misc.h: change libbalsa_make_string_from_list() to have 
+	const argument.
+	* src/main-window.c: print API updated.
+	* src/print.[hc]: new gnome-print code.
+	
 2000-09-15  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/address-book.c (ab_switch_cb): Fix crash when multiple

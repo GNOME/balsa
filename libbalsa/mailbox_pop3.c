@@ -256,8 +256,7 @@ static void libbalsa_mailbox_pop3_check (LibBalsaMailbox *mailbox)
 			threadmsg->mailbox = (void *) mailbox;
 			write( mail_thread_pipes[1], (void *) &threadmsg, sizeof(void *) );
 #else
-			config_mailbox_update( 
-				mailbox, mailbox_get_pkey(mailbox) );
+			config_mailbox_update(mailbox);
 #endif
 		}
 

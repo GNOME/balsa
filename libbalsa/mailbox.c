@@ -689,9 +689,9 @@ translate_message (HEADER * cur)
 
         for (tmp = cenv->references; tmp != NULL; tmp = tmp->next) {
                 message->references = g_list_append (message->references,
-                                                     tmp->data);
+                                                     g_strdup(tmp->data));
         }
-        
+
 	/* more! */
 
 	return message;

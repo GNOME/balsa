@@ -414,14 +414,14 @@ libbalsa_get_hostname (void)
 /* FIXME: Move to address.c and change name to
  *   libbalsa_address_list_to_string or something */
 gchar *
-libbalsa_make_string_from_list (GList * the_list)
+libbalsa_make_string_from_list (const GList * the_list)
 {
 	gchar *retc, *str;
 	GList *list;
 	GString *gs = g_string_new (NULL);
 	LibBalsaAddress *addy;
 
-	list = g_list_first (the_list);
+	list = g_list_first ((GList*)the_list);
 
 	while (list) {
 		addy = list->data;
@@ -529,14 +529,14 @@ libbalsa_wrap_string(gchar* str, int width)
 	lnbeg = sppos = ptr = str;
 
 	while(*ptr) {
-		if(*ptr=='\t') te += 7;
-		if(*ptr==' ') sppos = ptr;
-		if(ptr-lnbeg>width-te && sppos>=lnbeg+minl) {
+		switch(*ptr) {
+		case '\t': te += 7;               break;
+		case '\n': lnbeg = ptr+1; te = 0; break;
+		case ' ' : sppos = ptr;           break;
+		}
+		if(ptr-lnbeg>=width-te && sppos>=lnbeg+minl) {
 			*sppos = '\n';
 			lnbeg = sppos+1; te = 0;
-		}
-		if(*ptr=='\n') {
-			lnbeg = ptr; te = 0;
 		}
 		ptr++;
 	}

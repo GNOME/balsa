@@ -23,7 +23,7 @@
 extern "C" {
 #endif /* __cplusplus */
  
-extern void file_print_cb(GtkWidget *widget, gpointer cbdata);
+extern void message_print_cb(GtkWidget *widget, gpointer cbdata);
 
 #ifdef __cplusplus
 }

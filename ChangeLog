@@ -1,3 +1,8 @@
+2002-12-15 11:59  PeterB
+
+	* src/sendmsg-window.c: (sendmsg_window_new, create_info_pane)
+	Implement and use sendmsg_window_set_title.
+
 2002-12-13 17:24  PeterB
 
 	* src/balsa-mblist.c: (balsa_mblist_mru_option_menu) Correctly

@@ -1,5 +1,6 @@
 * Balsa-1.3.5 release. Release date 2002-04-16
 
+- protect ESMTP passwords and pass-phrases.
 - new mailboxes scanned in a thread.
 - improved message include function.
 - preserve References: headers over message postpone.

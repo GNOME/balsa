@@ -29,9 +29,7 @@
 #include "mailbox-node.h"
 #include "save-restore.h"
 #include "notify.h"
-#ifdef BALSA_SHOW_ALL
 #include "filter.h"
-#endif
 
 /* MailboxNode object is a GUI representation of a mailbox, or entire 
    set of them. It can read itself from the configuration, save its data,
@@ -547,7 +545,6 @@ mb_rescan_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
     balsa_mailbox_node_rescan(mbnode);
 }
 
-#ifdef BALSA_SHOW_ALL
 static void
 mb_filter_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 {
@@ -558,7 +555,6 @@ mb_filter_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 	   of the filter action (eg a copy)). So let's see that later :) */
 	g_print("You can apply filters only on mailbox\n");
 }
-#endif
 
 GtkWidget *
 balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
@@ -635,10 +631,8 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
 	    add_menu_entry(menu, _("Mark as Trash"),    mb_trash_cb,    mbnode);
 	if(mbnode->mailbox != balsa_app.draftbox)
 	    add_menu_entry(menu, _("Mark as Draftbox"), mb_draftbox_cb, mbnode);
-#ifdef BALSA_SHOW_ALL
 	/* FIXME : No test on mailbox type is made yet, should we ? */
 	add_menu_entry(menu, _("Edit/Apply filters"), mb_filter_cb, mbnode);
-#endif
     } else {
 	add_menu_entry(menu, _("Rescan"),   mb_rescan_cb,   mbnode);
     }

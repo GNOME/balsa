@@ -439,7 +439,7 @@ libbalsa_message_user_hdrs(LibBalsaMessage * message)
     }
 
     for (tmp = env->in_reply_to; tmp; tmp = tmp->next) {
-        res = g_list_append(res, libbalsa_create_hdr_pair("In-Reply-To:",
+        res = g_list_append(res, libbalsa_create_hdr_pair("In-Reply-To",
                                                           g_strdup(tmp->data)));
     }
 

@@ -28,13 +28,11 @@
 #include "quote-color.h"
 #include "toolbar-prefs.h"
 
-#ifdef BALSA_SHOW_ALL
 #include "filter-file.h"
 #include "filter-funcs.h"
 
 #define MAILBOX_FILTERS_SECTION_PREFIX "filters-mailbox-"
 #define MAILBOX_FILTERS_URL_KEY "Mailbox-URL"
-#endif
 
 #define BALSA_CONFIG_PREFIX "balsa/"
 #define FOLDER_SECTION_PREFIX "folder-"
@@ -61,10 +59,8 @@ static void config_identities_load(void);
 
 static void check_for_old_sigs(GList * id_list_tmp);
 
-#ifdef BALSA_SHOW_ALL
 static void config_filters_load(void);
 void config_filters_save(void);
-#endif
 
 #define folder_section_path(mn) \
     BALSA_MAILBOX_NODE(mn)->config_prefix ? \
@@ -458,7 +454,6 @@ config_global_load(void)
     config_address_books_load();
     config_identities_load();
 
-#ifdef BALSA_SHOW_ALL
     /* We must load filters before mailboxes, because they refer to the filters list */
     config_filters_load();
     if (filter_errno!=FILTER_NOERR) {
@@ -468,7 +463,6 @@ config_global_load(void)
  			     filter_strerror(filter_errno),
 			     _("Filters may not be correct"));
     }
-#endif
 
     /* find and convert old-style signature entries */
     check_for_old_sigs(balsa_app.identities);
@@ -1314,8 +1308,6 @@ save_color(gchar * key, GdkColor * color)
     g_free(str);
 }
 
-#ifdef BALSA_SHOW_ALL
-
 static void
 config_filters_load(void)
 {
@@ -1489,8 +1481,6 @@ void config_mailbox_filters_load(LibBalsaMailbox * mbox)
 	gnome_config_pop_prefix();
     }
 }
-
-#endif
 
 static void
 load_color(gchar * key, GdkColor * color)

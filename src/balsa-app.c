@@ -372,10 +372,8 @@ balsa_app_init(void)
     balsa_app.address_book_list = NULL;
     balsa_app.default_address_book = NULL;
 
-#ifdef BALSA_SHOW_ALL
     /* Filters */
     balsa_app.filters=NULL;
-#endif
 
     /* spell check */
     balsa_app.module = SPELL_CHECK_MODULE_ASPELL;

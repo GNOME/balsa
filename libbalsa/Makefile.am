@@ -1,36 +1,16 @@
 noinst_LIBRARIES = libbalsa.a
 
-filter_src = \
-	filter-error.c		\
-	filter-file.c		\
-	filter-file.h		\
-	filter-funcs.c		\
-	filter-funcs.h		\
-	filter-private.h	\
-	filter.c		\
-	filter.h		\
-	mailbox-filter.c	\
-	mailbox-filter.h
-
-if BALSA_SHOW_ALL
-extra_src  = $(filter_src)
-else
-extra_src  = 
-endif
-
-EXTRA_DIST = $(filter_src)
-
 libbalsa_a_SOURCES = 		\
 	abook-completion.c	\
 	abook-completion.h	\
+	address-book-extern.c	\
+	address-book-extern.h	\
 	address-book-ldap.c 	\
 	address-book-ldap.h	\
+	address-book-ldif.c	\
+	address-book-ldif.h	\
 	address-book-vcard.c	\
 	address-book-vcard.h	\
-	address-book-ldif.h	\
-	address-book-ldif.c	\
-	address-book-extern.h	\
-	address-book-extern.c	\
 	address-book.c		\
 	address-book.h		\
 	address-entry.c		\
@@ -41,6 +21,14 @@ libbalsa_a_SOURCES = 		\
 	body.h			\
 	files.c			\
 	files.h			\
+	filter-error.c		\
+	filter-file.c		\
+	filter-file.h		\
+	filter-funcs.c		\
+	filter-funcs.h		\
+	filter-private.h	\
+	filter.c		\
+	filter.h		\
 	folder-scanners.c	\
 	folder-scanners.h	\
 	identity.c		\
@@ -51,6 +39,8 @@ libbalsa_a_SOURCES = 		\
 	libbalsa.h		\
 	libbalsa_private.h	\
 	mailbackend.h		\
+	mailbox-filter.c	\
+	mailbox-filter.h	\
 	mailbox.c		\
 	mailbox.h		\
 	mailbox_imap.c		\
@@ -82,8 +72,8 @@ libbalsa_a_SOURCES = 		\
 	server.c		\
 	server.h		\
 	source-viewer.c		\
-	threads.h		\
-	$(extra_src)
+	threads.h
+
 
 
 INCLUDES=-I. -I${top_srcdir} -I${top_builddir}/libmutt \

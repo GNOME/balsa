@@ -1,3 +1,11 @@
+2002-04-26  Pawel Salek <pawsa@theochem.kth.se>
+
+	* configure.in, {libbalsa,src}/Makefile.am, libbalsa/mailbox.[ch]:
+	* libbalsa/mailbox_{local,pop3}.c, libbalsa/message.c: 
+	* src/balsa-app.[hc], src/balsa-index.[hc], src/mailbox-node.c: 
+	* src/main-window.c, src/save-restore.[hc]:
+	filters/searching not optional any longer.
+	
 2002-04-24  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/Makefile.am: Fix distcheck.

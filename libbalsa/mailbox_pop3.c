@@ -39,9 +39,7 @@
 #include "threads.h"
 #endif
 
-#ifdef BALSA_SHOW_ALL
 #include "mailbox-filter.h"
-#endif
 
 #include <libgnome/gnome-defs.h> 
 #include <libgnome/gnome-config.h> 
@@ -299,8 +297,6 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     }	
     libbalsa_mailbox_open(tmp_mailbox);
     if((m->inbox) && (tmp_mailbox->messages)) {
-
-#ifdef BALSA_SHOW_ALL
 	GSList * filters; 
 
 	filters = libbalsa_mailbox_filters_when(mailbox->filters,
@@ -312,7 +308,6 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 	    else g_warning("Filter error\n");
 	    g_slist_free(filters);
 	}
-#endif /*BALSA_SHOW_ALL*/
 
 	if (!libbalsa_messages_move(tmp_mailbox->message_list, m->inbox)) {    
 	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,

@@ -57,10 +57,8 @@
 #include "threads.h"
 #endif
 
-#ifdef BALSA_SHOW_ALL
 #include "filter.h"
 #include "filter-funcs.h"
-#endif
 
 #include "libinit_balsa/init_balsa.h"
 
@@ -203,13 +201,11 @@ static void mark_all_cb(GtkWidget * widget, gpointer);
 
 static void select_part_cb(BalsaMessage * bm, gpointer data);
 
-#ifdef BALSA_SHOW_ALL
 static void find_real(BalsaIndex * bindex,gboolean again);
 static void find_cb(GtkWidget * widget, gpointer data);
 static void find_again_cb(GtkWidget * widget, gpointer data);
 static void filter_dlg_cb(GtkWidget * widget, gpointer data);
 static void filter_export_cb(GtkWidget * widget, gpointer data);
-#endif
 
 static void mailbox_close_cb(GtkWidget * widget, gpointer data);
 static void mailbox_tab_close_cb(GtkWidget * widget, gpointer data);
@@ -359,7 +355,6 @@ static GnomeUIInfo edit_menu[] = {
     GNOMEUIINFO_MENU_COPY_ITEM(copy_cb, NULL),
 #define MENU_EDIT_SELECT_ALL_POS 1
     GNOMEUIINFO_MENU_SELECT_ALL_ITEM(select_all_cb, NULL),
-#ifdef BALSA_SHOW_ALL
     GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_MENU_FIND_ITEM(find_cb, NULL),
     GNOMEUIINFO_MENU_FIND_AGAIN_ITEM(find_again_cb, NULL),
@@ -372,7 +367,6 @@ static GnomeUIInfo edit_menu[] = {
                            filter_dlg_cb, GNOME_STOCK_MENU_PROP),
     GNOMEUIINFO_ITEM_STOCK(N_("_Export filters"), N_("Export filters as Sieve scripts"),
 			   filter_export_cb, GNOME_STOCK_MENU_PROP),
-#endif
     GNOMEUIINFO_END
 };
 
@@ -2520,8 +2514,6 @@ address_book_cb(GtkWindow *widget, gpointer data)
     gtk_widget_show(GTK_WIDGET(ab));
 }
 
-#ifdef BALSA_SHOW_ALL
-
 static GtkToggleButton*
 add_check_button(GtkWidget* table, const gchar* label, gint x, gint y)
 {
@@ -2712,7 +2704,6 @@ filter_export_cb(GtkWidget * widget, gpointer data)
 {
     filters_export_dialog();
 }
-#endif
 
 /* closes the mailbox on the notebook's active page */
 static void

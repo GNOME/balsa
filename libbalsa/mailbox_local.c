@@ -39,9 +39,7 @@
 #include "threads.h"
 #endif
 
-#ifdef BALSA_SHOW_ALL
 #include "mailbox-filter.h"
-#endif /*BALSA_SHOW_ALL*/
 
 #include <libgnome/gnome-defs.h> 
 #include <libgnome/gnome-config.h> 
@@ -69,10 +67,8 @@ static void libbalsa_mailbox_local_save_config(LibBalsaMailbox * mailbox,
 static void libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
 					       const gchar * prefix);
 
-#ifdef BALSA_SHOW_ALL
 static void
 run_filters_on_reception(LibBalsaMailbox * mailbox);
-#endif /* BALSA_SHOW_ALL */
 
 GtkType libbalsa_mailbox_local_get_type(void)
 {
@@ -237,7 +233,6 @@ libbalsa_mailbox_local_destroy(GtkObject * object)
 
 /* Helper function to run the "on reception" filters on a mailbox */
 
-#ifdef BALSA_SHOW_ALL
 static void
 run_filters_on_reception(LibBalsaMailbox * mailbox)
 {
@@ -259,7 +254,6 @@ run_filters_on_reception(LibBalsaMailbox * mailbox)
 	g_slist_free(filters);
     }
 }
-#endif /*BALSA_SHOW_ALL*/    
 
 /* libbalsa_mailbox_local_open:
    THREADING: it is always called from a signal handler so the gdk lock
@@ -315,9 +309,7 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox)
     gdk_threads_enter();
     libbalsa_mailbox_load_messages(mailbox);
     
-#ifdef BALSA_SHOW_ALL
     run_filters_on_reception(mailbox);
-#endif /*BALSA_SHOW_ALL*/    
 
     /* increment the reference count */
 #ifdef DEBUG
@@ -377,9 +369,7 @@ libbalsa_mailbox_local_check(LibBalsaMailbox * mailbox)
 		CLIENT_CONTEXT(mailbox)->msgcount - mailbox->messages;
 	    UNLOCK_MAILBOX(mailbox);
 	    libbalsa_mailbox_load_messages(mailbox);
-#ifdef BALSA_SHOW_ALL
 	    run_filters_on_reception(mailbox);
-#endif /*BALSA_SHOW_ALL*/    
 
 	} else {
 	    UNLOCK_MAILBOX(mailbox);

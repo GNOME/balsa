@@ -154,9 +154,7 @@ extern struct BalsaApplication {
     GList* identities;
     LibBalsaIdentity* current_ident;
 
-#ifdef BALSA_SHOW_ALL
     GSList* filters;
-#endif
 
     gchar *local_mail_directory;
 #if ENABLE_ESMTP

@@ -238,9 +238,7 @@ balsa_message_init(BalsaMessage * bm)
 
     gtk_widget_show(bm->table);
 
-    bm->content = gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(bm->content),
-                                   GTK_POLICY_NEVER, GTK_POLICY_NEVER);
+    bm->content = gtk_viewport_new(NULL, NULL);
 
     gtk_table_attach(GTK_TABLE(bm->table), bm->content, 0, 1, 1,
 		     2, GTK_EXPAND | GTK_FILL,
@@ -2371,8 +2369,7 @@ static BalsaPartInfo *add_part(BalsaMessage *bm, gint part)
 
 	    gtk_container_add(GTK_CONTAINER(bm->content), info->widget);
 	    gtk_widget_show(info->widget);
-            vadj = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW
-                                                       (bm->content));
+            vadj = gtk_viewport_get_vadjustment(GTK_VIEWPORT(bm->content));
             gtk_signal_connect(GTK_OBJECT(vadj), "changed",
                                (GtkSignalFunc) vadj_change_cb, info->widget);
 	}

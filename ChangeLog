@@ -1,3 +1,8 @@
+2002-04-07  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-message.c: GtkViewport is a thinner wrapper than a
+	GtkScrolledWindow for the GtkTextView and HtmlView widgets.
+
 2002-04-04  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/balsa-message.c: improve resizing scheme + cleanup.

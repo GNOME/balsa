@@ -24,6 +24,10 @@
 #include "mailbox.h"
 #include "index-child.h"
 
+#ifdef HAVE_LIBESD
+#include <esd.h>
+#endif
+
 /* global definitions */
 #define BALSA_BUTTON_HEIGHT  30
 #define BALSA_BUTTON_WIDTH  70
@@ -81,6 +85,10 @@ extern struct BalsaApplication
 
   gboolean previewpane;
   gboolean debug;
+#ifdef HAVE_LIBESD
+  gint esound;
+  gchar *esound_host;
+#endif
 }
 balsa_app;
 

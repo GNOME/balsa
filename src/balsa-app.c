@@ -37,6 +37,9 @@
 #include "index-child.h"
 #include "main-window.h"
 
+#ifdef HAVE_LIBESD
+#include <esd.h>
+#endif
 
 /* Global application structure */
 struct BalsaApplication balsa_app;
@@ -117,6 +120,11 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.mw_height = MW_DEFAULT_HEIGHT;
   balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
   balsa_app.mdi_style = GNOME_MDI_DEFAULT_MODE;
+
+#ifdef HAVE_LIBESD
+  balsa_app.esound_host = g_strdup ("localhost");
+  balsa_app.esound = esd_open_sound (balsa_app.esound_host);
+#endif
 
   if (config_load (BALSA_CONFIG_FILE) == FALSE)
     {

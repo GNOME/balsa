@@ -1,3 +1,7 @@
+2004-07-19 23:41  PeterB
+
+	* libbalsa/imap/imap-search.c: plug leak.
+
 2004-07-19  Pawel Salek
 
 	* libbalsa/body.[hc]: rename libbalsa_message_body_get_content_type()

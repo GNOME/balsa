@@ -1,3 +1,8 @@
+2000-04-24 Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/sendmsg-window.c: pasting texts containing \n to subject 
+	field lead to wrong mail headers.
+	
 2000-04-24  Pawel Salek <pawsa@theochem.kth.se>
 	* src/balsa-app.h,src/save-restore.c,src/main.c: remembering
 	open mailboxes between sessions.

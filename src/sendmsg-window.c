@@ -1156,8 +1156,23 @@ is_ready_to_send(BalsaSendmsg * bsmsg) {
    return TRUE;
 }
 
-/* bsmsg2message
+static void 
+strip_chars(gchar *str, const gchar * char2strip) 
+{
+    gchar *ins = str;
+    while(*str) {
+	if(strchr(char2strip, *str) == NULL) 
+	    *ins++ = *str;
+	str++;
+    }
+    *ins = '\0';
+}
+
+/* bsmsg2message:
    creates Message struct based on given BalsaMessage
+   stripping EOL chars is necessary - the GtkEntry fields can in principle 
+   contain them. Such characters might screw up message formatting
+   (consider moving this code to mutt part).
 */
 static Message *
 bsmsg2message(BalsaSendmsg *bsmsg)
@@ -1175,6 +1190,7 @@ bsmsg2message(BalsaSendmsg *bsmsg)
 
   message->subject = g_strdup (gtk_entry_get_text 
 			       (GTK_ENTRY (bsmsg->subject[1])));
+  strip_chars(message->subject,"\r\n");
 
   message->to_list = make_list_from_string (
      gtk_entry_get_text (GTK_ENTRY (bsmsg->to[1])));

@@ -779,7 +779,8 @@ mailbox_conf_update(MailboxConfWindow *mcw)
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
 	gchar *filename;
-	const gchar *name;
+	gchar *name;
+	BalsaMailboxNode *mbnode;
 
 	filename = gnome_file_entry_get_full_path(mcw->mb_data.local.path,
 						  FALSE);
@@ -794,21 +795,18 @@ mailbox_conf_update(MailboxConfWindow *mcw)
 	    g_free(filename);
 	    return;
 	}
-        if(mcw->mailbox_name) {
-	    BalsaMailboxNode *mbnode = balsa_find_mailbox(mcw->mailbox);
-	    name = gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name));
-            g_free(mailbox->name);
-            mailbox->name = g_strdup(name);
-	    balsa_mblist_mailbox_node_redraw(mbnode);
-	    balsa_window_update_tab(mbnode);
-	    g_object_unref(mbnode);
-        } else {
-	    mailbox->name = g_path_get_basename(filename);
-            balsa_mailbox_local_append(mailbox);
-	    g_free(filename);
-            return;
-        }
-	g_free(filename);
+
+        name = mcw->mailbox_name ?
+            gtk_editable_get_chars(GTK_EDITABLE(mcw->mailbox_name), 0, -1) :
+	    g_path_get_basename(filename);
+        g_free(filename);
+        g_free(mailbox->name);
+        mailbox->name = name;
+
+	mbnode = balsa_find_mailbox(mcw->mailbox);
+	balsa_mblist_mailbox_node_redraw(mbnode);
+	balsa_window_update_tab(mbnode);
+	g_object_unref(mbnode);
     } else if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
 	update_pop_mailbox(mcw);
     } else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {

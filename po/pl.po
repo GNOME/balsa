@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2000-10-17 02:54+0200\n"
-"PO-Revision-Date: 2000-10-18 01:18+0200\n"
+"POT-Creation-Date: 2000-11-05 02:25+0100\n"
+"PO-Revision-Date: 2000-11-05 02:37+0100\n"
 "Last-Translator: GNOME PL Team <translators@gnome.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -47,13 +47,18 @@ msgstr "Bez-nazwy"
 
 #: libbalsa/address-book-vcard.c:1
 #, c-format
+msgid "Could not open vCard address book %s."
+msgstr "Nie mo¿na otworzyæ ksi±¿ki adresowej vCard %s."
+
+#: libbalsa/address-book-vcard.c:1
+#, c-format
 msgid "%s is already in address book."
 msgstr "W ksi±¿ce adresowej jest ju¿ %s."
 
 #: libbalsa/address-book-vcard.c:1
 #, c-format
-msgid "Cannot open vCard address book %s\n"
-msgstr "Nie mo¿na otworzyæ ksi±¿ki adresowej vCard %s\n"
+msgid "Cannot open vCard address book %s for saving\n"
+msgstr "Nie mo¿na otworzyæ ksi±¿ki adresowej vCard %s do zapisu\n"
 
 #: libbalsa/address-book.c:1
 #, c-format
@@ -231,6 +236,10 @@ msgid ""
 msgstr ""
 "Spowoduje do zakoñczenie Balsy.\n"
 "Czy na pewno chcesz to zrobiæ?"
+
+#: libinit_balsa/balsa-initdruid.gob:1
+msgid "GnomeCard Address Book"
+msgstr "Ksi±¿ka adresowa GnomeCard"
 
 #: libinit_balsa/helper.c:1
 #, c-format
@@ -637,8 +646,8 @@ msgid "Address Book Name:"
 msgstr "Nazwa ksi±¿ki adresowej"
 
 #: src/address-book-config.c:1
-msgid "Path"
-msgstr "¦cie¿ka"
+msgid "File name"
+msgstr "Nazwa pliku"
 
 #: src/address-book-config.c:1 src/address-book-config.c:1
 msgid "Expand aliases as you type"
@@ -657,6 +666,15 @@ msgstr "Nazwa bazowa domeny"
 #: src/pref-manager.c:1
 msgid "Add"
 msgstr "Dodaj"
+
+#: src/address-book-config.c:1
+#, c-format
+msgid ""
+"The address book file path '%s' is not correct.\n"
+"Do you want to correct the file name?"
+msgstr ""
+"¦cie¿ka pliku ksi±¿ki adresowej \"%s\" nie jest poprawna.\n"
+"Czy chcesz poprawiæ nazwê pliku?"
 
 #: src/balsa-app.c:1
 #, c-format
@@ -834,6 +852,10 @@ msgstr "Zapis czê¶æ"
 #, c-format
 msgid "View part with %s"
 msgstr "Wy¶wietl czê¶æ za pomoc± %s"
+
+#: src/balsa-message.c:1
+msgid "Save..."
+msgstr "Zapisz..."
 
 #: src/balsa-message.c:1
 #, c-format
@@ -1015,6 +1037,11 @@ msgstr "Zarz±dzanie filtrami"
 #: src/information-dialog.c:1
 msgid "Balsa Information"
 msgstr "Komunikat Balsy"
+
+#: src/local-mailbox.c:1
+#, c-format
+msgid "Local Mailbox Loaded as: %s\n"
+msgstr "Wczytano lokaln± skrzynkê pocztow± jako: %s\n"
 
 #: src/mailbox-conf.c:1
 #, c-format
@@ -1943,6 +1970,14 @@ msgid "Misc Spelling Settings"
 msgstr "Dodatkowe opcje sprawdzania pisowni"
 
 #: src/pref-manager.c:1
+msgid "Check signature"
+msgstr "Sprawdzanie sygnatury"
+
+#: src/pref-manager.c:1
+msgid "Check quoted"
+msgstr "Sprawdzanie cytowania"
+
+#: src/pref-manager.c:1
 msgid "Charset"
 msgstr "Zestaw znaków"
 
@@ -2262,8 +2297,12 @@ msgid "Portugese"
 msgstr "Portugalski"
 
 #: src/sendmsg-window.c:1 src/sendmsg-window.c:1
-msgid "Russian"
-msgstr "Rosyjski"
+msgid "Russian (ISO)"
+msgstr "Rosyjski (ISO)"
+
+#: src/sendmsg-window.c:1 src/sendmsg-window.c:1
+msgid "Russian (KOI)"
+msgstr "Rosyjski (KOI)"
 
 #: src/sendmsg-window.c:1 src/sendmsg-window.c:1
 msgid "Slovak"
@@ -2316,8 +2355,9 @@ msgstr "Nie mo¿na pobraæ informacji o pliku '%s' : %s\n"
 
 #: src/sendmsg-window.c:1
 #, c-format
-msgid "Attachment is not a regular file: '%s'\n"
-msgstr "Za³±cznik nie jest zwyk³ym plikiem: '%s'\n"
+msgid "Attachment is not a regular file or cannot be read: '%s'\n"
+msgstr ""
+"Za³±cznik nie jest zwyk³ym plikiem lub nie mo¿e zostaæ odczytany: \"%s\"\n"
 
 #: src/sendmsg-window.c:1
 msgid "Attach file"

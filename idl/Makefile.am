@@ -10,6 +10,7 @@ lib_LIBRARIES = libbalsasrv.a
 BUILT_SOURCES = balsa-skels.c \
 		balsa.h
 
+INCLUDES=$(GNOME_INCLUDEDIR)
 
 libbalsasrv_a_SOURCES = \
 	balsa-skels.c \

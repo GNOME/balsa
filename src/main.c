@@ -70,9 +70,8 @@ balsa_init (int argc, char ***argv)
   PortableServer_POAManager pm;
   CORBA_char *objref;
 
-
   CORBA_exception_init (&ev);
-  orb = gnome_CORBA_init ("balsa", NULL, &argc, argv, 0, NULL, &ev);
+  orb = gnome_CORBA_init ("balsa", VERSION, &argc, argv, &ev);
   Exception (&ev);
 
   root_poa = (PortableServer_POA) CORBA_ORB_resolve_initial_references (orb,

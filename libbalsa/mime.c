@@ -20,6 +20,7 @@
 #include "config.h"
 
 #include <stdio.h>
+#include <errno.h>
 #include <sys/utsname.h>
 #include <string.h>
 #include <time.h>

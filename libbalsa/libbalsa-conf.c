@@ -102,6 +102,7 @@ static guint lbc_key_file_priv_changes;
 static GSList *lbc_groups;
 
 #define BALSA_KEY_FILE "config"
+#define DEBUG TRUE
 
 static gchar *
 lbc_readfile(const gchar * filename)
@@ -122,12 +123,13 @@ lbc_readfile(const gchar * filename)
     return buf;
 }
 
-#define DEBUG TRUE
-
 static void
 lbc_init(void)
 {
     GError *error = NULL;
+
+    if (lbc_key_file)
+        return;
 
     lbc_key_file = g_key_file_new();
     g_key_file_set_list_separator(lbc_key_file, ' ');
@@ -142,8 +144,8 @@ lbc_init(void)
 #if DEBUG
         g_message("Could not load config from \"%s\": %s",
                   lbc_key_file_name, error->message);
-	g_message("Trying ~/.gnome2.");
-#endif /* DEBUG */
+        g_message("Trying ~/.gnome2.");
+#endif                          /* DEBUG */
         g_error_free(error);
         error = NULL;
 
@@ -157,7 +159,7 @@ lbc_init(void)
 #if DEBUG
             g_message("Cannot load key file from file \"%s\": %s",
                       filename, error->message);
-#endif /* DEBUG */
+#endif                          /* DEBUG */
             g_error_free(error);
             error = NULL;
         }
@@ -178,8 +180,8 @@ lbc_init(void)
 #if DEBUG
         g_message("Could not load private config from \"%s\": %s",
                   lbc_key_file_priv_name, error->message);
-	g_message("Trying ~/.gnome2_private.");
-#endif /* DEBUG */
+        g_message("Trying ~/.gnome2_private.");
+#endif                          /* DEBUG */
         g_error_free(error);
         error = NULL;
 
@@ -196,7 +198,7 @@ lbc_init(void)
 #if DEBUG
             g_message("Cannot load private key file from file \"%s\": %s",
                       filename, error->message);
-#endif /* DEBUG */
+#endif                          /* DEBUG */
             g_error_free(error);
         }
         g_free(filename);
@@ -210,8 +212,7 @@ static void
 lbc_lock(void)
 {
     g_static_rec_mutex_lock(&lbc_mutex);
-    if (!lbc_key_file)
-        lbc_init();
+    lbc_init();
 }
 
 static void
@@ -464,7 +465,7 @@ lbc_sync(GKeyFile * key_file, const gchar * filename)
     if (error) {
 #if DEBUG
         g_message("Failed to sync key file: %s", error->message);
-#endif /* DEBUG */
+#endif                          /* DEBUG */
         g_error_free(error);
         return;
     }
@@ -476,7 +477,7 @@ lbc_sync(GKeyFile * key_file, const gchar * filename)
     } else
 #if DEBUG
         g_message("Failed to rewrite key file \"%s\".", filename);
-#endif /* DEBUG */
+#endif                          /* DEBUG */
     g_free(buf);
 }
 

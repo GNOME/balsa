@@ -23,16 +23,8 @@
 
 #include "libbalsa.h"
 
-#include <stdio.h>
-#include <string.h>
 #include <gnome.h>
-#include <ctype.h>
 
-#include <sys/stat.h>		/* for check_if_regular_file() */
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
-#include <errno.h>
 
 #include "balsa-app.h"
 #include "balsa-message.h"
@@ -47,9 +39,6 @@
 
 #define CASE_INSENSITIVE_NAME
 
-gchar *make_rfc822(gchar *, gchar *);
-
-
 /*
  * FIXME:  Should this come here?
  * 
@@ -59,7 +48,7 @@ gchar *make_rfc822(gchar *, gchar *);
  *         By putting it in the address books, its faster, but the user
  *         must type '"' to match relevant addresses...
  */
-gchar *
+static gchar *
 make_rfc822(gchar *full_name, gchar *address)
 {
     gboolean found_comma;

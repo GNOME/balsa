@@ -952,6 +952,14 @@ int mutt_parse_rfc822_line (ENVELOPE *e, HEADER *hdr, char *line, char *p, short
 	hdr->date_sent = mutt_parse_date (p, hdr);
       matched = 1;
     }
+#ifdef LIBMUTT
+    /* BALSA: we implement extra feature for balsa.*/
+    else if (!mutt_strcasecmp ("isposition-notification-to", line + 1))
+      {
+	e->dispnotify_to = rfc822_parse_adrlist (e->dispnotify_to, p);
+	matched = 1;
+      }
+#endif
     break;
     
     case 'e':

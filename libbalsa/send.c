@@ -562,6 +562,22 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 	    libbalsa_unlock_mutt();
 	} else if (body->buffer) {
 	    newbdy = add_mutt_body_plain(body->charset, encoding);
+#ifdef BALSA_MDN_REPLY
+	    if (body->mime_type) {
+		/* change the type and subtype within the mutt body */
+		gchar *type, *subtype;
+		
+		type = g_strdup (body->mime_type);
+		if ((subtype = strchr (type, '/'))) {
+		    *subtype++ = 0;
+		    libbalsa_lock_mutt();
+		    newbdy->type = mutt_check_mime_type (type);
+		    newbdy->subtype = g_strdup(subtype);
+		    libbalsa_unlock_mutt();
+		}
+		g_free (type);
+	    }
+#endif
 	    tempfp = safe_fopen(newbdy->filename, "w+");
 	    fputs(body->buffer, tempfp);
 	    fclose(tempfp);
@@ -984,6 +1000,22 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 	    }
 	} else if (body->buffer) {
 	    newbdy = add_mutt_body_plain(body->charset, encoding);
+#ifdef BALSA_MDN_REPLY
+	    if (body->mime_type) {
+		/* change the type and subtype within the mutt body */
+		gchar *type, *subtype;
+		
+		type = g_strdup (body->mime_type);
+		if ((subtype = strchr (type, '/'))) {
+		    *subtype++ = 0;
+		    libbalsa_lock_mutt();
+		    newbdy->type = mutt_check_mime_type (type);
+		    newbdy->subtype = g_strdup(subtype);
+		    libbalsa_unlock_mutt();
+		}
+		g_free (type);
+	    }
+#endif
 	    tempfp = safe_fopen(newbdy->filename, "w+");
 	    fputs(body->buffer, tempfp);
 	    fclose(tempfp);

@@ -1,3 +1,8 @@
+2001-03-22  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* parse.c: Patch from Albrecht Dreﬂ <albrecht.dress@arcormail.de> 
+	- support Disposition-notification-to: header.
+
 2001-02-24  Carlos Morgado  <chbm@chbm.nu>
 
 	* imap/imap.c: mutt -> balsa in message

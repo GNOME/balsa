@@ -37,6 +37,9 @@ libbalsa_message_body_new(LibBalsaMessage * message)
 
     body->message = message;
     body->buffer = NULL;
+#ifdef BALSA_MDN_REPLY
+    body->mime_type = NULL;
+#endif
     body->mutt_body = NULL;
     body->filename = NULL;
     body->temp_filename = NULL;
@@ -56,6 +59,9 @@ libbalsa_message_body_free(LibBalsaMessageBody * body)
 	return;
 
     g_free(body->buffer);
+#ifdef BALSA_MDN_REPLY
+    g_free(body->mime_type);
+#endif
     g_free(body->filename);
 
     if (body->temp_filename)
@@ -136,6 +142,10 @@ libbalsa_message_body_get_parameter(LibBalsaMessageBody * body,
     return g_strdup(res);
 }
 
+/* libbalsa_message_body_save_temporary:
+   check if body has already its copy in temporary file and if not,
+   allocates a temporary file name and saves the body there.
+*/
 gboolean
 libbalsa_message_body_save_temporary(LibBalsaMessageBody * body,
 				     gchar * prefix)
@@ -149,8 +159,20 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body,
 	libbalsa_unlock_mutt();
 
 	body->temp_filename = g_strdup(tmp_file_name);
+	return libbalsa_message_body_save(body, prefix, body->temp_filename);
+    } else {
+	/* the temporary name has been already allocated on previous
+	   save_temporary action. We just check if the file is still there.
+	*/
+	struct stat s;
+	if (stat(body->temp_filename, &s) == 0 && 
+	    S_ISREG(s.st_mode) && 
+	    s.st_uid == getuid())
+	    return TRUE;
+	else
+	    return libbalsa_message_body_save(body, prefix, 
+					      body->temp_filename);
     }
-    return libbalsa_message_body_save(body, prefix, body->temp_filename);
 }
 
 /* libbalsa_message_body_save:

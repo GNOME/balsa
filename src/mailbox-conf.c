@@ -20,13 +20,9 @@
  */
 
 #include "config.h"
-#include <errno.h>
-#include <fcntl.h>
 
 #include <gnome.h>
 #include <string.h>
-
-#include <sys/stat.h>
 
 #include "balsa-app.h"
 #include "balsa-mblist.h"

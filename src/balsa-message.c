@@ -154,6 +154,19 @@ static void part_create_menu (BalsaPartInfo* info);
 
 static GtkViewportClass *parent_class = NULL;
 
+#ifdef BALSA_MDN_REPLY
+/* stuff needed for sending Message Disposition Notifications */
+static gboolean rfc2298_address_equal(LibBalsaAddress *a, LibBalsaAddress *b);
+static void handle_mdn_request(LibBalsaMessage *message);
+static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg, gboolean manual);
+static GtkWidget* create_mdn_dialog (gchar *sender, gchar *mdn_to_address,
+				     LibBalsaMessage *send_msg);
+static void mdn_dialog_delete (GtkWidget *dialog, GdkEvent *event, gpointer user_data);
+static void no_mdn_reply (GtkWidget *widget, gpointer user_data);
+static void send_mdn_reply (GtkWidget *widget, gpointer user_data);
+#endif
+
+
 guint balsa_message_get_type()
 {
     static guint balsa_message_type = 0;
@@ -333,13 +346,12 @@ save_part(BalsaPartInfo * info)
 		_("File already exists. Overwrite?"),
 		NULL, NULL, GTK_WINDOW(balsa_app.main_window));
 	    b = gnome_dialog_run_and_close(GNOME_DIALOG(confirm));
-	    if ( b == 0 )
+	    if(b == 0) {
 		do_save = TRUE;
-	    else
-		do_save = FALSE;
-	} else {
+		unlink(filename);
+	    } else do_save = FALSE;
+	} else
 	    do_save = TRUE;
-	}
 	
 	if ( do_save ) {
 	    result = libbalsa_message_body_save(info->body, NULL, filename);
@@ -450,6 +462,15 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 	gtk_widget_hide(bm->header_text);
 	return TRUE;
     }
+
+#ifdef BALSA_MDN_REPLY
+    /*
+     * At this point we check if (a) a message has the unread flag set and
+     * (b) a Disposition-Notification-To header line is present
+     */
+    if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW && message->dispnotify_to)
+	handle_mdn_request (message);
+#endif
 
     /* mark message as read; no-op if it was read so don't worry.
        and this is the right place to do the marking.
@@ -666,6 +687,13 @@ display_headers(BalsaMessage * bm)
 
     if (message->fcc_mailbox)
 	add_header_gchar(bm, "fcc", _("Fcc:"), message->fcc_mailbox);
+
+    if (message->dispnotify_to) {
+	gchar *mdn_to = libbalsa_address_to_gchar(message->dispnotify_to, 0);
+	add_header_gchar(bm, "disposition-notification-to", 
+			 _("Disposition-Notification-To:"), mdn_to);
+	g_free(mdn_to);
+    }
 
     /* remaining headers */
     lst = libbalsa_message_user_hdrs(message);
@@ -1113,15 +1141,17 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
     gint quote_level = 0;
 
     if (!libbalsa_message_body_save_temporary(info->body, NULL)) {
-	balsa_information(LIBBALSA_INFORMATION_WARNING,
-			  "Error writing to temporary file %s.\nCheck the directory permissions.",
-			  info->body->temp_filename);
+	balsa_information
+	    (LIBBALSA_INFORMATION_ERROR,
+	     _("Error writing to temporary file %s.\n"
+	       "Check the directory permissions."),
+	     info->body->temp_filename);
 	return;
     }
 
     if ((fp = fopen(info->body->temp_filename, "r")) == NULL) {
-	balsa_information(LIBBALSA_INFORMATION_WARNING,
-			  "Cannot open temporary file %s.",
+	balsa_information(LIBBALSA_INFORMATION_ERROR,
+			  _("Cannot open temporary file %s."),
 			  info->body->temp_filename);
 	return;
     }
@@ -1816,3 +1846,273 @@ balsa_message_select_all(BalsaMessage * bmessage)
 			       (bmessage->current_part->focus_widget), 0,
 			       -1);
 }
+
+#ifdef BALSA_MDN_REPLY
+/* rfc2298_address_equal
+   compares two addresses according to rfc2298: local-part@domain is equal,
+   if the local-parts are case sensitive equal, but the domain case-insensitive
+*/
+static gboolean 
+rfc2298_address_equal(LibBalsaAddress *a, LibBalsaAddress *b)
+{
+    gchar *a_string, *b_string, *a_atptr, *b_atptr;
+    gint a_atpos, b_atpos;
+
+    if (!a || !b)
+	return FALSE;
+
+    a_string = libbalsa_address_to_gchar (a, -1);
+    b_string = libbalsa_address_to_gchar (b, -1);
+    
+    /* first find the "@" in the two addresses */
+    a_atptr = strchr (a_string, '@');
+    b_atptr = strchr (b_string, '@');
+    if (!a_atptr || !b_atptr) {
+	g_free (a_string);
+	g_free (b_string);
+	return FALSE;
+    }
+    a_atpos = a_atptr - a_string;
+    b_atpos = b_atptr - b_string;
+
+    /* now compare the strings */
+    if (!a_atpos || !b_atpos || a_atpos != b_atpos || 
+	strncmp (a_string, b_string, a_atpos) ||
+	g_strcasecmp (a_atptr, b_atptr)) {
+	g_free (a_string);
+	g_free (b_string);
+	return FALSE;
+    } else {
+	g_free (a_string);
+	g_free (b_string);
+	return TRUE;
+    }
+}
+
+static void
+handle_mdn_request(LibBalsaMessage *message)
+{
+    gboolean suspicious, found;
+    LibBalsaAddress *use_from, *addr;
+    GList *list;
+    BalsaMDNReply action;
+    LibBalsaMessage *mdn;
+
+    /* Check if the dispnotify_to address is equal to the (in this order,
+       if present) reply_to, from or sender address. */
+    if (message->reply_to)
+	use_from = message->reply_to;
+    else if (message->from)
+	use_from = message->from;
+    else if (message->sender)
+	use_from = message->sender;
+    else
+	use_from = NULL;
+    suspicious = !rfc2298_address_equal (message->dispnotify_to, use_from);
+    
+    if (!suspicious) {
+	/* Try to find "my" address first in the to, then in the cc list */
+	list = g_list_first(message->to_list);
+	found = FALSE;
+	while (list && !found) {
+	    addr = list->data;
+	    found = rfc2298_address_equal (balsa_app.address, addr);
+	    list = list->next;
+	}
+	if (!found) {
+	    list = g_list_first(message->cc_list);
+	    while (list && !found) {
+		addr = list->data;
+		found = rfc2298_address_equal (balsa_app.address, addr);
+		list = list->next;
+	    }
+	}
+	suspicious = !found;
+    }
+    
+    /* Now we decide from the settings of balsa_app.mdn_reply_[not]clean what
+       to do...
+    */
+    if (suspicious)
+	action = balsa_app.mdn_reply_notclean;
+    else
+	action = balsa_app.mdn_reply_clean;
+    if (action == BALSA_MDN_REPLY_NEVER)
+	return;
+    
+    /* We *may* send a reply, so let's create a message for that... */
+    mdn = create_mdn_reply (message, action == BALSA_MDN_REPLY_ASKME);
+
+    /* if the user wants to be asked, display a dialog, otherwise send... */
+    if (action == BALSA_MDN_REPLY_ASKME) {
+	gchar *sender;
+	gchar *reply_to;
+	
+	sender = libbalsa_address_to_gchar (use_from, 0);
+	reply_to = libbalsa_address_to_gchar (message->dispnotify_to, -1);
+	gtk_widget_show_all (create_mdn_dialog (sender, reply_to, mdn));
+	g_free (reply_to);
+	g_free (sender);
+    } else {
+	libbalsa_message_send(mdn, balsa_app.outbox, NULL,
+			      balsa_app.encoding_style,  
+			      balsa_app.smtp ? balsa_app.smtp_server : NULL,
+			      balsa_app.smtp_port);
+	gtk_object_destroy(GTK_OBJECT(mdn));
+    }
+}
+
+static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg, 
+					  gboolean manual)
+{
+    LibBalsaMessage *message;
+    LibBalsaMessageBody *body;
+    gchar *date, *dummy;
+
+    /* create a message with the header set from the incoming message */
+    libbalsa_set_charset("ISO-8859-1");  /* how do I detect the *standard* setting? */
+    message = libbalsa_message_new();
+    dummy = libbalsa_address_to_gchar(balsa_app.address, 0);
+    message->from = libbalsa_address_new_from_string(dummy);
+    g_free (dummy);
+    message->subject = g_strdup("Message Disposition Notification");
+    dummy = libbalsa_address_to_gchar(for_msg->dispnotify_to, 0);
+    message->to_list = libbalsa_address_new_list_from_string(dummy);
+    g_free (dummy);
+
+    /* the first part of the body is an informational note */
+    body = libbalsa_message_body_new(message);
+    date = libbalsa_message_date_to_gchar(for_msg, balsa_app.date_string);
+    dummy = libbalsa_make_string_from_list(for_msg->to_list);
+    body->buffer = g_strdup_printf(
+	"The message sent on %s to %s with subject \"%s\" has been displayed.\n"
+	"There is no guarantee that the message has been read or understood.\n\n",
+	date, dummy, for_msg->subject);
+    g_free (date);
+    g_free (dummy);
+    if (balsa_app.wordwrap)
+	libbalsa_wrap_string(body->buffer, balsa_app.wraplength);
+    body->charset = g_strdup ("ISO-8859-1");
+    libbalsa_message_append_part(message, body);
+    
+    /* the second part is a rfc2298 compliant message/disposition-notification */
+    body = libbalsa_message_body_new(message);
+    dummy = libbalsa_address_to_gchar(balsa_app.address, -1);
+    body->buffer = g_strdup_printf("Reporting-UA: %s;" PACKAGE " " VERSION "\n"
+				   "Final-Recipient: rfc822;%s\n"
+				   "Original-Message-ID: %s\n"
+				   "Disposition: %s-action/MDN-sent-%sly;displayed",
+				   dummy, dummy, for_msg->message_id, 
+				   manual ? "manual" : "automatic",
+				   manual ? "manual" : "automatical");
+    g_free (dummy);
+    body->mime_type = g_strdup ("message/disposition-notification");
+    body->charset = g_strdup ("US-ASCII");
+    libbalsa_message_append_part(message, body);
+    return message;
+}
+
+static GtkWidget* create_mdn_dialog (gchar *sender, gchar *mdn_to_address, 
+				     LibBalsaMessage *send_msg)
+{
+  GtkWidget *mdn_dialog;
+  GtkWidget *dialog_vbox;
+  GtkWidget *hbox;
+  GtkWidget *pixmap;
+  GtkWidget *label;
+  GtkWidget *dialog_action_area;
+  GtkWidget *button_no;
+  GtkWidget *button_yes;
+  gchar *l_text;
+
+  mdn_dialog = gnome_dialog_new (_("reply to MDN?"), NULL);
+  gtk_object_set_user_data (GTK_OBJECT (mdn_dialog), send_msg);
+
+  dialog_vbox = GNOME_DIALOG (mdn_dialog)->vbox;
+
+  hbox = gtk_hbox_new (FALSE, 10);
+  gtk_box_pack_start (GTK_BOX (dialog_vbox), hbox, TRUE, TRUE, 0);
+
+  pixmap = gnome_pixmap_new_from_file (GNOME_DATA_PREFIX "/pixmaps/gnome-question.png");
+  gtk_box_pack_start (GTK_BOX (hbox), pixmap, TRUE, TRUE, 0);
+
+  l_text = g_strdup_printf(
+      _("The sender of this mail, %s, requested \n"
+	"a Message Disposition Notification (MDN) to be returned to `%s'.\n"
+	"Do you want to send this notification?"),
+      sender, mdn_to_address);
+  label = gtk_label_new (l_text);
+  g_free (l_text);
+  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
+  gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_LEFT);
+  gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+
+  dialog_action_area = GNOME_DIALOG (mdn_dialog)->action_area;
+  gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area), 
+			     GTK_BUTTONBOX_END);
+  gtk_button_box_set_spacing (GTK_BUTTON_BOX (dialog_action_area), 8);
+
+  gnome_dialog_append_button (GNOME_DIALOG (mdn_dialog), 
+			      GNOME_STOCK_BUTTON_NO);
+  button_no = g_list_last (GNOME_DIALOG (mdn_dialog)->buttons)->data;
+  GTK_WIDGET_SET_FLAGS (button_no, GTK_CAN_DEFAULT);
+  
+  gnome_dialog_append_button (GNOME_DIALOG (mdn_dialog), 
+			      GNOME_STOCK_BUTTON_YES);
+  button_yes = g_list_last (GNOME_DIALOG (mdn_dialog)->buttons)->data;
+  GTK_WIDGET_SET_FLAGS (button_yes, GTK_CAN_DEFAULT);
+
+  gtk_signal_connect (GTK_OBJECT (mdn_dialog), "delete_event",
+                      GTK_SIGNAL_FUNC (mdn_dialog_delete), NULL);
+  gtk_signal_connect (GTK_OBJECT (button_no), "clicked",
+                      GTK_SIGNAL_FUNC (no_mdn_reply), mdn_dialog);
+  gtk_signal_connect (GTK_OBJECT (button_yes), "clicked",
+                      GTK_SIGNAL_FUNC (send_mdn_reply), mdn_dialog);
+
+  gtk_widget_grab_focus (button_no);
+  gtk_widget_grab_default (button_no);
+  return mdn_dialog;
+}
+
+static void mdn_dialog_delete (GtkWidget *dialog, GdkEvent *event, 
+			       gpointer user_data)
+{
+    LibBalsaMessage *send_msg;
+
+    send_msg = 
+	LIBBALSA_MESSAGE(gtk_object_get_user_data (GTK_OBJECT (dialog)));
+    gtk_object_destroy(GTK_OBJECT(send_msg));
+    gtk_widget_hide (dialog);
+    gtk_object_destroy(GTK_OBJECT(dialog));
+}
+
+static void no_mdn_reply (GtkWidget *widget, gpointer user_data)
+{
+    GtkWidget *dialog = GTK_WIDGET (user_data);
+    LibBalsaMessage *send_msg;
+
+    send_msg = 
+	LIBBALSA_MESSAGE(gtk_object_get_user_data (GTK_OBJECT (dialog)));
+    gtk_object_destroy(GTK_OBJECT(send_msg));
+    gtk_widget_hide (dialog);
+    gtk_object_destroy(GTK_OBJECT(dialog));
+}
+
+
+static void send_mdn_reply (GtkWidget *widget, gpointer user_data)
+{
+    GtkWidget *dialog = GTK_WIDGET (user_data);
+    LibBalsaMessage *send_msg;
+
+    send_msg = 
+	LIBBALSA_MESSAGE(gtk_object_get_user_data (GTK_OBJECT (dialog)));
+    libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
+			  balsa_app.encoding_style,  
+			  balsa_app.smtp ? balsa_app.smtp_server : NULL,
+			  balsa_app.smtp_port);
+    gtk_object_destroy(GTK_OBJECT(send_msg));
+    gtk_widget_hide (dialog);
+    gtk_object_destroy(GTK_OBJECT(dialog));
+}
+#endif

@@ -792,6 +792,8 @@ translate_message(HEADER * cur)
     message->from = libbalsa_address_new_from_libmutt(cenv->from);
     message->sender = libbalsa_address_new_from_libmutt(cenv->sender);
     message->reply_to = libbalsa_address_new_from_libmutt(cenv->reply_to);
+    message->dispnotify_to = 
+	libbalsa_address_new_from_libmutt(cenv->dispnotify_to);
 
     for (addy = cenv->to; addy; addy = addy->next) {
 	addr = libbalsa_address_new_from_libmutt(addy);

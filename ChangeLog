@@ -1,3 +1,24 @@
+2001-03-22  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/body.c: save temporary file only when needed.
+	* src/balsa-app.c: remove not used header files.
+	* src/balsa-message.c: translate critical error messages.
+	* src/expand-alias.c: remove not used header files. add static
+	in make_rfc822 definition.
+	* src/mailbox-conf.c, src/save-restore.c: remove not used header files.
+
+	Patch from Albrecht Dreﬂ <albrecht.dress@arcormail.de> 
+	for Message Disposition Notification (MDN) reply feature.
+	* acconfig.h: add BALSA_MDN_REPLY define.
+	* configure.in: support --enable-mdn-reply configuration option.
+	* libbalsa/body.[hc]: add body->mime_type field.
+	* libbalsa/mailbox.c: copy the message->dispnotify_to field from
+	mutt's data.
+	* libbalsa/send.c: support sending MDN notifications.
+	* src/balsa-app.h : add MDN configuration fields.
+	* src/balsa-message.c: fundamental MDN support & UI.
+	* src/save-restore.c: read & save MDN configuration.
+	
 2001-03-21  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/save-restore.c: 

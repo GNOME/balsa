@@ -21,12 +21,6 @@
 
 #include "config.h"
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdio.h>
-
 #include "balsa-app.h"
 #include "misc.h"
 #include "libbalsa.h"

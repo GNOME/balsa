@@ -44,6 +44,9 @@ enum _LibBalsaMessageBodyType {
 struct _LibBalsaMessageBody {
     LibBalsaMessage *message;	/* The message of which this is a part */
     gchar *buffer;		/* holds raw data of the MIME part, or NULL */
+#ifdef BALSA_MDN_REPLY
+    gchar *mime_type;           /* the mime type/subtype of buffer, or NULL, if plain */
+#endif
     MuttBody *mutt_body;	/* pointer to BODY struct of mutt message */
     gchar *filename;		/* holds filename for attachments and such (used mostly for sending) */
     gchar *temp_filename;	/* Holds the filename of a the temporary file where this part is saved */

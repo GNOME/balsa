@@ -200,6 +200,24 @@ else
 fi
 
 dnl ######################################################################################
+dnl Enable reply to MDN request?
+dnl ######################################################################################
+
+AC_ARG_ENABLE(all, [  --enable-mdn-reply      Enable reply to Message Disposition Notification requests [default=yes]],[
+	mdn_reply=$enableval
+],[
+	mdn_reply=yes
+])
+
+AC_MSG_CHECKING([whether to enable reply to MDN requests])
+if test x"$mdn_reply" = xyes ; then
+	AC_MSG_RESULT([yes])
+	AC_DEFINE(BALSA_MDN_REPLY)
+else
+	AC_MSG_RESULT([no])
+fi
+
+dnl ######################################################################################
 dnl Use threading?
 dnl ######################################################################################
 

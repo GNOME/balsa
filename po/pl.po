@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-04-21 19:36+0200\n"
+"POT-Creation-Date: 2004-04-23 14:28+0200\n"
 "PO-Revision-Date: 2003-07-27 23:38+0100\n"
 "Last-Translator: Gnome PL Team <translators@gnome.pl>\n"
 "Language-Team: Polish <translation-team-pl@lists.sourceforge.net>\n"
@@ -403,7 +403,7 @@ msgstr "%s: %s"
 msgid "Could not send \"%s\" to \"%s\""
 msgstr "Nie można wysłać \"%s\" do \"%s\""
 
-#: libbalsa/libbalsa.c:279
+#: libbalsa/libbalsa.c:277
 #, c-format
 msgid "LDAP Directory for %s"
 msgstr "Katalog LDAP dla %s"
@@ -1158,7 +1158,7 @@ msgstr "Dla"
 msgid "Disconnected"
 msgstr "Rozłączony"
 
-#: libbalsa/send.c:1104
+#: libbalsa/send.c:1111
 msgid ""
 "SMTP server refused connection.\n"
 "Balsa by default uses submission service (587).\n"
@@ -1172,7 +1172,7 @@ msgstr ""
 "to jawnie poprzez \"host:smtp\".\n"
 "List pozostał w skrzynce z pocztą wychodzącą."
 
-#: libbalsa/send.c:1114
+#: libbalsa/send.c:1121
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
@@ -1181,14 +1181,14 @@ msgstr ""
 "Wystąpił problem przy komunikacji z serwerem SMTP (%d): %s\n"
 "List pozostał w skrzynce poczty wychodzącej."
 
-#: libbalsa/send.c:1424
+#: libbalsa/send.c:1431
 #, c-format
 msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 msgstr ""
 "Nie można ustalić zestawu znaków dla pliku tekstowego \"%s\"; wysyłanie jako "
 "typ mime \"%s\""
 
-#: libbalsa/send.c:1718 libbalsa/send.c:1794
+#: libbalsa/send.c:1725 libbalsa/send.c:1801
 msgid "This message will not be encrpyted for the BCC: recipient(s)."
 msgstr "List nie zostanie zaszyfrowany dla odbiorców z pola BCC:."
 
@@ -1717,13 +1717,23 @@ msgstr "_Inny..."
 msgid "Choose destination folder"
 msgstr "Wybór folderu docelowego"
 
-#: src/balsa-mblist.c:2136
+#: src/balsa-mblist.c:2135
 #, c-format
-msgid "Shown mailbox: %s with %d message, %ld new"
-msgid_plural "Shown mailbox: %s with %d messages, %ld new"
-msgstr[0] "Widoczna skrzynka: %s z %d listem, %ld nowych"
-msgstr[1] "Widoczna skrzynka: %s z %d listami, %ld nowych"
-msgstr[2] "Widoczna skrzynka: %s z %d listami, %ld nowych"
+msgid "Shown mailbox: %s with %d message, "
+msgid_plural "Shown mailbox: %s with %d messages, "
+msgstr[0] "Widoczna skrzynka: %s z %d listem, "
+msgstr[1] "Widoczna skrzynka: %s z %d listami, "
+msgstr[2] "Widoczna skrzynka: %s z %d listami, "
+
+#. xgettext: this is the second part of the message
+#. * "Shown mailbox: %s with %d messages, %ld new".
+#: src/balsa-mblist.c:2141
+#, c-format
+msgid "%ld new"
+msgid_plural "%ld new"
+msgstr[0] "%ld nowy"
+msgstr[1] "%ld nowe"
+msgstr[2] "%ld nowych"
 
 #: src/balsa-message.c:469
 msgid "Content"

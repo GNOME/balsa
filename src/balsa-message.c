@@ -21,8 +21,8 @@
 
 #include "mutt.h"
 
-#define obstack_chunk_alloc malloc
-#define obstack_chunk_free  free
+#define obstack_chunk_alloc g_malloc
+#define obstack_chunk_free  g_free
 
 #include <obstack.h>
 

@@ -1161,10 +1161,6 @@ message_body_ref (Message * message)
 				cur->content->offset + cur->content->length,
 			 strcasecmp ("digest", cur->content->subtype) == 0);
     }
-  else
-    {
-      cur->content->parts = cur->content;
-    }
   if (msg != NULL)
     {
       GString *mbuf = g_string_new (NULL);
@@ -1184,24 +1180,32 @@ message_body_ref (Message * message)
 		   mime_content_type2str (cur->content->type),
 		   cur->content->type);
 	}
-      bdy = cur->content->parts;
-      while (bdy)
+      if (cur->content->type != TYPEMULTIPART)
 	{
-
-	  if (balsa_app.debug)
-	    {
-	      fprintf (stderr, "h->c->type      = %s[%d]\n", mime_content_type2str (bdy->type), bdy->type);
-	      fprintf (stderr, "h->c->subtype   = %s\n", bdy->subtype);
-	      fprintf (stderr, "======\n");
-	    }
 	  body = body_new ();
-	  body->mutt_body = bdy;
-	  fprintf (stderr, "message_body_ref: message->body = %p -> %p\n", body, bdy);
+	  body->mutt_body = cur->content;
 	  message->body_list = g_list_append (message->body_list, body);
-	  bdy = bdy->next;
-
 	}
+      else
+	{
+	  bdy = cur->content->parts;
+	  while (bdy)
+	    {
 
+	      if (balsa_app.debug)
+		{
+		  fprintf (stderr, "h->c->type      = %s[%d]\n", mime_content_type2str (bdy->type), bdy->type);
+		  fprintf (stderr, "h->c->subtype   = %s\n", bdy->subtype);
+		  fprintf (stderr, "======\n");
+		}
+	      body = body_new ();
+	      body->mutt_body = bdy;
+	      fprintf (stderr, "message_body_ref: message->body = %p -> %p\n", body, bdy);
+	      message->body_list = g_list_append (message->body_list, body);
+	      bdy = bdy->next;
+
+	    }
+	}
       message->body_ref++;
       mx_close_message (&msg);
     }
@@ -1219,7 +1223,7 @@ message_body_ref (Message * message)
       if (MAILBOX_IMAP (message->mailbox)->tmp_file_path)
 	g_free (MAILBOX_IMAP (message->mailbox)->tmp_file_path);
       MAILBOX_IMAP (message->mailbox)->tmp_file_path =
-	      g_strdup (cur->content->filename);
+	g_strdup (cur->content->filename);
     }
 }
 

@@ -16,6 +16,10 @@ body {margin-left: 50pt;}
 <ol>
 <li>A basic <a href="http://www.gnome.org/start/">GNOME installation</a>.</li>
 
+<li>Since version 1.1.5, we use <a
+href="http://www.stafford.uklinux.net/libesmtp/">libESMTP</a> library
+for message submission. It is small (<100kB) but modern and resourceful.</li>
+
 <li>Balsa 0.9.5 and greater uses the <b><samp>libpspell</samp></b>
 library for spell checking, which is available in both rpm and deb
 format as well as plain source.  You can find the library and modules at the
@@ -33,16 +37,17 @@ LDAP support (<samp>--enable-ldap</samp>).</li>
 
 <p><samp>balsa-1.0.0</samp> released on 2000-11-11 is the most recent
 stable release. It has passed long testing period and should be quite
-solid. Anyway, a lot has changed since then and if you look for
-reliable IMAP access and other goodies, try balsa-1.1.4 instead.</p>
+solid. <em>Anyway</em>, a lot has changed since then and if you look
+for reliable IMAP access and other goodies, try balsa-1.1.4
+instead.</p>
 
-<p>The binary rpm is compiled on RH-6.2 with update packages installed
-with <samp>gnome-print-0.25</samp> (available from <a
-href="http://www.ximian.com/">Ximian</a>). You can get rid of
-this dependency by recompiling balsa. You may want to recompile balsa
-(you may find <samp>rpm --rebuild balsa*src.rpm</samp> or <samp>rpm
--ta balsa.tar.bz2</samp> handy) to enable LDAP, GSS or HTML support,
-which are disabled by default.</p>
+<p>The binary rpm 1.1.5 is compiled on RH-7.1 with update packages
+installed, and with <samp>gnome-print-0.25</samp> (available from <a
+href="http://www.ximian.com/">Ximian</a>). You can get rid of this
+dependency by recompiling balsa. You may want to recompile balsa (you
+may find <samp>rpm --rebuild balsa*src.rpm</samp> or <samp>rpm -ta
+balsa.tar.bz2</samp> handy) to enable LDAP, GSS or HTML support, which
+are disabled by default.</p>
 
 <p>There have been many improvements over the last stable release,
 including:</p>
@@ -84,21 +89,29 @@ including:</p>
 </ul>
 
 <a name="dev"></a>
-<h3>Development release - 1.1.4</h3>
+<h3>Development release - 1.1.5</h3>
 
-<p><b>2001-03-29</b>: We gradually approach next stable release. This
-one has GDK locking problems fixed and can print international
-characters. You can download it as:</p>
+<p><b>2001-05-22</b>: We gradually approach next stable release. This
+release can use SMTP AUTHentication and print attached images:</p>
+
 <ul>
-<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.1.4.tar.gz">http://www.theochem.kth.se/~pawsa/balsa/balsa-1.1.4.tar.gz</a></li>
-<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.1.4-1.src.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-1.1.4-1.src.rpm</a></li>
+<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.1.5.tar.gz">http://www.theochem.kth.se/~pawsa/balsa/balsa-1.1.5.tar.gz</a></li>
+<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.1.5-1.src.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-1.1.5-1.src.rpm</a></li>
 
 <li><a
-href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.1.4-1.i386.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-1.1.4-1.i386.rpm</a>
-built on RH6.2 box as described above. This is most likely the last
-release built on this distribution: our development boxes are under
-transition to RH 7.1.</li>
+href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.1.5-1.i386.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-1.1.5-1.i386.rpm</a>
+built on RH7.1 box as described above.</li>
 </ul>
+
+<p>You need <a
+href="http://www.stafford.uklinux.net/libesmtp/">libESMTP</a>
+library. Get the sources from <a
+href="http://www.stafford.uklinux.net/libesmtp/">its home
+site</a>. You can grab <a
+href="http://www.theochem.kth.se/~pawsa/balsa/libesmtp-0.7.1-1.src.rpm">0.7.1
+src rpm</a> and <a
+href="http://www.theochem.kth.se/~pawsa/balsa/libesmtp-0.7.1-1.i386.rpm">0.7.1
+i386 rpm</a> packages directly.</p>
 
 <h3>CVS source &amp; build instructions</h3>
 
@@ -115,6 +128,11 @@ balsa. Get also <samp><a
 href="http://people.redhat.com/dcm/software.html">gnome-doc-tools</a></samp>
 or alternatively install <samp>png-support-3.?.dtd</samp> and
 <samp>gdp-both.dsl</samp> files yourself. Make sure your have <samp>libtool</samp> installed.</p>
+
+<p>If you get errors compiling balsa help file
+<samp>balsa.sgml</samp>, make sure your SGML catalog file contains
+paths to relevant packages. The frequent error is to omit PNG support
+files which results in seemingly unrelated errors.</p>
 
 <hr>
 <address><a href="mailto:balsa-list@gnome.org">balsa-list@gnome.org</a></address>

@@ -77,6 +77,14 @@ Specify the kerberos directory as the argument.
 
 Libraries:
 ---------
+	Balsa uses libESMTP library available at 
+http://www.stafford.uklinux.net/libesmtp/
+The current version is available at
+http://www.stafford.uklinux.net/libesmtp/libesmtp-0.7.1.tar.bz2
+or
+http://www.stafford.uklinux.net/libesmtp/libesmtp-0.7.1.tar.gz
+You can find links to binary rpm at balsa website.
+	
 	The binaries are compiled against gnome-libs-1.2.1, if you use
 older libraries, you will need to recompile balsa from the source.  Balsa 
 also needs the pspell spell checking libraries.

@@ -342,6 +342,7 @@ config_global_load(void)
 {
     gchar **open_mailbox_vector;
     gint open_mailbox_count;
+    gboolean def_used;
 
     config_address_books_load();
     config_identities_load();
@@ -538,7 +539,23 @@ config_global_load(void)
 
 #if ENABLE_ESMTP
     /* ... SMTP server */
-    balsa_app.smtp_server = gnome_config_get_string("ESMTPServer=localhost:25");
+    balsa_app.smtp_server =
+	gnome_config_get_string_with_default("ESMTPServer=localhost:25", 
+					     &def_used);
+    if(def_used) {
+	/* we need to check for old format, 1.1.4-compatible settings and
+	   convert them if needed.
+	*/
+	gchar* old_server = gnome_config_get_string("SMTPServer");
+	if(old_server) {
+	    int port = gnome_config_get_int("SMTPPort=25");
+	    g_free(balsa_app.smtp_server);
+	    balsa_app.smtp_server = g_strdup_printf("%s:%d",
+						    old_server, port);
+	    g_free(old_server);
+	g_warning("Converted old SMTP server config to ESMTP format. Verify the correctness.");
+	}
+    }
     balsa_app.smtp_user = gnome_config_get_string("ESMTPUser");
     balsa_app.smtp_passphrase = gnome_config_get_string("ESMTPPassphrase");
 #endif

@@ -204,6 +204,15 @@ balsa_app_init(void)
     balsa_app.tooltips = gtk_tooltips_new();
 }
 
+static gint
+append_subtree_f(GNode* gn, gpointer data)
+{
+    if(gn->data) /* fails for root node only */
+	balsa_mailbox_node_append_subtree(BALSA_MAILBOX_NODE(gn->data),
+					       gn);
+    return FALSE;
+}
+
 gboolean
 do_load_mailboxes(void)
 {
@@ -218,7 +227,14 @@ do_load_mailboxes(void)
     }
 
     load_local_mailboxes();
-
+    
+    /* expand subtrees; move later to an idle callback or a separate 
+       thread to construct folders that are expensive to build (IMAP over
+       dialup).
+    */
+    g_node_traverse(balsa_app.mailbox_nodes, G_IN_ORDER, G_TRAVERSE_LEAFS, -1,
+                    append_subtree_f, NULL);
+    
     return TRUE;
 }
 

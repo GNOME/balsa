@@ -162,14 +162,15 @@ read_dir (gchar * prefix, struct dirent *d)
   snprintf (filename, PATH_MAX, "%s/%s", prefix, d->d_name);
 
   /* ignore file if it can't be read. */
-     
-  if (stat (filename, &st) == -1 || access(filename, R_OK) == -1)
+
+  if (stat (filename, &st) == -1 || access (filename, R_OK) == -1)
     return;
 
   if (S_ISDIR (st.st_mode))
     {
       mailbox_type = mailbox_valid (filename);
-      fprintf(stderr,"Mailbox name = %s,  mailbox type = %d\n", filename, mailbox_type);
+      if (balsa_app.debug)
+	fprintf (stderr, "Mailbox name = %s,  mailbox type = %d\n", filename, mailbox_type);
       if (mailbox_type == MAILBOX_MH || mailbox_type == MAILBOX_MAILDIR)
 	{
 	  add_mailbox (d->d_name, filename, mailbox_type, 1);

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1998-08-23 12:51-0400\n"
+"POT-Creation-Date: 1998-08-23 13:45-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -38,110 +38,110 @@ msgstr ""
 msgid "Next..."
 msgstr ""
 
-#: src/balsa-init.c:191
+#: src/balsa-init.c:190
 msgid ""
 "Welcome to Balsa!\n"
 "\n"
 msgstr ""
 
-#: src/balsa-init.c:192
+#: src/balsa-init.c:191
 msgid "You seem to be running Balsa for the first time.\n"
 msgstr ""
 
-#: src/balsa-init.c:193
+#: src/balsa-init.c:192
 msgid "The following steps will setup Balsa by asking a few simple questions."
 msgstr ""
 
-#: src/balsa-init.c:194
+#: src/balsa-init.c:193
 msgid ""
 "Once you have completed these steps, you can always change them at a later "
 "time through Balsa's preferences."
 msgstr ""
 
-#: src/balsa-init.c:196
+#: src/balsa-init.c:195
 msgid ""
 "Please check the about box in Balsa's main window for more information on "
 "contacting the authors or reporting bugs."
 msgstr ""
 
 #. your name
-#: src/balsa-init.c:237 src/pref-manager.c:316
+#: src/balsa-init.c:236 src/pref-manager.c:315
 msgid "Your name:"
 msgstr ""
 
 #. email address
-#: src/balsa-init.c:251 src/pref-manager.c:326
+#: src/balsa-init.c:250 src/pref-manager.c:325
 msgid "E-Mail address:"
 msgstr ""
 
 #. smtp server
-#: src/balsa-init.c:266 src/pref-manager.c:336
+#: src/balsa-init.c:265 src/pref-manager.c:335
 msgid "SMTP server:"
 msgstr ""
 
-#: src/balsa-init.c:308
+#: src/balsa-init.c:307
 msgid "Inbox Path:"
 msgstr ""
 
-#: src/balsa-init.c:320
+#: src/balsa-init.c:319
 msgid "Outbox Path:"
 msgstr ""
 
-#: src/balsa-init.c:332
+#: src/balsa-init.c:331
 msgid "Trash Path:"
 msgstr ""
 
-#: src/balsa-init.c:343
+#: src/balsa-init.c:342
 msgid ""
 "If you wish to use IMAP for these\n"
 "please change them inside Balsa\n"
 msgstr ""
 
-#: src/balsa-init.c:361
+#: src/balsa-init.c:360
 msgid "Balsa is now ready to run.  Click finish to save your settings"
 msgstr ""
 
-#: src/balsa-init.c:365
+#: src/balsa-init.c:364
 msgid "Finish"
 msgstr ""
 
-#: src/balsa-init.c:417
+#: src/balsa-init.c:416
 msgid "Invalid Mailbox!"
 msgstr ""
 
-#: src/index-child.c:96
+#: src/index-child.c:95
 msgid "Unable to Open Mailbox!"
 msgstr ""
 
-#: src/index-child.c:220
+#: src/index-child.c:216
 msgid "Transfer"
 msgstr ""
 
-#: src/index-child.c:238
+#: src/index-child.c:234
 msgid "Change Status"
 msgstr ""
 
-#: src/index-child.c:241
+#: src/index-child.c:237
 msgid "Unread"
 msgstr ""
 
-#: src/index-child.c:247
+#: src/index-child.c:243
 msgid "Read"
 msgstr ""
 
-#: src/index-child.c:253
+#: src/index-child.c:249
 msgid "Replied"
 msgstr ""
 
-#: src/index-child.c:259
+#: src/index-child.c:255
 msgid "Forwarded"
 msgstr ""
 
-#: src/index-child.c:269 src/main-window.c:262
+#: src/index-child.c:265 src/main-window.c:262
 msgid "Undelete"
 msgstr ""
 
-#: src/index-child.c:277 src/main-window.c:248 src/main-window.c:411
+#: src/index-child.c:273 src/main-window.c:248 src/main-window.c:411
 msgid "Delete"
 msgstr ""
 
@@ -150,22 +150,22 @@ msgstr ""
 msgid "Local Mailbox Loaded as: %s\n"
 msgstr ""
 
-#: src/mailbox-conf.c:107
+#: src/mailbox-conf.c:145
 msgid ""
 "This will remove the mailbox permanently.\n"
 "Are you sure you want to delete this mailbox?"
 msgstr ""
 
-#: src/mailbox-conf.c:150
+#: src/mailbox-conf.c:200
 msgid "Mailbox Configurator"
 msgstr ""
 
-#: src/mailbox-conf.c:366
+#: src/mailbox-conf.c:417
 #, c-format
 msgid "Cannot create mailbox '%s': %s\n"
 msgstr ""
 
-#: src/mailbox-conf.c:367
+#: src/mailbox-conf.c:418
 msgid "Cancel"
 msgstr ""
 
@@ -245,7 +245,7 @@ msgid "Close"
 msgstr ""
 
 #. mailboxes page
-#: src/main-window.c:309 src/pref-manager.c:131
+#: src/main-window.c:309 src/pref-manager.c:130
 msgid "Mailboxes"
 msgstr ""
 
@@ -335,30 +335,30 @@ msgid "Delete Mailbox"
 msgstr ""
 
 #. identity page
-#: src/pref-manager.c:124
+#: src/pref-manager.c:123
 msgid "Identity"
 msgstr ""
 
 #. view page
-#: src/pref-manager.c:138
+#: src/pref-manager.c:137
 msgid "View"
 msgstr ""
 
 #. MDI page
-#: src/pref-manager.c:145 src/pref-manager.c:436
+#: src/pref-manager.c:144 src/pref-manager.c:434
 msgid "MDI"
 msgstr ""
 
-#: src/pref-manager.c:365
+#: src/pref-manager.c:364
 msgid "Local mail directory:"
 msgstr ""
 
 #. Toolbars
-#: src/pref-manager.c:395
+#: src/pref-manager.c:393
 msgid "Toolbars"
 msgstr ""
 
-#: src/pref-manager.c:415
+#: src/pref-manager.c:413
 msgid "Debug"
 msgstr ""
 
@@ -402,17 +402,17 @@ msgstr ""
 msgid "Forward message"
 msgstr ""
 
-#: libbalsa/mailbox.c:460
+#: libbalsa/mailbox.c:461
 #, c-format
 msgid "Mailbox: Opening %s Refcount: %d\n"
 msgstr ""
 
-#: libbalsa/mailbox.c:485
+#: libbalsa/mailbox.c:487
 #, c-format
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr ""
 
-#: libbalsa/mailbox.c:1342
+#: libbalsa/mailbox.c:1344
 #, c-format
 msgid "Loading message: %s/%s\n"
 msgstr ""

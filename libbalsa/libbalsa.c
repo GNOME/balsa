@@ -21,33 +21,41 @@
 
 #include <string.h>
 #include <gnome.h>
+#include "balsa-app.h"
 
-void mutt_message (const char *fmt, ...)
+void 
+mutt_message (const char *fmt,...)
 {
-   va_list ap;
-   char outstr[522];
+  if (balsa_app.debug)
+    {
+      va_list ap;
+      char outstr[522];
 
-   va_start(ap, fmt);
-   vsprintf(outstr, fmt, ap);
-   va_end(ap);
-
-   g_print("mutt_message: %s\n", outstr);
+      va_start (ap, fmt);
+      vsprintf (outstr, fmt, ap);
+      va_end (ap);
+      g_print ("mutt_message: %s\n", outstr);
+    }
 }
 
-void mutt_exit (int code)
+void 
+mutt_exit (int code)
 {
 }
 
-int mutt_yesorno (const char *msg, int def)
+int 
+mutt_yesorno (const char *msg, int def)
 {
- return 1;
+  return 1;
 }
 
-int mutt_any_key_to_continue (const char *s)
+int 
+mutt_any_key_to_continue (const char *s)
 {
- return 1;
+  return 1;
 }
 
-void mutt_clear_error (void)
+void 
+mutt_clear_error (void)
 {
 }

@@ -139,12 +139,12 @@ static Message *translate_message (HEADER * cur);
 static Address *translate_address (ADDRESS * caddr);
 
 static void
-do_mutt_error(char* str, ...)
+do_mutt_error (char *str,...)
 {
   va_list ap;
-  va_start(ap, str);
-  g_warning(str, ap);
-  va_end(ap);
+  va_start (ap, str);
+  g_warning (str, ap);
+  va_end (ap);
 }
 
 /* We're gonna set Mutt global vars here */
@@ -165,11 +165,11 @@ mailbox_init (gchar * inbox_path)
 
   Realname = g_get_real_name ();
 
-  Hostname = g_get_host_name();
+  Hostname = g_get_host_name ();
 
   mutt_error = &do_mutt_error;
 
-  Fqdn = g_strdup(Hostname);
+  Fqdn = g_strdup (Hostname);
 
   Sendmail = SENDMAIL;
 
@@ -309,7 +309,7 @@ Mailbox *
 mailbox_new (MailboxType type)
 {
   Mailbox *mailbox;
-  
+
   switch (type)
     {
     case MAILBOX_MBOX:
@@ -457,7 +457,8 @@ mailbox_open_ref (Mailbox * mailbox)
       /* incriment the reference count */
       mailbox->open_ref++;
 
-      g_print (_ ("Mailbox: Opening %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
+      if (balsa_app.debug)
+	g_print (_ ("Mailbox: Opening %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
 
       UNLOCK_MAILBOX ();
       return TRUE;
@@ -482,7 +483,8 @@ mailbox_open_unref (Mailbox * mailbox)
 
   if (mailbox->open_ref == 0)
     {
-      g_print (_ ("Mailbox: Closing %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
+      if (balsa_app.debug)
+	g_print (_ ("Mailbox: Closing %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
 
       free_messages (mailbox);
       mailbox->messages = 0;
@@ -652,42 +654,42 @@ load_messages (Mailbox * mailbox, gint emit)
   for (msgno = mailbox->messages;
        mailbox->new_messages > 0;
        msgno++)
-      {
-	cur = CLIENT_CONTEXT (mailbox)->hdrs[msgno];
+    {
+      cur = CLIENT_CONTEXT (mailbox)->hdrs[msgno];
 
-	if (!cur)
-	  continue;
+      if (!cur)
+	continue;
 
-	message = translate_message (cur);
-	message->mailbox = mailbox;
-	message->msgno = msgno;
-	mailbox->messages++;
+      message = translate_message (cur);
+      message->mailbox = mailbox;
+      message->msgno = msgno;
+      mailbox->messages++;
 
-	if (!cur->read)
-	  message->flags |= MESSAGE_FLAG_NEW;
+      if (!cur->read)
+	message->flags |= MESSAGE_FLAG_NEW;
 
-	if (cur->deleted)
-	  message->flags |= MESSAGE_FLAG_DELETED;
+      if (cur->deleted)
+	message->flags |= MESSAGE_FLAG_DELETED;
 
-	if (cur->flagged)
-	  message->flags |= MESSAGE_FLAG_FLAGGED;
+      if (cur->flagged)
+	message->flags |= MESSAGE_FLAG_FLAGGED;
 
-	if (cur->replied)
-	  message->flags |= MESSAGE_FLAG_REPLIED;
+      if (cur->replied)
+	message->flags |= MESSAGE_FLAG_REPLIED;
 
-	mailbox->message_list = g_list_append (mailbox->message_list, message);
-	mailbox->new_messages--;
+      mailbox->message_list = g_list_append (mailbox->message_list, message);
+      mailbox->new_messages--;
 
-	if (emit)
-	  send_watcher_new_message (mailbox, message, mailbox->new_messages);
+      if (emit)
+	send_watcher_new_message (mailbox, message, mailbox->new_messages);
 
-	/* 
-	 * give time to gtk so the GUI isn't blocked
-	 * this is kinda a hack right now
-	 */
-	while (gtk_events_pending ())
-	  gtk_main_iteration ();
-      }
+      /* 
+       * give time to gtk so the GUI isn't blocked
+       * this is kinda a hack right now
+       */
+      while (gtk_events_pending ())
+	gtk_main_iteration ();
+    }
 }
 
 

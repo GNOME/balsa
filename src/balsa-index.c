@@ -299,11 +299,10 @@ balsa_index_new ()
 }
 
 static gboolean
-moveto_timer_hack (BalsaIndex * bindex)
+moveto_handler (BalsaIndex * bindex)
 {
   if (!GTK_WIDGET_VISIBLE (GTK_WIDGET (bindex)))
     return TRUE;
-  g_print ("balsa-index.c: moving to row %i\n", bindex->first_new_message);
   gtk_clist_moveto (GTK_CLIST (GTK_BIN (bindex)->child), bindex->first_new_message - 1, -1, 1.0, 0.0);
   return FALSE;
 }
@@ -376,7 +375,7 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
   if (bindex->first_new_message == 0)
     bindex->first_new_message = i;
 
-  gtk_timeout_add (5, (GtkFunction) moveto_timer_hack, (gpointer)bindex);
+  gtk_idle_add ((GtkFunction) moveto_handler, bindex);
 }
 
 void

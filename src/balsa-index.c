@@ -762,6 +762,8 @@ balsa_index_del(BalsaIndex * bindex, LibBalsaMessage * message)
     row = gtk_clist_find_row_from_data (GTK_CLIST (bindex->ctree), row_data);
     gtk_clist_unselect_row (GTK_CLIST (bindex->ctree), row, -1);
     gtk_ctree_remove_node(GTK_CTREE(bindex->ctree), node);
+
+
 }
 
 
@@ -1485,6 +1487,7 @@ do_delete(BalsaIndex* index, gboolean move_to_trash)
     LibBalsaMessage *message;
     gboolean select_next = TRUE;
     GList *messages=NULL;
+    LibBalsaMailbox *orig;
 
     /* select the previous message if we're at the bottom of the index */
     if (GTK_CLIST(index->ctree)->rows - 1 == 
@@ -1495,11 +1498,12 @@ do_delete(BalsaIndex* index, gboolean move_to_trash)
     for(list = GTK_CLIST(index->ctree)->selection; list; list = list->next) {
 	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
 	messages= g_list_append(messages, message);
+	orig = message->mailbox; /* sloppy way */
     }
     if(messages) {
-	if (move_to_trash && (index != trash))
-	    libbalsa_messages_move(messages, balsa_app.trash);
-	else
+	if (move_to_trash && (index != trash)) {
+	    balsa_messages_move(messages, balsa_app.trash);
+	} else
 	    libbalsa_messages_delete(messages);
 	g_list_free(messages);
     }
@@ -1992,7 +1996,7 @@ transfer_messages_cb(BalsaMBList * bmbl, LibBalsaMailbox * mailbox,
 	}
 
 	if(messages!=NULL){
- 	  libbalsa_messages_move(messages, mailbox);
+ 	  balsa_messages_move(messages, mailbox);
 	  g_list_free(messages);
 	}
     }

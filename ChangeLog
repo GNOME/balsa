@@ -1,3 +1,22 @@
+2001-06-11  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/balsa-app.c: 
+	* src/balsa-app.h: 
+	balsa_message* - wrappers around libbalsa_message functions that 
+	know about the mblist
+
+	* src/main-window.c: 
+	* src/balsa-index.c: 
+	* src/balsa-mblist.c: use balsa_message functions
+
+	* libbalsa/message.c (libbalsa_message_real_set_read_flag): do
+	mark unread properly
+
+	* libbalsa/pop3.c: compile without threads
+	Pawel's safe_read_char patch converted to poll()
+
+	* src/sendmsg-window.c: don't remove whitespace from signatures 
+
 2001-06-05  Carlos Morgado  <chbm@chbm.nu>
 
 	* help/C/balsa.sgml: 

@@ -610,3 +610,50 @@ balsa_find_index_by_mailbox(LibBalsaMailbox * mailbox)
     return NULL;
 }
 
+gboolean balsa_message_copy(LibBalsaMessage * message,
+                               LibBalsaMailbox * dest)
+{
+    gboolean ret = libbalsa_message_copy( message, dest );
+    gtk_signal_emit_by_name( GTK_OBJECT(dest), "set-unread-messages-flag", 
+			     0, balsa_app.mblist);	
+    return(ret);
+}
+
+gboolean balsa_message_move(LibBalsaMessage * message,
+                               LibBalsaMailbox * dest)
+{
+    LibBalsaMailbox *orig = message->mailbox;
+    gboolean ret = libbalsa_message_move( message, dest );
+    gtk_signal_emit_by_name( GTK_OBJECT(orig), "set-unread-messages-flag", 
+			     0, balsa_app.mblist);	
+    gtk_signal_emit_by_name( GTK_OBJECT(dest), "set-unread-messages-flag", 
+			     0, balsa_app.mblist);	
+    return(ret);
+}
+
+gboolean balsa_messages_move(GList * messages,
+			     LibBalsaMailbox * dest) 
+{
+    LibBalsaMailbox *orig;
+    gpointer *ptr = g_list_nth_data( messages, 0); 
+    gboolean ret;
+    
+    if(ptr)
+	orig = ((LibBalsaMessage *)ptr)->mailbox;
+    ret = libbalsa_messages_move( messages, dest );
+    gtk_signal_emit_by_name( GTK_OBJECT(orig), "set-unread-messages-flag", 
+			     0, balsa_app.mblist);	
+    gtk_signal_emit_by_name( GTK_OBJECT(dest), "set-unread-messages-flag", 
+			     0, balsa_app.mblist);	
+    return(ret);
+}
+
+gboolean balsa_messages_copy(GList * messages,
+			     LibBalsaMailbox * dest) 
+{
+    gboolean ret = libbalsa_messages_copy( messages, dest );
+    gtk_signal_emit_by_name( GTK_OBJECT(dest), "set-unread-messages-flag", 
+			     0, balsa_app.mblist);	
+    return(ret);    
+}
+

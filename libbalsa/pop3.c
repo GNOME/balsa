@@ -31,8 +31,12 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <string.h>
+#include <sys/poll.h>
 
+#include <errno.h>
+#include <signal.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <gnome.h>
 #include "mutt.h"
@@ -61,39 +65,64 @@ pop_get_errstr(PopStatus status)
     return _(errmsgs[status]);
 }
 
-static int getLine (int fd, char *s, int len)
-{
-    char ch;
-    int bytes = 0;
-    
-    while (read (fd, &ch, 1) > 0) {
-	*s++ = ch;
-	bytes++;
-	if (ch == '\n') {
-	    *s = 0;
-#ifdef BALSA_TEST_POP3
-	    fprintf( stderr, "POP3 L: \"%s\"\n", (char *) (s - bytes) );
-#endif
-	    return bytes;
-	}
-      /* make sure not to overwrite the buffer */
-	if (bytes == len - 1) {
-	    *s = 0;
-#ifdef BALSA_TEST_POP3
-	    fprintf( stderr, "POP3 L: \"%s\"\n", (char *) (s - bytes) );
-#endif
-	    return bytes;
-	}
-    }
-    *s = 0;
-    return -1;
-}
 
 #ifdef BALSA_TEST_POP3
 #define DM( fmt, args... ) G_STMT_START { fprintf( stderr, "POP3 D: " ); fprintf( stderr, fmt, ##args ); fprintf( stderr, "\n" ); } G_STMT_END
 #else
 #define DM( fmt, args... ) 
 #endif
+
+static int
+safe_read_char(int fd, char *ch)
+{
+    int retval = -1;
+
+    retval = read (fd, ch, 1);
+    if(retval != 1) {
+	struct pollfd popsock;
+	
+	popsock.fd = fd;
+	popsock.events = POLLIN | POLLERR | POLLHUP;
+
+	if(poll( &popsock, 1, 30000 ) < 0) {
+	    g_warning("poll error on safe_read_char");
+	    return(-1);
+	}
+	if( (popsock.revents & (POLLERR | POLLHUP)) != 0 )
+	    return(-1);
+
+	if( (popsock.revents & POLLIN) != 0 ) {
+	    retval = read (fd, ch, 1);
+	} else 
+	    retval = 0;
+    }
+    
+    return retval;
+}
+
+static int getLine (int fd, char *s, int len)
+{
+    char ch;
+    int bytes = 0;
+    
+    while (safe_read_char (fd, &ch) > 0) {
+	*s++ = ch;
+	bytes++;
+	if (ch == '\n') {
+	    *s = 0;
+	    DM("POP3 L: \"%s\"\n", (char *) (s - bytes) );
+	    return bytes;
+	}
+      /* make sure not to overwrite the buffer */
+	if (bytes == len - 1) {
+	    *s = 0;
+	    DM("POP3 L: \"%s\"\n", (char *) (s - bytes) );
+	    return bytes;
+	}
+    }
+    *s = 0;
+    return -1;
+}
 
 /* getApopStamp:
    Get the Server Timestamp for APOP authentication -kabir 
@@ -148,6 +177,7 @@ pop_connect(int *s, const gchar *host, gint port)
     struct sockaddr_in sin;
     gint32 n;
     struct hostent *he;
+    
     *s = socket (AF_INET, SOCK_STREAM, IPPROTO_IP);
     
     memset ((char *) &sin, 0, sizeof(sin));
@@ -165,7 +195,9 @@ pop_connect(int *s, const gchar *host, gint port)
     
     if (connect(*s, (struct sockaddr *)&sin, sizeof(struct sockaddr_in)) == -1)
 	return POP_CONNECT_FAILED;
-    
+
+    fcntl(*s, F_SETFL, O_NONBLOCK);
+
     return POP_OK;
 }
 
@@ -318,6 +350,8 @@ fetch_single_msg(int s, FILE *msg, int msgno, int first_msg, int msgs,
 		 int *num_bytes, int tot_bytes, ProgressCallback prog_cb) {
     char buffer[2048];
 #ifdef BALSA_USE_THREADS
+    static const int GUI_PROGRESS_STEP = 2048;
+    int last_update_size = 0;
     char threadbuf[160];
     
     sprintf(threadbuf, _("Retrieving Message %d of %d"), msgno, msgs);
@@ -333,8 +367,12 @@ fetch_single_msg(int s, FILE *msg, int msgno, int first_msg, int msgs,
 	if ((chunk = getLine (s, buffer, sizeof (buffer))) == -1) 
 	    return POP_CONN_ERR;
 #ifdef BALSA_USE_THREADS
-	sprintf(threadbuf,_("Received %d bytes of %d"), *num_bytes, tot_bytes);
-	prog_cb (threadbuf, *num_bytes, tot_bytes);
+	if(last_update_size<*num_bytes) {
+	    sprintf(threadbuf,_("Received %d bytes of %d"), 
+		    *num_bytes, tot_bytes);
+	    prog_cb (threadbuf, *num_bytes, tot_bytes);
+	    last_update_size += GUI_PROGRESS_STEP;
+	}
 #endif
 	/* check to see if we got a full line */
 	if (buffer[chunk-2] == '\r' && buffer[chunk-1] == '\n') {
@@ -481,7 +519,10 @@ fetch_direct(int s, gint first_msg, gint msgs, gint tot_bytes,
     return err;
 }
 
-/* ------------------------------------------------------------------- */
+/* fetch_pop_mail:
+   loads the mail down from a POP server.
+   Can handle connection timeouts by using poll()
+*/
 typedef PopStatus
 (*ProcessCallback)(int s, gint first_msg, gint msgs, gint tot_bytes,
 		   gboolean delete_on_server, const gchar * procmail_path,
@@ -501,6 +542,7 @@ fetch_pop_mail (const gchar *pop_host, const gchar *pop_user,
 
     g_return_val_if_fail(pop_host, POP_HOST_NOT_FOUND);
     g_return_val_if_fail(pop_user, POP_AUTH_FAILED);
+
 
     DM("Begin connection");
     status = pop_connect(&s, pop_host, pop_port);

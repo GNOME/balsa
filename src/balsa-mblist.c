@@ -1495,15 +1495,15 @@ mblist_drag_cb (GtkWidget* widget, GdkDragContext* context,
         if (mailbox != orig_mailbox) {
             switch (context->suggested_action) {
             case GDK_ACTION_MOVE:
-                libbalsa_messages_move (messages, mailbox);
+                balsa_messages_move (messages, mailbox);
                 context->action = context->suggested_action;
                 break;
 
             case GDK_ACTION_DEFAULT:
             case GDK_ACTION_COPY:
             default:
-                libbalsa_messages_copy (messages, mailbox);
-                context->action = context->suggested_action;
+                balsa_messages_copy (messages, mailbox);
+		context->action = context->suggested_action;
                 break;
             }
             

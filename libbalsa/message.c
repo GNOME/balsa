@@ -605,7 +605,8 @@ libbalsa_message_real_set_read_flag(LibBalsaMessage * message,
 
     } else if (!set) {
 	libbalsa_lock_mutt();
-	mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_READ, TRUE);
+	mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_READ, FALSE);
+	mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_OLD, FALSE);
 	libbalsa_unlock_mutt();
 
 	message->flags |= LIBBALSA_MESSAGE_FLAG_NEW;

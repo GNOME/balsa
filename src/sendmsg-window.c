@@ -1602,7 +1602,6 @@ read_signature(void)
 	    return NULL;
 	len = libbalsa_readfile_nostat(fp, &ret);
 	pclose(fp);
-	if(ret) ret = g_strstrip(ret);       
 	g_free(sigpath);
     }
     /* Signature is just a regular file. */
@@ -1611,7 +1610,6 @@ read_signature(void)
 	    return NULL;
 	len = libbalsa_readfile_nostat(fp, &ret);
 	fclose(fp);
-	if(ret) ret = g_strstrip(ret);
     }
 
     return ret;

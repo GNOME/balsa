@@ -72,6 +72,28 @@ enum _LibBalsaMsgCreateResult {
     LIBBALSA_MESSAGE_SEND_ERROR
 };
 
+typedef enum _LibBalsaMessageStatus LibBalsaMessageStatus;
+enum _LibBalsaMessageStatus {
+    LIBBALSA_MESSAGE_STATUS_UNREAD,
+    LIBBALSA_MESSAGE_STATUS_DELETED,
+    LIBBALSA_MESSAGE_STATUS_FLAGGED,
+    LIBBALSA_MESSAGE_STATUS_REPLIED,
+    LIBBALSA_MESSAGE_STATUS_ICONS_NUM
+};
+
+typedef enum _LibBalsaMessageAttach LibBalsaMessageAttach;
+enum _LibBalsaMessageAttach {
+    LIBBALSA_MESSAGE_ATTACH_ATTACH,
+#ifdef HAVE_GPGME
+    LIBBALSA_MESSAGE_ATTACH_GOOD,
+    LIBBALSA_MESSAGE_ATTACH_NOTRUST,
+    LIBBALSA_MESSAGE_ATTACH_BAD,
+    LIBBALSA_MESSAGE_ATTACH_SIGN,
+    LIBBALSA_MESSAGE_ATTACH_ENCR,
+#endif
+    LIBBALSA_MESSAGE_ATTACH_ICONS_NUM
+};
+
 #ifdef HAVE_GPGME
 #define  LIBBALSA_MESSAGE_SIGNATURE_UNKNOWN     0
 #define  LIBBALSA_MESSAGE_SIGNATURE_GOOD        1
@@ -193,6 +215,10 @@ struct _LibBalsaMessage {
 #define LIBBALSA_MESSAGE_GET_LINES(m)  libbalsa_message_get_lines(m)
 #define LIBBALSA_MESSAGE_GET_NO(m)  libbalsa_message_get_no(m)
 #endif
+
+    /* Indices into the arrays of rendered icons. */
+    LibBalsaMessageStatus status_icon;
+    LibBalsaMessageAttach attach_icon;
 };
 
 #define LIBBALSA_MESSAGE_HAS_FLAG(message, mask) \
@@ -326,4 +352,5 @@ void libbalsa_message_set_references_from_string(LibBalsaMessage * message,
 						 const gchar *str);
 void libbalsa_message_set_in_reply_to_from_string(LibBalsaMessage * message,
 						  const gchar *str);
+void libbalsa_message_set_icons(LibBalsaMessage * message);
 #endif				/* __LIBBALSA_MESSAGE_H__ */

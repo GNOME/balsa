@@ -182,13 +182,17 @@ libbalsa_message_finalize(GObject * object)
     /* printf("%p message finalized.\n", message); */  message_cnt--;
 }
 
-static void libbalsa_message_find_charset(GMimeObject *mime_part, gpointer data)
+static void
+libbalsa_message_find_charset(GMimeObject * mime_part,
+                              const gchar ** charset)
 {
-	const GMimeContentType *type;
-	if (*(gchar **)data)
-		return;
-	type=g_mime_object_get_content_type(mime_part);
-	*(const gchar **)data=g_mime_content_type_get_parameter(type, "charset");
+    const GMimeContentType *type;
+
+    if (*charset)
+        return;
+
+    type = g_mime_object_get_content_type(mime_part);
+    *charset = g_mime_content_type_get_parameter(type, "charset");
 }
 
 static void
@@ -253,14 +257,12 @@ libbalsa_message_body_charset(LibBalsaMessageBody * body)
     const gchar *charset = NULL;
 
     if (body->mime_part) {
-	gchar *tmp = NULL;
-
 	if (GMIME_IS_MULTIPART(body->mime_part))
 	    g_mime_multipart_foreach(GMIME_MULTIPART(body->mime_part),
-				     libbalsa_message_find_charset, &tmp);
+				     (GMimePartFunc)
+				     libbalsa_message_find_charset, &charset);
 	else
-	    libbalsa_message_find_charset(body->mime_part, &tmp);
-	charset = tmp;
+	    libbalsa_message_find_charset(body->mime_part, &charset);
     } else {
 	do {
 	    if (body->charset) {

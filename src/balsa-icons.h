@@ -22,23 +22,22 @@
 #ifndef __BALSA_ICONS_H__
 #define __BALSA_ICONS_H__
 
-#define BALSA_PIXMAP_MAIL_RPL_ALL 	"reply_to_all"
+#define BALSA_PIXMAP_SHOW_ALL_HEADERS	"show_all_headers"
+#define BALSA_PIXMAP_SMALL_CLOSE	"small_close"
+#define BALSA_PIXMAP_ENVELOPE		"envelope"
+#define BALSA_PIXMAP_FLAG_UNREAD	"flag_unread"
+#define BALSA_PIXMAP_FLAGGED		"flagged"
+
+#define BALSA_PIXMAP_IDENTITY		"identity"
+#define BALSA_PIXMAP_IDENTITY_MENU	"identity_menu"
+
+#define BALSA_PIXMAP_MARK_ALL_MSGS	"mark_all"
+
+#define BALSA_PIXMAP_NEXT_UNREAD	"next_unread"
+#define BALSA_PIXMAP_NEXT_UNREAD_MENU	"next_unread_menu"
+
+#define BALSA_PIXMAP_MAIL_RPL_ALL	"reply_to_all"
 #define BALSA_PIXMAP_MAIL_RPL_ALL_MENU	"reply_to_all_menu"
-
-#define BALSA_PIXMAP_NEXT_UNREAD "next_unread"
-#define BALSA_PIXMAP_NEXT_UNREAD_MENU "next_unread_menu"
-
-#define BALSA_PIXMAP_FLAGGED "flagged"
-#define BALSA_PIXMAP_ENVELOPE "envelope"
-
-#define BALSA_PIXMAP_SMALL_CLOSE "small_close"
-
-#define BALSA_PIXMAP_IDENTITY "identity"
-#define BALSA_PIXMAP_IDENTITY_MENU "identity_menu"
-
-#define BALSA_PIXMAP_FLAG_UNREAD "flag_unread"
-#define BALSA_PIXMAP_MARK_ALL_MSGS "mark_all_msgs"
-#define BALSA_PIXMAP_SHOW_ALL_HEADERS "show_all_headers"
 
 typedef enum {
     BALSA_ICON_DRAFTBOX,
@@ -55,10 +54,7 @@ typedef enum {
 
     BALSA_ICON_REPLIED,
     BALSA_ICON_FORWARDED,
-
     BALSA_ICON_ENVELOPE,
-
-    BALSA_ICON_ARROW,
     BALSA_ICON_MULTIPART,
 } BalsaIconName;
 

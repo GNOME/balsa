@@ -8,8 +8,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2003-09-05 15:46+0200\n"
-"PO-Revision-Date: 2003-09-05 02:53+0200\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2003-09-10 22:37+0200\n"
+"PO-Revision-Date: 2003-09-10 22:37+0200\n"
 "Last-Translator: Страхиња Радић <mr99164@alas.matf.bg.ac.yu>\n"
 "Language-Team: Serbian (sr) <serbiangnome-lista@nongnu.org>\n"
 "MIME-Version: 1.0\n"
@@ -340,10 +341,11 @@ msgstr ""
 "или упит није сагласан са IMAP-ом (можда користите регуларне изразе)\n"
 "враћам се на подразумевани начин претраге"
 
-#: libbalsa/mailbox_imap.c:700
+#: libbalsa/mailbox_imap.c:700 libbalsa/mailbox_local.c:265
+#: libbalsa/mailbox_pop3.c:210
 #, c-format
-msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxImap: Отварам %s Рефброј: %d\n"
+msgid "%s: Opening %s Refcount: %d\n"
+msgstr "%s: Отварам %s Рефброј: %d\n"
 
 #: libbalsa/mailbox_imap.c:900
 #, c-format
@@ -353,11 +355,6 @@ msgid ""
 msgstr ""
 "Наредба IMAP SEARCH није успела за сандуче „%s“\n"
 "враћам се на подразумевани начин претраге"
-
-#: libbalsa/mailbox_local.c:265
-#, c-format
-msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxLocal: Отварам %s Рефброј: %d\n"
 
 #: libbalsa/mailbox_maildir.c:115
 #, c-format
@@ -418,11 +415,6 @@ msgstr "Нисам могао да створим директоријум вр�
 #, c-format
 msgid "Could not create MH structure at %s (%s)"
 msgstr "Нисам могао да створим структуру врсте „MH“ у %s (%s)"
-
-#: libbalsa/mailbox_pop3.c:210
-#, c-format
-msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxPop3: Отварам %s Рефброј: %d\n"
 
 #: libbalsa/mailbox_pop3.c:262
 #, c-format
@@ -907,7 +899,7 @@ msgstr "gpgme није могао да створи нове податке: %s"
 msgid "Sending Mail..."
 msgstr "Шаљем пошту..."
 
-#: libbalsa/send.c:221 src/main-window.c:1805
+#: libbalsa/send.c:221 src/main-window.c:1808
 msgid "_Hide"
 msgstr "_Сакриј"
 
@@ -2183,7 +2175,7 @@ msgstr "_Погледај извор"
 msgid "Mailbox"
 msgstr "Сандуче"
 
-#: src/balsa-mblist.c:360 src/filter-edit-callbacks.c:789
+#: src/balsa-mblist.c:360 src/filter-edit-callbacks.c:790
 msgid "Unread"
 msgstr "Непрочитано"
 
@@ -2195,15 +2187,15 @@ msgstr "Укупно"
 msgid "Failed to find mailbox"
 msgstr "Нисам успео да пронађем сандуче"
 
-#: src/balsa-mblist.c:1790
+#: src/balsa-mblist.c:1788
 msgid "_Other..."
 msgstr "_Друго..."
 
-#: src/balsa-mblist.c:1851
+#: src/balsa-mblist.c:1849
 msgid "Choose destination folder"
 msgstr "Изаберите одредишну фасциклу"
 
-#: src/balsa-mblist.c:2163
+#: src/balsa-mblist.c:2161
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr "Приказано сандуче: %s са %ld порука, %ld нових"
@@ -2507,7 +2499,7 @@ msgstr "Један од регуларних израза одговара"
 msgid "None of the regular expressions matches"
 msgstr "Ниједан од регуларних израза не одговара"
 
-#: src/filter-edit-callbacks.c:292 src/filter-edit-callbacks.c:884
+#: src/filter-edit-callbacks.c:292 src/filter-edit-callbacks.c:885
 msgid "Match when date is in the interval:"
 msgstr "Одговара када је датум у интервалу:"
 
@@ -2515,7 +2507,7 @@ msgstr "Одговара када је датум у интервалу:"
 msgid "Match when date is outside the interval:"
 msgstr "Одговара када датум није у интервалу:"
 
-#: src/filter-edit-callbacks.c:295 src/filter-edit-callbacks.c:922
+#: src/filter-edit-callbacks.c:295 src/filter-edit-callbacks.c:923
 msgid "Match when one of these flags is set:"
 msgstr "Одговара када је нека од ових ознака постављена:"
 
@@ -2551,140 +2543,140 @@ msgstr "Завршни датум је неисправан"
 msgid "Low date is greater than high date"
 msgstr "Почетни датум је већи од завршног"
 
-#: src/filter-edit-callbacks.c:769
+#: src/filter-edit-callbacks.c:770
 #, c-format
 msgid "Error displaying condition help: %s\n"
 msgstr "Дошло је до грешке приликом приказивања помоћи за услове: %s\n"
 
-#: src/filter-edit-callbacks.c:789
+#: src/filter-edit-callbacks.c:790
 msgid "Deleted"
 msgstr "Обрисано"
 
-#: src/filter-edit-callbacks.c:789
+#: src/filter-edit-callbacks.c:790
 msgid "Replied"
 msgstr "Одговорено"
 
-#: src/filter-edit-callbacks.c:789 src/main-window.c:448
+#: src/filter-edit-callbacks.c:790 src/main-window.c:448
 msgid "Flagged"
 msgstr "Означено"
 
-#: src/filter-edit-callbacks.c:803
+#: src/filter-edit-callbacks.c:804
 msgid "One of the specified f_ields contains"
 msgstr "Једно од задатих поља садр_жи"
 
-#: src/filter-edit-callbacks.c:818
+#: src/filter-edit-callbacks.c:819
 msgid "Contain/Does _Not Contain"
 msgstr "Садржи/_не садржи"
 
-#: src/filter-edit-callbacks.c:832
+#: src/filter-edit-callbacks.c:833
 msgid "_One of the regular expressions matches"
 msgstr "_Један од регуларних израза одговара"
 
 #. FIXME : I saw a lot of different ways to create button with
 #. pixmaps, hope this one is correct
 #. Right/Add button
-#: src/filter-edit-callbacks.c:859 src/filter-run-dialog.c:313
+#: src/filter-edit-callbacks.c:860 src/filter-run-dialog.c:313
 msgid "A_dd"
 msgstr "_Додај"
 
 #. Left/Remove button
-#: src/filter-edit-callbacks.c:863 src/filter-edit-dialog.c:310
+#: src/filter-edit-callbacks.c:864 src/filter-edit-dialog.c:310
 #: src/filter-run-dialog.c:318
 msgid "_Remove"
 msgstr "_Уклони"
 
-#: src/filter-edit-callbacks.c:867
+#: src/filter-edit-callbacks.c:868
 msgid "One _Matches/None Matches"
 msgstr "_Један одговара/ниједан не одговара"
 
-#: src/filter-edit-callbacks.c:904
+#: src/filter-edit-callbacks.c:905
 msgid "Inside/outside the date interval"
 msgstr "Унутар/ван интервала датума"
 
-#: src/filter-edit-callbacks.c:951
+#: src/filter-edit-callbacks.c:952
 msgid "Match when one flag is set/when no flag is set"
 msgstr ""
 "Одговара када је једна ознака постављена/када ниједна ознака није постављена"
 
 #. builds the toggle buttons to specify fields concerned by the conditions of
 #. * the filter
-#: src/filter-edit-callbacks.c:969
+#: src/filter-edit-callbacks.c:970
 msgid "Match In"
 msgstr "Упореди у"
 
-#: src/filter-edit-callbacks.c:981
+#: src/filter-edit-callbacks.c:982
 msgid "_All"
 msgstr "_Све"
 
-#: src/filter-edit-callbacks.c:989
+#: src/filter-edit-callbacks.c:990
 msgid "C_lear"
 msgstr "_Очисти"
 
-#: src/filter-edit-callbacks.c:998 src/main-window.c:2736
+#: src/filter-edit-callbacks.c:999 src/main-window.c:2739
 msgid "_Body"
 msgstr "Те_ло"
 
 #. To:
-#: src/filter-edit-callbacks.c:1005 src/main-window.c:2737
+#: src/filter-edit-callbacks.c:1006 src/main-window.c:2740
 #: src/sendmsg-window.c:1846
 msgid "_To:"
 msgstr "_Коме:"
 
-#: src/filter-edit-callbacks.c:1012 src/main-window.c:2738
+#: src/filter-edit-callbacks.c:1013 src/main-window.c:2741
 msgid "_From:"
 msgstr "_Од:"
 
-#: src/filter-edit-callbacks.c:1020 src/sendmsg-window.c:310
+#: src/filter-edit-callbacks.c:1021 src/sendmsg-window.c:310
 msgid "_Subject"
 msgstr "_Тема"
 
-#: src/filter-edit-callbacks.c:1027 src/main-window.c:2740
+#: src/filter-edit-callbacks.c:1028 src/main-window.c:2743
 msgid "_Cc:"
 msgstr "_Копија:"
 
-#: src/filter-edit-callbacks.c:1034
+#: src/filter-edit-callbacks.c:1035
 msgid "_User header:"
 msgstr "Ко_рисничко заглавље:"
 
-#: src/filter-edit-callbacks.c:1058
+#: src/filter-edit-callbacks.c:1059
 msgid "Search T_ype:"
 msgstr "_Врста претраге:"
 
-#: src/filter-edit-callbacks.c:1132
+#: src/filter-edit-callbacks.c:1133
 msgid "Edit condition for filter: "
 msgstr "Уреди услов филтера: "
 
-#: src/filter-edit-callbacks.c:1360
+#: src/filter-edit-callbacks.c:1362
 #, c-format
 msgid "Error displaying filter help: %s\n"
 msgstr "Дошло је до грешке приликом приказивања помоћи за филтере: %s\n"
 
-#: src/filter-edit-callbacks.c:1548
+#: src/filter-edit-callbacks.c:1550
 msgid "New filter"
 msgstr "Нови филтер"
 
-#: src/filter-edit-callbacks.c:1677
+#: src/filter-edit-callbacks.c:1679
 msgid "No filter name specified."
 msgstr "Назив филтера није задан."
 
-#: src/filter-edit-callbacks.c:1682
+#: src/filter-edit-callbacks.c:1684
 #, c-format
 msgid "Filter \"%s\" already exists."
 msgstr "Филтер „%s“ већ постоји."
 
-#: src/filter-edit-callbacks.c:1695
+#: src/filter-edit-callbacks.c:1697
 msgid "Filter must have conditions."
 msgstr "Филтер мора да има услове."
 
-#: src/filter-edit-callbacks.c:1754
+#: src/filter-edit-callbacks.c:1756
 msgid "Filter has matched"
 msgstr "Филтер се поклапа"
 
-#: src/filter-edit-callbacks.c:1772
+#: src/filter-edit-callbacks.c:1774
 msgid "You must provide a sound to play"
 msgstr "Морате да обезбедите звук за пуштање"
 
-#: src/filter-edit-callbacks.c:1903
+#: src/filter-edit-callbacks.c:1905
 #, c-format
 msgid "(Example: write December 31, 2000, as %s)"
 msgstr "(пример: 31. децембар 2000. пишите као %s)"
@@ -2818,17 +2810,17 @@ msgstr ""
 msgid "Balsa Filters Export"
 msgstr "Извоз Балсиних филтера"
 
-#: src/filter-run-callbacks.c:137
+#: src/filter-run-callbacks.c:139
 msgid "Error when applying filters"
 msgstr "Грешка при примени филтера"
 
-#: src/filter-run-callbacks.c:154
+#: src/filter-run-callbacks.c:157
 #, c-format
 msgid "Error displaying run filters help: %s\n"
 msgstr ""
 "Дошло је до грешке приликом приказивања помоћи за покретање филтера: %s\n"
 
-#: src/filter-run-callbacks.c:201
+#: src/filter-run-callbacks.c:204
 #, c-format
 msgid ""
 "The destination mailbox of the filter \"%s\" is \"%s\".\n"
@@ -2837,7 +2829,7 @@ msgstr ""
 "Одредишно сандуче за филтер „%s“ је „%s“.\n"
 "Не можете га повезати са истим сандучетом (то изазива рекурзију)."
 
-#: src/filter-run-callbacks.c:209
+#: src/filter-run-callbacks.c:212
 #, c-format
 msgid ""
 "The filter \"%s\" is not compatible with the mailbox type of \"%s\".\n"
@@ -3763,7 +3755,7 @@ msgstr ""
 "Не могу да приступим сандучету!\n"
 "Молим проверите подешавања сандучета."
 
-#: src/main-window.c:1685
+#: src/main-window.c:1688
 msgid "translator_credits"
 msgstr ""
 "Данило Шеган <danilo@prevod.org>\n"
@@ -3771,7 +3763,7 @@ msgstr ""
 "\n"
 "Prevod.org — превод на српски језик."
 
-#: src/main-window.c:1700
+#: src/main-window.c:1703
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://balsa.gnome.org/\n"
@@ -3784,72 +3776,72 @@ msgstr ""
 "Уколико желите да пријавите грешке, молим вас да то учините на: http://"
 "bugzilla.gnome.org/"
 
-#: src/main-window.c:1802
+#: src/main-window.c:1805
 msgid "Checking Mail..."
 msgstr "Проверавам пошту..."
 
-#: src/main-window.c:2100
+#: src/main-window.c:2103
 msgid "Finished Checking."
 msgstr "Завршена провера."
 
-#: src/main-window.c:2164
+#: src/main-window.c:2167
 #, c-format
 msgid "Sending error: %s"
 msgstr "Грешка при слању: %s"
 
-#: src/main-window.c:2260
+#: src/main-window.c:2263
 msgid "Balsa: New mail"
 msgstr "Балса: Нова пошта"
 
-#: src/main-window.c:2272
+#: src/main-window.c:2275
 #, c-format
 msgid "You have received %d new messages."
 msgstr "Примили сте %d нових порука."
 
-#: src/main-window.c:2273
+#: src/main-window.c:2276
 msgid "You have received 1 new message."
 msgstr "Примили сте 1 нову поруку."
 
-#: src/main-window.c:2696
+#: src/main-window.c:2699
 msgid "Search mailbox"
 msgstr "Претражи сандуче"
 
-#: src/main-window.c:2709
+#: src/main-window.c:2712
 msgid "_Reverse search"
 msgstr "_Обрнута претрага"
 
-#: src/main-window.c:2712
+#: src/main-window.c:2715
 msgid "_Search for:"
 msgstr "Пре_тражи за:"
 
-#: src/main-window.c:2725
+#: src/main-window.c:2728
 msgid "In:"
 msgstr "У:"
 
-#: src/main-window.c:2739
+#: src/main-window.c:2742
 msgid "S_ubject"
 msgstr "Т_ема"
 
-#: src/main-window.c:2854
+#: src/main-window.c:2857
 msgid "You can apply filters only on mailbox\n"
 msgstr "Филтере можете применити само на сандуче\n"
 
-#: src/main-window.c:2898 src/main-window.c:2917
+#: src/main-window.c:2901 src/main-window.c:2920
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Неуспешно чување измена у сандучету %s."
 
-#: src/main-window.c:3046
+#: src/main-window.c:3049
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Балса: %s (само за читање)"
 
-#: src/main-window.c:3048
+#: src/main-window.c:3051
 #, c-format
 msgid "Balsa: %s"
 msgstr "Балса: %s"
 
-#: src/main-window.c:3146
+#: src/main-window.c:3149
 msgid "Cannot access the message's body\n"
 msgstr "Не могу да приступим телу поруке\n"
 
@@ -5590,3 +5582,9 @@ msgstr "Горе"
 #: src/toolbar-prefs.c:508
 msgid "Down"
 msgstr "Доле"
+
+#~ msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
+#~ msgstr "LibBalsaMailboxImap: Отварам %s Рефброј: %d\n"
+
+#~ msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
+#~ msgstr "LibBalsaMailboxLocal: Отварам %s Рефброј: %d\n"

@@ -189,15 +189,16 @@ clip_expand_cursor (inputData *input)
 static gchar*
 expand_input(gchar **input, gint *tabs)
 {
-   gchar *prefix = NULL;     /* the longest common string. */
-   GList *match = NULL;      /* A list of matches.         */
-   GList *search = NULL;     /* Used to search the list.   */
-   gchar *output = NULL;     /* We return this.            */
-   LibBalsaAddress *addr = NULL; /* Process the list data.     */
-   gint i;                   /* A counter for the tabs.    */
-
-   if (strlen(*input) > 0)
-   {
+  gchar *prefix = NULL;     /* the longest common string. */
+  GList *match = NULL;      /* A list of matches.         */
+  GList *search = NULL;     /* Used to search the list.   */
+  gchar *output = NULL;     /* We return this.            */
+  LibBalsaAddress *addr = NULL; /* Process the list data.     */
+  gint i;                   /* A counter for the tabs.    */
+  
+  if (strlen(*input) > 0)
+  {
+    if(complete_name) {
 #ifdef CASE_INSENSITIVE_NAME
       str = g_strdup (*input);
       g_strup (str);
@@ -206,45 +207,46 @@ expand_input(gchar **input, gint *tabs)
 #else
       match = g_completion_complete (complete_name, *input, &prefix);
 #endif /* CASE_INSENSITIVE_NAME */
-      if (!match)
-	 match = g_completion_complete (complete_alias, *input, &prefix);
-      if (match)
+    }
+    if (!match && complete_alias)
+      match = g_completion_complete (complete_alias, *input, &prefix);
+    if (match)
+    {
+      i = *tabs;
+      if ((i == 1) && (strlen(prefix) > strlen(*input)))
       {
-	 i = *tabs;
-	 if ((i == 1) && (strlen(prefix) > strlen(*input)))
-	 {
-	    addr = LIBBALSA_ADDRESS(match->data);
-            output = g_strdup_printf("%s <%s>", addr->full_name, (gchar*)addr->address_list->data);
-	    g_free (*input);
-	    if (g_list_next (match))
-	       *input = g_strndup (output, strlen (prefix));
-	    else
-	       *input = g_strdup (output);
-	 } else {
-            for (search = match; i > 0; i--)
-	    {
-	       search = g_list_next(search);
-	       if (!search)
-	       {
-	          *tabs = i = 0;
-	          search = match;
-	       }
-	    }
-	    addr = LIBBALSA_ADDRESS(search->data);
-            output = g_strdup_printf("%s <%s>", addr->full_name, (gchar*)addr->address_list->data);
-	 }
+	addr = LIBBALSA_ADDRESS(match->data);
+	output = g_strdup_printf("%s <%s>", addr->full_name, (gchar*)addr->address_list->data);
+	g_free (*input);
+	if (g_list_next (match))
+	  *input = g_strndup (output, strlen (prefix));
+	else
+	  *input = g_strdup (output);
       } else {
-	 output = NULL;
+	for (search = match; i > 0; i--)
+	{
+	  search = g_list_next(search);
+	  if (!search) {
+	    *tabs = i = 0;
+	    search = match;
+	  }
+	}
+	addr = LIBBALSA_ADDRESS(search->data);
+	output = g_strdup_printf("%s <%s>", addr->full_name, 
+				 (gchar*)addr->address_list->data);
       }
-      if (prefix) g_free(prefix);
-      prefix = NULL;
-   } else {
-      output = g_strdup("");
-   }
-   return output;
+    } else {
+      output = NULL;
+    }
+    if (prefix) g_free(prefix);
+    prefix = NULL;
+  } else {
+    output = g_strdup("");
+  }
+  return output;
 }
-
-
+  
+  
 /*
  * expand_input_wrapper()
  *
@@ -973,45 +975,44 @@ alias_free_addressbook(void)
 void
 alias_load_addressbook (void)
 {
-    GList *list;
-    LibBalsaAddressBook *address_book;
-
-    alias_free_addressbook();
-
-    addresses = NULL;
-
-    list = balsa_app.address_book_list;
-    while(list) {
-	    address_book = LIBBALSA_ADDRESS_BOOK(list->data);
-
-	    if ( address_book->expand_aliases ) {
-		    GList *l;
-
-		    libbalsa_address_book_load(address_book);
-		    l = g_list_copy(address_book->address_list);
-		    addresses = g_list_concat(addresses, l);
-	    }
-	    list = g_list_next(list);
+  GList *list;
+  LibBalsaAddressBook *address_book;
+  
+  alias_free_addressbook();
+  
+  addresses = NULL;
+  
+  list = balsa_app.address_book_list;
+  while(list) {
+    address_book = LIBBALSA_ADDRESS_BOOK(list->data);
+    
+    if ( address_book->expand_aliases ) {
+      GList *l;
+      
+      libbalsa_address_book_load(address_book);
+      l = g_list_copy(address_book->address_list);
+      addresses = g_list_concat(addresses, l);
     }
-
-    if ( addresses )
-	    g_list_foreach(addresses, (GFunc)gtk_object_ref, NULL);
-
+    list = g_list_next(list);
+  }
+  
+  if ( addresses ) {
+    g_list_foreach(addresses, (GFunc)gtk_object_ref, NULL);
+    
     if (complete_name)
-	    g_completion_free (complete_name);
-
+      g_completion_free (complete_name);
+    
     if (complete_alias)
-	    g_completion_free (complete_alias);
-
+      g_completion_free (complete_alias);
+    
     complete_name = g_completion_new (
-                    (GCompletionFunc) extract_name_from_address);
-
+      (GCompletionFunc) extract_name_from_address);
     g_completion_add_items(complete_name, addresses);
-
+    
     complete_alias = g_completion_new (
-                     (GCompletionFunc) extract_alias_from_address);
-
+      (GCompletionFunc) extract_alias_from_address);
     g_completion_add_items(complete_alias, addresses);
+  }
 }
   
 

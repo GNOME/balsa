@@ -353,8 +353,9 @@ address_book_cb(GtkWidget * widget, gpointer data)
          * from a message window */
 	/* FIXME: (widget->parent->parent->parent->parent->parent) could be more elegant ;-) */
         if (GTK_IS_BUTTON (widget))
-                gnome_dialog_set_parent (GNOME_DIALOG (dialog), 
-                                         GTK_WINDOW (widget->parent->parent->parent->parent->parent));
+                gnome_dialog_set_parent (
+		    GNOME_DIALOG (dialog), 
+		    GTK_WINDOW (widget->parent->parent->parent->parent->parent->parent));
         else
                 gnome_dialog_set_parent (GNOME_DIALOG (dialog), 
                                          GTK_WINDOW (widget->parent->parent) );

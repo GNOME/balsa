@@ -731,14 +731,12 @@ balsa_spell_check_start (BalsaSpellCheck* spell_check)
         delete_pspell_config (spell_check->spell_config);
 
         if (pspell_error_number (spell_error) != 0) {
-                /* quit without breaking things, maybe emit a done
-                 * signal, and/or a balsa warning dialog.  For now, just
-                 * use balsa error*/
-                balsa_information (LIBBALSA_INFORMATION_ERROR, 
+                /* quit without breaking things */
+                balsa_information (LIBBALSA_INFORMATION_WARNING, 
                                    pspell_error_message (spell_error));
                 
                 gtk_signal_emit (GTK_OBJECT (spell_check),
-                                 balsa_spell_check_signals[DONE_SPELLCHECK]);
+				 balsa_spell_check_signals[DONE_SPELLCHECK]); 
                 return;
         }
         

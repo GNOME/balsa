@@ -329,11 +329,9 @@ close_window (GtkWidget * widget, gpointer data)
 static gint
 delete_event_cb (GtkWidget * widget, GdkEvent *e, gpointer data)
 {
-  g_message ("delete_event_cb(): Calling balsa_sendmsg_destroy().\n");
   balsa_sendmsg_destroy ((BalsaSendmsg*)data);
   g_message ("delete_event_cb(): Calling alias_free_addressbook().\n");
   alias_free_addressbook ();
-  g_message ("delete_event_cb(): End.\n");
   return TRUE;
 }
 
@@ -839,10 +837,9 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   gtk_notebook_set_page (GTK_NOTEBOOK (nb), mail_headers_page);
   msg->notebook = nb;
 
-  gtk_widget_show_all (sc);
   gtk_widget_show_all (table);
   gtk_widget_show_all (nb);
-
+  gtk_widget_hide(sc);
   return nb;
 }
 
@@ -1214,6 +1211,7 @@ sendmsg_window_new (GtkWidget * widget, LibBalsaMessage * message, SendType type
       }
   }
 
+  gtk_paned_set_position(GTK_PANED (paned), -1);
   gnome_app_set_contents (GNOME_APP (window), paned);
 
   if(type==SEND_CONTINUE) 
@@ -1895,7 +1893,7 @@ spell_check_cb (GtkWidget* widget, BalsaSendmsg* msg)
 
   /* configure the spell checker */
   language = gnome_i18n_get_language ();
-  if (g_strcasecmp (language, "C") == 0) {
+  if (!language || g_strcasecmp (language, "C") == 0) {
     /* We've got the default locale, but pspell doesn't understand
      * that, so put "en" instead.  This should be better, but should
      * probably be done within pspell.  
@@ -1922,6 +1920,7 @@ spell_check_cb (GtkWidget* widget, BalsaSendmsg* msg)
     return;
   } 
 
+  gtk_widget_show_all(GTK_WIDGET(sc));
   balsa_spell_check_set_character_set (sc, charset);
   g_free (charset);
   balsa_spell_check_set_module(sc, spell_check_modules_name[balsa_app.module]);
@@ -1943,6 +1942,7 @@ spell_check_cb (GtkWidget* widget, BalsaSendmsg* msg)
 static void 
 spell_check_done_cb (BalsaSpellCheck* spell_check, BalsaSendmsg* msg)
 {
+  gtk_widget_hide(GTK_WIDGET(spell_check));
   /* switch notebook page back to mail headers */  
   gtk_notebook_set_page (GTK_NOTEBOOK (msg->notebook), mail_headers_page);
 

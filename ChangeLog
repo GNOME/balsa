@@ -1,3 +1,14 @@
+2000-09-14  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/address-book.c: set parent properly when called from
+	compose window.
+	* src/expand-alias.c: handle lack of address book quietly.
+	* src/sendmsg-window.c: don't allocate space for spell-checker
+	when it's not active.
+	* src/spell-check.c: don't quit on pspell configuration error:
+	imagine you wrote so long and important e-mail that you think it
+	is worth to spell check it...
+	
 2000-09-14  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/address-book.c: Fix crash if there is no default address

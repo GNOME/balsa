@@ -1,9 +1,11 @@
 2001-08-20  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* libbalsa/address-entry.c: fix some memory leaks.
 	* libbalsa/folder-scanners.c (libbalsa_scanner_imap_dir): free state.
 	* src/main-window.c : streamline the mailbox checking code. (Peter B).
 	* src/store-address.c: fix memory leak (Ali Akcaagac).
-
+	* src/folder-conf.c: Peter Bloomfield's patch cleaning the code.
+	
 2001-08-19  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/folder-conf.c: 

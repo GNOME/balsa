@@ -255,66 +255,26 @@ browse_button_select_row_cb(GtkCTree * ctree, GList * node, gint column,
     }
 }
 
-/* slightly different from the function in mblist.c */
-static gboolean
-mailbox_nodes_to_ctree(GtkCTree * ctree, guint depth, GNode * gnode,
-                       GtkCTreeNode * cnode, gpointer data)
+static void
+fix_ctree(GtkCTree * ctree, GtkCTreeNode * cnode, gpointer data)
 {
-    SubfolderDialogData *fcw = (SubfolderDialogData *)data;
-    BalsaMailboxNode *mbnode;
-    g_return_val_if_fail(gnode, FALSE);
-
-    if ( (mbnode = gnode->data) == NULL) return FALSE;
-    if (!mbnode->server || mbnode->server->type !=  LIBBALSA_SERVER_IMAP)
-	/* not an IMAP folder */
-	return FALSE;
-    if (fcw->mbnode && fcw->mbnode->server != mbnode->server)
-	/* folder in a different tree from the one
-	 * we're modifying/creating in
-	 */
-	return FALSE;
-
-    if (mbnode->mailbox) {
-        if (LIBBALSA_IS_MAILBOX_POP3(mbnode->mailbox))
-            g_assert_not_reached();
-        else {
-            BalsaIconName in;
-	    if(mbnode->mailbox == balsa_app.draftbox)
-		in = BALSA_ICON_DRAFTBOX;
-            else if(mbnode->mailbox == balsa_app.inbox)
-                in = BALSA_ICON_INBOX;
-            else if(mbnode->mailbox == balsa_app.outbox)
-                in = BALSA_ICON_OUTBOX;
-            else if(mbnode->mailbox == balsa_app.sentbox)
-                in = BALSA_ICON_SENTBOX;
-            else if(mbnode->mailbox == balsa_app.trash)
-                in = BALSA_ICON_TRASH;
-            else
-                in = (mbnode->mailbox->new_messages > 0)
-                ? BALSA_ICON_TRAY_FULL : BALSA_ICON_TRAY_EMPTY;
-
-            gtk_ctree_set_node_info(ctree, cnode,
-                                    mbnode->mailbox->name, 5,
-                                    balsa_icon_get_pixmap(in),
-                                    balsa_icon_get_bitmap(in),
-                                    /* same icon when expanded: */
-                                    balsa_icon_get_pixmap(in),
-                                    balsa_icon_get_bitmap(in),
-                                    FALSE, mbnode->expanded);
-        }
-    } else {
-        /* new directory, but not a mailbox */
-        gtk_ctree_set_node_info(ctree, cnode, g_basename(mbnode->name), 5,
-                                balsa_icon_get_pixmap
-                                (BALSA_ICON_DIR_CLOSED),
-                                balsa_icon_get_bitmap
-                                (BALSA_ICON_DIR_CLOSED),
-                                balsa_icon_get_pixmap(BALSA_ICON_DIR_OPEN),
-                                balsa_icon_get_bitmap(BALSA_ICON_DIR_OPEN),
-                                FALSE, mbnode->expanded);
+    BalsaMailboxNode *mbnode = gtk_ctree_node_get_row_data(ctree, cnode);
+    if (mbnode) {
+	SubfolderDialogData *fcw = (SubfolderDialogData *) data;
+	if (mbnode->mailbox)
+	    /*
+	     * disconnect mailbox signal that passes this ctree as
+	     * `data', otherwise gtk_ctree code will segfault after the
+	     * node is destroyed, either here or later:
+	     * */
+	    gtk_signal_disconnect_by_data(GTK_OBJECT(mbnode->mailbox),
+					  (gpointer) ctree);
+	if (!mbnode->server || mbnode->server->type != LIBBALSA_SERVER_IMAP
+	    || (fcw->mbnode && fcw->mbnode->server != mbnode->server))
+	    gtk_ctree_remove_node(ctree, cnode);
+	else
+	    gtk_ctree_node_set_selectable(ctree, cnode, TRUE);
     }
-    gtk_ctree_node_set_row_data(ctree, cnode, mbnode);
-    return TRUE;
 }
 
 static void
@@ -322,7 +282,11 @@ browse_button_cb(GtkWidget * widget, gpointer data)
 {
     GtkWidget *scroll, *dialog;
     GtkRequisition req;
-    GtkWidget *ctree = GTK_WIDGET(gtk_ctree_new(1, 0));
+    GtkWidget *ctree = balsa_mblist_new();
+    /*
+     * Customize the ctree:
+     * */
+    gtk_ctree_post_recursive(GTK_CTREE(ctree), NULL, fix_ctree, data);
 
     dialog = gnome_dialog_new(_("Select parent folder"),
 			      GNOME_STOCK_BUTTON_CANCEL, NULL);
@@ -334,30 +298,16 @@ browse_button_cb(GtkWidget * widget, gpointer data)
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(scroll),
 				    GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
 
-    if (balsa_app.mailbox_nodes) {
-        GNode *walk;
-        GtkCTreeNode *node;
-
-        for (walk = g_node_last_child(balsa_app.mailbox_nodes); walk;
-	     walk = walk->prev) {
-            node = gtk_ctree_insert_gnode(GTK_CTREE(ctree), NULL, NULL, walk,
-                                       mailbox_nodes_to_ctree, data);
-        }
-    }
-    gtk_ctree_sort_recursive(GTK_CTREE(ctree), NULL);
     gtk_signal_connect(GTK_OBJECT(ctree), "tree-select-row",
 		       (GtkSignalFunc) browse_button_select_row_cb, data);
    
     /* Force the mailbox list to be a reasonable size. */
     gtk_widget_size_request(ctree, &req);
-    if ( req.height > balsa_app.mw_height/2 )
-	req.height = balsa_app.mw_height/2;
+    /* don't mess with the width, it gets saved! */
+    if ( req.height > balsa_app.mw_height )
+	req.height = balsa_app.mw_height;
     else if ( req.height < balsa_app.mw_height/4)
 	req.height = balsa_app.mw_height/4;
-    if ( req.width > gdk_screen_width() )
-	req.width = gdk_screen_width() - 2*GTK_CONTAINER(scroll)->border_width;
-    else if ( req.width < gdk_screen_width()/6)
-	req.width = gdk_screen_width()/6;
     gtk_widget_set_usize(GTK_WIDGET(ctree), req.width, req.height);
 
     gtk_container_add(GTK_CONTAINER(scroll), ctree);

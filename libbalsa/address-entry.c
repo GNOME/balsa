@@ -83,10 +83,10 @@ static void libbalsa_address_entry_destroy(GtkObject * object);
 /*
  * Other function prototypes.
  */
-void libbalsa_free_inputData(inputData * data);
-inputData *libbalsa_new_inputData(void);
-emailData *libbalsa_new_emailData(void);
-void libbalsa_free_emailData(emailData *addy);
+void libbalsa_inputData_free(inputData * data);
+inputData *libbalsa_inputData_new(void);
+emailData *libbalsa_emailData_new(void);
+void libbalsa_emailData_free(emailData *addy);
 static gint libbalsa_address_entry_timer(gpointer);
 static gint libbalsa_address_entry_find_position(LibBalsaAddressEntry *, gint);
 static void libbalsa_address_entry_make_backing_pixmap(LibBalsaAddressEntry *,
@@ -109,7 +109,7 @@ void libbalsa_force_no_match(emailData *);
 void libbalsa_address_entry_clear_match(LibBalsaAddressEntry *);
 void libbalsa_address_entry_set_focus(LibBalsaAddressEntry *, gint);
 gint libbalsa_address_entry_get_focus(LibBalsaAddressEntry *);
-GList *libbalsa_strsplit(gchar *, gchar);
+GList *libbalsa_strsplit(const gchar *, gchar);
 
 
 /*
@@ -304,7 +304,6 @@ libbalsa_address_entry_init(LibBalsaAddressEntry *address_entry)
 static void
 libbalsa_address_entry_destroy(GtkObject * object)
 {
-    inputData *data;
     LibBalsaAddressEntry *address_entry;
     GtkEntry *entry;
 
@@ -328,11 +327,9 @@ libbalsa_address_entry_destroy(GtkObject * object)
     /*
      * Remove the inputData structure.
      */
-    data = address_entry->input;
-    if (data)
-	libbalsa_free_inputData(data);
+    if (address_entry->input)
+	libbalsa_inputData_free(address_entry->input);
     address_entry->input = NULL;
-
 
     g_free(address_entry->domain);
     address_entry->domain = NULL;
@@ -385,7 +382,7 @@ libbalsa_force_no_match(emailData *addy) {
 
 
 /*************************************************************
- * libbalsa_new_emailData:
+ * libbalsa_emailData_new:
  *     Returns a newly allocated emailData structure.
  *
  *   arguments:
@@ -395,7 +392,7 @@ libbalsa_force_no_match(emailData *addy) {
  *     A new emailData structure.
  *************************************************************/
 emailData *
-libbalsa_new_emailData(void)
+libbalsa_emailData_new(void)
 {
     emailData *tmp;
 
@@ -409,7 +406,7 @@ libbalsa_new_emailData(void)
 
 
 /*************************************************************
- * libbalsa_free_emailData:
+ * libbalsa_emailData_free:
  *     Frees an emailData structure and all memory it holds.
  *
  *   arguments:
@@ -419,7 +416,7 @@ libbalsa_new_emailData(void)
  *     None.
  *************************************************************/
 void
-libbalsa_free_emailData(emailData *addy)
+libbalsa_emailData_free(emailData *addy)
 {
     g_return_if_fail(addy != NULL);
 
@@ -432,7 +429,7 @@ libbalsa_free_emailData(emailData *addy)
 
 
 /*************************************************************
- * libbalsa_new_inputData:
+ * libbalsa_inputData_new:
  *     Creates and returns an inputData structure which will
  *     be initialized correctly.
  *
@@ -443,7 +440,7 @@ libbalsa_free_emailData(emailData *addy)
  *     A newly allocated structure.
  *************************************************************/
 inputData *
-libbalsa_new_inputData(void)
+libbalsa_inputData_new(void)
 {
     inputData *tmp;
 
@@ -455,7 +452,7 @@ libbalsa_new_inputData(void)
 
 
 /*************************************************************
- * libbalsa_free_inputData:
+ * libbalsa_inputData_free:
  *     Frees an inputData structure and all memory it holds.
  *
  *   arguments:
@@ -465,11 +462,12 @@ libbalsa_new_inputData(void)
  *     None.
  *************************************************************/
 void
-libbalsa_free_inputData(inputData * data)
+libbalsa_inputData_free(inputData * data)
 {
     g_return_if_fail(data != NULL);
 
-    g_list_foreach(data->list, (GFunc) libbalsa_free_emailData, NULL);
+    g_list_foreach(data->list, (GFunc) libbalsa_emailData_free, NULL);
+    g_free(data);
 }
 
 
@@ -540,10 +538,11 @@ libbalsa_alias_accept_match(emailData *addy) {
  *     data inside it.
  *************************************************************/
 GList *
-libbalsa_strsplit(gchar *str, gchar delimiter)
+libbalsa_strsplit(const gchar *str, gchar delimiter)
 {
     GList *glist;
-    gchar *data, *old, *current;
+    gchar *data;
+    const gchar *old, *current;
     gint i, previous;
     gboolean quoted;
 
@@ -710,7 +709,6 @@ static inputData *
 libbalsa_fill_input(LibBalsaAddressEntry *address_entry)
 {
     gint cursor = 0, size = 0, prev = 0;
-    gchar *str = NULL;
     gchar *typed = NULL;
     GList *el, *current;
     GList *list = NULL;
@@ -723,16 +721,11 @@ libbalsa_fill_input(LibBalsaAddressEntry *address_entry)
     /*
      * Grab data from the widget.
      */
-    input = libbalsa_new_inputData();
+    input = libbalsa_inputData_new();
     cursor = (gint) gtk_editable_get_position(GTK_EDITABLE(address_entry));
     typed = gtk_editable_get_chars(GTK_EDITABLE(address_entry), 0, -1);
-    if (typed == NULL) {
-	str = g_strdup("");
-    } else {
-	str = g_strdup(typed);
-    }
-    g_free(typed);
-    typed = NULL;
+    if (typed == NULL)
+	typed = g_strdup("");
 
     /*
      * Split the input string by comma, and store the result in
@@ -741,10 +734,8 @@ libbalsa_fill_input(LibBalsaAddressEntry *address_entry)
      *
      * FIXME: Breaks for '"Doe, John" <john@doe.com>'
      */
-    el = libbalsa_strsplit(str, ',');
-    g_free(str);
-    str = NULL;
-
+    el = libbalsa_strsplit(typed, ',');
+    g_free(typed);
     /*
      * Store it all in a glist.
      */
@@ -752,13 +743,13 @@ libbalsa_fill_input(LibBalsaAddressEntry *address_entry)
 	for (current = el;
 	     current != NULL;
 	     current = g_list_next(current)) {
-	    addy = libbalsa_new_emailData();
+	    addy = libbalsa_emailData_new();
 	    addy->user = g_strdup((gchar *)current->data);
 	    input->list = g_list_append(input->list, addy);
 	}
 	g_list_foreach(el, (GFunc)g_free, NULL);
     } else {
-       addy = libbalsa_new_emailData();
+       addy = libbalsa_emailData_new();
        addy->user = g_strdup("");
        input->list = g_list_append(input->list, addy);
     }
@@ -889,7 +880,7 @@ libbalsa_delete_forward_word(LibBalsaAddressEntry *address_entry)
 	list = g_list_next(input->active);
 	if (list != NULL) {
 	    input->list = g_list_remove_link(input->list, list);
-	    libbalsa_free_emailData(list->data);
+	    libbalsa_emailData_free(list->data);
 	    g_list_free(list);
 	}
 
@@ -905,7 +896,7 @@ libbalsa_delete_forward_word(LibBalsaAddressEntry *address_entry)
 	else
 	    input->active = NULL;
 	input->list = g_list_remove_link(input->list, list);
-	libbalsa_free_emailData(list->data);
+	libbalsa_emailData_free(list->data);
 	g_list_free(list);
 	if (input->active != NULL) {
 	    addy = input->active->data;
@@ -913,6 +904,7 @@ libbalsa_delete_forward_word(LibBalsaAddressEntry *address_entry)
 	    addy->cursor = 0;
 	} else {
 	    libbalsa_address_entry_set_text(address_entry, "");
+	    libbalsa_inputData_free(address_entry->input);
 	    address_entry->input = libbalsa_fill_input(address_entry);
 	}
     }
@@ -957,7 +949,7 @@ libbalsa_delete_backward_word(LibBalsaAddressEntry *address_entry)
 	list = g_list_previous(input->active);
 	if (list != NULL) {
 	    input->list = g_list_remove_link(input->list, list);
-	    libbalsa_free_emailData(list->data);
+	    libbalsa_emailData_free(list->data);
 	    g_list_free(list);
 	}
 
@@ -974,7 +966,7 @@ libbalsa_delete_backward_word(LibBalsaAddressEntry *address_entry)
 	    input->active = NULL;
 	}
 	input->list = g_list_remove_link(input->list, list);
-	libbalsa_free_emailData(list->data);
+	libbalsa_emailData_free(list->data);
 	/*
 	list->next = NULL;
 	list->prev = NULL;
@@ -986,6 +978,7 @@ libbalsa_delete_backward_word(LibBalsaAddressEntry *address_entry)
 	    addy->cursor = strlen(addy->user);
 	} else {
 	    libbalsa_address_entry_set_text(address_entry, "");
+	    libbalsa_inputData_free(address_entry->input);
 	    address_entry->input = libbalsa_fill_input(address_entry);
 	}
     }
@@ -1035,13 +1028,14 @@ libbalsa_delete_to_line_end(LibBalsaAddressEntry *address_entry)
 	 /*
 	  * Concatenate the two e-mails.
 	  */
-	 libbalsa_free_emailData(list->data);
+	 libbalsa_emailData_free(list->data);
 	 input->list = g_list_remove_link(input->list, list);
 	 list->data = NULL;
 	 list->prev = NULL;
 	 list->next = NULL;
 	 g_list_free(list);
     }
+    libbalsa_inputData_free(address_entry->input);
     address_entry->input = input;
     libbalsa_address_entry_show(address_entry);
 }
@@ -1523,7 +1517,7 @@ libbalsa_address_entry_button_press(GtkWidget * widget, GdkEventButton * event)
 	 editable->editable )
     {
 	if (address_entry->input != NULL)
-	    libbalsa_free_inputData(address_entry->input);
+	    libbalsa_inputData_free(address_entry->input);
 	address_entry->input = libbalsa_fill_input(address_entry);
 	address_entry->focus = FOCUS_CACHED;
 	libbalsa_address_entry_show(address_entry);
@@ -1598,7 +1592,7 @@ libbalsa_delete_backward_character(LibBalsaAddressEntry *address_entry)
 	    * Free a whole bunch of RAM.
 	    */
 	   input->list = g_list_remove_link(input->list, input->active);
-	   libbalsa_free_emailData(addy);
+	   libbalsa_emailData_free(addy);
 	   input->active->data = NULL;
 	   g_list_free(input->active);
 	   input->active = list;
@@ -1687,7 +1681,7 @@ libbalsa_delete_forward_character(LibBalsaAddressEntry *address_entry)
 	     * Free a whole bunch of RAM.
 	     */
 	    input->list = g_list_remove_link(input->list, list);
-	    libbalsa_free_emailData(extra);
+	    libbalsa_emailData_free(extra);
 	    list->data = NULL;
 	    g_list_free(list);
 	}
@@ -1994,7 +1988,7 @@ libbalsa_keystroke_comma(LibBalsaAddressEntry *address_entry)
     /*
      * Now we add a new entry.
      */
-    extra = libbalsa_new_emailData();
+    extra = libbalsa_emailData_new();
     list = g_list_next(input->active);
     if (list == NULL)
 	g_list_append(input->list, extra);
@@ -2282,7 +2276,8 @@ libbalsa_paste_clipboard(LibBalsaAddressEntry *address_entry)
 
     editable = GTK_EDITABLE(address_entry);
     gtk_editable_paste_clipboard(editable);
-    libbalsa_free_inputData(address_entry->input);
+    if (address_entry->input)
+	libbalsa_inputData_free(address_entry->input);
     address_entry->input = libbalsa_fill_input(address_entry);
 }
 
@@ -2389,7 +2384,7 @@ libbalsa_cut_clipboard(LibBalsaAddressEntry *address_entry)
 	for (list = g_list_next(start);
 	     list != end;
 	     list = g_list_next(start)) {
-	    libbalsa_free_emailData(list->data);
+	    libbalsa_emailData_free(list->data);
 	    list->data = NULL;
 	    g_list_remove_link(address_entry->input->list, list);
 	}
@@ -2458,13 +2453,13 @@ libbalsa_address_entry_key_press(GtkWidget *widget, GdkEventKey *event)
      * can switch back and forth between To: and Cc:
      */
     if (!address_entry->input)
-	address_entry->input = libbalsa_new_inputData();
+	address_entry->input = libbalsa_inputData_new();
 
     /*
      * Check if we have lost focus.
      */
     if (address_entry->focus != FOCUS_CACHED) {
-	libbalsa_free_inputData(address_entry->input);
+	libbalsa_inputData_free(address_entry->input);
 	address_entry->input = libbalsa_fill_input(address_entry);
     }
     address_entry->focus = FOCUS_CACHED;
@@ -2876,11 +2871,10 @@ void
 libbalsa_address_entry_show(LibBalsaAddressEntry *address_entry)
 {
     GtkEditable *editable;
-    gchar *show;
+    GString *show;
     GList *list;
     emailData *addy;
     gchar *out;
-    gchar *str;
     gint cursor, start, end;
     gboolean found;
     inputData *input;
@@ -2895,7 +2889,7 @@ libbalsa_address_entry_show(LibBalsaAddressEntry *address_entry)
     editable = GTK_EDITABLE(address_entry);
 
     input = address_entry->input;
-    show = g_strdup("");
+    show = g_string_new("");
     cursor = start = end = 0;
     found = FALSE;
     for (list = g_list_first(input->list);
@@ -2907,22 +2901,17 @@ libbalsa_address_entry_show(LibBalsaAddressEntry *address_entry)
 	addy = (emailData *)list->data;
 	g_assert(addy != NULL);
 	if (addy->match != NULL) {
-	    str = g_strdup("");
-	    out = g_strconcat(str, addy->user, " (", addy->match, ")", NULL);
-	    g_free(str);
+	    out = g_strconcat("", addy->user, " (", addy->match, ")", NULL);
 	} else {
 	    out = g_strdup(addy->user);
 	}
 	/*
 	 * Copy the string, adding a delimiter if need be.
 	 */
-	str = g_strdup(show);
-	if (g_list_next(list) != NULL) {
-	    show = g_strconcat(str, out, ", ", NULL);
-	} else {
-	    show = g_strconcat(str, out, NULL);
-	}
-	g_free(str);
+	show = g_string_append(show, out);
+	if (g_list_next(list) != NULL)
+	    show = g_string_append(show, ", ");
+
 	/*
 	 * Check for the cursor position.
 	 */
@@ -2953,11 +2942,12 @@ libbalsa_address_entry_show(LibBalsaAddressEntry *address_entry)
     tmp_pos = 0;
     libbalsa_address_entry_delete_text(editable, 0,
 	    GTK_ENTRY(address_entry)->text_length);
-    gtk_editable_insert_text(editable, show, strlen(show), &tmp_pos);
+    gtk_editable_insert_text(editable, show->str, strlen(show->str), &tmp_pos);
     gtk_editable_set_position(GTK_EDITABLE(address_entry), cursor);
     editable->selection_start_pos = start;
     editable->selection_end_pos = end;
     libbalsa_address_entry_draw_text(address_entry);
+    g_string_free(show, TRUE);
 }
 
 

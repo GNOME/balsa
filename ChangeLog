@@ -1,3 +1,8 @@
+2004-10-31 15:47  PeterB
+
+	* src/toolbar-factory.c: toggle button is now a
+	GtkToggleToolButton.
+
 2004-10-30 11:37  PeterB
 
 	* src/main.c: destroy balsa_threads_mutex on exit.

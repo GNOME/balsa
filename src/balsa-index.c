@@ -1470,10 +1470,19 @@ balsa_index_toggle_flag(BalsaIndex* index, LibBalsaMessageFlag flag)
 static void
 bi_toggle_deleted_cb(GtkWidget * widget, gpointer user_data)
 {
+    BalsaIndex *index;
     g_return_if_fail(user_data != NULL);
 
-    balsa_index_toggle_flag(BALSA_INDEX(user_data), 
-                            LIBBALSA_MESSAGE_FLAG_DELETED);
+    index = BALSA_INDEX(user_data);
+    balsa_index_toggle_flag(index, LIBBALSA_MESSAGE_FLAG_DELETED);
+    if (widget == index->undelete_item) {
+	GList *l = balsa_index_selected_list(index);
+	if (LIBBALSA_MESSAGE_IS_DELETED(l->data))
+	    /* Oops! */
+	    balsa_index_toggle_flag(index, LIBBALSA_MESSAGE_FLAG_DELETED);
+	g_list_foreach(l, (GFunc) g_object_unref, NULL);
+	g_list_free(l);
+    }
 }
 /* This function toggles the FLAGGED attribute of a list of messages
  */

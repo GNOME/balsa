@@ -109,7 +109,7 @@ index_child_destroy(GtkObject *obj)
   mailbox_watcher_remove(ic->mailbox,ic->watcher_id);
   mailbox_open_unref (ic->mailbox);
 
-  gnome_mdi_remove_child(ic->mdi, GNOME_MDI_CHILD(ic), TRUE);
+  gnome_mdi_remove_child(ic->mdi, GNOME_MDI_CHILD(ic), FALSE);
 /*
   if(GTK_OBJECT_CLASS(parent_class)->destroy)
       (* GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(ic));

@@ -17,3 +17,6 @@ Balsa Library (libbalsa):
    inside the message structure.
 
  * mh folders, maildir, etc etc etc... same as above.
+
+ * Steal RCS's time parser.  Josh says its really awsome. :)
+   (for rfc822 stuff)

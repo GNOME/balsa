@@ -1,8 +1,12 @@
-2003-09-03 15:17  PeterB
+2003-09-03 16:34  PeterB
 
 	* doc/C/balsa.xml: Copy filter help from help/C/balsa.sgml.
 	* src/: filter-edit-callbacks.c, filter-run-callbacks.c: Connect
 	filter dialog Help buttons to text.
+	* src/: address-book-config.c, balsa-message.c,
+	filter-edit-callbacks.c, filter-run-callbacks.c, folder-conf.c,
+	pref-manager.c, sendmsg-window.c, toolbar-prefs.c: Use
+	balsa_information instead of g_print to report errors.
 
 2003-09-01 23:14  PeterB
 

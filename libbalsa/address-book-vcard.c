@@ -381,8 +381,25 @@ load_vcard_file(LibBalsaAddressBook *ab)
 
     completion_list = NULL;
     for (;list; list = list->next) {
-	cmp_data = completion_data_new(LIBBALSA_ADDRESS(list->data));
-	completion_list = g_list_prepend(completion_list, cmp_data);
+	LibBalsaAddress *address = list->data;
+
+	if (address->address_list->next && !ab->dist_list_mode) {
+	    /* Create multiple LibBalsaAddress objects. */
+	    GList *l;
+
+	    for (l = address->address_list; l; l = l->next) {
+		LibBalsaAddress *member;
+
+		member = libbalsa_address_new();
+		libbalsa_address_set_copy_member(member, address, l->data);
+		cmp_data = completion_data_new(member);
+		g_object_unref(member);
+		completion_list = g_list_prepend(completion_list, cmp_data);
+	    }
+	} else {
+	    cmp_data = completion_data_new(address);
+	    completion_list = g_list_prepend(completion_list, cmp_data);
+	}
     }
     completion_list = g_list_reverse(completion_list);
     g_completion_add_items(addr_vcard->name_complete, completion_list);

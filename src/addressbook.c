@@ -16,3 +16,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
+
+#include <gnome.h>
+
+#include "addressbook.h"
+#include "balsa-app.h"
+#include "index.h"
+#include "mailbox.h"
+#include "../config.h"
+
+void addressbook_init()
+{
+
+}

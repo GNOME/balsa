@@ -10,7 +10,9 @@ balsa_SOURCES =	\
 	main-window.c		\
 	main.c			\
 	options.c		\
-	sendmsg-window.c
+	sendmsg-window.c	\
+	addressbook.c		\
+	gtkspell.c
 
 INCLUDES=-I. -I$(srcdir)/../imap/c-client $(GNOME_INCLUDEDIR)
 

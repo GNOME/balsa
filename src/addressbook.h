@@ -17,3 +17,16 @@
  * 02111-1307, USA.
  */
 
+typedef struct _AddressbookEntry AddressbookEntry;
+struct _AddressbookEntry
+  {
+    gint num;
+
+    gchar *name;
+
+    gchar *comment;
+
+    GList *emails;
+  };
+
+void addressbook_init();

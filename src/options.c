@@ -463,7 +463,7 @@ personality_box (GtkWidget * widget, gpointer data)
 
   window = gtk_window_new (GTK_WINDOW_DIALOG);
   gtk_widget_set_usize (GTK_WIDGET (window), 407, 330);
-  gtk_window_set_title (GTK_WINDOW (window), "Personalities...");
+  gtk_window_set_title (GTK_WINDOW (window), "Account manager...");
   gtk_signal_connect (GTK_OBJECT (window), "delete_event",
 		      GTK_SIGNAL_FUNC (delete_event), NULL);
   gtk_container_border_width (GTK_CONTAINER (window), 3);

@@ -214,8 +214,6 @@ void sendmsg_window_new(GtkWidget *widget, gpointer data)
   GtkWidget *sendbut;
   GtkWidget *label;
   GtkWidget *menubar;
-  GtkMenuFactory *factory;
-  GtkMenuFactory *subfactories[1];
 
   msg->window = gnome_app_new ("balsa_sendmsg_window", "New message");
   gtk_window_set_wmclass (GTK_WINDOW (msg->window), "balsa_app",

@@ -42,7 +42,7 @@ struct
 
     MainWindow *main_window;
 
-    GList *addressbook;
+    GList *addressbook_entrys;
   }
 balsa_app;
 

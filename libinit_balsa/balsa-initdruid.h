@@ -19,7 +19,25 @@
  * 02111-1307, USA.
  */
 
+#include <gtk/gtk.h>
+
+#ifndef __BALSA_INITDRUID_H__
+#define __BALSA_INITDRUID_H__
+
+#ifdef __cplusplus
+extern "C" {
+#endif                          /* __cplusplus */
+
 #include "config.h"
 #include <gnome.h>
+#include "helper.h"
 
-void balsa_init_begin( void );
+/*
+ * Public methods
+ */
+    void balsa_initdruid(GtkWindow * window);
+
+#ifdef __cplusplus
+}
+#endif                          /* __cplusplus */
+#endif

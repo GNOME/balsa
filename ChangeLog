@@ -1,3 +1,11 @@
+2001-10-18  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/send.c: fix libmutt locking (Emmanuel).
+
+	Philip Van Hoof <freax@pandora.be>:
+	* src/balsa-index.c: a View Source right mouse button menu entry.
+	* libbalsa/source-viewer.c: Edit/Copy+Select 
+
 2001-10-18  Carlos Morgado  <chbm@cprm.net>
 
 	* src/sendmsg-window.c: 

@@ -99,7 +99,9 @@ msg_queue_item_new(LibBalsaMessage * message)
 
     mqi = g_new(MessageQueueItem, 1);
     mqi->orig = message;
+    libbalsa_lock_mutt();
     mqi->message = mutt_new_header();
+    libbalsa_unlock_mutt();
 #if !ENABLE_ESMTP
     mqi->next_message = NULL;
 #endif
@@ -116,8 +118,10 @@ msg_queue_item_destroy(MessageQueueItem * mqi)
 {
     if (*mqi->tempfile)
 	unlink(mqi->tempfile);
+    libbalsa_lock_mutt();
     if (mqi->message)
 	mutt_free_header(&mqi->message);
+    libbalsa_unlock_mutt();
     if (mqi->fcc)
 	g_free(mqi->fcc);
     g_free(mqi);
@@ -309,6 +313,40 @@ static void dump_queue(const char*msg)
 }
 #endif
 
+/* write_remote_fcc:
+   return -1 on failure, 0 on success.
+*/
+static int
+write_remote_fcc(LibBalsaMailbox* fccbox, HEADER* m_msg)
+{
+    LibBalsaServer* server = LIBBALSA_MAILBOX_REMOTE(fccbox)->server;
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX_IMAP(fccbox), -1);
+    if(CLIENT_CONTEXT_CLOSED(fccbox)) {
+        /* We cannot use LIBBALSA_REMOTE_MAILBOX_SERVER() here because */
+        /* it will lock up when NO IMAP mailbox has been accessed since */
+        /* balsa was started. This should be safe because we have already */
+        /* established that fccbox is in fact an IMAP mailbox */
+        if(server == (LibBalsaServer *)NULL) {
+            libbalsa_unlock_mutt();
+            libbalsa_information(LIBBALSA_INFORMATION_ERROR, 
+                                 _("Unable to open sentbox - could not get IMAP server information"));
+            return -1;
+        }
+        if (!(server->passwd && *server->passwd) &&
+            !(server->passwd = libbalsa_server_get_password(server, fccbox))) {
+            libbalsa_unlock_mutt();
+            libbalsa_information(LIBBALSA_INFORMATION_ERROR, 
+                                 "Unable to open sentbox - could not get passwords for server");
+            return -1;
+        }
+        reset_mutt_passwords(server);
+    }
+  
+    /* Passwords are guaranteed to be set now */
+    
+    return mutt_write_fcc(LIBBALSA_MAILBOX(fccbox)->url,
+                          m_msg, NULL, 0, NULL);
+}
 /* libbalsa_message_queue:
    places given message in the outbox. If fcc message field is set, saves
    it to fcc mailbox as well.
@@ -335,36 +373,12 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 	if (fccbox && (LIBBALSA_IS_MAILBOX_LOCAL(fccbox)
 		|| LIBBALSA_IS_MAILBOX_IMAP(fccbox))) {
 	    libbalsa_lock_mutt();
-	    if (LIBBALSA_IS_MAILBOX_LOCAL(fccbox)) {
+	    if (LIBBALSA_IS_MAILBOX_LOCAL(fccbox))
 	    mutt_write_fcc(libbalsa_mailbox_local_get_path(fccbox),
 			   mqi->message, NULL, 0, NULL);
-	    } else if (LIBBALSA_IS_MAILBOX_IMAP(fccbox)) {
-		server = LIBBALSA_MAILBOX_REMOTE(fccbox)->server;
-		if(!CLIENT_CONTEXT_OPEN(fccbox)) /* Has not been opened */
-		{
-			/* We cannot use LIBBALSA_REMOTE_MAILBOX_SERVER() here because */
-			/* it will lock up when NO IMAP mailbox has been accessed since */
-			/* balsa was started. This should be safe because we have already */
-			/* established that fccbox is in fact an IMAP mailbox */
-			if(server == (LibBalsaServer *)NULL) {
-				libbalsa_unlock_mutt();
-				libbalsa_information(LIBBALSA_INFORMATION_ERROR, "Unable to open sentbox - could not get server information");
-				return;
-			}
-			if (!(server->passwd && *server->passwd) &&
-			!(server->passwd = libbalsa_server_get_password(server, fccbox))) {
-				libbalsa_unlock_mutt();
-				libbalsa_information(LIBBALSA_INFORMATION_ERROR, "Unable to open sentbox - could not get passwords for server");
-				return;
-			}
-			reset_mutt_passwords(server);
-		}
+	    else if (LIBBALSA_IS_MAILBOX_IMAP(fccbox))
+                write_remote_fcc(fccbox, mqi->message);
 
-		/* Passwords are guaranteed to be set now */
-
-		mutt_write_fcc(LIBBALSA_MAILBOX(fccbox)->url,
-			   mqi->message, NULL, 0, NULL);
-	    }
 	    libbalsa_unlock_mutt();
 	    libbalsa_mailbox_check(fccbox);
 	}
@@ -1250,8 +1264,8 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 		    *subtype++ = 0;
 		    libbalsa_lock_mutt();
 		    newbdy->type = mutt_check_mime_type (type);
-		    newbdy->subtype = g_strdup(subtype);
 		    libbalsa_unlock_mutt();
+		    newbdy->subtype = g_strdup(subtype);
 		}
 		g_free (type);
 	    }
@@ -1277,8 +1291,9 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 	if (msg->content->next)
 	    msg->content = mutt_make_multipart(msg->content);
     }
-
     mutt_prepare_envelope(msg->env);
+    libbalsa_unlock_mutt();
+
     encode_descriptions(msg->content);
 
     if ((reply_message != NULL) && (reply_message->mailbox != NULL))
@@ -1293,39 +1308,12 @@ libbalsa_message_postpone(LibBalsaMessage * message,
     else
 	tmp = NULL;
 
+    libbalsa_lock_mutt();
     if (LIBBALSA_IS_MAILBOX_LOCAL(draftbox)) {
 	thereturn = mutt_write_fcc(libbalsa_mailbox_local_get_path(draftbox),
 				   msg, tmp, 1, fcc);
     } else if (LIBBALSA_IS_MAILBOX_IMAP(draftbox)) {
-	server = LIBBALSA_MAILBOX_REMOTE(draftbox)->server;
-	if(!CLIENT_CONTEXT_OPEN(draftbox)) /* Has not been opened */
-	{
-	    /* We cannot use LIBBALSA_REMOTE_MAILBOX_SERVER() here because */
-	    /* it will lock up when NO IMAP mailbox has been accessed since */
-	    /* balsa was started. This should be safe because we have already */
-	    /* established that draftbox is in fact an IMAP mailbox */
-	    if(server == (LibBalsaServer *)NULL) {
-		libbalsa_information(LIBBALSA_INFORMATION_ERROR, "Unable to open draftbox - could not get server information");
-		g_free(tmp);
-		mutt_free_header(&msg);
-		libbalsa_unlock_mutt();
-		return FALSE;
-	    }
-	    if (!(server->passwd && *server->passwd) &&
-		!(server->passwd = libbalsa_server_get_password(server, draftbox))) {
-		libbalsa_information(LIBBALSA_INFORMATION_ERROR, "Unable to open draftbox - could not get passwords for server");
-		g_free(tmp);
-		mutt_free_header(&msg);
-		libbalsa_unlock_mutt();
-		return FALSE;
-	    }
-	    reset_mutt_passwords(server);
-	}
-
-	/* Passwords are guaranteed to be set now */
-
-	thereturn = mutt_write_fcc(LIBBALSA_MAILBOX(draftbox)->url,
- 		       msg, tmp, 1, fcc);
+        thereturn = write_remote_fcc(draftbox, msg);
     } else 
 	thereturn = -1;
     g_free(tmp);
@@ -1335,10 +1323,7 @@ libbalsa_message_postpone(LibBalsaMessage * message,
     if (draftbox->open_ref > 0)
 	libbalsa_mailbox_check(draftbox);
 
-    if(thereturn<0)
-	return FALSE;
-    else
-	return TRUE;
+    return thereturn>=0;
 }
 
 /* balsa_create_msg:
@@ -1358,13 +1343,14 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
     LibBalsaMessageBody *body;
     GList *list;
     gchar **mime_type;
-
+    gboolean res = TRUE;
 
     message2HEADER(message, msg);
 
     /* If the message has references set, add them to he envelope */
     if (message->references != NULL) {
 	list = message->references;
+        libbalsa_lock_mutt();
 	msg->env->references = mutt_new_list();
 	references = msg->env->references;
 	references->data = g_strdup(list->data);
@@ -1377,6 +1363,8 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 	    references->next = NULL;
 	    list = list->next;
 	}
+        libbalsa_unlock_mutt();
+
 	/* There's no specific header for In-Reply-To, just
 	 * add it to the user headers */ in_reply_to = mutt_new_list();
 	in_reply_to->next = msg->env->userhdrs;
@@ -1462,7 +1450,9 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 	    tempfp = NULL;
 	} else {
 	    /* safe_free bug patch: steal it! */
+            libbalsa_lock_mutt();
 	    msg->content = mutt_copy_body(body->mutt_body, NULL);
+            libbalsa_unlock_mutt();
 	}
 
 	if (newbdy) {
@@ -1477,21 +1467,23 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 	body = body->next;
     }
 
-    if (msg->content) {
-	if (msg->content->next)
-	    msg->content = mutt_make_multipart(msg->content);
-    }
-
+    libbalsa_lock_mutt();
+    if (msg->content && msg->content->next)
+        msg->content = mutt_make_multipart(msg->content);
     mutt_prepare_envelope(msg->env);
+    libbalsa_unlock_mutt();
 
     encode_descriptions(msg->content);
 
 /* We create the message in MIME format here, we use the same format 
- * for local delivery that for SMTP */
+ * for local delivery and for SMTP */
     if (queu == 0) {
+        libbalsa_lock_mutt();
 	mutt_mktemp(tmpfile);
-	if ((tempfp = safe_fopen(tmpfile, "w")) == NULL)
-	    return (-1);
+	if ((tempfp = safe_fopen(tmpfile, "w")) == NULL) {
+            libbalsa_unlock_mutt();
+            return FALSE;
+        }
 
 	mutt_write_rfc822_header(tempfp, msg->env, msg->content, -1);
 	fputc('\n', tempfp);	/* tie off the header. */
@@ -1499,20 +1491,20 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 	if ((mutt_write_mime_body(msg->content, tempfp) == -1)) {
 	    fclose(tempfp);
 	    unlink(tmpfile);
-	    return (-1);
+            libbalsa_unlock_mutt();
+            return FALSE;
 	}
+        libbalsa_unlock_mutt();
 	fputc('\n', tempfp);	/* tie off the body. */
-
 	if (fclose(tempfp) != 0) {
 	    mutt_perror(tmpfile);
-	    unlink(tmpfile);
-	    return (-1);
+            unlink(tmpfile);
+            return FALSE;
 	}
 
-    } else {
-	/* the message is in the queue */
-
+    } else { /* the message is in the queue */
 	msg_tmp = message->header;
+        libbalsa_lock_mutt();
 	mutt_parse_mime_message(CLIENT_CONTEXT(message->mailbox),
 				msg_tmp);
 	mensaje =
@@ -1520,24 +1512,23 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 			    msg_tmp->msgno);
 
 	mutt_mktemp(tmpfile);
-	if ((tempfp = safe_fopen(tmpfile, "w")) == NULL)
-	    return FALSE;
-
+	if ((tempfp = safe_fopen(tmpfile, "w")) == NULL) {
+            libbalsa_unlock_mutt();
+            return FALSE;
+        }
 	_mutt_copy_message(tempfp, mensaje->fp, msg_tmp,
 			   msg_tmp->content, 0, CH_NOSTATUS);
 
 	if (fclose(tempfp) != 0) {
 	    mutt_perror(tmpfile);
 	    unlink(tmpfile);
-	    if (message->mailbox)
-		libbalsa_message_body_unref(message);
-	    return FALSE;
+            res = FALSE;
 	}
-
-    }
+        libbalsa_unlock_mutt();
+    }    
 
     if (message->mailbox)
 	libbalsa_message_body_unref(message);
 
-    return TRUE;
+    return res;
 }

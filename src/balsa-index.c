@@ -1197,15 +1197,14 @@ button_event_press_cb(GtkWidget * widget, GdkEventButton * event,
         return;
     } 
 
+    /* Keep the cast: I have got a strange crash here */
     if (on_message && 
-	(message = LIBBALSA_MESSAGE(gtk_clist_get_row_data(clist, row))) ) {
+	(message = (LibBalsaMessage*)gtk_clist_get_row_data(clist, row))) {
 	if (event && event->button == 1 && event->type == GDK_2BUTTON_PRESS) {
             message_window_new (message);
         }
     }
 }
-
-
 static void
 button_event_release_cb(GtkWidget * clist, GdkEventButton * event,
 			gpointer data)
@@ -1526,6 +1525,21 @@ balsa_index_close_and_destroy(GtkObject * obj)
         (*GTK_OBJECT_CLASS(parent_class)->destroy) (obj);
 }
 
+static void
+balsa_message_view_source(GtkWidget * widget, gpointer user_data)
+{
+    GList *list;
+    BalsaIndex* index;
+    LibBalsaMessage *message;
+    
+    index = BALSA_INDEX (user_data);
+    list = GTK_CLIST(index->ctree)->selection;
+    while (list) {
+	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
+	list = list->next;
+	libbalsa_show_message_source(message);
+    }	
+}
 
 void
 balsa_message_reply(GtkWidget * widget, gpointer user_data)
@@ -2046,6 +2060,9 @@ create_menu(BalsaIndex * bindex)
     mailbox = bindex->mailbox_node->mailbox;
 
     menu = gtk_menu_new();
+
+    create_stock_menu_item(menu, GNOME_STOCK_MENU_BOOK_OPEN , _("View Source"),
+ 			   balsa_message_view_source, bindex, TRUE);
 
     create_stock_menu_item(menu, BALSA_PIXMAP_MENU_REPLY, _("Reply..."),
 			   balsa_message_reply, bindex, TRUE);

@@ -29,20 +29,49 @@
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 
-
 static void close_cb(GtkWidget* w, gpointer data);
+static void copy_cb(GtkWidget * w, gpointer data);
+static void select_all_cb(GtkWidget* w, gpointer data);
 
 static GnomeUIInfo file_menu[] = {
-#define MENU_FILE_INCLUDE_POS 0
+#define MENU_FILE_INCLUDE_POS 1
     GNOMEUIINFO_MENU_CLOSE_ITEM(close_cb, NULL),
     GNOMEUIINFO_END
 };
 
-static GnomeUIInfo main_menu[] = {
-#define SOURCE_FILE_MENU 0
-    GNOMEUIINFO_MENU_FILE_TREE(file_menu),
+static GnomeUIInfo edit_menu[] = {
+#define MENU_EDIT_INCLUDE_POS 0
+    GNOMEUIINFO_MENU_COPY_ITEM(copy_cb, NULL),
+    GNOMEUIINFO_SEPARATOR,
+    {GNOME_APP_UI_ITEM, N_("_Select Text"),
+     N_("Select entire mail"),
+     select_all_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
+     NULL, 'A', GDK_CONTROL_MASK, NULL
+    },
     GNOMEUIINFO_END
 };
+
+static GnomeUIInfo main_menu[] = {
+#define SOURCE_FILE_MENU 2
+    GNOMEUIINFO_MENU_FILE_TREE(file_menu),
+    GNOMEUIINFO_MENU_EDIT_TREE(edit_menu),
+    GNOMEUIINFO_END
+};
+
+
+static void 
+select_all_cb(GtkWidget* w, gpointer data)
+{
+    GtkEditable * editable = gtk_object_get_data(GTK_OBJECT(data), "text");
+    gtk_editable_select_region(editable, 0, -1);
+}
+
+static void
+copy_cb(GtkWidget * w, gpointer data)
+{
+    GtkEditable * editable = gtk_object_get_data(GTK_OBJECT(data), "text");
+    gtk_editable_copy_clipboard(editable);
+}
 
 static void
 close_cb(GtkWidget* w, gpointer data)
@@ -50,18 +79,21 @@ close_cb(GtkWidget* w, gpointer data)
     gtk_widget_destroy(GTK_WIDGET(data));
 }
 
+
 static void
 libbalsa_show_file(FILE* f, long length)
 {
-    GtkWidget* window, *interior;
-    GtkEditable* text;  char buf[1024];
+    GtkWidget*window, *interior;
+    GtkEditable* text;
+    char buf[1024];
     int linelen, pos = 0;
 
     window = gnome_app_new("balsa", _("Message Source"));
     gtk_window_set_wmclass(GTK_WINDOW(window), "message-source", "Balsa");
-    gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, window);
     text = GTK_EDITABLE(gtk_text_new(NULL, NULL));
-    gtk_text_set_editable(GTK_TEXT(text), FALSE);
+    gtk_object_set_data(GTK_OBJECT(window), "text", text);
+    gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, window);
+    
     gtk_text_set_word_wrap(GTK_TEXT(text), TRUE);
     interior = gtk_scrolled_window_new(GTK_TEXT(text)->hadj,
 				       GTK_TEXT(text)->vadj);

@@ -278,7 +278,7 @@ restore_global_settings ()
 
   /* important mailboxes */
   balsa_app.inbox_path = gnome_config_get_string ("inbox");
-  if (!balsa_app.outbox_path)
+  if (!balsa_app.inbox_path)
     {
       g_snprintf (tmp, PATH_MAX, "%s/%s", MAILPATH, g_get_user_name());
       balsa_app.inbox_path = g_strdup (tmp);

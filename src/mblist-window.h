@@ -37,7 +37,6 @@ void mblist_menu_close_cb (GtkWidget * widget, gpointer data);
 GtkWidget *balsa_mailbox_list_window_new(BalsaWindow *window);
 
 Mailbox *mblist_get_selected_mailbox (void);
-
-
+void mblist_open_mailbox (Mailbox * mailbox);
 
 #endif /* MBLIST_WINDOW_H */

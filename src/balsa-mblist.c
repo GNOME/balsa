@@ -26,6 +26,8 @@
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "balsa-mblist.h"
+/* mblist-window.h for mblist_open_mailbox */
+#include "mblist-window.h"
 #include "misc.h"
 #include "mailbox.h"
 
@@ -538,6 +540,7 @@ select_mailbox (GtkCTree * ctree, GtkCTreeNode * row, gint column)
 
   mbnode = gtk_ctree_node_get_row_data (ctree, row);
 
+  g_return_if_fail(mbnode != NULL);
   if (mbnode->IsDir || !BALSA_IS_MAILBOX(mbnode->mailbox))
     return;
 
@@ -688,26 +691,49 @@ balsa_mblist_check_new (GtkCTree *ctree, GtkCTreeNode *node, gpointer data)
  * Description: the function looks for the mailbox in the mblist, if
  * it's there it changes the style (and fills the info columns)
  * depending on the mailbox variables unread_messages and
- * total_messages
+ * total_messages. Selects the mailbox (important when previous mailbox
+ * was closed).
  * */
+
 void 
 balsa_mblist_update_mailbox (BalsaMBList * mblist, Mailbox * mailbox)
 {
   GtkCTreeNode *node;
+  gchar * desc;
 
 /* try and find the mailbox in both sub trees */
-  node = gtk_ctree_find_by_row_data_custom (GTK_CTREE (&(mblist->ctree)), NULL, mailbox, mblist_mbnode_compare);
+  node = gtk_ctree_find_by_row_data_custom (GTK_CTREE (&(mblist->ctree)), NULL,
+					    mailbox, mblist_mbnode_compare);
   
   if (node == NULL)
-    return;
-  
-  balsa_mblist_mailbox_style (GTK_CTREE (&(mblist->ctree)), 
+     return;
+
+  balsa_mblist_mailbox_style (GTK_CTREE (&mblist->ctree), 
                               node, 
                               mailbox
 #ifdef BALSA_SHOW_INFO
                               ,balsa_app.mblist->display_content_info
 #endif
                               );
+
+  /* moving selection to the respective mailbox.
+     this is neccessary when the previous mailbox was closed and
+     redundant if the mailboxes were switched (notebook_switch_page)
+     The select/unselect pari moves the focus.
+  */
+  if(gtk_ctree_node_nth (&mblist->ctree,GTK_CLIST(&mblist->ctree)->focus_row)
+     != node) {
+     gtk_ctree_select  (GTK_CTREE(&mblist->ctree), node ); 
+     
+     if (gtk_ctree_node_is_visible (&mblist->ctree, node)!=GTK_VISIBILITY_FULL)
+	gtk_ctree_node_moveto (&mblist->ctree,node, 0, 1.0, 0.0);
+  }
+
+  desc = g_strdup_printf("Shown mailbox: %s with %ld messages, %ld new", 
+			 mailbox->name, mailbox->messages,
+			 mailbox->unread_messages);
+  gnome_appbar_set_default (balsa_app.appbar, desc);
+  g_free(desc);
 }
 
 /* balsa_mblist_mailbox_style [MBG]

@@ -1502,12 +1502,14 @@ static void mw_size_alloc_cb( GtkWidget *window, GtkAllocation *alloc )
     balsa_app.mw_width = alloc->width;
 }
 
-/* When page switches we change whe preview window */
+/* When page is switched we change the preview window and the selected 
+   mailbox in the mailbox tree.
+ */
 static void notebook_switch_page_cb( GtkWidget *notebook,
                                      GtkNotebookPage *page, guint page_num )
 {
     GtkWidget *index_page;
-    
+
     index_page = gtk_object_get_data (GTK_OBJECT (page->child), "indexpage");
     balsa_index_update_message (BALSA_INDEX_PAGE (index_page));
 }

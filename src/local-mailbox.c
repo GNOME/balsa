@@ -67,8 +67,43 @@ find_my_node (GNode * root,
   return d[1];
 }
 
+static gboolean
+traverse_find_path (GNode * node, gpointer* d)
+{
+   const gchar * path;
+  if (!node->data ||
+      !MAILBOX_IS_LOCAL( ((MailboxNode *) node->data)->mailbox ) )
+     return FALSE;
+
+  path = MAILBOX_LOCAL( ((MailboxNode *) node->data)->mailbox )->path;
+  if( strcmp ( path, (gchar *) d[0]) )
+     return FALSE;
+  d[1] = node;
+  return TRUE;
+}
+
+static GNode *
+mb_node_find_path (GNode * root, GTraverseType order, GTraverseFlags flags,
+		   gpointer data)
+{
+  gpointer d[2];
+
+  d[0] = data; d[1] = NULL;
+  g_node_traverse (root, order, flags, -1, traverse_find_path, d);
+
+  return d[1];
+}
+
+/* add_mailbox
+   the function scans the local mail directory (LMD) and adds them to the 
+   list of mailboxes. Takes care not to duplicate any of the "standard"
+   mailboxes (inbox, outbox etc). Avoids also problems with aliasing 
+   (someone added a local mailbox - possibly aliased - located in LMD 
+   to the configuration).
+*/
 static void
-add_mailbox (gchar * name, gchar * path, MailboxType type, gint isdir)
+add_mailbox (const gchar * name, const gchar * path, MailboxType type, 
+	     gint isdir)
 {
   Mailbox *mailbox;
   GNode *rnode;
@@ -97,6 +132,10 @@ add_mailbox (gchar * name, gchar * path, MailboxType type, gint isdir)
       balsa_app.trash->type != MAILBOX_POP3)
     if (strcmp (path, MAILBOX_LOCAL (balsa_app.trash)->path) == 0)
       return;
+  
+  /* don't add if the mailbox is already in the configuration */
+  if (mb_node_find_path(balsa_app.mailbox_nodes, G_LEVEL_ORDER, 
+		   G_TRAVERSE_ALL, path)) return;
 
   if (isdir && type == MAILBOX_UNKNOWN)
     {
@@ -114,7 +153,8 @@ add_mailbox (gchar * name, gchar * path, MailboxType type, gint isdir)
 
       g_free(tmppath);
 
-      rnode = find_my_node (balsa_app.mailbox_nodes, G_LEVEL_ORDER, G_TRAVERSE_ALL, g_dirname (path));
+      rnode = find_my_node (balsa_app.mailbox_nodes, G_LEVEL_ORDER, 
+			    G_TRAVERSE_ALL, g_dirname (path));
       if (rnode)
 	g_node_append (rnode, node);
       else

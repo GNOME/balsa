@@ -376,9 +376,9 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
    * makes it appear as if the message is displayed before the index; so we set
    * the clist selection mode to a mode that doesn't automagicly select, select
    * manually, then switch back */
-  gtk_clist_set_selection_mode (GTK_CLIST (bindex),
-				GTK_SELECTION_EXTENDED);
-
+  /* gtk_clist_set_selection_mode (GTK_CLIST (bindex),
+     GTK_SELECTION_EXTENDED); */
+  gtk_clist_freeze(GTK_CLIST (bindex));
   list = mailbox->message_list;
   while (list)
   {
@@ -386,9 +386,9 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
     list = list->next;
     i++;
   }
-
-  gtk_clist_set_selection_mode (GTK_CLIST (bindex),
-				GTK_SELECTION_EXTENDED);
+  gtk_clist_thaw(GTK_CLIST (bindex));
+  /* gtk_clist_set_selection_mode (GTK_CLIST (bindex),
+     GTK_SELECTION_EXTENDED); */
 
   /* FIXME this might could be cleaned up some */
   if (bindex->first_new_message == 0)
@@ -799,26 +799,4 @@ balsa_index_get_selected_rows( BalsaIndex *bindex, guint **rows, guint *nb_rows 
   *rows = selected_rows;
 
   return;
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

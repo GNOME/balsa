@@ -25,8 +25,6 @@
 #include "config.h"
 
 #include <string.h>
-#include <gdk/gdkx.h>
-#include <X11/Xutil.h>
 
 #include "balsa-app.h"
 #include "balsa-icons.h"
@@ -207,25 +205,24 @@ mblist_open_mailbox (Mailbox * mailbox)
       !strcmp (mailbox->name, _("Trash")))
     return ;
   
-    gtk_ctree_set_node_info (GTK_CTREE (bmbl),
+
+  gtk_ctree_set_node_info (GTK_CTREE (mblw->ctree),
     row,
     mailbox->name, 5,
     NULL, NULL,
     balsa_icon_get_pixmap (BALSA_ICON_TRAY_EMPTY),
     balsa_icon_get_bitmap (BALSA_ICON_TRAY_EMPTY),
-    FALSE, TRUE);
+    FALSE, TRUE); 
     
-    gtk_ctree_node_set_row_style (GTK_CTREE (bmbl), row, NULL);*/
+    gtk_ctree_node_set_row_style (GTK_CTREE (mblw->ctree), row, NULL); */
 }
 
 
 void
 mblist_close_mailbox (Mailbox * mailbox)
 {
-
   if (!mblw)
     return;
-
   balsa_window_close_mailbox(BALSA_WINDOW(mblw->window), mailbox);
 }
  
@@ -307,13 +304,8 @@ static void size_allocate_cb( GtkWidget *widget, GtkAllocation *alloc )
 static void
 mailbox_select_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row, GdkEventButton * event)
 {
-  
-  
   if (!mblw)
     return;
-  
-
-
 }
 
 static void

@@ -167,8 +167,8 @@ balsa_app_init (void)
 gint
 do_load_mailboxes (void)
 {
-  load_local_mailboxes ();
   special_mailboxes ();
+  load_local_mailboxes ();
 
   if (!balsa_app.inbox)
     return FALSE;

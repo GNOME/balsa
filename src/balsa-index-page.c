@@ -385,18 +385,17 @@ idle_handler_cb(GtkWidget * widget)
   }
   if (bmsg) {
       if (BALSA_MESSAGE(bmsg)) {
-          if (message) {
+          if (message) 
               balsa_message_set(BALSA_MESSAGE(bmsg), message);
-              /* [MBG]: Why does this appear here?  It gets called in
-               * the above function as well. */
-              /* message_read( message ); */
-              balsa_mblist_update_mailbox (balsa_app.mblist, message->mailbox);
-          } else
+          else
               balsa_message_clear (BALSA_MESSAGE (bmsg));
       }
   }
 
   handler = 0;
+  
+  balsa_mblist_update_mailbox (balsa_app.mblist, 
+			       BALSA_INDEX(widget)->mailbox);
 
   gtk_object_remove_data (GTK_OBJECT (widget), "bevent");
   gtk_object_remove_data (GTK_OBJECT (widget), "message");

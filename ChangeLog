@@ -1,3 +1,10 @@
+2002-12-15  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/mailbox_local.c: handle M_REOPENED correctly 
+	
+	* src/sendmsg-window.c: put to: subject on title, backport from balsa2, 
+	(#101196)
+
 2002-12-12  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/sendmsg-window.c: switch signatures properly even if one of

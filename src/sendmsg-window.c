@@ -158,6 +158,7 @@ static void set_ready(LibBalsaAddressEntry * address_entry,
                       BalsaSendmsgAddress *sma);
 static void set_entry_to_subject(GtkEntry *, LibBalsaMessage *,
 				 SendType, LibBalsaIdentity *);
+static void sendmsg_window_set_title(GtkWidget *foo, gpointer data);
 
 /* Standard DnD types */
 enum {
@@ -1908,9 +1909,14 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     create_email_entry(table, _("To:"), 1, GNOME_STOCK_MENU_BOOK_RED,
                        msg, msg->to,
                        &msg->to_info, 1, -1);
+    gtk_signal_connect(GTK_OBJECT(msg->to[1]), "changed",
+		       GTK_SIGNAL_FUNC(sendmsg_window_set_title), msg);
 
     /* Subject: */
     create_string_entry(table, _("Subject:"), 2, msg->subject);
+    gtk_signal_connect(GTK_OBJECT(msg->subject[1]), "changed",
+			     GTK_SIGNAL_FUNC(sendmsg_window_set_title), msg);
+
     /* cc: */
     create_email_entry(table, _("Cc:"), 3, GNOME_STOCK_MENU_BOOK_YELLOW,
                        msg, msg->cc,
@@ -4254,3 +4260,50 @@ rfc2822_skip_comments(gchar * str)
     }
     return str;
 }
+
+
+ 
+/* Set the title for the compose window;
+ *
+ * handler for the "changed" signals of the "To:" address and the
+ * "Subject:" field;
+ *
+ * also called directly from sendmsg_window_new.
+ */
+static void
+sendmsg_window_set_title(GtkWidget *foo, gpointer data)
+{
+    BalsaSendmsg * msg = (BalsaSendmsg *)data;
+    gchar *title_format;
+    gchar *title;
+ 
+    if (libbalsa_address_entry_matching(LIBBALSA_ADDRESS_ENTRY(msg->to[1])))
+	return;
+ 
+    switch (msg->type) {
+    case SEND_REPLY:
+    case SEND_REPLY_ALL:
+    case SEND_REPLY_GROUP:
+	title_format = _("Reply to %s: %s");
+	break;
+ 
+    case SEND_FORWARD_ATTACH:
+    case SEND_FORWARD_INLINE:
+	title_format = _("Forward message to %s: %s");
+	break;
+ 
+    case SEND_CONTINUE:
+	title_format = _("Continue message to %s: %s");
+	break;
+ 
+    default:
+	title_format = _("New message to %s: %s");
+	break;     
+    }
+    title = g_strdup_printf(title_format,
+                            gtk_entry_get_text(GTK_ENTRY(msg->to[1])),
+			    gtk_entry_get_text(GTK_ENTRY(msg->subject[1])));
+    gtk_window_set_title(GTK_WINDOW(msg->window), title);
+    g_free(title);
+}
+

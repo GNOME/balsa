@@ -559,7 +559,7 @@ address_book_cb(GtkWidget *widget, BalsaSendmsg *snd_msg_wind)
 	gchar *t;
 	t = balsa_address_book_get_recipients(BALSA_ADDRESS_BOOK(ab));
 	if ( t ) 
-	    libbalsa_address_entry_set_text(address_entry, t);
+	    gtk_entry_set_text(GTK_ENTRY(address_entry), t);
 	g_free(t);
     }
     gnome_dialog_close(GNOME_DIALOG(ab));
@@ -571,9 +571,7 @@ delete_handler(BalsaSendmsg* bsmsg)
     gint reply;
     if(balsa_app.debug) printf("delete_event_cb\n");
     if(bsmsg->modified) {
-        gchar *tmp =
-            libbalsa_address_entry_get_chars_all(LIBBALSA_ADDRESS_ENTRY
-                                                 (bsmsg->to[1]));
+        const gchar *tmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->to[1]));
 	gchar* str = 
 	    g_strdup_printf(_("The message to '%s' is modified.\n"
 			      "Save message to Draftbox?"),
@@ -588,7 +586,6 @@ delete_handler(BalsaSendmsg* bsmsg)
 	gnome_dialog_set_accelerator(GNOME_DIALOG(d), 0, 'Y', 0);
 	gnome_dialog_set_accelerator(GNOME_DIALOG(d), 1, 'N', 0);
 
-	g_free(tmp);
 	g_free(str);
 	gnome_dialog_set_parent(d, GTK_WINDOW(bsmsg->window));
 	gtk_widget_show(l);
@@ -734,25 +731,20 @@ edit_with_gnome_check(gpointer data) {
 	while(fgets(line, sizeof(line), tmp)) {
             if(line[strlen(line)-1] == '\n')line[strlen(line)-1] = '\0';
             if(!strncmp(line, "To: ", 4))
-                libbalsa_address_entry_set_text(LIBBALSA_ADDRESS_ENTRY
-                                                (data_real->msg->to[1]),
-                                                line + 4);
+                gtk_entry_set_text(GTK_ENTRY(data_real->msg->to[1]),
+                                   line + 4);
             else if(!strncmp(line, "From: ", 6))
-                libbalsa_address_entry_set_text(LIBBALSA_ADDRESS_ENTRY
-                                                (data_real->msg->from[1]), 
-                                                line+6);
+                gtk_entry_set_text(GTK_ENTRY(data_real->msg->from[1]), 
+                                   line+6);
             else if(!strncmp(line, "Reply-To: ", 10))
-                libbalsa_address_entry_set_text(LIBBALSA_ADDRESS_ENTRY
-                                                (data_real->msg->reply_to[1]), 
-                                                line+10);
+                gtk_entry_set_text(GTK_ENTRY(data_real->msg->reply_to[1]), 
+                                   line+10);
             else if(!strncmp(line, "Bcc: ", 5))
-                libbalsa_address_entry_set_text(LIBBALSA_ADDRESS_ENTRY
-                                                (data_real->msg->bcc[1]), 
-                                                line+5);
+                gtk_entry_set_text(GTK_ENTRY(data_real->msg->bcc[1]), 
+                                   line+5);
             else if(!strncmp(line, "Cc: ", 4))
-                libbalsa_address_entry_set_text(LIBBALSA_ADDRESS_ENTRY
-                                                (data_real->msg->cc[1]), 
-                                                line+4);
+                gtk_entry_set_text(GTK_ENTRY(data_real->msg->cc[1]), 
+                                   line+4);
             else if(!strncmp(line, "Comments: ", 10))
                 gtk_entry_set_text(GTK_ENTRY(data_real->msg->comments[1]), 
                                    line+10);
@@ -803,21 +795,12 @@ edit_with_gnome(GtkWidget* widget, BalsaSendmsg* msg)
     tmp   = fdopen(tmpfd, "w+");
     
     if(balsa_app.edit_headers) {
-        gchar *from =
-            libbalsa_address_entry_get_chars_all(LIBBALSA_ADDRESS_ENTRY
-                                                 (msg->from[1])),
-            *to =
-            libbalsa_address_entry_get_chars_all(LIBBALSA_ADDRESS_ENTRY
-                                                 (msg->to[1])),
-            *reply_to =
-            libbalsa_address_entry_get_chars_all(LIBBALSA_ADDRESS_ENTRY
-                                                 (msg->reply_to[1])),
-            *cc =
-            libbalsa_address_entry_get_chars_all(LIBBALSA_ADDRESS_ENTRY
-                                                 (msg->cc[1])),
-            *bcc =
-            libbalsa_address_entry_get_chars_all(LIBBALSA_ADDRESS_ENTRY
-                                                 (msg->bcc[1])),
+        const gchar
+            *from = gtk_entry_get_text(GTK_ENTRY (msg->from[1])),
+            *to = gtk_entry_get_text(GTK_ENTRY (msg->to[1])),
+            *reply_to = gtk_entry_get_text(GTK_ENTRY (msg->reply_to[1])),
+            *cc = gtk_entry_get_text(GTK_ENTRY (msg->cc[1])),
+            *bcc = gtk_entry_get_text(GTK_ENTRY (msg->bcc[1])),
 	    *subject = gtk_entry_get_text(GTK_ENTRY(msg->subject[1])),
 	    *comments = gtk_entry_get_text(GTK_ENTRY(msg->comments[1]));
 	
@@ -831,11 +814,6 @@ edit_with_gnome(GtkWidget* widget, BalsaSendmsg* msg)
                 "Reply-To: %s\n"
                 "Comments: %s\n\n\n",
                 from, to, cc, bcc, subject, reply_to, comments);
-        g_free(from);
-        g_free(to);
-        g_free(cc);
-        g_free(bcc);
-        g_free(reply_to);
     }
 
     gtk_widget_set_sensitive(msg->text, FALSE);
@@ -990,15 +968,12 @@ update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
     g_return_if_fail(ident != NULL);
 
 
-/* change entries to reflect new identity */
-    libbalsa_address_entry_set_text(LIBBALSA_ADDRESS_ENTRY
-                                    (msg->from[1]), tmpstr);
+    /* change entries to reflect new identity */
+    gtk_entry_set_text(GTK_ENTRY(msg->from[1]), tmpstr);
     g_free(tmpstr);
 
-    libbalsa_address_entry_set_text(LIBBALSA_ADDRESS_ENTRY
-                                    (msg->reply_to[1]), ident->replyto);
-    libbalsa_address_entry_set_text(LIBBALSA_ADDRESS_ENTRY
-                                    (msg->bcc[1]), ident->bcc);
+    gtk_entry_set_text(GTK_ENTRY(msg->reply_to[1]), ident->replyto);
+    gtk_entry_set_text(GTK_ENTRY(msg->bcc[1]), ident->bcc);
     
     /* change the subject to use the reply/forward strings */
     subject = gtk_entry_get_text(GTK_ENTRY(msg->subject[1]));
@@ -1751,19 +1726,14 @@ to_add(GtkWidget * widget,
        GtkSelectionData * selection_data,
        guint info, guint32 time, GnomeIconList * iconlist)
 {
-    LibBalsaAddressEntry *address_entry = LIBBALSA_ADDRESS_ENTRY(widget);
-    gchar *tmp =
-        libbalsa_address_entry_get_chars_all(address_entry);
+    GtkEntry *entry = GTK_ENTRY(widget);
 
-    if (!*tmp) {
-        libbalsa_address_entry_set_text(address_entry,
-                                        selection_data->data);
+    if (!*gtk_entry_get_text(entry)) {
+        gtk_entry_set_text(entry, selection_data->data);
     } else {
-        libbalsa_address_entry_append_text(address_entry, ",");
-        libbalsa_address_entry_append_text(address_entry,
-                                           selection_data->data);
+        gtk_entry_append_text(entry, ",");
+        gtk_entry_append_text(entry, selection_data->data);
     }
-    g_free(tmp);
 }
 
 
@@ -2504,7 +2474,7 @@ set_entry_from_address_list(LibBalsaAddressEntry * address_entry,
 {
     if (list) {
 	gchar* tmp = libbalsa_make_string_from_list(list);
-        libbalsa_address_entry_set_text(address_entry, tmp);
+        gtk_entry_set_text(GTK_ENTRY(address_entry), tmp);
 	g_free(tmp);
     }
 }
@@ -2634,15 +2604,12 @@ static void
 setup_headers_from_identity(BalsaSendmsg* cw, LibBalsaIdentity *ident)    
 {
     gchar* str = libbalsa_address_to_gchar(ident->address, 0);
-    libbalsa_address_entry_set_text(LIBBALSA_ADDRESS_ENTRY
-                                    (cw->from[1]), str);
+    gtk_entry_set_text(GTK_ENTRY(cw->from[1]), str);
     g_free(str); 
     if(ident->replyto)
-        libbalsa_address_entry_set_text(LIBBALSA_ADDRESS_ENTRY
-                                        (cw->reply_to[1]), ident->replyto);
+        gtk_entry_set_text(GTK_ENTRY(cw->reply_to[1]), ident->replyto);
     if(ident->bcc)
-	libbalsa_address_entry_set_text(LIBBALSA_ADDRESS_ENTRY
-                                        (cw->bcc[1]), ident->bcc);
+	gtk_entry_set_text(GTK_ENTRY(cw->bcc[1]), ident->bcc);
 }
 
 BalsaSendmsg *
@@ -2795,8 +2762,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	addr = (message->reply_to) ? message->reply_to : message->from;
 
 	tmp = libbalsa_address_to_gchar(addr, 0);
-	libbalsa_address_entry_set_text(LIBBALSA_ADDRESS_ENTRY
-                                        (msg->to[1]), tmp);
+	gtk_entry_set_text(GTK_ENTRY(msg->to[1]), tmp);
 	g_free(tmp);
     } else if ( type == SEND_REPLY_GROUP ) {
         set_list_post_address(msg);
@@ -2829,17 +2795,14 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     if (type == SEND_REPLY_ALL) {
 	tmp = libbalsa_make_string_from_list(message->to_list);
 
-	libbalsa_address_entry_set_text(LIBBALSA_ADDRESS_ENTRY
-                                        (msg->cc[1]), tmp);
+	gtk_entry_set_text(GTK_ENTRY(msg->cc[1]), tmp);
 	g_free(tmp);
 
 	if (message->cc_list) {
-	    libbalsa_address_entry_append_text(LIBBALSA_ADDRESS_ENTRY
-                                               (msg->cc[1]), ", ");
+	    gtk_entry_append_text(GTK_ENTRY(msg->cc[1]), ", ");
 
 	    tmp = libbalsa_make_string_from_list(message->cc_list);
-	    libbalsa_address_entry_append_text(LIBBALSA_ADDRESS_ENTRY
-                                               (msg->cc[1]), tmp);
+	    gtk_entry_append_text(GTK_ENTRY(msg->cc[1]), tmp);
 	    g_free(tmp);
 	}
     }
@@ -3123,9 +3086,9 @@ static void
 set_ready(LibBalsaAddressEntry * address_entry, BalsaSendmsgAddress *sma)
 {
     gint len = 0;
-    gchar *tmp = libbalsa_address_entry_get_chars_all(address_entry);
+    const gchar *tmp = gtk_entry_get_text(GTK_ENTRY(address_entry));
 
-    if (tmp && *tmp) {
+    if (*tmp) {
         GList *list = libbalsa_address_new_list_from_string(tmp);
 
         if (list) {
@@ -3139,7 +3102,6 @@ set_ready(LibBalsaAddressEntry * address_entry, BalsaSendmsgAddress *sma)
         }
         
     }
-    g_free(tmp);
 
     if (len < sma->min_addresses
         || (sma->max_addresses >= 0 && len > sma->max_addresses)) {
@@ -3180,47 +3142,32 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     LibBalsaMessageBody *body;
     GList *list;
     gchar *tmp;
+    const gchar *ctmp;
     gchar recvtime[50];
     struct tm *footime;
 
     g_assert(bsmsg != NULL);
     message = libbalsa_message_new();
 
-    tmp =
-        libbalsa_address_entry_get_chars_all(LIBBALSA_ADDRESS_ENTRY
-                                             (bsmsg->from[1]));
-    message->from = libbalsa_address_new_from_string(tmp);
-    g_free(tmp);
+    ctmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->from[1]));
+    message->from = libbalsa_address_new_from_string(ctmp);
 
     tmp = gtk_editable_get_chars(GTK_EDITABLE(bsmsg->subject[1]), 0, -1);
     strip_chars(tmp, "\r\n");
     LIBBALSA_MESSAGE_SET_SUBJECT(message, tmp);
 
-    tmp =
-        libbalsa_address_entry_get_chars_all(LIBBALSA_ADDRESS_ENTRY
-                                             (bsmsg->to[1]));
-    message->to_list = libbalsa_address_new_list_from_string(tmp);
-    g_free(tmp);
+    ctmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->to[1]));
+    message->to_list = libbalsa_address_new_list_from_string(ctmp);
 
-    tmp =
-        libbalsa_address_entry_get_chars_all(LIBBALSA_ADDRESS_ENTRY
-                                             (bsmsg->cc[1]));
-    message->cc_list = libbalsa_address_new_list_from_string(tmp);
-    g_free(tmp);
+    ctmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->cc[1]));
+    message->cc_list = libbalsa_address_new_list_from_string(ctmp);
 
-    tmp =
-        libbalsa_address_entry_get_chars_all(LIBBALSA_ADDRESS_ENTRY
-                                             (bsmsg->bcc[1]));
-    message->bcc_list = libbalsa_address_new_list_from_string(tmp);
-    g_free(tmp);
+    ctmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->bcc[1]));
+    message->bcc_list = libbalsa_address_new_list_from_string(ctmp);
 
-    if ((tmp =
-         libbalsa_address_entry_get_chars_all(LIBBALSA_ADDRESS_ENTRY
-                                              (bsmsg->reply_to[1])))
-        != NULL
-	&& *tmp)
-	message->reply_to = libbalsa_address_new_from_string(tmp);
-    g_free(tmp);
+    ctmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->reply_to[1]));
+    if (*ctmp)
+	message->reply_to = libbalsa_address_new_from_string(ctmp);
 
     if (balsa_app.req_dispnotify)
 	libbalsa_message_set_dispnotify(message, bsmsg->ident->address);
@@ -4175,8 +4122,7 @@ set_list_post_address(BalsaSendmsg * msg)
         gchar *tmp =
             libbalsa_address_to_gchar(message->mailbox->
                                       mailing_list_address, 0);
-        libbalsa_address_entry_set_text(LIBBALSA_ADDRESS_ENTRY(msg->to[1]),
-                                        tmp);
+        gtk_entry_set_text(GTK_ENTRY(msg->to[1]), tmp);
         g_free(tmp);
     } else {
         GList *lst = libbalsa_message_user_hdrs(message);
@@ -4188,8 +4134,7 @@ set_list_post_address(BalsaSendmsg * msg)
                 gchar **pair = p->data;
                 if (libbalsa_find_word(pair[0],
                                        "x-beenthere x-mailing-list")) {
-                    libbalsa_address_entry_set_text(LIBBALSA_ADDRESS_ENTRY
-                                                    (msg->to[1]), pair[1]);
+                    gtk_entry_set_text(GTK_ENTRY(msg->to[1]), pair[1]);
                     break;
                 }
             }

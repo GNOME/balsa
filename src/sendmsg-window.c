@@ -71,7 +71,7 @@ create_toolbar (GtkWidget * window, BalsaSendmsg * bsmw)
   gtk_widget_realize (window);
 
   toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-					   _ ("Send"), _ ("Send"), NULL,
+				     _ ("Send"), _ ("Send this mail"), NULL,
 	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_SND),
 					   GTK_SIGNAL_FUNC (send_message_cb),
 					   bsmw);
@@ -80,7 +80,16 @@ create_toolbar (GtkWidget * window, BalsaSendmsg * bsmw)
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
   toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-				 _ ("Spell Check"), _ ("Spell Check"), NULL,
+		  _ ("Attach"), _ ("Add attachments to this message"), NULL,
+		gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_OPEN),
+					   GTK_SIGNAL_FUNC (attach_clicked),
+					   bsmw->attachments);
+  GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
+
+  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+				 _ ("Spelling"), _ ("Check Spelling"), NULL,
 	  gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_SPELLCHECK),
 					   NULL,
 					   bsmw);
@@ -89,7 +98,7 @@ create_toolbar (GtkWidget * window, BalsaSendmsg * bsmw)
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
   toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-			       _ ("Address Book"), _ ("Address Book"), NULL,
+			 _ ("Addresses"), _ ("Open the address book"), NULL,
 	   gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_BOOK_BLUE),
 					   NULL,
 					   bsmw);
@@ -101,6 +110,15 @@ create_toolbar (GtkWidget * window, BalsaSendmsg * bsmw)
 	       gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_PRINT),
 					   NULL,
 					   bsmw);
+  GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
+
+  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+					   _ ("Cancel"), _ ("Cancel"), NULL,
+	       gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_CLOSE),
+					   GTK_SIGNAL_FUNC (close_window),
+					   GTK_OBJECT (window));
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
   gtk_widget_show (toolbar);
@@ -169,6 +187,8 @@ create_menu (GtkWidget * window, BalsaSendmsg * bmsg)
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_SND, _ ("Send"));
   gtk_widget_show (w);
+  gtk_widget_add_accelerator (w, "activate", accel,
+			      'Y', 0, GTK_ACCEL_VISIBLE);
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
   gtk_signal_connect (GTK_OBJECT (w),
@@ -179,6 +199,8 @@ create_menu (GtkWidget * window, BalsaSendmsg * bmsg)
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_OPEN, _ ("Attach File"));
   gtk_widget_show (w);
+  gtk_widget_add_accelerator (w, "activate", accel,
+			      'H', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
   gtk_signal_connect (GTK_OBJECT (w),
@@ -190,7 +212,7 @@ create_menu (GtkWidget * window, BalsaSendmsg * bmsg)
   gtk_widget_show (w);
   gtk_menu_append (GTK_MENU (menu), w);
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_QUIT, _ ("Close"));
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_CLOSE, _ ("Cancel"));
   gtk_widget_show (w);
   gtk_menu_append (GTK_MENU (menu), w);
   gtk_signal_connect_object (GTK_OBJECT (w), "activate",

@@ -1086,10 +1086,7 @@ _libbalsa_mailbox_local_get_message_stream(LibBalsaMailbox * mailbox,
     fd = open(filename, O_RDONLY);
     if (fd != -1) {
 	stream = g_mime_stream_fs_new(fd);
-	if (stream)
-	    g_mime_stream_set_bounds(stream, 0,
-				     g_mime_stream_length(stream));
-	else
+	if (!stream)
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 				 _("Open of %s failed. Errno = %d, "),
 				 filename, errno);

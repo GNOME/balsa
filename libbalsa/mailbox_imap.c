@@ -780,8 +780,6 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
 
     stream = get_cache_stream(mailbox, IMAP_MESSAGE_UID(message));
     gmime_stream = g_mime_stream_file_new(stream);
-    g_mime_stream_set_bounds(gmime_stream, 0,
-			     g_mime_stream_length(gmime_stream));
     return gmime_stream;
 }
 

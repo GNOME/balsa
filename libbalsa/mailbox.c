@@ -1112,9 +1112,7 @@ libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox,
     else {
 	mime_stream = g_mime_stream_mem_new();
 	g_mime_message_write_to_stream(message->mime_msg, mime_stream);
-	g_mime_stream_seek(mime_stream, 0, GMIME_STREAM_SEEK_SET);
-	g_mime_stream_set_bounds(mime_stream, 0,
-				 g_mime_stream_length(mime_stream));
+	g_mime_stream_reset(mime_stream);
     }
 
     return mime_stream;

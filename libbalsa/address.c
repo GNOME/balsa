@@ -318,6 +318,7 @@ libbalsa_address_get_phrase(LibBalsaAddress * address)
     return address->full_name;
 }
 
+#endif
 /* Extract the nth RFC 821/RFC 822 mailbox from the address. */
 const gchar *
 libbalsa_address_get_mailbox(LibBalsaAddress * address, gint n)
@@ -330,6 +331,4 @@ libbalsa_address_get_mailbox(LibBalsaAddress * address, gint n)
     g_return_val_if_fail(nth_address != NULL, NULL);
     return (gchar*)nth_address->data;
 }
-
-#endif
 

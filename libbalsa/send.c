@@ -198,8 +198,6 @@ ensure_send_progress_dialog()
     gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
 		       send_progress_message, FALSE, FALSE, 0);
 
-    /* [BCS] - I've left the progress bar in the dialogue box for now,
-       but the code to advance it hasn't been done yet. */
     send_dialog_bar = gtk_progress_bar_new();
     gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
 		       send_dialog_bar, FALSE, FALSE, 0);
@@ -398,12 +396,13 @@ libbalsa_message_cb (void **buf, int *len, void *arg)
     }
 
     /* The message needs to be read a line at a time and the newlines
-       converted to \r\n because libmutt foolishly terminates lines with
-       the Unix \n despite RFC 822 calling for \r\n.  Furthermore RFC
-       822 states that bare \n and \r are acceptable in messages and
-       that individually they do not constitute a line termination.
-       This requirement cannot be reconciled with storing messages
-       with Unix line terminations.
+       converted to \r\n because libmutt foolishly terminates lines in
+       the temporary file with the Unix \n despite RFC 2822 calling for
+       \r\n.  Furthermore RFC 822 states that bare \n and \r are acceptable
+       in messages and that individually they do not constitute a line
+       termination.  This requirement cannot be reconciled with storing
+       messages with Unix line terminations.  RFC 2822 relieves this
+       situation slightly by prohibiting bare \r and \n.
 
        The following code cannot therefore work correctly in all
        situations.  Furthermore it is very inefficient since it must
@@ -492,19 +491,13 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 	} else {
 	    total_messages_left++;
 
-	    /* The mail and its attachments should probably be made into
-	       a MIME document at this point (if not already)  Ideally
-	       the message is fully prepared in RFC 2822 format so that
-	       all the callback needs to do is open and read the temporary
-	       file. */
-
-	    /* If the Bcc: recipient list is present, add a additional copy
-	       of the message to the session.  The recipient list for
-	       the main copy of the message is generated from the To:
-	       and Cc: recipient list and libESMTP is asked to strip the
-	       Bcc: header.  The BCC copy of the message recipient list
-	       is taken from the Bcc recipients.  recipient list and the
-	       Bcc: header is preserved in the message. */
+	    /* If the Bcc: recipient list is present, add a additional
+	       copy of the message to the session.  The recipient list
+	       for the main copy of the message is generated from the
+	       To: and Cc: recipient list and libESMTP is asked to strip
+	       the Bcc: header.  The BCC copy of the message recipient
+	       list is taken from the Bcc recipient list and the Bcc:
+	       header is preserved in the message. */
 	    bcc_recip = g_list_first((GList *) queu->bcc_list);
 	    if (!bcc_recip)
 		bcc_message = NULL;
@@ -528,8 +521,8 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 #define LIBESMTP_ADDS_HEADERS
 #ifdef LIBESMTP_ADDS_HEADERS
 	    /* XXX - The following calls to smtp_set_header() probably
-	       arent necessary since they should already be in the
-	       message. */
+		     aren't necessary since they should already be in the
+		     message. */
 
 	    smtp_set_header (message, "Date", &queu->date);
 	    if (bcc_message)
@@ -655,11 +648,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 
    /* At this point the session is ready to be sent.  As I've written the
       code, a new smtp session is created for every call here.  Therefore
-      a new thread is always required to dispatch it.  When libESMTP gets
-      full pthread support, it should be possible to append a message to
-      a session that is currently being sent to the SMTP server, assuming
-      the QUIT command has not yet been issued.  That said, my gut feeling
-      is that its safer to always create a new server connection.
+      a new thread is always required to dispatch it.
     */
 
     send_message_info=send_message_info_new(outbox, session);
@@ -955,7 +944,13 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
 
     /* Kick off the connection with the MTA.  When this returns, all
        messages with valid recipients have been sent. */
-    smtp_start_session (info->session);
+    if (!smtp_start_session (info->session))
+      {
+        char buf[256];
+	libbalsa_information (LIBBALSA_INFORMATION_ERROR,
+	                      _("SMTP server problem: %s"),
+	                      smtp_strerror (smtp_errno (), buf, sizeof buf));
+      }
 
 #ifdef BALSA_USE_THREADS
     sending_mail = FALSE;

@@ -1,6 +1,9 @@
 2001-10-02  Pawel Salek  <pawsa@theochem.kth.se>
 
-	(credit to Peter Bloomfield)
+	* libbalsa/address.c: fix esmtp=no build.
+	* libbalsa/send.c: more verbose message on SMTP error.
+
+	Peter Bloomfield:
 	* libbalsa/identity.c: fix double click select&close (#61537).
 	* src/balsa-mblist.c: fix D&D crash. (#61272).
 

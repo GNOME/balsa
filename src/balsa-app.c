@@ -72,8 +72,11 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
                       entry = gtk_entry_new());
     gtk_widget_show_all(GTK_WIDGET(GTK_DIALOG(dialog)->vbox));
     gtk_entry_set_width_chars(GTK_ENTRY(entry), 20);
-    gtk_entry_set_visibility(GTK_ENTRY(entry), TRUE);
+    gtk_entry_set_visibility(GTK_ENTRY(entry), FALSE);
+
     gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
+    gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
+    gtk_widget_grab_focus (entry);
 
     if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK)
         passwd = g_strdup(gtk_entry_get_text(GTK_ENTRY(entry)));

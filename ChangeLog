@@ -1,3 +1,13 @@
+2002-04-16  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/libbalsa.c: ask libmutt for data in UTF-8.
+	* libbalsa/misc.[hc]: provide libbalsa_set_send_charset().
+	* src/balsa-app.c: hide password when typed in in the dialog.
+	* src/balsa-message.c: conversion not longer needed.
+	* src/sendmsg-window.c: do not always pop up spell-check window
+	* src/spell-check.c:    (Peter Bloomfield).
+
+
 2002-04-15  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/folder-scanners.c: ask for folder passwords.

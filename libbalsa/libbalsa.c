@@ -121,6 +121,7 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
 
     Sendmail = SENDMAIL;
 
+    libbalsa_set_charset("UTF-8");
     Shell   = g_strdup((p = g_getenv("SHELL")) ? p : "/bin/sh");
     Tempdir = (char*)g_get_tmp_dir();
 

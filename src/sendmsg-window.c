@@ -558,6 +558,7 @@ delete_handler(BalsaSendmsg* bsmsg)
 	gtk_widget_show(l);
 	gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(d)->vbox), l);
 	reply = gtk_dialog_run(GTK_DIALOG(d));
+       gtk_widget_destroy(d);
 	if(reply == GTK_RESPONSE_YES)
 	    message_postpone(bsmsg);
 	/* cancel action  when reply = "yes" or "no" */
@@ -1927,9 +1928,9 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     gtk_signal_connect(GTK_OBJECT(sc), "done-spell-check",
 		       GTK_SIGNAL_FUNC(spell_check_done_cb), msg);
     msg->spell_checker = sc;
-    gtk_widget_hide(sc);
 
     gtk_widget_show_all(table);
+    gtk_widget_hide(sc);
     return table;
 }
 
@@ -3103,7 +3104,6 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     } else if (balsa_app.wordwrap) {
         libbalsa_wrap_string(body->buffer, balsa_app.wraplength);
     }
-    printf("body is '%s'\n", body->buffer);
     body->charset = g_strdup(bsmsg->charset);
     libbalsa_message_append_part(message, body);
 
@@ -3156,7 +3156,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
     if (!is_ready_to_send(bsmsg))
 	return FALSE;
 
-    old_charset = libbalsa_set_charset(bsmsg->charset);
+    old_charset = libbalsa_set_send_charset(bsmsg->charset);
 
     if (balsa_app.debug)
 	fprintf(stderr, "sending with charset: %s\n", bsmsg->charset);
@@ -3183,7 +3183,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 					   balsa_app.encoding_style,
 					   bsmsg->flow); 
 #endif
-    libbalsa_set_charset(old_charset);
+    libbalsa_set_send_charset(old_charset);
     if (successful) {
 	if (bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
 	    bsmsg->type == SEND_REPLY_GROUP) {
@@ -3641,7 +3641,7 @@ spell_check_cb(GtkWidget * widget, BalsaSendmsg * msg)
     /* configure the spell checker */
     balsa_spell_check_set_language(sc, msg->locale);
 
-    gtk_widget_show(GTK_WIDGET(sc));
+    gtk_widget_show_all(GTK_WIDGET(sc));
     balsa_spell_check_set_character_set(sc, msg->charset);
     balsa_spell_check_set_module(sc,
 				 spell_check_modules_name
@@ -3652,6 +3652,7 @@ spell_check_cb(GtkWidget * widget, BalsaSendmsg * msg)
     balsa_spell_check_set_ignore_length(sc, balsa_app.ignore_size);
 
     balsa_spell_check_start(sc);
+    gtk_window_set_modal(GTK_WINDOW(sc), TRUE);
     gtk_dialog_run(GTK_DIALOG(sc));
 }
 
@@ -3659,6 +3660,7 @@ spell_check_cb(GtkWidget * widget, BalsaSendmsg * msg)
 static void
 spell_check_done_cb(BalsaSpellCheck * spell_check, BalsaSendmsg * msg)
 {
+    gtk_window_set_modal(GTK_WINDOW(spell_check), FALSE);
     gtk_widget_hide(GTK_WIDGET(spell_check));
     check_readiness(msg);
 }

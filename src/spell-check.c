@@ -522,9 +522,8 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
     gtk_signal_connect(GTK_OBJECT(done), "clicked",
 		       GTK_SIGNAL_FUNC(done_cb), spell_check);
 
-    gtk_window_set_modal(GTK_WINDOW(spell_check), TRUE);
-    gtk_window_set_title(GTK_WINDOW(spell_check), _("Balsa: spell check"));
-    gtk_widget_show_all(GTK_WIDGET(spell_check));
+    gtk_window_set_title(GTK_WINDOW(spell_check), _("Spell check"));
+    gtk_window_set_wmclass(GTK_WINDOW(spell_check), "spell", "Balsa");
 }
 
 

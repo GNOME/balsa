@@ -1555,10 +1555,6 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         GtkTextBuffer *buffer;
         regex_t rex;
         GList *url_list = NULL;
-        int obuflen, ibuflen;
-        char* obuf, *obufp, *ibuf;
-        const char*charset;
-        iconv_t conv;
 
         if (bm->wrap_text) {
             if (balsa_app.recognize_rfc2646_format_flowed
@@ -1591,35 +1587,16 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         gtk_signal_connect(GTK_OBJECT(item), "focus_out_event",
                            (GtkSignalFunc) balsa_message_focus_out_part,
                            (gpointer) bm);
-
-        obuflen = alloced * 4 +1;
-	obuf = obufp = g_malloc(obuflen);
-        ibuf = ptr;
-        ibuflen = alloced;
-        charset = libbalsa_message_charset(info->message);
-        conv = iconv_open("UTF-8", charset ? charset : "ISO-8859-1");
-        if(conv == (iconv_t)(-1)) { /* hm, isn't us-ascii to UTF-8 a noop? */
-            printf("iconv_open(%s) failed, defaulting to US-ASCII\n", charset);
-	    conv = iconv_open("UTF-8", "US-ASCII");
-        }
-#if defined __GLIBC__ && __GLIBC__ && __GLIBC_MINOR__ <= 1 || (defined sun)
-	iconv(conv, (const char **)&ibuf, &ibuflen, &obuf, &obuflen);
-#else
-	iconv(conv, &ibuf, &ibuflen, &obuf, &obuflen);
-#endif
-	iconv_close(conv);
-	*obuf = '\0';
-
         allocate_quote_colors(GTK_WIDGET(bm), balsa_app.quoted_color,
                               0, MAX_QUOTED_COLOR - 1);
         if (regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED) != 0) {
             g_warning
                 ("part_info_init_mimetext: quote regex compilation failed.");
-            gtk_text_buffer_insert_at_cursor(buffer, obufp, -1);
+            gtk_text_buffer_insert_at_cursor(buffer, ptr, -1);
         } else {
             GtkTextIter insert;
             gchar **lines;
-            gchar **l = g_strsplit(obufp, "\n", -1);
+            gchar **l = g_strsplit(ptr, "\n", -1);
 
             gtk_text_buffer_get_iter_at_mark(buffer, &insert, 
                                              gtk_text_buffer_get_insert
@@ -1650,7 +1627,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
                                (GtkSignalFunc) check_over_url, url_list);
         }
 
-        g_free(obufp);
+        g_free(ptr);
 
         gtk_text_view_set_editable(GTK_TEXT_VIEW(item), FALSE);
 
@@ -1663,7 +1640,6 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         gtk_timeout_add(1000, (GtkFunction) text_view_timeout,
                         item);
     }
-    g_free(ptr);
 
     fclose(fp);
 }

@@ -53,6 +53,7 @@ gchar *libbalsa_wrap_rfc2646(gchar * par, gint width,
 gboolean libbalsa_flowed_rfc2646(LibBalsaMessageBody * body);
 
 const char* libbalsa_set_charset(const gchar * charset);
+const char* libbalsa_set_send_charset(const gchar * charset);
 #if ENABLE_ESMTP
 gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 				gchar* smtp_server,

@@ -677,6 +677,16 @@ libbalsa_set_charset(const gchar * charset)
     return old_charset;
 }
 
+const char*
+libbalsa_set_send_charset(const gchar * charset)
+{
+    const char * old_charset = SendCharset;
+    libbalsa_lock_mutt();
+    SendCharset = (char*)charset;
+    libbalsa_unlock_mutt();
+    return old_charset;
+}
+
 /* libbalsa_marshal_POINTER__VOID:
    Marshalling function
 */

@@ -104,6 +104,7 @@ libbalsa_show_file(FILE* f, long length)
     g_object_set_data(G_OBJECT(window), "text", text);
     gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, window);
     
+    gtk_text_view_set_editable(GTK_TEXT_VIEW(text), FALSE);
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text), GTK_WRAP_WORD);
     interior = gtk_scrolled_window_new(GTK_TEXT_VIEW(text)->hadjustment,
 				       GTK_TEXT_VIEW(text)->vadjustment);

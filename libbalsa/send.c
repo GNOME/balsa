@@ -1456,9 +1456,6 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
     message2HEADER(message, msg);
     message_add_references(message, msg);
 
-    if (message->mailbox)
-	libbalsa_message_body_ref(message, TRUE);
-
     body = message->body_list;
 
     last = msg->content;
@@ -1614,9 +1611,6 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 	}
         libbalsa_unlock_mutt();
     }    
-
-    if (message->mailbox)
-	libbalsa_message_body_unref(message);
 
     return res;
 }

@@ -547,6 +547,18 @@ config_global_load (void)
     ;				/* an optional field for now */
   balsa_app.smtp_server = g_strdup (field);
 
+  /* toolbar style */
+  if ((field = pl_dict_get_str(globals, "ToolbarStyle")) == NULL)
+	  balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
+  else
+	  balsa_app.toolbar_style = atoi(field);
+
+  /* mdi style */
+  if ((field = pl_dict_get_str(globals, "MDIStyle")) == NULL)
+	  balsa_app.mdi_style = GNOME_MDI_DEFAULT_MODE;
+  else
+	  balsa_app.mdi_style = atoi(field);
+
   return TRUE;
 }				/* config_global_load */
 
@@ -578,6 +590,14 @@ config_global_save (void)
 			 balsa_app.local_mail_directory);
   if (balsa_app.smtp_server != NULL)
     pl_dict_add_str_str (globals, "SMTPServer", balsa_app.smtp_server);
+
+  {
+          char tmp[32];
+            snprintf (tmp, sizeof (tmp), "%d", balsa_app.toolbar_style);
+             pl_dict_add_str_str (globals, "ToolbarStyle", tmp);
+            snprintf (tmp, sizeof (tmp), "%d", balsa_app.mdi_style);
+             pl_dict_add_str_str (globals, "MDIStyle", tmp);
+         }
 
   /* Add it to configuration file */
   temp_str = PLMakeString ("Globals");

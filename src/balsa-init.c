@@ -20,6 +20,7 @@
 #include "config.h"
 
 #include <gnome.h>
+#include "mailbox.h"
 #include "main.h"
 #include "misc.h"
 #include "balsa-app.h"

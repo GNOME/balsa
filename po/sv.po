@@ -10,8 +10,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2000-12-21 23:58+0100\n"
-"PO-Revision-Date: 2000-12-22 00:00+0100\n"
+"POT-Creation-Date: 2000-12-26 16:42+0100\n"
+"PO-Revision-Date: 2000-12-26 17:10+0100\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -103,36 +103,55 @@ msgstr "Kunde inte skapa en brevlåda av typen %s"
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxImap: Öppnar %s Refräknare: %d\n"
 
-#: libbalsa/mailbox_local.c:235
+#: libbalsa/mailbox_local.c:265
 #, c-format
 msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxLocal: Öppnar %s Refräknare: %d\n"
 
-#: libbalsa/mailbox_maildir.c:114
+#: libbalsa/mailbox_maildir.c:120
 #, c-format
 msgid "Mailbox %s does not appear to be a Maildir mailbox."
 msgstr "Brevlådan %s verkar inte vara en epostkatalogsbrevlåda."
 
-#: libbalsa/mailbox_maildir.c:123
+#: libbalsa/mailbox_maildir.c:129
 msgid "Sorry. Balsa doesn't (yet) know how to create a maildir mailbox"
 msgstr "Tyvärr. Balsa kan (ännu) inte skapa en epostkatalogsbrevlåda"
 
-#: libbalsa/mailbox_maildir.c:155 libbalsa/mailbox_mh.c:155
+#: libbalsa/mailbox_maildir.c:161 libbalsa/mailbox_mh.c:160
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Öppnande av %s misslyckades. Felnummer = %d, "
 
-#: libbalsa/mailbox_mbox.c:115
+#: libbalsa/mailbox_maildir.c:179 libbalsa/mailbox_mh.c:177
+#, c-format
+msgid ""
+"Could not remove contents of %s:\n"
+"%s"
+msgstr ""
+"Kunde inte ta bort innehållet i %s:\n"
+"%s"
+
+#: libbalsa/mailbox_maildir.c:185 libbalsa/mailbox_mbox.c:169
+#: libbalsa/mailbox_mh.c:183
+#, c-format
+msgid ""
+"Could not remove %s:\n"
+"%s"
+msgstr ""
+"Kunde inte ta bort %s:\n"
+"%s"
+
+#: libbalsa/mailbox_mbox.c:120
 #, c-format
 msgid "Mailbox %s does not appear to be an Mbox mailbox."
 msgstr "Brevlådan %s verkar inte vara en Mbox-brevlåda."
 
-#: libbalsa/mailbox_mh.c:114
+#: libbalsa/mailbox_mh.c:119
 #, c-format
 msgid "Mailbox %s does not appear to be a Mh mailbox."
 msgstr "Brevlådan %s verkar inte vara en MH-brevlåda."
 
-#: libbalsa/mailbox_mh.c:123
+#: libbalsa/mailbox_mh.c:128
 msgid "Sorry. Balsa doesn't (yet) know how to create a mh mailbox"
 msgstr "Tyvärr. Balsa kan (ännu) inte skapa en MH-brevlåda"
 
@@ -676,45 +695,45 @@ msgstr "Certifikat sparat"
 msgid "Continue?"
 msgstr "Fortsätt?"
 
-#: src/address-book.c:145 src/filter-edit-dialog.c:130
+#: src/address-book.c:160 src/filter-edit-dialog.c:130
 msgid "Name"
 msgstr "Namn"
 
-#: src/address-book.c:145
+#: src/address-book.c:160
 msgid "E-Mail Address"
 msgstr "E-postadress:"
 
-#: src/address-book.c:149
+#: src/address-book.c:163
 msgid "Address Book"
 msgstr "Adressbok"
 
 #. Entry widget for finding an address
-#: src/address-book.c:229
+#: src/address-book.c:242
 msgid "Search for Name:"
 msgstr "Sök efter namn:"
 
-#: src/address-book.c:297
+#: src/address-book.c:310
 msgid "Send-To"
 msgstr "Skicka till"
 
-#: src/address-book.c:316
+#: src/address-book.c:329
 msgid "Run GnomeCard"
 msgstr "Kör GnomeCard"
 
-#: src/address-book.c:324
+#: src/address-book.c:337
 msgid "Re-Import"
 msgstr "Läs om"
 
 #. mode switching stuff
-#: src/address-book.c:333
+#: src/address-book.c:346
 msgid "Treat multiple addresses as:"
 msgstr "Betrakta flera adresser som:"
 
-#: src/address-book.c:338
+#: src/address-book.c:350
 msgid "alternative addresses for the same person"
 msgstr "alternativa adresser för samma person"
 
-#: src/address-book.c:343
+#: src/address-book.c:355
 msgid "a distribution list"
 msgstr "en distributionslista"
 
@@ -722,53 +741,53 @@ msgstr "en distributionslista"
 msgid "Address Book Configuration"
 msgstr "Adressbokskonfiguration"
 
-#: src/address-book-config.c:134 src/mailbox-conf.c:275
+#: src/address-book-config.c:135 src/mailbox-conf.c:262
 msgid "Update"
 msgstr "Uppdatera"
 
-#: src/address-book-config.c:255
+#: src/address-book-config.c:256
 msgid "New Address Book type:"
 msgstr "Typ av ny adressbok:"
 
-#: src/address-book-config.c:265
+#: src/address-book-config.c:266
 msgid "VCard Address Book (GnomeCard)"
 msgstr "VCard-adressbok (GnomeCard)"
 
-#: src/address-book-config.c:283
+#: src/address-book-config.c:284
 msgid "LDAP Address Book"
 msgstr "LDAP-adressbok"
 
-#: src/address-book-config.c:292
+#: src/address-book-config.c:293
 msgid "Balsa is not compiled with LDAP support"
 msgstr "Balsa är inte kompilerat med LDAP-stöd"
 
 #. mailbox name
-#: src/address-book-config.c:312 src/address-book-config.c:370
+#: src/address-book-config.c:313 src/address-book-config.c:371
 msgid "Address Book Name:"
 msgstr "Adressboksnamn:"
 
-#: src/address-book-config.c:321
+#: src/address-book-config.c:322
 msgid "File name"
 msgstr "Filnamn"
 
-#: src/address-book-config.c:333 src/address-book-config.c:404
+#: src/address-book-config.c:334 src/address-book-config.c:405
 msgid "Expand aliases as you type"
 msgstr "Expandera alias när du skriver"
 
-#: src/address-book-config.c:381
+#: src/address-book-config.c:382
 msgid "Host name"
 msgstr "Värdnamn"
 
-#: src/address-book-config.c:392
+#: src/address-book-config.c:393
 msgid "Base Domain Name"
 msgstr "Basdomännamn"
 
-#: src/address-book-config.c:459 src/filter-edit-dialog.c:379
-#: src/mailbox-conf.c:221 src/pref-manager.c:1215 src/pref-manager.c:1985
+#: src/address-book-config.c:460 src/filter-edit-dialog.c:379
+#: src/mailbox-conf.c:207 src/pref-manager.c:1215 src/pref-manager.c:1985
 msgid "Add"
 msgstr "Lägg till"
 
-#: src/address-book-config.c:506
+#: src/address-book-config.c:507
 #, c-format
 msgid ""
 "The address book file path '%s' is not correct.\n"
@@ -910,7 +929,7 @@ msgstr "Markera som utkastkorg"
 msgid "No mailbox selected."
 msgstr "Ingen brevlåda markerad."
 
-#: src/balsa-mblist.c:620 src/mailbox-conf.c:913
+#: src/balsa-mblist.c:620 src/mailbox-conf.c:900
 msgid "Mailbox"
 msgstr "Brevlåda"
 
@@ -935,8 +954,9 @@ msgstr "Spara MIME-delen"
 msgid "Save"
 msgstr "Spara"
 
-#: src/balsa-message.c:291 src/sendmsg-window.c:159 src/sendmsg-window.c:654
-#: src/sendmsg-window.c:1851 src/sendmsg-window.c:1874
+#: src/balsa-message.c:291 src/mailbox-conf.c:124 src/mailbox-conf.c:134
+#: src/sendmsg-window.c:159 src/sendmsg-window.c:654 src/sendmsg-window.c:1851
+#: src/sendmsg-window.c:1874
 msgid "Cancel"
 msgstr "Avbryt"
 
@@ -1205,63 +1225,77 @@ msgstr "Återgå"
 msgid "Balsa Filters"
 msgstr "Balsa-filter"
 
-#: src/information-dialog.c:155
+#: src/information-dialog.c:153
 msgid "Balsa Information"
 msgstr "Balsa-information"
 
-#: src/information-dialog.c:212
+#: src/information-dialog.c:210
 msgid "WARNING: "
 msgstr "VARNING: "
 
-#: src/information-dialog.c:215
+#: src/information-dialog.c:213
 msgid "ERROR: "
 msgstr "FEL: "
 
-#: src/information-dialog.c:218
+#: src/information-dialog.c:216
 msgid "FATAL: "
 msgstr "ÖDESDIGER: "
 
-#: src/local-mailbox.c:192
+#: src/local-mailbox.c:193
 #, c-format
 msgid "Local Mailbox Loaded as: %s\n"
 msgstr "Lokal brevlåda inläst som: %s\n"
 
-#: src/mailbox-conf.c:140
+#. FIXME: Should prompt to remove file aswell
+#: src/mailbox-conf.c:117
 #, c-format
 msgid ""
-"This will remove the mailbox %s and it's files permanently from your "
-"system.\n"
-"Are you sure you want to remove this mailbox?"
+"This will remove the mailbox %s from the list of mailboxes.\n"
+"You may also the disk file associated with this mailbox.\n"
+"If you do not remove the file on disk you may \"Add  Mailbox\" to access the "
+"mailbox again.\n"
+"What would you like to do?"
 msgstr ""
-"Detta kommer att ta bort brevlådan %s och dess filer permanent från ditt "
-"system.\n"
-"Är du säker på att du vill ta bort den här brevlådan?"
+"Detta kommer att ta bort brevlådan %s från listan över brevlådor.\n"
+"Du kan också göra filen på disken associerad med denna brevlåda.\n"
+"Om du inte tar bort filen från disken kan du använda \"Lägg till\n"
+"brevlåda\" för att komma åt brevlådan igen.\n"
+"Vad vill du göra?"
 
-#: src/mailbox-conf.c:146
+#: src/mailbox-conf.c:123 src/mailbox-conf.c:133
+msgid "Remove mailbox from list"
+msgstr "Ta bort brevlådan från listan"
+
+#: src/mailbox-conf.c:123
+msgid "Remove mailbox from list and disk"
+msgstr "Ta bort brevlådan från listan och disken"
+
+#: src/mailbox-conf.c:128
 #, c-format
 msgid ""
 "This will remove the mailbox %s from the list of mailboxes\n"
 "You may use \"Add Mailbox\" later to access this mailbox again\n"
-"Are you sure you want to remove this mailbox?"
+"What would you like to do?"
 msgstr ""
 "Detta kommer att ta bort brevlådan %s från listan över brevlådor\n"
-"Du kan använda \"Lägg till brevlåda\" för att komma åt brevlådan igen\n"
-"Är du säker på att du vill ta bort den här brevlådan?"
+"Du kan använda \"Lägg till brevlåda\" senare för att komma åt denna\n"
+"brevlåda igen\n"
+"Vad vill du göra?"
 
-#: src/mailbox-conf.c:173
+#: src/mailbox-conf.c:155
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr "Hoppsan! brevlådan inte funnen i balsa_app.mailbox-noder?\n"
 
-#: src/mailbox-conf.c:215 src/mailbox-conf.c:269
+#: src/mailbox-conf.c:200 src/mailbox-conf.c:255
 msgid "Mailbox Configurator"
 msgstr "Brevlådekonfigurerare"
 
-#: src/mailbox-conf.c:448
+#: src/mailbox-conf.c:435
 #, c-format
 msgid "%s on %s"
 msgstr "%s på %s"
 
-#: src/mailbox-conf.c:552
+#: src/mailbox-conf.c:539
 #, c-format
 msgid ""
 "Rename of %s to %s failed:\n"
@@ -1270,7 +1304,7 @@ msgstr ""
 "Byte av namn på %s till %s misslyckades:\n"
 "%s"
 
-#: src/mailbox-conf.c:570
+#: src/mailbox-conf.c:557
 msgid ""
 "This is a mailbox in your local directory.\n"
 "Change the path instead.\n"
@@ -1281,56 +1315,56 @@ msgstr ""
 "Brevlådan uppdaterades inte.\n"
 
 #. mailbox name
-#: src/mailbox-conf.c:770 src/mailbox-conf.c:806 src/mailbox-conf.c:855
+#: src/mailbox-conf.c:757 src/mailbox-conf.c:793 src/mailbox-conf.c:842
 msgid "Mailbox _Name:"
 msgstr "Brevlåde_namn:"
 
 #. path to file
-#: src/mailbox-conf.c:774
+#: src/mailbox-conf.c:761
 msgid "Mailbox _Path:"
 msgstr "Sökväg till _brevlådan:"
 
 #. pop server
-#: src/mailbox-conf.c:810 src/mailbox-conf.c:859
+#: src/mailbox-conf.c:797 src/mailbox-conf.c:846
 msgid "_Server:"
 msgstr "_Server:"
 
 #. pop port
-#: src/mailbox-conf.c:814 src/mailbox-conf.c:863
+#: src/mailbox-conf.c:801 src/mailbox-conf.c:850
 msgid "_Port:"
 msgstr "_Port:"
 
 #. username
-#: src/mailbox-conf.c:818 src/mailbox-conf.c:867
+#: src/mailbox-conf.c:805 src/mailbox-conf.c:854
 msgid "_Username:"
 msgstr "_Användarnamn:"
 
 #. password field
-#: src/mailbox-conf.c:822 src/mailbox-conf.c:871
+#: src/mailbox-conf.c:809 src/mailbox-conf.c:858
 msgid "Pass_word:"
 msgstr "_Lösenord:"
 
 #. toggle for apop
-#: src/mailbox-conf.c:827
+#: src/mailbox-conf.c:814
 msgid "Use _APOP Authentication"
 msgstr "Använd _APOP-autentisering"
 
 #. toggle for deletion from server
-#: src/mailbox-conf.c:830
+#: src/mailbox-conf.c:817
 msgid "_Delete messages from server after download"
 msgstr "_Ta bort meddelanden från servern efter hämtning"
 
 #. Procmail
-#: src/mailbox-conf.c:834
+#: src/mailbox-conf.c:821
 msgid "_Filter messages through procmail"
 msgstr "_Filtrera meddelanden genom procmail"
 
 #. toggle for check
-#: src/mailbox-conf.c:838
+#: src/mailbox-conf.c:825
 msgid "Periodically _Check This Mailbox For New Mail"
 msgstr "_Kontrollera denna brevlåda periodiskt efter ny e-post"
 
-#: src/mailbox-conf.c:875
+#: src/mailbox-conf.c:862
 msgid "F_older Path:"
 msgstr "Sökväg till _mapp:"
 
@@ -1718,22 +1752,22 @@ msgstr ""
 "\n"
 "Om du behöver rapportera något fel kan du göra det på http://bugs.gnome.org/"
 
-#: src/main-window.c:1537
+#: src/main-window.c:1539
 #, c-format
 msgid "Sending error: %s"
 msgstr "Fel vid sänding: %s"
 
-#: src/main-window.c:1903
+#: src/main-window.c:1904
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Sparande av brevlådan %s misslyckades."
 
-#: src/main-window.c:2124
+#: src/main-window.c:2125
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (skrivskyddad)"
 
-#: src/main-window.c:2126
+#: src/main-window.c:2127
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
@@ -2720,6 +2754,15 @@ msgstr "Ingen adressbok markerad..."
 #: src/store-address.c:254
 msgid "Sorry, no semicolons are allowed in the name!\n"
 msgstr "Tyvärr, semikolon är inte tillåtna i namnet!\n"
+
+#~ msgid ""
+#~ "This will remove the mailbox %s and it's files permanently from your "
+#~ "system.\n"
+#~ "Are you sure you want to remove this mailbox?"
+#~ msgstr ""
+#~ "Detta kommer att ta bort brevlådan %s och dess filer permanent från ditt "
+#~ "system.\n"
+#~ "Är du säker på att du vill ta bort den här brevlådan?"
 
 #~ msgid "Add New Mailbox..."
 #~ msgstr "Lägg till en ny brevlåda..."

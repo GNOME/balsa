@@ -625,17 +625,19 @@ libbalsa_mailbox_real_messages_change_flags(LibBalsaMailbox * mailbox,
 	LibBalsaMessage *msg =
 	    libbalsa_mailbox_get_message(mailbox, msgno);
 
-	libbalsa_message_set_msg_flags(msg, set, clr);
-	LIBBALSA_MAILBOX_GET_CLASS(mailbox)->change_message_flags(mailbox,
-								  msgno,
-								  set,
-								  clr);
-	libbalsa_mailbox_msgno_changed(mailbox, msgno);
-	list = g_list_prepend(list, msg);
+	if (libbalsa_message_set_msg_flags(msg, set, clr)) {
+	    /* Flags really changed. */
+	    LIBBALSA_MAILBOX_GET_CLASS(mailbox)->
+		change_message_flags(mailbox, msgno, set, clr);
+	    libbalsa_mailbox_msgno_changed(mailbox, msgno);
+	    list = g_list_prepend(list, msg);
+	}
     }
 
-    libbalsa_mailbox_messages_status_changed(mailbox, list, set | clr);
-    g_list_free(list);
+    if (list) {
+	libbalsa_mailbox_messages_status_changed(mailbox, list, set | clr);
+	g_list_free(list);
+    }
 
     return TRUE;
 }

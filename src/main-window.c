@@ -2903,6 +2903,18 @@ add_check_button(GtkWidget* table, const gchar* label, gint x, gint y)
     return GTK_TOGGLE_BUTTON(res);
 }
 
+enum {
+    FIND_RESPONSE_FILTER,
+    FIND_RESPONSE_RESET
+};
+
+static void
+bw_find_button_clicked(GtkWidget * widget, gpointer data)
+{
+    GtkWidget *dialog = gtk_widget_get_toplevel(widget);
+    gtk_dialog_response(GTK_DIALOG(dialog), GPOINTER_TO_INT(data));
+}
+
 static void 
 find_real(BalsaIndex * bindex, gboolean again)
 {
@@ -2910,8 +2922,8 @@ find_real(BalsaIndex * bindex, gboolean again)
        CONDITION_NONE if nothing has been set up */
     static LibBalsaCondition * cnd = NULL;
     static gboolean reverse = FALSE;
+    static gboolean wrap    = FALSE;
     static LibBalsaMailboxSearchIter *search_iter = NULL;
-    enum { FIND_RESPONSE_FILTER };
 
     if (!cnd) {
 	cnd = libbalsa_condition_new();
@@ -2926,18 +2938,17 @@ find_real(BalsaIndex * bindex, gboolean again)
             gtk_dialog_new_with_buttons(_("Search mailbox"),
                                         GTK_WINDOW(balsa_app.main_window),
                                         GTK_DIALOG_DESTROY_WITH_PARENT,
-                                        GTK_STOCK_OK, GTK_RESPONSE_OK,
-                                        _("Fi_lter"),  FIND_RESPONSE_FILTER,
+					GTK_STOCK_HELP,   GTK_RESPONSE_HELP,
                                         GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                         NULL);
-	GtkWidget *reverse_button, *search_entry, *w, *page, *table;
-        	GtkToggleButton *matching_body, *matching_from;
+	GtkWidget *reverse_button, *wrap_button;
+	GtkWidget *search_entry, *w, *page, *table;
+	GtkWidget *frame, *box, *button;
+	GtkToggleButton *matching_body, *matching_from;
         GtkToggleButton *matching_to, *matching_cc, *matching_subject;
 	gint ok;
 	
         vbox = GTK_DIALOG(dia)->vbox;
-	reverse_button = 
-            gtk_check_button_new_with_mnemonic(_("_Reverse search"));
 
 	page=gtk_table_new(2, 1, FALSE);
 	w = gtk_label_new_with_mnemonic(_("_Search for:"));
@@ -2947,40 +2958,86 @@ find_real(BalsaIndex * bindex, gboolean again)
         gtk_entry_set_max_length(GTK_ENTRY(search_entry), 30);
 	gtk_table_attach(GTK_TABLE(page),search_entry,1, 2, 0, 1,
 			 GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
+	gtk_label_set_mnemonic_widget(GTK_LABEL(w), search_entry);
 	gtk_box_pack_start(GTK_BOX(vbox), page, FALSE, FALSE, 2);
 
 	/* builds the toggle buttons to specify fields concerned by
          * the search. */
-	page = gtk_table_new(3, 7, FALSE);
     
-	w = gtk_frame_new(_("In:"));
-	gtk_frame_set_label_align(GTK_FRAME(w), GTK_POS_LEFT, GTK_POS_TOP);
-	gtk_frame_set_shadow_type(GTK_FRAME(w), GTK_SHADOW_ETCHED_IN);
-	gtk_table_attach(GTK_TABLE(page),
-			 w,
-			 0, 3, 0, 2,
-			 GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
+	frame = gtk_frame_new(_("In:"));
+	gtk_frame_set_label_align(GTK_FRAME(frame),
+				  GTK_POS_LEFT, GTK_POS_TOP);
+	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
+	gtk_container_set_border_width(GTK_CONTAINER(frame), 6);
+	gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 2);
     
-	table = gtk_table_new(3, 3, TRUE);
-	gtk_container_add(GTK_CONTAINER(w), table);
-		
+	table = gtk_table_new(2, 3, TRUE);
 	matching_body    = add_check_button(table, _("_Body"),    0, 0);
 	matching_to      = add_check_button(table, _("_To:"),     1, 0);
 	matching_from    = add_check_button(table, _("_From:"),   1, 1);
         matching_subject = add_check_button(table, _("S_ubject"), 2, 0);
 	matching_cc      = add_check_button(table, _("_Cc:"),     2, 1);
-	gtk_box_pack_start(GTK_BOX(vbox), page, FALSE, FALSE, 2);
+	gtk_container_add(GTK_CONTAINER(frame), table);
 
-	gtk_box_pack_start(GTK_BOX(vbox), gtk_hseparator_new(), 
-                           FALSE, FALSE, 2);
-	gtk_box_pack_start(GTK_BOX(vbox), reverse_button,TRUE,TRUE,0);
+	/* Frame with Apply and Clear buttons */
+	frame = gtk_frame_new(_("Show only matching messages"));
+	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
+	gtk_container_set_border_width(GTK_CONTAINER(frame), 6);
+	gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 2);
+
+	/* Button box */
+	box = gtk_hbutton_box_new();
+	gtk_container_set_border_width(GTK_CONTAINER(box), 6);
+	button = gtk_button_new_from_stock(GTK_STOCK_APPLY);
+	g_signal_connect(G_OBJECT(button), "clicked",
+			 G_CALLBACK(bw_find_button_clicked), 
+			 GINT_TO_POINTER(FIND_RESPONSE_FILTER));
+	gtk_container_add(GTK_CONTAINER(box), button);
+	button = gtk_button_new_from_stock(GTK_STOCK_CLEAR);
+	g_signal_connect(G_OBJECT(button), "clicked",
+			 G_CALLBACK(bw_find_button_clicked), 
+			 GINT_TO_POINTER(FIND_RESPONSE_RESET));
+	gtk_container_add(GTK_CONTAINER(box), button);
+	gtk_container_add(GTK_CONTAINER(frame), box);
+
+	/* Frame with OK button */
+	frame = gtk_frame_new(_("Open next matching message"));
+	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
+	gtk_container_set_border_width(GTK_CONTAINER(frame), 6);
+	gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 2);
+
+	/* Reverse and Wrap checkboxes */
+	box = gtk_hbox_new(FALSE, 6);
+	gtk_container_add(GTK_CONTAINER(frame), box);
+	w = gtk_vbox_new(TRUE, 2);
+	gtk_container_set_border_width(GTK_CONTAINER(w), 6);
+	reverse_button = 
+            gtk_check_button_new_with_mnemonic(_("_Reverse search"));
+	gtk_box_pack_start_defaults(GTK_BOX(w), reverse_button);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(reverse_button),
+                                     reverse);
+	wrap_button = 
+            gtk_check_button_new_with_mnemonic(_("_Wrap around"));
+	gtk_box_pack_start_defaults(GTK_BOX(w), wrap_button);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(wrap_button),
+                                     wrap);
+	gtk_box_pack_start(GTK_BOX(box), w, TRUE, TRUE, 0);
+
+	/* Button box */
+	w = gtk_hbutton_box_new();
+	gtk_container_set_border_width(GTK_CONTAINER(w), 6);
+	button = gtk_button_new_from_stock(GTK_STOCK_OK);
+	g_signal_connect(G_OBJECT(button), "clicked",
+			 G_CALLBACK(bw_find_button_clicked), 
+			 GINT_TO_POINTER(GTK_RESPONSE_OK));
+	gtk_container_add(GTK_CONTAINER(w), button);
+	gtk_box_pack_start(GTK_BOX(box), w, TRUE, TRUE, 0);
+
 	gtk_widget_show_all(vbox);
 
 	if (cnd->match.string.string)
 	    gtk_entry_set_text(GTK_ENTRY(search_entry),
                                cnd->match.string.string);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(reverse_button),
-                                     reverse);
 	gtk_toggle_button_set_active(matching_body,
 				     CONDITION_CHKMATCH(cnd,
 							CONDITION_MATCH_BODY));
@@ -2995,16 +3052,17 @@ find_real(BalsaIndex * bindex, gboolean again)
 				     CONDITION_CHKMATCH(cnd,CONDITION_MATCH_CC));
 
         gtk_widget_grab_focus(search_entry);
-        g_signal_connect_swapped(G_OBJECT(search_entry), "activate",
-                                 G_CALLBACK(gtk_window_activate_default),
-                                 dia);
+	gtk_entry_set_activates_default(GTK_ENTRY(search_entry), TRUE);
         gtk_dialog_set_default_response(GTK_DIALOG(dia), GTK_RESPONSE_OK);
 	do {
+	    GError *err = NULL;
+
 	    ok=gtk_dialog_run(GTK_DIALOG(dia));
             switch(ok) {
             case GTK_RESPONSE_OK:
             case FIND_RESPONSE_FILTER:
 		reverse = GTK_TOGGLE_BUTTON(reverse_button)->active;
+		wrap    = GTK_TOGGLE_BUTTON(wrap_button)->active;
 		g_free(cnd->match.string.string);
 		cnd->match.string.string =
                     g_strdup(gtk_entry_get_text(GTK_ENTRY(search_entry)));
@@ -3031,11 +3089,26 @@ find_real(BalsaIndex * bindex, gboolean again)
 		     * must provide a non-empty string")); */
                     ok = GTK_RESPONSE_CANCEL; 
                 break;
-            default: break;/* cancel or just close */
+	    case GTK_RESPONSE_HELP:
+		gnome_help_display("balsa", "win-search", &err);
+		if (err) {
+		    balsa_information(LIBBALSA_INFORMATION_WARNING,
+				      _("Error displaying help: %s\n"),
+				      err->message);
+		    g_error_free(err);
+		}
+		break;
+            case FIND_RESPONSE_RESET:
+		reset_filter_cb(NULL, NULL);
+		/* fall through */
+            default:
+		ok = GTK_RESPONSE_CANCEL; 
+		break;/* cancel or just close */
             } /* end of switch */
 	} while (ok==GTK_RESPONSE_HELP);
 	gtk_widget_destroy(dia);
-	if(ok ==GTK_RESPONSE_CANCEL) return;
+	if (ok == GTK_RESPONSE_CANCEL)
+	    return;
 	cnd->type = CONDITION_STRING;
 
 	libbalsa_mailbox_search_iter_free(search_iter);
@@ -3060,7 +3133,7 @@ find_real(BalsaIndex * bindex, gboolean again)
 
     if (!search_iter)
 	search_iter = libbalsa_mailbox_search_iter_new(cnd);
-    balsa_index_find(bindex, search_iter, reverse);
+    balsa_index_find(bindex, search_iter, reverse, wrap);
 }
 
 static void

@@ -55,7 +55,7 @@ General advices:
 <title>Balsa User's Guide</title>
 
 <copyright>
-  <year>1997-2001</year>
+  <year>1997-2004</year>
   <holder>Stuart Parmenter and others, see AUTHORS for a list of people
   </holder>
 </copyright>
@@ -90,10 +90,10 @@ General advices:
 </legalnotice>
 
 <releaseinfo> 
-This is version 2.718 of the Balsa manual.
+This is version 2.719 of the Balsa manual.
 </releaseinfo>
 
-<pubdate>6 Nov 2001</pubdate>
+<pubdate>28 May 2004</pubdate>
 
 <abstract>
 
@@ -452,6 +452,49 @@ This is version 2.718 of the Balsa manual.
 	</para>
       </listitem>
 
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Edit</guimenu>
+	    <guimenuitem>Find</guimenuitem>
+	  </menuchoice> &mdash; 
+	  Find messages in the current mailbox that match a given
+	  set of conditions, using the
+	  <link linkend="win-search">search mailbox window</link>.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Edit</guimenu>
+	    <guimenuitem>Find next</guimenuitem>
+	  </menuchoice> &mdash; 
+	  Find the next matching message.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Edit</guimenu>
+	    <guimenuitem>Filters</guimenuitem>
+	  </menuchoice> &mdash; 
+	  Open up the
+	  <link linkend="win-filters">filters window</link>.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Edit</guimenu>
+	    <guimenuitem>Export filters</guimenuitem>
+	  </menuchoice> &mdash; 
+	  Open up a window for exporting filters in the Sieve format.
+	</para>
+      </listitem>
+
     </itemizedlist>
 
   </listitem>
@@ -493,8 +536,8 @@ This is version 2.718 of the Balsa manual.
 	  </menuchoice> &mdash; 
 
 	  Toggle the display of messages using word wrap.  The column
-	  to which the message is wrapped is set in the <link
-	  linkend="preferences">Preferences</link> window.
+	  to which the message is wrapped is set in the
+	  <link linkend="preferences">Preferences</link> window.
 	</para>
       </listitem>
 
@@ -2579,7 +2622,7 @@ This is version 2.718 of the Balsa manual.
       <varlistentry>
 	<term><guilabel>Bad Spellers</guilabel></term>
 	<listitem>
-	  <para>The Bad Spellers mode is the most thourough and
+	  <para>The Bad Spellers mode is the most thorough and
 	    accurate mode, however it also takes the longest to find a
 	    list of suggestions.</para>
 	</listitem>
@@ -2926,14 +2969,6 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
 </sect1> <!-- ab-conf -->
 
 <!-- ################################################################# -->
-<!--                 SECTION: CUSTOMIZE TOOLBARS                       -->
-<!-- ################################################################# -->
-<sect1 id="toolbars">
-<title>Toolbar customization</title>
-  <para>This is to be filled in.</para>
-</sect1>
-
-<!-- ################################################################# -->
 <!--                 SECTION: IDENTITIES                               -->
 <!-- ################################################################# -->
 <sect1 id="identities">
@@ -3084,6 +3119,66 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
 </varlistentry>
 </variablelist>
 
+</sect1>
+
+<!-- ################################################################# -->
+<!--                 SECTION: FIND MESSAGES WINDOW                     -->
+<!-- ################################################################# -->
+<sect1 id="win-search">
+  <title>The Search Mailbox Window</title>
+  <para>
+    You can search a mailbox to find and display messages that contain a
+    given string in the To, From, Subject, or Cc headers,
+    or in the message body. 
+    This window allows you to specify the string for which you want to
+    search and where &Balsa; should look.
+  </para>
+  <para>
+      You can view the matching messages in two ways:
+      <variablelist>
+	  <varlistentry>
+	      <term><guilabel>Show only matching messages</guilabel></term>
+	      <listitem>
+		  <para>
+		      If you click the <guibutton>Apply</guibutton>
+		      button, the mailbox view will be filtered to show
+		      only the messages that match the conditions.
+		      If you click the <guibutton>Clear</guibutton>
+		      button, the filter will be cleared, 
+		      and the mailbox view will be restored to 
+		      show all messages.
+		      You can also use 
+		      <menuchoice>
+			  <guimenu>Mailbox</guimenu>
+			  <guimenuitem>Reset Filter</guimenuitem>
+		      </menuchoice>
+		      to restore the view.
+		  </para>
+	  </listitem>
+  </varlistentry>
+	  <varlistentry>
+	      <term><guilabel>Open next matching message</guilabel></term>
+	      <listitem>
+		  <para>
+		      Alternatively, you can step through the matching
+		      messages, either forward or in reverse, and
+		      optionally wrapping the search when it reaches the
+		      end of the mailbox.
+		      Click the <guibutton>OK</guibutton>
+		      button to view the first matching message after
+		      (or before) the current message.
+		      Then you can use
+		      <menuchoice>
+			  <shortcut><keysym>Ctrl-G</keysym></shortcut>
+			  <guimenu>Edit</guimenu>
+			  <guimenuitem>Find Next</guimenuitem>
+		      </menuchoice>
+		      to step through the matching messages.
+		  </para>
+	  </listitem>
+  </varlistentry>
+  </variablelist>
+  </para>
 </sect1>
 
 <!-- ################################################################# -->
@@ -3808,7 +3903,7 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
   Following people contributed to this manual:
   <itemizedlist>
   <listitem>
-  <para>Peter Bloomfield (<email>@MindSpring.com</email>)</para>
+  <para>Peter Bloomfield (<email>peterbloomfield@bellsouth.net</email>)</para>
   </listitem>
   <listitem>
   <para>Matthew Guenther (<email>guentherm@asme.org</email>)</para>

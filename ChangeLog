@@ -1,3 +1,8 @@
+2000-11-01  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/balsa-message.c (balsa_message_set): Check for messages with
+	no parts and don't crash.
+
 2000-10-31  Matthew Guenther  <guentherm@asme.org>
 
 	* help/C/balsa.sgml: Manual updates.

@@ -371,8 +371,10 @@ select_icon_cb(GnomeIconList * ilist, gint num, GdkEventButton * event,
 	select_part(bm, num);
     } else if (event->button == 3) {
 	info = (BalsaPartInfo *) gnome_icon_list_get_icon_data(ilist, num);
+	
+	g_assert(info != NULL);
 
-	if (info && info->popup_menu) {
+	if (info->popup_menu) {
 	    gtk_menu_popup(GTK_MENU(info->popup_menu),
 			   NULL, NULL, NULL, NULL,
 			   event->button, event->time);
@@ -444,6 +446,21 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 
     display_content(bm);
 
+    /*
+     * FIXME: This is a workaround for what may or may not be a libmutt bug.
+     *
+     * If the Content-Type: header is  multipart/alternative; boundary="XXX" 
+     * and no parts are found then mutt produces a message with no parts, even 
+     * if there is a single unmarked part (ie a normal email).
+     */
+    if (bm->part_count == 0) {
+	gtk_widget_hide(bm->part_list);
+
+	/* This is really annoying if you are browsing, since you keep getting a dialog... */
+	/* balsa_information(LIBBALSA_INFORMATION_WARNING, _("Message contains no parts!")); */
+	return;
+    }
+
     gnome_icon_list_select_icon(GNOME_ICON_LIST(bm->part_list), 0);
 
     select_part(bm, 0);
@@ -461,6 +478,8 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 	BalsaPartInfo *info = (BalsaPartInfo *)
 	    gnome_icon_list_get_icon_data(GNOME_ICON_LIST(bm->part_list),
 					  0);
+	g_assert( info != NULL );
+
 	if (info->can_display)
 	    gtk_widget_hide(bm->part_list);
 	else
@@ -1536,10 +1555,12 @@ select_part(BalsaMessage * bm, gint part)
 	info = (BalsaPartInfo *) gnome_icon_list_get_icon_data
 	    (GNOME_ICON_LIST(bm->part_list), part);
 
-	if (info && !info->widget)
+	g_assert(info != NULL);
+
+	if (info->widget == NULL)
 	    part_info_init(bm, info);
 
-	if (info && info->widget) {
+	if (info->widget) {
 	    gtk_widget_show(info->widget);
 	    gtk_table_attach(GTK_TABLE(bm->table), info->widget, 0, 1, 1,
 			     2, GTK_EXPAND | GTK_FILL,

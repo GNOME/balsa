@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "POT-Creation-Date: 2001-04-13 02:40+0800\n"
-"PO-Revision-Date: 2001-03-14 22:10+0800\n"
+"PO-Revision-Date: 2001-04-13 23:10+0800\n"
 "Last-Translator: Dillion Chen <dillon.chen@turbolinux.com.cn>\n"
 "Language-Team: zh_CN <i18n-translation@lists.linux.net.cn>\n"
 "MIME-Version: 1.0\n"
@@ -118,16 +118,16 @@ msgstr "邮件箱“%s”不是有效的 Maildir 邮箱。"
 
 # src/mailbox-conf.c:488
 #: libbalsa/mailbox_maildir.c:123
-#, fuzzy, c-format
+#, c-format
 msgid "Could not create a MailDir directory at %s (%s)"
-msgstr "无法创建类型为 %s 的邮件箱"
+msgstr "无法在 %s 创建 MailDir 目录 (%s)"
 
 # src/mailbox-conf.c:488
 #: libbalsa/mailbox_maildir.c:130 libbalsa/mailbox_maildir.c:138
 #: libbalsa/mailbox_maildir.c:148
 #, c-format
 msgid "Could not create a MailDir at %s (%s)"
-msgstr "无法在 %s 创建 MailDir (%s)
+msgstr "无法在 %s 创建 MailDir (%s)"
 
 #: libbalsa/mailbox_maildir.c:207 libbalsa/mailbox_mh.c:184
 #, c-format
@@ -427,61 +427,61 @@ msgstr "配置 Balsa"
 #. didn't find anything that we could display!
 #: libmutt/handler.c:1028
 msgid "[-- Error:  Could not display any parts of Multipart/Alternative! --]\n"
-msgstr ""
+msgstr "[-- 错误：无法显示 Multipart/Alternative 的任何部分！--]\n"
 
 # src/sendmsg-window.c:414
 #: libmutt/handler.c:1145
-#, fuzzy, c-format
+#, c-format
 msgid "[-- Attachment #%d"
-msgstr "附件(_A)"
+msgstr "[--附件 #%d"
 
 #: libmutt/handler.c:1156
 #, c-format
 msgid "[-- Type: %s/%s, Encoding: %s, Size: %s --]\n"
-msgstr ""
+msgstr "[-- 类型：%s/%s，编码：%s，大小：%s --]\n"
 
 #: libmutt/handler.c:1215
 #, c-format
 msgid "[-- Autoview using %s --]\n"
-msgstr ""
+msgstr "[-- 使用 %s 自动查看 --]\n"
 
 #: libmutt/handler.c:1216
 #, c-format
 msgid "Invoking autoview command: %s"
-msgstr ""
+msgstr "调用自动查看命令：%s"
 
 #: libmutt/handler.c:1253 libmutt/handler.c:1271
 #, c-format
 msgid "[-- Autoview stderr of %s --]\n"
-msgstr ""
+msgstr "[-- 自动查看 %s 的标准错误 --]\n"
 
 #: libmutt/handler.c:1303
 msgid "[-- Error: message/external-body has no access-type parameter --]\n"
-msgstr ""
+msgstr "[-- 错误：邮件/外部信体没有访问类型参数 --]\n"
 
 #: libmutt/handler.c:1320
 #, c-format
 msgid "[-- This %s/%s attachment "
-msgstr ""
+msgstr "[-- 此 %s/%s 附件 "
 
 #: libmutt/handler.c:1327
 #, c-format
 msgid "(size %s bytes) "
-msgstr ""
+msgstr "(大小为 %s 字节)"
 
 #: libmutt/handler.c:1329
 msgid "has been deleted --]\n"
-msgstr ""
+msgstr "已经被删除 --]\n"
 
 #: libmutt/handler.c:1332
 #, c-format
 msgid "[-- on %s --]\n"
-msgstr ""
+msgstr "[-- 在 %s --]\n"
 
 #: libmutt/handler.c:1334
 #, c-format
 msgid "[-- name: %s --]\n"
-msgstr ""
+msgstr "[-- 名字：%s --]\n"
 
 #: libmutt/handler.c:1345
 #, c-format
@@ -490,6 +490,8 @@ msgid ""
 "[-- and the indicated external source has --]\n"
 "[-- expired. --]\n"
 msgstr ""
+"[-- 没有包含此 %s/%s 附件，--]\n"
+"[-- 且其外部来源已经过期。--]\n"
 
 #: libmutt/handler.c:1359
 #, c-format
@@ -497,54 +499,54 @@ msgid ""
 "[-- This %s/%s attachment is not included, --]\n"
 "[-- and the indicated access-type %s is unsupported --]\n"
 msgstr ""
+"[-- 没有包含此 %s/%s 附件，--]\n"
+"[-- 且其访问类型 %s 不被支持 --]\n"
 
 #: libmutt/handler.c:1469
 msgid "Error: multipart/signed has no protocol."
-msgstr ""
+msgstr "错误：multipart/signed 没有协议。"
 
 #: libmutt/handler.c:1482
 msgid "Error: multipart/encrypted has no protocol parameter!"
-msgstr ""
+msgstr "错误：multipart/encrypted 没有协议参数！"
 
 #: libmutt/handler.c:1524
-#, fuzzy
 msgid "Unable to open temporary file!"
-msgstr "无法创建临时文件!"
+msgstr "无法打开临时文件！"
 
 #: libmutt/handler.c:1583
 #, c-format
 msgid "[-- %s/%s is unsupported "
-msgstr ""
+msgstr "[-- %s/%s 不被支持 "
 
 #: libmutt/imap/auth_anon.c:39
 msgid "Authenticating (anonymous)..."
-msgstr "正在进行身份验证 (匿名)..."
+msgstr "正在进行身份验证(匿名)..."
 
 #: libmutt/imap/auth_anon.c:69
-#, fuzzy
 msgid "Anonymous authentication failed."
-msgstr "身份验证失败"
+msgstr "匿名身份验证失败。"
 
 #: libmutt/imap/auth_cram.c:44
 msgid "Authenticating (CRAM-MD5)..."
-msgstr "正在进行身份验证 (CRAM-MD5)..."
+msgstr "正在进行身份验证(CRAM-MD5)..."
 
 #: libmutt/imap/auth_cram.c:124
 msgid "CRAM-MD5 authentication failed."
-msgstr "CRAM-MD5 身份验证失败."
+msgstr "CRAM-MD5 身份验证失败。"
 
 #. now begin login
 #: libmutt/imap/auth_gss.c:87
 msgid "Authenticating (GSSAPI)..."
-msgstr "正在进行身份验证 (GSSAPI)..."
+msgstr "正在进行身份验证(GSSAPI)..."
 
 #: libmutt/imap/auth_gss.c:262
 msgid "GSSAPI authentication failed."
-msgstr "GSSAPI 身份验证失败."
+msgstr "GSSAPI 身份验证失败。"
 
 #: libmutt/imap/auth_login.c:34
 msgid "LOGIN disabled on this server."
-msgstr ""
+msgstr "该服务器禁止登录。"
 
 #: libmutt/imap/auth_login.c:43
 msgid "Logging in..."
@@ -552,17 +554,15 @@ msgstr "正在登录..."
 
 #: libmutt/imap/auth_login.c:66
 msgid "Login failed."
-msgstr "登录失败."
+msgstr "登录失败。"
 
 #: libmutt/imap/auth_sasl.c:118
-#, fuzzy
 msgid "Authenticating (SASL)..."
-msgstr "正在进行身份验证 (GSSAPI)..."
+msgstr "正在进行身份验证(SASL)..."
 
 #: libmutt/imap/auth_sasl.c:196
-#, fuzzy
 msgid "SASL authentication failed."
-msgstr "GSSAPI 身份验证失败."
+msgstr "SASL 身份验证失败。"
 
 #: libmutt/imap/browse.c:95
 msgid "Getting namespaces..."
@@ -574,155 +574,149 @@ msgstr "正在取得文件夹列表..."
 
 # src/mailbox-conf.c:640
 #: libmutt/imap/browse.c:281
-#, fuzzy
 msgid "Create mailbox: "
-msgstr "关闭邮件箱"
+msgstr "创建邮件箱："
 
 # src/mailbox-conf.c:671 src/mailbox-conf.c:706
 #: libmutt/imap/browse.c:287
-#, fuzzy
 msgid "Mailbox created."
-msgstr "邮件箱名"
+msgstr "已创建邮件箱。"
 
 # src/main-window.c:200
 #. something is wrong because the server reported fewer messages
 #. * than we previously saw
 #.
 #: libmutt/imap/command.c:305
-#, fuzzy
 msgid "Fatal error.  Message count is out of sync!"
-msgstr "错误消息"
+msgstr "严重错误。消息技术不同步！"
 
 #: libmutt/imap/command.c:346
 #, c-format
 msgid "One of IMAP connections has been closed: %s"
-msgstr ""
+msgstr "某个 IMAP 连接已经关闭：%s"
 
 #: libmutt/imap/imap.c:89
-#, fuzzy, c-format
+#, c-format
 msgid "Closing connection to %s..."
-msgstr "连接到 %s 时发生错误."
+msgstr "正在关闭到 %s 的连接..."
 
 #: libmutt/imap/imap.c:295
 msgid "This IMAP server is ancient. Balsa does not work with it."
-msgstr ""
+msgstr "这个 IMAP 服务器太古老了。Balsa 无法和它一起使用。"
 
 # src/main-window.c:133 src/main-window.c:168
 #: libmutt/imap/imap.c:498
-#, fuzzy, c-format
+#, c-format
 msgid "Selecting %s..."
-msgstr "删除(_D)..."
+msgstr "正在选择 %s..."
 
 #. STATUS not supported
 #: libmutt/imap/imap.c:668
 msgid "Unable to append to IMAP mailboxes at this server"
-msgstr ""
+msgstr "无法追加到这个服务器上的 IMAP 邮件箱"
 
 #. command failed cause folder doesn't exist
 #: libmutt/imap/imap.c:677 libmutt/imap/message.c:577
-#, fuzzy, c-format
+#, c-format
 msgid "Create %s?"
-msgstr "字符"
+msgstr "创建 %s？"
 
 #: libmutt/imap/imap.c:714
 msgid "Closing connection to IMAP server..."
-msgstr ""
+msgstr "正在关闭到 IMAP 服务器的连接..."
 
 #: libmutt/imap/imap.c:877
-#, fuzzy, c-format
+#, c-format
 msgid "Marking %d messages deleted..."
-msgstr "正在把已读邮件移到 %s..."
+msgstr "正在标记要删除的 %d 个邮件..."
 
 #: libmutt/imap/imap.c:896
 #, c-format
 msgid "Saving message status flags... [%d/%d]"
-msgstr ""
+msgstr "正在保存邮件状态标志... [%d/%d]"
 
 #: libmutt/imap/imap.c:953
-#, fuzzy
 msgid "Expunging messages from server..."
-msgstr "正在把已读邮件移到 %s..."
+msgstr "正在从服务器上删除邮件..."
 
 #: libmutt/imap/imap.c:1229
-#, fuzzy, c-format
+#, c-format
 msgid "Subscribing to %s..."
-msgstr "正在写 %s..."
+msgstr "正在订阅 %s..."
 
 #: libmutt/imap/imap.c:1231
-#, fuzzy, c-format
+#, c-format
 msgid "Unsubscribing to %s..."
-msgstr "正在写 %s..."
+msgstr "正在退订 %s..."
 
 #. Unable to fetch headers for lower versions
 #: libmutt/imap/message.c:74
 msgid "Unable to fetch headers from this IMAP server version."
-msgstr ""
+msgstr "无法从该版本的 IMAP 服务器上取回邮件头。"
 
 #: libmutt/imap/message.c:92
-#, fuzzy, c-format
+#, c-format
 msgid "Fetching message headers... [%d/%d]"
-msgstr "正在写邮件... %d (%d%%)"
+msgstr "正在取回邮件头... [%d/%d]"
 
 #: libmutt/imap/message.c:237
-#, fuzzy
 msgid "Fetching message..."
-msgstr "正在取得名字空间..."
+msgstr "正在取回邮件..."
 
 #: libmutt/imap/message.c:276
 msgid "The message index is incorrect. Try reopening the mailbox."
-msgstr ""
+msgstr "邮件索引不正确。请重新打开邮件箱。"
 
 #: libmutt/imap/message.c:467
-#, fuzzy
 msgid "Uploading message ..."
-msgstr "正在把已读邮件移到 %s..."
+msgstr "正在上传邮件..."
 
 #: libmutt/imap/message.c:555
-#, fuzzy, c-format
+#, c-format
 msgid "Copying %d messages to %s..."
-msgstr "正在把已读邮件移到 %s..."
+msgstr "正在复制 %d 邮件到 %s..."
 
 #: libmutt/imap/message.c:559
-#, fuzzy, c-format
+#, c-format
 msgid "Copying message %d to %s..."
 msgstr "正在把已读邮件移到 %s..."
 
 #: libmutt/imap/util.c:43
 msgid "Continue?"
-msgstr "继续?"
+msgstr "继续？"
 
 # src/mailbox-conf.c:531
 #: libmutt/imap/util.c:49
-#, fuzzy, c-format
+#, c-format
 msgid "%s [%s]\n"
-msgstr "%s 在 %s"
+msgstr "%s [%s]\n"
 
 #: libmutt/mbox.c:134 libmutt/mbox.c:292
 msgid "Reading %s... %d (%d%%)"
-msgstr "正在读 %s... %d (%d%%)"
+msgstr "正在读取 %s... %d (%d%%)"
 
 # src/mailbox-conf.c:681
 #: libmutt/mbox.c:158 libmutt/mbox.c:217
 msgid "Mailbox is corrupt!"
-msgstr "邮件箱已损坏!"
+msgstr "邮件箱已损坏！"
 
 # src/index-child.c:143
 #: libmutt/mbox.c:666
 msgid "Mailbox was corrupted!"
-msgstr "邮件箱已损坏!"
+msgstr "邮件箱已损坏！"
 
 #: libmutt/mbox.c:703 libmutt/mbox.c:978
 msgid "Fatal error!  Could not reopen mailbox!"
-msgstr "严重错误! 无法重新打开邮件箱!"
+msgstr "严重错误！无法重新打开邮件箱！"
 
 # src/index-child.c:176
 #: libmutt/mbox.c:712
 msgid "Unable to lock mailbox!"
-msgstr "无法锁住邮件箱!"
+msgstr "无法锁住邮件箱！"
 
 #: libmutt/mbox.c:741
 msgid "Could not create temporary file!"
-msgstr "无法创建临时文件!"
+msgstr "无法创建临时文件！"
 
 #. this means ctx->changed or ctx->deleted was set, but no
 #. * messages were found to be changed or deleted.  This should
@@ -730,7 +724,7 @@ msgstr "无法创建临时文件!"
 #.
 #: libmutt/mbox.c:758
 msgid "sync: mbox modified, but no modified messages! (report this bug)"
-msgstr "同步: 邮件箱已修改, 但是没有修改的邮件! (报告这个软件缺陷)"
+msgstr "同步：邮件箱已修改，但是没有修改的邮件！(报告这个软件缺陷)"
 
 #: libmutt/mbox.c:788
 msgid "Writing messages... %d (%d%%)"
@@ -739,12 +733,12 @@ msgstr "正在写邮件... %d (%d%%)"
 #: libmutt/mbox.c:962
 #, c-format
 msgid "Write failed!  Saved partial mailbox to %s"
-msgstr "写错误! 将部分邮件箱保存到 %s"
+msgstr "写错误！已将部分邮件箱保存到 %s"
 
 # src/main-window.c:171
 #: libmutt/mbox.c:1028
 msgid "Could not reopen mailbox!"
-msgstr "无法重新打开邮件箱!"
+msgstr "无法重新打开邮件箱！"
 
 #: libmutt/mbox.c:1066
 msgid "Reopening mailbox..."
@@ -752,64 +746,62 @@ msgstr "正在重新打开邮件箱..."
 
 #: libmutt/mutt_socket.c:203
 msgid "SSL is unavailable."
-msgstr ""
+msgstr "SSL 不可用。"
 
 #: libmutt/mutt_socket.c:239
-#, fuzzy
 msgid "Preconnect command failed."
-msgstr "POP 命令执行失败"
+msgstr "预打开命令失败。"
 
 #: libmutt/mutt_socket.c:328 libmutt/mutt_socket.c:368
-#, fuzzy, c-format
+#, c-format
 msgid "Looking up %s..."
-msgstr "正在读 %s..."
+msgstr "正在查找 %s..."
 
 #: libmutt/mutt_socket.c:333 libmutt/mutt_socket.c:372
-#, fuzzy, c-format
+#, c-format
 msgid "Could not find the host \"%s\""
-msgstr "错误: 无法找到主机 %s 的地址."
+msgstr "错误：无法找到主机“%s”"
 
 #: libmutt/mutt_socket.c:337 libmutt/mutt_socket.c:377
-#, fuzzy, c-format
+#, c-format
 msgid "Connecting to %s..."
 msgstr "正在连接到 %s"
 
 #: libmutt/mutt_socket.c:400
-#, fuzzy, c-format
+#, c-format
 msgid "Could not connect to %s (%s)."
-msgstr "无法打开文件 %s.\n"
+msgstr "无法连接到 %s (%s)。"
 
 #: libmutt/mutt_socket.c:401
-#, fuzzy
 msgid "unknown error"
-msgstr "连接错误"
+msgstr "未知错误"
 
 #: libmutt/mutt_ssl.c:105
 msgid "Failed to find enough entropy on your system"
 msgstr "无法在系统中找到足够的熵"
 
 #: libmutt/mutt_ssl.c:120
-#, fuzzy, c-format
+#, c-format
 msgid "Filling entropy pool: %s...\n"
-msgstr "填充熵池"
+msgstr "填充熵池：%s...\n"
 
 #: libmutt/mutt_ssl.c:128
 #, c-format
 msgid "%s has insecure permissions!"
-msgstr ""
+msgstr "%s 的权限不安全！"
 
 #: libmutt/mutt_ssl.c:147
 msgid "SSL disabled due the lack of entropy"
-msgstr "因为缺少熵信息, 已禁用 SSL"
+msgstr "因为缺少熵信息，已禁用 SSL"
 
 #: libmutt/mutt_ssl.c:234
 msgid "Unable to get certificate from peer"
 msgstr "无法从对端获得证书"
 
 #: libmutt/mutt_ssl.c:245
-#, fuzzy, c-format
+#, c-format
 msgid "SSL connection using %s (%s)"
-msgstr "SSL 连接使用 %s"
+msgstr "SSL 连接使用 %s (%s)"
 
 #: libmutt/mutt_ssl.c:275
 msgid "Unknown"
@@ -833,15 +825,15 @@ msgstr "服务器证书已过期"
 
 #: libmutt/mutt_ssl.c:476
 msgid "This certificate belongs to:"
-msgstr "这个证书属于:"
+msgstr "该证书属于："
 
 #: libmutt/mutt_ssl.c:486
 msgid "This certificate was issued by:"
-msgstr "这个证书的签发者是:"
+msgstr "该证书的签发者是："
 
 #: libmutt/mutt_ssl.c:496
 msgid "This certificate is valid"
-msgstr "这个证书有效"
+msgstr "该证书有效"
 
 #: libmutt/mutt_ssl.c:497
 #, c-format
@@ -856,7 +848,7 @@ msgstr "     到 %s"
 #: libmutt/mutt_ssl.c:505
 #, c-format
 msgid "Fingerprint: %s"
-msgstr "指纹: %s"
+msgstr "指纹：%s"
 
 #: libmutt/mutt_ssl.c:507
 msgid "SSL Certificate check"
@@ -864,7 +856,7 @@ msgstr "SSL 证书检查"
 
 #: libmutt/mutt_ssl.c:510
 msgid "(r)eject, accept (o)nce, (a)ccept always"
-msgstr "(r)拒绝, (o)接受一次, (a)一直接受"
+msgstr "(r)拒绝，(o)接受一次，(a)一直接受"
 
 #: libmutt/mutt_ssl.c:511
 msgid "roa"
@@ -872,7 +864,7 @@ msgstr "roa"
 
 #: libmutt/mutt_ssl.c:515
 msgid "(r)eject, accept (o)nce"
-msgstr "(r)拒绝, (o)接受一次"
+msgstr "(r)拒绝，(o)接受一次"
 
 # src/balsa-index.c:231
 #: libmutt/mutt_ssl.c:516
@@ -889,7 +881,7 @@ msgstr "帮助"
 
 #: libmutt/mutt_ssl.c:545
 msgid "Warning: Couldn't save certificate"
-msgstr "警告: 无法保存证书"
+msgstr "警告：无法保存证书"
 
 #: libmutt/mutt_ssl.c:547
 msgid "Certificate saved"
@@ -898,16 +890,16 @@ msgstr "证书已保存"
 #: libmutt/mx.c:119
 #, c-format
 msgid "Lock count exceeded, remove lock for %s?"
-msgstr "超过锁计数, 删除 %s 的锁?"
+msgstr "超过锁计数，删除 %s 的锁？"
 
 #: libmutt/mx.c:131
 #, c-format
 msgid "Can't dotlock %s.\n"
-msgstr "无法锁定 %s.\n"
+msgstr "无法锁定 %s。\n"
 
 #: libmutt/mx.c:189
 msgid "Timeout exceeded while attempting fcntl lock!"
-msgstr "在试图进行 fcntl 锁的时候超时!"
+msgstr "在试图进行 fcntl 锁的时候超时！"
 
 #: libmutt/mx.c:195
 #, c-format
@@ -916,7 +908,7 @@ msgstr "等待 fcntl 锁... %d"
 
 #: libmutt/mx.c:223
 msgid "Timeout exceeded while attempting flock lock!"
-msgstr "在试图进行 flock 锁的时候超时!"
+msgstr "在试图进行 flock 锁的时候超时！"
 
 #: libmutt/mx.c:230
 #, c-format
@@ -927,7 +919,7 @@ msgstr "等待 flock 锁... %d"
 #: libmutt/mx.c:459 libmutt/mx.c:605
 #, c-format
 msgid "%s is not a mailbox."
-msgstr "%s 不是邮件箱."
+msgstr "%s 不是邮件箱。"
 
 #: libmutt/mx.c:542
 #, c-format
@@ -937,7 +929,7 @@ msgstr "无法锁住 %s\n"
 #: libmutt/mx.c:630
 #, c-format
 msgid "Reading %s..."
-msgstr "正在读 %s..."
+msgstr "正在读取 %s..."
 
 #: libmutt/mx.c:719
 #, c-format
@@ -947,7 +939,7 @@ msgstr "正在写 %s..."
 #: libmutt/mx.c:746
 #, c-format
 msgid "Could not synchronize mailbox %s!"
-msgstr "无法同步邮件箱 %s!"
+msgstr "无法同步邮件箱 %s！"
 
 #: libmutt/mx.c:848
 #, c-format
@@ -957,52 +949,46 @@ msgstr "正在把已读邮件移到 %s..."
 # src/pref-manager.c:441
 #: libmutt/mx.c:899 libmutt/mx.c:1056
 msgid "Mailbox is unchanged."
-msgstr "邮件箱没有改动."
+msgstr "邮件箱没有改动。"
 
 #: libmutt/mx.c:929
 #, c-format
 msgid "%d kept, %d moved, %d deleted."
-msgstr "保留 %d, 移动 %d, 删除 %d."
+msgstr "保留 %d，移动 %d，删除 %d。"
 
 #: libmutt/mx.c:932 libmutt/mx.c:1098
 #, c-format
 msgid "%d kept, %d deleted."
-msgstr "保留 %d, 删除 %d."
+msgstr "保留 %d，删除 %d."
 
 #: libmutt/mx.c:1040
 #, c-format
 msgid " Press '%s' to toggle write"
-msgstr " 按 '%s' 来调整写"
+msgstr " 按“%s”来调整写"
 
 #: libmutt/mx.c:1043
 msgid "Use 'toggle-write' to re-enable write!"
-msgstr "使用 'toggle-write' 来允许写!"
+msgstr "使用“切换写”来允许写！"
 
 #: libmutt/mx.c:1045
 #, c-format
 msgid "Mailbox is marked unwritable. %s"
-msgstr "邮件箱标记为不可读. %s"
+msgstr "邮件箱标记为不可读。%s"
 
 #: libmutt/mx.c:1050
 msgid "Mailbox is read-only."
-msgstr "邮件箱是只读的."
+msgstr "邮件箱是只读的。"
 
 # src/main-window.c:139
 #: libmutt/mx.c:1065
 #, c-format
 msgid "Purge %d deleted message?"
-msgstr "清除 %d 个已删除的邮件?"
-
-# src/main-window.c:139
-#: libmutt/mx.c:1065
-#, c-format
-msgid "Purge %d deleted messages?"
-msgstr "清除 %d 个已删除的邮件?"
+msgstr "清除 %d 个已删除的邮件？"
 
 #: libmutt/mx.c:1095
 #, c-format
 msgid "%d kept."
-msgstr "保留 %d."
+msgstr "保留 %d。"
 
 # src/main-window.c:139
 #: libmutt/mx.c:1375
@@ -1011,7 +997,7 @@ msgstr "无法写邮件"
 
 #: src/address-book-config.c:100
 msgid "Address Book Configuration"
-msgstr "地址簿"
+msgstr "地址簿配置"
 
 # src/mailbox-conf.c:290 src/mailbox-conf.c:898
 #: src/address-book-config.c:135 src/folder-conf.c:64 src/mailbox-conf.c:298
@@ -1020,7 +1006,7 @@ msgstr "更新"
 
 #: src/address-book-config.c:256
 msgid "New Address Book type:"
-msgstr "新的地址簿类型:"
+msgstr "新的地址簿类型："
 
 #: src/address-book-config.c:266
 msgid "VCard Address Book (GnomeCard)"
@@ -1037,7 +1023,7 @@ msgstr "Balsa 没有编译进 LDAP 支持"
 #. mailbox name
 #: src/address-book-config.c:313 src/address-book-config.c:371
 msgid "Address Book Name:"
-msgstr "地址簿名称:"
+msgstr "地址簿名称："
 
 # src/filter-edit-dialog.c:456
 #: src/address-book-config.c:322
@@ -1070,8 +1056,8 @@ msgid ""
 "The address book file path '%s' is not correct.\n"
 "Do you want to correct the file name?"
 msgstr ""
-"地址簿文件路径 '%s' 不正确.\n"
-"您要更正文件名吗?"
+"地址簿文件路径“%s”不正确。\n"
+"您要更正文件名吗？"
 
 # src/filter-edit-dialog.c:101
 #: src/address-book.c:161 src/filter-edit-dialog.c:130
@@ -1091,7 +1077,7 @@ msgstr "地址簿"
 #. Entry widget for finding an address
 #: src/address-book.c:243
 msgid "Search for Name:"
-msgstr "搜索名字:"
+msgstr "搜索名字："
 
 # src/sendmsg-window.c:71
 #: src/address-book.c:311
@@ -1109,7 +1095,7 @@ msgstr "重新导入"
 #. mode switching stuff
 #: src/address-book.c:347
 msgid "Treat multiple addresses as:"
-msgstr "处理多个地址:"
+msgstr "对待多个地址："
 
 #: src/address-book.c:351
 msgid "alternative addresses for the same person"
@@ -1125,14 +1111,14 @@ msgid ""
 "Opening remote mailbox %s.\n"
 "The password for %s@%s:"
 msgstr ""
-"正在打开远程邮件箱 %s.\n"
-"%s@%s 的口令是:"
+"正在打开远程邮件箱 %s。\n"
+"%s@%s 的口令是："
 
 # src/index-child.c:143
 #: src/balsa-app.c:71
 #, c-format
 msgid "Mailbox password for %s@%s:"
-msgstr "%s@%s 的邮件箱口令是:"
+msgstr "%s@%s 的邮件箱口令是："
 
 # src/balsa-index.c:231
 #. FIXME:
@@ -1151,9 +1137,9 @@ msgid "Date"
 msgstr "时间"
 
 #: src/balsa-index.c:534
-#, fuzzy, c-format
+#, c-format
 msgid "Opening mailbox %s. Please wait..."
-msgstr "正在重新打开邮件箱..."
+msgstr "正在打开邮件箱 %s。请等待..."
 
 # src/balsa-message.c:526 src/filter-edit-dialog.c:291
 # src/sendmsg-window.c:315
@@ -1163,9 +1149,8 @@ msgstr "收件人"
 
 # src/main-window.c:139
 #: src/balsa-index.c:1748
-#, fuzzy
 msgid "Cannot access the message's body\n"
-msgstr "无法写邮件"
+msgstr "无法访问邮件的内容\n"
 
 # src/main-window.c:214
 #: src/balsa-index.c:1785
@@ -1179,9 +1164,8 @@ msgstr "全部回复..."
 
 # src/main-window.c:215
 #: src/balsa-index.c:1793
-#, fuzzy
 msgid "Reply To Group..."
-msgstr "全部回复..."
+msgstr "回复到组..."
 
 # src/main-window.c:216
 #: src/balsa-index.c:1797
@@ -1209,14 +1193,12 @@ msgid "Store Address..."
 msgstr "保存地址..."
 
 #: src/balsa-index.c:1817
-#, fuzzy
 msgid "Toggle"
-msgstr "反转标志"
+msgstr "切换"
 
 #: src/balsa-index.c:1820 src/main-window.c:371
-#, fuzzy
 msgid "Flagged"
-msgstr "反转标志"
+msgstr "标记的"
 
 # src/index-child.c:422
 #: src/balsa-index.c:1823 src/balsa-mblist.c:483
@@ -1240,7 +1222,7 @@ msgstr "总共"
 #: src/balsa-mblist.c:962
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
-msgstr "显示的邮件箱: %s 个有 %ld 个邮件, %ld 个新邮件"
+msgstr "显示的邮件箱：%s 有 %ld 个邮件，%ld 个新邮件"
 
 # src/balsa-message.c:159 src/balsa-message.c:162
 #: src/balsa-message.c:303 src/balsa-message.c:306
@@ -1261,11 +1243,11 @@ msgstr "取消"
 
 #: src/balsa-message.c:316
 msgid "Please choose a filename to save this part of the message as:"
-msgstr "请选择这部分邮件要保存的文件名:"
+msgstr "请选择这部分邮件要保存的文件名："
 
 #: src/balsa-message.c:346
 msgid "File already exists. Overwrite?"
-msgstr ""
+msgstr "文件已经存在。要覆盖吗？"
 
 #: src/balsa-message.c:362
 #, c-format
@@ -1276,12 +1258,12 @@ msgstr " 无法保存 %s:%s "
 #. Subject:
 #: src/balsa-message.c:672 src/print.c:159 src/sendmsg-window.c:960
 msgid "Subject:"
-msgstr "标题:"
+msgstr "主题："
 
 # src/balsa-message.c:519
 #: src/balsa-message.c:675 src/print.c:162
 msgid "Date:"
-msgstr "时间:"
+msgstr "时间："
 
 # src/balsa-message.c:544 src/filter-edit-dialog.c:303
 # src/sendmsg-window.c:338
@@ -1289,7 +1271,7 @@ msgstr "时间:"
 #: src/balsa-message.c:680 src/filter-edit-dialog.c:316 src/print.c:149
 #: src/sendmsg-window.c:951
 msgid "From:"
-msgstr "发件人:"
+msgstr "发件人："
 
 # src/balsa-message.c:526 src/filter-edit-dialog.c:291
 # src/sendmsg-window.c:315
@@ -1297,43 +1279,41 @@ msgstr "发件人:"
 #: src/balsa-message.c:684 src/filter-edit-dialog.c:306 src/print.c:154
 #: src/sendmsg-window.c:954
 msgid "To:"
-msgstr "收件人:"
+msgstr "收件人："
 
 # src/balsa-message.c:534
 #. cc:
 #: src/balsa-message.c:685 src/sendmsg-window.c:962
 msgid "Cc:"
-msgstr "抄送:"
+msgstr "抄送："
 
 # src/sendmsg-window.c:368
 #. bcc:
 #: src/balsa-message.c:686 src/sendmsg-window.c:966
 msgid "Bcc:"
-msgstr "暗送:"
+msgstr "暗送："
 
 # src/sendmsg-window.c:368
 #. fcc:
 #: src/balsa-message.c:689 src/sendmsg-window.c:970
 msgid "Fcc:"
-msgstr "文件抄送:"
+msgstr "文件抄送："
 
 #: src/balsa-message.c:694
-#, fuzzy
 msgid "Disposition-Notification-To:"
-msgstr "要求发送阅读通告(_R)"
+msgstr "发送阅读通告至："
 
 #: src/balsa-message.c:762
 msgid "Could not load image. It is most likely corrupted."
-msgstr "无法载入图像. 可能已经损坏."
+msgstr "无法载入图像。可能已经损坏。"
 
 #: src/balsa-message.c:767
 msgid "Couldn't render image\n"
 msgstr "无法绘制图像\n"
 
 #: src/balsa-message.c:778
-#, fuzzy
 msgid "balsa/pixbuf: Could not load image. It is likely corrupted."
-msgstr "无法载入图像. 可能已经损坏."
+msgstr "balsa/pixbuf：无法载入图像。可能已经损坏。"
 
 #: src/balsa-message.c:827
 msgid "No open or view action defined in GNOME MIME for this content type"
@@ -1342,13 +1322,13 @@ msgstr "在 GNOME MIME 中没有定义这种内容类型的打开或查看动作"
 #: src/balsa-message.c:831
 #, c-format
 msgid "Content Type: %s"
-msgstr "内容类型: %s"
+msgstr "内容类型：%s"
 
 # src/filter-edit-dialog.c:456
 #: src/balsa-message.c:836
 #, c-format
 msgid "Filename: %s"
-msgstr "文件名: %s"
+msgstr "文件名：%s"
 
 # src/balsa-message.c:159 src/balsa-message.c:162
 #: src/balsa-message.c:844
@@ -1366,11 +1346,13 @@ msgid ""
 "Error writing to temporary file %s.\n"
 "Check the directory permissions."
 msgstr ""
+"写临时文件 %s 时发生错误。\n"
+"检查目录的权限。"
 
 #: src/balsa-message.c:1154
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot open temporary file %s."
-msgstr "无法创建临时文件!"
+msgstr "无法打开临时文件 %s。"
 
 # src/balsa-message.c:160
 #: src/balsa-message.c:1471
@@ -1384,9 +1366,8 @@ msgstr "无法创建临时文件 %s"
 
 # src/sendmsg-window.c:513
 #: src/balsa-message.c:2031
-#, fuzzy
 msgid "reply to MDN?"
-msgstr "回复到"
+msgstr "回复到 MDN？"
 
 #: src/balsa-message.c:2043
 #, c-format
@@ -1395,6 +1376,8 @@ msgid ""
 "a Message Disposition Notification (MDN) to be returned to `%s'.\n"
 "Do you want to send this notification?"
 msgstr ""
+"该邮件的发送者 %s 要求返回一个邮件处理通知(MDN)到“%s”。\n"
+"您要发送这个通知吗？"
 
 # src/balsa-init.c:590
 #: src/filter-edit-dialog.c:31
@@ -1442,20 +1425,20 @@ msgstr "外部命令"
 
 #: src/filter-edit-dialog.c:50
 msgid "Copy to folder:"
-msgstr "复制到文件夹:"
+msgstr "复制到文件夹："
 
 #: src/filter-edit-dialog.c:51
 msgid "Move to folder:"
-msgstr "移动到文件夹:"
+msgstr "移动到文件夹："
 
 #: src/filter-edit-dialog.c:52
 msgid "Print on printer:"
-msgstr "在打印机上打印:"
+msgstr "在打印机上打印："
 
 # src/filter-edit-dialog.c:506
 #: src/filter-edit-dialog.c:53
 msgid "Run program:"
-msgstr "运行程序:"
+msgstr "运行程序："
 
 #: src/filter-edit-dialog.c:54
 msgid "Send to Trash"
@@ -1484,7 +1467,7 @@ msgstr "新建"
 # src/filter-edit-dialog.c:237
 #: src/filter-edit-dialog.c:263
 msgid "Match in:"
-msgstr "匹配:"
+msgstr "匹配："
 
 # src/filter-edit-dialog.c:255
 #: src/filter-edit-dialog.c:276
@@ -1504,53 +1487,53 @@ msgstr "信体"
 # src/filter-edit-dialog.c:328
 #: src/filter-edit-dialog.c:337
 msgid "Match string:"
-msgstr "匹配串:"
+msgstr "匹配字符串："
 
 # src/filter-edit-dialog.c:391 src/sendmsg-window.c:145
 #: src/filter-edit-dialog.c:384 src/sendmsg-window.c:581
 msgid "Remove"
-msgstr "移除"
+msgstr "删除"
 
 # src/filter-edit-dialog.c:420
 #: src/filter-edit-dialog.c:404
 msgid "Command:"
-msgstr "命令:"
+msgstr "命令："
 
 # src/filter-edit-dialog.c:456
 #. The name entry
 #: src/filter-edit-dialog.c:436
 msgid "Filter name:"
-msgstr "过滤器名:"
+msgstr "过滤器名："
 
 # src/filter-edit-dialog.c:475
 #. The "Process when:" option menu
 #: src/filter-edit-dialog.c:451
 msgid "Process when:"
-msgstr "处理条件:"
+msgstr "处理条件："
 
 # src/filter-edit-dialog.c:506
 #. The "Run on:" option menu
 #: src/filter-edit-dialog.c:472
 msgid "Run on:"
-msgstr "运行于:"
+msgstr "运行于："
 
 # src/filter-edit-dialog.c:536
 #. the type notebook's option menu
 #: src/filter-edit-dialog.c:491
 msgid "Search type:"
-msgstr "搜索类型:"
+msgstr "搜索类型："
 
 # src/filter-edit-dialog.c:592
 #. The notification area
 #: src/filter-edit-dialog.c:538
 msgid "Notification:"
-msgstr "通知:"
+msgstr "通知："
 
 # src/filter-edit-dialog.c:601
 #. Notification buttons
 #: src/filter-edit-dialog.c:547
 msgid "Play sound:"
-msgstr "演奏声音:"
+msgstr "演奏声音："
 
 # src/filter-edit-dialog.c:609
 #: src/filter-edit-dialog.c:554
@@ -1560,29 +1543,29 @@ msgstr "使用声音..."
 # src/filter-edit-dialog.c:618
 #: src/filter-edit-dialog.c:559
 msgid "Popup text:"
-msgstr "弹出文本:"
+msgstr "弹出文本："
 
 # src/filter-edit-dialog.c:637
 #. The action area
 #: src/filter-edit-dialog.c:574
 msgid "Action to perform:"
-msgstr "要执行的动作:"
+msgstr "要执行的动作："
 
 # src/filter-edit-dialog.c:658
 #. The disposition area
 #: src/filter-edit-dialog.c:597
 msgid "Disposition:"
-msgstr "处理:"
+msgstr "处理："
 
 # src/filter-edit-dialog.c:666
 #: src/filter-edit-dialog.c:608
 msgid "Place/leave in default folder"
-msgstr "放置于确省目录"
+msgstr "放置于确省文件夹"
 
 # src/filter-edit-dialog.c:671
 #: src/filter-edit-dialog.c:615
 msgid "Do not place/leave in default folder"
-msgstr "不要放置于开确省目录"
+msgstr "不要放置于开确省文件夹"
 
 # src/filter-edit-dialog.c:676
 #: src/filter-edit-dialog.c:622
@@ -1610,81 +1593,75 @@ msgid "Balsa Filters"
 msgstr "Balsa 过滤器"
 
 #: src/folder-conf.c:63
-#, fuzzy
 msgid "Remote IMAP folder"
-msgstr "单个 IMAP 文件夹"
+msgstr "远程 IMAP 文件夹"
 
 #: src/folder-conf.c:64
-#, fuzzy
 msgid "Create"
-msgstr "字符"
+msgstr "创建"
 
 # src/mailbox-conf.c:648
 #: src/folder-conf.c:73
-#, fuzzy
 msgid "Remote IMAP folder set"
-msgstr "IMAP 文件夹集合"
+msgstr "远程 IMAP 文件夹集合"
 
 #. INPUT FIELD CREATION
 #: src/folder-conf.c:80
 msgid "Descriptive _Name:"
-msgstr ""
+msgstr "描述性名字(_N)："
 
 # src/mailbox-conf.c:723 src/mailbox-conf.c:804
 #. pop server
 #: src/folder-conf.c:85 src/mailbox-conf.c:727 src/mailbox-conf.c:788
-#, fuzzy
 msgid "_Server:"
-msgstr "服务器:"
+msgstr "服务器(_S)："
 
 # src/mailbox-conf.c:818
 #. pop port
 #: src/folder-conf.c:90 src/mailbox-conf.c:733 src/mailbox-conf.c:795
-#, fuzzy
 msgid "_Port:"
-msgstr "端口:"
+msgstr "端口(_P)："
 
 # src/mailbox-conf.c:742 src/mailbox-conf.c:833
 #: src/folder-conf.c:99
-#, fuzzy
 msgid "_User name:"
-msgstr "用户名:"
+msgstr "用户名(_U)："
 
 # src/index-child.c:149 src/mailbox-conf.c:759 src/mailbox-conf.c:848
 #: src/folder-conf.c:104
-#, fuzzy
 msgid "_Password:"
-msgstr "口令"
+msgstr "口令(_P)："
 
 #: src/folder-conf.c:111
 msgid "_Subscribed folders only"
-msgstr ""
+msgstr "只有订阅的文件夹(_S)"
 
 #: src/folder-conf.c:112
 msgid "_Prefix"
-msgstr ""
+msgstr "前缀(_P)"
 
 #: src/folder-conf.c:177
 msgid ""
 "This folder is not stored in configuration.I do not yet know how to remove "
 "it from remote server."
 msgstr ""
+"在配置中没有保存这个文件夹。不知道如何从远程服务器上删除它。"
 
 # src/mailbox-conf.c:166
 #: src/folder-conf.c:185
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "This will remove the folder %s from the list.\n"
 "You may use \"New IMAP Folder\" later to add this folder again.\n"
 "What would you like to do?"
 msgstr ""
-"这将会从邮件箱列表中删去邮件箱 %s\n"
-"您以后可以用 \"添加\" 来再次存取这个邮件箱.\n"
-"您确认您要删除这个邮件箱吗?"
+"这将会从列表中删去文件夹 %s。\n"
+"您仍然可以用“新建 IMAP文件夹”来再次添加此文件夹。\n"
+"您准备如何做？"
 
 #: src/folder-conf.c:190 src/mailbox-conf.c:163 src/mailbox-conf.c:174
 msgid "Remove from list"
-msgstr ""
+msgstr "从列表中删除"
 
 #: src/information-dialog.c:153
 msgid "Balsa Information"
@@ -1692,20 +1669,20 @@ msgstr "Balsa 信息"
 
 #: src/information-dialog.c:210
 msgid "WARNING: "
-msgstr ""
+msgstr "警告："
 
 #: src/information-dialog.c:213
 msgid "ERROR: "
-msgstr ""
+msgstr "错误："
 
 #: src/information-dialog.c:216
 msgid "FATAL: "
-msgstr ""
+msgstr "严重："
 
 # src/mailbox-conf.c:634
 #: src/mailbox-conf.c:131
 msgid "No mailbox selected."
-msgstr "没有选择邮件箱."
+msgstr "没有选择邮件箱。"
 
 # src/mailbox-conf.c:166
 #: src/mailbox-conf.c:157

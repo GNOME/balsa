@@ -215,8 +215,9 @@ static void prepare_url_offsets(GtkTextBuffer * buffer, GList * url_list);
 
 
 #ifdef HAVE_GPGME
-static gint balsa_message_scan_signatures(LibBalsaMessageBody *body,
-                                          LibBalsaMessage * message);
+static LibBalsaMsgProtectState
+    balsa_message_scan_signatures(LibBalsaMessageBody *body,
+				  LibBalsaMessage * message);
 static void balsa_message_set_crypto(LibBalsaMessage * message);
 static void add_header_sigstate(BalsaMessage * bm, GtkTextView *view,
                                 LibBalsaSignatureInfo *siginfo);
@@ -3701,10 +3702,10 @@ balsa_message_zoom(BalsaMessage * bm, gint in_out)
  * Scan all bodies for RFC3156 signed and/or encrypted parts and return the
  * combined result of the check.
  */
-static gint
+static LibBalsaMsgProtectState
 balsa_message_scan_signatures(LibBalsaMessageBody *body, LibBalsaMessage * message)
 {
-    gint result = LIBBALSA_MESSAGE_SIGNATURE_UNKNOWN;
+    LibBalsaMsgProtectState result = LIBBALSA_MSG_PROTECT_NONE;
     gchar *sender;
     gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
 
@@ -3734,25 +3735,25 @@ balsa_message_scan_signatures(LibBalsaMessageBody *body, LibBalsaMessage * messa
                         /* check if we trust this signature at least marginally */
                         if (checkResult->validity >= GPGME_VALIDITY_MARGINAL &&
                             checkResult->trust >= GPGME_VALIDITY_MARGINAL) {
-                            if (result <= LIBBALSA_MESSAGE_SIGNATURE_GOOD)
-                                result = LIBBALSA_MESSAGE_SIGNATURE_GOOD;
+                            if (result <= LIBBALSA_MSG_PROTECT_SIGN_GOOD)
+                                result = LIBBALSA_MSG_PROTECT_SIGN_GOOD;
                             libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
                                                  _("detected a good signature"));
                         } else {
-                            if (result <= LIBBALSA_MESSAGE_SIGNATURE_NOTRUST)
-                                result = LIBBALSA_MESSAGE_SIGNATURE_NOTRUST;
+                            if (result <= LIBBALSA_MSG_PROTECT_SIGN_NOTRUST)
+                                result = LIBBALSA_MSG_PROTECT_SIGN_NOTRUST;
                             libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
                                                  _("detected a good signature with insufficient validity/trust"));
                         }
                     } else {
-                        result = LIBBALSA_MESSAGE_SIGNATURE_BAD;
+                        result = LIBBALSA_MSG_PROTECT_SIGN_BAD;
                         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                              _("Checking the signature of the message sent by %s with subject \"%s\" returned:\n%s"),
                                              sender, subject,
                                              libbalsa_gpgme_sig_stat_to_gchar(checkResult->status));
                     }
                 } else {
-                    result = LIBBALSA_MESSAGE_SIGNATURE_BAD;
+                    result = LIBBALSA_MSG_PROTECT_SIGN_BAD;
                     libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                          _("Checking the signature of the message sent by %s with subject \"%s\" failed with an error!"),
                                          sender, subject);
@@ -3765,7 +3766,7 @@ balsa_message_scan_signatures(LibBalsaMessageBody *body, LibBalsaMessage * messa
 
         /* scan embedded messages */
         if (body->parts) {
-            gint sub_result =
+            LibBalsaMsgProtectState sub_result =
                 balsa_message_scan_signatures(body->parts, message);
             if (sub_result >= result)
                 result = sub_result;
@@ -3817,9 +3818,9 @@ balsa_message_set_crypto(LibBalsaMessage * message)
     }
     
     /* scan the message for signatures */
-    message->sig_state = 
+    message->prot_state = 
         balsa_message_scan_signatures(message->body_list, message);
-    if (message->sig_state != LIBBALSA_MESSAGE_SIGNATURE_UNKNOWN) {
+    if (message->prot_state != LIBBALSA_MSG_PROTECT_NONE) {
         GList *notify = NULL;
         notify = g_list_append(notify, message);
         /* send the message the signal to update the signature status icon.
@@ -3933,18 +3934,22 @@ part_info_init_mimetext_rfc2440(BalsaMessage * bm, BalsaPartInfo * info,
     rfc2440mode &= LIBBALSA_PROTECT_MODE;
         
     /* do the rfc2440 stuff */
-    if (rfc2440mode == LIBBALSA_PROTECT_SIGN)
+    if (rfc2440mode == LIBBALSA_PROTECT_SIGN) {
         sig_res = 
             libbalsa_rfc2440_check_signature(ptr, charset, 
                                              TRUE, &info->body->sig_info,
                                              balsa_app.date_string);
-    else
+	if (bm->message->prot_state < LIBBALSA_MSG_PROTECT_SIGN_UNKNOWN)
+	    bm->message->prot_state = LIBBALSA_MSG_PROTECT_SIGN_UNKNOWN;
+    } else {
         sig_res = 
             libbalsa_rfc2440_decrypt_buffer(ptr, charset, 
                                             balsa_app.convert_unknown_8bit,
                                             balsa_app.convert_unknown_8bit_codeset,
                                             TRUE, &info->body->sig_info,
                                             balsa_app.date_string, NULL);
+	bm->message->prot_state = LIBBALSA_MSG_PROTECT_CRYPT;
+    }
         
     if (sig_res == GPG_ERR_NO_ERROR) {
         if (info->body->sig_info->validity >= GPGME_VALIDITY_MARGINAL &&
@@ -3955,6 +3960,8 @@ part_info_init_mimetext_rfc2440(BalsaMessage * bm, BalsaPartInfo * info,
                                        GTK_ICON_SIZE_MENU, NULL);
             libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
                                  _("detected a good signature"));
+	    if (bm->message->prot_state < LIBBALSA_MSG_PROTECT_SIGN_GOOD)
+		bm->message->prot_state = LIBBALSA_MSG_PROTECT_SIGN_GOOD;
         } else {
             content_icon =
                 gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
@@ -3962,6 +3969,8 @@ part_info_init_mimetext_rfc2440(BalsaMessage * bm, BalsaPartInfo * info,
                                        GTK_ICON_SIZE_MENU, NULL);
             libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
                                  _("detected a good signature with insufficient validity/trust"));
+	    if (bm->message->prot_state < LIBBALSA_MSG_PROTECT_SIGN_NOTRUST)
+		bm->message->prot_state = LIBBALSA_MSG_PROTECT_SIGN_NOTRUST;
         }
     } else if (sig_res != GPG_ERR_USER_16 && sig_res != GPG_ERR_CANCELED) {
         gchar *sender = bm_sender_to_gchar(bm->message->headers->from, -1);
@@ -3983,6 +3992,8 @@ part_info_init_mimetext_rfc2440(BalsaMessage * bm, BalsaPartInfo * info,
             gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
                                    BALSA_PIXMAP_INFO_SIGN_BAD,
                                    GTK_ICON_SIZE_MENU, NULL);
+	if (bm->message->prot_state < LIBBALSA_MSG_PROTECT_SIGN_BAD)
+	    bm->message->prot_state = LIBBALSA_MSG_PROTECT_SIGN_BAD;
     } else if (rfc2440mode == LIBBALSA_PROTECT_ENCRYPT)
         content_icon =
             gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
@@ -4008,6 +4019,15 @@ part_info_init_mimetext_rfc2440(BalsaMessage * bm, BalsaPartInfo * info,
     fwrite(*ptr, strlen(*ptr), 1, fp);
     fflush(fp);
     g_free(charset);
+
+    /* update the icon if necessary */
+    if (bm->message->prot_state != LIBBALSA_MSG_PROTECT_NONE) {
+	GList *notify = NULL;
+
+	notify = g_list_append(notify, bm->message);
+	g_signal_emit_by_name(G_OBJECT(bm->message->mailbox), 
+			      "messages-status-changed", notify, 42);
+    }
 
     return rfc2440_no_pubkey;
 }

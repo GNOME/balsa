@@ -191,6 +191,14 @@ libbalsa_signature_info_destroy(LibBalsaSignatureInfo* info)
 	g_free(info->sign_email);
     if (info->fingerprint)
 	g_free(info->fingerprint);
+    if (info->issuer_serial)
+	g_free(info->issuer_serial);
+    if (info->issuer_name)
+	g_free(info->issuer_name);
+    if (info->chain_id)
+	g_free(info->chain_id);
+    if (info->sign_uid)
+	g_free(info->sign_uid);
     g_free(info);
     return NULL;
 }
@@ -206,33 +214,55 @@ libbalsa_signature_info_to_gchar(LibBalsaSignatureInfo * info,
     g_return_val_if_fail(info != NULL, NULL);
     g_return_val_if_fail(date_string != NULL, NULL);
 
-    msg = g_string_new(libbalsa_gpgme_sig_stat_to_gchar(info->status));
-    if (info->sign_name || info->sign_email || info->fingerprint) {
-	if (info->sign_name) {
-	    g_string_append_printf(msg, _("\nSigned by: %s"), info->sign_name);
-	    if (info->sign_email)
-		g_string_append_printf(msg, " <%s>", info->sign_email);
-	} else if (info->sign_email)
-	    g_string_append_printf(msg, _("Mail address: %s"),
-				   info->sign_email);
-	g_string_append_printf(msg, _("\nValidity: %s"),
-			       libbalsa_gpgme_validity_to_gchar(info->validity));
+    switch (info->protocol) {
+    case GPGME_PROTOCOL_OpenPGP:
+	msg = g_string_new(_("PGP Signature: "));
+	break;
+    case GPGME_PROTOCOL_CMS:
+	msg = g_string_new(_("S/MIME Signature: "));
+	break;
+    default:
+	msg = g_string_new(_("(unknown protocol) "));
+    }
+    msg = g_string_append(msg, libbalsa_gpgme_sig_stat_to_gchar(info->status));
+
+    if (info->sign_uid && strlen(info->sign_uid))
+	g_string_append_printf(msg, _("\nUser ID: %s"), info->sign_uid);
+    else if (info->sign_name && strlen(info->sign_name)) {
+	g_string_append_printf(msg, _("\nSigned by: %s"), info->sign_name);
+	if (info->sign_email && strlen(info->sign_email))
+	    g_string_append_printf(msg, " <%s>", info->sign_email);
+    } else if (info->sign_email && strlen(info->sign_email))
+	g_string_append_printf(msg, _("\nMail address: %s"),
+			       info->sign_email);
+
+    if (info->sign_time) {
+	gchar buf[128];
+	strftime(buf, 127, date_string, localtime(&info->sign_time));
+	g_string_append_printf(msg, _("\nSigned on: %s"), buf);
+    }
+    g_string_append_printf(msg, _("\nValidity: %s"),
+			   libbalsa_gpgme_validity_to_gchar(info->validity));
+    if (info->protocol == GPGME_PROTOCOL_OpenPGP)
 	g_string_append_printf(msg, _("\nOwner trust: %s"),
 			       libbalsa_gpgme_validity_to_gchar_short(info->trust));
-	if (info->fingerprint)
-	    g_string_append_printf(msg, _("\nKey fingerprint: %s"),
-				   info->fingerprint);
-	if (info->key_created) {
-	    gchar buf[128];
-	    strftime(buf, 127, date_string, localtime(&info->key_created));
-	    g_string_append_printf(msg, _("\nKey created on: %s"), buf);
-	}
-	if (info->sign_time) {
-	    gchar buf[128];
-	    strftime(buf, 127, date_string, localtime(&info->sign_time));
-	    g_string_append_printf(msg, _("\nSigned on: %s"), buf);
-	}
+    if (info->fingerprint)
+	g_string_append_printf(msg, _("\nKey fingerprint: %s"),
+			       info->fingerprint);
+    if (info->key_created) {
+	gchar buf[128];
+	strftime(buf, 127, date_string, localtime(&info->key_created));
+	g_string_append_printf(msg, _("\nKey created on: %s"), buf);
     }
+    if (info->issuer_name)
+	g_string_append_printf(msg, _("\nIssuer name: %s"),
+			       info->issuer_name);
+    if (info->issuer_serial)
+	g_string_append_printf(msg, _("\nIssuer serial number: %s"),
+			       info->issuer_serial);
+    if (info->chain_id)
+	g_string_append_printf(msg, _("\nChain ID: %s"),
+			       info->chain_id);
 
     retval = msg->str;
     g_string_free(msg, FALSE);
@@ -1514,6 +1544,7 @@ get_sig_info_from_ctx(LibBalsaSignatureInfo* info, gpgme_ctx_t ctx)
 {
     gpgme_verify_result_t result;
     gpgme_key_t key;
+    gpgme_user_id_t uid;
 	
     info->status = GPG_ERR_USER_16; /* no signature available */
 
@@ -1526,11 +1557,24 @@ get_sig_info_from_ctx(LibBalsaSignatureInfo* info, gpgme_ctx_t ctx)
     gpgme_get_key(ctx, info->fingerprint, &key, 0);
     if (key == NULL)
 	return;
+    info->protocol = key->protocol;
+    info->issuer_serial = g_strdup(key->issuer_serial);
+    info->issuer_name = g_strdup(key->issuer_name);
+    info->chain_id = g_strdup(key->chain_id);
     info->trust = key->owner_trust;
-    if (key->uids) {
-	info->validity = key->uids->validity;
-	info->sign_name = g_strdup(key->uids->name);
-	info->sign_email = g_strdup(key->uids->email);
+    uid = key->uids;
+    if (uid)
+	info->validity = uid->validity;
+    while (uid) {
+	if (!info->sign_name && uid->name && strlen(uid->name))
+	    info->sign_name = g_strdup(uid->name);
+	if (!info->sign_email && uid->email && strlen(uid->email))
+	    info->sign_email = g_strdup(uid->email);
+	if (!info->sign_email && uid->email && strlen(uid->email))
+	    info->sign_email = g_strdup(uid->email);
+	if (!info->sign_uid && uid->uid && strlen(uid->uid))
+	    info->sign_uid = g_strdup(uid->uid);
+	uid = uid->next;
     }
     if (key->subkeys)
 	info->key_created = key->subkeys->timestamp;
@@ -1540,7 +1584,7 @@ get_sig_info_from_ctx(LibBalsaSignatureInfo* info, gpgme_ctx_t ctx)
 
 /* stuff to get a key fingerprint from a selection list */
 enum {
-    GPG_KEY_FP_COLUMN = 0,
+    GPG_KEY_USER_ID_COLUMN = 0,
     GPG_KEY_ID_COLUMN,
     GPG_KEY_VALIDITY_COLUMN,
     GPG_KEY_TRUST_COLUMN,
@@ -1550,7 +1594,7 @@ enum {
 };
 
 static gchar *col_titles[] =
-    { N_("Fingerprint"), N_("Key ID"), N_("Validity"), N_("Owner trust"),
+    { N_("User ID"), N_("Key ID"), N_("Validity"), N_("Owner trust"),
       N_("Length") };
 
 
@@ -1630,22 +1674,23 @@ select_key_from_list(int secret_only, const gchar *for_address, GList *keys,
     while (keys) {
 	gpgme_key_t key = (gpgme_key_t)keys->data;
 
-	gtk_tree_store_append (GTK_TREE_STORE (model), &iter, NULL);
-	gtk_tree_store_set (GTK_TREE_STORE (model), &iter,
-			    GPG_KEY_FP_COLUMN,
-			    key->subkeys->fpr ? key->subkeys->fpr : "",
-			    GPG_KEY_ID_COLUMN,
-			    key->subkeys->keyid,
-			    GPG_KEY_VALIDITY_COLUMN, 
-			    libbalsa_gpgme_validity_to_gchar_short(key->uids->validity),
-			    GPG_KEY_TRUST_COLUMN, 
-			    libbalsa_gpgme_validity_to_gchar_short(key->owner_trust),
-			    GPG_KEY_LENGTH_COLUMN,
-			    key->subkeys->length,
-			    GPG_KEY_PTR_COLUMN,
-			    key,
-			    -1);
-
+	if (key->subkeys) {
+	    gtk_tree_store_append (GTK_TREE_STORE (model), &iter, NULL);
+	    gtk_tree_store_set (GTK_TREE_STORE (model), &iter,
+				GPG_KEY_USER_ID_COLUMN,
+				key->uids && key->uids->uid ? key->uids->uid : "",
+				GPG_KEY_ID_COLUMN,
+				key->subkeys->keyid,
+				GPG_KEY_VALIDITY_COLUMN, 
+				libbalsa_gpgme_validity_to_gchar_short(key->uids->validity),
+				GPG_KEY_TRUST_COLUMN, 
+				libbalsa_gpgme_validity_to_gchar_short(key->owner_trust),
+				GPG_KEY_LENGTH_COLUMN,
+				key->subkeys->length,
+				GPG_KEY_PTR_COLUMN,
+				key,
+				-1);
+	}
 	keys = g_list_next(keys);
     }
   
@@ -1680,6 +1725,8 @@ select_key_from_list(int secret_only, const gchar *for_address, GList *keys,
  * Get a key for name. If necessary, a dialog is shown to select
  * a key from a list. Return NULL if something failed.
  */
+#define KEY_IS_OK(k)   (!((k)->expired || (k)->revoked || \
+                          (k)->disabled || (k)->invalid))
 static gpgme_key_t
 get_key_from_name(gpgme_ctx_t ctx, const gchar *name, int secret_only,
 		  GtkWindow *parent)
@@ -1695,7 +1742,8 @@ get_key_from_name(gpgme_ctx_t ctx, const gchar *name, int secret_only,
 	return NULL;
     }
     while ((err = gpgme_op_keylist_next(ctx, &key)) == GPG_ERR_NO_ERROR)
-	keys = g_list_append(keys, key);
+	if (KEY_IS_OK(key) && key->subkeys && KEY_IS_OK(key->subkeys))
+	    keys = g_list_append(keys, key);
     if (gpg_err_code(err) != GPG_ERR_EOF) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 			     _("%s: could not retrieve key for %s: %s"),

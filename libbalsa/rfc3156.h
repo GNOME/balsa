@@ -50,12 +50,17 @@
 typedef struct _LibBalsaSignatureInfo LibBalsaSignatureInfo;
 
 struct _LibBalsaSignatureInfo {
+    gpgme_protocol_t protocol;
     gpgme_error_t status;
     gpgme_validity_t validity;
     gpgme_validity_t trust;
     gchar *sign_name;
     gchar *sign_email;
     gchar *fingerprint;
+    gchar *sign_uid;
+    gchar *issuer_serial;
+    gchar *issuer_name;
+    gchar *chain_id;
     time_t key_created;
     time_t sign_time;
 };

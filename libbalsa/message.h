@@ -70,10 +70,16 @@ enum _LibBalsaMsgCreateResult {
 };
 
 #ifdef HAVE_GPGME
-#define  LIBBALSA_MESSAGE_SIGNATURE_UNKNOWN     0
-#define  LIBBALSA_MESSAGE_SIGNATURE_GOOD        1
-#define  LIBBALSA_MESSAGE_SIGNATURE_NOTRUST     2
-#define  LIBBALSA_MESSAGE_SIGNATURE_BAD         3
+typedef enum _LibBalsaMsgProtectState LibBalsaMsgProtectState;
+
+enum _LibBalsaMsgProtectState {
+    LIBBALSA_MSG_PROTECT_NONE,
+    LIBBALSA_MSG_PROTECT_SIGN_UNKNOWN,
+    LIBBALSA_MSG_PROTECT_SIGN_GOOD,
+    LIBBALSA_MSG_PROTECT_SIGN_NOTRUST,
+    LIBBALSA_MSG_PROTECT_SIGN_BAD,
+    LIBBALSA_MSG_PROTECT_CRYPT
+};
 #endif
 
 /*
@@ -157,8 +163,8 @@ struct _LibBalsaMessage {
     /* GPG sign and/or encrypt message (sending) */
     guint gpg_mode;
 
-    /* signature status (received message) */
-    gint sig_state;
+    /* protection (i.e. sign/encrypt) status (received message) */
+    LibBalsaMsgProtectState prot_state;
 #endif
 
     /* a forced multipart subtype or NULL for mixed */

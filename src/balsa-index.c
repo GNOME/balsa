@@ -1243,45 +1243,61 @@ bndx_set_col_images(BalsaIndex * index, GtkTreeIter * iter,
      * balsa_icon_get_bitmap(BALSA_PIXMAP_INFO_READ)); 
      */
 
-    if (libbalsa_message_has_attachment(message))
-        attach_pixbuf =
-            gtk_widget_render_icon(GTK_WIDGET(index->window),
-                                   BALSA_PIXMAP_INFO_ATTACHMENT,
-                                   GTK_ICON_SIZE_MENU, NULL);
 #ifdef HAVE_GPGME
-    else if (libbalsa_message_is_pgp_signed(message)) {
-	switch (message->sig_state)
+    if (message->prot_state != LIBBALSA_MSG_PROTECT_NONE) {
+	switch (message->prot_state)
 	    {
-	    case LIBBALSA_MESSAGE_SIGNATURE_GOOD:
+	    case LIBBALSA_MSG_PROTECT_CRYPT:
+		attach_pixbuf =
+		    gtk_widget_render_icon(GTK_WIDGET(index->window),
+					   BALSA_PIXMAP_INFO_ENCR,
+					   GTK_ICON_SIZE_MENU, NULL);
+		break;
+	    case LIBBALSA_MSG_PROTECT_SIGN_UNKNOWN:
+		attach_pixbuf =
+		    gtk_widget_render_icon(GTK_WIDGET(index->window),
+					   BALSA_PIXMAP_INFO_SIGN,
+					   GTK_ICON_SIZE_MENU, NULL);
+		break;
+	    case LIBBALSA_MSG_PROTECT_SIGN_GOOD:
 		attach_pixbuf =
 		    gtk_widget_render_icon(GTK_WIDGET(index->window),
 					   BALSA_PIXMAP_INFO_SIGN_GOOD,
 					   GTK_ICON_SIZE_MENU, NULL);
 		break;
-	    case LIBBALSA_MESSAGE_SIGNATURE_NOTRUST:
+	    case LIBBALSA_MSG_PROTECT_SIGN_NOTRUST:
 		attach_pixbuf =
 		    gtk_widget_render_icon(GTK_WIDGET(index->window),
 					   BALSA_PIXMAP_INFO_SIGN_NOTRUST,
 					   GTK_ICON_SIZE_MENU, NULL);
 		break;
-	    case LIBBALSA_MESSAGE_SIGNATURE_BAD:
+	    case LIBBALSA_MSG_PROTECT_SIGN_BAD:
 		attach_pixbuf =
 		    gtk_widget_render_icon(GTK_WIDGET(index->window),
 					   BALSA_PIXMAP_INFO_SIGN_BAD,
 					   GTK_ICON_SIZE_MENU, NULL);
 		break;
 	    default:
-		attach_pixbuf =
-		    gtk_widget_render_icon(GTK_WIDGET(index->window),
-					   BALSA_PIXMAP_INFO_SIGN,
-					   GTK_ICON_SIZE_MENU, NULL);
+		g_warning("%s:%s:%d: message->prot_state == %d", __FILE__,
+			  __FUNCTION__, __LINE__, message->prot_state);
 	    }
-    } else if (libbalsa_message_is_pgp_encrypted(message))
+    } else if (libbalsa_message_is_pgp_signed(message))
+	attach_pixbuf =
+	    gtk_widget_render_icon(GTK_WIDGET(index->window),
+				   BALSA_PIXMAP_INFO_SIGN,
+				   GTK_ICON_SIZE_MENU, NULL);
+    else if (libbalsa_message_is_pgp_encrypted(message))
         attach_pixbuf =
             gtk_widget_render_icon(GTK_WIDGET(index->window),
                                    BALSA_PIXMAP_INFO_ENCR,
                                    GTK_ICON_SIZE_MENU, NULL);
+    else
 #endif
+    if (libbalsa_message_has_attachment(message))
+        attach_pixbuf =
+            gtk_widget_render_icon(GTK_WIDGET(index->window),
+                                   BALSA_PIXMAP_INFO_ATTACHMENT,
+                                   GTK_ICON_SIZE_MENU, NULL);
 
     gtk_tree_store_set(GTK_TREE_STORE(model), iter,
                        BNDX_STATUS_COLUMN, status_pixbuf,

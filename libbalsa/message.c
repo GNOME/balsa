@@ -102,6 +102,9 @@ libbalsa_message_init(LibBalsaMessage * message)
     message->body_ref = 0;
     message->body_list = NULL;
     message->references_for_threading = NULL;
+#ifdef HAVE_GPGME
+    message->prot_state = LIBBALSA_MSG_PROTECT_NONE;
+#endif
 }
 
 

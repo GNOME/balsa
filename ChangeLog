@@ -1,3 +1,11 @@
+2004-02-07  Albrecht Dreß
+
+	* libbalsa/message.[hc]: add and initialize prot_state field.
+	* libbalsa/rfc3156.[hc]: number of improvements, see
+	http://mail.gnome.org/archives/balsa-list/2004-January/msg00209.html
+	* src/balsa-index.c: show GPG status whenever available.
+	* src/balsa-message.c: changes to _scan_signatures()
+
 2004-02-01 09:11  PeterB
 
 	* libbalsa/address-entry.h: include "address.h".

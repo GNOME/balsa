@@ -236,6 +236,11 @@ config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
 
     *special = mailbox;
     gtk_object_ref(GTK_OBJECT(mailbox));
+
+    if(which == SPECIAL_SENT) {
+	balsa_mblist_mru_add(&balsa_app.fcc_mru, mailbox->url);
+    }    
+
     if(do_rescan_for) balsa_mailbox_local_rescan_parent(do_rescan_for);
 }
 

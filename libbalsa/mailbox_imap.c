@@ -219,13 +219,13 @@ libbalsa_mailbox_imap_update_url(LibBalsaMailboxImap* mailbox)
     LibBalsaServer* s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
     g_free(LIBBALSA_MAILBOX(mailbox)->url);
     LIBBALSA_MAILBOX(mailbox)->url =  
-        g_strdup_printf("imap%s://%s/%s", 
+        g_strdup_printf("imap%s://%s@%s/%s", 
 #ifdef USE_SSL
                         s->use_ssl ? "s" : "",
 #else
                         "",
 #endif
-                        s->host, mailbox->path? mailbox->path : "");
+                        s->user, s->host, mailbox->path? mailbox->path : "");
 }
 
 /* Unregister an old notification and add a current one */

@@ -1,5 +1,7 @@
-2004-07-29 12:06  PeterB
+2004-07-29 13:35  PeterB
 
+	* src/main-window.c: set sensitivity of next/previous/next-unread
+	message menu items.
 	* src/main-window.c: remove weak pointer when clearing
 	window->current_message.
 	* src/balsa-index.c: blank the display when next/previous fails

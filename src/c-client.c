@@ -130,7 +130,7 @@ mm_flags (MAILSTREAM * stream, unsigned long number)
 {
   if (balsa_app.debug)
     {
-      g_print ("Flags changed for message number: %d\n", number);
+      g_print ("Message %d in mailbox %s changed.\n", number, stream->mailbox);
     }
 }
 
@@ -230,7 +230,7 @@ mm_critical (MAILSTREAM * stream)
 {
   if (balsa_app.debug)
     {
-      g_print ("fixing to do some critical stuff to mail stream, do not interupt\n");
+      g_print ("Mailbox: %s - entering critical mode.\n", stream->mailbox);
     }
 }
 
@@ -240,7 +240,7 @@ mm_nocritical (MAILSTREAM * stream)
 {
   if (balsa_app.debug)
     {
-      g_print ("no longer in critical mode\n");
+      g_print ("Mailbox: %s - exiting critical mode.\n", stream->mailbox);
     }
 }
 

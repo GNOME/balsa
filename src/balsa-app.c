@@ -54,6 +54,8 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.main_window = NULL;
   balsa_app.addressbook_list = NULL;
 
+  balsa_app.timer = 0;
+
   load_global_settings ();
   options_init ();
   setup_local_mailboxes ();
@@ -61,6 +63,7 @@ init_balsa_app (int argc, char *argv[])
 
   /* create main window */
   balsa_app.main_window = create_main_window ();
+  balsa_app.timer = gtk_timeout_add (5*60*1000, current_mailbox_check, NULL);
 }
 
 static gint

@@ -47,6 +47,8 @@ struct
     MainWindow *main_window;
 
     GList *addressbook_list;
+
+    gint timer;
   }
 balsa_app;
 

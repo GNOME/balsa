@@ -181,6 +181,6 @@ int mailbox_open (Mailbox * mailbox);
 
 void mailbox_close (Mailbox * mailbox);
 
-void current_mailbox_check ();
+gint current_mailbox_check ();
 
 #endif /* __MAILBOX_H__ */

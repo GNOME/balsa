@@ -482,9 +482,12 @@ mailbox_close (Mailbox * mailbox)
 
 /* this is lame -- we need to replace this with a good
  * mailbox checking mechanism */
-void
+gint
 current_mailbox_check ()
 {
   mail_ping (balsa_app.current_mailbox->stream);
-  system("cat /home/pavlov/balsa/src/sounds/yougotmail.wav>/dev/dsp &");
+/*
+ * system("cat sounds/yougotmail.wav>/dev/dsp &");
+ */
+  return TRUE;
 }

@@ -213,9 +213,6 @@ mailboxes_init(void)
 	balsa_init_begin();
 	return;
     }
-    gdk_threads_enter();
-    config_views_load();
-    gdk_threads_leave();
 }
 
 
@@ -318,7 +315,6 @@ scan_mailboxes_idle_cb()
     g_node_traverse(balsa_app.mailbox_nodes, G_POST_ORDER, G_TRAVERSE_ALL, -1,
                     append_subtree_f, NULL);
     balsa_mailbox_nodes_unlock(TRUE);
-    config_views_load();
     balsa_mblist_repopulate(balsa_app.mblist_tree_store);
     gdk_threads_leave();
 
@@ -330,11 +326,8 @@ scan_mailboxes_idle_cb()
 	g_idle_add((GSourceFunc) open_mailboxes_idle_cb, urls);
     }
 
-    if (balsa_app.open_mailbox_vector) {
-	g_idle_add((GSourceFunc) open_mailboxes_idle_cb,
-		     balsa_app.open_mailbox_vector);
-	balsa_app.open_mailbox_vector = NULL;
-    }
+    if (balsa_app.remember_open_mboxes)
+	g_idle_add((GSourceFunc) open_mailboxes_idle_cb, NULL);
 
     if (cmd_open_inbox || balsa_app.open_inbox_upon_startup)
 	g_idle_add((GSourceFunc) initial_open_inbox, NULL);

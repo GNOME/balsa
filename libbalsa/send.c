@@ -80,7 +80,7 @@ add_mutt_body_plain (void)
 }
 
 gboolean
-balsa_send_message (Message * message, gchar * smtp_server, glong debug)
+balsa_send_message (Message * message)
 {
   HEADER *msg;
   BODY *last, *newbdy;
@@ -197,7 +197,23 @@ balsa_send_message (Message * message, gchar * smtp_server, glong debug)
 }
 
 gint
-send_file_as_msg(gchar* to, gchar* filename)
+send_file_as_msg (gchar * from, gchar * to, gchar * filename)
 {
-  ;
+  Message *message;
+  Body *body;
+
+  message = message_new ();
+  message->from = address_new ();
+  /* FIXME */
+  message->from->personal = g_strdup (from);
+  message->subject = g_strdup (filename);
+  message->to_list = make_list_from_string (to);
+
+  body = body_new ();
+  body->filename = g_strdup (filename);
+  message->body_list = g_list_append (message->body_list, body);
+
+  balsa_send_message (message);
+
+  message_free (message);
 }

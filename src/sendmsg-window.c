@@ -707,7 +707,7 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   }
 
 
-  if (balsa_send_message (message, balsa_app.smtp_server, balsa_app.debug))
+  if (balsa_send_message (message))
     if (bsmsg->type == SEND_REPLY)
       {
 	if (bsmsg->orig_message)

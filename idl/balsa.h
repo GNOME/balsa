@@ -23,7 +23,7 @@ extern "C" {
 #endif				/* !_balsa_simple_send_defined */
 
    extern CORBA_unsigned_long balsa_simple_send__classid;
-   extern CORBA_long balsa_simple_send_send_file_as_message(balsa_simple_send _obj, CORBA_char * to, CORBA_char * filename, CORBA_Environment * ev);
+   extern CORBA_long balsa_simple_send_send_file_as_message(balsa_simple_send _obj, CORBA_char * from, CORBA_char * to, CORBA_char * filename, CORBA_Environment * ev);
 
    /* server-side (via the POA) data structures and methods */
 #ifndef _POA_balsa_simple_send__epv_defined
@@ -31,7 +31,7 @@ extern "C" {
 
    typedef struct {
       void *_private;
-       CORBA_long(*send_file_as_message) (PortableServer_Servant servant, CORBA_char * to, CORBA_char * filename, CORBA_Environment * ev);
+       CORBA_long(*send_file_as_message) (PortableServer_Servant servant, CORBA_char * from, CORBA_char * to, CORBA_char * filename, CORBA_Environment * ev);
    } POA_balsa_simple_send__epv;
 #endif				/* !_POA_balsa_simple_send__epv_defined */
 

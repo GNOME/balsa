@@ -13,6 +13,7 @@ static void impl_balsa_simple_send__destroy(impl_POA_balsa_simple_send * servant
 
 CORBA_long
 impl_balsa_simple_send_send_file_as_message(impl_POA_balsa_simple_send * servant,
+					    CORBA_char * froM,
 					    CORBA_char * to,
 					    CORBA_char * filename,
 					    CORBA_Environment * ev);
@@ -68,11 +69,12 @@ impl_balsa_simple_send__destroy(impl_POA_balsa_simple_send * servant, CORBA_Envi
 
 CORBA_long
 impl_balsa_simple_send_send_file_as_message(impl_POA_balsa_simple_send * servant,
+					    CORBA_char * from,
 					    CORBA_char * to,
 					    CORBA_char * filename,
 					    CORBA_Environment * ev)
 {
    CORBA_long retval;
-   retval = send_file_as_msg(to, filename);
+   retval = send_file_as_msg(from, to, filename);
    return retval;
 }

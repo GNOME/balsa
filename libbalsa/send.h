@@ -25,7 +25,7 @@ extern "C"
 {
 #endif				/* __cplusplus */
 
-gboolean balsa_send_message (Message * message, gchar * smtp_server, glong debug);
+  gboolean balsa_send_message (Message * message);
 
 
 #ifdef __cplusplus

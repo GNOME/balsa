@@ -374,7 +374,7 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox)
 
     gtk_signal_emit(GTK_OBJECT(mailbox),
 		    libbalsa_mailbox_signals[CLOSE_MAILBOX]);
-    mailbox->context = NULL;
+    if(mailbox->open_ref <1) mailbox->context = NULL;
 }
 
 LibBalsaMailboxAppendHandle* 

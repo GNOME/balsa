@@ -1,5 +1,14 @@
 2002-01-05  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* libbalsa/mailbox.c: set context to NULL only when really closed.
+	* libbalsa/mailbox_imap.c: clean cache properly, not only first
+	item.
+	* libbalsa/mailbox_imap.h: LibbalsaMailboxImap::path is the path
+	on the server.
+	* libbalsa/message.c: extra safety test.
+
+2002-01-05  Pawel Salek  <pawsa@theochem.kth.se>
+
 	Message content caching. keep server names together with ports.
 	* libbalsa/folder-scanners.c: get rid of separate port numbers.
 	* libbalsa/mailbox.[hc]: mailbox_open returns status

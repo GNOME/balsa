@@ -46,7 +46,7 @@ typedef guint32 ImapUID;
 struct _LibBalsaMailboxImap {
     LibBalsaMailboxRemote mailbox;
 
-    gchar *path;		/* Imap path {host:port}mailbox */
+    gchar *path;		/* Imap local path (third part of URL) */
     ImapAuthType auth_type;	/* accepted authentication type */
     ImapUID      uid_validity;
 };

@@ -881,15 +881,11 @@ libbalsa_message_is_multipart(LibBalsaMessage * message)
 
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
     g_return_val_if_fail(message->mailbox, FALSE);
+    g_return_val_if_fail(CLIENT_CONTEXT(message->mailbox), FALSE);
     g_return_val_if_fail(CLIENT_CONTEXT(message->mailbox)->hdrs, FALSE);
 
     msg_header = message->header;	
-
-    if (msg_header->content->type == TYPEMULTIPART) {
-	return TRUE;
-    }
-    
-    return FALSE;
+    return msg_header->content->type == TYPEMULTIPART;
 }
 
 gboolean

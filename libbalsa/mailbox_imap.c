@@ -570,7 +570,7 @@ clean_cache(LibBalsaMailbox* mailbox)
     key.dsize = sizeof(ImapUID)*2;
     uid[0]    = uid_validity;    
     for(lst = remove_list; lst; lst = lst->next) {
-        uid[1] = POINTER_TO_UID(remove_list->data);
+        uid[1] = POINTER_TO_UID(lst->data);
         gdbm_delete(dbf, key);
         printf("Removed %d/%05d msg from cache\n", uid[0], uid[1]);
     }

@@ -129,7 +129,7 @@ load_mailboxes (gchar * name)
   gint type;
   GString *gstring;
   gchar *path;
-  mh[PATH_MAX + 1];
+  gchar mh[PATH_MAX + 1];
   gstring = g_string_new (NULL);
 
 

@@ -1,5 +1,7 @@
-2000-10-10  Carlos Morgado  <chbm@chbm.nu>
+2000-10-11  Carlos Morgado  <chbm@chbm.nu>
 
+	* src/balsa-index-page.c: fixed bug 26372 - delete from right click 
+	on trash folder didn't work 
 	* src/balsa-index-page.c: fixed typo that broke compilation. 
 
 2000-10-09  Ian Campbell  <ijc25@cam.ac.uk>

@@ -525,7 +525,7 @@ create_menu(BalsaIndex * bindex)
 			       _("Undelete"), balsa_message_undelete,
 			       bindex, !bindex->mailbox->readonly);
 	create_stock_menu_item(menu, GNOME_STOCK_MENU_UNDELETE,
-			       _("Delete"), balsa_message_undelete, bindex,
+			       _("Delete"), balsa_message_delete, bindex,
 			       !bindex->mailbox->readonly);
     } else {
 	create_stock_menu_item(menu, GNOME_STOCK_MENU_TRASH,

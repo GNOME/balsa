@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.5\n"
 "POT-Creation-Date: 2000-06-01 20:26-0400\n"
-"PO-Revision-Date: 2000-05-30 15:30+02:00\n"
+"PO-Revision-Date: 2000-06-04 02:30+02:00\n"
 "Last-Translator: Keld Simonsen <keld@dkuug.dk>\n"
 "Language-Team: Danish <dansk@klid.dk>\n"
 "MIME-Version: 1.0\n"
@@ -184,7 +184,7 @@ msgstr "Tilføj ny adresse"
 msgid "E-Mail Address:"
 msgstr "Epostadresse:"
 
-#: src/address-book.c:291 src/balsa-index-page.c:1046
+#: src/address-book.c:291 src/balsa-index-page.c:1043
 #, c-format
 msgid ""
 "Unable to open ~/.gnome/GnomeCard.gcrd for read.\n"
@@ -193,8 +193,8 @@ msgstr ""
 "Kunne ikke åbne og læse ~/.gnome/GnomeCard.gcrd.\n"
 " - %s\n"
 
-#: src/address-book.c:294 src/balsa-index-page.c:1028
-#: src/balsa-index-page.c:1049 src/balsa-index-page.c:1085
+#: src/address-book.c:294 src/balsa-index-page.c:1029
+#: src/balsa-index-page.c:1046 src/balsa-index-page.c:1083
 #: src/sendmsg-window.c:393
 msgid "OK"
 msgstr "Ok"
@@ -298,19 +298,19 @@ msgstr "Slet"
 msgid "Undelete"
 msgstr "Fortryd slet"
 
-#: src/balsa-index-page.c:638
+#: src/balsa-index-page.c:639
 msgid "Store Address"
 msgstr "Gem adresse"
 
-#: src/balsa-index-page.c:646
+#: src/balsa-index-page.c:647
 msgid "Transfer"
 msgstr "Overfør"
 
-#: src/balsa-index-page.c:1026
+#: src/balsa-index-page.c:1028
 msgid "You may only store one address at a time.\n"
 msgstr "Du kan kun gemme en adresse ad gangen.\n"
 
-#: src/balsa-index-page.c:1082
+#: src/balsa-index-page.c:1080
 #, c-format
 msgid ""
 "There is already an address book entry for %s.\n"
@@ -318,28 +318,6 @@ msgid ""
 msgstr ""
 "Der er allerede en adressebogs-optagelse for %s\n"
 "Kør GnomeCard hvis du gerne vil redigere dine optagelser i adressbogen.\n"
-
-#: src/balsa-index-page.c:1100
-msgid ""
-"\n"
-"BEGIN:VCARD\n"
-msgstr ""
-"\n"
-"BEGIN:VCARD\n"
-
-#: src/balsa-index-page.c:1101
-#, c-format
-msgid "FN:%s\n"
-msgstr "FN:%s\n"
-
-#: src/balsa-index-page.c:1102
-#, c-format
-msgid "EMAIL;INTERNET:%s\n"
-msgstr "EMAIL;INTERNET:%s\n"
-
-#: src/balsa-index-page.c:1103
-msgid "END:VCARD\n"
-msgstr "END:VCARD\n"
 
 #: src/balsa-index.c:252
 msgid "From"
@@ -352,6 +330,10 @@ msgstr "Emne"
 #: src/balsa-index.c:254
 msgid "Date"
 msgstr "Dato"
+
+#: src/balsa-index.c:362
+msgid "To"
+msgstr "Til"
 
 #: src/balsa-mblist.c:221 src/mailbox-conf.c:1186
 msgid "Mailbox"

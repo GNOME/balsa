@@ -782,7 +782,6 @@ libbalsa_mailbox_maildir_load_message(LibBalsaMailbox * mailbox,
 	g_free(filename);
 
     message->flags = msg_info->flags = msg_info->orig_flags;
-    libbalsa_message_headers_update(message, NULL);
 
     return message;
 }

@@ -1105,6 +1105,19 @@ libbalsa_mailbox_mbox_load_message(LibBalsaMailbox *mailbox, guint msgno)
 			      struct message_info, msgno - 1).message;
 }
 
+/* Create the LibBalsaMessage and call libbalsa_message_init_from_gmime
+ * to populate the headers we need for the display:
+ *   headers->from
+ *   headers->date
+ *   headers->to_list
+ *   headers->content_type
+ *   subj
+ *   length
+ * and for threading:
+ *   message_id
+ *   references
+ *   in_reply_to
+ */
 static LibBalsaMessage *
 lbm_mbox_message_new(GMimeMessage * mime_message,
 		     struct message_info *msg_info)
@@ -1122,19 +1135,6 @@ lbm_mbox_message_new(GMimeMessage * mime_message,
 #endif
 
     message = libbalsa_message_new();
-
-#ifdef MESSAGE_COPY_CONTENT
-    header =
-	g_mime_message_get_header(mime_message, "Content-Length");
-    message->length = 0;
-    if (header)
-	message->length = atoi(header);
-
-    header = g_mime_message_get_header(mime_message, "Lines");
-    message->lines_len = 0;
-    if (header)
-	message->lines_len = atoi(header);
-#endif
 
     header = g_mime_message_get_header (mime_message, "Status");
     if (header) {
@@ -1155,9 +1155,9 @@ lbm_mbox_message_new(GMimeMessage * mime_message,
 	if (strchr(header, 'A') != NULL) /* found == REPLIED */
 	    flags |= LIBBALSA_MESSAGE_FLAG_REPLIED;
     }
-
     message->flags = msg_info->flags = msg_info->orig_flags = flags;
-    libbalsa_message_headers_update(message, mime_message);
+
+    libbalsa_message_init_from_gmime(message, mime_message);
 
     return message;
 }

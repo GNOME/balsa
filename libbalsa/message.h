@@ -102,6 +102,25 @@ enum _LibBalsaMessageAttach {
 #endif
 
 /*
+ * Message info used by mailbox;
+ *
+ *   headers->from
+ *   headers->date
+ *   headers->to_list
+ *   headers->content_type
+ *   subj
+ *   length
+ *   lines_len (scrap?)
+ *
+ * loaded by driver:
+ *   flags
+ *
+ * needed for threading local mailboxes:
+ *   message_id
+ *   references
+ *   in_reply_to
+ */
+/*
  * LibBalsaMessageHeaders contains all headers which are used to display both
  * a "main" message's headers as well as those from an embedded message/rfc822
  * part.
@@ -174,7 +193,6 @@ struct _LibBalsaMessage {
 
     /* replied message ID's */
     GList *references;
-    GList *references_for_threading; /* oldest first */
 
     /* replied message ID; from address on date */
     GList *in_reply_to;
@@ -190,10 +208,11 @@ struct _LibBalsaMessage {
     gint sig_state;
 #endif
 
-    /* a forced multipart subtype or NULL for mixed */
+    /* a forced multipart subtype or NULL for mixed; used only for
+     * sending */
     gchar *subtype;
 
-    /* additional message content type parameters */
+    /* additional message content type parameters; used only for sending */
     GList *parameters;
 
     /* message body */
@@ -251,6 +270,8 @@ GType libbalsa_message_get_type(void);
 void libbalsa_message_headers_destroy(LibBalsaMessageHeaders * headers);
 void libbalsa_message_headers_from_gmime(LibBalsaMessageHeaders *headers,
 					 GMimeMessage *msg);
+void libbalsa_message_init_from_gmime(LibBalsaMessage * message,
+				      GMimeMessage * msg);
 GList *libbalsa_message_user_hdrs_from_gmime(GMimeMessage *msg);
 
 
@@ -347,8 +368,8 @@ guint libbalsa_message_get_lines(LibBalsaMessage* msg);
 glong libbalsa_message_get_length(LibBalsaMessage* msg);
 #endif
 glong libbalsa_message_get_no(LibBalsaMessage* msg);
-void libbalsa_message_headers_update(LibBalsaMessage * message,
-				     GMimeMessage * mime_msg);
+
+GList *libbalsa_message_refs_for_threading(LibBalsaMessage* msg);
 
 gboolean libbalsa_message_load_envelope_from_file(LibBalsaMessage *message,
 						  const char *filename);

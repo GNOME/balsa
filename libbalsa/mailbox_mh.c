@@ -564,6 +564,9 @@ libbalsa_mailbox_mh_close_mailbox(LibBalsaMailbox * mailbox)
 	g_ptr_array_free(mh->msgno_2_msg_info, TRUE);
 	mh->msgno_2_msg_info = NULL;
     }
+    g_free(mh->sequences_filename);
+    mh->sequences_filename = NULL;
+
     if (LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox)
 	LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox);
 }
@@ -875,7 +878,6 @@ libbalsa_mailbox_mh_load_message(LibBalsaMailbox * mailbox, guint msgno)
     g_free(filename);
 
     message->flags = msg_info->flags = msg_info->orig_flags;
-    libbalsa_message_headers_update(message, NULL);
 
     return message;
 }

@@ -477,6 +477,8 @@ libbalsa_mailbox_local_fetch_structure(LibBalsaMailbox *mailbox,
     libbalsa_message_body_set_mime_body(body,
                                         mime_message->mime_part);
     libbalsa_message_append_part(message, body);
+
+    libbalsa_message_headers_from_gmime(message->headers, mime_message);
 }
 
 static void
@@ -687,10 +689,10 @@ lbml_find_parent(LibBalsaMessage * message, ThreadingInfo * ti)
 
     /* The root of the mailbox tree is the default parent. */
     GNode *parent = ti->msg_tree;
-    GList *reference;
+    GList *reference, *l;
 
-    for (reference = message->references_for_threading; reference;
-	 reference = g_list_next(reference)) {
+    l = libbalsa_message_refs_for_threading(message);
+    for (reference = l; reference; reference = reference->next) {
 	gchar *id = reference->data;
 	GNode *foo = g_hash_table_lookup(ti->id_table, id);
 
@@ -706,6 +708,7 @@ lbml_find_parent(LibBalsaMessage * message, ThreadingInfo * ti)
 
 	parent = foo;
     }
+    g_list_free(l);
     return parent;
 }
 
@@ -1108,10 +1111,11 @@ lbml_thread_message(GNode * node, ThreadingInfo * ti)
     g_assert(message != NULL);
 #endif				/* MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT */
 
-    refs = message->references_for_threading;
+    refs = libbalsa_message_refs_for_threading(message);
     if (refs)
 	parent = g_hash_table_lookup(ti->id_table,
 				     g_list_last(refs)->data);
+    g_list_free(refs);
     if (!parent)
 	parent = ti->msg_tree;
     if (parent != node->parent)

@@ -503,17 +503,26 @@ static void identity_list_update(GtkTreeView * tree);
 static gboolean select_identity(GtkTreeView * tree,
                                 LibBalsaIdentity * identity);
 static LibBalsaIdentity *get_selected_identity(GtkTreeView * tree);
+static void set_identity_name_in_tree(GtkTreeView * tree,
+				      LibBalsaIdentity * identity,
+				      const gchar * name);
 static void md_response_cb(GtkWidget * dialog, gint response,
                            GtkTreeView * tree);
+static void md_name_changed(GtkEntry * name, GtkTreeView * tree);
 static void md_sig_path_changed(GtkEntry * sig_path, GObject * dialog);
 
 /* Callback for the "toggled" signal of the "Default" column. */
 static void
-toggle_cb(GtkCellRendererToggle * cellrenderertoggle, gchar * path,
-          GtkTreeView * tree)
+toggle_cb(GtkWidget * dialog, gchar * path)
 {
+    GtkTreeView *tree = g_object_get_data(G_OBJECT(dialog), "tree");
     GtkTreeModel *model = gtk_tree_view_get_model(tree);
     GtkTreeIter iter;
+
+    /* Save any changes to current identity; if it's not valid, just
+     * return. */
+    if (!ident_dialog_update(GTK_DIALOG(dialog)))
+	return;
 
     if (gtk_tree_model_get_iter_from_string(model, &iter, path)) {
         LibBalsaIdentity *identity, **default_id;
@@ -551,12 +560,8 @@ libbalsa_identity_tree(GCallback toggled_cb, gpointer toggled_data,
     g_object_unref(store);
 
     renderer = gtk_cell_renderer_toggle_new();
-    if (toggled_data)
-        g_signal_connect_swapped(G_OBJECT(renderer), "toggled",
-                                 toggled_cb, toggled_data);
-    else
-        g_signal_connect(G_OBJECT(renderer), "toggled",
-                         toggled_cb, tree);
+    g_signal_connect_swapped(G_OBJECT(renderer), "toggled",
+                             toggled_cb, toggled_data);
     column =
         gtk_tree_view_column_new_with_attributes(toggled_title, renderer,
                                                  "radio", DEFAULT_COLUMN,
@@ -579,14 +584,14 @@ libbalsa_identity_tree(GCallback toggled_cb, gpointer toggled_data,
  */
 static GtkWidget* 
 libbalsa_identity_config_frame(GList** identities,
-			       LibBalsaIdentity** defid)
+			       LibBalsaIdentity** defid, GtkWidget * dialog)
 {
     GtkWidget* config_frame = gtk_frame_new(NULL);
     GtkWidget *tree;
 
     gtk_container_set_border_width(GTK_CONTAINER(config_frame), 0);
     
-    tree = libbalsa_identity_tree(G_CALLBACK(toggle_cb), NULL,
+    tree = libbalsa_identity_tree(G_CALLBACK(toggle_cb), dialog,
                                   _("Default"));
     g_signal_connect(G_OBJECT(tree), "row-activated",
                      G_CALLBACK(set_default_ident_cb), NULL);
@@ -724,18 +729,23 @@ close_cb(GtkWidget * dialog)
 static void
 new_ident_cb(GtkTreeView * tree, GtkWidget * dialog)
 {
-    LibBalsaIdentity *ident = LIBBALSA_IDENTITY(libbalsa_identity_new());
-    GList **identities =
-        g_object_get_data(G_OBJECT(tree), "identities");
-    GtkWidget * name_entry =
-        g_object_get_data(G_OBJECT(dialog), "identity-name");
+    LibBalsaIdentity *ident;
+    GList **identities;
+    GtkWidget *name_entry;
 
+    /* Save any changes to current identity; if it's not valid, just
+     * return. */
+    if (!ident_dialog_update(GTK_DIALOG(dialog)))
+	return;
+
+    ident = LIBBALSA_IDENTITY(libbalsa_identity_new());
+    identities = g_object_get_data(G_OBJECT(tree), "identities");
     *identities = g_list_append(*identities, ident);
-
     identity_list_update(tree);
     /* select just added identity */
     select_identity(tree, ident);
 
+    name_entry = g_object_get_data(G_OBJECT(dialog), "identity-name");
     gtk_widget_grab_focus(name_entry);
 }
 
@@ -751,6 +761,7 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
     GtkWidget* frame = gtk_frame_new(NULL);
     GtkWidget *table = gtk_table_new(15, 2, FALSE);
     gint row = 0;
+    GObject *name;
     GObject *sig_path;
 
     gtk_container_set_border_width(GTK_CONTAINER(frame), padding);
@@ -813,11 +824,23 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
 			     TRUE);
 #endif
 
+    name = g_object_get_data(G_OBJECT(dialog), "identity-name");
+    g_signal_connect(name, "changed",
+                     G_CALLBACK(md_name_changed), tree);
     sig_path = g_object_get_data(G_OBJECT(dialog), "identity-sigpath");
     g_signal_connect(sig_path, "changed",
                      G_CALLBACK(md_sig_path_changed), dialog);
 
     return GTK_WIDGET(frame);
+}
+
+/* Callback for the "changed" signal of the name entry; updates the name
+ * in the tree. */
+static void
+md_name_changed(GtkEntry * name, GtkTreeView * tree)
+{
+    set_identity_name_in_tree(tree, get_selected_identity(tree),
+			      gtk_entry_get_text(name));
 }
 
 /* Callback for the "changed" signal of the signature path entry; sets
@@ -1164,9 +1187,6 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
         return;
     }
 
-    frame = libbalsa_identity_config_frame(identities, default_id);
-    tree = GTK_TREE_VIEW(gtk_bin_get_child(GTK_BIN(frame)));
-
     dialog =
         gtk_dialog_new_with_buttons(_("Manage Identities"),
                                     parent,
@@ -1176,6 +1196,10 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
                                     GTK_STOCK_REMOVE, IDENTITY_RESPONSE_REMOVE,
                                     GTK_STOCK_CLOSE, IDENTITY_RESPONSE_CLOSE,
                                     NULL);
+
+    frame = libbalsa_identity_config_frame(identities, default_id, dialog);
+    tree = GTK_TREE_VIEW(gtk_bin_get_child(GTK_BIN(frame)));
+
     g_signal_connect(G_OBJECT(dialog), "response",
                      G_CALLBACK(md_response_cb), tree);
     g_object_set_data(G_OBJECT(dialog), "tree", tree);

@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa.HEAD.nl\n"
-"POT-Creation-Date: 2003-05-30 03:49+0200\n"
-"PO-Revision-Date: 2003-05-30 11:31+0100\n"
+"POT-Creation-Date: 2003-06-15 11:49+0200\n"
+"PO-Revision-Date: 2003-06-15 14:01+0100\n"
 "Last-Translator: Vincent van Adrighem <V.vanAdrighem@dirck.mine.nu>\n"
 "Language-Team: Dutch <vertaling@nl.linux.org>\n"
 "MIME-Version: 1.0\n"
@@ -16,8 +16,8 @@ msgid "No-Id"
 msgstr "Geen-ID"
 
 #: libbalsa/address-book-extern.c:246 libbalsa/address-book-ldap.c:379
-#: libbalsa/address-book-ldif.c:408 libbalsa/address-book-ldif.c:637
-#: libbalsa/address-book-ldif.c:674 libbalsa/address-book-ldif.c:678
+#: libbalsa/address-book-ldif.c:408 libbalsa/address-book-ldif.c:640
+#: libbalsa/address-book-ldif.c:677 libbalsa/address-book-ldif.c:681
 #: libbalsa/address-book-vcard.c:290
 msgid "No-Name"
 msgstr "Geen-naam"
@@ -134,12 +134,12 @@ msgstr "Fout bij verplaatsen van berichten"
 
 #. should "re" be localized ?
 #: libbalsa/identity.c:88 src/balsa-index-threading.c:547
-#: src/balsa-index-threading.c:549 src/sendmsg-window.c:2398
-#: src/sendmsg-window.c:2399
+#: src/balsa-index-threading.c:549 src/sendmsg-window.c:2412
+#: src/sendmsg-window.c:2413
 msgid "Re:"
 msgstr "Re:"
 
-#: libbalsa/identity.c:89 src/sendmsg-window.c:2427 src/sendmsg-window.c:2428
+#: libbalsa/identity.c:89 src/sendmsg-window.c:2441 src/sendmsg-window.c:2442
 msgid "Fwd:"
 msgstr "Fwd:"
 
@@ -896,7 +896,7 @@ msgstr "gpgme kan geen nieuwe informatie aanmaken: %s"
 msgid "Sending Mail..."
 msgstr "Versturen post..."
 
-#: libbalsa/send.c:221 src/main-window.c:1786
+#: libbalsa/send.c:221 src/main-window.c:1787
 msgid "_Hide"
 msgstr "_Verbergen"
 
@@ -941,7 +941,7 @@ msgid "Connected to MTA"
 msgstr "Verbinden met MTA"
 
 #: libbalsa/send.c:886 src/balsa-message.c:1196 src/print.c:356
-#: src/sendmsg-window.c:777 src/sendmsg-window.c:2219 src/store-address.c:322
+#: src/sendmsg-window.c:797 src/sendmsg-window.c:2232 src/store-address.c:322
 msgid "From:"
 msgstr "Van:"
 
@@ -950,7 +950,7 @@ msgid "From"
 msgstr "Van"
 
 #: libbalsa/send.c:897 src/balsa-message.c:1205 src/print.c:366
-#: src/sendmsg-window.c:776 src/sendmsg-window.c:2225 src/store-address.c:323
+#: src/sendmsg-window.c:796 src/sendmsg-window.c:2238 src/store-address.c:323
 msgid "To:"
 msgstr "Aan:"
 
@@ -989,15 +989,23 @@ msgstr ""
 msgid "This message will not be encrpyted for the BCC: recipient(s)."
 msgstr "Dit bericht zal niet gecodeerd worden voor de BCC:-ontvanger(s)."
 
-#: libbalsa/source-viewer.c:46 src/main-window.c:513
+#: libbalsa/source-viewer.c:52 src/main-window.c:513
 msgid "_Select Text"
 msgstr "_Selecteer Tekst"
 
-#: libbalsa/source-viewer.c:47 src/main-window.c:514
+#: libbalsa/source-viewer.c:53 src/main-window.c:514
 msgid "Select entire mail"
 msgstr "Selecteer gehele e-mail"
 
-#: libbalsa/source-viewer.c:100
+#: libbalsa/source-viewer.c:62
+msgid "_Escape Special Characters"
+msgstr "_Speciale tekens coderen als stuurtekens"
+
+#: libbalsa/source-viewer.c:63
+msgid "Escape special and non-ASCII characters"
+msgstr "Speciale tekens en non-ASCII tekens coderen als stuurtekens"
+
+#: libbalsa/source-viewer.c:210
 msgid "Message Source"
 msgstr "Bron Bericht"
 
@@ -2268,28 +2276,28 @@ msgstr ""
 "\"multipart/encrypted\" gecodeerd berichtdeel. De structuur is echter "
 "ongeldig."
 
-#: src/balsa-message.c:1187 src/print.c:338 src/sendmsg-window.c:782
-#: src/sendmsg-window.c:2214
+#: src/balsa-message.c:1187 src/print.c:338 src/sendmsg-window.c:802
+#: src/sendmsg-window.c:2227
 msgid "Subject:"
 msgstr "Onderwerp:"
 
-#: src/balsa-message.c:1191 src/print.c:345 src/sendmsg-window.c:2208
+#: src/balsa-message.c:1191 src/print.c:345 src/sendmsg-window.c:2221
 msgid "Date:"
 msgstr "Datum:"
 
-#: src/balsa-message.c:1202 src/sendmsg-window.c:778
+#: src/balsa-message.c:1202 src/sendmsg-window.c:798
 msgid "Reply-To:"
 msgstr "Antwoord naar:"
 
 #. cc:
-#: src/balsa-message.c:1206 src/print.c:367 src/sendmsg-window.c:780
-#: src/sendmsg-window.c:1935 src/sendmsg-window.c:2231 src/store-address.c:324
+#: src/balsa-message.c:1206 src/print.c:367 src/sendmsg-window.c:800
+#: src/sendmsg-window.c:1948 src/sendmsg-window.c:2244 src/store-address.c:324
 msgid "Cc:"
 msgstr "Cc:"
 
 #. bcc:
-#: src/balsa-message.c:1207 src/print.c:368 src/sendmsg-window.c:779
-#: src/sendmsg-window.c:1940 src/store-address.c:325
+#: src/balsa-message.c:1207 src/print.c:368 src/sendmsg-window.c:799
+#: src/sendmsg-window.c:1953 src/store-address.c:325
 msgid "Bcc:"
 msgstr "Bcc:"
 
@@ -2448,7 +2456,7 @@ msgstr "Bewaren..."
 msgid "could not create temporary file %s"
 msgstr "Kan geen tijdelijk bestand %s aanmaken!"
 
-#: src/balsa-message.c:3532
+#: src/balsa-message.c:3514
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2459,7 +2467,7 @@ msgstr ""
 "Bericht Afleveringsnotificatie (MDN) verzocht naar `%s'.\n"
 "Wilt u deze notificatie versturen?"
 
-#: src/balsa-message.c:3539
+#: src/balsa-message.c:3521
 msgid "Reply to MDN?"
 msgstr "MDN beantwoorden? "
 
@@ -2587,25 +2595,25 @@ msgstr "_alles"
 msgid "C_lear"
 msgstr "_Legen"
 
-#: src/filter-edit-callbacks.c:990 src/main-window.c:2707
+#: src/filter-edit-callbacks.c:990 src/main-window.c:2709
 msgid "_Body"
 msgstr "_Inhoud"
 
 #. To:
-#: src/filter-edit-callbacks.c:997 src/main-window.c:2708
-#: src/sendmsg-window.c:1924
+#: src/filter-edit-callbacks.c:997 src/main-window.c:2710
+#: src/sendmsg-window.c:1937
 msgid "_To:"
 msgstr "_Aan:"
 
-#: src/filter-edit-callbacks.c:1004 src/main-window.c:2709
+#: src/filter-edit-callbacks.c:1004 src/main-window.c:2711
 msgid "_From:"
 msgstr "_Van:"
 
-#: src/filter-edit-callbacks.c:1012 src/sendmsg-window.c:296
+#: src/filter-edit-callbacks.c:1012 src/sendmsg-window.c:314
 msgid "_Subject"
 msgstr "_Onderwerp"
 
-#: src/filter-edit-callbacks.c:1019 src/main-window.c:2711
+#: src/filter-edit-callbacks.c:1019 src/main-window.c:2713
 msgid "_Cc:"
 msgstr "_Cc:"
 
@@ -2975,19 +2983,19 @@ msgstr ""
 msgid "Confirm"
 msgstr "Bevestigen"
 
-#: src/information-dialog.c:201
+#: src/information-dialog.c:184
 msgid "Information - Balsa"
 msgstr "Informatie - Balsa"
 
-#: src/information-dialog.c:268
+#: src/information-dialog.c:243
 msgid "WARNING: "
 msgstr "WAARSCHUWING: "
 
-#: src/information-dialog.c:271
+#: src/information-dialog.c:246
 msgid "ERROR: "
 msgstr "FOUT: "
 
-#: src/information-dialog.c:274
+#: src/information-dialog.c:249
 msgid "FATAL: "
 msgstr "FATAAL: "
 
@@ -3068,7 +3076,7 @@ msgstr "_Verwijderen uit lijst"
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr "Oooop! postbus niet gevonden in balsa_app.mailbox nodes?\n"
 
-#: src/mailbox-conf.c:406 src/sendmsg-window.c:920
+#: src/mailbox-conf.c:406 src/sendmsg-window.c:942
 msgid "Select Identity"
 msgstr "Identiteit"
 
@@ -3166,7 +3174,7 @@ msgstr "Weergegeven naam:"
 msgid "_From"
 msgstr "_Van"
 
-#: src/mailbox-conf.c:1149 src/sendmsg-window.c:294
+#: src/mailbox-conf.c:1149 src/sendmsg-window.c:312
 msgid "_To"
 msgstr "_Aan"
 
@@ -3447,7 +3455,7 @@ msgstr "Schakelen postbus tabbladen"
 msgid "_Wrap"
 msgstr "_Afbreken"
 
-#: src/main-window.c:402 src/sendmsg-window.c:244
+#: src/main-window.c:402 src/sendmsg-window.c:262
 msgid "Wrap message lines"
 msgstr "Berichtregels afbreken"
 
@@ -3688,7 +3696,7 @@ msgstr ""
 "Balsa is een e-mail aan het versturen.\n"
 "Breek versturen af?"
 
-#: src/main-window.c:1364
+#: src/main-window.c:1365
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -3696,7 +3704,7 @@ msgstr ""
 "Kan uw Postbus niet openen!\n"
 "Controleer uw instellingen"
 
-#: src/main-window.c:1656
+#: src/main-window.c:1657
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://balsa.gnome.org/\n"
@@ -3708,72 +3716,72 @@ msgstr ""
 "\n"
 "Voor bugreports: http://bugzilla.gnome.org/"
 
-#: src/main-window.c:1783
+#: src/main-window.c:1784
 msgid "Checking Mail..."
 msgstr "Controleren post..."
 
-#: src/main-window.c:2083
+#: src/main-window.c:2084
 msgid "Finished Checking."
 msgstr "Klaar met controleren."
 
-#: src/main-window.c:2147
+#: src/main-window.c:2148
 #, c-format
 msgid "Sending error: %s"
 msgstr "Stuur fout: %s"
 
-#: src/main-window.c:2243
+#: src/main-window.c:2244
 msgid "Balsa: New mail"
 msgstr "Balsa: Nieuwe e-mail"
 
-#: src/main-window.c:2255
+#: src/main-window.c:2256
 #, c-format
 msgid "You have received %d new messages."
 msgstr "U heeft %d nieuwe berichten."
 
-#: src/main-window.c:2256
+#: src/main-window.c:2257
 msgid "You have received 1 new message."
 msgstr "U heeft 1 nieuw bericht."
 
-#: src/main-window.c:2667
+#: src/main-window.c:2669
 msgid "Search mailbox"
 msgstr "Postbus doorzoeken"
 
-#: src/main-window.c:2680
+#: src/main-window.c:2682
 msgid "_Reverse search"
 msgstr "_Achterstevoren zoeken"
 
-#: src/main-window.c:2683
+#: src/main-window.c:2685
 msgid "_Search for:"
 msgstr "_Zoek naar:"
 
-#: src/main-window.c:2696
+#: src/main-window.c:2698
 msgid "In:"
 msgstr "In:"
 
-#: src/main-window.c:2710
+#: src/main-window.c:2712
 msgid "S_ubject"
 msgstr "_Onderwerp"
 
-#: src/main-window.c:2825
+#: src/main-window.c:2827
 msgid "You can apply filters only on mailbox\n"
 msgstr "U kunt alleen filters toepassen op postbussen\n"
 
-#: src/main-window.c:2869 src/main-window.c:2888
+#: src/main-window.c:2871 src/main-window.c:2890
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Vastleggen van postbus %s mislukt."
 
-#: src/main-window.c:3081
+#: src/main-window.c:3083
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (alleen lezen)."
 
-#: src/main-window.c:3083
+#: src/main-window.c:3085
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: src/main-window.c:3181
+#: src/main-window.c:3183
 msgid "Cannot access the message's body\n"
 msgstr "Kan berichttekst niet benaderen\n"
 
@@ -4616,324 +4624,324 @@ msgstr ""
 "De optie om een afleveringsnotificatie (MDN) aan te vragen bevindt zich nu "
 "in het Opties-menu van het venster 'Nieuw bericht'."
 
-#: src/sendmsg-window.c:191
+#: src/sendmsg-window.c:200
 msgid "_Include File..."
 msgstr "_Invoegen bestand..."
 
-#: src/sendmsg-window.c:194
+#: src/sendmsg-window.c:203
 msgid "_Attach File..."
 msgstr "_Bijvoegen bestand..."
 
-#: src/sendmsg-window.c:197
+#: src/sendmsg-window.c:206
 msgid "_Include Message(s)"
 msgstr "_Insluiten Bericht(en)"
 
-#: src/sendmsg-window.c:200
+#: src/sendmsg-window.c:209
 msgid "Attach _Message(s)"
 msgstr "Voeg _Bericht(en) toe"
 
-#: src/sendmsg-window.c:206
+#: src/sendmsg-window.c:215
 msgid "_Send"
 msgstr "_Versturen"
 
-#: src/sendmsg-window.c:207 src/toolbar-factory.c:121
+#: src/sendmsg-window.c:216 src/toolbar-factory.c:121
 msgid "Send this message"
 msgstr "Verzend dit bericht"
 
-#: src/sendmsg-window.c:211
+#: src/sendmsg-window.c:220
 msgid "_Queue"
 msgstr "_Plaats in wachtrij"
 
-#: src/sendmsg-window.c:212
+#: src/sendmsg-window.c:221
 msgid "Queue this message in Outbox for sending"
 msgstr "Plaats dit bericht in de wachtrij voor latere verzending"
 
-#: src/sendmsg-window.c:216
+#: src/sendmsg-window.c:225
 msgid "_Postpone"
 msgstr "_Uitstellen"
 
-#: src/sendmsg-window.c:219
+#: src/sendmsg-window.c:228
 msgid "_Save"
 msgstr "_Bewaren"
 
-#: src/sendmsg-window.c:220
+#: src/sendmsg-window.c:229
 msgid "Save this message"
 msgstr "Dit bericht opslaan"
 
-#: src/sendmsg-window.c:224
+#: src/sendmsg-window.c:233
 msgid "Print..."
 msgstr "Afdrukken..."
 
-#: src/sendmsg-window.c:224
+#: src/sendmsg-window.c:233
 msgid "Print the edited message"
 msgstr "Druk het bewerkte bericht af"
 
-#: src/sendmsg-window.c:244
+#: src/sendmsg-window.c:262
 msgid "_Wrap Body"
 msgstr "_Afbreken tekst"
 
-#: src/sendmsg-window.c:249
+#: src/sendmsg-window.c:267
 msgid "Insert Si_gnature"
 msgstr "_Ondertekening invoegen"
 
-#: src/sendmsg-window.c:253
+#: src/sendmsg-window.c:271
 msgid "_Quote Message(s)"
 msgstr "_Citeer Bericht(en)"
 
-#: src/sendmsg-window.c:258
+#: src/sendmsg-window.c:276
 msgid "_Reflow Paragraph"
 msgstr "_Reflow paragraaf"
 
-#: src/sendmsg-window.c:262
+#: src/sendmsg-window.c:280
 msgid "R_eflow Message"
 msgstr "R_eflow bericht"
 
-#: src/sendmsg-window.c:267
+#: src/sendmsg-window.c:285
 msgid "C_heck Spelling"
 msgstr "_Spellingscontrole"
 
-#: src/sendmsg-window.c:268
+#: src/sendmsg-window.c:286
 msgid "Check the spelling of the message"
 msgstr "Controleer de spelling van het bericht"
 
-#: src/sendmsg-window.c:273
+#: src/sendmsg-window.c:291
 msgid "Select _Identity..."
 msgstr "Selecteer _Identiteit..."
 
-#: src/sendmsg-window.c:274
+#: src/sendmsg-window.c:292
 msgid "Select the Identity to use for the message"
 msgstr "Selecteer de te gebruiken identiteit voor het bericht"
 
-#: src/sendmsg-window.c:279
+#: src/sendmsg-window.c:297
 msgid "_Edit with Gnome-Editor"
 msgstr "_Bewerken met Gnome-Tekstverwerker"
 
-#: src/sendmsg-window.c:280
+#: src/sendmsg-window.c:298
 msgid "Edit the current message with the default Gnome editor"
 msgstr "Bewerk het huidige e-mailtje met de standaard Gnome Tekstverwerker"
 
-#: src/sendmsg-window.c:292
+#: src/sendmsg-window.c:310
 msgid "Fr_om"
 msgstr "_Van"
 
-#: src/sendmsg-window.c:298
+#: src/sendmsg-window.c:316
 msgid "_Cc"
 msgstr "_Cc"
 
-#: src/sendmsg-window.c:300
+#: src/sendmsg-window.c:318
 msgid "_Bcc"
 msgstr "_Bcc"
 
-#: src/sendmsg-window.c:302
+#: src/sendmsg-window.c:320
 msgid "_Fcc"
 msgstr "_Fcc"
 
-#: src/sendmsg-window.c:304
+#: src/sendmsg-window.c:322
 msgid "_Reply To"
 msgstr "Beant_woorden Aan"
 
-#: src/sendmsg-window.c:306
+#: src/sendmsg-window.c:324
 msgid "_Attachments"
 msgstr "Bij_lagen"
 
-#: src/sendmsg-window.c:309
+#: src/sendmsg-window.c:327
 msgid "_Comments"
 msgstr "_Commentaar"
 
-#: src/sendmsg-window.c:312
+#: src/sendmsg-window.c:330
 msgid "_Keywords"
 msgstr "_Sleutelwoorden"
 
-#: src/sendmsg-window.c:329 src/sendmsg-window.c:400
+#: src/sendmsg-window.c:347 src/sendmsg-window.c:418
 msgid "Brazilian"
 msgstr "Braziliaans"
 
-#: src/sendmsg-window.c:331 src/sendmsg-window.c:402
+#: src/sendmsg-window.c:349 src/sendmsg-window.c:420
 msgid "Catalan"
 msgstr "Catalaans"
 
-#: src/sendmsg-window.c:333 src/sendmsg-window.c:404
+#: src/sendmsg-window.c:351 src/sendmsg-window.c:422
 msgid "Chinese Simplified"
 msgstr "Chinees (eenvoudig)"
 
-#: src/sendmsg-window.c:335 src/sendmsg-window.c:406
+#: src/sendmsg-window.c:353 src/sendmsg-window.c:424
 msgid "Chinese Traditional"
 msgstr "Chinees (traditioneel)"
 
-#: src/sendmsg-window.c:337 src/sendmsg-window.c:408
+#: src/sendmsg-window.c:355 src/sendmsg-window.c:426
 msgid "Czech"
 msgstr "Tsjechisch"
 
-#: src/sendmsg-window.c:339 src/sendmsg-window.c:410
+#: src/sendmsg-window.c:357 src/sendmsg-window.c:428
 msgid "Danish"
 msgstr "Deens"
 
-#: src/sendmsg-window.c:341 src/sendmsg-window.c:422
+#: src/sendmsg-window.c:359 src/sendmsg-window.c:440
 msgid "German"
 msgstr "Duits"
 
-#: src/sendmsg-window.c:343 src/sendmsg-window.c:412
+#: src/sendmsg-window.c:361 src/sendmsg-window.c:430
 msgid "Dutch"
 msgstr "Nederlands"
 
 #. English -> American English, argh...
-#: src/sendmsg-window.c:346 src/sendmsg-window.c:414
+#: src/sendmsg-window.c:364 src/sendmsg-window.c:432
 msgid "English"
 msgstr "Engels"
 
-#: src/sendmsg-window.c:348 src/sendmsg-window.c:416
+#: src/sendmsg-window.c:366 src/sendmsg-window.c:434
 msgid "Esperanto"
 msgstr "Esperanto"
 
-#: src/sendmsg-window.c:350
+#: src/sendmsg-window.c:368
 msgid "Estonian"
 msgstr "Estonisch"
 
-#: src/sendmsg-window.c:352 src/sendmsg-window.c:418
+#: src/sendmsg-window.c:370 src/sendmsg-window.c:436
 msgid "Finnish"
 msgstr "Fins"
 
-#: src/sendmsg-window.c:354 src/sendmsg-window.c:420
+#: src/sendmsg-window.c:372 src/sendmsg-window.c:438
 msgid "French"
 msgstr "Frans"
 
-#: src/sendmsg-window.c:356 src/sendmsg-window.c:424
+#: src/sendmsg-window.c:374 src/sendmsg-window.c:442
 msgid "Greek"
 msgstr "Grieks"
 
-#: src/sendmsg-window.c:358 src/sendmsg-window.c:426
+#: src/sendmsg-window.c:376 src/sendmsg-window.c:444
 msgid "Hebrew"
 msgstr "Hebreeuws"
 
-#: src/sendmsg-window.c:360 src/sendmsg-window.c:428
+#: src/sendmsg-window.c:378 src/sendmsg-window.c:446
 msgid "Hungarian"
 msgstr "Hongaars"
 
-#: src/sendmsg-window.c:362 src/sendmsg-window.c:430
+#: src/sendmsg-window.c:380 src/sendmsg-window.c:448
 msgid "Italian"
 msgstr "Italiaans"
 
-#: src/sendmsg-window.c:364 src/sendmsg-window.c:432
+#: src/sendmsg-window.c:382 src/sendmsg-window.c:450
 msgid "Japanese"
 msgstr "Japans"
 
-#: src/sendmsg-window.c:366 src/sendmsg-window.c:438
+#: src/sendmsg-window.c:384 src/sendmsg-window.c:456
 msgid "Korean"
 msgstr "Koreaans"
 
-#: src/sendmsg-window.c:368 src/sendmsg-window.c:440
+#: src/sendmsg-window.c:386 src/sendmsg-window.c:458
 msgid "Latvian"
 msgstr "Lets"
 
-#: src/sendmsg-window.c:370 src/sendmsg-window.c:442
+#: src/sendmsg-window.c:388 src/sendmsg-window.c:460
 msgid "Lithuanian"
 msgstr "Litouws"
 
-#: src/sendmsg-window.c:372 src/sendmsg-window.c:444
+#: src/sendmsg-window.c:390 src/sendmsg-window.c:462
 msgid "Norwegian"
 msgstr "Noors"
 
-#: src/sendmsg-window.c:374 src/sendmsg-window.c:446
+#: src/sendmsg-window.c:392 src/sendmsg-window.c:464
 msgid "Polish"
 msgstr "Pools"
 
-#: src/sendmsg-window.c:376 src/sendmsg-window.c:448
+#: src/sendmsg-window.c:394 src/sendmsg-window.c:466
 msgid "Portugese"
 msgstr "Portugees"
 
-#: src/sendmsg-window.c:378 src/sendmsg-window.c:450
+#: src/sendmsg-window.c:396 src/sendmsg-window.c:468
 msgid "Romanian"
 msgstr "Roemeens"
 
-#: src/sendmsg-window.c:380 src/sendmsg-window.c:452
+#: src/sendmsg-window.c:398 src/sendmsg-window.c:470
 msgid "Russian (ISO)"
 msgstr "Russsisch (KOI8-R)"
 
-#: src/sendmsg-window.c:382 src/sendmsg-window.c:454
+#: src/sendmsg-window.c:400 src/sendmsg-window.c:472
 msgid "Russian (KOI)"
 msgstr "Russisch (KOI)"
 
-#: src/sendmsg-window.c:384 src/sendmsg-window.c:456
+#: src/sendmsg-window.c:402 src/sendmsg-window.c:474
 msgid "Slovak"
 msgstr "Slowaaks"
 
-#: src/sendmsg-window.c:386 src/sendmsg-window.c:458
+#: src/sendmsg-window.c:404 src/sendmsg-window.c:476
 msgid "Spanish"
 msgstr "Spaans"
 
-#: src/sendmsg-window.c:388 src/sendmsg-window.c:460
+#: src/sendmsg-window.c:406 src/sendmsg-window.c:478
 msgid "Swedish"
 msgstr "Zweeds"
 
-#: src/sendmsg-window.c:390 src/sendmsg-window.c:462
+#: src/sendmsg-window.c:408 src/sendmsg-window.c:480
 msgid "Turkish"
 msgstr "Turks"
 
-#: src/sendmsg-window.c:392 src/sendmsg-window.c:464
+#: src/sendmsg-window.c:410 src/sendmsg-window.c:482
 msgid "Ukrainian"
 msgstr "Ukrains"
 
-#: src/sendmsg-window.c:394
+#: src/sendmsg-window.c:412
 msgid "Generic UTF-8"
 msgstr "Algemaan UTF-8"
 
-#: src/sendmsg-window.c:466
+#: src/sendmsg-window.c:484
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: src/sendmsg-window.c:474
+#: src/sendmsg-window.c:492
 msgid "_A-J"
 msgstr "_A-H"
 
-#: src/sendmsg-window.c:475
+#: src/sendmsg-window.c:493
 msgid "_K-Z"
 msgstr "_I-Z"
 
-#: src/sendmsg-window.c:485
+#: src/sendmsg-window.c:503
 msgid "_GnuPG uses MIME mode"
 msgstr "_GnuPG gebruikt de MIME methode"
 
-#: src/sendmsg-window.c:491
+#: src/sendmsg-window.c:509
 msgid "_GnuPG uses old OpenPGP mode"
 msgstr "_GnuPG gebruikt de oude OpenPGP methode"
 
-#: src/sendmsg-window.c:502
+#: src/sendmsg-window.c:520
 msgid "_Request Disposition Notification"
 msgstr "_Verzoek afleveringsnotificatie"
 
-#: src/sendmsg-window.c:505
+#: src/sendmsg-window.c:523
 msgid "_Format = Flowed"
 msgstr "_Format = Flowed"
 
-#: src/sendmsg-window.c:510
+#: src/sendmsg-window.c:528
 msgid "_Sign Message"
 msgstr "_Bericht ondertekenen"
 
-#: src/sendmsg-window.c:511
+#: src/sendmsg-window.c:529
 msgid "signs the message using GnuPG"
 msgstr "ondertekent het bericht met GnuPG"
 
-#: src/sendmsg-window.c:514
+#: src/sendmsg-window.c:532
 msgid "_Encrypt Message"
 msgstr "Bericht _coderen"
 
-#: src/sendmsg-window.c:515
+#: src/sendmsg-window.c:533
 msgid "signs the message using GnuPG for all To: and CC: recipients"
 msgstr "ondertekent het bericht met GnuPG voor alle Aan: en CC: geadresseerden"
 
-#: src/sendmsg-window.c:560
+#: src/sendmsg-window.c:578
 msgid "_Show"
 msgstr "_Toon"
 
-#: src/sendmsg-window.c:562
+#: src/sendmsg-window.c:580
 msgid "_Language"
 msgstr "Taa_l"
 
-#: src/sendmsg-window.c:564
+#: src/sendmsg-window.c:582
 msgid "_Options"
 msgstr "_Opties"
 
-#: src/sendmsg-window.c:647
+#: src/sendmsg-window.c:665
 #, c-format
 msgid ""
 "The message to '%s' is modified.\n"
@@ -4943,11 +4951,11 @@ msgstr ""
 "Bericht opslaan in de map concepten?"
 
 #. Comments:
-#: src/sendmsg-window.c:781 src/sendmsg-window.c:2028
+#: src/sendmsg-window.c:801 src/sendmsg-window.c:2041
 msgid "Comments:"
 msgstr "Commentaar:"
 
-#: src/sendmsg-window.c:1227
+#: src/sendmsg-window.c:1249
 #, c-format
 msgid ""
 "Saying yes will not send the file `%s' itself, but just a MIME message/"
@@ -4962,43 +4970,43 @@ msgstr ""
 "\n"
 "Weet u zeker dat u het bestand toe wilt voegen als verwijzing?"
 
-#: src/sendmsg-window.c:1238
+#: src/sendmsg-window.c:1260
 msgid "Attach as Reference?"
 msgstr "Toevoegen als verwijzing?"
 
-#: src/sendmsg-window.c:1329
+#: src/sendmsg-window.c:1351
 msgid "Remove"
 msgstr "Verwijderen"
 
-#: src/sendmsg-window.c:1340
+#: src/sendmsg-window.c:1362
 msgid "attach as reference"
 msgstr "toevoegen als verwijzing"
 
-#: src/sendmsg-window.c:1346
+#: src/sendmsg-window.c:1368
 msgid "attach as file"
 msgstr "toevoegen als bestand"
 
-#: src/sendmsg-window.c:1494
+#: src/sendmsg-window.c:1516
 #, c-format
 msgid "Cannot get info on file '%s': %s"
 msgstr "Info over bestand '%s' kan niet verkregen worden: %s"
 
-#: src/sendmsg-window.c:1499
+#: src/sendmsg-window.c:1521
 #, c-format
 msgid "Attachment %s is not a regular file."
 msgstr "Bijlage '%s' is geen regulier bestand."
 
-#: src/sendmsg-window.c:1502
+#: src/sendmsg-window.c:1524
 #, c-format
 msgid "File %s cannot be read\n"
 msgstr "Bestand %s kan niet worden gelezen\n"
 
-#: src/sendmsg-window.c:1556
+#: src/sendmsg-window.c:1578
 msgid "Attach file"
 msgstr "Bestand als bijlage"
 
-#: src/sendmsg-window.c:1650 src/sendmsg-window.c:1712
-#: src/sendmsg-window.c:2890
+#: src/sendmsg-window.c:1674 src/sendmsg-window.c:1736
+#: src/sendmsg-window.c:2913
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -5007,68 +5015,68 @@ msgstr ""
 "Mogelijke reden: niet genoeg tijdelijke ruimte"
 
 #. From:
-#: src/sendmsg-window.c:1919
+#: src/sendmsg-window.c:1932
 msgid "F_rom:"
 msgstr "Af_zender:"
 
 #. Subject:
-#: src/sendmsg-window.c:1931
+#: src/sendmsg-window.c:1944
 msgid "S_ubject:"
 msgstr "Onder_werp:"
 
 #. fcc:
-#: src/sendmsg-window.c:1945
+#: src/sendmsg-window.c:1958
 msgid "F_cc:"
 msgstr "F_cc:"
 
 #. Reply To:
-#: src/sendmsg-window.c:1974
+#: src/sendmsg-window.c:1987
 msgid "_Reply To:"
 msgstr "_Antwoord naar:"
 
 #. Attachment list
-#: src/sendmsg-window.c:1981
+#: src/sendmsg-window.c:1994
 msgid "_Attachments:"
 msgstr "_Bijlagen:"
 
 #. Keywords:
-#: src/sendmsg-window.c:2031
+#: src/sendmsg-window.c:2044
 msgid "Keywords:"
 msgstr "Sleutelwoorden:"
 
-#: src/sendmsg-window.c:2193
+#: src/sendmsg-window.c:2206
 msgid "you"
 msgstr "u"
 
-#: src/sendmsg-window.c:2202
+#: src/sendmsg-window.c:2215
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------ doorgestuurd bericht van %s ------\n"
 
-#: src/sendmsg-window.c:2235
+#: src/sendmsg-window.c:2248
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "Bericht-ID: %s\n"
 
-#: src/sendmsg-window.c:2241
+#: src/sendmsg-window.c:2254
 msgid "References:"
 msgstr "Verwijzingen:"
 
-#: src/sendmsg-window.c:2251
+#: src/sendmsg-window.c:2264
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "Op %s schreef %s:\n"
 
-#: src/sendmsg-window.c:2253
+#: src/sendmsg-window.c:2266
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s schreef:\n"
 
-#: src/sendmsg-window.c:3052
+#: src/sendmsg-window.c:3075
 msgid "Choose charset"
 msgstr "Kies tekenset"
 
-#: src/sendmsg-window.c:3059
+#: src/sendmsg-window.c:3082
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file."
@@ -5076,16 +5084,16 @@ msgstr ""
 "Dit bestand is niet in US-ASCII of UTF-8 formaat.\n"
 "Kies de te gebruiken tekenset voor het bericht."
 
-#: src/sendmsg-window.c:3125
+#: src/sendmsg-window.c:3148
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Kan bestand '%s' niet openen.\n"
 
-#: src/sendmsg-window.c:3146
+#: src/sendmsg-window.c:3170
 msgid "Include file"
 msgstr "Bestand invoegen"
 
-#: src/sendmsg-window.c:3404
+#: src/sendmsg-window.c:3428
 #, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
@@ -5094,7 +5102,7 @@ msgstr ""
 "Het bericht kan niet gecodeerd worden met de tekenset %s.\n"
 "Kies alstublieft een andere taal voor dit bericht."
 
-#: src/sendmsg-window.c:3423
+#: src/sendmsg-window.c:3447
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
@@ -5105,27 +5113,27 @@ msgstr ""
 "methode moeten gebruiken om het hele bericht te beschermen. Wilt u doorgaan "
 "met de OpenPGP methode?"
 
-#: src/sendmsg-window.c:3436
+#: src/sendmsg-window.c:3460
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "bericht wordt verzonden met gpg-stand %d"
 
-#: src/sendmsg-window.c:4271
+#: src/sendmsg-window.c:4365
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Antwoord naar %s: %s"
 
-#: src/sendmsg-window.c:4276
+#: src/sendmsg-window.c:4370
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Bericht doorsturen naar %s: %s"
 
-#: src/sendmsg-window.c:4280
+#: src/sendmsg-window.c:4374
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Verder gaan aan bericht naar %s: %s"
 
-#: src/sendmsg-window.c:4284
+#: src/sendmsg-window.c:4378
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Nieuw bericht naar %s: %s"
@@ -5440,7 +5448,23 @@ msgstr "Versleutelen"
 msgid "Encrypt message using GPG"
 msgstr "Bericht versleutelen met GPG"
 
-#: src/toolbar-factory.c:233
+#: src/toolbar-factory.c:152
+msgid "Undo"
+msgstr "Ongedaan maken"
+
+#: src/toolbar-factory.c:153
+msgid "Undo most recent change"
+msgstr "Meest recente verandering ongedaan maken"
+
+#: src/toolbar-factory.c:154
+msgid "Redo"
+msgstr "Weer toepassen"
+
+#: src/toolbar-factory.c:155
+msgid "Redo most recent change"
+msgstr "Meest recente verandering weer toepassen"
+
+#: src/toolbar-factory.c:237
 #, c-format
 msgid "Unknown toolbar icon \"%s\""
 msgstr "Onbekend werkbalkpictogram \"%s\""

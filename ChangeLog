@@ -1,5 +1,16 @@
 2001-02-03  Matthew Guenther  <guentherm@asme.org>
 
+	* src/balsa-app.[ch]: Add option to automatically view message
+	after newly opening a mailbox.
+	* src/balsa-index.c (moveto_handler): only auto view messages on
+	mailbox opening if the option is selected.
+	* src/pref-manager.c: Put option to auto view messages in the
+	Preferences dialog, reorganize "Display" page into subnotebook
+	pages.
+	* src/save-restore.c: Save and load auto view message option.
+		
+2001-02-03  Matthew Guenther  <guentherm@asme.org>
+
 	* src/store-address.c (balsa_store_address): Fix cast to GtkCList
 	from BalsaIndex.
 

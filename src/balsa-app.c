@@ -207,6 +207,8 @@ balsa_app_init(void)
     balsa_app.selected_headers = g_strdup(DEFAULT_SELECTED_HDRS);
     balsa_app.show_mblist = TRUE;
     balsa_app.show_notebook_tabs = FALSE;
+    balsa_app.alternative_layout = FALSE;
+    balsa_app.view_message_on_open = TRUE;
 
     balsa_app.index_num_width = NUM_DEFAULT_WIDTH;
     balsa_app.index_status_width = STATUS_DEFAULT_WIDTH;

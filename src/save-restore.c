@@ -444,6 +444,7 @@ config_global_load(void)
 
     /* ... alternative layout of main window */
     balsa_app.alternative_layout = gnome_config_get_bool("AlternativeLayout=false");
+    balsa_app.view_message_on_open = gnome_config_get_bool("ViewMessageOnOpen=true");
 
     /* ... style */
     balsa_app.toolbar_style = d_get_gint("ToolbarStyle", GTK_TOOLBAR_BOTH);
@@ -643,6 +644,7 @@ gint config_save(void)
     gnome_config_set_int("ToolbarStyle", balsa_app.toolbar_style);
     gnome_config_set_int("ProgressWindow", balsa_app.pwindow_option);
     gnome_config_set_bool("AlternativeLayout", balsa_app.alternative_layout);
+    gnome_config_set_bool("ViewMessageOnOpen", balsa_app.view_message_on_open);
 
     gnome_config_pop_prefix();
 

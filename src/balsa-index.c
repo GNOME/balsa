@@ -510,7 +510,19 @@ moveto_handler(BalsaIndex * bindex)
     if (row_data) {
         row = gtk_clist_find_row_from_data (GTK_CLIST (bindex->ctree),
                                             row_data);
-        balsa_index_select_row (bindex, row);
+
+        if (balsa_app.view_message_on_open) {  
+            balsa_index_select_row (bindex, row);
+        } else {
+            gtk_signal_handler_block_by_func(GTK_OBJECT(bindex->ctree),
+                                             GTK_SIGNAL_FUNC(select_message),
+                                             bindex);
+            gtk_clist_select_row (GTK_CLIST (bindex->ctree), row, -1);
+            gtk_signal_handler_unblock_by_func(GTK_OBJECT(bindex->ctree),
+                                             GTK_SIGNAL_FUNC(select_message),
+                                               bindex);
+            gtk_clist_moveto (GTK_CLIST (bindex->ctree), row, -1, 0.5, 0.0);
+        }
     }
     
     gdk_threads_leave();

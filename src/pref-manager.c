@@ -59,6 +59,7 @@ typedef struct _PropertyUI {
 
     GtkWidget *previewpane;
     GtkWidget *alternative_layout;
+    GtkWidget *view_message_on_open;
     GtkWidget *view_allheaders;
     GtkWidget *debug;		/* enable/disable debugging */
     GtkWidget *empty_trash;
@@ -293,6 +294,9 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     gtk_signal_connect(GTK_OBJECT(pui->alternative_layout), "toggled",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
+    gtk_signal_connect (GTK_OBJECT (pui->view_message_on_open), "toggled",
+                        GTK_SIGNAL_FUNC (properties_modified_cb),
+                        property_box);
     gtk_signal_connect(GTK_OBJECT(pui->debug), "toggled",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
@@ -569,6 +573,7 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     balsa_app.debug = GTK_TOGGLE_BUTTON(pui->debug)->active;
     balsa_app.previewpane = GTK_TOGGLE_BUTTON(pui->previewpane)->active;
     balsa_app.alternative_layout = GTK_TOGGLE_BUTTON(pui->alternative_layout)->active;
+    balsa_app.view_message_on_open = GTK_TOGGLE_BUTTON (pui->view_message_on_open)->active;
     
 //    if (balsa_app.alt_layout_is_active != balsa_app.alternative_layout)
 	balsa_change_window_layout(balsa_app.main_window);
@@ -794,6 +799,8 @@ set_prefs(void)
 				 balsa_app.previewpane);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->alternative_layout),
 				 balsa_app.alternative_layout);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->view_message_on_open),
+                                 balsa_app.view_message_on_open);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->debug),
 				 balsa_app.debug);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->rb_smtp_server),
@@ -1089,7 +1096,7 @@ color_box(GtkBox* parent, const gchar* title)
     gtk_box_pack_start_defaults(parent, box);
 
     picker = gnome_color_picker_new();
-    gnome_color_picker_set_title(GNOME_COLOR_PICKER(picker), (gchar*)label);
+    gnome_color_picker_set_title(GNOME_COLOR_PICKER(picker), (gchar*)title);
     gnome_color_picker_set_dither(GNOME_COLOR_PICKER(picker),TRUE);
     gtk_box_pack_start(GTK_BOX(box), picker,  FALSE, FALSE, 5);
     gtk_container_set_border_width(GTK_CONTAINER(picker), 5);
@@ -1457,6 +1464,7 @@ create_display_page(gpointer data)
      * PKGW: This naming scheme is, uh, unclear.
      */
     gint i;
+    GtkWidget *vbox1;
     GtkWidget *frame7;
     GtkWidget *vbox7;
     GtkWidget *hbox4;
@@ -1470,9 +1478,31 @@ create_display_page(gpointer data)
     GtkTable  *ftbl;
     GtkWidget *information_frame, *information_table, *label;
     GtkWidget *option_menu;
+    GtkWidget *subnb;
+    GtkWidget *vbox6;
+    GtkWidget *vbox8;
+    GtkWidget *color_frame;
+    GtkWidget *vbox12;
+    GtkWidget *mbcolor_frame;
+    GtkWidget *vbox9;
+    GtkWidget *font_frame;
+    GtkWidget *header_frame;
+    GtkWidget *table1;
+    GtkWidget *table2;
+    GtkWidget *label1;
+    GtkWidget *label2;
+    GtkWidget *label3;
+    GtkWidget *label4;
+
+    
+    vbox1 = gtk_vbox_new (FALSE, 0);
+    subnb = gtk_notebook_new ();
+    gtk_container_set_border_width (GTK_CONTAINER (subnb), 5);
+    gtk_box_pack_start (GTK_BOX (vbox1), subnb, FALSE, FALSE, 0);
 
     vbox2 = gtk_vbox_new(FALSE, 0);
-
+    gtk_notebook_append_page (GTK_NOTEBOOK (subnb), vbox2,
+                              gtk_label_new (_("Display")));
     frame7 = gtk_frame_new(_("Main window"));
     gtk_box_pack_start(GTK_BOX(vbox2), frame7, FALSE, FALSE, 0);
     gtk_container_set_border_width(GTK_CONTAINER(frame7), 5);
@@ -1484,6 +1514,8 @@ create_display_page(gpointer data)
 	_("Show mailbox statistics in left pane"), vbox7);
     pui->alternative_layout =	box_start_check(
 	_("Use alternative main window layout"), vbox7);
+    pui->view_message_on_open = box_start_check(
+        _("Automatically view message when mailbox opened"), vbox7);
 
     hbox4 = gtk_hbox_new(TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox2), hbox4, FALSE, FALSE, 0);
@@ -1517,6 +1549,8 @@ create_display_page(gpointer data)
 
     ftbl = GTK_TABLE(gtk_table_new(2, 2, FALSE));
     gtk_container_add(GTK_CONTAINER(format_frame), GTK_WIDGET(ftbl));
+    gtk_container_set_border_width(GTK_CONTAINER(ftbl), 5);
+    
     pui->date_format = attach_entry(_("Date encoding (for strftime):"),0,ftbl);
     pui->selected_headers = attach_entry(_("Selected headers:"), 1, ftbl);
 
@@ -1532,8 +1566,11 @@ create_display_page(gpointer data)
     }
 
     /* Information messages frame... */
+    vbox6 = gtk_vbox_new (FALSE, 0);
+    gtk_notebook_append_page (GTK_NOTEBOOK (subnb), vbox6,
+                              gtk_label_new (_("Messages")));
     information_frame = gtk_frame_new(_("Information Messages"));
-    gtk_box_pack_start(GTK_BOX(vbox2), information_frame, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox6), information_frame, FALSE, FALSE, 0);
     gtk_container_set_border_width(GTK_CONTAINER(information_frame), 5);
 
     information_table = create_table(5, 2, GTK_CONTAINER(information_frame));
@@ -1605,7 +1642,105 @@ create_display_page(gpointer data)
     gtk_table_attach(GTK_TABLE(information_table), option_menu, 1, 2, 4, 5,
 		     GTK_EXPAND | GTK_FILL, 0, 0, 0);
 
-    return vbox2;
+    vbox8 = gtk_vbox_new(FALSE, 0);
+    gtk_notebook_append_page(GTK_NOTEBOOK(subnb), vbox8,
+                             gtk_label_new(_("Colors")));
+
+    mbcolor_frame = gtk_frame_new(_("Mailbox Colors"));
+    gtk_container_set_border_width(GTK_CONTAINER(mbcolor_frame), 5);
+    gtk_box_pack_start(GTK_BOX(vbox8), mbcolor_frame, FALSE, FALSE, 0);
+    vbox9 = vbox_in_container(mbcolor_frame);
+
+    pui->unread_color = color_box(
+	GTK_BOX(vbox9), _("Mailbox with unread messages color"));
+
+    color_frame = gtk_frame_new(_("Message Colors"));
+    gtk_container_set_border_width(GTK_CONTAINER(color_frame), 5);
+    gtk_box_pack_start(GTK_BOX(vbox8), color_frame, FALSE, FALSE, 0);
+    vbox12 = vbox_in_container(color_frame);
+
+    pui->quoted_color_start = color_box(
+	GTK_BOX(vbox12), _("Quoted text primary color"));
+    pui->quoted_color_end = color_box(
+	GTK_BOX(vbox12), _("Quoted text secondary color"));
+    
+    vbox9 = gtk_vbox_new(FALSE, 0);
+    gtk_notebook_append_page(GTK_NOTEBOOK(subnb), vbox9,
+                             gtk_label_new(_("Fonts")));
+
+    font_frame = gtk_frame_new(_("Preview Font"));
+    gtk_container_set_border_width(GTK_CONTAINER(font_frame), 5);
+    gtk_box_pack_start(GTK_BOX(vbox9), font_frame, FALSE, FALSE, 0);
+
+    table1 = gtk_table_new(10, 3, FALSE);
+    gtk_container_add(GTK_CONTAINER(font_frame), table1);
+    gtk_container_set_border_width(GTK_CONTAINER(table1), 5);
+    pui->message_font = gtk_entry_new();
+    gtk_table_attach(GTK_TABLE(table1), pui->message_font, 0, 1, 1, 2,
+		     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+		     (GtkAttachOptions) (GTK_FILL), 0, 0);
+    pui->font_picker = gnome_font_picker_new();
+    gtk_table_attach(GTK_TABLE(table1), pui->font_picker, 1, 2, 1, 2,
+		     (GtkAttachOptions) (0), (GtkAttachOptions) (0), 0, 0);
+    gtk_container_set_border_width(GTK_CONTAINER(pui->font_picker), 5);
+
+    gnome_font_picker_set_font_name(GNOME_FONT_PICKER(pui->font_picker),
+				    balsa_app.message_font);
+    gnome_font_picker_set_preview_text(GNOME_FONT_PICKER(pui->font_picker),
+				       _("Select a font to use"));
+    gnome_font_picker_set_mode(GNOME_FONT_PICKER(pui->font_picker),
+			       GNOME_FONT_PICKER_MODE_USER_WIDGET);
+    label1 = gtk_label_new(_("Select..."));
+    gnome_font_picker_uw_set_widget(GNOME_FONT_PICKER(pui->font_picker),
+				    GTK_WIDGET(label1));
+    gtk_object_set_user_data(GTK_OBJECT(pui->font_picker),
+			     GTK_OBJECT(pui->message_font));
+    gtk_object_set_user_data(GTK_OBJECT(pui->message_font),
+			     GTK_OBJECT(pui->font_picker));
+    label2 = gtk_label_new(_("Preview pane"));
+    gtk_table_attach(GTK_TABLE(table1), label2, 0, 1, 0, 1,
+		     (GtkAttachOptions) (GTK_FILL),
+		     (GtkAttachOptions) (GTK_JUSTIFY_RIGHT), 0, 0);
+    gtk_label_set_justify(GTK_LABEL(label2), GTK_JUSTIFY_RIGHT);
+
+
+    /* Subject Font */    
+    header_frame = gtk_frame_new(_("Subject Header Font"));
+    gtk_container_set_border_width(GTK_CONTAINER(header_frame), 5);
+    gtk_box_pack_start(GTK_BOX(vbox9), header_frame, FALSE, FALSE, 0);
+    table2 = gtk_table_new(10, 3, FALSE);
+    gtk_container_add(GTK_CONTAINER(header_frame), table2);
+    gtk_container_set_border_width(GTK_CONTAINER(table2), 5);
+    pui->subject_font = gtk_entry_new();
+    gtk_table_attach(GTK_TABLE(table2), pui->subject_font, 0, 1, 1, 2,
+		     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+		     (GtkAttachOptions) (GTK_FILL), 0, 0);
+    pui->font_picker2 = gnome_font_picker_new();
+    gtk_table_attach(GTK_TABLE(table2), pui->font_picker2, 1, 2, 1, 2,
+		     (GtkAttachOptions) (0), (GtkAttachOptions) (0), 0, 0);
+    gtk_container_set_border_width(GTK_CONTAINER(pui->font_picker2), 5);
+    gnome_font_picker_set_font_name(GNOME_FONT_PICKER(pui->font_picker2),
+				    balsa_app.subject_font);
+    gnome_font_picker_set_preview_text(GNOME_FONT_PICKER
+				       (pui->font_picker2),
+				       _("Select a font to use"));
+    gnome_font_picker_set_mode(GNOME_FONT_PICKER(pui->font_picker2),
+			       GNOME_FONT_PICKER_MODE_USER_WIDGET);
+    label3 = gtk_label_new(_("Select..."));
+    gnome_font_picker_uw_set_widget(GNOME_FONT_PICKER(pui->font_picker2),
+				    GTK_WIDGET(label3));
+    gtk_object_set_user_data(GTK_OBJECT(pui->font_picker2),
+			     GTK_OBJECT(pui->subject_font));
+    gtk_object_set_user_data(GTK_OBJECT(pui->subject_font),
+			     GTK_OBJECT(pui->font_picker2));
+
+    label4 = gtk_label_new(_("Preview pane"));
+    gtk_table_attach(GTK_TABLE(table2), label4, 0, 1, 0, 1,
+		     (GtkAttachOptions) (GTK_FILL),
+		     (GtkAttachOptions) (GTK_JUSTIFY_RIGHT), 0, 0);
+    gtk_label_set_justify(GTK_LABEL(label4), GTK_JUSTIFY_RIGHT);
+
+    return vbox1;
 }
 
 #ifndef HAVE_GNOME_PRINT
@@ -1772,17 +1907,7 @@ create_misc_page(gpointer data)
     GtkWidget *vbox9;
     GtkWidget *frame13;
     GtkWidget *vbox10;
-    GtkWidget *frame14;
-    GtkWidget *frame914;
-    GtkWidget *table6;
-    GtkWidget *table96;
-    GtkWidget *label27;
-    GtkWidget *label927;
-    GtkWidget *label;
-    GtkWidget *label9;
     GtkWidget *label33;
-    GtkWidget *color_frame;
-    GtkWidget *vbox12;
     GtkWidget *hbox1;
     GtkObject *spinbutton4_adj;
 
@@ -1820,104 +1945,6 @@ create_misc_page(gpointer data)
     label33 = gtk_label_new(_("minutes"));
     gtk_widget_show(label33);
     gtk_box_pack_start(GTK_BOX(hbox1), label33, FALSE, TRUE, 0);
-
-    /* font */
-    frame14 = gtk_frame_new(_("Font"));
-    gtk_box_pack_start(GTK_BOX(vbox9), frame14, FALSE, FALSE, 0);
-    gtk_container_set_border_width(GTK_CONTAINER(frame14), 5);
-
-    table6 = gtk_table_new(10, 3, FALSE);
-    gtk_container_add(GTK_CONTAINER(frame14), table6);
-    gtk_container_set_border_width(GTK_CONTAINER(table6), 5);
-
-    pui->message_font = gtk_entry_new();
-    gtk_table_attach(GTK_TABLE(table6), pui->message_font, 0, 1, 1, 2,
-		     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-		     (GtkAttachOptions) (GTK_FILL), 0, 0);
-
-    /*a */
-    pui->font_picker = gnome_font_picker_new();
-    gtk_table_attach(GTK_TABLE(table6), pui->font_picker, 1, 2, 1, 2,
-		     (GtkAttachOptions) (0), (GtkAttachOptions) (0), 0, 0);
-    gtk_container_set_border_width(GTK_CONTAINER(pui->font_picker), 5);
-
-    gnome_font_picker_set_font_name(GNOME_FONT_PICKER(pui->font_picker),
-				    balsa_app.message_font);
-    gnome_font_picker_set_preview_text(GNOME_FONT_PICKER(pui->font_picker),
-				       _("Select a font to use"));
-    gnome_font_picker_set_mode(GNOME_FONT_PICKER(pui->font_picker),
-			       GNOME_FONT_PICKER_MODE_USER_WIDGET);
-
-    label = gtk_label_new(_("Select..."));
-    gnome_font_picker_uw_set_widget(GNOME_FONT_PICKER(pui->font_picker),
-				    GTK_WIDGET(label));
-    gtk_object_set_user_data(GTK_OBJECT(pui->font_picker),
-			     GTK_OBJECT(pui->message_font));
-    gtk_object_set_user_data(GTK_OBJECT(pui->message_font),
-			     GTK_OBJECT(pui->font_picker));
-
-    label27 = gtk_label_new(_("Preview pane"));
-    gtk_table_attach(GTK_TABLE(table6), label27, 0, 1, 0, 1,
-		     (GtkAttachOptions) (GTK_FILL),
-		     (GtkAttachOptions) (GTK_JUSTIFY_RIGHT), 0, 0);
-    gtk_label_set_justify(GTK_LABEL(label27), GTK_JUSTIFY_RIGHT);
-
-
-    /* Subject Font */
-    frame914 = gtk_frame_new(_("Subject Header Font"));
-    gtk_box_pack_start(GTK_BOX(vbox9), frame914, FALSE, FALSE, 0);
-    gtk_container_set_border_width(GTK_CONTAINER(frame914), 5);
-
-    table96 = gtk_table_new(10, 3, FALSE);
-    gtk_container_add(GTK_CONTAINER(frame914), table96);
-    gtk_container_set_border_width(GTK_CONTAINER(table96), 5);
-
-    pui->subject_font = gtk_entry_new();
-    gtk_table_attach(GTK_TABLE(table96), pui->subject_font, 0, 1, 1, 2,
-		     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-		     (GtkAttachOptions) (GTK_FILL), 0, 0);
-
-    /*b */
-    pui->font_picker2 = gnome_font_picker_new();
-    gtk_table_attach(GTK_TABLE(table96), pui->font_picker2, 1, 2, 1, 2,
-		     (GtkAttachOptions) (0), (GtkAttachOptions) (0), 0, 0);
-    gtk_container_set_border_width(GTK_CONTAINER(pui->font_picker2), 5);
-
-    gnome_font_picker_set_font_name(GNOME_FONT_PICKER(pui->font_picker2),
-				    balsa_app.subject_font);
-    gnome_font_picker_set_preview_text(GNOME_FONT_PICKER
-				       (pui->font_picker2),
-				       _("Select a font to use"));
-    gnome_font_picker_set_mode(GNOME_FONT_PICKER(pui->font_picker2),
-			       GNOME_FONT_PICKER_MODE_USER_WIDGET);
-
-    label9 = gtk_label_new(_("Select..."));
-    gnome_font_picker_uw_set_widget(GNOME_FONT_PICKER(pui->font_picker2),
-				    GTK_WIDGET(label9));
-    gtk_object_set_user_data(GTK_OBJECT(pui->font_picker2),
-			     GTK_OBJECT(pui->subject_font));
-    gtk_object_set_user_data(GTK_OBJECT(pui->subject_font),
-			     GTK_OBJECT(pui->font_picker2));
-
-    label927 = gtk_label_new(_("Preview pane"));
-    gtk_table_attach(GTK_TABLE(table96), label927, 0, 1, 0, 1,
-		     (GtkAttachOptions) (GTK_FILL),
-		     (GtkAttachOptions) (GTK_JUSTIFY_RIGHT), 0, 0);
-    gtk_label_set_justify(GTK_LABEL(label927), GTK_JUSTIFY_RIGHT);
-
-    /* mblist unread colour  */
-    color_frame = gtk_frame_new(_("Colors"));
-    gtk_container_set_border_width(GTK_CONTAINER(color_frame), 5);
-    gtk_box_pack_start(GTK_BOX(vbox9), color_frame, FALSE, FALSE, 0);
-
-    vbox12 = vbox_in_container(color_frame);
-
-    pui->unread_color = color_box(
-	GTK_BOX(vbox12), _("Mailbox with unread messages color"));    
-    pui->quoted_color_start = color_box(
-	GTK_BOX(vbox12), _("Quoted text primary color"));
-    pui->quoted_color_end = color_box(
-	GTK_BOX(vbox12), _("Quoted text secondary color"));
 
     return vbox9;
 }

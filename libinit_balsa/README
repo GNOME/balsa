@@ -1,0 +1,168 @@
+libinit_balsa
+Peter Williams
+12/9/99
+
+This document explains quickly how libinit_balsa works.
+
+1. OVERVIEW
+
+libinit_balsa is a static library. It can thus access Balsa's library functions
+and modify Balsa's data without kludginess. It is separate from the rest of the
+code because of limitations of GOB (see below) and for the sake of modularity.
+
+The purpose of libinit_balsa is to help the user set up Balsa when they first
+use it. Because this code will usually only be executed once by any given user,
+the bloat it adds is an important consideration. However, I justify the size
+of libinit_balsa thusly: Linux (and AFAIK the other kernels it runs on) load
+code pages on demand: the executable starts, jumps to an unloaded address,
+generates a page fault that causes the necessary code to be loaded, continues
+until it generates another page fault, until all the code that will be used
+by the program is in RAM. Hopefully the libinit_balsa code will not be loaded
+unless the user runs it, which will only happen once, so bloat is not an issue.
+
+2. IMPLEMENTATION
+
+libinit_balsa is based on GOB, the GTK+ Object Builder. It's like a lex for
+generating GTK+ objects instead of lexical scanners. It will automatically do
+the gtk_type_unique()'s, the gtk_signal_new()'s, and all those other chores. GOB
+is not very old but is pretty smart, and has not proven to limit the code I've
+written here.
+
+Almost all of libinit_balsa consists of GTK+ objects derived from the GnomeDruid
+objects. There are custom BalsaInitDruids and BalsaDruidPages. The same
+functionality could be (and has been) implemented as instances of GnomeDruid's
+and GnomeDruidPage's without the object code, but it had a few issues:
+
+	o	There were too many gtk_object_{g,s}et_data() calls
+	o	The code was crammed into one file and confusing
+	o	It was not extensible by any means
+
+I believe the current implementation addresses those problems
+
+3. INTERFACE
+
+libinit_balsa provides one function to the outside word: balsa_init_begin(),
+which creates the druid and takes control of the interface. While the druid is
+active it will modify some of Balsa's structures and call some functions, but
+the UI is completely frozen.
+
+4. BALSAINITDRUID
+
+The BalsaInitDruid object is essentially a GnomeDruid that knows exactly what
+pages it needs. On creation it populates itself with the custom init page. The
+only interesting data it maintains is a default icon for pages to use. This
+object is not designed to be extended.
+
+If the druid is cancelled, it will confirm whether the user wants to exit
+Balsa (not just the wizard) and conditionally exits.
+
+5. BALSADRUIDPAGE
+
+The BalsaDruidPage extends the GnomeDruidPageStandard's capabilities somewhat. It
+provides next and prev fields, for navigating the sequence of pages, a druid
+field that is probably superfluous (it references the owning druid), and 
+implements the 'construct' class function. 
+
+Unfortunately, the implementation of GnomeDruidPageStandard contains a function,
+gnome_druid_page_standard_construct(), that is both necessary and only
+accessible to the immediate file: it is static and not a class function or signal.
+It creates the canvas items needed to draw the page. BalsaDruidPage implements
+this function by copying it straight out of 
+gnome-libs/libgnomeui/gnome-druid-page-standard.c. BalsaDruidPage allows children
+to call this function, so that the functionality can be extended properly.
+
+BalsaDruidPage provides 'back' and 'next' functions that use the next and prev
+fields correctly. Someday the nomenclature (back vs. prev) should be standardized.
+
+All children of BalsaDruidPage are expected to behave a certain way: create their
+specific widgets on init / new; check for valid entries when next is clicked; go
+on to an error page (see below) if an entry is not valid; otherwise apply the
+changes and go on to another page. Note that all the messages and titles are
+preset, not up to the caller.
+
+BalsaDruidPage doesn't do much by itself, and should be subclassed.
+
+6. BALSADRUIDPAGEWELCOME
+
+The first page seen by the user is of class BalsaDruidPageWelcome. IT IS NOT A
+CHILD OF BalsaDruidPage! IT IS A CHILD OF GnomeDruidPageStart! This is because
+GnomeDruidPageStart provides too many services to make it worthwhile to do them
+myself. Also, the welcome page will not need any special functionality; some code
+relies on pages being BalsaDruidPages, but since the welcome page does nothing
+interesting along these lines.
+
+The Welcome page again reimplements the construct code from the Gnome sources.
+It is not designed to be subclassed.
+
+7. BALSADRUIDPAGEUSER
+
+The first real page the user sees is BalsaDruidPageUser. This collects
+user information in a table driven by the EntryData scheme (see below). When
+next is pressed, the data is validated, the local mail directory is created if
+necessary, and the user proceeds on to the mail files page.
+
+If an error occurs in creating the local mail directory the user goes on to
+an error page (see below). This page should not be subclassed.
+
+8. BALSADRUIDPAGEDIRECTORY
+
+The BalsaDruidPageDirectory lets the user set up their default mail files.
+If not present, directories and files will be created. It should not be 
+subclassed.
+
+9. BALSADRUIDPAGEFINISH
+
+This page displays a message that Balsa is set up and closes the whole druid,
+which applies the changes made, saves the config, and returns control to
+the main program. It should not be subclassed.
+
+10. BALSADRUIDPAGEERROR
+
+BalsaDruidPageError is an exception. It is a child of BalsaDruidPage, but
+it is a little bit configurable. At new()-time you specify a title and an
+error message. Otherwise, the page behaves the same all the time: it 
+disables the forward button, and displays the error message and extra 
+information (currently only errno). If the user goes back the page will
+remove itself from the list of pages and destroy itself. Well, that's not
+exactly how it works out, but you can pretend that's what happens.
+
+Although the error page is configurable it should not be subclassed.
+
+11. ENTRYDATA
+
+Also in libinit_balsa is a little utility routine to create tables for
+entering data. These tables do nifty things like preventing the user
+from continuing until all the fields contain text.
+
+If a page wishes to use this it needs to provide: an EntryMaster structure
+for containing information about the state of all the fields, and EntryData
+struct for each individual field, and a GtkTable that will have the fields
+packed into it.
+
+This code is very inflexible; it makes a great many assumptions. The table
+is filled at the second row, because in the times it is used so far the
+first row is filled with an instructional label.
+
+The EntryMaster structure having been initialized, and the EntryData
+structures blank except for the reference to the EntryMaster, your code should
+call balsa_init_add_table_entry(). The arguments are:
+
+	o	The table to pack the widgets into
+	o	The serial number of this entry
+	o	The text to put in label describing this entry
+	o	The default text of this entry
+	o	The EntryData describing this entry
+	o	The page that owns this table
+	o	(out) The entry widget that was created
+
+The result can be seen in BalsaDruidPageUser.
+
+12. OTHER HELPER FUNCTIONS
+
+balsa_init_get_png() -- Makes a GdkImlibImage out of a filename is it appears
+in balsa/pixmaps/*.png. Once we move to GdkPixbuf this'll have to be changed.
+
+balsa_init_create_to_directory() -- Given a directory pathname, creates
+directories (mode 700) up to and including that point. complaint is set to
+a nonnull string describing the error, and true is returned, when an error
+occurs

@@ -1,3 +1,8 @@
+1999-12-21  Héctor García Álvarez <hector@scouts-es.org>
+	* libbalsa/send.c: Made some changes to make balsa send queued 
+	messages. Still have the bug when trying to send queued messages 
+	from a Mailbox format outbox.
+ 	
 1999-12-21  Bruno Pires Marinho  <bapm@camoes.rnl.ist.utl.pt>
 
 	* src/main-window.c: When the notebook changes the message preview

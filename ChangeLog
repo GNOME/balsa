@@ -1,3 +1,8 @@
+2004-10-01 10:03  PeterB
+
+	* libbalsa/mailbox_mbox.c: must test g_mime_parser_eos while
+	parsing, not g_mime_stream_eos.
+
 2004-10-01  PeterB
 
 	* src/main-window.c: sensitize expand/collapse all.

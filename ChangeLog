@@ -1,5 +1,7 @@
-2004-05-05 14:34  PeterB
+2004-05-05 14:38  PeterB
 
+	* src/message-window.c: plug ref leak.
+	* src/balsa-index.c: prune dead code.
 	* src/mailbox-node.c: restore new mail check in closed mailboxes.
 	* libbalsa/: mailbox_maildir.c, mailbox_mbox.c, mailbox_mh.c:
 	restore new mail check in closed mailboxes; manage message

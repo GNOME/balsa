@@ -409,7 +409,7 @@ void libbalsa_mailbox_set_encr_icon(GdkPixbuf * pixbuf);
 #endif /* HAVE_GPGME */
 
 /* columns ids */
-enum {
+typedef enum {
     LB_MBOX_MSGNO_COL,
     LB_MBOX_MARKED_COL,
     LB_MBOX_ATTACH_COL,
@@ -420,6 +420,6 @@ enum {
     LB_MBOX_WEIGHT_COL,
     LB_MBOX_MESSAGE_COL,
     LB_MBOX_N_COLS
-};
+} LibBalsaMailboxColumn;
 
 #endif				/* __LIBBALSA_MAILBOX_H__ */

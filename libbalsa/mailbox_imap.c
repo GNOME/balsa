@@ -526,7 +526,7 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
     printf("%s old=%u new=%u\n", __func__,
            (unsigned)mailbox->total_messages, cnt);
     if(cnt<(unsigned)mailbox->total_messages) { /* remove messages */
-        printf("%s: expunge ignored?", __func__);
+        printf("%s: expunge ignored?\n", __func__);
     } else { /* new messages arrived */
         unsigned i;
         for(i=mailbox->total_messages+1; i<=cnt; i++) {
@@ -546,11 +546,12 @@ imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
 
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
     struct message_info *msg_info = message_info_from_msgno(mimap, seqno);
-    printf("%s\n", __func__);
+    printf("%s %d\n", __func__, seqno);
     libbalsa_mailbox_msgno_removed(mailbox, seqno);
     if(msg_info->message)
         g_object_unref(G_OBJECT(msg_info->message));
     g_array_remove_index(mimap->messages_info, seqno-1);
+    mailbox->total_messages = mimap->messages_info->len;
 
     for (i = seqno - 1; i < mimap->messages_info->len; i++) {
 	struct message_info *msg_info =
@@ -572,6 +573,12 @@ libbalsa_mailbox_imap_release_handle(LibBalsaMailboxImap * mimap)
     g_assert(mimap->handle_refs > 0);
 
     if (--mimap->handle_refs == 0) {
+	/* Only selected handles have these signal handlers, but we'll
+	 * disconnect them anyway. */
+	g_signal_handlers_disconnect_by_func(mimap->handle,
+					     imap_exists_cb, mimap);
+	g_signal_handlers_disconnect_by_func(mimap->handle,
+					     imap_expunge_cb, mimap);
 	RELEASE_HANDLE(mimap, mimap->handle);
 	mimap->handle = NULL;
 #ifdef BALSA_USE_THREADS

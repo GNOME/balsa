@@ -26,6 +26,7 @@
 
 #include "print.h"
 #include "misc.h"
+#include "balsa-message.h"
 
 #include <ctype.h>
 #include <libgnomeprint/gnome-print.h>
@@ -62,6 +63,7 @@
 #include <libgnomeprintui/gnome-print-dialog.h>
 
 #include <libbalsa.h>
+#include "html.h"
 #ifdef HAVE_PCRE
 #  include <pcreposix.h>
 #else
@@ -80,6 +82,9 @@
 #ifdef HAVE_GPGME
 #define BALSA_PRINT_TYPE_GPG_SIGN   6
 #endif
+#ifdef HAVE_GTKHTML
+# define BALSA_PRINT_TYPE_HTML      7
+#endif /* HAVE_GTKHTML */
 
 
 typedef struct _PrintInfo {
@@ -232,15 +237,13 @@ print_foot_lines(PrintInfo * pi, GnomeFont * font, float y,
 }
 
 static void
-start_new_page(PrintInfo * pi)
+start_new_page_real(PrintInfo * pi)
 {
     gdouble font_size;
     gchar *page_no;
     int width, ypos;
     gchar buf[20];
 
-    if (pi->current_page)
-	gnome_print_showpage(pi->pc);
     pi->current_page++;
     snprintf(buf, sizeof(buf ) - 1, "%d", pi->current_page);
     if (balsa_app.debug)
@@ -268,9 +271,24 @@ start_new_page(PrintInfo * pi)
     pi->ypos = pi->margin_bottom + pi->printable_height;
 }
 
+static void
+start_new_page(PrintInfo * pi)
+{
+    gnome_print_showpage(pi->pc);
+    start_new_page_real(pi);
+}
+
+/*
+ * ~~~ generic stuff for print tasks ~~~
+ */
+typedef struct _TaskInfo {
+    guint id_tag;
+} TaskInfo;
+
 /*
  * ~~~ stuff for the message and embedded headers ~~~
  */
+
 typedef struct _HeaderInfo {
     guint id_tag;
     float header_label_width;
@@ -599,6 +617,148 @@ print_separator(PrintInfo * pi, gpointer * data)
     pi->ypos -= (font_size / 2.0);
 }
 
+#ifdef HAVE_GTKHTML
+/*
+ * ~~~ stuff to print an html part ~~~
+ */
+typedef struct _HtmlInfo {
+    guint id_tag;
+    GtkWidget *html;
+} HtmlInfo;
+
+static void prepare_default(PrintInfo * pi, LibBalsaMessageBody * body);
+
+static void
+prepare_html(PrintInfo * pi, LibBalsaMessageBody * body)
+{
+    GtkWidget *dialog;
+    gint response;
+    HtmlInfo *pdata;
+    FILE *fp;
+    size_t len;
+    gchar *html_text;
+
+    if (!libbalsa_html_can_print()) {
+	prepare_default(pi, body);
+	return;
+    }
+
+    dialog =
+	gtk_message_dialog_new(NULL, GTK_DIALOG_DESTROY_WITH_PARENT,
+			       GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
+			       _("Processing an HTML message part, "
+				 "which must start on a new page.\n"
+				 "Print this part?"));
+    response = gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+    if (response != GTK_RESPONSE_YES) {
+	prepare_default(pi, body);
+	return;
+    }
+
+    if (!libbalsa_message_body_save_temporary(body)) {
+	balsa_information
+	    (LIBBALSA_INFORMATION_ERROR,
+	     _("Error writing to temporary file %s.\n"
+	       "Check the directory permissions."), body->temp_filename);
+	return;
+    }
+
+    if ((fp = fopen(body->temp_filename, "r")) == NULL) {
+	balsa_information(LIBBALSA_INFORMATION_ERROR,
+			  _("Cannot open temporary file %s."),
+			  body->temp_filename);
+	return;
+    }
+
+    len = libbalsa_readfile(fp, &html_text);
+    fclose(fp);
+    if (!html_text)
+	return;
+
+    pdata = g_new(HtmlInfo, 1);
+    pdata->id_tag = BALSA_PRINT_TYPE_HTML;
+    pdata->html =
+	libbalsa_html_new(html_text, len, pi->message, NULL);
+    g_free(html_text);
+
+    if (libbalsa_html_can_zoom(pdata->html)) {
+	gint zoom = GPOINTER_TO_INT(g_object_get_data
+				    (G_OBJECT(pi->message),
+				     BALSA_MESSAGE_ZOOM_KEY));
+
+	if (zoom > 0)
+	    do
+		libbalsa_html_zoom(pdata->html, 1);
+	    while (--zoom);
+	else if (zoom < 0)
+	    do
+		libbalsa_html_zoom(pdata->html, -1);
+	    while (++zoom);
+    }
+
+    pi->pages +=
+	libbalsa_html_print_get_pages_num(pdata->html, pi->pc,
+					  pi->margin_top,
+					  pi->margin_bottom);
+    pi->ypos = 0;		/* Must start a new page for the next part. */
+    pi->print_parts = g_list_append(pi->print_parts, pdata);
+}
+
+static void
+print_html_header(GtkWidget * html, GnomePrintContext * print_context,
+		  gdouble x, gdouble y, gdouble width, gdouble height,
+		  PrintInfo * pi)
+{
+    gchar *page_no;
+    int page_no_width, ypos;
+
+    if (balsa_app.print_highlight_cited)
+	gnome_print_setrgbcolor(pi->pc, 0.0, 0.0, 0.0);
+
+    pi->current_page++;
+    page_no =
+	g_strdup_printf(_("Page: %i/%i"), pi->current_page, pi->pages);
+    ypos = pi->page_height - pi->pgnum_from_top;
+    gnome_print_setfont(pi->pc, pi->header_font);
+    page_no_width = gnome_font_get_width_utf8(pi->header_font, page_no);
+    gnome_print_moveto(pi->pc,
+		       pi->page_width - pi->margin_left - page_no_width,
+		       ypos);
+    gnome_print_show(pi->pc, page_no);
+    g_free(page_no);
+}
+
+static void
+print_html_footer(GtkWidget * html, GnomePrintContext * print_context,
+		  gdouble x, gdouble y, gdouble width, gdouble height,
+		  PrintInfo * pi)
+{
+    gdouble font_size;
+
+    gnome_print_setfont(pi->pc, pi->footer_font);
+    font_size = gnome_font_get_size(pi->footer_font);
+    print_foot_lines(pi, pi->footer_font, 
+		     pi->margin_bottom - 2 * font_size,
+		     font_size, pi->footer);
+}
+
+static void
+print_html(PrintInfo * pi, HtmlInfo * pdata)
+{
+    g_return_if_fail(pdata->id_tag == BALSA_PRINT_TYPE_HTML);
+
+    libbalsa_html_print(pdata->html, pi->pc,
+				      pi->margin_top,
+				      pi->margin_bottom,
+				      (LibBalsaHTMLPrintCallback)
+				      print_html_header,
+				      (LibBalsaHTMLPrintCallback)
+				      print_html_footer, pi);
+    gtk_widget_destroy(pdata->html);
+}
+
+#endif /* HAVE_GTKHTML */
 /*
  * ~~~ stuff to print a plain text part ~~~
  */
@@ -812,10 +972,7 @@ prepare_default(PrintInfo * pi, LibBalsaMessageBody * body)
     pdata = g_malloc(sizeof(DefaultInfo));
     pdata->id_tag = BALSA_PRINT_TYPE_DEFAULT;
 
-    if (body->mime_part)
-	conttype = libbalsa_message_body_get_content_type(body);
-    else
-	conttype = libbalsa_lookup_mime_type(body->filename);
+    conttype = libbalsa_message_body_get_content_type(body);
 
     /* get a pixbuf according to the mime type */
     icon_name = libbalsa_icon_finder(conttype, NULL, NULL);
@@ -1096,7 +1253,11 @@ scan_body(PrintInfo * pi, LibBalsaMessageBody * body)
 {
     static mime_action_t mime_actions [] = {
 	{"multipart", NULL},              /* ignore `multipart' entries */
+#ifndef HAVE_GTKHTML
 	{"text/html", prepare_default},   /* don't print html source */
+#else /* HAVE_GTKHTML */
+	{"text/html", prepare_html},
+#endif /* HAVE_GTKHTML */
 	{"text", prepare_plaintext},
 	{"image", prepare_image},
 	{"message/rfc822", prepare_embedded_header},
@@ -1110,18 +1271,12 @@ scan_body(PrintInfo * pi, LibBalsaMessageBody * body)
     while (body) {
 	gchar *conttype;
 
-	if (body->buffer)
-	    conttype = g_strdup("text");
-	else
-	    if (!body->mime_part)
-		conttype = g_strdup("default");
-	    else
-		conttype = libbalsa_message_body_get_content_type(body);
+	conttype = libbalsa_message_body_get_content_type(body);
 	
 	for (action = mime_actions; 
 	     action->mime_type && 
-		 g_ascii_strncasecmp(action->mime_type, conttype, 
-			             strlen(action->mime_type));
+		 strncmp(action->mime_type, conttype,
+			 strlen(action->mime_type));
 	     action++);
 	g_free(conttype);
 
@@ -1247,17 +1402,22 @@ print_info_destroy(PrintInfo * pi)
 static void
 print_message(PrintInfo * pi)
 {
+#ifdef HAVE_GTKHTML
+    gboolean haspage;
+#endif /* HAVE_GTKHTML */
     GList *print_task;
 
     if (balsa_app.debug)
 	g_print("Printing.\n");
-    start_new_page(pi);
+
+#ifndef HAVE_GTKHTML
+    start_new_page_real(pi);
 
     print_task = pi->print_parts;
     while (print_task) {
-	guint *id = (guint *)(print_task->data);
+	TaskInfo *pdata = print_task->data;
 
-	switch (*id) {
+	switch (pdata->id_tag) {
 	case BALSA_PRINT_TYPE_HEADER:
 	    print_header(pi, print_task->data);
 	    break;
@@ -1284,6 +1444,52 @@ print_message(PrintInfo * pi)
 	print_task = g_list_next(print_task);
     }
     gnome_print_showpage(pi->pc);
+#else /* HAVE_GTKHTML */
+    haspage = FALSE;
+    for (print_task = pi->print_parts; print_task;
+	 print_task = g_list_next(print_task)) {
+	TaskInfo *pdata = print_task->data;
+
+	if (pdata->id_tag == BALSA_PRINT_TYPE_SEPARATOR) {
+	    if (haspage)
+		print_separator(pi, print_task->data);
+	} else if (pdata->id_tag == BALSA_PRINT_TYPE_HTML) {
+	    if (haspage)
+		gnome_print_showpage(pi->pc);
+	    print_html(pi, print_task->data);
+	    haspage = FALSE;
+	} else {
+	    if (!haspage)
+		start_new_page_real(pi);
+
+	    switch (pdata->id_tag) {
+	    case BALSA_PRINT_TYPE_HEADER:
+		print_header(pi, print_task->data);
+		break;
+	    case BALSA_PRINT_TYPE_PLAINTEXT:
+		print_plaintext(pi, print_task->data);
+		break;
+	    case BALSA_PRINT_TYPE_DEFAULT:
+		print_default(pi, print_task->data);
+		break;
+	    case BALSA_PRINT_TYPE_IMAGE:
+		print_image(pi, print_task->data);
+		break;
+#ifdef HAVE_GPGME
+	    case BALSA_PRINT_TYPE_GPG_SIGN:
+		print_gpg_signature(pi, print_task->data);
+		break;
+#endif
+	    default:
+		break;
+	    }
+	    haspage = TRUE;
+	}
+    }
+
+    if (haspage)
+	gnome_print_showpage(pi->pc);
+#endif /* HAVE_GTKHTML */
 }
 
 /* callback to read a toggle button */

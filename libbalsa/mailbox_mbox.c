@@ -46,7 +46,7 @@ struct message_info {
     off_t start;
     off_t status;		/* Offset of the "Status:" header. */
     off_t x_status;		/* Offset of the "X-Status:" header. */
-    off_t content;		/* Offset of the first "Content-*:" header. */
+    off_t mime_version;		/* Offset of the "MIME-Version:" header. */
     off_t end;
     char *from;
     LibBalsaMessage *message; /* registers only referenced messages
@@ -293,32 +293,31 @@ static void mbox_unlock(LibBalsaMailbox * mailbox, GMimeStream *stream)
 }
 
 /* GMimeParserHeaderRegexFunc callback; save the header's offset if it's
- * "Status", "X-Status", or "Content-*.
+ * "Status", "X-Status", or "MIME-Version".  Save only the first one, to
+ * avoid headers in encapsulated messages.
  * 
  * If a message has no status headers but an encapsulated message does,
- * we must be careful not to save the offset of the encapsulated header.
- * The outer message must have at least one "Content-* header, so we
- * save its offset, and use that as an indication that any later headers
- * are encapsulated.  We also use its offset as the location to insert
- * status headers, if necessary.
+ * we may save the offset of the encapsulated header; we check for that
+ * later.
+ * 
+ * We use the offset of the "MIME-Version" header as the location to
+ * insert status headers, if necessary.
  */
 static void
 lbm_mbox_header_cb(GMimeParser * parser, const char *header,
-		   const char *value, off_t offset,
-		   struct message_info ** msg_info_p)
+                   const char *value, off_t offset,
+                   struct message_info **msg_info_p)
 {
     struct message_info *msg_info = *msg_info_p;
 
-    if (msg_info->content >= 0)
-	/* We already passed the real headers. */
-	return;
-
-    if (g_ascii_strcasecmp(header, "status") == 0)
-	msg_info->status = offset;
-    else if (g_ascii_strcasecmp(header, "x-status") == 0)
-	msg_info->x_status = offset;
-    else if (g_ascii_strncasecmp(header, "content-", 8) == 0)
-	msg_info->content = offset;
+    if (g_ascii_strcasecmp(header, "Status") == 0 && msg_info->status < 0)
+        msg_info->status = offset;
+    else if (g_ascii_strcasecmp(header, "X-Status") == 0
+             && msg_info->x_status < 0)
+        msg_info->x_status = offset;
+    else if (g_ascii_strcasecmp(header, "MIME-Version") == 0
+             && msg_info->mime_version < 0)
+        msg_info->mime_version = offset;
 }
 
 static LibBalsaMessage *lbm_mbox_message_new(GMimeMessage * mime_message,
@@ -337,7 +336,7 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
     g_mime_parser_set_scan_from(gmime_parser, TRUE);
     g_mime_parser_set_respect_content_length(gmime_parser, TRUE);
     g_mime_parser_set_header_regex(gmime_parser,
-				   "^(X-)?Status|^Content-",
+                                   "^Status|^X-Status|^MIME-Version",
 				   (GMimeParserHeaderRegexFunc)
 				   lbm_mbox_header_cb, &msg_info_p);
 
@@ -346,7 +345,7 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
 	GMimeMessage *mime_message;
         LibBalsaMessage *msg;
 
-        msg_info.status = msg_info.x_status = msg_info.content = -1;
+        msg_info.status = msg_info.x_status = msg_info.mime_version = -1;
         mime_message   = g_mime_parser_construct_message(gmime_parser);
         msg_info.start = g_mime_parser_get_from_offset(gmime_parser);
         msg_info.end   = g_mime_parser_tell(gmime_parser);
@@ -355,6 +354,17 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
 	    g_object_unref(mime_message);
             continue;
 	}
+
+	/* Make sure we don't have offsets for any encapsulated headers. */
+	if (!g_mime_object_get_header(GMIME_OBJECT(mime_message),
+                                      "Status"))
+	    msg_info.status = -1;
+	if (!g_mime_object_get_header(GMIME_OBJECT(mime_message),
+                                      "X-Status"))
+	    msg_info.x_status = -1;
+	if (!g_mime_object_get_header(GMIME_OBJECT(mime_message),
+                                      "MIME-Version"))
+	    msg_info.mime_version = -1;
 
         msg = lbm_mbox_message_new(mime_message, &msg_info);
         g_object_unref(mime_message);
@@ -1023,7 +1033,8 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    if (status_len < 0)
 		break;
 	} else {
-            msg_info->status = msg_info->content >= 0 ? msg_info->content :
+            msg_info->status = msg_info->mime_version >= 0 ?
+		msg_info->mime_version :
                 (off_t) (msg_info->start + strlen(msg_info->from) + 1);
 	    
 	    status_len = 0;
@@ -1161,7 +1172,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     g_mime_parser_set_scan_from(gmime_parser, TRUE);
     g_mime_parser_set_respect_content_length(gmime_parser, TRUE);
     g_mime_parser_set_header_regex(gmime_parser,
-				   "^(X-)?Status|^Content-",
+                                   "^Status|^X-Status|^MIME-Version",
 				   (GMimeParserHeaderRegexFunc)
 				   lbm_mbox_header_cb, &msg_info);
     for (j = first; j < mbox->messages_info->len; ) {
@@ -1180,8 +1191,17 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	j++;
 
 	msg_info->start = g_mime_parser_tell(gmime_parser);
-	msg_info->status = msg_info->x_status = msg_info->content = -1;
+	msg_info->status = msg_info->x_status = msg_info->mime_version = -1;
 	mime_msg = g_mime_parser_construct_message(gmime_parser);
+
+	/* Make sure we don't have offsets for any encapsulated headers. */
+	if (!g_mime_object_get_header(GMIME_OBJECT(mime_msg), "Status"))
+	    msg_info->status = -1;
+	if (!g_mime_object_get_header(GMIME_OBJECT(mime_msg), "X-Status"))
+	    msg_info->x_status = -1;
+	if (!g_mime_object_get_header(GMIME_OBJECT(mime_msg), "MIME-Version"))
+	    msg_info->mime_version = -1;
+
 	g_free(msg_info->from);
 	msg_info->from = g_mime_parser_get_from(gmime_parser);
 	msg_info->end = g_mime_parser_tell(gmime_parser);

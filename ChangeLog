@@ -1,3 +1,11 @@
+2000-10-03  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libinit_balsa/Makefile.am: Fix GOB related rules. The generated
+	files will now only be deleted by maintainer-clean, and not clean
+	or dist-clean. The rule to build the x.[ch] from x.gob is now
+	included all the time, not just with
+	--enable-maintainer-mode.
+
 2000-10-03  Matthew Guenther  <guentherm@asme.org>
 
 	* src/spell-check.c: Fixed cancelled spell check outputting

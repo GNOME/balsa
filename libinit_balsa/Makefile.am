@@ -2,6 +2,7 @@ noinst_LIBRARIES = libinit_balsa.a
 
 libinit_balsa_a_SOURCES = 		\
 	$(BUILT_SOURCES)		\
+	$(GOB_SOURCES)			\
 	helper.c			\
 	helper.h			\
 	init_balsa.c			\
@@ -23,7 +24,7 @@ BUILT_SOURCES =				\
 	balsa-druid-page-directory.h	\
 	balsa-druid-page-finish.h	
 
-GOBFILES =				\
+GOB_SOURCES =				\
 	balsa-initdruid.gob		\
 	balsa-druid-page.gob		\
 	balsa-druid-page-error.gob	\
@@ -32,10 +33,6 @@ GOBFILES =				\
 	balsa-druid-page-directory.gob	\
 	balsa-druid-page-finish.gob
 
-EXTRA_DIST = $(GOBFILES)
-
-CLEANFILES = $(BUILT_SOURCES)
-
 INCLUDES=-I. -I$(top_srcdir) \
 	-I$(top_builddir)/libmutt \
 	-I$(top_srcdir)/libmutt \
@@ -43,10 +40,6 @@ INCLUDES=-I. -I$(top_srcdir) \
 	-I$(top_srcdir)/src \
 	$(GNOME_INCLUDEDIR)
 
-# dist-hook:
-#	test -n "$(BUILT_SOURCES)" \
-#		&& cp -f $(BUILT_SOURCES) $(distdir)
-
-@MAINT@%.c %.h: %.gob
-@MAINT@	(cd $(srcdir) && gob --no-private-header $<)
+%.c %.h: %.gob
+	(cd $(srcdir) && gob --no-private-header $<)
 

@@ -19,8 +19,7 @@
 
 #include "config.h"
 
-#include <mutt.h>
-#include <mime.h>
+#include "mutt.h"
 
 #define obstack_chunk_alloc malloc
 #define obstack_chunk_free  free

@@ -103,8 +103,14 @@ libbalsa_server_class_init(LibBalsaServerClass * klass)
     libbalsa_server_signals[SET_HOST] =
 	gtk_signal_new("set-host", GTK_RUN_FIRST, object_class->type,
 		       GTK_SIGNAL_OFFSET(LibBalsaServerClass, set_host),
+#ifdef USE_SSL
 		       gtk_marshal_NONE__POINTER_INT_INT, GTK_TYPE_NONE, 3,
 		       GTK_TYPE_STRING, GTK_TYPE_INT, GTK_TYPE_BOOL);
+#else
+                       gtk_marshal_NONE__POINTER_INT, GTK_TYPE_NONE, 2,
+	               GTK_TYPE_STRING, GTK_TYPE_INT);
+#endif
+
 
     libbalsa_server_signals[GET_PASSWORD] =
 	gtk_signal_new("get-password",

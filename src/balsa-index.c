@@ -477,37 +477,42 @@ bndx_filt_check(BalsaIndex * index)
     g_assert(check_list != NULL);
 
     /* Check whether the index was destroyed. */
-    if (index->mailbox_node) {
-        /* Search results may be cached in iter_view. */
-        iter_view =
-            libbalsa_mailbox_search_iter_view(index->mailbox_node->
-                                              mailbox);
-        if (iter_view) {
-	    if (index->current_message)
-		g_object_ref(index->current_message);
-            for (l = *check_list; l; l = l->next) {
-                LibBalsaMessage *message = l->data;
-                libbalsa_mailbox_msgno_filt_check(message->mailbox,
-                                                  message->msgno,
-                                                  iter_view);
+    if (!index->mailbox_node ||
+        !(iter_view =
+          libbalsa_mailbox_search_iter_view(index->mailbox_node->
+                                            mailbox))) {
+        g_object_set_data(G_OBJECT(index), BALSA_INDEX_CHECK_LIST, NULL);
+        g_object_unref(index);
+        gdk_threads_leave();
+        return FALSE;
+    }
+
+    if (index->current_message)
+        g_object_ref(index->current_message);
+
+    for (l = *check_list; l; l = l->next) {
+        LibBalsaMessage *message = l->data;
+        /* The list has a ref on the message, so it should still exist,
+         * but it may have been removed from the mailbox, so we'll be
+         * careful. */
+        if (message->mailbox && message->msgno)
+            libbalsa_mailbox_msgno_filt_check(message->mailbox,
+                                              message->msgno, iter_view);
+    }
+    libbalsa_mailbox_search_iter_free(iter_view);
+
+    if (index->current_message) {
+        GtkTreePath *path;
+        if (bndx_find_message(index, &path, NULL, index->current_message)) {
+            GtkTreeSelection *selection =
+                gtk_tree_view_get_selection(GTK_TREE_VIEW(index));
+            if (!gtk_tree_selection_path_is_selected(selection, path)) {
+                bndx_expand_to_row(index, path);
+                bndx_select_row(index, path);
             }
-	    if (index->current_message) {
-		GtkTreePath *path;
-		if (bndx_find_message(index, &path, NULL,
-				      index->current_message)) {
-		    GtkTreeSelection *selection =
-			gtk_tree_view_get_selection(GTK_TREE_VIEW(index));
-		    if (!gtk_tree_selection_path_is_selected(selection,
-							     path)) {
-			bndx_expand_to_row(index, path);
-			bndx_select_row(index, path);
-		    }
-		    gtk_tree_path_free(path);
-		} /* else ??? */
-		g_object_unref(index->current_message);
-	    }
-            libbalsa_mailbox_search_iter_free(iter_view);
-        }
+            gtk_tree_path_free(path);
+        }                       /* else ??? */
+        g_object_unref(index->current_message);
     }
 
     g_object_set_data(G_OBJECT(index), BALSA_INDEX_CHECK_LIST, NULL);

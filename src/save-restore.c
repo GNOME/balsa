@@ -505,10 +505,14 @@ config_mailbox_init(const gchar * prefix)
     mailbox = libbalsa_mailbox_new_from_config(prefix);
     if (mailbox == NULL)
 	return FALSE;
-    if (LIBBALSA_IS_MAILBOX_REMOTE(mailbox))
-        libbalsa_server_connect_signals(LIBBALSA_MAILBOX_REMOTE_SERVER
-                                        (mailbox),
+    if (LIBBALSA_IS_MAILBOX_REMOTE(mailbox)) {
+	LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+        libbalsa_server_connect_signals(server,
                                         G_CALLBACK(ask_password), mailbox);
+	g_signal_connect_swapped(server, "set-host",
+                                 G_CALLBACK(config_mailbox_update),
+				 mailbox);
+    }
 
     if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
         g_signal_connect(G_OBJECT(mailbox),
@@ -561,8 +565,12 @@ config_folder_init(const gchar * prefix)
 
     g_return_val_if_fail(prefix != NULL, FALSE);
 
-    if( (folder = balsa_mailbox_node_new_from_config(prefix)) )
+    if( (folder = balsa_mailbox_node_new_from_config(prefix)) ) {
+	g_signal_connect_swapped(folder->server, "set-host",
+                                 G_CALLBACK(config_folder_update),
+				 folder);
 	balsa_mblist_mailbox_node_append(NULL, folder);
+    }
 
     return folder != NULL;
 }				/* config_folder_init */

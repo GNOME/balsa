@@ -217,6 +217,13 @@ balsa_mailbox_node_finalize(GObject * object)
     g_free(mn->dir);           mn->dir = NULL;
     g_free(mn->config_prefix); mn->config_prefix = NULL;
 
+    if (mn->server) {
+	g_signal_handlers_disconnect_matched(mn->server,
+                                             G_SIGNAL_MATCH_DATA, 0,
+					     (GQuark) 0, NULL, NULL, mn);
+	mn->server = NULL;
+    }
+
     G_OBJECT_CLASS(parent_class)->finalize(G_OBJECT(object));
 }
 

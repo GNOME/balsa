@@ -1,3 +1,14 @@
+1999-11-28  Peter Williams  <peter@wgwill.ne.mediaone.net>
+
+	* src/main-window.c: Proper recording of the
+	main window's size now. Fixed compile warnings
+	by commenting out some unused things (search for
+	(FIXME unused)
+
+	* acconfig.h, configure.in: Updated with dummy
+	--enable-threads argument (does nothing except define
+	BALSA_USE_THREADS)
+	
 1999-11-28  Hector Garcia Alvarez <hector@scouts-es.org>
 
         * Added SMTP funtionalty. This should be consider

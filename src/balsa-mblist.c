@@ -1133,6 +1133,15 @@ bmbl_store_redraw_mbnode(GtkTreeIter * iter, BalsaMailboxNode * mbnode)
 					  ? LB_MAILBOX_SHOW_TO
 					  : LB_MAILBOX_SHOW_FROM);
 	}
+
+	if (g_object_get_data(G_OBJECT(mbnode),
+			      BALSA_MAILBOX_NODE_NEW_MAILBOX)) {
+	    g_signal_connect(mbnode->mailbox, "changed",
+			     G_CALLBACK(bmbl_mailbox_changed_cb),
+			     balsa_app.mblist_tree_store);
+	    g_object_set_data(G_OBJECT(mbnode),
+			      BALSA_MAILBOX_NODE_NEW_MAILBOX, NULL);
+	}
     } else {
 	/* new directory, but not a mailbox */
         in = mbnode->expanded ? BALSA_PIXMAP_MBOX_DIR_OPEN :
@@ -2009,11 +2018,6 @@ balsa_mblist_mailbox_node_append(BalsaMailboxNode * root,
 	gtk_tree_model_row_has_child_toggled(model, path, parent_iter);
 	gtk_tree_path_free(path);
     }
-
-    if (mbnode->mailbox)
-	g_signal_connect(mbnode->mailbox, "changed",
-			 G_CALLBACK(bmbl_mailbox_changed_cb),
-			 balsa_app.mblist_tree_store);
 
     /* The tree-store owns mbnode. */
     g_object_unref(mbnode);

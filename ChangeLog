@@ -1,3 +1,8 @@
+2003-01-15  PeterB
+
+	* src/mailbox-node.c: Fix #102139 (append-subtree failed for
+	  `special' IMAP mailboxes).
+
 2003-01-14  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/filter.c:compile with --disable-threads

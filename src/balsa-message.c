@@ -288,91 +288,87 @@ balsa_message_focus_out_part(GtkWidget * widget, GdkEventFocus * event,
 }
 
 static void
+save_dialog_ok(GtkWidget* button, GtkWidget* save_dialog)
+{
+    gchar *filename;
+    gboolean do_save, result;
+    BalsaPartInfo * info;
+
+    gtk_widget_hide(GTK_WIDGET(save_dialog)); 
+    info = gtk_object_get_user_data(GTK_OBJECT(save_dialog));
+    filename 
+	= gtk_file_selection_get_filename(GTK_FILE_SELECTION(save_dialog));
+    
+    g_free(balsa_app.save_dir);
+    balsa_app.save_dir = g_dirname(filename);
+    
+    if ( access(filename, F_OK) == 0 ) {
+	GtkWidget *confirm;
+	
+	/* File exists. check if they really want to overwrite */
+	confirm = gnome_question_dialog_modal_parented(
+	    _("File already exists. Overwrite?"),
+	    NULL, NULL, GTK_WINDOW(balsa_app.main_window));
+	do_save = (gnome_dialog_run_and_close(GNOME_DIALOG(confirm)) == 0);
+	if(do_save)
+	    unlink(filename);
+    } else
+	do_save = TRUE;
+    
+    if ( do_save ) {
+	result = libbalsa_message_body_save(info->body, NULL, filename);
+	if (!result) {
+	    gchar *msg;
+	    GtkWidget *msgbox;
+	    
+	    msg = g_strdup_printf(_(" Could not save %s: %s"), 
+				  filename, strerror(errno));
+	    msgbox = gnome_error_dialog_parented(msg, GTK_WINDOW
+						 (balsa_app.main_window));
+	    g_free(msg);
+	    gnome_dialog_run_and_close(GNOME_DIALOG(msgbox));
+	}
+    }
+    gtk_object_destroy(GTK_OBJECT(save_dialog));
+}
+
+static void
 save_part(BalsaPartInfo * info)
 {
     gchar *filename;
-
-    GtkWidget *save_dialog;
-    GtkWidget *file_entry;
-    gint button;
-    gboolean do_save, result;
+    GtkFileSelection *save_dialog;
     
     g_return_if_fail(info != 0);
 
-    save_dialog = gnome_dialog_new(_("Save MIME Part"),
-				   _("Save"), _("Cancel"), NULL);
-    file_entry = gnome_file_entry_new("Balsa_MIME_Saver",
-				      _("Save MIME Part"));
+    save_dialog = 
+	GTK_FILE_SELECTION(gtk_file_selection_new(_("Save MIME Part")));
+    // gtk_window_set_wmclass(GTK_WINDOW(save_dialog), "save", "Balsa");
 
-    if (info->body->filename)
-	gtk_entry_set_text(GTK_ENTRY
-			   (gnome_file_entry_gtk_entry
-			    (GNOME_FILE_ENTRY(file_entry))),
-			   info->body->filename);
+    if (balsa_app.save_dir)
+	filename = g_strdup_printf("%s/%s", balsa_app.save_dir,
+				   info->body->filename 
+				   ? info->body->filename : "");
+    else if(!balsa_app.save_dir && info->body->filename)
+	filename = g_strdup(info->body->filename);
+    else filename = NULL;
 
-    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(save_dialog)->vbox),
-		       gtk_label_new(_
-				     ("Please choose a filename to save this part of the message as:")),
-		       FALSE, FALSE, 10);
-
-    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(save_dialog)->vbox),
-		       file_entry, FALSE, FALSE, 10);
-
-    gnome_dialog_set_parent(GNOME_DIALOG(save_dialog),
-			    GTK_WINDOW(balsa_app.main_window));
-    gtk_window_set_modal(GTK_WINDOW(save_dialog), TRUE);
-    gtk_window_set_wmclass(GTK_WINDOW(save_dialog), "save", "Balsa");
-
-    gtk_widget_show_all(save_dialog);
-    gtk_widget_grab_focus(gnome_file_entry_gtk_entry
-			  (GNOME_FILE_ENTRY(file_entry)));
-    button = gnome_dialog_run(GNOME_DIALOG(save_dialog));
-
-    /* button 0 == OK */
-    if (button == 0) {
-	gtk_widget_hide(GTK_WIDGET(save_dialog));
-
-	filename = gtk_entry_get_text(
-	    GTK_ENTRY(gnome_file_entry_gtk_entry
-		      (GNOME_FILE_ENTRY(file_entry))));
-
-	if ( access(filename, F_OK) == 0 ) {
-	    GtkWidget *confirm;
-	    gint b;
-
-	    /* File exists. check if they really want to overright */
-	    confirm = gnome_question_dialog_modal_parented(
-		_("File already exists. Overwrite?"),
-		NULL, NULL, GTK_WINDOW(balsa_app.main_window));
-	    b = gnome_dialog_run_and_close(GNOME_DIALOG(confirm));
-	    if(b == 0) {
-		do_save = TRUE;
-		unlink(filename);
-	    } else do_save = FALSE;
-	} else
-	    do_save = TRUE;
-	
-	if ( do_save ) {
-	    result = libbalsa_message_body_save(info->body, NULL, filename);
-	    if (!result) {
-		gchar *msg;
-		GtkWidget *msgbox;
-		
-		msg = g_strdup_printf(_(" Could not save %s:%s "), 
-				      filename,
-				    strerror(errno));
-		
-		msgbox = gnome_error_dialog_parented(msg, GTK_WINDOW
-						     (balsa_app.main_window));
-		
-		g_free(msg);
-		
-		gnome_dialog_run_and_close(GNOME_DIALOG(msgbox));
-	    }
-	}
+    if (filename) {
+	gtk_file_selection_set_filename(save_dialog, filename);
+	g_free(filename);
     }
 
-    gtk_object_destroy(GTK_OBJECT(save_dialog));
+    gtk_object_set_user_data(GTK_OBJECT(save_dialog), info);
+    gtk_widget_set_parent_window(GTK_WIDGET(save_dialog),
+				 GTK_WIDGET(balsa_app.main_window)->window);
+    gtk_signal_connect(GTK_OBJECT(save_dialog->ok_button), "clicked",
+		       (GtkSignalFunc) save_dialog_ok, save_dialog);
+    gtk_signal_connect_object(GTK_OBJECT(save_dialog->cancel_button), 
+			      "clicked",
+			      (GtkSignalFunc)gtk_widget_destroy,
+			      GTK_OBJECT(save_dialog));
+
+    gtk_window_set_modal(GTK_WINDOW(save_dialog), TRUE);
+    gtk_widget_show_all(GTK_WIDGET(save_dialog));
 }
 
 GtkWidget *

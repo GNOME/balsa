@@ -257,6 +257,7 @@ balsa_app_init(void)
 
     /* file paths */
     balsa_app.attach_dir = NULL;
+    balsa_app.save_dir = NULL;
 
     /* Mailbox list column width (not fully implemented) */
     balsa_app.mblist_name_width = MBNAME_DEFAULT_WIDTH;

@@ -203,6 +203,7 @@ extern struct BalsaApplication {
 
     /* file paths */
     gchar *attach_dir;
+    gchar *save_dir;
 
     /* Column width settings */
     gint index_num_width;

@@ -439,7 +439,7 @@ static GnomeUIInfo message_menu[] = {
 	GNOME_STOCK_MENU_SAVE, 's', GDK_CONTROL_MASK, NULL
     },
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MESSAGE_DELETE_POS 9
+#define MENU_MESSAGE_TRASH_POS 9
     /* D */
     {
 	GNOME_APP_UI_ITEM, N_("_Move to Trash"), 
@@ -880,6 +880,7 @@ enable_message_menus(LibBalsaMessage * message)
     /* Handle menu items which require write access to mailbox */
     if (message && message->mailbox->readonly) {
 	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_DELETE_POS].widget, FALSE);
+	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_TRASH_POS].widget, FALSE);
 	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_UNDEL_POS].widget, FALSE);
 	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_TOGGLE_POS].widget,
 				 FALSE);
@@ -891,6 +892,7 @@ enable_message_menus(LibBalsaMessage * message)
 	gtk_widget_set_sensitive(main_toolbar[TOOLBAR_DELETE_POS].widget, FALSE);
     } else {
 	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_DELETE_POS].widget, enable);
+	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_TRASH_POS].widget, enable);
 	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_UNDEL_POS].widget, enable);
 	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_TOGGLE_POS].widget, enable);
 	gtk_widget_set_sensitive(message_toggle_menu[MENU_MESSAGE_TOGGLE_FLAGGED_POS].widget, enable);

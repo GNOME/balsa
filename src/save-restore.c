@@ -621,6 +621,14 @@ config_global_load(void)
 
     gnome_config_pop_prefix();
 
+    /* Last used paths options ... */
+    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Paths/");
+    g_free(balsa_app.attach_dir);
+    balsa_app.attach_dir = gnome_config_get_string("AttachDir");
+    g_free(balsa_app.save_dir);
+    balsa_app.save_dir = gnome_config_get_string("SavePartDir");
+    gnome_config_pop_prefix();
+
     return TRUE;
 }				/* config_global_load */
 
@@ -797,6 +805,15 @@ gint config_save(void)
     }
 
     gnome_config_pop_prefix();
+
+    
+    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Paths/");
+    if(balsa_app.attach_dir)
+	gnome_config_set_string("AttachDir", balsa_app.attach_dir);
+    if(balsa_app.save_dir)
+	gnome_config_set_string("SavePartDir", balsa_app.save_dir);
+    gnome_config_pop_prefix();
+
     gnome_config_sync();
     return TRUE;
 }				/* config_global_save */

@@ -1,3 +1,13 @@
+2001-05-25  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-app.[hc]: add save_dir field storing the last
+	directory path, an attachment or other message par was saved to.
+
+	* src/balsa-message.c: change the save mime part window to more
+	user friendly one.
+	* src/save-restore.c: save and restore attach_dir and save_dir.
+	* src/main-window.c: enable/disable move to trash entry as well.
+	
 2001-05-23  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/folder-scanners.c: patch for MH nested mailboxes from 

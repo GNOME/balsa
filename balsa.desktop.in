@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+_Name=Balsa
+_Comment=E-Mail utility
+TryExec=balsa
+Exec=balsa
+Icon=gnome-balsa2.png
+Terminal=0
+Type=Application
+StartupNotify=true
+Categories=GNOME;Application;Network

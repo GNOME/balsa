@@ -70,7 +70,7 @@ EXTRA_DIST = \
 # auto* *SHOULD* figure this out *grr*
 $(balsa_BASE_SRCLIST): $(balsa_IDL_SRCLIST)
 
-idldir = .
+idldir = $(prefix)/shared/idl
 idl_DATA = Balsa.idl
 
 

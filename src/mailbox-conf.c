@@ -1070,12 +1070,15 @@ entry_activated(GtkEntry * entry, MailboxConfWindow * mcw)
 static GtkWidget *
 create_imap_mailbox_page(MailboxConfWindow *mcw)
 {
-    GtkWidget *table;
+    GtkWidget *notebook, *advanced, *table;
     GtkWidget *label;
     GtkWidget *entry;
     gint row = -1;
 
+    notebook = gtk_notebook_new();
     table = gtk_table_new(7, 2, FALSE);
+    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), table,
+                             gtk_label_new_with_mnemonic(_("_Basic")));
 
     /* mailbox name */
     label = create_label(_("Mailbox _Name:"), table, ++row);
@@ -1138,9 +1141,17 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
                                            GTK_WINDOW(mcw->window),
                                            table, ++row);
 
+    advanced =
+        balsa_server_conf_get_advanced_widget(&mcw->mb_data.imap.bsc,
+                                              NULL, 1);
+    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), advanced,
+                             gtk_label_new_with_mnemonic(_("_Advanced")));
+
+    gtk_widget_show_all(notebook);
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 0);
     gtk_widget_grab_focus(mcw->mailbox_name? 
                           mcw->mailbox_name : mcw->mb_data.imap.server);
-    return table;
+    return notebook;
 }
 
 /* Manage the widgets that control aspects of the view, not the config.

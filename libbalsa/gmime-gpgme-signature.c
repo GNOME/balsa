@@ -19,6 +19,10 @@
  * 02111-1307, USA.
  */
 
+#include "config.h"
+
+#ifdef HAVE_GPGME
+
 #include <gpgme.h>
 #include <string.h>
 #include <glib.h>
@@ -222,3 +226,5 @@ fix_EMail_info(gchar * str)
     g_string_free(result, FALSE);
     return p;
 }
+
+#endif /* HAVE_GPGME */

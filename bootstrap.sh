@@ -11,7 +11,7 @@ autoheader || exit 1
 echo "Running libtoolize..."
 libtoolize --force || exit 1
 echo "Running automake..."
-automake-1.7 --foreign --add-missing --copy
+automake --foreign --add-missing --copy
 echo "Running autoconf..."
 autoconf || exit 1
 echo "Running configure $* ..."

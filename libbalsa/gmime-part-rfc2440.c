@@ -19,6 +19,9 @@
  * 02111-1307, USA.
  */
 
+#include "config.h"
+
+#ifdef HAVE_GPGME
 #include <string.h>
 
 #include <gmime/gmime.h>
@@ -255,3 +258,5 @@ g_mime_part_rfc2440_decrypt(GMimePart * part,
 
     return result;
 }
+
+#endif /* HAVE_GPGME */

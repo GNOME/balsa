@@ -2,6 +2,12 @@
 
 	* libbalsa/imap-server.c. libinit_balsa/balsa-druid-page-directory.c:
 	compile without SSL.
+	* Makefile.am, balsa.desktop.in: 
+	* po/POTFILES.in: i18n patch from report 142769.
+	* src/Makefile.am: bug 142958.
+	* libbalsa/gmime-gpgme-{context,signature}.c: compile without GPGME.
+	* libbalsa/gmime-part-rfc2440.c: ditto.
+	* src/mailbox-conf.c: fix configuration of IMAP mailboxes.
 	
 2004-05-15 16:12  PeterB
 

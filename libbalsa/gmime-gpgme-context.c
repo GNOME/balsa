@@ -20,6 +20,7 @@
  */
 #include "config.h"
 
+#ifdef HAVE_GPGME
 #include <string.h>
 #include <glib.h>
 #include <gmime/gmime.h>
@@ -1050,3 +1051,4 @@ release_keylist(gpgme_key_t * keylist)
     }
     g_free(keylist);
 }
+#endif /* HAVE_GPGME */

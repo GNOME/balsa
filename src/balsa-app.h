@@ -74,7 +74,7 @@
  */
 #define MAX_QUOTED_COLOR 6
 #define DEFAULT_QUOTED_COLOR "rgb:0000/5000/5000"
-#define DEFAULT_QUOTE_REGEX  "^(([ \tA-Z])\1*[|>:}#])"
+#define DEFAULT_QUOTE_REGEX  "^(([ \tA-Z])\\1*[|>:}#])"
 
 #define DEFAULT_URL_COLOR    "rgb:A000/0000/0000"
 #define DEFAULT_BAD_ADDRESS_COLOR    "rgb:8000/8000/0000"

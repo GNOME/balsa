@@ -59,10 +59,6 @@ static void libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox);
 static void libbalsa_mailbox_real_set_unread_messages_flag(LibBalsaMailbox
 							   * mailbox,
 							   gboolean flag);
-static GHashTable* libbalsa_mailbox_real_get_matching(LibBalsaMailbox* mailbox,
-                                                      int op, 
-                                                      GSList* conditions);
-
 static void libbalsa_mailbox_real_save_config(LibBalsaMailbox * mailbox,
 					      const gchar * prefix);
 static void libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
@@ -87,7 +83,6 @@ enum {
     MESSAGES_DELETE,
     GET_MESSAGE_STREAM,
     CHECK,
-    GET_MATCHING,
     SET_UNREAD_MESSAGES_FLAG,
     SAVE_CONFIG,
     LOAD_CONFIG,
@@ -222,13 +217,6 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
 		       GTK_CLASS_TYPE(object_class),
 		       GTK_SIGNAL_OFFSET(LibBalsaMailboxClass, check),
 		       gtk_marshal_NONE__NONE, GTK_TYPE_NONE, 0);
-    libbalsa_mailbox_signals[GET_MATCHING] =
-	gtk_signal_new("get-matching", GTK_RUN_LAST | GTK_RUN_NO_HOOKS,
-		       GTK_CLASS_TYPE(object_class),
-		       GTK_SIGNAL_OFFSET(LibBalsaMailboxClass, get_matching),
-		       libbalsa_marshal_POINTER__INT_POINTER, 
-                       GTK_TYPE_POINTER, 2, GTK_TYPE_INT, GTK_TYPE_POINTER);
-
     libbalsa_mailbox_signals[SAVE_CONFIG] =
 	gtk_signal_new("save-config",
 		       GTK_RUN_LAST,
@@ -265,7 +253,6 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
 
     klass->get_message_stream = NULL;
     klass->check = NULL;
-    klass->get_matching = libbalsa_mailbox_real_get_matching;
     klass->save_config  = libbalsa_mailbox_real_save_config;
     klass->load_config  = libbalsa_mailbox_real_load_config;
 }
@@ -467,23 +454,6 @@ libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
 #endif
 }
 
-/* libbalsa_mailbox_get_matching:
- * get a hash table of messages matching given set of conditions.
- */
-GHashTable*
-libbalsa_mailbox_get_matching(LibBalsaMailbox* mailbox, int op, 
-                              GSList* conditions)
-{
-    GHashTable* retval = NULL;
-    g_return_val_if_fail(mailbox != NULL, FALSE);
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
-
-    gtk_signal_emit(GTK_OBJECT(mailbox),
-		    libbalsa_mailbox_signals[GET_MATCHING], 
-                    op, conditions, &retval);
-    return retval;
-}
-
 void
 libbalsa_mailbox_save_config(LibBalsaMailbox * mailbox,
 			     const gchar * prefix)
@@ -594,22 +564,6 @@ libbalsa_mailbox_real_set_unread_messages_flag(LibBalsaMailbox * mailbox,
 {
     mailbox->has_unread_messages = flag;
 }
-
-static GHashTable*
-libbalsa_mailbox_real_get_matching(LibBalsaMailbox* mailbox, 
-                                   int op, GSList* conditions)
-{
-    GHashTable * ret = g_hash_table_new(NULL,NULL);
-    GList* msgs;
-    printf("real op=%d list=%p\n", op, conditions);
-    for(msgs = mailbox->message_list; msgs; msgs = msgs->next) {
-        LibBalsaMessage* msg = LIBBALSA_MESSAGE(msgs->data);
-        if(match_conditions(op, conditions, msg))
-            g_hash_table_insert(ret, msg, msg);
-    }
-    return ret;
-}
-
 
 static void
 libbalsa_mailbox_real_save_config(LibBalsaMailbox * mailbox,

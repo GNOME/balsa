@@ -1,3 +1,15 @@
+2002-09-29  Emmanuel <e.allaud@wanadoo.fr>
+
+	* libbalsa/filter.[hc]: try to implement incremental search.
+	* libbalsa/mailbox.[ch]: remove get-matching signal - not used.
+	* libbalsa/mailbox_{local,imap,pop3}.c: adapt to new 
+	* src/balsa-app.h: fix QuoteRegex default (prefix backslash w/b-slash).
+	* src/balsa-index.[hc]: incremental search.
+	* src/find-search.c: small fixes.
+	* src/sendmsg-window.c: back-port append_comma_separated from
+	BALSA_2; use it for addresses and `mailto:' url fields; recognize
+	`body' field in urls. (PB)
+	
 2002-09-28  Emmanuel <e.allaud@wanadoo.fr>
 
 	* src/filter-edit-callbacks.c: fix sensitivity problems.

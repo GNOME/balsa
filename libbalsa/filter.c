@@ -83,7 +83,8 @@ in_string(const gchar * s1,const gchar * s2)
 */
 
 gboolean
-match_condition(LibBalsaCondition* cond, LibBalsaMessage * message)
+match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
+		gboolean mbox_locked)
 {
     gboolean match = FALSE;
     gchar * str;
@@ -136,15 +137,22 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message)
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY)) {
 	    gboolean is_new = (message->flags & LIBBALSA_MESSAGE_FLAG_NEW);
+
+	    if (!message->mailbox)
+		return FALSE; /* We don't want to match if an error occured */
+	    if (mbox_locked)
+		UNLOCK_MAILBOX(message->mailbox);
 	    if (!libbalsa_message_body_ref(message)) {
 		libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                      _("Unable to load message body to "
                                        "match filter"));
-                return FALSE;  /* We don't want to match if an error occured */
+                return FALSE;  
 	    }
 	    body=content2reply(message,NULL,0,FALSE,FALSE);
 	    if (is_new) libbalsa_message_read(message, FALSE);
 	    libbalsa_message_body_unref(message);
+	    if (mbox_locked)
+		LOCK_MAILBOX(message->mailbox);
 	    if (body) {
 		if (body->str) match = in_string(body->str,cond->match.string);
 		g_string_free(body,TRUE);
@@ -204,6 +212,8 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message)
 	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY)) {
                 gboolean is_new = (message->flags & LIBBALSA_MESSAGE_FLAG_NEW);
 
+		if (mbox_locked)
+		    UNLOCK_MAILBOX(message->mailbox);
 		if (!libbalsa_message_body_ref(message)) {
 		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                          _("Unable to load message body "
@@ -213,6 +223,8 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message)
 		body = content2reply(message,NULL,0,FALSE,FALSE);
                 if(is_new) libbalsa_message_read(message, FALSE);
 		libbalsa_message_body_unref(message);
+		if (mbox_locked)
+		    LOCK_MAILBOX(message->mailbox);
 		if (body && body->str) 
                     match = (REGEXEC(*(regex->compiled),body->str)==0);
 		g_string_free(body,TRUE);
@@ -234,16 +246,19 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message)
 }
 
 gint
-match_conditions(FilterOpType op, GSList * cond, LibBalsaMessage * message)
+match_conditions(FilterOpType op, GSList * cond, LibBalsaMessage * message,
+		 gboolean mbox_locked)
 {
     g_assert((op!=FILTER_NOOP) && cond && message);
     
     if (op==FILTER_OP_OR) {
-	for (;cond && !match_condition((LibBalsaCondition*)cond->data, message);
+	for (;cond && !match_condition((LibBalsaCondition*)cond->data, message,
+				       mbox_locked);
 	     cond = g_slist_next(cond));
 	return cond!=NULL;
     }
-    for (;cond && match_condition((LibBalsaCondition*) cond->data,message);
+    for (;cond && match_condition((LibBalsaCondition*) cond->data,message,
+				  mbox_locked);
 	 cond = g_slist_next(cond));
     return cond==NULL;
 }
@@ -326,7 +341,8 @@ filters_prepare_to_run(GSList * filters)
  */
 
 void
-libbalsa_filter_match(GSList * filter_list, GList * messages)
+libbalsa_filter_match(GSList * filter_list, GList * messages,
+		      gboolean mbox_locked)
 {
     gint match;
     GSList * lst;
@@ -341,7 +357,8 @@ libbalsa_filter_match(GSList * filter_list, GList * messages)
 	    filt = (LibBalsaFilter*)lst->data;
 	    match = match_conditions(filt->conditions_op,
 				     filt->conditions,
-				     LIBBALSA_MESSAGE(messages->data));	    
+				     LIBBALSA_MESSAGE(messages->data),
+				     mbox_locked);
 	}
 	if (match) {
 	    /* We hold a reference on the matching messages, to be sure they are still there when we do actions of filter */
@@ -356,7 +373,7 @@ libbalsa_filter_match(GSList * filter_list, GList * messages)
 void libbalsa_filter_match_mailbox(GSList * filter_list, LibBalsaMailbox * mbox)
 {
     LOCK_MAILBOX(mbox);
-    libbalsa_filter_match(filter_list, mbox->message_list);
+    libbalsa_filter_match(filter_list, mbox->message_list, TRUE);
     UNLOCK_MAILBOX(mbox);
 }
 

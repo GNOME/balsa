@@ -244,7 +244,7 @@ run_filters_on_reception(LibBalsaMailbox * mailbox)
 	new_messages=libbalsa_extract_new_messages(mailbox->message_list);
 	if (new_messages) {
 	    if (filters_prepare_to_run(filters)) {
-		libbalsa_filter_match(filters, new_messages);
+		libbalsa_filter_match(filters, new_messages, TRUE);
 		UNLOCK_MAILBOX(mailbox);
 		libbalsa_filter_apply(filters);
 	    }

@@ -30,6 +30,27 @@
 extern "C" {
 #endif				/* __cplusplus */
 
+    /* Struct used to keep track of the last sort we've made on an index
+       the idea being to avoid unnecessary recalculation */
+
+    struct _BalsaIndexMatch {
+	/* Fields describing the current matching conditions
+	   Remark : conditions is a copy, it is the responsibility
+	   of the owner (here the index) to free it
+	 */
+	gint op;
+	GSList * conditions;
+
+	/* This is the list of matching messages corresponding to the current
+	   conditions (used for IMAP only).
+	   Remark : we drop this list each time the mailbox content has changed
+	   or the conditions or the op has changed
+	*/
+	/* Interval of message numbers where we have done the search */
+	gint msgno_beg, msgno_end;
+	GList * matching_messages;
+    };
+
     GtkType balsa_index_get_type(void);
 
 #define BALSA_TYPE_INDEX          (balsa_index_get_type ())
@@ -41,6 +62,7 @@ extern "C" {
 
     typedef struct _BalsaIndex BalsaIndex;
     typedef struct _BalsaIndexClass BalsaIndexClass;
+    typedef struct _BalsaIndexMatch BalsaIndexMatch;
 
     struct _BalsaIndex {
         GtkScrolledWindow sw;    
@@ -56,6 +78,8 @@ extern "C" {
 
 	gchar *date_string;
 	gboolean line_length;
+
+	BalsaIndexMatch * match_struct;
     };
 
     struct _BalsaIndexClass {

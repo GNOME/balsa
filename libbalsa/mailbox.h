@@ -133,8 +133,6 @@ struct _LibBalsaMailboxClass {
     FILE *(*get_message_stream) (LibBalsaMailbox * mailbox,
 				 LibBalsaMessage * message);
     void (*check) (LibBalsaMailbox * mailbox);
-    GHashTable* (*get_matching)(LibBalsaMailbox * mailbox,
-                                int op, GSList* conditions);
     void (*save_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
     void (*load_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
 };
@@ -167,9 +165,6 @@ FILE *libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox,
 gint libbalsa_mailbox_sync_backend(LibBalsaMailbox * mailbox, gboolean delete);
 
 void libbalsa_mailbox_check(LibBalsaMailbox * mailbox);
-
-GHashTable*libbalsa_mailbox_get_matching(LibBalsaMailbox * mailbox,
-                                         int op, GSList* conditions);
 
 void libbalsa_mailbox_save_config(LibBalsaMailbox * mailbox,
 				  const gchar * prefix);

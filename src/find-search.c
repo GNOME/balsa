@@ -243,10 +243,10 @@ find_real(BalsaIndex * bindex,gboolean again)
 	g_slist_free(lst);
 	conditions=f->conditions;
     }
-    else conditions=g_slist_append(NULL,cnd);
+    else conditions=g_slist_append(NULL, cnd);
 
     balsa_index_find(bindex,
-                     f ? f->conditions_op : FILTER_OP_OR,
+                     f ? f->conditions_op : FILTER_OP_AND,
                      conditions, reverse);
 
     /* FIXME : See if this does not lead to a segfault because of

@@ -537,6 +537,13 @@ struct {
 static gint mail_headers_page;
 static gint spell_check_page;
 
+static void
+append_comma_separated(GtkEntry *entry, const gchar * text)
+{
+    if (*gtk_entry_get_text(entry))
+        gtk_entry_append_text(entry, ", ");
+    gtk_entry_append_text(entry, text);
+}
 
 /* the callback handlers */
 static void
@@ -560,8 +567,7 @@ address_book_cb(GtkWidget *widget, BalsaSendmsg *snd_msg_wind)
     if ( button == 0 ) {
 	gchar *t;
 	t = balsa_address_book_get_recipients(BALSA_ADDRESS_BOOK(ab));
-	if ( t ) 
-	    gtk_entry_set_text(GTK_ENTRY(address_entry), t);
+	append_comma_separated(GTK_ENTRY(address_entry), t);
 	g_free(t);
     }
     gnome_dialog_close(GNOME_DIALOG(ab));
@@ -2944,9 +2950,13 @@ sendmsg_window_set_field(BalsaSendmsg *bsmsg, const gchar* key,
     else if(g_strcasecmp(key, "cc")     ==0) entry = bsmsg->cc[1];
     else if(g_strcasecmp(key, "bcc")    ==0) entry = bsmsg->bcc[1];
     else if(g_strcasecmp(key, "replyto")==0) entry = bsmsg->reply_to[1];
+    else if(g_strcasecmp(key, "body")   ==0) {
+        gtk_text_insert(GTK_TEXT(bsmsg->text), NULL, NULL, NULL, val, -1);
+        return;
+    }
     else return;
 
-    gtk_entry_set_text(GTK_ENTRY(entry), val);
+    append_comma_separated(GTK_ENTRY(entry), val);
 }
 
 static gchar *

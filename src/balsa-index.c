@@ -49,6 +49,7 @@
 #include "store-address.h"
 
 #include "filter.h"
+#include "filter-funcs.h"
 
 #define CLIST_WORKAROUND
 #if defined(CLIST_WORKAROUND)
@@ -72,6 +73,7 @@ static void clist_click_column(GtkCList * clist, gint column,
 			       gpointer data);
 
 /* statics */
+static void bndx_match_struct_destroy(BalsaIndex * index);
 static void balsa_index_set_sort_order(BalsaIndex * bindex, int column, 
 				    GtkSortType order);
 static void balsa_index_set_first_new_message(BalsaIndex * bindex);
@@ -258,6 +260,19 @@ balsa_index_class_init(BalsaIndexClass * klass)
 }
 
 static void
+bndx_match_struct_destroy(BalsaIndex * index)
+{
+    if (index->match_struct) {
+	if (index->match_struct->conditions)
+	    libbalsa_conditions_free(index->match_struct->conditions);
+	if (index->match_struct->matching_messages)
+	    g_list_free(index->match_struct->matching_messages);
+	g_free(index->match_struct);
+	index->match_struct = NULL;
+    }
+}
+
+static void
 balsa_index_init(BalsaIndex * bindex)
 {
     GtkCList *clist;
@@ -376,6 +391,9 @@ balsa_index_init(BalsaIndex * bindex)
                         GDK_ACTION_MOVE);
     gtk_signal_connect(GTK_OBJECT(bindex->ctree), "drag-data-get",
                        GTK_SIGNAL_FUNC(balsa_index_drag_cb), NULL);
+
+    /* Initializing the match structure */
+    bindex->match_struct = NULL;
 
     g_get_current_time (&bindex->last_use);
     GTK_OBJECT_UNSET_FLAGS (bindex->ctree, GTK_CAN_FOCUS);
@@ -507,16 +525,14 @@ balsa_index_set_first_new_message(BalsaIndex * bindex)
 }
 
 struct BalsaIndexScanInfo {
+    BalsaIndex * index;                 /* Index */
     gpointer node;                      /* current ctree node */
+    GtkCTreeNode * previous, * next;
+    GtkCTreeNode *first, * last;
     GList *selection;                   /* copy of clist->selection */
-    GHashTable* matching;               /* matching messages */
     LibBalsaMessageFlag flag;           /* look only for matching nodes */
-    GtkCTreeNode *first;                /* returns first matching */
-    GtkCTreeNode *previous;             /* returns last matching
-                                           before selection */
-    GtkCTreeNode *next;                 /* returns first matching
-                                           after selection */
-    GtkCTreeNode *last;                 /* returns last matching */
+    gint op;
+    GSList * conditions;                /* Conditions for the match */
 };
 
 /* 
@@ -910,6 +926,228 @@ balsa_index_check_visibility(GtkCList *clist, GtkCTreeNode * node,
  *   like balsa_index_select_next_unread
  */
 
+/* Helper to compare regexs */
+
+static gboolean
+compare_regexs(GSList * c1,GSList * c2)
+{
+    GSList * l1, *l2;
+    LibBalsaConditionRegex * r1,* r2;
+
+    for (;c1;c1 = g_slist_next(c1)) {
+	r1 = c1->data;
+	for (l2 = c2;l2 ;l2 = g_slist_next(l2)) {
+	    r2 = l2->data;
+	    if (strcmp(r1->string,r2->string)==0)
+		break;
+	}
+	if (!l2) return FALSE;
+    }
+    return TRUE;
+}
+
+/* Helper to compare conditions, a bit obscure at first glance
+   but we have to compare complex structure, so we must check
+   all fields.
+*/
+static gboolean
+compare_conditions(GSList * cnd1,GSList * cnd2)
+{
+    GSList * l1 = cnd1,* l2 = g_slist_copy(cnd2),* tmp;
+    gboolean OK;
+
+    for (;l1 && l2;l1 = g_slist_next(l1)) {
+	LibBalsaCondition * c1 = l1->data;
+	LibBalsaCondition * c2 = NULL;
+
+	OK = FALSE;
+	for (tmp = l2;tmp && !OK;tmp = g_slist_next(tmp)) {
+	    c2 = tmp->data;
+	    switch (c1->type) {
+	    case CONDITION_SIMPLE:
+		if ((c2->type == CONDITION_SIMPLE) 
+		    && (g_strcasecmp(c1->match.string,c2->match.string) == 0))
+		    OK = TRUE;
+		break;
+	    
+	    case CONDITION_REGEX:
+		if ((c2->type == CONDITION_REGEX) &&
+		    compare_regexs(c1->match.regexs,c2->match.regexs))
+		    OK = TRUE;
+		break;
+	    case CONDITION_DATE:
+		if ((c2->type == CONDITION_DATE) &&
+		    (c1->match.interval.date_low == c2->match.interval.date_low) &&
+		    (c1->match.interval.date_high == c2->match.interval.date_high))
+		    OK = TRUE;
+		break;
+		
+	    case CONDITION_FLAG:
+		if ((c2->type == CONDITION_FLAG) &&
+		    (c1->match.flags == c2->match.flags))
+		    OK = TRUE;
+		break;
+	    }
+	    /* If OK == TRUE conditions are equal until now, let's see if the
+	       equality is complete, comparing the match fields */
+	    OK = OK
+		&& !(CONDITION_CHKMATCH(c1, CONDITION_MATCH_FROM)
+		     ^ CONDITION_CHKMATCH(c2, CONDITION_MATCH_FROM))
+		&& !(CONDITION_CHKMATCH(c1, CONDITION_MATCH_TO)
+		     ^ CONDITION_CHKMATCH(c2, CONDITION_MATCH_TO))
+		&& !(CONDITION_CHKMATCH(c1, CONDITION_MATCH_CC)
+		     ^ CONDITION_CHKMATCH(c2, CONDITION_MATCH_CC))
+		&& !(CONDITION_CHKMATCH(c1, CONDITION_MATCH_SUBJECT)
+		     ^ CONDITION_CHKMATCH(c2, CONDITION_MATCH_SUBJECT))
+		&& !(CONDITION_CHKMATCH(c1, CONDITION_MATCH_BODY)
+		     ^ CONDITION_CHKMATCH(c2, CONDITION_MATCH_BODY));
+	    /* Special case for user headers */
+	    if (OK && CONDITION_CHKMATCH(c1, CONDITION_MATCH_US_HEAD))
+		OK = CONDITION_CHKMATCH(c2, CONDITION_MATCH_US_HEAD)
+		    && c1->user_header && c2->user_header
+		    && g_strcasecmp(c1->user_header,c2->user_header)==0;
+	}
+	/* We found the current condition of l1, remove it from l2 */
+	if (OK)
+	    l2 = g_slist_remove(l2,c2);
+	/* Else the conditions list differ, stop the process */
+	else break;
+    }
+    /* There is equality only when l1 = l2 = NULL */
+    if (!l2 && !l1)
+	return TRUE;
+    g_slist_free(l2);
+    return FALSE;
+}
+
+/* This function retrieve the list of all messages matching the conditions
+   stored in the match struct. There are put in the matching_messages list.
+   It does the search only for the following and preceding NB_MESSAGES_FORWARD
+*/
+
+#define NB_MESSAGES_FORWARD 50
+
+static gboolean
+bndx_in_messages_list(BalsaIndex * index, gint msgno)
+{
+    GList * lst;
+    BalsaIndexMatch * match = index->match_struct;
+    gint new_begin = -1, new_end = -1;
+    gchar * buffer = NULL;
+
+    /* If the msgno is not in the current interval, we extend our
+       search domain so that the new interval contains it */
+    if (msgno+1 < match->msgno_beg || match->msgno_beg<0)
+	new_begin = msgno-NB_MESSAGES_FORWARD <= 0 ? 1 : msgno-NB_MESSAGES_FORWARD;
+    /* FIXME : do we have to limit the upper bound (i.e. is this a problem if
+       it becomes greater that the number of messages in the mailbox? */
+    if (msgno+1> match->msgno_end)
+	new_end = msgno+NB_MESSAGES_FORWARD;
+
+    g_print("msgno=%d [%d,%d],[%d,%d]\n",msgno,match->msgno_beg,match->msgno_end,new_begin,new_end);
+    /* Extend the interval if needed */
+    if (new_begin!=-1 || new_end!=-1) {
+	gchar * imap_query =
+	    libbalsa_filter_build_imap_query(match->op,
+					     match->conditions);
+	GList * new = NULL;
+
+	/* Construct the complete query : we add the message sequence number
+	   interval that interests us (taking care of not search for messages
+	   we have already looked for) */
+	buffer = g_strdup_printf("%d:%d %s",
+				 new_begin!=-1 ? new_begin : match->msgno_end+1,
+				 new_end!=-1 ? new_end : match->msgno_beg-1,
+				 imap_query);
+	g_free(imap_query);
+#ifdef SEARCHING_FINALLY_FIXED_
+	libbalsa_mailbox_imap_search(LIBBALSA_MAILBOX_IMAP(index->mailbox_node->mailbox),
+				     buffer, &new);
+#else
+	g_print("FIXME: urgently, or revoke.\n");
+#endif
+	/* Now new is the list of new messages matching the request, we must
+	   concatenate it with the previous matches (keeping the order, this is
+	   done by appending it or prepending, depending on which sense we are
+	   extending the search interval). Be careful here : all is in REVERSE
+	   ORDER!
+	*/
+	if (new_begin!=-1) {
+	    match->matching_messages =
+		g_list_concat(match->matching_messages, new);
+	    match->msgno_beg = new_begin;
+	}
+	if (new_end!=-1) {
+	    /* This test is there to avoid reconcatenate the new and old lists
+	       of messages to make a ring (this happens only on the first load)
+	       I'm not sure this remark is understandable ;-)*/
+	    if (new_begin==-1)
+		match->matching_messages =
+		    g_list_concat(new, match->matching_messages);
+	    match->msgno_end = new_end;	
+	}
+    }
+    for (lst = match->matching_messages;lst;lst = g_list_next(lst))
+	g_print("%d ",GPOINTER_TO_INT(lst->data));
+    g_print("\n");
+
+    /* The list is in reverse order : seq numbers of matching messages are
+       ordered in decreasing order, so we can do the lookup quicker (we stop
+       whenever the searched number is smaller than the current item in the
+       list)
+    */
+    for (lst = match->matching_messages;lst && (msgno+1)<GPOINTER_TO_INT(lst->data);
+	 lst = g_list_next(lst));
+
+    return lst!=NULL && (msgno+1)==GPOINTER_TO_INT(lst->data);
+}
+
+static gboolean
+bndx_match_message(BalsaIndex * index, LibBalsaMessage * message, gint op,
+		   GSList * conditions)
+{
+    g_assert(op!=FILTER_NOOP && conditions && message && index);
+
+    /* For local mailboxes, just test the match */
+    if (LIBBALSA_IS_MAILBOX_LOCAL(index->mailbox_node->mailbox))
+	return match_conditions(op, conditions, message, FALSE);
+
+    else if (LIBBALSA_IS_MAILBOX_IMAP(index->mailbox_node->mailbox)) {
+	if (!index->match_struct) {
+	    index->match_struct = g_new(BalsaIndexMatch, 1);
+	    index->match_struct->op = FILTER_NOOP;
+	    index->match_struct->conditions = NULL;
+	    index->match_struct->matching_messages = NULL;
+	}
+	/* See if the conditions have changed since the last search
+	   if yes just forget what we have done before, else keep it */
+	if ((op != index->match_struct->op) ||
+	    !compare_conditions(index->match_struct->conditions,conditions)) {
+	    GSList * cnd;
+	    /* We make a copy of the conditions list, and first drop the
+	       preceding ones */
+	    libbalsa_conditions_free(index->match_struct->conditions);
+	    index->match_struct->conditions = NULL;
+	    for (cnd = conditions;cnd;cnd = g_slist_next(cnd))
+		index->match_struct->conditions =
+		    g_slist_prepend(index->match_struct->conditions,
+				    libbalsa_condition_clone(cnd->data));
+	    index->match_struct->conditions =
+		g_slist_reverse(index->match_struct->conditions);
+	    index->match_struct->op = op;
+	    if (index->match_struct->matching_messages)
+		g_list_free(index->match_struct->matching_messages);
+	    index->match_struct->matching_messages = NULL;
+	    index->match_struct->msgno_beg = -1;
+	    index->match_struct->msgno_end = -1;
+	}
+	return bndx_in_messages_list(index, LIBBALSA_MESSAGE_GET_NO(message));
+    }
+    /* We should not get there (POP3 mailboxes are not associated to indexes) */
+    g_assert_not_reached();
+    return FALSE;
+}
+
 /* balsa_index_scan_node:
  * callback for pre-recursive search for previous and next
  * after search:
@@ -918,38 +1156,30 @@ balsa_index_check_visibility(GtkCList *clist, GtkCTreeNode * node,
  * - b->next is first viewable message after current, NULL if none,
  *     first message if no current message
  */
-static void
+static gboolean
 balsa_index_scan_node(GtkCTree * ctree, GtkCTreeNode * node,
                       struct BalsaIndexScanInfo *b)
 {
-    if (node == b->node) {
-        b->previous = b->last;
-        b->next = NULL;
-    } else {
-        LibBalsaMessage *message =
-            LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data(ctree, node));
-        /* if we're not looking for flagged messages or we are called
-         * by a search function, we want only viewable messages if we
-         * are looking for flagged messages, we want those that match,
-         * viewable or not */
-	gboolean found = (b->flag & message->flags);
-	/* FIXME: simplify this. It  is not clear what is the scanning
-           search  condition combinations  are  valid: matching  flag,
-           matching filter, or something else. This makes this chunk
-	   ambigous. */
-	found |= (b->flag == 0 && !b->matching && 
-             gtk_ctree_is_viewable(ctree, node))
-	    || (b->matching && g_hash_table_lookup(b->matching,message));
-        if (found) {
-            if (b->first == NULL)
-                /* first matching message */
-                b->first = node;
-            if (b->next == NULL)
-                /* first message, or first after current */
-                b->next = node;
-            b->last = node;
-        }
-    }
+    LibBalsaMessage *message =
+	LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data(ctree, node));
+    /* if we're not looking for flagged messages or we are called
+     * by a search function, we want only viewable messages if we
+     * are looking for flagged messages, we want those that match,
+     * viewable or not */
+    gboolean found;
+
+    /* First we're looking for a flag */
+    if (b->flag)
+	found = (b->flag & message->flags);
+    /* We're looking for a filter match */
+    else if (b->op != FILTER_NOOP)
+	found = bndx_match_message(b->index, message,
+				   b->op,
+				   b->conditions);
+    /* Not looking for flag, neither for filter match so just check
+       visibility (This is used by Next or Previous message) */
+    else found = gtk_ctree_is_viewable(ctree, node);
+    return found;
 }
 
 /* balsa_index_select_node:
@@ -976,6 +1206,68 @@ balsa_index_select_node(BalsaIndex * bindex, GtkCTreeNode * node)
     }
 }
 
+static GtkCTreeNode *
+bndx_prev(GtkCTree * ctree, GtkCTreeNode * node, gboolean only_viewable)
+{
+    GtkCTreeNode * res = GTK_CTREE_NODE_PREV(node);
+    GtkCTreeRow * r;
+
+    if (only_viewable || !res)
+	return res;
+    /* We want to scan all nodes, so we have to enter into the collapse
+       subtrees : if the previous node is the root of a different subtree
+       scan into it (going to the last of its children) */
+    r = GTK_CTREE_ROW(res);
+    /* To be the root of a different subtree, res must not be an ancestor
+       of node, and have children */
+    if (!gtk_ctree_is_ancestor(ctree, res, node) && r->children) {
+	/* Go to the last in the subtree, this can mean to go deep */
+	do {
+	    res = r->children;
+	    r = GTK_CTREE_ROW(res);
+	    while (r->sibling) {
+		res = r->sibling;
+		r = GTK_CTREE_ROW(res);
+	    }
+	} while (r->children);
+    }
+    return res;
+}
+
+static GtkCTreeNode *
+bndx_next(GtkCTree * ctree, GtkCTreeNode * node, gboolean only_viewable)
+{
+    GtkCTreeRow * r;
+    GtkCTreeNode * res;
+
+    /* We want to scan all nodes, so we have to enter into the collapse
+       subtrees : if the current node is the root of subtree we must scan 
+       into it (we have to check if the next we have is indeed its) */
+    r = GTK_CTREE_ROW(node);
+    /* We want to scan all nodes, so we have to check if the current node
+       is the root of a subtree (checking if it has children)
+       and we enter in the subtree only if we have to (only_viewable is FALSE)
+       else we just use the NEXT macro
+     */
+    if (only_viewable)
+	return GTK_CTREE_NODE_NEXT(node);
+    if (r->children)
+	return r->children;
+
+    if (r->sibling)
+	return r->sibling;
+    /* We arrive here when we're at the end of a subtree, so we have to go
+       to the parents to find the next node
+     */
+    res = node;
+    do {
+	res = r->parent;
+	if (!res) return NULL;
+	r = GTK_CTREE_ROW(res);
+    } while (!r->sibling);
+    return r->sibling;
+}
+
 /* balsa_index_find_node:
  * common search code--look for next or previous, with or without flag
  */
@@ -985,28 +1277,37 @@ balsa_index_find_node(BalsaIndex * bindex, gboolean previous,
 {
     GtkCTreeNode *node;
     struct BalsaIndexScanInfo *bi;
+    gboolean one_turn_done = FALSE;
     
     g_return_val_if_fail(bindex != NULL, NULL);
 
     bi = g_new0(struct BalsaIndexScanInfo, 1);
-    bi->node =
+    bi->index = bindex;
+    node =
         GTK_CLIST(bindex->ctree)->selection
         ? g_list_last(GTK_CLIST(bindex->ctree)->selection)->data : NULL;
+    if (!node)
+	return NULL;
+
     bi->flag = flag;
-    if(conditions) {
-        bi->matching = 
-            libbalsa_mailbox_get_matching(bindex->mailbox_node->mailbox, 
-                                          op, conditions);
-    }
-    gtk_ctree_pre_recursive(bindex->ctree, NULL, (GtkCTreeFunc)
-                            balsa_index_scan_node, bi);
-    node = previous ? bi->previous : bi->next;
-    if (node == NULL && flag != 0)
-        /* if looking for new or flagged messages, fall back to first
-         * matching */
-        node = bi->first;
+    bi->op = op;
+    bi->conditions = conditions;
+    do
+	if (previous) 
+	    node = bndx_prev(bindex->ctree, node, flag==0);
+	else {
+	    node = bndx_next(bindex->ctree, node, flag==0);
+	    /* When we search using flag, we wrap the research from the
+	       beginning. Do that once, no more (else -> infinite loop)
+	    */
+	    if (!node && flag!=0 && !one_turn_done) {
+		node = gtk_ctree_node_nth(bindex->ctree, 0);
+		one_turn_done = TRUE;
+	    }
+	}
+    while (node && !balsa_index_scan_node(bindex->ctree, node, bi));
     g_free(bi);
-    if(bi->matching) g_hash_table_destroy(bi->matching);
+
     return node;
 }
 
@@ -1514,9 +1815,9 @@ mailbox_message_new_cb(BalsaIndex * bindex, LibBalsaMessage * message)
     gtk_clist_freeze(GTK_CLIST (bindex->ctree));
     balsa_index_add(bindex, message);
     if(bindex->mailbox_node->mailbox->new_messages==0){
-      balsa_index_threading(bindex);
-      gtk_clist_sort (GTK_CLIST (bindex->ctree));
-      DO_CLIST_WORKAROUND(GTK_CLIST (bindex->ctree));
+	balsa_index_threading(bindex);
+	gtk_clist_sort (GTK_CLIST (bindex->ctree));
+	DO_CLIST_WORKAROUND(GTK_CLIST (bindex->ctree));
     }
     gtk_clist_thaw (GTK_CLIST (bindex->ctree));
     balsa_mblist_update_mailbox(balsa_app.mblist, 
@@ -1626,6 +1927,9 @@ balsa_index_close_and_destroy(GtkObject * obj)
         gtk_object_remove_data (obj, "message");
         gtk_object_unref (message);
     }
+
+    /* Destroy match_struct */
+    bndx_match_struct_destroy(bindex);
 
     /*page->window references our owner */
     if (bindex->mailbox_node && (mailbox = bindex->mailbox_node->mailbox) ) {

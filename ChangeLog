@@ -1,3 +1,7 @@
+1999-12-29  Martin Norbäck  <d95mback@dtek.chalmers.se>
+
+	* configure.in: added "sv" to ALL_LINGUAS.
+
 1999-12-28  Bruno Pires Marinho  <bapm@camoes.rnl.ist.utl.pt>
 
 	* src/balsa-app.h, src/balsa-app.c, src/sendmsg-window.c: Changed

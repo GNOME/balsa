@@ -3358,7 +3358,8 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     body->disposition = DISPINLINE; /* this is the main body */
 
     /* Get the text from the buffer. First make sure it's wrapped. */
-    sw_wrap_body(bsmsg);
+    if (balsa_app.wordwrap)
+	sw_wrap_body(bsmsg);
     /* Copy it to buffer2, so we can change it without changing the
      * display. */
     sw_buffer_save(bsmsg);

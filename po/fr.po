@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa VERSION\n"
-"POT-Creation-Date: 2000-01-18 00:10+0100\n"
+"POT-Creation-Date: 2000-01-18 13:35+0100\n"
 "PO-Revision-Date: 1999-09-09 11:12+02:00\n"
 "Last-Translator: Joaquim Fellmann <joaquim@hrnet.fr>\n"
 "Language-Team: GNOME French Team <gnomefr@gnomefr.traduc.org>\n"
@@ -887,9 +887,15 @@ msgstr "Minutes"
 msgid "Check mail automatically every:"
 msgstr "Vérifier le courrier toutes les:"
 
+# À améliorer éventuellement
 #: src/pref-manager.c:1126
 msgid "Word Wrap"
-msgstr ""
+msgstr "Troncature"
+
+# idem
+#: src/pref-manager.c:1137
+msgid "Wrap Outgoing Text at:"
+msgstr "Tronque le texte sortant à:"
 
 #: src/pref-manager.c:1152
 msgid "Characters"

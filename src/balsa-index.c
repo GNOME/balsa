@@ -67,6 +67,8 @@ static gint date_compare(GtkCList * clist, gconstpointer ptr1,
 			 gconstpointer ptr2);
 static gint numeric_compare(GtkCList * clist, gconstpointer ptr1,
 			    gconstpointer ptr2);
+static gint size_compare(GtkCList * clist, gconstpointer ptr1,
+                            gconstpointer ptr2);
 static void clist_click_column(GtkCList * clist, gint column,
 			       gpointer data);
 
@@ -259,6 +261,7 @@ balsa_index_init(BalsaIndex * bindex)
 	"A",
 	NULL,
 	NULL,
+	NULL,
 	NULL
     };
 
@@ -266,6 +269,7 @@ balsa_index_init(BalsaIndex * bindex)
     titles[3] = _("From");
     titles[4] = _("Subject");
     titles[5] = _("Date");
+    titles[6] = _("Size");
 
     bindex->mailbox_node = NULL;
     bindex->threading_type=BALSA_INDEX_THREADING_JWZ;
@@ -280,7 +284,7 @@ balsa_index_init(BalsaIndex * bindex)
                                     GTK_POLICY_AUTOMATIC);
     
     /* create the clist */
-    bindex->ctree = GTK_CTREE (gtk_ctree_new_with_titles (6, 4, titles));
+    bindex->ctree = GTK_CTREE (gtk_ctree_new_with_titles (7, 4, titles));
     clist = GTK_CLIST(bindex->ctree);
     gtk_container_add (GTK_CONTAINER (bindex), GTK_WIDGET (bindex->ctree));
 
@@ -420,6 +424,31 @@ numeric_compare(GtkCList * clist, gconstpointer ptr1, gconstpointer ptr2)
     return 0;
 }
 
+static gint
+size_compare(GtkCList * clist, gconstpointer ptr1, gconstpointer ptr2)
+{
+    LibBalsaMessage *m1, *m2;
+    glong t1, t2;
+
+    GtkCListRow *row1 = (GtkCListRow *) ptr1;
+    GtkCListRow *row2 = (GtkCListRow *) ptr2;
+
+    m1 = row1->data;
+    m2 = row2->data;
+
+    g_return_val_if_fail(m1, 0);
+    g_return_val_if_fail(m2, 0);
+
+    if (balsa_app.line_length) {
+        t1 = LIBBALSA_MESSAGE_GET_LINES(m1);
+        t2 = LIBBALSA_MESSAGE_GET_LINES(m2);
+    } else {
+        t1 = LIBBALSA_MESSAGE_GET_LENGTH(m1);
+        t2 = LIBBALSA_MESSAGE_GET_LENGTH(m2);
+    }
+
+    return t2-t1;
+}
 
 /* bi_get_largest_selected:
    helper function, finds the message with largest number among selected and
@@ -632,7 +661,7 @@ void
 balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message)
 {
     gchar buff1[32];
-    gchar *text[6];
+    gchar *text[7];
     GtkCTreeNode *node;
     GList *list;
     LibBalsaAddress *addy = NULL;
@@ -674,14 +703,17 @@ balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message)
     } else
 	text[3] = "";
 
-    text[4] = message->subject;
+    text[4] = (gchar*)LIBBALSA_MESSAGE_GET_SUBJECT(message);
     text[5] =
 	libbalsa_message_date_to_gchar(message, balsa_app.date_string);
+    text[6] =
+	libbalsa_message_size_to_gchar(message, balsa_app.line_length);
 
     node = gtk_ctree_insert_node(GTK_CTREE(bindex->ctree), NULL, NULL, 
                                  text, 2, NULL, NULL, NULL, NULL, 
                                  FALSE, TRUE);
     g_free(text[5]);
+    g_free(text[6]);
 
     gtk_ctree_node_set_row_data (GTK_CTREE (bindex->ctree), node, 
                                  (gpointer) message);
@@ -2104,7 +2136,7 @@ balsa_index_set_sort_order(BalsaIndex * bindex, int column, GtkSortType order)
 {
     GtkCList * clist;
     g_return_if_fail(bindex->mailbox_node);
-    g_return_if_fail(column>=0 && column <=5);
+    g_return_if_fail(column>=0 && column <=6);
     g_return_if_fail(order == GTK_SORT_DESCENDING || 
 		     order == GTK_SORT_ASCENDING);
 
@@ -2121,7 +2153,98 @@ balsa_index_set_sort_order(BalsaIndex * bindex, int column, GtkSortType order)
     case 5:
 	gtk_clist_set_compare_func(clist, date_compare);
 	break;
+    case 6:
+        gtk_clist_set_compare_func(clist, size_compare);
+        break;
     default:
 	gtk_clist_set_compare_func(clist, NULL);
     }
 }
+
+void
+balsa_index_refresh_size (GtkNotebook *notebook,
+			  GtkNotebookPage *page,
+			  gint page_num,
+			  gpointer data)
+{
+    BalsaIndex *bindex;
+    LibBalsaMessage * message;
+    GtkWidget *index;
+    GtkCTreeNode *node;
+    GtkCTree *ctree;
+    gchar *txt_new;
+    gint j;
+
+    if (page)
+	index = page->child;
+    else
+	index = GTK_WIDGET(data);
+
+    bindex = BALSA_INDEX(index);
+    if (!bindex)
+        return;
+
+    if (bindex->line_length == balsa_app.line_length)
+        return;
+
+    bindex->line_length = balsa_app.line_length;
+
+    ctree = GTK_CTREE(bindex->ctree);
+    if (ctree) {
+	j = 0;
+	while ((node = gtk_ctree_node_nth (ctree, j))) {
+	    message = (LibBalsaMessage*)
+		gtk_ctree_node_get_row_data (ctree, node);
+	    txt_new = libbalsa_message_size_to_gchar(message,
+						     bindex->line_length);
+	    gtk_ctree_node_set_text (ctree, node, 6, txt_new);
+	    g_free (txt_new);
+	    j++;
+	}
+    }
+}
+
+void
+balsa_index_refresh_date (GtkNotebook *notebook,
+			  GtkNotebookPage *page,
+			  gint page_num,
+			  gpointer data)
+{
+    BalsaIndex *bindex;
+    LibBalsaMessage * message;
+    GtkWidget *index;
+    GtkCTreeNode *node;
+    GtkCTree *ctree;
+    gchar *txt_new;
+    gint j;
+
+    if (page)
+	index = page->child;
+    else
+	index = GTK_WIDGET(data);
+
+    bindex = BALSA_INDEX(index);
+    if (!bindex)
+        return;
+
+    if (!strcmp (bindex->date_string, balsa_app.date_string))
+        return;
+
+    g_free (bindex->date_string);
+    bindex->date_string = g_strdup (balsa_app.date_string);
+
+    ctree = GTK_CTREE(bindex->ctree);
+    if (ctree) {
+	j = 0;
+	while ((node = gtk_ctree_node_nth (ctree, j))) {
+	    message = (LibBalsaMessage*)
+		gtk_ctree_node_get_row_data (ctree, node);
+	    txt_new = libbalsa_message_date_to_gchar(message,
+						     bindex->date_string);
+	    gtk_ctree_node_set_text (ctree, node, 5, txt_new);
+	    g_free (txt_new);
+	    j++;
+	}
+    }
+}
+

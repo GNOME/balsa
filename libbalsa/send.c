@@ -488,8 +488,9 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 
 	    /* RFC 822 does not require a message to have a subject.
 	               I assume this is NULL if not present */
-	    if (queu->subject)
-	    	smtp_set_header (message, "Subject", queu->subject);
+	    if (LIBBALSA_MESSAGE_GET_SUBJECT(queu))
+	    	smtp_set_header (message, "Subject", 
+				 LIBBALSA_MESSAGE_GET_SUBJECT(queu));
 
 	    /* Add the sender info */
 	    phrase = libbalsa_address_get_phrase(queu->from);
@@ -1005,7 +1006,7 @@ message2HEADER(LibBalsaMessage * message, HEADER * hdr) {
 	g_free(tmp);
     }
 
-    hdr->env->subject = g_strdup(message->subject);
+    hdr->env->subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
 
     /* This continuous lock/unlock business is because 
      * we can't call libbalsa API funcs with the 

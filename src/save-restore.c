@@ -469,6 +469,7 @@ config_global_load(void)
     /* ... alternative layout of main window */
     balsa_app.alternative_layout = gnome_config_get_bool("AlternativeLayout=false");
     balsa_app.view_message_on_open = gnome_config_get_bool("ViewMessageOnOpen=true");
+    balsa_app.line_length = gnome_config_get_bool("MsgSizeAsLines=true");
 
     /* ... style */
     balsa_app.toolbar_style = d_get_gint("ToolbarStyle", GTK_TOOLBAR_BOTH);
@@ -568,6 +569,8 @@ config_global_load(void)
     balsa_app.wraplength = gnome_config_get_int("WrapLength=75");
     if (balsa_app.wraplength < 40)
 	balsa_app.wraplength = 40;
+
+	balsa_app.always_queue_sent_mail = d_get_gint("AlwaysQueueSentMail", 0);
 
     gnome_config_pop_prefix();
 
@@ -712,6 +715,7 @@ gint config_save(void)
     gnome_config_set_int("ProgressWindow", balsa_app.pwindow_option);
     gnome_config_set_bool("AlternativeLayout", balsa_app.alternative_layout);
     gnome_config_set_bool("ViewMessageOnOpen", balsa_app.view_message_on_open);
+    gnome_config_set_bool("MsgSizeAsLines", balsa_app.line_length);
 
     gnome_config_pop_prefix();
 
@@ -769,6 +773,7 @@ gint config_save(void)
     gnome_config_set_bool("WordWrap", balsa_app.wordwrap);
     gnome_config_set_int("WrapLength", balsa_app.wraplength);
 
+	gnome_config_set_int("AlwaysQueueSentMail", balsa_app.always_queue_sent_mail);
     gnome_config_pop_prefix();
 
     /* Compose window ... */

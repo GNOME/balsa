@@ -1109,6 +1109,10 @@ real_open_mbnode(BalsaMailboxNode* mbnode)
        else */
     label = balsa_notebook_label_new(mbnode);
 
+    /* for updating date when settings change */
+    index->date_string = g_strdup (balsa_app.date_string);
+    index->line_length = balsa_app.line_length;
+
     /* store for easy access */
     gtk_notebook_append_page(GTK_NOTEBOOK(balsa_app.main_window->notebook),
 			     GTK_WIDGET(index), label);
@@ -1290,6 +1294,14 @@ balsa_window_refresh(BalsaWindow * window)
 	       screens and all :) */
 	    gtk_paned_set_position(GTK_PANED(paned), G_MAXINT);
 	}
+
+	/* update the date column, only in the current page */
+	balsa_index_refresh_date (GTK_NOTEBOOK(balsa_app.notebook),
+				  NULL, 0, index);
+	/* update the size column, only in the current page */
+	balsa_index_refresh_size (GTK_NOTEBOOK(balsa_app.notebook),
+				  NULL, 0, index);
+
     }
     /*
      * set the toolbar style
@@ -2410,6 +2422,11 @@ notebook_switch_page_cb(GtkWidget * notebook,
     enable_mailbox_menus(BALSA_INDEX(index)->mailbox_node);
 
     balsa_mblist_focus_mailbox(balsa_app.mblist, mailbox);
+
+    balsa_index_refresh_date (GTK_NOTEBOOK(balsa_app.notebook),
+			      NULL, 0, index);
+    balsa_index_refresh_size (GTK_NOTEBOOK(balsa_app.notebook),
+			      NULL, 0, index);
 }
 
 static void

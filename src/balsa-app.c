@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -245,6 +245,7 @@ balsa_app_init(void)
     balsa_app.show_notebook_tabs = FALSE;
     balsa_app.alternative_layout = FALSE;
     balsa_app.view_message_on_open = TRUE;
+    balsa_app.line_length = FALSE;
 
     balsa_app.index_num_width = NUM_DEFAULT_WIDTH;
     balsa_app.index_status_width = STATUS_DEFAULT_WIDTH;

@@ -53,6 +53,9 @@ extern "C" {
 
         int threading_type;
         GTimeVal last_use;
+
+	gchar *date_string;
+	gboolean line_length;
     };
 
     struct _BalsaIndexClass {
@@ -122,7 +125,13 @@ extern "C" {
     void balsa_index_update_message(BalsaIndex * index);
 
     /* Threading Stuff */
-    void balsa_index_threading(BalsaIndex* bindex); 
+    void balsa_index_threading(BalsaIndex* bindex);
+
+    /* Updating index columns when preferences change */
+    void balsa_index_refresh_date (GtkNotebook *, GtkNotebookPage *,
+				   gint, gpointer);
+    void balsa_index_refresh_size (GtkNotebook *, GtkNotebookPage *,
+				   gint, gpointer);
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

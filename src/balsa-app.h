@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -239,6 +239,7 @@ extern struct BalsaApplication {
     gboolean show_notebook_tabs;
     gboolean alternative_layout;
     gboolean view_message_on_open;
+    gboolean line_length;
 
     gboolean empty_trash_on_exit;
     gboolean previewpane;
@@ -271,6 +272,8 @@ extern struct BalsaApplication {
 
     /* compose: request a disposition notification */
     gboolean req_dispnotify;   
+    gboolean always_queue_sent_mail;
+ 
 
     /* appbar */
     GnomeAppBar *appbar;

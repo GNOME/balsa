@@ -517,7 +517,10 @@ mb_unsubscribe_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 static void
 mb_rescan_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 {
+    /* no need for this:
     g_return_if_fail(mbnode->mailbox == NULL);
+     * balsa_mailbox_node_rescan() does a more refined test.
+     */
     balsa_mailbox_node_rescan(mbnode);
 }
 
@@ -575,6 +578,7 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
 	if(LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox)) {
 	    add_menu_entry(menu, _("Subscribe"),   mb_subscribe_cb,   mbnode);
 	    add_menu_entry(menu, _("Unsubscribe"), mb_unsubscribe_cb, mbnode);
+	    add_menu_entry(menu, _("Rescan"),	   mb_rescan_cb,      mbnode);
 	    add_menu_entry(menu, NULL, NULL, mbnode);
 	}
 	
@@ -743,7 +747,7 @@ get_parent_folder_name(const gchar* path, char delim)
 }
 
 static gboolean
-traverse_find_parent(GNode * node, gpointer * d)
+traverse_find_dir(GNode * node, gpointer * d)
 {
     BalsaMailboxNode * mbnode;
     if(node->data == NULL)
@@ -760,7 +764,7 @@ traverse_find_parent(GNode * node, gpointer * d)
 }
 
 static GNode*
-get_parent_by_name(GNode* root, const gchar* path)
+find_by_dir(GNode* root, const gchar* path)
 {
     gpointer d[2];
 
@@ -770,31 +774,39 @@ get_parent_by_name(GNode* root, const gchar* path)
     d[0] = (gchar*) path;
     d[1] = NULL;
     g_node_traverse(root, G_LEVEL_ORDER, G_TRAVERSE_ALL, -1,
-		    (GNodeTraverseFunc) traverse_find_parent, d);
+		    (GNodeTraverseFunc) traverse_find_dir, d);
 
     return d[1] ? d[1] : root;
 }
-static GNode* add_imap_entry(GNode*root, const char* fn, 
-			     LibBalsaMailboxImap* mailbox, char delim)
+
+/* add_imap_entry:
+ * Returns a node for the path `fn'.
+ * Finds the node if it exists, and creates one if it doesn't.
+ */
+static GNode* add_imap_entry(GNode*root, const char* fn, char delim)
 { 
+    GNode* node;
+    gchar * parent_name;
     GNode* parent;
     BalsaMailboxNode* mbnode;
-    gchar * parent_name = get_parent_folder_name(fn, delim);
+    const gchar *basename;
 
-    parent = get_parent_by_name(root, parent_name);
+    node = find_by_dir(root, fn);
+    if (node != root)
+	return node;
+
+    parent_name = get_parent_folder_name(fn, delim);
+    parent = find_by_dir(root, parent_name);
     g_free(parent_name);
 
     g_return_val_if_fail(parent, NULL);
     mbnode = balsa_mailbox_node_new_imap_node(BALSA_MAILBOX_NODE
 					 (root->data)->server, fn);
-    if(mailbox)
-	mbnode->mailbox = LIBBALSA_MAILBOX(mailbox);
-    else {
-	const gchar *basename = strrchr(fn, delim);
-	if(!basename) basename = fn;
-	else basename++;
-	mbnode->name = g_strdup(basename);
-    }
+
+    basename = strrchr(fn, delim);
+    if(!basename) basename = fn;
+    else basename++;
+    mbnode->name = g_strdup(basename);
     mbnode->parent = BALSA_MAILBOX_NODE(parent->data);
     mbnode->subscribed = mbnode->parent->subscribed;
     return g_node_append(parent, g_node_new(mbnode));
@@ -813,6 +825,8 @@ add_imap_mailbox(GNode*root, const char* fn, char delim)
 { 
     LibBalsaMailboxImap* m;
     const gchar *basename;
+    GNode *node;
+    BalsaMailboxNode* mbnode;
 
     basename = strrchr(fn, delim);
     if(!basename) basename = fn;
@@ -822,6 +836,12 @@ add_imap_mailbox(GNode*root, const char* fn, char delim)
 	    return NULL; 
     }
 
+    node = add_imap_entry(root, fn, delim);
+    mbnode = BALSA_MAILBOX_NODE(node->data);
+    if (LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox))
+	/* it already has a mailbox */
+	return node;
+
     m = LIBBALSA_MAILBOX_IMAP(libbalsa_mailbox_imap_new());
     libbalsa_mailbox_remote_set_server(
 	LIBBALSA_MAILBOX_REMOTE(m), BALSA_MAILBOX_NODE(root->data)->server);
@@ -829,8 +849,11 @@ add_imap_mailbox(GNode*root, const char* fn, char delim)
     if(balsa_app.debug) 
 	printf("add_imap_mailbox: Adding mailbox of name %s (full path %s)\n", 
 	       basename, fn);
-    LIBBALSA_MAILBOX(m)->name = g_strdup(basename);
-    return add_imap_entry(root, fn, m, delim);
+    /* avoid allocating the name again: */
+    LIBBALSA_MAILBOX(m)->name = mbnode->name;
+    mbnode->name = NULL;
+    mbnode->mailbox = LIBBALSA_MAILBOX(m);
+    return node;
 }
 
 static GNode*
@@ -838,6 +861,6 @@ add_imap_folder(GNode*root, const char* fn, char delim)
 { 
     if(balsa_app.debug) 
 	printf("add_imap_folder: Adding folder of path %s\n", fn);
-    return add_imap_entry(root, fn, NULL, delim);
+    return add_imap_entry(root, fn, delim);
 }
 

@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -304,6 +304,7 @@ prepare_header(PrintInfo * pi, LibBalsaMessageBody * body)
     GnomeFont *font;
     HeaderInfo *pdata;
     GString *footer_string = NULL;
+    const gchar* subject;
 
     pdata = g_malloc(sizeof(HeaderInfo));
     pdata->id_tag = BALSA_PRINT_TYPE_HEADER;
@@ -320,9 +321,10 @@ prepare_header(PrintInfo * pi, LibBalsaMessageBody * body)
 	pdata->headers[hdr++] =
 	    libbalsa_make_string_from_list(pi->message->to_list);
     }
-    if (pi->message->subject) {
+    subject = LIBBALSA_MESSAGE_GET_SUBJECT(pi->message);
+    if (subject) {
 	pdata->headers[hdr++] = g_strdup(_("Subject:"));
-	pdata->headers[hdr++] = g_strdup(pi->message->subject);
+	pdata->headers[hdr++] = g_strdup(subject);
 	if (footer_string) {
 	    footer_string = g_string_append(footer_string, " - ");
 	    footer_string = g_string_append(footer_string, 

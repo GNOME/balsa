@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -64,7 +64,7 @@ static void subject_merge(GNode *node, GHashTable* subject_table,
 			  GSList* root_set, GSList** save_node);
 static void reparent(GNode* node, GNode* children);
 static void free_node(gpointer key, GNode* value, gpointer data);
-static gchar* chop_re(gchar* str);
+static const gchar* chop_re(const gchar* str);
 
 static void threading_simple(BalsaIndex* bindex);
 static void add_message(GtkCTree *ctree, 
@@ -550,8 +550,8 @@ dump(GNode *node, int indent)
 	   (int)(node->data),
 	   ((node->data!=NULL) ?
 	    /* ((LibBalsaMessage *)(((GNode*)(node)->data)))->message_id : */
-	    ((LibBalsaMessage *)(((GNode*)(node)->data)))->subject :
-	    "empty"),
+	    LIBBALSA_MESSAGE_GET_SUBJECT(
+		((LibBalsaMessage *)(((GNode*)(node)->data)))) : "empty"),
 	   ((node->data!=NULL) ?
 	    (int)(((LibBalsaMessage *)(((GNode*)(node)->data)))->msgno+1) :
 	    -1)
@@ -616,8 +616,8 @@ static void
 subject_gather(GNode *node, GHashTable* subject_table)
 {
     LibBalsaMessage *message=NULL;
-    gchar *subject=NULL;
-    gchar *chopped_subject=NULL;
+    const gchar *subject=NULL;
+    const gchar *chopped_subject=NULL;
     GNode* old;
 
     /*
@@ -696,7 +696,7 @@ subject_gather(GNode *node, GHashTable* subject_table)
     
     g_return_if_fail(message!=NULL);
 
-    subject=message->subject;
+    subject=LIBBALSA_MESSAGE_GET_SUBJECT(message);
     if(subject==NULL)return;
     chopped_subject=chop_re(subject);
     if(chopped_subject==NULL) {
@@ -710,7 +710,7 @@ subject_gather(GNode *node, GHashTable* subject_table)
     old=g_hash_table_lookup(subject_table, chopped_subject);
     if(old==NULL ||
        (node->data==NULL&&old->data!=NULL)) {
-	g_hash_table_insert(subject_table, chopped_subject, node);
+	g_hash_table_insert(subject_table, (char*)chopped_subject, node);
 	return;
     }
 
@@ -718,11 +718,12 @@ subject_gather(GNode *node, GHashTable* subject_table)
 	LibBalsaMessage *old_message=(LibBalsaMessage *)(old->data!=NULL ?
 							 old->data :
 							 old->children->data);
+	const gchar* old_subject;
 	g_return_if_fail(old_message!=NULL);
+	old_subject = LIBBALSA_MESSAGE_GET_SUBJECT(old_message);
 
-	if(old_message->subject!=chop_re(old_message->subject) &&
-	   subject==chopped_subject) {
-	    g_hash_table_insert(subject_table, chopped_subject, node);
+	if( old_subject != chop_re(old_subject) && subject==chopped_subject) {
+	    g_hash_table_insert(subject_table, (gchar*)chopped_subject, node);
 	}
     }
     return;
@@ -733,8 +734,8 @@ subject_merge(GNode *node, GHashTable* subject_table,
 	      GSList* root_set, GSList** save_node)
 {
     LibBalsaMessage *message=NULL;
-    gchar *subject=NULL;
-    gchar *chopped_subject=NULL;
+    const gchar *subject=NULL;
+    const gchar *chopped_subject=NULL;
     GNode* node2;
 
     if(node==NULL) return;
@@ -745,7 +746,7 @@ subject_merge(GNode *node, GHashTable* subject_table,
 
     g_return_if_fail(message!=NULL);
 
-    subject=message->subject;
+    subject=LIBBALSA_MESSAGE_GET_SUBJECT(message);
     if(subject==NULL)return;
     chopped_subject=chop_re(subject);
     if(chopped_subject==NULL) {
@@ -776,9 +777,10 @@ subject_merge(GNode *node, GHashTable* subject_table,
 
     if(node2->data!=NULL) {
 	LibBalsaMessage *message2=(LibBalsaMessage *)(node2->data);
-	gchar* chopped_subject2=chop_re(message2->subject);
-	if((message2->subject==chopped_subject2) &&
-	   subject!=chopped_subject) {
+	const gchar* subject2 = LIBBALSA_MESSAGE_GET_SUBJECT(message2);
+	const gchar* chopped_subject2= chop_re(subject);
+
+	if((subject2==chopped_subject2) && subject!=chopped_subject) {
 	    GSList* foo=root_set;
 	    reparent(node2, node);
 
@@ -789,11 +791,10 @@ subject_merge(GNode *node, GHashTable* subject_table,
 	    }
 	    return;
 	}
-	if((message2->subject!=chopped_subject2) &&
-	   subject==chopped_subject) {
+	if((subject2!=chopped_subject2) && subject==chopped_subject) {
 	    GSList* foo=root_set;
 	    reparent(node, node2);
-	    g_hash_table_insert(subject_table, chopped_subject, node);
+	    g_hash_table_insert(subject_table, (char*)chopped_subject, node);
 	    while(foo) {
 		if(foo->data==node2)
 		    foo->data=NULL;
@@ -840,10 +841,10 @@ reparent(GNode* node, GNode* children)
 }
 
 /* The more heuristics should be added. */
-static gchar *
-chop_re(gchar* str)
+static const gchar *
+chop_re(const gchar* str)
 {
-    gchar *p=str;
+    const gchar *p=str;
     while(*p) {
 	while(*p && isspace((int)*p)) p++;
 	if(!*p) break;

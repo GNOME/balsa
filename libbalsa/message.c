@@ -19,6 +19,17 @@
  * 02111-1307, USA.
  */
 
+/* DESIGN NOTES.
+   MESSAGE_COPY_CONTENT define is an attempt to reduce memory usage of balsa.
+   When it is defined, The message date is stored in one place only (in
+   libmutt structures). This should reduce memory usage to some extent.
+   However, it is not implemented very extensively at the present moment
+   and the memory usage reduction is hardly noticeable.
+   - Lack of inline functions in C increases program complexity. This cost
+   can be accepted.
+   - thorough analysis of memory usage is needed.
+*/
+   
 #include "config.h"
 
 #include <glib.h>
@@ -105,7 +116,7 @@ libbalsa_message_init(LibBalsaMessage * message)
     message->from = NULL;
     message->sender = NULL;
     message->reply_to = NULL;
-    message->subject = NULL;
+    message->subj = NULL;
     message->to_list = NULL;
     message->cc_list = NULL;
     message->bcc_list = NULL;
@@ -240,9 +251,10 @@ libbalsa_message_destroy(GtkObject * object)
     g_list_free(message->bcc_list);
     message->bcc_list = NULL;
 
-    g_free(message->subject);
-    message->subject = NULL;
-
+#if MESSAGE_COPY_CONTENT
+    g_free(message->subj);
+    message->subj = NULL;
+#endif
     for (list = message->references; list; list = list->next) {
 	if (list->data)
 	    g_free(list->data);
@@ -921,6 +933,36 @@ libbalsa_message_date_to_gchar(LibBalsaMessage * message,
     return g_strdup(rettime);
 }
 
+gchar *
+libbalsa_message_size_to_gchar (LibBalsaMessage * message, gboolean lines)
+{
+    gchar retsize[32];
+    glong length;   /* byte len */
+    gint lines_len; /* line len */
+
+    g_return_val_if_fail(message != NULL, NULL);
+    length    = LIBBALSA_MESSAGE_GET_LENGTH(message);
+    lines_len = LIBBALSA_MESSAGE_GET_LINES(message);
+    /* lines is int, length is long */
+    if (lines)
+        g_snprintf (retsize, sizeof(retsize), "%d", lines_len);
+    else {
+        if (length <= 32768) {
+            g_snprintf (retsize, sizeof(retsize), "%ld", length);
+        } else if (length <= (100*1024)) {
+            float tmp = (float)length/1024.0;
+            g_snprintf (retsize, sizeof(retsize), "%.1fK", tmp);
+        } else if (length <= (1024*1024)) {
+            g_snprintf (retsize, sizeof(retsize), "%ldK", length/1024);
+        } else {
+            float tmp = (float)length/(1024.0*1024.0);
+            g_snprintf (retsize, sizeof(retsize), "%.1fM", tmp);
+        }
+    }
+
+    return g_strdup(retsize);
+}
+
 static gchar *
 ADDRESS_to_gchar(const ADDRESS * addr)
 {
@@ -1005,3 +1047,31 @@ libbalsa_message_set_dispnotify(LibBalsaMessage *message,
     if(address)
 	gtk_object_ref(GTK_OBJECT(message->dispnotify_to));
 }
+
+#ifndef MESSAGE_COPY_CONTENT
+/* libbalsa_message_get_subject:
+   get constant pointer to the subject of the message; 
+*/
+const gchar*
+libbalsa_message_get_subject(LibBalsaMessage* msg)
+{
+    if(msg->mailbox) {
+	/* g_print("Returning libmutt's pointer\n"); */
+	return CLIENT_CONTEXT(msg->mailbox)->hdrs[msg->msgno]->env->subject;
+    } else
+	return msg->subj;
+}
+
+
+guint
+libbalsa_message_get_lines(LibBalsaMessage* msg)
+{
+    return CLIENT_CONTEXT(msg->mailbox)->hdrs[msg->msgno]->lines;
+}
+glong
+libbalsa_message_get_length(LibBalsaMessage* msg)
+{
+    return CLIENT_CONTEXT(msg->mailbox)->hdrs[msg->msgno]->content->length;
+}
+
+#endif

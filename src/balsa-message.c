@@ -106,8 +106,8 @@ static void part_context_menu_save(GtkWidget * menu_item,
 /* static void part_context_menu_view(GtkWidget * menu_item, */
 /* 				   BalsaPartInfo * info); */
 
-static void add_header_gchar(BalsaMessage * bm, gchar * header,
-			     gchar * label, gchar * value);
+static void add_header_gchar(BalsaMessage * bm, const gchar *header,
+			     const gchar *label, const gchar *value);
 static void add_header_glist(BalsaMessage * bm, gchar * header,
 			     gchar * label, GList * list);
 
@@ -574,8 +574,8 @@ balsa_message_set_wrap(BalsaMessage * bm, gboolean wrap)
 
 /* This function should split \n into separate lines. */
 static void
-add_header_gchar(BalsaMessage * bm, gchar * header, gchar * label,
-		 gchar * value)
+add_header_gchar(BalsaMessage * bm, const gchar *header, const gchar *label,
+		 const gchar *value)
 {
     /*    GtkWidget *w; */
     GdkFont *fnt;
@@ -670,7 +670,8 @@ display_headers(BalsaMessage * bm)
 
     gtk_text_freeze(GTK_TEXT(bm->header_text));
 
-    add_header_gchar(bm, "subject", _("Subject:"), message->subject);
+    add_header_gchar(bm, "subject", _("Subject:"), 
+		     LIBBALSA_MESSAGE_GET_SUBJECT(message));
 
     date = libbalsa_message_date_to_gchar(message, balsa_app.date_string);
     add_header_gchar(bm, "date", _("Date:"), date);
@@ -2146,7 +2147,8 @@ static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
     dummy = libbalsa_address_to_gchar(balsa_app.current_ident->address, 0);
     message->from = libbalsa_address_new_from_string(dummy);
     g_free (dummy);
-    message->subject = g_strdup("Message Disposition Notification");
+    LIBBALSA_MESSAGE_SET_SUBJECT(message,
+				 g_strdup("Message Disposition Notification"));
     dummy = libbalsa_address_to_gchar(for_msg->dispnotify_to, 0);
     message->to_list = libbalsa_address_new_list_from_string(dummy);
     g_free (dummy);
@@ -2158,7 +2160,7 @@ static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
     body->buffer = g_strdup_printf(
 	"The message sent on %s to %s with subject \"%s\" has been displayed.\n"
 	"There is no guarantee that the message has been read or understood.\n\n",
-	date, dummy, for_msg->subject);
+	date, dummy, LIBBALSA_MESSAGE_GET_SUBJECT(for_msg));
     g_free (date);
     g_free (dummy);
     if (balsa_app.wordwrap)

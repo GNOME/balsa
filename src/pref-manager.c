@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -63,6 +63,7 @@ typedef struct _PropertyUI {
     GtkWidget *previewpane;
     GtkWidget *alternative_layout;
     GtkWidget *view_message_on_open;
+    GtkWidget *line_length;
     GtkWidget *view_allheaders;
     GtkWidget *debug;		/* enable/disable debugging */
     GtkWidget *empty_trash;
@@ -72,6 +73,7 @@ typedef struct _PropertyUI {
     GtkWidget *check_mail_upon_startup;
     GtkWidget *remember_open_mboxes;
     GtkWidget *mblist_show_mb_content_info;
+    GtkWidget *always_queue_sent_mail;
 
     /* Information messages */
     GtkWidget *information_message_menu;
@@ -274,6 +276,9 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     gtk_signal_connect (GTK_OBJECT (pui->view_message_on_open), "toggled",
                         GTK_SIGNAL_FUNC (properties_modified_cb),
                         property_box);
+    gtk_signal_connect (GTK_OBJECT (pui->line_length), "toggled",
+                        GTK_SIGNAL_FUNC (properties_modified_cb),
+                        property_box);
     gtk_signal_connect(GTK_OBJECT(pui->debug), "toggled",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
@@ -326,6 +331,8 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 		       GTK_SIGNAL_FUNC(wrap_modified_cb), property_box);
     gtk_signal_connect(GTK_OBJECT(pui->wraplength), "changed",
 		       GTK_SIGNAL_FUNC(wrap_modified_cb), property_box);
+    gtk_signal_connect(GTK_OBJECT(pui->always_queue_sent_mail), "toggled",
+		       GTK_SIGNAL_FUNC(properties_modified_cb), property_box);
 
     /* arp */
     gtk_signal_connect(GTK_OBJECT(pui->quote_str), "changed",
@@ -477,6 +484,7 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     balsa_app.previewpane = GTK_TOGGLE_BUTTON(pui->previewpane)->active;
     balsa_app.alternative_layout = GTK_TOGGLE_BUTTON(pui->alternative_layout)->active;
     balsa_app.view_message_on_open = GTK_TOGGLE_BUTTON (pui->view_message_on_open)->active;
+    balsa_app.line_length = GTK_TOGGLE_BUTTON (pui->line_length)->active;
     
     /* if (balsa_app.alt_layout_is_active != balsa_app.alternative_layout)  */
 	balsa_change_window_layout(balsa_app.main_window);
@@ -517,6 +525,8 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     balsa_app.wordwrap = GTK_TOGGLE_BUTTON(pui->wordwrap)->active;
     balsa_app.wraplength =
 	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(pui->wraplength));
+	balsa_app.always_queue_sent_mail =
+				GTK_TOGGLE_BUTTON(pui->always_queue_sent_mail)->active;
 
     balsa_app.close_mailbox_auto =
 	GTK_TOGGLE_BUTTON(pui->close_mailbox_auto)->active;
@@ -672,6 +682,8 @@ set_prefs(void)
 				 balsa_app.alternative_layout);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->view_message_on_open),
                                  balsa_app.view_message_on_open);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->line_length),
+                                 balsa_app.line_length);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->debug),
 				 balsa_app.debug);
     for (i = 0; i < NUM_ENCODING_MODES; i++)
@@ -713,6 +725,8 @@ set_prefs(void)
 				 balsa_app.wordwrap);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->wraplength),
 			      (float) balsa_app.wraplength);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->always_queue_sent_mail),
+				 balsa_app.always_queue_sent_mail);
 
     gtk_widget_set_sensitive(pui->wraplength,
 			     GTK_TOGGLE_BUTTON(pui->wordwrap)->active);
@@ -1270,10 +1284,17 @@ outgoing_page(gpointer data)
     gtk_box_pack_start(GTK_BOX(vbox1), frame2, FALSE, FALSE, 0);
     gtk_container_set_border_width(GTK_CONTAINER(frame2), 5);
 
+	vbox2 = vbox_in_container(frame2);
+
     table2 = GTK_TABLE(gtk_table_new(3, 2, FALSE));
-    gtk_container_add(GTK_CONTAINER(frame2), GTK_WIDGET(table2));
-    gtk_container_set_border_width(GTK_CONTAINER(table2), 5);
+    gtk_container_add(GTK_CONTAINER(vbox2), GTK_WIDGET(table2));
+    gtk_container_set_border_width(GTK_CONTAINER(table2), 2);
     pui->quote_str = attach_entry(_("Reply prefix:"), 4, table2);
+
+	pui->always_queue_sent_mail =
+	gtk_check_button_new_with_label(_("Send button always queues outgoing mail in outbox"));
+	gtk_box_pack_start(GTK_BOX(vbox2), pui->always_queue_sent_mail,
+				FALSE, TRUE, 0);
 
     frame2 = gtk_frame_new(_("Encoding"));
     gtk_box_pack_start(GTK_BOX(vbox1), frame2, FALSE, FALSE, 0);
@@ -1358,6 +1379,8 @@ create_display_page(gpointer data)
 	_("Use alternative main window layout"), vbox7);
     pui->view_message_on_open = box_start_check(
         _("Automatically view message when mailbox opened"), vbox7);
+    pui->line_length = box_start_check(
+	_("Display message size as number of lines"), vbox7);
 
     hbox4 = gtk_hbox_new(TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox2), hbox4, FALSE, FALSE, 0);

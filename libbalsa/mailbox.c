@@ -645,6 +645,11 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
 	if (cur->replied)
 	    message->flags |= LIBBALSA_MESSAGE_FLAG_REPLIED;
 
+        /* set the length */
+#ifdef MESSAGE_COPY_CONTENT
+        message->length = cur->content->length;
+        message->lines_len = cur->lines;
+#endif
 	/* take over the ownership */
 	mailbox->message_list =
 	    g_list_append(mailbox->message_list, message);
@@ -882,7 +887,9 @@ translate_message(HEADER * cur)
 	tmp = tmp->next;
     }
 
-    message->subject = g_strdup(cenv->subject);
+#ifdef MESSAGE_COPY_CONTENT
+    message->subj = g_strdup(cenv->subject);
+#endif
     message->message_id = g_strdup(cenv->message_id);
 
     for (tmp = cenv->references; tmp != NULL; tmp = tmp->next) {

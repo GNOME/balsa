@@ -33,6 +33,7 @@
 #include <auth-client.h>
 #endif
 
+/* #define MESSAGE_COPY_CONTENT 1 */
 #define LIBBALSA_TYPE_MESSAGE                      (libbalsa_message_get_type())
 #define LIBBALSA_MESSAGE(obj)                      (GTK_CHECK_CAST(obj, LIBBALSA_TYPE_MESSAGE, LibBalsaMessage))
 #define LIBBALSA_MESSAGE_CLASS(klass)              (GTK_CHECK_CLASS_CAST(klass, LIBBALSA_TYPE_MESSAGE, LibBalsaMessageClass))
@@ -74,9 +75,18 @@ struct _LibBalsaMessage {
     LibBalsaAddress *reply_to;
     LibBalsaAddress *dispnotify_to;
 
-    /* subject line */
-    gchar *subject;
-
+    /* subject line; we still need it here for sending;
+     * although _SET_SUBJECT might resolve it(?) 
+     * but we can set to to NULL unless there is no mailbox, like
+     * on sending. */
+    gchar *subj;
+#ifdef MESSAGE_COPY_CONTENT
+#define LIBBALSA_MESSAGE_GET_SUBJECT(m) ((m)->subj)
+#else
+#define LIBBALSA_MESSAGE_GET_SUBJECT(m) libbalsa_message_get_subject(m)
+#endif
+#define LIBBALSA_MESSAGE_SET_SUBJECT(m,s) \
+        { g_free((m)->subj); (m)->subj = (s); }
     /* primary, secondary, and blind recipent lists */
     GList *to_list;
     GList *cc_list;
@@ -99,6 +109,16 @@ struct _LibBalsaMessage {
     guint body_ref;
     LibBalsaMessageBody *body_list;
     /*  GList *body_list; */
+
+#if MESSAGE_COPY_CONTENT
+    glong length;   /* byte len */
+    gint lines_len; /* line len */
+#define LIBBALSA_MESSAGE_GET_LENGTH(m)  ((m)->length)
+#define LIBBALSA_MESSAGE_GET_LINES(m) ((m)->lines_len)
+#else
+#define LIBBALSA_MESSAGE_GET_LENGTH(m) libbalsa_message_get_length(m)
+#define LIBBALSA_MESSAGE_GET_LINES(m)  libbalsa_message_get_lines(m)
+#endif
 };
 
 struct _LibBalsaMessageClass {
@@ -184,6 +204,9 @@ gboolean libbalsa_message_postpone(LibBalsaMessage * message,
  */
 gchar *libbalsa_message_date_to_gchar(LibBalsaMessage * message,
 				      const gchar * date_string);
+gchar *libbalsa_message_size_to_gchar(LibBalsaMessage * message,
+                                      gboolean lines);
+
 const gchar *libbalsa_message_pathname(LibBalsaMessage * message);
 const gchar *libbalsa_message_charset(LibBalsaMessage * message);
 gboolean libbalsa_message_has_attachment(LibBalsaMessage * message);
@@ -195,4 +218,12 @@ gchar *libbalsa_message_get_text_content(LibBalsaMessage * msg,
 void libbalsa_message_set_dispnotify(LibBalsaMessage *message, 
 				     LibBalsaAddress *address);
 
+/* use LIBBALSA_MESSAGE_GET_SUBJECT() macro, we may optimize this
+   function out if we find a way.
+*/
+#ifndef MESSAGE_COPY_CONTENT
+const gchar* libbalsa_message_get_subject(LibBalsaMessage* message);
+guint libbalsa_message_get_lines(LibBalsaMessage* msg);
+glong libbalsa_message_get_length(LibBalsaMessage* msg);
+#endif
 #endif				/* __LIBBALSA_MESSAGE_H__ */

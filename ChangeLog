@@ -1,3 +1,28 @@
+2001-07-12  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/mailbox-node.c: Peter Bloomfield's <bloomfld@eos.ncsu.edu> 
+	duplicate folder squashing. 
+
+	Maciej Golebiewski's <s30125@lycos.com> message size/line patch.
+	And index refreshing on changed date format.
+	* libbalsa/mailbox.c: 
+	* libbalsa/message.[hc]: give access to message length an line count.
+	* src/balsa-app.[hc]: add line_length field.
+	* src/balsa-index.[hc]: Add the msg size support and format refreshing.
+	* src/main-window.c: format switching support.
+	* src/pref-manager.c: same.
+	* src/save-restore.c: save line_length.
+
+	Melanie Thielker's <balsa@t-data.com> "always queue" patch.
+	* src/save-restore.c: save always_queue_sent_mail.
+	* src/balsa-app.[hc]: add  always_queue_sent_mail field.
+	* src/sendmsg-window.c: use this variable.
+	
+	* libbalsa/send.c: use accessors to access message's subject.
+	* src/balsa-index-threading.c:
+	* src/balsa-message.c: 
+	* src/print.c: same.
+	
 2001-07-11  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Make Identity a clean(?) libbalsa object.

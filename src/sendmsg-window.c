@@ -78,6 +78,7 @@
 static gchar *read_signature(void);
 static gint include_file_cb(GtkWidget *, BalsaSendmsg *);
 static gint send_message_cb(GtkWidget *, BalsaSendmsg *);
+static gint send_message_toolbar_cb(GtkWidget *, BalsaSendmsg *);
 static gint queue_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint autopostpone_message( gpointer bsmsg );
 static gint postpone_message_cb(GtkWidget *, BalsaSendmsg *);
@@ -100,6 +101,7 @@ static gint toggle_attachments_cb(GtkWidget *, BalsaSendmsg *);
 static gint toggle_comments_cb(GtkWidget *, BalsaSendmsg *);
 static gint toggle_keywords_cb(GtkWidget *, BalsaSendmsg *);
 static gint toggle_reqdispnotify_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
+static gint toggle_queue_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 
 static void spell_check_cb(GtkWidget * widget, BalsaSendmsg *);
 static void spell_check_done_cb(BalsaSpellCheck * spell_check,
@@ -144,7 +146,7 @@ static gint insert_signature_cb(GtkWidget *, BalsaSendmsg *);
 static GnomeUIInfo main_toolbar[] = {
 #define TOOL_SEND_POS 0
     GNOMEUIINFO_ITEM_STOCK(N_("Send"), N_("Send this message"),
-			   send_message_cb,
+			   send_message_toolbar_cb,
 			   GNOME_STOCK_PIXMAP_MAIL_SND),
     GNOMEUIINFO_SEPARATOR,
 #define TOOL_ATTACH_POS 2
@@ -372,7 +374,10 @@ static GnomeUIInfo lang_menu[] = {
 
 static GnomeUIInfo opts_menu[] = {
 #define OPTS_MENU_DISPNOTIFY_POS 0
-    GNOMEUIINFO_TOGGLEITEM(N_("_Request Disposition Notification"), NULL, toggle_reqdispnotify_cb, NULL),
+    GNOMEUIINFO_TOGGLEITEM(N_("_Request Disposition Notification"), NULL, 
+			   toggle_reqdispnotify_cb, NULL),
+    GNOMEUIINFO_TOGGLEITEM(N_("_Always Queue Sent Mail"), NULL, 
+			   toggle_queue_cb, NULL),
     GNOMEUIINFO_END
 };
 
@@ -1343,15 +1348,102 @@ static gint insert_signature_cb(GtkWidget *widget, BalsaSendmsg *msg)
     return TRUE;
 }
 
+static void
+set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message, SendType type)
+{
+    const gchar *subject, *tmp;
+    gchar *newsubject = NULL;
+    gint i;
+
+    subject = LIBBALSA_MESSAGE_GET_SUBJECT(message);
+
+    switch (type) {
+    case SEND_REPLY:
+    case SEND_REPLY_ALL:
+    case SEND_REPLY_GROUP:
+	if (!subject) {
+	    newsubject = g_strdup(balsa_app.current_ident->reply_string);
+	    break;
+	}
+	
+	tmp = subject;
+	if (g_strncasecmp(tmp, "re:", 3) == 0 || g_strncasecmp(tmp, "aw:", 3) == 0) {
+	    tmp += 3;
+	} else if (g_strncasecmp(tmp, _("Re:"), strlen(_("Re:"))) == 0) {
+	    tmp += strlen(_("Re:"));
+	} else {
+	    i = strlen(balsa_app.current_ident->reply_string);
+	    if (g_strncasecmp(tmp, balsa_app.current_ident->reply_string, i)
+		== 0) {
+		tmp += i;
+	    }
+	}
+	while( *tmp && isspace(*tmp) ) tmp++;
+	newsubject = g_strdup_printf("%s %s", 
+				     balsa_app.current_ident->reply_string, 
+				     tmp);
+	g_strchomp(newsubject);
+	break;
+
+    case SEND_FORWARD:
+	if (!subject) {
+	    if (message->from && message->from->address_list)
+		newsubject = g_strdup_printf("%s from %s",
+					     balsa_app.current_ident->forward_string,
+					     (gchar *) message->
+					     from->address_list->data);
+	    else
+		newsubject = g_strdup(balsa_app.current_ident->forward_string);
+	} else {
+	    tmp = subject;
+	    if (g_strncasecmp(tmp, "fwd:", 4) == 0) {
+		tmp += 4;
+	    } else if (g_strncasecmp(tmp, _("Fwd:"), strlen(_("Fwd:"))) == 0) {
+		tmp += strlen(_("Fwd:"));
+	    } else {
+		i = strlen(balsa_app.current_ident->forward_string);
+		if (g_strncasecmp(tmp, balsa_app.current_ident->forward_string, i) == 0) {
+		    tmp += i;
+		}
+	    }
+	    while( *tmp && isspace(*tmp) ) tmp++;
+	    if (message->from && message->from->address_list)
+		newsubject = 
+		    g_strdup_printf("%s %s [%s]",
+				    balsa_app.current_ident->forward_string, 
+				    tmp,
+				    (gchar *) message->
+				    from->address_list->data);
+	    else {
+		newsubject = 
+		    g_strdup_printf("%s %s", 
+				    balsa_app.current_ident->forward_string, 
+				    tmp);
+		g_strchomp(newsubject);
+	    }
+	}
+	break;
+    case SEND_CONTINUE:
+	if (subject)
+	    gtk_entry_set_text(entry, subject);
+	return;
+    default:
+	return; /* or g_assert_never_reached() ? */
+    }
+
+    gtk_entry_set_text(entry, newsubject);
+    g_free(newsubject);
+}
+
 BalsaSendmsg *
 sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 		   SendType type)
 {
     GtkWidget *window;
     GtkWidget *paned = gtk_vpaned_new();
-    gchar *newsubject = NULL, *tmp;
     BalsaSendmsg *msg = NULL;
     GList *list;
+    gchar* tmp;
     gint i;
 
     msg = g_malloc(sizeof(BalsaSendmsg));
@@ -1503,82 +1595,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 			   message->fcc_mailbox);
 
     /* Subject: */
-    switch (type) {
-    case SEND_REPLY:
-    case SEND_REPLY_ALL:
-    case SEND_REPLY_GROUP:
-	if (!message->subject) {
-	    newsubject = g_strdup(balsa_app.current_ident->reply_string);
-	    break;
-	}
-
-	tmp = message->subject;
-	if (g_strncasecmp(tmp, "re:", 3) == 0 || g_strncasecmp(tmp, "aw:", 3) == 0) {
-	    tmp += 3;
-	} else if (g_strncasecmp(tmp, _("Re:"), strlen(_("Re:"))) == 0) {
-	    tmp += strlen(_("Re:"));
-	} else {
-	    i = strlen(balsa_app.current_ident->reply_string);
-	    if (g_strncasecmp(tmp, balsa_app.current_ident->reply_string, i)
-		== 0) {
-		tmp += i;
-	    }
-	}
-	while( *tmp && isspace(*tmp) ) tmp++;
-	newsubject = g_strdup_printf("%s %s", 
-				     balsa_app.current_ident->reply_string, 
-				     tmp);
-	g_strchomp(newsubject);
-	break;
-
-    case SEND_FORWARD:
-	if (!message->subject) {
-	    if (message->from && message->from->address_list)
-		newsubject = g_strdup_printf("%s from %s",
-					     balsa_app.current_ident->forward_string,
-					     (gchar *) message->
-					     from->address_list->data);
-	    else
-		newsubject = g_strdup(balsa_app.current_ident->forward_string);
-	} else {
-	    tmp = message->subject;
-	    if (g_strncasecmp(tmp, "fwd:", 4) == 0) {
-		tmp += 4;
-	    } else if (g_strncasecmp(tmp, _("Fwd:"), strlen(_("Fwd:"))) == 0) {
-		tmp += strlen(_("Fwd:"));
-	    } else {
-		i = strlen(balsa_app.current_ident->forward_string);
-		if (g_strncasecmp(tmp, balsa_app.current_ident->forward_string, i) == 0) {
-		    tmp += i;
-		}
-	    }
-	    while( *tmp && isspace(*tmp) ) tmp++;
-	    if (message->from && message->from->address_list)
-		newsubject = 
-		    g_strdup_printf("%s %s [%s]",
-				    balsa_app.current_ident->forward_string, 
-				    tmp,
-				    (gchar *) message->
-				    from->address_list->data);
-	    else {
-		newsubject = 
-		    g_strdup_printf("%s %s", 
-				    balsa_app.current_ident->forward_string, 
-				    tmp);
-		g_strchomp(newsubject);
-	    }
-	}
-	break;
-    default:
-	break;
-    }
-
-    if (type == SEND_REPLY || type == SEND_REPLY_ALL ||
-	type == SEND_REPLY_GROUP || type == SEND_FORWARD) {
-	gtk_entry_set_text(GTK_ENTRY(msg->subject[1]), newsubject);
-	g_free(newsubject);
-	newsubject = NULL;
-    }
+    set_entry_to_subject(GTK_ENTRY(msg->subject[1]), message, type);
 
     if (type == SEND_CONTINUE) {
 	if (message->to_list) {
@@ -1596,9 +1613,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	    gtk_entry_set_text(GTK_ENTRY(msg->bcc[1]), tmp);
 	    g_free(tmp);
 	}
-	if (message->subject)
-	    gtk_entry_set_text(GTK_ENTRY(msg->subject[1]),
-			       message->subject);
     }
 
     if (type == SEND_REPLY_ALL) {
@@ -1615,7 +1629,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	    g_free(tmp);
 	}
     }
-
     gtk_paned_set_position(GTK_PANED(paned), -1);
     gnome_app_set_contents(GNOME_APP(window), paned);
 
@@ -1864,9 +1877,9 @@ bsmsg2message(BalsaSendmsg * bsmsg, gboolean dup_filenames)
         libbalsa_address_new_from_string(gtk_entry_get_text
                                          (GTK_ENTRY(bsmsg->from[1])));
 
-    message->subject = g_strdup(gtk_entry_get_text
-				(GTK_ENTRY(bsmsg->subject[1])));
-    strip_chars(message->subject, "\r\n");
+    tmp = g_strdup(gtk_entry_get_text(GTK_ENTRY(bsmsg->subject[1])));
+    strip_chars(tmp, "\r\n");
+    LIBBALSA_MESSAGE_SET_SUBJECT(message, tmp);
 
     message->to_list =
 	libbalsa_address_new_list_from_string(gtk_entry_get_text
@@ -2005,7 +2018,18 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
     return TRUE;
 }
 
-/* "send message" menu and toolbar callback */
+/* "send message" toolbar callback */
+static gint
+send_message_toolbar_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+{
+    libbalsa_address_entry_clear_to_send(bsmsg->to[1]);
+    libbalsa_address_entry_clear_to_send(bsmsg->cc[1]);
+    libbalsa_address_entry_clear_to_send(bsmsg->bcc[1]);
+    return send_message_handler(bsmsg, balsa_app.always_queue_sent_mail);
+}
+
+
+/* "send message" menu callback */
 static gint
 send_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
@@ -2274,6 +2298,12 @@ toggle_reqdispnotify_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     return TRUE;
 }
 
+static gint
+toggle_queue_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+{
+    balsa_app.always_queue_sent_mail = GTK_CHECK_MENU_ITEM(widget)->active;
+    return TRUE;
+}
 
 /* init_menus:
    performs the initial menu setup: shown headers as well as correct

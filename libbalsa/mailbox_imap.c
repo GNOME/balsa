@@ -548,9 +548,20 @@ imap_flags_cb(unsigned seqno, LibBalsaMailboxImap *mimap)
     struct message_info *msg_info = message_info_from_msgno(mimap, seqno);
     ImapMessage *imsg  = imap_mbox_handle_get_msg(mimap->handle, seqno);
     if(msg_info->message) {
+	LibBalsaMessageFlag old_flags = msg_info->message->flags;
+
         lbimap_update_flags(msg_info->message, imsg);
         libbalsa_message_set_icons(msg_info->message);
         libbalsa_mailbox_msgno_changed(LIBBALSA_MAILBOX(mimap), seqno);
+
+	if ((old_flags ^ msg_info->message->flags) &
+	    LIBBALSA_MESSAGE_FLAG_NEW) {
+	    GList *list = g_list_prepend(NULL, msg_info->message);
+	    libbalsa_mailbox_messages_status_changed(LIBBALSA_MAILBOX
+						     (mimap), list,
+						     LIBBALSA_MESSAGE_FLAG_NEW);
+	    g_list_free_1(list);
+	}
     }
 }
 

@@ -1,3 +1,12 @@
+2002-01-30  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/balsa-index.c: BalsaMBList is not properly destroyed when
+	menu is clicked. Destroying manually.
+	* src/main-window.c:
+	* src/balsa-mblist.c: remember size only for main window BalsaMBList.
+	* src/sendmsg-window.c: add shortcuts and fix feof()/fgets() 
+	last-line problem. Add shortcuts for Yes/No (Jacob Ilsø Christensen).
+
 2002-01-29  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/files.c: Add "src" and "." last-resort prefixes.

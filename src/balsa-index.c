@@ -2178,6 +2178,11 @@ create_menu(BalsaIndex * bindex)
 		       (GtkSignalFunc) transfer_messages_cb,
 		       (gpointer) bindex);
 
+    /* We would rather connect to "destroy" signal but it is apparently
+     * not emmited. Gtk bug? memory leak? */
+    gtk_signal_connect_object(GTK_OBJECT(menu), "selection-done",
+                              gtk_object_destroy, GTK_OBJECT(bmbl));
+
     /* Force the mailbox list to be a reasonable size. */
     gtk_widget_size_request(bmbl, &req);
     if ( req.height > balsa_app.mw_height )

@@ -380,13 +380,6 @@ mblist_close_mailbox(LibBalsaMailbox * mailbox)
 			      BALSA_MAILBOX_NODE(gnode->data));
 }
 
-static void
-size_allocate_cb(GtkWidget * widget, GtkAllocation * alloc)
-{
-    if (balsa_app.show_mblist)
-	balsa_app.mblist_width = widget->parent->allocation.width;
-}
-
 /* mblist_button_press_cb:
    handle mouse button press events that occur on mailboxes
    (clicking on folders is passed to GtkCTree and may trigger expand events
@@ -484,9 +477,6 @@ balsa_mblist_init(BalsaMBList * tree)
                              GTK_SIGNAL_FUNC(mailbox_tree_expand), NULL);
     gtk_signal_connect(GTK_OBJECT(tree), "tree_collapse",
 		       GTK_SIGNAL_FUNC(mailbox_tree_collapse), NULL);
-
-    gtk_signal_connect(GTK_OBJECT(tree), "size_allocate",
-		       GTK_SIGNAL_FUNC(size_allocate_cb), NULL);
 
     gtk_object_set (GTK_OBJECT (tree), "show_content_info", 
                     balsa_app.mblist_show_mb_content_info, NULL);

@@ -757,6 +757,13 @@ delete_cb(GtkWidget* main_window)
 #endif
     return FALSE; /* allow delete */
 }
+static void
+size_allocate_cb(GtkWidget * widget, GtkAllocation * alloc)
+{
+    if (balsa_app.show_mblist)
+	balsa_app.mblist_width = widget->parent->allocation.width;
+}
+
 GtkWidget *
 balsa_window_new()
 {
@@ -865,6 +872,8 @@ balsa_window_new()
                       GTK_WIDGET(balsa_app.mblist));
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(window->mblist),
                                    GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    gtk_signal_connect(GTK_OBJECT(balsa_app.mblist), "size_allocate",
+		       GTK_SIGNAL_FUNC(size_allocate_cb), NULL);
     mblist_default_signal_bindings(balsa_app.mblist);
     gtk_widget_show_all(window->mblist);
 

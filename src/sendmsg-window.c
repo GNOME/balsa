@@ -547,6 +547,9 @@ delete_handler(BalsaSendmsg* bsmsg)
 					  GNOME_STOCK_BUTTON_NO,
 					  GNOME_STOCK_BUTTON_CANCEL,
 					  NULL));
+	gnome_dialog_set_accelerator(GNOME_DIALOG(d), 0, 'Y', 0);
+	gnome_dialog_set_accelerator(GNOME_DIALOG(d), 1, 'N', 0);
+
 	g_free(str);
 	gnome_dialog_set_parent(d, GTK_WINDOW(bsmsg->window));
 	gtk_widget_show(l);
@@ -689,8 +692,7 @@ edit_with_gnome_check(gpointer data) {
         return TRUE;
     }
     if(balsa_app.edit_headers) {
-	while(!feof(tmp)) {
-            fgets(line, 80, tmp);
+	while(fgets(line, sizeof(line), tmp)) {
             if(line[strlen(line)-1] == '\n')line[strlen(line)-1] = '\0';
             if(!strncmp(line, "To: ", 4))
                 gtk_entry_set_text(GTK_ENTRY(data_real->msg->to[1]), line+4);
@@ -714,8 +716,7 @@ edit_with_gnome_check(gpointer data) {
     }
     gtk_editable_delete_text(GTK_EDITABLE(data_real->msg->text),0,-1);
     curposition = 0;
-    while(!feof(tmp)) {
-        fgets(line, 80, tmp);
+    while(fgets(line, sizeof(line), tmp)) {
         gtk_editable_insert_text(GTK_EDITABLE(data_real->msg->text),line, 
                                  strlen(line), &curposition);
     }

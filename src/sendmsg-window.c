@@ -441,18 +441,23 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
       if (message->body_list)
 	{
 	  body = (Body *) message->body_list->data;
-	  c = body->buffer;
 	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "\n\n", 2);
 
-	  c = message->from->personal;
-
-	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
-
-	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, " on ", 4);
+	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "On ", 4);
 
 	  c = message->date;
 	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
+
+	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, " ", 1);
+
+	  if (message->from->personal)
+	    c = message->from->personal;
+	  else
+	    c = "you";
+	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
 	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, " wrote:\n", 8);
+
+	  c = body->buffer;
 
 	  c = gt_replys (c);
 

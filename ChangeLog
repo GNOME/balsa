@@ -1,5 +1,6 @@
-2004-12-01 17:14  PeterB
+2004-12-01 17:39  PeterB
 
+	* src/balsa-message.c: check for NULL sig_body.
 	* libbalsa/misc.c, libbalsa/misc.h, src/main-window.c,
 	src/main-window.h, src/message-window.c, src/sendmsg-window.c: move
 	libbalsa_window_select_all to src/main-window.c and rename; use

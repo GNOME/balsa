@@ -1,3 +1,12 @@
+2003-11-18  Carlos Morgado  <chbm gnome.org>
+
+	* configure.in: 
+	* src/Makefile.am: 
+	bonobo/ORBit stuff	
+
+	* GNOME_Balsa.server.in.in: there should be a factory definition 
+	around here somewhere. hum.
+
 2003-11-17  Carlos Morgado  <chbm gnome.org>
 
 	* src/balsa-bonobo.h (Repository): 

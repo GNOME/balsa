@@ -68,6 +68,7 @@ gnome-vfs-2.0
 gnome-vfs-module-2.0
 $gnome_extras
 gmime-2.0
+libbonobo-2.0
 ])
 AC_SUBST(BALSA_CFLAGS)
 AC_SUBST(BALSA_LIBS)
@@ -146,10 +147,18 @@ if test x$SCROLLKEEPER_CONFIG = xno; then
 fi
 
 dnl ###########################################################################
-dnl Configure libmutt, later
+dnl stuff for the CORBA interface
 dnl ###########################################################################
+                                                                               
+ORBIT_IDL="`$PKG_CONFIG --variable=orbit_idl ORBit-2.0`"
+AC_SUBST(ORBIT_IDL)
+                                                                                
+LIBBONOBO_IDL="`$PKG_CONFIG --variable=idldir libbonobo-2.0`"
+AC_SUBST(LIBBONOBO_IDL)
+ 
+BONOBO_ACTIVATION_IDL="`$PKG_CONFIG --variable=idldir bonobo-activation-2.0`"
+AC_SUBST(BONOBO_ACTIVATION_IDL)
 
-dnl AC_CONFIG_SUBDIRS(libmutt)
 
 dnl ###########################################################################
 dnl Configure locking

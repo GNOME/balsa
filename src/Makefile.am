@@ -60,9 +60,14 @@ balsa_BASE_SRCLIST =	\
 	toolbar-prefs.h
 
 
-balsa_IDL_SRCLIST = # balsa-common.c balsa-skels.c balsa-stubs.c		
+IDL_FILE = Balsa.idl
+balsa_IDL_SRCLIST = Balsa-common.c Balsa-skels.c Balsa-stubs.c Balsa.h
 
-balsa_SOURCES = $(balsa_BASE_SRCLIST) $(balsa_IDL_SRCLIST)
+$(balsa_IDL_SRCLIST): $(IDL_FILE) $(ORBIT_IDL)
+	$(ORBIT_IDL) -I $(LIBBONOBO_IDL) -I $(BONOBO_ACTIVATION_IDL) $(IDL_FILE)
+
+
+balsa_SOURCES = $(balsa_BASE_SRCLIST) # $(balsa_IDL_SRCLIST)
 
 INCLUDES = \
 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\" \

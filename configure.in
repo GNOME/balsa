@@ -110,6 +110,7 @@ AC_DEFINE(BALSA_SHOW_INFO),)
 dnl Create files.
 AC_OUTPUT([
 Makefile 
+basla.spec
 po/Makefile.in
 macros/Makefile
 intl/Makefile

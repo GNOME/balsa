@@ -1,6 +1,6 @@
 # Note that this is NOT a relocatable package
-%define ver      0.4.8
-%define rel      SNAP
+%define ver      @VERSION@
+%define rel      2
 %define prefix   /usr
 
 Summary:   Balsa Mail Client
@@ -13,8 +13,8 @@ Source0:   balsa-%{PACKAGE_VERSION}.tar.gz
 URL:       http://www.balsa.net/
 BuildRoot: /tmp/balsa-%{PACKAGE_VERSION}-root
 Packager: Michael Fulbright <msf@redhat.com>
-Requires: gtk+ >= 1.1.7
-Requires: gnome-libs
+Requires: gtk+ >= 1.2.0
+Requires: gnome-libs >= 1.0.0
 Docdir: %{prefix}/doc
 
 %description
@@ -26,8 +26,21 @@ IMAP.
 %setup
 
 %build
-CFLAGS="$RPM_OPT_FLAGS" LDFLAGS="-s" ./autogen.sh \
-	--prefix=%{prefix} 
+# Needed for snapshot releases.
+if [ ! -f configure ]; then
+%ifarch alpha
+  CFLAGS="$RPM_OPT_FLAGS" ./autogen.sh --host=alpha-redhat-linux --prefix=%prefi
+x 
+%else
+  CFLAGS="$RPM_OPT_FLAGS" ./autogen.sh --prefix=%prefix 
+%endif
+else
+%ifarch alpha
+  CFLAGS="$RPM_OPT_FLAGS" ./configure --host=alpha-redhat-linux --prefix=%prefix
+%else
+  CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%prefix 
+%endif
+fi
 
 if [ "$SMP" != "" ]; then
   (make "MAKE=make -k -j $SMP"; exit 0)

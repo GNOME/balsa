@@ -1,3 +1,7 @@
+2004-04-27 11:07  PeterB
+
+	* libbalsa/rfc3156.c: build --with-gpgme --disable-threads.
+
 2004-04-26 20:00  PeterB
 
 	* libbalsa/filter-file.c, libbalsa/filter-funcs.c,

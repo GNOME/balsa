@@ -73,8 +73,6 @@ libbalsa_a_SOURCES = 		\
 	misc.h			\
 	notify.c		\
 	notify.h		\
-	option_menu.c		\
-	option_menu.h		\
 	rfc3156.c		\
 	rfc3156.h		\
 	send.c			\

@@ -19,9 +19,6 @@
  * 02111-1307, USA.
  */
 
-/* FIXME port gnome_entry and gnome_color_picker to gtk2-4. */
-#undef GNOME_DISABLE_DEPRECATED
-
 /* MAKE SURE YOU USE THE HELPER FUNCTIONS, like create_table(, page), etc. */
 #include "config.h"
 

@@ -11,6 +11,9 @@
 	* libbalsa/imap/{auth-cram,imap-auth}.c: share code between pop
 	and IMAP.
 	* libbalsa/imap/{imap-auth.h,imap-handle.c,imap_private.h}: ditto.
+	* src/ab-window.c: revoke libbalsa_option_menu() patch of 2004-03-07:
+	it was a bad idea.
+	* src/store-address.c, etc: ditto.
 
 2004-03-26 17:05  PeterB
 

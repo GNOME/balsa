@@ -28,7 +28,6 @@
 #include "store-address.h"
 
 #include "libbalsa.h"
-#include "option_menu.h"
 
 /* global data */
 typedef struct _StoreAddressInfo StoreAddressInfo;
@@ -246,26 +245,22 @@ store_address_book_frame(StoreAddressInfo * info)
 {
     GList *ab_list;
     GtkWidget *frame = gtk_frame_new(_("Choose Address Book"));
-    GtkWidget *ab_option;
-    GObject *ab_menu;
+    GtkWidget *ab_option, *menu_item, *ab_menu;
     LibBalsaAddressBook *address_book;
+    guint default_ab_offset = 0;
 
-    ab_menu = libbalsa_option_menu_new();
+    ab_menu = gtk_menu_new();
     if (balsa_app.address_book_list) {
-        guint active_idx, curr_idx;
 	info->current_address_book = balsa_app.default_address_book;
 
-	curr_idx = active_idx = 0;
+	
 	for(ab_list = balsa_app.address_book_list;
             ab_list; 
             ab_list = g_list_next(ab_list)) {
 	    address_book = LIBBALSA_ADDRESS_BOOK(ab_list->data);
-#if 1
-	    if (address_book == balsa_app.default_address_book)
-                active_idx = curr_idx;
-            libbalsa_option_menu_append(ab_menu, address_book->name, 
-                                        address_book);
-#else
+	    if (info->current_address_book == NULL)
+		info->current_address_book = address_book;
+
 	    menu_item = gtk_menu_item_new_with_label(address_book->name);
 	    gtk_menu_shell_append(GTK_MENU_SHELL(ab_menu), menu_item);
 
@@ -276,14 +271,13 @@ store_address_book_frame(StoreAddressInfo * info)
 
 	    if (address_book == balsa_app.default_address_book)
 		gtk_menu_set_active(GTK_MENU(ab_menu), default_ab_offset);
-#endif
-	    curr_idx++;
+
+	    default_ab_offset++;
 
 	}
     }
-    info->current_address_book = balsa_app.default_address_book;
-    ab_option = libbalsa_option_menu_get_widget
-        (ab_menu, G_CALLBACK(store_address_book_menu_cb), info);
+    ab_option = gtk_option_menu_new();
+    gtk_option_menu_set_menu(GTK_OPTION_MENU(ab_option), ab_menu);
     gtk_container_add(GTK_CONTAINER(frame), ab_option);
     return frame;
 }
@@ -322,10 +316,12 @@ static void
 store_address_book_menu_cb(GtkWidget * widget, 
                            StoreAddressInfo * info)
 {
-    LibBalsaAddressBook *addr;
-    addr = LIBBALSA_ADDRESS_BOOK(libbalsa_option_menu_get_active_data(widget));
-    g_return_if_fail(addr);
-    info->current_address_book = addr;
+    guint i =
+        GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(widget),
+                                           "address-book"));
+    GList *nth = g_list_nth(balsa_app.address_book_list, i);
+    if(nth)
+        info->current_address_book = LIBBALSA_ADDRESS_BOOK(nth->data);
 }
 
 /* store_address_add_address:

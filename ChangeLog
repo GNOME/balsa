@@ -1,3 +1,8 @@
+2000-12-18  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in: bump version to 1.0.1
+	* INSTALL: list packages needed for building balsa. 
+
 2000-12-17  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_new): If the

@@ -1,3 +1,8 @@
+2000-2-11   Tomasz K³oczko <kloczek@pld.org.pl>
+
+	* balsa.desktop: moved desktop file from gnome-core,
+	* gnome-balsa2.png: moved icon file from gnome-core.
+
 2000-2-9    Tomasz K³oczko <kloczek@pld.org.pl>
 
 	* balsa.desktop:

@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa \n"
-"POT-Creation-Date: 2004-04-16 11:07-0400\n"
-"PO-Revision-Date: 2004-04-16 11:07-0400\n"
+"POT-Creation-Date: 2004-04-17 12:10-0400\n"
+"PO-Revision-Date: 2004-04-17 13:07-0400\n"
 "Last-Translator: Adam Weinberger <adamw@gnome.org>\n"
 "Language-Team: en_CA <adamw@FreeBSD.org>\n"
 "MIME-Version: 1.0\n"
@@ -345,6 +345,33 @@ msgstr "Error displaying help for identities: %s\n"
 msgid "Manage Identities"
 msgstr "Manage Identities"
 
+#. IMAP host name + message
+#: libbalsa/imap-server.c:249
+#, c-format
+msgid ""
+"IMAP server %s alert:\n"
+"%s"
+msgstr ""
+"IMAP server %s alert:\n"
+"%s"
+
+#. IMAP host name + message
+#: libbalsa/imap-server.c:253
+#, c-format
+msgid "IMAP server %s error: %s"
+msgstr "IMAP server %s error: %s"
+
+#. IMAP host name + message
+#: libbalsa/imap-server.c:257
+#, c-format
+msgid "%s: %s"
+msgstr "%s: %s"
+
+#: libbalsa/imap-server.c:332
+#, c-format
+msgid "Could not send \"%s\" to \"%s\""
+msgstr "Could not send \"%s\" to \"%s\""
+
 #: libbalsa/libbalsa.c:277
 #, c-format
 msgid "LDAP Directory for %s"
@@ -634,6 +661,24 @@ msgstr ""
 "\n"
 "--\n"
 "This is an OpenPGP signed message part:\n"
+
+#: libbalsa/misc.c:1602
+msgid "Timeout exceeded while attempting fcntl lock!"
+msgstr "Timeout exceeded while attempting fcntl lock!"
+
+#: libbalsa/misc.c:1609
+#, c-format
+msgid "Waiting for fcntl lock... %d"
+msgstr "Waiting for fcntl lock... %d"
+
+#: libbalsa/misc.c:1637
+msgid "Timeout exceeded while attempting flock lock!"
+msgstr "Timeout exceeded while attempting flock lock!"
+
+#: libbalsa/misc.c:1644
+#, c-format
+msgid "Waiting for flock attempt... %d"
+msgstr "Waiting for flock attempt... %d"
 
 #: libbalsa/rfc3156.c:177
 #, c-format
@@ -5056,22 +5101,3 @@ msgstr "Up"
 #: src/toolbar-prefs.c:508
 msgid "Down"
 msgstr "Down"
-
-#: libbalsa/misc.c:1602
-msgid "Timeout exceeded while attempting fcntl lock!"
-msgstr "Timeout exceeded while attempting fcntl lock!"
-
-#: libbalsa/misc.c:1609
-#, c-format
-msgid "Waiting for fcntl lock... %d"
-msgstr "Waiting for fcntl lock... %d"
-
-#: libbalsa/misc.c:1637
-msgid "Timeout exceeded while attempting flock lock!"
-msgstr "Timeout exceeded while attempting flock lock!"
-
-#: libbalsa/misc.c:1644
-#, c-format
-msgid "Waiting for flock attempt... %d"
-msgstr "Waiting for flock attempt... %d"
-

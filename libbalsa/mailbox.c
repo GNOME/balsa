@@ -1065,28 +1065,38 @@ static GtkTreePath *
 mbox_model_get_path(GtkTreeModel	* tree_model,
 		    GtkTreeIter		* iter)
 {
-    GNode *node;
-    GtkTreeIter parent_iter;
+    GNode *node, *parent_node;
     GtkTreePath *retval;
+    gint i;
 
     g_return_val_if_fail(VALID_ITER(iter, tree_model), NULL);
 
     node = iter->user_data;
-    if (node->parent == NULL) {
-	if (node == LIBBALSA_MAILBOX(tree_model)->msg_tree)
-	    return gtk_tree_path_new();
-	else
-	    return NULL;
+    parent_node = node->parent;
+
+    g_return_val_if_fail(parent_node != NULL, NULL);
+
+    if (parent_node->parent == NULL) {
+	g_assert(parent_node == LIBBALSA_MAILBOX(tree_model)->msg_tree);
+	retval = gtk_tree_path_new();
+    } else {
+	GtkTreeIter parent_iter;
+
+	parent_iter.user_data = parent_node;
+	VALIDATE_ITER(&parent_iter, tree_model);
+	retval = mbox_model_get_path(tree_model, &parent_iter);
     }
 
-    parent_iter.user_data = node->parent;
-    VALIDATE_ITER(&parent_iter, tree_model);
-    retval = mbox_model_get_path(tree_model, &parent_iter);
     if (retval == NULL)
 	return NULL;
 
-    gtk_tree_path_append_index(retval,
-			       g_node_child_position(node->parent, node));
+    i = g_node_child_position(node->parent, node);
+    if (i < 0) {
+	gtk_tree_path_free(retval);
+	return NULL;
+    }
+
+    gtk_tree_path_append_index(retval, i);
 
     return retval;
 }

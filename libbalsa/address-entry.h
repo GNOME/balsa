@@ -90,6 +90,9 @@ struct _LibBalsaAddressEntryClass {
  * Functions that outside programs are allowed to call to act on the     *
  * widget.                                                               *
  *                                                                       *
+ * LibBalsaAddressEntry subclasses GtkEntry, so any gtk_entry_* or       *
+ * gtk_editable_* method may also be used, by casting accordingly.       *
+ *                                                                       *
  *************************************************************************/
 
 GtkType libbalsa_address_entry_get_type(void);
@@ -98,12 +101,6 @@ void libbalsa_address_entry_set_find_match(LibBalsaAddressEntry *, void *);
 void libbalsa_address_entry_set_domain(LibBalsaAddressEntry *, void *);
 void libbalsa_address_entry_clear_to_send(LibBalsaAddressEntry *
                                           address_entry);
-gchar *libbalsa_address_entry_get_chars_all(LibBalsaAddressEntry *
-                                            address_entry);
-void libbalsa_address_entry_set_text(LibBalsaAddressEntry * address_entry,
-                                     const gchar * text);
-void libbalsa_address_entry_append_text(LibBalsaAddressEntry *
-                                        address_entry, const gchar * text);
 gboolean libbalsa_address_entry_matching(LibBalsaAddressEntry *
                                          address_entry);
 

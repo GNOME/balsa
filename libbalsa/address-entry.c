@@ -1997,38 +1997,6 @@ libbalsa_address_entry_clear_to_send(LibBalsaAddressEntry * address_entry)
 }
 
 /*************************************************************
- * libbalsa_address_entry_get_chars_all:
- *     Wrapper for GtkEditable method.
- *************************************************************/
-gchar *
-libbalsa_address_entry_get_chars_all(LibBalsaAddressEntry * address_entry)
-{
-    return gtk_editable_get_chars(GTK_EDITABLE(address_entry), 0, -1);
-}
-
-/*************************************************************
- * libbalsa_address_entry_set_text:
- *     Wrapper for GtkEntry method.
- *************************************************************/
-void
-libbalsa_address_entry_set_text(LibBalsaAddressEntry * address_entry,
-                                const gchar *text)
-{
-    gtk_entry_set_text(GTK_ENTRY(address_entry), text);
-}
-
-/*************************************************************
- * libbalsa_address_entry_append_text:
- *     Wrapper for GtkEntry method.
- *************************************************************/
-void
-libbalsa_address_entry_append_text(LibBalsaAddressEntry * address_entry,
-                                const gchar *text)
-{
-    gtk_entry_append_text(GTK_ENTRY(address_entry), text);
-}
-
-/*************************************************************
  * libbalsa_address_entry_matching:
  *     Is the widget showing a match? 
  *************************************************************/

@@ -116,7 +116,7 @@ libbalsa_address_new(void)
 
 /* returns only first address on the list; ignores remaining ones */
 LibBalsaAddress *
-libbalsa_address_new_from_string(gchar * str)
+libbalsa_address_new_from_string(const gchar * str)
 {
     ADDRESS *address = NULL;
     LibBalsaAddress *addr = NULL;
@@ -131,7 +131,7 @@ libbalsa_address_new_from_string(gchar * str)
 }
 
 GList *
-libbalsa_address_new_list_from_string(gchar * the_str)
+libbalsa_address_new_list_from_string(const gchar * the_str)
 {
     ADDRESS *address = NULL;
     LibBalsaAddress *addr = NULL;

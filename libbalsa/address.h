@@ -84,8 +84,8 @@ struct _LibBalsaAddressClass {
 GtkType libbalsa_address_get_type(void);
  
 LibBalsaAddress *libbalsa_address_new(void);
-LibBalsaAddress *libbalsa_address_new_from_string(gchar * address);
-GList *libbalsa_address_new_list_from_string(gchar * address);
+LibBalsaAddress *libbalsa_address_new_from_string(const gchar * address);
+GList *libbalsa_address_new_list_from_string(const gchar * address);
 
 gchar *libbalsa_address_to_gchar(LibBalsaAddress * addr, gint n);
 

@@ -1,3 +1,13 @@
+2002-05-08  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* libbalsa/address.[hc]: libbalsa_address_new_*from_string()
+	should take a const gchar * argument.
+	* libbalsa/address-entry.[hc]: remove wrappers for
+	GtkEntry/Editable methods.
+	* src/sendmsg-window.c: use GtkEntry/Editable methods on
+	LibBalsaAddressEntry widgets, instead of wrapped versions.
+	* src/save-restore.c: rot13 ESMTP certificate passphrase before saving.
+
 2002-05-07  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/message.c: libmutt fastcloses mailbox when it should not.

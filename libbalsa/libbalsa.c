@@ -446,6 +446,7 @@ ask_cert_real(X509 *cert, const char *explanation)
     default: i=0; break;
     }
     gtk_widget_destroy(dialog);
+    printf("%s returns %d\n", __FUNCTION__, i);
     return i;
 }
 

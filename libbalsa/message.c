@@ -695,10 +695,10 @@ libbalsa_message_reply(LibBalsaMessage * message)
 
     libbalsa_message_set_flag(message, LIBBALSA_MESSAGE_FLAG_REPLIED, 0);
 
-    UNLOCK_MAILBOX(message->mailbox);
     messages = g_list_prepend(NULL, message);
     libbalsa_mailbox_messages_status_changed(message->mailbox, messages,
 					     LIBBALSA_MESSAGE_FLAG_REPLIED);
+    UNLOCK_MAILBOX(message->mailbox);
     g_list_free(messages);
 }
 
@@ -731,10 +731,10 @@ libbalsa_messages_change_flag(GList * messages,
             libbalsa_mailbox_change_msgs_flags(mbox, lst, flag, 0);
         else
             libbalsa_mailbox_change_msgs_flags(mbox, lst, 0, flag);
-	UNLOCK_MAILBOX(mbox);
 	/* Emission of notification to the owning mailbox */
 	libbalsa_mailbox_messages_status_changed(mbox, notif_list,
 						 flag);
+	UNLOCK_MAILBOX(mbox);
 	g_list_free(notif_list);
     }
 }
@@ -789,11 +789,6 @@ mime_content_type2str(int contenttype)
 gboolean
 libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
 {
-#ifdef OLD_CODE
-    LibBalsaMessageBody *body;
-    GMimeMessage *msg;
-#endif
-
     g_return_val_if_fail(message, FALSE);
     if (!message->mailbox) return FALSE;
     g_return_val_if_fail(MAILBOX_OPEN(message->mailbox), FALSE);
@@ -806,68 +801,12 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
 	return TRUE;
     }
 
-#ifndef OLD_CODE
     libbalsa_mailbox_fetch_message_structure(message->mailbox, message,
 					     LB_FETCH_RFC822_HEADERS
 					     |LB_FETCH_STRUCTURE);
     message->body_ref++;
     UNLOCK_MAILBOX(message->mailbox);
-#else /* OLD_CODE */
-    /*
-     * load message body
-     */
-    if (message->mime_msg) {
-	msg = message->mime_msg;
-    } else {
-	LibBalsaMessage *m;
-	g_warning("%s: this path should never be executed!", __func__);
-	m = libbalsa_mailbox_get_message(message->mailbox, message->msgno);
-	message->mime_msg = msg = m->mime_msg;
-	/* clean up potentialy prefetched headers, use headers from mime_msg */
-	libbalsa_message_headers_destroy(message->headers);
-	message->headers = g_new0(LibBalsaMessageHeaders, 1);
-	if (message->sender) {
-	    g_object_unref(message->sender);
-	    message->sender = NULL;
-	}
-#if MESSAGE_COPY_CONTENT
-	g_free(message->subj);
-	message->subj = NULL;
-#endif
-	g_list_foreach(message->references, (GFunc) g_free, NULL);
-	g_list_free(message->references);
-	message->references = NULL;
-
-	g_list_foreach(message->in_reply_to, (GFunc) g_free, NULL);
-	g_list_free(message->in_reply_to);
-	message->in_reply_to = NULL;
-
-	g_free(message->message_id);
-	message->message_id = NULL;
-	libbalsa_message_headers_update(message);
-    }
-
-    if (msg != NULL) {
-	body = libbalsa_message_body_new(message);
-	libbalsa_message_body_set_mime_body(body,
-					    message->mime_msg->mime_part);
-	libbalsa_message_append_part(message, body);
-
-	message->body_ref++;
-    }
-    UNLOCK_MAILBOX(message->mailbox);
-#endif /* OLD_CODE */
     
-    /*
-     * emit read message
-     */
-    if ((LIBBALSA_MESSAGE_IS_UNREAD(message)) && read) {
-	GList * messages = g_list_prepend(NULL, message);
-	
-	libbalsa_messages_change_flag(messages, LIBBALSA_MESSAGE_FLAG_NEW,
-                                      FALSE);
-	g_list_free(messages);
-    }
     return TRUE;
 }
 

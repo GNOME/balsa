@@ -1086,7 +1086,7 @@ messages_status_changed_cb(LibBalsaMailbox * mb, GList * messages,
 {
     GList *lst;
 
-    LOCK_MAILBOX(mb);
+    if(!mb->lock) g_warning("messages changed but mailbox not locked!");
 
     for (lst = messages; lst; lst = lst->next) {
 	LibBalsaMessage *msg = LIBBALSA_MESSAGE(lst->data);
@@ -1109,8 +1109,6 @@ messages_status_changed_cb(LibBalsaMailbox * mb, GList * messages,
     }
 
     libbalsa_mailbox_set_unread_messages_flag(mb, mb->unread_messages > 0);
-
-    UNLOCK_MAILBOX(mb);
 }
 
 int
@@ -1719,25 +1717,24 @@ mbox_model_get_value(GtkTreeModel *tree_model,
 	if(msg) {
 	    tmp = get_from_field(msg);
 	    g_value_set_string_take_ownership(value, tmp);
-	} else g_value_set_string(value, "from unknown");
+	} else g_value_set_static_string(value, "from unknown");
         break;
     case LB_MBOX_SUBJECT_COL:
-	g_value_set_string(value, msg 
-			   ? LIBBALSA_MESSAGE_GET_SUBJECT(msg)
-			   : "unknown subject");
+	if(msg) g_value_set_string(value, LIBBALSA_MESSAGE_GET_SUBJECT(msg));
+        else g_value_set_static_string(value, "unknown subject");
 	    
 	break;
     case LB_MBOX_DATE_COL:
 	if(msg) {
 	    tmp = libbalsa_message_date_to_gchar(msg, "%x %X");
 	    g_value_set_string_take_ownership(value, tmp);
-	} else g_value_set_string(value, "unknown");
+	} else g_value_set_static_string(value, "unknown");
 	break;
     case LB_MBOX_SIZE_COL:
 	if(msg) {
 	    tmp = libbalsa_message_size_to_gchar(msg, FALSE);
 	    g_value_set_string_take_ownership(value, tmp);
-	} else g_value_set_string(value, "unknown");
+	} else g_value_set_static_string(value, "unknown");
 	break;
     case LB_MBOX_MESSAGE_COL:
 	g_value_set_pointer(value, msg); break;

@@ -1128,6 +1128,16 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
         tree_next_valid_part_info(gtk_tree_view_get_model(GTK_TREE_VIEW(bm->treeview)),
                                   &iter);
     select_part(bm, info);
+    /*
+     * emit read message
+     */
+    if (is_new) {
+	GList * messages = g_list_prepend(NULL, message);
+	
+	libbalsa_messages_change_flag(messages, LIBBALSA_MESSAGE_FLAG_NEW,
+                                      FALSE);
+	g_list_free(messages);
+    }
 
     /* restore keyboard focus to the content, if it was there before */
     if (has_focus)

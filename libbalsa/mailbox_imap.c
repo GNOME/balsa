@@ -1374,26 +1374,28 @@ lb_set_headers(LibBalsaMessageHeaders *headers, ImapEnvelope *  envelope,
 
 struct collect_seq_data {
     unsigned *msgno_arr;
-    unsigned first_msgno;
     unsigned cnt;
+    unsigned needed_msgno;
+    unsigned has_it;
 };
 
+static const unsigned MAX_CHUNK_LENGTH = 40; 
 static gboolean
 collect_seq_cb(GNode *node, gpointer data)
 {
-    /* we prefetch envelopes in chunks to save on RTTs */
-    static const unsigned MAX_CHUNK_LENGTH = 40; 
+    /* We prefetch envelopes in chunks to save on RTTs.
+     * Try to get the messages both before and after the message. */
     struct collect_seq_data *csd = (struct collect_seq_data*)data;
     unsigned msgno = GPOINTER_TO_UINT(node->data);
-    if(csd->msgno_arr == NULL) {
-        if( msgno != csd->first_msgno)
-            return FALSE;
-        csd->msgno_arr =
-            g_malloc(MAX_CHUNK_LENGTH*sizeof(csd->msgno_arr[0]));
-        csd->cnt = 0;
-    }
-    csd->msgno_arr[csd->cnt++] = msgno;
-    return csd->cnt == MAX_CHUNK_LENGTH;
+    if(msgno==0) /* root node */
+        return FALSE;
+    csd->msgno_arr[(csd->cnt++) % MAX_CHUNK_LENGTH] = msgno;
+    if(csd->has_it>0) csd->has_it++;
+    if(csd->needed_msgno == msgno)
+        csd->has_it = 1;
+    /* quit if we have enough messages and at least half of them are
+     * after message in question. */
+    return csd->cnt >= MAX_CHUNK_LENGTH && csd->has_it*2>MAX_CHUNK_LENGTH;
 }
 
 static int
@@ -1415,12 +1417,14 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
     g_return_val_if_fail(mimap->opened, FALSE);
     if( (imsg = imap_mbox_handle_get_msg(mimap->handle, message->msgno)) 
         == NULL) {
-        csd.msgno_arr   = NULL;
-        csd.first_msgno = message->msgno;
-        csd.cnt         = 0;
+        csd.needed_msgno = message->msgno;
+        csd.msgno_arr    = g_malloc(MAX_CHUNK_LENGTH*sizeof(csd.msgno_arr[0]));
+        csd.cnt          = 0;
+        csd.has_it       = 0;
         g_node_traverse(LIBBALSA_MAILBOX(mimap)->msg_tree,
                         G_PRE_ORDER, G_TRAVERSE_ALL, -1, collect_seq_cb,
                         &csd);
+        if(csd.cnt>MAX_CHUNK_LENGTH) csd.cnt = MAX_CHUNK_LENGTH;
         qsort(csd.msgno_arr, csd.cnt, sizeof(csd.msgno_arr[0]), cmp_msgno);
         rc = imap_mbox_handle_fetch_set(mimap->handle, csd.msgno_arr,
                                         csd.cnt,

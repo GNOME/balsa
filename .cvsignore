@@ -1,8 +1,10 @@
 ABOUT-NLS
 COPYING
+GNOME_Balsa.server
 Makefile
 Makefile.in
 aclocal.m4
+autom4te.cache
 balsa-?.?.?
 balsa-?.?.?.tar.bz2
 balsa-?.?.?.tar.gz

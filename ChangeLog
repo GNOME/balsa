@@ -1,3 +1,11 @@
+2004-02-12  Pawel Salek
+
+	* libbalsa/libbalsa.c: extra debugging for cert validation.
+	* libbalsa/mailbox.c: use set_static_string() whenever possible.
+	* libbalsa/message.c: 
+	* src/balsa-message.c: delay "set_read()" as much as possible.
+	* libbalsa/mailbox_imap.c: reduce RTT on open and on fetching new msgs.
+
 2004-02-13 11:36  PeterB
 
 	* libbalsa/mailbox_mbox.c: set msg_info.start as

@@ -11,8 +11,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2003-08-08 13:30+0200\n"
-"PO-Revision-Date: 2003-08-08 13:30+0200\n"
+"POT-Creation-Date: 2003-08-11 15:02+0200\n"
+"PO-Revision-Date: 2003-08-11 15:03+0200\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -20,19 +20,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. The externq database doesn't support Id's, sorry!
-#: libbalsa/address-book-extern.c:253 libbalsa/address-book-ldap.c:390
-#: libbalsa/address-book-ldif.c:417 libbalsa/address-book-vcard.c:281
+#: libbalsa/address-book-extern.c:255 libbalsa/address-book-ldap.c:403
+#: libbalsa/address-book-ldif.c:419 libbalsa/address-book-vcard.c:283
 msgid "No-Id"
 msgstr "Inget-Id"
 
-#: libbalsa/address-book-extern.c:257 libbalsa/address-book-ldap.c:394
-#: libbalsa/address-book-ldif.c:420 libbalsa/address-book-ldif.c:652
-#: libbalsa/address-book-ldif.c:689 libbalsa/address-book-ldif.c:693
-#: libbalsa/address-book-vcard.c:299
+#: libbalsa/address-book-extern.c:259 libbalsa/address-book-ldap.c:409
+#: libbalsa/address-book-ldif.c:422 libbalsa/address-book-ldif.c:654
+#: libbalsa/address-book-ldif.c:691 libbalsa/address-book-ldif.c:695
+#: libbalsa/address-book-vcard.c:301
 msgid "No-Name"
 msgstr "Namnlös"
 
-#: libbalsa/address-book-ldap.c:238
+#: libbalsa/address-book-ldap.c:240
 msgid ""
 "Failed to initialise LDAP server.\n"
 "Check that the servername is valid."
@@ -40,16 +40,16 @@ msgstr ""
 "Misslyckades med att initiera LDAP-servern.\n"
 "Kontrollera att servernamnet är giltigt."
 
-#: libbalsa/address-book-ldap.c:255
+#: libbalsa/address-book-ldap.c:257
 #, c-format
 msgid "Couldn't enable TLS on the LDAP connection: %s"
 msgstr "Kunde inte aktivera TLS på LDAP-anslutningen: %s"
 
-#: libbalsa/address-book-ldap.c:264
+#: libbalsa/address-book-ldap.c:266
 msgid "TLS requested but TLS support not compiled in."
 msgstr "TLS begärdes men stöd för TLS är inte inkompilerat."
 
-#: libbalsa/address-book-ldap.c:275
+#: libbalsa/address-book-ldap.c:277
 #, c-format
 msgid ""
 "Failed to bind to server: %s\n"
@@ -58,36 +58,36 @@ msgstr ""
 "Misslyckades med att binda till server: %s\n"
 "Kontrollera att servernamnet är giltigt."
 
-#: libbalsa/address-book-ldap.c:639
+#: libbalsa/address-book-ldap.c:862
 #, c-format
 msgid "Failed to do a search: %s.Check that the base name is valid."
 msgstr "Misslyckades med att söka: %s.Kontrollera att basnamnet är giltigt."
 
-#: libbalsa/address-book.c:384 libbalsa/filter-error.c:45
+#: libbalsa/address-book.c:385 libbalsa/filter-error.c:45
 msgid "No error"
 msgstr "Inget fel"
 
-#: libbalsa/address-book.c:385
+#: libbalsa/address-book.c:386
 msgid "Cannot read from address book"
 msgstr "Kan inte läsa från adressbok"
 
-#: libbalsa/address-book.c:386
+#: libbalsa/address-book.c:387
 msgid "Cannot write to address book"
 msgstr "Kan inte skriva till adressbok"
 
-#: libbalsa/address-book.c:387
+#: libbalsa/address-book.c:388
 msgid "Cannot connect to server"
 msgstr "Kan inte ansluta till server"
 
-#: libbalsa/address-book.c:388
+#: libbalsa/address-book.c:389
 msgid "Cannot search in the address book"
 msgstr "Kan inte söka i adressboken"
 
-#: libbalsa/address-book.c:390
+#: libbalsa/address-book.c:391
 msgid "Cannot add duplicate entry"
 msgstr "Kan inte lägga till dublettpost"
 
-#: libbalsa/address-book.c:391
+#: libbalsa/address-book.c:392
 msgid "Unknown error"
 msgstr "Okänt fel"
 
@@ -338,7 +338,7 @@ msgstr "_Förkasta"
 msgid "*** ERROR: Mailbox Lock Exists: %s ***\n"
 msgstr "*** FEL: Brevlådelås finns: %s ***\n"
 
-#: libbalsa/libbalsa_private.h:135 libbalsa/libbalsa_private.h:144
+#: libbalsa/libbalsa_private.h:136 libbalsa/libbalsa_private.h:145
 #, c-format
 msgid "*** ERROR: Mailbox Stream Closed: %s ***\n"
 msgstr "*** FEL: Brevlådeström stängd: %s ***\n"
@@ -989,7 +989,7 @@ msgid "Connected to MTA"
 msgstr "Ansluten till MTA"
 
 #: libbalsa/send.c:888 src/balsa-message.c:1232 src/print.c:349
-#: src/sendmsg-window.c:667 src/sendmsg-window.c:2138 src/store-address.c:341
+#: src/sendmsg-window.c:667 src/sendmsg-window.c:2138 src/store-address.c:297
 msgid "From:"
 msgstr "Från:"
 
@@ -998,7 +998,7 @@ msgid "From"
 msgstr "Från"
 
 #: libbalsa/send.c:899 src/balsa-message.c:1241 src/print.c:353
-#: src/sendmsg-window.c:666 src/sendmsg-window.c:2145 src/store-address.c:342
+#: src/sendmsg-window.c:666 src/sendmsg-window.c:2145 src/store-address.c:298
 msgid "To:"
 msgstr "Till:"
 
@@ -2056,55 +2056,55 @@ msgstr "Sökvägen \"%s\" är inte korrekt. %s"
 msgid "Do you want to correct the path?"
 msgstr "Vill du rätta till sökvägen?"
 
-#: src/ab-main.c:169 src/ab-window.c:167 src/filter-edit-dialog.c:193
+#: src/ab-main.c:304 src/ab-window.c:167 src/filter-edit-dialog.c:193
 #: src/filter-export-dialog.c:88 src/filter-run-dialog.c:220
 #: src/filter-run-dialog.c:292
 msgid "Name"
 msgstr "Namn"
 
-#: src/ab-main.c:299
-msgid "_Search for Name:"
-msgstr "_Sök efter namn:"
+#: src/ab-main.c:389
+msgid "F_ilter:"
+msgstr "F_ilter:"
 
 #: src/ab-window.c:175
 msgid "E-Mail Address"
 msgstr "E-postadress"
 
-#: src/ab-window.c:208
+#: src/ab-window.c:207
 msgid "Address Book"
 msgstr "Adressbok"
 
 #. Entry widget for finding an address
-#: src/ab-window.c:265
+#: src/ab-window.c:264
 msgid "Search for Name:"
 msgstr "Sök efter namn:"
 
-#: src/ab-window.c:324
+#: src/ab-window.c:323
 msgid "Send-To"
 msgstr "Skicka till"
 
-#: src/ab-window.c:344
+#: src/ab-window.c:343
 msgid "Run GnomeCard"
 msgstr "Kör GnomeCard"
 
-#: src/ab-window.c:352
-msgid "Re-Import"
-msgstr "Läs om"
+#: src/ab-window.c:351
+msgid "_Re-Import"
+msgstr "Importera _om"
 
 #. mode switching stuff
-#: src/ab-window.c:362
+#: src/ab-window.c:361
 msgid "Treat multiple addresses as:"
 msgstr "Betrakta flera adresser som:"
 
-#: src/ab-window.c:366
+#: src/ab-window.c:365
 msgid "alternative addresses for the same person"
 msgstr "alternativa adresser för samma person"
 
-#: src/ab-window.c:371
+#: src/ab-window.c:370
 msgid "a distribution list"
 msgstr "en distributionslista"
 
-#: src/ab-window.c:671
+#: src/ab-window.c:673
 #, c-format
 msgid ""
 "Error opening address book '%s'\n"
@@ -2338,13 +2338,13 @@ msgstr "Svara-till:"
 
 #. cc:
 #: src/balsa-message.c:1242 src/print.c:354 src/sendmsg-window.c:670
-#: src/sendmsg-window.c:1852 src/sendmsg-window.c:2152 src/store-address.c:343
+#: src/sendmsg-window.c:1852 src/sendmsg-window.c:2152 src/store-address.c:299
 msgid "Cc:"
 msgstr "Kopia:"
 
 #. bcc:
 #: src/balsa-message.c:1243 src/print.c:355 src/sendmsg-window.c:669
-#: src/sendmsg-window.c:1857 src/store-address.c:344
+#: src/sendmsg-window.c:1857 src/store-address.c:300
 msgid "Bcc:"
 msgstr "Blindkopia:"
 
@@ -5255,47 +5255,43 @@ msgstr "Återställ alla ändringar och slutför stavningskontrollen"
 msgid "Spell check"
 msgstr "Stavningskontroll"
 
-#: src/store-address.c:102
+#: src/store-address.c:101
 msgid "Store address: no addresses"
 msgstr "Lagra adress: inga adresser"
 
-#: src/store-address.c:179
+#: src/store-address.c:178
 msgid "Store Address"
 msgstr "Lagra adress"
 
-#: src/store-address.c:194
+#: src/store-address.c:193
 msgid "Save this address and close the dialog?"
 msgstr "Spara denna adress och stäng dialogfönstret?"
 
-#: src/store-address.c:213
+#: src/store-address.c:211
 msgid "No address book selected...."
 msgstr "Ingen adressbok markerad..."
 
-#: src/store-address.c:226
-msgid "Sorry, no semicolons are allowed in the name!\n"
-msgstr "Tyvärr, semikolon är inte tillåtna i namnet!\n"
-
-#: src/store-address.c:267
+#: src/store-address.c:221
 msgid "Address could not be written to this address book."
 msgstr "Adressen kunde inte skrivas till denna adressbok."
 
-#: src/store-address.c:269
+#: src/store-address.c:223
 msgid "Address book could not be accessed."
 msgstr "Adressboken kunde inte kommas åt."
 
-#: src/store-address.c:271
+#: src/store-address.c:225
 msgid "This mail address is already in this address book."
 msgstr "Denna e-postadress finns redan i denna adressbok."
 
-#: src/store-address.c:273
+#: src/store-address.c:227
 msgid "Unexpected address book error. Report it."
 msgstr "Oväntat adressboksfel. Rapportera det."
 
-#: src/store-address.c:287
+#: src/store-address.c:241
 msgid "Choose Address Book"
 msgstr "Välj adressbok"
 
-#: src/store-address.c:328
+#: src/store-address.c:284
 msgid "Choose Address"
 msgstr "Välj adress"
 
@@ -5605,6 +5601,21 @@ msgstr "Upp"
 #: src/toolbar-prefs.c:506
 msgid "Down"
 msgstr "Ned"
+
+#~ msgid "_Filter:"
+#~ msgstr "_Filter:"
+
+#~ msgid "Filter:"
+#~ msgstr "Filter:"
+
+#~ msgid "Re-Import"
+#~ msgstr "Importera om"
+
+#~ msgid "_Search for Name:"
+#~ msgstr "_Sök efter namn:"
+
+#~ msgid "Sorry, no semicolons are allowed in the name!\n"
+#~ msgstr "Tyvärr, semikolon är inte tillåtna i namnet!\n"
 
 #~ msgid "_Expand All"
 #~ msgstr "_Expandera alla"

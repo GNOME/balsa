@@ -39,10 +39,12 @@ static void libbalsa_identity_finalize(GObject* object);
 /* button callbacks */
 static gboolean close_cb(gpointer data);
 static gboolean new_ident_cb(gpointer);
-static gboolean set_default_ident_cb(gpointer);
 static gboolean delete_ident_cb(gpointer);
 static gboolean help_ident_cb(gpointer);
 
+static void set_default_ident_cb(GtkTreeView * tree, GtkTreePath * path,
+                                 GtkTreeViewColumn * column,
+                                 gpointer data);
 static void identity_list_update(GtkTreeView * tree);
 static void config_frame_button_select_cb(GtkTreeSelection * treeselection,
                                           gpointer user_data);
@@ -427,6 +429,7 @@ libbalsa_identity_select_dialog(GtkWindow* parent, const gchar* prompt,
     gtk_container_set_border_width(GTK_CONTAINER(frame1), padding);
     gtk_widget_show_all(frame1);
 
+    gtk_widget_grab_focus(GTK_WIDGET(tree));
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
     if (gtk_dialog_run(GTK_DIALOG(dialog)) != GTK_RESPONSE_OK
             || identity == *defid)
@@ -890,22 +893,20 @@ ident_dialog_get_bool(GtkDialog* dialog, const gchar* key)
 /* 
  * Set the default identity to the currently selected.
  */
-static gboolean
-set_default_ident_cb(gpointer user_data)
+static void
+set_default_ident_cb(GtkTreeView * tree, GtkTreePath * path,
+                     GtkTreeViewColumn * column, gpointer data)
 {
-    LibBalsaIdentity* ident, **default_id;
-    GtkTreeView *tree = GTK_TREE_VIEW(user_data);
-    
+    LibBalsaIdentity *ident, **default_id;
+
     /* should never be true with the _BROWSE selection mode
      * as long as there are any elements on the list */
 
     default_id = gtk_object_get_data(GTK_OBJECT(tree), "default-id");
     ident = get_selected_identity(tree);
-    g_return_val_if_fail(ident != NULL, FALSE);
+    g_return_if_fail(ident != NULL);
     *default_id = ident;
     identity_list_update(tree);
-
-    return FALSE;
 }
 
 
@@ -978,17 +979,6 @@ help_ident_cb(gpointer user_data)
     return FALSE;
 }
 
-/* row_activated_cb:
- * set the activated identity (which is also the currently selected
- * identity) as the default.
- */
-static void
-row_activated_cb(GtkTreeView * tree, GtkTreePath * path,
-                 GtkTreeViewColumn * column, gpointer data)
-{
-    set_default_ident_cb(tree);
-}
-
 /* in src/balsa-app.c: */
 extern GtkWidget *balsa_stock_button_with_label(const gchar *,
                                                 const gchar *);
@@ -1045,7 +1035,7 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
 
     gtk_object_set_data(GTK_OBJECT(tree), "frame", display_frame);
     gtk_signal_connect(GTK_OBJECT(tree), "row-activated",
-                       GTK_SIGNAL_FUNC(row_activated_cb), NULL);
+                       GTK_SIGNAL_FUNC(set_default_ident_cb), NULL);
     column = gtk_tree_view_get_column (tree, DEFAULT_COLUMN);
     renderer = gtk_tree_view_column_get_cell_renderers(column)->data;
     g_signal_connect(G_OBJECT(renderer), "toggled",
@@ -1060,7 +1050,8 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
         gtk_dialog_add_button(GTK_DIALOG(dialog), buttons[i].pixmap, i);
 
     gtk_widget_show_all(GTK_WIDGET(GTK_DIALOG(dialog)->action_area));
-    gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_CLOSE);
+    gtk_dialog_set_default_response(GTK_DIALOG(dialog),
+                                    IDENTITY_RESPONSE_CLOSE);
     config_dialog_select(select, dialog);
 
     while ((i = gtk_dialog_run(GTK_DIALOG(dialog))) >= 0) {

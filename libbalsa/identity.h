@@ -31,13 +31,13 @@ extern "C"
 {
 #endif /* __cplusplus */
 
-    GtkType libbalsa_identity_get_type(void);
+    GType libbalsa_identity_get_type(void);
 
 #define LIBBALSA_TYPE_IDENTITY          (libbalsa_identity_get_type ())
-#define LIBBALSA_IDENTITY(obj)          (GTK_CHECK_CAST (obj, libbalsa_identity_get_type (), LibBalsaIdentity))
-#define LIBBALSA_IDENTITY_CLASS(klass)  (GTK_CHECK_CLASS_CAST (klass, libbalsa_identity_get_type (), LibBalsaIdentityClass))
-#define LIBBALSA_IS_IDENTITY(obj)       (GTK_CHECK_TYPE (obj, libbalsa_identity_get_type ()))
-#define LIBBALSA_IS_IDENTITY_CLASS(klass) (GTK_CHECK_CLASS_TYPE (klass, BALSA_TYPE_IDENTITY))
+#define LIBBALSA_IDENTITY(obj)          (G_TYPE_CHECK_INSTANCE_CAST (obj, libbalsa_identity_get_type (), LibBalsaIdentity))
+#define LIBBALSA_IDENTITY_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST (klass, libbalsa_identity_get_type (), LibBalsaIdentityClass))
+#define LIBBALSA_IS_IDENTITY(obj)       (G_TYPE_CHECK_INSTANCE_TYPE (obj, libbalsa_identity_get_type ()))
+#define LIBBALSA_IS_IDENTITY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE (klass, BALSA_TYPE_IDENTITY))
 
     typedef struct _LibBalsaIdentity LibBalsaIdentity;
     typedef struct _LibBalsaIdentityClass LibBalsaIdentityClass;
@@ -45,7 +45,7 @@ extern "C"
     
     struct _LibBalsaIdentity 
     {
-        GtkObject object;
+        GObject object;
         
         gchar* identity_name;
         
@@ -67,7 +67,7 @@ extern "C"
 
     struct _LibBalsaIdentityClass 
     {
-        GtkObjectClass parent_class;
+        GObjectClass parent_class;
     };
 
 

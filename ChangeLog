@@ -1,3 +1,7 @@
+2002-05-19  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* libbalsa/identity.c: grab focus, finalize the conversion to GObject.
+
 2002-05-18  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* libbalsa/identity.c: make the dialogs more usable.

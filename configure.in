@@ -1,5 +1,6 @@
 AC_INIT(src/main.c)
 AM_CONFIG_HEADER(config.h)
+AC_CONFIG_SUBDIRS(libmutt)
 
 dnl
 dnl take care of version

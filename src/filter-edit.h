@@ -16,6 +16,36 @@
  * I'll fix that later.
  */
 
+
+typedef struct _option_list
+{
+    gchar *text;
+    GtkWidget *widget;
+} option_list;
+
+
+static option_list fe_run_on[] =
+{
+    { "Inbound", NULL },
+    { "Outbound", NULL },
+    { "Pre-send", NULL },
+    { "Demand", NULL }
+};
+
+static option_list fe_process_when[] =
+{
+    { "Matches", NULL },
+    { "Doesn't Match", NULL },
+    { "Never", NULL }
+};
+
+static option_list fe_search_type[] =
+{
+    { "Simple", NULL },
+    { "Regular Expression", NULL },
+    { "External Command", NULL}
+};
+
 /* Dialog window */
 GtkWidget *fe_dialog;
 /* and buttons */
@@ -108,6 +138,7 @@ void fe_revert_pressed(GtkWidget *widget,
 /* containers for radiobuttons */
 GtkWidget *fe_type_frame;
 GtkWidget *fe_type_box;
+GtkWidget *fe_search_option_menu;
 /* type notebook radiobuttons */
 GtkWidget *fe_simple;
 GtkWidget *fe_regex;
@@ -123,19 +154,12 @@ GtkWidget *fe_name_entry;
 /* when field */
 GtkWidget *fe_when_frame;
 GtkWidget *fe_when_box;
-/* The buttons thereof */
-GtkWidget *fe_when_match;
-GtkWidget *fe_when_nomatch;
-GtkWidget *fe_when_always;
+GtkWidget *fe_when_option_menu;
 
 /* group field (inbound, outbound, etc) */
 GtkWidget *fe_group_frame;
 GtkWidget *fe_group_box;
-/* the buttons thereof */
-GtkWidget *fe_group_inbound;
-GtkWidget *fe_group_outbound;
-GtkWidget *fe_group_presend;
-GtkWidget *fe_group_demand;
+GtkWidget *fe_group_option_menu;
 
 /* widgets for the type notebook simple page */
 GtkWidget *fe_type_simple_frame;

@@ -10,6 +10,49 @@
 #include <gnome.h>
 
 
+/*
+ * build_option_menu()
+ *
+ * takes an option_list and builds an OptionMenu from it
+ *
+ * Arguments:
+ *    option_list[] options - array of options
+ *    gin num - number of options
+ *
+ * Returns:
+ *    GtkOptionMenu - the menu created
+ */
+GtkWidget *build_option_menu(option_list options[],
+		       gint num)
+{
+    GtkWidget *option_menu;
+    GtkWidget *menu;
+    GSList *group;
+    int i;
+
+    if (num < 1)
+	return(NULL);
+
+    menu = gtk_menu_new();
+    group = NULL;
+
+    for (i = 0; i < num; i++)
+    {
+	options[i].widget = gtk_radio_menu_item_new_with_label(
+	    group,
+	    options[i].text);
+	group = gtk_radio_menu_item_group(
+	    GTK_RADIO_MENU_ITEM(options[i].widget));
+	gtk_menu_append(GTK_MENU(menu), options[i].widget);
+	gtk_widget_show(options[i].widget);
+    }
+
+    option_menu = gtk_option_menu_new();
+    gtk_option_menu_set_menu(GTK_OPTION_MENU(option_menu), menu);
+    gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu), 0);
+
+    return(option_menu);
+} /* end build_option_menu */
 
 
 /*
@@ -22,13 +65,17 @@
  */
 void filter_edit_dialog(GList *filter_list)
 {
+    gint i;
     static gchar *titles[] =
     {
 	"Enabled",
 	"Name",
     };
 
+
     fe_dialog = gtk_dialog_new();
+    gtk_window_set_title(GTK_WINDOW(fe_dialog),
+			 "Edit Filters...");
 
     /*
      * The buttons at the bottom
@@ -221,8 +268,9 @@ void filter_edit_dialog(GList *filter_list)
 		     5, 5);
     gtk_widget_show(fe_name_entry);
 
-    /* The when stuff */
-    
+
+    /* The "Process when:" option menu */
+
     fe_when_frame = gtk_frame_new("Process when:");
     gtk_frame_set_label_align(GTK_FRAME(fe_when_frame),
 			      GTK_POS_LEFT,
@@ -231,7 +279,7 @@ void filter_edit_dialog(GList *filter_list)
 			      GTK_SHADOW_ETCHED_IN);
     gtk_table_attach(GTK_TABLE(fe_notebook_match_page),
 		     fe_when_frame,
-		     5, 10, 1, 4,
+		     5, 10, 1, 2,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     GTK_SHRINK,
 		     5, 5);
@@ -240,34 +288,17 @@ void filter_edit_dialog(GList *filter_list)
     gtk_container_add(GTK_CONTAINER(fe_when_frame),
 		      fe_when_box);
     gtk_widget_show(fe_when_box);
-    fe_when_match = gtk_radio_button_new_with_label(NULL,
-						    "Matches");
-    gtk_box_pack_start(GTK_BOX(fe_when_box),
-		       fe_when_match,
-		       FALSE,
-		       FALSE,
-		       5);
-    gtk_widget_show(fe_when_match);
-    fe_when_nomatch = gtk_radio_button_new_with_label(
-	gtk_radio_button_group(GTK_RADIO_BUTTON(fe_when_match)),
-	"Doesn't Match");
-    gtk_box_pack_start(GTK_BOX(fe_when_box),
-		       fe_when_nomatch,
-		       FALSE,
-		       FALSE,
-		       5);
-    gtk_widget_show(fe_when_nomatch);
-    fe_when_always = gtk_radio_button_new_with_label(
-	gtk_radio_button_group(GTK_RADIO_BUTTON(fe_when_nomatch)),
-	"Doesn't Match");
-    gtk_box_pack_start(GTK_BOX(fe_when_box),
-		       fe_when_always,
-		       FALSE,
-		       FALSE,
-		       5);
-    gtk_widget_show(fe_when_always);
 
-    /* The groups */
+    fe_when_option_menu = build_option_menu(fe_process_when, 3);
+    gtk_box_pack_start(GTK_BOX(fe_when_box),
+		       fe_when_option_menu,
+		       TRUE,
+		       FALSE,
+		       5);
+    gtk_widget_show(fe_when_option_menu);
+
+
+    /* The "Run on:" option menu */
 
     fe_group_frame = gtk_frame_new("Run on:");
     gtk_frame_set_label_align(GTK_FRAME(fe_group_frame),
@@ -277,7 +308,7 @@ void filter_edit_dialog(GList *filter_list)
 			      GTK_SHADOW_ETCHED_IN);
     gtk_table_attach(GTK_TABLE(fe_notebook_match_page),
 		     fe_group_frame,
-		     0, 5, 1, 5,
+		     0, 5, 1, 2,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     GTK_SHRINK,
 		     5, 5);
@@ -286,43 +317,16 @@ void filter_edit_dialog(GList *filter_list)
     gtk_container_add(GTK_CONTAINER(fe_group_frame),
 		      fe_group_box);
     gtk_widget_show(fe_group_box);
-    fe_group_inbound = gtk_radio_button_new_with_label(NULL,
-						       "Inbound");
-    gtk_box_pack_start(GTK_BOX(fe_group_box),
-		       fe_group_inbound,
-		       FALSE,
-		       FALSE,
-		       5);
-    gtk_widget_show(fe_group_inbound);
-    fe_group_outbound = gtk_radio_button_new_with_label(
-	gtk_radio_button_group(GTK_RADIO_BUTTON(fe_group_inbound)),
-			       "Outbound");
-    gtk_box_pack_start(GTK_BOX(fe_group_box),
-		       fe_group_outbound,
-		       FALSE,
-		       FALSE,
-		       5);
-    gtk_widget_show(fe_group_outbound);
-    fe_group_presend = gtk_radio_button_new_with_label(
-	gtk_radio_button_group(GTK_RADIO_BUTTON(fe_group_outbound)),
-			       "Pre-send");
-    gtk_box_pack_start(GTK_BOX(fe_group_box),
-		       fe_group_presend,
-		       FALSE,
-		       FALSE,
-		       5);
-    gtk_widget_show(fe_group_presend);
-    fe_group_demand = gtk_radio_button_new_with_label(
-	gtk_radio_button_group(GTK_RADIO_BUTTON(fe_group_presend)),
-			       "On demand");
-    gtk_box_pack_start(GTK_BOX(fe_group_box),
-		       fe_group_demand,
-		       FALSE,
-		       FALSE,
-		       5);
-    gtk_widget_show(fe_group_demand);
 
-    /* the type notebook's radio buttons */
+    fe_group_option_menu = build_option_menu(fe_run_on, 4);
+    gtk_box_pack_start(GTK_BOX(fe_group_box),
+ 		       fe_group_option_menu,
+		       TRUE,
+		       FALSE,
+		       5);
+    gtk_widget_show(fe_group_option_menu);
+
+    /* the type notebook's option menu */
 
     fe_type_frame = gtk_frame_new("Search type:");
     gtk_frame_set_label_align(GTK_FRAME(fe_type_frame),
@@ -330,6 +334,7 @@ void filter_edit_dialog(GList *filter_list)
 			      GTK_POS_TOP);
     gtk_frame_set_shadow_type(GTK_FRAME(fe_type_frame),
 			      GTK_SHADOW_ETCHED_IN);
+    gtk_container_border_width(GTK_CONTAINER(fe_type_frame), 5);
     gtk_table_attach(GTK_TABLE(fe_notebook_match_page),
 		     fe_type_frame,
 		     0, 10, 5, 6,
@@ -337,49 +342,28 @@ void filter_edit_dialog(GList *filter_list)
 		     GTK_SHRINK,
 		     5, 5);
     gtk_widget_show(fe_type_frame);
-    fe_type_box = gtk_hbox_new(TRUE, 5);
+    fe_type_box = gtk_hbox_new(FALSE, 5);
     gtk_container_add(GTK_CONTAINER(fe_type_frame),
 		      fe_type_box);
     gtk_widget_show(fe_type_box);
-    fe_simple = gtk_radio_button_new_with_label(NULL,
-						"Simple");
-    gtk_signal_connect(GTK_OBJECT(fe_simple),
-		       "toggled",
-		       GTK_SIGNAL_FUNC(fe_checkbutton_toggled),
-		       (gpointer)0);
+
+    fe_search_option_menu = build_option_menu(fe_search_type, 3);
     gtk_box_pack_start(GTK_BOX(fe_type_box),
-		       fe_simple,
-		       TRUE,
-		       TRUE,
+		       fe_search_option_menu,
+		       FALSE,
+		       FALSE,
 		       5);
-    gtk_widget_show(fe_simple);
-    fe_regex = gtk_radio_button_new_with_label(
-	gtk_radio_button_group(GTK_RADIO_BUTTON(fe_simple)),
-			       "Regular Expression");
-    gtk_signal_connect(GTK_OBJECT(fe_regex),
-		       "toggled",
-		       GTK_SIGNAL_FUNC(fe_checkbutton_toggled),
-		       (gpointer)1);
-    gtk_box_pack_start(GTK_BOX(fe_type_box),
-		       fe_regex,
-		       TRUE,
-		       TRUE,
-		       5);
-    gtk_widget_show(fe_regex);
-    fe_exec = gtk_radio_button_new_with_label(
-	gtk_radio_button_group(GTK_RADIO_BUTTON(fe_regex)),
-			       "External Command");
-    gtk_signal_connect(GTK_OBJECT(fe_exec),
-		       "toggled",
-		       GTK_SIGNAL_FUNC(fe_checkbutton_toggled),
-		       (gpointer)2);
-    gtk_box_pack_start(GTK_BOX(fe_type_box),
-		       fe_exec,
-		       TRUE,
-		       TRUE,
-		       5);
-    gtk_widget_show(fe_exec);
-    
+    gtk_widget_show(fe_search_option_menu);
+
+
+    for (i = 0; i < 3; i++)
+    {
+	gtk_signal_connect(GTK_OBJECT(fe_search_type[i].widget),
+			   "toggled",
+			   GTK_SIGNAL_FUNC(fe_checkbutton_toggled),
+			   (gpointer)i);
+    }
+
 
     /* The type notebook */
 
@@ -574,7 +558,7 @@ void filter_edit_dialog(GList *filter_list)
 
     /* The action notebook page */
 
-    fe_notebook_action_page = gtk_table_new(10, 10, TRUE);
+    fe_notebook_action_page = gtk_table_new(10, 10, FALSE);
     fe_action_label = gtk_label_new("Action");
     gtk_notebook_append_page(GTK_NOTEBOOK(fe_notebook),
 			     fe_notebook_action_page,
@@ -597,7 +581,7 @@ void filter_edit_dialog(GList *filter_list)
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     5, 5);
     gtk_widget_show(fe_action_frame);
-    fe_action_table = gtk_table_new(5, 6, TRUE);
+    fe_action_table = gtk_table_new(5, 6, FALSE);
     gtk_container_add(GTK_CONTAINER(fe_action_frame),
 		      fe_action_table);
     gtk_widget_show(fe_action_table);

@@ -1,3 +1,8 @@
+2004-04-25 11:35  PeterB
+
+	* libbalsa/send.c: check for error return from
+	libbalsa_mailbox_open.
+
 2004-04-24  Carlos Morgado  <chbm gnome.org>
 
 	* libbalsa/Makefile.am: back out reintroduction of _DEPRECATED, 

@@ -1,3 +1,8 @@
+2004-12-13 09:41  PeterB
+
+	* libbalsa/html.c: do not write zero bytes, to avoid a
+	gtkhtml-CRITICAL.
+
 2004-12-12 12:23  PeterB
 
 	* libbalsa/mailbox_imap.c: check for NULL handle.

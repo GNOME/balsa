@@ -30,7 +30,6 @@ WHERE char *AttachFormat;
 WHERE char *Charset;
 WHERE char *DefaultHook;
 WHERE char *DateFmt;
-WHERE char *DeleteFmt;
 WHERE char *DsnNotify;
 WHERE char *DsnReturn;
 WHERE char *Editor;
@@ -62,7 +61,6 @@ WHERE char *PipeSep;
 WHERE char *PopHost;
 WHERE char *PopPass;
 WHERE char *PopUser;
-WHERE char *PopUID;
 #endif
 WHERE char *PostIndentString;
 WHERE char *Postponed;
@@ -76,7 +74,7 @@ WHERE char *Signature;
 WHERE char *SimpleSearch;
 WHERE char *Spoolfile;
 WHERE char *StChars;
-WHERE char *StatusString;
+/*WHERE char *Status; */
 WHERE char *Tempdir;
 WHERE char *Tochars;
 WHERE char *Username;
@@ -112,8 +110,12 @@ WHERE short SendmailWait;
 WHERE short Timeout;
 WHERE short WriteInc;
 
-/* vector to store received signals */
-WHERE short Signals INITVAL (0);
+/* flags for received signals */
+WHERE volatile sig_atomic_t SigAlrm INITVAL (0);
+WHERE volatile sig_atomic_t SigInt INITVAL (0);
+WHERE volatile sig_atomic_t SigWinch INITVAL (0);
+
+WHERE int CurrentMenu;
 
 WHERE ALIAS *Aliases INITVAL (0);
 WHERE LIST *UserHeader INITVAL (0);
@@ -128,7 +130,7 @@ const char *Weekdays[] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
 const char *Months[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "ERR" };
 
 const char *BodyTypes[] = { "x-unknown", "audio", "application", "image", "message", "model", "multipart", "text", "video" };
-const char *BodyEncodings[] = { "x-unknown", "7bit", "8bit", "quoted-printable", "base64", "binary" };
+const char *BodyEncodings[] = { "x-unknown", "7bit", "8bit", "quoted-printable", "base64", "binary", "x-uuencoded" };
 #else
 extern const char *Weekdays[];
 extern const char *Months[];
@@ -140,4 +142,7 @@ extern const char *Months[];
 #include "mutt_regex.h"
 #include "buffy.h"
 #include "sort.h"
-#endif /* MAIN_H */
+#ifdef _PGPPATH
+#include "pgp.h"
+#endif
+#endif /* GLOBALS_C */

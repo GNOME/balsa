@@ -22,6 +22,9 @@
 gchar * get_string_set_default (const char * path,
 				const char * value);
 
+gint get_int_set_default (const char *path,
+			  const gint value);
+
 GtkWidget * new_icon (gchar ** xpm, GtkWidget * window);
 
 #endif /* __MISC_H__ */

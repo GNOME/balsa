@@ -218,6 +218,10 @@ load_mailboxes (gchar * name)
   g_string_free (gstring, 1);
 }
 
+
+/*
+ * global settings
+ */
 void
 restore_global_settings ()
 {
@@ -250,6 +254,10 @@ restore_global_settings ()
   /* smtp server */
   balsa_app.smtp_server = get_string_set_default ("smtp server", "localhost");
 
+  /* toolbar style */
+  balsa_app.toolbar_style = get_int_set_default ("toolbar style", (gint) balsa_app.toolbar_style);
+
+
   /* save changes */
   gnome_config_pop_prefix ();
   gnome_config_sync ();
@@ -267,6 +275,7 @@ save_global_settings ()
   gnome_config_set_string ("organization", balsa_app.organization);
   gnome_config_set_string ("smtp server", balsa_app.smtp_server);
   gnome_config_set_string ("local mail directory", balsa_app.local_mail_directory);
+  gnome_config_set_int ("toolbar style", (gint) balsa_app.toolbar_style);
 
   gnome_config_pop_prefix ();
   gnome_config_sync ();

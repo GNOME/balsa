@@ -41,6 +41,28 @@ get_string_set_default (const char *path,
 }
 
 
+gint
+get_int_set_default (const char *path,
+		     const gint value)
+{
+  GString *buffer;
+  gboolean unset;
+  gint result;
+
+  result = 0;
+  buffer = g_string_new (NULL);
+
+  g_string_sprintf (buffer, "%s=%d", path, value);
+  result = gnome_config_get_int_with_default (buffer->str, &unset);
+  if (unset)
+    gnome_config_set_int (path, value);
+
+  g_string_free (buffer, 1);
+  return result;
+}
+
+
+
 GtkWidget *
 new_icon (gchar ** xpm, GtkWidget * window)
 {

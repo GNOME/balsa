@@ -1,3 +1,8 @@
+2002-12-15 22:05  PeterB
+
+	* src/balsa-mblist.c: (balsa_mblist_mru_option_menu) *Really*
+	initialize the option menu (fix bug from 2002-12-13 change).
+
 2002-12-15  Carlos Morgado  <chbm@chbm.nu>
 
 	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_check): 

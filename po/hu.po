@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa VERSION\n"
-"POT-Creation-Date: 2001-04-30 16:23+0200\n"
-"PO-Revision-Date: 2001-03-16 17:58+00:00\n"
+"POT-Creation-Date: 2001-05-04 11:18+0200\n"
+"PO-Revision-Date: 2001-05-04 11:20+0200\n"
 "Last-Translator: Andras TIMAR <timar@gnome.hu>\n"
 "Language-Team: Hungarian <hu@gnome.hu>\n"
 "MIME-Version: 1.0\n"
@@ -1184,7 +1184,7 @@ msgstr "Mentés"
 #: src/balsa-message.c:304 src/folder-conf.c:191 src/mailbox-conf.c:165
 #: src/mailbox-conf.c:175 src/sendmsg-window.c:160 src/sendmsg-window.c:630
 msgid "Cancel"
-msgstr "Mégsem"
+msgstr "Mégse"
 
 #: src/balsa-message.c:316
 msgid "Please choose a filename to save this part of the message as:"
@@ -1283,11 +1283,13 @@ msgid ""
 "Error writing to temporary file %s.\n"
 "Check the directory permissions."
 msgstr ""
+"Hiba lépett fel %s átmeneti fájl írása közben.\n"
+"Ellenõrizd a könyvtár jogosultságait."
 
 #: src/balsa-message.c:1154
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot open temporary file %s."
-msgstr "Nem lehet megnyitni az átmeneti fájlt!"
+msgstr "Nem lehet megnyitni %s átmeneti fájlt."
 
 #: src/balsa-message.c:1471
 msgid "Save..."

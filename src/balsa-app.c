@@ -89,6 +89,7 @@ mailboxes_init (void)
 
   for (i = 0; num > i; i++)
     {
+	    if (balsa_app.debug)
       printf ("Loaded mailbox: %s\n", mailboxes[i]);
       load_mailboxes (mailboxes[i]);
     }

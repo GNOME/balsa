@@ -11,4 +11,4 @@ Accounts=inbox
 
 [inbox]
 Path=/var/spool/mail/jdoe
-Type=5
+Type=0

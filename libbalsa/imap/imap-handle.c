@@ -1907,16 +1907,9 @@ ir_thread_sub(ImapMboxHandle *h, GNode *parent, int last)
       return rc;
   }
   if(seqno == 0) return IMAP_PROTOCOL_ERROR;
-  printf("%d ", seqno);
   item = g_node_append_data(parent, GUINT_TO_POINTER(seqno));
   if (c == ' ') {
-#if DEBUG
-      printf(">");
-#endif
       rc = ir_thread_sub(h, item, c);
-#if DEBUG
-      printf("<");
-#endif
   }
 
   return rc;
@@ -1930,7 +1923,8 @@ ir_thread(ImapMboxHandle *h)
   ImapResponse rc = IMR_OK;
   
   c=sio_getc(h->sio);
-  g_node_destroy(h->thread_root);
+  if(h->thread_root)
+    g_node_destroy(h->thread_root);
   h->thread_root = NULL;
   root = g_node_new(NULL);
   while (c == '(') {
@@ -1938,7 +1932,6 @@ ir_thread(ImapMboxHandle *h)
       if (rc!=IMR_OK) {
 	  return rc;
       }
-      printf("\n");
       c=sio_getc(h->sio);
   }
   if( c != 0x0d) {printf("CR:%d\n",c); rc = IMR_PROTOCOL;}

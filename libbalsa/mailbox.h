@@ -218,6 +218,8 @@ struct _LibBalsaMailboxClass {
     void (*change_message_flags) (LibBalsaMailbox * mailbox, guint msgno,
                                   LibBalsaMessageFlag set,
                                   LibBalsaMessageFlag clear);
+    void (*set_threading) (LibBalsaMailbox * mailbox,
+			   LibBalsaMailboxThreadingType thread_type);
     gboolean (*close_backend)(LibBalsaMailbox * mailbox);
 };
 
@@ -303,6 +305,9 @@ void libbalsa_mailbox_messages_status_changed(LibBalsaMailbox * mbox,
 void libbalsa_mailbox_set_view(LibBalsaMailbox *mailbox,
                                LibBalsaMessageFlag set,
                                LibBalsaMessageFlag clear);
+
+void libbalsa_mailbox_set_threading(LibBalsaMailbox *mailbox,
+				    LibBalsaMailboxThreadingType thread_type);
 
 LibBalsaMailboxView *libbalsa_mailbox_view_new(void);
 void libbalsa_mailbox_view_free(LibBalsaMailboxView * view);

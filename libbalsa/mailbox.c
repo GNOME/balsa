@@ -208,6 +208,8 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
     klass->get_message_stream = NULL;
     klass->get_message = NULL;
     klass->load_message = NULL;
+    klass->change_message_flags = NULL;
+    klass->set_threading = NULL;
     klass->check = NULL;
     klass->message_match = NULL;
     klass->mailbox_match = NULL;
@@ -898,6 +900,16 @@ libbalsa_mailbox_set_view(LibBalsaMailbox *mailbox,
     g_warning("Implement me!");
 }
 
+void
+libbalsa_mailbox_set_threading(LibBalsaMailbox *mailbox,
+			       LibBalsaMailboxThreadingType thread_type)
+{
+    g_return_if_fail(mailbox != NULL);
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+
+    LIBBALSA_MAILBOX_GET_CLASS(mailbox)->set_threading(mailbox, thread_type);
+}
+
 LibBalsaMailboxView *
 libbalsa_mailbox_view_new(void)
 {
@@ -1079,6 +1091,10 @@ mbox_model_get_path(GtkTreeModel	* tree_model,
     return retval;
 }
 
+/* mbox_model_get_value: 
+  FIXME: still includes some debugging code in case fetching the
+  message failed.
+*/
 static void
 mbox_model_get_value(GtkTreeModel *tree_model,
 		     GtkTreeIter  *iter,
@@ -1105,15 +1121,22 @@ mbox_model_get_value(GtkTreeModel *tree_model,
     case LB_MBOX_ATTACH_COL:
 	g_value_set_string(value, "A");  break;
     case LB_MBOX_FROM_COL:
-	tmp = libbalsa_address_to_gchar(msg->headers->from, -1);
-	g_value_set_string(value,tmp);
-	g_free(tmp);
+	if(msg) {
+	    tmp = libbalsa_address_to_gchar(msg->headers->from, -1);
+	    g_value_set_string_take_ownership(value, tmp);
+	} else g_value_set_string(value, "from unknown");
         break;
     case LB_MBOX_SUBJECT_COL:
-	g_value_set_string(value, LIBBALSA_MESSAGE_GET_SUBJECT(msg));
+	g_value_set_string(value, msg 
+			   ? LIBBALSA_MESSAGE_GET_SUBJECT(msg)
+			   : "unknown subject");
+	    
 	break;
     case LB_MBOX_DATE_COL:
-	g_value_set_string(value, g_mime_message_get_header(msg->mime_msg, "date"));
+	if(msg) {
+	    tmp = libbalsa_message_date_to_gchar(msg, "%x %X");
+	    g_value_set_string_take_ownership(value, tmp);
+	} else g_value_set_string(value, "unknown");
 	break;
     case LB_MBOX_SIZE_COL:
 	g_value_set_string(value, "unknown");

@@ -2769,8 +2769,8 @@ static void
 bndx_load_and_thread(BalsaIndex * index, int thtype)
 {
 #if 1
+    libbalsa_mailbox_set_threading(index->mailbox_node->mailbox, thtype);
     bndx_set_tree_store(index);
-    g_warning("%s: enable backend supported threading here", __func__);
 #else
     LibBalsaMailbox *mailbox;
     GList *list;

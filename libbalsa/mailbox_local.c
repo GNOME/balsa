@@ -54,6 +54,10 @@ static void libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
 static void libbalsa_mailbox_local_real_mbox_match(LibBalsaMailbox *mbox,
                                                    GSList * filter_list);
 
+static void libbalsa_mailbox_local_set_threading(LibBalsaMailbox *mailbox,
+						 LibBalsaMailboxThreadingType
+						 thread_type);
+
 GType
 libbalsa_mailbox_local_get_type(void)
 {
@@ -110,6 +114,8 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
 
     libbalsa_mailbox_class->mailbox_match = 
         libbalsa_mailbox_local_real_mbox_match;
+    libbalsa_mailbox_class->set_threading =
+	libbalsa_mailbox_local_set_threading;
     klass->remove_files = NULL;
 }
 
@@ -393,7 +399,6 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox)
 	libbalsa_message_headers_update(message);
 	libbalsa_mailbox_link_message(LIBBALSA_MAILBOX_LOCAL(mailbox),
                                       message);
-	g_node_append_data(mailbox->msg_tree, GINT_TO_POINTER(msgno));
 	messages=g_list_prepend(messages, message);
     }
     UNLOCK_MAILBOX(mailbox);
@@ -440,4 +445,18 @@ libbalsa_mailbox_commit(LibBalsaMailbox *mailbox)
     }
 
     return rc;
+}
+
+
+static void
+libbalsa_mailbox_local_set_threading(LibBalsaMailbox *mailbox,
+				     LibBalsaMailboxThreadingType thread_type)
+{
+    int i;
+    if(mailbox->msg_tree)
+	g_node_destroy(mailbox->msg_tree);
+    mailbox->msg_tree = g_node_new(NULL);
+    for(i=0; i<mailbox->total_messages; i++)
+	g_node_append_data(mailbox->msg_tree, GINT_TO_POINTER(i));
+    mailbox->stamp++;
 }

@@ -1,3 +1,11 @@
+2003-09-29  Pawel Salek  <pawsa theochem.kth.se>
+
+	* libbalsa/mailbox.[ch]: add set_threading virtual function.
+	* libbalsa/mailbox_imap.[ch]: cleanup, support server-side threading.
+	* libbalsa/mailbox_local.c: interface for message threading.
+	* libbalsa/imap/imap-handle.c: extra error checking.
+	* src/balsa-index.c: enable threading.
+
 2003-09-29 09:34  PeterB
 
 	* libbalsa/mailbox.c: Rewrite some of the tree-model code.

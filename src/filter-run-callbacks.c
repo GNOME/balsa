@@ -150,6 +150,7 @@ static
 void save_filters(BalsaFilterRunDialog * p)
 {
     if (p->filters_modified) {
+	g_slist_foreach(p->mbox->filters, (GFunc) g_free, NULL);
 	g_slist_free(p->mbox->filters);
 	p->mbox->filters=build_selected_filters_list(p->selected_filters,FALSE);
 	config_mailbox_filters_save(p->mbox);

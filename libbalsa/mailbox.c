@@ -387,6 +387,10 @@ libbalsa_mailbox_finalize(GObject * object)
     libbalsa_condition_free(mailbox->view_filter);
     mailbox->view_filter = NULL;
 
+    g_slist_foreach(mailbox->filters, (GFunc) g_free, NULL);
+    g_slist_free(mailbox->filters);
+    mailbox->filters = NULL;
+
     /* The LibBalsaMailboxView is owned by balsa_app.mailbox_views. */
     mailbox->view = NULL;
     G_OBJECT_CLASS(parent_class)->finalize(object);

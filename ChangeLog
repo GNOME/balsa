@@ -1,3 +1,7 @@
+2003-09-01 23:14  PeterB
+
+	* libbalsa/misc.c: Fix bug #121181.
+
 2003-08-31  Carlos Morgado  <chbm chbm.net>
 
 	* src/main-window.c (balsa_notebook_label_new): add tooltips 

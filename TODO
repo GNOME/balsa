@@ -68,3 +68,7 @@ Nat's ideas:
    the mailboxes; e.g. a full tray icon if there are unread messages in
    the mailbox, and an empty tray icon otherwise.
 
+ * When a user specifies mailboxes which do not exist in balsa-init or in
+   the mailbox configuration, Balsa should optionally create the mailboxes
+   instead of simply reporting that they are invalid.
+

@@ -860,13 +860,16 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
 	create_check(mcw->window, _("_Enable check for new mail"), 
 		     table, 8, TRUE);
 
-#ifdef USE_SSL
+#ifdef 0
+    /*
+     * chbm: we don't do pop3s. i did all the necessary config stuff 
+     * and then realized libbalsa/pop3.c can't use libmutt/ stuff
+     */
     /* toggle for ssl */
     mcw->mb_data.pop3.use_ssl = 
 	create_check(mcw->window, _("_Use SSL (pop3s)"), 
 		     table, 9, FALSE);
     gtk_signal_connect(GTK_OBJECT(mcw->mb_data.pop3.use_ssl), "toggled", pop3_use_ssl_cb, mcw);
-
 #endif
 
     return table;

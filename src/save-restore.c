@@ -449,10 +449,6 @@ config_global_load(void)
 
     /* ... outgoing mail */
     balsa_app.encoding_style = gnome_config_get_int("EncodingStyle=2");
-    g_free(balsa_app.charset);
-    balsa_app.charset =
-	gnome_config_get_string("Charset=" DEFAULT_CHARSET);
-    libbalsa_set_charset(balsa_app.charset);
     balsa_app.wordwrap = gnome_config_get_bool("WordWrap=true");
     balsa_app.wraplength = gnome_config_get_int("WrapLength=75");
     if (balsa_app.wraplength < 40)
@@ -615,7 +611,6 @@ gint config_save(void)
     gnome_config_set_bool("SMTP", balsa_app.smtp);
     gnome_config_set_string("SMTPServer", balsa_app.smtp_server);
     gnome_config_set_int("EncodingStyle", balsa_app.encoding_style);
-    gnome_config_set_string("Charset", balsa_app.charset);
     gnome_config_set_bool("WordWrap", balsa_app.wordwrap);
     gnome_config_set_int("WrapLength", balsa_app.wraplength);
 

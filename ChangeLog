@@ -1,3 +1,6 @@
+1999-12-09  Lauris Kaplinski <lauris@ariman.ee>
+	* configure.in: added et to ALL_LINGUAS.
+
 1999-12-08  David Pickens <dsp@iAesthetic.com>
 	* libbalsa/mailbox.c, mailbox.h, message.c, send.c, threads.h, 
 	  src/main-window.c, main-window.h, main.c, threads.h

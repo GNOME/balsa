@@ -2,6 +2,7 @@
 description=Balsa E-mail reader
 description[ca]=Lector de correu Balsa
 description[es]=Lector de correo Balsa
+description[et]=Elektronpostiprogramm Balsa
 description[fr]=Lecteur de courrier Balsa
 description[wa]=Manaedjeu d' emilaedjes Balsa
 
@@ -10,5 +11,6 @@ file=balsa/startup.wav
 description=Program startup
 description[ca]=Inici del programa
 description[es]=Inicio del programa
+description[et]=Programmi käivitamine
 description[fr]=Démarrage du programme
 description[wa]=Enondaedje do programe

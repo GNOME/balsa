@@ -76,6 +76,7 @@ static GtkWidget *create_welcome_page (void);
 static GtkWidget *create_general_page (void);
 static GtkWidget *create_mailboxes_page (void);
 
+static void create_mailbox_if_not_present(gchar * filename);
 
 /*
  * Balsa Initializing Stuff
@@ -365,26 +366,51 @@ delete_init_window (GtkWidget * widget, gpointer data)
   return FALSE;
 }
 
+/* Check to see if the specified file exists; if it doesn't, try to
+   create it */
+static void
+create_mailbox_if_not_present(gchar * filename)
+{
+  FILE * f;
+
+  /* Make sure the mailbox exists */
+  if ((f = fopen(filename, "r")) == NULL)
+    {
+      /* If it doesn't exist, try to create it */
+      f = fopen(filename, "w");
+      if (f != NULL)
+	fclose(f);
+    }
+} /* create_mailbox_if_not_present */
+
 static void
 next_cb (GtkWidget * widget, gpointer data)
 {
   GtkWidget *messagebox;
-  gchar *errstr;
+  gchar *errstr, *mbox;
 
   switch (gtk_notebook_current_page (GTK_NOTEBOOK (iw->notebook)) + 1)
     {
     case IW_PAGE_FINISHED:
-      if (mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->inbox))) == MAILBOX_UNKNOWN)
+      mbox = gtk_entry_get_text (GTK_ENTRY(prefs->inbox));
+      create_mailbox_if_not_present(mbox);
+      if (mailbox_valid (mbox) == MAILBOX_UNKNOWN)
 	{
 	  errstr = g_strdup (_ ("Inbox path is invalid."));
 	  goto BADMAILBOX;
 	}
-      else if (mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->outbox))) == MAILBOX_UNKNOWN)
+
+      mbox = gtk_entry_get_text (GTK_ENTRY(prefs->outbox));
+      create_mailbox_if_not_present(mbox);
+      if (mailbox_valid (mbox) == MAILBOX_UNKNOWN)
 	{
 	  errstr = g_strdup (_ ("Outbox path is invalid."));
 	  goto BADMAILBOX;
 	}
-      else if (mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->trash))) == MAILBOX_UNKNOWN)
+
+      mbox = gtk_entry_get_text (GTK_ENTRY(prefs->trash));
+      create_mailbox_if_not_present(mbox);
+      if (mailbox_valid (mbox) == MAILBOX_UNKNOWN)
 	{
 	  errstr = g_strdup (_ ("Trash path is invalid."));
 	  goto BADMAILBOX;

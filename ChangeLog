@@ -1,3 +1,9 @@
+1998-08-25  Nat Friedman  <ndf@retrans.mit.edu>
+
+	* src/balsa-init.c (next_cb): Try to create the specified
+	mailboxes if they do not exist
+	(create_mailbox_if_not_present): new function to do the above
+
 1998-08-23  Nat Friedman  <ndf@retrans.mit.edu>
 
 	* src/save-restore.c: This file has been completely rewritten.

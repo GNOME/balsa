@@ -1024,7 +1024,7 @@ balsa_mailbox_nodes_unlock(gboolean exclusive) {}
 struct _BalsaAppDescendInfo {
     guint len;
     const gchar *url;
-    GNode *node;
+    BalsaMailboxNode *mbnode;
 };
 typedef struct _BalsaAppDescendInfo BalsaAppDescendInfo;
 
@@ -1044,7 +1044,7 @@ balsa_app_descend_func(GNode * node, BalsaAppDescendInfo * badi)
     len = strlen(url);
     if (len > badi->len && !strncmp(url, badi->url, len)) {
         badi->len = len;
-        badi->node = node;
+        badi->mbnode = mbnode;
     }
 
     return FALSE;
@@ -1054,24 +1054,19 @@ static gboolean
 balsa_app_descend(const gchar * url)
 {
     BalsaAppDescendInfo badi;
-    BalsaMailboxNode *mbnode;
 
     badi.len = 0;
     badi.url = url;
-    badi.node = NULL;
+    badi.mbnode = NULL;
     balsa_mailbox_nodes_lock(FALSE);
     g_node_traverse(balsa_app.mailbox_nodes, G_PRE_ORDER, G_TRAVERSE_LEAFS,
                     -1, (GNodeTraverseFunc) balsa_app_descend_func, &badi);
     balsa_mailbox_nodes_unlock(FALSE);
 
-    if (!badi.node)
+    if (!badi.mbnode || badi.mbnode->scanned)
         return FALSE;
 
-    mbnode = badi.node->data;
-    if (mbnode->expanded)
-        return FALSE;
-
-    balsa_mailbox_node_rescan(mbnode);
+    balsa_mailbox_node_rescan(badi.mbnode);
 
     return TRUE;
 }

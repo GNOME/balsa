@@ -7,6 +7,7 @@ libmutt_a_SOURCES = \
 	buffy.c 	\
 	copy.c 		\
 	date.c 		\
+	dotlock.c	\
 	filter.c 	\
 	flaglib.c 	\
 	from.c 		\
@@ -37,6 +38,7 @@ libmutt_a_SOURCES = \
 	attach.h	\
 	buffy.h		\
 	copy.h		\
+	dotlock.h	\
 	functions.h	\
 	globals.h	\
 	hash.h		\

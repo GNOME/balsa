@@ -17,6 +17,7 @@
  *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */ 
 
+#ifdef USE_DOTLOCK
 /*
  * This module either be compiled into Mutt, or it can be
  * built as a separate program. For building it
@@ -712,3 +713,5 @@ dotlock_try(void)
 
   return DL_EX_IMPOSSIBLE;
 }
+
+#endif

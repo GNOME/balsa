@@ -1,5 +1,7 @@
-2004-02-04 08:35  PeterB
+2004-02-04 09:00  PeterB
 
+	* libbalsa/mailbox.c: simplify handling of unread message count and
+	flag.
 	* libbalsa/imap-server.c, libbalsa/imap-server.h, src/main.c:
 	implement --debug-imap (-D) switch to control monitoring imap
 	server dialog.

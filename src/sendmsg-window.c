@@ -2464,7 +2464,6 @@ set_identity_from_mailbox(BalsaSendmsg* msg)
 static gboolean
 guess_identity(BalsaSendmsg* msg)
 {
-    gboolean done = FALSE;
     GList *alist;
     LibBalsaMessage *message = msg->orig_message;
     if( !message || !message->to_list || !balsa_app.identities)
@@ -2474,28 +2473,27 @@ guess_identity(BalsaSendmsg* msg)
      * Loop through all the addresses in the message's To:
      * field, and look for an identity that matches one of them.
      */
-    for (alist = message->to_list;!done && alist;alist = alist->next) {
+    for (alist = message->to_list; alist; alist = g_list_next(alist)) {
         LibBalsaAddress *addy;
-        GList *nth_address, *ilist;
         gchar *address_string;
+        GList *ilist;
         
         addy = alist->data;
-        nth_address = g_list_nth(addy->address_list, 0);
-        address_string = (gchar*)nth_address->data;
-        for (ilist = balsa_app.identities;
-             !done && ilist;
+        address_string = addy->address_list->data;
+        for (ilist = balsa_app.identities; ilist;
              ilist = g_list_next(ilist)) {
             LibBalsaIdentity* ident;
+            gchar *tmp;
             
             ident = LIBBALSA_IDENTITY(ilist->data);
-            if (!g_ascii_strcasecmp(address_string,
-                              (gchar*)(ident->address->address_list->data))) {
+            if ((tmp = ident->address->address_list->data)
+                && !g_ascii_strcasecmp(address_string, tmp)) {
                 msg->ident = ident;
-                done = TRUE;
-		}
+                return TRUE;
+	    }
         }
     }
-    return done;
+    return FALSE;
 }
 
 static void

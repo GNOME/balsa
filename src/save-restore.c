@@ -182,12 +182,11 @@ gint
 load_mailboxes (gchar * name)
 {
   proplist_t dict, accts, mb, temp_str, temp_elem;
-  int num_elements, i;
 
   GString *gstring = g_string_new (NULL);
   MailboxType mailbox_type;
   Mailbox *mailbox;
-  gchar *path;
+  gchar *path, * mailbox_name;
   GNode *node;
   gint type;
 
@@ -216,6 +215,20 @@ load_mailboxes (gchar * name)
   else
     type = atoi (PLGetString (temp_elem));
 
+
+  /*
+   * Grab the "Friendly Mailbox Name"
+   */
+  temp_str = PLMakeString("Name");
+  temp_elem = PLGetDictionaryEntry (mb, temp_str);
+  PLRelease(temp_str);
+  if (temp_elem == NULL)
+    {
+      mailbox_name = g_strdup("Friendly Mailbox Name");
+    }
+  else
+    mailbox_name = g_strdup(PLGetString (temp_elem));
+
   switch (type)
     {
 
@@ -225,37 +238,16 @@ load_mailboxes (gchar * name)
       if (mailbox_type != MAILBOX_UNKNOWN)
 	{
 	  mailbox = mailbox_new (mailbox_type);
-	  mailbox->name = g_strdup (name);
+	  mailbox->name = mailbox_name;
 	  MAILBOX_LOCAL (mailbox)->path = g_strdup (path);
 	  g_free(path);
-
-	  if (strcmp ("Inbox", name) == 0)
-	    {
-	      balsa_app.inbox = mailbox;
-	    }
-	  else if (strcmp ("Outbox", name) == 0)
-	    {
-	      balsa_app.outbox = mailbox;
-	    }
-	  else if (strcmp ("Trash", name) == 0)
-	    {
-	      balsa_app.trash = mailbox;
-	    }
-	  else
-	    {
-	      if (mailbox_type == MAILBOX_MH)
-		node = g_node_new (mailbox_node_new (g_strdup (mailbox->name), mailbox, TRUE));
-	      else
-		node = g_node_new (mailbox_node_new (g_strdup (mailbox->name), mailbox, FALSE));
-	      g_node_append (balsa_app.mailbox_nodes, node);
-	    }
 	}
       break;
 
       /*  POP3  */
     case 1:
       mailbox = mailbox_new (MAILBOX_POP3);
-      mailbox->name = g_strdup (name);
+      mailbox->name = mailbox_name;
 
       /* Grab the Username */
       temp_str = PLMakeString("Username");
@@ -290,7 +282,6 @@ load_mailboxes (gchar * name)
 	}
       MAILBOX_POP3 (mailbox)->server = PLGetString (temp_elem);
 
-
       balsa_app.inbox_input =
 	g_list_append (balsa_app.inbox_input, mailbox);
       break;
@@ -298,7 +289,7 @@ load_mailboxes (gchar * name)
       /*  IMAP  */
     case 2:
       mailbox = mailbox_new (MAILBOX_IMAP);
-      mailbox->name = g_strdup (name);
+      mailbox->name = mailbox_name;
 
       /* Grab the Username */
       temp_str = PLMakeString("Username");
@@ -360,6 +351,28 @@ load_mailboxes (gchar * name)
       break;
     }
 
+  if (strcmp ("Inbox", name) == 0)
+    {
+      balsa_app.inbox = mailbox;
+    }
+  else if (strcmp ("Outbox", name) == 0)
+    {
+      balsa_app.outbox = mailbox;
+    }
+  else if (strcmp ("Trash", name) == 0)
+    {
+      balsa_app.trash = mailbox;
+    }
+  else
+    {
+      if (mailbox_type == MAILBOX_MH)
+	node = g_node_new (mailbox_node_new (g_strdup (mailbox->name),
+					     mailbox, TRUE));
+      else
+	node = g_node_new (mailbox_node_new (g_strdup (mailbox->name),
+					     mailbox, FALSE));
+      g_node_append (balsa_app.mailbox_nodes, node);
+    }
   return TRUE;
 }
 
@@ -426,22 +439,6 @@ restore_global_settings (void)
       return FALSE;
     }
   balsa_app.local_mail_directory = g_strdup (PLGetString (temp_elem));
-
-  if (load_mailboxes ("Inbox") == FALSE)
-    {
-      fprintf(stderr, "*** Could not load Inbox\n");
-      return FALSE;
-    }
-  if (load_mailboxes ("Outbox") == FALSE)
-    {
-      fprintf(stderr, "*** Could not load Outbox\n");
-      return FALSE;
-    }
-  if (load_mailboxes ("Trash") == FALSE)
-    {
-      fprintf(stderr, "*** Could not load trash\n");
-      return FALSE;
-    }
 
   /* smtp server */
   temp_str = PLMakeString("SMTPServer");

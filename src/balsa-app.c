@@ -101,6 +101,16 @@ init_balsa_app (int argc, char *argv[])
   /* initalize our mailbox access crap */
   do_load_mailboxes ();
 
+  /* At this point, if inbox/outbox/trash are still null, then we
+     were not able to locate the settings for them anywhere in our
+     configuartion and should run balsa-init. */
+  if (balsa_app.inbox == NULL || balsa_app.outbox == NULL ||
+      balsa_app.trash == NULL)
+    {
+      initialize_balsa (argc, argv);
+      return;
+    }
+
   open_main_window ();
 
   /* start timers */
@@ -114,6 +124,7 @@ void
 do_load_mailboxes ()
 {
   read_signature ();
+  mailboxes_init ();
 
   switch (balsa_app.inbox->type)
     {
@@ -130,7 +141,6 @@ do_load_mailboxes ()
       break;
     }
 
-  mailboxes_init ();
   load_local_mailboxes ();
   read_signature ();
   special_mailboxes ();
@@ -182,9 +192,11 @@ mailboxes_init (void)
 {
   gint num = 0;
   gint i = 0;
-  proplist_t accts, elem;
+  proplist_t accts, elem, temp_str;
 
-  accts = PLGetDictionaryEntry (balsa_app.proplist, PLMakeString ("accounts"));
+  temp_str = PLMakeString("accounts");
+  accts = PLGetDictionaryEntry (balsa_app.proplist, temp_str);
+  PLRelease(temp_str);
   if (accts == NULL)
     num = 0;
   else

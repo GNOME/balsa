@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.9.0\n"
-"POT-Creation-Date: 2000-07-20 19:51+0200\n"
-"PO-Revision-Date: 2000-07-20 21:08+0200\n"
+"POT-Creation-Date: 2000-07-31 12:05+0200\n"
+"PO-Revision-Date: 2000-07-31 12:05+0200\n"
 "Last-Translator: Fatih Demir <kabalak@gmx.net>\n"
 "Language-Team: Turkish <tr@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -377,7 +377,7 @@ msgstr "Tarih"
 msgid "To"
 msgstr "Gönderilen"
 
-#: src/balsa-mblist.c:225 src/mailbox-conf.c:1185
+#: src/balsa-mblist.c:225 src/mailbox-conf.c:1197
 msgid "Mailbox"
 msgstr "ePosta kutusu"
 
@@ -564,7 +564,7 @@ msgstr "Vücut"
 msgid "Match string:"
 msgstr "Aranacak metin:"
 
-#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:321 src/mailbox-conf.c:1150
+#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:321 src/mailbox-conf.c:1162
 #: src/pref-manager.c:890
 msgid "Add"
 msgstr "Ekle"
@@ -684,110 +684,110 @@ msgstr "Eh ! balsa_app.mailbox noktalarýnda ePosta kutusu bulunamadý ?!?\n"
 msgid "Mailbox Configurator"
 msgstr "ePosta kutusu ayarlayýcýsý"
 
-#: src/mailbox-conf.c:330 src/mailbox-conf.c:1144
+#: src/mailbox-conf.c:330 src/mailbox-conf.c:1156
 msgid "Update"
 msgstr "Yenileme"
 
-#: src/mailbox-conf.c:458 src/mailbox-conf.c:464 src/mailbox-conf.c:488
+#: src/mailbox-conf.c:462 src/mailbox-conf.c:468 src/mailbox-conf.c:492
 msgid "You need to fill in the Mailbox Name field."
 msgstr "ePosta kutusunun adýný belirlemek zorundasýn ."
 
-#: src/mailbox-conf.c:467
+#: src/mailbox-conf.c:471
 msgid "You need to fill in the folderpath field."
 msgstr "Dizinleme birimini boþ býrakamasýn ."
 
-#: src/mailbox-conf.c:469
+#: src/mailbox-conf.c:473
 msgid "You need to fill in the IMAP Server field"
 msgstr "IMAP sunucusu birimini boþ býrakamasýn"
 
-#: src/mailbox-conf.c:471
+#: src/mailbox-conf.c:475
 msgid "You need to fill in the username field"
 msgstr "Kullanýcý adýný belirlemek zorundasýn"
 
-#: src/mailbox-conf.c:475
+#: src/mailbox-conf.c:479
 msgid "You need to fill in the port field"
 msgstr "Kapý numarasýný belirlemek zorundasýn"
 
-#: src/mailbox-conf.c:492
+#: src/mailbox-conf.c:496
 msgid "You need to fill in the user field."
 msgstr "Kullanýcý birimini doldurmak zorundasýn ."
 
-#: src/mailbox-conf.c:500
+#: src/mailbox-conf.c:504
 msgid "You need to fill in the server field."
 msgstr "Sunucu birimini doldurmak zorundasýn ."
 
-#: src/mailbox-conf.c:504
+#: src/mailbox-conf.c:508
 msgid "You need to fill in the port field."
 msgstr "Kapý numarasý birimini doldurmak zorundasýn ."
 
-#: src/mailbox-conf.c:508
+#: src/mailbox-conf.c:512
 msgid "Some of the fields are blank."
 msgstr "Bazý birimleri boþ býrakýlmýþ ."
 
-#: src/mailbox-conf.c:642
+#: src/mailbox-conf.c:647
 #, c-format
 msgid "%s on %s"
 msgstr "%s : %s'de "
 
-#: src/mailbox-conf.c:835
+#: src/mailbox-conf.c:847
 msgid "New mailbox type:"
 msgstr "Yeni ePosta kutusu tipi:"
 
 #. radio buttons
 #. local mailbox
-#: src/mailbox-conf.c:841
+#: src/mailbox-conf.c:853
 msgid "Local mailbox"
 msgstr "Yerel ePosta kutusu"
 
-#: src/mailbox-conf.c:851
+#: src/mailbox-conf.c:863
 msgid "Single IMAP folder"
 msgstr "Tek bir IMAP dizini"
 
-#: src/mailbox-conf.c:860
+#: src/mailbox-conf.c:872
 msgid "IMAP folder set"
 msgstr "IMAP dizin kitlesi"
 
 #. mailbox name
-#: src/mailbox-conf.c:885 src/mailbox-conf.c:920 src/mailbox-conf.c:1037
+#: src/mailbox-conf.c:897 src/mailbox-conf.c:932 src/mailbox-conf.c:1049
 msgid "Mailbox Name:"
 msgstr "ePosta kutusu adý:"
 
 #. path to file
-#: src/mailbox-conf.c:895
+#: src/mailbox-conf.c:907
 msgid "Mailbox path:"
 msgstr "ePosta kutusu dizinlemesi:"
 
 #. pop server
-#: src/mailbox-conf.c:937 src/mailbox-conf.c:1047
+#: src/mailbox-conf.c:949 src/mailbox-conf.c:1059
 msgid "Server:"
 msgstr "Sunucu:"
 
 #. pop port
-#: src/mailbox-conf.c:956 src/mailbox-conf.c:1061
+#: src/mailbox-conf.c:968 src/mailbox-conf.c:1073
 msgid "Port:"
 msgstr "Port:"
 
 #. username
-#: src/mailbox-conf.c:975 src/mailbox-conf.c:1076
+#: src/mailbox-conf.c:987 src/mailbox-conf.c:1088
 msgid "Username:"
 msgstr "Kullanýcý:"
 
 #. password field
-#: src/mailbox-conf.c:992 src/mailbox-conf.c:1091
+#: src/mailbox-conf.c:1004 src/mailbox-conf.c:1103
 msgid "Password:"
 msgstr "Parola:"
 
 #. toggle for check
-#: src/mailbox-conf.c:1007 src/main-window.c:399
+#: src/mailbox-conf.c:1019 src/main-window.c:399
 msgid "Check"
 msgstr "Bak"
 
 #. toggle for deletion from server
-#: src/mailbox-conf.c:1015
+#: src/mailbox-conf.c:1027
 msgid "Delete from server"
 msgstr "Sunucu'dan sil"
 
-#: src/mailbox-conf.c:1104
+#: src/mailbox-conf.c:1116
 msgid "Folder path:"
 msgstr "Dizin dizinlemesi:"
 
@@ -1001,7 +1001,7 @@ msgstr "Filtralarla oyna"
 
 #: src/main-window.c:373
 msgid "_Show mailbox tree"
-msgstr "ePosta kutusu _aðaçiný göster"
+msgstr "ePosta kutusu _aðaçýný göster"
 
 #: src/main-window.c:376
 msgid "Show mailbox _tabs"
@@ -1077,15 +1077,16 @@ msgstr ""
 msgid ""
 "In order to store an address, you must open a mailbox and select a message.\n"
 msgstr ""
-"Bir adresi kaydetmek için, bir ePosta kutusunu açýp bir iletiyi seçmen lazým .\n"
+"Bir adresi kaydetmek için, bir ePosta kutusunu açýp bir iletiyi seçmen lazým "
+".\n"
 
 #: src/main.c:80
 msgid "Get new mail on startup"
 msgstr "Baþlarken yeni ePostayý al"
 
 #: src/main.c:82
-msgid "Compose a new email to _kabalak@gmx.net"
-msgstr "_kabalak@gmx.net'e yeni bir ePosta yaz"
+msgid "Compose a new email to EMAIL@ADDRESS"
+msgstr "EPOSTA@ADRES'e yeni bir ePosta yaz"
 
 #: src/main.c:84
 msgid "Opens MAILBOXNAME"
@@ -1738,7 +1739,7 @@ msgstr "Yazdýrma komutasýný çalýþtýramadým ."
 msgid "Error executing lpr"
 msgstr "lpr'i çalýþtýrýrken hata oldu"
 
-#: libbalsa/mailbox_imap.c:202
+#: libbalsa/mailbox_imap.c:195
 #, c-format
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxImap : %s'yi açýyorum , %d referans\n"
@@ -1748,7 +1749,7 @@ msgstr "LibBalsaMailboxImap : %s'yi açýyorum , %d referans\n"
 msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxLocal : %s'yi açýyorum , %d referans\n"
 
-#: libbalsa/mailbox_pop3.c:179
+#: libbalsa/mailbox_pop3.c:168
 #, c-format
 msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxPop3 : %s'yi açýyorum , %d referans\n"
@@ -1783,7 +1784,9 @@ msgstr "Geçiçi dosyayý yaratamadým !"
 #.
 #: libmutt/mbox.c:757
 msgid "sync: mbox modified, but no modified messages! (report this bug)"
-msgstr "eþitleme : mbox deðiþtirilmiþ, fakat hiç bir ileti deðiþtirilmemiþ ! ( bu hatayý rapor et )"
+msgstr ""
+"eþitleme : mbox deðiþtirilmiþ, fakat hiç bir ileti deðiþtirilmemiþ ! ( bu "
+"hatayý rapor et )"
 
 #: libmutt/mbox.c:787
 msgid "Writing messages... %d (%d%%)"
@@ -1881,7 +1884,8 @@ msgstr " Yazýnabilirliði açmak için '%s''ye bas"
 
 #: libmutt/mx.c:1043
 msgid "Use 'toggle-write' to re-enable write!"
-msgstr "Yazýnabilirliði yeniden mümkün etmek için 'toggle-write' eylemini kullan !"
+msgstr ""
+"Yazýnabilirliði yeniden mümkün etmek için 'toggle-write' eylemini kullan !"
 
 #: libmutt/mx.c:1045
 #, c-format

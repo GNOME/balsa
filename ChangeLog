@@ -1,3 +1,8 @@
+2000-09-04  Carlos Morgado <chbm@chbm.nu>
+
+	* libmutt/Makefile.am: removed socket.c from files list (replaced
+	by imap/socket.c)
+
 2000-09-04  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* configure.in: Fixed GSS configuration issue (I wonder how come

@@ -14,3 +14,11 @@
 #undef BALSA_VERSION
 #undef PACKAGE
 #undef VERSION
+
+#undef MUTT_MAJOR
+#undef MUTT_PATCHLEVEL
+#undef MUTT_REVISION
+#undef MUTT_VERSION
+#undef SENDMAIL
+#undef USE_POP
+#undef USE_IMAP

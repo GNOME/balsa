@@ -60,6 +60,14 @@
 #undef PACKAGE
 #undef VERSION
 
+#undef MUTT_MAJOR
+#undef MUTT_PATCHLEVEL
+#undef MUTT_REVISION
+#undef MUTT_VERSION
+#undef SENDMAIL
+#undef USE_POP
+#undef USE_IMAP
+
 /* Define if you have the __argz_count function.  */
 #undef HAVE___ARGZ_COUNT
 
@@ -71,6 +79,9 @@
 
 /* Define if you have the dcgettext function.  */
 #undef HAVE_DCGETTEXT
+
+/* Define if you have the ftruncate function.  */
+#undef HAVE_FTRUNCATE
 
 /* Define if you have the getcwd function.  */
 #undef HAVE_GETCWD
@@ -98,6 +109,9 @@
 
 /* Define if you have the strchr function.  */
 #undef HAVE_STRCHR
+
+/* Define if you have the strftime function.  */
+#undef HAVE_STRFTIME
 
 /* Define if you have the <X11/SM/SMlib.h> header file.  */
 #undef HAVE_X11_SM_SMLIB_H
@@ -134,3 +148,15 @@
 
 /* Define if you have the i library (-li).  */
 #undef HAVE_LIBI
+
+/* Define if you have the intl library (-lintl).  */
+#undef HAVE_LIBINTL
+
+/* Define if you have the nsl library (-lnsl).  */
+#undef HAVE_LIBNSL
+
+/* Define if you have the socket library (-lsocket).  */
+#undef HAVE_LIBSOCKET
+
+/* Define if you have the x library (-lx).  */
+#undef HAVE_LIBX

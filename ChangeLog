@@ -1,3 +1,7 @@
+2003-06-26 21:18  PeterB
+
+	* src/balsa-message.c: Compile with --disable-gtkhtml.
+
 2003-06-25 07:47  PeterB
 
 	* src/sendmsg-window.c: Replace Reflow Paragraph and Reflow Message,

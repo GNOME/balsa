@@ -1490,6 +1490,7 @@ body_new ()
   body->htmlized = NULL;
   body->buffer = NULL;
   body->mutt_body = NULL;
+  body->filename = NULL;
   return body;
 }
 
@@ -1500,9 +1501,8 @@ body_free (Body * body)
   if (!body)
     return;
 
-  if (body->htmlized)
-    g_free (body->htmlized);
-  if (body->buffer)
-    g_free (body->buffer);
+  g_free (body->htmlized);
+  g_free (body->buffer);
+  g_free (body->filename);
   g_free (body);
 }

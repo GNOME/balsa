@@ -233,7 +233,7 @@ attach_dialog_ok (GtkWidget * widget, gpointer data)
   fs = GTK_FILE_SELECTION (data);
   iconlist = GNOME_ICON_LIST (gtk_object_get_user_data (GTK_OBJECT (fs)));
 
-  filename = gtk_file_selection_get_filename (fs);
+  filename = g_strdup (gtk_file_selection_get_filename (fs));
 
   pos = gnome_icon_list_append (iconlist,
 		   gnome_unconditional_pixmap_file ("balsa/attachment.png"),
@@ -616,7 +616,7 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
     for (i = 0; i < GNOME_ICON_LIST (bsmsg->attachments)->icons; i++)
       {
 	abody = body_new ();
-	abody->filename = (gchar *) gnome_icon_list_get_icon_data (bsmsg->attachments, i);
+	abody->filename = g_strdup ((gchar *) gnome_icon_list_get_icon_data (GNOME_ICON_LIST (bsmsg->attachments), i));
 	message->body_list = g_list_append (message->body_list, abody);
       }
   }

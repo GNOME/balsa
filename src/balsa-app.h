@@ -242,6 +242,7 @@ extern struct BalsaApplication {
     /* file paths */
     gchar *attach_dir;
     gchar *save_dir;
+    gchar *pipe_cmd;
 
     /* Column width settings */
     gint index_num_width;

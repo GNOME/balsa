@@ -269,6 +269,12 @@ idle_process(GIOChannel *source, GIOCondition condition, gpointer data)
       printf("idle_process() got unexpected response %i!\n"
              "Last message was: \"%s\" - shutting down idle listener\n",
              rc, h->last_msg);
+      if(h->idle_enable_id) {
+          g_source_remove(h->idle_enable_id);
+          h->idle_enable_id = 0;
+      }
+      g_source_remove(h->idle_watch_id);
+      h->idle_watch_id = 0;
       /* FIXME: consider aborting connection here. */
       return FALSE;
     }

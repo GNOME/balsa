@@ -1071,6 +1071,8 @@ config_global_load(void)
     balsa_app.attach_dir = libbalsa_conf_get_string("AttachDir");
     g_free(balsa_app.save_dir);
     balsa_app.save_dir = libbalsa_conf_get_string("SavePartDir");
+    g_free(balsa_app.pipe_cmd);
+    balsa_app.pipe_cmd = libbalsa_conf_get_string("PipeCmd");
     libbalsa_conf_pop_prefix();
 
 	/* Folder MRU */
@@ -1361,6 +1363,8 @@ config_save(void)
 	libbalsa_conf_set_string("AttachDir", balsa_app.attach_dir);
     if(balsa_app.save_dir)
 	libbalsa_conf_set_string("SavePartDir", balsa_app.save_dir);
+    if(balsa_app.pipe_cmd)
+	libbalsa_conf_set_string("PipeCmd", balsa_app.pipe_cmd);
     libbalsa_conf_pop_prefix();
 
 	

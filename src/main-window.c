@@ -158,6 +158,7 @@ static void forward_message_attached_cb(GtkWidget * widget, gpointer data);
 static void forward_message_inline_cb(GtkWidget * widget, gpointer data);
 #endif
 static void forward_message_default_cb(GtkWidget * widget, gpointer data);
+static void pipe_message_cb(GtkWidget * widget, gpointer data);
 static void continue_message_cb(GtkWidget * widget, gpointer data);
 
 static void next_message_cb(GtkWidget * widget, gpointer data);
@@ -616,27 +617,35 @@ static GnomeUIInfo message_menu[] = {
         BALSA_PIXMAP_FORWARD, 0, 0, NULL
     },
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MESSAGE_NEXT_PART_POS 6
+#define MENU_MESSAGE_PIPE_POS 6
+    {
+        GNOME_APP_UI_ITEM, N_("_Pipe through..."),
+        N_("Pipe the message through another program"),
+        pipe_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+        BALSA_PIXMAP_FORWARD, 0, 0, NULL
+    },
+    GNOMEUIINFO_SEPARATOR,
+#define MENU_MESSAGE_NEXT_PART_POS (MENU_MESSAGE_PIPE_POS+2)
     {
         GNOME_APP_UI_ITEM, N_("_Next Part"), N_("Next part in message"),
         next_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
         BALSA_PIXMAP_NEXT_PART, '.', GDK_CONTROL_MASK, NULL
     },
-#define MENU_MESSAGE_PREVIOUS_PART_POS 7
+#define MENU_MESSAGE_PREVIOUS_PART_POS (MENU_MESSAGE_NEXT_PART_POS+1)
     {
         GNOME_APP_UI_ITEM, N_("_Previous Part"),
         N_("Previous part in message"),
         previous_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
         BALSA_PIXMAP_PREVIOUS_PART, ',', GDK_CONTROL_MASK, NULL
     },
-#define MENU_MESSAGE_SAVE_PART_POS 8
+#define MENU_MESSAGE_SAVE_PART_POS MENU_MESSAGE_PREVIOUS_PART_POS+1
     {
         GNOME_APP_UI_ITEM, N_("Save Current Part..."),
         N_("Save currently displayed part of message"),
         save_current_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
         GTK_STOCK_SAVE, 's', GDK_CONTROL_MASK, NULL
     },
-#define MENU_MESSAGE_SOURCE_POS 9
+#define MENU_MESSAGE_SOURCE_POS MENU_MESSAGE_SAVE_PART_POS+1
     {
         GNOME_APP_UI_ITEM, N_("_View Source..."),
         N_("View source form of the message"),
@@ -644,9 +653,9 @@ static GnomeUIInfo message_menu[] = {
         BALSA_PIXMAP_BOOK_OPEN, 'U', GDK_CONTROL_MASK, NULL
     },
 	GNOMEUIINFO_SEPARATOR,   
-#define MENU_MESSAGE_COPY_POS 11
+#define MENU_MESSAGE_COPY_POS MENU_MESSAGE_SOURCE_POS+2
 	GNOMEUIINFO_MENU_COPY_ITEM(message_copy_cb, NULL),
-#define MENU_MESSAGE_SELECT_ALL_POS 12
+#define MENU_MESSAGE_SELECT_ALL_POS MENU_MESSAGE_COPY_POS+1
 	{
 		GNOME_APP_UI_ITEM, N_("_Select Text"),
 		N_("Select entire mail"),
@@ -654,7 +663,7 @@ static GnomeUIInfo message_menu[] = {
 		NULL, 0, (GdkModifierType) 0, NULL
     },  
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MESSAGE_TRASH_POS 14
+#define MENU_MESSAGE_TRASH_POS MENU_MESSAGE_SELECT_ALL_POS+2
     /* D */
     {
         GNOME_APP_UI_ITEM, N_("_Move to Trash"), 
@@ -662,11 +671,11 @@ static GnomeUIInfo message_menu[] = {
         trash_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
         GTK_STOCK_DELETE, 'D', 0, NULL
     },
-#define MENU_MESSAGE_TOGGLE_POS 15
+#define MENU_MESSAGE_TOGGLE_POS MENU_MESSAGE_TRASH_POS+1
     /* ! */
     GNOMEUIINFO_SUBTREE(N_("_Toggle flag"), message_toggle_menu),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MESSAGE_STORE_ADDRESS_POS 17
+#define MENU_MESSAGE_STORE_ADDRESS_POS MENU_MESSAGE_TOGGLE_POS+2
     /* S */
     {
         GNOME_APP_UI_ITEM, N_("_Store Address..."),
@@ -1779,6 +1788,7 @@ enable_message_menus(BalsaWindow * window, LibBalsaMessage * message)
         &message_menu[MENU_MESSAGE_REPLY_GROUP_POS],
         &message_menu[MENU_MESSAGE_FORWARD_ATTACH_POS],
         &message_menu[MENU_MESSAGE_FORWARD_INLINE_POS],
+        &message_menu[MENU_MESSAGE_PIPE_POS],
         &message_menu[MENU_MESSAGE_STORE_ADDRESS_POS]
 #else /* ENABLE_TOUCH_UI */
         &tu_message_menu[MENU_MESSAGE_SAVE_PART_POS],
@@ -3211,6 +3221,54 @@ forward_message_default_cb(GtkWidget * widget, gpointer data)
         balsa_window_find_current_index(BALSA_WINDOW(data)));
 }
 
+static void
+pipe_message_cb(GtkWidget * widget, gpointer data)
+{
+    FILE *fprog;
+    GtkWidget *l, *e;
+    GtkWidget *d;
+    LibBalsaMessage *message = BALSA_WINDOW(data)->current_message;
+
+    g_return_if_fail(message);
+    d = gtk_dialog_new_with_buttons
+        (_("Pipe message through a program"), GTK_WINDOW(data),
+         GTK_DIALOG_MODAL,
+         _("_Run"),        GTK_RESPONSE_OK,
+         GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+         NULL);
+
+    gtk_container_add(GTK_CONTAINER (GTK_DIALOG(d)->vbox),
+                      l = gtk_label_new(_("Specify the program to run:")));
+    gtk_container_add(GTK_CONTAINER (GTK_DIALOG(d)->vbox),
+                      e = gtk_entry_new());
+    gtk_entry_set_text(GTK_ENTRY(e), balsa_app.pipe_cmd 
+                       ? balsa_app.pipe_cmd : "sa-learn --spam");
+    gtk_widget_show(l); gtk_widget_show(e);
+    gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_OK);
+
+    if(gtk_dialog_run(GTK_DIALOG(d)) == GTK_RESPONSE_OK) {
+        g_free(balsa_app.pipe_cmd);
+        balsa_app.pipe_cmd = g_strdup(gtk_entry_get_text(GTK_ENTRY(e)));
+    }
+    gtk_widget_destroy(d);
+    if(!balsa_app.pipe_cmd) return;
+
+    if( (fprog=popen(balsa_app.pipe_cmd, "w")) == 0) {
+        fprintf(stderr, "popen failed\n");
+    } else {
+        char buf[4096];
+        ssize_t l;
+        GMimeStream *stream = 
+            libbalsa_mailbox_get_message_stream(message->mailbox, message);
+        g_return_if_fail(stream);
+
+        while( (l=g_mime_stream_read(stream, buf, sizeof(buf))) >0) 
+            fwrite(buf, 1, l, fprog);
+	g_object_unref(stream);
+        if(pclose(fprog) == -1)
+            fprintf(stderr, "pclose failed\n");
+    }
+}
 
 static void
 continue_message_cb(GtkWidget * widget, gpointer data)

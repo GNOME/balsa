@@ -1,3 +1,7 @@
+2001-08-27  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/sendmsg-window.c: fix ##59535 introduced two days ago.
+
 2001-08-25  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* configure.in: clean up and fix; check if libESMTP has TLS

@@ -593,7 +593,7 @@ _mailbox_open_ref (Mailbox * mailbox, gint flag)
       mailbox->open_ref++;
 
 #ifdef DEBUG
-      g_print (_ ("Mailbox: Opening %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
+      g_print (_("Mailbox: Opening %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
 #endif
 
       /* FIXME */
@@ -613,7 +613,7 @@ void
 mailbox_open_unref (Mailbox * mailbox)
 {
 #ifdef DEBUG
-      g_print (_ ("Mailbox: Closing %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
+      g_print (_("Mailbox: Closing %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
 #endif
   LOCK_MAILBOX (mailbox);
 

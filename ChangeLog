@@ -1,3 +1,9 @@
+2000-04-26  Kjartan Maraas  <kmaraas@online.no>
+
+	* libbalsa/mailbox.c: Use '_(' not '_ (' to make marked
+	strings show up in the .pot file.
+	* src/balsa-index.c: Same here
+
 2000-04-25 Pawel Salek <pawsa@theochem.kth.se>
 	* src/save-restore.c: bug fix for remembering open mboxes
 	between sessions.

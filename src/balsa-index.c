@@ -249,9 +249,9 @@ balsa_index_init (BalsaIndex * bindex)
     NULL
   };
 
-  titles[3] = _ ("From");
-  titles[4] = _ ("Subject");
-  titles[5] = _ ("Date");
+  titles[3] = _("From");
+  titles[4] = _("Subject");
+  titles[5] = _("Date");
 
   bindex->mailbox = NULL;
 

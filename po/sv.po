@@ -11,8 +11,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2003-01-15 01:38+0100\n"
-"PO-Revision-Date: 2003-01-15 01:39+0100\n"
+"POT-Creation-Date: 2003-01-19 03:21+0100\n"
+"PO-Revision-Date: 2003-01-19 03:21+0100\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -20,19 +20,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. The externq database doesn't support Id's, sorry!
-#: libbalsa/address-book-extern.c:242 libbalsa/address-book-ldap.c:382
+#: libbalsa/address-book-extern.c:242 libbalsa/address-book-ldap.c:423
 #: libbalsa/address-book-ldif.c:405 libbalsa/address-book-vcard.c:272
 msgid "No-Id"
 msgstr "Inget-Id"
 
-#: libbalsa/address-book-extern.c:246 libbalsa/address-book-ldap.c:386
+#: libbalsa/address-book-extern.c:246 libbalsa/address-book-ldap.c:427
 #: libbalsa/address-book-ldif.c:408 libbalsa/address-book-ldif.c:637
 #: libbalsa/address-book-ldif.c:674 libbalsa/address-book-ldif.c:678
 #: libbalsa/address-book-vcard.c:290
 msgid "No-Name"
 msgstr "Namnlös"
 
-#: libbalsa/address-book-ldap.c:215
+#: libbalsa/address-book-ldap.c:224
 msgid ""
 "Failed to initialise LDAP server.\n"
 "Check that the servername is valid."
@@ -40,45 +40,58 @@ msgstr ""
 "Misslyckades med att initiera LDAP-servern.\n"
 "Kontrollera att servernamnet är giltigt."
 
-#: libbalsa/address-book-ldap.c:225
+#: libbalsa/address-book-ldap.c:237
+msgid "Couldn't set protocol version to LDAPv3."
+msgstr "Kunde inte ställa in protokollversion till LDAPv3."
+
+#: libbalsa/address-book-ldap.c:245
+#, c-format
+msgid "Couldn't enable TLS on the LDAP connection: %s"
+msgstr "Kunde inte aktivera TLS på LDAP-anslutningen: %s"
+
+#: libbalsa/address-book-ldap.c:254
+msgid "TLS requested but TLS support not compiled in."
+msgstr "TLS begärdes men stöd för TLS är inte inkompilerat."
+
+#: libbalsa/address-book-ldap.c:265
 #, c-format
 msgid ""
 "Failed to bind to server: %s\n"
-"Check that the servername is valid."
+"Check that the server name is valid."
 msgstr ""
-"Misslyckades med att binda till servern: %s\n"
+"Misslyckades med att binda till server: %s\n"
 "Kontrollera att servernamnet är giltigt."
 
-#: libbalsa/address-book-ldap.c:595
+#: libbalsa/address-book-ldap.c:648
 #, c-format
 msgid "Failed to do a search: %s.Check that the base name is valid."
 msgstr "Misslyckades med att söka: %s.Kontrollera att basnamnet är giltigt."
 
-#: libbalsa/address-book.c:329 libbalsa/filter-error.c:45
+#: libbalsa/address-book.c:332 libbalsa/filter-error.c:45
 msgid "No error"
 msgstr "Inget fel"
 
-#: libbalsa/address-book.c:330
+#: libbalsa/address-book.c:333
 msgid "Cannot read from address book"
 msgstr "Kan inte läsa från adressbok"
 
-#: libbalsa/address-book.c:331
+#: libbalsa/address-book.c:334
 msgid "Cannot write to address book"
 msgstr "Kan inte skriva till adressbok"
 
-#: libbalsa/address-book.c:332
+#: libbalsa/address-book.c:335
 msgid "Cannot connect to server"
 msgstr "Kan inte ansluta till server"
 
-#: libbalsa/address-book.c:333
+#: libbalsa/address-book.c:336
 msgid "Cannot search in the address book"
 msgstr "Kan inte söka i adressboken"
 
-#: libbalsa/address-book.c:335
+#: libbalsa/address-book.c:338
 msgid "Cannot add duplicate entry"
 msgstr "Kan inte lägga till dublettpost"
 
-#: libbalsa/address-book.c:336
+#: libbalsa/address-book.c:339
 msgid "Unknown error"
 msgstr "Okänt fel"
 
@@ -1453,120 +1466,132 @@ msgstr "Fel vid sändning av meddelande, processen avslutades %d (%s)."
 msgid "Output of the delivery process"
 msgstr "Resultat av leveransprocessen"
 
-#: src/address-book-config.c:142
+#: src/address-book-config.c:145
 msgid "Add Address Book"
 msgstr "Lägg till adressbok"
 
-#: src/address-book-config.c:150
+#: src/address-book-config.c:153
 msgid "Modify Address Book"
 msgstr "Ändra adressbok"
 
-#: src/address-book-config.c:185
+#: src/address-book-config.c:188
 msgid "New Address Book type:"
 msgstr "Typ för ny adressbok:"
 
-#: src/address-book-config.c:194
+#: src/address-book-config.c:197
 msgid "VCard Address Book (GnomeCard)"
 msgstr "VCard-adressbok (GnomeCard)"
 
-#: src/address-book-config.c:207
+#: src/address-book-config.c:210
 msgid "External query (a program)"
 msgstr "Extern fråga (ett program)"
 
-#: src/address-book-config.c:219
+#: src/address-book-config.c:222
 msgid "LDIF Address Book"
 msgstr "LDIF-adressbok"
 
-#: src/address-book-config.c:234
+#: src/address-book-config.c:237
 msgid "LDAP Address Book"
 msgstr "LDAP-adressbok"
 
-#: src/address-book-config.c:242
+#: src/address-book-config.c:245
 msgid "Balsa is not compiled with LDAP support"
 msgstr "Balsa är inte kompilerat med LDAP-stöd"
 
 #. mailbox name
-#: src/address-book-config.c:286 src/address-book-config.c:331
-#: src/address-book-config.c:393 src/address-book-config.c:453
+#: src/address-book-config.c:289 src/address-book-config.c:334
+#: src/address-book-config.c:396 src/address-book-config.c:456
 msgid "Address _Book Name"
 msgstr "Adress_boksnamn"
 
-#: src/address-book-config.c:291
+#: src/address-book-config.c:294
 msgid "_File Name"
 msgstr "_Filnamn"
 
-#: src/address-book-config.c:298
+#: src/address-book-config.c:301
 msgid "Select path for VCARD address book"
 msgstr "Välj sökväg för VCARD-adressboken"
 
-#: src/address-book-config.c:303 src/address-book-config.c:362
-#: src/address-book-config.c:412 src/address-book-config.c:469
+#: src/address-book-config.c:306 src/address-book-config.c:365
+#: src/address-book-config.c:415 src/address-book-config.c:487
 msgid "_Expand aliases as you type"
 msgstr "_Expandera alias när du skriver"
 
-#: src/address-book-config.c:336
+#: src/address-book-config.c:339
 msgid "Load program location"
 msgstr "Plats för sparprogram"
 
-#: src/address-book-config.c:343
+#: src/address-book-config.c:346
 msgid "Select load program for address book"
 msgstr "Välj inläsningsprogram för adressboken"
 
-#: src/address-book-config.c:349
+#: src/address-book-config.c:352
 msgid "Save program location"
 msgstr "Plats för sparprogram"
 
-#: src/address-book-config.c:355
+#: src/address-book-config.c:358
 msgid "Select save program for address book"
 msgstr "Välj sparprogram för adressboken"
 
-#: src/address-book-config.c:399
+#: src/address-book-config.c:402
 msgid "_File name"
 msgstr "_Filnamn"
 
-#: src/address-book-config.c:406
+#: src/address-book-config.c:409
 msgid "Select path for LDIF address book"
 msgstr "Välj sökväg för LDIF-adressboken"
 
-#: src/address-book-config.c:458
+#: src/address-book-config.c:461
 msgid "_Host Name"
 msgstr "_Värdnamn"
 
-#: src/address-book-config.c:463
-msgid "_Base Domain Name"
-msgstr "_Basdomännamn"
+#: src/address-book-config.c:466
+msgid "Base Domain _Name"
+msgstr "Basdomän_namn"
 
-#: src/address-book-config.c:535 src/folder-conf.c:167 src/folder-conf.c:419
+#: src/address-book-config.c:471
+msgid "_User Name (Bind DN)"
+msgstr "_Användarnamn (Bind-DN)"
+
+#: src/address-book-config.c:476
+msgid "_Password"
+msgstr "_Lösenord"
+
+#: src/address-book-config.c:483
+msgid "Enable _TLS"
+msgstr "Aktivera _TLS"
+
+#: src/address-book-config.c:553 src/folder-conf.c:183 src/folder-conf.c:472
 #, c-format
 msgid "Error displaying %s: %s\n"
 msgstr "Fel vid visning: %s: %s\n"
 
-#: src/address-book-config.c:553 src/mailbox-conf.c:435
+#: src/address-book-config.c:571 src/mailbox-conf.c:435
 #: src/pref-manager.c:1523 src/pref-manager.c:2614
 msgid "_Add"
 msgstr "_Lägg till"
 
-#: src/address-book-config.c:632
+#: src/address-book-config.c:650
 #, c-format
 msgid "The address book file path \"%s\" is not correct. %s"
 msgstr "Sökvägen \"%s\" till adressoksfilen är inte korrekt. %s"
 
-#: src/address-book-config.c:635
+#: src/address-book-config.c:653
 #, c-format
 msgid "The load program path \"%s\" is not correct. %s"
 msgstr "Sökvägen \"%s\" till inläsning av program är inte korrekt. %s"
 
-#: src/address-book-config.c:638
+#: src/address-book-config.c:656
 #, c-format
 msgid "The save program path \"%s\" is not correct. %s"
 msgstr "Sökvägen \"%s\" för programsparande är inte korrekt. %s"
 
-#: src/address-book-config.c:641
+#: src/address-book-config.c:659
 #, c-format
 msgid "The path \"%s\" is not correct. %s"
 msgstr "Sökvägen \"%s\" är inte korrekt. %s"
 
-#: src/address-book-config.c:644
+#: src/address-book-config.c:662
 msgid "Do you want to correct the path?"
 msgstr "Vill du rätta till sökvägen?"
 
@@ -1703,7 +1728,7 @@ msgstr "Vidarebefordra _inuti..."
 msgid "_Store Address..."
 msgstr "_Lagra adress..."
 
-#: src/balsa-index.c:2040 src/filter-edit-dialog.c:216 src/mailbox-node.c:764
+#: src/balsa-index.c:2040 src/filter-edit-dialog.c:216 src/mailbox-node.c:864
 #: src/main-window.c:528 src/pref-manager.c:1525 src/pref-manager.c:2618
 msgid "_Delete"
 msgstr "_Ta bort"
@@ -1748,15 +1773,15 @@ msgstr "Totalt"
 msgid "Failed to find mailbox"
 msgstr "Misslyckades med att hitta brevlådan"
 
-#: src/balsa-mblist.c:1810
+#: src/balsa-mblist.c:1765
 msgid "_Other..."
 msgstr "_Annan..."
 
-#: src/balsa-mblist.c:1871
+#: src/balsa-mblist.c:1826
 msgid "Choose destination folder"
 msgstr "Välj destinationsmapp"
 
-#: src/balsa-mblist.c:2183
+#: src/balsa-mblist.c:2138
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr "Visad brevlåda: %s med %ld meddelanden, %ld nya"
@@ -2186,7 +2211,7 @@ msgid "AND"
 msgstr "OCH"
 
 #. new button
-#: src/filter-edit-dialog.c:210 src/mailbox-node.c:736 src/main-window.c:284
+#: src/filter-edit-dialog.c:210 src/mailbox-node.c:836 src/main-window.c:284
 msgid "_New"
 msgstr "_Nytt"
 
@@ -2309,66 +2334,66 @@ msgid ""
 msgstr ""
 "Filterdialogen är öppen, stäng den innan du kan köra filter på någon brevlåda"
 
-#: src/folder-conf.c:191
+#: src/folder-conf.c:237
 msgid "Remote IMAP folder"
 msgstr "IMAP-fjärrmapp"
 
-#: src/folder-conf.c:194 src/folder-conf.c:573 src/mailbox-conf.c:446
+#: src/folder-conf.c:240 src/folder-conf.c:626 src/mailbox-conf.c:446
 msgid "_Update"
 msgstr "_Uppdatera"
 
-#: src/folder-conf.c:194 src/folder-conf.c:573
+#: src/folder-conf.c:240 src/folder-conf.c:626
 msgid "_Create"
 msgstr "_Skapa"
 
-#: src/folder-conf.c:201
+#: src/folder-conf.c:255
 msgid "Remote IMAP folder set"
 msgstr "Samling med IMAP-fjärrmappar"
 
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:208
+#: src/folder-conf.c:262
 msgid "Descriptive _Name:"
 msgstr "Beskrivande _namn:"
 
 #. pop server
-#: src/folder-conf.c:214 src/mailbox-conf.c:892 src/mailbox-conf.c:980
+#: src/folder-conf.c:268 src/mailbox-conf.c:895 src/mailbox-conf.c:983
 msgid "_Server:"
 msgstr "_Server:"
 
 #. username
-#: src/folder-conf.c:220 src/mailbox-conf.c:899
+#: src/folder-conf.c:274 src/mailbox-conf.c:902
 msgid "Use_r name:"
 msgstr "Använda_rnamn:"
 
-#: src/folder-conf.c:226
+#: src/folder-conf.c:280
 msgid "_Remember password"
 msgstr "_Kom ihåg lösenord"
 
-#: src/folder-conf.c:231
+#: src/folder-conf.c:285
 msgid "_Password:"
 msgstr "_Lösenord:"
 
-#: src/folder-conf.c:236
+#: src/folder-conf.c:290
 msgid "Subscribed _folders only"
 msgstr "Endast prenumererade _mappar"
 
-#: src/folder-conf.c:238
+#: src/folder-conf.c:292
 msgid "_Always show INBOX"
 msgstr "_Visa alltid INBOX"
 
-#: src/folder-conf.c:241
+#: src/folder-conf.c:295
 msgid "_Prefix"
 msgstr "_Prefix"
 
-#: src/folder-conf.c:247
+#: src/folder-conf.c:301
 msgid "Use SS_L (IMAPS)"
 msgstr "Använd SS_L (IMAPS)"
 
-#: src/folder-conf.c:367
+#: src/folder-conf.c:420
 msgid "Select parent folder"
 msgstr "Välj föräldermapp"
 
-#: src/folder-conf.c:444
+#: src/folder-conf.c:497
 #, c-format
 msgid ""
 "Renaming INBOX is special!\n"
@@ -2383,19 +2408,19 @@ msgstr ""
 "INBOX och dess undermappar kommer att\n"
 "finnas kvar. Vad vill du göra?"
 
-#: src/folder-conf.c:451
+#: src/folder-conf.c:504
 msgid "Question"
 msgstr "Fråga"
 
-#: src/folder-conf.c:454
+#: src/folder-conf.c:507
 msgid "Rename INBOX"
 msgstr "Byt namn på INBOX"
 
-#: src/folder-conf.c:455 src/toolbar-factory.c:132
+#: src/folder-conf.c:508 src/toolbar-factory.c:132
 msgid "Cancel"
 msgstr "Avbryt"
 
-#: src/folder-conf.c:546
+#: src/folder-conf.c:599
 msgid ""
 "An IMAP folder that is not a mailbox\n"
 "has no properties that can be changed."
@@ -2403,36 +2428,36 @@ msgstr ""
 "En IMAP-mapp som inte är en brevlåda\n"
 "har inga egenskaper som kan ändras."
 
-#: src/folder-conf.c:570
+#: src/folder-conf.c:623
 msgid "Remote IMAP subfolder"
 msgstr "IMAP-fjärrundermapp"
 
-#: src/folder-conf.c:582
+#: src/folder-conf.c:635
 msgid "Rename or move subfolder"
 msgstr "Byt namn på eller flytta undermapp"
 
-#: src/folder-conf.c:583
+#: src/folder-conf.c:636
 msgid "Create subfolder"
 msgstr "Skapa undermapp"
 
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:590
+#: src/folder-conf.c:643
 msgid "_Folder name:"
 msgstr "_Mappnamn:"
 
-#: src/folder-conf.c:596
+#: src/folder-conf.c:649
 msgid "_Subfolder of:"
 msgstr "_Undermapp till:"
 
-#: src/folder-conf.c:601
+#: src/folder-conf.c:654
 msgid "Browse..."
 msgstr "Bläddra..."
 
-#: src/folder-conf.c:609 src/mailbox-conf.c:869 src/mailbox-conf.c:1034
+#: src/folder-conf.c:662 src/mailbox-conf.c:872 src/mailbox-conf.c:1037
 msgid "_Identity:"
 msgstr "_Identitet:"
 
-#: src/folder-conf.c:635
+#: src/folder-conf.c:690
 msgid ""
 "This folder is not stored in configuration.I do not yet know how to remove "
 "it from remote server."
@@ -2440,7 +2465,7 @@ msgstr ""
 "Denna mapp finns inte lagrad i konfigurationen. Jag vet ännu inte om hur jag "
 "ska ta bort den från fjärrservern."
 
-#: src/folder-conf.c:645
+#: src/folder-conf.c:700
 #, c-format
 msgid ""
 "This will remove the folder \"%s\" from the list.\n"
@@ -2450,7 +2475,7 @@ msgstr ""
 "Du kan använda \"Ny IMAP-mapp\" senare för att lägga till denna\n"
 "mapp igen.\n"
 
-#: src/folder-conf.c:650
+#: src/folder-conf.c:705
 msgid "Confirm"
 msgstr "Bekräfta"
 
@@ -2572,146 +2597,146 @@ msgstr ""
 "%s"
 
 #. mailbox name
-#: src/mailbox-conf.c:838 src/mailbox-conf.c:886 src/mailbox-conf.c:974
+#: src/mailbox-conf.c:841 src/mailbox-conf.c:889 src/mailbox-conf.c:977
 msgid "Mailbox _Name:"
 msgstr "Brevlåde_namn:"
 
 #. path to file
-#: src/mailbox-conf.c:846
+#: src/mailbox-conf.c:849
 msgid "Mailbox _Path:"
 msgstr "Sökväg till _brevlådan:"
 
-#: src/mailbox-conf.c:848
+#: src/mailbox-conf.c:851
 msgid "Mailbox Path"
 msgstr "Sökväg till brevlådan"
 
 #. password field
-#: src/mailbox-conf.c:905 src/mailbox-conf.c:1001
+#: src/mailbox-conf.c:908 src/mailbox-conf.c:1004
 msgid "Pass_word:"
 msgstr "_Lösenord:"
 
-#: src/mailbox-conf.c:912
+#: src/mailbox-conf.c:915
 msgid "Use _APOP Authentication"
 msgstr "Använd _APOP-autentisering"
 
-#: src/mailbox-conf.c:918
+#: src/mailbox-conf.c:921
 msgid "_Delete messages from server after download"
 msgstr "_Ta bort meddelanden från servern efter hämtning"
 
-#: src/mailbox-conf.c:923
+#: src/mailbox-conf.c:926
 msgid "_Filter messages through procmail"
 msgstr "_Filtrera meddelanden genom procmail"
 
-#: src/mailbox-conf.c:928
+#: src/mailbox-conf.c:931
 msgid "_Enable check for new mail"
 msgstr "_Använd kontroll av ny e-post"
 
-#: src/mailbox-conf.c:938
+#: src/mailbox-conf.c:941
 msgid "Use SS_L (pop3s)"
 msgstr "Använd SS_L (pop3s)"
 
 #. username
-#: src/mailbox-conf.c:987
+#: src/mailbox-conf.c:990
 msgid "_Username:"
 msgstr "_Användarnamn:"
 
-#: src/mailbox-conf.c:995
+#: src/mailbox-conf.c:998
 msgid "_Remember Password"
 msgstr "_Kom ihåg lösenord"
 
-#: src/mailbox-conf.c:1006
+#: src/mailbox-conf.c:1009
 msgid "F_older Path:"
 msgstr "Sökväg till _mapp:"
 
-#: src/mailbox-conf.c:1029
+#: src/mailbox-conf.c:1032
 msgid "Use SS_L (imaps)"
 msgstr "Använd SS_L (imaps)"
 
-#: src/mailbox-node.c:230
+#: src/mailbox-node.c:239
 msgid "The folder edition to be written."
 msgstr "Mappversionen att skriva."
 
-#: src/mailbox-node.c:366
+#: src/mailbox-node.c:372
 #, c-format
 msgid "Scanning %s. Please wait..."
 msgstr "Genomsöker %s. Var vänlig vänta..."
 
-#: src/mailbox-node.c:721
+#: src/mailbox-node.c:821
 msgid "Local _mbox mailbox..."
 msgstr "Lokal _mbox-brevlåda..."
 
-#: src/mailbox-node.c:723
+#: src/mailbox-node.c:823
 msgid "Local Mail_dir mailbox..."
 msgstr "Lokal Mail_dir-brevlåda..."
 
-#: src/mailbox-node.c:725
+#: src/mailbox-node.c:825
 msgid "Local M_H mailbox..."
 msgstr "Lokal M_H-brevlåda..."
 
-#: src/mailbox-node.c:727
+#: src/mailbox-node.c:827
 msgid "Remote _IMAP mailbox..."
 msgstr "_IMAP-fjärrbrevlåda..."
 
-#: src/mailbox-node.c:730
+#: src/mailbox-node.c:830
 msgid "Remote IMAP _folder..."
 msgstr "IMAP-fjärr_mapp..."
 
-#: src/mailbox-node.c:732
+#: src/mailbox-node.c:832
 msgid "Remote IMAP _subfolder..."
 msgstr "IMAP-fjärr_undermapp..."
 
 #. clicked on the empty space
-#: src/mailbox-node.c:743 src/mailbox-node.c:775 src/mailbox-node.c:796
+#: src/mailbox-node.c:843 src/mailbox-node.c:875 src/mailbox-node.c:896
 msgid "_Rescan"
 msgstr "_Läs om"
 
-#: src/mailbox-node.c:752
+#: src/mailbox-node.c:852
 msgid "_Open"
 msgstr "_Öppna"
 
-#: src/mailbox-node.c:755 src/main-window.c:612
+#: src/mailbox-node.c:855 src/main-window.c:612
 msgid "_Close"
 msgstr "_Stäng"
 
-#: src/mailbox-node.c:761
+#: src/mailbox-node.c:861
 msgid "_Properties..."
 msgstr "_Egenskaper..."
 
-#: src/mailbox-node.c:771
+#: src/mailbox-node.c:871
 msgid "_Subscribe"
 msgstr "_Prenumerera"
 
-#: src/mailbox-node.c:773
+#: src/mailbox-node.c:873
 msgid "_Unsubscribe"
 msgstr "_Säg upp prenumeration"
 
-#: src/mailbox-node.c:781
+#: src/mailbox-node.c:881
 msgid "Mark as _Inbox"
 msgstr "Markera som _inkorg"
 
-#: src/mailbox-node.c:784
+#: src/mailbox-node.c:884
 msgid "_Mark as Sentbox"
 msgstr "_Markera som skickatkorg"
 
-#: src/mailbox-node.c:787
+#: src/mailbox-node.c:887
 msgid "Mark as _Trash"
 msgstr "Markera som _papperskorg"
 
-#: src/mailbox-node.c:790
+#: src/mailbox-node.c:890
 msgid "Mark as D_raftbox"
 msgstr "Markera som u_tkastkorg"
 
 #. FIXME : No test on mailbox type is made yet, should we ?
-#: src/mailbox-node.c:793
+#: src/mailbox-node.c:893
 msgid "_Edit/Apply filters"
 msgstr "_Redigera/Tillämpa filter"
 
-#: src/mailbox-node.c:882
+#: src/mailbox-node.c:990
 #, c-format
 msgid "Local mailbox %s loaded as: %s\n"
 msgstr "Lokala brevlådan %s inläst som: %s\n"
 
-#: src/mailbox-node.c:914
+#: src/mailbox-node.c:1015
 #, c-format
 msgid "Local folder %s\n"
 msgstr "Lokal mapp %s\n"

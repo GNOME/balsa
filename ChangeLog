@@ -1,4 +1,9 @@
 2003-09-28  Carlos Morgado  <chbm gnome.org>
+	
+	* libbalsa/mailbox.c (libbalsa_mailbox_copy_message): 
+	body_ref messages
+
+2003-09-28  Carlos Morgado  <chbm gnome.org>
 
 	* libbalsa/mailbox_mh.c (libbalsa_mailbox_mh_add_message): 
 	* libbalsa/mailbox_maildir.c (libbalsa_mailbox_maildir_add_message): 

@@ -995,7 +995,11 @@ messages_status_changed_cb(LibBalsaMailbox * mb, GList * messages,
 
 int libbalsa_mailbox_copy_message(LibBalsaMessage *message, LibBalsaMailbox *dest)
 {
-    int retval = LIBBALSA_MAILBOX_GET_CLASS(dest)->add_message ( dest, message );
+    int retval;
+
+    libbalsa_message_body_ref (message, FALSE);
+    retval = LIBBALSA_MAILBOX_GET_CLASS(dest)->add_message ( dest, message );
+    libbalsa_message_body_unref (message);
     if (retval > 0 && LIBBALSA_MESSAGE_IS_UNREAD(message))
 	dest->has_unread_messages = TRUE;
     

@@ -381,11 +381,14 @@ balsa_send_message_real(MessageQueueItem *first_message)
 	
 	if (current_message->delete == 1)
 	{
-	    if ( current_message->fcc && LIBBALSA_IS_MAILBOX_LOCAL(current_message->fcc) )
-		mutt_write_fcc (
-		    LIBBALSA_MAILBOX_LOCAL (current_message->fcc)->path,
-		    current_message->message, NULL, 0, NULL);
-	    
+	  if ( current_message->fcc) {
+	    LibBalsaMailbox *fcc_box = balsa_find_mbox_by_name(
+	      current_message->fcc);
+	    if( LIBBALSA_IS_MAILBOX_LOCAL(fcc_box) )
+	      mutt_write_fcc (
+		LIBBALSA_MAILBOX_LOCAL (fcc_box)->path,
+		current_message->message, NULL, 0, NULL);
+	  }
 #ifdef BALSA_USE_THREADS
 		 MSGSENDTHREAD(delete_message, MSGSENDTHREADDELETE," ",
 		                         current_message->orig, NULL, 0);
@@ -471,8 +474,8 @@ message2HEADER(LibBalsaMessage * message, HEADER * hdr)
 }
 
 gboolean
-libbalsa_message_postpone (LibBalsaMessage * message, LibBalsaMessage * reply_message, 
-				   gchar * fcc)
+libbalsa_message_postpone (LibBalsaMessage * message, 
+			   LibBalsaMessage * reply_message, gchar * fcc)
 {
   HEADER *msg;
   BODY *last, *newbdy;

@@ -1,3 +1,7 @@
+2004-09-25 09:48  Albrecht Dreß <albrecht.dress@arcor.de>
+
+	* src/balsa-message.c: check info->widget != NULL.
+
 2004-09-25 05:26  PeterB
 
 	* libbalsa/gmime-gpgme-context.c: use ctx->micalg as the hash name

@@ -7,8 +7,9 @@
 	the gpg subkey status; (2) improve dealing with low-validity uid's
 	for encryption; (3) several smaller fixes.
 
-2005-03-23 05:53  PeterB
+2005-03-23 PeterB
 
+	* libbalsa/rfc3156.c: fix bug 171415.
 	* libbalsa/address-book-ldap.c, src/ab-main.c: complete migration
 	from GnomeConfig to LibbalsaConf.
 	* src/sendmsg-window.c: strip parameter variables from exec string.

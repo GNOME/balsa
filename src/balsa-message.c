@@ -22,12 +22,12 @@
 #include <string.h>
 #include "balsa-message.h"
 /*
-#define HTML_HEAD "<html><body bgcolor=#ffffff><pre>"
-#define HTML_FOOT "</pre></body></html>"
-*/
+   #define HTML_HEAD "<html><body bgcolor=#ffffff><pre>"
+   #define HTML_FOOT "</pre></body></html>"
+ */
 
-#define HTML_HEAD "<html><body bgcolor=#ffffff><p><tt>"
-#define HTML_FOOT "</tt></p></body></html>"
+#define HTML_HEAD "<html><body bgcolor=#ffffff><p><tt>\n"
+#define HTML_FOOT "</tt></p></body></html>\n"
 
 static GString *text2html (char *buff);
 
@@ -181,10 +181,10 @@ balsa_message_set (BalsaMessage * bmessage,
   mail_free_stringlist (&lines);
 
   /* separate the headers from the body */
-  buff = g_realloc (buff, strlen (buff) + strlen ("</tt></p><p><tt>") + 1);
-  strcat (buff, "</tt></p><p><tt>");
+  buff = g_realloc (buff, strlen (buff) + strlen ("</tt></p><p><tt>\n") + 1);
+  strcat (buff, "</tt></p><p><tt>\n");
 
-  
+
   /* message body */
   c = mail_fetchtext (stream, mesgno);
 
@@ -206,6 +206,7 @@ balsa_message_set (BalsaMessage * bmessage,
 #endif
 /* set message contents */
   gtk_xmhtml_source (GTK_XMHTML (GTK_BIN (bmessage)->child), buff);
+  printf (buff);
   g_free (buff);
 }
 
@@ -330,149 +331,159 @@ text2html (char *buff)
       if (buff[i] == '\r' && buff[i + 1] == '\n')
 	{
 	  gs = g_string_append (gs, "<br>\n");
+	  i++;
 	}
-      else if (buff[i] == '\r')
+      else if (buff[i] == '\n' && buff[i + 1] == '\r')
 	{
 	  gs = g_string_append (gs, "<br>\n");
+	  i++;
 	}
       else if (buff[i] == '\n')
 	{
 	  gs = g_string_append (gs, "<br>\n");
 	}
-      switch (buff[i])
+      else if (buff[i] == '\r')
 	{
-	case '<':
-	  gs = g_string_append (gs, "&lt;");
-	  break;
-	case '>':
-	  gs = g_string_append (gs, "&gt;");
-	  break;
-	case '"':
-	  gs = g_string_append (gs, "&quot;");
-	  break;
-	case '&':
-	  gs = g_string_append (gs, "&amp;");
-	  break;
+	  gs = g_string_append (gs, "<br>\n");
+	}
+      else
+	switch (buff[i])
+	  {
+	  case ' ':
+	    gs = g_string_append (gs, "&nbsp;");
+	    break;
+	  case '<':
+	    gs = g_string_append (gs, "&lt;");
+	    break;
+	  case '>':
+	    gs = g_string_append (gs, "&gt;");
+	    break;
+	  case '"':
+	    gs = g_string_append (gs, "&quot;");
+	    break;
+	  case '&':
+	    gs = g_string_append (gs, "&amp;");
+	    break;
 /* 
  * Weird stuff, but stuff that should be taken care of too
  * I might be missing something, lemme know?
  */
-	case '©':
-	  gs = g_string_append (gs, "&copy;");
-	  break;
-	case '®':
-	  gs = g_string_append (gs, "&reg;");
-	  break;
-	case 'à':
-	  gs = g_string_append (gs, "&agrave;");
-	  break;
-	case 'À':
-	  gs = g_string_append (gs, "&Agrave;");
-	  break;
-	case 'â':
-	  gs = g_string_append (gs, "&acirc;");
-	  break;
-	case 'ä':
-	  gs = g_string_append (gs, "&auml;");
-	  break;
-	case 'Ä':
-	  gs = g_string_append (gs, "&Auml;");
-	  break;
-	case 'Â':
-	  gs = g_string_append (gs, "&Acirc;");
-	  break;
-	case 'å':
-	  gs = g_string_append (gs, "&aring;");
-	  break;
-	case 'Å':
-	  gs = g_string_append (gs, "&Aring;");
-	  break;
-	case 'æ':
-	  gs = g_string_append (gs, "&aelig;");
-	  break;
-	case 'Æ':
-	  gs = g_string_append (gs, "&AElig;");
-	  break;
-	case 'ç':
-	  gs = g_string_append (gs, "&ccedil;");
-	  break;
-	case 'Ç':
-	  gs = g_string_append (gs, "&Ccedil;");
-	  break;
-	case 'é':
-	  gs = g_string_append (gs, "&eacute;");
-	  break;
-	case 'É':
-	  gs = g_string_append (gs, "&Eacute;");
-	  break;
-	case 'è':
-	  gs = g_string_append (gs, "&egrave;");
-	  break;
-	case 'È':
-	  gs = g_string_append (gs, "&Egrave;");
-	  break;
-	case 'ê':
-	  gs = g_string_append (gs, "&ecirc;");
-	  break;
-	case 'Ê':
-	  gs = g_string_append (gs, "&Ecirc;");
-	  break;
-	case 'ë':
-	  gs = g_string_append (gs, "&euml;");
-	  break;
-	case 'Ë':
-	  gs = g_string_append (gs, "&Euml;");
-	  break;
-	case 'ï':
-	  gs = g_string_append (gs, "&iuml;");
-	  break;
-	case 'Ï':
-	  gs = g_string_append (gs, "&Iuml;");
-	  break;
-	case 'ô':
-	  gs = g_string_append (gs, "&ocirc;");
-	  break;
-	case 'Ô':
-	  gs = g_string_append (gs, "&Ocirc;");
-	  break;
-	case 'ö':
-	  gs = g_string_append (gs, "&ouml;");
-	  break;
-	case 'Ö':
-	  gs = g_string_append (gs, "&Ouml;");
-	  break;
-	case 'ø':
-	  gs = g_string_append (gs, "&oslash;");
-	  break;
-	case 'Ø':
-	  gs = g_string_append (gs, "&Oslash;");
-	  break;
-	case 'ß':
-	  gs = g_string_append (gs, "&szlig;");
-	  break;
-	case 'ù':
-	  gs = g_string_append (gs, "&ugrave;");
-	  break;
-	case 'Ù':
-	  gs = g_string_append (gs, "&Ugrave;");
-	  break;
-	case 'û':
-	  gs = g_string_append (gs, "&ucirc;");
-	  break;
-	case 'Û':
-	  gs = g_string_append (gs, "&Ucirc;");
-	  break;
-	case 'ü':
-	  gs = g_string_append (gs, "&uuml;");
-	  break;
-	case 'Ü':
-	  gs = g_string_append (gs, "&Uuml;");
-	  break;
+	  case '©':
+	    gs = g_string_append (gs, "&copy;");
+	    break;
+	  case '®':
+	    gs = g_string_append (gs, "&reg;");
+	    break;
+	  case 'à':
+	    gs = g_string_append (gs, "&agrave;");
+	    break;
+	  case 'À':
+	    gs = g_string_append (gs, "&Agrave;");
+	    break;
+	  case 'â':
+	    gs = g_string_append (gs, "&acirc;");
+	    break;
+	  case 'ä':
+	    gs = g_string_append (gs, "&auml;");
+	    break;
+	  case 'Ä':
+	    gs = g_string_append (gs, "&Auml;");
+	    break;
+	  case 'Â':
+	    gs = g_string_append (gs, "&Acirc;");
+	    break;
+	  case 'å':
+	    gs = g_string_append (gs, "&aring;");
+	    break;
+	  case 'Å':
+	    gs = g_string_append (gs, "&Aring;");
+	    break;
+	  case 'æ':
+	    gs = g_string_append (gs, "&aelig;");
+	    break;
+	  case 'Æ':
+	    gs = g_string_append (gs, "&AElig;");
+	    break;
+	  case 'ç':
+	    gs = g_string_append (gs, "&ccedil;");
+	    break;
+	  case 'Ç':
+	    gs = g_string_append (gs, "&Ccedil;");
+	    break;
+	  case 'é':
+	    gs = g_string_append (gs, "&eacute;");
+	    break;
+	  case 'É':
+	    gs = g_string_append (gs, "&Eacute;");
+	    break;
+	  case 'è':
+	    gs = g_string_append (gs, "&egrave;");
+	    break;
+	  case 'È':
+	    gs = g_string_append (gs, "&Egrave;");
+	    break;
+	  case 'ê':
+	    gs = g_string_append (gs, "&ecirc;");
+	    break;
+	  case 'Ê':
+	    gs = g_string_append (gs, "&Ecirc;");
+	    break;
+	  case 'ë':
+	    gs = g_string_append (gs, "&euml;");
+	    break;
+	  case 'Ë':
+	    gs = g_string_append (gs, "&Euml;");
+	    break;
+	  case 'ï':
+	    gs = g_string_append (gs, "&iuml;");
+	    break;
+	  case 'Ï':
+	    gs = g_string_append (gs, "&Iuml;");
+	    break;
+	  case 'ô':
+	    gs = g_string_append (gs, "&ocirc;");
+	    break;
+	  case 'Ô':
+	    gs = g_string_append (gs, "&Ocirc;");
+	    break;
+	  case 'ö':
+	    gs = g_string_append (gs, "&ouml;");
+	    break;
+	  case 'Ö':
+	    gs = g_string_append (gs, "&Ouml;");
+	    break;
+	  case 'ø':
+	    gs = g_string_append (gs, "&oslash;");
+	    break;
+	  case 'Ø':
+	    gs = g_string_append (gs, "&Oslash;");
+	    break;
+	  case 'ß':
+	    gs = g_string_append (gs, "&szlig;");
+	    break;
+	  case 'ù':
+	    gs = g_string_append (gs, "&ugrave;");
+	    break;
+	  case 'Ù':
+	    gs = g_string_append (gs, "&Ugrave;");
+	    break;
+	  case 'û':
+	    gs = g_string_append (gs, "&ucirc;");
+	    break;
+	  case 'Û':
+	    gs = g_string_append (gs, "&Ucirc;");
+	    break;
+	  case 'ü':
+	    gs = g_string_append (gs, "&uuml;");
+	    break;
+	  case 'Ü':
+	    gs = g_string_append (gs, "&Uuml;");
+	    break;
 
-	default:
-	  gs = g_string_append_c (gs, buff[i]);
-	  break;
-	}
+	  default:
+	    gs = g_string_append_c (gs, buff[i]);
+	    break;
+	  }
     }
   return gs;
 }

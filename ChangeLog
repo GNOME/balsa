@@ -1,3 +1,43 @@
+2005-02-06 18:45   Albrecht Dreß <albrecht dot dress at arcor dot de>
+
+	* configure.in, images/Makefile.am, images/16x16/Makefile,
+	images/16x16/Makefile.am, images/16x16/Makefile.in,
+	images/16x16/balsa-encrypted.png, images/16x16/balsa-mark-all.png,
+	images/16x16/balsa-mbox-draft.png,
+	images/16x16/balsa-mbox-sent.png,
+	images/16x16/balsa-mbox-tray-empty.png,
+	images/16x16/balsa-mbox-tray-full.png,
+	images/16x16/balsa-next-flagged.png,
+	images/16x16/balsa-next-part.png,
+	images/16x16/balsa-next-unread.png, images/16x16/balsa-next.png,
+	images/16x16/balsa-postpone.png,
+	images/16x16/balsa-previous-part.png,
+	images/16x16/balsa-previous.png, images/16x16/balsa-reply-all.png,
+	images/16x16/balsa-signature-bad.png,
+	images/16x16/balsa-signature-good.png,
+	images/16x16/balsa-signature-notrust.png,
+	images/16x16/balsa-signature-unknown.png, images/24x24/Makefile,
+	images/24x24/Makefile.am, images/24x24/Makefile.in,
+	images/24x24/balsa-crypt-check.png, images/24x24/balsa-encrypt.png,
+	images/24x24/balsa-encrypted.png, images/24x24/balsa-mark-all.png,
+	images/24x24/balsa-marked-new.png,
+	images/24x24/balsa-next-flagged.png,
+	images/24x24/balsa-next-part.png,
+	images/24x24/balsa-next-unread.png, images/24x24/balsa-next.png,
+	images/24x24/balsa-postpone.png, images/24x24/balsa-preview.png,
+	images/24x24/balsa-previous-part.png,
+	images/24x24/balsa-previous.png, images/24x24/balsa-reply-all.png,
+	images/24x24/balsa-sign.png, images/24x24/balsa-signature-bad.png,
+	images/24x24/balsa-signature-good.png,
+	images/24x24/balsa-signature-notrust.png,
+	images/24x24/balsa-signature-unknown.png,
+	images/24x24/balsa-trash-empty.png, images/mimetypes/Makefile.am,
+	src/balsa-icons.c, src/balsa-icons.h, src/balsa-index.c,
+	src/balsa-mblist.c, src/balsa-message.c, src/filter-edit-dialog.c,
+	src/main-window.c, src/message-window.c, src/sendmsg-window.c,
+	src/spell-check.c, src/toolbar-factory.c, src/toolbar-prefs.c:
+	themable icons.
+
 2005-02-06  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: fix some corner cases for

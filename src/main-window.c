@@ -31,16 +31,7 @@
 
 
 /* pixmaps for the toolbar */
-#include "pixmaps/p1.xpm"
-#include "pixmaps/p4.xpm"
-#include "pixmaps/p5.xpm"
-#include "pixmaps/p6.xpm"
-#include "pixmaps/p8.xpm"
-#include "pixmaps/p10.xpm"
-#include "pixmaps/p11.xpm"
-#include "pixmaps/p14.xpm"
-#include "pixmaps/tb_mail_reply.xpm"
-#include "pixmaps/tb_mail_forward.xpm"
+#include "pixmaps/tb_mail_compose.xpm"
 
 GtkWidget *bottom_pbar;
 
@@ -170,21 +161,21 @@ new_icon (gchar ** xpm, GtkWidget * window)
 
 static void
 set_toolbar_icons (GtkWidget * widget,
-		   GtkWidget *data)
+		   GtkWidget * data)
 {
   gtk_toolbar_set_style (GTK_TOOLBAR (data), GTK_TOOLBAR_ICONS);
 }
 
 static void
 set_toolbar_text (GtkWidget * widget,
-		  GtkWidget *data)
+		  GtkWidget * data)
 {
   gtk_toolbar_set_style (GTK_TOOLBAR (data), GTK_TOOLBAR_TEXT);
 }
 
 static void
 set_toolbar_both (GtkWidget * widget,
-		  GtkWidget *data)
+		  GtkWidget * data)
 {
   gtk_toolbar_set_style (GTK_TOOLBAR (data), GTK_TOOLBAR_BOTH);
 }
@@ -245,7 +236,7 @@ create_toolbar (MainWindow * mw)
 			     "Compose",
 			     "Compose Message",
 			     NULL,
-			     new_icon (p5_xpm, window),
+			     new_icon (tb_mail_compose_xpm, window),
 			     GTK_SIGNAL_FUNC (new_message),
 			     "Compose Message");
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
@@ -255,7 +246,7 @@ create_toolbar (MainWindow * mw)
 			     "Reply",
 			     "Reply",
 			     NULL,
-			     new_icon (tb_mail_reply_xpm, window),
+	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_RPL),
 			     GTK_SIGNAL_FUNC (replyto_message),
 			     "Reply");
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
@@ -265,7 +256,8 @@ create_toolbar (MainWindow * mw)
 			     "Forward",
 			     "Forward",
 			     NULL,
-  new_icon (tb_mail_forward_xpm, window), GTK_SIGNAL_FUNC (forward_message),
+	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_FWD),
+			     GTK_SIGNAL_FUNC (forward_message),
 			     "Forward");
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
@@ -294,19 +286,19 @@ create_toolbar (MainWindow * mw)
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+/*
+   toolbarbutton =
+   gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+   "Addresses",
+   "Address Book",
+   NULL,
+   new_icon (p14_xpm, window),
+   GTK_SIGNAL_FUNC (addressbook_window_new),
+   "Address Book");
+   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
-  toolbarbutton =
-    gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-			     "Addresses",
-			     "Address Book",
-			     NULL,
-			     new_icon (p14_xpm, window),
-			     GTK_SIGNAL_FUNC (addressbook_window_new),
-			     "Address Book");
-  GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
-
-  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
-
+   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+ */
 
   gtk_widget_show (toolbar);
   return toolbar;
@@ -343,25 +335,25 @@ create_menu (MainWindow * mw)
   w = gtk_menu_item_new ();
   gtk_widget_show (w);
   gtk_menu_append (GTK_MENU (menu), w);
+/*
+   w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Save mailbox..."));
+   gtk_widget_show (w);
+   gtk_menu_append (GTK_MENU (menu), w);
+   menu_items[i++] = w;
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Save mailbox..."));
-  gtk_widget_show (w);
-  gtk_menu_append (GTK_MENU (menu), w);
-  menu_items[i++] = w;
+   w = gtk_menu_item_new ();
+   gtk_widget_show (w);
+   gtk_menu_append (GTK_MENU (menu), w);
 
-  w = gtk_menu_item_new ();
-  gtk_widget_show (w);
-  gtk_menu_append (GTK_MENU (menu), w);
+   w = gnome_stock_menu_item (GNOME_STOCK_MENU_PRINT, _ ("Print..."));
+   gtk_widget_show (w);
+   gtk_menu_append (GTK_MENU (menu), w);
+   menu_items[i++] = w;
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_PRINT, _ ("Print..."));
-  gtk_widget_show (w);
-  gtk_menu_append (GTK_MENU (menu), w);
-  menu_items[i++] = w;
-
-  w = gtk_menu_item_new ();
-  gtk_widget_show (w);
-  gtk_menu_append (GTK_MENU (menu), w);
-
+   w = gtk_menu_item_new ();
+   gtk_widget_show (w);
+   gtk_menu_append (GTK_MENU (menu), w);
+ */
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_EXIT, _ ("Exit"));
   gtk_widget_show (w);
   gtk_widget_install_accelerator (w, accel, "activate", 'Q', GDK_CONTROL_MASK);
@@ -390,7 +382,7 @@ create_menu (MainWindow * mw)
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Reply"));
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_RPL, _ ("Reply"));
   gtk_widget_show (w);
   gtk_widget_install_accelerator (w, accel, "activate", 'R', GDK_CONTROL_MASK);
   gtk_signal_connect_object (GTK_OBJECT (w),
@@ -399,13 +391,13 @@ create_menu (MainWindow * mw)
 			     NULL);
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
-
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Reply to All"));
-  gtk_widget_show (w);
-  gtk_menu_append (GTK_MENU (menu), w);
-  menu_items[i++] = w;
-
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Foward"));
+/*
+   w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Reply to All"));
+   gtk_widget_show (w);
+   gtk_menu_append (GTK_MENU (menu), w);
+   menu_items[i++] = w;
+ */
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_FWD, _ ("Foward"));
   gtk_widget_show (w);
   gtk_signal_connect_object (GTK_OBJECT (w),
 			     "activate",
@@ -413,17 +405,17 @@ create_menu (MainWindow * mw)
 			     NULL);
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
+/*
+   w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Redirect"));
+   gtk_widget_show (w);
+   gtk_menu_append (GTK_MENU (menu), w);
+   menu_items[i++] = w;
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Redirect"));
-  gtk_widget_show (w);
-  gtk_menu_append (GTK_MENU (menu), w);
-  menu_items[i++] = w;
-
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Send again"));
-  gtk_widget_show (w);
-  gtk_menu_append (GTK_MENU (menu), w);
-  menu_items[i++] = w;
-
+   w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Send again"));
+   gtk_widget_show (w);
+   gtk_menu_append (GTK_MENU (menu), w);
+   menu_items[i++] = w;
+ */
   w = gtk_menu_item_new ();
   gtk_widget_show (w);
   gtk_menu_append (GTK_MENU (menu), w);

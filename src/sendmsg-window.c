@@ -27,11 +27,6 @@
 #include "sendmsg-window.h"
 #include "index.h"
 #include "mailbox.h"
-#include "pixmaps/p8.xpm"
-#include "pixmaps/p13.xpm"
-#include "pixmaps/p14.xpm"
-#include "pixmaps/p15.xpm"
-#include "pixmaps/p16.xpm"
 
 gint delete_event (GtkWidget *, gpointer);
 
@@ -72,32 +67,30 @@ create_toolbar (BalsaSendmsg * bsmw)
 					GTK_SIGNAL_FUNC (send_smtp_message),
 					   bsmw);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
+/*
+   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
-  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+   toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+   "Spell Check", "Spell Check", NULL,
+   new_icon (p13_xpm, window), NULL,
+   "Spell Check");
+   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
-  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-					 "Spell Check", "Spell Check", NULL,
-					   new_icon (p13_xpm, window), NULL,
-					   "Spell Check");
-  GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
+   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
-  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+   toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+   "Address Book", "Address Book", NULL,
+   new_icon (p14_xpm, window), NULL,
+   "Address Book");
 
-  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-				       "Address Book", "Address Book", NULL,
-					   new_icon (p14_xpm, window), NULL,
-					   "Address Book");
+   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
-  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
-
-  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-					   "Print", "Print", NULL,
-	       gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_PRINT),
-					   NULL, "Print");
-  GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
-
-  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
-
+   toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+   "Print", "Print", NULL,
+   gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_PRINT),
+   NULL, "Print");
+   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
+ */
   gtk_widget_show (toolbar);
   return toolbar;
 }
@@ -363,7 +356,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
 
   msg->text = gtk_text_new (NULL, NULL);
   gtk_text_set_editable (GTK_TEXT (msg->text), TRUE);
-  gtk_text_set_word_wrap(GTK_TEXT (msg->text), TRUE);
+  gtk_text_set_word_wrap (GTK_TEXT (msg->text), TRUE);
   gtk_widget_show (msg->text);
   gtk_table_attach_defaults (GTK_TABLE (table), msg->text, 0, 1, 0, 1);
   hscrollbar = gtk_hscrollbar_new (GTK_TEXT (msg->text)->hadj);
@@ -449,7 +442,7 @@ send_smtp_message (GtkWidget * widget, BalsaSendmsg * bsmsg)
   rfc822_parse_adrlist (&msg->to,
 			gtk_entry_get_text (GTK_ENTRY (bsmsg->to)),
 			balsa_app.hostname);
-  if (strlen(gtk_entry_get_text(GTK_ENTRY(bsmsg->cc))) > 4 )
+  if (strlen (gtk_entry_get_text (GTK_ENTRY (bsmsg->cc))) > 4)
     {
       rfc822_parse_adrlist (&msg->cc,
 			    gtk_entry_get_text (GTK_ENTRY (bsmsg->cc)),

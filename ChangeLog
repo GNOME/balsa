@@ -1,3 +1,8 @@
+2000-06-24  Peter Williams  <peter@beta.newton.cx>
+
+	* configure.in: Add GLIB_CFLAGS to the options
+	for the offset-tool so that we find /usr/lib/glib/include
+
 2000-06-16  Peter Williams  <peter@beta.newton.cx>
 
 	* libbalsa/sm.c: Wait for the save to go through

@@ -19,7 +19,34 @@
  * 02111-1307, USA.
  */
 
+#include <gtk/gtk.h>
+
+#ifndef __BALSA_DRUID_PAGE_FINISH_H__
+#define __BALSA_DRUID_PAGE_FINISH_H__
+
+#ifdef __cplusplus
+extern "C" {
+#endif                          /* __cplusplus */
+
+
+
 #include "config.h"
 #include <gnome.h>
+#include "helper.h"
+#include "balsa-initdruid.h"
 
-void balsa_init_begin( void );
+/*
+ * Public methods
+ */
+#if BALSA_MAJOR < 2
+    void balsa_druid_page_finish(GnomeDruid * druid,
+                                 GdkImlibImage * default_logo);
+#else
+    void balsa_druid_page_finish(GnomeDruid * druid,
+                                 GdkPixbuf * default_logo);
+#endif                          /* BALSA_MAJOR < 2 */
+
+#ifdef __cplusplus
+}
+#endif                          /* __cplusplus */
+#endif

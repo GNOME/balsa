@@ -1,3 +1,8 @@
+2002-03-09  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* libinit_balsa/*: get rid of gob. Port to gnome2.
+	* configure.in: remove test for gob.
+
 2002-03-04  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/balsa-icons.[hc], src/filter-run-callbacks.c,

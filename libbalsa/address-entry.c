@@ -326,8 +326,9 @@ libbalsa_address_entry_destroy(GtkObject * object)
 	libbalsa_free_inputData(data);
     address_entry->input = NULL;
 
-    if (address_entry->domain)
-	address_entry->domain = NULL;
+
+    g_free(address_entry->domain);
+    address_entry->domain = NULL;
 
     /*
      * Make sure the data makes sense.
@@ -780,7 +781,9 @@ libbalsa_fill_input(LibBalsaAddressEntry *address_entry)
     }
 
     addy = (emailData *)input->active->data;
-    addy->cursor = cursor - prev - 1;
+    addy->cursor = cursor - prev;
+    if (input->active != input->list)
+	addy->cursor = addy->cursor - 1; /* Compensate for the ',' */
     if (addy->cursor < 0) addy->cursor = 0;
     if (addy->cursor > strlen(addy->user)) addy->cursor = strlen(addy->user);
     
@@ -3095,7 +3098,7 @@ libbalsa_address_entry_set_domain(LibBalsaAddressEntry *address_entry,
     g_return_if_fail(address_entry != NULL);
     g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry));
 
-    address_entry->domain = domain;
+    address_entry->domain = g_strdup(domain);
 }
 
 

@@ -6,6 +6,9 @@
 	* src/pref-manager.c: configure sig_prepend.
 	* src/save-restore.c: save&restore sig_repend
 	* src/sendmsg-window.c: handle sig_prepend.
+
+	Berend De Schouwer <bds@jhb.ucs.co.za> fix for off-by one
+	* libbalsa/address-entry.c: and copy default domain to be safe.
 	
 2001-01-15   Pawel Salek  <pawsa@theochem.kth.se>
 

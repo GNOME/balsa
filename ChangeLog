@@ -1,5 +1,17 @@
-2003-12-16 13:33  PeterB
+2003-12-16 19:47  PeterB
 
+	* src/balsa-index.c: Use LibBalsaMailbox's "changed" signal; remove
+	style-setting code (style should be set by LibBalsaMailbox).
+	* libbalsa/send.c: Set the charset of a "text/*" attachment as
+	"us-ascii" if it's all 7-bit, or "utf-8" if it validates, else
+	retype as "application/octet-stream"; plug address-related memory
+	leaks.
+	* libbalsa/mailbox_mbox.c: Encode text parts as quoted-printable
+	and escape "From " lines.
+	* libbalsa/mailbox_local.c: Use LibBalsaMailbox's "changed" signal.
+	* libbalsa/: mailbox.c, mailbox.h: Replace "messages-added" signal
+	with a general-purpose "changed" signal, and emit when messages
+	might have been expunged.
 	* src/balsa-app.c: Remove imap keep-alive code--it's now handled by
 	LibBalsaImapServer.
 	* libbalsa/mailbox_imap.c: Remove unnecessary mailbox locking.

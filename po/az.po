@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 1.2.3\n"
 "POT-Creation-Date: 2001-11-25 23:25+0100\n"
-"PO-Revision-Date: 2001-11-16 19:59GMT+0200\n"
+"PO-Revision-Date: 2001-12-19 19:14GMT+0200\n"
 "Last-Translator: Vasif İsmayıloğlu MD <azerb_linux@hotmail.com>\n"
 "Language-Team: Azerbaijani Turkic <linuxaz@azerimail.net>\n"
 "MIME-Version: 1.0\n"
@@ -439,8 +439,7 @@ msgstr "Gizlə"
 
 #: libbalsa/send.c:367
 msgid "Unable to open sentbox - could not get IMAP server information"
-msgstr ""
-"Göndərilmə qutusu açılması bacarılmadı - IMAP verici məlumatı alına bilmir"
+msgstr "Göndərilmə qutusu açılması bacarılmadı - IMAP verici məlumatı alına bilmir"
 
 #: libbalsa/send.c:779
 msgid ""
@@ -528,8 +527,7 @@ msgstr "Zibil:"
 msgid ""
 "The pathname \"%s\" must be specified canonically -- it must start with a "
 "'/'."
-msgstr ""
-"\"%s\" qovluğu tamamilə göstərilməlidir-- yə'ni bir '/''lə başlamalıdır."
+msgstr "\"%s\" qovluğu tamamilə göstərilməlidir-- yə'ni bir '/''lə başlamalıdır."
 
 #: libinit_balsa/balsa-druid-page-directory.gob:137
 #, c-format
@@ -645,8 +643,7 @@ msgstr ""
 #: libinit_balsa/helper.c:148
 #, c-format
 msgid "The path %s must be relative to the filesystem root (start with /)."
-msgstr ""
-"%s cığırı fayl idarə sistemi kökünə görə yazılmalıdır( '/''ylə başlar )."
+msgstr "%s cığırı fayl idarə sistemi kökünə görə yazılmalıdır( '/''ylə başlar )."
 
 #: libinit_balsa/helper.c:158 libinit_balsa/helper.c:176
 #, c-format
@@ -665,8 +662,7 @@ msgstr "Balsanı Qur"
 #. didn't find anything that we could display!
 #: libmutt/handler.c:1308
 msgid "[-- Error:  Could not display any parts of Multipart/Alternative! --]\n"
-msgstr ""
-"[-- Xəta:  Multipart/Alternative-in heç bir qismi göstərilə bilmir! --]\n"
+msgstr "[-- Xəta:  Multipart/Alternative-in heç bir qismi göstərilə bilmir! --]\n"
 
 #: libmutt/handler.c:1426
 #, c-format
@@ -1659,7 +1655,7 @@ msgstr ""
 #: src/balsa-message.c:1065
 #, c-format
 msgid "Type: %s (%s)"
-msgstr ""
+msgstr "Növ: %s (%s)"
 
 #: src/balsa-message.c:1067
 #, c-format
@@ -1700,9 +1696,9 @@ msgid "Cannot open temporary file %s."
 msgstr "Müvəqqəti fayl %s açıla bilmir."
 
 #: src/balsa-message.c:2121
-#, fuzzy, c-format
+#, c-format
 msgid "Open with %s"
-msgstr "Bölməyi %s ilə göstər"
+msgstr "%s ilə aç"
 
 #: src/balsa-message.c:2258
 msgid "Save..."
@@ -2620,8 +2616,7 @@ msgstr "Hazırkını _yerinə gətir"
 
 #: src/main-window.c:607
 msgid "Commit the changes in the currently opened mailbox"
-msgstr ""
-"Hazırda açıq olan ePoçt qutusundakı dəyişlikləri bərabərlaşdir/yerinə gətir"
+msgstr "Hazırda açıq olan ePoçt qutusundakı dəyişlikləri bərabərlaşdir/yerinə gətir"
 
 #: src/main-window.c:611
 msgid "Commit _All"
@@ -3859,8 +3854,7 @@ msgstr "Hazırkı tövsiyyəni qəbul et və yerinə gətir"
 
 #: src/spell-check.c:499
 msgid "Replace all occurences of the current word with the selected suggestion"
-msgstr ""
-"Hazırkı tövsiyyəni işlədərək hazırkı kəlimənin bütün nüsxələrini dəyişdir"
+msgstr "Hazırkı tövsiyyəni işlədərək hazırkı kəlimənin bütün nüsxələrini dəyişdir"
 
 #: src/spell-check.c:506
 msgid "Skip the current word"
@@ -3975,3 +3969,4 @@ msgstr "-"
 #: src/toolbar-prefs.c:826
 msgid "+"
 msgstr "+"
+

@@ -396,6 +396,7 @@ main(int argc, char *argv[])
        gtk_window_set_default_icon_from_file(default_icon, NULL); */
     g_free(default_icon);
 
+    signal( SIGPIPE, SIG_IGN );
     gnome_triggers_do("", "program", "balsa", "startup", NULL);
 
     window = balsa_window_new();
@@ -433,7 +434,6 @@ main(int argc, char *argv[])
 	check_new_messages_cb(NULL, NULL);
 
 
-    signal( SIGPIPE, SIG_IGN );
     g_idle_add((GSourceFunc) scan_mailboxes_idle_cb, NULL);
 
     gdk_threads_enter();

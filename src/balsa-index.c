@@ -51,7 +51,7 @@ static void append_messages (BalsaIndex * bindex,
    glong mesgno);
  */
 static void update_message_flag (BalsaIndex * bindex,
-				 glong mesgno, gchar *flag);
+				 glong mesgno, gchar * flag);
 
 
 /* clist callbacks */
@@ -715,7 +715,7 @@ unselect_message (GtkWidget * widget,
 {
   BalsaIndex *bindex;
   glong mesgno;
-  gchar *foo=g_malloc(sizeof(char *)*2);
+  gchar *foo = g_malloc (sizeof (char *) * 2);
 
   bindex = BALSA_INDEX (data);
 
@@ -726,7 +726,10 @@ unselect_message (GtkWidget * widget,
 
   /* update the index to show any changes in the message
    * state */
-  gtk_clist_get_text(GTK_CLIST (GTK_BIN (bindex)->child),row,0,&foo);
-  if (*foo!='D')
-  update_message_flag (bindex, mesgno, " ");
+  gtk_clist_get_text (GTK_CLIST (GTK_BIN (bindex)->child), row, 0, &foo);
+  if (foo)
+    {
+      if (*foo != 'D')
+	update_message_flag (bindex, mesgno, " ");
+    }
 }

@@ -584,16 +584,11 @@ balsa_mblist_init(BalsaMBList * tree)
     gtk_signal_connect(GTK_OBJECT(tree), "tree_collapse",
 		       GTK_SIGNAL_FUNC(mailbox_tree_collapse), NULL);
 
-    gtk_signal_connect(GTK_OBJECT(tree), "button_press_event",
-		       GTK_SIGNAL_FUNC(mblist_button_press_cb), NULL);
-    gtk_signal_connect(GTK_OBJECT(tree), "key_press_event",
-		       GTK_SIGNAL_FUNC(mblist_key_press_cb), NULL);
     gtk_signal_connect(GTK_OBJECT(tree), "size_allocate",
 		       GTK_SIGNAL_FUNC(size_allocate_cb), NULL);
 
-    gtk_ctree_set_show_stub(GTK_CTREE(tree), FALSE);
-
-    gtk_clist_set_row_height(GTK_CLIST(tree), 16);
+    /* gtk_ctree_set_show_stub(GTK_CTREE(tree), FALSE);
+       gtk_clist_set_row_height(GTK_CLIST(tree), 16); */
     gtk_clist_set_column_width(GTK_CLIST(tree), 0,
 			       balsa_app.mblist_name_width);
 
@@ -1007,6 +1002,15 @@ balsa_mblist_set_style(BalsaMBList * mblist)
     mblist->unread_mailbox_style = style;
 }
 
+
+void
+mblist_default_signal_bindings(BalsaMBList * tree)
+{
+    gtk_signal_connect(GTK_OBJECT(tree), "button_press_event",
+		       GTK_SIGNAL_FUNC(mblist_button_press_cb), NULL);
+    gtk_signal_connect(GTK_OBJECT(tree), "key_press_event",
+		       GTK_SIGNAL_FUNC(mblist_key_press_cb), NULL);
+}
 
 /* balsa_mblist_have_new [MBG]
  * 

@@ -643,6 +643,7 @@ balsa_window_new()
 		      GTK_WIDGET(balsa_app.mblist));
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(window->mblist),
 				   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    mblist_default_signal_bindings(balsa_app.mblist);
     gtk_widget_show_all(window->mblist);
     gtk_paned_pack1(GTK_PANED(hpaned), window->mblist, TRUE, TRUE);
     gtk_paned_pack2(GTK_PANED(hpaned), vpaned, TRUE, TRUE);

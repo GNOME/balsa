@@ -1,3 +1,11 @@
+2000-11-20  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/send.c: place outbox and fccbox in right positions
+	* src/balsa-mblist.c: add mblist_default_signal_bindings() for 
+	connecting signals that are useful for mailbox tree, but not
+	transfer tree.
+	* src/main-window.c: use that.
+	
 2000-11-19  Gediminas Paulauskas  <menesis@delfi.lt>
 
 	* src/spell-check.c: (balsa_spell_check_start) set current encoding

@@ -174,8 +174,8 @@ static void dump_queue(const char*msg)
    it to fcc mailbox as well.
 */
 void
-libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * fccbox,
-		       LibBalsaMailbox * outbox, gint encoding)
+libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
+		       LibBalsaMailbox * fccbox, gint encoding)
 {
     MessageQueueItem *mqi;
 

@@ -759,18 +759,19 @@ libbalsa_threads_enter(void)
 static void
 libbalsa_threads_leave(void)
 {
-#if LIBBALSA_DEBUG_THREADS
     pthread_t self;
 
     self = pthread_self();
 
+#if LIBBALSA_DEBUG_THREADS
     if (self != libbalsa_threads_id) {
 	g_warning("Not holding gdk lock!!!");
 	return;
     }
 #endif /* LIBBALSA_DEBUG_THREADS */
     if (--libbalsa_threads_lock == 0) {
-        gdk_display_flush(gdk_display_get_default());
+	if (self != main_thread_id)
+	    gdk_display_flush(gdk_display_get_default());
         libbalsa_threads_id = 0;
         pthread_mutex_unlock(&libbalsa_threads_mutex);
     }

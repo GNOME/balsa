@@ -54,6 +54,9 @@ struct _AddressBookConfig {
 	struct {
 	    GtkWidget *host_name;
 	    GtkWidget *base_dn;
+	    GtkWidget *bind_dn;
+	    GtkWidget *passwd;
+	    GtkWidget *enable_tls;
 	} ldap;
 #endif
     } ab_specific;
@@ -436,7 +439,7 @@ create_ldif_page(AddressBookConfig * abc)
 static GtkWidget *
 create_ldap_page(AddressBookConfig * abc)
 {
-    GtkWidget *table = gtk_table_new(2, 3, FALSE);
+    GtkWidget *table = gtk_table_new(2, 6, FALSE);
 
     LibBalsaAddressBookLdap* ab;
     GtkDialog* mcw = GTK_DIALOG(abc->window);
@@ -460,13 +463,28 @@ create_ldap_page(AddressBookConfig * abc)
 	create_entry(mcw, table, NULL, NULL, 1, 
 		     ab ? ab->host : host, label);
 
-    label = create_label(_("_Base Domain Name"), table, 2);
+    label = create_label(_("Base Domain _Name"), table, 2);
     abc->ab_specific.ldap.base_dn = 
 	create_entry(mcw, table, NULL, NULL, 2, 
 		     ab ? ab->base_dn : base, label);
 
+    label = create_label(_("_User Name (Bind DN)"), table, 3);
+    abc->ab_specific.ldap.bind_dn = 
+	create_entry(mcw, table, NULL, NULL, 3, 
+		     ab ? ab->bind_dn : "", label);
+
+    label = create_label(_("_Password"), table, 4);
+    abc->ab_specific.ldap.passwd = 
+	create_entry(mcw, table, NULL, NULL, 4, 
+		     ab ? ab->passwd : "", label);
+    gtk_entry_set_visibility(GTK_ENTRY(abc->ab_specific.ldap.passwd), FALSE);
+
+    abc->ab_specific.ldap.enable_tls =
+	create_check(mcw, _("Enable _TLS"), table, 5,
+		     ab ? ab->enable_tls : FALSE);
+
     abc->expand_aliases_button =
-	create_check(mcw, _("_Expand aliases as you type"), table, 3,
+	create_check(mcw, _("_Expand aliases as you type"), table, 6,
 		     ab ? abc->address_book->expand_aliases : TRUE);
 
     gtk_widget_show(table);
@@ -692,8 +710,16 @@ create_book(AddressBookConfig * abc)
             gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.ldap.host_name));
         const gchar *base_dn =
             gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.ldap.base_dn));
+        const gchar *bind_dn =
+            gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.ldap.bind_dn));
+        const gchar *passwd =
+            gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.ldap.passwd));
+        gboolean enable_tls =
+            gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+                                         (abc->ab_specific.ldap.enable_tls));
         address_book =
-            libbalsa_address_book_ldap_new(name, host_name, base_dn);
+            libbalsa_address_book_ldap_new(name, host_name, base_dn,
+                                           bind_dn, passwd, enable_tls);
 #endif
     } else
         g_assert_not_reached();
@@ -765,13 +791,21 @@ modify_book(AddressBookConfig * abc)
             gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.ldap.host_name));
         const gchar *base_dn =
             gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.ldap.base_dn));
+        const gchar *bind_dn =
+            gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.ldap.bind_dn));
+        const gchar *passwd =
+            gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.ldap.passwd));
+        gboolean enable_tls =
+            gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+                                         (abc->ab_specific.ldap.enable_tls));
 
         ldap = LIBBALSA_ADDRESS_BOOK_LDAP(address_book);
 
-        g_free(ldap->host);
-        ldap->host = g_strdup(host_name);
-        g_free(ldap->base_dn);
-        ldap->base_dn = g_strdup(base_dn);
+        g_free(ldap->host);     ldap->host = g_strdup(host_name);
+        g_free(ldap->base_dn);  ldap->base_dn = g_strdup(base_dn);
+        g_free(ldap->bind_dn);  ldap->bind_dn = g_strdup(bind_dn);
+        g_free(ldap->passwd);   ldap->passwd  = g_strdup(passwd);
+        ldap->enable_tls = enable_tls;
 #endif
     } else
         g_assert_not_reached();

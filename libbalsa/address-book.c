@@ -244,7 +244,10 @@ libbalsa_address_book_save_config(LibBalsaAddressBook * ab,
 {
     g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab));
 
+    gnome_config_private_clean_section(prefix);
+    gnome_config_clean_section(prefix);
     gnome_config_push_prefix(prefix);
+
     g_signal_emit(G_OBJECT(ab),
                   libbalsa_address_book_signals[SAVE_CONFIG], 0,
                   prefix);

@@ -214,6 +214,9 @@ if test x"$use_ldap" = xyes ; then
 	AC_CHECK_LIB(ldap, ldap_search, AC_DEFINE(ENABLE_LDAP, 1,
                  [Defined when the LDAP support is to be compiled in.])
               LIBS="-lldap -llber -lresolv $LIBS", AC_MSG_ERROR([*** You enabled LDAP but ldap library is not found.]), -llber -lresolv)
+        AC_CHECK_LIB(ldap, ldap_start_tls_s,
+                     AC_DEFINE(HAVE_LDAP_TLS,1,
+                               [Defined when LDAP lib supports TLS]))
 else
 	AC_MSG_RESULT([no])
 fi

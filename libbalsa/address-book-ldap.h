@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2003 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -46,6 +46,9 @@ struct _LibBalsaAddressBookLdap {
 
     gchar *host;
     gchar *base_dn;
+    gchar *bind_dn;
+    gchar *passwd;
+    gboolean enable_tls;
 
     LDAP *directory;
 };
@@ -56,9 +59,12 @@ struct _LibBalsaAddressBookLdapClass {
 
 GType libbalsa_address_book_ldap_get_type(void);
 
-LibBalsaAddressBook *libbalsa_address_book_ldap_new(const gchar * name,
-						    const gchar * host,
-						    const gchar * base_dn);
+LibBalsaAddressBook *libbalsa_address_book_ldap_new(const gchar *name,
+						    const gchar *host,
+						    const gchar *base_dn,
+						    const gchar *bind_dn,
+						    const gchar *passwd,
+                                                    gboolean enable_tls);
 
 
 #endif				/* __LIBBALSA_ADDRESS_BOOK_LDAP_H__ */

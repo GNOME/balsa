@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2003 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -143,6 +143,9 @@ libbalsa_address_book_ldap_init(LibBalsaAddressBookLdap * ab)
 {
     ab->host = NULL;
     ab->base_dn = NULL;
+    ab->bind_dn = NULL;
+    ab->passwd  = NULL;
+    ab->enable_tls = FALSE;
     ab->directory = NULL;
     LIBBALSA_ADDRESS_BOOK(ab)->is_expensive = FALSE;
 }
@@ -156,17 +159,18 @@ libbalsa_address_book_ldap_finalize(GObject * object)
 
     libbalsa_address_book_ldap_close_connection(addr_ldap);
 
-    g_free(addr_ldap->host);
-    addr_ldap->host = NULL;
-    g_free(addr_ldap->base_dn);
-    addr_ldap->base_dn = NULL;
+    g_free(addr_ldap->host);    addr_ldap->host = NULL;
+    g_free(addr_ldap->base_dn); addr_ldap->base_dn = NULL;
+    g_free(addr_ldap->bind_dn); addr_ldap->bind_dn = NULL;
+    g_free(addr_ldap->passwd);  addr_ldap->passwd  = NULL;
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
 LibBalsaAddressBook *
-libbalsa_address_book_ldap_new(const gchar * name, const gchar * host,
-                               const gchar * base_dn)
+libbalsa_address_book_ldap_new(const gchar *name, const gchar *host,
+                               const gchar *base_dn, const gchar *bind_dn,
+                               const gchar *passwd, gboolean enable_tls)
 {
     LibBalsaAddressBookLdap *ldap;
     LibBalsaAddressBook *ab;
@@ -180,6 +184,11 @@ libbalsa_address_book_ldap_new(const gchar * name, const gchar * host,
     ab->name = g_strdup(name);
     ldap->host = g_strdup(host);
     ldap->base_dn = g_strdup(base_dn);
+    ldap->base_dn = g_strdup(base_dn);
+    ldap->bind_dn = g_strdup(bind_dn);
+    ldap->passwd = g_strdup(passwd);
+    ldap->enable_tls = enable_tls;
+
     /* We open on demand... */
     ldap->directory = NULL;
     return ab;
@@ -218,14 +227,46 @@ libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab)
 	return FALSE;
     }
 
-    result = ldap_simple_bind_s(ab->directory, NULL, NULL);
+    if(ab->enable_tls) {
+#ifdef HAVE_LDAP_TLS
+        int version = LDAP_VERSION3;
+        if (ldap_set_option(ab->directory, LDAP_OPT_PROTOCOL_VERSION, &version)
+            != LDAP_OPT_SUCCESS) {
+            libbalsa_information
+                (LIBBALSA_INFORMATION_WARNING,
+                 _("Couldn't set protocol version to LDAPv3."));
+        }
+
+        /* turn TLS on */
+        result = ldap_start_tls_s(ab->directory, NULL, NULL);
+        if(result != LDAP_SUCCESS) {
+            libbalsa_information
+                (LIBBALSA_INFORMATION_ERROR,
+                 _("Couldn't enable TLS on the LDAP connection: %s"),
+                 ldap_err2string(result));
+            ldap_unbind(ab->directory);
+            ab->directory = NULL;
+            return FALSE;
+        }
+#else /* HAVE_LDAP_TLS */
+            libbalsa_information
+                (LIBBALSA_INFORMATION_ERROR,
+                 _("TLS requested but TLS support not compiled in."));
+#endif /* HAVE_LDAP_TLS */
+    }
+
+    printf("Binding as: %s\n", ab->bind_dn ? ab->bind_dn : "anonymous");
+    result = ldap_simple_bind_s(ab->directory, 
+                                ab->bind_dn,
+                                ab->passwd);
 
     if (result != LDAP_SUCCESS) {
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 			     _("Failed to bind to server: %s\n"
-			       "Check that the servername is valid."),
+			       "Check that the server name is valid."),
 			     ldap_err2string(result));
 	ldap_unbind_s(ab->directory);
+	ab->directory = NULL;
 	return FALSE;
     }
     /* ldap_enable_cache(ab->directory, LDAP_CACHE_TIMEOUT, 0); */
@@ -360,13 +401,13 @@ libbalsa_address_book_ldap_get_address(LibBalsaAddressBook * ab,
 	 */
 	if ((vals = ldap_get_values(ldap_ab->directory, e, attr)) != NULL) {
 	    for (i = 0; vals[i] != NULL; i++) {
-		if ((strcmp(attr, "sn") == 0) && (!last))
+		if ((g_ascii_strcasecmp(attr, "sn") == 0) && (!last))
 		    last = ldap_get_string(vals[i]);
-		if ((strcmp(attr, "cn") == 0) && (!id))
+		if ((g_ascii_strcasecmp(attr, "cn") == 0) && (!id))
 		    id = ldap_get_string(vals[i]);
-		if ((strcmp(attr, "givenname") == 0) && (!first))
+		if ((g_ascii_strcasecmp(attr, "givenName") == 0) && (!first))
 		    first = ldap_get_string(vals[i]);
-		if ((strcmp(attr, "mail") == 0) && (!email))
+		if ((g_ascii_strcasecmp(attr, "mail") == 0) && (!email))
 		    email = ldap_get_string(vals[i]);
 	    }
 	    ldap_value_free(vals);
@@ -432,7 +473,9 @@ libbalsa_address_book_ldap_save_config(LibBalsaAddressBook * ab,
 
     gnome_config_set_string("Host", ldap->host);
     if(ldap->base_dn) gnome_config_set_string("BaseDN", ldap->base_dn);
-
+    if(ldap->bind_dn) gnome_config_private_set_string("BindDN", ldap->bind_dn);
+    if(ldap->passwd)  gnome_config_private_set_string("Passwd", ldap->passwd);
+    gnome_config_set_bool("EnableTLS", ldap->enable_tls);
     if (LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->save_config)
 	LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->save_config(ab, prefix);
 }
@@ -452,6 +495,16 @@ libbalsa_address_book_ldap_load_config(LibBalsaAddressBook * ab,
     if(ldap->base_dn && *ldap->base_dn == 0) { 
 	g_free(ldap->base_dn); ldap->base_dn = NULL; 
     }
+
+    ldap->bind_dn = gnome_config_private_get_string("BindDN");
+    if(ldap->bind_dn && *ldap->bind_dn == 0) { 
+	g_free(ldap->bind_dn); ldap->bind_dn = NULL; 
+    }
+    ldap->passwd = gnome_config_private_get_string("Passwd");
+    if(ldap->passwd && *ldap->passwd == 0) { 
+	g_free(ldap->passwd); ldap->passwd = NULL; 
+    }
+    ldap->enable_tls = gnome_config_get_bool("EnableTLS");
 
     if (LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->load_config)
 	LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->load_config(ab, prefix);

@@ -963,7 +963,8 @@ get_font_name(const gchar * base, const gchar * charset,
 
 /* balsa_get_font_by_charset:
    returns font or fontset as specified by general base and charset.
-   Follows code from gfontsel.
+   Follows code from gfontsel except from the fact that it tries 
+   to never return NULL.
 */
 GdkFont*
 balsa_get_font_by_charset(const gchar * base, const gchar * charset)
@@ -977,11 +978,11 @@ balsa_get_font_by_charset(const gchar * base, const gchar * charset)
     result   = gdk_font_load (fontname);
     xfs = result ? GDK_FONT_XFONT (result) : NULL;
 
-    if (xfs && (xfs->min_byte1 != 0 || xfs->max_byte1 != 0))
+    if (!xfs || (xfs->min_byte1 != 0 || xfs->max_byte1 != 0))
     {
 	gchar *tmp_name;
 	g_print("balsa_get_font_by_charset: using fontset\n");
-	gdk_font_unref (result);
+	if(result) gdk_font_unref (result);
 	tmp_name = g_strconcat (fontname, ",*", NULL);
 	result = gdk_fontset_load (tmp_name);
 	g_free (tmp_name);

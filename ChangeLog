@@ -3,6 +3,9 @@
 	* src/balsa-app.c: try to guess IMAP passwords when possible
 	by Berend De Schouwer <bds@jhb.ucs.co.za>.
 	* src/main.c: make the initial configuration even more robust.
+	* src/balsa-message.c: balsa_get_font_by_charset() always returns
+	a font (a default one if needed) so the compose window can have 
+	a chance to find out the character width.
 
 2001-01-17  Carlos Morgado  <chbm@chbm.nu>
 

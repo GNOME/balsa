@@ -32,7 +32,7 @@ ImapResponse imap_mbox_append_str(ImapMboxHandle *handle, const char *mbox,
 #endif
 ImapResponse imap_mbox_append_stream(ImapMboxHandle * handle,
 				     const char *mbox, ImapMsgFlags flags,
-				     GMimeStream * stream);
+				     GMimeStream * stream, ssize_t len);
 
 /* Selected State */
 ImapResult imap_mbox_search(ImapMboxHandle *h, const char* query);

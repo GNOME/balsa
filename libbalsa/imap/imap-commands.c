@@ -373,11 +373,11 @@ pass_stream(char* buf, size_t sz, void*arg)
 
 ImapResponse
 imap_mbox_append_stream(ImapMboxHandle *handle, const char *mbox,
-			ImapMsgFlags flags, GMimeStream *stream)
+			ImapMsgFlags flags, GMimeStream *stream, ssize_t len)
 {
-  return imap_mbox_append(handle, mbox, flags,
-			  g_mime_stream_length(stream), pass_stream,
-			  stream);
+  if (len < 0)
+    len = g_mime_stream_length(stream);
+  return imap_mbox_append(handle, mbox, flags, len, pass_stream, stream);
 }
 
 

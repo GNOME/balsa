@@ -935,11 +935,12 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
     balsa_message_clear_tree(bm);
 
     if (message == NULL) {
-        gtk_widget_hide_all(bm->header_box);    
+        gtk_widget_hide(bm->cont_viewport);
         gtk_notebook_set_show_tabs(GTK_NOTEBOOK(bm->notebook), FALSE);
         gtk_notebook_set_current_page(GTK_NOTEBOOK(bm->notebook), 0);
         return TRUE;
     }
+    gtk_widget_show(bm->cont_viewport);
 
     bm->message = message;
 
@@ -1222,10 +1223,10 @@ display_headers_real(BalsaMessage * bm, LibBalsaMessageHeaders * headers,
     g_return_if_fail(headers);
  
     if (!bm->show_all_headers && bm->shown_headers == HEADERS_NONE) {
-        gtk_widget_hide_all(GTK_WIDGET(bm->header_box));
+        gtk_widget_hide(GTK_WIDGET(bm->header_container));
         return;
     } else {
-        gtk_widget_show_all(GTK_WIDGET(bm->header_box));                
+        gtk_widget_show_all(GTK_WIDGET(bm->header_container));
         }
 
     add_header_gchar(bm, view, "subject", _("Subject:"), subject);

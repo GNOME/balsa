@@ -590,11 +590,14 @@ static const cfg_parm_t parms_BalsaApp[] = {
 	{ "MBListInfoShow", BALSA_OFFSET_BalsaApp_ELEM_mblist_show_mb_content_info, CPT_BOOL, NULL, cfg_type_const_init_bool( TRUE ) },
 #endif
 
-	{ "PWindowSetting", BALSA_OFFSET_BalsaApp_ELEM_pwindow_option, CPT_NUM, NULL, cfg_type_const_init_num( WHILERETR, WHILERETR, NEVER, CPNF_USEMIN | CPNF_USEMAX ) },
+	{ "PWindowSetting", BALSA_OFFSET_BalsaApp_ELEM_pwindow_option, CPT_NUM, NULL, 
+	  cfg_type_const_init_num( WHILERETR, WHILERETR, NEVER, CPNF_USEMIN | CPNF_USEMAX ) },
 	{ "WordwrapEnabled", BALSA_OFFSET_BalsaApp_ELEM_wordwrap, CPT_BOOL, NULL, cfg_type_const_init_bool( TRUE ) },
 	{ "WordwrapLineLen", BALSA_OFFSET_BalsaApp_ELEM_wraplength, CPT_NUM, NULL, cfg_type_const_init_num( DEFAULT_WRAPLENGTH, 1, 0, CPNF_USEMIN ) },
 	{ "PreviewWrapEnabled", BALSA_OFFSET_BalsaApp_ELEM_browse_wrap, CPT_BOOL, NULL, cfg_type_const_init_bool( TRUE ) },
 	{ "HeadersToShow", BALSA_OFFSET_BalsaApp_ELEM_selected_headers, CPT_STR, NULL, cfg_type_const_init_str( DEFAULT_SELECTED_HDRS, NULL, NULL ) },
+	{ "HeaderShowMode", BALSA_OFFSET_BalsaApp_ELEM_shown_headers, CPT_NUM, NULL, 
+	  cfg_type_const_init_num( HEADERS_SELECTED, HEADERS_NONE, HEADERS_ALL, CPNF_USEMIN | CPNF_USEMAX ) },
 	{ "ShowMBList", BALSA_OFFSET_BalsaApp_ELEM_show_mblist, CPT_BOOL, NULL, cfg_type_const_init_bool( TRUE ) },
 	{ "ShowTabs", BALSA_OFFSET_BalsaApp_ELEM_show_notebook_tabs, CPT_BOOL, NULL, cfg_type_const_init_bool( FALSE ) },
 	{ "EmptyTrashOnExit", BALSA_OFFSET_BalsaApp_ELEM_empty_trash_on_exit, CPT_BOOL, NULL, cfg_type_const_init_bool( TRUE ) },

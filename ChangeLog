@@ -1,3 +1,8 @@
+2000-06-16  Peter Williams  <peter@beta.newton.cx>
+
+	* src/cfg-balsa.c: Add balsa_app.shown_headers to the
+	metatype spec.
+
 2000-09-15  Peter Williams <peter@newton.cx>
 	Another new era: big bad session management
 

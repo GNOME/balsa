@@ -41,6 +41,8 @@ void
 mm_exists (MAILSTREAM * stream,
 	   unsigned long number)
 {
+  if (!balsa_app.main_window)
+    return;
   if (number > 0)
     balsa_index_append_new_messages (BALSA_INDEX (balsa_app.main_window->index));
 }

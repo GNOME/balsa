@@ -54,7 +54,7 @@ init_balsa_app (int argc, char *argv[])
 
   load_global_settings ();
   setup_local_mailboxes ();
-  options_init();
+  options_init ();
   my_special_mailbox ();
 
   /* create main window */
@@ -221,8 +221,9 @@ setup_local_mailboxes ()
   struct dirent *d;
   struct stat st;
   char filename[PATH_MAX + 1];
+  MAILSTREAM *s = NIL;
   MailboxMBox *mbox;
-
+  MailboxUNIX *unixmb;
 
   /* check the MAIL environment variable for a spool directory */
   if (getenv ("MAIL"))
@@ -238,6 +239,11 @@ setup_local_mailboxes ()
     {
       while ((d = readdir (dp)) != NULL)
 	{
+	  if (s != NIL)
+	    {
+	      mail_close (s);
+	      s = NIL;
+	    }
 	  sprintf (filename, "%s/%s", balsa_app.local_mail_directory, d->d_name);
 
 	  if (lstat (filename, &st) < 0)
@@ -245,11 +251,31 @@ setup_local_mailboxes ()
 
 	  if (S_ISREG (st.st_mode))
 	    {
-	      mbox = (MailboxMBox *) mailbox_new (MAILBOX_MBOX);
-	      mbox->name = g_strdup (d->d_name);
-	      mbox->path = g_strdup (filename);
+	      if (s = mail_open (s, g_strdup (filename), OP_READONLY))
+		{
 
-	      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbox);
+		if (!strcmp (s->dtb->name, "mbox"))
+		    {
+		      mail_close (s);
+		      s = NIL;
+		      mbox = (MailboxMBox *) mailbox_new (MAILBOX_MBOX);
+		      mbox->name = g_strdup (d->d_name);
+		      mbox->path = g_strdup (filename);
+
+		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbox);
+		    }
+		if (!strcmp (s->dtb->name, "unix"))
+		    {
+		      mail_close (s);
+		      s = NIL;
+		      unixmb = (MailboxUNIX *) mailbox_new (MAILBOX_UNIX);
+		      unixmb->name = g_strdup (d->d_name);
+		      unixmb->path = g_strdup (filename);
+
+		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, unixmb);
+		    }
+
+		}
 	    }
 	}
     }

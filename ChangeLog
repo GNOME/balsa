@@ -1,3 +1,11 @@
+2000-08-27  Carlos Morgado  <chbm@chbm.nu>
+
+	* save-restore.c, mailbox-conf.c: apop support (lacking GUI)
+	* pop.c: apop support merged from mutt 1.2
+	* init.h, mutt.h: APOP option 
+	* md5c.c, md5.h: added from mutt for apop
+	* mailbox_pop3.[ch]: support for use_apop 
+
 2000-08-26  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* libbalsa/*.[ch]: Implemented a mutex around all libmutt
@@ -2724,3 +2732,4 @@ Tue Jul 28 04:01:40 1998 Stuart Parmenter <pavlov@innerx.net>
 	Updated README to remove INSTALL file info, and such.  Added a description,
 	etc.
 
+=== Exit status: OK

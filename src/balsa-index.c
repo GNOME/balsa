@@ -43,7 +43,7 @@ static void balsa_index_size_allocate (GtkWidget * widget,
 
 /* internal functions */
 static void delete_messages (BalsaIndex * bindex,
-				glong msgno);
+			     glong msgno);
 static void append_messages (BalsaIndex * bindex,
 			     glong first,
 			     glong last);
@@ -412,9 +412,9 @@ balsa_index_size_allocate (GtkWidget * widget,
 }
 
 static void
-delete_messages (BalsaIndex *bindex, glong msgno)
+delete_messages (BalsaIndex * bindex, glong msgno)
 {
-  gtk_clist_remove(GTK_CLIST (GTK_BIN (bindex)->child), msgno);
+  gtk_clist_remove (GTK_CLIST (GTK_BIN (bindex)->child), msgno);
 }
 
 
@@ -517,7 +517,7 @@ create_menu (BalsaIndex * bindex, glong mesgno)
   GtkWidget *menu, *menuitem, *submenu, *smenuitem;
   Mailbox *mailbox;
   GList *list;
-  
+
   menu = gtk_menu_new ();
   menuitem = gtk_menu_item_new_with_label ("Transfer");
 
@@ -527,7 +527,7 @@ create_menu (BalsaIndex * bindex, glong mesgno)
     {
       mailbox = list->data;
       smenuitem = gtk_menu_item_new_with_label (mailbox->name);
-      gtk_menu_append(GTK_MENU(submenu), smenuitem);
+      gtk_menu_append (GTK_MENU (submenu), smenuitem);
       gtk_widget_show (smenuitem);
       list = list->next;
     }
@@ -540,16 +540,16 @@ create_menu (BalsaIndex * bindex, glong mesgno)
 
   submenu = gtk_menu_new ();
   smenuitem = gtk_menu_item_new_with_label ("Unread");
-  gtk_menu_append(GTK_MENU(submenu), smenuitem);
+  gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (smenuitem);
   smenuitem = gtk_menu_item_new_with_label ("Read");
-  gtk_menu_append(GTK_MENU(submenu), smenuitem);
+  gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (smenuitem);
   smenuitem = gtk_menu_item_new_with_label ("Replied");
-  gtk_menu_append(GTK_MENU(submenu), smenuitem);
+  gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (smenuitem);
   smenuitem = gtk_menu_item_new_with_label ("Forwarded");
-  gtk_menu_append(GTK_MENU(submenu), smenuitem);
+  gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (smenuitem);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), submenu);
@@ -560,21 +560,21 @@ create_menu (BalsaIndex * bindex, glong mesgno)
 
   submenu = gtk_menu_new ();
   smenuitem = gtk_menu_item_new_with_label ("Highest");
-  gtk_menu_append(GTK_MENU(submenu), smenuitem);
+  gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (smenuitem);
   smenuitem = gtk_menu_item_new_with_label ("High");
-  gtk_menu_append(GTK_MENU(submenu), smenuitem);
+  gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (smenuitem);
   smenuitem = gtk_menu_item_new_with_label ("Normal");
-  gtk_menu_append(GTK_MENU(submenu), smenuitem);
+  gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (smenuitem);
   smenuitem = gtk_menu_item_new_with_label ("Low");
-  gtk_menu_append(GTK_MENU(submenu), smenuitem);
+  gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (smenuitem);
   smenuitem = gtk_menu_item_new_with_label ("Lowest");
-  gtk_menu_append(GTK_MENU(submenu), smenuitem);
+  gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (smenuitem);
-  
+
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), submenu);
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);

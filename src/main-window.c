@@ -222,7 +222,7 @@ create_toolbar (MainWindow *mw)
 			     "Compose Message", 
 			     NULL,
 			     new_icon (p5_xpm, window), 
-			     GTK_SIGNAL_FUNC (sendmsg_window_new),
+			     GTK_SIGNAL_FUNC (new_message),
 			     "Compose Message");
   GTK_WIDGET_UNSET_FLAGS(toolbarbutton, GTK_CAN_FOCUS);
 
@@ -232,7 +232,7 @@ create_toolbar (MainWindow *mw)
 			     "Reply", 
 			     NULL,
 			     new_icon (p6_xpm, window), 
-			     GTK_SIGNAL_FUNC (sendmsg_window_new),
+			     GTK_SIGNAL_FUNC (replyto_message),
 			     "Reply");
   GTK_WIDGET_UNSET_FLAGS(toolbarbutton, GTK_CAN_FOCUS);
 
@@ -241,7 +241,7 @@ create_toolbar (MainWindow *mw)
 			     "Forward", 
 			     "Forward", 
 			     NULL,
-			     new_icon (p8_xpm, window), NULL,
+			     new_icon (p8_xpm, window), GTK_SIGNAL_FUNC(forward_message),
 			     "Forward");
   GTK_WIDGET_UNSET_FLAGS(toolbarbutton, GTK_CAN_FOCUS);
   

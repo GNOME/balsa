@@ -21,24 +21,29 @@
 #define __BALSA_SENDMSG_H__
 
 #ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
-
-typedef struct _BalsaSendmsg       BalsaSendmsg;
-
-struct _BalsaSendmsg
+extern "C"
 {
-  GtkWidget *to, *from, *subject, *cc, *bcc;
-  GtkWidget *text;
-  GtkWidget *window;
-};
+#endif				/* __cplusplus */
 
-void sendmsg_window_new(GtkWidget *, gpointer);
+
+  typedef struct _BalsaSendmsg BalsaSendmsg;
+
+  struct _BalsaSendmsg
+    {
+      GtkWidget *to, *from, *subject, *cc, *bcc;
+      GtkWidget *text;
+      GtkWidget *window;
+    };
+
+  void new_message (GtkWidget *, gpointer);
+  void replyto_message (GtkWidget *, gpointer);
+  void forward_message (GtkWidget *, gpointer);
+
+  void sendmsg_window_new (GtkWidget *, BalsaIndex *, gint);
 
 #ifdef __cplusplus
 }
-#endif /* __cplusplus */
+#endif				/* __cplusplus */
 
 
-#endif /* __BALSA_SENDMSG_H__ */
+#endif				/* __BALSA_SENDMSG_H__ */

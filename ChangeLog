@@ -1,3 +1,8 @@
+2004-10-06 05:18  PeterB
+
+	* libbalsa/send.c: remove X-Balsa-Fcc header when using sendmail
+	backend.
+
 2004-10-05 12:49  PeterB
 
 	* src/main-window.c: check that message still has a mailbox before

@@ -29,15 +29,8 @@ typedef struct _BalsaSendmsg       BalsaSendmsg;
 
 struct _BalsaSendmsg
 {
-  GtkWidget *window;
-  GtkWidget *toolbar;
   GtkWidget *to, *from, *subject, *cc, *bcc;
   GtkWidget *text;
-  GtkWidget *hscrollbar, *vscrollbar;
-  GtkWidget *sendbutton;
-
-  MAILSTREAM *current_stream;
-  glong current_mesgno;
 };
 
 void sendmsg_window_new(GtkWidget *, gpointer);

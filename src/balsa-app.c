@@ -53,8 +53,8 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.addressbook_list = NULL;
 
   load_global_settings ();
-  if (options_init () == -1)
-    setup_local_mailboxes ();
+  options_init ();
+  setup_local_mailboxes ();
   my_special_mailbox ();
 
   /* create main window */
@@ -274,7 +274,9 @@ setup_local_mailboxes ()
 		      mbox->path = g_strdup (filename);
 
 		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbox);
-		      mailbox_add_gnome_config (i, mbox->name, mbox->path, 3);
+/*
+ *		      mailbox_add_gnome_config (i, mbox->name, mbox->path, 3);
+ */
 		    }
 		  if (!strcmp (drv->name, "unix"))
 		    {
@@ -283,7 +285,9 @@ setup_local_mailboxes ()
 		      unixmb->path = g_strdup (filename);
 
 		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, unixmb);
-		      mailbox_add_gnome_config (i, unixmb->name, unixmb->path, 5);
+/*
+ * 		      mailbox_add_gnome_config (i, unixmb->name, unixmb->path, 5);
+ */
 		    }
 		  i++;
 		}

@@ -27,7 +27,7 @@
 gint delete_event (GtkWidget *, gpointer);
 
 static GtkWidget *menu_items[9];
-extern void close_window (GtkWidget *, gpointer);
+static void close_window (GtkWidget *, gpointer);
 
 static update_addyb_window (GtkWidget *, gpointer);
 static void addyb_compose_update (addyb_item *);
@@ -36,6 +36,13 @@ static void addyb_emaillist_update (addyb_item *);
 static GtkWidget *addyb_list;
 static GtkWidget *email_list;
 static GtkWidget *commentstext;
+
+
+static void
+close_window (GtkWidget * widget, gpointer data)
+{
+	  gtk_widget_destroy (GTK_WIDGET (data));
+}
 
 static addyb_item *
 addyb_item_new (gchar * name, gchar * comments)

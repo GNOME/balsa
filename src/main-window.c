@@ -1399,6 +1399,15 @@ real_open_mbnode(BalsaMailboxNode * mbnode)
     }
 
     gdk_threads_enter();
+    g_object_add_weak_pointer(G_OBJECT(mbnode), (gpointer) &mbnode);
+    g_object_unref(mbnode);
+    if (mbnode)
+	g_object_remove_weak_pointer(G_OBJECT(mbnode), (gpointer) &mbnode);
+    else
+    {
+	gdk_threads_leave();
+	return;
+    }
     window = g_object_get_data(G_OBJECT(mbnode), BALSA_WINDOW_KEY);
     g_object_set_data(G_OBJECT(mbnode), BALSA_WINDOW_KEY, NULL);
     index = BALSA_INDEX(balsa_index_new());
@@ -1469,6 +1478,7 @@ balsa_window_real_open_mbnode(BalsaWindow * window, BalsaMailboxNode * mbnode)
 
 #endif
     g_object_set_data(G_OBJECT(mbnode), BALSA_WINDOW_KEY, window);
+    g_object_ref(mbnode);
 #ifdef BALSA_USE_THREADS
     pthread_create(&open_thread, NULL, (void*(*)(void*))real_open_mbnode, 
                    mbnode);

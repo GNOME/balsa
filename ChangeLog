@@ -1,3 +1,8 @@
+2001-06-18  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/sendmsg-window.h:
+	* src/sendmsg-window.c: autopostpone messages when balsa exits
+	
 2001-06-17  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/main-window.c (check_messages_thread): check mboxes

@@ -78,6 +78,7 @@ static gchar *read_signature(void);
 static gint include_file_cb(GtkWidget *, BalsaSendmsg *);
 static gint send_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint queue_message_cb(GtkWidget *, BalsaSendmsg *);
+static gint autopostpone_message( gpointer bsmsg );
 static gint postpone_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint print_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint attach_clicked(GtkWidget *, gpointer);
@@ -498,6 +499,9 @@ balsa_sendmsg_destroy(BalsaSendmsg * bsm)
     g_assert(ELEMENTS(headerDescs) == ELEMENTS(bsm->view_checkitems));
 
     if(balsa_app.debug) g_message("balsa_sendmsg_destroy(): Start.");
+
+    gtk_quit_remove (bsm->quituid);
+
     if (bsm->orig_message) {
 	if (bsm->orig_message->mailbox)
 	    libbalsa_mailbox_close(bsm->orig_message->mailbox);
@@ -1566,6 +1570,8 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     else
 	gtk_widget_grab_focus(msg->text);
 
+    msg->quituid = gtk_quit_add( 0, autopostpone_message, msg );
+
     msg->update_config = TRUE;
     return msg;
 }
@@ -1922,10 +1928,17 @@ send_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     return send_message_handler(bsmsg, FALSE);
 }
 
+
 static gint
 queue_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
     return send_message_handler(bsmsg, TRUE);
+}
+
+static gint
+autopostpone_message( gpointer bsmsg )
+{
+    return postpone_message_cb( NULL, (BalsaSendmsg *)bsmsg );
 }
 
 /* "postpone message" menu and toolbar callback */

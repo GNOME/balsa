@@ -62,8 +62,6 @@ static GtkWidget *create_menu (GtkCTree * ctree, Mailbox * mailbox);
 static void open_cb (GtkWidget *, gpointer);
 static void close_cb (GtkWidget *, gpointer);
 
-static gboolean mailbox_nodes_to_ctree (GtkCTree *, guint, GNode *, GtkCTreeNode *, gpointer);
-
 void
 mblist_open_window (GnomeMDI * mdi)
 {
@@ -81,11 +79,11 @@ mblist_open_window (GnomeMDI * mdi)
   mblw = g_malloc0 (sizeof (MBListWindow));
 
   im = gdk_imlib_create_image_from_xpm_data (plain_folder_xpm);
-    gdk_imlib_render (im, im->rgb_width, im->rgb_height);
-      tray_empty = gdk_imlib_copy_image (im);
-        tray_empty_mask = gdk_imlib_copy_mask (im);
-	  gdk_imlib_destroy_image (im);
-  
+  gdk_imlib_render (im, im->rgb_width, im->rgb_height);
+  tray_empty = gdk_imlib_copy_image (im);
+  tray_empty_mask = gdk_imlib_copy_mask (im);
+  gdk_imlib_destroy_image (im);
+
   im = gdk_imlib_create_image_from_xpm_data (trash_xpm);
   gdk_imlib_render (im, im->rgb_width, im->rgb_height);
   trashpix = gdk_imlib_copy_image (im);
@@ -114,8 +112,8 @@ mblist_open_window (GnomeMDI * mdi)
   gtk_widget_push_colormap (gdk_imlib_get_colormap ());
 
   mblw->ctree = GTK_CTREE (balsa_mblist_new ());
-  balsa_app.mblist = BALSA_MBLIST(mblw->ctree);
-  
+  balsa_app.mblist = BALSA_MBLIST (mblw->ctree);
+
   gtk_widget_pop_colormap ();
   gtk_widget_pop_visual ();
 
@@ -126,7 +124,7 @@ mblist_open_window (GnomeMDI * mdi)
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG (mblw->window)->vbox), GTK_WIDGET (mblw->ctree), TRUE, TRUE, 0);
   gtk_widget_show (GTK_WIDGET (mblw->ctree));
 
-  balsa_mblist_redraw (BALSA_MBLIST(balsa_app.mblist));
+  balsa_mblist_redraw (BALSA_MBLIST (balsa_app.mblist));
 
   height = GTK_CLIST (mblw->ctree)->rows * GTK_CLIST (mblw->ctree)->row_height;
 
@@ -229,10 +227,9 @@ close_mblist_window (GtkWidget * widget)
   if (!mblw)
     return;
 
-  gtk_widget_realize (mblw->window);
-  gdk_window_get_size (mblw->window->window,
-		       &balsa_app.mblist_width, &balsa_app.mblist_height);
-  gtk_widget_unrealize (mblw->window);
+  balsa_app.mblist_width = mblw->window->allocation.width;
+  balsa_app.mblist_height = mblw->window->allocation.height;
+
   gtk_widget_destroy (mblw->window);
   gtk_widget_destroy (GTK_WIDGET (mblw->ctree));
 }

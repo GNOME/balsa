@@ -34,13 +34,13 @@ struct _BalsaMBList
 
 struct _BalsaMBListClass
   {
-    GtkBinClass parent_class;
+    GtkCTreeClass parent_class;
 
     void (*select_mailbox) (BalsaMBList * bmblist, Mailbox * mailbox);
   };
 
 GtkWidget *balsa_mblist_new (void);
 void balsa_mblist_redraw (BalsaMBList *bmbl);
-
+guint balsa_mblist_get_type (void);
 
 #endif

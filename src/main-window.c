@@ -104,8 +104,8 @@ main_window_set_cursor (gint type)
 static void
 destroy_window_cb (GnomeMDI * mdi, gpointer data)
 {
-  gdk_window_get_size (GTK_WIDGET (mdi->active_window)->window,
-		       &balsa_app.mw_width, &balsa_app.mw_height);
+  balsa_app.mw_width = GTK_WIDGET(mdi->active_window)->allocation.width;
+  balsa_app.mw_height = GTK_WIDGET(mdi->active_window)->allocation.height;
   balsa_exit ();
 }
 

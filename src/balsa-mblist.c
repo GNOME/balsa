@@ -83,7 +83,7 @@ balsa_mblist_get_type (void)
 }
 
 GtkWidget *
-balsa_mblist_new ()
+balsa_mblist_new (void)
 {
   BalsaMBList *new;
 
@@ -168,7 +168,7 @@ balsa_mblist_init (BalsaMBList * tree)
   gtk_widget_push_visual (gdk_imlib_get_visual ());
   gtk_widget_push_colormap (gdk_imlib_get_colormap ());
 
-  GTK_BIN (tree)->child = gtk_ctree_new (1, 0);
+  gtk_ctree_construct (GTK_CTREE(tree), 1, 0, NULL);
 
   gtk_widget_pop_colormap ();
   gtk_widget_pop_visual ();
@@ -191,7 +191,7 @@ balsa_mblist_redraw (BalsaMBList *bmbl)
   if (!BALSA_IS_MBLIST (bmbl))
     return;
 
-  ctree = GTK_CTREE(GTK_BIN(bmbl)->child);
+  ctree = GTK_CTREE(bmbl);
 
   gtk_clist_freeze (GTK_CLIST (ctree));
 

@@ -1,3 +1,7 @@
+2003-10-19 20:12  PeterB
+
+	* src/: balsa-message.c, save-restore.c: Plug memory leaks.
+
 2003-10-19  Carlos Morgado  <chbm gnome.org>
 
 	* libbalsa/mailbox_imap.c (libbalsa_mailbox_imap_get_msg_part): 

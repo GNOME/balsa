@@ -3,6 +3,9 @@
   $Id$
 */
 
+/* FIXME: work under progress. do not make parte of install */
+
+
 module GNOME {
   module Balsa {
     

@@ -1569,22 +1569,23 @@ mblist_drag_motion_cb(GtkWidget * mblist, GdkDragContext * context,
 
 /* mblist_scan_mailbox_node:
  * public interface for checking whether a mailbox node's children need
- * scanning.
+ * scanning. 
+ * Note that rescanning local_mail_directory will *not* trigger rescanning
+ * eventual IMAP servers.
  */
-
 void
 mblist_scan_mailbox_node(BalsaMBList * mblist, BalsaMailboxNode * mbnode)
 {
     GtkCTreeNode *node =
         gtk_ctree_find_by_row_data(GTK_CTREE(mblist), NULL, mbnode);
-    balsa_mblist_scan_children(GTK_CTREE(mblist), node);
+    if(node)    /* false only for the root: local_mail_directory */
+        balsa_mblist_scan_children(GTK_CTREE(mblist), node);
 }
 
 /* balsa_mblist_scan_children:
  * called by mailbox_tree_expand, after the tree has been expanded, and
  * by mblist_scan_mailbox_node, the public interface.
  */
-
 static void
 balsa_mblist_scan_children(GtkCTree * ctree, GtkCTreeNode * node)
 {

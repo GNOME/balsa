@@ -43,6 +43,7 @@
 
 #ifdef HAVE_GTKHTML
 #include <gtkhtml/gtkhtml.h>
+#include <gtkhtml/gtkhtml-stream.h>
 #endif
 
 #ifdef HAVE_PCRE
@@ -137,6 +138,9 @@ static void balsa_gtk_text_size_request(GtkWidget * widget,
 static void balsa_gtk_html_size_request(GtkWidget * widget,
 					GtkRequisition * requisition,
 					gpointer data);
+static gboolean balsa_gtk_html_url_requested(GtkWidget *html, const gchar *url,
+					     GtkHTMLStream* stream,
+					     LibBalsaMessage* msg);
 static void balsa_gtk_html_link_clicked(GtkWidget *html, 
 					const gchar *url);
 #endif
@@ -2029,6 +2033,8 @@ part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info, gchar * ptr,
     GtkWidget *html;
 
     html = gtk_html_new();
+    gtk_signal_connect(GTK_OBJECT(html), "url_requested",
+ 		     (GtkSignalFunc)balsa_gtk_html_url_requested, bm->message);
 
     stream = gtk_html_begin(GTK_HTML(html));
     gtk_html_write(GTK_HTML(html), stream, ptr, len);
@@ -2873,6 +2879,29 @@ balsa_gtk_html_size_request(GtkWidget * widget,
     requisition->width  += GTK_LAYOUT(widget)->hadjustment->upper -1 /*EMP*/;
     requisition->height += GTK_LAYOUT(widget)->vadjustment->upper -1 /*EMP*/;
 
+}
+
+static gboolean
+balsa_gtk_html_url_requested(GtkWidget *html, const gchar *url,
+			     GtkHTMLStream* stream, LibBalsaMessage* msg)
+{
+    FILE* f;
+    int i;
+    char buf[4096];
+
+    if(strncmp(url,"cid:",4)) {
+	printf("non-local URL request ignored: %s\n", url);
+	return FALSE;
+    }
+    if( (f=libbalsa_message_get_part_by_id(msg,url+4)) == NULL)
+	return FALSE;
+
+    while ((i = fread (buf, 1, sizeof(buf), f)) != 0)
+	gtk_html_stream_write (stream, buf, i);
+    gtk_html_stream_close(stream, GTK_HTML_STREAM_OK);
+    fclose (f);
+    
+    return TRUE;
 }
 
 static void

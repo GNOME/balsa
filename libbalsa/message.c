@@ -793,7 +793,7 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
 	UNLOCK_MAILBOX(message->mailbox);
 
 	fseek(msg->fp, cur->content->offset, 0);	
-    } else {
+    } else {  /* disconnected mode */
 	UNLOCK_MAILBOX(message->mailbox);
 	msg = (MESSAGE *)g_malloc (sizeof (MESSAGE));
 	msg->fp = libbalsa_mailbox_get_message_stream(message->mailbox,
@@ -880,6 +880,20 @@ libbalsa_message_body_unref(LibBalsaMessage * message)
 	message->body_list = NULL;
     }
     if(message->mailbox) { UNLOCK_MAILBOX(message->mailbox); }
+}
+
+/* libbalsa_message_get_part_by_id:
+   return a message part identified by Content-ID=id
+   message must be referenced. (FIXME?)
+*/
+FILE*
+libbalsa_message_get_part_by_id(LibBalsaMessage* msg, const gchar* id)
+{
+    LibBalsaMessageBody* body = 
+	libbalsa_message_body_get_by_id(msg->body_list,	id);
+    if(!body) return NULL;
+    if(!libbalsa_message_body_save_temporary(body, NULL)) return NULL;
+    return fopen(body->temp_filename, "r");
 }
 
 

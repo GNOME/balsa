@@ -25,9 +25,8 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 
+#include <stdio.h>
 #include <time.h>
-
-#include "libbalsa.h"
 
 #if ENABLE_ESMTP
 #include <auth-client.h>
@@ -221,7 +220,8 @@ GList *libbalsa_message_user_hdrs(LibBalsaMessage * message);
 GList *libbalsa_message_find_user_hdr(LibBalsaMessage * message, 
                                       const gchar * find);
 LibBalsaMessage *libbalsa_message_find_by_message_id(LibBalsaMailbox * mailbox,
-                                                     gchar * msgid);
+						     gchar * msgid);
+FILE* libbalsa_message_get_part_by_id(LibBalsaMessage* msg, const gchar* id);
 
 void libbalsa_message_set_dispnotify(LibBalsaMessage *message, 
 				     LibBalsaAddress *address);

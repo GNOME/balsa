@@ -1,3 +1,7 @@
+2003-01-02  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* parse.c: add id body parameter if Content-ID found.
+
 2002-10-15  Carlos Morgado  <chbm@chbm.nu>
 
 	* imap/message.c (imap_append_message): read last line

@@ -404,6 +404,14 @@ libbalsa_message_user_hdrs(LibBalsaMessage * message)
 gboolean
 libbalsa_message_move(LibBalsaMessage * message, LibBalsaMailbox * dest)
 {
+    if (message->mailbox->readonly) {
+	libbalsa_information(
+	    LIBBALSA_INFORMATION_ERROR,
+	    _("Source mailbox (%s) is readonly. Cannot move message"),
+	    message->mailbox->name);
+	return FALSE;
+    }
+
     if (libbalsa_message_copy (message, dest)) {
         libbalsa_message_delete (message);
         return TRUE;
@@ -414,6 +422,16 @@ libbalsa_message_move(LibBalsaMessage * message, LibBalsaMailbox * dest)
 gboolean
 libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
 {
+    g_return_val_if_fail(messages, FALSE);
+
+    if (LIBBALSA_MESSAGE(messages->data)->mailbox->readonly) {
+	libbalsa_information(
+	    LIBBALSA_INFORMATION_ERROR,
+	    _("Source mailbox (%s) is readonly. Cannot move messages"),
+	    LIBBALSA_MESSAGE(messages->data)->mailbox->name);
+	return FALSE;
+    }
+
     if (libbalsa_messages_copy (messages, dest)) {
         libbalsa_messages_delete (messages);
         return TRUE;
@@ -466,15 +484,6 @@ libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
 
     g_return_val_if_fail(messages != NULL, FALSE);
     g_return_val_if_fail(dest != NULL, FALSE);
-
-    if (LIBBALSA_MESSAGE(messages->data)->mailbox->readonly) {
-	libbalsa_information(
-	    LIBBALSA_INFORMATION_ERROR,
-	    _("Source mailbox (%s) is readonly. Cannot move messages"),
-	    LIBBALSA_MESSAGE(messages->data)->mailbox->name);
-	return FALSE;
-    }
-
 
     handle = libbalsa_mailbox_open_append(dest);
     if (!handle) {

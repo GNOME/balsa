@@ -6,7 +6,7 @@
 	* src/balsa-mblist.c: get rid of one more balsa_index_reset();
 	clean up the code.
 	* libbalsa/message.c: fix message counting and uninitialized
-	variable usage.
+	variable usage. Fix message copying from readonly mailboxes.
 	* libbalsa/send.c: commiting closed mailboxes makes no sense.
 	* src/balsa-index.c: yet another balsa_index_reset() removed.
 	* src/main-window.c: two balsa_index_reset() removed.

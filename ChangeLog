@@ -1,3 +1,11 @@
+2003-01-12  PeterB
+
+	* src/: main-window.c, main-window.h: Don't export
+	balsa_window_set_threading_menu.
+	* src/balsa-index.c: Rethread after removing messages; implement
+	and use a new helper, bndx_select_message;
+	balsa_window_set_threading_menu is now handled in main window.
+
 2003-01-11  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/address-book-ldif.c: fix UTF-8 issues and nicknames.

@@ -57,10 +57,6 @@ static gint close_window (GtkWidget *, gpointer);
 static gint check_if_regular_file (const gchar *);
 static void balsa_sendmsg_destroy (BalsaSendmsg * bsm);
 
-static void wrap_body_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
-static void reflow_par_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
-static void reflow_body_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
-
 static void check_readiness(GtkEditable *w, BalsaSendmsg *bsmsg);
 static void set_menus(BalsaSendmsg*);
 static gint toggle_from_cb (GtkWidget *, BalsaSendmsg *);
@@ -114,6 +110,7 @@ static GtkTargetEntry email_field_drop_types[] =
 static void cut_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
 static void copy_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
 static void paste_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
+static void select_all_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
 static void wrap_body_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
 static void reflow_par_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
 static void reflow_body_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
@@ -183,22 +180,25 @@ static GnomeUIInfo edit_menu[] =
    GNOMEUIINFO_MENU_CUT_ITEM(cut_cb, NULL),
    GNOMEUIINFO_MENU_COPY_ITEM(copy_cb, NULL),
    GNOMEUIINFO_MENU_PASTE_ITEM(paste_cb, NULL),
+   { GNOME_APP_UI_ITEM, N_ ("Select all"), NULL,
+     (gpointer) select_all_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
+     NULL, 'A', GDK_CONTROL_MASK, NULL },
    GNOMEUIINFO_SEPARATOR,
-#define EDIT_MENU_WRAP_BODY 4
+#define EDIT_MENU_WRAP_BODY 5
    { GNOME_APP_UI_ITEM, N_ ("_Wrap body") ,N_ ("Wrap message lines"),
      (gpointer)wrap_body_cb, NULL, NULL,  GNOME_APP_PIXMAP_NONE, NULL, 
      GDK_z, GDK_CONTROL_MASK, NULL },
    GNOMEUIINFO_SEPARATOR,
-#define EDIT_MENU_REFLOW_PARA 6
+#define EDIT_MENU_REFLOW_PARA 7
    { GNOME_APP_UI_ITEM, N_ ("_Reflow paragraph") , NULL,
      (gpointer)reflow_par_cb, NULL, NULL,  GNOME_APP_PIXMAP_NONE, NULL, 
      GDK_r, GDK_CONTROL_MASK, NULL },
-#define EDIT_MENU_REFLOW_MESSAGE 7
+#define EDIT_MENU_REFLOW_MESSAGE 8
    { GNOME_APP_UI_ITEM, N_ ("R_eflow message") , NULL,
      (gpointer)reflow_body_cb, NULL, NULL,  GNOME_APP_PIXMAP_NONE, NULL, 
      GDK_r, GDK_CONTROL_MASK | GDK_SHIFT_MASK, NULL },
    GNOMEUIINFO_SEPARATOR,
-#define EDIT_MENU_SPELL_CHECK 9
+#define EDIT_MENU_SPELL_CHECK 10
    GNOMEUIINFO_ITEM_STOCK (N_("Check Spelling"), 
                            N_("Spell check the current message"), 
                            spell_check_cb, GNOME_STOCK_MENU_SPELLCHECK),
@@ -1623,6 +1623,12 @@ static void
 paste_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
 {
   gtk_editable_paste_clipboard(GTK_EDITABLE(bsmsg->text));
+}
+
+static void
+select_all_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
+{
+  gtk_editable_select_region(GTK_EDITABLE(bsmsg->text), 0, -1); 
 }
 
 static void

@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 1.2\n"
 "POT-Creation-Date: 2002-01-21 06:18-0500\n"
-"PO-Revision-Date: 2002-01-22 00:39+0100\n"
+"PO-Revision-Date: 2002-01-22 00:54+0100\n"
 "Last-Translator: Vincent van Adrighem <V.vanAdrighem@dirck.mine.nu>\n"
 "Language-Team: Dutch <nl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -25,7 +25,7 @@ msgid ""
 "from: %s"
 msgstr ""
 "Kan programma-invoer adresboek %s niet openen tijdens het lezen van uitvoer "
-"van: %s"
+"van: "
 
 #. The externq database doesn't support Id's, sorry!
 #: libbalsa/address-book-extern.c:235 libbalsa/address-book-ldap.c:379
@@ -614,8 +614,8 @@ msgid ""
 "The pathname \"%s\" must be specified canonically -- it must start with a "
 "'/'."
 msgstr ""
-"De padnaam \"%s\" moet compleet worden opgegeven -- Hij moet beginnen met "
-"een '/'."
+"De padnaam \"%s\" moet compleet worden opgegeven -- Hij moet beginnen met een "
+"'/'."
 
 #: libinit_balsa/balsa-druid-page-directory.gob:134
 #, c-format
@@ -736,8 +736,8 @@ msgstr ""
 #, c-format
 msgid "The path %s must be relative to the filesystem root (start with /)."
 msgstr ""
-"Het pad %s moet relatief zijn aan het hoofd bestandssysteem (beginnende "
-"met /)."
+"Het pad %s moet relatief zijn aan het hoofd bestandssysteem (beginnende met "
+"/)."
 
 #: libinit_balsa/helper.c:158 libinit_balsa/helper.c:176
 #, c-format
@@ -794,8 +794,7 @@ msgstr "[-- Autoview stderr van %s --]\n"
 
 #: libmutt/handler.c:1595
 msgid "[-- Error: message/external-body has no access-type parameter --]\n"
-msgstr ""
-"[-- Fout: message/external-body heeft geen toegangstype parameter --]\n"
+msgstr "[-- Fout: message/external-body heeft geen toegangstype parameter --]\n"
 
 #: libmutt/handler.c:1612
 #, c-format
@@ -2095,8 +2094,8 @@ msgid ""
 "There are opened filter run dialogs, close them before you can modify "
 "filters."
 msgstr ""
-"Er zijn geopende dialogen met werkende filters, sluit ze voordat u de "
-"filters wijzigt."
+"Er zijn geopende dialogen met werkende filters, sluit ze voordat u de filters "
+"wijzigt."
 
 #: src/filter-export-dialog.c:73
 msgid "Balsa Filters Export"
@@ -2144,8 +2143,8 @@ msgid ""
 "The filters dialog is opened, close it before you can run filters on any "
 "mailbox"
 msgstr ""
-"Er zijn geopende dialogen met werkende filters, sluit ze voordat u de "
-"filters uitvoert"
+"Er zijn geopende dialogen met werkende filters, sluit ze voordat u de filters "
+"uitvoert"
 
 #: src/folder-conf.c:169
 msgid "Remote IMAP folder"
@@ -2261,8 +2260,8 @@ msgstr "Bladeren..."
 
 #: src/folder-conf.c:536
 msgid ""
-"This folder is not stored in configuration.I do not yet know how to remove "
-"it from remote server."
+"This folder is not stored in configuration.I do not yet know how to remove it "
+"from remote server."
 msgstr ""
 "Deze map is niet opgeslagen in configuratie.Ik weet nog niet hoe deze te "
 "verwijderen van de server"
@@ -2275,8 +2274,8 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 "Dit zal de postbus %s verwijderen uit de lijst van postbussen\n"
-"U kunt later \"Nieuwe IMAP map\" gebruiken om de postbus weer toe voegen, "
-"Wat wilt u doen?"
+"U kunt later \"Nieuwe IMAP map\" gebruiken om de postbus weer toe voegen, Wat "
+"wilt u doen?"
 
 #: src/folder-conf.c:549 src/mailbox-conf.c:222 src/mailbox-conf.c:246
 msgid "Remove from list"
@@ -2359,8 +2358,8 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 "Dit zal de postbus %s verwijderen uit de lijst van postbussen\n"
-"U kunt later \"Toevoegen postbus\" gebruiken om de postbus weer te "
-"benaderen, Weet u zeker dat u de postbus wilt verwijderen?"
+"U kunt later \"Toevoegen postbus\" gebruiken om de postbus weer te benaderen, "
+"Weet u zeker dat u de postbus wilt verwijderen?"
 
 #: src/mailbox-conf.c:298
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
@@ -2465,11 +2464,11 @@ msgstr "Lokaal MH postbus..."
 #
 #: src/mailbox-node.c:578 src/main-window.c:283 src/pref-manager.c:2483
 msgid "Remote IMAP mailbox..."
-msgstr "IMAP postbus op server..."
+msgstr "IMAP postbus op afstand..."
 
 #: src/mailbox-node.c:581 src/main-window.c:289 src/pref-manager.c:2488
 msgid "Remote IMAP folder..."
-msgstr "Server IMAP map..."
+msgstr "IMAP map op afstand..."
 
 #: src/mailbox-node.c:583 src/main-window.c:294
 msgid "Remote IMAP subfolder..."
@@ -2953,8 +2952,8 @@ msgstr "Copyright (C) 1997-2001"
 
 #: src/main-window.c:1575
 msgid ""
-"The Balsa email client is part of the GNOME desktop environment.  "
-"Information on Balsa can be found at http://www.balsa.net/\n"
+"The Balsa email client is part of the GNOME desktop environment.  Information "
+"on Balsa can be found at http://www.balsa.net/\n"
 "\n"
 "If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
 msgstr ""
@@ -3128,7 +3127,7 @@ msgstr "8bits"
 
 #: src/pref-manager.c:221
 msgid "quoted"
-msgstr "aangehaald"
+msgstr "geciteerde"
 
 #: src/pref-manager.c:231
 msgid "While Retrieving Messages"
@@ -3253,11 +3252,11 @@ msgstr "Controleren"
 
 #: src/pref-manager.c:1501 src/pref-manager.c:2186
 msgid "minutes"
-msgstr "minuten"
+msgstr "minuten of er post is"
 
 #: src/pref-manager.c:1513
 msgid "Check mail automatically every:"
-msgstr "Kijk automatisch of er post is elke:"
+msgstr "Kijk automatisch elke:"
 
 #: src/pref-manager.c:1522
 msgid "Check IMAP mailboxes"
@@ -3284,7 +3283,7 @@ msgstr "Aangehaalde tekst"
 
 #: src/pref-manager.c:1556
 msgid "Quoted Text Regular Expression"
-msgstr "Reguliere expressie van aangehaalde text"
+msgstr "Reguliere expressie van geciteerde text"
 
 #: src/pref-manager.c:1565
 msgid "Wrap Incoming Text at:"
@@ -3292,7 +3291,7 @@ msgstr "Breek inkomende tekst af op:"
 
 #: src/pref-manager.c:1574 src/pref-manager.c:1681
 msgid "Characters"
-msgstr "Tekens"
+msgstr "tekens"
 
 #: src/pref-manager.c:1579
 msgid "Reflow messages of type `text/plain; format=flowed'"
@@ -3318,8 +3317,8 @@ msgid ""
 "list)"
 msgstr ""
 "de berichtkopregels in orde lijken\n"
-"(het notify-to adres is gelijk aan het return path, ik in de Aan of Cc lijst "
-"voorkom)"
+"(het notify-to adres is gelijk aan het return pad en ik sta in de Aan of Cc "
+"lijst)"
 
 #: src/pref-manager.c:1621
 msgid "the message header looks suspicious"
@@ -3331,7 +3330,7 @@ msgstr "Woordafbreking"
 
 #: src/pref-manager.c:1665
 msgid "Wrap Outgoing Text at:"
-msgstr "Lijn uitgaande tekst uit, bij:"
+msgstr "Gebruik regelterugloop, bij:"
 
 #: src/pref-manager.c:1686
 msgid "Send message as type `text/plain; format=flowed'"
@@ -3355,7 +3354,7 @@ msgstr "Antwoordvoorvoegsel:"
 
 #: src/pref-manager.c:1710
 msgid "Automatically quote original when replying"
-msgstr "Citeer automatisch het origineel tijdens beantwoorden"
+msgstr "Citeer automatisch het origineel bij beantwoorden"
 
 #: src/pref-manager.c:1715
 msgid "Don't include HTML parts as text when replying or forwarding mail"
@@ -3545,7 +3544,7 @@ msgstr "Controleer ondertekening"
 
 #: src/pref-manager.c:2133
 msgid "Check quoted"
-msgstr "Controleer aangehaald"
+msgstr "Controleer geciteerd"
 
 #: src/pref-manager.c:2163
 msgid "Debug"
@@ -3624,7 +3623,7 @@ msgstr "Maak standaard"
 #
 #: src/pref-manager.c:2479
 msgid "Remote POP3 mailbox..."
-msgstr "IMAP postbus op server..."
+msgstr "POP3 postbus op afstand..."
 
 #: src/pref-manager.c:2619
 msgid "Show nothing"
@@ -4045,8 +4044,8 @@ msgstr "Toevoegen als referentie?"
 #: src/sendmsg-window.c:977
 #, c-format
 msgid ""
-"Saying yes will not send the file `%s' itself, but just a MIME message/"
-"external-body reference.  Note that the recipient must have proper "
+"Saying yes will not send the file `%s' itself, but just a MIME "
+"message/external-body reference.  Note that the recipient must have proper "
 "permissions to see the `real' file.\n"
 "\n"
 "Do you really want to attach this file as reference?"
@@ -4215,7 +4214,8 @@ msgid "Replace the current word with the selected suggestion"
 msgstr "Vervang dit woord door de geselecteerde suggestie"
 
 #: src/spell-check.c:499
-msgid "Replace all occurences of the current word with the selected suggestion"
+msgid ""
+"Replace all occurences of the current word with the selected suggestion"
 msgstr "Vervang alle voorkomens van dit woord met de geselecteerde suggestie"
 
 #: src/spell-check.c:506
@@ -4554,8 +4554,8 @@ msgstr "'Aan' adres onjuist of niet aanwezig"
 msgid ""
 "There are opened filter run dialogs, close them before you can modify filters"
 msgstr ""
-"Er zijn geopende dialogen met werkende filters, sluit ze voordat u de "
-"filters wijzigt"
+"Er zijn geopende dialogen met werkende filters, sluit ze voordat u de filters "
+"wijzigt"
 
 msgid "Error : not enough memory"
 msgstr "Fout: niet genoeg geheugenruimte"
@@ -4809,8 +4809,7 @@ msgid "Path"
 msgstr "Pad"
 
 msgid ""
-"This will remove the mailbox %s and it's files permanently from your "
-"system.\n"
+"This will remove the mailbox %s and it's files permanently from your system.\n"
 "Are you sure you want to remove this mailbox?"
 msgstr ""
 "Dit verwijdert het postvak %s en zijn bestanden permanent van uw systeem.\n"
@@ -4871,7 +4870,7 @@ msgid "Charset"
 msgstr "Karakterset"
 
 msgid "Colour of quoted text"
-msgstr "Kleur van aangehaalde tekst"
+msgstr "Kleur van geciteerde tekst"
 
 msgid "Baltic"
 msgstr "Batisch"
@@ -5014,8 +5013,8 @@ msgstr "Het lijkt erop dat u Balsa voor het eerst start.\n"
 msgid ""
 "The following steps will setup Balsa by asking a few simple questions.  "
 msgstr ""
-"Balsa wordt geconfigureerd via het beantwoorden van enkele eenvoudige "
-"vragen. "
+"Balsa wordt geconfigureerd via het beantwoorden van enkele eenvoudige vragen. "
+""
 
 msgid ""
 "Once you have completed these steps, you can always change them at a later "
@@ -5061,3 +5060,4 @@ msgstr "Postbussen/Geopend/"
 
 msgid "Mailboxes/<Separator>"
 msgstr "Postbussen/<Separator>"
+

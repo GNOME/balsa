@@ -1,3 +1,11 @@
+2000-04-18  Peter Williams  <peter@beta.newton.cx>
+
+	* main.html.in: Updated for 0.8.0-pre1
+	
+	* bugs.html.in: New file with bug report instructions.
+	
+	* *.html.in: Fix titles to be different.
+
 2000-04-04  Peter Williams  <peter@beta.newton.cx>
 
 	* main.html.in: Added announcement of Balsa 0.8.

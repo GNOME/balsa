@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2000-02-18 23:42+0200\n"
+"POT-Creation-Date: 2000-04-18 21:23-0400\n"
 "PO-Revision-Date: 1999-12-09 21:44+0200\n"
 "Last-Translator: Lemmit Toomet <leone@cafe.ee>>\n"
 "Language-Team: Estonian <linux-l@eenet.ee>\n"
@@ -13,20 +13,169 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8-bit\n"
 
-#: src/address-book.c:165
-msgid "Add New Address"
-msgstr "Lisa uus aadress"
+#: libbalsa/mailbox.c:596
+#, c-format
+msgid "Mailbox: Opening %s Refcount: %d\n"
+msgstr "Postkast: Avan %s Refcount %d\n"
 
-#: libinit_balsa/balsa-druid-page-user.gob:82 src/address-book.c:171
-#: src/address-book.c:309
+#: libbalsa/mailbox.c:616
+#, c-format
+msgid "Mailbox: Closing %s Refcount: %d\n"
+msgstr "Postkast: Sulgen %s Refcount: %d\n"
+
+#: libinit_balsa/balsa-druid-page-directory.gob:58
+#, c-format
+msgid ""
+"The pathname \"%s\" must be specified canonically -- it must start with a "
+"'/'."
+msgstr "Rada \"%s\" tuleb anda kanooniliselt, s.t. alguses peab olema '/'."
+
+#: libinit_balsa/balsa-druid-page-directory.gob:76
+#, c-format
+msgid "An error occurred when attempting to creat(2) the file \"%s\"."
+msgstr "Juhtus viga, kui üritati luua faili \"%s\" käsuga creat()."
+
+#: libinit_balsa/balsa-druid-page-directory.gob:84
+#, c-format
+msgid "The mailbox \"%s\" does not appear to be valid."
+msgstr "\"%s\" ei ole kehtiva postkasti nimi."
+
+#: libinit_balsa/balsa-druid-page-directory.gob:146
+msgid ""
+"Please confirm the locations of your default mail files.\n"
+"These will be created if necessary."
+msgstr ""
+"Palun kinnitage vaikimisi postifailide asukohad.\n"
+"Kui selliseid faile ei ole, siis need luuakse."
+
+#: libinit_balsa/balsa-druid-page-directory.gob:157
+msgid "Inbox:"
+msgstr "Saabunud:"
+
+#. This used to set all the mail directories to their proper values
+#. * as in the prepare code. But at this point balsa_app.local_mail_directory
+#. * is NULL, so we use a dummy value.
+#.
+#: libinit_balsa/balsa-druid-page-directory.gob:166
+msgid "Outbox:"
+msgstr "Saatmisel:"
+
+#: libinit_balsa/balsa-druid-page-directory.gob:169
+msgid "Sentbox:"
+msgstr "Saadetud:"
+
+#: libinit_balsa/balsa-druid-page-directory.gob:172
+msgid "Draftbox:"
+msgstr "Mustandid:"
+
+#: libinit_balsa/balsa-druid-page-directory.gob:175
+msgid "Trash:"
+msgstr "Prügikast:"
+
+#: libinit_balsa/balsa-druid-page-directory.gob:186
+msgid "Mail Files"
+msgstr "Postifailid"
+
+#: libinit_balsa/balsa-druid-page-directory.gob:259
+msgid "Problem Creating Mailboxes"
+msgstr "Viga postkastide loomisel"
+
+#: libinit_balsa/balsa-druid-page-finish.gob:44
+msgid ""
+"You've successfully set up Balsa. Have fun!\n"
+"   -- The Balsa development team"
+msgstr ""
+"Teie Balsa paigaldamine õnnestus. Edu ka edaspidiseks!\n"
+"  -- Balsa meeskond"
+
+#: libinit_balsa/balsa-druid-page-finish.gob:56
+msgid "All Done!"
+msgstr "Valmis!"
+
+#: libinit_balsa/balsa-druid-page-user.gob:74
+msgid "Please enter information about yourself."
+msgstr "Palun sisestage informatsioon iseenda kohta."
+
+#: libinit_balsa/balsa-druid-page-user.gob:82 src/address-book.c:185
+#: src/address-book.c:410
 msgid "Name:"
 msgstr "Nimi:"
 
-#: src/address-book.c:177
+#: libinit_balsa/balsa-druid-page-user.gob:86
+msgid "Email address:"
+msgstr "E-posti aadress:"
+
+#: libinit_balsa/balsa-druid-page-user.gob:90
+msgid "SMTP Server:"
+msgstr "SMTP server:"
+
+#: libinit_balsa/balsa-druid-page-user.gob:93
+msgid "Local Mail Directory:"
+msgstr "Kohalik postikataloog:"
+
+#: libinit_balsa/balsa-druid-page-user.gob:103
+msgid "User Settings"
+msgstr "Kasutaja andmed"
+
+#: libinit_balsa/balsa-druid-page-user.gob:151
+msgid "Local Mail Problem"
+msgstr "Viga kohaliku postiga"
+
+#: libinit_balsa/balsa-druid-page-welcome.gob:47
+msgid "Welcome to Balsa!"
+msgstr "Tere tulemast!"
+
+#: libinit_balsa/balsa-druid-page-welcome.gob:50
+msgid ""
+"You seem to be running Balsa for the first time. The following\n"
+"steps will set up Balsa by asking a few simple questions. Once\n"
+"you have completed these steps, you can always change them later\n"
+"in Balsa's preferences. If any files or directories need to be created,\n"
+"it will be done so automatically. Please check the about box in Balsa's\n"
+"main window for more information about contacting the authors or\n"
+"reporting bugs."
+msgstr ""
+"Näib, et te käivitasite Balsa esimest korda. Järgnevalt küsitakse\n"
+"Teilt mõned lihtsad küsimused. Neid on hiljem alati võimalik Balsa\n"
+"häälestuse menüüst muuta. Abimenüüst info alt leiate täpsemad andmed,\n"
+"kuidas teatada võimalikest programmi vigadest."
+
+#: libinit_balsa/balsa-initdruid.gob:91
+msgid ""
+"This will exit Balsa. Do you\n"
+"really want to do this?"
+msgstr ""
+"See lõpetab Balsa. Kas sa\n"
+"tõesti tahad seda?"
+
+#: libinit_balsa/helper.c:142
+#, c-format
+msgid "The path %s must be relative to the filesystem root (start with /)."
+msgstr "Rada %s peab algama failisüsteemi algusest (algama / märgiga)."
+
+#: libinit_balsa/helper.c:152 libinit_balsa/helper.c:170
+#, c-format
+msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
+msgstr "Ei suutnud luua kataloogi: mkdir() rajaga \"%s\" ei õnnestunud."
+
+#: libinit_balsa/helper.c:159 libinit_balsa/helper.c:176
+#, c-format
+msgid "The file with pathname \"%s\" is not a directory."
+msgstr "Rada \"%s\" ei ole kataloog."
+
+#: libinit_balsa/init_balsa.c:36
+msgid "Configure Balsa"
+msgstr "Balsa häälestus"
+
+#: src/address-book.c:175
+msgid "Add New Address"
+msgstr "Lisa uus aadress"
+
+#: src/address-book.c:192
 msgid "E-Mail Address:"
 msgstr "E-posti aadress:"
 
-#: src/address-book.c:205
+#: src/address-book.c:271
 #, c-format
 msgid ""
 "Unable to open ~/.gnome/GnomeCard.gcrd for read.\n"
@@ -35,36 +184,39 @@ msgstr ""
 "Ei suuda avada faili ~/.gnome/GnomeCard.gcrd lugemiseks.\n"
 " - %s\n"
 
-#: src/address-book.c:224
-#, c-format
-msgid "EMAIL;INTERNET:%s\n"
-msgstr "EMAIL;INTERNET:%s\n"
+#: src/address-book.c:274 src/sendmsg-window.c:381
+msgid "OK"
+msgstr "OK"
 
-#: src/address-book.c:228
+#: src/address-book.c:293
+msgid "No-Id"
+msgstr ""
+
+#: src/address-book.c:301
 msgid "No-Name"
 msgstr "Nimetu"
 
-#: src/address-book.c:289 src/filter-edit-dialog.c:137
+#: src/address-book.c:390 src/filter-edit-dialog.c:137
 msgid "Name"
 msgstr "Nimi"
 
-#: src/address-book.c:289
+#: src/address-book.c:390
 msgid "E-Mail Address"
 msgstr "E-posti aadress:"
 
-#: src/address-book.c:291 src/address-book.c:319 src/main-window.c:232
+#: src/address-book.c:392 src/address-book.c:420 src/main-window.c:173
 msgid "Address Book"
 msgstr "Aadressraamat"
 
-#: src/address-book.c:351
+#: src/address-book.c:452
 msgid "Send-To"
 msgstr "Saaja"
 
-#: src/address-book.c:365
+#: src/address-book.c:466
 msgid "Run GnomeCard"
 msgstr "Käivita GnomeCard"
 
-#: src/address-book.c:371
+#: src/address-book.c:472
 msgid "Re-Import"
 msgstr "Impordi uuesti"
 
@@ -73,113 +225,128 @@ msgid "Mailbox password:"
 msgstr "Postikasti parool:"
 
 #. password field
-#: src/balsa-index-page.c:293 src/mailbox-conf.c:952 src/mailbox-conf.c:1041
+#: src/balsa-index-page.c:293 src/mailbox-conf.c:988 src/mailbox-conf.c:1087
 msgid "Password:"
 msgstr "Parool:"
 
-#: src/balsa-index-page.c:318
-msgid "Unable to Open Mailbox!"
-msgstr "Ei suuda avada postkasti!"
+#: src/balsa-index-page.c:319
+msgid ""
+"Unable to Open Mailbox!\n"
+"Please check the mailbox settings."
+msgstr ""
 
-#: src/balsa-index-page.c:569 src/filter-edit-dialog.c:224
+#: src/balsa-index-page.c:582 src/filter-edit-dialog.c:224
 msgid "New"
 msgstr "Uus"
 
-#: src/balsa-index-page.c:577 src/main-window.c:307
+#: src/balsa-index-page.c:590 src/main-window.c:373
 msgid "Reply"
 msgstr "Vasta"
 
-#: src/balsa-index-page.c:585 src/main-window.c:310
+#: src/balsa-index-page.c:598 src/main-window.c:376
 msgid "Reply to all"
 msgstr "Vasta kõigile"
 
-#: src/balsa-index-page.c:593 src/main-window.c:313
+#: src/balsa-index-page.c:606 src/main-window.c:379
 msgid "Forward"
 msgstr "Edasta"
 
-#: src/balsa-index-page.c:601 src/filter-edit-dialog.c:230
-#: src/main-window.c:300 src/pref-manager.c:970
+#: src/balsa-index-page.c:614 src/filter-edit-dialog.c:230
+#: src/main-window.c:366 src/pref-manager.c:876
 msgid "Delete"
 msgstr "Kustuta"
 
-#: src/balsa-index-page.c:609
+#: src/balsa-index-page.c:622
 msgid "Undelete"
 msgstr "Taasta"
 
-#: src/balsa-index-page.c:617
+#: src/balsa-index-page.c:630
 msgid "Transfer"
 msgstr "Tõsta ümber"
 
-#: src/balsa-index.c:254
+#: src/balsa-index.c:252
 msgid "From"
 msgstr "Saatja"
 
-#: src/balsa-index.c:255 src/filter-edit-dialog.c:351
+#: src/balsa-index.c:253 src/filter-edit-dialog.c:351
 msgid "Subject"
 msgstr "Teema"
 
-#: src/balsa-index.c:256
+#: src/balsa-index.c:254
 msgid "Date"
 msgstr "Kuupäev"
 
-#: src/balsa-message.c:163 src/balsa-message.c:166
+#: src/balsa-mblist.c:813
+#, c-format
+msgid "Shown mailbox: %s with %ld messages, %ld new"
+msgstr ""
+
+#: src/balsa-message.c:165 src/balsa-message.c:169
 msgid "Save MIME Part"
 msgstr "Salvesta MIME-osa"
 
-#: src/balsa-message.c:164
+#: src/balsa-message.c:166 src/balsa-message.c:224
 msgid "Save"
 msgstr "Salvesta"
 
-#: src/balsa-message.c:164 src/mailbox-conf.c:632 src/sendmsg-window.c:113
-#: src/sendmsg-window.c:327 src/sendmsg-window.c:1004
-#: src/sendmsg-window.c:1323 src/sendmsg-window.c:1346
+#: src/balsa-message.c:166 src/balsa-message.c:224 src/mailbox-conf.c:665
+#: src/sendmsg-window.c:125 src/sendmsg-window.c:407 src/sendmsg-window.c:1074
+#: src/sendmsg-window.c:1364 src/sendmsg-window.c:1387
 msgid "Cancel"
 msgstr "Vabandust"
 
-#: src/balsa-message.c:235 src/balsa-message.c:250
+#: src/balsa-message.c:167 src/balsa-message.c:225
+msgid "Please choose a filename to save this part of the message as:"
+msgstr ""
+
+#: src/balsa-message.c:223 src/balsa-message.c:227
+#, fuzzy
+msgid "Save Text"
+msgstr "Salvesta"
+
+#: src/balsa-message.c:298 src/balsa-message.c:313
 #, c-format
 msgid " Open of %s failed:%s "
 msgstr "%s avamine ebaõnnestus: %s"
 
-#: src/balsa-message.c:236 src/balsa-message.c:251
+#: src/balsa-message.c:299 src/balsa-message.c:314
 msgid "Ok"
 msgstr "Ok"
 
-#. this is the first row, so we'll use 0.0 here
-#: src/balsa-message.c:521
+#: src/balsa-message.c:640
 msgid "Date:"
 msgstr "Kuupäev"
 
 #. From:
-#: src/balsa-message.c:530 src/filter-edit-dialog.c:339
-#: src/sendmsg-window.c:463
+#: src/balsa-message.c:644 src/filter-edit-dialog.c:339
+#: src/sendmsg-window.c:579
 msgid "From:"
 msgstr "Saatja:"
 
 #. To:
-#: src/balsa-message.c:544 src/filter-edit-dialog.c:327
-#: src/sendmsg-window.c:437
+#: src/balsa-message.c:648 src/filter-edit-dialog.c:327
+#: src/sendmsg-window.c:581
 msgid "To:"
 msgstr "Saaja:"
 
-#: src/balsa-message.c:552
+#: src/balsa-message.c:649
 msgid "Cc:"
 msgstr "Cc:"
 
-#: src/balsa-message.c:560
+#: src/balsa-message.c:650
 msgid "Bcc:"
 msgstr "Bcc."
 
-#: src/balsa-message.c:568
+#: src/balsa-message.c:653
 msgid "Fcc:"
 msgstr "Fcc:"
 
 #. Subject:
-#: src/balsa-message.c:576 src/sendmsg-window.c:483
+#: src/balsa-message.c:654 src/sendmsg-window.c:587
 msgid "Subject:"
 msgstr "Teema:"
 
-#: src/balsa-message.c:669
+#: src/balsa-message.c:763
 msgid ""
 "<tr><td bgcolor=\"#f0f0f0\"> You received an encoded file of type "
 "application/"
@@ -187,15 +354,15 @@ msgstr ""
 "<tr><td bgcolor=\"#f0f0f0\"> Sulle on saadetud kodeeritud fail tüübiga "
 "rakendus/"
 
-#: src/balsa-message.c:673
+#: src/balsa-message.c:767
 msgid "<P>The parameters of this message are:<BR>"
 msgstr "<P>Selle sõnumi parameetrid on:<BR>"
 
-#: src/balsa-message.c:674
+#: src/balsa-message.c:768
 msgid "<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n"
 msgstr "<table border=0><tr><th>Atribuut</th><th>Väärtus</th></tr>\n"
 
-#: src/balsa-message.c:903
+#: src/balsa-message.c:1163
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "%s avamine ebaõnnestus. Viga = %d"
@@ -232,12 +399,12 @@ msgstr "Kiri"
 msgid "Match string:"
 msgstr "Leitav tekst:"
 
-#: src/filter-edit-dialog.c:416 src/mailbox-conf.c:281 src/mailbox-conf.c:1097
-#: src/pref-manager.c:957
+#: src/filter-edit-dialog.c:416 src/mailbox-conf.c:280 src/mailbox-conf.c:1147
+#: src/pref-manager.c:863
 msgid "Add"
 msgstr "Lisa"
 
-#: src/filter-edit-dialog.c:427 src/sendmsg-window.c:248
+#: src/filter-edit-dialog.c:427 src/sendmsg-window.c:328
 msgid "Remove"
 msgstr "Eemalda"
 
@@ -321,12 +488,7 @@ msgstr "Taasta"
 msgid "Balsa Filters"
 msgstr "Balsa filtrid"
 
-#: src/local-mailbox.c:163
-#, c-format
-msgid "Local Mailbox Loaded as: %s\n"
-msgstr "Kohalik postikaust loetud nimega %s\n"
-
-#: src/mailbox-conf.c:161
+#: src/mailbox-conf.c:159
 msgid ""
 "This will remove the mailbox and it's files permanently from your system.\n"
 "Are you sure you want to remove this mailbox?"
@@ -334,7 +496,7 @@ msgstr ""
 "See kustutab postikasti ja selle sisu sinu arvutist lõplikult.\n"
 "Oled sa kindel et sa tahad postkasti eemaldada?"
 
-#: src/mailbox-conf.c:166
+#: src/mailbox-conf.c:164
 msgid ""
 "This will remove the mailbox from the list of mailboxes\n"
 "You may use \"Add Mailbox\" later to access this mailbox again\n"
@@ -344,315 +506,374 @@ msgstr ""
 "Sa võid kasutada \"Lisa postkasti\" nuppu, et seda postkasti taas kasutada\n"
 "Oled sa kindel, et sa tahad seda postkasti eemaldada?"
 
-#: src/mailbox-conf.c:194
+#: src/mailbox-conf.c:192
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr "Oioi! Mingi jama postkastiga\n"
 
-#: src/mailbox-conf.c:238
+#: src/mailbox-conf.c:236
 msgid "Mailbox Configurator"
 msgstr "Postikausta konfigureerimine"
 
-#: src/mailbox-conf.c:291 src/mailbox-conf.c:1091
+#: src/mailbox-conf.c:290 src/mailbox-conf.c:1141
 msgid "Update"
 msgstr "Uuenda"
 
-#: src/mailbox-conf.c:423
-msgid "You need to fill in the folderpath field."
-msgstr "Sa pead täitma Kausta raja lahtri."
-
-#: src/mailbox-conf.c:427
-msgid "You need to fill in the IMAP Server field"
-msgstr "Sa pead täitma IMAP serveri lahtri."
-
-#: src/mailbox-conf.c:431
-msgid "You need to fill in the username field"
-msgstr "Sa pead täitma kasutajanime lahtri"
-
-#: src/mailbox-conf.c:435
-msgid "You need to fill in the password field"
-msgstr "Sa pead täitma parooli lahtri."
-
-#: src/mailbox-conf.c:439
-msgid "You need to fill in the port field"
-msgstr "Sa pead täitma pordi lahtri."
-
-#: src/mailbox-conf.c:442
-msgid "All of the fields must be filled in"
-msgstr "Kõik lahtrid tuleb täita"
-
-#: src/mailbox-conf.c:449 src/mailbox-conf.c:462
+#: src/mailbox-conf.c:434 src/mailbox-conf.c:450 src/mailbox-conf.c:463
 msgid "You need to fill in the Mailbox Name field."
 msgstr "Sa pead täitma Postikausta nime lahtri."
 
-#: src/mailbox-conf.c:466
+#: src/mailbox-conf.c:437
+msgid "You need to fill in the folderpath field."
+msgstr "Sa pead täitma Kausta raja lahtri."
+
+#: src/mailbox-conf.c:439
+msgid "You need to fill in the IMAP Server field"
+msgstr "Sa pead täitma IMAP serveri lahtri."
+
+#: src/mailbox-conf.c:441
+msgid "You need to fill in the username field"
+msgstr "Sa pead täitma kasutajanime lahtri"
+
+#: src/mailbox-conf.c:443
+msgid "You need to fill in the password field"
+msgstr "Sa pead täitma parooli lahtri."
+
+#: src/mailbox-conf.c:445
+msgid "You need to fill in the port field"
+msgstr "Sa pead täitma pordi lahtri."
+
+#: src/mailbox-conf.c:467
 msgid "You need to fill in the user field."
 msgstr "Sa pead täitma kasutaja lahtri."
 
-#: src/mailbox-conf.c:470
+#: src/mailbox-conf.c:471
 msgid "You need to fill in the password field."
 msgstr "Sa pead täitma parooli lahtri."
 
-#: src/mailbox-conf.c:474
+#: src/mailbox-conf.c:475
 msgid "You need to fill in the server field."
 msgstr "Sa pead täitma serveri lahtri."
 
-#: src/mailbox-conf.c:478
+#: src/mailbox-conf.c:479
 msgid "You need to fill in the port field."
 msgstr "Te peate täitma pordi lahtri."
 
-#: src/mailbox-conf.c:482
+#: src/mailbox-conf.c:483
 msgid "Some of the fields are blank."
 msgstr "Osad lahtrid on tühjad."
 
-#: src/mailbox-conf.c:631
+#: src/mailbox-conf.c:664
 #, c-format
 msgid "Cannot create mailbox '%s': %s\n"
 msgstr "Ei saa luua postkasti '%s' : %s\n"
 
 #. used to build a string: MAILBOXNAME " on " SERVERNAME
-#: src/mailbox-conf.c:696
+#: src/mailbox-conf.c:731
 msgid " on "
 msgstr " on "
 
-#: src/mailbox-conf.c:808
+#: src/mailbox-conf.c:844
 msgid "New mailbox type:"
 msgstr "Uue postikasti tüüp:"
 
 #. radio buttons
 #. local mailbox
-#: src/mailbox-conf.c:814
+#: src/mailbox-conf.c:850
 msgid "Local mailbox"
 msgstr "Kohalik postikast"
 
-#: src/mailbox-conf.c:822
+#: src/mailbox-conf.c:858
 msgid "IMAP server"
 msgstr "IMAP server"
 
 #. mailbox name
-#: src/mailbox-conf.c:845 src/mailbox-conf.c:880
+#: src/mailbox-conf.c:881 src/mailbox-conf.c:916 src/mailbox-conf.c:1033
 msgid "Mailbox Name:"
 msgstr "Postikasti nimi:"
 
 #. path to file
-#: src/mailbox-conf.c:855
+#: src/mailbox-conf.c:891
 msgid "Mailbox path:"
 msgstr "Postikasti rada:"
 
 #. pop server
-#: src/mailbox-conf.c:897 src/mailbox-conf.c:997
+#: src/mailbox-conf.c:933 src/mailbox-conf.c:1043
 msgid "Server:"
 msgstr "Server:"
 
 #. pop port
-#: src/mailbox-conf.c:916 src/mailbox-conf.c:1011
+#: src/mailbox-conf.c:952 src/mailbox-conf.c:1057
 msgid "Port:"
 msgstr "Port:"
 
 #. username
-#: src/mailbox-conf.c:935 src/mailbox-conf.c:1026
+#: src/mailbox-conf.c:971 src/mailbox-conf.c:1072
 msgid "Username:"
 msgstr "Kasutajanimi:"
 
 #. toggle for check
-#: src/mailbox-conf.c:967 src/main-window.c:296
+#: src/mailbox-conf.c:1003 src/main-window.c:362
 msgid "Check"
 msgstr "Vaata"
 
 #. toggle for deletion from server
-#: src/mailbox-conf.c:975
+#: src/mailbox-conf.c:1011
 msgid "Delete from server"
 msgstr "Kustuta serverilt"
 
-#: src/mailbox-conf.c:1054
+#: src/mailbox-conf.c:1100
 msgid "Folder path:"
 msgstr "Kataloogi rada:"
 
-#: src/mailbox-conf.c:1132
+#: src/mailbox-conf.c:1182
 msgid "Mailbox"
 msgstr "Postikast"
 
-#: src/main-window.c:152
+#: src/main-window.c:167
 msgid "_Get new mail"
 msgstr "Vaata uusi kirju"
 
-#: src/main-window.c:152
+#: src/main-window.c:167
 msgid "Fetch new incoming mail"
 msgstr "Tõmba uued sissetulevad kirjad"
 
-#: src/main-window.c:160
-msgid "Pr_int"
-msgstr "Trüki"
-
-#: src/main-window.c:160
-msgid "Print current mail"
-msgstr "Trüki käesolev kiri"
-
-#: src/main-window.c:187
-msgid "_New"
-msgstr "Uus"
-
-#: src/main-window.c:187
-msgid "Compose a new message"
-msgstr "Kirjuta uus kiri"
-
-#: src/main-window.c:193 src/message-window.c:54
-msgid "_Reply"
-msgstr "Vasta"
-
-#: src/main-window.c:193
-msgid "Reply to the current message"
-msgstr "Vasta käesolevale kirjale"
-
-#: src/main-window.c:199 src/message-window.c:60
-msgid "Reply to _all"
-msgstr "Vasta kõigile"
-
-#: src/main-window.c:200
-msgid "Reply to all recipients of the current message"
-msgstr "Vasta kõigile käesoleva kirja adressaatidele"
-
-#: src/main-window.c:206 src/message-window.c:67
-msgid "_Forward"
-msgstr "Edasta"
-
-#: src/main-window.c:206
-msgid "Forward the current message"
-msgstr "Edasta käesolev kiri"
-
-#: src/main-window.c:212
-msgid "_Continue"
-msgstr "Jätka"
-
-#: src/main-window.c:212
-msgid "Continue editing current message"
-msgstr "Jätka käesoleva kirja kirjutamist"
-
-#: src/main-window.c:219 src/main-window.c:257
-msgid "_Delete"
-msgstr "Kustuta"
-
-#: src/main-window.c:219
-msgid "Delete the current message"
-msgstr "Kustuta käesolev kiri"
-
-#: src/main-window.c:225
-msgid "_Undelete"
-msgstr "Taasta"
-
-#: src/main-window.c:225
-msgid "Undelete the message"
-msgstr "Taasta kiri"
-
-#: src/main-window.c:232
+#: src/main-window.c:173
 msgid "Opens the address book"
 msgstr "Avab aadressraamatu"
 
-#: src/main-window.c:249
-msgid "List"
-msgstr "Nimekiri"
+#: src/main-window.c:180
+msgid "Pr_int"
+msgstr "Trüki"
 
-#: src/main-window.c:253
-msgid "_Add"
-msgstr "Lisa"
+#: src/main-window.c:180
+msgid "Print current mail"
+msgstr "Trüki käesolev kiri"
 
-#: src/main-window.c:253
-msgid "Add a new mailbox"
-msgstr "Lisa uus postkast"
+#: src/main-window.c:205
+msgid "N_o headers"
+msgstr ""
 
-#: src/main-window.c:255
-msgid "_Edit"
-msgstr "Muuda"
+#: src/main-window.c:207
+#, fuzzy
+msgid "_Selected headers"
+msgstr "Näita kõiki päiseid"
 
-#: src/main-window.c:255
-msgid "Edit the selected mailbox"
-msgstr "Muuda valitud postkasti"
+#: src/main-window.c:209
+#, fuzzy
+msgid "All _headers"
+msgstr "Näita kõiki päiseid"
 
-#: src/main-window.c:257
-msgid "Delete the selected mailbox"
-msgstr "Kustuta valitud postkast"
-
-#: src/main-window.c:260
-msgid "Co_mmit current"
-msgstr "Rakenda muutused"
-
-#: src/main-window.c:260
-msgid "Commit the changes in the currently opened mailbox"
-msgstr "Rakenda muutused avatud postkastis"
-
-#: src/main-window.c:263
-msgid "Empty _Trash"
-msgstr "Tühjenda prügikast"
-
-#: src/main-window.c:263
-msgid "Delete Messages from the trash mailbox"
-msgstr "Kustuta kirjad prügikastist"
-
-#: src/main-window.c:269
-msgid "_Filters..."
-msgstr "_Filtrid"
-
-#: src/main-window.c:269
-msgid "Manage filters"
-msgstr "Halda filtreid"
-
-#: src/main-window.c:287
-msgid "_Message"
-msgstr "Kiri"
-
-#: src/main-window.c:288
-msgid "Mail_boxes"
-msgstr "_Postkastid"
-
-#: src/main-window.c:296
-msgid "Check Email"
-msgstr "Vaata posti"
-
-#: src/main-window.c:300
-msgid "Delete Message"
-msgstr "Kustuta kiri"
-
-#: src/main-window.c:304
-msgid "Compose"
-msgstr "Kirjuta"
-
-#: src/main-window.c:304
-msgid "Compose Message"
-msgstr "Kirjuta kiri"
-
-#: src/main-window.c:316
-msgid "Continue"
-msgstr "Jätka"
-
-#: src/main-window.c:321
-msgid "Previous"
-msgstr "Eelmine"
-
-#: src/main-window.c:321
-msgid "Open Previous message"
-msgstr "Ava eelmine kiri"
-
-#: src/main-window.c:326
+#: src/main-window.c:218 src/main-window.c:392
 msgid "Next"
 msgstr "Järgmine"
 
-#: src/main-window.c:326
+#: src/main-window.c:218
+#, fuzzy
+msgid "Next Message"
+msgstr "Uus kiri"
+
+#: src/main-window.c:224 src/main-window.c:387
+msgid "Previous"
+msgstr "Eelmine"
+
+#: src/main-window.c:224
+#, fuzzy
+msgid "Preivous Message"
+msgstr "Ava eelmine kiri"
+
+#: src/main-window.c:230 src/main-window.c:397
+msgid "Next Unread"
+msgstr ""
+
+#: src/main-window.c:230
+#, fuzzy
+msgid "Next Unread Message"
+msgstr "Kustuta kiri"
+
+#: src/main-window.c:238
+msgid "_New"
+msgstr "Uus"
+
+#: src/main-window.c:238
+msgid "Compose a new message"
+msgstr "Kirjuta uus kiri"
+
+#: src/main-window.c:245 src/message-window.c:54
+msgid "_Reply"
+msgstr "Vasta"
+
+#: src/main-window.c:245
+msgid "Reply to the current message"
+msgstr "Vasta käesolevale kirjale"
+
+#: src/main-window.c:252 src/message-window.c:60
+msgid "Reply to _all"
+msgstr "Vasta kõigile"
+
+#: src/main-window.c:253
+msgid "Reply to all recipients of the current message"
+msgstr "Vasta kõigile käesoleva kirja adressaatidele"
+
+#: src/main-window.c:260 src/message-window.c:67
+msgid "_Forward"
+msgstr "Edasta"
+
+#: src/main-window.c:260
+msgid "Forward the current message"
+msgstr "Edasta käesolev kiri"
+
+#: src/main-window.c:267
+msgid "_Continue"
+msgstr "Jätka"
+
+#: src/main-window.c:267
+msgid "Continue editing current message"
+msgstr "Jätka käesoleva kirja kirjutamist"
+
+#: src/main-window.c:275 src/main-window.c:313
+msgid "_Delete"
+msgstr "Kustuta"
+
+#: src/main-window.c:275
+msgid "Delete the current message"
+msgstr "Kustuta käesolev kiri"
+
+#: src/main-window.c:282
+msgid "_Undelete"
+msgstr "Taasta"
+
+#: src/main-window.c:282
+msgid "Undelete the message"
+msgstr "Taasta kiri"
+
+#: src/main-window.c:288
+msgid "_Wrap"
+msgstr ""
+
+#: src/main-window.c:305
+msgid "List"
+msgstr "Nimekiri"
+
+#: src/main-window.c:309
+msgid "_Add"
+msgstr "Lisa"
+
+#: src/main-window.c:309
+msgid "Add a new mailbox"
+msgstr "Lisa uus postkast"
+
+#: src/main-window.c:311
+msgid "_Edit"
+msgstr "Muuda"
+
+#: src/main-window.c:311
+msgid "Edit the selected mailbox"
+msgstr "Muuda valitud postkasti"
+
+#: src/main-window.c:313
+msgid "Delete the selected mailbox"
+msgstr "Kustuta valitud postkast"
+
+#: src/main-window.c:316
+msgid "Co_mmit current"
+msgstr "Rakenda muutused"
+
+#: src/main-window.c:316
+msgid "Commit the changes in the currently opened mailbox"
+msgstr "Rakenda muutused avatud postkastis"
+
+#: src/main-window.c:318
+msgid "_Close"
+msgstr "Sulge"
+
+#: src/main-window.c:318
+#, fuzzy
+msgid "Close mailbox"
+msgstr "Sule postkast"
+
+#: src/main-window.c:321
+msgid "Empty _Trash"
+msgstr "Tühjenda prügikast"
+
+#: src/main-window.c:321
+msgid "Delete Messages from the trash mailbox"
+msgstr "Kustuta kirjad prügikastist"
+
+#: src/main-window.c:327
+msgid "_Filters..."
+msgstr "_Filtrid"
+
+#: src/main-window.c:327
+msgid "Manage filters"
+msgstr "Halda filtreid"
+
+#: src/main-window.c:336
+#, fuzzy
+msgid "_Show mailbox tree"
+msgstr "Uue postikasti tüüp:"
+
+#: src/main-window.c:339
+#, fuzzy
+msgid "Show mailbox _tabs"
+msgstr "Uue postikasti tüüp:"
+
+#: src/main-window.c:353
+msgid "_Message"
+msgstr "Kiri"
+
+#: src/main-window.c:354
+#, fuzzy
+msgid "Mail_box"
+msgstr "Postikast"
+
+#: src/main-window.c:362
+msgid "Check Email"
+msgstr "Vaata posti"
+
+#: src/main-window.c:366
+msgid "Delete Message"
+msgstr "Kustuta kiri"
+
+#: src/main-window.c:370
+msgid "Compose"
+msgstr "Kirjuta"
+
+#: src/main-window.c:370
+msgid "Compose Message"
+msgstr "Kirjuta kiri"
+
+#: src/main-window.c:382
+msgid "Continue"
+msgstr "Jätka"
+
+#: src/main-window.c:387
+msgid "Open Previous message"
+msgstr "Ava eelmine kiri"
+
+#: src/main-window.c:392
 msgid "Open Next message"
 msgstr "Ava järgmine kiri"
 
-#: src/main-window.c:331 src/print.c:82 src/sendmsg-window.c:110
-#: src/sendmsg-window.c:129
+#: src/main-window.c:397
+#, fuzzy
+msgid "Open Next Unread Message"
+msgstr "Ava järgmine kiri"
+
+#: src/main-window.c:402 src/print.c:82 src/sendmsg-window.c:122
+#: src/sendmsg-window.c:150
 msgid "Print"
 msgstr "Trüki"
 
-#: src/main-window.c:331
+#: src/main-window.c:402
 msgid "Print current message"
 msgstr "Trüki käesolev kiri"
 
-#: src/main-window.c:763
-msgid "Copyright (C) 1997-1999"
+#: src/main-window.c:886
+#, fuzzy
+msgid "Copyright (C) 1997-2000"
 msgstr "Copyright (c) 1997-1999"
 
-#: src/main-window.c:765
+#: src/main-window.c:888
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://www.balsa.net/\n"
@@ -665,32 +886,49 @@ msgstr ""
 "Kui teil on vaja teatada vigadest, kasutage selleks palun aadressi "
 "http://bugs.gnome.org/"
 
-#: src/main.c:101
+#: src/main.c:102
 msgid "Get new mail on startup"
 msgstr "Vaata uut posti käivitumisel"
 
-#: src/mblist-window.c:352
+#: src/main.c:103
+msgid "Compose a new email to EMAIL@ADDRESS"
+msgstr ""
+
+#: src/main.c:104
+msgid "Opens MAILBOXNAME"
+msgstr ""
+
+#: src/main.c:104
+msgid "MAILBOXNAME"
+msgstr ""
+
+#: src/main.c:105
+#, fuzzy
+msgid "Opens first unread mailbox"
+msgstr "Ava valitud postkast"
+
+#: src/mblist-window.c:376
 msgid "Open Mailbox"
 msgstr "Ava postkast"
 
-#: src/mblist-window.c:358
+#: src/mblist-window.c:382
 msgid "Close Mailbox"
 msgstr "Sule postkast"
 
-#: src/mblist-window.c:365
+#: src/mblist-window.c:389
 msgid "Add New Mailbox"
 msgstr "Lisa uus postkast"
 
-#: src/mblist-window.c:373
+#: src/mblist-window.c:397
 msgid "Edit Mailbox Properties"
 msgstr "Muuda postkasti häälestust"
 
-#: src/mblist-window.c:379
+#: src/mblist-window.c:403
 msgid "Delete Mailbox"
 msgstr "Kustuta postkast"
 
-#: src/mblist-window.c:406 src/mblist-window.c:422 src/mblist-window.c:440
-#: src/mblist-window.c:455
+#: src/mblist-window.c:430 src/mblist-window.c:446 src/mblist-window.c:464
+#: src/mblist-window.c:479
 msgid "No mailbox selected."
 msgstr "Ühtegi postkasti pole valitud."
 
@@ -706,208 +944,212 @@ msgstr "Vasta kõigile selle kirja saajatele"
 msgid "Forward this message"
 msgstr "Edasta käesolev kiri"
 
-#: src/pref-manager.c:118
+#: src/pref-manager.c:123
 msgid "Text"
 msgstr "Tekst"
 
-#: src/pref-manager.c:119
+#: src/pref-manager.c:124
 msgid "Icons"
 msgstr "Ikoonid"
 
-#: src/pref-manager.c:120
+#: src/pref-manager.c:125
 msgid "Both"
 msgstr "Mõlemad"
 
-#: src/pref-manager.c:132
+#: src/pref-manager.c:137
 msgid "7bits"
 msgstr "7 bitti"
 
-#: src/pref-manager.c:133
+#: src/pref-manager.c:138
 msgid "8bits"
 msgstr "8 bitti"
 
-#: src/pref-manager.c:134
+#: src/pref-manager.c:139
 msgid "quoted"
 msgstr "tsitaat"
 
-#: src/pref-manager.c:146
+#: src/pref-manager.c:151
 msgid "While Retrieving Messages"
 msgstr "Kirjade laadimisel"
 
-#: src/pref-manager.c:147
+#: src/pref-manager.c:152
 msgid "Until Closed"
 msgstr "Kuni sulgemiseni"
 
-#: src/pref-manager.c:148
+#: src/pref-manager.c:153
 msgid "Never"
 msgstr "Ei kunagi"
 
-#: src/pref-manager.c:182
+#: src/pref-manager.c:178
 msgid "Balsa Preferences"
 msgstr "Balsa eelistused"
 
-#: src/pref-manager.c:260 src/pref-manager.c:744
+#: src/pref-manager.c:186 src/pref-manager.c:643
 msgid "Identity"
 msgstr "isikuandmed"
 
-#: src/pref-manager.c:269 src/pref-manager.c:814 src/pref-manager.c:885
+#: src/pref-manager.c:189 src/pref-manager.c:713 src/pref-manager.c:791
 msgid "Signature"
 msgstr "Allkiri"
 
-#: src/pref-manager.c:277
+#: src/pref-manager.c:192
 msgid "Mail Servers"
 msgstr "E-posti serverid"
 
-#: src/pref-manager.c:285
+#: src/pref-manager.c:195
 msgid "Mail Options"
 msgstr "Posti määrangud"
 
-#: src/pref-manager.c:293 src/pref-manager.c:1278
+#: src/pref-manager.c:198 src/pref-manager.c:1213
 msgid "Display"
 msgstr "Näit"
 
-#: src/pref-manager.c:301 src/pref-manager.c:1303 src/pref-manager.c:1348
+#: src/pref-manager.c:201 src/pref-manager.c:1238 src/pref-manager.c:1283
 msgid "Printing"
 msgstr "Trükkimine"
 
-#: src/pref-manager.c:309 src/pref-manager.c:1389 src/pref-manager.c:1407
+#: src/pref-manager.c:204 src/pref-manager.c:1324 src/pref-manager.c:1342
 msgid "Encoding"
 msgstr "Kodeering"
 
-#: src/pref-manager.c:317 src/pref-manager.c:1431
+#: src/pref-manager.c:207 src/pref-manager.c:1369
 msgid "Misc"
 msgstr "Muud"
 
-#: src/pref-manager.c:325
+#: src/pref-manager.c:210
 msgid "Startup"
 msgstr "Käivitus"
 
-#: src/pref-manager.c:768
+#: src/pref-manager.c:667
 msgid "Your name:"
 msgstr "Sinu nimi:"
 
-#: src/pref-manager.c:775
+#: src/pref-manager.c:674
 msgid "E-mail address:"
 msgstr "E-posti aadress:"
 
-#: src/pref-manager.c:781
+#: src/pref-manager.c:680
 msgid "Reply-to address:"
 msgstr "Vastuseaadress:"
 
-#: src/pref-manager.c:826
+#: src/pref-manager.c:725
 msgid "Select your signature file"
 msgstr "Valige allkirjafail:"
 
-#: src/pref-manager.c:836
+#: src/pref-manager.c:735
 msgid "sending mail"
 msgstr "saates kirja"
 
-#: src/pref-manager.c:842
+#: src/pref-manager.c:741
 msgid "replying to mail"
 msgstr "vastates kirjale"
 
-#: src/pref-manager.c:848
+#: src/pref-manager.c:747
 msgid "forwarding mail"
 msgstr "kirja edasi saates"
 
-#: src/pref-manager.c:863
+#: src/pref-manager.c:762
 msgid ">"
 msgstr ">"
 
-#: src/pref-manager.c:865
+#: src/pref-manager.c:764
 msgid "Signature file:"
 msgstr "Allkirja fail:"
 
-#: src/pref-manager.c:872
+#: src/pref-manager.c:771
 msgid "Reply prefix:"
 msgstr "Vastamise eesliide:"
 
-#: src/pref-manager.c:879
+#: src/pref-manager.c:778
 msgid "Use signature file when:"
 msgstr "Kasuta allkirja:"
 
-#: src/pref-manager.c:916
+#: src/pref-manager.c:785
+msgid "enable signature separator"
+msgstr ""
+
+#: src/pref-manager.c:822
 msgid "Remote Malibox Servers"
 msgstr "Postiserverid"
 
-#: src/pref-manager.c:941
+#: src/pref-manager.c:847
 msgid "Type"
 msgstr "Tüüp:"
 
-#: src/pref-manager.c:945
+#: src/pref-manager.c:851
 msgid "Mailbox name"
 msgstr "Postkasti nimi"
 
-#: src/pref-manager.c:964
+#: src/pref-manager.c:870
 msgid "Modify"
 msgstr "Muuda"
 
-#: src/pref-manager.c:976
+#: src/pref-manager.c:882
 msgid "Local mail"
 msgstr "Kohalik post"
 
-#: src/pref-manager.c:991
+#: src/pref-manager.c:897
 msgid "Select your local mail directory"
 msgstr "Valige kohalik postikataloog"
 
-#: src/pref-manager.c:1001
+#: src/pref-manager.c:907
 msgid "Outgoing mail"
 msgstr "Väljaminevad kirjad"
 
-#: src/pref-manager.c:1020
+#: src/pref-manager.c:926
 msgid "Remote SMTP Server"
 msgstr "SMTP server"
 
-#: src/pref-manager.c:1027
+#: src/pref-manager.c:933
 msgid "Local mail user agent"
 msgstr "Kohalik postilugemise rakendus"
 
-#: src/pref-manager.c:1056
+#: src/pref-manager.c:962
 msgid "Incoming"
 msgstr "Sissetulevad"
 
-#: src/pref-manager.c:1060
+#: src/pref-manager.c:966
 msgid "Outgoing"
 msgstr "Väljuvad"
 
-#: src/pref-manager.c:1079
+#: src/pref-manager.c:985
 #, fuzzy
 msgid "Checking"
 msgstr "Vaatame"
 
-#: src/pref-manager.c:1089
+#: src/pref-manager.c:995
 msgid "Minutes"
 msgstr "Minutit"
 
-#: src/pref-manager.c:1103
+#: src/pref-manager.c:1009
 msgid "Check mail automatically every:"
 msgstr "Vaata posti automaatselt intervalliga:"
 
-#: src/pref-manager.c:1126
+#: src/pref-manager.c:1032
 msgid "Word Wrap"
 msgstr "Poolitus sõnade vahel"
 
-#: src/pref-manager.c:1137
+#: src/pref-manager.c:1043
 msgid "Wrap Outgoing Text at:"
 msgstr "Poolit väljuvate kirjade read:"
 
-#: src/pref-manager.c:1152
+#: src/pref-manager.c:1058
 msgid "Characters"
 msgstr "Tähemärgi juurest"
 
-#: src/pref-manager.c:1158
+#: src/pref-manager.c:1064
 msgid "Other options"
 msgstr "Muud määrangud"
 
-#: src/pref-manager.c:1169
+#: src/pref-manager.c:1075
 msgid "Default Bcc to:"
 msgstr "Vaikimisi Bcc saaja:"
 
-#: src/pref-manager.c:1205
+#: src/pref-manager.c:1112
 msgid "Main window"
 msgstr "Põhiaken"
 
-#: src/pref-manager.c:1215
+#: src/pref-manager.c:1120
 msgid "use preview pane"
 msgstr "kasuta ülevaatepaneeli"
 
@@ -916,68 +1158,94 @@ msgstr "kasuta ülevaatepaneeli"
 #. *
 #. * -Ragnar-
 #. *
+#. * pawels: is replaced by the code connected to "selected headers" field
+#. * below. To be removed.
 #.
-#: src/pref-manager.c:1226
+#: src/pref-manager.c:1133
 msgid "View all headers"
 msgstr "Näita kõiki päiseid"
 
-#: src/pref-manager.c:1232
-msgid "View mailbox content informations"
-msgstr "Näita informatsiooni postkasti sisu kohta"
+#: src/pref-manager.c:1139
+msgid "Show mailbox statistics in left pane"
+msgstr ""
 
-#: src/pref-manager.c:1241
+#: src/pref-manager.c:1146
 msgid "Toolbars"
 msgstr "Tööriistaribad"
 
-#: src/pref-manager.c:1260
+#: src/pref-manager.c:1163
 msgid "Display progress dialog"
 msgstr "Näita progressidialoogi"
 
-#: src/pref-manager.c:1331
+#: src/pref-manager.c:1171
+#, fuzzy
+msgid "Display Formats"
+msgstr "Näit"
+
+#: src/pref-manager.c:1178
+msgid "Date encoding (for strftime):"
+msgstr ""
+
+#: src/pref-manager.c:1190
+#, fuzzy
+msgid "Selected headers:"
+msgstr "Näita kõiki päiseid"
+
+#: src/pref-manager.c:1266
 msgid "characters"
 msgstr "tähemärgid"
 
-#: src/pref-manager.c:1335
+#: src/pref-manager.c:1270
 msgid "Print command:"
 msgstr "Trükkimise käsklus:"
 
-#: src/pref-manager.c:1341
+#: src/pref-manager.c:1276
 msgid "Break line at:"
 msgstr "Poolita rida:"
 
-#: src/pref-manager.c:1375
+#: src/pref-manager.c:1310
 msgid "Charset"
 msgstr "Koodileht"
 
-#: src/pref-manager.c:1441
+#: src/pref-manager.c:1379
 msgid "Debug"
 msgstr "Prussakatõrje"
 
-#: src/pref-manager.c:1445
+#: src/pref-manager.c:1383
 msgid "Empty trash on exit"
 msgstr "Tühjenda lahkumisel prügikast"
 
-#: src/pref-manager.c:1449
+#: src/pref-manager.c:1387
 msgid "Font"
 msgstr "Font:"
 
-#: src/pref-manager.c:1477
+#: src/pref-manager.c:1415
 msgid "Select a font to use"
 msgstr "Valige kasutatav font"
 
-#: src/pref-manager.c:1481
+#: src/pref-manager.c:1419
 msgid "Browse..."
 msgstr "Sirvi..."
 
-#: src/pref-manager.c:1486
+#: src/pref-manager.c:1424
 msgid "Preview pane"
 msgstr "Ülevaatepaneel"
 
-#: src/pref-manager.c:1506
+#. mblist unread colour
+#: src/pref-manager.c:1432
+#, fuzzy
+msgid "Colours"
+msgstr "Sulge"
+
+#: src/pref-manager.c:1442 src/pref-manager.c:1450
+msgid "Mailbox with unread messages colour"
+msgstr ""
+
+#: src/pref-manager.c:1471
 msgid "Options"
 msgstr "Häälestus"
 
-#: src/pref-manager.c:1516
+#: src/pref-manager.c:1481
 msgid "Check mail upon startup"
 msgstr "Vaata käivitamisel uut posti"
 
@@ -994,127 +1262,160 @@ msgstr ""
 msgid "Print Command:"
 msgstr "Trükkimise käsklus:"
 
-#: src/sendmsg-window.c:96
+#: src/sendmsg-window.c:106
 msgid "Send"
 msgstr "Saada"
 
-#: src/sendmsg-window.c:96
+#: src/sendmsg-window.c:106
 msgid "Send this mail"
 msgstr "Saada see kiri"
 
-#: src/sendmsg-window.c:99
+#: src/sendmsg-window.c:110
 msgid "Attach"
 msgstr "Lisa"
 
-#: src/sendmsg-window.c:99
+#: src/sendmsg-window.c:110
 msgid "Add attachments to this message"
 msgstr "Lisa kirjale fail"
 
-#: src/sendmsg-window.c:102
+#: src/sendmsg-window.c:114
 msgid "Postpone"
 msgstr "Lükka edasi"
 
-#: src/sendmsg-window.c:102
+#: src/sendmsg-window.c:114
 msgid "Continue this message later"
 msgstr "Jätka kirjutamist hiljem"
 
-#: src/sendmsg-window.c:106
+#: src/sendmsg-window.c:118
 msgid "Spelling"
 msgstr "Õigekiri"
 
-#: src/sendmsg-window.c:106
+#: src/sendmsg-window.c:118
 msgid "Check Spelling"
 msgstr "Kontrolli õigekirja"
 
-#: src/sendmsg-window.c:120
+#: src/sendmsg-window.c:133
 msgid "_Include File..."
 msgstr "Lisatav fail..."
 
-#: src/sendmsg-window.c:122
+#: src/sendmsg-window.c:137
 msgid "_Attach file..."
 msgstr "Lisa fail..."
 
-#: src/sendmsg-window.c:125
+#: src/sendmsg-window.c:142
 msgid "_Send"
 msgstr "Saada"
 
-#: src/sendmsg-window.c:125
+#: src/sendmsg-window.c:142
 msgid "Send the currently edited message"
 msgstr "Saada viimati redigeeritud kiri"
 
-#: src/sendmsg-window.c:127
+#: src/sendmsg-window.c:146
 msgid "_Postpone"
 msgstr "Lükka edasi"
 
-#: src/sendmsg-window.c:129
+#: src/sendmsg-window.c:150
 msgid "Print the edited message"
 msgstr "Trüki käesolev kiri"
 
-#: src/sendmsg-window.c:142
-msgid "_From"
+#: src/sendmsg-window.c:168
+msgid "_Wrap body"
+msgstr ""
+
+#: src/sendmsg-window.c:168
+#, fuzzy
+msgid "Wrap message lines"
+msgstr "Edasta kiri"
+
+#: src/sendmsg-window.c:172
+msgid "_Reflow paragraph"
+msgstr ""
+
+#: src/sendmsg-window.c:175
+#, fuzzy
+msgid "R_eflow message"
+msgstr "Uus kiri"
+
+#: src/sendmsg-window.c:184
+#, fuzzy
+msgid "Fr_om"
 msgstr "Saatja"
 
-#: src/sendmsg-window.c:144
+#: src/sendmsg-window.c:186
 msgid "_To"
 msgstr "Saaja"
 
-#: src/sendmsg-window.c:146
+#: src/sendmsg-window.c:188
 msgid "_Subject"
 msgstr "Teema"
 
-#: src/sendmsg-window.c:148
+#: src/sendmsg-window.c:190
 msgid "_Cc"
 msgstr "_Cc:"
 
-#: src/sendmsg-window.c:150
+#: src/sendmsg-window.c:192
 msgid "_Bcc"
 msgstr "_Bcc."
 
-#: src/sendmsg-window.c:152
+#: src/sendmsg-window.c:194
 msgid "_Fcc"
 msgstr "_Fcc"
 
-#: src/sendmsg-window.c:154
+#: src/sendmsg-window.c:196
+#, fuzzy
+msgid "_Reply To"
+msgstr "Vasta"
+
+#: src/sendmsg-window.c:198
 msgid "_Attachments"
 msgstr "Lisad:"
 
-#: src/sendmsg-window.c:162
+#: src/sendmsg-window.c:200
+msgid "_Comments"
+msgstr ""
+
+#: src/sendmsg-window.c:202
+msgid "_Keywords"
+msgstr ""
+
+#: src/sendmsg-window.c:213
 msgid "_Western (ISO-8859-1)"
 msgstr "Lääne-Euroopa (ISO-8859-1)"
 
-#: src/sendmsg-window.c:164
+#: src/sendmsg-window.c:215
 msgid "W_estern (ISO-8859-15)"
 msgstr "Lääne-Euroopa (ISO-8859-15)"
 
-#: src/sendmsg-window.c:166
+#: src/sendmsg-window.c:217
 msgid "_Central European (ISO-8859-2)"
 msgstr "Kesk-Euroopa (ISO-8859-2)"
 
-#: src/sendmsg-window.c:168
+#: src/sendmsg-window.c:219
 msgid "_South European (ISO-8859-3)"
 msgstr "Lõuna-Euroopa (ISO-8859-5)"
 
-#: src/sendmsg-window.c:170
-msgid "_Cyrillic (ISO-8859-5)"
+#: src/sendmsg-window.c:221
+#, fuzzy
+msgid "Cy_rillic (ISO-8859-5)"
 msgstr "Kirillits (ISO-8859-5)"
 
-#: src/sendmsg-window.c:172
+#: src/sendmsg-window.c:223
 msgid "_Hebrew (ISO-8859-8)"
 msgstr "Heebrea (ISO-8859-8)"
 
-#: src/sendmsg-window.c:174
+#: src/sendmsg-window.c:225
 msgid "_Turkish (ISO-8859-9)"
 msgstr "Türgi (ISO-8859-9)"
 
-#: src/sendmsg-window.c:201
+#: src/sendmsg-window.c:262
 msgid "_Show"
 msgstr "Näita"
 
-#: src/sendmsg-window.c:202
+#: src/sendmsg-window.c:263
 msgid "_ISO Charset"
 msgstr "ISO koodileht"
 
-#: src/sendmsg-window.c:299
+#: src/sendmsg-window.c:379
 msgid ""
 "The attachment pixmap (balsa/attachment.png) cannot be found.\n"
 "This means you cannot attach any files.\n"
@@ -1122,255 +1423,133 @@ msgstr ""
 "Lisatud pixmapi (balsa/attachment.png) ei õnnestu leida.\n"
 "Paraku tähendab see seda, et sa ei saa ühtegi faili kirjale lisada.\n"
 
-#: src/sendmsg-window.c:301
-msgid "OK"
-msgstr "OK"
-
-#: src/sendmsg-window.c:317
+#: src/sendmsg-window.c:397
 #, c-format
 msgid "Cannot get info on file '%s': %s\n"
 msgstr "Ei suuda lugeda infot faili kohta '%s': %s\n"
 
-#: src/sendmsg-window.c:321
+#: src/sendmsg-window.c:401
 #, c-format
 msgid "Attachment is not a regular file: '%s'\n"
 msgstr "Kirjalisa ei ole tavaline fail: '%s'\n"
 
-#: src/sendmsg-window.c:365
+#: src/sendmsg-window.c:462
 msgid "Attach file"
 msgstr "Lisa fail"
 
 #. cc:
-#: src/sendmsg-window.c:493
+#: src/sendmsg-window.c:590
 msgid "cc:"
 msgstr "cc:"
 
 #. bcc:
-#: src/sendmsg-window.c:519
+#: src/sendmsg-window.c:593
 msgid "bcc:"
 msgstr "bcc:"
 
 #. fcc:
-#: src/sendmsg-window.c:545
+#: src/sendmsg-window.c:596
 msgid "fcc:"
 msgstr "fcc:"
 
+#. Reply To:
+#: src/sendmsg-window.c:624
+#, fuzzy
+msgid "Reply To:"
+msgstr "Vasta "
+
 #. Attachment list
-#: src/sendmsg-window.c:573
+#: src/sendmsg-window.c:628
 msgid "Attachments:"
 msgstr "Lisad:"
 
-#: src/sendmsg-window.c:685
+#. Comments:
+#: src/sendmsg-window.c:670
+#, fuzzy
+msgid "Comments:"
+msgstr "Käsk:"
+
+#. Keywords:
+#: src/sendmsg-window.c:673
+msgid "Keywords:"
+msgstr ""
+
+#: src/sendmsg-window.c:750
 msgid "you"
 msgstr "sina"
 
-#: src/sendmsg-window.c:694
+#: src/sendmsg-window.c:759
 #, c-format
 msgid "On %s %s wrote:\n"
 msgstr "%s %s kirjutas:\n"
 
-#: src/sendmsg-window.c:696
+#: src/sendmsg-window.c:761
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s kirjutas::\n"
 
-#: src/sendmsg-window.c:758
+#: src/sendmsg-window.c:831
 msgid "Reply to "
 msgstr "Vasta "
 
-#: src/sendmsg-window.c:763
+#: src/sendmsg-window.c:836
 msgid "Forward message"
 msgstr "Edasta kiri"
 
-#: src/sendmsg-window.c:768
+#: src/sendmsg-window.c:841
 msgid "Continue message"
 msgstr "Jätka kirjutamist"
 
-#: src/sendmsg-window.c:773
+#: src/sendmsg-window.c:846
 msgid "New message"
 msgstr "Uus kiri"
 
-#: src/sendmsg-window.c:1003
+#: src/sendmsg-window.c:1073
 msgid "Could not open the file.\n"
 msgstr "Ei suuda avada faili.\n"
 
-#: src/sendmsg-window.c:1009
+#: src/sendmsg-window.c:1079
 msgid "Loading..."
 msgstr "Laadime..."
 
-#: src/sendmsg-window.c:1034
+#: src/sendmsg-window.c:1104
 msgid "Include file"
 msgstr "Lisatav fail"
 
-#: src/sendmsg-window.c:1321
+#: src/sendmsg-window.c:1362
 msgid "Cannot execute print command."
 msgstr "Ei suuda käivitada trükikäsku"
 
-#: src/sendmsg-window.c:1345
+#: src/sendmsg-window.c:1386
 msgid "Error executing lpr"
 msgstr "Viga lpr käivitamisel"
 
-#: src/spell-check.c:136
-msgid "Spell Check"
-msgstr "Korrektuur"
+#~ msgid "EMAIL;INTERNET:%s\n"
+#~ msgstr "EMAIL;INTERNET:%s\n"
 
-#: libbalsa/mailbox.c:593
-#, c-format
-msgid "Mailbox: Opening %s Refcount: %d\n"
-msgstr "Postkast: Avan %s Refcount %d\n"
+#~ msgid "Unable to Open Mailbox!"
+#~ msgstr "Ei suuda avada postkasti!"
 
-#: libbalsa/mailbox.c:613
-#, c-format
-msgid "Mailbox: Closing %s Refcount: %d\n"
-msgstr "Postkast: Sulgen %s Refcount: %d\n"
+#~ msgid "Local Mailbox Loaded as: %s\n"
+#~ msgstr "Kohalik postikaust loetud nimega %s\n"
 
-#: libinit_balsa/helper.c:138
-#, c-format
-msgid "The path %s must be relative to the filesystem root (start with /)."
-msgstr "Rada %s peab algama failisüsteemi algusest (algama / märgiga)."
+#~ msgid "All of the fields must be filled in"
+#~ msgstr "Kõik lahtrid tuleb täita"
 
-#: libinit_balsa/helper.c:148 libinit_balsa/helper.c:166
-#, c-format
-msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
-msgstr "Ei suutnud luua kataloogi: mkdir() rajaga \"%s\" ei õnnestunud."
+#~ msgid "Mail_boxes"
+#~ msgstr "_Postkastid"
 
-#: libinit_balsa/helper.c:155 libinit_balsa/helper.c:172
-#, c-format
-msgid "The file with pathname \"%s\" is not a directory."
-msgstr "Rada \"%s\" ei ole kataloog."
+#~ msgid "View mailbox content informations"
+#~ msgstr "Näita informatsiooni postkasti sisu kohta"
 
-#: libinit_balsa/init_balsa.c:36
-msgid "Configure Balsa"
-msgstr "Balsa häälestus"
+#~ msgid "_From"
+#~ msgstr "Saatja"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:58
-#, c-format
-msgid ""
-"The pathname \"%s\" must be specified canonically -- it must start with a "
-"'/'."
-msgstr "Rada \"%s\" tuleb anda kanooniliselt, s.t. alguses peab olema '/'."
-
-#: libinit_balsa/balsa-druid-page-directory.gob:76
-#, c-format
-msgid "An error occurred when attempting to creat(2) the file \"%s\"."
-msgstr "Juhtus viga, kui üritati luua faili \"%s\" käsuga creat()."
-
-#: libinit_balsa/balsa-druid-page-directory.gob:84
-#, c-format
-msgid "The mailbox \"%s\" does not appear to be valid."
-msgstr "\"%s\" ei ole kehtiva postkasti nimi."
-
-#: libinit_balsa/balsa-druid-page-directory.gob:146
-msgid ""
-"Please confirm the locations of your default mail files.\n"
-"These will be created if necessary."
-msgstr ""
-"Palun kinnitage vaikimisi postifailide asukohad.\n"
-"Kui selliseid faile ei ole, siis need luuakse."
-
-#: libinit_balsa/balsa-druid-page-directory.gob:157
-msgid "Inbox:"
-msgstr "Saabunud:"
-
-#. This used to set all the mail directories to their proper values
-#. * as in the prepare code. But at this point balsa_app.local_mail_directory
-#. * is NULL, so we use a dummy value.
-#.
-#: libinit_balsa/balsa-druid-page-directory.gob:166
-msgid "Outbox:"
-msgstr "Saatmisel:"
-
-#: libinit_balsa/balsa-druid-page-directory.gob:169
-msgid "Sentbox:"
-msgstr "Saadetud:"
-
-#: libinit_balsa/balsa-druid-page-directory.gob:172
-msgid "Draftbox:"
-msgstr "Mustandid:"
-
-#: libinit_balsa/balsa-druid-page-directory.gob:175
-msgid "Trash:"
-msgstr "Prügikast:"
-
-#: libinit_balsa/balsa-druid-page-directory.gob:186
-msgid "Mail Files"
-msgstr "Postifailid"
-
-#: libinit_balsa/balsa-druid-page-directory.gob:259
-msgid "Problem Creating Mailboxes"
-msgstr "Viga postkastide loomisel"
-
-#: libinit_balsa/balsa-druid-page-finish.gob:44
-msgid ""
-"You've successfully set up Balsa. Have fun!\n"
-"   -- The Balsa development team"
-msgstr ""
-"Teie Balsa paigaldamine õnnestus. Edu ka edaspidiseks!\n"
-"  -- Balsa meeskond"
-
-#: libinit_balsa/balsa-druid-page-finish.gob:56
-msgid "All Done!"
-msgstr "Valmis!"
-
-#: libinit_balsa/balsa-druid-page-user.gob:74
-msgid "Please enter information about yourself."
-msgstr "Palun sisestage informatsioon iseenda kohta."
-
-#: libinit_balsa/balsa-druid-page-user.gob:86
-msgid "Email address:"
-msgstr "E-posti aadress:"
-
-#: libinit_balsa/balsa-druid-page-user.gob:90
-msgid "SMTP Server:"
-msgstr "SMTP server:"
-
-#: libinit_balsa/balsa-druid-page-user.gob:93
-msgid "Local Mail Directory:"
-msgstr "Kohalik postikataloog:"
-
-#: libinit_balsa/balsa-druid-page-user.gob:103
-msgid "User Settings"
-msgstr "Kasutaja andmed"
-
-#: libinit_balsa/balsa-druid-page-user.gob:151
-msgid "Local Mail Problem"
-msgstr "Viga kohaliku postiga"
-
-#: libinit_balsa/balsa-druid-page-welcome.gob:47
-msgid "Welcome to Balsa!"
-msgstr "Tere tulemast!"
-
-#: libinit_balsa/balsa-druid-page-welcome.gob:50
-msgid ""
-"You seem to be running Balsa for the first time. The following\n"
-"steps will set up Balsa by asking a few simple questions. Once\n"
-"you have completed these steps, you can always change them later\n"
-"in Balsa's preferences. If any files or directories need to be created,\n"
-"it will be done so automatically. Please check the about box in Balsa's\n"
-"main window for more information about contacting the authors or\n"
-"reporting bugs."
-msgstr ""
-"Näib, et te käivitasite Balsa esimest korda. Järgnevalt küsitakse\n"
-"Teilt mõned lihtsad küsimused. Neid on hiljem alati võimalik Balsa\n"
-"häälestuse menüüst muuta. Abimenüüst info alt leiate täpsemad andmed,\n"
-"kuidas teatada võimalikest programmi vigadest."
-
-#: libinit_balsa/balsa-initdruid.gob:91
-msgid ""
-"This will exit Balsa. Do you\n"
-"really want to do this?"
-msgstr ""
-"See lõpetab Balsa. Kas sa\n"
-"tõesti tahad seda?"
+#~ msgid "Spell Check"
+#~ msgstr "Korrektuur"
 
 #~ msgid "_Open"
 #~ msgstr "Ava"
-
-#~ msgid "Open the selected mailbox"
-#~ msgstr "Ava valitud postkast"
-
-#~ msgid "_Close"
-#~ msgstr "Sulge"
 
 #~ msgid "Close the selected mailbox"
 #~ msgstr "Sulge valitud postkast"

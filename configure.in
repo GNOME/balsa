@@ -4,11 +4,15 @@ AM_CONFIG_HEADER(config.h)
 dnl
 dnl take care of version
 dnl
+
 BALSA_MAJOR=0
-BALSA_REVISION=6
+BALSA_REVISION=8
 BALSA_PATCHLEVEL=0
-BALSA_VERSION="$BALSA_MAJOR.$BALSA_REVISION.$BALSA_PATCHLEVEL"
-VERSION="$BALSA_MAJOR.$BALSA_REVISION.$BALSA_PATCHLEVEL"
+BALSA_RELEASE="pre1"
+
+BALSA_SHORT_VERSION="$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}"
+BALSA_VERSION="$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}-${BALSA_RELEASE}"
+VERSION="$BALSA_VERSION"
 
 dnl configure libmutt
 AC_CONFIG_SUBDIRS(libmutt)
@@ -46,6 +50,7 @@ LDFLAGS="$balsa_save_LDFLAGS"
 LIBS="$balsa_save_LIBS"
 
 ALL_LINGUAS="ca da de el es et fi fr ga ja ko no it nl pl ru pt_BR sv tr uk zh_CN"
+LINGUAS="$ALL_LINGUAS"
 AM_GNU_GETTEXT
 
 
@@ -79,6 +84,8 @@ dnl Automake @VARIABLE@ exports.
 AC_SUBST(BALSA_MAJOR)
 AC_SUBST(BALSA_REVISION)
 AC_SUBST(BALSA_PATCHLEVEL)
+AC_SUBST(BALSA_RELEASE)
+AC_SUBST(BALSA_SHORT_VERSION)
 AC_SUBST(BALSA_VERSION)
 AC_SUBST(LIBOBJS)
 AC_SUBST(LIBESD_LIB)
@@ -198,6 +205,18 @@ AC_DEFINE_UNQUOTED( GNOME_STD_PREFIX, "$GNOME_STD_PREFIX" )
 AC_DEFINE_UNQUOTED( GNOME_LIB_PREFIX, "$GNOME_LIB_PREFIX" )
 AC_DEFINE_UNQUOTED( GNOME_DATA_PREFIX, "$GNOME_DATA_PREFIX" )
 AC_DEFINE_UNQUOTED( BALSA_COMMON_PREFIXES, `echo $BALSA_COMMON_PREFIXES` ) dnl bleah
+
+dnl This is for the rpm spec, where we patch the @-@ thingies but we don't want
+dnl them substituted in the .infile->file conversion
+
+at_prefix="@prefix@"
+at_srcdir="@srcdir@"
+at_DATADIRNAME="@DATADIRNAME@"
+at_exec_prefix="@exec_prefix@"
+AC_SUBST(at_prefix)
+AC_SUBST(at_srcdir)
+AC_SUBST(at_DATADIRNAME)
+AC_SUBST(at_exec_prefix)
 
 dnl ######################################################################################
 dnl Things needed by CVS user

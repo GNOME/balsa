@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Balsa Downloads</title>
+<title>Balsa -- Downloads</title>
 <link rel="stylesheet" type="text/css" href="@website_root@/style.css">
 </head>
 <body background="@website_root@/images/bg.jpg" bgcolor="#ffffff" text="#000000" link="#993300" vlink="#993300">

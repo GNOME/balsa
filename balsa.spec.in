@@ -1,7 +1,9 @@
 # Note that this is NOT a relocatable package
-%define ver      @VERSION@
-%define rel      1
+%define ver      @BALSA_SHORT_VERSION@
+%define rel      @BALSA_RELEASE@
 %define prefix   /usr
+
+%define config_opts --prefix=%{prefix} --sysconfdir=/etc --enable-threads --disable-system-install
 
 Summary:   Balsa Mail Client
 Name:      balsa
@@ -18,7 +20,7 @@ Requires: gnome-libs >= 1.0.0
 Docdir: %{prefix}/doc
 
 %description
-Balsa is a e-mail reader.  This client is part of the GNOME
+Balsa is an e-mail reader.  This client is part of the GNOME
 desktop environment.  It supports local mailboxes, POP3 and
 IMAP.
  
@@ -29,12 +31,12 @@ patch -b -p1 <<EOF
 --- balsa-0.6.0.orig/po/Makefile.in.in
 +++ balsa-0.6.0/po/Makefile.in.in
 @@ -17,6 +17,6 @@
- VPATH = @srcdir@
+ VPATH = @at_srcdir@
 
--prefix = @prefix@
+-prefix = @at_prefix@
 +prefix = \$(DESTDIR)/usr
- exec_prefix = @exec_prefix@
- datadir = \$(prefix)/@DATADIRNAME@
+ exec_prefix = @at_exec_prefix@
+ datadir = \$(prefix)/@at_DATADIRNAME@
  localedir = \$(datadir)/locale
 EOF
 
@@ -42,17 +44,15 @@ EOF
 # Needed for snapshot releases.
 if [ ! -f configure ]; then
 %ifarch alpha
-  CFLAGS="$RPM_OPT_FLAGS" ./autogen.sh --host=alpha-redhat-linux \
-    --prefix=%{prefix} --sysconfdir=/etc
+  CFLAGS="$RPM_OPT_FLAGS" ./autogen.sh --host=alpha-redhat-linux %{config_opts}
 %else
-  CFLAGS="$RPM_OPT_FLAGS" ./autogen.sh --prefix=%{prefix} --sysconfdir=/etc 
+  CFLAGS="$RPM_OPT_FLAGS" ./autogen.sh %{config_opts}
 %endif
 else
 %ifarch alpha
-  CFLAGS="$RPM_OPT_FLAGS" ./configure --host=alpha-redhat-linux \
-    --prefix=%{prefix} --sysconfdir=/etc
+  CFLAGS="$RPM_OPT_FLAGS" ./configure --host=alpha-redhat-linux %{config_opts}
 %else
-  CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{prefix} --sysconfdir=/etc
+  CFLAGS="$RPM_OPT_FLAGS" ./configure %{config_opts}
 %endif
 fi
 
@@ -125,7 +125,3 @@ rm -rf $RPM_BUILD_ROOT
 * Thu Apr 02 1998 Michael Fulbright <msf@redhat.com>
 
 - First try at an RPM
-
-
-
-

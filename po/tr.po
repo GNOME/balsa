@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.6.0\n"
-"POT-Creation-Date: 2000-04-16 18:53+0200\n"
+"POT-Creation-Date: 2000-04-18 21:23-0400\n"
 "PO-Revision-Date: 2000-04-16 22:02+0100\n"
 "Last-Translator: Fatih Demir <kabalak@gmx.net>\n"
 "Language-Team: Turkish <tr@li.org>\n"
@@ -140,7 +140,8 @@ msgstr ""
 "Balsa'yý ilk def'a çalýþtýrdýðýna benziyor .\n"
 "Bir-iki adýmda Balsa sana bazý kolay sorular soracak ve cevaplarýnla\n"
 "kendisini kuracaktýr . Bu ayarlarý sonradan \"Ayarlar\" mönüsünde de\n"
-"deðiþtirebilirsin . Bazý dosyalar yada dizinler yoksa , onlar yaratýlacaktýr .\n"
+"deðiþtirebilirsin . Bazý dosyalar yada dizinler yoksa , onlar yaratýlacaktýr "
+".\n"
 "Lütfen Balsa'nýn \"Bilgi\" kutusuna göz atýo, Balsa'nýn yazarlarýyla\n"
 "iletiþime geçebilirsin ve hata raporlarýný gönderebilirsin .\n"
 " "
@@ -156,7 +157,9 @@ msgstr ""
 #: libinit_balsa/helper.c:142
 #, c-format
 msgid "The path %s must be relative to the filesystem root (start with /)."
-msgstr "%s dizinlemesi dosya yönetim sistemi köküne göre yazýlmasý gerekir ( '/''yle baþlar )."
+msgstr ""
+"%s dizinlemesi dosya yönetim sistemi köküne göre yazýlmasý gerekir ( '/''yle "
+"baþlar )."
 
 #: libinit_balsa/helper.c:152 libinit_balsa/helper.c:170
 #, c-format
@@ -234,36 +237,38 @@ msgstr "ePosta kutusu parolasý:"
 msgid "Password:"
 msgstr "Parola:"
 
-#: src/balsa-index-page.c:318
-msgid "Unable to Open Mailbox!"
-msgstr "ePosta kutusunu açamadým !"
+#: src/balsa-index-page.c:319
+msgid ""
+"Unable to Open Mailbox!\n"
+"Please check the mailbox settings."
+msgstr ""
 
-#: src/balsa-index-page.c:581 src/filter-edit-dialog.c:224
+#: src/balsa-index-page.c:582 src/filter-edit-dialog.c:224
 msgid "New"
 msgstr "Yeni"
 
-#: src/balsa-index-page.c:589 src/main-window.c:373
+#: src/balsa-index-page.c:590 src/main-window.c:373
 msgid "Reply"
 msgstr "Cevap"
 
-#: src/balsa-index-page.c:597 src/main-window.c:376
+#: src/balsa-index-page.c:598 src/main-window.c:376
 msgid "Reply to all"
 msgstr "Hepsine cevap ver"
 
-#: src/balsa-index-page.c:605 src/main-window.c:379
+#: src/balsa-index-page.c:606 src/main-window.c:379
 msgid "Forward"
 msgstr "Ilet"
 
-#: src/balsa-index-page.c:613 src/filter-edit-dialog.c:230
+#: src/balsa-index-page.c:614 src/filter-edit-dialog.c:230
 #: src/main-window.c:366 src/pref-manager.c:876
 msgid "Delete"
 msgstr "Sil"
 
-#: src/balsa-index-page.c:621
+#: src/balsa-index-page.c:622
 msgid "Undelete"
 msgstr "Kurtar"
 
-#: src/balsa-index-page.c:629
+#: src/balsa-index-page.c:630
 msgid "Transfer"
 msgstr "Taþý"
 
@@ -505,7 +510,8 @@ msgid ""
 "Are you sure you want to remove this mailbox?"
 msgstr ""
 "Bu ePosta kutusunu ePosta kutularý listesinden silmek üzeresin .\n"
-"\"ePosta kutusu ekle\" yoluyla o ePosta kutusunu sonradan yeniden ekleyebilirsin .\n"
+"\"ePosta kutusu ekle\" yoluyla o ePosta kutusunu sonradan yeniden "
+"ekleyebilirsin .\n"
 "Bu ePosta kutusunu buradan silmek istediðinden emin misin ?"
 
 #: src/mailbox-conf.c:192
@@ -871,17 +877,19 @@ msgid ""
 "\n"
 "If you need to report bugs, please do so at: http://bugs.gnome.org/"
 msgstr ""
-"Balsa ePosta uygulamasý GNOME masaüstü çevresinin bir parçasýdýr ."
-"Balsa'yla alakalý bilgilere \"http://www.balsa.net/\"'den ulaþabilirsin .\n"
+"Balsa ePosta uygulamasý GNOME masaüstü çevresinin bir parçasýdýr .Balsa'yla "
+"alakalý bilgilere \"http://www.balsa.net/\"'den ulaþabilirsin .\n"
 "\n"
-"Hata raporlarý göndermek zorunda kalýrsan , lütfen \"http://bugs.gnome.org/\"'a git."
+"Hata raporlarý göndermek zorunda kalýrsan , lütfen "
+"\"http://bugs.gnome.org/\"'a git."
 
 #: src/main.c:102
 msgid "Get new mail on startup"
 msgstr "Baþlarken yeni ePostayý al"
 
 #: src/main.c:103
-msgid "Compose a new email to EMAIL"
+#, fuzzy
+msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "EMAIL'e yeni bir ePosta iletisi yaz"
 
 #: src/main.c:104
@@ -1501,3 +1509,6 @@ msgstr "Yazdýrma komutasýný çalýþtýramadým ."
 #: src/sendmsg-window.c:1386
 msgid "Error executing lpr"
 msgstr "lpr'i çalýþtýrýrken hata oldu"
+
+#~ msgid "Unable to Open Mailbox!"
+#~ msgstr "ePosta kutusunu açamadým !"

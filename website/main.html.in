@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Balsa</title>
+<title>Balsa -- Main Page</title>
 <link rel="stylesheet" type="text/css" href="@website_root@/style.css">
 </head>
 <body background="@website_root@/images/bg.jpg" bgcolor="#ffffff" text="#000000" link="#993300" vlink="#993300">
@@ -11,6 +11,7 @@
 <p>A <a href="http://www.gnome.org/">GNOME</a> Email Client</p>
 <p>Updates:</p>
 <p>
+04/18/2000 - Balsa 0.8.0-pre1 is available! And in honor thereof, <a href="@website_root@/bugs.html">bug reporting instructions</a>.<br>
 04/04/2000 - Balsa 0.8 is coming soon!<br>
 12/21/1999 - <a href="@website_root@/download.html">Balsa 0.6.0 released!</a><br>
 10/14/1999 - Updated screenshots<br>

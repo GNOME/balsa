@@ -1,3 +1,13 @@
+2000-04-18  Peter Williams  <peter@beta.newton.cx>
+
+	* balsa.spec.in: Fixes to make RPMs work. Now I understand
+	  why people say RPM sucks.
+
+	* configure.in (BALSA_VERSION): Changed to
+	  reflet preview release, and to placate RPM.
+	
+	* README: Same.
+
 2000-04-18  Pablo Saratxaga <pablo@mandrakesoft.com>
 
 	* configure.in (ALL_LINGUAS): added Catalan

@@ -5,6 +5,7 @@ IN_FILES = \
 	faq.html.in \
 	features.html.in \
 	screenshots.html.in \
+	bugs.html.in \
 	style.css.in
 
 HTML_FILES = \
@@ -13,7 +14,8 @@ HTML_FILES = \
 	download.html \
 	faq.html \
 	features.html \
-	screenshots.html
+	screenshots.html \
+	bugs.html
 
 EXTRA_DIST = $(IN_FILES)
 

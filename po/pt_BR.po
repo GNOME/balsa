@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2000-04-18 07:31-0300\n"
+"POT-Creation-Date: 2000-04-18 21:23-0400\n"
 "PO-Revision-Date: 1999-11-18 15:45+0200\n"
 "Last-Translator: Alexandre Hautequest <hquest@fesppr.br>\n"
 "Language-Team: Brazilian Portuguese <ldp-br@bazar.conectiva.com.br>\n"
@@ -249,36 +249,38 @@ msgstr "Senha da caixa de entrada:"
 msgid "Password:"
 msgstr "Senha:"
 
-#: src/balsa-index-page.c:318
-msgid "Unable to Open Mailbox!"
-msgstr "Não foi possível abrir Caixa de Entrada!"
+#: src/balsa-index-page.c:319
+msgid ""
+"Unable to Open Mailbox!\n"
+"Please check the mailbox settings."
+msgstr ""
 
-#: src/balsa-index-page.c:581 src/filter-edit-dialog.c:224
+#: src/balsa-index-page.c:582 src/filter-edit-dialog.c:224
 msgid "New"
 msgstr "Novo"
 
-#: src/balsa-index-page.c:589 src/main-window.c:373
+#: src/balsa-index-page.c:590 src/main-window.c:373
 msgid "Reply"
 msgstr "Responder"
 
-#: src/balsa-index-page.c:597 src/main-window.c:376
+#: src/balsa-index-page.c:598 src/main-window.c:376
 msgid "Reply to all"
 msgstr "Responder a todos"
 
-#: src/balsa-index-page.c:605 src/main-window.c:379
+#: src/balsa-index-page.c:606 src/main-window.c:379
 msgid "Forward"
 msgstr "Encaminhar"
 
-#: src/balsa-index-page.c:613 src/filter-edit-dialog.c:230
+#: src/balsa-index-page.c:614 src/filter-edit-dialog.c:230
 #: src/main-window.c:366 src/pref-manager.c:876
 msgid "Delete"
 msgstr "Apagar"
 
-#: src/balsa-index-page.c:621
+#: src/balsa-index-page.c:622
 msgid "Undelete"
 msgstr "Recuperar"
 
-#: src/balsa-index-page.c:629
+#: src/balsa-index-page.c:630
 msgid "Transfer"
 msgstr "Transferir"
 
@@ -1585,173 +1587,176 @@ msgstr ""
 msgid "Error executing lpr"
 msgstr ""
 
-msgid "Local Mailbox Loaded as: %s\n"
-msgstr "Caixa de mensagem local carregada como: %s\n"
+#~ msgid "Unable to Open Mailbox!"
+#~ msgstr "Não foi possível abrir Caixa de Entrada!"
 
-msgid "All of the fields must be filled in"
-msgstr "Todos os campos devem ser completados"
+#~ msgid "Local Mailbox Loaded as: %s\n"
+#~ msgstr "Caixa de mensagem local carregada como: %s\n"
 
-msgid "_Open"
-msgstr "_Abrir"
+#~ msgid "All of the fields must be filled in"
+#~ msgstr "Todos os campos devem ser completados"
 
-msgid "Close the selected mailbox"
-msgstr "Fecha a caixa de mensagens selecionada"
+#~ msgid "_Open"
+#~ msgstr "_Abrir"
 
-msgid "C_lose current"
-msgstr "F_echar a atual"
+#~ msgid "Close the selected mailbox"
+#~ msgstr "Fecha a caixa de mensagens selecionada"
 
-msgid "Close the currently opened mailbox"
-msgstr "Fecha a caixa de mensagens atual"
+#~ msgid "C_lose current"
+#~ msgstr "F_echar a atual"
 
-msgid "O_pened"
-msgstr "A_bertos"
+#~ msgid "Close the currently opened mailbox"
+#~ msgstr "Fecha a caixa de mensagens atual"
 
-msgid "Mail_boxes"
-msgstr "Caixas de _Entrada"
+#~ msgid "O_pened"
+#~ msgstr "A_bertos"
 
-msgid "View mailbox content informations "
-msgstr "Ver informações da caixa mensagens"
+#~ msgid "Mail_boxes"
+#~ msgstr "Caixas de _Entrada"
 
-msgid "On %s "
-msgstr "Em %s"
+#~ msgid "View mailbox content informations "
+#~ msgstr "Ver informações da caixa mensagens"
 
-msgid "Inbox"
-msgstr "Caixa de Entrada"
+#~ msgid "On %s "
+#~ msgstr "Em %s"
 
-msgid "Outbox"
-msgstr "Caixa de Saída"
+#~ msgid "Inbox"
+#~ msgstr "Caixa de Entrada"
 
-msgid "Sentbox"
-msgstr "Caixa de emails Enviados"
+#~ msgid "Outbox"
+#~ msgstr "Caixa de Saída"
 
-msgid "Draftbox"
-msgstr "Caixa de rascunhos"
+#~ msgid "Sentbox"
+#~ msgstr "Caixa de emails Enviados"
 
-msgid "Trash"
-msgstr "Lixo"
+#~ msgid "Draftbox"
+#~ msgstr "Caixa de rascunhos"
 
-#, fuzzy
-msgid "Local"
-msgstr "Email local"
-
-#, fuzzy
-msgid "New Local Mailbox"
-msgstr "Caixa de mensagens local"
+#~ msgid "Trash"
+#~ msgstr "Lixo"
 
 #, fuzzy
-msgid "Mailbox name:"
-msgstr "Nome da caixa de mensagens"
+#~ msgid "Local"
+#~ msgstr "Email local"
 
 #, fuzzy
-msgid "Path to mailbox:"
-msgstr "Caixa de mensagens local"
+#~ msgid "New Local Mailbox"
+#~ msgstr "Caixa de mensagens local"
 
 #, fuzzy
-msgid "Finished"
-msgstr "Terminar"
+#~ msgid "Mailbox name:"
+#~ msgstr "Nome da caixa de mensagens"
 
 #, fuzzy
-msgid "Create Mail Directory?"
-msgstr "Diretório local de email:"
+#~ msgid "Path to mailbox:"
+#~ msgstr "Caixa de mensagens local"
 
 #, fuzzy
-msgid "Configure %s"
-msgstr "Continuar"
+#~ msgid "Finished"
+#~ msgstr "Terminar"
 
 #, fuzzy
-msgid "Mailbox Creation Failed"
-msgstr "Nome da caixa de mensagens"
+#~ msgid "Create Mail Directory?"
+#~ msgstr "Diretório local de email:"
 
 #, fuzzy
-msgid "Your mailbox directory:"
-msgstr "Diretório local de email:"
+#~ msgid "Configure %s"
+#~ msgstr "Continuar"
 
-msgid "Welcome To Balsa!"
-msgstr "Bem Vindo ao Balsa!"
+#, fuzzy
+#~ msgid "Mailbox Creation Failed"
+#~ msgstr "Nome da caixa de mensagens"
 
-msgid "welcome"
-msgstr "bem vindo"
+#, fuzzy
+#~ msgid "Your mailbox directory:"
+#~ msgstr "Diretório local de email:"
 
-msgid "general"
-msgstr "principal"
+#~ msgid "Welcome To Balsa!"
+#~ msgstr "Bem Vindo ao Balsa!"
 
-msgid "mailboxs"
-msgstr "caixas de mensagens"
+#~ msgid "welcome"
+#~ msgstr "bem vindo"
 
-msgid "You seem to be running Balsa for the first time.\n"
-msgstr "Parece que você está executando o Balsa pela primeira vez.\n"
+#~ msgid "general"
+#~ msgstr "principal"
 
-msgid ""
-"The following steps will setup Balsa by asking a few simple questions.  "
-msgstr ""
-"Os passos a seguir irão configurar o Balsa perguntando algumas poucas "
-"informações"
+#~ msgid "mailboxs"
+#~ msgstr "caixas de mensagens"
 
-msgid ""
-"Once you have completed these steps, you can always change them at a later "
-"time through Balsa's preferences.  "
-msgstr ""
-"Assim que tiver completado estes passos, você pode sempre alterá-los mais "
-"tardenas preferêncais do Balsa"
+#~ msgid "You seem to be running Balsa for the first time.\n"
+#~ msgstr "Parece que você está executando o Balsa pela primeira vez.\n"
 
-msgid ""
-"Please check the about box in Balsa's main window for more information on "
-"contacting the authors or reporting bugs."
-msgstr ""
-"Cheque a caixa Sobre na janela do Balsa para maiores informações "
-"paracontactar os autores ou reportar erros."
+#~ msgid ""
+#~ "The following steps will setup Balsa by asking a few simple questions.  "
+#~ msgstr ""
+#~ "Os passos a seguir irão configurar o Balsa perguntando algumas poucas "
+#~ "informações"
 
-msgid "Inbox Path:"
-msgstr "Caminho da caixa de entrada:"
+#~ msgid ""
+#~ "Once you have completed these steps, you can always change them at a later "
+#~ "time through Balsa's preferences.  "
+#~ msgstr ""
+#~ "Assim que tiver completado estes passos, você pode sempre alterá-los mais "
+#~ "tardenas preferêncais do Balsa"
 
-msgid "Outbox Path:"
-msgstr "Caminho da caixa de saida:"
+#~ msgid ""
+#~ "Please check the about box in Balsa's main window for more information on "
+#~ "contacting the authors or reporting bugs."
+#~ msgstr ""
+#~ "Cheque a caixa Sobre na janela do Balsa para maiores informações "
+#~ "paracontactar os autores ou reportar erros."
 
-msgid "Sentbox Path:"
-msgstr "Caminho da caixa de saída:"
+#~ msgid "Inbox Path:"
+#~ msgstr "Caminho da caixa de entrada:"
 
-msgid "Draftbox Path:"
-msgstr "Caminho da caixa de rascunhos:"
+#~ msgid "Outbox Path:"
+#~ msgstr "Caminho da caixa de saida:"
 
-msgid "Trash Path:"
-msgstr "Caminho do lixo:"
+#~ msgid "Sentbox Path:"
+#~ msgstr "Caminho da caixa de saída:"
 
-msgid ""
-"If you wish to use IMAP for these\n"
-"please change them inside Balsa\n"
-msgstr ""
-"Se você deseja usar IMAP para isto\n"
-"altere nas preferências do Balsa\n"
+#~ msgid "Draftbox Path:"
+#~ msgstr "Caminho da caixa de rascunhos:"
 
-msgid ""
-"Mailbox \"%s\" is not valid.\n"
-"\n"
-"Would you like to create it?"
-msgstr ""
-"Caida de entrada \"%s\" não é válida.\n"
-"\n"
-"Criar uma?"
+#~ msgid "Trash Path:"
+#~ msgstr "Caminho do lixo:"
 
-msgid "Unable to procede without a valid mailbox.  Please try again."
-msgstr "Não é possível continuar sem uma caixa de entrada. Tente novamente."
+#~ msgid ""
+#~ "If you wish to use IMAP for these\n"
+#~ "please change them inside Balsa\n"
+#~ msgstr ""
+#~ "Se você deseja usar IMAP para isto\n"
+#~ "altere nas preferências do Balsa\n"
 
-msgid "Checked."
-msgstr "Checado."
+#~ msgid ""
+#~ "Mailbox \"%s\" is not valid.\n"
+#~ "\n"
+#~ "Would you like to create it?"
+#~ msgstr ""
+#~ "Caida de entrada \"%s\" não é válida.\n"
+#~ "\n"
+#~ "Criar uma?"
 
-msgid "Change Status"
-msgstr "Alterar estado"
+#~ msgid "Unable to procede without a valid mailbox.  Please try again."
+#~ msgstr "Não é possível continuar sem uma caixa de entrada. Tente novamente."
 
-msgid "Read"
-msgstr "Ler"
+#~ msgid "Checked."
+#~ msgstr "Checado."
 
-msgid "Replied"
-msgstr "Responder"
+#~ msgid "Change Status"
+#~ msgstr "Alterar estado"
 
-msgid "Forwarded"
-msgstr "Reenviar"
+#~ msgid "Read"
+#~ msgstr "Ler"
 
-msgid "Mailboxes/Opened/"
-msgstr "Caixas de entrada abertas"
+#~ msgid "Replied"
+#~ msgstr "Responder"
+
+#~ msgid "Forwarded"
+#~ msgstr "Reenviar"
+
+#~ msgid "Mailboxes/Opened/"
+#~ msgstr "Caixas de entrada abertas"
 
 #~ msgid "Include signature when sending mail"
 #~ msgstr "Incluir assinatura quando enviar mensagem"

@@ -1,3 +1,11 @@
+2003-10-24 00:35  PeterB
+
+	* src/balsa-index.c: Get a bit further with message deletion.
+	* libbalsa/imap/imap.h: Add ImapBody::content_uri--new in RFC 3051.
+	* libbalsa/imap/imap-handle.c: Clarify BODY and BODYSTRUCTURE
+	response handlers.
+	* libbalsa/mailbox.c: Fix incorrect signal from 2003-10-22 commit.
+
 2003-10-22 19:49  PeterB
 
 	* libbalsa/: mailbox.c, mailbox_maildir.c, mailbox_mbox.c,

@@ -1,3 +1,10 @@
+2003-01-22  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Compile against gnome-2.2 and openssl-0.9.7
+	* configure.in: lower 2.2 requirements on libgnomeprint{,ui},
+	support openssl-0.9.7
+	* libbalsa/address-book-ldap.c: handle connection errors better.
+
 2003-01-21 08:20  PeterB
 
 	* src/folder-conf.c: Non-modal IMAP sub-folder dialog; use common

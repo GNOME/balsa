@@ -596,8 +596,10 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
     ldap_ab = LIBBALSA_ADDRESS_BOOK_LDAP(ab);
 
     if (!ab->expand_aliases || strlen(prefix)<LDAP_MIN_LEN) return NULL;
-    if (ldap_ab->directory == NULL)
-        libbalsa_address_book_ldap_open_connection(ldap_ab);
+    if (ldap_ab->directory == NULL) {
+        if(!libbalsa_address_book_ldap_open_connection(ldap_ab))
+	    return NULL;
+    }
 
     /*
      * Attempt to search for e-mail addresses.  It returns success

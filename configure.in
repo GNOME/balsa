@@ -77,8 +77,8 @@ if $PKG_CONFIG --exists libgnomeprint-2.0 ; then
   ])
 else
   PKG_CHECK_MODULES(LGPRINT, [
-  libgnomeprint-2.2 >= 2.1.5
-  libgnomeprintui-2.2 >= 2.1.5
+  libgnomeprint-2.2 >= 2.1.4
+  libgnomeprintui-2.2 >= 2.1.4
   ])
   AC_DEFINE(HAVE_LGPRINT22,1,[If defined, build using libgnomeprint-2.2 specific API])
 fi
@@ -350,35 +350,40 @@ AC_ARG_WITH(ssl, [  --with-ssl              Enable SSL [default=no]],[
 
 AC_MSG_CHECKING([whether to build SSL support])
 if test "x$with_ssl" != xno  ; then
-   if test -d $with_ssl && test -f "$with_ssl/include/openssl/ssl.h" ; then
-      ssldir=$with_ssl
+# openssl >=0.9.7 is pkg-config compatible.
+   if pkg-config openssl >&/dev/null; then
+      LIBS="$LIBS `pkg-config --libs openssl`"
+      CPPFLAGS="`pkg-config --cflags-only-I openssl` $CPPFLAGS"
+      AC_MSG_RESULT(yes)
+      AC_DEFINE(USE_SSL,1,[Defined when SSL support is to be compiled.])
    else
-        AC_TRY_COMPILE([#include <openssl/ssl.h>], ,
-			ssldir=default,
-			ssldir="")
-	if test "x$ssldir" = x ; then
-           for prefixdir in /usr /usr/local /usr/lib /usr/pkg /var /opt; do
-               for dir in $prefixdir $prefixdir/openssl $prefixdir/ssl; do
-                   if test -f "$dir/include/openssl/ssl.h"; then
-                      ssldir=$dir
-                   fi
-               done
-           done
-	fi
-   fi
-fi
-
-if test "x$with_ssl" != xno; then
-   if test -z "$ssldir"; then
-      AC_MSG_ERROR([SSL requested but no SSL headers found.])
-   else
-        AC_MSG_RESULT(yes)
-        LIBS="$LIBS -lssl -lcrypto"
-	if test "x$ssldir" != xdefault ; then
+      if test -d $with_ssl && test -f "$with_ssl/include/openssl/ssl.h" ; then
+         ssldir=$with_ssl
+      else
+           AC_TRY_COMPILE([#include <openssl/ssl.h>], ,
+		          ssldir=default,
+			  ssldir="")
+	   if test "x$ssldir" = x ; then		
+              for prefixdir in /usr /usr/local /usr/lib /usr/pkg /var /opt; do
+                  for dir in $prefixdir $prefixdir/openssl $prefixdir/ssl; do
+                      if test -f "$dir/include/openssl/ssl.h"; then
+                         ssldir=$dir
+                      fi
+                  done
+              done
+	   fi
+       fi
+       if test -z "$ssldir"; then
+          AC_MSG_ERROR([SSL requested but no SSL headers found.])
+       else
+          AC_MSG_RESULT(yes)
+          LIBS="$LIBS -lssl -lcrypto"
+	  if test "x$ssldir" != xdefault ; then
 		CPPFLAGS="-I${ssldir}/include $CPPFLAGS"
-	fi
-	ac_cv_path_openssl=$ssldir
-	AC_DEFINE(USE_SSL,1,[Defined when SSL support is to be compiled.])
+	  fi
+	  ac_cv_path_openssl=$ssldir
+	  AC_DEFINE(USE_SSL,1,[Defined when SSL support is to be compiled.])
+       fi
    fi
 else
    AC_MSG_RESULT(no)

@@ -1,4 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
+AC_PREREQ(2.52)
 AC_INIT(mutt.h)
 
 MUTT_MAJOR=0
@@ -285,18 +286,23 @@ AC_ARG_WITH(ssl, [  --with-ssl[=PFX]         Compile in SSL socket support for I
 	  if test "$need_imap" != "yes"; then
 	   AC_MSG_ERROR([SSL support is only for IMAP, but IMAP is not enabled])
 	  fi
-
-	  AC_CACHE_CHECK(for ssldir, ac_cv_path_openssl, [
-	    if test "$with_ssl" != "yes"; then
-			ac_cv_path_openssl=$withval
-		fi
-	  ])
-	  if test "x$ac_cv_path_openssl" != "x"; then
-	    LDFLAGS="$LDFLAGS -L$ac_cv_path_openssl/lib"
-	    CPPFLAGS="$CPPFLAGS -I$ac_cv_path_openssl/include"
-	  fi	
-	  saved_LIBS="$LIBS"
-
+          if pkg-config openssl >& /dev/null; then
+	     echo here
+             LDFLAGS="$LIBS `pkg-config --libs openssl`"
+             CPPFLAGS="`pkg-config --cflags-only-I openssl` $CPPFLAGS"
+          else
+             echo failed
+	     AC_CACHE_CHECK(for ssldir, ac_cv_path_openssl, [
+	       if test "$with_ssl" != "yes"; then
+			   ac_cv_path_openssl=$withval
+	       fi
+	     ])
+	     if test "x$ac_cv_path_openssl" != "x"; then
+	        LDFLAGS="$LDFLAGS -L$ac_cv_path_openssl/lib"
+	        CPPFLAGS="$CPPFLAGS -I$ac_cv_path_openssl/include"
+	     fi	
+	     saved_LIBS="$LIBS"
+          fi
 	  AC_CHECK_LIB(crypto, X509_new,, AC_MSG_ERROR([Unable to find SSL library]))
 	  AC_CHECK_LIB(ssl, SSL_new,, AC_MSG_ERROR([Unable to find SSL library]), -lcrypto)
 

@@ -46,6 +46,13 @@
 */
 static GObjectClass *parent_class = NULL;
 
+typedef struct imap_scan_item_ imap_scan_item;
+struct imap_scan_item_ {
+    gchar *fn;
+    gboolean scanned, selectable;
+    LibBalsaMailbox **special;
+};
+
 static void balsa_mailbox_node_class_init(BalsaMailboxNodeClass *
 					     klass);
 static void balsa_mailbox_node_init(BalsaMailboxNode * mn);
@@ -56,8 +63,10 @@ static void balsa_mailbox_node_real_save_config(BalsaMailboxNode* mn,
 static void balsa_mailbox_node_real_load_config(BalsaMailboxNode* mn,
 						const gchar * prefix);
 
-static GNode* imap_scan_create_mbnode(GNode*root, const char* fn, char delim, 
-				      gboolean scanned);
+static GNode *imap_scan_create_mbnode(GNode * root, imap_scan_item * isi,
+                                      char delim);
+static void imap_scan_attach_mailbox(GNode* node, imap_scan_item * isi);
+
 static GNode* add_local_mailbox(GNode*root, const char*d_name, const char* fn);
 static GNode* add_local_folder(GNode*root, const char*d_name, const char* fn);
 
@@ -254,7 +263,7 @@ register_mailbox(GNode* node, gpointer data)
 }
 
 static void
-imap_scan_attach_mailbox(GNode* node, const gchar* fn)
+imap_scan_attach_mailbox(GNode* node, imap_scan_item * isi)
 {
     LibBalsaMailboxImap *m;
     BalsaMailboxNode* mbnode = BALSA_MAILBOX_NODE(node->data);
@@ -267,17 +276,19 @@ imap_scan_attach_mailbox(GNode* node, const gchar* fn)
     libbalsa_mailbox_remote_set_server(
         LIBBALSA_MAILBOX_REMOTE(m),
         BALSA_MAILBOX_NODE(node->data)->server);
-    m->path = g_strdup(fn);
+    m->path = g_strdup(isi->fn);
     libbalsa_mailbox_imap_update_url(m);
     if(balsa_app.debug)
         printf("add_imap_mailbox: add mbox of name %s (full path %s)\n",
-               fn, LIBBALSA_MAILBOX(m)->url);
+               isi->fn, LIBBALSA_MAILBOX(m)->url);
     /* avoid allocating the name again: */
     LIBBALSA_MAILBOX(m)->name = mbnode->name;
     mbnode->name = NULL;
     mbnode->mailbox = LIBBALSA_MAILBOX(m);
-    g_object_ref(G_OBJECT(m));
-    /*g_object_sink(G_OBJECT(m)); */
+    if (isi->special) {
+        *isi->special = LIBBALSA_MAILBOX(m);
+        g_object_ref(m);
+    }
 }
 
 /* imap_dir_cb:
@@ -292,12 +303,6 @@ imap_scan_attach_mailbox(GNode* node, const gchar* fn)
    We do it by remembering url of the root and
    by finding the root again when phase b. is about to start.
 */
-
-typedef struct imap_scan_item_ imap_scan_item;
-struct imap_scan_item_ {
-    gchar *fn;
-    gboolean scanned, selectable;
-};
 
 typedef struct imap_scan_tree_ imap_scan_tree;
 struct imap_scan_tree_ {
@@ -331,10 +336,9 @@ imap_dir_cb_real(void* r)
     for (list = imap_tree.list; list; list = g_slist_next(list)) {
         imap_scan_item *item = list->data;
 
-	n = imap_scan_create_mbnode(root, item->fn, 
-				    imap_tree.delim, item->scanned);
+	n = imap_scan_create_mbnode(root, item, imap_tree.delim);
 	if(item->selectable)
-	    imap_scan_attach_mailbox(n, item->fn);
+	    imap_scan_attach_mailbox(n, item);
     }
     imap_scan_destroy_tree(&imap_tree);
 
@@ -813,36 +817,44 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
 */
 
 /* remove_mailbox_from_nodes:
-   must be called with balsa_mailbox_nodes_lock held.
 */
 static GNode*
 remove_mailbox_from_nodes(LibBalsaMailbox* mailbox)
 {
     GNode* gnode;
 
+    balsa_mailbox_nodes_lock(TRUE);
     gnode = balsa_find_url(balsa_app.mailbox_nodes, mailbox->url);
     if (gnode)
 	g_node_unlink(gnode);
     else
 	gnode = g_node_new(balsa_mailbox_node_new_from_mailbox(mailbox));
+    balsa_mailbox_nodes_unlock(TRUE);
     return gnode;
 }
     
 static GNode* 
-remove_special_mailbox_by_url(const gchar* url)
+remove_special_mailbox_by_url(const gchar* url, LibBalsaMailbox *** special)
 {
+    LibBalsaMailbox **mailbox;
+
     if (strcmp(url, balsa_app.trash->url) == 0)
-	return remove_mailbox_from_nodes(balsa_app.trash);
+	mailbox = &balsa_app.trash;
     else if (strcmp(url, balsa_app.inbox->url) == 0)
-	return remove_mailbox_from_nodes(balsa_app.inbox);
+	mailbox = &balsa_app.inbox;
     else if (strcmp(url, balsa_app.outbox->url) == 0)
-	return remove_mailbox_from_nodes(balsa_app.outbox);
-    if (strcmp(url, balsa_app.sentbox->url) == 0)
-	return remove_mailbox_from_nodes(balsa_app.sentbox);
+	mailbox = &balsa_app.outbox;
+    else if (strcmp(url, balsa_app.sentbox->url) == 0)
+	mailbox = &balsa_app.sentbox;
     else if (strcmp(url, balsa_app.draftbox->url) == 0)
-	return remove_mailbox_from_nodes(balsa_app.draftbox);
-    else return NULL;
+	mailbox = &balsa_app.draftbox;
+    else
+        mailbox = NULL;
+
+    if (special)
+        *special = mailbox;
 	
+    return mailbox ? remove_mailbox_from_nodes(*mailbox) : NULL;
 }
 
 static GNode*
@@ -856,7 +868,7 @@ add_local_mailbox(GNode *root, const gchar * name, const gchar * path)
     if(root == NULL) return NULL;
     url = g_strconcat("file://", path, NULL);
     
-    if( (node = remove_special_mailbox_by_url(url)) == NULL) {
+    if( (node = remove_special_mailbox_by_url(url, NULL)) == NULL) {
 	type = libbalsa_mailbox_type_from_path(path);
 	
 	if ( type == LIBBALSA_TYPE_MAILBOX_MH ) {
@@ -929,25 +941,26 @@ get_parent_folder_name(const gchar* path, char delim)
 }
 
 /* imap_scan_create_mbnode:
- * Returns a node for the path `fn'.
+ * Returns a node for the path isi->fn.
  * Finds the node if it exists, and creates one if it doesn't.
+ * If this is a special mailbox and should replace a place-holder, we
+ * save a pointer to its address in isi.
  */
-static GNode* 
-imap_scan_create_mbnode(GNode*root, const char* fn, char delim, 
-			gboolean scanned)
-{ 
-    GNode* node;
-    gchar * parent_name;
-    GNode* parent;
-    BalsaMailboxNode* mbnode;
+static GNode *
+imap_scan_create_mbnode(GNode * root, imap_scan_item * isi, char delim)
+{
+    GNode *node;
+    gchar *parent_name;
+    GNode *parent;
+    BalsaMailboxNode *mbnode;
     const gchar *basename;
-    gchar* url;
+    gchar *url;
 
-    node = balsa_find_dir(root, fn);
+    node = balsa_find_dir(root, isi->fn);
     if (node && node != root)
-	return node;
+        return node;
 
-    parent_name = get_parent_folder_name(fn, delim);
+    parent_name = get_parent_folder_name(isi->fn, delim);
     parent = balsa_find_dir(root, parent_name);
     if (parent == NULL)
         parent = root;
@@ -957,31 +970,35 @@ imap_scan_create_mbnode(GNode*root, const char* fn, char delim,
 
     url = g_strdup_printf("imap%s://%s@%s/%s",
 #ifdef USE_SSL
-			  BALSA_MAILBOX_NODE(root->data)->server->use_ssl 
+                          BALSA_MAILBOX_NODE(root->data)->server->use_ssl
                           ? "s" : "",
 #else
-			  "",
+                          "",
 #endif
-			  BALSA_MAILBOX_NODE(root->data)->server->user,
-			  BALSA_MAILBOX_NODE(root->data)->server->host,
-			  fn);
-    node = remove_special_mailbox_by_url(url);
+                          BALSA_MAILBOX_NODE(root->data)->server->user,
+                          BALSA_MAILBOX_NODE(root->data)->server->host,
+                          isi->fn);
+    node = remove_special_mailbox_by_url(url, &isi->special);
     g_free(url);
     if(node != NULL) {
-	g_free(BALSA_MAILBOX_NODE(node->data)->dir);
-	BALSA_MAILBOX_NODE(node->data)->dir = g_strdup(fn);
-    } else {
-	mbnode = balsa_mailbox_node_new_imap_node(BALSA_MAILBOX_NODE
-						  (root->data)->server, fn);
-	basename = strrchr(fn, delim);
-	if(!basename) basename = fn;
-	else basename++;
-	mbnode->name = g_strdup(basename);
-	mbnode->parent = BALSA_MAILBOX_NODE(parent->data);
-	mbnode->subscribed = mbnode->parent->subscribed;
-	mbnode->scanned = scanned;
-	node = g_node_new(mbnode);
+        g_object_unref(BALSA_MAILBOX_NODE(node->data)->mailbox);
+        g_object_unref(node->data);
+        g_node_destroy(node);
     }
+
+    mbnode = balsa_mailbox_node_new_imap_node(BALSA_MAILBOX_NODE
+                                              (root->data)->server,
+                                              isi->fn);
+    basename = strrchr(isi->fn, delim);
+    if (!basename)
+        basename = isi->fn;
+    else
+        basename++;
+    mbnode->name = g_strdup(basename);
+    mbnode->parent = BALSA_MAILBOX_NODE(parent->data);
+    mbnode->subscribed = mbnode->parent->subscribed;
+    mbnode->scanned = isi->scanned;
+    node = g_node_new(mbnode);
 
     return g_node_append(parent, node);
 }

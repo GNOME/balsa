@@ -255,7 +255,6 @@ main (int argc, char *argv[])
 
   window = balsa_window_new();
   balsa_app.main_window = BALSA_WINDOW (window);
-  gtk_widget_show(window);
 
 
   gdk_rgb_init();
@@ -264,8 +263,10 @@ main (int argc, char *argv[])
     BalsaSendmsg *snd;
     snd=sendmsg_window_new(window,NULL,SEND_NORMAL);
     gtk_entry_set_text(GTK_ENTRY(snd->to[1]),balsa_app.compose_email);
-    gtk_widget_grab_focus(snd->subject[1]);
-  }
+    gtk_widget_grab_focus(balsa_app.compose_email[0] 
+			  ? snd->subject[1] : snd->to[1]);
+  } else gtk_widget_show(window);
+
 
 #ifdef USE_PIXBUF
   gtk_widget_set_default_colormap(gdk_rgb_get_cmap());

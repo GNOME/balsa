@@ -1,3 +1,9 @@
+2000-04-23  Mikael Hermansson <mikeh@bahnhof.se>
+
+	* src/sendmsg-window.c, src/main.c: show only compose window and
+	quit immediately after sending mail when called with --compose
+	option.
+	
 2000-04-23  Andreas Hyden  <a.hyden@cyberpoint.se>
 
 	* src/pref-manager.c: Fixed a litte spellerror.

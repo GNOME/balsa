@@ -307,6 +307,9 @@ balsa_sendmsg_destroy (BalsaSendmsg * bsm)
    gtk_widget_destroy (bsm->window);
    if(balsa_app.debug) printf("balsa_sendmsg_destroy: Freeing bsm\n");
    g_free (bsm);
+
+  if(balsa_app.compose_email)
+    balsa_exit();
 }
 
 /* remove_attachment - right mouse button callback */

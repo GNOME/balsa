@@ -120,12 +120,13 @@ my_special_mailbox ()
 
   balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, pop3);
   */
-
+/*
   mh = (MailboxMH *) mailbox_new (MAILBOX_MH);
   mh->name = g_strdup ("GNOME CVS");
   mh->path = g_strdup ("/home/pavlov/Mail/gnomecvs");
 
   balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, pop3);
+*/
 }
 
 

@@ -1,3 +1,16 @@
+2003-06-19 11:07  PeterB
+
+	* src/: main-window.c, message-window.c, sendmsg-window.c: Use
+	libbalsa_window_select_all(), to make "select-all" consistent with
+	the other editing methods ("copy" in all windows, and "cut" and
+	"paste" in the compose window).
+	* src/: balsa-message.c, balsa-message.h: Remove
+	balsa_message_select_all(); implement balsa_message_grab_focus(),
+	so that we can use the focus widget as the target for copy and
+	select-all.
+	* libbalsa/: misc.c, misc.h: Imnplement
+	libbalsa_window_select_all(), a helper for "select-all" callbacks.
+
 2003-06-18 09:09  PeterB
 
 	* libbalsa/mailbox.c: When we see LibBalsaMailboxLocal in the

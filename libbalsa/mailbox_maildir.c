@@ -733,6 +733,9 @@ libbalsa_mailbox_maildir_load_message(LibBalsaMailbox * mailbox, guint msgno)
     message->flags = msg_info->flags = msg_info->orig_flags;
 
     message->msgno = msgno;
+    message->mailbox = mailbox;
+    libbalsa_message_set_icons(message);
+
     return message;
 }
 

@@ -838,6 +838,9 @@ libbalsa_mailbox_mbox_load_message(LibBalsaMailbox *mailbox,
     msg_info->orig_flags = msg_info->flags = message->flags;
 
     message->msgno = msgno;
+    message->mailbox = mailbox;
+    libbalsa_message_set_icons(message);
+
     return message;
 }
 

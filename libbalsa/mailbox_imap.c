@@ -1284,9 +1284,12 @@ libbalsa_mailbox_imap_get_message(LibBalsaMailbox * mailbox, guint msgno)
         LibBalsaMessage *msg = libbalsa_message_new();
         msg->msgno   = msgno;
         msg->mailbox = mailbox;
-        if (libbalsa_mailbox_imap_load_envelope(mimap, msg))
+        if (libbalsa_mailbox_imap_load_envelope(mimap, msg)) {
+	    LOCK_MAILBOX(LIBBALSA_MAILBOX(mimap));
+	    libbalsa_message_set_icons(msg);
+	    UNLOCK_MAILBOX(LIBBALSA_MAILBOX(mimap));
             msg_info->message  = msg;
-        else 
+	} else 
             g_object_unref(G_OBJECT(msg));
     }
     return msg_info->message;

@@ -1,3 +1,7 @@
+2004-01-22 06:14  PeterB
+
+	* libbalsa/message.c: Make sure subject is valid utf-8.
+
 2004-01-21 15:03  PeterB
 
 	* src/message-window.c: Add `next unread' item to message menu with

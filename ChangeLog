@@ -1,3 +1,18 @@
+2004-10-19  Pawel Salek
+
+	* libbalsa/filter.c: display information provided by GError.
+	* libbalsa/libbalsa.h: add new error codes.
+	* libbalsa/mailbox.[ch]: copy() and add_message provide more info
+	on error.
+	* libbalsa/mailbox_imap.c: set GError.
+	* libbalsa/mailbox_{maildir,mh}.c: ditto.
+	* libbalsa/mailbox_mbox.c: ditto. Fix rewind bug in ::check().
+	* libbalsa/mailbox_pop3.c: do not leave messages around. More
+	thourough error checking: do not remove messages from server when
+	save fails.
+	* libbalsa/send.c: adapt to changed LibBalsaMailbox API.
+	* src/balsa-index.c: report more info on error.
+
 2004-10-19 18:26  PeterB
 
 	* src/main-window.c: more accurate and informative progress dialog

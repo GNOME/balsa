@@ -263,13 +263,14 @@ struct _LibBalsaMailboxClass {
     void (*save_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
     void (*load_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
     gboolean (*sync) (LibBalsaMailbox * mailbox, gboolean expunge);
-    int (*add_message) (LibBalsaMailbox * mailbox, LibBalsaMessage * message );
+    int (*add_message) (LibBalsaMailbox * mailbox, LibBalsaMessage * message,
+                        GError **err);
     gboolean (*messages_change_flags) (LibBalsaMailbox * mailbox,
 				       GArray *msgnos,
 				       LibBalsaMessageFlag set,
 				       LibBalsaMessageFlag clear);
     gboolean (*messages_copy) (LibBalsaMailbox * mailbox, GArray *msgnos,
-			       LibBalsaMailbox * dest);
+			       LibBalsaMailbox * dest, GError **err);
     /* Test message flags */
     gboolean(*msgno_has_flags) (LibBalsaMailbox * mailbox, guint msgno,
                                 LibBalsaMessageFlag set,
@@ -404,7 +405,7 @@ void libbalsa_mailbox_load_config(LibBalsaMailbox * mailbox,
 				  const gchar * prefix);
 
 int libbalsa_mailbox_copy_message(LibBalsaMessage *message,
-				  LibBalsaMailbox *dest);
+				  LibBalsaMailbox *dest, GError **err);
 gboolean libbalsa_mailbox_close_backend(LibBalsaMailbox * mailbox);
 
 /* Message number-list methods */
@@ -414,10 +415,10 @@ gboolean libbalsa_mailbox_messages_change_flags(LibBalsaMailbox * mailbox,
 						LibBalsaMessageFlag clear);
 gboolean libbalsa_mailbox_messages_copy(LibBalsaMailbox * mailbox,
 					GArray * msgnos,
-					LibBalsaMailbox * dest);
+					LibBalsaMailbox * dest, GError **err);
 gboolean libbalsa_mailbox_messages_move(LibBalsaMailbox * mailbox,
 					GArray * msgnos,
-					LibBalsaMailbox * dest);
+					LibBalsaMailbox * dest, GError **err);
 
                                
 /*

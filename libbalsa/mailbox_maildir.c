@@ -77,7 +77,8 @@ libbalsa_mailbox_maildir_fetch_message_structure(LibBalsaMailbox * mailbox,
 						 LibBalsaMessage * message,
 						 LibBalsaFetchFlag flags);
 static int libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
-						LibBalsaMessage * message );
+						LibBalsaMessage * message,
+                                                GError **err);
 static gboolean
 libbalsa_mailbox_maildir_messages_change_flags(LibBalsaMailbox * mailbox,
                                                GArray * msgnos,
@@ -847,8 +848,9 @@ libbalsa_mailbox_maildir_get_message(LibBalsaMailbox * mailbox,
 }
 
 /* Called with mailbox locked. */
-static int libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
-						LibBalsaMessage * message )
+static int
+libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
+                                     LibBalsaMessage * message, GError **err)
 {
     const char *path;
     char *tmp;
@@ -874,6 +876,9 @@ static int libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
         g_object_unref(out_stream);
         unlink(tmp);
         g_free(tmp);
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                    LIBBALSA_MAILBOX_COPY_ERROR,
+                    _("Cannot read message"));
         return -1;
     }
     in_stream = g_mime_stream_filter_new_with_stream(tmp_stream);
@@ -891,6 +896,9 @@ static int libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
 	g_object_unref(out_stream);
 	unlink (tmp);
 	g_free(tmp);
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                    LIBBALSA_MAILBOX_COPY_ERROR,
+                    _("Data copy error"));
 	return -1;
     }
     g_object_unref(in_stream);

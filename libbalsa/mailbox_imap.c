@@ -134,7 +134,8 @@ static gboolean libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
 						   LibBalsaMessageBody *);
 
 static int libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
-					     LibBalsaMessage * message );
+					     LibBalsaMessage * message,
+                                             GError **err);
 
 static gboolean lbm_imap_messages_change_flags(LibBalsaMailbox * mailbox,
                                                GArray * seqno,
@@ -162,7 +163,8 @@ static gboolean libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox *
 						    mailbox,
 						    GArray * msgnos,
 						    LibBalsaMailbox *
-						    dest);
+						    dest,
+                                                    GError **err);
 
 static void server_host_settings_changed_cb(LibBalsaServer * server,
 					    gchar * host,
@@ -511,7 +513,7 @@ mi_reconnect(ImapMboxHandle *h)
    login information... */
 #define II(rc,h,line) \
    {int trials=2;do{\
-    if(imap_mbox_is_disconnected(h) &&mi_reconnect!=IMAP_SUCCESS)\
+    if(imap_mbox_is_disconnected(h) &&mi_reconnect(h)!=IMAP_SUCCESS)\
         {rc=IMR_NO;break;};\
     rc=line; \
     if(rc==IMR_SEVERED) \
@@ -2156,8 +2158,9 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
 */
 int
 libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
-                                  LibBalsaMessage * message )
+                                  LibBalsaMessage * message, GError **err)
 {
+    LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     ImapMsgFlags imap_flags = IMAP_FLAGS_EMPTY;
     ImapResponse rc;
     GMimeStream *stream;
@@ -2167,22 +2170,26 @@ libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
     gint outfd;
     gchar *outfile;
     GMimeStream *outstream;
-    GError *error = NULL;
     gssize len;
 
     if(message->mailbox &&
        LIBBALSA_IS_MAILBOX_IMAP(message->mailbox) &&
        LIBBALSA_MAILBOX_REMOTE(message->mailbox)->server ==
        LIBBALSA_MAILBOX_REMOTE(mailbox)->server) {
-        ImapMboxHandle *handle = 
-            LIBBALSA_MAILBOX_IMAP(message->mailbox)->handle;
+        ImapMboxHandle *handle = mimap->handle;
         unsigned msgno = message->msgno;
         g_return_val_if_fail(handle, -1); /* message is there but
                                            * the source mailbox closed! */
         /* FIXME: reconnect? The msgno number might have changed.
          * we should probably reconnect and return a retriable error. */
-        rc = imap_mbox_handle_copy(handle, 1, &msgno,
-                                   LIBBALSA_MAILBOX_IMAP(mailbox)->path);
+        rc = imap_mbox_handle_copy(handle, 1, &msgno, mimap->path);
+        if(rc != IMR_OK) {
+            gchar *msg = imap_mbox_handle_get_last_msg(mimap->handle);
+            g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                        LIBBALSA_MAILBOX_COPY_ERROR,
+                        "%s", msg);
+            g_free(msg);
+        }
         return rc == IMR_OK ? 1 : -1;
     }
 
@@ -2205,10 +2212,9 @@ libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(tmpstream), crlffilter);
     g_object_unref(crlffilter);
 
-    outfd = g_file_open_tmp("balsa-tmp-file-XXXXXX", &outfile, &error);
+    outfd = g_file_open_tmp("balsa-tmp-file-XXXXXX", &outfile, err);
     if (outfd < 0) {
-	g_warning("Could not create temporary file: %s", error->message);
-	g_error_free(error);
+	g_warning("Could not create temporary file: %s", (*err)->message);
 	g_mime_stream_unref(tmpstream);
 	return -1;
     }
@@ -2224,12 +2230,17 @@ libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
         libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, 
                              _("Uploading %ld kB"),
                              (long)len/1024);
-    handle = libbalsa_mailbox_imap_get_handle(LIBBALSA_MAILBOX_IMAP(mailbox),
-					      NULL);
-    rc = imap_mbox_append_stream(handle,
-				 LIBBALSA_MAILBOX_IMAP(mailbox)->path,
+    handle = libbalsa_mailbox_imap_get_handle(mimap, NULL);
+    rc = imap_mbox_append_stream(handle, mimap->path,
 				 imap_flags, outstream, len);
-    libbalsa_mailbox_imap_release_handle(LIBBALSA_MAILBOX_IMAP(mailbox));
+    if(rc != IMR_OK) {
+        gchar *msg = imap_mbox_handle_get_last_msg(mimap->handle);
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                    LIBBALSA_MAILBOX_APPEND_ERROR,
+                    "%s", msg);
+        g_free(msg);
+    }
+    libbalsa_mailbox_imap_release_handle(mimap);
 
     g_mime_stream_unref(outstream);
     unlink(outfile);
@@ -2522,24 +2533,33 @@ libbalsa_mailbox_imap_total_messages(LibBalsaMailbox * mailbox)
 static gboolean
 libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
 				    GArray * msgnos,
-				    LibBalsaMailbox * dest)
+				    LibBalsaMailbox * dest, GError **err)
 {
     if (LIBBALSA_IS_MAILBOX_IMAP(dest) &&
 	LIBBALSA_MAILBOX_REMOTE(dest)->server ==
 	LIBBALSA_MAILBOX_REMOTE(mailbox)->server) {
+        gboolean ret;
 	ImapMboxHandle *handle = LIBBALSA_MAILBOX_IMAP(mailbox)->handle;
 	g_return_val_if_fail(handle, FALSE);
 
 	/* User server-side copy. */
 	g_array_sort(msgnos, cmp_msgno);
-	return imap_mbox_handle_copy(handle, msgnos->len,
-				     (guint *) msgnos->data,
-				     LIBBALSA_MAILBOX_IMAP(dest)->path)
+	ret = imap_mbox_handle_copy(handle, msgnos->len,
+                                    (guint *) msgnos->data,
+                                    LIBBALSA_MAILBOX_IMAP(dest)->path)
 	    == IMR_OK;
+        if(!ret) {
+            gchar *msg = imap_mbox_handle_get_last_msg(handle);
+            g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                        LIBBALSA_MAILBOX_COPY_ERROR,
+                        "%s", msg);
+            g_free(msg);
+        }
+        return ret;
     }
 
     /* Couldn't use server-side copy, fall back to default method. */
-    return parent_class->messages_copy(mailbox, msgnos, dest);
+    return parent_class->messages_copy(mailbox, msgnos, dest, err);
 }
 
 void
@@ -2637,7 +2657,7 @@ icm_restore_from_cache(ImapMboxHandle *h, struct ImapCacheManager *icm)
     }
 
     /* detect unhandled "else" case */
-    if(icm->exists != exists || icm->uidnext != uidnext) {
+    if(exists - icm->exists !=  uidnext - icm->uidnext) {
         printf("mailbox modified exists: %u %u uidnext: %u %u\n",
                icm->exists, exists, icm->uidnext, uidnext);
         return;

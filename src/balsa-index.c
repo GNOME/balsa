@@ -1558,8 +1558,15 @@ bndx_do_delete(BalsaIndex* index, gboolean move_to_trash)
 
     if (messages->len) {
 	if (move_to_trash && (index != trash)) {
-            libbalsa_mailbox_messages_move(mailbox, messages,
-                                           balsa_app.trash);
+            GError *err = NULL;
+            if(!libbalsa_mailbox_messages_move(mailbox, messages,
+                                               balsa_app.trash, &err)) {
+                balsa_information_parented(GTK_WINDOW(balsa_app.main_window),
+                                           LIBBALSA_INFORMATION_ERROR,
+                                           _("Move to Trash failed: %s"),
+                                           err ? err->message : "?");
+                g_clear_error(&err);
+            }
 	    enable_empty_trash(balsa_app.main_window, TRASH_FULL);
 	} else {
             libbalsa_mailbox_messages_change_flags
@@ -1991,7 +1998,7 @@ balsa_index_remove_duplicates(BalsaIndex * index)
 
     if (messages) {
 	if (mailbox != balsa_app.trash) {
-	    libbalsa_messages_move(messages, balsa_app.trash);
+	    libbalsa_messages_move(messages, balsa_app.trash, NULL);
 	    enable_empty_trash(TRASH_FULL);
 	} else {
 	    libbalsa_messages_change_flag(messages, 
@@ -2026,21 +2033,22 @@ balsa_index_transfer(BalsaIndex *index, GArray * msgnos,
 {
     gboolean success;
     LibBalsaMailbox *from_mailbox;
+    GError *e = NULL;
 
     if (index->selected->len == 0)
         return;
 
     from_mailbox = index->mailbox_node->mailbox;
     success = copy ?
-        libbalsa_mailbox_messages_copy(from_mailbox, msgnos, to_mailbox) :
-        libbalsa_mailbox_messages_move(from_mailbox, msgnos, to_mailbox);
+        libbalsa_mailbox_messages_copy(from_mailbox, msgnos, to_mailbox, &e) :
+        libbalsa_mailbox_messages_move(from_mailbox, msgnos, to_mailbox, &e);
 
     if (!success) {
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
 			  index->selected->len > 1 
-			  ? _("Failed to copy messages to mailbox \"%s\".")
-			  : _("Failed to copy message to mailbox \"%s\"."),
-			  to_mailbox->name);
+			  ? _("Failed to copy messages to mailbox \"%s\": %s")
+			  : _("Failed to copy message to mailbox \"%s\": %s"),
+			  to_mailbox->name, e ? e->message : "?");
 	return;
     }
 

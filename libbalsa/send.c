@@ -378,7 +378,7 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
     if (fccbox)
         g_mime_message_set_header(message->mime_msg, "X-Balsa-Fcc",
                                   fccbox->url);
-    if(libbalsa_mailbox_copy_message( message, outbox ) < 0)
+    if(libbalsa_mailbox_copy_message( message, outbox, NULL) < 0)
         return LIBBALSA_MESSAGE_QUEUE_ERROR;
     return LIBBALSA_MESSAGE_CREATE_OK;
 }
@@ -804,14 +804,18 @@ handle_successful_send(smtp_message_t message, void *be_verbose)
 
 	    if (mqi->orig->mailbox && fccurl) {
                 LibBalsaMailbox *fccbox = mqi->finder(fccurl[1]);
+                GError *err = NULL;
 		lbs_change_flags(mqi->orig, 0, LIBBALSA_MESSAGE_FLAG_NEW);
 		lbs_change_flags(mqi->orig, 0, LIBBALSA_MESSAGE_FLAG_FLAGGED);
 		libbalsa_mailbox_sync_storage(mqi->orig->mailbox, FALSE);
-                remove = libbalsa_mailbox_copy_message(mqi->orig, fccbox)>=0;
+                remove =
+                    libbalsa_mailbox_copy_message(mqi->orig, fccbox, &err)>=0;
                 if(!remove) 
-                    libbalsa_information(LIBBALSA_INFORMATION_ERROR, 
-                                         _("Saving sent message to %s failed"),
-                                         fccbox->url);
+                    libbalsa_information
+                        (LIBBALSA_INFORMATION_ERROR, 
+                         _("Saving sent message to %s failed: %s"),
+                         fccbox->url, err ? err->message : "?");
+                g_clear_error(&err);
             }
             /* If copy failed, mark the message again as flagged -
                otherwise it will get resent again. And again, and
@@ -1070,7 +1074,8 @@ handle_successful_send(MessageQueueItem *mqi, LibBalsaFccboxFinder finder)
 
         if (mqi->orig->mailbox && fccurl) {
             LibBalsaMailbox *fccbox = mqi->finder(fccurl[1]);
-            remove = libbalsa_mailbox_copy_message(mqi->orig, fccbox)>=0;
+            remove =
+                libbalsa_mailbox_copy_message(mqi->orig, fccbox, NULL)>=0;
         }
         /* If copy failed, mark the message again as flagged -
            otherwise it will get resent again. And again, and
@@ -1707,7 +1712,7 @@ libbalsa_message_postpone(LibBalsaMessage * message,
     if (fcc)
 	g_mime_message_set_header(message->mime_msg, "X-Balsa-Fcc", fcc);
 
-    thereturn = libbalsa_mailbox_copy_message( message, draftbox );
+    thereturn = libbalsa_mailbox_copy_message( message, draftbox, NULL );
 
     return thereturn!=-1;
 }

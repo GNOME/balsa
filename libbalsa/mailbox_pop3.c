@@ -182,6 +182,42 @@ libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox, GError **err)
     return TRUE;
 }
 
+static gboolean
+move_from_msgdrop(LibBalsaMailbox *tmp_mailbox, LibBalsaMailbox *dest,
+                  gchar *pop_name, unsigned msgno)
+{
+    gboolean success = TRUE;
+    GError *err = NULL;
+    if (libbalsa_mailbox_open(tmp_mailbox, NULL)) {
+	guint msgno, total = libbalsa_mailbox_total_messages(tmp_mailbox);
+	GArray *messages = g_array_new(FALSE, FALSE, sizeof(guint));
+
+	for (msgno = 1; msgno <= total; msgno++)
+	    g_array_append_val(messages, msgno);
+
+        if (!libbalsa_mailbox_messages_change_flags
+            (tmp_mailbox, messages,
+             LIBBALSA_MESSAGE_FLAG_NEW | LIBBALSA_MESSAGE_FLAG_RECENT, 0) ||
+	    !libbalsa_mailbox_sync_storage(tmp_mailbox, FALSE))
+            libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                                 _("Error setting flags on messages "
+                                   "in mailbox %s"), tmp_mailbox->name);
+
+        success = libbalsa_mailbox_messages_move(tmp_mailbox, messages, dest,
+                                                 &err);
+	g_array_free(messages, TRUE);
+        libbalsa_mailbox_close(tmp_mailbox, TRUE);
+    }
+    if(!success)
+        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                             _("Error appending message %d from %s to %s: %s"),
+                             msgno, pop_name, dest->name,
+                             err ? err->message : "?");
+    g_clear_error(&err);
+    return success;
+}
+
+
 static GHashTable*
 mp_load_uids(void)
 {
@@ -301,6 +337,7 @@ struct PopDownloadMode {
 */
 struct fetch_data {
     LibBalsaMailbox *mailbox;
+    LibBalsaMailbox *tmp; /* temporary drop mailbox */
     PopHandle *pop;
     GError   **err;
     gchar     *msg_name;
@@ -378,14 +415,18 @@ fetch_async_cb(PopReqCode prc, void *arg, ...)
             }
 	}
 	break;
-        case POP_REQ_DONE:
+    case POP_REQ_DONE:
             if(fd->dm->close(fd->f) != 0) {
                 if(!*fd->err)
                     g_set_error(fd->err, IMAP_ERROR, IMAP_POP_SAVE_ERROR,
                                 _("Transfering POP message to %s failed."),
                                 fd->msg_name);
-	} else if(fd->delete_on_server && !fd->error_occured)
-	    pop_delete_message(fd->pop, fd->msgno, NULL, NULL, NULL);
+            } else if(!fd->error_occured &&
+                      move_from_msgdrop
+                      (fd->tmp, LIBBALSA_MAILBOX_POP3(fd->mailbox)->inbox,
+                       fd->mailbox->name, fd->msgno) &&
+                      fd->delete_on_server)
+                pop_delete_message(fd->pop, fd->msgno, NULL, NULL, NULL);
 	fd->f = NULL;
 	break;
     }
@@ -429,7 +470,6 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     LibBalsaMailbox *tmp_mailbox;
     LibBalsaMailboxPop3 *m = LIBBALSA_MAILBOX_POP3(mailbox);
     LibBalsaServer *server;
-    gboolean remove_tmp = TRUE;
     gchar *msgbuf, *mhs;
     GError *err = NULL;
     unsigned msgcnt, i;
@@ -439,7 +479,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     ImapTlsMode tls_mode;
     PopHandle *pop;
  
-    if (!m->check) return;
+    if (!m->check || !m->inbox) return;
 
     server = LIBBALSA_MAILBOX_REMOTE_SERVER(m);
     switch(server->tls_mode) {
@@ -481,6 +521,15 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     mhs = g_strdup_printf ( "%s/.mh_sequences", tmp_path );
     if( (tmp_file=creat( mhs, 0600)) != -1) close(tmp_file);
     /* we fake a real mh box - it's good enough */
+    tmp_mailbox = (LibBalsaMailbox*)
+        libbalsa_mailbox_mh_new(tmp_path, FALSE);
+    if(!tmp_mailbox)  {
+	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+			     _("POP3 mailbox %s temp mailbox error:\n"), 
+			     mailbox->name);
+	g_free(tmp_path); g_free(mhs);
+	return;
+    }
     
     pop = pop_new();
     pop_set_option(pop, IMAP_POP_OPT_FILTER_CR, TRUE);
@@ -555,12 +604,15 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 			     msg_path);
             break;
         }
-        if(m->delete_from_server)
+        if(move_from_msgdrop(tmp_mailbox, m->inbox,
+                             mailbox->name, i) &&
+           m->delete_from_server)
             pop_delete_message_s(pop, i, NULL);
         g_free(msg_path);
 #else 
 	{struct fetch_data *fd = g_new0(struct fetch_data, 1);
         fd->mailbox  = mailbox;
+        fd->tmp      = tmp_mailbox;
 	fd->pop      = pop; 
 	fd->err      = &err;
 	fd->msg_name = msg_path;
@@ -596,60 +648,11 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     /* ===================================================================
      * Postprocessing...
      * =================================================================== */
-    tmp_mailbox = (LibBalsaMailbox*)
-        libbalsa_mailbox_mh_new(tmp_path, FALSE);
-    if(!tmp_mailbox)  {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("POP3 mailbox %s temp mailbox error:\n"), 
-			     mailbox->name);
-	g_free(tmp_path); g_free(mhs);
-	return;
-    }
 
-    /* FIXME: check error code of the mailbox_open */
-    if (libbalsa_mailbox_open(tmp_mailbox, NULL) && 
-        m->inbox &&
-        libbalsa_mailbox_total_messages(tmp_mailbox)) {
-	guint msgno, total = libbalsa_mailbox_total_messages(tmp_mailbox);
-	GArray *messages = g_array_new(FALSE, FALSE, sizeof(guint));
-
-	for (msgno = 1; msgno <= total; msgno++)
-	    g_array_append_val(messages, msgno);
-
-        if (!libbalsa_mailbox_messages_change_flags
-            (tmp_mailbox, messages,
-             LIBBALSA_MESSAGE_FLAG_NEW | LIBBALSA_MESSAGE_FLAG_RECENT, 0) ||
-	    !libbalsa_mailbox_sync_storage(tmp_mailbox, FALSE))
-            libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                                 _("Error setting flags on messages "
-                                   "in mailbox %s"), mailbox->name);
-
-	if (!libbalsa_mailbox_messages_move(tmp_mailbox, messages,
-                                            m->inbox)) {    
-	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-				 _("Error placing messages from %s on %s\n"
-				   "Messages are left in %s\n"),
-				 mailbox->name, 
-				 LIBBALSA_MAILBOX(m->inbox)->name,
-				 tmp_path);
-	    remove_tmp = FALSE;
-	}
-	g_array_free(messages, TRUE);
-        libbalsa_mailbox_close(tmp_mailbox, TRUE);
-    }
+    libbalsa_mailbox_local_remove_files(LIBBALSA_MAILBOX_LOCAL(tmp_mailbox));
     libbalsa_mailbox_pop3_config_changed(m);
-    
     g_object_unref(G_OBJECT(tmp_mailbox));
-    if(remove_tmp) { 
-	unlink(mhs);
-	if (rmdir(tmp_path)) {
-	    /* Probably some file was left behind... */
-	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-				 _("POP3 temp mailbox %s was not removed "
-				   "(system error message: %s)"),
-				   tmp_path, g_strerror(errno));
-	}
-    }
+
     g_free(tmp_path);
     g_free(mhs);
 }

@@ -82,7 +82,8 @@ libbalsa_mailbox_mbox_fetch_message_structure(LibBalsaMailbox * mailbox,
                                               LibBalsaMessage * message,
                                               LibBalsaFetchFlag flags);
 static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
-                                             LibBalsaMessage *message );
+                                             LibBalsaMessage *message,
+                                             GError **err);
 static gboolean
 libbalsa_mailbox_mbox_messages_change_flags(LibBalsaMailbox * mailbox,
                                             GArray * msgnos,
@@ -644,6 +645,8 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
         free_message_info(msg_info);
         g_array_remove_index(mbox->messages_info, msgno - 1);
     }
+    if(msgno == 0)
+        g_mime_stream_seek(mbox->gmime_stream, 0, GMIME_STREAM_SEEK_SET);
     parse_mailbox(mbox);
     mbox->size = g_mime_stream_tell(mbox->gmime_stream);
     mbox_unlock(mailbox, NULL);
@@ -1498,8 +1501,9 @@ lbm_mbox_armor_stream(GMimeStream * stream, LibBalsaMessageFlag flags)
 }
 
 /* Called with mailbox locked. */
-static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
-                                             LibBalsaMessage *message )
+static int
+libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
+                                  LibBalsaMessage *message, GError **err)
 {
     gchar date_string[27];
     gchar *sender;
@@ -1535,17 +1539,19 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     /* open in read-write mode */
     fd = open(path, O_RDWR);
     if (fd < 0) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
-			     _("%s: could not open %s."), "MBOX", path);
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                    LIBBALSA_MAILBOX_APPEND_ERROR,
+                    _("%s: could not open %s."), "MBOX", path);
         return -1;
     }
     
     orig_length = lseek (fd, 0, SEEK_END);
     dest = g_mime_stream_fs_new (fd);
     if (!dest) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
-			     _("%s: could not get new mime stream."),
-			     "MBOX");
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                    LIBBALSA_MAILBOX_APPEND_ERROR,
+                    _("%s: could not get new mime stream."),
+                    "MBOX");
 	g_free(from);
 	return -1;
     }
@@ -1553,9 +1559,10 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
 
     orig = libbalsa_mailbox_get_message_stream(message->mailbox, message);
     if (!orig) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
-			     _("%s: could not get message stream."),
-			     "MBOX");
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                    LIBBALSA_MAILBOX_APPEND_ERROR,
+                    _("%s: could not get message stream."),
+                    "MBOX");
 	mbox_unlock(mailbox, dest);
 	g_mime_stream_unref(dest);
 	g_free(from);
@@ -1568,9 +1575,8 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
 
     if (g_mime_stream_write_string(dest, from) < (gint) strlen(from)
 	|| g_mime_stream_write_to_stream (orig, dest) < 0) {
-        libbalsa_information ( LIBBALSA_INFORMATION_ERROR,
-			       _("Error copying message to mailbox %s!"),
-			       mailbox->name );
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                    LIBBALSA_MAILBOX_APPEND_ERROR, _("Data copy error"));
 	retval = -1;
     }
 

@@ -831,8 +831,13 @@ libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox)
     if(mailbox->open_ref == 0) {
 	LibBalsaMailboxImap * mbox = LIBBALSA_MAILBOX_IMAP(mailbox);
 
-	g_object_unref(mbox->handle);
-	mbox->handle=NULL;
+	/* pb: not needed? the parent class's close_mailbox method
+	 * seems to unref and clear the handle using
+	 * libbalsa_mailbox_imap_close_backend. */
+	if (mbox->handle) {
+	    g_object_unref(mbox->handle);
+	    mbox->handle = NULL;
+	}
 
 	libbalsa_notify_register_mailbox(mailbox);
 	if (mbox->matching_messages) {
@@ -1637,7 +1642,8 @@ void libbalsa_mailbox_imap_change_message_flags(LibBalsaMailbox * mailbox, guint
     /* This flag can't be turned on again. */
     if (set & LIBBALSA_MESSAGE_FLAG_RECENT)
 	imap_mbox_store_flag(handle, seq, IMSGF_RECENT, 1);
-#endif
+    /* ...or turned off. */
     if (clear & LIBBALSA_MESSAGE_FLAG_RECENT)
 	imap_mbox_store_flag(handle, seq, IMSGF_RECENT, 0);
+#endif
 }

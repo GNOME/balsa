@@ -1,3 +1,8 @@
+2001-11-27  Christian Rose  <menthos@menthos.com>
+
+	* sv.po: Updated Swedish translation.
+	* update.pl: Removed this script, it's obsoleted by intltool.
+
 2001-11-27  Abel Cheung  <maddog@linux.org.hk>
 
 	* zh_TW.po: New traditional Chinese translation by
@@ -9,7 +14,8 @@
 
 2001-11-26  Stanislav Visnovsky  <visnovsky@nenya.ms.mff.cuni.cz>
 
-	* sk.po: Updated Slovak translation from Marcel Telka <marcel@telka.sk>.
+	* sk.po: Updated Slovak translation from
+	Marcel Telka <marcel@telka.sk>.
 
 2001-11-24  Pablo Saratxaga <pablo@mandrakesoft.com>
 
@@ -21,7 +27,8 @@
 
 2001-11-13  Stanislav Visnovsky  <visnovsky@nenya.ms.mff.cuni.cz>
 
-	* sk.po: Updated Slovak translation from Marcel Telka <marcel@telka.sk>.
+	* sk.po: Updated Slovak translation from
+	Marcel Telka <marcel@telka.sk>.
 
 2001-11-12  Zbigniew Chyla  <cyba@gnome.pl>
 

@@ -220,8 +220,8 @@ close_mblist_window (GtkWidget * widget)
   if (!mblw)
     return;
 
-  balsa_app.mblist_width = GTK_WIDGET(mblw->ctree)->allocation.width;
-  balsa_app.mblist_height = GTK_WIDGET(mblw->ctree)->allocation.height;
+  balsa_app.mblist_width = GTK_WIDGET (mblw->ctree)->allocation.width;
+  balsa_app.mblist_height = GTK_WIDGET (mblw->ctree)->allocation.height;
 
   gtk_widget_destroy (mblw->window);
   gtk_widget_destroy (GTK_WIDGET (mblw->ctree));
@@ -257,12 +257,19 @@ mailbox_select_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row, Gd
 	}
       main_window_set_cursor (-1);
 
-      gtk_ctree_set_node_info (GTK_CTREE (bmbl),
-			       row,
-			       mailbox->name, 5,
-			       NULL, NULL,
-			       tray_empty, tray_empty_mask,
-			       FALSE, TRUE);
+      if (!strcmp (mailbox->name, "Inbox") ||
+	  !strcmp (mailbox->name, "Outbox") ||
+	  !strcmp (mailbox->name, "Trash"))
+        return;
+
+	gtk_ctree_set_node_info (GTK_CTREE (bmbl),
+				 row,
+				 mailbox->name, 5,
+				 NULL, NULL,
+				 tray_empty, tray_empty_mask,
+				 FALSE, TRUE);
+
+	gtk_ctree_node_set_row_style(GTK_CTREE(bmbl), row, NULL);
     }
 
   if (event && event->button == 3)

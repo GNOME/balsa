@@ -10,8 +10,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2001-12-19 06:21+0100\n"
-"PO-Revision-Date: 2001-12-19 06:21+0100\n"
+"POT-Creation-Date: 2001-12-21 13:06+0100\n"
+"PO-Revision-Date: 2001-12-21 13:06+0100\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -174,12 +174,12 @@ msgid "LDAP Directory for %s"
 msgstr "LDAP-katalog för %s"
 
 #. Non-threaded locking mechanism
-#: libbalsa/libbalsa_private.h:99 libbalsa/libbalsa_private.h:111
+#: libbalsa/libbalsa_private.h:104 libbalsa/libbalsa_private.h:116
 #, c-format
 msgid "*** ERROR: Mailbox Lock Exists: %s ***\n"
 msgstr "*** FEL: Brevlådelås finns: %s ***\n"
 
-#: libbalsa/libbalsa_private.h:129 libbalsa/libbalsa_private.h:138
+#: libbalsa/libbalsa_private.h:134 libbalsa/libbalsa_private.h:143
 #, c-format
 msgid "*** ERROR: Mailbox Stream Closed: %s ***\n"
 msgstr "*** FEL: Brevlådeström stängd: %s ***\n"
@@ -301,7 +301,7 @@ msgstr "Vill du verkligen ta bort den valda identiteten?"
 msgid "New"
 msgstr "Ny"
 
-#: libbalsa/identity.c:1061 src/balsa-index.c:2091
+#: libbalsa/identity.c:1061 src/balsa-index.c:2084
 #: src/filter-edit-dialog.c:250 src/mailbox-node.c:612 src/pref-manager.c:1285
 #: src/pref-manager.c:2223
 msgid "Delete"
@@ -507,19 +507,19 @@ msgstr "Hämtar meddelande %d av %d"
 msgid "Received %d bytes of %d"
 msgstr "Mottog %d byte av %d"
 
-#: libbalsa/send.c:220 libbalsa/send.c:223
+#: libbalsa/send.c:219 libbalsa/send.c:222
 msgid "Sending Mail..."
 msgstr "Skickar brev..."
 
-#: libbalsa/send.c:220 src/main-window.c:1683
+#: libbalsa/send.c:219 src/main-window.c:1683
 msgid "Hide"
 msgstr "Göm"
 
-#: libbalsa/send.c:367
+#: libbalsa/send.c:366
 msgid "Unable to open sentbox - could not get IMAP server information"
 msgstr "Kan inte öppna utkorg - kunde inte få tag i IMAP-serverinformation."
 
-#: libbalsa/send.c:779
+#: libbalsa/send.c:778
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
@@ -528,40 +528,40 @@ msgstr ""
 "Systemet kommer att försöka skicka om meddelandet igen tills\n"
 "du tar bort det."
 
-#: libbalsa/send.c:807
+#: libbalsa/send.c:806
 msgid "Connected to MTA"
 msgstr "Ansluten till MTA"
 
-#: libbalsa/send.c:814
+#: libbalsa/send.c:813
 #, c-format
 msgid "From: %d <%s>"
 msgstr "Från: %d <%s>"
 
-#: libbalsa/send.c:817
+#: libbalsa/send.c:816
 #, c-format
 msgid "From %s: %d %s"
 msgstr "Från %s: %d %s"
 
-#: libbalsa/send.c:825
+#: libbalsa/send.c:824
 #, c-format
 msgid "To: %d <%s>"
 msgstr "Till: %d <%s>"
 
-#: libbalsa/send.c:828
+#: libbalsa/send.c:827
 #, c-format
 msgid "To %s: %d %s"
 msgstr "Till %s: %d %s"
 
-#: libbalsa/send.c:852
+#: libbalsa/send.c:851
 #, c-format
 msgid "%d %s"
 msgstr "%d %s"
 
-#: libbalsa/send.c:865
+#: libbalsa/send.c:864
 msgid "Disconnected"
 msgstr "Frånkopplad"
 
-#: libbalsa/send.c:1031
+#: libbalsa/send.c:1030
 #, c-format
 msgid "SMTP server problem: %s"
 msgstr "SMTP-serverproblem: %s"
@@ -1531,91 +1531,91 @@ msgid "Mailbox password for %s@%s:"
 msgstr "Brevlådelösenord för %s@%s:"
 
 #. FIXME:
-#: src/balsa-index.c:305
+#: src/balsa-index.c:302
 msgid "From"
 msgstr "Från"
 
-#: src/balsa-index.c:306 src/filter-edit-callbacks.c:854
+#: src/balsa-index.c:303 src/filter-edit-callbacks.c:854
 #: src/main-window.c:2627
 msgid "Subject"
 msgstr "Ämne"
 
-#: src/balsa-index.c:307
+#: src/balsa-index.c:304
 msgid "Date"
 msgstr "Datum"
 
-#: src/balsa-index.c:308
+#: src/balsa-index.c:305
 msgid "Size"
 msgstr "Storlek"
 
-#: src/balsa-index.c:627
+#: src/balsa-index.c:624
 #, c-format
 msgid "Opening mailbox %s. Please wait..."
 msgstr "Öppnar brevlådan %s. Var vänlig vänta..."
 
-#: src/balsa-index.c:659
+#: src/balsa-index.c:656
 msgid "To"
 msgstr "Till"
 
-#: src/balsa-index.c:2033
+#: src/balsa-index.c:2026
 msgid "Cannot access the message's body\n"
 msgstr "Kan inte komma åt meddelandehuvudet\n"
 
-#: src/balsa-index.c:2061
+#: src/balsa-index.c:2054
 msgid "View Source"
 msgstr "Visa källa"
 
-#: src/balsa-index.c:2063
+#: src/balsa-index.c:2056
 msgid "Reply..."
 msgstr "Svara..."
 
-#: src/balsa-index.c:2065
+#: src/balsa-index.c:2058
 msgid "Reply To All..."
 msgstr "Svara till alla..."
 
-#: src/balsa-index.c:2067
+#: src/balsa-index.c:2060
 msgid "Reply To Group..."
 msgstr "Svara till grupp..."
 
-#: src/balsa-index.c:2069
+#: src/balsa-index.c:2062
 msgid "Forward Attached..."
 msgstr "Vidarebefordra bifogad..."
 
-#: src/balsa-index.c:2071
+#: src/balsa-index.c:2064
 msgid "Forward Inline..."
 msgstr "Vidarebefordra inuti..."
 
-#: src/balsa-index.c:2073
+#: src/balsa-index.c:2066
 msgid "Store Address..."
 msgstr "Lagra adress..."
 
-#: src/balsa-index.c:2095
+#: src/balsa-index.c:2088
 msgid "Undelete"
 msgstr "Återskapa"
 
-#: src/balsa-index.c:2099
+#: src/balsa-index.c:2092
 msgid "Move To Trash"
 msgstr "Flytta till papperskorgen"
 
-#: src/balsa-index.c:2103
+#: src/balsa-index.c:2096
 msgid "Toggle"
 msgstr "Växla"
 
-#: src/balsa-index.c:2106 src/filter-edit-callbacks.c:622
+#: src/balsa-index.c:2099 src/filter-edit-callbacks.c:622
 #: src/main-window.c:440
 msgid "Flagged"
 msgstr "Flaggad"
 
-#: src/balsa-index.c:2109 src/balsa-mblist.c:478
+#: src/balsa-index.c:2102 src/balsa-mblist.c:478
 msgid "Unread"
 msgstr "Olästa"
 
-#: src/balsa-index.c:2123
+#: src/balsa-index.c:2116
 msgid "Move"
 msgstr "Flytta"
 
 #. Create standard entry
-#: src/balsa-index.c:2134 src/message-window.c:702
+#: src/balsa-index.c:2127 src/message-window.c:702
 msgid "Folder"
 msgstr "Mapp"
 
@@ -4139,7 +4139,15 @@ msgstr "Läser in..."
 msgid "Include file"
 msgstr "Inkludera fil"
 
-#: src/sendmsg-window.c:2871
+#: src/sendmsg-window.c:2719
+msgid "Missing or invalid `From' address"
+msgstr "\"Från\"-adress saknas eller är ogiltig"
+
+#: src/sendmsg-window.c:2725
+msgid "Missing or invalid `To' address"
+msgstr "\"Till\"-adress saknas eller är ogiltig"
+
+#: src/sendmsg-window.c:2882
 msgid ""
 "Balsa has been compiled without gnome-print support.\n"
 "Printing is not possible."

@@ -3,7 +3,7 @@ SUBDIRS = macros po intl sounds images libmutt libbalsa idl src
 balsa_MANS=balsa.1
 
 EXTRA_DIST =	balsa.1 \
-		configure \
+		configure
 
 ## to automatically rebuild aclocal.m4 if any of the macros in
 ## `macros/' change

@@ -1,5 +1,12 @@
 2004-02-01  Pawel Salek
 
+	(correcting myself)
+	* libbalsa/libbalsa.h: fix the build ---disable-threads
+	* libbalsa/imap/imap-tls.c: same.
+	* libbalsa/imap/auth-cram.c: initialize pointers.
+
+2004-02-01  Pawel Salek
+
 	* libbalsa/imap-server.c: try harder on failed cert verification.
 	* libbalsa/libbalsa.[ch]: convert UI of cert v-fy to the new code.
 	* libbalsa/imap/imap-tls.c: fix SSL threading. Improve server v-fy.

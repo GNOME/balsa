@@ -145,7 +145,7 @@ imaptls_thread_cleanup(void)
 
 #else /* BALSA_USE_THREADS */
 static void
-imaptls_init_threads(void)
+imaptls_thread_setup(void)
 {
 }
 #endif /* BALSA_USE_THREADS */

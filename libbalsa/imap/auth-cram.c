@@ -48,7 +48,7 @@ imap_auth_cram(ImapMboxHandle* handle)
   unsigned char hmac_response[MD5_DIGEST_LEN];
   unsigned cmdno;
   int len, rc, ok;
-  char *user, *pass;
+  char *user = NULL, *pass = NULL;
 
   if (!imap_mbox_handle_can_do(handle, IMCAP_ACRAM_MD5))
     return IMAP_AUTH_UNAVAIL;

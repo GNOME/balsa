@@ -1,3 +1,17 @@
+2004-01-14 09:43  PeterB
+
+	* src/balsa-index.c: Use balsa_index_selected_list instead of
+	gtk_tree_selection_get_selected_rows to view message source: it's
+	simpler and doesn't introduce a dependence on gtk+-2.0 version
+	2.2.x.
+	* libbalsa/mailbox_mh.c: Use libbalsa_str_has_prefix for
+	compatibility with older glib-2.0.
+	* libbalsa/mailbox.c: Suppress some debugging messages.
+	* libbalsa/: misc.c, misc.h: Implement libbalsa_str_has_prefix as a
+	compatibility wrapper for g_str_has_prefix.
+	* configure.in: Check whether we have glib-2.0 version 2.2.0 or
+	newer.
+
 2004-01-13 23:45  PeterB
 
 	* libbalsa/mailbox.c: Flag partial messages so we don't keep making

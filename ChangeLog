@@ -1,3 +1,24 @@
+2001-11-03  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* balsa.spec.in: require libesmtp-0.8.6 (perhaps not strictly
+	necessary).
+	* help/C/Makefile.am: include index.html in the tarball.
+
+	* src/balsa-app.[hc]: make find_by_dir() public. Change some defaults
+	to more sensible values.
+	* src/folder-conf.c: use "clicked" signal instead of silly loop
+	over events.
+	* src/mailbox-conf.c: make "mailbox configurator" dialog non-modal.
+	rescan local dirs (fix #54889).
+	* src/mailbox-node.c: set  BalsaMailboxNode:dir field for local dirs.
+	* src/main.c: add -i - open mailbox on startup (Toralf Lund).
+	* balsa.1.in: add -i description.
+
+	Michael Broaddus <mbroaddu@indy.net>
+	* libbalsa/identity.[hc]: add sig_executable field and its UI.
+	* src/save-restore.c: save and restore new sig data (fixed).
+	* src/sendmsg-window.c: insert or execute.
+
 2001-11-02  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/address-book-config.c: mark two strings for translation.

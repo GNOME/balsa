@@ -264,6 +264,7 @@ balsa_mailbox_node_new_from_dir(const gchar* dir)
     mbn->expanded = (access(tmppath, F_OK) != -1);
     g_free(tmppath);
     mbn->name = g_strdup(dir);
+    mbn->dir  = g_strdup(dir);
     gtk_signal_connect(GTK_OBJECT(mbn), "show-prop-dialog", 
 		       dir_conf_edit, NULL);
     gtk_signal_connect(GTK_OBJECT(mbn), "append-subtree", 
@@ -414,8 +415,7 @@ void balsa_mailbox_node_rescan(BalsaMailboxNode* mn)
 {
     GNode *gnode;
 
-    g_return_if_fail(mn->mailbox == NULL ||
-		     LIBBALSA_IS_MAILBOX_IMAP(mn->mailbox));
+    g_return_if_fail(mn->mailbox == NULL);
 
     gnode = balsa_find_mbnode(balsa_app.mailbox_nodes, mn);
 
@@ -801,39 +801,6 @@ get_parent_folder_name(const gchar* path, char delim)
 	: g_strdup("");
 }
 
-static gboolean
-traverse_find_dir(GNode * node, gpointer * d)
-{
-    BalsaMailboxNode * mbnode;
-    if(node->data == NULL)
-	return FALSE;
-    
-    mbnode = (BalsaMailboxNode *) node->data;
-
-    g_return_val_if_fail(mbnode->dir, FALSE);
-    if (strcmp(mbnode->dir, (gchar *) d[0]))
-	return FALSE;
-
-    d[1] = node;
-    return TRUE;
-}
-
-static GNode*
-find_by_dir(GNode* root, const gchar* path)
-{
-    gpointer d[2];
-
-    /* if(strcmp(BALSA_MAILBOX_NODE(root->data)->dir, path) == 0)
-       return root; */
-
-    d[0] = (gchar*) path;
-    d[1] = NULL;
-    g_node_traverse(root, G_LEVEL_ORDER, G_TRAVERSE_ALL, -1,
-		    (GNodeTraverseFunc) traverse_find_dir, d);
-
-    return d[1] ? d[1] : root;
-}
-
 /* add_imap_entry:
  * Returns a node for the path `fn'.
  * Finds the node if it exists, and creates one if it doesn't.
@@ -848,12 +815,12 @@ add_imap_entry(GNode*root, const char* fn, char delim)
     const gchar *basename;
     gchar* url;
 
-    node = find_by_dir(root, fn);
+    node = balsa_app_find_by_dir(root, fn);
     if (node != root)
 	return node;
 
     parent_name = get_parent_folder_name(fn, delim);
-    parent = find_by_dir(root, parent_name);
+    parent = balsa_app_find_by_dir(root, parent_name);
     g_free(parent_name);
 
     g_return_val_if_fail(parent, NULL);

@@ -51,6 +51,8 @@ static void config_address_books_load(void);
 static void config_address_books_save(void);
 static void config_identities_load(void);
 
+static void check_for_old_sigs(GList * id_list_tmp);
+
 #define folder_section_path(mn) \
     BALSA_MAILBOX_NODE(mn)->config_prefix ? \
     g_strdup(BALSA_MAILBOX_NODE(mn)->config_prefix) : \
@@ -440,7 +442,10 @@ config_global_load(void)
 #endif
     config_address_books_load();
     config_identities_load();
-    
+
+    /* find and convert old-style signature entries */
+    check_for_old_sigs(balsa_app.identities);
+
     /* Section for the balsa_information() settings... */
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "InformationMessages/");
 
@@ -1250,3 +1255,39 @@ save_mru(GList *mru)
     }
     gnome_config_set_int("MRUCount", i);
 }
+
+/* check_for_old_sigs:
+   function for old style signature conversion (executable sigs prefixed
+   with '|') to new style (filename and a checkbox).
+   this function just strips the leading '|'.
+*/
+static void 
+check_for_old_sigs(GList * id_list_tmp)
+{
+    /* strip pipes and spaces,set executable flag if warranted */
+    /* FIXME remove after a few stable releases.*/
+    
+    LibBalsaIdentity* id_tmp = NULL;
+    
+    for (id_list_tmp = balsa_app.identities; id_list_tmp; 
+         id_list_tmp = g_list_next(id_list_tmp)) {
+       
+        id_tmp = LIBBALSA_IDENTITY(id_list_tmp->data);
+        if(!id_tmp->signature_path) continue;
+
+        id_tmp->signature_path = g_strstrip(id_tmp->signature_path);
+        if(*id_tmp->signature_path == '|'){
+            printf("Found old style signature for identity: %s\n"\
+                   "Converting: %s --> ", id_tmp->identity_name, 
+                   id_tmp->signature_path);
+            id_tmp->signature_path = g_strchug(id_tmp->signature_path+1);
+            printf("%s \n", id_tmp->signature_path);
+            
+            /* set new-style executable var*/
+            id_tmp->sig_executable=TRUE;
+            printf("Setting converted signature as executable.\n");
+        }
+    }
+} 
+                                                               
+

@@ -50,6 +50,7 @@ balsa.rtf: $(SGML_FILES)
 # Dist / install hook thingies
 dist-hook:
 	-cp README $(distdir)
+	-cp index.html $(distdir)
 	mkdir $(distdir)/balsa
 	-cp balsa/*.html $(distdir)/balsa
 	mkdir $(distdir)/images

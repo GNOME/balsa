@@ -135,6 +135,7 @@ libbalsa_identity_init(LibBalsaIdentity* ident)
     ident->reply_string = g_strdup(_("Re:"));
     ident->forward_string = g_strdup(_("Fwd:"));
     ident->signature_path = NULL;
+    ident->sig_executable = FALSE;
     ident->sig_sending = TRUE;
     ident->sig_whenforward = TRUE;
     ident->sig_whenreply = TRUE;
@@ -277,6 +278,13 @@ libbalsa_identity_set_signature_path(LibBalsaIdentity* ident, const gchar* path)
     
     g_free(ident->signature_path);
     ident->signature_path = g_strdup(path);
+}
+
+void
+libbalsa_identity_set_sig_executable(LibBalsaIdentity* ident, gboolean sig_executable)
+{
+    g_return_if_fail(ident != NULL);
+    ident->sig_executable = sig_executable;
 }
 
 
@@ -680,6 +688,10 @@ setup_ident_dialog(GtkWindow* parent,
                            "identity-sigpath",
                            ident->signature_path);
     
+    ident_dialog_add_checkbutton(dialog, _("Execute Signature"),
+				"identity-sigexecutable",
+				ident->sig_executable);
+ 
     ident_dialog_add_checkbutton(dialog, _("Append Signature"), 
                                  "identity-sigappend", 
                                  ident->sig_sending);
@@ -695,7 +707,7 @@ setup_ident_dialog(GtkWindow* parent,
                                  ident->sig_separator);
     ident_dialog_add_checkbutton(dialog, _("Prepend Signature"),
                                  "identity-sigprepend",
-                                 ident->sig_prepend);    
+                                 ident->sig_prepend);
     gtk_widget_show_all(main_box);
     return GTK_WIDGET(dialog);
 }
@@ -906,12 +918,14 @@ ident_dialog_update(GnomeDialog* dlg)
     id->forward_string  = ident_dialog_get_text(dlg, "identity-forwardstring");
     g_free(id->signature_path);
     id->signature_path  = ident_dialog_get_text(dlg, "identity-sigpath");
+    
+    id->sig_executable  = ident_dialog_get_bool(dlg, "identity-sigexecutable");
     id->sig_sending     = ident_dialog_get_bool(dlg, "identity-sigappend");
     id->sig_whenforward = ident_dialog_get_bool(dlg, "identity-whenforward");
     id->sig_whenreply   = ident_dialog_get_bool(dlg, "identity-whenreply");
     id->sig_separator   = ident_dialog_get_bool(dlg, "identity-sigseparator");
     id->sig_prepend     = ident_dialog_get_bool(dlg, "identity-sigprepend");
-    
+   
     return TRUE;
 }
 
@@ -1168,6 +1182,9 @@ libbalsa_identity_display_frame(void)
     display_frame_add_field(GTK_FRAME(frame1), GTK_BOX(vbox1), 
                             _("Signature Path:"), "identity-sigpath");
 
+    display_frame_add_boolean(GTK_FRAME(frame1), GTK_BOX(vbox1),
+			      _("Execute Signature"), "identity-sigexecutable");
+
     display_frame_add_boolean(GTK_FRAME(frame1), GTK_BOX(vbox1), 
                               _("Append Signature"), "identity-sigappend");
     display_frame_add_boolean(GTK_FRAME(frame1), GTK_BOX(vbox1), 
@@ -1239,6 +1256,9 @@ display_frame_update(GtkFrame* frame, LibBalsaIdentity* ident)
     display_frame_set_field(frame, "identity-forwardstring", 
                             ident->forward_string);
     display_frame_set_field(frame, "identity-sigpath", ident->signature_path);
+
+    display_frame_set_boolean(frame, "identity-sigexecutable", ident->sig_executable);
+
     display_frame_set_boolean(frame, "identity-sigappend", ident->sig_sending);
     display_frame_set_boolean(frame, "identity-whenforward", 
                               ident->sig_whenforward);
@@ -1306,7 +1326,7 @@ libbalsa_identity_new_config(const gchar* prefix, const gchar* name)
     }
     
     ident->signature_path = gnome_config_get_string("SignaturePath");
-
+    ident->sig_executable = gnome_config_get_bool("SigExecutable");
     ident->sig_sending = gnome_config_get_bool("SigSending");
     ident->sig_whenforward = gnome_config_get_bool("SigForward");
     ident->sig_whenreply = gnome_config_get_bool("SigReply");
@@ -1335,6 +1355,7 @@ libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* prefix)
     gnome_config_set_string("ForwardString", ident->forward_string);
     gnome_config_set_string("SignaturePath", ident->signature_path);
 
+    gnome_config_set_bool("SigExecutable", ident->sig_executable);
     gnome_config_set_bool("SigSending", ident->sig_sending);
     gnome_config_set_bool("SigForward", ident->sig_whenforward);
     gnome_config_set_bool("SigReply", ident->sig_whenreply);

@@ -57,7 +57,8 @@ extern "C"
         gchar* forward_string;
 
         gchar* signature_path;
-        gboolean sig_sending;
+        gboolean sig_executable;
+	gboolean sig_sending;
         gboolean sig_whenforward;
         gboolean sig_whenreply;
         gboolean sig_separator;
@@ -82,6 +83,7 @@ extern "C"
     void libbalsa_identity_set_reply_string(LibBalsaIdentity* , const gchar*);
     void libbalsa_identity_set_forward_string(LibBalsaIdentity*, const gchar*);
     void libbalsa_identity_set_signature_path(LibBalsaIdentity*, const gchar*);
+    void libbalsa_identity_set_sig_executable(LibBalsaIdentity*, gboolean);
     void libbalsa_identity_set_sig_sending(LibBalsaIdentity*, gboolean);
     void libbalsa_identity_set_sig_whenforward(LibBalsaIdentity*, gboolean);
     void libbalsa_identity_set_sig_whenreply(LibBalsaIdentity*, gboolean);

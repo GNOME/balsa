@@ -66,7 +66,7 @@
 #define INFO_FIELD_LENGTH 10
 
 /* Default colour for mailboxes with unread messages */
-#define MBLIST_UNREAD_COLOR "rgb:0000/FFFF/0000"
+#define MBLIST_UNREAD_COLOR "rgb:FFFF/0000/0000"
 
 /*
  * Default colour for quoted text
@@ -84,7 +84,7 @@
 #define MESSAGEBOX_WIDTH 450
 #define MESSAGEBOX_HEIGHT 150
 
-#define DEFAULT_MESSAGE_FONT "-*-fixed-medium-r-normal-*-*-*-*-*-c-*-iso8859-1"
+#define DEFAULT_MESSAGE_FONT "-*-fixed-medium-r-semicondensed-*-13-*-*-*-c-*-iso8859-1"
 #define DEFAULT_SUBJECT_FONT "-*-fixed-bold-r-normal-*-*-*-*-*-c-*-iso8859-1"
 #define DEFAULT_DATE_FORMAT "%Y.%m.%d %H:%M"
 #define DEFAULT_PAPER_SIZE "A4"
@@ -357,6 +357,7 @@ gboolean open_mailboxes_idle_cb(gchar * names[]);
 
 GNode *find_gnode_in_mbox_list(GNode * gnode_list, LibBalsaMailbox * mailbox);
 GNode *balsa_find_mbnode(GNode* gnode, BalsaMailboxNode* mbnode);
+GNode* balsa_app_find_by_dir(GNode* root, const gchar* path);
 void  balsa_remove_children_mailbox_nodes(GNode* gnode);
 BalsaIndex* balsa_find_index_by_mailbox(LibBalsaMailbox* mailbox);
 

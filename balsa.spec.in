@@ -14,7 +14,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Packager: Pawel Salek <pawsa@theochem.kth.se>
 Requires: gtk+ >= 1.2.7
 Requires: gnome-libs >= 1.2.0
-Requires: libesmtp >= 0.8.3
+Requires: libesmtp >= 0.8.6
 Provides: balsa
 
 BuildRequires:  libesmtp >= 0.7.1

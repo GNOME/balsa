@@ -40,6 +40,7 @@ struct _MailboxConfWindow {
 
     GnomeDialog *window;
 
+    void (*ok_handler)(MailboxConfWindow*);
     GtkWidget *mailbox_name;
     GtkType mailbox_type;
 
@@ -299,6 +300,23 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 }
 
 static void
+conf_clicked_cb(GnomeDialog* dialog, gint buttonno, gpointer data)
+{
+    MailboxConfWindow *mcw =(MailboxConfWindow*)data;
+    switch(buttonno) {
+    case 0: mcw->ok_handler(mcw); 
+        /* fall through */
+    default: gnome_dialog_close(dialog);
+    }
+}
+
+static void
+free_data(GtkWidget* w, gpointer data)
+{
+    g_free(data);
+}
+
+static void
 run_mailbox_conf(BalsaMailboxNode* mbnode, GtkType mailbox_type, 
 		 void (*ok_handler)(MailboxConfWindow*), 
 		 const char* ok_button_name,
@@ -312,14 +330,14 @@ run_mailbox_conf(BalsaMailboxNode* mbnode, GtkType mailbox_type,
 
     mcw = g_new0(MailboxConfWindow, 1);
 
+    mcw->ok_handler = ok_handler;
     mcw->mailbox = mbnode ? mbnode->mailbox : NULL;
     mcw->mailbox_type = mailbox_type;
 
     mcw->window = GNOME_DIALOG(gnome_dialog_new(_("Mailbox Configurator"),
 						NULL));
-    gtk_window_set_wmclass(GTK_WINDOW(mcw->window), "mailbox_config_dialog", "Balsa");
-
-    gnome_dialog_close_hides(mcw->window, TRUE);
+    gtk_window_set_wmclass(GTK_WINDOW(mcw->window), 
+                           "mailbox_config_dialog", "Balsa");
 
     gnome_dialog_append_button_with_pixmap(mcw->window, 
 					   ok_button_name,
@@ -344,15 +362,11 @@ run_mailbox_conf(BalsaMailboxNode* mbnode, GtkType mailbox_type,
     }
     gtk_widget_grab_focus(mcw->mailbox_name);
 
-    button = gnome_dialog_run(mcw->window);
-
-    if ( button == 0 )
-	ok_handler(mcw);
-
-    /* close the new mailbox window */
-    gtk_object_destroy(GTK_OBJECT(mcw->window));
-
-    g_free(mcw);
+    gtk_signal_connect(GTK_OBJECT(mcw->window), "clicked", 
+                       conf_clicked_cb, mcw);
+    gtk_signal_connect(GTK_OBJECT(mcw->window), "destroy", 
+                       free_data, mcw);
+    gtk_widget_show_all(GTK_WIDGET(mcw->window));
 }
 /*
  * Brings up dialog to configure a new mailbox of type mailbox_type.
@@ -746,9 +760,19 @@ mailbox_conf_add(MailboxConfWindow *mcw)
     if(update_config)
 	config_mailbox_add(mcw->mailbox, NULL);
     else {
-	gchar *dir = g_dirname(libbalsa_mailbox_local_get_path(mcw->mailbox));
-	/* FIXME ME: find the node and rescan so it appears*/
-
+	gchar *dir; 
+        GNode* parent = NULL;
+        for(dir = g_strdup(libbalsa_mailbox_local_get_path(mcw->mailbox));
+            strlen(dir)>1 /* i.e dir != "/" */ &&
+                (parent = balsa_app_find_by_dir(balsa_app.mailbox_nodes,dir));
+            ) {
+            gchar* tmp =  g_dirname(dir); g_free(dir);
+            dir = tmp;
+            printf("dir: %s\n", dir);
+        }
+	if(parent)
+            balsa_mailbox_node_rescan(BALSA_MAILBOX_NODE(parent->data)); 
+        else g_warning("parent for %s not found.\n", mcw->mailbox);
 	g_free(dir);
     }
 

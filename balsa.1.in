@@ -1,4 +1,4 @@
-.TH Balsa 1 "11 November 2000" Version @VERSION@
+.TH Balsa 1 "03 November 2001" Version @VERSION@
 .SH NAME
 Balsa - the GNOME email client.
 
@@ -32,6 +32,10 @@ environment.  It supports local mailboxes, POP3 and IMAP.  For help on using Bal
 .TP 
 .BR \-c ", " \-\^\-checkmail
 Balsa will immediately check for new mail when the program is launched
+
+.TP 
+.BR \-i ", " \-\^\-open-inbox
+Balsa will open the Inbox on startup.
 
 .TP
 .BI \-m " USER@HOST.TLD" "\fR,\fP \-\^\-compose=" USER@HOST.TLD
@@ -99,7 +103,7 @@ Balsa's POP and IMAP passwords file.
 .BR sendmail (8)
 
 .SH COPYRIGHT
-(c) 1997-2000 Stuart Parmenter and others, see AUTHORS for a list of people.
+(c) 1997-2001 Stuart Parmenter and others, see AUTHORS for a list of people.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted,

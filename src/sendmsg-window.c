@@ -655,7 +655,7 @@ change_identity_dialog_cb(GtkWidget* widget, BalsaSendmsg* msg)
     ident = libbalsa_identity_select_dialog(GTK_WINDOW(msg->window),
 					    _("Select Identity"),
 					    &balsa_app.identities,
-					    &balsa_app.current_ident);
+					    &msg->ident);
     if (ident != NULL)        
 	update_msg_identity(msg, ident);
 }
@@ -2420,41 +2420,27 @@ sendmsg_window_set_field(BalsaSendmsg *bsmsg, const gchar* key,
 static gchar *
 read_signature(BalsaSendmsg *msg)
 {
-    FILE *fp;
-    size_t len;
-    gint siglen;
-    gchar *ret, *p, *sigpath;
+    FILE *fp = NULL;
+    size_t len = 0;
+    gchar *ret = NULL;
 
     if (msg->ident->signature_path == NULL)
 	return NULL;
 
-    for (p = msg->ident->signature_path; 
-	 *p != '|' && *p != '\0'; p++);
-    /* Signature is a path to a program */
-    if (*p == '|') {
-	p++;
-	while (isspace((int)*p) && *p != '\0')
-	    p++; /* Forward past any spaces */
-
-	siglen = strlen(p);
-	sigpath = g_malloc(siglen+1);
-	strncpy(sigpath,p,siglen);
-	sigpath[siglen] = '\0';
-
-	if ((fp = popen(sigpath,"r")) == NULL)
-	    return NULL;
-	len = libbalsa_readfile_nostat(fp, &ret);
-	pclose(fp);
-	g_free(sigpath);
-    }
-    /* Signature is just a regular file. */
-    else {
-	if (!(fp = fopen(msg->ident->signature_path, "r")))
-	    return NULL;
-	len = libbalsa_readfile_nostat(fp, &ret);
-	fclose(fp);
-    }
-
+    if(msg->ident->sig_executable){
+        /* signature is executable */
+        if (!(fp = popen(msg->ident->signature_path,"r")))
+            return NULL;
+         len = libbalsa_readfile_nostat(fp, &ret);
+         pclose(fp);    
+	}
+     else{
+         /* sign is normal file */
+         if (!(fp = fopen(msg->ident->signature_path, "r")))
+             return NULL;
+         len = libbalsa_readfile_nostat(fp, &ret);
+         fclose(fp);
+	}
     return ret;
 }
 

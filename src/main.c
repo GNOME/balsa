@@ -100,7 +100,7 @@ static gint balsa_save_session(GnomeClient * client, gint phase,
 */
 static gchar *cmd_line_open_mailboxes;
 static gboolean cmd_check_mail_on_startup,
-     cmd_open_unread_mailbox;
+    cmd_open_unread_mailbox, cmd_open_inbox;
 
 static void
 balsa_init(int argc, char **argv)
@@ -119,6 +119,9 @@ balsa_init(int argc, char **argv)
 	{"open-unread-mailbox", 'u', POPT_ARG_NONE,
 	 &(cmd_open_unread_mailbox), 0,
 	 N_("Opens first unread mailbox"), NULL},
+	{"open-inbox", 'i', POPT_ARG_NONE,
+	 &(cmd_open_inbox), 0,
+	 N_("Opens default Inbox on startup"), NULL},
 	{"debug-pop", 'd', POPT_ARG_NONE, &PopDebug, 0, 
 	 N_("Debug POP3 connection"), NULL},
 	{NULL, '\0', 0, NULL, 0}	/* end the list */
@@ -249,6 +252,22 @@ initial_open_unread_mailboxes()
     return FALSE;
 }
 
+
+static gboolean
+initial_open_inbox()
+{
+    GList *i;
+    
+    if (!balsa_app.inbox)
+	return FALSE;
+
+    printf("opening %s..\n", (LIBBALSA_MAILBOX(balsa_app.inbox))->name);
+    mblist_open_mailbox(LIBBALSA_MAILBOX(balsa_app.inbox));
+    
+    return FALSE;
+}
+
+
 /* -------------------------- main --------------------------------- */
 int
 main(int argc, char *argv[])
@@ -360,6 +379,9 @@ main(int argc, char *argv[])
 
     if (cmd_open_unread_mailbox || balsa_app.open_unread_mailbox)
 	gtk_idle_add((GtkFunction) initial_open_unread_mailboxes, NULL);
+
+    if (cmd_open_inbox)
+	gtk_idle_add((GtkFunction) initial_open_inbox, NULL);
 
     if (cmd_line_open_mailboxes) {
 	gchar **names = g_strsplit(cmd_line_open_mailboxes, ";", 20);

@@ -512,6 +512,35 @@ balsa_find_mbnode(GNode* gnode, BalsaMailboxNode* mbnode)
     return (GNode*)d[1];
 }
 
+static gboolean
+traverse_find_dir(GNode * node, gpointer * d)
+{
+    BalsaMailboxNode * mbnode;
+    if(node->data == NULL)
+	return FALSE;
+    
+    mbnode = (BalsaMailboxNode *) node->data;
+
+    if (mbnode->dir == NULL || strcmp(mbnode->dir, (gchar *) d[0]))
+	return FALSE;
+
+    d[1] = node;
+    return TRUE;
+}
+/* balsa_app_find_by_dir:
+   looks for a mailbox node with dir equal to path.
+*/
+GNode*
+balsa_app_find_by_dir(GNode* root, const gchar* path)
+{
+    gpointer d[2];
+
+    d[0] = (gchar*) path;
+    d[1] = NULL;
+    g_node_traverse(root, G_LEVEL_ORDER, G_TRAVERSE_ALL, -1,
+		    (GNodeTraverseFunc) traverse_find_dir, d);
+    return d[1] ? d[1] : root;
+}
 
 
 /* balsa_remove_children_mailbox_nodes:

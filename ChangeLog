@@ -1,3 +1,26 @@
+2003-09-18 12:16  PeterB
+
+	* libbalsa/imap/imap-handle.c: Trim port from host string, and use
+	it.
+	* libbalsa/imap/imap-commands.c: Use LSUB command in
+	imap_mbox_lsub().
+	* libbalsa/send.c: Set a message-id on a message's mime_message
+	before placing it in the outbox and fccbox; unref the mime_message.
+	* libbalsa/message.c: Don't lock the mailbox in
+	libbalsa_message_clear_recent().
+	* libbalsa/mailbox_imap.c: Don't double-unref mbox->handle.
+	* libbalsa/mailbox.h: Define LIBBALSA_MAILBOX_GET_CLASS().
+	* libbalsa/mailbox.c: Use
+	LIBBALSA_MAILBOX_GET_CLASS(mailbox)->method instead of emitting a
+	signal.
+	* libbalsa/libbalsa_private.h: Use libbalsa_{un}lock_mailbox in
+	*LOCK_MAILBOX* macros.
+	* libbalsa/libbalsa.c: Use a pthread_condition for mailbox locking.
+	* libbalsa/libbalsa-marshal.list: Drop some funky marshallers--they
+	were used only in libbalsa/mailbox.c.
+	* libbalsa/folder-scanners.c: Append delimiter to path only if it's
+	not already there.
+
 2003-09-14  Pawel Salek  <pawsa theochem.kth.se>
 
 	* libbalsa/imap/*: merge updates from libimap.

@@ -1,3 +1,8 @@
+2000-05-27  Fatih Demir	<kabalak@gmx.net>
+	
+	* sounds/balsa.soundlist : Corrected a typo
+		in the [tr]-sections.
+
 2000-05-25  Pawel Salek <pawsa@theochem.kth.se>
 
 	* help/C/balsa.sgml: Preperties window help started.

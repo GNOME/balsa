@@ -3495,12 +3495,12 @@ message_postpone(BalsaSendmsg * bsmsg)
     /* set some balsa-specific headers to hold data (mainly for
      * replies) through the postponement: sendtype, orig_mailbox_name
      */
-    if (bsmsg->type != SEND_CONTINUE) {
+    if (bsmsg->type != SEND_CONTINUE && bsmsg->orig_message) {
         tmp = g_malloc(sizeof(gchar)*2);
         snprintf(tmp, 2, "%i", bsmsg->type);
         message->user_headers = g_list_prepend(message->user_headers, libbalsa_create_hdr_pair("X-Balsa-SendType", tmp));
         message->user_headers = g_list_prepend(message->user_headers, libbalsa_create_hdr_pair("X-Balsa-OrigMailboxName", g_strdup(bsmsg->orig_message->mailbox->name)));
-    } else {
+    } else if (bsmsg->orig_message) {
         /* We want to copy these from the original message because
          * it's the postponed message we continued from 
          */
@@ -3509,13 +3509,16 @@ message_postpone(BalsaSendmsg * bsmsg)
 
         list = libbalsa_message_find_user_hdr(bsmsg->orig_message,
                                               "X-Balsa-SendType");
-        usrhdr = list->data;
-        message->user_headers = g_list_prepend(message->user_headers, libbalsa_create_hdr_pair("X-Balsa-SendType", g_strdup(usrhdr[1])));
 
-        list = libbalsa_message_find_user_hdr(bsmsg->orig_message, 
-                                              "X-Balsa-OrigMailboxName");
-        usrhdr = list->data;
-        message->user_headers = g_list_prepend(message->user_headers, libbalsa_create_hdr_pair("X-Balsa-OrigMailboxName", g_strdup(usrhdr[1])));
+        if (list) {
+            usrhdr = list->data;
+            message->user_headers = g_list_prepend(message->user_headers, libbalsa_create_hdr_pair("X-Balsa-SendType", g_strdup(usrhdr[1])));
+
+            list = libbalsa_message_find_user_hdr(bsmsg->orig_message, 
+                                                  "X-Balsa-OrigMailboxName");
+            usrhdr = list->data;
+            message->user_headers = g_list_prepend(message->user_headers, libbalsa_create_hdr_pair("X-Balsa-OrigMailboxName", g_strdup(usrhdr[1])));
+        }
     }
     
     

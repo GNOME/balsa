@@ -264,15 +264,17 @@ struct _LibBalsaMailboxClass {
     void (*load_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
     gboolean (*sync) (LibBalsaMailbox * mailbox, gboolean expunge);
     int (*add_message) (LibBalsaMailbox * mailbox, LibBalsaMessage * message );
-    void (*change_message_flags) (LibBalsaMailbox * mailbox, guint msgno,
-                                  LibBalsaMessageFlag set,
-                                  LibBalsaMessageFlag clear);
     gboolean (*messages_change_flags) (LibBalsaMailbox * mailbox,
 				       GArray *msgnos,
 				       LibBalsaMessageFlag set,
 				       LibBalsaMessageFlag clear);
     gboolean (*messages_copy) (LibBalsaMailbox * mailbox, GArray *msgnos,
 			       LibBalsaMailbox * dest);
+    /* Test message flags */
+    gboolean(*msgno_has_flags) (LibBalsaMailbox * mailbox, guint msgno,
+                                LibBalsaMessageFlag set,
+                                LibBalsaMessageFlag unset);
+
     gboolean (*can_do) (LibBalsaMailbox *mailbox,
                         enum LibBalsaMailboxCapability cap);
     void (*set_threading) (LibBalsaMailbox * mailbox,
@@ -423,9 +425,6 @@ gboolean libbalsa_mailbox_messages_move(LibBalsaMailbox * mailbox,
  */
 GType libbalsa_mailbox_type_from_path(const gchar * filename);
 
-void libbalsa_mailbox_messages_status_changed(LibBalsaMailbox * mbox,
-					      GList * messages,
-					      gint flag);
 guint libbalsa_mailbox_total_messages(LibBalsaMailbox * mailbox);
 
 /*
@@ -520,6 +519,11 @@ gboolean libbalsa_mailbox_msgno_find(LibBalsaMailbox * mailbox,
 				     guint seqno,
 				     GtkTreePath ** path,
 				     GtkTreeIter * iter);
+/* Test message flags */
+gboolean libbalsa_mailbox_msgno_has_flags(LibBalsaMailbox * mailbox,
+                                          guint seqno,
+                                          LibBalsaMessageFlag set,
+                                          LibBalsaMessageFlag unset);
 
 /* set icons */
 void libbalsa_mailbox_set_unread_icon(GdkPixbuf * pixbuf);

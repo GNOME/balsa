@@ -42,6 +42,7 @@ G_BEGIN_DECLS
 #define BALSA_COMPOSER_GET_CLASS(o) \
     (G_TYPE_INSTANCE_GET_CLASS ((o), BALSA_COMPOSER_TYPE, BalsaComposerClass))
 
+G_END_DECLS
  
 typedef struct
 {
@@ -56,8 +57,7 @@ typedef struct
 } BalsaComposerClass;
  
 GType          balsa_composer_get_type (void);
-BonoboObject  *balsa_composer_new      ();
+BonoboObject  *balsa_composer_new      (void);
  
-G_END_DECLS
  
 #endif /* __BALSA_BONOBO_H */

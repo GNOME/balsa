@@ -24,12 +24,16 @@
 #include <config.h>
 #endif
 
+#include <string.h>
+
 #include <bonobo/bonobo-generic-factory.h>
 #include <bonobo/bonobo-main.h>
 #include <bonobo/bonobo-context.h>
 #include <bonobo/bonobo-object.h>
 
-#include "Balsa.h"
+#include "balsa-app.h"
+#include "sendmsg-window.h"
+
 #include "balsa-bonobo.h"
 
 
@@ -59,19 +63,13 @@ balsa_composer_factory (BonoboGenericFactory *this_factory,
 }
 
 BonoboObject *
-balsa_composer_new () {
+balsa_composer_new (void) {
     BonoboGenericFactory *factory;
-    char                 *registration_id;
-    
-    registration_id =  bonobo_activation_make_registration_id 
-	( "OAFIID:GNOME_Balsa_Composer",
-	  "0");
-    
-    factory = bonobo_generic_factory_new (registration_id,
+        
+    factory = bonobo_generic_factory_new ("OAFIID:GNOME_Balsa_Composer_Factory",
 					  balsa_composer_factory,
 					  NULL);
     
-    g_free (registration_id);
     return BONOBO_OBJECT (factory);
 }
 
@@ -93,32 +91,6 @@ balsa_composer_init (BalsaComposer *c)
 {
 }
 
-GtkType
-balsa_composer_get_type (void)
-{
-    static GType type = 0;
-
-    if (!type) {
-	static const GTypeInfo info = {
-	    sizeof (BalsaComposerClass),
-	    NULL,
-	    NULL,
-	    (GClassInitFunc) balsa_composer_class_init,
-	    NULL,
-	    NULL,
-	    sizeof (BalsaComposer),
-	    0,
-	    (GInstanceInitFunc) balsa_composer_init,
-	};
-
-	type = g_type_register_static (G_TYPE_OBJECT,
-				       "BalsaComposer",
-				       &info, 0);
-
-
-    return type;
-}
-
 
 static void
 impl_balsa_composer_sendMessage (PortableServer_Servant _servant,
@@ -130,6 +102,26 @@ impl_balsa_composer_sendMessage (PortableServer_Servant _servant,
 				 const CORBA_boolean nogui,
 				 CORBA_Environment * ev)
 {
+    BalsaSendmsg *snd;
+    guint i;
+    
+    gdk_threads_enter();
+    snd = sendmsg_window_new(GTK_WIDGET(balsa_app.main_window), 
+			     NULL, SEND_NORMAL); 
+    gdk_threads_leave();
+
+    if(strlen(to)) {
+	if(g_ascii_strncasecmp(to, "mailto:", 7) == 0)
+	    sendmsg_window_process_url(to+7, 
+				       sendmsg_window_set_field, snd);
+	else 
+	    sendmsg_window_set_field(snd,"to", to);
+    }
+    
+    for( i = 0; i < attachments->_length ; i++ ) {
+	add_attachment(GNOME_ICON_LIST(snd->attachments[1]), 
+		       attachments->_buffer[i], FALSE, NULL);	
+    }
 }
 
 
@@ -141,8 +133,10 @@ balsa_composer_object_finalize (GObject *object)
  
     balsa_composer_parent_class->finalize (G_OBJECT (a));
 }
- 
+
+
 BONOBO_TYPE_FUNC_FULL ( BalsaComposer,
 			GNOME_Balsa_Composer,
 			BONOBO_TYPE_OBJECT,
 			balsa_composer );
+

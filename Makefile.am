@@ -18,8 +18,16 @@ EXTRA_DIST = \
 	HACKING			\
 	docs/mh-mail-HOWTO	\
 	docs/vconvert.awk	\
-	docs/pine2vcard
-#	idl/balsa.idl
+	docs/pine2vcard		\
+	GNOME_Balsa.server GNOME_Balsa.server.in
+
+serverdir       = $(libdir)/bonobo/servers
+server_in_files = GNOME_Balsa.server
+server_DATA     = $(server_in_files:.server.in=.server)
+
+$(server_in_files): $(server_in_files).in
+	sed -e "s|\@bindir\@|$(bindir)|" $< > $@
+
 
 dist-hook: balsa.spec
 	cp balsa.spec $(distdir)

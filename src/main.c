@@ -53,11 +53,9 @@
 
 #include "libinit_balsa/init_balsa.h"
 
-#if 0
 #include "Balsa.h"
 #include "balsa-bonobo.h"
 #include <bonobo-activation/bonobo-activation.h>
-#endif
 
 #ifdef HAVE_GPGME
 #include <gpgme.h>
@@ -111,29 +109,60 @@ static gchar *opt_compose_email = NULL;
 
 static void
 balsa_handle_automation_options() {
-#if 0
+#if 1
    CORBA_Object factory;
    CORBA_Environment ev;
+   BonoboObject *balsacomposer;
+   gint i;
+
+   CORBA_exception_init (&ev);
 
    factory = bonobo_activation_activate_from_id 
-       ("OAFIID:GNOME_Balsa_Factory",
+       ("OAFIID:GNOME_Balsa_Composer_Factory",
 	Bonobo_ACTIVATION_FLAG_EXISTING_ONLY,
 	NULL, &ev);
 
    if (factory) {
        /* there already is a server. good */
-       
+              
        /* we only do compose for the time being */
-       if (opt_compose_email != NULL) {
+       if (opt_compose_email || opt_attach_list) {
+	   GNOME_Balsa_Composer_attachs *attachs;
+	   CORBA_Object server;
 	   
+	   attachs = CORBA_sequence_CORBA_string__alloc();
+	   server =  
+	       bonobo_activation_activate_from_id ("OAFIID:GNOME_Balsa_Composer",
+						   0, NULL, &ev);
+	   if(opt_attach_list) {
+	       i = g_slist_length(opt_attach_list);
+	       attachs->_buffer=CORBA_sequence_CORBA_string_allocbuf(i);
+	       attachs->_length = i;
+	       
+	       
+	       for( ; i > 0; i--) {
+		   attachs->_buffer[i] = 
+		       g_slist_nth_data( opt_attach_list, i );
+	       }
+	   } else 
+	       attachs->_length = 0;
+	   CORBA_sequence_set_release( attachs, TRUE);
+
+	   GNOME_Balsa_Composer_sendMessage(server,
+					    "",
+					    opt_compose_email,
+					    "",
+					    "",
+					    attachs,
+					    0, 
+					    &ev );
        }
 
        exit(0);
+   } else {
+       balsacomposer = balsa_composer_new ();
    }
    
-      
-   balsa_composer_new ();
-
 #endif   
 }
 
@@ -187,8 +216,6 @@ balsa_init(int argc, char **argv)
                        GNOME_PARAM_APP_DATADIR, BALSA_STD_PREFIX "/share",
 		       GNOME_PARAM_HUMAN_READABLE_NAME, _("The Balsa E-Mail Client"),
                        NULL);
-
-
 
     balsa_handle_automation_options();  
     
@@ -451,25 +478,8 @@ main(int argc, char *argv[])
 		     G_CALLBACK(balsa_save_session), argv[0]);
     g_signal_connect(G_OBJECT(client), "die",
 		     G_CALLBACK(balsa_kill_session), NULL);
-
-    if (opt_compose_email || opt_attach_list) {
-	BalsaSendmsg *snd;
-	GSList *lst;
-        gdk_threads_enter();
-	snd = sendmsg_window_new(window, NULL, SEND_NORMAL);
-        gdk_threads_leave();
-	if(opt_compose_email) {
-	    if(g_ascii_strncasecmp(opt_compose_email, "mailto:", 7) == 0)
-	        sendmsg_window_process_url(opt_compose_email+7, 
-		    	sendmsg_window_set_field, snd);
-	    else sendmsg_window_set_field(snd,"to", opt_compose_email);
-	}
-	for(lst = opt_attach_list; lst; lst = g_slist_next(lst))
-	    add_attachment(GNOME_ICON_LIST(snd->attachments[1]), 
-			   lst->data, FALSE, NULL);
-	SENDMSG_WINDOW_QUIT_ON_CLOSE(snd);
-    } else
-	gtk_widget_show(window);
+    
+    gtk_widget_show(window);
 
     if (cmd_check_mail_on_startup || balsa_app.check_mail_upon_startup)
 	check_new_messages_cb(NULL, NULL);

@@ -1,3 +1,17 @@
+2003-12-15  Carlos Morgado  <chbm gnome.org>
+
+	* GNOME_Balsa.server.in (Repository): 
+	* Makefile.am (Message): 
+	* src/main.c (Message): 
+	* src/balsa-bonobo.h (Message): 
+	* src/balsa-bonobo.c (Message): 
+	* src/Makefile.am (Message): 
+	
+	implement new_message bonobo interface and use it. 
+	balsa no longer spawns a new process for balsa -m.
+	you must make install to make the .server file make it's way to 
+	/usr/lib/bonobo/servers
+	
 2003-12-10 15:45  PeterB
 
 	* src/message-window.c: Idle handler must return FALSE (Nuno

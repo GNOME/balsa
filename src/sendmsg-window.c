@@ -158,10 +158,10 @@ static void
 select_attachment (GnomeIconList * ilist, gint num, GdkEventButton * event)
 {
 
-  if (!event || event->button != 3)
-    return;
-
-  gtk_menu_popup (GTK_MENU (create_popup_menu (ilist, num)), NULL, NULL, NULL, NULL, event->button, event->time);
+  if (event->type == GDK_BUTTON_PRESS && event->button == 3)
+    gtk_menu_popup (GTK_MENU (create_popup_menu (ilist, num)),
+		    NULL, NULL, NULL, NULL,
+		    event->button, event->time);
 }
 
 static GtkWidget *
@@ -330,6 +330,8 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   GtkWidget *table;
   GtkWidget *label;
   GtkWidget *button;
+  GtkWidget *frame;
+  GtkStyle *style;
 
   table = gtk_table_new (6, 3, FALSE);
   gtk_table_set_row_spacings (GTK_TABLE (table), 2);
@@ -426,16 +428,35 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 5, 6,
 		    GTK_FILL, GTK_FILL, 0, 0);
 
-  msg->attachments = gnome_icon_list_new (100, NULL, TRUE);
-  gnome_icon_list_thaw (GNOME_ICON_LIST (msg->attachments));
+  gtk_widget_push_visual (gdk_imlib_get_visual ());
+  gtk_widget_push_colormap (gdk_imlib_get_colormap ());
+  /* create icon list */
+  msg->attachments = gnome_icon_list_new (100, NULL, FALSE);
+  gtk_widget_pop_visual ();
+  gtk_widget_pop_colormap ();
 
-  gtk_widget_show (msg->attachments);
-  gtk_table_attach (GTK_TABLE (table), msg->attachments, 1, 3, 5, 6,
+  /* set bg of icon list to white */
+  style = gtk_widget_get_style (msg->attachments);
+  gdk_color_white (gdk_imlib_get_colormap (), &style->bg[GTK_STATE_NORMAL]);
+  gtk_widget_set_style (msg->attachments, style);
+
+  gtk_widget_set_usize (msg->attachments, -1, 50);
+
+  frame = gtk_frame_new (NULL);
+  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
+  gtk_container_add (GTK_CONTAINER (frame), msg->attachments);
+
+  gtk_table_attach (GTK_TABLE (table), frame, 1, 3, 5, 6,
 		    GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_EXPAND, 0, 0);
+
   gtk_signal_connect (GTK_OBJECT (msg->attachments), "select_icon",
 		      GTK_SIGNAL_FUNC (select_attachment),
 		      NULL);
 
+  gnome_icon_list_set_selection_mode (GNOME_ICON_LIST (msg->attachments), GTK_SELECTION_MULTIPLE);
+  GTK_WIDGET_SET_FLAGS (GNOME_ICON_LIST (msg->attachments), GTK_CAN_FOCUS);
+
+  gnome_icon_list_thaw (GNOME_ICON_LIST (msg->attachments));
 
   return table;
 }

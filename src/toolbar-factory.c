@@ -24,25 +24,11 @@
 #include <string.h>
 #include <gnome.h>
 
-#include "libbalsa.h"
-
-#include "address-book.h"
 #include "balsa-app.h"
 #include "balsa-icons.h"
-#include "balsa-index.h"
-#include "balsa-mblist.h"
-#include "balsa-message.h"
-#include "folder-conf.h"
-#include "mailbox-conf.h"
 #include "main-window.h"
 #include "message-window.h"
-#include "pref-manager.h"
-#include "print.h"
 #include "sendmsg-window.h"
-#include "store-address.h"
-#include "save-restore.h"
-
-#include "libinit_balsa/init_balsa.h"
 
 #include "toolbar-prefs.h"
 #include "toolbar-factory.h"

@@ -1,0 +1,27 @@
+<html>
+<head>
+<title>Balsa</title>
+<link rel="stylesheet" type="text/css" href="@website_root@/style.css">
+</head>
+<body background="@website_root@/images/bg.jpg" bgcolor="#ffffff" text="#000000" link="#993300" vlink="#993300">
+<table width="100%">
+	<tr>
+		<td width="80"></td>
+		<td>
+			<dd align="left"><img src="@website_root@/images/balsa.jpg" alt="balsa" align="middle" width="476" height="122"><big><big><b>Features</b></big></big><br></dd>
+			<p>Balsa has many features including:</p>
+			<p>Balsa is a e-mail client. It is part of the GNOME desktop environment.</p>
+			<p><font face="lucida, helvetica, arial">It supports:</font>
+			<ul>
+				<li>Local mailboxes (mbox, maildir, mh)</li>
+				<li>POP3</li>
+				<li>IMAP</li>
+				<li>Printing</li>
+				<li>Multi-threaded mail retrevial (optional)</li>
+				<li>MIME support</li>
+				<li>Supports both SMTP and the use of a local MTA</li>
+			</ul>
+		</td>
+	</tr>
+</table>
+</body>

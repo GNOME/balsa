@@ -1,5 +1,8 @@
-2004-03-26 11:14  PeterB
+2004-03-26 17:05  PeterB
 
+	* libbalsa/mime.c: file descriptor leak.
+	* libbalsa/mailbox.c: lock the mailbox while searching it.
+	* libbalsa/body.c: use the GError argument of g_file_open_tmp.
 	* libbalsa/: mailbox_maildir.c, mailbox_maildir.h: test the subdirs
 	for write permission, as well as the main dir--set readonly if any
 	fails.

@@ -42,7 +42,7 @@
 
 #define MAILBOX_DATA "mailbox_data"
 
-#define PROCESSBAR_KEY "balsa_window_pbar"
+#define APPBAR_KEY "balsa_appbar"
 
 GnomeMDI *mdi = NULL;
 static guint pbar_timeout;
@@ -206,9 +206,11 @@ static GnomeUIInfo main_toolbar[] =
 void
 main_window_set_cursor (gint type)
 {
+  GnomeAppBar *appbar;
   GList *list;
-  GtkWidget *widget, *pbar;
+  GtkWidget *widget;
   GdkCursor *cursor;
+  GtkProgress *pbar;
 
   if (mdi->windows == NULL)
     return;
@@ -217,20 +219,23 @@ main_window_set_cursor (gint type)
   for (list = mdi->windows; list; list = list->next)
     {
       widget = GTK_WIDGET (GNOME_APP (list->data));
-      pbar = GTK_WIDGET (gtk_object_get_data (GTK_OBJECT(widget), PROCESSBAR_KEY));
+      appbar = GNOME_APPBAR (gtk_object_get_data (GTK_OBJECT(widget),
+						  APPBAR_KEY));
+      pbar = gnome_appbar_get_progress(appbar);
+      
       if (type == -1)
 	{
-	  gtk_widget_set_sensitive (pbar, FALSE);
-	  gtk_progress_set_activity_mode (GTK_PROGRESS (pbar), FALSE);
-	  gtk_timeout_remove (pbar_timeout);
-	  gtk_progress_set_value (GTK_PROGRESS (pbar), 0.0);
+	  gtk_widget_set_sensitive (GTK_WIDGET (pbar), FALSE);
+          gtk_progress_set_activity_mode (GTK_PROGRESS (pbar), FALSE);
+          gtk_timeout_remove (pbar_timeout);
+          gtk_progress_set_value (GTK_PROGRESS (pbar), 0.0);
 	  gdk_window_set_cursor (widget->window, NULL);
 	}
       else
 	{
-	  gtk_widget_set_sensitive (pbar, TRUE);
-	  gtk_progress_set_activity_mode (GTK_PROGRESS (pbar), TRUE);
-	  pbar_timeout = gtk_timeout_add (50, progress_timeout, pbar);
+	  gtk_widget_set_sensitive (GTK_WIDGET (pbar), TRUE);
+          gtk_progress_set_activity_mode (GTK_PROGRESS (pbar), TRUE);
+          pbar_timeout = gtk_timeout_add (50, progress_timeout, pbar);
 	  cursor = gdk_cursor_new (type);
 	  gdk_window_set_cursor (widget->window, cursor);
 	  gdk_cursor_destroy (cursor);
@@ -281,10 +286,12 @@ main_window_init (void)
 static gint
 progress_timeout (gpointer data)
 {
-  gfloat new_val;
+  GtkProgress *pbar;
   GtkAdjustment *adj;
+  gfloat new_val;
 
-  adj = GTK_PROGRESS (data)->adjustment;
+  pbar = GTK_PROGRESS(data);
+  adj = pbar->adjustment;
 
   new_val = adj->value + 1;
   if (new_val > adj->upper)
@@ -299,8 +306,7 @@ progress_timeout (gpointer data)
 static void
 app_created (GnomeMDI * mdi, GnomeApp * app)
 {
-  GtkWidget *statusbar;
-  GtkWidget *pbar;
+  GnomeAppBar *appbar;
 
   /* we can only set icon after realization, as we have no windows before. */
   gtk_signal_connect (GTK_OBJECT (app), "realize",
@@ -308,27 +314,16 @@ app_created (GnomeMDI * mdi, GnomeApp * app)
   gtk_signal_connect (GTK_OBJECT (app), "destroy",
 		      GTK_SIGNAL_FUNC (destroy_window_cb), NULL);
 
-  statusbar = GNOME_APPBAR(gnome_appbar_new(TRUE, TRUE,
-					    GNOME_PREFERENCES_USER));
-  pbar = gtk_progress_bar_new ();
-  gtk_progress_bar_set_activity_step (GTK_PROGRESS_BAR (pbar), 5);
-  gtk_progress_bar_set_activity_blocks (GTK_PROGRESS_BAR (pbar), 5);
+  appbar = GNOME_APPBAR(gnome_appbar_new(TRUE, TRUE, GNOME_PREFERENCES_USER));
 
-  gtk_progress_set_activity_mode (GTK_PROGRESS (pbar), FALSE);
-  gtk_progress_set_value (GTK_PROGRESS (pbar), 0.0);
+  gnome_app_set_statusbar (app, GTK_WIDGET (appbar));
 
-  gtk_widget_set_usize (pbar, 100, -1);
-  gtk_box_pack_start (GTK_BOX (statusbar), pbar, FALSE, FALSE, 5);
-  gtk_widget_show (pbar);
-
-  gnome_app_set_statusbar (app, statusbar);
+  gtk_object_set_data (GTK_OBJECT (app), APPBAR_KEY, appbar);
 
   gtk_window_set_policy (GTK_WINDOW (app), TRUE, TRUE, FALSE);
   gtk_widget_set_usize (GTK_WIDGET (app), balsa_app.mw_width, balsa_app.mw_height);
 
   mblist_open_window (mdi);
-
-  gtk_object_set_data (GTK_OBJECT (app), PROCESSBAR_KEY, pbar);
 
   refresh_main_window ();
 

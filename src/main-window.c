@@ -980,8 +980,8 @@ enable_mailbox_menus(BalsaMailboxNode * mbnode)
     };
 
     LibBalsaMailbox *mailbox = NULL;
+    BalsaIndex *index;
     gboolean enable;
-    gboolean enable_move;
     unsigned i;
 
     enable =  (mbnode != NULL);
@@ -995,16 +995,19 @@ enable_mailbox_menus(BalsaMailboxNode * mbnode)
     }
 
     /* Toolbar */
-    enable_move = (mailbox != NULL && mailbox->total_messages > 0);
+    index = balsa_find_index_by_mailbox(mailbox);
     set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
-                                 0, BALSA_PIXMAP_PREVIOUS, enable_move);
+                                 0, BALSA_PIXMAP_PREVIOUS, 
+                                 index && index->previous_message);
     set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
-                                 0, BALSA_PIXMAP_NEXT, enable_move);
+                                 0, BALSA_PIXMAP_NEXT, 
+                                 index && index->next_message);
     set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
                                  0, BALSA_PIXMAP_NEXT_UNREAD, 
                                  mailbox && mailbox->unread_messages > 0);
     set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
-                                 0, BALSA_PIXMAP_NEXT_FLAGGED, enable_move);
+                                 0, BALSA_PIXMAP_NEXT_FLAGGED, 
+                                 mailbox && mailbox->total_messages > 0);
     set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
                                  0, BALSA_PIXMAP_CLOSE_MBOX, enable);
     set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),

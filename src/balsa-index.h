@@ -57,6 +57,8 @@ extern "C" {
         BalsaMailboxNode* mailbox_node;
         LibBalsaMessage* first_new_message;
         LibBalsaMessage* current_message;
+        LibBalsaMessage* previous_message;
+        LibBalsaMessage* next_message;
 
         int threading_type;
         GTimeVal last_use;

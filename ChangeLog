@@ -4,10 +4,14 @@
 
 2002-09-10  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
-	* src/balsa-index.c: modify bndx_find_row to find next in thread,
+	* src/balsa-index.[hc]: modify bndx_find_row to find next in thread,
 	excluding messages to be removed; fix bndx_messages_remove to use
-	bndx_find_row, and simplify it.
-
+	bndx_find_row, and simplify it. postpone signalling main-window to
+	an idle handler, to avoid mailbox deadlock; add previous_message
+	and next_message to BalsaIndex, to inform main-window.
+	* src/main-window.c: set sensitivity of next and previous message
+	buttons.
+	
 2002-09-09  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/balsa-index.c: 2nd message is not previous from

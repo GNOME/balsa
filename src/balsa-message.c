@@ -509,11 +509,11 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 		       GTK_SIGNAL_FUNC(message_destroyed_cb),
 		       (gpointer) bm);
 
-    display_headers(bm);
 
     if(!libbalsa_message_body_ref(bm->message)) 
 	return FALSE;
 
+    display_headers(bm);
     display_content(bm);
 
     /*

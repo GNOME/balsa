@@ -1,3 +1,7 @@
+2001-11-14  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-message.c: body_ref() can add more headers.
+
 2001-11-13  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* configure.in: remember to have pthread libs at the end. 

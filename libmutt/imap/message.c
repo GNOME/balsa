@@ -54,8 +54,12 @@ int imap_read_headers (IMAP_DATA* idata, int msgbegin, int msgend)
   IMAP_HEADER h;
   int rc, mfhrc;
   int fetchlast = 0;
+#ifdef LIBMUTT
+  const char *want_headers = 
+      "DATE FROM SUBJECT TO MESSAGE-ID REFERENCES CONTENT-TYPE LINES";
+#else
   const char *want_headers = "DATE FROM SUBJECT TO CC MESSAGE-ID REFERENCES CONTENT-TYPE IN-REPLY-TO REPLY-TO LINES X-LABEL";
-
+#endif
   ctx = idata->ctx;
 
   if (mutt_bit_isset (idata->capabilities,IMAP4REV1))
@@ -343,7 +347,11 @@ int imap_fetch_message (MESSAGE *msg, CONTEXT *ctx, int msgno)
   if (h->env->real_subj)
     hash_delete (ctx->subj_hash, h->env->real_subj, h, NULL);
   mutt_free_envelope (&h->env);
+#ifdef LIBMUTT
+  h->env = mutt_read_rfc822_header (msg->fp, h, 1, 0);
+#else
   h->env = mutt_read_rfc822_header (msg->fp, h, 0, 0);
+#endif
   if (h->env->message_id)
     hash_insert (ctx->id_hash, h->env->message_id, h, 0);
   if (h->env->real_subj)

@@ -204,12 +204,17 @@ message2html (Message * message)
   gchar tbuff[1024];
 
 
-  g_string_append (mbuff, "<html><body bgcolor=#ffffff><p><b>Date: </b>");
+  g_string_append (mbuff, "<html><body bgcolor=#ffffff><p>");
 
-  /* date */
-  buff = text2html (message->date);
-  g_string_append (mbuff, buff);
-  g_free (buff);
+
+  if (message->date)
+    {
+      g_string_append (mbuff, "<b>Date: </b>");
+      /* date */
+      buff = text2html (message->date);
+      g_string_append (mbuff, buff);
+      g_free (buff);
+    }
 
   if (message->from)
     {
@@ -241,10 +246,16 @@ message2html (Message * message)
 
   g_string_append (mbuff, "<br></p><p><tt>");
 
-  body = (Body *) message->body_list->data;
-  buff = text2html (body->buffer);
-  g_string_append (mbuff, buff);
-  g_free (buff);
+  if (message->body_list)
+    {
+      body = (Body *) message->body_list->data;
+      if (body)
+	{
+	  buff = text2html (body->buffer);
+	  g_string_append (mbuff, buff);
+	  g_free (buff);
+	}
+    }
 
   g_string_append (mbuff, "</tt></p></body></html>");
   buff = mbuff->str;

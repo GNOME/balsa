@@ -199,11 +199,11 @@ static GtkToolbar *get_bar_instance(GtkWidget *window,
 static int get_position_value(BalsaToolbarType toolbar, char *id);
 
 #ifdef NEW_GTK
-#define mygtk_toolbar_remove_all(bar,j) gtk_toolbar_remove_all(bar)
+#define balsa_toolbar_remove_all(bar,j) gtk_toolbar_remove_all(bar)
 #else
 /* this should go to GTK because it modifies its internal structures. */
-static void
-mygtk_toolbar_remove_all(GtkToolbar *toolbar)
+void
+balsa_toolbar_remove_all(GtkToolbar *toolbar)
 {
     GList *children;
     
@@ -213,10 +213,14 @@ mygtk_toolbar_remove_all(GtkToolbar *toolbar)
 	GtkToolbarChild *child = children->data;
 	
 	if (child->type != GTK_TOOLBAR_CHILD_SPACE) {
+#ifdef REMOVE_TOOLBAR_ITEMS_VERY_CAUTIOUSLY
 	    gtk_widget_ref (child->widget);
 	    gtk_widget_unparent (child->widget);
 	    gtk_widget_destroy (child->widget);
 	    gtk_widget_unref (child->widget);
+#else 
+	    gtk_widget_unparent (child->widget);
+#endif /* REMOVE_TOOLBAR_ITEMS_VERY_CAUTIOUSLY */
 	}
 	g_free (child);
     }
@@ -256,7 +260,7 @@ GtkWidget *
 get_tool_widget(GtkWidget *window, BalsaToolbarType toolbar, char *id)
 {
     GtkToolbar *bar;
-    GList *lp, *children;
+    GList *children;
     int position;
     GtkWidget *child;
 
@@ -265,28 +269,13 @@ get_tool_widget(GtkWidget *window, BalsaToolbarType toolbar, char *id)
 	return NULL;
     
     position=get_position_value(toolbar, id);
-    if(position == -1)
+    if (position < 0)
 	return NULL;
     
-    lp=children=gtk_container_children(GTK_CONTAINER(bar));
-    if(!children)
-	return(NULL);
+    children = gtk_container_children(GTK_CONTAINER(bar));
+    child = GTK_WIDGET(g_list_nth_data(children, position));
+    g_list_free(children);
 
-    lp = g_list_nth(lp, position);
-
-    if(!lp) {
-	g_list_free(children);
-	return NULL;
-    }
-	
-    child=(GtkWidget *)(lp->data);
-
-    if(children)
-	g_list_free(children);
-	
-    if(!child)
-	return NULL;
-	
     return child;
 }
 
@@ -513,7 +502,7 @@ get_toolbar(GtkWidget *window, BalsaToolbarType toolbar)
     } else {
 	bar=GTK_TOOLBAR(toolbar_map[i].toolbar);
 	/* remove all items from the existing bar. */
-	mygtk_toolbar_remove_all(bar);
+	balsa_toolbar_remove_all(bar);
     }
 
     toolbar_map[i].toolbar=GTK_WIDGET(bar);

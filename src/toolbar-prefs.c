@@ -108,7 +108,6 @@ static void get_toolbar_data(BalsaToolbarType toolbar);
 static void apply_toolbar_prefs(GtkWidget *widget, gpointer data);
 static void wrap_toggled_cb(GtkWidget *widget, gpointer data);
 static void page_active_cb(GtkWidget *widget, GdkEvent *event, gpointer data);
-static void remove_all_buttons(GtkToolbar *bar);
 
 static void
 page_active_cb(GtkWidget *widget, GdkEvent *event, gpointer data)
@@ -246,28 +245,6 @@ get_toolbar_data(BalsaToolbarType toolbar)
     }
 }
 
-/* remove_all_buttons:
- * does what it says
- * lifted from gtk_toolbar_destroy, just doesn't unref the tooltips, or
- * destroy the toolbar itself
- */
-static void
-remove_all_buttons(GtkToolbar *toolbar)
-{
-    GList *children;
-
-    for (children = toolbar->children; children; children = children->next) {
-        GtkToolbarChild *child = children->data;
-
-        if (child->type != GTK_TOOLBAR_CHILD_SPACE)
-            gtk_widget_unparent(child->widget); /* this will unref, too */
-        g_free(child);
-    }
-
-    g_list_free(toolbar->children);
-    toolbar->children = NULL;
-}
-
 static void
 replace_nl_with_space(char* str)
 {
@@ -292,7 +269,7 @@ recreate_preview(BalsaToolbarType toolbar, gboolean preview_only)
     list_data[0] = list_data[1] = NULL;
     bar=GTK_TOOLBAR(toolbar_pages[toolbar].preview);
     
-    remove_all_buttons(bar);
+    balsa_toolbar_remove_all(bar);
     if(!preview_only) {
 	gtk_clist_clear(
 	    GTK_CLIST(toolbar_pages[toolbar].destination));

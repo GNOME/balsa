@@ -3619,7 +3619,6 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     gchar *tmp;
     const gchar *ctmp;
     gchar recvtime[50];
-    struct tm footime;
     GtkTextIter start, end;
 
     g_assert(bsmsg != NULL);
@@ -3666,9 +3665,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 	    }
 	    message->references = g_list_reverse(message->references);
 	}
-	localtime_r(&bsmsg->orig_message->headers->date, &footime);
-	strftime(recvtime, sizeof(recvtime),
-		 "%a, %b %d, %Y at %H:%M:%S %z", &footime);
+	ctime_r(&bsmsg->orig_message->headers->date, recvtime);
 
 	if (bsmsg->orig_message->message_id) {
 	    message->references =

@@ -47,7 +47,7 @@
     (G_TYPE_INSTANCE_GET_CLASS ((mailbox), LIBBALSA_TYPE_MAILBOX, \
 				LibBalsaMailboxClass))
 
-#define MAILBOX_OPEN(mailbox)     (mailbox->state == LB_MAILBOX_STATE_OPEN)
+#define MAILBOX_OPEN(mailbox)     (mailbox->state != LB_MAILBOX_STATE_CLOSED)
 
 #define MAILBOX_CLOSED(mailbox)   (mailbox->state == LB_MAILBOX_STATE_CLOSED)
 

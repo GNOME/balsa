@@ -3,6 +3,9 @@
 	* NEWS, configure.in: release 2.2.2.
 	* src/save-restore.c: switch SMTP TLS on if available.
 	* src/main-window.c: menu item numbering fixes.
+	* libbalsa/mailbox.h: mailbox is open even when eg. TREECLEANING.
+	* sounds/newmail.wav: less disturbing newmail sound.
+	* src/sendmsg-window.c: in-reply-to date must be in C locale.
 
 2004-08-07  21:30 Pawel Salek
 

@@ -276,14 +276,17 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     }	
     libbalsa_mailbox_open(tmp_mailbox);
     if ((m->inbox) && (libbalsa_mailbox_total_messages(tmp_mailbox))) {
-        LibBalsaMailboxLocal *mbox = LIBBALSA_MAILBOX_LOCAL(tmp_mailbox);
-	GList *list;
+	guint msgno = libbalsa_mailbox_total_messages(tmp_mailbox);
+	GList *msg_list = NULL;
 
-	for (list = mbox->msg_list; list; list = list->next)
-	    ((LibBalsaMessage *) list->data)->flags |=
-		LIBBALSA_MESSAGE_FLAG_NEW;
+	do {
+	    LibBalsaMessage *message =
+		libbalsa_mailbox_get_message(tmp_mailbox, msgno);
+	    message->flags |= LIBBALSA_MESSAGE_FLAG_NEW;
+	    msg_list = g_list_prepend(msg_list, message);
+	} while (--msgno > 0);
 
-	if (!libbalsa_messages_move(mbox->msg_list, m->inbox)) {    
+	if (!libbalsa_messages_move(msg_list, m->inbox)) {    
 	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 				 _("Error placing messages from %s on %s\n"
 				   "Messages are left in %s\n"),
@@ -292,6 +295,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 				 tmp_path);
 	    remove_tmp = FALSE;
 	}
+	g_list_free(msg_list);
     }
     libbalsa_mailbox_close(tmp_mailbox);
     

@@ -246,8 +246,7 @@ bndx_destroy(GtkObject * obj)
     }
 
     if (index->current_message) {
-	g_object_remove_weak_pointer(G_OBJECT(index->current_message),
-				     (gpointer)&index->current_message);
+	g_object_unref(index->current_message);
 	index->current_message = NULL;
     }
 
@@ -492,9 +491,6 @@ bndx_deselected_idle(BalsaIndex * index)
         return FALSE;
     }
 
-    if (index->current_message)
-        g_object_ref(index->current_message);
-
     libbalsa_mailbox_messages_change_flags(index->mailbox_node->mailbox,
                                            deselected, 0,
                                            LIBBALSA_MESSAGE_FLAG_SELECTED);
@@ -510,7 +506,6 @@ bndx_deselected_idle(BalsaIndex * index)
             }
             gtk_tree_path_free(path);
         }                       /* else ??? */
-        g_object_unref(index->current_message);
     }
 
     g_object_set_data(G_OBJECT(index), BALSA_INDEX_DESELECTED_ARRAY, NULL);
@@ -527,10 +522,12 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
     GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(index));
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(model);
     struct BndxSelectionChangedInfo sci;
-    GtkTreeIter iter;
     gboolean have_selected;
     GArray *deselected;
     gint i;
+    gint current_depth = 0;
+    guint current_msgno = 0;
+    gboolean current_selected = FALSE;
 
     if (mailbox->state == LB_MAILBOX_STATE_TREECLEANING)
         return;
@@ -548,6 +545,8 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
     /* Check previously selected messages. */
     deselected =
 	g_object_get_data(G_OBJECT(index), BALSA_INDEX_DESELECTED_ARRAY);
+    if (index->current_message)
+	current_msgno = index->current_message->msgno;
     for (i = index->selected->len; --i >= 0; ) {
 	GtkTreePath *path;
 	guint msgno = g_array_index(index->selected, guint, i);
@@ -576,7 +575,10 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
 	    }
 	    g_array_append_val(deselected, msgno);
 	    g_array_remove_index(index->selected, i);
-	}
+	    if (msgno == current_msgno)
+		current_depth = gtk_tree_path_get_depth(path);
+	} else if (msgno == current_msgno)
+	    ++current_selected;
 	gtk_tree_path_free(path);
     }
 
@@ -596,28 +598,28 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
     g_array_free(sci.new_selected, TRUE);
 
     /* If current message is still selected, return. */
-    if (index->current_message) {
-	guint current_msgno = index->current_message->msgno;
-        for (i = index->selected->len; --i >= 0; )
-            if (g_array_index(index->selected, guint, i) == current_msgno)
-                return;
-    }
+    if (current_selected)
+	return;
 
-    /* we don't clear the current message if the tree contains any
-     * messages */
-    if (sci.msgno || !gtk_tree_model_get_iter_first(model, &iter)) {
-	if (index->current_message)
-	    g_object_remove_weak_pointer(G_OBJECT(index->current_message),
-					 (gpointer)&index->current_message);
+    /* sci.msgno is the msgno of the new current message;
+     * if sci.msgno == 0, either:
+     * - no messages remain in the view, in which case we clear
+     *   index->current_message,
+     * or:
+     * - the thread containing the current message was collapsed, in
+     *   which case we leave index->current_message unchanged;
+     * we detect the latter case by checking the depth of the current
+     * message.  */
+    if (sci.msgno || current_depth <= 1) {
+	if (index->current_message) {
+	    g_object_unref(index->current_message);
+	    index->current_message = NULL;
+	}
         if (sci.msgno
             && (index->current_message =
-                libbalsa_mailbox_get_message(mailbox, sci.msgno))) {
-            g_object_add_weak_pointer(G_OBJECT(index->current_message),
-                                      (gpointer)&index->current_message);
+                libbalsa_mailbox_get_message(mailbox, sci.msgno)))
 	    index->current_message_is_deleted =
 		LIBBALSA_MESSAGE_IS_DELETED(index->current_message);
-	} else
-	    index->current_message = NULL;
         bndx_changed_find_row(index);
     }
 }

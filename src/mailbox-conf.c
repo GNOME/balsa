@@ -273,9 +273,20 @@ mailbox_conf_new (Mailbox * mailbox, gint add_mbox, MailboxType type)
   gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox),
 			   BALSA_BUTTON_WIDTH / 2, BALSA_BUTTON_HEIGHT / 2);
 
-  if (mcw->mailbox)
+  if (type != MAILBOX_UNKNOWN)
     {
-      mcw->ok = gtk_button_new_with_label ("Update");
+      GtkWidget *pixmap;
+      pixmap = gnome_stock_pixmap_widget (NULL, GNOME_STOCK_PIXMAP_NEW);
+      mcw->ok = gnome_pixmap_button (pixmap, _ ("Add"));
+      gtk_container_add (GTK_CONTAINER (bbox), mcw->ok);
+      gtk_signal_connect (GTK_OBJECT (mcw->ok), "clicked",
+			  (GtkSignalFunc) mailbox_conf_close, (void *) TRUE);
+    }
+  else if (mcw->mailbox)
+    {
+      GtkWidget *pixmap;
+      pixmap = gnome_stock_pixmap_widget (NULL, GNOME_STOCK_PIXMAP_SAVE);
+      mcw->ok = gnome_pixmap_button (pixmap, _ ("Update"));
       gtk_container_add (GTK_CONTAINER (bbox), mcw->ok);
       gtk_signal_connect (GTK_OBJECT (mcw->ok), "clicked",
 			  (GtkSignalFunc) mailbox_conf_close, (void *) TRUE);
@@ -580,7 +591,6 @@ create_new_page (void)
 }
 
 
-
 static GtkWidget *
 create_local_mailbox_page (void)
 {
@@ -642,13 +652,6 @@ create_pop_mailbox_page (void)
   gtk_table_attach (GTK_TABLE (table), mcw->pop_mailbox_name, 1, 2, 0, 1,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL,
 		    0, 10);
-
-/*
-   gtk_signal_connect (GTK_OBJECT (mcw->pop_mailbox_name),
-   "changed",
-   (GtkSignalFunc) pop_mailbox_name_changed_cb,
-   NULL);
- */
 
   gtk_widget_show (mcw->pop_mailbox_name);
 
@@ -800,9 +803,17 @@ next_cb (GtkWidget * widget)
   gtk_widget_destroy (mcw->ok);
 
   if (mcw->mailbox)
-    mcw->ok = gtk_button_new_with_label ("Update");
+    {
+      mcw->ok = gtk_button_new_with_label ("Update");
+    }
   else
-    mcw->ok = gnome_stock_button (GNOME_STOCK_BUTTON_OK);
+    {
+      GtkWidget *pixmap;
+      pixmap = gnome_stock_pixmap_widget (NULL, GNOME_STOCK_PIXMAP_NEW);
+      mcw->ok = gnome_pixmap_button (pixmap, _ ("Add"));
+      gtk_signal_connect (GTK_OBJECT (mcw->ok), "clicked",
+			  (GtkSignalFunc) mailbox_conf_close, (void *) TRUE);
+    }
   gtk_widget_show (mcw->ok);
 
   gtk_container_add (GTK_CONTAINER (bbox), mcw->ok);

@@ -514,7 +514,6 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox, gboolean closing)
     gboolean save_failed;
     GMimeParser *gmime_parser;
     LibBalsaMailboxMbox *mbox;
-    GSList *l, *removed_list = NULL;
 
     mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
     
@@ -583,59 +582,53 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox, gboolean closing)
     for (i = first, j = 0; i < messages; i++)
     {
 	msg_info = &g_array_index(mbox->messages_info,
-		       struct message_info, i);
-	if ((msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED)) {
-	    if (msg_info->message)
-		removed_list =
-		    g_slist_prepend(removed_list,
-			    GINT_TO_POINTER(msg_info->message->msgno));
+				  struct message_info, i);
+	if ((msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED))
+	    continue;
+
+	j++;
+
+	/*
+	 * back up some information which is needed to restore offsets when
+	 * something fails.
+	 */
+
+	/* save the new offset for this message.  we add `offset' because
+	 * the temporary file only contains saved message which are located
+	 * after `offset' in the real mailbox
+	 */
+	if (msg_info->flags == msg_info->orig_flags) {
+	    g_mime_stream_set_bounds(mbox_stream,
+				     msg_info->start, msg_info->end);
+	    g_mime_stream_seek(mbox_stream, msg_info->start,
+			       GMIME_STREAM_SEEK_SET);
+	    if (g_mime_stream_write_to_stream(mbox_stream,
+					      temp_stream) <= 0) {
+		g_mime_stream_unref(temp_stream);
+		g_mime_stream_set_bounds(mbox_stream, 0, -1);
+		unlink(tempfile);
+		g_free(tempfile);
+		mbox_unlock(mailbox, gmime_stream);
+		g_mime_stream_unref(gmime_stream);
+		return FALSE;
+	    }
 	} else {
-	    j++;
-
-	    /*
-	     * back up some information which is needed to restore offsets when
-	     * something fails.
-	     */
-
-	    /* save the new offset for this message.  we add `offset' because
-	     * the temporary file only contains saved message which are located
-	     * after `offset' in the real mailbox
-	     */
-	    if (msg_info->flags == msg_info->orig_flags)
-	    {
-		g_mime_stream_set_bounds(mbox_stream,
-			msg_info->start, msg_info->end);
-		g_mime_stream_seek(mbox_stream, msg_info->start,
-				   GMIME_STREAM_SEEK_SET);
-		if (g_mime_stream_write_to_stream(mbox_stream,
-						  temp_stream) <= 0)
-		{
-		    g_mime_stream_unref(temp_stream);
-		    g_mime_stream_set_bounds(mbox_stream, 0, -1);
-		    unlink(tempfile);
-		    g_free(tempfile);
-		    mbox_unlock(mailbox, gmime_stream);
-		    g_mime_stream_unref(gmime_stream);
-		    return FALSE;
-		}
-	    } else {
-		/* write From_ & message */
-		if (g_mime_stream_write_string(temp_stream,
-					       msg_info->from) == -1
-		    || g_mime_stream_write_string(temp_stream, "\n") == -1
-		    || g_mime_message_write_to_stream(msg_info->mime_message,
-						      temp_stream) == -1
-		    || g_mime_stream_write_string(temp_stream, "\n") == -1)
-		{
-		    g_mime_stream_unref(temp_stream);
-		    unlink(tempfile);
-		    mbox_unlock(mailbox, gmime_stream);
-		    g_mime_stream_unref(gmime_stream);
-		    return FALSE;
-		}
+	    /* write From_ & message */
+	    if (g_mime_stream_write_string(temp_stream,
+					   msg_info->from) == -1
+		|| g_mime_stream_write_string(temp_stream, "\n") == -1
+		|| g_mime_message_write_to_stream(msg_info->mime_message,
+						  temp_stream) == -1
+		|| g_mime_stream_write_string(temp_stream, "\n") == -1) {
+		g_mime_stream_unref(temp_stream);
+		unlink(tempfile);
+		mbox_unlock(mailbox, gmime_stream);
+		g_mime_stream_unref(gmime_stream);
+		return FALSE;
 	    }
 	}
     }
+
     g_mime_stream_set_bounds(mbox_stream, 0, -1);
     if (g_mime_stream_flush(temp_stream) == -1)
     {
@@ -747,20 +740,15 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox, gboolean closing)
 
 	    } else {
 		g_array_remove_index(mbox->messages_info, j);
+		libbalsa_mailbox_msgno_removed(mailbox, j + 1);
+		mailbox->total_messages = mbox->messages_info->len;
 	    }
 	}
 	g_object_unref(G_OBJECT(gmime_parser));
 	g_mime_stream_unref(gmime_stream);
 
 	mailbox->messages = j;
-	mailbox->total_messages = mbox->messages_info->len;
-
-	for (l = removed_list; l; l = l->next)
-	    libbalsa_mailbox_msgno_removed(mailbox,
-					   GPOINTER_TO_INT(l->data));
     }
-
-    g_slist_free(removed_list);
 
     return TRUE;
 }

@@ -62,11 +62,19 @@ AC_CHECK_FUNCS(setegid srand48 strerror)
 
 AC_REPLACE_FUNCS(strcasecmp)
 
-mutt_cv_snprintf=no
-AC_CHECK_FUNC(snprintf, [AC_DEFINE(HAVE_SNPRINTF)], [mutt_cv_snprintf=yes])
-AC_CHECK_FUNC(vsnprintf, [AC_DEFINE(HAVE_VSNPRINTF)], [mutt_cv_snprintf=yes])
-if test $mutt_cv_snprintf = yes; then
-	LIBOBJS="$LIBOBJS snprintf.o"
+if( -f ../libbalsa/libbalsa.c ) 
+# if we're part of balsa, we're part of
+# gnome and thus have snprintf and vsnprintf
+  AC_DEFINE(HAVE_SNPRINTF)
+  AC_DEFINE(HAVE_VSNPRINTF)
+else
+# otherwise test as usual
+  mutt_cv_snprintf=no
+  AC_CHECK_FUNC(snprintf, [AC_DEFINE(HAVE_SNPRINTF)], [mutt_cv_snprintf=yes])
+  AC_CHECK_FUNC(vsnprintf, [AC_DEFINE(HAVE_VSNPRINTF)], [mutt_cv_snprintf=yes])
+  if test $mutt_cv_snprintf = yes; then
+    LIBOBJS="$LIBOBJS snprintf.o"
+  fi
 fi
 
 dnl SCO uses chsize() instead of ftruncate()

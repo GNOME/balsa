@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-03-23 16:25-0500\n"
-"PO-Revision-Date: 2005-03-23 16:41-0500\n"
+"POT-Creation-Date: 2005-03-24 02:30-0500\n"
+"PO-Revision-Date: 2005-03-24 16:41-0500\n"
 "Last-Translator: Adam Weinberger <adamw@gnome.org>\n"
 "Language-Team: Canadian English <adamw@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -1264,7 +1264,7 @@ msgid "The validity of the key with user ID \"%s\" is \"%s\"."
 msgstr "The validity of the key with user ID \"%s\" is \"%s\"."
 
 #: libbalsa/rfc3156.c:1543
-msgid "Use this key nevertheless?"
+msgid "Use this key anyway?"
 msgstr "Use this key anyway?"
 
 #: libbalsa/rfc3156.c:1751

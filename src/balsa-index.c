@@ -562,7 +562,7 @@ update_new_message_flag (BalsaIndex * bindex,
     gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child),
 			mesgno - 1, 0,
 			NULL);
-
+}
 /*
  * CLIST Callbacks
  */
@@ -710,5 +710,5 @@ unselect_message (GtkWidget * widget,
 
   /* update the index to show any changes in the message
    * state */
-  update_new_message_pixmap (bindex, mesgno);
+  update_new_message_flag (bindex, mesgno);
 }

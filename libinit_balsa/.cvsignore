@@ -1,3 +1,5 @@
 .deps
 Makefile.in
 Makefile
+balsa-*.c
+balsa-*.h

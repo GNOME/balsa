@@ -184,8 +184,14 @@ gboolean cfg_location_cmp( const cfg_location_t *left, const cfg_location_t *rig
 	if( strcmp( left->prefix, right->prefix ) )
 		return TRUE;
 
-	if( left->section == NULL && right->section == NULL )
+	if( left->section == NULL ) {
+		if( right->section )
+			return TRUE;
 		return FALSE;
+	} else {
+		if( right->section == NULL )
+			return TRUE;
+	}
 
 	if( strcmp( left->section, right->section ) )
 		return TRUE;
@@ -337,6 +343,8 @@ void cfg_location_enumerate( const cfg_location_t *where, cfg_enum_callback cb, 
 				continue;
 			if( strncmp( key, where->section, len ) )
 				continue;
+			if( strncmp( &( key[len] ), SUBSECTSEP, SSSLEN ) )
+				continue;
 			if( strstr( &( key[len+SSSLEN] ), SUBSECTSEP ) )
 				continue;
 			cb( where, &( key[len+SSSLEN] ), TRUE, user_data );
@@ -382,4 +390,34 @@ void cfg_location_free( cfg_location_t *where )
 	if( where->section )
 		g_free( where->section );
 	g_free( where );
+}
+
+/* Only used internally for the gnome-config subsystem 
+*/
+cfg_location_t *cfg_location_from_gnome_prefix( const gchar *prefix )
+{
+	cfg_location_t *loc = g_new( cfg_location_t, 1 );
+	guint32 len;
+
+	loc->prefix = g_strdup( prefix );
+	loc->section = NULL;
+
+	len = strlen( prefix );
+	if( loc->prefix[len-1] == '/' )
+		loc->prefix[len-1] = '\0';
+
+	return loc;
+}
+
+/* Discard changes made below a location 
+ */
+gboolean cfg_location_discard( const cfg_location_t *loc )
+{
+	if( loc->section ) {
+		g_warning( "Discarding of section information not supported by gnome-config!" );
+		return TRUE;
+	}
+
+	gnome_config_drop_file( loc->prefix );
+	return FALSE;
 }

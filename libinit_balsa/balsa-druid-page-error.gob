@@ -44,7 +44,8 @@ class Balsa:Druid:Page:Error from Balsa:Druid:Page {
 		(BALSA_DRUID_PAGE( self ))->next = NULL;
 		(BALSA_DRUID_PAGE( self ))->druid = (BALSA_DRUID_PAGE( prev ))->druid;
 	
-		balsa_druid_page_error_construct( BALSA_DRUID_PAGE( self ) );
+		if( (BALSA_DRUID_PAGE_CLASS( parent_class ))->construct )
+			(BALSA_DRUID_PAGE_CLASS( parent_class ))->construct( BALSA_DRUID_PAGE( self ) );
 		gnome_druid_page_standard_set_title( GNOME_DRUID_PAGE_STANDARD( self ), title );
 		gnome_druid_page_standard_set_logo( GNOME_DRUID_PAGE_STANDARD( self ), 
 			(BALSA_INITDRUID( (BALSA_DRUID_PAGE( self ))->druid ))->default_logo );

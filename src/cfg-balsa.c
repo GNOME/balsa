@@ -32,6 +32,7 @@
 
 /* OFFSET DEF[[ #include "libbalsa.h" ]] */
 /* OFFSET DEF[[ #include "balsa-app.h" ]] */
+/* OFFSET DEF[[ #include "sm-balsa.h" ]] */
 /* OFFSET DEF[[ typedef struct BalsaApplication BalsaApp; ]] */
 
 /* Implement all of our metatypes. These are mostly support functions that
@@ -90,9 +91,15 @@ gboolean cfg_meta_MailboxArray_read( const gpointer data, const cfg_location_t *
 gboolean cfg_meta_BalsaApp_write( const struct BalsaApplication *bapp, const cfg_location_t *loc, gpointer typedata );
 gboolean cfg_meta_BalsaApp_read( struct BalsaApplication *bapp, const cfg_location_t *loc, gpointer typedata );
 
+gboolean cfg_meta_mblist_write( const GSList **list, const cfg_location_t *loc, gpointer typedata );
+gboolean cfg_meta_mblist_read( GSList **list, const cfg_location_t *loc, gpointer typedata );
+
+gboolean cfg_meta_state_write( const sm_state_t *state, const cfg_location_t *loc, gpointer typedata );
+gboolean cfg_meta_state_read( sm_state_t *state, const cfg_location_t *loc, gpointer typedata );
+
 gboolean cfg_mailbox_write( Mailbox *mb, const cfg_location_t *top );
 Mailbox *cfg_mailbox_read( const gchar *name, const cfg_location_t *top );
-gboolean cfg_mailbox_delete( Mailbox *mb, cfg_location_t *top );
+gboolean cfg_mailbox_delete( Mailbox *mb, const cfg_location_t *top );
 
 gboolean cfg_mailbox_write_simple( Mailbox *mb );
 Mailbox *cfg_mailbox_read_simple( const gchar *name );
@@ -100,6 +107,10 @@ gboolean cfg_mailbox_delete_simple( Mailbox *mb );
 
 gboolean cfg_save( void );
 gboolean cfg_load( void );
+
+/* ************************************************************************ */
+
+const gchar mb_key[] = "Mailboxes";
 
 /* ** GdkColor (in a very ugly manner) ************************************ */
 
@@ -490,24 +501,33 @@ static void read_cb( const cfg_location_t *where, const gchar *name, const gbool
 
 gboolean cfg_meta_MailboxArray_write( const gpointer data, const cfg_location_t *loc, gpointer typedata )
 {
+	cfg_location_t *down;
+
+	down = cfg_location_godown( loc, mb_key );
+
 	/* Without this, no Mailboxes section is created, only subsections, and the
 	 * test for the existence of [Mailboxes] fails. */
-	cfg_location_put_bool( loc, "DummyValue", FALSE );
+	cfg_location_put_bool( down, "DummyValue", FALSE );
 
-	cfg_mailbox_write( balsa_app.inbox, loc );
-	cfg_mailbox_write( balsa_app.outbox, loc );
-	cfg_mailbox_write( balsa_app.sentbox, loc );
-	cfg_mailbox_write( balsa_app.draftbox, loc );
-	cfg_mailbox_write( balsa_app.trash, loc );
+	cfg_mailbox_write( balsa_app.inbox, down );
+	cfg_mailbox_write( balsa_app.outbox, down );
+	cfg_mailbox_write( balsa_app.sentbox, down );
+	cfg_mailbox_write( balsa_app.draftbox, down );
+	cfg_mailbox_write( balsa_app.trash, down );
 
-	g_node_traverse( balsa_app.mailbox_nodes, G_IN_ORDER, G_TRAVERSE_ALL, -1, write_traverse, (gpointer) loc );
-	g_list_foreach( balsa_app.inbox_input, write_foreach, (gpointer) loc );
+	g_node_traverse( balsa_app.mailbox_nodes, G_IN_ORDER, G_TRAVERSE_ALL, -1, write_traverse, (gpointer) down );
+	g_list_foreach( balsa_app.inbox_input, write_foreach, (gpointer) down );
+	cfg_location_free( down );
 	return FALSE;
 }
 
 gboolean cfg_meta_MailboxArray_read( const gpointer data, const cfg_location_t *loc, gpointer typedata )
 {
-	cfg_location_enumerate( loc, read_cb, NULL );
+	cfg_location_t *down;
+       
+	down = cfg_location_godown( loc, mb_key );
+	cfg_location_enumerate( down, read_cb, NULL );
+	cfg_location_free( down );
 	return FALSE;
 }
 
@@ -613,17 +633,100 @@ static gchar *fetch_sigpath( const gchar *parmname )
 
 gboolean cfg_meta_BalsaApp_write( const struct BalsaApplication *bapp, const cfg_location_t *loc, gpointer typedata )
 {
-	return cfg_group_write( (gpointer) bapp, parms_BalsaApp, loc );
+	cfg_location_t *down;
+	gboolean ret;
+
+	down = cfg_location_godown( loc, "Preferences" );
+	ret = cfg_group_write( (gpointer) bapp, parms_BalsaApp, down );
+	cfg_location_free( down );
+	return ret;
 }
 
 gboolean cfg_meta_BalsaApp_read( struct BalsaApplication *bapp, const cfg_location_t *loc, gpointer typedata )
 {
+	cfg_location_t *down;
+	gboolean ret;
+
 	if( bapp->address == NULL )
 		bapp->address = g_new0( Address, 1 );
-	return cfg_group_read( (gpointer) bapp, parms_BalsaApp, loc );
+
+	down = cfg_location_godown( loc, "Preferences" );
+	ret = cfg_group_read( (gpointer) bapp, parms_BalsaApp, down );
+	cfg_location_free( down );
+	return ret;
 }
 
 const cfg_metatype_spec_t spec_BalsaApp = { (meta_writer) cfg_meta_BalsaApp_write, (meta_reader) cfg_meta_BalsaApp_read };
+
+/* ** List of mailboxes for balsa_state *********************************** */
+
+gboolean cfg_meta_mblist_write( const GSList **list, const cfg_location_t *loc, gpointer typedata )
+{
+	int i;
+	const GSList *iter;
+	gchar key[16];
+	i = 0;
+
+	for( iter = (*list); iter; iter = iter->next ) {
+		g_snprintf( key, 16, "Mb-%d", i );
+		if( cfg_location_put_str( loc, key, (gchar *) (iter->data) ) )
+			return TRUE;
+		i++;
+	}
+	
+	if( cfg_location_put_num( loc, "Count", i ) )
+		return TRUE;
+
+	return FALSE;
+}
+
+gboolean cfg_meta_mblist_read( GSList **list, const cfg_location_t *loc, gpointer typedata )
+{
+	int i, count;
+	gchar key[16];
+	gchar *mbname;
+	i = 0;
+
+	if( cfg_location_get_num( loc, "Count", &count, 0 ) )
+		return TRUE;
+
+	for( i = 0; i < count; i++ ) {
+		g_snprintf( key, 16, "Mb-%d", i );
+		
+		if( cfg_location_get_str( loc, key, &mbname, "Inbox" ) )
+			return TRUE;
+
+		(*list) = g_slist_prepend( (*list), mbname );
+	}
+	
+	return FALSE;
+}
+
+const cfg_metatype_spec_t spec_mblist = { (meta_writer) cfg_meta_mblist_write, (meta_reader) cfg_meta_mblist_read };
+
+/* ** sm_state_t ********************************************************** */
+
+static const cfg_parm_t parms_sm_state_t[] = {
+	{ "AskedAboutAutosave", BALSA_OFFSET_sm_state_t_ELEM_asked_about_autosave, CPT_BOOL, NULL, cfg_type_const_init_bool( FALSE ) },
+	{ "DoAutosave", BALSA_OFFSET_sm_state_t_ELEM_do_autosave, CPT_BOOL, NULL, cfg_type_const_init_bool( FALSE ) },
+	{ "OpenFirstUnreadMailbox", BALSA_OFFSET_sm_state_t_ELEM_open_unread_mailbox, CPT_BOOL, NULL, cfg_type_const_init_bool( TRUE ) },
+	{ "CheckMailOnStartup", BALSA_OFFSET_sm_state_t_ELEM_checkmail, CPT_BOOL, NULL, cfg_type_const_init_bool( FALSE ) },
+	{ "StartAsComposer", BALSA_OFFSET_sm_state_t_ELEM_compose_mode, CPT_BOOL, NULL, cfg_type_const_init_bool( FALSE ) },
+	{ "MailboxesToOpen", BALSA_OFFSET_sm_state_t_ELEM_mbs_to_open, CPT_META, NULL, cfg_type_const_init_meta( &spec_mblist, NULL, FALSE ) },
+	cfg_parm_null
+};
+
+gboolean cfg_meta_state_write( const sm_state_t *state, const cfg_location_t *loc, gpointer typedata )
+{
+	return cfg_group_write( (gpointer) state, parms_sm_state_t, loc );
+}
+
+gboolean cfg_meta_state_read( sm_state_t *state, const cfg_location_t *loc, gpointer typedata )
+{
+	return cfg_group_read( (gpointer) state, parms_sm_state_t, loc );
+}
+
+const cfg_metatype_spec_t spec_sm_state_t = { (meta_writer) cfg_meta_state_write, (meta_reader) cfg_meta_state_read };
 
 /* ** Generic Mailboxes *************************************************** */
 
@@ -643,7 +746,6 @@ const cfg_metatype_spec_t spec_BalsaApp = { (meta_writer) cfg_meta_BalsaApp_writ
  */
 
 static gchar *mbname( Mailbox *mb );
-static cfg_location_t *mbloc( void );
 
 gboolean cfg_mailbox_write( Mailbox *mb, const cfg_location_t *top )
 {
@@ -686,7 +788,6 @@ gboolean cfg_mailbox_write( Mailbox *mb, const cfg_location_t *top )
 	}
 
 	cfg_location_free( down );
-	cfg_sync();
 	return ret;
 }
 
@@ -746,7 +847,7 @@ Mailbox *cfg_mailbox_read( const gchar *name, const cfg_location_t *top )
 	return mb;
 }
 
-gboolean cfg_mailbox_delete( Mailbox *mb, cfg_location_t *top )
+gboolean cfg_mailbox_delete( Mailbox *mb, const cfg_location_t *top )
 {
 	gchar *name;
 	cfg_location_t *down;
@@ -759,39 +860,70 @@ gboolean cfg_mailbox_delete( Mailbox *mb, cfg_location_t *top )
 		return TRUE;
 
 	cfg_location_free( down );
-	cfg_sync();
 	return FALSE;
+}
+
+/* **************************************** */
+
+static gboolean write_cb( const cfg_location_t *loc, gpointer user_data );
+static gboolean write_cb( const cfg_location_t *loc, gpointer user_data )
+{
+	cfg_location_t *down = cfg_location_godown( loc, mb_key );
+	gboolean ret;
+
+	ret = cfg_mailbox_write( MAILBOX( user_data ), down );
+	cfg_location_free( down );
+	return ret;
 }
 
 gboolean cfg_mailbox_write_simple( Mailbox *mb )
 {
-	cfg_location_t *loc = mbloc();
-	gboolean ret;
+	return balsa_sm_save_global_event( write_cb, mb );
+}
 
-	ret = cfg_mailbox_write( mb, loc );
-	cfg_location_free( loc );
-	return ret;
+typedef struct read_info_s {
+	const gchar *name;
+	Mailbox *result;
+} read_info;
+
+static gboolean simple_read_cb( const cfg_location_t *loc, gpointer user_data );
+static gboolean simple_read_cb( const cfg_location_t *loc, gpointer user_data )
+{
+	read_info *ri = (read_info *) user_data;
+	cfg_location_t *down = cfg_location_godown( loc, mb_key );
+
+	ri->result = cfg_mailbox_read( ri->name, down );
+	cfg_location_free( down );
+	return FALSE;
 }
 
 Mailbox *cfg_mailbox_read_simple( const gchar *name )
 {
-	cfg_location_t *loc = mbloc();
-	Mailbox *ret;
+	read_info ri;
 
-	ret = cfg_mailbox_read( name, loc );
-	cfg_location_free( loc );
+	ri.name = name;
+	if( balsa_sm_load_global_event( simple_read_cb, &ri ) )
+		return NULL;
+	return ri.result;
+}
+
+static gboolean delete_cb( const cfg_location_t *loc, gpointer user_data );
+static gboolean delete_cb( const cfg_location_t *loc, gpointer user_data )
+{
+	gboolean ret;
+	cfg_location_t *down = cfg_location_godown( loc, mb_key );
+
+	ret = cfg_mailbox_delete( MAILBOX( user_data ), down );
+	cfg_location_free( down );
 	return ret;
 }
 
 gboolean cfg_mailbox_delete_simple( Mailbox *mb )
 {
-	cfg_location_t *loc = mbloc();
-	gboolean ret;
-
-	ret = cfg_mailbox_delete( mb, loc );
-	cfg_location_free( loc );
-	return ret;
+	return balsa_sm_save_global_event( delete_cb, mb );
 }
+
+/* **************************************** */
 
 static gchar *mbname( Mailbox *mb )
 {
@@ -821,68 +953,3 @@ static gchar *mbname( Mailbox *mb )
 
 	return name;
 }
-
-static cfg_location_t *mbloc( void )
-{
-	cfg_location_t *root = cfg_get_root();
-	cfg_location_t *down = cfg_location_godown( root, "Mailboxes" );
-	cfg_location_free( root );
-	return down;
-}
-
-/* ** Global config ******************************************************* */
-
-/* Save and load all of Balsa's settings. TRUE on error, FALSE on ok. */
-
-gboolean cfg_save( void )
-{
-	cfg_location_t *root = cfg_get_root();
-	cfg_location_t *down;
-
-	down = cfg_location_godown( root, "Preferences" );
-	if( cfg_meta_BalsaApp_write( &balsa_app, down, NULL ) )
-		return TRUE;
-	cfg_location_free( down );
-
-	down = cfg_location_godown( root, "Mailboxes" );
-	if( cfg_meta_MailboxArray_write( NULL, down, NULL ) )
-		return TRUE;
-	cfg_location_free( down );
-
-	down = cfg_memory_default_root();
-	cfg_memory_write_all( down );
-	cfg_location_free( down );
-
-	cfg_sync();
-	cfg_location_free( root );
-	return FALSE;
-}
-
-gboolean cfg_load( void )
-{
-	cfg_location_t *root = cfg_get_root();
-	cfg_location_t *down;
-
-	down = cfg_location_godown( root, "Preferences" );
-	if( cfg_location_exists( down ) == FALSE ) {
-		/* Set up our default values! */
-		cfg_meta_BalsaApp_read( &balsa_app, down, NULL );
-		return TRUE;
-	}
-
-	if( cfg_meta_BalsaApp_read( &balsa_app, down, NULL ) )
-		return TRUE;
-	cfg_location_free( down );
-
-	down = cfg_location_godown( root, "Mailboxes" );
-	if( cfg_location_exists( down ) == FALSE )
-		return TRUE;
-	if( cfg_meta_MailboxArray_read( NULL, down, NULL ) )
-		return TRUE;
-	cfg_location_free( down );
-
-	cfg_location_free( root );
-	return FALSE;
-}
-
-

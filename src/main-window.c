@@ -193,7 +193,7 @@ static GnomeUIInfo file_menu[] =
 
   /* XXX 
      GNOMEUIINFO_MENU_EXIT_ITEM(close_main_window, NULL), */
-  GNOMEUIINFO_MENU_EXIT_ITEM(balsa_exit, NULL),
+  GNOMEUIINFO_MENU_EXIT_ITEM(balsa_sm_exit, NULL),
 
   GNOMEUIINFO_END
 };
@@ -565,7 +565,7 @@ balsa_window_new ()
   /* set the toolbar style */
   balsa_window_refresh(window);
 
-  if (balsa_app.check_mail_upon_startup)
+  if (balsa_state.checkmail)
     check_new_messages_cb(NULL, NULL);
 
   if(balsa_app.browse_wrap)
@@ -770,7 +770,7 @@ static void balsa_window_destroy (GtkObject     *object)
 
   /* don't try to use notebook later in empty_trash */
   balsa_app.notebook = NULL;
-  balsa_exit();
+  balsa_sm_exit();
 }
 
 /*FIXME unused

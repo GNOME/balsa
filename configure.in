@@ -100,15 +100,6 @@ AM_HDR_SIGACTION
 AM_HDR_SIGSET
 
 dnl ######################################################################################
-dnl ORBit support
-dnl Use 'failure' instead of 'dontfail' to make us bomb if no orbit. Probably should
-dnl   use 'failure'.
-dnl ######################################################################################
-
-GNOME_ORBIT_HOOK([],dontfail)
-AM_CONDITIONAL(ORBIT_INSTALLED, test -n "$ORBIT_LIBS")
-
-dnl ######################################################################################
 dnl More substitutions
 dnl ######################################################################################
 
@@ -313,7 +304,6 @@ help/Makefile
 help/C/Makefile
 libbalsa/Makefile
 libinit_balsa/Makefile
-idl/Makefile
 src/Makefile
 ])
 

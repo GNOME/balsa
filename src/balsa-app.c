@@ -46,7 +46,7 @@ static void cantfind_notice( const gchar *name );
 static void
 error_exit_cb (GtkWidget * widget, gpointer data)
 {
-  balsa_exit ();
+  balsa_sm_exit ();
 }
 
 static void
@@ -82,79 +82,10 @@ balsa_error (const char *fmt,...)
 
 
 void
-balsa_app_init (void)
+balsa_app_init( void )
 {
-  /* 
-   * initalize application structure before ALL ELSE 
-   * to some reasonable defaults
-   */
-  balsa_app.address = address_new ();
-  balsa_app.replyto = NULL;
-  balsa_app.bcc = NULL;
-
-  balsa_app.local_mail_directory = NULL;
-  balsa_app.signature_path = NULL;
-  balsa_app.sig_separator = TRUE;
-  balsa_app.smtp_server = NULL;
-
-  balsa_app.inbox = NULL;
-  balsa_app.inbox_input = NULL;
-  balsa_app.outbox = NULL;
-  balsa_app.sentbox = NULL;
-  balsa_app.draftbox = NULL;
-  balsa_app.trash = NULL;
-
-  balsa_app.mailbox_nodes = g_node_new (NULL);
-
-  balsa_app.new_messages_timer = 0;
-  balsa_app.new_messages = 0;
-
-  balsa_app.check_mail_auto = FALSE;
-  balsa_app.check_mail_timer = 0;
-
-  balsa_app.debug = FALSE;
-  balsa_app.previewpane = TRUE;
-
-  /* GUI settings */
-  balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
-  balsa_app.pwindow_option = WHILERETR;
-  balsa_app.wordwrap = TRUE;
-  balsa_app.wraplength = 79;
-  balsa_app.browse_wrap = TRUE;
-  balsa_app.shown_headers = HEADERS_SELECTED;
-  balsa_app.selected_headers = g_strdup(DEFAULT_SELECTED_HDRS);
-  balsa_app.show_mblist = TRUE;
-  balsa_app.show_notebook_tabs = FALSE;
-
-#ifdef BALSA_SHOW_INFO
-  balsa_app.mblist_show_mb_content_info = FALSE;
-#endif
-
-  balsa_app.mblist_unread_color.red = MBLIST_UNREAD_COLOR_RED;
-  balsa_app.mblist_unread_color.blue = MBLIST_UNREAD_COLOR_BLUE;
-  balsa_app.mblist_unread_color.green = MBLIST_UNREAD_COLOR_GREEN;
-
-  /* arp */
-  balsa_app.quote_str = NULL;
-
-  /* font */
-  balsa_app.message_font = NULL;
-
-  /*encoding */
-  balsa_app.encoding_style = 0;
-  balsa_app.charset = NULL;
-
-  balsa_app.checkbox = 0;
-
-  /* compose: shown headers */
-  balsa_app.compose_headers = NULL;
-
-  balsa_app.PrintCommand.breakline = FALSE;
-  balsa_app.PrintCommand.linesize = 78;
-  balsa_app.PrintCommand.PrintCommand = NULL;
-
-  /* date format */
-  balsa_app.date_string = NULL;
+	balsa_app.address = address_new();
+	balsa_app.mailbox_nodes = g_node_new (NULL);
 }
 
 gint
@@ -163,35 +94,36 @@ do_load_mailboxes (void)
 	if( check_special_mailboxes () )
 		return FALSE;
 
-  /* load_local_mailboxes does not work well without trash */
-  if (!balsa_app.trash) 
-    return FALSE;
-  load_local_mailboxes ();
+	/* load_local_mailboxes does not work well without trash */
+	if (!balsa_app.trash) 
+		return FALSE;
 
-  if (!balsa_app.inbox)
-    return FALSE;
+	load_local_mailboxes ();
 
-  switch (balsa_app.inbox->type)
-    {
-    case MAILBOX_MAILDIR:
-    case MAILBOX_MBOX:
-    case MAILBOX_MH:
-      mailbox_init (MAILBOX_LOCAL (balsa_app.inbox)->path,
-		      balsa_error,
-		      update_gui);
-      break;
+	if (!balsa_app.inbox)
+		return FALSE;
 
-    case MAILBOX_IMAP:
-      break;
+	switch (balsa_app.inbox->type)
+	{
+	case MAILBOX_MAILDIR:
+	case MAILBOX_MBOX:
+	case MAILBOX_MH:
+		mailbox_init (MAILBOX_LOCAL (balsa_app.inbox)->path,
+			      balsa_error,
+			      update_gui);
+		break;
 
-    case MAILBOX_POP3:
-      break;
-    default:
-      fprintf (stderr, "do_load_mailboxes: Unknown mailbox type\n");
-      break;
-    }
+	case MAILBOX_IMAP:
+		break;
 
-  return TRUE;
+	case MAILBOX_POP3:
+		break;
+	default:
+		fprintf (stderr, "do_load_mailboxes: Unknown mailbox type\n");
+		break;
+	}
+	
+	return TRUE;
 }
 
 static void cantfind_notice( const gchar *name )

@@ -167,11 +167,12 @@ extern struct BalsaApplication
   gchar *quote_str;
 
   /* command line options */
-
+	/* These are now part of SM!
   gint check_mail_upon_startup;
   gint open_unread_mailbox;
   gchar *open_mailbox;
   gchar* compose_email;
+	*/
 
   /* font used to display messages */
   gchar *message_font;
@@ -208,5 +209,7 @@ typedef struct BalsaFudgeColor_t
 void balsa_app_init (void);
 gint do_load_mailboxes (void);
 void update_timer( gboolean update, guint minutes );
+
+#include "sm-balsa.h"
 
 #endif /* __BALSA_APP_H__ */

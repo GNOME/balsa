@@ -20,6 +20,9 @@
 #ifndef __MAIN_H__
 #define __MAIN_H__
 
-void balsa_exit (void);
+#include "sm.h"
+
+void balsa_close_mailboxes( sm_exit_trigger_results_t *res, gpointer user_data );
+void balsa_maybe_save( sm_exit_trigger_results_t *res, gpointer user_data );
 
 #endif /* __MAIN_H__ */

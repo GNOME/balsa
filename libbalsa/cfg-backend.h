@@ -62,6 +62,11 @@ gboolean cfg_location_exists( const cfg_location_t *where );
 void cfg_location_free( cfg_location_t *where );
 
 #define cfg_sync gnome_config_sync
+#define cfg_revert gnome_config_drop_all
+
+/* Only used internally for the gnome-config subsystem */
+cfg_location_t *cfg_location_from_gnome_prefix( const gchar *prefix );
+gboolean cfg_location_discard( const cfg_location_t *loc );
 
 /* ********************************************************************** */
 

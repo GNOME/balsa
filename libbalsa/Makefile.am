@@ -37,6 +37,8 @@ libbalsa_a_SOURCES = 		\
 	mailbox_imap.c		\
 	mailbox_imap.h		\
 	send.c			\
+	sm.c			\
+	sm.h
 	threads.h		
 
 

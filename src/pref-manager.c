@@ -454,7 +454,7 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
 	balsa_app.PrintCommand.breakline =  GTK_TOGGLE_BUTTON(pui->PrintBreakline)->active;
 
 
-	balsa_app.check_mail_upon_startup = GTK_TOGGLE_BUTTON(pui->check_mail_upon_startup)->active;
+	balsa_state.checkmail = GTK_TOGGLE_BUTTON(pui->check_mail_upon_startup)->active;
 	balsa_app.empty_trash_on_exit = GTK_TOGGLE_BUTTON(pui->empty_trash)->active;
 
 	/* date format */
@@ -573,7 +573,7 @@ set_prefs (void)
 	gtk_entry_set_text(GTK_ENTRY(pui->PrintLinesize), tmp);
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->PrintBreakline), balsa_app.PrintCommand.breakline);
 
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->check_mail_upon_startup), balsa_app.check_mail_upon_startup);
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->check_mail_upon_startup), balsa_state.checkmail );
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->empty_trash), balsa_app.empty_trash_on_exit);
 
 	/* date format */

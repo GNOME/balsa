@@ -23,6 +23,7 @@
 
 #include "cfg-backend.h"
 #include "cfg-engine.h"
+#include "sm-balsa.h"
 
 /* ************************************************************************ */
 
@@ -30,6 +31,11 @@ typedef struct generic_memory_s {
 	const gchar *name;
 	GSList **list;
 } generic_memory_t;
+
+typedef struct clist_memory_s {
+	gint num_cols;
+	gint *widths;
+} clist_memory_t;
 
 /* ************************************************************************ */
 
@@ -56,8 +62,8 @@ void cfg_memory_add_to_paned( GtkWidget *paned, const cfg_location_t *root, cons
 void cfg_memory_write_all( const cfg_location_t *root );
 cfg_location_t *cfg_memory_default_root( void );
 
-void cfg_memory_clist_sync_from( GtkWidget *clist, const cfg_location_t *root );
-void cfg_memory_clist_sync_to( GtkWidget *clist, const cfg_location_t *root );
+void cfg_memory_clist_restore( GtkWidget *clist );
+void cfg_memory_clist_backup( GtkWidget *clist );
 
 /* ************************************************************************ */
 
@@ -67,10 +73,13 @@ static const gchar height_key[] = "Height";
 static const gchar col_width_format[] = "Column%dWidth";
 static const gchar col_count_key[] = "ColumnCount";
 static const gchar offset_key[] = "Offset";
+static const gchar clist_obj_key[] = "balsa-config-clist-info";
 
 static GSList *memory_windows = NULL;
 static GSList *memory_clists = NULL;
 static GSList *memory_paneds = NULL;
+
+static clist_memory_t cmem;
 
 /* ************************************************************************ */
 
@@ -152,37 +161,51 @@ void cfg_memory_add_to_paned( GtkWidget *paned, const cfg_location_t *root, cons
 void cfg_memory_write_all( const cfg_location_t *root )
 {
 	GSList *iter;
+	cfg_location_t *down;
+
+	down = cfg_location_godown( root, "UISettings" );
 
 	for( iter = memory_windows; iter; iter = iter->next )
-		generic_save( GTK_WIDGET( iter->data ), root, window_save );
+		generic_save( GTK_WIDGET( iter->data ), down, window_save );
 
 	for( iter = memory_clists; iter; iter = iter->next )
-		generic_save( GTK_WIDGET( iter->data ), root, clist_save );
+		generic_save( GTK_WIDGET( iter->data ), down, clist_save );
 
 	for( iter = memory_paneds; iter; iter = iter->next )
-		generic_save( GTK_WIDGET( iter->data ), root, paned_save );
+		generic_save( GTK_WIDGET( iter->data ), down, paned_save );
+
+	cfg_location_free( down );
 }
 
 cfg_location_t *cfg_memory_default_root( void )
 {
-	cfg_location_t *realroot, *myroot;
-
-	realroot = cfg_get_root();
-	myroot = cfg_location_godown( realroot, "UISettings" );
-	cfg_location_free( realroot );
-	return myroot;
+	return cfg_location_godown( balsa_sm_local_root, "UISettings" );
 }
 
-void cfg_memory_clist_sync_from( GtkWidget *clist, const cfg_location_t *root )
+/* **************************************** */
+
+/* Icky icky icky we really need to fix this notebook thingie */
+
+void cfg_memory_clist_restore( GtkWidget *clist )
 {
-	generic_load( clist, root, clist_load );
-	cfg_sync();
+	int i;
+
+	for( i = 0; i < cmem.num_cols; i++ )
+		gtk_clist_set_column_width( GTK_CLIST( clist ), i, cmem.widths[i] );
+
+	g_free( cmem.widths );
+	cmem.widths = NULL;
 }
 
-void cfg_memory_clist_sync_to( GtkWidget *clist, const cfg_location_t *root )
+void cfg_memory_clist_backup( GtkWidget *clist )
 {
-	generic_save( clist, root, clist_save );
-	cfg_sync();
+	int i;
+
+	cmem.num_cols = (GTK_CLIST( clist ))->columns;
+	cmem.widths = g_new0( gint, cmem.num_cols );
+
+	for( i = 0; i < cmem.num_cols; i++ )
+		cmem.widths[i] = (GTK_CLIST( clist ))->column[i].width;	
 }
 
 /* ************************************************************************ */
@@ -312,6 +335,8 @@ static void clist_save( GtkWidget *clist, const cfg_location_t *home )
 		cfg_location_put_num( home, name, (GTK_CLIST( clist ))->column[i].width );
 		g_free( name );
 	}
+
+	cfg_location_put_num( home, col_count_key, i );
 }
 
 static gboolean paned_load( GtkWidget *paned, const cfg_location_t *home )

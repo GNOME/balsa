@@ -37,8 +37,8 @@ void cfg_memory_add_to_paned( GtkPaned *paned, const cfg_location_t *root, const
 void cfg_memory_write_all( const cfg_location_t *root );
 cfg_location_t *cfg_memory_default_root( void );
 
-void cfg_memory_clist_sync_from( GtkCList *clist, const cfg_location_t *root );
-void cfg_memory_clist_sync_to( GtkCList *clist, const cfg_location_t *root );
+void cfg_memory_clist_restore( GtkWidget *clist );
+void cfg_memory_clist_backup( GtkWidget *clist );
 
 /* ************************************************************************ */
 

@@ -77,7 +77,6 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bin/balsa
 /usr/share/gnome/apps/Internet/balsa.desktop
 %{prefix}/share/gnome/help/balsa/*
-%{prefix}/share/idl/balsa.idl
 /usr/share/locale/*
 /usr/share/pixmaps/*
 /usr/share/sounds/balsa/*

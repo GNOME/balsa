@@ -32,7 +32,7 @@
 
 gboolean cfg_mailbox_write( Mailbox *mb, const cfg_location_t *top );
 Mailbox *cfg_mailbox_read( const gchar *name, const cfg_location_t *top );
-gboolean cfg_mailbox_delete( Mailbox *mb, cfg_location_t *top );
+gboolean cfg_mailbox_delete( Mailbox *mb, const cfg_location_t *top );
 
 gboolean cfg_mailbox_write_simple( Mailbox *mb );
 Mailbox *cfg_mailbox_read_simple( const gchar *name );
@@ -43,18 +43,20 @@ gboolean cfg_load( void );
 
 /* ************************************************************************ */
 
-/* Make sure we're clear of the old code. */
-
-#define config_load Choke on this
-#define config_save Choke on this
-
-#define config_mailbox_add Choke on this
-#define config_mailbox_delete Choke on this
-#define config_mailbox_update Choke on this
-#define config_mailboxes_init Choke on this
-
-#define config_global_load Choke on this
-#define config_global_save Choke on this
+extern const cfg_metatype_spec_t spec_Printing_t;
+extern const cfg_metatype_spec_t spec_GdkColor_t;
+extern const cfg_metatype_spec_t spec_Address;
+extern const cfg_metatype_spec_t spec_ServerType;
+extern const cfg_metatype_spec_t spec_NonObvious;
+extern const cfg_metatype_spec_t spec_Server;
+extern const cfg_metatype_spec_t spec_Mailbox;
+extern const cfg_metatype_spec_t spec_MailboxIMAP;
+extern const cfg_metatype_spec_t spec_MailboxPOP3;
+extern const cfg_metatype_spec_t spec_MailboxLocal;
+extern const cfg_metatype_spec_t spec_MailboxArray;
+extern const cfg_metatype_spec_t spec_BalsaApp;
+extern const cfg_metatype_spec_t spec_mblist;
+extern const cfg_metatype_spec_t spec_sm_state_t;
 
 /* ************************************************************************ */
 

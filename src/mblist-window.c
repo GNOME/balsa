@@ -141,7 +141,6 @@ GtkWidget *balsa_mailbox_list_window_new(BalsaWindow *window)
 void
 mblist_open_mailbox (Mailbox * mailbox)
 {
-	cfg_location_t *uiroot;
 	GtkWidget *page = NULL;
 	int i, c;
 
@@ -155,10 +154,7 @@ mblist_open_mailbox (Mailbox * mailbox)
 		page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),c); 
 		page = gtk_object_get_data(GTK_OBJECT(page),"indexpage"); 
 
-		uiroot = cfg_memory_default_root();
-		cfg_memory_clist_sync_to( GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), uiroot );
-		cfg_location_free( uiroot );
-		cfg_sync();
+		cfg_memory_clist_backup( GTK_WIDGET(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)) );
 
 		g_get_current_time(&BALSA_INDEX_PAGE(page)->last_use); 
 	} 
@@ -166,20 +162,15 @@ mblist_open_mailbox (Mailbox * mailbox)
 	if( mailbox->open_ref ) {
 		i = balsa_find_notebook_page_num( mailbox );
 		if( i != -1 ) {
-			uiroot = cfg_memory_default_root();
-			
 			/*c = gtk_notebook_get_current_page( GTK_NOTEBOOK( balsa_app.notebook ) );
 			page = gtk_notebook_get_nth_page( GTK_NOTEBOOK( balsa_app.notebook ), c );
 			page = gtk_object_get_data( GTK_OBJECT( page ), "indexpage" );
-			cfg_memory_clist_sync_to( GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), uiroot );
 			*/
 
 			gtk_notebook_set_page(GTK_NOTEBOOK(balsa_app.notebook),i);
 			page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),i);
 			page = gtk_object_get_data(GTK_OBJECT(page),"indexpage");
-			cfg_memory_clist_sync_from( GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), uiroot );
-			
-			cfg_location_free( uiroot );
+			cfg_memory_clist_restore( GTK_WIDGET(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)) );
 			
 			g_get_current_time(&BALSA_INDEX_PAGE(page)->last_use);
 			
@@ -199,7 +190,12 @@ mblist_open_mailbox (Mailbox * mailbox)
 #endif
 	
 	balsa_mblist_have_new (BALSA_MBLIST(mblw->ctree));
-	
+
+	c = gtk_notebook_get_current_page(GTK_NOTEBOOK(balsa_app.notebook));
+	page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),c); 
+	page = gtk_object_get_data(GTK_OBJECT(page),"indexpage"); 
+	cfg_memory_clist_restore( GTK_WIDGET(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)) );
+
 	/* I don't know what is the purpose of that code, so I put
 	 * it in comment until somebody tells me waht it  is useful 
 	 * for.      -Bertrand 

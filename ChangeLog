@@ -3,6 +3,8 @@
 	* libbalsa/: mailbox_local.c, mailbox_maildir.c, mailbox_maildir.h:
 	populate subdir strings when creating a maildir.
 	* libbalsa/mailbox.c: set validated state of iter on return.
+	* libbalsa/mailbox_imap.c: Revert the
+	libbalsa_mailbox_imap_message_match() chunk from the re-try patch.
 
 2004-08-04  Pawel Salek
 

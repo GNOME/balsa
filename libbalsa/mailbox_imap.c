@@ -1030,18 +1030,17 @@ libbalsa_mailbox_imap_message_match(LibBalsaMailbox* mailbox, guint msgno,
     LibBalsaMailboxImap *mimap;
     struct message_info *msg_info;
     GHashTable *matchings;
-    ImapMessage *imsg;
 
     mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     msg_info = message_info_from_msgno(mimap, msgno);
 
     if (msg_info->message)
         g_object_ref(msg_info->message);
-    else {
-        imsg = mi_get_imsg(mimap, msgno);
-        if (imsg && imsg->envelope)
+    else if (imap_mbox_handle_get_msg(mimap->handle, msgno)
+             && imap_mbox_handle_get_msg(mimap->handle, msgno)->envelope)
+        /* The backend has already downloaded the data, we can just
+        * convert it to LibBalsaMessage. */
         libbalsa_mailbox_imap_get_message(mailbox, msgno);
-    }
     if (msg_info->message) {
         if (libbalsa_condition_can_match(search_iter->condition,
                                          msg_info->message)) {
@@ -1624,6 +1623,7 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
     return TRUE;
 }
 
+/* converts the backend data to LibBalsaMessage object */
 static LibBalsaMessage*
 libbalsa_mailbox_imap_get_message(LibBalsaMailbox * mailbox, guint msgno)
 {

@@ -1302,6 +1302,61 @@ get_mailbox_names(GList *list, GList *address_list)
 }
 #endif
 
+/* Check whether a file is all ascii or utf-8, and return charset
+ * accordingly (NULL if it's neither).
+ */
+static const gchar *
+lbs_file_get_charset(const gchar * filename)
+{
+    FILE *fp;
+    gchar buf[80];
+    gchar *new_chars = buf;
+    gboolean is_ascii = TRUE;
+    gboolean is_utf8 = TRUE;
+
+    fp = fopen(filename, "r");
+    if (!fp)
+	return NULL;
+
+    while (fgets(new_chars, (sizeof buf) - (new_chars - buf), fp)) {
+	gchar *p;
+	gunichar c = 0;
+
+	if (is_ascii) {
+	    for (p = new_chars; *p; p++) {
+		if (*p & 0x80) {
+		    is_ascii = FALSE;
+		    break;
+		}
+	    }
+	}
+
+	for (p = buf; p < buf + sizeof buf && *p; p = g_utf8_next_char(p)) {
+	    c = g_utf8_get_char_validated(p, -1);
+	    if (c >= (gunichar) (-2))
+		break;
+	}
+
+	if (c == (gunichar) (-1)) {
+	    is_utf8 = FALSE;
+	    break;
+	}
+
+	/* copy any remaining bytes, including the terminating '\0', to
+	 * start of buffer */
+	for (new_chars = buf; (*new_chars = *p++) != '\0'; new_chars++)
+	    /* Nothing. */ ;
+    }
+
+    fclose(fp);
+
+    if (is_ascii)
+	return "us-ascii";
+    else if (is_utf8)
+	return "utf-8";
+    else
+	return NULL;
+}
 
 static LibBalsaMsgCreateResult
 libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
@@ -1348,8 +1403,8 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 					"Note: this is _not_ the real body!\n",
 					34);
 	    } else {
+		const gchar *charset = NULL;
 		GMimeStream *stream;
-		GMimePartEncodingType encoding;
 		GMimeDataWrapper *content;
 		int fd;
 
@@ -1359,6 +1414,23 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 		    g_free(mt);
 		} else
 		    mime_type = g_strsplit(body->mime_type, "/", 2);
+
+		if (!strcasecmp(mime_type[0], "text")) {
+		    charset = lbs_file_get_charset(body->filename);
+		    if (!charset) {
+			static const gchar default_type[] =
+			    "application/octet-stream";
+
+			libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+					     _("Cannot determine charset "
+					       "for text file `%s'; "
+					       "sending as mime type `%s'"),
+					     body->filename, default_type);
+			g_strfreev(mime_type);
+			mime_type = g_strsplit(default_type, "/", 2);
+		    }
+		}
+
 		/* use BASE64 encoding for non-text mime types 
 		   use 8BIT for message */
 		mime_part=g_mime_part_new_with_type(mime_type[0], mime_type[1]);
@@ -1371,8 +1443,11 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 		{
 		    g_mime_part_set_encoding(mime_part, GMIME_PART_ENCODING_BASE64);
 		} else {
-		    /* is text, force unknown-8bit here. FIXME! PLEASE! */
-		    g_mime_object_set_content_type_parameter(GMIME_OBJECT(mime_part), "charset", "unknown-8bit");
+		    /* is text */
+		    g_mime_object_set_content_type_parameter(GMIME_OBJECT
+							     (mime_part),
+							     "charset",
+							     charset);
 		}
 		g_strfreev(mime_type);
 
@@ -1380,7 +1455,6 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 		g_mime_part_set_filename(mime_part, tmp);
 		g_free(tmp);
 
-		encoding = g_mime_part_get_encoding(mime_part);
 		fd = open(body->filename, O_RDONLY);
 		stream = g_mime_stream_fs_new(fd);
 		content = g_mime_data_wrapper_new_with_stream(stream,
@@ -1504,12 +1578,20 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
     }
     message_add_references(message, mime_message);
 
-    if (message->headers->from)
-	g_mime_message_set_sender(mime_message,
-			libbalsa_address_to_gchar(message->headers->from, -1));
-    if (message->headers->reply_to)
-	g_mime_message_set_reply_to(mime_message,
-			libbalsa_address_to_gchar(message->headers->reply_to, -1));
+    if (message->headers->from) {
+	tmp = libbalsa_address_to_gchar(message->headers->from, -1);
+	if (tmp) {
+	    g_mime_message_set_sender(mime_message, tmp);
+	    g_free(tmp);
+	}
+    }
+    if (message->headers->reply_to) {
+	tmp = libbalsa_address_to_gchar(message->headers->reply_to, -1);
+	if (tmp) {
+	    g_mime_message_set_reply_to(mime_message, tmp);
+	    g_free(tmp);
+	}
+    }
 
     if (LIBBALSA_MESSAGE_GET_SUBJECT(message))
 	g_mime_message_set_subject(mime_message,
@@ -1533,8 +1615,12 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
     g_free(tmp);
 
     if (message->headers->dispnotify_to) {
-	g_mime_message_add_header(mime_message, "Disposition-Notification-To",
-			libbalsa_address_to_gchar(message->headers->dispnotify_to, 0));
+	tmp = libbalsa_address_to_gchar(message->headers->dispnotify_to, 0);
+	if (tmp) {
+	    g_mime_message_add_header(mime_message,
+				      "Disposition-Notification-To", tmp);
+	    g_free(tmp);
+	}
     }
 
     for (list = message->headers->user_hdrs; list; list = g_list_next(list)) {

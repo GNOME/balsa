@@ -1,3 +1,11 @@
+* Balsa-1.1.0 development release. Release date 2001-01-22
+
+- aliases support improved A LOT.
+- DnD support. don't stress it too much, it sometimes crashes unexpectedly.
+- sends Disposition Notification requests.
+- give a choice to prepend or append the signature.
+- lot of internal mailbox node restructure and bug fixes.
+
 * Balsa-1.0.pre2 test release. Release date 2000-10-06.
 
 This is a second official pre-release. No new features, only bugs have

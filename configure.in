@@ -1,20 +1,20 @@
-dnl ######################################################################################
+dnl ###########################################################################
 dnl Startup
-dnl ######################################################################################
+dnl ###########################################################################
 
 AC_INIT(src/main.c)
 AM_CONFIG_HEADER(config.h)
 
-dnl ######################################################################################
+dnl ###########################################################################
 dnl Versioning
 dnl   BALSA_VERSION is what we use, except when we want...
-dnl   BALSA_SHORT_VERSION, which doesn't have the release appended. For RPM, which
-dnl                        keeps the release as a separate field
-dnl ######################################################################################
+dnl   BALSA_SHORT_VERSION, which doesn't have the release appended. 
+dnl   For RPM, which keeps the release as a separate field
+dnl ###########################################################################
 
 BALSA_MAJOR=1
-BALSA_REVISION=0
-BALSA_PATCHLEVEL=1
+BALSA_REVISION=1
+BALSA_PATCHLEVEL=0
 BALSA_RELEASE=1
 use_release=no
 

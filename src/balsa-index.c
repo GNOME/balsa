@@ -1355,9 +1355,15 @@ bndx_set_parent_style(BalsaIndex * index, GtkTreeIter * iter)
     GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(index));
     GtkTreeIter parent_iter;
     GtkTreePath *path = gtk_tree_model_get_path(model, iter);
+    gboolean first_parent = TRUE;
 
     while (gtk_tree_model_iter_parent(model, &parent_iter, iter)) {
         gtk_tree_path_up(path);
+	if (first_parent) {
+	    if (balsa_app.expand_tree)
+		gtk_tree_view_expand_row(GTK_TREE_VIEW(index), path, FALSE);
+	    first_parent = FALSE;
+	}
 	bndx_set_style(index, path, &parent_iter);
         *iter = parent_iter;
     }

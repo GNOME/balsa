@@ -535,6 +535,12 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 
     send_lock();
 
+    libbalsa_mailbox_open(outbox);
+    if (!outbox->message_list) {
+	libbalsa_mailbox_close(outbox);
+	send_unlock();
+	return TRUE;
+    }
     /* We create here the progress bar */
     ensure_send_progress_dialog();
 
@@ -557,7 +563,6 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
        succeed before transferring a message.  */
     smtp_option_require_all_recipients (session, 1);
 
-    libbalsa_mailbox_open(outbox);
     for (lista = outbox->message_list; lista; lista = lista->next) {
 	msg = LIBBALSA_MESSAGE(lista->data);
 
@@ -910,32 +915,37 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 #endif
 
     ensure_send_progress_dialog();
-    if (sending_threads==0) {
-	libbalsa_mailbox_open(outbox);
-	lista = outbox->message_list;
-	
-	mqi = message_queue;
-	while (lista != NULL) {
-	    queu = LIBBALSA_MESSAGE(lista->data);
-	    
-	    new_message = msg_queue_item_new(queu);
-	    if (!libbalsa_create_msg(queu, new_message->message,
-				     new_message->tempfile, 
-				     encoding, flow, 1)) {
-		msg_queue_item_destroy(new_message);
-	    } else {
-		if (mqi)
-		    mqi->next_message = new_message;
-		else
-		    message_queue = new_message;
-
-		mqi = new_message;
-	    }
-	    lista = lista->next;
-	}
+    libbalsa_mailbox_open(outbox);
+    lista = outbox->message_list;
+    if (!lista) {
+	libbalsa_mailbox_close(outbox);
+	sending_threads--;
+	send_unlock();
+	return TRUE;
     }
-    send_message_info=send_message_info_new(outbox);
+	
+    mqi = message_queue;
+    while (lista != NULL) {
+	queu = LIBBALSA_MESSAGE(lista->data);
+	
+	new_message = msg_queue_item_new(queu);
+	if (!libbalsa_create_msg(queu, new_message->message,
+				 new_message->tempfile, 
+				 encoding, flow, 1)) {
+	    msg_queue_item_destroy(new_message);
+	} else {
+	    if (mqi)
+		mqi->next_message = new_message;
+	    else
+		message_queue = new_message;
+	    
+	    mqi = new_message;
+	}
+	lista = lista->next;
+    }
 
+    send_message_info=send_message_info_new(outbox);
+    
 #ifdef BALSA_USE_THREADS
     
     pthread_create(&send_mail, NULL,
@@ -945,9 +955,9 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
      * reclaimed as soon as the thread exits
      */
     pthread_detach(send_mail);
-
+    
 #else				/*non-threaded code */
-
+    
     balsa_send_message_real(send_message_info);
 #endif
     send_unlock();

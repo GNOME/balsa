@@ -1,3 +1,7 @@
+2003-02-18  Emmanuel <e.allaud@wanadoo.fr>
+
+	* libalsa/send.c: fix --without-estmp (bug 106377).
+
 2003-02-17  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-mblist.c: set-unread-message-flags must be handled idle.

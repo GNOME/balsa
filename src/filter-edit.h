@@ -42,8 +42,17 @@
 typedef struct _option_list {
     gchar *text;
     gint value;
+#if !GTK_CHECK_VERSION(2, 4, 0)
     GtkWidget *widget;
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 } option_list;
+
+#if GTK_CHECK_VERSION(2, 4, 0)
+struct fe_combo_box_info {
+    GSList *values;
+};
+#define BALSA_FE_COMBO_BOX_INFO "balsa-fe-combo-box-info"
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
 /* destroy calback */
 void fe_destroy_window_cb(GtkWidget *,gpointer);

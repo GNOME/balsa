@@ -143,9 +143,13 @@ static GnomeUIInfo message_menu[] =
   GNOMEUIINFO_END
 };
 
+static GnomeUIInfo open_mailboxes[] =
+{
+  GNOMEUIINFO_END
+};
+
 static GnomeUIInfo mailbox_menu[] =
 {
-    /* C */
 #if 0
   {
     GNOME_APP_UI_ITEM, N_ ("List"), NULL, mblist_window_cb, NULL,
@@ -156,6 +160,7 @@ static GnomeUIInfo mailbox_menu[] =
 			  mblist_menu_open_cb, GNOME_STOCK_MENU_PROP),
   GNOMEUIINFO_ITEM_STOCK (N_ ("_Close"), N_("Close the selected mailbox"),
 			  mblist_menu_close_cb, GNOME_STOCK_MENU_PROP),
+  GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_ITEM_STOCK (N_ ("_Add"), N_("Add a new mailbox"),
 			  mblist_menu_add_cb, GNOME_STOCK_MENU_PROP),
   GNOMEUIINFO_ITEM_STOCK (N_ ("_Edit"), N_("Edit the selected mailbox"),
@@ -165,11 +170,10 @@ static GnomeUIInfo mailbox_menu[] =
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_ITEM_STOCK (N_ ("C_lose current"), N_("Close the currently opened mailbox"),
 			  mailbox_close_child, GNOME_STOCK_MENU_CLOSE),
-
   GNOMEUIINFO_ITEM_STOCK (N_ ("Co_mmit current"), N_("Commit the changes in the currently opened mailbox"),
 			  mailbox_commit_changes, GNOME_STOCK_MENU_REFRESH),
-
   GNOMEUIINFO_SEPARATOR,
+  GNOMEUIINFO_SUBTREE (N_("O_pened"), open_mailboxes),
   GNOMEUIINFO_END
 };
 static GnomeUIInfo settings_menu[] =
@@ -284,7 +288,7 @@ main_window_init (void)
   /* meubar and toolbar */
   gtk_signal_connect (GTK_OBJECT (mdi), "child_changed", GTK_SIGNAL_FUNC (index_child_changed), NULL);
   gtk_signal_connect (GTK_OBJECT (mdi), "app_created", GTK_SIGNAL_FUNC (app_created), NULL);
-  gnome_mdi_set_child_list_path (mdi, _ ("Mailboxes/<Separator>"));
+  gnome_mdi_set_child_list_path (mdi, _ ("Mailboxes/Opened/"));
 
   gnome_mdi_set_menubar_template (mdi, main_menu);
   gnome_mdi_set_toolbar_template (mdi, main_toolbar);
@@ -387,7 +391,6 @@ show_about_box (void)
     "Jay Painter <jpaint@gimp.org>",
     NULL
   };
-  gchar *logo;
 
 
   /* only show one about box at a time */
@@ -396,14 +399,12 @@ show_about_box (void)
   else
     about_box_visible = TRUE;
 
-  logo = gnome_unconditional_pixmap_file ("balsa/balsa_logo.png");
   about = gnome_about_new ("Balsa",
 			   BALSA_VERSION,
-			   "Copyright (C) 1997-99",
+			   _ ("Copyright (C) 1997-1999"),
 			   authors,
-			   _ ("The Balsa email client is part of the GNOME desktop environment.  Information on Balsa can be found at http://www.balsa.net/\n\nIf you need to report bugs, please do so at: http://www.gnome.org/cgi-bin/bugs"),
-			   logo);
-  g_free (logo);
+			   _ ("The Balsa email client is part of the GNOME desktop environment.  Information on Balsa can be found at http://www.balsa.net/\n\nIf you need to report bugs, please do so at: http://bugs.gnome.org/"),
+			   "balsa/balsa_logo.png");
 
   gtk_signal_connect (GTK_OBJECT (about),
 		      "destroy",

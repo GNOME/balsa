@@ -5,12 +5,13 @@
 #
 # Copyright (C) 2000 Free Software Foundation
 # Pablo Saratxaga <pablo@mandrakesoft.com> 2000,2003
+# Pablo Saratxaga <pablo@walon.org>, 2003.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 1.2.3\n"
-"POT-Creation-Date: 2003-03-15 17:07+0100\n"
-"PO-Revision-Date: 2000-08-15 17:37+0100\n"
+"POT-Creation-Date: 2003-07-07 03:52+0200\n"
+"PO-Revision-Date: 2003-07-07 11:39+0200\n"
 "Last-Translator: Pablo Saratxaga <pablo@mandrakesoft.com>\n"
 "Language-Team: walon <linux-wa@chanae.alphanet.ch>\n"
 "MIME-Version: 1.0\n"
@@ -18,45 +19,45 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. The externq database doesn't support Id's, sorry!
-#: libbalsa/address-book-extern.c:242 libbalsa/address-book-ldap.c:423
+#: libbalsa/address-book-extern.c:242 libbalsa/address-book-ldap.c:375
 #: libbalsa/address-book-ldif.c:405 libbalsa/address-book-vcard.c:272
 msgid "No-Id"
-msgstr "Sin-identifiant"
+msgstr "Sins-identifiant"
 
-#: libbalsa/address-book-extern.c:246 libbalsa/address-book-ldap.c:427
-#: libbalsa/address-book-ldif.c:408 libbalsa/address-book-ldif.c:637
-#: libbalsa/address-book-ldif.c:674 libbalsa/address-book-ldif.c:678
+#: libbalsa/address-book-extern.c:246 libbalsa/address-book-ldap.c:379
+#: libbalsa/address-book-ldif.c:408 libbalsa/address-book-ldif.c:640
+#: libbalsa/address-book-ldif.c:677 libbalsa/address-book-ldif.c:681
 #: libbalsa/address-book-vcard.c:290
 msgid "No-Name"
-msgstr "Sin-no"
+msgstr "Sins-no"
 
-#: libbalsa/address-book-ldap.c:224
+#: libbalsa/address-book-ldap.c:220
 msgid ""
 "Failed to initialise LDAP server.\n"
 "Check that the servername is valid."
 msgstr ""
 
-#: libbalsa/address-book-ldap.c:237
+#: libbalsa/address-book-ldap.c:233
 msgid "Couldn't set protocol version to LDAPv3."
 msgstr ""
 
-#: libbalsa/address-book-ldap.c:245
+#: libbalsa/address-book-ldap.c:241
 #, c-format
 msgid "Couldn't enable TLS on the LDAP connection: %s"
 msgstr ""
 
-#: libbalsa/address-book-ldap.c:254
+#: libbalsa/address-book-ldap.c:250
 msgid "TLS requested but TLS support not compiled in."
 msgstr ""
 
-#: libbalsa/address-book-ldap.c:265
+#: libbalsa/address-book-ldap.c:261
 #, c-format
 msgid ""
 "Failed to bind to server: %s\n"
 "Check that the server name is valid."
 msgstr ""
 
-#: libbalsa/address-book-ldap.c:650
+#: libbalsa/address-book-ldap.c:599
 #, c-format
 msgid "Failed to do a search: %s.Check that the base name is valid."
 msgstr ""
@@ -75,15 +76,15 @@ msgstr "Dji n' sai scrire e l' calpin d' adresses"
 
 #: libbalsa/address-book.c:335
 msgid "Cannot connect to server"
-msgstr "Dji n' sai m' raloyî å sierveu IMAP"
+msgstr "Dji n' sai m' raloyî å sierveu"
 
 #: libbalsa/address-book.c:336
 msgid "Cannot search in the address book"
-msgstr "Dji n' sai cweru e l' calpin d' adresses"
+msgstr "Dji n' sai cweri e l' calpin d' adresses"
 
 #: libbalsa/address-book.c:338
 msgid "Cannot add duplicate entry"
-msgstr ""
+msgstr "Dji n' såreu radjouter ene intrêye e dobe"
 
 #: libbalsa/address-book.c:339
 msgid "Unknown error"
@@ -95,7 +96,7 @@ msgstr ""
 
 #: libbalsa/filter-error.c:47
 msgid "Unable to allocate memory"
-msgstr ""
+msgstr "Dji n' sai alower del memwere"
 
 #: libbalsa/filter-error.c:48
 msgid "Error in regular expression syntax"
@@ -105,157 +106,161 @@ msgstr ""
 msgid "Attempt to apply an invalid filter"
 msgstr ""
 
-#: libbalsa/filter-file.c:434
+#: libbalsa/filter-file.c:440
 #, c-format
 msgid "Invalid filters %s for mailbox %s"
-msgstr ""
+msgstr "Passetes nén valides %s pol boesse %s"
 
-#: libbalsa/filter.c:201 libbalsa/filter.c:277
+#: libbalsa/filter.c:203 libbalsa/filter.c:280
 msgid "Unable to load message body to match filter"
 msgstr ""
 
-#: libbalsa/filter.c:474
+#: libbalsa/filter.c:480
 #, c-format
 msgid "Invalid filter: %s"
 msgstr "Passete nén valide: %s"
 
-#: libbalsa/filter.c:557 libbalsa/filter.c:576
+#: libbalsa/filter.c:594 libbalsa/filter.c:613
 #, c-format
 msgid "Bad mailbox name for filter: %s"
-msgstr ""
+msgstr "Måva no d' boesse ås emiles pol passete: %s"
 
-#: libbalsa/filter.c:561
+#: libbalsa/filter.c:598
 msgid "Error when copying messages"
 msgstr "Åk n' a nén stî tot copiant les messaedjes"
 
-#: libbalsa/filter.c:569
+#: libbalsa/filter.c:606
 msgid "Error when trashing messages"
-msgstr "Åk n' a nén stô tot-z evoyant les messaedjes å batch"
+msgstr "Åk n' a nén stî tot-z evoyant les messaedjes å batch"
 
-#: libbalsa/filter.c:580
+#: libbalsa/filter.c:617
 msgid "Error when moving messages"
 msgstr "Åk n' a nén stî tot bodjant les messaedjes"
 
 #. should "re" be localized ?
 #: libbalsa/identity.c:88 src/balsa-index-threading.c:547
-#: src/balsa-index-threading.c:549 src/sendmsg-window.c:2312
-#: src/sendmsg-window.c:2313
+#: src/balsa-index-threading.c:549 src/sendmsg-window.c:2285
+#: src/sendmsg-window.c:2286
 msgid "Re:"
-msgstr ""
+msgstr "Re:"
 
-#: libbalsa/identity.c:89 src/sendmsg-window.c:2341 src/sendmsg-window.c:2342
+#: libbalsa/identity.c:89 src/sendmsg-window.c:2315 src/sendmsg-window.c:2316
 msgid "Fwd:"
 msgstr ""
 
-#: libbalsa/identity.c:130
+#: libbalsa/identity.c:134
 msgid "New Identity"
-msgstr "Novele idintisté"
+msgstr "Novele idintité"
 
-#: libbalsa/identity.c:365
+#: libbalsa/identity.c:387
 msgid "Current"
 msgstr "Do moumint"
 
-#: libbalsa/identity.c:568
+#: libbalsa/identity.c:595
 msgid "Default"
 msgstr "Prémetou"
 
-#: libbalsa/identity.c:741
+#: libbalsa/identity.c:774
 msgid "_Identity Name:"
-msgstr "No del _idintisté:"
+msgstr "No del _idintité:"
 
-#: libbalsa/identity.c:743
+#: libbalsa/identity.c:776
 msgid "_Full Name:"
 msgstr "No en _etir:"
 
-#: libbalsa/identity.c:745
+#: libbalsa/identity.c:778
 msgid "_Mailing Address:"
 msgstr "Adresse _emile:"
 
-#: libbalsa/identity.c:747
+#: libbalsa/identity.c:780
 msgid "Reply _To:"
 msgstr "_Risponde a:"
 
-#: libbalsa/identity.c:749
+#: libbalsa/identity.c:782
 msgid "_Domain:"
 msgstr "_Dominne:"
 
-#: libbalsa/identity.c:751
+#: libbalsa/identity.c:784
 msgid "_Bcc:"
 msgstr "_Bcc:"
 
-#: libbalsa/identity.c:753
+#: libbalsa/identity.c:786
 msgid "Reply _String:"
 msgstr "_Tchinne po les responses:"
 
-#: libbalsa/identity.c:755
-#, fuzzy
+#: libbalsa/identity.c:788
 msgid "F_orward String:"
-msgstr "Dji tchedje..."
+msgstr ""
 
-#: libbalsa/identity.c:757
+#: libbalsa/identity.c:790
 msgid "Signature _Path:"
 msgstr "_Tchimin pol sinateure:"
 
-#: libbalsa/identity.c:761
+#: libbalsa/identity.c:794
 msgid "_Execute Signature"
 msgstr "_Enonder li sinateure"
 
-#: libbalsa/identity.c:764
-#, fuzzy
+#: libbalsa/identity.c:797
 msgid "Incl_ude Signature"
-msgstr "Enonder li sinateure"
+msgstr ""
 
-#: libbalsa/identity.c:767
+#: libbalsa/identity.c:800
 msgid "Include Signature When For_warding"
 msgstr ""
 
-#: libbalsa/identity.c:770
+#: libbalsa/identity.c:803
 msgid "Include Signature When Rep_lying"
 msgstr ""
 
-#: libbalsa/identity.c:773
-#, fuzzy
+#: libbalsa/identity.c:806
 msgid "_Add Signature Separator"
-msgstr "Tchimin pol sinateure:"
+msgstr "_Radjouter li separateu di sinateure"
 
-#: libbalsa/identity.c:776
-#, fuzzy
+#: libbalsa/identity.c:809
 msgid "Prepend Si_gnature"
-msgstr "Mete li sinateure al copete"
+msgstr "Mete li sinateure al _copete"
 
-#: libbalsa/identity.c:907
+#: libbalsa/identity.c:814
+msgid "GPG sign by default"
+msgstr "Siner avou GPG come prémetowe dujhance"
+
+#: libbalsa/identity.c:820
+msgid "GPG encrypt by default"
+msgstr "Ecripter avou GPG come prémetowe dujhance"
+
+#: libbalsa/identity.c:967
 msgid "Error: The identity does not have a name"
-msgstr ""
+msgstr "Aroke: L' idintité n' a pont d' no"
 
-#: libbalsa/identity.c:917
+#: libbalsa/identity.c:977
 msgid "Error: An identity with that name already exists"
-msgstr ""
+msgstr "Aroke: Ene idintité avou ç' no la egzistêye dedja"
 
-#: libbalsa/identity.c:1069
+#: libbalsa/identity.c:1134
 msgid "Do you really want to delete the selected identity?"
-msgstr ""
+msgstr "Voloz vs po do bon disfacer li tchoezeye idintité?"
 
-#: libbalsa/identity.c:1102
+#: libbalsa/identity.c:1167
 #, c-format
 msgid "Error displaying help for identities: %s\n"
-msgstr ""
+msgstr "Åk n' a nén stî tot håynant l' aidance po ls idintités: %s\n"
 
-#: libbalsa/identity.c:1129
+#: libbalsa/identity.c:1191
 msgid "Manage Identities"
-msgstr "Manaedjî les idintistés"
+msgstr "Manaedjî les idintités"
 
 #: libbalsa/libbalsa.c:85 libmutt/mutt_socket.c:489
 msgid "unknown error"
 msgstr "aroke nén cnoxhowe"
 
 #: libbalsa/libbalsa.c:398
-#, fuzzy, c-format
+#, c-format
 msgid "LDAP Directory for %s"
-msgstr "Ridant: %s\n"
+msgstr "Botin LDAP po: %s"
 
 #: libbalsa/libbalsa.c:505
 msgid "<b>This certificate belongs to:</b>\n"
-msgstr "<b>Ciste acertineure apartént a:</b>\n"
+msgstr "<b>Ciste acertineure apårtént a:</b>\n"
 
 #: libbalsa/libbalsa.c:513
 msgid ""
@@ -265,7 +270,7 @@ msgstr ""
 "\n"
 "<b>Ciste acertineure a stî fwaite pa:</b>\n"
 
-#: libbalsa/libbalsa.c:522
+#: libbalsa/libbalsa.c:523
 #, c-format
 msgid ""
 "<b>This certificate is valid</b>\n"
@@ -278,22 +283,21 @@ msgstr ""
 "å %s\n"
 "<b>Arote del clé:</b> %s"
 
-#: libbalsa/libbalsa.c:531
+#: libbalsa/libbalsa.c:533
 msgid "IMAP TLS certificate"
 msgstr ""
 
-#: libbalsa/libbalsa.c:533
+#: libbalsa/libbalsa.c:535
 msgid "_Accept Once"
 msgstr ""
 
-#: libbalsa/libbalsa.c:534
+#: libbalsa/libbalsa.c:536
 msgid "Accept&_Save"
 msgstr ""
 
-#: libbalsa/libbalsa.c:535
-#, fuzzy
+#: libbalsa/libbalsa.c:537
 msgid "_Reject"
-msgstr "_Sudjet"
+msgstr ""
 
 #. Non-threaded locking mechanism
 #: libbalsa/libbalsa_private.h:105 libbalsa/libbalsa_private.h:117
@@ -306,27 +310,47 @@ msgstr ""
 msgid "*** ERROR: Mailbox Stream Closed: %s ***\n"
 msgstr ""
 
-#: libbalsa/mailbox.c:384
+#: libbalsa/mailbox.c:403
 #, c-format
 msgid "Cannot load mailbox %s"
 msgstr "Dji n' pou tcherdjî li boesse ås emiles %s"
 
-#: libbalsa/mailbox.c:391
+#: libbalsa/mailbox.c:410
 #, c-format
 msgid "No such mailbox type: %s"
 msgstr "I gn a pont di boesse ås emiles di cisse sôre: %s"
 
-#: libbalsa/mailbox.c:408
+#: libbalsa/mailbox.c:427
+#, c-format
+msgid "Bad local mailbox path \"%s\""
+msgstr "Måva tchmin «%s» po ene boesse locåle"
+
+#: libbalsa/mailbox.c:432
 #, c-format
 msgid "Could not create a mailbox of type %s"
 msgstr "Dji n' a savou fé ene boesse ås emiles del sôre %s"
 
-#: libbalsa/mailbox_imap.c:656
+#: libbalsa/mailbox_imap.c:623 libbalsa/mailbox_imap.c:1022
+#, c-format
+msgid ""
+"IMAP SEARCH command failed for mailbox %s\n"
+"or query was incompatible with IMAP (perhaps you use regular expressions)\n"
+"falling back to default searching method"
+msgstr ""
+
+#: libbalsa/mailbox_imap.c:700
 #, c-format
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxImap: Dji droveye %s Conteu di referinces: %d\n"
 
-#: libbalsa/mailbox_local.c:267
+#: libbalsa/mailbox_imap.c:889
+#, c-format
+msgid ""
+"IMAP SEARCH command failed for mailbox %s\n"
+"falling back to default searching method"
+msgstr ""
+
+#: libbalsa/mailbox_local.c:265
 #, c-format
 msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxLocal: dji droveye %s Conteu di referinces: %d\n"
@@ -334,7 +358,7 @@ msgstr "LibBalsaMailboxLocal: dji droveye %s Conteu di referinces: %d\n"
 #: libbalsa/mailbox_maildir.c:115
 #, c-format
 msgid "Mailbox %s does not appear to be a Maildir mailbox."
-msgstr "Li boesse ås emiles %s sonle nén esse ene boesse del sôre Maildir."
+msgstr "Li boesse ås emiles %s shonne nén esse ene boesse del sôre Maildir."
 
 #: libbalsa/mailbox_maildir.c:124
 #, c-format
@@ -422,20 +446,31 @@ msgid ""
 "Messages are left in %s\n"
 msgstr ""
 
-#: libbalsa/message.c:429
+#: libbalsa/message.c:461
 #, c-format
 msgid "Source mailbox (%s) is readonly. Cannot move messages"
 msgstr ""
 
-#: libbalsa/message.c:438 libbalsa/message.c:550
+#: libbalsa/message.c:470 libbalsa/message.c:582
 #, c-format
 msgid "Couldn't open destination mailbox (%s) for writing"
 msgstr "Dji n' a savou drovi li boesse di destinåcion (%s) po scrire"
 
-#: libbalsa/message.c:489
+#: libbalsa/message.c:521
 #, c-format
 msgid "Couldn't open destination mailbox (%s) for copying"
 msgstr "Dji n' a savou drovi li boesse di destinåcion (%s) po copyî"
+
+#: libbalsa/message.c:1157
+msgid "(No subject)"
+msgstr "(Nou sudjet)"
+
+#: libbalsa/mime.c:85 libbalsa/rfc3156.c:64
+msgid ""
+"\n"
+"--\n"
+"This is an OpenPGP signed message part:\n"
+msgstr ""
 
 #: libbalsa/pop3.c:57
 msgid "connection error"
@@ -454,23 +489,20 @@ msgid "Could not run the delivery program (procmail)"
 msgstr ""
 
 #: libbalsa/pop3.c:61
-#, fuzzy
 msgid "Could not open mailbox for spooling"
-msgstr "Dji n' a savou drovi l' boesse!"
+msgstr ""
 
 #: libbalsa/pop3.c:62
-#, fuzzy
 msgid "Could not append message"
-msgstr "Dji n' a savou drovi l' fitchî.\n"
+msgstr ""
 
 #: libbalsa/pop3.c:63
 msgid "Host not found"
 msgstr "Lodjoe nén trové"
 
 #: libbalsa/pop3.c:64
-#, fuzzy
 msgid "Connection refused"
-msgstr "Continuwer"
+msgstr ""
 
 #: libbalsa/pop3.c:65
 msgid "Authentication failed"
@@ -486,11 +518,370 @@ msgstr ""
 msgid "Received %d bytes of %d"
 msgstr "Riçuvous %d octets so %d"
 
+#: libbalsa/rfc3156.c:167
+#, c-format
+msgid ""
+"\n"
+"Signed by: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:171
+#, c-format
+msgid "Mail address: %s"
+msgstr "Adresse emile: %s"
+
+#: libbalsa/rfc3156.c:173
+#, c-format
+msgid ""
+"\n"
+"Validity: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:175
+#, c-format
+msgid ""
+"\n"
+"Owner trust: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:178
+#, c-format
+msgid ""
+"\n"
+"Key fingerprint: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:183
+#, c-format
+msgid ""
+"\n"
+"Key created on: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:188
+#, c-format
+msgid ""
+"\n"
+"Signed on: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:329 libbalsa/rfc3156.c:348 libbalsa/rfc3156.c:560
+#, c-format
+msgid "gpgme could not get data from mailbox file: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:361 libbalsa/rfc3156.c:953
+#, c-format
+msgid "gpgme signature verification failed: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:545 libbalsa/rfc3156.c:814 libbalsa/rfc3156.c:916
+#: libbalsa/rfc3156.c:1036 libbalsa/rfc3156.c:1151 libbalsa/rfc3156.c:2289
+#: libbalsa/rfc3156.c:2380
+#, c-format
+msgid "could not create gpgme context: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:551
+msgid "Enter passphrase to decrypt message"
+msgstr ""
+
+#: libbalsa/rfc3156.c:570 libbalsa/rfc3156.c:844 libbalsa/rfc3156.c:943
+#: libbalsa/rfc3156.c:1076 libbalsa/rfc3156.c:1169
+#, c-format
+msgid "gpgme could not create new data object: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:581
+#, c-format
+msgid "gpgme decryption failed: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:595
+#, c-format
+msgid "could not get gpgme decrypted data: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:726
+msgid "The signature is valid."
+msgstr "Li sinateure est valide."
+
+#: libbalsa/rfc3156.c:728
+msgid "The signature is valid but expired."
+msgstr ""
+
+#: libbalsa/rfc3156.c:730
+msgid "The signature is valid but the key used to verify the signature has expired."
+msgstr ""
+
+#: libbalsa/rfc3156.c:732
+msgid "The signature is invalid."
+msgstr "Li sinateure n' est nén valide."
+
+#: libbalsa/rfc3156.c:734
+msgid "The signature could not be verified due to a missing key."
+msgstr "Li sinateure n' a nén polou esse verifieye, la k' i manke ene clé."
+
+#: libbalsa/rfc3156.c:736
+msgid "This part is not a real PGP signature."
+msgstr "Cisse pårteye chal n' est nén ene vraiye sinateure GPG."
+
+#: libbalsa/rfc3156.c:738
+msgid "An error prevented the signature verification."
+msgstr "Li verifiaedje del sinateure a fwait berwete cåze d' ene aroke."
+
+#: libbalsa/rfc3156.c:740
+msgid "This part contains at least two signatures with different status."
+msgstr ""
+
+#: libbalsa/rfc3156.c:743
+msgid "bad status"
+msgstr ""
+
+#: libbalsa/rfc3156.c:753
+msgid "The user ID is of unknown validity."
+msgstr ""
+
+#: libbalsa/rfc3156.c:755
+msgid "The validity of the user ID is undefined."
+msgstr ""
+
+#: libbalsa/rfc3156.c:757
+msgid "The user ID is never valid."
+msgstr ""
+
+#: libbalsa/rfc3156.c:759
+msgid "The user ID is marginally valid."
+msgstr ""
+
+#: libbalsa/rfc3156.c:761
+msgid "The user ID is fully valid."
+msgstr ""
+
+#: libbalsa/rfc3156.c:763
+msgid "The user ID is ultimately valid."
+msgstr ""
+
+#: libbalsa/rfc3156.c:765 libbalsa/rfc3156.c:1410
+msgid "bad validity"
+msgstr ""
+
+#: libbalsa/rfc3156.c:829 libbalsa/rfc3156.c:1056
+msgid "Enter passsphrase to OpenPGP sign the first message part"
+msgstr ""
+
+#: libbalsa/rfc3156.c:837 libbalsa/rfc3156.c:933 libbalsa/rfc3156.c:1068
+#: libbalsa/rfc3156.c:1160
+#, c-format
+msgid "gpgme could not get data from buffer: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:853 libbalsa/rfc3156.c:2325
+#, c-format
+msgid "gpgme signing failed: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:865 libbalsa/rfc3156.c:983 libbalsa/rfc3156.c:1108
+#: libbalsa/rfc3156.c:1210 libbalsa/rfc3156.c:2343 libbalsa/rfc3156.c:2427
+#, c-format
+msgid "could not get gpgme data: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1090
+#, c-format
+msgid "gpgme signing and encryption failed: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1094 libbalsa/rfc3156.c:2413
+#, c-format
+msgid "gpgme encryption failed: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1176
+msgid "Enter passsphrase to decrypt message part"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1182
+#, c-format
+msgid "gpgme decryption and signature verification failed: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1227
+#, c-format
+msgid ""
+"The OpenPGP encrypted message part contains 8-bit characters, but no header "
+"describing the used codeset (converted to %s)"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1293
+#, c-format
+msgid ""
+"%s\n"
+"Do you want to run gpg to import the public key with fingerprint %s?"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1318
+#, c-format
+msgid "Could not launch %s to get the public key %s."
+msgstr "Dji n' a savou enonder %s po prinde li clé publike %s."
+
+#: libbalsa/rfc3156.c:1366
+#, c-format
+msgid ""
+"Running gpg failed with return value %d:\n"
+"%s"
+msgstr ""
+"L' enondaedje di gpg a fwait berwete et s' ritourner l' valixhance %d:\n"
+"%s"
+
+#: libbalsa/rfc3156.c:1373
+#, c-format
+msgid ""
+"Running gpg successful:\n"
+"%s"
+msgstr ""
+"L' enondaedje di gpg a stî comifåt:\n"
+"%s"
+
+#: libbalsa/rfc3156.c:1398
+msgid "unknown"
+msgstr "nén cnoxhou"
+
+#: libbalsa/rfc3156.c:1400
+msgid "undefined"
+msgstr "nén defini"
+
+#: libbalsa/rfc3156.c:1402
+msgid "never"
+msgstr "måy"
+
+#: libbalsa/rfc3156.c:1404
+msgid "marginal"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1406
+msgid "full"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1408
+msgid "ultimate"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1452
+msgid "Fingerprint"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1452
+msgid "Key ID"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1452
+msgid "Validity"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1452
+msgid "Owner trust"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1453
+msgid "Length"
+msgstr "Longueu"
+
+#. FIXME: create dialog according to the Gnome HIG
+#: libbalsa/rfc3156.c:1490
+msgid "Select key"
+msgstr "Tchoezi l' clé"
+
+#: libbalsa/rfc3156.c:1498
+#, c-format
+msgid "Select the private key for the signer %s"
+msgstr "Tchoezi l' clé privêye po %s siner"
+
+#: libbalsa/rfc3156.c:1501
+#, c-format
+msgid "Select the public key for the recipient %s"
+msgstr "Tchoezixhoz li clé publike pol riçuveu %s"
+
+#: libbalsa/rfc3156.c:1591
+#, c-format
+msgid "could not list keys for %s: %s"
+msgstr "dji n' a savou mostrer les clés po %s: %s"
+
+#: libbalsa/rfc3156.c:1599
+#, c-format
+msgid "could not retrieve key for %s: %s"
+msgstr "dji n' a savou prinde li clé po %s: %s"
+
+#: libbalsa/rfc3156.c:1636
+#, c-format
+msgid "could not get a private key for %s"
+msgstr "dji n' a savou aveur ene clé privêye po %s"
+
+#: libbalsa/rfc3156.c:1662
+#, c-format
+msgid "could not create gpgme recipients set: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1674
+#, c-format
+msgid "could not get a key for %s"
+msgstr "dji n' a savou aveur ene clé po %s"
+
+#: libbalsa/rfc3156.c:1686
+#, c-format
+msgid "could not add recipient %s: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:2065
+#, c-format
+msgid ""
+"The passphrase for this key was bad, please try again!\n"
+"\n"
+"Key: %s"
+msgstr ""
+"Li scret po cisse clé la n' est nén corek, rissayî cor on côp s' i vs plait!\n"
+"\n"
+"Clé: %s"
+
+#: libbalsa/rfc3156.c:2069
+#, c-format
+msgid ""
+"Please enter the passphrase for the secret key!\n"
+"\n"
+"Key: %s"
+msgstr ""
+"Tapez l' sicret pol clé privêye!\n"
+"\n"
+"Clé: %s"
+
+#: libbalsa/rfc3156.c:2084
+msgid "remember passphrase for"
+msgstr "si rmimbrer do scret po"
+
+#: libbalsa/rfc3156.c:2089 src/pref-manager.c:1700 src/pref-manager.c:2530
+#: src/pref-manager.c:2551
+msgid "minutes"
+msgstr "munutes"
+
+#: libbalsa/rfc3156.c:2304
+msgid "Enter passsphrase to sign message"
+msgstr "Tapez li scret po siner l' messaedje"
+
+#: libbalsa/rfc3156.c:2309 libbalsa/rfc3156.c:2396
+#, c-format
+msgid "gpgme could not get data from file: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:2316 libbalsa/rfc3156.c:2404
+#, c-format
+msgid "gpgme could not create new data: %s"
+msgstr ""
+
 #: libbalsa/send.c:218 libbalsa/send.c:225
 msgid "Sending Mail..."
 msgstr "Evoyaedje di l' emile..."
 
-#: libbalsa/send.c:221 src/main-window.c:1790
+#: libbalsa/send.c:221 src/main-window.c:1818
 msgid "_Hide"
 msgstr "_Catchî"
 
@@ -498,40 +889,55 @@ msgstr "_Catchî"
 msgid "Unable to open sentbox - could not get IMAP server information"
 msgstr ""
 
-#: libbalsa/send.c:799
+#: libbalsa/send.c:797
+#, c-format
+msgid ""
+"Could not send the message to %s:\n"
+"%d: %s\n"
+"Message left in your outbox.\n"
+msgstr ""
+
+#: libbalsa/send.c:839
+#, c-format
+msgid ""
+"Relaying refused:\n"
+"%d: %s\n"
+"Message left in your outbox.\n"
+msgstr ""
+
+#: libbalsa/send.c:849
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
 msgstr ""
 
-#: libbalsa/send.c:826
-#, fuzzy
+#: libbalsa/send.c:879
 msgid "Connected to MTA"
-msgstr "Raloyaedje a %s"
+msgstr ""
 
-#: libbalsa/send.c:833 src/balsa-message.c:765 src/print.c:347
-#: src/sendmsg-window.c:740 src/sendmsg-window.c:2143 src/store-address.c:322
+#: libbalsa/send.c:886 src/balsa-message.c:1230 src/print.c:349
+#: src/sendmsg-window.c:666 src/sendmsg-window.c:2103 src/store-address.c:323
 msgid "From:"
 msgstr "Di:"
 
-#: libbalsa/send.c:836 src/balsa-index.c:360
+#: libbalsa/send.c:889 src/balsa-index.c:360
 msgid "From"
 msgstr "Di"
 
-#: libbalsa/send.c:844 src/balsa-message.c:774 src/print.c:357
-#: src/sendmsg-window.c:739 src/sendmsg-window.c:2149 src/store-address.c:323
+#: libbalsa/send.c:897 src/balsa-message.c:1239 src/print.c:353
+#: src/sendmsg-window.c:665 src/sendmsg-window.c:2110 src/store-address.c:324
 msgid "To:"
 msgstr "A:"
 
-#: libbalsa/send.c:847 src/balsa-index.c:847
+#: libbalsa/send.c:900 src/balsa-index.c:845
 msgid "To"
 msgstr "A"
 
-#: libbalsa/send.c:883
+#: libbalsa/send.c:936
 msgid "Disconnected"
 msgstr "Disraloyî"
 
-#: libbalsa/send.c:1076
+#: libbalsa/send.c:1129
 msgid ""
 "SMTP server refused connection.\n"
 "Balsa by default uses submission service (587).\n"
@@ -540,22 +946,34 @@ msgid ""
 "Message is left in outbox."
 msgstr ""
 
-#: libbalsa/send.c:1086
+#: libbalsa/send.c:1139
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
 "Message is left in outbox."
 msgstr ""
 
-#: libbalsa/source-viewer.c:46 src/main-window.c:513
+#: libbalsa/send.c:1551 libbalsa/send.c:1775
+msgid "This message will not be encrpyted for the BCC: recipient(s)."
+msgstr ""
+
+#: libbalsa/source-viewer.c:52 src/main-window.c:531
 msgid "_Select Text"
 msgstr "_Tchoezi l' tecse"
 
-#: libbalsa/source-viewer.c:47 src/main-window.c:514
+#: libbalsa/source-viewer.c:53 src/main-window.c:532
 msgid "Select entire mail"
 msgstr "Tchoezi l' messaedje en etir"
 
-#: libbalsa/source-viewer.c:100
+#: libbalsa/source-viewer.c:62
+msgid "_Escape Special Characters"
+msgstr ""
+
+#: libbalsa/source-viewer.c:63
+msgid "Escape special and non-ASCII characters"
+msgstr ""
+
+#: libbalsa/source-viewer.c:210
 msgid "Message Source"
 msgstr "Sourdant do messaedje"
 
@@ -584,8 +1002,7 @@ msgstr "_Batch:"
 msgid ""
 "The pathname \"%s\" must be specified canonically -- it must start with a "
 "'/'."
-msgstr ""
-"Li tchmin «%s» doet esse specifyî en etir -- i doet comincî avou on «/»."
+msgstr "Li tchmin «%s» doet esse specifyî en etir -- i doet comincî avou on «/»."
 
 #: libinit_balsa/balsa-druid-page-directory.c:121
 #, c-format
@@ -644,7 +1061,7 @@ msgstr "Dinez les informåcions da vosse, s' i vs plait."
 msgid "_Name:"
 msgstr "_No:"
 
-#: libinit_balsa/balsa-druid-page-user.c:79 src/store-address.c:362
+#: libinit_balsa/balsa-druid-page-user.c:79 src/store-address.c:364
 msgid "_Email Address:"
 msgstr "_Adresse emile:"
 
@@ -684,13 +1101,12 @@ msgid ""
 msgstr ""
 
 #: libinit_balsa/balsa-initdruid.c:83
-#, fuzzy
 msgid ""
 "This will exit Balsa.\n"
 "Do you really want to do this?"
 msgstr ""
-"Estoz-ve sheur di voleur moussî foû\n"
-"di Balsa po d' bon?"
+"Çoula vs frè moussî foû di Balsa.\n"
+"El voloz vs po d' bon?"
 
 #: libinit_balsa/helper.c:76
 #, c-format
@@ -723,7 +1139,7 @@ msgstr ""
 #: libmutt/handler.c:1453
 #, c-format
 msgid "[-- Attachment #%d"
-msgstr "[-- Atatchmint lº%d"
+msgstr "[-- Ataetchmint lº%d"
 
 #: libmutt/handler.c:1464
 #, c-format
@@ -763,7 +1179,7 @@ msgstr ""
 #: libmutt/handler.c:1651
 #, c-format
 msgid "[-- This %s/%s attachment "
-msgstr "[-- Cist atatchmint %s/%s "
+msgstr "[-- Cist ataetchmint %s/%s "
 
 #: libmutt/handler.c:1658
 #, c-format
@@ -788,38 +1204,38 @@ msgid ""
 msgstr ""
 
 #: libmutt/handler.c:1696
-#, fuzzy, c-format
+#, c-format
 msgid "[-- This %s/%s attachment is not included, --]\n"
-msgstr "[-- Cist atatchmint %s/%s "
+msgstr "[-- Cist ataetchmint %s/%s n' est nén inclût, --]\n"
 
 #: libmutt/handler.c:1700
 #, c-format
 msgid "[-- and the indicated access-type %s is unsupported --]\n"
 msgstr ""
 
-#: libmutt/handler.c:1828
+#: libmutt/handler.c:1821
 msgid "Error: multipart/signed has no protocol."
 msgstr ""
 
-#: libmutt/handler.c:1841
+#: libmutt/handler.c:1834
 msgid "Error: multipart/encrypted has no protocol parameter!"
 msgstr ""
 
-#: libmutt/handler.c:1888
+#: libmutt/handler.c:1881
 msgid "Unable to open temporary file!"
 msgstr ""
 
-#: libmutt/handler.c:1949
+#: libmutt/handler.c:1942
 #, c-format
 msgid "[-- %s/%s is unsupported "
 msgstr "[-- %s/%s n' est nén sopoirté "
 
-#: libmutt/handler.c:1954
+#: libmutt/handler.c:1947
 #, c-format
 msgid "(use '%s' to view this part)"
 msgstr "(eployî «%s» po vey ci boket)"
 
-#: libmutt/handler.c:1956
+#: libmutt/handler.c:1949
 msgid "(need 'view-attachments' bound to key!)"
 msgstr ""
 
@@ -829,11 +1245,11 @@ msgstr ""
 
 #: libmutt/imap/auth_anon.c:39
 msgid "Authenticating (anonymous)..."
-msgstr "Otintifiaedje (anonîme)..."
+msgstr "Otintifiaedje (anonime)..."
 
 #: libmutt/imap/auth_anon.c:69
 msgid "Anonymous authentication failed."
-msgstr "L' otintifiaedje anonîme a fwait berwete."
+msgstr "L' otintifiaedje anonime a fwait berwete."
 
 #: libmutt/imap/auth_cram.c:44
 msgid "Authenticating (CRAM-MD5)..."
@@ -875,7 +1291,7 @@ msgstr "L' otintifiaedje SASL a fwait berwete."
 #: libmutt/imap/browse.c:85 libmutt/imap/imap.c:537
 #, c-format
 msgid "%s is an invalid IMAP path"
-msgstr ""
+msgstr "%s n' est nén on tchmin IMAP valide"
 
 #: libmutt/imap/browse.c:102
 msgid "Getting namespaces..."
@@ -886,9 +1302,8 @@ msgid "Getting folder list..."
 msgstr ""
 
 #: libmutt/imap/browse.c:229
-#, fuzzy
 msgid "No such folder"
-msgstr "Copyî èl ridant:"
+msgstr "Nou ridant lomé insi"
 
 #: libmutt/imap/browse.c:314
 msgid "Create mailbox: "
@@ -1000,10 +1415,10 @@ msgstr "Si disabounant a %s..."
 msgid "Unable to fetch headers from this IMAP server version."
 msgstr ""
 
-#: libmutt/imap/message.c:89 src/balsa-message.c:2141
-#, fuzzy, c-format
+#: libmutt/imap/message.c:89 src/balsa-message.c:2855
+#, c-format
 msgid "Could not create temporary file %s"
-msgstr "Dji n' a savou drovi l' fitchî.\n"
+msgstr ""
 
 #: libmutt/imap/message.c:106
 #, c-format
@@ -1020,7 +1435,7 @@ msgstr ""
 
 #: libmutt/imap/message.c:545
 msgid "Uploading message ..."
-msgstr "Eberwatant messaedje ..."
+msgstr "Eberwetant messaedje ..."
 
 #: libmutt/imap/message.c:658
 #, c-format
@@ -1124,7 +1539,7 @@ msgstr "Åk n' a nén stî tot cåzant avou %s (%s)"
 #: libmutt/mutt_socket.c:415 libmutt/mutt_socket.c:456
 #, c-format
 msgid "Looking up %s..."
-msgstr "Riwaitant aprè %s..."
+msgstr "Riwaitant après %s..."
 
 #: libmutt/mutt_socket.c:420 libmutt/mutt_socket.c:460
 #, c-format
@@ -1181,7 +1596,7 @@ msgstr ""
 msgid "SSL connection using %s (%s)"
 msgstr "Raloyaedje SSL avou %s (%s)"
 
-#: libmutt/mutt_ssl.c:440 src/pref-manager.c:1230 src/pref-manager.c:1329
+#: libmutt/mutt_ssl.c:440 src/pref-manager.c:1276 src/pref-manager.c:1375
 msgid "Unknown"
 msgstr "Nén cnoxhou"
 
@@ -1211,7 +1626,7 @@ msgstr "Acertineure schapêye"
 
 #: libmutt/mutt_ssl.c:667
 msgid "This certificate belongs to:"
-msgstr "Ciste acertineure apartént a:"
+msgstr "Ciste acertineure apårtént a:"
 
 #: libmutt/mutt_ssl.c:678
 msgid "This certificate was issued by:"
@@ -1242,7 +1657,7 @@ msgstr "Verifiaedje del acertineure SSL"
 
 #: libmutt/mutt_ssl.c:703
 msgid "(r)eject, accept (o)nce, (a)ccept always"
-msgstr "(r)efuzer, accepter ci (c)ôp chal, todi (a)ccepter"
+msgstr "(r)ifuzer, accepter ci (c)ôp chal, todi (a)ccepter"
 
 #: libmutt/mutt_ssl.c:704
 msgid "roa"
@@ -1250,7 +1665,7 @@ msgstr "rca"
 
 #: libmutt/mutt_ssl.c:708
 msgid "(r)eject, accept (o)nce"
-msgstr "(r)efuzer, accepter ci (c)ôp chal"
+msgstr "(r)ifuzer, accepter ci (c)ôp chal"
 
 #: libmutt/mutt_ssl.c:709
 msgid "ro"
@@ -1378,7 +1793,7 @@ msgstr "%d wårdés."
 msgid "Can't write message"
 msgstr "Dji n' pou scrire li messaedje"
 
-#: libmutt/parse.c:619
+#: libmutt/parse.c:624
 msgid "multipart message has no boundary parameter!"
 msgstr ""
 
@@ -1399,25 +1814,24 @@ msgstr ""
 #: libmutt/sendlib.c:930
 #, c-format
 msgid "Can't stat %s: %s"
-msgstr ""
-"Dji n' sai fé stat() %s: %s"
+msgstr "Dji n' sai fé stat() %s: %s"
 
 #: libmutt/sendlib.c:937
-#, fuzzy, c-format
+#, c-format
 msgid "%s isn't a regular file."
-msgstr "%s n' est nén ene boesse ås emiles."
+msgstr ""
 
 #: libmutt/sendlib.c:1113
-#, fuzzy, c-format
+#, c-format
 msgid "Could not open %s"
-msgstr "Dji n' a savou drovi l' fitchî %s.\n"
+msgstr "Dji n' a savou drovi %s"
 
-#: libmutt/sendlib.c:2115
+#: libmutt/sendlib.c:2134
 #, c-format
 msgid "Error sending message, child exited %d (%s)."
 msgstr ""
 
-#: libmutt/sendlib.c:2122
+#: libmutt/sendlib.c:2141
 msgid "Output of the delivery process"
 msgstr ""
 
@@ -1464,9 +1878,8 @@ msgid "_File Name"
 msgstr "No do _fitchî"
 
 #: src/address-book-config.c:303
-#, fuzzy
 msgid "Select path for VCARD address book"
-msgstr "Drovi l' calpin d' adresses"
+msgstr "Tchoezixhoz l' tchimin pol calpin d' adresses VCARD"
 
 #: src/address-book-config.c:308 src/address-book-config.c:367
 #: src/address-book-config.c:417 src/address-book-config.c:489
@@ -1478,23 +1891,20 @@ msgid "Load program location"
 msgstr ""
 
 #: src/address-book-config.c:348
-#, fuzzy
 msgid "Select load program for address book"
-msgstr "Drovi l' calpin d' adresses"
+msgstr ""
 
 #: src/address-book-config.c:354
 msgid "Save program location"
 msgstr ""
 
 #: src/address-book-config.c:360
-#, fuzzy
 msgid "Select save program for address book"
-msgstr "Drovi l' calpin d' adresses"
+msgstr ""
 
 #: src/address-book-config.c:411
-#, fuzzy
 msgid "Select path for LDIF address book"
-msgstr "Drovi l' calpin d' adresses"
+msgstr "Tchoezixhoz l' tchimin pol calpin d' adresses LDIF"
 
 #: src/address-book-config.c:463
 msgid "_Host Name"
@@ -1514,22 +1924,22 @@ msgstr "_Sicret"
 
 #: src/address-book-config.c:485
 msgid "Enable _TLS"
-msgstr "Peremte _TLS"
+msgstr "Permete _TLS"
 
-#: src/address-book-config.c:555 src/folder-conf.c:93
+#: src/address-book-config.c:555 src/folder-conf.c:95
 #, c-format
 msgid "Error displaying %s: %s\n"
 msgstr "Åk n' a nén stî tot håynant %s: %s\n"
 
-#: src/address-book-config.c:573 src/mailbox-conf.c:473
-#: src/pref-manager.c:1524 src/pref-manager.c:2615
+#: src/address-book-config.c:573 src/mailbox-conf.c:466
+#: src/pref-manager.c:1570 src/pref-manager.c:2710
 msgid "_Add"
 msgstr "_Radjouter"
 
 #: src/address-book-config.c:652
 #, c-format
 msgid "The address book file path \"%s\" is not correct. %s"
-msgstr "Li tchmin «%s» fo fitchî calpin d' adresses n' est nén corek. %s"
+msgstr "Li tchmin «%s» do fitchî calpin d' adresses n' est nén corek. %s"
 
 #: src/address-book-config.c:655
 #, c-format
@@ -1537,9 +1947,9 @@ msgid "The load program path \"%s\" is not correct. %s"
 msgstr "Li tchmin «%s» do programe a-z enonder n' est nén corek. %s"
 
 #: src/address-book-config.c:658
-#, fuzzy, c-format
+#, c-format
 msgid "The save program path \"%s\" is not correct. %s"
-msgstr "Li fitchî avou l' no etir «%s» n' est nén on ridant."
+msgstr ""
 
 #: src/address-book-config.c:661
 #, c-format
@@ -1604,7 +2014,7 @@ msgid ""
 "Error opening address book '%s'\n"
 "%s"
 msgstr ""
-"Åk n' a né stî tot drovant li calpin d' adresses «%s»\n"
+"Åk n' a nén stî tot drovant li calpin d' adresses «%s»\n"
 "%s"
 
 #: src/balsa-app.c:66
@@ -1625,7 +2035,7 @@ msgstr "Sicret pol boesse %s@%s:"
 msgid "Password needed"
 msgstr "I gn a mezåjhe d' scret"
 
-#: src/balsa-app.c:598
+#: src/balsa-app.c:633
 #, c-format
 msgid "Couldn't open mailbox \"%s\""
 msgstr "Dji n' a savou drovi l' boesse «%s»"
@@ -1642,67 +2052,65 @@ msgstr "Date"
 msgid "Size"
 msgstr "Grandeu"
 
-#: src/balsa-index.c:806
+#: src/balsa-index.c:805
 #, c-format
 msgid "Opening mailbox %s. Please wait..."
 msgstr "Dji droveye li boesse %s. Tårdjîz s' i vs plait..."
 
-#: src/balsa-index.c:1848
+#: src/balsa-index.c:1883
 msgid "_View Source"
 msgstr "_Vey sourdant"
 
-#: src/balsa-index.c:1850 src/main-window.c:444 src/message-window.c:126
+#: src/balsa-index.c:1885 src/main-window.c:462 src/message-window.c:116
 msgid "_Reply..."
 msgstr "_Responde..."
 
-#: src/balsa-index.c:1852
+#: src/balsa-index.c:1887
 msgid "Reply To _All..."
 msgstr "Responde a _tertos..."
 
-#: src/balsa-index.c:1854
+#: src/balsa-index.c:1889
 msgid "Reply To _Group..."
 msgstr "Risponde å _groupe..."
 
-#: src/balsa-index.c:1856
-#, fuzzy
+#: src/balsa-index.c:1891
 msgid "_Forward Attached..."
-msgstr "Dji tchedje..."
-
-#: src/balsa-index.c:1858
-#, fuzzy
-msgid "Forward _Inline..."
-msgstr "Dji tchedje..."
-
-#: src/balsa-index.c:1860 src/main-window.c:546
-msgid "_Store Address..."
-msgstr "_Wårder l' adresse..."
-
-#: src/balsa-index.c:1873 src/filter-edit-dialog.c:216 src/mailbox-node.c:868
-#: src/main-window.c:528 src/pref-manager.c:1526 src/pref-manager.c:2619
-msgid "_Delete"
-msgstr "_Disfacer"
-
-#: src/balsa-index.c:1878 src/main-window.c:535
-msgid "_Undelete"
-msgstr "_Disrafacer"
-
-#: src/balsa-index.c:1883
-msgid "Move To _Trash"
-msgstr "Taper å _batch"
-
-#: src/balsa-index.c:1887
-msgid "T_oggle"
-msgstr ""
-
-#: src/balsa-index.c:1890
-msgid "_Flagged"
 msgstr ""
 
 #: src/balsa-index.c:1893
-msgid "_Unread"
-msgstr "_Nén lejhous"
+msgid "Forward _Inline..."
+msgstr ""
 
-#: src/balsa-index.c:1901
+#: src/balsa-index.c:1895 src/main-window.c:564
+msgid "_Store Address..."
+msgstr "_Wårder l' adresse..."
+
+#: src/balsa-index.c:1908 src/filter-edit-dialog.c:216 src/mailbox-node.c:952
+#: src/main-window.c:546 src/pref-manager.c:1572 src/pref-manager.c:2714
+msgid "_Delete"
+msgstr "_Disfacer"
+
+#: src/balsa-index.c:1913 src/main-window.c:553
+msgid "_Undelete"
+msgstr "_Disrafacer"
+
+#: src/balsa-index.c:1918
+msgid "Move To _Trash"
+msgstr "Taper å _batch"
+
+#: src/balsa-index.c:1922
+msgid "T_oggle"
+msgstr ""
+
+#: src/balsa-index.c:1925
+msgid "_Flagged"
+msgstr ""
+
+#: src/balsa-index.c:1928
+msgid "_Unread"
+msgstr "_Nén léjhous"
+
+#: src/balsa-index.c:1936
 msgid "_Move to"
 msgstr "_Bodjî viè"
 
@@ -1710,193 +2118,287 @@ msgstr "_Bodjî viè"
 msgid "Mailbox"
 msgstr "Boesse"
 
-#: src/balsa-mblist.c:360 src/filter-edit-callbacks.c:777
+#: src/balsa-mblist.c:360 src/filter-edit-callbacks.c:781
 msgid "Unread"
-msgstr "Nén lejhou"
+msgstr "Nén léjhou"
 
 #: src/balsa-mblist.c:384
 msgid "Total"
 msgstr "Totå"
 
-#: src/balsa-mblist.c:974 src/balsa-mblist.c:1019
+#: src/balsa-mblist.c:1016 src/balsa-mblist.c:1061
 msgid "Failed to find mailbox"
 msgstr ""
 
-#: src/balsa-mblist.c:1737
+#: src/balsa-mblist.c:1790
 msgid "_Other..."
 msgstr "_Ôtes..."
 
-#: src/balsa-mblist.c:1798
+#: src/balsa-mblist.c:1851
 msgid "Choose destination folder"
 msgstr "Tchoezixhoz li boesse såme"
 
-#: src/balsa-mblist.c:2110
+#: src/balsa-mblist.c:2163
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr ""
 
-#: src/balsa-message.c:350
-msgid "File already exists. Overwrite?"
-msgstr ""
+#: src/balsa-message.c:327
+msgid "Content"
+msgstr "Å dvins"
 
-#: src/balsa-message.c:362
+#: src/balsa-message.c:399
+msgid "Message parts"
+msgstr "Pårteyes do messaedje"
+
+#: src/balsa-message.c:483
+msgid "File already exists. Overwrite?"
+msgstr "Li fitchî egzistêye dedja. El sipotchî?"
+
+#: src/balsa-message.c:495
 #, c-format
 msgid "Could not save %s: %s"
 msgstr "Dji n' a savou schaper %s: %s"
 
-#: src/balsa-message.c:375
-msgid "Save MIME Part"
+#: src/balsa-message.c:509
+#, c-format
+msgid "Save %s MIME Part"
+msgstr "Schaper li pårteye MIME %s"
+
+#: src/balsa-message.c:664
+msgid "Save selected..."
 msgstr ""
 
-#: src/balsa-message.c:756 src/print.c:330 src/sendmsg-window.c:745
-#: src/sendmsg-window.c:2139
+#: src/balsa-message.c:807 src/balsa-message.c:957 src/balsa-message.c:2057
+#: src/balsa-message.c:2113
+msgid "(No sender)"
+msgstr "(Nou evoyeu)"
+
+#: src/balsa-message.c:829 src/balsa-message.c:2101
+msgid "detected a good signature"
+msgstr "boune sinateure di trovêye"
+
+#: src/balsa-message.c:834 src/balsa-message.c:2108
+msgid "detected a good signature with insufficient validity/trust"
+msgstr ""
+
+#: src/balsa-message.c:842 src/balsa-message.c:851 src/balsa-message.c:2122
+#: src/balsa-message.c:2131
+#, c-format
+msgid ""
+"Checking the signature of the message sent by %s with subject \"%s\" "
+"returned:\n"
+"%s"
+msgstr ""
+
+#: src/balsa-message.c:858
+#, c-format
+msgid ""
+"Checking the signature of the message sent by %s with subject \"%s\" failed "
+"with an error!"
+msgstr ""
+
+#: src/balsa-message.c:863
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains a \"multipart/signed\" "
+"part, but it's structure is invalid. The signature, if there is any, can not "
+"be checked."
+msgstr ""
+
+#: src/balsa-message.c:964
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains a \"multipart/encrypted"
+"\" part, but it's structure is invalid."
+msgstr ""
+
+#: src/balsa-message.c:1222 src/print.c:338 src/sendmsg-window.c:671
+#: src/sendmsg-window.c:2098
 msgid "Subject:"
 msgstr "Sudjet:"
 
-#: src/balsa-message.c:760 src/print.c:336 src/sendmsg-window.c:2135
+#: src/balsa-message.c:1225 src/print.c:344 src/sendmsg-window.c:2092
 msgid "Date:"
 msgstr "Date:"
 
-#: src/balsa-message.c:771 src/sendmsg-window.c:741
+#: src/balsa-message.c:1236 src/sendmsg-window.c:667
 msgid "Reply-To:"
 msgstr "Risponde a:"
 
 #. cc:
-#: src/balsa-message.c:775 src/print.c:358 src/sendmsg-window.c:743
-#: src/sendmsg-window.c:1857 src/sendmsg-window.c:2155 src/store-address.c:324
+#: src/balsa-message.c:1240 src/print.c:354 src/sendmsg-window.c:669
+#: src/sendmsg-window.c:1817 src/sendmsg-window.c:2117 src/store-address.c:325
 msgid "Cc:"
 msgstr "Cc:"
 
 #. bcc:
-#: src/balsa-message.c:776 src/print.c:359 src/sendmsg-window.c:742
-#: src/sendmsg-window.c:1862 src/store-address.c:325
+#: src/balsa-message.c:1241 src/print.c:355 src/sendmsg-window.c:668
+#: src/sendmsg-window.c:1822 src/store-address.c:326
 msgid "Bcc:"
 msgstr "Bcc:"
 
-#: src/balsa-message.c:779 src/print.c:360
+#: src/balsa-message.c:1244 src/print.c:356
 msgid "Fcc:"
 msgstr "Fcc:"
 
-#: src/balsa-message.c:784 src/print.c:366
+#: src/balsa-message.c:1249 src/print.c:361
 msgid "Disposition-Notification-To:"
 msgstr ""
 
-#: src/balsa-message.c:889 src/balsa-message.c:905 src/balsa-message.c:935
-#: src/balsa-message.c:988
+#: src/balsa-message.c:1404 src/balsa-message.c:1420 src/balsa-message.c:1450
+#: src/balsa-message.c:1503
 msgid "Content Type: external-body\n"
 msgstr ""
 
-#: src/balsa-message.c:890
+#: src/balsa-message.c:1405
 msgid "Access type: local-file\n"
 msgstr "Sôre d' accès: fitchî locå\n"
 
-#: src/balsa-message.c:891 src/balsa-message.c:942 src/balsa-message.c:1075
+#: src/balsa-message.c:1406 src/balsa-message.c:1457 src/balsa-message.c:1612
 #, c-format
 msgid "File name: %s"
 msgstr "No d' fitchî: %s"
 
-#: src/balsa-message.c:906
+#: src/balsa-message.c:1421
 msgid "Access type: URL\n"
 msgstr "Sôre d' accès: hårdêye\n"
 
-#: src/balsa-message.c:907
+#: src/balsa-message.c:1422
 #, c-format
 msgid "URL: %s"
 msgstr "Hårdêye: %s"
 
-#: src/balsa-message.c:936
+#: src/balsa-message.c:1451
 #, c-format
 msgid "Access type: %s\n"
 msgstr "Sôre d' accès: %s\n"
 
-#: src/balsa-message.c:939
+#: src/balsa-message.c:1454
 #, c-format
 msgid "FTP site: %s\n"
 msgstr ""
 
-#: src/balsa-message.c:941
+#: src/balsa-message.c:1456
 #, c-format
 msgid "Directory: %s\n"
 msgstr "Ridant: %s\n"
 
-#: src/balsa-message.c:989
+#: src/balsa-message.c:1504
 msgid "Access type: mail-server\n"
 msgstr ""
 
-#: src/balsa-message.c:990
+#: src/balsa-message.c:1505
 #, c-format
 msgid "Mail server: %s\n"
 msgstr "Sierveu d' emilaedje: %s\n"
 
-#: src/balsa-message.c:992
+#: src/balsa-message.c:1507
 #, c-format
 msgid "Subject: %s\n"
 msgstr "Sudjet: %s\n"
 
-#: src/balsa-message.c:1003
+#: src/balsa-message.c:1518
 msgid "Send message to obtain this part"
 msgstr ""
 
-#: src/balsa-message.c:1083
+#: src/balsa-message.c:1620
 #, c-format
 msgid "Type: %s (%s)"
 msgstr "Sôre: %s (%s)"
 
-#: src/balsa-message.c:1086
+#: src/balsa-message.c:1623
 #, c-format
 msgid "Content Type: %s"
 msgstr ""
 
-#: src/balsa-message.c:1097
+#: src/balsa-message.c:1634
 msgid "No open or view action defined in GNOME MIME for this content type"
 msgstr ""
 
-#: src/balsa-message.c:1103
+#: src/balsa-message.c:1640
 msgid "Save part"
 msgstr ""
 
-#: src/balsa-message.c:1127 src/balsa-message.c:1152
+#: src/balsa-message.c:1664 src/balsa-message.c:1689
 #, c-format
 msgid "View part with %s"
 msgstr ""
 
-#: src/balsa-message.c:1542
-#, fuzzy, c-format
+#: src/balsa-message.c:1979
+#, c-format
 msgid "Calling URL %s..."
-msgstr "Léjhant %s..."
+msgstr ""
 
-#: src/balsa-message.c:1551 src/balsa-message.c:2060 src/balsa-message.c:2608
+#: src/balsa-message.c:1988 src/balsa-message.c:2774 src/balsa-message.c:3395
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "Åk n' a nén stî tot mostrant %s: %s\n"
 
-#: src/balsa-message.c:1582
+#: src/balsa-message.c:2012
 #, c-format
 msgid ""
 "Error writing to temporary file %s.\n"
 "Check the directory permissions."
 msgstr ""
 
-#: src/balsa-message.c:1590
-#, fuzzy, c-format
+#: src/balsa-message.c:2020
+#, c-format
 msgid "Cannot open temporary file %s."
-msgstr "Dji n' a savou drovi l' fitchî.\n"
+msgstr ""
 
-#: src/balsa-message.c:1863
+#: src/balsa-message.c:2063
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains 8-bit characters, but no "
+"header describing the used codeset (converted to %s)"
+msgstr ""
+
+#: src/balsa-message.c:2417
+msgid "mixed parts"
+msgstr ""
+
+#: src/balsa-message.c:2419
+msgid "alternative parts"
+msgstr ""
+
+#: src/balsa-message.c:2421
+msgid "signed parts"
+msgstr ""
+
+#: src/balsa-message.c:2423
+msgid "encrypted parts"
+msgstr ""
+
+#: src/balsa-message.c:2425
+msgid "rfc822 message"
+msgstr "messaedje rfc822"
+
+#: src/balsa-message.c:2427
+#, c-format
+msgid "\"%s\" parts"
+msgstr "pårteyes «%s»"
+
+#: src/balsa-message.c:2462
+#, c-format
+msgid "rfc822 message (from %s, subject \"%s\")"
+msgstr "messaedje rfc822 (di %s, sudjet «%s»)"
+
+#: src/balsa-message.c:2548
 #, c-format
 msgid "Open with %s"
 msgstr "Drovi avou %s"
 
-#: src/balsa-message.c:2001
+#: src/balsa-message.c:2686
 msgid "Save..."
 msgstr "Schaper..."
 
-#: src/balsa-message.c:2186
+#: src/balsa-message.c:2900
 #, c-format
 msgid "could not create temporary file %s"
 msgstr ""
 
-#: src/balsa-message.c:2891
+#: src/balsa-message.c:3640
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -1904,200 +2406,198 @@ msgid ""
 "Do you want to send this notification?"
 msgstr ""
 
-#: src/balsa-message.c:2898
-#, fuzzy
+#: src/balsa-message.c:3647
 msgid "Reply to MDN?"
-msgstr "Responde a tertos"
-
-#: src/filter-edit-callbacks.c:282
-msgid "One of the specified fields contains:"
-msgstr ""
-
-#: src/filter-edit-callbacks.c:283
-msgid "None of the specified fields contains:"
-msgstr ""
-
-#: src/filter-edit-callbacks.c:285
-msgid "One of the regular expressions matches"
 msgstr ""
 
 #: src/filter-edit-callbacks.c:286
-msgid "None of the regular expressions matches"
+msgid "One of the specified fields contains:"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:288 src/filter-edit-callbacks.c:872
-msgid "Match when date is in the interval:"
+#: src/filter-edit-callbacks.c:287
+msgid "None of the specified fields contains:"
 msgstr ""
 
 #: src/filter-edit-callbacks.c:289
+msgid "One of the regular expressions matches"
+msgstr ""
+
+#: src/filter-edit-callbacks.c:290
+msgid "None of the regular expressions matches"
+msgstr ""
+
+#: src/filter-edit-callbacks.c:292 src/filter-edit-callbacks.c:876
+msgid "Match when date is in the interval:"
+msgstr ""
+
+#: src/filter-edit-callbacks.c:293
 msgid "Match when date is outside the interval:"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:291 src/filter-edit-callbacks.c:910
+#: src/filter-edit-callbacks.c:295 src/filter-edit-callbacks.c:914
 msgid "Match when one of these flags is set:"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:292
+#: src/filter-edit-callbacks.c:296
 msgid "Match when none of these flags is set:"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:444
+#: src/filter-edit-callbacks.c:448
 msgid "You must specify the name of the user header to match on"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:459
+#: src/filter-edit-callbacks.c:463
 msgid "You must specify at least one field for matching"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:469
+#: src/filter-edit-callbacks.c:473
 msgid "You must provide a string"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:476
+#: src/filter-edit-callbacks.c:480
 msgid "You must provide at least one regular expression"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:488
+#: src/filter-edit-callbacks.c:492
 msgid "Low date is incorrect"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:499
+#: src/filter-edit-callbacks.c:503
 msgid "High date is incorrect"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:507
+#: src/filter-edit-callbacks.c:511
 msgid "Low date is greater than high date"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:777
+#: src/filter-edit-callbacks.c:781
 msgid "Deleted"
 msgstr "Disfacé"
 
-#: src/filter-edit-callbacks.c:777
+#: src/filter-edit-callbacks.c:781
 msgid "Replied"
 msgstr "Respondou"
 
-#: src/filter-edit-callbacks.c:777 src/main-window.c:426
+#: src/filter-edit-callbacks.c:781 src/main-window.c:444
 msgid "Flagged"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:791
+#: src/filter-edit-callbacks.c:795
 msgid "One of the specified f_ields contains"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:806
+#: src/filter-edit-callbacks.c:810
 msgid "Contain/Does _Not Contain"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:820
+#: src/filter-edit-callbacks.c:824
 msgid "_One of the regular expressions matches"
 msgstr ""
 
 #. FIXME : I saw a lot of different ways to create button with
 #. pixmaps, hope this one is correct
 #. Right/Add button
-#: src/filter-edit-callbacks.c:847 src/filter-run-dialog.c:313
+#: src/filter-edit-callbacks.c:851 src/filter-run-dialog.c:313
 msgid "A_dd"
 msgstr "_Radjouter"
 
 #. Left/Remove button
-#: src/filter-edit-callbacks.c:851 src/filter-edit-dialog.c:310
+#: src/filter-edit-callbacks.c:855 src/filter-edit-dialog.c:310
 #: src/filter-run-dialog.c:318
 msgid "_Remove"
 msgstr "_Oister"
 
-#: src/filter-edit-callbacks.c:855
+#: src/filter-edit-callbacks.c:859
 msgid "One _Matches/None Matches"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:892
+#: src/filter-edit-callbacks.c:896
 msgid "Inside/outside the date interval"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:939
+#: src/filter-edit-callbacks.c:943
 msgid "Match when one flag is set/when no flag is set"
 msgstr ""
 
 #. builds the toggle buttons to specify fields concerned by the conditions of
 #. * the filter
-#: src/filter-edit-callbacks.c:957
+#: src/filter-edit-callbacks.c:961
 msgid "Match In"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:969
+#: src/filter-edit-callbacks.c:973
 msgid "_All"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:977
+#: src/filter-edit-callbacks.c:981
 msgid "C_lear"
 msgstr "_Netyî"
 
-#: src/filter-edit-callbacks.c:986 src/main-window.c:2708
+#: src/filter-edit-callbacks.c:990 src/main-window.c:2748
 msgid "_Body"
 msgstr "_Coir"
 
 #. To:
-#: src/filter-edit-callbacks.c:993 src/main-window.c:2709
-#: src/sendmsg-window.c:1846
+#: src/filter-edit-callbacks.c:997 src/main-window.c:2749
+#: src/sendmsg-window.c:1806
 msgid "_To:"
 msgstr "_A:"
 
-#: src/filter-edit-callbacks.c:1000 src/main-window.c:2710
+#: src/filter-edit-callbacks.c:1004 src/main-window.c:2750
 msgid "_From:"
 msgstr "_Di:"
 
-#: src/filter-edit-callbacks.c:1008 src/sendmsg-window.c:288
+#: src/filter-edit-callbacks.c:1012 src/sendmsg-window.c:308
 msgid "_Subject"
 msgstr "_Sudjet"
 
-#: src/filter-edit-callbacks.c:1015 src/main-window.c:2712
+#: src/filter-edit-callbacks.c:1019 src/main-window.c:2752
 msgid "_Cc:"
 msgstr "_Cc:"
 
-#: src/filter-edit-callbacks.c:1022
+#: src/filter-edit-callbacks.c:1026
 msgid "_User header:"
 msgstr "Tiestire di l' _uzeu:"
 
-#: src/filter-edit-callbacks.c:1046
+#: src/filter-edit-callbacks.c:1050
 msgid "Search T_ype:"
-msgstr "_Sôre di cweriaedje:"
+msgstr "_Sôre di cweraedje:"
 
-#: src/filter-edit-callbacks.c:1120
+#: src/filter-edit-callbacks.c:1124
 msgid "Edit condition for filter: "
 msgstr ""
 
-#: src/filter-edit-callbacks.c:1527
+#: src/filter-edit-callbacks.c:1531
 msgid "New filter"
 msgstr "Nouve passete"
 
-#: src/filter-edit-callbacks.c:1656
+#: src/filter-edit-callbacks.c:1660
 msgid "No filter name specified."
 msgstr ""
 
-#: src/filter-edit-callbacks.c:1661
+#: src/filter-edit-callbacks.c:1665
 #, c-format
 msgid "Filter \"%s\" already exists."
 msgstr "Li passete «%s» egzistêye dedja."
 
-#: src/filter-edit-callbacks.c:1674
+#: src/filter-edit-callbacks.c:1678
 msgid "Filter must have conditions."
 msgstr ""
 
-#: src/filter-edit-callbacks.c:1733
-#, fuzzy
+#: src/filter-edit-callbacks.c:1737
 msgid "Filter has matched"
-msgstr "No del passete:"
+msgstr ""
 
-#: src/filter-edit-callbacks.c:1751
+#: src/filter-edit-callbacks.c:1755
 msgid "You must provide a sound to play"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:1882
+#: src/filter-edit-callbacks.c:1886
 #, c-format
 msgid "(Example: write December 31, 2000, as %s)"
 msgstr ""
 
-#: src/filter-edit-dialog.c:88 src/pref-manager.c:343
+#: src/filter-edit-dialog.c:88 src/pref-manager.c:351
 msgid "Simple"
 msgstr "Simpe"
 
@@ -2115,11 +2615,11 @@ msgstr ""
 
 #: src/filter-edit-dialog.c:95
 msgid "Copy to folder:"
-msgstr "Copyî èl ridant:"
+msgstr "Copyî el ridant:"
 
 #: src/filter-edit-dialog.c:96
 msgid "Move to folder:"
-msgstr "Bodjî èl ridant:"
+msgstr "Bodjî el ridant:"
 
 #: src/filter-edit-dialog.c:97
 msgid "Print on printer:"
@@ -2142,7 +2642,7 @@ msgid "AND"
 msgstr "ET"
 
 #. new button
-#: src/filter-edit-dialog.c:210 src/mailbox-node.c:840 src/main-window.c:284
+#: src/filter-edit-dialog.c:210 src/mailbox-node.c:924 src/main-window.c:287
 msgid "_New"
 msgstr "_Novea"
 
@@ -2219,9 +2719,8 @@ msgid ""
 msgstr ""
 
 #: src/filter-export-dialog.c:73
-#, fuzzy
 msgid "Balsa Filters Export"
-msgstr "Passetes di Balsa"
+msgstr ""
 
 #: src/filter-run-callbacks.c:136
 msgid "Error when applying filters"
@@ -2231,18 +2730,25 @@ msgstr ""
 #, c-format
 msgid ""
 "The destination mailbox of the filter \"%s\" is \"%s\"\n"
-"You can't associate it with the same mailbox (that causes recursion)."
+".You can't associate it with the same mailbox (that causes recursion)."
+msgstr ""
+
+#: src/filter-run-callbacks.c:201
+#, c-format
+msgid ""
+"The filter \"%s\" is not compatible with the mailbox type of \"%s\".\n"
+"This happens for example when you use regular expressions match with IMAP "
+"mailboxes, it is done by a very slow method; if possible, use substring "
+"match instead."
 msgstr ""
 
 #: src/filter-run-dialog.c:188
-#, fuzzy
 msgid "Balsa Filters of Mailbox: "
-msgstr "Passetes di Balsa"
+msgstr ""
 
 #: src/filter-run-dialog.c:229
-#, fuzzy
 msgid "On reception"
-msgstr "Relijhas"
+msgstr ""
 
 #: src/filter-run-dialog.c:241
 msgid "On exit"
@@ -2264,71 +2770,66 @@ msgid ""
 "mailbox"
 msgstr ""
 
-#: src/folder-conf.c:263
+#: src/folder-conf.c:265
 msgid "Remote IMAP folder"
 msgstr "Ridant IMAP å lon"
 
-#: src/folder-conf.c:266 src/folder-conf.c:700 src/mailbox-conf.c:484
+#: src/folder-conf.c:268 src/folder-conf.c:658 src/mailbox-conf.c:477
 msgid "_Update"
 msgstr "Mete a _djoû"
 
-#: src/folder-conf.c:266 src/folder-conf.c:700
+#: src/folder-conf.c:268 src/folder-conf.c:658
 msgid "_Create"
 msgstr "_Askepyî"
 
-#: src/folder-conf.c:281
+#: src/folder-conf.c:283
 msgid "Remote IMAP folder set"
 msgstr ""
 
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:288
+#: src/folder-conf.c:290
 msgid "Descriptive _Name:"
 msgstr "_Discrijhaedje:"
 
 #. pop server
-#: src/folder-conf.c:294 src/mailbox-conf.c:952 src/mailbox-conf.c:1047
+#: src/folder-conf.c:296 src/mailbox-conf.c:926 src/mailbox-conf.c:1020
 msgid "_Server:"
 msgstr "_Sierveu:"
 
 #. username
-#: src/folder-conf.c:300 src/mailbox-conf.c:959
+#: src/folder-conf.c:302 src/mailbox-conf.c:933
 msgid "Use_r name:"
 msgstr "No d' _uzeu:"
 
-#: src/folder-conf.c:306
+#: src/folder-conf.c:308
 msgid "_Remember password"
 msgstr "Si _rmimbrer do scret"
 
-#: src/folder-conf.c:311
+#: src/folder-conf.c:313
 msgid "_Password:"
 msgstr "_Sicret:"
 
-#: src/folder-conf.c:316
+#: src/folder-conf.c:318
 msgid "Subscribed _folders only"
 msgstr ""
 
-#: src/folder-conf.c:318
+#: src/folder-conf.c:320
 msgid "_Always show INBOX"
 msgstr ""
 
-#: src/folder-conf.c:321
+#: src/folder-conf.c:323
 msgid "Pr_efix"
 msgstr "_Betchete"
 
-#: src/folder-conf.c:327 src/mailbox-conf.c:1096
+#: src/folder-conf.c:329 src/mailbox-conf.c:1069
 msgid "Use SS_L (IMAPS)"
 msgstr "Eployî SS_L (IMAPS)"
 
-#: src/folder-conf.c:459
-#, fuzzy
+#: src/folder-conf.c:461
 msgid "Select parent folder"
-msgstr "Tchoezixhoz li fonte a-z eployî"
+msgstr "Tchoezixhoz li ridant do dzeu"
 
-#: src/folder-conf.c:530 src/mailbox-conf.c:407 src/sendmsg-window.c:883
-msgid "Select Identity"
-msgstr "Tchoezi idintisté"
-
-#: src/folder-conf.c:558
+#: src/folder-conf.c:532
 #, c-format
 msgid ""
 "Renaming INBOX is special!\n"
@@ -2338,96 +2839,87 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 
-#: src/folder-conf.c:564
+#: src/folder-conf.c:538
 msgid "Question"
-msgstr ""
+msgstr "Kesse"
 
-#: src/folder-conf.c:569
+#: src/folder-conf.c:543
 msgid "Rename INBOX"
 msgstr ""
 
-#: src/folder-conf.c:571 src/toolbar-factory.c:132
+#: src/folder-conf.c:545 src/toolbar-factory.c:132
 msgid "Cancel"
 msgstr "Rinoncî"
 
-#: src/folder-conf.c:672
+#: src/folder-conf.c:640
 msgid ""
 "An IMAP folder that is not a mailbox\n"
 "has no properties that can be changed."
 msgstr ""
 
-#: src/folder-conf.c:697
-#, fuzzy
+#: src/folder-conf.c:655
 msgid "Remote IMAP subfolder"
-msgstr "Ridant IMAP å lon"
+msgstr "Sorridant IMAP å lon"
 
-#: src/folder-conf.c:719
+#: src/folder-conf.c:677
 msgid "Rename or move subfolder"
 msgstr ""
 
-#: src/folder-conf.c:720
+#: src/folder-conf.c:678
 msgid "Create subfolder"
 msgstr ""
 
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:727
+#: src/folder-conf.c:685
 msgid "_Folder name:"
 msgstr "No do _ridant:"
 
-#: src/folder-conf.c:733
+#: src/folder-conf.c:691
 msgid "_Subfolder of:"
 msgstr ""
 
-#: src/folder-conf.c:738
+#: src/folder-conf.c:696
 msgid "_Browse..."
 msgstr "_Foyter..."
 
-#: src/folder-conf.c:746 src/mailbox-conf.c:918
-msgid "Identity:"
-msgstr "Idintisté"
-
-#: src/folder-conf.c:752 src/mailbox-conf.c:925 src/mailbox-conf.c:1106
-msgid "C_hange..."
-msgstr "_Candjî..."
-
-#: src/folder-conf.c:779
+#: src/folder-conf.c:728
 msgid ""
 "This folder is not stored in configuration. I do not yet know how to remove "
 "it from remote server."
 msgstr ""
 
-#: src/folder-conf.c:788
+#: src/folder-conf.c:737
 #, c-format
 msgid ""
 "This will remove the folder \"%s\" from the list.\n"
 "You may use \"New IMAP Folder\" later to add this folder again.\n"
 msgstr ""
 
-#: src/folder-conf.c:793
+#: src/folder-conf.c:742
 msgid "Confirm"
 msgstr "Acertiner"
 
-#: src/information-dialog.c:201
-msgid "Balsa Information"
-msgstr "Informåcion di Balsa"
+#: src/information-dialog.c:184
+msgid "Information - Balsa"
+msgstr "Informåcion - Balsa"
 
-#: src/information-dialog.c:263
+#: src/information-dialog.c:244
 msgid "WARNING: "
-msgstr "AVERTIXHMINT: "
+msgstr "ADVIERTIXHMINT: "
 
-#: src/information-dialog.c:266
+#: src/information-dialog.c:247
 msgid "ERROR: "
 msgstr "AROKE: "
 
-#: src/information-dialog.c:269
+#: src/information-dialog.c:250
 msgid "FATAL: "
 msgstr "AROKE MOIRT: "
 
-#: src/mailbox-conf.c:211
+#: src/mailbox-conf.c:218
 msgid "No mailbox selected."
 msgstr "Nole boesse di tchoezeye."
 
-#: src/mailbox-conf.c:237
+#: src/mailbox-conf.c:244
 #, c-format
 msgid ""
 "Mailbox \"%s\" is used by Balsa and I cannot remove it.\n"
@@ -2435,7 +2927,7 @@ msgid ""
 "to some other mailbox."
 msgstr ""
 
-#: src/mailbox-conf.c:247
+#: src/mailbox-conf.c:254
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.  You may "
@@ -2445,15 +2937,15 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 
-#: src/mailbox-conf.c:259
+#: src/mailbox-conf.c:266
 msgid "Remove from _list"
 msgstr "Oister del _djivêye"
 
-#: src/mailbox-conf.c:260
+#: src/mailbox-conf.c:267
 msgid "Remove from list and _disk"
 msgstr "Oister del djivêye eyet del deure _plake"
 
-#: src/mailbox-conf.c:268
+#: src/mailbox-conf.c:275
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" and all its messages from your IMAP "
@@ -2463,11 +2955,11 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 
-#: src/mailbox-conf.c:281
+#: src/mailbox-conf.c:288
 msgid "_Remove from server"
 msgstr "_Oister do sierveu"
 
-#: src/mailbox-conf.c:288
+#: src/mailbox-conf.c:295
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.\n"
@@ -2475,24 +2967,28 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 
-#: src/mailbox-conf.c:297
+#: src/mailbox-conf.c:304
 msgid "_Remove from list"
 msgstr "_Oister del djivêye"
 
-#: src/mailbox-conf.c:348
+#: src/mailbox-conf.c:355
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr ""
 
-#: src/mailbox-conf.c:435
+#: src/mailbox-conf.c:406 src/sendmsg-window.c:811
+msgid "Select Identity"
+msgstr "Tchoezi idintité"
+
+#: src/mailbox-conf.c:433
 msgid "Mailbox Configurator"
 msgstr ""
 
-#: src/mailbox-conf.c:640
+#: src/mailbox-conf.c:625
 #, c-format
 msgid "%s on %s"
 msgstr "%s so %s"
 
-#: src/mailbox-conf.c:763
+#: src/mailbox-conf.c:741
 #, c-format
 msgid ""
 "Rename of %s to %s failed:\n"
@@ -2500,609 +2996,634 @@ msgid ""
 msgstr ""
 
 #. mailbox name
-#: src/mailbox-conf.c:891 src/mailbox-conf.c:945 src/mailbox-conf.c:1041
+#: src/mailbox-conf.c:877 src/mailbox-conf.c:921 src/mailbox-conf.c:1014
 msgid "Mailbox _Name:"
 msgstr "_No del boesse:"
 
 #. path to file
-#: src/mailbox-conf.c:899
+#: src/mailbox-conf.c:885
 msgid "Mailbox _Path:"
 msgstr "_Tchimin del boesse:"
 
-#: src/mailbox-conf.c:901
+#: src/mailbox-conf.c:887
 msgid "Mailbox Path"
 msgstr "Tchimin del boesse"
 
-#: src/mailbox-conf.c:920
-msgid "No value set"
-msgstr "Nole valixhance di dnêye"
-
 #. password field
-#: src/mailbox-conf.c:965 src/mailbox-conf.c:1068
+#: src/mailbox-conf.c:939 src/mailbox-conf.c:1041
 msgid "Pass_word:"
 msgstr "Sicre_t:"
 
-#: src/mailbox-conf.c:972
+#: src/mailbox-conf.c:946
 msgid "Use _APOP Authentication"
 msgstr "Eployî l' otintifiaedje _APOP"
 
-#: src/mailbox-conf.c:978
+#: src/mailbox-conf.c:952
 msgid "_Delete messages from server after download"
 msgstr "_Disfacer les messaedjes sol sierveu après les aveur prindou"
 
-#: src/mailbox-conf.c:983
+#: src/mailbox-conf.c:957
 msgid "_Filter messages through procmail"
 msgstr ""
 
-#: src/mailbox-conf.c:987
-#, fuzzy
+#: src/mailbox-conf.c:961
 msgid "Fi_lter Command:"
-msgstr "Comande:"
+msgstr "Comande pol _passete:"
 
-#: src/mailbox-conf.c:995
+#: src/mailbox-conf.c:969
 msgid "_Enable check for new mail"
 msgstr ""
 
-#: src/mailbox-conf.c:1005
+#: src/mailbox-conf.c:979
 msgid "Use SS_L (pop3s)"
 msgstr "Eployî SS_L (pop3s)"
 
 #. username
-#: src/mailbox-conf.c:1054
+#: src/mailbox-conf.c:1027
 msgid "_Username:"
 msgstr "No d' uze_u:"
 
-#: src/mailbox-conf.c:1062
+#: src/mailbox-conf.c:1035
 msgid "_Remember Password"
 msgstr "Si _rmimbrer do scret"
 
-#: src/mailbox-conf.c:1073
+#: src/mailbox-conf.c:1046
 msgid "F_older Path:"
 msgstr "Tchimin do ridant:"
 
-#: src/mailbox-conf.c:1101
-msgid "_Identity:"
-msgstr "_Idintisté:"
+#: src/mailbox-conf.c:1124
+msgid "Identity:"
+msgstr "Idintité:"
 
-#: src/mailbox-node.c:235
+#: src/mailbox-conf.c:1129
+msgid "(No identity set)"
+msgstr "(Nole idintité di defineye)"
+
+#: src/mailbox-conf.c:1133
+msgid "C_hange..."
+msgstr "_Candjî..."
+
+#: src/mailbox-conf.c:1140
+msgid "Show address:"
+msgstr "Mostrer l' adresse:"
+
+#: src/mailbox-conf.c:1143
+msgid "_From"
+msgstr "_Di"
+
+#: src/mailbox-conf.c:1149 src/sendmsg-window.c:306
+msgid "_To"
+msgstr "_Po"
+
+#: src/mailbox-node.c:237
 msgid "The folder edition to be written."
 msgstr ""
 
-#: src/mailbox-node.c:366
-#, fuzzy, c-format
+#: src/mailbox-node.c:395
+#, c-format
 msgid "Scanning %s. Please wait..."
-msgstr "Dji droveye li boesse %s. Tårdjîz s' i vs plait..."
+msgstr ""
 
-#: src/mailbox-node.c:825
+#: src/mailbox-node.c:909
 msgid "Local _mbox mailbox..."
 msgstr "Boesse _mbox locåle..."
 
-#: src/mailbox-node.c:827
+#: src/mailbox-node.c:911
 msgid "Local Mail_dir mailbox..."
 msgstr "Boesse Mail_dir locåle..."
 
-#: src/mailbox-node.c:829
+#: src/mailbox-node.c:913
 msgid "Local M_H mailbox..."
 msgstr "Boesse M_H locåle..."
 
-#: src/mailbox-node.c:831
+#: src/mailbox-node.c:915
 msgid "Remote _IMAP mailbox..."
 msgstr "Boesse _IMAP å lon..."
 
-#: src/mailbox-node.c:834
+#: src/mailbox-node.c:918
 msgid "Remote IMAP _folder..."
 msgstr "_Ridant IMAP å lon..."
 
-#: src/mailbox-node.c:836
+#: src/mailbox-node.c:920
 msgid "Remote IMAP _subfolder..."
 msgstr "_Sorridant IMAP å lon..."
 
 #. clicked on the empty space
-#: src/mailbox-node.c:847 src/mailbox-node.c:879 src/mailbox-node.c:900
+#: src/mailbox-node.c:931 src/mailbox-node.c:963 src/mailbox-node.c:984
 msgid "_Rescan"
 msgstr ""
 
-#: src/mailbox-node.c:856
+#: src/mailbox-node.c:940
 msgid "_Open"
 msgstr "_Drovi"
 
-#: src/mailbox-node.c:859 src/main-window.c:612
+#: src/mailbox-node.c:943 src/main-window.c:630
 msgid "_Close"
 msgstr "_Clôre"
 
-#: src/mailbox-node.c:865
+#: src/mailbox-node.c:949
 msgid "_Properties..."
 msgstr "_Prôpietés..."
 
-#: src/mailbox-node.c:875
+#: src/mailbox-node.c:959
 msgid "_Subscribe"
 msgstr ""
 
-#: src/mailbox-node.c:877
+#: src/mailbox-node.c:961
 msgid "_Unsubscribe"
 msgstr ""
 
-#: src/mailbox-node.c:885
+#: src/mailbox-node.c:969
 msgid "Mark as _Inbox"
 msgstr "Marker come _riçuvou"
 
-#: src/mailbox-node.c:888
+#: src/mailbox-node.c:972
 msgid "_Mark as Sentbox"
 msgstr "Marker come _evoyî"
 
-#: src/mailbox-node.c:891
+#: src/mailbox-node.c:975
 msgid "Mark as _Trash"
 msgstr "Marker come tapé å _batch"
 
-#: src/mailbox-node.c:894
+#: src/mailbox-node.c:978
 msgid "Mark as D_raftbox"
 msgstr "Marker come brou_yon"
 
 #. FIXME : No test on mailbox type is made yet, should we ?
-#: src/mailbox-node.c:897
+#: src/mailbox-node.c:981
 msgid "_Edit/Apply filters"
 msgstr "_Candjî/Mete en alaedje les passetes"
 
-#: src/mailbox-node.c:994
+#: src/mailbox-node.c:1082
 #, c-format
 msgid "Local mailbox %s loaded as: %s\n"
 msgstr "Boesse locåle %s tcherdjeye come: %s\n"
 
-#: src/mailbox-node.c:1019
+#: src/mailbox-node.c:1108
 #, c-format
 msgid "Local folder %s\n"
 msgstr "Ridant locå %s\n"
 
-#: src/main-window.c:243
+#: src/main-window.c:246
 msgid "_Message..."
 msgstr "_Messaedje..."
 
-#: src/main-window.c:243
+#: src/main-window.c:246
 msgid "Compose a new message"
 msgstr "Scrire on novea messaedje"
 
-#: src/main-window.c:249
+#: src/main-window.c:252
 msgid "Local mbox mailbox..."
 msgstr "Boesse mbox locåle..."
 
-#: src/main-window.c:250
+#: src/main-window.c:253
 msgid "Add a new mbox style mailbox"
 msgstr "Radjouter ene novele boesse del sôre mbox"
 
-#: src/main-window.c:254
+#: src/main-window.c:257
 msgid "Local Maildir mailbox..."
 msgstr "Boesse Maildir locåle..."
 
-#: src/main-window.c:255
+#: src/main-window.c:258
 msgid "Add a new Maildir style mailbox"
 msgstr "Radjouter ene novele boesse del sôre Maildir"
 
-#: src/main-window.c:259
+#: src/main-window.c:262
 msgid "Local MH mailbox..."
 msgstr "Boesse MH locåle..."
 
-#: src/main-window.c:260
+#: src/main-window.c:263
 msgid "Add a new MH style mailbox"
 msgstr "Radjouter ene novele boesse del sôre MH"
 
-#: src/main-window.c:264 src/pref-manager.c:2782
+#: src/main-window.c:267 src/pref-manager.c:2877
 msgid "Remote IMAP mailbox..."
 msgstr "Boesse IMAP å lon..."
 
-#: src/main-window.c:265
+#: src/main-window.c:268
 msgid "Add a new IMAP mailbox"
 msgstr "Radjouter ene novele boesse IMAP"
 
-#: src/main-window.c:270 src/pref-manager.c:2787
+#: src/main-window.c:273 src/pref-manager.c:2882
 msgid "Remote IMAP folder..."
 msgstr "Ridant IMAP å lon..."
 
-#: src/main-window.c:271
+#: src/main-window.c:274
 msgid "Add a new IMAP folder"
 msgstr "Radjouter on novea ridant IMAP"
 
-#: src/main-window.c:275
+#: src/main-window.c:278
 msgid "Remote IMAP subfolder..."
 msgstr "Sorridant IMAP å lon..."
 
-#: src/main-window.c:276
+#: src/main-window.c:279
 msgid "Add a new IMAP subfolder"
 msgstr "Radjouter on novea sorridant IMAP"
 
-#: src/main-window.c:288
+#: src/main-window.c:291
 msgid "_Continue"
 msgstr "_Continuwer"
 
-#: src/main-window.c:289
+#: src/main-window.c:292
 msgid "Continue editing current message"
 msgstr "Continuwer l' aspougnaedje do messaedje"
 
-#: src/main-window.c:296
+#: src/main-window.c:299
 msgid "_Get New Mail"
 msgstr "_Prinde les noveas emiles"
 
-#: src/main-window.c:296
+#: src/main-window.c:299
 msgid "Fetch new incoming mail"
 msgstr "Prinde les noveas emiles"
 
-#: src/main-window.c:302
+#: src/main-window.c:305
 msgid "_Send Queued Mail"
-msgstr "_Evoyî les messaedje èl caweye"
+msgstr "_Evoyî les messaedje el caweye"
 
-#: src/main-window.c:303
-#, fuzzy
+#: src/main-window.c:306
 msgid "Send messages from the outbox"
-msgstr "Disfacer po d' bon les messaedjes k' on stî tapés å batch"
+msgstr ""
 
-#: src/main-window.c:309
-#, fuzzy
+#: src/main-window.c:312
 msgid "Send and _Receive Mail"
-msgstr "_Evoyî les messaedje èl caweye"
+msgstr ""
 
-#: src/main-window.c:310 src/toolbar-factory.c:123
-#, fuzzy
+#: src/main-window.c:313 src/toolbar-factory.c:123
 msgid "Send and Receive messages"
-msgstr "Evoyî ci messaedje chal"
+msgstr ""
 
-#: src/main-window.c:315
+#: src/main-window.c:318
 msgid "_Print..."
 msgstr "_Eprimî..."
 
-#: src/main-window.c:316 src/toolbar-factory.c:119
+#: src/main-window.c:319 src/toolbar-factory.c:119
 msgid "Print current message"
 msgstr "Eprimî li messaedje do moumint"
 
-#: src/main-window.c:322
+#: src/main-window.c:325
 msgid "_Address Book..."
 msgstr "Calpin d' _adresses..."
 
-#: src/main-window.c:323
+#: src/main-window.c:326
 msgid "Open the address book"
 msgstr "Drovi l' calpin d' adresses"
 
-#: src/main-window.c:350
+#: src/main-window.c:353
 msgid "F_ilters..."
 msgstr "_Passetes..."
 
-#: src/main-window.c:350
+#: src/main-window.c:353
 msgid "Manage filters"
 msgstr "Manaedjî les passetes"
 
-#: src/main-window.c:352
-#, fuzzy
+#: src/main-window.c:355
 msgid "_Export Filters"
-msgstr "_Passetes..."
+msgstr ""
 
-#: src/main-window.c:352
+#: src/main-window.c:355
 msgid "Export filters as Sieve scripts"
 msgstr ""
 
-#: src/main-window.c:358 src/message-window.c:83
-msgid "N_o Headers"
+#: src/main-window.c:361
+msgid "_No Headers"
 msgstr "_Nole tiestire"
 
-#: src/main-window.c:358
+#: src/main-window.c:361
 msgid "Display no headers"
-msgstr "Nén håyner di tiestires"
+msgstr "Èn nén håyner di tiestires"
 
-#: src/main-window.c:360
+#: src/main-window.c:363
 msgid "S_elected Headers"
 msgstr "_Tchoezeyès tiestires"
 
-#: src/main-window.c:361
+#: src/main-window.c:364
 msgid "Display selected headers"
 msgstr "Håyner les tchoezeyès tiestires"
 
-#: src/main-window.c:363 src/message-window.c:87
+#: src/main-window.c:366 src/message-window.c:77
 msgid "All _Headers"
 msgstr "_Totes les tiestires"
 
-#: src/main-window.c:363
+#: src/main-window.c:366
 msgid "Display all headers"
 msgstr "Håyner totes les tiestires"
 
-#: src/main-window.c:370
+#: src/main-window.c:373
 msgid "_Flat index"
 msgstr ""
 
-#: src/main-window.c:371
+#: src/main-window.c:374
 msgid "No threading at all"
 msgstr ""
 
-#: src/main-window.c:376
-msgid "S_imple threading"
+#: src/main-window.c:379
+msgid "Si_mple threading"
 msgstr ""
 
-#: src/main-window.c:377
+#: src/main-window.c:380
 msgid "Simple threading algorithm"
 msgstr ""
 
-#: src/main-window.c:382
+#: src/main-window.c:385
 msgid "_JWZ threading"
 msgstr ""
 
-#: src/main-window.c:383
+#: src/main-window.c:386
 msgid "Elaborate JWZ threading"
 msgstr ""
 
-#: src/main-window.c:393
+#: src/main-window.c:396
 msgid "_Show Mailbox Tree"
 msgstr ""
 
-#: src/main-window.c:394
+#: src/main-window.c:397
 msgid "Toggle display of mailbox and folder tree"
 msgstr ""
 
-#: src/main-window.c:397
+#: src/main-window.c:400
 msgid "Show Mailbox _Tabs"
 msgstr ""
 
-#: src/main-window.c:398
+#: src/main-window.c:401
 msgid "Toggle display of mailbox notebook tabs"
 msgstr ""
 
-#: src/main-window.c:402 src/message-window.c:117
+#: src/main-window.c:405 src/message-window.c:107
 msgid "_Wrap"
 msgstr ""
 
-#: src/main-window.c:402 src/sendmsg-window.c:236
+#: src/main-window.c:405 src/sendmsg-window.c:261
 msgid "Wrap message lines"
 msgstr ""
 
-#: src/main-window.c:410
+#: src/main-window.c:413
 msgid "_Expand All"
 msgstr ""
 
-#: src/main-window.c:411
-#, fuzzy
+#: src/main-window.c:414
 msgid "Expand all threads"
-msgstr "Håyner totes les tiestires"
+msgstr ""
 
-#: src/main-window.c:415
+#: src/main-window.c:418
 msgid "_Collapse All"
 msgstr ""
 
-#: src/main-window.c:416
+#: src/main-window.c:419
 msgid "Collapse all expanded threads"
 msgstr ""
 
-#: src/main-window.c:426
+#: src/main-window.c:424
+msgid "Zoom _In"
+msgstr ""
+
+#: src/main-window.c:424
+msgid "Increase magnification"
+msgstr ""
+
+#: src/main-window.c:428
+msgid "Zoom _Out"
+msgstr ""
+
+#: src/main-window.c:428
+msgid "Decrease magnification"
+msgstr ""
+
+#. To warn msgfmt that the % sign isn't a format specifier:
+#: src/main-window.c:434
+#, no-c-format
+msgid "Zoom _100%"
+msgstr ""
+
+#: src/main-window.c:434
+msgid "No magnification"
+msgstr ""
+
+#: src/main-window.c:444
 msgid "Toggle flagged"
 msgstr ""
 
-#: src/main-window.c:433
+#: src/main-window.c:451
 msgid "New"
 msgstr "Novea"
 
-#: src/main-window.c:433
+#: src/main-window.c:451
 msgid "Toggle New"
 msgstr ""
 
-#: src/main-window.c:445 src/toolbar-factory.c:99
+#: src/main-window.c:463 src/toolbar-factory.c:99
 msgid "Reply to the current message"
 msgstr "Responde a ci messaedje chal"
 
-#: src/main-window.c:452 src/message-window.c:131
+#: src/main-window.c:470 src/message-window.c:121
 msgid "Reply to _All..."
 msgstr "Responde a _tertos..."
 
-#: src/main-window.c:453
+#: src/main-window.c:471
 msgid "Reply to all recipients of the current message"
-msgstr "Responde a ci messaedje chal èt evoyî a tos les djins e Cc: avou"
+msgstr "Responde a ci messaedje chal et evoyî a tos les djins e Cc: avou"
 
-#: src/main-window.c:460 src/message-window.c:137
+#: src/main-window.c:478 src/message-window.c:127
 msgid "Reply to _Group..."
 msgstr "Responde å _groupe..."
 
-#: src/main-window.c:461 src/message-window.c:138 src/toolbar-factory.c:103
+#: src/main-window.c:479 src/message-window.c:128 src/toolbar-factory.c:103
 msgid "Reply to mailing list"
 msgstr "Responde al djåspinreye"
 
-#: src/main-window.c:468 src/message-window.c:143
-#, fuzzy
+#: src/main-window.c:486 src/message-window.c:133
 msgid "_Forward attached..."
-msgstr "Dji tchedje..."
+msgstr "_Ricassî en ataetchmint..."
 
-#: src/main-window.c:469
-#, fuzzy
+#: src/main-window.c:487
 msgid "Forward the current message as attachment"
-msgstr "Responde a ci messaedje chal"
+msgstr "Ricassî li messaedje do moumint come èn ataetchmint"
 
-#: src/main-window.c:475
-#, fuzzy
+#: src/main-window.c:493
 msgid "Forward _inline..."
-msgstr "Dji tchedje..."
+msgstr "Ricassî e _coir do messaedje..."
 
-#: src/main-window.c:476
-#, fuzzy
+#: src/main-window.c:494
 msgid "Forward the current message inline"
-msgstr "Responde a ci messaedje chal"
+msgstr "Ricassî li messaedje do moumint tot l' metant e coir do messaedje ki srè evoyî"
 
-#: src/main-window.c:483 src/message-window.c:154
+#: src/main-window.c:501 src/message-window.c:144
 msgid "Next Part"
 msgstr "Pårteye shuvante"
 
-#: src/main-window.c:483 src/message-window.c:154
+#: src/main-window.c:501 src/message-window.c:144
 msgid "Next part in message"
 msgstr "Pårteye shuvante e l' messaedje"
 
-#: src/main-window.c:489 src/message-window.c:158
+#: src/main-window.c:507 src/message-window.c:148
 msgid "Previous Part"
 msgstr "Pårteye di dvant"
 
-#: src/main-window.c:490 src/message-window.c:159
+#: src/main-window.c:508 src/message-window.c:149
 msgid "Previous part in message"
 msgstr "Pårteye di dvant e l' messaedje"
 
-#: src/main-window.c:496 src/message-window.c:163
+#: src/main-window.c:514 src/message-window.c:153
 msgid "Save Current Part..."
 msgstr "Schaper li pårteye do moumint..."
 
-#: src/main-window.c:497 src/message-window.c:164
+#: src/main-window.c:515 src/message-window.c:154
 msgid "Save current part in message"
 msgstr "Schaper li pårteye do moumint do messaedje"
 
-#: src/main-window.c:503 src/message-window.c:168
+#: src/main-window.c:521 src/message-window.c:158
 msgid "_View Source..."
 msgstr "_Vey sourdant..."
 
-#: src/main-window.c:504 src/message-window.c:169
+#: src/main-window.c:522 src/message-window.c:159
 msgid "View source form of the message"
-msgstr "Vey li messaedje dins l' cogne sorudant"
+msgstr "Vey li messaedje dins l' cogne sourdant"
 
-#: src/main-window.c:522
+#: src/main-window.c:540
 msgid "_Move to Trash"
 msgstr "_Taper å batch"
 
-#: src/main-window.c:523
+#: src/main-window.c:541
 msgid "Move the current message to Trash mailbox"
 msgstr "Evoyî l' messaedje do moumint al boesse ki sieve di batch"
 
-#: src/main-window.c:529
+#: src/main-window.c:547
 msgid "Delete the current message"
 msgstr "Disfacer ci messaedje chal"
 
-#: src/main-window.c:535
+#: src/main-window.c:553
 msgid "Undelete the message"
 msgstr ""
 
 #. !
-#: src/main-window.c:541
+#: src/main-window.c:559
 msgid "_Toggle"
 msgstr ""
 
-#: src/main-window.c:547
+#: src/main-window.c:565
 msgid "Store address of sender in addressbook"
 msgstr "Wårder l' adresse di l' evoyeu dins vosse calpin d' adresses"
 
-#: src/main-window.c:557
+#: src/main-window.c:575
 msgid "Next Message"
 msgstr "Messaedje shuvant"
 
-#: src/main-window.c:563
+#: src/main-window.c:581
 msgid "Previous Message"
 msgstr "Messaedje di dvant"
 
-#: src/main-window.c:569 src/main-window.c:570
+#: src/main-window.c:587 src/main-window.c:588
 msgid "Next Unread Message"
-msgstr "Messaedje nén lejhou shuvant"
+msgstr "Messaedje nén léjhou shuvant"
 
-#: src/main-window.c:576 src/main-window.c:577
-#, fuzzy
+#: src/main-window.c:594 src/main-window.c:595
 msgid "Next Flagged Message"
-msgstr "Messaedje shuvant"
+msgstr "Messaedje avou drapea shuvant"
 
-#: src/main-window.c:584
+#: src/main-window.c:602
 msgid "Select all"
 msgstr "Tchoezi totafwait"
 
-#: src/main-window.c:585
+#: src/main-window.c:603
 msgid "Select all messages in current mailbox"
 msgstr "Tchoezi tos les messaedjes del boesse do moumint"
 
-#: src/main-window.c:591
+#: src/main-window.c:609
 msgid "_Edit..."
 msgstr "_Aspougnî..."
 
-#: src/main-window.c:591
+#: src/main-window.c:609
 msgid "Edit the selected mailbox"
 msgstr "Aspougnî li boesse tchoezeye"
 
-#: src/main-window.c:595
+#: src/main-window.c:613
 msgid "_Delete..."
 msgstr "_Disfacer..."
 
-#: src/main-window.c:596
+#: src/main-window.c:614
 msgid "Delete the selected mailbox"
 msgstr "Disfacer li boesse tchoezeye"
 
-#: src/main-window.c:602
+#: src/main-window.c:620
 msgid "Co_mmit Current"
 msgstr ""
 
-#: src/main-window.c:603
+#: src/main-window.c:621
 msgid "Commit the changes in the currently opened mailbox"
 msgstr ""
 
-#: src/main-window.c:607
+#: src/main-window.c:625
 msgid "Commit _All"
 msgstr ""
 
-#: src/main-window.c:608
+#: src/main-window.c:626
 msgid "Commit the changes in all mailboxes"
 msgstr ""
 
-#: src/main-window.c:612
+#: src/main-window.c:630
 msgid "Close mailbox"
 msgstr "Clôre li boesse ås emiles"
 
-#: src/main-window.c:616
+#: src/main-window.c:634
 msgid "Empty _Trash"
-msgstr "_Vuder l' batch"
+msgstr "_Vudî l' batch"
 
-#: src/main-window.c:617 src/toolbar-factory.c:141
+#: src/main-window.c:635 src/toolbar-factory.c:141
 msgid "Delete messages from the Trash mailbox"
 msgstr "Disfacer po d' bon les messaedjes k' on stî tapés å batch"
 
-#: src/main-window.c:621
+#: src/main-window.c:639
 msgid "Edit/Apply _Filters"
 msgstr "Candjî/Mete en alaedje les _passetes"
 
-#: src/main-window.c:622
-#, fuzzy
+#: src/main-window.c:640
 msgid "Filter the content of the selected mailbox"
-msgstr "Disfacer li boesse tchoezeye"
-
-#: src/main-window.c:626
-msgid "_Remove Duplicates"
 msgstr ""
 
-#: src/main-window.c:627
-#, fuzzy
-msgid "Remove duplicated messages from the selected mailbox"
-msgstr "Disfacer po d' bon les messaedjes k' on stî tapés å batch"
+#: src/main-window.c:644
+msgid "_Remove Duplicates"
+msgstr "_Oister messaedjes e dobe"
 
-#: src/main-window.c:636
+#: src/main-window.c:645
+msgid "Remove duplicated messages from the selected mailbox"
+msgstr "Oister les messaedjes e dobe del boesse ås emiles tchoezeye"
+
+#: src/main-window.c:654
 msgid "_Toolbars..."
 msgstr "Bårs ås _usteyes..."
 
-#: src/main-window.c:637
+#: src/main-window.c:655
 msgid "Customize toolbars"
 msgstr "Bår ås usteyes a vosse môde"
 
-#: src/main-window.c:640
+#: src/main-window.c:658
 msgid "_Identities..."
-msgstr "_Idintistés..."
+msgstr "_Idintités..."
 
-#: src/main-window.c:641
+#: src/main-window.c:659
 msgid "Create and set current identities"
 msgstr ""
 
-#: src/main-window.c:658
+#: src/main-window.c:675 src/message-window.c:175
 msgid "_Message"
 msgstr "_Messaedje"
 
-#: src/main-window.c:659
+#: src/main-window.c:676
 msgid "Mail_box"
 msgstr "_Boesse ås emiles"
 
-#: src/main-window.c:750
+#: src/main-window.c:767
 msgid ""
 "Balsa is sending a mail now.\n"
 "Abort sending?"
 msgstr ""
 
-#: src/main-window.c:1374
+#: src/main-window.c:1396
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
 msgstr ""
 
-#: src/main-window.c:1656
-msgid "Copyright (C) 1997-2002"
-msgstr "Copyright © 1997-2002"
-
-#: src/main-window.c:1660
+#: src/main-window.c:1688
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://balsa.gnome.org/\n"
@@ -3110,1138 +3631,1214 @@ msgid ""
 "If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
 msgstr ""
 
-#: src/main-window.c:1787
-#, fuzzy
+#: src/main-window.c:1815
 msgid "Checking Mail..."
-msgstr "Evoyaedje di l' emile..."
+msgstr "Cwerant après des emiles..."
 
-#: src/main-window.c:2087
+#: src/main-window.c:2115
 msgid "Finished Checking."
 msgstr ""
 
-#: src/main-window.c:2151
+#: src/main-window.c:2179
 #, c-format
 msgid "Sending error: %s"
-msgstr ""
+msgstr "Åk n' a nén stî tot-z evoyant: %s"
 
-#: src/main-window.c:2246
+#: src/main-window.c:2275
 msgid "Balsa: New mail"
-msgstr ""
+msgstr "Balsa: Noveas emiles"
 
-#: src/main-window.c:2256
-#, fuzzy, c-format
+#: src/main-window.c:2287
+#, c-format
 msgid "You have received %d new messages."
-msgstr "Evoyî ci messaedje chal"
+msgstr "Vos avoz rçuvou %d noveas messaedjes."
 
-#: src/main-window.c:2257
+#: src/main-window.c:2288
 msgid "You have received 1 new message."
-msgstr ""
+msgstr "Vos avoz rçuvou 1 novea messaedje."
 
-#: src/main-window.c:2668
-#, fuzzy
+#: src/main-window.c:2708
 msgid "Search mailbox"
-msgstr "Clôre li boesse ås emiles"
+msgstr "Cweri e l' boesse ås emiles"
 
-#: src/main-window.c:2681
+#: src/main-window.c:2721
 msgid "_Reverse search"
-msgstr ""
+msgstr "Cweri å _rvier"
 
-#: src/main-window.c:2684
-#, fuzzy
+#: src/main-window.c:2724
 msgid "_Search for:"
-msgstr "_Sierveu:"
+msgstr "C_weri après:"
 
-#: src/main-window.c:2697
-#, fuzzy
+#: src/main-window.c:2737
 msgid "In:"
-msgstr "Messaedjes en intreye:"
+msgstr "E:"
 
-#: src/main-window.c:2711
+#: src/main-window.c:2751
 msgid "S_ubject"
 msgstr "S_udjet"
 
-#: src/main-window.c:2826
+#: src/main-window.c:2866
 msgid "You can apply filters only on mailbox\n"
 msgstr ""
 
-#: src/main-window.c:2870 src/main-window.c:2889
-#, fuzzy, c-format
+#: src/main-window.c:2910 src/main-window.c:2929
+#, c-format
 msgid "Commiting mailbox %s failed."
-msgstr "Nole boesse di tchoezeye."
+msgstr ""
 
-#: src/main-window.c:3082
+#: src/main-window.c:3122
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr ""
 
-#: src/main-window.c:3084
+#: src/main-window.c:3124
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: src/main-window.c:3175
-#, fuzzy
+#: src/main-window.c:3222
 msgid "Cannot access the message's body\n"
-msgstr "Dji n' pou scrire li messaedje"
+msgstr ""
 
-#: src/main.c:115
+#: src/main.c:119
 msgid "Get new mail on startup"
 msgstr ""
 
-#: src/main.c:117
+#: src/main.c:121
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "Sicrire on novea emile po ADRESSE@EMILE"
 
-#: src/main.c:119
-#, fuzzy
+#: src/main.c:123
 msgid "Attach file at PATH"
-msgstr "Atatchî fitchî"
+msgstr "Ataetchî fitchî"
 
-#: src/main.c:121
+#: src/main.c:125
 msgid "Opens MAILBOXNAME"
 msgstr "Droveye NODELBOESSE"
 
-#: src/main.c:121
+#: src/main.c:125
 msgid "MAILBOXNAME"
 msgstr "NODELBOESSE"
 
-#: src/main.c:124
+#: src/main.c:128
 msgid "Opens first unread mailbox"
-msgstr "Drovi li 1ire boesse avou des messaedjes nén lejhous"
+msgstr "Drovi li 1ire boesse avou des messaedjes nén léjhous"
 
-#: src/main.c:127
+#: src/main.c:131
 msgid "Opens default Inbox on startup"
 msgstr ""
 
-#: src/main.c:129
+#: src/main.c:133
 msgid "Debug POP3 connection"
 msgstr ""
 
-#: src/main.c:165 src/main.c:170 src/main.c:176 src/main.c:182 src/main.c:188
+#: src/main.c:169 src/main.c:174 src/main.c:180 src/main.c:186 src/main.c:192
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
 msgstr "Balsa n' pout nén drovi vosse boesse ås emiles «%s»."
 
-#: src/main.c:165
+#: src/main.c:169
 msgid "Inbox"
 msgstr "Messaedjes en intrêye"
 
-#: src/main.c:171
+#: src/main.c:175
 msgid "Outbox"
 msgstr "Messaedjes e rexhowe"
 
-#: src/main.c:177
+#: src/main.c:181
 msgid "Sentbox"
 msgstr "Messaedjes evoyîs"
 
-#: src/main.c:183
+#: src/main.c:187
 msgid "Draftbox"
 msgstr "Brouyons"
 
-#: src/main.c:188
+#: src/main.c:192
 msgid "Trash"
 msgstr "Batch"
 
-#: src/message-window.c:85
+#: src/message-window.c:73
+msgid "N_o Headers"
+msgstr "_Nole tiestire"
+
+#: src/message-window.c:75
 msgid "_Selected Headers"
 msgstr "_Tchoezeyes tiestires"
 
-#: src/message-window.c:126
+#: src/message-window.c:116
 msgid "Reply to this message"
 msgstr "Risponde a ci messaedje chal"
 
-#: src/message-window.c:132
+#: src/message-window.c:122
 msgid "Reply to all recipients of this message"
-msgstr "Risponde a tertos k' on rçu ci messaedje chal"
+msgstr "Risponde a tertos k' on rçuvou ci messaedje chal"
 
-#: src/message-window.c:144
-#, fuzzy
+#: src/message-window.c:134
 msgid "Forward this message as attachment"
-msgstr "[-- Cist atatchmint %s/%s "
+msgstr "Ricassî ci messaedje chal come èn ataetchmint"
 
-#: src/message-window.c:148
-#, fuzzy
+#: src/message-window.c:138
 msgid "Forward inline..."
-msgstr "Dji tchedje..."
+msgstr "Ricassî e _coir do messaedje..."
 
-#: src/message-window.c:149
-#, fuzzy
+#: src/message-window.c:139
 msgid "Forward this message inline"
-msgstr "Evoyî ci messaedje chal"
+msgstr "Ricassî ci messaedje chal tot l' metant e coir do messaedje ki srè evoyî"
 
-#: src/pref-manager.c:318
+#: src/message-window.c:174
+msgid "M_ove"
+msgstr "_Displaecî"
+
+#: src/pref-manager.c:326
 msgid "7 Bits"
 msgstr "7 bits"
 
-#: src/pref-manager.c:319
+#: src/pref-manager.c:327
 msgid "8 Bits"
 msgstr "8 bits"
 
-#: src/pref-manager.c:320
+#: src/pref-manager.c:328
 msgid "Quoted"
 msgstr ""
 
-#: src/pref-manager.c:330
+#: src/pref-manager.c:338
 msgid "While Retrieving Messages"
 msgstr ""
 
-#: src/pref-manager.c:331
+#: src/pref-manager.c:339
 msgid "Until Closed"
 msgstr ""
 
-#: src/pref-manager.c:332 src/pref-manager.c:2945 src/pref-manager.c:2993
+#: src/pref-manager.c:340 src/pref-manager.c:3040 src/pref-manager.c:3108
 msgid "Never"
 msgstr "Måy"
 
-#: src/pref-manager.c:336
+#: src/pref-manager.c:344
 msgid "Fast"
 msgstr "Roed"
 
-#: src/pref-manager.c:337
+#: src/pref-manager.c:345
 msgid "Normal"
 msgstr "Normå"
 
-#: src/pref-manager.c:338
+#: src/pref-manager.c:346
 msgid "Bad Spellers"
 msgstr "Måvas coridjeus"
 
-#: src/pref-manager.c:342
-#, fuzzy
+#: src/pref-manager.c:350
 msgid "Flat"
-msgstr "Roed"
+msgstr ""
 
-#: src/pref-manager.c:344
+#: src/pref-manager.c:352
 msgid "JWZ"
 msgstr ""
 
+#: src/pref-manager.c:356
+msgid "west european (traditional)"
+msgstr "urope di l' ouwess"
+
+#: src/pref-manager.c:357
+msgid "east european"
+msgstr "urope di l' ess"
+
+#: src/pref-manager.c:358
+msgid "south european"
+msgstr "urope do sud"
+
+#: src/pref-manager.c:359
+msgid "north european"
+msgstr "urope do nôr"
+
+#: src/pref-manager.c:360
+msgid "cyrillic (iso/windows)"
+msgstr "cirilike (iso/windows)"
+
+#: src/pref-manager.c:361
+msgid "arabic"
+msgstr "arabe"
+
+#: src/pref-manager.c:362
+msgid "greek"
+msgstr "grek"
+
+#: src/pref-manager.c:363
+msgid "hebrew"
+msgstr "ebreu"
+
+#: src/pref-manager.c:364
+msgid "turkish"
+msgstr "turk"
+
+#: src/pref-manager.c:365
+msgid "nordic"
+msgstr "nordike"
+
+#: src/pref-manager.c:366
+msgid "thai"
+msgstr "taylandès"
+
+#: src/pref-manager.c:367
+msgid "baltic"
+msgstr "baltike"
+
+#: src/pref-manager.c:368
+msgid "celtic"
+msgstr "celtike"
+
 #: src/pref-manager.c:369
+msgid "west european (euro)"
+msgstr "urope di l' ouwess (avou l' €)"
+
+#: src/pref-manager.c:370
+msgid "russian (koi)"
+msgstr "rûsse (koi8-r)"
+
+#: src/pref-manager.c:371
+msgid "ukranian (koi)"
+msgstr "oucrinnyin (koi8-u)"
+
+#: src/pref-manager.c:372
+msgid "japanese"
+msgstr "djaponès"
+
+#: src/pref-manager.c:373
+msgid "korean"
+msgstr "coreyin"
+
+#: src/pref-manager.c:397
 msgid "Balsa Preferences"
 msgstr "Preferinces di Balsa"
 
-#: src/pref-manager.c:395
+#: src/pref-manager.c:423
 msgid "Mail Servers"
 msgstr "Sierveus d' emilaedje"
 
-#: src/pref-manager.c:399 src/pref-manager.c:2565
+#: src/pref-manager.c:427 src/pref-manager.c:2660
 msgid "Address Books"
 msgstr "Calpins d' adresses"
 
-#: src/pref-manager.c:403
+#: src/pref-manager.c:431
 msgid "Mail Options"
 msgstr "Tchuzes d' emilaedje"
 
-#: src/pref-manager.c:407 src/pref-manager.c:1922
+#: src/pref-manager.c:435 src/pref-manager.c:2016
 msgid "Display"
 msgstr "Håynaedje"
 
-#: src/pref-manager.c:411 src/toolbar-factory.c:130
+#: src/pref-manager.c:439 src/toolbar-factory.c:130
 msgid "Spelling"
 msgstr "Coridjî"
 
-#: src/pref-manager.c:415
+#: src/pref-manager.c:443
 msgid "Misc"
 msgstr "Totes sôres"
 
-#: src/pref-manager.c:419
+#: src/pref-manager.c:447
 msgid "Startup"
 msgstr "Enondaedje"
 
-#: src/pref-manager.c:1233
+#: src/pref-manager.c:1279
 #, c-format
 msgid "%s (default)"
 msgstr "%s (prémetou)"
 
-#: src/pref-manager.c:1483
+#: src/pref-manager.c:1529
 msgid "Remote Mailbox Servers"
 msgstr "Sierveus di boesses å lon"
 
-#: src/pref-manager.c:1504 src/pref-manager.c:2586
+#: src/pref-manager.c:1550 src/pref-manager.c:2681
 msgid "Type"
-msgstr "Sôte"
+msgstr "Sôre"
 
-#: src/pref-manager.c:1512
+#: src/pref-manager.c:1558
 msgid "Mailbox Name"
 msgstr "No del boesse ås emiles"
 
-#: src/pref-manager.c:1525 src/pref-manager.c:2617
+#: src/pref-manager.c:1571 src/pref-manager.c:2712
 msgid "_Modify"
 msgstr "_Candjî"
 
-#: src/pref-manager.c:1540
+#: src/pref-manager.c:1586
 msgid "Local Mail"
 msgstr "Emiles locås"
 
-#: src/pref-manager.c:1542
+#: src/pref-manager.c:1588
 msgid "Select your local mail directory"
 msgstr "Tchoezixhoz vosse ridant des emiles locås"
 
-#: src/pref-manager.c:1562
+#: src/pref-manager.c:1608
 msgid "Outgoing Mail"
 msgstr "Emiles e rexhowe"
 
-#: src/pref-manager.c:1567
+#: src/pref-manager.c:1613
 msgid "Remote SMTP Server"
 msgstr "Sierveu SMTP å lon"
 
-#: src/pref-manager.c:1569
+#: src/pref-manager.c:1615
 msgid "User"
-msgstr "Ûzeu"
+msgstr "Uzeu"
 
-#: src/pref-manager.c:1572
+#: src/pref-manager.c:1618
 msgid "Pass Phrase"
 msgstr "Sicret"
 
 #. STARTTLS
-#: src/pref-manager.c:1576
+#: src/pref-manager.c:1622
 msgid "Use TLS"
 msgstr "Eployî TLS"
 
-#: src/pref-manager.c:1594
+#: src/pref-manager.c:1640
 msgid "Certificate Pass Phrase"
 msgstr "Sicret po l' acertineure"
 
-#: src/pref-manager.c:1612
+#: src/pref-manager.c:1658
 msgid "Incoming"
 msgstr "Intrêye"
 
-#: src/pref-manager.c:1614
+#: src/pref-manager.c:1660
 msgid "Outgoing"
 msgstr "Rexhowe"
 
-#: src/pref-manager.c:1638
+#: src/pref-manager.c:1684
 msgid "Checking"
 msgstr ""
 
-#: src/pref-manager.c:1643
+#: src/pref-manager.c:1689
 msgid "_Check mail automatically every:"
 msgstr ""
 
-#: src/pref-manager.c:1654 src/pref-manager.c:2435 src/pref-manager.c:2456
-msgid "minutes"
-msgstr "munutes"
-
-#: src/pref-manager.c:1660
-#, fuzzy
+#: src/pref-manager.c:1706
 msgid "Check _IMAP mailboxes"
-msgstr "Radjouter ene novele boesse IMAP"
+msgstr ""
 
-#: src/pref-manager.c:1666
+#: src/pref-manager.c:1712
 msgid "Check INBOX _only"
 msgstr ""
 
-#: src/pref-manager.c:1671
+#: src/pref-manager.c:1717
 msgid "Display message if new mail has arrived in an open mailbox"
 msgstr ""
 
-#: src/pref-manager.c:1676
+#: src/pref-manager.c:1722
 msgid "Do background check quietly (no messages in status bar)"
 msgstr ""
 
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
-#: src/pref-manager.c:1694
+#: src/pref-manager.c:1740
 msgid "Quoted and Flowed Text"
 msgstr ""
 
-#: src/pref-manager.c:1698
+#: src/pref-manager.c:1744 src/sendmsg-window.c:3715
 msgid "Quoted Text Regular Expression"
 msgstr ""
 
-#: src/pref-manager.c:1709
+#: src/pref-manager.c:1755
 msgid "Wrap Incoming Text at:"
 msgstr ""
 
-#: src/pref-manager.c:1720 src/pref-manager.c:1844
+#: src/pref-manager.c:1766 src/pref-manager.c:1938
 msgid "characters"
 msgstr "caracteres"
 
 #. handling of multipart/alternative
-#: src/pref-manager.c:1735
+#: src/pref-manager.c:1781
 msgid "Display of Multipart/Alternative Parts"
 msgstr ""
 
-#: src/pref-manager.c:1738
+#: src/pref-manager.c:1784
 msgid "prefer text/plain over html"
 msgstr ""
 
+#. treatment of messages with 8-bit chars, but without proper MIME encoding
+#: src/pref-manager.c:1802
+msgid "National (8-bit) characters in broken messages without codeset header"
+msgstr ""
+
+#: src/pref-manager.c:1808
+msgid "display as \"?\""
+msgstr "håyner come «?»"
+
+#: src/pref-manager.c:1817
+msgid "display using codeset"
+msgstr "håyner tot-z eployant l' ecôdaedje"
+
 #. How to handle received MDN requests
-#: src/pref-manager.c:1755
+#: src/pref-manager.c:1849
 msgid "Message Disposition Notification Requests"
 msgstr ""
 
-#: src/pref-manager.c:1757
+#: src/pref-manager.c:1851
 msgid ""
 "When I receive a message and its sender requested to return a\n"
 "Message Disposition Notification (MDN), send it in the following cases:"
 msgstr ""
 
-#: src/pref-manager.c:1768
+#: src/pref-manager.c:1862
 msgid ""
 "The message header looks clean\n"
 "(the notify-to address is equal to the return path,\n"
 "I am in the \"To:\" or \"Cc:\" list)."
 msgstr ""
 
-#: src/pref-manager.c:1786
+#: src/pref-manager.c:1880
 msgid "The message header looks suspicious."
 msgstr ""
 
-#: src/pref-manager.c:1825
+#: src/pref-manager.c:1919
 msgid "Word Wrap"
 msgstr ""
 
-#: src/pref-manager.c:1830
+#: src/pref-manager.c:1924
 msgid "Wrap Outgoing Text at:"
 msgstr ""
 
-#: src/pref-manager.c:1858
-#, fuzzy
+#: src/pref-manager.c:1952
 msgid "Other Options"
-msgstr "Ôtes relijhas"
+msgstr "Ôtès tchuzes"
 
-#: src/pref-manager.c:1864
+#: src/pref-manager.c:1958
 msgid "External editor command:"
 msgstr ""
 
-#: src/pref-manager.c:1865
-#, fuzzy
+#: src/pref-manager.c:1959
 msgid "Reply Prefix:"
-msgstr "Tchinne po les rsponses"
+msgstr "Betchete di response:"
 
-#: src/pref-manager.c:1868
+#: src/pref-manager.c:1962
 msgid "Edit headers in external editor"
 msgstr ""
 
-#: src/pref-manager.c:1870
+#: src/pref-manager.c:1964
 msgid "Automatically quote original when replying"
 msgstr ""
 
-#: src/pref-manager.c:1873
+#: src/pref-manager.c:1967
 msgid "Don't include HTML parts as text when replying or forwarding mail"
 msgstr ""
 
-#: src/pref-manager.c:1876
+#: src/pref-manager.c:1970
 msgid "Forward a mail as attachment instead of quoting it"
 msgstr ""
 
-#: src/pref-manager.c:1879
+#: src/pref-manager.c:1973
 msgid "Send button always queues outgoing mail in outbox"
 msgstr ""
 
-#: src/pref-manager.c:1882
-#, fuzzy
+#: src/pref-manager.c:1976
 msgid "Copy outgoing messages to sentbox"
-msgstr "Copiant %d messaedjes viè %s..."
+msgstr ""
 
-#: src/pref-manager.c:1895 src/pref-manager.c:2019
+#: src/pref-manager.c:1989 src/pref-manager.c:2113
 msgid "Encoding"
-msgstr "Ecôdaedje des doneyes"
+msgstr "Ecôdaedje des dnêyes"
 
-#: src/pref-manager.c:1925
+#: src/pref-manager.c:2019
 msgid "Status Messages"
-msgstr "Messaedjes so l' etat"
+msgstr "Messaedjes so l' estat"
 
-#: src/pref-manager.c:1927
+#: src/pref-manager.c:2021
 msgid "Colors"
 msgstr "Coleurs"
 
-#: src/pref-manager.c:1929
+#: src/pref-manager.c:2023
 msgid "Message"
 msgstr "Messaedje"
 
-#: src/pref-manager.c:1931 src/pref-manager.c:2258
+#: src/pref-manager.c:2025 src/pref-manager.c:2353
 msgid "Threading"
 msgstr ""
 
-#: src/pref-manager.c:1956
+#: src/pref-manager.c:2050
 msgid "Main Window"
-msgstr "Maisse purnea"
+msgstr "Mwaisse purnea"
 
-#: src/pref-manager.c:1959
+#: src/pref-manager.c:2053
 msgid "Use preview pane"
 msgstr ""
 
-#: src/pref-manager.c:1961
+#: src/pref-manager.c:2055
 msgid "Show mailbox statistics in left pane"
 msgstr ""
 
-#: src/pref-manager.c:1963
+#: src/pref-manager.c:2057
 msgid "Use alternative main window layout"
 msgstr ""
 
-#: src/pref-manager.c:1965
+#: src/pref-manager.c:2059
 msgid "Automatically view message when mailbox opened"
 msgstr ""
 
-#: src/pref-manager.c:1968
+#: src/pref-manager.c:2062
 msgid "Display message size as number of lines"
 msgstr ""
 
-#: src/pref-manager.c:1973
+#: src/pref-manager.c:2067
 msgid "PageUp/PageDown keys scroll message by:"
 msgstr ""
 
-#: src/pref-manager.c:1984
+#: src/pref-manager.c:2078
 msgid "percent"
 msgstr ""
 
-#: src/pref-manager.c:1999
+#: src/pref-manager.c:2093
 msgid "Display Progress Dialog"
 msgstr ""
 
-#: src/pref-manager.c:2024
+#: src/pref-manager.c:2118
 msgid "Date encoding (for strftime):"
 msgstr "Cogne del date (po strftime):"
 
-#: src/pref-manager.c:2026
+#: src/pref-manager.c:2120
 msgid "Selected headers:"
 msgstr "Tchoezeyès tiestires:"
 
-#: src/pref-manager.c:2028
+#: src/pref-manager.c:2122
 msgid "Message window title format:"
 msgstr "Cogne do tite do purnea di messaedje:"
 
-#: src/pref-manager.c:2049 src/pref-manager.c:2054
+#: src/pref-manager.c:2143 src/pref-manager.c:2148
 msgid "Information Messages"
 msgstr "Messaedjes d' informåcion"
 
-#: src/pref-manager.c:2058
+#: src/pref-manager.c:2152
 msgid "Warning Messages"
-msgstr "Messaedjes d' advertixhmint"
+msgstr "Messaedjes d' adviertixhmint"
 
-#: src/pref-manager.c:2062
+#: src/pref-manager.c:2156
 msgid "Error Messages"
 msgstr "Messaedjes d' aroke"
 
-#: src/pref-manager.c:2066
+#: src/pref-manager.c:2160
 msgid "Fatal Error Messages"
 msgstr "Messaedjes d' arokes moirts"
 
-#: src/pref-manager.c:2070
+#: src/pref-manager.c:2164
 msgid "Debug Messages"
-msgstr "Messaedjes di disbogaedje"
+msgstr "Messaedjes di disbugaedje"
 
-#: src/pref-manager.c:2095
+#: src/pref-manager.c:2189
 msgid "Mailbox Colors"
 msgstr "Coleurs des boesses ås emiles"
 
-#: src/pref-manager.c:2098
+#: src/pref-manager.c:2192
 msgid "Mailbox with unread messages color"
-msgstr "Coleur des boesses avou des messaedjes nén lejhous"
+msgstr "Coleur des boesses avou des messaedjes nén léjhous"
 
-#: src/pref-manager.c:2112
+#: src/pref-manager.c:2206
 msgid "Message Colors"
 msgstr "Coleurs pol messaedje"
 
-#: src/pref-manager.c:2123
+#: src/pref-manager.c:2217
 #, c-format
 msgid "Quote level %d color"
 msgstr ""
 
-#: src/pref-manager.c:2143
-#, fuzzy
+#: src/pref-manager.c:2237
 msgid "Link Color"
-msgstr "Coleurs"
+msgstr "Coleur po les loyéns"
 
-#: src/pref-manager.c:2145
+#: src/pref-manager.c:2239
 msgid "Hyperlink color"
 msgstr ""
 
-#: src/pref-manager.c:2156
+#: src/pref-manager.c:2250
 msgid "Composition Window"
 msgstr "Purnea d' aspougnaedje"
 
-#: src/pref-manager.c:2160
+#: src/pref-manager.c:2254
 msgid "Invalid or incomplete address label color"
 msgstr ""
 
 #. create a 2nd notebook page for the fonts
-#: src/pref-manager.c:2184 src/print.c:1251
+#: src/pref-manager.c:2279 src/print.c:1413
 msgid "Fonts"
 msgstr "Fontes"
 
-#: src/pref-manager.c:2199 src/pref-manager.c:2224
+#: src/pref-manager.c:2294 src/pref-manager.c:2319
 msgid "Select a font to use"
 msgstr "Tchoezixhoz li fonte a-z eployî"
 
-#: src/pref-manager.c:2202 src/pref-manager.c:2227
+#: src/pref-manager.c:2297 src/pref-manager.c:2322
 msgid "Select..."
 msgstr "Tchoezi..."
 
-#: src/pref-manager.c:2209
+#: src/pref-manager.c:2304
 msgid "Message Font"
 msgstr "Fonte po les messaedjes"
 
-#: src/pref-manager.c:2235
+#: src/pref-manager.c:2330
 msgid "Message Subject Font"
 msgstr "Fonte pol sudjet des messaedjes"
 
-#: src/pref-manager.c:2261
+#: src/pref-manager.c:2356
 msgid "Expand mailbox tree on open"
 msgstr ""
 
-#: src/pref-manager.c:2265
+#: src/pref-manager.c:2360
 msgid "Default threading style"
 msgstr ""
 
-#: src/pref-manager.c:2344
+#: src/pref-manager.c:2439
 msgid "Pspell Settings"
 msgstr "Apontiaedje di pspell"
 
-#: src/pref-manager.c:2350
+#: src/pref-manager.c:2445
 msgid "Spell Check Module"
 msgstr "Module pol coridjaedje"
 
-#: src/pref-manager.c:2357
+#: src/pref-manager.c:2452
 msgid "Suggestion Level"
 msgstr ""
 
 #. do the ignore length
-#: src/pref-manager.c:2363
+#: src/pref-manager.c:2458
 msgid "Ignore words shorter than"
 msgstr ""
 
-#: src/pref-manager.c:2384
+#: src/pref-manager.c:2479
 msgid "Miscellaneous Spelling Settings"
 msgstr "Apontiaedje di totes sôres pol coridjrece"
 
-#: src/pref-manager.c:2386
+#: src/pref-manager.c:2481
 msgid "Check signature"
 msgstr ""
 
-#: src/pref-manager.c:2387
+#: src/pref-manager.c:2482
 msgid "Check quoted"
 msgstr ""
 
-#: src/pref-manager.c:2412
+#: src/pref-manager.c:2507
 msgid "Miscellaneous"
 msgstr "Totes sôres"
 
-#: src/pref-manager.c:2414
+#: src/pref-manager.c:2509
 msgid "Debug"
-msgstr "Disbogaedje"
+msgstr "Disbugaedje"
 
-#: src/pref-manager.c:2415
+#: src/pref-manager.c:2510
 msgid "Empty Trash on exit"
-msgstr "Vuder l' batch e cwitant"
+msgstr "Vudî l' batch e cwitant"
 
-#: src/pref-manager.c:2421
+#: src/pref-manager.c:2516
 msgid "Automatically close mailbox if unused more than"
 msgstr ""
 
-#: src/pref-manager.c:2443
+#: src/pref-manager.c:2538
 msgid "Automatically commit mailbox if unused more than"
 msgstr ""
 
-#: src/pref-manager.c:2460
+#: src/pref-manager.c:2555
 msgid "Drag-and-drop moves messages by default"
 msgstr ""
 
-#: src/pref-manager.c:2471
-#, fuzzy
+#: src/pref-manager.c:2566
 msgid "Deleting Messages"
-msgstr "Disfacer messaedje"
+msgstr "Disfaçant messaedjes"
 
-#: src/pref-manager.c:2474
+#: src/pref-manager.c:2569
 msgid "Delete immediately and irretrievably"
-msgstr ""
+msgstr "Disfacer tot d' shûte et k' on n' poye nén l' raveur"
 
-#: src/pref-manager.c:2477
-#, fuzzy
+#: src/pref-manager.c:2572
 msgid "Hide deleted messages"
-msgstr "Disfacer messaedje"
+msgstr "Catchî les disfacés messaedjes"
 
-#: src/pref-manager.c:2498
+#: src/pref-manager.c:2593
 msgid "Options"
-msgstr "Relijhas"
+msgstr "Tchuzes"
 
-#: src/pref-manager.c:2501
+#: src/pref-manager.c:2596
 msgid "Open Inbox upon startup"
 msgstr ""
 
-#: src/pref-manager.c:2503
+#: src/pref-manager.c:2598
 msgid "Check mail upon startup"
 msgstr ""
 
-#: src/pref-manager.c:2505
+#: src/pref-manager.c:2600
 msgid "Remember open mailboxes between sessions"
 msgstr ""
 
-#: src/pref-manager.c:2519
+#: src/pref-manager.c:2614
 msgid "IMAP Folder Scanning"
 msgstr ""
 
-#: src/pref-manager.c:2521
+#: src/pref-manager.c:2616
 msgid ""
 "Choose depth 1 for fast startup; this defers scanning some folders.\n"
 "To see more of the tree at startup, choose a greater depth."
 msgstr ""
 
-#: src/pref-manager.c:2532
+#: src/pref-manager.c:2627
 msgid "Scan tree to depth"
 msgstr ""
 
-#: src/pref-manager.c:2594
+#: src/pref-manager.c:2689
 msgid "Address Book Name"
 msgstr "No do calpin d' adresses"
 
-#: src/pref-manager.c:2602
+#: src/pref-manager.c:2697
 msgid "Expand aliases"
 msgstr ""
 
-#: src/pref-manager.c:2621
+#: src/pref-manager.c:2716
 msgid "_Set as default"
 msgstr "_Defini come prémetou"
 
-#: src/pref-manager.c:2777
+#: src/pref-manager.c:2872
 msgid "Remote POP3 mailbox..."
 msgstr "Boesse POP3 å lon..."
 
-#: src/pref-manager.c:2923
+#: src/pref-manager.c:3018
 msgid "Show nothing"
 msgstr ""
 
-#: src/pref-manager.c:2924
+#: src/pref-manager.c:3019
 msgid "Show dialog"
 msgstr ""
 
-#: src/pref-manager.c:2925
+#: src/pref-manager.c:3020
 msgid "Show in list"
 msgstr ""
 
-#: src/pref-manager.c:2926
-#, fuzzy
+#: src/pref-manager.c:3021
 msgid "Print to console"
-msgstr "Rexhe sol scrirece:"
+msgstr ""
 
-#: src/pref-manager.c:2946
+#: src/pref-manager.c:3041
 msgid "Ask me"
 msgstr "Mi dmander"
 
-#: src/pref-manager.c:2947
+#: src/pref-manager.c:3042
 msgid "Always"
 msgstr "Tofer"
 
-#: src/pref-manager.c:2994
+#: src/pref-manager.c:3109
 msgid "If Possible"
-msgstr ""
+msgstr "Si possibe"
 
-#: src/pref-manager.c:2995
+#: src/pref-manager.c:3110
 msgid "Required"
 msgstr ""
 
-#: src/pref-manager.c:3019
+#: src/pref-manager.c:3134
 #, c-format
 msgid "Error displaying link_id %s: %s\n"
 msgstr "Åk n' a nén stî tot håynant l' idintifiant do loyén (link_id) %s: %s\n"
 
-#: src/print.c:249
+#: src/print.c:252
 #, c-format
 msgid "Page: %i/%i"
 msgstr "Pådje: %i/%i"
 
 #. gather some info about this part
 #. four fields, one terminator
-#: src/print.c:757
+#: src/print.c:830
 msgid "Type:"
 msgstr "Sôre:"
 
-#: src/print.c:760
+#: src/print.c:833
 msgid "File name:"
 msgstr "No do fitchî:"
 
-#: src/print.c:1157
+#: src/print.c:1319
 msgid "Font available for printing"
 msgstr "Fonte disponibe po-z eprimî"
 
-#: src/print.c:1163
+#: src/print.c:1325
 #, c-format
 msgid "Font <b>not</b> available for printing. Closest: %s"
-msgstr "Li font n' est <b>nén</b> disponibe po-z eprimî. Li pus rshonnante: %s"
+msgstr "Li fonte n' est <b>nén</b> disponibe po-z eprimî. Li pus rshonnante: %s"
 
-#: src/print.c:1176
+#: src/print.c:1338
 msgid "Select Font"
 msgstr "Tchoezi fonte"
 
-#: src/print.c:1209
+#: src/print.c:1371
 msgid "Change..."
 msgstr "Candjî..."
 
-#: src/print.c:1242
+#: src/print.c:1404
 msgid "Print message"
 msgstr "Eprimî l' messaedje"
 
-#: src/print.c:1254
+#: src/print.c:1416
 msgid "Header font"
 msgstr "Fonte pol tiestire"
 
-#: src/print.c:1256
+#: src/print.c:1418
 msgid "Body font"
-msgstr "Fonte pol coir do messaejde"
+msgstr "Fonte pol coir do messaedje"
 
-#: src/print.c:1258
+#: src/print.c:1420
 msgid "Footer font"
 msgstr "Fonte pol pînote"
 
 #. highlight cited stuff
-#: src/print.c:1262
+#: src/print.c:1424
 msgid "Highlight cited text"
 msgstr ""
 
-#: src/print.c:1266
+#: src/print.c:1428
 msgid "_Enable highlighting of cited text"
 msgstr ""
 
-#: src/print.c:1291
+#: src/print.c:1453
 #, c-format
 msgid ""
 "Balsa could not find font \"%s\".\n"
 "Use the \"Fonts\" page on the \"Print message\" dialog to change it."
 msgstr ""
 
-#: src/print.c:1379
+#: src/print.c:1541
 msgid "Balsa: message print preview"
 msgstr ""
 
-#: src/save-restore.c:564
+#: src/save-restore.c:562
 msgid "Error during filters loading: "
 msgstr ""
 
-#: src/save-restore.c:566
+#: src/save-restore.c:564
 #, c-format
 msgid ""
 "Error during filters loading: %s\n"
 "Filters may not be correct."
 msgstr ""
 
-#: src/save-restore.c:673
+#: src/save-restore.c:675
 msgid "The option not to recognize \"format=flowed\" text has been removed."
 msgstr ""
 
-#: src/save-restore.c:886
+#: src/save-restore.c:894
 msgid ""
 "The option not to send \"format=flowed\" is now on the Options menu of the "
 "compose window."
 msgstr ""
 
-#: src/save-restore.c:921
-msgid ""
-"The option to request a MDN is now on the Options menu of the compose window."
+#: src/save-restore.c:929
+msgid "The option to request a MDN is now on the Options menu of the compose window."
 msgstr ""
 
-#: src/sendmsg-window.c:183
+#: src/sendmsg-window.c:199
 msgid "_Include File..."
 msgstr ""
 
-#: src/sendmsg-window.c:186
+#: src/sendmsg-window.c:202
 msgid "_Attach File..."
-msgstr "_Atatchî on fitchî..."
+msgstr "_Ataetchî on fitchî..."
 
-#: src/sendmsg-window.c:189
-#, fuzzy
+#: src/sendmsg-window.c:205
 msgid "_Include Message(s)"
-msgstr "Messaedjes di disbogaedje"
+msgstr ""
 
-#: src/sendmsg-window.c:192
+#: src/sendmsg-window.c:208
 msgid "Attach _Message(s)"
-msgstr "Atatchî _messaedje(s)"
+msgstr "Ataetchî _messaedje(s)"
 
-#: src/sendmsg-window.c:198
+#: src/sendmsg-window.c:214
 msgid "_Send"
 msgstr "_Evoyî"
 
-#: src/sendmsg-window.c:199 src/toolbar-factory.c:121
+#: src/sendmsg-window.c:215 src/toolbar-factory.c:121
 msgid "Send this message"
 msgstr "Evoyî ci messaedje chal"
 
-#: src/sendmsg-window.c:203
+#: src/sendmsg-window.c:219
 msgid "_Queue"
 msgstr "El _caweye"
 
-#: src/sendmsg-window.c:204
+#: src/sendmsg-window.c:220
 msgid "Queue this message in Outbox for sending"
-msgstr "Mete ci messaedje chal èl caweye po l' evoyî pus tård"
+msgstr "Mete ci messaedje chal el caweye po l' evoyî pus tård"
 
-#: src/sendmsg-window.c:208
+#: src/sendmsg-window.c:224
 msgid "_Postpone"
 msgstr "_Leyî po pus tård"
 
-#: src/sendmsg-window.c:211
+#: src/sendmsg-window.c:227
 msgid "_Save"
 msgstr "_Schaper"
 
-#: src/sendmsg-window.c:212
+#: src/sendmsg-window.c:228
 msgid "Save this message"
 msgstr "Schaper ci messaedje chal"
 
-#: src/sendmsg-window.c:216
+#: src/sendmsg-window.c:232
 msgid "Print..."
 msgstr "Eprimî..."
 
-#: src/sendmsg-window.c:216
+#: src/sendmsg-window.c:232
 msgid "Print the edited message"
 msgstr "Rexhe li messaedje sol sicrirece"
 
-#: src/sendmsg-window.c:236
+#: src/sendmsg-window.c:261
 msgid "_Wrap Body"
 msgstr ""
 
-#: src/sendmsg-window.c:241
+#: src/sendmsg-window.c:265
+msgid "_Reflow Selected Text"
+msgstr ""
+
+#: src/sendmsg-window.c:270
 msgid "Insert Si_gnature"
 msgstr "Sititchî _sinateure"
 
-#: src/sendmsg-window.c:245
-#, fuzzy
+#: src/sendmsg-window.c:274
 msgid "_Quote Message(s)"
-msgstr "Messaedjes di disbogaedje"
-
-#: src/sendmsg-window.c:250
-msgid "_Reflow Paragraph"
 msgstr ""
 
-#: src/sendmsg-window.c:254
-#, fuzzy
-msgid "R_eflow Message"
-msgstr "_Messaedje"
-
-#: src/sendmsg-window.c:259
+#: src/sendmsg-window.c:279
 msgid "C_heck Spelling"
 msgstr "_Verifyî l' ortografeye"
 
-#: src/sendmsg-window.c:260
+#: src/sendmsg-window.c:280
 msgid "Check the spelling of the message"
 msgstr "Verifyî l' ortografeye do messaedje"
 
-#: src/sendmsg-window.c:265
+#: src/sendmsg-window.c:285
 msgid "Select _Identity..."
 msgstr "Tchoezi ene _idintité..."
 
-#: src/sendmsg-window.c:266
+#: src/sendmsg-window.c:286
 msgid "Select the Identity to use for the message"
 msgstr "Tchoezi l' idintité a-z eployî pol messaedje"
 
-#: src/sendmsg-window.c:271
+#: src/sendmsg-window.c:291
 msgid "_Edit with Gnome-Editor"
 msgstr ""
 
-#: src/sendmsg-window.c:272
+#: src/sendmsg-window.c:292
 msgid "Edit the current message with the default Gnome editor"
 msgstr ""
 
-#: src/sendmsg-window.c:284
+#: src/sendmsg-window.c:304
 msgid "Fr_om"
 msgstr ""
 
-#: src/sendmsg-window.c:286
-msgid "_To"
-msgstr ""
-
-#: src/sendmsg-window.c:290
+#: src/sendmsg-window.c:310
 msgid "_Cc"
 msgstr "_Cc"
 
-#: src/sendmsg-window.c:292
+#: src/sendmsg-window.c:312
 msgid "_Bcc"
 msgstr "_Bcc"
 
-#: src/sendmsg-window.c:294
+#: src/sendmsg-window.c:314
 msgid "_Fcc"
 msgstr "_Fcc"
 
-#: src/sendmsg-window.c:296
+#: src/sendmsg-window.c:316
 msgid "_Reply To"
 msgstr ""
 
-#: src/sendmsg-window.c:298
+#: src/sendmsg-window.c:318
 msgid "_Attachments"
-msgstr "_Atatchmints"
+msgstr "_Ataetchmints"
 
-#: src/sendmsg-window.c:301
+#: src/sendmsg-window.c:321
 msgid "_Comments"
 msgstr "_Rawetes"
 
-#: src/sendmsg-window.c:304
+#: src/sendmsg-window.c:324
 msgid "_Keywords"
 msgstr ""
 
-#: src/sendmsg-window.c:321 src/sendmsg-window.c:392
-msgid "Brazilian"
-msgstr "Braezilyin"
+#: src/sendmsg-window.c:340
+msgid "_Brazilian"
+msgstr "_Braezilyin"
 
-#: src/sendmsg-window.c:323 src/sendmsg-window.c:394
-msgid "Catalan"
-msgstr "Catalan"
-
-#: src/sendmsg-window.c:325 src/sendmsg-window.c:396
-msgid "Chinese Simplified"
-msgstr "Chinwès simplifyî"
-
-#: src/sendmsg-window.c:327 src/sendmsg-window.c:398
-msgid "Chinese Traditional"
-msgstr ""
-
-#: src/sendmsg-window.c:329 src/sendmsg-window.c:400
-msgid "Czech"
-msgstr "Tcheke"
-
-#: src/sendmsg-window.c:331 src/sendmsg-window.c:402
-msgid "Danish"
-msgstr "Daenwès"
-
-#: src/sendmsg-window.c:333 src/sendmsg-window.c:414
-msgid "German"
-msgstr "Almand"
-
-#: src/sendmsg-window.c:335 src/sendmsg-window.c:404
-msgid "Dutch"
-msgstr "Neyerlandès"
-
-#. English -> American English, argh...
-#: src/sendmsg-window.c:338 src/sendmsg-window.c:406
-msgid "English"
-msgstr "Inglès"
-
-#: src/sendmsg-window.c:340 src/sendmsg-window.c:408
-msgid "Esperanto"
-msgstr "Esperanto"
+#: src/sendmsg-window.c:341
+msgid "_Catalan"
+msgstr "_Catalan"
 
 #: src/sendmsg-window.c:342
-msgid "Estonian"
-msgstr "Estonyin"
+msgid "_Chinese Simplified"
+msgstr "_Chinwès simplifyî"
 
-#: src/sendmsg-window.c:344 src/sendmsg-window.c:410
-msgid "Finnish"
-msgstr "Finwès"
+#: src/sendmsg-window.c:343
+msgid "_Chinese Traditional"
+msgstr "_Chinwès tradicionel"
 
-#: src/sendmsg-window.c:346 src/sendmsg-window.c:412
-msgid "French"
-msgstr "Francès"
+#: src/sendmsg-window.c:344
+msgid "_Czech"
+msgstr "_Tcheke"
 
-#: src/sendmsg-window.c:348 src/sendmsg-window.c:416
-msgid "Greek"
-msgstr "Grek"
+#: src/sendmsg-window.c:345
+msgid "_Danish"
+msgstr "_Daenwès"
 
-#: src/sendmsg-window.c:350 src/sendmsg-window.c:418
-msgid "Hebrew"
-msgstr ""
+#: src/sendmsg-window.c:346
+msgid "_Dutch"
+msgstr "_Neyerlandès"
 
-#: src/sendmsg-window.c:352 src/sendmsg-window.c:420
-msgid "Hungarian"
-msgstr "Hongrwès"
+#: src/sendmsg-window.c:348
+msgid "_English (American)"
+msgstr "_Inglès (USA)"
 
-#: src/sendmsg-window.c:354 src/sendmsg-window.c:422
-msgid "Italian"
-msgstr "Itålyin"
+#: src/sendmsg-window.c:349
+msgid "_English (British)"
+msgstr "_Inglès (GB)"
 
-#: src/sendmsg-window.c:356 src/sendmsg-window.c:424
-msgid "Japanese"
-msgstr "Djaponès"
+#: src/sendmsg-window.c:350
+msgid "_Esperanto"
+msgstr "_Esperanto"
 
-#: src/sendmsg-window.c:358 src/sendmsg-window.c:430
-msgid "Korean"
-msgstr "Coreyin"
+#: src/sendmsg-window.c:351
+msgid "_Estonian"
+msgstr "_Estonyin"
 
-#: src/sendmsg-window.c:360 src/sendmsg-window.c:432
-msgid "Latvian"
-msgstr "Letonyin"
+#: src/sendmsg-window.c:352
+msgid "_Finnish"
+msgstr "_Finwès"
 
-#: src/sendmsg-window.c:362 src/sendmsg-window.c:434
-msgid "Lithuanian"
-msgstr "Lituanyin"
+#: src/sendmsg-window.c:353
+msgid "_French"
+msgstr "_Francès"
 
-#: src/sendmsg-window.c:364 src/sendmsg-window.c:436
-msgid "Norwegian"
-msgstr "Norvedjyin"
+#: src/sendmsg-window.c:354
+msgid "_German"
+msgstr "_Almand"
 
-#: src/sendmsg-window.c:366 src/sendmsg-window.c:438
-msgid "Polish"
-msgstr "Polonès"
+#: src/sendmsg-window.c:355
+msgid "_Greek"
+msgstr "_Grek"
 
-#: src/sendmsg-window.c:368 src/sendmsg-window.c:440
-msgid "Portugese"
-msgstr "Portugès"
+#: src/sendmsg-window.c:356
+msgid "_Hebrew"
+msgstr "_Ebreu"
 
-#: src/sendmsg-window.c:370 src/sendmsg-window.c:442
-msgid "Romanian"
-msgstr "Roumin"
+#: src/sendmsg-window.c:357
+msgid "_Hungarian"
+msgstr "_Hongrwès"
 
-#: src/sendmsg-window.c:372 src/sendmsg-window.c:444
-msgid "Russian (ISO)"
-msgstr "Russe (ISO5)"
+#: src/sendmsg-window.c:358
+msgid "_Italian"
+msgstr "_Itålyin"
 
-#: src/sendmsg-window.c:374 src/sendmsg-window.c:446
-msgid "Russian (KOI)"
-msgstr "Russe (KOI8-R)"
+#: src/sendmsg-window.c:359
+msgid "_Japanese"
+msgstr "D_japonès"
 
-#: src/sendmsg-window.c:376 src/sendmsg-window.c:448
-msgid "Slovak"
-msgstr "Slovake"
+#: src/sendmsg-window.c:360
+msgid "_Korean"
+msgstr "_Coreyin"
 
-#: src/sendmsg-window.c:378 src/sendmsg-window.c:450
-msgid "Spanish"
-msgstr "Castiyan"
+#: src/sendmsg-window.c:361
+msgid "_Latvian"
+msgstr "_Letonyin"
 
-#: src/sendmsg-window.c:380 src/sendmsg-window.c:452
-msgid "Swedish"
-msgstr "Suwedwès"
+#: src/sendmsg-window.c:362
+msgid "_Lithuanian"
+msgstr "_Litwanyin"
 
-#: src/sendmsg-window.c:382 src/sendmsg-window.c:454
-msgid "Turkish"
-msgstr "Turk"
+#: src/sendmsg-window.c:363
+msgid "_Norwegian"
+msgstr "_Norvedjyin"
 
-#: src/sendmsg-window.c:384 src/sendmsg-window.c:456
-msgid "Ukrainian"
-msgstr "Ucrinnyin"
+#: src/sendmsg-window.c:364
+msgid "_Polish"
+msgstr "_Polonès"
+
+#: src/sendmsg-window.c:365
+msgid "_Portugese"
+msgstr "_Portuguès"
+
+#: src/sendmsg-window.c:366
+msgid "_Romanian"
+msgstr "_Roumin"
+
+#: src/sendmsg-window.c:367
+msgid "_Russian (ISO)"
+msgstr "_Rûsse (ISO5)"
+
+#: src/sendmsg-window.c:368
+msgid "_Russian (KOI)"
+msgstr "_Rûsse (KOI8-R)"
+
+#: src/sendmsg-window.c:369
+msgid "_Slovak"
+msgstr "_Slovake"
+
+#: src/sendmsg-window.c:370
+msgid "_Spanish"
+msgstr "_Castiyan"
+
+#: src/sendmsg-window.c:371
+msgid "_Swedish"
+msgstr "_Suwedwès"
+
+#: src/sendmsg-window.c:372
+msgid "_Turkish"
+msgstr "_Turk"
+
+#: src/sendmsg-window.c:373
+msgid "_Ukrainian"
+msgstr "_Oucrinnyin"
+
+#: src/sendmsg-window.c:374
+msgid "_Generic UTF-8"
+msgstr "_Unicôde djenerike (UTF-8)"
 
 #: src/sendmsg-window.c:386
-msgid "Generic UTF-8"
-msgstr "Unicôde djenerike (UTF-8)"
+msgid "_GnuPG uses MIME mode"
+msgstr "_GnuPG eploye li môde MIME"
 
-#: src/sendmsg-window.c:458
-msgid "UTF-8"
-msgstr "Unicôde (UTF-8)"
+#: src/sendmsg-window.c:392
+msgid "_GnuPG uses old OpenPGP mode"
+msgstr "_GnuPG eploye li vî môde OpenPGP"
 
-#: src/sendmsg-window.c:466
-msgid "_A-J"
-msgstr "_A-J"
-
-#: src/sendmsg-window.c:467
-msgid "_K-Z"
-msgstr "_K-Z"
-
-#: src/sendmsg-window.c:476
+#: src/sendmsg-window.c:403
 msgid "_Request Disposition Notification"
 msgstr ""
 
-#: src/sendmsg-window.c:479
+#: src/sendmsg-window.c:406
 msgid "_Format = Flowed"
 msgstr ""
 
-#: src/sendmsg-window.c:522
+#: src/sendmsg-window.c:411
+msgid "_Sign Message"
+msgstr "_Siner l' messaedje"
+
+#: src/sendmsg-window.c:412
+msgid "signs the message using GnuPG"
+msgstr "Siner l' messaedje avou GnuPG"
+
+#: src/sendmsg-window.c:415
+msgid "_Encrypt Message"
+msgstr "_Ecripter l' messaedje"
+
+#: src/sendmsg-window.c:416
+msgid "signs the message using GnuPG for all To: and CC: recipients"
+msgstr ""
+
+#: src/sendmsg-window.c:461
 msgid "_Show"
 msgstr "_Vey"
 
-#: src/sendmsg-window.c:524
+#: src/sendmsg-window.c:463
 msgid "_Language"
 msgstr "_Lingaedjes"
 
-#: src/sendmsg-window.c:526
+#: src/sendmsg-window.c:465
 msgid "_Options"
 msgstr "_Tchuzes"
 
-#: src/sendmsg-window.c:609
+#: src/sendmsg-window.c:548
 #, c-format
 msgid ""
 "The message to '%s' is modified.\n"
 "Save message to Draftbox?"
 msgstr ""
+"Li messaedje po «%s» a stî candjî.\n"
+"El schaper dins l' boesse di brouyons?"
 
 #. Comments:
-#: src/sendmsg-window.c:744 src/sendmsg-window.c:1950
+#: src/sendmsg-window.c:670 src/sendmsg-window.c:1911
 msgid "Comments:"
 msgstr "Rawetes:"
 
-#: src/sendmsg-window.c:1182
+#: src/sendmsg-window.c:1118
 #, c-format
 msgid ""
 "Saying yes will not send the file `%s' itself, but just a MIME message/"
@@ -4251,187 +4848,204 @@ msgid ""
 "Do you really want to attach this file as reference?"
 msgstr ""
 
-#: src/sendmsg-window.c:1193
-#, fuzzy
+#: src/sendmsg-window.c:1129
 msgid "Attach as Reference?"
-msgstr "Preferinces di Balsa"
+msgstr ""
 
-#: src/sendmsg-window.c:1284
+#: src/sendmsg-window.c:1220
 msgid "Remove"
 msgstr "Oister"
 
-#: src/sendmsg-window.c:1295
-#, fuzzy
+#: src/sendmsg-window.c:1231
 msgid "attach as reference"
-msgstr "Preferinces di Balsa"
+msgstr ""
 
-#: src/sendmsg-window.c:1301
+#: src/sendmsg-window.c:1237
 msgid "attach as file"
-msgstr "atatchî come on fitchî"
+msgstr "ataetchî come on fitchî"
 
-#: src/sendmsg-window.c:1449
+#: src/sendmsg-window.c:1385
 #, c-format
 msgid "Cannot get info on file '%s': %s"
 msgstr "Dji n' sai aveur des informåcions sol fitchî «%s»: %s"
 
-#: src/sendmsg-window.c:1454
+#: src/sendmsg-window.c:1390
 #, c-format
 msgid "Attachment %s is not a regular file."
 msgstr ""
 
-#: src/sendmsg-window.c:1457
+#: src/sendmsg-window.c:1393
 #, c-format
 msgid "File %s cannot be read\n"
-msgstr "Li fitchî %s n' pout nén esse lejhou\n"
+msgstr "Li fitchî %s n' pout nén esse léjhou\n"
 
-#: src/sendmsg-window.c:1511
+#: src/sendmsg-window.c:1447
 msgid "Attach file"
-msgstr "Atatchî fitchî"
+msgstr "Ataetchî fitchî"
 
-#: src/sendmsg-window.c:1605 src/sendmsg-window.c:1642
-#: src/sendmsg-window.c:2726
+#: src/sendmsg-window.c:1543 src/sendmsg-window.c:1605
+#: src/sendmsg-window.c:2824
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
 msgstr ""
 
 #. From:
-#: src/sendmsg-window.c:1841
+#: src/sendmsg-window.c:1801
 msgid "F_rom:"
 msgstr "_Di:"
 
 #. Subject:
-#: src/sendmsg-window.c:1853
+#: src/sendmsg-window.c:1813
 msgid "S_ubject:"
 msgstr "S_udjet:"
 
 #. fcc:
-#: src/sendmsg-window.c:1867
+#: src/sendmsg-window.c:1827
 msgid "F_cc:"
 msgstr "_Fcc:"
 
 #. Reply To:
-#: src/sendmsg-window.c:1896
+#: src/sendmsg-window.c:1857
 msgid "_Reply To:"
 msgstr "_Risponde a:"
 
 #. Attachment list
-#: src/sendmsg-window.c:1903
+#: src/sendmsg-window.c:1864
 msgid "_Attachments:"
-msgstr "_Atatchmints:"
+msgstr "_Ataetchmints:"
 
 #. Keywords:
-#: src/sendmsg-window.c:1953
+#: src/sendmsg-window.c:1914
 msgid "Keywords:"
-msgstr ""
+msgstr "Mots clé:"
 
-#: src/sendmsg-window.c:2122
+#: src/sendmsg-window.c:2077
 msgid "you"
-msgstr ""
+msgstr "vosse"
 
-#: src/sendmsg-window.c:2129
+#: src/sendmsg-window.c:2086
 #, c-format
 msgid "------forwarded message from %s------\n"
-msgstr ""
+msgstr "------messaedje ricassî da %s------\n"
 
-#: src/sendmsg-window.c:2159
-#, fuzzy, c-format
+#: src/sendmsg-window.c:2121
+#, c-format
 msgid "Message-ID: %s\n"
-msgstr "Coleurs pol messaedje"
+msgstr "ID do messaedje: %s\n"
 
-#: src/sendmsg-window.c:2165
+#: src/sendmsg-window.c:2127
 msgid "References:"
 msgstr "Referinces: "
 
-#: src/sendmsg-window.c:2175
+#: src/sendmsg-window.c:2137
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "Li %s, %s scrijha:\n"
 
-#: src/sendmsg-window.c:2177
+#: src/sendmsg-window.c:2139
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s scrijha:\n"
 
-#: src/sendmsg-window.c:2891
+#: src/sendmsg-window.c:2986
 msgid "Choose charset"
 msgstr "Tchoezixhoz l' ecôdaedje"
 
-#: src/sendmsg-window.c:2898
+#: src/sendmsg-window.c:2993
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file."
 msgstr ""
+"Ci fitchî chal n' est nén ecôdé en ASCII nerén en UTF-8.\n"
+"Tchoezixhoz l' ecôdaedje do fitchî s' i vs plait."
 
-#: src/sendmsg-window.c:2964
+#: src/sendmsg-window.c:3059
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Dji n' a savou drovi l' fitchî %s.\n"
 
-#: src/sendmsg-window.c:2985
+#: src/sendmsg-window.c:3081
 msgid "Include file"
-msgstr ""
+msgstr "Sititchî fitchî"
 
-#: src/sendmsg-window.c:3238
+#: src/sendmsg-window.c:3339
 #, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
 "Please choose a language for this message."
 msgstr ""
+"Li messaedje ni pout nén esse ecôdé avou l' ecôdaedje %s.\n"
+"Tchoezixhoz on lingaedje po ç' messaedje chal."
 
-#: src/sendmsg-window.c:3946
-#, fuzzy, c-format
+#: src/sendmsg-window.c:3358
+msgid ""
+"You selected OpenPGP mode for a message with attachments. In this mode, only "
+"the first part will be signed and/or encrypted. You should select MIME mode "
+"if the complete message shall be protected. Do you really want to proceed?"
+msgstr ""
+
+#: src/sendmsg-window.c:3371
+#, c-format
+msgid "sending message with gpg mode %d"
+msgstr "evoyant messaedje avou gpg môde %d"
+
+#: src/sendmsg-window.c:3714
+#, c-format
+msgid "Could not compile %s"
+msgstr "Dji n' a savou copiler %s"
+
+#: src/sendmsg-window.c:4247
+#, c-format
 msgid "Reply to %s: %s"
-msgstr "Risponde a ci messaedje chal"
+msgstr "Risponde a %s: %s"
 
-#: src/sendmsg-window.c:3951
-#, fuzzy, c-format
+#: src/sendmsg-window.c:4252
+#, c-format
 msgid "Forward message to %s: %s"
-msgstr "Evoyî ci messaedje chal"
+msgstr "Ricassî ci messaedje viè %s: %s"
 
-#: src/sendmsg-window.c:3955
-#, fuzzy, c-format
+#: src/sendmsg-window.c:4256
+#, c-format
 msgid "Continue message to %s: %s"
-msgstr "Continuwer on messaedje"
+msgstr "Continuwer on messaedje po %s: %s"
 
-#: src/sendmsg-window.c:3959
-#, fuzzy, c-format
+#: src/sendmsg-window.c:4260
+#, c-format
 msgid "New message to %s: %s"
-msgstr "Novea messaedje"
+msgstr "Novea messaedje po %s: %s"
 
-#: src/spell-check.c:503
+#: src/spell-check.c:509
 msgid "Replace the current word with the selected suggestion"
 msgstr "Candjî ci mot chal avou li suddjestion tchoezeye"
 
-#: src/spell-check.c:511
+#: src/spell-check.c:517
 msgid "Replace all occurences of the current word with the selected suggestion"
 msgstr "Candjî ci mot chal so tot l' tecse avou li suddjestion tchoezeye"
 
-#: src/spell-check.c:523
-msgid "Skip the current word"
-msgstr "Passer hute ci mot chal"
-
 #: src/spell-check.c:529
-#, fuzzy
+msgid "Skip the current word"
+msgstr "Passer houte di ç' mot chal"
+
+#: src/spell-check.c:535
 msgid "Skip all occurrences of the current word"
-msgstr "Passer hute ci mot po tot l' tecse"
+msgstr "Passer houte di ç' mot chal po tot l' tecse"
 
-#: src/spell-check.c:539
+#: src/spell-check.c:545
 msgid "Add the current word to your personal dictionary"
-msgstr ""
+msgstr "Radjouter ç' mot chal å motî da vosse"
 
-#: src/spell-check.c:548
+#: src/spell-check.c:554
 msgid "Finish spell checking"
-msgstr "Fini li coridjaedje"
+msgstr "Fini l' coridjaedje"
 
-#: src/spell-check.c:553
+#: src/spell-check.c:559
 msgid "Revert all changes and finish spell checking"
-msgstr ""
+msgstr "Disfé tos les candjmints eyet fini l' coridjaedje"
 
-#: src/spell-check.c:584
-#, fuzzy
+#: src/spell-check.c:590
 msgid "Spell check"
-msgstr "Module pol coridjaedje"
+msgstr "Coridjaedje"
 
 #: src/store-address.c:101
 msgid "Store address: no addresses"
@@ -4451,7 +5065,7 @@ msgstr "Nou calpin d' adresses di tchoezi..."
 
 #: src/store-address.c:221
 msgid "Sorry, no semicolons are allowed in the name!\n"
-msgstr "Mande escuzes, mins on pout nén mete des pont-virgule (;) èl nom!\n"
+msgstr "Mande escuzes, mins on pout nén mete des pont-virgule (;) el no!\n"
 
 #: src/store-address.c:269
 msgid "Choose Address Book"
@@ -4461,29 +5075,27 @@ msgstr "Tchoezixhoz on calpin d' adresses"
 msgid "Choose Address"
 msgstr "Tchoezixhoz ene adresse"
 
-#: src/store-address.c:356
-#, fuzzy
+#: src/store-address.c:358
 msgid "_Displayed Name:"
-msgstr "No do mitan:"
+msgstr "No di _håyné:"
 
-#: src/store-address.c:357
+#: src/store-address.c:359
 msgid "_First Name:"
 msgstr "_Pitit no:"
 
-#: src/store-address.c:358
+#: src/store-address.c:360
 msgid "_Middle Name:"
 msgstr "No do _mitan:"
 
-#: src/store-address.c:359
+#: src/store-address.c:361
 msgid "_Last Name:"
 msgstr "No d' _famile:"
 
-#: src/store-address.c:360
-#, fuzzy
+#: src/store-address.c:362
 msgid "_Nickname:"
-msgstr "No:"
+msgstr "No do _spotaedje:"
 
-#: src/store-address.c:361
+#: src/store-address.c:363
 msgid "O_rganization:"
 msgstr "_Organizåcion:"
 
@@ -4494,10 +5106,12 @@ msgstr "Separateu"
 #: src/toolbar-factory.c:92
 msgid "Check"
 msgstr ""
+"Cweri\n"
+"noveas"
 
 #: src/toolbar-factory.c:93
 msgid "Check for new email"
-msgstr ""
+msgstr "Cweri après des noveas messaedjes"
 
 #: src/toolbar-factory.c:94
 msgid "Compose"
@@ -4528,9 +5142,8 @@ msgstr ""
 "a tertos"
 
 #: src/toolbar-factory.c:101
-#, fuzzy
 msgid "Reply to all recipients"
-msgstr "Risponde a tertos k' on rçu ci messaedje chal"
+msgstr "Risponde a tertos k' on rçuvou ci messaedje chal"
 
 #: src/toolbar-factory.c:102
 msgid ""
@@ -4542,16 +5155,15 @@ msgstr ""
 
 #: src/toolbar-factory.c:104
 msgid "Forward"
-msgstr ""
+msgstr "Ricassî"
 
 #: src/toolbar-factory.c:105
-#, fuzzy
 msgid "Forward the current message"
-msgstr "Responde a ci messaedje chal"
+msgstr "Ricassî l' messaedje do moumint"
 
 #: src/toolbar-factory.c:106
 msgid "Previous"
-msgstr "Çu di dvant"
+msgstr "Di dvant"
 
 #: src/toolbar-factory.c:107
 msgid "Open previous"
@@ -4566,37 +5178,38 @@ msgid "Open next"
 msgstr "Drovi l' shuvant"
 
 #: src/toolbar-factory.c:110
-#, fuzzy
 msgid ""
 "Next\n"
 "unread"
-msgstr "Messaedje nén lejhou shuvant"
+msgstr ""
+"Shuvant\n"
+"nén léjhou"
 
 #: src/toolbar-factory.c:111
 msgid "Open next unread message"
-msgstr "Drovi l' shuvant messaedje nén lejhou"
+msgstr "Drovi l' shuvant messaedje nén léjhou"
 
 #: src/toolbar-factory.c:112
-#, fuzzy
 msgid ""
 "Next\n"
 "flagged"
-msgstr "Messaedje shuvant"
+msgstr ""
+"Drapea\n"
+"shuvant"
 
 #: src/toolbar-factory.c:113
-#, fuzzy
 msgid "Open next flagged message"
-msgstr "Drovi l' shuvant messaedje nén lejhou"
+msgstr "Drovi l' shuvant messaedje avou on drapea"
 
 #: src/toolbar-factory.c:114
-#, fuzzy
 msgid ""
 "Trash /\n"
 "Delete"
-msgstr "Disfacer"
+msgstr ""
+"Batch /\n"
+"Disfacer"
 
 #: src/toolbar-factory.c:115
-#, fuzzy
 msgid "Move the current message to trash"
 msgstr "Evoyî l' messaedje do moumint al boesse ki sieve di batch"
 
@@ -4605,9 +5218,8 @@ msgid "Postpone"
 msgstr "Leyî po pus tård"
 
 #: src/toolbar-factory.c:117
-#, fuzzy
 msgid "Postpone current message"
-msgstr "Responde a ci messaedje chal"
+msgstr "Leyî l' messaedje do moumint po pus tård"
 
 #: src/toolbar-factory.c:118
 msgid "Print"
@@ -4623,59 +5235,55 @@ msgstr ""
 
 #: src/toolbar-factory.c:124
 msgid "Attach"
-msgstr "Atatchî"
+msgstr "Ataetchî"
 
 #: src/toolbar-factory.c:125
 msgid "Add attachments to this message"
-msgstr "Radjouter des atatchmints a ci messaedje chal"
+msgstr "Radjouter des ataetchmints a ci messaedje chal"
 
 #: src/toolbar-factory.c:126
 msgid "Save"
 msgstr "Schaper"
 
 #: src/toolbar-factory.c:127
-#, fuzzy
 msgid "Save the current item"
-msgstr "Passer hute ci mot chal"
+msgstr "Schaper l' cayet do moumint"
 
 #: src/toolbar-factory.c:128
-#, fuzzy
 msgid "Identity"
-msgstr "Aspougnî l' idintisté"
+msgstr "Idintité"
 
 #: src/toolbar-factory.c:129
-#, fuzzy
 msgid "Set identity to use for this message"
-msgstr "Tchoezi l' idintité a-z eployî pol messaedje"
+msgstr "Tchoezi l' idintité a-z eployî po ci messaedje chal"
 
 #: src/toolbar-factory.c:131
-#, fuzzy
 msgid "Run a spell check"
-msgstr "Fini li coridjaedje"
+msgstr "Fé on coridjaedje"
 
 #: src/toolbar-factory.c:133
 msgid "Cancel this message"
-msgstr "Rinoncî a ci mesaedje chal"
+msgstr "Rinoncî a ci messaedje chal"
 
 #: src/toolbar-factory.c:134
 msgid ""
 "Toggle\n"
 "new"
 msgstr ""
+"Discandjî\n"
+"novea"
 
 #: src/toolbar-factory.c:135
-#, fuzzy
 msgid "Toggle new message flag"
-msgstr "Scrire on novea messaedje"
+msgstr "Discandjî l' drapea di novea messaedje"
 
 #: src/toolbar-factory.c:136
 msgid "Mark all"
-msgstr ""
+msgstr "Marker ttafwait"
 
 #: src/toolbar-factory.c:137
-#, fuzzy
 msgid "Mark all messages in current mailbox"
-msgstr "Tchoezi tos les messaedjes del boesse do moumint"
+msgstr "Marker tos les messaedjes del boesse do moumint"
 
 #: src/toolbar-factory.c:138
 msgid ""
@@ -4691,19 +5299,17 @@ msgstr "Håyner totes les tiestires"
 
 #: src/toolbar-factory.c:140
 msgid "Empty Trash"
-msgstr "Vuder l' batch"
+msgstr "Vudî l' batch"
 
 #: src/toolbar-factory.c:142
 msgid "Close"
 msgstr "Clôre"
 
 #: src/toolbar-factory.c:143
-#, fuzzy
 msgid "Close current mailbox"
-msgstr "Clôre li boesse ås emiles"
+msgstr "Clôre li boesse ås emiles do moumint"
 
 #: src/toolbar-factory.c:144
-#, fuzzy
 msgid "Msg Preview"
 msgstr "Vey divant"
 
@@ -4711,18 +5317,50 @@ msgstr "Vey divant"
 msgid "Show preview pane"
 msgstr ""
 
-#: src/toolbar-factory.c:227
+#: src/toolbar-factory.c:147
+msgid "Sign"
+msgstr "Siner"
+
+#: src/toolbar-factory.c:148
+msgid "Sign message using GPG"
+msgstr "Siner l' messaedje avou GPG"
+
+#: src/toolbar-factory.c:149
+msgid "Encrypt"
+msgstr "Ecripter"
+
+#: src/toolbar-factory.c:150
+msgid "Encrypt message using GPG"
+msgstr "Ecripter l' messaedje avou GPG"
+
+#: src/toolbar-factory.c:152
+msgid "Undo"
+msgstr "Disfé"
+
+#: src/toolbar-factory.c:153
+msgid "Undo most recent change"
+msgstr "Disfé l' dierin candjmint"
+
+#: src/toolbar-factory.c:154
+msgid "Redo"
+msgstr "Rifé"
+
+#: src/toolbar-factory.c:155
+msgid "Redo most recent change"
+msgstr "Rifé l' dierin candjmint"
+
+#: src/toolbar-factory.c:237
 #, c-format
 msgid "Unknown toolbar icon \"%s\""
 msgstr ""
 
 #: src/toolbar-prefs.c:136
-msgid "Customize"
-msgstr "A vosse môde"
+msgid "Customize Toolbars"
+msgstr "Bår ås usteyes a vosse môde"
 
 #: src/toolbar-prefs.c:157
 msgid "Main window"
-msgstr "Maisse purnea"
+msgstr "Mwaisse purnea"
 
 #: src/toolbar-prefs.c:161
 msgid "Compose window"
@@ -4733,9 +5371,8 @@ msgid "Message window"
 msgstr "Purnea di messaedje"
 
 #: src/toolbar-prefs.c:167
-#, fuzzy
 msgid "Toolbar options"
-msgstr "Bårs ås usteyes"
+msgstr "Tchuzes del bårs ås usteyes"
 
 #: src/toolbar-prefs.c:177
 msgid "_Wrap button labels"
@@ -4765,267 +5402,8 @@ msgstr "Bår ås usteyes do moumint"
 
 #: src/toolbar-prefs.c:490
 msgid "Up"
-msgstr ""
+msgstr "Monter"
 
 #: src/toolbar-prefs.c:506
 msgid "Down"
-msgstr ""
-
-#~ msgid "Could not stat ldif address book: %s"
-#~ msgstr "Dji n' a savou fé on stat() sol calpin d' adresses LDIF: %s"
-
-#~ msgid "Cannot open LDIF address book %s for saving\n"
-#~ msgstr "Dji n' a savou drovi li calpin d' adresses LDIF %s pol schaper\n"
-
-#~ msgid "No such address book type: %s"
-#~ msgstr "I gn a pont d' calpin d' adresses di cisse sôre: %s"
-
-#~ msgid "Could not create a address book of type %s"
-#~ msgstr "Dji n' a savou fé on calpin d' adresses del sôre %s"
-
-#~ msgid "Create Identity"
-#~ msgstr "Fé ene idintisté"
-
-#~ msgid "Append Signature"
-#~ msgstr "Radjouter sinateure al fén"
-
-#~ msgid "Do"
-#~ msgstr "Fé"
-
-#~ msgid "Do Not"
-#~ msgstr "En nén fé"
-
-#~ msgid "From: %d <%s>"
-#~ msgstr "Di: %d <%s>"
-
-#~ msgid "From %s: %d %s"
-#~ msgstr "Di %s: %d %s"
-
-#~ msgid "To: %d <%s>"
-#~ msgstr "A: %d <%s>"
-
-#~ msgid "To %s: %d %s"
-#~ msgstr "A %s: %d %s"
-
-#~ msgid "%d %s"
-#~ msgstr "%d %s"
-
-#~ msgid "SMTP server problem: %s"
-#~ msgstr "Probleme avou l' sierveu SMTP: %s"
-
-#~ msgid "Email address:"
-#~ msgstr "Adresse emile:"
-
-#~ msgid "[-- name: %s --]\n"
-#~ msgstr "[-- no: %s --]\n"
-
-#~ msgid "This certificate accepted but not verified !!!"
-#~ msgstr "Ciste acertineure a stî acceptêye mins nén verifieye !!!"
-
-#~ msgid "Connecting with \"%s\"..."
-#~ msgstr "Si raloyant avou «%s»..."
-
-#~ msgid "Address Book Configuration"
-#~ msgstr "Apontiaedje do calpin d' adresses"
-
-#~ msgid "_Address Book Name"
-#~ msgstr "No do calpin d' _adresses"
-
-#~ msgid "Reply..."
-#~ msgstr "Responde..."
-
-#~ msgid "Store Address..."
-#~ msgstr "Wårder l' adresse..."
-
-#~ msgid "Undelete"
-#~ msgstr "Disrafacer"
-
-#~ msgid "Move"
-#~ msgstr "Bodjî"
-
-#~ msgid "Folder"
-#~ msgstr "Ridant"
-
-#~ msgid "Filename: %s"
-#~ msgstr "No d' fitchî: %s"
-
-#~ msgid "_Port:"
-#~ msgstr "_Pôrt:"
-
-#~ msgid "Use SSL (imaps)"
-#~ msgstr "Eployî SSL (imaps)"
-
-#~ msgid "OK"
-#~ msgstr "'l est bon"
-
-#~ msgid "Next part in Message"
-#~ msgstr "Pårteye shuvante e l' messaedje"
-
-#~ msgid "Previous part in Message"
-#~ msgstr "Pårteye di dvant e l' messaedje"
-
-#~ msgid "Text"
-#~ msgstr "Tecse"
-
-#~ msgid "Icons"
-#~ msgstr "Imådjetes"
-
-#~ msgid "Both"
-#~ msgstr "Les deus"
-
-#~ msgid "Yes"
-#~ msgstr "Oyi"
-
-#~ msgid "Subject Header Font"
-#~ msgstr "Fonte pol tiestire di sudjet"
-
-#~ msgid "Balsa could not find paper type \"%s\".\n"
-#~ msgstr "Balsa n' a nén savou trover l' sôre di papî «%s».\n"
-
-#~ msgid "Paper"
-#~ msgstr "Papî"
-
-#~ msgid "_Select All"
-#~ msgstr "_Tchoezi totafwait"
-
-#~ msgid ""
-#~ "Default attachment pixmap (balsa/attachment.png) cannot be found:\n"
-#~ "Your balsa installation is corrupted."
-#~ msgstr ""
-#~ "Dj' a nén savou trover li prémetowe imådjete po les atatchmints (balsa/"
-#~ "attachment.png):\n"
-#~ "Çoula vout dire ki voste astalåcion di balsa est crombe."
-
-#~ msgid "Date: %s\n"
-#~ msgstr "Date: %s\n"
-
-#~ msgid "From: %s\n"
-#~ msgstr "Di: %s\n"
-
-#~ msgid "To: %s\n"
-#~ msgstr "A: %s\n"
-
-#~ msgid ""
-#~ "Balsa has been compiled without gnome-print support.\n"
-#~ "Printing is not possible."
-#~ msgstr ""
-#~ "Balsa a stî copilé sins l' sopoirt di gnome-print.\n"
-#~ "C' est nén possibe d' eprimî."
-
-#~ msgid "Card Name:"
-#~ msgstr "No del cåte:"
-
-#~ msgid "-"
-#~ msgstr "-"
-
-#~ msgid "+"
-#~ msgstr "+"
-
-#~ msgid "Address Book Name:"
-#~ msgstr "No do calpin d' adresses:"
-
-#~ msgid "Your name:"
-#~ msgstr "Vosse no:"
-
-#~ msgid "E-mail address:"
-#~ msgstr "Vosse adresse emile:"
-
-#~ msgid "Reply-to address:"
-#~ msgstr "Adresse di rtour:"
-
-#~ msgid "Use signature file when:"
-#~ msgstr "Eployî sinateure po:"
-
-#~ msgid "sending mail"
-#~ msgstr "evoyî on novea emile"
-
-#~ msgid "replying to mail"
-#~ msgstr "risponde a on emile"
-
-#~ msgid "Signature file:"
-#~ msgstr "Fitchî di sinateure:"
-
-#~ msgid "Select your signature file"
-#~ msgstr "Tchoezixhoz vosse fitchî di sinateure"
-
-#~ msgid "Port"
-#~ msgstr "Pôrt"
-
-#~ msgid "Continue this message later"
-#~ msgstr "Leyî ci messaedje po l' continuwer pus tård"
-
-#~ msgid "Run a spell check on the current message"
-#~ msgstr "Enonder on coridjeu d' ortografeye so ci messaedje chal"
-
-#~ msgid "Error executing lpr"
-#~ msgstr "Åk n' a nén stî cwand dj' a-st enondé lpr"
-
-#~ msgid "Add New Address"
-#~ msgstr "Radjouter novele adresse"
-
-#~ msgid ""
-#~ "Unable to open %s for read.\n"
-#~ " - %s\n"
-#~ msgstr ""
-#~ "Dj' a nén savou drovi %s pol lere.\n"
-#~ " - %s\n"
-
-#~ msgid "List"
-#~ msgstr "Djivêye"
-
-#~ msgid "Open Mailbox"
-#~ msgstr "Drovi boesse"
-
-#~ msgid "Close Mailbox"
-#~ msgstr "Clôre boesse"
-
-#~ msgid "Delete Mailbox"
-#~ msgstr "Disfacer boesse"
-
-#~ msgid ">"
-#~ msgstr ">"
-
-#~ msgid "_Western (ISO-8859-1)"
-#~ msgstr "Di l' Europe di l' _ouwess (ISO-8859-15)"
-
-#~ msgid "W_estern (ISO-8859-15)"
-#~ msgstr "Di l' Europe di l' ou_wess (ISO-8859-15)"
-
-#~ msgid "_Central European (ISO-8859-2)"
-#~ msgstr "Di l' Europe di l' _esse (ISO-8859-2)"
-
-#~ msgid "_South European (ISO-8859-3)"
-#~ msgstr "_Esperanto (ISO-8859-3)"
-
-#~ msgid "_Baltic (ISO-8859-13)"
-#~ msgstr "Del _baltike (ISO-8859-13)"
-
-#~ msgid "Cy_rillic (ISO-8859-5)"
-#~ msgstr "C_irilike (ISO-8859-5)"
-
-#~ msgid "_Hebrew (ISO-8859-8)"
-#~ msgstr "_Hebreu (ISO-8859-8)"
-
-#~ msgid "_Turkish (ISO-8859-9)"
-#~ msgstr "_Turk (ISO-8859-9)"
-
-#~ msgid "Ce_ltic (ISO-8859-14)"
-#~ msgstr "Ce_ltikes (ISO-8859-14)"
-
-#~ msgid "_ISO Charset"
-#~ msgstr "Ecôdaedje _ISO"
-
-#~ msgid "On %s you wrote:\n"
-#~ msgstr "Li %s vos scrijhîz:\n"
-
-#~ msgid "You wrote:\n"
-#~ msgstr "Vos scrijhîz:\n"
-
-#~ msgid "Error: "
-#~ msgstr "Aroke: "
-
-#~ msgid "Error"
-#~ msgstr "Aroke"
-
-#~ msgid "Ok"
-#~ msgstr "I va"
+msgstr "Dischinde"

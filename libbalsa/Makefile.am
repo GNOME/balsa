@@ -77,6 +77,7 @@ libbalsa_a_SOURCES = 		\
 	imap-server.h		\
 	information.c		\
 	information.h		\
+	libbalsa-conf.c		\
 	libbalsa-conf.h		\
 	libbalsa-marshal.c	\
 	libbalsa-marshal.h	\

@@ -209,7 +209,7 @@ libbalsa_mailbox_filters_save_config(LibBalsaMailbox * mbox)
     g_free(filters_names);
 }
 
-#ifdef HAVE_GNOME
+/* FIXME: #ifdef HAVE_GNOME ?? */
 /* Temporary code for transition from 2.0.x */
 static LibBalsaCondition *
 libbalsa_condition_new_from_config()
@@ -315,76 +315,88 @@ compare_conditions_order(gconstpointer a, gconstpointer b)
 
 #define CONDITION_SECTION_PREFIX "condition-"
 
-LibBalsaCondition *
-libbalsa_condition_new_2_0(gchar * prefix, gchar * filter_section_name,
-			   ConditionMatchType cmt)
+struct lbc_new_info {
+    const gchar *prefix;
+    GList *tmp_list;
+    gint err;
+};
+
+static gboolean
+lbc_new_helper(const gchar * key, const gchar * value, gpointer data)
 {
+    struct lbc_new_info *info = data;
+    gchar *condprefix;
     LibBalsaCondition *cond;
+
+    condprefix = g_strconcat(info->prefix, key, "/", NULL);
+    libbalsa_conf_push_prefix(condprefix);
+    g_free(condprefix);
+
+    cond = libbalsa_condition_new_from_config();
+    if (cond) {
+        if (filter_errno == FILTER_EFILESYN) {
+            /* We don't stop the process for syntax error, we
+             * just discard the malformed condition we also
+             * remember (with err) that a syntax error occurs
+             */
+            info->err = FILTER_EFILESYN;
+            filter_errno = FILTER_NOERR;
+            libbalsa_condition_free(cond);
+        } else {
+            LibBalsaTempCondition *tmp_cond;
+
+            tmp_cond = g_new(LibBalsaTempCondition, 1);
+            tmp_cond->cnd = cond;
+            tmp_cond->order = atoi(strrchr(key, ':') + 1);
+            info->tmp_list = g_list_prepend(info->tmp_list, tmp_cond);
+        }
+    }
+
+    libbalsa_conf_pop_prefix();
+
+    return filter_errno != FILTER_NOERR;
+}
+
+LibBalsaCondition *
+libbalsa_condition_new_2_0(const gchar * prefix,
+                           const gchar * filter_section_name,
+                           ConditionMatchType cmt)
+{
+    struct lbc_new_info info;
+    gchar *section_prefix;
     LibBalsaCondition *cond_2_0 = NULL;
-    void *iterator;
-    gchar *tmp, *condprefix, *key;
-    gint pref_len =
-	strlen(CONDITION_SECTION_PREFIX) + strlen(filter_section_name) + 1;
-    gint err = FILTER_NOERR;
-    GList *tmp_list = NULL;
     GList *l;
 
-    tmp =
-	g_strconcat(CONDITION_SECTION_PREFIX, filter_section_name, ":",
-		    NULL);
-    iterator = libbalsa_conf_init_iterator_sections(prefix);
-    filter_errno = FILTER_NOERR;
+    info.prefix = prefix;
+    info.tmp_list = NULL;
+    info.err = filter_errno = FILTER_NOERR;
 
-    while ((filter_errno == FILTER_NOERR) &&
-	   (iterator = libbalsa_conf_iterator_next(iterator, &key, NULL))) {
+    section_prefix =
+        g_strconcat(CONDITION_SECTION_PREFIX, filter_section_name, ":",
+                    NULL);
+    libbalsa_conf_foreach_section(section_prefix, lbc_new_helper, &info);
+    g_free(section_prefix);
 
-	if (strncmp(key, tmp, pref_len) == 0) {
-	    condprefix = g_strconcat(prefix, key, "/", NULL);
-	    libbalsa_conf_push_prefix(condprefix);
-	    g_free(condprefix);
-	    cond = libbalsa_condition_new_from_config();
-	    if (cond) {
-		if (filter_errno == FILTER_EFILESYN) {
-		    /* We don't stop the process for syntax error, we
-		     * just discard the malformed condition we also
-		     * remember (with err) that a syntax error occurs
-		     */
-		    err = FILTER_EFILESYN;
-		    filter_errno = FILTER_NOERR;
-		    libbalsa_condition_free(cond);
-		} else {
-		    LibBalsaTempCondition *tmp =
-			g_new(LibBalsaTempCondition, 1);
-
-		    tmp->cnd = cond;
-		    tmp->order = atoi(strrchr(key, ':') + 1);
-		    tmp_list = g_list_prepend(tmp_list, tmp);
-		}
-	    }
-	    libbalsa_conf_pop_prefix();
-	}
-	g_free(key);
-    }
-    g_free(tmp);
     /* We position filter_errno to the last non-critical error */
     if (filter_errno == FILTER_NOERR) {
-	LibBalsaTempCondition *tmp;
+        LibBalsaTempCondition *tmp;
 
-	filter_errno = err;
-	/* We sort the list of temp conditions, then
-	   we create the combined condition. */
-	tmp_list = g_list_sort(tmp_list, compare_conditions_order);
-	l = tmp_list;
-	for (; tmp_list; tmp_list = g_list_next(tmp_list)) {
-	    tmp = (LibBalsaTempCondition *) (tmp_list->data);
-	    cond_2_0 = cond_2_0 ?
-		libbalsa_condition_new_bool_ptr(FALSE, cmt, tmp->cnd,
-						cond_2_0) : tmp->cnd;
-	    g_free(tmp);
-	}
-	g_list_free(l);
-    } /* else we leak the list and structures?? */
-
+        filter_errno = info.err;
+        /* We sort the list of temp conditions, then
+           we create the combined condition. */
+        info.tmp_list =
+            g_list_sort(info.tmp_list, compare_conditions_order);
+        l = info.tmp_list;
+        for (; info.tmp_list; info.tmp_list = info.tmp_list->next) {
+            tmp = (LibBalsaTempCondition *) (info.tmp_list->data);
+            cond_2_0 = cond_2_0 ?
+                libbalsa_condition_new_bool_ptr(FALSE, cmt, tmp->cnd,
+                                                cond_2_0) : tmp->cnd;
+            g_free(tmp);
+        }
+        g_list_free(l);
+    }
+    /* else we leak the list and structures?? */
     return cond_2_0;
 }
-#endif /* HAVE_GNOME */
+/* #endif *//* HAVE_GNOME */

@@ -59,34 +59,44 @@ libbalsa_mailbox_filters_when(GSList * filters, gint when)
  * returns the section name or NULL if none found
  * The returned string has to be freed by the caller
  */
+struct lbmf_section_lookup_info {
+    const gchar *name;
+    gchar *section;
+};
 
-gchar*
+static gboolean
+lbmf_section_lookup_func(const gchar * key, const gchar * value,
+                         gpointer data)
+{
+    struct lbmf_section_lookup_info *info = data;
+    gchar *url;
+
+    info->section = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
+    libbalsa_conf_push_prefix(info->section);
+    url = libbalsa_conf_get_string(MAILBOX_FILTERS_URL_KEY);
+    libbalsa_conf_pop_prefix();
+    if (strcmp(url, info->name) != 0) {
+        g_free(info->section);
+        info->section = NULL;
+    }
+    g_free(url);
+
+    return info->section != NULL;
+}
+
+gchar *
 mailbox_filters_section_lookup(const gchar * name)
 {
-    gchar * key, *section = NULL;
-    void * iterator;
+    struct lbmf_section_lookup_info info;
 
-    g_return_val_if_fail(name && name[0],NULL);
-    iterator = libbalsa_conf_init_iterator_sections(BALSA_CONFIG_PREFIX);
-    while (!section &&
-	   (iterator = libbalsa_conf_iterator_next(iterator, &key, NULL))) {
-	if (libbalsa_str_has_prefix(key, MAILBOX_FILTERS_SECTION_PREFIX)) {
-	    gchar *url;
+    g_return_val_if_fail(name && name[0], NULL);
 
-	    section = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
-	    libbalsa_conf_push_prefix(section);
-	    url = libbalsa_conf_get_string(MAILBOX_FILTERS_URL_KEY);
-	    libbalsa_conf_pop_prefix();
-	    if (strcmp(url, name) != 0) {
-		g_free(section);
-		section = NULL;
-	    }
-	    g_free(url);
-	}
-	g_free(key);
-    }
-    g_free(iterator);
-    return section;
+    info.name = name;
+    info.section = NULL;
+    libbalsa_conf_foreach_section(MAILBOX_FILTERS_SECTION_PREFIX,
+                                  lbmf_section_lookup_func, &info);
+
+    return info.section;
 }
 
 void

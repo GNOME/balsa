@@ -1,3 +1,8 @@
+2004-09-03 08:48  PeterB
+
+	* src/balsa-message.c: leave vertical scrollbar in place while html
+	widget is displayed.
+
 2004-09-02  Pawel Salek
 
 	Handle parts' content-id for imap mailboxes.

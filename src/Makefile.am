@@ -32,8 +32,6 @@ balsa_BASE_SOURCES =	\
 	main-window.h		\
 	main.c			\
 	main.h			\
-	mblist-window.c		\
-	mblist-window.h		\
 	message-window.c	\
 	message-window.h	\
 	pref-manager.c		\

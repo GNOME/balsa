@@ -868,6 +868,7 @@ bmbl_select_mailbox(GtkTreeSelection * selection, gpointer data)
         if (mbnode->mailbox)
             balsa_mblist_open_mailbox(mbnode->mailbox);
     }
+    gtk_tree_path_free(path);
     gdk_event_free(event);
 }
 

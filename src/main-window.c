@@ -2640,25 +2640,23 @@ add_check_button(GtkWidget* table, const gchar* label, gint x, gint y)
 }
 
 static void 
-find_real(BalsaIndex * bindex,gboolean again)
+find_real(BalsaIndex * bindex, gboolean again)
 {
-    /* FIXME : later we could do a search based on a complete filter */
-    static LibBalsaFilter * f=NULL;
     /* Condition set up for the search, it will be of type
        CONDITION_NONE if nothing has been set up */
-    static LibBalsaCondition * cnd=NULL;
+    static LibBalsaCondition * cnd = NULL;
     GSList * conditions;
-    static gboolean reverse=FALSE;
+    static gboolean reverse = FALSE;
 
     if (!cnd) {
-	cnd=libbalsa_condition_new();
+	cnd = libbalsa_condition_new();
         CONDITION_SETMATCH(cnd,CONDITION_MATCH_FROM);
         CONDITION_SETMATCH(cnd,CONDITION_MATCH_SUBJECT);
     }
 
 
     /* first search, so set up the match rule(s) */
-    if (!again || (!f && cnd->type==CONDITION_NONE)) {
+    if (!again || cnd->type==CONDITION_NONE) {
 	GtkWidget* vbox, *dia =
             gtk_dialog_new_with_buttons(_("Search mailbox"),
                                         GTK_WINDOW(balsa_app.main_window),
@@ -2671,11 +2669,6 @@ find_real(BalsaIndex * bindex,gboolean again)
         GtkToggleButton *matching_to, *matching_cc, *matching_subject;
 	gint ok;
 	
-	/* FIXME : we'll set up this callback later when selecting
-	   filters has been enabled
-	   g_signal_connect(G_OBJECT(dia), "clicked",
-	   G_CALLBACK(find_dialog_button_cb), &f);
-	*/
         vbox = GTK_DIALOG(dia)->vbox;
 	reverse_button = 
             gtk_check_button_new_with_mnemonic(_("_Reverse search"));
@@ -2720,9 +2713,11 @@ find_real(BalsaIndex * bindex,gboolean again)
 	if (cnd->match.string)
 	    gtk_entry_set_text(GTK_ENTRY(search_entry),cnd->match.string);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(reverse_button),reverse);
-	gtk_toggle_button_set_active(matching_body,
-				     CONDITION_CHKMATCH(cnd,
-                                                        CONDITION_MATCH_BODY));
+	if (!LIBBALSA_IS_MAILBOX_IMAP(bindex->mailbox_node->mailbox))
+	    gtk_toggle_button_set_active(matching_body,
+					 CONDITION_CHKMATCH(cnd,
+							    CONDITION_MATCH_BODY));
+	else gtk_widget_set_sensitive(GTK_WIDGET(matching_body), FALSE);
 	gtk_toggle_button_set_active(matching_to,
 				     CONDITION_CHKMATCH(cnd,
                                                         CONDITION_MATCH_TO));
@@ -2741,7 +2736,7 @@ find_real(BalsaIndex * bindex,gboolean again)
 	do {
 	    ok=gtk_dialog_run(GTK_DIALOG(dia));
 	    if (ok==GTK_RESPONSE_OK) {
-		reverse=GTK_TOGGLE_BUTTON(reverse_button)->active;
+		reverse = GTK_TOGGLE_BUTTON(reverse_button)->active;
 		g_free(cnd->match.string);
 		cnd->match.string =
                     g_strdup(gtk_entry_get_text(GTK_ENTRY(search_entry)));
@@ -2766,29 +2761,21 @@ find_real(BalsaIndex * bindex,gboolean again)
 		     * *balsa_information(LIBBALSA_INFORMATION_ERROR,_("You
 		     * must provide a non-empty string")); */
 
-		    ok=GTK_RESPONSE_OK;
-		else ok=GTK_RESPONSE_CANCEL; 
+		    ok = GTK_RESPONSE_OK;
+		else ok = GTK_RESPONSE_CANCEL; 
 	    }
-            else ok=GTK_RESPONSE_CANCEL;
+            else ok = GTK_RESPONSE_CANCEL;
 	}
 	while (ok==GTK_RESPONSE_HELP);
 	gtk_widget_destroy(dia);
 	if (ok!=GTK_RESPONSE_OK) return;
-	cnd->type=CONDITION_SIMPLE;
+	cnd->type = CONDITION_SIMPLE;
     }
 
-    if (f) {
-	GSList * lst=g_slist_append(NULL,f);
-	if (!filters_prepare_to_run(lst)) return;
-	g_slist_free(lst);
-	conditions=f->conditions;
-    }
-    else conditions=g_slist_append(NULL,cnd);
-    balsa_index_find(bindex,
-                     f ? f->conditions_op : FILTER_OP_OR,
-                     conditions, reverse);
+    conditions = g_slist_append(NULL,cnd);
+    balsa_index_find(bindex, FILTER_OP_OR, conditions, reverse);
 
-    if (!f) g_slist_free(conditions);
+    g_slist_free(conditions);
 }
 
 static void

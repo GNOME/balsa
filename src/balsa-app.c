@@ -116,7 +116,7 @@ balsa_app_init (void)
   balsa_app.mdi_style = GNOME_MDI_DEFAULT_MODE;
 
   /* arp */
-  balsa_app.leadin_str = NULL;
+  balsa_app.quote_str = NULL;
 }
 
 gint

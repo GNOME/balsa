@@ -82,7 +82,7 @@ static GtkWidget *create_welcome_page (void);
 static GtkWidget *create_general_page (void);
 static GtkWidget *create_mailboxes_page (void);
 
-static int make_parents (gchar *filename);
+static int make_parents (gchar * filename);
 static void create_mailbox_if_not_present (gchar * filename);
 
 /*
@@ -390,34 +390,54 @@ delete_init_window (GtkWidget * widget, gpointer data)
  * Return 0 if all missing parents were created, else !0.
  */
 static int
-make_parents (gchar *filename)
+make_parents (gchar * filename)
 {
-  /* "Grow" the path from left-to-right checking if it exists.
-   * If this fails, we need to create the missing dir and continue.
-   */
-  gchar *sep_pos;
-  gchar *path = g_strdup (filename);
-  if (!path)
-    return 1;
-  
-  sep_pos = path + 1;
-  while (*sep_pos)
+  struct stat st;
+  gchar *dir = NULL;
+  gchar *pathname = NULL;
+  gint i = 1;			/* skip the initial / cause we don't care about it */
+  gint len;
+
+  pathname = g_strdup (filename);
+
+  len = strlen (pathname);
+
+  while (i < len)
     {
-      if (*sep_pos == '/')	/* TODO: use a 'portable' path seperator. */
+      if (pathname[i] == '/')
 	{
-	  *sep_pos = '\0';
-	  if (mkdir (path, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) && 
-	      (errno != EEXIST && errno != EACCES)) /* Oh-oh! */
-	    return 1;
-
-	  *sep_pos = '/';
+	  dir = g_strndup (pathname, i);
+	  if (stat (dir, &st) != 0)
+	    {
+	      int ret;
+	      ret = mkdir (dir, S_IRUSR | S_IWUSR | S_IXUSR);
+	      if (ret == -1)
+		{
+		  g_error ("Error creating directory %s: %s",
+			   dir, strerror (errno));
+		  return FALSE;
+		}
+	    }
 	}
-
-      sep_pos++;
+      i++;
     }
 
-  free (path);
-  return 0;
+  if (stat (pathname, &st) != 0)
+    {
+      int ret;
+      ret = mkdir (pathname, S_IRUSR | S_IWUSR | S_IXUSR);
+      if (ret == -1)
+	{
+	  g_error ("Error creating directory %s: %s",
+		   pathname, strerror (errno));
+	  return FALSE;
+	}
+    }
+
+  g_free (dir);
+  g_free (pathname);
+
+  return TRUE;
 }
 
 
@@ -426,28 +446,13 @@ make_parents (gchar *filename)
 static void
 create_mailbox_if_not_present (gchar * filename)
 {
-  struct stat st;
   gchar *dir;
   dir = g_dirname (filename);
 
-  if (stat (dir, &st) != 0)
-    {
-      int ret;
-      ret = mkdir (dir, S_IRUSR | S_IWUSR | S_IXUSR);
-      if (ret == -1)
-	g_error ("Error creating directory %s: %s",
-		 dir, strerror (errno));
-    }
+/* Make the as much of the path as required. */
+  if (make_parents (dir))
+    creat (filename, S_IRUSR | S_IWUSR);
   g_free (dir);
-
-  if (stat (filename, &st) != 0)
-    if ((creat (filename, S_IRUSR | S_IWUSR) == -1) && 
-	(errno == ENOENT))
-      {
-	/* Make the as much of the path as required. */
-	if (make_parents (filename) == 0)
-	  creat (filename, S_IRUSR | S_IWUSR);
-      }
 }				/* create_mailbox_if_not_present */
 
 static void

@@ -43,7 +43,7 @@ typedef struct _PropertyUI
     GtkWidget *debug;		/* enable/disable debugging */
 
     /* arp */
-    GtkWidget *leadin_str;
+    GtkWidget *quote_str;
   }
 PropertyUI;
 
@@ -197,7 +197,7 @@ open_preferences_manager (void)
 
 
   /* arp */
-  gtk_signal_connect (GTK_OBJECT (pui->leadin_str), "changed",
+  gtk_signal_connect (GTK_OBJECT (pui->quote_str), "changed",
 		      GTK_SIGNAL_FUNC (properties_modified_cb), 
 		      pui->pbox);
 
@@ -259,9 +259,9 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
   balsa_app.previewpane = GTK_TOGGLE_BUTTON (pui->previewpane)->active;
 
   /* arp */
-  g_free (balsa_app.leadin_str);
-  balsa_app.leadin_str = 
-    g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->leadin_str)));
+  g_free (balsa_app.quote_str);
+  balsa_app.quote_str = 
+    g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->quote_str)));
 
 
   refresh_main_window ();
@@ -309,7 +309,7 @@ set_prefs (void)
   gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (pui->debug), balsa_app.debug);
 
   /* arp */
-  gtk_entry_set_text (GTK_ENTRY (pui->leadin_str), balsa_app.leadin_str);
+  gtk_entry_set_text (GTK_ENTRY (pui->quote_str), balsa_app.quote_str);
 }
 
 void
@@ -577,8 +577,8 @@ create_misc_page ()
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
 		    GTK_FILL, GTK_FILL, 10, 10);
 
-  pui->leadin_str = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), pui->leadin_str, 1, 2, 0, 1,
+  pui->quote_str = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), pui->quote_str, 1, 2, 0, 1,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
   gtk_box_pack_start (GTK_BOX (vbox1), GTK_WIDGET (table), TRUE, TRUE, 2);

@@ -670,9 +670,9 @@ config_global_load (void)
 
   /* arp --- LeadinStr for "reply to" leadin. */
   if ((field = pl_dict_get_str (globals, "LeadinStr")) == NULL)
-    balsa_app.leadin_str = g_strdup ("> ");
+    balsa_app.quote_str = g_strdup ("> ");
   else
-    balsa_app.leadin_str = g_strdup (field);
+    balsa_app.quote_str = g_strdup (field);
 
   return TRUE;
 }				/* config_global_load */
@@ -741,8 +741,8 @@ config_global_save (void)
 
 
   /* arp --- "LeadinStr" into cfg. */
-  if (balsa_app.leadin_str != NULL)
-    pl_dict_add_str_str (globals, "LeadinStr", balsa_app.leadin_str);
+  if (balsa_app.quote_str != NULL)
+    pl_dict_add_str_str (globals, "LeadinStr", balsa_app.quote_str);
   else
     pl_dict_add_str_str (globals, "LeadinStr", "> ");
 

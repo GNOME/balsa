@@ -144,7 +144,7 @@ static void part_info_init_unknown(BalsaMessage * bm,
 static void part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info,
 				gchar * ptr, size_t len);
 #endif
-static GtkWidget* part_info_mime_button (BalsaPartInfo* info, const gchar* content_type, gchar* key);
+static GtkWidget* part_info_mime_button (BalsaPartInfo* info, const gchar* content_type, const gchar* key);
 static void part_context_menu_cb(GtkWidget * menu_item, BalsaPartInfo * info);
 static void part_create_menu (BalsaPartInfo* info);
 
@@ -779,18 +779,18 @@ part_info_init_unknown(BalsaMessage * bm, BalsaPartInfo * info)
 
 
 static GtkWidget*
-part_info_mime_button (BalsaPartInfo* info, const gchar* content_type, gchar* key)
+part_info_mime_button (BalsaPartInfo* info, const gchar* content_type, 
+		       const gchar* key)
 {
     GtkWidget* button;
     gchar* msg;
     const gchar* cmd;
     
 
-    cmd = gnome_mime_get_value (content_type, key);
+    cmd = gnome_mime_get_value (content_type, (char*) key);
     msg = g_strdup_printf(_("View part with %s"), cmd);
     button = gtk_button_new_with_label(msg);
-    gtk_object_set_data (GTK_OBJECT (button), "mime_action", 
-                         (gpointer) key);
+    gtk_object_set_data (GTK_OBJECT (button), "mime_action",  (gpointer) key);
     g_free(msg);
 
     gtk_signal_connect(GTK_OBJECT(button), "clicked",
@@ -1357,8 +1357,7 @@ part_create_menu (BalsaPartInfo* info)
     const gchar* cmd;
     gchar* menu_label;
     gchar** split_key;
-    gint i = 0;
-
+    gint i;
     
     info->popup_menu = gtk_menu_new ();
     
@@ -1368,7 +1367,8 @@ part_create_menu (BalsaPartInfo* info)
     while (list) {
         key = list->data;
 
-        if (key != NULL && g_strcasecmp (key, "icon-filename") && g_strncasecmp (key, "fm-", 3)) {
+        if (key && g_strcasecmp (key, "icon-filename") 
+	    && g_strncasecmp (key, "fm-", 3)) {
             if ((cmd = gnome_mime_get_value (content_type, key)) != NULL) {
                 if (g_strcasecmp (key, "open") == 0 || 
                     g_strcasecmp (key, "view") == 0 || 
@@ -1381,6 +1381,7 @@ part_create_menu (BalsaPartInfo* info)
                 } else {
                     split_key = g_strsplit (key, ".", -1);
 
+		    i = 0;
                     while (split_key[i+1] != NULL) {
                         ++i;
                     }
@@ -1462,7 +1463,6 @@ part_context_menu_cb(GtkWidget * menu_item, BalsaPartInfo * info)
 			      _("could not create temporary file %s"),
 			      info->body->temp_filename);
 	    g_free(content_type);
-            g_free (key);
 	    return;
 	}
 
@@ -1477,7 +1477,6 @@ part_context_menu_cb(GtkWidget * menu_item, BalsaPartInfo * info)
 	fprintf(stderr, "view for %s returned NULL\n", content_type);
 
     g_free(content_type);
-    g_free (key);
 }
 
 

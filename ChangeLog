@@ -1,3 +1,8 @@
+2000-10-18  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/balsa-message.c: fix SECOND bug in right-button menu 
+ 	generation. One too many bugs in single part of the frozen code.
+
 2000-10-17  Pawel Salek <pawsa@theochem.kth.se>
 
 	* configure.in: stop if LDAP enabled but not found. Bump version
@@ -5,6 +10,7 @@
 	* src/address-book-config.c: parent dialog window
 	* src/address-book.c: open compose window on double clicking
 	* src/main-window.c: remove not needed X11/Xutil.h include
+	* src/balsa-message.c: fix a bug in right-button menu generation.
 	
 2000-10-16  Pawel Salek <pawsa@theochem.kth.se>
  

@@ -474,6 +474,13 @@ libbalsa_message_move(LibBalsaMessage * message, LibBalsaMailbox * dest)
 gboolean
 libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
 {
+    gboolean r = TRUE;
+    HEADER *cur;
+    LibBalsaMessage *message;
+    GList *d = NULL;
+    GList *p;
+    LibBalsaMailboxAppendHandle* handle;
+
     g_return_val_if_fail(messages, FALSE);
 
     if (LIBBALSA_MESSAGE(messages->data)->mailbox->readonly) {
@@ -483,19 +490,50 @@ libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
 	    LIBBALSA_MESSAGE(messages->data)->mailbox->name);
 	return FALSE;
     }
-
-    if (libbalsa_messages_copy (messages, dest)) {
-        libbalsa_messages_delete (messages);
-        return TRUE;
-    } else {
-        return FALSE;
+    
+    handle = libbalsa_mailbox_open_append(dest);
+    if (!handle) {
+	libbalsa_information(
+			     LIBBALSA_INFORMATION_ERROR,
+			     _("Couldn't open destination mailbox (%s) for writing"),
+			     dest->name);
+	return FALSE;
     }
+    
+    libbalsa_lock_mutt();
+    for(p=messages; p; 	p=g_list_next(p)) {
+	message=(LibBalsaMessage *)(p->data);
+	if(CLIENT_CONTEXT_CLOSED(message->mailbox)) continue;
+	if(!CLIENT_CONTEXT(message->mailbox)->hdrs) {
+            printf("Ugly libmutt error, why did it fastclose mailbox!?");
+            break;
+        }
+	cur = message->header;
+	mutt_parse_mime_message(CLIENT_CONTEXT(message->mailbox), cur); 
+	if(!mutt_append_message(handle->context,
+				CLIENT_CONTEXT(message->mailbox), cur, 
+				0,0))
+	    d = g_list_append(d, message);
+	else
+	    r = FALSE;
+    }
+    libbalsa_unlock_mutt();
+
+    /* it would be faster to inline real_set_deleted_flag but this is
+       cleaner */
+    libbalsa_messages_delete(d);
+    g_list_free(d);
+
+    libbalsa_mailbox_close_append(handle);
+    libbalsa_mailbox_check(dest);
+    return r;
 }
 
 /* FIXME: look at the flags for mutt_append_message */
 gboolean
 libbalsa_message_copy(LibBalsaMessage * message, LibBalsaMailbox * dest)
 {
+    gboolean r = TRUE;
     HEADER *cur;
     LibBalsaMailboxAppendHandle* handle;
     g_return_val_if_fail(message->mailbox, FALSE);
@@ -515,13 +553,15 @@ libbalsa_message_copy(LibBalsaMessage * message, LibBalsaMailbox * dest)
 
     libbalsa_lock_mutt();
     mutt_parse_mime_message(CLIENT_CONTEXT(message->mailbox), cur);
-    mutt_append_message(handle->context,
-			CLIENT_CONTEXT(message->mailbox), cur, 0, 0);
+    if(mutt_append_message(handle->context,
+			   CLIENT_CONTEXT(message->mailbox), cur,
+			   0,0))
+	r = FALSE;
     libbalsa_unlock_mutt();
 
     libbalsa_mailbox_close_append(handle);
     libbalsa_mailbox_check(dest);
-    return TRUE;
+    return r;
 }
 
 /* libbalsa_message_save:
@@ -554,6 +594,7 @@ libbalsa_message_save(LibBalsaMessage * message, const gchar *filename)
 gboolean
 libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
 {
+    gboolean r=TRUE;
     HEADER *cur;
     LibBalsaMessage *message;
     GList *p;
@@ -581,14 +622,16 @@ libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
         }
 	cur = message->header;
 	mutt_parse_mime_message(CLIENT_CONTEXT(message->mailbox), cur); 
-	mutt_append_message(handle->context,
-			    CLIENT_CONTEXT(message->mailbox), cur, 0, 0);
+	if(mutt_append_message(handle->context,
+			       CLIENT_CONTEXT(message->mailbox), cur, 
+			       0, 0))
+	    r = FALSE;
     }
     libbalsa_unlock_mutt();
 
     libbalsa_mailbox_close_append(handle);
     libbalsa_mailbox_check(dest);
-    return TRUE;
+    return r;
 }
 
 static void

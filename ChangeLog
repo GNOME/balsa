@@ -1,3 +1,7 @@
+2002-05-20  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/message.c: only delete messages that really got moved 
+
 2002-05-19  Pawel Salek <pawsa@theochem.kth.se>
 
 	* configure.in, src/Makefile.am: remove GDBM_LIBS.

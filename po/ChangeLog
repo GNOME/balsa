@@ -1,3 +1,8 @@
+2001-09-01  Wang Jian  <lark@linux.net.cn>
+
+	* zh_CN.po: Renamed from zh_CN.GB2312.po. Updated totally.
+	* TRANSLATORS: zh_CN translator changed.
+
 2001-08-30  Carlos Morgado  <chbm@chbm.nu>
 
 	* TRANSLATORS: created. now all it needs is maintaining :) 

@@ -31,7 +31,6 @@ static GnomeMDIChildClass *parent_class = NULL;
 static void index_child_class_init (IndexChildClass *);
 static void index_child_init (IndexChild *);
 
-
 guint
 index_child_get_type ()
 {
@@ -262,29 +261,6 @@ create_menu (BalsaIndex * bindex, Message * message)
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
 
-  menuitem = gtk_menu_item_new_with_label ("Change Priority");
-
-  submenu = gtk_menu_new ();
-  smenuitem = gtk_menu_item_new_with_label ("Highest");
-  gtk_menu_append (GTK_MENU (submenu), smenuitem);
-  gtk_widget_show (smenuitem);
-  smenuitem = gtk_menu_item_new_with_label ("High");
-  gtk_menu_append (GTK_MENU (submenu), smenuitem);
-  gtk_widget_show (smenuitem);
-  smenuitem = gtk_menu_item_new_with_label ("Normal");
-  gtk_menu_append (GTK_MENU (submenu), smenuitem);
-  gtk_widget_show (smenuitem);
-  smenuitem = gtk_menu_item_new_with_label ("Low");
-  gtk_menu_append (GTK_MENU (submenu), smenuitem);
-  gtk_widget_show (smenuitem);
-  smenuitem = gtk_menu_item_new_with_label ("Lowest");
-  gtk_menu_append (GTK_MENU (submenu), smenuitem);
-  gtk_widget_show (smenuitem);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), submenu);
-  gtk_menu_append (GTK_MENU (menu), menuitem);
-  gtk_widget_show (menuitem);
-
   if (message->flags & MESSAGE_FLAG_DELETED)
     {
       menuitem = gtk_menu_item_new_with_label ("Undelete");
@@ -355,6 +331,8 @@ index_child_class_init (IndexChildClass * class)
   parent_class = gtk_type_class (gnome_mdi_child_get_type ());
 }
 
-static void index_child_init (IndexChild *child) {
+static void index_child_init (IndexChild *child)
+{
+
 }
 

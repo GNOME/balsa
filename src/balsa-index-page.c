@@ -889,6 +889,8 @@ balsa_message_delete(GtkWidget * widget, gpointer index)
     if (to_trash == TRUE)
 	if ((page = balsa_find_notebook_page(balsa_app.trash)))
 	    balsa_index_page_reset(page);
+
+    balsa_index_redraw_current(BALSA_INDEX(index));
 }
 
 

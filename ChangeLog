@@ -2,6 +2,8 @@
 
 	* src/main-window.c: treat balsa_app.input_inbox elements as 
 	MailboxNodes. This patch hopefully concludes the transormation.
+	* src/balsa-index-page.c: Jeff Horwitz <jhorwitz75@yahoo.com>'s
+	patch for redrawing message preview after message deletion.
 	
 2001-01-08  Pawel Salek  <pawsa@theochem.kth.se>
 

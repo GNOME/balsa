@@ -39,7 +39,7 @@ typedef struct _MessageWindow MessageWindow;
 
 /* callbacks */
 static void destroy_message_window(GtkWidget * widget, MessageWindow * mw);
-static void mw_message_weak_notify(MessageWindow * mw, GObject * obj);
+static void mw_bmessage_weak_notify(MessageWindow * mw, GObject * obj);
 static void close_message_window(GtkWidget * widget, gpointer data);
 
 static void replyto_message_cb(GtkWidget * widget, gpointer data);
@@ -365,8 +365,6 @@ mw_set_message(MessageWindow *mw, LibBalsaMessage * message)
     mw->message = message;
     mw_set_buttons_sensitive(mw);
     g_object_set_data(G_OBJECT(message), BALSA_MESSAGE_WINDOW_KEY, mw);
-    g_object_weak_ref(G_OBJECT(message),
-		      (GWeakNotify) mw_message_weak_notify, mw);
 
     g_object_ref(message); /* protect from destroying */
     mw->idle_handler_id =
@@ -457,6 +455,9 @@ message_window_new(LibBalsaMessage * message)
     if(message->mailbox->readonly)
 	gtk_widget_set_sensitive(move_menu, FALSE);
     mw->bmessage = balsa_message_new();
+    balsa_message_set_close(BALSA_MESSAGE(mw->bmessage), TRUE);
+    g_object_weak_ref(G_OBJECT(mw->bmessage), 
+		      (GWeakNotify) mw_bmessage_weak_notify, mw);
     
     gnome_app_set_contents(GNOME_APP(mw->window), mw->bmessage);
 
@@ -495,8 +496,6 @@ mw_clear_message(MessageWindow * mw)
     } else if (mw->message) {
 	g_object_set_data(G_OBJECT(mw->message), BALSA_MESSAGE_WINDOW_KEY,
 			  NULL);
-	g_object_weak_unref(G_OBJECT(mw->message),
-			    (GWeakNotify) mw_message_weak_notify, mw);
     }
     mw->message = NULL;
 }
@@ -510,32 +509,22 @@ destroy_message_window(GtkWidget * widget, MessageWindow * mw)
 					     G_SIGNAL_MATCH_DATA, 0, 0,
 					     NULL, NULL, mw);
 
+    if (mw->bmessage) {
+	g_object_weak_unref(G_OBJECT(mw->bmessage),
+			    (GWeakNotify) mw_bmessage_weak_notify, mw);
+	mw->bmessage = NULL;
+    }
     mw_clear_message(mw);
 
     g_free(mw);
 }
 
-/* GWeakNotify for mw->message. */
-static gboolean
-mw_destroy_window(MessageWindow * mw)
-{
-    gdk_threads_enter();
-    g_object_unref(mw->window);
-    gtk_widget_destroy(mw->window);
-    gdk_threads_leave();
-
-    return FALSE;
-}
-
+/* GWeakNotify for mw->bmessage. */
 static void
-mw_message_weak_notify(MessageWindow * mw, GObject *obj)
+mw_bmessage_weak_notify(MessageWindow * mw, GObject *obj)
 {
-    mw->message = NULL;
-    g_object_ref(mw->window);
-    /* Destroy the window in an idle handler, because the BalsaMessage
-     * must get its own weak notification about the message before we
-     * destroy the window. */
-    g_idle_add((GSourceFunc) mw_destroy_window, mw);
+    mw->bmessage = NULL;
+    gtk_widget_destroy(mw->window);
 }
 
 static void

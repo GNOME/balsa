@@ -280,8 +280,8 @@ libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab,
 {
     LibBalsaAddressBookLdap *ldap_ab;
     LibBalsaAddress *address;
-    LDAPMessage *e, *result;
-    int rc;
+    LDAPMessage *msg, *result;
+    int msgid, rc;
 
     g_return_val_if_fail ( LIBBALSA_IS_ADDRESS_BOOK_LDAP(ab), LBABERR_OK);
 
@@ -300,25 +300,28 @@ libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab,
     /* 
      * Attempt to search for e-mail addresses. It returns success 
      * or failure, but not all the matches. 
+     * we use the asynchronous lookup to fetch the results in chunks
+     * in case we exceed administrative limits.
      */ 
     /* g_print("Performing full lookup...\n"); */
-    rc = ldap_search_s(ldap_ab->directory, ldap_ab->base_dn,
-		       LDAP_SCOPE_SUBTREE, "(mail=*)", NULL, 0, &result);
-    if (rc != LDAP_SUCCESS)
+    msgid = ldap_search(ldap_ab->directory, ldap_ab->base_dn,
+                     LDAP_SCOPE_SUBTREE, "(mail=*)", attrs, 0);
+    if (msgid == -1)
 	return LBABERR_CANNOT_SEARCH;
     
     /* 
      * Now loop over all the results, and spit out the output.
      */
-    for(e = ldap_first_entry(ldap_ab->directory, result); e != NULL;
-	e = ldap_next_entry(ldap_ab->directory, e)) {
-	address = libbalsa_address_book_ldap_get_address(ab, e);
-	callback(ab, address, closure);
-	g_object_unref(address);
+    while((rc=ldap_result(ldap_ab->directory, msgid, 
+                          LDAP_MSG_ONE, NULL, &result))>0) {
+        msg = ldap_first_entry(ldap_ab->directory, result);
+        if (!msg || ldap_msgtype( msg ) == LDAP_RES_SEARCH_RESULT)
+            break;
+        address = libbalsa_address_book_ldap_get_address(ab, msg);
+        callback(ab, address, closure);
+        g_object_unref(address);
     }
-    
     callback(ab, NULL, closure);
-    /* printf("ldap_load:: result=%p\n", result); */
     ldap_msgfree(result);
     return LBABERR_OK;
 }
@@ -364,6 +367,7 @@ libbalsa_address_book_ldap_get_address(LibBalsaAddressBook * ab,
     /*
      * Record will have e-mail (searched)
      */
+    if(email == NULL) email = g_strdup("none");
     g_return_val_if_fail(email != NULL, NULL);
     name = create_name(first, last);
 

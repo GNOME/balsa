@@ -31,11 +31,17 @@
  * filter * libbalsa_filter_new_from_config(void)
  */
 
+#include "config.h"
+
 /* define _XOPEN_SOURCE to make strptime visible */
 #define _XOPEN_SOURCE
 /* extensions  needed additonally on Solaris for strptime */
 #define __EXTENSIONS__
 #include <stdio.h>
+/* yellow dog has crappy libc and needs pthread.h to be included here */
+#ifdef BALSA_USE_THREADS
+#  include <pthread.h>
+#endif
 #include <time.h>
 #include <sys/types.h>
 #include "filter-file.h"

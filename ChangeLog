@@ -1,3 +1,10 @@
+2003-05-09  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/address-book-ldap.c: handle large directories slightly
+	better (show at least some records).
+	* libbalsa/filter-file.c: build workarounds for yellowdog. (AD)
+	* src/filter-edit-callbacks.c: ditto.
+
 2003-05-07  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
 
 	* libbalsa/body.c: use attachment's extension for temporary files.

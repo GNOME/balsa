@@ -541,3 +541,27 @@ create_entry(GnomeDialog *mcw, GtkWidget * table,
     return entry;
 }
 
+/* balsa_find_index_by_mailbox:
+   returns BalsaIndex displaying passed mailbox, or NULL, if mailbox is 
+   not displayed.
+*/
+BalsaIndex*
+balsa_find_index_by_mailbox(LibBalsaMailbox * mailbox)
+{
+    GtkWidget *index;
+    guint i;
+    g_return_val_if_fail(balsa_app.notebook, NULL);
+
+    for (i = 0;
+	 (index =
+	  gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), i));
+	 i++) {
+        
+	if (BALSA_INDEX(index)->mailbox_node->mailbox == mailbox)
+	    return BALSA_INDEX(index);
+    }
+
+    /* didn't find a matching mailbox */
+    return NULL;
+}
+

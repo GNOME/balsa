@@ -1,5 +1,16 @@
 2001-04-06  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* src/main.c: GConf-1.0.0 compatibility. remove duplicate of
+	empty_trash function.
+	* src/balsa-app.[hc]: move balsa_find_index_by_mailbox to where it 
+	belongs and give it a more apriopriate name.
+	* src/balsa-mblist.c:
+	* src/balsa-index.[ch]: use renamed function above. fix the 
+	crash on "empty trash" #51701.
+	* src/main-window.[hc]: share the empty_trash() function.
+	
+2001-04-06  Pawel Salek  <pawsa@theochem.kth.se>
+
 	* src/main-window.c:
 	* libbalsa/mailbox_local.c, libbalsa/mailbox.c:
 	Fix the GDK locking as approved in #52420.

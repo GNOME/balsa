@@ -24,6 +24,7 @@
 
 #include <gnome.h>
 #include "libbalsa.h"
+#include "balsa-index.h"
 #include "balsa-mblist.h"
 #include "main-window.h"
 #include "information-dialog.h"
@@ -311,6 +312,7 @@ gboolean open_mailboxes_idle_cb(gchar * names[]);
 GNode *find_gnode_in_mbox_list(GNode * gnode_list, LibBalsaMailbox * mailbox);
 GNode *balsa_find_mbnode(GNode* gnode, BalsaMailboxNode* mbnode);
 void  balsa_remove_children_mailbox_nodes(GNode* gnode);
+BalsaIndex* balsa_find_index_by_mailbox(LibBalsaMailbox* mailbox);
 
 GtkWidget *create_label(const gchar * label, GtkWidget * table, 
 			       gint row, guint *keyval);

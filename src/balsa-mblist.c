@@ -974,7 +974,7 @@ __mbnode_set_tab_style(BalsaMailboxNode *mbnode, GtkStyle *style, gint unread)
    GtkWidget *label;
    GList *l;
 
-   index = balsa_find_index(mbnode->mailbox);
+   index = balsa_find_index_by_mailbox(mbnode->mailbox);
    if (index == NULL)
       return;
    
@@ -1511,7 +1511,7 @@ mblist_drag_cb (GtkWidget* widget, GdkDragContext* context,
             
             libbalsa_mailbox_commit_changes (orig_mailbox);
 
-            if ((bindex = balsa_find_index (mailbox)))
+            if ((bindex = balsa_find_index_by_mailbox (mailbox)))
                 balsa_index_reset (bindex);
         }
     }

@@ -1480,7 +1480,7 @@ balsa_message_delete(GtkWidget * widget, gpointer user_data)
      * notebook, reset the contents.
      */
     if (to_trash == TRUE)
-	if ((trash = balsa_find_index (balsa_app.trash)))
+	if ((trash = balsa_find_index_by_mailbox (balsa_app.trash)))
 	    balsa_index_reset(trash);
 
     balsa_index_redraw_current(index);
@@ -1508,28 +1508,6 @@ balsa_message_undelete(GtkWidget * widget, gpointer user_data)
     }
 
     balsa_index_select_next(index);
-}
-
-
-BalsaIndex*
-balsa_find_index(LibBalsaMailbox * mailbox)
-{
-    GtkWidget *index;
-    guint i;
-
-    for (i = 0;
-	 (index =
-	  gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), i));
-	 i++) {
-        
-	if (index != NULL && 
-            BALSA_INDEX(index)->mailbox_node->mailbox == mailbox)
-
-	    return BALSA_INDEX(index);
-    }
-
-    /* didn't find a matching mailbox */
-    return NULL;
 }
 
 gint
@@ -1662,7 +1640,6 @@ balsa_index_reset(BalsaIndex * index)
     balsa_window_close_mbnode(BALSA_WINDOW(window), mbnode);
     balsa_window_open_mbnode(BALSA_WINDOW(window), mbnode);
 
-    mbnode = BALSA_INDEX (current_index)->mailbox_node;
     page_num = balsa_find_notebook_page_num(mbnode->mailbox);
     gtk_notebook_set_page(GTK_NOTEBOOK(balsa_app.notebook), page_num);
 }
@@ -1967,7 +1944,7 @@ transfer_messages_cb(BalsaMBList * bmbl, LibBalsaMailbox * mailbox,
 
     libbalsa_mailbox_commit_changes(bindex->mailbox_node->mailbox);
 
-    if ((dest_index = balsa_find_index(mailbox)))
+    if ((dest_index = balsa_find_index_by_mailbox(mailbox)))
 	balsa_index_reset(dest_index);
 
     gtk_object_set_data(GTK_OBJECT(bindex), "transferredp", (gpointer) 1);

@@ -190,7 +190,6 @@ static void mailbox_close_cb(GtkWidget * widget, gpointer data);
 static void mailbox_tab_close_cb(GtkWidget * widget, gpointer data);
 
 static void mailbox_commit_changes(GtkWidget * widget, gpointer data);
-static void mailbox_empty_trash(GtkWidget * widget, gpointer data);
 
 static void show_mbtree_cb(GtkWidget * widget, gpointer data);
 static void show_mbtabs_cb(GtkWidget * widget, gpointer data);
@@ -513,7 +512,7 @@ static GnomeUIInfo mailbox_menu[] = {
 #define MENU_MAILBOX_EMPTY_TRASH_POS 10
     GNOMEUIINFO_ITEM_STOCK(N_("Empty _Trash"),
 			   N_("Delete messages from the Trash mailbox"),
-			   mailbox_empty_trash, GNOME_STOCK_PIXMAP_REMOVE),
+			   empty_trash, GNOME_STOCK_PIXMAP_REMOVE),
     GNOMEUIINFO_END
 };
 
@@ -2148,8 +2147,11 @@ mailbox_commit_changes(GtkWidget * widget, gpointer data)
 			  current_mailbox->name);
 }
 
-static void
-mailbox_empty_trash(GtkWidget * widget, gpointer data)
+/* empty_trash:
+   empty the trash mailbox.
+*/
+void
+empty_trash(void)
 {
     BalsaIndex *index;
     GList *message;
@@ -2166,9 +2168,8 @@ mailbox_empty_trash(GtkWidget * widget, gpointer data)
 
     libbalsa_mailbox_close(balsa_app.trash);
 
-    if ((index = balsa_find_index(balsa_app.trash)))
+    if ((index = balsa_find_index_by_mailbox(balsa_app.trash)))
 	balsa_index_reset(index);
-
 }
 
 static void

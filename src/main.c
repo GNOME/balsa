@@ -84,7 +84,6 @@ static void threads_init(gboolean init);
 static void balsa_init(int argc, char **argv);
 static void config_init(void);
 static void mailboxes_init(void);
-static void empty_trash(void);
 static gint balsa_kill_session(GnomeClient * client, gpointer client_data);
 static gint balsa_save_session(GnomeClient * client, gint phase,
 			       GnomeSaveStyle save_style, gint is_shutdown,
@@ -324,7 +323,7 @@ main(int argc, char *argv[])
 
 #ifdef GTKHTML_HAVE_GCONF
     if (!gconf_init(argc, argv, &gconf_error))
-	gconf_error_destroy(gconf_error);
+	g_error_free(gconf_error);
     gconf_error = NULL;
 #endif
 
@@ -479,28 +478,6 @@ balsa_exit(void)
    it should not make assumptions about the presence of the like
    the notebook and so on.
 */
-static void
-empty_trash(void)
-{
-    BalsaIndex *index;
-    GList *message;
-
-    libbalsa_mailbox_open(balsa_app.trash, FALSE);
-
-    message = balsa_app.trash->message_list;
-
-    while (message) {
-	libbalsa_message_delete(message->data);
-	message = message->next;
-    }
-    libbalsa_mailbox_commit_changes(balsa_app.trash);
-
-    libbalsa_mailbox_close(balsa_app.trash);
-
-    if (balsa_app.notebook &&
-	(index = balsa_find_index(balsa_app.trash)))
-	    balsa_index_reset(index);
-}
 
 
 static gint

@@ -26,7 +26,7 @@
 extern "C" {
 #endif				/* __cplusplus */
 
-    void message_print(LibBalsaMessage * msg);
+    GtkWidget *message_print(LibBalsaMessage * msg, GtkWindow * parent);
 
 #ifdef __cplusplus
 }

@@ -680,6 +680,8 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsm)
 
     if (bsm->spell_checker)
         gtk_widget_destroy(bsm->spell_checker);
+    if (bsm->print_dialog)
+        gtk_dialog_response(GTK_DIALOG(bsm->print_dialog), GTK_RESPONSE_NONE);
 
     g_free(bsm);
 
@@ -2606,6 +2608,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     msg->window = window = gnome_app_new("balsa", NULL);
     msg->type = type;
     msg->spell_checker = NULL;
+    msg->print_dialog = NULL;
 
     if (message) {
         /* ref message so we don't lose it even if it is deleted */
@@ -3425,8 +3428,17 @@ save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static void
 print_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    LibBalsaMessage *msg = bsmsg2message(bsmsg);
-    message_print(msg);
+    LibBalsaMessage *msg;
+
+    if (bsmsg->print_dialog) {
+        gdk_window_raise(bsmsg->print_dialog->window);
+        return;
+    }
+
+    msg = bsmsg2message(bsmsg);
+    bsmsg->print_dialog = message_print(msg, GTK_WINDOW(bsmsg->window));
+    g_object_add_weak_pointer(G_OBJECT(bsmsg->print_dialog),
+                              (gpointer) &bsmsg->print_dialog);
     g_object_unref(msg);
 }
 

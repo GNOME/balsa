@@ -1397,19 +1397,19 @@ print_response_cb(GtkDialog * dialog, gint response, CommonInfo * ci)
  *
  * the public method
  */
-void
-message_print(LibBalsaMessage * msg)
+GtkWidget *
+message_print(LibBalsaMessage * msg, GtkWindow * parent)
 {
     CommonInfo *ci;
     GnomePrintConfig *config;
 
-    g_return_if_fail(msg != NULL);
+    g_return_val_if_fail(msg != NULL, NULL);
 
     /* Show only one dialog per message. */
     ci = g_object_get_data(G_OBJECT(msg), BALSA_PRINT_COMMON_INFO_KEY);
     if (ci) {
         gdk_window_raise(ci->dialog->window);
-        return;
+        return NULL;
     }
 
     ci = g_new(CommonInfo, 1);
@@ -1436,9 +1436,13 @@ message_print(LibBalsaMessage * msg)
     gnome_print_config_unref(config);
     
     ci->dialog = print_dialog(ci);
+    gtk_window_set_transient_for(GTK_WINDOW(ci->dialog), parent);
+
     set_dialog_buttons_sensitive(ci);
     g_signal_connect(G_OBJECT(ci->dialog), "response",
                      G_CALLBACK(print_response_cb), ci);
 
     gtk_widget_show_all(ci->dialog);
+
+    return ci->dialog;
 }

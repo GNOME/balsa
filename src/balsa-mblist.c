@@ -510,11 +510,29 @@ bmbl_tree_expand(GtkTreeView * tree_view, GtkTreeIter * iter,
     g_object_unref(mbnode);
 
     if (gtk_tree_model_iter_children(model, &child_iter, iter)) {
+	GtkWidget *current_index =
+	    balsa_window_find_current_index(balsa_app.main_window);
+	LibBalsaMailbox *current_mailbox =
+	    current_index ?
+	    BALSA_INDEX(current_index)->mailbox_node->mailbox :
+	    NULL;
         do {
             gtk_tree_model_get(model, &child_iter,
                                MBNODE_COLUMN, &mbnode, -1);
-            if (mbnode && mbnode->mailbox)
+            if (mbnode && mbnode->mailbox) {
 		libbalsa_mailbox_set_exposed(mbnode->mailbox, TRUE);
+		if (mbnode->mailbox == current_mailbox) {
+		    GtkTreeSelection *selection =
+			gtk_tree_view_get_selection(tree_view);
+		    g_signal_handlers_block_by_func(selection,
+						    bmbl_select_mailbox,
+						    NULL);
+		    gtk_tree_selection_select_iter(selection, &child_iter);
+		    g_signal_handlers_unblock_by_func(selection,
+						      bmbl_select_mailbox,
+						      NULL);
+		}
+	    }
 	    g_object_unref(mbnode);
         } while (gtk_tree_model_iter_next(model, &child_iter));
     }
@@ -842,8 +860,27 @@ bmbl_select_mailbox(GtkTreeSelection * selection, gpointer data)
         gtk_tree_view_get_model(tree_view);
     GtkTreePath *path;
 
-    if (!event)
+    if (!event) {
+	GtkTreeModel *model;
+	GtkTreeIter iter;
+
+	if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
+	    BalsaMailboxNode *mbnode;
+	    LibBalsaMailbox *mailbox;
+	    gtk_tree_model_get(model, &iter, MBNODE_COLUMN, &mbnode, -1);
+	    mailbox = mbnode->mailbox;
+	    g_object_unref(mbnode);
+	    if (MAILBOX_OPEN(mailbox))
+		/* Opening a mailbox under program control. */
+		return;
+	}
+	/* Not opening a mailbox--must be the initial selection of the
+	 * first mailbox in the list, so we'll unselect it again. */
+	g_signal_handlers_block_by_func(selection, bmbl_select_mailbox, NULL);
+	gtk_tree_selection_unselect_all(selection);
+	g_signal_handlers_unblock_by_func(selection, bmbl_select_mailbox, NULL);
         return;
+    }
     if (event->type != GDK_BUTTON_PRESS
             /* keyboard navigation */
         || event->button.button != 1
@@ -859,7 +896,9 @@ bmbl_select_mailbox(GtkTreeSelection * selection, gpointer data)
          * widget first gets the focus, whether it's a keyboard event or
          * a button event. If it's a button event, but no mailbox was
          * clicked, we'll just undo that selection and return. */
+	g_signal_handlers_block_by_func(selection, bmbl_select_mailbox, NULL);
         gtk_tree_selection_unselect_all(selection);
+	g_signal_handlers_unblock_by_func(selection, bmbl_select_mailbox, NULL);
         gdk_event_free(event);
         return;
     }
@@ -911,6 +950,7 @@ struct update_mbox_data {
     LibBalsaMailbox *mailbox;
     GtkTreeStore *store;
     guint total_messages;
+    gboolean notify;
 };
 static void bmbl_update_mailbox(GtkTreeStore * store,
 				LibBalsaMailbox * mailbox,
@@ -919,13 +959,17 @@ static gboolean
 update_mailbox_idle(struct update_mbox_data*umd)
 {
     gdk_threads_enter();
-    if (umd->store) {
+    if (umd->mailbox)
+        g_object_remove_weak_pointer(G_OBJECT(umd->mailbox),
+                                     (gpointer) &umd->mailbox);
+    if (umd->store)
         g_object_remove_weak_pointer(G_OBJECT(umd->store),
                                      (gpointer) &umd->store);
+    if (umd->mailbox && umd->store) {
         bmbl_update_mailbox(umd->store, umd->mailbox, umd->total_messages);
-	check_new_messages_count(umd->mailbox);
+	check_new_messages_count(umd->mailbox, umd->notify);
+	g_object_set_data(G_OBJECT(umd->mailbox), "mblist-update", NULL);
     }
-    g_object_set_data(G_OBJECT(umd->mailbox), "mblist-update", NULL);
     gdk_threads_leave();
     g_free(umd);
     return FALSE;
@@ -941,9 +985,13 @@ bmbl_mailbox_changed_cb(LibBalsaMailbox * mailbox, GtkTreeStore * store)
         return;
     g_object_set_data(G_OBJECT(mailbox), "mblist-update", GINT_TO_POINTER(1));
     umd = g_new(struct update_mbox_data,1);
-    umd->mailbox = mailbox; umd->store = store;
-    umd->total_messages = libbalsa_mailbox_total_messages(mailbox);
+    umd->mailbox = mailbox;
+    g_object_add_weak_pointer(G_OBJECT(mailbox), (gpointer) &umd->mailbox);
+    umd->store = store;
     g_object_add_weak_pointer(G_OBJECT(store), (gpointer) &umd->store);
+    umd->total_messages = libbalsa_mailbox_total_messages(mailbox);
+    umd->notify = (mailbox->state == LB_MAILBOX_STATE_OPEN
+                   || mailbox->state == LB_MAILBOX_STATE_CLOSED);
     g_idle_add((GSourceFunc)update_mailbox_idle, umd);
 }
 

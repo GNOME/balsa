@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.9.0\n"
-"POT-Creation-Date: 2000-06-06 15:56+0200\n"
-"PO-Revision-Date: 2000-06-06 15:59+0200\n"
+"POT-Creation-Date: 2000-06-07 21:45+0200\n"
+"PO-Revision-Date: 2000-06-07 21:46+0200\n"
 "Last-Translator: Fatih Demir <kabalak@gmx.net>\n"
 "Language-Team: Turkish <tr@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -1027,8 +1027,8 @@ msgid "Get new mail on startup"
 msgstr "Baþlarken yeni ePostayý al"
 
 #: src/main.c:80
-msgid "Compose a new email to kabalak@gmx.net"
-msgstr "_EMAIL_@_ADDRESS_'e yeni bir ePosta yaz"
+msgid "Compose a new email to EMAIL@ADDRESS"
+msgstr "EMAIL@ADDRESS'e yeni bir ePosta yaz"
 
 #: src/main.c:82
 msgid "Opens MAILBOXNAME"

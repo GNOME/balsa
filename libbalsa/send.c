@@ -1777,6 +1777,8 @@ libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage * message,
                                     "Status");
         g_mime_object_remove_header(GMIME_OBJECT(message->mime_msg),
                                     "X-Status");
+        g_mime_object_remove_header(GMIME_OBJECT(message->mime_msg),
+                                    "X-Balsa-Fcc");
 	mqi->stream = g_mime_stream_mem_new();
 	g_mime_message_write_to_stream(message->mime_msg, mqi->stream);
 	g_mime_stream_reset(mqi->stream);

@@ -1,3 +1,8 @@
+2004-03-16 10:47  PeterB
+
+	* libbalsa/mailbox.c: set the value even if the tree-view is not
+	realized.
+
 2004-03-15 15:02  PeterB
 
 	* src/balsa-index.c: don't connect to mailbox's "row-changed"

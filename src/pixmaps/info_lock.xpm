@@ -1,5 +1,5 @@
 /* XPM */
-static const char * info_lock_xpm[] = {
+static const char * info_sign_xpm[] = {
 "16 16 11 1",
 " 	c None",
 ".	c #3A3A3A",

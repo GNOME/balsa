@@ -1106,7 +1106,10 @@ libbalsa_mktempdir (char **s)
 	    if (!g_error_matches(error, G_FILE_ERROR, G_FILE_ERROR_EXIST))
 		return FALSE;
 	}
-	g_error_free(error);
+	if (error) {
+	    g_error_free(error);
+	    error = NULL;
+	}
     } while (fd == -1);
     *s = name;
     /* FIXME: rmdir(name) at sometime */

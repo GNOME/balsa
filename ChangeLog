@@ -7,6 +7,8 @@
 	- include mailbox-conf.h to avoid warnings.
 	- Added menu items to add, edit, and delete mailboxes.
 	- Corrected typo.
+	- Pop up error dialogs if no item is selected, and edit/delete
+	  is chosen.
 
 	* src/message-window.c:
 	- added menu to message window, just File|Close right now.

@@ -946,8 +946,11 @@ mblist_menu_edit_cb (GtkWidget * widget, gpointer data)
 {
   Mailbox *mailbox = mblist_get_selected_mailbox();
 
-  if (mailbox == NULL)
+  if (mailbox == NULL) {
+    GtkWidget* err_dialog = gnome_error_dialog(_("No mailbox selected."));
+    gnome_dialog_run(GNOME_DIALOG(err_dialog));
     return;
+  }
 
   mailbox_conf_new (mailbox, FALSE, MAILBOX_UNKNOWN);
 }
@@ -958,8 +961,11 @@ mblist_menu_delete_cb (GtkWidget * widget, gpointer data)
 {
   Mailbox *mailbox = mblist_get_selected_mailbox();
 
-  if (mailbox == NULL)
+  if (mailbox == NULL) {
+    GtkWidget* err_dialog = gnome_error_dialog(_("No mailbox selected."));
+    gnome_dialog_run(GNOME_DIALOG(err_dialog));
     return;
+  }
 
   if (mailbox->type == MAILBOX_UNKNOWN)
     return;
@@ -971,6 +977,9 @@ static Mailbox *
 mblist_get_selected_mailbox(void)
 {
     GtkCTreeNode *node;
+
+    g_assert(mblw != NULL);
+    g_assert(mblw->ctree != NULL);
 
     if (! GTK_CLIST(mblw->ctree)->selection)
         return NULL;

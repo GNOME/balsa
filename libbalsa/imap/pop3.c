@@ -644,8 +644,10 @@ pop_destroy(PopHandle *pop, GError **err)
   while(pop->req_insert_pos && pop->state == IMHS_AUTHENTICATED)
     pop_complete_pending_requests(pop);
 
-  if(pop->sio) {
+  if(pop->sio)
     res = pop_exec(pop, "Quit\r\n", err);
+  /* check again */
+  if(pop->sio) {
     sio_detach(pop->sio); pop->sio = NULL;
     close(pop->sd);
   }

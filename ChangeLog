@@ -1,3 +1,9 @@
+2003-05-28 19:23  PeterB
+
+	* libbalsa/filter.c, libbalsa/message.c, libbalsa/send.c,
+	src/balsa-index.c, src/balsa-message.c, src/sendmsg-window.c: Check
+	for NULL message->from.
+
 2003-05-27 21:20  PeterB
 
 	* src/main-window.c: Restore set_wmclass to new mail notification

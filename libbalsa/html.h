@@ -51,6 +51,7 @@ typedef void (*LibBalsaHTMLPrintCallback) (GtkWidget * widget,
 #endif
 
 GtkWidget *libbalsa_html_new(const gchar * text, size_t len,
+			     const gchar * charset,
 			     gpointer message,
 			     GCallback link_clicked_cb);
 void libbalsa_html_to_string(gchar ** text, size_t len);

@@ -303,6 +303,8 @@ print_header_string(GList **header_list, const gchar *field_id,
     hdr_pair = g_new0(gchar *, 3);
     hdr_pair[0] = g_strdup(label);
     hdr_pair[1] = g_strdup(value);
+    libbalsa_utf8_sanitize(&hdr_pair[1], balsa_app.convert_unknown_8bit,
+			   NULL);
     *header_list = g_list_append(*header_list, hdr_pair);
 }
 
@@ -321,6 +323,8 @@ print_header_list(GList **header_list, const gchar *field_id,
     hdr_pair = g_new0(gchar *, 3);
     hdr_pair[0] = g_strdup(label);
     hdr_pair[1] = internet_address_list_to_string(values, FALSE);
+    libbalsa_utf8_sanitize(&hdr_pair[1], balsa_app.convert_unknown_8bit,
+			   NULL);
     *header_list = g_list_append(*header_list, hdr_pair);
 }
 
@@ -673,7 +677,9 @@ prepare_html(PrintInfo * pi, LibBalsaMessageBody * body, gpointer data)
     pdata = g_new(HtmlInfo, 1);
     pdata->id_tag = BALSA_PRINT_TYPE_HTML;
     pdata->html =
-	libbalsa_html_new(html_text, len, pi->message, NULL);
+	libbalsa_html_new(html_text, len,
+			  libbalsa_message_body_charset(body),
+			  pi->message, NULL);
     g_free(html_text);
 
     if (libbalsa_html_can_zoom(pdata->html)) {

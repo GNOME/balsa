@@ -87,6 +87,7 @@ libbalsa_html_write_mime_stream(GtkHTMLStream * stream,
 /* Helper for creating a new GtkHTML widget:
  * text			the HTML source;
  * len			length of text;
+ * charset		source charset, or NULL;
  * export_string 	if we want the text exported as text/plain, a
  * 			GString to receive it; otherwise NULL;
  * message 		the LibBalsaMessage from which to extract any
@@ -95,7 +96,9 @@ libbalsa_html_write_mime_stream(GtkHTMLStream * stream,
  *			if NULL.
  */
 static GtkWidget *
-lbh_new(const gchar * text, size_t len, GString * export_string,
+lbh_new(const gchar * text, size_t len,
+	const gchar * charset,
+        GString * export_string,
 	gpointer message, GCallback link_clicked_cb)
 {
     GtkWidget *html;
@@ -110,8 +113,17 @@ lbh_new(const gchar * text, size_t len, GString * export_string,
 			 link_clicked_cb, NULL);
 
     stream = gtk_html_begin(GTK_HTML(html));
-    if (len > 0)
-	gtk_html_write(GTK_HTML(html), stream, text, len);
+    if (len > 0) {
+        if (charset && g_ascii_strcasecmp(charset, "us-ascii") != 0
+            && g_ascii_strcasecmp(charset, "utf-8") != 0) {
+            gsize bytes_written;
+            gchar *s = g_convert(text, len, "utf-8", charset, NULL,
+                                 &bytes_written, NULL);
+            gtk_html_write(GTK_HTML(html), stream, s, bytes_written);
+            g_free(s);
+        } else
+            gtk_html_write(GTK_HTML(html), stream, text, len);
+    }
     if (export_string)
 	gtk_html_export(GTK_HTML(html), "text/plain",
 			(GtkHTMLSaveReceiverFn) libbalsa_html_receiver_fn,
@@ -131,6 +143,7 @@ lbh_new(const gchar * text, size_t len, GString * export_string,
 /* Create a new HtmlView widget:
  * text			the HTML source;
  * len			length of text;
+ * charset		source charset, or NULL;
  * message 		the LibBalsaMessage from which to extract any
  *			HTML objects (by url); ignored if NULL;
  * link_clicked_cb	callback for the "link-clicked" signal; ignored
@@ -138,9 +151,10 @@ lbh_new(const gchar * text, size_t len, GString * export_string,
  */
 GtkWidget *
 libbalsa_html_new(const gchar * text, size_t len,
+		  const gchar * charset,
 		  gpointer message, GCallback link_clicked_cb)
 {
-    return lbh_new(text, len, NULL, message, link_clicked_cb);
+    return lbh_new(text, len, charset, NULL, message, link_clicked_cb);
 }
 
 /* Use an HtmlView widget to convert html text to a (null-terminated) string:
@@ -155,7 +169,7 @@ libbalsa_html_to_string(gchar ** text, size_t len)
     GString *str;
 
     str = g_string_new(NULL);	/* We want only the text, in str. */
-    html = lbh_new(*text, len, str, NULL, NULL);
+    html = lbh_new(*text, len, NULL, str, NULL, NULL);
     gtk_widget_destroy(html);
 
     g_free(*text);
@@ -289,6 +303,7 @@ libbalsa_html_write_mime_stream(HtmlStream * stream,
 /* Create a new HtmlView widget:
  * text			the HTML source;
  * len			length of text;
+ * charset		ignored;
  * message 		the LibBalsaMessage from which to extract any
  *			HTML objects (by url); ignored if NULL;
  * link_clicked_cb	callback for the "link-clicked" signal; ignored
@@ -297,6 +312,7 @@ libbalsa_html_write_mime_stream(HtmlStream * stream,
 
 GtkWidget *
 libbalsa_html_new(const gchar * text, size_t len,
+		  const gchar * charset,
 		  gpointer message, GCallback link_clicked_cb)
 {
     GtkWidget *html;

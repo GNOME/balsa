@@ -2632,7 +2632,9 @@ part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info, gchar * ptr,
                     size_t len)
 {
     GtkWidget *html =
-        libbalsa_html_new(ptr, len, bm->message,
+        libbalsa_html_new(ptr, len,
+			  libbalsa_message_body_charset(info->body),
+			  bm->message,
                           G_CALLBACK(balsa_gtk_html_link_clicked));
 
     g_signal_connect(G_OBJECT(html), "size-request",

@@ -1,4 +1,18 @@
-1999-01-12  bertrand  <Bertrand.Guiheneuf@inria.fr>
+1999-01-13  bertrand  <Bertrand.Guiheneuf@inria.fr>
+
+	* src/mailbox-conf.c (mailbox_conf_delete): bug when removing 
+	the firts pop mailbox. Fix submitted by Ian Campbell <ijc25@cam.ac.uk>
+
+	* src/main.c (config_init): commented out the return keyword after
+	.balsarc initialisation. It prevented the config to be loaded and
+	in particular the mailbox list window size to be set correctly
+	when a .balsarc did not exist.
+
+	* src/mblist-window.c (mblist_clicked_cb): new function to handle 
+	contextual menus more precisely and in particular, allowing the menu
+	to appear even when the mouse does not click on one mailbox row.
+
+1999-01-12  
 
 	* src/filter-edit-callbacks.c 
 	* src/mailbox-conf.c 

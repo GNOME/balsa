@@ -109,7 +109,7 @@ config_init (void)
       fprintf (stderr, "*** Could not load config file %s!\n",
 	       BALSA_CONFIG_FILE);
       initialize_balsa ();
-      return;
+      //return;
     }
 
   /* Load all the global settings.  If there's an error, then some crucial

@@ -183,7 +183,7 @@ mailbox_conf_delete (Mailbox * mailbox)
   /* Don't forget to remove the node from balsa's mailbox list */
   if (mailbox->type == MAILBOX_POP3)
     {
-      g_list_remove (balsa_app.inbox_input, mailbox);
+      balsa_app.inbox_input = g_list_remove (balsa_app.inbox_input, mailbox);
     }
   else
     {

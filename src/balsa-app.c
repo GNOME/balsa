@@ -173,6 +173,7 @@ mailboxes_init (void)
 static void
 my_special_mailbox ()
 {
+#if 0
   Mailbox *mailbox;
 
   mailbox = mailbox_new (MAILBOX_NNTP);
@@ -180,4 +181,5 @@ my_special_mailbox ()
   MAILBOX_NNTP (mailbox)->server = g_strdup ("news.serv.net");
   MAILBOX_NNTP (mailbox)->newsgroup = g_strdup ("comp.os.linux.announce");
   balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mailbox);
+#endif
 }

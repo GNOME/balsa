@@ -6,9 +6,9 @@
 #, no-wrap
 msgid ""
 msgstr ""
-"Project-Id-Version: balsa 1.3.0\n"
-"POT-Creation-Date: 2002-01-27 01:47+0900\n"
-"PO-Revision-Date: 2002-01-27 01:47+0900\n"
+"Project-Id-Version: balsa 1.3.1\n"
+"POT-Creation-Date: 2002-02-08 23:23+0900\n"
+"PO-Revision-Date: 2002-02-08 23:23+0900\n"
 "Last-Translator: Takeshi Aihana <aihana@gnome.gr.jp>\n"
 "Language-Team: Japan GNOME Users Group <translation@gnome.gr.jp>\n"
 "MIME-Version: 1.0\n"
@@ -169,12 +169,12 @@ msgstr "デフォルト"
 
 #. should "re" be localized ?
 #: libbalsa/identity.c:135 src/balsa-index-threading.c:854
-#: src/balsa-index-threading.c:856 src/sendmsg-window.c:2134
-#: src/sendmsg-window.c:2135
+#: src/balsa-index-threading.c:856 src/sendmsg-window.c:2125
+#: src/sendmsg-window.c:2126
 msgid "Re:"
 msgstr "Re:"
 
-#: libbalsa/identity.c:136 src/sendmsg-window.c:2163 src/sendmsg-window.c:2164
+#: libbalsa/identity.c:136 src/sendmsg-window.c:2154 src/sendmsg-window.c:2155
 msgid "Fwd:"
 msgstr "Fwd:"
 
@@ -208,7 +208,7 @@ msgid "Mailing Address:"
 msgstr "E-Mailアドレス:"
 
 #. Reply To:
-#: libbalsa/identity.c:672 libbalsa/identity.c:1173 src/sendmsg-window.c:1684
+#: libbalsa/identity.c:672 libbalsa/identity.c:1173 src/sendmsg-window.c:1675
 msgid "Reply To:"
 msgstr "返信先:"
 
@@ -218,7 +218,7 @@ msgstr "ドメイン:"
 
 #. bcc:
 #: libbalsa/identity.c:678 libbalsa/identity.c:1177 src/balsa-message.c:736
-#: src/print.c:393 src/sendmsg-window.c:1652 src/store-address.c:270
+#: src/print.c:395 src/sendmsg-window.c:1643 src/store-address.c:270
 msgid "Bcc:"
 msgstr "Bcc:"
 
@@ -278,13 +278,13 @@ msgstr "本当に選択した身元情報を削除しても宜しいですか？"
 
 #: libbalsa/identity.c:1058 src/filter-edit-callbacks.c:637
 #: src/filter-edit-dialog.c:244 src/filter-edit-dialog.c:362
-#: src/mailbox-node.c:587 src/main-window.c:447
+#: src/mailbox-node.c:590 src/main-window.c:447
 msgid "New"
 msgstr "新規"
 
-#: libbalsa/identity.c:1061 src/balsa-index.c:2113
-#: src/filter-edit-dialog.c:250 src/mailbox-node.c:610 src/pref-manager.c:1354
-#: src/pref-manager.c:2330
+#: libbalsa/identity.c:1061 src/balsa-index.c:2123
+#: src/filter-edit-dialog.c:250 src/mailbox-node.c:615 src/pref-manager.c:1375
+#: src/pref-manager.c:2353
 msgid "Delete"
 msgstr "削除"
 
@@ -496,12 +496,12 @@ msgstr "接続が拒否されました"
 msgid "Authentication failed"
 msgstr "認証に失敗しました"
 
-#: libbalsa/pop3.c:417
+#: libbalsa/pop3.c:420
 #, c-format
 msgid "Retrieving Message %d of %d"
 msgstr "%d / %d のメッセージを取得中"
 
-#: libbalsa/pop3.c:431
+#: libbalsa/pop3.c:434
 #, c-format
 msgid "Received %d bytes of %d"
 msgstr "%d バイト/ %d 受信済み"
@@ -510,7 +510,7 @@ msgstr "%d バイト/ %d 受信済み"
 msgid "Sending Mail..."
 msgstr "メールを送信中..."
 
-#: libbalsa/send.c:219 src/main-window.c:1683
+#: libbalsa/send.c:219 src/main-window.c:1692
 msgid "Hide"
 msgstr "隠す"
 
@@ -967,53 +967,53 @@ msgstr "TLS へ接続できません"
 msgid "Selecting %s..."
 msgstr "%s を選択中..."
 
-#: libmutt/imap/imap.c:686
+#: libmutt/imap/imap.c:685
 msgid "Error opening mailbox"
 msgstr "メールボックスを開く時にエラー"
 
 #. STATUS not supported
-#: libmutt/imap/imap.c:739
+#: libmutt/imap/imap.c:738
 msgid "Unable to append to IMAP mailboxes at this server"
 msgstr "このサーバーの IMAP メールボックスに追加することは出来ません"
 
 #. command failed cause folder doesn't exist
-#: libmutt/imap/imap.c:748 libmutt/imap/message.c:666
+#: libmutt/imap/imap.c:747 libmutt/imap/message.c:666
 #, c-format
 msgid "Create %s?"
 msgstr "%s を作成しても宜しいですか？"
 
-#: libmutt/imap/imap.c:784
+#: libmutt/imap/imap.c:783
 msgid "Closing connection to IMAP server..."
 msgstr "IMAP サーバーとの接続を閉じています..."
 
-#: libmutt/imap/imap.c:947
+#: libmutt/imap/imap.c:946
 #, c-format
 msgid "Marking %d messages deleted..."
 msgstr "%d 通のメッセージに削除マーク付与中..."
 
-#: libmutt/imap/imap.c:956
+#: libmutt/imap/imap.c:955
 msgid "Expunge failed"
 msgstr "削除に失敗しました"
 
-#: libmutt/imap/imap.c:971
+#: libmutt/imap/imap.c:970
 #, c-format
 msgid "Saving message status flags... [%d/%d]"
 msgstr "メッセージ状態フラグの保存中... [%d/%d]"
 
-#: libmutt/imap/imap.c:1058
+#: libmutt/imap/imap.c:1057
 msgid "Expunging messages from server..."
 msgstr "サーバーからメッセージを削除中..."
 
-#: libmutt/imap/imap.c:1097
+#: libmutt/imap/imap.c:1096
 msgid "CLOSE failed"
 msgstr "CLOSE に失敗"
 
-#: libmutt/imap/imap.c:1364
+#: libmutt/imap/imap.c:1363
 #, c-format
 msgid "Subscribing to %s..."
 msgstr "%s へ署名中..."
 
-#: libmutt/imap/imap.c:1366
+#: libmutt/imap/imap.c:1365
 #, c-format
 msgid "Unsubscribing to %s..."
 msgstr "%s の取り消し中..."
@@ -1469,7 +1469,7 @@ msgid "_Base Domain Name"
 msgstr "基本ドメイン名(_B)"
 
 #: src/address-book-config.c:652 src/filter-edit-callbacks.c:710
-#: src/mailbox-conf.c:388 src/pref-manager.c:1352 src/pref-manager.c:2328
+#: src/mailbox-conf.c:388 src/pref-manager.c:1373 src/pref-manager.c:2351
 msgid "Add"
 msgstr "追加"
 
@@ -1546,7 +1546,7 @@ msgid "From"
 msgstr "送信元"
 
 #: src/balsa-index.c:312 src/filter-edit-callbacks.c:883
-#: src/main-window.c:2627
+#: src/main-window.c:2636
 msgid "Subject"
 msgstr "件名"
 
@@ -1567,77 +1567,77 @@ msgstr "メールボックス %s を開いています。少々お待ち下さい..."
 msgid "To"
 msgstr "送信先"
 
-#: src/balsa-index.c:2041
+#: src/balsa-index.c:2048
 msgid "Cannot access the message's body\n"
 msgstr "メッセージ本体にアクセスすることが出来ませんでした\n"
 
-#: src/balsa-index.c:2069
+#: src/balsa-index.c:2076
 msgid "View Source"
 msgstr "ソースの表示"
 
-#: src/balsa-index.c:2071
+#: src/balsa-index.c:2078
 msgid "Reply..."
 msgstr "返信..."
 
-#: src/balsa-index.c:2073
+#: src/balsa-index.c:2080
 msgid "Reply To All..."
 msgstr "全員に返信..."
 
-#: src/balsa-index.c:2075
+#: src/balsa-index.c:2082
 msgid "Reply To Group..."
 msgstr "グループに返信..."
 
-#: src/balsa-index.c:2077
+#: src/balsa-index.c:2084
 msgid "Forward Attached..."
 msgstr "添付して転送..."
 
-#: src/balsa-index.c:2079
+#: src/balsa-index.c:2086
 msgid "Forward Inline..."
 msgstr "インラインで転送..."
 
-#: src/balsa-index.c:2081
+#: src/balsa-index.c:2088
 msgid "Store Address..."
 msgstr "アドレスの追加..."
 
-#: src/balsa-index.c:2118
+#: src/balsa-index.c:2128
 msgid "Undelete"
 msgstr "復活"
 
-#: src/balsa-index.c:2123
+#: src/balsa-index.c:2133
 msgid "Move To Trash"
 msgstr "ゴミ箱に送る"
 
-#: src/balsa-index.c:2127
+#: src/balsa-index.c:2137
 msgid "Toggle"
 msgstr "切り替え"
 
-#: src/balsa-index.c:2130 src/filter-edit-callbacks.c:637
+#: src/balsa-index.c:2140 src/filter-edit-callbacks.c:637
 #: src/main-window.c:440
 msgid "Flagged"
 msgstr "フラグ付け"
 
-#: src/balsa-index.c:2133 src/balsa-mblist.c:478
+#: src/balsa-index.c:2143 src/balsa-mblist.c:471
 msgid "Unread"
 msgstr "読み込み不可"
 
-#: src/balsa-index.c:2147
+#: src/balsa-index.c:2157
 msgid "Move"
 msgstr "移動"
 
 #. Create standard entry
-#: src/balsa-index.c:2158 src/message-window.c:702
+#: src/balsa-index.c:2168 src/message-window.c:706
 msgid "Folder"
 msgstr "フォルダ"
 
-#: src/balsa-mblist.c:478 src/mailbox-conf.c:1005
+#: src/balsa-mblist.c:471 src/mailbox-conf.c:1005
 msgid "Mailbox"
 msgstr "メールボックス"
 
-#: src/balsa-mblist.c:478
+#: src/balsa-mblist.c:471
 msgid "Total"
 msgstr "合計"
 
-#: src/balsa-mblist.c:946
+#: src/balsa-mblist.c:936
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr "メール状況: %s / %ld メッセージ, %ld が新規"
@@ -1656,41 +1656,41 @@ msgid "Save MIME Part"
 msgstr "MIME部分の保存"
 
 #. Subject:
-#: src/balsa-message.c:721 src/print.c:364 src/sendmsg-window.c:1645
+#: src/balsa-message.c:721 src/print.c:366 src/sendmsg-window.c:1636
 msgid "Subject:"
 msgstr "件名:"
 
-#: src/balsa-message.c:725 src/print.c:370
+#: src/balsa-message.c:725 src/print.c:372
 msgid "Date:"
 msgstr "日付:"
 
 #. From:
 #: src/balsa-message.c:730 src/filter-edit-callbacks.c:874
-#: src/main-window.c:2626 src/print.c:381 src/sendmsg-window.c:1635
+#: src/main-window.c:2635 src/print.c:383 src/sendmsg-window.c:1626
 #: src/store-address.c:267
 msgid "From:"
 msgstr "送信元:"
 
 #. To:
 #: src/balsa-message.c:734 src/filter-edit-callbacks.c:865
-#: src/main-window.c:2625 src/print.c:391 src/sendmsg-window.c:1640
+#: src/main-window.c:2634 src/print.c:393 src/sendmsg-window.c:1631
 #: src/store-address.c:268
 msgid "To:"
 msgstr "送信先:"
 
 #. cc:
 #: src/balsa-message.c:735 src/filter-edit-callbacks.c:892
-#: src/main-window.c:2628 src/print.c:392 src/sendmsg-window.c:1647
+#: src/main-window.c:2637 src/print.c:394 src/sendmsg-window.c:1638
 #: src/store-address.c:269
 msgid "Cc:"
 msgstr "Cc:"
 
 #. fcc:
-#: src/balsa-message.c:739 src/print.c:394 src/sendmsg-window.c:1657
+#: src/balsa-message.c:739 src/print.c:396 src/sendmsg-window.c:1648
 msgid "Fcc:"
 msgstr "Fcc:"
 
-#: src/balsa-message.c:744 src/print.c:400
+#: src/balsa-message.c:744 src/print.c:402
 msgid "Disposition-Notification-To:"
 msgstr "配送通知先:"
 
@@ -1745,7 +1745,7 @@ msgstr "アクセス形式: メール・サーバ\n"
 msgid "Mail server: %s\n"
 msgstr "メールサーバ: %s\n"
 
-#: src/balsa-message.c:978 src/sendmsg-window.c:1948
+#: src/balsa-message.c:978 src/sendmsg-window.c:1939
 #, c-format
 msgid "Subject: %s\n"
 msgstr "件名: %s\n"
@@ -1905,7 +1905,7 @@ msgid "Contain/Does not contain"
 msgstr "含む/含まない"
 
 #: src/filter-edit-callbacks.c:714 src/filter-edit-dialog.c:367
-#: src/sendmsg-window.c:1064
+#: src/sendmsg-window.c:1065
 msgid "Remove"
 msgstr "削除"
 
@@ -1939,7 +1939,7 @@ msgstr "全てのヘッダ"
 msgid "Clear"
 msgstr "クリア"
 
-#: src/filter-edit-callbacks.c:856 src/main-window.c:2624
+#: src/filter-edit-callbacks.c:856 src/main-window.c:2633
 msgid "Body"
 msgstr "本文"
 
@@ -2205,7 +2205,7 @@ msgid "Rename INBOX"
 msgstr "INBOX 名の変更"
 
 #: src/folder-conf.c:381 src/folder-conf.c:550 src/mailbox-conf.c:224
-#: src/mailbox-conf.c:237 src/mailbox-conf.c:247 src/sendmsg-window.c:1158
+#: src/mailbox-conf.c:237 src/mailbox-conf.c:247 src/sendmsg-window.c:1159
 #: src/toolbar-factory.c:176
 msgid "Cancel"
 msgstr "キャンセル"
@@ -2438,81 +2438,82 @@ msgstr "SSL (IMAP用) を利用する"
 msgid "The folder edition to be written."
 msgstr "書き込み済みフォルダです。"
 
-#: src/mailbox-node.c:572 src/main-window.c:268
+#: src/mailbox-node.c:575 src/main-window.c:268
 msgid "Local mbox mailbox..."
 msgstr "ローカル Mbox 形式メールボックス..."
 
-#: src/mailbox-node.c:574 src/main-window.c:273
+#: src/mailbox-node.c:577 src/main-window.c:273
 msgid "Local Maildir mailbox..."
 msgstr "ローカル Maildir 形式メールボックス..."
 
-#: src/mailbox-node.c:576 src/main-window.c:278
+#: src/mailbox-node.c:579 src/main-window.c:278
 msgid "Local MH mailbox..."
 msgstr "ローカル MH 形式メールボックス..."
 
-#: src/mailbox-node.c:578 src/main-window.c:283 src/pref-manager.c:2483
+#: src/mailbox-node.c:581 src/main-window.c:283 src/pref-manager.c:2506
 msgid "Remote IMAP mailbox..."
 msgstr "リモート IMAP メールボックス..."
 
-#: src/mailbox-node.c:581 src/main-window.c:289 src/pref-manager.c:2488
+#: src/mailbox-node.c:584 src/main-window.c:289 src/pref-manager.c:2511
 msgid "Remote IMAP folder..."
 msgstr "リモート IMAP 形式フォルダ..."
 
-#: src/mailbox-node.c:583 src/main-window.c:294
+#: src/mailbox-node.c:586 src/main-window.c:294
 msgid "Remote IMAP subfolder..."
 msgstr "リモート IMAP サブフォルダ..."
 
-#: src/mailbox-node.c:601
-msgid "Open"
-msgstr "開く"
-
-#: src/mailbox-node.c:603 src/toolbar-factory.c:186
-msgid "Close"
-msgstr "閉じる"
-
-#: src/mailbox-node.c:608
-msgid "Properties..."
-msgstr "プロパティ..."
-
-#: src/mailbox-node.c:616
-msgid "Subscribe"
-msgstr "署名"
-
-#: src/mailbox-node.c:617
-msgid "Unsubscribe"
-msgstr "取り消し"
-
-#: src/mailbox-node.c:618 src/mailbox-node.c:635
+#. clicked on the empty space
+#: src/mailbox-node.c:597 src/mailbox-node.c:623 src/mailbox-node.c:640
 msgid "Rescan"
 msgstr "再スキャン"
 
-#: src/mailbox-node.c:623
+#: src/mailbox-node.c:606
+msgid "Open"
+msgstr "開く"
+
+#: src/mailbox-node.c:608 src/toolbar-factory.c:186
+msgid "Close"
+msgstr "閉じる"
+
+#: src/mailbox-node.c:613
+msgid "Properties..."
+msgstr "プロパティ..."
+
+#: src/mailbox-node.c:621
+msgid "Subscribe"
+msgstr "署名"
+
+#: src/mailbox-node.c:622
+msgid "Unsubscribe"
+msgstr "取り消し"
+
+#: src/mailbox-node.c:628
 msgid "Mark as Inbox"
 msgstr "受信箱をマーク"
 
-#: src/mailbox-node.c:625
+#: src/mailbox-node.c:630
 msgid "Mark as Sentbox"
 msgstr "送信箱をマーク"
 
-#: src/mailbox-node.c:627
+#: src/mailbox-node.c:632
 msgid "Mark as Trash"
 msgstr "ゴミ箱をマーク"
 
-#: src/mailbox-node.c:629
+#: src/mailbox-node.c:634
 msgid "Mark as Draftbox"
 msgstr "草案箱をマーク"
 
 #. FIXME : No test on mailbox type is made yet, should we ?
-#: src/mailbox-node.c:632
+#: src/mailbox-node.c:637
 msgid "Edit/Apply filters"
 msgstr "フィルタの編集と適用"
 
-#: src/mailbox-node.c:784
+#: src/mailbox-node.c:789
 #, c-format
 msgid "Local mailbox %s loaded as: %s\n"
 msgstr "ロードされたローカル・メールボックス %s: %s\n"
 
-#: src/mailbox-node.c:810
+#: src/mailbox-node.c:815
 #, c-format
 msgid "Local folder %s\n"
 msgstr "ローカルフォルダ %s\n"
@@ -2926,7 +2927,7 @@ msgstr ""
 "Balsa はメール送信中です。\n"
 "送信を中止しますか？"
 
-#: src/main-window.c:1291
+#: src/main-window.c:1300
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -2934,11 +2935,11 @@ msgstr ""
 "メールボックスが開けません!\n"
 "メールボックスの設定を確認して下さい。"
 
-#: src/main-window.c:1572
-msgid "Copyright (C) 1997-2001"
-msgstr "Copyright (C) 1997-2001"
+#: src/main-window.c:1581
+msgid "Copyright (C) 1997-2002"
+msgstr "Copyright (C) 1997-2002"
 
-#: src/main-window.c:1575
+#: src/main-window.c:1584
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://www.balsa.net/\n"
@@ -2950,28 +2951,28 @@ msgstr ""
 "\n"
 "バグを報告する際は、http://bugzilla.gnome.org/ にて報告して下さい。"
 
-#: src/main-window.c:1683
+#: src/main-window.c:1692
 msgid "Checking Mail..."
 msgstr "着信メールの確認中..."
 
-#: src/main-window.c:1971
+#: src/main-window.c:1980
 msgid "Finished Checking."
 msgstr "確認が終了しました。"
 
-#: src/main-window.c:2038
+#: src/main-window.c:2047
 #, c-format
 msgid "Sending error: %s"
 msgstr "送信エラー: %s"
 
-#: src/main-window.c:2136
+#: src/main-window.c:2145
 msgid "You have new mail waiting"
 msgstr "新規メール待ち"
 
-#: src/main-window.c:2139
+#: src/main-window.c:2148
 msgid "OK"
 msgstr "OK"
 
-#: src/main-window.c:2582
+#: src/main-window.c:2591
 msgid "Search a message"
 msgstr "メッセージの検索"
 
@@ -2980,29 +2981,29 @@ msgstr "メッセージの検索"
 #. gtk_signal_connect(GTK_OBJECT(dia),"clicked",
 #. find_dialog_button_cb,&f);
 #.
-#: src/main-window.c:2598
+#: src/main-window.c:2607
 msgid "Reverse search"
 msgstr "逆方向に検索"
 
-#: src/main-window.c:2601
+#: src/main-window.c:2610
 msgid "Search for:"
 msgstr "検索文字:"
 
-#: src/main-window.c:2613
+#: src/main-window.c:2622
 msgid "In:"
 msgstr "検索対象:"
 
-#: src/main-window.c:2773 src/main-window.c:2792
+#: src/main-window.c:2782 src/main-window.c:2801
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "メールボックス %s への書き込みが失敗しました。"
 
-#: src/main-window.c:2991
+#: src/main-window.c:3000
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (読み込み専用)"
 
-#: src/main-window.c:2993
+#: src/main-window.c:3002
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
@@ -3092,203 +3093,203 @@ msgstr "メッセージの次の部分"
 msgid "Previous part in Message"
 msgstr "メッセージの前の部分"
 
-#: src/pref-manager.c:207
+#: src/pref-manager.c:208
 msgid "Text"
 msgstr "テキスト"
 
-#: src/pref-manager.c:208
+#: src/pref-manager.c:209
 msgid "Icons"
 msgstr "アイコン"
 
-#: src/pref-manager.c:209
+#: src/pref-manager.c:210
 msgid "Both"
 msgstr "テキストとアイコン"
 
-#: src/pref-manager.c:219
+#: src/pref-manager.c:220
 msgid "7bits"
 msgstr "7ビット"
 
-#: src/pref-manager.c:220
+#: src/pref-manager.c:221
 msgid "8bits"
 msgstr "8ビット"
 
-#: src/pref-manager.c:221
+#: src/pref-manager.c:222
 msgid "quoted"
 msgstr "クォート済"
 
-#: src/pref-manager.c:231
+#: src/pref-manager.c:232
 msgid "While Retrieving Messages"
 msgstr "メッセージを読み込んでいる間ずっと"
 
-#: src/pref-manager.c:232
+#: src/pref-manager.c:233
 msgid "Until Closed"
 msgstr "閉じるまで"
 
-#: src/pref-manager.c:233 src/pref-manager.c:2630 src/pref-manager.c:2666
+#: src/pref-manager.c:234 src/pref-manager.c:2653 src/pref-manager.c:2689
 msgid "Never"
 msgstr "しない"
 
-#: src/pref-manager.c:237
+#: src/pref-manager.c:238
 msgid "Fast"
 msgstr "速い"
 
-#: src/pref-manager.c:238
+#: src/pref-manager.c:239
 msgid "Normal"
 msgstr "標準"
 
-#: src/pref-manager.c:239
+#: src/pref-manager.c:240
 msgid "Bad Spellers"
 msgstr "おかしなスペルチェッカー"
 
-#: src/pref-manager.c:262
+#: src/pref-manager.c:263
 msgid "Balsa Preferences"
 msgstr "バルサの設定"
 
-#: src/pref-manager.c:273
+#: src/pref-manager.c:274
 msgid "Mail Servers"
 msgstr "メールサーバ"
 
-#: src/pref-manager.c:277 src/pref-manager.c:2295
+#: src/pref-manager.c:278 src/pref-manager.c:2318
 msgid "Address Books"
 msgstr "アドレス帳"
 
-#: src/pref-manager.c:281
+#: src/pref-manager.c:282
 msgid "Mail Options"
 msgstr "メール・オプション"
 
-#: src/pref-manager.c:285 src/pref-manager.c:1807
+#: src/pref-manager.c:286 src/pref-manager.c:1828
 msgid "Display"
 msgstr "表示"
 
-#: src/pref-manager.c:289 src/toolbar-factory.c:174
+#: src/pref-manager.c:290 src/toolbar-factory.c:174
 msgid "Spelling"
 msgstr "スペル"
 
-#: src/pref-manager.c:293 src/pref-manager.c:2157
+#: src/pref-manager.c:294 src/pref-manager.c:2180
 msgid "Misc"
 msgstr "その他"
 
-#: src/pref-manager.c:297
+#: src/pref-manager.c:298
 msgid "Startup"
 msgstr "起動時"
 
-#: src/pref-manager.c:1104
+#: src/pref-manager.c:1125
 msgid "Yes"
 msgstr "はい"
 
-#: src/pref-manager.c:1320
+#: src/pref-manager.c:1341
 msgid "Remote Mailbox Servers"
 msgstr "リモート・メールボックス・サーバ"
 
-#: src/pref-manager.c:1342 src/pref-manager.c:2317
+#: src/pref-manager.c:1363 src/pref-manager.c:2340
 msgid "Type"
 msgstr "形式"
 
-#: src/pref-manager.c:1345
+#: src/pref-manager.c:1366
 msgid "Mailbox Name"
 msgstr "メールボックス名"
 
-#: src/pref-manager.c:1353 src/pref-manager.c:2329
+#: src/pref-manager.c:1374 src/pref-manager.c:2352
 msgid "Modify"
 msgstr "編集"
 
-#: src/pref-manager.c:1356
+#: src/pref-manager.c:1377
 msgid "Local mail"
 msgstr "ローカルメール"
 
-#: src/pref-manager.c:1366
+#: src/pref-manager.c:1387
 msgid "Select your local mail directory"
 msgstr "ローカル・メール・ディレクトリの選択"
 
-#: src/pref-manager.c:1376
+#: src/pref-manager.c:1397
 msgid "Outgoing mail"
 msgstr "メールの送信"
 
-#: src/pref-manager.c:1388
+#: src/pref-manager.c:1409
 msgid "Remote SMTP Server"
 msgstr "リモート SMTP サーバ"
 
-#: src/pref-manager.c:1397
+#: src/pref-manager.c:1418
 msgid "User"
 msgstr "ユーザ"
 
-#: src/pref-manager.c:1406
+#: src/pref-manager.c:1427
 msgid "Pass Phrase"
 msgstr "パスフレーズ"
 
 #. STARTTLS
-#: src/pref-manager.c:1418
+#: src/pref-manager.c:1439
 msgid "Use TLS"
 msgstr "TLS を利用する"
 
-#: src/pref-manager.c:1434
+#: src/pref-manager.c:1455
 msgid "Certificate Pass Phrase"
 msgstr "認証パスフレーズ"
 
-#: src/pref-manager.c:1463
+#: src/pref-manager.c:1484
 msgid "Incoming"
 msgstr "新着"
 
-#: src/pref-manager.c:1465
+#: src/pref-manager.c:1486
 msgid "Outgoing"
 msgstr "送信"
 
-#: src/pref-manager.c:1491
+#: src/pref-manager.c:1512
 msgid "Checking"
 msgstr "チェック"
 
-#: src/pref-manager.c:1501 src/pref-manager.c:2186
+#: src/pref-manager.c:1522 src/pref-manager.c:2209
 msgid "minutes"
 msgstr "分"
 
-#: src/pref-manager.c:1513
+#: src/pref-manager.c:1534
 msgid "Check mail automatically every:"
 msgstr "メールを自動的に確認する周期:"
 
-#: src/pref-manager.c:1522
+#: src/pref-manager.c:1543
 msgid "Check IMAP mailboxes"
 msgstr "IMAP メールボックスのチェック"
 
-#: src/pref-manager.c:1527
+#: src/pref-manager.c:1548
 msgid "Check INBOX only"
 msgstr "INBOX のみチェックする"
 
-#: src/pref-manager.c:1532
+#: src/pref-manager.c:1553
 msgid "Display message if new mail has arrived"
 msgstr "新着メールがあればメッセージを表示する"
 
-#: src/pref-manager.c:1537
+#: src/pref-manager.c:1558
 msgid "Do background check quietly (no messages in status bar)"
 msgstr "素早くバックグラウンドでチェックする (ステータスバーには表示しない)"
 
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
-#: src/pref-manager.c:1543
+#: src/pref-manager.c:1564
 msgid "Quoted and Flowed Text"
 msgstr "文の引用とフロー"
 
-#: src/pref-manager.c:1556
+#: src/pref-manager.c:1577
 msgid "Quoted Text Regular Expression"
 msgstr "引用文の正規表現"
 
-#: src/pref-manager.c:1565
+#: src/pref-manager.c:1586
 msgid "Wrap Incoming Text at:"
 msgstr "ラップする文字:"
 
-#: src/pref-manager.c:1574 src/pref-manager.c:1681
+#: src/pref-manager.c:1595 src/pref-manager.c:1702
 msgid "Characters"
 msgstr "文字"
 
-#: src/pref-manager.c:1579
+#: src/pref-manager.c:1600
 msgid "Reflow messages of type `text/plain; format=flowed'"
 msgstr "MIME 型 'text/plain; format=flowed<' のメッセージのリフロー"
 
 #. How to handle received MDN requests
-#: src/pref-manager.c:1587
+#: src/pref-manager.c:1608
 msgid "Message Disposition Notification requests"
 msgstr "メッセージ配送通知の要求"
 
-#: src/pref-manager.c:1595
+#: src/pref-manager.c:1616
 msgid ""
 "When I receive a message and its sender requested to return a\n"
 "Message Disposition Notification (MDN), send it in the following cases:"
@@ -3296,7 +3297,7 @@ msgstr ""
 "メッセージを受け取り、その送信元がメッセージ配送通知 (MDN) を\n"
 "返すよう要求してきたら、下記の要領で返信します:"
 
-#: src/pref-manager.c:1606
+#: src/pref-manager.c:1627
 msgid ""
 "the message header looks clean\n"
 "(the notify-to address is equal to the return path, I am in the to or cc "
@@ -3306,281 +3307,285 @@ msgstr ""
 "(通知先アドレスが返信パスと等しく、To: または Cc: リストに自分のアドレスが存"
 "在しています)"
 
-#: src/pref-manager.c:1621
+#: src/pref-manager.c:1642
 msgid "the message header looks suspicious"
 msgstr "メッセージのヘッダは疑わしいです"
 
-#: src/pref-manager.c:1655
+#: src/pref-manager.c:1676
 msgid "Word Wrap"
 msgstr "ワードラップ"
 
-#: src/pref-manager.c:1665
+#: src/pref-manager.c:1686
 msgid "Wrap Outgoing Text at:"
 msgstr "ラップする文字:"
 
-#: src/pref-manager.c:1686
+#: src/pref-manager.c:1707
 msgid "Send message as type `text/plain; format=flowed'"
 msgstr "メッセージを MIME 型 'text/plain; format=flowed' で送信する"
 
-#: src/pref-manager.c:1693
+#: src/pref-manager.c:1714
 msgid "Other options"
 msgstr "その他のオプション"
 
-#: src/pref-manager.c:1703
+#: src/pref-manager.c:1724
 msgid "External editor command:"
 msgstr "外部エディタのコマンド:"
 
-#: src/pref-manager.c:1705
+#: src/pref-manager.c:1726
 msgid "Edit headers in external editor"
 msgstr "外部エディタでヘッダを編集します"
 
-#: src/pref-manager.c:1707
+#: src/pref-manager.c:1728
 msgid "Reply Prefix:"
 msgstr "返信時の先頭文字列:"
 
-#: src/pref-manager.c:1710
+#: src/pref-manager.c:1731
 msgid "Automatically quote original when replying"
 msgstr "返信時に原文を自動的に引用する"
 
-#: src/pref-manager.c:1715
+#: src/pref-manager.c:1736
 msgid "Don't include HTML parts as text when replying or forwarding mail"
 msgstr "メールの返信または転送時に HTML 部分を含めない"
 
-#: src/pref-manager.c:1721
+#: src/pref-manager.c:1742
 msgid "Forward a mail as attachment instead of quoting it"
 msgstr "引用する代わりに添付してメールを転送する"
 
-#: src/pref-manager.c:1727
+#: src/pref-manager.c:1748
 msgid "Send button always queues outgoing mail in outbox"
 msgstr "送信ボタンは常に送信箱にあるメールの送信待ちにする"
 
-#: src/pref-manager.c:1732
+#: src/pref-manager.c:1753
 msgid "Copy outgoing messages to sentbox"
 msgstr "送信メッセージを送信箱にコピーする"
 
-#: src/pref-manager.c:1736
+#: src/pref-manager.c:1757
 msgid "Encoding"
 msgstr "エンコード"
 
-#: src/pref-manager.c:1808 src/toolbar-prefs.c:658
+#: src/pref-manager.c:1829 src/toolbar-prefs.c:658
 msgid "Main window"
 msgstr "メインウィンドウ"
 
-#: src/pref-manager.c:1814
+#: src/pref-manager.c:1835
 msgid "Use preview pane"
 msgstr "プレビュー・ウィンドウを使う"
 
-#: src/pref-manager.c:1816
+#: src/pref-manager.c:1837
 msgid "Show mailbox statistics in left pane"
 msgstr "左側のウィンドウにメールボックスを固定表示する"
 
-#: src/pref-manager.c:1818
+#: src/pref-manager.c:1839
 msgid "Use alternative main window layout"
 msgstr "二者択一型ウィンドウレイアウトを使用する"
 
-#: src/pref-manager.c:1820
+#: src/pref-manager.c:1841
 msgid "Automatically view message when mailbox opened"
 msgstr "メールボックスを開いたら自動的にメッセージを表示する"
 
-#: src/pref-manager.c:1822
+#: src/pref-manager.c:1843
 msgid "Display message size as number of lines"
 msgstr "メッセージのサイズを行数で表示する"
 
-#: src/pref-manager.c:1827
+#: src/pref-manager.c:1848
 msgid "PageUp/PageDown keys scroll message by:"
 msgstr "[PageUP]/[PageDown] キーでメッセージをスクロール:"
 
-#: src/pref-manager.c:1837
+#: src/pref-manager.c:1858
 msgid "percent"
 msgstr "パーセント"
 
-#: src/pref-manager.c:1844
+#: src/pref-manager.c:1865
 msgid "Toolbars"
 msgstr "ツールバー"
 
-#: src/pref-manager.c:1861
+#: src/pref-manager.c:1882
 msgid "Display progress dialog"
 msgstr "プログレス・ダイアログを表示する"
 
-#: src/pref-manager.c:1867
+#: src/pref-manager.c:1888
 msgid "Display Formats"
 msgstr "表示形式"
 
-#: src/pref-manager.c:1875
+#: src/pref-manager.c:1896
 msgid "Date encoding (for strftime):"
 msgstr "日付のエンコード (strftime関数用)"
 
-#: src/pref-manager.c:1876
+#: src/pref-manager.c:1897
 msgid "Selected headers:"
 msgstr "選択したヘッダ:"
 
-#: src/pref-manager.c:1892
+#: src/pref-manager.c:1899
+msgid "Message window title format:"
+msgstr "メッセージウィンドウのタイトル書式:"
+
+#: src/pref-manager.c:1915
 msgid "Status Messages"
 msgstr "ステータスメッセージ"
 
-#: src/pref-manager.c:1893 src/pref-manager.c:1903
+#: src/pref-manager.c:1916 src/pref-manager.c:1926
 msgid "Information Messages"
 msgstr "メッセージの情報"
 
-#: src/pref-manager.c:1907
+#: src/pref-manager.c:1930
 msgid "Warning Messages"
 msgstr "警告メッセージ"
 
-#: src/pref-manager.c:1911
+#: src/pref-manager.c:1934
 msgid "Error Messages"
 msgstr "エラー・メッセージ"
 
-#: src/pref-manager.c:1915
+#: src/pref-manager.c:1938
 msgid "Fatal Error Messages"
 msgstr "致命的なエラー・メッセージ"
 
-#: src/pref-manager.c:1919
+#: src/pref-manager.c:1942
 msgid "Debug Messages"
 msgstr "デバッグ・メッセージ"
 
-#: src/pref-manager.c:1926
+#: src/pref-manager.c:1949
 msgid "Colors"
 msgstr "色"
 
-#: src/pref-manager.c:1928
+#: src/pref-manager.c:1951
 msgid "Mailbox Colors"
 msgstr "メールボックスの表示色"
 
-#: src/pref-manager.c:1934
+#: src/pref-manager.c:1957
 msgid "Mailbox with unread messages color"
 msgstr "未読メッセージがあるメールボックスの表示色"
 
-#: src/pref-manager.c:1936
+#: src/pref-manager.c:1959
 msgid "Message Colors"
 msgstr "メッセージの表示色"
 
-#: src/pref-manager.c:1947
+#: src/pref-manager.c:1970
 #, c-format
 msgid "Quote level %d color"
 msgstr "引用レベル %d の表示色"
 
-#: src/pref-manager.c:1959
+#: src/pref-manager.c:1982
 msgid "Link Color"
 msgstr "リンクの色"
 
-#: src/pref-manager.c:1964
+#: src/pref-manager.c:1987
 msgid "Hyperlink color"
 msgstr "ハイパーリンクの色"
 
-#: src/pref-manager.c:1967
+#: src/pref-manager.c:1990
 msgid "Composition Window"
 msgstr "ウィンドウの構成"
 
-#: src/pref-manager.c:1973
+#: src/pref-manager.c:1996
 msgid "Invalid or incomplete address label color"
 msgstr "アドレスのラベル色が正しくないか完全ではありません"
 
-#: src/pref-manager.c:1979
+#: src/pref-manager.c:2002
 msgid "Fonts"
 msgstr "フォント"
 
-#: src/pref-manager.c:1981
+#: src/pref-manager.c:2004
 msgid "Preview Font"
 msgstr "フォントのプレビュー"
 
-#: src/pref-manager.c:1998 src/pref-manager.c:2032
+#: src/pref-manager.c:2021 src/pref-manager.c:2055
 msgid "Select a font to use"
 msgstr "使用するフォントの選択"
 
-#: src/pref-manager.c:2001 src/pref-manager.c:2035
+#: src/pref-manager.c:2024 src/pref-manager.c:2058
 msgid "Select..."
 msgstr "選択..."
 
-#: src/pref-manager.c:2008 src/pref-manager.c:2043
+#: src/pref-manager.c:2031 src/pref-manager.c:2066
 msgid "Preview pane"
 msgstr "プレビュー・ウィンドウ"
 
 #. Subject Font
-#: src/pref-manager.c:2016
+#: src/pref-manager.c:2039
 msgid "Subject Header Font"
 msgstr "サブジェクトのフォント"
 
 #. pspell frame
-#: src/pref-manager.c:2096
+#: src/pref-manager.c:2119
 msgid "Pspell Settings"
 msgstr "Pspel設定"
 
 #. do the module menu
-#: src/pref-manager.c:2102
+#: src/pref-manager.c:2125
 msgid "Spell Check Module"
 msgstr "スペル・チェッカー"
 
-#: src/pref-manager.c:2108
+#: src/pref-manager.c:2131
 msgid "Suggestion Level"
 msgstr "確認レベル"
 
-#: src/pref-manager.c:2116
+#: src/pref-manager.c:2139
 msgid "Ignore words shorter than"
 msgstr "無視する文字数"
 
 #. ignore signature check box
-#: src/pref-manager.c:2123
+#: src/pref-manager.c:2146
 msgid "Misc Spelling Settings"
 msgstr "その他のスペル・チェック設定"
 
-#: src/pref-manager.c:2129
+#: src/pref-manager.c:2152
 msgid "Check signature"
 msgstr "署名の確認"
 
-#: src/pref-manager.c:2133
+#: src/pref-manager.c:2156
 msgid "Check quoted"
 msgstr "引用の確認"
 
-#: src/pref-manager.c:2163
+#: src/pref-manager.c:2186
 msgid "Debug"
 msgstr "デバッグ"
 
-#: src/pref-manager.c:2167
+#: src/pref-manager.c:2190
 msgid "Empty Trash on exit"
 msgstr "終了時にゴミ箱を空にする"
 
-#: src/pref-manager.c:2175
+#: src/pref-manager.c:2198
 msgid "Automatically close mailbox if unused more than"
 msgstr "使用しなくなったらメールボックスを自動的に閉じる"
 
-#: src/pref-manager.c:2191
+#: src/pref-manager.c:2214
 msgid "Drag-and-drop moves messages by default"
 msgstr "デフォルトでドラッグ＆ドロップを使ってメッセージを移動する"
 
-#: src/pref-manager.c:2197
+#: src/pref-manager.c:2220
 msgid "Deleting Messages"
 msgstr "メッセージの削除"
 
-#: src/pref-manager.c:2204
+#: src/pref-manager.c:2227
 msgid "Delete immediately and irretrievably"
 msgstr "直ちに削除する"
 
-#: src/pref-manager.c:2210
+#: src/pref-manager.c:2233
 msgid "Hide deleted messages"
 msgstr "削除済みのメッセージを隠す"
 
-#: src/pref-manager.c:2233
+#: src/pref-manager.c:2256
 msgid "Options"
 msgstr "オプション"
 
-#: src/pref-manager.c:2240
+#: src/pref-manager.c:2263
 msgid "Open Inbox upon startup"
 msgstr "起動時に受信箱を開く"
 
-#: src/pref-manager.c:2244
+#: src/pref-manager.c:2267
 msgid "Check mail upon startup"
 msgstr "起動時にメールを確認する"
 
-#: src/pref-manager.c:2249
+#: src/pref-manager.c:2272
 msgid "Remember open mailboxes between sessions"
 msgstr "セッション間で開くメールボックスを記憶する"
 
 #. do the IMAP scan depth
-#: src/pref-manager.c:2254
+#: src/pref-manager.c:2277
 msgid "IMAP Folder Scanning"
 msgstr "IMAP フォルダ検出"
 
-#: src/pref-manager.c:2259
+#: src/pref-manager.c:2282
 msgid ""
 "Choose depth 1 for fast startup; this defers scanning some folders.\n"
 "To see more of the tree at startup, choose a greater depth."
@@ -3589,55 +3594,55 @@ msgstr ""
 "を遅くします。\n"
 "起動時にツリーをたくさん表示する場合は、ツリーの深さを大きくして下さい。"
 
-#: src/pref-manager.c:2270
+#: src/pref-manager.c:2293
 msgid "Scan tree to depth"
 msgstr "次のツリーの深さでスキャン"
 
-#: src/pref-manager.c:2320
+#: src/pref-manager.c:2343
 msgid "Address Book Name"
 msgstr "アドレス帳名"
 
-#: src/pref-manager.c:2324
+#: src/pref-manager.c:2347
 msgid "Expand aliases"
 msgstr "拡張エイリアス"
 
-#: src/pref-manager.c:2331
+#: src/pref-manager.c:2354
 msgid "Set as default"
 msgstr "デフォルトにセット"
 
-#: src/pref-manager.c:2479
+#: src/pref-manager.c:2502
 msgid "Remote POP3 mailbox..."
 msgstr "リモート POP3 メールボックス..."
 
-#: src/pref-manager.c:2619
+#: src/pref-manager.c:2642
 msgid "Show nothing"
 msgstr "何も表示しない"
 
-#: src/pref-manager.c:2620
+#: src/pref-manager.c:2643
 msgid "Show dialog"
 msgstr "ダイアログを表示する"
 
-#: src/pref-manager.c:2621
+#: src/pref-manager.c:2644
 msgid "Show in list"
 msgstr "一覧で表示する"
 
-#: src/pref-manager.c:2622
+#: src/pref-manager.c:2645
 msgid "Print to console"
 msgstr "画面に印刷"
 
-#: src/pref-manager.c:2631
+#: src/pref-manager.c:2654
 msgid "Ask me"
 msgstr "質問"
 
-#: src/pref-manager.c:2632
+#: src/pref-manager.c:2655
 msgid "Always"
 msgstr "常に"
 
-#: src/pref-manager.c:2667
+#: src/pref-manager.c:2690
 msgid "If Possible"
 msgstr "可能ならば"
 
-#: src/pref-manager.c:2668
+#: src/pref-manager.c:2691
 msgid "Required"
 msgstr "必須"
 
@@ -3650,32 +3655,41 @@ msgstr ""
 "印刷することは出来ません。"
 
 #. print the page number
-#: src/print.c:281
+#: src/print.c:283
 #, c-format
 msgid "Page: %i/%i"
 msgstr "ページ: %i/%i"
 
+#: src/print.c:612 src/print.c:961
+#, c-format
+msgid ""
+"Can not convert %s, falling back to us-ascii.\n"
+"Some characters may be printed incorrectly."
+msgstr ""
+"%s を変換できないので、\"US-ASCII\" に戻します。\n"
+"いくつかの文字は正しく表示されないかもしれません。"
+
 #. gather some info about this part
 #. four fields, one terminator
-#: src/print.c:689
+#: src/print.c:710
 msgid "Type:"
 msgstr "種類:"
 
-#: src/print.c:692
+#: src/print.c:713
 msgid "Filename:"
 msgstr "ファイル名:"
 
-#: src/print.c:899
+#: src/print.c:920
 #, c-format
 msgid "Balsa could not find paper type \"%s\".\n"
 msgstr "用紙タイプ \"%s\" が見つかりませんでした。\n"
 
-#: src/print.c:901
+#: src/print.c:922
 #, c-format
 msgid "Using paper type \"%s\" from /etc/paper.config instead\n"
 msgstr "/etc/paper.config の代わりに \"%s\" の用紙タイプを使う\n"
 
-#: src/print.c:1016
+#: src/print.c:1043
 #, c-format
 msgid ""
 "Balsa could not find font %s\n"
@@ -3684,25 +3698,25 @@ msgstr ""
 "Balsa はフォント %s を見つけることができませんでした。\n"
 "印刷することが出来ません。"
 
-#: src/print.c:1066
+#: src/print.c:1093
 #, c-format
 msgid "Balsa could not find paper type \"%s\", using system default.\n"
 msgstr ""
 "\"%s\" の用紙タイプが見つかりませんでした。デフォルト用紙を使用します。\n"
 
-#: src/print.c:1069
+#: src/print.c:1096
 msgid "Check your paper type configuration or balsa preferences\n"
 msgstr "用紙タイプ設定または Balsa 設定を確認して下さい\n"
 
-#: src/print.c:1072
+#: src/print.c:1099
 msgid "Paper"
 msgstr "用紙"
 
-#: src/print.c:1099
+#: src/print.c:1126
 msgid "Print message"
 msgstr "メッセージの印刷"
 
-#: src/print.c:1129
+#: src/print.c:1156
 msgid "Balsa: message print preview"
 msgstr "Balsa: メッセージ印刷プレビュー"
 
@@ -4017,15 +4031,15 @@ msgstr ""
 msgid "Closing the Compose Window"
 msgstr "新規メール作成ウィンドウを閉じる"
 
-#: src/sendmsg-window.c:810 src/toolbar-factory.c:172
+#: src/sendmsg-window.c:811 src/toolbar-factory.c:172
 msgid "Select Identity"
 msgstr "身元情報の選択"
 
-#: src/sendmsg-window.c:962
+#: src/sendmsg-window.c:963
 msgid "attach as reference?"
 msgstr "リファレンスとして添付しますか？"
 
-#: src/sendmsg-window.c:977
+#: src/sendmsg-window.c:978
 #, c-format
 msgid ""
 "Saying yes will not send the file `%s' itself, but just a MIME message/"
@@ -4040,15 +4054,15 @@ msgstr ""
 "\n"
 "リファレンスとしてこのファイルを添付しても宜しいですか？"
 
-#: src/sendmsg-window.c:1075
+#: src/sendmsg-window.c:1076
 msgid "attach as reference"
 msgstr "リファレンスとして添付"
 
-#: src/sendmsg-window.c:1081
+#: src/sendmsg-window.c:1082
 msgid "attach as file"
 msgstr "ファイルとして添付"
 
-#: src/sendmsg-window.c:1187
+#: src/sendmsg-window.c:1188
 #, c-format
 msgid ""
 "The attachment pixmap (%s) cannot be used.\n"
@@ -4057,7 +4071,7 @@ msgstr ""
 "添付された画像 (%s) を使用することが出来ません。\n"
 " %s"
 
-#: src/sendmsg-window.c:1193
+#: src/sendmsg-window.c:1194
 msgid ""
 "Default attachment pixmap (balsa/attachment.png) cannot be found:\n"
 "Your balsa installation is corrupted."
@@ -4065,27 +4079,27 @@ msgstr ""
 "デフォルトで添付される画像 (balsa/attachment.png) が見つかりません:\n"
 "Balsa が正しくインストールされたか確認して下さい。"
 
-#: src/sendmsg-window.c:1206
+#: src/sendmsg-window.c:1207
 #, c-format
 msgid "Cannot get info on file '%s': %s"
 msgstr "ファイル '%s' の情報を取得できません: %s"
 
-#: src/sendmsg-window.c:1211
+#: src/sendmsg-window.c:1212
 #, c-format
 msgid "Attachment %s is not a regular file."
 msgstr "添付ファイル %s は通常のファイルではありません。"
 
-#: src/sendmsg-window.c:1214
+#: src/sendmsg-window.c:1215
 #, c-format
 msgid "File %s cannot be read\n"
 msgstr "ファイル %s を読み込むことが出来ません\n"
 
-#: src/sendmsg-window.c:1280
+#: src/sendmsg-window.c:1281
 msgid "Attach file"
 msgstr "添付ファイル"
 
-#: src/sendmsg-window.c:1386 src/sendmsg-window.c:1420
-#: src/sendmsg-window.c:2500
+#: src/sendmsg-window.c:1387 src/sendmsg-window.c:1421
+#: src/sendmsg-window.c:2491
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -4094,98 +4108,98 @@ msgstr ""
 "考えられる原因: 作業領域が十分ではありません"
 
 #. Attachment list
-#: src/sendmsg-window.c:1691
+#: src/sendmsg-window.c:1682
 msgid "Attachments:"
 msgstr "添付:"
 
 #. Comments:
-#: src/sendmsg-window.c:1736
+#: src/sendmsg-window.c:1727
 msgid "Comments:"
 msgstr "コメント:"
 
 #. Keywords:
-#: src/sendmsg-window.c:1739
+#: src/sendmsg-window.c:1730
 msgid "Keywords:"
 msgstr "キーワード:"
 
-#: src/sendmsg-window.c:1928
+#: src/sendmsg-window.c:1919
 msgid "you"
 msgstr "あなた"
 
-#: src/sendmsg-window.c:1935
+#: src/sendmsg-window.c:1926
 msgid "------forwarded message------\n"
 msgstr "------転送メッセージ------\n"
 
-#: src/sendmsg-window.c:1941
+#: src/sendmsg-window.c:1932
 #, c-format
 msgid "Date: %s\n"
 msgstr "日付: %s\n"
 
-#: src/sendmsg-window.c:1955
+#: src/sendmsg-window.c:1946
 #, c-format
 msgid "From: %s\n"
 msgstr "送信元: %s\n"
 
-#: src/sendmsg-window.c:1963
+#: src/sendmsg-window.c:1954
 #, c-format
 msgid "To: %s\n"
 msgstr "送信先: %s\n"
 
-#: src/sendmsg-window.c:1971
+#: src/sendmsg-window.c:1962
 #, c-format
 msgid "CC: %s\n"
 msgstr "CC: %s\n"
 
-#: src/sendmsg-window.c:1977
+#: src/sendmsg-window.c:1968
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "Message-ID: %s\n"
 
-#: src/sendmsg-window.c:1984
+#: src/sendmsg-window.c:1975
 #, c-format
 msgid "References: %s"
 msgstr "リファレンス: %s"
 
-#: src/sendmsg-window.c:2000
+#: src/sendmsg-window.c:1991
 #, c-format
 msgid "On %s %s wrote:\n"
 msgstr "%s に %s さんは書きました:\n"
 
-#: src/sendmsg-window.c:2002
+#: src/sendmsg-window.c:1993
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s さんは書きました:\n"
 
-#: src/sendmsg-window.c:2309
+#: src/sendmsg-window.c:2300
 msgid "Reply to "
 msgstr "返信先 "
 
-#: src/sendmsg-window.c:2315
+#: src/sendmsg-window.c:2306
 msgid "Forward message"
 msgstr "メッセージの転送"
 
-#: src/sendmsg-window.c:2320 src/toolbar-factory.c:141
+#: src/sendmsg-window.c:2311 src/toolbar-factory.c:141
 msgid "Continue message"
 msgstr "メッセージの継続"
 
-#: src/sendmsg-window.c:2325
+#: src/sendmsg-window.c:2316
 msgid "New message"
 msgstr "新規メッセージ"
 
-#: src/sendmsg-window.c:2643
+#: src/sendmsg-window.c:2634
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "ファイル %s を開くことが出来ませんでした。\n"
 
-#: src/sendmsg-window.c:2645
+#: src/sendmsg-window.c:2636
 msgid "Loading..."
 msgstr "読み込み中..."
 
-#: src/sendmsg-window.c:2672
+#: src/sendmsg-window.c:2663
 msgid "Include file"
 msgstr "ファイルの挿入"
 
-#: src/sendmsg-window.c:3058
+#: src/sendmsg-window.c:3049
 msgid ""
 "Balsa has been compiled without gnome-print support.\n"
 "Printing is not possible."

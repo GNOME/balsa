@@ -45,7 +45,7 @@ extern "C" {
 
 
     struct _BalsaSpellCheck {
-	GtkFrame frame;
+	GtkDialog dialog;
 
 	GtkTextView *view;
 	GtkCList *list;
@@ -75,7 +75,7 @@ extern "C" {
 
 
     struct _BalsaSpellCheckClass {
-	GtkFrameClass parent_class;
+	GtkDialogClass parent_class;
 
 	void (*done_spell_check) (BalsaSpellCheck * spell_check);
     };

@@ -314,14 +314,12 @@ balsa_message_focus_out_part(GtkWidget * widget, GdkEventFocus * event,
 }
 
 static void
-save_dialog_ok(GtkWidget* button, GtkWidget* save_dialog)
+save_dialog_ok(GtkWidget* save_dialog, BalsaPartInfo * info)
 {
     const gchar *filename;
     gboolean do_save, result;
-    BalsaPartInfo * info;
 
-    gtk_widget_hide(GTK_WIDGET(save_dialog)); 
-    info = gtk_object_get_user_data(GTK_OBJECT(save_dialog));
+    gtk_widget_hide(save_dialog); 
     filename 
 	= gtk_file_selection_get_filename(GTK_FILE_SELECTION(save_dialog));
     
@@ -332,10 +330,13 @@ save_dialog_ok(GtkWidget* button, GtkWidget* save_dialog)
 	GtkWidget *confirm;
 	
 	/* File exists. check if they really want to overwrite */
-	confirm = gnome_question_dialog_modal_parented(
-	    _("File already exists. Overwrite?"),
-	    NULL, NULL, GTK_WINDOW(balsa_app.main_window));
-	do_save = (gnome_dialog_run_and_close(GNOME_DIALOG(confirm)) == 0);
+	confirm = gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
+                                         GTK_DIALOG_MODAL,
+                                         GTK_MESSAGE_QUESTION,
+                                         GTK_BUTTONS_YES_NO,
+                                         _("File already exists. Overwrite?"));
+	do_save = (gtk_dialog_run(GTK_DIALOG(confirm)) == GTK_RESPONSE_YES);
+        gtk_widget_destroy(confirm);
 	if(do_save)
 	    unlink(filename);
     } else
@@ -352,30 +353,27 @@ save_dialog_ok(GtkWidget* button, GtkWidget* save_dialog)
 	    
 	    msg = g_strdup_printf(_(" Could not save %s: %s"), 
 				  filename, strerror(errno));
-	    msgbox = gnome_error_dialog_parented(msg, GTK_WINDOW
-						 (balsa_app.main_window));
+	    msgbox = gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
+                                            GTK_DIALOG_DESTROY_WITH_PARENT,
+                                            GTK_MESSAGE_ERROR,
+                                            GTK_BUTTONS_CLOSE,
+                                            msg);
 	    g_free(msg);
-	    gnome_dialog_run_and_close(GNOME_DIALOG(msgbox));
+	    gtk_dialog_run(GTK_DIALOG(msgbox));
+            gtk_widget_destroy(msgbox);
 	}
     }
-    gtk_object_destroy(GTK_OBJECT(save_dialog));
 }
 
 static void
 save_part(BalsaPartInfo * info)
 {
     gchar *filename;
-    GtkFileSelection *save_dialog;
+    GtkWidget *save_dialog;
     
     g_return_if_fail(info != 0);
 
-    save_dialog = 
-	GTK_FILE_SELECTION(gtk_file_selection_new(_("Save MIME Part")));
-    /* start workaround for prematurely realized widget returned
-     * by some GTK+ versions */
-    if(GTK_WIDGET_REALIZED(save_dialog))
-        gtk_widget_unrealize(GTK_WIDGET(save_dialog));
-    /* end workaround for prematurely realized widget */
+    save_dialog = gtk_file_selection_new(_("Save MIME Part"));
     gtk_window_set_wmclass(GTK_WINDOW(save_dialog), "save_part", "Balsa");
 
     if (balsa_app.save_dir)
@@ -387,22 +385,17 @@ save_part(BalsaPartInfo * info)
     else filename = NULL;
 
     if (filename) {
-	gtk_file_selection_set_filename(save_dialog, filename);
+	gtk_file_selection_set_filename(GTK_FILE_SELECTION(save_dialog),
+                                        filename);
 	g_free(filename);
     }
 
-    gtk_object_set_user_data(GTK_OBJECT(save_dialog), info);
-    gtk_widget_set_parent_window(GTK_WIDGET(save_dialog),
-				 GTK_WIDGET(balsa_app.main_window)->window);
-    gtk_signal_connect(GTK_OBJECT(save_dialog->ok_button), "clicked",
-		       (GtkSignalFunc) save_dialog_ok, save_dialog);
-    gtk_signal_connect_object(GTK_OBJECT(save_dialog->cancel_button), 
-			      "clicked",
-			      (GtkSignalFunc)gtk_widget_destroy,
-			      GTK_OBJECT(save_dialog));
-
+    gtk_window_set_transient_for(GTK_WINDOW(save_dialog),
+				 GTK_WINDOW(balsa_app.main_window));
     gtk_window_set_modal(GTK_WINDOW(save_dialog), TRUE);
-    gtk_widget_show_all(GTK_WIDGET(save_dialog));
+    if(gtk_dialog_run(GTK_DIALOG(save_dialog)) == GTK_RESPONSE_OK)
+        save_dialog_ok(save_dialog, info);
+    gtk_widget_destroy(save_dialog);
 }
 
 GtkWidget *
@@ -2838,10 +2831,13 @@ static GtkWidget* create_mdn_dialog (gchar *sender, gchar *mdn_to_address,
   GtkWidget *button_yes;
   gchar *l_text;
 
-  mdn_dialog = gnome_dialog_new (_("reply to MDN?"), NULL);
+  mdn_dialog = gtk_dialog_new_with_buttons(_("reply to MDN?"), 
+                                           GTK_WINDOW(balsa_app.main_window),
+                                           GTK_DIALOG_DESTROY_WITH_PARENT,
+                                           NULL);
   gtk_object_set_user_data (GTK_OBJECT (mdn_dialog), send_msg);
 
-  dialog_vbox = GNOME_DIALOG (mdn_dialog)->vbox;
+  dialog_vbox = GTK_DIALOG (mdn_dialog)->vbox;
 
   hbox = gtk_hbox_new (FALSE, 10);
   gtk_box_pack_start (GTK_BOX (dialog_vbox), hbox, TRUE, TRUE, 0);
@@ -2862,19 +2858,17 @@ static GtkWidget* create_mdn_dialog (gchar *sender, gchar *mdn_to_address,
   gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
   gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
 
-  dialog_action_area = GNOME_DIALOG (mdn_dialog)->action_area;
+  dialog_action_area = GTK_DIALOG (mdn_dialog)->action_area;
   gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area), 
 			     GTK_BUTTONBOX_END);
   gtk_button_box_set_spacing (GTK_BUTTON_BOX (dialog_action_area), 8);
 
-  gnome_dialog_append_button (GNOME_DIALOG (mdn_dialog), 
-			      GNOME_STOCK_BUTTON_NO);
-  button_no = g_list_last (GNOME_DIALOG (mdn_dialog)->buttons)->data;
+  button_no = gtk_dialog_add_button(GTK_DIALOG(mdn_dialog), 
+                                       GTK_STOCK_NO, GTK_RESPONSE_NO);
   GTK_WIDGET_SET_FLAGS (button_no, GTK_CAN_DEFAULT);
   
-  gnome_dialog_append_button (GNOME_DIALOG (mdn_dialog), 
-			      GNOME_STOCK_BUTTON_YES);
-  button_yes = g_list_last (GNOME_DIALOG (mdn_dialog)->buttons)->data;
+  button_yes = gtk_dialog_add_button(GTK_DIALOG(mdn_dialog), 
+                                     GTK_STOCK_YES, GTK_RESPONSE_YES);
   GTK_WIDGET_SET_FLAGS (button_yes, GTK_CAN_DEFAULT);
 
   gtk_signal_connect (GTK_OBJECT (mdn_dialog), "delete_event",

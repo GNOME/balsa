@@ -120,7 +120,6 @@ static gint toggle_queue_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void spell_check_cb(GtkWidget * widget, BalsaSendmsg *);
 static void spell_check_done_cb(BalsaSpellCheck * spell_check,
 				BalsaSendmsg *);
-static void spell_check_set_sensitive(BalsaSendmsg * msg, gboolean state);
 
 static void address_book_cb(GtkWidget *widget, BalsaSendmsg *smd_msg_wind);
 
@@ -305,15 +304,6 @@ static GnomeUIInfo view_menu[] = {
     GNOMEUIINFO_TOGGLEITEM(N_("_Keywords"), NULL, toggle_keywords_cb,
 			   NULL),
     GNOMEUIINFO_END
-};
-
-static char * main_toolbar_spell_disable[] = {
-    BALSA_PIXMAP_SEND,
-    BALSA_PIXMAP_ATTACHMENT,
-    BALSA_PIXMAP_SAVE,
-    BALSA_PIXMAP_IDENTITY,
-    GNOME_STOCK_PIXMAP_SPELLCHECK,
-    GNOME_STOCK_PIXMAP_CLOSE
 };
 
 #if MENU_TOGGLE_KEYWORDS_POS+1 != VIEW_MENU_LENGTH
@@ -514,9 +504,6 @@ struct {
     {"uk_UK", "KOI8-U", N_("Ukrainian")}
 };
 
-static gint mail_headers_page;
-static gint spell_check_page;
-
 
 /* the callback handlers */
 static void
@@ -524,27 +511,24 @@ address_book_cb(GtkWidget *widget, BalsaSendmsg *snd_msg_wind)
 {
     GtkWidget *ab;
     LibBalsaAddressEntry *address_entry;
-    gint button;
+    gint response;
 
     address_entry =
         LIBBALSA_ADDRESS_ENTRY(gtk_object_get_data
                                (GTK_OBJECT(widget),
                                 "address-entry-widget"));
 
-    ab = balsa_address_book_new(TRUE);
-    gnome_dialog_set_parent(GNOME_DIALOG(ab), 
-			    GTK_WINDOW(snd_msg_wind->window));
+    ab = balsa_address_book_new(TRUE, GTK_WINDOW(snd_msg_wind->window));
 
-    gnome_dialog_close_hides (GNOME_DIALOG(ab), TRUE);
-    button = gnome_dialog_run(GNOME_DIALOG(ab));
-    if ( button == 0 ) {
+    response = gtk_dialog_run(GTK_DIALOG(ab));
+    if ( response == GTK_RESPONSE_OK ) {
 	gchar *t;
 	t = balsa_address_book_get_recipients(BALSA_ADDRESS_BOOK(ab));
-	if ( t ) 
+	if ( t ) /* FIXME: append */
 	    libbalsa_address_entry_set_text(address_entry, t);
 	g_free(t);
     }
-    gnome_dialog_close(GNOME_DIALOG(ab));
+    gtk_widget_destroy(ab);
 }
 
 static gint
@@ -561,25 +545,23 @@ delete_handler(BalsaSendmsg* bsmsg)
 			      "Save message to Draftbox?"),
                               tmp);
 	GtkWidget* l = gtk_label_new(str);
-	GnomeDialog* d =
-	    GNOME_DIALOG(gnome_dialog_new(_("Closing the Compose Window"),
-					  GNOME_STOCK_BUTTON_YES,
-					  GNOME_STOCK_BUTTON_NO,
-					  GNOME_STOCK_BUTTON_CANCEL,
-					  NULL));
-	gnome_dialog_set_accelerator(GNOME_DIALOG(d), 0, 'Y', 0);
-	gnome_dialog_set_accelerator(GNOME_DIALOG(d), 1, 'N', 0);
-
+	GtkWidget* d = 
+            gtk_dialog_new_with_buttons(_("Closing the Compose Window"),
+                                        GTK_WINDOW(bsmsg->window),
+                                        GTK_DIALOG_MODAL,
+                                        GTK_STOCK_YES, GTK_RESPONSE_YES,
+                                        GTK_STOCK_NO,  GTK_RESPONSE_NO,
+                                        GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                        NULL);
 	g_free(tmp);
 	g_free(str);
-	gnome_dialog_set_parent(d, GTK_WINDOW(bsmsg->window));
 	gtk_widget_show(l);
-	gtk_box_pack_start_defaults(GTK_BOX(d->vbox), l);
-	reply = gnome_dialog_run_and_close(GNOME_DIALOG(d));
-	if(reply == 0)
+	gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(d)->vbox), l);
+	reply = gtk_dialog_run(GTK_DIALOG(d));
+	if(reply == GTK_RESPONSE_YES)
 	    message_postpone(bsmsg);
 	/* cancel action  when reply = "yes" or "no" */
-	return (reply != 0) && (reply != 1);
+	return (reply != GTK_RESPONSE_YES) && (reply != GTK_RESPONSE_NO);
     }
     return FALSE;
 }
@@ -632,7 +614,6 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsm)
 	printf("balsa_sendmsg_destroy_handler: Freeing bsm\n");
     release_toolbars(bsm->window);
     gtk_widget_destroy(bsm->window);
-    g_list_free(bsm->spell_check_disable_list);
     if (bsm->bad_address_style)
         g_object_unref(G_OBJECT(bsm->bad_address_style));
     quit_on_close = bsm->quit_on_close;
@@ -1145,21 +1126,25 @@ static void
 show_extbody_dialog(GtkWidget *widget, GnomeIconList *ilist)
 {
     GtkWidget *extbody_dialog;
-    GtkWidget *dialog_vbox;
+    GtkWidget *dialog_vbox, *parent;
     GtkWidget *hbox;
     GtkWidget *pixmap;
     GtkWidget *label;
     GtkWidget *dialog_action_area;
-    GtkWidget *button_no;
-    GtkWidget *button_yes;
+    GtkWidget *button_yes, *button_no;
     gchar *l_text;
     gint num;
     attachment_t *attach;
     
-    extbody_dialog = gnome_dialog_new (_("attach as reference?"), NULL);
+    parent = gtk_widget_get_ancestor(widget, GTK_TYPE_WINDOW);
+
+    extbody_dialog = 
+        gtk_dialog_new_with_buttons (_("Attach as Reference?"), 
+                                     GTK_WINDOW(parent),
+                                     GTK_DIALOG_MODAL, NULL);
     gtk_object_set_user_data (GTK_OBJECT (extbody_dialog), ilist);
     
-    dialog_vbox = GNOME_DIALOG (extbody_dialog)->vbox;
+    dialog_vbox = GTK_DIALOG (extbody_dialog)->vbox;
     
     hbox = gtk_hbox_new (FALSE, 10);
     gtk_box_pack_start (GTK_BOX (dialog_vbox), hbox, TRUE, TRUE, 0);
@@ -1183,25 +1168,24 @@ show_extbody_dialog(GtkWidget *widget, GnomeIconList *ilist)
     gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
     gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
     
-    dialog_action_area = GNOME_DIALOG (extbody_dialog)->action_area;
+    dialog_action_area = GTK_DIALOG (extbody_dialog)->action_area;
     gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area), 
 			       GTK_BUTTONBOX_END);
     gtk_button_box_set_spacing (GTK_BUTTON_BOX (dialog_action_area), 8);
     
-    gnome_dialog_append_button (GNOME_DIALOG (extbody_dialog), 
-				GNOME_STOCK_BUTTON_NO);
-    button_no = g_list_last (GNOME_DIALOG (extbody_dialog)->buttons)->data;
+    button_no = gtk_dialog_add_button(GTK_DIALOG(extbody_dialog), 
+                                      GTK_STOCK_NO, GTK_RESPONSE_NO);
     GTK_WIDGET_SET_FLAGS (button_no, GTK_CAN_DEFAULT);
     
-    gnome_dialog_append_button (GNOME_DIALOG (extbody_dialog), 
-				GNOME_STOCK_BUTTON_YES);
-    button_yes = g_list_last (GNOME_DIALOG (extbody_dialog)->buttons)->data;
+    button_yes = gtk_dialog_add_button(GTK_DIALOG (extbody_dialog), 
+                                       GTK_STOCK_YES, GTK_RESPONSE_YES);
     GTK_WIDGET_SET_FLAGS (button_yes, GTK_CAN_DEFAULT);
     
     gtk_signal_connect (GTK_OBJECT (extbody_dialog), "delete_event",
 			GTK_SIGNAL_FUNC (extbody_dialog_delete), NULL);
     gtk_signal_connect (GTK_OBJECT (button_no), "clicked",
-			GTK_SIGNAL_FUNC (no_change_to_extbody), extbody_dialog);
+			GTK_SIGNAL_FUNC (no_change_to_extbody), 
+                        extbody_dialog);
     gtk_signal_connect (GTK_OBJECT (button_yes), "clicked",
 			GTK_SIGNAL_FUNC (extbody_attachment), extbody_dialog);
     
@@ -1353,10 +1337,13 @@ add_attachment(GnomeIconList * iconlist, char *filename,
     if (balsa_app.debug)
 	fprintf(stderr, "Trying to attach '%s'\n", filename);
     if ( (err_msg=check_if_regular_file(filename)) != NULL) {
-	msgbox = gnome_message_box_new(err_msg, GNOME_MESSAGE_BOX_ERROR,
-				       _("Cancel"), NULL);
-	gtk_window_set_modal(GTK_WINDOW(msgbox), TRUE);
-	gnome_dialog_run(GNOME_DIALOG(msgbox));
+	msgbox = gtk_message_dialog_new(NULL,
+                                        GTK_DIALOG_MODAL,
+                                        GTK_MESSAGE_ERROR,
+                                        GTK_BUTTONS_CANCEL,
+                                        err_msg);
+	gtk_dialog_run(GTK_DIALOG(msgbox));
+        gtk_widget_destroy(msgbox);
 	g_free(err_msg);
         g_free(content_type);
 	return;
@@ -1819,7 +1806,6 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     GtkWidget *table;
     GtkWidget *frame;
     GtkWidget *sc;
-    GtkWidget *nb;
     GList     *glist = NULL;
 
 
@@ -1941,28 +1927,10 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     gtk_signal_connect(GTK_OBJECT(sc), "done-spell-check",
 		       GTK_SIGNAL_FUNC(spell_check_done_cb), msg);
     msg->spell_checker = sc;
-
-    nb = gtk_notebook_new();
-    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(nb), FALSE);
-    gtk_notebook_set_show_border(GTK_NOTEBOOK(nb), FALSE);
-
-    /* add the spell check widget to the notebook last */
-    gtk_notebook_append_page(GTK_NOTEBOOK(nb), GTK_WIDGET(sc),
-			     gtk_label_new("Spell Check"));
-    spell_check_page = gtk_notebook_page_num(GTK_NOTEBOOK(nb), sc);
-
-    /* add the mail headers table to the notebook first */
-    gtk_notebook_append_page(GTK_NOTEBOOK(nb), GTK_WIDGET(table),
-			     gtk_label_new("Mail Headers"));
-    mail_headers_page = gtk_notebook_page_num(GTK_NOTEBOOK(nb), table);
-
-    gtk_notebook_set_page(GTK_NOTEBOOK(nb), mail_headers_page);
-    msg->notebook = nb;
+    gtk_widget_hide(sc);
 
     gtk_widget_show_all(table);
-    gtk_widget_show_all(nb);
-    gtk_widget_hide(sc);
-    return nb;
+    return table;
 }
 
 /*
@@ -2557,7 +2525,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     GtkWidget *window;
     GtkWidget *paned = gtk_vpaned_new();
     BalsaSendmsg *msg = NULL;
-    GList *list;
     unsigned i;
     gchar* tmp;
 
@@ -2647,23 +2614,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     /* set options - just the Disposition Notification request for now */
     gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (opts_menu[OPTS_MENU_DISPNOTIFY_POS].widget), balsa_app.req_dispnotify);
 
-    /* create spell checking disable widget list */
-    list = NULL;
-
-    for (i = 0; i < MAIN_MENUS_COUNT; ++i) {
-	if (i != MAIN_FILE_MENU)
-	    list = g_list_append(list, (gpointer) main_menu[i].widget);
-    }
-    for (i = 0; i < MENU_FILE_CLOSE_POS; ++i) {
-	if (i != MENU_FILE_SEPARATOR1_POS && i != MENU_FILE_SEPARATOR2_POS)
-	    list = g_list_append(list, (gpointer) file_menu[i].widget);
-    }
-
-    for(i=0; i<ELEMENTS(main_toolbar_spell_disable); i++)
-	list = g_list_prepend(
-	    list, get_tool_widget(window, 1, main_toolbar_spell_disable[i]));
-    msg->spell_check_disable_list = list;
-
     /* Set up the default identity */
     if(!set_identity_from_mailbox(msg))
         /* Get the identity from the To: field of the original message */
@@ -2748,7 +2698,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
        forth which is sub-optimal.
      */
     init_menus(msg);
-    gtk_notebook_set_page(GTK_NOTEBOOK(msg->notebook), mail_headers_page);
 
     /*
      * restore the SendMsg window size
@@ -3512,9 +3461,12 @@ toggle_entry(BalsaSendmsg * bmsg, GtkWidget * entry[], int pos, int cnt)
 	    gtk_widget_hide(GTK_WIDGET(entry[cnt]));
 
 	/* force size recomputation if embedded in paned */
-	parent = GTK_WIDGET(GTK_WIDGET(entry[0])->parent)->parent->parent;
-	if (parent)
-	    gtk_paned_set_position(GTK_PANED(parent), -1);
+        for (parent = entry[0]; parent; 
+             parent = gtk_widget_get_parent(parent))
+	    if (GTK_IS_PANED(parent)) {
+	        gtk_paned_set_position(GTK_PANED(parent), -1);
+                break;
+            }
     }
 
     if(bmsg->update_config) { /* then save the config */
@@ -3689,7 +3641,7 @@ spell_check_cb(GtkWidget * widget, BalsaSendmsg * msg)
     /* configure the spell checker */
     balsa_spell_check_set_language(sc, msg->locale);
 
-    gtk_widget_show_all(GTK_WIDGET(sc));
+    gtk_widget_show(GTK_WIDGET(sc));
     balsa_spell_check_set_character_set(sc, msg->charset);
     balsa_spell_check_set_module(sc,
 				 spell_check_modules_name
@@ -3698,15 +3650,9 @@ spell_check_cb(GtkWidget * widget, BalsaSendmsg * msg)
 				       spell_check_suggest_mode_name
 				       [balsa_app.suggestion_mode]);
     balsa_spell_check_set_ignore_length(sc, balsa_app.ignore_size);
-    gtk_notebook_set_page(GTK_NOTEBOOK(msg->notebook), spell_check_page);
 
-    /* disable menu and toolbar items so message can't be modified */
-    spell_check_set_sensitive(msg, FALSE);
-
-    if (balsa_app.debug)
-	g_print("BalsaSendmsg: switching page to %d\n", spell_check_page);
-
-    balsa_spell_check_start(BALSA_SPELL_CHECK(msg->spell_checker));
+    balsa_spell_check_start(sc);
+    gtk_dialog_run(GTK_DIALOG(sc));
 }
 
 
@@ -3714,29 +3660,8 @@ static void
 spell_check_done_cb(BalsaSpellCheck * spell_check, BalsaSendmsg * msg)
 {
     gtk_widget_hide(GTK_WIDGET(spell_check));
-    /* switch notebook page back to mail headers */
-    gtk_notebook_set_page(GTK_NOTEBOOK(msg->notebook), mail_headers_page);
-
-    /* reactivate menu and toolbar items */
-    spell_check_set_sensitive(msg, TRUE);
-
-    if (balsa_app.debug)
-	g_print("BalsaSendmsg: switching page to %d\n", mail_headers_page);
+    check_readiness(msg);
 }
-
-
-static void
-spell_check_set_sensitive(BalsaSendmsg * msg, gboolean state)
-{
-    GList *list;
-
-    for(list = msg->spell_check_disable_list; list; list = list->next)
-	gtk_widget_set_sensitive(GTK_WIDGET(list->data), state);
-
-    if (state)
-	check_readiness(msg);
-}
-
 
 static void
 lang_brazilian_cb(GtkWidget * w, BalsaSendmsg * bsmsg)

@@ -1,3 +1,19 @@
+2002-04-15  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/folder-scanners.c: ask for folder passwords.
+	* libbalsa/mailbox_imap.c: follow the password convention.
+	* libbalsa/server.h: empty ("") passwd is legal.
+	* src/address-book.[hc]: next round of porting to GtkDialog.
+	* src/balsa-app.c, main.c: port ask_passwd
+	* src/balsa-message.c: GnomeDialog->GtkDialog.
+	* src/folder-conf.c, information-dialog.c, mailbox-node.c:
+	* src/main-window.c, sendmsg-window.c: same.
+
+2002-04-15 Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/spell-check.[ch]: ignore numbers.
+	* src/sendmsg-window.[ch]: make spell check widget a separate dialog.
+	
 2002-04-14  Pawel Salek <pawsa@theochem.kth.se>
 
 	* configure.in: make libgtkhtml default again.

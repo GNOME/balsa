@@ -81,6 +81,7 @@ static void ignore_cb(GtkButton *, gpointer);
 static void ignore_all_cb(GtkButton *, gpointer);
 static void learn_cb(GtkButton * button, gpointer);
 static void cancel_cb(GtkButton * button, gpointer);
+static void dialog_cancel_cb(GtkDialog *, gint, gpointer);
 static void select_word_cb(GtkCList *, gint, gint,
 			   GdkEventButton *, gpointer);
 
@@ -105,7 +106,7 @@ static void balsa_spell_check_learn(BalsaSpellCheck * spell_check,
 typedef void (*BalsaSpellCheckSignal1) (GtkObject * object);
 
 static gint balsa_spell_check_signals[LAST_SIGNAL] = { 0 };
-static GtkFrameClass *parent_class = NULL;
+static GtkDialogClass *parent_class = NULL;
 
 
 
@@ -128,7 +129,7 @@ balsa_spell_check_get_type()
 	};
 
 	balsa_spell_check_type =
-	    gtk_type_unique(gtk_frame_get_type(), &balsa_spell_check_info);
+	    gtk_type_unique(gtk_dialog_get_type(), &balsa_spell_check_info);
     }
 
     return balsa_spell_check_type;
@@ -388,10 +389,7 @@ balsa_spell_check_set_character_set(BalsaSpellCheck * spell_check,
 static void
 balsa_spell_check_init(BalsaSpellCheck * spell_check)
 {
-    GtkWidget *hbox;
-    GtkWidget *vbox0;
-    GtkWidget *vbox1;
-    GtkWidget *vbox2;
+    GtkWidget *vbox;
     GtkWidget *new_word_text;
     GtkWidget *sw;
     GtkWidget *suggestion_list;
@@ -417,33 +415,18 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
     spell_check->language_tag = g_strdup("en");
     spell_check->character_set = g_strdup("iso8859-*");
 
-    /* Set up interface elements */
-    gtk_container_set_border_width(GTK_CONTAINER(spell_check),
-				   padding / 2);
-
-    hbox = gtk_hbox_new(FALSE, padding);
-    gtk_container_set_border_width(GTK_CONTAINER(hbox), padding / 2);
-    gtk_container_add(GTK_CONTAINER(spell_check), hbox);
-
-    vbox0 = gtk_vbox_new(FALSE, padding / 2);
-    gtk_box_pack_start(GTK_BOX(hbox), vbox0, TRUE, TRUE, 0);
-
-    vbox1 = gtk_vbox_new(FALSE, padding);
-    gtk_box_pack_start(GTK_BOX(hbox), vbox1, FALSE, FALSE, 0);
-
-    vbox2 = gtk_vbox_new(FALSE, padding);
-    gtk_box_pack_start(GTK_BOX(hbox), vbox2, FALSE, FALSE, 0);
-
     /* setup suggestion display */
     new_word_text = gtk_entry_new();
     spell_check->entry = GTK_ENTRY(new_word_text);
-    gtk_box_pack_start(GTK_BOX(vbox0), new_word_text, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(spell_check)->vbox),
+                       new_word_text, FALSE, FALSE, 0);
 
     sw = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
 				   GTK_POLICY_AUTOMATIC,
 				   GTK_POLICY_AUTOMATIC);
-    gtk_box_pack_start(GTK_BOX(vbox0), sw, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(spell_check)->vbox),
+                       sw, TRUE, TRUE, 0);
 
     /* setup suggestion list */
     suggestion_list = gtk_clist_new(1);
@@ -455,49 +438,61 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
     spell_check->list = GTK_CLIST(suggestion_list);
 
     /* setup buttons to perform actions */
+    vbox = gtk_vbox_new(FALSE, padding);
     change = balsa_stock_button_with_label(GNOME_STOCK_PIXMAP_REDO,
 					   "Change");
     gtk_tooltips_set_tip(balsa_app.tooltips, change,
 			 _
 			 ("Replace the current word with the selected suggestion"),
 			 NULL);
-    gtk_box_pack_start(GTK_BOX(vbox1), change, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), change, FALSE, FALSE, 0);
 
     change_all = balsa_stock_button_with_label(GNOME_STOCK_PIXMAP_REFRESH,
 					       "Change All");
     gtk_tooltips_set_tip(balsa_app.tooltips, change_all,
 			 _("Replace all occurences of the current word with the selected suggestion"),
 			 NULL);
-    gtk_box_pack_start(GTK_BOX(vbox2), change_all, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), change_all, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(spell_check)->action_area),
+                       vbox, FALSE, FALSE, 0);
 
+    vbox = gtk_vbox_new(FALSE, padding);
     ignore = balsa_stock_button_with_label(GNOME_STOCK_PIXMAP_FORWARD, "Ignore");
 
     gtk_tooltips_set_tip(balsa_app.tooltips, ignore,
 			 _("Skip the current word"), NULL);
-    gtk_box_pack_start(GTK_BOX(vbox1), ignore, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), ignore, FALSE, FALSE, 0);
 
     ignore_all = balsa_stock_button_with_label(GNOME_STOCK_PIXMAP_LAST, "Ignore All");
     gtk_tooltips_set_tip(balsa_app.tooltips, ignore_all,
 			 _("Skip all occurances of the current word"),
 			 NULL);
-    gtk_box_pack_start(GTK_BOX(vbox2), ignore_all, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), ignore_all, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(spell_check)->action_area),
+                       vbox, FALSE, FALSE, 0);
 
+    vbox = gtk_vbox_new(FALSE, padding);
     learn = balsa_stock_button_with_label(GNOME_STOCK_PIXMAP_BOOK_OPEN, "Learn");
     gtk_tooltips_set_tip(balsa_app.tooltips, learn,
 			 _("Add the current word to your personal dictionary"),
 			 NULL);
-    gtk_box_pack_start(GTK_BOX(vbox1), learn, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), learn, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(spell_check)->action_area),
+                       vbox, FALSE, FALSE, 0);
 
+    vbox = gtk_vbox_new(FALSE, padding);
     done = balsa_stock_button_with_label(GNOME_STOCK_BUTTON_OK, "Done");
     gtk_tooltips_set_tip(balsa_app.tooltips, done,
 			 _("Finish spell checking"), NULL);
-    gtk_box_pack_end(GTK_BOX(vbox1), done, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), done, FALSE, FALSE, 0);
 
     cancel = gtk_button_new_from_stock(GNOME_STOCK_BUTTON_CANCEL);
     gtk_tooltips_set_tip(balsa_app.tooltips, cancel,
 			 _("Revert all changes and finish spell checking"),
 			 NULL);
-    gtk_box_pack_end(GTK_BOX(vbox2), cancel, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), cancel, FALSE, FALSE, 0);
+    gtk_box_pack_end(GTK_BOX(GTK_DIALOG(spell_check)->action_area),
+                     vbox, FALSE, FALSE, 0);
 
     /* connect signal handlers */
     gtk_signal_connect(GTK_OBJECT(suggestion_list), "select-row",
@@ -521,9 +516,14 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
     gtk_signal_connect(GTK_OBJECT(cancel), "clicked",
 		       GTK_SIGNAL_FUNC(cancel_cb), spell_check);
 
+    gtk_signal_connect(GTK_OBJECT(spell_check), "response",
+		       GTK_SIGNAL_FUNC(dialog_cancel_cb), NULL);
+
     gtk_signal_connect(GTK_OBJECT(done), "clicked",
 		       GTK_SIGNAL_FUNC(done_cb), spell_check);
 
+    gtk_window_set_modal(GTK_WINDOW(spell_check), TRUE);
+    gtk_window_set_title(GTK_WINDOW(spell_check), _("Balsa: spell check"));
     gtk_widget_show_all(GTK_WIDGET(spell_check));
 }
 
@@ -664,6 +664,16 @@ cancel_cb(GtkButton * button, gpointer data)
 
     spell_check = BALSA_SPELL_CHECK(data);
     balsa_spell_check_finish(spell_check, FALSE);
+}
+
+/* dialog_cancel_cb ()
+ *
+ * User clicked the `close' window decoration.
+ */
+static void
+dialog_cancel_cb(GtkDialog * dialog, gint response, gpointer data)
+{
+    cancel_cb(NULL, dialog);
 }
 
 
@@ -1173,10 +1183,20 @@ next_word(BalsaSpellCheck * spell_check)
     gtk_text_iter_forward_line(&line_end);
 
     do {
+        gunichar last_char;
+
         /* move forward one word */
-        if (!gtk_text_iter_forward_word_end(&spell_check->end_iter))
-            /* end of buffer */
-            return FALSE;
+        do {
+
+            if (!gtk_text_iter_forward_word_end(&spell_check->end_iter))
+                /* end of buffer */
+                return FALSE;
+
+            /* we want only alpha words */
+            spell_check->start_iter = spell_check->end_iter;
+            gtk_text_iter_backward_char(&spell_check->start_iter);
+            last_char = gtk_text_iter_get_char(&spell_check->start_iter);
+        } while (!g_unichar_isalpha(last_char));
 
         /* is the new word on a new line? */
         while (gtk_text_iter_compare(&spell_check->end_iter, &line_end) > 0) {

@@ -67,9 +67,6 @@ static void balsa_address_book_menu_changed(GtkWidget * widget,
 					    BalsaAddressBook *ab);
 static void balsa_address_book_run_gnomecard(GtkWidget * widget, gpointer data);
 static void balsa_address_book_find(GtkWidget * group_entry, BalsaAddressBook *ab);
-static void balsa_address_book_button_clicked (BalsaAddressBook *ab, 
-					       gint button_number, 
-					       gpointer data);
 
 /* address and recipient list management ... */
 static void balsa_address_book_swap_clist_entry(GtkCList * src, GtkCList * dst);
@@ -91,6 +88,11 @@ static gint balsa_address_book_compare_entries(GtkCList * clist,
 					       gconstpointer a, 
 					       gconstpointer b);
 
+struct _BalsaAddressBookClass
+{
+    GtkDialogClass parent_class;
+};
+
 GtkType
 balsa_address_book_get_type(void)
 {
@@ -106,13 +108,13 @@ balsa_address_book_get_type(void)
 	    NULL, /*reserved*/
 	    NULL, /*reserved*/
 	};
-	ab_type = gtk_type_unique(GNOME_TYPE_DIALOG, &ab_info);
+	ab_type = gtk_type_unique(GTK_TYPE_DIALOG, &ab_info);
     }
     return ab_type;
 }
 
 GtkWidget *
-balsa_address_book_new(gboolean composing)
+balsa_address_book_new(gboolean composing, GtkWindow* parent)
 {
     GtkWidget *ret;
 
@@ -122,20 +124,20 @@ balsa_address_book_new(gboolean composing)
     BALSA_ADDRESS_BOOK(ret)->composing = composing;
 
     if ( composing ) { 
-	gnome_dialog_append_buttons(GNOME_DIALOG(ret), 
-				    GNOME_STOCK_BUTTON_OK,
-				    GNOME_STOCK_BUTTON_CANCEL,
-				    NULL);
+	gtk_dialog_add_buttons(GTK_DIALOG(ret), 
+                               GTK_STOCK_OK,     GTK_RESPONSE_OK,
+                               GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                               NULL);
 	gtk_widget_show(GTK_WIDGET(BALSA_ADDRESS_BOOK(ret)->send_to_box));
 	gtk_widget_show(GTK_WIDGET(BALSA_ADDRESS_BOOK(ret)->arrow_box));
     } else {
-	gnome_dialog_append_buttons(GNOME_DIALOG(ret),
-				    GNOME_STOCK_BUTTON_CLOSE,
-				    NULL);
+	gtk_dialog_add_buttons(GTK_DIALOG(ret),
+                               GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
+                               NULL);
 	gtk_widget_hide(GTK_WIDGET(BALSA_ADDRESS_BOOK(ret)->send_to_box));
 	gtk_widget_hide(GTK_WIDGET(BALSA_ADDRESS_BOOK(ret)->arrow_box));
     }
-
+    if(parent) gtk_window_set_transient_for(GTK_WINDOW(ret), parent);
     return ret;
 
 }
@@ -166,10 +168,12 @@ balsa_address_book_init(BalsaAddressBook *ab)
     titles[1] = _(titles[1]);
 #endif
 
-    gtk_signal_connect(GTK_OBJECT(ab), "clicked",
-		       GTK_SIGNAL_FUNC(balsa_address_book_button_clicked), NULL);
-		     
-    vbox = GNOME_DIALOG(ab)->vbox;
+#if 0
+    gtk_signal_connect(GTK_OBJECT(ab), "response",
+		       GTK_SIGNAL_FUNC(balsa_address_book_button_clicked), 
+                       NULL);
+#endif
+    vbox = GTK_DIALOG(ab)->vbox;
 
     gtk_window_set_wmclass(GTK_WINDOW(ab), "addressbook", "Balsa");
 
@@ -178,7 +182,8 @@ balsa_address_book_init(BalsaAddressBook *ab)
     gtk_clist_set_selection_mode(GTK_CLIST(ab->address_clist),
 				 GTK_SELECTION_MULTIPLE);
     gtk_clist_column_titles_passive(GTK_CLIST(ab->address_clist));
-    gtk_clist_set_compare_func(GTK_CLIST(ab->address_clist), balsa_address_book_compare_entries);
+    gtk_clist_set_compare_func(GTK_CLIST(ab->address_clist), 
+                               balsa_address_book_compare_entries);
     gtk_clist_set_sort_type(GTK_CLIST(ab->address_clist), GTK_SORT_ASCENDING);
     gtk_clist_set_auto_sort(GTK_CLIST(ab->address_clist), TRUE);
     gtk_clist_set_column_auto_resize(GTK_CLIST(ab->address_clist), 0, TRUE);
@@ -773,9 +778,11 @@ address_book_entry_unref(AddressBookEntry *entry)
     g_free(entry);
 }
 
+#if 0
 static void
-balsa_address_book_button_clicked (BalsaAddressBook *ab, gint button_number, gpointer data)
+balsa_address_book_button_clicked (BalsaAddressBook *ab, gint response)
 {
     if ( !ab->composing )
 	gtk_widget_destroy(GTK_WIDGET(ab));
 }
+#endif

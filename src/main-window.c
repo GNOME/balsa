@@ -740,14 +740,17 @@ delete_cb(GtkWidget* main_window)
      * with disabled main window. */
     if(libbalsa_is_sending_mail()) {
         GtkWidget* d = 
-            gnome_ok_cancel_dialog_parented(_("Balsa is sending a mail now.\n"
-                                              "Abort sending?"),
-                                            NULL, NULL,
-                                            GTK_WINDOW(main_window));
-        int retval = gnome_dialog_run_and_close(GNOME_DIALOG(d));
+            gtk_message_dialog_new(GTK_WINDOW(main_window),
+                                   GTK_DIALOG_MODAL,
+                                   GTK_MESSAGE_QUESTION,
+                                   GTK_BUTTONS_YES_NO,
+                                   _("Balsa is sending a mail now.\n"
+                                     "Abort sending?"));
+        int retval = gtk_dialog_run(GTK_DIALOG(d));
         /* FIXME: we should terminate sending thread nicely here,
          * but we must know their ids. */
-        return retval!=0; /* keep running unless OK */
+        gtk_widget_destroy(d);
+        return retval != GTK_RESPONSE_YES; /* keep running unless OK */
     }                                          
 #endif
     return FALSE; /* allow delete */
@@ -1711,6 +1714,14 @@ progress_dialog_destroy_cb(GtkWidget * widget, gpointer data)
     progress_dialog_message = NULL;
     progress_dialog_bar = NULL;
 }
+static void
+progress_dialog_response_cb(GtkWidget* dialog, gint response)
+{
+    if(response == GTK_RESPONSE_CLOSE)
+        /* this should never be done in response handler, but... */
+        gtk_widget_destroy(dialog);
+}
+
 /* ensure_check_mail_dialog:
    make sure that mail checking dialog exists.
 */
@@ -1721,29 +1732,31 @@ ensure_check_mail_dialog(void)
 	gtk_widget_destroy(GTK_WIDGET(progress_dialog));
     
     progress_dialog =
-	gnome_dialog_new(_("Checking Mail..."), _("Hide"), NULL);
+	gtk_dialog_new_with_buttons(_("Checking Mail..."),
+                                    GTK_WINDOW(balsa_app.main_window),
+                                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                                    _("Hide"), GTK_RESPONSE_CLOSE,
+                                    NULL);
     gtk_window_set_wmclass(GTK_WINDOW(progress_dialog), 
 			   "progress_dialog", "Balsa");
         
-    if (balsa_app.main_window)
-	gnome_dialog_set_parent(GNOME_DIALOG(progress_dialog),
-				GTK_WINDOW(balsa_app.main_window));
     gtk_signal_connect(GTK_OBJECT(progress_dialog), "destroy",
 		       GTK_SIGNAL_FUNC(progress_dialog_destroy_cb),
 		       NULL);
-    
-    gnome_dialog_set_close(GNOME_DIALOG(progress_dialog), TRUE);
+    gtk_signal_connect(GTK_OBJECT(progress_dialog), "response",
+		       GTK_SIGNAL_FUNC(progress_dialog_response_cb),
+		       NULL);
     
     progress_dialog_source = gtk_label_new("Checking Mail....");
-    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(progress_dialog)->vbox),
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(progress_dialog)->vbox),
 		       progress_dialog_source, FALSE, FALSE, 0);
     
     progress_dialog_message = gtk_label_new("");
-    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(progress_dialog)->vbox),
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(progress_dialog)->vbox),
 		       progress_dialog_message, FALSE, FALSE, 0);
     
     progress_dialog_bar = gtk_progress_bar_new();
-    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(progress_dialog)->vbox),
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(progress_dialog)->vbox),
 		       progress_dialog_bar, FALSE, FALSE, 0);
     gtk_widget_show_all(progress_dialog);
 }
@@ -2022,10 +2035,14 @@ mail_progress_notify_cb()
             break;
 
         case MSGMAILTHREAD_ERROR:
-            errorbox = gnome_message_box_new(threadmessage->message_string,
-                                             GNOME_MESSAGE_BOX_ERROR,
-                                             GNOME_STOCK_BUTTON_OK, NULL);
-            gnome_dialog_run(GNOME_DIALOG(errorbox));
+            errorbox = 
+                gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
+                                       GTK_DIALOG_DESTROY_WITH_PARENT,
+                                       GTK_MESSAGE_ERROR,
+                                       GTK_BUTTONS_OK,
+                                       threadmessage->message_string);
+            gtk_dialog_run(GTK_DIALOG(errorbox));
+            gtk_widget_destroy(errorbox);
             break;
 
         default:
@@ -2583,9 +2600,7 @@ address_book_cb(GtkWindow *widget, gpointer data)
 {
     GtkWidget *ab;
 
-    ab = balsa_address_book_new(FALSE);
-    gnome_dialog_set_parent(GNOME_DIALOG(ab), GTK_WINDOW(balsa_app.main_window));
-
+    ab = balsa_address_book_new(FALSE, GTK_WINDOW(balsa_app.main_window));
     gtk_widget_show(GTK_WIDGET(ab));
 }
 
@@ -2622,33 +2637,35 @@ find_real(BalsaIndex * bindex,gboolean again)
 
     /* first search, so set up the match rule(s) */
     if (!again || (!f && cnd->type==CONDITION_NONE)) {
-	GnomeDialog* dia=
-            GNOME_DIALOG(gnome_dialog_new(_("Search a message"),
-                                          GNOME_STOCK_BUTTON_OK,
-                                          GNOME_STOCK_BUTTON_CANCEL,
-                                          NULL));
+	GtkWidget* vbox, *dia =
+            gtk_dialog_new_with_buttons(_("Search mailbox"),
+                                        GTK_WINDOW(balsa_app.main_window),
+                                        GTK_DIALOG_DESTROY_WITH_PARENT,
+                                        GTK_STOCK_OK, GTK_RESPONSE_OK,
+                                        GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                        NULL);
 	GtkWidget *reverse_button, *search_entry, *w, *page, *table;
-	GtkToggleButton *matching_body, *matching_from;
+        	GtkToggleButton *matching_body, *matching_from;
         GtkToggleButton *matching_to, *matching_cc, *matching_subject;
 	gint ok;
 	
-	gnome_dialog_close_hides(dia,TRUE);
-
 	/* FIXME : we'll set up this callback later when selecting
 	   filters has been enabled
 	   gtk_signal_connect(GTK_OBJECT(dia),"clicked",
 	   find_dialog_button_cb,&f);
 	*/
-	reverse_button = gtk_check_button_new_with_label(_("Reverse search"));
+        vbox = GTK_DIALOG(dia)->vbox;
+	reverse_button = 
+            gtk_check_button_new_with_mnemonic(_("_Reverse search"));
 
 	page=gtk_table_new(2, 1, FALSE);
-	w = gtk_label_new(_("Search for:"));
+	w = gtk_label_new_with_mnemonic(_("_Search for:"));
 	gtk_table_attach(GTK_TABLE(page),w,0, 1, 0, 1,
 			 GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
 	search_entry = gtk_entry_new_with_max_length(30);
 	gtk_table_attach(GTK_TABLE(page),search_entry,1, 2, 0, 1,
 			 GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
-	gtk_box_pack_start(GTK_BOX(dia->vbox), page, FALSE, FALSE, 2);
+	gtk_box_pack_start(GTK_BOX(vbox), page, FALSE, FALSE, 2);
 
 	/* builds the toggle buttons to specify fields concerned by
          * the search. */
@@ -2665,17 +2682,17 @@ find_real(BalsaIndex * bindex,gboolean again)
 	table = gtk_table_new(3, 3, TRUE);
 	gtk_container_add(GTK_CONTAINER(w), table);
 		
-	matching_body    = add_check_button(table, _("Body"),    0, 0);
-	matching_to      = add_check_button(table, _("To:"),     1, 0);
-	matching_from    = add_check_button(table, _("From:"),   1, 1);
-        matching_subject = add_check_button(table, _("Subject"), 2, 0);
-	matching_cc      = add_check_button(table, _("Cc:"),     2, 1);
-	gtk_box_pack_start(GTK_BOX(dia->vbox), page, FALSE, FALSE, 2);
+	matching_body    = add_check_button(table, _("_Body"),    0, 0);
+	matching_to      = add_check_button(table, _("_To:"),     1, 0);
+	matching_from    = add_check_button(table, _("_From:"),   1, 1);
+        matching_subject = add_check_button(table, _("_Subject"), 2, 0);
+	matching_cc      = add_check_button(table, _("_Cc:"),     2, 1);
+	gtk_box_pack_start(GTK_BOX(vbox), page, FALSE, FALSE, 2);
 
-	gtk_box_pack_start(GTK_BOX(dia->vbox), gtk_hseparator_new(), 
+	gtk_box_pack_start(GTK_BOX(vbox), gtk_hseparator_new(), 
                            FALSE, FALSE, 2);
-	gtk_box_pack_start(GTK_BOX(dia->vbox), reverse_button,TRUE,TRUE,0);
-	gtk_widget_show_all(dia->vbox);
+	gtk_box_pack_start(GTK_BOX(vbox), reverse_button,TRUE,TRUE,0);
+	gtk_widget_show_all(vbox);
 
 	if (cnd->match.string)
 	    gtk_entry_set_text(GTK_ENTRY(search_entry),cnd->match.string);
@@ -2694,10 +2711,12 @@ find_real(BalsaIndex * bindex,gboolean again)
 				     CONDITION_CHKMATCH(cnd,CONDITION_MATCH_CC));
 
         gtk_widget_grab_focus(search_entry);
+#if TO_BE_PORTED
         gnome_dialog_editable_enters(dia, GTK_EDITABLE(search_entry));
-        gnome_dialog_set_default(dia, 0);
+#endif
+        gtk_dialog_set_default_response(GTK_DIALOG(dia), GTK_RESPONSE_OK);
 	do {
-	    ok=gnome_dialog_run(dia);
+	    ok=gtk_dialog_run(GTK_DIALOG(dia));
 	    if (ok==0) {
 		reverse=GTK_TOGGLE_BUTTON(reverse_button)->active;
 		g_free(cnd->match.string);
@@ -2730,7 +2749,7 @@ find_real(BalsaIndex * bindex,gboolean again)
 	    else ok=-1;
 	}
 	while (ok==0);
-	gtk_widget_destroy(GTK_WIDGET(dia));
+	gtk_widget_destroy(dia);
 	/* Here ok==1 means OK button was pressed, search is valid so let's go
 	 * else cancel was pressed return */
 	if (ok!=1) return;

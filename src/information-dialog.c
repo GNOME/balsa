@@ -34,9 +34,6 @@
 
 static GtkWidget *information_list = NULL;
 
-static void balsa_information_list_button_cb(GnomeDialog * dialog,
-					     gint button, gpointer data);
-
 static void balsa_information_list(LibBalsaInformationType type,
 				   char *msg);
 static void balsa_information_dialog(LibBalsaInformationType type,
@@ -45,20 +42,16 @@ static void balsa_information_stderr(LibBalsaInformationType type,
 				     char *msg);
 
 /* Handle button clicks in the warning window */
-/* Button 0 is clear, button 1 is close */
 static void
-balsa_information_list_button_cb(GnomeDialog * dialog, gint button,
-				 gpointer data)
+balsa_information_list_response_cb(GtkDialog * dialog, gint response,
+                                   gpointer data)
 {
-    switch (button) {
-    case 0:
+    switch (response) {
+    case GTK_RESPONSE_APPLY:
 	gtk_clist_clear(GTK_CLIST(information_list));
 	break;
-    case 1:
-	gtk_object_destroy(GTK_OBJECT(dialog));
-	break;
-    default:
-	g_error("Unknown button %d pressed in warning dialog", button);
+    case GTK_RESPONSE_CLOSE:
+	gtk_object_destroy(GTK_OBJECT(dialog)); /* FIXME: should not do it */
 	break;
     }
 }
@@ -124,11 +117,12 @@ balsa_information_dialog(LibBalsaInformationType type, char *msg)
     GtkWidget *messagebox;
 
     messagebox =
-	gnome_error_dialog_parented(msg,
-				    GTK_WINDOW(balsa_app.main_window));
+	gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
+                               GTK_DIALOG_DESTROY_WITH_PARENT,
+                               GTK_MESSAGE_INFO,
+                               GTK_BUTTONS_CLOSE,msg);
 
     gtk_window_set_position(GTK_WINDOW(messagebox), GTK_WIN_POS_CENTER);
-
 }
 
 /*
@@ -153,24 +147,27 @@ balsa_information_list(LibBalsaInformationType type, char *msg)
 	GtkWidget *scrolled_window;
 
 	information_dialog =
-	    gnome_dialog_new(_("Balsa Information"), "Clear",
-			     GNOME_STOCK_BUTTON_CLOSE, NULL);
+	    gtk_dialog_new_with_buttons(_("Balsa Information"), 
+                                        GTK_WINDOW(balsa_app.main_window),
+                                        GTK_DIALOG_DESTROY_WITH_PARENT,
+                                        _("Clear"), GTK_RESPONSE_APPLY,
+                                        GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
+                                        NULL);
 	/* Default is to close */
-	gnome_dialog_set_default(GNOME_DIALOG(information_dialog), 1);
-	gnome_dialog_set_parent(GNOME_DIALOG(information_dialog),
-				GTK_WINDOW(balsa_app.main_window));
+	gtk_dialog_set_default_response(GTK_DIALOG(information_dialog), 
+                                        GTK_RESPONSE_CLOSE);
 
-	/* Reset the policy gnome_dialog_new makes itself non-resizable */
+	/* Reset the policy gtk_dialog_new makes itself non-resizable */
 	gtk_window_set_policy(GTK_WINDOW(information_dialog), TRUE, TRUE,
-			      FALSE);
+                              FALSE);
 	gtk_window_set_default_size(GTK_WINDOW(information_dialog), 350,
 				    200);
 	gtk_window_set_wmclass(GTK_WINDOW(information_dialog),
 			       "Information", "Balsa");
 
-	gtk_signal_connect(GTK_OBJECT(information_dialog), "clicked",
+	gtk_signal_connect(GTK_OBJECT(information_dialog), "response",
 			   GTK_SIGNAL_FUNC
-			   (balsa_information_list_button_cb), NULL);
+			   (balsa_information_list_response_cb), NULL);
 
 	/* A scrolled window for the list. */
 	scrolled_window = gtk_scrolled_window_new(NULL, NULL);
@@ -178,7 +175,7 @@ balsa_information_list(LibBalsaInformationType type, char *msg)
 				       (scrolled_window),
 				       GTK_POLICY_AUTOMATIC,
 				       GTK_POLICY_AUTOMATIC);
-	gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(information_dialog)->vbox),
+	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(information_dialog)->vbox),
 			   scrolled_window, TRUE, TRUE, 1);
 	gtk_widget_show(scrolled_window);
 

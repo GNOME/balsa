@@ -39,22 +39,13 @@ const gchar *pspell_suggest_modes[] = {
     "bad-spellers"
 };
 
-gchar * ask_password_real(LibBalsaServer *, LibBalsaMailbox *);
-gboolean check_mailbox_password(GNode *, gpointer);
-
 /* ask_password:
    asks the user for the password to the mailbox on given remote server.
 */
-static void
-handle_password(gchar * string, gchar ** target)
-{
-    *target = string;
-}
-
-gchar *
+static gchar *
 ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
 {
-    GtkWidget *dialog;
+    GtkWidget *dialog, *entry;
     gchar *prompt, *passwd = NULL;
 
     g_return_val_if_fail(server != NULL, NULL);
@@ -68,14 +59,25 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
 	    g_strdup_printf(_("Mailbox password for %s@%s:"), server->user,
 			    server->host);
 
-    dialog = gnome_request_dialog(TRUE, prompt, NULL,
-				  0,
-				  (GnomeStringCallback) handle_password,
-				  (gpointer) & passwd,
-				  GTK_WINDOW(balsa_app.main_window));
+    dialog = gtk_dialog_new_with_buttons(_("Password needed"),
+                                         GTK_WINDOW(balsa_app.main_window),
+                                         GTK_DIALOG_DESTROY_WITH_PARENT,
+                                         GTK_STOCK_OK, GTK_RESPONSE_OK,
+                                         GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                         NULL); 
+    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),
+                      gtk_label_new(prompt));
     g_free(prompt);
-    gnome_dialog_run_and_close(GNOME_DIALOG(dialog));
-    
+    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),
+                      entry = gtk_entry_new());
+    gtk_widget_show_all(GTK_WIDGET(GTK_DIALOG(dialog)->vbox));
+    gtk_entry_set_width_chars(GTK_ENTRY(entry), 20);
+    gtk_entry_set_visibility(GTK_ENTRY(entry), TRUE);
+    gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
+
+    if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK)
+        passwd = g_strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
+    gtk_widget_destroy(dialog);
     return passwd;
 }
 
@@ -94,6 +96,7 @@ static gboolean
 ask_passwd_idle(gpointer data)
 {
     AskPasswdData* apd = (AskPasswdData*)data;
+    printf("ask_passwd_idle\n");
     gdk_threads_enter();
     apd->res = ask_password_real(apd->server, apd->mbox);
     gdk_threads_leave();
@@ -107,6 +110,7 @@ ask_password_mt(LibBalsaServer * server, LibBalsaMailbox * mbox)
     static pthread_mutex_t ask_passwd_lock = PTHREAD_MUTEX_INITIALIZER;
     AskPasswdData apd;
 
+    printf("ask_password_mt\n");
     gdk_threads_leave();
     pthread_mutex_lock(&ask_passwd_lock);
     pthread_cond_init(&apd.cond, NULL);
@@ -174,6 +178,7 @@ ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
     g_return_val_if_fail(server != NULL, NULL);
 
     password = NULL;
+    printf("ask_password\n");
     if (mbox) {
         g_node_traverse(balsa_app.mailbox_nodes, G_IN_ORDER, G_TRAVERSE_LEAFS,
 		-1, set_passwd_from_matching_server, server);
@@ -182,6 +187,7 @@ ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
 	    server->passwd = NULL;
 	}
     }
+    printf("ask_password: password=%s\n", password);
     if (!password)
 #ifdef BALSA_USE_THREADS
 	return ask_password_mt(server, mbox);
@@ -407,15 +413,6 @@ balsa_app_init(void)
     balsa_app.drag_default_is_move=0;
 }
 
-static gint
-append_subtree_f(GNode* gn, gpointer data)
-{
-    g_return_val_if_fail(gn->data, FALSE);
-    balsa_mailbox_node_append_subtree(BALSA_MAILBOX_NODE(gn->data),
-				      gn);
-    return FALSE;
-}
-
 gboolean
 do_load_mailboxes(void)
 {
@@ -428,12 +425,6 @@ do_load_mailboxes(void)
 	fprintf(stderr, "do_load_mailboxes: Unknown inbox mailbox type\n");
 	return FALSE;
     }
-    /* expand subtrees; move later to an idle callback or a separate 
-       thread to construct folders that are expensive to build (IMAP over
-       dialup).
-    */
-    g_node_traverse(balsa_app.mailbox_nodes, G_POST_ORDER, G_TRAVERSE_ALL, -1,
-                    append_subtree_f, NULL);
     return TRUE;
 }
 

@@ -205,8 +205,13 @@ static void
 dir_conf_edit(BalsaMailboxNode* mb)
 {
     GtkWidget *err_dialog =
-	gnome_error_dialog(_("The folder edition to be written."));
-    gnome_dialog_run_and_close(GNOME_DIALOG(err_dialog));
+	gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
+                               GTK_DIALOG_DESTROY_WITH_PARENT,
+                               GTK_MESSAGE_ERROR,
+                               GTK_BUTTONS_CLOSE,
+                               _("The folder edition to be written."));
+    gtk_dialog_run(GTK_DIALOG(err_dialog));
+    gtk_widget_destroy(err_dialog);
 }
 
 static void
@@ -307,6 +312,9 @@ balsa_mailbox_node_new_from_config(const gchar* prefix)
 		       GTK_SIGNAL_FUNC(folder_conf_imap_node), NULL);
     gtk_signal_connect(GTK_OBJECT(folder), "append-subtree", 
 		       GTK_SIGNAL_FUNC(imap_dir_cb), NULL);
+    gtk_signal_connect(GTK_OBJECT(folder->server),
+                       "get-password", GTK_SIGNAL_FUNC(ask_password),
+                       NULL);
     balsa_mailbox_node_load_config(folder, prefix);
 
     folder->dir = gnome_config_get_string("Directory");
@@ -413,7 +421,8 @@ balsa_mailbox_node_save_config(BalsaMailboxNode* mn, const gchar* prefix)
    the expansion state preservation is not perfect, only top level is
    preserved.
 */
-void balsa_mailbox_node_rescan(BalsaMailboxNode* mn)
+void
+balsa_mailbox_node_rescan(BalsaMailboxNode* mn)
 {
     GNode *gnode;
 

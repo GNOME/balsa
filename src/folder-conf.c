@@ -88,9 +88,8 @@ remember_cb(GtkToggleButton * button, FolderDialogData * fcw)
 }
 
 static void
-folder_conf_clicked_cb(GtkObject* dialog, int buttonno, gpointer data)
+folder_conf_clicked_cb(GtkDialog* dialog, int response, FolderDialogData* fcw)
 {
-    FolderDialogData *fcw = (FolderDialogData*)data;
     LibBalsaServer * s = fcw->mn ? fcw->mn->server : NULL;
 #if BALSA_MAJOR < 2
     static GnomeHelpMenuEntry help_entry = { NULL, "folder-config.html" };
@@ -103,10 +102,9 @@ folder_conf_clicked_cb(GtkObject* dialog, int buttonno, gpointer data)
 
 #if BALSA_MAJOR < 2
     help_entry.name = gnome_app_id;
-
 #endif                          /* BALSA_MAJOR < 2 */
-    switch(buttonno) {
-    case 0: /* OK */
+    switch(response) {
+    case GTK_RESPONSE_OK: 
 	if(!fcw->mn) { 
 	    insert = TRUE; 
 	    s = LIBBALSA_SERVER(libbalsa_server_new(LIBBALSA_SERVER_IMAP));
@@ -152,9 +150,8 @@ folder_conf_clicked_cb(GtkObject* dialog, int buttonno, gpointer data)
 	}
         /* Fall over */
     default: 
-        gtk_widget_destroy(GTK_WIDGET(dialog));
         break;
-    case 2:
+    case GTK_RESPONSE_HELP:
 #if BALSA_MAJOR < 2
         gnome_help_display(NULL, &help_entry);
 #else
@@ -180,13 +177,14 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     FolderDialogData fcw;
     LibBalsaServer * s = mn ? mn->server : NULL;
     gchar *default_server = libbalsa_guess_imap_server();
+    gint resp;
 
     fcw.mn = mn;
     fcw.dialog = GTK_DIALOG(gtk_dialog_new_with_buttons
                             (_("Remote IMAP folder"), 
                              GTK_WINDOW(balsa_app.main_window),
                              GTK_DIALOG_MODAL,
-                             mn ? _("Update") : _("Create"), GTK_RESPONSE_OK,
+                             mn ? _("_Update") : _("_Create"), GTK_RESPONSE_OK,
                              GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                              GTK_STOCK_HELP,   GTK_RESPONSE_HELP,
                              NULL));
@@ -251,9 +249,14 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     validate_folder(NULL, &fcw);
     gtk_widget_grab_focus(fcw.folder_name);
 
-    gtk_signal_connect(GTK_OBJECT(fcw.dialog), "clicked", 
-                       GTK_SIGNAL_FUNC(folder_conf_clicked_cb), &fcw);
-    gtk_dialog_run(fcw.dialog);
+    gtk_dialog_set_default_response(fcw.dialog, 
+                                    mn ? GTK_RESPONSE_OK 
+                                    : GTK_RESPONSE_CANCEL);
+    do {
+        resp = gtk_dialog_run(fcw.dialog);
+        folder_conf_clicked_cb(fcw.dialog, resp, &fcw);
+    } while(resp == GTK_RESPONSE_HELP);
+    gtk_widget_destroy(GTK_WIDGET(fcw.dialog));
 }
 
 /* folder_conf_imap_sub_node:
@@ -369,7 +372,7 @@ browse_button_cb(GtkWidget * widget, gpointer data)
 }
 
 static void
-subfolder_conf_clicked_cb(GtkObject* dialog, int buttonno, gpointer data)
+subfolder_conf_clicked_cb(GtkDialog* dialog, gint response, gpointer data)
 {
 #if BALSA_MAJOR < 2
     static GnomeHelpMenuEntry help_entry =
@@ -385,8 +388,8 @@ subfolder_conf_clicked_cb(GtkObject* dialog, int buttonno, gpointer data)
     help_entry.name = gnome_app_id;
 
 #endif                          /* BALSA_MAJOR < 2 */
-    switch(buttonno) {
-    case 0: /* OK */
+    switch(response) {
+    case GTK_RESPONSE_OK:
 	parent = 
             gtk_editable_get_chars(GTK_EDITABLE(fcw->parent_folder), 0, -1);
 	folder = 
@@ -408,7 +411,7 @@ subfolder_conf_clicked_cb(GtkObject* dialog, int buttonno, gpointer data)
 			folder, parent);
 		    GtkWidget *ask = gtk_dialog_new_with_buttons
                         (_("Question"),
-                         GTK_WINDOW(balsa_app.main_window),
+                         GTK_WINDOW(dialog),
                          GTK_DIALOG_MODAL, 
                          _("Rename INBOX"), GTK_RESPONSE_OK,
                          _("Cancel"), GTK_RESPONSE_CANCEL,
@@ -468,11 +471,8 @@ subfolder_conf_clicked_cb(GtkObject* dialog, int buttonno, gpointer data)
 	g_free(folder);
         /* fall over */
     default:
-#if TO_BE_PORTED
-        gnome_dialog_close(GNOME_DIALOG(dialog));
-#endif
         break;
-    case 2:
+    case GTK_RESPONSE_HELP:
 #if BALSA_MAJOR < 2
         gnome_help_display(NULL, &help_entry);
 #else
@@ -572,9 +572,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     validate_sub_folder(NULL, &fcw);
     gtk_widget_grab_focus(fcw.folder_name);
 
-    gtk_signal_connect(GTK_OBJECT(fcw.dialog), "clicked", 
-                       GTK_SIGNAL_FUNC(subfolder_conf_clicked_cb), &fcw);
-    gtk_dialog_run(fcw.dialog);
+    subfolder_conf_clicked_cb(fcw.dialog, gtk_dialog_run(fcw.dialog), &fcw);
 }
 
 void

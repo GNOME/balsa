@@ -823,7 +823,7 @@ config_global_load(void)
 
 	/* Folder MRU */
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "FolderMRU/");
-	load_mru(&balsa_app.folder_mru);
+    load_mru(&balsa_app.folder_mru);
     gnome_config_pop_prefix();
 
     return TRUE;

@@ -34,7 +34,7 @@ typedef struct _BalsaAddressBookClass BalsaAddressBookClass;
 
 struct _BalsaAddressBook 
 {
-    GnomeDialog parent;
+    GtkDialog parent;
 
     /* Are we composing? */
     gboolean composing;
@@ -58,20 +58,13 @@ struct _BalsaAddressBook
     GtkWidget *arrow_box;
 };
 
-struct _BalsaAddressBookClass
-{
-    GnomeDialogClass parent_class;
-};
-
 GtkType balsa_address_book_get_type(void);
-GtkWidget *balsa_address_book_new(gboolean composing);
+GtkWidget *balsa_address_book_new(gboolean composing, GtkWindow* parent);
 
 gchar *balsa_address_book_get_recipients(BalsaAddressBook *ab);
 
 
 #endif				/* __ADDRESS_BOOK_H__ */
-
-
 
 
 

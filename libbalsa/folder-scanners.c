@@ -166,6 +166,10 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
 	   return;
        }
     }
+    /* try getting password, quit on cancel */
+    if (!server->passwd &&
+	!(server->passwd = libbalsa_server_get_password(server, NULL)))
+	return;
 	
     libbalsa_lock_mutt();
     safe_free((void **)&ImapUser);   ImapUser = safe_strdup(server->user);

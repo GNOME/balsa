@@ -215,10 +215,12 @@ extern struct BalsaApplication {
     gint mblist_width;
     gint sw_width; /* sendmsg window */
     gint sw_height;
-    int toolbar_count;
-    BalsaToolbarType *toolbar_ids; 
-    char ***toolbars;     /* toolbar_ids[i] is a type of toolbars[i] */
+
+    /* toolbars */
     int toolbar_wrap_button_text;
+    GSList *main_window_toolbar_current;
+    GSList *compose_window_toolbar_current;
+    GSList *message_window_toolbar_current;
 
     /* file paths */
     gchar *attach_dir;

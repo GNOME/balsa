@@ -651,7 +651,6 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsm)
 
     if (balsa_app.debug)
 	printf("balsa_sendmsg_destroy_handler: Freeing bsm\n");
-    release_toolbars(bsm->window);
     gtk_widget_destroy(bsm->window);
     if (bsm->bad_address_style)
         g_object_unref(G_OBJECT(bsm->bad_address_style));
@@ -2505,32 +2504,73 @@ setup_headers_from_identity(BalsaSendmsg* cw, LibBalsaIdentity *ident)
 	gtk_entry_set_text(GTK_ENTRY(cw->bcc[1]), ident->bcc);
 }
 
+/* Toolbar buttons and their callbacks. */
+static const struct callback_item {
+    const char *icon_id;
+    BalsaToolbarFunc callback;
+} callback_table[] = {
+    {BALSA_PIXMAP_ATTACHMENT, BALSA_TOOLBAR_FUNC(attach_clicked)},
+    {BALSA_PIXMAP_IDENTITY, BALSA_TOOLBAR_FUNC(change_identity_dialog_cb)},
+    {BALSA_PIXMAP_POSTPONE, BALSA_TOOLBAR_FUNC(postpone_message_cb)},
+    {BALSA_PIXMAP_PRINT, BALSA_TOOLBAR_FUNC(print_message_cb)},
+    {BALSA_PIXMAP_SAVE, BALSA_TOOLBAR_FUNC(save_message_cb)},
+    {BALSA_PIXMAP_SEND, BALSA_TOOLBAR_FUNC(send_message_toolbar_cb)},
+    {GTK_STOCK_CLOSE, BALSA_TOOLBAR_FUNC(close_window_cb)},
+    {GTK_STOCK_SPELL_CHECK, BALSA_TOOLBAR_FUNC(spell_check_cb)}
+};
+
+/* Standard buttons; "" means a separator. */
+static const gchar* compose_toolbar[] = {
+    BALSA_PIXMAP_SEND,
+    "",
+    BALSA_PIXMAP_ATTACHMENT,
+    "",
+    BALSA_PIXMAP_SAVE,
+    "",
+    BALSA_PIXMAP_IDENTITY,
+    "",
+    GNOME_STOCK_PIXMAP_SPELLCHECK,
+    "",
+    BALSA_PIXMAP_PRINT,
+    "",
+    GNOME_STOCK_PIXMAP_CLOSE,
+};
+
+/* Create the toolbar model for the compose window's toolbar.
+ */
+BalsaToolbarModel *
+sendmsg_window_get_toolbar_model(void)
+{
+    static BalsaToolbarModel *model = NULL;
+    GSList *legal;
+    GSList *standard;
+    GSList **current;
+    guint i;
+
+    if (model)
+        return model;
+
+    legal = NULL;
+    for (i = 0; i < ELEMENTS(callback_table); i++)
+        legal = g_slist_append(legal, g_strdup(callback_table[i].icon_id));
+
+    standard = NULL;
+    for (i = 0; i < ELEMENTS(compose_toolbar); i++)
+        standard = g_slist_append(standard, g_strdup(compose_toolbar[i]));
+
+    current = &balsa_app.compose_window_toolbar_current;
+
+    model = balsa_toolbar_model_new(legal, standard, current);
+
+    return model;
+}
+
 BalsaSendmsg *
 sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 		   SendType type)
 {
-    static const struct callback_item {
-        const char *icon_id;
-        BalsaToolbarFunc callback;
-    } callback_table[] = {
-        {BALSA_PIXMAP_ATTACHMENT,
-            BALSA_TOOLBAR_FUNC(attach_clicked)},
-        {BALSA_PIXMAP_IDENTITY,
-            BALSA_TOOLBAR_FUNC(change_identity_dialog_cb)},
-        {BALSA_PIXMAP_POSTPONE,
-            BALSA_TOOLBAR_FUNC(postpone_message_cb)},
-        {BALSA_PIXMAP_PRINT,
-            BALSA_TOOLBAR_FUNC(print_message_cb)},
-        {BALSA_PIXMAP_SAVE,
-            BALSA_TOOLBAR_FUNC(save_message_cb)},
-        {BALSA_PIXMAP_SEND,
-            BALSA_TOOLBAR_FUNC(send_message_toolbar_cb)},
-        {GTK_STOCK_CLOSE,
-            BALSA_TOOLBAR_FUNC(close_window_cb)},
-        {GTK_STOCK_SPELL_CHECK,
-            BALSA_TOOLBAR_FUNC(spell_check_cb)}
-    };
-
+    BalsaToolbarModel *model;
+    GtkWidget *toolbar;
     GtkWidget *window;
     GtkWidget *paned = gtk_vpaned_new();
     BalsaSendmsg *msg = NULL;
@@ -2611,20 +2651,18 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     gtk_widget_set_sensitive(edit_menu[EDIT_MENU_REFLOW_MESSAGE].widget,
                              !msg->flow);
 
+    model = sendmsg_window_get_toolbar_model();
+    toolbar = balsa_toolbar_new(model);
     for(i=0; i < ELEMENTS(callback_table); i++)
-        set_toolbar_button_callback(TOOLBAR_COMPOSE, callback_table[i].icon_id,
-                                    callback_table[i].callback, msg);
+        balsa_toolbar_set_callback(toolbar, callback_table[i].icon_id,
+                                   G_CALLBACK(callback_table[i].callback),
+                                   msg);
 
-    gnome_app_set_toolbar(GNOME_APP(window),
-			  get_toolbar(GTK_WIDGET(window), TOOLBAR_COMPOSE));
+    gnome_app_set_toolbar(GNOME_APP(window), GTK_TOOLBAR(toolbar));
 
     msg->ready_widgets[0] = file_menu[MENU_FILE_SEND_POS].widget;
     msg->ready_widgets[1] = file_menu[MENU_FILE_QUEUE_POS].widget;
     msg->ready_widgets[2] = file_menu[MENU_FILE_POSTPONE_POS].widget;
-    msg->ready_widgets[3] = get_tool_widget(window, TOOLBAR_COMPOSE,
-                                            BALSA_PIXMAP_SEND);
-    msg->ready_widgets[4] = get_tool_widget(window, TOOLBAR_COMPOSE,
-                                            BALSA_PIXMAP_POSTPONE);
     msg->current_language_menu = lang_menu[LANG_CURRENT_POS].widget;
 
     /* set options - just the Disposition Notification request for now */
@@ -3387,12 +3425,15 @@ reflow_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static void
 check_readiness(BalsaSendmsg * msg)
 {
+    GtkWidget *toolbar =
+        balsa_toolbar_get_from_gnome_app(GNOME_APP(msg->window));
     unsigned i;
     gboolean state = is_ready_to_send(msg);
 
     for (i = 0; i < ELEMENTS(msg->ready_widgets); i++)
-        if(msg->ready_widgets[i])
-            gtk_widget_set_sensitive(msg->ready_widgets[i], state);
+        gtk_widget_set_sensitive(msg->ready_widgets[i], state);
+    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_SEND, state);
+    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_POSTPONE, state);
 }
 
 /* toggle_entry:

@@ -70,7 +70,7 @@ extern "C" {
         /* fcc mailbox */
         gchar *fcc_url;
 	/* widgets to be disabled when the address is incorrect */
-	GtkWidget *ready_widgets[5];
+	GtkWidget *ready_widgets[3];
 	GtkWidget *view_checkitems[VIEW_MENU_LENGTH];
 	gboolean update_config; /* is the window being set up or in normal  */
 	                        /* operation and user actions should update */
@@ -101,6 +101,8 @@ extern "C" {
     BalsaSendmsg *sendmsg_window_new_from_list(GtkWidget * w,
                                                GList * message_list,
                                                SendType type);
+    BalsaToolbarModel *sendmsg_window_get_toolbar_model(void);
+
 #define SENDMSG_WINDOW_QUIT_ON_CLOSE(bsmsg) ((bsmsg)->quit_on_close=TRUE)
 
 #ifdef __cplusplus

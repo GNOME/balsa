@@ -95,86 +95,109 @@ d_get_gint(const gchar * key, gint def_val)
     return def ? def_val : res;
 }
 
+/* save/load_toolbars:
+   handle customized toolbars for main/message preview and compose windows.
+*/
+static struct {
+    const gchar *key;
+    GSList **current;
+} toolbars[] = {
+    { "toolbar-MainWindow",    &balsa_app.main_window_toolbar_current },
+    { "toolbar-ComposeWindow", &balsa_app.compose_window_toolbar_current },
+    { "toolbar-MessageWindow", &balsa_app.message_window_toolbar_current }
+};
+
 static void
-free_toolbar(int i)
+save_toolbars(void)
 {
-    int j;
-    for(j=0; balsa_app.toolbars[i][j]; j++)
-	g_free(balsa_app.toolbars[i][j]);
-    g_free(balsa_app.toolbars[i]);
-}
-static void
-free_toolbars(void)
-{
-    int i;
-    
-    if(!balsa_app.toolbars == 0)
-	return;
-    
-    for(i=0; i<balsa_app.toolbar_count; i++) 
-	free_toolbar(i);
-    g_free((void *)balsa_app.toolbars);
-    g_free((void *)balsa_app.toolbar_ids);
+    guint i, j;
+
+    gnome_config_clean_section(BALSA_CONFIG_PREFIX "Toolbars/");
+    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Toolbars/");
+    gnome_config_set_int("WrapButtonText",
+                         balsa_app.toolbar_wrap_button_text);
+    gnome_config_pop_prefix();
+
+    for (i = 0; i < ELEMENTS(toolbars); i++) {
+        GSList *list;
+        gchar *key;
+
+        key = g_strconcat(BALSA_CONFIG_PREFIX, toolbars[i].key, "/", NULL);
+        gnome_config_clean_section(key);
+        gnome_config_push_prefix(key);
+        g_free(key);
+
+        for (j = 0, list = *toolbars[i].current; list;
+             j++, list = g_slist_next(list)) {
+            key = g_strdup_printf("Item%d", j);
+            gnome_config_set_string(key, list->data);
+            g_free(key);
+        }
+        gnome_config_pop_prefix();
+    }
 }
 
-/* load_toolbars:
-   loads customized toolbars for main/message preview and compose windows.
-*/
 static void
 load_toolbars(void)
 {
-    gint i, j, items;
+    guint i, j, items;
     char tmpkey[256];
+    gchar *key;
+    GSList **list;
 
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Toolbars/");
-    
-    balsa_app.toolbar_wrap_button_text=d_get_gint("WrapButtonText", 1);
-    
-    free_toolbars();
-    
-    balsa_app.toolbar_ids=
-	(BalsaToolbarType *)g_malloc(sizeof(BalsaToolbarType)*MAXTOOLBARS);
-    balsa_app.toolbars=	(char ***)g_malloc(sizeof(char *)*MAXTOOLBARS);
-    
-    balsa_app.toolbar_count=d_get_gint("ToolbarCount", 0);
-    if(balsa_app.toolbar_count>=MAXTOOLBARS)   /* most likely, this means   */
-        balsa_app.toolbar_count=MAXTOOLBARS-1; /* configure file corruption */
+    balsa_app.toolbar_wrap_button_text = d_get_gint("WrapButtonText", 1);
+    gnome_config_pop_prefix();
 
-    for(i=0; i<balsa_app.toolbar_count; i++) {
-	balsa_app.toolbars[i]=
-	    (char **)g_malloc(sizeof(char *)*MAXTOOLBARITEMS);
-	
-	sprintf(tmpkey, "Toolbar%dID", i);
-	balsa_app.toolbar_ids[i] = d_get_gint(tmpkey, TOOLBAR_INVALID);
-	
-	if(balsa_app.toolbar_ids[i] == TOOLBAR_INVALID) {
-	    balsa_app.toolbars[i][0]=NULL;
-	    continue;
-	}
-	
-	sprintf(tmpkey, "Toolbar%dItemCount", i);
-	items=d_get_gint(tmpkey, 0);
-        if(items>=MAXTOOLBARITEMS)        /* most likely, this means   */
-            items=MAXTOOLBARITEMS-1;      /* configure file corruption */
-	
-	for(j=0; j<items; j++) {
-	    sprintf(tmpkey, "Toolbar%dItem%d", i, j);
-	    balsa_app.toolbars[i][j]=  gnome_config_get_string(tmpkey);
-	}
-	balsa_app.toolbars[i][j]=NULL;
-	/* validate */
-	for(j=0; balsa_app.toolbars[i][j]; j++) {
-	    if(get_toolbar_button_index(balsa_app.toolbars[i][j])<0) {
-		/* validation failed: roll the toolbar back. */
-		free_toolbar(i); 
-		balsa_app.toolbars[i] = NULL;
-		balsa_app.toolbar_ids[i] = TOOLBAR_INVALID;
-		i--;
-		balsa_app.toolbar_count--;
-		g_warning("I dropped a toolbar. Are you up/downgrading?");
-		break;
-	    }
-	}
+    items = 0;
+    for (i = 0; i < ELEMENTS(toolbars); i++) {
+        key = g_strconcat(BALSA_CONFIG_PREFIX, toolbars[i].key, "/", NULL);
+        gnome_config_push_prefix(key);
+        g_free(key);
+
+        list = toolbars[i].current;
+        for (j = 0;; j++) {
+            gchar *item;
+
+            key = g_strdup_printf("Item%d", j);
+            item = gnome_config_get_string(key);
+            g_free(key);
+
+            if (!item)
+                break;
+            *list = g_slist_append(*list, g_strdup(item));
+            items++;
+        }
+        gnome_config_pop_prefix();
+    }
+
+    if (items)
+        return;
+
+    /* We didn't find new-style toolbar configs, so we'll try the old
+     * style */
+    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Toolbars/");
+    for (i = 0; i < ELEMENTS(toolbars); i++) {
+        guint type;
+
+        sprintf(tmpkey, "Toolbar%dID", i);
+        type = d_get_gint(tmpkey, -1);
+
+        if (type >= ELEMENTS(toolbars)) {
+            continue;
+        }
+
+        sprintf(tmpkey, "Toolbar%dItemCount", i);
+        items = d_get_gint(tmpkey, 0);
+
+        list = toolbars[type].current;
+        for (j = 0; j < items; j++) {
+            gchar *item;
+
+            sprintf(tmpkey, "Toolbar%dItem%d", i, j);
+            item = gnome_config_get_string(tmpkey);
+            *list = g_slist_append(*list, g_strdup(item));
+        }
     }
     gnome_config_pop_prefix();
 }
@@ -938,8 +961,7 @@ config_global_load(void)
 gint config_save(void)
 {
     gchar **open_mailboxes_vector;
-    gint i, j;
-	char tmpkey[32];
+    gint i;
 
     config_address_books_save();
     config_identities_save();
@@ -1172,24 +1194,9 @@ gint config_save(void)
 
     gnome_config_pop_prefix();
 
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Toolbars/");
-    gnome_config_set_int("WrapButtonText", balsa_app.toolbar_wrap_button_text);
+    /* Toolbars */
+    save_toolbars();
 
-    gnome_config_set_int("ToolbarCount", balsa_app.toolbar_count);
-    
-    for(i=0; i<balsa_app.toolbar_count; i++) {
-        sprintf(tmpkey, "Toolbar%dID", i);
-        gnome_config_set_int(tmpkey, balsa_app.toolbar_ids[i]);
-        
-        for(j=0;balsa_app.toolbars[i][j];j++) {
-            sprintf(tmpkey, "Toolbar%dItem%d", i, j);
-            gnome_config_set_string(tmpkey, balsa_app.toolbars[i][j]);
-        }
-        sprintf(tmpkey, "Toolbar%dItemCount", i);
-        gnome_config_set_int(tmpkey, j);
-    }
-    gnome_config_pop_prefix();
-    
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Paths/");
     if(balsa_app.attach_dir)
 	gnome_config_set_string("AttachDir", balsa_app.attach_dir);

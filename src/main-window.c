@@ -629,8 +629,8 @@ static GnomeUIInfo mailbox_menu[] = {
 static GnomeUIInfo settings_menu[] = {
 #define MENU_SETTINGS_PREFERENCES_POS 0
     GNOMEUIINFO_MENU_PREFERENCES_ITEM (open_preferences_manager, NULL),
-    GNOMEUIINFO_ITEM_STOCK(N_("_Customize..."),
-                           N_("Customize toolbars and menus"),
+    GNOMEUIINFO_ITEM_STOCK(N_("_Toolbars..."),
+                           N_("Customize toolbars"),
                            customize_dialog_cb,
                            GTK_STOCK_EXECUTE),
     GNOMEUIINFO_ITEM_STOCK(N_("_Identities..."), 
@@ -762,39 +762,90 @@ size_allocate_cb(GtkWidget * widget, GtkAllocation * alloc)
 	balsa_app.mblist_width = widget->parent->allocation.width;
 }
 
+/* Toolbar buttons and their callbacks. */
+static const struct callback_item {
+    const char* icon_id;
+    void (*callback)(GtkWidget *, gpointer);
+} callback_table[] = {
+    { BALSA_PIXMAP_SEND_RECEIVE,     send_receive_messages_cb },
+    { BALSA_PIXMAP_RECEIVE,          check_new_messages_cb },
+    { BALSA_PIXMAP_TRASH,            trash_message_cb },
+    { BALSA_PIXMAP_NEW,              new_message_cb },
+    { BALSA_PIXMAP_CONTINUE,         continue_message_cb },
+    { BALSA_PIXMAP_REPLY,            replyto_message_cb },
+    { BALSA_PIXMAP_REPLY_ALL,        replytoall_message_cb },
+    { BALSA_PIXMAP_REPLY_GROUP,      replytogroup_message_cb },
+    { BALSA_PIXMAP_FORWARD,          forward_message_default_cb },
+    { BALSA_PIXMAP_PREVIOUS,         previous_message_cb },
+    { BALSA_PIXMAP_NEXT,             next_message_cb },
+    { BALSA_PIXMAP_NEXT_UNREAD,      next_unread_message_cb },
+    { BALSA_PIXMAP_NEXT_FLAGGED,     next_flagged_message_cb },
+    { BALSA_PIXMAP_PRINT,            message_print_cb },
+    { BALSA_PIXMAP_MARKED_NEW,       toggle_new_message_cb },
+    { BALSA_PIXMAP_MARKED_ALL,       mark_all_cb },
+    { BALSA_PIXMAP_SHOW_HEADERS,     show_all_headers_tool_cb },
+    { BALSA_PIXMAP_TRASH_EMPTY,      (void(*)())empty_trash },
+    { BALSA_PIXMAP_CLOSE_MBOX,       mailbox_close_cb },
+    { BALSA_PIXMAP_SHOW_PREVIEW,     show_preview_pane_cb }
+};
+
+/* Standard buttons; "" means a separator. */
+static const gchar* main_toolbar[] = {
+    BALSA_PIXMAP_RECEIVE,
+    "",
+    BALSA_PIXMAP_TRASH,
+    "",
+    BALSA_PIXMAP_NEW,
+    BALSA_PIXMAP_CONTINUE,
+    BALSA_PIXMAP_REPLY,
+    BALSA_PIXMAP_REPLY_ALL,
+    BALSA_PIXMAP_FORWARD,
+    "",
+    BALSA_PIXMAP_PREVIOUS,
+    BALSA_PIXMAP_NEXT,
+    BALSA_PIXMAP_NEXT_UNREAD,
+    "",
+    BALSA_PIXMAP_PRINT
+};
+
+/* Create the toolbar model for the main window's toolbar.
+ */
+BalsaToolbarModel *
+balsa_window_get_toolbar_model(void)
+{
+    static BalsaToolbarModel *model = NULL;
+    GSList *legal;
+    GSList *standard;
+    GSList **current;
+    guint i;
+
+    if (model)
+        return model;
+
+    legal = NULL;
+    for (i = 0; i < ELEMENTS(callback_table); i++)
+        legal = g_slist_append(legal, g_strdup(callback_table[i].icon_id));
+
+    standard = NULL;
+    for (i = 0; i < ELEMENTS(main_toolbar); i++)
+        standard = g_slist_append(standard, g_strdup(main_toolbar[i]));
+
+    current = &balsa_app.main_window_toolbar_current;
+
+    model = balsa_toolbar_model_new(legal, standard, current);
+
+    return model;
+}
+
 GtkWidget *
 balsa_window_new()
 {
-    static const struct callback_item {
-        const char* icon_id;
-        void (*callback)(GtkWidget *, gpointer);
-    } callback_table[] = {
-        { BALSA_PIXMAP_SEND_RECEIVE,     send_receive_messages_cb },
-        { BALSA_PIXMAP_RECEIVE,          check_new_messages_cb },
-        { BALSA_PIXMAP_TRASH,            trash_message_cb },
-        { BALSA_PIXMAP_NEW,              new_message_cb },
-        { BALSA_PIXMAP_CONTINUE,         continue_message_cb },
-        { BALSA_PIXMAP_REPLY,            replyto_message_cb },
-        { BALSA_PIXMAP_REPLY_ALL,        replytoall_message_cb },
-        { BALSA_PIXMAP_REPLY_GROUP,      replytogroup_message_cb },
-        { BALSA_PIXMAP_FORWARD,          forward_message_default_cb },
-        { BALSA_PIXMAP_PREVIOUS,         previous_message_cb },
-        { BALSA_PIXMAP_NEXT,             next_message_cb },
-        { BALSA_PIXMAP_NEXT_UNREAD,      next_unread_message_cb },
-        { BALSA_PIXMAP_NEXT_FLAGGED,     next_flagged_message_cb },
-        { BALSA_PIXMAP_PRINT,            message_print_cb },
-        { BALSA_PIXMAP_MARKED_NEW,       toggle_new_message_cb },
-        { BALSA_PIXMAP_MARKED_ALL,       mark_all_cb },
-        { BALSA_PIXMAP_SHOW_HEADERS,     show_all_headers_tool_cb },
-        { BALSA_PIXMAP_TRASH_EMPTY,      (void(*)())empty_trash },
-        { BALSA_PIXMAP_CLOSE_MBOX,       mailbox_close_cb },
-        { BALSA_PIXMAP_SHOW_PREVIEW,     show_preview_pane_cb }
-    };
 
     BalsaWindow *window;
+    BalsaToolbarModel *model;
+    GtkWidget *toolbar;
     GnomeAppBar *appbar;
     GtkWidget *scroll;
-    GtkWidget* btn;
     unsigned i;
 
     /* Call to register custom balsa pixmaps with GNOME_STOCK_PIXMAPS
@@ -809,12 +860,14 @@ balsa_window_new()
 
     gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, window);
 
+    model = balsa_window_get_toolbar_model();
+    toolbar = balsa_toolbar_new(model);
     for(i=0; i < ELEMENTS(callback_table); i++)
-        set_toolbar_button_callback(TOOLBAR_MAIN, callback_table[i].icon_id,
-                                    callback_table[i].callback, window);
+        balsa_toolbar_set_callback(toolbar, callback_table[i].icon_id,
+                                   G_CALLBACK(callback_table[i].callback),
+                                   window);
 
-    gnome_app_set_toolbar(GNOME_APP(window),
-                          get_toolbar(GTK_WIDGET(window), TOOLBAR_MAIN));
+    gnome_app_set_toolbar(GNOME_APP(window), GTK_TOOLBAR(toolbar));
     
     appbar =
         GNOME_APPBAR(gnome_appbar_new(TRUE, TRUE, GNOME_PREFERENCES_USER));
@@ -944,9 +997,8 @@ balsa_window_new()
     gdk_threads_leave();*/
 
     /* set initial state of toggle preview pane button */
-    btn=get_tool_widget(GTK_WIDGET(balsa_app.main_window), 0, BALSA_PIXMAP_SHOW_PREVIEW);
-    if (btn)
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(btn), balsa_app.previewpane);
+    balsa_toolbar_set_button_active(toolbar, BALSA_PIXMAP_SHOW_PREVIEW,
+                                    balsa_app.previewpane);
 
     /* we can only set icon after realization, as we have no windows before. */
     g_signal_connect(G_OBJECT(window), "realize",
@@ -987,6 +1039,8 @@ enable_mailbox_menus(BalsaIndex * index)
     LibBalsaMailbox *mailbox = NULL;
     BalsaMailboxNode *mbnode = NULL;
     gboolean enable;
+    GtkWidget *toolbar =
+        balsa_toolbar_get_from_gnome_app(GNOME_APP(balsa_app.main_window));
     unsigned i;
 
     enable = (index != NULL);
@@ -1003,22 +1057,20 @@ enable_mailbox_menus(BalsaIndex * index)
     }
 
     /* Toolbar */
-    set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
-                                 0, BALSA_PIXMAP_PREVIOUS, 
-                                 index && index->prev_message);
-    set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
-                                 0, BALSA_PIXMAP_NEXT, 
-                                 index && index->next_message);
-    set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
-                                 0, BALSA_PIXMAP_NEXT_UNREAD, 
-                                 mailbox && mailbox->unread_messages > 0);
-    set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
-                                 0, BALSA_PIXMAP_NEXT_FLAGGED, 
-                                 mailbox && mailbox->total_messages > 0);
-    set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
-                                 0, BALSA_PIXMAP_CLOSE_MBOX, enable);
-    set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
-                                 0, BALSA_PIXMAP_MARKED_ALL, enable);
+    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_PREVIOUS, 
+                                       index && index->prev_message);
+    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT, 
+                                       index && index->next_message);
+    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT_UNREAD, 
+                                       mailbox 
+                                       && mailbox->unread_messages > 0);
+    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT_FLAGGED, 
+                                       mailbox
+                                       && mailbox->total_messages > 0);
+    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_CLOSE_MBOX,
+                                       enable);
+    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_MARKED_ALL,
+                                       enable);
 
     /* Menu entries */
     for(i=0; i < ELEMENTS(mailbox_menu_entries); i++)
@@ -1066,6 +1118,9 @@ enable_message_menus(LibBalsaMessage * message)
     };
     gboolean enable, enable_mod, enable_multi;
     guint i;
+    GtkWidget *toolbar =
+        balsa_toolbar_get_from_gnome_app(GNOME_APP(balsa_app.main_window));
+
     enable       = (message != NULL);
     enable_mod   = (message && !message->mailbox->readonly);
     enable_multi = (message && libbalsa_message_is_multipart(message));
@@ -1073,8 +1128,8 @@ enable_message_menus(LibBalsaMessage * message)
     /* Handle menu items which require write access to mailbox */
     for(i=0; i<ELEMENTS(mods); i++)
         gtk_widget_set_sensitive(mods[i]->widget, enable_mod);
-    set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
-                                 0, BALSA_PIXMAP_TRASH, enable_mod);
+    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_TRASH,
+                                       enable_mod);
 
     /* Handle items which require multiple parts to the mail */
     gtk_widget_set_sensitive(message_menu
@@ -1089,8 +1144,7 @@ enable_message_menus(LibBalsaMessage * message)
 
     /* Toolbar */
     for(i=0; i<ELEMENTS(tools); i++)
-        set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
-                        0, tools[i], enable);
+        balsa_toolbar_set_button_sensitive(toolbar, tools[i], enable);
 
     balsa_window_enable_continue();
 }
@@ -1126,6 +1180,8 @@ enable_edit_menus(BalsaMessage * bm)
 void
 enable_empty_trash(TrashState status)
 {
+    GtkWidget *toolbar =
+        balsa_toolbar_get_from_gnome_app(GNOME_APP(balsa_app.main_window));
     gboolean set = TRUE;
     if (balsa_app.trash->open_ref) {
         set = balsa_app.trash->total_messages > 0;
@@ -1152,8 +1208,8 @@ enable_empty_trash(TrashState status)
             break;
         }
     }
-    set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window), 0,
-                                 BALSA_PIXMAP_TRASH_EMPTY, set);
+    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_TRASH_EMPTY,
+                                       set);
     gtk_widget_set_sensitive(mailbox_menu[MENU_MAILBOX_EMPTY_TRASH_POS].widget,
                              set);
 }
@@ -1164,6 +1220,9 @@ enable_empty_trash(TrashState status)
 void
 balsa_window_enable_continue(void)
 {
+    GtkWidget *toolbar =
+        balsa_toolbar_get_from_gnome_app(GNOME_APP(balsa_app.main_window));
+
     /* Check msg count in draftbox */
     if (balsa_app.draftbox) {
         /* This is commented out because it causes long delays and
@@ -1177,8 +1236,7 @@ balsa_window_enable_continue(void)
         gboolean n = balsa_app.draftbox->open_ref == 0
             || balsa_app.draftbox->total_messages;
 
-        set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
-                        0, BALSA_PIXMAP_CONTINUE, n);
+        balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_CONTINUE, n);
         gtk_widget_set_sensitive(file_menu[MENU_FILE_CONTINUE_POS].widget, n);
 
 /*      libbalsa_mailbox_close(balsa_app.draftbox); */
@@ -1520,10 +1578,6 @@ balsa_window_refresh(BalsaWindow * window)
 	   screens and all :) */
 	gtk_paned_set_position(GTK_PANED(paned), G_MAXINT);
     }
-
-    /* I don't know if this is a bug of gtk or not but if this is not here
-       it doesn't properly resize after a toolbar style change */
-    gtk_widget_queue_resize(GTK_WIDGET(window));
 }
 
 /* monitored functions for MT-safe manipulation of the open mailbox list
@@ -3462,13 +3516,11 @@ mark_all_cb(GtkWidget * widget, gpointer data)
 static void
 show_all_headers_tool_cb(GtkWidget * widget, gpointer data)
 {
-    GtkWidget *btn;
+    GtkWidget *toolbar = balsa_toolbar_get_from_gnome_app(GNOME_APP(data));
     BalsaWindow *bw;
 
-    btn=get_tool_widget(GTK_WIDGET(balsa_app.main_window), 0, BALSA_PIXMAP_SHOW_HEADERS);
-    if(!btn)
-        return;
-    if(GTK_TOGGLE_BUTTON(btn)->active) {
+    if (balsa_toolbar_get_button_active(toolbar,
+                                        BALSA_PIXMAP_SHOW_HEADERS)) {
         show_all_headers_save=balsa_app.shown_headers;
         balsa_app.shown_headers=HEADERS_ALL;
         bw = BALSA_WINDOW(data);
@@ -3498,26 +3550,21 @@ show_all_headers_tool_cb(GtkWidget * widget, gpointer data)
 void
 reset_show_all_headers(void)
 {
-    GtkWidget *btn;
+    GtkWidget *toolbar =
+        balsa_toolbar_get_from_gnome_app(GNOME_APP(balsa_app.main_window));
 
     show_all_headers_save=-1;
-    btn=get_tool_widget(GTK_WIDGET(balsa_app.main_window), 0,
-                        BALSA_PIXMAP_SHOW_HEADERS);
-    if(btn)
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(btn), FALSE);
+    balsa_toolbar_set_button_active(toolbar, BALSA_PIXMAP_SHOW_HEADERS,
+                                    FALSE);
 }
 
 static void
 show_preview_pane_cb(GtkWidget * widget, gpointer data)
 {
-    GtkWidget *btn;
+    GtkWidget *toolbar = balsa_toolbar_get_from_gnome_app(GNOME_APP(data));
 
-    btn=get_tool_widget(GTK_WIDGET(balsa_app.main_window), TOOLBAR_MAIN,
-			BALSA_PIXMAP_SHOW_PREVIEW);
-    if(!btn)
-	return;
-
-    balsa_app.previewpane = GTK_TOGGLE_BUTTON(btn)->active;
+    balsa_app.previewpane =
+        balsa_toolbar_get_button_active(toolbar, BALSA_PIXMAP_SHOW_PREVIEW);
     balsa_window_refresh(balsa_app.main_window);
 }
 

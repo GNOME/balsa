@@ -47,81 +47,44 @@
 #include "toolbar-prefs.h"
 #include "toolbar-factory.h"
 
-struct toolbar_bdata {
+/* Structures for holding various details */
+
+/* one per type of toolbar */
+struct BalsaToolbarModel_ {
+    GSList *legal;
+    GSList *standard;
+    GSList **current;
+};
+
+/* one per instance of a toolbar: */
+typedef struct BalsaToolbarData_ BalsaToolbarData;
+struct BalsaToolbarData_ {
+    BalsaToolbarModel *model;   /* the model for toolbars of this type */
+    GHashTable *table;          /* hash table of icons:
+                                   id -> BalsaToolbarIcon */
+};
+
+/* one per icon per instance of a toolbar: */
+typedef struct BalsaToolbarIcon_ BalsaToolbarIcon;
+struct BalsaToolbarIcon_ {
     GtkWidget *widget;
-    void (*callback)(GtkWidget *, gpointer);
-    gpointer data;
-    const char *id;
-    int disabled;
-    int position;
-} toolbar_data[MAXTOOLBARS][MAXTOOLBARITEMS] = { { {0} } };
-
-static struct toolbar_bmap
-{
-    GtkWidget *window;
-    GtkWidget *toolbar;
-    BalsaToolbarType type;
-} toolbar_map[100];
-static int toolbar_map_entries=0;
-
-static char *toolbar0_legal[]={
-    "",
-    BALSA_PIXMAP_CLOSE_MBOX,
-    BALSA_PIXMAP_CONTINUE,
-    BALSA_PIXMAP_FORWARD,
-    BALSA_PIXMAP_MARKED_ALL,
-    BALSA_PIXMAP_MARKED_NEW,
-    BALSA_PIXMAP_NEW,
-    BALSA_PIXMAP_NEXT,
-    BALSA_PIXMAP_NEXT_FLAGGED,
-    BALSA_PIXMAP_NEXT_UNREAD,
-    BALSA_PIXMAP_PREVIOUS,
-    BALSA_PIXMAP_PRINT,
-    BALSA_PIXMAP_RECEIVE,
-    BALSA_PIXMAP_REPLY,
-    BALSA_PIXMAP_REPLY_ALL,
-    BALSA_PIXMAP_REPLY_GROUP,
-    BALSA_PIXMAP_SEND_RECEIVE,
-    BALSA_PIXMAP_SHOW_HEADERS,
-    BALSA_PIXMAP_SHOW_PREVIEW,
-    BALSA_PIXMAP_TRASH,
-    BALSA_PIXMAP_TRASH_EMPTY,
-    NULL
+    GCallback callback;
+    gpointer user_data;
+    gboolean sensitive;
+    gboolean active;
 };
 
-static char *toolbar1_legal[]={
-    "",
-    BALSA_PIXMAP_ATTACHMENT,
-    BALSA_PIXMAP_IDENTITY,
-    BALSA_PIXMAP_POSTPONE,
-    BALSA_PIXMAP_PRINT,
-    BALSA_PIXMAP_SAVE,
-    BALSA_PIXMAP_SEND,
-    GTK_STOCK_CLOSE,
-    GTK_STOCK_SPELL_CHECK,
-    NULL
-};
+/* callbacks */
+static void bt_button_toggled(GtkToggleButton * button,
+                              BalsaToolbarIcon * bti);
+static void bt_destroy(GtkWidget * toolbar, BalsaToolbarData * btd);
 
-static char *toolbar2_legal[]={
-    "",
-    BALSA_PIXMAP_FORWARD,
-    BALSA_PIXMAP_NEXT,
-    BALSA_PIXMAP_NEXT_FLAGGED,
-    BALSA_PIXMAP_NEXT_UNREAD,
-    BALSA_PIXMAP_PREVIOUS,
-    BALSA_PIXMAP_PRINT,
-    BALSA_PIXMAP_REPLY,
-    BALSA_PIXMAP_REPLY_ALL,
-    BALSA_PIXMAP_REPLY_GROUP,
-    BALSA_PIXMAP_SAVE,
-    BALSA_PIXMAP_SHOW_HEADERS,
-    BALSA_PIXMAP_TRASH,
-    BALSA_PIXMAP_TRASH_EMPTY,
-    GTK_STOCK_CLOSE,
-    NULL
-};
+/* forward references */
+static BalsaToolbarData *bt_data_new(BalsaToolbarModel * model);
+static BalsaToolbarIcon *bt_get_icon(GtkWidget * toolbar,
+                                     const gchar * icon);
 
-static char **toolbar_legal[]={toolbar0_legal, toolbar1_legal, toolbar2_legal};
+static GSList *toolbar_list;
 
 /* The descriptions must be SHORT */
 button_data toolbar_buttons[]={
@@ -182,525 +145,27 @@ button_data toolbar_buttons[]={
      N_("Show preview pane"), TOOLBAR_BUTTON_TYPE_TOGGLE}
 };
 
-const int toolbar_button_count = sizeof(toolbar_buttons)
-     /sizeof(button_data);
+const int toolbar_button_count =
+    sizeof(toolbar_buttons) / sizeof(button_data);
 
-static void populate_stock_toolbar(int bar, BalsaToolbarType id);
-static int get_toolbar_button_slot(BalsaToolbarType toolbar, const char *id);
-static GtkToolbar *get_bar_instance(GtkWidget *window, 
-				    BalsaToolbarType toolbar);
-static int get_position_value(BalsaToolbarType toolbar, const char *id);
+/* Public methods. */
 
-#ifdef NEW_GTK
-#define balsa_toolbar_remove_all(bar,j) gtk_toolbar_remove_all(bar)
-#else
 /* this should go to GTK because it modifies its internal structures. */
 void
-balsa_toolbar_remove_all(GtkToolbar *toolbar)
+balsa_toolbar_remove_all(GtkWidget * widget)
 {
+    GtkToolbar *toolbar = GTK_TOOLBAR(widget);
     GList *children;
-    
-    g_return_if_fail (GTK_IS_TOOLBAR (toolbar));
     
     for (children = toolbar->children; children; children = children->next) {
 	GtkToolbarChild *child = children->data;
 	
-	if (child->type != GTK_TOOLBAR_CHILD_SPACE) {
-#ifdef REMOVE_TOOLBAR_ITEMS_VERY_CAUTIOUSLY
-	    gtk_widget_ref (child->widget);
-	    gtk_widget_unparent (child->widget);
-	    gtk_widget_destroy (child->widget);
-	    gtk_widget_unref (child->widget);
-#else 
-	    gtk_widget_unparent (child->widget);
-#endif /* REMOVE_TOOLBAR_ITEMS_VERY_CAUTIOUSLY */
-	}
-	g_free (child);
+	if (child->type != GTK_TOOLBAR_CHILD_SPACE)
+	    gtk_widget_unparent(child->widget);
+	g_free(child);
     }
-    g_list_free (toolbar->children);
+    g_list_free(toolbar->children);
     toolbar->children = NULL;
-    gtk_widget_queue_resize (GTK_WIDGET (toolbar));
-}
-#endif
-
-static int
-get_position_value(BalsaToolbarType toolbar, const char *id)
-{
-    int i;
-
-    for(i=0; i<MAXTOOLBARITEMS; i++)  {
-	if(toolbar_data[toolbar][i].id &&
-	   !strcmp(toolbar_data[toolbar][i].id, id))
-	    break;
-    }
-    if(i == MAXTOOLBARITEMS)
-	return -1;
-    return toolbar_data[toolbar][i].position;
-}
-
-/* get_tool_widget:
-   Get the GtkWidget * to a button in a specific toolbar.
-
-   Parameters:
-   		window		The window the toolbar is attached to
-		toolbar		The type of the toolbar to search
-		id			The ID string of the button pixmap
-
-   Returns:
-   		GtkWidget *, or NULL if error / not found
-*/
-GtkWidget *
-get_tool_widget(GtkWidget *window, BalsaToolbarType toolbar, const char *id)
-{
-    GtkToolbar *bar;
-    GList *children;
-    int position;
-    GtkWidget *child;
-
-    bar=get_bar_instance(window, toolbar);
-    if(!bar)
-	return NULL;
-    
-    position=get_position_value(toolbar, id);
-    if (position < 0)
-	return NULL;
-    
-    children = gtk_container_get_children(GTK_CONTAINER(bar));
-    child = GTK_WIDGET(g_list_nth_data(children, position));
-    g_list_free(children);
-
-    return child;
-}
-
-/* get_bar_instance:
-   Get a pointer to the toolbar for a given window
-
-   Parameters:
-   	window		Window the toolbar is attached to
-	toolbar		The type of the toolbar
-
-   Returns:
-   	GtkToolbar *, or NULL if error / not found
-
-   Notes:
-   	Uses the internal map tables, _not_ the GtkWidget "children" list
-*/
-static GtkToolbar*
-get_bar_instance(GtkWidget *window, BalsaToolbarType toolbar)
-{
-    int i;
-
-    for(i=0; i<toolbar_map_entries; i++)  {
-	if(toolbar_map[i].window == window &&
-	   toolbar_map[i].type == toolbar)
-	    return GTK_TOOLBAR(toolbar_map[i].toolbar);
-    }
-    return NULL;
-}
-
-static const gchar* main_toolbar[] = {
-    BALSA_PIXMAP_RECEIVE,
-    "",
-    BALSA_PIXMAP_TRASH,
-    "",
-    BALSA_PIXMAP_NEW,
-    BALSA_PIXMAP_CONTINUE,
-    BALSA_PIXMAP_REPLY,
-    BALSA_PIXMAP_REPLY_ALL,
-    BALSA_PIXMAP_FORWARD,
-    "",
-    BALSA_PIXMAP_PREVIOUS,
-    BALSA_PIXMAP_NEXT,
-    BALSA_PIXMAP_NEXT_UNREAD,
-    "",
-    BALSA_PIXMAP_PRINT,
-    NULL
-};
-
-static const gchar* compose_toolbar[] = {
-    BALSA_PIXMAP_SEND,
-    "",
-    BALSA_PIXMAP_ATTACHMENT,
-    "",
-    BALSA_PIXMAP_SAVE,
-    "",
-    BALSA_PIXMAP_IDENTITY,
-    "",
-    GTK_STOCK_SPELL_CHECK,
-    "",
-    BALSA_PIXMAP_PRINT,
-    "",
-    GTK_STOCK_CLOSE,
-    NULL
-};
-
-static const gchar* message_toolbar[] = {
-    BALSA_PIXMAP_NEXT_UNREAD,
-    "",
-    BALSA_PIXMAP_REPLY,
-    BALSA_PIXMAP_REPLY_ALL,
-    BALSA_PIXMAP_REPLY_GROUP,
-    BALSA_PIXMAP_FORWARD,
-    "",
-    BALSA_PIXMAP_PREVIOUS,
-    BALSA_PIXMAP_NEXT,
-    BALSA_PIXMAP_SAVE,
-    "",
-    BALSA_PIXMAP_PRINT,
-    "",
-    BALSA_PIXMAP_TRASH,
-    NULL
-};
-
-static const gchar* null_toolbar[] = { NULL };
-
-static void
-populate_stock_toolbar(int index, BalsaToolbarType id)
-{
-    const gchar** toolbar;
-    int i;
-
-    switch(id) {
-    case TOOLBAR_MAIN:     toolbar = main_toolbar;    break;
-    case TOOLBAR_COMPOSE:  toolbar = compose_toolbar; break; 
-    case TOOLBAR_MESSAGE:  toolbar = message_toolbar; break;
-    default:               toolbar = null_toolbar;    break;
-    }
-    for(i=0; toolbar[i]; i++)
-	balsa_app.toolbars[index][i] = g_strdup(toolbar[i]);
-    balsa_app.toolbars[index][i]= NULL;
-}
-
-/* get_toolbar_index:
-   Get the index of the given toolbar in the data read from config
-   
-   Toolbar numbering in the config file is dependent on the order in that
-   each toolbar was customized. Therefore, the toolbar ID is not the same
-   as the config index. This maps the toolbar id to the config index.
-
-   Parameters:
-   	id		ID of the desired toolbar
-
-   Returns:
-   	Toolbar index in config data, or -1 if error / not found
-*/
-int
-get_toolbar_index(BalsaToolbarType id)
-{
-    int i;
-    
-    for(i=0; i<balsa_app.toolbar_count; i++)
-	if(balsa_app.toolbar_ids[i] == id)
-	    return i;
-    
-    return -1;
-}
-
-/* create_stock_toolbar:
-   Create a stock toolbar (uncustomized version) from the tables in this file
-   
-   This function is called to create a toolbar template when a toolbar has
-   never been customized.
-
-   Parameters:
-   	id			ID of the toolbar to create
-
-   Returns:
-	0 if OK, -1 if there are too many toolbars.
-*/
-int
-create_stock_toolbar(BalsaToolbarType id)
-{
-    int newbar;
-    
-    if(get_toolbar_index(id) != -1)
-	return 0;
-    
-    /* Create new toolbar */
-    if(balsa_app.toolbar_count >= MAXTOOLBARS)
-	return -1;
-    
-    newbar = balsa_app.toolbar_count++;
-    
-    balsa_app.toolbars[newbar]=
-	(char **)g_malloc(sizeof(char *)*MAXTOOLBARITEMS);
-    
-    populate_stock_toolbar(newbar, id);
-    balsa_app.toolbar_ids[newbar]=id;
-    
-    return 0;
-}
-
-/* get_toolbar:
-   This is the main toolbar generating function
-
-   It will check if there is a toolbar for the given window/type combination
-   If one is found, it will empty and repopulate it, if none is found it
-   will create one, enter it into the local tables and fill it with the
-   buttons loaded from config or a default set of buttons.
-
-   The first time this function is called for a given window, thr caller
-   is responsible for attaching the newly created toolbar to it's window.
-   On subsequent calls for the same window / id combination this _must_ not
-   be done.
-   Once the toolbar is attached to a window, it will be updated in place. It
-   will never be destroyed for the lifetime of the window. Therefore, the
-   results of calling any of the toolbar add functions on the second and
-   further calls to this function will yield unsightly results and maybe
-   cause crashes.
-
-   Correct usage is:
-   	-	Call get_toolbar _once_ during window construction. Attach the
-		returned toolbar handle to the window.
-	-	When a toolbar needs to be refreshed, call get_toolbar again, but
-		_discard_ the return value
-	-	In a "destroy" handler for a window, call release_toolbars
-   
-   Parameters:
-	window		the GtkWindow for which a toolbar should be created
-	toolbar		the ID of the toolbar to create
-
-   Returns:
-    a GtkToolbar *, or NULL if error
-*/
-GtkToolbar *
-get_toolbar(GtkWidget *window, BalsaToolbarType toolbar)
-{
-    GtkToolbar *bar;
-    int index;
-    int i, j, button;
-    int position;
-    int type;
-    char *tmp, *text;
-    struct toolbar_bdata tmpdata[MAXTOOLBARITEMS];
-
-    memset((char *)&tmpdata, 0, sizeof(tmpdata));
-
-    for(i=0; i<MAXTOOLBARITEMS; i++) {
-	tmpdata[i]=toolbar_data[toolbar][i];
-	tmpdata[i].widget=NULL;
-	tmpdata[i].position=-1;
-    }
-	
-    for(i=0; i<toolbar_map_entries; i++) {
-	if(toolbar_map[i].window == window && toolbar_map[i].type == toolbar)
-	    break;
-    }
-    if(i == toolbar_map_entries) {
-	if(i >= 100) /* FIXME: what is this magic number? */
-	    return NULL;
-	++toolbar_map_entries;
-#if BALSA_MAJOR < 2
-	bar=GTK_TOOLBAR(gtk_toolbar_new(GTK_ORIENTATION_HORIZONTAL,
-					GTK_TOOLBAR_BOTH));
-#else
-        bar = GTK_TOOLBAR(gtk_toolbar_new());
-        gtk_toolbar_set_orientation(bar, GTK_ORIENTATION_HORIZONTAL);
-#endif                          /* BALSA_MAJOR < 2 */
-    } else {
-	bar=GTK_TOOLBAR(toolbar_map[i].toolbar);
-	/* remove all items from the existing bar. */
-	balsa_toolbar_remove_all(bar);
-    }
-
-    toolbar_map[i].toolbar=GTK_WIDGET(bar);
-    toolbar_map[i].window=window;
-    toolbar_map[i].type=toolbar;
-    
-#if BALSA_MAJOR < 2
-    gtk_toolbar_set_space_style(bar, GTK_TOOLBAR_SPACE_LINE);
-#endif                          /* BALSA_MAJOR < 2 */
-    
-    if(create_stock_toolbar(toolbar) == -1)
-	return NULL;
-
-    index=get_toolbar_index(toolbar);
-    if(index == -1)
-	return NULL;
-
-    position=0;
-    for(j=0; balsa_app.toolbars[index][j]; j++) {
-	button=get_toolbar_button_index(balsa_app.toolbars[index][j]);
-	
-	if(button == -1) {
-	    g_warning("button '%s' not found. ABORT!\n",
-		      balsa_app.toolbars[index][j]);
-	    continue;
-	}
-
-	if(!*(balsa_app.toolbars[index][j])) {
-	    gtk_toolbar_append_space(bar);
-	    continue;
-	}
-	for(i=0; i<MAXTOOLBARITEMS; i++) {
-	    if(tmpdata[i].id &&
-	       !strcmp(tmpdata[i].id, toolbar_buttons[button].pixmap_id))
-		break;
-	}
-
-	if(i != MAXTOOLBARITEMS && tmpdata[i].widget == NULL) {
-	    text=tmp=g_strdup(_(toolbar_buttons[button].button_text));
-	    if(!balsa_app.toolbar_wrap_button_text)
-		while(*tmp) {
-		    if(*tmp == '\n')
-			*tmp=' ';
-		    ++tmp;
-		}
-	    switch(toolbar_buttons[button].type) {
-	    case TOOLBAR_BUTTON_TYPE_RADIO:
-		type=GTK_TOOLBAR_CHILD_RADIOBUTTON;
-		break;
-	    case TOOLBAR_BUTTON_TYPE_TOGGLE:
-		type=GTK_TOOLBAR_CHILD_TOGGLEBUTTON;
-		break;
-	    case TOOLBAR_BUTTON_TYPE_BUTTON:
-	    default:
-		type=GTK_TOOLBAR_CHILD_BUTTON;
-		break;
-	    }
-	    tmpdata[i].widget=
-		gtk_toolbar_append_element(
-		    bar, type, NULL, text, 
-		    _(toolbar_buttons[button].help_text),
-		    _(toolbar_buttons[button].help_text),
-#if BALSA_MAJOR < 2
-		    gnome_stock_pixmap_widget(
-			window, toolbar_buttons[button].pixmap_id),
-#else
-                    gtk_image_new_from_stock(toolbar_buttons[button].pixmap_id,
-                                             GTK_ICON_SIZE_LARGE_TOOLBAR),
-#endif                          /* BALSA_MAJOR < 2 */
-		    GTK_SIGNAL_FUNC(tmpdata[i].callback),
-		    tmpdata[i].data != NULL ? tmpdata[i].data : window);
-	    g_free(text);
-	    tmpdata[i].position=position++;
-	    gtk_widget_set_sensitive(tmpdata[i].widget, !tmpdata[i].disabled);
-	}
-    }
-    
-    for(i=0; i<MAXTOOLBARITEMS; i++)
-	toolbar_data[toolbar][i]=tmpdata[i];
-    
-    gtk_widget_show_all(GTK_WIDGET(bar));
-
-    return bar;
-}
-
-static int
-get_toolbar_button_slot(BalsaToolbarType toolbar, const char *id)
-{
-    int i;
-    
-    for(i=0;i<MAXTOOLBARITEMS &&
-	    (toolbar_data[toolbar][i].widget ||
-	     toolbar_data[toolbar][i].id);i++) {
-	if(toolbar_data[toolbar][i].id &&
-	   !strcmp(id, toolbar_data[toolbar][i].id))
-	    return i;
-    }
-    if(i == MAXTOOLBARITEMS)
-	return -1;
-	
-    toolbar_data[toolbar][i].id=id;
-    return i;
-}
-
-/* set_toolbar_button_callback:
-   This _must_ be called for each toolbar button to set a handler
-   _before_ get_toolbar is called. Failure to do so will keep the
-   buttons without handlers from appearing on the toolbar
-
-   Parameters:
-   	toolbar		ID of the toolbar to set callbacks for
-	id			Pixmap ID of the button to associate
-	callback	The callback function
-	data		User data to be passed to the callback
-
-   Returns:
-   	nothing
-
-   Notes:
-   	If data == NULL, the GtkWidget * of the toolbar's parent window will
-	be passed to the callback
-
-*/
-void
-set_toolbar_button_callback(BalsaToolbarType toolbar, const char *id, 
-			    void (*callback)(GtkWidget *, gpointer), 
-			    gpointer data)
-{
-    int slot;
-    
-    slot=get_toolbar_button_slot(toolbar, id);
-    if(slot == -1)
-	return;
-	
-    toolbar_data[toolbar][slot].callback=callback;
-    toolbar_data[toolbar][slot].data=data;
-}
-
-/* set_toolbar_button_sensitive:
-   Sensitize or desensitize a toolbar button
-
-   This should be used in preference to gtk_widget_set_sensitive because it
-   also sets internal flags. This way sensitivity will be preserved across
-   toolbar reconfiguration.
-
-   Parameters:
-   	window		Window * of the toolbar's parent window
-	toolbar		Type if the toolbar
-	id			Pixmap ID of the button to set
-	sensitive	1 sets sensitive, 0 desensitizes
-
-   Notes:
-   	This function may be called before the toolbar is instantiated using
-	get_toolbar.
-*/
-void
-set_toolbar_button_sensitive(GtkWidget *window, BalsaToolbarType toolbar, 
-			     const char *id, int sensitive)
-{
-    int slot;
-    GtkWidget *widget;
-
-    slot=get_toolbar_button_slot(toolbar, id);
-    if(slot == -1)
-	return;
-	
-    toolbar_data[toolbar][slot].disabled=!sensitive;
-
-    widget=get_tool_widget(window, toolbar, id);
-    if(widget)
-	gtk_widget_set_sensitive(widget, sensitive);
-}
-
-/* release_toolbars:
-   Another mainstay of the toolbar system. This function will release the
-   toolbar from the module internal data tables. These tables have a finite
-   (100) size and may overflow if toolbars are not released. The proper way
-   to do this is to call release_toolbars from a "destroy" handler for the
-   window using the toolbar.
-
-   Parameters:
-   	window		The window that is being destroyed
-
-   Returns:
-   	nothing
-*/
-void
-release_toolbars(GtkWidget *window)
-{
-    int i;
-
-    for(i=0; i<toolbar_map_entries; i++) {
-	if(toolbar_map[i].window == window) {
-	    if(i < toolbar_map_entries-1)
-		toolbar_map[i]=toolbar_map[toolbar_map_entries-1];
-
-	    toolbar_map_entries--;
-	    i--;
-	}
-    }
 }
 
 /* update_all_toolbars:
@@ -712,22 +177,300 @@ release_toolbars(GtkWidget *window)
 void
 update_all_toolbars(void)
 {
-    int i;
+    GSList *list;
 
-    for(i=0; i<toolbar_map_entries; i++)
-	get_toolbar(toolbar_map[i].window, toolbar_map[i].type);
+    for (list = toolbar_list; list; list = g_slist_next(list))
+        balsa_toolbar_refresh(GTK_WIDGET(list->data));
 }
 
-/* get_legal_toolbar_buttons:
-   Returns a pointer to an array of char * listing the buttons that can
-   be placed on the given toolbar. A pointer to an empty string, if present,
-   _must_ be the first item and means that separators are legal to insert
-   in the given toolbar. If the first item is not a separator, the behavior
-   of the preferences dialog is undefined.
-*/
-char**
-get_legal_toolbar_buttons(int toolbar)
+#define BALSA_KEY_TOOLBAR_DATA "balsa-toolbar-data"
+
+/* Create a BalsaToolbarModel structure.
+ */
+BalsaToolbarModel *
+balsa_toolbar_model_new(GSList * legal, GSList * standard,
+                        GSList ** current)
 {
-    return(toolbar_legal[toolbar]);
+    BalsaToolbarModel *model = g_new(BalsaToolbarModel, 1);
+    model->legal = legal;
+    model->standard = standard;
+    model->current = current;
+    return model;
 }
 
+/* Return the legal icons.
+ */
+GSList *
+balsa_toolbar_model_get_legal(BalsaToolbarModel * model)
+{
+    return model->legal;
+}
+
+/* Return the current icons.
+ */
+GSList *
+balsa_toolbar_model_get_current(BalsaToolbarModel * model)
+{
+    return *model->current ? *model->current : model->standard;
+}
+
+/* Add an icon to the list of current icons in a BalsaToolbarModel.
+ */
+void
+balsa_toolbar_model_insert_icon(BalsaToolbarModel * model, gchar * icon,
+                                gint position)
+{
+    if (get_toolbar_button_index(icon) >= 0)
+        *model->current =
+            g_slist_insert(*model->current, g_strdup(icon), position);
+    else
+        g_warning(_("Unknown toolbar icon \"%s\""), icon);
+}
+
+/* Remove all icons from the BalsaToolbarModel.
+ */
+void 
+balsa_toolbar_model_clear(BalsaToolbarModel * model)
+{
+    g_slist_foreach(*model->current, (GFunc) g_free, NULL);
+    g_slist_free(*model->current);
+    *model->current = NULL;
+}
+
+/* Create a new instance of a toolbar with the given BalsaToolbarModel
+ * set as object data.
+ */
+GtkWidget *
+balsa_toolbar_new(BalsaToolbarModel * model)
+{
+    GtkWidget *toolbar = gtk_toolbar_new();
+    BalsaToolbarData *btd = bt_data_new(model);
+    
+    g_object_set_data(G_OBJECT(toolbar), BALSA_KEY_TOOLBAR_DATA, btd);
+    g_signal_connect(G_OBJECT(toolbar), "destroy",
+                     G_CALLBACK(bt_destroy), btd);
+    toolbar_list = g_slist_prepend(toolbar_list, toolbar);
+    balsa_toolbar_refresh(toolbar);
+
+    return toolbar;
+}
+
+/* Refresh (or initially populate) a toolbar.
+ */
+void
+balsa_toolbar_refresh(GtkWidget * toolbar)
+{
+    BalsaToolbarData *btd =
+        g_object_get_data(G_OBJECT(toolbar), BALSA_KEY_TOOLBAR_DATA);
+    BalsaToolbarModel *model = btd->model;
+    GSList *list;
+    gchar *second_line;
+    GtkWidget *parent;
+
+    balsa_toolbar_remove_all(toolbar);
+
+    /* Find out whether any button has 2 lines of text. */
+    for (list = balsa_toolbar_model_get_current(model), second_line = NULL;
+         list && !second_line; list = g_slist_next(list)) {
+        const gchar *icon = list->data;
+        gint button = get_toolbar_button_index(icon);
+
+        if (button < 0) {
+            g_warning("button '%s' not found. ABORT!\n", icon);
+            continue;
+        }
+
+        second_line = strchr(_(toolbar_buttons[button].button_text), '\n');
+    }
+
+    for (list = balsa_toolbar_model_get_current(model); list;
+         list = g_slist_next(list)) {
+        const gchar *icon = list->data;
+        BalsaToolbarIcon *bti;
+        gint button;
+        gchar *text, *tmp;
+        gint type;
+
+        if (!*icon) {
+            gtk_toolbar_append_space(GTK_TOOLBAR(toolbar));
+            continue;
+        }
+
+        bti = bt_get_icon(toolbar, icon);
+        button = get_toolbar_button_index(icon);
+
+        if (button < 0)
+            continue;
+
+        tmp = _(toolbar_buttons[button].button_text);
+        if (balsa_app.toolbar_wrap_button_text) {
+            /* Make sure all buttons have the same number of lines of
+             * text (1 or 2), to keep icons aligned */
+            text = second_line && !strchr(tmp, '\n') ?
+                g_strconcat(tmp, "\n", NULL) : g_strdup(tmp);
+        } else {
+            text = tmp = g_strdup(tmp);
+            while ((tmp = strchr(tmp, '\n')))
+                *tmp++ = ' ';
+        }
+
+        switch (toolbar_buttons[button].type) {
+        case TOOLBAR_BUTTON_TYPE_RADIO:
+            type = GTK_TOOLBAR_CHILD_RADIOBUTTON;
+            break;
+        case TOOLBAR_BUTTON_TYPE_TOGGLE:
+            type = GTK_TOOLBAR_CHILD_TOGGLEBUTTON;
+            break;
+        case TOOLBAR_BUTTON_TYPE_BUTTON:
+        default:
+            type = GTK_TOOLBAR_CHILD_BUTTON;
+            break;
+        }
+        bti->widget =
+            gtk_toolbar_append_element(GTK_TOOLBAR(toolbar), type, NULL,
+                                       text,
+                                       _(toolbar_buttons[button].help_text),
+                                       _(toolbar_buttons[button].help_text),
+                                       gtk_image_new_from_stock(icon,
+                                           GTK_ICON_SIZE_LARGE_TOOLBAR),
+                                       GTK_SIGNAL_FUNC(bti->callback),
+                                       bti->user_data);
+        g_free(text);
+        gtk_widget_set_sensitive(bti->widget, bti->sensitive);
+        if (type == GTK_TOOLBAR_CHILD_TOGGLEBUTTON) {
+            gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(bti->widget),
+                                         bti->active);
+            g_signal_connect(G_OBJECT(bti->widget), "toggled",
+                             G_CALLBACK(bt_button_toggled), bti);
+        }
+    }
+
+    parent = gtk_widget_get_parent(toolbar);
+    if (parent)
+        gtk_widget_queue_resize(parent);
+}
+
+/* Get the GtkToolbar from a GnomeApp (for convenience: not really a
+ * BalsaToolbar method).
+ */
+GtkWidget *
+balsa_toolbar_get_from_gnome_app(GnomeApp * app)
+{
+    BonoboDockItem *item =
+        gnome_app_get_dock_item_by_name(app, GNOME_APP_TOOLBAR_NAME);
+    return bonobo_dock_item_get_child(item);
+}
+
+/* Set up a callback for the toolbar button with the given id.
+ *
+ * Saves the callback and user_data in a BalsaToolbarIcon structure, and
+ * if the corresponding widget has been created, connects to its
+ * "clicked" signal.
+ */
+guint
+balsa_toolbar_set_callback(GtkWidget * toolbar, const gchar * icon,
+                           GCallback callback, gpointer user_data)
+{
+    BalsaToolbarIcon *bti = bt_get_icon(toolbar, icon);
+    guint handler = 0;
+
+    bti->callback = callback;
+    bti->user_data = user_data;
+    if (bti->widget)
+        handler = g_signal_connect(G_OBJECT(bti->widget), "clicked",
+                                   callback, user_data);
+
+    return handler;
+}
+
+/* Set a button's sensitivity, and save the state in the appropriate
+ * BalsaToolbarIcon structure.
+ */
+void
+balsa_toolbar_set_button_sensitive(GtkWidget * toolbar, const gchar * icon,
+                                   gboolean sensitive)
+{
+    BalsaToolbarIcon *bti = bt_get_icon(toolbar, icon);
+
+    bti->sensitive = sensitive;
+    if (bti->widget)
+        gtk_widget_set_sensitive(bti->widget, sensitive);
+}
+
+/* Get the active status of a toggle-button from the BalsaToolbarIcon
+ * structure, which is kept current in the signal handler.
+ */
+gboolean
+balsa_toolbar_get_button_active(GtkWidget * toolbar, const gchar * icon)
+{
+    BalsaToolbarIcon *bti = bt_get_icon(toolbar, icon);
+
+    return bti->active;
+}
+
+/* Set the active status of a toggle-button if it exists, and save the
+ * status in the BalsaToolbarIcon structure.
+ */
+void
+balsa_toolbar_set_button_active(GtkWidget * toolbar, const gchar * icon,
+                                gboolean active)
+{
+    BalsaToolbarIcon *bti = bt_get_icon(toolbar, icon);
+
+    bti->active = active;
+    if (bti->widget)
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(bti->widget),
+                                     active);
+}
+
+/* Signal handlers. */
+
+/* Handler for the "toggled" signal. */
+static void
+bt_button_toggled(GtkToggleButton * button, BalsaToolbarIcon * bti)
+{
+    bti->active = gtk_toggle_button_get_active(button);
+}
+
+/* Handler for the "destroy" signal. */
+static void
+bt_destroy(GtkWidget * toolbar, BalsaToolbarData * btd)
+{
+    g_hash_table_destroy(btd->table);
+    g_free(btd);
+    toolbar_list = g_slist_remove(toolbar_list, toolbar);
+}
+
+/* Helpers. */
+
+/* Create and initialize a BalsaToolbarData structure with the given
+ * BalsaToolbarModel.
+ */
+static BalsaToolbarData *
+bt_data_new(BalsaToolbarModel * model)
+{
+    BalsaToolbarData *btd = g_new(BalsaToolbarData, 1);
+
+    btd->model = model;
+    btd->table =
+        g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+
+    return btd;
+}
+
+/* Find or create the BalsaToolbarIcon structure for the given icon in
+ * the given toolbar.
+ */
+static BalsaToolbarIcon *
+bt_get_icon(GtkWidget * toolbar, const gchar * icon)
+{
+    BalsaToolbarData *btd =
+        g_object_get_data(G_OBJECT(toolbar), BALSA_KEY_TOOLBAR_DATA);
+    BalsaToolbarIcon *bti = g_hash_table_lookup(btd->table, icon);
+    if (!bti) {
+        bti = g_new0(BalsaToolbarIcon, 1);
+        bti->sensitive = TRUE;
+        g_hash_table_insert(btd->table, g_strdup(icon), bti);
+    }
+    return bti;
+}

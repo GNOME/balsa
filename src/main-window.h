@@ -22,6 +22,8 @@
 #ifndef __MAIN_WINDOW_H__
 #define __MAIN_WINDOW_H__
 
+#include "toolbar-factory.h"
+
 #define BALSA_TYPE_WINDOW		       (balsa_window_get_type ())
 #define BALSA_WINDOW(obj)		       (GTK_CHECK_CAST (obj, BALSA_TYPE_WINDOW, BalsaWindow))
 #define BALSA_WINDOW_CLASS(klass)	       (GTK_CHECK_CLASS_CAST (klass, BALSA_TYPE_WINDOW, BalsaWindowClass))
@@ -84,6 +86,7 @@ void check_new_messages_cb(GtkWidget *, gpointer data);
 void check_new_messages_real(GtkWidget *, gpointer data, int type);
 void empty_trash(void);
 void update_view_menu(void);
+BalsaToolbarModel *balsa_window_get_toolbar_model(void);
 
 /* functions to manipulate the progress bars of the window */
 void balsa_window_increase_activity(BalsaWindow* window);

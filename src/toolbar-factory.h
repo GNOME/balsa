@@ -43,19 +43,37 @@ typedef struct t_button_data {
 extern button_data toolbar_buttons[];
 extern const int toolbar_button_count;
 
-int create_stock_toolbar(BalsaToolbarType id);
-int get_toolbar_index(BalsaToolbarType id);
-void set_toolbar_button_callback(BalsaToolbarType toolbar, const char *id, 
-				 BalsaToolbarFunc callback,
-				 gpointer);
-void set_toolbar_button_sensitive(GtkWidget *window, BalsaToolbarType toolbar,
-				  const char *id, int sensitive);
-GtkToolbar *get_toolbar(GtkWidget *window, BalsaToolbarType toolbar);
-void release_toolbars(GtkWidget *window);
-GtkWidget *get_tool_widget(GtkWidget *window, BalsaToolbarType toolbar, 
-			   const char *id);
+typedef struct BalsaToolbarModel_ BalsaToolbarModel;
+
 void update_all_toolbars(void);
-char **get_legal_toolbar_buttons(int toolbar);
-void balsa_toolbar_remove_all(GtkToolbar *toolbar);
+void balsa_toolbar_remove_all(GtkWidget *toolbar);
+
+/* toolbar code for gtk+-2 */
+
+/* BalsaToolbarModel */
+BalsaToolbarModel *balsa_toolbar_model_new(GSList * legal,
+                                           GSList * standard,
+                                           GSList ** current);
+GSList *balsa_toolbar_model_get_legal(BalsaToolbarModel * model);
+GSList *balsa_toolbar_model_get_current(BalsaToolbarModel * model);
+void balsa_toolbar_model_insert_icon(BalsaToolbarModel * model,
+                                     gchar * icon, gint position);
+void balsa_toolbar_model_delete_icon(BalsaToolbarModel * model,
+                                     gchar * icon);
+void balsa_toolbar_model_clear(BalsaToolbarModel * model);
+
+/* BalsaToolbar */
+GtkWidget *balsa_toolbar_new(BalsaToolbarModel * model);
+GtkWidget *balsa_toolbar_get_from_gnome_app(GnomeApp * app);
+guint balsa_toolbar_set_callback(GtkWidget * toolbar, const gchar * icon,
+                                 GCallback callback, gpointer user_data);
+void balsa_toolbar_set_button_sensitive(GtkWidget * toolbar,
+                                        const gchar * icon,
+                                        gboolean sensitive);
+gboolean balsa_toolbar_get_button_active(GtkWidget * toolbar,
+                                         const gchar * icon);
+void balsa_toolbar_set_button_active(GtkWidget * toolbar,
+                                     const gchar * icon, gboolean active);
+void balsa_toolbar_refresh(GtkWidget * toolbar);
 
 #endif

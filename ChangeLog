@@ -5,6 +5,16 @@
 	* libmutt/imap.c: do check the NOOP server response.
 	* src/balsa-mblist.c: actual mailbox polling.
 	
+2000-05-03  Peter Williams  <peter@beta.newton.cx>
+
+	* libbalsa/mailbox.c (error_in_thread): New function to
+	  replace the usual mutt_error, cause it makes GTK+ calls,
+	  which in this case happens in another thread, which
+	  makes GTK+ barf.
+	  (check_all_pop3_hosts): Fix to change mutt_error.
+	* src/main-window.c (mail_progress_notify_cb): Handle
+	  the _ERROR message by displaying a dialog box.
+	
 2000-05-02 Pawel Salek <pawsa@theochem.kth.se>:
 	* libinit_balsa/balsa-druid-page-directory.gob:
 	handle lack of MAIL environment variable properly.
@@ -18,6 +28,7 @@
 	* libbalsa/send.c (balsa_lookup_mime_type): fixed GNOME mime 
 	type lookup 
 
+>>>>>>> 1.218
 2000-04-27  Pawel Salek <pawsa@theochem.kth.se>
 	* src/sendmsg-window.c: one g_free() too much.
 	* src/main.c: code cleanup.

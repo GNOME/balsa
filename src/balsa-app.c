@@ -69,6 +69,10 @@ balsa_error (const char *fmt,...)
 
   g_warning (outstr);
 
+  /* Sometimes a different thread makes GTK+
+   * calls in here. How do we handle this???
+   */
+  
   messagebox = gnome_message_box_new (outstr,
 				      GNOME_MESSAGE_BOX_ERROR,
 				      GNOME_STOCK_BUTTON_OK,

@@ -1040,6 +1040,7 @@ mail_progress_notify_cb( )
     void *msgbuffer;
     uint count;
     gfloat percent;
+    GtkWidget *errorbox;
 
     msgbuffer = malloc( 2049 );
 
@@ -1142,6 +1143,15 @@ mail_progress_notify_cb( )
 	    balsa_mblist_have_new (balsa_app.mblist);
 
 	    break;
+
+	  case MSGMAILTHREAD_ERROR:
+		  errorbox = gnome_message_box_new( threadmessage->message_string,
+						    GNOME_MESSAGE_BOX_ERROR,
+						    GNOME_STOCK_BUTTON_OK,
+						    NULL );
+		  gnome_dialog_run( GNOME_DIALOG( errorbox ) );
+		  break;
+
 	  default:
 	    fprintf ( stderr, " Unknown: %s \n", 
 		      threadmessage->message_string );

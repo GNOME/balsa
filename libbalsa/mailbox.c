@@ -180,6 +180,26 @@ check_all_imap_hosts (Mailbox * to, GList *mailboxes)
 #endif
 }
 
+#ifdef BALSA_USE_THREADS
+static void error_in_thread( const char *format, ... );
+
+static void error_in_thread( const char *format, ... )
+{
+	va_list val;
+	gchar *submessage, *message;
+	MailThreadMessage *tmsg;
+
+	va_start( val, format );
+	submessage = g_strdup_vprintf( format, val );
+	va_end( val );
+
+	message = g_strconcat( _("Error: "), submessage, NULL );
+	g_free( submessage );
+
+	MSGMAILTHREAD( tmsg, MSGMAILTHREAD_ERROR, message );
+	g_free( message );
+}
+#endif
 
 void
 check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
@@ -191,6 +211,11 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
 #ifdef BALSA_USE_THREADS
   char msgbuf[160];
   MailThreadMessage *threadmsg;
+  void (*mutt_error_backup)( const char *, ... );
+
+  /* Otherwise we get multithreaded GTK+ calls... baaad */
+  mutt_error_backup = mutt_error;
+  mutt_error = error_in_thread;
 
 /*  Only check if lock has been set */
   pthread_mutex_lock( &mailbox_lock);
@@ -247,10 +272,11 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
       g_free (PopPass);
       g_free (PopUser);
 
-      if(MAILBOX_POP3(mailbox)->last_popped_uid == NULL ||
+      if( MAILBOX_POP3(mailbox)->last_popped_uid == NULL ||
          strcmp(MAILBOX_POP3(mailbox)->last_popped_uid, uid) != 0)
       {
-        g_free ( MAILBOX_POP3 (mailbox)->last_popped_uid );
+	      if( MAILBOX_POP3( mailbox )->last_popped_uid )
+		      g_free ( MAILBOX_POP3 (mailbox)->last_popped_uid );
         MAILBOX_POP3 (mailbox)->last_popped_uid = g_strdup ( uid );
 
 #ifdef BALSA_USE_THREADS
@@ -266,6 +292,11 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
     }
     list = list->next;
   }
+
+  #ifdef BALSA_USE_THREADS
+  mutt_error = mutt_error_backup;
+  #endif
+
   return;
 }
 

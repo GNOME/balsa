@@ -1,3 +1,8 @@
+2003-09-19 07:16  PeterB
+
+	* src/main-window.c: Desensitize `Mailbox -> Remove Duplicates'
+	when no mailbox is selected.
+
 2003-09-12  Pawel Salek  <pawsa theochem.kth.se>
 
 	* src/main.c: fix bug 121867.

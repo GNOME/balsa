@@ -1,3 +1,17 @@
+2003-04-17 18:51  PeterB
+
+	* libbalsa/: mailbox.c, mailbox.h: Add LibBalsaMailboxShow *show
+	member to LibBalsaMailbox, and the LibBalsaMailboxShow enum.
+	* src/balsa-mblist.c: Make sure mailbox->show is set when adding a
+	mailbox to the list.
+	* src/balsa-index.c: Use mailbox->show instead of looking for sent,
+	draft, and outbox.
+	* src/: mailbox-conf.c, mailbox-conf.h: Consolidate code for
+	widgets that control mailbox view items, and add a radio group for
+	showing From or To.
+	* src/folder-conf.c: Use the code in mailbox-conf.c for view
+	widgets.
+
 2003-04-14 19:13  PeterB
 
 	* src/main-window.c: Rearrange Help menu (Darko Obradovic

@@ -54,8 +54,6 @@ enum {
   LAST_SIGNAL
 };
 
-
-
 static void balsa_window_class_init(BalsaWindowClass *klass);
 static void balsa_window_init(BalsaWindow *window);
 static void balsa_window_real_set_cursor(BalsaWindow *window, GdkCursor *cursor);
@@ -64,21 +62,22 @@ static void balsa_window_real_close_mailbox(BalsaWindow *window, Mailbox *mailbo
 static void balsa_window_destroy(GtkObject * object);
 
 static GtkWidget *balsa_window_create_preview_pane(BalsaWindow *window);
+
 GtkWidget *balsa_window_find_current_index(BalsaWindow *window);
+void       balsa_window_open_mailbox( BalsaWindow *window, Mailbox *mailbox );
+void       balsa_window_close_mailbox( BalsaWindow *window, Mailbox *mailbox );
 
-
-
+/*FIXME unused
 static guint pbar_timeout;
-
+*/
 static gint about_box_visible = FALSE;
 
-/* main window widget components */
+/* FIXME unused main window widget components
 static gint progress_timeout (gpointer data);
-
+*/
 
 /* dialogs */
 static void show_about_box (void);
-
 
 /* callbacks */
 static void check_new_messages_cb (GtkWidget *, gpointer data);
@@ -104,6 +103,7 @@ static void about_box_destroy_cb (void);
 static void set_icon (GnomeApp * app);
 
 static void notebook_size_alloc_cb( GtkWidget *notebook, GtkAllocation *alloc );
+static void mw_size_alloc_cb( GtkWidget *window, GtkAllocation *alloc );
 
 static GnomeUIInfo file_menu[] =
 {
@@ -403,6 +403,8 @@ balsa_window_new ()
   /* we can only set icon after realization, as we have no windows before. */
   gtk_signal_connect (GTK_OBJECT (window), "realize",
 		      GTK_SIGNAL_FUNC (set_icon), NULL);
+  gtk_signal_connect( GTK_OBJECT( window ), "size_allocate", 
+		      GTK_SIGNAL_FUNC( mw_size_alloc_cb ), NULL );
 
   appbar = GNOME_APPBAR(gnome_appbar_new(TRUE, TRUE, GNOME_PREFERENCES_USER));
   gnome_app_set_statusbar(GNOME_APP(window), GTK_WIDGET(appbar));
@@ -476,6 +478,7 @@ void balsa_window_open_mailbox(BalsaWindow *window, Mailbox *mailbox)
   gtk_signal_emit(GTK_OBJECT(window), window_signals[OPEN_MAILBOX], mailbox);
 }
 
+/*void balsa_window_open_mailbox(BalsaWindow *window, Mailbox *mailbox)*/
 void balsa_window_close_mailbox(BalsaWindow *window, Mailbox *mailbox)
 {
   g_return_if_fail(window != NULL);
@@ -570,22 +573,24 @@ static GtkWidget *balsa_window_create_preview_pane(BalsaWindow *window)
 static void balsa_window_destroy (GtkObject     *object)
 {
   BalsaWindow *window;
-  gint x, y;
-  gchar *geometry;
-
-  /* XXX this is too late to get the right width and height
-  geometry = gnome_geometry_string(GTK_WIDGET(object)->window);
-  gnome_parse_geometry(geometry,
-		       &x, &y,
-		       &balsa_app.mw_width, 
+  /*
+    gint x, y;
+    gchar *geometry;
+    XXX this is too late to get the right width and height
+    geometry = gnome_geometry_string(GTK_WIDGET(object)->window);
+    gnome_parse_geometry(geometry,
+                       &x, &y,
+                       &balsa_app.mw_width, 
 		       &balsa_app.mw_height);
   g_free (geometry);
   */
 
   window = BALSA_WINDOW(object);
 
+  /*
   balsa_app.mw_width = GTK_WIDGET(object)->allocation.width;
   balsa_app.mw_height = GTK_WIDGET(object)->allocation.height;
+  */
 
   if (GTK_OBJECT_CLASS(parent_class)->destroy)
     (*GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(object));
@@ -593,7 +598,7 @@ static void balsa_window_destroy (GtkObject     *object)
   balsa_exit();
 }
 
-
+/*FIXME unused
 static gint
 progress_timeout (gpointer data)
 {
@@ -612,7 +617,7 @@ progress_timeout (gpointer data)
 
   return TRUE;
 }
-
+*/
 
 
 /*
@@ -907,11 +912,13 @@ filter_dlg_cb (GtkWidget * widget, gpointer data)
   filter_edit_dialog (NULL);
 }
 
+/*FIXME unused (#if0'ed out in GNOMEUI defs)
 static void
 mblist_window_cb (GtkWidget * widget, gpointer data)
 {
   //  mblist_open_window (mdi);
 }
+*/
 
 static void
 mailbox_close_child (GtkWidget * widget, gpointer data)
@@ -1021,4 +1028,10 @@ set_icon (GnomeApp * app)
 static void notebook_size_alloc_cb( GtkWidget *notebook, GtkAllocation *alloc )
 {
     balsa_app.notebook_height = alloc->height;
+}
+
+static void mw_size_alloc_cb( GtkWidget *window, GtkAllocation *alloc )
+{
+    balsa_app.mw_height = alloc->height;
+    balsa_app.mw_width = alloc->width;
 }

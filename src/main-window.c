@@ -92,6 +92,7 @@ static GnomeUIInfo file_menu[] =
  GNOME_STOCK_MENU_MAIL_RCV, 'M', GDK_CONTROL_MASK, NULL
   },
 
+
   GNOMEUIINFO_SEPARATOR,
 
   GNOMEUIINFO_MENU_EXIT_ITEM(close_main_window, NULL), 
@@ -151,18 +152,24 @@ static GnomeUIInfo mailbox_menu[] =
     NULL, GNOME_APP_PIXMAP_NONE, GNOME_STOCK_MENU_PROP, 'C', 0, NULL
   },
 #endif
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Add"), N_("Add a new mailbox"),
+  GNOMEUIINFO_ITEM_STOCK (N_ ("_Add"), N_("Add a new mailbox"),
 			  mblist_menu_add_cb, GNOME_STOCK_MENU_PROP),
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Edit"), N_("Edit the selected mailbox"),
+  GNOMEUIINFO_ITEM_STOCK (N_ ("_Edit"), N_("Edit the selected mailbox"),
 			  mblist_menu_edit_cb, GNOME_STOCK_MENU_PROP),
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Delete"), N_("Delete the selected mailbox"),
+  GNOMEUIINFO_ITEM_STOCK (N_ ("_Delete"), N_("Delete the selected mailbox"),
 			  mblist_menu_delete_cb, GNOME_STOCK_MENU_TRASH),
+  GNOMEUIINFO_SEPARATOR,
+  GNOMEUIINFO_ITEM_STOCK (N_ ("_Close current"), N_("Close the currently opened mailbox"),
+			  mailbox_close_child, GNOME_STOCK_MENU_CLOSE),
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_END
 };
 static GnomeUIInfo settings_menu[] =
 {
-  GNOMEUIINFO_ITEM_STOCK ("_Filters...", NULL, filter_dlg_cb, GNOME_STOCK_MENU_PROP),
+  GNOMEUIINFO_ITEM_STOCK (N_ ("_Filters..."), N_("Manage filters"),
+			  filter_dlg_cb, GNOME_STOCK_MENU_PROP),
+
+  GNOMEUIINFO_SEPARATOR,
 
   GNOMEUIINFO_MENU_PREFERENCES_ITEM(open_preferences_manager, NULL),
 

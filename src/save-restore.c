@@ -85,11 +85,8 @@ config_load (gchar * user_filename)
 
   /* Construct the filename by appending 'user_filename' to the user's
      home directory. */
-  filename = g_malloc (strlen (user_filename) +
-		       strlen (g_get_home_dir ()) + 2);
-  strcpy (filename, g_get_home_dir ());
-  strcat (filename, "/");
-  strcat (filename, user_filename);
+
+  filename = g_strdup_printf("%s/%s", g_get_home_dir(), user_filename);
 
   balsa_app.proplist = PLGetProplistWithPath (filename);
 
@@ -121,11 +118,7 @@ config_save (gchar * user_filename)
 
   /* Construct the filename by appending 'user_filename' to the user's
      home directory. */
-  filename = g_malloc (strlen (user_filename) +
-		       strlen (g_get_home_dir ()) + 2);
-  strcpy (filename, g_get_home_dir ());
-  strcat (filename, "/");
-  strcat (filename, user_filename);
+  filename = g_strdup_printf("%s/%s", g_get_home_dir(), user_filename);
 
   /* Set the property list's filename */
   temp_str = PLMakeString (filename);

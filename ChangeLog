@@ -1,3 +1,13 @@
+2000-12-17  Pawel Salek  <pawsa@theochem.kth.se>
+	Berend De Schouwer <bds@jhb.ucs.co.za> patch for improved
+	alias expansion.
+	
+	* libbalsa/Makefile.am: add address-entry widget to the file list.
+	* libbalsa/address-entry.[hc]: the subclassed GtkEntry for mail 
+	address edition with alias support.
+	* src/expand-alias.[hc]: move code to address_entry widget.
+	* src/sendmsg-window.c: update API apriopriately.
+	
 2000-12-16  Matthew Guenther  <guentherm@asme.org>
 
 	* src/balsa-mblist.c (mblist_drag_cb): Refresh destination index

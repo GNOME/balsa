@@ -18,6 +18,8 @@ libbalsa_a_SOURCES = 		\
 	address-book-ldap.c 	\
 	address-book-vcard.h	\
 	address-book-vcard.c	\
+	address-entry.c		\
+	address-entry.h		\
 	mime.h			\
 	misc.h			\
 	notify.c		\

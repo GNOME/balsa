@@ -66,6 +66,7 @@
 
 #include "sendmsg-window.h"
 #include "address-book.h"
+#include "address-entry.h"
 #include "expand-alias.h"
 #include "main.h"
 #include "print.h"
@@ -789,6 +790,37 @@ to_add(GtkWidget * widget,
 
 
 /*
+ * static void create_address_entry()
+ * 
+ * Creates a gtk_label()/libbalsa_address_entry() pair.
+ *
+ * Input: GtkWidget* table       - Table to attach to.
+ *        const gchar* label     - Label string.
+ *        int y_pos              - position in the table.
+ *      
+ * Output: GtkWidget* arr[] - arr[0] will be the label widget.
+ *                          - arr[1] will be the entry widget.
+ */
+static void
+create_address_entry(GtkWidget * table, const gchar * label, int y_pos,
+		    GtkWidget * arr[])
+{
+    arr[0] = gtk_label_new(label);
+    gtk_misc_set_alignment(GTK_MISC(arr[0]), 0.0, 0.5);
+    gtk_misc_set_padding(GTK_MISC(arr[0]), GNOME_PAD_SMALL,
+			 GNOME_PAD_SMALL);
+    gtk_table_attach(GTK_TABLE(table), arr[0], 0, 1, y_pos, y_pos + 1,
+		     GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
+
+    arr[1] = libbalsa_address_entry_new();
+    gtk_table_attach(GTK_TABLE(table), arr[1], 1, 2, y_pos, y_pos + 1,
+		     GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_SHRINK, 0, 0);
+    gtk_signal_connect(GTK_OBJECT(arr[1]), "activate",
+		       GTK_SIGNAL_FUNC(next_entrybox), arr[1]);
+}
+
+
+/*
  * static void create_string_entry()
  * 
  * Creates a gtk_label()/gtk_entry() pair.
@@ -842,7 +874,7 @@ create_email_entry(GtkWidget * table, const gchar * label, int y_pos,
 
     gint *focus_counter;
 
-    create_string_entry(table, label, y_pos, arr);
+    create_address_entry(table, label, y_pos, arr);
 
     arr[2] = gtk_button_new();
     gtk_button_set_relief(GTK_BUTTON(arr[2]), GTK_RELIEF_NONE);
@@ -1733,6 +1765,13 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 static gint
 send_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
+    /*
+     * First, check if aliasing is on, and get it to nullify the
+     * match.  Otherwise we send mail to "John (John Doe <jdoe@public.com>)"
+     */
+    expand_alias_clear_to_send(bsmsg->to[1]);
+    expand_alias_clear_to_send(bsmsg->cc[1]);
+    expand_alias_clear_to_send(bsmsg->bcc[1]);
     return send_message_handler(bsmsg, FALSE);
 }
 

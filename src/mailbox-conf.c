@@ -831,12 +831,8 @@ mailbox_conf_add(MailboxConfWindow *mcw)
     }
 
 
-    if(save_to_config) {
+    if(save_to_config)
 	config_mailbox_add(mcw->mailbox, NULL);
-        g_hash_table_insert(balsa_app.mailbox_views,
-                            g_strdup(mcw->mailbox->url), 
-                            mcw->mailbox->view);
-    }
     else
         balsa_mailbox_local_rescan_parent(mcw->mailbox);
 
@@ -844,18 +840,15 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 	/* redraw the pop3 server list */
 	update_mail_servers();
     else {/* redraw the main mailbox list */
-        /* We have experienced VERY misterious crashes when
-         * a new view was inserted to the hash table when another one
-         * for the same URL was already there - and was silently
-         * removed without LibBalsaMailbox noticing it leading
-         * to crashes in random places.
-         * This is why we do some error checking here.
-         * We should possibly check before EACH g_hash_table_insert().
-         */
-         
-        gpointer p = g_hash_table_lookup(balsa_app.mailbox_views, 
-                                         mcw->mailbox->url);
-        if(!p) g_warning("EXPECTED TO BE ALREADY THERE!");
+	/* If the new mailbox is in the local mail tree, its view will
+	 * already be in the mailbox-views, in which case inserting it
+	 * again would cause the view to be freed, so we'd better
+	 * check... */
+	if (!g_hash_table_lookup(balsa_app.mailbox_views,
+				 mcw->mailbox->url))
+	    g_hash_table_insert(balsa_app.mailbox_views,
+				g_strdup(mcw->mailbox->url),
+				mcw->mailbox->view);
 	balsa_mblist_repopulate(balsa_app.mblist_tree_store);
     }
 }

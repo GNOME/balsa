@@ -53,8 +53,7 @@ create_new_index (Mailbox * mailbox)
   IndexWindow *iw;
   GList *list;
   GtkWidget *messagebox;
-  GtkWidget *button;
-  GtkWidget *bbox;
+  GtkWidget *vbox;
 
   iw = g_malloc (sizeof (IndexWindow));
   /* DISABLE EDITING FOR NOW */
@@ -64,6 +63,27 @@ create_new_index (Mailbox * mailbox)
   /* TODO check to see if already open */
 
   iw->mailbox = mailbox;
+
+  iw->window = gnome_app_new ("balsa", iw->mailbox->name);
+
+  gtk_signal_connect (GTK_OBJECT (iw->window),
+		      "destroy",
+		      (GtkSignalFunc) destroy_index_window,
+		      NULL);
+
+  gtk_signal_connect (GTK_OBJECT (iw->window),
+		      "delete_event",
+		      (GtkSignalFunc) gtk_false,
+		      NULL);
+
+  vbox = gtk_vbox_new(TRUE, 0);
+  gnome_app_set_contents (GNOME_APP (iw->window), vbox);
+  gtk_widget_show(vbox);
+
+  iw->index = balsa_index_new();
+  gtk_box_pack_start(GTK_BOX(vbox), iw->index, TRUE, TRUE, 0);
+  gtk_widget_show(iw->index);
+
   balsa_index_set_mailbox (BALSA_INDEX (iw->index), iw->mailbox);
   iw->watcher_id = mailbox_watcher_set (mailbox,
 				      (MailboxWatcherFunc) mailbox_listener,
@@ -82,21 +102,6 @@ create_new_index (Mailbox * mailbox)
       gtk_window_position (GTK_WINDOW (messagebox), GTK_WIN_POS_CENTER);
       gtk_widget_show (messagebox);
     }
-
-
-  iw->window = gnome_app_new ("balsa", iw->mailbox->name);
-
-
-  gtk_signal_connect (GTK_OBJECT (iw->window),
-		      "destroy",
-		      (GtkSignalFunc) destroy_index_window,
-		      NULL);
-
-  gtk_signal_connect (GTK_OBJECT (iw->window),
-		      "delete_event",
-		      (GtkSignalFunc) gtk_false,
-		      NULL);
-
 
   gtk_widget_show (iw->window);
 }

@@ -86,8 +86,8 @@ ab_okay_cb(GtkWidget * widget, gpointer data)
 			sprintf(new, "%s%s%s <%s>", new, 
 				((*new != '\0') ? ", " : ""), 
 				addy->name, addy->addy);
-			free(addy->name);
-			free(addy->addy);
+			g_free(addy->name);
+			g_free(addy->addy);
 			g_free(addy);
 			gtk_clist_remove(GTK_CLIST(add_clist), 0);
 		}
@@ -105,8 +105,8 @@ ab_clear_clist(GtkCList * clist)
 	gpointer        row;
 	while ((row = gtk_clist_get_row_data(clist, 0))) {
 		AddressData    *addy = (AddressData *) row;
-		free(addy->name);
-		free(addy->addy);
+		g_free(addy->name);
+		g_free(addy->addy);
 		g_free(addy);
 		gtk_clist_remove(GTK_CLIST(clist), 0);
 	}
@@ -131,7 +131,8 @@ ab_switch_cb(GtkWidget * widget, gpointer data)
 	GList          *glist = GTK_CLIST(from)->selection;
 	GList          *deletelist = NULL, *pointer;
 
-	for (pointer = g_list_first(glist); pointer != NULL; pointer = g_list_next(pointer)) {
+	for (pointer = g_list_first(glist); pointer != NULL; 
+	     pointer = g_list_next(pointer)) {
 		gint            num;
 		gchar          *listdata[2];
 		AddressData    *addy_data;
@@ -139,20 +140,21 @@ ab_switch_cb(GtkWidget * widget, gpointer data)
 		num = GPOINTER_TO_INT(pointer->data);
 		
 		addy_data = gtk_clist_get_row_data(GTK_CLIST(from), num);
-		listdata[0] = addy_data->name;
+		listdata[0] = addy_data->id;
 		listdata[1] = addy_data->addy;
 		
 		deletelist = g_list_append(deletelist, GINT_TO_POINTER(num));
 
 		num = gtk_clist_append(GTK_CLIST(to), listdata);
-		gtk_clist_set_row_data(GTK_CLIST(to), num, (gpointer) addy_data);
+		gtk_clist_set_row_data(GTK_CLIST(to), num,(gpointer)addy_data);
 	}
 
 	deletelist = g_list_sort(deletelist, (GCompareFunc) ab_delete_compare);
 
-	for (pointer = g_list_last(deletelist); pointer != NULL; pointer = g_list_previous(pointer)) {
-		gtk_clist_remove(GTK_CLIST(from), GPOINTER_TO_INT(pointer->data));
-	}
+	for (pointer = g_list_last(deletelist); pointer != NULL; 
+	     pointer = g_list_previous(pointer))
+	   gtk_clist_remove(GTK_CLIST(from), GPOINTER_TO_INT(pointer->data));
+	
 
 	g_list_free(deletelist);
 
@@ -168,19 +170,25 @@ ab_add_cb(GtkWidget * widget, gpointer data)
 		*w,
 		*hbox;
 	
-	dialog = gnome_dialog_new(N_("Add New Address"), GNOME_STOCK_BUTTON_CANCEL, GNOME_STOCK_BUTTON_OK, NULL);
-	gnome_dialog_button_connect(GNOME_DIALOG(dialog), 0, GTK_SIGNAL_FUNC(ab_cancel_cb), (gpointer) dialog);
+	dialog = gnome_dialog_new( N_("Add New Address"), 
+				   GNOME_STOCK_BUTTON_CANCEL, 
+				   GNOME_STOCK_BUTTON_OK, NULL);
+	gnome_dialog_button_connect(GNOME_DIALOG(dialog), 0, 
+				    GTK_SIGNAL_FUNC(ab_cancel_cb), 
+				    (gpointer) dialog);
 	vbox = GNOME_DIALOG(dialog)->vbox;
 
 	hbox = gtk_hbox_new(FALSE, 5);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(N_("Name:")), FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(N_("Name:")), FALSE, 
+			   FALSE, 0);
 	w = gtk_entry_new();
 	gtk_box_pack_start(GTK_BOX(hbox), w, FALSE, FALSE, 0);
 
 	hbox = gtk_hbox_new(FALSE, 5);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(N_("E-Mail Address:")), FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(N_("E-Mail Address:")),
+			   FALSE, FALSE, 0);
 	w = gtk_entry_new();
 	gtk_box_pack_start(GTK_BOX(hbox), w, FALSE, FALSE, 0);
 
@@ -247,7 +255,7 @@ ab_load(GtkWidget * widget, gpointer data)
 { 
    FILE *gc; 
    gchar string[LINE_LEN];
-   gchar * name = NULL, *email = NULL, *listdata[2];
+   gchar *name = NULL, *email = NULL, *listdata[2], *id = NULL;
    gint in_vcard = FALSE;
 
    ab_clear_clist(GTK_CLIST(book_clist)); 
@@ -276,20 +284,26 @@ ab_load(GtkWidget * widget, gpointer data)
       }
 
       if ( strncasecmp(string, "END:VCARD", 9) == 0) {
-	 int rownum; 
+	 gint rownum; 
 	 AddressData *data;
 	 if(email) {
 	    data = g_malloc( sizeof(AddressData) ); 
-	    data->name = name ? name : g_strdup( N_("No-Name") );
+	    data->id = id ? id : g_strdup(N_("No-Id"));
 	    data->addy = email;
-	    listdata[0] = name;
+	    data->name = name ? name : g_strdup( N_("No-Name") );
+	    listdata[0] = id;
 	    listdata[1] = email;
 	    rownum = gtk_clist_append(GTK_CLIST(book_clist), listdata); 
 	    gtk_clist_set_row_data(GTK_CLIST( book_clist),
 				   rownum, (gpointer) data); 
 	    name  = NULL;
 	    email = NULL;
-	 } else g_free(name);
+	    id = NULL;
+	 } else 
+	 {
+	    g_free(name);
+	    g_free(id);
+	 } 
 
 	 in_vcard = FALSE;
 	 continue;
@@ -298,6 +312,11 @@ ab_load(GtkWidget * widget, gpointer data)
       if (!in_vcard) continue;
       g_strchomp(string);
 
+      if (strncasecmp(string, "FN:", 3) == 0)
+      {
+		id = g_strdup(string+3);
+		continue;
+      }
       if(strncasecmp(string, "N:", 2) == 0) {
 	 name = extract_name(string+2);
 	 /* printf("name : %s\n", name); */

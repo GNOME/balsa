@@ -26,6 +26,7 @@ extern "C" {
 typedef struct {
 	gchar          *name;
 	gchar          *addy;
+	gchar          *id;
 } AddressData;
 
 extern gint address_book_cb(GtkWidget * widget, gpointer data);

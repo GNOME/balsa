@@ -2204,15 +2204,19 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
 void
 balsa_index_set_threading_type(BalsaIndex * index, int thtype)
 {
+    GtkTreeSelection *selection =
+        gtk_tree_view_get_selection(GTK_TREE_VIEW(index));
     GList *list;
     LibBalsaMailbox* mailbox = NULL;
+    GtkTreeIter iter;
 
     g_return_if_fail (index);
     g_return_if_fail (index->mailbox_node != NULL);
     g_return_if_fail (index->mailbox_node->mailbox != NULL);
 
     index->mailbox_node->mailbox->threading_type = thtype;
-    
+
+    g_signal_handler_block(selection, index->selection_changed_id);
     gtk_tree_store_clear(GTK_TREE_STORE
                          (gtk_tree_view_get_model(GTK_TREE_VIEW(index))));
     
@@ -2226,6 +2230,11 @@ balsa_index_set_threading_type(BalsaIndex * index, int thtype)
 
     /* set the menu apriopriately */
     balsa_window_set_threading_menu(thtype);
+
+    /* reselect current message */
+    g_signal_handler_unblock(selection, index->selection_changed_id);
+    if (bndx_find_message(index, NULL, &iter, index->current_message))
+        bndx_expand_to_row_and_select(index, &iter);
 }
 
 static void

@@ -1,3 +1,8 @@
+2002-02-25  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* libbalsa/*: remove uncesessary #includes (PS)
+	* src/*: Further work on porting to GNOME2.
+
 2002-02-24  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/Makefile.am, src/address-book-config.c,

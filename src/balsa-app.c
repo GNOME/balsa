@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,14 +20,7 @@
  * 02111-1307, USA.
  */
 
-#include "config.h"
-
 #include "balsa-app.h"
-#include "misc.h"
-#include "libbalsa.h"
-#include "spell-check.h"
-#include "main-window.h"
-#include "information.h"
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
@@ -502,9 +495,13 @@ open_mailboxes_idle_cb(gchar * names[])
 }
 
 GtkWidget *
-gnome_stock_button_with_label(const char *icon, const char *label)
+balsa_stock_button_with_label(const char *icon, const char *label)
 {
-    return gnome_pixmap_button(gnome_stock_new_with_icon(icon), label);
+    GtkWidget *button = gtk_button_new_with_label(label);
+    GtkWidget *pixmap = gtk_image_new_from_stock(icon,
+                                                 GTK_ICON_SIZE_BUTTON);
+    gtk_container_add(GTK_CONTAINER(button), pixmap);
+    return button;
 }
 
 static gint
@@ -617,10 +614,12 @@ destroy_mailbox_node(GNode* node, GNode* root)
     return FALSE;
 }
 
+#if 0
 static void 
 destroy_mailbox_tree(GNode* node, GNode* root)
 { 
 }
+#endif
 
 void
 balsa_remove_children_mailbox_nodes(GNode* gnode)

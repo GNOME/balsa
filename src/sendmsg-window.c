@@ -55,6 +55,7 @@
 #include <errno.h>
 
 #include "libbalsa.h"
+#include "misc.h"
 
 #include "balsa-app.h"
 #include "balsa-message.h"
@@ -1348,7 +1349,7 @@ destroy_attachment (gpointer data)
 */
 void
 add_attachment(GnomeIconList * iconlist, char *filename, 
-               gboolean is_a_temp_file, gchar *forced_mime_type)
+               gboolean is_a_temp_file, const gchar *forced_mime_type)
 {
     GtkWidget *msgbox;
     const gchar *content_type;

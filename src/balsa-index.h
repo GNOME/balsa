@@ -138,10 +138,8 @@ extern "C" {
     void balsa_index_threading(BalsaIndex* bindex);
 
     /* Updating index columns when preferences change */
-    void balsa_index_refresh_date (GtkNotebook *, GtkNotebookPage *,
-				   gint, gpointer);
-    void balsa_index_refresh_size (GtkNotebook *, GtkNotebookPage *,
-				   gint, gpointer);
+    void balsa_index_refresh_date (BalsaIndex *);
+    void balsa_index_refresh_size (BalsaIndex *);
 
     /* Change the display of all indexes when balsa_app.hide_deleted is
      * changed */

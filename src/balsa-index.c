@@ -214,7 +214,7 @@ static gint balsa_index_signals[LAST_SIGNAL] = {
 
 static GtkScrolledWindowClass *parent_class = NULL;
 
-guint
+GtkType
 balsa_index_get_type()
 {
     static guint balsa_index_type = 0;
@@ -226,8 +226,9 @@ balsa_index_get_type()
 	    sizeof(BalsaIndexClass),
 	    (GtkClassInitFunc) balsa_index_class_init,
 	    (GtkObjectInitFunc) balsa_index_init,
-	    (GtkArgSetFunc) NULL,
-	    (GtkArgGetFunc) NULL
+	    (gpointer) NULL,
+	    (gpointer) NULL,
+	    (GtkClassInitFunc) NULL
 	};
 
 	balsa_index_type =
@@ -254,30 +255,27 @@ balsa_index_class_init(BalsaIndexClass * klass)
     balsa_index_signals[SELECT_MESSAGE] =
 	gtk_signal_new("select_message",
 		       GTK_RUN_FIRST,
-		       object_class->type,
+		       balsa_index_get_type(),
 		       GTK_SIGNAL_OFFSET(BalsaIndexClass, select_message),
 		       gtk_marshal_NONE__POINTER_POINTER,
 		       GTK_TYPE_NONE, 2, GTK_TYPE_POINTER,
-		       GTK_TYPE_GDK_EVENT);
+		       GTK_TYPE_POINTER);
     balsa_index_signals[UNSELECT_MESSAGE] =
 	gtk_signal_new("unselect_message",
 		       GTK_RUN_FIRST,
-		       object_class->type,
+		       balsa_index_get_type(),
 		       GTK_SIGNAL_OFFSET(BalsaIndexClass,
 					 unselect_message),
 		       gtk_marshal_NONE__POINTER_POINTER, GTK_TYPE_NONE, 2,
-		       GTK_TYPE_POINTER, GTK_TYPE_GDK_EVENT);
+		       GTK_TYPE_POINTER, GTK_TYPE_POINTER);
     balsa_index_signals[UNSELECT_ALL_MESSAGES] = 
         gtk_signal_new ("unselect_all_messages",
                         GTK_RUN_FIRST,
-                        object_class->type,
+                        balsa_index_get_type(),
                         GTK_SIGNAL_OFFSET (BalsaIndexClass, 
                                            unselect_all_messages),
                         gtk_marshal_NONE__NONE, 
                         GTK_TYPE_NONE, 0);
-
-    gtk_object_class_add_signals(object_class, balsa_index_signals,
-				 LAST_SIGNAL);
 
     object_class->destroy = balsa_index_close_and_destroy;
     klass->select_message = NULL;
@@ -346,7 +344,7 @@ balsa_index_init(BalsaIndex * bindex)
     gtk_clist_set_column_width(clist, 4, balsa_app.index_subject_width);
     gtk_clist_set_column_width(clist, 5, balsa_app.index_date_width);
     gtk_clist_set_column_width(clist, 6, balsa_app.index_size_width);
-    font = gtk_widget_get_style (GTK_WIDGET(clist))->font;
+    font = gtk_style_get_font(gtk_widget_get_style (GTK_WIDGET(clist)));
     row_height = font->ascent + font->descent+2;
     
     if(row_height<16) /* pixmap height */
@@ -415,7 +413,7 @@ balsa_index_new(void)
 {
     BalsaIndex* bindex;
     bindex = BALSA_INDEX (gtk_type_new(BALSA_TYPE_INDEX));
-    gtk_object_default_construct (GTK_OBJECT (bindex));
+    balsa_index_init (bindex);
     return GTK_WIDGET(bindex);
 }
 
@@ -1275,7 +1273,7 @@ thread_has_unread(GtkCTree *ctree, GtkCTreeNode *node)
 	LibBalsaMessage *message=
 	    LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data(ctree, child));
 
-	if(message && message->flags & LIBBALSA_MESSAGE_FLAG_NEW ||
+	if((message && message->flags & LIBBALSA_MESSAGE_FLAG_NEW) ||
 	   thread_has_unread(ctree, child)) 
 	    return TRUE;
     }
@@ -2074,19 +2072,19 @@ create_menu(BalsaIndex * bindex)
         GtkSignalFunc func;
     } entries[] = {
         { GNOME_STOCK_MENU_BOOK_OPEN,    N_("View Source"), 
-          balsa_message_view_source },
+          GTK_SIGNAL_FUNC(balsa_message_view_source) },
         { BALSA_PIXMAP_MENU_REPLY,       N_("Reply..."), 
-          balsa_message_reply },
+          GTK_SIGNAL_FUNC(balsa_message_reply) },
         { BALSA_PIXMAP_MENU_REPLY_ALL,   N_("Reply To All..."), 
-          balsa_message_replytoall },
+          GTK_SIGNAL_FUNC(balsa_message_replytoall) },
         { BALSA_PIXMAP_MENU_REPLY_GROUP, N_("Reply To Group..."), 
-          balsa_message_replytogroup },
+          GTK_SIGNAL_FUNC(balsa_message_replytogroup) },
         { BALSA_PIXMAP_MENU_FORWARD,     N_("Forward Attached..."), 
-          balsa_message_forward_attached },
+          GTK_SIGNAL_FUNC(balsa_message_forward_attached) },
         { BALSA_PIXMAP_MENU_FORWARD,     N_("Forward Inline..."), 
-          balsa_message_forward_inline },
+          GTK_SIGNAL_FUNC(balsa_message_forward_inline) },
         { GNOME_STOCK_MENU_BOOK_RED,     N_("Store Address..."), 
-          balsa_store_address } };
+          GTK_SIGNAL_FUNC(balsa_store_address) } };
     GtkWidget *menu, *menuitem, *submenu, *smenuitem, *mrumenu, *mruitem;
     GtkWidget *bmbl, *scroll;
     GtkRequisition req;
@@ -2102,7 +2100,7 @@ create_menu(BalsaIndex * bindex)
     menu = gtk_menu_new();
     /* it's a single-use menu, so we must destroy it when we're done */
     gtk_signal_connect(GTK_OBJECT(menu), "selection-done",
-                       gtk_object_destroy, NULL);
+                       GTK_SIGNAL_FUNC(gtk_object_destroy), NULL);
 
     for(i=0; i<ELEMENTS(entries); i++)
         create_stock_menu_item(menu, entries[i].icon, _(entries[i].label),
@@ -2120,17 +2118,20 @@ create_menu(BalsaIndex * bindex)
     }
     if (any_not_deleted) {
         create_stock_menu_item(menu, GNOME_STOCK_MENU_TRASH,
-                               _("Delete"), balsa_message_delete, bindex,
-                               !mailbox->readonly);
+                               _("Delete"),
+                               GTK_SIGNAL_FUNC(balsa_message_delete),
+                               bindex, !mailbox->readonly);
     }
     if (any_deleted) {
 	create_stock_menu_item(menu, GNOME_STOCK_MENU_UNDELETE,
-			       _("Undelete"), balsa_message_undelete,
+			       _("Undelete"),
+                               GTK_SIGNAL_FUNC(balsa_message_undelete),
 			       bindex, !mailbox->readonly);
     }
     if (mailbox != balsa_app.trash) {
 	create_stock_menu_item(menu, GNOME_STOCK_MENU_TRASH,
-			       _("Move To Trash"), balsa_message_move_to_trash,
+			       _("Move To Trash"),
+                               GTK_SIGNAL_FUNC(balsa_message_move_to_trash),
 			       bindex, !mailbox->readonly);
     }
 
@@ -2138,13 +2139,12 @@ create_menu(BalsaIndex * bindex)
     submenu = gtk_menu_new();
 
     create_stock_menu_item( submenu, BALSA_PIXMAP_MENU_FLAGGED, _("Flagged"),
-			    balsa_message_toggle_flagged, bindex, TRUE);
+			    GTK_SIGNAL_FUNC(balsa_message_toggle_flagged),
+                            bindex, TRUE);
 
     create_stock_menu_item( submenu, BALSA_PIXMAP_MENU_NEW, _("Unread"),
-			    balsa_message_toggle_new, bindex, TRUE);
-
-    gtk_widget_show(submenu);
-    gtk_widget_show(menuitem);
+			    GTK_SIGNAL_FUNC(balsa_message_toggle_new),
+                            bindex, TRUE);
 
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), submenu);
 
@@ -2157,16 +2157,13 @@ create_menu(BalsaIndex * bindex)
     menuitem = gtk_menu_item_new_with_label(_("Move"));
     gtk_widget_set_sensitive(menuitem, !mailbox->readonly);
     gtk_menu_append(GTK_MENU(menu), menuitem);
-    gtk_widget_show(menuitem);
 
     mrumenu = gtk_menu_new();
-    gtk_widget_show(mrumenu);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), mrumenu);
 
     populate_mru(mrumenu, bindex);
 
     mruitem = gtk_menu_item_new_with_label(_("Folder"));
-    gtk_widget_show(mruitem);
 
     gtk_menu_append(GTK_MENU(mrumenu), mruitem);
 
@@ -2202,9 +2199,7 @@ create_menu(BalsaIndex * bindex)
     gtk_container_add(GTK_CONTAINER(smenuitem), scroll);
     gtk_menu_append(GTK_MENU(submenu), smenuitem);
 
-    gtk_widget_show(bmbl);
-    gtk_widget_show(scroll);
-    gtk_widget_show(smenuitem);
+    gtk_widget_show_all(menu);
 
     return menu;
 }
@@ -2215,14 +2210,18 @@ create_stock_menu_item(GtkWidget * menu, const gchar * type,
 		       const gchar * label, GtkSignalFunc cb,
 		       gpointer data, gboolean sensitive)
 {
-    GtkWidget *menuitem = gnome_stock_menu_item(type, label);
+    GtkWidget *menuitem = gtk_menu_item_new();
+
+    gtk_container_add(GTK_CONTAINER(menuitem), 
+                      gtk_image_new_from_stock(type, GTK_ICON_SIZE_MENU));
+    gtk_container_add(GTK_CONTAINER(menuitem),
+                      gtk_label_new(label));
     gtk_widget_set_sensitive(menuitem, sensitive);
 
     gtk_signal_connect(GTK_OBJECT(menuitem),
 		       "activate", (GtkSignalFunc) cb, data);
 
     gtk_menu_append(GTK_MENU(menu), menuitem);
-    gtk_widget_show(menuitem);
 }
 
 
@@ -2245,7 +2244,6 @@ balsa_index_transfer_messages(BalsaIndex * bindex,
     GtkCList* clist;
     GList *list, *messages;
     LibBalsaMessage* message;
-    BalsaMailboxNode *mbnode;
 
     g_return_if_fail(bindex != NULL);
     if (mailbox == NULL)
@@ -2328,8 +2326,10 @@ balsa_index_update_tree(BalsaIndex *bindex, gboolean expand)
 
     gtk_clist_freeze(clist);
     gtk_signal_handler_block_by_func(GTK_OBJECT(bindex->ctree),
-                                     expand ? tree_expand_cb :
-                                     tree_collapse_cb, bindex);
+                                     GTK_SIGNAL_FUNC(expand ?
+                                                     tree_expand_cb :
+                                                     tree_collapse_cb),
+                                     bindex);
     for(node=gtk_ctree_node_nth(tree, 0); node; 
 	node=GTK_CTREE_NODE_NEXT(node)) {
 	if(expand)
@@ -2354,8 +2354,10 @@ balsa_index_update_tree(BalsaIndex *bindex, gboolean expand)
     } else
         gtk_clist_thaw(clist);
     gtk_signal_handler_unblock_by_func(GTK_OBJECT(bindex->ctree),
-                                       expand ? tree_expand_cb :
-                                       tree_collapse_cb, bindex);
+                                       GTK_SIGNAL_FUNC(expand ?
+                                                       tree_expand_cb :
+                                                       tree_collapse_cb),
+                                       bindex);
 }
 
 /* balsa_index_set_threading_type:
@@ -2449,22 +2451,10 @@ refresh_size(GtkCTree * ctree,
 }
 
 void
-balsa_index_refresh_size (GtkNotebook *notebook,
-			  GtkNotebookPage *page,
-			  gint page_num,
-			  gpointer data)
+balsa_index_refresh_size(BalsaIndex * bindex)
 {
-    BalsaIndex *bindex;
-    GtkWidget *index;
-    GtkCTreeNode *node;
     GtkCTree *ctree;
 
-    if (page)
-	index = page->child;
-    else
-	index = GTK_WIDGET(data);
-
-    bindex = BALSA_INDEX(index);
     if (!bindex)
         return;
 
@@ -2496,22 +2486,10 @@ refresh_date(GtkCTree * ctree,
 }
 
 void
-balsa_index_refresh_date (GtkNotebook *notebook,
-			  GtkNotebookPage *page,
-			  gint page_num,
-			  gpointer data)
+balsa_index_refresh_date (BalsaIndex *bindex)
 {
-    BalsaIndex *bindex;
-    GtkWidget *index;
-    GtkCTreeNode *node;
     GtkCTree *ctree;
 
-    if (page)
-	index = page->child;
-    else
-	index = GTK_WIDGET(data);
-
-    bindex = BALSA_INDEX(index);
     if (!bindex)
         return;
 

@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -43,10 +43,17 @@
 #include "libbalsa_private.h"
 
 #include "mailbackend.h"
+/* needed for truncate_string */
+#include "misc.h"
 
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
 #endif
+
+/* GTK_CLASS_TYPE for 1.2<->1.3/2.0 GTK+ compatibility */
+#ifndef GTK_CLASS_TYPE
+#define GTK_CLASS_TYPE(x) (GTK_OBJECT_CLASS(x)->type)
+#endif /* GTK_CLASS_TYPE */
 
 static void libbalsa_message_class_init(LibBalsaMessageClass * klass);
 static void libbalsa_message_init(LibBalsaMessage * message);

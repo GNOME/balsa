@@ -31,6 +31,7 @@
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 #include "mailbackend.h"
+#include "misc.h"
 
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
@@ -39,6 +40,11 @@
 #ifdef BALSA_SHOW_ALL
 #include "mailbox-filter.h"
 #endif
+
+/* GTK_CLASS_TYPE for 1.2<->1.3/2.0 GTK+ compatibility */
+#ifndef GTK_CLASS_TYPE
+#define GTK_CLASS_TYPE(x) (GTK_OBJECT_CLASS(x)->type)
+#endif /* GTK_CLASS_TYPE */
 
 /* Class functions */
 static void libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass);

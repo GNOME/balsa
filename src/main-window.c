@@ -1481,11 +1481,9 @@ balsa_window_refresh(BalsaWindow * window)
     index = balsa_window_find_current_index(window);
     if (index) {
         /* update the date column, only in the current page */
-        balsa_index_refresh_date (GTK_NOTEBOOK(balsa_app.notebook),
-                                  NULL, 0, index);
+        balsa_index_refresh_date(BALSA_INDEX(index));
         /* update the size column, only in the current page */
-        balsa_index_refresh_size (GTK_NOTEBOOK(balsa_app.notebook),
-                                  NULL, 0, index);
+        balsa_index_refresh_size(BALSA_INDEX(index));
 
     }
     if (balsa_app.alternative_layout)
@@ -3024,10 +3022,8 @@ notebook_switch_page_cb(GtkWidget * notebook,
 
     balsa_mblist_focus_mailbox(balsa_app.mblist, mailbox);
 
-    balsa_index_refresh_date (GTK_NOTEBOOK(balsa_app.notebook),
-                              NULL, 0, index);
-    balsa_index_refresh_size (GTK_NOTEBOOK(balsa_app.notebook),
-                              NULL, 0, index);
+    balsa_index_refresh_date(BALSA_INDEX(index));
+    balsa_index_refresh_size(BALSA_INDEX(index));
 }
 
 static void

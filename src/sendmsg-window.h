@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -91,7 +91,7 @@ extern "C" {
                                   const gchar* val);
 
     void add_attachment(GnomeIconList * iconlist, char *filename, 
-			gboolean is_a_temp_file, gchar *forced_mime_type);
+			gboolean is_a_tmp_file, const gchar *forced_mime_type);
 
     typedef void (*field_setter)(BalsaSendmsg *d, const gchar*, const gchar*);
 

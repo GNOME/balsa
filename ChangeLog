@@ -1,3 +1,9 @@
+2001-05-29  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-app.h: helpful macro BALSA_IS_MAILBOX_SPECIAL()
+	* src/mailbox-conf.c: treat Esc as cancel action when deleting 
+	mailboxes.
+
 2001-05-28  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/balsa-index.c (do_delete): fix segfault when deleting from Trash

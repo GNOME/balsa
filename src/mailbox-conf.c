@@ -153,11 +153,21 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
     gint cancel_button;
     LibBalsaMailbox* mailbox = mbnode->mailbox;
 
+    if(BALSA_IS_MAILBOX_SPECIAL(mailbox)) {
+	balsa_information(
+	    LIBBALSA_INFORMATION_ERROR,
+	    _("Mailbox '%s' is used by balsa and I cannot remove it.\n"
+	      "If you really want to remove it, assign its function\n"
+	      "to some other mailbox."), mailbox->name);
+	return;
+    }
+
     if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
-	msg = g_strdup_printf(_("This will remove the mailbox %s from the list of mailboxes.\n"
-				"You may also delete the disk file or files associated with this mailbox.\n"
-				"If you do not remove the file on disk you may \"Add  Mailbox\" to access the mailbox again.\n"
-				"What would you like to do?"),
+	msg = g_strdup_printf(
+	    _("This will remove the mailbox %s from the list of mailboxes.\n"
+	      "You may also delete the disk file or files associated with this mailbox.\n"
+	      "If you do not remove the file on disk you may \"Add  Mailbox\" to access the mailbox again.\n"
+	      "What would you like to do?"),
 			      mailbox->name);
 	ask = gnome_message_box_new(msg, GNOME_MESSAGE_BOX_QUESTION,
 				    _("Remove from list"), 
@@ -165,7 +175,7 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 				    _("Cancel"), NULL);
 	cancel_button = 2;
 	g_free(msg);
-    } else {
+    } else { /* deleting remote mailbox */
 	msg = g_strdup_printf(_("This will remove the mailbox %s from the list of mailboxes\n"
 				"You may use \"Add Mailbox\" later to access this mailbox again\n"
 				"What would you like to do?"),
@@ -182,9 +192,12 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 			    GTK_WINDOW(balsa_app.main_window));
     gtk_window_set_modal(GTK_WINDOW(ask), TRUE);
 
-    button = gnome_dialog_run(GNOME_DIALOG(ask));
+    button = gnome_dialog_run_and_close(GNOME_DIALOG(ask));
 
-    if ( button == cancel_button ) 
+    /* button < 0 means that the dialog window was closed without pressing
+       any buttons.
+    */
+    if ( button < 0 || button == cancel_button ) 
 	return;
 
     /* Delete it from the config file and internal nodes */

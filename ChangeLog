@@ -1,3 +1,10 @@
+2004-11-17 09:16  PeterB
+
+	* libbalsa/send.c: combine flag changes.
+	* libbalsa/mailbox_mbox.c: be more careful with pseudo-flags; flush
+	stream and save mtime after rewriting in place.
+	* libbalsa/mailbox_maildir.c: be more careful with pseudo-flags.
+
 2004-11-16 11:53  PeterB
 
 	* src/expand-alias.c: utf8-aware entry matching.

@@ -112,7 +112,6 @@ typedef struct _Mailbox Mailbox;
 typedef struct _MailboxLocal MailboxLocal;
 typedef struct _MailboxPOP3 MailboxPOP3;
 typedef struct _MailboxIMAP MailboxIMAP;
-typedef struct _MailboxNNTP MailboxNNTP;
 
 typedef struct _MailboxWatcherMessage MailboxWatcherMessage;
 typedef struct _MailboxWatcherMessageNew MailboxWatcherMessageNew;

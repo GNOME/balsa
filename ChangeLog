@@ -1,3 +1,10 @@
+2005-03-29 19:25  PeterB
+
+	* libbalsa/rfc3156.c: pass NULL to g_locale_to_utf8 instead of
+	(ssize_t *), to keep gcc4 quiet.
+	* src/: balsa-message.c, sendmsg-window.c: use glib macros to cast
+	int to pointer and back.
+
 2005-03-26 Albrecht Dreß <albrecht dot dress at arcor dot de>
 
 	* libbalsa/rfc3156.c: plug in recently introduced DoS.

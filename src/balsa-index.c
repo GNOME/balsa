@@ -262,8 +262,14 @@ balsa_index_set_stream (BalsaIndex * bindex,
   append_messages (bindex, 1, bindex->last_message);
 
   if (GTK_CLIST (GTK_BIN (bindex)->child)->rows > 0)
-    gtk_clist_select_row (GTK_CLIST (GTK_BIN (bindex)->child), 0, -1);
-
+  {
+    if (first_new_mesgno != 0)
+    {
+      gtk_clist_select_row (GTK_CLIST (GTK_BIN (bindex)->child), first_new_mesgno - 1, -1);
+      gtk_clist_moveto (GTK_CLIST (GTK_BIN (bindex)->child), first_new_mesgno-1, 0, 0.5, 0.0);
+    }
+    else gtk_clist_select_row (GTK_CLIST (GTK_BIN (bindex)->child), 0, -1);
+  }
   gtk_clist_set_selection_mode (GTK_CLIST (GTK_BIN (bindex)->child),
 				GTK_SELECTION_BROWSE);
 }
@@ -476,7 +482,6 @@ append_messages (BalsaIndex * bindex,
 
   gtk_clist_thaw (GTK_CLIST (GTK_BIN (bindex)->child));
 
-  gtk_clist_select_row (GTK_CLIST (GTK_BIN (bindex)->child), first_new_mesgno - 1, -1);
   /* re-set the progress bar to 0.0 */
   if (bindex->progress_bar)
     gtk_progress_bar_update (bindex->progress_bar, 0.0);

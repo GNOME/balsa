@@ -390,7 +390,6 @@ int mh_read_dir (CONTEXT *ctx, const char *subdir)
 #ifdef LIBMUTT
     if (count > i)
     {
-      libmutt_set_gui_update_hook(count, 0);
       i+=50;
     }
 #endif

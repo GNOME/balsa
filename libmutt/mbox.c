@@ -262,8 +262,6 @@ int mbox_parse_mailbox (CONTEXT *ctx)
 #ifdef LIBMUTT
       if (count > i)
       {
-        libmutt_set_gui_update_hook(count,
-			ftell (ctx->fp) / (ctx->size / 100 + 1));
         i+=50;
       }
 #endif

@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: balsa 0.8\n"
 "POT-Creation-Date: 2000-07-15 18:42+0100\n"
 "PO-Revision-Date: 2000-07-15 17:42+0000\n"
 "Last-Translator: Robert Brady <rwb197@zepler.org>\n"

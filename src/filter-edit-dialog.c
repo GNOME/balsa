@@ -597,7 +597,7 @@ void filter_edit_dialog(GList *filter_list)
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     5, 5);
     gtk_widget_show(fe_action_frame);
-    fe_action_table = gtk_table_new(5, 5, TRUE);
+    fe_action_table = gtk_table_new(5, 6, TRUE);
     gtk_container_add(GTK_CONTAINER(fe_action_frame),
 		      fe_action_table);
     gtk_widget_show(fe_action_table);
@@ -646,12 +646,30 @@ void filter_edit_dialog(GList *filter_list)
 		     GTK_SHRINK,
 		     5, 5);
     gtk_widget_show(fe_move_label);
-    fe_run_button = gtk_radio_button_new_with_label(
+    fe_print_button = gtk_radio_button_new_with_label(
 	gtk_radio_button_group(GTK_RADIO_BUTTON(fe_move_button)),
+			       "Print on printer:");
+    gtk_table_attach(GTK_TABLE(fe_action_table),
+		     fe_print_button,
+		     0, 2, 3, 4,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_print_button);
+    fe_print_entry = gtk_entry_new_with_max_length(255);
+    gtk_table_attach(GTK_TABLE(fe_action_table),
+		     fe_print_entry,
+		     2, 5, 3, 4,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_print_entry);
+    fe_run_button = gtk_radio_button_new_with_label(
+	gtk_radio_button_group(GTK_RADIO_BUTTON(fe_print_button)),
 			       "Run program:");
     gtk_table_attach(GTK_TABLE(fe_action_table),
 		     fe_run_button,
-		     0, 2, 3, 4,
+		     0, 2, 4, 5,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     GTK_SHRINK,
 		     5, 5);
@@ -659,7 +677,7 @@ void filter_edit_dialog(GList *filter_list)
     fe_run_entry = gtk_entry_new_with_max_length(1023);
     gtk_table_attach(GTK_TABLE(fe_action_table),
 		     fe_run_entry,
-		     2, 5, 3, 4,
+		     2, 5, 4, 5,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     GTK_SHRINK,
 		     5, 5);
@@ -669,7 +687,7 @@ void filter_edit_dialog(GList *filter_list)
 			       "Send to Trash");
     gtk_table_attach(GTK_TABLE(fe_action_table),
 		     fe_delete_button,
-		     0, 2, 4, 5,
+		     0, 2, 5, 6,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     GTK_SHRINK,
 		     5, 5);
@@ -678,7 +696,7 @@ void filter_edit_dialog(GList *filter_list)
 	"(Implies \"Stop filtering\" below)");
     gtk_table_attach(GTK_TABLE(fe_action_table),
 		     fe_delete_label,
-		     2, 5, 4, 5,
+		     2, 5, 5, 6,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     GTK_SHRINK,
 		     5, 5);

@@ -1,3 +1,7 @@
+2005-02-20 Kacper Wysocki <kacperw at online dot no>
+
+	* libbalsa/imap/pop3.c: const char *service should not be static.
+
 2005-02-20  Pawel Salek
 
 	* balsa.spec.in: icon-related updates.

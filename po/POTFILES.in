@@ -41,7 +41,6 @@ src/ab-main.c
 src/ab-window.c
 src/address-book-config.c
 src/balsa-app.c
-src/balsa-index-threading.c
 src/balsa-index.c
 src/balsa-mblist.c
 src/balsa-message.c

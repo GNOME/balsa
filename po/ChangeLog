@@ -1,3 +1,7 @@
+2003-10-03  Pawel Salek <pawsa@theochem.kth.se>
+
+	* POTFILES.in: removed src/balsa-index-threading.c
+
 2003-09-26  Christian Neumair  <chris@gnome-de.org>
 
 	* POTFILES.in: Removed non-existant libmutt cruft. Finally!

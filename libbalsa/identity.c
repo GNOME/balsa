@@ -401,9 +401,6 @@ libbalsa_identity_select_dialog(GtkWindow* parent, const gchar* prompt,
                        &isd);
     identity_list_update(GTK_CLIST(clist));
 
-#if TO_BE_PORTED
-    gnome_dialog_set_parent(GNOME_DIALOG(dialog), parent);
-#endif
     /* default action=Enter is to select the identity */
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
 
@@ -692,9 +689,6 @@ setup_ident_dialog(GtkWindow* parent, gboolean createp,
     gtk_object_set_data(GTK_OBJECT(dialog), "identity-edit", 
 			(gpointer)!createp);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
-#if TO_BE_PORTED
-    gnome_dialog_set_parent(dialog, parent);
-#endif    
     gtk_box_pack_start(GTK_BOX(main_box), frame, TRUE, TRUE, 0);
     gtk_container_add(GTK_CONTAINER(frame), vbox);
 
@@ -1074,9 +1068,6 @@ libbalsa_identity_config_dialog(GtkWindow* parent, GList**identities,
                                          GTK_STOCK_CLOSE,
                                          GTK_RESPONSE_CLOSE,
                                          NULL);
-#if TO_BE_PORTED
-    gnome_dialog_set_parent(GNOME_DIALOG(dialog), parent);
-#endif
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), 
                        hbox, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(hbox), frame, FALSE, FALSE, 0);
@@ -1128,7 +1119,8 @@ config_dialog_select_cb(GtkCList* clist, gint row, gint column,
     /* disable default identity deletion */
     default_id = gtk_object_get_data(GTK_OBJECT(clist), "default-id");
 #if TO_BE_PORTED
-    gnome_dialog_set_sensitive(dialog, 3, ident != *default_id);
+    response is not used properly yet.
+    gtk_dialog_set_response_sensitive(dialog, 3, ident != *default_id);
 #endif
     frame = gtk_object_get_data(GTK_OBJECT(clist), "frame");
     g_return_if_fail(frame);

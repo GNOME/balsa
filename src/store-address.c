@@ -37,6 +37,9 @@ struct store_address_info {
     GtkWidget *notebook;
     BalsaIndex *index;
 };
+enum StoreAddressResponse {
+    SA_RESPONSE_SAVE = 1,
+};
 
 /* statics */
 GtkWidget *store_address_dialog(struct store_address_info * info);
@@ -73,20 +76,19 @@ balsa_store_address(GtkWidget * widget, gpointer user_data)
 
     if (info->entries_list) {
         GtkNotebook *notebook = GTK_NOTEBOOK(info->notebook);
-        gint button;
+        gint response;
 
-        gnome_dialog_close_hides(GNOME_DIALOG(dialog), TRUE);
-        /* button ==  0 => OK
-         * button ==  1 => save
-         * button ==  2 => close
-         * button == -1    if user closed dialog using the window
+        /* response ==  0 => OK
+         * response ==  1 => save
+         * response ==  2 => close
+         * response == -1    if user closed dialog using the window
          *                   decorations */
-        while ((button = gnome_dialog_run(GNOME_DIALOG(dialog))) == 0 
-                || button == 1) {
+        while ((response = gtk_dialog_run(GTK_DIALOG(dialog))) 
+               == GTK_RESPONSE_OK || response == SA_RESPONSE_SAVE) {
             gint page = gtk_notebook_get_current_page(notebook);
             GList *list = g_list_nth(info->entries_list, page);
             store_address_from_entries(info, list->data);
-            if (button == 0)
+            if (response == GTK_RESPONSE_OK)
                 break;
         }
         g_list_foreach(info->entries_list, (GFunc) g_free, NULL);
@@ -104,11 +106,14 @@ GtkWidget *
 store_address_dialog(struct store_address_info * info)
 {
     GtkWidget *dialog =
-        gnome_dialog_new(_("Store Address"),
-                         GNOME_STOCK_BUTTON_OK,
-                         "Save",
-                         GNOME_STOCK_BUTTON_CLOSE, NULL);
-    GtkWidget *vbox = GNOME_DIALOG(dialog)->vbox;
+        gtk_dialog_new_with_buttons(_("Store Address"),
+                                    GTK_WINDOW(balsa_app.main_window),
+                                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                                    GTK_STOCK_OK, GTK_RESPONSE_OK,
+                                    _("Save"),  SA_RESPONSE_SAVE,
+                                    GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
+                                    NULL);
+    GtkWidget *vbox = GTK_DIALOG(dialog)->vbox;
     GtkWidget *frame;
 
     frame = store_address_book_frame(info);
@@ -150,24 +155,25 @@ store_address_from_entries(struct store_address_info * info,
         entry_str_len = strlen(entry_str);
 
         for (cnt2 = 0; cnt2 < entry_str_len; cnt2++) {
-    	if (entry_str[cnt2] == ';') {
-    	    msg = _("Sorry, no semicolons are allowed in the name!\n");
+            if (entry_str[cnt2] == ';') {
+                msg = _("Sorry, no semicolons are allowed in the name!\n");
 
-    	    gtk_editable_select_region(GTK_EDITABLE(entries[cnt]),
-    				       0, -1);
-
-    	    gtk_widget_grab_focus(GTK_WIDGET(entries[cnt]));
-
-    	    box = gnome_message_box_new(msg,
-    					GNOME_MESSAGE_BOX_ERROR,
-    					GNOME_STOCK_BUTTON_OK,
-    					NULL);
-
-    	    gtk_window_set_modal(GTK_WINDOW(box), TRUE);
-    	    gnome_dialog_run_and_close(GNOME_DIALOG(box));
-    	    g_free(entry_str);
-    	    return;
-    	}
+                gtk_editable_select_region(GTK_EDITABLE(entries[cnt]),
+                                           0, -1);
+                
+                gtk_widget_grab_focus(GTK_WIDGET(entries[cnt]));
+                
+                box = gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
+                                             GTK_DIALOG_MODAL,
+                                             GTK_MESSAGE_ERROR,
+                                             GTK_BUTTONS_CLOSE,
+                                             msg);
+                
+                gtk_dialog_run(GTK_DIALOG(box));
+                gtk_widget_destroy(box);
+                g_free(entry_str);
+                return;
+            }
         }
         g_free(entry_str);
     }

@@ -193,11 +193,17 @@ balsa_druid_page_user_next(GnomeDruidPage * page, GnomeDruid * druid,
 
     if (balsa_init_create_to_directory
         (balsa_app.local_mail_directory, &uhoh)) {
-        gchar *tmp =
-            g_strconcat(_("Local Mail Problem"), "\n", uhoh, NULL);
-        gnome_dialog_run_and_close(GNOME_DIALOG(gnome_error_dialog(tmp)));
+        GtkWidget* err = 
+            gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_ancestor
+                                          (GTK_WIDGET(druid), 
+                                           GTK_TYPE_WINDOW)),
+                                   GTK_DIALOG_MODAL,
+                                   GTK_MESSAGE_ERROR,
+                                   GTK_BUTTONS_OK,
+                                   _("Local Mail Problem\n%s"), uhoh);
+        gtk_dialog_run(GTK_DIALOG(err));
+        gtk_widget_destroy(err);
         g_free(uhoh);
-        g_free(tmp);
         return TRUE;
     }
 

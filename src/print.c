@@ -54,14 +54,13 @@
 
 typedef struct _PrintInfo {
     /* gnome print info */
-    const GnomePrintPaper *paper;
     GnomePrintMaster *master;
     GnomePrintContext *pc;
 
     /* page info */
     gint pages, current_page;
     float ypos;
-    float page_width, page_height;
+    gdouble page_width, page_height;
     float margin_top, margin_bottom, margin_left, margin_right;
     float printable_width, printable_height;
     float pgnum_from_top;
@@ -898,27 +897,16 @@ print_info_new(const gchar * paper, LibBalsaMessage * msg,
 {
     gchar *the_charset;
     GnomeFont *font;
-    GList *papers;
     GnomePrintConfig* config;
     PrintInfo *pi = g_new0(PrintInfo, 1);
 
-    pi->paper = gnome_print_paper_get_by_name(paper);
-    if (pi->paper == NULL) {
-     	papers = gnome_print_paper_get_list();
-	balsa_information(LIBBALSA_INFORMATION_WARNING,
-			  _("Balsa could not find paper type \"%s\".\n"), paper);
-	balsa_information(LIBBALSA_INFORMATION_WARNING,
-			  _("Using paper type \"%s\" from /etc/paper.config instead\n"),
-			  (char *)papers->data);
-	pi->paper = gnome_print_paper_get_by_name((char *)papers->data);
-    }
     config = gnome_print_dialog_get_config(dlg);
     pi->master = gnome_print_master_new_from_config(config);
-    gnome_print_config_unref(config);
     pi->pc = gnome_print_master_get_context(pi->master);
 
-    pi->page_width  = pi->paper->width;
-    pi->page_height = pi->paper->height;
+    gnome_print_master_get_page_size_from_config(config, &pi->page_width,
+                                                 &pi->page_height);
+    gnome_print_config_unref(config);
 
     pi->margin_top = 0.75 * 72;
     pi->margin_bottom = 0.75 * 72;
@@ -1059,46 +1047,12 @@ message_print_cb(GtkWidget * widget, gpointer cbdata)
     message_print(msg);
 }
 
-/* callback to read new paper selection */
-static void 
-paper_changed (GtkEntry *paper_selector, gchar **paper_size)
-{
-    g_free(*paper_size);
-    *paper_size = g_strdup(gtk_entry_get_text(paper_selector));
-}
-
-/*
- * Adds combo with paper list to print dialog
- */
-static void
-print_paper_select_new(GtkWidget * dialog)
-{
-    GtkWidget  *frame;
-    GtkWidget  *combo;
-    GtkEntry   *entry;
-    const GnomePrintPaper   *gpaper;
-
-    if ((gpaper = gnome_print_paper_get_by_name(balsa_app.paper_size))==NULL) 
-        gpaper = gnome_print_paper_get_default();
-    frame = gtk_frame_new(_("Paper"));
-    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(dialog)->vbox), GTK_WIDGET(frame),
-		       FALSE, FALSE, 3);
-    combo = gtk_combo_new();
-    gtk_container_set_border_width(GTK_CONTAINER(combo), 3);
-    entry = GTK_ENTRY(GTK_COMBO(combo)->entry);
-    gtk_combo_set_popdown_strings(GTK_COMBO(combo), 
-				  g_list_copy(gnome_print_paper_get_list()));
-    gtk_entry_set_text(entry, balsa_app.paper_size);
-    gtk_signal_connect(GTK_OBJECT(entry), "changed",
-		       GTK_SIGNAL_FUNC(paper_changed), &balsa_app.paper_size);
-    gtk_container_add (GTK_CONTAINER(frame), combo);
-    gtk_widget_show_all(frame);
-}
 
 void
 message_print(LibBalsaMessage * msg)
 {
     GtkWidget *dialog;
+    GnomePrintConfig* config;
     PrintInfo *pi;
     gboolean preview = FALSE;
 
@@ -1109,11 +1063,17 @@ message_print(LibBalsaMessage * msg)
 
     dialog = gnome_print_dialog_new(_("Print message"),
 				    GNOME_PRINT_DIALOG_COPIES);
-    /*
-     * add paper selection combo to print dialog
-     */
-    print_paper_select_new(dialog);
-    /* gtk_widget_set_parent_window(dialog, 
+
+    config = gnome_print_dialog_get_config(GNOME_PRINT_DIALOG(dialog));
+    
+    /* FIXME: this sets the paper size in the GnomePrintConfig. We can
+     * change it in the Paper page of the GnomePrintDialog, and retrieve
+     * it from the GnomePrintConfig. However, it doesn't get set as the
+     * initial value in the Paper page. Is there some Gnome-2-wide
+     * repository for data like this? */
+    gnome_print_config_set(config, GNOME_PRINT_KEY_PAPER_SIZE, 
+                           balsa_app.paper_size);
+    /* gtk_widget_set_parent_window(dialog,
        GTK_WINDOW(balsa_app.main_window)); */
     gtk_window_set_wmclass(GTK_WINDOW(dialog), "print", "Balsa");
 
@@ -1128,6 +1088,10 @@ message_print(LibBalsaMessage * msg)
     default:
 	return;
     }
+
+    g_free(balsa_app.paper_size);
+    balsa_app.paper_size =
+        gnome_print_config_get(config, GNOME_PRINT_KEY_PAPER_SIZE); 
     pi = print_info_new(balsa_app.paper_size, msg, GNOME_PRINT_DIALOG(dialog));
     gtk_widget_destroy(dialog);
 

@@ -21,7 +21,11 @@
  */
 
 /*
- * A VCard (eg GnomeCard) addressbook
+ * A VCard (eg GnomeCard) addressbook.
+ * assumes that the file charset is in current locale.
+ * the strings are converted to UTF-8.
+ * FIXME: verify assumption agains RFC.
+ * Obviously, the best method would be to have file encoded in UTF-8.
  */
 
 #include "config.h"
@@ -263,9 +267,18 @@ static void load_vcard_file(LibBalsaAddressBook *ab)
 
 		address->address_list = address_list;
 
-		if (name)
-		    address->full_name = name;
-		else if (id)
+		if (name) {
+                    gint bread, bwritten;
+                    GError *err = NULL;
+                    gchar *cved = g_locale_to_utf8(name, -1, 
+                                                   &bread, &bwritten, &err);
+                    if(err) g_error_free(err); /* ignore errors */
+		    if(cved) {
+                        address->full_name = cved; g_free(name);
+                    } else
+                        address->full_name = name; /* conv error */
+                        
+                } else if (id)
 		    address->full_name = g_strdup(id);
 		else
 		    address->full_name = g_strdup(_("No-Name"));

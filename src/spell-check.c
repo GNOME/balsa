@@ -99,8 +99,6 @@ static void balsa_spell_check_fix(BalsaSpellCheck * spell_check,
 				  gboolean fix_al);
 static void balsa_spell_check_learn(BalsaSpellCheck * spell_check,
 				    LearnType learn);
-static void balsa_iter_move(GtkTextIter *iter, gint chars);
-static GtkTextTag *highlight_tag(GtkTextBuffer * buffer);
 
 
 /* marshallers */
@@ -692,6 +690,10 @@ done_cb(GtkButton * button, gpointer data)
  * Start the spell check, allocating the PSpellConfig and
  * PSpellManager to do the checking.
  * */
+
+static regex_t quoted_rex;
+static gboolean quoted_rex_compiled = FALSE;
+
 void
 balsa_spell_check_start(BalsaSpellCheck * spell_check)
 {
@@ -755,6 +757,21 @@ balsa_spell_check_start(BalsaSpellCheck * spell_check)
 	balsa_information(LIBBALSA_INFORMATION_DEBUG,
 			  "BalsaSpellCheck: Start\n");
 
+    /* 
+     * compile the quoted-text regular expression (note:
+     * balsa_app.quote_regex may change, so compile it new every
+     * time!)
+     */
+    if (quoted_rex_compiled)
+        regfree(&quoted_rex);
+    if (regcomp(&quoted_rex, balsa_app.quote_regex, REG_EXTENDED)) {
+        balsa_information(LIBBALSA_INFORMATION_ERROR,
+                          "BalsaSpellCheck: Quoted text "
+                          "regular expression compilation failed\n");
+        quoted_rex_compiled = FALSE;
+    } else
+        quoted_rex_compiled = TRUE;
+
     spell_check->end_iter = start;
     balsa_spell_check_next(spell_check);
 }
@@ -784,11 +801,10 @@ balsa_spell_check_next(BalsaSpellCheck * spell_check)
 	}
     }
 
-    /* replace the current word with the same word in a different
-     * colour */
-    gtk_text_buffer_apply_tag(buffer, highlight_tag(buffer),
-                              &spell_check->start_iter,
-                              &spell_check->end_iter);
+    /* highlight current word by selecting it */
+    gtk_text_buffer_place_cursor(buffer, &spell_check->start_iter);
+    gtk_text_buffer_move_mark_by_name(buffer, "selection_bound",
+                                      &spell_check->end_iter);
 
     /* scroll text window to show current word */
     gtk_text_view_scroll_to_iter(spell_check->view,
@@ -957,6 +973,11 @@ balsa_spell_check_destroy(GtkObject * object)
     g_free(spell_check->character_set);
     spell_check->character_set = NULL;
 
+    if (quoted_rex_compiled) {
+        regfree(&quoted_rex);
+        quoted_rex_compiled = FALSE;
+    }
+
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
 	(*GTK_OBJECT_CLASS(parent_class)->destroy) (object);
 }
@@ -1102,8 +1123,6 @@ check_word(BalsaSpellCheck * spell_check)
 static void
 finish_check(BalsaSpellCheck * spell_check)
 {
-    GtkTextBuffer *buffer = gtk_text_view_get_buffer(spell_check->view);
-
     /* get rid of the suggestions */
     gtk_clist_freeze(spell_check->list);
     gtk_clist_clear(spell_check->list);
@@ -1113,11 +1132,6 @@ finish_check(BalsaSpellCheck * spell_check)
 
     free(spell_check->suggestions);
     spell_check->suggestions = NULL;
-
-    /* we need to make sure there's no highlighted text left */
-    gtk_text_buffer_remove_tag(buffer, highlight_tag(buffer),
-                               &spell_check->start_iter,
-                               &spell_check->end_iter);
 }
 
 
@@ -1150,157 +1164,44 @@ static gboolean
 next_word(BalsaSpellCheck * spell_check)
 {
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(spell_check->view);
-    GtkTextIter end;
-    regex_t quoted_rex;
-    gchar *text;
-    gchar *line;
-    gchar **line_array;
-    gchar **line_array_base;
-    gint offset = 0;
-    gboolean at_end = FALSE;
+    GtkTextIter line_start, line_end;
+    gchar *line = NULL;
+    gboolean skip_sig, skip_quoted = FALSE;
 
-    static gboolean in_line = FALSE;
+    /* find end of current line */
+    line_end = spell_check->end_iter;
+    gtk_text_iter_forward_line(&line_end);
 
-#ifdef HAVE_PCRE
-    const gchar *new_word_regex = "\\b[[:alpha:]']+\\b";
-    static pcre *new_word_rex = NULL;
-    static const guchar *locale_tables = NULL;
-    gint rm[3];
-#else
-    const gchar *new_word_regex = "\\<[[:alpha:]']+\\>";
-    static regex_t *new_word_rex = NULL;
-    regmatch_t rm;
-#endif
+    do {
+        /* move forward one word */
+        if (!gtk_text_iter_forward_word_end(&spell_check->end_iter))
+            /* end of buffer */
+            return FALSE;
 
-    /* 
-     * compile the regular expressions if necessary (note: balsa_app.quote_regex
-     * may change, so compile it new every time!)
-     */
-    if (regcomp(&quoted_rex, balsa_app.quote_regex, REG_EXTENDED)) {
-	balsa_information(LIBBALSA_INFORMATION_ERROR,
-			  "BalsaSpellCheck: Quoted text regular expression compilation failed\n");
-	return FALSE;
-    }
+        /* is the new word on a new line? */
+        while (gtk_text_iter_compare(&spell_check->end_iter, &line_end) > 0) {
+            line_start = line_end;
+            gtk_text_iter_forward_line(&line_end);
+            line = gtk_text_buffer_get_text(buffer, &line_start,
+                                        &line_end, FALSE);
+            skip_sig = (!balsa_app.check_sig
+                        && strcmp(line, "-- \n") == 0);
+            skip_quoted = (!balsa_app.check_quoted && quoted_rex_compiled
+                           && is_a_quote(line, &quoted_rex));
+            g_free(line);
 
-    if (!new_word_rex) {
-#ifdef HAVE_PCRE
-	const gchar *errptr;
-	gint erroffs;
+            if (skip_sig)
+                /* new word is in the sig */
+                return FALSE;
+        }
+        /* we've found the line that the new word is on--keep looking if
+         * it's quoted */
+    } while (skip_quoted);
 
-	locale_tables = pcre_maketables();
-	if (!(new_word_rex = 
-	      pcre_compile(new_word_regex, PCRE_CASELESS, &errptr, &erroffs, locale_tables))) {
-	    balsa_information(LIBBALSA_INFORMATION_ERROR,
-			      "BalsaSpellCheck: New word regular expression compilation failed (%s)\n", errptr);
-	    regfree(&quoted_rex);
-	    return FALSE;
-	}
-#else
-	new_word_rex = g_malloc(sizeof(regex_t));
-	if (regcomp(new_word_rex, new_word_regex, REG_EXTENDED | REG_NEWLINE)) {
-	    balsa_information(LIBBALSA_INFORMATION_ERROR,
-			      "BalsaSpellCheck: New word regular expression compilation failed\n");
-	    regfree(&quoted_rex);
-	    return FALSE;
-	}
-#endif
-    }
-
-    /* get the message text */
     spell_check->start_iter = spell_check->end_iter;
-    gtk_text_buffer_get_end_iter(buffer, &end);
-    text = gtk_text_buffer_get_text(buffer, &spell_check->end_iter,
-                                    &end, FALSE);
-    if (!*text)
-        return FALSE;
+    gtk_text_iter_backward_word_start(&spell_check->start_iter);
 
-    /* skip quoted text */
-    line_array_base = g_strsplit(text, "\n", -1);
-    line_array = line_array_base;
-    line = g_strconcat(*line_array, "\n", NULL);
-
-    while (!in_line && line && !balsa_app.check_quoted &&
-	   is_a_quote(line, &quoted_rex)) {
-	if (balsa_app.debug) {
-	    balsa_information(LIBBALSA_INFORMATION_DEBUG,
-			      "BalsaSpellCheck: Ignore Quoted: %s\n",
-			      line);
-	}
-
-	offset += strlen(line);
-	in_line = FALSE;
-
-	g_free(line);
-	line = *(++line_array);
-	if (line)
-	    line = g_strconcat(line, "\n", NULL);
-    }
-
-
-    if (!in_line && line && !balsa_app.check_sig) {
-	if (g_strncasecmp(line, "-- \n", 4) == 0) {
-	    at_end = TRUE;
-	    g_free(line);
-	}
-    }
-
-    /* match the next word */
-    if (!at_end && line) {
-	guint line_len=strlen(line);
-#ifdef HAVE_PCRE
-	rm[0] = rm[1] = 0;
-	pcre_exec(new_word_rex, NULL, line, line_len, 0, 0, rm ,3);
-
-	if (rm[0] == rm[1]) {
-            balsa_iter_move(&spell_check->start_iter, line_len + offset);
-            balsa_iter_move(&spell_check->end_iter, line_len + offset);
-	    in_line = FALSE;
-	} else {
-            balsa_iter_move(&spell_check->start_iter, rm[0] + offset);
-            balsa_iter_move(&spell_check->end_iter, rm[1] + offset);
-	    in_line = TRUE;
-	}
-#else
-	rm.rm_so = 0;
-	rm.rm_eo = 0;
-	regexec(new_word_rex, line, 1, &rm, 0);
-
-	if (rm.rm_so == rm.rm_eo) {
-            balsa_iter_move(&spell_check->start_iter, line_len + offset);
-            balsa_iter_move(&spell_check->end_iter, line_len + offset);
-	    in_line = FALSE;
-	} else {
-            balsa_iter_move(&spell_check->start_iter, rmrm_so + offset);
-            balsa_iter_move(&spell_check->end_iter, rm.rm_eo + offset);
-	    in_line = TRUE;
-	}
-#endif
-
-	g_free(line);
-    } else {
-	at_end = TRUE;
-    }
-
-    g_strfreev(line_array_base);
-    g_free(text);
-    regfree(&quoted_rex);
-
-    /* check to see if we're at the end yet */
-    if (!at_end) {
-        if (!gtk_text_iter_get_char(&spell_check->end_iter))
-	    at_end = TRUE;
-	else if (gtk_text_iter_get_offset(&spell_check->start_iter)
-                 == gtk_text_iter_get_offset(&spell_check->end_iter))
-	    at_end = !next_word(spell_check);
-    }
-
-    if (at_end) {
-        gtk_text_buffer_get_end_iter(buffer, &spell_check->end_iter);
-        spell_check->start_iter = spell_check->end_iter;
-	return FALSE;
-    } else {
-	return TRUE;
-    }
+    return TRUE;
 }
 
 
@@ -1327,35 +1228,4 @@ switch_word(BalsaSpellCheck * spell_check, const gchar * old_word,
     gtk_text_buffer_get_iter_at_mark(buffer,
                                      &spell_check->start_iter, mark);
     gtk_text_buffer_delete_mark(buffer, mark);
-}
-
-/*
- * balsa_iter_move:
- *   convenience function for moving a GtkTextIter.
- */
-static void
-balsa_iter_move(GtkTextIter * iter, gint chars)
-{
-    GtkTextBuffer *buffer = gtk_text_iter_get_buffer(iter);
-    gint offset = gtk_text_iter_get_offset(iter);
-    offset += chars;
-    gtk_text_buffer_get_iter_at_offset(buffer, iter, offset);
-}
-
-/*
- * highlight_tag:
- *   find and return the  highlighting tag, creating it if necessary.
- */
-static GtkTextTag *
-highlight_tag(GtkTextBuffer * buffer)
-{
-    GtkTextTagTable *table = gtk_text_buffer_get_tag_table(buffer);
-    GtkTextTag *tag = gtk_text_tag_table_lookup(table, "highlight");
-
-    if (!tag)
-        tag = gtk_text_buffer_create_tag(buffer, "highlight",
-                                         "foreground", "red",
-                                         NULL);
-
-    return tag;
 }

@@ -1,3 +1,20 @@
+2002-04-14  Pawel Salek <pawsa@theochem.kth.se>
+
+	* configure.in: make libgtkhtml default again.
+	* libbalsa/address-book-vcard.c: convert strings from locale to
+	UTF-8. Forcing this is dumb (IMO).
+	* libbalsa/address.h: Fix header.
+	* libbalsa/identity.c: complete porting to GtkDialog.
+	* libinit_balsa/balsa-druid-page-directory.c: do same.
+	* libinit_balsa/{balsa-druid-page-user.c, balsa-initdruid.c}:
+	* src/{address-book-config.c, balsa-app.[hc], folder-conf.c:
+	* src/mailbox-conf.c: GnomeDialog->GtkDialog.
+	* src/pref-manager.c: ref new address book.
+	* src/print.c: remove unnecessary paper selection widget (Peter B.).
+	* src/spell-check.c: compile the quote regex once per invocation;
+	- highlight a bad word by selecting it; - use GtkTextIter to find
+	words, instead of a regex (Peter B.).
+
 2002-04-12  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/print.c: make print work with new API (still some warnings

@@ -2539,6 +2539,8 @@ address_book_add_cb(GtkWidget * widget, gpointer data)
     address_book = balsa_address_book_config_new(NULL);
 
     if (address_book != NULL) {
+        gtk_object_ref(GTK_OBJECT(address_book));
+        gtk_object_sink(GTK_OBJECT(address_book));
 	balsa_app.address_book_list =
 	    g_list_append(balsa_app.address_book_list, address_book);
 	config_address_book_save(address_book);

@@ -74,12 +74,19 @@ static void
 balsa_initdruid_cancel(GnomeDruid * druid)
 {
     GtkWidget *dialog =
-        gnome_question_dialog_modal(_("This will exit Balsa.\n"
-                                      "Do you really want to do this?"),
-                                    NULL, NULL);
-    gint reply = gnome_dialog_run_and_close(GNOME_DIALOG(dialog));
+        gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_ancestor
+                                          (GTK_WIDGET(druid), 
+                                           GTK_TYPE_WINDOW)),
+                               GTK_DIALOG_MODAL,
+                               GTK_MESSAGE_QUESTION,
+                               GTK_BUTTONS_YES_NO,
+                               _("This will exit Balsa.\n"
+                                 "Do you really want to do this?"));
+    GtkResponseType reply = 
+        gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
 
-    if (reply == GNOME_YES) {
+    if (reply == GTK_RESPONSE_YES) {
         gnome_config_drop_all();
         exit(0);
     }

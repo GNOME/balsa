@@ -341,12 +341,18 @@ balsa_druid_page_directory_next(GnomeDruidPage * page, GtkWidget * druid,
     dir->paths_locked = TRUE;
 
     if (error) {
-        gchar *tmp =
-            g_strconcat(_("Problem Creating Mailboxes"), "\n", error,
-                        NULL);
-        gnome_dialog_run_and_close(GNOME_DIALOG(gnome_error_dialog(tmp)));
+        GtkWidget *dlg =
+            gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_ancestor
+                                          (GTK_WIDGET(druid), 
+                                           GTK_TYPE_WINDOW)),
+                                   GTK_DIALOG_MODAL,
+                                   GTK_MESSAGE_ERROR,
+                                   GTK_BUTTONS_OK,
+                                   _("Problem Creating Mailboxes\n%s"),
+                                   error);
         g_free(error);
-        g_free(tmp);
+        gtk_dialog_run(GTK_DIALOG(dlg));
+        gtk_widget_destroy(dlg);
         return TRUE;
     }
 

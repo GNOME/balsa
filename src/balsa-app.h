@@ -379,12 +379,11 @@ GNode* balsa_app_find_by_dir(GNode* root, const gchar* path);
 void  balsa_remove_children_mailbox_nodes(GNode* gnode);
 BalsaIndex* balsa_find_index_by_mailbox(LibBalsaMailbox* mailbox);
 
-GtkWidget *create_label(const gchar * label, GtkWidget * table, 
-			       gint row, guint *keyval);
-GtkWidget *create_entry(GnomeDialog *mcw, GtkWidget * table, 
+GtkWidget *create_label(const gchar * label, GtkWidget * table, gint row);
+GtkWidget *create_entry(GtkDialog *mcw, GtkWidget * table, 
 			GtkSignalFunc func, gpointer data, gint row, 
-			const gchar * initval, const guint keyval);
-GtkWidget *create_check(GnomeDialog *mcw, const gchar * label, 
+			const gchar * initval, GtkWidget* hotlabel);
+GtkWidget *create_check(GtkDialog *mcw, const gchar * label, 
 			GtkWidget * table, gint row, gboolean initval);
 
 #endif				/* __BALSA_APP_H__ */

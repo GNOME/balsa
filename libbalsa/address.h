@@ -92,11 +92,11 @@ gchar *libbalsa_address_to_gchar(LibBalsaAddress * addr, gint n);
 /* get pointer to descriptive name (full name if available, or e-mail) */
 const gchar *libbalsa_address_get_name(const LibBalsaAddress * addr);
 
+/* XXX - added by Brian Stafford <brian@stafford.uklinux.net> */
+const gchar *libbalsa_address_get_mailbox(LibBalsaAddress * address, gint n);
 #if ENABLE_ESMTP
 /* XXX - added by Brian Stafford <brian@stafford.uklinux.net> */
 const gchar *libbalsa_address_get_phrase(LibBalsaAddress * address);
-/* XXX - added by Brian Stafford <brian@stafford.uklinux.net> */
-const gchar *libbalsa_address_get_mailbox(LibBalsaAddress * address, gint n);
 #endif
 
 #endif				/* __LIBBALSA_ADDRESS_H__ */

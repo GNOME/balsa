@@ -60,7 +60,7 @@ struct _LibBalsaMailboxImap {
 
     GHashTable* messages_info;
     GPtrArray* msgno_2_msg_info;
-    ImapMboxHandle* handle;
+    gboolean opened;
     time_t mtime;
     time_t mtime_cur;
     time_t mtime_new;
@@ -95,6 +95,8 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
 void libbalsa_mailbox_imap_noop(LibBalsaMailboxImap* mbox);
 
 void libbalsa_imap_close_all_connections(void);
+void libbalsa_mailbox_imap_expunge_notify(LibBalsaMailboxImap* mailbox,
+					  int seqno);
 
 void libbalsa_imap_new_subfolder(const gchar * parent, const gchar * folder,
 				 gboolean subscribe, LibBalsaServer * server);
@@ -105,11 +107,7 @@ gboolean libbalsa_imap_rename_subfolder(LibBalsaMailboxImap* mbox,
 
 void libbalsa_imap_delete_folder(LibBalsaMailboxImap * mailbox);
 
-void reset_mutt_passwords(LibBalsaServer *);
-
 gchar *libbalsa_imap_path(LibBalsaServer * server, const gchar * path);
 gchar *libbalsa_imap_url(LibBalsaServer * server, const gchar * path);
 
-ImapMboxHandle *libbalsa_mailbox_imap_get_handle(LibBalsaMailboxImap *mailbox,
-						 LibBalsaServer *server);
 #endif				/* __LIBBALSA_MAILBOX_IMAP_H__ */

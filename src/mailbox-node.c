@@ -37,6 +37,7 @@
 #include "save-restore.h"
 #include "notify.h"
 #include "filter.h"
+#include "imap-server.h"
 
 /* MailboxNode object is a GUI representation of a mailbox, or entire 
    set of them. It can read itself from the configuration, save its data,
@@ -460,9 +461,7 @@ balsa_mailbox_node_new_from_config(const gchar* prefix)
     BalsaMailboxNode * folder = balsa_mailbox_node_new();
     gnome_config_push_prefix(prefix);
 
-    folder->server = LIBBALSA_SERVER(
-	libbalsa_server_new(LIBBALSA_SERVER_IMAP));
-    libbalsa_server_load_config(folder->server);
+    folder->server = LIBBALSA_SERVER(libbalsa_imap_server_new_from_config());
 
 #ifdef USE_SSL  
     if(balsa_app.debug)

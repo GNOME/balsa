@@ -694,9 +694,6 @@ update_imap_mailbox(MailboxConfWindow *mcw)
     server->remember_passwd = 
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->
                                                        mb_data.imap.remember));
-    libbalsa_server_set_password(server,
-				 gtk_entry_get_text(GTK_ENTRY
-						    (mcw->mb_data.imap.password)));
     libbalsa_server_set_host(server,
 			     gtk_entry_get_text(GTK_ENTRY
 						(mcw->mb_data.imap.server))
@@ -704,6 +701,9 @@ update_imap_mailbox(MailboxConfWindow *mcw)
 			     , gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.imap.use_ssl))
 #endif
 );
+    libbalsa_server_set_password(server,
+				 gtk_entry_get_text(GTK_ENTRY
+						    (mcw->mb_data.imap.password)));
 
     g_signal_connect(G_OBJECT(server), "get-password",
                      G_CALLBACK(ask_password), mailbox);

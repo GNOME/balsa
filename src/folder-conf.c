@@ -29,6 +29,7 @@
 #include "mailbox-node.h"
 #include "save-restore.h"
 #include "pref-manager.h"
+#include "imap-server.h"
 
 typedef struct _CommonDialogData CommonDialogData;
 typedef struct _FolderDialogData FolderDialogData;
@@ -173,25 +174,28 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
     gboolean insert;
     LibBalsaServer *s;
     GNode *gnode;
+    const gchar *username;
+    const gchar *host;
+
+    host = gtk_entry_get_text(GTK_ENTRY(fcw->server));
+    username = gtk_entry_get_text(GTK_ENTRY(fcw->username));
 
     if (fcw->mbnode) {
         insert = FALSE;
         s = fcw->mbnode->server;
     } else {
         insert = TRUE;
-        s = LIBBALSA_SERVER(libbalsa_server_new(LIBBALSA_SERVER_IMAP));
+	s = LIBBALSA_SERVER(libbalsa_imap_server_new(username, host));
     }
 
-    libbalsa_server_set_host(s, gtk_entry_get_text(GTK_ENTRY(fcw->server))
+    libbalsa_server_set_host(s, host
 #ifdef USE_SSL
                              ,
                              gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
                                                           (fcw->use_ssl))
 #endif
         );
-    libbalsa_server_set_username(s,
-                                 gtk_entry_get_text(GTK_ENTRY
-                                                    (fcw->username)));
+    libbalsa_server_set_username(s, username);
     s->remember_passwd =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->remember));
     libbalsa_server_set_password(s,

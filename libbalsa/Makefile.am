@@ -79,6 +79,8 @@ libbalsa_a_SOURCES = 		\
 	send.h			\
 	server.c		\
 	server.h		\
+	imap-server.c		\
+	imap-server.h		\
 	source-viewer.c		\
 	url.c			\
 	url.h

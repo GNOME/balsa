@@ -36,9 +36,6 @@
 
 #include "libbalsa.h"
 #include "misc.h"
-/* For global mutt vars */
-#include "mailbackend.h"
-
 
 #ifdef BALSA_USE_THREADS
 static pthread_t main_thread_id;

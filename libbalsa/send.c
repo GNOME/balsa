@@ -367,7 +367,6 @@ write_remote_fcc(LibBalsaMailbox* fccbox, HEADER* m_msg)
                                  "Unable to open sentbox - could not get passwords for server");
             return -1;
         }
-        reset_mutt_passwords(server);
     }
   
     /* Passwords are guaranteed to be set now */
@@ -1055,8 +1054,8 @@ monitor_cb (const char *buf, int buflen, int writing, void *arg)
 /* balsa_send_message_real:
    does the actual message sending. 
    This function may be called as a thread and should therefore do
-   proper gdk_threads_{enter/leave} stuff around GTK,libbalsa or
-   libmutt calls. Also, structure info should be freed before exiting.
+   proper gdk_threads_{enter/leave} stuff around GTK or libbalsa calls.
+   Also, structure info should be freed before exiting.
 */
 
 /* [BCS] radically different since it uses the libESMTP interface.

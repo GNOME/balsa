@@ -36,6 +36,7 @@
 #include "imap.h"
 #include "imap-handle.h"
 #include "imap-commands.h"
+#include "imap-server.h"
 
 static void
 libbalsa_scanner_mdir(GNode *rnode,
@@ -260,14 +261,9 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     ImapMboxHandle* handle;
     gulong handler_id;
 
-    /* try getting password, quit on cancel */
-    if (!server->passwd) {
-        server->passwd = libbalsa_server_get_password(server, NULL);
-        if(!server->passwd)
-            return;
-    }
-
-    handle = libbalsa_mailbox_imap_get_handle(NULL, server);
+    if (!LIBBALSA_IS_IMAP_SERVER(server))
+	    return;
+    handle = libbalsa_imap_server_get_handle(LIBBALSA_IMAP_SERVER(server));
     if (!handle)
 	return;
 
@@ -295,5 +291,5 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     i = 0;
     libbalsa_imap_browse(path, &state, handle, server, check_imap_path, &i);
     g_signal_handler_disconnect(G_OBJECT(handle), handler_id);
-    g_object_unref(handle);
+    libbalsa_imap_server_release_handle(LIBBALSA_IMAP_SERVER(server), handle);
 }

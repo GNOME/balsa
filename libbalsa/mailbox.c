@@ -377,7 +377,7 @@ libbalsa_mailbox_is_open(LibBalsaMailbox *mailbox)
     } else if(LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
 	LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
 	
-	return(mimap->handle != NULL);
+	return(mimap->opened);
     };
 
     return FALSE; // this will break unlisted mailbox types

@@ -34,11 +34,6 @@
 #include "mime.h"
 #include "misc.h"
 
-/*
-#include <libmutt/mutt.h>
-#include <libmutt/mime.h>
-*/
-
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
 #ifdef HAVE_GTKHTML

@@ -1,3 +1,18 @@
+2003-09-23  Magick  <magick Linux-Fan.com>
+
+	* libbalsa/Makefile.am: add imap-server.[hc]
+	* libbalsa/address.c: remove code obsoleted by gmime.
+	* libbalsa/folder-scanners.c: get and release server handles.
+	* libbalsa/libbalsa.[hc]: cleanup.
+	* libbalsa/mailbox.c: return 'opened' field.
+	* libbalsa/mailbox_imap.[ch]: use ImapServer class for connection pool.
+	* libbalsa/{misc,send}}.c: misc fixes.
+	* libbalsa/server.c: use it only for POP3 connections.
+	* libbalsa/imap/imap-commands.c: proper returned type.
+	* libbalsa/imap/imap-handle.c: add argument to expunge-notify handler.
+	* src/balsa-message.c, src/sendmsg-window.c: cleanup.
+	* src/{mailbox,folder}-conf.c, mailbox-node.c: adapt to new api.
+
 2003-09-23 16:17  PeterB
 
 	* libbalsa/mailbox_imap.c, libbalsa/message.c, libbalsa/message.h,

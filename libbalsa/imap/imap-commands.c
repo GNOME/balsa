@@ -165,7 +165,7 @@ imap_mbox_select(ImapMboxHandle* handle, const char *mbox,
   ImapResponse rc;
 
   if (handle->state == IMHS_SELECTED && strcmp(handle->mbox, mbox) == 0)
-      return IMAP_SUCCESS;
+      return IMR_OK;
 
   imap_mbox_resize_cache(handle, 0);
   mbox_view_dispose(&handle->mbox_view);

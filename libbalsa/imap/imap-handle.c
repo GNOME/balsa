@@ -54,7 +54,7 @@ struct _ImapMboxHandleClass {
   void (*fetch_response)(ImapMboxHandle* handle);
   void (*list_response)(ImapMboxHandle* handle, int delim,
                         ImapMboxFlags flags, const gchar* mbox);
-  void (*expunge_notify)(ImapMboxHandle* handle);
+  void (*expunge_notify)(ImapMboxHandle* handle, int seqno);
   void (*exists_notify)(ImapMboxHandle* handle);
 };
 
@@ -154,7 +154,8 @@ imap_mbox_handle_class_init(ImapMboxHandleClass * klass)
                  G_SIGNAL_RUN_FIRST,
                  G_STRUCT_OFFSET(ImapMboxHandleClass, expunge_notify),
                  NULL, NULL,
-                 g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+                 g_cclosure_marshal_VOID__INT, G_TYPE_NONE, 1,
+		 G_TYPE_INT);
 
   imap_mbox_handle_signals[EXISTS_NOTIFY] = 
     g_signal_new("exists-notify",
@@ -1289,7 +1290,10 @@ static ImapResponse
 ir_expunge(ImapMboxHandle *h, unsigned seqno)
 {
   int c; while( (c=sio_getc(h->sio))!=EOF && c != 0x0a);
-  /* FIXME: emit signal here */
+
+  g_signal_emit(G_OBJECT(h), imap_mbox_handle_signals[EXPUNGE_NOTIFY],
+		0, seqno);
+  
   if(h->msg_cache[seqno-1] != NULL)
     imap_message_free(h->msg_cache[seqno-1]);
   while(seqno<h->exists) {

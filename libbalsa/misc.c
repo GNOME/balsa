@@ -1564,7 +1564,7 @@ libbalsa_lock_file (const char *path, int fd, int excl, int dot, int timeout)
     while (fcntl (fd, F_SETLK, &lck) == -1)
 	{
 	    struct stat sb;
-	    g_warning"mx_lock_file(): fcntl errno %d.\n", errno);
+	    g_warning("mx_lock_file(): fcntl errno %d.\n", errno);
     if (errno != EAGAIN && errno != EACCES)
 	{
 	    mutt_perror ("fcntl");

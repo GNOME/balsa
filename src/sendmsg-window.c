@@ -438,13 +438,6 @@ headerMenuDesc headerDescs[] = { {"from", 3}, {"to", 3}, {"subject", 2},
 {"comments", 2}, {"keywords", 2}
 };
 
-/* from libmutt/mime.h - Content-Disposition values */
-enum
-{
-  DISPINLINE,
-  DISPATTACH,
-  DISPFORMDATA
-};
 /* i'm sure there's a subtle and nice way of making it visible here */
 typedef struct {
     gchar *filename;

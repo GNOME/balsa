@@ -324,8 +324,11 @@ balsa_sendmsg_destroy (BalsaSendmsg * bsm)
    if(balsa_app.debug) printf("balsa_sendmsg_destroy: Freeing bsm\n");
    g_free (bsm);
 
-   if(bsm->orig_message && bsm->orig_message->mailbox)
-       mailbox_open_unref(bsm->orig_message->mailbox);
+   if(bsm->orig_message) {
+       if(bsm->orig_message->mailbox) 
+	   mailbox_open_unref(bsm->orig_message->mailbox);
+       gtk_object_unref( GTK_OBJECT(bsm->orig_message) );
+   }
 
    if(balsa_app.compose_email)
        balsa_exit();
@@ -871,11 +874,13 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
       msg->orig_message = NULL;
       break;
     }
-  if(message && message->mailbox)
+  if(message) { /* ref message so we don't loose it ieven if it is deleted */
+      gtk_object_ref( GTK_OBJECT(message) );
                 /* reference the original mailbox so we don't loose the
 		   mail even if the mailbox is closed */
-      mailbox_open_ref(message->mailbox);
-
+      if(message->mailbox)
+	  mailbox_open_ref(message->mailbox);
+  }
   msg->window  = window;
   msg->type    = type;
 

@@ -69,6 +69,7 @@ void libbalsa_init(LibBalsaInformationFunc information_callback);
 void libbalsa_set_spool(gchar * spool);
 
 void libbalsa_show_message_source(LibBalsaMessage* msg);
+gchar *libbalsa_rot(const gchar * pass);
 
 gchar *libbalsa_guess_email_address(void);
 gchar *libbalsa_guess_mail_spool(void);

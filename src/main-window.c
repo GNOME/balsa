@@ -656,7 +656,9 @@ mblist_open_window (GnomeMDI * mdi)
   gtk_widget_push_visual (gdk_imlib_get_visual ());
   gtk_widget_push_colormap (gdk_imlib_get_colormap ());
 
-  dock_item = gnome_dock_item_new (GNOME_DOCK_ITEM_BEH_EXCLUSIVE | GNOME_DOCK_ITEM_BEH_NEVER_HORIZONTAL);
+  dock_item = gnome_dock_item_new (GNOME_DOCK_ITEM_BEH_NEVER_HORIZONTAL);
+  gnome_dock_item_set_shadow_type (GNOME_DOCK_ITEM (dock_item), GTK_SHADOW_NONE);
+
   
   mblw->sw = gtk_scrolled_window_new(NULL, NULL);
   mblw->ctree = GTK_CTREE (balsa_mblist_new ());

@@ -1,3 +1,10 @@
+2003-07-23  Pawel Salek  <pawsa theochem.kth.se>
+
+	* src/balsa-app.h: change date defaults as suggested in #118118.
+	* src/sendmsg-window.c: use gnome default editor.
+	* src/balsa-app.h: remove balsa_app.extern_editor_command.
+	* src/save-restore.c, src/pref-manager.c: ditto.
+
 2003-07-22  Pawel Salek  <pawsa theochem.kth.se>
 
 	* src/mailbox-conf.c: fix (at least partially) bug 117163.

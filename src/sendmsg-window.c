@@ -30,6 +30,7 @@
 #include <string.h>
 #include <gnome.h>
 #include <libgnomevfs/gnome-vfs-uri.h>
+#include <libgnomevfs/gnome-vfs-mime-handlers.h>
 #include <ctype.h>
 
 #ifdef HAVE_LOCALE_H
@@ -745,8 +746,6 @@ edit_with_gnome(GtkWidget* widget, BalsaSendmsg* bsmsg)
 {
     static const char TMP_PATTERN[] = "/tmp/balsa-edit-XXXXXX";
     gchar filename[sizeof(TMP_PATTERN)];
-    gchar *command;
-    gchar **cmdline;
     balsa_edit_with_gnome_data *data = 
         g_malloc(sizeof(balsa_edit_with_gnome_data));
     pid_t pid;
@@ -756,11 +755,50 @@ edit_with_gnome(GtkWidget* widget, BalsaSendmsg* bsmsg)
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
     GtkTextIter start, end;
     gchar *p;
+    GnomeVFSMimeApplication *app;
+    char **argv;
+    int argc;
 
     sw_buffer_save(bsmsg);
-
     strcpy(filename, TMP_PATTERN);
     tmpfd = mkstemp(filename);
+    app = gnome_vfs_mime_get_default_application ("text/plain");
+    if (app) {
+	gboolean adduri = (app->expects_uris ==
+                           GNOME_VFS_MIME_APPLICATION_ARGUMENT_TYPE_URIS);
+        argc = 2;
+        argv = g_new0 (char *, argc+1);
+        argv[0] = g_strdup(app->command);
+        argv[1] = g_strdup_printf("%s%s", adduri ? "file:" : "", filename);
+
+        /* this does not work really well with gnome-terminal
+         * that quits before the text editing application quits.
+         * Blame gnome-terminal.
+         * WORKAROUND: if the terminal is gnome-terminal, 
+         * --disable-factory option is added as well.
+         */
+        if (app->requires_terminal) {
+            gnome_prepend_terminal_to_vector(&argc, &argv);
+            if(strstr(argv[0], "gnome-terminal")) {
+                int i;
+                gchar ** new_argv = g_new(char*, ++argc+1);
+                new_argv[0] = argv[0];
+                new_argv[1] = g_strdup("--disable-factory");
+                for(i=2; i<=argc; i++)
+                    new_argv[i] = argv[i-1];
+                g_free(argv);
+                argv = new_argv;
+            }
+        }
+        gnome_vfs_mime_application_free (app);
+    } else {
+        balsa_information(LIBBALSA_INFORMATION_ERROR,
+                          _("Gnome editor is not defined"
+                            " in your preferred applications."));
+        return;
+    }
+
+
     tmp   = fdopen(tmpfd, "w+");
     
     if(balsa_app.edit_headers) {
@@ -787,15 +825,12 @@ edit_with_gnome(GtkWidget* widget, BalsaSendmsg* bsmsg)
     } 
     if (pid == 0) {
         setpgid(0, 0);
-        
-        command = g_strdup_printf(balsa_app.extern_editor_command, filename); 
-        cmdline = g_strsplit(command, " ", 1024); 
-        execvp (cmdline[0], cmdline); 
+        execvp (argv[0], argv); 
         perror ("execvp"); 
-        g_strfreev (cmdline); 
-        g_free(command);
+        g_strfreev (argv); 
         exit(127);
     }
+    g_strfreev (argv); 
     /* Return immediately. We don't want balsa to 'hang' */
     data->pid_editor = pid;
     data->filename = g_strdup(filename);

@@ -67,6 +67,14 @@ locking and use fcntl/lockf functions instead.
 	This enables alternative fcntl file locking scheme. This
 function is sometimes troublesome over NFS but is POSIX compatible.
 
+--with-gpgme
+        Use GPGME library for message signing and encryption. 
+GPGME version more recent than  0.3.x w/ x >= 14 is required. 
+Please note that all national characters in the passphrase must be
+valid UTF-8 characters, see
+http://home.arcor.de/dralbrecht.dress/balsa/UsingGnuPG.html#FAQ
+for more details.
+
 --with-gss[=/usr/kerberos]
 	This enables GSSAPI Kerberos based authentication scheme. 
 Specify the kerberos directory as the argument.
@@ -75,6 +83,10 @@ Specify the kerberos directory as the argument.
 	Use OpenSASL library for POP/IMAP authentication instead of
 mutt's native code (in the future, the native code will most likely be
 phased out in favour of SASL library).
+
+--with-ldap
+        Use ldap libraries for a read-only address book. The read/write
+address book is in the works but needs some finishing touches.
 
 
 Libraries:

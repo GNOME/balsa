@@ -88,13 +88,13 @@
 #define MESSAGEBOX_WIDTH 450
 #define MESSAGEBOX_HEIGHT 150
 
-#define DEFAULT_MESSAGE_FONT "monospace 11"
-#define DEFAULT_SUBJECT_FONT "helvetica Bold 11"
-#define DEFAULT_DATE_FORMAT "%Y.%m.%d %H:%M"
+#define DEFAULT_MESSAGE_FONT "monospace 10"
+#define DEFAULT_SUBJECT_FONT "helvetica Bold 10"
+#define DEFAULT_DATE_FORMAT "%x %X"
 #define DEFAULT_PAPER_SIZE "A4"
-#define DEFAULT_PRINT_HEADER_FONT "Nimbus Sans L Regular 11"
-#define DEFAULT_PRINT_BODY_FONT "Courier Regular 10"
-#define DEFAULT_PRINT_FOOTER_FONT "Nimbus Sans L Regular 7"
+#define DEFAULT_PRINT_HEADER_FONT "Times Roman 11"
+#define DEFAULT_PRINT_BODY_FONT "Courier 11"
+#define DEFAULT_PRINT_FOOTER_FONT "Times Roman 7"
 #define DEFAULT_SELECTED_HDRS "from to date cc subject"
 #define DEFAULT_MESSAGE_TITLE_FORMAT "Message from %F: %s"
 #define DEFAULT_ENCODING ENC8BIT
@@ -294,7 +294,6 @@ extern struct BalsaApplication {
     gboolean debug;
 
     /* external editor */
-    gchar *extern_editor_command;
     gboolean edit_headers;
 
     /* arp --- string to prefix "replied to" messages. */

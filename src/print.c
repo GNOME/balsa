@@ -1410,7 +1410,7 @@ print_dialog(CommonInfo * ci)
     g_list_free(childList);
 
     /* create a 2nd notebook page for the fonts */
-    label = gtk_label_new(_("Fonts"));
+    label = gtk_label_new_with_mnemonic(_("_Fonts"));
     vbox = gtk_vbox_new(FALSE, 3);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), vbox, label);
     frame = font_frame(_("Header font"), &ci->header_font_info);

@@ -118,7 +118,6 @@ typedef struct _PropertyUI {
     GtkWidget *fatal_message_menu;
 
     /* External editor preferences */
-    GtkWidget *extern_editor_command;
     GtkWidget *edit_headers;
 
     /* arp */
@@ -552,8 +551,6 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 		     G_CALLBACK(properties_modified_cb), property_box);
 
     /* external editor */
-    g_signal_connect(G_OBJECT(pui->extern_editor_command), "changed",
-                     G_CALLBACK(properties_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->edit_headers), "toggled",
     		     G_CALLBACK(properties_modified_cb), property_box);
 		
@@ -824,10 +821,6 @@ apply_prefs(GtkDialog * pbox)
     }
 
     /* external editor */
-    g_free(balsa_app.extern_editor_command);
-    balsa_app.extern_editor_command = 
-    	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->extern_editor_command)));
-    	
     balsa_app.edit_headers = GTK_TOGGLE_BUTTON(pui->edit_headers)->active;
 
     /* arp */
@@ -1115,8 +1108,6 @@ set_prefs(void)
 			     GTK_TOGGLE_BUTTON(pui->wordwrap)->active);
 
     /* external editor */
-    gtk_entry_set_text(GTK_ENTRY(pui->extern_editor_command),
-                       balsa_app.extern_editor_command);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->edit_headers),
                                  balsa_app.edit_headers);
 
@@ -1951,11 +1942,9 @@ other_options_group(GtkWidget * page)
 
     group = pm_group_new(_("Other Options"));
 
-    table = create_table(2, 2, page);
+    table = create_table(1, 2, page);
     pm_group_add(group, table);
 
-    pui->extern_editor_command = 
-        attach_entry(_("External editor command:"), 0, GTK_TABLE(table));
     pui->quote_str = attach_entry(_("Reply Prefix:"), 1, GTK_TABLE(table));
 
     pui->edit_headers =

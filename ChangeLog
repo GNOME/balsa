@@ -1,4 +1,8 @@
-2003-06-29  Albrecht Dreﬂ  <albrecht.dress@arcor.de>	
+2003-07-02  Danilo ≈†egan  <dsegan@gmx.net>
+
+	* configure.in: Added "sr" and "sr@Latn" to ALL_LINGUAS.
+
+2003-06-29  Albrecht Dre√ü  <albrecht.dress@arcor.de>	
 
 	* src/pixmaps/info_lock_sigtrust.xpm: 
 	* src/balsa-message.c: 
@@ -130,7 +134,7 @@
 	* src/balsa-app.c: Remove `connect_swapped' from create_entry: it
 	sometimes leads to infinite recursion=>segv.
 
-2003-05-27  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
+2003-05-27  Albrecht Dre√ü  <albrecht.dress@arcor.de>
 	
 	* src/message-window.c: 
 	* src/main-window.c: 
@@ -177,7 +181,7 @@
 
 	* sounds/balsa.soundlist: convert to UTF-8
 
-2003-05-11  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
+2003-05-11  Albrecht Dre√ü  <albrecht.dress@arcor.de>
 
 	* configure.in:
         * libbalsa/rfc3156.c:
@@ -198,7 +202,7 @@
 	* libbalsa/filter-file.c: build workarounds for yellowdog. (AD)
 	* src/filter-edit-callbacks.c: ditto.
 
-2003-05-07  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
+2003-05-07  Albrecht Dre√ü  <albrecht.dress@arcor.de>
 
 	* libbalsa/body.c: use attachment's extension for temporary files.
 	* src/balsa-message.c: set MDN message type to multipart/report.
@@ -223,12 +227,12 @@
 
 	* src/sendmsg-window.c: fix bug 112266.
 
-2003-05-05  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
+2003-05-05  Albrecht Dre√ü  <albrecht.dress@arcor.de>
 
 	* src/balsa-message.c: sanitize subject to avoid errors on reply etc.
 	* src/{print,sendmsg-window}.c: ditto.
 
-2003-05-05  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
+2003-05-05  Albrecht Dre√ü  <albrecht.dress@arcor.de>
 
 	* libbalsa/identity.[hc]: add gpg_sign and gpg_encrypt fields, and 
 	respective UI support.
@@ -240,7 +244,7 @@
 	
 2003-05-04 23:40  PeterB
 
-	* src/sendmsg-window.c: Fix #111958 (Albrecht Dreﬂ
+	* src/sendmsg-window.c: Fix #111958 (Albrecht Dre√ü
 	<albrecht.dress@arcor.de>)
 
 2003-05-03 03:50  PeterB
@@ -259,7 +263,7 @@
 	* libbalsa/filter.c: Message list for filter action must not have
 	duplicates.
 
-2003-05-01  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
+2003-05-01  Albrecht Dre√ü  <albrecht.dress@arcor.de>
 
 	* libbalsa/libbalsa.c: show ceritificate expire date
 	correctly
@@ -352,7 +356,7 @@
 	* libbalsa/mailbox_local.c: Make sure
 	libbalsa_mailbox_local_set_path returns non-zero on error.
 
-2003-04-09  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
+2003-04-09  Albrecht Dre√ü  <albrecht.dress@arcor.de>
 
 	* libbalsa/rfc3156.[ch]: OpenPGP (RFC2440) mode support.
 	* libbalsa/send.c: sending OpenPGP signed messages.
@@ -383,7 +387,7 @@
 
 	* src/sendmsg-window.c: Fix Edit => Wrap Body.
 
-2003-04-04  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
+2003-04-04  Albrecht Dre√ü  <albrecht.dress@arcor.de>
 
 	* libbalsa/rfc3156.c: remove paranoia test.
 	* src/print.c: sanitize before printing.
@@ -393,7 +397,7 @@
 
 	* src/sendmsg-window.c: Wrap initial text.
 
-2003-04-03  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
+2003-04-03  Albrecht Dre√ü  <albrecht.dress@arcor.de>
 
 	* libbalsa/rfc3156.[hc]: fix EOL character conversion.  Implement
 	libbalsa_signature_info_to_gchar(). selecting a key from a list if
@@ -444,7 +448,7 @@
 
 	* NEWS, configure.in: release 2.0.10
 
-2003-03-24  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
+2003-03-24  Albrecht Dre√ü  <albrecht.dress@arcor.de>
 
 	further work on GPG
 	* libbalsa/message.h: add sig_state field.
@@ -481,7 +485,7 @@
 
 	* configure.in: Added Mayalalam (ml) in ALL_LINGUAS
 
-2003-03-18  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
+2003-03-18  Albrecht Dre√ü  <albrecht.dress@arcor.de>
 
 	* libbalsa/body.[ch]: add, initialize destroy GPG-related fields.
 	* libbalsa/message.[ch]: implement is_pgp_{signed,encrypted}()

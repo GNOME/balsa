@@ -793,8 +793,6 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 	  ( (type == SEND_FORWARD) && balsa_app.sig_whenforward) ||
 	  ( (type == SEND_NORMAL) && balsa_app.sig_sending) )
 	      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, balsa_app.signature, strlen (balsa_app.signature));
-     else 
-	     printf("ikke signatur\n");
     }
   gtk_text_set_point (GTK_TEXT (msg->text), 0);
   gtk_text_thaw (GTK_TEXT (msg->text));

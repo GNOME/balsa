@@ -1,8 +1,8 @@
-		IMAP4rev1/c-client Development Environment
-			   30 December 1997
-			     Mark Crispin
+		  IMAP4rev1/c-client Development Environment
+				8 January 1998
+				 Mark Crispin
 
-			    BUG REPORTING ADDRESS
+			     BUG REPORTING ADDRESS
 
      Bugs or questions regarding this software may be reported to the
 author:
@@ -31,7 +31,7 @@ Documentation:
 
 Sources:
  . Makefile		master makefile for UNIX
- . makefile.nt		master makefile for NT
+ . makefile.nt		master makefile for NT/Win32
  . makefile.wce		master makefile for Windows CE
  . src			portable C sources
  . src/ansilib		pre-processed ANSI library routines
@@ -51,7 +51,7 @@ Sources:
  . src/osdep/wce	pre-processed Windows CE-specific sources (incomplete)
  . tools		internal tools needed as part of the build process
 
-Directories created at build time on UNIX and NT:
+Directories created at build time on UNIX and NT/Win32:
  . c-client		post-processed c-client sources and binary
  . ipopd		post-processed POP2/POP3 daemon sources and binaries
  . imapd		post-processed IMAP4rev1 daemon sources and binaries
@@ -68,6 +68,12 @@ puts you in a command mode where "?" will give you a list of commands.
 
      The Pine mailer for UNIX and DOS uses c-client, and is available
 separately on the FTP.CAC.Washington.EDU archives.
+
+SUPPORT NOTES:
+
+     The focus of development and support is for UNIX and NT/Win32 (including
+Windows 95).  The other ports are not frequently used or tested, and may be
+incomplete.
 
 			       UNIX BUILD NOTES
 
@@ -182,7 +188,7 @@ have the -E flag.  A typical entry will lool like:
 
 Mlocal, P=/usr/lib/mail.local, F=flsSDFMmnPE, S=10, R=20, A=mail.local -d $u
 
-		       NT BUILD AND INSTALLATION NOTES
+		     NT/WIN32 BUILD AND INSTALLATION NOTES
 
      I build using Visual C++ 5.0.  If you build with an earlier version of
 Visual C, you may need to install the Platform SDK (formerly called the Win32
@@ -223,7 +229,7 @@ system is to have inetlisn run by an AT command, e.g. if the time now is
 and/or are unwilling to invest the time to do some programming, you probably
 want to buy a commercial server for NT.
 
-			       DOS BUILD NOTES
+			     DOS/WIN16 BUILD NOTES
 
      If you are building a DOS client, you will need a TCP/IP stack installed
 on your DOS system along with its development environment.  The currently
@@ -231,24 +237,46 @@ supported stacks are Beame & Whiteside, PC-NFS, Novell, PC/IP, Waterloo, and
 Winsock.  mtest and a version of Pine called PC Pine run under DOS.
 
       You do not use imap-4.1/Makefile under DOS, nor do you build any
-components other than c-client.  Merge the contents of imap-4.1/src/c-client,
-imap-4.1/src/charset, and imap-4.1/src/osdep/dos onto a single directory on
-DOS and build from that.  The MAKE command on DOS takes an argument
-identifying the TCP/IP stack in use.  For example, do:
+components other than c-client and mtest.  Merge the contents of
+imap-4.1/src/c-client, imap-4.1/src/charset, imap-4.1/src/mtest, and
+imap-4.1/src/osdep/dos onto a single directory on DOS and build from that.  The
+MAKE command on DOS takes an argument identifying the TCP/IP stack in use.  For
+example, do:
 	MAKE MAKEFILE OS=WSK   (or MAKE -F MAKEFILE OS=WSK)
 to build for Winsock.  
+
+     If you write a program for DOS/Win16, you will probably have to write a
+replacement cache manager (look at mm_cache()) and otherwise disable most of
+c-client's caching.  Even so, memory limitations will be an ongoing problem,
+particularly with DOS, and you will have some severe performance problems.
+It's a bit better on Win16, but in my opinion you are better off writing a
+32-bit program and telling your Win16 customers to upgrade to Windows 95 or at
+least install Win32s.
 
-			    MACINTOSH BUILD NOTES
+			     MACINTOSH BUILD NOTES
 
      If you are building a Macintosh client, you will need MacTCP installed on
-your system as well as the MacTCP C includes and libraries.  I use THINK C.
+your system as well as the MacTCP C includes and libraries.
 
-      You do not use imap-4.1/Makefile on the Mac, nor do you build any
+     You do not use imap-4.1/Makefile on the Mac, nor do you build any
 components other than c-client and mtest.  Merge the contents of
 imap-4.1/src/c-client, imap-4.1/src/charset, imap-4.1/src/mtest, and
 imap-4.1/src/osdep/mac onto a single directory on the Mac and build from that.
 mtext.sit.hqx is a THINK C project file and cute icon for building mtest,
 encoded with Binhex and StuffIt.
+
+     THINK C is a truly wretched product which help make me understand why
+Macintosh has lost most of its market share.  Not only does it do cretinous
+things such as barf about a cast in front of an lvalue, it also limits the size
+of code *or* data in a single file to 32K!  So much for having large character
+set tables.  Symantec says that "MacOS requires it, break up your files into
+smaller pieces" yet somehow gcc under MachTen contrives to compile C programs
+without subjecting the programmer to this idiocy.
+
+     As a result of this, I found myself obliged to comment out the #includes
+of the East Asian character sets in utf8.c in order to get it to build.  Maybe
+you don't have to do this in CodeWarrior or whatever the new compiler is
+called, but I've pretty much given up on Macintosh.
 
      If you use precompiled headers, you may get some compilation errors since
 some Apple symbols need to be redefined in order to get it to build under all
@@ -279,13 +307,17 @@ person will try porting Pine to TOPS-20.  I recently built mtest on TOPS-20
 (thank you, XKL!!), so the sources are known to compile with the ANSI C
 version of KCC.
 
-      You do not use imap-4.1/Makefile under TOPS-20, nor do you build any
-components other than c-client.  Merge the contents of imap-4.1/src/c-client,
-imap-4.1/src/charset, imap-4.1/src/mtest, and imap-4.1/src/osdep/tops-20 onto
-a single directory on TOPS-20 and build from that.  The command:
+     You do not use imap-4.1/Makefile under TOPS-20, nor do you build any
+components other than c-client and mtest.  Merge the contents of
+imap-4.1/src/c-client, imap-4.1/src/charset, imap-4.1/src/mtest, and
+imap-4.1/src/osdep/tops-20 onto a single directory on TOPS-20 and build from
+that.  The command:
 	DO BUILD.CTL
 will build the sources.  If you don't have MIC, then SUBMIT BUILD.CTL and let
 BATCON execute it.
+
+     KCC loves to give lots of diagnostics about unused parameters.  That's
+perfectly alright; just ignore them.
 
 			       VMS BUILD NOTES
 
@@ -294,9 +326,10 @@ Yehavi@VMS.HUJI.AC.IL, for the IMAP2bis toolkit.  I included the stuff that
 I could get to work on a VMS system at UW.
 
       You do not use imap-4.1/Makefile under VMS, nor do you build any
-components other than c-client.  Merge the contents of imap-4.1/src/c-client,
-imap-4.1/src/charset, imap-4.1/src/mtest, and imap-4.1/src/osdep/vms onto a
-single directory on VMS and build from that.  The command to build it is:
+components other than c-client and mtest.  Merge the contents of
+imap-4.1/src/c-client, imap-4.1/src/charset, imap-4.1/src/mtest, and
+imap-4.1/src/osdep/vms onto a single directory on VMS and build from that.  The
+command to build it is:
 	@BUILD MULTINET
 or	@BUILD NETLIB
 If you just do @BUILD it will build with dummy TCP code, and since only TCP
@@ -305,7 +338,7 @@ based drivers are provided here this isn't too useful.
      If you aren't on the Pacific coast of the US or Canada, you probably will
 need to change the wired-in timezone in the BUILD.COM file.  Apparently, the
 wonderful VMS system that DEC loves so much doesn't maintain any concept of
-time zone.  In fact, the VMS C compiler returns a null pointer from gmtime()!
+time zone; the VMS C compiler returns a null pointer from gmtime()!
 
      Otherwise you're pretty much on your own here.  Ask Yehavi for help, not
 me.  Yehavi has a VMS local mail driver so you can get local mail services.

@@ -1103,6 +1103,8 @@ add_local_mailbox(GNode *root, const gchar * name, const gchar * path)
 	    g_print(_("Local mailbox %s loaded as: %s\n"),
 		    mailbox->name,
 		    g_type_name(G_OBJECT_TYPE(mailbox)));
+	if (balsa_app.check_mail_upon_startup)
+	    libbalsa_mailbox_check(mailbox);
     }
     g_free(url);
     /* no type checking, parent is NULL for root */

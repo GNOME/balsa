@@ -223,13 +223,8 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 	GTK_WIDGET_SET_FLAGS (button, GTK_CAN_DEFAULT);
 	help_entry.name = gnome_app_id;
 	gtk_signal_connect (GTK_OBJECT (button), "clicked",
-			    GTK_SIGNAL_FUNC (gnome_help_pbox_display),
+			    GTK_SIGNAL_FUNC (gnome_help_display),
 			    &help_entry);
-	/*
-	 * set insensitive, becase it's not working yet!
-	 * -Ragnar-
-	 */
-	gtk_widget_set_sensitive (button, FALSE);
 
 	dialog_vbox1 = GNOME_DIALOG (pui->pbox)->vbox;
 	gtk_widget_show (dialog_vbox1);

@@ -927,7 +927,7 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
     /* printf("ldap_alias_complete:: result=%p\n", result); */
     if(result) ldap_msgfree(result);
 
-    if(res) g_list_reverse(res);
+    if(res) res = g_list_reverse(res);
 
     return res;
 }

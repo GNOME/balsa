@@ -133,7 +133,7 @@ run_filters_on_mailbox(GtkTreeView * filter_list, LibBalsaMailbox * mbox)
     g_slist_free(filters);
 
     if (sent_to_trash)
-	enable_empty_trash(TRASH_FULL);
+	enable_empty_trash(balsa_app.main_window, TRASH_FULL);
 
     return TRUE;
 }

@@ -816,7 +816,7 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.browse_wrap = GTK_TOGGLE_BUTTON(pui->browse_wrap)->active;
     /* main window view menu can also toggle balsa_app.browse_wrap
      * update_view_menu lets it know we've made a change */
-    update_view_menu();
+    update_view_menu(balsa_app.main_window);
     balsa_app.browse_wrap_length =
 	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(pui->browse_wrap_length));
 

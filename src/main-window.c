@@ -67,7 +67,6 @@ enum {
     LAST_SIGNAL
 };
 
-gint balsa_window_progress_timeout(gpointer user_data);
 enum {
     BALSA_PROGRESS_NONE = 0,
     BALSA_PROGRESS_ACTIVITY,
@@ -173,12 +172,15 @@ static void show_no_headers_cb(GtkWidget * widget, gpointer data);
 static void show_selected_cb(GtkWidget * widget, gpointer data);
 static void show_all_headers_cb(GtkWidget * widget, gpointer data);
 static void show_all_headers_tool_cb(GtkWidget * widget, gpointer data);
+static void empty_trash_cb(GtkWidget * widget, gpointer data);
 static void reset_show_all_headers(BalsaWindow * window);
 static void show_preview_pane_cb(GtkWidget * widget, gpointer data);
 
 static void threading_change_cb(GtkWidget * widget, gpointer data);
-static void balsa_window_set_threading_menu(int option);
-static void balsa_window_set_filter_menu(int gui_filter);
+static void balsa_window_set_threading_menu(BalsaWindow * window,
+					    int option);
+static void balsa_window_set_filter_menu(BalsaWindow * window,
+					 int gui_filter);
 static void expand_all_cb(GtkWidget * widget, gpointer data);
 static void collapse_all_cb(GtkWidget * widget, gpointer data);
 #ifdef HAVE_GTKHTML
@@ -195,7 +197,8 @@ static void mark_all_cb(GtkWidget * widget, gpointer);
 
 static void select_part_cb(BalsaMessage * bm, gpointer data);
 
-static void find_real(BalsaIndex * bindex,gboolean again);
+static void find_real(BalsaWindow * window, BalsaIndex * bindex,
+		      gboolean again);
 static void find_cb(GtkWidget * widget, gpointer data);
 static void find_again_cb(GtkWidget * widget, gpointer data);
 static void filter_dlg_cb(GtkWidget * widget, gpointer data);
@@ -243,10 +246,10 @@ static void ident_manage_dialog_cb(GtkWidget*, gpointer);
 
 
 static void
-balsa_quit_nicely(void)
+balsa_quit_nicely(GtkWidget * widget, gpointer data)
 {
     GdkEventAny e = { GDK_DELETE, NULL, 0 };
-    e.window = GTK_WIDGET(balsa_app.main_window)->window;
+    e.window = GTK_WIDGET(data)->window;
     gdk_event_put((GdkEvent*)&e);
 }
 
@@ -582,7 +585,7 @@ static GnomeUIInfo message_menu[] = {
 /* Really, entire mailbox_hide_menu should be build dynamically from
  * the hide_states array since different mailboxes support different
  * set of flags/keywords. */
-static struct {
+static const struct {
     LibBalsaMessageFlag flag;
     unsigned set:1;
 } hide_states[] = {
@@ -699,7 +702,7 @@ static GnomeUIInfo mailbox_menu[] = {
 #define MENU_MAILBOX_EMPTY_TRASH_POS (MENU_MAILBOX_CLOSE_POS+2)
     GNOMEUIINFO_ITEM_STOCK(N_("Empty _Trash"),
                            N_("Delete messages from the Trash mailbox"),
-                           empty_trash, GTK_STOCK_REMOVE),
+                           empty_trash_cb, GTK_STOCK_REMOVE),
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_APPLY_FILTERS (MENU_MAILBOX_EMPTY_TRASH_POS+2)
     GNOMEUIINFO_ITEM_STOCK(N_("Edit/Apply _Filters"),
@@ -872,7 +875,7 @@ static const struct callback_item {
     { BALSA_PIXMAP_MARKED_NEW,       toggle_new_message_cb },
     { BALSA_PIXMAP_MARKED_ALL,       mark_all_cb },
     { BALSA_PIXMAP_SHOW_HEADERS,     show_all_headers_tool_cb },
-    { BALSA_PIXMAP_TRASH_EMPTY,      (void(*)())empty_trash },
+    { BALSA_PIXMAP_TRASH_EMPTY,      empty_trash_cb },
     { BALSA_PIXMAP_CLOSE_MBOX,       mailbox_close_cb },
     { BALSA_PIXMAP_SHOW_PREVIEW,     show_preview_pane_cb }
 };
@@ -1187,8 +1190,9 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
         gtk_widget_set_sensitive(view_menu[view_menu_entries[i]].widget, enable);
 
     if (mailbox) {
-        balsa_window_set_threading_menu(mailbox->view->threading_type);
-        balsa_window_set_filter_menu(mailbox->view->filter);
+        balsa_window_set_threading_menu(window,
+					mailbox->view->threading_type);
+        balsa_window_set_filter_menu(window, mailbox->view->filter);
     }
 }
 
@@ -1299,10 +1303,10 @@ enable_view_menus(BalsaMessage * bm)
  * items, or to open the trash folder and get the message count.
  */
 void
-enable_empty_trash(TrashState status)
+enable_empty_trash(BalsaWindow * window, TrashState status)
 {
     GtkWidget *toolbar =
-        balsa_toolbar_get_from_gnome_app(GNOME_APP(balsa_app.main_window));
+        balsa_toolbar_get_from_gnome_app(GNOME_APP(window));
     gboolean set = TRUE;
     if (MAILBOX_OPEN(balsa_app.trash)) {
         set = libbalsa_mailbox_total_messages(balsa_app.trash) > 0;
@@ -1368,7 +1372,7 @@ balsa_window_enable_continue(BalsaWindow * window)
 }
 
 static void
-balsa_window_set_threading_menu(int option)
+balsa_window_set_threading_menu(BalsaWindow * window, int option)
 {
     int pos;
     switch(option) {
@@ -1382,16 +1386,16 @@ balsa_window_set_threading_menu(int option)
     }
     g_signal_handlers_block_by_func(G_OBJECT(threading_menu[pos].widget),
                                     threading_menu[pos].moreinfo, 
-                                    balsa_app.main_window);
+                                    window);
     gtk_check_menu_item_set_active
         (GTK_CHECK_MENU_ITEM(threading_menu[pos].widget), TRUE);
     g_signal_handlers_unblock_by_func(G_OBJECT(threading_menu[pos].widget),
                                       threading_menu[pos].moreinfo,
-                                      balsa_app.main_window);
+                                      window);
 }
 
 static void
-balsa_window_set_filter_menu(int mask)
+balsa_window_set_filter_menu(BalsaWindow * window, int mask)
 {
     unsigned i;
 
@@ -1404,12 +1408,12 @@ balsa_window_set_filter_menu(int mask)
         item = mailbox_hide_menu[i].widget;
         g_signal_handlers_block_by_func(G_OBJECT(item),
                                         mailbox_hide_menu[i].moreinfo, 
-                                        balsa_app.main_window);
+                                        window);
         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), 
                                        mask & (1<<states_index));
         g_signal_handlers_unblock_by_func(G_OBJECT(item),
                                           mailbox_hide_menu[i].moreinfo, 
-                                          balsa_app.main_window);
+                                          window);
     }
 }
 
@@ -2011,14 +2015,14 @@ progress_dialog_response_cb(GtkWidget* dialog, gint response)
    make sure that mail checking dialog exists.
 */
 static void
-ensure_check_mail_dialog(void)
+ensure_check_mail_dialog(BalsaWindow * window)
 {
     if (progress_dialog && GTK_IS_WIDGET(progress_dialog))
 	gtk_widget_destroy(GTK_WIDGET(progress_dialog));
     
     progress_dialog =
 	gtk_dialog_new_with_buttons(_("Checking Mail..."),
-                                    GTK_WINDOW(balsa_app.main_window),
+                                    GTK_WINDOW(window),
                                     GTK_DIALOG_DESTROY_WITH_PARENT,
                                     _("_Hide"), GTK_RESPONSE_CLOSE,
                                     NULL);
@@ -2057,6 +2061,8 @@ void
 check_new_messages_real(GtkWidget *widget, gpointer data, int type)
 {
 #ifdef BALSA_USE_THREADS
+    BalsaWindow * window = window;
+
     /*  Only Run once -- If already checking mail, return.  */
     pthread_mutex_lock(&mailbox_lock);
     if (checking_mail) {
@@ -2074,7 +2080,7 @@ check_new_messages_real(GtkWidget *widget, gpointer data, int type)
     if (type == TYPE_CALLBACK && 
         (balsa_app.pwindow_option == WHILERETR ||
          (balsa_app.pwindow_option == UNTILCLOSED && progress_dialog)))
-	ensure_check_mail_dialog();
+	ensure_check_mail_dialog(window);
 
     /* initiate threads */
     pthread_create(&get_mail_thread,
@@ -2787,13 +2793,13 @@ show_no_headers_cb(GtkWidget * widget, gpointer data)
 {
     BalsaWindow *bw;
 
-    reset_show_all_headers(BALSA_WINDOW(data));
+    bw = BALSA_WINDOW(data);
+    reset_show_all_headers(bw);
     if(widget && !GTK_CHECK_MENU_ITEM(widget)->active)
         return;
 
     balsa_app.shown_headers = HEADERS_NONE;
 
-    bw = BALSA_WINDOW(data);
     if (bw->preview)
         balsa_message_set_displayed_headers(BALSA_MESSAGE(bw->preview),
                                             HEADERS_NONE);
@@ -2804,13 +2810,13 @@ show_selected_cb(GtkWidget * widget, gpointer data)
 {
     BalsaWindow *bw;
 
-    reset_show_all_headers(BALSA_WINDOW(data));
+    bw = BALSA_WINDOW(data);
+    reset_show_all_headers(bw);
     if(widget && !GTK_CHECK_MENU_ITEM(widget)->active)
         return;
 
     balsa_app.shown_headers = HEADERS_SELECTED;
 
-    bw = BALSA_WINDOW(data);
     if (bw->preview)
         balsa_message_set_displayed_headers(BALSA_MESSAGE(bw->preview),
                                             HEADERS_SELECTED);
@@ -2821,13 +2827,13 @@ show_all_headers_cb(GtkWidget * widget, gpointer data)
 {
     BalsaWindow *bw;
     
-    reset_show_all_headers(BALSA_WINDOW(data));
+    bw = BALSA_WINDOW(data);
+    reset_show_all_headers(bw);
     
     if(widget && !GTK_CHECK_MENU_ITEM(widget)->active)
         return;
     
     balsa_app.shown_headers = HEADERS_ALL;
-    bw = BALSA_WINDOW(data);
     if (bw->preview)
         balsa_message_set_displayed_headers(BALSA_MESSAGE(bw->preview),
                                             HEADERS_ALL);
@@ -2836,19 +2842,21 @@ show_all_headers_cb(GtkWidget * widget, gpointer data)
 static void
 threading_change_cb(GtkWidget * widget, gpointer data)
 {
+    BalsaWindow *bw;
     LibBalsaMailboxThreadingType type;
     GtkWidget *index;
 
     if(!GTK_CHECK_MENU_ITEM(widget)->active)
         return;
 
-    index = balsa_window_find_current_index(balsa_app.main_window);
+    bw = BALSA_WINDOW(data);
+    index = balsa_window_find_current_index(bw);
     g_return_if_fail(index != NULL);
 
     type = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget),
                                              GNOMEUIINFO_KEY_UIDATA));
     balsa_index_set_threading_type(BALSA_INDEX(index), type);
-    balsa_window_set_threading_menu(type);
+    balsa_window_set_threading_menu(bw, type);
 }
 
 static void
@@ -2856,7 +2864,7 @@ expand_all_cb(GtkWidget * widget, gpointer data)
 {
     GtkWidget *index;
 
-    index = balsa_window_find_current_index(balsa_app.main_window);
+    index = balsa_window_find_current_index(BALSA_WINDOW(data));
     g_return_if_fail(index);
     balsa_index_update_tree(BALSA_INDEX(index), TRUE);
 }
@@ -2866,7 +2874,7 @@ collapse_all_cb(GtkWidget * widget, gpointer data)
 {
     GtkWidget *index;
 
-    index = balsa_window_find_current_index(balsa_app.main_window);
+    index = balsa_window_find_current_index(BALSA_WINDOW(data));
     g_return_if_fail(index);
     balsa_index_update_tree(BALSA_INDEX(index), FALSE);
 }
@@ -2888,7 +2896,7 @@ address_book_cb(GtkWindow *widget, gpointer data)
 {
     GtkWidget *ab;
 
-    ab = balsa_ab_window_new(FALSE, GTK_WINDOW(balsa_app.main_window));
+    ab = balsa_ab_window_new(FALSE, GTK_WINDOW(data));
     gtk_widget_show(GTK_WIDGET(ab));
 }
 
@@ -2916,7 +2924,7 @@ bw_find_button_clicked(GtkWidget * widget, gpointer data)
 }
 
 static void 
-find_real(BalsaIndex * bindex, gboolean again)
+find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 {
     /* Condition set up for the search, it will be of type
        CONDITION_NONE if nothing has been set up */
@@ -2936,7 +2944,7 @@ find_real(BalsaIndex * bindex, gboolean again)
     if (!again || cnd->type==CONDITION_NONE) {
 	GtkWidget* vbox, *dia =
             gtk_dialog_new_with_buttons(_("Search mailbox"),
-                                        GTK_WINDOW(balsa_app.main_window),
+                                        GTK_WINDOW(window),
                                         GTK_DIALOG_DESTROY_WITH_PARENT,
 					GTK_STOCK_HELP,   GTK_RESPONSE_HELP,
                                         GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
@@ -3119,7 +3127,7 @@ find_real(BalsaIndex * bindex, gboolean again)
             LibBalsaMailbox *mailbox = 
                 BALSA_INDEX(bindex)->mailbox_node->mailbox;
             LibBalsaCondition *filter;
-            filter = balsa_window_get_view_filter(balsa_app.main_window);
+            filter = balsa_window_get_view_filter(window);
             /* steal cnd */
             if(filter)
                 filter = libbalsa_condition_new_bool_ptr
@@ -3140,17 +3148,19 @@ find_real(BalsaIndex * bindex, gboolean again)
 static void
 find_cb(GtkWidget * widget,gpointer data)
 {
+    BalsaWindow *window = data;
     GtkWidget * bindex;
-    if ((bindex=balsa_window_find_current_index(BALSA_WINDOW(data))))
-	find_real(BALSA_INDEX(bindex),FALSE);
+    if ((bindex=balsa_window_find_current_index(window)))
+	find_real(window, BALSA_INDEX(bindex),FALSE);
 }
 
 static void
 find_again_cb(GtkWidget * widget,gpointer data)
 {
+    BalsaWindow *window = data;
     GtkWidget * bindex;
-    if ((bindex=balsa_window_find_current_index(BALSA_WINDOW(data))))
-	find_real(BALSA_INDEX(bindex),TRUE);
+    if ((bindex=balsa_window_find_current_index(window)))
+	find_real(window, BALSA_INDEX(bindex), TRUE);
 }
 
 static void
@@ -3189,6 +3199,12 @@ remove_duplicates_cb(GtkWidget * widget, gpointer data)
         balsa_index_remove_duplicates(BALSA_INDEX(index));
 }
 
+static void
+empty_trash_cb(GtkWidget * widget, gpointer data)
+{
+    empty_trash(BALSA_WINDOW(data));
+}
+
 /* closes the mailbox on the notebook's active page */
 static void
 mailbox_close_cb(GtkWidget * widget, gpointer data)
@@ -3203,8 +3219,9 @@ mailbox_close_cb(GtkWidget * widget, gpointer data)
 static void
 mailbox_tab_close_cb(GtkWidget * widget, gpointer data)
 {
-   balsa_window_real_close_mbnode(balsa_app.main_window,
-                                  (BalsaMailboxNode *)data);
+    GtkWidget * window = gtk_widget_get_toplevel(widget);
+    balsa_window_real_close_mbnode(BALSA_WINDOW(window),
+				   BALSA_MAILBOX_NODE(data));
 }
 
 
@@ -3266,15 +3283,13 @@ balsa_window_get_view_filter(BalsaWindow *window)
 }
 
 /**balsa_window_filter_to_int() returns an integer representing the
-   view filter.  This routine must gracefully handle case when main
-   window is not yet created - it may be called from the setup druid.
+   view filter.
 */
 static int
 balsa_window_filter_to_int(void)
 {
     unsigned i;
     int res = 0;
-    if(!balsa_app.main_window) return 0;
     for(i=0; i<ELEMENTS(mailbox_hide_menu); i++) {
         int states_index =
             GPOINTER_TO_INT(mailbox_hide_menu[i].user_data);
@@ -3291,7 +3306,8 @@ static void
 hide_changed_cb(GtkWidget * widget, gpointer data)
 {
     LibBalsaMailbox *mailbox;
-    GtkWidget *index = balsa_window_find_current_index(balsa_app.main_window);
+    BalsaWindow *bw = BALSA_WINDOW(data);
+    GtkWidget *index = balsa_window_find_current_index(bw);
     LibBalsaCondition *filter;
     
     /* PART 1: assure menu consistency */
@@ -3328,7 +3344,7 @@ hide_changed_cb(GtkWidget * widget, gpointer data)
     /* PART 2: do the job. */
     mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
 
-    filter = balsa_window_get_view_filter(balsa_app.main_window);
+    filter = balsa_window_get_view_filter(bw);
     /* libbalsa_mailbox_set_view_filter() will take the ownership of
      * filter.  We need also to rethread to take into account that
      * some messages might have been removed or added to the view.  We
@@ -3342,11 +3358,12 @@ hide_changed_cb(GtkWidget * widget, gpointer data)
 static void
 show_name_cb(GtkWidget * widget, gpointer data)
 {
-    GtkWidget *index = balsa_window_find_current_index(balsa_app.main_window);
+    BalsaWindow *bw = BALSA_WINDOW(data);
+    GtkWidget *index = balsa_window_find_current_index(bw);
     LibBalsaMailbox *mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
     LibBalsaCondition *filter, *name;
     time_t t1 = time(NULL)-3*30*24*3600;
-    filter = balsa_window_get_view_filter(balsa_app.main_window);
+    filter = balsa_window_get_view_filter(bw);
     /* (((not body "dreß" and (subject "rfc" or body "rfc") and flagged)
      * or (from "helgaker" and not subject "huddinge") and 
      * sent in last three months.
@@ -3385,10 +3402,11 @@ show_name_cb(GtkWidget * widget, gpointer data)
 static void
 show_patch_cb(GtkWidget * widget, gpointer data)
 {
-    GtkWidget *index = balsa_window_find_current_index(balsa_app.main_window);
+    BalsaWindow *bw = BALSA_WINDOW(data);
+    GtkWidget *index = balsa_window_find_current_index(bw);
     LibBalsaMailbox *mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
     LibBalsaCondition *filter, *name;
-    filter = balsa_window_get_view_filter(balsa_app.main_window);
+    filter = balsa_window_get_view_filter(bw);
     /* (((not body "dreß" and (subject "rfc" or body "rfc") and flagged)
      * or (from "helgaker" and not subject "huddinge") and 
      * sent in last three months.
@@ -3407,10 +3425,11 @@ show_patch_cb(GtkWidget * widget, gpointer data)
 static void
 reset_filter_cb(GtkWidget * widget, gpointer data)
 {
-    GtkWidget *index = balsa_window_find_current_index(balsa_app.main_window);
+    BalsaWindow *bw = BALSA_WINDOW(data);
+    GtkWidget *index = balsa_window_find_current_index(bw);
     LibBalsaMailbox *mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
     LibBalsaCondition *filter;
-    filter = balsa_window_get_view_filter(balsa_app.main_window);
+    filter = balsa_window_get_view_filter(bw);
     libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE);
 }
 
@@ -3472,7 +3491,7 @@ mailbox_commit_all(GtkWidget * widget, gpointer data)
    empty the trash mailbox.
 */
 void
-empty_trash(void)
+empty_trash(BalsaWindow * window)
 {
     guint msgno;
     GList *msg_list = NULL;
@@ -3494,23 +3513,23 @@ empty_trash(void)
     libbalsa_mailbox_close(balsa_app.trash);
     balsa_mblist_update_mailbox(balsa_app.mblist_tree_store,
 				balsa_app.trash);
-    enable_empty_trash(TRASH_EMPTY);
+    enable_empty_trash(window, TRASH_EMPTY);
 }
 
 static void
 show_mbtree_cb(GtkWidget * widget, gpointer data)
 {
+    BalsaWindow *bw = BALSA_WINDOW(data);
     GtkWidget *parent;
-    parent = gtk_widget_get_ancestor(BALSA_WINDOW(data)->mblist,
-				     GTK_TYPE_HPANED);
+    parent = gtk_widget_get_ancestor(bw->mblist, GTK_TYPE_HPANED);
     g_assert(parent != NULL);
 
     balsa_app.show_mblist = GTK_CHECK_MENU_ITEM(widget)->active;
     if (balsa_app.show_mblist) {
-        gtk_widget_show(BALSA_WINDOW(data)->mblist);
+        gtk_widget_show(bw->mblist);
         gtk_paned_set_position(GTK_PANED(parent), balsa_app.mblist_width);
     } else {
-        gtk_widget_hide(BALSA_WINDOW(data)->mblist);
+        gtk_widget_hide(bw->mblist);
         gtk_paned_set_position(GTK_PANED(parent), 0);
     }
 }
@@ -3829,19 +3848,15 @@ notebook_drag_motion_cb(GtkWidget * widget, GdkDragContext * context,
  * this routine is called from g_timeout_dispatch() and needs to take care 
  * of GDK locking itself using gdk_threads_{enter,leave}
  **/
-gint
+static gint
 balsa_window_progress_timeout(gpointer user_data) 
 {
-    gboolean retval = TRUE;
     gdk_threads_enter();
-    if (balsa_app.main_window)
-	gtk_progress_bar_pulse(GTK_PROGRESS_BAR(user_data));
-    else
-	retval = FALSE;
+    gtk_progress_bar_pulse(GTK_PROGRESS_BAR(user_data));
     gdk_threads_leave();
 
     /* return true so it continues to be called */
-    return retval;
+    return TRUE;
 }
 
 
@@ -4047,7 +4062,7 @@ balsa_window_increment_progress(BalsaWindow* window)
 static void
 ident_manage_dialog_cb(GtkWidget * widget, gpointer user_data)
 {
-    libbalsa_identity_config_dialog(GTK_WINDOW(balsa_app.main_window),
+    libbalsa_identity_config_dialog(GTK_WINDOW(user_data),
                                     &balsa_app.identities,
                                     &balsa_app.current_ident);
 }
@@ -4104,8 +4119,7 @@ show_preview_pane_cb(GtkWidget * widget, gpointer data)
 
     balsa_app.previewpane =
         balsa_toolbar_get_button_active(toolbar, BALSA_PIXMAP_SHOW_PREVIEW);
-    if(balsa_app.main_window)
-        balsa_window_refresh(balsa_app.main_window);
+    balsa_window_refresh(BALSA_WINDOW(data));
 }
 
 /* browse_wrap can also be changed in the preferences window
@@ -4113,19 +4127,18 @@ show_preview_pane_cb(GtkWidget * widget, gpointer data)
  * update_view_menu is called to synchronize the view menu check item
  * */
 void
-update_view_menu(void)
+update_view_menu(BalsaWindow * window)
 {
     GtkWidget *w = view_menu[MENU_VIEW_WRAP_POS].widget;
     g_signal_handlers_block_by_func(G_OBJECT(w), 
-                                    G_CALLBACK(wrap_message_cb),
-                                    balsa_app.main_window);
+                                    G_CALLBACK(wrap_message_cb), window);
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(w),
                                    balsa_app.browse_wrap);
     g_signal_handlers_unblock_by_func(G_OBJECT(w), 
                                       G_CALLBACK(wrap_message_cb),
-                                      balsa_app.main_window);
-    if (balsa_app.main_window->preview)
-        balsa_message_set_wrap(BALSA_MESSAGE(balsa_app.main_window->preview),
+                                      window);
+    if (window->preview)
+        balsa_message_set_wrap(BALSA_MESSAGE(window->preview),
                                balsa_app.browse_wrap);
 }
 

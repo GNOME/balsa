@@ -79,15 +79,15 @@ void balsa_window_refresh(BalsaWindow * window);
 void balsa_window_open_mbnode(BalsaWindow * window, BalsaMailboxNode*mbnode);
 void balsa_window_close_mbnode(BalsaWindow * window, BalsaMailboxNode*mbnode);
 void balsa_window_update_tab(BalsaMailboxNode * mbnode);
-void enable_empty_trash(TrashState status);
+void enable_empty_trash(BalsaWindow * window, TrashState status);
 void balsa_window_enable_continue(BalsaWindow * window);
 void balsa_change_window_layout(BalsaWindow *window);
 gboolean mail_progress_notify_cb(void);
 gboolean send_progress_notify_cb(void);
 void check_new_messages_cb(GtkWidget *, gpointer data);
 void check_new_messages_real(GtkWidget *, gpointer data, int type);
-void empty_trash(void);
-void update_view_menu(void);
+void empty_trash(BalsaWindow * window);
+void update_view_menu(BalsaWindow * window);
 BalsaToolbarModel *balsa_window_get_toolbar_model(void);
 
 /* functions to manipulate the progress bars of the window */

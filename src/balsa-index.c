@@ -1378,13 +1378,13 @@ bndx_do_delete(BalsaIndex* index, gboolean move_to_trash)
     if(messages) {
 	if (move_to_trash && (index != trash)) {
 	    libbalsa_messages_move(messages, balsa_app.trash);
-	    enable_empty_trash(TRASH_FULL);
+	    enable_empty_trash(balsa_app.main_window, TRASH_FULL);
 	} else {
 	    libbalsa_messages_change_flag(messages,
                                           LIBBALSA_MESSAGE_FLAG_DELETED,
                                           TRUE);
 	    if (index == trash)
-		enable_empty_trash(TRASH_CHECK);
+		enable_empty_trash(balsa_app.main_window, TRASH_CHECK);
 	}
 	g_list_foreach(messages, (GFunc)g_object_unref, NULL);
 	g_list_free(messages);
@@ -1812,9 +1812,9 @@ balsa_index_transfer(BalsaIndex *index, GList * messages,
     balsa_mblist_set_status_bar(from_mailbox);
 
     if (from_mailbox == balsa_app.trash && !copy)
-        enable_empty_trash(TRASH_CHECK);
+        enable_empty_trash(balsa_app.main_window, TRASH_CHECK);
     else if (to_mailbox == balsa_app.trash)
-        enable_empty_trash(TRASH_FULL);
+        enable_empty_trash(balsa_app.main_window, TRASH_FULL);
 }
 
 /* General helpers. */

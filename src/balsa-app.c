@@ -474,7 +474,7 @@ balsa_app_destroy(void)
     g_hash_table_destroy(balsa_app.mailbox_views);
     balsa_app.mailbox_views = NULL;
     if (balsa_app.empty_trash_on_exit)
-	empty_trash();
+	empty_trash(balsa_app.main_window);
 
     config_save();
 

@@ -245,7 +245,7 @@ mmw_add_mb_to_clist_traverse_nodes (GNode * node, gpointer data)
   gtk_clist_set_row_data (GTK_CLIST (mmw->list),
 		       gtk_clist_append (GTK_CLIST (mmw->list), list_items),
 			  mailbox);
-  return TRUE;
+  return FALSE;
 }
 
 /* sets the list of mailboxes in the mailbox manager window */

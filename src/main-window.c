@@ -607,7 +607,7 @@ mblist_add_mailbox_traverse_nodes (GNode * node, gpointer data)
       mailbox = node->data;
       mblist_add_mailbox (mailbox);
     }
-  return TRUE;
+  return FALSE;
 }
 
 static void

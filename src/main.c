@@ -52,7 +52,7 @@ close_all_mailboxes (GNode * node, gpointer data)
       while (mailbox->open_ref > 0)
 	mailbox_open_unref (mailbox);
     }
-  return TRUE;
+  return FALSE;
 }
 
 void

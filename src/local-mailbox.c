@@ -45,10 +45,7 @@ add_mailbox (gchar * name, gchar * path, MailboxType type)
   MAILBOX_LOCAL (mailbox)->path = g_strdup (path);
 
   node = g_node_new (mailbox);
-  if (balsa_app.mailbox_nodes)
-    g_node_append (balsa_app.mailbox_nodes, node);
-  else
-    balsa_app.mailbox_nodes = node;
+  g_node_append (balsa_app.mailbox_nodes, node);
 
   if (balsa_app.debug)
     g_print ("Local Mailbox Loaded as: %s\n", mailbox_type_description (mailbox->type));

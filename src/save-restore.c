@@ -152,10 +152,7 @@ load_mailboxes (gchar * name)
 	  mailbox->name = g_strdup (name);
 	  MAILBOX_LOCAL (mailbox)->path = g_strdup (path);
 	  node = g_node_new (mailbox);
-	  if (balsa_app.mailbox_nodes)
-	    g_node_append (balsa_app.mailbox_nodes, node);
-	  else
-	    balsa_app.mailbox_nodes = node;
+	  g_node_append (balsa_app.mailbox_nodes, node);
 	}
       break;
 

@@ -698,6 +698,7 @@ show_about_box (void)
   {
     "Stuart Parmenter <pavlov@pavlov.net>",
     "Jay Painter <jpaint@gimp.org>",
+    "Peter Williams <peter@newton.cx>",
     "David Pickens <dpickens@iaesthetic.com>",
     "Héctor García Álvarez <hector@scouts-es.org>",
     "Bruno Pires Marinho <bapm@camoes.rnl.ist.utl.pt>",

@@ -1,5 +1,7 @@
-2003-12-09 05:36  PeterB
+2003-12-09 10:37  PeterB
 
+	* libbalsa/mailbox.c: Keep the tree-view better informed about
+	changes in the mailbox.
 	* src/: balsa-index.c, message-window.c: Always mark current
 	message as read when user selects "next" anything.
 

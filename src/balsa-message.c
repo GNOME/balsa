@@ -2534,11 +2534,12 @@ balsa_gtk_html_popup(BalsaMessage * bm)
     fill_part_menu_by_content_type(bm->current_part, GTK_MENU(menu),
                                    "text/html");
 
-    g_signal_connect(G_OBJECT(menu), "selection-done",
-                     G_CALLBACK(gtk_widget_destroy), NULL);
     gtk_widget_show_all(menu);
+    g_object_ref(menu);
+    gtk_object_sink(GTK_OBJECT(menu));
     gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,
                    0, gtk_get_current_event_time());
+    g_object_unref(menu);
     return TRUE;
 }
 

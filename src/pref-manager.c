@@ -2796,7 +2796,10 @@ server_add_cb(GtkWidget * widget, gpointer data)
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
     gtk_widget_show(menuitem);
     gtk_widget_show(menu);
+    g_object_ref(menu);
+    gtk_object_sink(GTK_OBJECT(menu));
     gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, 0, 0);
+    g_object_unref(menu);
 }
 
 static void

@@ -1566,8 +1566,11 @@ sw_do_popup(GnomeIconList * ilist, GdkEventButton * event)
         event_button = 0;
         event_time = gtk_get_current_event_time();
     }
+    g_object_ref(menu);
+    gtk_object_sink(GTK_OBJECT(menu));
     gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,
                    event_button, event_time);
+    g_object_unref(menu);
     return TRUE;
 }
 

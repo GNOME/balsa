@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-10-24 02:36+0200\n"
-"PO-Revision-Date: 2004-10-24 05:22+0200\n"
+"POT-Creation-Date: 2004-10-25 02:37+0200\n"
+"PO-Revision-Date: 2004-10-25 10:04+0200\n"
 "Last-Translator: Miloslav Trmac <mitr@volny.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -156,6 +156,11 @@ msgstr "Chyba při vyhazování zpráv: %s"
 #, c-format
 msgid "Error when moving messages: %s"
 msgstr "Chyba při přesunu zpráv: %s"
+
+#: libbalsa/gmime-application-pkcs7.c:246
+#: libbalsa/gmime-application-pkcs7.c:389
+msgid "Failed to decrypt MIME part: parse error"
+msgstr "Nemohu dešifrovat část MIME: chyba při analýze"
 
 #: libbalsa/gmime-gpgme-context.c:288 libbalsa/rfc3156.c:1501
 #, c-format

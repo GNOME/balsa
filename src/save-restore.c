@@ -234,7 +234,10 @@ config_mailbox_add (Mailbox * mailbox, char * key_arg)
 
   if (accounts == NULL)
     {
-      strcpy(key, "M1");
+      if (!strcmp(key_arg, "generic"))
+	strcpy(key, "m1");
+      else
+	snprintf(key, sizeof(key), "%s", key_arg);
 
       /* If there is no Accounts list in the global proplist, create
          one and add it to the global configuration dictionary. */
@@ -260,6 +263,8 @@ config_mailbox_add (Mailbox * mailbox, char * key_arg)
 	  mbox_max = config_mailbox_get_highest_number(accounts);
 	  snprintf(key, sizeof(key), "m%d", mbox_max + 1);
 	}
+      else
+	snprintf(key, sizeof(key), "%s", key_arg);
 
       /* If there is already an Accounts list, just add this new mailbox */
       temp_str = PLMakeString (key);

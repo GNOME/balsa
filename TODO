@@ -6,9 +6,6 @@ little things:
 
 later stuff:
 
- * set cursor for window to GDK_WATCH when we are loading a mailbox so that we
-   let the user know we are busy.  use: gdk_cursor_new() and gdk_window_set_cursor()
-
  * inbox/outbox/trash should be able to be IMAP
     this can be done by editing ~/.balsarc
 
@@ -40,12 +37,6 @@ Nat's ideas:
    character.  Make automatic message quoting optional and make it
    flexible enough to allow the user to select their quote
    character(s).
-
- * An important one: by default, for IMAP and POP mailboxes, Balsa stores the
-   user's password in the config file.  The file is mode 0600, however a lot
-   of people won't feel so good about this, myself included.  Add an option
-   which makes Balsa instead prompt for the password everytime it
-   needs to login to the IMAP server.
 
  * The message display/composition font should be selectable,
    including color.

@@ -395,8 +395,6 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
   if (mailbox == NULL)
     return;
 
-  main_window_set_cursor (GDK_WATCH);
-
   /*
    * release the old mailbox
    */
@@ -411,11 +409,6 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
    * set the new mailbox
    */
   bindex->mailbox = mailbox;
-
-  if ((mailbox->type == MAILBOX_IMAP && MAILBOX_IMAP (mailbox)->passwd != NULL)
-      ||
-  (mailbox->type == MAILBOX_POP3 && MAILBOX_POP3 (mailbox)->passwd != NULL))
-    return;
 
   if (mailbox->open_ref == 0)
     mailbox_open_ref (mailbox);
@@ -457,8 +450,6 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
   /* FIXME MAJOR HACK */
   if (bindex->first_new_message == 0)
     bindex->first_new_message = i;
-
-  main_window_set_cursor (-1);
 
   gtk_idle_add ((GtkFunction) moveto_handler, bindex);
 }

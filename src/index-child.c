@@ -106,6 +106,8 @@ index_child_new (GnomeMDI * mdi, Mailbox * mailbox)
   GnomeMDIChild *mdichild;
   GtkWidget *messagebox;
 
+  main_window_set_cursor (GDK_WATCH);
+
   {
     GtkWidget *hbox;
     GtkWidget *label;

@@ -392,6 +392,7 @@ open_cb (GtkWidget * widget, gpointer data)
       gnome_mdi_add_child (mblw->mdi, GNOME_MDI_CHILD (index_child));
       gnome_mdi_add_view (mblw->mdi, GNOME_MDI_CHILD (index_child));
     }
+  main_window_set_cursor (-1);
 }
 
 static void
@@ -487,6 +488,7 @@ mailbox_select_cb (GtkCTree * ctree, GtkCTreeNode * row, gint column)
 	  gnome_mdi_add_child (mblw->mdi, GNOME_MDI_CHILD (index_child));
 	  gnome_mdi_add_view (mblw->mdi, GNOME_MDI_CHILD (index_child));
 	}
+      main_window_set_cursor (-1);
     }
 }
 

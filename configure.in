@@ -614,7 +614,7 @@ dnl ##########################################################################
 dnl Create files.
 dnl ##########################################################################
 
-AC_OUTPUT([ intl/Makefile po/Makefile.in m4/Makefile 
+AC_OUTPUT([ 
 Makefile
 balsa.1
 balsa.spec
@@ -624,6 +624,7 @@ images/Makefile
 intl/Makefile
 libbalsa/Makefile
 libinit_balsa/Makefile
+m4/Makefile
 macros/Makefile
 po/Makefile.in
 sounds/Makefile

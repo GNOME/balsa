@@ -1,6 +1,6 @@
 2002-08-19  Pawel Salek  <pawsa@theochem.kth.se>
 
-	* configure.in, NEWS: release 1.4.0.
+	* configure.in, Makefile.am, NEWS: release 1.4.0.
 	* libbalsa/message.h: copy content after all to avoid races.
 
 2002-08-16  Pawel Salek  <pawsa@theochem.kth.se>

@@ -27,3 +27,6 @@ Installation:
 Do the above then
 
 # make install
+
+You may need to remove old ~/.balsarc file: balsa sometimes gets confused 
+when it cannot parse the configuration file.

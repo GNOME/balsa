@@ -1,3 +1,7 @@
+2004-10-05  Amanpreet Singh Alam<amanpreetalam@yahoo.com>
+	
+	* configure.in: pa (Punjabi Language entey made) 
+
 2004-10-04 16:39  PeterB
 
 	* libbalsa /: mailbox.c, mailbox.h: implement new _msgno_has_flags

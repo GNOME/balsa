@@ -81,8 +81,8 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
   balsa_app.mdi_style = GNOME_MDI_DEFAULT_MODE;
 
-  balsa_app.proplist = PLGetProplistWithPath("~/.balsarc");
-  
+  balsa_app.proplist = PLGetProplistWithPath ("~/.balsarc");
+
   if (!balsa_app.proplist)
     {
       initialize_balsa (argc, argv);

@@ -179,7 +179,7 @@ update_mailbox_config (Mailbox * mailbox, gchar * old_mbox_name)
 }
 
 gint
-load_mailboxes (gchar *name)
+load_mailboxes (gchar * name)
 {
   proplist_t dict, accts, mb;
   int num_elements, i;

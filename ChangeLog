@@ -1,3 +1,7 @@
+2003-07-16  Pawel Salek  <pawsa theochem.kth.se>
+
+	* src/main.c: remove console warning questioned in bug 114036.
+
 2003-07-15 11:40  PeterB
 
 	* src/sendmsg-window.c: Set locale only when menu item is

@@ -200,7 +200,6 @@ static void
 config_init(void)
 {
     while(!config_load() || check_special_mailboxes()) {
-	g_warning("*** Could not load basic configuration!\n");
 	balsa_init_begin();
     }
 }

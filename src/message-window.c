@@ -335,6 +335,19 @@ static const struct callback_item {
 
 /* Standard buttons; "" means a separator. */
 static const gchar* message_toolbar[] = {
+#if defined(ENABLE_TOUCH_UI)
+    BALSA_PIXMAP_NEXT_UNREAD,
+    "",
+    BALSA_PIXMAP_REPLY,
+    BALSA_PIXMAP_REPLY_ALL,
+    BALSA_PIXMAP_FORWARD,
+    "",
+    BALSA_PIXMAP_PRINT,
+    "",
+    BALSA_PIXMAP_TRASH,
+    "",
+    GTK_STOCK_CLOSE
+#else /* ENABLE_TOUCH_UI */
     BALSA_PIXMAP_NEXT_UNREAD,
     "",
     BALSA_PIXMAP_REPLY,
@@ -348,11 +361,8 @@ static const gchar* message_toolbar[] = {
     "",
     BALSA_PIXMAP_PRINT,
     "",
-    BALSA_PIXMAP_TRASH,
-#if defined(ENABLE_TOUCH_UI)
-    "",
-    GTK_STOCK_CLOSE
-#endif /* ENABLE_TOUCH_UI */
+    BALSA_PIXMAP_TRASH
+#endif /* ENEBLE_TOUCH_UI */
 };
 
 /* Create the toolbar model for the message window's toolbar.

@@ -515,9 +515,23 @@ libbalsa_address_book_gpe_modify_address(LibBalsaAddressBook *ab,
 
 struct gpe_completion_closure {
     sqlite *db;
+    const gchar *prefix;
     gchar **new_prefix;
     GList *res;
 };
+static void
+strip_superflous_addresses(LibBalsaAddress *a)
+{
+    if(a->address_list) {
+        /* a person has several matching addresses of the same kind! */
+        GList *l, *tmp;
+        for(l=a->address_list->next; l; l = tmp){
+            tmp = l->next;
+            g_free(l->data);
+            a->address_list = g_list_delete_link(a->address_list, l);
+        }
+    }
+}
 
 static int
 gpe_read_completion(void *arg, int argc, char **argv, char **names)
@@ -525,15 +539,27 @@ gpe_read_completion(void *arg, int argc, char **argv, char **names)
     struct gpe_completion_closure *gc = arg;
     LibBalsaAddress * a= libbalsa_address_new();
     guint uid = atoi(argv[0]);
+    gchar *tag = argv[1];
 
     /* follow read_entry_data. FIXME: error reporting */
-    sqlite_exec_printf (gc->db,
-                        "select tag,value from contacts where urn=%d",
-                        gpe_read_attr, a, NULL, uid);
+    if(strstr(tag, "EMAIL") != NULL) { /* be extra cautious - return just one address */
+        sqlite_exec_printf
+            (gc->db,
+             "select tag,value from contacts where urn=%d"
+             " and (upper(tag)='FAMILY_NAME' or upper(tag)='FIRST_NAME' or "
+             "upper(tag)='NAME' or "
+             "(upper(tag)='%q' and value LIKE '%q%%'))",
+             gpe_read_attr, a, NULL, uid, tag, gc->prefix);
+    } else {
+        sqlite_exec_printf(gc->db,
+                            "select tag,value from contacts where urn=%d",
+                            gpe_read_attr, a, NULL, uid);
+    }
     if(!a->address_list) { /* entry without address: ignore! */
         g_object_unref(a);
         return 0;
     }
+    strip_superflous_addresses(a);
     if(!a->full_name)
         a->full_name = create_name(a->first_name, a->last_name);
     g_object_set_data(G_OBJECT(a), "urn", GUINT_TO_POINTER(uid));
@@ -550,7 +576,7 @@ libbalsa_address_book_gpe_alias_complete(LibBalsaAddressBook * ab,
 					  gchar ** new_prefix)
 {
     static const char *query = 
-        "select distinct urn from contacts where "
+        "select distinct urn,tag from contacts where "
         "(upper(tag)='FAMILY_NAME' or upper(tag)='FIRST_NAME' or "
         "upper(tag)='NAME' or "
         "upper(tag)='WORK.EMAIL' or upper(tag)='HOME.EMAIL') "
@@ -572,6 +598,7 @@ libbalsa_address_book_gpe_alias_complete(LibBalsaAddressBook * ab,
 
     *new_prefix = NULL;
     gcc.db = gpe_ab->db;
+    gcc.prefix = prefix;
     gcc.new_prefix = new_prefix;
     gcc.res = NULL;
     if(prefix)

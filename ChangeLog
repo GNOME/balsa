@@ -1,3 +1,9 @@
+2004-09-08  Pawel Salek
+
+	* src/message-window.c: change defaults for touch-ui build.
+	* libbalsa/address-book-gpe.c: armour against persons with
+	multiple addresses.
+
 2004-09-07  Pawel Salek
 
 	* libbalsa/send.c: make the error messages match reality.

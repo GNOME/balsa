@@ -232,31 +232,23 @@ int imap_mbox_is_selected     (ImapMboxHandle *h)
 { return IMAP_MBOX_IS_SELECTED(h); }
 
 ImapResult
-imap_mbox_handle_connect(ImapMboxHandle* ret, const char *host)
+imap_mbox_handle_connect(ImapMboxHandle* ret, const char *host, int over_ssl)
 {
   ImapResult rc;
-  ImapResponse resp;
 
   g_return_val_if_fail(imap_mbox_is_disconnected(ret), IMAP_CONNECT_FAILED);
+#if !defined(USE_TLS)
+  if(over_ssl)
+    return IMAP_UNSECURE;
+#else
+  ret->over_ssl = over_ssl;
+#endif
 
   g_free(ret->host);   ret->host   = g_strdup(host);
 
   if( (rc=imap_mbox_connect(ret)) != IMAP_SUCCESS)
     return rc;
 
-#if defined(USE_TLS)
-  if(imap_mbox_handle_can_do(ret, IMCAP_STARTTLS)) {
-    if( imap_handle_starttls(ret) != IMR_OK)
-      return IMAP_UNSECURE; /* TLS negotiation error */
-    resp = IMR_OK;
-  } else
-    resp = IMR_NO;
-#else
-  resp = IMR_NO;
-#endif
-  if(ret->require_tls && resp != IMR_OK)
-    return IMAP_UNSECURE;
-  
   rc = imap_authenticate(ret);
 
   return rc;
@@ -378,11 +370,14 @@ static ImapResult
 imap_mbox_connect(ImapMboxHandle* handle)
 {
   static const int SIO_BUFSZ=8192;
+  ImapResponse resp;
+  const char *service = "imap";
 
 #ifdef USE_TLS
   handle->using_tls = 0;
+  if(handle->over_ssl) service = "imaps";
 #endif
-  handle->sd = socket_open(handle->host, "imap");
+  handle->sd = socket_open(handle->host, service);
   if(handle->sd<0) return IMAP_CONNECT_FAILED;
   
   /* Add buffering to the socket */
@@ -391,6 +386,14 @@ imap_mbox_connect(ImapMboxHandle* handle)
     close(handle->sd);
     return IMAP_NOMEM;
   }
+#ifdef USE_TLS
+  if(handle->over_ssl) {
+    SSL *ssl = imap_create_ssl();
+    if(!ssl) return IMAP_UNSECURE;
+    ImapResponse rc = imap_handle_setup_ssl(handle, ssl);
+    if(rc != IMR_OK) return IMAP_UNSECURE;
+  }
+#endif
   if(handle->monitor_cb) 
     sio_set_monitorcb(handle->sio, handle->monitor_cb, handle->monitor_arg);
 
@@ -403,6 +406,21 @@ imap_mbox_connect(ImapMboxHandle* handle)
     return IMAP_PROTOCOL_ERROR;
   }
 
+#if defined(USE_TLS)
+  if(handle->over_ssl)
+    resp = IMR_OK; /* secured already with SSL */
+  else if(imap_mbox_handle_can_do(handle, IMCAP_STARTTLS)) {
+    if( imap_handle_starttls(handle) != IMR_OK)
+      return IMAP_UNSECURE; /* TLS negotiation error */
+    resp = IMR_OK; /* secured with TLS */
+  } else
+    resp = IMR_NO; /* not over SSL and TLS unavailable */
+#else
+  resp = IMR_NO;
+#endif
+  if(handle->require_tls && resp != IMR_OK)
+    return IMAP_UNSECURE;
+    
   return IMAP_SUCCESS;
 }
 
@@ -1025,6 +1043,9 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
   /* our command tags are hexadecimal numbers */
   if(sscanf(tag, "%x", &cmdno) != 1) {
     printf("scanning '%s' for tag number failed. Cannot recover.\n", tag);
+    /* sio_detach(handle->sio); leads to a crash */
+    close(handle->sd);
+    handle->state = IMHS_DISCONNECTED;
     return IMR_BAD;
   }
 

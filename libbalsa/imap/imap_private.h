@@ -56,6 +56,8 @@ struct _ImapMboxHandle {
   void *search_arg;
   unsigned readonly_mbox:1;
 #ifdef USE_TLS
+  unsigned over_ssl:1; /* transmission is to be made over SSL-protected
+                        * connection, usually to imaps port. */
   unsigned using_tls:1;
 #endif
   unsigned require_tls:1;
@@ -67,6 +69,12 @@ void imap_mbox_resize_cache(ImapMboxHandle *h, unsigned new_size);
 
 ImapResponse imap_cmd_exec(ImapMboxHandle* handle, const char* cmd);
 char* imap_mbox_gets(ImapMboxHandle *h, char* buf, size_t sz);
+
+#ifdef USE_TLS
+#include <openssl/ssl.h>
+SSL* imap_create_ssl(void);
+ImapResponse imap_handle_setup_ssl(ImapMboxHandle *handle, SSL *ssl);
+#endif
 
 /* even more private functions */
 int imap_cmd_start(ImapMboxHandle* handle, const char* cmd, unsigned* cmdno);

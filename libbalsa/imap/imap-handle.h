@@ -116,7 +116,8 @@ void imap_handle_set_infocb(ImapMboxHandle* h, ImapInfoCb cb, void*);
 void imap_handle_set_usercb(ImapMboxHandle* h, ImapUserCb cb, void*);
 void imap_handle_set_flagscb(ImapMboxHandle* h, ImapFlagsCb cb, void*);
 
-ImapResult imap_mbox_handle_connect(ImapMboxHandle* r, const char *hst);
+ImapResult imap_mbox_handle_connect(ImapMboxHandle* r, const char *hst, 
+                                    int over_ssl);
 ImapResponse imap_mbox_handle_reconnect(ImapMboxHandle* r,
                                         gboolean *readonly);
 unsigned imap_mbox_handle_require_tls(ImapMboxHandle* r, unsigned state);

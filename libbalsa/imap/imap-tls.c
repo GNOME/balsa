@@ -151,8 +151,8 @@ imaptls_thread_setup(void)
 }
 #endif /* BALSA_USE_THREADS */
 
-static SSL*
-create_ssl(void)
+SSL*
+imap_create_ssl(void)
 {
   SSL *ssl;
 
@@ -165,7 +165,14 @@ create_ssl(void)
     imaptls_thread_setup();
     SSL_library_init();
     SSL_load_error_strings();
+#if 1
     global_ssl_context = SSL_CTX_new (TLSv1_client_method ());
+#else
+    /* we could also enable SSLv3 but it doe not work very well with 
+     * all servers. */
+    global_ssl_context = SSL_CTX_new (SSLv23_client_method ());
+    SSL_CTX_set_options(global_ssl_context, SSL_OP_ALL|SSL_OP_NO_SSLv2);
+#endif
     /* no client certificate password support yet
      * SSL_CTX_set_default_passwd_cb (ctx, ctx_password_cb);
      * SSL_CTX_set_default_passwd_cb_userdata (ctx, ctx_password_cb_arg); 
@@ -298,26 +305,13 @@ check_cipher_strength(ImapMboxHandle *handle, SSL *ssl)
                     bits, &ok);
   return ok;
 }
- 
 
 ImapResponse
-imap_handle_starttls(ImapMboxHandle *handle)
+imap_handle_setup_ssl(ImapMboxHandle *handle, SSL *ssl)
 {
-  ImapResponse rc;
-  SSL *ssl;
-
-  if(!imap_mbox_handle_can_do(handle, IMCAP_STARTTLS)) 
-    return IMR_NO;
-
-
-  ssl = create_ssl();
-  if(!ssl) { 
-    printf("ssl=%p ctx=%p\n", ssl, global_ssl_context);
-    return IMR_NO;
-  }
-
-  if( (rc=imap_cmd_exec(handle, "StartTLS")) != IMR_OK)
-    return rc;
+  fprintf(stderr, "OpenSSL error in %s():\n", __FUNCTION__);
+  ERR_print_errors_fp(stderr);
+  fprintf(stderr, "\nEnd of print_errors\n");
 
   if(sio_set_tlsclient_ssl (handle->sio, ssl)) {
     handle->using_tls = 1;
@@ -335,9 +329,33 @@ imap_handle_starttls(ImapMboxHandle *handle)
       handle->state = IMHS_DISCONNECTED;
       return IMR_NO;
     }
+    return IMR_OK;
+  } else {
+    printf("set_tlscliend failed!\n");
+    return IMR_NO;
+  }
+}
 
+ImapResponse
+imap_handle_starttls(ImapMboxHandle *handle)
+{
+  ImapResponse rc;
+  SSL *ssl;
+
+  if(!imap_mbox_handle_can_do(handle, IMCAP_STARTTLS)) 
+    return IMR_NO;
+
+
+  ssl = imap_create_ssl();
+  if(!ssl) { 
+    printf("ssl=%p ctx=%p\n", ssl, global_ssl_context);
+    return IMR_NO;
   }
 
-  return rc;
+  if( (rc=imap_cmd_exec(handle, "StartTLS")) != IMR_OK) {
+    SSL_free(ssl);
+    return rc;
+  }
+  return imap_handle_setup_ssl(handle, ssl);
 }
 #endif /* USE_TLS */

@@ -1,3 +1,9 @@
+2004-02-22  Pawel Salek
+
+	* libbalsa/imap-server.c: support SSL/imaps.
+	* libbalsa/imap/imap-handle.[ch]: ditto.
+	* libbalsa/imap/imap{-tls.c,_private.h}: share TLS/SSL routines.
+
 2004-02-20 12:19  PeterB
 
 	* src/sendmsg-window.c: use accessor function

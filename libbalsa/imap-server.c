@@ -18,6 +18,9 @@
 
 #ifdef USE_TLS
 #include <openssl/err.h>
+#define REQ_SSL(s) (LIBBALSA_SERVER(s)->use_ssl)
+#else
+#define REQ_SSL(s) (0)
 #endif
 
 static LibBalsaServerClass *parent_class = NULL;
@@ -681,7 +684,8 @@ libbalsa_imap_server_get_handle(LibBalsaImapServer *imap_server)
     }
     if (info) {
         if(imap_mbox_is_disconnected(info->handle)) {
-            rc=imap_mbox_handle_connect(info->handle, server->host);
+            rc=imap_mbox_handle_connect(info->handle, server->host,
+                                        REQ_SSL(server));
             if(rc != IMAP_SUCCESS) {
                 if(rc == IMAP_AUTH_FAILURE)
                     libbalsa_server_set_password(server, NULL);
@@ -767,7 +771,8 @@ libbalsa_imap_server_get_handle_with_user(LibBalsaImapServer *imap_server,
 	    g_list_delete_link(imap_server->free_handles, conn);
     }
     if (info && imap_mbox_is_disconnected(info->handle)) {
-	rc=imap_mbox_handle_connect(info->handle, server->host);
+	rc=imap_mbox_handle_connect(info->handle, server->host,
+                                    REQ_SSL(server));
 	if(rc != IMAP_SUCCESS) {
             if(rc == IMAP_AUTH_FAILURE)
                 libbalsa_server_set_password(server, NULL);

@@ -164,6 +164,13 @@ libbalsa_message_body_set_mime_body(LibBalsaMessageBody * body,
 	body->next = libbalsa_message_body_new(body->message);
 	libbalsa_message_body_set_mime_body(body->next,
 					    embedded_message->mime_part);
+	if (GMIME_IS_PART(embedded_message->mime_part))
+	    /* This part may not have a Content-Disposition header, but
+	     * we must treat it as inline. */
+	    g_mime_part_set_content_disposition(GMIME_PART
+						(embedded_message->
+						 mime_part),
+						GMIME_DISPOSITION_INLINE);
     } else
     if (GMIME_IS_MULTIPART(mime_part))
     {

@@ -1,3 +1,8 @@
+2003-05-15 10:59  PeterB
+
+	* libmutt/imap/imap.c: Check for broken IMAP connection in
+	imap_uid_search.
+
 2003-05-15  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* sounds/balsa.soundlist: convert to UTF-8
@@ -9,7 +14,6 @@
         * src/balsa-message.c:
         popup a dialog if key is not found and run
         gpg --recv-key
-
 
 2003-05-11  Pawel Salek  <pawsa@theochem.kth.se>
 

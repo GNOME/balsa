@@ -1,3 +1,9 @@
+2004-01-21 15:11  PeterB
+
+	* src/message-window.c: Add `next unread' item to message menu with
+	ctrl+N binding, and manage its sensitivity; add zoom controls for
+	html parts.
+
 2004-01-19 17:15  PeterB
 
 	* src/balsa-message.c: set background of message to base of message

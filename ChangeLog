@@ -1,3 +1,10 @@
+2003-10-15 14:24  PeterB
+
+	* libbalsa/imap/imap-handle.c: Implement ir_check_crlf() and use it
+	for protocol checking; use g_ascii_ stringcomparisons; add
+	`always_has_data' info to ResponseHandlers structures and use it
+	for more careful syntax checking.
+
 2003-10-14  Pawel Salek  <pawsa theochem.kth.se>
 
 	* libbalsa/mailbox.[hc]: remove old crap. fix sync_storage().

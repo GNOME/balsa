@@ -231,6 +231,7 @@ fe_type_simple_toggled (GtkWidget * widget,
     }
 }				/* end fe_type_simple_toggled() */
 
+#ifdef HAVE_LIBESD
 
 /*
  * browse_fileselect_clicked()
@@ -247,7 +248,6 @@ browse_fileselect_clicked (GtkWidget * widget,
 						GTK_FILE_SELECTION (data)));
   gtk_widget_destroy (GTK_WIDGET (data));
 }				/* end browse_fileselect_clicked */
-
 
 /*
  * fe_sound_browse_clicked()
@@ -279,7 +279,7 @@ fe_sound_browse_clicked (GtkWidget * widget,
 			      GTK_OBJECT (filesel));
   gtk_widget_show (filesel);
 }				/* end fe_sound_browse_clicked */
-
+#endif
 
 /*
  * fe_new_pressed()

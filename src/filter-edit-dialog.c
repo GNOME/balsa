@@ -628,7 +628,7 @@ void build_action_page()
     gtk_widget_show(fe_notification_table);
 
     /* Notification buttons */
-
+#ifdef HAVE_LIBESD
     fe_sound_button = gtk_check_button_new_with_label("Play sound:");
     gtk_table_attach(GTK_TABLE(fe_notification_table),
 		     fe_sound_button,
@@ -657,6 +657,7 @@ void build_action_page()
 			      GTK_SIGNAL_FUNC(fe_sound_browse_clicked),
 			      NULL);
     gtk_widget_show(fe_sound_browse);
+#endif
     fe_popup_button = gtk_check_button_new_with_label("Popup text:");
     gtk_table_attach(GTK_TABLE(fe_notification_table),
 		     fe_popup_button,

@@ -72,7 +72,9 @@ typedef struct _filter
     guint match_fields; /* for FILTER_SIMPLE filters */
 
     /* The notification fields */
-    gchar sound[1024];
+#ifdef HAVE_LIBESD
+    gchar sound[PATH_MAX];
+#endif
     gchar popup_text[256];
 
     /* other options I haven't thought of yet */

@@ -13,3 +13,4 @@ config.cache
 aclocal.m4
 stamp-h
 stamp-h.in
+muttconfig.h.in

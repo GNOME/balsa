@@ -1,3 +1,10 @@
+2004-08-20 08:31  PeterB
+
+	* src/: folder-conf.c, mailbox-conf.c, mailbox-conf.h: strip port
+	off host string when user toggles use_ssl.
+	* libbalsa/mailbox_imap.c: jensgr@gmx.net (Jens Granseuer),
+	statement order.
+
 2004-08-20  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: work with MSExchange (no sort extension).

@@ -1855,10 +1855,10 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         ibuf = ptr;
         ibuflen = alloced;
         charset = libbalsa_message_charset(info->message);
-        conv = iconv_open("utf8", charset ? charset : "iso-8859-1");
-        if(conv == (iconv_t)(-1)) { /* hm, isn't us-ascii to utf8 a noop? */
-            printf("iconv_open(%s) failed, defaulting to us-ascii\n", charset);
-	    conv = iconv_open("utf8", "us-ascii");
+        conv = iconv_open("UTF-8", charset ? charset : "ISO-8859-1");
+        if(conv == (iconv_t)(-1)) { /* hm, isn't us-ascii to UTF-8 a noop? */
+            printf("iconv_open(%s) failed, defaulting to US-ASCII\n", charset);
+	    conv = iconv_open("UTF-8", "US-ASCII");
         }
 #if defined __GLIBC__ && __GLIBC__ && __GLIBC_MINOR__ <= 1 || (defined sun)
 	iconv(conv, (const char **)&ibuf, &ibuflen, &obuf, &obuflen);

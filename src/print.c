@@ -115,7 +115,7 @@ typedef struct _mime_action_t {
 static void
 gnome_print_show_with_charset(PrintInfo * pi, char const * text, iconv_t conv)
 {
-    /* if we can not convert to utf8, try to print "raw" (which might fail) */
+    /* if we can not convert to UTF-8, try to print "raw" (which might fail) */
     if (conv == (iconv_t)(-1))
 	gnome_print_show(pi->pc, text);
     else {
@@ -607,16 +607,16 @@ prepare_plaintext(PrintInfo * pi, LibBalsaMessageBody * body)
     charset = libbalsa_message_body_get_parameter(body, "charset");
 
     if (charset) {
-	pdata->conv = iconv_open("utf8", charset);
+	pdata->conv = iconv_open("UTF-8", charset);
 	if (pdata->conv == (iconv_t)(-1)) {
 	    balsa_information(LIBBALSA_INFORMATION_ERROR,
-			      _("Can not convert %s, falling back to us-ascii.\nSome characters may be printed incorrectly."),
+			      _("Can not convert %s, falling back to US-ASCII.\nSome characters may be printed incorrectly."),
 			      charset);
-	    pdata->conv = iconv_open("utf8", "us-ascii");
+	    pdata->conv = iconv_open("UTF-8", "US-ASCII");
 	}
 	g_free(charset);
     } else
-	pdata->conv = iconv_open("utf8", "iso-8859-1");
+	pdata->conv = iconv_open("UTF-8", "ISO-8859-1");
 
     /* fake an empty buffer if textbuf is NULL */
     if (!pdata->textbuf)
@@ -955,15 +955,15 @@ print_info_new(const gchar * paper, LibBalsaMessage * msg,
     
     the_charset = (gchar *)libbalsa_message_charset(msg);
     if (the_charset) {
-	pi->conv_data = iconv_open("utf8", the_charset);
+	pi->conv_data = iconv_open("UTF-8", the_charset);
 	if (pi->conv_data == (iconv_t)(-1)) {
 	    balsa_information(LIBBALSA_INFORMATION_ERROR,
-			      _("Can not convert %s, falling back to us-ascii.\nSome characters may be printed incorrectly."),
+			      _("Can not convert %s, falling back to US-ASCII.\nSome characters may be printed incorrectly."),
 			      the_charset);
-	    pi->conv_data = iconv_open("utf8", "us-ascii");
+	    pi->conv_data = iconv_open("UTF-8", "US-ASCII");
 	}
     } else
-	pi->conv_data = iconv_open("utf8", "iso-8859-1");
+	pi->conv_data = iconv_open("UTF-8", "ISO-8859-1");
 
     /* now get the message contents... */
     libbalsa_message_body_ref(msg);

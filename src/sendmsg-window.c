@@ -1670,20 +1670,20 @@ to_add(GtkWidget * widget,
 
 
 /*
- * static void create_address_entry()
+ * static void create_email_or_string_entry()
  * 
- * Creates a gtk_label()/libbalsa_address_entry() pair.
+ * Creates a gtk_label()/entry pair.
  *
  * Input: GtkWidget* table       - Table to attach to.
  *        const gchar* label     - Label string.
  *        int y_pos              - position in the table.
+ *        arr                    - arr[1] is the entry widget.
  *      
  * Output: GtkWidget* arr[] - arr[0] will be the label widget.
- *                          - arr[1] will be the entry widget.
  */
 static void
-create_address_entry(GtkWidget * table, const gchar * label, int y_pos,
-		    GtkWidget * arr[])
+create_email_or_string_entry(GtkWidget * table, const gchar * label,
+                             int y_pos, GtkWidget * arr[])
 {
     arr[0] = gtk_label_new(label);
     gtk_misc_set_alignment(GTK_MISC(arr[0]), 0.0, 0.5);
@@ -1692,7 +1692,6 @@ create_address_entry(GtkWidget * table, const gchar * label, int y_pos,
     gtk_table_attach(GTK_TABLE(table), arr[0], 0, 1, y_pos, y_pos + 1,
 		     GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
 
-    arr[1] = libbalsa_address_entry_new();
     gtk_widget_modify_font(arr[1],
                            pango_font_description_from_string
                            (balsa_app.message_font));
@@ -1717,22 +1716,14 @@ static void
 create_string_entry(GtkWidget * table, const gchar * label, int y_pos,
 		    GtkWidget * arr[])
 {
-    arr[0] = gtk_label_new(label);
-    gtk_misc_set_alignment(GTK_MISC(arr[0]), 0.0, 0.5);
-    gtk_misc_set_padding(GTK_MISC(arr[0]), GNOME_PAD_SMALL,
-			 GNOME_PAD_SMALL);
-    gtk_table_attach(GTK_TABLE(table), arr[0], 0, 1, y_pos, y_pos + 1,
-		     GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
-
     arr[1] = gtk_entry_new_with_max_length(2048);
-    gtk_table_attach(GTK_TABLE(table), arr[1], 1, 2, y_pos, y_pos + 1,
-		     GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_SHRINK, 0, 0);
+    create_email_or_string_entry(table, label, y_pos, arr);
 }
 
 /*
  * static void create_email_entry()
  *
- * Creates a gtk_label()/gtk_entry() and button in a table for
+ * Creates a gtk_label()/libbalsa_address_entry() and button in a table for
  * e-mail entries, eg. To:.  It also sets up some callbacks in gtk.
  *
  * Input:  GtkWidget *table   - table to insert the widgets into.
@@ -1760,7 +1751,8 @@ create_email_entry(GtkWidget * table, const gchar * label, int y_pos,
                    BalsaSendmsgAddress *sma, gint min_addresses,
                    gint max_addresses)
 {
-    create_address_entry(table, label, y_pos, arr);
+    arr[1] = libbalsa_address_entry_new();
+    create_email_or_string_entry(table, label, y_pos, arr);
 
     arr[2] = gtk_button_new();
     gtk_button_set_relief(GTK_BUTTON(arr[2]), GTK_RELIEF_NONE);
@@ -2282,8 +2274,8 @@ fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 	g_free(signature);
     }
 
-    tmp = g_convert(body->str, body->len, "utf-8", 
-                    msg->charset ? msg->charset : "us-ascii", 
+    tmp = g_convert(body->str, body->len, "UTF-8", 
+                    msg->charset ? msg->charset : "US-ASCII", 
                     &bytes_read, &bytes_written, &err);
     if(err) { 
         g_warning("Error charset conversion on body quoting.\n"); 
@@ -3114,13 +3106,13 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     gtk_text_buffer_get_bounds(buffer, &start, &end);
     tmp = gtk_text_iter_get_text(&start, &end);
     body->buffer = g_convert(tmp, -1, 
-                             bsmsg->charset ? bsmsg->charset : "us-ascii", 
-                             "utf-8", &bytes_read, &bytes_written, &error);
+                             bsmsg->charset ? bsmsg->charset : "US-ASCII", 
+                             "UTF-8", &bytes_read, &bytes_written, &error);
     if(error) {
-        g_warning("Charset conversion error on sending. setting to UTF8\n");
+        g_warning("Charset conversion error on sending. setting to UTF-8\n");
         g_error_free(error);
         body->buffer = tmp; 
-        bsmsg->charset = "utf-8";
+        bsmsg->charset = "UTF-8";
     } else { g_free(tmp); }
 
     if (bsmsg->flow) {

@@ -1,6 +1,7 @@
 2004-10-25 06:28  PeterB
 
-	* src/filter-edit-callbacks.c: migrate filter edit dialogs from
+	* src/: filter-edit-callbacks.c, filter-edit-dialog.c,
+	filter-edit.h: migrate filter edit dialogs from
 	deprecated GtkCombo to GtkComboBoxEntry, and from deprecated
 	GtkOptionMenu to GtkComboBox.
 	* src/filter-run-callbacks.c, libbalsa/mailbox.c: plug memory

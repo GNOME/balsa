@@ -177,8 +177,7 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
 	if (abc->create_type == LIBBALSA_TYPE_ADDRESS_BOOK_VCARD) {
 	    gchar *path =
 		gnome_file_entry_get_full_path(GNOME_FILE_ENTRY
-					       (abc->ab_specific.vcard.
-						path), FALSE);
+					       (abc->ab_specific.vcard.path), FALSE);
 	    if (path != NULL)
 		address_book = libbalsa_address_book_vcard_new(name, path);
 #ifdef ENABLE_LDAP
@@ -207,8 +206,7 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
 	    LibBalsaAddressBookVcard *vcard;
 	    gchar *path =
 		gnome_file_entry_get_full_path(GNOME_FILE_ENTRY
-					       (abc->ab_specific.vcard.
-						path), FALSE);
+					       (abc->ab_specific.vcard.path), FALSE);
 
 	    vcard = LIBBALSA_ADDRESS_BOOK_VCARD(address_book);
 	    if (path) {

@@ -67,7 +67,8 @@ make_gradient(GdkColor colors[], gint first, gint last)
  * Output:
  *   an integer saying how many levels deep.  
  * */
-gint is_a_quote(const gchar * str, const regex_t * rex)
+gint
+is_a_quote(const gchar * str, const regex_t * rex)
 {
     gint cnt = 0, off;
     regmatch_t rm[1];

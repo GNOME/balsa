@@ -147,8 +147,7 @@ static void part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info,
 
 static GtkViewportClass *parent_class = NULL;
 
-guint
-balsa_message_get_type()
+guint balsa_message_get_type()
 {
     static guint balsa_message_type = 0;
 
@@ -513,12 +512,13 @@ add_header_gchar(BalsaMessage * bm, gchar * header, gchar * label,
     gchar *line_start, *line_end;
     gchar *wrapped_value;
 
-    if (!
-	(bm->shown_headers == HEADERS_ALL
-	 || libbalsa_find_word(header,
-			       balsa_app.selected_headers))) return;
+    if (!(bm->shown_headers == HEADERS_ALL || libbalsa_find_word(header, balsa_app.selected_headers))) 
+	return;
 
-    fnt = gdk_font_load(balsa_app.message_font);
+    if (strcmp(header, "subject") != 0)
+	fnt = gdk_font_load(balsa_app.message_font);
+    else
+	fnt = gdk_font_load(balsa_app.subject_font);
 
     gtk_text_insert(GTK_TEXT(bm->header_text), fnt, NULL, NULL, label, -1);
 
@@ -569,10 +569,8 @@ add_header_glist(BalsaMessage * bm, gchar * header, gchar * label,
     if (list == NULL)
 	return;
 
-    if (!
-	(bm->shown_headers == HEADERS_ALL
-	 || libbalsa_find_word(header,
-			       balsa_app.selected_headers))) return;
+    if (!(bm->shown_headers == HEADERS_ALL || libbalsa_find_word(header, balsa_app.selected_headers))) 
+	return;
 
     value = libbalsa_make_string_from_list(list);
 
@@ -584,14 +582,13 @@ add_header_glist(BalsaMessage * bm, gchar * header, gchar * label,
 static void
 display_headers(BalsaMessage * bm)
 {
-
     LibBalsaMessage *message = bm->message;
     GList *p, *lst;
     gchar **pair, *hdr;
     gchar *date;
 
     gtk_editable_delete_text(GTK_EDITABLE(bm->header_text), 0, -1);
-
+ 
     if (bm->shown_headers == HEADERS_NONE) {
 	gtk_widget_hide(bm->header_text);
 	return;
@@ -600,6 +597,8 @@ display_headers(BalsaMessage * bm)
     }
 
     gtk_text_freeze(GTK_TEXT(bm->header_text));
+
+    add_header_gchar(bm, "subject", _("Subject:"), message->subject);
 
     date = libbalsa_message_date_to_gchar(message, balsa_app.date_string);
     add_header_gchar(bm, "date", _("Date:"), date);
@@ -617,8 +616,6 @@ display_headers(BalsaMessage * bm)
 
     if (message->fcc_mailbox)
 	add_header_gchar(bm, "fcc", _("Fcc:"), message->fcc_mailbox);
-
-    add_header_gchar(bm, "subject", _("Subject:"), message->subject);
 
     /* remaining headers */
     lst = libbalsa_message_user_hdrs(message);
@@ -696,6 +693,7 @@ part_info_init_image(BalsaMessage * bm, BalsaPartInfo * info)
     mask = gdk_imlib_copy_mask(im);
 
     gdk_imlib_destroy_image(im);
+
 #else
     pb = gdk_pixbuf_new_from_file(info->body->temp_filename);
     gdk_pixbuf_render_pixmap_and_mask(pb, &pixmap, &mask, 0);
@@ -852,7 +850,6 @@ get_font_name(const gchar * base, const gchar * charset)
 	    postfix = charset2font[i].font_postfix;
 	    break;
 	}
-
     if (!postfix)
 	return g_strdup(base);	/* print warning here? */
 
@@ -935,7 +932,6 @@ get_koi_font_name(const gchar * base, const gchar * code)
     sprintf(res + len, "-%s-%s", type, code);
     return res;
 }
-
 
 /* HELPER FUNCTIONS ----------------------------------------------- */
 static gchar *
@@ -1222,8 +1218,6 @@ find_part_icon(BalsaPartInfo * info, gchar * content_type)
 	pix = gnome_pixmap_file("balsa/attachment.png");
 
     return pix;
-
-
 }
 
 static void
@@ -1663,8 +1657,7 @@ balsa_icon_list_size_request(GtkWidget * widget,
  * widgets are supported for this (GtkHTML could be, but I don't have a 
  * working build right now)
  */
-gboolean
-balsa_message_can_select(BalsaMessage * bmessage)
+gboolean balsa_message_can_select(BalsaMessage * bmessage)
 {
     g_return_val_if_fail(bmessage != NULL, FALSE);
 

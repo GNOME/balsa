@@ -272,8 +272,7 @@ mblist_button_press_cb(GtkWidget * widget, GdkEventButton * event,
 
 	g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
 
-	if (event->button == 1)
-	 {			/* && event->type == GDK_2BUTTON_PRESS) */
+	if (event->button == 1) {	/* && event->type == GDK_2BUTTON_PRESS) */
 	    /* double click with button left */
 
 	    mblist_open_mailbox(mailbox);

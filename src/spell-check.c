@@ -76,14 +76,17 @@ static void select_word_cb(GtkCList *, gint, gint,
 /* function prototypes */
 static gboolean next_word(BalsaSpellCheck * spell_check);
 static gboolean check_word(BalsaSpellCheck * spell_check);
-static void switch_word(BalsaSpellCheck * spell_check, const gchar * old_word, const gchar * new_word);
+static void switch_word(BalsaSpellCheck * spell_check,
+			const gchar * old_word, const gchar * new_word);
 static void finish_check(BalsaSpellCheck * spell_check);
 static gboolean check_pspell_errors(PspellManager * manager);
 
 static void setup_suggestions(BalsaSpellCheck * spell_check);
 static void balsa_spell_check_next(BalsaSpellCheck * spell_check);
-static void balsa_spell_check_fix(BalsaSpellCheck * spell_check, gboolean fix_al);
-static void balsa_spell_check_learn(BalsaSpellCheck * spell_check, LearnType learn);
+static void balsa_spell_check_fix(BalsaSpellCheck * spell_check,
+				  gboolean fix_al);
+static void balsa_spell_check_learn(BalsaSpellCheck * spell_check,
+				    LearnType learn);
 
 
 /* marshallers */
@@ -95,7 +98,8 @@ static GtkFrameClass *parent_class = NULL;
 
 
 /* begin actual code */
-GtkType balsa_spell_check_get_type()
+GtkType
+balsa_spell_check_get_type()
 {
     static GtkType balsa_spell_check_type = 0;
 
@@ -844,8 +848,8 @@ balsa_spell_check_learn(BalsaSpellCheck * spell_check,
 	if (pspell_manager_error_number(spell_check->spell_manager) != 0) {
 	    balsa_information(BALSA_INFORMATION_SHOW_DIALOG,
 			      "BalsaSpellCheck: Learn operation failed;\n%s\n",
-			      pspell_manager_error_message(spell_check->
-							   spell_manager));
+			      pspell_manager_error_message
+			      (spell_check->spell_manager));
 	} else {
 	    balsa_information(BALSA_INFORMATION_SHOW_DIALOG,
 			      "BalsaSpellCheck: Learn operation failed.\n");

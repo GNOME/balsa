@@ -94,7 +94,8 @@ static gint numeric_compare(GtkCList * clist, gconstpointer ptr1,
 			    gconstpointer ptr2);
 static gint mblist_mbnode_compare(gconstpointer a, gconstpointer b);
 
-guint balsa_mblist_get_type(void)
+guint
+balsa_mblist_get_type(void)
 {
     static guint mblist_type = 0;
 

@@ -78,7 +78,8 @@ static void balsa_index_page_init(BalsaIndexPage * page);
 void balsa_index_page_window_init(BalsaIndexPage * page);
 void balsa_index_page_close_and_destroy(GtkObject * obj);
 
-GtkType balsa_index_page_get_type(void)
+GtkType
+balsa_index_page_get_type(void)
 {
     static GtkType window_type = 0;
 
@@ -198,12 +199,12 @@ balsa_index_page_reset(BalsaIndexPage * page)
 
     gtk_notebook_set_page(GTK_NOTEBOOK(balsa_app.notebook),
 			  balsa_find_notebook_page_num(BALSA_INDEX_PAGE
-						       (current_page)->
-						       mailbox));
+						       (current_page)->mailbox));
 
 }
 
-gint balsa_find_notebook_page_num(LibBalsaMailbox * mailbox)
+gint
+balsa_find_notebook_page_num(LibBalsaMailbox * mailbox)
 {
     GtkWidget *cur_page;
     guint i;
@@ -330,8 +331,8 @@ idle_handler_cb(GtkWidget * widget)
 
     /* get the preview pane from the index page's BalsaWindow parent */
     bmsg =
-	BALSA_MESSAGE(BALSA_WINDOW(BALSA_INDEX_PAGE(data)->window)->
-		      preview);
+	BALSA_MESSAGE(BALSA_WINDOW
+		      (BALSA_INDEX_PAGE(data)->window)->preview);
 
     if (bmsg && BALSA_MESSAGE(bmsg)) {
 	if (message)
@@ -596,8 +597,7 @@ transfer_messages_cb(BalsaMBList * bmbl, LibBalsaMailbox * mailbox,
 			  (gtk_notebook_get_nth_page
 			   (GTK_NOTEBOOK(balsa_app.notebook),
 			    gtk_notebook_get_current_page(GTK_NOTEBOOK
-							  (balsa_app.
-							   notebook)))),
+							  (balsa_app.notebook)))),
 			  "indexpage"));
     if (page->mailbox == mailbox)	/*Transferring to same mailbox? */
 	return;

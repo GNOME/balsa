@@ -30,8 +30,11 @@
 
 static LibBalsaAddressBook *current_address_book;
 
-static void store_address_dialog_button_clicked_cb(GtkWidget * widget, gint which, GtkWidget ** entries);
-static gint store_address_dialog_close(GtkWidget * widget, GtkWidget ** entries);
+static void store_address_dialog_button_clicked_cb(GtkWidget * widget,
+						   gint which,
+						   GtkWidget ** entries);
+static gint store_address_dialog_close(GtkWidget * widget,
+				       GtkWidget ** entries);
 
 static void address_book_menu_cb(GtkWidget * widget, gpointer data);
 
@@ -221,7 +224,8 @@ balsa_store_address(GtkWidget * widget, gpointer index)
 }
 
 static void
-store_address_dialog_button_clicked_cb(GtkWidget * widget, gint which, GtkWidget ** entries)
+store_address_dialog_button_clicked_cb(GtkWidget * widget, gint which,
+				       GtkWidget ** entries)
 {
     if (which == 0) {
 	LibBalsaAddress *address = NULL;

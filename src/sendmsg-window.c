@@ -740,8 +740,7 @@ attachments_add(GtkWidget * widget,
 
     /* show attachment list */
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
-				   (bsmsg->
-				    view_checkitems
+				   (bsmsg->view_checkitems
 				    [MENU_TOGGLE_ATTACHMENTS_POS]), TRUE);
 }
 
@@ -1273,8 +1272,8 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     {
 	gchar *from;
 	from = g_strdup_printf("%s <%s>", balsa_app.address->full_name,
-			       (gchar *) balsa_app.address->address_list->
-			       data);
+			       (gchar *) balsa_app.address->
+			       address_list->data);
 	gtk_entry_set_text(GTK_ENTRY(msg->from[1]), from);
 	g_free(from);
     }
@@ -1319,15 +1318,15 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	if (!message->subject) {
 	    if (message->from && message->from->address_list)
 		newsubject = g_strdup_printf("Forwarded message from %s",
-					     (gchar *) message->from->
-					     address_list->data);
+					     (gchar *) message->
+					     from->address_list->data);
 	    else
 		newsubject = g_strdup("Forwarded message");
 	} else {
 	    if (message->from && message->from->address_list)
 		newsubject = g_strdup_printf("[%s: %s]",
-					     (gchar *) message->from->
-					     address_list->data,
+					     (gchar *) message->
+					     from->address_list->data,
 					     message->subject);
 	    else
 		newsubject = g_strdup_printf("Fwd: %s", message->subject);
@@ -1502,8 +1501,8 @@ include_file_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     /* Ensure that the dialog box is destroyed when the user clicks a button. */
 
     gtk_signal_connect_object(GTK_OBJECT
-			      (GTK_FILE_SELECTION(file_selector)->
-			       cancel_button), "clicked",
+			      (GTK_FILE_SELECTION
+			       (file_selector)->cancel_button), "clicked",
 			      GTK_SIGNAL_FUNC(gtk_widget_destroy),
 			      (gpointer) file_selector);
 
@@ -1575,8 +1574,8 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     message = libbalsa_message_new();
 
     message->from = libbalsa_address_new_from_string(gtk_entry_get_text
-						     (GTK_ENTRY(bsmsg->
-								from[1])));
+						     (GTK_ENTRY(bsmsg->from
+								[1])));
 
     message->subject = g_strdup(gtk_entry_get_text
 				(GTK_ENTRY(bsmsg->subject[1])));
@@ -1608,8 +1607,8 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 	    }
 	}
 	message->references = g_list_prepend(message->references,
-					     g_strdup(bsmsg->orig_message->
-						      message_id));
+					     g_strdup(bsmsg->
+						      orig_message->message_id));
 
 	footime = localtime(&bsmsg->orig_message->date);
 	strftime(recvtime, sizeof(recvtime),
@@ -1618,15 +1617,15 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 	if (bsmsg->orig_message->message_id)
 	    message->in_reply_to =
 		g_strconcat(bsmsg->orig_message->message_id, "; from ",
-			    (gchar *) bsmsg->orig_message->from->
-			    address_list->data, " on ", recvtime, NULL);
+			    (gchar *) bsmsg->orig_message->
+			    from->address_list->data, " on ", recvtime,
+			    NULL);
     }
 
     body = libbalsa_message_body_new(message);
     body->buffer = gtk_editable_get_chars(GTK_EDITABLE(bsmsg->text), 0,
 					  gtk_text_get_length(GTK_TEXT
-							      (bsmsg->
-							       text)));
+							      (bsmsg->text)));
     if (balsa_app.wordwrap)
 	libbalsa_wrap_string(body->buffer, balsa_app.wraplength);
     body->charset = g_strdup(bsmsg->charset);
@@ -1675,8 +1674,8 @@ send_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 	} else if (bsmsg->type == SEND_CONTINUE) {
 	    if (bsmsg->orig_message) {
 		libbalsa_message_delete(bsmsg->orig_message);
-		libbalsa_mailbox_commit_changes(bsmsg->orig_message->
-						mailbox);
+		libbalsa_mailbox_commit_changes(bsmsg->
+						orig_message->mailbox);
 	    }
 	}
     }
@@ -1755,10 +1754,9 @@ print_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     fputs("\n\f", lpr);
 
     if (pclose(lpr) != 0) {
-	GtkWidget *msgbox =
-	    gnome_message_box_new(_("Error executing lpr"),
-				  GNOME_MESSAGE_BOX_ERROR,
-				  _("Cancel"), NULL);
+	GtkWidget *msgbox = gnome_message_box_new(_("Error executing lpr"),
+						  GNOME_MESSAGE_BOX_ERROR,
+						  _("Cancel"), NULL);
 	gtk_window_set_modal(GTK_WINDOW(msgbox), TRUE);
 	gnome_dialog_run(GNOME_DIALOG(msgbox));
     }
@@ -1914,16 +1912,19 @@ toggle_bcc_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
     return toggle_entry(bsmsg, bsmsg->bcc, MENU_TOGGLE_BCC_POS, 3);
 }
+
 static gint
 toggle_fcc_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
     return toggle_entry(bsmsg, bsmsg->fcc, MENU_TOGGLE_FCC_POS, 2);
 }
+
 static gint
 toggle_reply_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
     return toggle_entry(bsmsg, bsmsg->reply_to, MENU_TOGGLE_REPLY_POS, 3);
 }
+
 static gint
 toggle_attachments_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
@@ -1936,6 +1937,7 @@ toggle_comments_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
     return toggle_entry(bsmsg, bsmsg->comments, MENU_TOGGLE_COMMENTS_POS,
 			2);}
+
 static gint
 toggle_keywords_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
@@ -2075,8 +2077,8 @@ spell_check_cb(GtkWidget * widget, BalsaSendmsg * msg)
     gtk_widget_show_all(GTK_WIDGET(sc));
     balsa_spell_check_set_character_set(sc, msg->charset);
     balsa_spell_check_set_module(sc,
-				 spell_check_modules_name[balsa_app.
-							  module]);
+				 spell_check_modules_name
+				 [balsa_app.module]);
     balsa_spell_check_set_suggest_mode(sc,
 				       spell_check_suggest_mode_name
 				       [balsa_app.suggestion_mode]);

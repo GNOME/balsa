@@ -189,11 +189,12 @@ ab_select_row_event(GtkWidget * widget, gint row, gint column,
     if (event == NULL)
 	return;
 
-    if (event->type == GDK_2BUTTON_PRESS || event->type == GDK_3BUTTON_PRESS) 
+    if (event->type == GDK_2BUTTON_PRESS || event->type == GDK_3BUTTON_PRESS)
 	swap_clist_entry(row,	                                            /* row to swap */
 			 GTK_WIDGET(data),	                            /* from */
 			 (data == book_clist) ? (add_clist) : (book_clist)  /* to */
 			 );
+
 }
 
 static void
@@ -349,7 +350,8 @@ mode_toggled(GtkWidget * w, gpointer data)
     ab_load(NULL, NULL);
 }
 
-gint address_book_cb(GtkWidget * widget, gpointer data)
+gint
+address_book_cb(GtkWidget * widget, gpointer data)
 {
     GtkWidget *find_label,
 	*find_entry,
@@ -380,8 +382,9 @@ gint address_book_cb(GtkWidget * widget, gpointer data)
     /* FIXME: (widget->parent->parent->parent->parent->parent) could be more elegant ;-) */
     if (GTK_IS_BUTTON(widget))
 	gnome_dialog_set_parent(GNOME_DIALOG(dialog),
-				GTK_WINDOW(widget->parent->parent->parent->
-					   parent->parent->parent));
+				GTK_WINDOW(widget->parent->parent->
+					   parent->parent->parent->
+					   parent));
     else
 	gnome_dialog_set_parent(GNOME_DIALOG(dialog),
 				GTK_WINDOW(widget->parent->parent));

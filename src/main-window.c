@@ -495,7 +495,8 @@ static GnomeUIInfo main_toolbar[] = {
 static GnomeAppClass *parent_class = NULL;
 static guint window_signals[LAST_SIGNAL] = { 0 };
 
-GtkType balsa_window_get_type(void)
+GtkType
+balsa_window_get_type(void)
 {
     static GtkType window_type = 0;
 
@@ -649,9 +650,8 @@ balsa_window_new()
     /*PKGW: do it this way, without the usizes. */
     if (balsa_app.show_mblist)
 	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
-				       (view_menu
-					[MENU_VIEW_MAILBOX_LIST_POS].
-					widget), balsa_app.show_mblist);
+				       (view_menu[MENU_VIEW_MAILBOX_LIST_POS].widget),
+				       balsa_app.show_mblist);
 
     gtk_paned_pack1(GTK_PANED(vpaned), window->notebook, TRUE, TRUE);
     gtk_paned_pack2(GTK_PANED(vpaned), scroll, TRUE, TRUE);
@@ -677,21 +677,19 @@ balsa_window_new()
 
     if (balsa_app.browse_wrap)
 	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
-				       (view_menu[MENU_VIEW_WRAP_POS].
-					widget), TRUE);
+				       (view_menu[MENU_VIEW_WRAP_POS].widget),
+				       TRUE);
 
     if (balsa_app.shown_headers >= HEADERS_NONE
 	&& balsa_app.shown_headers <= HEADERS_ALL)
 	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
-				       (shown_hdrs_menu
-					[balsa_app.shown_headers].widget),
+				       (shown_hdrs_menu[balsa_app.shown_headers].widget),
 				       TRUE);
 
     if (balsa_app.show_notebook_tabs)
 	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
-				       (view_menu
-					[MENU_VIEW_MAILBOX_TABS_POS].
-					widget), TRUE);
+				       (view_menu[MENU_VIEW_MAILBOX_TABS_POS].widget),
+				       TRUE);
 
     return GTK_WIDGET(window);
 }
@@ -711,11 +709,9 @@ enable_mailbox_menus(LibBalsaMailbox * mailbox)
 	enable = TRUE;
 
     if (mailbox && mailbox->readonly) {
-	gtk_widget_set_sensitive(mailbox_menu[MENU_MAILBOX_COMMIT_POS].
-				 widget, FALSE);
+	gtk_widget_set_sensitive(mailbox_menu[MENU_MAILBOX_COMMIT_POS].widget, FALSE);
     } else {
-	gtk_widget_set_sensitive(mailbox_menu[MENU_MAILBOX_COMMIT_POS].
-				 widget, enable);
+	gtk_widget_set_sensitive(mailbox_menu[MENU_MAILBOX_COMMIT_POS].widget, enable);
     }
 
     /* Toolbar */
@@ -733,8 +729,9 @@ enable_mailbox_menus(LibBalsaMailbox * mailbox)
 			     enable);
     gtk_widget_set_sensitive(mailbox_menu[MENU_MAILBOX_PREV_POS].widget,
 			     enable);
-    gtk_widget_set_sensitive(mailbox_menu[MENU_MAILBOX_NEXT_UNREAD_POS].
-			     widget, enable);
+    gtk_widget_set_sensitive(mailbox_menu
+			     [MENU_MAILBOX_NEXT_UNREAD_POS].widget,
+			     enable);
     gtk_widget_set_sensitive(mailbox_menu[MENU_MAILBOX_CLOSE_POS].widget,
 			     enable);
     gtk_widget_set_sensitive(mailbox_menu[MENU_MAILBOX_EDIT_POS].widget,
@@ -759,68 +756,43 @@ enable_message_menus(LibBalsaMessage * message)
 
     /* Handle menu items which require write access to mailbox */
     if (message && message->mailbox->readonly) {
-	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_DELETE_POS].
-				 widget, FALSE);
-	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_UNDEL_POS].
-				 widget, FALSE);
-	gtk_widget_set_sensitive(message_menu
-				 [MENU_MESSAGE_TOGGLE_FLAGGED_POS].widget,
+	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_DELETE_POS].widget, FALSE);
+	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_UNDEL_POS].widget, FALSE);
+	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_TOGGLE_FLAGGED_POS].widget,
 				 FALSE);
 
-	gtk_widget_set_sensitive(main_toolbar[TOOLBAR_DELETE_POS].widget,
-				 FALSE);
+	gtk_widget_set_sensitive(main_toolbar[TOOLBAR_DELETE_POS].widget, FALSE);
     } else {
-	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_DELETE_POS].
-				 widget, enable);
-	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_UNDEL_POS].
-				 widget, enable);
-	gtk_widget_set_sensitive(message_menu
-				 [MENU_MESSAGE_TOGGLE_FLAGGED_POS].widget,
-				 enable);
+	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_DELETE_POS].widget, enable);
+	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_UNDEL_POS].widget, enable);
+	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_TOGGLE_FLAGGED_POS].widget, enable);
 
-	gtk_widget_set_sensitive(main_toolbar[TOOLBAR_DELETE_POS].widget,
-				 enable);
+	gtk_widget_set_sensitive(main_toolbar[TOOLBAR_DELETE_POS].widget, enable);
     }
 
     /* Handle items which require multiple parts to the mail */
     if (message && !libbalsa_message_has_attachment(message)) {
-	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_NEXT_PART_POS].
-				 widget, FALSE);
-	gtk_widget_set_sensitive(message_menu
-				 [MENU_MESSAGE_PREVIOUS_PART_POS].widget,
-				 FALSE);
+	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_NEXT_PART_POS].widget, FALSE);
+	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_PREVIOUS_PART_POS].widget, FALSE);
     } else {
-	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_NEXT_PART_POS].
-				 widget, enable);
-	gtk_widget_set_sensitive(message_menu
-				 [MENU_MESSAGE_PREVIOUS_PART_POS].widget,
-				 enable);
+	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_NEXT_PART_POS].widget, enable);
+	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_PREVIOUS_PART_POS].widget, enable);
     }
 
 
-    gtk_widget_set_sensitive(file_menu[MENU_FILE_PRINT_POS].widget,
-			     enable);
-    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_SAVE_PART_POS].
-			     widget, enable);
-    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_REPLY_POS].widget,
-			     enable);
-    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_REPLY_ALL_POS].
-			     widget, enable);
-    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_FORWARD_POS].widget,
-			     enable);
+    gtk_widget_set_sensitive(file_menu[MENU_FILE_PRINT_POS].widget, enable);
+    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_SAVE_PART_POS].widget, enable);
+    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_REPLY_POS].widget, enable);
+    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_REPLY_ALL_POS].widget, enable);
+    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_FORWARD_POS].widget, enable);
 
-    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_STORE_ADDRESS_POS].
-			     widget, enable);
+    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_STORE_ADDRESS_POS].widget, enable);
 
     /* Toolbar */
-    gtk_widget_set_sensitive(main_toolbar[TOOLBAR_REPLY_POS].widget,
-			     enable);
-    gtk_widget_set_sensitive(main_toolbar[TOOLBAR_REPLY_ALL_POS].widget,
-			     enable);
-    gtk_widget_set_sensitive(main_toolbar[TOOLBAR_FORWARD_POS].widget,
-			     enable);
-    gtk_widget_set_sensitive(main_toolbar[TOOLBAR_PRINT_POS].widget,
-			     enable);
+    gtk_widget_set_sensitive(main_toolbar[TOOLBAR_REPLY_POS].widget, enable);
+    gtk_widget_set_sensitive(main_toolbar[TOOLBAR_REPLY_ALL_POS].widget, enable);
+    gtk_widget_set_sensitive(main_toolbar[TOOLBAR_FORWARD_POS].widget, enable);
+    gtk_widget_set_sensitive(main_toolbar[TOOLBAR_PRINT_POS].widget, enable);
 
     balsa_window_enable_continue();
 }
@@ -852,15 +824,13 @@ balsa_window_enable_continue(void)
     if (balsa_app.draftbox) {
 	libbalsa_mailbox_open(balsa_app.draftbox, FALSE);
 	if (balsa_app.draftbox->total_messages > 0) {
-	    gtk_widget_set_sensitive(main_toolbar[TOOLBAR_CONTINUE_POS].
-				     widget, TRUE);
-	    gtk_widget_set_sensitive(file_menu[MENU_FILE_CONTINUE_POS].
-				     widget, TRUE);
+	    gtk_widget_set_sensitive(main_toolbar[TOOLBAR_CONTINUE_POS].widget, TRUE);
+	    gtk_widget_set_sensitive(file_menu[MENU_FILE_CONTINUE_POS].widget,
+				     TRUE);
 	} else {
-	    gtk_widget_set_sensitive(main_toolbar[TOOLBAR_CONTINUE_POS].
-				     widget, FALSE);
-	    gtk_widget_set_sensitive(file_menu[MENU_FILE_CONTINUE_POS].
-				     widget, FALSE);
+	    gtk_widget_set_sensitive(main_toolbar[TOOLBAR_CONTINUE_POS].widget, FALSE);
+	    gtk_widget_set_sensitive(file_menu[MENU_FILE_CONTINUE_POS].widget,
+				     FALSE);
 	}
 	libbalsa_mailbox_close(balsa_app.draftbox);
     }
@@ -935,8 +905,8 @@ balsa_window_real_open_mailbox(BalsaWindow * window,
 	return;
     }
     label =
-	gtk_label_new(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->mailbox->
-		      name);
+	gtk_label_new(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->
+		      mailbox->name);
 
     /* store for easy access */
     gtk_object_set_data(GTK_OBJECT(BALSA_INDEX_PAGE(page)->sw),
@@ -1011,7 +981,8 @@ balsa_window_real_close_mailbox(BalsaWindow * window,
 	balsa_mblist_focus_mailbox(balsa_app.mblist, index->mailbox);
 }
 
-gboolean balsa_close_mailbox_on_timer(GtkWidget * widget, gpointer * data)
+gboolean
+balsa_close_mailbox_on_timer(GtkWidget * widget, gpointer * data)
 {
     GTimeVal current_time;
     GtkWidget *page, *index_page;
@@ -1203,7 +1174,8 @@ mailbox_check_func(GNode * node, gpointer data)
  * Callbacks
  */
 
-gint check_new_messages_auto_cb(gpointer data)
+gint
+check_new_messages_auto_cb(gpointer data)
 {
     check_new_messages_cb((GtkWidget *) NULL, data);
 
@@ -1345,7 +1317,8 @@ check_messages_thread(gpointer data)
    called from the thread checking the new mail. Basically does the GUI
    interaction because checking thread cannot do it.
 */
-gboolean mail_progress_notify_cb()
+gboolean
+mail_progress_notify_cb()
 {
     const int MSG_BUFFER_SIZE = 512 * sizeof(MailThreadMessage *);
     MailThreadMessage *threadmessage;
@@ -1474,7 +1447,8 @@ progress_dialog_destroy_cb(GtkWidget * widget, gpointer data)
 }
 
 
-gboolean send_progress_notify_cb()
+gboolean
+send_progress_notify_cb()
 {
     SendThreadMessage *threadmessage;
     SendThreadMessage **currentpos;
@@ -2086,8 +2060,9 @@ notebook_switch_page_cb(GtkWidget * notebook,
     if (GTK_CLIST(index)->selection) {
 	message = message = gtk_clist_get_row_data(GTK_CLIST(index),
 						   GPOINTER_TO_INT
-						   (GTK_CLIST(index)->
-						    selection->data));
+						   (GTK_CLIST
+						    (index)->selection->
+						    data));
 	enable_message_menus(message);
     } else {
 	enable_message_menus(NULL);

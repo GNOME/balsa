@@ -212,8 +212,7 @@ expand_input(gchar ** input, gint * tabs)
 	    i = *tabs;
 	    if ((i == 1) && (strlen(prefix) > strlen(*input))) {
 		addr =
-		    LIBBALSA_ADDRESS(((CompletionData *) match->data)->
-				     address);
+		    LIBBALSA_ADDRESS(((CompletionData *) match->data)->address);
 		output =
 		    g_strdup_printf("%s <%s>", addr->full_name,
 				    (gchar *) addr->address_list->data);
@@ -231,8 +230,7 @@ expand_input(gchar ** input, gint * tabs)
 		    }
 		}
 		addr =
-		    LIBBALSA_ADDRESS(((CompletionData *) search->data)->
-				     address);
+		    LIBBALSA_ADDRESS(((CompletionData *) search->data)->address);
 		output =
 		    g_strdup_printf("%s <%s>", addr->full_name,
 				    (gchar *) addr->address_list->data);
@@ -269,6 +267,7 @@ expand_input_wrapper(inputData * input, gboolean preserve)
     if ((str = expand_input(&tmp, input->tabs))) {
 	input->have_match = TRUE;
 	input->typo = tmp;
+
 	g_free(input->skip->data);
 	if (input->show)
 	    g_free(input->show);
@@ -1069,14 +1068,10 @@ alias_load_addressbook(void)
 	if (complete_alias)
 	    g_completion_free(complete_alias);
 
-	complete_name = g_completion_new(
-					 (GCompletionFunc)
-					 completion_data_extract);
+	complete_name = g_completion_new((GCompletionFunc)completion_data_extract);
 	g_completion_add_items(complete_name, address_name_data);
 
-	complete_alias = g_completion_new(
-					  (GCompletionFunc)
-					  completion_data_extract);
+	complete_alias = g_completion_new((GCompletionFunc)completion_data_extract);
 	g_completion_add_items(complete_alias, address_alias_data);
     }
 }

@@ -189,7 +189,7 @@ extern struct BalsaApplication {
     gint index_subject_width;
     gint index_date_width;
 
-/*gint mblist_height; PKGW: unused */
+    /*gint mblist_height; PKGW: unused */
     gint notebook_height;	/* PKGW: used :-) */
 
     /* Column width settings for mailbox list window, not fully implemented yet */
@@ -228,7 +228,6 @@ extern struct BalsaApplication {
     gchar *quote_str;
 
     /* command line options */
-
     gint check_mail_upon_startup;
     gint remember_open_mboxes;
     gint open_unread_mailbox;
@@ -237,13 +236,14 @@ extern struct BalsaApplication {
 
     /* font used to display messages */
     gchar *message_font;
+    gchar *subject_font;
 
     /* encoding stuff */
     gint encoding_style;
     gchar *charset;
     gchar *date_string;
 
-    //gint checkbox;
+    /* gint checkbox; */
 
     /* printing */
     Printing_t PrintCommand;

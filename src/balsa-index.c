@@ -160,7 +160,8 @@ numeric_compare(GtkCList * clist, gconstpointer ptr1, gconstpointer ptr2)
     return 0;
 }
 
-guint balsa_index_get_type()
+guint
+balsa_index_get_type()
 {
     static guint balsa_index_type = 0;
 

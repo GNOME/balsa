@@ -141,7 +141,8 @@ fe_dialog_button_clicked(GtkWidget * widget, gint button, gpointer data)
 		break;
 
 		default:break;
-	}}			/* end fe_action_selected() */
+	    }
+	}			/* end fe_action_selected() */
 /*
  * fe_add_pressed()
  *
@@ -220,7 +221,8 @@ fe_dialog_button_clicked(GtkWidget * widget, gint button, gpointer data)
 					     FALSE);
 
 		    default:break;
-	    }} else {
+		}
+	    } else {
 		switch (GPOINTER_TO_INT(data)) {
 		case 1:	/* ALL */
 		    gtk_widget_set_sensitive(GTK_WIDGET
@@ -353,10 +355,9 @@ fe_dialog_button_clicked(GtkWidget * widget, gint button, gpointer data)
  *
  * Callback for when button is pressed.
  */ void
-	
-	    clist_button_event_press(GtkWidget * clist,
-				     GdkEventButton * bevent,
-				     gpointer data) {
+
+	 clist_button_event_press(GtkWidget * clist,
+				  GdkEventButton * bevent, gpointer data) {
 	    gint row, column, res;
 	    GdkImlibImage *im;
 	    GdkPixmap *pixmap;
@@ -425,9 +426,9 @@ fe_dialog_button_clicked(GtkWidget * widget, gint button, gpointer data)
 		 FILTER_SETFLAG(fil, FILTER_POPUP);
 		 tmpstr = gtk_entry_get_text(GTK_ENTRY(fe_popup_entry));
 
-		 strncpy(fil->popup_text,
-			 ((!tmpstr)
-			  || (tmpstr[0] == '\0')) ? defstring : tmpstr,
+		 strncpy(fil->popup_text, ((!tmpstr)
+					   || (tmpstr[0] ==
+					       '\0')) ? defstring : tmpstr,
 			 256);
 	    }
 #ifdef HAVE_LIBESD
@@ -464,7 +465,7 @@ fe_dialog_button_clicked(GtkWidget * widget, gint button, gpointer data)
 	     gtk_clist_select_row(GTK_CLIST(clist),
 				  GPOINTER_TO_INT(
 						  ((GList
-						    *) (GTK_CLIST(clist)->
-							selection))->data),
-				  -1);
+						    *) (GTK_CLIST
+							(clist)->selection))->
+						  data), -1);
 	}			/* end fe_revert_pressed() */

@@ -363,6 +363,9 @@ config_global_load(void)
     g_free(balsa_app.message_font);
     balsa_app.message_font =
 	gnome_config_get_string("MessageFont=" DEFAULT_MESSAGE_FONT);
+    g_free(balsa_app.subject_font);
+    balsa_app.subject_font =
+	gnome_config_get_string("SubjectFont=" DEFAULT_MESSAGE_FONT);
 
     /* ... wrap words */
     balsa_app.browse_wrap = gnome_config_get_bool("WordWrap=true");
@@ -548,6 +551,7 @@ gint config_save(void)
     gnome_config_set_string("SelectedHeaders", balsa_app.selected_headers);
     gnome_config_set_string("QuoteRegex", balsa_app.quote_regex);
     gnome_config_set_string("MessageFont", balsa_app.message_font);
+    gnome_config_set_string("SubjectFont", balsa_app.subject_font);
     gnome_config_set_bool("WordWrap", balsa_app.browse_wrap);
     save_color("QuotedColorStart", &balsa_app.quoted_color[0]);
     save_color("QuotedColorEnd",

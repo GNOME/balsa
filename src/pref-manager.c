@@ -73,7 +73,9 @@ typedef struct _PropertyUI {
     GtkWidget *quote_str;
 
     GtkWidget *message_font;	/* font used to display messages */
+    GtkWidget *subject_font;	/* font used to display messages */
     GtkWidget *font_picker;
+    GtkWidget *font_picker2;
 
     /* charset */
     GtkRadioButton *encoding_type[NUM_ENCODING_MODES];
@@ -284,7 +286,6 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 				   GTK_WIDGET(page),
 				   gtk_label_new(_("Startup")));
 
-
     set_prefs();
 
     for (i = 0; i < NUM_TOOLBAR_MODES; i++) {
@@ -383,8 +384,11 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     /* message font */
     gtk_signal_connect(GTK_OBJECT(pui->message_font), "changed",
 		       GTK_SIGNAL_FUNC(font_changed), property_box);
-
     gtk_signal_connect(GTK_OBJECT(pui->font_picker), "font_set",
+		       GTK_SIGNAL_FUNC(font_changed), property_box);
+    gtk_signal_connect(GTK_OBJECT(pui->subject_font), "changed",
+		       GTK_SIGNAL_FUNC(font_changed), property_box);
+    gtk_signal_connect(GTK_OBJECT(pui->font_picker2), "font_set",
 		       GTK_SIGNAL_FUNC(font_changed), property_box);
 
     /* charset */
@@ -552,7 +556,7 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
 	    balsa_app.pwindow_option = pwindow_type[i];
 	    break;
 	}
-
+    
     balsa_app.debug = GTK_TOGGLE_BUTTON(pui->debug)->active;
     balsa_app.previewpane = GTK_TOGGLE_BUTTON(pui->previewpane)->active;
     balsa_app.smtp = GTK_TOGGLE_BUTTON(pui->rb_smtp_server)->active;
@@ -805,6 +809,9 @@ set_prefs(void)
     gtk_entry_set_text(GTK_ENTRY(pui->message_font),
 		       balsa_app.message_font);
     gtk_entry_set_position(GTK_ENTRY(pui->message_font), 0);
+    gtk_entry_set_text(GTK_ENTRY(pui->subject_font),
+		       balsa_app.subject_font);
+    gtk_entry_set_position(GTK_ENTRY(pui->subject_font), 0);
 
     /* charset */
     gtk_entry_set_text(GTK_ENTRY(pui->charset), balsa_app.charset);
@@ -871,12 +878,9 @@ set_prefs(void)
 			       balsa_app.quoted_color[0].green,
 			       balsa_app.quoted_color[0].blue, 0);
     gnome_color_picker_set_i16(GNOME_COLOR_PICKER(pui->quoted_color_end),
-			       balsa_app.quoted_color[MAX_QUOTED_COLOR -
-						      1].red,
-			       balsa_app.quoted_color[MAX_QUOTED_COLOR -
-						      1].green,
-			       balsa_app.quoted_color[MAX_QUOTED_COLOR -
-						      1].blue, 0);
+			       balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].red,
+			       balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].green,
+			       balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].blue, 0);
 
     /* Information Message */
     gtk_menu_set_active(GTK_MENU(pui->information_message_menu),
@@ -1917,9 +1921,13 @@ create_misc_page()
     GtkWidget *frame13;
     GtkWidget *vbox10;
     GtkWidget *frame14;
+    GtkWidget *frame914;
     GtkWidget *table6;
+    GtkWidget *table96;
     GtkWidget *label27;
+    GtkWidget *label927;
     GtkWidget *label;
+    GtkWidget *label9;
     GtkWidget *color_frame;
     GtkWidget *unread_color_box;
     GtkWidget *unread_color_label;
@@ -1970,7 +1978,7 @@ create_misc_page()
 
     gtk_widget_show(pui->message_font);
 
-
+    /*a */
     pui->font_picker = gnome_font_picker_new();
     gtk_widget_show(pui->font_picker);
     gtk_table_attach(GTK_TABLE(table6), pui->font_picker, 1, 2, 1, 2,
@@ -2000,6 +2008,57 @@ create_misc_page()
 		     (GtkAttachOptions) (GTK_FILL),
 		     (GtkAttachOptions) (GTK_JUSTIFY_RIGHT), 0, 0);
     gtk_label_set_justify(GTK_LABEL(label27), GTK_JUSTIFY_RIGHT);
+
+
+    /* Subject Font */
+    frame914 = gtk_frame_new(_("Subject Header Font"));
+    gtk_widget_show(frame914);
+    gtk_box_pack_start(GTK_BOX(vbox9), frame914, FALSE, FALSE, 0);
+    gtk_container_set_border_width(GTK_CONTAINER(frame914), 5);
+
+    table96 = gtk_table_new(10, 3, FALSE);
+    gtk_widget_show(table96);
+    gtk_container_add(GTK_CONTAINER(frame914), table96);
+    gtk_container_set_border_width(GTK_CONTAINER(table96), 5);
+
+    pui->subject_font = gtk_entry_new();
+    gtk_table_attach(GTK_TABLE(table96), pui->subject_font, 0, 1, 1, 2,
+		     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+		     (GtkAttachOptions) (GTK_FILL), 0, 0);
+
+    gtk_widget_show(pui->subject_font);
+
+    /*b */
+    pui->font_picker2 = gnome_font_picker_new();
+    gtk_widget_show(pui->font_picker2);
+    gtk_table_attach(GTK_TABLE(table96), pui->font_picker2, 1, 2, 1, 2,
+		     (GtkAttachOptions) (0), (GtkAttachOptions) (0), 0, 0);
+    gtk_container_set_border_width(GTK_CONTAINER(pui->font_picker2), 5);
+
+    gnome_font_picker_set_font_name(GNOME_FONT_PICKER(pui->font_picker2),
+				    gtk_entry_get_text(GTK_ENTRY
+						       (pui->
+							subject_font)));
+    gnome_font_picker_set_preview_text(GNOME_FONT_PICKER
+				       (pui->font_picker2),
+				       _("Select a font to use"));
+    gnome_font_picker_set_mode(GNOME_FONT_PICKER(pui->font_picker2),
+			       GNOME_FONT_PICKER_MODE_USER_WIDGET);
+
+    label9 = gtk_label_new(_("Browse..."));
+    gnome_font_picker_uw_set_widget(GNOME_FONT_PICKER(pui->font_picker2),
+				    GTK_WIDGET(label9));
+    gtk_object_set_user_data(GTK_OBJECT(pui->font_picker2),
+			     GTK_OBJECT(pui->subject_font));
+    gtk_object_set_user_data(GTK_OBJECT(pui->subject_font),
+			     GTK_OBJECT(pui->font_picker2));
+
+    label927 = gtk_label_new(_("Preview pane"));
+    gtk_widget_show(label927);
+    gtk_table_attach(GTK_TABLE(table96), label927, 0, 1, 0, 1,
+		     (GtkAttachOptions) (GTK_FILL),
+		     (GtkAttachOptions) (GTK_JUSTIFY_RIGHT), 0, 0);
+    gtk_label_set_justify(GTK_LABEL(label927), GTK_JUSTIFY_RIGHT);
 
     /* mblist unread colour  */
     color_frame = gtk_frame_new(_("Colours"));
@@ -2034,7 +2093,7 @@ create_misc_page()
     gtk_label_set_justify(GTK_LABEL(unread_color_label), GTK_JUSTIFY_LEFT);
 
     /*
-     * Colours for quoted text.
+       * Colours for quoted text.
      */
     quoted_color_box_start = gtk_hbox_new(FALSE, 0);
     gtk_widget_show(quoted_color_box_start);
@@ -2210,9 +2269,7 @@ create_address_book_page(void)
 		       property_box);
     gtk_widget_show(button);
     gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
-
     return table;
-
 }
 
 /*

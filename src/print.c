@@ -363,8 +363,7 @@ prepare_page_header(PrintInfo * pi)
     }
     pi->headers[hdr++] = g_strdup(_("Date:"));
     pi->headers[hdr++] = libbalsa_message_date_to_gchar(pi->message,
-							balsa_app.
-							date_string);
+							balsa_app.date_string);
 
     pi->header_label_width = 0;
     font = gnome_font_new(BALSA_PRINT_HEAD_FONT, BALSA_PRINT_HEAD_SIZE);
@@ -502,7 +501,8 @@ message_print(LibBalsaMessage * msg)
     g_return_if_fail(msg);
 
     if (!is_font_ok(BALSA_PRINT_HEAD_FONT)
-	|| !is_font_ok(BALSA_PRINT_BODY_FONT)) return;
+	|| !is_font_ok(BALSA_PRINT_BODY_FONT))
+	return;
     dialog =
 	gnome_print_dialog_new(_("Print mesage"),
 			       GNOME_PRINT_DIALOG_COPIES);

@@ -166,6 +166,7 @@ balsa_app_init(void)
 
     /* font */
     balsa_app.message_font = NULL;
+    balsa_app.subject_font = NULL;
 
     /*encoding */
     balsa_app.encoding_style = 0;
@@ -205,7 +206,8 @@ balsa_app_init(void)
     balsa_app.tooltips = gtk_tooltips_new();
 }
 
-gboolean do_load_mailboxes(void)
+gboolean
+do_load_mailboxes(void)
 {
     if (LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.inbox)) {
 	libbalsa_set_spool(LIBBALSA_MAILBOX_LOCAL(balsa_app.inbox)->path);
@@ -300,7 +302,8 @@ balsa_find_mbox_by_name(const gchar * name)
    This is an idle handler. Be sure to use gdk_threads_{enter/leave}
    Release the passed argument when done.
  */
-gboolean open_mailboxes_idle_cb(gchar * names[])
+gboolean
+open_mailboxes_idle_cb(gchar * names[])
 {
     gint i = 0;
 

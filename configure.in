@@ -215,6 +215,17 @@ gmime-2.0 >= 2.1.9
 $gnome_extras
 ])
 
+dnl ##########################################################################
+dnl Check versions
+dnl ##########################################################################
+
+if test x$with_gnome != xno; then
+  if $PKG_CONFIG --atleast-version=2.8.0 gnome-vfs-2.0 ; then
+    AC_DEFINE(HAVE_GNOME_VFS28,1,
+	      [Defined when gnome-vfs-2.0 version is at least 2.8.0])
+  fi
+fi
+
 # CORBA interface.
 #
                                                                         
@@ -229,10 +240,6 @@ AC_SUBST(BONOBO_ACTIVATION_IDL)
 
 AC_SUBST(BALSA_CFLAGS)
 AC_SUBST(BALSA_LIBS)
-
-if $PKG_CONFIG --atleast-version=2.2.0 glib-2.0 ; then
-  AC_DEFINE(HAVE_GLIB22,1,[Defined when glib version is at least 2.2.0])
-fi
 
 # GtkHtml library.
 #

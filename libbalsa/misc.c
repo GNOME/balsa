@@ -1981,7 +1981,7 @@ libbalsa_unlock_file (const char *path, int fd, int dot)
     return 0;
 }
 
-#ifndef HAVE_GLIB22
+#if !GLIB_CHECK_VERSION(2, 2, 0)
 gboolean
 libbalsa_str_has_prefix(const gchar * str, const gchar * prefix)
 {
@@ -1995,7 +1995,7 @@ libbalsa_str_has_prefix(const gchar * str, const gchar * prefix)
 
     return *prefix == '\0';
 }
-#endif				/* HAVE_GLIB22 */
+#endif				/* !GLIB_CHECK_VERSION(2, 2, 0) */
 
 
 /* libbalsa_ia_rfc2821_equal

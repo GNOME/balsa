@@ -1,3 +1,10 @@
+2003-01-05 PeterB
+
+	* libbalsa/body.c (libbalsa_message_body_save_temporary,
+	libbalsa_message_body_save), libbalsa/body.h, libmutt/mutt.h
+	(STATE structure), src/balsa-message.c (save_dialog_ok):
+        Use (const gchar *) type for file name and/or prefix.
+
 2003-01-05  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox.[hc]: initial attempt to make mailboxes serve

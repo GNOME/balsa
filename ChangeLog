@@ -1,3 +1,10 @@
+1998-12-16  Jeff Garzik  <jgarzik@pobox.com>
+
+	* src/pref-manager.c:
+	Outgoing mail is now a table, allowing you to select
+	'remote smtp server' or 'local mail agent' for mail delivery.
+	Greyed out because it doesn't actually work yet.
+
 1998-12-16  Joel Becker  <jlbec@ocala.cs.miami.edu>
 
 	* libbalsa/filter-error.c, libbalsa/filter-file.c,

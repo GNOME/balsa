@@ -36,6 +36,7 @@ typedef struct _PropertyUI
     GtkWidget *real_name, *email, *replyto, *signature;
 
     GtkWidget *pop3servers, *smtp_server, *mail_directory;
+    GtkWidget *rb_local_mua, *rb_smtp_server;
 
     GtkWidget *previewpane;
     GtkWidget *debug;		/* enable/disable debugging */
@@ -391,9 +392,11 @@ create_mailservers_page ()
   GtkWidget *label;
   GtkWidget *frame;
   GtkWidget *hbox;
+  GtkWidget *table1;
   GtkWidget *bbox;
   GtkWidget *button;
   GtkWidget *mail_dir;
+  GSList *rbgroup;
 
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 10);
@@ -455,15 +458,36 @@ create_mailservers_page ()
   gtk_box_pack_start (GTK_BOX (hbox), mail_dir, TRUE, TRUE, 2);
 
   /* smtp server */
-  frame = gtk_frame_new (_("Sending Mail"));
+  frame = gtk_frame_new (_("Outgoing Mail"));
   gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
-  hbox = gtk_hbox_new (TRUE, 0);
-  gtk_container_add (GTK_CONTAINER (frame), hbox);
 
-  label = gtk_label_new (_ ("SMTP Server:"));
-  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 2);
+  table1 = gtk_table_new (2, 2, FALSE);
+  gtk_container_add (GTK_CONTAINER (frame), table1);
+  gtk_widget_show (table1);
+
+  pui->rb_smtp_server = gtk_radio_button_new_with_label (NULL,
+  	_("Remote SMTP Server"));
+  rbgroup = gtk_radio_button_group (GTK_RADIO_BUTTON (pui->rb_smtp_server));
+  gtk_widget_show (pui->rb_smtp_server);
+  gtk_table_attach (GTK_TABLE (table1), pui->rb_smtp_server, 0, 1, 0, 1,
+                    (GtkAttachOptions) GTK_EXPAND | GTK_FILL,
+		    (GtkAttachOptions) GTK_EXPAND | GTK_FILL, 0, 0);
+  gtk_widget_set_sensitive (pui->rb_smtp_server, FALSE);
+
+  pui->rb_local_mua = gtk_radio_button_new_with_label (rbgroup,
+  	_("Local mail user agent"));
+  gtk_widget_show (pui->rb_local_mua);
+  gtk_table_attach (GTK_TABLE (table1), pui->rb_local_mua, 0, 1, 1, 2,
+                    (GtkAttachOptions) GTK_EXPAND | GTK_FILL,
+		    (GtkAttachOptions) GTK_EXPAND | GTK_FILL, 0, 0);
+  gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (pui->rb_local_mua), TRUE);
+
   pui->smtp_server = gtk_entry_new ();
-  gtk_box_pack_start (GTK_BOX (hbox), pui->smtp_server, TRUE, TRUE, 2);
+  gtk_widget_show (pui->smtp_server);
+  gtk_table_attach (GTK_TABLE (table1), pui->smtp_server, 1, 2, 0, 1,
+                    (GtkAttachOptions) GTK_EXPAND | GTK_FILL,
+		    (GtkAttachOptions) GTK_EXPAND | GTK_FILL, 0, 0);
+  gtk_widget_set_sensitive (pui->smtp_server, FALSE);
 
   return vbox;
 }

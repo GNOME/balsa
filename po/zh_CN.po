@@ -4,570 +4,656 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2001-11-10 23:16+0800\n"
-"PO-Revision-Date: 2001-09-01 16:51+0800\n"
+"POT-Creation-Date: 2002-01-29 22:48+0800\n"
+"PO-Revision-Date: 2002-01-29 23:04+0800\n"
 "Last-Translator: Dillion Chen <dillon.chen@turbolinux.com.cn>\n"
 "Language-Team: zh_CN <i18n-translation@lists.linux.net.cn>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=gb2312\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Translator: Wang Jian <lark@linux.net.cn>\n"
 
-#: libbalsa/address-book-ldap.c:205
+#: libbalsa/address-book-extern.c:213
+#, c-format
+msgid ""
+"Could not open external query address book %s while trying to parse output "
+"from: %s"
+msgstr ""
+
+#. The externq database doesn't support Id's, sorry!
+#: libbalsa/address-book-extern.c:235 libbalsa/address-book-ldap.c:379
+#: libbalsa/address-book-ldif.c:267 libbalsa/address-book-vcard.c:262
+msgid "No-Id"
+msgstr "æ²¡æœ‰ Id"
+
+# src/filter-edit-dialog.c:101
+#: libbalsa/address-book-extern.c:239 libbalsa/address-book-ldap.c:383
+#: libbalsa/address-book-ldif.c:270 libbalsa/address-book-ldif.c:545
+#: libbalsa/address-book-ldif.c:549 libbalsa/address-book-vcard.c:271
+msgid "No-Name"
+msgstr "æ²¡æœ‰åå­—"
+
+#: libbalsa/address-book-extern.c:264
+#, fuzzy, c-format
+msgid "Could not add address to address book %s while trying to execute: %s"
+msgstr "æ— æ³•åˆ›å»ºç±»å‹ä¸º %s çš„åœ°å€ç°¿"
+
+#: libbalsa/address-book-ldap.c:209
 msgid ""
 "Failed to initialise LDAP server.\n"
 "Check that the servername is valid."
 msgstr ""
-"ÎŞ·¨³õÊ¼»¯ LDAP ·şÎñÆ÷¡£\n"
-"Çë¼ì²é·şÎñÆ÷ÃûÊÇ·ñÕıÈ·¡£"
+"æ— æ³•åˆå§‹åŒ– LDAP æœåŠ¡å™¨ã€‚\n"
+"è¯·æ£€æŸ¥æœåŠ¡å™¨åæ˜¯å¦æ­£ç¡®ã€‚"
 
-#: libbalsa/address-book-ldap.c:215
+#: libbalsa/address-book-ldap.c:219
 #, c-format
 msgid ""
 "Failed to bind to server: %s\n"
 "Check that the servername is valid."
 msgstr ""
-"ÎŞ·¨°ó¶¨·şÎñÆ÷£º%s\n"
-"Çë¼ì²é·şÎñÆ÷ÃûÊÇ·ñÕıÈ·¡£"
+"æ— æ³•ç»‘å®šæœåŠ¡å™¨ï¼š%s\n"
+"è¯·æ£€æŸ¥æœåŠ¡å™¨åæ˜¯å¦æ­£ç¡®ã€‚"
 
-#: libbalsa/address-book-ldap.c:264 libbalsa/address-book-ldap.c:529
+#: libbalsa/address-book-ldap.c:268 libbalsa/address-book-ldap.c:584
 #, c-format
 msgid "Failed to do a search: %s.Check that the base name is valid."
-msgstr "ÎŞ·¨½øĞĞ²éÕÒ£º%s¡£¼ì²éÆğÊ¼ÃûÊÇ·ñÕıÈ·¡£"
-
-#: libbalsa/address-book-ldap.c:329 libbalsa/address-book-ldif.c:272
-#: libbalsa/address-book-vcard.c:274
-msgid "No-Id"
-msgstr "Ã»ÓĞ Id"
-
-# src/filter-edit-dialog.c:101
-#: libbalsa/address-book-ldap.c:333 libbalsa/address-book-ldif.c:275
-#: libbalsa/address-book-ldif.c:550 libbalsa/address-book-ldif.c:554
-#: libbalsa/address-book-vcard.c:283
-msgid "No-Name"
-msgstr "Ã»ÓĞÃû×Ö"
+msgstr "æ— æ³•è¿›è¡ŒæŸ¥æ‰¾ï¼š%sã€‚æ£€æŸ¥èµ·å§‹åæ˜¯å¦æ­£ç¡®ã€‚"
 
 # src/mailbox-conf.c:488
-#: libbalsa/address-book-vcard.c:193
-#, c-format
-msgid "Could not stat vcard address book: %s"
-msgstr "ÎŞ·¨¼ì²é vcard µØÖ·²¾×´Ì¬£º%s"
-
-# src/mailbox-conf.c:488
-#: libbalsa/address-book-vcard.c:252
-#, c-format
-msgid "Could not open vCard address book %s."
-msgstr "ÎŞ·¨´ò¿ª vcard µØÖ·²¾ %s¡£"
-
-#: libbalsa/address-book-ldif.c:568 libbalsa/address-book-vcard.c:421
-#, c-format
-msgid "%s is already in address book."
-msgstr "%s ÒÑ¾­ÔÚµØÖ·²¾ÖĞ¡£"
-
-#: libbalsa/address-book-vcard.c:431
-#, c-format
-msgid "Cannot open vCard address book %s for saving\n"
-msgstr "ÎŞ·¨´ò¿ª vCard µØÖ·²¾ %s À´½øĞĞ±£´æ\n"
-
-# src/mailbox-conf.c:488
-#: libbalsa/address-book-ldif.c:226
+#: libbalsa/address-book-ldif.c:221
 #, c-format
 msgid "Could not stat ldif address book: %s"
-msgstr "ÎŞ·¨¼ì²é ldif µØÖ·²¾×´Ì¬£º%s"
+msgstr "æ— æ³•æ£€æŸ¥ ldif åœ°å€ç°¿çŠ¶æ€ï¼š%s"
 
 # src/mailbox-conf.c:488
-#: libbalsa/address-book-ldif.c:364
+#: libbalsa/address-book-ldif.c:359
 #, c-format
 msgid "Could not open LDIF address book %s."
-msgstr "ÎŞ·¨´ò¿ª LDIF µØÖ·²¾ %s¡£"
+msgstr "æ— æ³•æ‰“å¼€ LDIF åœ°å€ç°¿ %sã€‚"
 
-#: libbalsa/address-book-ldif.c:579
+#: libbalsa/address-book-ldif.c:563 libbalsa/address-book-vcard.c:409
+#, c-format
+msgid "%s is already in address book."
+msgstr "%s å·²ç»åœ¨åœ°å€ç°¿ä¸­ã€‚"
+
+#: libbalsa/address-book-ldif.c:574
 #, c-format
 msgid "Cannot open LDIF address book %s for saving\n"
-msgstr "ÎŞ·¨´ò¿ª LDIF µØÖ·²¾ %s À´½øĞĞ±£´æ\n"
+msgstr "æ— æ³•æ‰“å¼€ LDIF åœ°å€ç°¿ %s æ¥è¿›è¡Œä¿å­˜\n"
+
+# src/mailbox-conf.c:488
+#: libbalsa/address-book-vcard.c:181
+#, c-format
+msgid "Could not stat vcard address book: %s"
+msgstr "æ— æ³•æ£€æŸ¥ vcard åœ°å€ç°¿çŠ¶æ€ï¼š%s"
+
+# src/mailbox-conf.c:488
+#: libbalsa/address-book-vcard.c:240
+#, c-format
+msgid "Could not open vCard address book %s."
+msgstr "æ— æ³•æ‰“å¼€ vcard åœ°å€ç°¿ %sã€‚"
+
+#: libbalsa/address-book-vcard.c:419
+#, c-format
+msgid "Cannot open vCard address book %s for saving\n"
+msgstr "æ— æ³•æ‰“å¼€ vCard åœ°å€ç°¿ %s æ¥è¿›è¡Œä¿å­˜\n"
 
 #: libbalsa/address-book.c:177
 #, c-format
 msgid "Cannot load address book %s"
-msgstr "ÎŞ·¨ÔØÈëµØÖ·²¾ %s"
+msgstr "æ— æ³•è½½å…¥åœ°å€ç°¿ %s"
 
 #: libbalsa/address-book.c:185
 #, c-format
 msgid "No such address book type: %s"
-msgstr "Ã»ÓĞÕâÖÖµØÖ·²¾ÀàĞÍ£º%s"
+msgstr "æ²¡æœ‰è¿™ç§åœ°å€ç°¿ç±»å‹ï¼š%s"
 
 #: libbalsa/address-book.c:195
 #, c-format
 msgid "Could not create a address book of type %s"
-msgstr "ÎŞ·¨´´½¨ÀàĞÍÎª %s µÄµØÖ·²¾"
+msgstr "æ— æ³•åˆ›å»ºç±»å‹ä¸º %s çš„åœ°å€ç°¿"
+
+#: libbalsa/filter-error.c:45
+msgid "No error"
+msgstr "æ²¡æœ‰é”™è¯¯"
+
+#: libbalsa/filter-error.c:46
+msgid "Syntax error in the filter configuration file"
+msgstr "åœ¨è¿‡æ»¤é…ç½®æ–‡ä»¶ä¸­æœ‰è¯­æ³•é”™è¯¯"
+
+# src/index-child.c:176
+#: libbalsa/filter-error.c:47
+msgid "Unable to allocate memory"
+msgstr "æ— æ³•åˆ†é…å†…å­˜"
+
+#: libbalsa/filter-error.c:48
+msgid "Error in regular expression syntax"
+msgstr "æ­£åˆ™è¡¨è¾¾å¼ä¸­æœ‰è¯­æ³•é”™è¯¯"
+
+#: libbalsa/filter-error.c:49
+msgid "Attempt to apply an invalid filter"
+msgstr "è¯•å›¾åº”ç”¨ä¸€ä¸ªæ— æ•ˆçš„è¿‡æ»¤è§„åˆ™"
+
+#: libbalsa/filter-file.c:429
+#, c-format
+msgid "Invalid filters %s for mailbox %s"
+msgstr ""
+
+#: libbalsa/filter.c:125 libbalsa/filter.c:169
+msgid "Unable to load message body to match filter"
+msgstr ""
+
+# src/main-window.c:182
+#: libbalsa/filter.c:225
+#, c-format
+msgid "Invalid filter : %s"
+msgstr "æ— æ•ˆçš„è¿‡æ»¤è§„åˆ™ï¼š%s"
+
+#: libbalsa/filter.c:287 libbalsa/filter.c:299
+#, c-format
+msgid "Bad mailbox name for filter : %s"
+msgstr ""
+
+# src/main-window.c:200
+#: libbalsa/filter.c:289
+msgid "Error when copying messages"
+msgstr "å¤åˆ¶é‚®ä»¶æ—¶å‘ç”Ÿé”™è¯¯"
+
+# src/sendmsg-window.c:71
+#: libbalsa/filter.c:293
+msgid "Error when trashing messages"
+msgstr "åˆ é™¤é‚®ä»¶æ—¶å‘ç”Ÿé”™è¯¯"
+
+# src/main-window.c:200
+#: libbalsa/filter.c:301
+msgid "Error when moving messages"
+msgstr "ç§»åŠ¨é‚®ä»¶æ—¶å‘ç”Ÿé”™è¯¯"
 
 #: libbalsa/identity.c:30
 msgid "Default"
-msgstr "Ä¬ÈÏ"
+msgstr "é»˜è®¤"
 
 #. should "re" be localized ?
 #: libbalsa/identity.c:135 src/balsa-index-threading.c:854
-#: src/balsa-index-threading.c:856 src/sendmsg-window.c:1950
-#: src/sendmsg-window.c:1951
+#: src/balsa-index-threading.c:856 src/sendmsg-window.c:2134
+#: src/sendmsg-window.c:2135
 msgid "Re:"
-msgstr "»Ø¸´£º"
+msgstr "å›å¤ï¼š"
 
-#: libbalsa/identity.c:136 src/sendmsg-window.c:1979 src/sendmsg-window.c:1980
+#: libbalsa/identity.c:136 src/sendmsg-window.c:2163 src/sendmsg-window.c:2164
 msgid "Fwd:"
-msgstr "×ª·¢£º"
+msgstr "è½¬å‘ï¼š"
 
 # src/main-window.c:166
 #: libbalsa/identity.c:450 libbalsa/identity.c:1059
+#: src/filter-edit-dialog.c:357
 msgid "Edit"
-msgstr "±à¼­"
+msgstr "ç¼–è¾‘"
 
 #: libbalsa/identity.c:455 libbalsa/identity.c:1060
 msgid "Set Default"
-msgstr "ÉèÎªÄ¬ÈÏÖµ"
+msgstr "è®¾ä¸ºé»˜è®¤å€¼"
 
 # src/pref-manager.c:137
 #: libbalsa/identity.c:618
 msgid "Create Identity"
-msgstr "´´½¨Éí·İ"
+msgstr "åˆ›å»ºèº«ä»½"
 
 # src/pref-manager.c:137
 #: libbalsa/identity.c:619
 msgid "Edit Identity"
-msgstr "±à¼­Éí·İ"
+msgstr "ç¼–è¾‘èº«ä»½"
 
 # src/pref-manager.c:137
 #: libbalsa/identity.c:653 libbalsa/identity.c:1167
 msgid "Identity Name:"
-msgstr "Éí·İÃû£º"
+msgstr "èº«ä»½åï¼š"
 
 # src/filter-edit-dialog.c:101
 #: libbalsa/identity.c:658 libbalsa/identity.c:1169
 msgid "Full Name:"
-msgstr "È«Ãû£º"
+msgstr "å…¨åï¼š"
 
 # src/balsa-init.c:261 src/pref-manager.c:377
 #: libbalsa/identity.c:663 libbalsa/identity.c:667 libbalsa/identity.c:1171
 msgid "Mailing Address:"
-msgstr "ÓÊ¼şµØÖ·£º"
+msgstr "é‚®ä»¶åœ°å€ï¼š"
 
 # src/sendmsg-window.c:513
 #. Reply To:
-#: libbalsa/identity.c:672 libbalsa/identity.c:1173 src/sendmsg-window.c:1504
+#: libbalsa/identity.c:672 libbalsa/identity.c:1173 src/sendmsg-window.c:1684
 msgid "Reply To:"
-msgstr "»Ø¸´µ½£º"
+msgstr "å›å¤åˆ°ï¼š"
 
 # src/filter-edit-dialog.c:420
 #: libbalsa/identity.c:675 libbalsa/identity.c:1175
 msgid "Domain:"
-msgstr "Óò£º"
+msgstr "åŸŸï¼š"
 
 # src/sendmsg-window.c:368
 #. bcc:
-#: libbalsa/identity.c:678 libbalsa/identity.c:1177 src/balsa-message.c:708
-#: src/print.c:393 src/sendmsg-window.c:1473 src/store-address.c:254
+#: libbalsa/identity.c:678 libbalsa/identity.c:1177 src/balsa-message.c:736
+#: src/print.c:393 src/sendmsg-window.c:1652 src/store-address.c:270
 msgid "Bcc:"
-msgstr "°µËÍ£º"
+msgstr "æš—é€ï¼š"
 
 #: libbalsa/identity.c:681 libbalsa/identity.c:1179
 msgid "Reply String:"
-msgstr "»Ø¸´×Ö·û´®£º"
+msgstr "å›å¤å­—ç¬¦ä¸²ï¼š"
 
 #: libbalsa/identity.c:684 libbalsa/identity.c:1181
 msgid "Forward String:"
-msgstr "×ª·¢×Ö·û´®£º"
+msgstr "è½¬å‘å­—ç¬¦ä¸²ï¼š"
 
 # src/pref-manager.c:397
 #: libbalsa/identity.c:687 libbalsa/identity.c:1183
 msgid "Signature Path:"
-msgstr "Ç©ÃûÂ·¾¶£º"
+msgstr "ç­¾åè·¯å¾„ï¼š"
 
 # src/pref-manager.c:397
 #: libbalsa/identity.c:691 libbalsa/identity.c:1186
-#, fuzzy
 msgid "Execute Signature"
-msgstr "Ô¤¼ÓÇ©Ãû"
+msgstr "æ‰§è¡Œç­¾å"
 
 # src/pref-manager.c:397
 #: libbalsa/identity.c:695 libbalsa/identity.c:1189
 msgid "Append Signature"
-msgstr "¸½¼ÓÇ©Ãû"
+msgstr "é™„åŠ ç­¾å"
 
 #: libbalsa/identity.c:699 libbalsa/identity.c:1191
 msgid "Append Signature When Forwarding"
-msgstr "×ª·¢Ê±¸½¼ÓÇ©Ãû"
+msgstr "è½¬å‘æ—¶é™„åŠ ç­¾å"
 
 #: libbalsa/identity.c:702 libbalsa/identity.c:1194
 msgid "Append Signature When Replying"
-msgstr "»Ø¸´Ê±¸½¼ÓÇ©Ãû"
+msgstr "å›å¤æ—¶é™„åŠ ç­¾å"
 
 #: libbalsa/identity.c:705 libbalsa/identity.c:1197
 msgid "Include Signature Separator"
-msgstr "°üº¬Ç©Ãû·Ö¸ô·û"
+msgstr "åŒ…å«ç­¾ååˆ†éš”ç¬¦"
 
 # src/pref-manager.c:397
 #: libbalsa/identity.c:708 libbalsa/identity.c:1200
 msgid "Prepend Signature"
-msgstr "Ô¤¼ÓÇ©Ãû"
+msgstr "é¢„åŠ ç­¾å"
 
 #: libbalsa/identity.c:882
 msgid "Error: The identity does not have a name"
-msgstr "´íÎó£º¸ÃÉí·İÃ»ÓĞÃû×Ö"
+msgstr "é”™è¯¯ï¼šè¯¥èº«ä»½æ²¡æœ‰åå­—"
 
 #: libbalsa/identity.c:892
 msgid "Error: An identity with that name already exists"
-msgstr "´íÎó£º¾ßÓĞÍ¬ÃûµÄÉí·İÒÑ´æÔÚ"
+msgstr "é”™è¯¯ï¼šå…·æœ‰åŒåçš„èº«ä»½å·²å­˜åœ¨"
 
 #: libbalsa/identity.c:1010
 msgid "Cannot delete default profile, please make another default first."
-msgstr "ÎŞ·¨É¾³ıÄ¬ÈÏÅäÖÃ£¬ÇëÏÈÉèÖÃÁíÍâÒ»¸öÄ¬ÈÏÅäÖÃ¡£"
+msgstr "æ— æ³•åˆ é™¤é»˜è®¤é…ç½®ï¼Œè¯·å…ˆè®¾ç½®å¦å¤–ä¸€ä¸ªé»˜è®¤é…ç½®ã€‚"
 
 #: libbalsa/identity.c:1017
 msgid "Do you really want to delete the selected identity?"
-msgstr "ÄúÈ·ÈÏÒªÉ¾³ıÑ¡ÖĞµÄÉí·İ£¿"
+msgstr "æ‚¨ç¡®è®¤è¦åˆ é™¤é€‰ä¸­çš„èº«ä»½ï¼Ÿ"
 
 # src/filter-edit-dialog.c:188
-#: libbalsa/identity.c:1058 src/filter-edit-dialog.c:226
-#: src/mailbox-node.c:568 src/main-window.c:437
+#: libbalsa/identity.c:1058 src/filter-edit-callbacks.c:637
+#: src/filter-edit-dialog.c:244 src/filter-edit-dialog.c:362
+#: src/mailbox-node.c:587 src/main-window.c:447
 msgid "New"
-msgstr "ĞÂ½¨"
+msgstr "æ–°å»º"
 
 # src/filter-edit-dialog.c:194 src/index-child.c:449 src/main-window.c:211
 # src/pref-manager.c:471
-#: libbalsa/identity.c:1061 src/balsa-index.c:1950
-#: src/filter-edit-dialog.c:232 src/mailbox-node.c:591 src/pref-manager.c:1273
-#: src/pref-manager.c:2185
+#: libbalsa/identity.c:1061 src/balsa-index.c:2113
+#: src/filter-edit-dialog.c:250 src/mailbox-node.c:610 src/pref-manager.c:1354
+#: src/pref-manager.c:2330
 msgid "Delete"
-msgstr "É¾³ı"
+msgstr "åˆ é™¤"
 
 # src/main-window.c:182
 #: libbalsa/identity.c:1072
 msgid "Manage Identities"
-msgstr "¹ÜÀíÉí·İ"
+msgstr "ç®¡ç†èº«ä»½"
 
 # src/filter-edit-dialog.c:171
 #: libbalsa/identity.c:1287
 msgid "Do"
-msgstr "Òª"
+msgstr "è¦"
 
 #: libbalsa/identity.c:1287
 msgid "Do Not"
-msgstr "²»Òª"
+msgstr "ä¸è¦"
+
+#: libbalsa/libbalsa.c:350
+#, c-format
+msgid "LDAP Directory for %s"
+msgstr "%s çš„LDAP ç›®å½•"
+
+#. Non-threaded locking mechanism
+#: libbalsa/libbalsa_private.h:104 libbalsa/libbalsa_private.h:116
+#, c-format
+msgid "*** ERROR: Mailbox Lock Exists: %s ***\n"
+msgstr "*** é”™è¯¯ï¼šé‚®ç®±é”å­˜åœ¨ï¼š%s ***\n"
+
+#: libbalsa/libbalsa_private.h:134 libbalsa/libbalsa_private.h:143
+#, c-format
+msgid "*** ERROR: Mailbox Stream Closed: %s ***\n"
+msgstr "*** é”™è¯¯ï¼šé‚®ç®±æµè¢«å…³é—­ï¼š%s ***\n"
 
 # src/mailbox-conf.c:488
-#: libbalsa/mailbox.c:314
+#: libbalsa/mailbox.c:323
 #, c-format
 msgid "Cannot load mailbox %s"
-msgstr "ÎŞ·¨ÔØÈëÓÊ¼şÏä %s"
+msgstr "æ— æ³•è½½å…¥é‚®ä»¶ç®± %s"
 
 # src/mailbox-conf.c:634
-#: libbalsa/mailbox.c:322
+#: libbalsa/mailbox.c:330
 #, c-format
 msgid "No such mailbox type: %s"
-msgstr "Ã»ÓĞÕâÖÖÓÊ¼şÏäÀàĞÍ£º%s"
+msgstr "æ²¡æœ‰è¿™ç§é‚®ä»¶ç®±ç±»å‹ï¼š%s"
 
 # src/mailbox-conf.c:488
-#: libbalsa/mailbox.c:339
+#: libbalsa/mailbox.c:347
 #, c-format
 msgid "Could not create a mailbox of type %s"
-msgstr "ÎŞ·¨´´½¨ÀàĞÍÎª %s µÄÓÊ¼şÏä"
+msgstr "æ— æ³•åˆ›å»ºç±»å‹ä¸º %s çš„é‚®ä»¶ç®±"
 
 # libbalsa/mailbox.c:476
-#: libbalsa/mailbox_imap.c:321
+#: libbalsa/mailbox_imap.c:652
 #, c-format
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxImap£º´ò¿ª %s µÄÒıÓÃ¼ÆÊı£º%d\n"
+msgstr "LibBalsaMailboxImapï¼šæ‰“å¼€ %s çš„å¼•ç”¨è®¡æ•°ï¼š%d\n"
 
 # libbalsa/mailbox.c:476
-#: libbalsa/mailbox_local.c:282
+#: libbalsa/mailbox_local.c:281
 #, c-format
 msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxLocal£º´ò¿ª %s µÄÒıÓÃ¼ÆÊı£º%d\n"
+msgstr "LibBalsaMailboxLocalï¼šæ‰“å¼€ %s çš„å¼•ç”¨è®¡æ•°ï¼š%d\n"
 
 #: libbalsa/mailbox_maildir.c:114
 #, c-format
 msgid "Mailbox %s does not appear to be a Maildir mailbox."
-msgstr "ÓÊ¼şÏä¡°%s¡±²»ÊÇÓĞĞ§µÄ Maildir ÓÊÏä¡£"
+msgstr "é‚®ä»¶ç®±â€œ%sâ€ä¸æ˜¯æœ‰æ•ˆçš„ Maildir é‚®ç®±ã€‚"
 
 # src/mailbox-conf.c:488
 #: libbalsa/mailbox_maildir.c:123
 #, c-format
 msgid "Could not create a MailDir directory at %s (%s)"
-msgstr "ÎŞ·¨ÔÚ %s ´´½¨ MailDir Ä¿Â¼ (%s)"
+msgstr "æ— æ³•åœ¨ %s åˆ›å»º MailDir ç›®å½• (%s)"
 
 # src/mailbox-conf.c:488
 #: libbalsa/mailbox_maildir.c:130 libbalsa/mailbox_maildir.c:138
 #: libbalsa/mailbox_maildir.c:148
 #, c-format
 msgid "Could not create a MailDir at %s (%s)"
-msgstr "ÎŞ·¨ÔÚ %s ´´½¨ MailDir (%s)"
+msgstr "æ— æ³•åœ¨ %s åˆ›å»º MailDir (%s)"
 
-#: libbalsa/mailbox_maildir.c:209 libbalsa/mailbox_mh.c:186
+#: libbalsa/mailbox_maildir.c:209 libbalsa/mailbox_mh.c:187
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
-msgstr "´ò¿ª %s Ê§°Ü¡£Errno = %d£¬"
+msgstr "æ‰“å¼€ %s å¤±è´¥ã€‚Errno = %dï¼Œ"
 
-#: libbalsa/mailbox_maildir.c:228 libbalsa/mailbox_mh.c:205
+#: libbalsa/mailbox_maildir.c:228 libbalsa/mailbox_mh.c:206
 #, c-format
 msgid ""
 "Could not remove contents of %s:\n"
 "%s"
 msgstr ""
-"ÎŞ·¨É¾³ı %s µÄÄÚÈİ£º\n"
+"æ— æ³•åˆ é™¤ %s çš„å†…å®¹ï¼š\n"
 "%s"
 
-#: libbalsa/mailbox_maildir.c:234 libbalsa/mailbox_mbox.c:181
-#: libbalsa/mailbox_mh.c:211
+#: libbalsa/mailbox_maildir.c:234 libbalsa/mailbox_mbox.c:178
+#: libbalsa/mailbox_mh.c:212
 #, c-format
 msgid ""
 "Could not remove %s:\n"
 "%s"
 msgstr ""
-"ÎŞ·¨É¾³ı %s£º\n"
+"æ— æ³•åˆ é™¤ %sï¼š\n"
 "%s"
 
 #: libbalsa/mailbox_mbox.c:113
 #, c-format
 msgid "Mailbox %s does not appear to be an Mbox mailbox."
-msgstr "ÓÊ¼şÏä %s ²»ÊÇÒ»¸ö Mbox ÓÊÏä¡£"
+msgstr "é‚®ä»¶ç®± %s ä¸æ˜¯ä¸€ä¸ª Mbox é‚®ç®±ã€‚"
 
 #: libbalsa/mailbox_mh.c:112
 #, c-format
 msgid "Mailbox %s does not appear to be a Mh mailbox."
-msgstr "ÓÊ¼şÏä %s ²»ÊÇÒ»¸ö Mh ÓÊÏä¡£"
+msgstr "é‚®ä»¶ç®± %s ä¸æ˜¯ä¸€ä¸ª Mh é‚®ç®±ã€‚"
 
 #: libbalsa/mailbox_mh.c:122
 #, c-format
 msgid "Could not create MH directory at %s (%s)"
-msgstr "ÎŞ·¨ÔÚ %s ´´½¨ MH Ä¿Â¼ (%s)"
+msgstr "æ— æ³•åœ¨ %s åˆ›å»º MH ç›®å½• (%s)"
 
 #: libbalsa/mailbox_mh.c:129
 #, c-format
 msgid "Could not create MH structure at %s (%s)"
-msgstr "ÎŞ·¨ÔÚ %s ´´½¨ MH ½á¹¹ (%s)"
+msgstr "æ— æ³•åœ¨ %s åˆ›å»º MH ç»“æ„ (%s)"
 
 # libbalsa/mailbox.c:476
-#: libbalsa/mailbox_pop3.c:191
+#: libbalsa/mailbox_pop3.c:193
 #, c-format
 msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxPop3£º´ò¿ª %s µÄÒıÓÃ¼ÆÊı£º%d\n"
+msgstr "LibBalsaMailboxPop3ï¼šæ‰“å¼€ %s çš„å¼•ç”¨è®¡æ•°ï¼š%d\n"
 
-#: libbalsa/mailbox_pop3.c:246
+#: libbalsa/mailbox_pop3.c:249
 #, c-format
 msgid ""
 "POP3 mailbox %s temp file error:\n"
 "%s"
 msgstr ""
-"POP3 ÓÊ¼şÏä %s ÁÙÊ±ÎÄ¼ş´íÎó£º\n"
+"POP3 é‚®ä»¶ç®± %s ä¸´æ—¶æ–‡ä»¶é”™è¯¯ï¼š\n"
 "%s"
 
-#: libbalsa/mailbox_pop3.c:260
+#: libbalsa/mailbox_pop3.c:263
 #, c-format
 msgid ""
 "POP3 mailbox %s accessing error:\n"
 "%s"
 msgstr ""
-"POP3 ÓÊ¼şÏä %s ´æÈ¡´íÎó£º\n"
+"POP3 é‚®ä»¶ç®± %s å­˜å–é”™è¯¯ï¼š\n"
 "%s"
 
-#: libbalsa/mailbox_pop3.c:290
+#: libbalsa/mailbox_pop3.c:293
 #, c-format
 msgid "POP3 mailbox %s temp mailbox error:\n"
-msgstr "POP3 ÓÊ¼şÏä %s ÁÙÊ±ÓÊ¼şÏä´íÎó£º\n"
+msgstr "POP3 é‚®ä»¶ç®± %s ä¸´æ—¶é‚®ä»¶ç®±é”™è¯¯ï¼š\n"
 
-#: libbalsa/mailbox_pop3.c:299
+#: libbalsa/mailbox_pop3.c:312
 #, c-format
 msgid ""
 "Error placing messages from %s on %s\n"
 "Messages are left in %s\n"
 msgstr ""
-"´Ó %s ·ÅÖÃÓÊ¼şµ½ %s Ê±·¢Éú´íÎó\n"
-"ÓÊ¼ş±£ÁôÔÚ %s\n"
+"ä» %s æ”¾ç½®é‚®ä»¶åˆ° %s æ—¶å‘ç”Ÿé”™è¯¯\n"
+"é‚®ä»¶ä¿ç•™åœ¨ %s\n"
 
-#: libbalsa/message.c:423
+#: libbalsa/message.c:413
 #, c-format
 msgid "Source mailbox (%s) is readonly. Cannot move message"
-msgstr "Ô´ÓÊ¼şÏä(%s)Ö»¶Á¡£ÎŞ·¨ÒÆ¶¯ÓÊ¼ş"
+msgstr "æºé‚®ä»¶ç®±(%s)åªè¯»ã€‚æ— æ³•ç§»åŠ¨é‚®ä»¶"
 
-#: libbalsa/message.c:443
+#: libbalsa/message.c:433
 #, c-format
 msgid "Source mailbox (%s) is readonly. Cannot move messages"
-msgstr "Ô´ÓÊ¼şÏä(%s)Ö»¶Á¡£ÎŞ·¨ÒÆ¶¯ÓÊ¼ş"
+msgstr "æºé‚®ä»¶ç®±(%s)åªè¯»ã€‚æ— æ³•ç§»åŠ¨é‚®ä»¶"
 
 # src/main-window.c:171
-#: libbalsa/message.c:472
+#: libbalsa/message.c:462
 #, c-format
 msgid "Couldn't open destination mailbox (%s) for copying"
-msgstr "ÎŞ·¨´ò¿ªÄ¿±êÓÊ¼şÏä(%s)½øĞĞ¸´ÖÆ"
+msgstr "æ— æ³•æ‰“å¼€ç›®æ ‡é‚®ä»¶ç®±(%s)è¿›è¡Œå¤åˆ¶"
 
 # src/main-window.c:171
-#: libbalsa/message.c:530
+#: libbalsa/message.c:520
 #, c-format
 msgid "Couldn't open destination mailbox (%s) for writing"
-msgstr "ÎŞ·¨´ò¿ªÄ¿±êÓÊ¼şÏä(%s)Ğ´Èë"
+msgstr "æ— æ³•æ‰“å¼€ç›®æ ‡é‚®ä»¶ç®±(%s)å†™å…¥"
 
 #: libbalsa/pop3.c:55
 msgid "connection error"
-msgstr "Á¬½Ó´íÎó"
+msgstr "è¿æ¥é”™è¯¯"
 
 #: libbalsa/pop3.c:56
 msgid "POP command execution failed"
-msgstr "POP ÃüÁîÖ´ĞĞÊ§°Ü"
+msgstr "POP å‘½ä»¤æ‰§è¡Œå¤±è´¥"
 
 # src/main-window.c:139
 #: libbalsa/pop3.c:57
 msgid "Could not write the message"
-msgstr "ÎŞ·¨Ğ´ÓÊ¼ş"
+msgstr "æ— æ³•å†™é‚®ä»¶"
 
 #: libbalsa/pop3.c:58
 msgid "Could not run the delivery program (procmail)"
-msgstr "ÎŞ·¨Ö´ĞĞ·Ö·¢³ÌĞò (procmail)"
+msgstr "æ— æ³•æ‰§è¡Œåˆ†å‘ç¨‹åº (procmail)"
 
 # src/main-window.c:171
 #: libbalsa/pop3.c:59
 msgid "Could not open mailbox for spooling"
-msgstr "ÎŞ·¨´ò¿ªÓÊ¼şÏäÀ´ÍÑ»ú»º³å"
+msgstr "æ— æ³•æ‰“å¼€é‚®ä»¶ç®±æ¥è„±æœºç¼“å†²"
 
 # src/main-window.c:171
 #: libbalsa/pop3.c:60
 msgid "Could not append message"
-msgstr "ÎŞ·¨×·¼ÓÓÊ¼ş"
+msgstr "æ— æ³•è¿½åŠ é‚®ä»¶"
 
 #: libbalsa/pop3.c:61
 msgid "Host not found"
-msgstr "ÎŞ·¨ÕÒµ½Ö÷»ú"
+msgstr "æ— æ³•æ‰¾åˆ°ä¸»æœº"
 
 #: libbalsa/pop3.c:62
 msgid "Connection refused"
-msgstr "Á¬½Ó±»¾Ü¾ø"
+msgstr "è¿æ¥è¢«æ‹’ç»"
 
 #: libbalsa/pop3.c:63
 msgid "Authentication failed"
-msgstr "Éí·İÑéÖ¤Ê§°Ü"
+msgstr "èº«ä»½éªŒè¯å¤±è´¥"
 
 # src/main-window.c:211
-#: libbalsa/pop3.c:406
-#, c-format
-msgid "Retrieving Message %d of %d"
-msgstr "ÕıÔÚÏÂÔØÓÊ¼ş£ºµÚ %d ·â¹² %d"
-
 #: libbalsa/pop3.c:420
 #, c-format
+msgid "Retrieving Message %d of %d"
+msgstr "æ­£åœ¨ä¸‹è½½é‚®ä»¶ï¼šç¬¬ %d å°å…± %d"
+
+#: libbalsa/pop3.c:434
+#, c-format
 msgid "Received %d bytes of %d"
-msgstr "ÒÑ½ÓÊÕ %d ×Ö½Ú¹² %d"
+msgstr "å·²æ¥æ”¶ %d å­—èŠ‚å…± %d"
 
 # src/sendmsg-window.c:71
-#: libbalsa/send.c:220 libbalsa/send.c:223
+#: libbalsa/send.c:219 libbalsa/send.c:222
 msgid "Sending Mail..."
-msgstr "ÕıÔÚ·¢ËÍÓÊ¼ş..."
+msgstr "æ­£åœ¨å‘é€é‚®ä»¶..."
 
 # src/filter-edit-dialog.c:267
-#: libbalsa/send.c:220 src/main-window.c:1673
+#: libbalsa/send.c:219 src/main-window.c:1683
 msgid "Hide"
-msgstr "Òş²Ø"
+msgstr "éšè—"
 
-#: libbalsa/send.c:367
+#: libbalsa/send.c:366
 msgid "Unable to open sentbox - could not get IMAP server information"
-msgstr "ÎŞ·¨´ò¿ªÒÑ·¢ËÍÓÊ¼şÏä£­ÎŞ·¨»ñÈ¡ IMAP ·şÎñÆ÷ĞÅÏ¢"
+msgstr "æ— æ³•æ‰“å¼€å·²å‘é€é‚®ä»¶ç®±ï¼æ— æ³•è·å– IMAP æœåŠ¡å™¨ä¿¡æ¯"
 
-#: libbalsa/send.c:779
+#: libbalsa/send.c:778
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
 msgstr ""
-"ÓÊ¼şÌá½»´íÎó£¬ÒÑ½«Ëü·ÅÈë·¢¼şÏä¡£\n"
-"ÏµÍ³½«ÊÔÍ¼ÖØĞÂÌá½»£¬Ö±µ½ÄúÉ¾³ıËüÎªÖ¹¡£"
+"é‚®ä»¶æäº¤é”™è¯¯ï¼Œå·²å°†å®ƒæ”¾å…¥å‘ä»¶ç®±ã€‚\n"
+"ç³»ç»Ÿå°†è¯•å›¾é‡æ–°æäº¤ï¼Œç›´åˆ°æ‚¨åˆ é™¤å®ƒä¸ºæ­¢ã€‚"
 
-#: libbalsa/send.c:807
+#: libbalsa/send.c:806
 msgid "Connected to MTA"
-msgstr "ÒÑÁ¬½Óµ½ MTA"
+msgstr "å·²è¿æ¥åˆ° MTA"
 
-#: libbalsa/send.c:814
+#: libbalsa/send.c:813
 #, c-format
 msgid "From: %d <%s>"
-msgstr "´Ó£º%d <%s>"
+msgstr "ä»ï¼š%d <%s>"
 
-#: libbalsa/send.c:817
+#: libbalsa/send.c:816
 #, c-format
 msgid "From %s: %d %s"
-msgstr "´Ó %s£º%d %s"
+msgstr "ä» %sï¼š%d %s"
 
-#: libbalsa/send.c:825
+#: libbalsa/send.c:824
 #, c-format
 msgid "To: %d <%s>"
-msgstr "ÖÁ£º%d <%s>"
+msgstr "è‡³ï¼š%d <%s>"
 
 # src/mailbox-conf.c:531
-#: libbalsa/send.c:828
+#: libbalsa/send.c:827
 #, c-format
 msgid "To %s: %d %s"
-msgstr "ÖÁ %s£º%d %s"
+msgstr "è‡³ %sï¼š%d %s"
 
 # src/mailbox-conf.c:531
-#: libbalsa/send.c:852
+#: libbalsa/send.c:851
 #, c-format
 msgid "%d %s"
 msgstr "%d %s"
 
-#: libbalsa/send.c:865
+#: libbalsa/send.c:864
 msgid "Disconnected"
-msgstr "ÒÑ¶Ï¿ª"
+msgstr "å·²æ–­å¼€"
 
 # src/balsa-init.c:276
-#: libbalsa/send.c:1031
+#: libbalsa/send.c:1030
 #, c-format
 msgid "SMTP server problem: %s"
-msgstr "SMTP ·şÎñÆ÷ÎÊÌâ£º%s"
+msgstr "SMTP æœåŠ¡å™¨é—®é¢˜ï¼š%s"
 
 # src/main-window.c:215
-#: libbalsa/source-viewer.c:46 src/main-window.c:517
+#: libbalsa/source-viewer.c:46 src/main-window.c:527
 msgid "_Select Text"
-msgstr "Ñ¡ÖĞÎÄ×Ö(_S)"
+msgstr "é€‰ä¸­æ–‡å­—(_S)"
 
 # src/pref-manager.c:137
-#: libbalsa/source-viewer.c:47 src/main-window.c:518
+#: libbalsa/source-viewer.c:47 src/main-window.c:528
 msgid "Select entire mail"
-msgstr "Ñ¡ÖĞÕû¸öÓÊ¼ş"
+msgstr "é€‰ä¸­æ•´ä¸ªé‚®ä»¶"
 
 # src/main-window.c:200
 #: libbalsa/source-viewer.c:91
 msgid "Message Source"
-msgstr "ÓÊ¼şÀ´Ô´"
+msgstr "é‚®ä»¶æ¥æº"
 
 # src/balsa-init.c:590
 #.
 #. ISPRIME(9)
 #.
-#: libinit_balsa/balsa-druid-page-directory.gob:60
+#: libinit_balsa/balsa-druid-page-directory.gob:62
 msgid "Inbox:"
-msgstr "ÊÕ¼şÏä£º"
+msgstr "æ”¶ä»¶ç®±ï¼š"
 
 # src/balsa-init.c:598
-#: libinit_balsa/balsa-druid-page-directory.gob:60
+#: libinit_balsa/balsa-druid-page-directory.gob:62
 msgid "Outbox:"
-msgstr "·¢¼şÏä£º"
+msgstr "å‘ä»¶ç®±ï¼š"
 
 # src/balsa-init.c:590
-#: libinit_balsa/balsa-druid-page-directory.gob:60
+#: libinit_balsa/balsa-druid-page-directory.gob:62
 msgid "Sentbox:"
-msgstr "ÒÑ·¢ËÍÓÊ¼ş£º"
+msgstr "å·²å‘é€é‚®ä»¶ï¼š"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:60
+#: libinit_balsa/balsa-druid-page-directory.gob:62
 msgid "Draftbox:"
-msgstr "¸å¼şÏä£º"
+msgstr "ç¨¿ä»¶ç®±ï¼š"
 
 # src/balsa-init.c:606
-#: libinit_balsa/balsa-druid-page-directory.gob:60
+#: libinit_balsa/balsa-druid-page-directory.gob:62
 msgid "Trash:"
-msgstr "ÒÑÉ¾³ıÓÊ¼ş£º"
+msgstr "å·²åˆ é™¤é‚®ä»¶ï¼š"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:78
+#: libinit_balsa/balsa-druid-page-directory.gob:82
 #, c-format
 msgid ""
 "The pathname \"%s\" must be specified canonically -- it must start with a "
 "'/'."
-msgstr "Â·¾¶Ãû¡°%s¡±±ØĞëÊÇÕı¹æµÄĞÎÊ½ -- ±ØĞëÒÔ¡°/¡±¿ªÊ¼¡£"
+msgstr "è·¯å¾„åâ€œ%sâ€å¿…é¡»æ˜¯æ­£è§„çš„å½¢å¼ -- å¿…é¡»ä»¥â€œ/â€å¼€å§‹ã€‚"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:102
+#: libinit_balsa/balsa-druid-page-directory.gob:134
 #, c-format
 msgid ""
 "The mailbox \"%s\" does not appear to be valid.\n"
@@ -576,86 +662,86 @@ msgid ""
 "until the system created the mailboxes. Please change\n"
 "the mailbox path or check your system configuration."
 msgstr ""
-"ÓÊ¼şÏä¡°%s¡±ÎŞĞ§¡£\n"
-"ÄúµÄÏµÍ³²»ÔÊĞíÔÚ /var/spool/mail ÏÂ´´½¨ÓÊ¼şÏä¡£\n"
-"Èç¹ûÏµÍ³²»´´½¨ÓÊ¼şÏä£¬Balsa ½«ÎŞ·¨Õı³£¹¤×÷¡£\n"
-"ÇëĞŞ¸ÄÓÊ¼şÏäÂ·¾¶»ò¼ì²éÏµÍ³µÄÅäÖÃ¡£"
+"é‚®ä»¶ç®±â€œ%sâ€æ— æ•ˆã€‚\n"
+"æ‚¨çš„ç³»ç»Ÿä¸å…è®¸åœ¨ /var/spool/mail ä¸‹åˆ›å»ºé‚®ä»¶ç®±ã€‚\n"
+"å¦‚æœç³»ç»Ÿä¸åˆ›å»ºé‚®ä»¶ç®±ï¼ŒBalsa å°†æ— æ³•æ­£å¸¸å·¥ä½œã€‚\n"
+"è¯·ä¿®æ”¹é‚®ä»¶ç®±è·¯å¾„æˆ–æ£€æŸ¥ç³»ç»Ÿçš„é…ç½®ã€‚"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:109
+#: libinit_balsa/balsa-druid-page-directory.gob:141
 #, c-format
 msgid "The mailbox \"%s\" does not appear to be valid."
-msgstr "ÓÊ¼şÏä¡°%s¡±ÎŞĞ§¡£"
+msgstr "é‚®ä»¶ç®±â€œ%sâ€æ— æ•ˆã€‚"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:160
+#: libinit_balsa/balsa-druid-page-directory.gob:193
 msgid ""
 "Please verify the locations of your default mail files.\n"
 "These will be created if necessary."
 msgstr ""
-"Çë¼ì²éÄúµÄÄ¬ÈÏÓÊ¼şÎÄ¼şµÄÎ»ÖÃ¡£\n"
-"Èç¹ûĞèÒª£¬»á´´½¨ÕâĞ©ÎÄ¼ş¡£"
+"è¯·æ£€æŸ¥æ‚¨çš„é»˜è®¤é‚®ä»¶æ–‡ä»¶çš„ä½ç½®ã€‚\n"
+"å¦‚æœéœ€è¦ï¼Œä¼šåˆ›å»ºè¿™äº›æ–‡ä»¶ã€‚"
 
 # src/filter-edit-dialog.c:749
-#: libinit_balsa/balsa-druid-page-directory.gob:203
+#: libinit_balsa/balsa-druid-page-directory.gob:241
 msgid "Mail Files"
-msgstr "ÓÊ¼şÎÄ¼ş"
+msgstr "é‚®ä»¶æ–‡ä»¶"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:276
+#: libinit_balsa/balsa-druid-page-directory.gob:314
 msgid "Problem Creating Mailboxes"
-msgstr "´´½¨ÓÊ¼şÏäÊ±²úÉú´íÎó"
+msgstr "åˆ›å»ºé‚®ä»¶ç®±æ—¶äº§ç”Ÿé”™è¯¯"
 
 #: libinit_balsa/balsa-druid-page-finish.gob:46
 msgid ""
 "You've successfully set up Balsa. Have fun!\n"
 "   -- The Balsa development team"
 msgstr ""
-"ÄúÒÑ¾­³É¹¦ÅäÖÃºÃ Balsa¡£×£Äú¿ªĞÄ£¡\n"
-"   -- Balsa ¿ª·¢Ğ¡×é"
+"æ‚¨å·²ç»æˆåŠŸé…ç½®å¥½ Balsaã€‚ç¥æ‚¨å¼€å¿ƒï¼\n"
+"   -- Balsa å¼€å‘å°ç»„"
 
 #: libinit_balsa/balsa-druid-page-finish.gob:58
 msgid "All Done!"
-msgstr "È«²¿Íê³É£¡"
+msgstr "å…¨éƒ¨å®Œæˆï¼"
 
 #: libinit_balsa/balsa-druid-page-finish.gob:75
 msgid "GnomeCard Address Book"
-msgstr "GnomeCard µØÖ·²¾"
+msgstr "GnomeCard åœ°å€ç°¿"
 
-#: libinit_balsa/balsa-druid-page-user.gob:80
+#: libinit_balsa/balsa-druid-page-user.gob:79
 msgid "Please enter information about yourself."
-msgstr "ÇëÊäÈëÄú×Ô¼ºµÄĞÅÏ¢¡£"
+msgstr "è¯·è¾“å…¥æ‚¨è‡ªå·±çš„ä¿¡æ¯ã€‚"
 
 # src/filter-edit-dialog.c:101
-#: libinit_balsa/balsa-druid-page-user.gob:88
+#: libinit_balsa/balsa-druid-page-user.gob:87
 msgid "Name:"
-msgstr "Ãû×Ö£º"
+msgstr "åå­—ï¼š"
 
 # src/balsa-init.c:261 src/pref-manager.c:377
-#: libinit_balsa/balsa-druid-page-user.gob:92
+#: libinit_balsa/balsa-druid-page-user.gob:89
 msgid "Email address:"
-msgstr "µç×ÓÓÊ¼şµØÖ·£º"
+msgstr "ç”µå­é‚®ä»¶åœ°å€ï¼š"
 
 # src/pref-manager.c:481
-#: libinit_balsa/balsa-druid-page-user.gob:96
+#: libinit_balsa/balsa-druid-page-user.gob:93
 msgid "Local Mail Directory:"
-msgstr "±¾µØÓÊ¼şÄ¿Â¼£º"
+msgstr "æœ¬åœ°é‚®ä»¶ç›®å½•ï¼š"
 
 # src/balsa-init.c:276
-#: libinit_balsa/balsa-druid-page-user.gob:101
+#: libinit_balsa/balsa-druid-page-user.gob:98
 msgid "SMTP Server:"
-msgstr "SMTP·şÎñÆ÷£º"
+msgstr "SMTPæœåŠ¡å™¨ï¼š"
 
-#: libinit_balsa/balsa-druid-page-user.gob:111
+#: libinit_balsa/balsa-druid-page-user.gob:108
 msgid "User Settings"
-msgstr "ÓÃ»§ÉèÖÃ"
+msgstr "ç”¨æˆ·è®¾ç½®"
 
 # src/pref-manager.c:476
-#: libinit_balsa/balsa-druid-page-user.gob:171
+#: libinit_balsa/balsa-druid-page-user.gob:168
 msgid "Local Mail Problem"
-msgstr "±¾µØÓÊ¼şÎÊÌâ"
+msgstr "æœ¬åœ°é‚®ä»¶é—®é¢˜"
 
 # src/balsa-init.c:193
 #: libinit_balsa/balsa-druid-page-welcome.gob:47
 msgid "Welcome to Balsa!"
-msgstr "»¶Ó­Ê¹ÓÃ Balsa£¡"
+msgstr "æ¬¢è¿ä½¿ç”¨ Balsaï¼"
 
 #: libinit_balsa/balsa-druid-page-welcome.gob:50
 msgid ""
@@ -667,106 +753,106 @@ msgid ""
 "main window for more information about contacting the authors or\n"
 "reporting bugs."
 msgstr ""
-"ÄúÊÇµÚÒ»´ÎÔËĞĞ Balsa¡£ÒÔÏÂµÄ²½Öè½«ÒªÏòÄúÎÊÒ»Ğ©¼òµ¥\n"
-"µÄÎÊÌâÀ´ÉèÖÃºÃ Balsa¡£\n"
-"Ò»µ©ÄúÍê³ÉÁËÕâĞ©²½Öè£¬ÄúÒ²¿ÉÒÔÔÚÒÔºóÍ¨¹ıÊ×Ñ¡ÏîÀ´¸Ä±ä\n"
-"ÉèÖÃ¡£Èç¹ûĞèÒª´´½¨ÎÄ¼ş»òÕßÄ¿Â¼£¬Balsa »á×Ô¶¯½øĞĞ¡£\n"
-"ÇëÔÚ Balsa µÄ¡°¹ØÓÚ¡±ÖĞ²é¿´ÈçºÎÁªÏµ×÷Õß»ò±¨¸æ´íÎó\n"
-"µÄÏêÏ¸ĞÅÏ¢¡£"
+"æ‚¨æ˜¯ç¬¬ä¸€æ¬¡è¿è¡Œ Balsaã€‚ä»¥ä¸‹çš„æ­¥éª¤å°†è¦å‘æ‚¨é—®ä¸€äº›ç®€å•\n"
+"çš„é—®é¢˜æ¥è®¾ç½®å¥½ Balsaã€‚\n"
+"ä¸€æ—¦æ‚¨å®Œæˆäº†è¿™äº›æ­¥éª¤ï¼Œæ‚¨ä¹Ÿå¯ä»¥åœ¨ä»¥åé€šè¿‡é¦–é€‰é¡¹æ¥æ”¹å˜\n"
+"è®¾ç½®ã€‚å¦‚æœéœ€è¦åˆ›å»ºæ–‡ä»¶æˆ–è€…ç›®å½•ï¼ŒBalsa ä¼šè‡ªåŠ¨è¿›è¡Œã€‚\n"
+"è¯·åœ¨ Balsa çš„â€œå…³äºâ€ä¸­æŸ¥çœ‹å¦‚ä½•è”ç³»ä½œè€…æˆ–æŠ¥å‘Šé”™è¯¯\n"
+"çš„è¯¦ç»†ä¿¡æ¯ã€‚"
 
 #: libinit_balsa/balsa-initdruid.gob:96
 msgid ""
 "This will exit Balsa. Do you\n"
 "really want to do this?"
-msgstr "ÄúÕæµÄÒªÍË³öÂğ£¿"
+msgstr "æ‚¨çœŸçš„è¦é€€å‡ºå—ï¼Ÿ"
 
-#: libinit_balsa/helper.c:142
+#: libinit_balsa/helper.c:148
 #, c-format
 msgid "The path %s must be relative to the filesystem root (start with /)."
-msgstr "Â·¾¶ %s ±ØĞëÏà¶ÔÓÚ¸ùÎÄ¼şÏµÍ³ (¿ªÊ¼ÓÚ /)."
+msgstr "è·¯å¾„ %s å¿…é¡»ç›¸å¯¹äºæ ¹æ–‡ä»¶ç³»ç»Ÿ (å¼€å§‹äº /)."
 
-#: libinit_balsa/helper.c:152 libinit_balsa/helper.c:170
+#: libinit_balsa/helper.c:158 libinit_balsa/helper.c:176
 #, c-format
 msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
-msgstr "ÎŞ·¨´´½¨Ä¿Â¼£ºmkdir() ´´½¨¡°%s¡±Ê§°Ü¡£"
+msgstr "æ— æ³•åˆ›å»ºç›®å½•ï¼šmkdir() åˆ›å»ºâ€œ%sâ€å¤±è´¥ã€‚"
 
-#: libinit_balsa/helper.c:159 libinit_balsa/helper.c:176
+#: libinit_balsa/helper.c:165 libinit_balsa/helper.c:182
 #, c-format
 msgid "The file with pathname \"%s\" is not a directory."
-msgstr "¡°%s¡±²»ÊÇÄ¿Â¼¡£"
+msgstr "â€œ%sâ€ä¸æ˜¯ç›®å½•ã€‚"
 
 #: libinit_balsa/init_balsa.c:36
 msgid "Configure Balsa"
-msgstr "ÅäÖÃ Balsa"
+msgstr "é…ç½® Balsa"
 
 #. didn't find anything that we could display!
 #: libmutt/handler.c:1308
 msgid "[-- Error:  Could not display any parts of Multipart/Alternative! --]\n"
-msgstr "[-- ´íÎó£ºÎŞ·¨ÏÔÊ¾ Multipart/Alternative µÄÈÎºÎ²¿·Ö£¡--]\n"
+msgstr "[-- é”™è¯¯ï¼šæ— æ³•æ˜¾ç¤º Multipart/Alternative çš„ä»»ä½•éƒ¨åˆ†ï¼--]\n"
 
 # src/sendmsg-window.c:414
 #: libmutt/handler.c:1426
 #, c-format
 msgid "[-- Attachment #%d"
-msgstr "[--¸½¼ş #%d"
+msgstr "[--é™„ä»¶ #%d"
 
 #: libmutt/handler.c:1437
 #, c-format
 msgid "[-- Type: %s/%s, Encoding: %s, Size: %s --]\n"
-msgstr "[-- ÀàĞÍ£º%s/%s£¬±àÂë£º%s£¬´óĞ¡£º%s --]\n"
+msgstr "[-- ç±»å‹ï¼š%s/%sï¼Œç¼–ç ï¼š%sï¼Œå¤§å°ï¼š%s --]\n"
 
 #: libmutt/handler.c:1496
 #, c-format
 msgid "[-- Autoview using %s --]\n"
-msgstr "[-- Ê¹ÓÃ %s ×Ô¶¯²é¿´ --]\n"
+msgstr "[-- ä½¿ç”¨ %s è‡ªåŠ¨æŸ¥çœ‹ --]\n"
 
 #: libmutt/handler.c:1497
 #, c-format
 msgid "Invoking autoview command: %s"
-msgstr "µ÷ÓÃ×Ô¶¯²é¿´ÃüÁî£º%s"
+msgstr "è°ƒç”¨è‡ªåŠ¨æŸ¥çœ‹å‘½ä»¤ï¼š%s"
 
 # src/main-window.c:182
 #: libmutt/handler.c:1525
 msgid "Can't create filter"
-msgstr "ÎŞ·¨´´½¨¹ıÂËÆ÷"
+msgstr "æ— æ³•åˆ›å»ºè¿‡æ»¤å™¨"
 
 #: libmutt/handler.c:1527
 #, c-format
 msgid "[-- Can't run %s. --]\n"
-msgstr "[-- ÎŞ·¨ÔËĞĞ %s¡£--]\n"
+msgstr "[-- æ— æ³•è¿è¡Œ %sã€‚--]\n"
 
 #: libmutt/handler.c:1542 libmutt/handler.c:1560
 #, c-format
 msgid "[-- Autoview stderr of %s --]\n"
-msgstr "[-- ×Ô¶¯²é¿´ %s µÄ±ê×¼´íÎó --]\n"
+msgstr "[-- è‡ªåŠ¨æŸ¥çœ‹ %s çš„æ ‡å‡†é”™è¯¯ --]\n"
 
 #: libmutt/handler.c:1595
 msgid "[-- Error: message/external-body has no access-type parameter --]\n"
-msgstr "[-- ´íÎó£ºÓÊ¼ş/Íâ²¿ĞÅÌåÃ»ÓĞ·ÃÎÊÀàĞÍ²ÎÊı --]\n"
+msgstr "[-- é”™è¯¯ï¼šé‚®ä»¶/å¤–éƒ¨ä¿¡ä½“æ²¡æœ‰è®¿é—®ç±»å‹å‚æ•° --]\n"
 
 #: libmutt/handler.c:1612
 #, c-format
 msgid "[-- This %s/%s attachment "
-msgstr "[-- ´Ë %s/%s ¸½¼ş "
+msgstr "[-- æ­¤ %s/%s é™„ä»¶ "
 
 #: libmutt/handler.c:1619
 #, c-format
 msgid "(size %s bytes) "
-msgstr "(´óĞ¡Îª %s ×Ö½Ú)"
+msgstr "(å¤§å°ä¸º %s å­—èŠ‚)"
 
 #: libmutt/handler.c:1621
 msgid "has been deleted --]\n"
-msgstr "ÒÑ¾­±»É¾³ı --]\n"
+msgstr "å·²ç»è¢«åˆ é™¤ --]\n"
 
 #: libmutt/handler.c:1624
 #, c-format
 msgid "[-- on %s --]\n"
-msgstr "[-- ÔÚ %s --]\n"
+msgstr "[-- åœ¨ %s --]\n"
 
 #: libmutt/handler.c:1626
 #, c-format
 msgid "[-- name: %s --]\n"
-msgstr "[-- Ãû×Ö£º%s --]\n"
+msgstr "[-- åå­—ï¼š%s --]\n"
 
 #: libmutt/handler.c:1637
 #, c-format
@@ -775,8 +861,8 @@ msgid ""
 "[-- and the indicated external source has --]\n"
 "[-- expired. --]\n"
 msgstr ""
-"[-- Ã»ÓĞ°üº¬´Ë %s/%s ¸½¼ş£¬--]\n"
-"[-- ÇÒÆäÍâ²¿À´Ô´ÒÑ¾­¹ıÆÚ¡£--]\n"
+"[-- æ²¡æœ‰åŒ…å«æ­¤ %s/%s é™„ä»¶ï¼Œ--]\n"
+"[-- ä¸”å…¶å¤–éƒ¨æ¥æºå·²ç»è¿‡æœŸã€‚--]\n"
 
 #: libmutt/handler.c:1651
 #, c-format
@@ -784,111 +870,111 @@ msgid ""
 "[-- This %s/%s attachment is not included, --]\n"
 "[-- and the indicated access-type %s is unsupported --]\n"
 msgstr ""
-"[-- Ã»ÓĞ°üº¬´Ë %s/%s ¸½¼ş£¬--]\n"
-"[-- ÇÒÆä·ÃÎÊÀàĞÍ %s ²»±»Ö§³Ö --]\n"
+"[-- æ²¡æœ‰åŒ…å«æ­¤ %s/%s é™„ä»¶ï¼Œ--]\n"
+"[-- ä¸”å…¶è®¿é—®ç±»å‹ %s ä¸è¢«æ”¯æŒ --]\n"
 
 #: libmutt/handler.c:1767
 msgid "Error: multipart/signed has no protocol."
-msgstr "´íÎó£ºmultipart/signed Ã»ÓĞĞ­Òé¡£"
+msgstr "é”™è¯¯ï¼šmultipart/signed æ²¡æœ‰åè®®ã€‚"
 
 #: libmutt/handler.c:1780
 msgid "Error: multipart/encrypted has no protocol parameter!"
-msgstr "´íÎó£ºmultipart/encrypted Ã»ÓĞĞ­Òé²ÎÊı£¡"
+msgstr "é”™è¯¯ï¼šmultipart/encrypted æ²¡æœ‰åè®®å‚æ•°ï¼"
 
 #: libmutt/handler.c:1827
 msgid "Unable to open temporary file!"
-msgstr "ÎŞ·¨´ò¿ªÁÙÊ±ÎÄ¼ş£¡"
+msgstr "æ— æ³•æ‰“å¼€ä¸´æ—¶æ–‡ä»¶ï¼"
 
 #: libmutt/handler.c:1887
 #, c-format
 msgid "[-- %s/%s is unsupported "
-msgstr "[-- %s/%s ²»±»Ö§³Ö "
+msgstr "[-- %s/%s ä¸è¢«æ”¯æŒ "
 
 #: libmutt/handler.c:1892
 #, c-format
 msgid "(use '%s' to view this part)"
-msgstr "(Ê¹ÓÃ¡°%s¡±À´²é¿´ÕâÒ»²¿·Ö)"
+msgstr "(ä½¿ç”¨â€œ%sâ€æ¥æŸ¥çœ‹è¿™ä¸€éƒ¨åˆ†)"
 
 #: libmutt/handler.c:1894
 msgid "(need 'view-attachments' bound to key!)"
-msgstr "(ĞèÒª½«¡°²é¿´¸½¼ş¡±°ó¶¨µ½Ò»¸ö¼üÉÏ£¡)"
+msgstr "(éœ€è¦å°†â€œæŸ¥çœ‹é™„ä»¶â€ç»‘å®šåˆ°ä¸€ä¸ªé”®ä¸Šï¼)"
 
 #: libmutt/imap/auth.c:104
 msgid "No authenticators available"
-msgstr "Ã»ÓĞ¿ÉÓÃµÄÑéÖ¤·½·¨"
+msgstr "æ²¡æœ‰å¯ç”¨çš„éªŒè¯æ–¹æ³•"
 
 #: libmutt/imap/auth_anon.c:39
 msgid "Authenticating (anonymous)..."
-msgstr "ÕıÔÚ½øĞĞÉí·İÑéÖ¤(ÄäÃû)..."
+msgstr "æ­£åœ¨è¿›è¡Œèº«ä»½éªŒè¯(åŒ¿å)..."
 
 #: libmutt/imap/auth_anon.c:69
 msgid "Anonymous authentication failed."
-msgstr "ÄäÃûÉí·İÑéÖ¤Ê§°Ü¡£"
+msgstr "åŒ¿åèº«ä»½éªŒè¯å¤±è´¥ã€‚"
 
 #: libmutt/imap/auth_cram.c:44
 msgid "Authenticating (CRAM-MD5)..."
-msgstr "ÕıÔÚ½øĞĞÉí·İÑéÖ¤(CRAM-MD5)..."
+msgstr "æ­£åœ¨è¿›è¡Œèº«ä»½éªŒè¯(CRAM-MD5)..."
 
 #: libmutt/imap/auth_cram.c:124
 msgid "CRAM-MD5 authentication failed."
-msgstr "CRAM-MD5 Éí·İÑéÖ¤Ê§°Ü¡£"
+msgstr "CRAM-MD5 èº«ä»½éªŒè¯å¤±è´¥ã€‚"
 
 #. now begin login
 #: libmutt/imap/auth_gss.c:104
 msgid "Authenticating (GSSAPI)..."
-msgstr "ÕıÔÚ½øĞĞÉí·İÑéÖ¤(GSSAPI)..."
+msgstr "æ­£åœ¨è¿›è¡Œèº«ä»½éªŒè¯(GSSAPI)..."
 
 #: libmutt/imap/auth_gss.c:267
 msgid "GSSAPI authentication failed."
-msgstr "GSSAPI Éí·İÑéÖ¤Ê§°Ü¡£"
+msgstr "GSSAPI èº«ä»½éªŒè¯å¤±è´¥ã€‚"
 
 #: libmutt/imap/auth_login.c:34
 msgid "LOGIN disabled on this server."
-msgstr "¸Ã·şÎñÆ÷½ûÖ¹µÇÂ¼¡£"
+msgstr "è¯¥æœåŠ¡å™¨ç¦æ­¢ç™»å½•ã€‚"
 
 #: libmutt/imap/auth_login.c:43
 msgid "Logging in..."
-msgstr "ÕıÔÚµÇÂ¼..."
+msgstr "æ­£åœ¨ç™»å½•..."
 
 #: libmutt/imap/auth_login.c:63
 msgid "Login failed."
-msgstr "µÇÂ¼Ê§°Ü¡£"
+msgstr "ç™»å½•å¤±è´¥ã€‚"
 
 #: libmutt/imap/auth_sasl.c:93
 msgid "Authenticating (SASL)..."
-msgstr "ÕıÔÚ½øĞĞÉí·İÑéÖ¤(SASL)..."
+msgstr "æ­£åœ¨è¿›è¡Œèº«ä»½éªŒè¯(SASL)..."
 
 #: libmutt/imap/auth_sasl.c:174
 msgid "SASL authentication failed."
-msgstr "SASL Éí·İÑéÖ¤Ê§°Ü¡£"
+msgstr "SASL èº«ä»½éªŒè¯å¤±è´¥ã€‚"
 
 #: libmutt/imap/browse.c:102
 msgid "Getting namespaces..."
-msgstr "ÕıÔÚÈ¡µÃÃû×Ö¿Õ¼ä..."
+msgstr "æ­£åœ¨å–å¾—åå­—ç©ºé—´..."
 
 #: libmutt/imap/browse.c:111
 msgid "Getting folder list..."
-msgstr "ÕıÔÚÈ¡µÃÎÄ¼ş¼ĞÁĞ±í..."
+msgstr "æ­£åœ¨å–å¾—æ–‡ä»¶å¤¹åˆ—è¡¨..."
 
 # src/mailbox-conf.c:640
 #: libmutt/imap/browse.c:308
 msgid "Create mailbox: "
-msgstr "´´½¨ÓÊ¼şÏä£º"
+msgstr "åˆ›å»ºé‚®ä»¶ç®±ï¼š"
 
 # src/pref-manager.c:441
 #: libmutt/imap/browse.c:313
 msgid "Mailbox must have a name."
-msgstr "ÓÊ¼şÏä±ØĞëÓĞÒ»¸öÃû×Ö¡£"
+msgstr "é‚®ä»¶ç®±å¿…é¡»æœ‰ä¸€ä¸ªåå­—ã€‚"
 
 # src/mailbox-conf.c:671 src/mailbox-conf.c:706
 #: libmutt/imap/browse.c:326
 msgid "Mailbox created."
-msgstr "ÒÑ´´½¨ÓÊ¼şÏä¡£"
+msgstr "å·²åˆ›å»ºé‚®ä»¶ç®±ã€‚"
 
 # src/mailbox-conf.c:238
 #: libmutt/imap/command.c:289
 msgid "Mailbox closed"
-msgstr "ÓÊ¼şÏä±»¹Ø±Õ"
+msgstr "é‚®ä»¶ç®±è¢«å…³é—­"
 
 # src/main-window.c:200
 #. something is wrong because the server reported fewer messages
@@ -896,122 +982,122 @@ msgstr "ÓÊ¼şÏä±»¹Ø±Õ"
 #.
 #: libmutt/imap/command.c:326
 msgid "Fatal error.  Message count is out of sync!"
-msgstr "ÑÏÖØ´íÎó¡£ÏûÏ¢¼¼Êõ²»Í¬²½£¡"
+msgstr "ä¸¥é‡é”™è¯¯ã€‚æ¶ˆæ¯æŠ€æœ¯ä¸åŒæ­¥ï¼"
 
 #: libmutt/imap/imap.c:150
 #, c-format
 msgid "Closing connection to %s..."
-msgstr "ÕıÔÚ¹Ø±Õµ½ %s µÄÁ¬½Ó..."
+msgstr "æ­£åœ¨å…³é—­åˆ° %s çš„è¿æ¥..."
 
 #: libmutt/imap/imap.c:311
 msgid "This IMAP server is ancient. Mutt does not work with it."
-msgstr "Õâ¸ö IMAP ·şÎñÆ÷Ì«¹ÅÀÏÁË¡£Mutt ÎŞ·¨ºÍËüÒ»ÆğÊ¹ÓÃ¡£"
+msgstr "è¿™ä¸ª IMAP æœåŠ¡å™¨å¤ªå¤è€äº†ã€‚Mutt æ— æ³•å’Œå®ƒä¸€èµ·ä½¿ç”¨ã€‚"
 
 #: libmutt/imap/imap.c:397
 msgid "Secure connection with TLS?"
-msgstr "Ê¹ÓÃ TLS À´½øĞĞ°²È«Á¬½Ó£¿"
+msgstr "ä½¿ç”¨ TLS æ¥è¿›è¡Œå®‰å…¨è¿æ¥ï¼Ÿ"
 
 #: libmutt/imap/imap.c:400
 #, c-format
 msgid "Connecting to %s ..."
-msgstr "ÕıÔÚÁ¬½Óµ½ %s ..."
+msgstr "æ­£åœ¨è¿æ¥åˆ° %s ..."
 
 #: libmutt/imap/imap.c:410
 msgid "Could not negotiate TLS connection"
-msgstr "ÎŞ·¨Ğ­ÉÌ TLS Á¬½Ó"
+msgstr "æ— æ³•åå•† TLS è¿æ¥"
 
 # src/main-window.c:133 src/main-window.c:168
 #: libmutt/imap/imap.c:555
 #, c-format
 msgid "Selecting %s..."
-msgstr "ÕıÔÚÑ¡Ôñ %s..."
+msgstr "æ­£åœ¨é€‰æ‹© %s..."
 
-#: libmutt/imap/imap.c:677
+#: libmutt/imap/imap.c:686
 msgid "Error opening mailbox"
-msgstr "´ò¿ªÓÊ¼şÏäÊ±·¢Éú´íÎó"
+msgstr "æ‰“å¼€é‚®ä»¶ç®±æ—¶å‘ç”Ÿé”™è¯¯"
 
 #. STATUS not supported
-#: libmutt/imap/imap.c:730
+#: libmutt/imap/imap.c:739
 msgid "Unable to append to IMAP mailboxes at this server"
-msgstr "ÎŞ·¨×·¼Óµ½Õâ¸ö·şÎñÆ÷ÉÏµÄ IMAP ÓÊ¼şÏä"
+msgstr "æ— æ³•è¿½åŠ åˆ°è¿™ä¸ªæœåŠ¡å™¨ä¸Šçš„ IMAP é‚®ä»¶ç®±"
 
 #. command failed cause folder doesn't exist
-#: libmutt/imap/imap.c:739 libmutt/imap/message.c:657
+#: libmutt/imap/imap.c:748 libmutt/imap/message.c:666
 #, c-format
 msgid "Create %s?"
-msgstr "´´½¨ %s£¿"
+msgstr "åˆ›å»º %sï¼Ÿ"
 
-#: libmutt/imap/imap.c:775
+#: libmutt/imap/imap.c:784
 msgid "Closing connection to IMAP server..."
-msgstr "ÕıÔÚ¹Ø±Õµ½ IMAP ·şÎñÆ÷µÄÁ¬½Ó..."
-
-#: libmutt/imap/imap.c:938
-#, c-format
-msgid "Marking %d messages deleted..."
-msgstr "ÕıÔÚ±ê¼ÇÒªÉ¾³ıµÄ %d ¸öÓÊ¼ş..."
+msgstr "æ­£åœ¨å…³é—­åˆ° IMAP æœåŠ¡å™¨çš„è¿æ¥..."
 
 #: libmutt/imap/imap.c:947
-msgid "Expunge failed"
-msgstr "É¾³ıÊ§°Ü"
+#, c-format
+msgid "Marking %d messages deleted..."
+msgstr "æ­£åœ¨æ ‡è®°è¦åˆ é™¤çš„ %d ä¸ªé‚®ä»¶..."
 
-#: libmutt/imap/imap.c:962
+#: libmutt/imap/imap.c:956
+msgid "Expunge failed"
+msgstr "åˆ é™¤å¤±è´¥"
+
+#: libmutt/imap/imap.c:971
 #, c-format
 msgid "Saving message status flags... [%d/%d]"
-msgstr "ÕıÔÚ±£´æÓÊ¼ş×´Ì¬±êÖ¾... [%d/%d]"
+msgstr "æ­£åœ¨ä¿å­˜é‚®ä»¶çŠ¶æ€æ ‡å¿—... [%d/%d]"
 
-#: libmutt/imap/imap.c:1046
+#: libmutt/imap/imap.c:1058
 msgid "Expunging messages from server..."
-msgstr "ÕıÔÚ´Ó·şÎñÆ÷ÉÏÉ¾³ıÓÊ¼ş..."
+msgstr "æ­£åœ¨ä»æœåŠ¡å™¨ä¸Šåˆ é™¤é‚®ä»¶..."
 
-#: libmutt/imap/imap.c:1085
+#: libmutt/imap/imap.c:1097
 msgid "CLOSE failed"
-msgstr "¹Ø±ÕÊ§°Ü"
+msgstr "å…³é—­å¤±è´¥"
 
-#: libmutt/imap/imap.c:1352
+#: libmutt/imap/imap.c:1364
 #, c-format
 msgid "Subscribing to %s..."
-msgstr "ÕıÔÚ¶©ÔÄ %s..."
+msgstr "æ­£åœ¨è®¢é˜… %s..."
 
-#: libmutt/imap/imap.c:1354
+#: libmutt/imap/imap.c:1366
 #, c-format
 msgid "Unsubscribing to %s..."
-msgstr "ÕıÔÚÍË¶© %s..."
+msgstr "æ­£åœ¨é€€è®¢ %s..."
 
 #. Unable to fetch headers for lower versions
-#: libmutt/imap/message.c:73
+#: libmutt/imap/message.c:78
 msgid "Unable to fetch headers from this IMAP server version."
-msgstr "ÎŞ·¨´Ó¸Ã°æ±¾µÄ IMAP ·şÎñÆ÷ÉÏÈ¡»ØÓÊ¼şÍ·¡£"
+msgstr "æ— æ³•ä»è¯¥ç‰ˆæœ¬çš„ IMAP æœåŠ¡å™¨ä¸Šå–å›é‚®ä»¶å¤´ã€‚"
 
-#: libmutt/imap/message.c:92
+#: libmutt/imap/message.c:97
 #, c-format
 msgid "Fetching message headers... [%d/%d]"
-msgstr "ÕıÔÚÈ¡»ØÓÊ¼şÍ·... [%d/%d]"
+msgstr "æ­£åœ¨å–å›é‚®ä»¶å¤´... [%d/%d]"
 
-#: libmutt/imap/message.c:239
+#: libmutt/imap/message.c:244
 msgid "Fetching message..."
-msgstr "ÕıÔÚÈ¡»ØÓÊ¼ş..."
+msgstr "æ­£åœ¨å–å›é‚®ä»¶..."
 
-#: libmutt/imap/message.c:282
+#: libmutt/imap/message.c:287
 msgid "The message index is incorrect. Try reopening the mailbox."
-msgstr "ÓÊ¼şË÷Òı²»ÕıÈ·¡£ÇëÖØĞÂ´ò¿ªÓÊ¼şÏä¡£"
+msgstr "é‚®ä»¶ç´¢å¼•ä¸æ­£ç¡®ã€‚è¯·é‡æ–°æ‰“å¼€é‚®ä»¶ç®±ã€‚"
 
-#: libmutt/imap/message.c:523
+#: libmutt/imap/message.c:532
 msgid "Uploading message ..."
-msgstr "ÕıÔÚÉÏ´«ÓÊ¼ş..."
+msgstr "æ­£åœ¨ä¸Šä¼ é‚®ä»¶..."
 
-#: libmutt/imap/message.c:633
+#: libmutt/imap/message.c:642
 #, c-format
 msgid "Copying %d messages to %s..."
-msgstr "ÕıÔÚ¸´ÖÆ %d ¸öÓÊ¼şµ½ %s..."
+msgstr "æ­£åœ¨å¤åˆ¶ %d ä¸ªé‚®ä»¶åˆ° %s..."
 
-#: libmutt/imap/message.c:637
+#: libmutt/imap/message.c:646
 #, c-format
 msgid "Copying message %d to %s..."
-msgstr "ÕıÔÚ¸´ÖÆÓÊ¼ş %d µ½ %s..."
+msgstr "æ­£åœ¨å¤åˆ¶é‚®ä»¶ %d åˆ° %s..."
 
 #: libmutt/imap/util.c:239
 msgid "Continue?"
-msgstr "¼ÌĞø£¿"
+msgstr "ç»§ç»­ï¼Ÿ"
 
 # src/mailbox-conf.c:531
 #: libmutt/imap/util.c:245
@@ -1020,31 +1106,32 @@ msgid "%s [%s]\n"
 msgstr "%s [%s]\n"
 
 #: libmutt/mbox.c:134 libmutt/mbox.c:292
+#, c-format
 msgid "Reading %s... %d (%d%%)"
-msgstr "ÕıÔÚ¶ÁÈ¡ %s... %d (%d%%)"
+msgstr "æ­£åœ¨è¯»å– %s... %d (%d%%)"
 
 # src/mailbox-conf.c:681
 #: libmutt/mbox.c:158 libmutt/mbox.c:217
 msgid "Mailbox is corrupt!"
-msgstr "ÓÊ¼şÏäÒÑËğ»µ£¡"
+msgstr "é‚®ä»¶ç®±å·²æŸåï¼"
 
 # src/index-child.c:143
 #: libmutt/mbox.c:666
 msgid "Mailbox was corrupted!"
-msgstr "ÓÊ¼şÏäÒÑËğ»µ£¡"
+msgstr "é‚®ä»¶ç®±å·²æŸåï¼"
 
 #: libmutt/mbox.c:703 libmutt/mbox.c:978
 msgid "Fatal error!  Could not reopen mailbox!"
-msgstr "ÑÏÖØ´íÎó£¡ÎŞ·¨ÖØĞÂ´ò¿ªÓÊ¼şÏä£¡"
+msgstr "ä¸¥é‡é”™è¯¯ï¼æ— æ³•é‡æ–°æ‰“å¼€é‚®ä»¶ç®±ï¼"
 
 # src/index-child.c:176
 #: libmutt/mbox.c:712
 msgid "Unable to lock mailbox!"
-msgstr "ÎŞ·¨Ëø×¡ÓÊ¼şÏä£¡"
+msgstr "æ— æ³•é”ä½é‚®ä»¶ç®±ï¼"
 
 #: libmutt/mbox.c:741
 msgid "Could not create temporary file!"
-msgstr "ÎŞ·¨´´½¨ÁÙÊ±ÎÄ¼ş£¡"
+msgstr "æ— æ³•åˆ›å»ºä¸´æ—¶æ–‡ä»¶ï¼"
 
 #. this means ctx->changed or ctx->deleted was set, but no
 #. * messages were found to be changed or deleted.  This should
@@ -1052,1026 +1139,1172 @@ msgstr "ÎŞ·¨´´½¨ÁÙÊ±ÎÄ¼ş£¡"
 #.
 #: libmutt/mbox.c:758
 msgid "sync: mbox modified, but no modified messages! (report this bug)"
-msgstr "Í¬²½£ºÓÊ¼şÏäÒÑĞŞ¸Ä£¬µ«ÊÇÃ»ÓĞĞŞ¸ÄµÄÓÊ¼ş£¡(±¨¸æÕâ¸öÈí¼şÈ±Ïİ)"
+msgstr "åŒæ­¥ï¼šé‚®ä»¶ç®±å·²ä¿®æ”¹ï¼Œä½†æ˜¯æ²¡æœ‰ä¿®æ”¹çš„é‚®ä»¶ï¼(æŠ¥å‘Šè¿™ä¸ªè½¯ä»¶ç¼ºé™·)"
 
 #: libmutt/mbox.c:788
+#, c-format
 msgid "Writing messages... %d (%d%%)"
-msgstr "ÕıÔÚĞ´ÓÊ¼ş... %d (%d%%)"
+msgstr "æ­£åœ¨å†™é‚®ä»¶... %d (%d%%)"
 
 #: libmutt/mbox.c:962
 #, c-format
 msgid "Write failed!  Saved partial mailbox to %s"
-msgstr "Ğ´´íÎó£¡ÒÑ½«²¿·ÖÓÊ¼şÏä±£´æµ½ %s"
+msgstr "å†™é”™è¯¯ï¼å·²å°†éƒ¨åˆ†é‚®ä»¶ç®±ä¿å­˜åˆ° %s"
 
 # src/main-window.c:171
 #: libmutt/mbox.c:1028
 msgid "Could not reopen mailbox!"
-msgstr "ÎŞ·¨ÖØĞÂ´ò¿ªÓÊ¼şÏä£¡"
+msgstr "æ— æ³•é‡æ–°æ‰“å¼€é‚®ä»¶ç®±ï¼"
 
 #: libmutt/mbox.c:1066
 msgid "Reopening mailbox..."
-msgstr "ÕıÔÚÖØĞÂ´ò¿ªÓÊ¼şÏä..."
+msgstr "æ­£åœ¨é‡æ–°æ‰“å¼€é‚®ä»¶ç®±..."
 
 #: libmutt/mutt_socket.c:90 libmutt/mutt_socket.c:146
 #, c-format
 msgid "Connection to %s closed"
-msgstr "ÒÑ¹Ø±Õµ½ %s µÄÁ¬½Ó"
+msgstr "å·²å…³é—­åˆ° %s çš„è¿æ¥"
 
 #: libmutt/mutt_socket.c:256
 msgid "SSL is unavailable."
-msgstr "SSL ²»¿ÉÓÃ¡£"
+msgstr "SSL ä¸å¯ç”¨ã€‚"
 
 #: libmutt/mutt_socket.c:287
 msgid "Preconnect command failed."
-msgstr "Ô¤´ò¿ªÃüÁîÊ§°Ü¡£"
+msgstr "é¢„æ‰“å¼€å‘½ä»¤å¤±è´¥ã€‚"
 
 #: libmutt/mutt_socket.c:358 libmutt/mutt_socket.c:372
 #, c-format
 msgid "Error talking to %s (%s)"
-msgstr "ºÍ %s (%s)Ğ­ÉÌÊ±·¢Éú´íÎó"
+msgstr "å’Œ %s (%s)åå•†æ—¶å‘ç”Ÿé”™è¯¯"
 
 #: libmutt/mutt_socket.c:406 libmutt/mutt_socket.c:447
 #, c-format
 msgid "Looking up %s..."
-msgstr "ÕıÔÚ²éÕÒ %s..."
+msgstr "æ­£åœ¨æŸ¥æ‰¾ %s..."
 
 #: libmutt/mutt_socket.c:411 libmutt/mutt_socket.c:451
 #, c-format
 msgid "Could not find the host \"%s\""
-msgstr "´íÎó£ºÎŞ·¨ÕÒµ½Ö÷»ú¡°%s¡±"
+msgstr "é”™è¯¯ï¼šæ— æ³•æ‰¾åˆ°ä¸»æœºâ€œ%sâ€"
 
 #: libmutt/mutt_socket.c:415 libmutt/mutt_socket.c:456
 #, c-format
 msgid "Connecting to %s..."
-msgstr "ÕıÔÚÁ¬½Óµ½ %s"
+msgstr "æ­£åœ¨è¿æ¥åˆ° %s"
 
 #: libmutt/mutt_socket.c:479
 #, c-format
 msgid "Could not connect to %s (%s)."
-msgstr "ÎŞ·¨Á¬½Óµ½ %s (%s)¡£"
+msgstr "æ— æ³•è¿æ¥åˆ° %s (%s)ã€‚"
 
 #: libmutt/mutt_socket.c:480
 msgid "unknown error"
-msgstr "Î´Öª´íÎó"
+msgstr "æœªçŸ¥é”™è¯¯"
 
 #: libmutt/mutt_ssl.c:172
 msgid "Failed to find enough entropy on your system"
-msgstr "ÎŞ·¨ÔÚÏµÍ³ÖĞÕÒµ½×ã¹»µÄìØ"
+msgstr "æ— æ³•åœ¨ç³»ç»Ÿä¸­æ‰¾åˆ°è¶³å¤Ÿçš„ç†µ"
 
 #: libmutt/mutt_ssl.c:196
 #, c-format
 msgid "Filling entropy pool: %s...\n"
-msgstr "Ìî³äìØ³Ø£º%s...\n"
+msgstr "å¡«å……ç†µæ± ï¼š%s...\n"
 
 #: libmutt/mutt_ssl.c:204
 #, c-format
 msgid "%s has insecure permissions!"
-msgstr "%s µÄÈ¨ÏŞ²»°²È«£¡"
+msgstr "%s çš„æƒé™ä¸å®‰å…¨ï¼"
 
 #: libmutt/mutt_ssl.c:223
 msgid "SSL disabled due the lack of entropy"
-msgstr "ÒòÎªÈ±ÉÙìØĞÅÏ¢£¬ÒÑ½ûÓÃ SSL"
+msgstr "å› ä¸ºç¼ºå°‘ç†µä¿¡æ¯ï¼Œå·²ç¦ç”¨ SSL"
 
 #: libmutt/mutt_ssl.c:389
 msgid "Unable to get certificate from peer"
-msgstr "ÎŞ·¨´Ó¶Ô¶Ë»ñµÃÖ¤Êé"
+msgstr "æ— æ³•ä»å¯¹ç«¯è·å¾—è¯ä¹¦"
 
-#: libmutt/mutt_ssl.c:398 libmutt/mutt_ssl.c:401
+#: libmutt/mutt_ssl.c:397
 #, c-format
 msgid "SSL connection using %s (%s)"
-msgstr "SSL Á¬½ÓÊ¹ÓÃ %s (%s)"
+msgstr "SSL è¿æ¥ä½¿ç”¨ %s (%s)"
 
-#: libmutt/mutt_ssl.c:431
+#: libmutt/mutt_ssl.c:428
 msgid "Unknown"
-msgstr "Î´Öª"
+msgstr "æœªçŸ¥"
 
-#: libmutt/mutt_ssl.c:456
+#: libmutt/mutt_ssl.c:453
 msgid "[unable to calculate]"
-msgstr "[ÎŞ·¨¼ÆËã]"
+msgstr "[æ— æ³•è®¡ç®—]"
 
-#: libmutt/mutt_ssl.c:474
+#: libmutt/mutt_ssl.c:471
 msgid "[invalid date]"
-msgstr "[ÎŞĞ§µÄÈÕÆÚ]"
+msgstr "[æ— æ•ˆçš„æ—¥æœŸ]"
 
-#: libmutt/mutt_ssl.c:549
+#: libmutt/mutt_ssl.c:546
 msgid "Server certificate is not yet valid"
-msgstr "·şÎñÆ÷Ö¤Êé»¹Î´ÉúĞ§"
+msgstr "æœåŠ¡å™¨è¯ä¹¦è¿˜æœªç”Ÿæ•ˆ"
 
-#: libmutt/mutt_ssl.c:556
+#: libmutt/mutt_ssl.c:553
 msgid "Server certificate has expired"
-msgstr "·şÎñÆ÷Ö¤ÊéÒÑ¹ıÆÚ"
+msgstr "æœåŠ¡å™¨è¯ä¹¦å·²è¿‡æœŸ"
 
-#: libmutt/mutt_ssl.c:627
+#: libmutt/mutt_ssl.c:624
 msgid "This certificate accepted but not verified !!!"
-msgstr "½ÓÊÜÁË¸ÃÖ¤Êéµ«ÎŞ·¨È·ÈÏ!!!"
+msgstr "æ¥å—äº†è¯¥è¯ä¹¦ä½†æ— æ³•ç¡®è®¤!!!"
 
-#: libmutt/mutt_ssl.c:638
+#: libmutt/mutt_ssl.c:635
 msgid "This certificate belongs to:"
-msgstr "¸ÃÖ¤ÊéÊôÓÚ£º"
+msgstr "è¯¥è¯ä¹¦å±äºï¼š"
 
-#: libmutt/mutt_ssl.c:648
+#: libmutt/mutt_ssl.c:645
 msgid "This certificate was issued by:"
-msgstr "¸ÃÖ¤ÊéµÄÇ©·¢ÕßÊÇ£º"
+msgstr "è¯¥è¯ä¹¦çš„ç­¾å‘è€…æ˜¯ï¼š"
 
-#: libmutt/mutt_ssl.c:658
+#: libmutt/mutt_ssl.c:655
 msgid "This certificate is valid"
-msgstr "¸ÃÖ¤ÊéÓĞĞ§"
+msgstr "è¯¥è¯ä¹¦æœ‰æ•ˆ"
 
-#: libmutt/mutt_ssl.c:659
+#: libmutt/mutt_ssl.c:656
 #, c-format
 msgid "   from %s"
-msgstr "   ´Ó %s"
+msgstr "   ä» %s"
 
-#: libmutt/mutt_ssl.c:661
+#: libmutt/mutt_ssl.c:658
 #, c-format
 msgid "     to %s"
-msgstr "     µ½ %s"
+msgstr "     åˆ° %s"
 
-#: libmutt/mutt_ssl.c:667
+#: libmutt/mutt_ssl.c:664
 #, c-format
 msgid "Fingerprint: %s"
-msgstr "Ö¸ÎÆ£º%s"
+msgstr "æŒ‡çº¹ï¼š%s"
+
+#: libmutt/mutt_ssl.c:666
+msgid "SSL Certificate check"
+msgstr "SSL è¯ä¹¦æ£€æŸ¥"
 
 #: libmutt/mutt_ssl.c:669
-msgid "SSL Certificate check"
-msgstr "SSL Ö¤Êé¼ì²é"
-
-#: libmutt/mutt_ssl.c:672
 msgid "(r)eject, accept (o)nce, (a)ccept always"
-msgstr "(r)¾Ü¾ø£¬(o)½ÓÊÜÒ»´Î£¬(a)Ò»Ö±½ÓÊÜ"
+msgstr "(r)æ‹’ç»ï¼Œ(o)æ¥å—ä¸€æ¬¡ï¼Œ(a)ä¸€ç›´æ¥å—"
 
-#: libmutt/mutt_ssl.c:673
+#: libmutt/mutt_ssl.c:670
 msgid "roa"
 msgstr "roa"
 
-#: libmutt/mutt_ssl.c:677
+#: libmutt/mutt_ssl.c:674
 msgid "(r)eject, accept (o)nce"
-msgstr "(r)¾Ü¾ø£¬(o)½ÓÊÜÒ»´Î"
+msgstr "(r)æ‹’ç»ï¼Œ(o)æ¥å—ä¸€æ¬¡"
 
 # src/balsa-index.c:231
-#: libmutt/mutt_ssl.c:678
+#: libmutt/mutt_ssl.c:675
 msgid "ro"
 msgstr "ro"
 
-#: libmutt/mutt_ssl.c:682
+#: libmutt/mutt_ssl.c:679
 msgid "Exit  "
-msgstr "ÍË³ö"
+msgstr "é€€å‡º"
 
-#: libmutt/mutt_ssl.c:684
+#: libmutt/mutt_ssl.c:681
 msgid "Help"
-msgstr "°ïÖú"
+msgstr "å¸®åŠ©"
 
-#: libmutt/mutt_ssl.c:708
+#: libmutt/mutt_ssl.c:705
 msgid "Warning: Couldn't save certificate"
-msgstr "¾¯¸æ£ºÎŞ·¨±£´æÖ¤Êé"
+msgstr "è­¦å‘Šï¼šæ— æ³•ä¿å­˜è¯ä¹¦"
 
-#: libmutt/mutt_ssl.c:713
+#: libmutt/mutt_ssl.c:710
 msgid "Certificate saved"
-msgstr "Ö¤ÊéÒÑ±£´æ"
+msgstr "è¯ä¹¦å·²ä¿å­˜"
 
 #: libmutt/mutt_tunnel.c:73
 #, c-format
 msgid "Connecting with \"%s\"..."
-msgstr "ÕıÔÚÁ¬½Óµ½¡°%s¡±..."
+msgstr "æ­£åœ¨è¿æ¥åˆ°â€œ%sâ€..."
 
 #: libmutt/mutt_tunnel.c:150 libmutt/mutt_tunnel.c:166
 #, c-format
 msgid "Tunnel error talking to %s: %s"
-msgstr "Ğ­ÉÌ %s Ê±·¢ÉúËíµÀ´íÎó£º%s"
+msgstr "åå•† %s æ—¶å‘ç”Ÿéš§é“é”™è¯¯ï¼š%s"
 
 #: libmutt/mx.c:119
 #, c-format
 msgid "Lock count exceeded, remove lock for %s?"
-msgstr "³¬¹ıËø¼ÆÊı£¬É¾³ı %s µÄËø£¿"
+msgstr "è¶…è¿‡é”è®¡æ•°ï¼Œåˆ é™¤ %s çš„é”ï¼Ÿ"
 
 #: libmutt/mx.c:131
 #, c-format
 msgid "Can't dotlock %s.\n"
-msgstr "ÎŞ·¨Ëø¶¨ %s¡£\n"
+msgstr "æ— æ³•é”å®š %sã€‚\n"
 
 #: libmutt/mx.c:189
 msgid "Timeout exceeded while attempting fcntl lock!"
-msgstr "ÔÚÊÔÍ¼½øĞĞ fcntl ËøµÄÊ±ºò³¬Ê±£¡"
+msgstr "åœ¨è¯•å›¾è¿›è¡Œ fcntl é”çš„æ—¶å€™è¶…æ—¶ï¼"
 
 #: libmutt/mx.c:195
 #, c-format
 msgid "Waiting for fcntl lock... %d"
-msgstr "µÈ´ı fcntl Ëø... %d"
+msgstr "ç­‰å¾… fcntl é”... %d"
 
 #: libmutt/mx.c:223
 msgid "Timeout exceeded while attempting flock lock!"
-msgstr "ÔÚÊÔÍ¼½øĞĞ flock ËøµÄÊ±ºò³¬Ê±£¡"
+msgstr "åœ¨è¯•å›¾è¿›è¡Œ flock é”çš„æ—¶å€™è¶…æ—¶ï¼"
 
 #: libmutt/mx.c:230
 #, c-format
 msgid "Waiting for flock attempt... %d"
-msgstr "µÈ´ı flock Ëø... %d"
+msgstr "ç­‰å¾… flock é”... %d"
 
 # src/mailbox-conf.c:640
 #: libmutt/mx.c:500 libmutt/mx.c:646
 #, c-format
 msgid "%s is not a mailbox."
-msgstr "%s ²»ÊÇÓÊ¼şÏä¡£"
+msgstr "%s ä¸æ˜¯é‚®ä»¶ç®±ã€‚"
 
 #: libmutt/mx.c:583
 #, c-format
 msgid "Couldn't lock %s\n"
-msgstr "ÎŞ·¨Ëø×¡ %s\n"
+msgstr "æ— æ³•é”ä½ %s\n"
 
 #: libmutt/mx.c:671
 #, c-format
 msgid "Reading %s..."
-msgstr "ÕıÔÚ¶ÁÈ¡ %s..."
+msgstr "æ­£åœ¨è¯»å– %s..."
 
 #: libmutt/mx.c:760
 #, c-format
 msgid "Writing %s..."
-msgstr "ÕıÔÚĞ´ %s..."
+msgstr "æ­£åœ¨å†™ %s..."
 
 #: libmutt/mx.c:787
 #, c-format
 msgid "Could not synchronize mailbox %s!"
-msgstr "ÎŞ·¨Í¬²½ÓÊ¼şÏä %s£¡"
+msgstr "æ— æ³•åŒæ­¥é‚®ä»¶ç®± %sï¼"
 
 #: libmutt/mx.c:889
 #, c-format
 msgid "Moving read messages to %s..."
-msgstr "ÕıÔÚ°ÑÒÑ¶ÁÓÊ¼şÒÆµ½ %s..."
+msgstr "æ­£åœ¨æŠŠå·²è¯»é‚®ä»¶ç§»åˆ° %s..."
 
 # src/pref-manager.c:441
 #: libmutt/mx.c:947 libmutt/mx.c:1110
 msgid "Mailbox is unchanged."
-msgstr "ÓÊ¼şÏäÃ»ÓĞ¸Ä¶¯¡£"
+msgstr "é‚®ä»¶ç®±æ²¡æœ‰æ”¹åŠ¨ã€‚"
 
 #: libmutt/mx.c:983
 #, c-format
 msgid "%d kept, %d moved, %d deleted."
-msgstr "±£Áô %d£¬ÒÆ¶¯ %d£¬É¾³ı %d¡£"
+msgstr "ä¿ç•™ %dï¼Œç§»åŠ¨ %dï¼Œåˆ é™¤ %dã€‚"
 
 #: libmutt/mx.c:986 libmutt/mx.c:1155
 #, c-format
 msgid "%d kept, %d deleted."
-msgstr "±£Áô %d£¬É¾³ı %d."
+msgstr "ä¿ç•™ %dï¼Œåˆ é™¤ %d."
 
 #: libmutt/mx.c:1094
 #, c-format
 msgid " Press '%s' to toggle write"
-msgstr " °´¡°%s¡±À´µ÷ÕûĞ´"
+msgstr " æŒ‰â€œ%sâ€æ¥è°ƒæ•´å†™"
 
 #: libmutt/mx.c:1097
 msgid "Use 'toggle-write' to re-enable write!"
-msgstr "Ê¹ÓÃ¡°ÇĞ»»Ğ´¡±À´ÔÊĞíĞ´£¡"
+msgstr "ä½¿ç”¨â€œåˆ‡æ¢å†™â€æ¥å…è®¸å†™ï¼"
 
 #: libmutt/mx.c:1099
 #, c-format
 msgid "Mailbox is marked unwritable. %s"
-msgstr "ÓÊ¼şÏä±ê¼ÇÎª²»¿É¶Á¡£%s"
+msgstr "é‚®ä»¶ç®±æ ‡è®°ä¸ºä¸å¯è¯»ã€‚%s"
 
 #: libmutt/mx.c:1104
 msgid "Mailbox is read-only."
-msgstr "ÓÊ¼şÏäÊÇÖ»¶ÁµÄ¡£"
+msgstr "é‚®ä»¶ç®±æ˜¯åªè¯»çš„ã€‚"
 
 # src/main-window.c:139
 #: libmutt/mx.c:1121
 #, c-format
 msgid "Purge %d deleted message?"
-msgstr "Çå³ı %d ¸öÒÑÉ¾³ıµÄÓÊ¼ş£¿"
+msgstr "æ¸…é™¤ %d ä¸ªå·²åˆ é™¤çš„é‚®ä»¶ï¼Ÿ"
 
 # src/main-window.c:139
 #: libmutt/mx.c:1121
 #, c-format
 msgid "Purge %d deleted messages?"
-msgstr "Çå³ı %d ¸öÒÑÉ¾³ıµÄÓÊ¼ş£¿"
+msgstr "æ¸…é™¤ %d ä¸ªå·²åˆ é™¤çš„é‚®ä»¶ï¼Ÿ"
 
 #: libmutt/mx.c:1152
 #, c-format
 msgid "%d kept."
-msgstr "±£Áô %d¡£"
+msgstr "ä¿ç•™ %dã€‚"
 
 # src/main-window.c:139
 #: libmutt/mx.c:1432
 msgid "Can't write message"
-msgstr "ÎŞ·¨Ğ´ÓÊ¼ş"
+msgstr "æ— æ³•å†™é‚®ä»¶"
 
-#: src/address-book-config.c:104
+#: src/address-book-config.c:122
 msgid "Address Book Configuration"
-msgstr "µØÖ·²¾ÅäÖÃ"
+msgstr "åœ°å€ç°¿é…ç½®"
 
 # src/mailbox-conf.c:290 src/mailbox-conf.c:898
-#: src/address-book-config.c:139 src/folder-conf.c:159 src/folder-conf.c:477
-#: src/mailbox-conf.c:390
+#: src/address-book-config.c:151 src/folder-conf.c:170 src/folder-conf.c:480
+#: src/mailbox-conf.c:399
 msgid "Update"
-msgstr "¸üĞÂ"
+msgstr "æ›´æ–°"
 
-#: src/address-book-config.c:284
+#: src/address-book-config.c:329
 msgid "New Address Book type:"
-msgstr "ĞÂµÄµØÖ·²¾ÀàĞÍ£º"
+msgstr "æ–°çš„åœ°å€ç°¿ç±»å‹ï¼š"
 
-#: src/address-book-config.c:294
+#: src/address-book-config.c:338
 msgid "VCard Address Book (GnomeCard)"
-msgstr "VCard µØÖ·²¾ (GnomeCard)"
+msgstr "VCard åœ°å€ç°¿ (GnomeCard)"
 
-#: src/address-book-config.c:308
+#: src/address-book-config.c:352
+msgid "External query (a program)"
+msgstr ""
+
+#: src/address-book-config.c:365
 msgid "LDIF Address Book"
-msgstr "LDIF µØÖ·²¾"
+msgstr "LDIF åœ°å€ç°¿"
 
-#: src/address-book-config.c:324
+#: src/address-book-config.c:381
 msgid "LDAP Address Book"
-msgstr "LDAP µØÖ·²¾"
+msgstr "LDAP åœ°å€ç°¿"
 
-#: src/address-book-config.c:333
+#: src/address-book-config.c:390
 msgid "Balsa is not compiled with LDAP support"
-msgstr "Balsa Ã»ÓĞ±àÒë½ø LDAP Ö§³Ö"
+msgstr "Balsa æ²¡æœ‰ç¼–è¯‘è¿› LDAP æ”¯æŒ"
 
 #. mailbox name
-#: src/address-book-config.c:357 src/address-book-config.c:400
-#: src/address-book-config.c:455
+#: src/address-book-config.c:415 src/address-book-config.c:461
+#: src/address-book-config.c:521 src/address-book-config.c:580
 msgid "_Address Book Name"
-msgstr "µØÖ·²¾Ãû(_A)"
+msgstr "åœ°å€ç°¿å(_A)"
 
 # src/filter-edit-dialog.c:456
-#: src/address-book-config.c:362 src/address-book-config.c:406
+#: src/address-book-config.c:420 src/address-book-config.c:527
 msgid "File name"
-msgstr "ÎÄ¼şÃû"
+msgstr "æ–‡ä»¶å"
 
-#: src/address-book-config.c:369 src/address-book-config.c:413
-msgid "Select path for address book"
-msgstr "Ñ¡ÔñµØÖ·²¾Â·¾¶"
+#: src/address-book-config.c:427
+msgid "Select path for VCARD address book"
+msgstr "é€‰æ‹© VCARD åœ°å€ç°¿è·¯å¾„"
 
-#: src/address-book-config.c:374 src/address-book-config.c:418
-#: src/address-book-config.c:471
+#: src/address-book-config.c:432 src/address-book-config.c:489
+#: src/address-book-config.c:539 src/address-book-config.c:596
 msgid "_Expand aliases as you type"
-msgstr "ÔÚÊäÈëµÄÊ±ºòÕ¹¿ª±ğÃû(_E)"
+msgstr "åœ¨è¾“å…¥çš„æ—¶å€™å±•å¼€åˆ«å(_E)"
+
+#: src/address-book-config.c:466
+msgid "Load program location"
+msgstr "è½½å…¥ç¨‹åºä½ç½®"
+
+#: src/address-book-config.c:471
+msgid "Save program location"
+msgstr "ä¿å­˜ç¨‹åºä½ç½®"
+
+#: src/address-book-config.c:478
+msgid "Select load program for address book"
+msgstr "é€‰æ‹©åœ°å€ç°¿è½½å…¥ç¨‹åº"
+
+#: src/address-book-config.c:484
+msgid "Select save program for address book"
+msgstr "é€‰æ‹©åœ°å€ç°¿ä¿å­˜ç¨‹åº"
+
+#: src/address-book-config.c:534
+msgid "Select path for LDIF address book"
+msgstr "é€‰æ‹© LDIF åœ°å€ç°¿è·¯å¾„"
 
 # src/balsa-init.c:247 src/pref-manager.c:367
-#: src/address-book-config.c:460
+#: src/address-book-config.c:585
 msgid "_Host Name"
-msgstr "Ö÷»úÃû(_H)"
+msgstr "ä¸»æœºå(_H)"
 
-#: src/address-book-config.c:465
+#: src/address-book-config.c:590
 msgid "_Base Domain Name"
-msgstr "»ùÓòÃû(_B)"
+msgstr "åŸºåŸŸå(_B)"
 
 # src/filter-edit-dialog.c:380 src/mailbox-conf.c:281 src/mailbox-conf.c:904
 # src/pref-manager.c:461
-#: src/address-book-config.c:510 src/filter-edit-dialog.c:387
-#: src/mailbox-conf.c:379 src/pref-manager.c:1271 src/pref-manager.c:2183
+#: src/address-book-config.c:652 src/filter-edit-callbacks.c:710
+#: src/mailbox-conf.c:388 src/pref-manager.c:1352 src/pref-manager.c:2328
 msgid "Add"
-msgstr "Ìí¼Ó"
+msgstr "æ·»åŠ "
 
-#: src/address-book-config.c:560 src/address-book-config.c:586
+#: src/address-book-config.c:704 src/address-book-config.c:730
 #, c-format
 msgid ""
 "The address book file path '%s' is not correct.\n"
 "Do you want to correct the file name?"
 msgstr ""
-"µØÖ·²¾ÎÄ¼şÂ·¾¶¡°%s¡±²»ÕıÈ·¡£\n"
-"ÄúÒª¸üÕıÎÄ¼şÃûÂğ£¿"
+"åœ°å€ç°¿æ–‡ä»¶è·¯å¾„â€œ%sâ€ä¸æ­£ç¡®ã€‚\n"
+"æ‚¨è¦æ›´æ­£æ–‡ä»¶åå—ï¼Ÿ"
 
 # src/filter-edit-dialog.c:101
-#: src/address-book.c:161 src/filter-edit-dialog.c:133
+#: src/address-book.c:161 src/filter-edit-dialog.c:186
+#: src/filter-export-dialog.c:53 src/filter-run-dialog.c:229
+#: src/filter-run-dialog.c:230
 msgid "Name"
-msgstr "Ãû×Ö"
+msgstr "åå­—"
 
 # src/balsa-init.c:261 src/pref-manager.c:377
 #: src/address-book.c:161
 msgid "E-Mail Address"
-msgstr "ÓÊ¼şµØÖ·"
+msgstr "é‚®ä»¶åœ°å€"
 
 #: src/address-book.c:164
 msgid "Address Book"
-msgstr "µØÖ·²¾"
+msgstr "åœ°å€ç°¿"
 
 # src/filter-edit-dialog.c:536
 #. Entry widget for finding an address
 #: src/address-book.c:243
 msgid "Search for Name:"
-msgstr "ËÑË÷Ãû×Ö£º"
+msgstr "æœç´¢åå­—ï¼š"
 
 # src/sendmsg-window.c:71
 #: src/address-book.c:311
 msgid "Send-To"
-msgstr "·¢ÖÁ"
+msgstr "å‘è‡³"
 
 #: src/address-book.c:330
 msgid "Run GnomeCard"
-msgstr "ÔËĞĞ GnomeCard"
+msgstr "è¿è¡Œ GnomeCard"
 
 #: src/address-book.c:338
 msgid "Re-Import"
-msgstr "ÖØĞÂµ¼Èë"
+msgstr "é‡æ–°å¯¼å…¥"
 
 #. mode switching stuff
 #: src/address-book.c:347
 msgid "Treat multiple addresses as:"
-msgstr "¶Ô´ı¶à¸öµØÖ·£º"
+msgstr "å¯¹å¾…å¤šä¸ªåœ°å€ï¼š"
 
 #: src/address-book.c:351
 msgid "alternative addresses for the same person"
-msgstr "Í¬Ò»¸öÈËµÄÆäËüµØÖ·"
+msgstr "åŒä¸€ä¸ªäººçš„å…¶å®ƒåœ°å€"
 
 #: src/address-book.c:356
 msgid "a distribution list"
-msgstr "·Ö·¢ÁĞ±í"
+msgstr "åˆ†å‘åˆ—è¡¨"
 
-#: src/balsa-app.c:68
+#: src/balsa-app.c:71
 #, c-format
 msgid ""
 "Opening remote mailbox %s.\n"
 "The password for %s@%s:"
 msgstr ""
-"ÕıÔÚ´ò¿ªÔ¶³ÌÓÊ¼şÏä %s¡£\n"
-"%s@%s µÄ¿ÚÁîÊÇ£º"
+"æ­£åœ¨æ‰“å¼€è¿œç¨‹é‚®ä»¶ç®± %sã€‚\n"
+"%s@%s çš„å£ä»¤æ˜¯ï¼š"
 
 # src/index-child.c:143
-#: src/balsa-app.c:72
+#: src/balsa-app.c:76
 #, c-format
 msgid "Mailbox password for %s@%s:"
-msgstr "%s@%s µÄÓÊ¼şÏä¿ÚÁîÊÇ£º"
+msgstr "%s@%s çš„é‚®ä»¶ç®±å£ä»¤æ˜¯ï¼š"
 
 # src/balsa-index.c:231
 #. FIXME:
-#: src/balsa-index.c:297
+#: src/balsa-index.c:311
 msgid "From"
-msgstr "·¢¼şÈË"
+msgstr "å‘ä»¶äºº"
 
 # src/balsa-index.c:232 src/filter-edit-dialog.c:315
-#: src/balsa-index.c:298 src/filter-edit-dialog.c:334
+#: src/balsa-index.c:312 src/filter-edit-callbacks.c:883
+#: src/main-window.c:2627
 msgid "Subject"
-msgstr "Ö÷Ìâ"
+msgstr "ä¸»é¢˜"
 
 # src/balsa-index.c:233
-#: src/balsa-index.c:299
+#: src/balsa-index.c:313
 msgid "Date"
-msgstr "Ê±¼ä"
+msgstr "æ—¶é—´"
 
-#: src/balsa-index.c:300
+#: src/balsa-index.c:314
 msgid "Size"
-msgstr "´óĞ¡"
+msgstr "å¤§å°"
 
-#: src/balsa-index.c:610
+#: src/balsa-index.c:634
 #, c-format
 msgid "Opening mailbox %s. Please wait..."
-msgstr "ÕıÔÚ´ò¿ªÓÊ¼şÏä %s¡£ÇëµÈ´ı..."
+msgstr "æ­£åœ¨æ‰“å¼€é‚®ä»¶ç®± %sã€‚è¯·ç­‰å¾…..."
 
 # src/balsa-message.c:526 src/filter-edit-dialog.c:291
 # src/sendmsg-window.c:315
-#: src/balsa-index.c:642
+#: src/balsa-index.c:666
 msgid "To"
-msgstr "ÊÕ¼şÈË"
+msgstr "æ”¶ä»¶äºº"
 
 # src/main-window.c:139
-#: src/balsa-index.c:1892
+#: src/balsa-index.c:2041
 msgid "Cannot access the message's body\n"
-msgstr "ÎŞ·¨·ÃÎÊÓÊ¼şµÄÄÚÈİ\n"
+msgstr "æ— æ³•è®¿é—®é‚®ä»¶çš„å†…å®¹\n"
 
-#: src/balsa-index.c:1920
+#: src/balsa-index.c:2069
 msgid "View Source"
-msgstr "²é¿´Ô´"
+msgstr "æŸ¥çœ‹æº"
 
 # src/main-window.c:214
-#: src/balsa-index.c:1922
+#: src/balsa-index.c:2071
 msgid "Reply..."
-msgstr "»Ø¸´..."
+msgstr "å›å¤..."
 
 # src/main-window.c:215
-#: src/balsa-index.c:1924
+#: src/balsa-index.c:2073
 msgid "Reply To All..."
-msgstr "È«²¿»Ø¸´..."
+msgstr "å…¨éƒ¨å›å¤..."
 
 # src/main-window.c:215
-#: src/balsa-index.c:1926
+#: src/balsa-index.c:2075
 msgid "Reply To Group..."
-msgstr "»Ø¸´µ½×é..."
+msgstr "å›å¤åˆ°ç»„..."
 
 # src/main-window.c:216
-#: src/balsa-index.c:1928
+#: src/balsa-index.c:2077
 msgid "Forward Attached..."
-msgstr "×÷Îª¸½¼ş×ª·¢..."
+msgstr "ä½œä¸ºé™„ä»¶è½¬å‘..."
 
 # src/main-window.c:216
-#: src/balsa-index.c:1930
+#: src/balsa-index.c:2079
 msgid "Forward Inline..."
-msgstr "Ö±½Ó×ª·¢..."
+msgstr "ç›´æ¥è½¬å‘..."
 
-#: src/balsa-index.c:1932
+#: src/balsa-index.c:2081
 msgid "Store Address..."
-msgstr "±£´æµØÖ·..."
+msgstr "ä¿å­˜åœ°å€..."
 
 # src/index-child.c:457
-#: src/balsa-index.c:1954
+#: src/balsa-index.c:2118
 msgid "Undelete"
-msgstr "È¡ÏûÉ¾³ı"
+msgstr "å–æ¶ˆåˆ é™¤"
 
-#: src/balsa-index.c:1958
+#: src/balsa-index.c:2123
 msgid "Move To Trash"
-msgstr "ÒÆµ½ÒÑÉ¾³ıÓÊ¼ş"
+msgstr "ç§»åˆ°å·²åˆ é™¤é‚®ä»¶"
 
-#: src/balsa-index.c:1962
+#: src/balsa-index.c:2127
 msgid "Toggle"
-msgstr "ÇĞ»»"
+msgstr "åˆ‡æ¢"
 
-#: src/balsa-index.c:1965 src/main-window.c:430
+#: src/balsa-index.c:2130 src/filter-edit-callbacks.c:637
+#: src/main-window.c:440
 msgid "Flagged"
-msgstr "±ê¼ÇµÄ"
+msgstr "æ ‡è®°çš„"
 
 # src/index-child.c:422
-#: src/balsa-index.c:1968 src/balsa-mblist.c:475
+#: src/balsa-index.c:2133 src/balsa-mblist.c:478
 msgid "Unread"
-msgstr "Î´¶Á"
+msgstr "æœªè¯»"
 
 # src/filter-edit-dialog.c:391 src/sendmsg-window.c:145
-#: src/balsa-index.c:1982
+#: src/balsa-index.c:2147
 msgid "Move"
-msgstr "ÒÆ¶¯"
+msgstr "ç§»åŠ¨"
 
 # src/mailbox-conf.c:861
 #. Create standard entry
-#: src/balsa-index.c:1993 src/message-window.c:702
+#: src/balsa-index.c:2158 src/message-window.c:702
 msgid "Folder"
-msgstr "ÎÄ¼ş¼Ğ"
+msgstr "æ–‡ä»¶å¤¹"
 
 # src/mailbox-conf.c:939
-#: src/balsa-mblist.c:475 src/mailbox-conf.c:1005
+#: src/balsa-mblist.c:478 src/mailbox-conf.c:1005
 msgid "Mailbox"
-msgstr "ÓÊ¼şÏä"
+msgstr "é‚®ä»¶ç®±"
 
-#: src/balsa-mblist.c:475
+#: src/balsa-mblist.c:478
 msgid "Total"
-msgstr "×Ü¹²"
+msgstr "æ€»å…±"
 
-#: src/balsa-mblist.c:947
+#: src/balsa-mblist.c:946
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
-msgstr "ÏÔÊ¾µÄÓÊ¼şÏä£º%s ÓĞ %ld ¸öÓÊ¼ş£¬%ld ¸öĞÂÓÊ¼ş"
+msgstr "æ˜¾ç¤ºçš„é‚®ä»¶ç®±ï¼š%s æœ‰ %ld ä¸ªé‚®ä»¶ï¼Œ%ld ä¸ªæ–°é‚®ä»¶"
 
-#: src/balsa-message.c:340
+#: src/balsa-message.c:344
 msgid "File already exists. Overwrite?"
-msgstr "ÎÄ¼şÒÑ¾­´æÔÚ¡£Òª¸²¸ÇÂğ£¿"
+msgstr "æ–‡ä»¶å·²ç»å­˜åœ¨ã€‚è¦è¦†ç›–å—ï¼Ÿ"
 
-#: src/balsa-message.c:354
+#: src/balsa-message.c:358
 #, c-format
 msgid " Could not save %s: %s"
-msgstr " ÎŞ·¨±£´æ %s£º%s "
+msgstr " æ— æ³•ä¿å­˜ %sï¼š%s "
 
 # src/balsa-message.c:159 src/balsa-message.c:162
-#: src/balsa-message.c:374
+#: src/balsa-message.c:378
 msgid "Save MIME Part"
-msgstr "±£´æ MIME ²¿·Ö"
+msgstr "ä¿å­˜ MIME éƒ¨åˆ†"
 
 # src/balsa-message.c:558 src/sendmsg-window.c:358
 #. Subject:
-#: src/balsa-message.c:693 src/print.c:364 src/sendmsg-window.c:1467
+#: src/balsa-message.c:721 src/print.c:364 src/sendmsg-window.c:1645
 msgid "Subject:"
-msgstr "Ö÷Ìâ£º"
+msgstr "ä¸»é¢˜ï¼š"
 
 # src/balsa-message.c:519
-#: src/balsa-message.c:697 src/print.c:370
+#: src/balsa-message.c:725 src/print.c:370
 msgid "Date:"
-msgstr "Ê±¼ä£º"
+msgstr "æ—¶é—´ï¼š"
 
 # src/balsa-message.c:544 src/filter-edit-dialog.c:303
 # src/sendmsg-window.c:338
 #. From:
-#: src/balsa-message.c:702 src/filter-edit-dialog.c:324 src/print.c:381
-#: src/sendmsg-window.c:1455 src/store-address.c:251
+#: src/balsa-message.c:730 src/filter-edit-callbacks.c:874
+#: src/main-window.c:2626 src/print.c:381 src/sendmsg-window.c:1635
+#: src/store-address.c:267
 msgid "From:"
-msgstr "·¢¼şÈË£º"
+msgstr "å‘ä»¶äººï¼š"
 
 # src/balsa-message.c:526 src/filter-edit-dialog.c:291
 # src/sendmsg-window.c:315
 #. To:
-#: src/balsa-message.c:706 src/filter-edit-dialog.c:314 src/print.c:391
-#: src/sendmsg-window.c:1461 src/store-address.c:252
+#: src/balsa-message.c:734 src/filter-edit-callbacks.c:865
+#: src/main-window.c:2625 src/print.c:391 src/sendmsg-window.c:1640
+#: src/store-address.c:268
 msgid "To:"
-msgstr "ÊÕ¼şÈË£º"
+msgstr "æ”¶ä»¶äººï¼š"
 
 # src/balsa-message.c:534
 #. cc:
-#: src/balsa-message.c:707 src/print.c:392 src/sendmsg-window.c:1469
-#: src/store-address.c:253
+#: src/balsa-message.c:735 src/filter-edit-callbacks.c:892
+#: src/main-window.c:2628 src/print.c:392 src/sendmsg-window.c:1647
+#: src/store-address.c:269
 msgid "Cc:"
-msgstr "³­ËÍ£º"
+msgstr "æŠ„é€ï¼š"
 
 # src/sendmsg-window.c:368
 #. fcc:
-#: src/balsa-message.c:711 src/print.c:394 src/sendmsg-window.c:1477
+#: src/balsa-message.c:739 src/print.c:394 src/sendmsg-window.c:1657
 msgid "Fcc:"
-msgstr "ÎÄ¼ş³­ËÍ£º"
+msgstr "æ–‡ä»¶æŠ„é€ï¼š"
 
-#: src/balsa-message.c:716 src/print.c:400
+#: src/balsa-message.c:744 src/print.c:400
 msgid "Disposition-Notification-To:"
-msgstr "·¢ËÍÔÄ¶ÁÍ¨¸æÖÁ£º"
+msgstr "å‘é€é˜…è¯»é€šå‘Šè‡³ï¼š"
 
-#: src/balsa-message.c:784
-msgid "Could not load image. It is most likely corrupted."
-msgstr "ÎŞ·¨ÔØÈëÍ¼Ïñ¡£¿ÉÄÜÒÑ¾­Ëğ»µ¡£"
-
-#: src/balsa-message.c:789
-msgid "Couldn't render image\n"
-msgstr "ÎŞ·¨»æÖÆÍ¼Ïñ\n"
-
-#: src/balsa-message.c:800
+#: src/balsa-message.c:811
 msgid "balsa/pixbuf: Could not load image. It is likely corrupted."
-msgstr "balsa/pixbuf£ºÎŞ·¨ÔØÈëÍ¼Ïñ¡£¿ÉÄÜÒÑ¾­Ëğ»µ¡£"
+msgstr "balsa/pixbufï¼šæ— æ³•è½½å…¥å›¾åƒã€‚å¯èƒ½å·²ç»æŸåã€‚"
 
-#: src/balsa-message.c:865 src/balsa-message.c:881 src/balsa-message.c:911
-#: src/balsa-message.c:964
+#: src/balsa-message.c:875 src/balsa-message.c:891 src/balsa-message.c:921
+#: src/balsa-message.c:974
 msgid "Content Type: external-body\n"
-msgstr "ÄÚÈİÀàĞÍ£ºÍâ²¿ÓÊ¼ş\n"
+msgstr "å†…å®¹ç±»å‹ï¼šå¤–éƒ¨é‚®ä»¶\n"
 
-#: src/balsa-message.c:866
+#: src/balsa-message.c:876
 msgid "Access type: local-file\n"
-msgstr "·ÃÎÊÀàĞÍ£º±¾µØÎÄ¼ş\n"
+msgstr "è®¿é—®ç±»å‹ï¼šæœ¬åœ°æ–‡ä»¶\n"
 
 # src/filter-edit-dialog.c:456
-#: src/balsa-message.c:867 src/balsa-message.c:918
+#: src/balsa-message.c:877 src/balsa-message.c:928
 #, c-format
 msgid "File name: %s"
-msgstr "ÎÄ¼şÃû£º%s"
+msgstr "æ–‡ä»¶åï¼š%s"
 
-#: src/balsa-message.c:882
+#: src/balsa-message.c:892
 msgid "Access type: URL\n"
-msgstr "·ÃÎÊÀàĞÍ£ºURL\n"
+msgstr "è®¿é—®ç±»å‹ï¼šURL\n"
 
-#: src/balsa-message.c:883
+#: src/balsa-message.c:893
 #, c-format
 msgid "URL: %s"
-msgstr "URL£º%s"
+msgstr "URLï¼š%s"
 
-#: src/balsa-message.c:912
+#: src/balsa-message.c:922
 #, c-format
 msgid "Access type: %s\n"
-msgstr "·ÃÎÊÀàĞÍ£º%s\n"
+msgstr "è®¿é—®ç±»å‹ï¼š%s\n"
 
-#: src/balsa-message.c:915
+#: src/balsa-message.c:925
 #, c-format
 msgid "FTP site: %s\n"
-msgstr "FTP Õ¾µã£º%s\n"
+msgstr "FTP ç«™ç‚¹ï¼š%s\n"
 
-#: src/balsa-message.c:917
+#: src/balsa-message.c:927
 #, c-format
 msgid "Directory: %s\n"
-msgstr "Ä¿Â¼£º%s\n"
+msgstr "ç›®å½•ï¼š%s\n"
 
-#: src/balsa-message.c:965
+#: src/balsa-message.c:975
 msgid "Access type: mail-server\n"
-msgstr "·ÃÎÊÀàĞÍ£ºÓÊ¼ş·şÎñÆ÷\n"
+msgstr "è®¿é—®ç±»å‹ï¼šé‚®ä»¶æœåŠ¡å™¨\n"
 
 # src/pref-manager.c:144
-#: src/balsa-message.c:966
+#: src/balsa-message.c:976
 #, c-format
 msgid "Mail server: %s\n"
-msgstr "ÓÊ¼ş·şÎñÆ÷£º%s\n"
+msgstr "é‚®ä»¶æœåŠ¡å™¨ï¼š%s\n"
 
 # src/balsa-message.c:558 src/sendmsg-window.c:358
-#: src/balsa-message.c:968 src/sendmsg-window.c:1764
+#: src/balsa-message.c:978 src/sendmsg-window.c:1948
 #, c-format
 msgid "Subject: %s\n"
-msgstr "Ö÷Ìâ£º%s\n"
+msgstr "ä¸»é¢˜ï¼š%s\n"
 
-#: src/balsa-message.c:979
+#: src/balsa-message.c:989
 msgid "Send message to obtain this part"
-msgstr "·¢ËÍÓÊ¼şÒÔ»ñÈ¡¸Ã²¿·Ö"
+msgstr "å‘é€é‚®ä»¶ä»¥è·å–è¯¥éƒ¨åˆ†"
 
-#: src/balsa-message.c:1054
+#: src/balsa-message.c:1070
 msgid "No open or view action defined in GNOME MIME for this content type"
-msgstr "ÔÚ GNOME MIME ÖĞÃ»ÓĞ¶¨ÒåÕâÖÖÄÚÈİÀàĞÍµÄ´ò¿ª»ò²é¿´¶¯×÷"
+msgstr "åœ¨ GNOME MIME ä¸­æ²¡æœ‰å®šä¹‰è¿™ç§å†…å®¹ç±»å‹çš„æ‰“å¼€æˆ–æŸ¥çœ‹åŠ¨ä½œ"
 
-#: src/balsa-message.c:1058
+#: src/balsa-message.c:1075
+#, c-format
+msgid "Type: %s (%s)"
+msgstr ""
+
+#: src/balsa-message.c:1077
 #, c-format
 msgid "Content Type: %s"
-msgstr "ÄÚÈİÀàĞÍ£º%s"
+msgstr "å†…å®¹ç±»å‹ï¼š%s"
 
 # src/filter-edit-dialog.c:456
-#: src/balsa-message.c:1063
+#: src/balsa-message.c:1083
 #, c-format
 msgid "Filename: %s"
-msgstr "ÎÄ¼şÃû£º%s"
+msgstr "æ–‡ä»¶åï¼š%s"
 
 # src/balsa-message.c:159 src/balsa-message.c:162
-#: src/balsa-message.c:1071
+#: src/balsa-message.c:1091
 msgid "Save part"
-msgstr "±£´æ²¿·Ö"
+msgstr "ä¿å­˜éƒ¨åˆ†"
 
-#: src/balsa-message.c:1095
+#: src/balsa-message.c:1115 src/balsa-message.c:1139
 #, c-format
 msgid "View part with %s"
-msgstr "ÓÃ %s ²é¿´²¿·Ö"
+msgstr "ç”¨ %s æŸ¥çœ‹éƒ¨åˆ†"
 
-#: src/balsa-message.c:1721
+#: src/balsa-message.c:1766
 #, c-format
 msgid "Calling URL %s..."
-msgstr "ÕıÔËĞĞ URL %s..."
+msgstr "æ­£è¿è¡Œ URL %s..."
 
-#: src/balsa-message.c:1787
+#: src/balsa-message.c:1832
 #, c-format
 msgid ""
 "Error writing to temporary file %s.\n"
 "Check the directory permissions."
 msgstr ""
-"Ğ´ÁÙÊ±ÎÄ¼ş %s Ê±·¢Éú´íÎó¡£\n"
-"Çë¼ì²éÄ¿Â¼µÄÈ¨ÏŞ¡£"
+"å†™ä¸´æ—¶æ–‡ä»¶ %s æ—¶å‘ç”Ÿé”™è¯¯ã€‚\n"
+"è¯·æ£€æŸ¥ç›®å½•çš„æƒé™ã€‚"
 
-#: src/balsa-message.c:1795
+#: src/balsa-message.c:1840
 #, c-format
 msgid "Cannot open temporary file %s."
-msgstr "ÎŞ·¨´ò¿ªÁÙÊ±ÎÄ¼ş %s¡£"
+msgstr "æ— æ³•æ‰“å¼€ä¸´æ—¶æ–‡ä»¶ %sã€‚"
+
+#: src/balsa-message.c:2129
+#, c-format
+msgid "Open with %s"
+msgstr "ç”¨ %s æ‰“å¼€"
 
 # src/balsa-message.c:160
-#: src/balsa-message.c:2143
+#: src/balsa-message.c:2266
 msgid "Save..."
-msgstr "±£´æ..."
+msgstr "ä¿å­˜..."
 
-#: src/balsa-message.c:2279
+#: src/balsa-message.c:2403 src/balsa-message.c:2445
 #, c-format
 msgid "could not create temporary file %s"
-msgstr "ÎŞ·¨´´½¨ÁÙÊ±ÎÄ¼ş %s"
+msgstr "æ— æ³•åˆ›å»ºä¸´æ—¶æ–‡ä»¶ %s"
 
 # src/sendmsg-window.c:513
-#: src/balsa-message.c:2938
+#: src/balsa-message.c:3093
 msgid "reply to MDN?"
-msgstr "»Ø¸´µ½ MDN£¿"
+msgstr "å›å¤åˆ° MDNï¼Ÿ"
 
-#: src/balsa-message.c:2950
+#: src/balsa-message.c:3105
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
 "a Message Disposition Notification (MDN) to be returned to `%s'.\n"
 "Do you want to send this notification?"
 msgstr ""
-"¸ÃÓÊ¼şµÄ·¢ËÍÕß %s ÒªÇó·µ»ØÒ»¸öÓÊ¼ş´¦ÀíÍ¨Öª(MDN)µ½¡°%s¡±¡£\n"
-"ÄúÒª·¢ËÍÕâ¸öÍ¨ÖªÂğ£¿"
+"è¯¥é‚®ä»¶çš„å‘é€è€… %s è¦æ±‚è¿”å›ä¸€ä¸ªé‚®ä»¶å¤„ç†é€šçŸ¥(MDN)åˆ°â€œ%sâ€ã€‚\n"
+"æ‚¨è¦å‘é€è¿™ä¸ªé€šçŸ¥å—ï¼Ÿ"
 
-# src/balsa-init.c:590
-#: src/filter-edit-dialog.c:34
-msgid "Inbound"
-msgstr "½ÓÊÕ"
+#: src/filter-edit-callbacks.c:233 src/filter-edit-callbacks.c:650
+msgid "One of the specified fields contains:"
+msgstr "æŒ‡å®šçš„å­—æ®µä¹‹ä¸€åŒ…å«ï¼š"
 
-# src/balsa-init.c:598
-#: src/filter-edit-dialog.c:35
-msgid "Outbound"
-msgstr "·¢ËÍ"
+#: src/filter-edit-callbacks.c:234
+msgid "None of the specified fields contains:"
+msgstr "æ‰€æœ‰æŒ‡å®šçš„å­—æ®µéƒ½ä¸åŒ…å«ï¼š"
 
-#: src/filter-edit-dialog.c:36
-msgid "Before Sending"
-msgstr "ÔÚ·¢ËÍÖ®Ç°"
+#: src/filter-edit-callbacks.c:236 src/filter-edit-callbacks.c:678
+msgid "One of the regular expressions matches"
+msgstr "ä¸€ä¸ªæ­£åˆ™è¡¨è¾¾å¼åŒ¹é…"
 
-# src/index-child.c:428
-#: src/filter-edit-dialog.c:37
-msgid "Demand"
-msgstr "ÒªÇóÊ±"
+#: src/filter-edit-callbacks.c:237
+msgid "None of the regular expressions matches"
+msgstr "æ²¡æœ‰æ­£åˆ™è¡¨è¾¾å¼åŒ¹é…"
 
-# src/filter-edit-dialog.c:704
-#: src/filter-edit-dialog.c:41
-msgid "Matches"
-msgstr "Æ¥Åä"
+#: src/filter-edit-callbacks.c:239 src/filter-edit-callbacks.c:736
+msgid "Match when date is in the interval:"
+msgstr "å½“æ—¥æœŸåœ¨é—´éš”ä¸­æ—¶åŒ¹é…ï¼š"
 
-#: src/filter-edit-dialog.c:42
-msgid "Doesn't Match"
-msgstr "²»Æ¥Åä"
+#: src/filter-edit-callbacks.c:240
+msgid "Match when date is outside the interval:"
+msgstr "å½“æ—¥æœŸä¸åœ¨é—´éš”ä¸­æ—¶åŒ¹é…ï¼š"
 
-#: src/filter-edit-dialog.c:43 src/pref-manager.c:2487
-msgid "Always"
-msgstr "×ÜÊÇ"
+#: src/filter-edit-callbacks.c:242 src/filter-edit-callbacks.c:771
+msgid "Match when one of these flags is set:"
+msgstr "å½“è®¾ç½®äº†ä»»æ„ä¸€ä¸ªæ ‡å¿—æ—¶åŒ¹é…ï¼š"
 
-#: src/filter-edit-dialog.c:47
-msgid "Simple"
-msgstr "¼òµ¥"
+#: src/filter-edit-callbacks.c:243
+msgid "Match when none of these flags is set:"
+msgstr "å½“ä»»ä½•ä¸€ä¸ªæ ‡å¿—éƒ½æ²¡æœ‰è®¾ç½®æ—¶åŒ¹é…ï¼š"
 
-#: src/filter-edit-dialog.c:48
-msgid "Regular Expression"
-msgstr "ÕıÔò±í´ïÊ½"
+#: src/filter-edit-callbacks.c:382
+msgid "You must specify at least one field for matching"
+msgstr "æ‚¨è‡³å°‘è¦æŒ‡å®šä¸€ä¸ªè¦åŒ¹é…çš„å­—æ®µ"
 
-#: src/filter-edit-dialog.c:49
-msgid "External Command"
-msgstr "Íâ²¿ÃüÁî"
+#. balsa_information(LIBBALSA_INFORMATION_ERROR,_("You must provide a string"));
+#: src/filter-edit-callbacks.c:391
+msgid "You must provide a string"
+msgstr "æ‚¨å¿…é¡»æä¾›ä¸€ä¸ªå­—ç¬¦ä¸²"
 
-#: src/filter-edit-dialog.c:53
-msgid "Copy to folder:"
-msgstr "¸´ÖÆµ½ÎÄ¼ş¼Ğ£º"
+#. balsa_information(LIBBALSA_INFORMATION_ERROR,_("You must provide at least one regular expression"));
+#: src/filter-edit-callbacks.c:398
+msgid "You must provide at least one regular expression"
+msgstr ""
 
-#: src/filter-edit-dialog.c:54
-msgid "Move to folder:"
-msgstr "ÒÆ¶¯µ½ÎÄ¼ş¼Ğ£º"
+#. balsa_information(LIBBALSA_INFORMATION_ERROR,_("Low date is incorrect"));
+#: src/filter-edit-callbacks.c:409
+msgid "Low date is incorrect"
+msgstr ""
 
-#: src/filter-edit-dialog.c:55
-msgid "Print on printer:"
-msgstr "ÔÚ´òÓ¡»úÉÏ´òÓ¡£º"
+#. balsa_information(LIBBALSA_INFORMATION_ERROR,_("High date is incorrect"));
+#: src/filter-edit-callbacks.c:420
+msgid "High date is incorrect"
+msgstr ""
 
-# src/filter-edit-dialog.c:506
-#: src/filter-edit-dialog.c:56
-msgid "Run program:"
-msgstr "ÔËĞĞ³ÌĞò£º"
+#. balsa_information(LIBBALSA_INFORMATION_ERROR,_("Low date is greater than high date"));
+#: src/filter-edit-callbacks.c:427
+msgid "Low date is greater than high date"
+msgstr ""
 
-#: src/filter-edit-dialog.c:57
-msgid "Send to Trash"
-msgstr "ÒÆµ½ÒÑÉ¾³ıÓÊ¼ş"
+# src/filter-edit-dialog.c:194 src/index-child.c:449 src/main-window.c:211
+# src/pref-manager.c:471
+#: src/filter-edit-callbacks.c:637
+msgid "Deleted"
+msgstr "å·²åˆ é™¤"
 
-# src/filter-edit-dialog.c:100
-#: src/filter-edit-dialog.c:132
-msgid "On"
-msgstr "¿ªÆô"
+#: src/filter-edit-callbacks.c:637
+msgid "Replied"
+msgstr "å·²å›å¤"
 
-# src/filter-edit-dialog.c:165
-#: src/filter-edit-dialog.c:202 src/toolbar-prefs.c:808
-msgid "Up"
-msgstr "ÏòÉÏ"
-
-# src/filter-edit-dialog.c:171
-#: src/filter-edit-dialog.c:208 src/toolbar-prefs.c:834
-msgid "Down"
-msgstr "ÏòÏÂ"
-
-# src/filter-edit-dialog.c:237
-#: src/filter-edit-dialog.c:271
-msgid "Match in:"
-msgstr "Æ¥Åä£º"
-
-# src/filter-edit-dialog.c:255
-#: src/filter-edit-dialog.c:284
-msgid "All"
-msgstr "È«²¿"
-
-# src/filter-edit-dialog.c:267
-#: src/filter-edit-dialog.c:294
-msgid "Header"
-msgstr "ĞÅÍ·"
-
-# src/filter-edit-dialog.c:279
-#: src/filter-edit-dialog.c:304
-msgid "Body"
-msgstr "ĞÅÌå"
-
-# src/filter-edit-dialog.c:328
-#: src/filter-edit-dialog.c:345
-msgid "Match string:"
-msgstr "Æ¥Åä×Ö·û´®£º"
+#: src/filter-edit-callbacks.c:664
+msgid "Contain/Does not contain"
+msgstr "åŒ…å«/ä¸åŒ…å«"
 
 # src/filter-edit-dialog.c:391 src/sendmsg-window.c:145
-#: src/filter-edit-dialog.c:392 src/sendmsg-window.c:916
+#: src/filter-edit-callbacks.c:714 src/filter-edit-dialog.c:367
+#: src/sendmsg-window.c:1064
 msgid "Remove"
-msgstr "É¾³ı"
+msgstr "åˆ é™¤"
 
-# src/filter-edit-dialog.c:420
-#: src/filter-edit-dialog.c:412
-msgid "Command:"
-msgstr "ÃüÁî£º"
+#: src/filter-edit-callbacks.c:719
+msgid "One matches/None matches"
+msgstr "ä¸€ä¸ªåŒ¹é…/æ²¡æœ‰åŒ¹é…"
+
+#: src/filter-edit-callbacks.c:758
+msgid "Inside/outside the date interval"
+msgstr ""
+
+#: src/filter-edit-callbacks.c:801
+msgid "Match when one flag is set/when no flag is set"
+msgstr ""
+
+# src/filter-edit-dialog.c:237
+#. builds the toggle buttons to specify fields concerned by the conditions of
+#. * the filter
+#: src/filter-edit-callbacks.c:819
+msgid "Match in:"
+msgstr "åŒ¹é…ï¼š"
+
+# src/filter-edit-dialog.c:255
+#: src/filter-edit-callbacks.c:831
+msgid "All"
+msgstr "å…¨éƒ¨"
+
+# src/filter-edit-dialog.c:267
+#: src/filter-edit-callbacks.c:839
+msgid "All headers"
+msgstr "å…¨éƒ¨ä¿¡å¤´"
+
+# src/main-window.c:161
+#: src/filter-edit-callbacks.c:847
+msgid "Clear"
+msgstr "æ¸…é™¤"
+
+# src/filter-edit-dialog.c:279
+#: src/filter-edit-callbacks.c:856 src/main-window.c:2624
+msgid "Body"
+msgstr "ä¿¡ä½“"
+
+#: src/filter-edit-callbacks.c:902
+msgid "Selected condition search type:"
+msgstr ""
+
+#: src/filter-edit-callbacks.c:965
+msgid "Edit condition for filter: "
+msgstr ""
+
+# src/main-window.c:182
+#: src/filter-edit-callbacks.c:1311
+msgid "New filter"
+msgstr "æ–°å»ºè¿‡æ»¤è§„åˆ™"
+
+#: src/filter-edit-callbacks.c:1424
+msgid "No filter name specified."
+msgstr "æ²¡æœ‰æŒ‡å®šè¿‡æ»¤è§„åˆ™åã€‚"
+
+#: src/filter-edit-callbacks.c:1429
+#, c-format
+msgid "Filter %s already exists."
+msgstr "è¿‡æ»¤è§„åˆ™ %s å·²å­˜åœ¨ã€‚"
+
+#: src/filter-edit-callbacks.c:1448
+msgid "Your filter must have conditions\n"
+msgstr "è¿‡æ»¤è§„åˆ™å¿…é¡»æœ‰æ¡ä»¶\n"
+
+# src/filter-edit-dialog.c:456
+#: src/filter-edit-callbacks.c:1504
+msgid "Filter has matched"
+msgstr "è¿‡æ»¤è§„åˆ™åŒ¹é…"
+
+#: src/filter-edit-dialog.c:79
+msgid "Simple"
+msgstr "ç®€å•"
+
+#: src/filter-edit-dialog.c:80
+msgid "Regular Expression"
+msgstr "æ­£åˆ™è¡¨è¾¾å¼"
+
+#: src/filter-edit-dialog.c:81
+msgid "Date interval"
+msgstr "æ—¥æœŸé—´éš”"
+
+#: src/filter-edit-dialog.c:82
+msgid "Flag condition"
+msgstr ""
+
+#: src/filter-edit-dialog.c:86
+msgid "Copy to folder:"
+msgstr "å¤åˆ¶åˆ°æ–‡ä»¶å¤¹ï¼š"
+
+#: src/filter-edit-dialog.c:87
+msgid "Move to folder:"
+msgstr "ç§»åŠ¨åˆ°æ–‡ä»¶å¤¹ï¼š"
+
+#: src/filter-edit-dialog.c:88
+msgid "Print on printer:"
+msgstr "åœ¨æ‰“å°æœºä¸Šæ‰“å°ï¼š"
+
+# src/filter-edit-dialog.c:506
+#: src/filter-edit-dialog.c:89
+msgid "Run program:"
+msgstr "è¿è¡Œç¨‹åºï¼š"
+
+#: src/filter-edit-dialog.c:90
+msgid "Send to Trash"
+msgstr "ç§»åˆ°å·²åˆ é™¤é‚®ä»¶"
+
+#: src/filter-edit-dialog.c:94
+msgid "OR"
+msgstr "æˆ–"
+
+#: src/filter-edit-dialog.c:95
+msgid "AND"
+msgstr "å’Œ"
 
 # src/filter-edit-dialog.c:456
 #. The name entry
-#: src/filter-edit-dialog.c:444
+#: src/filter-edit-dialog.c:297
 msgid "Filter name:"
-msgstr "¹ıÂËÆ÷Ãû£º"
+msgstr "è¿‡æ»¤è§„åˆ™åï¼š"
 
-# src/filter-edit-dialog.c:475
-#. The "Process when:" option menu
-#: src/filter-edit-dialog.c:459
-msgid "Process when:"
-msgstr "´¦ÀíÌõ¼ş£º"
-
-# src/filter-edit-dialog.c:506
-#. The "Run on:" option menu
-#: src/filter-edit-dialog.c:480
-msgid "Run on:"
-msgstr "ÔËĞĞÓÚ£º"
-
-# src/filter-edit-dialog.c:536
-#. the type notebook's option menu
-#: src/filter-edit-dialog.c:499
-msgid "Search type:"
-msgstr "ËÑË÷ÀàĞÍ£º"
+#. The filter op-code : "OR" or "AND" all the conditions
+#: src/filter-edit-dialog.c:310
+msgid "Operation between conditions"
+msgstr ""
 
 # src/filter-edit-dialog.c:592
 #. The notification area
-#: src/filter-edit-dialog.c:546
+#: src/filter-edit-dialog.c:395
 msgid "Notification:"
-msgstr "Í¨Öª£º"
+msgstr "é€šçŸ¥ï¼š"
 
 # src/filter-edit-dialog.c:601
 #. Notification buttons
-#: src/filter-edit-dialog.c:555
+#: src/filter-edit-dialog.c:404
 msgid "Play sound:"
-msgstr "Ñİ×àÉùÒô£º"
+msgstr "æ¼”å¥å£°éŸ³ï¼š"
 
 # src/filter-edit-dialog.c:609
-#: src/filter-edit-dialog.c:562
+#: src/filter-edit-dialog.c:410
 msgid "Use Sound..."
-msgstr "Ê¹ÓÃÉùÒô..."
+msgstr "ä½¿ç”¨å£°éŸ³..."
 
 # src/filter-edit-dialog.c:618
-#: src/filter-edit-dialog.c:567
+#: src/filter-edit-dialog.c:414
 msgid "Popup text:"
-msgstr "µ¯³öÎÄ±¾£º"
+msgstr "å¼¹å‡ºæ–‡æœ¬ï¼š"
 
 # src/filter-edit-dialog.c:637
 #. The action area
-#: src/filter-edit-dialog.c:582
+#: src/filter-edit-dialog.c:426
 msgid "Action to perform:"
-msgstr "ÒªÖ´ĞĞµÄ¶¯×÷£º"
-
-# src/filter-edit-dialog.c:658
-#. The disposition area
-#: src/filter-edit-dialog.c:605
-msgid "Disposition:"
-msgstr "´¦Àí£º"
-
-# src/filter-edit-dialog.c:666
-#: src/filter-edit-dialog.c:616
-msgid "Place/leave in default folder"
-msgstr "·ÅÖÃÓÚÈ·Ê¡ÎÄ¼ş¼Ğ"
-
-# src/filter-edit-dialog.c:671
-#: src/filter-edit-dialog.c:623
-msgid "Do not place/leave in default folder"
-msgstr "²»Òª·ÅÖÃÓÚÈ·Ê¡ÎÄ¼ş¼Ğ"
-
-# src/filter-edit-dialog.c:676
-#: src/filter-edit-dialog.c:630
-msgid "Stop filtering here"
-msgstr "Í£Ö¹¹ıÂË"
+msgstr "è¦æ‰§è¡Œçš„åŠ¨ä½œï¼š"
 
 # src/filter-edit-dialog.c:704
-#: src/filter-edit-dialog.c:658
+#: src/filter-edit-dialog.c:486
 msgid "Match"
-msgstr "Æ¥Åä"
+msgstr "åŒ¹é…"
 
 # src/filter-edit-dialog.c:707
-#: src/filter-edit-dialog.c:661
+#: src/filter-edit-dialog.c:489
 msgid "Action"
-msgstr "¶¯×÷"
+msgstr "åŠ¨ä½œ"
 
 # src/filter-edit-dialog.c:721
-#: src/filter-edit-dialog.c:674
+#: src/filter-edit-dialog.c:502
 msgid "Revert"
-msgstr "»¹Ô­"
+msgstr "è¿˜åŸ"
+
+#: src/filter-edit-dialog.c:531
+msgid "A filter run dialog is open.Close it before you can modify filters."
+msgstr ""
 
 # src/filter-edit-dialog.c:749
-#: src/filter-edit-dialog.c:701
+#: src/filter-edit-dialog.c:544
 msgid "Balsa Filters"
-msgstr "Balsa ¹ıÂËÆ÷"
+msgstr "Balsa è¿‡æ»¤å™¨"
 
-#: src/folder-conf.c:158
+#: src/filter-export-callbacks.c:61
+#, c-format
+msgid "Unable to export filter %s,an error occured."
+msgstr ""
+
+#: src/filter-export-dialog.c:62
+msgid ""
+"There are opened filter run dialogs, close them before you can modify "
+"filters."
+msgstr ""
+
+# src/filter-edit-dialog.c:749
+#: src/filter-export-dialog.c:73
+#, fuzzy
+msgid "Balsa Filters Export"
+msgstr "Balsa è¿‡æ»¤å™¨"
+
+#: src/filter-run-callbacks.c:135
+msgid "Error when applying filters"
+msgstr "åº”ç”¨è¿‡æ»¤è§„åˆ™æ—¶å‘ç”Ÿé”™è¯¯"
+
+#: src/filter-run-callbacks.c:196
+#, c-format
+msgid ""
+"The destination mailbox of the filter %s is %s\n"
+"you can't associate it with the same mailbox (that causes recursion)"
+msgstr ""
+
+# src/filter-edit-dialog.c:749
+#: src/filter-run-dialog.c:192
+#, fuzzy
+msgid "Balsa Filters of mailbox : "
+msgstr "Balsa è¿‡æ»¤å™¨"
+
+#: src/filter-run-dialog.c:209
+msgid "Memory allocation error"
+msgstr "å†…å­˜åˆ†é…é”™è¯¯"
+
+# src/filter-edit-dialog.c:707
+#: src/filter-run-dialog.c:230
+msgid "On reception"
+msgstr "æ¥æ”¶æ—¶"
+
+#: src/filter-run-dialog.c:230
+msgid "On exit"
+msgstr "é€€å‡ºæ—¶"
+
+# src/filter-edit-dialog.c:165
+#: src/filter-run-dialog.c:362 src/toolbar-prefs.c:790
+msgid "Up"
+msgstr "å‘ä¸Š"
+
+# src/filter-edit-dialog.c:171
+#: src/filter-run-dialog.c:368 src/toolbar-prefs.c:816
+msgid "Down"
+msgstr "å‘ä¸‹"
+
+#: src/filter-run-dialog.c:399
+msgid ""
+"The filters dialog is opened, close it before you can run filters on any "
+"mailbox"
+msgstr ""
+
+#: src/folder-conf.c:169
 msgid "Remote IMAP folder"
-msgstr "Ô¶³Ì IMAP ÎÄ¼ş¼Ğ"
+msgstr "è¿œç¨‹ IMAP æ–‡ä»¶å¤¹"
 
-#: src/folder-conf.c:159 src/folder-conf.c:477
+#: src/folder-conf.c:170 src/folder-conf.c:480
 msgid "Create"
-msgstr "´´½¨"
+msgstr "åˆ›å»º"
 
 # src/mailbox-conf.c:648
-#: src/folder-conf.c:168
+#: src/folder-conf.c:179
 msgid "Remote IMAP folder set"
-msgstr "Ô¶³Ì IMAP ÎÄ¼ş¼Ğ¼¯ºÏ"
+msgstr "è¿œç¨‹ IMAP æ–‡ä»¶å¤¹é›†åˆ"
 
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:175
+#: src/folder-conf.c:186
 msgid "Descriptive _Name:"
-msgstr "ÃèÊöĞÔÃû×Ö(_N)£º"
+msgstr "æè¿°æ€§åå­—(_N)ï¼š"
 
 # src/mailbox-conf.c:723 src/mailbox-conf.c:804
 #. pop server
-#: src/folder-conf.c:180 src/mailbox-conf.c:859 src/mailbox-conf.c:934
+#: src/folder-conf.c:191 src/mailbox-conf.c:858 src/mailbox-conf.c:937
 msgid "_Server:"
-msgstr "·şÎñÆ÷(_S)£º"
-
-# src/mailbox-conf.c:818
-#. pop port
-#: src/folder-conf.c:185 src/mailbox-conf.c:865 src/mailbox-conf.c:941
-msgid "_Port:"
-msgstr "¶Ë¿Ú(_P)£º"
+msgstr "æœåŠ¡å™¨(_S)ï¼š"
 
 # src/mailbox-conf.c:742 src/mailbox-conf.c:833
-#: src/folder-conf.c:194
+#: src/folder-conf.c:196
 msgid "_User name:"
-msgstr "ÓÃ»§Ãû(_U)£º"
+msgstr "ç”¨æˆ·å(_U)ï¼š"
+
+#: src/folder-conf.c:201
+msgid "_Remember password"
+msgstr "è®°ä½å£ä»¤(_R)"
 
 # src/index-child.c:149 src/mailbox-conf.c:759 src/mailbox-conf.c:848
-#: src/folder-conf.c:199
+#: src/folder-conf.c:206
 msgid "_Password:"
-msgstr "¿ÚÁî(_P)£º"
+msgstr "å£ä»¤(_P)ï¼š"
 
-#: src/folder-conf.c:205
+#: src/folder-conf.c:212
 msgid "_Subscribed folders only"
-msgstr "Ö»ÓĞ¶©ÔÄµÄÎÄ¼ş¼Ğ(_S)"
+msgstr "åªæœ‰è®¢é˜…çš„æ–‡ä»¶å¤¹(_S)"
 
-#: src/folder-conf.c:207
+#: src/folder-conf.c:214
 msgid "_Always show INBOX"
-msgstr "×ÜÏÔÊ¾ÊÕ¼şÏä(_A)"
+msgstr "æ€»æ˜¾ç¤ºæ”¶ä»¶ç®±(_A)"
 
-#: src/folder-conf.c:210
+#: src/folder-conf.c:217
 msgid "_Prefix"
-msgstr "Ç°×º(_P)"
+msgstr "å‰ç¼€(_P)"
 
-#: src/folder-conf.c:216
+#: src/folder-conf.c:223
 msgid "Use SSL (IMAPS)"
-msgstr "Ê¹ÓÃ SSL(IMAPS)"
+msgstr "ä½¿ç”¨ SSL(IMAPS)"
 
-#: src/folder-conf.c:315
+#: src/folder-conf.c:318
 msgid "Select parent folder"
-msgstr "Ñ¡Ôñ¸¸×ÖÌå"
+msgstr "é€‰æ‹©çˆ¶å­—ä½“"
 
-#: src/folder-conf.c:370
+#: src/folder-conf.c:373
 #, c-format
 msgid ""
 "Renaming INBOX is special!\n"
@@ -2080,112 +2313,113 @@ msgid ""
 "INBOX and its subfolders will remain.\n"
 "What would you like to do?"
 msgstr ""
-"ÖØÃüÃûÊÕ¼şÏäÊÇÌØÊâµÄ£¡\n"
-"Äú½«´´½¨Ò»¸ö×ÓÎÄ¼ş¼Ğ %s Î»ÓÚ %s ÄÚ£¬\n"
-"´æ·ÅÊÕ¼şÏäÖĞµÄÓÊ¼ş¡£\n"
-"ÊÕ¼şÏäºÍËüµÄ×ÓÎÄ¼ş¼Ğ½«±£Áô¡£\n"
-"ÄúÒªÔõÑù×ö£¿"
+"é‡å‘½åæ”¶ä»¶ç®±æ˜¯ç‰¹æ®Šçš„ï¼\n"
+"æ‚¨å°†åˆ›å»ºä¸€ä¸ªå­æ–‡ä»¶å¤¹ %s ä½äº %s å†…ï¼Œ\n"
+"å­˜æ”¾æ”¶ä»¶ç®±ä¸­çš„é‚®ä»¶ã€‚\n"
+"æ”¶ä»¶ç®±å’Œå®ƒçš„å­æ–‡ä»¶å¤¹å°†ä¿ç•™ã€‚\n"
+"æ‚¨è¦æ€æ ·åšï¼Ÿ"
 
-#: src/folder-conf.c:378
+#: src/folder-conf.c:381
 msgid "Rename INBOX"
-msgstr "ÖØÃüÃûÊÕ¼şÏä"
+msgstr "é‡å‘½åæ”¶ä»¶ç®±"
 
 # src/balsa-message.c:160 src/mailbox-conf.c:489 src/sendmsg-window.c:81
 # src/sendmsg-window.c:192
-#: src/folder-conf.c:378 src/folder-conf.c:547 src/mailbox-conf.c:215
-#: src/mailbox-conf.c:228 src/mailbox-conf.c:238 src/sendmsg-window.c:1010
+#: src/folder-conf.c:381 src/folder-conf.c:550 src/mailbox-conf.c:224
+#: src/mailbox-conf.c:237 src/mailbox-conf.c:247 src/sendmsg-window.c:1158
+#: src/toolbar-factory.c:176
 msgid "Cancel"
-msgstr "È¡Ïû"
+msgstr "å–æ¶ˆ"
 
-#: src/folder-conf.c:458
+#: src/folder-conf.c:461
 msgid ""
 "An IMAP folder that is not a mailbox\n"
 "has no properties that can be changed."
 msgstr ""
-"²»ÊÇÓÊ¼şÏäµÄ IMAP ÎÄ¼ş¼ĞÃ»ÓĞ¿ÉÒÔ\n"
-"¸ü¸ÄµÄÊôĞÔ¡£"
+"ä¸æ˜¯é‚®ä»¶ç®±çš„ IMAP æ–‡ä»¶å¤¹æ²¡æœ‰å¯ä»¥\n"
+"æ›´æ”¹çš„å±æ€§ã€‚"
 
-#: src/folder-conf.c:476
+#: src/folder-conf.c:479
 msgid "Remote IMAP subfolder"
-msgstr "Ô¶³Ì IMAP ×ÓÎÄ¼ş¼Ğ"
+msgstr "è¿œç¨‹ IMAP å­æ–‡ä»¶å¤¹"
 
-#: src/folder-conf.c:488
+#: src/folder-conf.c:491
 msgid "Rename or move subfolder"
-msgstr "ÖØÃüÃû»òÒÆ¶¯×ÓÎÄ¼ş¼Ğ"
+msgstr "é‡å‘½åæˆ–ç§»åŠ¨å­æ–‡ä»¶å¤¹"
 
-#: src/folder-conf.c:489
+#: src/folder-conf.c:492
 msgid "Create subfolder"
-msgstr "´´½¨×ÓÎÄ¼ş¼Ğ"
+msgstr "åˆ›å»ºå­æ–‡ä»¶å¤¹"
 
 # src/filter-edit-dialog.c:456
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:496
+#: src/folder-conf.c:499
 msgid "_Folder name:"
-msgstr "ÎÄ¼ş¼ĞÃû(_F)£º"
+msgstr "æ–‡ä»¶å¤¹å(_F)ï¼š"
 
-#: src/folder-conf.c:501
+#: src/folder-conf.c:504
 msgid "_Subfolder of:"
-msgstr "×ÓÎÄ¼ş¼Ğ(_S)£º"
+msgstr "å­æ–‡ä»¶å¤¹(_S)ï¼š"
 
-#: src/folder-conf.c:505
+#: src/folder-conf.c:508
 msgid "Browse..."
-msgstr "ä¯ÀÀ..."
+msgstr "æµè§ˆ..."
 
-#: src/folder-conf.c:533
+#: src/folder-conf.c:536
 msgid ""
 "This folder is not stored in configuration.I do not yet know how to remove "
 "it from remote server."
-msgstr "ÔÚÅäÖÃÖĞÃ»ÓĞ±£´æÕâ¸öÎÄ¼ş¼Ğ¡£²»ÖªµÀÈçºÎ´ÓÔ¶³Ì·şÎñÆ÷ÉÏÉ¾³ıËü¡£"
+msgstr "åœ¨é…ç½®ä¸­æ²¡æœ‰ä¿å­˜è¿™ä¸ªæ–‡ä»¶å¤¹ã€‚ä¸çŸ¥é“å¦‚ä½•ä»è¿œç¨‹æœåŠ¡å™¨ä¸Šåˆ é™¤å®ƒã€‚"
 
 # src/mailbox-conf.c:166
-#: src/folder-conf.c:541
+#: src/folder-conf.c:544
 #, c-format
 msgid ""
 "This will remove the folder %s from the list.\n"
 "You may use \"New IMAP Folder\" later to add this folder again.\n"
 "What would you like to do?"
 msgstr ""
-"Õâ½«»á´ÓÁĞ±íÖĞÉ¾È¥ÎÄ¼ş¼Ğ %s¡£\n"
-"ÄúÈÔÈ»¿ÉÒÔÓÃ¡°ĞÂ½¨ IMAPÎÄ¼ş¼Ğ¡±À´ÔÙ´ÎÌí¼Ó´ËÎÄ¼ş¼Ğ¡£\n"
-"Äú×¼±¸ÈçºÎ×ö£¿"
+"è¿™å°†ä¼šä»åˆ—è¡¨ä¸­åˆ å»æ–‡ä»¶å¤¹ %sã€‚\n"
+"æ‚¨ä»ç„¶å¯ä»¥ç”¨â€œæ–°å»º IMAPæ–‡ä»¶å¤¹â€æ¥å†æ¬¡æ·»åŠ æ­¤æ–‡ä»¶å¤¹ã€‚\n"
+"æ‚¨å‡†å¤‡å¦‚ä½•åšï¼Ÿ"
 
-#: src/folder-conf.c:546 src/mailbox-conf.c:213 src/mailbox-conf.c:237
+#: src/folder-conf.c:549 src/mailbox-conf.c:222 src/mailbox-conf.c:246
 msgid "Remove from list"
-msgstr "´ÓÁĞ±íÖĞÉ¾³ı"
+msgstr "ä»åˆ—è¡¨ä¸­åˆ é™¤"
 
 #: src/information-dialog.c:156
 msgid "Balsa Information"
-msgstr "Balsa ĞÅÏ¢"
+msgstr "Balsa ä¿¡æ¯"
 
 #: src/information-dialog.c:213
 msgid "WARNING: "
-msgstr "¾¯¸æ£º"
+msgstr "è­¦å‘Šï¼š"
 
 #: src/information-dialog.c:216
 msgid "ERROR: "
-msgstr "´íÎó£º"
+msgstr "é”™è¯¯ï¼š"
 
 #: src/information-dialog.c:219
 msgid "FATAL: "
-msgstr "ÑÏÖØ´íÎó£º"
+msgstr "ä¸¥é‡é”™è¯¯ï¼š"
 
 # src/mailbox-conf.c:634
-#: src/mailbox-conf.c:171
+#: src/mailbox-conf.c:180
 msgid "No mailbox selected."
-msgstr "Ã»ÓĞÑ¡ÔñÓÊ¼şÏä¡£"
+msgstr "æ²¡æœ‰é€‰æ‹©é‚®ä»¶ç®±ã€‚"
 
-#: src/mailbox-conf.c:199
+#: src/mailbox-conf.c:208
 #, c-format
 msgid ""
 "Mailbox '%s' is used by balsa and I cannot remove it.\n"
 "If you really want to remove it, assign its function\n"
 "to some other mailbox."
 msgstr ""
-"Balsa Ê¹ÓÃÁËÓÊ¼şÏä¡°%s¡±£¬ÎŞ·¨½«ËüÉ¾³ı¡£\n"
-"Èç¹ûÄúÕæµÄÒªÉ¾³ıËü£¬ÇëÏÈ½«ËüµÄ¹¦ÄÜ¸³ÓèÆäËüÓÊ¼şÏä¡£"
+"Balsa ä½¿ç”¨äº†é‚®ä»¶ç®±â€œ%sâ€ï¼Œæ— æ³•å°†å®ƒåˆ é™¤ã€‚\n"
+"å¦‚æœæ‚¨çœŸçš„è¦åˆ é™¤å®ƒï¼Œè¯·å…ˆå°†å®ƒçš„åŠŸèƒ½èµ‹äºˆå…¶å®ƒé‚®ä»¶ç®±ã€‚"
 
 # src/mailbox-conf.c:166
-#: src/mailbox-conf.c:207
+#: src/mailbox-conf.c:216
 #, c-format
 msgid ""
 "This will remove the mailbox %s from the list of mailboxes.\n"
@@ -2194,17 +2428,17 @@ msgid ""
 "mailbox again.\n"
 "What would you like to do?"
 msgstr ""
-"Õâ½«»á´ÓÓÊ¼şÏäÁĞ±íÖĞÉ¾È¥ÓÊ¼şÏä %s¡£\n"
-"ÄúÒ²¿ÉÒÔÉ¾³ıºÍ¸ÃÓÊ¼şÏä¹ØÁªµÄ´ÅÅÌÎÄ¼ş¡£\n"
-"Èç¹ûÄú²»É¾³ı´ÅÅÌÎÄ¼ş£¬ÄúÒÔºó¿ÉÒÔÓÃ¡°Ìí¼ÓÓÊ¼şÏä¡±À´ÔÙ´Î´æÈ¡Õâ¸öÓÊ¼şÏä¡£\n"
-"ÄúÒªÔõÑù×ö£¿"
+"è¿™å°†ä¼šä»é‚®ä»¶ç®±åˆ—è¡¨ä¸­åˆ å»é‚®ä»¶ç®± %sã€‚\n"
+"æ‚¨ä¹Ÿå¯ä»¥åˆ é™¤å’Œè¯¥é‚®ä»¶ç®±å…³è”çš„ç£ç›˜æ–‡ä»¶ã€‚\n"
+"å¦‚æœæ‚¨ä¸åˆ é™¤ç£ç›˜æ–‡ä»¶ï¼Œæ‚¨ä»¥åå¯ä»¥ç”¨â€œæ·»åŠ é‚®ä»¶ç®±â€æ¥å†æ¬¡å­˜å–è¿™ä¸ªé‚®ä»¶ç®±ã€‚\n"
+"æ‚¨è¦æ€æ ·åšï¼Ÿ"
 
-#: src/mailbox-conf.c:214
+#: src/mailbox-conf.c:223
 msgid "Remove from list and disk"
-msgstr "´ÓÁĞ±íºÍ´ÅÅÌÖĞÉ¾³ı"
+msgstr "ä»åˆ—è¡¨å’Œç£ç›˜ä¸­åˆ é™¤"
 
 # src/mailbox-conf.c:166
-#: src/mailbox-conf.c:221
+#: src/mailbox-conf.c:230
 #, c-format
 msgid ""
 "This will remove the mailbox %s and all its messages from your IMAP server.\n"
@@ -2212,2080 +2446,2558 @@ msgid ""
 "You may use \"New IMAP subfolder\" later to add a mailbox with this name.\n"
 "What would you like to do?"
 msgstr ""
-"Õâ½«»á´ÓÄúµÄ IMAP ·şÎñÆ÷ÉÏÉ¾³ıÓÊ¼şÏä %s ºÍÀïÃæµÄÓÊ¼ş¡£\n"
-"Èç¹û %s ÓĞ×ÓÎÄ¼ş¼Ğ£¬ËüÈÔÈ»×÷ÎªÎÄ¼ş¼ĞÊ÷µÄÒ»¸ö½Úµã³öÏÖ¡£\n"
-"ÄúÒÔºó¿ÉÒÔÓÃ¡°ĞÂ½¨ IMAP ×ÓÎÄ¼ş¼Ğ¡±À´Ìí¼ÓÒ»¸öÍ¬ÃûµÄÓÊ¼şÏä¡£\n"
-"ÄúÒªÔõÑù×ö£¿"
+"è¿™å°†ä¼šä»æ‚¨çš„ IMAP æœåŠ¡å™¨ä¸Šåˆ é™¤é‚®ä»¶ç®± %s å’Œé‡Œé¢çš„é‚®ä»¶ã€‚\n"
+"å¦‚æœ %s æœ‰å­æ–‡ä»¶å¤¹ï¼Œå®ƒä»ç„¶ä½œä¸ºæ–‡ä»¶å¤¹æ ‘çš„ä¸€ä¸ªèŠ‚ç‚¹å‡ºç°ã€‚\n"
+"æ‚¨ä»¥åå¯ä»¥ç”¨â€œæ–°å»º IMAP å­æ–‡ä»¶å¤¹â€æ¥æ·»åŠ ä¸€ä¸ªåŒåçš„é‚®ä»¶ç®±ã€‚\n"
+"æ‚¨è¦æ€æ ·åšï¼Ÿ"
 
-#: src/mailbox-conf.c:227
+#: src/mailbox-conf.c:236
 msgid "Remove from server"
-msgstr "´Ó·şÎñÆ÷ÉÏÉ¾³ı"
+msgstr "ä»æœåŠ¡å™¨ä¸Šåˆ é™¤"
 
 # src/mailbox-conf.c:166
 #. deleting other remote mailbox
-#: src/mailbox-conf.c:232
+#: src/mailbox-conf.c:241
 #, c-format
 msgid ""
 "This will remove the mailbox %s from the list of mailboxes\n"
 "You may use \"Add Mailbox\" later to access this mailbox again\n"
 "What would you like to do?"
 msgstr ""
-"Õâ½«»á´ÓÓÊ¼şÏäÁĞ±íÖĞÉ¾³ıÓÊ¼şÏä %s\n"
-"ÄúÒÔºó¿ÉÒÔÓÃ¡°Ìí¼ÓÓÊ¼şÏä¡±À´ÔÙ´Î´æÈ¡Õâ¸öÓÊ¼şÏä¡£\n"
-"ÄúÈ·ÈÏÒªÉ¾³ıÕâ¸öÓÊ¼şÏäÂğ£¿"
+"è¿™å°†ä¼šä»é‚®ä»¶ç®±åˆ—è¡¨ä¸­åˆ é™¤é‚®ä»¶ç®± %s\n"
+"æ‚¨ä»¥åå¯ä»¥ç”¨â€œæ·»åŠ é‚®ä»¶ç®±â€æ¥å†æ¬¡å­˜å–è¿™ä¸ªé‚®ä»¶ç®±ã€‚\n"
+"æ‚¨ç¡®è®¤è¦åˆ é™¤è¿™ä¸ªé‚®ä»¶ç®±å—ï¼Ÿ"
 
 # src/mailbox-conf.c:194
-#: src/mailbox-conf.c:289
+#: src/mailbox-conf.c:298
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
-msgstr "²»ºÃ£¡Ã»ÓĞÔÚ balsa_app.mailbox Àï·¢ÏÖÓÊ¼şÏä£¿\n"
+msgstr "ä¸å¥½ï¼æ²¡æœ‰åœ¨ balsa_app.mailbox é‡Œå‘ç°é‚®ä»¶ç®±ï¼Ÿ\n"
 
 # src/mailbox-conf.c:238
-#: src/mailbox-conf.c:337
+#: src/mailbox-conf.c:346
 msgid "Mailbox Configurator"
-msgstr "ÓÊ¼şÏäÅäÖÃ¹¤¾ß"
+msgstr "é‚®ä»¶ç®±é…ç½®å·¥å…·"
 
 # src/mailbox-conf.c:531
-#: src/mailbox-conf.c:546
+#: src/mailbox-conf.c:545
 #, c-format
 msgid "%s on %s"
-msgstr "%s ÔÚ %s"
+msgstr "%s åœ¨ %s"
 
 # src/balsa-message.c:231 src/balsa-message.c:246
-#: src/mailbox-conf.c:663
+#: src/mailbox-conf.c:662
 #, c-format
 msgid ""
 "Rename of %s to %s failed:\n"
 "%s"
 msgstr ""
-"ÖØÃüÃû %s µ½ %s Ê§°Ü£º\n"
+"é‡å‘½å %s åˆ° %s å¤±è´¥ï¼š\n"
 "%s"
 
-#: src/mailbox-conf.c:681
+#: src/mailbox-conf.c:680
 msgid ""
 "This is a mailbox in your local directory.\n"
 "Change the path instead.\n"
 "Mailbox not Updated.\n"
 msgstr ""
-"ÕâÊÇÒ»¸öÔÚÄú±¾µØÄ¿Â¼ÖĞµÄÓÊ¼şÏä¡£\n"
-"Çë¸Ä±äÂ·¾¶¡£\n"
-"ÓÊ¼şÏäÃ»ÓĞ¸üĞÂ¡£\n"
+"è¿™æ˜¯ä¸€ä¸ªåœ¨æ‚¨æœ¬åœ°ç›®å½•ä¸­çš„é‚®ä»¶ç®±ã€‚\n"
+"è¯·æ”¹å˜è·¯å¾„ã€‚\n"
+"é‚®ä»¶ç®±æ²¡æœ‰æ›´æ–°ã€‚\n"
 
 # src/mailbox-conf.c:671 src/mailbox-conf.c:706
 #. mailbox name
-#: src/mailbox-conf.c:811 src/mailbox-conf.c:853 src/mailbox-conf.c:928
+#: src/mailbox-conf.c:810 src/mailbox-conf.c:852 src/mailbox-conf.c:931
 msgid "Mailbox _Name:"
-msgstr "ÓÊ¼şÏäÃû(_N)£º"
+msgstr "é‚®ä»¶ç®±å(_N)ï¼š"
 
 # src/mailbox-conf.c:681
 #. path to file
-#: src/mailbox-conf.c:817
+#: src/mailbox-conf.c:816
 msgid "Mailbox _Path:"
-msgstr "ÓÊ¼şÏäÂ·¾¶(_P)£º"
+msgstr "é‚®ä»¶ç®±è·¯å¾„(_P)ï¼š"
 
 # src/mailbox-conf.c:742 src/mailbox-conf.c:833
 #. username
-#: src/mailbox-conf.c:870 src/mailbox-conf.c:946
+#: src/mailbox-conf.c:865 src/mailbox-conf.c:944
 msgid "_Username:"
-msgstr "ÓÃ»§Ãû(_U)£º"
+msgstr "ç”¨æˆ·å(_U)ï¼š"
 
 # src/index-child.c:149 src/mailbox-conf.c:759 src/mailbox-conf.c:848
 #. password field
-#: src/mailbox-conf.c:876 src/mailbox-conf.c:953
+#: src/mailbox-conf.c:871 src/mailbox-conf.c:959
 msgid "Pass_word:"
-msgstr "¿ÚÁî(_W)£º"
+msgstr "å£ä»¤(_W)ï¼š"
 
-#: src/mailbox-conf.c:883
+#: src/mailbox-conf.c:878
 msgid "Use _APOP Authentication"
-msgstr "Ê¹ÓÃ _APOP Éí·İÑéÖ¤"
+msgstr "ä½¿ç”¨ _APOP èº«ä»½éªŒè¯"
 
 # src/main-window.c:168
-#: src/mailbox-conf.c:889
+#: src/mailbox-conf.c:884
 msgid "_Delete messages from server after download"
-msgstr "ÔÚÏÂÔØºó´Ó·şÎñÆ÷É¾³ıÓÊ¼ş(_D)"
+msgstr "åœ¨ä¸‹è½½åä»æœåŠ¡å™¨åˆ é™¤é‚®ä»¶(_D)"
+
+#: src/mailbox-conf.c:889
+msgid "_Filter messages through procmail"
+msgstr "ç”¨ procmail è¿‡æ»¤(_F)"
 
 #: src/mailbox-conf.c:894
-msgid "_Filter messages through procmail"
-msgstr "ÓÃ procmail ¹ıÂË(_F)"
-
-#: src/mailbox-conf.c:899
 msgid "_Enable check for new mail"
-msgstr "ÆôÓÃĞÂÓÊ¼ş¼ì²é(_E)"
+msgstr "å¯ç”¨æ–°é‚®ä»¶æ£€æŸ¥(_E)"
 
-#: src/mailbox-conf.c:909
+#: src/mailbox-conf.c:904
 msgid "_Use SSL (pop3s)"
-msgstr "Ê¹ÓÃ SSL(_U)(POP3S)"
+msgstr "ä½¿ç”¨ SSL(_U)(POP3S)"
+
+# src/index-child.c:149 src/mailbox-conf.c:759 src/mailbox-conf.c:848
+#: src/mailbox-conf.c:952
+#, fuzzy
+msgid "_Remember Password"
+msgstr "å£ä»¤(_P)ï¼š"
 
 # src/mailbox-conf.c:861
-#: src/mailbox-conf.c:958
+#: src/mailbox-conf.c:964
 msgid "F_older Path:"
-msgstr "ÎÄ¼ş¼ĞÂ·¾¶(_O)£º"
+msgstr "æ–‡ä»¶å¤¹è·¯å¾„(_O)ï¼š"
 
-#: src/mailbox-conf.c:988
+#: src/mailbox-conf.c:991
 msgid "Use SSL (imaps)"
-msgstr "Ê¹ÓÃ SSL(IMAPS)"
+msgstr "ä½¿ç”¨ SSL(IMAPS)"
 
-#: src/mailbox-node.c:205
+#: src/mailbox-node.c:211
 #, fuzzy
 msgid "The folder edition to be written."
-msgstr "Òª±»Ğ´ÈëµÄÎÄ¼ş¼Ğ¡£"
+msgstr "è¦è¢«å†™å…¥çš„æ–‡ä»¶å¤¹ã€‚"
 
 # src/mailbox-conf.c:640
-#: src/mailbox-node.c:553 src/main-window.c:261
+#: src/mailbox-node.c:572 src/main-window.c:268
 msgid "Local mbox mailbox..."
-msgstr "±¾µØ mbox ÓÊ¼şÏä..."
+msgstr "æœ¬åœ° mbox é‚®ä»¶ç®±..."
 
 # src/mailbox-conf.c:640
-#: src/mailbox-node.c:555 src/main-window.c:266
+#: src/mailbox-node.c:574 src/main-window.c:273
 msgid "Local Maildir mailbox..."
-msgstr "±¾µØ Maildir ÓÊ¼şÏä..."
+msgstr "æœ¬åœ° Maildir é‚®ä»¶ç®±..."
 
 # src/mailbox-conf.c:640
-#: src/mailbox-node.c:557 src/main-window.c:271
+#: src/mailbox-node.c:576 src/main-window.c:278
 msgid "Local MH mailbox..."
-msgstr "±¾µØ MH ÓÊ¼şÏä..."
+msgstr "æœ¬åœ° MH é‚®ä»¶ç®±..."
 
-#: src/mailbox-node.c:559 src/main-window.c:276 src/pref-manager.c:2338
+#: src/mailbox-node.c:578 src/main-window.c:283 src/pref-manager.c:2483
 msgid "Remote IMAP mailbox..."
-msgstr "Ô¶³Ì IMAP ÓÊ¼şÏä..."
+msgstr "è¿œç¨‹ IMAP é‚®ä»¶ç®±..."
 
-#: src/mailbox-node.c:562 src/main-window.c:282 src/pref-manager.c:2343
+#: src/mailbox-node.c:581 src/main-window.c:289 src/pref-manager.c:2488
 msgid "Remote IMAP folder..."
-msgstr "Ô¶³Ì IMAP ÎÄ¼ş¼Ğ..."
+msgstr "è¿œç¨‹ IMAP æ–‡ä»¶å¤¹..."
 
-#: src/mailbox-node.c:564 src/main-window.c:287
+#: src/mailbox-node.c:583 src/main-window.c:294
 msgid "Remote IMAP subfolder..."
-msgstr "Ô¶³Ì IMAP ×ÓÎÄ¼ş¼Ğ..."
+msgstr "è¿œç¨‹ IMAP å­æ–‡ä»¶å¤¹..."
 
 # src/main-window.c:159
-#: src/mailbox-node.c:582
+#: src/mailbox-node.c:601
 msgid "Open"
-msgstr "´ò¿ª"
+msgstr "æ‰“å¼€"
 
 # src/main-window.c:161
-#: src/mailbox-node.c:584
+#: src/mailbox-node.c:603 src/toolbar-factory.c:186
 msgid "Close"
-msgstr "¹Ø±Õ"
-
-#: src/mailbox-node.c:589
-msgid "Properties..."
-msgstr "ÊôĞÔ..."
-
-#: src/mailbox-node.c:597
-msgid "Subscribe"
-msgstr "¶©ÔÄ"
-
-#: src/mailbox-node.c:598
-msgid "Unsubscribe"
-msgstr "ÍË¶©"
-
-#: src/mailbox-node.c:599 src/mailbox-node.c:612
-msgid "Rescan"
-msgstr "ÖØĞÂÉ¨Ãè"
-
-#: src/mailbox-node.c:604
-msgid "Mark as Inbox"
-msgstr "±ê¼ÇÎªÊÕ¼şÏä"
-
-#: src/mailbox-node.c:606
-msgid "Mark as Sentbox"
-msgstr "±ê¼ÇÎªÒÑ·¢ÓÊ¼şÏä"
+msgstr "å…³é—­"
 
 #: src/mailbox-node.c:608
-msgid "Mark as Trash"
-msgstr "±ê¼ÇÎª·ÏÖ½Â¨"
+msgid "Properties..."
+msgstr "å±æ€§..."
 
-#: src/mailbox-node.c:610
+#: src/mailbox-node.c:616
+msgid "Subscribe"
+msgstr "è®¢é˜…"
+
+#: src/mailbox-node.c:617
+msgid "Unsubscribe"
+msgstr "é€€è®¢"
+
+#: src/mailbox-node.c:618 src/mailbox-node.c:635
+msgid "Rescan"
+msgstr "é‡æ–°æ‰«æ"
+
+#: src/mailbox-node.c:623
+msgid "Mark as Inbox"
+msgstr "æ ‡è®°ä¸ºæ”¶ä»¶ç®±"
+
+#: src/mailbox-node.c:625
+msgid "Mark as Sentbox"
+msgstr "æ ‡è®°ä¸ºå·²å‘é‚®ä»¶ç®±"
+
+#: src/mailbox-node.c:627
+msgid "Mark as Trash"
+msgstr "æ ‡è®°ä¸ºåºŸçº¸ç¯“"
+
+#: src/mailbox-node.c:629
 msgid "Mark as Draftbox"
-msgstr "±ê¼ÇÎª¸å¼şÏä"
+msgstr "æ ‡è®°ä¸ºç¨¿ä»¶ç®±"
+
+#. FIXME : No test on mailbox type is made yet, should we ?
+#: src/mailbox-node.c:632
+msgid "Edit/Apply filters"
+msgstr ""
 
 # src/local-mailbox.c:151
-#: src/mailbox-node.c:761
+#: src/mailbox-node.c:784
 #, c-format
 msgid "Local mailbox %s loaded as: %s\n"
-msgstr "±¾µØÓÊ¼şÏä %s ÔØÈëÎª£º%s\n"
+msgstr "æœ¬åœ°é‚®ä»¶ç®± %s è½½å…¥ä¸ºï¼š%s\n"
 
 # src/local-mailbox.c:151
-#: src/mailbox-node.c:787
+#: src/mailbox-node.c:810
 #, c-format
 msgid "Local folder %s\n"
-msgstr "±¾µØÎÄ¼ş¼Ğ %s\n"
+msgstr "æœ¬åœ°æ–‡ä»¶å¤¹ %s\n"
 
 # src/main-window.c:200
-#: src/main-window.c:255
-msgid "_Message..."
-msgstr "ÓÊ¼ş(_M)..."
-
-# src/main-window.c:107
-#: src/main-window.c:255
-msgid "Compose a new message"
-msgstr "±àĞ´ĞÂÓÊ¼ş"
-
-# src/main-window.c:164
 #: src/main-window.c:262
-msgid "Add a new mbox style mailbox"
-msgstr "Ìí¼ÓĞÂµÄ mbox ÀàĞÍÓÊ¼şÏä"
-
-# src/main-window.c:164
-#: src/main-window.c:267
-msgid "Add a new Maildir style mailbox"
-msgstr "Ìí¼ÓĞÂµÄ Maildir ÀàĞÍÓÊ¼şÏä"
-
-# src/main-window.c:164
-#: src/main-window.c:272
-msgid "Add a new MH style mailbox"
-msgstr "Ìí¼ÓĞÂµÄ MH ÀàĞÍÓÊ¼şÏä"
-
-# src/main-window.c:164
-#: src/main-window.c:277
-msgid "Add a new IMAP mailbox"
-msgstr "Ìí¼ÓĞÂµÄ IMAP ÓÊ¼şÏä"
-
-# src/main-window.c:164
-#: src/main-window.c:283
-msgid "Add a new IMAP folder"
-msgstr "Ìí¼ÓĞÂµÄ IMAP ÎÄ¼ş¼Ğ"
-
-# src/main-window.c:164
-#: src/main-window.c:288
-msgid "Add new IMAP subfolder"
-msgstr "Ìí¼ÓĞÂµÄ IMAP ×ÓÎÄ¼ş¼Ğ"
+msgid "_Message..."
+msgstr "é‚®ä»¶(_M)..."
 
 # src/main-window.c:107
-#: src/main-window.c:296
-msgid "_New"
-msgstr "ĞÂ½¨(_N)"
+#: src/main-window.c:262
+msgid "Compose a new message"
+msgstr "ç¼–å†™æ–°é‚®ä»¶"
 
-#: src/main-window.c:300
+# src/main-window.c:164
+#: src/main-window.c:269
+msgid "Add a new mbox style mailbox"
+msgstr "æ·»åŠ æ–°çš„ mbox ç±»å‹é‚®ä»¶ç®±"
+
+# src/main-window.c:164
+#: src/main-window.c:274
+msgid "Add a new Maildir style mailbox"
+msgstr "æ·»åŠ æ–°çš„ Maildir ç±»å‹é‚®ä»¶ç®±"
+
+# src/main-window.c:164
+#: src/main-window.c:279
+msgid "Add a new MH style mailbox"
+msgstr "æ·»åŠ æ–°çš„ MH ç±»å‹é‚®ä»¶ç®±"
+
+# src/main-window.c:164
+#: src/main-window.c:284
+msgid "Add a new IMAP mailbox"
+msgstr "æ·»åŠ æ–°çš„ IMAP é‚®ä»¶ç®±"
+
+# src/main-window.c:164
+#: src/main-window.c:290
+msgid "Add a new IMAP folder"
+msgstr "æ·»åŠ æ–°çš„ IMAP æ–‡ä»¶å¤¹"
+
+# src/main-window.c:164
+#: src/main-window.c:295
+msgid "Add new IMAP subfolder"
+msgstr "æ·»åŠ æ–°çš„ IMAP å­æ–‡ä»¶å¤¹"
+
+# src/main-window.c:107
+#: src/main-window.c:303
+msgid "_New"
+msgstr "æ–°å»º(_N)"
+
+#: src/main-window.c:307
 msgid "_Continue"
-msgstr "¼ÌĞø(_C)"
+msgstr "ç»§ç»­(_C)"
 
 # src/main-window.c:222
-#: src/main-window.c:301
+#: src/main-window.c:308
 msgid "Continue editing current message"
-msgstr "¼ÌĞø±à¼­ÓÊ¼ş"
+msgstr "ç»§ç»­ç¼–è¾‘é‚®ä»¶"
 
 # src/main-window.c:90
-#: src/main-window.c:308
-msgid "_Get New Mail"
-msgstr "È¡ĞÂÓÊ¼ş(_G)"
-
-# src/main-window.c:90
-#: src/main-window.c:308
-msgid "Fetch new incoming mail"
-msgstr "È¡ĞÂÀ´µÄÓÊ¼ş"
-
-# src/sendmsg-window.c:71
-#: src/main-window.c:314
-msgid "_Send Queued Mail"
-msgstr "·¢ËÍ¶ÓÁĞÖĞµÄÓÊ¼ş(_S)"
-
 #: src/main-window.c:315
-msgid "Send messages from the outbox"
-msgstr "´Ó·¢¼şÏäÖĞ·¢ËÍÓÊ¼ş"
+msgid "_Get New Mail"
+msgstr "å–æ–°é‚®ä»¶(_G)"
+
+# src/main-window.c:90
+#: src/main-window.c:315
+msgid "Fetch new incoming mail"
+msgstr "å–æ–°æ¥çš„é‚®ä»¶"
 
 # src/sendmsg-window.c:71
 #: src/main-window.c:321
-msgid "Send and _Receive Mail"
-msgstr "·¢ËÍºÍ½ÓÊÕÓÊ¼ş(_R)"
+msgid "_Send Queued Mail"
+msgstr "å‘é€é˜Ÿåˆ—ä¸­çš„é‚®ä»¶(_S)"
+
+#: src/main-window.c:322
+msgid "Send messages from the outbox"
+msgstr "ä»å‘ä»¶ç®±ä¸­å‘é€é‚®ä»¶"
 
 # src/sendmsg-window.c:71
-#: src/main-window.c:322
+#: src/main-window.c:328
+msgid "Send and _Receive Mail"
+msgstr "å‘é€å’Œæ¥æ”¶é‚®ä»¶(_R)"
+
+# src/sendmsg-window.c:71
+#: src/main-window.c:329 src/toolbar-factory.c:167
 msgid "Send and Receive messages"
-msgstr "·¢ËÍºÍ½ÓÊÕÓÊ¼ş"
+msgstr "å‘é€å’Œæ¥æ”¶é‚®ä»¶"
 
 # src/main-window.c:222 src/sendmsg-window.c:78
-#: src/main-window.c:327
+#: src/main-window.c:334
 msgid "_Print..."
-msgstr "´òÓ¡(_P)..."
+msgstr "æ‰“å°(_P)..."
 
 # src/main-window.c:222
-#: src/main-window.c:328
-msgid "Print currently selected messages"
-msgstr "´òÓ¡µ±Ç°Ñ¡ÖĞµÄÓÊ¼ş"
-
-#: src/main-window.c:334
-msgid "_Address Book..."
-msgstr "µØÖ·²¾(_A)..."
-
 #: src/main-window.c:335
+msgid "Print currently selected messages"
+msgstr "æ‰“å°å½“å‰é€‰ä¸­çš„é‚®ä»¶"
+
+#: src/main-window.c:341
+msgid "_Address Book..."
+msgstr "åœ°å€ç°¿(_A)..."
+
+#: src/main-window.c:342
 msgid "Open the address book"
-msgstr "´ò¿ªµØÖ·²¾"
+msgstr "æ‰“å¼€åœ°å€ç°¿"
 
 # src/main-window.c:182
-#: src/main-window.c:362
+#: src/main-window.c:370
 msgid "_Filters..."
-msgstr "¹ıÂËÆ÷(_F)..."
+msgstr "è¿‡æ»¤å™¨(_F)..."
 
 # src/main-window.c:182
-#: src/main-window.c:362
+#: src/main-window.c:370
 msgid "Manage filters"
-msgstr "¹ÜÀí¹ıÂËÆ÷"
-
-# src/filter-edit-dialog.c:267
-#: src/main-window.c:369 src/message-window.c:90
-msgid "N_o Headers"
-msgstr "Ã»ÓĞĞÅÍ·(_O)"
-
-#: src/main-window.c:369
-msgid "Display no headers"
-msgstr "²»ÏÔÊ¾ĞÅÍ·"
-
-#: src/main-window.c:371
-msgid "S_elected Headers"
-msgstr "Ñ¡ÔñĞÅÍ·(_E)"
+msgstr "ç®¡ç†è¿‡æ»¤å™¨"
 
 #: src/main-window.c:372
-msgid "Display selected headers"
-msgstr "ÏÔÊ¾Ñ¡¶¨µÄĞÅÍ·"
+msgid "_Export filters"
+msgstr ""
+
+#: src/main-window.c:372
+msgid "Export filters as Sieve scripts"
+msgstr ""
 
 # src/filter-edit-dialog.c:267
-#: src/main-window.c:374 src/message-window.c:94
+#: src/main-window.c:379 src/message-window.c:90
+msgid "N_o Headers"
+msgstr "æ²¡æœ‰ä¿¡å¤´(_O)"
+
+#: src/main-window.c:379
+msgid "Display no headers"
+msgstr "ä¸æ˜¾ç¤ºä¿¡å¤´"
+
+#: src/main-window.c:381
+msgid "S_elected Headers"
+msgstr "é€‰æ‹©ä¿¡å¤´(_E)"
+
+#: src/main-window.c:382
+msgid "Display selected headers"
+msgstr "æ˜¾ç¤ºé€‰å®šçš„ä¿¡å¤´"
+
+# src/filter-edit-dialog.c:267
+#: src/main-window.c:384 src/message-window.c:94
 msgid "All _Headers"
-msgstr "È«²¿ĞÅÍ·(_H)"
-
-#: src/main-window.c:374
-msgid "Display all headers"
-msgstr "ÏÔÊ¾ËùÓĞĞÅÍ·"
-
-#: src/main-window.c:381
-msgid "_Flat index"
-msgstr "Æ½ÃæË÷Òı(_F)"
-
-#: src/main-window.c:381
-msgid "No threading at all"
-msgstr "ÎŞÏßË÷"
+msgstr "å…¨éƒ¨ä¿¡å¤´(_H)"
 
 #: src/main-window.c:384
+msgid "Display all headers"
+msgstr "æ˜¾ç¤ºæ‰€æœ‰ä¿¡å¤´"
+
+#: src/main-window.c:391
+msgid "_Flat index"
+msgstr "å¹³é¢ç´¢å¼•(_F)"
+
+#: src/main-window.c:391
+msgid "No threading at all"
+msgstr "æ— çº¿ç´¢"
+
+#: src/main-window.c:394
 msgid "S_imple threading"
-msgstr "¼òµ¥ÏßË÷(_I)"
+msgstr "ç®€å•çº¿ç´¢(_I)"
 
-#: src/main-window.c:385
+#: src/main-window.c:395
 msgid "Simple threading algorithm"
-msgstr "¼òµ¥µÄÏßË÷Ëã·¨"
-
-#: src/main-window.c:388
-msgid "_JWZ threading"
-msgstr "_JWZ ÏßË÷"
-
-#: src/main-window.c:389
-msgid "Elaborate JWZ threading"
-msgstr "ÏêÏ¸µÄ JWZ ÏßË÷"
-
-# src/mailbox-conf.c:634
-#: src/main-window.c:397
-msgid "_Show Mailbox Tree"
-msgstr "ÏÔÊ¾ÓÊ¼şÏäÊ÷(_S)"
+msgstr "ç®€å•çš„çº¿ç´¢ç®—æ³•"
 
 #: src/main-window.c:398
-msgid "Toggle display of mailbox and folder tree"
-msgstr "·´×ªÓÊ¼şÏäºÍÎÄ¼ş¼ĞÊ÷µÄÏÔÊ¾"
+msgid "_JWZ threading"
+msgstr "_JWZ çº¿ç´¢"
+
+#: src/main-window.c:399
+msgid "Elaborate JWZ threading"
+msgstr "è¯¦ç»†çš„ JWZ çº¿ç´¢"
 
 # src/mailbox-conf.c:634
-#: src/main-window.c:401
+#: src/main-window.c:407
+msgid "_Show Mailbox Tree"
+msgstr "æ˜¾ç¤ºé‚®ä»¶ç®±æ ‘(_S)"
+
+#: src/main-window.c:408
+msgid "Toggle display of mailbox and folder tree"
+msgstr "åè½¬é‚®ä»¶ç®±å’Œæ–‡ä»¶å¤¹æ ‘çš„æ˜¾ç¤º"
+
+# src/mailbox-conf.c:634
+#: src/main-window.c:411
 msgid "Show Mailbox _Tabs"
-msgstr "ÏÔÊ¾ÓÊ¼şÏä±í(_T)"
+msgstr "æ˜¾ç¤ºé‚®ä»¶ç®±è¡¨(_T)"
 
-#: src/main-window.c:402
+#: src/main-window.c:412
 msgid "Toggle display of mailbox notebook tabs"
-msgstr "·´×ªÓÊ¼şÏäµÄÏÔÊ¾"
+msgstr "åè½¬é‚®ä»¶ç®±çš„æ˜¾ç¤º"
 
-#: src/main-window.c:406 src/message-window.c:123
+#: src/main-window.c:416 src/message-window.c:123
 msgid "_Wrap"
-msgstr "×Ô¶¯»»ĞĞ(_W)"
+msgstr "è‡ªåŠ¨æ¢è¡Œ(_W)"
 
 # src/sendmsg-window.c:518
-#: src/main-window.c:406 src/sendmsg-window.c:213
+#: src/main-window.c:416 src/sendmsg-window.c:226
 msgid "Wrap message lines"
-msgstr "ÓÊ¼ş×Ô¶¯»»ĞĞ"
+msgstr "é‚®ä»¶è‡ªåŠ¨æ¢è¡Œ"
 
-#: src/main-window.c:414
+#: src/main-window.c:424
 msgid "_Expand All"
-msgstr "È«²¿Õ¹¿ª(_E)"
+msgstr "å…¨éƒ¨å±•å¼€(_E)"
 
-#: src/main-window.c:415
+#: src/main-window.c:425
 msgid "Expand all threads"
-msgstr "Õ¹¿ªËùÓĞÏßË÷"
+msgstr "å±•å¼€æ‰€æœ‰çº¿ç´¢"
 
-#: src/main-window.c:419
+#: src/main-window.c:429
 msgid "_Collapse All"
-msgstr "È«²¿ÕÛµş(_C)"
-
-#: src/main-window.c:420
-msgid "Collapse all expanded threads"
-msgstr "ÕÛµşËùÓĞÕ¹¿ªµÄÏßË÷"
+msgstr "å…¨éƒ¨æŠ˜å (_C)"
 
 #: src/main-window.c:430
-msgid "Toggle flagged"
-msgstr "·´×ª±êÖ¾"
+msgid "Collapse all expanded threads"
+msgstr "æŠ˜å æ‰€æœ‰å±•å¼€çš„çº¿ç´¢"
 
-#: src/main-window.c:437
+#: src/main-window.c:440
+msgid "Toggle flagged"
+msgstr "åè½¬æ ‡å¿—"
+
+#: src/main-window.c:447
 msgid "Toggle New"
-msgstr "·´×ªÎ´¶Á"
+msgstr "åè½¬æœªè¯»"
 
 # src/main-window.c:113 src/message-window.c:54
-#: src/main-window.c:448 src/message-window.c:132
+#: src/main-window.c:458 src/message-window.c:132
 msgid "_Reply..."
-msgstr "»Ø¸´(_R)..."
+msgstr "å›å¤(_R)..."
 
 # src/main-window.c:113
-#: src/main-window.c:449
+#: src/main-window.c:459 src/toolbar-factory.c:143
 msgid "Reply to the current message"
-msgstr "»Ø¸´µ±Ç°ÓÊ¼ş"
+msgstr "å›å¤å½“å‰é‚®ä»¶"
 
 # src/main-window.c:119 src/message-window.c:60
-#: src/main-window.c:456 src/message-window.c:137
+#: src/main-window.c:466 src/message-window.c:137
 msgid "Reply to _All..."
-msgstr "È«²¿»Ø¸´(_A)..."
+msgstr "å…¨éƒ¨å›å¤(_A)..."
 
 # src/main-window.c:120
-#: src/main-window.c:457
+#: src/main-window.c:467
 msgid "Reply to all recipients of the current message"
-msgstr "»Ø¸´¸øµ±Ç°ÓÊ¼şµÄËùÓĞÊÕ¼şÈË"
+msgstr "å›å¤ç»™å½“å‰é‚®ä»¶çš„æ‰€æœ‰æ”¶ä»¶äºº"
 
 # src/main-window.c:119 src/message-window.c:60
-#: src/main-window.c:464 src/message-window.c:143
+#: src/main-window.c:474 src/message-window.c:143
 msgid "Reply to _Group..."
-msgstr "»Ø¸´¸ø×é(_G)..."
+msgstr "å›å¤ç»™ç»„(_G)..."
 
 # src/main-window.c:215
-#: src/main-window.c:465 src/message-window.c:144
+#: src/main-window.c:475 src/message-window.c:144 src/toolbar-factory.c:147
 msgid "Reply to mailing list"
-msgstr "»Ø¸´¸øÓÊ¼şÁĞ±í"
+msgstr "å›å¤ç»™é‚®ä»¶åˆ—è¡¨"
 
 # src/main-window.c:126 src/message-window.c:67
-#: src/main-window.c:472 src/message-window.c:149
+#: src/main-window.c:482 src/message-window.c:149
 msgid "_Forward attached..."
-msgstr "×÷Îª¸½¼ş×ª·¢(_F)..."
+msgstr "ä½œä¸ºé™„ä»¶è½¬å‘(_F)..."
 
 # src/main-window.c:126
-#: src/main-window.c:473
+#: src/main-window.c:483
 msgid "Forward the current message as attachment"
-msgstr "½«µ±Ç°ÓÊ¼ş×÷Îª¸½¼ş×ª·¢"
+msgstr "å°†å½“å‰é‚®ä»¶ä½œä¸ºé™„ä»¶è½¬å‘"
 
 # src/main-window.c:216
-#: src/main-window.c:479 src/message-window.c:154
+#: src/main-window.c:489 src/message-window.c:154
 msgid "Forward inline..."
-msgstr "Ö±½Ó×ª·¢..."
+msgstr "ç›´æ¥è½¬å‘..."
 
 # src/main-window.c:126
-#: src/main-window.c:480
+#: src/main-window.c:490
 msgid "Forward the current message inline"
-msgstr "½«µ±Ç°ÓÊ¼ş×÷ÎªĞÂÓÊ¼ş×ª·¢"
+msgstr "å°†å½“å‰é‚®ä»¶ä½œä¸ºæ–°é‚®ä»¶è½¬å‘"
 
 # src/main-window.c:219
-#: src/main-window.c:487 src/message-window.c:160
+#: src/main-window.c:497 src/message-window.c:160
 msgid "Next Part"
-msgstr "ÏÂÒ»²¿·Ö"
+msgstr "ä¸‹ä¸€éƒ¨åˆ†"
 
 # src/main-window.c:219
-#: src/main-window.c:487
+#: src/main-window.c:497
 msgid "Next part in message"
-msgstr "ÓÊ¼şµÄÏÂÒ»²¿·Ö"
+msgstr "é‚®ä»¶çš„ä¸‹ä¸€éƒ¨åˆ†"
 
 # src/main-window.c:218
-#: src/main-window.c:493 src/message-window.c:164
+#: src/main-window.c:503 src/message-window.c:164
 msgid "Previous Part"
-msgstr "Ç°Ò»²¿·Ö"
+msgstr "å‰ä¸€éƒ¨åˆ†"
 
 # src/main-window.c:218
-#: src/main-window.c:494
+#: src/main-window.c:504
 msgid "Previous part in message"
-msgstr "ÓÊ¼şµÄÇ°Ò»²¿·Ö"
+msgstr "é‚®ä»¶çš„å‰ä¸€éƒ¨åˆ†"
 
-#: src/main-window.c:500 src/message-window.c:169
+#: src/main-window.c:510 src/message-window.c:169
 msgid "Save Current Part..."
-msgstr "±£´æµ±Ç°²¿·Ö..."
+msgstr "ä¿å­˜å½“å‰éƒ¨åˆ†..."
 
-#: src/main-window.c:501 src/message-window.c:170
+#: src/main-window.c:511 src/message-window.c:170
 msgid "Save current part in message"
-msgstr "±£´æÓÊ¼şµ±Ç°²¿·Ö"
+msgstr "ä¿å­˜é‚®ä»¶å½“å‰éƒ¨åˆ†"
 
-#: src/main-window.c:507 src/message-window.c:174
+#: src/main-window.c:517 src/message-window.c:174
 msgid "_View Source..."
-msgstr "²é¿´Ô´(_V)..."
+msgstr "æŸ¥çœ‹æº(_V)..."
 
-#: src/main-window.c:508 src/message-window.c:175
+#: src/main-window.c:518 src/message-window.c:175
 msgid "View source form of the message"
-msgstr "²é¿´ÓÊ¼şµÄÔ´ĞÎÊ½"
+msgstr "æŸ¥çœ‹é‚®ä»¶çš„æºå½¢å¼"
 
-#: src/main-window.c:526
+#: src/main-window.c:536
 msgid "_Move to Trash"
-msgstr "ÒÆµ½ÒÑÉ¾³ıÓÊ¼ş(_M)"
+msgstr "ç§»åˆ°å·²åˆ é™¤é‚®ä»¶(_M)"
 
 # src/main-window.c:168
-#: src/main-window.c:527
+#: src/main-window.c:537
 msgid "Move the current message to Trash mailbox"
-msgstr "½«µ±Ç°ÓÊ¼şÒÆµ½ÒÑÉ¾³ıÓÊ¼şÏä"
+msgstr "å°†å½“å‰é‚®ä»¶ç§»åˆ°å·²åˆ é™¤é‚®ä»¶ç®±"
 
 # src/main-window.c:133 src/main-window.c:168
-#: src/main-window.c:532
+#: src/main-window.c:542
 msgid "_Delete"
-msgstr "É¾³ı(_D)"
+msgstr "åˆ é™¤(_D)"
 
 # src/main-window.c:133
-#: src/main-window.c:533
+#: src/main-window.c:543
 msgid "Delete the current message"
-msgstr "É¾³ıµ±Ç°ÓÊ¼ş"
+msgstr "åˆ é™¤å½“å‰é‚®ä»¶"
 
 # src/main-window.c:139
-#: src/main-window.c:539
+#: src/main-window.c:549
 msgid "_Undelete"
-msgstr "È¡ÏûÉ¾³ı(_U)"
+msgstr "å–æ¶ˆåˆ é™¤(_U)"
 
 # src/main-window.c:139
-#: src/main-window.c:539
+#: src/main-window.c:549
 msgid "Undelete the message"
-msgstr "È¡ÏûÉ¾³ıÓÊ¼ş"
+msgstr "å–æ¶ˆåˆ é™¤é‚®ä»¶"
 
 #. !
-#: src/main-window.c:545
+#: src/main-window.c:555
 msgid "_Toggle"
-msgstr "·´×ª±êÖ¾(_T)"
+msgstr "åè½¬æ ‡å¿—(_T)"
 
-#: src/main-window.c:550
+#: src/main-window.c:560
 msgid "_Store Address..."
-msgstr "±£´æµØÖ·(_S)..."
+msgstr "ä¿å­˜åœ°å€(_S)..."
 
-#: src/main-window.c:551
+#: src/main-window.c:561
 msgid "Store address of sender in addressbook"
-msgstr "ÔÚµØÖ·²¾ÖĞ±£´æ·¢¼şÈËµØÖ·"
+msgstr "åœ¨åœ°å€ç°¿ä¸­ä¿å­˜å‘ä»¶äººåœ°å€"
 
 # src/main-window.c:219
-#: src/main-window.c:561
+#: src/main-window.c:571
 msgid "Next Message"
-msgstr "ÏÂÒ»ÓÊ¼ş"
+msgstr "ä¸‹ä¸€é‚®ä»¶"
 
 # src/main-window.c:218
-#: src/main-window.c:567
+#: src/main-window.c:577
 msgid "Previous Message"
-msgstr "Ç°Ò»ÓÊ¼ş"
+msgstr "å‰ä¸€é‚®ä»¶"
 
 # src/main-window.c:211
-#: src/main-window.c:573 src/main-window.c:574
+#: src/main-window.c:583 src/main-window.c:584
 msgid "Next Unread Message"
-msgstr "ÏÂÒ»Î´¶ÁÓÊ¼ş"
+msgstr "ä¸‹ä¸€æœªè¯»é‚®ä»¶"
 
 # src/main-window.c:211
-#: src/main-window.c:580 src/main-window.c:581
+#: src/main-window.c:590 src/main-window.c:591
 msgid "Next Flagged Message"
-msgstr "ÏÂÒ»×ö±ê¼ÇÓÊ¼ş"
+msgstr "ä¸‹ä¸€åšæ ‡è®°é‚®ä»¶"
 
 # src/main-window.c:215
-#: src/main-window.c:588
+#: src/main-window.c:598
 msgid "Select all"
-msgstr "È«²¿Ñ¡ÖĞ"
+msgstr "å…¨éƒ¨é€‰ä¸­"
 
-#: src/main-window.c:589
+#: src/main-window.c:599
 msgid "Select all messages in current mailbox"
-msgstr "Ñ¡ÖĞµ±Ç°ÓÊ¼şÏäÖĞµÄÈ«²¿ÓÊ¼ş"
+msgstr "é€‰ä¸­å½“å‰é‚®ä»¶ç®±ä¸­çš„å…¨éƒ¨é‚®ä»¶"
 
 # src/main-window.c:166
-#: src/main-window.c:595
+#: src/main-window.c:605
 msgid "_Edit..."
-msgstr "±à¼­(_E)..."
+msgstr "ç¼–è¾‘(_E)..."
 
 # src/main-window.c:166
-#: src/main-window.c:595
+#: src/main-window.c:605
 msgid "Edit the selected mailbox"
-msgstr "±à¼­Ñ¡¶¨µÄÓÊ¼şÏä"
+msgstr "ç¼–è¾‘é€‰å®šçš„é‚®ä»¶ç®±"
 
 # src/main-window.c:133 src/main-window.c:168
-#: src/main-window.c:599
+#: src/main-window.c:609
 msgid "_Delete..."
-msgstr "É¾³ı(_D)..."
+msgstr "åˆ é™¤(_D)..."
 
 # src/main-window.c:168
-#: src/main-window.c:600
+#: src/main-window.c:610
 msgid "Delete the selected mailbox"
-msgstr "É¾³ıÑ¡¶¨µÄÓÊ¼şÏä"
+msgstr "åˆ é™¤é€‰å®šçš„é‚®ä»¶ç®±"
 
 # src/main-window.c:173
-#: src/main-window.c:606
+#: src/main-window.c:616
 msgid "Co_mmit Current"
-msgstr "Ìá½»µ±Ç°(_M)"
+msgstr "æäº¤å½“å‰(_M)"
 
 # src/main-window.c:173
-#: src/main-window.c:607
+#: src/main-window.c:617
 msgid "Commit the changes in the currently opened mailbox"
-msgstr "Ìá½»µ±Ç°´ò¿ªµÄÓÊ¼şÏäµÄ±ä»¯"
+msgstr "æäº¤å½“å‰æ‰“å¼€çš„é‚®ä»¶ç®±çš„å˜åŒ–"
 
-#: src/main-window.c:611
+#: src/main-window.c:621
 msgid "Commit _All"
-msgstr "È«²¿Ìá½»(_A)"
+msgstr "å…¨éƒ¨æäº¤(_A)"
 
 # src/main-window.c:173
-#: src/main-window.c:612
+#: src/main-window.c:622
 msgid "Commit the changes in all mailboxes"
-msgstr "Ìá½»ËùÓĞÓÊ¼şÏäµÄ±ä»¯"
+msgstr "æäº¤æ‰€æœ‰é‚®ä»¶ç®±çš„å˜åŒ–"
 
 # src/main-window.c:161
-#: src/main-window.c:616
+#: src/main-window.c:626
 msgid "_Close"
-msgstr "¹Ø±Õ(_C)"
+msgstr "å…³é—­(_C)"
 
 # src/mailbox-conf.c:640
-#: src/main-window.c:616
+#: src/main-window.c:626
 msgid "Close mailbox"
-msgstr "¹Ø±ÕÓÊ¼şÏä"
-
-#: src/main-window.c:620
-msgid "Empty _Trash"
-msgstr "Çå¿Õ·ÏÖ½Â¨(_T)"
-
-# src/main-window.c:168
-#: src/main-window.c:621
-msgid "Delete messages from the Trash mailbox"
-msgstr "É¾³ı·ÏÖ½Â¨ÖĞµÄÓÊ¼ş"
-
-#: src/main-window.c:629
-msgid "_Customize..."
-msgstr "¶¨ÖÆ(_C)..."
+msgstr "å…³é—­é‚®ä»¶ç®±"
 
 #: src/main-window.c:630
+msgid "Empty _Trash"
+msgstr "æ¸…ç©ºåºŸçº¸ç¯“(_T)"
+
+# src/main-window.c:168
+#: src/main-window.c:631
+msgid "Delete messages from the Trash mailbox"
+msgstr "åˆ é™¤åºŸçº¸ç¯“ä¸­çš„é‚®ä»¶"
+
+#: src/main-window.c:639
+msgid "_Customize..."
+msgstr "å®šåˆ¶(_C)..."
+
+#: src/main-window.c:640
 msgid "Customize toolbars and menus"
-msgstr "¶¨ÖÆ¹¤¾ßÀ¸ºÍ²Ëµ¥"
+msgstr "å®šåˆ¶å·¥å…·æ å’Œèœå•"
 
 # src/main-window.c:182
-#: src/main-window.c:633
+#: src/main-window.c:643
 msgid "_Identities..."
-msgstr "Éí·İ(_I)..."
+msgstr "èº«ä»½(_I)..."
 
-#: src/main-window.c:634
+#: src/main-window.c:644
 msgid "Create and set current identities"
-msgstr "´´½¨ºÍÉèÖÃµ±Ç°Éí·İ"
+msgstr "åˆ›å»ºå’Œè®¾ç½®å½“å‰èº«ä»½"
 
 # src/main-window.c:200
-#: src/main-window.c:651
+#: src/main-window.c:661
 msgid "_Message"
-msgstr "ÓÊ¼ş(_M)"
+msgstr "é‚®ä»¶(_M)"
 
 # src/mailbox-conf.c:939
-#: src/main-window.c:652
+#: src/main-window.c:662
 msgid "Mail_box"
-msgstr "ÓÊ¼şÏä(_B)"
+msgstr "é‚®ä»¶ç®±(_B)"
 
-#: src/main-window.c:738
+#: src/main-window.c:748
 msgid ""
 "Balsa is sending a mail now.\n"
 "Abort sending?"
 msgstr ""
-"Balsa ÕıÔÚ·¢ËÍÓÊ¼ş¡£\n"
-"ÖĞÖ¹·¢ËÍ£¿"
+"Balsa æ­£åœ¨å‘é€é‚®ä»¶ã€‚\n"
+"ä¸­æ­¢å‘é€ï¼Ÿ"
 
-#: src/main-window.c:1281
+#: src/main-window.c:1291
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
 msgstr ""
-"ÎŞ·¨´ò¿ªÓÊ¼şÏä£¡\n"
-"Çë¼ì²éÓÊ¼şÏäÉèÖÃ¡£"
+"æ— æ³•æ‰“å¼€é‚®ä»¶ç®±ï¼\n"
+"è¯·æ£€æŸ¥é‚®ä»¶ç®±è®¾ç½®ã€‚"
 
 # src/main-window.c:407
-#: src/main-window.c:1562
+#: src/main-window.c:1572
 msgid "Copyright (C) 1997-2001"
-msgstr "°æÈ¨ËùÓĞ (C) 1997-2001"
+msgstr "ç‰ˆæƒæ‰€æœ‰ (C) 1997-2001"
 
 # src/main-window.c:409
-#: src/main-window.c:1565
+#: src/main-window.c:1575
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://www.balsa.net/\n"
 "\n"
 "If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
 msgstr ""
-"Balsa ÓÊ¼ş¿Í»§³ÌĞòÊÇ GNOME ×ÀÃæ»·¾³µÄÒ»²¿·Ö¡£¹ØÓÚ Balsa µÄĞÅÏ¢¿ÉÒÔ·ÃÎÊ "
+"Balsa é‚®ä»¶å®¢æˆ·ç¨‹åºæ˜¯ GNOME æ¡Œé¢ç¯å¢ƒçš„ä¸€éƒ¨åˆ†ã€‚å…³äº Balsa çš„ä¿¡æ¯å¯ä»¥è®¿é—® "
 "http://www.balsa.net\n"
 "\n"
-"Èç¹ûÄúÒª±¨¸æÈí¼şµÄÎÊÌâ£¬Çë·ÃÎÊhttp://bugzilla.gnome.org/"
+"å¦‚æœæ‚¨è¦æŠ¥å‘Šè½¯ä»¶çš„é—®é¢˜ï¼Œè¯·è®¿é—®http://bugzilla.gnome.org/"
 
 # src/sendmsg-window.c:71
-#: src/main-window.c:1673
+#: src/main-window.c:1683
 msgid "Checking Mail..."
-msgstr "ÕıÔÚ¼ì²éÓÊ¼ş..."
+msgstr "æ­£åœ¨æ£€æŸ¥é‚®ä»¶..."
 
-#: src/main-window.c:1961
+#: src/main-window.c:1971
 msgid "Finished Checking."
-msgstr "Íê³É¼ì²é¡£"
+msgstr "å®Œæˆæ£€æŸ¥ã€‚"
 
-#: src/main-window.c:2028
+#: src/main-window.c:2038
 #, c-format
 msgid "Sending error: %s"
-msgstr "·¢ËÍ´íÎó£º%s"
+msgstr "å‘é€é”™è¯¯ï¼š%s"
 
-#: src/main-window.c:2126
+#: src/main-window.c:2136
 msgid "You have new mail waiting"
-msgstr "ÄúÓĞĞÂÓÊ¼ş"
+msgstr "æ‚¨æœ‰æ–°é‚®ä»¶"
 
-#: src/main-window.c:2129
+#: src/main-window.c:2139
 msgid "OK"
-msgstr "È·¶¨"
+msgstr "ç¡®å®š"
 
-#: src/main-window.c:2577 src/main-window.c:2596
+# src/sendmsg-window.c:523
+#: src/main-window.c:2582
+#, fuzzy
+msgid "Search a message"
+msgstr "æ–°å»ºé‚®ä»¶"
+
+#. FIXME : we'll set up this callback later when selecting
+#. filters has been enabled
+#. gtk_signal_connect(GTK_OBJECT(dia),"clicked",
+#. find_dialog_button_cb,&f);
+#.
+#: src/main-window.c:2598
+msgid "Reverse search"
+msgstr ""
+
+# src/filter-edit-dialog.c:536
+#: src/main-window.c:2601
+#, fuzzy
+msgid "Search for:"
+msgstr "æœç´¢åå­—ï¼š"
+
+# src/balsa-init.c:590
+#: src/main-window.c:2613
+#, fuzzy
+msgid "In:"
+msgstr "æ”¶ä»¶ç®±ï¼š"
+
+#: src/main-window.c:2773 src/main-window.c:2792
 #, c-format
 msgid "Commiting mailbox %s failed."
-msgstr "¸Ä±äÓÊ¼şÏä %s Ê§°Ü¡£"
+msgstr "æ”¹å˜é‚®ä»¶ç®± %s å¤±è´¥ã€‚"
 
-#: src/main-window.c:2817
+#: src/main-window.c:2991
 #, c-format
 msgid "Balsa: %s (readonly)"
-msgstr "Balsa£º%s (Ö»¶Á)"
+msgstr "Balsaï¼š%s (åªè¯»)"
 
 # src/filter-edit-dialog.c:749
-#: src/main-window.c:2819
+#: src/main-window.c:2993
 #, c-format
 msgid "Balsa: %s"
-msgstr "Balsa£º%s"
+msgstr "Balsaï¼š%s"
 
 # src/main-window.c:90
-#: src/main.c:112
+#: src/main.c:123
 msgid "Get new mail on startup"
-msgstr "ÔÚÆô¶¯Ê±È¡ĞÂÓÊ¼ş"
+msgstr "åœ¨å¯åŠ¨æ—¶å–æ–°é‚®ä»¶"
 
-#: src/main.c:114
+#: src/main.c:125
 msgid "Compose a new email to EMAIL@ADDRESS"
-msgstr "×«Ğ´¸ø EMAIL@ADDRESS µÄĞÂÓÊ¼ş"
+msgstr "æ’°å†™ç»™ EMAIL@ADDRESS çš„æ–°é‚®ä»¶"
 
 # src/sendmsg-window.c:239
-#: src/main.c:116
+#: src/main.c:127
 msgid "Attach file at PATH"
-msgstr "Õ³¸½ÎÄ¼şÓÚ PATH"
+msgstr "ç²˜é™„æ–‡ä»¶äº PATH"
 
-#: src/main.c:118
+#: src/main.c:129
 msgid "Opens MAILBOXNAME"
-msgstr "´ò¿ª MAILBOXNAME"
+msgstr "æ‰“å¼€ MAILBOXNAME"
 
-#: src/main.c:118
+#: src/main.c:129
 msgid "MAILBOXNAME"
 msgstr "MAILBOXNAME"
 
 # src/main-window.c:159
-#: src/main.c:121
+#: src/main.c:132
 msgid "Opens first unread mailbox"
-msgstr "´ò¿ªµÚÒ»¸öÎª¶ÁµÄÓÊ¼şÏä"
+msgstr "æ‰“å¼€ç¬¬ä¸€ä¸ªä¸ºè¯»çš„é‚®ä»¶ç®±"
 
 # src/main-window.c:90
-#: src/main.c:124
+#: src/main.c:135
 msgid "Opens default Inbox on startup"
-msgstr "Æô¶¯Ê±´ò¿ªÄ¬ÈÏµÄÊÕ¼şÏä"
+msgstr "å¯åŠ¨æ—¶æ‰“å¼€é»˜è®¤çš„æ”¶ä»¶ç®±"
 
-#: src/main.c:126
+#: src/main.c:137
 msgid "Debug POP3 connection"
-msgstr "µ÷ÊÔ POP3 Á¬½Ó"
+msgstr "è°ƒè¯• POP3 è¿æ¥"
 
-#: src/main.c:144 src/main.c:149 src/main.c:155 src/main.c:161 src/main.c:167
+#: src/main.c:164 src/main.c:169 src/main.c:175 src/main.c:181 src/main.c:187
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
-msgstr "Balsa ÎŞ·¨´ò¿ªÄúµÄ¡°%s¡±ÓÊ¼şÏä¡£"
+msgstr "Balsa æ— æ³•æ‰“å¼€æ‚¨çš„â€œ%sâ€é‚®ä»¶ç®±ã€‚"
 
 # src/balsa-init.c:590
-#: src/main.c:144
+#: src/main.c:164
 msgid "Inbox"
-msgstr "ÊÕ¼şÏä"
+msgstr "æ”¶ä»¶ç®±"
 
 # src/balsa-init.c:598
-#: src/main.c:150
+#: src/main.c:170
 msgid "Outbox"
-msgstr "·¢¼şÏä"
+msgstr "å‘ä»¶ç®±"
 
 # src/balsa-init.c:590
-#: src/main.c:156
+#: src/main.c:176
 msgid "Sentbox"
-msgstr "ÒÑ·¢ËÍÓÊ¼ş"
+msgstr "å·²å‘é€é‚®ä»¶"
 
-#: src/main.c:162
+#: src/main.c:182
 msgid "Draftbox"
-msgstr "¸å¼şÏä"
+msgstr "ç¨¿ä»¶ç®±"
 
 # src/balsa-init.c:606
-#: src/main.c:167
+#: src/main.c:187
 msgid "Trash"
-msgstr "ÒÑÉ¾³ıÓÊ¼ş"
+msgstr "å·²åˆ é™¤é‚®ä»¶"
 
 #: src/message-window.c:92
 msgid "_Selected Headers"
-msgstr "Ñ¡ÔñµÄĞÅÍ·(_S)"
+msgstr "é€‰æ‹©çš„ä¿¡å¤´(_S)"
 
 # src/message-window.c:54
 #: src/message-window.c:132
 msgid "Reply to this message"
-msgstr "»Ø¸´´ËÓÊ¼ş"
+msgstr "å›å¤æ­¤é‚®ä»¶"
 
 # src/message-window.c:61
 #: src/message-window.c:138
 msgid "Reply to all recipients of this message"
-msgstr "»Ø¸´¸ø´ËÓÊ¼şµÄËùÓĞÊÕ¼şÈË"
+msgstr "å›å¤ç»™æ­¤é‚®ä»¶çš„æ‰€æœ‰æ”¶ä»¶äºº"
 
 # src/message-window.c:67
 #: src/message-window.c:150
 msgid "Forward this message as attachment"
-msgstr "½«´ËÓÊ¼ş×÷Îª¸½¼ş×ª·¢"
+msgstr "å°†æ­¤é‚®ä»¶ä½œä¸ºé™„ä»¶è½¬å‘"
 
 # src/message-window.c:67
 #: src/message-window.c:155
 msgid "Forward this message inline"
-msgstr "Ö±½Ó×ª·¢´ËÓÊ¼ş"
+msgstr "ç›´æ¥è½¬å‘æ­¤é‚®ä»¶"
 
 # src/main-window.c:219
 #: src/message-window.c:160
 msgid "Next part in Message"
-msgstr "ÓÊ¼şµÄÏÂÒ»²¿·Ö"
+msgstr "é‚®ä»¶çš„ä¸‹ä¸€éƒ¨åˆ†"
 
 # src/main-window.c:218
 #: src/message-window.c:165
 msgid "Previous part in Message"
-msgstr "ÓÊ¼şµÄÇ°Ò»²¿·Ö"
+msgstr "é‚®ä»¶çš„å‰ä¸€éƒ¨åˆ†"
 
 # src/pref-manager.c:66
-#: src/pref-manager.c:198
+#: src/pref-manager.c:207
 msgid "Text"
-msgstr "ÎÄ±¾"
+msgstr "æ–‡æœ¬"
 
 # src/pref-manager.c:67
-#: src/pref-manager.c:199
+#: src/pref-manager.c:208
 msgid "Icons"
-msgstr "Í¼±ê"
+msgstr "å›¾æ ‡"
 
 # src/pref-manager.c:68
-#: src/pref-manager.c:200
+#: src/pref-manager.c:209
 msgid "Both"
-msgstr "Á½Õß"
+msgstr "ä¸¤è€…"
 
-#: src/pref-manager.c:210
+#: src/pref-manager.c:219
 msgid "7bits"
-msgstr "7Î»±àÂë"
+msgstr "7ä½ç¼–ç "
 
-#: src/pref-manager.c:211
+#: src/pref-manager.c:220
 msgid "8bits"
-msgstr "8Î»±àÂë"
+msgstr "8ä½ç¼–ç "
 
-#: src/pref-manager.c:212
+#: src/pref-manager.c:221
 msgid "quoted"
-msgstr "ÒıÓÃµÄ"
+msgstr "å¼•ç”¨çš„"
 
 # src/main-window.c:211
-#: src/pref-manager.c:222
+#: src/pref-manager.c:231
 msgid "While Retrieving Messages"
-msgstr "ÔÚÏÂÔØÓÊ¼şÊ±"
+msgstr "åœ¨ä¸‹è½½é‚®ä»¶æ—¶"
 
-#: src/pref-manager.c:223
+#: src/pref-manager.c:232
 msgid "Until Closed"
-msgstr "Ö±µ½¹Ø±ÕÊ±"
+msgstr "ç›´åˆ°å…³é—­æ—¶"
 
 # src/filter-edit-dialog.c:721
-#: src/pref-manager.c:224 src/pref-manager.c:2485 src/pref-manager.c:2521
+#: src/pref-manager.c:233 src/pref-manager.c:2630 src/pref-manager.c:2666
 msgid "Never"
-msgstr "´Ó²»"
+msgstr "ä»ä¸"
 
-#: src/pref-manager.c:228
+#: src/pref-manager.c:237
 msgid "Fast"
-msgstr "¿ì"
+msgstr "å¿«"
 
-#: src/pref-manager.c:229
+#: src/pref-manager.c:238
 msgid "Normal"
-msgstr "ÆÕÍ¨"
+msgstr "æ™®é€š"
 
-#: src/pref-manager.c:230
+#: src/pref-manager.c:239
 msgid "Bad Spellers"
-msgstr "×ĞÏ¸¼ì²é"
+msgstr "ä»”ç»†æ£€æŸ¥"
 
 # src/pref-manager.c:117
-#: src/pref-manager.c:253
+#: src/pref-manager.c:262
 msgid "Balsa Preferences"
-msgstr "Balsa Ê×Ñ¡Ïî"
+msgstr "Balsa é¦–é€‰é¡¹"
 
 # src/pref-manager.c:144
-#: src/pref-manager.c:264
+#: src/pref-manager.c:273
 msgid "Mail Servers"
-msgstr "ÓÊ¼ş·şÎñÆ÷"
+msgstr "é‚®ä»¶æœåŠ¡å™¨"
 
-#: src/pref-manager.c:268 src/pref-manager.c:2150
+#: src/pref-manager.c:277 src/pref-manager.c:2295
 msgid "Address Books"
-msgstr "µØÖ·²¾"
+msgstr "åœ°å€ç°¿"
 
-#: src/pref-manager.c:272
+#: src/pref-manager.c:281
 msgid "Mail Options"
-msgstr "ÓÊ¼şÑ¡Ïî"
+msgstr "é‚®ä»¶é€‰é¡¹"
 
 # src/pref-manager.c:151
-#: src/pref-manager.c:276 src/pref-manager.c:1719
+#: src/pref-manager.c:285 src/pref-manager.c:1807
 msgid "Display"
-msgstr "ÏÔÊ¾"
+msgstr "æ˜¾ç¤º"
 
 # src/sendmsg-window.c:76
-#: src/pref-manager.c:280
+#: src/pref-manager.c:289 src/toolbar-factory.c:174
 msgid "Spelling"
-msgstr "Æ´Ğ´"
+msgstr "æ‹¼å†™"
 
 # src/pref-manager.c:158 src/pref-manager.c:587
-#: src/pref-manager.c:284 src/pref-manager.c:2059
+#: src/pref-manager.c:293 src/pref-manager.c:2157
 msgid "Misc"
-msgstr "ÆäËü"
+msgstr "å…¶å®ƒ"
 
-#: src/pref-manager.c:288
+#: src/pref-manager.c:297
 msgid "Startup"
-msgstr "Æô¶¯"
+msgstr "å¯åŠ¨"
 
-#: src/pref-manager.c:1023
+#: src/pref-manager.c:1104
 msgid "Yes"
-msgstr "ÊÇ"
+msgstr "æ˜¯"
 
 # src/pref-manager.c:431
-#: src/pref-manager.c:1239
+#: src/pref-manager.c:1320
 msgid "Remote Mailbox Servers"
-msgstr "Ô¶³ÌÓÊ¼şÏä·şÎñÆ÷"
+msgstr "è¿œç¨‹é‚®ä»¶ç®±æœåŠ¡å™¨"
 
 # src/pref-manager.c:440
-#: src/pref-manager.c:1261 src/pref-manager.c:2172
+#: src/pref-manager.c:1342 src/pref-manager.c:2317
 msgid "Type"
-msgstr "ÀàĞÍ"
+msgstr "ç±»å‹"
 
 # src/mailbox-conf.c:671 src/mailbox-conf.c:706
-#: src/pref-manager.c:1264
+#: src/pref-manager.c:1345
 msgid "Mailbox Name"
-msgstr "ÓÊ¼şÏäÃû"
+msgstr "é‚®ä»¶ç®±å"
 
 # src/pref-manager.c:466
-#: src/pref-manager.c:1272 src/pref-manager.c:2184
+#: src/pref-manager.c:1353 src/pref-manager.c:2329
 msgid "Modify"
-msgstr "ĞŞ¸Ä"
+msgstr "ä¿®æ”¹"
 
 # src/pref-manager.c:476
-#: src/pref-manager.c:1275
+#: src/pref-manager.c:1356
 msgid "Local mail"
-msgstr "±¾µØÓÊ¼ş"
+msgstr "æœ¬åœ°é‚®ä»¶"
 
 # src/pref-manager.c:481
-#: src/pref-manager.c:1285
+#: src/pref-manager.c:1366
 msgid "Select your local mail directory"
-msgstr "Ñ¡Ôñ±¾µØÓÊ¼şÄ¿Â¼"
+msgstr "é€‰æ‹©æœ¬åœ°é‚®ä»¶ç›®å½•"
 
 # src/pref-manager.c:488
-#: src/pref-manager.c:1295
+#: src/pref-manager.c:1376
 msgid "Outgoing mail"
-msgstr "Íâ·¢ÓÊ¼ş"
+msgstr "å¤–å‘é‚®ä»¶"
 
 # src/pref-manager.c:496
-#: src/pref-manager.c:1307
+#: src/pref-manager.c:1388
 msgid "Remote SMTP Server"
-msgstr "Ô¶³Ì SMTP ·şÎñÆ÷"
+msgstr "è¿œç¨‹ SMTP æœåŠ¡å™¨"
 
-#: src/pref-manager.c:1316
+#: src/pref-manager.c:1397
 msgid "User"
-msgstr "ÓÃ»§"
+msgstr "ç”¨æˆ·"
 
-#: src/pref-manager.c:1325
+#: src/pref-manager.c:1406
 msgid "Pass Phrase"
-msgstr "¿ÚÁî"
+msgstr "å£ä»¤"
 
 #. STARTTLS
-#: src/pref-manager.c:1337
+#: src/pref-manager.c:1418
 msgid "Use TLS"
-msgstr "Ê¹ÓÃ TLS"
+msgstr "ä½¿ç”¨ TLS"
 
-#: src/pref-manager.c:1353
+#: src/pref-manager.c:1434
 msgid "Certificate Pass Phrase"
-msgstr "Ö¤Êé¿ÚÁî´®"
+msgstr "è¯ä¹¦å£ä»¤ä¸²"
 
 # src/pref-manager.c:67
-#: src/pref-manager.c:1382
+#: src/pref-manager.c:1463
 msgid "Incoming"
-msgstr "½ÓÊÕ"
+msgstr "æ¥æ”¶"
 
 # src/pref-manager.c:488
-#: src/pref-manager.c:1384
+#: src/pref-manager.c:1465
 msgid "Outgoing"
-msgstr "·¢ËÍ"
+msgstr "å‘é€"
 
 # src/mailbox-conf.c:774 src/main-window.c:209
-#: src/pref-manager.c:1410
+#: src/pref-manager.c:1491
 msgid "Checking"
-msgstr "¼ì²é"
+msgstr "æ£€æŸ¥"
 
-#: src/pref-manager.c:1420 src/pref-manager.c:2088
+#: src/pref-manager.c:1501 src/pref-manager.c:2186
 msgid "minutes"
-msgstr "·ÖÖÓ"
+msgstr "åˆ†é’Ÿ"
 
-#: src/pref-manager.c:1432
+#: src/pref-manager.c:1513
 msgid "Check mail automatically every:"
-msgstr "×Ô¶¯¼ì²éÓÊ¼ş£º"
+msgstr "è‡ªåŠ¨æ£€æŸ¥é‚®ä»¶ï¼š"
 
-#: src/pref-manager.c:1441
+#: src/pref-manager.c:1522
 msgid "Check IMAP mailboxes"
-msgstr "Ô¶³Ì IMAP ÓÊ¼şÏä"
+msgstr "è¿œç¨‹ IMAP é‚®ä»¶ç®±"
 
-#: src/pref-manager.c:1446
+#: src/pref-manager.c:1527
 msgid "Check INBOX only"
-msgstr "Ö»¼ì²éÊÕ¼şÏä"
+msgstr "åªæ£€æŸ¥æ”¶ä»¶ç®±"
 
-#: src/pref-manager.c:1451
+#: src/pref-manager.c:1532
 msgid "Display message if new mail has arrived"
-msgstr "Èç¹ûĞÂÓÊ¼şµ½´ïÔòÏÔÊ¾"
+msgstr "å¦‚æœæ–°é‚®ä»¶åˆ°è¾¾åˆ™æ˜¾ç¤º"
 
-#: src/pref-manager.c:1456
+#: src/pref-manager.c:1537
 msgid "Do background check quietly (no messages in status bar)"
-msgstr "ºóÌ¨¼ì²é(×´Ì¬À¸²»ÏÔÊ¾ÏûÏ¢)"
+msgstr "åå°æ£€æŸ¥(çŠ¶æ€æ ä¸æ˜¾ç¤ºæ¶ˆæ¯)"
 
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
-#: src/pref-manager.c:1462
+#: src/pref-manager.c:1543
 #, fuzzy
 msgid "Quoted and Flowed Text"
-msgstr "ÒıÓÃÎÄ±¾"
+msgstr "å¼•ç”¨æ–‡æœ¬"
 
-#: src/pref-manager.c:1475
+#: src/pref-manager.c:1556
 msgid "Quoted Text Regular Expression"
-msgstr "ÒıÓÃÎÄ±¾µÄÕıÔò±í´ïÊ½"
+msgstr "å¼•ç”¨æ–‡æœ¬çš„æ­£åˆ™è¡¨è¾¾å¼"
 
-#: src/pref-manager.c:1484
+#: src/pref-manager.c:1565
 #, fuzzy
 msgid "Wrap Incoming Text at:"
-msgstr "·¢³öµÄÓÊ¼ş×Ô¶¯»»ĞĞÔÚ£º"
+msgstr "å‘å‡ºçš„é‚®ä»¶è‡ªåŠ¨æ¢è¡Œåœ¨ï¼š"
 
-#: src/pref-manager.c:1493 src/pref-manager.c:1600
+#: src/pref-manager.c:1574 src/pref-manager.c:1681
 msgid "Characters"
-msgstr "×Ö·û"
+msgstr "å­—ç¬¦"
 
-#: src/pref-manager.c:1498
+#: src/pref-manager.c:1579
 msgid "Reflow messages of type `text/plain; format=flowed'"
 msgstr ""
 
 #. How to handle received MDN requests
-#: src/pref-manager.c:1506
+#: src/pref-manager.c:1587
 msgid "Message Disposition Notification requests"
-msgstr "ÓÊ¼şÔÄ¶ÁÍ¨¸æÇëÇó"
+msgstr "é‚®ä»¶é˜…è¯»é€šå‘Šè¯·æ±‚"
 
-#: src/pref-manager.c:1514
+#: src/pref-manager.c:1595
 msgid ""
 "When I receive a message and its sender requested to return a\n"
 "Message Disposition Notification (MDN), send it in the following cases:"
 msgstr ""
-"µ±ÊÕµ½ÓÊ¼şÇÒ·¢ËÍÕßÇëÇóÓÊ¼şÔÄ¶ÁÍ¨¸æ(MDN)£¬ÔÚÏÂÁĞÇé¿öÏÂ\n"
-"·¢ËÍÍ¨¸æ£º"
+"å½“æ”¶åˆ°é‚®ä»¶ä¸”å‘é€è€…è¯·æ±‚é‚®ä»¶é˜…è¯»é€šå‘Š(MDN)ï¼Œåœ¨ä¸‹åˆ—æƒ…å†µä¸‹\n"
+"å‘é€é€šå‘Šï¼š"
 
-#: src/pref-manager.c:1525
+#: src/pref-manager.c:1606
 msgid ""
 "the message header looks clean\n"
 "(the notify-to address is equal to the return path, I am in the to or cc "
 "list)"
 msgstr ""
-"ÓÊ¼şÍ·Ò»ÖÂ\n"
-"(notify-to µØÖ·ºÍ·µ»ØÂ·¾¶Ò»ÖÂ£¬ÎÒÔÚÊÕ¼şÈË»ò³­ËÍÁĞ±íÉÏ)"
+"é‚®ä»¶å¤´ä¸€è‡´\n"
+"(notify-to åœ°å€å’Œè¿”å›è·¯å¾„ä¸€è‡´ï¼Œæˆ‘åœ¨æ”¶ä»¶äººæˆ–æŠ„é€åˆ—è¡¨ä¸Š)"
 
-#: src/pref-manager.c:1540
+#: src/pref-manager.c:1621
 msgid "the message header looks suspicious"
-msgstr "ÓÊ¼şÍ·ÓĞÎÊÌâ"
+msgstr "é‚®ä»¶å¤´æœ‰é—®é¢˜"
 
-#: src/pref-manager.c:1574
+#: src/pref-manager.c:1655
 msgid "Word Wrap"
-msgstr "×Ô¶¯»»ĞĞ"
+msgstr "è‡ªåŠ¨æ¢è¡Œ"
 
-#: src/pref-manager.c:1584
+#: src/pref-manager.c:1665
 msgid "Wrap Outgoing Text at:"
-msgstr "·¢³öµÄÓÊ¼ş×Ô¶¯»»ĞĞÔÚ£º"
+msgstr "å‘å‡ºçš„é‚®ä»¶è‡ªåŠ¨æ¢è¡Œåœ¨ï¼š"
 
-#: src/pref-manager.c:1605
+#: src/pref-manager.c:1686
 msgid "Send message as type `text/plain; format=flowed'"
-msgstr "ÒÔ¡°text/plain; format=flowed¡±ÀàĞÍ·¢ËÍÓÊ¼ş"
+msgstr "ä»¥â€œtext/plain; format=flowedâ€ç±»å‹å‘é€é‚®ä»¶"
 
-#: src/pref-manager.c:1612
+#: src/pref-manager.c:1693
 msgid "Other options"
-msgstr "ÆäËüÑ¡Ïî"
+msgstr "å…¶å®ƒé€‰é¡¹"
+
+#: src/pref-manager.c:1703
+#, fuzzy
+msgid "External editor command:"
+msgstr "å¤–éƒ¨å‘½ä»¤"
+
+#: src/pref-manager.c:1705
+msgid "Edit headers in external editor"
+msgstr ""
 
 # src/pref-manager.c:601
-#: src/pref-manager.c:1621
-msgid "Reply prefix:"
-msgstr "»Ø¸´Ç°×º£º"
+#: src/pref-manager.c:1707
+#, fuzzy
+msgid "Reply Prefix:"
+msgstr "å›å¤å‰ç¼€ï¼š"
 
-#: src/pref-manager.c:1624
+#: src/pref-manager.c:1710
 msgid "Automatically quote original when replying"
-msgstr "»Ø¸´Ê±×Ô¶¯ÒıÓÃÔ­ÎÄ"
+msgstr "å›å¤æ—¶è‡ªåŠ¨å¼•ç”¨åŸæ–‡"
 
-#: src/pref-manager.c:1629
+#: src/pref-manager.c:1715
 msgid "Don't include HTML parts as text when replying or forwarding mail"
-msgstr "µ±»Ø¸´»ò×ª·¢ÓÊ¼şÊ±ÕıÎÄ²»°üÀ¨ HTML ÄÚÈİ"
+msgstr "å½“å›å¤æˆ–è½¬å‘é‚®ä»¶æ—¶æ­£æ–‡ä¸åŒ…æ‹¬ HTML å†…å®¹"
 
-#: src/pref-manager.c:1634
+#: src/pref-manager.c:1721
 msgid "Forward a mail as attachment instead of quoting it"
-msgstr "½«ÓÊ¼ş×÷Îª¸½¼ş×ª·¢¶ø²»ÊÇÒıÓÃËü"
+msgstr "å°†é‚®ä»¶ä½œä¸ºé™„ä»¶è½¬å‘è€Œä¸æ˜¯å¼•ç”¨å®ƒ"
 
-#: src/pref-manager.c:1639
+#: src/pref-manager.c:1727
 msgid "Send button always queues outgoing mail in outbox"
-msgstr "·¢ËÍ°´Å¥×ÜÊÇ½«·¢ËÍÓÊ¼ş»º´æµ½·¢¼şÏäÖĞ"
-
-#: src/pref-manager.c:1644
-msgid "Copy outgoing messages to sentbox"
-msgstr "ÕıÔÚ½«ÓÊ¼ş¸´ÖÆµ½·¢¼şÏä"
-
-#: src/pref-manager.c:1648
-msgid "Encoding"
-msgstr "±àÂë"
-
-# src/pref-manager.c:555
-#: src/pref-manager.c:1720 src/toolbar-prefs.c:676
-msgid "Main window"
-msgstr "Ö÷´°¿Ú"
-
-# src/pref-manager.c:558
-#: src/pref-manager.c:1726
-msgid "Use preview pane"
-msgstr "Ê¹ÓÃÔ¤ÀÀÃæ°å"
-
-#: src/pref-manager.c:1728
-msgid "Show mailbox statistics in left pane"
-msgstr "ÔÚ×óÃæ°åÏÔÊ¾ÓÊ¼şÏäÍ³¼ÆÊı¾İ"
-
-#: src/pref-manager.c:1730
-msgid "Use alternative main window layout"
-msgstr "Ê¹ÓÃÆäËüµÄÖ÷´°¿Ú²¼¾Ö"
+msgstr "å‘é€æŒ‰é’®æ€»æ˜¯å°†å‘é€é‚®ä»¶ç¼“å­˜åˆ°å‘ä»¶ç®±ä¸­"
 
 #: src/pref-manager.c:1732
+msgid "Copy outgoing messages to sentbox"
+msgstr "æ­£åœ¨å°†é‚®ä»¶å¤åˆ¶åˆ°å‘ä»¶ç®±"
+
+#: src/pref-manager.c:1736
+msgid "Encoding"
+msgstr "ç¼–ç "
+
+# src/pref-manager.c:555
+#: src/pref-manager.c:1808 src/toolbar-prefs.c:658
+msgid "Main window"
+msgstr "ä¸»çª—å£"
+
+# src/pref-manager.c:558
+#: src/pref-manager.c:1814
+msgid "Use preview pane"
+msgstr "ä½¿ç”¨é¢„è§ˆé¢æ¿"
+
+#: src/pref-manager.c:1816
+msgid "Show mailbox statistics in left pane"
+msgstr "åœ¨å·¦é¢æ¿æ˜¾ç¤ºé‚®ä»¶ç®±ç»Ÿè®¡æ•°æ®"
+
+#: src/pref-manager.c:1818
+msgid "Use alternative main window layout"
+msgstr "ä½¿ç”¨å…¶å®ƒçš„ä¸»çª—å£å¸ƒå±€"
+
+#: src/pref-manager.c:1820
 msgid "Automatically view message when mailbox opened"
-msgstr "µ±´ò¿ªÓÊ¼şÏäÊ±×Ô¶¯²é¿´ÓÊ¼ş"
+msgstr "å½“æ‰“å¼€é‚®ä»¶ç®±æ—¶è‡ªåŠ¨æŸ¥çœ‹é‚®ä»¶"
 
-#: src/pref-manager.c:1734
+#: src/pref-manager.c:1822
 msgid "Display message size as number of lines"
-msgstr "ÒÔĞĞÊıÏÔÊ¾ÓÊ¼ş´óĞ¡"
+msgstr "ä»¥è¡Œæ•°æ˜¾ç¤ºé‚®ä»¶å¤§å°"
 
-#: src/pref-manager.c:1739
+#: src/pref-manager.c:1827
 msgid "PageUp/PageDown keys scroll message by:"
-msgstr "PageUp/PageDown °´¼ü¾í¶¯ÓÊ¼ş£º"
+msgstr "PageUp/PageDown æŒ‰é”®å·åŠ¨é‚®ä»¶ï¼š"
 
-#: src/pref-manager.c:1749
+#: src/pref-manager.c:1837
 msgid "percent"
-msgstr "°Ù·Ö±È"
+msgstr "ç™¾åˆ†æ¯”"
 
 # src/pref-manager.c:538
-#: src/pref-manager.c:1756
+#: src/pref-manager.c:1844
 msgid "Toolbars"
-msgstr "¹¤¾ßÀ¸"
+msgstr "å·¥å…·æ "
 
-#: src/pref-manager.c:1773
+#: src/pref-manager.c:1861
 msgid "Display progress dialog"
-msgstr "ÏÔÊ¾½ø¶È¶Ô»°"
+msgstr "æ˜¾ç¤ºè¿›åº¦å¯¹è¯"
 
 # src/pref-manager.c:151
-#: src/pref-manager.c:1779
+#: src/pref-manager.c:1867
 msgid "Display Formats"
-msgstr "ÏÔÊ¾¸ñÊ½"
+msgstr "æ˜¾ç¤ºæ ¼å¼"
 
-#: src/pref-manager.c:1787
+#: src/pref-manager.c:1875
 msgid "Date encoding (for strftime):"
-msgstr "ÈÕÆÚ±àÂë(strftime Ê¹ÓÃ)£º"
-
-#: src/pref-manager.c:1788
-msgid "Selected headers:"
-msgstr "Ñ¡ÖĞµÄĞÅÍ·£º"
-
-# src/main-window.c:200
-#: src/pref-manager.c:1804
-msgid "Status Messages"
-msgstr "×´Ì¬ĞÅÏ¢"
-
-# src/main-window.c:213
-#: src/pref-manager.c:1805 src/pref-manager.c:1815
-msgid "Information Messages"
-msgstr "ĞÅÏ¢"
-
-#: src/pref-manager.c:1819
-msgid "Warning Messages"
-msgstr "¾¯¸æĞÅÏ¢"
-
-# src/main-window.c:200
-#: src/pref-manager.c:1823
-msgid "Error Messages"
-msgstr "´íÎóĞÅÏ¢"
-
-# src/main-window.c:200
-#: src/pref-manager.c:1827
-msgid "Fatal Error Messages"
-msgstr "ÑÏÖØ´íÎóĞÅÏ¢"
-
-# src/main-window.c:211
-#: src/pref-manager.c:1831
-msgid "Debug Messages"
-msgstr "µ÷ÊÔĞÅÏ¢"
-
-# src/main-window.c:161
-#: src/pref-manager.c:1838
-msgid "Colors"
-msgstr "ÑÕÉ«"
-
-# src/mailbox-conf.c:238
-#: src/pref-manager.c:1840
-msgid "Mailbox Colors"
-msgstr "ÓÊ¼şÏäÑÕÉ«"
-
-#: src/pref-manager.c:1846
-msgid "Mailbox with unread messages color"
-msgstr "ÓĞÎ´¶ÁÓÊ¼şµÄÓÊ¼şÏäÑÕÉ«"
-
-# src/main-window.c:200
-#: src/pref-manager.c:1848
-msgid "Message Colors"
-msgstr "ÓÊ¼şÑÕÉ«"
-
-#: src/pref-manager.c:1859
-#, c-format
-msgid "Quote level %d color"
-msgstr "ÒıÓÃ¼¶±ğ %d ÑÕÉ«"
-
-# src/main-window.c:161
-#: src/pref-manager.c:1871
-msgid "Link Color"
-msgstr "Á´½ÓÑÕÉ«"
+msgstr "æ—¥æœŸç¼–ç (strftime ä½¿ç”¨)ï¼š"
 
 #: src/pref-manager.c:1876
-msgid "Hyperlink color"
-msgstr "³¬¼¶Á´½ÓÑÕÉ«"
+msgid "Selected headers:"
+msgstr "é€‰ä¸­çš„ä¿¡å¤´ï¼š"
 
-#: src/pref-manager.c:1881
+# src/main-window.c:200
+#: src/pref-manager.c:1892
+msgid "Status Messages"
+msgstr "çŠ¶æ€ä¿¡æ¯"
+
+# src/main-window.c:213
+#: src/pref-manager.c:1893 src/pref-manager.c:1903
+msgid "Information Messages"
+msgstr "ä¿¡æ¯"
+
+#: src/pref-manager.c:1907
+msgid "Warning Messages"
+msgstr "è­¦å‘Šä¿¡æ¯"
+
+# src/main-window.c:200
+#: src/pref-manager.c:1911
+msgid "Error Messages"
+msgstr "é”™è¯¯ä¿¡æ¯"
+
+# src/main-window.c:200
+#: src/pref-manager.c:1915
+msgid "Fatal Error Messages"
+msgstr "ä¸¥é‡é”™è¯¯ä¿¡æ¯"
+
+# src/main-window.c:211
+#: src/pref-manager.c:1919
+msgid "Debug Messages"
+msgstr "è°ƒè¯•ä¿¡æ¯"
+
+# src/main-window.c:161
+#: src/pref-manager.c:1926
+msgid "Colors"
+msgstr "é¢œè‰²"
+
+# src/mailbox-conf.c:238
+#: src/pref-manager.c:1928
+msgid "Mailbox Colors"
+msgstr "é‚®ä»¶ç®±é¢œè‰²"
+
+#: src/pref-manager.c:1934
+msgid "Mailbox with unread messages color"
+msgstr "æœ‰æœªè¯»é‚®ä»¶çš„é‚®ä»¶ç®±é¢œè‰²"
+
+# src/main-window.c:200
+#: src/pref-manager.c:1936
+msgid "Message Colors"
+msgstr "é‚®ä»¶é¢œè‰²"
+
+#: src/pref-manager.c:1947
+#, c-format
+msgid "Quote level %d color"
+msgstr "å¼•ç”¨çº§åˆ« %d é¢œè‰²"
+
+# src/main-window.c:161
+#: src/pref-manager.c:1959
+msgid "Link Color"
+msgstr "é“¾æ¥é¢œè‰²"
+
+#: src/pref-manager.c:1964
+msgid "Hyperlink color"
+msgstr "è¶…çº§é“¾æ¥é¢œè‰²"
+
+# src/main-window.c:213
+#: src/pref-manager.c:1967
+#, fuzzy
+msgid "Composition Window"
+msgstr "æ’°å†™çª—å£"
+
+#: src/pref-manager.c:1973
+msgid "Invalid or incomplete address label color"
+msgstr ""
+
+#: src/pref-manager.c:1979
 msgid "Fonts"
-msgstr "×ÖÌå"
+msgstr "å­—ä½“"
 
 # src/pref-manager.c:558
-#: src/pref-manager.c:1883
+#: src/pref-manager.c:1981
 msgid "Preview Font"
-msgstr "Ô¤ÀÀ×ÖÌå"
+msgstr "é¢„è§ˆå­—ä½“"
 
-#: src/pref-manager.c:1900 src/pref-manager.c:1934
+#: src/pref-manager.c:1998 src/pref-manager.c:2032
 msgid "Select a font to use"
-msgstr "Ñ¡ÔñÊ¹ÓÃµÄ×ÖÌå"
+msgstr "é€‰æ‹©ä½¿ç”¨çš„å­—ä½“"
 
 # src/main-window.c:133 src/main-window.c:168
-#: src/pref-manager.c:1903 src/pref-manager.c:1937
+#: src/pref-manager.c:2001 src/pref-manager.c:2035
 msgid "Select..."
-msgstr "Ñ¡Ôñ..."
+msgstr "é€‰æ‹©..."
 
 # src/pref-manager.c:558
-#: src/pref-manager.c:1910 src/pref-manager.c:1945
+#: src/pref-manager.c:2008 src/pref-manager.c:2043
 msgid "Preview pane"
-msgstr "Ô¤ÀÀÃæ°å"
+msgstr "é¢„è§ˆé¢æ¿"
 
 #. Subject Font
-#: src/pref-manager.c:1918
+#: src/pref-manager.c:2016
 msgid "Subject Header Font"
-msgstr "±êÌâÍ·×ÖÌå"
+msgstr "æ ‡é¢˜å¤´å­—ä½“"
 
 # src/sendmsg-window.c:76
 #. pspell frame
-#: src/pref-manager.c:1998
+#: src/pref-manager.c:2096
 msgid "Pspell Settings"
-msgstr "Æ´Ğ´ÉèÖÃ"
+msgstr "æ‹¼å†™è®¾ç½®"
 
 #. do the module menu
-#: src/pref-manager.c:2004
+#: src/pref-manager.c:2102
 msgid "Spell Check Module"
-msgstr "Æ´Ğ´¼ì²éÄ£¿é"
+msgstr "æ‹¼å†™æ£€æŸ¥æ¨¡å—"
 
-#: src/pref-manager.c:2010
+#: src/pref-manager.c:2108
 msgid "Suggestion Level"
-msgstr "ÌáÊ¾¼¶±ğ"
+msgstr "æç¤ºçº§åˆ«"
 
-#: src/pref-manager.c:2018
+#: src/pref-manager.c:2116
 msgid "Ignore words shorter than"
-msgstr "ºöÂÔµ¥´Ê¶ÌÓÚ"
+msgstr "å¿½ç•¥å•è¯çŸ­äº"
 
 #. ignore signature check box
-#: src/pref-manager.c:2025
+#: src/pref-manager.c:2123
 msgid "Misc Spelling Settings"
-msgstr "ÆäËüÆ´Ğ´ÉèÖÃ"
+msgstr "å…¶å®ƒæ‹¼å†™è®¾ç½®"
 
 # src/pref-manager.c:397
-#: src/pref-manager.c:2031
+#: src/pref-manager.c:2129
 msgid "Check signature"
-msgstr "¼ì²éÇ©Ãû"
+msgstr "æ£€æŸ¥ç­¾å"
 
-#: src/pref-manager.c:2035
+#: src/pref-manager.c:2133
 msgid "Check quoted"
-msgstr "¼ì²éÒıÓÃ"
+msgstr "æ£€æŸ¥å¼•ç”¨"
 
 # src/pref-manager.c:594
-#: src/pref-manager.c:2065
+#: src/pref-manager.c:2163
 msgid "Debug"
-msgstr "µ÷ÊÔ"
+msgstr "è°ƒè¯•"
 
-#: src/pref-manager.c:2069
+#: src/pref-manager.c:2167
 msgid "Empty Trash on exit"
-msgstr "ÍË³öÊ±Çå¿Õ·ÏÖ½Â¨"
-
-#: src/pref-manager.c:2077
-msgid "Automatically close mailbox if unused more than"
-msgstr "×Ô¶¯¹Ø±ÕÓÊ¼şÏä£¬Èç¹ûÎ´Ê¹ÓÃÊ±¼ä³¬¹ı"
-
-#: src/pref-manager.c:2093
-msgid "Drag-and-drop moves messages by default"
-msgstr "ÍÏ·Å²Ù×÷Ä¬ÈÏÎªÒÆ¶¯ÓÊ¼ş"
-
-# src/filter-edit-dialog.c:707
-#: src/pref-manager.c:2114
-msgid "Options"
-msgstr "Ñ¡Ïî"
-
-#: src/pref-manager.c:2121
-msgid "Open Inbox upon startup"
-msgstr "Æô¶¯Ê±´ò¿ªÊÕ¼şÏä"
-
-#: src/pref-manager.c:2125
-msgid "Check mail upon startup"
-msgstr "Æô¶¯Ê±¼ì²éÓÊ¼ş"
-
-#: src/pref-manager.c:2130
-msgid "Remember open mailboxes between sessions"
-msgstr "ÔÚ»á»°ÖĞ¼Ç×¡´ò¿ªµÄÓÊ¼şÏä"
+msgstr "é€€å‡ºæ—¶æ¸…ç©ºåºŸçº¸ç¯“"
 
 #: src/pref-manager.c:2175
+msgid "Automatically close mailbox if unused more than"
+msgstr "è‡ªåŠ¨å…³é—­é‚®ä»¶ç®±ï¼Œå¦‚æœæœªä½¿ç”¨æ—¶é—´è¶…è¿‡"
+
+#: src/pref-manager.c:2191
+msgid "Drag-and-drop moves messages by default"
+msgstr "æ‹–æ”¾æ“ä½œé»˜è®¤ä¸ºç§»åŠ¨é‚®ä»¶"
+
+# src/main-window.c:211
+#: src/pref-manager.c:2197
+#, fuzzy
+msgid "Deleting Messages"
+msgstr "è°ƒè¯•ä¿¡æ¯"
+
+#: src/pref-manager.c:2204
+msgid "Delete immediately and irretrievably"
+msgstr ""
+
+# src/main-window.c:139
+#: src/pref-manager.c:2210
+#, fuzzy
+msgid "Hide deleted messages"
+msgstr "æ¸…é™¤ %d ä¸ªå·²åˆ é™¤çš„é‚®ä»¶ï¼Ÿ"
+
+# src/filter-edit-dialog.c:707
+#: src/pref-manager.c:2233
+msgid "Options"
+msgstr "é€‰é¡¹"
+
+#: src/pref-manager.c:2240
+msgid "Open Inbox upon startup"
+msgstr "å¯åŠ¨æ—¶æ‰“å¼€æ”¶ä»¶ç®±"
+
+#: src/pref-manager.c:2244
+msgid "Check mail upon startup"
+msgstr "å¯åŠ¨æ—¶æ£€æŸ¥é‚®ä»¶"
+
+#: src/pref-manager.c:2249
+msgid "Remember open mailboxes between sessions"
+msgstr "åœ¨ä¼šè¯ä¸­è®°ä½æ‰“å¼€çš„é‚®ä»¶ç®±"
+
+#. do the IMAP scan depth
+#: src/pref-manager.c:2254
+msgid "IMAP Folder Scanning"
+msgstr ""
+
+#: src/pref-manager.c:2259
+msgid ""
+"Choose depth 1 for fast startup; this defers scanning some folders.\n"
+"To see more of the tree at startup, choose a greater depth."
+msgstr ""
+
+#: src/pref-manager.c:2270
+msgid "Scan tree to depth"
+msgstr ""
+
+#: src/pref-manager.c:2320
 msgid "Address Book Name"
-msgstr "µØÖ·²¾Ãû"
+msgstr "åœ°å€ç°¿å"
 
-#: src/pref-manager.c:2179
+#: src/pref-manager.c:2324
 msgid "Expand aliases"
-msgstr "Õ¹¿ª±ğÃû"
+msgstr "å±•å¼€åˆ«å"
 
-#: src/pref-manager.c:2186
+#: src/pref-manager.c:2331
 msgid "Set as default"
-msgstr "ÉèÎªÄ¬ÈÏÖµ"
+msgstr "è®¾ä¸ºé»˜è®¤å€¼"
 
-#: src/pref-manager.c:2334
+#: src/pref-manager.c:2479
 msgid "Remote POP3 mailbox..."
-msgstr "Ô¶³Ì POP3 ÓÊ¼şÏä..."
+msgstr "è¿œç¨‹ POP3 é‚®ä»¶ç®±..."
 
-#: src/pref-manager.c:2474
+#: src/pref-manager.c:2619
 msgid "Show nothing"
-msgstr "²»ÏÔÊ¾"
+msgstr "ä¸æ˜¾ç¤º"
 
-#: src/pref-manager.c:2475
+#: src/pref-manager.c:2620
 msgid "Show dialog"
-msgstr "ÏÔÊ¾¶Ô»°"
+msgstr "æ˜¾ç¤ºå¯¹è¯"
 
-#: src/pref-manager.c:2476
+#: src/pref-manager.c:2621
 msgid "Show in list"
-msgstr "ÔÚÁĞ±íÖĞÏÔÊ¾"
+msgstr "åœ¨åˆ—è¡¨ä¸­æ˜¾ç¤º"
 
-#: src/pref-manager.c:2477
+#: src/pref-manager.c:2622
 msgid "Print to console"
-msgstr "´òÓ¡µ½¿ØÖÆÌ¨"
+msgstr "æ‰“å°åˆ°æ§åˆ¶å°"
 
-#: src/pref-manager.c:2486
+#: src/pref-manager.c:2631
 msgid "Ask me"
-msgstr "Ñ¯ÎÊ"
+msgstr "è¯¢é—®"
 
-#: src/pref-manager.c:2522
+#: src/pref-manager.c:2632
+msgid "Always"
+msgstr "æ€»æ˜¯"
+
+#: src/pref-manager.c:2667
 msgid "If Possible"
-msgstr "Èç¹û¿ÉÄÜ"
+msgstr "å¦‚æœå¯èƒ½"
 
-#: src/pref-manager.c:2523
+#: src/pref-manager.c:2668
 msgid "Required"
-msgstr "ĞèÒª"
+msgstr "éœ€è¦"
 
 #: src/print.c:42 src/print.c:49
 msgid ""
 "This version of balsa is compiled without gnome-print support.\n"
 "Printing is not possible."
 msgstr ""
-"Õâ¸ö°æ±¾µÄ balsa Ã»ÓĞ±àÒë½ø gnome-print Ö§³Ö¡£\n"
-"²»ÄÜ´òÓ¡¡£"
+"è¿™ä¸ªç‰ˆæœ¬çš„ balsa æ²¡æœ‰ç¼–è¯‘è¿› gnome-print æ”¯æŒã€‚\n"
+"ä¸èƒ½æ‰“å°ã€‚"
 
 #. print the page number
 #: src/print.c:281
 #, c-format
 msgid "Page: %i/%i"
-msgstr "Ò³£º%i/%i"
+msgstr "é¡µï¼š%i/%i"
 
 # src/pref-manager.c:440
 #. gather some info about this part
 #. four fields, one terminator
-#: src/print.c:696
+#: src/print.c:689
 msgid "Type:"
-msgstr "ÀàĞÍ£º"
+msgstr "ç±»å‹ï¼š"
 
 # src/filter-edit-dialog.c:456
-#: src/print.c:699
+#: src/print.c:692
 msgid "Filename:"
-msgstr "ÎÄ¼şÃû£º"
+msgstr "æ–‡ä»¶åï¼š"
 
-#: src/print.c:914
+#: src/print.c:899
 #, c-format
 msgid "Balsa could not find paper type \"%s\".\n"
-msgstr "Balsa ÎŞ·¨ÕÒµ½Ö½ÕÅÀàĞÍ¡°%s¡±¡£\n"
+msgstr "Balsa æ— æ³•æ‰¾åˆ°çº¸å¼ ç±»å‹â€œ%sâ€ã€‚\n"
 
-#: src/print.c:916
+#: src/print.c:901
 #, c-format
 msgid "Using paper type \"%s\" from /etc/paper.config instead\n"
-msgstr "Ê¹ÓÃ /etc/paper.config ÖĞµÄÖ½ÕÅÀàĞÍ¡°%s¡±\n"
+msgstr "ä½¿ç”¨ /etc/paper.config ä¸­çš„çº¸å¼ ç±»å‹â€œ%sâ€\n"
 
-#: src/print.c:1031
+#: src/print.c:1016
 #, c-format
 msgid ""
 "Balsa could not find font %s\n"
 "Printing is not possible"
 msgstr ""
-"Balsa Î´ÄÜÕÒµ½×ÖÌå %s\n"
-"ÎŞ·¨½øĞĞ´òÓ¡"
+"Balsa æœªèƒ½æ‰¾åˆ°å­—ä½“ %s\n"
+"æ— æ³•è¿›è¡Œæ‰“å°"
 
-#: src/print.c:1081
+#: src/print.c:1066
 #, c-format
 msgid "Balsa could not find paper type \"%s\", using system default.\n"
-msgstr "Balsa ÎŞ·¨ÕÒµ½Ö½ÕÅÀàĞÍ¡°%s¡±£¬Ê¹ÓÃÏµÍ³Ä¬ÈÏÖµ¡£\n"
+msgstr "Balsa æ— æ³•æ‰¾åˆ°çº¸å¼ ç±»å‹â€œ%sâ€ï¼Œä½¿ç”¨ç³»ç»Ÿé»˜è®¤å€¼ã€‚\n"
 
-#: src/print.c:1084
+#: src/print.c:1069
 msgid "Check your paper type configuration or balsa preferences\n"
-msgstr "Çë¼ì²éÄúµÄÖ½ÕÅÀàĞÍÅäÖÃ»ò balsa Ê×Ñ¡Ïî\n"
+msgstr "è¯·æ£€æŸ¥æ‚¨çš„çº¸å¼ ç±»å‹é…ç½®æˆ– balsa é¦–é€‰é¡¹\n"
 
-#: src/print.c:1087
+#: src/print.c:1072
 msgid "Paper"
-msgstr "Ö½ÕÅ"
+msgstr "çº¸å¼ "
 
 # src/main-window.c:222
-#: src/print.c:1114
+#: src/print.c:1099
 msgid "Print message"
-msgstr "´òÓ¡ÓÊ¼ş"
+msgstr "æ‰“å°é‚®ä»¶"
 
-#: src/print.c:1144
+#: src/print.c:1129
 msgid "Balsa: message print preview"
-msgstr "Balsa£ºÓÊ¼ş´òÓ¡Ô¤ÀÀ"
+msgstr "Balsaï¼šé‚®ä»¶æ‰“å°é¢„è§ˆ"
 
-#: src/sendmsg-window.c:160
+#: src/save-restore.c:465
+msgid "Error during filters loading : "
+msgstr ""
+
+#: src/save-restore.c:467
+#, c-format
+msgid ""
+"Error during filters loading : %s\n"
+"%s"
+msgstr ""
+
+#: src/save-restore.c:469
+#, fuzzy
+msgid "Filters may not be correct"
+msgstr "æ— æ³•è¯»å–æ–‡ä»¶ %s\n"
+
+#: src/sendmsg-window.c:173
 msgid "_Include File..."
-msgstr "°üº¬ÎÄ¼ş(_I)..."
+msgstr "åŒ…å«æ–‡ä»¶(_I)..."
 
 # src/sendmsg-window.c:92
-#: src/sendmsg-window.c:163
+#: src/sendmsg-window.c:176
 msgid "_Attach File..."
-msgstr "¸½¼ÓÎÄ¼ş(_A)..."
+msgstr "é™„åŠ æ–‡ä»¶(_A)..."
 
 # src/main-window.c:211
-#: src/sendmsg-window.c:166
+#: src/sendmsg-window.c:179
 msgid "_Include Message(s)"
-msgstr "°üÀ¨ÓÊ¼ş(_I)"
+msgstr "åŒ…æ‹¬é‚®ä»¶(_I)"
 
 # src/main-window.c:200
-#: src/sendmsg-window.c:169
+#: src/sendmsg-window.c:182
 msgid "Attach _Message(s)"
-msgstr "¸½¼ÓÓÊ¼ş(_M)"
+msgstr "é™„åŠ é‚®ä»¶(_M)"
 
 # src/sendmsg-window.c:88
-#: src/sendmsg-window.c:175
+#: src/sendmsg-window.c:188
 msgid "_Send"
-msgstr "·¢ËÍ(_S)"
+msgstr "å‘é€(_S)"
 
 # src/sendmsg-window.c:71
-#: src/sendmsg-window.c:176
+#: src/sendmsg-window.c:189 src/toolbar-factory.c:165
 msgid "Send this message"
-msgstr "·¢ËÍÓÊ¼ş"
+msgstr "å‘é€é‚®ä»¶"
 
-#: src/sendmsg-window.c:180
+#: src/sendmsg-window.c:193
 msgid "_Queue"
-msgstr "»º´æ(_Q)"
+msgstr "ç¼“å­˜(_Q)"
 
-#: src/sendmsg-window.c:181
+#: src/sendmsg-window.c:194
 msgid "Queue this message in Outbox for sending"
-msgstr "½«´ËÓÊ¼ş·ÅÔÚ·¢¼şÏäÖĞÅÅ¶Ó½øĞĞ·¢ËÍ"
+msgstr "å°†æ­¤é‚®ä»¶æ”¾åœ¨å‘ä»¶ç®±ä¸­æ’é˜Ÿè¿›è¡Œå‘é€"
 
-#: src/sendmsg-window.c:185
+#: src/sendmsg-window.c:198
 msgid "_Postpone"
-msgstr "ÑÓ³Ù(_P)"
+msgstr "å»¶è¿Ÿ(_P)"
 
 # src/balsa-message.c:160
-#: src/sendmsg-window.c:188
+#: src/sendmsg-window.c:201
 msgid "_Save"
-msgstr "±£´æ(_S)"
+msgstr "ä¿å­˜(_S)"
 
 # src/main-window.c:222 src/sendmsg-window.c:78
-#: src/sendmsg-window.c:191
+#: src/sendmsg-window.c:204
 msgid "Print..."
-msgstr "´òÓ¡..."
+msgstr "æ‰“å°..."
 
 # src/main-window.c:222
-#: src/sendmsg-window.c:191
+#: src/sendmsg-window.c:204
 msgid "Print the edited message"
-msgstr "´òÓ¡µ±Ç°ÓÊ¼ş"
+msgstr "æ‰“å°å½“å‰é‚®ä»¶"
 
 # src/main-window.c:215
-#: src/sendmsg-window.c:208
+#: src/sendmsg-window.c:221
 msgid "_Select All"
-msgstr "È«²¿Ñ¡ÖĞ(_S)"
+msgstr "å…¨éƒ¨é€‰ä¸­(_S)"
 
-#: src/sendmsg-window.c:213
+#: src/sendmsg-window.c:226
 msgid "_Wrap Body"
-msgstr "ÓÊ¼ş×Ô¶¯»»ĞĞ(_W)"
+msgstr "é‚®ä»¶è‡ªåŠ¨æ¢è¡Œ(_W)"
 
 # src/pref-manager.c:397
-#: src/sendmsg-window.c:218
+#: src/sendmsg-window.c:231
 msgid "Insert _Signature"
-msgstr "²åÈëÇ©Ãû(_S)"
+msgstr "æ’å…¥ç­¾å(_S)"
 
 # src/main-window.c:200
-#: src/sendmsg-window.c:222
+#: src/sendmsg-window.c:235
 msgid "_Quote Message(s)"
-msgstr "ÒıÓÃÓÊ¼ş(_Q)"
+msgstr "å¼•ç”¨é‚®ä»¶(_Q)"
 
-#: src/sendmsg-window.c:227
+#: src/sendmsg-window.c:240
 msgid "_Reflow Paragraph"
-msgstr "ÖØÅÅ¶ÎÂä(_R)"
+msgstr "é‡æ’æ®µè½(_R)"
 
 # src/sendmsg-window.c:523
-#: src/sendmsg-window.c:231
+#: src/sendmsg-window.c:244
 msgid "R_eflow Message"
-msgstr "ÖØÅÅÓÊ¼ş(_R)"
+msgstr "é‡æ’é‚®ä»¶(_R)"
 
 # src/sendmsg-window.c:76
-#: src/sendmsg-window.c:236
+#: src/sendmsg-window.c:249
 msgid "_Check Spelling"
-msgstr "¼ì²éÆ´Ğ´(_C)"
+msgstr "æ£€æŸ¥æ‹¼å†™(_C)"
 
 # src/message-window.c:61
-#: src/sendmsg-window.c:237
+#: src/sendmsg-window.c:250
 msgid "Check the spelling of the message"
-msgstr "¼ì²éÓÊ¼şµÄÆ´Ğ´"
+msgstr "æ£€æŸ¥é‚®ä»¶çš„æ‹¼å†™"
 
 # src/main-window.c:133 src/main-window.c:168
-#: src/sendmsg-window.c:242
+#: src/sendmsg-window.c:255
 msgid "Select _Identity..."
-msgstr "Ñ¡ÔñÉí·İ(_I)..."
+msgstr "é€‰æ‹©èº«ä»½(_I)..."
 
-#: src/sendmsg-window.c:243
+#: src/sendmsg-window.c:256
 msgid "Select the Identity to use for the message"
-msgstr "Ñ¡Ôñ·¢ËÍ¸ÃÓÊ¼şËùÊ¹ÓÃµÄÉí·İ"
+msgstr "é€‰æ‹©å‘é€è¯¥é‚®ä»¶æ‰€ä½¿ç”¨çš„èº«ä»½"
+
+#: src/sendmsg-window.c:261
+msgid "_Edit with Gnome-Editor"
+msgstr ""
+
+#: src/sendmsg-window.c:262
+msgid "Edit the current message with the default Gnome editor"
+msgstr ""
 
 # src/balsa-index.c:231
-#: src/sendmsg-window.c:251
+#: src/sendmsg-window.c:271
 msgid "Fr_om"
-msgstr "·¢¼şÈË(_O)"
+msgstr "å‘ä»¶äºº(_O)"
 
 # src/balsa-message.c:526 src/filter-edit-dialog.c:291
 # src/sendmsg-window.c:315
-#: src/sendmsg-window.c:253
+#: src/sendmsg-window.c:273
 msgid "_To"
-msgstr "ÊÕ¼şÈË(_T)"
+msgstr "æ”¶ä»¶äºº(_T)"
 
 # src/balsa-index.c:232 src/filter-edit-dialog.c:315
-#: src/sendmsg-window.c:255
+#: src/sendmsg-window.c:275
 msgid "_Subject"
-msgstr "Ö÷Ìâ(_S)"
+msgstr "ä¸»é¢˜(_S)"
 
 # src/balsa-message.c:534
-#: src/sendmsg-window.c:257
+#: src/sendmsg-window.c:277
 msgid "_Cc"
-msgstr "³­ËÍ(_C)"
+msgstr "æŠ„é€(_C)"
 
-#: src/sendmsg-window.c:259
+#: src/sendmsg-window.c:279
 msgid "_Bcc"
-msgstr "°µËÍ(_B)"
+msgstr "æš—é€(_B)"
 
-#: src/sendmsg-window.c:261
+#: src/sendmsg-window.c:281
 msgid "_Fcc"
-msgstr "ÎÄ¼ş³­ËÍ(_F)"
+msgstr "æ–‡ä»¶æŠ„é€(_F)"
 
 # src/main-window.c:113 src/message-window.c:54
-#: src/sendmsg-window.c:263
+#: src/sendmsg-window.c:283
 msgid "_Reply To"
-msgstr "»Ø¸´µ½(_R)"
+msgstr "å›å¤åˆ°(_R)"
 
 # src/sendmsg-window.c:414
-#: src/sendmsg-window.c:265
+#: src/sendmsg-window.c:285
 msgid "_Attachments"
-msgstr "¸½¼ş(_A)"
+msgstr "é™„ä»¶(_A)"
 
-#: src/sendmsg-window.c:268
+#: src/sendmsg-window.c:288
 msgid "_Comments"
-msgstr "×¢ÊÍ(_C)"
+msgstr "æ³¨é‡Š(_C)"
 
-#: src/sendmsg-window.c:271
+#: src/sendmsg-window.c:291
 msgid "_Keywords"
-msgstr "¹Ø¼ü×Ö(_K)"
+msgstr "å…³é”®å­—(_K)"
 
-#: src/sendmsg-window.c:320 src/sendmsg-window.c:423
+#: src/sendmsg-window.c:340 src/sendmsg-window.c:443
 msgid "Brazilian"
-msgstr "Î÷°àÑÀÓï"
+msgstr "è¥¿ç­ç‰™è¯­"
 
-#: src/sendmsg-window.c:321 src/sendmsg-window.c:324 src/sendmsg-window.c:425
+#: src/sendmsg-window.c:341 src/sendmsg-window.c:344 src/sendmsg-window.c:445
 msgid "Catalan"
-msgstr "¼ÓÌ©ÂŞÄáÑÇÓï"
+msgstr "åŠ æ³°ç½—å°¼äºšè¯­"
 
-#: src/sendmsg-window.c:322 src/sendmsg-window.c:427
+#: src/sendmsg-window.c:342 src/sendmsg-window.c:447
 msgid "Chinese Simplified"
-msgstr "¼òÌåÖĞÎÄ"
+msgstr "ç®€ä½“ä¸­æ–‡"
 
-#: src/sendmsg-window.c:323 src/sendmsg-window.c:429
+#: src/sendmsg-window.c:343 src/sendmsg-window.c:449
 msgid "Chinese Traditional"
-msgstr "·±ÌåÖĞÎÄ"
+msgstr "ç¹ä½“ä¸­æ–‡"
 
 # src/balsa-init.c:533
-#: src/sendmsg-window.c:325 src/sendmsg-window.c:431
+#: src/sendmsg-window.c:345 src/sendmsg-window.c:451
 msgid "Danish"
-msgstr "µ¤ÂóÓï"
+msgstr "ä¸¹éº¦è¯­"
 
 # src/filter-edit-dialog.c:704
-#: src/sendmsg-window.c:326 src/sendmsg-window.c:435
+#: src/sendmsg-window.c:346 src/sendmsg-window.c:455
 msgid "Dutch"
-msgstr "ºÉÀ¼Óï"
+msgstr "è·å…°è¯­"
 
 # src/balsa-init.c:533
 #. English -> American English, argh...
-#: src/sendmsg-window.c:327 src/sendmsg-window.c:438
+#: src/sendmsg-window.c:347 src/sendmsg-window.c:458
 msgid "English"
-msgstr "Ó¢Óï"
+msgstr "è‹±è¯­"
 
-#: src/sendmsg-window.c:328 src/sendmsg-window.c:440
+#: src/sendmsg-window.c:348 src/sendmsg-window.c:460
 msgid "Estonian"
-msgstr "°®É³ÄáÑÇÓï"
+msgstr "çˆ±æ²™å°¼äºšè¯­"
 
 # src/balsa-init.c:533
-#: src/sendmsg-window.c:329 src/sendmsg-window.c:442
+#: src/sendmsg-window.c:349 src/sendmsg-window.c:462
 msgid "Finnish"
-msgstr "·ÒÀ¼Óï"
+msgstr "èŠ¬å…°è¯­"
 
-#: src/sendmsg-window.c:330 src/sendmsg-window.c:444
+#: src/sendmsg-window.c:350 src/sendmsg-window.c:464
 msgid "French"
-msgstr "·¨Óï"
+msgstr "æ³•è¯­"
 
-#: src/sendmsg-window.c:331 src/sendmsg-window.c:433
+#: src/sendmsg-window.c:351 src/sendmsg-window.c:453
 msgid "German"
-msgstr "µÂÓï"
+msgstr "å¾·è¯­"
 
-#: src/sendmsg-window.c:332 src/sendmsg-window.c:446
+#: src/sendmsg-window.c:352 src/sendmsg-window.c:466
 msgid "Greek"
-msgstr "Ï£À°Óï"
+msgstr "å¸Œè…Šè¯­"
 
-#: src/sendmsg-window.c:333 src/sendmsg-window.c:448
+#: src/sendmsg-window.c:353 src/sendmsg-window.c:468
 msgid "Hungarian"
-msgstr "ĞÙÑÀÀûÓï"
+msgstr "åŒˆç‰™åˆ©è¯­"
 
-#: src/sendmsg-window.c:334 src/sendmsg-window.c:450
+#: src/sendmsg-window.c:354 src/sendmsg-window.c:470
 msgid "Italian"
-msgstr "Òâ´óÀûÓï"
+msgstr "æ„å¤§åˆ©è¯­"
 
-#: src/sendmsg-window.c:335 src/sendmsg-window.c:452
+#: src/sendmsg-window.c:355 src/sendmsg-window.c:472
 msgid "Japanese"
-msgstr "ÈÕÓï"
+msgstr "æ—¥è¯­"
 
-#: src/sendmsg-window.c:340 src/sendmsg-window.c:454
+#: src/sendmsg-window.c:360 src/sendmsg-window.c:474
 msgid "Korean"
-msgstr "º«Óï"
+msgstr "éŸ©è¯­"
 
-#: src/sendmsg-window.c:341 src/sendmsg-window.c:456
+#: src/sendmsg-window.c:361 src/sendmsg-window.c:476
 msgid "Latvian"
-msgstr "À­ÍÑÎ¬ÑÇÓï"
+msgstr "æ‹‰è„±ç»´äºšè¯­"
 
-#: src/sendmsg-window.c:342 src/sendmsg-window.c:458
+#: src/sendmsg-window.c:362 src/sendmsg-window.c:478
 msgid "Lithuanian"
-msgstr "Á¢ÌÕÍğÓï"
+msgstr "ç«‹é™¶å®›è¯­"
 
-#: src/sendmsg-window.c:343 src/sendmsg-window.c:460
+#: src/sendmsg-window.c:363 src/sendmsg-window.c:480
 msgid "Norwegian"
-msgstr "Å²ÍşÓï"
+msgstr "æŒªå¨è¯­"
 
-#: src/sendmsg-window.c:344 src/sendmsg-window.c:462
+#: src/sendmsg-window.c:364 src/sendmsg-window.c:482
 msgid "Polish"
-msgstr "²¨À¼Óï"
+msgstr "æ³¢å…°è¯­"
 
-#: src/sendmsg-window.c:345 src/sendmsg-window.c:464
+#: src/sendmsg-window.c:365 src/sendmsg-window.c:484
 msgid "Portugese"
-msgstr "ÆÏÌÑÑÀÓï"
+msgstr "è‘¡è„ç‰™è¯­"
 
-#: src/sendmsg-window.c:346 src/sendmsg-window.c:466
+#: src/sendmsg-window.c:366 src/sendmsg-window.c:486
 msgid "Romanian"
-msgstr "ÂŞÂíÄáÑÇÓï"
+msgstr "ç½—é©¬å°¼äºšè¯­"
 
-#: src/sendmsg-window.c:347 src/sendmsg-window.c:468
+#: src/sendmsg-window.c:367 src/sendmsg-window.c:488
 msgid "Russian (ISO)"
-msgstr "¶íÓï (ISO)"
+msgstr "ä¿„è¯­ (ISO)"
 
-#: src/sendmsg-window.c:348 src/sendmsg-window.c:470
+#: src/sendmsg-window.c:368 src/sendmsg-window.c:490
 msgid "Russian (KOI)"
-msgstr "¶íÓï (KOI)"
+msgstr "ä¿„è¯­ (KOI)"
 
-#: src/sendmsg-window.c:349 src/sendmsg-window.c:472
+#: src/sendmsg-window.c:369 src/sendmsg-window.c:492
 msgid "Slovak"
-msgstr "Ë¹Âå·¥¿ËÓï"
+msgstr "æ–¯æ´›ä¼å…‹è¯­"
 
 # src/balsa-init.c:533
-#: src/sendmsg-window.c:350 src/sendmsg-window.c:474
+#: src/sendmsg-window.c:370 src/sendmsg-window.c:494
 msgid "Spanish"
-msgstr "Î÷°àÑÀÓï"
+msgstr "è¥¿ç­ç‰™è¯­"
 
-#: src/sendmsg-window.c:351 src/sendmsg-window.c:476
+#: src/sendmsg-window.c:371 src/sendmsg-window.c:496
 msgid "Swedish"
-msgstr "ÈğµäÓï"
+msgstr "ç‘å…¸è¯­"
 
 # src/balsa-init.c:606
-#: src/sendmsg-window.c:352 src/sendmsg-window.c:478
+#: src/sendmsg-window.c:372 src/sendmsg-window.c:498
 msgid "Turkish"
-msgstr "ÍÁ¶úÆäÓï"
+msgstr "åœŸè€³å…¶è¯­"
 
-#: src/sendmsg-window.c:353 src/sendmsg-window.c:480
+#: src/sendmsg-window.c:373 src/sendmsg-window.c:500
 msgid "Ukrainian"
-msgstr "ÎÚ¿ËÀ¼Óï"
+msgstr "ä¹Œå…‹å…°è¯­"
 
-#: src/sendmsg-window.c:360
+#: src/sendmsg-window.c:380
 msgid "_A-J"
 msgstr "_A-J"
 
-#: src/sendmsg-window.c:361
+#: src/sendmsg-window.c:381
 msgid "_K-Z"
 msgstr "_K-Z"
 
-#: src/sendmsg-window.c:372
+#: src/sendmsg-window.c:392
 msgid "_Request Disposition Notification"
-msgstr "ÒªÇó·¢ËÍÔÄ¶ÁÍ¨¸æ(_R)"
+msgstr "è¦æ±‚å‘é€é˜…è¯»é€šå‘Š(_R)"
 
 # src/sendmsg-window.c:71
-#: src/sendmsg-window.c:374
+#: src/sendmsg-window.c:394
 msgid "_Always Queue Sent Mail"
-msgstr "×ÜÊÇ»º´æ·¢ËÍµÄÓÊ¼ş(_A)"
+msgstr "æ€»æ˜¯ç¼“å­˜å‘é€çš„é‚®ä»¶(_A)"
 
-#: src/sendmsg-window.c:408
+#: src/sendmsg-window.c:428
 msgid "_Show"
-msgstr "ÏÔÊ¾(_S)"
+msgstr "æ˜¾ç¤º(_S)"
 
-#: src/sendmsg-window.c:410
+#: src/sendmsg-window.c:430
 msgid "_Language"
-msgstr "ÓïÑÔ(_L)"
+msgstr "è¯­è¨€(_L)"
 
 # src/filter-edit-dialog.c:707
-#: src/sendmsg-window.c:412
+#: src/sendmsg-window.c:432
 msgid "_Options"
-msgstr "Ñ¡Ïî(_O)"
+msgstr "é€‰é¡¹(_O)"
 
-#: src/sendmsg-window.c:520
+#: src/sendmsg-window.c:540
 #, c-format
 msgid ""
 "The message to '%s' is modified.\n"
 "Save message to Draftbox?"
 msgstr ""
-"·¢¸ø¡°%s¡±µÄÓÊ¼ş±»ĞŞ¸Ä¡£\n"
-"½«ÓÊ¼ş±£´æµ½¸å¼şÏäÖĞ£¿"
+"å‘ç»™â€œ%sâ€çš„é‚®ä»¶è¢«ä¿®æ”¹ã€‚\n"
+"å°†é‚®ä»¶ä¿å­˜åˆ°ç¨¿ä»¶ç®±ä¸­ï¼Ÿ"
 
 # src/main-window.c:213
-#: src/sendmsg-window.c:525
+#: src/sendmsg-window.c:545
 msgid "Closing the Compose Window"
-msgstr "ÕıÔÚ¹Ø±Õ×«Ğ´´°¿Ú"
+msgstr "æ­£åœ¨å…³é—­æ’°å†™çª—å£"
 
 # src/pref-manager.c:137
-#: src/sendmsg-window.c:656
+#: src/sendmsg-window.c:810 src/toolbar-factory.c:172
 msgid "Select Identity"
-msgstr "Ñ¡ÔñÉí·İ"
+msgstr "é€‰æ‹©èº«ä»½"
 
 # src/pref-manager.c:117
-#: src/sendmsg-window.c:814
+#: src/sendmsg-window.c:962
 msgid "attach as reference?"
-msgstr "¸½¼Ó×÷Îª²Î¿¼£¿"
+msgstr "é™„åŠ ä½œä¸ºå‚è€ƒï¼Ÿ"
 
-#: src/sendmsg-window.c:829
+#: src/sendmsg-window.c:977
 #, c-format
 msgid ""
-"Saying yes will not send the file `%s' itself, but just a MIME "
-"message/external-body reference.  Note that the recipient must have proper "
+"Saying yes will not send the file `%s' itself, but just a MIME message/"
+"external-body reference.  Note that the recipient must have proper "
 "permissions to see the `real' file.\n"
 "\n"
 "Do you really want to attach this file as reference?"
 msgstr ""
-"»Ø´ğ¡°ÊÇ¡±½«²»»á·¢ËÍÎÄ¼ş¡°%s¡±±¾Éí£¬¶øÖ»ÊÇÒ»¸ö MIME message/external-body"
-"(Íâ²¿ÄÚÈİ)²Î¿¼¡£×¢ÒâÊÕ¼şÈË±ØĞëÓĞ×ã¹»µÄÈ¨ÏŞÀ´²é¿´¡°ÕæÕıµÄ¡±ÎÄ¼ş¡£\n"
+"å›ç­”â€œæ˜¯â€å°†ä¸ä¼šå‘é€æ–‡ä»¶â€œ%sâ€æœ¬èº«ï¼Œè€Œåªæ˜¯ä¸€ä¸ª MIME message/external-body(å¤–éƒ¨å†…"
+"å®¹)å‚è€ƒã€‚æ³¨æ„æ”¶ä»¶äººå¿…é¡»æœ‰è¶³å¤Ÿçš„æƒé™æ¥æŸ¥çœ‹â€œçœŸæ­£çš„â€æ–‡ä»¶ã€‚\n"
 "\n"
-"ÄúÕæµÄÒª½«¸ÃÎÄ¼ş¸½¼ÓÒÔ×÷Îª²Î¿¼Âğ£¿"
+"æ‚¨çœŸçš„è¦å°†è¯¥æ–‡ä»¶é™„åŠ ä»¥ä½œä¸ºå‚è€ƒå—ï¼Ÿ"
 
 # src/pref-manager.c:117
-#: src/sendmsg-window.c:927
+#: src/sendmsg-window.c:1075
 msgid "attach as reference"
-msgstr "¸½¼Ó×÷Îª²Î¿¼"
+msgstr "é™„åŠ ä½œä¸ºå‚è€ƒ"
 
 # src/sendmsg-window.c:239
-#: src/sendmsg-window.c:933
+#: src/sendmsg-window.c:1081
 msgid "attach as file"
-msgstr "¸½¼ÓÎªÎÄ¼ş"
+msgstr "é™„åŠ ä¸ºæ–‡ä»¶"
 
-#: src/sendmsg-window.c:1039
+#: src/sendmsg-window.c:1187
 #, c-format
 msgid ""
 "The attachment pixmap (%s) cannot be used.\n"
 " %s"
 msgstr ""
-"ÎŞ·¨Ê¹ÓÃ¸½¼şµãÍ¼ (%s)¡£\n"
+"æ— æ³•ä½¿ç”¨é™„ä»¶ç‚¹å›¾ (%s)ã€‚\n"
 " %s"
 
-#: src/sendmsg-window.c:1045
+#: src/sendmsg-window.c:1193
 msgid ""
 "Default attachment pixmap (balsa/attachment.png) cannot be found:\n"
 "Your balsa installation is corrupted."
 msgstr ""
-"ÎŞ·¨ÕÒµ½¸½¼şµãÍ¼ (balsa/attachment.png)£º\n"
-"ÄúµÄ balsa °²×°ÓĞÎÊÌâ¡£"
+"æ— æ³•æ‰¾åˆ°é™„ä»¶ç‚¹å›¾ (balsa/attachment.png)ï¼š\n"
+"æ‚¨çš„ balsa å®‰è£…æœ‰é—®é¢˜ã€‚"
 
 # src/sendmsg-window.c:185
-#: src/sendmsg-window.c:1058
+#: src/sendmsg-window.c:1206
 #, c-format
 msgid "Cannot get info on file '%s': %s"
-msgstr "ÎŞ·¨»ñµÃÎÄ¼ş¡°%s¡±µÄĞÅÏ¢£º%s"
+msgstr "æ— æ³•è·å¾—æ–‡ä»¶â€œ%sâ€çš„ä¿¡æ¯ï¼š%s"
 
 # src/sendmsg-window.c:188
-#: src/sendmsg-window.c:1063
+#: src/sendmsg-window.c:1211
 #, c-format
 msgid "Attachment %s is not a regular file."
-msgstr "¸½¼ş %s ²»ÊÇ³£¹æÎÄ¼ş¡£"
+msgstr "é™„ä»¶ %s ä¸æ˜¯å¸¸è§„æ–‡ä»¶ã€‚"
 
-#: src/sendmsg-window.c:1066
+#: src/sendmsg-window.c:1214
 #, c-format
 msgid "File %s cannot be read\n"
-msgstr "ÎŞ·¨¶ÁÈ¡ÎÄ¼ş %s\n"
+msgstr "æ— æ³•è¯»å–æ–‡ä»¶ %s\n"
 
 # src/sendmsg-window.c:239
-#: src/sendmsg-window.c:1133
+#: src/sendmsg-window.c:1280
 msgid "Attach file"
-msgstr "Õ³¸½ÎÄ¼ş"
+msgstr "ç²˜é™„æ–‡ä»¶"
 
-#: src/sendmsg-window.c:1239 src/sendmsg-window.c:1273
-#: src/sendmsg-window.c:2332
+#: src/sendmsg-window.c:1386 src/sendmsg-window.c:1420
+#: src/sendmsg-window.c:2500
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
 msgstr ""
-"¸½¼ÓÓÊ¼şÊ§°Ü¡£\n"
-"¿ÉÄÜµÄÔ­Òò£ºÃ»ÓĞ×ã¹»µÄÁÙÊ±¿Õ¼ä"
+"é™„åŠ é‚®ä»¶å¤±è´¥ã€‚\n"
+"å¯èƒ½çš„åŸå› ï¼šæ²¡æœ‰è¶³å¤Ÿçš„ä¸´æ—¶ç©ºé—´"
 
 # src/sendmsg-window.c:414
 #. Attachment list
-#: src/sendmsg-window.c:1510
+#: src/sendmsg-window.c:1691
 msgid "Attachments:"
-msgstr "¸½¼ş£º"
+msgstr "é™„ä»¶ï¼š"
 
 # src/filter-edit-dialog.c:420
 #. Comments:
-#: src/sendmsg-window.c:1555
+#: src/sendmsg-window.c:1736
 msgid "Comments:"
-msgstr "×¢ÊÍ£º"
+msgstr "æ³¨é‡Šï¼š"
 
 #. Keywords:
-#: src/sendmsg-window.c:1558
+#: src/sendmsg-window.c:1739
 msgid "Keywords:"
-msgstr "¹Ø¼ü×Ö£º"
+msgstr "å…³é”®å­—ï¼š"
 
 # src/sendmsg-window.c:685 src/sendmsg-window.c:688
-#: src/sendmsg-window.c:1744
+#: src/sendmsg-window.c:1928
 msgid "you"
-msgstr "Äú"
+msgstr "æ‚¨"
 
 # src/sendmsg-window.c:518
-#: src/sendmsg-window.c:1751
+#: src/sendmsg-window.c:1935
 msgid "------forwarded message------\n"
-msgstr "------×ª·¢µÄÓÊ¼ş------\n"
+msgstr "------è½¬å‘çš„é‚®ä»¶------\n"
 
 # src/balsa-message.c:519
-#: src/sendmsg-window.c:1757
+#: src/sendmsg-window.c:1941
 #, c-format
 msgid "Date: %s\n"
-msgstr "ÈÕÆÚ£º%s\n"
+msgstr "æ—¥æœŸï¼š%s\n"
 
-#: src/sendmsg-window.c:1771
+#: src/sendmsg-window.c:1955
 #, c-format
 msgid "From: %s\n"
-msgstr "ÊÕ¼şÈË£º%s\n"
+msgstr "æ”¶ä»¶äººï¼š%s\n"
 
-#: src/sendmsg-window.c:1779
+#: src/sendmsg-window.c:1963
 #, c-format
 msgid "To: %s\n"
-msgstr "·¢¼şÈË£º%s\n"
+msgstr "å‘ä»¶äººï¼š%s\n"
 
-#: src/sendmsg-window.c:1787
+#: src/sendmsg-window.c:1971
 #, c-format
 msgid "CC: %s\n"
-msgstr "³­ËÍ£º%s\n"
+msgstr "æŠ„é€ï¼š%s\n"
 
 # src/main-window.c:200
-#: src/sendmsg-window.c:1793
+#: src/sendmsg-window.c:1977
 #, c-format
 msgid "Message-ID: %s\n"
-msgstr "ÓÊ¼ş±êÊ¶£º%s\n"
+msgstr "é‚®ä»¶æ ‡è¯†ï¼š%s\n"
 
-#: src/sendmsg-window.c:1800
+#: src/sendmsg-window.c:1984
 #, c-format
 msgid "References: %s"
-msgstr "²Î¿¼£º%s"
+msgstr "å‚è€ƒï¼š%s"
 
 # src/sendmsg-window.c:690
-#: src/sendmsg-window.c:1816
+#: src/sendmsg-window.c:2000
 #, c-format
 msgid "On %s %s wrote:\n"
-msgstr "ÔÚ %s %s Ğ´µÀ£º\n"
+msgstr "åœ¨ %s %s å†™é“ï¼š\n"
 
 # src/sendmsg-window.c:690
-#: src/sendmsg-window.c:1818
+#: src/sendmsg-window.c:2002
 #, c-format
 msgid "%s wrote:\n"
-msgstr "%s Ğ´µÀ£º\n"
+msgstr "%s å†™é“ï¼š\n"
 
 # src/sendmsg-window.c:513
-#: src/sendmsg-window.c:2124
+#: src/sendmsg-window.c:2309
 msgid "Reply to "
-msgstr "»Ø¸´µ½"
+msgstr "å›å¤åˆ°"
 
 # src/sendmsg-window.c:518
-#: src/sendmsg-window.c:2130
+#: src/sendmsg-window.c:2315
 msgid "Forward message"
-msgstr "×ª·¢ÓÊ¼ş"
+msgstr "è½¬å‘é‚®ä»¶"
 
 # src/sendmsg-window.c:523
-#: src/sendmsg-window.c:2135
+#: src/sendmsg-window.c:2320 src/toolbar-factory.c:141
 msgid "Continue message"
-msgstr "¼ÌĞøÓÊ¼ş"
+msgstr "ç»§ç»­é‚®ä»¶"
 
 # src/sendmsg-window.c:523
-#: src/sendmsg-window.c:2140
+#: src/sendmsg-window.c:2325
 msgid "New message"
-msgstr "ĞÂ½¨ÓÊ¼ş"
+msgstr "æ–°å»ºé‚®ä»¶"
 
-#: src/sendmsg-window.c:2475
+#: src/sendmsg-window.c:2643
 #, c-format
 msgid "Could not open the file %s.\n"
-msgstr "ÎŞ·¨´ò¿ªÎÄ¼ş %s¡£\n"
+msgstr "æ— æ³•æ‰“å¼€æ–‡ä»¶ %sã€‚\n"
 
-#: src/sendmsg-window.c:2477
+#: src/sendmsg-window.c:2645
 msgid "Loading..."
-msgstr "ÕıÔÚÔØÈë..."
+msgstr "æ­£åœ¨è½½å…¥..."
 
-#: src/sendmsg-window.c:2504
+#: src/sendmsg-window.c:2672
 msgid "Include file"
-msgstr "°üº¬ÎÄ¼ş"
+msgstr "åŒ…å«æ–‡ä»¶"
 
-#: src/sendmsg-window.c:2882
+#: src/sendmsg-window.c:3058
 msgid ""
 "Balsa has been compiled without gnome-print support.\n"
 "Printing is not possible."
 msgstr ""
-"Balsa Ã»ÓĞ±àÒë½ø gnome-print Ö§³Ö¡£\n"
-"²»ÄÜ´òÓ¡¡£"
+"Balsa æ²¡æœ‰ç¼–è¯‘è¿› gnome-print æ”¯æŒã€‚\n"
+"ä¸èƒ½æ‰“å°ã€‚"
 
 #: src/spell-check.c:492
 msgid "Replace the current word with the selected suggestion"
-msgstr "°Ñµ±Ç°´ÊÌæ»»ÎªÑ¡ÖĞµÄ½¨Òé´Ê"
+msgstr "æŠŠå½“å‰è¯æ›¿æ¢ä¸ºé€‰ä¸­çš„å»ºè®®è¯"
 
 # src/main-window.c:120
 #: src/spell-check.c:499
 msgid "Replace all occurences of the current word with the selected suggestion"
-msgstr "°ÑËùÓĞ³öÏÖµÄÕâ¸ö´ÊÌæ»»ÎªÑ¡ÖĞµÄ½¨Òé´Ê"
+msgstr "æŠŠæ‰€æœ‰å‡ºç°çš„è¿™ä¸ªè¯æ›¿æ¢ä¸ºé€‰ä¸­çš„å»ºè®®è¯"
 
 #: src/spell-check.c:506
 msgid "Skip the current word"
-msgstr "Ìø¹ıµ±Ç°´Ê"
+msgstr "è·³è¿‡å½“å‰è¯"
 
 # src/main-window.c:120
 #: src/spell-check.c:511
 msgid "Skip all occurances of the current word"
-msgstr "ÒÔºó²»¼ì²éÕâ¸ö´Ê"
+msgstr "ä»¥åä¸æ£€æŸ¥è¿™ä¸ªè¯"
 
 #: src/spell-check.c:517
 msgid "Add the current word to your personal dictionary"
-msgstr "°Ñµ±Ç°´ÊÌí¼Óµ½ÄúµÄ¸öÈË´ÊµäÖĞ"
+msgstr "æŠŠå½“å‰è¯æ·»åŠ åˆ°æ‚¨çš„ä¸ªäººè¯å…¸ä¸­"
 
 #: src/spell-check.c:523
 msgid "Finish spell checking"
-msgstr "Íê³ÉÆ´Ğ´¼ì²é"
+msgstr "å®Œæˆæ‹¼å†™æ£€æŸ¥"
 
 #: src/spell-check.c:528
 msgid "Revert all changes and finish spell checking"
-msgstr "»Ö¸´ËùÓĞ¸ü¸Ä£¬Íê³ÉÆ´Ğ´¼ì²é"
+msgstr "æ¢å¤æ‰€æœ‰æ›´æ”¹ï¼Œå®Œæˆæ‹¼å†™æ£€æŸ¥"
 
-#: src/store-address.c:86
+#: src/store-address.c:96
 msgid "Store address: no addresses"
-msgstr "±£´æµØÖ·£ºÃ»ÓĞµØÖ·"
+msgstr "ä¿å­˜åœ°å€ï¼šæ²¡æœ‰åœ°å€"
 
 # src/pref-manager.c:387
-#: src/store-address.c:97
+#: src/store-address.c:107
 msgid "Store Address"
-msgstr "±£´æµØÖ·"
+msgstr "ä¿å­˜åœ°å€"
 
-#: src/store-address.c:97
-msgid "Save in address book"
-msgstr "±£´æÔÚµØÖ·²¾ÖĞ"
+#: src/store-address.c:119
+msgid "Save this address and close the dialog?"
+msgstr ""
 
-#: src/store-address.c:126
+#: src/store-address.c:142
 msgid "No address book selected...."
-msgstr "Ã»ÓĞÑ¡ÖĞµØÖ·²¾..."
+msgstr "æ²¡æœ‰é€‰ä¸­åœ°å€ç°¿..."
 
-#: src/store-address.c:138
+#: src/store-address.c:154
 msgid "Sorry, no semicolons are allowed in the name!\n"
-msgstr "±§Ç¸£¬ÔÚÃû×ÖÖĞ²»ÄÜÓĞ·ÖºÅ£¡\n"
+msgstr "æŠ±æ­‰ï¼Œåœ¨åå­—ä¸­ä¸èƒ½æœ‰åˆ†å·ï¼\n"
 
-#: src/store-address.c:193
+#: src/store-address.c:209
 msgid "Choose Address Book"
-msgstr "Ñ¡ÔñµØÖ·²¾"
+msgstr "é€‰æ‹©åœ°å€ç°¿"
 
 # src/pref-manager.c:387
-#: src/store-address.c:237
+#: src/store-address.c:253
 msgid "Choose Address"
-msgstr "Ñ¡ÔñµØÖ·"
+msgstr "é€‰æ‹©åœ°å€"
 
 # src/mailbox-conf.c:671 src/mailbox-conf.c:706
-#: src/store-address.c:285
+#: src/store-address.c:301
 msgid "Card Name:"
-msgstr "¿¨Æ¬Ãû£º"
+msgstr "å¡ç‰‡åï¼š"
 
 # src/filter-edit-dialog.c:456
-#: src/store-address.c:286
+#: src/store-address.c:302
 msgid "First Name:"
-msgstr "Ãû£º"
+msgstr "åï¼š"
 
 # src/mailbox-conf.c:671 src/mailbox-conf.c:706
-#: src/store-address.c:287
+#: src/store-address.c:303
 msgid "Middle Name:"
-msgstr "ÖĞ¼äÃû£º"
+msgstr "ä¸­é—´åï¼š"
 
 # src/mailbox-conf.c:671 src/mailbox-conf.c:706
-#: src/store-address.c:288
+#: src/store-address.c:304
 msgid "Last Name:"
-msgstr "ĞÕ£º"
+msgstr "å§“ï¼š"
 
-#: src/store-address.c:289
+#: src/store-address.c:305
 msgid "Organization:"
-msgstr "×éÖ¯£º"
+msgstr "ç»„ç»‡ï¼š"
 
 # src/balsa-init.c:261 src/pref-manager.c:377
-#: src/store-address.c:290
+#: src/store-address.c:306
 msgid "Email Address:"
-msgstr "ÓÊ¼şµØÖ·£º"
+msgstr "é‚®ä»¶åœ°å€ï¼š"
 
 # src/balsa-message.c:159 src/balsa-message.c:162
-#: src/toolbar-prefs.c:354
+#: src/toolbar-factory.c:135 src/toolbar-prefs.c:327
 msgid "Separator"
-msgstr "·Ö¸ô·û"
+msgstr "åˆ†éš”ç¬¦"
 
-#: src/toolbar-prefs.c:662
-msgid "Customize"
-msgstr "¶¨ÖÆ"
+# src/mailbox-conf.c:774 src/main-window.c:209
+#: src/toolbar-factory.c:136
+#, fuzzy
+msgid "Check"
+msgstr "æ£€æŸ¥"
+
+#: src/toolbar-factory.c:137
+#, fuzzy
+msgid "Check for new email"
+msgstr "å¯ç”¨æ–°é‚®ä»¶æ£€æŸ¥(_E)"
 
 # src/main-window.c:213
-#: src/toolbar-prefs.c:680
+#: src/toolbar-factory.c:138
+#, fuzzy
+msgid "Compose"
+msgstr "æ’°å†™çª—å£"
+
+# src/main-window.c:107
+#: src/toolbar-factory.c:139
+#, fuzzy
+msgid "Compose message"
+msgstr "ç¼–å†™æ–°é‚®ä»¶"
+
+#: src/toolbar-factory.c:140
+#, fuzzy
+msgid "Continue"
+msgstr "ç»§ç»­(_C)"
+
+# src/main-window.c:214
+#: src/toolbar-factory.c:142
+#, fuzzy
+msgid "Reply"
+msgstr "å›å¤..."
+
+# src/sendmsg-window.c:513
+#: src/toolbar-factory.c:144
+#, fuzzy
+msgid ""
+"Reply\n"
+"to all"
+msgstr "å›å¤åˆ°"
+
+# src/message-window.c:61
+#: src/toolbar-factory.c:145
+#, fuzzy
+msgid "Reply to all recipients"
+msgstr "å›å¤ç»™æ­¤é‚®ä»¶çš„æ‰€æœ‰æ”¶ä»¶äºº"
+
+# src/main-window.c:119 src/message-window.c:60
+#: src/toolbar-factory.c:146
+#, fuzzy
+msgid ""
+"Reply\n"
+"to group"
+msgstr "å›å¤ç»™ç»„(_G)..."
+
+# src/sendmsg-window.c:518
+#: src/toolbar-factory.c:148
+#, fuzzy
+msgid "Forward"
+msgstr "è½¬å‘é‚®ä»¶"
+
+# src/main-window.c:126
+#: src/toolbar-factory.c:149
+#, fuzzy
+msgid "Forward the current message"
+msgstr "å°†å½“å‰é‚®ä»¶ä½œä¸ºæ–°é‚®ä»¶è½¬å‘"
+
+# src/main-window.c:218
+#: src/toolbar-factory.c:150
+#, fuzzy
+msgid "Previous"
+msgstr "å‰ä¸€éƒ¨åˆ†"
+
+#: src/toolbar-factory.c:151
+msgid "Open previous"
+msgstr ""
+
+# src/pref-manager.c:66
+#: src/toolbar-factory.c:152
+#, fuzzy
+msgid "Next"
+msgstr "æ–‡æœ¬"
+
+# src/main-window.c:159
+#: src/toolbar-factory.c:153
+#, fuzzy
+msgid "Open next"
+msgstr "æ‰“å¼€"
+
+# src/main-window.c:211
+#: src/toolbar-factory.c:154
+#, fuzzy
+msgid ""
+"Next\n"
+"unread"
+msgstr "ä¸‹ä¸€æœªè¯»é‚®ä»¶"
+
+# src/main-window.c:211
+#: src/toolbar-factory.c:155
+#, fuzzy
+msgid "Open next unread message"
+msgstr "ä¸‹ä¸€æœªè¯»é‚®ä»¶"
+
+#: src/toolbar-factory.c:156
+#, fuzzy
+msgid ""
+"Next\n"
+"flagged"
+msgstr "æ ‡è®°çš„"
+
+# src/main-window.c:211
+#: src/toolbar-factory.c:157
+#, fuzzy
+msgid "Open next flagged message"
+msgstr "ä¸‹ä¸€åšæ ‡è®°é‚®ä»¶"
+
+# src/filter-edit-dialog.c:194 src/index-child.c:449 src/main-window.c:211
+# src/pref-manager.c:471
+#: src/toolbar-factory.c:158
+#, fuzzy
+msgid ""
+"Trash /\n"
+"Delete"
+msgstr "åˆ é™¤"
+
+# src/main-window.c:168
+#: src/toolbar-factory.c:159
+#, fuzzy
+msgid "Move the current message to trash"
+msgstr "å°†å½“å‰é‚®ä»¶ç§»åˆ°å·²åˆ é™¤é‚®ä»¶ç®±"
+
+#: src/toolbar-factory.c:160
+#, fuzzy
+msgid "Postpone"
+msgstr "å»¶è¿Ÿ(_P)"
+
+# src/main-window.c:113
+#: src/toolbar-factory.c:161
+#, fuzzy
+msgid "Postpone current message"
+msgstr "å›å¤å½“å‰é‚®ä»¶"
+
+# src/main-window.c:222 src/sendmsg-window.c:78
+#: src/toolbar-factory.c:162
+#, fuzzy
+msgid "Print"
+msgstr "æ‰“å°..."
+
+# src/main-window.c:222
+#: src/toolbar-factory.c:163
+#, fuzzy
+msgid "Print current message"
+msgstr "æ‰“å°å½“å‰é€‰ä¸­çš„é‚®ä»¶"
+
+# src/sendmsg-window.c:88
+#: src/toolbar-factory.c:164
+#, fuzzy
+msgid "Send"
+msgstr "å‘é€(_S)"
+
+# src/sendmsg-window.c:71
+#: src/toolbar-factory.c:166
+#, fuzzy
+msgid ""
+"Send /\n"
+"Receive"
+msgstr "å‘é€å’Œæ¥æ”¶é‚®ä»¶(_R)"
+
+# src/sendmsg-window.c:239
+#: src/toolbar-factory.c:168
+#, fuzzy
+msgid "Attach"
+msgstr "ç²˜é™„æ–‡ä»¶"
+
+# src/message-window.c:61
+#: src/toolbar-factory.c:169
+#, fuzzy
+msgid "Add attachments to this message"
+msgstr "å›å¤ç»™æ­¤é‚®ä»¶çš„æ‰€æœ‰æ”¶ä»¶äºº"
+
+# src/balsa-message.c:160
+#: src/toolbar-factory.c:170
+#, fuzzy
+msgid "Save"
+msgstr "ä¿å­˜(_S)"
+
+#: src/toolbar-factory.c:171
+#, fuzzy
+msgid "Save the current item"
+msgstr "è·³è¿‡å½“å‰è¯"
+
+#: src/toolbar-factory.c:173
+#, fuzzy
+msgid "Set identity to use for this message"
+msgstr "é€‰æ‹©å‘é€è¯¥é‚®ä»¶æ‰€ä½¿ç”¨çš„èº«ä»½"
+
+#: src/toolbar-factory.c:175
+#, fuzzy
+msgid "Run a spell check"
+msgstr "å®Œæˆæ‹¼å†™æ£€æŸ¥"
+
+# src/sendmsg-window.c:71
+#: src/toolbar-factory.c:177
+#, fuzzy
+msgid "Cancel this message"
+msgstr "å‘é€é‚®ä»¶"
+
+#: src/toolbar-factory.c:178
+#, fuzzy
+msgid ""
+"Toggle\n"
+"new"
+msgstr "åè½¬æœªè¯»"
+
+# src/main-window.c:107
+#: src/toolbar-factory.c:179
+#, fuzzy
+msgid "Toggle new message flag"
+msgstr "ç¼–å†™æ–°é‚®ä»¶"
+
+#: src/toolbar-factory.c:180
+msgid "Mark all"
+msgstr ""
+
+#: src/toolbar-factory.c:181
+#, fuzzy
+msgid "Mark all messages in current mailbox"
+msgstr "é€‰ä¸­å½“å‰é‚®ä»¶ç®±ä¸­çš„å…¨éƒ¨é‚®ä»¶"
+
+# src/filter-edit-dialog.c:267
+#: src/toolbar-factory.c:182
+#, fuzzy
+msgid ""
+"All\n"
+"headers"
+msgstr "å…¨éƒ¨ä¿¡å¤´(_H)"
+
+#: src/toolbar-factory.c:183
+#, fuzzy
+msgid "Show all headers"
+msgstr "æ˜¾ç¤ºæ‰€æœ‰ä¿¡å¤´"
+
+#: src/toolbar-factory.c:184
+#, fuzzy
+msgid "Empty Trash"
+msgstr "æ¸…ç©ºåºŸçº¸ç¯“(_T)"
+
+# src/main-window.c:168
+#: src/toolbar-factory.c:185
+#, fuzzy
+msgid "Delete messages from the trash mailbox"
+msgstr "åˆ é™¤åºŸçº¸ç¯“ä¸­çš„é‚®ä»¶"
+
+# src/mailbox-conf.c:640
+#: src/toolbar-factory.c:187
+#, fuzzy
+msgid "Close current mailbox"
+msgstr "å…³é—­é‚®ä»¶ç®±"
+
+# src/pref-manager.c:558
+#: src/toolbar-factory.c:188
+#, fuzzy
+msgid ""
+"Preview\n"
+"pane"
+msgstr "é¢„è§ˆé¢æ¿"
+
+# src/pref-manager.c:558
+#: src/toolbar-factory.c:189
+#, fuzzy
+msgid "Show preview pane"
+msgstr "ä½¿ç”¨é¢„è§ˆé¢æ¿"
+
+#: src/toolbar-prefs.c:644
+msgid "Customize"
+msgstr "å®šåˆ¶"
+
+# src/main-window.c:213
+#: src/toolbar-prefs.c:662
 msgid "Compose window"
-msgstr "×«Ğ´´°¿Ú"
+msgstr "æ’°å†™çª—å£"
 
 # src/pref-manager.c:555
-#: src/toolbar-prefs.c:684
+#: src/toolbar-prefs.c:666
 msgid "Message window"
-msgstr "ÓÊ¼ş´°¿Ú"
+msgstr "é‚®ä»¶çª—å£"
 
 # src/pref-manager.c:558
 #. Preview display
-#: src/toolbar-prefs.c:720
+#: src/toolbar-prefs.c:702
 msgid "Preview"
-msgstr "Ô¤ÀÀ"
+msgstr "é¢„è§ˆ"
 
 #. Wrap button
-#: src/toolbar-prefs.c:752
+#: src/toolbar-prefs.c:734
 msgid "Wrap button labels"
-msgstr "°´Å¥±êÇ©»»ĞĞ"
+msgstr "æŒ‰é’®æ ‡ç­¾æ¢è¡Œ"
+
+#: src/toolbar-prefs.c:753
+msgid "Available buttons"
+msgstr "å¯ç”¨çš„æŒ‰é’®"
 
 #: src/toolbar-prefs.c:771
-msgid "Available buttons"
-msgstr "¿ÉÓÃµÄ°´Å¥"
-
-#: src/toolbar-prefs.c:789
 msgid "Current toolbar"
-msgstr "µ±Ç°¹¤¾ßÀ¸"
+msgstr "å½“å‰å·¥å…·æ "
 
-#: src/toolbar-prefs.c:818
+#: src/toolbar-prefs.c:800
 msgid "-"
 msgstr "-"
 
-#: src/toolbar-prefs.c:826
+#: src/toolbar-prefs.c:808
 msgid "+"
 msgstr "+"
+
+#~ msgid "Could not load image. It is most likely corrupted."
+#~ msgstr "æ— æ³•è½½å…¥å›¾åƒã€‚å¯èƒ½å·²ç»æŸåã€‚"
+
+#~ msgid "Couldn't render image\n"
+#~ msgstr "æ— æ³•ç»˜åˆ¶å›¾åƒ\n"
+
+# src/balsa-init.c:590
+#~ msgid "Inbound"
+#~ msgstr "æ¥æ”¶"
+
+# src/balsa-init.c:598
+#~ msgid "Outbound"
+#~ msgstr "å‘é€"
+
+#~ msgid "Before Sending"
+#~ msgstr "åœ¨å‘é€ä¹‹å‰"
+
+# src/index-child.c:428
+#~ msgid "Demand"
+#~ msgstr "è¦æ±‚æ—¶"
+
+# src/filter-edit-dialog.c:704
+#~ msgid "Matches"
+#~ msgstr "åŒ¹é…"
+
+#~ msgid "Doesn't Match"
+#~ msgstr "ä¸åŒ¹é…"
+
+# src/filter-edit-dialog.c:100
+#~ msgid "On"
+#~ msgstr "å¼€å¯"
+
+# src/filter-edit-dialog.c:267
+#~ msgid "Header"
+#~ msgstr "ä¿¡å¤´"
+
+# src/filter-edit-dialog.c:328
+#~ msgid "Match string:"
+#~ msgstr "åŒ¹é…å­—ç¬¦ä¸²ï¼š"
+
+# src/filter-edit-dialog.c:420
+#~ msgid "Command:"
+#~ msgstr "å‘½ä»¤ï¼š"
+
+# src/filter-edit-dialog.c:475
+#~ msgid "Process when:"
+#~ msgstr "å¤„ç†æ¡ä»¶ï¼š"
+
+# src/filter-edit-dialog.c:506
+#~ msgid "Run on:"
+#~ msgstr "è¿è¡Œäºï¼š"
+
+# src/filter-edit-dialog.c:536
+#~ msgid "Search type:"
+#~ msgstr "æœç´¢ç±»å‹ï¼š"
+
+# src/filter-edit-dialog.c:658
+#~ msgid "Disposition:"
+#~ msgstr "å¤„ç†ï¼š"
+
+# src/filter-edit-dialog.c:666
+#~ msgid "Place/leave in default folder"
+#~ msgstr "æ”¾ç½®äºç¡®çœæ–‡ä»¶å¤¹"
+
+# src/filter-edit-dialog.c:671
+#~ msgid "Do not place/leave in default folder"
+#~ msgstr "ä¸è¦æ”¾ç½®äºç¡®çœæ–‡ä»¶å¤¹"
+
+# src/filter-edit-dialog.c:676
+#~ msgid "Stop filtering here"
+#~ msgstr "åœæ­¢è¿‡æ»¤"
+
+# src/mailbox-conf.c:818
+#~ msgid "_Port:"
+#~ msgstr "ç«¯å£(_P)ï¼š"
+
+#~ msgid "Save in address book"
+#~ msgstr "ä¿å­˜åœ¨åœ°å€ç°¿ä¸­"

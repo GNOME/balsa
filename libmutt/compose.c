@@ -299,7 +299,7 @@ int mutt_send_menu (HEADER *msg,   /* structure for new message */
   CONTEXT *ctx = NULL, *this = NULL;
   /* Sort, SortAux could be changed in mutt_index_menu() */
   int oldSort = Sort, oldSortAux = SortAux;
-  HEADER **hdrs = NULL;
+  struct stat st;
 
   idx = mutt_gen_attach_list (msg->content, idx, &idxlen, &idxmax, 0, 1);
 
@@ -478,20 +478,18 @@ int mutt_send_menu (HEADER *msg,   /* structure for new message */
 	    break;
 	  }
 	  
+	  this = Context; /* remember current folder */
+	  Context = ctx;
+	  close = mutt_index_menu (1);
+	  if (!Context)
 	  {
-	    int i, j;
-	    this = Context; /* remember current folder */
-	    
-	    Context = ctx;
-	    close = mutt_index_menu (1);
-	    /* allocate memory to store pointers to tagged headers */
-	    hdrs = safe_calloc (Context->tagged, sizeof (HEADER *));
-	    for (i=0, j=0; i < Context->vcount; i++)
-	    {
-	      HEADER *cur = Context->hdrs[Context->v2r[i]];
-	      /* store the headers of the tagged messages */
-	      if (cur->tagged) hdrs[j++] = cur;
-	   }
+	    /* go back to the folder we started from */
+	    Context = this;
+	    /* Restore old $sort and $sort_aux */
+	    Sort = oldSort;
+	    SortAux = oldSortAux;
+	    menu->redraw |= REDRAW_INDEX | REDRAW_STATUS;
+	    break;
 	  }
 	}
         {
@@ -500,60 +498,59 @@ int mutt_send_menu (HEADER *msg,   /* structure for new message */
 	  if (op == OP_COMPOSE_ATTACH_MESSAGE)
 	    numtag = Context->tagged;
 	  if (idxlen + numtag >= idxmax)
-	{
+	  {
 	    safe_realloc ((void **) &idx, sizeof (ATTACHPTR *) * (idxmax += 5 + numtag));
-	  menu->data = idx;
-	}
+	    menu->data = idx;
+	  }
 	}
 
 	if (op == OP_COMPOSE_ATTACH_FILE)
 	{
-         idx[idxlen] = (ATTACHPTR *) safe_calloc (1, sizeof (ATTACHPTR));
-         idx[idxlen]->content = mutt_make_file_attach (fname);
-         if (idx[idxlen]->content != NULL)
-          update_idx (menu, idx, idxlen);
-         else
-         {
-          mutt_error ("Unable to attach!");
-          safe_free ((void **) &idx[idxlen]);
-         }
-	 menu->redraw |= REDRAW_INDEX | REDRAW_STATUS;
-	 idxlen++;
-         break;
+	  idx[idxlen] = (ATTACHPTR *) safe_calloc (1, sizeof (ATTACHPTR));
+	  idx[idxlen]->content = mutt_make_file_attach (fname);
+	  if (idx[idxlen]->content != NULL)
+	    update_idx (menu, idx, idxlen++);
+	  else
+	  {
+	    mutt_error ("Unable to attach!");
+	    safe_free ((void **) &idx[idxlen]);
+	  }
+	  menu->redraw |= REDRAW_INDEX | REDRAW_STATUS;
+	  break;
         }
 	else
 	{
-	 int i = 0;
-	 /* Did we tag any messages? */
-	 while (Context->tagged--)
-	 {
-	   idx[idxlen] = (ATTACHPTR *) safe_calloc (1, sizeof (ATTACHPTR));
-	   idx[idxlen]->content = mutt_make_message_attach (Context, hdrs[i], 1);
-	   i++;
-	   if (idx[idxlen]->content != NULL)
-	     update_idx (menu, idx, idxlen);
-	   else
-	   {
-	     mutt_error ("Unable to attach!");
-	     safe_free ((void **) &idx[idxlen]);
-	   }
-	   idxlen++;
-	 }
-	 menu->redraw |= REDRAW_FULL;
-
-         if (close == OP_QUIT) 
-	   mx_close_mailbox (Context);
-	 else
-	   mx_fastclose_mailbox (Context);
-	 safe_free ((void **) &Context);
-	 FREE (&hdrs);
-	 
-	 /* go back to the folder we started from */
-	 Context = this;
-	 /* Restore old $sort and $sort_aux */
-	 Sort = oldSort;
-	 SortAux = oldSortAux;
+	  HEADER *h;
+	  for (i = 0; i < Context->msgcount; i++)
+	  {
+	    h = Context->hdrs[i];
+	    if (h->tagged)
+	    {
+	      idx[idxlen] = (ATTACHPTR *) safe_calloc (1, sizeof (ATTACHPTR));
+	      idx[idxlen]->content = mutt_make_message_attach (Context, h, 1);
+	      if (idx[idxlen]->content != NULL)
+		update_idx (menu, idx, idxlen++);
+	      else
+	      {
+		mutt_error ("Unable to attach!");
+		safe_free ((void **) &idx[idxlen]);
+	      }
+	    }
+	  }
+	  menu->redraw |= REDRAW_FULL;
 	}
+
+	if (close == OP_QUIT) 
+	  mx_close_mailbox (Context);
+	else
+	  mx_fastclose_mailbox (Context);
+	safe_free ((void **) &Context);
+	
+	/* go back to the folder we started from */
+	Context = this;
+	/* Restore old $sort and $sort_aux */
+	Sort = oldSort;
+	SortAux = oldSortAux;
 	break;
 
       case OP_DELETE:
@@ -589,8 +586,21 @@ int mutt_send_menu (HEADER *msg,   /* structure for new message */
 
       case OP_COMPOSE_UPDATE_ENCODING:
         CHECK_COUNT;
-        mutt_update_encoding(idx[menu->current]->content);
-        menu->redraw = REDRAW_CURRENT;
+        if(menu->tagprefix)
+        {
+	  BODY *top;
+	  for(top = msg->content; top; top = top->next)
+	  {
+	    if(top->tagged)
+	      mutt_update_encoding(top);
+	  }
+	  menu->redraw = REDRAW_FULL;
+	}
+        else
+        {
+          mutt_update_encoding(idx[menu->current]->content);
+	  menu->redraw = REDRAW_CURRENT;
+	}
         break;
       
       case OP_COMPOSE_EDIT_TYPE:
@@ -668,6 +678,23 @@ int mutt_send_menu (HEADER *msg,   /* structure for new message */
 	menu->redraw = REDRAW_INDEX;
 	break;
 
+      case OP_COMPOSE_GET_ATTACHMENT:
+        CHECK_COUNT;
+        if(menu->tagprefix)
+        {
+	  BODY *top;
+	  for(top = msg->content; top; top = top->next)
+	  {
+	    if(top->tagged)
+	      mutt_get_tmp_attachment(top);
+	  }
+	  menu->redraw = REDRAW_FULL;
+	}
+        else if (mutt_get_tmp_attachment(idx[menu->current]->content) == 0)
+	  menu->redraw = REDRAW_CURRENT;
+
+        break;
+      
       case OP_COMPOSE_RENAME_FILE:
 	CHECK_COUNT;
 	strfcpy (fname, idx[menu->current]->content->filename, sizeof (fname));
@@ -675,13 +702,23 @@ int mutt_send_menu (HEADER *msg,   /* structure for new message */
 	if (mutt_get_field ("Rename to: ", fname, sizeof (fname), M_FILE) == 0
 								  && fname[0])
 	{
-	  mutt_expand_path (fname, sizeof (fname));
-	  if (!mutt_rename_file (idx[menu->current]->content->filename, fname))
+	  if(stat(idx[menu->current]->content->filename, &st) == -1)
 	  {
-	    safe_free ((void **) &idx[menu->current]->content->filename);
-	    idx[menu->current]->content->filename = safe_strdup (fname);
-	    menu->redraw = REDRAW_CURRENT;
+	    mutt_error("Can't stat: %s", fname);
+	    break;
 	  }
+
+	  mutt_expand_path (fname, sizeof (fname));
+	  if(mutt_rename_file (idx[menu->current]->content->filename, fname))
+	    break;
+	  
+	  safe_free ((void **) &idx[menu->current]->content->filename);
+	  idx[menu->current]->content->filename = safe_strdup (fname);
+	  menu->redraw = REDRAW_CURRENT;
+
+	  if(idx[menu->current]->content->stamp >= st.st_mtime)
+	    mutt_stamp_attachment(idx[menu->current]->content);
+	  
 	}
 	break;
 

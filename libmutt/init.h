@@ -89,6 +89,8 @@ struct option_t MuttVars[] = {
   { "beep_new",		DT_BOOL, R_NONE, OPTBEEPNEW, 0 },
   { "charset",		DT_STR,	 R_NONE, UL &Charset, UL "iso-8859-1" },
   { "check_new",	DT_BOOL, R_NONE, OPTCHECKNEW, 1 },
+  { "collapse_unread",	DT_BOOL, R_NONE, OPTCOLLAPSEUNREAD, 1 },
+  { "uncollapse_jump", 	DT_BOOL, R_NONE, OPTUNCOLLAPSEJUMP, 0 },
   { "confirmappend",	DT_BOOL, R_NONE, OPTCONFIRMAPPEND, 1 },
   { "confirmcreate",	DT_BOOL, R_NONE, OPTCONFIRMCREATE, 1 },
   { "copy",		DT_QUAD, R_NONE, OPT_COPY, M_YES },

@@ -70,10 +70,13 @@ static int invoke_dotlock(const char *path, int flags, int retry)
 {
   char cmd[LONG_STRING + _POSIX_PATH_MAX];
   char r[SHORT_STRING];
+  char *f;
  
   if(flags & DL_FL_RETRY)
     snprintf(r, sizeof(r), "-r %d ", retry ? MAXLOCKATTEMPT : 0);
  
+  f = mutt_quote_filename(path);
+
   snprintf(cmd, sizeof(cmd),
            "%s %s%s%s%s%s%s",
            DOTLOCK,
@@ -82,7 +85,9 @@ static int invoke_dotlock(const char *path, int flags, int retry)
            flags & DL_FL_USEPRIV ? "-p " : "",
            flags & DL_FL_FORCE ? "-f " : "",
            flags & DL_FL_RETRY ? r : "",
-           path);
+           f);
+
+  FREE(&f);
 
   return mutt_system(cmd);
 }
@@ -571,6 +576,7 @@ CONTEXT *mx_open_mailbox (const char *path, int flags, CONTEXT *pctx)
   ctx->path = safe_strdup (path);
 
   ctx->msgnotreadyet = -1;
+  ctx->collapsed = 0;
   
   if (flags & M_QUIET)
     ctx->quiet = 1;
@@ -995,7 +1001,9 @@ int mx_sync_mailbox (CONTEXT *ctx)
 #undef this_body
     ctx->msgcount = j;
 
+    set_option (OPTSORTCOLLAPSE);
     mutt_sort_headers (ctx, 1); /* rethread from scratch */
+    unset_option (OPTSORTCOLLAPSE);
   }
 
   return (rc);

@@ -68,6 +68,8 @@ struct binding_t OpMain[] = {
   { "bounce-message",		OP_BOUNCE_MESSAGE,		"b" },
   { "change-folder",		OP_MAIN_CHANGE_FOLDER,		"c" },
   { "change-folder-readonly",	OP_MAIN_CHANGE_FOLDER_READONLY,	"\033c" },
+  { "collapse-thread",		OP_MAIN_COLLAPSE_THREAD,	"\033v" },
+  { "collapse-all",		OP_MAIN_COLLAPSE_ALL,		"\033V" },
   { "copy-message",		OP_COPY_MESSAGE,		"C" },
   { "decode-copy",		OP_DECODE_COPY,			"\033C" },
   { "decode-save",		OP_DECODE_SAVE,			"\033s" },
@@ -307,7 +309,8 @@ struct binding_t OpCompose[] = {
   { "edit-encoding",	OP_COMPOSE_EDIT_ENCODING,	"\005" },
   { "edit-from",	OP_COMPOSE_EDIT_FROM,		"\033f" },
   { "edit-fcc",		OP_COMPOSE_EDIT_FCC,		"f" },
-  { "filter-entry",	OP_FILTER,			"F" }, 
+  { "filter-entry",	OP_FILTER,			"F" },
+  { "get-attachment",	OP_COMPOSE_GET_ATTACHMENT,	"G" },
   { "ispell",		OP_COMPOSE_ISPELL,		"i" },
   { "print-entry",	OP_PRINT,			"l" },
   { "redraw-screen",	OP_REDRAW,			"\014" },
@@ -338,6 +341,7 @@ struct binding_t OpPost[] = {
 /* The file browser */
 struct binding_t OpBrowser[] = {
   { "change-dir",	OP_CHANGE_DIRECTORY,	"c" },
+  { "display-filename",	OP_BROWSER_TELL,	"@" },
   { "enter-mask",	OP_ENTER_MASK,		"m" },
   { "sort",		OP_SORT,		"o" },
   { "sort-reverse",	OP_SORT_REVERSE,	"O" },

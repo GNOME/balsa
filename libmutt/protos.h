@@ -46,6 +46,13 @@ int _mutt_system (const char *, int);
 #define mutt_previous_subthread(x) _mutt_aside_thread(x,0,1)
 int _mutt_aside_thread (HEADER *, short, short);
 
+#define mutt_collapse_thread(x,y) _mutt_traverse_thread (x,y,M_THREAD_COLLAPSE)
+#define mutt_uncollapse_thread(x,y) _mutt_traverse_thread (x,y,M_THREAD_UNCOLLAPSE)
+#define mutt_get_hidden(x,y)_mutt_traverse_thread (x,y,M_THREAD_GET_HIDDEN) 
+#define mutt_thread_contains_unread(x,y) _mutt_traverse_thread (x,y,M_THREAD_UNREAD)
+#define mutt_thread_next_unread(x,y) _mutt_traverse_thread(x,y,M_THREAD_NEXT_UNREAD)
+int _mutt_traverse_thread (CONTEXT *ctx, HEADER *hdr, int flag);
+
 #define ISSPACE(c) isspace((unsigned char)c)
 
 #define mutt_new_parameter() safe_calloc (1, sizeof (PARAMETER))
@@ -104,6 +111,7 @@ char *mutt_generate_boundary (void);
 char *mutt_gen_msgid (void);
 char *mutt_get_name (ADDRESS *);
 char *mutt_get_parameter (const char *, PARAMETER *);
+char *mutt_quote_filename(const char *);
 char *mutt_read_line (char *, size_t *, FILE *, int *);
 char *mutt_strlower (char *);
 char *mutt_skip_whitespace (char *);
@@ -119,7 +127,7 @@ void mutt_block_signals_system (void);
 void mutt_body_handler (BODY *, STATE *);
 void mutt_bounce_message (HEADER *, ADDRESS *);
 void mutt_buffy (char *);
-void mutt_check_rescore (CONTEXT *ctx);
+void mutt_check_rescore (CONTEXT *);
 void mutt_clear_error (void);
 void mutt_create_alias (ENVELOPE *, ADDRESS *);
 void mutt_decode_attachment (BODY *, STATE *);
@@ -152,6 +160,7 @@ void mutt_normalize_time (struct tm *);
 void mutt_parse_mime_message (CONTEXT *ctx, HEADER *);
 void mutt_pipe_message_to_state (HEADER *, STATE *);
 void mutt_perror (const char *);
+void mutt_prepare_envelope (ENVELOPE *);
 void mutt_pretty_mailbox (char *);
 void mutt_pretty_size (char *, size_t, long);
 void mutt_print_message (HEADER *);
@@ -166,9 +175,11 @@ void mutt_select_fcc (char *, size_t, HEADER *);
 void mutt_select_file (char *, size_t, int);
 void mutt_send_hook (HEADER *);
 void mutt_set_flag (CONTEXT *, HEADER *, int, int);
+void mutt_set_followup_to (ENVELOPE *);
 void mutt_shell_escape (void);
 void mutt_show_error (void);
 void mutt_signal_init (void);
+void mutt_stamp_attachment (BODY *a);
 void mutt_tabs_to_spaces (char *);
 void mutt_tag_set_flag (int, int);
 void mutt_unblock_signals (void);
@@ -178,6 +189,7 @@ void mutt_update_encoding (BODY *a);
 void mutt_update_tree (ATTACHPTR **, short);
 void mutt_version (void);
 void mutt_view_attachments (HEADER *);
+void mutt_set_virtual (CONTEXT *);
 
 int mutt_addr_is_user (ADDRESS *);
 int mutt_alias_complete (char *, size_t);
@@ -207,7 +219,9 @@ int mutt_enter_string (unsigned char *, size_t, int, int, int);
 int mutt_get_field (char *, char *, size_t, int);
 int mutt_get_password (char *, char *, size_t);
 int mutt_get_postponed (CONTEXT *, HEADER *, HEADER **);
+int mutt_get_tmp_attachment (BODY *);
 int mutt_index_menu (int);
+int mutt_invoke_sendmail (ADDRESS *, ADDRESS *, ADDRESS *, const char *, int);
 int mutt_is_autoview (char *);
 int mutt_is_mail_list (ADDRESS *);
 int mutt_is_message_type(int, const char *);
@@ -237,7 +251,6 @@ int mutt_save_attachment (FILE *, BODY *, char *, int, HEADER *);
 int mutt_save_message (HEADER *, int, int, int *);
 int mutt_search_command (int, int);
 int mutt_send_menu (HEADER *, char *, size_t, HEADER *);
-int mutt_send_message (HEADER *, const char *);
 int mutt_strcmp (const char *, const char *);
 int mutt_thread_set_flag (HEADER *, int, int, int);
 int mutt_view_attachment (FILE*, BODY *, int);

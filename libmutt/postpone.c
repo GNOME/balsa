@@ -91,7 +91,8 @@ static void post_entry (char *s, size_t slen, MUTTMENU *menu, int entry)
 {
   CONTEXT *ctx = (CONTEXT *) menu->data;
 
-  mutt_make_string (s, slen, NONULL (HdrFmt), ctx, ctx->hdrs[entry]);
+  _mutt_make_string (s, slen, NONULL (HdrFmt), ctx, ctx->hdrs[entry],
+		     M_FORMAT_ARROWCURSOR);
 }
 
 static HEADER *select_msg (void)
@@ -241,6 +242,7 @@ int mutt_get_postponed (CONTEXT *ctx, HEADER *hdr, HEADER **cur)
       else
 	/* avoid Content-Disposition: header with temporary filename */
 	b->use_disp = 0;
+
       mutt_adv_mktemp (file, sizeof(file));
       if (mutt_save_attachment (msg->fp, b, file, 0, NULL) == -1)
       {
@@ -255,6 +257,7 @@ int mutt_get_postponed (CONTEXT *ctx, HEADER *hdr, HEADER **cur)
       b->filename = safe_strdup (file);
       b->unlink = 1;
       mutt_free_body (&b->parts);
+      mutt_stamp_attachment(b);
       b = b->next;
     }
     h->content->parts = NULL;

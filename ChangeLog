@@ -1,3 +1,7 @@
+2003-10-27 17:01  PeterB
+
+	* libbalsa/filter.c: Avoid casting a (const gchar *) to (gchar *).
+
 2003-10-19 19:55  PeterB
 
 	* src/: balsa-message.c, save-restore.c: Plug memory leaks.

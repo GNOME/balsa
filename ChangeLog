@@ -1,3 +1,8 @@
+2003-08-13 09:29  PeterB
+
+	* libbalsa/mailbox-filter.c: Plug memory leak in
+	mailbox_filters_section_lookup.
+
 2003-08-10  Pawel Salek  <pawsa theochem.kth.se>
 
 	* libbalsa/address-book*.[hc]:

@@ -121,6 +121,7 @@ balsa_message_init (BalsaMessage * bmessage)
   bmessage->message = NULL;
   bmessage->headers = NULL;
   bmessage->body = NULL;
+  bmessage->message = NULL;
 }
 
 BalsaSaveFileInfo *
@@ -288,10 +289,17 @@ balsa_message_size_allocate (GtkWidget * widget, GtkAllocation * allocation)
 #if 0
   gnome_canvas_set_scroll_region (GNOME_CANVAS (widget), 0, 0, allocation->width, allocation->height);
 #endif
-  gnome_canvas_item_get_bounds (GNOME_CANVAS_ITEM (GNOME_CANVAS_GROUP (GNOME_CANVAS (widget)->root)),
-				&x1, &y1, &x2, &y2);
-  gnome_canvas_set_scroll_region (GNOME_CANVAS (widget), x1 - 10, y1 - 10, x2 + 10, y2 + 10);
 
+  gnome_canvas_item_get_bounds (
+				 GNOME_CANVAS_ITEM (GNOME_CANVAS_GROUP (
+					      GNOME_CANVAS (widget)->root)),
+				 &x1, &y1, &x2, &y2);
+
+  gnome_canvas_set_scroll_region (GNOME_CANVAS (widget),
+				  0,
+				  0,
+			  (x2 > allocation->width) ? x2 : allocation->width,
+		       (y2 > allocation->height) ? y2 : allocation->height);
 }
 
 
@@ -299,6 +307,7 @@ void
 balsa_message_set (BalsaMessage * bmessage,
 		   Message * message)
 {
+  GtkAllocation *alloc = NULL;
   GnomeCanvasGroup *bm_group;
   double x1, x2, y1, y2;
 
@@ -322,9 +331,13 @@ balsa_message_set (BalsaMessage * bmessage,
   gnome_canvas_item_get_bounds (GNOME_CANVAS_ITEM (bm_group),
 				&x1, &y1, &x2, &y2);
 
+  alloc = &(GTK_WIDGET (bmessage)->allocation);
   gnome_canvas_set_scroll_region (GNOME_CANVAS (bmessage),
-				  x1 - 10, y1 - 10,
-				  x2 + 10, y2 + 10);
+				  0,
+				  0,
+				  (x2 > alloc->width) ? x2 : alloc->width,
+				  (y2 > alloc->height) ? y2 : alloc->height);
+
 }
 
 static GnomeCanvasItem *

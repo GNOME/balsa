@@ -26,7 +26,6 @@
 #include "misc.h"
 #include "balsa-app.h"
 #include "balsa-init.h"
-#include "balsa.xpm"
 #include "save-restore.h"
 
 typedef enum
@@ -95,6 +94,7 @@ balsa_init_window_new (void)
   GtkWidget *pixmap;
   GtkWidget *label;
   GtkWidget *bbox;
+  gchar *logo;
 
   iw = g_malloc0 (sizeof (InitWindow));
   prefs = g_malloc0 (sizeof (Prefs));
@@ -114,7 +114,9 @@ balsa_init_window_new (void)
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG (iw->window)->vbox), vbox, FALSE, FALSE, 0);
   gtk_widget_show (vbox);
 
-  pixmap = gnome_pixmap_new_from_xpm_d (balsa_logo_xpm);
+  logo = gnome_unconditional_pixmap_file ("balsa_logo.png");
+  pixmap = gnome_pixmap_new_from_file (logo);
+  g_free (logo);
   gtk_box_pack_start (GTK_BOX (vbox), pixmap, FALSE, FALSE, 0);
   gtk_widget_show (pixmap);
 

@@ -1,8 +1,15 @@
 SUBDIRS = macros po intl libmutt libbalsa src
 
-EXTRA_DIST = balsa.1 configure balsa.xpm
+balsa_BITMAPS = balsa_logo.png
 
-man_MANS=balsa.1
+balsa_MANS=balsa.1
+
+EXTRA_DIST =	balsa.1 \
+		configure \
+		$(balsa_BITMAPS)
+
+balsabitmapsdir = $(datadir)/pixmaps
+balsabitmaps_DATA = $(balsa_BITMAPS)
 
 ## to automatically rebuild aclocal.m4 if any of the macros in
 ## `macros/' change

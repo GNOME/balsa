@@ -240,7 +240,7 @@ run_filters_on_reception(LibBalsaMailbox * mailbox)
     GList * new_messages;
 
     if (!mailbox->filters)                                
-        libbalsa_mailbox_filters_load_config(mailbox);
+        config_mailbox_filters_load(mailbox);
 
     filters = libbalsa_mailbox_filters_when(mailbox->filters,
                                             FILTER_WHEN_INCOMING);

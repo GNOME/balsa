@@ -1,4 +1,9 @@
-2002-04-26  Pawel Salek <pawsa@theochem.kth.se>
+2002-04-28  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox_{local,pop3}.c: push_prefix() before loading
+	filter configuration.
+
+2002-04-27  Pawel Salek <pawsa@theochem.kth.se>
 
 	Emmanuel Allaud's patch (+minor modifications) to fix filtering on
 	receiving

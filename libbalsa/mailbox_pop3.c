@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -301,7 +301,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 
 	 /* Load associated filters if needed */
         if (!mailbox->filters)                                
-            libbalsa_mailbox_filters_load_config(mailbox);
+            config_mailbox_filters_load(mailbox);
         filters = libbalsa_mailbox_filters_when(mailbox->filters,
 						FILTER_WHEN_INCOMING);
 	if (filters) {

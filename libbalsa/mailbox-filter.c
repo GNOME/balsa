@@ -58,7 +58,8 @@ libbalsa_mailbox_filters_when(GSList * filters, gint when)
  * The returned string has to be freed by the caller
  */
 
-gchar * mailbox_filters_section_lookup(const gchar * name)
+gchar*
+mailbox_filters_section_lookup(const gchar * name)
 {
     gint pref_len=strlen(MAILBOX_FILTERS_SECTION_PREFIX);
     guint name_len;
@@ -86,7 +87,8 @@ gchar * mailbox_filters_section_lookup(const gchar * name)
     return NULL;
 }
 
-void config_mailbox_filters_load(LibBalsaMailbox * mbox)
+void
+config_mailbox_filters_load(LibBalsaMailbox * mbox)
 {
     gchar * section;
 

@@ -1,3 +1,7 @@
+1999-04-08 Jesse Sightler <jsight@pair.com
+
+	* libbalsa/mime.c: Fixed failure to traverse all nodes of multipart msg.
+
 Wed Mar 31 18:14:00 1999  Manish Vachharajani <mvachhar@vger.rutgers.edu>
 
 	* src/mailbox_conf.c: Show the config notebook widget before

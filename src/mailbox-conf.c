@@ -817,34 +817,58 @@ mailbox_conf_update(MailboxConfWindow *mcw)
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
 	gchar *filename;
-	gchar *name;
-	BalsaMailboxNode *mbnode;
+	gchar *path;
 
 	filename = gnome_file_entry_get_full_path(mcw->mb_data.local.path,
 						  FALSE);
-	/* rename */
-	i = libbalsa_mailbox_local_set_path(LIBBALSA_MAILBOX_LOCAL
-					    (mailbox), filename);
-	if (i != 0) {
-	    balsa_information(LIBBALSA_INFORMATION_WARNING,
-			      _("Rename of %s to %s failed:\n%s"),
-			      libbalsa_mailbox_local_get_path(mailbox),
-			      filename, strerror(i));
-	    g_free(filename);
-	    return;
+	path = g_strdup(libbalsa_mailbox_local_get_path(mailbox));
+        if (strcmp(filename, path)) {
+            /* rename */
+	    gchar *file_dir, *path_dir;
+	    BalsaMailboxNode *mbnode;
+	    gchar *name;
+
+            i = libbalsa_mailbox_local_set_path(LIBBALSA_MAILBOX_LOCAL
+                                                (mailbox), filename);
+            if (i != 0) {
+                balsa_information(LIBBALSA_INFORMATION_WARNING,
+                                  _("Rename of %s to %s failed:\n%s"),
+                                  path, filename, strerror(i));
+                g_free(filename);
+		g_free(path);
+                return;
+            }
+
+	    file_dir = g_path_get_dirname(filename);
+	    path_dir = g_path_get_dirname(path);
+	    mbnode = balsa_find_mailbox(mailbox);
+            if (strcmp(file_dir, path_dir)) {
+		/* Actual move. */
+		balsa_mblist_mailbox_node_remove(mbnode);
+		g_object_ref(mailbox);
+		g_object_unref(mbnode);
+		balsa_mailbox_local_append(mailbox);
+
+		/* We might have moved a subtree. */
+		mbnode = balsa_find_mailbox(mailbox);
+		balsa_mailbox_node_rescan(mbnode);
+            } 
+
+	    /* Change name. */
+            name = mcw->mailbox_name ?
+                gtk_editable_get_chars(GTK_EDITABLE(mcw->mailbox_name), 0,
+                                       -1) : g_path_get_basename(filename);
+            g_free(mailbox->name);
+	    mailbox->name = name;
+	    balsa_mblist_mailbox_node_redraw(mbnode);
+	    balsa_window_update_tab(mbnode);
+
+	    g_object_unref(mbnode);
+            g_free(file_dir);
+            g_free(path_dir);
 	}
-
-        name = mcw->mailbox_name ?
-            gtk_editable_get_chars(GTK_EDITABLE(mcw->mailbox_name), 0, -1) :
-	    g_path_get_basename(filename);
         g_free(filename);
-        g_free(mailbox->name);
-        mailbox->name = name;
-
-	mbnode = balsa_find_mailbox(mcw->mailbox);
-	balsa_mblist_mailbox_node_redraw(mbnode);
-	balsa_window_update_tab(mbnode);
-	g_object_unref(mbnode);
+	g_free(path);
     } else if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
 	update_pop_mailbox(mcw);
     } else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
@@ -869,7 +893,6 @@ mailbox_conf_add(MailboxConfWindow * mcw)
     gboolean save_to_config = TRUE;
 
     mcw->mailbox = g_object_new(mcw->mailbox_type, NULL);
-    mbnode = balsa_mailbox_node_new_from_mailbox(mcw->mailbox);
     mailbox_conf_view_check(mcw->view_info, mcw->mailbox);
 
     if ( LIBBALSA_IS_MAILBOX_LOCAL(mcw->mailbox) ) {
@@ -892,7 +915,9 @@ mailbox_conf_add(MailboxConfWindow * mcw)
         printf("Save to config: %d\n", save_to_config);
 	mcw->mailbox->name = g_path_get_basename(path);
 	balsa_mailbox_local_append(mcw->mailbox);
-    } else if ( LIBBALSA_IS_MAILBOX_POP3(mcw->mailbox) ) {
+    }
+    mbnode = balsa_mailbox_node_new_from_mailbox(mcw->mailbox);
+    if ( LIBBALSA_IS_MAILBOX_POP3(mcw->mailbox) ) {
 	/* POP3 Mailboxes */
 	update_pop_mailbox(mcw);
 	balsa_app.inbox_input =
@@ -901,7 +926,7 @@ mailbox_conf_add(MailboxConfWindow * mcw)
 	update_imap_mailbox(mcw);
 	balsa_mblist_mailbox_node_append(NULL, mbnode);
 	update_mail_servers();
-    } else {
+    } else if ( !LIBBALSA_IS_MAILBOX_LOCAL(mcw->mailbox) ) {
 	g_assert_not_reached();
     }
 
@@ -1282,9 +1307,8 @@ mailbox_conf_view_check(BalsaMailboxConfView * view_info,
 	mailbox->view = libbalsa_mailbox_view_new();
 
     if (view_info->identity_name) {
-	changed =
-	    libbalsa_mailbox_set_identity_name(mailbox,
-					       view_info->identity_name);
+	libbalsa_mailbox_set_identity_name(mailbox,
+                                           view_info->identity_name);
 	g_free(view_info->identity_name);
 	view_info->identity_name = NULL;
     }
@@ -1299,5 +1323,10 @@ mailbox_conf_view_check(BalsaMailboxConfView * view_info,
     if (!changed || !libbalsa_mailbox_get_open(mailbox))
 	return;
 
+    /* Redraw the mailbox; we temporarily increase its open_ref to keep
+     * the backend open. */
+    libbalsa_mailbox_open(mailbox, NULL);
     balsa_mblist_close_mailbox(mailbox);
+    balsa_mblist_open_mailbox(mailbox);
+    libbalsa_mailbox_close(mailbox, FALSE);
 }

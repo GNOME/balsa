@@ -7,25 +7,25 @@ msgstr ""
 "Project-Id-Version: balsa 0.4.9\n"
 "POT-Creation-Date: 2000-06-01 20:26-0400\n"
 "PO-Revision-Date: 2000-08-27 11:00+0000\n"
-"Last-Translator: Alastair McKinstry <mckinstry@computer.org> \n"
-"Language-Team: Irish <ga@li.org>\n"
+"Last-Translator: Seán Ó Ceallaigh <s_oceallaigh@yahoo.com> \n"
+"Language-Team: Gaeilge <gaeilge-a@listserv.heanet.ie>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8-bit\n"
 
 #: libbalsa/mailbox.c:196
 msgid "Error: "
-msgstr "Earraidh: "
+msgstr "Earráid: "
 
 #: libbalsa/mailbox.c:631
 #, c-format
 msgid "Mailbox: Opening %s Refcount: %d\n"
-msgstr "Boscaphoist: Ag oscáil: %s ref-uimhir: %d\n"
+msgstr "Bosca Poist: Ag oscáil: %s Cuntas tagartha: %d\n"
 
 #: libbalsa/mailbox.c:651
 #, c-format
 msgid "Mailbox: Closing %s Refcount: %d\n"
-msgstr "Boscaphoist: Ag dúnadh %s, refcount: %d\n"
+msgstr "Bosca Poist: Ag dúnadh %s, Cuntas tagartha: %d\n"
 
 #.
 #. ISPRIME(9)
@@ -40,11 +40,11 @@ msgstr "Asbhosca:"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:57
 msgid "Sentbox:"
-msgstr ""
+msgstr "Bosca Seolta"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:57
 msgid "Draftbox:"
-msgstr ""
+msgstr "Bosca Dréachta"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:57
 msgid "Trash:"
@@ -89,7 +89,7 @@ msgstr ""
 
 #: libinit_balsa/balsa-druid-page-finish.gob:57
 msgid "All Done!"
-msgstr "Gach rud rinneadh!"
+msgstr "Gach Rud Rinneadh!"
 
 #: libinit_balsa/balsa-druid-page-user.gob:75
 msgid "Please enter information about yourself."
@@ -102,7 +102,7 @@ msgstr "Ainm"
 
 #: libinit_balsa/balsa-druid-page-user.gob:87
 msgid "Email address:"
-msgstr "Seoladh E-Post:"
+msgstr "Ríomhsheoladh:"
 
 #: libinit_balsa/balsa-druid-page-user.gob:91
 msgid "SMTP Server:"
@@ -118,7 +118,7 @@ msgstr "Roghnaí Úsáideoir"
 
 #: libinit_balsa/balsa-druid-page-user.gob:152
 msgid "Local Mail Problem"
-msgstr "postbhosca Áitiúil"
+msgstr "Postbhosca Áitiúil"
 
 #: libinit_balsa/balsa-druid-page-welcome.gob:47
 msgid "Welcome to Balsa!"
@@ -166,7 +166,7 @@ msgstr "Suimigh Seoladh Nua"
 
 #: src/address-book.c:212
 msgid "E-Mail Address:"
-msgstr "Seoladh E-Post:"
+msgstr "Ríomhsheoladh:"
 
 #: src/address-book.c:291 src/balsa-index-page.c:1046
 #, c-format

@@ -1,5 +1,7 @@
-2004-01-23 00:17  PeterB
+2004-01-23 00:36  PeterB
 
+	* libbalsa/body.c: Make sure subject in embedded header is valid
+	utf-8.
 	* src/balsa-message.c: set message background correctly for all
 	known themes; reset header colors when theme is changed.
 

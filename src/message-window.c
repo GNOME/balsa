@@ -42,6 +42,9 @@ static void destroy_message_window (GtkWidget * widget);
 static void close_message_window (GtkWidget * widget);
 static void refresh_message_window (MessageWindow * mw);
 
+static void set_message_window_data (GtkObject * object, MessageWindow * mw);
+static MessageWindow *get_index_window_data (GtkObject * object);
+
 static void mailbox_listener (MailboxWatcherMessage * iw_message);
 
 void
@@ -53,8 +56,9 @@ message_window_new(Message *message)
   if (!message)
     return;
 
-  mw = g_malloc (sizeof (MessageWindow));
+  mw = g_malloc0 (sizeof (MessageWindow));
 
+  printf("making window thingy now\n");
   /* TODO check to see if already open */
 
   mw->window = gnome_app_new ("balsa", "message");
@@ -73,12 +77,15 @@ message_window_new(Message *message)
   gnome_app_set_contents (GNOME_APP (mw->window), vbox);
   gtk_widget_show (vbox);
 
+  printf("making balsa-message\n");
   mw->bmessage = balsa_message_new ();
   gtk_box_pack_start (GTK_BOX (vbox), mw->bmessage, TRUE, TRUE, 0);
   balsa_message_set (BALSA_MESSAGE (mw->bmessage), message);
   gtk_widget_show(mw->bmessage);
   
+  printf("shown the balsa message, now showing the window\n");
   gtk_widget_show (mw->window);
+  printf("shown the message\n");
 }
 
 /*

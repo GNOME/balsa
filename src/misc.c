@@ -104,30 +104,6 @@ new_icon (gchar ** xpm, GtkWidget * window)
   return pixmapwid;
 }
 
-
-
-gint
-g_list_index (GList * list, gpointer data)
-{
-  gint index;
-
-  if (list)
-    {
-      index = 0;
-
-      while (list)
-	{
-	  if (list->data == data)
-	    return index;
-
-	  list = list->next;
-	  index++;
-	}
-    }
-
-  return -1;
-}
-
 gchar *
 make_string_from_list (GList * the_list)
 {

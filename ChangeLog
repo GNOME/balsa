@@ -1,5 +1,7 @@
-2003-05-27 21:04  PeterB
+2003-05-27 21:20  PeterB
 
+	* src/main-window.c: Restore set_wmclass to new mail notification
+	popup.
 	* src/balsa-app.c: Remove `connect_swapped' from create_entry: it
 	sometimes leads to infinite recursion=>segv.
 

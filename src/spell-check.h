@@ -24,6 +24,9 @@
 
 #include "config.h"
 
+#define USE_ORIGINAL_MANAGER_FUNCS
+
+
 #include <gnome.h>
 #include <pspell/pspell.h>
 

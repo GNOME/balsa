@@ -18,7 +18,7 @@ New features/unfinished things:
 
 UI:
 ---
-- Message threading
+- [DONE] Message threading
 
 - Incorporate use of GNOME Docklet to indicate status of unread mail,
 status, etc.
@@ -83,9 +83,3 @@ that gmc uses?
 	indexing system
 	
 - Split Preferences window into several more managable chunks.
-
-----------------------------------
-Old list.. may or may not be in above list
-
-    this can be done by editing ~/.balsarc
-

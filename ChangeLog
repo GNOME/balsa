@@ -1,3 +1,11 @@
+2000-11-27  Matthew Guenther  <guentherm@asme.org>
+
+	* TODO: cleaning up
+	* src/balsa-mblist.c (balsa_mblist_init): better ctree row height
+	selection, set display info arg depending on global
+	* src/spell-check.[ch]: define preprocessor symbol to try and
+	avert problems with new versions of pspell.
+
 2000-11-28  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* libbalsa/address-book.[ch]: New function

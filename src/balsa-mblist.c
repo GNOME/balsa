@@ -573,6 +573,9 @@ mblist_key_press_cb(GtkWidget * widget, GdkEventKey * event, gpointer data)
 static void
 balsa_mblist_init(BalsaMBList * tree)
 {
+    GtkStyle* style;
+    GdkFont* font;
+    gint text_height;
     int i;
     char *titles[3] = { N_("Mailbox"), N_("Unread"), N_("Total") };
     for (i = 0; i < ELEMENTS(titles); i++) titles[i] = _(titles[i]);
@@ -587,8 +590,20 @@ balsa_mblist_init(BalsaMBList * tree)
     gtk_signal_connect(GTK_OBJECT(tree), "size_allocate",
 		       GTK_SIGNAL_FUNC(size_allocate_cb), NULL);
 
+    gtk_object_set (GTK_OBJECT (tree), "show_content_info", 
+                    balsa_app.mblist_show_mb_content_info, NULL);
+
     /* gtk_ctree_set_show_stub(GTK_CTREE(tree), FALSE);
        gtk_clist_set_row_height(GTK_CLIST(tree), 16); */
+    style = gtk_widget_get_style (GTK_WIDGET (tree));
+    font = style->font;
+    text_height = font->ascent + font->descent;
+    
+    if (text_height <= 16)
+        gtk_clist_set_row_height (GTK_CLIST (tree), 16);
+    else
+        gtk_clist_set_row_height (GTK_CLIST (tree), text_height);
+
     gtk_clist_set_column_width(GTK_CLIST(tree), 0,
 			       balsa_app.mblist_name_width);
 

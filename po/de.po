@@ -5020,7 +5020,7 @@ msgstr "Sie haben den OpenPGP-Modus für eine Nachricht mit Anlagen gewählt. In
 #: src/sendmsg-window.c:3347
 #, c-format
 msgid "sending message with gpg mode %d"
-msgstr "Verschicken der Nachricht mit gpg-Modus %s"
+msgstr "Verschicken der Nachricht mit gpg-Modus %d"
 
 #: src/sendmsg-window.c:4112
 #, c-format

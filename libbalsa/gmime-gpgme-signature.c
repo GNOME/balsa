@@ -125,6 +125,7 @@ g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx_t ctx)
     }
     if (key->subkeys) {
 	sig_stat->key_created = key->subkeys->timestamp;
+	sig_stat->key_expires = key->subkeys->expires;
 	sig_stat->key_revoked = key->subkeys->revoked;
 	sig_stat->key_expired = key->subkeys->expired;
 	sig_stat->key_disabled = key->subkeys->disabled;

@@ -42,10 +42,7 @@ enum _GMimePartRfc2440Mode {
     GMIME_PART_RFC2440_SIGNED,
     GMIME_PART_RFC2440_ENCRYPTED
 };
-GType g_mime_part_rfc2440_get_type(void);
 
-/* constructors */
-GMimePart *g_mime_part_rfc2440_new(void);
 
 /* part status check */
 GMimePartRfc2440Mode g_mime_part_check_rfc2440(GMimePart * part);

@@ -1266,6 +1266,7 @@ scan_body(PrintInfo * pi, LibBalsaMessageBody * body)
         {"application/pgp-signature", prepare_crypto_signature},
 #ifdef HAVE_SMIME
         {"application/pkcs7-signature", prepare_crypto_signature},
+        {"application/x-pkcs7-signature", prepare_crypto_signature},
 #endif
 #endif
 	{NULL, prepare_default}           /* anything else... */
@@ -1294,9 +1295,12 @@ scan_body(PrintInfo * pi, LibBalsaMessageBody * body)
 #ifdef HAVE_GPGME
 	if (body->sig_info &&
 	    g_ascii_strcasecmp(conttype, "application/pgp-signature") &&
-	    g_ascii_strcasecmp(conttype, "application/pkcs7-signature")) {
+	    g_ascii_strcasecmp(conttype, "application/pkcs7-signature") &&
+	    g_ascii_strcasecmp(conttype, "application/x-pkcs7-signature")) {
 	    gchar * header =
-		g_strdup_printf(_("This is an inline OpenPGP signed %s message part:"),
+		g_strdup_printf(_("This is an inline %s signed %s message part:"),
+				body->sig_info->protocol == GPGME_PROTOCOL_OpenPGP ?
+				_("OpenPGP") : _("S/MIME"),
 				conttype);
 	    prepare_crypto_signature(pi, body, header);
 	    g_free(header);

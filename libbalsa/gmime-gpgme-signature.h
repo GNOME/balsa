@@ -61,6 +61,7 @@ struct _GMimeGpgmeSigstat {
     gchar *issuer_name;
     gchar *chain_id;
     time_t key_created;
+    time_t key_expires;
     gboolean key_revoked;
     gboolean key_expired;
     gboolean key_disabled;

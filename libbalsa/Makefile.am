@@ -23,6 +23,17 @@ libbalsa_gpgme_extra_dist =	\
 	gmime-gpgme-signature.c
 endif
 
+if BUILD_WITH_SMIME
+libbalsa_smime_extra =			\
+	gmime-application-pkcs7.h	\
+	gmime-application-pkcs7.c
+libbalsa_smime_extra_dist =
+else
+libbalsa_smime_extra =
+libbalsa_smime_extra_dist =		\
+	gmime-application-pkcs7.h	\
+	gmime-application-pkcs7.c
+endif
 
 libbalsa_a_SOURCES = 		\
 	abook-completion.c	\
@@ -104,13 +115,15 @@ libbalsa_a_SOURCES = 		\
 	source-viewer.c		\
 	url.c			\
 	url.h			\
-	${libbalsa_gpgme_extra}
+	${libbalsa_gpgme_extra}	\
+	${libbalsa_smime_extra}
 
 
-EXTRA_DIST = \
-	libbalsa-marshal.list	\
-	padlock-keyhole.xpm	\
-	${libbalsa_gpgme_extra_dist}
+EXTRA_DIST = 				\
+	libbalsa-marshal.list		\
+	padlock-keyhole.xpm		\
+	${libbalsa_gpgme_extra_dist}	\
+	${libbalsa_smime_extra_dist}
 
 INCLUDES= -I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \
 	-I${top_srcdir}/libbalsa/imap \

@@ -1545,7 +1545,8 @@ part_info_init_application(BalsaMessage * bm, BalsaPartInfo * info)
 
     if (!g_ascii_strcasecmp("application/pgp-signature", body_type) ||
 	(balsa_app.has_smime &&
-	 !g_ascii_strcasecmp("application/pkcs7-signature", body_type))) {
+	 (!g_ascii_strcasecmp("application/pkcs7-signature", body_type) ||
+	  !g_ascii_strcasecmp("application/x-pkcs7-signature", body_type)))) {
         g_free(body_type);
         return;
     }
@@ -3528,7 +3529,8 @@ add_multipart_mixed(BalsaMessage * bm, LibBalsaMessageBody * body)
                 libbalsa_message_body_is_multipart(body) ||
 		g_mime_content_type_is_type(type, "application", "pgp-signature") ||
 		(balsa_app.has_smime && 
-		 g_mime_content_type_is_type(type, "application", "pkcs7-signature")))
+		 (g_mime_content_type_is_type(type, "application", "pkcs7-signature") ||
+		  g_mime_content_type_is_type(type, "application", "x-pkcs7-signature"))))
                 add_body(bm, body);
 	    g_mime_content_type_destroy(type);
 #else
@@ -4464,9 +4466,12 @@ part_info_init_crypto_signature(BalsaMessage * bm, BalsaPartInfo * info)
                                          balsa_app.date_string);
     mime_type = libbalsa_message_body_get_mime_type(info->body);
     if (g_ascii_strcasecmp(mime_type, "application/pgp-signature") &&
-	g_ascii_strcasecmp(mime_type, "application/pkcs7-signature")) {
+	g_ascii_strcasecmp(mime_type, "application/pkcs7-signature") &&
+	g_ascii_strcasecmp(mime_type, "application/x-pkcs7-signature")) {
 	gchar * labelstr = 
-	    g_strdup_printf(_("This is an inline OpenPGP signed %s message part:\n%s"),
+	    g_strdup_printf(_("This is an inline %s signed %s message part:\n%s"),
+			    info->body->sig_info->protocol == GPGME_PROTOCOL_OpenPGP ?
+			    _("OpenPGP") : _("S/MIME"),
 			    mime_type, infostr);
 	g_free(infostr);
 	infostr = labelstr;
@@ -4551,7 +4556,8 @@ get_crypto_content_icon(LibBalsaMessageBody * body, const gchar * content_type,
 
     if (*icon_title && 
 	g_ascii_strcasecmp(content_type, "application/pgp-signature") &&
-	g_ascii_strcasecmp(content_type, "application/pkcs7-signature"))
+	g_ascii_strcasecmp(content_type, "application/pkcs7-signature") &&
+	g_ascii_strcasecmp(content_type, "application/x-pkcs7-signature"))
 	new_title = g_strconcat(*icon_title, "; ",
 				libbalsa_gpgme_sig_protocol_name(body->sig_info->protocol),
 				libbalsa_gpgme_sig_stat_to_gchar(body->sig_info->status),
@@ -4899,6 +4905,7 @@ libbalsa_msg_perform_crypto_real(LibBalsaMessage * message,
 
 	if (g_ascii_strcasecmp(mime_type, "application/octet-stream") &&
 	    g_ascii_strcasecmp(mime_type, "application/pkcs7-signature") &&
+	    g_ascii_strcasecmp(mime_type, "application/x-pkcs7-signature") &&
 	    g_ascii_strcasecmp(mime_type, "application/pgp-signature"))
 	    libbalsa_msg_part_2440(message, chk_body, chk_crypto);
 	g_free(mime_type);

@@ -36,6 +36,10 @@
 #include "gmime-gpgme-signature.h"
 #include "gmime-part-rfc2440.h"
 
+#ifdef HAVE_SMIME
+#  include "gmime-application-pkcs7.h"
+#endif
+
 #ifdef BALSA_USE_THREADS
 #  include <pthread.h>
 #  include "misc.h"
@@ -55,6 +59,8 @@ static gpgme_key_t select_key_from_list(const gchar * name,
 					GMimeGpgmeContext * ctx,
 					GList * keys);
 static gboolean gpg_updates_trustdb(void);
+static gchar *fix_EMail_info(gchar * str);
+
 
 /* ==== public functions =================================================== */
 gboolean
@@ -150,10 +156,14 @@ libbalsa_message_body_protection(LibBalsaMessageBody * body)
 
 	result = LIBBALSA_PROTECT_SIGN;
 	if (protocol && body->parts && body->parts->next) {
-	    if (!g_ascii_strcasecmp
-		("application/pkcs7-signature", protocol)
-		&& body_is_type(body->parts->next, "application",
-				"pkcs7-signature")) {
+	    if ((!g_ascii_strcasecmp("application/pkcs7-signature",
+				     protocol)
+		 && body_is_type(body->parts->next, "application", 
+				 "pkcs7-signature")) ||
+		(!g_ascii_strcasecmp("application/x-pkcs7-signature",
+				     protocol)
+		 && body_is_type(body->parts->next, "application",
+				 "x-pkcs7-signature"))) {
 		result |= LIBBALSA_PROTECT_SMIMEV3;
 		if (!micalg)
 		    result |= LIBBALSA_PROTECT_ERROR;
@@ -189,10 +199,9 @@ libbalsa_message_body_protection(LibBalsaMessageBody * body)
 	    libbalsa_message_body_get_parameter(body, "smime-type");
 
 	result = LIBBALSA_PROTECT_SMIMEV3;
-	if (!g_ascii_strcasecmp("enveloped-data", smime_type))
+	if (!g_ascii_strcasecmp("enveloped-data", smime_type) ||
+	    !g_ascii_strcasecmp("signed-data", smime_type))
 	    result |= LIBBALSA_PROTECT_ENCRYPT;
-	else if (!g_ascii_strcasecmp("signed-data", smime_type))
-	    result |= LIBBALSA_PROTECT_SIGN;
 	else
 	    result |= LIBBALSA_PROTECT_ERROR;
 	g_free(smime_type);
@@ -207,6 +216,9 @@ libbalsa_message_body_protection(LibBalsaMessageBody * body)
  * Signs the MIME object *content with the private key of rfc822_for using
  * protocol. Return TRUE on success (in which case *content is replaced by the
  * new MIME object).
+ * Note: In RFC 2633 mode (GPGME_PROTOCOL_CMS), this function creates a
+ * multipart/signed instead of an application/pkcs7-mime, as the latter one
+ * doesn't contain a cleartext also readable for MUA's without S/MIME support.
  */
 gboolean
 libbalsa_sign_mime_object(GMimeObject ** content, const gchar * rfc822_for,
@@ -220,6 +232,9 @@ libbalsa_sign_mime_object(GMimeObject ** content, const gchar * rfc822_for,
     /* paranoia checks */
     g_return_val_if_fail(rfc822_for != NULL, FALSE);
     g_return_val_if_fail(content != NULL, FALSE);
+#ifndef HAVE_SMIME
+    g_return_val_if_fail(protocol == GPGME_PROTOCOL_OpenPGP, FALSE);
+#endif
 
     /* check if gpg is currently available */
     if (protocol == GPGME_PROTOCOL_OpenPGP && gpg_updates_trustdb())
@@ -300,13 +315,17 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
 {
     GMimeSession *session;
     GMimeGpgmeContext *ctx;
+    GMimeObject *encrypted_obj = NULL;
     GPtrArray *recipients;
-    GMimeMultipartEncrypted *mpe;
+    int result = -1;
     GError *error = NULL;
 
     /* paranoia checks */
     g_return_val_if_fail(rfc822_for != NULL, FALSE);
     g_return_val_if_fail(content != NULL, FALSE);
+#ifndef HAVE_SMIME
+    g_return_val_if_fail(protocol == GPGME_PROTOCOL_OpenPGP, FALSE);
+#endif
 
     /* check if gpg is currently available */
     if (protocol == GPGME_PROTOCOL_OpenPGP && gpg_updates_trustdb())
@@ -340,11 +359,33 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
 	rfc822_for = g_list_next(rfc822_for);
     }
 
-    /* encrypt */
-    mpe = g_mime_multipart_encrypted_new();
-    if (g_mime_multipart_encrypted_encrypt(mpe, *content,
-					   GMIME_CIPHER_CONTEXT(ctx),
-					   recipients, &error) != 0) {
+    /* encrypt: multipart/encrypted for RFC 3156, application/pkcs7-mime for
+       RFC 2633 */
+    if (protocol == GPGME_PROTOCOL_OpenPGP) {
+	GMimeMultipartEncrypted *mpe = g_mime_multipart_encrypted_new();
+
+	encrypted_obj = GMIME_OBJECT(mpe);
+	result = 
+	    g_mime_multipart_encrypted_encrypt(mpe, *content,
+					       GMIME_CIPHER_CONTEXT(ctx),
+					       recipients, &error);
+    }
+#ifdef HAVE_SMIME
+    else {
+	GMimePart *pkcs7 =
+	    g_mime_part_new_with_type("application", "pkcs7-mime");
+
+	encrypted_obj = GMIME_OBJECT(pkcs7);
+	ctx->singlepart_mode = TRUE;
+	result = 
+	    g_mime_application_pkcs7_encrypt(pkcs7, *content,
+					     GMIME_CIPHER_CONTEXT(ctx),
+					     recipients, &error);
+    }
+#endif
+
+    /* error checking */
+    if (result != 0) {
 	if (error) {
 	    if (error->code != GPG_ERR_CANCELED)
 		libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
@@ -357,13 +398,13 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
 	g_ptr_array_free(recipients, FALSE);
 	g_object_unref(ctx);
 	g_object_unref(session);
-	g_object_unref(mpe);
+	g_object_unref(encrypted_obj);
 	return FALSE;
     }
 
     g_ptr_array_free(recipients, FALSE);
     g_object_unref(G_OBJECT(*content));
-    *content = GMIME_OBJECT(mpe);
+    *content = GMIME_OBJECT(encrypted_obj);
     g_object_unref(ctx);
     g_object_unref(session);
 
@@ -390,6 +431,9 @@ libbalsa_sign_encrypt_mime_object(GMimeObject ** content,
     g_return_val_if_fail(rfc822_signer != NULL, FALSE);
     g_return_val_if_fail(rfc822_for != NULL, FALSE);
     g_return_val_if_fail(content != NULL, FALSE);
+#ifndef HAVE_SMIME
+    g_return_val_if_fail(protocol == GPGME_PROTOCOL_OpenPGP, FALSE);
+#endif
 
     /* check if gpg is currently available */
     if (protocol == GPGME_PROTOCOL_OpenPGP && gpg_updates_trustdb())
@@ -432,10 +476,14 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
     GMimeCipherContext *ctx;
     GMimeSignatureValidity *valid;
     GError *error = NULL;
+
+    /* paranoia checks */
     g_return_val_if_fail(body, FALSE);
-    g_return_val_if_fail(body->parts, FALSE);
-    g_return_val_if_fail(body->parts->next, FALSE);
+    g_return_val_if_fail(body->mime_part != NULL, FALSE);
     g_return_val_if_fail(body->message, FALSE);
+#ifndef HAVE_SMIME
+    g_return_val_if_fail(protocol == GPGME_PROTOCOL_OpenPGP, FALSE);
+#endif
 
     /* check if gpg is currently available */
     if (protocol == GPGME_PROTOCOL_OpenPGP && gpg_updates_trustdb())
@@ -446,11 +494,6 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
 	return FALSE;
     if (body->parts->next->sig_info)
 	g_object_unref(G_OBJECT(body->parts->next->sig_info));
-
-    /* fix the protocol of the multipart/signed if protocol is S/MIME */
-    if (protocol == GPGME_PROTOCOL_CMS)
-	g_mime_object_set_content_type_parameter(GMIME_OBJECT (body->mime_part),
-						 "protocol", "application/pkcs7-signature");
 
     /* try to create GMimeGpgMEContext */
     session = g_object_new(g_mime_session_get_type(), NULL, NULL);
@@ -470,6 +513,17 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
 	return FALSE;
     }
 
+    /* S/MIME uses the protocol application/pkcs7-signature, but some ancient
+       mailers, not yet knowing RFC 2633, use application/x-pkcs7-signature,
+       so tweak the context if necessary... */
+    if (protocol == GPGME_PROTOCOL_CMS) {
+	const char * cms_protocol = 
+	    g_mime_object_get_content_type_parameter(GMIME_OBJECT (body->mime_part),
+						     "protocol");
+	if (!g_ascii_strcasecmp(cms_protocol, "application/x-pkcs7-signature"))
+	    ctx->sign_protocol = cms_protocol;
+    }
+
     /* verify the signature */
     valid = g_mime_multipart_signed_verify(GMIME_MULTIPART_SIGNED
 					   (body->mime_part), ctx, &error);
@@ -483,8 +537,10 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 				 _("signature verification failed"));
     }
-    body->parts->next->sig_info = GMIME_GPGME_CONTEXT(ctx)->sig_state;
-    g_object_ref(G_OBJECT(body->parts->next->sig_info));
+    if (GMIME_GPGME_CONTEXT(ctx)->sig_state) {
+	body->parts->next->sig_info = GMIME_GPGME_CONTEXT(ctx)->sig_state;
+	g_object_ref(G_OBJECT(body->parts->next->sig_info));
+    }
     g_mime_signature_validity_free(valid);
     g_object_unref(ctx);
     g_object_unref(session);
@@ -493,7 +549,7 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
 
 
 /*
- * body points to an application/pgp-encrypted body. If decryption is
+ * Body points to an application/pgp-encrypted body. If decryption is
  * successful, it is freed, and the routine returns a pointer to the chain of
  * decrypted bodies. Otherwise, the original body is returned.
  */
@@ -503,21 +559,46 @@ libbalsa_body_decrypt(LibBalsaMessageBody * body,
 {
     GMimeSession *session;
     GMimeGpgmeContext *ctx;
-    GMimeObject *mime_obj;
+    GMimeObject *mime_obj = NULL;
     GError *error = NULL;
     LibBalsaMessage *message;
+#ifdef HAVE_SMIME
+    gboolean smime_signed = FALSE;
+#endif
 
     /* paranoia checks */
     g_return_val_if_fail(body != NULL, body);
+    g_return_val_if_fail(body->mime_part != NULL, body);
     g_return_val_if_fail(body->message != NULL, body);
+#ifndef HAVE_SMIME
+    g_return_val_if_fail(protocol == GPGME_PROTOCOL_OpenPGP, FALSE);
+#endif
 
     /* check if gpg is currently available */
     if (protocol == GPGME_PROTOCOL_OpenPGP && gpg_updates_trustdb())
 	return body;
 
-    /* check if the body is really a multipart/signed */
-    if (!GMIME_IS_MULTIPART_ENCRYPTED(body->mime_part))
-	return body;
+    /* sanity checks... */
+    if (protocol == GPGME_PROTOCOL_OpenPGP) {
+	if (!GMIME_IS_MULTIPART_ENCRYPTED(body->mime_part))
+	    return body;
+    }
+#ifdef HAVE_SMIME
+    else {
+	const char * smime_type = 
+	    g_mime_object_get_content_type_parameter(body->mime_part,
+						     "smime-type");
+
+	if (!smime_type || !GMIME_IS_PART(body->mime_part))
+	    return body;
+	if (!g_ascii_strcasecmp(smime_type, "signed-data"))
+	    smime_signed = TRUE;
+	else if (!g_ascii_strcasecmp(smime_type, "enveloped-data"))
+	    smime_signed = FALSE;
+	else
+	    return body;
+    }
+#endif
 
     /* create a session and a GMimeGpgmeContext */
     session = g_object_new(g_mime_session_get_type(), NULL, NULL);
@@ -546,11 +627,30 @@ libbalsa_body_decrypt(LibBalsaMessageBody * body,
 			  _("Enter passphrase to decrypt message"));
     }
 
-    mime_obj =
-	g_mime_multipart_encrypted_decrypt(GMIME_MULTIPART_ENCRYPTED
-					   (body->mime_part),
-					   GMIME_CIPHER_CONTEXT(ctx),
-					   &error);
+    if (protocol == GPGME_PROTOCOL_OpenPGP)
+	mime_obj =
+	    g_mime_multipart_encrypted_decrypt(GMIME_MULTIPART_ENCRYPTED(body->mime_part),
+					       GMIME_CIPHER_CONTEXT(ctx),
+					       &error);
+#ifdef HAVE_SMIME
+    else if (smime_signed) {
+	GMimeSignatureValidity *valid;
+
+	ctx->singlepart_mode = TRUE;
+	mime_obj =
+	    g_mime_application_pkcs7_verify(GMIME_PART(body->mime_part),
+					    &valid,
+					    GMIME_CIPHER_CONTEXT(ctx),
+					    &error);
+	g_mime_signature_validity_free(valid);
+    } else
+	mime_obj =
+	    g_mime_application_pkcs7_decrypt(GMIME_PART(body->mime_part),
+					       GMIME_CIPHER_CONTEXT(ctx),
+					       &error);
+#endif
+
+    /* check the result */
     if (mime_obj == NULL) {
 	if (error) {
 	    if (error->code != GPG_ERR_CANCELED)
@@ -568,7 +668,15 @@ libbalsa_body_decrypt(LibBalsaMessageBody * body,
     message = body->message;
     libbalsa_message_body_free(body);
     body = libbalsa_message_body_new(message);
-    body->was_encrypted = TRUE;  /* remember that is was encrypted */
+
+    /* remember that is was encrypted */
+    if (protocol == GPGME_PROTOCOL_OpenPGP)
+	body->was_encrypted = TRUE;
+#ifdef HAVE_SMIME
+    else
+	body->was_encrypted = !smime_signed;
+#endif
+
     libbalsa_message_body_set_mime_body(body, mime_obj);
     g_object_unref(G_OBJECT(mime_obj));
     if (ctx->sig_state && ctx->sig_state->status != GPG_ERR_NOT_SIGNED) {
@@ -968,6 +1076,11 @@ libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
 	strftime(buf, sizeof(buf), date_string, &date);
 	g_string_append_printf(msg, _("\nKey created on: %s"), buf);
     }
+    if (info->key_expires) {
+	localtime_r(&info->key_expires, &date);
+	strftime(buf, sizeof(buf), date_string, &date);
+	g_string_append_printf(msg, _("\nKey expires on: %s"), buf);
+    }
     if (info->key_revoked || info->key_expired || info->key_disabled ||
        info->key_invalid) {
        GString * attrs = g_string_new("");
@@ -998,9 +1111,12 @@ libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
            g_string_append_printf(msg, _("\nKey attribute:%s"), attrs->str);
        g_string_free(attrs, TRUE);
     }
-    if (info->issuer_name)
-	g_string_append_printf(msg, _("\nIssuer name: %s"),
-			       info->issuer_name);
+    if (info->issuer_name) {
+	gchar * issuer = fix_EMail_info(g_strdup(info->issuer_name));
+
+	g_string_append_printf(msg, _("\nIssuer name: %s"), issuer);
+	g_free(issuer);
+    }
     if (info->issuer_serial)
 	g_string_append_printf(msg, _("\nIssuer serial number: %s"),
 			       info->issuer_serial);

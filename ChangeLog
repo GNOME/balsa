@@ -1,3 +1,8 @@
+2004-10-22 15:07  PeterB
+
+	* src/balsa-index.c: take care not to lose current message; use
+	binary search to find msgno in array.
+
 2004-10-21 19:51  PeterB
 
 	* src/main.c: implement recursive gdk_threads_{enter,leave}.

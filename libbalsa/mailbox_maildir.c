@@ -812,7 +812,7 @@ libbalsa_mailbox_maildir_get_message(LibBalsaMailbox * mailbox,
 	} else
 	    g_free(filename);
 
-	message->flags = msg_info->flags = msg_info->orig_flags;
+	message->flags = msg_info->flags;
 	message->mailbox = mailbox;
 	message->msgno = msgno;
 	libbalsa_message_set_icons(message);

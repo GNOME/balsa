@@ -1535,7 +1535,7 @@ bndx_view_source_func(GtkTreeModel *model, GtkTreePath *path,
 {
     LibBalsaMessage *message = NULL;
 
-    gtk_tree_model_get(model, iter, BNDX_COLOR_COLUMN, &message, -1);
+    gtk_tree_model_get(model, iter, LB_MBOX_MESSAGE_COL, &message, -1);
     libbalsa_show_message_source(message, balsa_app.message_font,
                                  &balsa_app.source_escape_specials);
 }

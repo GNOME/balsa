@@ -446,7 +446,7 @@ libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox)
     }
 
     mdir->messages_info = g_hash_table_new_full(g_str_hash, g_str_equal,
-				  NULL, (GDestroyNotify)free_message_info);
+				  g_free, (GDestroyNotify)free_message_info);
     mdir->msgno_2_msg_info = g_ptr_array_new();
 
     mdir->mtime = st.st_mtime;
@@ -542,7 +542,8 @@ static void libbalsa_mailbox_maildir_check(LibBalsaMailbox * mailbox)
     }
 }
 
-static void free_message_info(struct message_info *msg_info)
+static void
+free_message_info(struct message_info *msg_info)
 {
     if (!msg_info)
 	return;
@@ -550,7 +551,9 @@ static void free_message_info(struct message_info *msg_info)
     g_free(msg_info->filename);
     if (msg_info->mime_message)
 	g_object_remove_weak_pointer(G_OBJECT(msg_info->mime_message),
-				     (gpointer) &msg_info->mime_message);
+				     (gpointer) & msg_info->mime_message);
+    if (msg_info->message)
+	g_object_unref(msg_info->message);
 }
 
 static gboolean libbalsa_mailbox_maildir_close_backend(LibBalsaMailbox * mailbox)

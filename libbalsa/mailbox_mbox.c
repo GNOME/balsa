@@ -312,6 +312,8 @@ static void free_messages_info(GArray *messages_info)
 	msg_info = &g_array_index(messages_info, struct message_info, i);
 	g_free(msg_info->from);
 	g_mime_object_unref(GMIME_OBJECT(msg_info->mime_message));
+	if (msg_info->message)
+	    g_object_unref(msg_info->message);
     }
     messages_info->len=0;
 }

@@ -659,6 +659,22 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
 }
 
 static void
+free_messages_info(LibBalsaMailboxImap * mbox)
+{
+    guint i;
+    GArray *messages_info = mbox->messages_info;
+
+    for (i = 0; i < messages_info->len; i++) {
+	struct message_info *msg_info =
+	    &g_array_index(messages_info, struct message_info, i);
+	if (msg_info->message)
+	    g_object_unref(msg_info->message);
+    }
+    g_array_free(mbox->messages_info, TRUE);
+    mbox->messages_info = NULL;
+}
+
+static void
 libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox)
 {
     if(mailbox->open_ref == 1) { /* about to close */
@@ -681,6 +697,7 @@ libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox)
 	    mbox->conditions = NULL;
 	    mbox->op = FILTER_NOOP;
 	}
+	free_messages_info(mbox);
     }
 }
 

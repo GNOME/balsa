@@ -567,6 +567,8 @@ static void free_messages_info(GArray *messages_info)
 	if (msg_info->mime_message)
 	    g_object_remove_weak_pointer(G_OBJECT(msg_info->mime_message),
 					 (gpointer) &msg_info->mime_message);
+	if (msg_info->message)
+	    g_object_unref(msg_info->message);
     }
     messages_info->len=0;
 }
@@ -576,6 +578,7 @@ static gboolean libbalsa_mailbox_mh_close_backend(LibBalsaMailbox * mailbox)
     g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MH(mailbox), FALSE);
     g_array_free(LIBBALSA_MAILBOX_MH(mailbox)->msgno_2_index, TRUE);
     LIBBALSA_MAILBOX_MH(mailbox)->msgno_2_index = NULL;
+    free_messages_info(LIBBALSA_MAILBOX_MH(mailbox)->messages_info);
 
     return TRUE;
 }

@@ -604,9 +604,13 @@ traverse_find_path(GNode * node, gpointer * d)
 	return FALSE;
     
     mailbox = ((BalsaMailboxNode *) node->data)->mailbox;
-    if(!LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) return FALSE;
 
-    path = LIBBALSA_MAILBOX_LOCAL(mailbox)->path;
+    if(LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) 
+	path = LIBBALSA_MAILBOX_LOCAL(mailbox)->path;
+    else if(!mailbox)
+	path = ((BalsaMailboxNode *) node->data)->name;
+    else 
+	return FALSE;
 
     if (strcmp(path, (gchar *) d[0]))
 	return FALSE;
@@ -683,7 +687,8 @@ add_local_mailbox(GNode *root, const gchar * name, const gchar * path)
     node = g_node_new(balsa_mailbox_node_new_from_mailbox(mailbox));
 
     if (balsa_app.debug)
-	g_print(_("Local mailbox loaded as: %s\n"),
+	g_print(_("Local mailbox %s loaded as: %s\n"),
+		mailbox->name,
 		gtk_type_name(GTK_OBJECT_TYPE(mailbox)));
     
     /* no type checking, parent is NULL for root */
@@ -695,8 +700,17 @@ add_local_mailbox(GNode *root, const gchar * name, const gchar * path)
 GNode* add_local_folder(GNode*root, const char*d_name, const char* path)
 {
     GNode *node = g_node_new(balsa_mailbox_node_new_from_dir(path));
+
+    /* don't add if the folder is already in the configuration */
+    if (find_by_path(balsa_app.mailbox_nodes, G_LEVEL_ORDER, 
+		     G_TRAVERSE_ALL, path))
+	return NULL;
+
     BALSA_MAILBOX_NODE(node->data)->parent = (BalsaMailboxNode*)root->data;
     g_node_append(root, node);
+    if (balsa_app.debug)
+	g_print(_("Local folder %s\n"), path );
+		
     return node;
 }	
 

@@ -135,12 +135,16 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY)) {
 	    gboolean is_new = (message->flags & LIBBALSA_MESSAGE_FLAG_NEW);
+	    gboolean bool;
 
 	    if (!message->mailbox)
 		return FALSE; /* We don't want to match if an error occured */
 	    if (mbox_locked)
 		UNLOCK_MAILBOX(message->mailbox);
-	    if (!libbalsa_message_body_ref(message)) {
+	    bool = libbalsa_message_body_ref(message);
+	    if (mbox_locked)
+		LOCK_MAILBOX(message->mailbox);
+	    if (!bool) {
 		libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                      _("Unable to load message body to "
                                        "match filter"));
@@ -148,6 +152,8 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
 	    }
 	    body=content2reply(message,NULL,0,FALSE,FALSE);
 	    if (is_new) libbalsa_message_read(message, FALSE);
+	    if (mbox_locked)
+		UNLOCK_MAILBOX(message->mailbox);
 	    libbalsa_message_body_unref(message);
 	    if (mbox_locked)
 		LOCK_MAILBOX(message->mailbox);
@@ -211,6 +217,8 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
                 gboolean is_new = (message->flags & LIBBALSA_MESSAGE_FLAG_NEW);
 		gboolean bool;
 
+		if (!message->mailbox)
+		    return FALSE;
 		if (mbox_locked)
 		    UNLOCK_MAILBOX(message->mailbox);
 		bool = libbalsa_message_body_ref(message);
@@ -225,7 +233,7 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
 		body = content2reply(message,NULL,0,FALSE,FALSE);
  		if (mbox_locked)
 		    UNLOCK_MAILBOX(message->mailbox);
-               if(is_new) libbalsa_message_read(message, FALSE);
+		if(is_new) libbalsa_message_read(message, FALSE);
 		libbalsa_message_body_unref(message);
 		if (mbox_locked)
 		    LOCK_MAILBOX(message->mailbox);

@@ -1,3 +1,8 @@
+2002-10-20  Emmanuel <e.allaud@wanadoo.fr>
+
+	* libbalsa/filter.c: corrects mailbox locking when matching
+	against message body.
+
 2002-10-05  Emmanuel <e.allaud@wanadoo.fr>
 
 	* libbalsa/filter-file.c: use same fixed date format to 

@@ -1398,14 +1398,11 @@ lbmsg_set_header(LibBalsaMessage *message, const gchar *name,
 	message->headers->content_type =
 	    g_mime_content_type_new_from_string(value);
     } else
-
-
 #ifdef MESSAGE_COPY_CONTENT
     if (g_ascii_strcasecmp(name, "Content-Length") == 0) {
 	    message->length = atoi(value);
     } else
 #endif
-    /* do nothing */;
     message->headers->user_hdrs =
         g_list_append(message->headers->user_hdrs,
                       libbalsa_create_hdr_pair(g_strdup(name),

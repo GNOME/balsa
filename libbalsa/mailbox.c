@@ -316,7 +316,8 @@ mailbox_add_for_checking (Mailbox * mailbox)
       path = MAILBOX_LOCAL (mailbox)->path;
       user = passwd = NULL;
   }
-  else if (MAILBOX_IS_IMAP(mailbox)) {
+  else if (MAILBOX_IS_IMAP(mailbox) && MAILBOX_IMAP(mailbox)->server->user 
+           && MAILBOX_IMAP(mailbox)->server->passwd) {
       path = g_strdup_printf("{%s:%i}%s", 
 			     MAILBOX_IMAP(mailbox)->server->host,
 			     MAILBOX_IMAP(mailbox)->server->port,

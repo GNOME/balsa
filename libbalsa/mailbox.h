@@ -368,6 +368,20 @@ void libbalsa_mailbox_set_threading(LibBalsaMailbox *mailbox,
 LibBalsaMailboxView *libbalsa_mailbox_view_new(void);
 void libbalsa_mailbox_view_free(LibBalsaMailboxView * view);
 
+/* set icons */
+void libbalsa_mailbox_set_unread_icon(GdkPixbuf * pixbuf);
+void libbalsa_mailbox_set_trash_icon(GdkPixbuf * pixbuf);
+void libbalsa_mailbox_set_flagged_icon(GdkPixbuf * pixbuf);
+void libbalsa_mailbox_set_replied_icon(GdkPixbuf * pixbuf);
+void libbalsa_mailbox_set_attach_icon(GdkPixbuf * pixbuf);
+#ifdef HAVE_GPGME
+void libbalsa_mailbox_set_good_icon(GdkPixbuf * pixbuf);
+void libbalsa_mailbox_set_notrust_icon(GdkPixbuf * pixbuf);
+void libbalsa_mailbox_set_bad_icon(GdkPixbuf * pixbuf);
+void libbalsa_mailbox_set_sign_icon(GdkPixbuf * pixbuf);
+void libbalsa_mailbox_set_encr_icon(GdkPixbuf * pixbuf);
+#endif /* HAVE_GPGME */
+
 /* columns ids */
 enum {
     LB_MBOX_MSGNO_COL,

@@ -742,6 +742,17 @@ libbalsa_mailbox_sync_backend(LibBalsaMailbox * mailbox, gboolean delete)
 }
 #endif
 
+static void
+libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint msgno)
+{
+    GtkTreeIter iter;
+
+    iter.user_data = g_node_find(mailbox->msg_tree, G_PRE_ORDER,
+				 G_TRAVERSE_ALL, GUINT_TO_POINTER(msgno));
+    g_assert(iter.user_data != NULL);
+    iter.stamp = mailbox->stamp;
+    g_signal_emit_by_name(mailbox, "row-changed", NULL, &iter);
+}
 
 /* Callback for the "messages-status-changed" signal.
  * mb:          the mailbox--must not be NULL;
@@ -808,6 +819,14 @@ messages_status_changed_cb(LibBalsaMailbox * mb, GList * messages,
     case LIBBALSA_MESSAGE_FLAG_FLAGGED:
         break;
     }
+
+    LOCK_MAILBOX(mb);
+    for (lst = messages; lst; lst = lst->next) {
+	LibBalsaMessage *msg = LIBBALSA_MESSAGE(lst->data);
+	libbalsa_message_set_icons(msg);
+	libbalsa_mailbox_msgno_changed(mb, msg->msgno);
+    }
+    UNLOCK_MAILBOX(mb);
 }
 
 int libbalsa_mailbox_copy_message(LibBalsaMessage *message, LibBalsaMailbox *dest)
@@ -1031,18 +1050,7 @@ static gboolean     mbox_model_iter_parent     (GtkTreeModel      *tree_model,
 						GtkTreeIter       *child);
 
 
-static const GType mbox_model_col_type[] = {
-    G_TYPE_UINT,      /* msg no   */
-    G_TYPE_STRING,   /* flagged   */
-    G_TYPE_STRING,   /* A: has attachments */
-    G_TYPE_STRING,   /* From     */
-    G_TYPE_STRING,   /* Subject  */
-    G_TYPE_STRING,   /* Date     */
-    G_TYPE_STRING,   /* size     */
-    G_TYPE_UINT,     /* FIXME PANGO_TYPE_WEIGHT can't be used
-		      * in static initialzation */
-    G_TYPE_POINTER   /* message itself */
-};
+static GType mbox_model_col_type[LB_MBOX_N_COLS];
 
 static void
 mbox_model_init(GtkTreeModelIface *iface)
@@ -1059,6 +1067,16 @@ mbox_model_init(GtkTreeModelIface *iface)
     iface->iter_n_children = mbox_model_iter_n_children;
     iface->iter_nth_child  = mbox_model_iter_nth_child;
     iface->iter_parent     = mbox_model_iter_parent;
+
+    mbox_model_col_type[LB_MBOX_MSGNO_COL]   = G_TYPE_UINT;
+    mbox_model_col_type[LB_MBOX_MARKED_COL]  = GDK_TYPE_PIXBUF;
+    mbox_model_col_type[LB_MBOX_ATTACH_COL]  = GDK_TYPE_PIXBUF;
+    mbox_model_col_type[LB_MBOX_FROM_COL]    = G_TYPE_STRING;
+    mbox_model_col_type[LB_MBOX_SUBJECT_COL] = G_TYPE_STRING;
+    mbox_model_col_type[LB_MBOX_DATE_COL]    = G_TYPE_STRING;
+    mbox_model_col_type[LB_MBOX_SIZE_COL]    = G_TYPE_STRING;
+    mbox_model_col_type[LB_MBOX_WEIGHT_COL]  = G_TYPE_UINT;
+    mbox_model_col_type[LB_MBOX_MESSAGE_COL] = G_TYPE_POINTER;
 }
 
 static GtkTreeModelFlags
@@ -1191,6 +1209,9 @@ get_from_field(LibBalsaMessage *message)
     return from;
 }
 
+static GdkPixbuf *status_icons[LIBBALSA_MESSAGE_STATUS_ICONS_NUM];
+static GdkPixbuf *attach_icons[LIBBALSA_MESSAGE_ATTACH_ICONS_NUM];
+
 static void
 mbox_model_get_value(GtkTreeModel *tree_model,
 		     GtkTreeIter  *iter,
@@ -1236,9 +1257,17 @@ mbox_model_get_value(GtkTreeModel *tree_model,
     case LB_MBOX_MSGNO_COL:
 	g_value_set_uint(value, msgno);  break;
     case LB_MBOX_MARKED_COL:
-	g_value_set_string(value, "M");  break;
+	if (!msg || msg->status_icon >= LIBBALSA_MESSAGE_STATUS_ICONS_NUM)
+	    g_value_set_object(value, NULL);
+	else
+	    g_value_set_object(value, status_icons[msg->status_icon]);
+	break;
     case LB_MBOX_ATTACH_COL:
-	g_value_set_string(value, "A");  break;
+	if (!msg || msg->attach_icon >= LIBBALSA_MESSAGE_ATTACH_ICONS_NUM)
+	    g_value_set_object(value, NULL);
+	else
+	    g_value_set_object(value, attach_icons[msg->attach_icon]);
+	break;
     case LB_MBOX_FROM_COL:
 	if(msg) {
 	    tmp = get_from_field(msg);
@@ -1386,3 +1415,87 @@ mbox_model_iter_parent(GtkTreeModel	* tree_model,
     } else
 	return FALSE;
 }
+
+/* Set icons used in tree view. */
+static void
+libbalsa_mailbox_set_icon(GdkPixbuf * pixbuf, GdkPixbuf ** pixbuf_store)
+{
+    if (*pixbuf_store)
+	g_object_unref(*pixbuf_store);
+    *pixbuf_store = pixbuf;
+}
+
+/* Icons for status column. */
+void
+libbalsa_mailbox_set_unread_icon(GdkPixbuf * pixbuf)
+{
+    libbalsa_mailbox_set_icon(pixbuf,
+			      &status_icons
+			      [LIBBALSA_MESSAGE_STATUS_UNREAD]);
+}
+
+void libbalsa_mailbox_set_trash_icon(GdkPixbuf * pixbuf)
+{
+    libbalsa_mailbox_set_icon(pixbuf,
+			      &status_icons
+			      [LIBBALSA_MESSAGE_STATUS_DELETED]);
+}
+
+void libbalsa_mailbox_set_flagged_icon(GdkPixbuf * pixbuf)
+{
+    libbalsa_mailbox_set_icon(pixbuf,
+			      &status_icons
+			      [LIBBALSA_MESSAGE_STATUS_FLAGGED]);
+}
+
+void libbalsa_mailbox_set_replied_icon(GdkPixbuf * pixbuf)
+{
+    libbalsa_mailbox_set_icon(pixbuf,
+			      &status_icons
+			      [LIBBALSA_MESSAGE_STATUS_REPLIED]);
+}
+
+/* Icons for attachment column. */
+void libbalsa_mailbox_set_attach_icon(GdkPixbuf * pixbuf)
+{
+    libbalsa_mailbox_set_icon(pixbuf,
+			      &attach_icons
+			      [LIBBALSA_MESSAGE_ATTACH_ATTACH]);
+}
+
+#ifdef HAVE_GPGME
+void libbalsa_mailbox_set_good_icon(GdkPixbuf * pixbuf)
+{
+    libbalsa_mailbox_set_icon(pixbuf,
+			      &attach_icons
+			      [LIBBALSA_MESSAGE_ATTACH_GOOD]);
+}
+
+void libbalsa_mailbox_set_notrust_icon(GdkPixbuf * pixbuf)
+{
+    libbalsa_mailbox_set_icon(pixbuf,
+			      &attach_icons
+			      [LIBBALSA_MESSAGE_ATTACH_NOTRUST]);
+}
+
+void libbalsa_mailbox_set_bad_icon(GdkPixbuf * pixbuf)
+{
+    libbalsa_mailbox_set_icon(pixbuf,
+			      &attach_icons
+			      [LIBBALSA_MESSAGE_ATTACH_BAD]);
+}
+
+void libbalsa_mailbox_set_sign_icon(GdkPixbuf * pixbuf)
+{
+    libbalsa_mailbox_set_icon(pixbuf,
+			      &attach_icons
+			      [LIBBALSA_MESSAGE_ATTACH_SIGN]);
+}
+
+void libbalsa_mailbox_set_encr_icon(GdkPixbuf * pixbuf)
+{
+    libbalsa_mailbox_set_icon(pixbuf,
+			      &attach_icons
+			      [LIBBALSA_MESSAGE_ATTACH_ENCR]);
+}
+#endif /* HAVE_GPGME */

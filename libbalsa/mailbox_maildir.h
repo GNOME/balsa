@@ -42,6 +42,7 @@ struct _LibBalsaMailboxMaildirClass {
 
 GtkType libbalsa_mailbox_maildir_get_type(void);
 GtkObject *libbalsa_mailbox_maildir_new(const gchar * path, gboolean create);
+gint libbalsa_mailbox_maildir_create(const gchar * path, gboolean create);
 
 #endif
 

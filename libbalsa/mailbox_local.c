@@ -158,14 +158,14 @@ libbalsa_mailbox_local_new(const gchar * path, gboolean create)
 
 /* libbalsa_mailbox_local_set_path:
    returrns errno on error, 0 on success
-   FIXME: Needs to work for maildir and mh
+   FIXME: proper suport for maildir and mh
 */
 gint
 libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 				const gchar * path)
 {
     int i;
-    /* rename */
+
     g_return_val_if_fail(path, 0);
 
     if ( LIBBALSA_MAILBOX_LOCAL(mailbox)->path != NULL ) {
@@ -174,10 +174,10 @@ libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 	else
 	    i = rename(LIBBALSA_MAILBOX_LOCAL(mailbox)->path, path);
     } else {
-	/* doesn't yet exist, we touch it */
-	i = open( path, O_CREAT | O_NDELAY | O_RDONLY , 0600 );
-	if(i>-1)
-	    close(i);
+	if(LIBBALSA_MAILBOX(mailbox)->is_directory)
+	    return libbalsa_mailbox_maildir_create(path, TRUE);
+	else 
+	    return libbalsa_mailbox_mbox_create(path, TRUE);
     }
 
     /* update mailbox data */

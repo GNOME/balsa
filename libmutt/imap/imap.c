@@ -292,9 +292,10 @@ static int imap_check_capabilities (IMAP_DATA* idata)
   if (!(mutt_bit_isset(idata->capabilities,IMAP4)
       ||mutt_bit_isset(idata->capabilities,IMAP4REV1)))
   {
-    mutt_error _("This IMAP server is ancient. Mutt does not work with it.");
+    mutt_error _("This IMAP server is ancient. Balsa does not work with it.");
+#ifndef LIBMUTT /* don't pause */
     sleep (5);	/* pause a moment to let the user see the error */
-
+#endif
     return -1;
   }
 

@@ -1029,7 +1029,10 @@ real_open_mbnode(BalsaMailboxNode* mbnode)
 	    LIBBALSA_INFORMATION_ERROR,
 	    _("Unable to Open Mailbox!\nPlease check the mailbox settings."));
 	gtk_object_destroy(GTK_OBJECT(index));
-	gdk_threads_enter();
+	gdk_threads_leave();
+#ifdef BALSA_USE_THREADS
+	pthread_mutex_unlock(&open_lock);
+#endif
 	return;
     }
 

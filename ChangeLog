@@ -1,3 +1,16 @@
+2001-02-25  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/main-window.c: (real_open_mbnode) fix nasty gdk deadlock
+	when opening non-existing mbox
+
+	* libbalsa/mailbox_local.c: (libbalsa_mailbox_local_set_path) use 
+	libbalsa_mailbox_*_create  
+
+	* libbalsa/mailbox_mbox.[ch]: libbalsa_mailbox_mbox_create 
+	* libbalsa/mailbox_maildir.[ch]: libbalsa_mailbox_maildir_create
+	* libbalsa/mailbox_mh.[ch]: libbalsa_mailbox_mh_create
+
+	
 2001-02-24  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-mblist.[hc]: implement mblist_remove_mailbox_node().

@@ -92,47 +92,57 @@ libbalsa_mailbox_maildir_init(LibBalsaMailboxMaildir * mailbox)
 {
 }
 
+gint
+libbalsa_mailbox_maildir_create(const gchar * path, gboolean create)
+{
+    gint exists;
+    gint magic_type;
+
+    g_return_val_if_fail( path != NULL, -1);
+
+    exists = access(path, F_OK);
+    if ( exists == 0 ) {
+	/* File exists. Check if it is a maildir... */
+	
+	libbalsa_lock_mutt();
+	magic_type = mx_get_magic(path);
+	libbalsa_unlock_mutt();
+	
+	if ( magic_type != M_MAILDIR )
+	    libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
+				 _("Mailbox %s does not appear to be a Maildir mailbox."), path);
+	return(-1);
+    } else {
+	if(create) {
+	    /*FIXME: Create Maildir...*/
+	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+				 _("Sorry. Balsa doesn't (yet) know how to create a maildir mailbox"));
+	    return(-1);
+	}
+    }
+    return(0);
+}
+
 GtkObject *
 libbalsa_mailbox_maildir_new(const gchar * path, gboolean create)
 {
     LibBalsaMailbox *mailbox;
-    gint magic_type;
-    gint exists;
 
-    g_return_val_if_fail( path != NULL, NULL);
 
     mailbox = gtk_type_new(LIBBALSA_TYPE_MAILBOX_MAILDIR);
-
+    
     mailbox->is_directory = TRUE;
-
+	
     LIBBALSA_MAILBOX_LOCAL(mailbox)->path = g_strdup(path);
 
-    exists = access(path, F_OK);
-    if ( exists == 0 ) {
-	    /* File exists. Check if it is a maildir... */
-	    
-	    libbalsa_lock_mutt();
-	    magic_type = mx_get_magic(path);
-	    libbalsa_unlock_mutt();
-	    
-	    if ( magic_type != M_MAILDIR )
-		    libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
-					 _("Mailbox %s does not appear to be a Maildir mailbox."), path);
-    } else {
-	    if (!create) {
-		    gtk_object_destroy(GTK_OBJECT(mailbox));
-		    return NULL;
-	    }
-
-	    /*FIXME: Create Maildir...*/
-	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-				 _("Sorry. Balsa doesn't (yet) know how to create a maildir mailbox"));
-	    
-	    return NULL;
+    
+    if(libbalsa_mailbox_maildir_create(path, create) < 0) {
+	gtk_object_destroy(GTK_OBJECT(mailbox));
+	return NULL;
     }
-
+    
     libbalsa_notify_register_mailbox(mailbox);
-
+    
     return GTK_OBJECT(mailbox);
 }
 

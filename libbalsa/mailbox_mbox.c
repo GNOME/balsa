@@ -91,52 +91,61 @@ libbalsa_mailbox_mbox_init(LibBalsaMailboxMbox * mailbox)
 {
 }
 
+gint
+libbalsa_mailbox_mbox_create(const gchar * path, gboolean create)
+{
+    gint exists; 
+    gint magic_type;
+    gint fd;
+    
+    g_return_val_if_fail( path != NULL, -1);
+
+    exists = access(path, F_OK);
+    if ( exists == 0 ) {
+	/* File exists. Check if it is an mbox... */
+	
+	libbalsa_lock_mutt();
+	magic_type = mx_get_magic(path);
+	libbalsa_unlock_mutt();
+	
+	if ( magic_type != M_MBOX )
+	    libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
+				 _("Mailbox %s does not appear to be an Mbox mailbox."), path);
+    } else {
+	if(!create)
+	    return(-1);
+
+	if ((fd = creat(path, S_IRUSR | S_IWUSR)) == -1) {
+	    g_warning("An error:\n%s\n occured while trying to "
+		      "create the mailbox \"%s\"\n",
+		      strerror(errno), path);
+	    return -1;
+	} else {
+	    close(fd);
+	}
+    }
+    return(0);
+}
+
 GtkObject *
 libbalsa_mailbox_mbox_new(const gchar * path, gboolean create)
 {
     LibBalsaMailbox *mailbox;
-    gint magic_type;
-    gint exists;
-    gint fd;
 
-    g_return_val_if_fail( path != NULL, NULL);
 
     mailbox = gtk_type_new(LIBBALSA_TYPE_MAILBOX_MBOX);
-
+    
     mailbox->is_directory = FALSE;
-
+	
     LIBBALSA_MAILBOX_LOCAL(mailbox)->path = g_strdup(path);
-
-    exists = access(path, F_OK);
-    if ( exists == 0 ) {
-	    /* File exists. Check if it is an mbox... */
-	    
-	    libbalsa_lock_mutt();
-	    magic_type = mx_get_magic(path);
-	    libbalsa_unlock_mutt();
-	    
-	    if ( magic_type != M_MBOX )
-		    libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
-					 _("Mailbox %s does not appear to be an Mbox mailbox."), path);
-    } else {
-	    if (!create) {
-		    gtk_object_destroy(GTK_OBJECT(mailbox));
-		    return NULL;
-	    }
-
-	    if ((fd = creat(path, S_IRUSR | S_IWUSR)) == -1) {
-		    gtk_object_destroy(GTK_OBJECT(mailbox));
-		    g_warning("An error:\n%s\n occured while trying to "
-			      "create the mailbox \"%s\"\n",
-			      strerror(errno), path);
-		    return NULL;
-	    } else {
-		    close(fd);
-	    }
+	
+    if( libbalsa_mailbox_mbox_create(path, create) < 0 ) {
+	gtk_object_destroy(GTK_OBJECT(mailbox));
+	return NULL;
     }
-
+    
     libbalsa_notify_register_mailbox(mailbox);
-
+    
     return GTK_OBJECT(mailbox);
 }
 

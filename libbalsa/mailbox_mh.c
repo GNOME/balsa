@@ -91,21 +91,14 @@ libbalsa_mailbox_mh_init(LibBalsaMailboxMh * mailbox)
 {
 }
 
-GtkObject *
-libbalsa_mailbox_mh_new(const gchar * path, gboolean create)
+gint
+libbalsa_mailbox_mh_create(const gchar * path, gboolean create) 
 {
-    LibBalsaMailbox *mailbox;
     gint magic_type;
     gint exists;
-    
-    g_return_val_if_fail( path != NULL, NULL);
-    
-    mailbox = gtk_type_new(LIBBALSA_TYPE_MAILBOX_MH);
-    
-    mailbox->is_directory = TRUE;
-    
-    LIBBALSA_MAILBOX_LOCAL(mailbox)->path = g_strdup(path);
-    
+
+    g_return_val_if_fail( path != NULL, -1);
+	
     exists = access(path, F_OK);
     if ( exists == 0 ) {
 	/* File exists. Check if it is a mh... */
@@ -117,16 +110,33 @@ libbalsa_mailbox_mh_new(const gchar * path, gboolean create)
 	if ( magic_type != M_MH )
 	    libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
 				 _("Mailbox %s does not appear to be a Mh mailbox."), path);
+	return(-1);
     } else {
-	if (!create) {
-	    gtk_object_destroy(GTK_OBJECT(mailbox));
-	    return NULL;
+	if(create) {
+	    /*FIXME: Create Mh...*/
+	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+				 _("Sorry. Balsa doesn't (yet) know how to create a mh mailbox"));
+	    return(-1);
 	}
-	
-	/*FIXME: Create Mh...*/
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("Sorry. Balsa doesn't (yet) know how to create a mh mailbox"));
-	
+    }
+    return(0);
+}
+    
+
+GtkObject *
+libbalsa_mailbox_mh_new(const gchar * path, gboolean create)
+{
+    LibBalsaMailbox *mailbox;
+
+    
+    mailbox = gtk_type_new(LIBBALSA_TYPE_MAILBOX_MH);
+    
+    mailbox->is_directory = TRUE;
+    
+    LIBBALSA_MAILBOX_LOCAL(mailbox)->path = g_strdup(path);
+    
+    if(libbalsa_mailbox_mh_create(path, create) < 0) {
+	gtk_object_destroy(GTK_OBJECT(mailbox));
 	return NULL;
     }
     

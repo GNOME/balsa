@@ -38,6 +38,9 @@
  * Returns:
  *    GtkOptionMenu - the menu created
  */
+
+#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
+
 static GtkWidget *
 build_option_menu (option_list options[],
 		   gint num,
@@ -470,7 +473,7 @@ build_match_page ()
   gtk_widget_show (fe_when_box);
 
   fe_when_option_menu = build_option_menu (fe_process_when,
-					   3,
+					   ELEMENTS(fe_process_when),
 					   NULL);
   gtk_box_pack_start (GTK_BOX (fe_when_box),
 		      fe_when_option_menu,
@@ -501,7 +504,7 @@ build_match_page ()
   gtk_widget_show (fe_group_box);
 
   fe_group_option_menu = build_option_menu (fe_run_on,
-					    4,
+					    ELEMENTS(fe_run_on),
 					    NULL);
   gtk_box_pack_start (GTK_BOX (fe_group_box),
 		      fe_group_option_menu,
@@ -532,7 +535,7 @@ build_match_page ()
   gtk_widget_show (fe_type_box);
 
   fe_search_option_menu = build_option_menu (fe_search_type,
-					     3,
+					     ELEMENTS(fe_search_type),
 				  GTK_SIGNAL_FUNC (fe_checkbutton_toggled));
   gtk_box_pack_start (GTK_BOX (fe_type_box),
 		      fe_search_option_menu,
@@ -558,7 +561,10 @@ build_action_page ()
 
   GtkWidget *button;
 
-  page = gtk_vbox_new (FALSE, 0);
+  GtkWidget *box = NULL;
+  GtkWidget *radio = NULL;
+
+  page = gtk_vbox_new (TRUE, 5);
 
   /* The notification area */
 
@@ -567,41 +573,31 @@ build_action_page ()
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_IN);
   gtk_box_pack_start (GTK_BOX (page), frame, FALSE, FALSE, 2);
 
-  table = gtk_table_new (5, 6, FALSE);
+  table = gtk_table_new (2, 2, FALSE);
   gtk_container_add (GTK_CONTAINER (frame), table);
 
   /* FIXME uh, lots and lots and lots of global vars */
   /* Notification buttons */
   button = gtk_check_button_new_with_label ("Play sound:");
   gtk_table_attach (GTK_TABLE (table), button,
-		    0, 2, 0, 1,
+		    0, 1, 0, 1,
 		    GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		    GTK_SHRINK,
 		    5, 5);
 
-  fe_sound_entry = gtk_entry_new_with_max_length (255);
+  fe_sound_entry = gnome_file_entry_new("filter_sounds", "Use Sound...");
   gtk_table_attach (GTK_TABLE (table),
 		    fe_sound_entry,
-		    2, 8, 0, 1,
+		    1, 2, 0, 1,
 		    GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		    GTK_SHRINK,
 		    5, 5);
   gtk_widget_show (fe_sound_entry);
-  fe_sound_browse = gtk_button_new_with_label ("Browse...");
-  gtk_table_attach (GTK_TABLE (table),
-		    fe_sound_browse,
-		    8, 10, 0, 1,
-		    GTK_FILL | GTK_SHRINK | GTK_EXPAND,
-		    GTK_SHRINK,
-		    5, 5);
-  gtk_signal_connect_object (GTK_OBJECT (fe_sound_browse),
-			     "clicked",
-			     GTK_SIGNAL_FUNC (fe_sound_browse_clicked),
-			     NULL);
+
   fe_popup_button = gtk_check_button_new_with_label ("Popup text:");
   gtk_table_attach (GTK_TABLE (table),
 		    fe_popup_button,
-		    0, 2, 1, 2,
+		    0, 1, 1, 2,
 		    GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		    GTK_SHRINK,
 		    5, 5);
@@ -609,7 +605,7 @@ build_action_page ()
   fe_popup_entry = gtk_entry_new_with_max_length (255);
   gtk_table_attach (GTK_TABLE (table),
 		    fe_popup_entry,
-		    2, 10, 1, 2,
+		    1, 2, 1, 2,
 		    GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		    GTK_SHRINK,
 		    5, 5);
@@ -623,12 +619,12 @@ build_action_page ()
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_IN);
   gtk_box_pack_start (GTK_BOX (page), frame, FALSE, FALSE, 2);
 
-  table = gtk_table_new (5, 2, FALSE);
+  table = gtk_table_new (2, 2, FALSE);
   gtk_container_add (GTK_CONTAINER (frame), table);
   gtk_widget_show (table);
 
   fe_action_option_menu = build_option_menu (fe_actions,
-					     5,
+					     ELEMENTS(fe_actions),
 				      GTK_SIGNAL_FUNC (fe_action_selected));
   gtk_table_attach (GTK_TABLE (table),
 		    fe_action_option_menu,
@@ -640,7 +636,7 @@ build_action_page ()
   fe_action_entry = gtk_entry_new_with_max_length (1023);
   gtk_table_attach (GTK_TABLE (table),
 		    fe_action_entry,
-		    0, 5, 1, 2,
+		    0, 2, 1, 2,
 		    GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		    GTK_SHRINK,
 		    5, 5);
@@ -653,27 +649,22 @@ build_action_page ()
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_IN);
   gtk_box_pack_start (GTK_BOX (page), frame, FALSE, FALSE, 2);
 
-  {
-    GtkWidget *box;
-    GtkWidget *radio;
-    GSList *slist;
-
     box = gtk_vbox_new (TRUE, 2);
     gtk_container_add (GTK_CONTAINER (frame), box);
 
-    radio = gtk_radio_button_new_with_label (NULL, "Place/leave in default folder");
+    fe_disp_place = radio = gtk_radio_button_new_with_label (NULL,
+		    "Place/leave in default folder");
     gtk_box_pack_start (GTK_BOX (box), radio, TRUE, FALSE, 1);
 
-    slist = gtk_radio_button_group (GTK_RADIO_BUTTON (radio));
-
-
-    radio = gtk_radio_button_new_with_label (slist, "Do not place/leave in default folder");
+    fe_disp_continue = radio = gtk_radio_button_new_with_label (
+		    gtk_radio_button_group(GTK_RADIO_BUTTON(radio)),
+		    "Do not place/leave in default folder");
     gtk_box_pack_start (GTK_BOX (box), radio, TRUE, FALSE, 1);
 
-    radio = gtk_radio_button_new_with_label (slist,
+    radio = gtk_radio_button_new_with_label (
+		    gtk_radio_button_group(GTK_RADIO_BUTTON(radio)),
 					     "Stop filtering here");
     gtk_box_pack_start (GTK_BOX (box), radio, TRUE, FALSE, 1);
-  }
 
   return page;
 }				/* end build_action_page() */
@@ -741,6 +732,10 @@ filter_edit_dialog (GList * filter_list)
 		  GNOME_STOCK_BUTTON_CANCEL,
 		  GNOME_STOCK_BUTTON_HELP, NULL);
 
+  gtk_signal_connect (GTK_OBJECT (window),
+			   "clicked",
+			    fe_dialog_button_clicked,
+			    NULL);
   /* main hbox */
   hbox = gtk_hbox_new (FALSE, 0);
   gtk_box_pack_start (GTK_BOX (GNOME_DIALOG (window)->vbox),

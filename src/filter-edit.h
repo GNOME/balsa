@@ -60,6 +60,7 @@ static option_list fe_actions[] =
 
 /* and button callbacs */
 void fe_dialog_button_clicked (GtkWidget * widget,
+                               gint button,
                                gpointer data);
 
 

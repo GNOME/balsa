@@ -52,9 +52,6 @@ static gint unique_filter_name(GtkWidget *clist, gchar *name)
     return(1);
 } /* end unique_filter_name() */
 
-#if 0
-/* FIXME FIXME FIXME */
-
 /*
  * fe_dialog_button_clicked()
  *
@@ -63,29 +60,29 @@ static gint unique_filter_name(GtkWidget *clist, gchar *name)
  */
 void
 fe_dialog_button_clicked (GtkWidget * widget,
+                          gint button,
                           gpointer data)
 {
-  switch (GPOINTER_TO_INT (data))
+  switch (button)
     {
-    case 2:                        /* Cancel button */
+    case 0:		/* OK button */
+      /* more destruction is needed.  But that is for later */
+      gtk_widget_destroy (widget);
       break;
 
-    case 1:                        /* Help button */
-      /* something here */
+    case 1:		/* Cancel button */
+      /* more destruction is needed.  But that is for later */
+      gtk_widget_destroy (widget);
       break;
 
-    case 3:                        /* OK button */
+    case 2:		/* Help button */
       /* more of something here */
 
     default:
       /* we should NEVER get here */
     }
-
-  /* destroy the dialog */
-  gtk_widget_destroy (fe_dialog);
-  /* more destruction is needed.  But that is for later */
 }                                /* end fe_dialog_button_clicked */
-#endif
+
 
 /*
  * fe_checkbutton_toggled()
@@ -118,25 +115,24 @@ fe_action_selected (GtkWidget * widget,
                             TRUE);
   switch (GPOINTER_TO_INT (data))
     {
-    case 1:                        /* copy to folder */
-    case 3:                        /* print on printer */
-    case 4:                        /* run program */
-      gtk_widget_set_sensitive (GTK_WIDGET (fe_disp_place),
-                                TRUE);
-      break;
-
-    case 5:                        /* send to trash */
-      gtk_widget_set_sensitive (GTK_WIDGET (fe_action_entry),
-                                FALSE);
-      /* fall through */
-    case 2:                        /* move to folder */
+    case FILTER_COPY:		/* copy to folder */
+    case FILTER_MOVE:		/* move to folder */
       if (GTK_TOGGLE_BUTTON (fe_disp_place)->active)
         gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (fe_disp_continue),
                                      TRUE);
       gtk_widget_set_sensitive (GTK_WIDGET (fe_disp_place),
                                 FALSE);
       break;
+    case FILTER_PRINT:		/* print on printer */
+    case FILTER_RUN:		/* run program */
+      gtk_widget_set_sensitive (GTK_WIDGET (fe_disp_place),
+                                TRUE);
+      break;
 
+    case FILTER_TRASH:		/* send to trash */
+      gtk_widget_set_sensitive (GTK_WIDGET (fe_action_entry),
+                                FALSE);
+      /* fall through */
     default:
       break;
     }

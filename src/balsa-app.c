@@ -38,7 +38,7 @@
 
 /* Global application structure */
 struct BalsaApplication balsa_app;
-
+static gboolean errors_are_fatal = TRUE;
 
 /* prototypes */
 static gboolean check_special_mailboxes (void);
@@ -47,7 +47,7 @@ static void cantfind_notice( const gchar *name );
 static void
 error_exit_cb (GtkWidget * widget, gpointer data)
 {
-  balsa_exit ();
+	balsa_exit ();
 }
 
 static void
@@ -56,6 +56,7 @@ update_gui(void)
     while (gtk_events_pending ())
          gtk_main_iteration ();
 }
+
 static void
 balsa_error (const char *fmt,...)
 {
@@ -81,8 +82,9 @@ balsa_error (const char *fmt,...)
   gtk_window_set_position (GTK_WINDOW (messagebox), GTK_WIN_POS_CENTER);
   gtk_widget_show (messagebox);
 
-  gtk_signal_connect (GTK_OBJECT (messagebox), "clicked",
-		      GTK_SIGNAL_FUNC (error_exit_cb), NULL);
+  if( errors_are_fatal ) 
+	  gtk_signal_connect (GTK_OBJECT (messagebox), "clicked",
+			      GTK_SIGNAL_FUNC (error_exit_cb), NULL);
 }
 
 
@@ -272,4 +274,9 @@ update_timer( gboolean update, guint minutes )
       balsa_app.check_mail_timer_id = 0;
     }
 
+}
+
+void balsa_error_toggle_fatality( gboolean are_fatal )
+{
+	errors_are_fatal = are_fatal;
 }

@@ -214,5 +214,6 @@ balsa_app;
 void balsa_app_init (void);
 gint do_load_mailboxes (void);
 void update_timer( gboolean update, guint minutes );
+void balsa_error_toggle_fatality( gboolean are_fatal );
 
 #endif /* __BALSA_APP_H__ */

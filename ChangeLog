@@ -1,5 +1,12 @@
 2000-05-06  Peter Williams  <peter@beta.newton.cx>
 
+	* src/balsa-app.[ch]: Allow toggling of whether to
+	exit when balsa_error is called. Defaults to YES; turned
+	off for mailbox checking. We actually need a mutex for this,
+	but we can get away without one.
+	
+	* src/main.c (balsa_exit): Remove unused var.
+
 	* src/main-window.c (mail_progress_notify_cb): g_free
 	the mailbox pkey now. Include save-restore.h
 

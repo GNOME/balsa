@@ -362,8 +362,6 @@ force_close_mailbox(Mailbox *mailbox) {
 void
 balsa_exit (void)
 {
-  Mailbox *mailbox;
-
   g_node_traverse (balsa_app.mailbox_nodes,
 		   G_LEVEL_ORDER,
 		   G_TRAVERSE_ALL,

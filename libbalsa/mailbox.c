@@ -227,6 +227,8 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
   pthread_mutex_unlock( &mailbox_lock );
 #endif BALSA_USE_THREADS
 
+  balsa_error_toggle_fatality( FALSE );
+
   list = g_list_first (mailboxes);
 
  /* if (to->type != MAILBOX_MBOX)
@@ -298,6 +300,7 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
   mutt_error = mutt_error_backup;
   #endif
 
+  balsa_error_toggle_fatality( TRUE );
   return;
 }
 

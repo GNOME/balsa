@@ -500,8 +500,8 @@ static void
 identity_list_update(GtkCList* clist)
 {
     LibBalsaIdentity* ident;
-    /*GdkPixmap* pixmap = NULL;
-      GdkPixmap* bitmap = NULL;*/
+    GdkPixmap* pixmap = NULL;
+    GdkPixmap* bitmap = NULL;
     GList** identities, *list;
     LibBalsaIdentity* *default_id, *current;
     gchar* text[2];
@@ -528,7 +528,7 @@ identity_list_update(GtkCList* clist)
         gtk_clist_set_row_data(clist, i, ident);
         
         /* do something to indicate it is the active style */
-        /* FIXME: port it to gnome2:
+#if BALSA_MAJOR < 2
         if (ident == *default_id) {
             gnome_stock_pixmap_gdk(GNOME_STOCK_MENU_FORWARD, 
                                    GNOME_STOCK_PIXMAP_REGULAR, 
@@ -540,7 +540,20 @@ identity_list_update(GtkCList* clist)
                                    &pixmap, &bitmap);
             gtk_clist_set_pixmap(clist, i, 0, pixmap, bitmap);
         }
-        */
+#else
+        {
+            /* FIXME: nasty hack! */
+            GtkWidget *tmp =
+                gtk_image_new_from_stock(ident == *default_id ?
+                                         GNOME_STOCK_MENU_FORWARD :
+                                         GNOME_STOCK_MENU_BLANK,
+                                         GTK_ICON_SIZE_BUTTON);
+
+            gtk_image_get_pixmap(GTK_IMAGE(tmp), &pixmap, &bitmap);
+            gtk_widget_destroy(tmp);
+            gtk_clist_set_pixmap(clist, i, 0, pixmap, bitmap);
+        }
+#endif                          /* BALSA_MAJOR < 2 */
     }
 
     gtk_clist_set_selection_mode(clist, GTK_SELECTION_BROWSE);

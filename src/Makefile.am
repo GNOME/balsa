@@ -87,12 +87,11 @@ balsa_LDADD = \
 	$(top_builddir)/libmutt/imap/libimap.a	\
 	$(top_builddir)/libmutt/libmutt.a	\
 	$(top_builddir)/libinit_balsa/libinit_balsa.a \
-	-lpspell \
 	-lltdl	\
 	-lgdbm	\
+        -lesmtp \
 	$(INTLLIBS) \
-	$(PCRE_LIBS) \
-	$(PTHREAD_LIB)
+        $(BALSA_LIBS)
 
 dist-hook:
 	mkdir $(distdir)/pixmaps

@@ -23,7 +23,7 @@
  * Rather crude POP3 support.
  */
 
-#include "md5.h"
+#include "config.h"
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -39,6 +39,8 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <gnome.h>
+
+#include "md5.h"
 #include "mutt.h"
 #include "libmutt/mailbox.h"
 #include "libbalsa.h"

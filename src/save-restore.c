@@ -1,5 +1,4 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
-/* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.

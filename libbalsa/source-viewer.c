@@ -22,12 +22,12 @@
    in in a GtkText widget.
 */
 
+#include "libbalsa.h"
+#include "libbalsa_private.h"
+
 #include <stdio.h>
 #include <gnome.h>
 
-#include "mutt.h"
-#include "libbalsa.h"
-#include "libbalsa_private.h"
 
 static void close_cb(GtkWidget* w, gpointer data);
 static void copy_cb(GtkWidget * w, gpointer data);

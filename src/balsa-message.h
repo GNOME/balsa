@@ -22,6 +22,8 @@
 #ifndef __BALSA_MESSAGE_H__
 #define __BALSA_MESSAGE_H__
 
+#define GTK_ENABLE_BROKEN
+
 #include <gnome.h>
 #include "libbalsa.h"
 
@@ -30,9 +32,10 @@ extern "C" {
 #endif				/* __cplusplus */
 
 
-#define BALSA_MESSAGE(obj)          GTK_CHECK_CAST (obj, balsa_message_get_type (), BalsaMessage)
-#define BALSA_MESSAGE_CLASS(klass)  GTK_CHECK_CLASS_CAST (klass, balsa_message_get_type (), BalsaMessageClass)
-#define BALSA_IS_MESSAGE(obj)       GTK_CHECK_TYPE (obj, balsa_message_get_type ())
+#define BALSA_TYPE_MESSAGE          (balsa_message_get_type ())
+#define BALSA_MESSAGE(obj)          GTK_CHECK_CAST (obj, BALSA_TYPE_MESSAGE, BalsaMessage)
+#define BALSA_MESSAGE_CLASS(klass)  GTK_CHECK_CLASS_CAST (klass, BALSA_TYPE_MESSAGE, BalsaMessageClass)
+#define BALSA_IS_MESSAGE(obj)       GTK_CHECK_TYPE (obj, BALSA_TYPE_MESSAGE)
 
 
 typedef struct _BalsaMessage BalsaMessage;
@@ -93,7 +96,8 @@ void balsa_message_select_all(BalsaMessage * bmessage);
 void reflow_string(gchar * str, gint mode, gint * cur_pos, int width);
 
 /* a helper functions; FIXME: find more proper location for them.  */
-    GdkFont* balsa_get_font_by_charset(const gchar* base, const gchar*charset);
+GdkFont* balsa_get_font_by_charset(const gchar* base, const gchar*charset,
+                                   gchar ** fontname);
 
 #ifdef __cplusplus
 }

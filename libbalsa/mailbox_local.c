@@ -39,6 +39,10 @@
 #include "threads.h"
 #endif
 
+#include <libgnome/gnome-defs.h> 
+#include <libgnome/gnome-config.h> 
+#include <libgnome/gnome-i18n.h> 
+
 enum {
     REMOVE_FILES,
     LAST_SIGNAL

@@ -1,3 +1,22 @@
+2002-03-13  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/*,libinit_balsa/*, libbalsa/identity.c, libbalsa/misc.[hc]:
+	make entire balsa compile within GNOME2.
+
+2002-03-10  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/libbalsa_private.h: do not include gnome.h here.
+	* libbalsa/mailbox.c:
+	* libbalsa/mailbox_imap.c: 
+	* libbalsa/mailbox_local.c: 
+	* libbalsa/mailbox_pop3.c: 
+	* libbalsa/message.c: 
+	* libbalsa/pop3.c: 
+	* libbalsa/send.c: 
+	* libbalsa/server.c: 
+	* libbalsa/source-viewer.c: include only needed pieces of gnome here.
+	* src/sendmsg-window.c: it is legal to have no signature.
+	
 2002-03-09  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* configure.in: gtkhtml was renamed to libgkthtml. Take into account.

@@ -869,3 +869,12 @@ libbalsa_truncate_string(const gchar *str, gint length, gint dots)
 
     return res;
 }
+
+/* wrapper for the libmutt method */
+void
+libbalsa_mktemp(gchar * name)
+{
+    libbalsa_lock_mutt();
+    mutt_mktemp(name);
+    libbalsa_unlock_mutt();
+}

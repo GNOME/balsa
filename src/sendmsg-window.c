@@ -36,14 +36,12 @@
    Locale data is then used exclusively for the spelling checking.  */
 
 
-#if FINALLY_PORTED
 #include "config.h"
-
-#include "libbalsa.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <gnome.h>
+#include <libgnomevfs/gnome-vfs-uri.h>
 #include <ctype.h>
 
 #ifdef HAVE_LOCALE_H
@@ -201,7 +199,7 @@ static GnomeUIInfo file_menu[] = {
     { GNOME_APP_UI_ITEM, N_("_Send"),
       N_("Send this message"),
       send_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-      BALSA_PIXMAP_MENU_SEND, 'S', GDK_CONTROL_MASK, NULL },
+      BALSA_PIXMAP_MENU_SEND, 'S', GDK_CONTROL_MASK|GDK_MOD1_MASK, NULL },
 #define MENU_FILE_QUEUE_POS 6
     { GNOME_APP_UI_ITEM, N_("_Queue"),
       N_("Queue this message in Outbox for sending"),
@@ -278,6 +276,9 @@ static GnomeUIInfo edit_menu[] = {
                            BALSA_PIXMAP_MENU_IDENTITY), /*FIXME: Other icon */
     GNOMEUIINFO_END
 };
+
+typedef gint (*ViewMenuFunc)(GtkWidget * widget, BalsaSendmsg * bsmsg);
+#define VIEW_MENU_FUNC(f) ((ViewMenuFunc) (f))
 
 static GnomeUIInfo view_menu[] = {
 #define MENU_TOGGLE_FROM_POS 0
@@ -696,6 +697,8 @@ static gboolean
 edit_with_gnome_check(gpointer data) {
     FILE *tmp;
     balsa_edit_with_gnome_data *data_real = (balsa_edit_with_gnome_data *)data;
+    GtkTextBuffer *buffer =
+        gtk_text_view_get_buffer(GTK_TEXT_VIEW(data_real->msg->text));
     pid_t pid;
     gint curposition;
     gchar line[81]; /* FIXME:All lines should wrap at this line */
@@ -743,12 +746,10 @@ edit_with_gnome_check(gpointer data) {
             else break;
 	}
     }
-    gtk_editable_delete_text(GTK_EDITABLE(data_real->msg->text),0,-1);
+    gtk_text_buffer_set_text(buffer, "", 0);
     curposition = 0;
-    while(fgets(line, sizeof(line), tmp)) {
-        gtk_editable_insert_text(GTK_EDITABLE(data_real->msg->text),line, 
-                                 strlen(line), &curposition);
-    }
+    while(fgets(line, sizeof(line), tmp))
+        gtk_text_buffer_insert_at_cursor(buffer, line, -1);
     g_free(data_real->filename);
     fclose(tmp);
     unlink(data_real->filename);
@@ -778,27 +779,22 @@ edit_with_gnome(GtkWidget* widget, BalsaSendmsg* msg)
     pid_t pid;
     FILE *tmp;
     int tmpfd;
+    GtkTextBuffer *buffer =
+        gtk_text_view_get_buffer(GTK_TEXT_VIEW(msg->text));
+    GtkTextIter start, end;
+    gchar *p;
 
     strcpy(filename, TMP_PATTERN);
     tmpfd = mkstemp(filename);
     tmp   = fdopen(tmpfd, "w+");
     
     if(balsa_app.edit_headers) {
-        gchar *from =
-            libbalsa_address_entry_get_chars_all(LIBBALSA_ADDRESS_ENTRY
-                                                 (msg->from[1])),
-            *to =
-            libbalsa_address_entry_get_chars_all(LIBBALSA_ADDRESS_ENTRY
-                                                 (msg->to[1])),
-            *reply_to =
-            libbalsa_address_entry_get_chars_all(LIBBALSA_ADDRESS_ENTRY
-                                                 (msg->reply_to[1])),
-            *cc =
-            libbalsa_address_entry_get_chars_all(LIBBALSA_ADDRESS_ENTRY
-                                                 (msg->cc[1])),
-            *bcc =
-            libbalsa_address_entry_get_chars_all(LIBBALSA_ADDRESS_ENTRY
-                                                 (msg->bcc[1])),
+        const gchar
+            *from = gtk_entry_get_text(GTK_ENTRY(msg->from[1])),
+            *to = gtk_entry_get_text(GTK_ENTRY(msg->to[1])),
+            *reply_to = gtk_entry_get_text(GTK_ENTRY(msg->reply_to[1])),
+            *cc = gtk_entry_get_text(GTK_ENTRY(msg->cc[1])),
+            *bcc = gtk_entry_get_text(GTK_ENTRY(msg->bcc[1])),
 	    *subject = gtk_entry_get_text(GTK_ENTRY(msg->subject[1])),
 	    *comments = gtk_entry_get_text(GTK_ENTRY(msg->comments[1]));
 	
@@ -812,17 +808,13 @@ edit_with_gnome(GtkWidget* widget, BalsaSendmsg* msg)
                 "Reply-To: %s\n"
                 "Comments: %s\n\n\n",
                 from, to, cc, bcc, subject, reply_to, comments);
-        g_free(from);
-        g_free(to);
-        g_free(cc);
-        g_free(bcc);
-        g_free(reply_to);
     }
 
-    gtk_widget_set_sensitive(msg->text, FALSE);
-    fputs(gtk_editable_get_chars(GTK_EDITABLE(msg->text), 0,
-                                 gtk_text_get_length(GTK_TEXT
-                                                     (msg->text))), tmp);
+    gtk_widget_set_sensitive(GTK_WIDGET(msg->text), FALSE);
+    gtk_text_buffer_get_bounds(buffer, &start, &end);
+    p = gtk_text_iter_get_text(&start, &end);
+    fputs(p, tmp);
+    g_free(p);
     fclose(tmp);
     if ((pid = fork()) < 0) {
         perror ("fork");
@@ -865,21 +857,23 @@ repl_identity_signature(BalsaSendmsg* msg, LibBalsaIdentity* new_ident,
                         LibBalsaIdentity* old_ident, gint* replace_offset, 
                         gint siglen, gchar* new_sig) 
 {
-    gint ins_pos;
-    gint length_delta = 0;
     gint newsiglen;
     gboolean reply_type = (msg->type == SEND_REPLY || 
                            msg->type == SEND_REPLY_ALL ||
                            msg->type == SEND_REPLY_GROUP);
     gboolean forward_type = (msg->type == SEND_FORWARD_ATTACH || 
                              msg->type == SEND_FORWARD_INLINE);
+    GtkTextBuffer *buffer =
+        gtk_text_view_get_buffer(GTK_TEXT_VIEW(msg->text));
+    GtkTextIter ins, end;
     
-    gtk_text_freeze(GTK_TEXT(msg->text));
-    gtk_editable_delete_text(GTK_EDITABLE(msg->text), *replace_offset,
-                             *replace_offset + siglen);
+    gtk_text_buffer_get_iter_at_offset(buffer, &ins,
+                                       *replace_offset);
+    gtk_text_buffer_get_iter_at_offset(buffer, &end,
+                                       *replace_offset + siglen);
+    gtk_text_buffer_delete(buffer, &ins, &end);
 
     if (!new_sig) {
-        gtk_text_thaw(GTK_TEXT(msg->text));
         return;
     } else {
         newsiglen = strlen(new_sig);
@@ -889,33 +883,23 @@ repl_identity_signature(BalsaSendmsg* msg, LibBalsaIdentity* new_ident,
      * settings to determine whether to add signature */
     if ((reply_type && !new_ident->sig_whenreply) ||
         (forward_type && !new_ident->sig_whenforward)) {
-        gtk_text_thaw(GTK_TEXT(msg->text));
         return;
     } 
 
     /* see if sig location is probably going to be the same */
     if (new_ident->sig_prepend == old_ident->sig_prepend) {
-        ins_pos = *replace_offset;
-        gtk_editable_insert_text(GTK_EDITABLE(msg->text), 
-                                 new_sig, newsiglen, &ins_pos);
-
         /* account for sig length difference in replacement offset */
         *replace_offset += newsiglen - siglen;
     } else if (new_ident->sig_prepend) {
         /* sig location not the same between idents, take a WAG and
          * put it at the start of the message */
-        ins_pos = 0;
-        gtk_editable_insert_text(GTK_EDITABLE(msg->text),
-                                 new_sig, newsiglen, &ins_pos);
+        gtk_text_buffer_get_start_iter(buffer, &ins);
         *replace_offset += newsiglen;
     } else {
         /* put it at the end of the message */
-        ins_pos = gtk_text_get_length(GTK_TEXT(msg->text));
-        gtk_editable_insert_text(GTK_EDITABLE(msg->text),
-                                 new_sig, newsiglen, &ins_pos);
+        gtk_text_buffer_get_end_iter(buffer, &ins);
     }
-    
-    gtk_text_thaw(GTK_TEXT(msg->text));
+    gtk_text_buffer_insert(buffer, &ins, new_sig, newsiglen);
 }
 
 
@@ -924,7 +908,8 @@ prep_signature(LibBalsaIdentity* ident, gchar* sig)
 {
     gchar* sig_tmp;
 
-    g_return_val_if_fail(sig != NULL, NULL);
+    /* empty signature is a legal signature */
+    if(sig == NULL) return NULL;
     
     if (ident->sig_separator) {
         sig_tmp = g_strconcat("\n-- \n", sig, NULL);
@@ -949,9 +934,12 @@ prep_signature(LibBalsaIdentity* ident, gchar* sig)
 static void
 update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
 {
+    GtkTextBuffer *buffer = 
+        gtk_text_view_get_buffer(GTK_TEXT_VIEW(msg->text));
+    GtkTextIter start, end;
+
     gint replace_offset = 0;
     gint siglen;
-    gint ins_pos;
     gint i = 0;
     
     gchar* old_sig;
@@ -1001,7 +989,8 @@ update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
     new_sig = prep_signature(ident, new_sig);
 
     /* split on sig separator */
-    message_text = gtk_editable_get_chars(GTK_EDITABLE(msg->text), 0, -1);
+    gtk_text_buffer_get_bounds(buffer, &start, &end);
+    message_text = gtk_text_iter_get_text(&start, &end);
     message_split = g_strsplit(message_text, "\n-- \n", 0);
     
     while (message_split[i]) {
@@ -1178,7 +1167,7 @@ show_extbody_dialog(GtkWidget *widget, GnomeIconList *ilist)
     hbox = gtk_hbox_new (FALSE, 10);
     gtk_box_pack_start (GTK_BOX (dialog_vbox), hbox, TRUE, TRUE, 0);
     
-    pixmap = gnome_pixmap_new_from_file (GNOME_DATA_PREFIX "/pixmaps/gnome-question.png");
+    pixmap = gnome_pixmap_new_from_file (BALSA_DATA_PREFIX "/pixmaps/gnome-question.png");
     gtk_box_pack_start (GTK_BOX (hbox), pixmap, TRUE, TRUE, 0);
 
     num = GPOINTER_TO_INT(gtk_object_get_data(GTK_OBJECT(ilist),
@@ -1437,7 +1426,8 @@ attach_dialog_ok(GtkWidget * widget, gpointer data)
     GtkFileSelection *fs;
     GnomeIconList *iconlist;
     BalsaSendmsg *bsmsg;
-    gchar *filename, *dir, *p, *sel_file;
+    gchar *filename, *dir, *p;
+    const gchar *sel_file;
     GList *node;
 
     fs = GTK_FILE_SELECTION(data);
@@ -1524,9 +1514,7 @@ attach_message(BalsaSendmsg *msg, LibBalsaMessage *message)
 {
     gchar *name, tmp_file_name[PATH_MAX + 1];
 	
-    libbalsa_lock_mutt();
-    mutt_mktemp(tmp_file_name);
-    libbalsa_unlock_mutt();
+    libbalsa_mktemp(tmp_file_name);
     mkdir(tmp_file_name, 0700);
     name = g_strdup_printf("%s/forwarded-message", tmp_file_name);
     if(!libbalsa_message_save(message, name)) {
@@ -1543,14 +1531,14 @@ attach_message(BalsaSendmsg *msg, LibBalsaMessage *message)
 static gint
 insert_selected_messages(BalsaSendmsg *msg, SendType type)
 {
+    GtkTextBuffer *buffer = 
+        gtk_text_view_get_buffer(GTK_TEXT_VIEW(msg->text));
     GtkWidget *index =
 	balsa_window_find_current_index(balsa_app.main_window);
-    gint pos=gtk_editable_get_position(GTK_EDITABLE(msg->text));
     GString *text = g_string_new("");
     
     if (index) {
 	GList *node;
-	GList *mailbox;
 	GtkCTree *ctree = GTK_CTREE(BALSA_INDEX(index)->ctree);
     
 	for (node = GTK_CLIST(ctree)->selection; node;
@@ -1564,8 +1552,7 @@ insert_selected_messages(BalsaSendmsg *msg, SendType type)
 	}
     }
     
-    gtk_editable_insert_text(GTK_EDITABLE(msg->text), text->str,
-			     text->len, &pos);
+    gtk_text_buffer_insert_at_cursor(buffer, text->str, text->len);
     g_string_free(text, TRUE);
     
     return TRUE;
@@ -1605,10 +1592,12 @@ attach_message_cb(GtkWidget * widget, BalsaSendmsg *msg)
 }
 
 
+#if 0
 static gint include_messages_cb(GtkWidget *widget, BalsaSendmsg *msg)
 {
     return insert_selected_messages(msg, SEND_FORWARD_INLINE);
 }
+#endif /* 0 */
 
 /* attachments_add - attachments field D&D callback */
 static void
@@ -1632,16 +1621,15 @@ attachments_add(GtkWidget * widget,
                                        "Possible reason: not enough temporary space"));
         }
     } else if (info == TARGET_URI_LIST) {
-	GList *names, *l;
-	
-	names = gnome_uri_list_extract_filenames(selection_data->data);
-	
-	for (l = names; l; l = l->next)
+        GList *uri_list;
+        
+        for (uri_list = (GList *)selection_data->data; uri_list;
+             uri_list = g_list_next(uri_list)) {
+            const gchar *path = gnome_vfs_uri_get_path(uri_list->data);
 	    add_attachment(GNOME_ICON_LIST(bsmsg->attachments[1]),
-			   g_strdup((char *) l->data), FALSE, NULL);
-	
-	gnome_uri_list_free_strings(names);
-	
+			   g_strdup(path), FALSE, NULL);
+        }
+
 	/* show attachment list */
 	bsmsg->update_config = FALSE;
 	gtk_check_menu_item_set_active(
@@ -1772,7 +1760,8 @@ create_email_entry(GtkWidget * table, const gchar * label, int y_pos,
     gtk_button_set_relief(GTK_BUTTON(arr[2]), GTK_RELIEF_NONE);
     GTK_WIDGET_UNSET_FLAGS(arr[2], GTK_CAN_FOCUS);
     gtk_container_add(GTK_CONTAINER(arr[2]),
-		      gnome_stock_pixmap_widget(NULL, icon));
+		      gtk_image_new_from_stock(icon,
+                                               GTK_ICON_SIZE_BUTTON));
     gtk_table_attach(GTK_TABLE(table), arr[2], 2, 3, y_pos, y_pos + 1,
 		     0, 0, 0, 0);
 
@@ -2007,8 +1996,13 @@ drag_data_quote(GtkWidget * widget,
         LibBalsaMessage **message_array =
             (LibBalsaMessage **) selection_data->data;
         GString *text = g_string_new(NULL);
-        gint pos = gtk_editable_get_position(GTK_EDITABLE(widget));
-        gint orig_pos = pos;
+        GtkTextBuffer *buffer =
+            gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
+        GtkTextIter orig_pos;
+
+        gtk_text_buffer_get_iter_at_mark(buffer, &orig_pos,
+                                         gtk_text_buffer_get_insert
+                                         (buffer));
 
         while (*message_array) {
             GString *body = quoteBody(bsmsg, *message_array++, SEND_REPLY);
@@ -2016,9 +2010,8 @@ drag_data_quote(GtkWidget * widget,
             g_string_append(text, body->str);
             g_string_free(body, TRUE);
         }
-        gtk_editable_insert_text(GTK_EDITABLE(widget), text->str,
-                                 text->len, &pos);
-        gtk_editable_set_position(GTK_EDITABLE(widget), orig_pos);
+        gtk_text_buffer_insert_at_cursor(buffer, text->str, text->len);
+        gtk_text_buffer_place_cursor(buffer, &orig_pos);
         g_string_free(text, TRUE);
     }
 }
@@ -2031,17 +2024,16 @@ create_text_area(BalsaSendmsg * msg)
 {
     GtkWidget *table;
 
-    msg->text = gtk_text_new(NULL, NULL);
+    msg->text = gtk_text_view_new();
     if (msg->flow)
-        gtk_signal_connect(GTK_OBJECT(msg->text), "insert-text",
-                           insert_text_cb, NULL);
-    gtk_text_set_editable(GTK_TEXT(msg->text), TRUE);
-    gtk_text_set_word_wrap(GTK_TEXT(msg->text), TRUE);
+        gtk_signal_connect(GTK_OBJECT(msg->text), "insert-at-cursor",
+                           GTK_SIGNAL_FUNC(insert_text_cb), NULL);
+    gtk_text_view_set_editable(GTK_TEXT_VIEW(msg->text), TRUE);
+    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(msg->text), GTK_WRAP_WORD);
     balsa_spell_check_set_text(BALSA_SPELL_CHECK(msg->spell_checker),
-			       GTK_TEXT(msg->text));
+			       GTK_TEXT_VIEW(msg->text));
 
-    table = gtk_scrolled_window_new(GTK_TEXT(msg->text)->hadj,
-				    GTK_TEXT(msg->text)->vadj);
+    table = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(table),
     				   GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
     gtk_container_add(GTK_CONTAINER(table), msg->text);
@@ -2079,14 +2071,16 @@ continueBody(BalsaSendmsg * msg, LibBalsaMessage * message)
 	    GString *rbdy;
 	    gchar *body_type = libbalsa_message_body_get_content_type(body);
             gint llen = -1;
+            GtkTextBuffer *buffer =
+                gtk_text_view_get_buffer(GTK_TEXT_VIEW(msg->text));
 
             if (msg->flow && libbalsa_flowed_rfc2646(body))
                 llen = balsa_app.wraplength;
 	    if (!strcmp(body_type, "text/plain") &&
 		(rbdy = process_mime_part(message, body, NULL, llen, FALSE,
                                           msg->flow))) {
-		gtk_text_insert(GTK_TEXT(msg->text), NULL, NULL, NULL, 
-				rbdy->str, rbdy->len);
+                gtk_text_buffer_insert_at_cursor(buffer, rbdy->str,
+                                                 rbdy->len);
 		g_string_free(rbdy, TRUE);
 	    }
 	    g_free(body_type);
@@ -2095,9 +2089,7 @@ continueBody(BalsaSendmsg * msg, LibBalsaMessage * message)
 	while (body) {
 	    gchar *name, *body_type, tmp_file_name[PATH_MAX + 1];
 
-	    libbalsa_lock_mutt();
-	    mutt_mktemp(tmp_file_name);
-	    libbalsa_unlock_mutt();
+	    libbalsa_mktemp(tmp_file_name);
 	    if (body->filename) {
 		mkdir(tmp_file_name, 0700);
 		name = g_strdup_printf("%s/%s", tmp_file_name, body->filename);
@@ -2139,7 +2131,7 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
     if (type == SEND_FORWARD_ATTACH) {
 	const gchar *subject;
 
-	str = g_strdup_printf(_("------forwarded message------\n"), 
+	str = g_strdup_printf(_("------forwarded message from %s------\n"), 
 			      personStr);
 	body = g_string_new(str);
 	g_free(str);
@@ -2188,13 +2180,14 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 	if (message->references) {
 	    GList *ref_list = message->references;
 
-	    str = g_strdup_printf(_("References: %s"), ref_list->data);
+	    str = g_strdup_printf(_("References: %s"),
+                                  (gchar *) ref_list->data);
 	    g_string_append(body, str);
 	    g_free(str);
 	    ref_list = ref_list->next;
 
 	    while (ref_list) {
-		str = g_strdup_printf(" %s", ref_list->data);
+		str = g_strdup_printf(" %s", (gchar *) ref_list->data);
 		g_string_append(body, str);
 		g_free(str);
 		ref_list = ref_list->next;
@@ -2239,11 +2232,13 @@ fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 {
     GString *body = NULL;
     gchar *signature;
-    gint pos = 0;
     gboolean reply_any = (type == SEND_REPLY || type == SEND_REPLY_ALL
                           || type == SEND_REPLY_GROUP);
     gboolean forwd_any = (type == SEND_FORWARD_ATTACH
                           || type == SEND_FORWARD_INLINE);
+    GtkTextBuffer *buffer =
+        gtk_text_view_get_buffer(GTK_TEXT_VIEW(msg->text));
+    GtkTextIter start;
 
     if (message && ((balsa_app.autoquote && reply_any)
                     || type == SEND_FORWARD_INLINE))
@@ -2275,16 +2270,17 @@ fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 	g_free(signature);
     }
 
-    gtk_editable_insert_text(GTK_EDITABLE(msg->text), body->str, body->len,
-			     &pos);
-    gtk_editable_set_position(GTK_EDITABLE(msg->text), 0);
+    gtk_text_buffer_set_text(buffer, body->str, body->len);
+    gtk_text_buffer_get_start_iter(buffer, &start);
+    gtk_text_buffer_place_cursor(buffer, &start);
     g_string_free(body, TRUE);
 }
 
 static gint insert_signature_cb(GtkWidget *widget, BalsaSendmsg *msg)
 {
     gchar *signature;
-    gint pos=gtk_editable_get_position(GTK_EDITABLE(msg->text));
+    GtkTextBuffer *buffer =
+        gtk_text_view_get_buffer(GTK_TEXT_VIEW(msg->text));
     
     if ((signature = read_signature(msg)) != NULL) {
 	if (msg->ident->sig_separator
@@ -2295,8 +2291,7 @@ static gint insert_signature_cb(GtkWidget *widget, BalsaSendmsg *msg)
 	    signature = tmp;
 	}
 	
-	gtk_editable_insert_text(GTK_EDITABLE(msg->text), signature, 
-				 strlen(signature), &pos);
+        gtk_text_buffer_insert_at_cursor(buffer, signature, -1);
 	
 	g_free(signature);
     }
@@ -2495,17 +2490,27 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 		   SendType type)
 {
     static const struct callback_item {
-        const char* icon_id;
-        GtkSignalFunc callback;
+        const char *icon_id;
+        BalsaToolbarFunc callback;
     } callback_table[] = {
-        { BALSA_PIXMAP_ATTACHMENT,       attach_clicked },
-        { BALSA_PIXMAP_IDENTITY,         change_identity_dialog_cb },
-        { BALSA_PIXMAP_POSTPONE,         postpone_message_cb },
-        { BALSA_PIXMAP_PRINT,            print_message_cb },
-        { BALSA_PIXMAP_SAVE,             save_message_cb },
-        { BALSA_PIXMAP_SEND,             send_message_toolbar_cb },
-        { GNOME_STOCK_PIXMAP_CLOSE,      close_window_cb },
-        { GNOME_STOCK_PIXMAP_SPELLCHECK, spell_check_cb } };
+        {BALSA_PIXMAP_ATTACHMENT,
+            BALSA_TOOLBAR_FUNC(attach_clicked)},
+        {BALSA_PIXMAP_IDENTITY,
+            BALSA_TOOLBAR_FUNC(change_identity_dialog_cb)},
+        {BALSA_PIXMAP_POSTPONE,
+            BALSA_TOOLBAR_FUNC(postpone_message_cb)},
+        {BALSA_PIXMAP_PRINT,
+            BALSA_TOOLBAR_FUNC(print_message_cb)},
+        {BALSA_PIXMAP_SAVE,
+            BALSA_TOOLBAR_FUNC(save_message_cb)},
+        {BALSA_PIXMAP_SEND,
+            BALSA_TOOLBAR_FUNC(send_message_toolbar_cb)},
+        {GNOME_STOCK_PIXMAP_CLOSE,
+            BALSA_TOOLBAR_FUNC(close_window_cb)},
+        {GNOME_STOCK_PIXMAP_SPELLCHECK,
+            BALSA_TOOLBAR_FUNC(spell_check_cb)}
+    };
+
     GtkWidget *window;
     GtkWidget *paned = gtk_vpaned_new();
     BalsaSendmsg *msg = NULL;
@@ -2683,12 +2688,12 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 
     /* set the toolbar so we are consistant with the rest of balsa */
     {
-	GnomeDockItem *item;
+	BonoboDockItem *item;
 	GtkWidget *toolbar;
 
 	item = gnome_app_get_dock_item_by_name(GNOME_APP(window),
 					       GNOME_APP_TOOLBAR_NAME);
-	toolbar = gnome_dock_item_get_child(item);
+	toolbar = bonobo_dock_item_get_child(item);
 
 	gtk_toolbar_set_style(GTK_TOOLBAR(toolbar),
 			      balsa_app.toolbar_style);
@@ -2726,10 +2731,13 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
                                        "Possible reason: not enough temporary space"));
     }
 
-    if (type == SEND_CONTINUE && 
-	GNOME_ICON_LIST(msg->attachments[1])->icons)
- 	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
-	    msg->view_checkitems[MENU_TOGGLE_ATTACHMENTS_POS]), TRUE);
+    if (type == SEND_CONTINUE
+        && gnome_icon_list_get_num_icons(GNOME_ICON_LIST
+                                         (msg->attachments[1])))
+        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
+                                       (msg->view_checkitems
+                                        [MENU_TOGGLE_ATTACHMENTS_POS]),
+                                       TRUE);
 
     msg->update_config = TRUE;
  
@@ -2852,7 +2860,7 @@ read_signature(BalsaSendmsg *msg)
 static void
 do_insert_file(GtkWidget * selector, GtkFileSelection * fs)
 {
-    gchar *fname;
+    const gchar *fname;
     guint cnt;
     gchar buf[4096];
     FILE *fl;
@@ -2861,30 +2869,26 @@ do_insert_file(GtkWidget * selector, GtkFileSelection * fs)
     bsmsg = (BalsaSendmsg *) gtk_object_get_user_data(GTK_OBJECT(fs));
     fname = gtk_file_selection_get_filename(GTK_FILE_SELECTION(fs));
 
-    cnt = gtk_editable_get_position(GTK_EDITABLE(bsmsg->text));
-
     if (!(fl = fopen(fname, "rt"))) {
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
 			  _("Could not open the file %s.\n"), fname);
     } else {
+        GtkTextBuffer *buffer =
+            gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
+
 	gnome_appbar_push(balsa_app.appbar, _("Loading..."));
 
-	gtk_text_freeze(GTK_TEXT(bsmsg->text));
-	gtk_text_set_point(GTK_TEXT(bsmsg->text), cnt);
 	while ((cnt = fread(buf, 1, sizeof(buf), fl)) > 0) {
 	    if (balsa_app.debug)
 		printf("%s cnt: %d (max: %d)\n", fname, cnt, sizeof(buf));
-	    gtk_text_insert(GTK_TEXT(bsmsg->text), bsmsg->font,
-			    NULL, NULL, buf, cnt);
+	    gtk_text_buffer_insert_at_cursor(buffer, buf, cnt);
 	}
 	if (balsa_app.debug)
 	    printf("%s cnt: %d (max: %d)\n", fname, cnt, sizeof(buf));
 
-	gtk_text_thaw(GTK_TEXT(bsmsg->text));
 	fclose(fl);
 	gnome_appbar_pop(balsa_app.appbar);
     }
-    /* g_free(fname); */
     gtk_widget_destroy(GTK_WIDGET(fs));
 
 }
@@ -3012,6 +3016,9 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     gchar *tmp;
     gchar recvtime[50];
     struct tm *footime;
+    GtkTextBuffer *buffer =
+        gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
+    GtkTextIter start, end;
 
     g_assert(bsmsg != NULL);
     message = libbalsa_message_new();
@@ -3055,8 +3062,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     if (balsa_app.req_dispnotify)
 	libbalsa_message_set_dispnotify(message, bsmsg->ident->address);
 
-    if (bsmsg->orig_message != NULL &&
-	!GTK_OBJECT_DESTROYED(bsmsg->orig_message)) {
+    if (bsmsg->orig_message != NULL) {
 
 	if (bsmsg->orig_message->references != NULL) {
 	    for (list = bsmsg->orig_message->references; list;
@@ -3082,9 +3088,8 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     }
 
     body = libbalsa_message_body_new(message);
-    body->buffer = gtk_editable_get_chars(GTK_EDITABLE(bsmsg->text), 0,
-					  gtk_text_get_length(GTK_TEXT
-							      (bsmsg->text)));
+    gtk_text_buffer_get_bounds(buffer, &start, &end);
+    body->buffer = gtk_text_iter_get_text(&start, &end);
     if (bsmsg->flow) {
         body->buffer =
             libbalsa_wrap_rfc2646(body->buffer, balsa_app.wraplength, TRUE,
@@ -3094,9 +3099,13 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     body->charset = g_strdup(bsmsg->charset);
     libbalsa_message_append_part(message, body);
 
-    {				/* handle attachments */
-	gint i;
-	for (i = 0; i < GNOME_ICON_LIST(bsmsg->attachments[1])->icons; i++) {
+    {                           /* handle attachments */
+        guint i;
+        guint n =
+            gnome_icon_list_get_num_icons(GNOME_ICON_LIST
+                                          (bsmsg->attachments[1]));
+
+        for (i = 0; i < n; i++) {
 	    attachment_t *attach;
 	    
 	    body = libbalsa_message_body_new(message);
@@ -3119,8 +3128,9 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 	}
     }
 
-    tmp = gtk_entry_get_text(GTK_ENTRY(GTK_COMBO(bsmsg->fcc[1])->entry));
-    message->fcc_mailbox = tmp ? g_strdup(tmp) : NULL;
+    message->fcc_mailbox =
+        gtk_editable_get_chars(GTK_EDITABLE
+                               (GTK_COMBO(bsmsg->fcc[1])->entry), 0, -1);
     message->date = time(NULL);
 
     return message;
@@ -3258,7 +3268,7 @@ static void
 postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
     if (is_ready_to_send(bsmsg)) {
-        gboolean thereturn = message_postpone(bsmsg);
+        message_postpone(bsmsg);
         gtk_widget_destroy(bsmsg->window);
     }
 }
@@ -3316,35 +3326,60 @@ print_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static void
 cut_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    gtk_editable_cut_clipboard(GTK_EDITABLE(bsmsg->text));
+    GtkTextBuffer *buffer =
+        gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
+    GtkClipboard *clipboard = gtk_clipboard_get(GDK_NONE);
+
+    gtk_text_buffer_cut_clipboard(buffer, clipboard, TRUE);
 }
 
 static void
 copy_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    gtk_editable_copy_clipboard(GTK_EDITABLE(bsmsg->text));
+    GtkTextBuffer *buffer =
+        gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
+    GtkClipboard *clipboard = gtk_clipboard_get(GDK_NONE);
+
+    gtk_text_buffer_copy_clipboard(buffer, clipboard);
 }
 static void
 paste_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    gtk_editable_paste_clipboard(GTK_EDITABLE(bsmsg->text));
+    GtkTextBuffer *buffer =
+        gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
+    GtkClipboard *clipboard = gtk_clipboard_get(GDK_NONE);
+
+    gtk_text_buffer_paste_clipboard(buffer, clipboard, NULL, TRUE);
 }
 
 static void
 select_all_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    gtk_editable_select_region(GTK_EDITABLE(bsmsg->text), 0, -1);
+    GtkTextBuffer *buffer =
+        gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
+    GtkTextIter start, end;
+
+    gtk_text_buffer_get_bounds(buffer, &start, &end);
+    gtk_text_buffer_move_mark_by_name(buffer, "insert", &start);
+    gtk_text_buffer_move_mark_by_name(buffer, "selection_bound", &end);
 }
 
 static void
 wrap_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    gint pos, dummy;
+    gint pos;
     gchar *the_text;
+    GtkTextBuffer *buffer =
+        gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
+    GtkTextIter start, end, now;
 
-    pos = gtk_editable_get_position(GTK_EDITABLE(bsmsg->text));
+    gtk_text_buffer_get_bounds(buffer, &start, &end);
+    the_text = gtk_text_iter_get_text(&start, &end);
 
-    the_text = gtk_editable_get_chars(GTK_EDITABLE(bsmsg->text), 0, -1);
+    gtk_text_buffer_get_iter_at_mark(buffer, &now,
+                                     gtk_text_buffer_get_insert(buffer));
+    pos = gtk_text_iter_get_offset(&now);
+
     if (bsmsg->flow) {
         the_text =
             libbalsa_wrap_rfc2646(the_text, balsa_app.wraplength, TRUE,
@@ -3352,48 +3387,45 @@ wrap_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     } else
         libbalsa_wrap_string(the_text, balsa_app.wraplength);
 
-    gtk_text_freeze(GTK_TEXT(bsmsg->text));
-    gtk_editable_delete_text(GTK_EDITABLE(bsmsg->text), 0, -1);
-    dummy = 0;
-    gtk_editable_insert_text(GTK_EDITABLE(bsmsg->text), the_text,
-			     strlen(the_text), &dummy);
-    gtk_editable_set_position(GTK_EDITABLE(bsmsg->text),
-                              MIN(pos, dummy));
-    gtk_text_thaw(GTK_TEXT(bsmsg->text));
+    gtk_text_buffer_set_text(buffer, the_text, -1);
+    gtk_text_buffer_get_iter_at_offset(buffer, &now, pos);
+    gtk_text_buffer_place_cursor(buffer, &now);
     g_free(the_text);
 }
 
 static void
-do_reflow(GtkText * txt, gint mode)
+do_reflow(GtkTextView * txt, gint mode)
 {
-    gint pos, dummy;
+    gint pos;
     gchar *the_text;
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(txt);
+    GtkTextIter start, end, now;
 
-    pos = gtk_editable_get_position(GTK_EDITABLE(txt));
-    the_text = gtk_editable_get_chars(GTK_EDITABLE(txt), 0, -1);
+    gtk_text_buffer_get_bounds(buffer, &start, &end);
+    the_text = gtk_text_iter_get_text(&start, &end);
+
+    gtk_text_buffer_get_iter_at_mark(buffer, &now,
+                                     gtk_text_buffer_get_insert(buffer));
+    pos = gtk_text_iter_get_offset(&now);
+
     reflow_string(the_text, mode, &pos, balsa_app.wraplength);
 
-    gtk_text_freeze(txt);
-    gtk_editable_delete_text(GTK_EDITABLE(txt), 0, -1);
-    dummy = 0;
-    gtk_editable_insert_text(GTK_EDITABLE(txt), the_text,
-			     strlen(the_text), &dummy);
-    gtk_text_thaw(txt);
-    gtk_editable_set_position(GTK_EDITABLE(txt), pos);
+    gtk_text_buffer_set_text(buffer, the_text, -1);
+    gtk_text_buffer_get_iter_at_offset(buffer, &now, pos);
+    gtk_text_buffer_place_cursor(buffer, &now);
     g_free(the_text);
 }
 
 static void
 reflow_par_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    do_reflow(GTK_TEXT(bsmsg->text),
-	      gtk_editable_get_position(GTK_EDITABLE(bsmsg->text)));
+    do_reflow(GTK_TEXT_VIEW(bsmsg->text), 0);
 }
 
 static void
 reflow_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    do_reflow(GTK_TEXT(bsmsg->text), -1);
+    do_reflow(GTK_TEXT_VIEW(bsmsg->text), -1);
 }
 
 /* To field "changed" signal callback. */
@@ -3545,7 +3577,7 @@ init_menus(BalsaSendmsg * msg)
 					   (view_menu[i].widget), TRUE);
 	} else {
 	    /* or hide... */
-	    GTK_SIGNAL_FUNC(view_menu[i].moreinfo) (view_menu[i].widget, msg);
+	    VIEW_MENU_FUNC(view_menu[i].moreinfo)(view_menu[i].widget, msg);
 	}
     }
 
@@ -3591,13 +3623,14 @@ set_locale(GtkWidget * w, BalsaSendmsg * msg, gint idx)
 		       (GTK_BIN(msg->current_language_menu)->child), tmp);
     g_free(tmp);
     
-    msg->font = balsa_get_font_by_charset(balsa_app.message_font,msg->charset);
+    msg->font = balsa_get_font_by_charset(balsa_app.message_font,
+                                          msg->charset, NULL);
 
     if (msg->font) {
 	gdk_font_ref(msg->font);
 	/* Set the new message style */
 	style = gtk_style_copy(gtk_widget_get_style(msg->text));
-	style->font = msg->font;
+        gtk_style_set_font(style, msg->font);
 	gtk_widget_set_style (msg->text, style);
 	gtk_widget_set_style (msg->to[1], style);
         gtk_widget_set_style (msg->from[1], style);
@@ -3837,23 +3870,21 @@ sendmsg_window_new_from_list(GtkWidget * w, GList * message_list,
 {
     BalsaSendmsg *bsmsg;
     LibBalsaMessage *message;
-    gint pos;
+    GtkTextBuffer *buffer;
 
     g_return_val_if_fail(message_list != NULL, NULL);
 
     message = message_list->data;
     bsmsg = sendmsg_window_new(w, message, type);
-    if (type == SEND_FORWARD_INLINE)
-        pos = gtk_editable_get_position(GTK_EDITABLE(bsmsg->text));
+    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
 
-    while (message_list = g_list_next(message_list)) {
+    while ((message_list = g_list_next(message_list))) {
         message = message_list->data;
         if (type == SEND_FORWARD_ATTACH)
             attach_message(bsmsg, message);
         else if (type == SEND_FORWARD_INLINE) {
             GString *body = quoteBody(bsmsg, message, type);
-            gtk_editable_insert_text(GTK_EDITABLE(bsmsg->text), body->str,
-                                     body->len, &pos);
+            gtk_text_buffer_insert_at_cursor(buffer, body->str, body->len);
             g_string_free(body, TRUE);
         }
     }
@@ -3981,10 +4012,9 @@ rfc2822_skip_comments(gchar * str)
                  * which would be an error; in this case, return a
                  * pointer to the '\0' character following the '\\' */
                 break;
-        } else if (!isblank(*str))
+        } else if (!(*str == ' ' || *str == '\t'))
             break;
         ++str;
     }
     return str;
 }
-#endif

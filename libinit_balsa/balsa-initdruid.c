@@ -55,11 +55,17 @@ balsa_initdruid(GtkWindow * window)
     g_return_if_fail(window != NULL);
     g_return_if_fail(GTK_IS_WINDOW(window));
 
-    gtk_object_ref(GTK_OBJECT(window));
     druid = GNOME_DRUID(gnome_druid_new());
     gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(druid));
+#if BALSA_MAJOR < 2
     gtk_signal_connect(GTK_OBJECT(druid), "cancel",
                        GTK_SIGNAL_FUNC(balsa_initdruid_cancel), NULL);
+    gtk_object_ref(GTK_OBJECT(window));
+#else
+    g_signal_connect(G_OBJECT(druid), "cancel",
+                     G_CALLBACK(balsa_initdruid_cancel), NULL);
+    g_object_ref(G_OBJECT(window));
+#endif /* BALSA_MAJOR < 2 */
 
     balsa_initdruid_init(druid);
 }
@@ -75,6 +81,6 @@ balsa_initdruid_cancel(GnomeDruid * druid)
 
     if (reply == GNOME_YES) {
         gnome_config_drop_all();
-        gtk_exit(0);
+        exit(0);
     }
 }

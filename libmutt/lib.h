@@ -44,22 +44,26 @@
 # endif
 
 #ifdef LIBMUTT
-# if defined(ENABLE_NLS) && 0
-#  include <libintl.h>
-char *mutt_gettext (const char *); /* gettext.c */
-# define _(a) (mutt_gettext (a))
-#  ifdef gettext_noop
-#   define N_(a) gettext_noop (a)
+# if !defined(BALSA_MAJOR) /* libbalsa includes i18h headers on its own */
+#  if defined(ENABLE_NLS)
+#   include <libintl.h>
+/* we need to define these extra function because mutt authors invented
+   own, incompatible with standard macros way of string translation */
+#   define _(String) (gettext (String))
+#   ifdef gettext_noop
+#        define N_(String) gettext_noop (String)
+#   else
+#        define N_(String) (String)
+#   endif
 #  else
-#   define N_(a) (a)
+#   define _(a) (a)
+#   define N_(a) a
 #  endif
-# else
-#  define _(a) (a)
-#  define N_(a) a
+# endif /* !defined(BALSA_MAJOR) */
+# if !defined(TRUE)
+#  define TRUE  1
+#  define FALSE 0
 # endif
-
-# define TRUE 1
-# define FALSE 0
 #endif
 
 # define HUGE_STRING	5120

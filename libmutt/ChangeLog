@@ -1,3 +1,7 @@
+2002-03-10  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in, lib.h: add proper NLS support.
+
 2002-01-29  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* imap/imap.c: remove UIDVALIDITY debugging output.

@@ -37,13 +37,15 @@ balsa_druid_page_welcome(GnomeDruid * druid, GdkPixbuf * default_logo)
     static const gchar title[] = N_("Welcome to Balsa!");
     static const gchar text[] =
         N_
-        ("You seem to be running Balsa for the first time. The following\n"
-         "steps will set up Balsa by asking a few simple questions. Once\n"
-         "you have completed these steps, you can always change them later\n"
-         "in Balsa's preferences. If any files or directories need to be created,\n"
-         "it will be done so automatically. Please check the about box in Balsa's\n"
-         "main window for more information about contacting the authors or\n"
-         "reporting bugs.");
+        ("You seem to be running Balsa for the first time. "
+         "The following steps will set up Balsa by asking "
+         "a few simple questions. Once you have completed "
+         "these steps, you can always change them later in "
+         "Balsa's preferences. If any files or directories "
+         "need to be created, it will be done so automatically.\n"
+         "  Please check the about box in Balsa's main window "
+         "for more information about contacting the authors "
+         "or reporting bugs.");
 
 #if BALSA_MAJOR < 2
     page = GNOME_DRUID_PAGE_START(gnome_druid_page_start_new());
@@ -53,6 +55,9 @@ balsa_druid_page_welcome(GnomeDruid * druid, GdkPixbuf * default_logo)
     gnome_druid_page_start_set_watermark(page,
                                          balsa_init_get_png
                                          ("balsa-watermark.png"));
+    gtk_signal_connect(GTK_OBJECT(page), "prepare",
+                       GTK_SIGNAL_FUNC(balsa_druid_page_welcome_prepare),
+                       NULL);
 #else
     page =
         GNOME_DRUID_PAGE_EDGE(gnome_druid_page_edge_new
@@ -63,12 +68,12 @@ balsa_druid_page_welcome(GnomeDruid * druid, GdkPixbuf * default_logo)
     gnome_druid_page_edge_set_watermark(page,
                                         balsa_init_get_png
                                         ("balsa-watermark.png"));
+    g_signal_connect(G_OBJECT(page), "prepare",
+                     G_CALLBACK(balsa_druid_page_welcome_prepare),
+                     NULL);
 #endif                          /* BALSA_MAJOR < 2 */
     gnome_druid_append_page(druid, GNOME_DRUID_PAGE(page));
     gnome_druid_set_page(druid, GNOME_DRUID_PAGE(page));
-    gtk_signal_connect(GTK_OBJECT(page), "prepare",
-                       GTK_SIGNAL_FUNC(balsa_druid_page_welcome_prepare),
-                       NULL);
 }
 
 static void

@@ -26,6 +26,11 @@
 #include "libbalsa_private.h"
 #include "misc.h"
 
+#include <libgnome/gnome-defs.h>
+#include <libgnome/gnome-config.h> 
+#include <libgnome/gnome-i18n.h> 
+
+
 /* GTK_CLASS_TYPE for 1.2<->1.3/2.0 GTK+ compatibility */
 #ifndef GTK_CLASS_TYPE
 #define GTK_CLASS_TYPE(x) (GTK_OBJECT_CLASS(x)->type)

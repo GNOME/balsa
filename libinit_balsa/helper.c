@@ -103,8 +103,13 @@ balsa_init_add_table_entry(GtkTable * table, guint num, gchar * ltext,
 
     w = gtk_entry_new();
     gtk_entry_set_text(GTK_ENTRY(w), etext);
+#if BALSA_MAJOR < 2
     gtk_signal_connect(GTK_OBJECT(w), "changed",
                        GTK_SIGNAL_FUNC(entry_changed_cb), ed);
+#else
+    g_signal_connect(G_OBJECT(w), "changed",
+                     G_CALLBACK(entry_changed_cb), ed);
+#endif                          /* BALSA_MAJOR < 2 */
     gtk_table_attach(table, GTK_WIDGET(w), 1, 2, num + 1, num + 2,
                      GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 8, 4);
 

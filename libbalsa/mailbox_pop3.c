@@ -47,6 +47,10 @@
 #include "mailbox-filter.h"
 #endif
 
+#include <libgnome/gnome-defs.h> 
+#include <libgnome/gnome-config.h> 
+#include <libgnome/gnome-i18n.h> 
+
 static LibBalsaMailboxClass *parent_class = NULL;
 
 static void libbalsa_mailbox_pop3_destroy(GtkObject * object);

@@ -243,6 +243,7 @@ balsa_druid_page_directory(GnomeDruid * druid, GdkPixbuf * default_logo)
     gnome_druid_page_standard_set_logo(page, default_logo);
     balsa_druid_page_directory_init(dir, page, druid);
     gnome_druid_append_page(druid, GNOME_DRUID_PAGE(page));
+#if BALSA_MAJOR < 2
     gtk_signal_connect(GTK_OBJECT(page), "prepare",
                        GTK_SIGNAL_FUNC(balsa_druid_page_directory_prepare),
                        dir);
@@ -252,6 +253,14 @@ balsa_druid_page_directory(GnomeDruid * druid, GdkPixbuf * default_logo)
     gtk_signal_connect(GTK_OBJECT(page), "back",
                        GTK_SIGNAL_FUNC(balsa_druid_page_directory_back),
                        dir);
+#else
+    g_signal_connect(G_OBJECT(page), "prepare",
+                     G_CALLBACK(balsa_druid_page_directory_prepare), dir);
+    g_signal_connect(G_OBJECT(page), "next",
+                     G_CALLBACK(balsa_druid_page_directory_next), dir);
+    g_signal_connect(G_OBJECT(page), "back",
+                     G_CALLBACK(balsa_druid_page_directory_back), dir);
+#endif                          /* BALSA_MAJOR < 2 */
 }
 
 static void

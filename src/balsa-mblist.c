@@ -143,6 +143,37 @@ GtkWidget *
 balsa_mblist_new()
 {
     BalsaMBList *new = gtk_type_new(balsa_mblist_get_type());
+    GtkCList *clist = GTK_CLIST(new);
+    BalsaMBList *tree = BALSA_MBLIST(new);
+    
+    gtk_clist_set_column_title(clist, 0, _("Mailbox"));
+    gtk_clist_set_column_title(clist, 1, _("Unread"));
+    gtk_clist_set_column_title(clist, 2, _("Total"));
+    gtk_clist_set_column_width(GTK_CLIST(tree), 0,
+			       balsa_app.mblist_name_width);
+
+    gtk_clist_set_column_width(GTK_CLIST(tree), 1,
+			       balsa_app.mblist_newmsg_width);
+    gtk_clist_set_column_justification(GTK_CLIST(tree), 1,
+				       GTK_JUSTIFY_RIGHT);
+
+    gtk_clist_set_column_width(GTK_CLIST(tree), 2,
+			       balsa_app.mblist_totalmsg_width);
+    gtk_clist_set_column_justification(GTK_CLIST(tree), 2,
+				       GTK_JUSTIFY_RIGHT);
+
+    gtk_clist_set_sort_column(GTK_CLIST(tree), 0);
+    gtk_clist_set_sort_type(GTK_CLIST(tree), GTK_SORT_ASCENDING);
+    gtk_clist_set_compare_func(GTK_CLIST(tree), balsa_mblist_row_compare);
+
+    if (!tree->display_info) {
+	gtk_clist_set_column_visibility(GTK_CLIST(tree), 1, FALSE);
+	gtk_clist_set_column_visibility(GTK_CLIST(tree), 2, FALSE);
+	gtk_clist_column_titles_hide(GTK_CLIST(tree));
+    } else gtk_clist_column_titles_show(GTK_CLIST(tree));
+
+    balsa_mblist_repopulate(tree);
+    
     return GTK_WIDGET(new);
 }
 
@@ -196,7 +227,8 @@ balsa_mblist_set_arg(GtkObject * object, GtkArg * arg, guint arg_id)
     switch (arg_id) {
     case ARG_SHOW_CONTENT_INFO:
 	bmbl->display_info = GTK_VALUE_BOOL(*arg);
-	balsa_mblist_repopulate(bmbl);
+	if (GTK_CLIST(bmbl)->column)
+            balsa_mblist_repopulate(bmbl);
 	break;
 
     default:
@@ -473,22 +505,19 @@ balsa_mblist_init(BalsaMBList * tree)
 {
 #if BALSA_MAJOR < 2
     GtkCTree *ctree = GTK_CTREE(tree);
-#endif                          /* BALSA_MAJOR < 2 */
     GtkCList *clist = GTK_CLIST(tree);
+#endif                          /* BALSA_MAJOR < 2 */
     GtkStyle* style;
     GdkFont* font;
     gint text_height;
 
     gtk_object_set(GTK_OBJECT(tree),
-                   "n_columns", 3,
+                   "GtkCTree::n_columns", 3,
                    "tree_column", 0,
                    NULL);
 #if BALSA_MAJOR < 2
     ctree->tree_column = 0;
 #endif                          /* BALSA_MAJOR < 2 */
-    gtk_clist_set_column_title(clist, 0, _("Mailbox"));
-    gtk_clist_set_column_title(clist, 1, _("Unread"));
-    gtk_clist_set_column_title(clist, 2, _("Total"));
 
     gtk_signal_connect_after(GTK_OBJECT(tree), "tree_expand",
                              GTK_SIGNAL_FUNC(mailbox_tree_expand), NULL);
@@ -509,30 +538,6 @@ balsa_mblist_init(BalsaMBList * tree)
     if(text_height < 16) /* pixmap height */
 	gtk_clist_set_row_height (GTK_CLIST (tree), 16);
 
-    gtk_clist_set_column_width(GTK_CLIST(tree), 0,
-			       balsa_app.mblist_name_width);
-
-    gtk_clist_set_column_width(GTK_CLIST(tree), 1,
-			       balsa_app.mblist_newmsg_width);
-    gtk_clist_set_column_justification(GTK_CLIST(tree), 1,
-				       GTK_JUSTIFY_RIGHT);
-
-    gtk_clist_set_column_width(GTK_CLIST(tree), 2,
-			       balsa_app.mblist_totalmsg_width);
-    gtk_clist_set_column_justification(GTK_CLIST(tree), 2,
-				       GTK_JUSTIFY_RIGHT);
-
-    gtk_clist_set_sort_column(GTK_CLIST(tree), 0);
-    gtk_clist_set_sort_type(GTK_CLIST(tree), GTK_SORT_ASCENDING);
-    gtk_clist_set_compare_func(GTK_CLIST(tree), balsa_mblist_row_compare);
-
-    if (!tree->display_info) {
-	gtk_clist_set_column_visibility(GTK_CLIST(tree), 1, FALSE);
-	gtk_clist_set_column_visibility(GTK_CLIST(tree), 2, FALSE);
-	gtk_clist_column_titles_hide(GTK_CLIST(tree));
-    } else gtk_clist_column_titles_show(GTK_CLIST(tree));
-
-    balsa_mblist_repopulate(tree);
 }
 
 /* select_mailbox

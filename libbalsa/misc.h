@@ -83,6 +83,7 @@ void libbalsa_marshal_POINTER__POINTER_POINTER(GClosure *closure,
 
 gboolean libbalsa_delete_directory_contents(const gchar *path);
 gchar *libbalsa_truncate_string(const gchar * str, gint length, gint dots);
+void libbalsa_mktemp(gchar * name);
 
 
 #endif				/* __LIBBALSA_MISC_H__ */

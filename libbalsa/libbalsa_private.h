@@ -20,12 +20,10 @@
  * 02111-1307, USA.
  */
 
-#include <gnome.h>
-
-#include "libmutt/mutt.h"
-
 #ifndef __LIBBALSA_PRIVATE_H__
 #define __LIBBALSA_PRIVATE_H__
+
+#include "libmutt/mutt.h"
 
 LibBalsaAddress *libbalsa_address_new_from_libmutt(ADDRESS * caddr);
 /* private interfaces to avoid the libbalsa API */

@@ -28,6 +28,8 @@
 #include <pthread.h>
 #endif
 
+#include <gnome.h>
+
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 

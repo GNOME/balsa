@@ -1,3 +1,7 @@
+2003-03-04 11:26  PeterB
+
+	* libbalsa/misc.c: Fix infinite loop when not wrapping.
+
 2003-03-03 18:39  PeterB
 
 	* libbalsa/message.h, libbalsa/misc.h, libbalsa/send.c,

@@ -55,6 +55,9 @@ static gboolean mailbox_nodes_to_ctree (GtkCTree *, guint, GNode *, GtkCTreeNode
 static void balsa_mblist_class_init (BalsaMBListClass * class);
 static void balsa_mblist_init (BalsaMBList * tree);
 
+static void mailbox_tree_expand (GtkCTree *, GtkCTreeNode *, gpointer);
+static void mailbox_tree_collapse (GtkCTree *, GtkCTreeNode *, gpointer);
+
 guint
 balsa_mblist_get_type (void)
 {
@@ -136,6 +139,11 @@ balsa_mblist_init (BalsaMBList * tree)
 
   gtk_widget_pop_colormap ();
   gtk_widget_pop_visual ();
+
+  gtk_signal_connect (GTK_OBJECT (tree), "tree_expand",
+		      GTK_SIGNAL_FUNC (mailbox_tree_expand), NULL);
+  gtk_signal_connect (GTK_OBJECT (tree), "tree_collapse",
+		      GTK_SIGNAL_FUNC (mailbox_tree_collapse), NULL);
 
   gtk_ctree_set_show_stub (GTK_CTREE (tree), FALSE);
   gtk_ctree_set_line_style (GTK_CTREE (tree), GTK_CTREE_LINES_DOTTED);
@@ -234,8 +242,8 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 	  gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
 				   NULL, NULL,
 				   NULL, NULL,
-				   G_NODE_IS_LEAF (gnode),
-				   mbnode->expanded);
+				   FALSE,
+				   FALSE);
 	  gtk_ctree_node_set_row_data (ctree, cnode, mbnode->mailbox);
 	}
       else if (mbnode->mailbox && mbnode->name)
@@ -296,6 +304,7 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 			       balsa_icon_get_bitmap (BALSA_ICON_DIR_OPEN),
 			       G_NODE_IS_LEAF (gnode),
 			       mbnode->expanded);
+      gtk_ctree_node_set_row_data (ctree, cnode, mbnode);
     }
   return TRUE;
 }
@@ -349,4 +358,20 @@ select_mailbox (GtkCTree * ctree, GtkCTreeNode * row, gint column)
 			 row,
 			 bevent);
     }
+}
+
+static void
+mailbox_tree_expand (GtkCTree * ctree, GtkCTreeNode * node, gpointer data)
+{
+  MailboxNode *mbnode;
+  mbnode = gtk_ctree_node_get_row_data (ctree, node);
+  mbnode->expanded = TRUE;
+}
+
+static void
+mailbox_tree_collapse (GtkCTree * ctree, GtkCTreeNode * node, gpointer data)
+{
+  MailboxNode *mbnode;
+  mbnode = gtk_ctree_node_get_row_data (ctree, node);
+  mbnode->expanded = FALSE;
 }

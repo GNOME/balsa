@@ -23,6 +23,11 @@
 #include <libgnorba/gnorba.h>
 #include <orb/orbit.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "balsa-init.h"
@@ -92,8 +97,8 @@ balsa_init (int argc, char **argv)
   PortableServer_POAManager_activate (pm, &ev);
   Exception (&ev);
 
-  goad_server_register(CORBA_OBJECT_NIL,
-		       balsa_servant, "balsa_mail_send", "server", &ev);
+  goad_server_register (CORBA_OBJECT_NIL,
+			balsa_servant, "balsa_mail_send", "server", &ev);
 }
 
 static void
@@ -157,8 +162,8 @@ main (int argc, char *argv[])
 
   /* create all the pretty icons that balsa uses that
    * arn't part of gnome-libs */
-  balsa_icons_init();
-  
+  balsa_icons_init ();
+
   gnome_triggers_do ("", "program", "balsa", "startup", NULL);
 
   main_window_init ();
@@ -171,21 +176,46 @@ static gboolean
 close_all_mailboxes (GNode * node, gpointer data)
 {
   Mailbox *mailbox;
+  MailboxNode *mbnode;
 
   if (node->data)
-    if (((MailboxNode *) node->data)->mailbox)
-      {
-	mailbox = ((MailboxNode *) node->data)->mailbox;
+    {
+      mbnode = (MailboxNode *) node->data;
 
-	if (!mailbox)
-	  return FALSE;
+      if (mbnode)
+	{
+	  gchar *tmpfile;
 
-	if (balsa_app.debug)
-	  g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
+	  if (mbnode->IsDir)
+	    {
+	      if (mbnode->expanded)
+		{
+		  tmpfile = g_strdup_printf ("%s/.expanded", mbnode->name);
+		  if (access (tmpfile, F_OK) == -1)
+		    creat (tmpfile, S_IRUSR | S_IWUSR);
+		  g_free (tmpfile);
+		}
+	      else
+		{
+		  tmpfile = g_strdup_printf ("%s/.expanded", mbnode->name);
+		  if (access (tmpfile, F_OK) != -1)
+		    unlink (tmpfile);
+		  g_free (tmpfile);
+		}
+	    }
 
-	while (mailbox->open_ref > 0)
-	  mailbox_open_unref (mailbox);
-      }
+	  mailbox = mbnode->mailbox;
+
+	  if (!mailbox)
+	    return FALSE;
+
+	  if (balsa_app.debug)
+	    g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
+
+	  while (mailbox->open_ref > 0)
+	    mailbox_open_unref (mailbox);
+	}
+    }
   return FALSE;
 }
 

@@ -484,7 +484,7 @@ gtk_text_to_email (char *buff)
 static gchar *
 make_string_from_list (GList * the_list)
 {
-  GList *list;
+  GList *list = NULL;
   GString *gs;
   gchar *str;
 
@@ -507,13 +507,14 @@ make_string_from_list (GList * the_list)
 static GList *
 make_list_from_string (gchar * the_str)
 {
-  GList *list;
+  GList *list = NULL;
   gchar *str;
   char *token;
 
-  if (!the_str) return NULL;
+  if (!the_str)
+    return NULL;
 
-  str = g_strdup(the_str);
+  str = g_strdup (the_str);
   token = strtok (str, ",");
   while (token)
     {
@@ -564,7 +565,7 @@ send_message (Message * message)
   envelope->subject = g_strdup (message->subject);
   body->type = TYPETEXT;
 
-  text = ((Body *)(g_list_first(message->body_list)->data))->buffer;
+  text = ((Body *) (g_list_first (message->body_list)->data))->buffer;
 
   text = gtk_text_to_email (text);
 

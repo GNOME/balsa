@@ -85,22 +85,24 @@ do {\
  * watcher information
  */
 typedef struct
-{
-  guint id;
-  guint16 mask;
-  MailboxWatcherFunc func;
-  gpointer data;
-} MailboxWatcher;
+  {
+    guint id;
+    guint16 mask;
+    MailboxWatcherFunc func;
+    gpointer data;
+  }
+MailboxWatcher;
 
 
 /* 
  * private mailbox data
  */
 typedef struct
-{
-  MAILSTREAM *stream;
-  GList *watcher_list;
-} MailboxPrivate;
+  {
+    MAILSTREAM *stream;
+    GList *watcher_list;
+  }
+MailboxPrivate;
 
 
 /* 
@@ -128,8 +130,8 @@ static void send_watcher_mark_undelete_message (Mailbox * mailbox, Message * mes
 static void send_watcher_new_message (Mailbox * mailbox, Message * message, gint remaining);
 static void send_watcher_delete_message (Mailbox * mailbox, Message * message);
 
-static Message * translate_message (ENVELOPE *cenv);
-static Address * translate_address (ADDRESS *caddr);
+static Message *translate_message (ENVELOPE * cenv);
+static Address *translate_address (ADDRESS * caddr);
 
 
 
@@ -362,8 +364,8 @@ mailbox_check_new_messages (Mailbox * mailbox)
 }
 
 
-guint 
-mailbox_watcher_set (Mailbox * mailbox, 
+guint
+mailbox_watcher_set (Mailbox * mailbox,
 		     MailboxWatcherFunc func,
 		     guint16 mask,
 		     gpointer data)
@@ -399,7 +401,7 @@ mailbox_watcher_set (Mailbox * mailbox,
       bumped = FALSE;
     }
 
-  
+
   /* allocate the new watcher */
   watcher = g_malloc (sizeof (MailboxWatcher));
   watcher->id = id;
@@ -497,7 +499,7 @@ free_messages (Mailbox * mailbox)
 {
   GList *list;
   Message *message;
-  
+
   list = mailbox->message_list;
   while (list)
     {
@@ -510,7 +512,7 @@ free_messages (Mailbox * mailbox)
   g_list_free (mailbox->message_list);
   mailbox->message_list = NULL;
 }
-  
+
 
 /*
  * sending messages to watchers
@@ -605,7 +607,7 @@ send_watcher_new_message (Mailbox * mailbox, Message * message, gint remaining)
       if (watcher->mask & MESSAGE_NEW_MASK)
 	{
 	  mw_new_message.data = watcher->data;
-	  (*watcher->func) ((MailboxWatcherMessage *) &mw_new_message);
+	  (*watcher->func) ((MailboxWatcherMessage *) & mw_new_message);
 	}
     }
 }
@@ -785,19 +787,26 @@ message_new ()
 void
 message_free (Message * message)
 {
-  g_free (message->remail);
-  g_free (message->date);
+  if (message->remail)
+    g_free (message->remail);
+  if (message->date)
+    g_free (message->date);
   address_free (message->from);
   address_free (message->sender);
   address_free (message->reply_to);
-  g_free (message->subject);
+  if (message->subject)
+    g_free (message->subject);
 
-  g_free (message->in_reply_to);
-  g_free (message->message_id);
-  g_free (message->newsgroups);
-  g_free (message->followup_to);
-  g_free (message->references);
-
+  if (message->in_reply_to)
+    g_free (message->in_reply_to);
+  if (message->message_id)
+    g_free (message->message_id);
+  if (message->newsgroups)
+    g_free (message->newsgroups);
+  if (message->followup_to)
+    g_free (message->followup_to);
+  if (message->references)
+    g_free (message->references);
 
   /* finally free the message */
   g_free (message);
@@ -839,7 +848,7 @@ message_undelete (Message * message)
 
   sprintf (tmp, "%ld", message->msgno);
   mail_clearflag (CLIENT_STREAM (message->mailbox), tmp, "\\DELETED");
-   send_watcher_mark_undelete_message (message->mailbox, message);
+  send_watcher_mark_undelete_message (message->mailbox, message);
 
   UNLOCK_MAILBOX ();
 }
@@ -847,7 +856,7 @@ message_undelete (Message * message)
 
 /* internal c-client translation */
 static Message *
-translate_message (ENVELOPE *cenv)
+translate_message (ENVELOPE * cenv)
 {
   Message *message;
 
@@ -859,7 +868,7 @@ translate_message (ENVELOPE *cenv)
   message->from = translate_address (cenv->from);
   message->sender = translate_address (cenv->sender);
   message->reply_to = translate_address (cenv->reply_to);
-  
+
   message->subject = g_strdup (cenv->subject);
 
   /* more! */
@@ -892,9 +901,15 @@ address_new ()
 void
 address_free (Address * address)
 {
-  g_free (address->personal);
-  g_free (address->user);
-  g_free (address->host);
+  if (!address)
+    return;
+
+  if (address->personal)
+    g_free (address->personal);
+  if (address->user)
+    g_free (address->user);
+  if (address->host)
+    g_free (address->host);
 
   g_free (address);
 }
@@ -903,7 +918,7 @@ address_free (Address * address)
 
 /* internal c-client translation */
 static Address *
-translate_address (ADDRESS *caddr)
+translate_address (ADDRESS * caddr)
 {
   Address *address;
 
@@ -935,8 +950,13 @@ body_new ()
 void
 body_free (Body * body)
 {
-  g_free (body->mime);
-  g_free (body->buffer);
+  if (!body)
+    return;
+
+  if (body->mime)
+    g_free (body->mime);
+  if (body->buffer)
+    g_free (body->buffer);
   g_free (body);
 }
 
@@ -981,7 +1001,7 @@ mm_exists (MAILSTREAM * stream, unsigned long number)
 
   if (balsa_app.debug)
     {
-      g_print ("mm_exists: %s %d messages %d new_messages\n", 
+      g_print ("mm_exists: %s %d messages %d new_messages\n",
 	       client_mailbox->name,
 	       client_mailbox->messages,
 	       new_messages);

@@ -1454,13 +1454,13 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     GNode * new_tree;
     ImapMboxHandle *handle;
-    int i;
+    int msgno;
 
     switch(thread_type) {
     case LB_MAILBOX_THREADING_FLAT:
 	new_tree = g_node_new(NULL);
-	for(i=0; i<mailbox->total_messages; i++)
-	    g_node_append_data(new_tree, GUINT_TO_POINTER(i));
+	for(msgno = 1; msgno <= mailbox->total_messages; msgno++)
+	    g_node_append_data(new_tree, GUINT_TO_POINTER(msgno));
 	break;
     case  LB_MAILBOX_THREADING_SIMPLE:
     case LB_MAILBOX_THREADING_JWZ:

@@ -8,8 +8,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 2\n"
-"POT-Creation-Date: 2003-08-13 01:32+0200\n"
-"PO-Revision-Date: 2003-08-13 01:32+0200\n"
+"POT-Creation-Date: 2003-08-19 01:45+0200\n"
+"PO-Revision-Date: 2003-08-19 01:45+0200\n"
 "Last-Translator: Данило Шеган <danilo@prevod.org>\n"
 "Language-Team: Serbian (sr) <serbiangnome-lista@nongnu.org>\n"
 "MIME-Version: 1.0\n"
@@ -19,75 +19,43 @@ msgstr ""
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
 #. The externq database doesn't support Id's, sorry!
-#: libbalsa/address-book-extern.c:255 libbalsa/address-book-ldap.c:403
+#: libbalsa/address-book-extern.c:255 libbalsa/address-book-ldap.c:391
 #: libbalsa/address-book-ldif.c:419 libbalsa/address-book-vcard.c:283
 msgid "No-Id"
 msgstr "Нема-ИД-а"
 
-#: libbalsa/address-book-extern.c:259 libbalsa/address-book-ldap.c:409
+#: libbalsa/address-book-extern.c:259 libbalsa/address-book-ldap.c:397
 #: libbalsa/address-book-ldif.c:422 libbalsa/address-book-ldif.c:654
 #: libbalsa/address-book-ldif.c:691 libbalsa/address-book-ldif.c:695
 #: libbalsa/address-book-vcard.c:301
 msgid "No-Name"
 msgstr "Нема-имена"
 
-#: libbalsa/address-book-ldap.c:240
-msgid ""
-"Failed to initialise LDAP server.\n"
-"Check that the servername is valid."
-msgstr ""
-"Не може да покрене ЛДАП сервер.\n"
-"Проверите да ли је име сервера исправно."
-
-#: libbalsa/address-book-ldap.c:257
-#, c-format
-msgid "Couldn't enable TLS on the LDAP connection: %s"
-msgstr "Не може да омогући ТЛС на ЛДАП вези: %s"
-
-#: libbalsa/address-book-ldap.c:266
-msgid "TLS requested but TLS support not compiled in."
-msgstr "Захтеван је ТЛС, али подршка за њега није укључена."
-
-#: libbalsa/address-book-ldap.c:277
-#, c-format
-msgid ""
-"Failed to bind to server: %s\n"
-"Check that the server name is valid."
-msgstr ""
-"Не може да се веже на сервер: %s\n"
-"Проверите да ли је име сервера исправно."
-
-#: libbalsa/address-book-ldap.c:862
-#, c-format
-msgid "Failed to do a search: %s.Check that the base name is valid."
-msgstr ""
-"Не може да изведе претрагу: %s. Проверите да ли је основно име исправно."
-
-#: libbalsa/address-book.c:385 libbalsa/filter-error.c:45
+#: libbalsa/address-book.c:398 libbalsa/filter-error.c:45
 msgid "No error"
 msgstr "Нема грешке"
 
-#: libbalsa/address-book.c:386
+#: libbalsa/address-book.c:399
 msgid "Cannot read from address book"
 msgstr "Не може да чита из адресара"
 
-#: libbalsa/address-book.c:387
+#: libbalsa/address-book.c:400
 msgid "Cannot write to address book"
 msgstr "Не може да пише у адресар"
 
-#: libbalsa/address-book.c:388
+#: libbalsa/address-book.c:401
 msgid "Cannot connect to server"
 msgstr "Не може да се повеже на сервер"
 
-#: libbalsa/address-book.c:389
+#: libbalsa/address-book.c:402
 msgid "Cannot search in the address book"
 msgstr "Не може да претражује адресар"
 
-#: libbalsa/address-book.c:391
+#: libbalsa/address-book.c:404
 msgid "Cannot add duplicate entry"
 msgstr "Не може да дода исти унос као постојећи"
 
-#: libbalsa/address-book.c:392
+#: libbalsa/address-book.c:405
 msgid "Unknown error"
 msgstr "Непозната грешка"
 
@@ -173,12 +141,12 @@ msgstr "Грешка при премештању порука"
 
 #. should "re" be localized ?
 #: libbalsa/identity.c:88 src/balsa-index-threading.c:547
-#: src/balsa-index-threading.c:549 src/sendmsg-window.c:2320
-#: src/sendmsg-window.c:2321
+#: src/balsa-index-threading.c:549 src/sendmsg-window.c:2321
+#: src/sendmsg-window.c:2322
 msgid "Re:"
 msgstr "Одг:"
 
-#: libbalsa/identity.c:89 src/sendmsg-window.c:2350 src/sendmsg-window.c:2351
+#: libbalsa/identity.c:89 src/sendmsg-window.c:2351 src/sendmsg-window.c:2352
 msgid "Fwd:"
 msgstr "Просл:"
 
@@ -989,7 +957,7 @@ msgid "Connected to MTA"
 msgstr "Повезан на сервер за слање"
 
 #: libbalsa/send.c:888 src/balsa-message.c:1232 src/print.c:349
-#: src/sendmsg-window.c:667 src/sendmsg-window.c:2138 src/store-address.c:297
+#: src/sendmsg-window.c:668 src/sendmsg-window.c:2139 src/store-address.c:297
 msgid "From:"
 msgstr "Од:"
 
@@ -998,7 +966,7 @@ msgid "From"
 msgstr "Од"
 
 #: libbalsa/send.c:899 src/balsa-message.c:1241 src/print.c:353
-#: src/sendmsg-window.c:666 src/sendmsg-window.c:2145 src/store-address.c:298
+#: src/sendmsg-window.c:667 src/sendmsg-window.c:2146 src/store-address.c:298
 msgid "To:"
 msgstr "За:"
 
@@ -2120,10 +2088,10 @@ msgstr "допунске адресе исте особе"
 msgid "a distribution list"
 msgstr "списак прималаца"
 
-#: src/ab-window.c:673
+#: src/ab-window.c:676
 #, c-format
 msgid ""
-"Error opening address book '%s'\n"
+"Error opening address book '%s':\n"
 "%s"
 msgstr ""
 "Грешка при приступу адресару „%s“\n"
@@ -2337,28 +2305,28 @@ msgstr ""
 "Порука послата од стране %s са темом „%s“ садржи шифровани део, али је "
 "структура неисправна."
 
-#: src/balsa-message.c:1224 src/print.c:338 src/sendmsg-window.c:672
-#: src/sendmsg-window.c:2133
+#: src/balsa-message.c:1224 src/print.c:338 src/sendmsg-window.c:673
+#: src/sendmsg-window.c:2134
 msgid "Subject:"
 msgstr "Тема:"
 
-#: src/balsa-message.c:1227 src/print.c:344 src/sendmsg-window.c:2127
+#: src/balsa-message.c:1227 src/print.c:344 src/sendmsg-window.c:2128
 msgid "Date:"
 msgstr "Датум:"
 
-#: src/balsa-message.c:1238 src/sendmsg-window.c:668
+#: src/balsa-message.c:1238 src/sendmsg-window.c:669
 msgid "Reply-To:"
 msgstr "Одговор за:"
 
 #. cc:
-#: src/balsa-message.c:1242 src/print.c:354 src/sendmsg-window.c:670
-#: src/sendmsg-window.c:1852 src/sendmsg-window.c:2152 src/store-address.c:299
+#: src/balsa-message.c:1242 src/print.c:354 src/sendmsg-window.c:671
+#: src/sendmsg-window.c:1853 src/sendmsg-window.c:2153 src/store-address.c:299
 msgid "Cc:"
 msgstr "Копија:"
 
 #. bcc:
-#: src/balsa-message.c:1243 src/print.c:355 src/sendmsg-window.c:669
-#: src/sendmsg-window.c:1857 src/store-address.c:300
+#: src/balsa-message.c:1243 src/print.c:355 src/sendmsg-window.c:670
+#: src/sendmsg-window.c:1858 src/store-address.c:300
 msgid "Bcc:"
 msgstr "Невидљива копија:"
 
@@ -2673,7 +2641,7 @@ msgstr "_Садржај"
 
 #. To:
 #: src/filter-edit-callbacks.c:997 src/main-window.c:2732
-#: src/sendmsg-window.c:1841
+#: src/sendmsg-window.c:1842
 msgid "_To:"
 msgstr "_За:"
 
@@ -2937,12 +2905,12 @@ msgid "Descriptive _Name:"
 msgstr "_Описно име:"
 
 #. pop server
-#: src/folder-conf.c:296 src/mailbox-conf.c:940 src/mailbox-conf.c:1034
+#: src/folder-conf.c:296 src/mailbox-conf.c:933 src/mailbox-conf.c:1027
 msgid "_Server:"
 msgstr "_Сервер:"
 
 #. username
-#: src/folder-conf.c:302 src/mailbox-conf.c:947
+#: src/folder-conf.c:302 src/mailbox-conf.c:940
 msgid "Use_r name:"
 msgstr "Ко_рисничко име:"
 
@@ -2962,7 +2930,7 @@ msgstr "_Увек прикажи долазну"
 msgid "Pr_efix"
 msgstr "Пр_ефикс"
 
-#: src/folder-conf.c:329 src/mailbox-conf.c:1083
+#: src/folder-conf.c:329 src/mailbox-conf.c:1076
 msgid "Use SS_L (IMAPS)"
 msgstr "Користи SS_L (IMAPS)"
 
@@ -3143,7 +3111,7 @@ msgstr "_Уклони са списка"
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr "Упс! сандуче није нађено међу balsa_app.mailbox чворовима?\n"
 
-#: src/mailbox-conf.c:406 src/sendmsg-window.c:846
+#: src/mailbox-conf.c:406 src/sendmsg-window.c:847
 msgid "Select Identity"
 msgstr "Изаберите идентитет"
 
@@ -3166,82 +3134,82 @@ msgstr ""
 "%s"
 
 #. mailbox name
-#: src/mailbox-conf.c:891 src/mailbox-conf.c:935 src/mailbox-conf.c:1028
+#: src/mailbox-conf.c:884 src/mailbox-conf.c:928 src/mailbox-conf.c:1021
 msgid "Mailbox _Name:"
 msgstr "_Име сандучета:"
 
 #. path to file
-#: src/mailbox-conf.c:899
+#: src/mailbox-conf.c:892
 msgid "Mailbox _Path:"
 msgstr "_Путања за сандуче:"
 
-#: src/mailbox-conf.c:901
+#: src/mailbox-conf.c:894
 msgid "Mailbox Path"
 msgstr "Путања за сандуче"
 
 #. password field
-#: src/mailbox-conf.c:953 src/mailbox-conf.c:1055
+#: src/mailbox-conf.c:946 src/mailbox-conf.c:1048
 msgid "Pass_word:"
 msgstr "_Лозинка:"
 
-#: src/mailbox-conf.c:960
+#: src/mailbox-conf.c:953
 msgid "Use _APOP Authentication"
 msgstr "Користи _APOP идентификацију"
 
-#: src/mailbox-conf.c:966
+#: src/mailbox-conf.c:959
 msgid "_Delete messages from server after download"
 msgstr "Обриши поруке са сервера након преузимања"
 
-#: src/mailbox-conf.c:971
+#: src/mailbox-conf.c:964
 msgid "_Filter messages through procmail"
 msgstr "_Филтрирај поруке кроз procmail"
 
-#: src/mailbox-conf.c:975
+#: src/mailbox-conf.c:968
 msgid "Fi_lter Command:"
 msgstr "Наредба за фи_лтер:"
 
-#: src/mailbox-conf.c:983
+#: src/mailbox-conf.c:976
 msgid "_Enable check for new mail"
 msgstr "_Омогући проверу нове поште"
 
-#: src/mailbox-conf.c:993
+#: src/mailbox-conf.c:986
 msgid "Use SS_L (pop3s)"
 msgstr "Користи SS_L (pop3s)"
 
 #. username
-#: src/mailbox-conf.c:1041
+#: src/mailbox-conf.c:1034
 msgid "_Username:"
 msgstr "_Корисник:"
 
-#: src/mailbox-conf.c:1049
+#: src/mailbox-conf.c:1042
 msgid "_Remember Password"
 msgstr "_Запамти лозинку"
 
-#: src/mailbox-conf.c:1060
+#: src/mailbox-conf.c:1053
 msgid "F_older Path:"
 msgstr "Путања _директоријума:"
 
-#: src/mailbox-conf.c:1138
+#: src/mailbox-conf.c:1131
 msgid "Identity:"
 msgstr "Идентитет:"
 
-#: src/mailbox-conf.c:1143
+#: src/mailbox-conf.c:1136
 msgid "(No identity set)"
 msgstr "(Идентитет није постављен)"
 
-#: src/mailbox-conf.c:1147
+#: src/mailbox-conf.c:1140
 msgid "C_hange..."
 msgstr "И_змени..."
 
-#: src/mailbox-conf.c:1154
+#: src/mailbox-conf.c:1147
 msgid "Show address:"
 msgstr "Прикажи адресу:"
 
-#: src/mailbox-conf.c:1157
+#: src/mailbox-conf.c:1150
 msgid "_From"
 msgstr "_Од"
 
-#: src/mailbox-conf.c:1163 src/sendmsg-window.c:308
+#: src/mailbox-conf.c:1156 src/sendmsg-window.c:308
 msgid "_To"
 msgstr "_За"
 
@@ -4218,7 +4186,7 @@ msgstr "Тиха провера у позадини (без порука у ли
 msgid "Quoted and Flowed Text"
 msgstr "Цитирани и укључени текст"
 
-#: src/pref-manager.c:1735 src/sendmsg-window.c:3787
+#: src/pref-manager.c:1735 src/sendmsg-window.c:3788
 msgid "Quoted Text Regular Expression"
 msgstr "Регуларни израз за цитирани текст"
 
@@ -5028,7 +4996,7 @@ msgstr "_Језик"
 msgid "_Options"
 msgstr "_Опције"
 
-#: src/sendmsg-window.c:549
+#: src/sendmsg-window.c:550
 #, c-format
 msgid ""
 "The message to '%s' is modified.\n"
@@ -5038,15 +5006,15 @@ msgstr ""
 "Сачувати поруку међу недовршеним порукама?"
 
 #. Comments:
-#: src/sendmsg-window.c:671 src/sendmsg-window.c:1946
+#: src/sendmsg-window.c:672 src/sendmsg-window.c:1947
 msgid "Comments:"
 msgstr "Примедбе:"
 
-#: src/sendmsg-window.c:797
+#: src/sendmsg-window.c:798
 msgid "Gnome editor is not defined in your preferred applications."
 msgstr "Уређивач текста за Гном није наведен међу изабраним програмима."
 
-#: src/sendmsg-window.c:1153
+#: src/sendmsg-window.c:1154
 #, c-format
 msgid ""
 "Saying yes will not send the file `%s' itself, but just a MIME message/"
@@ -5061,43 +5029,43 @@ msgstr ""
 "\n"
 "Да ли заиста желите да прикачите ову датотеку као референцу?"
 
-#: src/sendmsg-window.c:1164
+#: src/sendmsg-window.c:1165
 msgid "Attach as Reference?"
 msgstr "Приложи као референцу?"
 
-#: src/sendmsg-window.c:1255
+#: src/sendmsg-window.c:1256
 msgid "Remove"
 msgstr "Уклони"
 
-#: src/sendmsg-window.c:1266
+#: src/sendmsg-window.c:1267
 msgid "attach as reference"
 msgstr "приложи као референцу"
 
-#: src/sendmsg-window.c:1272
+#: src/sendmsg-window.c:1273
 msgid "attach as file"
 msgstr "приложи као датотеку"
 
-#: src/sendmsg-window.c:1420
+#: src/sendmsg-window.c:1421
 #, c-format
 msgid "Cannot get info on file '%s': %s"
 msgstr "Не може да сазна податке за датотеку „%s“: %s"
 
-#: src/sendmsg-window.c:1425
+#: src/sendmsg-window.c:1426
 #, c-format
 msgid "Attachment %s is not a regular file."
 msgstr "Прилог %s није обична датотека."
 
-#: src/sendmsg-window.c:1428
+#: src/sendmsg-window.c:1429
 #, c-format
 msgid "File %s cannot be read\n"
 msgstr "Не може да учита датотеку %s\n"
 
-#: src/sendmsg-window.c:1482
+#: src/sendmsg-window.c:1483
 msgid "Attach file"
 msgstr "Приложи датотеку уз поруку"
 
-#: src/sendmsg-window.c:1578 src/sendmsg-window.c:1640
-#: src/sendmsg-window.c:2890
+#: src/sendmsg-window.c:1579 src/sendmsg-window.c:1641
+#: src/sendmsg-window.c:2891
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -5106,68 +5074,68 @@ msgstr ""
 "Могући разлог: недовољно простора за привремени смештај"
 
 #. From:
-#: src/sendmsg-window.c:1836
+#: src/sendmsg-window.c:1837
 msgid "F_rom:"
 msgstr "О_д:"
 
 #. Subject:
-#: src/sendmsg-window.c:1848
+#: src/sendmsg-window.c:1849
 msgid "S_ubject:"
 msgstr "_Тема:"
 
 #. fcc: mailbox folder where the message copy will be written to
-#: src/sendmsg-window.c:1862
+#: src/sendmsg-window.c:1863
 msgid "F_cc:"
 msgstr "У _датотеку:"
 
 #. Reply To:
-#: src/sendmsg-window.c:1892
+#: src/sendmsg-window.c:1893
 msgid "_Reply To:"
 msgstr "_Одговор за:"
 
 #. Attachment list
-#: src/sendmsg-window.c:1899
+#: src/sendmsg-window.c:1900
 msgid "_Attachments:"
 msgstr "_Прилози:"
 
 #. Keywords:
-#: src/sendmsg-window.c:1949
+#: src/sendmsg-window.c:1950
 msgid "Keywords:"
 msgstr "Кључне речи:"
 
-#: src/sendmsg-window.c:2112
+#: src/sendmsg-window.c:2113
 msgid "you"
 msgstr "ви"
 
-#: src/sendmsg-window.c:2121
+#: src/sendmsg-window.c:2122
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------прослеђена порука од %s------\n"
 
-#: src/sendmsg-window.c:2156
+#: src/sendmsg-window.c:2157
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "ИД поруке: %s\n"
 
-#: src/sendmsg-window.c:2162
+#: src/sendmsg-window.c:2163
 msgid "References:"
 msgstr "Референце:"
 
-#: src/sendmsg-window.c:2172
+#: src/sendmsg-window.c:2173
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "%s — %s написа:\n"
 
-#: src/sendmsg-window.c:2174
+#: src/sendmsg-window.c:2175
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s написа:\n"
 
-#: src/sendmsg-window.c:3052
+#: src/sendmsg-window.c:3053
 msgid "Choose charset"
 msgstr "Изаберите скуп знакова:"
 
-#: src/sendmsg-window.c:3059
+#: src/sendmsg-window.c:3060
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file."
@@ -5175,16 +5143,16 @@ msgstr ""
 "Ова датотека није ни у US-ASCII нити UTF-8 запису.\n"
 "Молим изаберите скуп знакова којом је записана датотека."
 
-#: src/sendmsg-window.c:3125
+#: src/sendmsg-window.c:3126
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Не може да отвори датотеку %s.\n"
 
-#: src/sendmsg-window.c:3147
+#: src/sendmsg-window.c:3148
 msgid "Include file"
 msgstr "Укључи датотеку"
 
-#: src/sendmsg-window.c:3443
+#: src/sendmsg-window.c:3444
 #, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
@@ -5193,7 +5161,7 @@ msgstr ""
 "Порука се не може превести у скуп знакова %s.\n"
 "Молим изаберите језик за ову поруку."
 
-#: src/sendmsg-window.c:3462
+#: src/sendmsg-window.c:3463
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
@@ -5203,32 +5171,32 @@ msgstr ""
 "поруке се потписује и/или шифрује. Уколико је потребно заштитити целу "
 "поруку, треба да изаберете МИМЕ мод. Да ли заиста желите да наставите?"
 
-#: src/sendmsg-window.c:3475
+#: src/sendmsg-window.c:3476
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "шаље поруку помоћу GPG-а %d"
 
-#: src/sendmsg-window.c:3786
+#: src/sendmsg-window.c:3787
 #, c-format
 msgid "Could not compile %s"
 msgstr "Не може да преведе %s"
 
-#: src/sendmsg-window.c:4304
+#: src/sendmsg-window.c:4305
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Одговор за %s: %s"
 
-#: src/sendmsg-window.c:4309
+#: src/sendmsg-window.c:4310
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Проследи поруку за %s: %s"
 
-#: src/sendmsg-window.c:4313
+#: src/sendmsg-window.c:4314
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Настави поруку за %s: %s"
 
-#: src/sendmsg-window.c:4317
+#: src/sendmsg-window.c:4318
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Нова порука за %s: %s"
@@ -5612,6 +5580,30 @@ msgstr "Горе"
 #: src/toolbar-prefs.c:506
 msgid "Down"
 msgstr "Доле"
+
+#~ msgid ""
+#~ "Failed to initialise LDAP server.\n"
+#~ "Check that the servername is valid."
+#~ msgstr ""
+#~ "Не може да покрене ЛДАП сервер.\n"
+#~ "Проверите да ли је име сервера исправно."
+
+#~ msgid "Couldn't enable TLS on the LDAP connection: %s"
+#~ msgstr "Не може да омогући ТЛС на ЛДАП вези: %s"
+
+#~ msgid "TLS requested but TLS support not compiled in."
+#~ msgstr "Захтеван је ТЛС, али подршка за њега није укључена."
+
+#~ msgid ""
+#~ "Failed to bind to server: %s\n"
+#~ "Check that the server name is valid."
+#~ msgstr ""
+#~ "Не може да се веже на сервер: %s\n"
+#~ "Проверите да ли је име сервера исправно."
+
+#~ msgid "Failed to do a search: %s.Check that the base name is valid."
+#~ msgstr ""
+#~ "Не може да изведе претрагу: %s. Проверите да ли је основно име исправно."
 
 #~ msgid "Couldn't set protocol version to LDAPv3."
 #~ msgstr "Не може да постави издање протокола на ЛДАП3."

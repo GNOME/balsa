@@ -2153,22 +2153,6 @@ typedef struct {
 #define LIBBALSA_ADDRESS_ENTRY_INFO "libbalsa-address-entry-info"
 
 /*************************************************************
- *     Allocate and initialize LibBalsaAddressEntryInfo.
- *************************************************************/
-static LibBalsaAddressEntryInfo *
-lbae_info_new(void)
-{
-    LibBalsaAddressEntryInfo *info;
-
-    info = g_new(LibBalsaAddressEntryInfo, 1);
-    info->list = NULL;
-    info->active = NULL;
-    info->domain = NULL;
-
-    return info;
-}
-
-/*************************************************************
  *     Deallocate LibBalsaAddressEntryInfo.
  *************************************************************/
 static void
@@ -2181,31 +2165,6 @@ lbae_info_free(LibBalsaAddressEntryInfo * info)
 }
 
 /* Helpers. */
-
-/*************************************************************
- *     Does the UTF-8 string begin with the prefix?
- *************************************************************/
-static gboolean
-lbae_utf8_name_has_prefix(const gchar * name, const gchar * prefix)
-{
-    gchar *name_n, *name_f, *prefix_n, *prefix_f;
-    gboolean retval;
-
-    if (!name || !prefix)
-        return FALSE;
-
-    name_n = g_utf8_normalize(name, -1, G_NORMALIZE_DEFAULT);
-    name_f = g_utf8_casefold(name_n, -1);
-    g_free(name_n);
-    prefix_n = g_utf8_normalize(prefix, -1, G_NORMALIZE_DEFAULT);
-    prefix_f = g_utf8_casefold(prefix_n, -1);
-    g_free(prefix_n);
-    retval = g_str_has_prefix(name_f, prefix_f);
-    g_free(name_f);
-    g_free(prefix_f);
-
-    return retval;
-}
 
 /*************************************************************
  *     Is the name in a row of the model?  If so, return the
@@ -2230,10 +2189,7 @@ lbae_name_in_model(const gchar * name, GtkTreeModel * model,
                            NAME_COL, &this_name,
                            ADDRESS_COL, &this_address, -1);
         if (this_name && strcmp(name, this_name) == 0) {
-            if (address)
-                *address = this_address;
-            else if (this_address)
-                g_object_unref(this_address);
+	    *address = this_address;
             g_free(this_name);
             return TRUE;
         }
@@ -2243,34 +2199,6 @@ lbae_name_in_model(const gchar * name, GtkTreeModel * model,
     }
 
     return FALSE;
-}
-
-/*************************************************************
- *     Create an address string with either the addressee's
- *     full name or nick name, depending on which we matched;
- *     returns a newly allocated string, which must be
- *     deallocated with g_free.
- *************************************************************/
-static gchar *
-lbae_get_name_from_address(LibBalsaAddress * address, const gchar * prefix)
-{
-    gchar *address_string;
-
-    if (lbae_utf8_name_has_prefix(address->full_name, prefix))
-        address_string = libbalsa_address_to_gchar(address, 0);
-    else {
-        LibBalsaAddress *tmp_address;
-
-        tmp_address = libbalsa_address_new();
-        libbalsa_address_set_copy(tmp_address, address);
-        g_free(tmp_address->full_name);
-        tmp_address->full_name = g_strdup(tmp_address->nick_name);
-
-        address_string = libbalsa_address_to_gchar(tmp_address, 0);
-        g_object_unref(tmp_address);
-    }
-
-    return address_string;
 }
 
 /*************************************************************
@@ -2361,38 +2289,32 @@ lbae_append_addresses(GtkEntryCompletion * completion, GList * match,
                       const gchar * prefix)
 {
     LibBalsaAddressEntryInfo *info;
-    GtkTreeModel *model;
     GtkListStore *store;
     GtkTreeIter iter;
-    gboolean valid;
+    gchar *name;
 
-    info = g_object_get_data(G_OBJECT(completion),
-                             LIBBALSA_ADDRESS_ENTRY_INFO);
-    model = gtk_entry_completion_get_model(completion);
-    store = GTK_LIST_STORE(model);
-
-    /* Remove any previous autocompletion row; it has a NULL address. */
-    for (valid = gtk_tree_model_get_iter_first(model, &iter); valid;) {
-        LibBalsaAddress *address;
-
-        gtk_tree_model_get(model, &iter, ADDRESS_COL, &address, -1);
-        valid = address ? gtk_tree_model_iter_next(model, &iter) :
-            gtk_list_store_remove(store, &iter);
-    }
+    store = GTK_LIST_STORE(gtk_entry_completion_get_model(completion));
+    gtk_list_store_clear(store);
     /* Synchronize the filtered model. */
     gtk_entry_completion_complete(completion);
 
     for (; match; match = match->next) {
-        gchar *name;
+        name = libbalsa_address_to_gchar(match->data, 0);
+	gtk_list_store_append(store, &iter);
+	gtk_list_store_set(store, &iter, NAME_COL, name,
+                           ADDRESS_COL, match->data, -1);
+        g_free(name);
+    }
 
-        name = match->data ?
-            lbae_get_name_from_address(match->data, prefix) :
-            g_strconcat(prefix, "@", info->domain, NULL);
-        if (!lbae_name_in_model(name, model, NULL)) {
-            gtk_list_store_append(store, &iter);
-            gtk_list_store_set(store, &iter, NAME_COL, name,
-                               ADDRESS_COL, match->data, -1);
-        }
+    info = g_object_get_data(G_OBJECT(completion),
+                             LIBBALSA_ADDRESS_ENTRY_INFO);
+    if (info->domain && *info->domain && !strpbrk(prefix, "@%!")) {
+        /* No domain in the user's entry, and the current identity has a
+         * default domain, so we'll add user@domain as a possible
+         * autocompletion. */
+	name = g_strconcat(prefix, "@", info->domain, NULL);
+	gtk_list_store_append(store, &iter);
+	gtk_list_store_set(store, &iter, NAME_COL, name, -1);
         g_free(name);
     }
 }
@@ -2406,29 +2328,7 @@ static gboolean
 lbae_completion_match(GtkEntryCompletion * completion, const gchar * key,
                       GtkTreeIter * iter, gpointer user_data)
 {
-    LibBalsaAddressEntryInfo *info;
-    const gchar *prefix;
-    gchar *name;
-    gboolean retval;
-
-    info = g_object_get_data(G_OBJECT(completion),
-                             LIBBALSA_ADDRESS_ENTRY_INFO);
-    prefix = info->active->data;
-    if (!*prefix)
-        return FALSE;
-
-    gtk_tree_model_get(gtk_entry_completion_get_model(completion), iter,
-                       NAME_COL, &name, -1);
-
-    if (!name)
-        /* How can this happen? */
-        return FALSE;
-
-    retval =
-        lbae_utf8_name_has_prefix(*name == '"' ? name + 1 : name, prefix);
-    g_free(name);
-
-    return retval;
+    return TRUE;
 }
 
 /*************************************************************
@@ -2451,14 +2351,7 @@ lbae_entry_changed(GtkEntry * entry, gpointer data)
         return;
 
     match = lbae_get_matching_addresses(prefix);
-    if (info->domain && *info->domain && !strpbrk(prefix, "@%!"))
-        /* No domain in the user's entry, and the current identity has a
-         * default domain, so we'll add user@domain as a possible
-         * autocompletion; lbae_append_addresses treats a NULL address
-         * as a request for that option. */
-        match = g_list_append(match, NULL);
     lbae_append_addresses(completion, match, prefix);
-    match = g_list_remove(match, NULL);
     g_list_foreach(match, (GFunc) g_object_unref, NULL);
     g_list_free(match);
 }
@@ -2538,7 +2431,7 @@ libbalsa_address_entry_new()
     g_signal_connect(completion, "match-selected",
                      G_CALLBACK(lbae_completion_match_selected), NULL);
 
-    info = lbae_info_new();
+    info = g_new0(LibBalsaAddressEntryInfo, 1);
     g_object_set_data_full(G_OBJECT(completion),
                            LIBBALSA_ADDRESS_ENTRY_INFO, info,
                            (GDestroyNotify) lbae_info_free);
@@ -2579,6 +2472,8 @@ libbalsa_address_entry_get_list(GtkEntry * address_entry)
     GSList *list;
     GList *res = NULL;
 
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry), NULL);
+
     completion = gtk_entry_get_completion(address_entry);
     info = g_object_get_data(G_OBJECT(completion),
                              LIBBALSA_ADDRESS_ENTRY_INFO);
@@ -2602,7 +2497,6 @@ libbalsa_address_entry_set_domain(GtkEntry * address_entry, void *domain)
     GtkEntryCompletion *completion;
     LibBalsaAddressEntryInfo *info;
 
-    g_return_if_fail(address_entry != NULL);
     g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry));
 
     completion = gtk_entry_get_completion(address_entry);

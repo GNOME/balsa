@@ -1,3 +1,9 @@
+2004-05-24 09:05  PeterB
+
+	* libbalsa/mailbox.c, libbalsa/message.c, src/balsa-message.c:
+	update the cached icon as well as the message icon; shift the
+	responsibility for signalling "row-changed" to the mailbox code.
+
 2004-05-22  Pawel Salek
 
 	* balsa.spec.in: Balsa.idl should be distributed.

@@ -40,8 +40,12 @@ typedef struct _BalsaIndexClass BalsaIndexClass;
 struct _BalsaIndex
   {
     GtkBin bin;
+
     MAILSTREAM *stream;
     glong last_message;
+
+    GdkPixmap *new_xpm;
+    GdkBitmap *new_xpm_mask;
   };
 
 struct _BalsaIndexClass
@@ -53,16 +57,22 @@ struct _BalsaIndexClass
 			    glong mesgno);
   };
 
+
+
 guint balsa_index_get_type (void);
+
 GtkWidget *balsa_index_new ();
+
 void balsa_index_set_stream (BalsaIndex * bindex,
 			     MAILSTREAM * stream);
+
 void balsa_index_append_new_messages (BalsaIndex * bindex);
+
+void balsa_index_select_next (BalsaIndex * bindex);
+void balsa_index_select_previous (BalsaIndex * bindex);
 
 
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */
-
-
 #endif				/* __BALSA_INDEX_H__ */

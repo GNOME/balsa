@@ -21,8 +21,11 @@
 #include <string.h>
 #include "balsa-index.h"
 
+/* pixmaps */
+#include "pixmaps/gball.xpm"
 
 #define BUFFER_SIZE 1024
+
 
 /* gtk widget */
 static void balsa_index_class_init (BalsaIndexClass * klass);
@@ -37,11 +40,20 @@ static void append_messages (BalsaIndex *bindex,
 			     glong first,
 			     glong last);
 
+static void update_new_message_pixmap (BalsaIndex *bindex,
+				       glong mesgno);
+
 static void select_message (GtkWidget * widget, 
 			    gint row,
 			    gint column,
 			    GdkEventButton * bevent,
 			    gpointer * data);
+
+static void unselect_message (GtkWidget * widget, 
+			      gint row,
+			      gint column,
+			      GdkEventButton * bevent,
+			      gpointer * data);
 			   
 
 
@@ -146,6 +158,7 @@ balsa_index_init (BalsaIndex * bindex)
 
   static gchar *titles[] =
   {
+    "N",
     "#",
     "From",
     "Subject",
@@ -157,23 +170,34 @@ balsa_index_init (BalsaIndex * bindex)
   bindex->stream = NIL;
   bindex->last_message = 0;
 
-  GTK_BIN (bindex)->child = (GtkWidget *) clist = gtk_clist_new_with_titles (4, titles);
+  GTK_BIN (bindex)->child = (GtkWidget *) clist = gtk_clist_new_with_titles (5, titles);
   gtk_widget_set_parent (GTK_WIDGET (clist), GTK_WIDGET (bindex));
   gtk_clist_set_policy (clist, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_clist_set_selection_mode (clist, GTK_SELECTION_BROWSE);
-  gtk_clist_set_column_justification (clist, 0, GTK_JUSTIFY_RIGHT);
+  gtk_clist_set_column_justification (clist, 1, GTK_JUSTIFY_RIGHT);
   gtk_clist_set_column_width (clist, 0, 25);
-  gtk_clist_set_column_width (clist, 1, 150);
-  gtk_clist_set_column_width (clist, 2, 250);
-  gtk_clist_set_column_width (clist, 3, 100);
+  gtk_clist_set_column_width (clist, 1, 25);
+  gtk_clist_set_column_width (clist, 2, 150);
+  gtk_clist_set_column_width (clist, 3, 250);
+  gtk_clist_set_column_width (clist, 4, 100);
 
   gtk_signal_connect (GTK_OBJECT (clist),
                       "select_row",
                       (GtkSignalFunc) select_message,
                       (gpointer) bindex);
 
-  gtk_widget_show (GTK_BIN (bindex)->child);
-  gtk_widget_ref (GTK_BIN (bindex)->child);
+  gtk_signal_connect (GTK_OBJECT (clist),
+                      "unselect_row",
+                      (GtkSignalFunc) unselect_message,
+                      (gpointer) bindex);
+
+  gtk_widget_show (GTK_WIDGET (clist));
+  gtk_widget_ref (GTK_WIDGET (clist));
+
+  bindex->new_xpm = gdk_pixmap_create_from_xpm_d (clist->clist_window, 
+						  &bindex->new_xpm_mask, 
+						  &GTK_WIDGET (clist)->style->white,
+						  gball_xpm);
 }
 
 GtkWidget *
@@ -199,7 +223,21 @@ balsa_index_set_stream (BalsaIndex * bindex,
 
   /* clear list and append messages */
   gtk_clist_clear (GTK_CLIST (GTK_BIN (bindex)->child));
+
+
+  /* here we play a little trick on clist; in GTK_SELECTION_BROWSE mode
+   * (the default for this index), the first row appended automagicly gets
+   * selected.  this causes a delay in the index getting filled out, and
+   * makes it appear as if the message is displayed before the index; so we set
+   * the clist selection mode to a mode that doesn't automagicly select, select
+   * manually, then switch back */
+  gtk_clist_set_selection_mode (GTK_CLIST (GTK_BIN (bindex)->child), GTK_SELECTION_SINGLE);
   append_messages (bindex, 1, bindex->last_message);
+  
+  if (GTK_CLIST (GTK_BIN (bindex)->child)->rows > 0)
+    gtk_clist_select_row (GTK_CLIST (GTK_BIN (bindex)->child), 0, -1);
+
+  gtk_clist_set_selection_mode (GTK_CLIST (GTK_BIN (bindex)->child), GTK_SELECTION_BROWSE);
 }
 
 void
@@ -219,6 +257,17 @@ balsa_index_append_new_messages (BalsaIndex * bindex)
       append_messages (bindex, first, bindex->last_message);
     }
 }
+
+void
+balsa_index_select_next (BalsaIndex * bindex)
+{
+}
+
+void
+balsa_index_select_previous (BalsaIndex * bindex)
+{
+}
+
 
 static void
 balsa_index_size_request (GtkWidget * widget,
@@ -277,41 +326,65 @@ balsa_index_size_allocate (GtkWidget * widget,
 }
 
 
+
+
 static void
 append_messages (BalsaIndex *bindex,
 		 glong first,
 		 glong last)
 {
   glong i;
-  gchar *text[4];
+  gchar *text[5];
   MESSAGECACHE *cache;
 
-  text[0] = g_malloc (BUFFER_SIZE);
+  text[0] = NULL;
   text[1] = g_malloc (BUFFER_SIZE);
   text[2] = g_malloc (BUFFER_SIZE);
   text[3] = g_malloc (BUFFER_SIZE);
+  text[4] = g_malloc (BUFFER_SIZE);
 
   gtk_clist_freeze (GTK_CLIST (GTK_BIN (bindex)->child));
 
   for (i = first; i <= last; i++)
     {
-      sprintf (text[0], "%d", i);
-      mail_fetchfrom (text[1], bindex->stream, i, (long) BUFFER_SIZE);
-      mail_fetchsubject (text[2], bindex->stream, i, (long) BUFFER_SIZE);
+      sprintf (text[1], "%d", i);
+      mail_fetchfrom (text[2], bindex->stream, i, (long) BUFFER_SIZE);
+      mail_fetchsubject (text[3], bindex->stream, i, (long) BUFFER_SIZE);
 
       mail_fetchstructure (bindex->stream, i, NIL);
       cache = mail_elt (bindex->stream, i);
-      mail_date (text[3], cache);
+      mail_date (text[4], cache);
 
       gtk_clist_append (GTK_CLIST (GTK_BIN (bindex)->child), text);
+      update_new_message_pixmap (bindex, i);
     }
 
   gtk_clist_thaw (GTK_CLIST (GTK_BIN (bindex)->child));
 
-  g_free (text[0]);
   g_free (text[1]);
   g_free (text[2]);
   g_free (text[3]);
+  g_free (text[4]);
+}
+
+
+static void
+update_new_message_pixmap (BalsaIndex *bindex,
+			   glong mesgno)
+{
+  MESSAGECACHE *elt;
+
+  elt = mail_elt (bindex->stream, mesgno);
+
+  if (!elt->seen)
+    gtk_clist_set_pixmap (GTK_CLIST (GTK_BIN (bindex)->child),
+			  mesgno - 1, 0,
+			  bindex->new_xpm,
+			  bindex->new_xpm_mask);
+  else
+    gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child),
+			mesgno - 1, 0,
+			NULL);
 }
 
 static void
@@ -336,4 +409,26 @@ select_message (GtkWidget * widget,
 		   bindex->stream,
 		   mesgno,
 		   NULL);
+}
+
+static void
+unselect_message (GtkWidget * widget, 
+		  gint row,
+		  gint column,
+		  GdkEventButton * bevent,
+		  gpointer * data)
+{
+  BalsaIndex *bindex;
+  glong mesgno;
+
+  bindex = BALSA_INDEX (data);
+
+  /* the message number is going to be one more
+   * than the row selected -- until the message list
+   * starts getting sorted! */
+  mesgno = row + 1;
+
+  /* update the index to show any changes in the message
+   * state */
+  update_new_message_pixmap (bindex, mesgno);
 }

@@ -125,25 +125,6 @@ balsa_message_clear (BalsaMessage * bmessage)
 }
 
 void
-balsa_message_delete (BalsaMessage * bmessage,
-		      MAILSTREAM * stream,
-		      glong mesgno)
-
-{
-  g_return_if_fail (bmessage != NULL);
-  g_return_if_fail (stream != NIL);
-
-  bmessage->current_stream = stream;
-  bmessage->current_mesgno = mesgno;
-
-  mail_setflag (stream, mesgno, "\\DELETED");
-  balsa_message_clear (bmessage);
-  mailbox_menu_update ();
-/* remove from index list... */
-/* mabey just make it invisible or something, while we move it into trash ? */
-}
-
-void
 balsa_message_set (BalsaMessage * bmessage,
 		   MAILSTREAM * stream,
 		   glong mesgno)

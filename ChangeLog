@@ -1,7 +1,8 @@
 2000-11-13  Carlos Morgado <chbm@chbm.nu>
 
-	* src/save-restore.c: remove  balsa_app.charset field that is used
+	* src/save-restore.c: remove balsa_app.charset field that is used
 	no more.
+	* configure.in: added "Use SSL" and "Use GSS"
 
 2000-11-13  Pawel Salek  <pawsa@theochem.kth.se>
 

@@ -1,5 +1,7 @@
 CFLAGS += -Wall -Wmissing-prototypes -Wpointer-arith
 
+noinst_HEADERS =
+
 noinst_LIBRARIES = libinit_balsa.a
 
 libinit_balsa_a_SOURCES = 		\

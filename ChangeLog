@@ -1,5 +1,6 @@
-2003-10-27 00:54  PeterB
+2003-10-27 17:06  PeterB
 
+	* libbalsa/filter.c: Avoid casting a (const gchar *) to (gchar *).
 	* libbalsa/mailbox_imap.c: Update message->msgno after expunge.
 
 2003-10-25 18:29  PeterB

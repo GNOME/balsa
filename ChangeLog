@@ -1,3 +1,8 @@
+2003-06-04 06:01  PeterB
+
+	* libbalsa/source-viewer.c: Include "misc.h" (Miquel van
+	Smoorenburg <miquels@cistron.nl>); weak ref the message.
+
 2003-06-03 22:22  PeterB
 
 	* libbalsa/libbalsa.h, libbalsa/source-viewer.c, src/balsa-index.c,

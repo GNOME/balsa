@@ -90,6 +90,7 @@ gchar *libbalsa_message_body_get_content_type(LibBalsaMessageBody * body);
 gboolean libbalsa_message_body_is_multipart(LibBalsaMessageBody * body);
 gboolean libbalsa_message_body_is_inline(LibBalsaMessageBody* body);
 gboolean libbalsa_message_body_is_flowed(LibBalsaMessageBody * body);
+gboolean libbalsa_message_body_is_delsp(LibBalsaMessageBody * body);
 
 LibBalsaMessageBody *libbalsa_message_body_get_by_id(LibBalsaMessageBody *
                                                      body,

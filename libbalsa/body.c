@@ -318,22 +318,41 @@ gboolean
 libbalsa_message_body_is_flowed(LibBalsaMessageBody * body)
 {
     gchar *content_type;
-    gchar *format;
-    gboolean flowed;
+    gboolean flowed = FALSE;
 
     content_type = libbalsa_message_body_get_content_type(body);
-    if (g_ascii_strcasecmp(content_type, "text/plain"))
-        flowed = FALSE;
-    else {
-        format = libbalsa_message_body_get_parameter(body, "format");
-        flowed = format && (g_ascii_strcasecmp(format, "flowed") == 0);
-        g_free(format);
+    if (g_ascii_strcasecmp(content_type, "text/plain") == 0) {
+	gchar *format =
+	    libbalsa_message_body_get_parameter(body, "format");
+
+	if (format) {
+	    flowed = (g_ascii_strcasecmp(format, "flowed") == 0);
+	    g_free(format);
+	}
     }
     g_free(content_type);
 
     return flowed;
 }
 
+gboolean
+libbalsa_message_body_is_delsp(LibBalsaMessageBody * body)
+{
+    gboolean delsp = FALSE;
+
+    if (libbalsa_message_body_is_flowed(body)) {
+	gchar *delsp_param =
+	    libbalsa_message_body_get_parameter(body, "delsp");
+
+	if (delsp_param) {
+	    delsp = (g_ascii_strcasecmp(delsp_param, "yes") == 0);
+	    g_free(delsp_param);
+	}
+    }
+
+    return delsp;
+}
+    
 LibBalsaMessageBody*
 libbalsa_message_body_get_by_id(LibBalsaMessageBody* body, const gchar* id)
 {

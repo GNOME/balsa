@@ -1,5 +1,6 @@
-2005-03-19 22:05  PeterB
+2005-03-19 23:00  PeterB
 
+	* libbalsa/libbalsa-conf.h: check Gtk version.
 	* libbalsa/Makefile.am, libbalsa/address-book-ldif.c,
 	libbalsa/address-book.c, libbalsa/body.c, libbalsa/files.c,
 	libbalsa/filter-file.c, libbalsa/filter.h,

@@ -11,8 +11,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2002-08-01 18:55+0200\n"
-"PO-Revision-Date: 2002-08-01 19:41+0200\n"
+"POT-Creation-Date: 2002-08-21 20:09+0200\n"
+"PO-Revision-Date: 2002-08-21 20:10+0200\n"
 "Last-Translator: GNOME PL Team <translators@gnome.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -611,6 +611,11 @@ msgstr "Zaznacza cały list"
 #: libbalsa/source-viewer.c:1
 msgid "Message Source"
 msgstr "Źródło listu"
+
+#: libbalsa/source-viewer.c:1
+#, c-format
+msgid "Conversion error: %s\n"
+msgstr "Błąd przy konwersji: %s\n"
 
 #: libinit_balsa/balsa-druid-page-directory.c:1
 msgid "Inbox:"

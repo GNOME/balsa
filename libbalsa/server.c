@@ -123,9 +123,16 @@ libbalsa_server_class_init(LibBalsaServerClass * klass)
 		     G_STRUCT_OFFSET(LibBalsaServerClass,
                                      set_host),
                      NULL, NULL,
+#ifdef USE_SSL
                      libbalsa_VOID__POINTER_INT,
                      G_TYPE_NONE, 2,
-                     G_TYPE_POINTER, G_TYPE_INT);
+                     G_TYPE_POINTER, G_TYPE_INT
+#else /* USE_SSL */
+		     g_cclosure_marshal_VOID__POINTER,
+		     G_TYPE_NONE, 1,
+		     G_TYPE_POINTER
+#endif /* USE_SSL */
+		     );
 
 
     libbalsa_server_signals[GET_PASSWORD] =

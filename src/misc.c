@@ -173,7 +173,9 @@ make_list_from_string (gchar * the_str)
       switch (the_str[i])
 	{
 	case ',':
-	  list = g_list_append (list, buff);
+	  buff[y] = '\0';
+	  list = g_list_append (list, g_strdup(buff));
+	  buff[0] = '\0';
 	  y = 0;
 	  break;
 	default:
@@ -182,7 +184,8 @@ make_list_from_string (gchar * the_str)
 	  break;
 	}
     }
-  list = g_list_append (list, buff);
+  buff[y] = '\0';
+  list = g_list_append (list, g_strdup(buff));
 
   g_free (buff);
   return list;

@@ -1,5 +1,7 @@
 2000-09-11  Ian Campbell  <ijc25@cam.ac.uk>
 
+	* libbalsa/body.c: Close the file after saving. Fixes bug #24055.
+
 	* libbalsa/mailbox_local.c: When loading from config, setup
 	local->type correctly.
 

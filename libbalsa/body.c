@@ -171,7 +171,8 @@ libbalsa_message_body_save (LibBalsaMessageBody *body, gchar *prefix, gchar *fil
 
 	fflush (s.fpout);
 	fclose (s.fpout);
-  
+	fclose (s.fpin);
+
 	return TRUE;
 }
 

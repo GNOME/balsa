@@ -1286,7 +1286,7 @@ translate_message (HEADER * cur)
 
   footime = localtime (&cur->date_sent);
 
-  strftime (rettime, sizeof (rettime), "%a, %d %b %Y %H:%M:%S", footime);
+  strftime (rettime, sizeof (rettime), balsa_app.date_string, footime);
 
   message->datet = cur->date_sent;
   message->date = g_strdup (rettime);

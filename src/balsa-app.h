@@ -61,6 +61,7 @@
 #define MESSAGEBOX_HEIGHT 150
 
 #define DEFAULT_MESSAGE_FONT "-*-fixed-medium-r-normal-*-*-*-*-*-c-*-iso8859-1"
+#define DEFAULT_DATE_FORMAT "%a, %d %b %Y %H:%M:%S"
 #define DEFAULT_CHARSET "ISO-8859-1"
 #define DEFAULT_ENCODING ENC8BIT
 #define DEFAULT_LINESIZE 78
@@ -170,8 +171,10 @@ extern struct BalsaApplication
   /* encoding stuff */
   gint encoding_style;
   gchar *charset;
+	gchar *date_string;
 
   gint checkbox;
+
   /* printing */
   Printing_t PrintCommand;
 

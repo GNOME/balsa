@@ -1,3 +1,11 @@
+2000-03-03  Peter Williams  <peter@beta.newton.cx>
+
+	* libbalsa/mailbox.c (translate_message): Uses user's
+	  preferred time format now.
+	
+	* src/save-restore.c, src/balsa-app.h, src/prefs-manager.c:
+ 	  Changes to support the new preference.
+
 2000-2-28  Héctor García Álvarez <hector@scouts-es.org>
 	* Some changes in SMTP to make it work right with the queue
 

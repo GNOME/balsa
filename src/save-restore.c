@@ -891,6 +891,12 @@ config_global_load (void)
   else
 	  balsa_app.empty_trash_on_exit = atoi(field);
 
+  /* How we format dates */
+  if ((field = pl_dict_get_str (globals, "DateFormat")) == NULL)
+    balsa_app.date_string = DEFAULT_DATE_FORMAT;
+  else
+    balsa_app.date_string = g_strdup (field);
+
  return TRUE;
 }				/* config_global_load */
 
@@ -1065,6 +1071,10 @@ config_global_save (void)
   snprintf ( tmp, sizeof(tmp), "%d", balsa_app.empty_trash_on_exit);
   pl_dict_add_str_str (globals, "EmptyTrash", tmp);
 
+  if( balsa_app.date_string )
+	  pl_dict_add_str_str (globals, "DateFormat", balsa_app.date_string );
+  else
+       	  pl_dict_add_str_str (globals, "DateFormat", DEFAULT_DATE_FORMAT );
   /* Add it to configuration file */
   temp_str = PLMakeString ("Globals");
   PLInsertDictionaryEntry (balsa_app.proplist, temp_str, globals);

@@ -67,7 +67,9 @@ typedef struct _PropertyUI {
 	/* charset */
 	GtkRadioButton *encoding_type[NUM_ENCODING_MODES];
 	GtkWidget *charset;
-	
+
+	GtkWidget *date_format;
+
 	/* printing */
 	GtkWidget *PrintCommand;
 	GtkWidget *PrintBreakline;
@@ -433,6 +435,9 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 	gtk_signal_connect (GTK_OBJECT (pui->empty_trash), "toggled",
 			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
 
+	/* Date format */
+	gtk_signal_connect (GTK_OBJECT (pui->date_format), "changed",
+			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
 
 	gtk_widget_show_all ( GTK_WIDGET(pui->pbox));
 
@@ -572,6 +577,10 @@ apply_prefs (GtkWidget * pbox, PropertyUI * pui)
 	balsa_app.check_mail_upon_startup = GTK_TOGGLE_BUTTON(pui->check_mail_upon_startup)->active;
 	balsa_app.empty_trash_on_exit = GTK_TOGGLE_BUTTON(pui->empty_trash)->active;
 
+	/* date format */
+	g_free (balsa_app.date_string);
+	balsa_app.date_string = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->date_format)));
+
 	// XXX
 	//  refresh_main_window ();
 	
@@ -684,6 +693,10 @@ set_prefs (void)
 
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->check_mail_upon_startup), balsa_app.check_mail_upon_startup);
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->empty_trash), balsa_app.empty_trash_on_exit);
+
+	/* date format */
+	gtk_entry_set_text (GTK_ENTRY (pui->date_format),
+			    balsa_app.date_string ? balsa_app.date_string : "");
 
 }
 
@@ -1186,6 +1199,7 @@ create_display_page ( )
 {	
 	/*
 	 * finnished mail options, starting on display
+	 * PKGW: This naming scheme is, uh, unclear.
 	 */
 	gint      i;
 	GtkWidget *frame7;
@@ -1198,6 +1212,7 @@ create_display_page ( )
 	GtkWidget *label18;
 	GSList    *group;
 	GtkWidget *vbox2;
+	GtkWidget *format_frame, *format_table, *format_widget;
 	
 	vbox2 = gtk_vbox_new (FALSE, 0);
 	gtk_widget_show (vbox2);
@@ -1267,6 +1282,31 @@ create_display_page ( )
 	gtk_container_add (GTK_CONTAINER (frame9), vbox4);
 	gtk_container_set_border_width (GTK_CONTAINER (vbox4), 5);
 
+	format_frame = gtk_frame_new( _("Display Formats") );
+	gtk_widget_show( format_frame );
+	gtk_box_pack_start( GTK_BOX(vbox2), format_frame, FALSE, FALSE, 0 );
+	gtk_container_set_border_width( GTK_CONTAINER( format_frame ), 5 );
+
+	format_table = gtk_table_new( 1, 2, FALSE );
+	gtk_widget_show( format_table );
+	gtk_container_add( GTK_CONTAINER( format_frame ), format_table );
+	gtk_container_set_border_width( GTK_CONTAINER( format_table ), 5 );	
+
+	format_widget = gtk_label_new( _("Date encoding (for strftime):") );
+	gtk_widget_show( format_widget );
+	gtk_table_attach( GTK_TABLE( format_table ), format_widget, 0, 1, 0, 1,
+			  (GtkAttachOptions) GTK_FILL, (GtkAttachOptions) 0,
+			  0, 0 );
+	gtk_label_set_justify( GTK_LABEL( format_widget ), GTK_JUSTIFY_RIGHT );
+
+	format_widget = gtk_entry_new();
+	gtk_widget_show( format_widget );
+	gtk_table_attach( GTK_TABLE( format_table ), format_widget, 1, 2, 0, 1,
+			  (GtkAttachOptions) GTK_FILL, (GtkAttachOptions) 0,
+			  0, 0 );
+	pui->date_format = format_widget;
+
+	
 	group = NULL;
 	for (i = 0; i < NUM_PWINDOW_MODES; i++)  {
 		pui->pwindow_type[i] = GTK_RADIO_BUTTON (gtk_radio_button_new_with_label (group, _(pwindow_type_label[i])));

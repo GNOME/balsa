@@ -101,6 +101,7 @@ void       balsa_window_close_mailbox( BalsaWindow *window, LibBalsaMailbox *mai
 static gchar * get_open_mailboxes_string(void);
 
 static void check_mailbox_list (GList *list);
+static gint mailbox_check_func ( GNode *mbox, gpointer data );
 
 static gint about_box_visible = FALSE;
 
@@ -906,6 +907,20 @@ check_mailbox_list (GList *mailbox_list)
   }
 }
 
+/*Callback to check a mailbox in a balsa-mblist */
+static gint
+mailbox_check_func ( GNode *node, gpointer data )
+{
+  MailboxNode *mbnode = (MailboxNode*)node->data;
+
+  if ( !mbnode || mbnode->IsDir)
+    return FALSE;
+
+  libbalsa_mailbox_check ( mbnode->mailbox );
+
+  return FALSE;
+}
+
 /*
  * Callbacks
  */
@@ -982,6 +997,14 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
 #else
   check_mailbox_list (balsa_app.inbox_input); 
 
+  libbalsa_mailbox_check ( balsa_app.inbox );
+  libbalsa_mailbox_check ( balsa_app.sentbox );
+  libbalsa_mailbox_check ( balsa_app.draftbox );
+  libbalsa_mailbox_check ( balsa_app.outbox );
+  libbalsa_mailbox_check ( balsa_app.trash );
+  
+  g_node_traverse (balsa_app.mailbox_nodes, G_LEVEL_ORDER, G_TRAVERSE_ALL, -1, mailbox_check_func, NULL );
+
   balsa_mblist_have_new (balsa_app.mblist);
 #endif
 }
@@ -997,7 +1020,6 @@ send_outbox_messages_cb (GtkWidget * widget, gpointer data)
 
 /* this one is called only in the threaded code */
 #ifdef BALSA_USE_THREADS
-static gint mailbox_check_func ( GNode *mbox, gpointer data );
 
 static void
 check_messages_thread( gpointer data )
@@ -1029,19 +1051,6 @@ check_messages_thread( gpointer data )
   pthread_mutex_unlock( &mailbox_lock );
 
   pthread_exit( 0 );
-}
-
-static gint
-mailbox_check_func ( GNode *node, gpointer data )
-{
-  MailboxNode *mbnode = (MailboxNode*)node->data;
-
-  if ( !mbnode || mbnode->IsDir)
-    return FALSE;
-
-  libbalsa_mailbox_check ( mbnode->mailbox );
-
-  return FALSE;
 }
 
 /* mail_progress_notify_cb:

@@ -1,3 +1,10 @@
+2000-08-22  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/mailbox.c(libbalsa_mailbox_set_unread_messages_flag):
+	Always emit the signal, since it allows balsa-mblist to update
+	when a second new message arrives.
+	* src/main-window.c: Check all mailboxes even in non-threaded mode.
+
 2000-08-22  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/quote-color.[hc]: rewrite is_a_quote() to use regexp's

@@ -252,8 +252,7 @@ libbalsa_mailbox_close(LibBalsaMailbox *mailbox)
 void
 libbalsa_mailbox_set_unread_messages_flag(LibBalsaMailbox *mailbox, gboolean has_unread)
 {
-	if ( has_unread != mailbox->has_unread_messages )
-		gtk_signal_emit(GTK_OBJECT(mailbox), libbalsa_mailbox_signals[SET_UNREAD_MESSAGES_FLAG], has_unread);
+	gtk_signal_emit(GTK_OBJECT(mailbox), libbalsa_mailbox_signals[SET_UNREAD_MESSAGES_FLAG], has_unread);
 }
 
 void

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.6.0\n"
-"POT-Creation-Date: 2000-04-25 03:43+0200\n"
+"POT-Creation-Date: 2000-04-26 23:49+0200\n"
 "PO-Revision-Date: 1999-12-28 14:03+0100\n"
 "Last-Translator: Andreas Hyden <a.hyden@cyberpoint.se>\n"
 "Language-Team: Swedish <sv@li.org>\n"
@@ -224,16 +224,41 @@ msgstr "Kör GnomeCard"
 msgid "Re-Import"
 msgstr "Läs om"
 
+#: src/balsa-app.c:217
+#, c-format
+msgid "Balsa cannot open your \"%s\" mailbox."
+msgstr "Balsa kan inte öppna din \"%s\" brevlåda."
+
+#: src/balsa-app.c:230
+msgid "Inbox"
+msgstr "Inkorg"
+
+#: src/balsa-app.c:235
+msgid "Outbox"
+msgstr "Utkorg"
+
+#: src/balsa-app.c:240
+msgid "Sentbox"
+msgstr "Skickatkorg"
+
+#: src/balsa-app.c:245
+msgid "Draftbox"
+msgstr "Utkastkorg"
+
+#: src/balsa-app.c:250
+msgid "Trash"
+msgstr "Bortkastat"
+
 #: src/balsa-index-page.c:287
 msgid "Mailbox password:"
 msgstr "Brevlådans lösenord:"
 
 #. password field
-#: src/balsa-index-page.c:294 src/mailbox-conf.c:989 src/mailbox-conf.c:1088
+#: src/balsa-index-page.c:295 src/mailbox-conf.c:989 src/mailbox-conf.c:1088
 msgid "Password:"
 msgstr "Lösenord:"
 
-#: src/balsa-index-page.c:320
+#: src/balsa-index-page.c:321
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -241,32 +266,32 @@ msgstr ""
 "Kunde inte öppna brevlådan!\n"
 "Var vänlig kolla brevlådeinställningarna."
 
-#: src/balsa-index-page.c:583 src/filter-edit-dialog.c:224
+#: src/balsa-index-page.c:584 src/filter-edit-dialog.c:224
 msgid "New"
 msgstr "Nytt"
 
-#: src/balsa-index-page.c:591 src/main-window.c:373
+#: src/balsa-index-page.c:592 src/main-window.c:373
 msgid "Reply"
 msgstr "Svara"
 
-#: src/balsa-index-page.c:599 src/main-window.c:376
+#: src/balsa-index-page.c:600 src/main-window.c:376
 msgid "Reply to all"
 msgstr "Svara till alla"
 
-#: src/balsa-index-page.c:607 src/main-window.c:379
+#: src/balsa-index-page.c:608 src/main-window.c:379
 msgid "Forward"
 msgstr "Eftersänd"
 
-#: src/balsa-index-page.c:615 src/filter-edit-dialog.c:230
+#: src/balsa-index-page.c:616 src/filter-edit-dialog.c:230
 #: src/main-window.c:366 src/pref-manager.c:885
 msgid "Delete"
 msgstr "Radera"
 
-#: src/balsa-index-page.c:623
+#: src/balsa-index-page.c:624
 msgid "Undelete"
 msgstr "_Återskapa"
 
-#: src/balsa-index-page.c:631
+#: src/balsa-index-page.c:632
 msgid "Transfer"
 msgstr "Överför"
 
@@ -297,7 +322,7 @@ msgstr "Spara"
 
 #: src/balsa-message.c:166 src/balsa-message.c:225 src/mailbox-conf.c:666
 #: src/sendmsg-window.c:125 src/sendmsg-window.c:410 src/sendmsg-window.c:1077
-#: src/sendmsg-window.c:1367 src/sendmsg-window.c:1390
+#: src/sendmsg-window.c:1383 src/sendmsg-window.c:1406
 msgid "Cancel"
 msgstr "Avbryt"
 
@@ -1500,13 +1525,17 @@ msgstr "Laddar..."
 msgid "Include file"
 msgstr "Inkludera fil"
 
-#: src/sendmsg-window.c:1365
+#: src/sendmsg-window.c:1381
 msgid "Cannot execute print command."
 msgstr "Kan inte köra utskriftskommandot."
 
-#: src/sendmsg-window.c:1389
+#: src/sendmsg-window.c:1405
 msgid "Error executing lpr"
 msgstr "Fel vid körning av lpr"
+
+#: src/spell-check.c:136
+msgid "Spell Check"
+msgstr "Rättstavningskontroll"
 
 #~ msgid "Local Mailbox Loaded as: %s\n"
 #~ msgstr "Lokal brevlåda inladdad som: %s\n"
@@ -1549,15 +1578,3 @@ msgstr "Fel vid körning av lpr"
 
 #~ msgid "On %s "
 #~ msgstr "%s skrev"
-
-#~ msgid "Inbox"
-#~ msgstr "Inkorg"
-
-#~ msgid "Outbox"
-#~ msgstr "Utkorg"
-
-#~ msgid "Sentbox"
-#~ msgstr "Skickatkorg"
-
-#~ msgid "Draftbox"
-#~ msgstr "Utkastkorg"

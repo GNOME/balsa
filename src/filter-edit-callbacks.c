@@ -115,7 +115,8 @@ fe_dialog_button_clicked(GtkWidget * widget, gint button, gpointer data)
 
     default:
 	/* we should NEVER get here */
-    break;}
+	break;
+    }
 }			/* end fe_dialog_button_clicked */
 
 

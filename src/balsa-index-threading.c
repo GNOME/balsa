@@ -86,7 +86,7 @@ balsa_index_threading(BalsaIndex* bindex)
     case BALSA_INDEX_THREADING_FLAT:
 	break;
     default:
-		break;
+	break;
     }
 }
 

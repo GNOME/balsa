@@ -259,7 +259,7 @@ void mutt_fetchPopMail (void)
   total = msgs - first_msg + 1; /* will be used for display later */
  
 
-  /*  Check for the total amount of bytes mail to be recieved */
+  /*  Check for the total amount of bytes mail to be received */
   tot_bytes=0;
   for (i = first_msg ; i <= msgs ; i++)
   {
@@ -324,7 +324,7 @@ void mutt_fetchPopMail (void)
 	break;
       }
       
-      sprintf( threadbuf,"Recieved %d bytes of %d",num_bytes,tot_bytes);
+      sprintf( threadbuf,"Received %d bytes of %d",num_bytes,tot_bytes);
 #ifdef BALSA_USE_THREADS
       MSGMAILTHREAD(threadmsg, MSGMAILTHREAD_PROGRESS, threadbuf, num_bytes,tot_bytes); 
 #endif

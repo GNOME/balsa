@@ -468,16 +468,12 @@ BODY *mutt_read_mime_header (FILE *fp, int digest)
 	parse_content_disposition (c, p);
 #ifdef LIBMUTT
       else if (!ascii_strcasecmp ("ID", line + 8))
-      {
-        char* p1 = strchr(c,'<');
-        char* p2 = strchr(p1,'>');
-        if(p1 && p2) {
-          char id[STRING];
-	  int len = p2-p1-1;
-	  if(len>0 && len<STRING-1) {
-	    strncpy(id, p1+1, len); id[len] = '\0';
-	    mutt_set_parameter("id", id, &p->parameter);
-	  }
+      { /* cf. rfc2822 and rfc2045 */
+        char* id = extract_message_id(c);
+        if(id)
+        {
+          mutt_set_parameter("id", id, &p->parameter);
+          FREE(&id);
         }
       }
 #endif

@@ -364,6 +364,9 @@ extern struct BalsaApplication {
     gboolean recognize_rfc2646_format_flowed;
     gboolean send_rfc2646_format_flowed;
 
+    /* how to handle multipart/alternative */
+    gboolean display_alt_plain;
+
     GList *folder_mru;
     GList *fcc_mru;
     gint drag_default_is_move;

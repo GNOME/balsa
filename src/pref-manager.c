@@ -145,6 +145,9 @@ typedef struct _PropertyUI {
     GtkWidget *browse_wrap_length;
     GtkWidget *recognize_rfc2646_format_flowed;
 
+    /* how to display multipart/alternative */
+    GtkWidget *display_alt_plain;
+
     /* spell checking */
     GtkWidget *module;
     gint module_index;
@@ -463,6 +466,11 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
                        "toggled", GTK_SIGNAL_FUNC(properties_modified_cb),
                        property_box);
 
+    /* multipart/alternative */
+    gtk_signal_connect(GTK_OBJECT(pui->display_alt_plain), "toggled",
+		       GTK_SIGNAL_FUNC(properties_modified_cb), property_box);
+
+
     /* message font */
     gtk_signal_connect(GTK_OBJECT(pui->message_font), "changed",
                        GTK_SIGNAL_FUNC(font_changed), property_box);
@@ -760,6 +768,9 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     balsa_app.recognize_rfc2646_format_flowed =
         GTK_TOGGLE_BUTTON(pui->recognize_rfc2646_format_flowed)->active;
 
+    balsa_app.display_alt_plain =
+	GTK_TOGGLE_BUTTON(pui->display_alt_plain)->active;
+
     balsa_app.open_inbox_upon_startup =
         GTK_TOGGLE_BUTTON(pui->open_inbox_upon_startup)->active;
     balsa_app.check_mail_upon_startup =
@@ -1046,6 +1057,11 @@ set_prefs(void)
                              balsa_app.browse_wrap);
     gtk_widget_set_sensitive(pui->recognize_rfc2646_format_flowed,
                              balsa_app.browse_wrap);
+
+    /* how to treat multipart/alternative */
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+				 (pui->display_alt_plain),
+                                 balsa_app.display_alt_plain);
 
     /* message font */
     gtk_entry_set_text(GTK_ENTRY(pui->message_font),
@@ -1556,6 +1572,7 @@ incoming_page(gpointer data)
     GtkWidget *regex_hbox;
     GtkWidget *regex_label;
     GtkWidget *mdn_frame;
+    GtkWidget *alt_frame;
     GtkWidget *mdn_vbox;
     GtkWidget *mdn_label;
     GtkWidget *mdn_table;
@@ -1656,7 +1673,15 @@ incoming_page(gpointer data)
     gtk_box_pack_start(GTK_BOX(vbox2), pui->recognize_rfc2646_format_flowed,
                                                TRUE, FALSE, 0);
 
-        
+    /* handling of multipart/alternative */
+    alt_frame = gtk_frame_new (_("Display of Multipart/Alternative Parts"));
+    gtk_container_set_border_width (GTK_CONTAINER(alt_frame), 5);
+    gtk_box_pack_start(GTK_BOX(vbox1), alt_frame, FALSE, FALSE, 0);
+
+    pui->display_alt_plain =
+	gtk_check_button_new_with_label(_("prefer text/plain over html"));
+    gtk_container_add (GTK_CONTAINER(alt_frame), pui->display_alt_plain);
+    gtk_container_set_border_width (GTK_CONTAINER(pui->display_alt_plain), 5);
 
     /* How to handle received MDN requests */
     mdn_frame = gtk_frame_new (_("Message Disposition Notification requests"));

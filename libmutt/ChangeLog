@@ -1,3 +1,7 @@
+2003-01-20  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* parse.c: follow rfc2045 closer.
+
 2003-01-03  Carlos Morgado  <chbm@chbm.nu>
 
 	* imap/message.c: 

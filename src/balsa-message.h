@@ -59,7 +59,6 @@ struct _BalsaMessage {
 
 	/* Widget to hold icons */
 	GtkWidget *part_list;
-	gint part_count;
 
 	gboolean wrap_text;
 

@@ -468,6 +468,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 {
     gboolean had_focus;
     gboolean is_new;
+    gint part_count;
 
     g_return_val_if_fail(bm != NULL, FALSE);
 
@@ -487,7 +488,6 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 	libbalsa_message_body_unref(bm->message);
     }
     bm->message = NULL;
-    bm->part_count = 0;
     gnome_icon_list_clear(GNOME_ICON_LIST(bm->part_list));
 
     if (message == NULL) {
@@ -524,7 +524,9 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
      * and no parts are found then mutt produces a message with no parts, even 
      * if there is a single unmarked part (ie a normal email).
      */
-    if (bm->part_count == 0) {
+    part_count =
+        gnome_icon_list_get_num_icons(GNOME_ICON_LIST(bm->part_list));
+    if (part_count == 0) {
 	gtk_widget_hide(bm->part_list);
 
 	/* This is really annoying if you are browsing, since you keep
@@ -545,7 +547,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
      *    there is > 1 part
      * or we don't know how to display the one part.
      */
-    if (bm->part_count > 1) {
+    if (part_count > 1) {
 	gtk_widget_show(bm->part_list);
     } else {
 	BalsaPartInfo *info = (BalsaPartInfo *)
@@ -607,50 +609,27 @@ add_header_gchar(BalsaMessage * bm, const gchar *header, const gchar *label,
     GtkTextBuffer *buffer =
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(bm->header_text));
     GtkTextIter insert;
-    GtkTextTag *tag;
-    gchar *fontname;
+    GtkTextTag *tag = NULL;
     gchar pad[] = "                ";
     gchar cr[] = "\n";
     gchar *line_start, *line_end;
     gchar *wrapped_value;
-#ifdef OLD_HEADER_FONT_CODE
-    const gchar *msgcharset;
-    GdkFont *fnt;
-#endif
     if (!(bm->shown_headers == HEADERS_ALL || 
           libbalsa_find_word(header, balsa_app.selected_headers))) 
 	return;
 
     /* always display the label in the predefined font */
-    if (strcmp(header, "subject") != 0)
-        fontname = balsa_app.message_font;
-    else
-	fontname = balsa_app.subject_font;
-    tag = gtk_text_buffer_create_tag(buffer, NULL,
-                                     "font", fontname,
-                                     NULL);
+    if (strcmp(header, "subject") == 0)
+        tag = gtk_text_buffer_create_tag(buffer, NULL,
+                                         "font", balsa_app.subject_font,
+                                         NULL);
 
     gtk_text_buffer_get_iter_at_mark(buffer, &insert, 
                                      gtk_text_buffer_get_insert(buffer));
-    gtk_text_buffer_insert_with_tags(buffer, &insert, label, -1, 
+    gtk_text_buffer_insert_with_tags(buffer, &insert,
+                                     label, -1, 
                                      tag, NULL);
     
-#ifdef OLD_HEADER_FONT_CODE
-    /* select the font for the value according to the msg charset */
-    if ((msgcharset = libbalsa_message_charset(bm->message))) {
-	if (strcmp(header, "subject") != 0)
-	    fnt = balsa_get_font_by_charset(balsa_app.message_font, 
-					    msgcharset, &fontname);
-	else
-	    fnt = balsa_get_font_by_charset(balsa_app.subject_font,
-					    msgcharset, &fontname);
-        gdk_font_unref(fnt);
-        tag = gtk_text_buffer_create_tag(buffer, NULL,
-                                         "font", fontname,
-                                         NULL);
-        g_free(fontname);
-    }
-#endif	
     if (value && *value != '\0') {
         gint pad_chars = 15 - strlen(label);
 
@@ -2023,7 +2002,6 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body)
     if(!is_multipart ||
        g_strcasecmp(content_type, "multipart/mixed")==0 ||
        g_strcasecmp(content_type, "multipart/alternative")==0) {
-    bm->part_count++;
     info = part_info_new(body, bm->message);
 
 	if (is_multipart) {
@@ -2495,15 +2473,16 @@ preferred_part(LibBalsaMessageBody *parts)
 static gint part_icon_no(BalsaMessage *bm, const LibBalsaMessageBody *body)
 {
     const BalsaPartInfo *info;
-    int part;
+    gint part =
+        gnome_icon_list_get_num_icons(GNOME_ICON_LIST(bm->part_list));
 
-    for(part=0; part<bm->part_count; part++) {
+    while (--part >= 0) {
 	info = (const BalsaPartInfo *) gnome_icon_list_get_icon_data
 	    (GNOME_ICON_LIST(bm->part_list), part);
 	if(info->body==body)
-	    return part;
+	    break;
     }
-    return -1;
+    return part;
 }
 
 
@@ -2581,25 +2560,24 @@ static void
 hide_all_parts(BalsaMessage * bm)
 {
     if (bm->current_part) {
-        gint part;
+        gint part =
+            gnome_icon_list_get_num_icons(GNOME_ICON_LIST(bm->part_list));
 
-        for (part = 0; part < bm->part_count; part++) {
+        while (--part >= 0) {
             BalsaPartInfo *current_part =
                 (BalsaPartInfo *)
                 gnome_icon_list_get_icon_data(GNOME_ICON_LIST
                                               (bm->part_list), part);
 
             if (current_part && current_part->widget
-                && GTK_WIDGET_VISIBLE(current_part->widget)) {
-                if (GTK_IS_TEXT_VIEW(current_part->widget)
-                    && GTK_WIDGET_REALIZED(current_part->widget))
-                gtk_widget_hide(current_part->widget);
+                && current_part->widget->parent) {
                 gtk_container_remove(GTK_CONTAINER(bm->content),
                                      current_part->widget);
             }
-            gnome_icon_list_unselect_icon(GNOME_ICON_LIST(bm->part_list),
-                                          part);
         }
+        gnome_icon_list_unselect_all(GNOME_ICON_LIST(bm->part_list));
+
+        bm->current_part = NULL;
     }
 }
 
@@ -2611,6 +2589,9 @@ static void
 select_part(BalsaMessage * bm, gint part)
 {
     hide_all_parts(bm);
+    gtk_widget_modify_font(bm->header_text,
+                           pango_font_description_from_string
+                           (balsa_app.message_font));
 
     bm->current_part = add_part(bm, part);
 

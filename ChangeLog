@@ -1,6 +1,13 @@
 2002-03-26  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/sendmsg-window.c: font selection in compose window.
+	* src/balsa-message.[hc]:
+	- remove part_count member from BalsaMessage structure;
+	- use gnome_icon_list_get_num_icons() instead to get number of icons;
+	- set message font for header panel, and override only for subject 
+	header;
+	- delete obsolete code that uses charset to convert header text;
+	- fix hide_all_parts() to remove only widgets that are being shown.
 	
 2002-03-24  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 

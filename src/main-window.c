@@ -875,7 +875,7 @@ about_box_destroy_cb ()
 }
 
 
-void
+static void
 mailbox_listener (MailboxWatcherMessage * mw_message)
 {
   MainWindow *mainwindow = (MainWindow *) mw_message->data;

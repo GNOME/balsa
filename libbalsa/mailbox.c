@@ -950,7 +950,11 @@ static void
 lbm_threads_leave(gboolean unlock)
 {
     if (unlock) {
+#if GTK_CHECK_VERSION(2, 4, 0)
+        gdk_display_flush(gdk_display_get_default());
+#else
         gdk_flush();
+#endif
         gdk_threads_leave();
         holding_thread = 0;
     }

@@ -2435,10 +2435,8 @@ bndx_add_message(BalsaIndex * index, LibBalsaMessage * message)
 	    addy = list->data;
 	    append_dots = list->next != NULL;
 	}
-    } else {
-	if (message->from)
-	    addy = message->from;
-    }
+    } else
+        addy = message->from;
     if (addy)
 	name_str = libbalsa_address_get_name(addy);
     if(!name_str)		/* !addy, or addy contained no name/address */

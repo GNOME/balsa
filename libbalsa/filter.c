@@ -153,7 +153,8 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
 	    g_free(str);
             if(match) break;
 	}
-	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_FROM)) {
+	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_FROM)
+            && message->from) {
 	    str=libbalsa_address_to_gchar(message->from,0);
 	    match=in_string_utf8(str,cond->match.string);
 	    g_free(str);
@@ -227,7 +228,8 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
 		    if (match) break;
 		}
 	    }
-	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_FROM)) {
+	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_FROM)
+                && message->from) {
 		str=libbalsa_address_to_gchar(message->from,0);
 		if (str) {
 		    match=REGEXEC(*(regex->compiled),str)==0;

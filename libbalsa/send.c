@@ -652,8 +652,11 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
 	    }
 
 	    /* Add the sender info */
-	    phrase = libbalsa_address_get_phrase(msg->from);
-	    mailbox = libbalsa_address_get_mailbox(msg->from, 0);
+            if (msg->from) {
+	        phrase = libbalsa_address_get_phrase(msg->from);
+	        mailbox = libbalsa_address_get_mailbox(msg->from, 0);
+            } else
+                phrase = mailbox = "";
 	    smtp_set_reverse_path (message, mailbox);
 	    smtp_set_header (message, "From", phrase, mailbox);
 	    if (bcc_message) {
@@ -1267,10 +1270,11 @@ message2HEADER(LibBalsaMessage * message, HEADER * hdr) {
 	} safe_free((void **) &delptr->next);
     }
 
-    tmp = libbalsa_address_to_gchar_p(message->from, 0);
-
-    hdr->env->from = rfc822_parse_adrlist(hdr->env->from, tmp);
-    g_free(tmp);
+    if (message->from) {
+        tmp = libbalsa_address_to_gchar_p(message->from, 0);
+        hdr->env->from = rfc822_parse_adrlist(hdr->env->from, tmp);
+        g_free(tmp);
+    }
 
     if (message->reply_to) {
 	tmp = libbalsa_address_to_gchar_p(message->reply_to, 0);

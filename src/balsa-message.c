@@ -793,11 +793,13 @@ static gint
 balsa_message_scan_signatures(LibBalsaMessageBody *body, LibBalsaMessage * message)
 {
     gint result = LIBBALSA_MESSAGE_SIGNATURE_UNKNOWN;
+    gchar *sender = message->from
+        ? libbalsa_address_to_gchar(message->from, -1)
+        : g_strdup(_("(No sender)"));
+    gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
 
     for (; body; body = body->next) {
 	gint signres = libbalsa_is_pgp_signed(body);
-	gchar *sender = libbalsa_address_to_gchar(message->from, -1);
-	gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
 	
 	libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
 			       balsa_app.convert_unknown_8bit_codeset, NULL);
@@ -844,8 +846,6 @@ balsa_message_scan_signatures(LibBalsaMessageBody *body, LibBalsaMessage * messa
 				 _("The message sent by %s with subject \"%s\" contains a \"multipart/signed\" part, but it's structure is invalid. The signature, if there is any, can not be checked."),
 				 sender, subject);
 	}	    
-	g_free(subject);
-	g_free(sender);
 
 	/* scan embedded messages */
 	if (body->parts) {
@@ -857,6 +857,9 @@ balsa_message_scan_signatures(LibBalsaMessageBody *body, LibBalsaMessage * messa
 		result = sub_result;
 	}
     }
+
+    g_free(subject);
+    g_free(sender);
 
     return result;
 }
@@ -934,7 +937,9 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 	    message->body_list->parts =
 		libbalsa_body_decrypt(message->body_list->parts, NULL);
 	else if (encrres < 0) {
-	    gchar *sender = libbalsa_address_to_gchar(message->from, -1);
+	    gchar *sender = message->from
+                ? libbalsa_address_to_gchar(message->from, -1)
+                : g_strdup(_("(No sender)"));
 	    gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
 	
 	    libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
@@ -1985,7 +1990,9 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 
         if (!libbalsa_utf8_sanitize(&ptr, balsa_app.convert_unknown_8bit,
 				    balsa_app.convert_unknown_8bit_codeset, &target_cs)) {
-	    gchar *from = libbalsa_address_to_gchar(bm->message->from, 0);
+	    gchar *from = bm->message->from
+                ? libbalsa_address_to_gchar(bm->message->from, 0)
+                : g_strdup(_("(No sender)"));
 	    gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));
 	
 	    libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
@@ -2029,8 +2036,9 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 					   BALSA_PIXMAP_INFO_SIGN_GOOD,
 					   GTK_ICON_SIZE_MENU, NULL);
 	    } else if (sig_res != GPGME_SIG_STAT_NONE) {
-		gchar *sender = 
-		    libbalsa_address_to_gchar(bm->message->from, -1);
+		gchar *sender = bm->message->from 
+                    ? libbalsa_address_to_gchar(bm->message->from, -1)
+                    : g_strdup(_("(No sender)"));
 		gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));
 	
 		libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 

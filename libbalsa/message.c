@@ -1343,10 +1343,13 @@ libbalsa_message_title(LibBalsaMessage * message, const gchar * format)
 
         switch (c) {
         case 'f':
-            tmp = g_strdup(libbalsa_address_get_mailbox(message->from, 0));
+            tmp = g_strdup(message->from ?
+                           libbalsa_address_get_mailbox(message->from, 0)
+                           : "");
             break;
         case 'F':
-            tmp = libbalsa_address_to_gchar(message->from, 0);
+            tmp = message->from ?
+                  libbalsa_address_to_gchar(message->from, 0) : g_strdup("");
             break;
         case 's':
             tmp = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));

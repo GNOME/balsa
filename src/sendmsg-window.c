@@ -2185,16 +2185,19 @@ quoteBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message, SendType type)
 
     libbalsa_message_body_ref(message, TRUE);
 
-    if (!(orig_address = libbalsa_address_get_name(message->from)))
-	personStr = g_strdup(_("you"));
-    else {
-	personStr = g_strdup(orig_address);
-	libbalsa_utf8_sanitize(&personStr, balsa_app.convert_unknown_8bit,
-			       balsa_app.convert_unknown_8bit_codeset, NULL);
-    }
-	
+    if (message->from && (orig_address =
+                          libbalsa_address_get_name(message->from))) {
+        personStr = g_strdup(orig_address);
+        libbalsa_utf8_sanitize(&personStr,
+                               balsa_app.convert_unknown_8bit,
+                               balsa_app.convert_unknown_8bit_codeset,
+                               NULL);
+    } else
+        personStr = g_strdup(_("you"));
+
     if (message->date)
-	date = libbalsa_message_date_to_gchar(message, balsa_app.date_string);
+        date = libbalsa_message_date_to_gchar(message,
+                                              balsa_app.date_string);
 
     if (type == SEND_FORWARD_ATTACH) {
 	gchar *subject;
@@ -2808,15 +2811,17 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 
     /* To: */
     if (type == SEND_REPLY || type == SEND_REPLY_ALL) {
-	LibBalsaAddress *addr = NULL;
+        LibBalsaAddress *addr =
+            (message->reply_to) ? message->reply_to : message->from;
 
-	addr = (message->reply_to) ? message->reply_to : message->from;
-
-	tmp = libbalsa_address_to_gchar(addr, 0);
- 	libbalsa_utf8_sanitize(&tmp, balsa_app.convert_unknown_8bit,
- 			       balsa_app.convert_unknown_8bit_codeset, NULL);
-	gtk_entry_set_text(GTK_ENTRY(bsmsg->to[1]), tmp);
-	g_free(tmp);
+        if (addr) {
+            tmp = libbalsa_address_to_gchar(addr, 0);
+            libbalsa_utf8_sanitize(&tmp, balsa_app.convert_unknown_8bit,
+                                   balsa_app.convert_unknown_8bit_codeset,
+                                   NULL);
+            gtk_entry_set_text(GTK_ENTRY(bsmsg->to[1]), tmp);
+            g_free(tmp);
+        }
     } else if ( type == SEND_REPLY_GROUP ) {
         set_list_post_address(bsmsg);
     }
@@ -3311,15 +3316,17 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 	strftime(recvtime, sizeof(recvtime),
 		 "%a, %b %d, %Y at %H:%M:%S %z", footime);
 
-	if (bsmsg->orig_message->message_id) {
-	  message->references = g_list_prepend(
-	    message->references, g_strdup(bsmsg->orig_message->message_id));
-	    message->in_reply_to =
-		g_strconcat(bsmsg->orig_message->message_id, "; from ",
-			    (gchar *) bsmsg->orig_message->
-			    from->address_list->data, " on ", recvtime,
-			    NULL);
-	}
+        if (bsmsg->orig_message->message_id) {
+            message->references =
+                g_list_prepend(message->references,
+                               g_strdup(bsmsg->orig_message->message_id));
+            message->in_reply_to =
+                bsmsg->orig_message->from
+                ? g_strconcat(bsmsg->orig_message->message_id, "; from ",
+                              bsmsg->orig_message->from->address_list->data,
+                              " on ", recvtime, NULL)
+                : g_strdup(bsmsg->orig_message->message_id);
+        }
     }
 
     body = libbalsa_message_body_new(message);

@@ -1,3 +1,8 @@
+2003-03-20  Carlos Morgado  <chbm chbm.nu>
+
+	* imap/utf7.c:  fix exploitable buffer overflow
+	http://marc.theaimsgroup.com/?l=mutt-dev&m=104811170330897&w=2
+
 2003-03-18  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	* protos.h, sendlib.c: add forced multipart subtype.

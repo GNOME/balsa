@@ -1,3 +1,13 @@
+2004-09-21  Pawel Salek
+
+	* doc/C/balsa.xml: identity doc update from Craig Routledge.
+	* libbalsa/mailbox_imap.c: handle smoothely imaps servers
+	disconnecting on every FETCH response (yes, they exists!).
+	* libbalsa/message.c: set the charset correctly for embedded
+	messages fetched from imap.
+	* libbalsa/imap/imap-commands.c: send exist-notify on failed re-select.
+	* src/print.c: signature printing from Albrecht Dreß.
+
 2004-09-16  Pawel Salek
 
 	* libbalsa/imap/imap-commands.c: Improve heuristics in fetching HEADER.

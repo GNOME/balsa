@@ -137,7 +137,8 @@ struct _CommonInfo {
     GObject *parent_object;
 };
 
-typedef void (*prepare_func_t)(PrintInfo * pi, LibBalsaMessageBody * body);
+typedef void (*prepare_func_t)(PrintInfo * pi, LibBalsaMessageBody * body,
+			       gpointer data);
 
 typedef struct _mime_action_t {
     gchar *mime_type;
@@ -508,7 +509,7 @@ prepare_message_header(PrintInfo * pi, LibBalsaMessageBody * body)
 }
 
 static void
-prepare_embedded_header(PrintInfo * pi, LibBalsaMessageBody * body)
+prepare_embedded_header(PrintInfo * pi, LibBalsaMessageBody * body, gpointer data)
 {
     HeaderInfo *pdata;
 
@@ -590,7 +591,7 @@ typedef struct _SeparatorInfo {
 } SeparatorInfo;
 
 static void
-prepare_separator(PrintInfo * pi, LibBalsaMessageBody * body)
+prepare_separator(PrintInfo * pi, LibBalsaMessageBody * body, gpointer data)
 {
     SeparatorInfo *pdata;
     gdouble font_size = gnome_font_get_size(pi->header_font);
@@ -638,10 +639,10 @@ typedef struct _HtmlInfo {
     GtkWidget *html;
 } HtmlInfo;
 
-static void prepare_default(PrintInfo * pi, LibBalsaMessageBody * body);
+static void prepare_default(PrintInfo * pi, LibBalsaMessageBody * body, gpointer data);
 
 static void
-prepare_html(PrintInfo * pi, LibBalsaMessageBody * body)
+prepare_html(PrintInfo * pi, LibBalsaMessageBody * body, gpointer data)
 {
     GtkWidget *dialog;
     gint response;
@@ -656,7 +657,7 @@ prepare_html(PrintInfo * pi, LibBalsaMessageBody * body)
     g_free(conttype);
 
     if (!libbalsa_html_can_print() || !html_type) {
-	prepare_default(pi, body);
+	prepare_default(pi, body, data);
 	return;
     }
 
@@ -669,7 +670,7 @@ prepare_html(PrintInfo * pi, LibBalsaMessageBody * body)
     response = gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
     if (response != GTK_RESPONSE_YES) {
-	prepare_default(pi, body);
+	prepare_default(pi, body, data);
 	return;
     }
 
@@ -856,7 +857,7 @@ print_wrap_body(gchar * str, GnomeFont * font, gint width, gint tab_width)
 }
 
 static void
-prepare_plaintext(PrintInfo * pi, LibBalsaMessageBody * body)
+prepare_plaintext(PrintInfo * pi, LibBalsaMessageBody * body, gpointer data)
 {
     PlainTextInfo *pdata;
     gdouble font_size;
@@ -956,7 +957,7 @@ typedef struct _DefaultInfo {
 } DefaultInfo;
 
 static void
-prepare_default(PrintInfo * pi, LibBalsaMessageBody * body)
+prepare_default(PrintInfo * pi, LibBalsaMessageBody * body, gpointer data)
 {
     DefaultInfo *pdata;
     gchar *icon_name, *conttype;
@@ -1094,7 +1095,7 @@ typedef struct _ImageInfo {
 } ImageInfo;
 
 static void
-prepare_image(PrintInfo * pi, LibBalsaMessageBody * body)
+prepare_image(PrintInfo * pi, LibBalsaMessageBody * body, gpointer data)
 {
     ImageInfo * pdata;
     GError *err = NULL;
@@ -1109,7 +1110,7 @@ prepare_image(PrintInfo * pi, LibBalsaMessageBody * body)
     /* fall back to default if the pixbuf could no be loaded */
     if (!pdata->pixbuf) {
 	g_free(pdata);
-	prepare_default(pi, body);
+	prepare_default(pi, body, data);
 	return;
     }
 
@@ -1163,7 +1164,7 @@ print_image(PrintInfo * pi, gpointer * data)
  * ~~~ print a gpg signature info (like plain text, but with header font) ~~~
  */
 static void
-prepare_crypto_signature(PrintInfo * pi, LibBalsaMessageBody * body)
+prepare_crypto_signature(PrintInfo * pi, LibBalsaMessageBody * body, gpointer data)
 {
     PlainTextInfo *pdata;
     gdouble font_size;
@@ -1172,7 +1173,7 @@ prepare_crypto_signature(PrintInfo * pi, LibBalsaMessageBody * body)
 
     /* check if there is a sig_info and prepare as unknown if not */
     if (!body->sig_info) {
-	prepare_default(pi, body);
+	prepare_default(pi, body, data);
 	return;
     }
 
@@ -1182,6 +1183,11 @@ prepare_crypto_signature(PrintInfo * pi, LibBalsaMessageBody * body)
     /* create a buffer with the signature info */
     textbuf =
 	libbalsa_signature_info_to_gchar(body->sig_info, balsa_app.date_string);
+    if (data) {
+	gchar * newbuf = g_strconcat("\n", (gchar *)data, "\n", textbuf, NULL);
+	g_free(textbuf);
+	textbuf = newbuf;
+    }
 
     /* wrap lines (if necessary) */
     pdata->textlines = 
@@ -1273,18 +1279,30 @@ scan_body(PrintInfo * pi, LibBalsaMessageBody * body)
 	
 	for (action = mime_actions; 
 	     action->mime_type && 
-		 strncmp(action->mime_type, conttype,
-			 strlen(action->mime_type));
+		 g_ascii_strncasecmp(action->mime_type, conttype,
+				     strlen(action->mime_type));
 	     action++);
-	g_free(conttype);
 
 	if (action->prepare_func) {
-	    prepare_separator(pi, body);
-	    action->prepare_func(pi, body);
+	    prepare_separator(pi, body, NULL);
+	    action->prepare_func(pi, body, NULL);
 	}
 
 	if (body->parts)
 	    scan_body(pi, body->parts);
+
+#ifdef HAVE_GPGME
+	if (body->sig_info &&
+	    g_ascii_strcasecmp(conttype, "application/pgp-signature") &&
+	    g_ascii_strcasecmp(conttype, "application/pkcs7-signature")) {
+	    gchar * header =
+		g_strdup_printf(_("This is an inline OpenPGP signed %s message part:"),
+				conttype);
+	    prepare_crypto_signature(pi, body, header);
+	    g_free(header);
+	}
+#endif
+	g_free(conttype);
 
 	body = body->next;
     }

@@ -851,6 +851,30 @@ This is version 2.719 of the Balsa manual.
 	  window to change the settings of &Balsa;.
 	</para>
       </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Settings</guimenu>
+	    <guimenuitem>Toolbars...</guimenuitem>
+	  </menuchoice> &mdash;
+	  
+	  Open the <link linkend="toolbar-prefs">Toolbars</link>
+     window to modify the content and arrangement of the toolbars in &Balsa;.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Settings</guimenu>
+	    <guimenuitem>Identities...</guimenuitem>
+	  </menuchoice> &mdash;
+	  
+	  Open the <link linkend="identities">Identities</link>
+     window to customize how you present yourself to the rest of the world.
+	</para>
+      </listitem>
     </itemizedlist>
   </listitem>
 </varlistentry>
@@ -3078,7 +3102,16 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
 
 <variablelist>
   <varlistentry>
-    <term><guilabel>Your Name</guilabel></term>
+    <term><guilabel>Identity Name</guilabel></term>
+    <listitem>
+      <para>
+        A unique title by which this identity will be named within &Balsa;.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guilabel>Full Name</guilabel></term>
     <listitem>
       <para>
         This doesn't <emphasis>have</emphasis> to be your name, I
@@ -3089,7 +3122,7 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
   </varlistentry>
 	
   <varlistentry>
-    <term><guilabel>E-Mail address</guilabel></term>
+    <term><guilabel>Mailing Address</guilabel></term>
     <listitem>
       <para>
         As you wish it to appear in your &quot;From&quot; header.
@@ -3102,13 +3135,13 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
     <listitem>
       <para>
         The address that you wish people to reply to your email with
-	(if you have a home and a work address, for instance).
+        (if you have a home and a work address, for instance).
       </para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
-    <term><guilabel>Default domain</guilabel></term>
+    <term><guilabel>Default Domain</guilabel></term>
     <listitem>
       <para>
         The domain that you wish to append to all e-mail entries where
@@ -3121,99 +3154,128 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
   </varlistentry>
 
   <varlistentry>
-  <term><guilabel>Use Signature File When</guilabel></term>
-  <listitem>
-    <variablelist>
-      <varlistentry>
-	<term><guilabel>Sending Mail</guilabel></term>
-	<listitem>
-	  <para>
-            Include the signature file when sending email.
-          </para>
-	</listitem>
-      </varlistentry>
+    <term><guilabel>Bcc</guilabel></term>
+    <listitem>
+      <para>
+        The default value for the blind-carbon-copy field when using
+        this identity.  Useful if you want to always send a copy of
+        outgoing mail to another account.
+      </para>
+    </listitem>
+  </varlistentry>
 
-      <varlistentry>
-	<term><guilabel>Replying to Mail</guilabel></term>
-	<listitem>
-	  <para>
-            Include the signature file when replying to mail.
-          </para>
-	</listitem>
-      </varlistentry>
+  <varlistentry>
+    <term><guilabel>Reply String</guilabel></term>
+    <listitem>
+      <para>
+        The prefix for the subject line when replying to a message.
+      </para>
+    </listitem>
+  </varlistentry>
 
-      <varlistentry>
-	<term><guilabel>Forwarding Mail</guilabel></term>
-	<listitem>
-	  <para>
-            Include the signature file when forwarding mail.
-          </para>
-	</listitem>
-      </varlistentry>
-    </variablelist>
-  </listitem>
-</varlistentry>
+  <varlistentry>
+    <term><guilabel>Forward String</guilabel></term>
+    <listitem>
+      <para>
+        The prefix for the subject line when forwarding a message.
+      </para>
+    </listitem>
+  </varlistentry>
 
-<varlistentry>
-  <term><guilabel>Signature file</guilabel></term>
-  <listitem>
-    <para>
-      The text to append to all your messages. This text can come from
-      one of three places:
+  <varlistentry>
+    <term><guilabel>Signature Path</guilabel></term>
+    <listitem>
+      <para>
+        The file containing the signature to append to all your messages.
+        This can be generated in one of three ways:
+      </para>
+       <itemizedlist>
+         <listitem>
+           <para>
+             From a regular file.  List the path to any regular file,
+             and the text from that file will be appended to your
+             messages.
+           </para>
+         </listitem>
 
-     <itemizedlist>
-       <listitem>
-         <para>
-           From a regular file.  List the path to any regular file,
-           and the text from that file will be appended to your
-           messages.
-         </para>
-       </listitem>
+         <listitem>
+           <para>
+             A named pipe or FIFO.  In this case, to Balsa, the file
+             looks normal, but in reality, it is a pipe to a program
+             that is generating the content.  List the path to the pipe.
+           </para>
+         </listitem>
 
-       <listitem>
-         <para>
-           A named pipe or FIFO.  In this case, to Balsa, the file
-           looks normal, but in reality, it is a pipe to a program
-           that is generating the content.  List the path to the pipe.
-         </para>
-       </listitem>
+         <listitem>
+           <para>
+             An executable program. Balsa will execute the program and
+             read its output, appending that text to the message.  List
+             the path to the program with a "|" prepended to it.  For
+             example:
+           </para>
+           <para><quote>|/home/user/dynsig.pl</quote></para>
+         </listitem>
+      </itemizedlist>
+    </listitem>
+  </varlistentry>
 
-       <listitem>
-         <para>
-           An executable program. Balsa will execute the program and
-           read its output, appending that text to the message.  List
-           the path to the program with a "|" prepended to it.  For
-           example:
-         </para>
-         <para><quote>|/home/user/dynsig.pl</quote></para>
-       </listitem>
-     </itemizedlist>
-   </para>
+  <varlistentry>
+  <term><guilabel>Execute Signature</guilabel></term>
+    <listitem>
+	   <para>
+        Execute the instructions in the signature file and use the results
+        as the signature to append to outgoing mail.  Select this when
+        generating the signature from an executable program as outlined above
+        in Signature Path.
+      </para>
+    </listitem>
+  </varlistentry>
 
-   <para>
-     You also get to control when the signature is appended.
-   </para>
-  </listitem>
-</varlistentry>
+  <varlistentry>
+  <term><guilabel>Include Signature</guilabel></term>
+    <listitem>
+	   <para>
+        Append the signature to the end of all outgoing mail.
+      </para>
+    </listitem>
+  </varlistentry>
 
-<varlistentry>
-  <term><guilabel>Reply Prefix</guilabel></term>
-  <listitem>
-    <para>
-      The character sequence to prefix quoted lines in a reply with.
-    </para>
-  </listitem>
-</varlistentry>
+  <varlistentry>
+  <term><guilabel>Include Signature When Forwarding</guilabel></term>
+    <listitem>
+	   <para>
+        Add the signature when forwarding an existing mail.
+      </para>
+    </listitem>
+  </varlistentry>
 
-<varlistentry>
-  <term><guilabel>Enable Signature Separator</guilabel></term>
-  <listitem>
-    <para>
-      When checked, this has &Balsa; insert the standard signature
-      separator before your signature.
-    </para>
-  </listitem>
-</varlistentry>
+  <varlistentry>
+  <term><guilabel>Include Signature When Replying</guilabel></term>
+    <listitem>
+	   <para>
+        Add the signature when replying to a existing message.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+  <term><guilabel>Add Signature Separator</guilabel></term>
+    <listitem>
+	   <para>
+        When checked, this has &Balsa; insert the standard signature
+        separator before your signature.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+  <term><guilabel>Prepend Signature</guilabel></term>
+    <listitem>
+	   <para>
+        Add the signature before the message text, rather than after it.
+      </para>
+    </listitem>
+  </varlistentry>
 </variablelist>
 
 </sect1>

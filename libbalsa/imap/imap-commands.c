@@ -273,6 +273,7 @@ imap_mbox_select(ImapMboxHandle* handle, const char *mbox,
   } else { /* remove even traces of untagged responses */
     imap_mbox_resize_cache(handle, 0);
     mbox_view_dispose(&handle->mbox_view);
+    g_signal_emit_by_name(G_OBJECT(handle), "exists-notify");
   }
   return rc;
 }

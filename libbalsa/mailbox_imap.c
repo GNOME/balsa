@@ -493,7 +493,8 @@ clean_cache(LibBalsaMailbox* mailbox)
    login information... */
 #define II(rc,h,line) \
    {int trials=2;do{\
-    if(imap_mbox_is_disconnected(h)) imap_mbox_handle_reconnect(h, NULL);\
+    if(imap_mbox_is_disconnected(h)&&\
+       imap_mbox_handle_reconnect(h, NULL)!=IMAP_SUCCESS){rc=IMR_NO;break;};\
     rc=line; \
     if(rc==IMR_SEVERED) \
     libbalsa_information(LIBBALSA_INFORMATION_WARNING, \
@@ -696,8 +697,24 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
 
     mimap->sort_field = -1;	/* Invalidate. */
-    if(cnt<mimap->messages_info->len) { /* remove messages */
-        printf("%s: expunge ignored?\n", __func__);
+    if(cnt<mimap->messages_info->len) {
+        /* remove messages; we probably missed some EXPUNGE responses
+           - the only sensible scenario is that the connection was
+           severed. Still, we need to recover from this somehow... -
+           be aware, w are just guessing. In principle, we should
+           invalidate all the cache now. */
+        printf("%s: expunge ignored? Had %u messages and now only %u. "
+               "Bug in the program or broken connection\n",
+               __func__, mimap->messages_info->len, cnt);
+        while(cnt<mimap->messages_info->len) {
+            unsigned seqno = mimap->messages_info->len;
+            struct message_info *msg_info =
+                message_info_from_msgno(mimap, seqno);
+                if(msg_info->message)
+                g_object_unref(msg_info->message);
+            g_array_remove_index(mimap->messages_info, seqno-1);
+        }
+        ++mimap->search_stamp;
     } else if (cnt > mimap->messages_info->len) { /* new messages arrived */
         unsigned i;
 	struct message_info a = {0};

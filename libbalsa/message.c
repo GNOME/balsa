@@ -256,6 +256,9 @@ libbalsa_message_body_charset(LibBalsaMessageBody * body)
 {
     const gchar *charset = NULL;
 
+    if (body->charset) /* This overrides all! Important for non
+                        * us-ascii messages over IMAP. */
+        return body->charset;
     if (body->mime_part) {
 	if (GMIME_IS_MULTIPART(body->mime_part))
 	    g_mime_multipart_foreach(GMIME_MULTIPART(body->mime_part),

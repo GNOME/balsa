@@ -108,10 +108,9 @@ GtkWidget *balsa_mailbox_list_window_new(BalsaWindow *window)
   gtk_clist_set_row_height (GTK_CLIST (mblw->ctree), 16);
 
   gtk_widget_show(GTK_WIDGET(mblw->ctree));
-#ifdef BALSA_SHOW_INFO
+
   /* set the "show_content_info" property and redraw the mailbox list */
   gtk_object_set(GTK_OBJECT (mblw->ctree), "show_content_info", balsa_app.mblist_show_mb_content_info, NULL);
-#endif
 
   height = GTK_CLIST (mblw->ctree)->rows * GTK_CLIST (mblw->ctree)->row_height;
 
@@ -198,11 +197,10 @@ mblist_open_mailbox (LibBalsaMailbox * mailbox)
 
   balsa_window_set_cursor(BALSA_WINDOW(mblw->window), NULL);
     
-#ifdef BALSA_SHOW_INFO
   if (balsa_app.mblist->display_content_info){
     balsa_mblist_update_mailbox (balsa_app.mblist, mailbox);
   }
-#endif
+
   balsa_mblist_have_new (BALSA_MBLIST(mblw->ctree));
 }
 

@@ -121,7 +121,8 @@ static GnomeUIInfo main_toolbar[] =
   GNOMEUIINFO_ITEM_STOCK (N_ ("Postpone"), N_ ("Continue this message later"),
 			  postpone_message_cb, GNOME_STOCK_PIXMAP_SAVE),
   GNOMEUIINFO_SEPARATOR,
-#ifdef BALSA_SHOW_INFO
+/* FIXME: Implement spellcheck ;-) */
+#if 0
   GNOMEUIINFO_ITEM_STOCK (N_ ("Spelling"), N_ ("Check Spelling"), 
 			  NULL, GNOME_STOCK_PIXMAP_SPELLCHECK),
   GNOMEUIINFO_SEPARATOR,

@@ -35,10 +35,8 @@ struct _BalsaMBList
           GList *watched_mailbox; 
           /* store the style of unread mailboxes */
           GtkStyle *unread_mailbox_style; 
-#ifdef BALSA_SHOW_INFO
           /* shall the number of messages be displayed ? */
           gboolean display_content_info; 
-#endif
 
 #ifdef BALSA_USE_THREADS
           /* list of mailboxes for the updating thread */

@@ -16,7 +16,6 @@
 #undef BALSA_REVISION
 #undef BALSA_VERSION
 #undef BALSA_SHOW_ALL
-#undef BALSA_SHOW_INFO
 #undef PACKAGE
 #undef VERSION
 

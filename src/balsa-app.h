@@ -48,11 +48,10 @@
 
 /* default width settings for the mailbox list columns, not fully utilized yet */
 #define MBNAME_DEFAULT_WIDTH 80
-#ifdef BALSA_SHOW_INFO
+
 #define NEWMSGCOUNT_DEFAULT_WIDTH 45
 #define TOTALMSGCOUNT_DEFAULT_WIDTH 45
 #define INFO_FIELD_LENGTH 10
-#endif
 
 /* Default colour for mailboxes with unread messages */
 #define MBLIST_UNREAD_COLOR_RED 0
@@ -162,11 +161,9 @@ extern struct BalsaApplication
 
 /* Column width settings for mailbox list window, not fully implemented yet */
   gint mblist_name_width;
-#ifdef BALSA_SHOW_INFO
   gboolean mblist_show_mb_content_info;
   gint mblist_newmsg_width;
   gint mblist_totalmsg_width;
-#endif
 
 
   /* Colour of mailboxes with unread messages in mailbox list */

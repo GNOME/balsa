@@ -889,7 +889,6 @@ config_global_load (void)
   else
     balsa_app.mblist_name_width = atoi(field);
   
-#ifdef BALSA_SHOW_INFO
   if ((field = pl_dict_get_str (globals, "MBListNewMsgWidth")) == NULL)
     balsa_app.mblist_newmsg_width = NEWMSGCOUNT_DEFAULT_WIDTH;
   else
@@ -905,7 +904,7 @@ config_global_load (void)
     balsa_app.mblist_show_mb_content_info = TRUE;
   else
     balsa_app.mblist_show_mb_content_info = atoi (field);
-#endif
+
   /* debugging enabled */
   if ((field = pl_dict_get_str (globals, "Debug")) == NULL)
     balsa_app.debug = FALSE;
@@ -1201,7 +1200,6 @@ config_global_save (void)
     snprintf (tmp, sizeof(tmp), "%d", balsa_app.mblist_name_width);
     pl_dict_add_str_str (globals, "MBListNameWidth", tmp);
 
-#ifdef BALSA_SHOW_INFO
     snprintf (tmp, sizeof(tmp), "%d", balsa_app.mblist_newmsg_width);
     pl_dict_add_str_str (globals, "MBListNewMsgWidth", tmp);
 
@@ -1210,7 +1208,7 @@ config_global_save (void)
 
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.mblist_show_mb_content_info);
     pl_dict_add_str_str (globals, "ShowMailboxContentInfo", tmp);
-#endif
+
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.mw_width);
     pl_dict_add_str_str (globals, "MainWindowWidth", tmp);
 

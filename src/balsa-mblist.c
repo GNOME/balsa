@@ -87,9 +87,7 @@ static void balsa_mblist_folder_style (GtkCTree* ctree, GtkCTreeNode* node, gpoi
 GdkFont* balsa_widget_get_bold_font (GtkWidget* widget);
 static void balsa_mblist_set_style (BalsaMBList* mblist);
 
-#ifdef BALSA_SHOW_INFO
 static gint numeric_compare (GtkCList * clist, gconstpointer ptr1, gconstpointer ptr2);
-#endif
 static gint mblist_mbnode_compare (gconstpointer a, gconstpointer b);
 
 guint
@@ -177,7 +175,6 @@ balsa_mblist_class_init (BalsaMBListClass * klass)
 static void
 balsa_mblist_set_arg (GtkObject * object, GtkArg * arg, guint arg_id)
 {
-#ifdef BALSA_SHOW_INFO
   BalsaMBList *bmbl;
 
   bmbl = BALSA_MBLIST (object);
@@ -193,13 +190,11 @@ balsa_mblist_set_arg (GtkObject * object, GtkArg * arg, guint arg_id)
   default:
     break;
   }
-#endif
 }
 
 static void
 balsa_mblist_get_arg (GtkObject * object, GtkArg * arg, guint arg_id)
 {
-#ifdef BALSA_SHOW_INFO
   BalsaMBList *bmbl;
 
   bmbl = BALSA_MBLIST (object);
@@ -215,7 +210,6 @@ balsa_mblist_get_arg (GtkObject * object, GtkArg * arg, guint arg_id)
     break;
     
   }
-#endif
 }
 
 /* Set up the mail box list, including the tree's appearance and the callbacks */
@@ -232,16 +226,11 @@ balsa_mblist_init (BalsaMBList * tree)
 #ifdef BALSA_USE_THREADS
   tree->update_list = NULL;
 #endif
-#ifdef BALSA_SHOW_INFO
   gtk_ctree_construct (GTK_CTREE (tree), 3, 0, titles);
-#else
-  gtk_ctree_construct (GTK_CTREE (tree), 1, 0, titles);
-#endif
-#ifdef BALSA_SHOW_INFO
+
   if (tree->display_content_info)
     gtk_clist_column_titles_show (GTK_CLIST (tree));
   else
-#endif
     /* we want this on by default */
     gtk_clist_column_titles_hide (GTK_CLIST (tree));
 
@@ -255,7 +244,6 @@ balsa_mblist_init (BalsaMBList * tree)
   gtk_clist_set_row_height (GTK_CLIST (tree), 16);
   gtk_clist_set_column_width (GTK_CLIST (tree), 0, balsa_app.mblist_name_width);
 
-#ifdef BALSA_SHOW_INFO
   gtk_clist_set_column_width (GTK_CLIST (tree), 1, 
                               balsa_app.mblist_newmsg_width);
   gtk_clist_set_column_justification (GTK_CLIST (tree), 1, GTK_JUSTIFY_RIGHT);
@@ -274,8 +262,6 @@ balsa_mblist_init (BalsaMBList * tree)
     gtk_clist_set_column_visibility (GTK_CLIST (tree), 2, FALSE);
   }
   
-#endif
-
   gtk_signal_connect (GTK_OBJECT (tree), "tree_select_row",
 		      GTK_SIGNAL_FUNC (select_mailbox),
 		      (gpointer) NULL);
@@ -315,19 +301,13 @@ balsa_mblist_insert_mailbox (BalsaMBList * mblist,
 {
   GtkCTreeNode *ctnode;
   MailboxNode *mbnode;
-#ifdef BALSA_SHOW_INFO
   gchar* text[3];
-#else
-  gchar* text[1];
-#endif /* BALSA_SHOW_INFO */
   
   g_return_if_fail( mailbox != NULL );
 
   text[0] = mailbox->name;
-#ifdef BALSA_SHOW_INFO
   text[1] = "";
   text[2] = "";
-#endif
 
   gtk_signal_connect(GTK_OBJECT(mailbox), "set-unread-messages-flag", 
 		     GTK_SIGNAL_FUNC(balsa_mblist_unread_messages_changed_cb), 
@@ -383,7 +363,6 @@ void balsa_mblist_redraw (BalsaMBList * bmbl)
   gtk_clist_freeze (GTK_CLIST (ctree));
   gtk_clist_clear (GTK_CLIST (ctree));
   
-#ifdef BALSA_SHOW_INFO
   if (bmbl->display_content_info)
   {
     gtk_clist_column_titles_show (GTK_CLIST (ctree));
@@ -396,7 +375,6 @@ void balsa_mblist_redraw (BalsaMBList * bmbl)
     gtk_clist_set_column_visibility (GTK_CLIST (ctree), 1, FALSE);
     gtk_clist_set_column_visibility (GTK_CLIST (ctree), 2, FALSE);
   }
-#endif
 
   balsa_mblist_insert_mailbox (bmbl, balsa_app.inbox, BALSA_ICON_INBOX);
   balsa_mblist_insert_mailbox (bmbl, balsa_app.outbox, BALSA_ICON_OUTBOX);
@@ -622,14 +600,12 @@ balsa_mblist_column_resize (GtkCList * clist, gint column,
   case 0:
     balsa_app.mblist_name_width = size;
     break;
-#ifdef BALSA_SHOW_INFO
   case 1:
     balsa_app.mblist_newmsg_width = size;
     break;
   case 2:
     balsa_app.mblist_totalmsg_width = size;
     break;
-#endif
   default:
     if (balsa_app.debug)
       fprintf (stderr, "** Error: Unknown column resize\n");
@@ -646,7 +622,6 @@ static void
 balsa_mblist_column_click (GtkCList * clist, gint column, 
                            gpointer data)
 {
-#ifdef BALSA_SHOW_INFO
   if (clist->sort_column == column){
     if (clist->sort_type == GTK_SORT_DESCENDING){
       gtk_clist_set_sort_type (clist, GTK_SORT_ASCENDING);
@@ -665,7 +640,6 @@ balsa_mblist_column_click (GtkCList * clist, gint column,
   }
   
   gtk_ctree_sort_recursive (GTK_CTREE (data), NULL);
-#endif
 }
 
 /* balsa_mblist_set_style [MBG]
@@ -806,9 +780,7 @@ balsa_mblist_mailbox_style (GtkCTree * ctree, GtkCTreeNode *node, MailboxNode *m
   GtkStyle* style;
   BalsaIconName icon;
   gboolean tmp_is_leaf, tmp_expanded;
-#ifdef BALSA_SHOW_INFO
   gchar *text;
-#endif
   
   if (node == NULL)
     return;
@@ -839,7 +811,6 @@ balsa_mblist_mailbox_style (GtkCTree * ctree, GtkCTreeNode *node, MailboxNode *m
     mbnode->style |= MBNODE_STYLE_ICONFULL;
     
 
-#ifdef BALSA_SHOW_INFO
     /* If we have a count of the unread messages, and we are showing
        * columns, put the number in the unread column */
     if (mblist->display_content_info && mailbox->unread_messages > 0 ) {
@@ -849,7 +820,6 @@ balsa_mblist_mailbox_style (GtkCTree * ctree, GtkCTreeNode *node, MailboxNode *m
 
       mbnode->style |= MBNODE_STYLE_UNREAD_MESSAGES;
     }
-#endif
     
   } else {
     /* If the clist entry currently has the unread messages icon, set
@@ -883,17 +853,14 @@ balsa_mblist_mailbox_style (GtkCTree * ctree, GtkCTreeNode *node, MailboxNode *m
       mbnode->style &= ~MBNODE_STYLE_ICONFULL;
     }
 
-#ifdef BALSA_SHOW_INFO
     /* If we're showing unread column info, get rid of whatever's
      * there Also set the flag */
     if (mblist->display_content_info){
             gtk_ctree_node_set_text (ctree, node, 1, "");
             mbnode->style &= ~MBNODE_STYLE_UNREAD_MESSAGES;
     }
-#endif
   } 
   
-#ifdef BALSA_SHOW_INFO
   /* We only want to do this if the mailbox is open, otherwise leave
    * the message numbers untouched in the display */
   if (mblist->display_content_info && mailbox->open_ref && mailbox->total_messages >= 0){
@@ -908,7 +875,6 @@ balsa_mblist_mailbox_style (GtkCTree * ctree, GtkCTreeNode *node, MailboxNode *m
       mbnode->style &= ~MBNODE_STYLE_TOTAL_MESSAGES;
     }
   }
-#endif
 }
 
 /* balsa_mblist_folder_style [MBG]
@@ -977,7 +943,6 @@ balsa_mblist_folder_style (GtkCTree* ctree, GtkCTreeNode* node, gpointer data)
   }
 }
 
-#ifdef BALSA_SHOW_INFO                
 /* numeric_compare [MBG]
  * 
  * Description: this is for sorting mailboxes by number of unread or
@@ -1022,7 +987,6 @@ numeric_compare (GtkCList * clist, gconstpointer ptr1, gconstpointer ptr2)
   
   return 0;
 }
-#endif
 
 /* mblist_mbnode_compare [MBG]
  *   (GtkCTreeCompareFunc)

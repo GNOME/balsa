@@ -55,9 +55,8 @@ typedef struct _PropertyUI {
 	GtkWidget *bcc;	  
 	GtkWidget *check_mail_upon_startup;
 	GtkWidget *remember_open_mboxes;
-#ifdef BALSA_SHOW_INFO
 	GtkWidget *mblist_show_mb_content_info;
-#endif
+
 	/* arp */
 	GtkWidget *quote_str;
 	
@@ -233,10 +232,9 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 	gtk_signal_connect (GTK_OBJECT (pui->debug), "toggled",
 			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
-#ifdef BALSA_SHOW_INFO
+
 	gtk_signal_connect (GTK_OBJECT (pui->mblist_show_mb_content_info), "toggled",
 			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
-#endif
 
 	gtk_signal_connect (GTK_OBJECT (pui->real_name), "changed",
 			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
@@ -433,12 +431,12 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
 	balsa_app.debug = GTK_TOGGLE_BUTTON (pui->debug)->active;
 	balsa_app.previewpane = GTK_TOGGLE_BUTTON (pui->previewpane)->active;
 	balsa_app.smtp = GTK_TOGGLE_BUTTON (pui->rb_smtp_server)->active;
-#ifdef BALSA_SHOW_INFO
+
 	if (balsa_app.mblist_show_mb_content_info != GTK_TOGGLE_BUTTON (pui->mblist_show_mb_content_info)->active) {
 		balsa_app.mblist_show_mb_content_info = !balsa_app.mblist_show_mb_content_info;
 		gtk_object_set ( GTK_OBJECT (balsa_app.mblist),"show_content_info", balsa_app.mblist_show_mb_content_info, NULL  );
 	}
-#endif
+
 	balsa_app.check_mail_auto = GTK_TOGGLE_BUTTON(pui->check_mail_auto)->active;
 	balsa_app.check_mail_timer = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(pui->check_mail_minutes));
 
@@ -573,9 +571,7 @@ set_prefs (void)
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->previewpane), balsa_app.previewpane);
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->debug), balsa_app.debug);
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->rb_smtp_server), balsa_app.smtp);
-#ifdef BALSA_SHOW_INFO
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->mblist_show_mb_content_info), balsa_app.mblist_show_mb_content_info);
-#endif
 
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->check_mail_auto),
 				      balsa_app.check_mail_auto);
@@ -1198,10 +1194,8 @@ create_display_page ( )
 	gtk_box_pack_start (GTK_BOX (vbox7), pui->previewpane, FALSE, TRUE, 0);
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->previewpane), TRUE);
 	
-#ifdef BALSA_SHOW_INFO
 	pui->mblist_show_mb_content_info = gtk_check_button_new_with_label (_("Show mailbox statistics in left pane"));
 	gtk_box_pack_start (GTK_BOX (vbox7), pui->mblist_show_mb_content_info, FALSE, TRUE, 0);
-#endif BALSA_SHOW_INFO
 
 	hbox4 = gtk_hbox_new (TRUE, 0);
 	gtk_box_pack_start (GTK_BOX (vbox2), hbox4, FALSE, FALSE, 0);

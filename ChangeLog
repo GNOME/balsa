@@ -1,3 +1,18 @@
+2000-08-20  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* acconfig.h: 
+	* configure.in: 
+	* src/balsa-app.c: 
+	* src/balsa-app.h: 
+	* src/balsa-mblist.c:
+	* src/balsa-mblist.h: 
+	* src/mblist-window.c: 
+	* src/pref-manager.c: 
+	* src/save-restore.c: 
+	* src/sendmsg-window.c: 
+	Remove the --enable-info build-time option, always build this
+	functionality in. There is still a runtime option.
+
 2000-08-20  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/balsa-index.c: workaround for gtk_clist_sort() bug

@@ -32,8 +32,8 @@ static void balsa_message_size_request (GtkWidget * widget, GtkRequisition * req
 static void balsa_message_size_allocate (GtkWidget * widget, GtkAllocation * allocation);
 
 /* static */
-static gchar * message2html (Message * message);
-static gchar * text2html (char * buff);
+static gchar *message2html (Message * message);
+static gchar *text2html (char *buff);
 
 static GtkBinClass *parent_class = NULL;
 
@@ -211,20 +211,23 @@ message2html (Message * message)
   g_string_append (mbuff, buff);
   g_free (buff);
 
-  g_string_append (mbuff, "<br><b>From: </b>");
+  if (message->from)
+    {
+      g_string_append (mbuff, "<br><b>From: </b>");
 
-  /* to */
-  if (message->from->personal)
-    sprintf (tbuff, "%s <%s@%s>",
-	     message->from->personal,
-	     message->from->user, 
-	     message->from->host);
-  else
-    sprintf (tbuff, "%s@%s", message->from->user, message->from->host);
+      /* to */
+      if (message->from->personal)
+	sprintf (tbuff, "%s <%s@%s>",
+		 message->from->personal,
+		 message->from->user,
+		 message->from->host);
+      else
+	sprintf (tbuff, "%s@%s", message->from->user, message->from->host);
 
-  buff = text2html (tbuff);
-  g_string_append (mbuff, buff);
-  g_free (buff);
+      buff = text2html (tbuff);
+      g_string_append (mbuff, buff);
+      g_free (buff);
+    }
 
   g_string_append (mbuff, "<br><b>Subject: </b>");
 
@@ -248,7 +251,7 @@ message2html (Message * message)
 
 
 static gchar *
-text2html (char * buff)
+text2html (char *buff)
 {
   int i = 0, len = strlen (buff);
   gchar *str;
@@ -298,7 +301,7 @@ text2html (char * buff)
 	     * thing(tm)
 	     */
 	  case '\t':
-	    gs = g_string_append(gs, "&nbsp; &nbsp; &nbsp; &nbsp; ");
+	    gs = g_string_append (gs, "&nbsp; &nbsp; &nbsp; &nbsp; ");
 	    break;
 	  case ' ':
 	    gs = g_string_append (gs, " ");
@@ -441,29 +444,3 @@ text2html (char * buff)
   g_string_free (gs, 0);
   return str;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

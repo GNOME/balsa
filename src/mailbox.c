@@ -1017,19 +1017,12 @@ translate_address (ADDRESS * caddr)
 {
   Address *address;
 
-  address = address_new ();
   if (!caddr)
-    {
-      address->personal = g_strdup ("");
-      address->user = g_strdup ("");
-      address->host = g_strdup ("");
-    }
-  else
-    {
-      address->personal = g_strdup (caddr->personal);
-      address->user = g_strdup (caddr->mailbox);
-      address->host = g_strdup (caddr->host);
-    }
+    return NULL;
+  address = address_new ();
+  address->personal = g_strdup (caddr->personal);
+  address->user = g_strdup (caddr->mailbox);
+  address->host = g_strdup (caddr->host);
   return address;
 }
 

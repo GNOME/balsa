@@ -353,11 +353,15 @@ balsa_index_add (BalsaIndex * bindex,
   text[1] = buff1;
 
   text[2] = buff2;
-  if (message->from->personal)
-    sprintf (text[2], "%s", message->from->personal);
+  if (message->from)
+    {
+      if (message->from->personal)
+	sprintf (text[2], "%s", message->from->personal);
+      else
+	sprintf (text[2], "%s@%s", message->from->user, message->from->host);
+    }
   else
-    sprintf (text[2], "%s@%s", message->from->user, message->from->host);
-
+    text[2] = NULL;
   text[3] = message->subject;
 
   text[4] = message->date;

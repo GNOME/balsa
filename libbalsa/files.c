@@ -129,13 +129,32 @@ libbalsa_icon_finder(const char *mime_type, const char *filename,
 
     if (!icon || !g_file_test (icon, G_FILE_TEST_IS_REGULAR)) {
 	gchar *gnome_icon, *p_gnome_icon, *tmp;
+#if GTK_CHECK_VERSION(2, 4, 0)
+	GtkIconTheme *icon_theme;
+	GtkIconInfo *icon_info;
+
+	gnome_icon = g_strdup_printf("gnome-mime-%s", content_type);   
+#else                           /* GTK_CHECK_VERSION(2, 4, 0) */
 	
 	gnome_icon = g_strdup_printf ("gnome-%s.png", content_type);   
+#endif                          /* GTK_CHECK_VERSION(2, 4, 0) */
 	
 	p_gnome_icon = strchr (gnome_icon, '/');
 	if (p_gnome_icon != NULL)
 	    *p_gnome_icon = '-';
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+	icon_theme = gtk_icon_theme_get_default();
+	icon_info = gtk_icon_theme_lookup_icon(icon_theme, gnome_icon, 48, 0);
+	if (icon_info) {
+	    g_free(gnome_icon);
+	    icon = g_strdup(gtk_icon_info_get_filename(icon_info));
+	    gtk_icon_info_free(icon_info);
+	    if (used_type)
+		*used_type = content_type;
+	    return icon;
+	}
+#endif                          /* GTK_CHECK_VERSION(2, 4, 0) */
         tmp = g_strconcat("document-icons/", gnome_icon, NULL);
 	g_free(icon);
         icon = gnome_vfs_icon_path_from_filename(tmp);

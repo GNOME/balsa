@@ -1,15 +1,9 @@
 TODO LIST:
 
-For 0.4.5 release:
-
- * fix balsa-init's text box thing
-
-
 
 little things:
  * pref manager doesn't save the toolbar type or mdi type
  * make mailbox-conf pretty
-
 
 
 later stuff:

@@ -265,28 +265,28 @@ static GnomeUIInfo file_new_menu[] = {
                            N_("Add a new mbox style mailbox"),
                            mailbox_conf_add_mbox_cb, 
                            GNOME_STOCK_PIXMAP_ADD),
-#define MENU_FILE_NEW_MAILDIR_POS 2
+#define MENU_FILE_NEW_MAILDIR_POS 3
     GNOMEUIINFO_ITEM_STOCK(N_("Local Maildir mailbox..."), 
                            N_("Add a new Maildir style mailbox"),
                            mailbox_conf_add_maildir_cb, 
                            GNOME_STOCK_PIXMAP_ADD),
-#define MENU_FILE_NEW_MH_POS 3
+#define MENU_FILE_NEW_MH_POS 4
     GNOMEUIINFO_ITEM_STOCK(N_("Local MH mailbox..."), 
                            N_("Add a new MH style mailbox"),
                            mailbox_conf_add_mh_cb, 
                            GNOME_STOCK_PIXMAP_ADD),
-#define MENU_FILE_NEW_IMAP_POS 4
+#define MENU_FILE_NEW_IMAP_POS 5
     GNOMEUIINFO_ITEM_STOCK(N_("Remote IMAP mailbox..."), 
                            N_("Add a new IMAP mailbox"),
                            mailbox_conf_add_imap_cb, 
                            GNOME_STOCK_PIXMAP_ADD),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_FILE_NEW_IMAP_FOLDER_POS 6
+#define MENU_FILE_NEW_IMAP_FOLDER_POS 7
     GNOMEUIINFO_ITEM_STOCK(N_("Remote IMAP folder..."), 
                            N_("Add a new IMAP folder"),
                            folder_conf_add_imap_cb, 
                            GNOME_STOCK_PIXMAP_ADD),
-#define MENU_FILE_NEW_IMAP_SUBFOLDER_POS 7
+#define MENU_FILE_NEW_IMAP_SUBFOLDER_POS 8
     GNOMEUIINFO_ITEM_STOCK(N_("Remote IMAP subfolder..."), 
                            N_("Add new IMAP subfolder"),
                            folder_conf_add_imap_sub_cb, 
@@ -357,9 +357,9 @@ static GnomeUIInfo edit_menu[] = {
     GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_MENU_FIND_ITEM(find_cb, NULL),
     GNOMEUIINFO_MENU_FIND_AGAIN_ITEM(find_again_cb, NULL),
-    /*  GNOMEUIINFO_MENU_REPLACE_ITEM(NULL, NULL); */
+/*     GNOMEUIINFO_MENU_REPLACE_ITEM(NULL, NULL); */
 /*     GNOMEUIINFO_SEPARATOR, */
-/* #define MENU_EDIT_PREFERENCES_POS 3 */
+/* #define MENU_EDIT_PREFERENCES_POS 7 */
 /*     GNOMEUIINFO_MENU_PREFERENCES_ITEM(open_preferences_manager, NULL), */
     GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_ITEM_STOCK(N_("_Filters..."), N_("Manage filters"),
@@ -524,7 +524,7 @@ static GnomeUIInfo message_menu[] = {
 		NULL, 'A', GDK_CONTROL_MASK, NULL
     },  
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MESSAGE_TRASH_POS 15
+#define MENU_MESSAGE_TRASH_POS 14
     /* D */
     {
         GNOME_APP_UI_ITEM, N_("_Move to Trash"), 
@@ -532,19 +532,19 @@ static GnomeUIInfo message_menu[] = {
         trash_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
         GNOME_STOCK_MENU_TRASH, 'D', 0, NULL
     },
-#define MENU_MESSAGE_DELETE_POS 16
+#define MENU_MESSAGE_DELETE_POS 15
     { GNOME_APP_UI_ITEM, N_("_Delete"), 
       N_("Delete the current message"),
       delete_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
       GNOME_STOCK_MENU_TRASH, 'D', GDK_CONTROL_MASK, NULL },
-#define MENU_MESSAGE_UNDEL_POS 17
+#define MENU_MESSAGE_UNDEL_POS 16
     /* U */
     {
         GNOME_APP_UI_ITEM, N_("_Undelete"), N_("Undelete the message"),
         undelete_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
         GNOME_STOCK_MENU_UNDELETE, 'U', 0, NULL
     },
-#define MENU_MESSAGE_TOGGLE_POS 18
+#define MENU_MESSAGE_TOGGLE_POS 17
     /* ! */
     GNOMEUIINFO_SUBTREE(N_("_Toggle"), message_toggle_menu),
     GNOMEUIINFO_SEPARATOR,

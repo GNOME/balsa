@@ -83,8 +83,9 @@ static GnomeUIInfo shown_hdrs_menu[] = {
 };
 
 static GnomeUIInfo file_menu[] = {
+    GNOMEUIINFO_MENU_PRINT_ITEM(print_cb, NULL),
+    GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_MENU_CLOSE_ITEM(close_message_window, NULL),
-
     GNOMEUIINFO_END
 };
 

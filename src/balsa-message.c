@@ -1433,7 +1433,29 @@ check_over_url(GtkWidget * widget, GdkEventMotion * event,
     return FALSE;
 }
 
-/* if the mouse button was released over an url, try to call it */
+/* store the coordinates at which the button was pressed */
+static gint stored_x=-1, stored_y=-1;
+static GdkModifierType stored_mask=-1;
+
+static gboolean
+store_button_coords(GtkWidget *widget, GdkEventButton *event, gpointer data)
+{
+    if (event->type == GDK_BUTTON_PRESS && event->button == 1) {
+        gdk_window_get_pointer(gtk_text_view_get_window(GTK_TEXT_VIEW(widget),
+                                                        GTK_TEXT_WINDOW_TEXT),
+                               &stored_x, &stored_y, &stored_mask);
+       /* Take this button press out of the mask, so it won't interfere
+        * with the comparison in check_call_url()
+        * FIXME Is the mask comparison necessary?  Or should it be
+        * there, but only compare shift, ctrl, and mod1-mod5?
+        */
+       stored_mask &= ~(GDK_BUTTON_PRESS_MASK);
+    }
+    return FALSE;
+}
+
+/* if the mouse button was released over an URL, and the mouse hasn't
+ * moved since the button was pressed, try to call the URL */
 static gboolean
 check_call_url(GtkWidget * widget, GdkEventButton * event,
                GList * url_list)
@@ -1446,10 +1468,11 @@ check_call_url(GtkWidget * widget, GdkEventButton * event,
 
     x = event->x;
     y = event->y;
-    url = find_url(widget, x, y, url_list);
-    if (url)
-        handle_url(url);
-
+    if (x == stored_x && y == stored_y && event->state == stored_mask) {
+        url = find_url(widget, x, y, url_list);
+        if (url)
+            handle_url(url);
+    }
     return FALSE;
 }
 
@@ -1603,6 +1626,9 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
                                  (GtkSignalFunc) fix_text_widget,
                                  url_list);
         if (url_list) {
+            gtk_signal_connect_after(GTK_OBJECT(item), "button_press_event",
+                                     (GtkSignalFunc)store_button_coords, 
+                                     NULL);
             gtk_signal_connect(GTK_OBJECT(item),
                                "button_release_event",
                                (GtkSignalFunc) check_call_url, url_list);

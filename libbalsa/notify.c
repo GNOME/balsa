@@ -25,23 +25,34 @@
 #include <glib.h>
 
 #include "libbalsa.h"
+
+#if NOT_USED
 /* For Buffy structure */
 #include "mailbackend.h"
 #include "buffy.h"
+#endif  
+
+/*
+ * FIXME
+ * chbm: we gotta replace the buffy infrastrucure ! 
+ */
 
 /* Holds all the mailboxes which are registered for checking */
-static GHashTable *notify_hash;
+//static GHashTable *notify_hash;
 
 void
 libbalsa_notify_init(void)
 {
+#if NOT_USED
     /* Hash table uses the actual key as the hash */
     notify_hash = g_hash_table_new(g_direct_hash, g_direct_equal);
+#endif
 }
 
 void
 libbalsa_notify_register_mailbox(LibBalsaMailbox * mailbox)
 {
+#if NOT_USED
     BUFFY *tmp;
     const gchar *path = NULL;
     gchar *user, *passwd;
@@ -67,14 +78,14 @@ libbalsa_notify_register_mailbox(LibBalsaMailbox * mailbox)
     libbalsa_lock_mutt();
     tmp = buffy_add_mailbox(path, user, passwd);
     libbalsa_unlock_mutt();
-
     g_hash_table_insert(notify_hash, mailbox, tmp);
+#endif 
 }
 
 void
 libbalsa_notify_unregister_mailbox(LibBalsaMailbox * mailbox)
 {
-
+#if NOT_USED
     BUFFY *bf;
     BUFFY **tmp = &Incoming;
 
@@ -116,21 +127,25 @@ libbalsa_notify_unregister_mailbox(LibBalsaMailbox * mailbox)
     mutt_buffy_free(&bf);
 
     libbalsa_unlock_mutt();
+#endif
 }
 
 void
 libbalsa_notify_start_check(gboolean imap_check_test(const gchar *path))
 {
+#if NOT_USED
     /* Might as well use check rather than notify. All notify does is */
     /* write messages for each mailbox */
     libbalsa_lock_mutt();
     mutt_buffy_check(FALSE, imap_check_test);
     libbalsa_unlock_mutt();
+#endif
 }
 
 gint
 libbalsa_notify_check_mailbox(LibBalsaMailbox * mailbox)
 {
+#if NOT_USED
     BUFFY *bf;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), 0);
@@ -145,5 +160,6 @@ libbalsa_notify_check_mailbox(LibBalsaMailbox * mailbox)
     }
 
     return bf->new;
-
+#endif
+    return 0;
 }

@@ -487,7 +487,7 @@ save_dialog_ok(GtkWidget* save_dialog, BalsaPartInfo * info)
 	do_save = TRUE;
     
     if ( do_save ) {
-	result = libbalsa_message_body_save(info->body, NULL, filename);
+	result = libbalsa_message_body_save(info->body, filename);
 	if (!result)
             balsa_information(LIBBALSA_INFORMATION_ERROR,
                               _("Could not save %s: %s"),
@@ -1355,7 +1355,7 @@ part_info_init_image(BalsaMessage * bm, BalsaPartInfo * info)
 {
     GtkWidget *image;
 
-    libbalsa_message_body_save_temporary(info->body, NULL);
+    libbalsa_message_body_save_temporary(info->body);
     image = gtk_image_new_from_file(info->body->temp_filename);
     info->widget = image;
     info->focus_widget = image;
@@ -2013,7 +2013,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
     size_t alloced;
 
     /* proper code */
-    if (!libbalsa_message_body_save_temporary(info->body, NULL)) {
+    if (!libbalsa_message_body_save_temporary(info->body)) {
         balsa_information
             (LIBBALSA_INFORMATION_ERROR,
              _("Error writing to temporary file %s.\n"
@@ -2811,7 +2811,7 @@ part_context_menu_mail(GtkWidget * menu_item, BalsaPartInfo * info)
     /* the original body my have some data to be returned as commands... */
     body = libbalsa_message_body_new(message);
 
-    libbalsa_message_body_save_temporary(info->body, NULL);
+    libbalsa_message_body_save_temporary(info->body);
     part = fopen(info->body->temp_filename, "r");
     if (part) {
 	gchar *p;
@@ -2859,7 +2859,7 @@ part_context_menu_cb(GtkWidget * menu_item, BalsaPartInfo * info)
 
     if (key != NULL
         && (cmd = gnome_vfs_mime_get_value(content_type, key)) != NULL) {
-	if (!libbalsa_message_body_save_temporary(info->body, NULL)) {
+	if (!libbalsa_message_body_save_temporary(info->body)) {
 	    balsa_information(LIBBALSA_INFORMATION_WARNING,
 			      _("Could not create temporary file %s"),
 			      info->body->temp_filename);
@@ -2892,7 +2892,7 @@ part_context_menu_vfs_cb(GtkWidget * menu_item, BalsaPartInfo * info)
 	GnomeVFSMimeApplication *app=
 	    gnome_vfs_mime_application_new_from_id(id);
 	if(app) {
-	    if (libbalsa_message_body_save_temporary(info->body, NULL)) {
+	    if (libbalsa_message_body_save_temporary(info->body)) {
                 gboolean tmp =
                     (app->expects_uris ==
                      GNOME_VFS_MIME_APPLICATION_ARGUMENT_TYPE_URIS);

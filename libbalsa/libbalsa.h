@@ -90,10 +90,16 @@ gchar *libbalsa_guess_ldif_file(void);
 
 gboolean libbalsa_ldap_exists(const gchar *server);
 
+#if 0
 void libbalsa_lock_mutt(void);
 void libbalsa_unlock_mutt(void);
+#endif 
 
 void libbalsa_mktemp (char *);
 void libbalsa_assure_balsa_dir(void);
+
+void libbalsa_message(const char *fmt, ...);
+gchar * libbalsa_rot(const gchar * pass);
+
 
 #endif				/* __LIBBALSA_H__ */

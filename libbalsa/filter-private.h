@@ -35,8 +35,6 @@
 #  include <regex.h>
 #endif
 
-#include "libmutt/mutt.h"
-#include "libmutt/mutt_regex.h"
 
 /* regex options */
 #define FILTER_REGCOMP       (REG_NEWLINE | REG_NOSUB | REG_EXTENDED)

@@ -25,11 +25,12 @@
 #include <unistd.h>
 #include <string.h>
 #include <glib.h>
+#include <fcntl.h>
 /* gnome-i18n.h needed for _() */
 #include <libgnome/gnome-i18n.h>
 
 #include "libbalsa.h"
-/* for mutt_mktemp and safe_fopen */
+/* for safe_open */
 #include "mailbackend.h"
 
 LibBalsaMessageBody *
@@ -201,27 +202,29 @@ libbalsa_message_body_get_parameter(LibBalsaMessageBody * body,
    allocates a temporary file name and saves the body there.
 */
 gboolean
-libbalsa_message_body_save_temporary(LibBalsaMessageBody * body,
-				     const gchar * prefix)
+libbalsa_message_body_save_temporary(LibBalsaMessageBody * body)
 {
-    /* FIXME: Role our own mktemp that doesn't need a large array (use g_strdup_printf) */
     if (body->temp_filename == NULL) {
-	gchar tmp_file_name[PATH_MAX + 1];
+	gchar *tmp_file_name;
 	gchar *dotpos = NULL;
+	int fd;
 
-	libbalsa_lock_mutt();
-	mutt_mktemp(tmp_file_name);
-	libbalsa_unlock_mutt();
+	fd = g_file_open_tmp("balsa-body-XXXXXX", &tmp_file_name, NULL);
+	if (fd < 0)
+	    return FALSE;
 
 	if (body->filename) {
 	    gchar *seppos = strrchr(body->filename, G_DIR_SEPARATOR);
 	    dotpos = strchr(seppos ? seppos : body->filename, '.');
 	}
-	if (dotpos)
-	    body->temp_filename = g_strdup_printf("%s%s", tmp_file_name, dotpos);
+	if (dotpos) {
+	    body->temp_filename = g_strdup_printf("%s%s", tmp_file_name,
+						  dotpos);
+	    g_free(tmp_file_name);
+	}
 	else
-	    body->temp_filename = g_strdup(tmp_file_name);
-	return libbalsa_message_body_save(body, prefix, body->temp_filename);
+	    body->temp_filename = tmp_file_name;
+	return libbalsa_message_body_save_fd(body, fd);
     } else {
 	/* the temporary name has been already allocated on previous
 	   save_temporary action. We just check if the file is still there.
@@ -232,39 +235,57 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body,
 	    s.st_uid == getuid())
 	    return TRUE;
 	else
-	    return libbalsa_message_body_save(body, prefix, 
-					      body->temp_filename);
+	    return libbalsa_message_body_save(body, body->temp_filename);
     }
 }
 
 /* libbalsa_message_body_save:
-   NOTE: has to use safe_fopen to set the file access privileges to safe.
+   NOTE: has to use safe_open to set the file access privileges to safe.
 */
 gboolean
 libbalsa_message_body_save(LibBalsaMessageBody * body,
-                           const gchar * prefix,
 			   const gchar * filename)
 {
-    FILE *fpout;
+    int fd;
+    int flags = O_CREAT | O_EXCL | O_WRONLY;
+
+    g_return_val_if_fail(GMIME_IS_PART(body->mime_part), FALSE);
+
+#ifdef O_NOFOLLOW
+    flags |= O_NOFOLLOW;
+#endif
+
+    if ((fd=libbalsa_safe_open(filename, flags)) < 0)
+	return FALSE;
+    return libbalsa_message_body_save_fd(body, fd);
+}
+
+gboolean
+libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd)
+{
     const char *buf;
     ssize_t len;
     GMimeStream *stream, *filter_stream;
+    gchar *mime_type=NULL;
     const char *charset;
     GMimeFilter *filter;
 
     g_return_val_if_fail(GMIME_IS_PART(body->mime_part), FALSE);
-    fpout=safe_fopen(filename, "w");
-    if (!fpout)
-	return FALSE;
-    stream = g_mime_stream_file_new(fpout);
+    stream = g_mime_stream_fs_new(fd);
     filter_stream = g_mime_stream_filter_new_with_stream(stream);
     g_mime_stream_unref(stream);
-    charset = libbalsa_message_body_charset(body);
-    if (!charset)
-	charset="us-ascii";
-    filter = g_mime_filter_charset_new(charset, "UTF-8");
-    g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream), filter);
-    g_object_unref(G_OBJECT(filter));
+    if (libbalsa_message_body_type(body) == LIBBALSA_MESSAGE_BODY_TYPE_TEXT
+	&& strcmp(mime_type = libbalsa_message_body_get_content_type(body),
+		  "text/html") != 0) {
+	/* convert text bodies but HTML - gtkhtml does conversion on its own. */
+	charset = libbalsa_message_body_charset(body);
+	if (!charset)
+	    charset="us-ascii";
+	filter = g_mime_filter_charset_new(charset, "UTF-8");
+	g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream), filter);
+	g_object_unref(G_OBJECT(filter));
+    }
+    g_free(mime_type);
 
     buf = g_mime_part_get_content(GMIME_PART(body->mime_part), &len);
     if (len && g_mime_stream_write(filter_stream, (char*)buf, len) == -1) {

@@ -473,7 +473,6 @@ balsa_cleanup(void)
            b. send cancel signal to it. 
         */
         pthread_cancel(get_mail_thread);
-        libbalsa_unlock_mutt();
         printf("Mail check thread cancelled. I know it is rough.\n");
         sleep(1);
     }

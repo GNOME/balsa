@@ -41,7 +41,6 @@
 
 
 #ifdef BALSA_USE_THREADS
-static GMutex *mutt_lock;
 static pthread_t main_thread_id;
 pthread_mutex_t mailbox_lock = PTHREAD_MUTEX_INITIALIZER;
 #endif
@@ -50,19 +49,17 @@ pthread_mutex_t mailbox_lock = PTHREAD_MUTEX_INITIALIZER;
 #define IMAP_SERVER "mx"
 #define LDAP_SERVER "ldap"
 
-static gchar *Domainname;
 
-void mutt_message(const char *fmt, ...);
 void mutt_exit(int code);
 int mutt_yesorno(const char *msg, int def);
 int mutt_any_key_to_continue(const char *s);
 void mutt_clear_error(void);
 
-static void libbalsa_mutt_error(const char *fmt, ...);
 static gchar *qualified_hostname(const char *name);
+static char *Spoolfile; // libmutt leftover
 
 void
-mutt_message(const char *fmt, ...)
+libbalsa_message(const char *fmt, ...)
 {
     va_list va_args;
 
@@ -75,16 +72,6 @@ mutt_message(const char *fmt, ...)
 void
 mutt_exit(int code)
 {
-}
-
-void
-mutt_perror (const char *s)
-{
-  char *p = strerror (errno);
-
-  dprint (1, (debugfile, "%s: %s (errno = %d)\n", s, 
-      p ? p : "unknown error", errno));
-  mutt_error ("%s: %s (errno = %d)", s, p ? p : _("unknown error"), errno);
 }
 
 
@@ -101,29 +88,28 @@ mutt_clear_error(void)
 {
 }
 
-/* We're gonna set Mutt global vars here */
 void
 libbalsa_init(LibBalsaInformationFunc information_callback)
 {
     struct utsname utsname;
-    const char *p;
 
+
+#ifdef BALSA_USE_THREADS
+    if (!g_thread_supported()) {
+	g_error("Threads have not been initialised.");
+    }
+    main_thread_id = pthread_self();
+#endif
+
+    uname(&utsname);
+
+#if 0 
     /* FIXME: remove mutt vars */
     Spoolfile = libbalsa_guess_mail_spool();
 
     MhFlagged = "flagged";
     MhReplied = "replied";
     MhUnseen  = "unseen";
-
-#ifdef BALSA_USE_THREADS
-    if (!g_thread_supported()) {
-	g_error("Threads have not been initialised.");
-    }
-    mutt_lock = g_mutex_new();
-    main_thread_id = pthread_self();
-#endif
-
-    uname(&utsname);
 
     /* Username, Homedir etc. are really const char* */
     Username   = (char*)g_get_user_name();
@@ -165,7 +151,7 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
     Charset = "UTF-8";
     /* more likely to least likely or something: order *is* relevant!  */
     SendCharset = "us-ascii:iso-8859-1:iso-8859-15:iso-8859-2:iso-8859-9:iso-8859-13:KOI8-R:iso-8859-5:euc-kr:euc-jp:UTF-8";    
-
+#endif
     libbalsa_notify_init();
     g_mime_init(0);
 
@@ -198,25 +184,7 @@ libbalsa_set_spool(gchar * spool)
 	Spoolfile = libbalsa_guess_mail_spool();
 }
 
-/*
- * These two functions control the libmutt lock. 
- * This lock must be held around all mutt calls
- */
-void
-libbalsa_lock_mutt(void)
-{
-#ifdef BALSA_USE_THREADS
-    g_mutex_lock(mutt_lock);
-#endif
-}
 
-void
-libbalsa_unlock_mutt(void)
-{
-#ifdef BALSA_USE_THREADS
-    g_mutex_unlock(mutt_lock);
-#endif
-}
 
 /* libbalsa_rot:
    return rot13'ed string.
@@ -242,6 +210,7 @@ libbalsa_rot(const gchar * pass)
     }
     return buff;
 }
+
 
 /* libbalsa_guess_email_address:
    Email address can be determined in four ways:
@@ -453,26 +422,6 @@ libbalsa_assure_balsa_dir(void)
     g_free(dir);
 }
 
-/*
- * This function is hooked into the mutt_error callback
- * mutt sometimes generates empty messages, ignore them.
- */
-static void
-libbalsa_mutt_error(const char *fmt, ...)
-{
-    va_list va_args;
-
-    va_start(va_args, fmt);
-    if(*fmt) 
-	libbalsa_information_varg(NULL, LIBBALSA_INFORMATION_WARNING,
-                                  fmt, va_args);
-    va_end(va_args);
-}
-/* wraper function */
-void 
-libbalsa_mktemp (char *s) {
-    mutt_mktemp(s);
-}
 
 #ifdef USE_SSL
 #include "keymap_defs.h"

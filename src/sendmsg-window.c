@@ -1511,11 +1511,13 @@ attach_clicked(GtkWidget * widget, gpointer data)
 static gboolean 
 attach_message(BalsaSendmsg *bsmsg, LibBalsaMessage *message)
 {
-    gchar *name, tmp_file_name[PATH_MAX + 1];
+    gchar *name, *tmp_file_name;
 	
-    libbalsa_mktemp(tmp_file_name);
-    mkdir(tmp_file_name, 0700);
+    if (libbalsa_mktempdir(&tmp_file_name) == FALSE)
+	return FALSE;
     name = g_strdup_printf("%s/forwarded-message", tmp_file_name);
+    g_free(tmp_file_name);
+
     if(!libbalsa_message_save(message, name)) {
         g_free(name);
         return FALSE;
@@ -2062,15 +2064,18 @@ continueBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message)
 	    body = body->next;
 	}
 	while (body) {
-	    gchar *name, *body_type, tmp_file_name[PATH_MAX + 1];
+	    gchar *name, *body_type, *tmp_file_name;
+	    int fd;
 
-	    libbalsa_mktemp(tmp_file_name);
 	    if (body->filename) {
-		mkdir(tmp_file_name, 0700);
+		libbalsa_mktempdir(&tmp_file_name);
 		name = g_strdup_printf("%s/%s", tmp_file_name, body->filename);
-	    } else
-		name = g_strdup(tmp_file_name);
-	    libbalsa_message_body_save(body, NULL, name);
+		g_free(tmp_file_name);
+		libbalsa_message_body_save(body, name);
+	    } else {
+		fd = g_file_open_tmp("balsa-continue-XXXXXX", &name, NULL);
+		libbalsa_message_body_save_fd(body, fd);
+	    }
 	    body_type = libbalsa_message_body_get_content_type(body);
 	    add_attachment(GNOME_ICON_LIST(bsmsg->attachments[1]), name,
 			   body->filename != NULL, body_type);

@@ -33,6 +33,7 @@
 #include "config.h"
 
 #include <ctype.h>
+#include <string.h>
 
 #include <glib.h>
 #include <libgnome/gnome-i18n.h> 
@@ -253,8 +254,7 @@ libbalsa_message_charset(LibBalsaMessage * message)
 {
     LibBalsaMessageBody *body;
     const gchar *charset;
-    char tmp[SHORT_STRING];    /* SHORT_STRING = 128 */
-
+    const char *tmp;
     g_return_val_if_fail(message != NULL, NULL);
     body = message->body_list;
     g_return_val_if_fail(body != NULL, NULL);
@@ -265,10 +265,11 @@ libbalsa_message_charset(LibBalsaMessage * message)
         if (!charset)
             return NULL;
     }
-    mutt_canonical_charset(tmp, sizeof tmp, charset);
+    tmp = g_mime_charset_canon_name(charset);
     return g_strdup(tmp);
 }
 
+#if NOT_USED
 LibBalsaAddress *
 libbalsa_address_new_from_libmutt(ADDRESS * caddr)
 {
@@ -287,6 +288,7 @@ libbalsa_address_new_from_libmutt(ADDRESS * caddr)
 
     return address;
 }
+#endif
 
 /* message_user_hdrs:
    returns allocated GList containing (header=>value) ALL headers pairs
@@ -458,7 +460,7 @@ libbalsa_message_get_part_by_id(LibBalsaMessage* msg, const gchar* id)
     LibBalsaMessageBody* body = 
 	libbalsa_message_body_get_by_id(msg->body_list,	id);
     if(!body) return NULL;
-    if(!libbalsa_message_body_save_temporary(body, NULL)) return NULL;
+    if(!libbalsa_message_body_save_temporary(body)) return NULL;
     return fopen(body->temp_filename, "r");
 }
 

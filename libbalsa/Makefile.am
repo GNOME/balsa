@@ -33,6 +33,8 @@ libbalsa_a_SOURCES = 		\
 	filter.h		\
 	folder-scanners.c	\
 	folder-scanners.h	\
+	gmime-gpgme-context.c   \
+	gmime-gpgme-context.h   \
 	identity.c		\
 	identity.h		\
 	information.c		\
@@ -71,15 +73,14 @@ libbalsa_a_SOURCES = 		\
 	notify.h		\
 	pop3.c			\
 	pop3.h			\
+	rfc3156.c		\
+	rfc3156.h		\
 	send.c			\
 	send.h			\
 	server.c		\
 	server.h		\
-	source-viewer.c		\
-	gmime-gpgme-context.c   \
-	gmime-gpgme-context.h   \
-	rfc3156.c		\
-	rfc3156.h
+	source-viewer.c
+
 
 EXTRA_DIST = \
 	libbalsa-marshal.list

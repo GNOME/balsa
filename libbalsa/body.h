@@ -77,11 +77,10 @@ LibBalsaMessageBodyType libbalsa_message_body_type(LibBalsaMessageBody *
 void libbalsa_message_body_set_mime_body(LibBalsaMessageBody * body,
 					 GMimeObject * mime_part);
 
+gboolean libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd);
 gboolean libbalsa_message_body_save(LibBalsaMessageBody * body,
-				    const gchar * prefixm,
                                     const gchar * filename);
-gboolean libbalsa_message_body_save_temporary(LibBalsaMessageBody * body,
-					      const gchar * prefix);
+gboolean libbalsa_message_body_save_temporary(LibBalsaMessageBody * body);
 
 gchar *libbalsa_message_body_get_parameter(LibBalsaMessageBody * body,
 					   const gchar * param);

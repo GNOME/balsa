@@ -22,7 +22,7 @@
 #include "config.h"
 
 #include <ctype.h>
-
+#include <string.h>
 
 #include "libbalsa.h"
 #include "libbalsa-marshal.h"

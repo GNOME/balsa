@@ -462,8 +462,8 @@ libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox)
 
     /* increment the reference count */
 #ifdef DEBUG
-    g_print(_("LibBalsaMailboxMaildir: Opening %s Refcount: %d\n"),
-	    mailbox->name, mailbox->open_ref);
+    g_print(_("%s: Opening %s Refcount: %d\n"),
+	    "LibBalsaMailboxMaildir", mailbox->name, mailbox->open_ref);
 #endif
     return TRUE;
 }

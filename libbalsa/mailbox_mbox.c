@@ -245,7 +245,7 @@ static int mbox_lock(LibBalsaMailbox * mailbox, GMimeStream *stream)
 	fd = GMIME_STREAM_FS(stream)->fd;
     else
 	fd = GMIME_STREAM_FS(LIBBALSA_MAILBOX_MBOX(mailbox)->gmime_stream)->fd;
-    return mx_lock_file(path, fd, FALSE, TRUE, 1);
+    return libbalsa_lock_file(path, fd, FALSE, TRUE, 1);
 }
 
 static void mbox_unlock(LibBalsaMailbox * mailbox, GMimeStream *stream)
@@ -256,7 +256,7 @@ static void mbox_unlock(LibBalsaMailbox * mailbox, GMimeStream *stream)
 	fd = GMIME_STREAM_FS(stream)->fd;
     else
 	fd = GMIME_STREAM_FS(LIBBALSA_MAILBOX_MBOX(mailbox)->gmime_stream)->fd;
-    mx_unlock_file(path, fd, 1);
+    libbalsa_unlock_file(path, fd, 1);
 }
 
 static void
@@ -378,8 +378,8 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox)
 
     /* increment the reference count */
 #ifdef DEBUG
-    g_print(_("LibBalsaMailboxMbox: Opening %s Refcount: %d\n"),
-	    mailbox->name, mailbox->open_ref);
+    g_print(_("%s: Opening %s Refcount: %d\n"),
+	    "LibBalsaMailboxMbox", mailbox->name, mailbox->open_ref);
 #endif
     return TRUE;
 }
@@ -486,18 +486,6 @@ static gboolean libbalsa_mailbox_mbox_close_backend(LibBalsaMailbox * mailbox)
     return TRUE;
 }
 
-static gchar *libbalsa_tempfilename(void)
-{
-    gchar tmp_file_name[PATH_MAX + 1];
-
-    libbalsa_lock_mutt();
-    mutt_mktemp(tmp_file_name);
-    libbalsa_unlock_mutt();
-
-    return g_strdup(tmp_file_name);
-}
-
-
 static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox)
 {
     int fd;
@@ -513,6 +501,7 @@ static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox)
     GMimeStream *gmime_stream;
     GMimeStream *mbox_stream;
     gchar *tempfile;
+    GError *error = NULL;
     gchar buffer[5];
     gboolean save_failed;
     GMimeParser *gmime_parser;
@@ -572,10 +561,11 @@ static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox)
 	return FALSE;
     }
     /* Create a temporary file to write the new version of the mailbox in. */
-    tempfile = libbalsa_tempfilename();
-    if ((i = open (tempfile, O_RDWR | O_EXCL | O_CREAT, 0600)) == -1)
+    i = g_file_open_tmp("balsa-tmp-mbox-XXXXXX", &tempfile, &error);
+    if (i == -1)
     {
-	g_warning("Could not create temporary file!");
+	g_warning("Could not create temporary file: %s", error->message);
+	g_error_free (error);
 	mbox_unlock(mailbox, gmime_stream);
 	g_mime_stream_unref(gmime_stream);
 	return FALSE;

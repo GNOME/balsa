@@ -97,7 +97,7 @@ gboolean libbalsa_delete_directory_contents(const gchar *path);
 gchar *libbalsa_truncate_string(const gchar * str, gint length, gint dots);
 gchar *libbalsa_expand_path(const gchar *path);
 void libbalsa_contract_path(gchar *path);
-void libbalsa_mktemp(gchar * name);
+gboolean libbalsa_mktempdir(gchar ** name);
 gboolean libbalsa_utf8_sanitize(gchar ** text, gboolean fallback,
                                 LibBalsaCodeset codeset, gchar const **target);
 void libbalsa_insert_with_url(GtkTextBuffer * buffer,
@@ -113,5 +113,9 @@ void libbalsa_unwrap_selection(GtkTextBuffer * buffer, regex_t * rex);
 gboolean libbalsa_match_regex(const gchar * line, regex_t * rex,
 			      guint * count, guint * index);
 
+int libbalsa_safe_open (const char *path, int flags);
+int libbalsa_lock_file (const char *path, int fd, int excl, int dot, int timeout);
+int libbalsa_unlock_file (const char *path, int fd, int dot);
+int libbalsa_safe_rename (const char *src, const char *target);
 
 #endif				/* __LIBBALSA_MISC_H__ */

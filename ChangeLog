@@ -1,3 +1,49 @@
+2003-09-08  Carlos Morgado  <chbm chbm.net>
+
+	* src/Makefile.am: 
+	* configure.in: 
+	* Makefile.am: 
+	* libbalsa/filter-file.c: 
+	* libbalsa/filter-private.h: 
+	* libbalsa/mailbackend.h: 
+	* libinit_balsa/helper.c (balsa_init_create_to_directory): 
+	* libbalsa/message.c (libbalsa_message_charset): 
+	* libbalsa/mailbox_mh.c (libbalsa_mailbox_mh_check): 
+	* libbalsa/mailbox_mbox.c (mbox_unlock): 
+	* libbalsa/body.c (libbalsa_message_body_save): 
+	* src/save-restore.c (config_global_load): 
+	* libbalsa/libbalsa.c:
+	* libbalsa/libbalsa.h:
+	* libbalsa/misc.c:
+	* libbalsa/misc.h:
+	delibmuttification
+	UNFINISHED
+	
+	* libbalsa/mailbox_imap.c (libbalsa_mailbox_imap_open): 
+	* libbalsa/mailbox_mbox.c (libbalsa_mailbox_mbox_open): 
+	* libbalsa/mailbox_mh.c (libbalsa_mailbox_mh_open): 
+	* libbalsa/mailbox_maildir.c (libbalsa_mailbox_maildir_open): 
+	* libbalsa/mailbox_pop3.c (libbalsa_mailbox_pop3_open): 
+	fix #121637
+	
+	* libbalsa/body.c:
+	* libbalsa/body.h:
+	* libbalsa/libbalsa.c:
+	* libbalsa/mailbox_mbox.c:
+	* libbalsa/message.c:
+	* libbalsa/misc.c:
+	* libbalsa/misc.h:
+	* src/balsa-message.c:
+	* src/print.c:
+	* src/sendmsg-window.c:
+	-Removed prefix parameter in libbalsa_message_body_save* functions
+	-Added libbalsa_message_body_save_fd function to save to a 
+	filedescriptor
+	-Changed mutt_mktemp to g_file_open_tmp code
+	-Added libbalsa_mktempdir in forwarding/continuing message code
+	-Only convert body charset is mime type is text/* and not text/html
+	(from Bart)
+
 2003-09-07  Bart Visscher <magick@Linux-Fan.com>
 
 	* libbalsa/imap/util.c (Repository): 

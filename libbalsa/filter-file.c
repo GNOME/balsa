@@ -42,6 +42,7 @@
 #ifdef BALSA_USE_THREADS
 #  include <pthread.h>
 #endif
+#include <string.h>
 #include <time.h>
 #include <sys/types.h>
 #include "filter-file.h"

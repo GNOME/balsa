@@ -710,7 +710,7 @@ prepare_plaintext(PrintInfo * pi, LibBalsaMessageBody * body)
 	FILE *part;
 
 	textbuf = NULL;
-	libbalsa_message_body_save_temporary(body, NULL);
+	libbalsa_message_body_save_temporary(body);
 	part = fopen(body->temp_filename, "r");
 	if (part) {
 	    libbalsa_readfile(part, &textbuf);
@@ -950,7 +950,7 @@ prepare_image(PrintInfo * pi, LibBalsaMessageBody * body)
     pdata = g_malloc(sizeof(ImageInfo));
     pdata->id_tag = BALSA_PRINT_TYPE_IMAGE;
 
-    libbalsa_message_body_save_temporary(body, NULL);
+    libbalsa_message_body_save_temporary(body);
     pdata->pixbuf = gdk_pixbuf_new_from_file(body->temp_filename, &err);
     if(err) {
         g_warning("Error loading image from file.");

@@ -22,11 +22,13 @@
 
 #include "config.h"
 
+#include <stdio.h>
 #include <sys/utsname.h>
 #include <ctype.h>
 #include <string.h>
 #include <errno.h>
 #include <dirent.h>
+#include <sys/file.h>
 
 #include <libgnomevfs/gnome-vfs-file-info.h>
 #include <libgnomevfs/gnome-vfs-ops.h>
@@ -38,7 +40,7 @@
 
 static const gchar *libbalsa_get_codeset_name(const gchar *txt, 
 					      LibBalsaCodeset Codeset);
-
+static int getdnsdomainname(char *s, size_t l);
 
 /* libbalsa_lookup_mime_type:
    find out mime type of a file. Must work for both relative and absolute
@@ -78,6 +80,54 @@ libbalsa_get_hostname(void)
 	*p = 0;
 
     return g_strdup (utsname.nodename);
+}
+
+static int 
+getdnsdomainname (char *s, size_t l)
+{
+  FILE *f;
+  char tmp[1024];
+  char *p = NULL;
+  char *q;
+
+  if ((f = fopen ("/etc/resolv.conf", "r")) == NULL) return (-1);
+
+  tmp[sizeof (tmp) - 1] = 0;
+
+  l--; /* save room for the terminal \0 */
+
+  while (fgets (tmp, sizeof (tmp) - 1, f) != NULL)
+  {
+    p = tmp;
+    while (ISSPACE (*p)) p++;
+    if (strncmp ("domain", p, 6) == 0 || strncmp ("search", p, 6) == 0)
+    {
+      p += 6;
+      
+      for (q = strtok (p, " \t\n"); q; q = strtok (NULL, " \t\n"))
+	if (strcmp (q, "."))
+	  break;
+
+      if (q)
+      {
+	  char *a = q;
+	  
+	  for (; *q; q++)
+	      a = q;
+	  
+	  if (*a == '.')
+	      *a = '\0';
+	  
+	  g_stpcpy (s, q);
+	  fclose (f);
+	  return 0;
+      }
+      
+    }
+  }
+
+  fclose (f);
+  return (-1);
 }
 
 gchar *
@@ -1011,29 +1061,55 @@ libbalsa_truncate_string(const gchar *str, gint length, gint dots)
 }
 
 /* libbalsa_expand_path:
-   do different kind of filename expansions, e.g. ~ -> $HOME, etc.
+   expand ~ -> $HOME. libmutt did more, but we never advertived it
+   if someone complains, this is the stuff to fix
 */
 gchar*
 libbalsa_expand_path(const gchar * path)
 {
     char buf[_POSIX_PATH_MAX];
-    char* res;
-    strcpy(buf, path);
-    libbalsa_lock_mutt();
-    res = mutt_expand_path(buf, sizeof(buf));
-    libbalsa_unlock_mutt();
-    return g_strdup(res);
+   
+    if(path[0] == '~' && (path[1] == '/' || path[1] == '\0')) {
+	const gchar *foo = g_get_home_dir();
+	size_t len;
+
+	len = strlen(foo);
+	len++;
+	strcpy(buf, foo);
+	strncpy(buf + len, path+1, _POSIX_PATH_MAX-len);
+    }
+
+    return g_strdup(buf);
 }
 
-/* libbalsa_contract_path:
-   do a reverse transformation.
-*/
-void
-libbalsa_contract_path(gchar *path)
+
+
+/* create a uniq directory, resulting name should be freed with g_free */
+gboolean 
+libbalsa_mktempdir (char **s)
 {
-    libbalsa_lock_mutt();
-    mutt_pretty_mailbox(path);
-    libbalsa_unlock_mutt();
+    gchar *name;
+    int fd;
+    GError *error;
+
+    g_return_val_if_fail(s != NULL, FALSE);
+
+    do {
+	fd = g_file_open_tmp("balsa-tmpdir-XXXXXX", &name, &error);
+	close(fd);
+	unlink(name);
+	/* Here is a short time that the name could be reused */
+	fd = mkdir(name, 0700);
+	if (fd == -1) {
+	    g_free(name);
+	    if (!g_error_matches(error, G_FILE_ERROR, G_FILE_ERROR_EXIST))
+		return FALSE;
+	}
+	g_error_free(error);
+    } while (fd == -1);
+    *s = name;
+    /* FIXME: rmdir(name) at sometime */
+    return TRUE;
 }
 
 /* libbalsa_utf8_sanitize
@@ -1362,4 +1438,240 @@ libbalsa_match_regex(const gchar * line, regex_t * rex, guint * count,
     if (index)
 	*index = p - line;
     return c > 0;
+}
+
+
+#define compare_stat(osb, nsb)  ( (osb.st_dev != nsb.st_dev || osb.st_ino != nsb.st_ino || osb.st_rdev != nsb.st_rdev) ? -1 : 0 )
+
+int 
+libbalsa_safe_open (const char *path, int flags)
+{
+  struct stat osb, nsb;
+  int fd;
+ 
+  if ((fd = open (path, flags, 0600)) < 0)
+    return fd;
+ 
+  /* make sure the file is not symlink */
+  if (lstat (path, &osb) < 0 || fstat (fd, &nsb) < 0 ||
+      compare_stat(osb, nsb) == -1)
+      {
+	  g_warning("safe_open(): %s is a symlink!\n", path);
+	  close (fd);
+	  return (-1);
+      }
+ 
+  return (fd);
+}
+
+/* 
+ * This function is supposed to do nfs-safe renaming of files.
+ * 
+ * Warning: We don't check whether src and target are equal.
+ */
+
+int 
+libbalsa_safe_rename (const char *src, const char *target)
+{
+  struct stat ssb, tsb;
+
+  if (!src || !target)
+    return -1;
+
+  if (link (src, target) != 0)
+  {
+
+    /*
+     * Coda does not allow cross-directory links, but tells
+     * us it's a cross-filesystem linking attempt.
+     * 
+     * However, the Coda rename call is allegedly safe to use.
+     * 
+     * With other file systems, rename should just fail when 
+     * the files reside on different file systems, so it's safe
+     * to try it here.
+     *
+     */
+
+    if (errno == EXDEV)
+      return rename (src, target);
+    
+    return -1;
+  }
+
+  /*
+   * Stat both links and check if they are equal.
+   */
+  
+  if (stat (src, &ssb) == -1)
+  {
+    return -1;
+  }
+  
+  if (stat (target, &tsb) == -1)
+  {
+    return -1;
+  }
+
+  /* 
+   * pretend that the link failed because the target file
+   * did already exist.
+   */
+
+  if (compare_stat (ssb, tsb) == -1)
+  {
+    errno = EEXIST;
+    return -1;
+  }
+
+  /*
+   * Unlink the original link.  Should we really ignore the return
+   * value here? XXX
+   */
+
+  unlink (src);
+
+  return 0;
+}
+
+
+#define MAXLOCKATTEMPT 5
+
+/* Args:
+ *      excl            if excl != 0, request an exclusive lock
+ *      dot             if dot != 0, try to dotlock the file
+ *      timeout         should retry locking?
+ */
+int 
+libbalsa_lock_file (const char *path, int fd, int excl, int dot, int timeout)
+{
+#if defined (USE_FCNTL) || defined (USE_FLOCK)
+    int count;
+    int attempt;
+    struct stat prev_sb;
+#endif
+    int r = 0;
+                                                                                
+#ifdef USE_FCNTL
+    struct flock lck;
+                                                                                
+                                                                                
+    memset (&lck, 0, sizeof (struct flock));
+    lck.l_type = excl ? F_WRLCK : F_RDLCK;
+    lck.l_whence = SEEK_SET;
+                                                                                
+    count = 0;
+    attempt = 0;
+    while (fcntl (fd, F_SETLK, &lck) == -1)
+	{
+	    struct stat sb;
+	    g_warning"mx_lock_file(): fcntl errno %d.\n", errno);
+    if (errno != EAGAIN && errno != EACCES)
+	{
+	    mutt_perror ("fcntl");
+	    return (-1);
+	}
+ 
+    if (fstat (fd, &sb) != 0)
+	sb.st_size = 0;
+     
+    if (count == 0)
+	prev_sb = sb;
+ 
+    /* only unlock file if it is unchanged */
+    if (prev_sb.st_size == sb.st_size && ++count >= (timeout?MAXLOCKATTEMPT:0))
+	{
+	    if (timeout)
+		mutt_error _("Timeout exceeded while attempting fcntl lock!");
+	    return (-1);
+	}
+ 
+    prev_sb = sb;
+ 
+    mutt_message (_("Waiting for fcntl lock... %d"), ++attempt);
+    sleep (1);
+}
+#endif /* USE_FCNTL */
+ 
+#ifdef USE_FLOCK
+count = 0;
+attempt = 0;
+while (flock (fd, (excl ? LOCK_EX : LOCK_SH) | LOCK_NB) == -1)
+{
+    struct stat sb;
+    if (errno != EWOULDBLOCK)
+	{
+	    libbalsa_message ("flock: %s", strerror(errno));
+	    r = -1;
+	    break;
+	}
+ 
+    if (fstat(fd,&sb) != 0 )
+	sb.st_size=0;
+     
+    if (count == 0)
+	prev_sb=sb;
+ 
+    /* only unlock file if it is unchanged */
+    if (prev_sb.st_size == sb.st_size && ++count >= (timeout?MAXLOCKATTEMPT:0))
+	{
+	    if (timeout)
+		libbalsa_message (_("Timeout exceeded while attempting flock lock!"));
+	    r = -1;
+	    break;
+	}
+ 
+    prev_sb = sb;
+ 
+    libbalsa_message (_("Waiting for flock attempt... %d"), ++attempt);
+    sleep (1);
+}
+#endif /* USE_FLOCK */
+ 
+#ifdef USE_DOTLOCK
+if (r == 0 && dot)
+     r = dotlock_file (path, fd, timeout);
+#endif /* USE_DOTLOCK */
+ 
+     if (r == -1)
+{
+    /* release any other locks obtained in this routine */
+ 
+#ifdef USE_FCNTL
+    lck.l_type = F_UNLCK;
+    fcntl (fd, F_SETLK, &lck);
+#endif /* USE_FCNTL */
+ 
+#ifdef USE_FLOCK
+    flock (fd, LOCK_UN);
+#endif /* USE_FLOCK */
+ 
+    return (-1);
+}
+ 
+return 0;
+}
+
+int 
+libbalsa_unlock_file (const char *path, int fd, int dot)
+{
+#ifdef USE_FCNTL
+    struct flock unlockit = { F_UNLCK, 0, 0, 0 };
+                                                                                
+    memset (&unlockit, 0, sizeof (struct flock));
+    unlockit.l_type = F_UNLCK;
+    unlockit.l_whence = SEEK_SET;
+    fcntl (fd, F_SETLK, &unlockit);
+#endif
+                                                                                
+#ifdef USE_FLOCK
+    flock (fd, LOCK_UN);
+#endif
+                                                                                
+#ifdef USE_DOTLOCK
+    if (dot)
+	undotlock_file (path, fd);
+#endif
+                                                                                
+    return 0;
 }

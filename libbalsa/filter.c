@@ -30,6 +30,7 @@
  */
 
 #include <ctype.h>
+#include <string.h>
 
 /* we need _() function, how to get it? */
 #include <gnome.h>

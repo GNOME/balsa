@@ -23,8 +23,5 @@
 #ifndef __LIBBALSA_MAILBACKEND_H__
 #define __LIBBALSA_MAILBACKEND_H__
 
-#include "libmutt/mutt.h"
-#include "libmutt/mx.h"
-#include "libmutt/buffy.h"
 
 #endif				/* __LIBBALSA_MAILBACKEND_H__ */

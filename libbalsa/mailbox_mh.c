@@ -462,8 +462,8 @@ libbalsa_mailbox_mh_open(LibBalsaMailbox * mailbox)
 
     /* increment the reference count */
 #ifdef DEBUG
-    g_print(_("LibBalsaMailboxMh: Opening %s Refcount: %d\n"),
-	    mailbox->name, mailbox->open_ref);
+    g_print(_("%s: Opening %s Refcount: %d\n"),
+	    "LibBalsaMailboxMh", mailbox->name, mailbox->open_ref);
 #endif
     return TRUE;
 }
@@ -503,7 +503,7 @@ static void libbalsa_mailbox_mh_check(LibBalsaMailbox * mailbox)
 		if (fd != -1)
 		{
 		    close(fd);
-		    if (/*libbalsa_nfs_*/safe_rename(tmp,
+		    if (libbalsa_safe_rename(tmp,
 					     mh->sequences_filename) == -1)
 			unlink (tmp);
 		    g_free(tmp);
@@ -834,7 +834,7 @@ static gboolean libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox)
     unlink(sequences_filename);
 
     /* rename tempfile to '.mh_sequences' */
-    if (/*libbalsa_nfs_*/safe_rename(tmp, sequences_filename) == -1)
+    if (libbalsa_safe_rename(tmp, sequences_filename) == -1)
     {
 	unlink (tmp);
 	g_free(tmp);
@@ -1028,7 +1028,7 @@ static int libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
 	new_filename = g_strdup_printf("%s/%d", path, msgno);
 
 	/* rename tempfile to message-number-name */
-	if (/*libbalsa_nfs_*/safe_rename(tmp, new_filename) == -1) {
+	if (libbalsa_safe_rename(tmp, new_filename) == -1) {
 	    if (errno != EEXIST)
 	    {
 		unlink (tmp);

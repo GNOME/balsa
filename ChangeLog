@@ -1,3 +1,16 @@
+2004-01-13 21:49  PeterB
+
+	* src/print.c: Use GMime filter to print text/enriched and
+	text/richtext parts as html.
+	* src/balsa-message.c: Detect when GMime can filter text/enriched
+	and text/richtext; use libbalsa_mailbox api; use g_list_free1() to
+	free a list of one item.
+	* src/balsa-index.c: Plug a memory leak.
+	* configure.in, libbalsa/html.c, libbalsa/html.h, libbalsa/mime.c:
+	Detect when GMime can filter text/enriched and text/richtext.
+	* libbalsa/message.c, src/sendmsg-window.c: Keep references in the
+	correct order.
+
 2004-01-11 15:54  PeterB
 
 	* libbalsa/: mailbox.c, mailbox.h, mailbox_imap.c, mailbox_local.c,

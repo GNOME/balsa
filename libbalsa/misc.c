@@ -453,9 +453,13 @@ libbalsa_readfile (FILE * fp, char **buf)
 	size_t size;
 	off_t offset;
 	int r;
-	int fd = fileno (fp);
+	int fd;
 	struct stat statbuf;
 
+	*buf = NULL;
+	if(!fp) return 0;
+
+	fd = fileno (fp);
 	if (fstat (fd, &statbuf) == -1)
 		return -1;
 

@@ -57,7 +57,10 @@ process_mime_part (LibBalsaMessage * message, LibBalsaMessageBody * body,
 		libbalsa_message_body_save_temporary(body, NULL);
     
 		part = fopen (body->temp_filename, "r");
+		if(!part) break;
 		alloced = libbalsa_readfile (part, &res);
+		fclose(part);
+		if(!res) break;
 		if(llen>0) {
 			if(reply_prefix_str) llen -= strlen(reply_prefix_str);
 			libbalsa_wrap_string(res, llen);
@@ -109,14 +112,13 @@ content2reply (LibBalsaMessage * message, gchar *reply_prefix_str, gint llen)
 	GString *reply = NULL, *res;
 
 	body = message->body_list;
-	while ( body ) {
+	for(body = message->body_list; body; body = body->next)  {
 		res = process_mime_part(message, body, reply_prefix_str, llen);
 		if(!res) continue;
 		if(reply) {
 			reply =  g_string_append(reply, res->str);
 			g_string_free(res, TRUE);
 		} else reply = res;
-		body = body->next;
 	}    
 
 	return reply;

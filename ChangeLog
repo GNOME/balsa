@@ -1,3 +1,7 @@
+2000-10-04  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/mime.c,libbalsa/misc.c: don't crash on replying empty mails.
+	
 2000-10-04  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/Makefile.am: Don't need to include $(top_builddir)/libmutt.

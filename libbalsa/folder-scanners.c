@@ -35,6 +35,7 @@
 #include "folder-scanners.h"
 #include "mutt.h"
 #include "imap/imap.h"
+#include "imap/imap_private.h"
 #include "browser.h"
 #if 0
 static gboolean
@@ -186,11 +187,11 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
 	printf("Deph: %i -------------------------------------------\n", i);
 	for(el= g_list_first(list); el; el = g_list_next(el)) {
 	    if(*(char*)el->data)
-		imap_path = g_strdup_printf("{%s:%i}%s/", server->host, 
+		imap_path = g_strdup_printf("imap://%s:%i/%s/", server->host, 
 					    server->port, (char*)el->data);
 	    else 
-		imap_path = g_strdup_printf("{%s:%i}%s", server->host, 
-					    server->port, (char*)el->data);
+		imap_path = g_strdup_printf("imap://%s:%i/", server->host, 
+					    server->port);
 	    FREE(&state.folder);
 	    imap_browse ((char*)imap_path,  &state);
 	    g_free(imap_path);
@@ -209,9 +210,10 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
 void imap_add_folder (char delim, char *folder, int noselect,
   int noinferiors, struct browser_state *state, short isparent)
 {
-    /* printf("imap_add_folder. delim: '%c', folder: '%s', noselect: %d\n"
+    imap_unmunge_mbox_name (folder);
+    printf("imap_add_folder. delim: '%c', folder: '%s', noselect: %d\n"
 	   "noinferiors: %d, isparent: %d\n", delim, folder, noselect,
-	   noinferiors, isparent); */
+	   noinferiors, isparent); 
     if(isparent) return;
     if(!noselect) {
 	printf("ADDING MAILBOX %s\n", folder);

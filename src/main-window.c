@@ -1438,7 +1438,6 @@ check_new_messages_auto_cb(gpointer data)
 void
 check_new_messages_cb(GtkWidget * widget, gpointer data)
 {
-    libbalsa_notify_start_check();
 
 #ifdef BALSA_USE_THREADS
     /*  Only Run once -- If already checking mail, return.  */
@@ -1497,6 +1496,7 @@ check_new_messages_cb(GtkWidget * widget, gpointer data)
 
 #else
     fill_mailbox_passwords(balsa_app.inbox_input);
+    libbalsa_notify_start_check();
     check_mailbox_list(balsa_app.inbox_input);
 
     gtk_ctree_post_recursive(GTK_CTREE(balsa_app.mblist), NULL, 
@@ -1529,6 +1529,7 @@ check_messages_thread(gpointer data)
      */
     MailThreadMessage *threadmessage;
 
+    libbalsa_notify_start_check();
     MSGMAILTHREAD(threadmessage, MSGMAILTHREAD_SOURCE, NULL, "POP3", 0, 0);
     check_mailbox_list(balsa_app.inbox_input);
 

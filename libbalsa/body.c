@@ -153,6 +153,9 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body,
     return libbalsa_message_body_save(body, prefix, body->temp_filename);
 }
 
+/* libbalsa_message_body_save:
+   NOTE: has to use safe_fopen to set the file access privileges to safe.
+*/
 gboolean
 libbalsa_message_body_save(LibBalsaMessageBody * body, gchar * prefix,
 			   gchar * filename)
@@ -171,7 +174,7 @@ libbalsa_message_body_save(LibBalsaMessageBody * body, gchar * prefix,
     s.fpin = stream;
 
     s.prefix = prefix;
-    s.fpout = fopen(filename, "w");
+    s.fpout = safe_fopen(filename, "w");
     if (!s.fpout)
 	return FALSE;
 

@@ -887,6 +887,13 @@ balsa_message_next (GtkWidget * widget, gpointer index)
   balsa_index_select_next (index);
 }
 
+void
+balsa_message_next_unread (GtkWidget* widget, gpointer index)
+{
+  g_return_if_fail (index != NULL);
+  balsa_index_select_next_unread (index);
+}
+
 
 void
 balsa_message_previous (GtkWidget * widget, gpointer index)

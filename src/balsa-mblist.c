@@ -244,19 +244,25 @@ balsa_mblist_init (BalsaMBList * tree)
   gtk_clist_set_row_height (GTK_CLIST (tree), 16);
   gtk_clist_set_column_width (GTK_CLIST (tree), 0, balsa_app.mblist_name_width);
 #ifdef BALSA_SHOW_INFO
-  if (tree->display_content_info)
-    {
-      gtk_clist_set_column_width (GTK_CLIST (tree), 1, balsa_app.mblist_newmsg_width);
-      gtk_clist_set_column_width (GTK_CLIST (tree), 2, balsa_app.mblist_totalmsg_width);
-      gtk_clist_set_sort_column (GTK_CLIST (tree),0);
-      gtk_clist_set_sort_type (GTK_CLIST (tree), GTK_SORT_ASCENDING);
-      gtk_clist_set_compare_func (GTK_CLIST (tree), NULL);
-    }
-  else
-    {
-      gtk_clist_set_column_visibility (GTK_CLIST (tree), 1, FALSE);
-      gtk_clist_set_column_visibility (GTK_CLIST (tree), 2, FALSE);
-    }
+
+
+  gtk_clist_set_column_width (GTK_CLIST (tree), 1, 
+                              balsa_app.mblist_newmsg_width);
+  gtk_clist_set_column_justification (GTK_CLIST (tree), 1, GTK_JUSTIFY_RIGHT);
+
+  gtk_clist_set_column_width (GTK_CLIST (tree), 2, 
+                              balsa_app.mblist_totalmsg_width);
+  gtk_clist_set_column_justification (GTK_CLIST (tree), 2, GTK_JUSTIFY_RIGHT);
+
+  gtk_clist_set_sort_column (GTK_CLIST (tree),0);
+  gtk_clist_set_sort_type (GTK_CLIST (tree), GTK_SORT_ASCENDING);
+  gtk_clist_set_compare_func (GTK_CLIST (tree), NULL);
+
+  if (!tree->display_content_info)
+  {
+    gtk_clist_set_column_visibility (GTK_CLIST (tree), 1, FALSE);
+    gtk_clist_set_column_visibility (GTK_CLIST (tree), 2, FALSE);
+  }
   
 #endif
 

@@ -1,3 +1,10 @@
+2000-03-24  Matthew Guenther <mguenther@netcom.ca>
+	* src/main-window.c: add next_unread_message_cb, associated menu 
+	and toolbar items.
+	* src/balsa-index.[hc]: add balsa_message_next_unread
+	* src/balsa-index-page.[hc]: add balsa_index_select_next_unread
+
+
 2000-03-23  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/balsa-message.c: handling msgs w/o respective fonts

@@ -125,6 +125,7 @@ static void forward_message_cb (GtkWidget * widget, gpointer data);
 static void continue_message_cb (GtkWidget * widget, gpointer data);
 
 static void next_message_cb (GtkWidget * widget, gpointer data);
+static void next_unread_message_cb (GtkWidget* widget, gpointer data);
 static void previous_message_cb (GtkWidget * widget, gpointer data);
 
 static void delete_message_cb (GtkWidget * widget, gpointer data);
@@ -207,18 +208,40 @@ static GnomeUIInfo shown_hdrs_menu[] =
 
 static GnomeUIInfo message_menu[] =
 {
+#define MENU_MESSAGE_NEXT_POS 0
+  {
+    GNOME_APP_UI_ITEM, N_ ("Next"), N_ ("Next Message"),
+    next_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_FORWARD, 'N', 0, NULL
+  },
+#define MENU_MESSAGE_PREV_POS 1
+  {
+    GNOME_APP_UI_ITEM, N_ ("Previous"), N_ ("Preivous Message"),
+    previous_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_BACK, 'P', 0, NULL
+  },
+#define MENU_MESSAGE_NEXT_UNREAD_POS 2
+  {
+    GNOME_APP_UI_ITEM, N_ ("Next Unread"), N_ ("Next Unread Message"),
+    next_unread_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_FORWARD, 'N', GDK_CONTROL_MASK, NULL
+  },
+  GNOMEUIINFO_SEPARATOR,
+#define MENU_MESSAGE_NEW_POS 4
     /* M */
   {
     GNOME_APP_UI_ITEM, N_ ("_New"), N_("Compose a new message"),
     new_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_MAIL, 'M', 0, NULL
   },
+#define MENU_MESSAGE_REPLY_POS 5
     /* R */
   {
     GNOME_APP_UI_ITEM, N_ ("_Reply"), N_("Reply to the current message"),
     replyto_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_MAIL_RPL, 'R', 0, NULL
   },
+#define MENU_MESSAGE_REPLY_ALL_POS 6
     /* A */
   {
     GNOME_APP_UI_ITEM, N_ ("Reply to _all"),
@@ -226,12 +249,14 @@ static GnomeUIInfo message_menu[] =
     replytoall_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_MAIL_RPL, 'A', 0, NULL
   },
+#define MENU_MESSAGE_FORWARD_POS 7
     /* F */
   {
     GNOME_APP_UI_ITEM, N_ ("_Forward"), N_("Forward the current message"),
     forward_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_MAIL_FWD, 'F', 0, NULL
   },
+#define MENU_MESSAGE_CONTINUE_POS 8
     /* C */
   {
     GNOME_APP_UI_ITEM, N_ ("_Continue"), N_("Continue editing current message"),
@@ -239,12 +264,14 @@ static GnomeUIInfo message_menu[] =
     GNOME_STOCK_MENU_MAIL, 'C', 0, NULL
   },
   GNOMEUIINFO_SEPARATOR,
+#define MENU_MESSAGE_DELETE_POS 10
     /* D */
   {
     GNOME_APP_UI_ITEM, N_ ("_Delete"), N_("Delete the current message"),
     delete_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_TRASH, 'D', 0, NULL
   },
+#define MENU_MESSAGE_UNDEL_POS 11
     /* U */
   {
     GNOME_APP_UI_ITEM, N_ ("_Undelete"), N_("Undelete the message"),
@@ -252,7 +279,7 @@ static GnomeUIInfo message_menu[] =
     GNOME_STOCK_MENU_UNDELETE, 'U', 0, NULL
   },
   GNOMEUIINFO_SEPARATOR,
-#define MENU_MESSAGE_WRAP_POS 9
+#define MENU_MESSAGE_WRAP_POS 13
   GNOMEUIINFO_TOGGLEITEM( N_ ("_Wrap"), NULL, wrap_message_cb, NULL),
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_RADIOLIST(shown_hdrs_menu),
@@ -308,17 +335,16 @@ static GnomeUIInfo settings_menu[] =
 };
 static GnomeUIInfo help_menu[] =
 {
-  GNOMEUIINFO_HELP ("balsa"),
-
   GNOMEUIINFO_MENU_ABOUT_ITEM(show_about_box, NULL),
-
+  GNOMEUIINFO_SEPARATOR,
+  GNOMEUIINFO_HELP ("balsa"),
   GNOMEUIINFO_END
 };
 static GnomeUIInfo main_menu[] =
 {
   GNOMEUIINFO_MENU_FILE_TREE(file_menu),
   GNOMEUIINFO_SUBTREE (N_("_Message"), message_menu),
-  GNOMEUIINFO_SUBTREE (N_("Mail_boxes"), mailbox_menu),
+  GNOMEUIINFO_SUBTREE (N_("Mail_box"), mailbox_menu),
   GNOMEUIINFO_MENU_SETTINGS_TREE(settings_menu),
   GNOMEUIINFO_MENU_HELP_TREE(help_menu),
   GNOMEUIINFO_END
@@ -353,12 +379,17 @@ static GnomeUIInfo main_toolbar[] =
   {
     GNOME_APP_UI_ITEM, N_ ("Previous"), N_("Open Previous message"),
     previous_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-    GNOME_STOCK_PIXMAP_BACK, 'P', 0, NULL
+    GNOME_STOCK_PIXMAP_BACK, 0, 0, NULL
   },
   {
     GNOME_APP_UI_ITEM, N_ ("Next"), N_("Open Next message"),
     next_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-    GNOME_STOCK_PIXMAP_FORWARD, 'N', 0, NULL
+    GNOME_STOCK_PIXMAP_FORWARD, 0, 0, NULL
+  },
+  {
+    GNOME_APP_UI_ITEM, N_ ("Next Unread"), N_ ("Open Next Unread Message"),
+    next_unread_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_PIXMAP_FORWARD, 0, 0, NULL
   },
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_ITEM_STOCK (N_ ("Print"), N_ ("Print current message"), file_print_cb, GNOME_STOCK_PIXMAP_PRINT),
@@ -515,14 +546,11 @@ balsa_window_new ()
   gtk_paned_pack1(GTK_PANED(hpaned), window->mblist, TRUE, TRUE);
   gtk_paned_pack2(GTK_PANED(hpaned), vpaned, TRUE, TRUE);
   /*PKGW: do it this way, without the usizes.*/
-  if(balsa_app.show_mblist) {
+  if(balsa_app.show_mblist)
      gtk_check_menu_item_set_active(
 	GTK_CHECK_MENU_ITEM(settings_menu[MENU_SETTINGS_MBLIST_POS].widget),
 	balsa_app.show_mblist);
-  }
-  /* gtk_widget_show(GTK_WIDGET(window->mblist));
-     gtk_paned_set_position( GTK_PANED(hpaned), balsa_app.mblist_width); */
-
+  
   gtk_paned_pack1(GTK_PANED(vpaned), window->notebook, TRUE, TRUE);
   gtk_paned_pack2(GTK_PANED(vpaned), preview, TRUE, TRUE);
   /*PKGW: do it this way, without the usizes.*/
@@ -542,7 +570,6 @@ balsa_window_new ()
      gtk_check_menu_item_set_active(
 	GTK_CHECK_MENU_ITEM(shown_hdrs_menu[balsa_app.shown_headers].widget),
 	TRUE);
-
 
   if(balsa_app.show_notebook_tabs)
      gtk_check_menu_item_set_active(
@@ -1291,6 +1318,11 @@ next_message_cb (GtkWidget * widget, gpointer data)
   balsa_message_next (widget, balsa_window_find_current_index (BALSA_WINDOW (data)));
 }
 
+static void
+next_unread_message_cb (GtkWidget* widget, gpointer data)
+{
+  balsa_message_next_unread (widget, balsa_window_find_current_index (BALSA_WINDOW (data)));
+}
 
 static void
 previous_message_cb (GtkWidget * widget, gpointer data)

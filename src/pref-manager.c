@@ -28,7 +28,9 @@
 #include "../libmutt/mime.h"
 #include "../libmutt/mutt.h"
 
+#if 0
 #include "arrow.xpm"
+#endif
 
 #define NUM_TOOLBAR_MODES 3
 #define NUM_MDI_MODES 4
@@ -36,7 +38,6 @@
 #define NUM_PWINDOW_MODES 3
 
 typedef struct _PropertyUI {
-	GtkWidget *pbox;
 	GtkRadioButton *toolbar_type[NUM_TOOLBAR_MODES];
 	GtkWidget *real_name, *email, *replyto, *signature;
 	GtkWidget *sig_whenforward, *sig_whenreply, *sig_sending;
@@ -84,7 +85,9 @@ typedef struct _PropertyUI {
 } PropertyUI;
 
 
-static PropertyUI *pui;
+static PropertyUI *pui = NULL;
+static GtkWidget *property_box;
+static gboolean already_open;
 
 static GtkWidget *create_identity_page( void );
 static GtkWidget *create_signature_page ( void );
@@ -98,10 +101,9 @@ static GtkWidget *create_startup_page ( void );
 
 static GtkWidget *incoming_page ( void );
 static GtkWidget *outgoing_page ( void );
-static void ok_prefs ( GtkWidget *pbox, PropertyUI *pui);
+static void destroy_pref_window_cb (GtkWidget *pbox, PropertyUI *property_struct);
 static void set_prefs (void);
-static void apply_prefs (GtkWidget * pbox, PropertyUI * pui);
-static void cancel_prefs (void);
+static void apply_prefs (GnomePropertyBox* pbox, gint page_num);
 void update_pop3_servers (void);
 static void smtp_changed (void);
 static void properties_modified_cb (GtkWidget * widget, GtkWidget * pbox);
@@ -111,7 +113,6 @@ static void pop3_add_cb (GtkWidget * widget, gpointer data);
 static void pop3_del_cb (GtkWidget * widget, gpointer data);
 static void timer_modified_cb( GtkWidget *widget, GtkWidget *pbox);
 static void print_modified_cb( GtkWidget *widget, GtkWidget *pbox);
-static void clist_click_cb(GtkWidget * widget, gint num);
 static void wrap_modified_cb( GtkWidget *widget, GtkWidget *pbox);
 
 guint toolbar_type[NUM_TOOLBAR_MODES] =
@@ -164,304 +165,179 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 	static GnomeHelpMenuEntry help_entry = { "balsa", "win-config.html" };
 	gint i;
 	GnomeApp *active_win = GNOME_APP(data);
-	GtkWidget *hbuttonbox1;
-	GtkWidget *button;
-	GtkWidget *action_area;
-	GtkWidget *dialog_vbox1;
-	GtkWidget *hp1;
-	GtkWidget *sw;
-	GtkWidget *clist;
-	GdkPixmap *pmap;
-	GdkPixmap *mask;
-	gchar     *line[1] = {""};
 	GtkWidget *page;
-	GtkWidget *note;
 
 	/* only one preferences manager window */
-	if (pui) {
-		gdk_window_raise (GTK_WIDGET (GTK_DIALOG (pui->pbox))->window);
+	if (already_open) {
+		gdk_window_raise (GTK_WIDGET (property_box)->window);
 		return;
 	}
 
-
 	pui = g_malloc (sizeof (PropertyUI));
 
-	pui->pbox = gnome_dialog_new ( NULL, NULL );
-	gtk_window_set_title (GTK_WINDOW (pui->pbox), _("Balsa Preferences"));
-	gtk_window_set_policy (GTK_WINDOW (pui->pbox), FALSE, FALSE, FALSE);
-	gtk_window_set_modal(GTK_WINDOW (pui->pbox), FALSE);
-        gnome_dialog_set_parent(GNOME_DIALOG(pui->pbox), GTK_WINDOW(active_win));
+        property_box = gnome_property_box_new ();
 
-	hbuttonbox1 = gtk_hbutton_box_new ();
-	gtk_widget_show (hbuttonbox1);
+        already_open = TRUE;
+        
+	gtk_window_set_title (GTK_WINDOW (property_box), _("Balsa Preferences"));
+	gtk_window_set_policy (GTK_WINDOW (property_box), FALSE, FALSE, FALSE);
 
-	action_area = GNOME_DIALOG (pui->pbox)->action_area;
-	gtk_box_pack_start (GTK_BOX (action_area), hbuttonbox1, TRUE, TRUE, 0);
-	gtk_button_box_set_spacing (GTK_BUTTON_BOX (hbuttonbox1), 1);
-	gtk_button_box_set_child_size (GTK_BUTTON_BOX (hbuttonbox1), 74, 23);
-	gtk_button_box_set_child_ipadding (GTK_BUTTON_BOX (hbuttonbox1), 0, -1);
+        gnome_dialog_set_parent(GNOME_DIALOG(property_box), GTK_WINDOW(active_win));
 
-	button = gnome_stock_button (GNOME_STOCK_BUTTON_OK);
-	gtk_widget_show (button);
-	gtk_container_add (GTK_CONTAINER (hbuttonbox1), button);
-	GTK_WIDGET_SET_FLAGS (button, GTK_CAN_DEFAULT);
-	gtk_signal_connect (GTK_OBJECT (button), "clicked",
-			    GTK_SIGNAL_FUNC (ok_prefs), pui);
 
-	button = gnome_stock_button (GNOME_STOCK_BUTTON_APPLY);
-	gtk_widget_show (button);
-	gtk_container_add (GTK_CONTAINER (hbuttonbox1), button);
-	gtk_widget_set_sensitive (button, FALSE);
-	GTK_WIDGET_SET_FLAGS (button, GTK_CAN_DEFAULT);
+        
 
-	gtk_signal_connect (GTK_OBJECT (button), "clicked",
-			    GTK_SIGNAL_FUNC (apply_prefs), pui);
-	gtk_object_set_data(GTK_OBJECT(pui->pbox), "btn_apply", button);
-
-	button = gnome_stock_button (GNOME_STOCK_BUTTON_CANCEL);
-	gtk_widget_show (button);
-	gtk_container_add (GTK_CONTAINER (hbuttonbox1), button);
-	GTK_WIDGET_SET_FLAGS (button, GTK_CAN_DEFAULT);
-        gtk_signal_connect (GTK_OBJECT (button), "clicked",
-			    GTK_SIGNAL_FUNC (cancel_prefs), pui);
-
-	button = gnome_stock_button (GNOME_STOCK_BUTTON_HELP);
-	gtk_widget_show (button);
-	gtk_container_add (GTK_CONTAINER (hbuttonbox1), button);
-	GTK_WIDGET_SET_FLAGS (button, GTK_CAN_DEFAULT);
-	help_entry.name = gnome_app_id;
-	gtk_signal_connect (GTK_OBJECT (button), "clicked",
-			    GTK_SIGNAL_FUNC (gnome_help_display),
-			    &help_entry);
-
-	dialog_vbox1 = GNOME_DIALOG (pui->pbox)->vbox;
-	gtk_widget_show (dialog_vbox1);
-
-	hp1 = gtk_hpaned_new ();
-	gtk_widget_show (hp1);
-	gtk_box_pack_start (GTK_BOX (dialog_vbox1), hp1, TRUE, TRUE, 0);
-
-	sw = gtk_scrolled_window_new (NULL, NULL);
-	gtk_widget_show (sw);
-	gtk_container_add (GTK_CONTAINER (hp1), sw);
-	gtk_container_set_border_width (GTK_CONTAINER (sw), 5);
-	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw), GTK_POLICY_NEVER, GTK_POLICY_NEVER);
-	  
-	clist = gtk_clist_new (1);
-	gtk_widget_show (clist);
-	gtk_container_add (GTK_CONTAINER (sw), clist);
-	gtk_clist_set_column_width (GTK_CLIST (clist), 0, 80);
-	gtk_clist_column_titles_hide (GTK_CLIST (clist));
-	gtk_clist_set_row_height(GTK_CLIST(clist), 16);
-	gtk_clist_set_selection_mode(GTK_CLIST(clist), GTK_SELECTION_BROWSE);
-	
-	note = gtk_notebook_new();
-	gtk_widget_show(note);
-	gtk_notebook_set_show_border(GTK_NOTEBOOK(note), FALSE);
-	gtk_notebook_set_show_tabs(GTK_NOTEBOOK(note), FALSE);
-	gtk_container_add (GTK_CONTAINER (hp1), note);
-	gtk_object_set_data(GTK_OBJECT(clist), "note", note);
-
-	gtk_clist_append(GTK_CLIST(clist), line);
-	gdk_imlib_data_to_pixmap(behavior_xpm, &pmap, &mask);
-	gtk_clist_set_pixtext(GTK_CLIST(clist), 0, 0,
-			      _("Identity"), 1, pmap, mask);
 
 	page = create_identity_page();
-	gtk_notebook_append_page(GTK_NOTEBOOK(note), page, NULL);
- 
-
-	gtk_clist_append(GTK_CLIST(clist), line);
-	gdk_imlib_data_to_pixmap(behavior_xpm, &pmap, &mask);
-	gtk_clist_set_pixtext(GTK_CLIST(clist), 1, 0,
-			      _("Signature"), 1, pmap, mask);
+        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Identity")) );
 
 	page = create_signature_page ();
-	gtk_notebook_append_page(GTK_NOTEBOOK(note), page, NULL);
-
-	gtk_clist_append(GTK_CLIST(clist), line);
-	gdk_imlib_data_to_pixmap(behavior_xpm, &pmap, &mask);
-	gtk_clist_set_pixtext(GTK_CLIST(clist), 2, 0,
-			      _("Mail Servers"), 1, pmap, mask);
+        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Signature")) );
 
 	page = create_mailserver_page ();
-	gtk_notebook_append_page(GTK_NOTEBOOK(note), page, NULL);
-
-	gtk_clist_append(GTK_CLIST(clist), line);
-	gdk_imlib_data_to_pixmap(behavior_xpm, &pmap, &mask);
-	gtk_clist_set_pixtext(GTK_CLIST(clist), 3, 0,
-			      _("Mail Options"), 1, pmap, mask);
+        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Mail Servers")) );
 
 	page = create_mailoptions_page ();
-	gtk_notebook_append_page(GTK_NOTEBOOK(note), page, NULL);
-
-	gtk_clist_append(GTK_CLIST(clist), line);
-	gdk_imlib_data_to_pixmap(behavior_xpm, &pmap, &mask);
-	gtk_clist_set_pixtext(GTK_CLIST(clist), 4, 0,
-			      _("Display"), 1, pmap, mask);
+        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Mail Options")) );
 
 	page = create_display_page ();
-	gtk_notebook_append_page(GTK_NOTEBOOK(note), page, NULL);
-
-	gtk_clist_append(GTK_CLIST(clist), line);
-	gdk_imlib_data_to_pixmap(behavior_xpm, &pmap, &mask);
-	gtk_clist_set_pixtext(GTK_CLIST(clist), 5, 0,
-			      _("Printing"), 1, pmap, mask);
+        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Display")) );
 
 	page = create_printing_page ();
-	gtk_notebook_append_page(GTK_NOTEBOOK(note), page, NULL);
-
-	gtk_clist_append(GTK_CLIST(clist), line);
-	gdk_imlib_data_to_pixmap(behavior_xpm, &pmap, &mask);
-	gtk_clist_set_pixtext(GTK_CLIST(clist), 6, 0,
-			      _("Encoding"), 1, pmap, mask);
+        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Printing")) );
 
 	page = create_encondig_page();
-	gtk_notebook_append_page(GTK_NOTEBOOK(note), page, NULL);
-
-	gtk_clist_append(GTK_CLIST(clist), line);
-	gdk_imlib_data_to_pixmap(behavior_xpm, &pmap, &mask);
-	gtk_clist_set_pixtext(GTK_CLIST(clist), 7, 0,
-			      _("Misc"), 1, pmap, mask);
+        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Encoding")) );
 
 	page = create_misc_page ();
-	gtk_notebook_append_page(GTK_NOTEBOOK(note), page, NULL);
-
-	gtk_clist_append(GTK_CLIST(clist), line);
-	gdk_imlib_data_to_pixmap(behavior_xpm, &pmap, &mask);
-	gtk_clist_set_pixtext(GTK_CLIST(clist), 8, 0,
-			      _("Startup"), 1, pmap, mask);
+        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Misc")) );
 
 	page = create_startup_page ();
-	gtk_notebook_append_page(GTK_NOTEBOOK(note), page, NULL);
-
-	gtk_clist_columns_autosize(GTK_CLIST(clist));
-	gtk_clist_select_row(GTK_CLIST(clist), 0, 0);
-
-
-	/* CALLBACKS */
-	gtk_signal_connect(GTK_OBJECT(clist), "select_row",
-			   GTK_SIGNAL_FUNC(clist_click_cb), note);
-
+        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Startup")) );
 
 	set_prefs ();
-	for (i = 0; i < NUM_TOOLBAR_MODES; i++) {
+
+        for (i = 0; i < NUM_TOOLBAR_MODES; i++) {
 		gtk_signal_connect (GTK_OBJECT (pui->toolbar_type[i]), "clicked",
-				    properties_modified_cb, pui->pbox);
+				    properties_modified_cb, property_box);
 	}
 
 	for (i = 0; i < NUM_PWINDOW_MODES; i++) {
 		gtk_signal_connect (GTK_OBJECT (pui->pwindow_type[i]), "clicked",
-				    properties_modified_cb, pui->pbox);
+				    properties_modified_cb, property_box);
 	}
 
 	gtk_signal_connect (GTK_OBJECT (pui->previewpane), "toggled",
-			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 	gtk_signal_connect (GTK_OBJECT (pui->debug), "toggled",
-			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 #ifdef BALSA_SHOW_INFO
 	gtk_signal_connect (GTK_OBJECT (pui->mblist_show_mb_content_info), "toggled",
-			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 #endif
 
 	gtk_signal_connect (GTK_OBJECT (pui->real_name), "changed",
-			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 	gtk_signal_connect (GTK_OBJECT (pui->email), "changed",
-			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 	gtk_signal_connect (GTK_OBJECT (pui->replyto), "changed",
-			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 
 	gtk_signal_connect (GTK_OBJECT (pui->sig_sending), "toggled",
-			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 	gtk_signal_connect (GTK_OBJECT (pui->sig_whenforward), "toggled",
-			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 	gtk_signal_connect (GTK_OBJECT (pui->sig_whenreply), "toggled",
-			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 	gtk_signal_connect (GTK_OBJECT (pui->sig_separator), "toggled",
-			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 
 	gtk_signal_connect (GTK_OBJECT (pui->rb_smtp_server), "toggled",
-			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 	gtk_signal_connect (GTK_OBJECT (pui->rb_smtp_server), "toggled",
 			    GTK_SIGNAL_FUNC (smtp_changed), NULL);
 	gtk_signal_connect (GTK_OBJECT (pui->smtp_server), "changed",
-			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 	gtk_signal_connect (GTK_OBJECT (pui->mail_directory), "changed",
-			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 	gtk_signal_connect (GTK_OBJECT (pui->signature), "changed",
-			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 	gtk_signal_connect (GTK_OBJECT (pui->check_mail_auto), "toggled",
-			    GTK_SIGNAL_FUNC (timer_modified_cb), pui->pbox);
+			    GTK_SIGNAL_FUNC (timer_modified_cb), property_box);
 
 	gtk_signal_connect (GTK_OBJECT (pui->check_mail_minutes), "changed",
-			    GTK_SIGNAL_FUNC (timer_modified_cb), pui->pbox);
+			    GTK_SIGNAL_FUNC (timer_modified_cb), property_box);
 	gtk_signal_connect (GTK_OBJECT (pui->wordwrap), "toggled",
-			    GTK_SIGNAL_FUNC (wrap_modified_cb), pui->pbox);
+			    GTK_SIGNAL_FUNC (wrap_modified_cb), property_box);
 	gtk_signal_connect (GTK_OBJECT (pui->wraplength), "changed",
-			    GTK_SIGNAL_FUNC (wrap_modified_cb), pui->pbox);
+			    GTK_SIGNAL_FUNC (wrap_modified_cb), property_box);
 	gtk_signal_connect (GTK_OBJECT (pui->bcc), "changed",
-			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 
 	/* arp */
 	gtk_signal_connect (GTK_OBJECT (pui->quote_str), "changed",
 			    GTK_SIGNAL_FUNC (properties_modified_cb),
-			    pui->pbox);
+			    property_box);
 	
 	/* message font */
 	gtk_signal_connect (GTK_OBJECT (pui->message_font), "changed",
 			    GTK_SIGNAL_FUNC (font_changed),
-			    pui->pbox);
+			    property_box);
 	
 	gtk_signal_connect (GTK_OBJECT (pui->font_picker), "font_set",
 			    GTK_SIGNAL_FUNC (font_changed),
-			    pui->pbox);
+			    property_box);
  
 	/* charset */
 	gtk_signal_connect (GTK_OBJECT (pui->charset), "changed",
 			    GTK_SIGNAL_FUNC (properties_modified_cb),
-			    pui->pbox);
+			    property_box);
 
 	for (i = 0; i < NUM_ENCODING_MODES; i++) {
 		gtk_signal_connect (GTK_OBJECT (pui->encoding_type[i]), "clicked",
-				    properties_modified_cb, pui->pbox);
+				    properties_modified_cb, property_box);
 	}
 
 	/* printing */
 	gtk_signal_connect (GTK_OBJECT (pui->PrintCommand), "changed",
 			    GTK_SIGNAL_FUNC (print_modified_cb),
-			    pui->pbox);
+			    property_box);
 	gtk_signal_connect (GTK_OBJECT (pui->PrintBreakline), "toggled",
 			    GTK_SIGNAL_FUNC (print_modified_cb),
-			    pui->pbox);
+			    property_box);
 	gtk_signal_connect (GTK_OBJECT (pui->PrintLinesize), "changed",
 			    GTK_SIGNAL_FUNC (print_modified_cb),
-			    pui->pbox);
+			    property_box);
 
 	gtk_signal_connect (GTK_OBJECT (pui->check_mail_upon_startup), "toggled",
-			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 
 	gtk_signal_connect (GTK_OBJECT (pui->empty_trash), "toggled",
-			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 
 	/* Date format */
 	gtk_signal_connect (GTK_OBJECT (pui->date_format), "changed",
-			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 	gtk_signal_connect (GTK_OBJECT (pui->selected_headers), "changed",
-			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
         gtk_signal_connect (GTK_OBJECT (pui->unread_color), "released",
-                            GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
-        
-	gtk_widget_show_all ( GTK_WIDGET(pui->pbox));
+                            GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
+
+        /* Gnome Property Box Signals */
+        gtk_signal_connect (GTK_OBJECT (property_box), "destroy",
+                            GTK_SIGNAL_FUNC (destroy_pref_window_cb), pui);
+
+        gtk_signal_connect (GTK_OBJECT (property_box), "apply", 
+                            GTK_SIGNAL_FUNC (apply_prefs), pui);
+
+        help_entry.name = gnome_app_id;        
+        gtk_signal_connect (GTK_OBJECT (property_box), "help", 
+                            GTK_SIGNAL_FUNC (gnome_help_display), &help_entry);
+
+	gtk_widget_show_all ( GTK_WIDGET(property_box));
 
 } /* open_preferences_manager */
 
-static void
-cancel_prefs (void)
-{
-	gtk_widget_destroy (GTK_WIDGET (pui->pbox));
-	g_free (pui);
-	pui = NULL;
-}
 
 static void
 smtp_changed (void)
@@ -475,26 +351,21 @@ smtp_changed (void)
  */
 
 static void
-ok_prefs ( GtkWidget *pbox, PropertyUI *pui1)
+destroy_pref_window_cb (GtkWidget *pbox, PropertyUI *property_struct)
 {
-	GtkWidget *btn = NULL;
-
-	btn = (GtkWidget *) gtk_object_get_data(GTK_OBJECT(pui->pbox), "btn_apply");
-	if ( btn != NULL) {
-		if ( GTK_WIDGET_SENSITIVE (btn) ) 
-			apply_prefs ( pbox,  pui);
-	}
-
-	gtk_widget_destroy (GTK_WIDGET (pui->pbox));
-	g_free (pui);
-	pui = NULL;
+        g_free (property_struct);
+	property_struct = NULL;
+        already_open = FALSE;
 }
 
 static void
-apply_prefs (GtkWidget * pbox, PropertyUI * pui)
+apply_prefs (GnomePropertyBox* pbox, gint page_num)
 {
 	gint i;
-  
+
+        if (page_num != -1)
+                return;
+
 	/*
 	 * identity page
 	 */
@@ -612,18 +483,6 @@ apply_prefs (GtkWidget * pbox, PropertyUI * pui)
 	 */
 	config_global_save ();
         balsa_mblist_redraw (balsa_app.mblist);
-
-	/*
-	 * Setting the Apply buttin insensitive again
-	 */
-	{
-		GtkWidget *btn;
-		btn = (GtkWidget *) gtk_object_get_data(GTK_OBJECT(pui->pbox), "btn_apply");
-		if ( btn != NULL) {
-			if ( GTK_WIDGET_SENSITIVE (btn) ) 
-				gtk_widget_set_sensitive( GTK_WIDGET(btn), FALSE );
-		}
-	}
 }
 
 
@@ -1573,7 +1432,7 @@ create_misc_page ( )
 	gtk_label_set_justify (GTK_LABEL (label27), GTK_JUSTIFY_RIGHT);
 
         /* mblist unread colour  */
-        color_frame = gtk_frame_new (_("Colors"));
+        color_frame = gtk_frame_new (_("Colours"));
         gtk_widget_show (GTK_WIDGET (color_frame));
 	gtk_box_pack_start (GTK_BOX (vbox9), color_frame, FALSE, FALSE, 0);
 
@@ -1636,10 +1495,7 @@ create_startup_page ( )
 static void
 properties_modified_cb (GtkWidget * widget, GtkWidget * pbox)
 {
-	GtkWidget *btn;
-	
-	btn = (GtkWidget *) gtk_object_get_data(GTK_OBJECT(pbox), "btn_apply");
-	gtk_widget_set_sensitive (btn, TRUE);
+        gnome_property_box_changed (GNOME_PROPERTY_BOX (pbox));
 }
 
 
@@ -1735,18 +1591,6 @@ wrap_modified_cb( GtkWidget *widget, GtkWidget *pbox)
 
 	properties_modified_cb( widget, pbox );
 }
-
-
-
-static void
-clist_click_cb(GtkWidget * widget, gint num)
-{
-	GtkWidget *note;
-	
-	note = (GtkWidget *) gtk_object_get_data(GTK_OBJECT(widget), "note");
-	gtk_notebook_set_page(GTK_NOTEBOOK(note), num);
-}
-
 
 static void 
 print_modified_cb( GtkWidget *widget, GtkWidget *pbox)

@@ -62,6 +62,7 @@ void balsa_message_replytoall (GtkWidget * widget, gpointer index);
 void balsa_message_forward (GtkWidget * widget, gpointer index);
 void balsa_message_continue (GtkWidget * widget, gpointer index);
 void balsa_message_next (GtkWidget * widget, gpointer index);
+void balsa_message_next_unread (GtkWidget* widget, gpointer index);
 void balsa_message_previous (GtkWidget * widget, gpointer index);
 void balsa_message_delete (GtkWidget * widget, gpointer index);
 void balsa_message_undelete (GtkWidget * widget, gpointer index);

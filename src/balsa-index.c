@@ -210,20 +210,22 @@ clist_click_column (GtkCList * clist, gint column, gpointer data)
 {
   if (column == clist->sort_column)
     {
-      if (clist->sort_type == GTK_SORT_ASCENDING)
-	clist->sort_type = GTK_SORT_DESCENDING;
-      else
-	clist->sort_type = GTK_SORT_ASCENDING;
+       clist->sort_type = (clist->sort_type == GTK_SORT_ASCENDING) ?
+	  GTK_SORT_DESCENDING : GTK_SORT_ASCENDING;
     }
   else
     gtk_clist_set_sort_column (clist, column);
 
-  if (column == 0)
-    gtk_clist_set_compare_func (clist, numeric_compare);
-  else if (column == 5)
-    gtk_clist_set_compare_func (clist, date_compare);
-  else
-    gtk_clist_set_compare_func (clist, NULL);
+  switch(column) {
+     case 0:
+	gtk_clist_set_compare_func (clist, numeric_compare);
+	break;
+     case 5:
+	gtk_clist_set_compare_func (clist, date_compare);
+	break;
+     default:
+	gtk_clist_set_compare_func (clist, NULL);
+  }
 
   gtk_clist_sort (clist);
 }
@@ -463,45 +465,88 @@ balsa_index_del (BalsaIndex * bindex,
       bindex->first_new_message = 0;
   
   gtk_clist_remove (GTK_CLIST (bindex),  row);
-
-
 }
 
+/* bi_get_largest_selected:
+   helper function, finds the message with largest number among selected and
+   fails with -1, if the selection is empty.
+*/
+static gint
+bi_get_largest_selected(GtkCList * clist) {
+  GList *list;
+  gint i = 0;
+  gint h = 0;
+
+  if (!clist->selection)
+     return -1;
+  
+  list = clist->selection;
+  while (list)
+    {
+      i = GPOINTER_TO_INT (list->data);
+      if (i > h) 
+	h = i;
+      list = g_list_next(list);
+    }
+  return h;
+}
 
 
 void
 balsa_index_select_next (BalsaIndex * bindex)
 {
   GtkCList *clist;
-  GList *list;
-  gint i = 0;
-  gint h = 0;
-
+  gint h;
   g_return_if_fail (bindex != NULL);
 
   clist = GTK_CLIST (bindex);
 
-  if (!clist->selection)
-    return;
-
-  list = clist->selection;
-  while (list)
-    {
-      i = GPOINTER_TO_INT (list->data);
-      if (i > h)
-	h = i;
-      list = list->next;
-    }
-
-  if (h + 1 >= clist->rows)
-    return;
-
+  if( (h=bi_get_largest_selected(clist)) < 0
+     || h + 1 >= clist->rows)
+     return;
+  
   gtk_clist_unselect_all (clist);
 
   gtk_clist_select_row (clist, h + 1, -1);
 
   if (gtk_clist_row_is_visible (clist, h + 1) != GTK_VISIBILITY_FULL)
     gtk_clist_moveto (clist, h + 1, 0, 1.0, 0.0);
+}
+
+/* balsa_index_select_next_unread:
+   search for the next unread in the current mailbox.
+   wraps over if the selected message was the last one.
+*/
+void
+balsa_index_select_next_unread (BalsaIndex * bindex)
+{
+  GtkCList *clist;
+  Message* message;
+  gint h;
+
+  g_return_if_fail (bindex != NULL);
+
+  clist = GTK_CLIST (bindex);
+
+  if( (h=bi_get_largest_selected(clist)+1) <= 0)
+     return;
+
+  if (h >= clist->rows) 
+    h = 0;
+
+  while (h < clist->rows) {
+    message = LIBBALSA_MESSAGE (gtk_clist_get_row_data (clist, h));
+    if (message->flags & MESSAGE_FLAG_NEW) {
+      gtk_clist_unselect_all (clist);
+      
+      gtk_clist_select_row (clist, h, -1);
+      
+      if (gtk_clist_row_is_visible (clist, h) != GTK_VISIBILITY_FULL)
+        gtk_clist_moveto (clist, h, 0, 1.0, 0.0);
+      return;
+    }
+    ++h;
+  }
 }
 
 

@@ -308,6 +308,7 @@ filters_run_on_messages(GSList * filter_list, GList * messages)
 		break;
 	    case FILTER_NOTHING:
 		/* Nothing to do */
+		break;
 	    }
 	    /* We unref all messages */
 	    for (lst_messages=filt->matching_messages;lst_messages;lst_messages=g_list_next(lst_messages))

@@ -1,3 +1,8 @@
+2002-01-21  Ali Akcaagac <ali.akcaagac@stud.fh-wilhelmshaven.de>
+
+	* libbalsa/filter-file.c, libbalsa/filter-funcs.c, libbalsa/filter.c:
+	* src/filter-edit-callbacks.c: add break to squash gcc3 warnings.
+	
 2002-01-21  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/save-restore.c: limit items by MAXTOOLBARITEMS

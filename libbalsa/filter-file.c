@@ -305,6 +305,7 @@ libbalsa_condition_save_config(LibBalsaCondition * cond)
 	gnome_config_set_int("Flags", cond->match.flags);
     case CONDITION_NONE:
 	/* Hmm this should not happen */
+	break;
     }
 }
 

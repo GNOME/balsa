@@ -73,6 +73,7 @@ libbalsa_condition_free(LibBalsaCondition* cond)
 	/* nothing to do */
     case CONDITION_NONE:
 	/* to avoid warnings */
+	break;
     }
     g_free(cond);
 }	                       /* end libbalsa_condition_free() */
@@ -242,6 +243,7 @@ filter_condition_validity(LibBalsaFilter* fil, LibBalsaCondition* cond)
 	break;
     case CONDITION_FLAG:
     case CONDITION_NONE:
+	break;
     }
 }
 

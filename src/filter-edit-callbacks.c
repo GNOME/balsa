@@ -297,8 +297,9 @@ fe_negate_condition(GtkWidget * widget, gpointer data)
         fe_update_label(fe_type_date_label,   &date_label);   break;
     case CONDITION_FLAG:   
         fe_update_label(fe_type_flag_label,   &flags_label);
-   case CONDITION_NONE:
+    case CONDITION_NONE:
         /* to avoid warnings */
+	break;
     }
     condition_has_changed=TRUE;
 }                      /* end fe_negate_condition */
@@ -430,6 +431,7 @@ condition_validate(LibBalsaCondition* new_cnd)
     case CONDITION_FLAG:
     case CONDITION_NONE:
         /* to avoid warnings */
+	break;
     }
 
     /* Sanity checks OK, retrieve datas from widgets */
@@ -465,6 +467,7 @@ condition_validate(LibBalsaCondition* new_cnd)
 
     case CONDITION_NONE:
         /* To avoid warnings :) */
+	break;
     }
     return TRUE;
 }                        /* condition_validate*/
@@ -561,6 +564,7 @@ fill_condition_widgets(LibBalsaCondition* cnd)
         break;
     case CONDITION_NONE:
         /* To avoid warnings :), we should never get there */
+	break;
     }
     gtk_menu_set_active(GTK_MENU(gtk_option_menu_get_menu(GTK_OPTION_MENU(fe_search_option_menu))),cnd->type-1);
 }            /* end fill_condition_widget */
@@ -615,6 +619,7 @@ condition_dialog_button_clicked(GtkWidget * dialog, gint button,
         break;
     case 2:  /* Help button */
         /* FIXME */
+	break;
     }
 }
 

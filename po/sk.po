@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2003-09-07 09:03+0200\n"
-"PO-Revision-Date: 2003-09-07 12:27+0200\n"
+"POT-Creation-Date: 2003-09-08 20:59+0200\n"
+"PO-Revision-Date: 2003-09-08 21:00+0200\n"
 "Last-Translator: Marcel Telka <marcel@telka.sk>\n"
 "Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
 "MIME-Version: 1.0\n"
@@ -54,35 +54,35 @@ msgstr "Nemôžem pridať duplikátnu položku"
 msgid "Unknown error"
 msgstr "Neznáma chyba"
 
-#: libbalsa/address.c:747
+#: libbalsa/address.c:751
 msgid "_Displayed Name:"
 msgstr "_Zobrazené meno:"
 
-#: libbalsa/address.c:748
+#: libbalsa/address.c:752
 msgid "_First Name:"
 msgstr "_Prvé meno:"
 
-#: libbalsa/address.c:749
+#: libbalsa/address.c:753
 msgid "_Middle Name:"
 msgstr "P_rostredné meno:"
 
-#: libbalsa/address.c:750
+#: libbalsa/address.c:754
 msgid "_Last Name:"
 msgstr "_Priezvisko:"
 
-#: libbalsa/address.c:751
+#: libbalsa/address.c:755
 msgid "_Nickname:"
 msgstr "Pre_zývka:"
 
-#: libbalsa/address.c:752
+#: libbalsa/address.c:756
 msgid "O_rganization:"
 msgstr "_Organizácia:"
 
-#: libbalsa/address.c:753 libinit_balsa/balsa-druid-page-user.c:79
+#: libbalsa/address.c:757 libinit_balsa/balsa-druid-page-user.c:79
 msgid "_Email Address:"
 msgstr "Adresa _elektronickej pošty:"
 
-#: libbalsa/body.c:112 libbalsa/message.c:1023
+#: libbalsa/body.c:115 libbalsa/message.c:1018
 msgid "(No subject)"
 msgstr "(Bez predmetu)"
 
@@ -102,144 +102,154 @@ msgstr "Chybná syntax regulárneho výrazu"
 msgid "Attempt to apply an invalid filter"
 msgstr "Pokus o aplikáciu neplatného filtra"
 
-#: libbalsa/filter-file.c:440
+#: libbalsa/filter-file.c:441
 #, c-format
 msgid "Invalid filters %s for mailbox %s"
 msgstr "Neplatné filtre %s pre poštovú schránku %s"
 
-#: libbalsa/filter.c:203 libbalsa/filter.c:280
+#: libbalsa/filter.c:209 libbalsa/filter.c:286
 msgid "Unable to load message body to match filter"
 msgstr "Nemôžem načítať telo správy pre filtráciu"
 
-#: libbalsa/filter.c:480
+#: libbalsa/filter.c:486
 #, c-format
 msgid "Invalid filter: %s"
 msgstr "Neplatný filter: %s"
 
-#: libbalsa/filter.c:594 libbalsa/filter.c:613
+#: libbalsa/filter.c:600 libbalsa/filter.c:619
 #, c-format
 msgid "Bad mailbox name for filter: %s"
 msgstr "Zlý názov poštovej schránky pre filter: %s"
 
-#: libbalsa/filter.c:598
+#: libbalsa/filter.c:604
 msgid "Error when copying messages"
 msgstr "Chyba pri kopírovaní správ"
 
-#: libbalsa/filter.c:606
+#: libbalsa/filter.c:612
 msgid "Error when trashing messages"
 msgstr "Chyba pri zahadzovaní správ do koša"
 
-#: libbalsa/filter.c:617
+#: libbalsa/filter.c:623
 msgid "Error when moving messages"
 msgstr "Chyba pri presúvaní správ"
 
-#: libbalsa/gmime-gpgme-context.c:155
+#: libbalsa/gmime-gpgme-context.c:157
 #, c-format
 msgid "Cannot sign message: could not create gpgme context: %s"
 msgstr "Nemožno podpísať správu: nepodarilo sa vytvoriť gpgme kontext: %s"
 
-#: libbalsa/gmime-gpgme-context.c:306
+#: libbalsa/gmime-gpgme-context.c:308
 #, c-format
 msgid "Cannot sign message: could not get gpgme data from istream: %s"
-msgstr "Nemožno podpísať správu: nepodarilo sa získať gpgme údaje zo vstupu istream: %s"
+msgstr ""
+"Nemožno podpísať správu: nepodarilo sa získať gpgme údaje zo vstupu istream: "
+"%s"
 
-#: libbalsa/gmime-gpgme-context.c:314
+#: libbalsa/gmime-gpgme-context.c:316
 #, c-format
 msgid "Cannot sign message: gpgme could not create new data: %s"
 msgstr "Nemožno podpísať správu: gpgme nemohlo vytvoriť nové údaje: %s"
 
-#: libbalsa/gmime-gpgme-context.c:324
+#: libbalsa/gmime-gpgme-context.c:326
 #, c-format
 msgid "Cannot sign message: gpgme signing failed: %s"
 msgstr "Nemožno podpísať správu: gpgme podpisovanie zlyhalo: %s"
 
-#: libbalsa/gmime-gpgme-context.c:343
+#: libbalsa/gmime-gpgme-context.c:345
 #, c-format
 msgid "Cannot sign message: could not get gpgme data: %s"
 msgstr "Nemožno podpísať správu: nepodarilo sa získať gpgme údaje: %s"
 
-#: libbalsa/gmime-gpgme-context.c:373
+#: libbalsa/gmime-gpgme-context.c:375
 #, c-format
 msgid ""
 "Cannot verify message signature: could not get gpgme data from istream: %s"
 msgstr ""
-"Nemožno overiť podpis správy: nepodarilo sa získať gpgme údaje zo vstupu istream: %s"
+"Nemožno overiť podpis správy: nepodarilo sa získať gpgme údaje zo vstupu "
+"istream: %s"
 
-#: libbalsa/gmime-gpgme-context.c:382
+#: libbalsa/gmime-gpgme-context.c:384
 #, c-format
 msgid ""
 "Cannot verify message signature: could not get gpgme data from sigstream: %s"
 msgstr ""
-"Nemožno overiť podpis správy: nepodarilo sa získať gpgme údaje z prúdu sigstream: %s"
+"Nemožno overiť podpis správy: nepodarilo sa získať gpgme údaje z prúdu "
+"sigstream: %s"
 
-#: libbalsa/gmime-gpgme-context.c:391 libbalsa/rfc3156.c:763
+#: libbalsa/gmime-gpgme-context.c:393 libbalsa/rfc3156.c:759
 #, c-format
 msgid "gpgme signature verification failed: %s"
 msgstr "overenie podpisu gpgme zlyhalo: %s"
 
-#: libbalsa/gmime-gpgme-context.c:440
+#: libbalsa/gmime-gpgme-context.c:442
 #, c-format
 msgid "Cannot encrypt message: could not create gpgme recipients set: %s"
-msgstr "Nemožno zašifrovať správu: nepodarilo sa vytvoriť množinu prijímateľov gpgme: %s"
+msgstr ""
+"Nemožno zašifrovať správu: nepodarilo sa vytvoriť množinu prijímateľov "
+"gpgme: %s"
 
-#: libbalsa/gmime-gpgme-context.c:466
+#: libbalsa/gmime-gpgme-context.c:468
 #, c-format
 msgid "Cannot encrypt message: could not get gpgme data from istream: %s"
-msgstr "Nemožno zašifrovať správu: nepodarilo sa získať gpgme údaje zo vstupu istream: %s"
+msgstr ""
+"Nemožno zašifrovať správu: nepodarilo sa získať gpgme údaje zo vstupu "
+"istream: %s"
 
-#: libbalsa/gmime-gpgme-context.c:475
+#: libbalsa/gmime-gpgme-context.c:477
 #, c-format
 msgid "Cannot encrypt message: gpgme could not create new data: %s"
 msgstr "Nemožno zašifrovať správu: gpgme nemohlo vytvoriť nové údaje: %s"
 
-#: libbalsa/gmime-gpgme-context.c:486
+#: libbalsa/gmime-gpgme-context.c:488
 #, c-format
 msgid "Cannot encrypt message: gpgme encryption failed: %s"
 msgstr "Nemožno zašifrovať správu: gpgme šifrovanie zlyhalo: %s"
 
-#: libbalsa/gmime-gpgme-context.c:501
+#: libbalsa/gmime-gpgme-context.c:503
 #, c-format
 msgid "Cannot encrypt message: could not get gpgme data: %s"
 msgstr "Nemožno zašifrovať správu: nepodarilo sa získať gpgme údaje: %s"
 
-#: libbalsa/gmime-gpgme-context.c:532
+#: libbalsa/gmime-gpgme-context.c:534
 #, c-format
 msgid "Cannot decrypt message: could not get gpgme data from istream: %s"
-msgstr "Nemožno dešifrovať správu: nepodarilo sa získať gpgme údaje zo vstupu istream: %s"
+msgstr ""
+"Nemožno dešifrovať správu: nepodarilo sa získať gpgme údaje zo vstupu "
+"istream: %s"
 
-#: libbalsa/gmime-gpgme-context.c:540
+#: libbalsa/gmime-gpgme-context.c:542
 #, c-format
 msgid "Cannot decrypt message: gpgme could not create new data: %s"
 msgstr "Nemožno dešifrovať správu: gpgme nemohlo vytvoriť nové údaje: %s"
 
-#: libbalsa/gmime-gpgme-context.c:550
+#: libbalsa/gmime-gpgme-context.c:552
 #, c-format
 msgid "Cannot decrypt message: gpgme decrypting failed: %s"
 msgstr "Nemožno dešifrovať správu: gpgme dešifrovanie zlyhalo: %s"
 
-#: libbalsa/gmime-gpgme-context.c:561
+#: libbalsa/gmime-gpgme-context.c:563
 #, c-format
 msgid "Cannot decrypt message: could not get gpgme data: %s"
 msgstr "Nemožno dešifrovať správu: nepodarilo sa získať gpgme údaje: %s"
 
-#: libbalsa/gmime-gpgme-context.c:589 libbalsa/gmime-gpgme-context.c:644
+#: libbalsa/gmime-gpgme-context.c:591 libbalsa/gmime-gpgme-context.c:646
 #, c-format
 msgid "Failed to execute gpgme: %s"
 msgstr "Vykonanie gpgme zlyhalo: %s"
 
-#: libbalsa/gmime-gpgme-context.c:590 libbalsa/gmime-gpgme-context.c:645
+#: libbalsa/gmime-gpgme-context.c:592 libbalsa/gmime-gpgme-context.c:647
 #: libmutt/mutt_ssl.c:440 src/pref-manager.c:1267 src/pref-manager.c:1366
 msgid "Unknown"
 msgstr "Neznámy"
 
 #. should "re" be localized ?
 #: libbalsa/identity.c:88 src/balsa-index-threading.c:547
-#: src/balsa-index-threading.c:549 src/sendmsg-window.c:2318
-#: src/sendmsg-window.c:2319
+#: src/balsa-index-threading.c:549 src/sendmsg-window.c:2323
+#: src/sendmsg-window.c:2324
 msgid "Re:"
 msgstr "Odp:"
 
-#: libbalsa/identity.c:89 src/sendmsg-window.c:2348 src/sendmsg-window.c:2349
+#: libbalsa/identity.c:89 src/sendmsg-window.c:2353 src/sendmsg-window.c:2354
 msgid "Fwd:"
 msgstr "Posl:"
 
@@ -344,20 +354,16 @@ msgstr "Chyba pri zobrazovaní pomocníka pre identity: %s\n"
 msgid "Manage Identities"
 msgstr "Spravovať identity"
 
-#: libbalsa/libbalsa.c:87 libmutt/mutt_socket.c:489
-msgid "unknown error"
-msgstr "neznáma chyba"
-
-#: libbalsa/libbalsa.c:397
+#: libbalsa/libbalsa.c:319
 #, c-format
 msgid "LDAP Directory for %s"
 msgstr "Adresár LDAP pre %s"
 
-#: libbalsa/libbalsa.c:505
+#: libbalsa/libbalsa.c:407
 msgid "<b>This certificate belongs to:</b>\n"
 msgstr "<b>Tento certifikát patrí:</b>\n"
 
-#: libbalsa/libbalsa.c:513
+#: libbalsa/libbalsa.c:415
 msgid ""
 "\n"
 "<b>This certificate was issued by:</b>\n"
@@ -365,7 +371,7 @@ msgstr ""
 "\n"
 "<b>Tento certifikát bol vydaný:</b>\n"
 
-#: libbalsa/libbalsa.c:523
+#: libbalsa/libbalsa.c:425
 #, c-format
 msgid ""
 "<b>This certificate is valid</b>\n"
@@ -378,49 +384,49 @@ msgstr ""
 "do %s\n"
 "<b>Odtlačok:</b> %s"
 
-#: libbalsa/libbalsa.c:533
+#: libbalsa/libbalsa.c:435
 msgid "IMAP TLS certificate"
 msgstr "IMAP TLS certifikát"
 
-#: libbalsa/libbalsa.c:535
+#: libbalsa/libbalsa.c:437
 msgid "_Accept Once"
 msgstr "_Akceptovať len raz"
 
-#: libbalsa/libbalsa.c:536
+#: libbalsa/libbalsa.c:438
 msgid "Accept&_Save"
 msgstr "Akceptovať a _Uložiť"
 
-#: libbalsa/libbalsa.c:537
+#: libbalsa/libbalsa.c:439
 msgid "_Reject"
 msgstr "_Odmietnuť"
 
 #. Non-threaded locking mechanism
-#: libbalsa/libbalsa_private.h:105 libbalsa/libbalsa_private.h:117
+#: libbalsa/libbalsa_private.h:103 libbalsa/libbalsa_private.h:115
 #, c-format
 msgid "*** ERROR: Mailbox Lock Exists: %s ***\n"
 msgstr "*** CHYBA: Zámok poštovej schránky existuje: %s ***\n"
 
-#: libbalsa/mailbox.c:453
+#: libbalsa/mailbox.c:456
 #, c-format
 msgid "Cannot load mailbox %s"
 msgstr "Nemôžem nahrať poštovú schránku %s"
 
-#: libbalsa/mailbox.c:460
+#: libbalsa/mailbox.c:463
 #, c-format
 msgid "No such mailbox type: %s"
 msgstr "Neznámy typ poštovej schránky: %s"
 
-#: libbalsa/mailbox.c:477
+#: libbalsa/mailbox.c:480
 #, c-format
 msgid "Bad local mailbox path \"%s\""
 msgstr "Zlá cesta k miestnej poštovej schránke \"%s\""
 
-#: libbalsa/mailbox.c:482
+#: libbalsa/mailbox.c:485
 #, c-format
 msgid "Could not create a mailbox of type %s"
 msgstr "Nemôžem vytvoriť poštovú schránku typu %s"
 
-#: libbalsa/mailbox_imap.c:664 libbalsa/mailbox_imap.c:1150
+#: libbalsa/mailbox_imap.c:656 libbalsa/mailbox_imap.c:1148
 #, c-format
 msgid ""
 "IMAP SEARCH command failed for mailbox %s\n"
@@ -432,12 +438,14 @@ msgstr ""
 "výrazy)\n"
 "vraciam sa späť k štandardnej vyhľadávacej metóde"
 
-#: libbalsa/mailbox_imap.c:819
+#: libbalsa/mailbox_imap.c:814 libbalsa/mailbox_maildir.c:465
+#: libbalsa/mailbox_mbox.c:381 libbalsa/mailbox_mh.c:465
+#: libbalsa/mailbox_pop3.c:208
 #, c-format
-msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxImap: Otváram %s Počet odkazov: %d\n"
+msgid "%s: Opening %s Refcount: %d\n"
+msgstr "%s: Otváram %s Počet odkazov: %d\n"
 
-#: libbalsa/mailbox_imap.c:1017
+#: libbalsa/mailbox_imap.c:1015
 #, c-format
 msgid ""
 "IMAP SEARCH command failed for mailbox %s\n"
@@ -446,28 +454,28 @@ msgstr ""
 "Príkaz IMAP SEARCH zlyhal pre poštovú schránku %s\n"
 "vraciam sa späť k štandardnej vyhľadávacej metóde"
 
-#: libbalsa/mailbox_maildir.c:166
+#: libbalsa/mailbox_maildir.c:164
 #, c-format
 msgid "Mailbox %s does not appear to be a Maildir mailbox."
 msgstr "Zdá sa, že poštová schránka \"%s\" nie je typu Maildir."
 
-#: libbalsa/mailbox_maildir.c:175
+#: libbalsa/mailbox_maildir.c:173
 #, c-format
 msgid "Could not create a MailDir directory at %s (%s)"
 msgstr "Nemôžem vytvoriť priečinok typu Maildir v %s (%s)"
 
-#: libbalsa/mailbox_maildir.c:182 libbalsa/mailbox_maildir.c:190
-#: libbalsa/mailbox_maildir.c:200
+#: libbalsa/mailbox_maildir.c:180 libbalsa/mailbox_maildir.c:188
+#: libbalsa/mailbox_maildir.c:198
 #, c-format
 msgid "Could not create a MailDir at %s (%s)"
 msgstr "Nemôžem vytvoriť Maildir v %s (%s)"
 
-#: libbalsa/mailbox_maildir.c:272 libbalsa/mailbox_mh.c:248
+#: libbalsa/mailbox_maildir.c:280 libbalsa/mailbox_mh.c:248
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Otváranie %s zlyhalo. Errno = %d, "
 
-#: libbalsa/mailbox_maildir.c:291 libbalsa/mailbox_mh.c:267
+#: libbalsa/mailbox_maildir.c:299 libbalsa/mailbox_mh.c:267
 #, c-format
 msgid ""
 "Could not remove contents of %s:\n"
@@ -476,7 +484,7 @@ msgstr ""
 "Nemôžem odstrániť obsah z %s:\n"
 "%s"
 
-#: libbalsa/mailbox_maildir.c:297 libbalsa/mailbox_mbox.c:235
+#: libbalsa/mailbox_maildir.c:305 libbalsa/mailbox_mbox.c:235
 #: libbalsa/mailbox_mh.c:273
 #, c-format
 msgid ""
@@ -485,11 +493,6 @@ msgid ""
 msgstr ""
 "Nemôžem vymazať %s:\n"
 "%s"
-
-#: libbalsa/mailbox_maildir.c:459 libbalsa/mailbox_mbox.c:381
-#, c-format
-msgid "LibBalsaMailboxMbox: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxMbox: Otváram %s Počet odkazov: %d\n"
 
 #: libbalsa/mailbox_mbox.c:158
 #, c-format
@@ -511,17 +514,7 @@ msgstr "Nemôžem vytvoriť priečinok typu MH v %s (%s)"
 msgid "Could not create MH structure at %s (%s)"
 msgstr "Nemôžem vytvoriť štruktúru MH v %s (%s)"
 
-#: libbalsa/mailbox_mh.c:465
-#, c-format
-msgid "LibBalsaMailboxMh: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxMh: Otváram %s Počet odkazov: %d\n"
-
-#: libbalsa/mailbox_pop3.c:204
-#, c-format
-msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxPop3: Otváram %s Počet odkazov: %d\n"
-
-#: libbalsa/mailbox_pop3.c:256
+#: libbalsa/mailbox_pop3.c:260
 #, c-format
 msgid ""
 "POP3 mailbox %s temp file error:\n"
@@ -530,7 +523,7 @@ msgstr ""
 "Chyba dočasného súboru poštovej schránky %s protokolu POP3:\n"
 "%s"
 
-#: libbalsa/mailbox_pop3.c:272
+#: libbalsa/mailbox_pop3.c:276
 #, c-format
 msgid ""
 "POP3 mailbox %s accessing error:\n"
@@ -539,12 +532,12 @@ msgstr ""
 "Chyba pri prístupe k poštovej schránke %s protokolu POP3:\n"
 "%s"
 
-#: libbalsa/mailbox_pop3.c:291
+#: libbalsa/mailbox_pop3.c:295
 #, c-format
 msgid "POP3 mailbox %s temp mailbox error:\n"
 msgstr "Chyba dočasnej poštovej schránky %s protokolu POP3:\n"
 
-#: libbalsa/mailbox_pop3.c:300
+#: libbalsa/mailbox_pop3.c:304
 #, c-format
 msgid ""
 "Error placing messages from %s on %s\n"
@@ -553,13 +546,13 @@ msgstr ""
 "Chyba pri ukladaní správ z %s na %s\n"
 "Správy sú ponechané v %s\n"
 
-#: libbalsa/message.c:480
+#: libbalsa/message.c:482
 #, c-format
 msgid "Source mailbox (%s) is readonly. Cannot move messages"
 msgstr ""
 "Zdrojová poštová schránka (%s) je len na čítanie. Nemôžem presunúť správy"
 
-#: libbalsa/mime.c:100 libbalsa/rfc3156.c:64
+#: libbalsa/mime.c:99 libbalsa/rfc3156.c:63
 msgid ""
 "\n"
 "--\n"
@@ -605,17 +598,17 @@ msgstr "Spojenie odmietnuté"
 msgid "Authentication failed"
 msgstr "Overovanie totožnosti zlyhalo"
 
-#: libbalsa/pop3.c:421
+#: libbalsa/pop3.c:422
 #, c-format
 msgid "Retrieving Message %d of %d"
 msgstr "Získavam správy (%d z %d)"
 
-#: libbalsa/pop3.c:433
+#: libbalsa/pop3.c:434
 #, c-format
 msgid "Received %d bytes of %d"
 msgstr "Prijatých %d bajtov z %d"
 
-#: libbalsa/rfc3156.c:180
+#: libbalsa/rfc3156.c:176
 #, c-format
 msgid ""
 "\n"
@@ -624,12 +617,12 @@ msgstr ""
 "\n"
 "Podpísaný: %s"
 
-#: libbalsa/rfc3156.c:184
+#: libbalsa/rfc3156.c:180
 #, c-format
 msgid "Mail address: %s"
 msgstr "Adresa elektronickej pošty: %s"
 
-#: libbalsa/rfc3156.c:186
+#: libbalsa/rfc3156.c:182
 #, c-format
 msgid ""
 "\n"
@@ -638,7 +631,7 @@ msgstr ""
 "\n"
 "Platnosť: %s"
 
-#: libbalsa/rfc3156.c:188
+#: libbalsa/rfc3156.c:184
 #, c-format
 msgid ""
 "\n"
@@ -647,7 +640,7 @@ msgstr ""
 "\n"
 "Dôvera vlastníka: %s"
 
-#: libbalsa/rfc3156.c:191
+#: libbalsa/rfc3156.c:187
 #, c-format
 msgid ""
 "\n"
@@ -656,7 +649,7 @@ msgstr ""
 "\n"
 "Odtlačok prsta kľúča: %s"
 
-#: libbalsa/rfc3156.c:196
+#: libbalsa/rfc3156.c:192
 #, c-format
 msgid ""
 "\n"
@@ -665,7 +658,7 @@ msgstr ""
 "\n"
 "Kľúč vytvorený dňa: %s"
 
-#: libbalsa/rfc3156.c:201
+#: libbalsa/rfc3156.c:197
 #, c-format
 msgid ""
 "\n"
@@ -674,139 +667,139 @@ msgstr ""
 "\n"
 "Podpísané dňa: %s"
 
-#: libbalsa/rfc3156.c:335
+#: libbalsa/rfc3156.c:331
 #, c-format
 msgid "GMimeGPG signature verification failed: %s"
 msgstr "Overenie podpisu GMimeGPG zlyhalo: %s"
 
-#: libbalsa/rfc3156.c:442
+#: libbalsa/rfc3156.c:438
 msgid "Enter passphrase to decrypt message"
 msgstr "Zadajte heslo na dešifrovanie správy"
 
-#: libbalsa/rfc3156.c:503 libbalsa/rfc3156.c:1508
+#: libbalsa/rfc3156.c:499 libbalsa/rfc3156.c:1501
 #, c-format
 msgid "could not get a key for %s"
 msgstr "nepodarilo sa získať kľúč pre %s"
 
-#: libbalsa/rfc3156.c:536
+#: libbalsa/rfc3156.c:532
 msgid "The signature is valid."
 msgstr "Podpis je platný."
 
-#: libbalsa/rfc3156.c:538
+#: libbalsa/rfc3156.c:534
 msgid "The signature is valid but expired."
 msgstr "Podpis je platný, ale jeho časová platnosť vypršala."
 
-#: libbalsa/rfc3156.c:540
+#: libbalsa/rfc3156.c:536
 msgid ""
 "The signature is valid but the key used to verify the signature has expired."
 msgstr ""
 "Podpis je platný, ale kľúč použitý pre overenie podpisu má vypršanú platnosť."
 
-#: libbalsa/rfc3156.c:542
+#: libbalsa/rfc3156.c:538
 msgid "The signature is invalid."
 msgstr "Podpis je neplatný."
 
-#: libbalsa/rfc3156.c:544
+#: libbalsa/rfc3156.c:540
 msgid "The signature could not be verified due to a missing key."
 msgstr "Podpis nemohol byť overený kvôli chýbajúcemu kľúču."
 
-#: libbalsa/rfc3156.c:546
+#: libbalsa/rfc3156.c:542
 msgid "This part is not a real PGP signature."
 msgstr "Táto časť nie je naozajstný PGP podpis."
 
-#: libbalsa/rfc3156.c:548
+#: libbalsa/rfc3156.c:544
 msgid "An error prevented the signature verification."
 msgstr "Nejaká chyba zabránila overiť podpis."
 
-#: libbalsa/rfc3156.c:550
+#: libbalsa/rfc3156.c:546
 msgid "This part contains at least two signatures with different status."
 msgstr "Táto časť obsahuje minimálne dva podpisy s rozdielnym stavom."
 
-#: libbalsa/rfc3156.c:553
+#: libbalsa/rfc3156.c:549
 msgid "bad status"
 msgstr "zlý stav"
 
-#: libbalsa/rfc3156.c:563
+#: libbalsa/rfc3156.c:559
 msgid "The user ID is of unknown validity."
 msgstr "Identifikátor používateľa má neznámu platnosť."
 
-#: libbalsa/rfc3156.c:565
+#: libbalsa/rfc3156.c:561
 msgid "The validity of the user ID is undefined."
 msgstr "Platnosť používateľovho identifikátora je nedefinovaná."
 
-#: libbalsa/rfc3156.c:567
+#: libbalsa/rfc3156.c:563
 msgid "The user ID is never valid."
 msgstr "Identifikátor používateľa nie je nikdy platný."
 
-#: libbalsa/rfc3156.c:569
+#: libbalsa/rfc3156.c:565
 msgid "The user ID is marginally valid."
 msgstr "Identifikátor používateľa je platný okrajovo."
 
-#: libbalsa/rfc3156.c:571
+#: libbalsa/rfc3156.c:567
 msgid "The user ID is fully valid."
 msgstr "Identifikátor používateľa je plne platný."
 
-#: libbalsa/rfc3156.c:573
+#: libbalsa/rfc3156.c:569
 msgid "The user ID is ultimately valid."
 msgstr "Identifikátor používateľa má základnú platnosť."
 
-#: libbalsa/rfc3156.c:575 libbalsa/rfc3156.c:1220
+#: libbalsa/rfc3156.c:571 libbalsa/rfc3156.c:1216
 msgid "bad validity"
 msgstr "zlá platnosť"
 
-#: libbalsa/rfc3156.c:624 libbalsa/rfc3156.c:726 libbalsa/rfc3156.c:846
-#: libbalsa/rfc3156.c:961 libbalsa/rfc3156.c:2178
+#: libbalsa/rfc3156.c:620 libbalsa/rfc3156.c:722 libbalsa/rfc3156.c:842
+#: libbalsa/rfc3156.c:957
 #, c-format
 msgid "could not create gpgme context: %s"
 msgstr "nepodarilo sa vytvoriť gpgme kontext: %s"
 
-#: libbalsa/rfc3156.c:639 libbalsa/rfc3156.c:866
+#: libbalsa/rfc3156.c:635 libbalsa/rfc3156.c:862
 msgid "Enter passsphrase to OpenPGP sign the first message part"
 msgstr "Zadajte heslo pre OpenPGP podpis prvej časti správy"
 
-#: libbalsa/rfc3156.c:647 libbalsa/rfc3156.c:743 libbalsa/rfc3156.c:878
-#: libbalsa/rfc3156.c:970
+#: libbalsa/rfc3156.c:643 libbalsa/rfc3156.c:739 libbalsa/rfc3156.c:874
+#: libbalsa/rfc3156.c:966
 #, c-format
 msgid "gpgme could not get data from buffer: %s"
 msgstr "gpgme nemohlo získať údaje z vyrovnávacej pamäte: %s"
 
-#: libbalsa/rfc3156.c:654 libbalsa/rfc3156.c:753 libbalsa/rfc3156.c:886
-#: libbalsa/rfc3156.c:979
+#: libbalsa/rfc3156.c:650 libbalsa/rfc3156.c:749 libbalsa/rfc3156.c:882
+#: libbalsa/rfc3156.c:975
 #, c-format
 msgid "gpgme could not create new data object: %s"
 msgstr "gpgme nemôže vytvoriť nový dátový objekt: %s"
 
-#: libbalsa/rfc3156.c:663
+#: libbalsa/rfc3156.c:659
 #, c-format
 msgid "gpgme signing failed: %s"
 msgstr "gpgme podpisovanie zlyhalo: %s"
 
-#: libbalsa/rfc3156.c:675 libbalsa/rfc3156.c:793 libbalsa/rfc3156.c:918
-#: libbalsa/rfc3156.c:1020 libbalsa/rfc3156.c:2225
+#: libbalsa/rfc3156.c:671 libbalsa/rfc3156.c:789 libbalsa/rfc3156.c:914
+#: libbalsa/rfc3156.c:1016
 #, c-format
 msgid "could not get gpgme data: %s"
 msgstr "nepodarilo sa získať gpgme údaje: %s"
 
-#: libbalsa/rfc3156.c:900
+#: libbalsa/rfc3156.c:896
 #, c-format
 msgid "gpgme signing and encryption failed: %s"
 msgstr "gpgme podpisovanie a šifrovanie zlyhalo: %s"
 
-#: libbalsa/rfc3156.c:904 libbalsa/rfc3156.c:2211
+#: libbalsa/rfc3156.c:900
 #, c-format
 msgid "gpgme encryption failed: %s"
 msgstr "gpgme šifrovanie zlyhalo: %s"
 
-#: libbalsa/rfc3156.c:986
+#: libbalsa/rfc3156.c:982
 msgid "Enter passsphrase to decrypt message part"
 msgstr "Zadajte heslo na dešifrovanie časti správy"
 
-#: libbalsa/rfc3156.c:992
+#: libbalsa/rfc3156.c:988
 #, c-format
 msgid "gpgme decryption and signature verification failed: %s"
 msgstr "gpgme dešifrovanie a overenie podpisu zlyhalo: %s"
 
-#: libbalsa/rfc3156.c:1037
+#: libbalsa/rfc3156.c:1033
 #, c-format
 msgid ""
 "The OpenPGP encrypted message part contains 8-bit characters, but no header "
@@ -815,7 +808,7 @@ msgstr ""
 "Časť správy zašifrovaná OpenPGP obsahuje 8 bitové znaky, ale neobsahuje "
 "hlavičku, popisujúcu použitú znakovú sadu (konvertované do %s)"
 
-#: libbalsa/rfc3156.c:1103
+#: libbalsa/rfc3156.c:1099
 #, c-format
 msgid ""
 "%s\n"
@@ -824,12 +817,12 @@ msgstr ""
 "%s\n"
 "Chcete spustiť gpg a naimportovať verejný kľúč s odtlačkom prsta %s?"
 
-#: libbalsa/rfc3156.c:1128
+#: libbalsa/rfc3156.c:1124
 #, c-format
 msgid "Could not launch %s to get the public key %s."
 msgstr "Nepodarilo sa spustiť %s na získanie verejného kľúča %s."
 
-#: libbalsa/rfc3156.c:1176
+#: libbalsa/rfc3156.c:1172
 #, c-format
 msgid ""
 "Running gpg failed with return value %d:\n"
@@ -838,7 +831,7 @@ msgstr ""
 "Beh gpg zlyhal s návratovou hodnotou %d:\n"
 "%s"
 
-#: libbalsa/rfc3156.c:1183
+#: libbalsa/rfc3156.c:1179
 #, c-format
 msgid ""
 "Running gpg successful:\n"
@@ -847,91 +840,91 @@ msgstr ""
 "Beh gpg úspešný:\n"
 "%s"
 
-#: libbalsa/rfc3156.c:1208
+#: libbalsa/rfc3156.c:1204
 msgid "unknown"
 msgstr "neznámy"
 
-#: libbalsa/rfc3156.c:1210
+#: libbalsa/rfc3156.c:1206
 msgid "undefined"
 msgstr "nedefinovaný"
 
-#: libbalsa/rfc3156.c:1212
+#: libbalsa/rfc3156.c:1208
 msgid "never"
 msgstr "nikdy"
 
-#: libbalsa/rfc3156.c:1214
+#: libbalsa/rfc3156.c:1210
 msgid "marginal"
 msgstr "okrajová"
 
-#: libbalsa/rfc3156.c:1216
+#: libbalsa/rfc3156.c:1212
 msgid "full"
 msgstr "plná"
 
-#: libbalsa/rfc3156.c:1218
+#: libbalsa/rfc3156.c:1214
 msgid "ultimate"
 msgstr "základná"
 
-#: libbalsa/rfc3156.c:1286
+#: libbalsa/rfc3156.c:1279
 msgid "Fingerprint"
 msgstr "Odtlačok prsta"
 
-#: libbalsa/rfc3156.c:1286
+#: libbalsa/rfc3156.c:1279
 msgid "Key ID"
 msgstr "Identifikátor kľúča"
 
-#: libbalsa/rfc3156.c:1286
+#: libbalsa/rfc3156.c:1279
 msgid "Validity"
 msgstr "Platnosť"
 
-#: libbalsa/rfc3156.c:1286
+#: libbalsa/rfc3156.c:1279
 msgid "Owner trust"
 msgstr "Dôvera vlastníka"
 
-#: libbalsa/rfc3156.c:1287
+#: libbalsa/rfc3156.c:1280
 msgid "Length"
 msgstr "Dĺžka"
 
 #. FIXME: create dialog according to the Gnome HIG
-#: libbalsa/rfc3156.c:1324
+#: libbalsa/rfc3156.c:1317
 msgid "Select key"
 msgstr "Vybrať kľúč"
 
-#: libbalsa/rfc3156.c:1332
+#: libbalsa/rfc3156.c:1325
 #, c-format
 msgid "Select the private key for the signer %s"
 msgstr "Vybrať súkromný kľúč pre podpisovateľa %s"
 
-#: libbalsa/rfc3156.c:1335
+#: libbalsa/rfc3156.c:1328
 #, c-format
 msgid "Select the public key for the recipient %s"
 msgstr "Zvoliť verejný kľúč pre prijímateľa %s"
 
-#: libbalsa/rfc3156.c:1425
+#: libbalsa/rfc3156.c:1418
 #, c-format
 msgid "could not list keys for %s: %s"
 msgstr "nepodarilo sa vypísať kľúče pre %s: %s"
 
-#: libbalsa/rfc3156.c:1433
+#: libbalsa/rfc3156.c:1426
 #, c-format
 msgid "could not retrieve key for %s: %s"
 msgstr "nepodarilo sa vybrať kľúč pre %s: %s"
 
-#: libbalsa/rfc3156.c:1470
+#: libbalsa/rfc3156.c:1463
 #, c-format
 msgid "could not get a private key for %s"
 msgstr "nepodarilo sa získať súkromný kľúč pre %s"
 
-#: libbalsa/rfc3156.c:1496
+#: libbalsa/rfc3156.c:1489
 #, c-format
 msgid "could not create gpgme recipients set: %s"
 msgstr "nepodarilo sa vytvoriť množinu prijímateľov gpgme: %s"
 
-#: libbalsa/rfc3156.c:1520
+#: libbalsa/rfc3156.c:1513
 #, c-format
 msgid "could not add recipient %s: %s"
 msgstr "nepodarilo sa pridať prijímateľov %s: %s"
 
-#: libbalsa/rfc3156.c:1899
+#: libbalsa/rfc3156.c:1855
 #, c-format
 msgid ""
 "The passphrase for this key was bad, please try again!\n"
@@ -942,7 +935,7 @@ msgstr ""
 "\n"
 "Kľúč: %s"
 
-#: libbalsa/rfc3156.c:1903
+#: libbalsa/rfc3156.c:1859
 #, c-format
 msgid ""
 "Please enter the passphrase for the secret key!\n"
@@ -953,43 +946,33 @@ msgstr ""
 "\n"
 "Kľúč: %s"
 
-#: libbalsa/rfc3156.c:1918
+#: libbalsa/rfc3156.c:1874
 msgid "remember passphrase for"
 msgstr "zapamätať heslo pre"
 
-#: libbalsa/rfc3156.c:1923 src/pref-manager.c:1691 src/pref-manager.c:2519
+#: libbalsa/rfc3156.c:1879 src/pref-manager.c:1691 src/pref-manager.c:2519
 #: src/pref-manager.c:2540
 msgid "minutes"
 msgstr "minút"
 
-#: libbalsa/rfc3156.c:2129
+#: libbalsa/rfc3156.c:2063
 msgid "Enter passsphrase to sign message"
 msgstr "Zadajte heslo pre podpis správy"
 
-#: libbalsa/rfc3156.c:2194
-#, c-format
-msgid "gpgme could not get data from file: %s"
-msgstr "gpgme nemohlo získať údaje zo súboru: %s"
-
-#: libbalsa/rfc3156.c:2202
-#, c-format
-msgid "gpgme could not create new data: %s"
-msgstr "gpgme nemohlo vytvoriť nové údaje: %s"
-
-#: libbalsa/send.c:219 libbalsa/send.c:226
+#: libbalsa/send.c:221 libbalsa/send.c:228
 msgid "Sending Mail..."
 msgstr "Posielam správu..."
 
-#: libbalsa/send.c:222 src/main-window.c:1805
+#: libbalsa/send.c:224 src/main-window.c:1805
 msgid "_Hide"
 msgstr "_Skryť"
 
-#: libbalsa/send.c:356
+#: libbalsa/send.c:359
 msgid "Unable to open sentbox - could not get IMAP server information"
 msgstr ""
 "Nemôžem otvoriť odoslanú poštu - nemôžem získať imformáciu o serveri IMAP"
 
-#: libbalsa/send.c:776
+#: libbalsa/send.c:779
 #, c-format
 msgid ""
 "Could not send the message to %s:\n"
@@ -1000,7 +983,7 @@ msgstr ""
 "%d: %s\n"
 "Správa bola ponechaná medzi poštou na odoslanie.\n"
 
-#: libbalsa/send.c:818
+#: libbalsa/send.c:821
 #, c-format
 msgid ""
 "Relaying refused:\n"
@@ -1011,7 +994,7 @@ msgstr ""
 "%d: %s\n"
 "Správa bola ponechaná medzi poštou na odoslanie.\n"
 
-#: libbalsa/send.c:828
+#: libbalsa/send.c:831
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
@@ -1019,33 +1002,33 @@ msgstr ""
 "Problém pri posielaní správy. Ukladám ju do priečinka Pošta na odoslanie.\n"
 "Systém sa bude pokúšať správu opätovne odoslať, dokiaľ ju nevymažete."
 
-#: libbalsa/send.c:858
+#: libbalsa/send.c:861
 msgid "Connected to MTA"
 msgstr "Pripojený k MTA"
 
-#: libbalsa/send.c:865 src/balsa-message.c:1236 src/print.c:349
-#: src/sendmsg-window.c:669 src/sendmsg-window.c:2136 src/store-address.c:303
+#: libbalsa/send.c:868 src/balsa-message.c:1236 src/print.c:349
+#: src/sendmsg-window.c:669 src/sendmsg-window.c:2141 src/store-address.c:303
 msgid "From:"
 msgstr "Od:"
 
-#: libbalsa/send.c:868 src/balsa-index.c:360
+#: libbalsa/send.c:871 src/balsa-index.c:360
 msgid "From"
 msgstr "Od"
 
-#: libbalsa/send.c:876 src/balsa-message.c:1245 src/print.c:353
-#: src/sendmsg-window.c:668 src/sendmsg-window.c:2143 src/store-address.c:304
+#: libbalsa/send.c:879 src/balsa-message.c:1245 src/print.c:353
+#: src/sendmsg-window.c:668 src/sendmsg-window.c:2148 src/store-address.c:304
 msgid "To:"
 msgstr "Pre:"
 
-#: libbalsa/send.c:879 src/balsa-index.c:845
+#: libbalsa/send.c:882 src/balsa-index.c:845
 msgid "To"
 msgstr "Pre"
 
-#: libbalsa/send.c:915
+#: libbalsa/send.c:918
 msgid "Disconnected"
 msgstr "Odpojený"
 
-#: libbalsa/send.c:1102
+#: libbalsa/send.c:1105
 msgid ""
 "SMTP server refused connection.\n"
 "Balsa by default uses submission service (587).\n"
@@ -1059,7 +1042,7 @@ msgstr ""
 "pomocou: \"hostiteľ:smtp\".\n"
 "Správa bola ponechaná medzi poštou na odoslanie."
 
-#: libbalsa/send.c:1112
+#: libbalsa/send.c:1115
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
@@ -1068,7 +1051,7 @@ msgstr ""
 "Problém SMTP servera (%d): %s\n"
 "Správa bola ponechaná medzi poštou na odoslanie."
 
-#: libbalsa/send.c:1436 libbalsa/send.c:1614
+#: libbalsa/send.c:1438 libbalsa/send.c:1615
 msgid "This message will not be encrpyted for the BCC: recipient(s)."
 msgstr "Táto správa nebude zašifrovaná pre skrytých príjemcov."
 
@@ -1695,6 +1678,10 @@ msgstr "Pripájam sa k %s..."
 msgid "Could not connect to %s (%s)."
 msgstr "Nemôžem sa spojiť s %s (%s)."
 
+#: libmutt/mutt_socket.c:489
+msgid "unknown error"
+msgstr "neznáma chyba"
+
 #: libmutt/mutt_ssl.c:170
 msgid "Failed to find enough entropy on your system"
 msgstr "Hľadanie potrebnej entrópie na vašom systéme zlyhalo"
@@ -1824,20 +1811,20 @@ msgstr "Počet zámkov bol prekročený, odobrať zámok z %s?"
 msgid "Can't dotlock %s.\n"
 msgstr "Nemôžem vykonať dotlock %s.\n"
 
-#: libmutt/mx.c:189
+#: libmutt/mx.c:189 libbalsa/misc.c:1585
 msgid "Timeout exceeded while attempting fcntl lock!"
 msgstr "Časový interval vypršal počas pokusu urobiť zámok fcntl!"
 
-#: libmutt/mx.c:195
+#: libmutt/mx.c:195 libbalsa/misc.c:1591
 #, c-format
 msgid "Waiting for fcntl lock... %d"
 msgstr "Čakám na zámok fcntl... %d"
 
-#: libmutt/mx.c:223
+#: libmutt/mx.c:223 libbalsa/misc.c:1619
 msgid "Timeout exceeded while attempting flock lock!"
 msgstr "Časový interval vypršal počas pokusu urobiť zámok flock!"
 
-#: libmutt/mx.c:230
+#: libmutt/mx.c:230 libbalsa/misc.c:1626
 #, c-format
 msgid "Waiting for flock attempt... %d"
 msgstr "Čakám na pokus o flock... %d"
@@ -2356,11 +2343,11 @@ msgstr ""
 "\",ale jej štruktúra je neplatná."
 
 #: src/balsa-message.c:1228 src/print.c:338 src/sendmsg-window.c:674
-#: src/sendmsg-window.c:2131
+#: src/sendmsg-window.c:2136
 msgid "Subject:"
 msgstr "Predmet:"
 
-#: src/balsa-message.c:1231 src/print.c:344 src/sendmsg-window.c:2125
+#: src/balsa-message.c:1231 src/print.c:344 src/sendmsg-window.c:2130
 msgid "Date:"
 msgstr "Dátum:"
 
@@ -2370,13 +2357,13 @@ msgstr "Odpoveď-pre:"
 
 #. cc:
 #: src/balsa-message.c:1246 src/print.c:354 src/sendmsg-window.c:672
-#: src/sendmsg-window.c:1850 src/sendmsg-window.c:2150 src/store-address.c:305
+#: src/sendmsg-window.c:1852 src/sendmsg-window.c:2155 src/store-address.c:305
 msgid "Cc:"
 msgstr "Kópia:"
 
 #. bcc:
 #: src/balsa-message.c:1247 src/print.c:355 src/sendmsg-window.c:671
-#: src/sendmsg-window.c:1855 src/store-address.c:306
+#: src/sendmsg-window.c:1857 src/store-address.c:306
 msgid "Bcc:"
 msgstr "Skrytá kópia:"
 
@@ -2695,7 +2682,7 @@ msgstr "_Telo"
 
 #. To:
 #: src/filter-edit-callbacks.c:1006 src/main-window.c:2737
-#: src/sendmsg-window.c:1839
+#: src/sendmsg-window.c:1841
 msgid "_To:"
 msgstr "_Pre:"
 
@@ -4247,7 +4234,7 @@ msgstr "Kontrolovať na pozadí bez oznámenia (bez správ na stavovej lište)"
 msgid "Quoted and Flowed Text"
 msgstr "Citovaný a formátovaný text"
 
-#: src/pref-manager.c:1735 src/sendmsg-window.c:3787
+#: src/pref-manager.c:1735 src/sendmsg-window.c:3792
 msgid "Quoted Text Regular Expression"
 msgstr "Regulárny výraz pre citovaný text"
 
@@ -5077,7 +5064,7 @@ msgstr ""
 "Uložiť správu do priečinka 'Nedokončená pošta'?"
 
 #. Comments:
-#: src/sendmsg-window.c:673 src/sendmsg-window.c:1944
+#: src/sendmsg-window.c:673 src/sendmsg-window.c:1946
 msgid "Comments:"
 msgstr "Komentáre:"
 
@@ -5141,8 +5128,8 @@ msgstr "Nemôžem prečítať súbor %s\n"
 msgid "Attach file"
 msgstr "Pripojiť súbor"
 
-#: src/sendmsg-window.c:1576 src/sendmsg-window.c:1638
-#: src/sendmsg-window.c:2888
+#: src/sendmsg-window.c:1578 src/sendmsg-window.c:1640
+#: src/sendmsg-window.c:2893
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -5151,68 +5138,68 @@ msgstr ""
 "Pravdepodobný dôvod: málo dočasného priestoru"
 
 #. From:
-#: src/sendmsg-window.c:1834
+#: src/sendmsg-window.c:1836
 msgid "F_rom:"
 msgstr "_Od:"
 
 #. Subject:
-#: src/sendmsg-window.c:1846
+#: src/sendmsg-window.c:1848
 msgid "S_ubject:"
 msgstr "_Predmet:"
 
 #. fcc: mailbox folder where the message copy will be written to
-#: src/sendmsg-window.c:1860
+#: src/sendmsg-window.c:1862
 msgid "F_cc:"
 msgstr "_Automatická kópia:"
 
 #. Reply To:
-#: src/sendmsg-window.c:1890
+#: src/sendmsg-window.c:1892
 msgid "_Reply To:"
 msgstr "Odpoveď p_re:"
 
 #. Attachment list
-#: src/sendmsg-window.c:1897
+#: src/sendmsg-window.c:1899
 msgid "_Attachments:"
 msgstr "Prí_lohy:"
 
 #. Keywords:
-#: src/sendmsg-window.c:1947
+#: src/sendmsg-window.c:1949
 msgid "Keywords:"
 msgstr "Kľúčové slová:"
 
-#: src/sendmsg-window.c:2110
+#: src/sendmsg-window.c:2115
 msgid "you"
 msgstr "vy"
 
-#: src/sendmsg-window.c:2119
+#: src/sendmsg-window.c:2124
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------spáva poslaná ďalej od %s------\n"
 
-#: src/sendmsg-window.c:2154
+#: src/sendmsg-window.c:2159
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "ID-správy: %s\n"
 
-#: src/sendmsg-window.c:2160
+#: src/sendmsg-window.c:2165
 msgid "References:"
 msgstr "Odkazy:"
 
-#: src/sendmsg-window.c:2170
+#: src/sendmsg-window.c:2175
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "Napísané dňa %s, (autor: %s):\n"
 
-#: src/sendmsg-window.c:2172
+#: src/sendmsg-window.c:2177
 #, c-format
 msgid "%s wrote:\n"
 msgstr "Napísané, (autor: %s):\n"
 
-#: src/sendmsg-window.c:3050
+#: src/sendmsg-window.c:3055
 msgid "Choose charset"
 msgstr "Vybrať znakovú sadu"
 
-#: src/sendmsg-window.c:3057
+#: src/sendmsg-window.c:3062
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file."
@@ -5220,16 +5207,16 @@ msgstr ""
 "Tento súbor nie je kódovaný v US-ASCII ani v UTF-8.\n"
 "Prosím zvoľte znakovú sadu na zakódovanie tohoto súboru."
 
-#: src/sendmsg-window.c:3123
+#: src/sendmsg-window.c:3128
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Nemôžem otvoriť súbor %s.\n"
 
-#: src/sendmsg-window.c:3145
+#: src/sendmsg-window.c:3150
 msgid "Include file"
 msgstr "Vložiť súbor"
 
-#: src/sendmsg-window.c:3442
+#: src/sendmsg-window.c:3447
 #, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
@@ -5240,7 +5227,7 @@ msgstr ""
 "Prosím zvoľte jazyk pre túto správu.\n"
 "Pre viacjazyčné správy zvoľte UTF-8."
 
-#: src/sendmsg-window.c:3462
+#: src/sendmsg-window.c:3467
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
@@ -5250,32 +5237,32 @@ msgstr ""
 "podpísaná a/alebo zašifrovaná len prvá časť správy. Ak má byť chránená celá "
 "správa, mali by ste si zvoliť režim MIME. Naozaj chcete pokračovať?"
 
-#: src/sendmsg-window.c:3475
+#: src/sendmsg-window.c:3480
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "odosielanie správy v režime gpg %d"
 
-#: src/sendmsg-window.c:3786
+#: src/sendmsg-window.c:3791
 #, c-format
 msgid "Could not compile %s"
 msgstr "Nepodarilo sa skompilovať %s"
 
-#: src/sendmsg-window.c:4304
+#: src/sendmsg-window.c:4309
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Odpoveď pre %s: %s"
 
-#: src/sendmsg-window.c:4309
+#: src/sendmsg-window.c:4314
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Poslať správu ďalej pre %s: %s"
 
-#: src/sendmsg-window.c:4313
+#: src/sendmsg-window.c:4318
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Pokračovať v písaní správy pre %s: %s"
 
-#: src/sendmsg-window.c:4317
+#: src/sendmsg-window.c:4322
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Nová správa pre %s: %s"

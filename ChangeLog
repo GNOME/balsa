@@ -1,3 +1,8 @@
+2003-03-12 02:35  PeterB
+
+	* src/sendmsg-window.c: Add `format-flowed' to message options
+	menu.
+
 2003-03-12  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/print.c: mark a string for translation.

@@ -39,7 +39,7 @@ main (int argc, char *argv[])
   gtk_main ();
   return 0;
 }
- 
+
 static gboolean
 close_all_mailboxes (GNode * node, gpointer data)
 {
@@ -106,6 +106,7 @@ balsa_exit (void)
   gtk_timeout_remove (balsa_app.new_messages_timer);
 #endif
 
-  config_global_save ();
+  if (balsa_app.proplist)
+    config_global_save ();
   gtk_exit (0);
 }

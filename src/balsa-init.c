@@ -63,6 +63,7 @@ static Prefs *prefs = NULL;
 
 void balsa_init_window_new (void);
 static gint delete_init_window (GtkWidget *, gpointer);
+static void text_realize_handler (GtkWidget *, gpointer);
 
 static void next_cb (GtkWidget *, gpointer);
 static void prev_cb (GtkWidget *, gpointer);
@@ -168,43 +169,42 @@ balsa_init_window_new (void)
   gtk_widget_show (iw->window);
 }
 
+static void
+text_realize_handler (GtkWidget * text, gpointer data)
+{
+  GString *str;
+
+  str = g_string_new (_ ("Welcome to Balsa!\n\n"));
+
+  str = g_string_append (str, _ ("You seem to be running Balsa for the first time.\n"));
+  str = g_string_append (str, _ ("The following steps will setup Balsa by asking a few simple questions.  "));
+  str = g_string_append (str, _ ("Once you have completed these steps, you can always change them at a later time through Balsa's preferences.  "));
+  str = g_string_append (str, _ ("Please check the about box in Balsa's main window for more information on contacting the authors or reporting bugs."));
+
+  gtk_text_freeze (GTK_TEXT (text));
+  gtk_text_set_editable (GTK_TEXT (text), FALSE);
+  gtk_text_set_word_wrap (GTK_TEXT (text), TRUE);
+  gtk_text_insert (GTK_TEXT (text), NULL, NULL, NULL, str->str, strlen (str->str));
+  gtk_text_thaw (GTK_TEXT (text));
+
+  g_string_free (str, TRUE);
+}
+
 static GtkWidget *
 create_welcome_page (void)
 {
   GtkWidget *vbox;
   GtkWidget *text;
 
-  gchar *buf;
-
-  buf = g_new (gchar, 2048);
-
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox);
 
-  snprintf (buf, 2048, _ ("Welcome to Balsa!\n\n"),
-	    _ ("You seem to be running Balsa for the first time.\n"),
-	    _ ("The following steps will setup Balsa by asking a few simple questions."), "  ",
-	    _ ("Once you have completed these steps, you can always change them at a later time through Balsa's preferences."),
-	    "  ",
-	    _ ("Please check the about box in Balsa's main window for more information on contacting the authors or reporting bugs."));
   text = gtk_text_new (NULL, NULL);
   gtk_box_pack_start (GTK_BOX (vbox), text, FALSE, FALSE, 5);
   gtk_widget_show (text);
-  gtk_text_freeze (GTK_TEXT (text));
-  gtk_text_set_editable (GTK_TEXT (text), TRUE);
-  gtk_text_set_word_wrap (GTK_TEXT (text), TRUE);
-  gtk_widget_realize (text);
-  gtk_text_insert (GTK_TEXT (text), NULL, NULL, NULL, buf, strlen (buf));
-  g_free (buf);
-  gtk_text_thaw (GTK_TEXT (text));
-  /*
-     vbox = gtk_vbox_new (FALSE, 0);
-     gtk_widget_show (vbox);
 
-     label = gtk_label_new (_ ("Welcome to Balsa!  The following steps will help you get setup to use Balsa."));
-     gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 5);
-     gtk_widget_show (label);
-   */
+  gtk_signal_connect (GTK_OBJECT (text), "realize", GTK_SIGNAL_FUNC (text_realize_handler), NULL);
+
   return vbox;
 }
 

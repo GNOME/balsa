@@ -559,7 +559,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 		      (GWeakNotify) bm_message_weak_ref_cb,
 		      (gpointer) bm);
 
-    is_new = message->flags & LIBBALSA_MESSAGE_FLAG_NEW;
+    is_new = LIBBALSA_MESSAGE_IS_UNREAD(message);
     if(!libbalsa_message_body_ref(bm->message, TRUE)) 
 	return FALSE;
 

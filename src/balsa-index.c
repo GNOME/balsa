@@ -653,8 +653,7 @@ balsa_index_add(BalsaIndex * index, LibBalsaMessage * message)
     g_return_if_fail(index != NULL);
     g_return_if_fail(message != NULL);
 
-    if (balsa_app.hide_deleted 
-        && message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)
+    if (balsa_app.hide_deleted && LIBBALSA_MESSAGE_IS_DELETED(message))
         return;
 
     mailbox = index->mailbox_node->mailbox;
@@ -1001,12 +1000,12 @@ bndx_find_row_func(GtkTreeModel *model, GtkTreePath *path,
         return FALSE;
     }
 
-    if (message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)
+    if (LIBBALSA_MESSAGE_IS_DELETED(message))
         return FALSE;
 
     if (b->flag) {
         /* looking for flagged messages */
-        if (!(b->flag & message->flags))
+        if (!LIBBALSA_MESSAGE_HAS_FLAG(message, b->flag))
             return FALSE;
     } else if (b->matching) {
         /* looking for messages that match some conditions */
@@ -1182,8 +1181,9 @@ bndx_set_col_images(BalsaIndex * index, GtkTreeIter * iter,
         { LIBBALSA_MESSAGE_FLAG_REPLIED, BALSA_PIXMAP_INFO_REPLIED },
         { LIBBALSA_MESSAGE_FLAG_NEW,     BALSA_PIXMAP_INFO_NEW } };
 
-    for(tmp=0; tmp<ELEMENTS(flags) && !(message->flags & flags[tmp].mask);
-        tmp++);
+    for (tmp = 0; tmp < ELEMENTS(flags)
+         && !LIBBALSA_MESSAGE_HAS_FLAG(message, flags[tmp].mask);
+         tmp++);
 
     if (tmp < ELEMENTS(flags))
         status_pixbuf =
@@ -1224,7 +1224,7 @@ thread_has_unread(BalsaIndex * index, GtkTreePath * path)
 
         gtk_tree_model_get(model, &iter, BNDX_MESSAGE_COLUMN, &message, -1);
 
-        if ((message && message->flags & LIBBALSA_MESSAGE_FLAG_NEW) ||
+        if (LIBBALSA_MESSAGE_IS_UNREAD(message) ||
             thread_has_unread(index, child_path)) {
             ret_val = TRUE;
             break;
@@ -1548,8 +1548,7 @@ mailbox_messages_changed_status_cb(LibBalsaMailbox * mb,
     if (!libbalsa_mailbox_is_valid(mb)) return;
 
     if (flag == LIBBALSA_MESSAGE_FLAG_DELETED &&
-        (LIBBALSA_MESSAGE(messages->data)->flags
-         & LIBBALSA_MESSAGE_FLAG_DELETED) &&
+        LIBBALSA_MESSAGE_IS_DELETED(messages->data) &&
 	(balsa_app.hide_deleted || balsa_app.delete_immediately)) {
 	/* These messages are flagged as deleted, but we must remove them from
 	   the index because of the prefs
@@ -1562,8 +1561,7 @@ mailbox_messages_changed_status_cb(LibBalsaMailbox * mb,
         balsa_index_update_flag(bindex, LIBBALSA_MESSAGE(list->data));
 
     if (flag == LIBBALSA_MESSAGE_FLAG_DELETED
-        && (LIBBALSA_MESSAGE(bindex->current_message)->flags
-            & LIBBALSA_MESSAGE_FLAG_DELETED)) {
+        && LIBBALSA_MESSAGE_IS_DELETED(bindex->current_message)) {
         GtkTreeIter iter;
 
         bndx_find_row(bindex, NULL, &iter, (LibBalsaMessageFlag) 0,
@@ -1818,7 +1816,7 @@ bndx_do_delete(BalsaIndex* index, gboolean move_to_trash)
         GList *next = g_list_next(list);
         LibBalsaMessage * message = list->data;
 
-        if (message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)
+        if (LIBBALSA_MESSAGE_IS_DELETED(message))
             messages = g_list_delete_link(messages, list);
 
         list = next;
@@ -1898,15 +1896,13 @@ balsa_message_toggle_flag(BalsaIndex* index, LibBalsaMessageFlag flag,
                           void(*cb)(GList*, gboolean))
 {
     GList *list, *l;
-    LibBalsaMessage *message;
     int is_all_flagged = TRUE;
     gboolean new_flag;
 
     /* First see if we should set given flag or unset */
     l = balsa_index_selected_list(index);
     for (list = l; list; list = g_list_next(list)) {
-	message = list->data;
-	if (!(message->flags & flag)) {
+	if (!LIBBALSA_MESSAGE_HAS_FLAG(list->data, flag)) {
 	    is_all_flagged = FALSE;
 	    break;
 	}
@@ -2096,7 +2092,7 @@ bndx_do_popup(BalsaIndex * index, GdkEventButton * event)
     for (list = l; list; list = g_list_next(list)) {
         LibBalsaMessage *message = list->data;
 
-        if (message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)
+        if (LIBBALSA_MESSAGE_IS_DELETED(message))
             any_deleted = TRUE;
         else
             any_not_deleted = TRUE;
@@ -2363,7 +2359,7 @@ hide_deleted(BalsaIndex * index, gboolean hide)
     for (list = mailbox->message_list; list; list = g_list_next(list)) {
         LibBalsaMessage *message = list->data;
 
-        if (message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)
+        if (LIBBALSA_MESSAGE_IS_DELETED(message))
             messages = g_list_prepend(messages, message);
     }
 

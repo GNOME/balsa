@@ -561,9 +561,11 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
     for (lista = outbox->message_list; lista; lista = lista->next) {
 	msg = LIBBALSA_MESSAGE(lista->data);
 
-	if (msg->flags & (LIBBALSA_MESSAGE_FLAG_FLAGGED |
-                          LIBBALSA_MESSAGE_FLAG_DELETED))
+        if (LIBBALSA_MESSAGE_HAS_FLAG(msg,
+                                      (LIBBALSA_MESSAGE_FLAG_FLAGGED |
+                                       LIBBALSA_MESSAGE_FLAG_DELETED)))
             continue;
+
 	new_message = msg_queue_item_new(msg);
 	if (!libbalsa_create_msg(msg, new_message->message,
 				 new_message->tempfile, encoding, 

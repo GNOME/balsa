@@ -127,8 +127,17 @@ struct _LibBalsaMessage {
 #define LIBBALSA_MESSAGE_GET_NO(m)  libbalsa_message_get_no(m)
 #endif
 };
-#define LIBBALSA_MESSAGE_IS_FLAGGED(m)\
- ((m)->flags&LIBBALSA_MESSAGE_FLAG_FLAGGED)
+
+#define LIBBALSA_MESSAGE_HAS_FLAG(message, mask) \
+    ((LIBBALSA_MESSAGE(message)->flags & mask) != 0)
+#define LIBBALSA_MESSAGE_IS_UNREAD(message) \
+    LIBBALSA_MESSAGE_HAS_FLAG(message, LIBBALSA_MESSAGE_FLAG_NEW)
+#define LIBBALSA_MESSAGE_IS_DELETED(message) \
+    LIBBALSA_MESSAGE_HAS_FLAG(message, LIBBALSA_MESSAGE_FLAG_DELETED)
+#define LIBBALSA_MESSAGE_IS_REPLIED(message) \
+    LIBBALSA_MESSAGE_HAS_FLAG(message, LIBBALSA_MESSAGE_FLAG_REPLIED)
+#define LIBBALSA_MESSAGE_IS_FLAGGED(message) \
+    LIBBALSA_MESSAGE_HAS_FLAG(message, LIBBALSA_MESSAGE_FLAG_FLAGGED)
 
 struct _LibBalsaMessageClass {
     GObjectClass parent_class;

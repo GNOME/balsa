@@ -262,7 +262,7 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
 	}
         break;
     case CONDITION_FLAG:
-        match = (message->flags & cond->match.flags);
+        match = LIBBALSA_MESSAGE_HAS_FLAG(message, cond->match.flags);
         break;
     case CONDITION_DATE:
         match = message->date>=cond->match.interval.date_low 

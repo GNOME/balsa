@@ -11,8 +11,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2002-12-28 11:02+0100\n"
-"PO-Revision-Date: 2002-12-28 11:03+0100\n"
+"POT-Creation-Date: 2002-12-29 00:47+0100\n"
+"PO-Revision-Date: 2002-12-29 00:47+0100\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -108,23 +108,23 @@ msgstr "Kan inte läsa in meddelandetexten för att matcha filter"
 
 #: libbalsa/filter.c:424
 #, c-format
-msgid "Invalid filter : %s"
+msgid "Invalid filter: %s"
 msgstr "Ogiltigt filter: %s"
 
-#: libbalsa/filter.c:506 libbalsa/filter.c:525
+#: libbalsa/filter.c:507 libbalsa/filter.c:526
 #, c-format
-msgid "Bad mailbox name for filter : %s"
+msgid "Bad mailbox name for filter: %s"
 msgstr "Felaktigt brevlådenamn för filtret: %s"
 
-#: libbalsa/filter.c:510
+#: libbalsa/filter.c:511
 msgid "Error when copying messages"
 msgstr "Fel vid kopiering av meddelanden"
 
-#: libbalsa/filter.c:518
+#: libbalsa/filter.c:519
 msgid "Error when trashing messages"
 msgstr "Fel vid borttagning av meddelanden"
 
-#: libbalsa/filter.c:529
+#: libbalsa/filter.c:530
 msgid "Error when moving messages"
 msgstr "Fel vid flyttande av meddelanden"
 
@@ -475,19 +475,19 @@ msgstr "Hämtar meddelande %d av %d"
 msgid "Received %d bytes of %d"
 msgstr "Mottog %d byte av %d"
 
-#: libbalsa/send.c:211 libbalsa/send.c:218
+#: libbalsa/send.c:218 libbalsa/send.c:225
 msgid "Sending Mail..."
 msgstr "Skickar brev..."
 
-#: libbalsa/send.c:214 src/main-window.c:1778
+#: libbalsa/send.c:221 src/main-window.c:1778
 msgid "_Hide"
 msgstr "_Dölj"
 
-#: libbalsa/send.c:360
+#: libbalsa/send.c:369
 msgid "Unable to open sentbox - could not get IMAP server information"
 msgstr "Kan inte öppna utkorg - kunde inte få tag i IMAP-serverinformation."
 
-#: libbalsa/send.c:768
+#: libbalsa/send.c:777
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
@@ -496,40 +496,40 @@ msgstr ""
 "Systemet kommer att försöka skicka om meddelandet igen tills\n"
 "du tar bort det."
 
-#: libbalsa/send.c:795
+#: libbalsa/send.c:804
 msgid "Connected to MTA"
 msgstr "Ansluten till MTA"
 
-#: libbalsa/send.c:802
+#: libbalsa/send.c:811
 #, c-format
 msgid "From: %d <%s>"
 msgstr "Från: %d <%s>"
 
-#: libbalsa/send.c:805
+#: libbalsa/send.c:814
 #, c-format
 msgid "From %s: %d %s"
 msgstr "Från %s: %d %s"
 
-#: libbalsa/send.c:813
+#: libbalsa/send.c:822
 #, c-format
 msgid "To: %d <%s>"
 msgstr "Till: %d <%s>"
 
-#: libbalsa/send.c:816
+#: libbalsa/send.c:825
 #, c-format
 msgid "To %s: %d %s"
 msgstr "Till %s: %d %s"
 
-#: libbalsa/send.c:840
+#: libbalsa/send.c:849
 #, c-format
 msgid "%d %s"
 msgstr "%d %s"
 
-#: libbalsa/send.c:853
+#: libbalsa/send.c:862
 msgid "Disconnected"
 msgstr "Frånkopplad"
 
-#: libbalsa/send.c:1024
+#: libbalsa/send.c:1033
 msgid ""
 "SMTP server refused connection.\n"
 "Balsa by default uses submission service (587).\n"
@@ -543,7 +543,7 @@ msgstr ""
 "via: \"host:smtp\".\n"
 "Meddelandet är kvar i utkorgen."
 
-#: libbalsa/send.c:1034
+#: libbalsa/send.c:1043
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
@@ -2279,7 +2279,7 @@ msgstr ""
 "Du kan inte associera det med samma brevlåda (det orsakar rekursion)."
 
 #: src/filter-run-dialog.c:187
-msgid "Balsa Filters of Mailbox : "
+msgid "Balsa Filters of Mailbox: "
 msgstr "Balsa-filter för brevlåda: "
 
 #: src/filter-run-dialog.c:228
@@ -3921,21 +3921,17 @@ msgid "Balsa: message print preview"
 msgstr "Balsa: förhandsgranska meddelandeutskrift"
 
 #: src/save-restore.c:553
-msgid "Error during filters loading : "
+msgid "Error during filters loading: "
 msgstr "Fel vid filterinläsning: "
 
 #: src/save-restore.c:555
 #, c-format
 msgid ""
-"Error during filters loading : %s\n"
-"%s"
+"Error during filters loading: %s\n"
+"Filters may not be correct."
 msgstr ""
 "Fel vid filterinläsning: %s\n"
-"%s"
-
-#: src/save-restore.c:557
-msgid "Filters may not be correct"
-msgstr "Filtret kan vara felaktigt"
+"Filtren kan vara felaktiga."
 
 #: src/sendmsg-window.c:190
 msgid "_Include File..."
@@ -4394,22 +4390,31 @@ msgstr "Läser in..."
 msgid "Include file"
 msgstr "Inkludera fil"
 
-#: src/sendmsg-window.c:3818
+#: src/sendmsg-window.c:3163
+#, c-format
+msgid ""
+"The message cannot be encoded in charset %s.\n"
+"Please choose a language for this message."
+msgstr ""
+"Meddelandet kan inte kodas i teckentabellen %s.\n"
+"Välj ett språk för detta meddelande."
+
+#: src/sendmsg-window.c:3849
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Svara till %s: %s"
 
-#: src/sendmsg-window.c:3823
+#: src/sendmsg-window.c:3854
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Vidarebefordra meddelande till %s: %s"
 
-#: src/sendmsg-window.c:3827
+#: src/sendmsg-window.c:3858
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Fortsätt meddelande till %s: %s"
 
-#: src/sendmsg-window.c:3831
+#: src/sendmsg-window.c:3862
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Nytt meddelande till %s: %s"
@@ -4782,11 +4787,27 @@ msgstr "Upp"
 msgid "Down"
 msgstr "Ned"
 
-#~ msgid "Invalid filter: %s"
+#~ msgid "Invalid filter : %s"
 #~ msgstr "Ogiltigt filter: %s"
 
-#~ msgid "Bad mailbox name for filter: %s"
+#~ msgid "Bad mailbox name for filter : %s"
 #~ msgstr "Felaktigt brevlådenamn för filtret: %s"
+
+#~ msgid "Balsa Filters of Mailbox : "
+#~ msgstr "Balsa-filter för brevlåda: "
+
+#~ msgid "Error during filters loading : "
+#~ msgstr "Fel vid filterinläsning: "
+
+#~ msgid ""
+#~ "Error during filters loading : %s\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Fel vid filterinläsning: %s\n"
+#~ "%s"
+
+#~ msgid "Filters may not be correct"
+#~ msgstr "Filtret kan vara felaktigt"
 
 #~ msgid "Uploading message..."
 #~ msgstr "Lämnar meddelande..."
@@ -4809,9 +4830,6 @@ msgstr "Ned"
 #~ msgid "Filter name:"
 #~ msgstr "Filternamn:"
 
-#~ msgid "Balsa Filters of Mailbox: "
-#~ msgstr "Balsa-filter för brevlåda: "
-
 #~ msgid "_Export filters"
 #~ msgstr "_Exportera filter"
 
@@ -4820,16 +4838,6 @@ msgstr "Ned"
 
 #~ msgid "Edit/Apply Filters"
 #~ msgstr "Redigera/Tillämpa filter"
-
-#~ msgid "Error during filters loading: "
-#~ msgstr "Fel vid filterinläsning: "
-
-#~ msgid ""
-#~ "Error during filters loading: %s\n"
-#~ "%s"
-#~ msgstr ""
-#~ "Fel vid filterinläsning: %s\n"
-#~ "%s"
 
 #~ msgid "Body"
 #~ msgstr "Meddelandetext"

@@ -30,8 +30,6 @@ typedef struct _BalsaMBListClass BalsaMBListClass;
 struct _BalsaMBList
   {
     GtkCTree ctree;
-
-    GtkWidget *foo;
   };
 
 struct _BalsaMBListClass

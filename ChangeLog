@@ -1,5 +1,7 @@
-2003-11-14 08:57  PeterB
+2003-11-14 22:11  PeterB
 
+	* src/sendmsg-window.c: Test for empty <> in address.
+	* libbalsa/misc.c: Clear error in loop.
 	* libbalsa/mailbox_maildir.c: Plug a memory leak; move a test to
 	where it's really needed.
 	* libbalsa/mailbox_mbox.c: Expunge deleted messages even if flags

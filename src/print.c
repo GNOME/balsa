@@ -323,7 +323,7 @@ prepare_header(PrintInfo * pi, LibBalsaMessageBody * body)
     gdouble font_size;
     HeaderInfo *pdata;
     GString *footer_string = NULL;
-    const gchar *subject;
+    gchar *subject;
     gchar *date;
     GList *other_hdrs, *p;
 
@@ -331,12 +331,15 @@ prepare_header(PrintInfo * pi, LibBalsaMessageBody * body)
     pdata->id_tag = BALSA_PRINT_TYPE_HEADER;
     pdata->headers = NULL;
 
-    subject = LIBBALSA_MESSAGE_GET_SUBJECT(pi->message);
+    subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(pi->message));
+    libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit,
+			   balsa_app.convert_unknown_8bit_codeset, NULL);
     if (subject) {
 	print_header_string (&pdata->headers, "subject", _("Subject:"),
 			     subject);
 	footer_string = g_string_new(subject);
     }
+    g_free(subject);
 
     date = libbalsa_message_date_to_gchar(pi->message, balsa_app.date_string);
     print_header_string (&pdata->headers, "date", _("Date:"), date);

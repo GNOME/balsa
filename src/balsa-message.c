@@ -520,11 +520,14 @@ balsa_message_scan_signatures(LibBalsaMessageBody *body, LibBalsaMessage * messa
 
     for (; body; body = body->next) {
 	gint signres = libbalsa_is_pgp_signed(body);
+	gchar *sender = libbalsa_address_to_gchar(message->from, -1);
+	gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
+	
+	libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
+			       balsa_app.convert_unknown_8bit_codeset, NULL);
 
 	if (signres > 0) {
 	    LibBalsaSignatureInfo *checkResult;
-	    gchar *sender = libbalsa_address_to_gchar(message->from, -1);
-
 	    if (!body->parts->next->sig_info)
 		libbalsa_body_check_signature(body->parts);
 	    checkResult = body->parts->next->sig_info;
@@ -539,24 +542,22 @@ balsa_message_scan_signatures(LibBalsaMessageBody *body, LibBalsaMessage * messa
 		    result = LIBBALSA_MESSAGE_SIGNATURE_BAD;
 		    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 					 _("Checking the signature of the message sent by %s with subject \"%s\" returned:\n%s"),
-					 sender, LIBBALSA_MESSAGE_GET_SUBJECT(message),
+					 sender, subject,
 					 libbalsa_gpgme_sig_stat_to_gchar(checkResult->status));
 		}
 	    } else {
 		result = LIBBALSA_MESSAGE_SIGNATURE_BAD;
 		libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 				     _("Checking the signature of the message sent by %s with subject \"%s\" failed with an error!"),
-				     sender, LIBBALSA_MESSAGE_GET_SUBJECT(message));
+				     sender, subject);
 	    }
-	    g_free(sender);
 	} else if (signres < 0) {
-	    gchar *sender = libbalsa_address_to_gchar(message->from, -1);
-	    
 	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 				 _("The message sent by %s with subject \"%s\" contains a \"multipart/signed\" part, but it's structure is invalid. The signature, if there is any, can not be checked."),
-				 sender, LIBBALSA_MESSAGE_GET_SUBJECT(message));
-	    g_free(sender);
+				 sender, subject);
 	}	    
+	g_free(subject);
+	g_free(sender);
 
 	/* scan embedded messages */
 	if (body->parts) {
@@ -629,10 +630,15 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 		libbalsa_body_decrypt(message->body_list->parts, NULL);
 	else if (encrres < 0) {
 	    gchar *sender = libbalsa_address_to_gchar(message->from, -1);
-
+	    gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
+	
+	    libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
+				   balsa_app.convert_unknown_8bit_codeset, NULL);
+	    
 	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 				 _("The message sent by %s with subject \"%s\" contains a \"multipart/encrypted\" part, but it's structure is invalid."),
-				 sender, LIBBALSA_MESSAGE_GET_SUBJECT(message));
+				 sender, subject);
+	    g_free(subject);
 	    g_free(sender);
 	}
     }
@@ -1690,11 +1696,15 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         if (!libbalsa_utf8_sanitize(&ptr, balsa_app.convert_unknown_8bit,
 				    balsa_app.convert_unknown_8bit_codeset, &target_cs)) {
 	    gchar *from = libbalsa_address_to_gchar(bm->message->from, 0);
+	    gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));
+	
+	    libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
+				   balsa_app.convert_unknown_8bit_codeset, NULL);
 	    libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
 				 _("The message sent by %s with subject \"%s\" contains 8-bit characters, but no header describing the used codeset (converted to %s)"),
-				 from,
-				 LIBBALSA_MESSAGE_GET_SUBJECT(bm->message),
+				 from, subject,
 				 target_cs ? target_cs : "\"?\"");
+	    g_free(subject);
 	    g_free(from);
 	}
 
@@ -1725,11 +1735,16 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 	    else if (sig_res != GPGME_SIG_STAT_NONE) {
 		gchar *sender = 
 		    libbalsa_address_to_gchar(bm->message->from, -1);
+		gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));
+	
+		libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
+				       balsa_app.convert_unknown_8bit_codeset, NULL);
 		
 		libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 				     _("Checking the signature of the message sent by %s with subject \"%s\" returned:\n%s"),
-				     sender, LIBBALSA_MESSAGE_GET_SUBJECT(bm->message),
+				     sender, subject,
 				     libbalsa_gpgme_sig_stat_to_gchar(sig_res));
+		g_free(subject);
 		g_free(sender);
 	    }
 	    

@@ -1,5 +1,10 @@
 2003-05-05  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
 
+	* src/balsa-message.c: sanitize subject to avoid errors on reply etc.
+	* src/{print,sendmsg-window}.c: ditto.
+
+2003-05-05  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
+
 	* libbalsa/identity.c: add gpg_sign and gpg_encrypt fields, and 
 	respective UI support.
 	* libbalsa/rfc3156.[hc]: enable passphrase caching.

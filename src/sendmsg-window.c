@@ -2175,7 +2175,7 @@ quoteBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message, SendType type)
 	date = libbalsa_message_date_to_gchar(message, balsa_app.date_string);
 
     if (type == SEND_FORWARD_ATTACH) {
-	const gchar *subject;
+	gchar *subject;
 
 	str = g_strdup_printf(_("------forwarded message from %s------\n"), 
 			      personStr);
@@ -2185,9 +2185,12 @@ quoteBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message, SendType type)
 	if (date)
 	    g_string_append_printf(body, "%s %s\n", _("Date:"), date);
 
-	subject = LIBBALSA_MESSAGE_GET_SUBJECT(message);
+	subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
+	libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit,
+			       balsa_app.convert_unknown_8bit_codeset, NULL);
 	if (subject)
 	    g_string_append_printf(body, "%s %s\n", _("Subject:"), subject);
+	g_free(subject);
 
 	if (message->from) {
 	    gchar *from = libbalsa_address_to_gchar(message->from, 0);
@@ -2349,12 +2352,14 @@ static void
 set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message,
                      SendType type, LibBalsaIdentity* ident)
 {
-    const gchar *subject, *tmp;
-    gchar *newsubject = NULL;
+    const gchar *tmp;
+    gchar *subject, *newsubject = NULL;
     gint i;
 
     if(!message) return;
-    subject = LIBBALSA_MESSAGE_GET_SUBJECT(message);
+    subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
+    libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit,
+			   balsa_app.convert_unknown_8bit_codeset, NULL);
 
     switch (type) {
     case SEND_REPLY:
@@ -2423,12 +2428,14 @@ set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message,
     case SEND_CONTINUE:
 	if (subject)
 	    gtk_entry_set_text(entry, subject);
+	g_free(subject);
 	return;
     default:
 	return; /* or g_assert_never_reached() ? */
     }
 
     gtk_entry_set_text(entry, newsubject);
+    g_free(subject);
     g_free(newsubject);
 }
 

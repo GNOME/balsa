@@ -36,7 +36,6 @@
 
 
 
-
 static void append_signature (FILE *f)
 {
   FILE *tmpfp;

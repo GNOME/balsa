@@ -251,6 +251,9 @@ int mutt_save_attachment (FILE *, BODY *, char *, int, HEADER *);
 int mutt_save_message (HEADER *, int, int, int *);
 int mutt_search_command (int, int);
 int mutt_send_menu (HEADER *, char *, size_t, HEADER *);
+#ifdef LIBMUTT
+int mutt_send_message(HEADER *);
+#endif
 int mutt_strcmp (const char *, const char *);
 int mutt_thread_set_flag (HEADER *, int, int, int);
 int mutt_view_attachment (FILE*, BODY *, int);

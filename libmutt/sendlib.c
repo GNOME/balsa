@@ -1502,6 +1502,40 @@ strsysexit(int e)
   return sysexits_h[i].str;
 }
 
+#ifdef LIBMUTT
+int mutt_send_message (HEADER *msg)
+{
+  char tempfile[_POSIX_PATH_MAX];
+  FILE *tempfp;
+  int i;
+
+  /* Write out the message in MIME form. */
+  mutt_mktemp (tempfile);
+  if ((tempfp = safe_fopen (tempfile, "w")) == NULL)
+    return (-1);
+
+  mutt_write_rfc822_header (tempfp, msg->env, msg->content, 0);
+  fputc ('\n', tempfp); /* tie off the header. */
+
+  if ((mutt_write_mime_body (msg->content, tempfp) == -1))
+  {
+    fclose(tempfp);
+    unlink (tempfile);
+    return (-1);
+  }
+
+  if (fclose (tempfp) != 0)
+  {
+    mutt_perror (tempfile);
+    unlink (tempfile);
+    return (-1);
+  }
+
+  i = mutt_invoke_sendmail (msg->env->to, msg->env->cc, msg->env->bcc,
+                       tempfile, (msg->content->encoding == ENC8BIT));
+  return (i ? -1 : 0);
+}
+#endif
 
 int
 mutt_invoke_sendmail (ADDRESS *to, ADDRESS *cc, ADDRESS *bcc, /* recips */
@@ -1633,7 +1667,7 @@ char *mutt_quote_string (const char *s)
   *pr = 0;
   return (r);
 }
-
+#ifndef LIBMUTT
 void mutt_prepare_envelope (ENVELOPE *env)
 {
   char buffer[LONG_STRING];
@@ -1674,7 +1708,7 @@ void mutt_prepare_envelope (ENVELOPE *env)
   if (!env->message_id)
     env->message_id = mutt_gen_msgid ();
 }
-  
+#endif  
 void mutt_bounce_message (HEADER *h, ADDRESS *to)
 {
   int i;

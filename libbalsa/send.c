@@ -30,7 +30,7 @@
 #include "send.h"
 
 gboolean
-send_message (Message * message, gchar * smtp_server, glong debug)
+balsa_send_message (Message * message, gchar * smtp_server, glong debug)
 {
   FILE *tempfp = NULL;
   HEADER *msg;
@@ -95,10 +95,13 @@ send_message (Message * message, gchar * smtp_server, glong debug)
     case MAILBOX_MAILDIR:
     case MAILBOX_MH:
     case MAILBOX_MBOX:
-      mutt_send_message (msg, MAILBOX_LOCAL(balsa_app.outbox)->path);
+	    /*
+      send_message (msg, MAILBOX_LOCAL(balsa_app.outbox)->path);
+      */
+      mutt_send_message (msg);
       break;
     case MAILBOX_IMAP:
-      mutt_send_message (msg, MAILBOX_IMAP(balsa_app.outbox)->path);
+      mutt_send_message (msg);
       break;
     default:
       break;

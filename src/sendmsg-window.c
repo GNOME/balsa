@@ -521,7 +521,7 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 
   message->body_list = g_list_append (message->body_list, body);
 
-  if (send_message (message, balsa_app.smtp_server, balsa_app.debug))
+  if (balsa_send_message (message, balsa_app.smtp_server, balsa_app.debug))
     if (bsmsg->type == 1)
       {
 	if (bsmsg->orig_message)

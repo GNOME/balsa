@@ -64,6 +64,7 @@ class Balsa:Druid:Page:Finish from Balsa:Druid:Page {
 
 	override (Gnome:Druid:Page) void
 	finish( Gnome:Druid:Page *_self, Gtk:Widget *druid (check type null) ) {
+		config_global_save();
 		balsa_initdruid_finished( BALSA_INITDRUID( druid ) );
 	}
 }

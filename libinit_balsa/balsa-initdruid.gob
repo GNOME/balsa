@@ -109,6 +109,6 @@ class Balsa:InitDruid from Gnome:Druid {
 		gtk_object_destroy( win );
 
 		gtk_main_quit();
-		config_global_save();
+		/*config_global_save(); When cancelling this makes us coredump */
 	}
 }

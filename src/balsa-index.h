@@ -158,6 +158,9 @@ extern "C" {
     /* Remove duplicate messages. */
     void balsa_index_remove_duplicates(BalsaIndex * index);
 
+    /* Expunge deleted messages. */
+    void balsa_index_expunge(BalsaIndex * index);
+
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

@@ -3444,55 +3444,24 @@ reset_filter_cb(GtkWidget * widget, gpointer data)
 static void
 mailbox_commit_changes(GtkWidget * widget, gpointer data)
 {
-    LibBalsaMailbox *current_mailbox;
     GtkWidget *index;
 
     index = balsa_window_find_current_index(BALSA_WINDOW(data));
-
-    g_return_if_fail(index != NULL);
-
-    current_mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
-    
-    if (!current_mailbox->readonly &&
-	!libbalsa_mailbox_sync_storage(current_mailbox, TRUE))
-        balsa_information(LIBBALSA_INFORMATION_WARNING,
-                          _("Commiting mailbox %s failed."),
-                          current_mailbox->name);
+    balsa_index_expunge(BALSA_INDEX(index));
 }
 
-
-static gboolean
-mailbox_commit_each(GtkTreeModel * model, GtkTreePath * path,
-		    GtkTreeIter * iter, gpointer data) 
+static void
+mailbox_commit_each(GtkWidget * page, gpointer data) 
 {
-    BalsaMailboxNode *mbnode;
-    LibBalsaMailbox *box;
-
-    gtk_tree_model_get(model, iter, 0, &mbnode, -1);
-    box = mbnode->mailbox;
-    g_object_unref(mbnode);
-    if (!box)
-        return FALSE; /* mailbox_node->mailbox == NULL is legal */
-    
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(box), FALSE);
-
-    if(!MAILBOX_OPEN(box) || box->readonly)
-	return FALSE;
-
-    if (!libbalsa_mailbox_sync_storage(box, TRUE))
-        balsa_information(LIBBALSA_INFORMATION_WARNING,
-                          _("Commiting mailbox %s failed."),
-                          box->name);
-    return FALSE;
+    BalsaIndex *index = BALSA_INDEX(gtk_bin_get_child(GTK_BIN(page)));
+    balsa_index_expunge(index);
 }
-
 
 static void
 mailbox_commit_all(GtkWidget * widget, gpointer data)
 {
-    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
-			   (GtkTreeModelForeachFunc) mailbox_commit_each, 
-			   NULL);
+    gtk_container_foreach(GTK_CONTAINER(BALSA_WINDOW(data)->notebook),
+			  mailbox_commit_each, NULL);
 }
 
 /* empty_trash:

@@ -1912,3 +1912,26 @@ bndx_row_is_viewable(BalsaIndex * index, GtkTreePath * path)
     gtk_tree_path_free(tmp_path);
     return ret_val;
 }
+
+/* Expunge deleted messages. */
+void
+balsa_index_expunge(BalsaIndex * index)
+{
+    LibBalsaMailbox *mailbox;
+    GtkTreeSelection *selection;
+
+    g_return_if_fail(index != NULL);
+
+    mailbox = index->mailbox_node->mailbox;
+    if (mailbox->readonly)
+	return;
+
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(index));
+    g_signal_handler_block(selection, index->selection_changed_id);
+    if (!libbalsa_mailbox_sync_storage(mailbox, TRUE))
+	balsa_information(LIBBALSA_INFORMATION_WARNING,
+			  _("Committing mailbox %s failed."),
+			  mailbox->name);
+    g_signal_handler_unblock(selection, index->selection_changed_id);
+    g_signal_emit_by_name(G_OBJECT(selection), "changed");
+}

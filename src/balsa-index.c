@@ -1350,8 +1350,7 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
 
     /* we don't clear the current message if the tree contains any
      * messages */
-    if ((sci.message || gtk_tree_model_iter_n_children(model, NULL) == 0)
-        && sci.message != index->current_message) {
+    if (sci.message || gtk_tree_model_iter_n_children(model, NULL) == 0) {
         index->current_message = sci.message;
         bndx_changed_find_row(index);
     }

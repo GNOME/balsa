@@ -1059,10 +1059,10 @@ real_open_mbnode(BalsaMailboxNode* mbnode)
 	return;
     }
 
+    gdk_threads_enter();
     index = BALSA_INDEX(balsa_index_new());
     index->window = GTK_WIDGET(balsa_app.main_window);
 
-    gdk_threads_enter();
     balsa_window_increase_activity(balsa_app.main_window);
     failurep = balsa_index_load_mailbox_node(BALSA_INDEX (index), mbnode);
     balsa_window_decrease_activity(balsa_app.main_window);

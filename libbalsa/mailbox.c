@@ -545,7 +545,9 @@ libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
  * PS: called by mail_progress_notify_cb:
  * loads incrementally new messages, if any.
  *  Mailbox lock MUST NOT BE HELD before calling this function.
- *  Neither gdk_lock.
+ *  gdk_lock MUST BE HELD before calling this function because it is called
+ *  from both threading and not threading code and we want to be on the safe
+ *  side.
  */
 void
 libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)

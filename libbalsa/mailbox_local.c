@@ -282,8 +282,8 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox, gboolean append)
     mailbox->new_messages = CLIENT_CONTEXT(mailbox)->msgcount;
     mailbox->open_ref++;
     UNLOCK_MAILBOX(mailbox);
-    libbalsa_mailbox_load_messages(mailbox);
     gdk_threads_enter();
+    libbalsa_mailbox_load_messages(mailbox);
     
     /* increment the reference count */
 #ifdef DEBUG

@@ -720,7 +720,7 @@ config_global_load(void)
     balsa_app.delete_immediately =
         gnome_config_get_bool("DeleteImmediately=false");
     balsa_app.hide_deleted =
-        gnome_config_get_bool("HideDeleted=false");
+        gnome_config_get_bool("HideDeleted=true");
 
     gnome_config_pop_prefix();
 

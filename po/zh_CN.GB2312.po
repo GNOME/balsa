@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2001-03-14 21:51+0800\n"
+"POT-Creation-Date: 2001-04-13 02:40+0800\n"
 "PO-Revision-Date: 2001-03-14 22:10+0800\n"
 "Last-Translator: Dillion Chen <dillon.chen@turbolinux.com.cn>\n"
 "Language-Team: zh_CN <i18n-translation@lists.linux.net.cn>\n"
@@ -18,8 +18,8 @@ msgid ""
 "Failed to initialise LDAP server.\n"
 "Check that the servername is valid."
 msgstr ""
-"无法初始化 LDAP 服务器.\n"
-"请检查服务器名是否正确."
+"无法初始化 LDAP 服务器。\n"
+"请检查服务器名是否正确。"
 
 #: libbalsa/address-book-ldap.c:213
 #, c-format
@@ -27,13 +27,13 @@ msgid ""
 "Failed to bind to server: %s\n"
 "Check that the servername is valid."
 msgstr ""
-"无法绑定服务器: %s\n"
-"请检查服务器名是否正确."
+"无法绑定服务器：%s\n"
+"请检查服务器名是否正确。"
 
 #: libbalsa/address-book-ldap.c:261 libbalsa/address-book-ldap.c:517
 #, c-format
 msgid "Failed to do a search: %sCheck that the base name is valid."
-msgstr "无法进行查找: %s检查起始名是否正确."
+msgstr "无法进行查找：%s检查起始名是否正确。"
 
 #: libbalsa/address-book-ldap.c:328 libbalsa/address-book-vcard.c:274
 msgid "No-Id"
@@ -48,18 +48,18 @@ msgstr "没有名字"
 #: libbalsa/address-book-vcard.c:193
 #, c-format
 msgid "Could not stat vcard address book: %s"
-msgstr "无法检查 vcard 地址簿状态: %s"
+msgstr "无法检查 vcard 地址簿状态：%s"
 
 # src/mailbox-conf.c:488
 #: libbalsa/address-book-vcard.c:252
 #, c-format
 msgid "Could not open vCard address book %s."
-msgstr "无法打开 vcard 地址簿 %s."
+msgstr "无法打开 vcard 地址簿 %s。"
 
 #: libbalsa/address-book-vcard.c:421
 #, c-format
 msgid "%s is already in address book."
-msgstr "%s 已经在地址簿中."
+msgstr "%s 已经在地址簿中。"
 
 #: libbalsa/address-book-vcard.c:431
 #, c-format
@@ -74,7 +74,7 @@ msgstr "无法载入地址簿 %s"
 #: libbalsa/address-book.c:184
 #, c-format
 msgid "No such address book type: %s"
-msgstr "没有这种地址簿类型: %s"
+msgstr "没有这种地址簿类型：%s"
 
 #: libbalsa/address-book.c:194
 #, c-format
@@ -91,7 +91,7 @@ msgstr "无法载入邮件箱 %s"
 #: libbalsa/mailbox.c:309
 #, c-format
 msgid "No such mailbox type: %s"
-msgstr "没有这种邮件箱类型: %s"
+msgstr "没有这种邮件箱类型：%s"
 
 # src/mailbox-conf.c:488
 #: libbalsa/mailbox.c:326
@@ -103,62 +103,81 @@ msgstr "无法创建类型为 %s 的邮件箱"
 #: libbalsa/mailbox_imap.c:290
 #, c-format
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxImap: 打开 %s 的引用计数: %d\n"
+msgstr "LibBalsaMailboxImap：打开 %s 的引用计数：%d\n"
 
 # libbalsa/mailbox.c:476
-#: libbalsa/mailbox_local.c:289
+#: libbalsa/mailbox_local.c:290
 #, c-format
 msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxLocal: 打开 %s 的引用计数: %d\n"
+msgstr "LibBalsaMailboxLocal：打开 %s 的引用计数：%d\n"
 
-#: libbalsa/mailbox_maildir.c:113
+#: libbalsa/mailbox_maildir.c:114
 #, c-format
 msgid "Mailbox %s does not appear to be a Maildir mailbox."
 msgstr "邮件箱“%s”不是有效的 Maildir 邮箱。"
 
-#: libbalsa/mailbox_maildir.c:120
-msgid "Sorry. Balsa doesn't (yet) know how to create a maildir mailbox"
-msgstr ""
+# src/mailbox-conf.c:488
+#: libbalsa/mailbox_maildir.c:123
+#, fuzzy, c-format
+msgid "Could not create a MailDir directory at %s (%s)"
+msgstr "无法创建类型为 %s 的邮件箱"
 
-#: libbalsa/mailbox_maildir.c:172 libbalsa/mailbox_mh.c:171
+# src/mailbox-conf.c:488
+#: libbalsa/mailbox_maildir.c:130 libbalsa/mailbox_maildir.c:138
+#: libbalsa/mailbox_maildir.c:148
+#, c-format
+msgid "Could not create a MailDir at %s (%s)"
+msgstr "无法在 %s 创建 MailDir (%s)
+
+#: libbalsa/mailbox_maildir.c:207 libbalsa/mailbox_mh.c:184
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
-msgstr ""
+msgstr "打开 %s 失败。Errno = %d，"
 
-#: libbalsa/mailbox_maildir.c:190 libbalsa/mailbox_mh.c:188
-#, fuzzy, c-format
+#: libbalsa/mailbox_maildir.c:225 libbalsa/mailbox_mh.c:201
+#, c-format
 msgid ""
 "Could not remove contents of %s:\n"
 "%s"
-msgstr "无法打开文件 %s.\n"
+msgstr ""
+"无法删除 %s 的内容：\n"
+"%s"
 
-#: libbalsa/mailbox_maildir.c:196 libbalsa/mailbox_mbox.c:180
-#: libbalsa/mailbox_mh.c:194
-#, fuzzy, c-format
+#: libbalsa/mailbox_maildir.c:231 libbalsa/mailbox_mbox.c:180
+#: libbalsa/mailbox_mh.c:207
+#, c-format
 msgid ""
 "Could not remove %s:\n"
 "%s"
-msgstr " 无法保存 %s:%s "
+msgstr ""
+"无法删除 %s：\n"
+"%s"
 
 #: libbalsa/mailbox_mbox.c:113
-#, fuzzy, c-format
+#, c-format
 msgid "Mailbox %s does not appear to be an Mbox mailbox."
-msgstr "邮件箱 \"%s\" 无效."
+msgstr "邮件箱 %s 不是一个 Mbox 邮箱。"
 
 #: libbalsa/mailbox_mh.c:112
-#, fuzzy, c-format
+#, c-format
 msgid "Mailbox %s does not appear to be a Mh mailbox."
-msgstr "邮件箱 \"%s\" 无效."
+msgstr "邮件箱 %s 不是一个 Mh 邮箱。"
 
-#: libbalsa/mailbox_mh.c:119
-msgid "Sorry. Balsa doesn't (yet) know how to create a mh mailbox"
-msgstr ""
+#: libbalsa/mailbox_mh.c:122
+#, c-format
+msgid "Could not create MH directory at %s (%s)"
+msgstr "无法在 %s 创建 MH 目录 (%s)"
+
+#: libbalsa/mailbox_mh.c:129
+#, c-format
+msgid "Could not create MH structure at %s (%s)"
+msgstr "无法在 %s 创建 MH 结构 (%s)"
 
 # libbalsa/mailbox.c:476
 #: libbalsa/mailbox_pop3.c:200
 #, c-format
 msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxPop3: 打开 %s 的引用计数: %d\n"
+msgstr "LibBalsaMailboxPop3：打开 %s 的引用计数：%d\n"
 
 #: libbalsa/mailbox_pop3.c:250
 #, c-format
@@ -166,7 +185,7 @@ msgid ""
 "POP3 mailbox %s accessing error:\n"
 "%s"
 msgstr ""
-"POP3 邮件箱 %s 存取错误:\n"
+"POP3 邮件箱 %s 存取错误：\n"
 "%s"
 
 #: libbalsa/pop3.c:48
@@ -212,7 +231,7 @@ msgstr "身份验证失败"
 #: libbalsa/pop3.c:323
 #, c-format
 msgid "Retrieving Message %d of %d"
-msgstr "正在下载邮件: 第 %d 封共 %d"
+msgstr "正在下载邮件：第 %d 封共 %d"
 
 #: libbalsa/pop3.c:336
 #, c-format
@@ -222,38 +241,36 @@ msgstr "已接收 %d 字节共 %d"
 # src/sendmsg-window.c:71
 #. We create here the progress bar
 #: libbalsa/send.c:273 libbalsa/send.c:276
-#, fuzzy
 msgid "Sending Mail..."
-msgstr "发送邮件"
+msgstr "正在发送邮件..."
 
 # src/filter-edit-dialog.c:267
 #: libbalsa/send.c:273
-#, fuzzy
 msgid "Hide"
-msgstr "信头"
+msgstr "隐藏"
 
 #: libbalsa/send.c:416
 msgid ""
 "SMTP protocol error. Cannot relay.\n"
 "Your message is left in Outbox."
 msgstr ""
-"SMTP 协议错误. 不能转发.\n"
-"您的邮件在发件箱中."
+"SMTP 协议错误。不能转发。\n"
+"您的邮件在发件箱中。"
 
-#: libbalsa/send.c:818
+#: libbalsa/send.c:834
 #, c-format
 msgid "Error: Could not find address for host %s."
-msgstr "错误: 无法找到主机 %s 的地址."
+msgstr "错误：无法找到主机 %s 的地址。"
 
-#: libbalsa/send.c:828
+#: libbalsa/send.c:844
 #, c-format
 msgid "Connecting to %s"
 msgstr "正在连接到 %s"
 
-#: libbalsa/send.c:834
+#: libbalsa/send.c:850
 #, c-format
 msgid "Error connecting to %s."
-msgstr "连接到 %s 时发生错误."
+msgstr "连接到 %s 时发生错误。"
 
 # src/balsa-init.c:590
 #.
@@ -571,10 +588,15 @@ msgstr "邮件箱名"
 #. something is wrong because the server reported fewer messages
 #. * than we previously saw
 #.
-#: libmutt/imap/command.c:306
+#: libmutt/imap/command.c:305
 #, fuzzy
 msgid "Fatal error.  Message count is out of sync!"
 msgstr "错误消息"
+
+#: libmutt/imap/command.c:346
+#, c-format
+msgid "One of IMAP connections has been closed: %s"
+msgstr ""
 
 #: libmutt/imap/imap.c:89
 #, fuzzy, c-format
@@ -728,36 +750,36 @@ msgstr "无法重新打开邮件箱!"
 msgid "Reopening mailbox..."
 msgstr "正在重新打开邮件箱..."
 
-#: libmutt/mutt_socket.c:204
+#: libmutt/mutt_socket.c:203
 msgid "SSL is unavailable."
 msgstr ""
 
-#: libmutt/mutt_socket.c:240
+#: libmutt/mutt_socket.c:239
 #, fuzzy
 msgid "Preconnect command failed."
 msgstr "POP 命令执行失败"
 
-#: libmutt/mutt_socket.c:329 libmutt/mutt_socket.c:369
+#: libmutt/mutt_socket.c:328 libmutt/mutt_socket.c:368
 #, fuzzy, c-format
 msgid "Looking up %s..."
 msgstr "正在读 %s..."
 
-#: libmutt/mutt_socket.c:334 libmutt/mutt_socket.c:373
+#: libmutt/mutt_socket.c:333 libmutt/mutt_socket.c:372
 #, fuzzy, c-format
 msgid "Could not find the host \"%s\""
 msgstr "错误: 无法找到主机 %s 的地址."
 
-#: libmutt/mutt_socket.c:338 libmutt/mutt_socket.c:378
+#: libmutt/mutt_socket.c:337 libmutt/mutt_socket.c:377
 #, fuzzy, c-format
 msgid "Connecting to %s..."
 msgstr "正在连接到 %s"
 
-#: libmutt/mutt_socket.c:401
+#: libmutt/mutt_socket.c:400
 #, fuzzy, c-format
 msgid "Could not connect to %s (%s)."
 msgstr "无法打开文件 %s.\n"
 
-#: libmutt/mutt_socket.c:402
+#: libmutt/mutt_socket.c:401
 #, fuzzy
 msgid "unknown error"
 msgstr "连接错误"
@@ -992,7 +1014,7 @@ msgid "Address Book Configuration"
 msgstr "地址簿"
 
 # src/mailbox-conf.c:290 src/mailbox-conf.c:898
-#: src/address-book-config.c:135 src/folder-conf.c:64 src/mailbox-conf.c:302
+#: src/address-book-config.c:135 src/folder-conf.c:64 src/mailbox-conf.c:298
 msgid "Update"
 msgstr "更新"
 
@@ -1038,7 +1060,7 @@ msgstr "基域名"
 # src/filter-edit-dialog.c:380 src/mailbox-conf.c:281 src/mailbox-conf.c:904
 # src/pref-manager.c:461
 #: src/address-book-config.c:460 src/filter-edit-dialog.c:379
-#: src/mailbox-conf.c:291 src/pref-manager.c:1233 src/pref-manager.c:2021
+#: src/mailbox-conf.c:287 src/pref-manager.c:1228 src/pref-manager.c:1970
 msgid "Add"
 msgstr "添加"
 
@@ -1097,7 +1119,7 @@ msgstr "同一个人的其它地址"
 msgid "a distribution list"
 msgstr "分发列表"
 
-#: src/balsa-app.c:73
+#: src/balsa-app.c:67
 #, c-format
 msgid ""
 "Opening remote mailbox %s.\n"
@@ -1107,7 +1129,7 @@ msgstr ""
 "%s@%s 的口令是:"
 
 # src/index-child.c:143
-#: src/balsa-app.c:77
+#: src/balsa-app.c:71
 #, c-format
 msgid "Mailbox password for %s@%s:"
 msgstr "%s@%s 的邮件箱口令是:"
@@ -1140,74 +1162,74 @@ msgid "To"
 msgstr "收件人"
 
 # src/main-window.c:139
-#: src/balsa-index.c:1771
+#: src/balsa-index.c:1748
 #, fuzzy
 msgid "Cannot access the message's body\n"
 msgstr "无法写邮件"
 
 # src/main-window.c:214
-#: src/balsa-index.c:1808
+#: src/balsa-index.c:1785
 msgid "Reply..."
 msgstr "回复..."
 
 # src/main-window.c:215
-#: src/balsa-index.c:1812
+#: src/balsa-index.c:1789
 msgid "Reply To All..."
 msgstr "全部回复..."
 
 # src/main-window.c:215
-#: src/balsa-index.c:1816
+#: src/balsa-index.c:1793
 #, fuzzy
 msgid "Reply To Group..."
 msgstr "全部回复..."
 
 # src/main-window.c:216
-#: src/balsa-index.c:1820
+#: src/balsa-index.c:1797
 msgid "Forward..."
 msgstr "转发..."
 
 # src/index-child.c:457
-#: src/balsa-index.c:1825
+#: src/balsa-index.c:1802
 msgid "Undelete"
 msgstr "取消删除"
 
 # src/filter-edit-dialog.c:194 src/index-child.c:449 src/main-window.c:211
 # src/pref-manager.c:471
-#: src/balsa-index.c:1828 src/filter-edit-dialog.c:224 src/mailbox-node.c:550
-#: src/main-window.c:551 src/pref-manager.c:1235 src/pref-manager.c:2023
+#: src/balsa-index.c:1805 src/filter-edit-dialog.c:224 src/mailbox-node.c:560
+#: src/main-window.c:550 src/pref-manager.c:1230 src/pref-manager.c:1972
 msgid "Delete"
 msgstr "删除"
 
-#: src/balsa-index.c:1832
+#: src/balsa-index.c:1809
 msgid "Move To Trash"
 msgstr "移到废纸篓"
 
-#: src/balsa-index.c:1837
+#: src/balsa-index.c:1814
 msgid "Store Address..."
 msgstr "保存地址..."
 
-#: src/balsa-index.c:1840
+#: src/balsa-index.c:1817
 #, fuzzy
 msgid "Toggle"
 msgstr "反转标志"
 
-#: src/balsa-index.c:1843 src/main-window.c:372
+#: src/balsa-index.c:1820 src/main-window.c:371
 #, fuzzy
 msgid "Flagged"
 msgstr "反转标志"
 
 # src/index-child.c:422
-#: src/balsa-index.c:1846 src/balsa-mblist.c:483
+#: src/balsa-index.c:1823 src/balsa-mblist.c:483
 msgid "Unread"
 msgstr "未读"
 
 # src/index-child.c:399
-#: src/balsa-index.c:1857
+#: src/balsa-index.c:1834
 msgid "Transfer"
 msgstr "传送"
 
 # src/mailbox-conf.c:939
-#: src/balsa-mblist.c:483 src/mailbox-conf.c:836
+#: src/balsa-mblist.c:483 src/mailbox-conf.c:850
 msgid "Mailbox"
 msgstr "邮件箱"
 
@@ -1221,50 +1243,50 @@ msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr "显示的邮件箱: %s 个有 %ld 个邮件, %ld 个新邮件"
 
 # src/balsa-message.c:159 src/balsa-message.c:162
-#: src/balsa-message.c:290 src/balsa-message.c:293
+#: src/balsa-message.c:303 src/balsa-message.c:306
 msgid "Save MIME Part"
 msgstr "保存 MIME 部分"
 
 # src/balsa-message.c:160
-#: src/balsa-message.c:291
+#: src/balsa-message.c:304
 msgid "Save"
 msgstr "保存"
 
 # src/balsa-message.c:160 src/mailbox-conf.c:489 src/sendmsg-window.c:81
 # src/sendmsg-window.c:192
-#: src/balsa-message.c:291 src/folder-conf.c:191 src/mailbox-conf.c:169
-#: src/mailbox-conf.c:179 src/sendmsg-window.c:160 src/sendmsg-window.c:630
+#: src/balsa-message.c:304 src/folder-conf.c:191 src/mailbox-conf.c:165
+#: src/mailbox-conf.c:175 src/sendmsg-window.c:160 src/sendmsg-window.c:630
 msgid "Cancel"
 msgstr "取消"
 
-#: src/balsa-message.c:303
+#: src/balsa-message.c:316
 msgid "Please choose a filename to save this part of the message as:"
 msgstr "请选择这部分邮件要保存的文件名:"
 
-#: src/balsa-message.c:333
+#: src/balsa-message.c:346
 msgid "File already exists. Overwrite?"
 msgstr ""
 
-#: src/balsa-message.c:350
+#: src/balsa-message.c:362
 #, c-format
 msgid " Could not save %s:%s "
 msgstr " 无法保存 %s:%s "
 
 # src/balsa-message.c:558 src/sendmsg-window.c:358
 #. Subject:
-#: src/balsa-message.c:651 src/print.c:159 src/sendmsg-window.c:960
+#: src/balsa-message.c:672 src/print.c:159 src/sendmsg-window.c:960
 msgid "Subject:"
 msgstr "标题:"
 
 # src/balsa-message.c:519
-#: src/balsa-message.c:654 src/print.c:162
+#: src/balsa-message.c:675 src/print.c:162
 msgid "Date:"
 msgstr "时间:"
 
 # src/balsa-message.c:544 src/filter-edit-dialog.c:303
 # src/sendmsg-window.c:338
 #. From:
-#: src/balsa-message.c:659 src/filter-edit-dialog.c:316 src/print.c:149
+#: src/balsa-message.c:680 src/filter-edit-dialog.c:316 src/print.c:149
 #: src/sendmsg-window.c:951
 msgid "From:"
 msgstr "发件人:"
@@ -1272,76 +1294,107 @@ msgstr "发件人:"
 # src/balsa-message.c:526 src/filter-edit-dialog.c:291
 # src/sendmsg-window.c:315
 #. To:
-#: src/balsa-message.c:663 src/filter-edit-dialog.c:306 src/print.c:154
+#: src/balsa-message.c:684 src/filter-edit-dialog.c:306 src/print.c:154
 #: src/sendmsg-window.c:954
 msgid "To:"
 msgstr "收件人:"
 
 # src/balsa-message.c:534
 #. cc:
-#: src/balsa-message.c:664 src/sendmsg-window.c:962
+#: src/balsa-message.c:685 src/sendmsg-window.c:962
 msgid "Cc:"
 msgstr "抄送:"
 
 # src/sendmsg-window.c:368
 #. bcc:
-#: src/balsa-message.c:665 src/sendmsg-window.c:966
+#: src/balsa-message.c:686 src/sendmsg-window.c:966
 msgid "Bcc:"
 msgstr "暗送:"
 
 # src/sendmsg-window.c:368
 #. fcc:
-#: src/balsa-message.c:668 src/sendmsg-window.c:970
+#: src/balsa-message.c:689 src/sendmsg-window.c:970
 msgid "Fcc:"
 msgstr "文件抄送:"
 
-#: src/balsa-message.c:734
+#: src/balsa-message.c:694
+#, fuzzy
+msgid "Disposition-Notification-To:"
+msgstr "要求发送阅读通告(_R)"
+
+#: src/balsa-message.c:762
 msgid "Could not load image. It is most likely corrupted."
 msgstr "无法载入图像. 可能已经损坏."
 
-#: src/balsa-message.c:739
+#: src/balsa-message.c:767
 msgid "Couldn't render image\n"
 msgstr "无法绘制图像\n"
 
-#: src/balsa-message.c:750
+#: src/balsa-message.c:778
 #, fuzzy
 msgid "balsa/pixbuf: Could not load image. It is likely corrupted."
 msgstr "无法载入图像. 可能已经损坏."
 
-#: src/balsa-message.c:799
+#: src/balsa-message.c:827
 msgid "No open or view action defined in GNOME MIME for this content type"
 msgstr "在 GNOME MIME 中没有定义这种内容类型的打开或查看动作"
 
-#: src/balsa-message.c:803
+#: src/balsa-message.c:831
 #, c-format
 msgid "Content Type: %s"
 msgstr "内容类型: %s"
 
 # src/filter-edit-dialog.c:456
-#: src/balsa-message.c:808
+#: src/balsa-message.c:836
 #, c-format
 msgid "Filename: %s"
 msgstr "文件名: %s"
 
 # src/balsa-message.c:159 src/balsa-message.c:162
-#: src/balsa-message.c:816
+#: src/balsa-message.c:844
 msgid "Save part"
 msgstr "保存部分"
 
-#: src/balsa-message.c:840
+#: src/balsa-message.c:868
 #, c-format
 msgid "View part with %s"
 msgstr "用 %s 查看部分"
 
+#: src/balsa-message.c:1146
+#, c-format
+msgid ""
+"Error writing to temporary file %s.\n"
+"Check the directory permissions."
+msgstr ""
+
+#: src/balsa-message.c:1154
+#, fuzzy, c-format
+msgid "Cannot open temporary file %s."
+msgstr "无法创建临时文件!"
+
 # src/balsa-message.c:160
-#: src/balsa-message.c:1438
+#: src/balsa-message.c:1471
 msgid "Save..."
 msgstr "保存..."
 
-#: src/balsa-message.c:1495
+#: src/balsa-message.c:1528
 #, c-format
 msgid "could not create temporary file %s"
 msgstr "无法创建临时文件 %s"
+
+# src/sendmsg-window.c:513
+#: src/balsa-message.c:2031
+#, fuzzy
+msgid "reply to MDN?"
+msgstr "回复到"
+
+#: src/balsa-message.c:2043
+#, c-format
+msgid ""
+"The sender of this mail, %s, requested \n"
+"a Message Disposition Notification (MDN) to be returned to `%s'.\n"
+"Do you want to send this notification?"
+msgstr ""
 
 # src/balsa-init.c:590
 #: src/filter-edit-dialog.c:31
@@ -1371,7 +1424,7 @@ msgstr "匹配"
 msgid "Doesn't Match"
 msgstr "不匹配"
 
-#: src/filter-edit-dialog.c:40
+#: src/filter-edit-dialog.c:40 src/pref-manager.c:2222
 msgid "Always"
 msgstr "总是"
 
@@ -1424,7 +1477,7 @@ msgid "Down"
 msgstr "向下"
 
 # src/filter-edit-dialog.c:188
-#: src/filter-edit-dialog.c:218 src/mailbox-node.c:531 src/main-window.c:379
+#: src/filter-edit-dialog.c:218 src/mailbox-node.c:541 src/main-window.c:378
 msgid "New"
 msgstr "新建"
 
@@ -1579,14 +1632,14 @@ msgstr ""
 
 # src/mailbox-conf.c:723 src/mailbox-conf.c:804
 #. pop server
-#: src/folder-conf.c:85 src/mailbox-conf.c:713 src/mailbox-conf.c:774
+#: src/folder-conf.c:85 src/mailbox-conf.c:727 src/mailbox-conf.c:788
 #, fuzzy
 msgid "_Server:"
 msgstr "服务器:"
 
 # src/mailbox-conf.c:818
 #. pop port
-#: src/folder-conf.c:90 src/mailbox-conf.c:719 src/mailbox-conf.c:781
+#: src/folder-conf.c:90 src/mailbox-conf.c:733 src/mailbox-conf.c:795
 #, fuzzy
 msgid "_Port:"
 msgstr "端口:"
@@ -1629,7 +1682,7 @@ msgstr ""
 "您以后可以用 \"添加\" 来再次存取这个邮件箱.\n"
 "您确认您要删除这个邮件箱吗?"
 
-#: src/folder-conf.c:190 src/mailbox-conf.c:167 src/mailbox-conf.c:178
+#: src/folder-conf.c:190 src/mailbox-conf.c:163 src/mailbox-conf.c:174
 msgid "Remove from list"
 msgstr ""
 
@@ -1650,12 +1703,12 @@ msgid "FATAL: "
 msgstr ""
 
 # src/mailbox-conf.c:634
-#: src/mailbox-conf.c:135
+#: src/mailbox-conf.c:131
 msgid "No mailbox selected."
 msgstr "没有选择邮件箱."
 
 # src/mailbox-conf.c:166
-#: src/mailbox-conf.c:161
+#: src/mailbox-conf.c:157
 #, fuzzy, c-format
 msgid ""
 "This will remove the mailbox %s from the list of mailboxes.\n"
@@ -1668,12 +1721,12 @@ msgstr ""
 "您以后可以用 \"添加\" 来再次存取这个邮件箱.\n"
 "您确认您要删除这个邮件箱吗?"
 
-#: src/mailbox-conf.c:168
+#: src/mailbox-conf.c:164
 msgid "Remove from list and disk"
 msgstr "从列表和磁盘中删除"
 
 # src/mailbox-conf.c:166
-#: src/mailbox-conf.c:173
+#: src/mailbox-conf.c:169
 #, c-format
 msgid ""
 "This will remove the mailbox %s from the list of mailboxes\n"
@@ -1685,23 +1738,23 @@ msgstr ""
 "您确认要删除这个邮件箱吗？"
 
 # src/mailbox-conf.c:194
-#: src/mailbox-conf.c:215
+#: src/mailbox-conf.c:211
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr "不好！没有在 balsa_app.mailbox 里发现邮件箱？\n"
 
 # src/mailbox-conf.c:238
-#: src/mailbox-conf.c:244
+#: src/mailbox-conf.c:240
 msgid "Mailbox Configurator"
 msgstr "邮件箱配置工具"
 
 # src/mailbox-conf.c:531
-#: src/mailbox-conf.c:446
+#: src/mailbox-conf.c:442
 #, c-format
 msgid "%s on %s"
 msgstr "%s 在 %s"
 
 # src/balsa-message.c:231 src/balsa-message.c:246
-#: src/mailbox-conf.c:550
+#: src/mailbox-conf.c:546
 #, c-format
 msgid ""
 "Rename of %s to %s failed:\n"
@@ -1710,7 +1763,7 @@ msgstr ""
 "重命名 %s 到 %s 失败：\n"
 "%s"
 
-#: src/mailbox-conf.c:568
+#: src/mailbox-conf.c:564
 msgid ""
 "This is a mailbox in your local directory.\n"
 "Change the path instead.\n"
@@ -1722,509 +1775,509 @@ msgstr ""
 
 # src/mailbox-conf.c:671 src/mailbox-conf.c:706
 #. mailbox name
-#: src/mailbox-conf.c:669 src/mailbox-conf.c:707 src/mailbox-conf.c:768
+#: src/mailbox-conf.c:683 src/mailbox-conf.c:721 src/mailbox-conf.c:782
 msgid "Mailbox _Name:"
 msgstr "邮件箱名(_N)："
 
 # src/mailbox-conf.c:681
 #. path to file
-#: src/mailbox-conf.c:675
+#: src/mailbox-conf.c:689
 msgid "Mailbox _Path:"
 msgstr "邮件箱路径(_P)："
 
 # src/mailbox-conf.c:742 src/mailbox-conf.c:833
 #. username
-#: src/mailbox-conf.c:724 src/mailbox-conf.c:786
+#: src/mailbox-conf.c:738 src/mailbox-conf.c:800
 msgid "_Username:"
 msgstr "用户名(_U)："
 
 # src/index-child.c:149 src/mailbox-conf.c:759 src/mailbox-conf.c:848
 #. password field
-#: src/mailbox-conf.c:730 src/mailbox-conf.c:793
+#: src/mailbox-conf.c:744 src/mailbox-conf.c:807
 msgid "Pass_word:"
 msgstr "口令(_W)："
 
 #. toggle for apop
-#: src/mailbox-conf.c:736
+#: src/mailbox-conf.c:750
 msgid "Use _APOP Authentication"
 msgstr "使用 _APOP 身份验证"
 
 # src/main-window.c:168
-#: src/mailbox-conf.c:741
+#: src/mailbox-conf.c:755
 msgid "_Delete messages from server after download"
 msgstr "在下载后从服务器删除邮件(_D)"
 
-#: src/mailbox-conf.c:746
+#: src/mailbox-conf.c:760
 msgid "_Filter messages through procmail"
 msgstr "用 procmail 过滤(_F)"
 
-#: src/mailbox-conf.c:751
+#: src/mailbox-conf.c:765
 msgid "_Check this mailbox for new mail"
 msgstr "检查新邮件(_C)"
 
 # src/mailbox-conf.c:861
-#: src/mailbox-conf.c:798
+#: src/mailbox-conf.c:812
 msgid "F_older Path:"
 msgstr "文件夹路径(_O)："
 
-#: src/mailbox-node.c:201
+#: src/mailbox-node.c:204
 msgid "The folder edition to be written."
 msgstr ""
 
 # src/mailbox-conf.c:640
-#: src/mailbox-node.c:518 src/main-window.c:231
+#: src/mailbox-node.c:528 src/main-window.c:230
 msgid "Local mbox mailbox..."
 msgstr "本地 mbox 邮件箱..."
 
 # src/mailbox-conf.c:640
-#: src/mailbox-node.c:520 src/main-window.c:236
+#: src/mailbox-node.c:530 src/main-window.c:235
 msgid "Local Maildir mailbox..."
 msgstr "本地 Maildir 邮件箱..."
 
 # src/mailbox-conf.c:640
-#: src/mailbox-node.c:522 src/main-window.c:241
+#: src/mailbox-node.c:532 src/main-window.c:240
 msgid "Local MH mailbox..."
 msgstr "本地 MH 邮件箱..."
 
-#: src/mailbox-node.c:524 src/main-window.c:246
+#: src/mailbox-node.c:534 src/main-window.c:245
 msgid "Remote IMAP mailbox..."
 msgstr "远程 IMAP 邮件箱..."
 
-#: src/mailbox-node.c:527 src/main-window.c:252
+#: src/mailbox-node.c:537 src/main-window.c:251
 msgid "Remote IMAP folder..."
 msgstr "远程 IMAP 文件夹..."
 
 # src/main-window.c:159
-#: src/mailbox-node.c:545
+#: src/mailbox-node.c:555
 msgid "Open"
 msgstr "打开"
 
 # src/main-window.c:161
-#: src/mailbox-node.c:547
+#: src/mailbox-node.c:557
 msgid "Close"
 msgstr "关闭"
 
-#: src/mailbox-node.c:549
+#: src/mailbox-node.c:559
 msgid "Properties..."
 msgstr "属性..."
 
-#: src/mailbox-node.c:556
+#: src/mailbox-node.c:566
 msgid "Subscribe"
 msgstr "订阅"
 
-#: src/mailbox-node.c:557
+#: src/mailbox-node.c:567
 msgid "Unsubscribe"
 msgstr "退订"
 
-#: src/mailbox-node.c:562
+#: src/mailbox-node.c:572
 msgid "Mark as Inbox"
 msgstr "标记为收件箱"
 
-#: src/mailbox-node.c:564
+#: src/mailbox-node.c:574
 msgid "Mark as Sentbox"
 msgstr "标记为已发邮件箱"
 
-#: src/mailbox-node.c:566
+#: src/mailbox-node.c:576
 msgid "Mark as Trash"
 msgstr "标记为废纸篓"
 
-#: src/mailbox-node.c:568
+#: src/mailbox-node.c:578
 msgid "Mark as Draftbox"
 msgstr "标记为稿件箱"
 
-#: src/mailbox-node.c:570
+#: src/mailbox-node.c:580
 msgid "Rescan"
 msgstr "重新扫描"
 
 # src/local-mailbox.c:151
-#: src/mailbox-node.c:676
+#: src/mailbox-node.c:686
 #, c-format
 msgid "Local mailbox loaded as: %s\n"
 msgstr "本地邮件箱载入为：%s\n"
 
 # src/main-window.c:200
-#: src/main-window.c:225
+#: src/main-window.c:224
 msgid "_Message..."
 msgstr "邮件(_M)..."
 
 # src/main-window.c:107
-#: src/main-window.c:225
+#: src/main-window.c:224
 msgid "Compose a new message"
 msgstr "编写新邮件"
 
 # src/main-window.c:164
-#: src/main-window.c:232
+#: src/main-window.c:231
 msgid "Add a new mbox style mailbox"
 msgstr "添加新的 mbox 类型邮件箱"
 
 # src/main-window.c:164
-#: src/main-window.c:237
+#: src/main-window.c:236
 msgid "Add a new Maildir style mailbox"
 msgstr "添加新的 Maildir 类型邮件箱"
 
 # src/main-window.c:164
-#: src/main-window.c:242
+#: src/main-window.c:241
 msgid "Add a new MH style mailbox"
 msgstr "添加新的 MH 类型邮件箱"
 
 # src/main-window.c:164
-#: src/main-window.c:247
+#: src/main-window.c:246
 msgid "Add a new IMAP mailbox"
 msgstr "添加新的 IMAP 邮件箱"
 
 # src/main-window.c:164
-#: src/main-window.c:253
+#: src/main-window.c:252
 msgid "Add a new IMAP folder"
 msgstr "添加新的 IMAP 文件夹"
 
 # src/main-window.c:107
-#: src/main-window.c:261
+#: src/main-window.c:260
 msgid "_New"
 msgstr "新建(_N)"
 
-#: src/main-window.c:265
+#: src/main-window.c:264
 msgid "_Continue"
 msgstr "继续(_C)"
 
 # src/main-window.c:222
-#: src/main-window.c:266
+#: src/main-window.c:265
 msgid "Continue editing current message"
 msgstr "继续编辑邮件"
 
 # src/main-window.c:90
-#: src/main-window.c:273
+#: src/main-window.c:272
 msgid "_Get New Mail"
 msgstr "取新邮件(_G)"
 
 # src/main-window.c:90
-#: src/main-window.c:273
+#: src/main-window.c:272
 msgid "Fetch new incoming mail"
 msgstr "取新来的邮件"
 
 # src/sendmsg-window.c:71
-#: src/main-window.c:279
+#: src/main-window.c:278
 msgid "_Send Queued Mail"
 msgstr "发送队列中的邮件(_S)"
 
-#: src/main-window.c:280
+#: src/main-window.c:279
 msgid "Send mail from the outbox"
 msgstr "从发件箱中发送邮件"
 
-#: src/main-window.c:288
+#: src/main-window.c:287
 msgid "_Address Book..."
 msgstr "地址簿(_A)..."
 
-#: src/main-window.c:289
+#: src/main-window.c:288
 msgid "Open the address book"
 msgstr "打开地址簿"
 
 # src/main-window.c:182
-#: src/main-window.c:316
+#: src/main-window.c:315
 msgid "_Filters..."
 msgstr "过滤器(_F)..."
 
 # src/main-window.c:182
-#: src/main-window.c:316
+#: src/main-window.c:315
 msgid "Manage filters"
 msgstr "管理过滤器"
 
 # src/filter-edit-dialog.c:267
-#: src/main-window.c:323 src/message-window.c:61
+#: src/main-window.c:322 src/message-window.c:61
 msgid "N_o Headers"
 msgstr "没有信头(_O)"
 
-#: src/main-window.c:323
+#: src/main-window.c:322
 msgid "Display no headers"
 msgstr "不显示信头"
 
-#: src/main-window.c:325
+#: src/main-window.c:324
 msgid "S_elected Headers"
 msgstr "选择信头(_E)"
 
-#: src/main-window.c:326
+#: src/main-window.c:325
 msgid "Display selected headers"
 msgstr "显示选定的信头"
 
 # src/filter-edit-dialog.c:267
-#: src/main-window.c:328 src/message-window.c:65
+#: src/main-window.c:327 src/message-window.c:65
 msgid "All _Headers"
 msgstr "全部信头(_H)"
 
-#: src/main-window.c:328
+#: src/main-window.c:327
 msgid "Display all headers"
 msgstr "显示所有信头"
 
-#: src/main-window.c:335
+#: src/main-window.c:334
 msgid "_Flat index"
 msgstr "平面索引(_F)"
 
-#: src/main-window.c:335
+#: src/main-window.c:334
 msgid "No threading at all"
 msgstr "无线索"
 
-#: src/main-window.c:338
+#: src/main-window.c:337
 msgid "S_imple threading"
 msgstr "简单线索(_I)"
 
-#: src/main-window.c:339
+#: src/main-window.c:338
 msgid "Simple threading algorithm"
 msgstr "简单的线索算法"
 
-#: src/main-window.c:342
+#: src/main-window.c:341
 msgid "_JWZ threading"
 msgstr "_JWZ 线索"
 
-#: src/main-window.c:343
+#: src/main-window.c:342
 msgid "Elaborate JWZ threading"
 msgstr "详细的 JWZ 线索"
 
 # src/mailbox-conf.c:634
-#: src/main-window.c:350
+#: src/main-window.c:349
 msgid "_Show Mailbox Tree"
 msgstr "显示邮件箱树(_S)"
 
-#: src/main-window.c:351
+#: src/main-window.c:350
 msgid "Toggle display of mailbox and folder tree"
 msgstr "反转邮件箱和文件夹树的显示"
 
 # src/mailbox-conf.c:634
-#: src/main-window.c:354
+#: src/main-window.c:353
 msgid "Show Mailbox _Tabs"
 msgstr "显示邮件箱表(_T)"
 
-#: src/main-window.c:355
+#: src/main-window.c:354
 msgid "Toggle display of mailbox notebook tabs"
 msgstr "反转邮件箱的显示"
 
-#: src/main-window.c:359 src/message-window.c:94
+#: src/main-window.c:358 src/message-window.c:94
 msgid "_Wrap"
 msgstr "换行(_W)"
 
 # src/sendmsg-window.c:518
-#: src/main-window.c:359 src/sendmsg-window.c:213
+#: src/main-window.c:358 src/sendmsg-window.c:213
 msgid "Wrap message lines"
 msgstr "邮件换行"
 
-#: src/main-window.c:372
+#: src/main-window.c:371
 msgid "Toggle flagged"
 msgstr "反转标志"
 
-#: src/main-window.c:379
+#: src/main-window.c:378
 msgid "Toggle New"
 msgstr "反转未读"
 
 # src/main-window.c:113 src/message-window.c:54
-#: src/main-window.c:391 src/message-window.c:103
+#: src/main-window.c:390 src/message-window.c:103
 msgid "_Reply..."
 msgstr "回复(_R)..."
 
 # src/main-window.c:113
-#: src/main-window.c:392
+#: src/main-window.c:391
 msgid "Reply to the current message"
 msgstr "回复当前邮件"
 
 # src/main-window.c:119 src/message-window.c:60
-#: src/main-window.c:399 src/message-window.c:108
+#: src/main-window.c:398 src/message-window.c:108
 msgid "Reply to _All..."
 msgstr "全部回复(_A)..."
 
 # src/main-window.c:120
-#: src/main-window.c:400
+#: src/main-window.c:399
 msgid "Reply to all recipients of the current message"
 msgstr "回复给当前邮件的所有收件人"
 
 # src/main-window.c:119 src/message-window.c:60
-#: src/main-window.c:407
+#: src/main-window.c:406
 msgid "Reply to _Group..."
 msgstr "回复给组(_G)..."
 
 # src/main-window.c:215
-#: src/main-window.c:408
+#: src/main-window.c:407
 msgid "Reply to mailing list"
 msgstr "回复给邮件列表"
 
 # src/main-window.c:126 src/message-window.c:67
-#: src/main-window.c:415 src/message-window.c:114
+#: src/main-window.c:414 src/message-window.c:114
 msgid "_Forward..."
 msgstr "转发(_F)..."
 
 # src/main-window.c:126
-#: src/main-window.c:416
+#: src/main-window.c:415
 msgid "Forward the current message"
 msgstr "转发当前邮件"
 
 # src/main-window.c:219
-#: src/main-window.c:423 src/message-window.c:119
+#: src/main-window.c:422 src/message-window.c:119
 msgid "Next Part"
 msgstr "下一部分"
 
 # src/main-window.c:219
-#: src/main-window.c:423
+#: src/main-window.c:422
 msgid "Next part in message"
 msgstr "邮件的下一部分"
 
 # src/main-window.c:218
-#: src/main-window.c:429 src/message-window.c:123
+#: src/main-window.c:428 src/message-window.c:123
 msgid "Previous Part"
 msgstr "前一部分"
 
 # src/main-window.c:218
-#: src/main-window.c:430
+#: src/main-window.c:429
 msgid "Previous part in message"
 msgstr "邮件的前一部分"
 
-#: src/main-window.c:436 src/message-window.c:128
+#: src/main-window.c:435 src/message-window.c:128
 msgid "Save Current Part..."
 msgstr "保存当前部分..."
 
-#: src/main-window.c:437 src/message-window.c:129
+#: src/main-window.c:436 src/message-window.c:129
 msgid "Save current part in message"
 msgstr "保存邮件当前部分"
 
 # src/main-window.c:133 src/main-window.c:168
-#: src/main-window.c:445
+#: src/main-window.c:444
 msgid "_Delete"
 msgstr "删除(_D)"
 
 # src/main-window.c:133
-#: src/main-window.c:445
+#: src/main-window.c:444
 msgid "Delete the current message"
 msgstr "删除当前邮件"
 
 # src/main-window.c:139
-#: src/main-window.c:452
+#: src/main-window.c:451
 msgid "_Undelete"
 msgstr "取消删除(_U)"
 
 # src/main-window.c:139
-#: src/main-window.c:452
+#: src/main-window.c:451
 msgid "Undelete the message"
 msgstr "取消删除邮件"
 
 #. !
-#: src/main-window.c:459
+#: src/main-window.c:458
 #, fuzzy
 msgid "_Toggle"
 msgstr "反转标志(_T)"
 
-#: src/main-window.c:464
+#: src/main-window.c:463
 msgid "_Store Address..."
 msgstr "保存地址(_S)..."
 
-#: src/main-window.c:465
+#: src/main-window.c:464
 msgid "Store address of sender in addressbook"
 msgstr "在地址簿中保存发件人地址"
 
 # src/main-window.c:219
-#: src/main-window.c:475
+#: src/main-window.c:474
 msgid "Next Message"
 msgstr "下一邮件"
 
 # src/main-window.c:218
-#: src/main-window.c:481
+#: src/main-window.c:480
 msgid "Previous Message"
 msgstr "前一邮件"
 
 # src/main-window.c:211
-#: src/main-window.c:487 src/main-window.c:488
+#: src/main-window.c:486 src/main-window.c:487
 msgid "Next Unread Message"
 msgstr "下一未读邮件"
 
 # src/main-window.c:166
-#: src/main-window.c:494
+#: src/main-window.c:493
 msgid "_Edit..."
 msgstr "编辑(_E)..."
 
 # src/main-window.c:166
-#: src/main-window.c:494
+#: src/main-window.c:493
 msgid "Edit the selected mailbox"
 msgstr "编辑选定的邮件箱"
 
 # src/main-window.c:133 src/main-window.c:168
-#: src/main-window.c:498
+#: src/main-window.c:497
 msgid "_Delete..."
 msgstr "删除(_D)..."
 
 # src/main-window.c:168
-#: src/main-window.c:499
+#: src/main-window.c:498
 msgid "Delete the selected mailbox"
 msgstr "删除选定的邮件箱"
 
 # src/main-window.c:173
-#: src/main-window.c:505
+#: src/main-window.c:504
 msgid "Co_mmit Current"
 msgstr "提交当前(_M)"
 
 # src/main-window.c:173
-#: src/main-window.c:506
+#: src/main-window.c:505
 msgid "Commit the changes in the currently opened mailbox"
 msgstr "提交当前打开的邮件箱的变化"
 
 # src/main-window.c:161
-#: src/main-window.c:510
+#: src/main-window.c:509
 msgid "_Close"
 msgstr "关闭(_C)"
 
 # src/mailbox-conf.c:640
-#: src/main-window.c:510
+#: src/main-window.c:509
 msgid "Close mailbox"
 msgstr "关闭邮件箱"
 
-#: src/main-window.c:514
+#: src/main-window.c:513
 msgid "Empty _Trash"
 msgstr "清空废纸篓(_T)"
 
 # src/main-window.c:168
-#: src/main-window.c:515
+#: src/main-window.c:514
 msgid "Delete messages from the Trash mailbox"
 msgstr "删除废纸篓中的邮件"
 
 # src/main-window.c:200
-#: src/main-window.c:537
+#: src/main-window.c:536
 msgid "_Message"
 msgstr "邮件(_M)"
 
 # src/mailbox-conf.c:939
-#: src/main-window.c:538
+#: src/main-window.c:537
 msgid "Mail_box"
 msgstr "邮件箱(_B)"
 
 # src/mailbox-conf.c:774 src/main-window.c:209
-#: src/main-window.c:546
+#: src/main-window.c:545
 msgid "Check"
 msgstr "检查"
 
 # src/main-window.c:209
-#: src/main-window.c:546
+#: src/main-window.c:545
 msgid "Check Email"
 msgstr "检查邮件"
 
 # src/main-window.c:211
-#: src/main-window.c:551
+#: src/main-window.c:550
 msgid "Delete message"
 msgstr "删除邮件"
 
 # src/main-window.c:213
-#: src/main-window.c:556
+#: src/main-window.c:555
 msgid "Compose"
 msgstr "撰写"
 
 # src/main-window.c:213
-#: src/main-window.c:556
+#: src/main-window.c:555
 msgid "Compose message"
 msgstr "撰写邮件"
 
-#: src/main-window.c:560
+#: src/main-window.c:559
 msgid "Continue"
 msgstr "继续"
 
 # src/main-window.c:214
-#: src/main-window.c:564
+#: src/main-window.c:563
 msgid "Reply"
 msgstr "回复"
 
 # src/main-window.c:215
-#: src/main-window.c:568
+#: src/main-window.c:567
 msgid ""
 "Reply\n"
 "to All"
@@ -2233,37 +2286,37 @@ msgstr ""
 "回复"
 
 # src/main-window.c:215
-#: src/main-window.c:568
+#: src/main-window.c:567
 msgid "Reply to all"
 msgstr "回复给所有人"
 
 # src/main-window.c:216
-#: src/main-window.c:572
+#: src/main-window.c:571
 msgid "Forward"
 msgstr "转发"
 
 # src/main-window.c:218
-#: src/main-window.c:578
+#: src/main-window.c:577
 msgid "Previous"
 msgstr "前一个"
 
 # src/main-window.c:218
-#: src/main-window.c:578
+#: src/main-window.c:577
 msgid "Open previous message"
 msgstr "打开前一邮件"
 
 # src/main-window.c:219
-#: src/main-window.c:583
+#: src/main-window.c:582
 msgid "Next"
 msgstr "下一个"
 
 # src/main-window.c:219
-#: src/main-window.c:583
+#: src/main-window.c:582
 msgid "Open next message"
 msgstr "打开下一邮件"
 
 # src/index-child.c:422
-#: src/main-window.c:587
+#: src/main-window.c:586
 msgid ""
 "Next\n"
 "Unread"
@@ -2272,21 +2325,21 @@ msgstr ""
 "未读"
 
 # src/main-window.c:219
-#: src/main-window.c:587
+#: src/main-window.c:586
 msgid "Open next unread message"
 msgstr "打开下一个未读邮件"
 
 # src/main-window.c:222 src/sendmsg-window.c:78
-#: src/main-window.c:591 src/sendmsg-window.c:157
+#: src/main-window.c:590 src/sendmsg-window.c:157
 msgid "Print"
 msgstr "打印"
 
 # src/main-window.c:222
-#: src/main-window.c:591
+#: src/main-window.c:590
 msgid "Print current message"
 msgstr "打印当前邮件"
 
-#: src/main-window.c:1073
+#: src/main-window.c:1072
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -2295,92 +2348,93 @@ msgstr ""
 "请检查邮件箱设置。"
 
 # src/main-window.c:407
-#: src/main-window.c:1352
+#: src/main-window.c:1349
 msgid "Copyright (C) 1997-2001"
 msgstr "版权所有 (C) 1997-2001"
 
 # src/main-window.c:409
-#: src/main-window.c:1355
+#: src/main-window.c:1352
+#, fuzzy
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://www.balsa.net/\n"
 "\n"
-"If you need to report bugs, please do so at: http://bugs.gnome.org/"
+"If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
 msgstr ""
 "Balsa 邮件客户程序是 GNOME 桌面环境的一部分。关于 Balsa 的信息可以访问 "
 "http://www.balsa.net\n"
 "\n"
 "如果发现软件的缺陷，请报告http://bugs.gnome.org/"
 
-#: src/main-window.c:1727
+#: src/main-window.c:1724
 #, c-format
 msgid "Sending error: %s"
 msgstr "发送错误：%s"
 
-#: src/main-window.c:2149
+#: src/main-window.c:2146
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "改变邮件箱 %s 失败。"
 
-#: src/main-window.c:2364
+#: src/main-window.c:2363
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa：%s (只读)"
 
 # src/filter-edit-dialog.c:749
-#: src/main-window.c:2366
+#: src/main-window.c:2365
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa：%s"
 
 # src/main-window.c:90
-#: src/main.c:109
+#: src/main.c:108
 msgid "Get new mail on startup"
 msgstr "在启动时取新邮件"
 
-#: src/main.c:111
+#: src/main.c:110
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "撰写给 EMAIL@ADDRESS 的新邮件"
 
-#: src/main.c:113
+#: src/main.c:112
 msgid "Opens MAILBOXNAME"
 msgstr "打开 MAILBOXNAME"
 
-#: src/main.c:113
+#: src/main.c:112
 msgid "MAILBOXNAME"
 msgstr "MAILBOXNAME"
 
 # src/main-window.c:159
-#: src/main.c:116
+#: src/main.c:115
 msgid "Opens first unread mailbox"
 msgstr "打开第一个为读的邮件箱"
 
-#: src/main.c:134 src/main.c:139 src/main.c:145 src/main.c:151 src/main.c:157
+#: src/main.c:133 src/main.c:138 src/main.c:144 src/main.c:150 src/main.c:156
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
 msgstr "Balsa 无法打开您的“%s”邮件箱。"
 
 # src/balsa-init.c:590
-#: src/main.c:134
+#: src/main.c:133
 msgid "Inbox"
 msgstr "收件箱"
 
 # src/balsa-init.c:598
-#: src/main.c:140
+#: src/main.c:139
 msgid "Outbox"
 msgstr "发件箱"
 
 # src/balsa-init.c:590
-#: src/main.c:146
+#: src/main.c:145
 msgid "Sentbox"
 msgstr "已发邮件箱"
 
-#: src/main.c:152
+#: src/main.c:151
 msgid "Draftbox"
 msgstr "稿件箱"
 
 # src/balsa-init.c:606
-#: src/main.c:157
+#: src/main.c:156
 msgid "Trash"
 msgstr "废纸篓"
 
@@ -2414,509 +2468,523 @@ msgid "Previous part in Message"
 msgstr "邮件的前一部分"
 
 # src/pref-manager.c:66
-#: src/pref-manager.c:172
+#: src/pref-manager.c:169
 msgid "Text"
 msgstr "文本"
 
 # src/pref-manager.c:67
-#: src/pref-manager.c:173
+#: src/pref-manager.c:170
 msgid "Icons"
 msgstr "图标"
 
 # src/pref-manager.c:68
-#: src/pref-manager.c:174
+#: src/pref-manager.c:171
 msgid "Both"
 msgstr "两者"
 
-#: src/pref-manager.c:184
+#: src/pref-manager.c:181
 msgid "7bits"
 msgstr "7位编码"
 
-#: src/pref-manager.c:185
+#: src/pref-manager.c:182
 msgid "8bits"
 msgstr "8位编码"
 
-#: src/pref-manager.c:186
+#: src/pref-manager.c:183
 msgid "quoted"
 msgstr "引用的"
 
 # src/main-window.c:211
-#: src/pref-manager.c:196
+#: src/pref-manager.c:193
 msgid "While Retrieving Messages"
 msgstr "在下载邮件时"
 
-#: src/pref-manager.c:197
+#: src/pref-manager.c:194
 msgid "Until Closed"
 msgstr "直到关闭时"
 
 # src/filter-edit-dialog.c:721
-#: src/pref-manager.c:198
+#: src/pref-manager.c:195 src/pref-manager.c:2220
 msgid "Never"
 msgstr "从不"
 
-#: src/pref-manager.c:202
+#: src/pref-manager.c:199
 msgid "Fast"
 msgstr "快"
 
-#: src/pref-manager.c:203
+#: src/pref-manager.c:200
 msgid "Normal"
 msgstr "普通"
 
-#: src/pref-manager.c:204
+#: src/pref-manager.c:201
 msgid "Bad Spellers"
 msgstr "仔细检查"
 
 # src/pref-manager.c:117
-#: src/pref-manager.c:228
+#: src/pref-manager.c:225
 msgid "Balsa Preferences"
 msgstr "Balsa 首选项"
 
 # src/pref-manager.c:137
-#: src/pref-manager.c:239 src/pref-manager.c:1123
+#: src/pref-manager.c:236 src/pref-manager.c:1118
 msgid "Identity"
 msgstr "身份"
 
 # src/pref-manager.c:397
-#: src/pref-manager.c:243 src/pref-manager.c:1146
+#: src/pref-manager.c:240 src/pref-manager.c:1141
 msgid "Signature"
 msgstr "签名"
 
 # src/pref-manager.c:144
-#: src/pref-manager.c:247
+#: src/pref-manager.c:244
 msgid "Mail Servers"
 msgstr "邮件服务器"
 
-#: src/pref-manager.c:251 src/pref-manager.c:1988
+#: src/pref-manager.c:248 src/pref-manager.c:1937
 msgid "Address Books"
 msgstr "地址簿"
 
-#: src/pref-manager.c:255
+#: src/pref-manager.c:252
 msgid "Mail Options"
 msgstr "邮件选项"
 
 # src/pref-manager.c:151
-#: src/pref-manager.c:259 src/pref-manager.c:1502
+#: src/pref-manager.c:256 src/pref-manager.c:1558
 msgid "Display"
 msgstr "显示"
 
-# src/main-window.c:222 src/sendmsg-window.c:78
-#: src/pref-manager.c:264 src/pref-manager.c:1760 src/pref-manager.c:1800
-msgid "Printing"
-msgstr "打印"
-
 # src/sendmsg-window.c:76
-#: src/pref-manager.c:268 src/sendmsg-window.c:151
+#: src/pref-manager.c:260 src/sendmsg-window.c:151
 msgid "Spelling"
 msgstr "拼写"
 
 # src/pref-manager.c:158 src/pref-manager.c:587
-#: src/pref-manager.c:272 src/pref-manager.c:1911
+#: src/pref-manager.c:264 src/pref-manager.c:1860
 msgid "Misc"
 msgstr "其它"
 
-#: src/pref-manager.c:276
+#: src/pref-manager.c:268
 msgid "Startup"
 msgstr "启动"
 
-#: src/pref-manager.c:974
+#: src/pref-manager.c:950
 msgid "Yes"
 msgstr "是"
 
 # src/balsa-init.c:247 src/pref-manager.c:367
-#: src/pref-manager.c:1127
+#: src/pref-manager.c:1122
 msgid "Your name:"
 msgstr "您的名字："
 
 # src/balsa-init.c:261 src/pref-manager.c:377
-#: src/pref-manager.c:1128
+#: src/pref-manager.c:1123
 msgid "E-mail address:"
 msgstr "邮件地址："
 
 # src/pref-manager.c:387
-#: src/pref-manager.c:1129
+#: src/pref-manager.c:1124
 msgid "Reply-to address:"
 msgstr "回复地址："
 
-#: src/pref-manager.c:1130
+#: src/pref-manager.c:1125
 msgid "Default domain:"
 msgstr "默认域："
 
-#: src/pref-manager.c:1151
+#: src/pref-manager.c:1146
 msgid "Use signature file when:"
 msgstr "使用签名文件当："
 
 # src/sendmsg-window.c:71
-#: src/pref-manager.c:1155
+#: src/pref-manager.c:1150
 msgid "sending mail"
 msgstr "发送邮件"
 
 # src/main-window.c:215
-#: src/pref-manager.c:1156
+#: src/pref-manager.c:1151
 msgid "replying to mail"
 msgstr "回复邮件"
 
 # src/sendmsg-window.c:518
-#: src/pref-manager.c:1157
+#: src/pref-manager.c:1152
 msgid "forwarding mail"
 msgstr "转发邮件"
 
 # src/pref-manager.c:397
-#: src/pref-manager.c:1159
+#: src/pref-manager.c:1154
 msgid "Signature file:"
 msgstr "签名文件："
 
-#: src/pref-manager.c:1166
+#: src/pref-manager.c:1161
 msgid "Select your signature file"
 msgstr "选择签名文件"
 
 # src/pref-manager.c:601
-#: src/pref-manager.c:1174
+#: src/pref-manager.c:1169
 msgid "Reply prefix:"
 msgstr "回复前缀："
 
-#: src/pref-manager.c:1177
+#: src/pref-manager.c:1172
 msgid "Enable signature separator"
 msgstr "启用签名分隔符"
 
-#: src/pref-manager.c:1178
+#: src/pref-manager.c:1173
 msgid "Insert signature before quoted messages"
 msgstr "在引用文字前插入签名"
 
 # src/pref-manager.c:431
-#: src/pref-manager.c:1203
+#: src/pref-manager.c:1198
 msgid "Remote Mailbox Servers"
 msgstr "远程邮件箱服务器"
 
 # src/pref-manager.c:440
-#: src/pref-manager.c:1225 src/pref-manager.c:2010
+#: src/pref-manager.c:1220 src/pref-manager.c:1959
 msgid "Type"
 msgstr "类型"
 
 # src/mailbox-conf.c:671 src/mailbox-conf.c:706
-#: src/pref-manager.c:1228
+#: src/pref-manager.c:1223
 msgid "Mailbox Name"
 msgstr "邮件箱名"
 
 # src/pref-manager.c:466
-#: src/pref-manager.c:1234 src/pref-manager.c:2022
+#: src/pref-manager.c:1229 src/pref-manager.c:1971
 msgid "Modify"
 msgstr "修改"
 
 # src/pref-manager.c:476
-#: src/pref-manager.c:1237
+#: src/pref-manager.c:1232
 msgid "Local mail"
 msgstr "本地邮件"
 
 # src/pref-manager.c:481
-#: src/pref-manager.c:1247
+#: src/pref-manager.c:1242
 msgid "Select your local mail directory"
 msgstr "选择本地邮件目录"
 
 # src/pref-manager.c:488
-#: src/pref-manager.c:1256
+#: src/pref-manager.c:1251
 msgid "Outgoing mail"
 msgstr "外发邮件"
 
 # src/mailbox-conf.c:818
-#: src/pref-manager.c:1278
+#: src/pref-manager.c:1273
 msgid "Port"
 msgstr "端口："
 
 # src/pref-manager.c:496
-#: src/pref-manager.c:1285
+#: src/pref-manager.c:1280
 msgid "Remote SMTP server"
 msgstr "远程 SMTP 服务器"
 
 # src/pref-manager.c:505
-#: src/pref-manager.c:1294
+#: src/pref-manager.c:1289
 msgid "Local mail transport agent"
 msgstr "本地邮件传输代理"
 
 # src/pref-manager.c:67
-#: src/pref-manager.c:1320
+#: src/pref-manager.c:1315
 msgid "Incoming"
 msgstr "接收"
 
 # src/pref-manager.c:488
-#: src/pref-manager.c:1322
+#: src/pref-manager.c:1317
 msgid "Outgoing"
 msgstr "发送"
 
 # src/mailbox-conf.c:774 src/main-window.c:209
-#: src/pref-manager.c:1341
+#: src/pref-manager.c:1343
 msgid "Checking"
 msgstr "检查"
 
-#: src/pref-manager.c:1349 src/pref-manager.c:1940
+#: src/pref-manager.c:1351 src/pref-manager.c:1889
 msgid "minutes"
 msgstr "分钟"
 
-#: src/pref-manager.c:1361
+#: src/pref-manager.c:1363
 msgid "Check mail automatically every:"
 msgstr "自动检查邮件："
 
 #. Quoted text regular expression
-#: src/pref-manager.c:1367
+#: src/pref-manager.c:1369
 msgid "Quoted Text"
 msgstr "引用文本"
 
-#: src/pref-manager.c:1375
+#: src/pref-manager.c:1377
 msgid "Quoted Text Regular Expression"
 msgstr "引用文本的正则表达式"
 
-#: src/pref-manager.c:1399
+#. How to handle received MDN requests
+#: src/pref-manager.c:1385
+#, fuzzy
+msgid "Message Disposition Notification requests"
+msgstr "要求发送阅读通告(_R)"
+
+#: src/pref-manager.c:1393
+msgid ""
+"When I receive a message and its sender requested to return a\n"
+"Message Disposition Notification (MDN), send it in the following cases:"
+msgstr ""
+
+#: src/pref-manager.c:1404
+msgid ""
+"the message header looks clean\n"
+"(the notify-to address is equal to the return path, I am in the to or cc "
+"list)"
+msgstr ""
+
+#: src/pref-manager.c:1419
+msgid "the message header looks suspicious"
+msgstr ""
+
+#: src/pref-manager.c:1454
 msgid "Word Wrap"
 msgstr "自动换行"
 
-#: src/pref-manager.c:1409
+#: src/pref-manager.c:1464
 msgid "Wrap Outgoing Text at:"
 msgstr "发出的邮件自动换行在："
 
-#: src/pref-manager.c:1422
+#: src/pref-manager.c:1477
 msgid "Characters"
 msgstr "字符"
 
-#: src/pref-manager.c:1426
+#: src/pref-manager.c:1481
 msgid "Other options"
 msgstr "其它选项"
 
-#: src/pref-manager.c:1433
+#: src/pref-manager.c:1488
 msgid "Default Bcc to:"
 msgstr "默认暗送给："
 
-#: src/pref-manager.c:1435
+#: src/pref-manager.c:1489
+#, fuzzy
+msgid "Default Reply string:"
+msgstr "默认域："
+
+#: src/pref-manager.c:1490
+#, fuzzy
+msgid "Default Forward string:"
+msgstr "默认域："
+
+#: src/pref-manager.c:1492
 msgid "Encoding"
 msgstr "编码"
 
 # src/pref-manager.c:555
-#: src/pref-manager.c:1503
+#: src/pref-manager.c:1559
 msgid "Main window"
 msgstr "主窗口"
 
 # src/pref-manager.c:558
-#: src/pref-manager.c:1509
+#: src/pref-manager.c:1565
 msgid "Use preview pane"
 msgstr "使用预览面板"
 
-#: src/pref-manager.c:1511
+#: src/pref-manager.c:1567
 msgid "Show mailbox statistics in left pane"
 msgstr "在左面板显示邮件箱统计数据"
 
-#: src/pref-manager.c:1513
+#: src/pref-manager.c:1569
 msgid "Use alternative main window layout"
 msgstr "使用其它的主窗口布局"
 
-#: src/pref-manager.c:1515
+#: src/pref-manager.c:1571
 msgid "Automatically view message when mailbox opened"
 msgstr "当打开邮件箱时自动查看邮件"
 
 # src/pref-manager.c:538
-#: src/pref-manager.c:1520
+#: src/pref-manager.c:1576
 msgid "Toolbars"
 msgstr "工具栏"
 
-#: src/pref-manager.c:1537
+#: src/pref-manager.c:1593
 msgid "Display progress dialog"
 msgstr "显示进度对话"
 
 # src/pref-manager.c:151
-#: src/pref-manager.c:1543
+#: src/pref-manager.c:1599
 msgid "Display Formats"
 msgstr "显示格式"
 
-#: src/pref-manager.c:1551
+#: src/pref-manager.c:1607
 msgid "Date encoding (for strftime):"
 msgstr "日期编码 (strftime 使用)："
 
-#: src/pref-manager.c:1552
+#: src/pref-manager.c:1608
 msgid "Selected headers:"
 msgstr "选中的信头："
 
 # src/main-window.c:200
-#: src/pref-manager.c:1568
+#: src/pref-manager.c:1624
 msgid "Status Messages"
 msgstr "状态信息"
 
 # src/main-window.c:213
-#. gtk_table_set_row_spacings(GTK_TABLE(information_table), 1);
-#. gtk_table_set_col_spacings(GTK_TABLE(information_table), 5);
-#: src/pref-manager.c:1569 src/pref-manager.c:1577
+#: src/pref-manager.c:1625 src/pref-manager.c:1635
 msgid "Information Messages"
 msgstr "信息"
 
-#: src/pref-manager.c:1590
+#: src/pref-manager.c:1639
 msgid "Warning Messages"
 msgstr "警告信息"
 
 # src/main-window.c:200
-#: src/pref-manager.c:1603
+#: src/pref-manager.c:1643
 msgid "Error Messages"
 msgstr "错误信息"
 
 # src/main-window.c:200
-#: src/pref-manager.c:1616
+#: src/pref-manager.c:1647
 msgid "Fatal Error Messages"
 msgstr "严重错误信息"
 
 # src/main-window.c:211
-#: src/pref-manager.c:1629
+#: src/pref-manager.c:1651
 msgid "Debug Messages"
 msgstr "调试信息"
 
 # src/main-window.c:161
-#: src/pref-manager.c:1645
+#: src/pref-manager.c:1658
 msgid "Colors"
 msgstr "颜色"
 
 # src/mailbox-conf.c:238
-#: src/pref-manager.c:1647
+#: src/pref-manager.c:1660
 msgid "Mailbox Colors"
 msgstr "邮件箱颜色"
 
-#: src/pref-manager.c:1653
+#: src/pref-manager.c:1666
 msgid "Mailbox with unread messages color"
 msgstr "有未读邮件的邮件箱颜色"
 
 # src/main-window.c:200
-#: src/pref-manager.c:1655
+#: src/pref-manager.c:1668
 msgid "Message Colors"
 msgstr "邮件颜色"
 
-#: src/pref-manager.c:1661
-msgid "Quoted text primary color"
-msgstr "引用文字的主要颜色"
-
-#: src/pref-manager.c:1663
-msgid "Quoted text secondary color"
+#: src/pref-manager.c:1674
+#, fuzzy, c-format
+msgid "Quote level %d color"
 msgstr "引用文字的备用颜色"
 
-#: src/pref-manager.c:1668
+#: src/pref-manager.c:1682
 msgid "Fonts"
 msgstr "字体"
 
 # src/pref-manager.c:558
-#: src/pref-manager.c:1670
+#: src/pref-manager.c:1684
 msgid "Preview Font"
 msgstr "预览字体"
 
-#: src/pref-manager.c:1687 src/pref-manager.c:1721
+#: src/pref-manager.c:1701 src/pref-manager.c:1735
 msgid "Select a font to use"
 msgstr "选择使用的字体"
 
 # src/main-window.c:133 src/main-window.c:168
-#: src/pref-manager.c:1690 src/pref-manager.c:1724
+#: src/pref-manager.c:1704 src/pref-manager.c:1738
 msgid "Select..."
 msgstr "选择..."
 
 # src/pref-manager.c:558
-#: src/pref-manager.c:1697 src/pref-manager.c:1732
+#: src/pref-manager.c:1711 src/pref-manager.c:1746
 msgid "Preview pane"
 msgstr "预览面板"
 
 #. Subject Font
-#: src/pref-manager.c:1705
+#: src/pref-manager.c:1719
 msgid "Subject Header Font"
 msgstr "标题头字体"
 
-#: src/pref-manager.c:1785
-msgid "characters"
-msgstr "字符"
-
-# src/filter-edit-dialog.c:420
-#: src/pref-manager.c:1788
-msgid "Print command:"
-msgstr "打印命令："
-
-#: src/pref-manager.c:1794
-msgid "Break line at:"
-msgstr "断行于："
-
 # src/sendmsg-window.c:76
 #. pspell frame
-#: src/pref-manager.c:1850
+#: src/pref-manager.c:1799
 msgid "Pspell Settings"
 msgstr "拼写设置"
 
 #. do the module menu
-#: src/pref-manager.c:1856
+#: src/pref-manager.c:1805
 msgid "Spell Check Module"
 msgstr "拼写检查模块"
 
-#: src/pref-manager.c:1862
+#: src/pref-manager.c:1811
 msgid "Suggestion Level"
 msgstr "提示级别"
 
-#: src/pref-manager.c:1870
+#: src/pref-manager.c:1819
 msgid "Ignore words shorter than"
 msgstr "忽略单词短于"
 
 #. ignore signature check box
-#: src/pref-manager.c:1877
+#: src/pref-manager.c:1826
 msgid "Misc Spelling Settings"
 msgstr "其它拼写设置"
 
 # src/pref-manager.c:397
-#: src/pref-manager.c:1883
+#: src/pref-manager.c:1832
 msgid "Check signature"
 msgstr "检查签名"
 
-#: src/pref-manager.c:1887
+#: src/pref-manager.c:1836
 msgid "Check quoted"
 msgstr "检查引用"
 
 # src/pref-manager.c:594
-#: src/pref-manager.c:1917
+#: src/pref-manager.c:1866
 msgid "Debug"
 msgstr "调试"
 
-#: src/pref-manager.c:1921
+#: src/pref-manager.c:1870
 msgid "Empty Trash on exit"
 msgstr "退出时清空废纸篓"
 
-#: src/pref-manager.c:1929
+#: src/pref-manager.c:1878
 msgid "Automatically close mailbox if unused more than"
 msgstr "自动关闭邮件箱，如果未使用时间超过"
 
 # src/filter-edit-dialog.c:707
-#: src/pref-manager.c:1956
+#: src/pref-manager.c:1905
 msgid "Options"
 msgstr "选项"
 
-#: src/pref-manager.c:1963
+#: src/pref-manager.c:1912
 msgid "Check mail upon startup"
 msgstr "启动的时候检查邮件"
 
-#: src/pref-manager.c:1968
+#: src/pref-manager.c:1917
 msgid "Remember open mailboxes between sessions"
 msgstr "在会话中记住打开的邮件箱"
 
-#: src/pref-manager.c:2013
+#: src/pref-manager.c:1962
 msgid "Address Book Name"
 msgstr "地址簿名"
 
-#: src/pref-manager.c:2017
+#: src/pref-manager.c:1966
 msgid "Expand aliases"
 msgstr "展开别名"
 
-#: src/pref-manager.c:2024
+#: src/pref-manager.c:1973
 msgid "Set as default"
 msgstr "设为默认值"
 
-#: src/pref-manager.c:2271
+#: src/pref-manager.c:2208
 msgid "Show nothing"
 msgstr "不显示"
 
-#: src/pref-manager.c:2272
+#: src/pref-manager.c:2209
 msgid "Show dialog"
 msgstr "显示对话"
 
-#: src/pref-manager.c:2273
+#: src/pref-manager.c:2210
 msgid "Show in list"
 msgstr "在列表中显示"
 
-#: src/pref-manager.c:2274
+#: src/pref-manager.c:2211
 msgid "Print to console"
 msgstr "打印到控制台"
+
+#: src/pref-manager.c:2221
+msgid "Ask me"
+msgstr ""
 
 #: src/print.c:40
 msgid ""
@@ -3331,26 +3399,35 @@ msgstr "继续邮件"
 msgid "New message"
 msgstr "新建邮件"
 
-#: src/sendmsg-window.c:1565
+#: src/sendmsg-window.c:1378 src/sendmsg-window.c:1379
+msgid "Re:"
+msgstr ""
+
+#: src/sendmsg-window.c:1404 src/sendmsg-window.c:1405
+msgid "Fwd:"
+msgstr ""
+
+#: src/sendmsg-window.c:1586
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "无法打开文件 %s。\n"
 
-#: src/sendmsg-window.c:1567
+#: src/sendmsg-window.c:1588
 msgid "Loading..."
 msgstr "正在载入..."
 
-#: src/sendmsg-window.c:1594
+#: src/sendmsg-window.c:1615
 msgid "Include file"
 msgstr "包含文件"
 
-#: src/sendmsg-window.c:1879
-msgid "Cannot execute print command."
-msgstr "无法执行打印命令。"
-
-#: src/sendmsg-window.c:1902
-msgid "Error executing lpr"
-msgstr "在执行 lpr 时发生错误"
+#: src/sendmsg-window.c:1890
+#, fuzzy
+msgid ""
+"Balsa has been compiled without gnome-print support.\n"
+"Printing is not possible."
+msgstr ""
+"这个版本的 balsa 没有编译进 gnome-print 支持。\n"
+"不能打印。"
 
 #: src/spell-check.c:482
 msgid "Replace the current word with the selected suggestion"
@@ -3434,3 +3511,26 @@ msgstr "没有选中地址簿..."
 #: src/store-address.c:257
 msgid "Sorry, no semicolons are allowed in the name!\n"
 msgstr "抱歉，在名字中不能有分号！\n"
+
+# src/main-window.c:222 src/sendmsg-window.c:78
+#~ msgid "Printing"
+#~ msgstr "打印"
+
+#~ msgid "Quoted text primary color"
+#~ msgstr "引用文字的主要颜色"
+
+#~ msgid "characters"
+#~ msgstr "字符"
+
+# src/filter-edit-dialog.c:420
+#~ msgid "Print command:"
+#~ msgstr "打印命令："
+
+#~ msgid "Break line at:"
+#~ msgstr "断行于："
+
+#~ msgid "Cannot execute print command."
+#~ msgstr "无法执行打印命令。"
+
+#~ msgid "Error executing lpr"
+#~ msgstr "在执行 lpr 时发生错误"

@@ -337,7 +337,6 @@ select_mailbox (GtkCTree * ctree, GtkCTreeNode * row, gint column)
 
   if (bevent && bevent->button == 1)
     {
-
       if (mailbox)
 	gtk_signal_emit (GTK_OBJECT (bmbl),
 			 balsa_mblist_signals[SELECT_MAILBOX],

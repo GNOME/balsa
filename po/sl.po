@@ -2960,9 +2960,6 @@ msgstr "Oprostite, dvopièja v imenu niso dovoljena!\n"
 #~ msgid "You need to fill in the folderpath field."
 #~ msgstr "Vpisati morate imenik mape."
 
-#~ msgid "You need to fill in the IMAP Server field"
-#~ msgstr "Vpisati morate stre¾nik IMAP
-
 #~ msgid "You need to fill in the username field"
 #~ msgstr "Vpisati morate uporabni¹ko ime"
 

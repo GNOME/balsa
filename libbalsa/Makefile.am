@@ -93,9 +93,7 @@ INCLUDES= -I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \
 	-I${top_srcdir}/libbalsa/imap \
 	$(BALSA_CFLAGS)
 
-DEFS = -DG_DISABLE_DEPRECATED   \
-       -DGTK_DISABLE_DEPRECATED \
-       -DGNOME_DISABLE_DEPRECATED
+DEFS = 
 
 #Signal marshallers
 marshal_prefix = libbalsa

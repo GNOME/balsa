@@ -1,3 +1,8 @@
+2004-04-11  Carlos Morgado  <chbm gnome.org>
+
+	* libbalsa/Makefile.am: 
+	remove *_DISABLE_DEPRECATED
+
 2004-04-11  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: fetch references and list-post. 

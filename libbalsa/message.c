@@ -1253,6 +1253,7 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
 	    const char *subj;
 	    subj = g_mime_message_get_subject(message->mime_msg);
 	    message->subj = g_mime_utils_8bit_header_decode(subj);
+	    libbalsa_utf8_sanitize(&message->subj, TRUE, NULL);
 	}
 #endif
 	if (!message->message_id) {

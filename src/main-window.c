@@ -1693,18 +1693,27 @@ show_about_box(void)
     static GtkWidget *about = NULL;
     const gchar *authors[] = {
         "Balsa Maintainers <balsa-maintainer@theochem.kth.se>:",
+        "Emmanuel Allaud <e.allaud@wanadoo.fr>",
         "Peter Bloomfield <PeterBloomfield@bellsouth.net>",
         "Carlos Morgado <chbm@chbm.nu>",
         "Pawel Salek <pawsa@theochem.kth.se>",
-        "and many others (see AUTHORS file)",
         NULL
     };
     const gchar *documenters[] = {
+        "Peter Bloomfield <PeterBloomfield@bellsouth.net>",
+        "Matthew Guenther <guentherm@asme.org>",
+        "Berend De Schouwer <bds@jhb.ucs.co.za>",
+        "Pawel Salek <pawsa@theochem.kth.se>",
+        "Peter Williams <peter@newton.cx>",
+        "Jelmer Vernooij <jelmer@nl.linux.org>",
         NULL
     };
-
     const gchar *translator_credits = _("translator_credits");
 
+    /* FIXME: do we need error handling for this? */
+    GdkPixbuf *balsa_logo =
+        gdk_pixbuf_new_from_file(BALSA_DATA_PREFIX
+                                 "/pixmaps/balsa_logo.png", NULL);
 
     /* only show one about box at a time */
     if (about) {
@@ -1714,10 +1723,7 @@ show_about_box(void)
 
     about = gnome_about_new("Balsa",
                             BALSA_VERSION,
-                            "Copyright \xc2\xa9 1997-2003",
-#if BALSA_MAJOR < 2
-                            authors,
-#endif                          /* BALSA_MAJOR < 2 */
+                            "Copyright \xc2\xa9 1997-2003 The Balsa Developers",
                             _("The Balsa email client is part of "
                               "the GNOME desktop environment.  "
                               "Information on Balsa can be found at "
@@ -1725,16 +1731,11 @@ show_about_box(void)
                               "If you need to report bugs, "
                               "please do so at: "
                               "http://bugzilla.gnome.org/"),
-#if BALSA_MAJOR < 2
-                            "balsa/balsa_logo.png"
-#else
                             authors,
                             documenters,
-			    strcmp (translator_credits, "translator_credits") != 0 ? translator_credits : NULL,
-                            gdk_pixbuf_new_from_file("balsa/balsa_logo.png",
-                                                     NULL)
-#endif                          /* BALSA_MAJOR < 2 */
-                           );
+                            strcmp(translator_credits, "translator_credits") != 0 ? translator_credits : NULL,
+                            balsa_logo
+                            );
 
     g_object_add_weak_pointer(G_OBJECT(about), (gpointer) &about);
 

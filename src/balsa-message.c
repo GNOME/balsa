@@ -43,7 +43,8 @@ struct _BalsaSaveFileInfo
   };
 
 
-static gint item_event (GnomeCanvasItem * item, GdkEvent * event, gpointer data);
+BalsaSaveFileInfo * balsa_save_file_info_new (GtkWidget * widget, Message * message, BODY * body);
+static void item_event (GnomeCanvasItem * item, GdkEvent * event, gpointer data);
 static void save_MIME_part (GtkObject * o, BalsaSaveFileInfo *);
 
 /* widget */
@@ -134,7 +135,7 @@ balsa_save_file_info_new (GtkWidget * widget, Message * message, BODY * body)
   return new;
 }
 
-static gint
+static void
 item_event (GnomeCanvasItem * item, GdkEvent * event, gpointer data)
 {
   BalsaSaveFileInfo *info;

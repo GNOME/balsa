@@ -426,12 +426,10 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 5, 6,
 		    GTK_FILL, GTK_FILL, 0, 0);
 
-  msg->attachments = gnome_icon_list_new ();
+  msg->attachments = gnome_icon_list_new (80,NULL,TRUE);
+  gtk_widget_show(msg->attachments);
   gtk_table_attach (GTK_TABLE (table), msg->attachments, 1, 3, 5, 6,
 		    GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_EXPAND, 0, 0);
-  gnome_icon_list_set_policy (GNOME_ICON_LIST (msg->attachments),
-			      GTK_POLICY_AUTOMATIC,
-			      GTK_POLICY_AUTOMATIC);
   gtk_signal_connect (GTK_OBJECT (msg->attachments), "select_icon",
 		      GTK_SIGNAL_FUNC (select_attachment),
 		      NULL);

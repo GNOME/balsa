@@ -1656,6 +1656,7 @@ ir_list_lsub(ImapMboxHandle *h, ImapHandleSignal signal)
     if(delim            != 'N' ||
        sio_getc(h->sio) != 'I' ||
        sio_getc(h->sio) != 'L') return IMR_PROTOCOL;
+    delim = '\0'; /* NIL */
   }
   if(sio_getc(h->sio) != ' ') return IMR_PROTOCOL;
   /* mailbox */

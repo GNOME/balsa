@@ -1,3 +1,8 @@
+2004-11-09  Pawel Salek
+
+	* libbalsa/imap/imap-handle.c: return '\0' as the delimiter
+	when server responds NIL (exposed by UW-IMAP 2004a).
+
 2004-11-08  Pawel Salek
 
 	* src/mailbox-conf.c: do not crash on POP3 mailbox update.

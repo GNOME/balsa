@@ -1,3 +1,7 @@
+2003-03-20  Guntupalli Karunakar  <karunakar@freedomink.org>
+
+	* configure.in: Added Mayalalam (ml) in ALL_LINGUAS
+
 2003-03-18  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	* libbalsa/body.[ch]: add, initialize destroy GPG-related fields.

@@ -1,3 +1,11 @@
+1999-12-20  Bruno Pires Marinho  <bapm@camoes.rnl.ist.utl.pt>
+
+	* libmutt/*:
+	* libbalsa/message.c:
+	* libbalsa/mailbox.c:
+	* libbalsa/send.c: Updated libmutt to the version 1.0i with last
+	ChangeLog entry on Wed Oct 20 14:51:57 1999.
+
 1999-12-17  Peter Williams  <peter@wgwill.ne.mediaone.net>
 
 	* libinit_balsa/balsa-druid-page-user.gob: Changed default

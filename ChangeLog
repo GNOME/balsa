@@ -1,3 +1,8 @@
+2000-05-02  Peter Williams  <peter@beta.newton.cx>
+
+	* configure.in : change GLIB_CFLAGS to GNORBA_CFLAGS
+	  for arguments to offset-tool.
+
 2000-04-25  Peter Williams  <peter@beta.newton.cx>
 
 	* macros/offset-tool.sh.in (header): Added --noclean

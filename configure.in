@@ -277,7 +277,7 @@ dnl ############################################################################
 
 BALSA_OFFSET_TOOL([src/Makefile.offset],[src/cfg-balsa.c],
 [	
-	CFLAGS="${CFLAGS} ${GLIB_CFLAGS}"
+	CFLAGS="${CFLAGS} ${GNORBA_CFLAGS}"
 	CFLAGS="\${CFLAGS} -I\${top_builddir} -I\${top_builddir}/src -I\${top_builddir}/libmutt"
 	CFLAGS="\${CFLAGS} -I\${top_srcdir} -I\${top_srcdir}/libmutt -I\${top_srcdir}/libbalsa"
 	CFLAGS="\${CFLAGS} -I\${top_srcdir}/src"

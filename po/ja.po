@@ -581,23 +581,23 @@ msgstr ""
 
 #: src/filter-edit-dialog.c:710
 msgid "Stop filtering here"
-msgstr ""
+msgstr "ここでフィルタを停止"
 
 #: src/filter-edit-dialog.c:738
 msgid "Match"
-msgstr ""
+msgstr "一致"
 
 #: src/filter-edit-dialog.c:741
 msgid "Action"
-msgstr ""
+msgstr "アクション"
 
 #: src/filter-edit-dialog.c:755
 msgid "Revert"
-msgstr ""
+msgstr "元に戻す"
 
 #: src/filter-edit-dialog.c:783
 msgid "Balsa Filters"
-msgstr ""
+msgstr "バルサ フィルタ"
 
 #: src/mailbox-conf.c:159
 #, c-format
@@ -614,14 +614,17 @@ msgid ""
 "You may use \"Add Mailbox\" later to access this mailbox again\n"
 "Are you sure you want to remove this mailbox?"
 msgstr ""
+"メールボックス%sをメールボックスリストから削除します\n"
+"\"メールボックスの追加\"でこのメールボックスをあとでもう一度\n"
+"追加することができます。このメールボックスを削除しますか？"
 
 #: src/mailbox-conf.c:193
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
-msgstr ""
+msgstr "Oooop! メールボックスはbalsa_app.mailboxノードを見つけられない?\n"
 
 #: src/mailbox-conf.c:237
 msgid "Mailbox Configurator"
-msgstr ""
+msgstr "メールボックスの設定"
 
 #: src/mailbox-conf.c:292 src/mailbox-conf.c:1143
 msgid "Update"
@@ -629,52 +632,52 @@ msgstr "更新"
 
 #: src/mailbox-conf.c:436 src/mailbox-conf.c:452 src/mailbox-conf.c:465
 msgid "You need to fill in the Mailbox Name field."
-msgstr ""
+msgstr "メールボックス名称を入力して下さい。"
 
 #: src/mailbox-conf.c:439
 msgid "You need to fill in the folderpath field."
-msgstr ""
+msgstr "フォルダパスは入力して下さい。"
 
 #: src/mailbox-conf.c:441
 msgid "You need to fill in the IMAP Server field"
-msgstr ""
+msgstr "IMAPサーバは入力して下さい"
 
 #: src/mailbox-conf.c:443
 msgid "You need to fill in the username field"
-msgstr ""
+msgstr "ユーザ名は入力して下さい"
 
 #: src/mailbox-conf.c:445
 msgid "You need to fill in the password field"
-msgstr ""
+msgstr "パスワードは入力して下さい"
 
 #: src/mailbox-conf.c:447
 msgid "You need to fill in the port field"
-msgstr ""
+msgstr "ポート番号は入力して下さい"
 
 #: src/mailbox-conf.c:469
 msgid "You need to fill in the user field."
-msgstr ""
+msgstr "ユーザ名は入力して下さい。"
 
 #: src/mailbox-conf.c:473
 msgid "You need to fill in the password field."
-msgstr ""
+msgstr "パスワードは入力して下さい。"
 
 #: src/mailbox-conf.c:477
 msgid "You need to fill in the server field."
-msgstr ""
+msgstr "サーバ名は入力して下さい。"
 
 #: src/mailbox-conf.c:481
 msgid "You need to fill in the port field."
-msgstr ""
+msgstr "ポート番号は入力して下さい。"
 
 #: src/mailbox-conf.c:485
 msgid "Some of the fields are blank."
-msgstr ""
+msgstr "空のフィールドがあります。"
 
 #: src/mailbox-conf.c:666
 #, c-format
 msgid "Cannot create mailbox '%s': %s\n"
-msgstr ""
+msgstr "メールボックス'%s'を作成できません: %s\n"
 
 #. used to build a string: MAILBOXNAME " on " SERVERNAME
 #: src/mailbox-conf.c:733
@@ -732,7 +735,7 @@ msgstr "サーバから削除する"
 
 #: src/mailbox-conf.c:1102
 msgid "Folder path:"
-msgstr ""
+msgstr "フォルダのパス:"
 
 #: src/main-window.c:167
 msgid "_Get new mail"
@@ -740,7 +743,7 @@ msgstr "受信(_G)"
 
 #: src/main-window.c:167
 msgid "Fetch new incoming mail"
-msgstr ""
+msgstr "新規メールの取り込み"
 
 #: src/main-window.c:173
 msgid "Opens the address book"
@@ -752,7 +755,7 @@ msgstr "印刷(_I)"
 
 #: src/main-window.c:180
 msgid "Print current mail"
-msgstr ""
+msgstr "現在のメールの印刷"
 
 #: src/main-window.c:205
 msgid "N_o headers"
@@ -804,7 +807,7 @@ msgstr "返信(_R)"
 
 #: src/main-window.c:245
 msgid "Reply to the current message"
-msgstr ""
+msgstr "現在のメッセージに返信"
 
 #: src/main-window.c:252 src/message-window.c:60
 msgid "Reply to _all"
@@ -812,7 +815,7 @@ msgstr "全員に返信(_A)"
 
 #: src/main-window.c:253
 msgid "Reply to all recipients of the current message"
-msgstr ""
+msgstr "現在のメッセージの受信者全員に返信"
 
 #: src/main-window.c:260 src/message-window.c:67
 msgid "_Forward"
@@ -900,11 +903,11 @@ msgstr "ゴミ箱にあるメッセージを削除する"
 
 #: src/main-window.c:327
 msgid "_Filters..."
-msgstr ""
+msgstr "フィルタ(_F)..."
 
 #: src/main-window.c:327
 msgid "Manage filters"
-msgstr ""
+msgstr "フィルタ管理"
 
 #: src/main-window.c:336
 msgid "_Show mailbox tree"
@@ -982,7 +985,7 @@ msgstr ""
 
 #: src/main.c:102
 msgid "Get new mail on startup"
-msgstr ""
+msgstr "起動時に新規メールを読み込む"
 
 #: src/main.c:104
 msgid "Compose a new email to EMAIL@ADDRESS"
@@ -1163,7 +1166,7 @@ msgstr "署名に区切りを入れる"
 
 #: src/pref-manager.c:831
 msgid "Remote Mailbox Servers"
-msgstr "リモートメールボックスサーバ"
+msgstr "リモートメールサーバ"
 
 #: src/pref-manager.c:856
 msgid "Type"
@@ -1485,11 +1488,11 @@ msgstr "南欧(_S) (ISO-8859-3)"
 
 #: src/sendmsg-window.c:224
 msgid "_Baltic (ISO-8859-13)"
-msgstr "バルチック(_B) (ISO-8859-13)"
+msgstr "バルト諸語(_B) (ISO-8859-13)"
 
 #: src/sendmsg-window.c:226
 msgid "Cy_rillic (ISO-8859-5)"
-msgstr ""
+msgstr "キリル文字(_R) (ISO-8859-5)"
 
 #: src/sendmsg-window.c:228
 msgid "_Hebrew (ISO-8859-8)"
@@ -1501,7 +1504,7 @@ msgstr "トルコ語(_T) (ISO-8859-9)"
 
 #: src/sendmsg-window.c:232
 msgid "_Celtic (ISO-8859-14)"
-msgstr ""
+msgstr "ケルト語(_C) (ISO-8859-14)"
 
 #: src/sendmsg-window.c:271
 msgid "_Show"
@@ -1509,7 +1512,7 @@ msgstr "表示(_S)"
 
 #: src/sendmsg-window.c:272
 msgid "_ISO Charset"
-msgstr "_ISOキャラクタセット"
+msgstr "_ISO文字集合"
 
 #: src/sendmsg-window.c:391
 msgid ""

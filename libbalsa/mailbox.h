@@ -27,7 +27,6 @@
 #include <gmime/gmime.h>
 
 #include "libbalsa.h"
-#include "filter.h"
 
 #define LIBBALSA_TYPE_MAILBOX \
     (libbalsa_mailbox_get_type())
@@ -185,12 +184,12 @@ struct _LibBalsaMailbox {
 };
 
 /* Search iter */
-typedef struct {
+struct _LibBalsaMailboxSearchIter {
     LibBalsaMailbox *mailbox;
     gint stamp;
     LibBalsaCondition *condition;	
     gpointer user_data;		/* private backend info */
-} LibBalsaMailboxSearchIter;
+};
 
 struct _LibBalsaMailboxClass {
     GObjectClass parent_class;
@@ -200,8 +199,6 @@ struct _LibBalsaMailboxClass {
     void (*close_mailbox) (LibBalsaMailbox * mailbox);
     void (*changed) (LibBalsaMailbox * mailbox);
 
-    void (*message_append) (LibBalsaMailbox * mailbox,
-			    LibBalsaMessage * message);
     void (*messages_status_changed) (LibBalsaMailbox * mailbox,
 				     GList * messages,
 				     gint flag);
@@ -229,8 +226,6 @@ struct _LibBalsaMailboxClass {
     gboolean (*message_match) (LibBalsaMailbox * mailbox,
 			       guint msgno,
 			       LibBalsaMailboxSearchIter *search_iter);
-    void (*mailbox_match) (LibBalsaMailbox * mailbox,
-			   GSList * filters_list);
     gboolean (*can_match) (LibBalsaMailbox * mailbox,
 			   LibBalsaCondition *condition);
     void (*save_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
@@ -240,11 +235,14 @@ struct _LibBalsaMailboxClass {
     void (*change_message_flags) (LibBalsaMailbox * mailbox, guint msgno,
                                   LibBalsaMessageFlag set,
                                   LibBalsaMessageFlag clear);
-    gboolean (*change_msgs_flags) (LibBalsaMailbox * mailbox,
-                                   GList *messages, /* change to list
-                                                     * of MSGNOs? */
-                                   LibBalsaMessageFlag set,
-                                   LibBalsaMessageFlag clear);
+    gboolean (*messages_change_flags) (LibBalsaMailbox * mailbox,
+				       guint msgcnt, guint *msgnos,
+				       LibBalsaMessageFlag set,
+				       LibBalsaMessageFlag clear);
+    gboolean (*messages_copy) (LibBalsaMailbox * mailbox,
+			       guint msgcnt, guint *msgnos,
+			       LibBalsaMailbox * dest,
+			       LibBalsaMailboxSearchIter * search_iter);
     void (*set_threading) (LibBalsaMailbox * mailbox,
 			   LibBalsaMailboxThreadingType thread_type);
     void (*update_view_filter) (LibBalsaMailbox * mailbox,
@@ -357,13 +355,7 @@ gboolean libbalsa_mailbox_search_iter_step(LibBalsaMailbox * mailbox,
 					   guint stop_msgno);
 void libbalsa_mailbox_search_iter_free(LibBalsaMailboxSearchIter * iter);
 
-/* Virtual function (this function is different for IMAP
- */
-void libbalsa_mailbox_match(LibBalsaMailbox * mbox, GSList * filter_list );
-
-/* Default filtering function (on reception) : this is exported
-   because it is used as a fallback for IMAP mailboxes when SEARCH
-   command can not be used.
+/* Default filtering function (on reception)
    It is ONLY FOR INTERNAL USE
 */
 void libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox,
@@ -378,15 +370,21 @@ int libbalsa_mailbox_copy_message(LibBalsaMessage *message,
 				  LibBalsaMailbox *dest);
 gboolean libbalsa_mailbox_close_backend(LibBalsaMailbox * mailbox);
 
-void libbalsa_mailbox_change_message_flags(LibBalsaMailbox * mailbox,
-					   guint msgno,
-					   LibBalsaMessageFlag set,
-					   LibBalsaMessageFlag clear);
-/* */
-gboolean libbalsa_mailbox_change_msgs_flags(LibBalsaMailbox * mailbox,
-                                            GList *messages,
-                                            LibBalsaMessageFlag set,
-                                            LibBalsaMessageFlag clear);
+/* Message number-list methods */
+gboolean libbalsa_mailbox_messages_change_flags(LibBalsaMailbox * mailbox,
+						guint msgcnt, guint *msgnos,
+						LibBalsaMessageFlag set,
+						LibBalsaMessageFlag clear);
+gboolean libbalsa_mailbox_messages_copy(LibBalsaMailbox * mailbox,
+					guint msgcnt, guint *msgnos,
+					LibBalsaMailbox * dest,
+					LibBalsaMailboxSearchIter *
+					search_iter);
+gboolean libbalsa_mailbox_messages_move(LibBalsaMailbox * mailbox,
+					guint msgcnt, guint *msgnos,
+					LibBalsaMailbox * dest,
+					LibBalsaMailboxSearchIter *
+					search_iter);
 
                                
 /*
@@ -453,6 +451,8 @@ void libbalsa_mailbox_set_encr_icon(GdkPixbuf * pixbuf);
 /* Partial messages */
 void libbalsa_mailbox_try_reassemble(LibBalsaMailbox * mailbox,
 				     const gchar * id);
+
+void libbalsa_mailbox_invalidate_iters(LibBalsaMailbox * mailbox);
 
 /* columns ids */
 typedef enum {

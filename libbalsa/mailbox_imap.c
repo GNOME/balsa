@@ -61,12 +61,6 @@ struct _LibBalsaMailboxImap {
 
     GArray* messages_info;
     gboolean opened;
-
-    /* Hash table containing the messages matching the conditions
-     */
-    GHashTable * matching_messages;
-    int op;
-    GSList * conditions;
 };
 
 struct _LibBalsaMailboxImapClass {
@@ -97,17 +91,6 @@ static gboolean libbalsa_mailbox_imap_message_match(LibBalsaMailbox* mailbox,
 						    guint msgno,
 						    LibBalsaMailboxSearchIter
 						    * search_iter);
-static void hash_table_to_list_func(gpointer key,
-				    gpointer value,
-				    gpointer data);
-static GList * hash_table_to_list(GHashTable * hash);
-
-static void run_filters_on_reception(LibBalsaMailboxImap * mbox);
-static gboolean libbalsa_mailbox_real_imap_match(LibBalsaMailboxImap * mbox,
-						 GSList * filters_list,
-						 gboolean only_recent);
-static void libbalsa_mailbox_imap_mbox_match(LibBalsaMailbox * mbox,
-					     GSList * filters_list);
 static gboolean libbalsa_mailbox_imap_can_match(LibBalsaMailbox  *mbox,
 						LibBalsaCondition *condition);
 static void libbalsa_mailbox_imap_save_config(LibBalsaMailbox * mailbox,
@@ -136,10 +119,12 @@ void libbalsa_mailbox_imap_change_message_flags(LibBalsaMailbox * mailbox,
 						guint msgno,
 						LibBalsaMessageFlag set,
 						LibBalsaMessageFlag clear);
-static gboolean lbm_imap_change_msgs_flags(LibBalsaMailbox * mailbox,
-                                           GList *messages,
-                                           LibBalsaMessageFlag set,
-                                           LibBalsaMessageFlag clear);
+static gboolean lbm_imap_messages_change_flags(LibBalsaMailbox * mailbox,
+                                              unsigned msgcnt,
+                                              unsigned *seqno,
+                                              LibBalsaMessageFlag set,
+                                              LibBalsaMessageFlag clear);
+
 static void libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
 						LibBalsaMailboxThreadingType
 						thread_type);
@@ -149,6 +134,11 @@ static void libbalsa_mailbox_imap_sort(LibBalsaMailbox *mailbox,
                                        GArray *array);
 static guint libbalsa_mailbox_imap_total_messages(LibBalsaMailbox *
 						  mailbox);
+static gboolean
+libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
+                                   guint msgcnt, guint * msgnos,
+                                   LibBalsaMailbox * dest,
+                                   LibBalsaMailboxSearchIter * search_iter);
 
 static void server_settings_changed(LibBalsaServer * server,
 				    LibBalsaMailbox * mailbox);
@@ -227,8 +217,6 @@ libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass * klass)
 	libbalsa_mailbox_imap_search_iter_free;
     libbalsa_mailbox_class->message_match =
 	libbalsa_mailbox_imap_message_match;
-    libbalsa_mailbox_class->mailbox_match =
-	libbalsa_mailbox_imap_mbox_match;
     libbalsa_mailbox_class->can_match =
 	libbalsa_mailbox_imap_can_match;
 
@@ -249,8 +237,8 @@ libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass * klass)
     libbalsa_mailbox_class->add_message = libbalsa_mailbox_imap_add_message;
     libbalsa_mailbox_class->change_message_flags =
 	libbalsa_mailbox_imap_change_message_flags;
-    libbalsa_mailbox_class->change_msgs_flags =
-	lbm_imap_change_msgs_flags;
+    libbalsa_mailbox_class->messages_change_flags =
+	lbm_imap_messages_change_flags;
     libbalsa_mailbox_class->set_threading =
 	libbalsa_mailbox_imap_set_threading;
     libbalsa_mailbox_class->update_view_filter =
@@ -258,6 +246,8 @@ libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass * klass)
     libbalsa_mailbox_class->sort = libbalsa_mailbox_imap_sort;
     libbalsa_mailbox_class->total_messages =
 	libbalsa_mailbox_imap_total_messages;
+    libbalsa_mailbox_class->messages_copy =
+	libbalsa_mailbox_imap_messages_copy;
 }
 
 static void
@@ -265,9 +255,6 @@ libbalsa_mailbox_imap_init(LibBalsaMailboxImap * mailbox)
 {
     mailbox->path = NULL;
     mailbox->auth_type = AuthCram;	/* reasonable default */
-    mailbox->matching_messages = NULL;
-    mailbox->op = FILTER_NOOP;
-    mailbox->conditions = NULL;
     mailbox->handle = NULL;
     mailbox->handle_refs = 0;
 }
@@ -473,39 +460,6 @@ clean_cache(LibBalsaMailbox* mailbox)
     return TRUE;
 }
 
-/* Helper */
-
-void run_filters_on_reception(LibBalsaMailboxImap * mbox)
-{
-    GSList * filters;
-    LibBalsaMailbox * mailbox = LIBBALSA_MAILBOX(mbox);
-
-    if (!mailbox->filters)
-	config_mailbox_filters_load(mailbox);
-    
-    filters = libbalsa_mailbox_filters_when(mailbox->filters,
-					    FILTER_WHEN_INCOMING);
-    /* We apply filter if needed */
-    if (filters) {
-	if (filters_prepare_to_run(filters)) {
-	    if (!libbalsa_mailbox_real_imap_match(mbox,
-						  filters,
-						  TRUE))
-		libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-				     _("IMAP SEARCH command failed for mailbox %s\n"
-				       "or query was incompatible with IMAP"
-				       " (perhaps you use regular expressions)\n"
-				       "falling back to default searching method"),
-				     mailbox->url);
-	    /* IMAP specific filtering failed, fallback to default
-	       filtering function*/
-	    libbalsa_mailbox_run_filters_on_reception(mailbox, filters);
-	    libbalsa_filter_apply(filters);
-	}
-	g_slist_free(filters);
-    }
-}
-
 static ImapMboxHandle *
 libbalsa_mailbox_imap_get_handle(LibBalsaMailboxImap *mimap)
 {
@@ -572,7 +526,7 @@ imap_flags_cb(unsigned seqno, LibBalsaMailboxImap *mimap)
 						     LIBBALSA_MESSAGE_FLAG_NEW);
 	    g_list_free_1(list);
 	}
-	LIBBALSA_MAILBOX(mimap)->stamp++;
+	libbalsa_mailbox_invalidate_iters(LIBBALSA_MAILBOX(mimap));
     }
 }
 
@@ -703,7 +657,8 @@ lbm_imap_get_unseen(LibBalsaMailboxImap * mimap)
     g_free(msgs);
 
     LIBBALSA_MAILBOX(mimap)->unread_messages = count;
-    LIBBALSA_MAILBOX(mimap)->has_unread_messages = count > 0;
+    libbalsa_mailbox_set_unread_messages_flag(LIBBALSA_MAILBOX(mimap),
+					      count > 0);
 }
 
 /* libbalsa_mailbox_imap_open:
@@ -741,9 +696,8 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
     }
 
     mailbox->first_unread = imap_mbox_handle_first_unseen(mimap->handle);
-    if (mailbox->first_unread)
-	lbm_imap_get_unseen(mimap);
-    run_filters_on_reception(mimap);
+    libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
+    lbm_imap_get_unseen(mimap);
 
 #ifdef DEBUG
     g_print(_("%s: Opening %s Refcount: %d\n"),
@@ -780,17 +734,6 @@ libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox)
 
     mbox->opened = FALSE;
 
-    if (mbox->matching_messages) {
-	g_hash_table_destroy(mbox->matching_messages);
-	mbox->matching_messages = NULL;
-    }
-#ifdef FIXME
-    if (mbox->condition) {
-	libbalsa_condition_free(mbox->condition);
-	mbox->conditions = NULL;
-	mbox->op = FILTER_NOOP;
-    }
-#endif
     imap_mbox_unselect(mbox->handle);
     free_messages_info(mbox);
     libbalsa_mailbox_imap_release_handle(mbox);
@@ -868,11 +811,10 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 
     if (LIBBALSA_MAILBOX_IMAP(mailbox)->handle) {
 	libbalsa_mailbox_imap_noop(LIBBALSA_MAILBOX_IMAP(mailbox));
+	libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
 	lbm_imap_get_unseen(LIBBALSA_MAILBOX_IMAP(mailbox));
     } else
 	g_warning("mailbox has open_ref>0 but no handle!\n");
-
-    run_filters_on_reception(LIBBALSA_MAILBOX_IMAP(mailbox));
 }
 
 /* Search iters */
@@ -1027,6 +969,10 @@ lbmi_build_imap_query(const LibBalsaCondition* cond,
             cnt++,query = add_or_query
                 (query, neg, imap_search_key_new_flag
                  (neg, IMSGF_FLAGGED));
+	if (cond->match.flags & LIBBALSA_MESSAGE_FLAG_RECENT)
+	    cnt++, query = add_or_query
+		(query, neg, imap_search_key_new_flag
+		 (neg, IMSGF_RECENT));
         if(neg && cnt>1)
             query = imap_search_key_new_not(FALSE, query);
         imap_search_key_set_next(query, next);
@@ -1124,96 +1070,6 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
 			     LIBBALSA_MAILBOX(mbox)->url);
     };
     return cbdata->res;
-}
-
-static void hash_table_to_list_func(gpointer key,
-				    gpointer value,
-				    gpointer data)
-{
-    GList ** list = (GList **)data;
-
-    *list = g_list_prepend(*list, value);
-}
-
-/* Transform a hash_table to a glist, do not preserve order
-   in fact it reverses the order
-*/
-static GList * hash_table_to_list(GHashTable * hash)
-{
-    GList * list = NULL;
-
-    g_hash_table_foreach(hash, hash_table_to_list_func, &list);
-    return list;
-}
-
-gboolean libbalsa_mailbox_real_imap_match(LibBalsaMailboxImap * mbox,
-					  GSList * filter_list,
-					  gboolean only_recent)
-{
-    GSList * lst;
-    LibBalsaFilter * flt;
-    GList * matching;
-
-    /* First check if we can use IMAP specific filtering funcs*/
-    for (lst = filter_list; lst; lst = g_slist_next(lst)) {
-	flt = lst->data;
-	if (!libbalsa_mailbox_imap_can_match(LIBBALSA_MAILBOX(mbox),
-					     flt->condition))
-	    return FALSE;
-    }
-
-    /*
-      For each filter we dowload the matching messages, via the corresponding
-      function from imap mailbox.
-    */
-    for (lst = filter_list;lst;lst = g_slist_next(lst)) {
-	gboolean error;
-	GHashTable * matchings;
-	
-	flt = lst->data;
-	matchings = libbalsa_mailbox_imap_get_matchings(mbox,
-							flt->condition,
-							only_recent,
-							&error);
-	if (error) return FALSE;
-	
-	if (matchings)
-	    flt->matching_messages =
-		hash_table_to_list(matchings);
-    }
-
-    libbalsa_filter_sanitize(filter_list);
-    /* Now ref all matching messages to be sure they are still there
-       when we want to apply the filter actions on them
-    */
-    for (lst = filter_list; lst; lst = g_slist_next(lst)) {
-	flt = lst->data;
-	for (matching = flt->matching_messages; matching;
-	     matching = g_list_next(matching))
-	    g_object_ref(matching->data);
-    }
-    return TRUE;
-}
-
-void libbalsa_mailbox_imap_mbox_match(LibBalsaMailbox * mbox,
-				      GSList * filters_list)
-{
-    g_return_if_fail(mbox != NULL);
-    g_return_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mbox));
-    /* For IMAP mailboxes we first try the special imap match functions
-       if this fails, we fallback to the default function
-     */
-    if (!libbalsa_mailbox_real_imap_match(LIBBALSA_MAILBOX_IMAP(mbox),
-					  filters_list,
-					  FALSE)) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("IMAP SEARCH command failed for mailbox %s\n"),
-			     LIBBALSA_MAILBOX(mbox)->url);	
-#if 0 
-        /* could fall back to standard algorithms but will not */
-	libbalsa_mailbox_real_mbox_match(mbox, filters_list);
-#endif
-    }
 }
 
 /* Returns false if the conditions contain regex matches
@@ -2015,22 +1871,15 @@ libbalsa_mailbox_imap_change_message_flags(LibBalsaMailbox * mailbox,
 }
 
 static gboolean
-lbm_imap_change_msgs_flags(LibBalsaMailbox * mailbox,
-                           GList *messages,
-                           LibBalsaMessageFlag set,
-                           LibBalsaMessageFlag clear)
+lbm_imap_messages_change_flags(LibBalsaMailbox * mailbox,
+			       unsigned msgcnt,
+			       unsigned *seqno,
+			       LibBalsaMessageFlag set,
+			       LibBalsaMessageFlag clear)
 {
-    unsigned msgcnt = g_list_length(messages);
-    unsigned *seqno = g_malloc(msgcnt*sizeof(unsigned));
-    unsigned i = 0;
     ImapMsgFlag flag_set, flag_clr;
     ImapResponse rc1 = IMR_OK, rc2 = IMR_OK;
 
-    while(messages) {
-        LibBalsaMessage * msg = LIBBALSA_MESSAGE(messages->data);
-        seqno[i++] = msg->msgno;
-        messages = g_list_next(messages);
-    }
     qsort(seqno, msgcnt, sizeof(seqno[0]), cmp_msgno);
     transform_flags(set, clear, &flag_set, &flag_clr);
 
@@ -2040,7 +1889,24 @@ lbm_imap_change_msgs_flags(LibBalsaMailbox * mailbox,
     if(flag_clr)
         rc2 = imap_mbox_store_flag(LIBBALSA_MAILBOX_IMAP(mailbox)->handle,
                                    msgcnt, seqno, flag_clr, FALSE);
-    return rc1 == IMR_OK && rc2 == IMR_OK;
+
+    if (rc1 == IMR_OK && rc2 == IMR_OK) {
+	LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
+	unsigned i;
+
+	for (i = 0; i < msgcnt; i++) {
+	    struct message_info *msg_info =
+		message_info_from_msgno(mimap, seqno[i]);
+
+	    if (msg_info->message) {
+		libbalsa_message_set_msg_flags(msg_info->message, set, clear);
+		libbalsa_mailbox_msgno_changed(mailbox, seqno[i]);
+	    }
+	}
+
+	return TRUE;
+    } else
+	return FALSE;
 }
 
 static ImapSortKey
@@ -2181,4 +2047,39 @@ libbalsa_mailbox_imap_total_messages(LibBalsaMailbox * mailbox)
     LibBalsaMailboxImap *mimap = (LibBalsaMailboxImap *) mailbox;
 
     return mimap->messages_info ? mimap->messages_info->len : 0;
+}
+
+/* Copy messages in the list to dest; use server-side copy if mailbox
+ * and dest are on the same server, fall back to parent method
+ * otherwise.
+ */
+static gboolean
+libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
+				    guint msgcnt, guint * msgnos,
+				    LibBalsaMailbox * dest,
+				    LibBalsaMailboxSearchIter *
+				    search_iter)
+{
+    if (mailbox->stamp != search_iter->stamp) {
+	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+			     _("Message filtering  for IMAP mailbox %s"
+			       " failed: mailbox changed"), mailbox->url);
+	return FALSE;
+    }
+
+    if (LIBBALSA_IS_MAILBOX_IMAP(dest) &&
+	LIBBALSA_MAILBOX_REMOTE(dest)->server ==
+	LIBBALSA_MAILBOX_REMOTE(mailbox)->server) {
+	ImapMboxHandle *handle = LIBBALSA_MAILBOX_IMAP(mailbox)->handle;
+	g_return_val_if_fail(handle, FALSE);
+
+	/* User server-side copy. */
+	return imap_mbox_handle_copy(handle, msgcnt, msgnos,
+				     LIBBALSA_MAILBOX_IMAP(dest)->path)
+	    == IMR_OK;
+    }
+
+    /* Couldn't use server-side copy, fall back to default method. */
+    return parent_class->messages_copy(mailbox, msgcnt, msgnos, dest,
+				       search_iter);
 }

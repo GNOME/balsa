@@ -52,10 +52,16 @@ static void libbalsa_mailbox_real_set_unread_messages_flag(LibBalsaMailbox
 							   gboolean flag);
 static void libbalsa_mailbox_real_release_message (LibBalsaMailbox * mailbox,
 						   LibBalsaMessage * message);
-static gboolean libbalsa_mailbox_real_change_msgs_flags(LibBalsaMailbox *mbox,
-                                                      GList *messages,
-                                                      LibBalsaMessageFlag set,
-                                                      LibBalsaMessageFlag clr);
+static gboolean
+libbalsa_mailbox_real_messages_change_flags(LibBalsaMailbox * mailbox,
+					    guint msgcnt, guint *msgnos,
+					    LibBalsaMessageFlag set,
+					    LibBalsaMessageFlag clr);
+static gboolean
+libbalsa_mailbox_real_messages_copy(LibBalsaMailbox * mailbox,
+				    guint msgcnt, guint *msgnos,
+				    LibBalsaMailbox * dest,
+				    LibBalsaMailboxSearchIter * search_iter);
 static void libbalsa_mailbox_real_sort(LibBalsaMailbox* mbox,
                                        GArray *sort_array);
 static gboolean libbalsa_mailbox_real_can_match(LibBalsaMailbox  *mailbox,
@@ -237,13 +243,13 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
     klass->get_message_part = NULL;
     klass->get_message_stream = NULL;
     klass->change_message_flags = NULL;
-    klass->change_msgs_flags    = libbalsa_mailbox_real_change_msgs_flags;
+    klass->messages_change_flags = libbalsa_mailbox_real_messages_change_flags;
+    klass->messages_copy  = libbalsa_mailbox_real_messages_copy;
     klass->set_threading = NULL;
     klass->update_view_filter = NULL;
     klass->sort = libbalsa_mailbox_real_sort;
     klass->check = NULL;
     klass->message_match = NULL;
-    klass->mailbox_match = NULL;
     klass->can_match = libbalsa_mailbox_real_can_match;
     klass->save_config  = libbalsa_mailbox_real_save_config;
     klass->load_config  = libbalsa_mailbox_real_load_config;
@@ -516,20 +522,6 @@ libbalsa_mailbox_message_match(LibBalsaMailbox * mailbox,
 							      search_iter);
 }
 
-/* libbalsa_mailbox_match:
-   Compute the messages matching the filters.
-   Virtual method : it is redefined by IMAP
- */
-void
-libbalsa_mailbox_match(LibBalsaMailbox * mailbox, GSList * filters_list)
-{
-    g_return_if_fail(mailbox != NULL);
-    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
-
-    LIBBALSA_MAILBOX_GET_CLASS(mailbox)->mailbox_match(mailbox,
-						       filters_list);
-}
-
 gboolean libbalsa_mailbox_real_can_match(LibBalsaMailbox  *mailbox,
 					 LibBalsaCondition *condition)
 {
@@ -554,13 +546,25 @@ void
 libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox,
                                           GSList * filters)
 {
-    if (filters)
-	g_warning(" %s accesses list of messages directly, reimplement", __func__);
-#if 0
-    GList * new_messages;
+    GSList *lst;
     gboolean free_filters = FALSE;
+    static LibBalsaCondition cond_recent =
+    {
+	FALSE,
+	CONDITION_FLAG,
+	{
+	    {
+		LIBBALSA_MESSAGE_FLAG_RECENT
+	    }
+	}
+    };
+    static LibBalsaCondition cond_and =
+    {
+	FALSE,
+	CONDITION_AND
+    };
 
-    g_return_if_fail(mailbox!=NULL);
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
     if (!filters) {
 	if (!mailbox->filters)
@@ -571,24 +575,39 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox,
 	free_filters = TRUE;
     }
 
-    /* We apply filter if needed */
-    if (filters) {
-	LOCK_MAILBOX(mailbox);
-	new_messages = libbalsa_extract_new_messages(mailbox->message_list);
-	if (new_messages) {
-	    if (filters_prepare_to_run(filters)) {
-		libbalsa_filter_match(filters, new_messages, TRUE);
-		UNLOCK_MAILBOX(mailbox);
-		libbalsa_filter_apply(filters);
-	    }
-	    else UNLOCK_MAILBOX(mailbox);
-	    g_list_free(new_messages);
-	}
-	else UNLOCK_MAILBOX(mailbox);
+    if (!filters)
+	return;
+    if (!filters_prepare_to_run(filters)) {
 	if (free_filters)
 	    g_slist_free(filters);
+	return;
     }
-#endif
+
+    g_assert(HAVE_MAILBOX_LOCKED(mailbox));
+    for (lst = filters; lst; lst = g_slist_next(lst)) {
+	LibBalsaFilter *filter = lst->data;
+	LibBalsaMailboxSearchIter *search_iter;
+	guint msgno;
+	GArray *msgnos;
+
+	cond_and.match.andor.left  = filter->condition;
+	cond_and.match.andor.right = &cond_recent;
+	search_iter = libbalsa_mailbox_search_iter_new(&cond_and);
+
+	msgnos = g_array_new(FALSE, FALSE, sizeof(guint));
+	for (msgno = libbalsa_mailbox_total_messages(mailbox);
+	     msgno > 0; msgno--)
+	    if (libbalsa_mailbox_message_match(mailbox, msgno, search_iter))
+		g_array_append_val(msgnos, msgno);
+	libbalsa_filter_mailbox_messages(filter, mailbox, msgnos->len,
+					 (guint *) msgnos->data,
+					 search_iter);
+	g_array_free(msgnos, TRUE);
+	libbalsa_mailbox_search_iter_free(search_iter);
+    }
+
+    if (free_filters)
+	g_slist_free(filters);
 }
 
 void
@@ -641,17 +660,56 @@ libbalsa_mailbox_real_release_message(LibBalsaMailbox * mailbox,
    non-transactional interface.
 */
 static gboolean
-libbalsa_mailbox_real_change_msgs_flags(LibBalsaMailbox *mbox,
-                                        GList *messages,
-                                        LibBalsaMessageFlag set,
-                                        LibBalsaMessageFlag clr)
+libbalsa_mailbox_real_messages_change_flags(LibBalsaMailbox * mailbox,
+					    guint msgcnt, guint * msgnos,
+					    LibBalsaMessageFlag set,
+					    LibBalsaMessageFlag clr)
 {
-    while(messages) {
-        LibBalsaMessage * message = LIBBALSA_MESSAGE(messages->data);
-        libbalsa_mailbox_change_message_flags(mbox, message->msgno, set, clr);
-        messages = g_list_next(messages);
+    guint i;
+    GList *list = NULL;
+
+    for (i = 0; i < msgcnt; i++) {
+	guint msgno = msgnos[i];
+	LibBalsaMessage *msg =
+	    libbalsa_mailbox_get_message(mailbox, msgno);
+
+	libbalsa_message_set_msg_flags(msg, set, clr);
+	LIBBALSA_MAILBOX_GET_CLASS(mailbox)->change_message_flags(mailbox,
+								  msgno,
+								  set,
+								  clr);
+	libbalsa_mailbox_msgno_changed(mailbox, msgno);
+	list = g_list_prepend(list, msg);
     }
+
+    libbalsa_mailbox_messages_status_changed(mailbox, list, set | clr);
+    g_list_free(list);
+
     return TRUE;
+}
+
+/* Default method; imap backend replaces with its own method, optimized
+ * for server-side copy, but falls back to this one if it's not a
+ * server-side copy. */
+static gboolean
+libbalsa_mailbox_real_messages_copy(LibBalsaMailbox * mailbox,
+				    guint msgcnt, guint *msgnos,
+				    LibBalsaMailbox * dest, 
+				    LibBalsaMailboxSearchIter * search_iter)
+{
+    GList *messages = NULL;
+    gboolean retval;
+
+    while (msgcnt > 0)
+	messages =
+	    g_list_prepend(messages,
+			   libbalsa_mailbox_get_message(mailbox,
+							msgnos[--msgcnt]));
+
+    retval = libbalsa_messages_copy(messages, dest);
+    g_list_free(messages);
+
+    return retval;
 }
 
 static gint mbox_compare_func(const SortTuple * a,
@@ -1188,7 +1246,8 @@ messages_status_changed_cb(LibBalsaMailbox * mb, GList * messages,
 {
     GList *lst;
 
-    if(!mb->lock) g_warning("messages changed but mailbox not locked!");
+    if(!HAVE_MAILBOX_LOCKED(mb))
+	g_warning("messages changed but mailbox not locked!");
 
     for (lst = messages; lst; lst = lst->next) {
 	LibBalsaMessage *msg = LIBBALSA_MESSAGE(lst->data);
@@ -1388,50 +1447,57 @@ libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox,
     return mime_stream;
 }
 
-void
-libbalsa_mailbox_change_message_flags(LibBalsaMailbox * mailbox,
-				      guint msgno, LibBalsaMessageFlag set,
-				      LibBalsaMessageFlag clear)
-{
-    g_return_if_fail(mailbox != NULL);
-    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
-    g_return_if_fail(msgno > 0);
-
-    LIBBALSA_MAILBOX_GET_CLASS(mailbox)->change_message_flags(mailbox,
-							      msgno, set,
-							      clear);
-    libbalsa_mailbox_msgno_changed(mailbox, msgno);
-}
-
 /* libbalsa_mailbox_change_msgs_flags() changes stored message flags
    and is to be used only internally by libbalsa and it assumes that
-   the mailbox is already locked.  FIXME: pass a list of msgno's
-   instead of messages: we do not need that much information to flip
-   just the message flag (think of "Select All+Toggle Deleted").
-   Returns TRUE on success, FALSE on failure.
+   the mailbox is already locked.  
 */
 gboolean
-libbalsa_mailbox_change_msgs_flags(LibBalsaMailbox * mailbox,
-                                   GList *messages,
-                                   LibBalsaMessageFlag set,
-                                   LibBalsaMessageFlag clear)
+libbalsa_mailbox_messages_change_flags(LibBalsaMailbox * mailbox,
+				       guint msgcnt, guint *msgnos,
+				       LibBalsaMessageFlag set,
+				       LibBalsaMessageFlag clear)
 {
-    gboolean res;
-
     g_return_val_if_fail(mailbox != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
 
-    res = LIBBALSA_MAILBOX_GET_CLASS(mailbox)
-        ->change_msgs_flags(mailbox, messages, set, clear);
+    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->
+	messages_change_flags(mailbox, msgcnt, msgnos, set, clear);
+}
 
-    while(messages) {
-        LibBalsaMessage *msg = LIBBALSA_MESSAGE(messages->data);
-        msg->flags |= set;
-        msg->flags &= ~clear;
-        libbalsa_mailbox_msgno_changed(mailbox, msg->msgno);
-        messages = g_list_next(messages);
-    }
-    return res;
+/* Copy messages with msgnos in the list from mailbox to dest;
+ * mailbox MUST BE LOCKED before calling. */
+gboolean
+libbalsa_mailbox_messages_copy(LibBalsaMailbox * mailbox,
+			       guint msgcnt, guint * msgnos,
+			       LibBalsaMailbox * dest,
+			       LibBalsaMailboxSearchIter * search_iter)
+{
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+    g_assert(HAVE_MAILBOX_LOCKED(mailbox));
+    g_assert(msgcnt > 0);
+
+    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->messages_copy(mailbox,
+							      msgcnt,
+							      msgnos,
+							      dest,
+							      search_iter);
+}
+
+/* Move messages with msgnos in the list from mailbox to dest;
+ * mailbox MUST BE LOCKED before calling. */
+gboolean
+libbalsa_mailbox_messages_move(LibBalsaMailbox * mailbox,
+			       guint msgcnt, guint * msgnos,
+			       LibBalsaMailbox * dest,
+			       LibBalsaMailboxSearchIter * search_iter)
+{
+    if (libbalsa_mailbox_messages_copy(mailbox, msgcnt, msgnos, dest,
+				       search_iter))
+	return libbalsa_mailbox_messages_change_flags(mailbox,
+		msgcnt, msgnos, LIBBALSA_MESSAGE_FLAG_DELETED,
+		(LibBalsaMessageFlag) 0);
+    else
+	return FALSE;
 }
 
 /*
@@ -1465,6 +1531,7 @@ lbm_set_threading(LibBalsaMailbox * mailbox,
     gboolean unlock;
 
     g_return_if_fail(MAILBOX_OPEN(mailbox)); /* or perhaps it's legal? */
+    g_assert(HAVE_MAILBOX_LOCKED(mailbox));
     unlock = lbm_threads_enter();
 
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->set_threading(mailbox,
@@ -2733,4 +2800,18 @@ libbalsa_mailbox_try_reassemble(LibBalsaMailbox * mailbox,
 
     g_ptr_array_free(partials, TRUE);
     g_list_free(messages);
+}
+
+/* Increment the mailbox stamp; get the gdk lock first, to avoid
+ * invalidating iters in the middle of an event. */
+void
+libbalsa_mailbox_invalidate_iters(LibBalsaMailbox * mailbox)
+{
+    gboolean unlock;
+
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+
+    unlock = lbm_threads_enter();
+    mailbox->stamp++;
+    lbm_threads_leave(unlock);
 }

@@ -532,7 +532,7 @@ imap_mbox_find_unseen(ImapMboxHandle * h,
 		      unsigned       * msgcnt,
 		      unsigned      ** msgs)
 {
-  return imap_mbox_find_helper(h, "SEARCH UNSEEN", msgcnt, msgs);
+  return imap_mbox_find_helper(h, "SEARCH UNSEEN UNDELETED", msgcnt, msgs);
 }
 
 /* 6.4.5 FETCH Command */

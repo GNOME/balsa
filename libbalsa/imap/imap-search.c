@@ -177,6 +177,7 @@ imap_write_key_flag(ImapMboxHandle *handle, unsigned negated,
   case IMSGF_FLAGGED:  s = "flagged";  break;
   case IMSGF_DELETED:  s = "deleted";  break;
   case IMSGF_DRAFT:    s = "draft";    break;
+  case IMSGF_RECENT:   s = "recent";   break;
   }
   sio_write(handle->sio, s, strlen(s));
 }

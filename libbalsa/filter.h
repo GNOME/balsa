@@ -236,35 +236,16 @@ gboolean libbalsa_condition_matches(LibBalsaCondition* cond,
 
 gint filters_prepare_to_run(GSList * filters);
 
-/* libbalsa_filter_match run all filters on the list of messages
-   each filter is stuffed with the list of its matching messages
-   you must call libbalsa_filter_apply after to make the filters
-   act on their matching messages (this split is needed for proper
-   locking)
- */
-
-void libbalsa_filter_match(GSList * filter_list, GList * messages,
-			   gboolean mbox_locked);
-
-/* Sanitize the matching messages of a filters list, ie if a
-   message matches several filters, only keep the first match
-   Essentially used by IMAP code
- */
-void libbalsa_filter_sanitize(GSList * filter_list);
-
-/* libbalsa_filter_apply will let all filters to apply on their
- * matching messages (you must call libbalsa_filters_match before)
+/* Apply the filter action to the list of messages.
  * It returns TRUE if the trash bin has been filled with something
  * this is used to call enable_empty_trash after
  */
 
-gboolean libbalsa_filter_apply(GSList * filter_list);
-
-/* libalsa_extract_new_messages : returns a sublist of the messages
-   list containing all "new" messages, ie just retrieved mails
-*/
-
-GList * libbalsa_extract_new_messages(GList * messages);
+gboolean libbalsa_filter_mailbox_messages(LibBalsaFilter * filt,
+					  LibBalsaMailbox * mailbox,
+					  guint msgcnt, guint * msgnos,
+					  LibBalsaMailboxSearchIter *
+					  search_iter);
 
 /*
  * libbalsa_filter_get_by_name()

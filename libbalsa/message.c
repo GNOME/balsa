@@ -625,32 +625,37 @@ libbalsa_message_set_attach_icons(LibBalsaMessage * message)
 	message->attach_icon = LIBBALSA_MESSAGE_ATTACH_ICONS_NUM;
 }
 
-static void
-libbalsa_message_set_flag(LibBalsaMessage * message, LibBalsaMessageFlag set, LibBalsaMessageFlag clear)
+/* Helper for mailbox drivers. */
+void
+libbalsa_message_set_msg_flags(LibBalsaMessage * message,
+			       LibBalsaMessageFlag set,
+			       LibBalsaMessageFlag clear)
 {
     message->flags |= set;
     message->flags &= ~clear;
     libbalsa_message_set_status_icons(message);
-    libbalsa_mailbox_change_message_flags(message->mailbox, message->msgno,
-					  set, clear);
+}
+
+/* Tell the mailbox driver to change flags. */
+static void
+libbalsa_message_set_flag(LibBalsaMessage * message,
+			  LibBalsaMessageFlag set,
+			  LibBalsaMessageFlag clear)
+{
+    guint msgno = message->msgno;
+    libbalsa_mailbox_messages_change_flags(message->mailbox, 1, &msgno,
+					   set, clear);
 }
 
 void
 libbalsa_message_reply(LibBalsaMessage * message)
 {
-    GList * messages;
-
     g_return_if_fail(message->mailbox);
     LOCK_MAILBOX(message->mailbox);
     RETURN_IF_MAILBOX_CLOSED(message->mailbox);
 
     libbalsa_message_set_flag(message, LIBBALSA_MESSAGE_FLAG_REPLIED, 0);
-
-    messages = g_list_prepend(NULL, message);
-    libbalsa_mailbox_messages_status_changed(message->mailbox, messages,
-					     LIBBALSA_MESSAGE_FLAG_REPLIED);
     UNLOCK_MAILBOX(message->mailbox);
-    g_list_free(messages);
 }
 
 /* Assume all messages come from the same mailbox */
@@ -660,52 +665,47 @@ libbalsa_messages_change_flag(GList * messages,
                               gboolean set)
 {
     GList *list;
-    GList * notif_list = NULL;
+    GArray *msgnos;
     LibBalsaMessage * message;
+    LibBalsaMailbox *mbox;
+    
+    if (!messages)
+	return;
+    mbox = LIBBALSA_MESSAGE(messages->data)->mailbox;
 
     /* Construct the list of messages that actually change state */
+    msgnos = g_array_new(FALSE, FALSE, sizeof(guint));
     for (list = messages; list; list = list->next) {
 	message = LIBBALSA_MESSAGE(list->data);
  	if ( (set && !(message->flags & flag)) ||
              (!set && (message->flags & flag)) )
-	    notif_list = g_list_prepend(notif_list, message);
+	    g_array_append_val(msgnos, message->msgno);
     }
     
-    if (notif_list) {
-	LibBalsaMailbox * mbox = LIBBALSA_MESSAGE(notif_list->data)->mailbox;
-	GList * lst = notif_list;
-
+    if (msgnos->len > 0) {
 	LOCK_MAILBOX(mbox);
-	RETURN_IF_MAILBOX_CLOSED(mbox);
+	/* RETURN_IF_MAILBOX_CLOSED(mbox); */
         /* set flags for entire set in one transaction */
         if(set)
-            libbalsa_mailbox_change_msgs_flags(mbox, lst, flag, 0);
+            libbalsa_mailbox_messages_change_flags(mbox, msgnos->len,
+						   (guint *) msgnos->data,
+						   flag, 0);
         else
-            libbalsa_mailbox_change_msgs_flags(mbox, lst, 0, flag);
-	/* Emission of notification to the owning mailbox */
-	libbalsa_mailbox_messages_status_changed(mbox, notif_list,
-						 flag);
+            libbalsa_mailbox_messages_change_flags(mbox, msgnos->len,
+						   (guint *) msgnos->data,
+						   0, flag);
 	UNLOCK_MAILBOX(mbox);
-	g_list_free(notif_list);
     }
+    g_array_free(msgnos, TRUE);
 }
 
 void
 libbalsa_message_clear_recent(LibBalsaMessage * message)
 {
-    GList * messages;
-
     g_return_if_fail(message->mailbox);
     RETURN_IF_MAILBOX_CLOSED(message->mailbox);
 
     libbalsa_message_set_flag(message, 0, LIBBALSA_MESSAGE_FLAG_RECENT);
-
-    messages = g_list_prepend(NULL, message);
-    libbalsa_mailbox_messages_status_changed(message->mailbox, messages,
-	    /*FIXME: should this flag be LIBBALSA_MESSAGE_FLAG_RECENT?
-	     * If not, we need to document why not! */
-					     LIBBALSA_MESSAGE_FLAG_REPLIED);
-    g_list_free_1(messages);
 }
 
 #ifdef DEBUG

@@ -87,20 +87,50 @@ run_filters_on_mailbox(GtkTreeView * filter_list, LibBalsaMailbox * mbox)
 {
     GSList *filters = build_selected_filters_list(filter_list, TRUE);
     GSList *lst;
+    guint sent_to_trash;
 
-    if (!filters) return TRUE;
-    if (!filters_prepare_to_run(filters))
+    if (!filters)
+	return TRUE;
+    if (!filters_prepare_to_run(filters)) {
+	g_slist_free(filters);
 	return FALSE;
-    libbalsa_mailbox_match(mbox, filters);
-    for (lst=filters;lst;lst = g_slist_next(lst))
-	if (((LibBalsaFilter*) lst->data)->matching_messages)
-	    break;
-    
-    if (lst) {
-	if (libbalsa_filter_apply(filters))
-	    enable_empty_trash(TRASH_FULL);
+    }
+
+    sent_to_trash = 0;
+    for (lst = filters; lst; lst = g_slist_next(lst)) {
+	LibBalsaFilter *filter = lst->data;
+	LibBalsaMailboxSearchIter *search_iter =
+	    libbalsa_mailbox_search_iter_new(filter->condition);
+	guint msgno;
+	GArray *messages;
+
+	/* Build a list of matching messages;
+	 * - to use the existing search_iter methods, we go repeatedly
+	 *   to the mailbox;
+	 * - for the local mailboxes, that may be reasonable;
+	 * - for imap, it can surely be improved--the backend caches the
+	 * search results (in the search-iter), so we don't go
+	 * repeatedly to the server, but each test is a hash-table
+	 * lookup; the question is how to design an api that handles
+	 * cleanly both this search and mailbox searching.
+	 */
+	messages = g_array_new(FALSE, FALSE, sizeof(guint));
+	for (msgno = 1; msgno <= libbalsa_mailbox_total_messages(mbox);
+	     msgno++)
+	    if (libbalsa_mailbox_message_match(mbox, msgno, search_iter))
+		g_array_append_val(messages, msgno);
+	sent_to_trash +=
+	    libbalsa_filter_mailbox_messages(filter, mbox, messages->len,
+					     (guint *) messages->data,
+					     search_iter);
+	g_array_free(messages, TRUE);
+	libbalsa_mailbox_search_iter_free(search_iter);
     }
     g_slist_free(filters);
+
+    if (sent_to_trash)
+	enable_empty_trash(TRASH_FULL);
+
     return TRUE;
 }
 

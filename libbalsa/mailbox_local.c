@@ -58,9 +58,6 @@ static gboolean libbalsa_mailbox_local_message_match(LibBalsaMailbox *
 						     LibBalsaMailboxSearchIter
 						     * iter);
 
-static void libbalsa_mailbox_local_real_mbox_match(LibBalsaMailbox *mbox,
-                                                   GSList * filter_list);
-
 static void libbalsa_mailbox_local_set_threading(LibBalsaMailbox *mailbox,
 						 LibBalsaMailboxThreadingType
 						 thread_type);
@@ -138,8 +135,6 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
 
     libbalsa_mailbox_class->message_match = 
         libbalsa_mailbox_local_message_match;
-    libbalsa_mailbox_class->mailbox_match = 
-        libbalsa_mailbox_local_real_mbox_match;
     libbalsa_mailbox_class->set_threading =
 	libbalsa_mailbox_local_set_threading;
     libbalsa_mailbox_class->update_view_filter =
@@ -324,27 +319,6 @@ libbalsa_mailbox_local_message_match(LibBalsaMailbox * mailbox,
 	libbalsa_mailbox_get_message(mailbox, msgno);
 
     return libbalsa_condition_matches(iter->condition, message, TRUE);
-}
-
-static void
-libbalsa_mailbox_local_real_mbox_match(LibBalsaMailbox * mbox,
-				       GSList * filter_list)
-{
-    guint msgno;
-    GList *msg_list = NULL;
-
-    g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mbox));
-    LOCK_MAILBOX(mbox);
-
-    for (msgno = libbalsa_mailbox_total_messages(mbox); msgno > 0; msgno--)
-	msg_list =
-	    g_list_prepend(msg_list,
-			   libbalsa_mailbox_get_message(mbox, msgno));
-
-    libbalsa_filter_match(filter_list, msg_list, TRUE);
-    g_list_free(msg_list);
-
-    UNLOCK_MAILBOX(mbox);
 }
 
 /* libbalsa_mailbox_link_message:

@@ -355,174 +355,78 @@ filters_prepare_to_run(GSList * filters)
     return ok;
 }
 
-/*
- * Run all filters until one matches (so order of filter is important)
- * filters must be valid and compiled (ie filters_prepare_to_run have been called before)
- * In general you'll call this function with mailbox lock held (ie you locked the mailbox
- * you're filtering before calling this function)
- */
-
-void
-libbalsa_filter_match(GSList * filter_list, GList * messages,
-		      gboolean mbox_locked)
-{
-    gint match;
-    GSList * lst;
-    LibBalsaFilter * filt=NULL;
-
-    if (!filter_list || ! messages) return;
-
-    for (;messages;messages=g_list_next(messages)) {
-
-	match=0;
-	for (lst=filter_list;!match &&  lst;lst=g_slist_next(lst)) {
-	    filt=(LibBalsaFilter*)lst->data;
-	    match = 
-		libbalsa_condition_matches(filt->condition,
-					   LIBBALSA_MESSAGE(messages->data),
-					   mbox_locked);
-	}
-	if (match && !g_list_find(filt->matching_messages, messages->data)) {
-	    /* We hold a reference on the matching messages, to be sure they 
-	       are still there when we do actions of filter */
-	    g_object_ref(messages->data);
-	    filt->matching_messages = 
-		g_list_prepend(filt->matching_messages,
-			       LIBBALSA_MESSAGE(messages->data));
-	}
-    }
-}
-
-void libbalsa_filter_sanitize(GSList * filter_list)
-{
-    GSList * lst,* lst2;
-    GList * matching;
-    LibBalsaFilter * flt,* flt2;
-
-    /* Now we traverse all matching messages so that we only keep the first
-       match : ie if a message matches several filters, it is kept only by
-       the first one as a matching message.
-    */
-    for (lst = g_slist_next(filter_list); lst; lst = g_slist_next(lst)) {
-	flt = lst->data;
-	for (matching = flt->matching_messages; matching;) {
-	    for (lst2 = filter_list; lst2 != lst; lst2 = g_slist_next(lst2)) {
-		flt2 = lst2->data;
-		/* We found that this message matches a previous filter, get
-		   rid of it and stop the search */
-		if (g_list_find(flt2->matching_messages, matching->data)) {
-		    /* Don't forget to pass to the next message before deleting
-		       the current one */
-		    GList * tmp = g_list_next(matching);
-
-		    flt->matching_messages = 
-			g_list_delete_link(flt->matching_messages, matching);
-		    matching = tmp;
-		    break;
-		}
-	    }
-	    /* Pass to the next message only if the current one has not been
-	       found, else matching has already been made pointing to the next
-	       message */
-	    if (lst2==lst)
-		matching = g_list_next(matching);
-	}
-    }
-}
-
-/* Apply all filters on their matching messages (call
- * libbalsa_filter_match before) returns TRUE if the trash bin has
- * been filled FIXME: Should position filter_errno on errors (bad
- * command action,bad destination mailbox...)
- */
-
+/* Apply the filter's action to the messages in the list; returns TRUE
+ * if message(s) were moved to the trash. */
 gboolean
-libbalsa_filter_apply(GSList * filter_list)
+libbalsa_filter_mailbox_messages(LibBalsaFilter * filt,
+				 LibBalsaMailbox * mailbox,
+				 guint msgcnt, guint *msgnos,
+				 LibBalsaMailboxSearchIter * search_iter)
 {
-    GSList * lst;
-    GList * lst_messages;
-    LibBalsaFilter * filt=NULL;
     gboolean result=FALSE;
     LibBalsaMailbox *mbox;
 
-    g_return_val_if_fail(url_to_mailbox_mapper, FALSE);
-    if (!filter_list) return FALSE;
-    for (lst=filter_list;lst;lst=g_slist_next(lst)) {
-	filt=(LibBalsaFilter*)lst->data;
-	if (!filt->matching_messages) continue;
-        if (filt->sound)
-	    gnome_sound_play(filt->sound);
-        if (filt->popup_text)
-	    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
-				 filt->popup_text);
-        switch (filt->action) {
-        case FILTER_COPY:
-            mbox = url_to_mailbox_mapper(filt->action_string);
-            if (!mbox)
-                libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-                                     _("Bad mailbox name for filter: %s"),
-                                     filt->name);
-            else if (!libbalsa_messages_copy(filt->matching_messages,mbox))
-                libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-                                     _("Error when copying messages"));
-            else if (mbox==filters_trash_mbox) result=TRUE;
-            break;
-        case FILTER_TRASH:
-            if (!filters_trash_mbox || 
-                !libbalsa_messages_move(filt->matching_messages,
-                                        filters_trash_mbox))
-                libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-                                     _("Error when trashing messages"));
-            else result=TRUE;
-            break;
-        case FILTER_MOVE:
-            mbox = url_to_mailbox_mapper(filt->action_string);
-            if (!mbox)
-                libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-                                     _("Bad mailbox name for filter: %s"),
-                                     filt->name);
-            else if (!libbalsa_messages_move(filt->matching_messages,mbox))
-                libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-                                     _("Error when moving messages"));
-            else if (mbox==filters_trash_mbox) result=TRUE;
-            break;
-        case FILTER_PRINT:
-            /* FIXME : to be implemented */
-            break;
-        case FILTER_RUN:
-            /* FIXME : to be implemented */
-            break;
-        case FILTER_NOTHING:
-            /* Nothing to do */
-            break;
-        }
-        /* We unref all messages */
-        for (lst_messages=filt->matching_messages; lst_messages;
-             lst_messages=g_list_next(lst_messages))
-            g_object_unref(lst_messages->data);
-        g_list_free(filt->matching_messages);
-        filt->matching_messages=NULL;
+    if (msgcnt == 0)
+	return FALSE;
+
+    if (filt->sound)
+	gnome_sound_play(filt->sound);
+    if (filt->popup_text)
+	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+			     filt->popup_text);
+
+    LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
+
+    switch (filt->action) {
+    case FILTER_COPY:
+	mbox = url_to_mailbox_mapper(filt->action_string);
+	if (!mbox)
+	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+				 _("Bad mailbox name for filter: %s"),
+				 filt->name);
+	else if (!libbalsa_mailbox_messages_copy(mailbox, msgcnt, msgnos,
+						 mbox, search_iter))
+	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+				 _("Error when copying messages"));
+	else if (mbox == filters_trash_mbox)
+	    result = TRUE;
+	break;
+    case FILTER_TRASH:
+	if (!filters_trash_mbox ||
+	    !libbalsa_mailbox_messages_move(mailbox, msgcnt, msgnos,
+					    filters_trash_mbox, search_iter))
+	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+				 _("Error when trashing messages"));
+	else
+	    result = TRUE;
+	break;
+    case FILTER_MOVE:
+	mbox = url_to_mailbox_mapper(filt->action_string);
+	if (!mbox)
+	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+				 _("Bad mailbox name for filter: %s"),
+				 filt->name);
+	else if (!libbalsa_mailbox_messages_move(mailbox, msgcnt, msgnos,
+						 mbox, search_iter))
+	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+				 _("Error when moving messages"));
+	else if (mbox == filters_trash_mbox)
+	    result = TRUE;
+	break;
+    case FILTER_PRINT:
+	/* FIXME : to be implemented */
+	break;
+    case FILTER_RUN:
+	/* FIXME : to be implemented */
+	break;
+    case FILTER_NOTHING:
+	/* Nothing to do */
+	break;
     }
+
+    UNLOCK_MAILBOX(mailbox);
+
     return result;
-}
-
-/* libbalsa_extract_new_messages : returns a sublist of the messages
-   list containing all "new" messages, ie just retrieved mails
-*/
-
-GList * libbalsa_extract_new_messages(GList * messages)
-{
-    GList * extracted=NULL;
-
-    for (;messages;messages=g_list_next(messages)) {
-	LibBalsaMessage * message = LIBBALSA_MESSAGE(messages->data);
-
-	if (!LIBBALSA_MESSAGE_IS_RECENT(message)) {
-	    extracted = g_list_prepend(extracted, message);
-	    libbalsa_message_clear_recent(message);
-	}
-    }
-    return extracted;
 }
 
 /*--------- End of Filtering functions -------------------------------*/
@@ -558,7 +462,9 @@ libbalsa_condition_can_match(LibBalsaCondition * cond,
     switch (cond->type) {
     case CONDITION_STRING:
 	return !(CONDITION_CHKMATCH(cond, CONDITION_MATCH_BODY)
-		 && message->body_list == NULL);
+		 && message->body_list == NULL)
+	    && !(CONDITION_CHKMATCH(cond, CONDITION_MATCH_US_HEAD)
+		 && message->mime_msg == NULL);
     case CONDITION_AND:
     case CONDITION_OR:
 	return libbalsa_condition_can_match(cond->match.andor.left,

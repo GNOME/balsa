@@ -2541,6 +2541,8 @@ notebook_drag_received_cb (GtkWidget* widget, GdkDragContext* context,
  * 
  * This function is called at a preset interval to cause the progress
  * bar to move in activity mode.  
+ * this routine is called from g_timeout_dispatch() and needs to take care 
+ * of GDK locking itself using gdk_threads_{enter,leave}
  **/
 gint
 balsa_window_progress_timeout(gpointer user_data) 
@@ -2548,7 +2550,7 @@ balsa_window_progress_timeout(gpointer user_data)
     gfloat new_val;
     GtkAdjustment* adj;
     
-    
+    gdk_threads_enter();
     /* calculate the new value of the progressbar */
     new_val = gtk_progress_get_value(GTK_PROGRESS(user_data)) + 1;
     adj = GTK_PROGRESS(user_data)->adjustment;
@@ -2556,6 +2558,7 @@ balsa_window_progress_timeout(gpointer user_data)
         new_val = adj->lower;
     }
     gtk_progress_set_value(GTK_PROGRESS(user_data), new_val);
+    gdk_threads_leave();
 
     /* return true so it continues to be called */
     return TRUE;

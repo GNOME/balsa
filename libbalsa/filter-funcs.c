@@ -119,9 +119,21 @@ libbalsa_condition_new_string(gboolean negated, unsigned headers,
     cond->match.string.user_header = user_header;
     return cond;
 }
+LibBalsaCondition*
+libbalsa_condition_new_date(gboolean negated, time_t *from, time_t *to)
+{
+    LibBalsaCondition *cond;
+    cond = g_new(LibBalsaCondition,1);
+    cond->negate = negated;
+    cond->type = CONDITION_STRING;
+    cond->type = CONDITION_DATE;
+    cond->match.date.date_low  = from ? *from : 0;
+    cond->match.date.date_high = to   ? *to   : 0;
+    return cond;
+}
 
 static LibBalsaCondition*
-libbalsa_condition_new_date(gboolean negated, gchar **string)
+libbalsa_condition_new_date_parse(gboolean negated, gchar **string)
 {
     LibBalsaCondition *cond;
     gchar *hi, *lo = get_quoted_string(string);
@@ -245,7 +257,7 @@ libbalsa_condition_new_from_string(gchar **string)
         LibBalsaCondition *(*parser)(gboolean negate, gchar **str);
     } cond_types[] = {
         { "STRING ", 7, libbalsa_condition_new_string_parse },
-        { "DATE ",   5, libbalsa_condition_new_date   },
+        { "DATE ",   5, libbalsa_condition_new_date_parse   },
         { "FLAG ",   5, libbalsa_condition_new_flag   },
         { "AND ",    4, libbalsa_condition_new_and    },
         { "OR ",     3, libbalsa_condition_new_or     }

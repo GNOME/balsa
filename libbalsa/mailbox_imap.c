@@ -873,7 +873,7 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 
 /* Search iters */
 
-static ImapSearchKey *lbmi_build_imap_query(LibBalsaCondition * cond,
+static ImapSearchKey *lbmi_build_imap_query(const LibBalsaCondition * cond,
 					    ImapSearchKey * last);
 static gboolean
 libbalsa_mailbox_imap_message_match(LibBalsaMailbox* mailbox, guint msgno,
@@ -923,98 +923,120 @@ libbalsa_mailbox_imap_search_iter_free(LibBalsaMailboxSearchIter * iter)
     /* iter->condition and iter are freed in the LibBalsaMailbox method. */
 }
 
+/* add_or_query() adds a new term to an set of eqs. that can be or-ed.
+   There are at least two ways to do it:
+   a). transform a and b to NOT (NOT a NOT b)
+   b). transform a and b to OR a b
+   We keep it simple.
+*/
 static ImapSearchKey*
-lbmi_build_imap_query(LibBalsaCondition* cond, ImapSearchKey *last)
+add_or_query(ImapSearchKey *or_query, gboolean neg, ImapSearchKey *new_term)
 {
+    if(!or_query) return new_term;
+    if(neg) {
+        imap_search_key_set_next(new_term, or_query);
+        return new_term;
+    } else return imap_search_key_new_or(FALSE, new_term, or_query);
+}
+
+static ImapSearchKey*
+lbmi_build_imap_query(const LibBalsaCondition* cond,
+                      ImapSearchKey *next)
+{
+    gboolean neg;
     ImapSearchKey *query = NULL;
+    int cnt=0;
 
     if(!cond) return NULL;
-
+    neg = cond->negate;
     switch (cond->type) {
     case CONDITION_STRING:
         if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_TO))
-            query = imap_search_key_new_string
-                (cond->negate, IMSE_S_TO, cond->match.string.string, last);
+            cnt++,query = add_or_query
+                (query, neg, imap_search_key_new_string
+                 (neg, IMSE_S_TO, cond->match.string.string, NULL));
         if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_FROM))
-            query = imap_search_key_new_string
-                (cond->negate, IMSE_S_FROM, cond->match.string.string, last);
+            cnt++,query = add_or_query
+                (query, neg, imap_search_key_new_string
+                 (neg, IMSE_S_FROM, cond->match.string.string, NULL));
         if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_SUBJECT))
-            query = imap_search_key_new_string
-                (cond->negate, IMSE_S_SUBJECT,cond->match.string.string,last);
+            cnt++,query = add_or_query
+                (query, neg, imap_search_key_new_string
+                (neg, IMSE_S_SUBJECT,cond->match.string.string, NULL));
         if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_CC))
-            query = imap_search_key_new_string
-                (cond->negate, IMSE_S_CC, cond->match.string.string, last);
+            cnt++,query = add_or_query
+                (query, neg, imap_search_key_new_string
+                 (neg, IMSE_S_CC, cond->match.string.string, NULL));
         if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY))
-            query = imap_search_key_new_string
-                (cond->negate, IMSE_S_BODY, cond->match.string.string, last);
-#if 0
-        if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_US_HEAD)) {
-            gchar * tmp = g_strdup_printf("HEADER %s", cond->user_header);
-            extend_query(buffer, tmp, cond->match.string.string, last);
-            g_free(tmp);
-        }
-#endif
+            cnt++,query = add_or_query
+                (query, neg, imap_search_key_new_string
+                 (neg, IMSE_S_BODY, cond->match.string.string, NULL));
+        if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_US_HEAD))
+            cnt++,query = add_or_query
+                (query, neg, imap_search_key_new_string
+                 (neg, IMSE_S_HEADER, cond->match.string.string,
+                  cond->match.string.user_header));
+        if(neg && cnt>1)
+            query = imap_search_key_new_not(FALSE, query);
+        imap_search_key_set_next(query, next);
         break;
-    case CONDITION_DATE:
-#if 0
-        str = NULL;
-        if (cond->match.date.date_low) {
-            date = localtime(&cond->match.date.date_low);
-            strftime(str_date, sizeof(str_date), "%Y-%m-%d", date);
-            str = g_strdup_printf("SENTSINCE %s",str_date);
-        }
+    case CONDITION_DATE: {
+        ImapSearchKey *slo = NULL, *shi = NULL;
+        if (cond->match.date.date_low)
+            query  = slo = imap_search_key_new_date
+                (IMSE_D_SINCE, FALSE, cond->match.date.date_low);
         if (cond->match.date.date_high) {
-            if (str) {
-                g_string_append_c(buffer, '(');
-                g_string_append(buffer, str);
-                g_string_append_c(buffer, ' ');
-                g_free(str);
-            }
-            date = localtime(&cond->match.date.date_high);
-            strftime(str_date, sizeof(str_date), "%Y-%m-%d", date);
-            str = g_strdup_printf("SENTBEFORE %s", str_date);
+            shi = imap_search_key_new_date
+                (IMSE_D_BEFORE, FALSE, cond->match.date.date_high);
+            imap_search_key_set_next(query, shi);
         }
-        /* If no date has been put continue (this is not allowed normally
-           but who knows */
-        if (str) {
-            if(cond->negate)
-                extend_query(buffer, "NOT");
-            g_string_append(buffer, str);
-            g_free(str);
-            if (buffer->str[0]=='(')
-                g_string_append_c(buffer, ')');
-            g_string_prepend(buffer, "NOT ");
-        }
-#endif
+        /* this might be redundant if only one limit was specified. */
+        if(query)
+            query = imap_search_key_new_not(neg, query);
         break;
+    }
     case CONDITION_FLAG:
         if (cond->match.flags & LIBBALSA_MESSAGE_FLAG_REPLIED)
-            query = imap_search_key_new_flag
-                (cond->negate, IMSGF_ANSWERED, last);
+            cnt++,query = add_or_query
+                (query, neg, imap_search_key_new_flag
+                 (neg, IMSGF_ANSWERED));
         if (cond->match.flags & LIBBALSA_MESSAGE_FLAG_NEW)
-            query = imap_search_key_new_flag
-                (!cond->negate, IMSGF_SEEN, last);
+            cnt++,query = add_or_query
+                (query, neg, imap_search_key_new_flag
+                 (!neg, IMSGF_SEEN));
         if (cond->match.flags & LIBBALSA_MESSAGE_FLAG_DELETED)
-            query = imap_search_key_new_flag
-                (cond->negate, IMSGF_DELETED, last);
+            cnt++,query = add_or_query
+                (query, neg, imap_search_key_new_flag
+                 (neg, IMSGF_DELETED));
         if (cond->match.flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)
-            query = imap_search_key_new_flag
-                (cond->negate, IMSGF_FLAGGED, last);
+            cnt++,query = add_or_query
+                (query, neg, imap_search_key_new_flag
+                 (neg, IMSGF_FLAGGED));
+        if(neg && cnt>1)
+            query = imap_search_key_new_not(FALSE, query);
+        imap_search_key_set_next(query, next);
         break;
     case CONDITION_AND:
-        query = 
-            lbmi_build_imap_query
-            (cond->match.andor.left,
-             lbmi_build_imap_query
-             (cond->match.andor.right, last));
+        if(neg) {
+            query = imap_search_key_new_not
+                (TRUE, lbmi_build_imap_query
+                 (cond->match.andor.left,
+                  lbmi_build_imap_query
+                  (cond->match.andor.right, NULL)));
+            imap_search_key_set_next(query, next);
+        } else
+            query = lbmi_build_imap_query
+                (cond->match.andor.left,
+                 lbmi_build_imap_query
+                 (cond->match.andor.right, next));
         break;
     case CONDITION_OR: 
         query = 
             imap_search_key_new_or
-            (cond->negate,
+            (neg,
              lbmi_build_imap_query(cond->match.andor.left, NULL),
-             lbmi_build_imap_query(cond->match.andor.right, NULL),
-             last);
+             lbmi_build_imap_query(cond->match.andor.right, NULL));
+            imap_search_key_set_next(query, next);
         break;
     case CONDITION_NONE:
     case CONDITION_REGEX:

@@ -1,3 +1,16 @@
+2004-02-28  Pawel Salek
+
+	* libbalsa/filter-funcs.c: implement libbalsa_condition_new_date()
+	* libbalsa/filter.h: add proper prototype.
+	* libbalsa/mailbox_imap.c: fix lbmi_build_imap_query to handle
+	properly multiple fields to be searched for simultaneously.
+	* libbalsa/imap/imap-commands.c: adapt to changes in imap_write_key()
+	* libbalsa/imap/imap-handle.c: move IS_ATOM_CHAR to imap_private.h
+	* libbalsa/imap/imap_private.h: add this macro here.
+	* libbalsa/imap/imap-handle.h: add searching for sizes and dates.
+	* libbalsa/imap/imap-search.c: ditto.
+	* src/main-window.c: extend the test.
+
 2004-02-27 07:06  PeterB
 
 	* src/main-window.c: don't free the condition used by find_real.

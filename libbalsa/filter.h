@@ -114,6 +114,8 @@ LibBalsaCondition* libbalsa_condition_new_string(gboolean negated,
                                                  unsigned headers,
                                                  gchar *str,
                                                  gchar *user_header);
+LibBalsaCondition* libbalsa_condition_new_date(gboolean negated,
+                                               time_t *from, time_t *to);
 LibBalsaCondition* libbalsa_condition_new_bool_ptr(gboolean negated,
                                                    ConditionMatchType cmt,
                                                    LibBalsaCondition *left,

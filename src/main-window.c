@@ -3139,9 +3139,34 @@ show_name_cb(GtkWidget * widget, gpointer data)
     GtkWidget *index = balsa_window_find_current_index(balsa_app.main_window);
     LibBalsaMailbox *mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
     LibBalsaCondition *filter, *name;
+    time_t t1 = time(NULL)-3*30*24*3600;
     filter = balsa_window_get_view_filter(balsa_app.main_window);
-    name = libbalsa_condition_new_string(FALSE,CONDITION_MATCH_BODY,
-                                         "Dreß",NULL);
+    /* (((not body "dreß" and (subject "rfc" or body "rfc") and flagged)
+     * or (from "helgaker" and not subject "huddinge") and 
+     * sent in last three months.
+     * This probably can be moved to a special "debug" menu. */
+    name = libbalsa_condition_new_bool_ptr
+        (FALSE, CONDITION_AND,
+         libbalsa_condition_new_bool_ptr
+        (FALSE, CONDITION_OR,
+         libbalsa_condition_new_bool_ptr
+         (FALSE, CONDITION_AND,
+          libbalsa_condition_new_bool_ptr
+          (TRUE, CONDITION_AND,
+           libbalsa_condition_new_string
+           (TRUE, CONDITION_MATCH_FROM, "Dreß",NULL),
+           libbalsa_condition_new_string
+           (FALSE, CONDITION_MATCH_SUBJECT|CONDITION_MATCH_BODY, "rfc",NULL)),
+          libbalsa_condition_new_flag_enum
+          (FALSE, LIBBALSA_MESSAGE_FLAG_FLAGGED)),
+         libbalsa_condition_new_bool_ptr
+         (FALSE, CONDITION_AND,
+          libbalsa_condition_new_string
+          (FALSE, CONDITION_MATCH_FROM, "helgaker",NULL),
+          libbalsa_condition_new_string
+          (TRUE, CONDITION_MATCH_SUBJECT, "huddinge",NULL))),
+         libbalsa_condition_new_date(FALSE, &t1, NULL));
+
     if(filter)
         filter = libbalsa_condition_new_bool_ptr
             (FALSE, CONDITION_AND, name, filter);

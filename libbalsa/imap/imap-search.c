@@ -1,6 +1,8 @@
 /* (c) Pawel Salek, 2004 */
 
+#define _POSIX_SOURCE 1
 #include <string.h>
+#include <time.h>
 
 #include "siobuf.h"
 #include "imap-handle.h"
@@ -10,9 +12,11 @@ struct ImapSearchKey_ {
   struct ImapSearchKey_ *next; /* message must match all the conditions 
                                 * on the list. */
   enum {
-    IMSE_OR, IMSE_FLAG, IMSE_STRING, IMSE_DATE, IMSE_SIZE
+    IMSE_NOT, IMSE_OR, IMSE_FLAG, IMSE_STRING, IMSE_DATE, IMSE_SIZE
   } type;
   union {
+    /* IMSE_NOT */
+    struct ImapSearchKey_ *not;
     /* IMSE_OR */
     struct { struct ImapSearchKey_ *l, *r; } or;
     /* IMSE_FLAG */
@@ -21,23 +25,33 @@ struct ImapSearchKey_ {
     } flag;
     /* IMSE_STRING */
     struct {
-      char *s;
+      char *s, *usr; /* string and user header if any */
       ImapSearchHeader hdr;
     } string;
     /* IMSE_DATE: FIXME */
-    time_t date;
-    /* IMSE_SIZE: FIXME */
+    struct { time_t dt; unsigned internal_date:1; unsigned range:2; } date;
+    /* IMSE_SIZE */
     size_t size;
   } d;
   unsigned negated:1;
 };
 
 ImapSearchKey*
-imap_search_key_new_or(unsigned negated, ImapSearchKey *a, ImapSearchKey *b,
-                       ImapSearchKey *next)
+imap_search_key_new_not(unsigned negated, ImapSearchKey *list)
 {
   ImapSearchKey *s = g_new(ImapSearchKey,1);
-  s->next = next;
+  s->next = NULL;
+  s->type = IMSE_NOT;
+  s->negated = negated; /* Usually true */
+  s->d.not = list;
+  return s;
+}
+
+ImapSearchKey*
+imap_search_key_new_or(unsigned negated, ImapSearchKey *a, ImapSearchKey *b)
+{
+  ImapSearchKey *s = g_new(ImapSearchKey,1);
+  s->next = NULL;
   s->type = IMSE_OR;
   s->negated = negated;
   s->d.or.l = a;
@@ -46,27 +60,62 @@ imap_search_key_new_or(unsigned negated, ImapSearchKey *a, ImapSearchKey *b,
 }
 
 ImapSearchKey*
-imap_search_key_new_flag(unsigned negated, ImapMsgFlag flg,
-                         ImapSearchKey *next)
+imap_search_key_new_flag(unsigned negated, ImapMsgFlag flg)
 {
   ImapSearchKey *s = g_new(ImapSearchKey,1);
-  s->next = next;
+  s->next = NULL;
   s->type = IMSE_FLAG;
   s->negated = negated;
   s->d.flag.sys_flag = flg;
   return s;
 }
 
+/* imap_search_key_new_string sets the string. It makes sure that
+   the user header - if specified - is sane.
+*/
 ImapSearchKey*
 imap_search_key_new_string(unsigned negated, ImapSearchHeader hdr,
-                           const char *string, ImapSearchKey *next)
+                           const char *string, const char *user_hdr)
 {
   ImapSearchKey *s = g_new(ImapSearchKey,1);
-  s->next = next;
+  int i;
+  s->next = NULL;
   s->type = IMSE_STRING;
   s->negated = negated;
   s->d.string.hdr = hdr;
+  s->d.string.usr = (user_hdr && *user_hdr) ? g_strdup(user_hdr) : NULL;
   s->d.string.s = g_strdup(string);
+  if(s->d.string.usr)
+    for(i=strlen(s->d.string.usr)-1; i>=0; i--)
+      if(!IS_ATOM_CHAR(s->d.string.usr[i])) s->d.string.usr[i] = '_';
+  return s;
+}
+
+ImapSearchKey*
+imap_search_key_new_size_greater(unsigned negated, size_t sz)
+{
+  ImapSearchKey *s = g_new(ImapSearchKey,1);
+  s->next = NULL;
+  s->type = IMSE_SIZE;
+  s->negated = negated;
+  s->d.size = sz;
+  return s;
+}
+
+/* imap_search_key_new_date() creates new term that matches earlier or
+   later dates. It can match both internal date as well as sent
+   date. */
+ImapSearchKey*
+imap_search_key_new_date(ImapSearchDateRange range, int internal, time_t tm)
+{
+  ImapSearchKey *s = g_new(ImapSearchKey,1);
+  s->next = NULL;
+  s->type = IMSE_DATE;
+  s->negated = FALSE; /* this field is ignored for date */
+  s->d.date.dt = tm;
+  s->d.date.internal_date = internal;
+  s->d.date.range = range;
+  printf("%s(): time=%u\n", __FUNCTION__, (unsigned)tm);
   return s;
 }
 
@@ -76,6 +125,9 @@ imap_search_key_free(ImapSearchKey *s)
   while(s) {
     ImapSearchKey *t = s;
     switch(s->type) {
+    case IMSE_NOT:
+      imap_search_key_free(s->d.not);
+      break;
     case IMSE_OR:
       imap_search_key_free(s->d.or.l);
       imap_search_key_free(s->d.or.r);
@@ -90,13 +142,18 @@ imap_search_key_free(ImapSearchKey *s)
   }
 }
 
+void
+imap_search_key_set_next(ImapSearchKey *list, ImapSearchKey *next)
+{
+  if(list->next) g_warning("I may be loosing my tail now!\n");
+  list->next = next;
+}
 static void
 imap_write_key_flag(ImapMboxHandle *handle, unsigned negated, 
                     ImapMsgFlag flag)
 {
   const char *s;
-  if(negated) sio_write(handle->sio, " Un", 3);
-  else sio_write(handle->sio, " ", 1);
+  if(negated) sio_write(handle->sio, "Un", 2);
   switch(flag) {
   default:
   case IMSGF_SEEN:     s = "seen";     break;
@@ -109,13 +166,12 @@ imap_write_key_flag(ImapMboxHandle *handle, unsigned negated,
 }
 
 static ImapResponse
-imap_write_key_string(ImapMboxHandle *handle, unsigned negated,
-                      ImapSearchHeader hdr, const char* str,
+imap_write_key_string(ImapMboxHandle *handle, ImapSearchKey *k,
                       unsigned cmdno, int use_literal)
 {
   const char *s;
-  if(negated) sio_write(handle->sio, " Not", 4);
-  switch(hdr) {
+  if(k->negated) sio_write(handle->sio, "Not ", 4);
+  switch(k->d.string.hdr) {
   case IMSE_S_BCC:     s= "Bcc"; break;
   case IMSE_S_BODY:    s= "Body"; break;
   case IMSE_S_CC:      s= "Cc"; break;
@@ -124,22 +180,29 @@ imap_write_key_string(ImapMboxHandle *handle, unsigned negated,
   case IMSE_S_SUBJECT: s= "Subject"; break;
   case IMSE_S_TEXT:    s= "Text"; break;
   case IMSE_S_TO:      s= "To"; break;
+  case IMSE_S_HEADER:  s= "Header"; break;
   }
-  sio_printf(handle->sio, " %s ", s);
-
+  sio_printf(handle->sio, "%s ", s);
+  if(k->d.string.usr) {
+    /* we checked on structure creation that the header does not contain
+     * spaces or 8-bit characters so we can write it simply... */
+    sio_write(handle->sio, k->d.string.usr, strlen(k->d.string.usr));
+    sio_write(handle->sio, " ", 1);
+  }
   /* Here comes the difficult part: writing the string. If the server
      does not support LITERAL+, we have to either use quoting or use
      synchronizing literals which are somewhat painful. That's the
      life! */
   if(use_literal)
-    sio_printf(handle->sio, "{%u+}\r\n%s", strlen(str), str);
+    sio_printf(handle->sio, "{%u+}\r\n%s",
+               strlen(k->d.string.s), k->d.string.s);
   else { /* No literal+ suppport, do it the old way */
-    for (s = str; *s && (*s & 0x80) == 0; s++)
+    for (s = k->d.string.s; *s && (*s & 0x80) == 0; s++)
       ;
     if(*s & 0x80) { /* use synchronising literals */
       int c;
       ImapResponse rc;
-      unsigned len = strlen(str);
+      unsigned len = strlen(k->d.string.s);
       sio_printf(handle->sio, "{%u}\r\n", len);
       imap_handle_flush(handle);
       do
@@ -153,10 +216,10 @@ imap_write_key_string(ImapMboxHandle *handle, unsigned negated,
       while( (c=sio_getc(handle->sio)) != -1 && c != '\n')
         ;
       if(c == -1) return IMR_SEVERED;
-      sio_write(handle->sio, str, len);
+      sio_write(handle->sio, k->d.string.s, len);
     } else { /* quoting is sufficient */
       sio_write(handle->sio, "\"", 1);
-      for(s=str; *s; s++) {
+      for(s=k->d.string.s; *s; s++) {
         if(*s == '"') sio_write(handle->sio, "\\\"", 2);
         else if(*s == '"') sio_write(handle->sio, "\\\\", 2);
         else sio_write(handle->sio, s, 1);
@@ -166,9 +229,37 @@ imap_write_key_string(ImapMboxHandle *handle, unsigned negated,
   }
   return IMR_OK;
 }
- 
 
-/* private */
+static void
+imap_write_key_date(ImapMboxHandle *handle, ImapSearchDateRange range,
+                    gboolean internal, time_t tm)
+{
+  /* january is there twice - it is not a mispelling! */
+  static const char *month[] = 
+    { "Jan", "Jan", "Feb", "Mar", "Apr", "May",
+      "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+  struct tm date;
+  if(!internal) sio_write(handle->sio, "SENT", 4);
+  switch(range) {
+  case IMSE_D_BEFORE : sio_write(handle->sio, "BEFORE ", 7); break;
+  case IMSE_D_ON     : sio_write(handle->sio, "ON ",     3); break;
+  default: /* which is -2, the only remaining option */
+  case IMSE_D_SINCE  : sio_write(handle->sio, "SINCE " , 6); break;
+  }
+  printf("%s(): time=%u\n", __FUNCTION__, (unsigned)tm);
+  localtime_r(&tm, &date);
+  sio_printf(handle->sio, "%02d-%s-%04d",
+             date.tm_mday, month[date.tm_mon], date.tm_year + 1900);
+}
+
+static void
+imap_write_key_size(ImapMboxHandle *handle, gboolean negate, size_t size)
+{
+  if(negate) sio_printf(handle->sio, "NOT LARGER %u", size);
+  else       sio_printf(handle->sio, "LARGER %u", size);
+}
+
+/* private.  */
 ImapResponse
 imap_write_key(ImapMboxHandle *handle, ImapSearchKey *s, unsigned cmdno,
                int use_literal)
@@ -176,26 +267,44 @@ imap_write_key(ImapMboxHandle *handle, ImapSearchKey *s, unsigned cmdno,
   ImapResponse rc;
   while(s) {
     switch(s->type) {
+    case IMSE_NOT:
+      if(s->negated) sio_write(handle->sio, "Not (", 5);
+      else sio_write(handle->sio, "(", 1);
+      rc = imap_write_key(handle, s->d.not, cmdno, use_literal);
+      if(rc != IMR_OK) return rc;
+      sio_write(handle->sio, ")", 1);
+      break;
     case IMSE_OR:
-      if(s->negated) sio_write(handle->sio, " Not Or", 7);
-      else sio_write(handle->sio, " Or", 3);
+      if(s->negated) sio_write(handle->sio, "Not Or ", 7);
+      else sio_write(handle->sio, "Or ", 3);
+      if(s->d.or.l->next) sio_write(handle->sio, "(", 1);
       rc = imap_write_key(handle, s->d.or.l, cmdno, use_literal);
       if(rc != IMR_OK) return rc;      
+      if(s->d.or.l->next) sio_write(handle->sio, ") ", 2);
+      else  sio_write(handle->sio, " ", 1);
+      if(s->d.or.r->next) sio_write(handle->sio, "(", 1);
       rc = imap_write_key(handle, s->d.or.r, cmdno, use_literal);
       if(rc != IMR_OK) return rc;      
+      if(s->d.or.r->next) sio_write(handle->sio, ")", 1);
       break;
     case IMSE_FLAG: 
       imap_write_key_flag(handle, s->negated, s->d.flag.sys_flag);
       break;
     case IMSE_STRING:
-      rc = imap_write_key_string(handle, s->negated, s->d.string.hdr,
-                                 s->d.string.s, cmdno, use_literal);
+      rc = imap_write_key_string(handle, s, cmdno, use_literal);
       if(rc != IMR_OK) return rc;
       break;
-    case IMSE_DATE: /* FIXME */
-    case IMSE_SIZE:  /* FIXME */ break;
+    case IMSE_DATE:
+      printf("%s(): time=%u\n", __FUNCTION__, (unsigned)s->d.date.dt);
+      imap_write_key_date(handle, s->d.date.range, s->d.date.internal_date,
+                          s->d.date.dt);
+      break;
+    case IMSE_SIZE:
+      imap_write_key_size(handle, s->negated, s->d.size);
+      break;
     }
     s = s->next;
+    if(s) sio_write(handle->sio, " ", 1);
   }
     
   return IMR_OK;
@@ -213,14 +322,14 @@ imap_search_exec(ImapMboxHandle *h, ImapSearchKey *s,
   void *oarg;
   unsigned cmdno;
 
-  if(!IMAP_MBOX_IS_SELECTED(h))
+  if(!IMAP_MBOX_IS_SELECTED(h) || !s)
     return IMR_BAD;
 
   ocb  = h->search_cb;  h->search_cb  = (ImapSearchCb)cb;
   oarg = h->search_arg; h->search_arg = cb_arg;
   
   cmdno = imap_make_tag(tag);
-  sio_printf(h->sio, "%s Search", tag);
+  sio_printf(h->sio, "%s Search ", tag);
   if( (ir=imap_write_key(h, s, cmdno, can_do_literals)) == IMR_OK) {
     sio_write(h->sio, "\r\n", 2);
     imap_handle_flush(h);

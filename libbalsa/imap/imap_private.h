@@ -68,6 +68,8 @@ struct _ImapMboxHandle {
 #define IMAP_MBOX_IS_AUTHENTICATED(h) ((h)->state == IMHS_AUTHENTICATED)
 #define IMAP_MBOX_IS_SELECTED(h)      ((h)->state == IMHS_SELECTED)
 
+#define IS_ATOM_CHAR(c) (strchr("(){ %*\"\\]",(c))==NULL&&(c)>0x1f&&(c)!=0x7f)
+
 extern const char* msg_flags[6];
 
 void imap_mbox_resize_cache(ImapMboxHandle *h, unsigned new_size);

@@ -427,7 +427,6 @@ imap_make_tag(ImapCmdTag tag)
   return no;
 }
 
-#define IS_ATOM_CHAR(c) (strchr("(){ %*\"\\]",(c))==NULL&&(c)>0x1f&&(c)!=0x7f)
 static int
 imap_get_atom(struct siobuf *sio, char* atom, size_t len)
 {

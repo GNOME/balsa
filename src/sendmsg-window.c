@@ -38,6 +38,8 @@ static void close_window (GtkWidget *, gpointer);
 static void balsa_sendmsg_free (BalsaSendmsg *);
 static GtkWidget *create_menu (BalsaSendmsg *);
 
+static gchar *gt_replys (gchar *);
+
 static GtkWidget *menu_items[6];
 GtkTooltips *tooltips;
 
@@ -220,6 +222,10 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   gchar *from;
   gint row;
   gchar *tmp;
+  gchar *c;
+  gchar *tmpbuf = g_malloc (1024);
+
+  MESSAGECACHE *cache;
 
   msg = g_malloc (sizeof (BalsaSendmsg));
   switch (type)
@@ -381,6 +387,31 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
 		    GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
   gtk_widget_show (vscrollbar);
 
+  if (type != 0)
+    {
+      gtk_widget_realize (msg->text);
+
+      gtk_text_freeze (GTK_TEXT (msg->text));
+
+      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "\n\n", 2);
+
+      c = get_header ("from", bindex->stream, row);
+      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
+
+      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, " on ", 4);
+      cache = mail_elt (bindex->stream, row);
+      mail_date (tmpbuf, cache);
+
+      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, tmpbuf, strlen (tmpbuf));
+      g_free (tmpbuf);
+      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, " wrote:\n", 8);
+
+      c = mail_fetchtext (bindex->stream, row);
+      c = gt_replys (c);
+
+      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
+      gtk_text_thaw (GTK_TEXT (msg->text));
+    }
 
 
   gnome_app_set_contents (GNOME_APP (msg->window), vbox);
@@ -493,4 +524,41 @@ send_smtp_message (GtkWidget * widget, BalsaSendmsg * bsmsg)
   mail_free_body (&body);
   g_string_free (text, 1);
   balsa_sendmsg_destroy (bsmsg);
+}
+
+
+static gchar *
+gt_replys (char *buff)
+{
+  int i = 0, len = strlen (buff);
+  GString *gs = g_string_new (NULL);
+
+  for (i = 0; i < len; i++)
+    {
+      if (buff[i] == '\r' && buff[i + 1] == '\n')
+	{
+	  gs = g_string_append (gs, "\n> ");
+	  i++;
+	}
+      else if (buff[i] == '\n' && buff[i + 1] == '\r')
+	{
+	  gs = g_string_append (gs, "\n> ");
+	  i++;
+	}
+      else if (buff[i] == '\n')
+	{
+	  gs = g_string_append (gs, "\n> ");
+	}
+      else if (buff[i] == '\r')
+	{
+	  gs = g_string_append (gs, "\n> ");
+	}
+      else
+	{
+	  gs = g_string_append_c (gs, buff[i]);
+	}
+    }
+
+  gs = g_string_prepend (gs, "> ");
+  return gs->str;
 }

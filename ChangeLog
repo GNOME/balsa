@@ -1,4 +1,4 @@
-2005-03-24 Albrecht Dreß <albrecht dot dress at arcor dot de>
+2005-03-26 Albrecht Dreß <albrecht dot dress at arcor dot de>
 
 	* libbalsa/rfc3156.c: plug in recently introduced DoS.
 

@@ -31,8 +31,8 @@
 typedef struct _PropertyUI
   {
     GnomePropertyBox *pbox;
-    GtkRadioButton *toolbar_type[3];
-    GtkRadioButton *mdi_type[3];
+    GtkRadioButton *toolbar_type[NUM_TOOLBAR_MODES];
+    GtkRadioButton *mdi_type[NUM_MDI_MODES];
 
     GtkWidget *real_name, *email, *smtp_server, *mail_directory;
     

@@ -1,3 +1,8 @@
+2003-12-31  Carlos Morgado  <chbm gnome.org>
+
+	* libbalsa/html.c (libbalsa_html_print_get_pages_num): 
+	fix build glitch
+	
 2003-12-30 14:15  PeterB
 
 	* libbalsa/: html.c, html.h: Provide wrappers to insulate the rest

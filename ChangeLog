@@ -1,5 +1,6 @@
-2004-10-29 08:35  PeterB
+2004-10-29 15:11  PeterB
 
+	* src/ab-main.c: restore address book radio button mnemonics.
 	* src/main-window.c, libbalsa/mailbox_mbox.c: check for corrupt
 	mbox when opening and when adding a message, and check return value
 	from open.

@@ -528,7 +528,7 @@ imap_mbox_connect(ImapMboxHandle* handle)
   handle->state = IMHS_CONNECTED;
   if (imap_cmd_step(handle, 0) != IMR_UNTAGGED) {
     g_warning("imap_mbox_connect:unexpected initial response\n");
-    sio_detach(handle->sio);
+    sio_detach(handle->sio); handle->sio = NULL;
     close(handle->sd);
     handle->state = IMHS_DISCONNECTED;
     return IMAP_PROTOCOL_ERROR;
@@ -1408,7 +1408,7 @@ imap_mbox_gets(ImapMboxHandle *h, char* buf, size_t sz)
 
   rc = sio_gets(h->sio, buf, sz);
   if(rc == NULL) {
-    sio_detach(h->sio);
+    sio_detach(h->sio); h->sio = NULL;
     h->state = IMHS_DISCONNECTED;
   }
   return rc;

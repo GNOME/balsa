@@ -1,3 +1,9 @@
+2003-11-21 Darko Obradovic <dobradovic gmx.de>
+
+	* src/balsa-app.h: set MAX_QUOTED_COLOR to 2.
+	* src/pref-manager.c: simplify preferences.
+	* src/save-restore.c: adjust accordingly.
+
 2003-11-21 10:25  PeterB
 
 	* src/balsa-mblist.c: Fix bug 127422.

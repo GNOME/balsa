@@ -2197,32 +2197,17 @@ static GtkWidget *
 message_colors_group(GtkWidget * page)
 {
     GtkWidget *group;
-    GtkWidget *hbox;
-    GtkWidget *vbox1;
-    GtkWidget *vbox2;
+    GtkWidget *vbox;
     gint i;
     
     group = pm_group_new(_("Message Colors"));
-    hbox = gtk_hbox_new(TRUE, 3 * HIG_PADDING);
-    pm_group_add(group, hbox);
-
-    vbox1 = gtk_vbox_new(FALSE, HIG_PADDING);
-    vbox2 = gtk_vbox_new(FALSE, HIG_PADDING);
-    gtk_box_pack_start(GTK_BOX(hbox), vbox1, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(hbox), vbox2, TRUE, TRUE, 0);
+    vbox = gtk_vbox_new(TRUE, HIG_PADDING);
+    pm_group_add(group, vbox);
 
     for(i = 0; i < MAX_QUOTED_COLOR; i++) {
-        GtkWidget *current_vbox;
-	gchar *text = g_strdup_printf(_("Quote level %d color"), i+1);
-
-        if (i < MAX_QUOTED_COLOR/2) {
-            current_vbox = vbox1;
-        } else {
-            current_vbox = vbox2;
-        }
-        
-	pui->quoted_color[i] = color_box( GTK_BOX(current_vbox), text);
-	g_free(text);
+        gchar *text = g_strdup_printf(_("Quote level %d color"), i+1);
+        pui->quoted_color[i] = color_box( GTK_BOX(vbox), text);
+        g_free(text);
     }
 
     return group;

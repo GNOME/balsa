@@ -727,7 +727,8 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
 	g_array_append_val(mimap->messages_info, a);
     }
 
-    if (imap_mbox_handle_first_unseen(mimap->handle))
+    mailbox->first_unread = imap_mbox_handle_first_unseen(mimap->handle);
+    if (mailbox->first_unread)
 	lbm_imap_get_unseen(mimap);
     run_filters_on_reception(mimap);
 

@@ -174,8 +174,10 @@ struct _LibBalsaMailbox {
 
     /* info fields */
     gboolean has_unread_messages;
-    glong unread_messages;	/* number of unread messages in the mailbox */
-
+    glong unread_messages; /* number of unread messages in the mailbox */
+    unsigned first_unread; /* set to 0 if there is no unread present.
+                            * used for automatical scrolling down on opening.
+                            */
     /* Associated filters (struct mailbox_filter) */
     GSList * filters;
 

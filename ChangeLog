@@ -1,3 +1,10 @@
+2004-02-08  Pawel Salek
+
+	* libbalsa/mailbox.h: add first_unseen field.
+	* libbalsa/mailbox_{imap,local}.c: add support for it.
+	* src/balsa-index.[ch]: use it to scroll on open.
+	* src/main-window.c: ditto.
+
 2004-02-08 Darko Obradovic <dobradovic gmx.de>
 
 	* src/main-window.c: fix 114041

@@ -254,7 +254,8 @@ libbalsa_mailbox_local_load_message(LibBalsaMailbox * mailbox, guint msgno)
     message->msgno = msgno;
     libbalsa_mailbox_link_message(LIBBALSA_MAILBOX_LOCAL(mailbox), message);
     libbalsa_message_set_icons(message);
-
+    if(LIBBALSA_MESSAGE_IS_UNREAD(message) && mailbox->first_unread == 0)
+        mailbox->first_unread = msgno;
     return message;
 }
 

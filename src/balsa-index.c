@@ -653,6 +653,31 @@ balsa_index_new(void)
     return GTK_WIDGET(index);
 }
 
+/**
+ * balsa_index_scroll_on_open()
+ * moves to the first unread message in the index, or the
+ * last message if none is unread, and selects it.
+ */
+void
+balsa_index_scroll_on_open(BalsaIndex *index)
+{
+    LibBalsaMailbox *mailbox = index->mailbox_node->mailbox;
+    GtkTreeIter iter;
+    GtkTreePath *path = NULL;
+
+    balsa_index_update_tree(index, balsa_app.expand_tree);
+    if(mailbox->first_unread && 
+       libbalsa_mailbox_msgno_find(mailbox, mailbox->first_unread,
+                                   &path, &iter)) {
+        bndx_expand_to_row(index, path);
+	gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(index), path, NULL,
+				     FALSE, 0, 0);
+        if(balsa_app.view_message_on_open)
+            bndx_select_row(index, path);
+        gtk_tree_path_free(path);
+    }
+}
+
 /* balsa_index_load_mailbox_node:
    open mailbox_node, the opening is done in thread to keep UI alive.
    NOTES:
@@ -722,20 +747,11 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
     g_object_set_data(G_OBJECT(mailbox), "tree-view", tree_view);
 #endif
     gtk_tree_view_set_model(tree_view, GTK_TREE_MODEL(mailbox));
-#if 0
-    bndx_moveto(index);
-#endif
-
-    balsa_index_update_tree(index, balsa_app.expand_tree);
 
     return FALSE;
 }
 
-/* Helper for balsa_index_load_mailbox_node.
- * Description: moves to the first unread message in the index, or the
- * last message if none is unread, and selects it.
- * static void bndx_moveto(BalsaIndex * bindex)
- */
+
 /*
  * select message interfaces
  *

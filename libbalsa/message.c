@@ -1436,4 +1436,6 @@ libbalsa_message_set_icons(LibBalsaMessage * message)
     message->status_icon = 
 	libbalsa_get_icon_from_flags(message->flags);
     libbalsa_message_set_attach_icons(message);
+    libbalsa_mailbox_msgno_update_icons(message->mailbox,
+					message->msgno, message);
 }

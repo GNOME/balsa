@@ -1026,24 +1026,19 @@ lbm_node_has_unseen_child(LibBalsaMailbox * lmm, GNode * node)
 }
 #endif /* CACHE_UNSEEN_CHILD */
 
-void
-libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
+static void
+lbm_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
 {
     GtkTreeIter iter;
     GtkTreePath *path;
-    gboolean unlock;
-
-    if (!mailbox->msg_tree)
-        return;
-
-    unlock = lbm_threads_enter();
 
     iter.user_data = g_node_find(mailbox->msg_tree, G_PRE_ORDER,
                                  G_TRAVERSE_ALL, GUINT_TO_POINTER(seqno));
     /* trying to modify seqno that is not in the tree?  Possible for
      * filtered views... Perhaps there is nothing to worry about.
      */
-    g_return_if_fail(iter.user_data != NULL);
+    if (iter.user_data == NULL)
+	return;
 
     iter.stamp = mailbox->stamp;
     path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
@@ -1054,7 +1049,18 @@ libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
 #if CACHE_UNSEEN_CHILD
     lbm_entry_check(mailbox, seqno);
 #endif /* CACHE_UNSEEN_CHILD */
+}
 
+void
+libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
+{
+    gboolean unlock;
+
+    if (!mailbox->msg_tree)
+        return;
+
+    unlock = lbm_threads_enter();
+    lbm_msgno_changed(mailbox, seqno);
     lbm_threads_leave(unlock);
 }
 
@@ -3090,4 +3096,24 @@ libbalsa_mailbox_msgno_get_subject(LibBalsaMailbox * mailbox, guint msgno)
 {
     LibBalsaMailboxIndexEntry *entry = lbm_get_index_entry(mailbox, msgno);
     return entry->subject;
+}
+
+/* Update icons, but only if entry has been allocated. */
+void
+libbalsa_mailbox_msgno_update_icons(LibBalsaMailbox * mailbox,
+				    guint msgno, LibBalsaMessage * message)
+{
+    LibBalsaMailboxIndexEntry *entry;
+
+    if (!mailbox || !mailbox->mindex || mailbox->mindex->len < msgno)
+	return;
+
+    entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
+    if (!entry)
+	return;
+
+    entry->status_icon = message->status_icon;
+    entry->attach_icon = message->attach_icon;
+
+    lbm_msgno_changed(mailbox, msgno);
 }

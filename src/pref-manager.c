@@ -839,15 +839,15 @@ create_signature_page ( )
 			  (GtkAttachOptions) (GTK_FILL),
 			  (GtkAttachOptions) (0), 0, 0);
 	
-	pui->sig_whenforward  = gtk_check_button_new_with_label (_("replying to mail"));
-	gtk_widget_show ( pui->sig_whenforward );
-	gtk_table_attach (GTK_TABLE (table1),  pui->sig_whenforward , 1, 2, 1, 2,
+	pui->sig_whenreply = gtk_check_button_new_with_label (_("replying to mail"));
+	gtk_widget_show ( pui->sig_whenreply);
+	gtk_table_attach (GTK_TABLE (table1),  pui->sig_whenreply, 1, 2, 1, 2,
 			  (GtkAttachOptions) (GTK_FILL),
 			  (GtkAttachOptions) (0), 0, 0);
 	
-	pui->sig_whenreply = gtk_check_button_new_with_label (_("forwarding mail"));
-	gtk_widget_show ( pui->sig_whenreply);
-	gtk_table_attach (GTK_TABLE (table1),  pui->sig_whenreply, 1, 2, 2, 3,
+	pui->sig_whenforward  = gtk_check_button_new_with_label (_("forwarding mail"));
+	gtk_widget_show ( pui->sig_whenforward );
+	gtk_table_attach (GTK_TABLE (table1),  pui->sig_whenforward , 1, 2, 2, 3,
 			  (GtkAttachOptions) (GTK_FILL),
 			  (GtkAttachOptions) (0), 0, 0);
 	

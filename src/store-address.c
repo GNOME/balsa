@@ -227,7 +227,7 @@ store_address_book_frame(struct store_address_info * info)
 
             info->address_book = address_book;
 	    gtk_signal_connect(GTK_OBJECT(menu_item), "activate",
-			       store_address_book_menu_cb, info);
+			       (GtkSignalFunc)store_address_book_menu_cb,info);
 
 	    if (address_book == balsa_app.default_address_book)
 		gtk_menu_set_active(GTK_MENU(ab_menu), default_ab_offset);

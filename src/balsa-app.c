@@ -1,5 +1,4 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
-/* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
@@ -497,11 +496,15 @@ open_mailboxes_idle_cb(gchar * names[])
 GtkWidget *
 balsa_stock_button_with_label(const char *icon, const char *label)
 {
+#if BALSA_MAJOR < 2
+    return gnome_pixmap_button(gnome_stock_new_with_icon(icon), label);
+#else
     GtkWidget *button = gtk_button_new_with_label(label);
     GtkWidget *pixmap = gtk_image_new_from_stock(icon,
                                                  GTK_ICON_SIZE_BUTTON);
     gtk_container_add(GTK_CONTAINER(button), pixmap);
     return button;
+#endif              /* BALSA_MAJOR < 2 */
 }
 
 static gint

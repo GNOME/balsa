@@ -240,14 +240,28 @@ build_left_side(void)
     gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 2);
 
     /* new button */
+#if BALSA_MAJOR < 2
     pixmap = gnome_stock_new_with_icon(GNOME_STOCK_MENU_NEW);
     button = gnome_pixmap_button(pixmap, _("New"));
+#else
+    pixmap = gtk_image_new_from_stock(GNOME_STOCK_MENU_NEW,
+                                      GTK_ICON_SIZE_BUTTON);
+    button = gtk_button_new_with_label(_("New"));
+    gtk_container_add(GTK_CONTAINER(button), pixmap);
+#endif                          /* BALSA_MAJOR < 2 */
     gtk_signal_connect(GTK_OBJECT(button), "clicked",
 		       GTK_SIGNAL_FUNC(fe_new_pressed), NULL);
     gtk_container_add(GTK_CONTAINER(bbox), button);
     /* delete button */
+#if BALSA_MAJOR < 2
     pixmap = gnome_stock_new_with_icon(GNOME_STOCK_MENU_TRASH);
     fe_delete_button = gnome_pixmap_button(pixmap, _("Delete"));
+#else
+    pixmap = gtk_image_new_from_stock(GNOME_STOCK_MENU_TRASH,
+                                      GTK_ICON_SIZE_BUTTON);
+    fe_delete_button = gtk_button_new_with_label(_("Delete"));
+    gtk_container_add(GTK_CONTAINER(fe_delete_button), pixmap);
+#endif                          /* BALSA_MAJOR < 2 */
     gtk_signal_connect(GTK_OBJECT(fe_delete_button), "clicked",
 		       GTK_SIGNAL_FUNC(fe_delete_pressed), NULL);
     gtk_container_add(GTK_CONTAINER(bbox), fe_delete_button);
@@ -285,8 +299,8 @@ add_mailbox_to_option_menu(GtkCTree * ctree,GtkCTreeNode *node,gpointer menu)
 static GtkWidget *
 build_match_page()
 {
-    GtkWidget *page,*table,*button;
-    GtkWidget *frame,*label,*scroll;
+    GtkWidget *page, *button;
+    GtkWidget *label, *scroll;
     GtkWidget *box = NULL;
 
     /* The notebook page */
@@ -384,9 +398,8 @@ build_action_page()
 {
     GtkWidget *page, *frame, *table;
     GtkWidget *box = NULL;
-    GtkWidget *menu,* item;
+    GtkWidget *menu;
     GtkCTreeNode * node;
-    gint i;
 
     page = gtk_vbox_new(TRUE, 5);
 
@@ -492,14 +505,25 @@ build_right_side(void)
     bbox = gtk_hbutton_box_new();
     gtk_box_pack_start(GTK_BOX(rightside), bbox, FALSE, FALSE, 0);
 
+#if BALSA_MAJOR < 2
     fe_apply_button = gnome_stock_button(GNOME_STOCK_BUTTON_APPLY);
+#else
+    fe_apply_button = gtk_button_new_from_stock(GNOME_STOCK_BUTTON_APPLY);
+#endif                          /* BALSA_MAJOR < 2 */
     gtk_signal_connect(GTK_OBJECT(fe_apply_button),
 		       "clicked",
 		       GTK_SIGNAL_FUNC(fe_apply_pressed), NULL);
     gtk_container_add(GTK_CONTAINER(bbox), fe_apply_button);
 
+#if BALSA_MAJOR < 2
     pixmap = gnome_stock_new_with_icon(GNOME_STOCK_MENU_UNDO);
     fe_revert_button = gnome_pixmap_button(pixmap, _("Revert"));
+#else
+    pixmap = gtk_image_new_from_stock(GNOME_STOCK_MENU_UNDO,
+                                      GTK_ICON_SIZE_BUTTON);
+    fe_revert_button = gtk_button_new_with_label(_("New"));
+    gtk_container_add(GTK_CONTAINER(fe_revert_button), pixmap);
+#endif                          /* BALSA_MAJOR < 2 */
     gtk_signal_connect(GTK_OBJECT(fe_revert_button),
 		       "clicked",
 		       GTK_SIGNAL_FUNC(fe_revert_pressed), NULL);
@@ -546,8 +570,8 @@ filters_edit_dialog(void)
 					      GNOME_STOCK_BUTTON_CANCEL,
 					      GNOME_STOCK_BUTTON_HELP, NULL));
 
-    gtk_signal_connect(GTK_OBJECT(fe_window),
-		       "clicked", fe_dialog_button_clicked, NULL);
+    gtk_signal_connect(GTK_OBJECT(fe_window), "clicked",
+                       GTK_SIGNAL_FUNC(fe_dialog_button_clicked), NULL);
     gtk_signal_connect(GTK_OBJECT(fe_window), "destroy",
 		       GTK_SIGNAL_FUNC(fe_destroy_window_cb), NULL);
     /* main hbox */

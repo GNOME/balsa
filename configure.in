@@ -8,10 +8,12 @@ dnl ###########################################################################
 BALSA_MAJOR=2
 BALSA_REVISION=0
 BALSA_PATCHLEVEL=0
+BALSA_VERSION="$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}"
 
 AC_SUBST(BALSA_MAJOR)
 AC_SUBST(BALSA_REVISION)
 AC_SUBST(BALSA_PATCHLEVEL)
+AC_SUBST(BALSA_VERSION)
 
 AM_INIT_AUTOMAKE(balsa, "$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}")
 AC_CONFIG_SRCDIR(src/main.c)
@@ -33,6 +35,8 @@ AC_DEFINE_UNQUOTED(BALSA_REVISION, $BALSA_REVISION,
                    [Define to the Balsa revision])
 AC_DEFINE_UNQUOTED(BALSA_PATCHLEVEL, $BALSA_PATCHLEVEL,
                    [Define to the Balsa patch level])
+AC_DEFINE_UNQUOTED(BALSA_VERSION, "$BALSA_VERSION",
+                   [Define to the Balsa version])
 
 dnl ##########################################################################
 dnl Check for GtkHTML if available

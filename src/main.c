@@ -138,7 +138,11 @@ balsa_init(int argc, char **argv)
 	{NULL, '\0', 0, NULL, 0}	/* end the list */
     };
 
+#if BALSA_MAJOR < 2
     context = poptGetContext(PACKAGE, argc, argv, options, 0);
+#else
+    context = poptGetContext(PACKAGE, argc, (const char **)argv, options, 0);
+#endif                          /* BALSA_MAJOR < 2 */
     while((opt = poptGetNextOpt(context)) > 0) {
         switch (opt) {
 	    case 'a':
@@ -276,8 +280,6 @@ initial_open_unread_mailboxes()
 static gboolean
 initial_open_inbox()
 {
-    GList *i;
-    
     if (!balsa_app.inbox)
 	return FALSE;
 
@@ -303,7 +305,10 @@ main(int argc, char *argv[])
     /* Initialize the i18n stuff */
     bindtextdomain(PACKAGE, GNOMELOCALEDIR);
     textdomain(PACKAGE);
-    setlocale(LC_CTYPE, gnome_i18n_get_language());
+    /* FIXME: gnome_i18n_get_language seems to have gone away; 
+     * is this a reasonable replacement? */
+    setlocale(LC_CTYPE,
+              (const char *) gnome_i18n_get_language_list(LC_CTYPE)->data);
 #endif
 
 #ifdef BALSA_USE_THREADS
@@ -408,6 +413,7 @@ main(int argc, char *argv[])
 
 
 
+#if 0
 static void
 force_close_mailbox(LibBalsaMailbox * mailbox)
 {
@@ -418,6 +424,7 @@ force_close_mailbox(LibBalsaMailbox * mailbox)
     while (mailbox->open_ref > 0)
 	libbalsa_mailbox_close(mailbox);
 }
+#endif /* 0 */
 
 /* Word of comment: previous definition of this function used access()
 function before attempting creat/unlink operation. In PS opinion, the

@@ -32,9 +32,10 @@
 #include <gnome.h>
 #include "balsa-app.h"
 #include "filter-export.h"
+#include "filter-funcs.h"
 
 /* To prevent user from silmultaneously edit/export filters */
-extern fex_already_open;
+extern int fex_already_open;
 
 void 
 fex_destroy_window_cb(GtkWidget * widget,gpointer throwaway)

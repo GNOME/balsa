@@ -333,7 +333,6 @@ run_mailbox_conf(BalsaMailboxNode* mbnode, GtkType mailbox_type,
 {
     MailboxConfWindow* mcw;
     GtkWidget* page;
-    int button;
 
     g_return_if_fail(gtk_type_is_a(mailbox_type, LIBBALSA_TYPE_MAILBOX));
 
@@ -372,9 +371,9 @@ run_mailbox_conf(BalsaMailboxNode* mbnode, GtkType mailbox_type,
     gtk_widget_grab_focus(mcw->mailbox_name);
 
     gtk_signal_connect(GTK_OBJECT(mcw->window), "clicked", 
-                       conf_clicked_cb, mcw);
+                       GTK_SIGNAL_FUNC(conf_clicked_cb), mcw);
     gtk_signal_connect(GTK_OBJECT(mcw->window), "destroy", 
-                       free_data, mcw);
+                       GTK_SIGNAL_FUNC(free_data), mcw);
     gtk_widget_show_all(GTK_WIDGET(mcw->window));
 }
 /*
@@ -532,9 +531,9 @@ check_for_blank_fields(GtkWidget *widget, MailboxConfWindow *mcw)
 static void
 fill_in_imap_data(MailboxConfWindow *mcw, gchar ** name, gchar ** path)
 {
-    gchar *fos;
-    fos =
-	gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.imap.folderpath));
+    *path =
+	gtk_editable_get_chars(GTK_EDITABLE(mcw->mb_data.imap.folderpath),
+                               0, -1);
 
     if (!(*name =
 	  g_strdup(gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name))))
@@ -542,11 +541,10 @@ fill_in_imap_data(MailboxConfWindow *mcw, gchar ** name, gchar ** path)
 	if (*name)
 	    g_free(*name);
 
-	*name = g_strdup_printf(_("%s on %s"), fos,
+	*name = g_strdup_printf(_("%s on %s"), *path,
 				gtk_entry_get_text(GTK_ENTRY
 						   (mcw->mb_data.imap.server)));
     }
-    *path = g_strdup(fos);
 }
 
 /*
@@ -649,7 +647,7 @@ mailbox_conf_update(MailboxConfWindow *mcw)
     update_config = mailbox->config_prefix != NULL;
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
-	gchar *filename, *name;
+	const gchar *filename, *name;
 
 	filename =
 	    gtk_entry_get_text(GTK_ENTRY((mcw->mb_data.local.path)));
@@ -723,7 +721,7 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 
     mbnode = balsa_mailbox_node_new_from_mailbox(mcw->mailbox);
     if ( LIBBALSA_IS_MAILBOX_LOCAL(mcw->mailbox) ) {
-	gchar *path;
+	const gchar *path;
 
 	path = gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.local.path));
 	if(libbalsa_mailbox_local_set_path(
@@ -771,7 +769,7 @@ mailbox_conf_add(MailboxConfWindow *mcw)
         }
 	if(parent)
             balsa_mailbox_node_rescan(BALSA_MAILBOX_NODE(parent->data)); 
-        else g_warning("parent for %s not found.\n", mcw->mailbox);
+        else g_warning("parent for %s not found.\n", mcw->mailbox->name);
 	g_free(dir);
     }
 
@@ -990,7 +988,7 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
     mcw->mb_data.imap.use_ssl = 
         create_check(mcw->window, _("Use SSL (imaps)"), table, 7, FALSE);
     gtk_signal_connect(GTK_OBJECT(mcw->mb_data.imap.use_ssl), "toggled", 
-                       imap_use_ssl_cb, mcw);
+                       GTK_SIGNAL_FUNC(imap_use_ssl_cb), mcw);
 #endif
 
     return table;

@@ -22,6 +22,8 @@
 #ifndef __TOOLBAR_FACTORY_H__
 #define __TOOLBAR_FACTORY_H__
 
+typedef void (*BalsaToolbarFunc)(GtkWidget *, gpointer);
+#define BALSA_TOOLBAR_FUNC(f) ((BalsaToolbarFunc) (f))
 
 typedef enum { 
     TOOLBAR_INVALID = -1,
@@ -44,7 +46,7 @@ extern const int toolbar_button_count;
 int create_stock_toolbar(BalsaToolbarType id);
 int get_toolbar_index(BalsaToolbarType id);
 void set_toolbar_button_callback(BalsaToolbarType toolbar, const char *id, 
-				 void (*callback)(GtkWidget *, gpointer), 
+				 BalsaToolbarFunc callback,
 				 gpointer);
 void set_toolbar_button_sensitive(GtkWidget *window, BalsaToolbarType toolbar,
 				  char *id, int sensitive);

@@ -83,7 +83,11 @@ static void set_the_page(GtkWidget * button, AddressBookConfig * abc);
 static GtkWidget*
 add_button(const char* butt, GtkWidget* bbox, GtkSignalFunc cb, gpointer abc)
 {
+#if BALSA_MAJOR < 2
+    GtkWidget* button = gnome_stock_button(butt);
+#else
     GtkWidget* button = gtk_button_new_from_stock(butt);
+#endif                          /* BALSA_MAJOR < 2 */
     gtk_signal_connect(GTK_OBJECT(button), "clicked", cb, abc);
     gtk_container_add(GTK_CONTAINER(bbox), button);
     gtk_widget_show(button);
@@ -146,10 +150,15 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
 	page = create_choice_page(abc);
     } else {
 	GtkWidget *pixmap;
+#if BALSA_MAJOR < 2
+	pixmap = gnome_stock_pixmap_widget(NULL, GNOME_STOCK_PIXMAP_SAVE);
+        button = gnome_pixmap_button(pixmap, _("Update"));
+#else
 	button = gtk_button_new_with_label(_("Update"));
 	pixmap = gtk_image_new_from_stock(GNOME_STOCK_PIXMAP_SAVE,
                                           GTK_ICON_SIZE_BUTTON);
 	gtk_container_add(GTK_CONTAINER(button), pixmap);
+#endif                          /* BALSA_MAJOR < 2 */
 	gtk_container_add(GTK_CONTAINER(bbox), button);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
 			   (GtkSignalFunc) update_button_cb,
@@ -628,8 +637,22 @@ set_the_page(GtkWidget * button, AddressBookConfig * abc)
 static void
 help_button_cb(GtkWidget * button, AddressBookConfig * abc)
 {
-    GError *error;
-    gnome_help_display_uri(abc->help_path, &error);
+#if BALSA_MAJOR < 2
+    static GnomeHelpMenuEntry help_entry = { NULL, NULL };
+    help_entry.name = gnome_app_id;
+    help_entry.path = abc->help_path;
+    gnome_help_display(NULL, &help_entry);
+#else
+    GError *err = NULL;
+
+    gnome_help_display_uri(abc->help_path, &err);
+
+    if (err) {
+        g_print(_("Error displaying %s: %s\n"), abc->help_path,
+                err->message);
+        g_error_free(err);
+    }
+#endif                          /* BALSA_MAJOR < 2 */
 }
 
 static void
@@ -649,10 +672,15 @@ next_button_cb(GtkWidget * button, AddressBookConfig * abc)
     bbox = GNOME_DIALOG(abc->window)->action_area;
 
     gtk_widget_destroy(abc->continue_button);
+#if BALSA_MAJOR < 2
+    pixmap = gnome_stock_pixmap_widget(NULL, GNOME_STOCK_PIXMAP_NEW);
+    abc->continue_button = gnome_pixmap_button(pixmap, _("Add"));
+#else
     abc->continue_button = gtk_button_new_with_label(_("Add"));
     pixmap = gtk_image_new_from_stock(GNOME_STOCK_PIXMAP_NEW,
                                       GTK_ICON_SIZE_BUTTON);
     gtk_container_add(GTK_CONTAINER(abc->continue_button), pixmap);
+#endif                          /* BALSA_MAJOR < 2 */
     gtk_signal_connect(GTK_OBJECT(abc->continue_button), "clicked",
 		       GTK_SIGNAL_FUNC(add_button_cb), (gpointer) abc);
 

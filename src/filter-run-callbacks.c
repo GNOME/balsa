@@ -125,7 +125,6 @@ void save_filters(BalsaFilterRunDialog * p)
 void fr_dialog_button_clicked(GtkWidget * widget, gint button,
 			      gpointer throwaway)
 {
-    gint row;
     BalsaFilterRunDialog * p;
 
     p=BALSA_FILTER_RUN_DIALOG(widget);
@@ -163,7 +162,6 @@ fr_add_pressed(GtkWidget * widget, gpointer data)
 {
     LibBalsaFilter* fil;
     GList * lst;
-    GSList *tmp;
     gint row,rows;
     gchar *col[FILTER_WHEN_NB+1];
     BalsaFilterRunDialog * p;

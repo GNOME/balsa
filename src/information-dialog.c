@@ -185,7 +185,8 @@ balsa_information_list(LibBalsaInformationType type, char *msg)
 	/* The list itself */
 	information_list = gtk_clist_new(1);
 	gtk_signal_connect(GTK_OBJECT(information_list), "destroy",
-			   gtk_widget_destroyed, &information_list);
+			   GTK_SIGNAL_FUNC(gtk_widget_destroyed),
+                           &information_list);
 	gtk_clist_set_reorderable(GTK_CLIST(information_list), FALSE);
 	gtk_container_add(GTK_CONTAINER(scrolled_window),
 			  information_list);

@@ -45,9 +45,10 @@ extern "C" {
 #endif				/* __cplusplus */
 
 
-#define BALSA_FILTER_RUN_DIALOG(obj)          GTK_CHECK_CAST (obj, balsa_filter_run_dialog_get_type (),BalsaFilterRunDialog)
-#define BALSA_FILTER_RUN_DIALOG_CLASS(klass)  GTK_CHECK_CLASS_CAST (klass, balsa_filter_run_dialog_get_type (), BalsaFilterRunDialogClass)
-#define BALSA_IS_MESSAGE(obj)                 GTK_CHECK_TYPE (obj, balsa_filter_run_dialog_get_type ())
+#define BALSA_TYPE_FILTER_RUN_DIALOG          balsa_filter_run_dialog_get_type()
+#define BALSA_FILTER_RUN_DIALOG(obj)          GTK_CHECK_CAST(obj, BALSA_TYPE_FILTER_RUN_DIALOG, BalsaFilterRunDialog)
+#define BALSA_FILTER_RUN_DIALOG_CLASS(klass)  GTK_CHECK_CLASS_CAST(klass, BALSA_TYPE_FILTER_RUN_DIALOG, BalsaFilterRunDialogClass)
+#define BALSA_IS_FILTER_RUN_DIALOG(obj)       GTK_CHECK_TYPE(obj, BALSA_TYPE_FILTER_RUN_DIALOG)
 
 
 typedef struct _BalsaFilterRunDialog BalsaFilterRunDialog;

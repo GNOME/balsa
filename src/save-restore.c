@@ -19,7 +19,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
-
 #include "config.h"
 
 #include <gnome.h>
@@ -109,7 +108,7 @@ free_toolbar(int i)
 static void
 free_toolbars(void)
 {
-    int i, j;
+    int i;
     
     if(!balsa_app.toolbars == 0)
 	return;
@@ -1218,7 +1217,6 @@ config_identities_save(void)
     GList* list;
     gchar** conf_vec, *prefix, *key, *val;
     GList* old_identities = NULL;
-    gint i = 0;
     void* iterator;
     int pref_len = strlen(IDENTITY_SECTION_PREFIX);
 

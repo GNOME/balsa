@@ -109,8 +109,8 @@ filters_export_dialog(void)
 
     gtk_widget_set_usize(GTK_WIDGET(clist),-1,200);
 
-    gtk_signal_connect(GTK_OBJECT(fex_window),
-		       "clicked", fex_dialog_buttons_cb, clist);
+    gtk_signal_connect(GTK_OBJECT(fex_window), "clicked",
+                       GTK_SIGNAL_FUNC(fex_dialog_buttons_cb), clist);
     gtk_signal_connect(GTK_OBJECT(fex_window), "destroy",
 		       GTK_SIGNAL_FUNC(fex_destroy_window_cb), NULL);
 

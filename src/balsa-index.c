@@ -344,7 +344,11 @@ balsa_index_init(BalsaIndex * bindex)
     gtk_clist_set_column_width(clist, 4, balsa_app.index_subject_width);
     gtk_clist_set_column_width(clist, 5, balsa_app.index_date_width);
     gtk_clist_set_column_width(clist, 6, balsa_app.index_size_width);
+#if BALSA_MAJOR < 2
+    font = gtk_widget_get_style (GTK_WIDGET(clist))->font;
+#else
     font = gtk_style_get_font(gtk_widget_get_style (GTK_WIDGET(clist)));
+#endif                          /* BALSA_MAJOR < 2 */
     row_height = font->ascent + font->descent+2;
     
     if(row_height<16) /* pixmap height */
@@ -413,6 +417,10 @@ balsa_index_new(void)
 {
     BalsaIndex* bindex;
     bindex = BALSA_INDEX (gtk_type_new(BALSA_TYPE_INDEX));
+#if BALSA_MAJOR < 2
+    gtk_object_default_construct (GTK_OBJECT(bindex));
+#endif                          /* BALSA_MAJOR < 2 */
+
     return GTK_WIDGET(bindex);
 }
 
@@ -2209,12 +2217,16 @@ create_stock_menu_item(GtkWidget * menu, const gchar * type,
 		       const gchar * label, GtkSignalFunc cb,
 		       gpointer data, gboolean sensitive)
 {
+#if BALSA_MAJOR < 2
+    GtkWidget *menuitem = gnome_stock_menu_item(type, label);
+#else
     GtkWidget *menuitem = gtk_menu_item_new();
 
     gtk_container_add(GTK_CONTAINER(menuitem), 
                       gtk_image_new_from_stock(type, GTK_ICON_SIZE_MENU));
     gtk_container_add(GTK_CONTAINER(menuitem),
                       gtk_label_new(label));
+#endif                          /* BALSA_MAJOR < 2 */
     gtk_widget_set_sensitive(menuitem, sensitive);
 
     gtk_signal_connect(GTK_OBJECT(menuitem),
@@ -2450,10 +2462,21 @@ refresh_size(GtkCTree * ctree,
 }
 
 void
-balsa_index_refresh_size(BalsaIndex * bindex)
+balsa_index_refresh_size(GtkNotebook *notebook,
+			 GtkNotebookPage *page,
+                         gint page_num,
+                         gpointer data)
 {
+    BalsaIndex *bindex;
+    GtkWidget *index;
     GtkCTree *ctree;
 
+    if (page)
+	index = gtk_notebook_get_nth_page(notebook, page_num);
+    else
+	index = GTK_WIDGET(data);
+
+    bindex = BALSA_INDEX(index);
     if (!bindex)
         return;
 
@@ -2485,10 +2508,21 @@ refresh_date(GtkCTree * ctree,
 }
 
 void
-balsa_index_refresh_date (BalsaIndex *bindex)
+balsa_index_refresh_date (GtkNotebook *notebook,
+			  GtkNotebookPage *page,
+                          gint page_num,
+                          gpointer data)
 {
+    BalsaIndex *bindex;
+    GtkWidget *index;
     GtkCTree *ctree;
 
+    if (page)
+	index = gtk_notebook_get_nth_page(notebook, page_num);
+    else
+	index = GTK_WIDGET(data);
+
+    bindex = BALSA_INDEX(index);
     if (!bindex)
         return;
 

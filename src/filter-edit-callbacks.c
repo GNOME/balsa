@@ -25,6 +25,7 @@
 
 #include "config.h"
 
+#define _XOPEN_SOURCE /* glibc2 needs this */
 #include <time.h>
 #include <gnome.h>
 
@@ -167,7 +168,7 @@ static GList * new_filters_names=NULL;
  */
 
 static gint
-unique_filter_name(gchar * name,gint current_row)
+unique_filter_name(const gchar * name,gint current_row)
 {
     gchar *row_text;
     guint len;
@@ -358,8 +359,9 @@ static gboolean
 condition_validate(LibBalsaCondition* new_cnd)
 {
     LibBalsaConditionRegex * new_reg;
-    gchar * str,* p;
-    gint match,row,col;
+    const gchar * str,* p;
+    gchar *str2;
+    gint row, col;
     struct tm date;
 
     /* Sanity checks, prevent "empty" condition */
@@ -448,8 +450,8 @@ condition_validate(LibBalsaCondition* new_cnd)
     case CONDITION_REGEX:
         for (row=0; row<fe_type_regex_list->rows; row++) {
           new_reg = libbalsa_condition_regex_new();
-          gtk_clist_get_text(fe_type_regex_list,row,0,&str);
-          new_reg->string = g_strdup(str);
+          gtk_clist_get_text(fe_type_regex_list,row,0,&str2);
+          new_reg->string = g_strdup(str2);
           new_cnd->match.regexs=g_slist_prepend(new_cnd->match.regexs,new_reg);
         }
         new_cnd->match.regexs=g_slist_reverse(new_cnd->match.regexs);
@@ -494,6 +496,7 @@ fill_condition_widgets(LibBalsaCondition* cnd)
     struct tm * date;
     gint row,col;
     gboolean andmask;
+    static const gchar xformat[] = "%x"; /* to suppress error in strftime */
     
     condition_not=cnd->condition_not;
     /* Clear all widgets */
@@ -544,13 +547,13 @@ fill_condition_widgets(LibBalsaCondition* cnd)
         if (cnd->match.interval.date_low==0) str[0]='\0';
         else {
             date=localtime(&cnd->match.interval.date_low);
-            strftime(str,sizeof(str),"%x",date);
+            strftime(str,sizeof(str), xformat, date);
         }
         gtk_entry_set_text(GTK_ENTRY(fe_type_date_low_entry),str);
         if (cnd->match.interval.date_high==0) str[0]='\0';
         else {
             date=localtime(&cnd->match.interval.date_high);
-            strftime(str,sizeof(str),"%x",date);
+            strftime(str,sizeof(str), xformat, date);
         }
         gtk_entry_set_text(GTK_ENTRY(fe_type_date_high_entry),str);
         fe_update_label(fe_type_date_label, &date_label);
@@ -956,7 +959,9 @@ fe_edit_condition(GtkWidget * throwaway,gpointer is_new_cnd)
                                           GNOME_STOCK_BUTTON_HELP, NULL));
 
         gtk_signal_connect(GTK_OBJECT(condition_dialog),
-                           "clicked", condition_dialog_button_clicked, NULL);
+                           "clicked",
+                           GTK_SIGNAL_FUNC(condition_dialog_button_clicked),
+                           NULL);
         /* Now we build the dialog*/
         build_condition_dialog();
         /* For now this box is modal */
@@ -1134,7 +1139,6 @@ void
 fe_dialog_button_clicked(GtkWidget * dialog, gint button, gpointer data)
 {
     gint row;
-    GList * names_lst;
     
     switch (button) {
     case 0:                     /* OK button */
@@ -1195,14 +1199,14 @@ fe_action_selected(GtkWidget * widget, gpointer data)
 static void
 fe_add_pressed(GtkWidget * widget, gpointer throwaway)
 {
-    gchar *text;
+    const gchar *text;
 
     text = gtk_entry_get_text(GTK_ENTRY(fe_type_regex_entry));
     
     if (!text || text[0] == '\0')
         return;
     
-    gtk_clist_append(fe_type_regex_list, &text);
+    gtk_clist_append(fe_type_regex_list, (gchar **)&text);
     condition_has_changed=TRUE;
     gtk_widget_set_sensitive(fe_regex_remove_button,TRUE);
 }                       /* end fe_add_pressed() */
@@ -1408,7 +1412,7 @@ void
 fe_apply_pressed(GtkWidget * widget, gpointer data)
 {
     LibBalsaFilter *fil,*old;
-    gchar *temp,*mailbox_name=NULL;
+    const gchar *temp,*mailbox_name=NULL;
     GtkWidget * menu;
     gint row,i;
     FilterActionType action;
@@ -1502,7 +1506,7 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
 
     if (GTK_TOGGLE_BUTTON(fe_popup_button)->active) {
         static gchar defstring[19] = N_("Filter has matched");
-        gchar *tmpstr;
+        const gchar *tmpstr;
         
         FILTER_SETFLAG(fil, FILTER_POPUP);
         tmpstr = gtk_entry_get_text(GTK_ENTRY(fe_popup_entry));

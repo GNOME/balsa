@@ -1,5 +1,4 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
-/* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
@@ -33,6 +32,7 @@
 #endif
 
 #include "libbalsa.h"
+#include "misc.h"
 
 #include "address-book.h"
 #include "balsa-app.h"
@@ -705,7 +705,7 @@ balsa_window_class_init(BalsaWindowClass * klass)
     window_signals[OPEN_MAILBOX_NODE] =
         gtk_signal_new("open_mailbox_node",
                        GTK_RUN_LAST,
-                       object_class->type,
+                       BALSA_TYPE_WINDOW,
                        GTK_SIGNAL_OFFSET(BalsaWindowClass, open_mbnode),
                        gtk_marshal_NONE__POINTER,
                        GTK_TYPE_NONE, 1, GTK_TYPE_POINTER);
@@ -713,13 +713,10 @@ balsa_window_class_init(BalsaWindowClass * klass)
     window_signals[CLOSE_MAILBOX_NODE] =
         gtk_signal_new("close_mailbox_node",
                        GTK_RUN_LAST,
-                       object_class->type,
+                       BALSA_TYPE_WINDOW,
                        GTK_SIGNAL_OFFSET(BalsaWindowClass, close_mbnode),
                        gtk_marshal_NONE__POINTER,
                        GTK_TYPE_NONE, 1, GTK_TYPE_POINTER);
-
-    gtk_object_class_add_signals(object_class, window_signals,
-                                 LAST_SIGNAL);
 
     object_class->destroy = balsa_window_destroy;
 
@@ -1249,8 +1246,13 @@ balsa_notebook_label_new (BalsaMailboxNode* mbnode)
        GtkWidget *lab = gtk_label_new(mbnode->mailbox->name);
        GtkWidget *but = gtk_button_new();
 
+#if BALSA_MAJOR < 2
        close_pix = gnome_stock_pixmap_widget(GTK_WIDGET(balsa_app.main_window),
-             BALSA_PIXMAP_OTHER_CLOSE);
+               BALSA_PIXMAP_OTHER_CLOSE);
+#else
+       close_pix = gtk_image_new_from_stock(BALSA_PIXMAP_OTHER_CLOSE,
+                                            GTK_ICON_SIZE_BUTTON);
+#endif                          /* BALSA_MAJOR < 2 */
 
        gtk_button_set_relief(GTK_BUTTON (but), GTK_RELIEF_NONE);
        gtk_container_add(GTK_CONTAINER (but), close_pix);
@@ -1470,7 +1472,11 @@ balsa_window_destroy(GtkObject * object)
 void
 balsa_window_refresh(BalsaWindow * window)
 {
+#if BALSA_MAJOR < 2
     GnomeDockItem *item;
+#else
+    BonoboDockItem *item;
+#endif                          /* BALSA_MAJOR < 2 */
     GtkWidget *toolbar;
     GtkWidget *index;
     BalsaMessage *bmsg;
@@ -1481,9 +1487,11 @@ balsa_window_refresh(BalsaWindow * window)
     index = balsa_window_find_current_index(window);
     if (index) {
         /* update the date column, only in the current page */
-        balsa_index_refresh_date(BALSA_INDEX(index));
+        balsa_index_refresh_date(GTK_NOTEBOOK(balsa_app.notebook),
+				 NULL, 0, index);
         /* update the size column, only in the current page */
-        balsa_index_refresh_size(BALSA_INDEX(index));
+        balsa_index_refresh_size(GTK_NOTEBOOK(balsa_app.notebook),
+                                 NULL, 0, index);
 
     }
     if (balsa_app.alternative_layout)
@@ -1509,7 +1517,11 @@ balsa_window_refresh(BalsaWindow * window)
     item = gnome_app_get_dock_item_by_name(GNOME_APP(window),
                                            GNOME_APP_TOOLBAR_NAME);
     if(item) {
+#if BALSA_MAJOR < 2
         toolbar = gnome_dock_item_get_child(item);
+#else
+        toolbar = bonobo_dock_item_get_child(item);
+#endif                          /* BALSA_MAJOR < 2 */
         gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), balsa_app.toolbar_style);
     }
     /* I don't know if this is a bug of gtk or not but if this is not here
@@ -1566,6 +1578,9 @@ show_about_box(void)
         "and many others (see AUTHORS file)",
         NULL
     };
+    const gchar *documenters[] = {
+        NULL
+    };
 
 
     /* only show one about box at a time */
@@ -1577,10 +1592,27 @@ show_about_box(void)
     about = gnome_about_new("Balsa",
                             BALSA_VERSION,
                             _("Copyright (C) 1997-2002"),
+#if BALSA_MAJOR < 2
                             authors,
-                            _
-                            ("The Balsa email client is part of the GNOME desktop environment.  Information on Balsa can be found at http://www.balsa.net/\n\nIf you need to report bugs, please do so at: http://bugzilla.gnome.org/"),
-                            "balsa/balsa_logo.png");
+#endif                          /* BALSA_MAJOR < 2 */
+                            _("The Balsa email client is part of "
+                              "the GNOME desktop environment.  "
+                              "Information on Balsa can be found at "
+                              "http://www.balsa.net/\n\n"
+                              "If you need to report bugs, "
+                              "please do so at: "
+                              "http://bugzilla.gnome.org/"),
+#if BALSA_MAJOR < 2
+                            "balsa/balsa_logo.png"
+#else
+                            authors,
+                            documenters,
+                            "",
+                            gdk_pixbuf_new_from_file("balsa/balsa_logo.png",
+                                                     NULL)
+#endif                          /* BALSA_MAJOR < 2 */
+                           );
+
 
     gtk_signal_connect(GTK_OBJECT(about),
                        "destroy",
@@ -1967,7 +1999,8 @@ mail_progress_notify_cb()
                 gtk_progress_bar_update(GTK_PROGRESS_BAR(progress_dialog_bar),
 					percent);
             else
-                gnome_appbar_set_progress(balsa_app.appbar, percent);
+                gnome_appbar_set_progress_percentage(balsa_app.appbar, 
+                                                     percent);
             break;
         case MSGMAILTHREAD_FINISHED:
 
@@ -1980,7 +2013,7 @@ mail_progress_notify_cb()
                                         (progress_dialog_bar), 0.0);
             } else {
                 gnome_appbar_refresh(balsa_app.appbar);
-                gnome_appbar_set_progress(balsa_app.appbar, 0.0);
+                gnome_appbar_set_progress_percentage(balsa_app.appbar, 0.0);
             }
             balsa_mblist_have_new(balsa_app.mblist);
             display_new_mail_notification(threadmessage->num_bytes);
@@ -2064,7 +2097,8 @@ send_progress_notify_cb()
                 gtk_progress_bar_update(GTK_PROGRESS_BAR(send_dialog_bar),
                                         percent);
             else
-                gnome_appbar_set_progress(balsa_app.appbar, percent);
+                gnome_appbar_set_progress_percentage(balsa_app.appbar,
+                                                     percent);
 
             /* display progress x of y, y = of_total */
             break;
@@ -2149,10 +2183,11 @@ display_new_mail_notification(int num_new)
     gtk_widget_grab_default(ok_button);
     
     gtk_signal_connect_object(GTK_OBJECT(ok_button), "clicked",
-                       gtk_object_destroy, GTK_OBJECT(dlg));
+                              GTK_SIGNAL_FUNC(gtk_object_destroy),
+                              GTK_OBJECT(dlg));
 
     gtk_signal_connect(GTK_OBJECT(dlg), "destroy",
-                       new_mail_dialog_destroy_cb, NULL);
+                       GTK_SIGNAL_FUNC(new_mail_dialog_destroy_cb), NULL);
 
     gtk_widget_show_all(GTK_WIDGET(dlg));
 }
@@ -2950,7 +2985,11 @@ set_icon(GnomeApp * app)
     gdk_window_set_icon(w, ic_win, NULL, NULL);
 
     if( (filename = balsa_pixmap_finder("balsa/balsa_icon.png")) ) {
+#if BALSA_MAJOR < 2
         pb = gdk_pixbuf_new_from_file(filename);
+#else
+        pb = gdk_pixbuf_new_from_file(filename, NULL);
+#endif                          /* BALSA_MAJOR < 2 */
         gdk_window_clear(ic_win);
         gdk_pixbuf_unref(pb);
         g_free(filename);
@@ -2986,7 +3025,7 @@ notebook_switch_page_cb(GtkWidget * notebook,
     LibBalsaMessage *message;
     gchar *title;
 
-    index = page->child;
+    index = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), page_num);
 
     mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
     window = BALSA_INDEX(index)->window;
@@ -3022,8 +3061,10 @@ notebook_switch_page_cb(GtkWidget * notebook,
 
     balsa_mblist_focus_mailbox(balsa_app.mblist, mailbox);
 
-    balsa_index_refresh_date(BALSA_INDEX(index));
-    balsa_index_refresh_size(BALSA_INDEX(index));
+    balsa_index_refresh_date(GTK_NOTEBOOK(balsa_app.notebook),
+			     NULL, 0, index);
+    balsa_index_refresh_size(GTK_NOTEBOOK(balsa_app.notebook),
+			     NULL, 0, index);
 }
 
 static void
@@ -3215,12 +3256,13 @@ balsa_window_increase_activity(BalsaWindow* window)
     gint in_use = 0;
     gint activity_handler;
     guint activity_counter = 0;
-    GtkProgress* progress_bar;
+    GtkProgress *progress_bar;
     GtkAdjustment* adj;
     
 
-    progress_bar = gnome_appbar_get_progress(
-        GNOME_APPBAR(GNOME_APP(window)->statusbar));
+    progress_bar =
+        GTK_PROGRESS(gnome_appbar_get_progress
+                     (GNOME_APPBAR(GNOME_APP(window)->statusbar)));
     in_use = GPOINTER_TO_INT(gtk_object_get_data(GTK_OBJECT(progress_bar), 
                                                   "in_use"));
     
@@ -3228,8 +3270,8 @@ balsa_window_increase_activity(BalsaWindow* window)
         gtk_object_set_data(GTK_OBJECT(progress_bar), "in_use", 
                             GINT_TO_POINTER(BALSA_PROGRESS_ACTIVITY));
 
-        gtk_progress_set_activity_mode(progress_bar, 1);
-        adj = progress_bar->adjustment;
+        gtk_progress_set_activity_mode(GTK_PROGRESS(progress_bar), 1);
+        gtk_object_get(GTK_OBJECT(progress_bar), "adjustment", &adj, NULL);
         adj->lower = 0;
         adj->upper = 100;
         adj->value = 0;
@@ -3271,8 +3313,9 @@ balsa_window_decrease_activity(BalsaWindow* window)
     guint activity_counter = 0;
     GtkProgress* progress_bar;
     
-    progress_bar = gnome_appbar_get_progress(
-        GNOME_APPBAR(GNOME_APP(window)->statusbar));
+    progress_bar =
+        GTK_PROGRESS(gnome_appbar_get_progress
+                     (GNOME_APPBAR(GNOME_APP(window)->statusbar)));
     in_use = GPOINTER_TO_INT(
         gtk_object_get_data(GTK_OBJECT(progress_bar), "in_use"));
 
@@ -3336,8 +3379,9 @@ balsa_window_setup_progress(BalsaWindow* window, gfloat upper_bound)
     GtkAdjustment* adj;
     
 
-    progress_bar = gnome_appbar_get_progress(
-        GNOME_APPBAR(GNOME_APP(window)->statusbar));
+    progress_bar =
+        GTK_PROGRESS(gnome_appbar_get_progress
+                     (GNOME_APPBAR(GNOME_APP(window)->statusbar)));
     in_use = GPOINTER_TO_INT(
         gtk_object_get_data(GTK_OBJECT(progress_bar), "in_use"));
 
@@ -3373,8 +3417,9 @@ balsa_window_clear_progress(BalsaWindow* window)
     GtkProgress* progress_bar;
     GtkAdjustment* adj;
 
-    progress_bar = gnome_appbar_get_progress(
-        GNOME_APPBAR(GNOME_APP(window)->statusbar));
+    progress_bar =
+        GTK_PROGRESS(gnome_appbar_get_progress
+                     (GNOME_APPBAR(GNOME_APP(window)->statusbar)));
     in_use = GPOINTER_TO_INT(
         gtk_object_get_data(GTK_OBJECT(progress_bar), "in_use"));
 
@@ -3409,8 +3454,9 @@ balsa_window_increment_progress(BalsaWindow* window)
     GtkProgress* progress_bar;
     GtkAdjustment* adj;
     
-    progress_bar = gnome_appbar_get_progress(
-        GNOME_APPBAR(GNOME_APP(window)->statusbar));
+    progress_bar =
+        GTK_PROGRESS(gnome_appbar_get_progress
+                     (GNOME_APPBAR(GNOME_APP(window)->statusbar)));
     in_use = GPOINTER_TO_INT(
         gtk_object_get_data(GTK_OBJECT(progress_bar), "in_use"));
 
@@ -3540,11 +3586,13 @@ void
 update_view_menu(void)
 {
     GtkWidget *w = view_menu[MENU_VIEW_WRAP_POS].widget;
-    gtk_signal_handler_block_by_func(GTK_OBJECT(w), wrap_message_cb,
+    gtk_signal_handler_block_by_func(GTK_OBJECT(w), 
+                                     GTK_SIGNAL_FUNC(wrap_message_cb),
                                      balsa_app.main_window);
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(w),
                                    balsa_app.browse_wrap);
-    gtk_signal_handler_unblock_by_func(GTK_OBJECT(w), wrap_message_cb,
+    gtk_signal_handler_unblock_by_func(GTK_OBJECT(w), 
+                                       GTK_SIGNAL_FUNC(wrap_message_cb),
                                        balsa_app.main_window);
     if (balsa_app.main_window->preview)
         balsa_message_set_wrap(BALSA_MESSAGE(balsa_app.main_window->preview),

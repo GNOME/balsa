@@ -34,21 +34,14 @@
 #include "address-book.h"
 #include "address-book-vcard.h"
 #include "information.h"
+#include "abook-completion.h"
 
 /* FIXME: Perhaps the whole thing could be rewritten to use a g_scanner ?? */
 
 /* FIXME: Arbitrary constant */
 #define LINE_LEN 256
-/* FIXME: Make an option */
-#define CASE_INSENSITIVE_NAME
 
 static GtkObjectClass *parent_class = NULL;
-
-typedef struct _CompletionData CompletionData;
-struct _CompletionData {
-    gchar *string;
-    LibBalsaAddress *address;
-};
 
 static void libbalsa_address_book_vcard_class_init(LibBalsaAddressBookVcardClass *klass);
 static void libbalsa_address_book_vcard_init(LibBalsaAddressBookVcard *ab);
@@ -68,15 +61,10 @@ static GList *libbalsa_address_book_vcard_alias_complete(LibBalsaAddressBook * a
 							 const gchar * prefix,
 							 gchar ** new_prefix);
 
-static gchar *extract_name(const gchar * string);
-
-static CompletionData *completion_data_new(LibBalsaAddress * address,
-					   gboolean alias);
-static void completion_data_free(CompletionData * data);
-static gchar *completion_data_extract(CompletionData * data);
-static gint address_compare(LibBalsaAddress *a, LibBalsaAddress *b);
-
 static void load_vcard_file(LibBalsaAddressBook *ab);
+
+static gchar *
+extract_name(const gchar * string);
 
 static gboolean vcard_address_book_need_reload(LibBalsaAddressBookVcard *ab);
 
@@ -555,59 +543,3 @@ static GList *libbalsa_address_book_vcard_alias_complete(LibBalsaAddressBook * a
 
     return res;
 }
-
-/*
- * Create a new CompletionData
- */
-static CompletionData *
-completion_data_new(LibBalsaAddress * address, gboolean alias)
-{
-    CompletionData *ret;
-
-    ret = g_new0(CompletionData, 1);
-
-    /*  gtk_object_ref(GTK_OBJECT(address)); */
-    ret->address = address;
-
-    if (alias)
-	ret->string = g_strdup(address->id);
-    else
-	ret->string = g_strdup(address->full_name);
-
-#ifdef CASE_INSENSITIVE_NAME
-    g_strup(ret->string);
-#endif
-
-    return ret;
-}
-
-/*
- * Free a CompletionData
- */
-static void
-completion_data_free(CompletionData * data)
-{
-    /*  gtk_object_unref(GTK_OBJECT(data->address)); */
-
-    g_free(data->string);
-    g_free(data);
-}
-
-/*
- * The GCompletionFunc
- */
-static gchar *
-completion_data_extract(CompletionData * data)
-{
-    return data->string;
-}
-
-static gint
-address_compare(LibBalsaAddress *a, LibBalsaAddress *b)
-{
-    g_return_val_if_fail(a != NULL, -1);
-    g_return_val_if_fail(b != NULL, 1);
-
-    return g_strcasecmp(a->full_name, b->full_name);
-}
-

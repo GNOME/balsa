@@ -34,21 +34,14 @@
 #include "address-book.h"
 #include "address-book-extern.h"
 #include "information.h"
+#include "abook-completion.h"
 
 /* FIXME: Perhaps the whole thing could be rewritten to use a g_scanner ?? */
 
 /* FIXME: Arbitrary constant */
 #define LINE_LEN 256
-/* FIXME: Make an option */
-#define CASE_INSENSITIVE_NAME
 
 static GtkObjectClass *parent_class = NULL;
-
-typedef struct _CompletionData CompletionData;
-struct _CompletionData {
-    gchar *string;
-    LibBalsaAddress *address;
-};
 
 static void libbalsa_address_book_externq_class_init(LibBalsaAddressBookExternClass *klass);
 static void libbalsa_address_book_externq_init(LibBalsaAddressBookExtern *ab);
@@ -64,22 +57,15 @@ static void libbalsa_address_book_externq_save_config(LibBalsaAddressBook *ab,
 						    const gchar * prefix);
 static void libbalsa_address_book_externq_load_config(LibBalsaAddressBook *ab,
 						    const gchar * prefix);
-static GList *libbalsa_address_book_externq_alias_complete(LibBalsaAddressBook * ab,
-							 const gchar * prefix,
-							 gchar ** new_prefix);
-
-static gchar *extract_name(const gchar * string);
-
-static CompletionData *completion_data_new(LibBalsaAddress * address,
-					   gboolean alias);
-static void completion_data_free(CompletionData * data);
-static gchar *completion_data_extract(CompletionData * data);
-static gint address_compare(LibBalsaAddress *a, LibBalsaAddress *b);
-
 static void load_externq_file(LibBalsaAddressBook *ab);
 
 static gboolean externq_address_book_need_reload(LibBalsaAddressBookExtern *ab);
 
+static GList *parse_externq_file(LibBalsaAddressBookExtern *addr_externq, gchar *pattern);
+
+static GList *libbalsa_address_book_externq_alias_complete(LibBalsaAddressBook *ab, 
+							const gchar * prefix,
+							gchar ** new_prefix);
 
 GtkType libbalsa_address_book_externq_get_type(void)
 {
@@ -137,7 +123,8 @@ libbalsa_address_book_externq_class_init(LibBalsaAddressBookExternClass *
 static void
 libbalsa_address_book_externq_init(LibBalsaAddressBookExtern * ab)
 {
-    ab->path = NULL;
+    ab->load = NULL;
+	ab->save = NULL;
     ab->address_list = NULL;
     ab->mtime = 0;
 
@@ -154,19 +141,12 @@ libbalsa_address_book_externq_destroy(GtkObject * object)
 
     addr_externq = LIBBALSA_ADDRESS_BOOK_EXTERN(object);
 
-    g_free(addr_externq->path);
-
+    g_free(addr_externq->load);
+    g_free(addr_externq->save);
+	
     g_list_foreach(addr_externq->address_list, (GFunc) gtk_object_unref, NULL);
     g_list_free(addr_externq->address_list);
     addr_externq->address_list = NULL;
-
-    g_list_foreach(addr_externq->name_complete->items, 
-		   (GFunc)completion_data_free, NULL);
-    g_list_foreach(addr_externq->alias_complete->items, 
-		   (GFunc)completion_data_free, NULL);
-    
-    g_completion_free(addr_externq->name_complete);
-    g_completion_free(addr_externq->alias_complete);
 
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
 	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
@@ -174,7 +154,7 @@ libbalsa_address_book_externq_destroy(GtkObject * object)
 }
 
 LibBalsaAddressBook *
-libbalsa_address_book_externq_new(const gchar * name, const gchar * path)
+libbalsa_address_book_externq_new(const gchar * name, const gchar * load, const gchar *save)
 {
     LibBalsaAddressBookExtern *abvc;
     LibBalsaAddressBook *ab;
@@ -183,7 +163,8 @@ libbalsa_address_book_externq_new(const gchar * name, const gchar * path)
     ab = LIBBALSA_ADDRESS_BOOK(abvc);
 
     ab->name = g_strdup(name);
-    abvc->path = g_strdup(path);
+    abvc->load = g_strdup(load);
+	abvc->save = g_strdup(save);
 
     return ab;
 }
@@ -203,144 +184,90 @@ libbalsa_address_book_externq_load(LibBalsaAddressBook * ab, LibBalsaAddressBook
     callback(ab, NULL, closure);
 }
 
-/* FIXME: Could stat the file to see if it has changed since last time
-   we read it */
 static void load_externq_file(LibBalsaAddressBook *ab)
 {
+    LibBalsaAddressBookExtern *addr_externq;
+    addr_externq = LIBBALSA_ADDRESS_BOOK_EXTERN(ab);
+	
+	/* Erase the current address list */
+    g_list_foreach(addr_externq->address_list, (GFunc) gtk_object_unref, NULL);
+    g_list_free(addr_externq->address_list);
+	addr_externq->address_list = parse_externq_file(addr_externq, " ");
+}
+
+static GList *parse_externq_file(LibBalsaAddressBookExtern *addr_externq, gchar *pattern){
     FILE *gc;
     gchar string[LINE_LEN];
     gchar name[LINE_LEN], email[LINE_LEN], tmp[LINE_LEN];
+	gchar command[LINE_LEN];
     gint in_externq = FALSE;
     GList *list = NULL;
-    GList *completion_list = NULL;
     GList *address_list = NULL;
     CompletionData *cmp_data;
 
-    LibBalsaAddressBookExtern *addr_externq;
-
-    addr_externq = LIBBALSA_ADDRESS_BOOK_EXTERN(ab);
-
-    g_list_foreach(addr_externq->address_list, (GFunc) gtk_object_unref, NULL);
-    g_list_free(addr_externq->address_list);
-    addr_externq->address_list = NULL;
-
-    g_list_foreach(addr_externq->name_complete->items, 
-		   (GFunc)completion_data_free, NULL);
-    g_list_foreach(addr_externq->alias_complete->items, 
-		   (GFunc)completion_data_free, NULL);
-
-    g_completion_clear_items(addr_externq->name_complete);
-    g_completion_clear_items(addr_externq->alias_complete);
-
-    gc = popen(addr_externq->path,"r");
-
-    if (gc == NULL) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
-			     _("Could not open external query address book %s."), 
-			     ab->name);
-	return;
-    }
+	/* Start the program */
+	g_snprintf(command, sizeof(command), "%s \"%s\"", addr_externq->load, pattern);
 	
+    gc = popen(command,"r");
+
+	if (gc == NULL) {
+		libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
+				_("Could not open external query address book %s while trying to parse output from: %s"), 
+				addr_externq->parent.name, command); 
+		return NULL;
+    }
     fgets(string, sizeof(string), gc);
+	/* The first line should be junk, just debug output */
+#ifdef DEBUG
     printf("%s\n", string);
+#endif
 	
-    while (fgets(string, sizeof(string), gc)) {
-	LibBalsaAddress *address;
-	printf("%s\n", string);
-	if(sscanf(string, "%[^\t]\t%[^\t]%[^\n]", &email, &name, &tmp) < 2)
-	    continue;
-	printf("%s,%s,%s\n",email,name,tmp);
-	address = libbalsa_address_new();
-	address->id = g_strdup(_("No-Id"));
-	address->address_list = g_list_append(address_list, g_strdup(email));
-	
-	if (name)address->full_name = g_strdup(name);
-	else address->full_name = g_strdup(_("No-Name"));
-	list = g_list_prepend(list,address);
-    }
-    fclose(gc);
+	while (fgets(string, sizeof(string), gc)) {
+		LibBalsaAddress *address;
+#ifdef DEBUG
+		printf("%s\n", string);
+#endif
+		if(sscanf(string, "%[^\t]\t%[^\t]%[^\n]", &email, &name, &tmp) < 2)
+			continue;
+#ifdef DEBUG
+		printf("%s,%s,%s\n",email,name,tmp);
+#endif
+		address = libbalsa_address_new();
+		/* The externq database doesn't support Id's, sorry! */
+		address->id = g_strdup(_("No-Id"));
+		address->address_list = g_list_append(address_list, g_strdup(email));
+
+		if (name)address->full_name = g_strdup(name);
+		else address->full_name = g_strdup(_("No-Name"));
+		list = g_list_prepend(list,address);
+	}
+	fclose(gc);
     
     list = g_list_sort(list, (GCompareFunc)address_compare);
-    addr_externq->address_list = list;
-    
-    completion_list = NULL;
-    while (list) {
-	cmp_data = completion_data_new(LIBBALSA_ADDRESS(list->data), FALSE);
-	completion_list = g_list_prepend(completion_list, cmp_data);
-	list = g_list_next(list);
-    }
-    completion_list = g_list_reverse(completion_list);
-    g_completion_add_items(addr_externq->name_complete, completion_list);
-    g_list_free(completion_list);
-
-    completion_list = NULL;
-    for(list=addr_externq->address_list; list; list=g_list_next(list)) {
-	cmp_data = completion_data_new(LIBBALSA_ADDRESS(list->data), TRUE);
-	completion_list = g_list_prepend(completion_list, cmp_data);
-    }
-    completion_list = g_list_reverse(completion_list);
-    g_completion_add_items(addr_externq->alias_complete, completion_list);
-    g_list_free(completion_list);
-}
-
-static gchar *
-extract_name(const gchar * string)
-/* Extract full name in order from <string> that has GnomeCard format
-   and returns the pointer to the allocated memory chunk.
-*/
-{
-    enum GCardFieldOrder { LAST = 0, FIRST, MIDDLE, PREFIX, SUFFIX };
-    gint cpt, j;
-    gchar **fld, **name_arr;
-    gchar *res = NULL;
-
-    fld = g_strsplit(string, ";", 5);
-
-    for(cpt = 0; fld[cpt] != '\0'; cpt++)
-	;
-
-    if (cpt == 0)		/* insane empty name */
-	return NULL;
-
-    name_arr = g_malloc((cpt + 1) * sizeof(gchar *));
-
-    j = 0;
-    if (cpt > PREFIX && *fld[PREFIX] != '\0')
-	name_arr[j++] = g_strdup(fld[PREFIX]);
-
-    if (cpt > FIRST && *fld[FIRST] != '\0')
-	name_arr[j++] = g_strdup(fld[FIRST]);
-
-    if (cpt > MIDDLE && *fld[MIDDLE] != '\0')
-	name_arr[j++] = g_strdup(fld[MIDDLE]);
-
-    if (cpt > LAST && *fld[LAST] != '\0')
-	name_arr[j++] = g_strdup(fld[LAST]);
-
-    if (cpt > SUFFIX && *fld[SUFFIX] != '\0')
-	name_arr[j++] = g_strdup(fld[SUFFIX]);
-
-    name_arr[j] = NULL;
-
-    g_strfreev(fld);
-
-    /* collect the data to one string */
-    res = g_strjoinv(" ", name_arr);
-    while (j-- > 0)
-	g_free(name_arr[j]);
-
-    g_free(name_arr);
-
-    return res;
+	return list;
 }
 
 static void
 libbalsa_address_book_externq_store_address(LibBalsaAddressBook * ab,
 					  LibBalsaAddress * new_address)
 {
-    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
-			 _("Can't save %s: saving not yet supported"),
-			 new_address->full_name);
+	gchar command[LINE_LEN];
+    LibBalsaAddressBookExtern *ex;
+   	FILE *gc; 
+	g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK_EXTERN(ab));
+
+    ex = LIBBALSA_ADDRESS_BOOK_EXTERN(ab);
+
+	g_snprintf(command, sizeof(command), "%s \"%s\" \"%s\" \"%s\"", ex->save, (gchar *)g_list_first(new_address->address_list)->data, new_address->full_name, "TODO");
+
+	gc = popen(command, "r");
+	if(gc == NULL){
+		libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
+				_("Could not add address to address book %s while trying to execute: %s"), 
+				ex->parent.name, command); 
+		return;
+    }
+	fclose(gc);
 }
 
 static void
@@ -353,7 +280,8 @@ libbalsa_address_book_externq_save_config(LibBalsaAddressBook * ab,
 
     vc = LIBBALSA_ADDRESS_BOOK_EXTERN(ab);
 
-    gnome_config_set_string("Path", vc->path);
+    gnome_config_set_string("Load", vc->load);
+    gnome_config_set_string("Save", vc->save);
 
     if (LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->save_config)
 	LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->save_config(ab, prefix);
@@ -369,125 +297,36 @@ libbalsa_address_book_externq_load_config(LibBalsaAddressBook * ab,
 
     vc = LIBBALSA_ADDRESS_BOOK_EXTERN(ab);
 
-    g_free(vc->path);
-    vc->path = gnome_config_get_string("Path");
+    g_free(vc->load);
+    vc->load = gnome_config_get_string("Load");
+	vc->save = gnome_config_get_string("Save");
 
     if (LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->load_config)
 	LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->load_config(ab, prefix);
 }
 
-static GList *
-libbalsa_address_book_externq_alias_complete(LibBalsaAddressBook * ab,
-					     const gchar * prefix, 
-					     gchar ** new_prefix)
+static GList *libbalsa_address_book_externq_alias_complete(LibBalsaAddressBook * ab,
+							 const gchar * prefix, 
+							 gchar ** new_prefix)
 {
-    LibBalsaAddressBookExtern *vc;
-    GList *resa = NULL, *resb = NULL;
+    LibBalsaAddressBookExtern *ex;
     GList *res = NULL;
     gchar *p1 = NULL, *p2 = NULL;
     LibBalsaAddress *addr1, *addr2;
+	*new_prefix = NULL;
 
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK_EXTERN(ab), NULL);
 
-    vc = LIBBALSA_ADDRESS_BOOK_EXTERN(ab);
+    ex = LIBBALSA_ADDRESS_BOOK_EXTERN(ab);
 
     if ( ab->expand_aliases == FALSE )
 	return NULL;
 
-    load_externq_file(ab);
-
-    resa = g_completion_complete(vc->name_complete, (gchar*)prefix, &p1);
-    resb = g_completion_complete(vc->alias_complete, (gchar*)prefix, &p2);
-
-    if ( p1 && p2 ) {
-	if ( strlen(p1) > strlen(p2) ) {
-	    *new_prefix = p1;
-	    g_free(p2);
-	} else {
-	    *new_prefix = p2;
-	    g_free(p1);
-	}
-    } else {
-	*new_prefix = p1?p1:p2;
-    }
-
-    /*
-      Extract a list of addresses.
-      pick any of them if two addresses point to the same structure.
-      pick addr1 if it is available and there is no addr2 
-                    or it is smaller than addr1.
-      in other case, pick addr2 (one of addr1 or addr2 must be not-null).
-    */
-    while ( resa || resb ) {
-	addr1 = resa ? ((CompletionData*)resa->data)->address : NULL;
-	addr2 = resb ? ((CompletionData*)resb->data)->address : NULL;
+	res = parse_externq_file(ex, (gchar *)prefix);
 	
-	if (addr1 == addr2) {
-	    res = g_list_prepend(res, addr1);
-	    gtk_object_ref(GTK_OBJECT(addr1));
-	    resa = g_list_next(resa);
-	    resb = g_list_next(resb);
-	} else if (resa != NULL && 
-		   (resb == NULL || address_compare(addr1, addr2) > 0) ) {
-	    res = g_list_prepend(res, addr1);
-	    gtk_object_ref(GTK_OBJECT(addr1));
-	    resa = g_list_next(resa);
-	} else {
-	    res = g_list_prepend(res, addr2);
-	    gtk_object_ref(GTK_OBJECT(addr2));
-	    resb = g_list_next(resb);
-	}
-    }
-    res = g_list_reverse(res);
-    return res;
-}
+	g_list_reverse(res);
 
-/*
- * Create a new CompletionData
- */
-static CompletionData *
-completion_data_new(LibBalsaAddress * address, gboolean alias)
-{
-    CompletionData *ret;
+	if(res != NULL)*new_prefix = libbalsa_address_to_gchar((LibBalsaAddress *)g_list_first(res)->data, 0);
 
-    ret = g_new0(CompletionData, 1);
-
-    /*  gtk_object_ref(GTK_OBJECT(address)); */
-    ret->address = address;
-    ret->string  = g_strdup(alias ? address->id : address->full_name);
-
-#ifdef CASE_INSENSITIVE_NAME
-    g_strup(ret->string);
-#endif
-
-    return ret;
-}
-
-/*
- * Free a CompletionData
- */
-static void
-completion_data_free(CompletionData * data)
-{
-    /*  gtk_object_unref(GTK_OBJECT(data->address)); */
-    g_free(data->string);
-    g_free(data);
-}
-
-/*
- * The GCompletionFunc
- */
-static gchar *
-completion_data_extract(CompletionData * data)
-{
-    return data->string;
-}
-
-static gint
-address_compare(LibBalsaAddress *a, LibBalsaAddress *b)
-{
-    g_return_val_if_fail(a != NULL, -1);
-    g_return_val_if_fail(b != NULL, 1);
-
-    return g_strcasecmp(a->full_name, b->full_name);
+	return res;
 }

@@ -42,7 +42,8 @@ typedef struct _LibBalsaAddressBookExternClass
 struct _LibBalsaAddressBookExtern {
     LibBalsaAddressBook parent;
 
-    gchar *path;
+    gchar *load;
+    gchar *save;
 
     GList *address_list;
 
@@ -59,7 +60,7 @@ struct _LibBalsaAddressBookExternClass {
 GtkType libbalsa_address_book_externq_get_type(void);
 
 LibBalsaAddressBook *libbalsa_address_book_externq_new(const gchar * name,
-						     const gchar * path);
+						     const gchar * load, const char * save);
 
 
 #endif

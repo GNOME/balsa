@@ -9,6 +9,8 @@ filter_src = \
 endif
 
 libbalsa_a_SOURCES = 		\
+	abook-completion.c	\
+	abook-completion.h	\
 	address-book-ldap.c 	\
 	address-book-ldap.h	\
 	address-book-vcard.c	\

@@ -1,3 +1,7 @@
+2004-01-09 06:06  PeterB
+
+	* libbalsa/mime.c: Don't assume body has a mime-part.
+
 2004-01-07 19:15  PeterB
 
 	* libbalsa/mailbox_imap.c: Fix last commit.

@@ -513,9 +513,12 @@ balsa_window_new ()
   gtk_paned_pack2(GTK_PANED(hpaned), vpaned, TRUE, TRUE);
   /*PKGW: do it this way, without the usizes.*/
   if(balsa_app.show_mblist) {
-     gtk_widget_show(window->mblist);
-     gtk_paned_set_position( GTK_PANED(hpaned), balsa_app.mblist_width );
+     gtk_check_menu_item_set_active(
+	GTK_CHECK_MENU_ITEM(settings_menu[MENU_SETTINGS_MBLIST_POS].widget),
+	balsa_app.show_mblist);
   }
+  /* gtk_widget_show(GTK_WIDGET(window->mblist));
+     gtk_paned_set_position( GTK_PANED(hpaned), balsa_app.mblist_width); */
 
   gtk_paned_pack1(GTK_PANED(vpaned), window->notebook, TRUE, TRUE);
   gtk_paned_pack2(GTK_PANED(vpaned), preview, TRUE, TRUE);
@@ -537,10 +540,6 @@ balsa_window_new ()
 	GTK_CHECK_MENU_ITEM(shown_hdrs_menu[balsa_app.shown_headers].widget),
 	TRUE);
 
-  if(balsa_app.show_mblist)
-     gtk_check_menu_item_set_active(
-	GTK_CHECK_MENU_ITEM(settings_menu[MENU_SETTINGS_MBLIST_POS].widget),
-	TRUE);
 
   if(balsa_app.show_notebook_tabs)
      gtk_check_menu_item_set_active(
@@ -1432,26 +1431,30 @@ mailbox_empty_trash(GtkWidget * widget, gpointer data)
 
 }
 
-static void show_mbtree_cb(GtkWidget * widget, gpointer data)
+static void
+show_mbtree_cb(GtkWidget * widget, gpointer data)
 {
    GtkWidget* parent;
-   parent = GTK_WIDGET(GTK_WIDGET(balsa_app.mblist)->parent)->parent;
+   parent = GTK_WIDGET(BALSA_WINDOW(data)->mblist)->parent;
    g_assert(parent!=NULL);
 
-   if(GTK_CHECK_MENU_ITEM(widget)->active) {
-      gtk_widget_show(GTK_WIDGET(balsa_app.mblist));
+   balsa_app.show_mblist = GTK_CHECK_MENU_ITEM(widget)->active;
+   if(balsa_app.show_mblist) {
+      gtk_widget_show(BALSA_WINDOW (data)->mblist);
       gtk_paned_set_position( GTK_PANED(parent), balsa_app.mblist_width);
    }
    else {
-      gtk_widget_hide(GTK_WIDGET(balsa_app.mblist));
-      gtk_paned_set_position    (GTK_PANED(parent), 0);
+      gtk_widget_hide(BALSA_WINDOW(data)->mblist);
+      gtk_paned_set_position( GTK_PANED(parent), 0);
    }
 }
 
-static void show_mbtabs_cb(GtkWidget * widget, gpointer data)
+static void
+show_mbtabs_cb(GtkWidget * widget, gpointer data)
 {
+   balsa_app.show_notebook_tabs = GTK_CHECK_MENU_ITEM(widget)->active;
    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(balsa_app.notebook), 
-			      GTK_CHECK_MENU_ITEM(widget)->active);
+			      balsa_app.show_notebook_tabs);
 }
 
 static void

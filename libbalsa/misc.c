@@ -344,6 +344,9 @@ libbalsa_wrap_string(gchar * str, int width)
  * The stuffing space isn't logically part of the text of the paragraph,
  * so this doesn't change the content.
  * */
+/* Updated 2003 to implement DelSp=Yes as in
+ * http://www.ietf.org/internet-drafts/draft-gellens-format-bis-01.txt
+ */
 
 #define MAX_WIDTH	997	/* enshrined somewhere */
 #define QUOTE_CHAR	'>'
@@ -549,6 +552,7 @@ dowrap_rfc2646(GList * list, gint width, gboolean to_screen,
                          or of a received message window?
    gboolean quote:       should the wrapped lines be prefixed 
                          with the RFC 2646 quote character '>'?
+   gboolean delsp:	 was the message formatted with DelSp=Yes?
 */
 GString *
 libbalsa_process_text_rfc2646(gchar * par, gint width,

@@ -310,7 +310,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
       if (addr->personal)
 	{
 	  tmp = g_malloc (strlen (addr->personal) + 1 + 1 + strlen (addr->mailbox) + 1 + 1);
-	  sprintf (tmp, "%s <>", addr->personal, addr->mailbox);
+	  sprintf (tmp, "%s <%s>", addr->personal, addr->mailbox);
 	  gtk_entry_set_text (GTK_ENTRY (msg->to), tmp);
 	  g_free (tmp);
 	}

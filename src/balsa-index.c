@@ -198,7 +198,7 @@ balsa_index_init (BalsaIndex * bindex)
 
 
   gtk_clist_set_policy (clist, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-  gtk_clist_set_selection_mode (clist, GTK_SELECTION_BROWSE);
+  gtk_clist_set_selection_mode (clist, GTK_SELECTION_EXTENDED);
   gtk_clist_set_column_justification (clist, 0, GTK_JUSTIFY_RIGHT);
   gtk_clist_set_column_justification (clist, 1, GTK_JUSTIFY_CENTER);
   gtk_clist_set_column_justification (clist, 2, GTK_JUSTIFY_CENTER);
@@ -363,7 +363,7 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
     }
 
   gtk_clist_set_selection_mode (GTK_CLIST (GTK_BIN (bindex)->child),
-				GTK_SELECTION_BROWSE);
+				GTK_SELECTION_EXTENDED);
 
   if (first_new_message != 0)
     {

@@ -236,7 +236,7 @@ dnl ############################################################################
 dnl Check from GtkHTML if available
 dnl ######################################################################################
 
-AC_ARG_ENABLE([gtkhtml], [  --enable-gtkhtml Use GtkHTML if available [default=no]],[
+AC_ARG_ENABLE([gtkhtml], [  --enable-gtkhtml Use GtkHTML if available (experimental) [default=no]],[
 	check_gtkhtml=$enableval
 ],[
 	check_gtkhtml=no

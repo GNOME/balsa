@@ -25,6 +25,10 @@
 #include <libgnomeui/gnome-window-icon.h>
 #endif
 
+#ifdef GTKHTML_HAVE_GCONF
+# include <gconf/gconf.h>
+#endif
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -178,12 +182,21 @@ main (int argc, char *argv[])
   GtkWidget *window;
   GnomeClient* client;
   gchar *default_icon;
+#ifdef GTKHTML_HAVE_GCONF
+  GConfError *gconf_error;
+#endif
 
   /* Initialize the i18n stuff */
   bindtextdomain (PACKAGE, GNOMELOCALEDIR);
   textdomain (PACKAGE);
  
   balsa_init (argc, argv);
+
+#ifdef GTKHTML_HAVE_GCONF
+  if (!gconf_init(argc, argv, &gconf_error))
+    gconf_error_destroy(gconf_error);
+  gconf_error = NULL;
+#endif
 
   balsa_app_init ();
 

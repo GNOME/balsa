@@ -23,7 +23,7 @@
 
 #include <gtk/gtk.h>
 #if !GTK_CHECK_VERSION(2, 6, 0)
-#undef GNOME_DISABLE_DEPRECATED
+#undef GTK_DISABLE_DEPRECATED
 #include <gnome.h>
 #endif
 

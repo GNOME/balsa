@@ -1,5 +1,9 @@
 2001-04-17  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* configure.in, NEWS: release balsa-1.1.4
+
+2001-04-20  Pawel Salek  <pawsa@theochem.kth.se>
+
 	* libbalsa/send.c: encode BASE64 non-text message parts: Fix #52891.
 	
 2001-04-17  Pawel Salek  <pawsa@theochem.kth.se>

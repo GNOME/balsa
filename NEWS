@@ -1,3 +1,9 @@
+* Balsa-2.0.14 release. Release date 2003-08-26
+
+- message wrapping improvements, RFC 2646 support.
+- experimental LDAP write support (feedback and patches appreciated).
+- number of bugs fixed.
+
 * Balsa-2.0.13 release. Release date 2003-07-27
 
 - more flexible printing configuration.

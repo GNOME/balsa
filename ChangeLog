@@ -1,3 +1,7 @@
+2003-08-26  Pawel Salek  <pawsa theochem.kth.se>
+
+	* configure.in, NEWS: release 2.0.14.
+
 2003-08-23 18:47  PeterB
 
 	* src/balsa-message.c: Implement bm_sender_to_gchar() to put all

@@ -1,3 +1,8 @@
+2002-01-15  Emmanuel <e.allaud@wanadoo.fr>
+
+	* src/balsa-index.c: update properly size and date columns on format
+	change.
+	
 2002-01-14  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libinit_balsa/Makefile.am: remove the need for --maintainer-mode.

@@ -112,6 +112,13 @@ static void balsa_index_idle_remove(gpointer data);
 static void balsa_index_idle_add(gpointer data, gpointer message);
 static gboolean balsa_index_idle_clear(gpointer data);
 static gint balsa_index_most_recent_message(GtkCList * clist);
+static void refresh_size(GtkCTree * ctree,
+			 GtkCTreeNode *node,
+			 gpointer data);
+static void refresh_date(GtkCTree * ctree,
+			 GtkCTreeNode *node,
+			 gpointer data);
+
 
 
 /* mailbox callbacks */
@@ -2405,6 +2412,21 @@ balsa_index_set_sort_order(BalsaIndex * bindex, int column, GtkSortType order)
     }
 }
 
+static void
+refresh_size(GtkCTree * ctree,
+	     GtkCTreeNode *node,
+	     gpointer data)
+{
+    gchar *txt_new;
+    LibBalsaMessage * message;
+    
+    message = LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data (ctree, node));
+    txt_new = libbalsa_message_size_to_gchar(message,
+					     GPOINTER_TO_INT(data));
+    gtk_ctree_node_set_text (ctree, node, 6, txt_new);
+    g_free (txt_new);
+}
+
 void
 balsa_index_refresh_size (GtkNotebook *notebook,
 			  GtkNotebookPage *page,
@@ -2412,12 +2434,9 @@ balsa_index_refresh_size (GtkNotebook *notebook,
 			  gpointer data)
 {
     BalsaIndex *bindex;
-    LibBalsaMessage * message;
     GtkWidget *index;
     GtkCTreeNode *node;
     GtkCTree *ctree;
-    gchar *txt_new;
-    gint j;
 
     if (page)
 	index = page->child;
@@ -2432,20 +2451,27 @@ balsa_index_refresh_size (GtkNotebook *notebook,
         return;
 
     bindex->line_length = balsa_app.line_length;
-
     ctree = GTK_CTREE(bindex->ctree);
-    if (ctree) {
-	j = 0;
-	while ((node = gtk_ctree_node_nth (ctree, j))) {
-	    message = (LibBalsaMessage*)
-		gtk_ctree_node_get_row_data (ctree, node);
-	    txt_new = libbalsa_message_size_to_gchar(message,
-						     bindex->line_length);
-	    gtk_ctree_node_set_text (ctree, node, 6, txt_new);
-	    g_free (txt_new);
-	    j++;
-	}
-    }
+    if (ctree)
+	gtk_ctree_pre_recursive(ctree,
+				NULL,
+				refresh_size,
+				GINT_TO_POINTER(bindex->line_length));
+}
+
+static void
+refresh_date(GtkCTree * ctree,
+	     GtkCTreeNode *node,
+	     gpointer data)
+{
+    LibBalsaMessage * message;
+    gchar *txt_new;
+
+    message = LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data (ctree, node));
+    txt_new = libbalsa_message_date_to_gchar(message,
+					     (gchar*) data);
+    gtk_ctree_node_set_text (ctree, node, 5, txt_new);
+    g_free (txt_new);
 }
 
 void
@@ -2455,12 +2481,9 @@ balsa_index_refresh_date (GtkNotebook *notebook,
 			  gpointer data)
 {
     BalsaIndex *bindex;
-    LibBalsaMessage * message;
     GtkWidget *index;
     GtkCTreeNode *node;
     GtkCTree *ctree;
-    gchar *txt_new;
-    gint j;
 
     if (page)
 	index = page->child;
@@ -2478,18 +2501,11 @@ balsa_index_refresh_date (GtkNotebook *notebook,
     bindex->date_string = g_strdup (balsa_app.date_string);
 
     ctree = GTK_CTREE(bindex->ctree);
-    if (ctree) {
-	j = 0;
-	while ((node = gtk_ctree_node_nth (ctree, j))) {
-	    message = (LibBalsaMessage*)
-		gtk_ctree_node_get_row_data (ctree, node);
-	    txt_new = libbalsa_message_date_to_gchar(message,
-						     bindex->date_string);
-	    gtk_ctree_node_set_text (ctree, node, 5, txt_new);
-	    g_free (txt_new);
-	    j++;
-	}
-    }
+    if (ctree)	
+	gtk_ctree_pre_recursive(ctree,
+				NULL,
+				refresh_date,
+				bindex->date_string);
 }
 
 static gint

@@ -4858,12 +4858,15 @@ libbalsa_msg_perform_crypto_real(LibBalsaMessage * message,
     g_free(mime_type);
 
     /* loop over the parts, checking for RFC 2440 stuff, but ignore
-       application/octet-stream which might be a detached signature */
+       application/octet-stream which might be a detached encrypted part
+       as well as all detached signatures */
     chk_body = body;
     while (chk_body) {
 	mime_type = libbalsa_message_body_get_mime_type(chk_body);
 
-	if (g_ascii_strcasecmp(mime_type, "application/octet-stream"))
+	if (g_ascii_strcasecmp(mime_type, "application/octet-stream") &&
+	    g_ascii_strcasecmp(mime_type, "application/pkcs7-signature") &&
+	    g_ascii_strcasecmp(mime_type, "application/pgp-signature"))
 	    libbalsa_msg_part_2440(message, chk_body, chk_crypto);
 	g_free(mime_type);
 

@@ -13,7 +13,7 @@ dnl                        keeps the release as a separate field
 dnl ######################################################################################
 
 BALSA_MAJOR=0
-BALSA_REVISION=8
+BALSA_REVISION=9
 BALSA_PATCHLEVEL=0
 BALSA_RELEASE=1
 use_release=no

@@ -1,3 +1,8 @@
+2000-05-24  Peter Williams  <peter@beta.newton.cx>
+
+	* configure.in (BALSA_REVISION): This is now
+	development version 0.9.0.
+
 2000-05-22  Matthew Guenther  <mguenthe@netcom.ca>
 	* src/main.c: added session management to Balsa, functions 
 	balsa_save_session and balsa_kill_session.

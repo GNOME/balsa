@@ -468,21 +468,21 @@ check_mailboxes_for_finish (GtkWidget * widget, gpointer data)
   mbox = gtk_entry_get_text (GTK_ENTRY (prefs->inbox));
   if (mailbox_valid (mbox) == MAILBOX_UNKNOWN)
     {
-      g_string_sprintf (str, "Mailbox \"%s\" is not valid.\n\nWould you like to create it?", mbox);
+      g_string_sprintf (str, _("Mailbox \"%s\" is not valid.\n\nWould you like to create it?"), mbox);
       goto BADMAILBOX;
     }
 
   mbox = gtk_entry_get_text (GTK_ENTRY (prefs->outbox));
   if (mailbox_valid (mbox) == MAILBOX_UNKNOWN)
     {
-      g_string_sprintf (str, "Mailbox \"%s\" is not valid.\n\nWould you like to create it?", mbox);
+      g_string_sprintf (str, _("Mailbox \"%s\" is not valid.\n\nWould you like to create it?"), mbox);
       goto BADMAILBOX;
     }
 
   mbox = gtk_entry_get_text (GTK_ENTRY (prefs->trash));
   if (mailbox_valid (mbox) == MAILBOX_UNKNOWN)
     {
-      g_string_sprintf (str, "Mailbox \"%s\" is not valid.\n\nWould you like to create it?", mbox);
+      g_string_sprintf (str, _("Mailbox \"%s\" is not valid.\n\nWould you like to create it?"), mbox);
       goto BADMAILBOX;
     }
   else
@@ -509,7 +509,7 @@ BADMAILBOX:
     }
   else
     {
-      ask = gnome_message_box_new ("Unable to procede without a valid mailbox.  Please try again.",
+      ask = gnome_message_box_new (_("Unable to procede without a valid mailbox.  Please try again."),
 				   GNOME_MESSAGE_BOX_ERROR,
 				   GNOME_STOCK_BUTTON_OK,
 				   NULL);

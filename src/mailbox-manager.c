@@ -134,6 +134,7 @@ open_mailbox_manager ()
   update_mailbox_list ();
   gtk_widget_show (mmw->list);
 
+  gtk_widget_realize(mmw->list);
 
   /* one vbox to hold them all... */
   vbox = gtk_vbox_new (FALSE, 0);

@@ -178,6 +178,8 @@ create_toolbar (MainWindow *mw)
 
   toolbar = gtk_toolbar_new (GTK_ORIENTATION_HORIZONTAL, GTK_TOOLBAR_ICONS);
 
+  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+
   label = gtk_label_new ("Mailbox:");
   gtk_toolbar_append_widget (GTK_TOOLBAR (toolbar), label, NULL, NULL);
   gtk_widget_show (label);

@@ -1509,6 +1509,7 @@ mbox_model_init(GtkTreeModelIface *iface)
     mbox_model_col_type[LB_MBOX_DATE_COL]    = G_TYPE_STRING;
     mbox_model_col_type[LB_MBOX_SIZE_COL]    = G_TYPE_STRING;
     mbox_model_col_type[LB_MBOX_WEIGHT_COL]  = G_TYPE_UINT;
+    mbox_model_col_type[LB_MBOX_STYLE_COL]   = G_TYPE_UINT;
     mbox_model_col_type[LB_MBOX_MESSAGE_COL] = G_TYPE_POINTER;
 
     libbalsa_mbox_model_signals[ROW_CHANGED] =
@@ -1655,6 +1656,20 @@ get_from_field(LibBalsaMessage *message)
 static GdkPixbuf *status_icons[LIBBALSA_MESSAGE_STATUS_ICONS_NUM];
 static GdkPixbuf *attach_icons[LIBBALSA_MESSAGE_ATTACH_ICONS_NUM];
 
+static gboolean
+lbm_node_has_unread_child(LibBalsaMailbox * lmm, GNode * node)
+{
+    for (node = node->children; node; node = node->next) {
+	LibBalsaMessage *msg =
+	    libbalsa_mailbox_get_message(lmm,
+					 GPOINTER_TO_UINT(node->data));
+	if (LIBBALSA_MESSAGE_IS_UNREAD(msg)
+	    || lbm_node_has_unread_child(lmm, node))
+	    return TRUE;
+    }
+    return FALSE;
+}
+
 static void
 mbox_model_get_value(GtkTreeModel *tree_model,
 		     GtkTreeIter  *iter,
@@ -1684,8 +1699,9 @@ mbox_model_get_value(GtkTreeModel *tree_model,
 	return;
 
     path = gtk_tree_model_get_path(tree_model, iter);
-    col = gtk_tree_view_get_column(tree, (column == LB_MBOX_WEIGHT_COL ?
-					  LB_MBOX_FROM_COL : column));
+    col = gtk_tree_view_get_column(tree, ((column == LB_MBOX_WEIGHT_COL
+					   || column == LB_MBOX_STYLE_COL)
+					  ? LB_MBOX_FROM_COL : column));
     gtk_tree_view_get_visible_rect(tree, &a);
     gtk_tree_view_get_cell_area(tree, path, col, &b);
     gtk_tree_view_widget_to_tree_coords(tree, b.x, b.y, &c.x, &c.y);
@@ -1747,6 +1763,13 @@ mbox_model_get_value(GtkTreeModel *tree_model,
 			 (msg && !LIBBALSA_MESSAGE_IS_DELETED(msg)
 			  && LIBBALSA_MESSAGE_IS_UNREAD(msg)) ?
 			 PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
+	break;
+    case LB_MBOX_STYLE_COL:
+	g_value_set_uint(value,
+			 (msg && !LIBBALSA_MESSAGE_IS_DELETED(msg)
+			  && lbm_node_has_unread_child(lmm,
+						       iter->user_data)) ?
+			 PANGO_STYLE_OBLIQUE : PANGO_STYLE_NORMAL);
 	break;
     }
 }

@@ -419,7 +419,7 @@ gtk_text_to_email (char *buff)
 static void
 send_smtp_message (GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-  long debug = 0;
+  long debug = 1;
   char line[MAILTMPLEN];
 
   SENDSTREAM *stream = NIL;

@@ -38,7 +38,9 @@ get_header (char *header, MAILSTREAM * stream, unsigned long mesgno)
   char *t;
   int olen = strlen (header);
   int len;
-  STRINGLIST headerline = {{(unsigned char *) header, olen}, NIL};
+  STRINGLIST headerline =
+  {
+    {(unsigned char *) header, olen}, NIL};
   t = mail_fetch_header (stream, mesgno, NIL, &headerline, NIL, FT_INTERNAL | FT_PEEK);
   len = strlen (t);
   if (len < 3)
@@ -107,56 +109,77 @@ mm_exists (MAILSTREAM * stream,
 	   unsigned long number)
 {
   if (number > 0 && balsa_app.current_index)
-    balsa_index_append_new_messages (BALSA_INDEX (balsa_app.current_index));
+    {
+      balsa_index_append_new_messages (BALSA_INDEX (balsa_app.current_index));
+    }
 }
 
 
 void
 mm_expunged (MAILSTREAM * stream, unsigned long number)
 {
+#ifdef DEBUG
+#endif
 }
 
 
 void
 mm_flags (MAILSTREAM * stream, unsigned long number)
 {
+#ifdef DEBUG
+  g_print ("Flags changed for message number: %d\n", number);
+#endif
 }
 
 
 void
 mm_notify (MAILSTREAM * stream, char *string, long errflg)
 {
+#ifdef DEBUG
+  g_print ("%s\n", string);
+#endif
 }
 
 
 void
 mm_list (MAILSTREAM * stream, int delimiter, char *mailbox, long attributes)
 {
+#ifdef DEBUG
+#endif
 }
 
 
 void
 mm_lsub (MAILSTREAM * stream, int delimiter, char *mailbox, long attributes)
 {
+#ifdef DEBUG
+#endif
 }
 
 
 void
 mm_status (MAILSTREAM * stream, char *mailbox, MAILSTATUS * status)
 {
+#ifdef DEBUG
+#endif
 }
 
 
 void
 mm_log (char *string, long errflg)
 {
+#ifdef DEBUG
+  g_print ("%s\n", string);
+#endif
 }
 
 
 void
 mm_dlog (char *string)
 {
-
+#ifdef DEBUG
+  g_print ("%s\n", string);
+#endif
 }
 
 
@@ -193,12 +216,18 @@ mm_login (NETMBX * mb, char *user, char *pwd, long trial)
 void
 mm_critical (MAILSTREAM * stream)
 {
+#ifdef DEBUG
+  g_print ("fixing to do some critical stuff to mail stream, do not interupt\n");
+#endif
 }
 
 
 void
 mm_nocritical (MAILSTREAM * stream)
 {
+#ifdef DEBUG
+  g_print ("no longer in critical mode\n");
+#endif
 }
 
 
@@ -212,4 +241,7 @@ mm_diskerror (MAILSTREAM * stream, long errcode, long serious)
 void
 mm_fatal (char *string)
 {
+#ifdef DEBUG
+  g_print ("%s\n", string);
+#endif
 }

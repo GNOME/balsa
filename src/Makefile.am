@@ -1,8 +1,6 @@
 bin_PROGRAMS = balsa
 
 balsa_SOURCES =	\
-	addrbook-manager.c	\
-	addrbook.c		\
 	balsa-app.c		\
 	balsa-index.c		\
 	balsa-init.c		\

@@ -1,2 +1,5 @@
 usr/bin
 usr/sbin
+usr/doc
+usr/man
+usr/lib

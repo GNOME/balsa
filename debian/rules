@@ -47,7 +47,7 @@ binary-arch: build
 #	dh_installinit
 #	dh_installcron
 	dh_installmanpages
-	dh_undocumented balsa.1
+#	dh_undocumented balsa.1
 	dh_installchangelogs
 	dh_strip
 	dh_compress

@@ -31,8 +31,6 @@
 #include "send.h"
 #include "sendmsg-window.h"
 
-gint delete_event (GtkWidget *, gpointer);
-
 extern GtkWidget *new_icon (gchar **, GtkWidget *);
 
 static void send_message_cb (GtkWidget *, BalsaSendmsg *);
@@ -267,10 +265,9 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
       msg->window = gnome_app_new ("balsa", "Forward message");
       break;
     }
-  gtk_signal_connect (GTK_OBJECT (msg->window), "destroy",
-		      GTK_SIGNAL_FUNC (delete_event), NULL);
+
   gtk_signal_connect (GTK_OBJECT (msg->window), "delete_event",
-		      GTK_SIGNAL_FUNC (delete_event), NULL);
+		      GTK_SIGNAL_FUNC (gtk_false), NULL);
 
   vbox = gtk_vbox_new (FALSE, 1);
   gtk_container_border_width (GTK_CONTAINER (vbox), 2);

@@ -1,5 +1,5 @@
 # Note that this is NOT a relocatable package
-%define ver      0.3.5
+%define ver      0.4.0
 %define rel      SNAP
 %define prefix   /usr
 
@@ -13,7 +13,7 @@ Source0:   balsa-%{PACKAGE_VERSION}.tar.gz
 URL:       http://www.balsa.net/
 BuildRoot: /tmp/balsa-%{PACKAGE_VERSION}-root
 Packager: Michael Fulbright <msf@redhat.com>
-Requires: gtk+ >= 1.1.0
+Requires: gtk+ >= 1.1.1
 Requires: gnome-libs
 Docdir: %{prefix}/doc
 
@@ -50,9 +50,14 @@ rm -rf $RPM_BUILD_ROOT
 %doc README COPYING ChangeLog NEWS TODO
 %{prefix}/bin/balsa
 %{prefix}/share/*
+%{prefix}/man/*
 
 
 %changelog
+* Mon Aug  3 1998 Stuart Parmenter <pavlov@pavlov.net>
+
+- Updated to version 0.4.0.
+
 * Sun Jul 26 1998 Stuart Parmenter <pavlov@pavlov.net>
 
 - Updated RPM file to reflect recent changes with the

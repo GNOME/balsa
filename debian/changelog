@@ -1,8 +1,8 @@
-balsa (0.3.5-1) unstable; urgency=low
+balsa (0.4.0-1) unstable; urgency=low
 
   * Initial Release.
 
- -- Stuart Parmenter <pavlov@innerx.net>  Mon, 27 Jul 1998 11:44:08 -0400
+ -- Stuart Parmenter <pavlov@innerx.net>  Mon, 03 Aug 1998 21:24:58 -0400
 
 Local variables:
 mode: debian-changelog

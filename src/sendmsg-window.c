@@ -73,7 +73,6 @@ static gint set_iso_charset(BalsaSendmsg*, gint , gint );
 static gint iso_1_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_2_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_3_cb(GtkWidget* , BalsaSendmsg *);
-static gint iso_4_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_5_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_8_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_9_cb(GtkWidget* , BalsaSendmsg *);
@@ -229,7 +228,7 @@ static GnomeUIInfo iso_charset_menu[] = {
   GNOMEUIINFO_ITEM_NONE( N_ ("_Hebrew (ISO-8859-8)"), NULL, iso_8_cb),
 #define ISO_CHARSET_9_POS 7
   GNOMEUIINFO_ITEM_NONE( N_ ("_Turkish (ISO-8859-9)"), NULL, iso_9_cb),
-#define ISO_CHARSET_14_POS 4
+#define ISO_CHARSET_14_POS 8
   GNOMEUIINFO_ITEM_NONE( N_ ("_Celtic (ISO-8859-14)"), NULL, iso_14_cb),
   GNOMEUIINFO_END
 };
@@ -246,6 +245,7 @@ static gchar* iso_charset_names[] = {
    "ISO-8859-5",
    "ISO-8859-8",
    "ISO-8859-9",
+   "ISO-8859-14"
 };
 
 typedef struct {

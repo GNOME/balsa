@@ -457,7 +457,7 @@ libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox *mailbox,
     g_warning("%s not implemented yet.\n", __func__);
 }
 
-/* Default method for local mailboxes; maildir and mh have their own
+/* fetch message structure method: all local mailboxes have their own
  * methods, which ensure that message->mime_msg != NULL, then chain up
  * to this one.
  */

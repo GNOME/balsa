@@ -738,6 +738,8 @@ replyto_message_cb (GtkWidget * widget, gpointer data)
 
   index = balsa_window_find_current_index(BALSA_WINDOW(data));
 
+  g_return_if_fail(index != NULL);
+
   list = GTK_CLIST(index)->selection;
   while (list)
   {
@@ -758,6 +760,8 @@ replytoall_message_cb (GtkWidget * widget, gpointer data)
 
   index = balsa_window_find_current_index(BALSA_WINDOW(data));
 
+  g_return_if_fail(index != NULL);
+
   list = GTK_CLIST(index)->selection;
   while (list)
   {
@@ -777,6 +781,8 @@ forward_message_cb (GtkWidget * widget, gpointer data)
   g_return_if_fail (widget != NULL);
 
   index = balsa_window_find_current_index(BALSA_WINDOW(data));
+
+  g_return_if_fail(index != NULL);
 
   list = GTK_CLIST(index)->selection;
   while (list)
@@ -799,6 +805,8 @@ continue_message_cb (GtkWidget * widget, gpointer data)
 
   index = balsa_window_find_current_index(BALSA_WINDOW(data));
 
+  g_return_if_fail(index != NULL);
+
   list = GTK_CLIST(index)->selection;
   while (list)
   {
@@ -812,18 +820,30 @@ continue_message_cb (GtkWidget * widget, gpointer data)
 static void
 next_message_cb (GtkWidget * widget, gpointer data)
 {
+  GtkWidget *index;
+
   g_return_if_fail (widget != NULL);
 
-  balsa_index_select_next(BALSA_INDEX(balsa_window_find_current_index(BALSA_WINDOW(data))));
+  index = balsa_window_find_current_index(BALSA_WINDOW(data));
+
+  g_return_if_fail(index != NULL);
+
+  balsa_index_select_next(BALSA_INDEX(index));
 }
 
 
 static void
 previous_message_cb (GtkWidget * widget, gpointer data)
 {
+  GtkWidget *index;
+
   g_return_if_fail (widget != NULL);
 
-  balsa_index_select_previous(BALSA_INDEX(balsa_window_find_current_index(BALSA_WINDOW(data))));
+  index = balsa_window_find_current_index(BALSA_WINDOW(data));
+
+  g_return_if_fail(index != NULL);
+
+  balsa_index_select_previous(BALSA_INDEX(index));
 }
 
 
@@ -837,6 +857,8 @@ delete_message_cb (GtkWidget * widget, gpointer data)
   g_return_if_fail (widget != NULL);
 
   index = balsa_window_find_current_index(BALSA_WINDOW(data));
+
+  g_return_if_fail(index != NULL);
 
   list = GTK_CLIST(index)->selection;
   while (list)
@@ -860,6 +882,8 @@ undelete_message_cb (GtkWidget * widget, gpointer data)
   g_return_if_fail (widget != NULL);
 
   index = balsa_window_find_current_index(BALSA_WINDOW(data));
+
+  g_return_if_fail(index != NULL);
 
   list = GTK_CLIST(index)->selection;
   while (list)
@@ -891,8 +915,7 @@ mailbox_close_child (GtkWidget * widget, gpointer data)
 
   index = balsa_window_find_current_index(BALSA_WINDOW(data));
 
-  if (!index)
-    return;
+  g_return_if_fail(index != NULL);
 
   balsa_window_close_mailbox(BALSA_WINDOW(data), BALSA_INDEX(index)->mailbox);
 }
@@ -905,8 +928,7 @@ mailbox_commit_changes (GtkWidget * widget, gpointer data)
 
   index = balsa_window_find_current_index(BALSA_WINDOW(data));
 
-  if (!index)
-    return;
+  g_return_if_fail(index != NULL);
 
   current_mailbox = BALSA_INDEX(index)->mailbox;
   mailbox_commit_flagged_changes(current_mailbox);

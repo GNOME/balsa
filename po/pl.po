@@ -11,8 +11,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2003-03-15 13:32+0100\n"
-"PO-Revision-Date: 2003-03-14 07:40+0100\n"
+"POT-Creation-Date: 2003-03-19 09:16+0100\n"
+"PO-Revision-Date: 2003-03-20 18:57+0100\n"
 "Last-Translator: GNOME PL Team <translators@gnome.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -1784,6 +1784,31 @@ msgstr "Nie można zapisać pliku %s: %s"
 msgid "Save MIME Part"
 msgstr "Zapis załącznika MIME"
 
+#: src/balsa-message.c:1
+#, c-format
+msgid "The signature of the message sent by %s with subject \"%s\" is good."
+msgstr "Podpis listu wysłanego przez %s z tematem \"%s\" jest poprawny."
+
+#: src/balsa-message.c:1
+#, c-format
+msgid ""
+"Checking the signature of the message sent by %s with subject \"%s\" "
+"returned:\n"
+"%s"
+msgstr ""
+"Sprawdzenie podpisu listu wysłanego przez %s z tematem \"%s\" dało w "
+"wyniku:\n"
+"%s"
+
+#: src/balsa-message.c:1
+#, c-format
+msgid ""
+"ckecking the signature of the message sent by %s with subject \"%s\" failed "
+"with an error!"
+msgstr ""
+"sprawdzenie podpisu listu wysłanego przez %s z tematem \"%s\" zakończyło się "
+"błędem!"
+
 #: src/balsa-message.c:1 src/print.c:1 src/sendmsg-window.c:1
 #: src/sendmsg-window.c:1
 msgid "Subject:"
@@ -1816,6 +1841,57 @@ msgstr "Fcc:"
 #: src/balsa-message.c:1 src/print.c:1
 msgid "Disposition-Notification-To:"
 msgstr "Powiadomienie-o-otrzymaniu:"
+
+#: src/balsa-message.c:1
+msgid ""
+"\n"
+"\n"
+"Signature details:"
+msgstr ""
+"\n"
+"\n"
+"Szczegóły podpisu:"
+
+#: src/balsa-message.c:1
+#, c-format
+msgid ""
+"\n"
+"Signed by: %s"
+msgstr ""
+"\n"
+"Podpisane przez: %s"
+
+# Musze jeszcze sprawdzić czy napewno idzie o adres e-mail
+# a nie pocztowy (tradycyjny)
+#: src/balsa-message.c:1
+msgid "Mail address: %s"
+msgstr "Adres e-mail: %s"
+
+#: src/balsa-message.c:1
+msgid ""
+"\n"
+"Key fingerprint: %s"
+msgstr ""
+"\n"
+"Odcisk klucza: %s"
+
+#: src/balsa-message.c:1
+#, c-format
+msgid ""
+"\n"
+"Key created on: %s"
+msgstr ""
+"\n"
+"Data utworzenia klucza: %s"
+
+#: src/balsa-message.c:1
+#, c-format
+msgid ""
+"\n"
+"Signed on: %s"
+msgstr ""
+"\n"
+"Data podpisu: %s"
 
 #: src/balsa-message.c:1 src/balsa-message.c:1 src/balsa-message.c:1
 #: src/balsa-message.c:1
@@ -2189,7 +2265,7 @@ msgstr "_Nowy"
 #. The name entry
 #: src/filter-edit-dialog.c:1
 msgid "_Filter name:"
-msgstr "Nazwa _filtru:"
+msgstr "Nazwa fi_ltru:"
 
 #. The filter op-code : "OR" or "AND" all the conditions
 #: src/filter-edit-dialog.c:1
@@ -2294,7 +2370,7 @@ msgstr "Przy zakończeniu"
 #. up button
 #: src/filter-run-dialog.c:1
 msgid "_Up"
-msgstr "_Góra"
+msgstr "Do gó_ry"
 
 # ktoś ma pomysł co z tym zrobić?
 # bo koliduje z dodaj
@@ -2303,7 +2379,7 @@ msgstr "_Góra"
 #. down button
 #: src/filter-run-dialog.c:1
 msgid "Do_wn"
-msgstr "Dół"
+msgstr "_Na dół"
 
 #: src/filter-run-dialog.c:1
 msgid ""
@@ -3530,7 +3606,7 @@ msgstr "Wyświetlanie listów wieloczęściowych"
 
 #: src/pref-manager.c:1
 msgid "prefer text/plain over html"
-msgstr "przedkładaj czysty tekst nad format HTML"
+msgstr "wybór czystego tekstu przed formatem HTML"
 
 #. How to handle received MDN requests
 #: src/pref-manager.c:1
@@ -3906,6 +3982,7 @@ msgstr "Wymagane"
 # nie wiem czy link_id zostawić niezmienione
 # czy tłumaczyć identyfikator_odnośnika
 #: src/pref-manager.c:1
+#, c-format
 msgid "Error displaying link_id %s: %s\n"
 msgstr "Błąd przy wyświetlaniu link_id %s: %s\n"
 
@@ -3995,15 +4072,16 @@ msgstr ""
 #: src/save-restore.c:1
 msgid "The option not to recognize \"format=flowed\" text has been removed."
 msgstr ""
-"Opcja nierozpoznawania tekstu \"format=przeformatowywanie\" została usunięta."
+"Opcja powodująca nierozpoznawanie ustawienia \"format=flowed\" została "
+"usunięta."
 
 #: src/save-restore.c:1
 msgid ""
 "The option not to send \"format=flowed\" is now on the Options menu of the "
 "compose window."
 msgstr ""
-"Opcja \"format=przeformatowywanie\" jest teraz w menu opcje okna tworzenia "
-"listu."
+"Opcja \"Przeformatowywanie\", dotycząca ustawienia \"format=flowed\", "
+"znajduje się teraz w menu Opcje okna tworzenia listu."
 
 #: src/save-restore.c:1
 msgid ""
@@ -4296,7 +4374,15 @@ msgstr "Żą_danie powiadomienia o otrzymaniu (MDM)"
 
 #: src/sendmsg-window.c:1
 msgid "_Format = Flowed"
-msgstr "_Format = Przeformatowywanie"
+msgstr "P_rzeformatowywanie"
+
+#: src/sendmsg-window.c:1
+msgid "_Sign Message"
+msgstr "_Podpisanie listu"
+
+#: src/sendmsg-window.c:1
+msgid "_Encrypt Message"
+msgstr "Za_szyfrowanie listu"
 
 #: src/sendmsg-window.c:1
 msgid "_Show"
@@ -4450,8 +4536,8 @@ msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file."
 msgstr ""
-"Plik nie jest zakodowany w formacie US-ASCII lub UTF-8.\n"
-"Proszę wybrać zestaw znaków do zakodowania pliku."
+"Plik nie jest zakodowany przy użyciu US-ASCII ani UTF-8.\n"
+"Wybierz zestaw znaków do zakodowania pliku."
 
 #: src/sendmsg-window.c:1
 #, c-format
@@ -4470,6 +4556,18 @@ msgid ""
 msgstr ""
 "Nie można zapisać listu przy użyciu zestawu znaków %s.\n"
 "Wybierz język tego listu."
+
+#: src/sendmsg-window.c:1
+msgid "%s the message failed."
+msgstr "%s listu nie powiodło się."
+
+#: src/sendmsg-window.c:1
+msgid "Signing"
+msgstr "Podpisanie"
+
+#: src/sendmsg-window.c:1
+msgid "Encrypting"
+msgstr "Zaszyfrowanie"
 
 #: src/sendmsg-window.c:1
 #, c-format
@@ -4865,9 +4963,6 @@ msgstr "Dół"
 
 #~ msgid "%d %s"
 #~ msgstr "%d %s"
-
-#~ msgid "_Email address:"
-#~ msgstr "Adres _e-mail:"
 
 #~ msgid "_File name"
 #~ msgstr "Nazwa p_liku"

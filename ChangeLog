@@ -1,3 +1,7 @@
+2004-11-16 11:53  PeterB
+
+	* src/expand-alias.c: utf8-aware entry matching.
+
 2004-11-15 21:32  PeterB
 
 	* libbalsa/misc.c, libbalsa/misc.h, libbalsa/send.c,

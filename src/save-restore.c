@@ -227,6 +227,9 @@ config_mailbox_add (Mailbox * mailbox, char *key_arg)
       {
 	char tmp[32];
 
+	snprintf (tmp, sizeof (tmp), "%d", MAILBOX_POP3 (mailbox)->server->port);
+	pl_dict_add_str_str (mbox_dict, "Port", tmp);
+
 	snprintf (tmp, sizeof (tmp), "%d", MAILBOX_POP3 (mailbox)->check);
 	pl_dict_add_str_str (mbox_dict, "Check", tmp);
 
@@ -510,6 +513,11 @@ config_mailbox_init (proplist_t mbox, gchar * key)
       if ((field = pl_dict_get_str (mbox, "Server")) == NULL)
 	return FALSE;
       MAILBOX_POP3 (mailbox)->server->host = g_strdup (field);
+
+      if ((field = pl_dict_get_str (mbox, "Port")) == NULL)
+	MAILBOX_POP3 (mailbox)->server->port = 110;
+      else
+	MAILBOX_POP3 (mailbox)->server->port = atol (field);
 
       if ((field = pl_dict_get_str (mbox, "Check")) == NULL)
 	MAILBOX_POP3 (mailbox)->check = FALSE;

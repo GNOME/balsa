@@ -241,7 +241,7 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
     if (MAILBOX_POP3 (mailbox)->check)
     {
       PopHost = g_strdup (MAILBOX_POP3(mailbox)->server->host);
-      PopPort = 110;
+      PopPort = (MAILBOX_POP3(mailbox)->server->port);
       PopPass = g_strdup (MAILBOX_POP3(mailbox)->server->passwd);
       PopUser = g_strdup (MAILBOX_POP3(mailbox)->server->user);
 

@@ -1,3 +1,8 @@
+2003-09-05 11:19  PeterB
+
+	* src/: filter-edit-callbacks.c, filter-run-callbacks.c: Use
+	balsa_information_parented().
+
 2003-09-04 08:47  PeterB
 
 	* libbalsa/address-book-vcard.c: Test new_address fields.

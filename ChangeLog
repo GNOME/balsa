@@ -1,3 +1,8 @@
+2000-05-02  Pawel Salek <pawsa@theochem.kth.se>
+	* src/balsa-message.c, src/sendmsg-window.c:
+	Martynas Kunigëlis <mkunigelis@alna.lt> patch for Baltic language
+	support.
+	
 2000-04-27  Pawel Salek <pawsa@theochem.kth.se>
 	* src/sendmsg-window.c: one g_free() too much.
 	* src/main.c: code cleanup.

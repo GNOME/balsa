@@ -503,8 +503,8 @@ balsa_message_text_item (const gchar * text, GnomeCanvasGroup * group,
 	   GdkFont *fnt = gdk_font_load(font_name);
 	   if(fnt) gdk_font_unref(fnt);
 	   else {
-	      font_name = balsa_app.message_font;
 	      fprintf(stderr,"message/text:: font not found: %s\n", font_name);
+	      font_name = balsa_app.message_font;
 	   }	      
 	} else font_name = balsa_app.message_font;
 

@@ -820,7 +820,9 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
 {
 
   GtkWidget *index;
+  GtkWidget *page;
   Mailbox *mbox;
+  int c;
 
 #ifdef BALSA_USE_THREADS
 /*  Only Run once -- If already checking mail, return.  */
@@ -888,6 +890,17 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
   check_messages_thread(mbox);
 #endif
 
+  /* We want to sync the current mailbox to prevent erroneous results when 
+   * we check for new messages */
+  c = gtk_notebook_get_current_page(GTK_NOTEBOOK(balsa_app.notebook));
+  /* If we currently have a page open, commit whatever changes have
+   * occurred, and update the time last visited */
+  if (c != -1) { 
+    page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),c); 
+    page = gtk_object_get_data(GTK_OBJECT(page),"indexpage"); 
+    mailbox_commit_flagged_changes (BALSA_INDEX_PAGE (page)->mailbox); 
+  } 
+  balsa_mblist_have_new (balsa_app.mblist);
 }
 
 void

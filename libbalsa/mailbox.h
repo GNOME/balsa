@@ -27,10 +27,10 @@
 
 
 #define BALSA_TYPE_MAILBOX			(balsa_mailbox_get_type())
-#define BALSA_MAILBOX(obj)			(GTK_CHECK_CAST (obj, BALSA_TYPE_MAILBOX, Mailbox))
-#define BALSA_MAILBOX_CLASS(klass)		(GTK_CHECK_CLASS_CAST (klass, BALSA_TYPE_MAILBOX, MailboxClass))
-#define BALSA_IS_MAILBOX(obj)			(GTK_CHECK_TYPE (obj, BALSA_TYPE_MAILBOX))
-#define BALSA_IS_MAILBOX_CLASS(klass)		(GTK_CHECK_CLASS_TYPE (klass, BALSA_TYPE_MAILBOX))
+#define BALSA_MAILBOX(obj)			(GTK_CHECK_CAST ((obj), BALSA_TYPE_MAILBOX, Mailbox))
+#define BALSA_MAILBOX_CLASS(klass)		(GTK_CHECK_CLASS_CAST ((klass), BALSA_TYPE_MAILBOX, MailboxClass))
+#define BALSA_IS_MAILBOX(obj)			(GTK_CHECK_TYPE ((obj), BALSA_TYPE_MAILBOX))
+#define BALSA_IS_MAILBOX_CLASS(klass)		(GTK_CHECK_CLASS_TYPE ((klass), BALSA_TYPE_MAILBOX))
 
 /*
  * enumes
@@ -134,6 +134,7 @@ struct _Mailbox
   GList *message_list;
 
   /* info fields */
+  gboolean has_unread_messages;
   glong unread_messages; /* number of unread messages in the mailbox */
   glong total_messages;  /* total number of messages in the mailbox  */
 };
@@ -158,7 +159,6 @@ struct _MailboxClass
   /* message's flags changed */
   void (* message_flagged) (Mailbox *mailbox,
 			    Message *message);
-
 };
 
 struct _Server
@@ -260,7 +260,6 @@ GtkObject *mailbox_new (MailboxType type);
 void mailbox_free (Mailbox * mailbox);
 gint mailbox_check_new_messages (Mailbox * mailbox);
 
-
 /*
  * watchers
  */
@@ -295,8 +294,6 @@ void mailbox_commit_flagged_changes( Mailbox *mailbox );
 
 Server *server_new(ServerType type);
 void server_free(Server *server);
-
-
 
 #include "mailbox_local.h"
 #include "mailbox_pop3.h"

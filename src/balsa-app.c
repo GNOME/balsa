@@ -137,6 +137,7 @@ balsa_app_init (void)
 /* Mailbox list column width (not fully implemented) */
   balsa_app.mblist_name_width = MBNAME_DEFAULT_WIDTH;
 #ifdef BALSA_SHOW_INFO
+  balsa_app.mblist_show_mb_content_info = FALSE;
   balsa_app.mblist_newmsg_width = NEWMSGCOUNT_DEFAULT_WIDTH;
   balsa_app.mblist_totalmsg_width = TOTALMSGCOUNT_DEFAULT_WIDTH;
 #endif

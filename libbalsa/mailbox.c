@@ -27,8 +27,10 @@
 #include <stdio.h>
 #include <sys/utsname.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <string.h>
 #include <time.h>
+#include <dirent.h>
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
@@ -313,11 +315,8 @@ mailbox_have_new_messages (gchar * path)
 	    return TRUE;
 	}
     }
-
   return FALSE;
 }
-
-
 
 enum {
   OPEN_MAILBOX,
@@ -397,6 +396,9 @@ balsa_mailbox_init(Mailbox *mailbox)
   mailbox->open_ref = 0;
   mailbox->messages = 0;
   mailbox->new_messages = 0;
+  mailbox->has_unread_messages = FALSE;
+  mailbox->unread_messages = 0;
+  mailbox->total_messages = 0;
   mailbox->message_list = NULL;
 }
 
@@ -426,7 +428,6 @@ mailbox_new(MailboxType type)
     }
 
   mailbox->type = type;
-  
   return GTK_OBJECT(mailbox);
 }
 
@@ -677,9 +678,10 @@ mailbox_check_new_messages (Mailbox * mailbox)
 
 	  mailbox->unread_messages += mailbox->new_messages ;
 	  mailbox->total_messages += mailbox->new_messages ;
-	  /* TODO:the preceeding two lines should be put in load_messages 
-	     but I don't want to rely on the 'emit' flag to know if there is REALLY 
-	     new mail in the mailbox. -bertrand */
+	  /* TODO:the preceeding two lines should be put in
+	     load_messages but I don't want to rely on the 'emit' flag
+	     to know if there is REALLY new mail in the
+	     mailbox. -bertrand */
 
 #ifndef BALSA_USE_THREADS
 	  load_messages (mailbox, 1);
@@ -808,6 +810,10 @@ load_messages (Mailbox * mailbox, gint emit)
   Message *message;
   HEADER *cur = 0;
 
+  mailbox->has_unread_messages = FALSE;
+  mailbox->unread_messages = 0;
+  mailbox->total_messages = 0;
+
   for (msgno = mailbox->messages;
        mailbox->new_messages > 0;
        msgno++)
@@ -829,8 +835,15 @@ load_messages (Mailbox * mailbox, gint emit)
       message->msgno = msgno;
       mailbox->messages++;
 
+      mailbox->total_messages++;
+
       if (!cur->read)
+      {
 	message->flags |= MESSAGE_FLAG_NEW;
+        
+        mailbox->unread_messages++;
+
+      }
 
       if (cur->deleted)
 	message->flags |= MESSAGE_FLAG_DELETED;
@@ -847,6 +860,9 @@ load_messages (Mailbox * mailbox, gint emit)
       if (emit)
         send_watcher_new_message (mailbox, message, mailbox->new_messages);
     }
+
+  if (mailbox->unread_messages > 0)
+    mailbox->has_unread_messages = TRUE;
 }
 
 
@@ -1209,9 +1225,8 @@ mailbox_valid (gchar * filename)
 gboolean
 mailbox_gather_content_info(Mailbox *mailbox)
 {
-	/* this code is far too slow, and mut does not provide a good way to
+	/* this code is far too slow, and mutt does not provide a good way to
 	 * do this.  we will not use it for now */
-#if 0
   GList *message_list;
   Message *current_message;
 
@@ -1219,19 +1234,21 @@ mailbox_gather_content_info(Mailbox *mailbox)
 
   mailbox->total_messages = 0;
   mailbox->unread_messages = 0;
+
   /* examine all the message in the mailbox */
   message_list = mailbox->message_list;
   while (message_list)
     {
       current_message = (Message *) message_list->data;
-      if ( current_message->flags & MESSAGE_FLAG_NEW ) mailbox->unread_messages++ ;
+      if ( current_message->flags & MESSAGE_FLAG_NEW ) 
+	mailbox->unread_messages++ ;
       mailbox->total_messages++ ;
       message_list = message_list->next;
       
     }
 
   mailbox_open_unref (mailbox);
-#endif
+
   return TRUE;
 }
 
@@ -1261,8 +1278,11 @@ void mailbox_commit_flagged_changes( Mailbox *mailbox )
       
     }
 
+  /* [MBG] This should prevent segfaults */
+/*   if (CLIENT_CONTEXT (mailbox) != NULL) */
+/*     mx_sync_mailbox (CLIENT_CONTEXT(mailbox)); */
+
   mailbox_open_unref (mailbox);
-  //  mx_sync_mailbox( CLIENT_CONTEXT(mailbox)  );
 }
 
 /* internal c-client translation */

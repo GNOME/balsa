@@ -1,3 +1,4 @@
+
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -1149,7 +1150,7 @@ content2canvas (Message * message, GnomeCanvasGroup * group)
     case MAILBOX_MH:
     case MAILBOX_MAILDIR:
       {
-	snprintf (msg_filename, PATH_MAX, "%s/%s", MAILBOX_LOCAL (message->mailbox)->path, message_pathname (message));
+	snprintf (msg_filename, PATH_MAX, "%s/%s", MAILBOX_LOCAL (message->mailbox)->path, message_pathname  (message));
 	msg_stream = fopen (msg_filename, "r");
 	if (!msg_stream || ferror (msg_stream))
 	  {

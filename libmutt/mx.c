@@ -1035,8 +1035,14 @@ int mx_sync_mailbox (CONTEXT *ctx)
     {
       if (!ctx->changed)
 	return 0; /* nothing to do! */
-      for (i = 0 ; i < ctx->msgcount ; i++)
-	ctx->hdrs[i]->deleted = 0;
+
+/* [MBG] I commented the following out in order to prevent calls to
+ * mx_sync_mailbox from preventing the deletion of messages.  This
+ * probably isn't a good way to do things, but it works for now.
+ * */
+/*       for (i = 0 ; i < ctx->msgcount ; i++) */
+/* 	ctx->hdrs[i]->deleted = 0; */
+
       ctx->deleted = 0;
     }
   }
@@ -1045,7 +1051,11 @@ int mx_sync_mailbox (CONTEXT *ctx)
   {
     mutt_message ("%d kept, %d deleted.", ctx->msgcount - ctx->deleted,
 		  ctx->deleted);
-    sleep (1); /* allow the user time to read the message */
+
+/* [MBG] I commented this out because we want the syncing to happen as
+ * fast as possible, and the user doesn't see this message anyways. 
+ * */
+    /* sleep (1); */ /* allow the user time to read the message */
 
     if (ctx->msgcount == ctx->deleted &&
 	(ctx->magic == M_MBOX || ctx->magic == M_MMDF) &&

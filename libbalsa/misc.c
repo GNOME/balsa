@@ -45,6 +45,7 @@ mailbox_node_new (const gchar * name, Mailbox * mb, gint i)
     mbn->mailbox = NULL;
   mbn->IsDir = i;
   mbn->expanded = FALSE;
+  mbn->style = 0;
   return mbn;
 }
 

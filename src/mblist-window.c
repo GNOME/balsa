@@ -97,7 +97,7 @@ GtkWidget *balsa_mailbox_list_window_new(BalsaWindow *window)
 /*
    gtk_ctree_show_stub (mblw->ctree, FALSE);
  */
-  gtk_ctree_set_line_style (mblw->ctree, GTK_CTREE_LINES_DOTTED);
+  /* gtk_ctree_set_line_style (mblw->ctree, GTK_CTREE_LINES_DOTTED); */
 
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(widget),
 				  GTK_POLICY_AUTOMATIC,
@@ -151,18 +151,24 @@ GtkWidget *balsa_mailbox_list_window_new(BalsaWindow *window)
 void
 mblist_open_mailbox (Mailbox * mailbox)
 {
-  GtkWidget *page;
+  GtkWidget *page = NULL;
   int i, c;
 
   if (!mblw)
     return;
 
-  if( mailbox->open_ref ) {
-    c = gtk_notebook_get_current_page(GTK_NOTEBOOK(balsa_app.notebook));
-    page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),c);
-    page = gtk_object_get_data(GTK_OBJECT(page),"indexpage");
-    g_get_current_time(&BALSA_INDEX_PAGE(page)->last_use);
+  c = gtk_notebook_get_current_page(GTK_NOTEBOOK(balsa_app.notebook));
 
+  /* If we currently have a page open, commit whatever changes have
+   * occurred, and update the time last visited */
+  if (c != -1) { 
+    page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),c); 
+    page = gtk_object_get_data(GTK_OBJECT(page),"indexpage"); 
+    g_get_current_time(&BALSA_INDEX_PAGE(page)->last_use); 
+    mailbox_commit_flagged_changes (BALSA_INDEX_PAGE (page)->mailbox); 
+  } 
+  
+  if( mailbox->open_ref ) {
     i = balsa_find_notebook_page_num( mailbox );
     if( i != -1 )
       {
@@ -182,7 +188,8 @@ mblist_open_mailbox (Mailbox * mailbox)
 	gtk_clist_set_column_width (GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), 3, balsa_app.index_from_width);
 	gtk_clist_set_column_width (GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), 4, balsa_app.index_subject_width);
 	gtk_clist_set_column_width (GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), 5, balsa_app.index_date_width);
-
+        
+        balsa_mblist_have_new (BALSA_MBLIST(mblw->ctree));
 	return;
       }
   }
@@ -196,6 +203,9 @@ mblist_open_mailbox (Mailbox * mailbox)
     balsa_mblist_update_mailbox (balsa_app.mblist, mailbox);
   }
 #endif
+
+  balsa_mblist_have_new (BALSA_MBLIST(mblw->ctree));
+
   /* I don't know what is the purpose of that code, so I put
      it in comment until somebody tells me waht it  is useful 
      for.      -Bertrand 
@@ -224,6 +234,7 @@ mblist_close_mailbox (Mailbox * mailbox)
   if (!mblw)
     return;
   balsa_window_close_mailbox(BALSA_WINDOW(mblw->window), mailbox);
+  balsa_mblist_have_new (BALSA_MBLIST(mblw->ctree));
 }
  
 
@@ -471,8 +482,6 @@ mblist_menu_close_cb (GtkWidget * widget, gpointer data)
     }
   mblist_close_mailbox (mailbox);
 }
-
-
 
 
 Mailbox *

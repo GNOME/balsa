@@ -1070,7 +1070,7 @@ msgstr "postbhosca Áitiúil"
 
 #: balsa-druid-page-welcome.gob:47
 msgid "Welcome to Balsa!"
-msgstr "Fáilte go Balsa!\n"
+msgstr "Fáilte go Balsa!"
 
 #: balsa-druid-page-welcome.gob:50
 msgid ""

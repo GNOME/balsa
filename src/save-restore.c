@@ -476,6 +476,7 @@ config_mailbox_init (proplist_t mbox, gchar * key)
 	  mailbox = BALSA_MAILBOX(mailbox_new (mailbox_type));
 	  mailbox->name = mailbox_name;
 	  MAILBOX_LOCAL (mailbox)->path = g_strdup (path);
+          add_mailboxes_for_checking(mailbox);
 	}
       else
 	{

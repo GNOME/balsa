@@ -347,18 +347,23 @@ libbalsa_message_real_set_read_flag(Message *message, gboolean set)
   LOCK_MAILBOX (message->mailbox);
   RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
 
-  if (set) {
+  if (set && (message->flags & MESSAGE_FLAG_NEW)) {
     mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_READ, TRUE);
     mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_OLD, FALSE);
 
     message->flags &= ~MESSAGE_FLAG_NEW;
     message->mailbox->unread_messages-- ;
+
+    if (message->mailbox->unread_messages <= 0) 
+      message->mailbox->has_unread_messages = FALSE;
+
     send_watcher_mark_read_message (message->mailbox, message);
-  } else {
+  } else if (!set){
     mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_READ, TRUE);
 
     message->flags |= MESSAGE_FLAG_NEW;
     message->mailbox->unread_messages++;
+    message->mailbox->has_unread_messages = TRUE;
     send_watcher_mark_unread_message (message->mailbox, message);
   }
 
@@ -373,16 +378,21 @@ libbalsa_message_real_set_deleted_flag(Message *message, gboolean set)
     LOCK_MAILBOX (message->mailbox);
     RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
     
-    if (set) {
+    if (set && !(message->flags & MESSAGE_FLAG_DELETED)) {
 	mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_DELETE, TRUE);
 	
 	message->flags |= MESSAGE_FLAG_DELETED;
-	if (message->flags & MESSAGE_FLAG_NEW)
-	    message->mailbox->unread_messages--;
+	if (message->flags & MESSAGE_FLAG_NEW) {
+          message->mailbox->unread_messages--;
+
+          if (message->mailbox->unread_messages <= 0) 
+            message->mailbox->has_unread_messages = FALSE;
+        }
+        
 	message->mailbox->total_messages--;
 
 	send_watcher_mark_delete_message( message->mailbox, message );
-    } else {
+    } else if (!set){
 	mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_DELETE, FALSE);
 	
 	message->flags &= ~MESSAGE_FLAG_DELETED;
@@ -494,6 +504,9 @@ message_body_ref (Message * message)
       message->body_ref++;
       return;
     }
+
+  if (cur == NULL)
+    return;
 
   /*
    * load message body

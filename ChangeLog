@@ -1,3 +1,40 @@
+2000-03-13  alastairmck  <alastairmck@beta.theochem.kth.se>
+
+	* po/ChangeLog, po/ga.po: Updates
+
+2000-03-13  hectorg  <hector@scouts-es.org>
+
+	* libbalsa/send.c, src/main-window.c:
+	Some minor bugs fixed in send code
+
+2000-03-12  birger  <birger.langkjer@image.dk>
+
+	* po/da.po:
+	 Modified Files:
+	 	balsa/po/da.po
+
+2000-03-12  pawels  <pawsa@theochem.kth.se>
+
+	* src/balsa-app.c, src/balsa-index-page.c, src/balsa-index.c, 
+	* src/balsa-mblist.c, src/local-mailbox.c, src/main-window.c,
+	* src/mblist-window.c, src/mblist-window.h:
+	Fix for duplicate local mailboxes that were located in the local
+	mail directory and were added at the same time to the cofiguration.
+	Fixes also local mailbox deletion problem.
+
+2000-03-11  alastairmck  
+
+	* balsa.desktop: Irish translations
+
+2000-03-11  Matthew Guenther <mguenther@netcom.ca>
+	* libbalsa/misc.c:  Added style to MailboxNode
+	* src/mblist-window.c: Update mailbox style when changing 
+	mailboxes
+	* src/balsa-mblist.c:  Mailboxes with unread messages are now 
+	displayed without having to load the mailboxes.  
+	* src/main-window.c:  Mailbox appearence are now updated when 
+	the "Check New Messages" button is pressed.
+
 2000-03-11 Alastair McKinstry <mckinstry@computer.org>
 
 	* balsa.desktop: Added Irish translation.
@@ -30,7 +67,7 @@
 
 	* src/local-mailbox.c (is_mh_message): Use isdigit properly.
 
-2000-03-03  Peter Williams  <peter@beta.newton.cx>
+2000-03-03  Peter Williams  <peter@newton.cx>
 
 	* libbalsa/mailbox.c (translate_message): Uses user's
 	  preferred time format now.
@@ -45,8 +82,25 @@
 	* Allowed the user to save the text in any message by clicking.
 	
 2000-2-26   Birger Langkjer <birger.langkjer@image.dk>
-
 	* Integrated a patch from Mikael Hermansson <mikeh@bahnhof.se>
+
+2000-2-25   Matthew Guenther <mguenther@netcom.ca>
+	* src/mblist-window.c:
+	* src/balsa-mblist.c: Added ability to display total number of 
+	messages and number of unread messages in the mailbox list.  Mailboxes
+	with unread messages are displayed in bold, and with different icon.  
+	Mailbox list is updated when mailbox contents change (through user 
+	action).  Can now sort mailboxes by name, number of unread messages, 
+	or total number of messages, in ascending or descending order. 
+	Mailbox info column width is saved between sessions.  Fixed mailbox 
+	tree expand/collapse to save between sessions.
+	* src/balsa-index-page.c: Reading messages in index will decrement 
+	message unread_messages count and update mailbox list display.
+	* src/save-restore.c: Code to save all the mailbox list stuff.
+	* libbalsa/mailbox.c: Fixed mailbox loading code to increment mailbox 
+	messages counter.
+	* libbalsa/message.c: Flag changing fixed to prevent double decrement 
+	of message count.  
 	
 2000-2-14   Birger Langkjer <birger.langkjer@image.dk>
 

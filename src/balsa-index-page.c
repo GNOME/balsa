@@ -214,7 +214,7 @@ balsa_find_notebook_page_num(Mailbox *mailbox)
   GtkWidget *cur_page;
   guint i;
 
-  for(i=0;(cur_page=gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),i));i++)
+  for (i=0;(cur_page=gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),i));i++)
     {
       cur_page = gtk_object_get_data(GTK_OBJECT(cur_page),"indexpage");
       if( BALSA_INDEX_PAGE(cur_page)->mailbox == mailbox)
@@ -385,9 +385,10 @@ idle_handler_cb(GtkWidget * widget)
   }
   if (bmsg) {
       if (BALSA_MESSAGE(bmsg)) {
-          if (message) 
+	 if (message) {
               balsa_message_set(BALSA_MESSAGE(bmsg), message);
-          else
+	      balsa_mblist_update_mailbox (balsa_app.mblist, message->mailbox);
+	 } else
               balsa_message_clear (BALSA_MESSAGE (bmsg));
       }
   }

@@ -27,6 +27,28 @@ gchar *make_string_from_list (GList *);
 
 size_t readfile (FILE * fp, char **buf);
 
+/* MailboxNodeStyle [MBG] 
+ * 
+ * MBNODE_STYLE_ICONFULL: Whether the full mailbox icon is displayed
+ *      (also when font is bolded)
+ * MBNODE_STYLE_UNREAD_MESSAGES: Whether the number of unread messages 
+ *      is being displayed in the maibox list
+ * MBNODE_STYLE_TOTAL_MESSAGES: Whether the number of total messages 
+ *      is being displayed in the mailbox list
+ * 
+ * I added these style flags so we can easily keep track of what the
+ * node looks like without having to resort to ugly gtk_get_style...
+ * stuff.  Currently only MBNODE_STYLE_ICONFULL is really used, but
+ * the others may be used later for more efficient style handling.
+ * */
+typedef enum
+{
+  MBNODE_STYLE_ICONFULL = 1 << 1,
+  MBNODE_STYLE_UNREAD_MESSAGES = 1 << 2,
+  MBNODE_STYLE_TOTAL_MESSAGES = 1 << 3,
+} MailboxNodeStyle;
+
+
 typedef struct _MailboxNode MailboxNode;
 struct _MailboxNode
 {
@@ -35,6 +57,7 @@ struct _MailboxNode
   Mailbox *mailbox;
   gint IsDir;
   gint expanded;
+  MailboxNodeStyle style;
 };
 
 MailboxNode *mailbox_node_new (const gchar * name, Mailbox * mb, gint i);

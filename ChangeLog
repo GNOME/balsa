@@ -1,3 +1,8 @@
+1999-12-05  Peter Williams  <peter@wgwill.ne.mediaone.net>
+
+	* src/balsa-init.c (balsa_init_window_new, druid_destroy_cb):
+	  Destroy the window owning the druid as well.
+
 1999-12-05  Héctor García Álvarez <hector@scouts-es.org>
         * Rewrited send and SMTP funtions
 	* libbalsa/send.c: Added ofline message writing funcionality

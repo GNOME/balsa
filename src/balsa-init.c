@@ -130,6 +130,7 @@ balsa_init_window_new (void)
 
     druid = gnome_druid_new();
     gtk_signal_connect( GTK_OBJECT( druid ), "cancel", GTK_SIGNAL_FUNC( druid_cancel_cb ), NULL );
+    gtk_object_set_data( GTK_OBJECT( druid ), "window", window );
     gtk_object_set_data( GTK_OBJECT( druid ), "logo_imlib", logo );
 
     /* Start page **************************************** */
@@ -638,9 +639,12 @@ static void entry_changed_cb( GtkEntry *entry )
 
 static void druid_destroy_cb( GnomeDruid *druid )
 {
+    GtkWidget *window;
+
     /* We don't need to set balsa_app data because it's
        set in the various pages' next callbacks. */
-    gtk_widget_destroy( GTK_WIDGET( druid ) );
+    window = gtk_object_get_data( GTK_OBJECT( druid ), "window" );
+    gtk_widget_destroy( window );
     gtk_main_quit();
 }
 

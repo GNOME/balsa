@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.6.0\n"
-"POT-Creation-Date: 2000-05-08 00:17+0200\n"
+"POT-Creation-Date: 2000-05-13 20:27+0200\n"
 "PO-Revision-Date: 1999-12-28 14:03+0100\n"
 "Last-Translator: Andreas Hyden <a.hyden@cyberpoint.se>\n"
 "Language-Team: Swedish <sv@li.org>\n"
@@ -101,8 +101,8 @@ msgstr "Allt klart!"
 msgid "Please enter information about yourself."
 msgstr "Skriv in information om dig själv."
 
-#: libinit_balsa/balsa-druid-page-user.gob:82 src/address-book.c:187
-#: src/address-book.c:422
+#: libinit_balsa/balsa-druid-page-user.gob:82 src/address-book.c:205
+#: src/address-book.c:451
 msgid "Name:"
 msgstr "Namn:"
 
@@ -175,15 +175,15 @@ msgstr "Filen \"%s\" är inte en katalog."
 msgid "Configure Balsa"
 msgstr "Konfigurera Balsa"
 
-#: src/address-book.c:175
+#: src/address-book.c:193
 msgid "Add New Address"
 msgstr "Lägg till ny adress"
 
-#: src/address-book.c:194
+#: src/address-book.c:212
 msgid "E-Mail Address:"
 msgstr "Epostadress:"
 
-#: src/address-book.c:273
+#: src/address-book.c:291
 #, c-format
 msgid ""
 "Unable to open ~/.gnome/GnomeCard.gcrd for read.\n"
@@ -192,39 +192,39 @@ msgstr ""
 "Kunde inte öppna ~/.gnome/GnomeCard.gcrd för läsning.\n"
 " - %s\n"
 
-#: src/address-book.c:276 src/sendmsg-window.c:393
+#: src/address-book.c:294 src/sendmsg-window.c:393
 msgid "OK"
 msgstr "Ok"
 
-#: src/address-book.c:295
+#: src/address-book.c:313
 msgid "No-Id"
 msgstr "Inget-Id"
 
-#: src/address-book.c:303
+#: src/address-book.c:321
 msgid "No-Name"
 msgstr "Namnlös"
 
-#: src/address-book.c:392 src/filter-edit-dialog.c:137
+#: src/address-book.c:416 src/filter-edit-dialog.c:135
 msgid "Name"
 msgstr "Namn"
 
-#: src/address-book.c:392
+#: src/address-book.c:416
 msgid "E-Mail Address"
 msgstr "Epostadress:"
 
-#: src/address-book.c:394 src/address-book.c:432 src/main-window.c:173
+#: src/address-book.c:423 src/address-book.c:461 src/main-window.c:173
 msgid "Address Book"
 msgstr "Adressbok"
 
-#: src/address-book.c:464
+#: src/address-book.c:493
 msgid "Send-To"
 msgstr "Skicka till"
 
-#: src/address-book.c:478
+#: src/address-book.c:507
 msgid "Run GnomeCard"
 msgstr "Kör GnomeCard"
 
-#: src/address-book.c:484
+#: src/address-book.c:513
 msgid "Re-Import"
 msgstr "Läs om"
 
@@ -270,7 +270,7 @@ msgstr ""
 "Kunde inte öppna brevlådan!\n"
 "Var vänlig kolla brevlådeinställningarna."
 
-#: src/balsa-index-page.c:586 src/filter-edit-dialog.c:224
+#: src/balsa-index-page.c:586 src/filter-edit-dialog.c:222
 msgid "New"
 msgstr "Nytt"
 
@@ -286,7 +286,7 @@ msgstr "Svara till alla"
 msgid "Forward"
 msgstr "Eftersänd"
 
-#: src/balsa-index-page.c:618 src/filter-edit-dialog.c:230
+#: src/balsa-index-page.c:618 src/filter-edit-dialog.c:228
 #: src/main-window.c:366 src/pref-manager.c:885
 msgid "Delete"
 msgstr "Radera"
@@ -303,7 +303,7 @@ msgstr "Överför"
 msgid "From"
 msgstr "Från"
 
-#: src/balsa-index.c:253 src/filter-edit-dialog.c:351
+#: src/balsa-index.c:253 src/filter-edit-dialog.c:349
 msgid "Subject"
 msgstr "Rubrik"
 
@@ -332,204 +332,264 @@ msgstr "Visad brevlåda: %s med %ld meddelanden, %ld nya"
 msgid "Save MIME Part"
 msgstr "Spara MIME-delen"
 
-#: src/balsa-message.c:166 src/balsa-message.c:225
+#: src/balsa-message.c:166 src/balsa-message.c:226
 msgid "Save"
 msgstr "Spara"
 
-#: src/balsa-message.c:166 src/balsa-message.c:225 src/mailbox-conf.c:667
+#: src/balsa-message.c:166 src/balsa-message.c:226 src/mailbox-conf.c:667
 #: src/sendmsg-window.c:129 src/sendmsg-window.c:419 src/sendmsg-window.c:1085
 #: src/sendmsg-window.c:1391 src/sendmsg-window.c:1414
 msgid "Cancel"
 msgstr "Avbryt"
 
-#: src/balsa-message.c:168 src/balsa-message.c:227
+#: src/balsa-message.c:168 src/balsa-message.c:228
 msgid "Please choose a filename to save this part of the message as:"
 msgstr "Var vänlig välj ett filnamn att spara denna delen av meddelandet som:"
 
-#: src/balsa-message.c:224 src/balsa-message.c:229
+#: src/balsa-message.c:225 src/balsa-message.c:230
 msgid "Save Text"
 msgstr "Spara text"
 
-#: src/balsa-message.c:300 src/balsa-message.c:315
+#: src/balsa-message.c:301 src/balsa-message.c:316
 #, c-format
 msgid " Open of %s failed:%s "
 msgstr " Misslyckades med att öppna %s:%s "
 
-#: src/balsa-message.c:301 src/balsa-message.c:316
+#: src/balsa-message.c:302 src/balsa-message.c:317
 msgid "Ok"
 msgstr "Ok"
 
-#: src/balsa-message.c:642
+#: src/balsa-message.c:643
 msgid "Date:"
 msgstr "Datum:"
 
 #. From:
-#: src/balsa-message.c:646 src/filter-edit-dialog.c:339
+#: src/balsa-message.c:647 src/filter-edit-dialog.c:337
 #: src/sendmsg-window.c:590
 msgid "From:"
 msgstr "Från:"
 
 #. To:
-#: src/balsa-message.c:650 src/filter-edit-dialog.c:327
+#: src/balsa-message.c:651 src/filter-edit-dialog.c:325
 #: src/sendmsg-window.c:592
 msgid "To:"
 msgstr "Till:"
 
-#: src/balsa-message.c:651
+#: src/balsa-message.c:652
 msgid "Cc:"
 msgstr "Kopia:"
 
-#: src/balsa-message.c:652
+#: src/balsa-message.c:653
 msgid "Bcc:"
 msgstr "Osynlig kopia:"
 
-#: src/balsa-message.c:655
+#: src/balsa-message.c:656
 msgid "Fcc:"
 msgstr "Vidarebefodrad kopia:"
 
 #. Subject:
-#: src/balsa-message.c:656 src/sendmsg-window.c:598
+#: src/balsa-message.c:657 src/sendmsg-window.c:598
 msgid "Subject:"
 msgstr "Rubrik:"
 
-#: src/balsa-message.c:765
+#: src/balsa-message.c:766
 msgid ""
 "<tr><td bgcolor=\"#f0f0f0\"> You received an encoded file of type "
 "application/"
 msgstr ""
 "<tr><td bgcolor=\"#f0f0f0\"> Du fick en kodad fil av typen application/"
 
-#: src/balsa-message.c:769
+#: src/balsa-message.c:770
 msgid "<P>The parameters of this message are:<BR>"
 msgstr "<P>Parametrarna i detta meddelande är:<BR>"
 
-#: src/balsa-message.c:770
+#: src/balsa-message.c:771
 msgid "<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n"
 msgstr "<table border=0><tr><th>Attribut</th><th>Värde</th></tr>\n"
 
-#: src/balsa-message.c:1165
+#: src/balsa-message.c:1167
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Kunde inte öppna %s. Felnummer = %d, "
 
-#: src/filter-edit-dialog.c:136
+#: src/filter-edit-dialog.c:30
+msgid "Inbound"
+msgstr "Inbundet"
+
+#: src/filter-edit-dialog.c:31
+msgid "Outbound"
+msgstr "Utbundet"
+
+#: src/filter-edit-dialog.c:32
+msgid "Pre-send"
+msgstr "Förhandsskicka"
+
+#: src/filter-edit-dialog.c:33
+msgid "Demand"
+msgstr "Kräv"
+
+#: src/filter-edit-dialog.c:38
+msgid "Matches"
+msgstr "Matchar"
+
+#: src/filter-edit-dialog.c:39
+msgid "Doesn't Match"
+msgstr "Matcher inte"
+
+#: src/filter-edit-dialog.c:40
+msgid "Always"
+msgstr "Alltid"
+
+#: src/filter-edit-dialog.c:45
+msgid "Simple"
+msgstr "Enkelt"
+
+#: src/filter-edit-dialog.c:46
+msgid "Regular Expression"
+msgstr "Vanligt uttryck"
+
+#: src/filter-edit-dialog.c:47
+msgid "External Command"
+msgstr "Externt kommando"
+
+#: src/filter-edit-dialog.c:52
+msgid "Copy to folder:"
+msgstr "Kopiera till mapp:"
+
+#: src/filter-edit-dialog.c:53
+msgid "Move to folder:"
+msgstr "Flytta till mapp:"
+
+#: src/filter-edit-dialog.c:54
+msgid "Print on printer:"
+msgstr "Skriv ut på skrivare:"
+
+#: src/filter-edit-dialog.c:55
+msgid "Run program:"
+msgstr "Kör program:"
+
+#: src/filter-edit-dialog.c:56
+msgid "Send to Trash"
+msgstr "Skicka till papperskorg"
+
+#: src/filter-edit-dialog.c:134
 msgid "On"
 msgstr "På"
 
-#: src/filter-edit-dialog.c:201
+#: src/filter-edit-dialog.c:199
 msgid "Up"
 msgstr "Upp"
 
-#: src/filter-edit-dialog.c:207
+#: src/filter-edit-dialog.c:205
 msgid "Down"
 msgstr "Ner"
 
-#: src/filter-edit-dialog.c:273
+#: src/filter-edit-dialog.c:271
 msgid "Match in:"
 msgstr "Matcha på:"
 
-#: src/filter-edit-dialog.c:291
+#: src/filter-edit-dialog.c:289
 msgid "All"
 msgstr "Alla"
 
-#: src/filter-edit-dialog.c:303
+#: src/filter-edit-dialog.c:301
 msgid "Header"
 msgstr "Rubrik"
 
-#: src/filter-edit-dialog.c:315
+#: src/filter-edit-dialog.c:313
 msgid "Body"
 msgstr "Meddelande"
 
-#: src/filter-edit-dialog.c:364
+#: src/filter-edit-dialog.c:362
 msgid "Match string:"
 msgstr "Matcha sträng:"
 
-#: src/filter-edit-dialog.c:416 src/mailbox-conf.c:282 src/mailbox-conf.c:1149
+#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:282 src/mailbox-conf.c:1149
 #: src/pref-manager.c:872
 msgid "Add"
 msgstr "Lägg till"
 
-#: src/filter-edit-dialog.c:427 src/sendmsg-window.c:340
+#: src/filter-edit-dialog.c:425 src/sendmsg-window.c:340
 msgid "Remove"
 msgstr "Ta bort"
 
-#: src/filter-edit-dialog.c:456
+#: src/filter-edit-dialog.c:454
 msgid "Command:"
 msgstr "Kommando:"
 
 #. The name entry
-#: src/filter-edit-dialog.c:492
+#: src/filter-edit-dialog.c:490
 msgid "Filter name:"
 msgstr "Filternamn:"
 
 #. The "Process when:" option menu
-#: src/filter-edit-dialog.c:511
+#: src/filter-edit-dialog.c:509
 msgid "Process when:"
 msgstr "Behandla om:"
 
 #. The "Run on:" option menu
-#: src/filter-edit-dialog.c:542
+#: src/filter-edit-dialog.c:540
 msgid "Run on:"
 msgstr "Kör på:"
 
 #. the type notebook's option menu
-#: src/filter-edit-dialog.c:572
+#: src/filter-edit-dialog.c:570
 msgid "Search type:"
 msgstr "Söktyp:"
 
 #. The notification area
-#: src/filter-edit-dialog.c:628
+#: src/filter-edit-dialog.c:626
 msgid "Notification:"
 msgstr "Påkalla uppmärksamhet:"
 
 #. Notification buttons
-#: src/filter-edit-dialog.c:637
+#: src/filter-edit-dialog.c:635
 msgid "Play sound:"
 msgstr "Spela ljud:"
 
-#: src/filter-edit-dialog.c:645
+#: src/filter-edit-dialog.c:643
 msgid "Use Sound..."
 msgstr "Använd ljud..."
 
-#: src/filter-edit-dialog.c:654
+#: src/filter-edit-dialog.c:652
 msgid "Popup text:"
 msgstr "Visa textruta:"
 
 #. The action area
-#: src/filter-edit-dialog.c:673
+#: src/filter-edit-dialog.c:671
 msgid "Action to perform:"
 msgstr "Vad som skall utföras:"
 
 #. The disposition area
-#: src/filter-edit-dialog.c:694
+#: src/filter-edit-dialog.c:692
 msgid "Disposition:"
 msgstr "Disposition:"
 
-#: src/filter-edit-dialog.c:702
+#: src/filter-edit-dialog.c:700
 msgid "Place/leave in default folder"
 msgstr "Placera/lämna i standardmappen"
 
-#: src/filter-edit-dialog.c:707
+#: src/filter-edit-dialog.c:705
 msgid "Do not place/leave in default folder"
 msgstr "Placera/lämna inte i standardmappen"
 
-#: src/filter-edit-dialog.c:712
+#: src/filter-edit-dialog.c:710
 msgid "Stop filtering here"
 msgstr "Sluta filtrera här"
 
-#: src/filter-edit-dialog.c:740
+#: src/filter-edit-dialog.c:738
 msgid "Match"
 msgstr "Matcha"
 
-#: src/filter-edit-dialog.c:743
+#: src/filter-edit-dialog.c:741
 msgid "Action"
 msgstr "Händelse"
 
-#: src/filter-edit-dialog.c:757
+#: src/filter-edit-dialog.c:755
 msgid "Revert"
 msgstr "Återgå"
 
-#: src/filter-edit-dialog.c:785
+#: src/filter-edit-dialog.c:783
 msgid "Balsa Filters"
 msgstr "Balsa-filter"
 

@@ -30,9 +30,6 @@
 #define MAILBOX_POP3(mailbox)   ((MailboxPOP3 *)(mailbox))
 #define MAILBOX_IMAP(mailbox)   ((MailboxIMAP *)(mailbox))
 
-
-typedef *(my_variadic_function)(const gchar* fmt, ...);
-
 /*
  * enumes
  */

@@ -1,3 +1,9 @@
+2003-02-07 04:23  PeterB
+
+	* src/balsa-index-threading.c: Properly thread duplicates in jwz
+	threading (thanks to jwz for clarification!); use GNode api to
+	simplify code.
+
 2003-02-07  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox.c: remove some references to GDK to reduce

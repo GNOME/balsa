@@ -1,3 +1,7 @@
+2005-02-08 10:13  PeterB
+
+	* libbalsa/imap/imap-handle.c: typo.
+
 2005-02-08  Pawel Salek
 
 	* libbalsa/imap/imap-handle.c: unregister IDLE listener on

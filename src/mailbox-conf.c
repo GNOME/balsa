@@ -80,6 +80,7 @@ static MailboxConfWindow *mcw;
 static MailboxType new_mailbox_type = -1;
 
 /* callbacks */
+static void mailbox_conf_close (GtkWidget * widget, gboolean save);
 static void next_cb (GtkWidget * widget);
 
 /* misc functions */
@@ -111,8 +112,8 @@ mailbox_conf_new (Mailbox * mailbox)
 
   gtk_signal_connect (GTK_OBJECT (mcw->window),
 		      "delete_event",
-		      (GtkSignalFunc) gtk_false,
-		      NULL);
+		      (GtkSignalFunc) mailbox_conf_close,
+		      FALSE);
 
 
   /* notbook for action area of dialog */
@@ -159,8 +160,8 @@ mailbox_conf_new (Mailbox * mailbox)
 
   gtk_signal_connect (GTK_OBJECT (button),
 		      "clicked",
-		      (GtkSignalFunc) NULL,
-		      NULL);
+		      (GtkSignalFunc) mailbox_conf_close,
+		      TRUE);
 
   /* cancel button */
   button = gnome_stock_button (GNOME_STOCK_BUTTON_CANCEL);
@@ -168,8 +169,8 @@ mailbox_conf_new (Mailbox * mailbox)
 
   gtk_signal_connect (GTK_OBJECT (button),
 		      "clicked",
-		      (GtkSignalFunc) NULL,
-		      NULL);
+		      (GtkSignalFunc) mailbox_conf_close,
+		      FALSE);
 
   mailbox_conf_set_values (mailbox);
 
@@ -276,7 +277,7 @@ conf_update_mailbox (Mailbox * mailbox)
 }
 
 static void
-mbconf_window_close (GtkWidget * widget)
+mailbox_conf_close (GtkWidget * widget, gboolean save)
 {
   GtkWidget *menu;
   GtkWidget *menuitem;
@@ -286,13 +287,14 @@ mbconf_window_close (GtkWidget * widget)
 
   mailbox = mcw->mailbox;
 
-  if (mcw->mailbox)
+  if (mcw->mailbox && save)
   {
     conf_update_mailbox(mcw->mailbox);
     /* TODO cleanup */
     return;
   }
  
+  if (save)
   switch (mcw->next_page)
     {
 
@@ -343,6 +345,8 @@ mbconf_window_close (GtkWidget * widget)
 
   /* close the new mailbox window */
   gtk_widget_destroy (mcw->window);
+  g_free(mcw);
+  mcw = NULL;
 }
 
 
@@ -362,6 +366,9 @@ create_new_page ()
   GtkWidget *bbox;
   GtkWidget *button;
   GtkWidget *radio_button;
+
+  vbox = gtk_vbox_new(FALSE, 0);
+  gtk_widget_show(vbox);
 
   /* radio buttons */
   /* local mailbox */

@@ -1641,7 +1641,7 @@ setup_headers_from_message(BalsaSendmsg* cw, LibBalsaMessage *message)
 static void
 setup_headers_from_identity(BalsaSendmsg* cw, LibBalsaIdentity *ident)    
 {
-    gchar* str = libbalsa_address_to_gchar(ident->address, -1);
+    gchar* str = libbalsa_address_to_gchar(ident->address, 0);
     gtk_entry_set_text(GTK_ENTRY(cw->from[1]), str); 
     g_free(str); 
     if(ident->replyto)

@@ -558,6 +558,14 @@ void mutt_generate_boundary (PARAMETER **parm)
   char rs[BOUNDARYLEN + 1];
   char *p = rs;
   int i;
+#ifdef LIBMUTT
+  static int seeded = 0;
+
+  if (!seeded) {
+    SRAND(time(NULL));
+    ++seeded;
+  }
+#endif
 
   rs[BOUNDARYLEN] = 0;
   for (i=0;i<BOUNDARYLEN;i++) 

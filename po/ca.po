@@ -4,8 +4,8 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: balsa 0.6.0\n"
-"POT-Creation-Date: 2000-05-03 14:19+0200\n"
+"Project-Id-Version: balsa 0.8.0\n"
+"POT-Creation-Date: 2000-05-03 22:58+0200\n"
 "PO-Revision-Date: 1999-12-21 00:21+0100\n"
 "Last-Translator: Softcatala <linux@softcatala.org>\n"
 "Language-Team: \n"
@@ -315,7 +315,7 @@ msgstr "Assumpte"
 msgid "Date"
 msgstr "Data"
 
-#: src/balsa-mblist.c:813
+#: src/balsa-mblist.c:814
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr ""
@@ -1566,9 +1566,6 @@ msgstr "No es pot executar l'ordre d'imprimir"
 msgid "Error executing lpr"
 msgstr "Error en executar lpr"
 
-#~ msgid "Spell Check"
-#~ msgstr "Verifica l'ortografia"
-
 #~ msgid "EMAIL;INTERNET:%s\n"
 #~ msgstr "ADREÇA DE CORREU ELECTRÒNICA;INTERNET:%s\n"
 
@@ -1586,3 +1583,6 @@ msgstr "Error en executar lpr"
 
 #~ msgid "_From"
 #~ msgstr "_De"
+
+#~ msgid "Spell Check"
+#~ msgstr "Verifica l'ortografia"

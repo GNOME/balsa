@@ -3386,6 +3386,89 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
   </sect2>
 </sect1>
 
+<sect1 id="win-run-filters">
+  <title>The Edit/Apply Filters Window</title>
+  <para>
+    This window is divided in two lists : the left one displays all available
+    filters, and the right part displays all filters to be applied on the mailbox
+    (the name of which is reminded in the window title). See the <link linkend="win-filters">
+       <guilabel>filters window</guilabel> </link> section to see how to set up filters.
+  </para>
+  <para>
+    The right list has three columns. The first one contains the filters name.
+    The two others tells you if the filter will be automatically applied : eg if
+    a green dot is displayed in the second column ("On reception"),
+    this tells you that whenever new messages arrived in this mailbox, they will be
+    filtered by the corresponding filter (Note : the filter is applied only on
+    the new messages, not the entire mailbox, this is similar to the use of
+    procmail). In the same way if a green dot is displayed in the third column
+    ("On exit"), the filter will be applied to the entire mailbox when you exit Balsa.
+  </para>
+  <para>
+    Note : the "On exit" feature is not yet implented.
+  </para>
+  <para>
+    When you tell Balsa to apply several filters on the same mailbox (i.e. when you
+    put several filters in the right list), only the first match counts : the filters
+    are applied in the specified order and the first that matches on the current
+    message will be applied but not the following ones.
+  </para>
+  <para>
+    There are two buttons between the filters lists :
+    <itemizedlist>
+      <listitem>  
+        <para>
+          The Add button : it moves the selected filters from the left list to the
+	  right one, adding one more filter to be applied to the mailbox.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          The Remove button : removes the currently selected filter in the right
+	  list and puts it back in the left list.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </para>
+  <para>
+    The two buttons under the right list serves to reorder the filters that are to
+    be applied. This is a sort of priority between filters, because if several
+    filters could match the current message, only the first one will be applied.
+  </para>
+  <para>
+    There are three buttons between the filters lists :
+    <itemizedlist>
+      <listitem>  
+        <para>
+          The Apply button : this applies all filters of the right list to the
+	  entire mailbox immediately (be patient, this can take a quite long time on big
+	  mailboxes or remote ones).
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          The OK button : saves the list of filters associated to the mailbox.
+	  Note that this does not apply the filters to the mailbox. It is useful
+	  only when you have set up automatic filters, or when you have to manually
+	  apply a lot of filters frequently to this mailbox : the next time Balsa
+	  will reload the saved filters and you will only have to press the "Apply"
+	  button.
+        </para>
+      </listitem>
+      <listitem>
+         <para>
+          The Cancel button : this discards any changes and closes the dialog box.
+        </para>
+      </listitem>
+      <listitem>
+         <para>
+          The Help button : opens this help window.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </para>
+ 
+</sect1>
 <!-- ################################################################# -->
 <!--                 SECTION: OTHER GENERAL STUFF, FAQ etc.            -->
 <!-- ################################################################# -->

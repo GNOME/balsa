@@ -95,7 +95,7 @@ libbalsa_condition_new_from_config()
 	    newc->match.interval.date_low = 0;
 	else {
 	    (void) strptime("00:00:00", "%T", &date);
-	    p = (gchar*)strptime(str, "%x", &date);
+	    p = (gchar*)strptime(str, "%Y-%m-%d", &date);
 	    if (!p || *p!='\0')
 		filter_errno = FILTER_EFILESYN;
 	    else newc->match.interval.date_low = mktime(&date);
@@ -106,7 +106,7 @@ libbalsa_condition_new_from_config()
 	    newc->match.interval.date_high = 0;
 	else {
 	    (void) strptime("23:59:59", "%T", &date);
-	    p=(gchar *)strptime(str, "%x", &date);
+	    p=(gchar *)strptime(str, "%Y-%m-%d", &date);
 	    if (!p || *p!='\0')
 		filter_errno = FILTER_EFILESYN;
 	    else newc->match.interval.date_high = mktime(&date);

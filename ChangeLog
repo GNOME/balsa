@@ -1,3 +1,14 @@
+2002-10-07  Emmanuel <e.allaud@wanadoo.fr>
+
+	* src/filter-run-callbacks.c: add missing sync_backend in filter code.
+	* libbalsa/filter.c: add missing LOCK_MAILOX. complete IMAP support.
+	* libbalsa/filter-file.c: use fixed date format for storing filter
+	dates.
+	* src/filter-edit-callbacks.c: let the user specify an empty
+	string for the high date.
+	* help/C/balsa.sgml: help on Edit/Apply filters.
+	* src/mailbox-node.c: sort by date by default.
+
 2002-10-01  Emmanuel <e.allaud@wanadoo.fr>
 
 	* libbalsa/filter.c: rewrite extend_query().

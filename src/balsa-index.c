@@ -1210,6 +1210,10 @@ balsa_index_find_node(BalsaIndex * bindex, gboolean previous,
     while (node && !balsa_index_scan_node(bindex->ctree, node, bi));
     g_free(bi);
 
+    /* Display a message if search was unfruitful */
+    if (!node && op!=FILTER_NOOP)
+	balsa_information(LIBBALSA_INFORMATION_WARNING, NULL,
+			  _("No message found\n"));
     return node;
 }
 

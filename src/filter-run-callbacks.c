@@ -93,6 +93,7 @@ run_filters_on_mailbox(GtkCList * clist,LibBalsaMailbox *mbox)
     if (lst) {
 	if (libbalsa_filter_apply(filters))
 	    enable_empty_trash(TRASH_FULL);
+	balsa_index_sync_backend(mbox);
     }
     gtk_clist_thaw(GTK_CLIST(balsa_app.mblist));
     g_slist_free(filters);

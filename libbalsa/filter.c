@@ -209,17 +209,23 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
 	    }
 	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY)) {
                 gboolean is_new = (message->flags & LIBBALSA_MESSAGE_FLAG_NEW);
+		gboolean bool;
 
 		if (mbox_locked)
 		    UNLOCK_MAILBOX(message->mailbox);
-		if (!libbalsa_message_body_ref(message)) {
+		bool = libbalsa_message_body_ref(message);
+		if (mbox_locked)
+		    LOCK_MAILBOX(message->mailbox);
+		if (!bool) {
 		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                          _("Unable to load message body "
                                            "to match filter"));
 		    return FALSE;
 		}
 		body = content2reply(message,NULL,0,FALSE,FALSE);
-                if(is_new) libbalsa_message_read(message, FALSE);
+ 		if (mbox_locked)
+		    UNLOCK_MAILBOX(message->mailbox);
+               if(is_new) libbalsa_message_read(message, FALSE);
 		libbalsa_message_body_unref(message);
 		if (mbox_locked)
 		    LOCK_MAILBOX(message->mailbox);
@@ -273,9 +279,11 @@ extend_query(GString ** query, const gchar * imap_str, gchar * string)
 	*query = g_string_append_c(*query, ' ');
     *query = g_string_append(*query, "NOT ");    
     *query = g_string_append(*query, imap_str);
-    *query = g_string_append(*query, " \"");
-    *query = g_string_append(*query, string);
-    *query = g_string_append_c(*query, '"');
+    if (string) {
+	*query = g_string_append(*query, " \"");
+	*query = g_string_append(*query, string);
+	*query = g_string_append_c(*query, '"');
+    }
 }
 
 /* Stupid problem : the IMAP SEARCH command considers AND its default
@@ -289,27 +297,71 @@ libbalsa_filter_build_imap_query(FilterOpType op, GSList* condlist)
     GString* query = g_string_new("");
     gchar* str;
     gboolean first = TRUE;
+    gchar str_date[20];
+    struct tm * date;
 
     for (;condlist;condlist = g_slist_next(condlist)) {
         LibBalsaCondition* cond = (LibBalsaCondition*)condlist->data;
 	GString * buffer = g_string_new("");
 
-        if (cond->type!=CONDITION_SIMPLE) continue;
-	
-	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_TO))
-            extend_query(&buffer, "TO", cond->match.string);
-	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_FROM))
-            extend_query(&buffer, "FROM", cond->match.string);
- 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_SUBJECT))
-            extend_query(&buffer, "SUBJECT", cond->match.string);
-	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_CC))
-            extend_query(&buffer, "CC", cond->match.string);
-	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY))
-            extend_query(&buffer, "TEXT", cond->match.string);
-	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_US_HEAD)) {
-	    gchar * tmp = g_strdup_printf("HEADER %s", cond->user_header);
-	    extend_query(&buffer, tmp, cond->match.string);
-	    g_free(tmp);
+	switch (cond->type) {
+	case CONDITION_SIMPLE:
+	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_TO))
+		extend_query(&buffer, "TO", cond->match.string);
+	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_FROM))
+		extend_query(&buffer, "FROM", cond->match.string);
+	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_SUBJECT))
+		extend_query(&buffer, "SUBJECT", cond->match.string);
+	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_CC))
+		extend_query(&buffer, "CC", cond->match.string);
+	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY))
+		extend_query(&buffer, "TEXT", cond->match.string);
+	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_US_HEAD)) {
+		gchar * tmp = g_strdup_printf("HEADER %s", cond->user_header);
+		extend_query(&buffer, tmp, cond->match.string);
+		g_free(tmp);
+	    }
+	    break;
+	case CONDITION_DATE:
+	    str = NULL;
+	    if (cond->match.interval.date_low) {
+		date = localtime(&cond->match.interval.date_low);
+		strftime(str_date, sizeof(str_date), "%x", date);
+		str = g_strdup_printf("SENTSINCE %s",str_date);
+	    }
+	    if (cond->match.interval.date_high) {
+		if (str) {
+		    buffer = g_string_append_c(buffer, '(');
+		    buffer = g_string_append(buffer, str);
+		    buffer = g_string_append_c(buffer, ' ');
+		    g_free(str);
+		}
+		date = localtime(&cond->match.interval.date_high);
+		strftime(str_date, sizeof(str_date), "%x", date);
+		str = g_strdup_printf("SENTBEFORE %s", str_date);
+	    }
+	    /* If no date has been put continue (this is not allowed normally
+	       but who knows */
+	    if (!str)
+		continue;
+	    buffer = g_string_append(buffer, str);
+	    g_free(str);
+	    if (buffer->str[0]=='(')
+		buffer = g_string_append_c(buffer, ')');
+	    buffer = g_string_prepend(buffer, "NOT ");
+	    break;
+	case CONDITION_FLAG:
+	    /* NOTE : nothing about replied flag in the IMAP protocol,
+	       so continue if only this flag is present */
+	    if (!(cond->match.flags & ~LIBBALSA_MESSAGE_FLAG_REPLIED))
+		continue;
+	    if (cond->match.flags & LIBBALSA_MESSAGE_FLAG_NEW)
+		extend_query(&buffer, "NEW", NULL);
+	    if (cond->match.flags & LIBBALSA_MESSAGE_FLAG_DELETED)
+		extend_query(&buffer, "DELETED", NULL);
+	    if (cond->match.flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)
+		extend_query(&buffer, "FLAGGED", NULL);
+	    break;
 	}
 
 	if (!first)

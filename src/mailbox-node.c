@@ -143,7 +143,7 @@ balsa_mailbox_node_init(BalsaMailboxNode * mn)
     mn->config_prefix = NULL;
     mn->threading_type = BALSA_INDEX_THREADING_SIMPLE;
     mn->sort_type = GTK_SORT_DESCENDING;
-    mn->sort_field = BALSA_SORT_NO;
+    mn->sort_field = BALSA_SORT_DATE;
     mn->subscribed = FALSE;
     mn->scanned = FALSE;
 }

@@ -488,6 +488,7 @@ condition_validate(LibBalsaCondition* new_cnd)
             }
             new_cnd->match.interval.date_low = mktime(&date);
         }
+	else new_cnd->match.interval.date_low = 0;
         str = gtk_entry_get_text(GTK_ENTRY(fe_type_date_high_entry));
         if (str && str[0]!='\0') {
             (void) strptime("23:59:59","%T",&date);
@@ -498,7 +499,9 @@ condition_validate(LibBalsaCondition* new_cnd)
             }
             new_cnd->match.interval.date_high = mktime(&date);
         }
-        if (new_cnd->match.interval.date_low>new_cnd->match.interval.date_high) {
+	else new_cnd->match.interval.date_high = 0;
+        if (new_cnd->match.interval.date_high &&
+	    new_cnd->match.interval.date_low>new_cnd->match.interval.date_high) {
             condition_error(_("Low date is greater than high date"));
             return FALSE;
         }

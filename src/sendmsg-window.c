@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1998-2000 Stuart Parmenter and others, see AUTHORS file.
  *
@@ -599,9 +599,12 @@ select_attachment(GnomeIconList * ilist, gint num, GdkEventButton * event,
 static void
 add_attachment(GnomeIconList * iconlist, char *filename)
 {
-    /* FIXME: the path to the file must not be hardcoded */
-    /* gchar *pix = gnome_pixmap_file ("balsa/attachment.png"); */
-    gchar *pix = balsa_pixmap_finder("balsa/attachment.png");
+    const gchar *content_type;
+    gchar *pix;
+
+    /* FIXME: What is the default type? */
+    content_type = gnome_mime_type_or_default ( filename, "application/octet-stream" );
+    pix = libbalsa_icon_finder(content_type, filename);
 
     if (balsa_app.debug)
 	fprintf(stderr, "Trying to attach '%s'\n", filename);
@@ -612,12 +615,23 @@ add_attachment(GnomeIconList * iconlist, char *filename)
 
     if (pix && check_if_regular_file(pix)) {
 	gint pos;
-	pos = gnome_icon_list_append(iconlist, pix, g_basename(filename));
+	gchar *label;
+
+	g_print ("POO\n");
+
+	label = g_strdup_printf ("%s (%s)", g_basename(filename), content_type);
+
+	pos = gnome_icon_list_append(iconlist, pix, label);
 	gnome_icon_list_set_icon_data(iconlist, pos, filename);
+
+	g_free(label);
+
     } else
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
 			  _("The attachment pixmap (balsa/attachment.png) cannot be found.\n"
 			    "This means you cannot attach any files.\n"));
+
+    g_free ( pix ) ;
 }
 
 static gint
@@ -960,7 +974,7 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
 		      drop_types, ELEMENTS(drop_types),
 		      GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
 
-    gtk_widget_set_usize(msg->attachments[1], -1, 50);
+    gtk_widget_set_usize(msg->attachments[1], -1, 100);
 
     frame = gtk_frame_new(NULL);
     gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);

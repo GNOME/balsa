@@ -2119,6 +2119,7 @@ register_balsa_pixmaps(void)
     register_balsa_pixmap(BALSA_PIXMAP_MAIL_RPL_ALL, reply_to_all_xpm, 24, 24);
     register_balsa_pixmap(BALSA_PIXMAP_MAIL_RPL_ALL_MENU,
 			  reply_to_all_menu_xpm, 16, 15);
+
     register_balsa_pixmap (BALSA_PIXMAP_NEXT_UNREAD, next_unread_xpm, 24, 24);
     register_balsa_pixmap (BALSA_PIXMAP_NEXT_UNREAD_MENU, 
                            next_unread_menu_xpm, 16, 15);

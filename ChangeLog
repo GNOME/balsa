@@ -1,3 +1,14 @@
+2000-10-13  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/files.[ch]: New function libbalsa_icon_finder, which
+	finds an icon for a part, based on filename or mime
+	type. Contributed by Timothy Alan Chandler
+	<fusion@heavywater.net>.
+	* src/balsa-message.c: Use libbalsa_icon_finder to find
+	icons. Based in parts on a patch from James A Laska
+	<james_laska@yahoo.com>
+	* src/sendmsg-window.c: Use libbalsa_icon_finder to find icons.
+
 2000-10-12  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/sendmsg-window.c: fix #27784 (crash on replying a message that

@@ -86,3 +86,47 @@ balsa_file_finder(const gchar * filename, const gchar * splice,
 	 filename, splice);
     return NULL;
 }
+
+/* balsa_icon_finder:
+ *   locate a suitable icon (pixmap graphic) based on 'mime-type' and/or
+ *   'filename', either of which can be NULL.  If both arguments are
+ *   non-NULL, 'mime-type' has priority.  If both are NULL, the default
+ *   'balsa/attachment.png' icon will be returned.  This function *MUST*
+ *   return the complete path to the icon file.
+ */
+gchar *
+libbalsa_icon_finder(const char *mime_type, const char *filename)
+{
+    const char *content_type, *icon_file;
+    gchar *icon = NULL;
+    
+    content_type = (!mime_type) ? gnome_mime_type (filename) : mime_type;
+
+    icon_file = gnome_mime_get_value (content_type, "icon-filename");
+
+    if ( icon_file ) 
+	icon = g_strdup (icon_file);
+
+    if (!icon || !g_file_exists (icon)) {
+	gchar *gnome_icon, *p_gnome_icon;
+	
+	gnome_icon = g_strdup_printf ("gnome-%s.png", content_type);   
+	
+	p_gnome_icon = strchr (gnome_icon, '/');
+	if (p_gnome_icon != NULL)
+	    *p_gnome_icon = '-';
+
+	icon = balsa_pixmap_finder (gnome_icon);
+
+	/*
+	 * FIXME: Should use a better icon. Since this one is small
+	 * In pratice I don't think we will ever make it this far...
+	 */
+	if ( icon == NULL )
+	    icon = balsa_pixmap_finder ("balsa/attachment.png");
+	
+	g_free (gnome_icon);
+    }
+
+    return (icon);
+}

@@ -1195,31 +1195,6 @@ part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info, gchar * ptr,
 }
 #endif
 
-static gchar *
-find_part_icon(BalsaPartInfo * info, gchar * content_type)
-{
-    gchar *pix;
-    gchar *filename = g_strdup_printf("gnome-%s.png", content_type);
-
-    gchar *p = filename;
-
-    while (*p) {
-	*p = tolower(*p);
-	if (*p == '/')
-	    *p = '-';
-	p++;
-    }
-
-    pix = gnome_pixmap_file(filename);
-
-    g_free(filename);
-
-    if (!pix)
-	pix = gnome_pixmap_file("balsa/attachment.png");
-
-    return pix;
-}
-
 static void
 part_info_init(BalsaMessage * bm, BalsaPartInfo * info)
 {
@@ -1321,8 +1296,7 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body)
     else
 	icon_title = g_strdup_printf("(%s)", content_type);
 
-    if (!pix)
-	pix = find_part_icon(info, content_type);
+    pix = libbalsa_icon_finder(content_type, body->filename);
 
     menu_item = gtk_menu_item_new_with_label(_("Save..."));
     gtk_menu_append(GTK_MENU(info->popup_menu), menu_item);

@@ -1,5 +1,9 @@
-2003-06-03 11:48  PeterB
+2003-06-03 22:22  PeterB
 
+	* libbalsa/libbalsa.h, libbalsa/source-viewer.c, src/balsa-index.c,
+	src/main-window.c, src/message-window.c: Use balsa_app.message_font
+	for the source viewer, and add a View menu with an option to
+	utf8_sanitize the source, not g_strescape it.
 	* src/main.c: Ignore SIG_PIPE before starting gnome triggers.
 	* src/: balsa-message.c, balsa-message.h, main-window.c,
 	message-window.c, sendmsg-window.c, sendmsg-window.h: Handle cut,

@@ -11,8 +11,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2001-10-14 15:39+0200\n"
-"PO-Revision-Date: 2001-10-14 15:45+0200\n"
+"POT-Creation-Date: 2001-10-23 19:38+0200\n"
+"PO-Revision-Date: 2001-10-24 19:18+0200\n"
 "Last-Translator: GNOME PL Team <translators@gnome.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -437,9 +437,15 @@ msgstr "Pobrano %d bajtów z %d"
 msgid "Sending Mail..."
 msgstr "Wysy³anie listu..."
 
-#: libbalsa/send.c:1
+#: libbalsa/send.c:1 src/main-window.c:1
 msgid "Hide"
 msgstr "Ukryj"
+
+#: libbalsa/send.c:1
+msgid "Unable to open sentbox - could not get IMAP server information"
+msgstr ""
+"Nie mo¿na otworzyæ folderu \"Poczta wys³ana\" - brak informacji od serwera "
+"IMAP"
 
 #: libbalsa/send.c:1
 msgid ""
@@ -489,6 +495,14 @@ msgid "SMTP server problem: %s"
 msgstr "Problem z serwerem SMTP: %s"
 
 #: libbalsa/source-viewer.c:1
+msgid "_Select Text"
+msgstr "Zaznacz _tekst"
+
+#: libbalsa/source-viewer.c:1
+msgid "Select entire mail"
+msgstr "Zaznacza ca³y list"
+
+#: libbalsa/source-viewer.c:1
 msgid "Message Source"
 msgstr "¬ród³o listu"
 
@@ -533,6 +547,11 @@ msgid ""
 "until the system created the mailboxes. Please change\n"
 "the mailbox path or check your system configuration."
 msgstr ""
+"Skrzynka \"%s\" wydaje siê byæ niepoprawna.\n"
+"System nie pozwala na tworzenie skrzynek w katalogu\n"
+"/var/spool/mail. Do czasu stworzenia skrzynek Balsa\n"
+"nie bêdzie prawid³owo dzia³a³a. Sprawd¼ konfiguracjê\n"
+"systemu lub zmieñ ¶cie¿kê skrzynki."
 
 #: libinit_balsa/balsa-druid-page-directory.gob:1
 #, c-format
@@ -1448,6 +1467,10 @@ msgid "Cannot access the message's body\n"
 msgstr "Nie mo¿na uzyskaæ dostêpu do tre¶ci listu\n"
 
 #: src/balsa-index.c:1
+msgid "View Source"
+msgstr "Wy¶wietl ¼ród³o"
+
+#: src/balsa-index.c:1
 msgid "Reply..."
 msgstr "Odpisz..."
 
@@ -1576,6 +1599,7 @@ msgstr ""
 "uszkodzony."
 
 #: src/balsa-message.c:1 src/balsa-message.c:1 src/balsa-message.c:1
+#: src/balsa-message.c:1
 msgid "Content Type: external-body\n"
 msgstr "Typ zawarto¶ci: external-body\n"
 
@@ -1587,6 +1611,15 @@ msgstr "Typ dostêpu: local-file\n"
 #, c-format
 msgid "File name: %s"
 msgstr "Nazwa pliku: %s"
+
+#: src/balsa-message.c:1
+msgid "Access type: URL\n"
+msgstr "Typ dostêpu: URL\n"
+
+#: src/balsa-message.c:1
+#, c-format
+msgid "URL: %s"
+msgstr "URL: %s"
 
 #: src/balsa-message.c:1
 #, c-format
@@ -2024,6 +2057,9 @@ msgid ""
 "If you really want to remove it, assign its function\n"
 "to some other mailbox."
 msgstr ""
+"Nie mo¿na usun±æ folderu \"%s\", gdy¿ jest u¿ywany przez Balsê.\n"
+"Je¶li rzeczywi¶cie chcesz go usun±æ, przypisz jego funkcjê\n"
+"innemu folderowi."
 
 #: src/mailbox-conf.c:1
 #, c-format
@@ -2293,7 +2329,7 @@ msgid "_Send Queued Mail"
 msgstr "_Wy¶lij listy z kolejki"
 
 #: src/main-window.c:1
-msgid "Send mail from the outbox"
+msgid "Send messages from the outbox"
 msgstr "Wysy³a listy z folderu \"Poczta wychodz±ca\""
 
 #: src/main-window.c:1
@@ -2358,11 +2394,11 @@ msgstr "Zastosowuje prosty algorytm grupowania w±tków"
 
 #: src/main-window.c:1
 msgid "_JWZ threading"
-msgstr ""
+msgstr "W±tki _JWZ"
 
 #: src/main-window.c:1
 msgid "Elaborate JWZ threading"
-msgstr ""
+msgstr "W±tki JWZ"
 
 #: src/main-window.c:1
 msgid "_Show Mailbox Tree"
@@ -2476,11 +2512,11 @@ msgstr "Zapisz bie¿±c± czê¶æ..."
 msgid "Save current part in message"
 msgstr "Zapisuje bie¿±c± czê¶æ listu"
 
-#: src/main-window.c:1
+#: src/main-window.c:1 src/message-window.c:1
 msgid "_View Source..."
 msgstr "_Wy¶wietl ¼ród³o..."
 
-#: src/main-window.c:1
+#: src/main-window.c:1 src/message-window.c:1
 msgid "View source form of the message"
 msgstr "Wy¶wietla list w postaci ¼ród³owej"
 
@@ -2537,12 +2573,12 @@ msgstr "Nastêpny nieprzeczytany list"
 msgid "Next Flagged Message"
 msgstr "Nastêpny oznakowany list"
 
-#: src/main-window.c:1 src/toolbar-prefs.c:1
-msgid "Mark all"
-msgstr "Zaznacz wszystkie"
+#: src/main-window.c:1
+msgid "Select all"
+msgstr "Zaznacz wszystko"
 
-#: src/main-window.c:1 src/toolbar-prefs.c:1
-msgid "Mark all messages in current mailbox"
+#: src/main-window.c:1
+msgid "Select all messages in current mailbox"
 msgstr "Zaznacza wszystkie listy w bie¿±cej skrzynce"
 
 #: src/main-window.c:1
@@ -2611,6 +2647,14 @@ msgstr "_Skrzynka"
 
 #: src/main-window.c:1
 msgid ""
+"Balsa is sending a mail now.\n"
+"Abort sending?"
+msgstr ""
+"Balsa wysy³a obecnie pocztê.\n"
+"Czy przerwaæ wysy³anie?"
+
+#: src/main-window.c:1
+msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
 msgstr ""
@@ -2632,6 +2676,10 @@ msgstr ""
 "mo¿na odnale¼æ na witrynie http://www.balsa.net/\n"
 "\n"
 "Aby zg³osiæ b³±d w programie, odwied¼ http://bugzilla.gnome.org/"
+
+#: src/main-window.c:1
+msgid "Checking Mail..."
+msgstr "Sprawdzanie poczty..."
 
 #: src/main-window.c:1
 msgid "Finished Checking."
@@ -2873,7 +2921,7 @@ msgstr "Has³o"
 #. STARTTLS
 #: src/pref-manager.c:1
 msgid "Use TLS"
-msgstr ""
+msgstr "U¿ywanie TLS"
 
 #: src/pref-manager.c:1
 msgid "Certificate Pass Phrase"
@@ -2935,18 +2983,20 @@ msgstr "znaku"
 
 #: src/pref-manager.c:1
 msgid "Reflow messages of type `text/plain; format=flowed'"
-msgstr ""
+msgstr "Przeformatowywanie listów typu \"text/plain; format=flowed\""
 
 #. How to handle received MDN requests
 #: src/pref-manager.c:1
 msgid "Message Disposition Notification requests"
-msgstr ""
+msgstr "¯±dania powiadomienia o otrzymaniu listu (MDN)"
 
 #: src/pref-manager.c:1
 msgid ""
 "When I receive a message and its sender requested to return a\n"
 "Message Disposition Notification (MDN), send it in the following cases:"
 msgstr ""
+"Przy otrzymaniu listu, którego nadawca oczekuje powiadomienia o\n"
+"otrzymaniu listu (MDN), nale¿y go powiadomiæ w nastêpuj±cych przypadkach:"
 
 #: src/pref-manager.c:1
 msgid ""
@@ -2954,10 +3004,13 @@ msgid ""
 "(the notify-to address is equal to the return path, I am in the to or cc "
 "list)"
 msgstr ""
+"nag³ówek listu wygl±da w³a¶ciwie\n"
+"(adres w notify-to jest równy ¶cie¿ce powrotnej, twój adres jest na li¶cie "
+"to (do) lub cc)"
 
 #: src/pref-manager.c:1
 msgid "the message header looks suspicious"
-msgstr ""
+msgstr "nag³ówek listu wygl±da podejrzanie"
 
 #: src/pref-manager.c:1
 msgid "Word Wrap"
@@ -2969,7 +3022,7 @@ msgstr "Zawijanie wysy³anego tekstu na pozycji:"
 
 #: src/pref-manager.c:1
 msgid "Send message as type `text/plain; format=flowed'"
-msgstr ""
+msgstr "Wys³anie listu jako \"text/plain; format=flowed\""
 
 #: src/pref-manager.c:1
 msgid "Other options"
@@ -2980,16 +3033,26 @@ msgid "Reply prefix:"
 msgstr "Przedrostek cytowania:"
 
 #: src/pref-manager.c:1
-msgid "don't include HTML parts as text when replying or forwarding mail"
-msgstr ""
+msgid "Automatically quote original when replying"
+msgstr "Automatyczne cytowanie orygina³u przy odpowiadaniu"
 
 #: src/pref-manager.c:1
-msgid "forward a mail as attachment instead of quoting it"
+msgid "Don't include HTML parts as text when replying or forwarding mail"
 msgstr ""
+"Pomijanie czê¶ci w HTML-u przy odpowiadaniu na list lub jego przesy³aniu"
+
+#: src/pref-manager.c:1
+msgid "Forward a mail as attachment instead of quoting it"
+msgstr "Przesy³anie listów w postaci za³±czników zamiast ich cytowania"
 
 #: src/pref-manager.c:1
 msgid "Send button always queues outgoing mail in outbox"
 msgstr ""
+"Kolejkowanie listów w folderze \"Poczta wychodz±ca\" po wci¶niêciu \"Wy¶lij\""
+
+#: src/pref-manager.c:1
+msgid "Copy outgoing messages to sentbox"
+msgstr "Kopiowanie wychodz±cych listów do folderu \"Poczta wychodz±ca\""
 
 #: src/pref-manager.c:1
 msgid "Encoding"
@@ -3318,11 +3381,12 @@ msgstr "Wysy³a list"
 
 #: src/sendmsg-window.c:1
 msgid "_Queue"
-msgstr ""
+msgstr "Zapisz w _kolejce"
 
 #: src/sendmsg-window.c:1
 msgid "Queue this message in Outbox for sending"
 msgstr ""
+"Kolejkuje list w folderze \"Poczta wychodz±ca\", przygotowuj±c go do wys³ania"
 
 #: src/sendmsg-window.c:1
 msgid "_Postpone"
@@ -3424,9 +3488,17 @@ msgstr "_S³owa kluczowe"
 msgid "Brazilian"
 msgstr "Brazylijski"
 
-#: src/sendmsg-window.c:1 src/sendmsg-window.c:1
+#: src/sendmsg-window.c:1 src/sendmsg-window.c:1 src/sendmsg-window.c:1
 msgid "Catalan"
 msgstr "Kataloñski"
+
+#: src/sendmsg-window.c:1 src/sendmsg-window.c:1
+msgid "Chinese Simplified"
+msgstr "Chiñski uproszczony"
+
+#: src/sendmsg-window.c:1 src/sendmsg-window.c:1
+msgid "Chinese Traditional"
+msgstr "Chiñski tradycyjny"
 
 #: src/sendmsg-window.c:1 src/sendmsg-window.c:1
 msgid "Danish"
@@ -3539,11 +3611,11 @@ msgstr "_K-Z"
 
 #: src/sendmsg-window.c:1
 msgid "_Request Disposition Notification"
-msgstr ""
+msgstr "¯±_danie powiadomienia o otrzymaniu (MDM)"
 
 #: src/sendmsg-window.c:1
 msgid "_Always Queue Sent Mail"
-msgstr ""
+msgstr "_Zawsze kolejkowanie wys³anych listów"
 
 #: src/sendmsg-window.c:1
 msgid "_Show"
@@ -3573,6 +3645,33 @@ msgstr "Zamykanie okna tworzenia listu"
 #: src/sendmsg-window.c:1 src/toolbar-prefs.c:1
 msgid "Select Identity"
 msgstr "To¿samo¶æ"
+
+#: src/sendmsg-window.c:1
+msgid "attach as reference?"
+msgstr "za³±czyæ jako odno¶nik?"
+
+#: src/sendmsg-window.c:1
+#, c-format
+msgid ""
+"Saying yes will not send the file `%s' itself, but just a MIME "
+"message/external-body reference.  Note that the recipient must have proper "
+"permissions to see the `real' file.\n"
+"\n"
+"Do you really want to attach this file as reference?"
+msgstr ""
+"Odpowied¼ pozytywna spowoduje, ¿e nie bêdzie wys³any plik \"%s\", a tylko "
+"odno¶nik MIME message/external-body. Aby uzyskaæ dostêp do rzeczywistego "
+"pliku, odbiorca musi mieæ odpowiednie uprawnienia.\n"
+"\n"
+"Czy rzeczywi¶cie chcesz za³±czyæ ten plik jako odno¶nik?"
+
+#: src/sendmsg-window.c:1
+msgid "attach as reference"
+msgstr "za³±cz jako odno¶nik"
+
+#: src/sendmsg-window.c:1
+msgid "attach as file"
+msgstr "za³±cz jako plik"
 
 #: src/sendmsg-window.c:1
 #, c-format
@@ -3950,6 +4049,14 @@ msgstr ""
 #: src/toolbar-prefs.c:1
 msgid "Toggle new message flag"
 msgstr "Prze³±cza oznaczenie listu jako nowy"
+
+#: src/toolbar-prefs.c:1
+msgid "Mark all"
+msgstr "Zaznacz wszystkie"
+
+#: src/toolbar-prefs.c:1
+msgid "Mark all messages in current mailbox"
+msgstr "Zaznacza wszystkie listy w bie¿±cej skrzynce"
 
 #: src/toolbar-prefs.c:1
 msgid ""

@@ -19,6 +19,7 @@ balsa_SOURCES =	\
 	main.c			\
 	message-window.c	\
 	pref-manager.c		\
+	print.c			\
 	save-restore.c		\
 	sendmsg-window.c	\
 	balsa-app.h		\
@@ -35,6 +36,7 @@ balsa_SOURCES =	\
 	main.h			\
 	message-window.h	\
 	pref-manager.h		\
+	print.h			\
 	save-restore.h		\
 	sendmsg-window.h	\
 	mblist-window.c		\

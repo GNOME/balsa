@@ -6,6 +6,7 @@
 
 #include <glib.h>
 #include <gtk/gtk.h>
+#include "pixmaps/enabled.xpm"
 
 /*
  * fe = filter edit
@@ -71,8 +72,8 @@ void fe_clist_select_row(GtkWidget *widget,
 			 gint row, gint column,
 			 GdkEventButton *bevent,
 			 gpointer data);
-void fe_clist_button_event_press(GtkCList *clist,
-				 GdkEventButton *event,
+void fe_clist_button_event_press(GtkWidget *widget,
+				 GdkEventButton *bevent,
 				 gpointer data);
 
 /* boxes for clist control buttons */

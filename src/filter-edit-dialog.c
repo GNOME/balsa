@@ -138,6 +138,10 @@ void build_left_side()
 		       TRUE,
 		       TRUE,
 		       0);
+    gtk_signal_connect(GTK_OBJECT(fe_new),
+		       "clicked",
+		       GTK_SIGNAL_FUNC(fe_new_pressed),
+		       NULL);
     gtk_widget_show(fe_new);
     fe_delete = gtk_button_new_with_label("Delete");
     gtk_box_pack_start(GTK_BOX(fe_box_newdelete),
@@ -195,6 +199,10 @@ void build_left_side()
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     10,10);
+    gtk_signal_connect(GTK_OBJECT(fe_clist),
+		       "button_press_event",
+		       GTK_SIGNAL_FUNC(fe_clist_button_event_press),
+		       NULL);
     gtk_widget_show(fe_clist);
 } /* end build_left_side() */
 

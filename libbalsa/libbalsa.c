@@ -42,7 +42,6 @@
 
 #ifdef BALSA_USE_THREADS
 static pthread_t main_thread_id;
-pthread_mutex_t mailbox_lock = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
 #define POP_SERVER "pop"
@@ -520,3 +519,34 @@ libbalsa_get_main_thread(void)
     return main_thread_id;
 }
 #endif
+
+#ifdef BALSA_USE_THREADS
+#include "libbalsa_private.h"	/* for prototypes */
+pthread_mutex_t mailbox_lock = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t mailbox_cond = PTHREAD_COND_INITIALIZER;
+
+/* Lock/unlock a mailbox; no argument checking--we'll assume the caller
+ * took care of that. */
+
+void
+libbalsa_lock_mailbox(LibBalsaMailbox * mailbox)
+{
+    pthread_mutex_lock(&mailbox_lock);
+    while (mailbox->lock)
+	pthread_cond_wait(&mailbox_cond, &mailbox_lock);
+    /* We'll assume that no-one would destroy a mailbox while we've been
+     * trying to lock it. If they have, we have larger problems than
+     * this reference! */
+    mailbox->lock = TRUE;
+    pthread_mutex_unlock(&mailbox_lock);
+}
+
+void
+libbalsa_unlock_mailbox(LibBalsaMailbox * mailbox)
+{
+    pthread_mutex_lock(&mailbox_lock);
+    mailbox->lock = FALSE;
+    pthread_cond_broadcast(&mailbox_cond);
+    pthread_mutex_unlock(&mailbox_lock);
+}
+#endif				/* BALSA_USE_THREADS */

@@ -1,6 +1,6 @@
 2002-12-19 12:46  PeterB
 
-	* src/: Makefile.am, sendmsg-window.c (file_menu):
+	* src/: Makefile.am, balsa-message.h, sendmsg-window.c (file_menu):
         Final (?) deprecation cleanup; add *_DISABLE_DEPRECATED DEFS
         in Makefile.am.
 

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 1.0.0\n"
-"POT-Creation-Date: 2000-11-05 12:13+0100\n"
+"POT-Creation-Date: 2000-11-10 12:18+0100\n"
 "PO-Revision-Date: 2000-11-05 23:51+01:00\n"
 "Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
 "Language-Team: Norwegian <no@li.org>\n"
@@ -104,12 +104,12 @@ msgstr "LibBalsaMailboxLocal: Åpner %s referansetall: %d\n"
 msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxPop3: Åpner %s referansetall: %d\n"
 
-#: libbalsa/send.c:788
+#: libbalsa/send.c:753
 #, c-format
 msgid "Could not find address for host %s."
 msgstr "Kunne ikke finne adresse for vert %s."
 
-#: libbalsa/send.c:794
+#: libbalsa/send.c:759
 #, c-format
 msgid "Error: Could not find address for host %s."
 msgstr "Feil: Kunne ikke finne adresse for vert %s."
@@ -730,19 +730,11 @@ msgstr "Flytt til søppel"
 msgid "Store Address..."
 msgstr "Lagre adresse..."
 
-#. menuitem = gtk_menu_item_new_with_label(_("Toggle Flagged"));
-#: src/balsa-index-page.c:555
+#: src/balsa-index-page.c:554
 msgid "Toggle Flagged"
 msgstr "Slå på/av flaggede"
 
-#. gtk_widget_set_sensitive(menuitem, !bindex->mailbox->readonly);
-#. gtk_signal_connect(GTK_OBJECT(menuitem),
-#. "activate",
-#. (GtkSignalFunc) balsa_message_toggle_flagged,
-#. bindex);
-#. gtk_menu_append(GTK_MENU(menu), menuitem);
-#. gtk_widget_show(menuitem);
-#: src/balsa-index-page.c:565
+#: src/balsa-index-page.c:557
 msgid "Transfer"
 msgstr "Overfør"
 
@@ -776,7 +768,7 @@ msgstr "Uleste"
 msgid "Total"
 msgstr "Total"
 
-#: src/balsa-mblist.c:736
+#: src/balsa-mblist.c:731
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr "Vist postboks: %s med %ld meldinger, %ld nye"
@@ -790,7 +782,7 @@ msgid "Save"
 msgstr "Lagre"
 
 #: src/balsa-message.c:288 src/sendmsg-window.c:155 src/sendmsg-window.c:634
-#: src/sendmsg-window.c:1728 src/sendmsg-window.c:1751
+#: src/sendmsg-window.c:1715 src/sendmsg-window.c:1738
 msgid "Cancel"
 msgstr "Avbryt"
 
@@ -1540,11 +1532,11 @@ msgstr "Skriv ut"
 msgid "Print current message"
 msgstr "Skriv ut denne meldingen"
 
-#: src/main-window.c:1103
+#: src/main-window.c:1106
 msgid "Copyright (C) 1997-2000"
 msgstr "Copyright (C) 1997-2000"
 
-#: src/main-window.c:1106
+#: src/main-window.c:1109
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://www.balsa.net/\n"
@@ -1556,22 +1548,22 @@ msgstr ""
 "\n"
 "Vennligst rapporter feil på: http://bugs.gnome.org/"
 
-#: src/main-window.c:1481
+#: src/main-window.c:1482
 #, c-format
 msgid "Sending error: %s"
 msgstr "Feil under sending: %s"
 
-#: src/main-window.c:1859
+#: src/main-window.c:1828
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Endring av postboks %s feilet."
 
-#: src/main-window.c:2043
+#: src/main-window.c:2012
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (skrivebeskyttet)"
 
-#: src/main-window.c:2045
+#: src/main-window.c:2014
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
@@ -2441,11 +2433,11 @@ msgstr "Kommentarer:"
 msgid "Keywords:"
 msgstr "Nøkkelord:"
 
-#: src/sendmsg-window.c:1092
+#: src/sendmsg-window.c:1079
 msgid "you"
 msgstr "deg"
 
-#: src/sendmsg-window.c:1097
+#: src/sendmsg-window.c:1084
 #, c-format
 msgid ""
 "\n"
@@ -2454,7 +2446,7 @@ msgstr ""
 "\n"
 "%s skrev %s:\n"
 
-#: src/sendmsg-window.c:1100
+#: src/sendmsg-window.c:1087
 #, c-format
 msgid ""
 "\n"
@@ -2463,40 +2455,40 @@ msgstr ""
 "\n"
 "%s skrev:\n"
 
-#: src/sendmsg-window.c:1180
+#: src/sendmsg-window.c:1167
 msgid "Reply to "
 msgstr "Svar til "
 
-#: src/sendmsg-window.c:1185
+#: src/sendmsg-window.c:1172
 msgid "Forward message"
 msgstr "Videresend melding"
 
-#: src/sendmsg-window.c:1190
+#: src/sendmsg-window.c:1177
 msgid "Continue message"
 msgstr "Fortsett på en melding"
 
-#: src/sendmsg-window.c:1195
+#: src/sendmsg-window.c:1182
 msgid "New message"
 msgstr "Ny melding"
 
-#: src/sendmsg-window.c:1454
+#: src/sendmsg-window.c:1441
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Kunne ikke åpne filen %s.\n"
 
-#: src/sendmsg-window.c:1456
+#: src/sendmsg-window.c:1443
 msgid "Loading..."
 msgstr "Laster..."
 
-#: src/sendmsg-window.c:1483
+#: src/sendmsg-window.c:1470
 msgid "Include file"
 msgstr "Inkluder fil"
 
-#: src/sendmsg-window.c:1726
+#: src/sendmsg-window.c:1713
 msgid "Cannot execute print command."
 msgstr "Kan ikke utføre utskriftskommando."
 
-#: src/sendmsg-window.c:1749
+#: src/sendmsg-window.c:1736
 msgid "Error executing lpr"
 msgstr "Feil under kjøring av lpr"
 

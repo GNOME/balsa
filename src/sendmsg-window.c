@@ -4231,6 +4231,8 @@ reflow_selected_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     gtk_text_view_scroll_to_mark(text_view,
 				 gtk_text_buffer_get_insert(buffer),
 				 0, FALSE, 0, 0);
+
+    regfree(&rex);
 }
 
 /* To field "changed" signal callback. */

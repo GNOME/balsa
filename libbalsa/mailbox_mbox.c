@@ -1121,6 +1121,8 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 		(msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED)) {
 		free_message_info(msg_info);
 		g_array_remove_index(mbox->messages_info, j);
+                libbalsa_mailbox_index_entry_free(g_ptr_array_index
+                                                  (mailbox->mindex, j));
 		g_ptr_array_remove_index(mailbox->mindex, j);
 	    } else
 		j++;

@@ -71,21 +71,21 @@ static int invoke_dotlock(const char *path, int flags, int retry)
   char cmd[LONG_STRING + _POSIX_PATH_MAX];
   char r[SHORT_STRING];
   char *f;
- 
+
   if(flags & DL_FL_RETRY)
     snprintf(r, sizeof(r), "-r %d ", retry ? MAXLOCKATTEMPT : 0);
  
   f = mutt_quote_filename(path);
 
   snprintf(cmd, sizeof(cmd),
-           "%s %s%s%s%s%s%s",
-           DOTLOCK,
-           flags & DL_FL_TRY ? "-t " : "",
-           flags & DL_FL_UNLOCK ? "-u " : "",
-           flags & DL_FL_USEPRIV ? "-p " : "",
-           flags & DL_FL_FORCE ? "-f " : "",
-           flags & DL_FL_RETRY ? r : "",
-           f);
+	   "%s %s%s%s%s%s%s",
+	   DOTLOCK,
+	   flags & DL_FL_TRY ? "-t " : "",
+	   flags & DL_FL_UNLOCK ? "-u " : "",
+	   flags & DL_FL_USEPRIV ? "-p " : "",
+	   flags & DL_FL_FORCE ? "-f " : "",
+	   flags & DL_FL_RETRY ? r : "",
+	   f);
 
   FREE(&f);
 
@@ -112,7 +112,7 @@ retry_lock:
     char msg[LONG_STRING];
 
     snprintf(msg, sizeof(msg), "Lock count exceeded, remove lock for %s?",
-             path);
+	     path);
     if(retry && mutt_yesorno(msg, 1) == 1)
     {
       flags |= DL_FL_FORCE;
@@ -125,8 +125,8 @@ retry_lock:
 
 static int undotlock_file (const char *path)
 {
-  return (invoke_dotlock(path, DL_FL_USEPRIV | DL_FL_UNLOCK, 0) == DL_EX_OK ?
-          0 : -1);
+  return (invoke_dotlock(path, DL_FL_USEPRIV | DL_FL_UNLOCK, 0) == DL_EX_OK ? 
+	  0 : -1);
 }
 
 #endif /* USE_DOTLOCK */
@@ -357,7 +357,7 @@ int mx_get_magic (const char *path)
     return M_IMAP;
 #endif /* USE_IMAP */
 
-  if (stat (path, &st) != 0)
+  if (stat (path, &st) == -1)
   {
     dprint (1, (debugfile, "mx_get_magic(): unable to stat %s: %s (errno %d).\n",
 		path, strerror (errno), errno));
@@ -776,10 +776,11 @@ int mx_close_mailbox (CONTEXT *ctx)
   {
     char *p;
 #ifndef LIBMUTT
+
     if ((p = mutt_find_hook (M_MBOXHOOK, ctx->path)))
     {
       isSpool = 1;
-      strfcpy (mbox, NONULL(Inbox), sizeof (mbox));
+      strfcpy (mbox, p, sizeof (mbox));
     }
     
     else
@@ -888,7 +889,7 @@ int mx_sync_mailbox (CONTEXT *ctx)
   if (ctx->dontwrite)
   {
     char buf[STRING], tmp[STRING];
-#ifdef FULL_MUTT    
+#ifndef LIBMUTT   
     if (km_expand_key (buf, sizeof(buf),
                        km_find_func (MENU_MAIN, OP_TOGGLE_WRITE)))
       snprintf (tmp, sizeof(tmp), " Press '%s' to toggle write", buf);

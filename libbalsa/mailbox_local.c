@@ -400,7 +400,7 @@ libbalsa_mailbox_link_message(LibBalsaMailboxLocal *mailbox,
         return;
     if (LIBBALSA_MESSAGE_IS_UNREAD(msg))
         mbx->unread_messages++;
-    mbx->total_messages++;
+    libbalsa_mailbox_msgno_inserted(mbx, msg->msgno);
 }
 
 /*

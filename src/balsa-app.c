@@ -120,28 +120,16 @@ do_load_mailboxes ()
 static gint
 read_signature ()
 {
-  int fd, ret;
-  struct stat stats;
+  FILE *fp;
+  size_t len;
+
   gchar path[PATH_MAX];
   sprintf (path, "%s/.signature", g_get_home_dir ());
-  fd = open (path, O_RDONLY);
-  if (fd == -1)
-    {
-      perror ("error opening signature file");
-      return FALSE;
-    }
-  ret = fstat (fd, &stats);
-  if (ret != 0)
-    {
-      perror ("error doing fstat on signature");
-      close (fd);
-      return FALSE;
-    }
-  balsa_app.signature = g_new (gchar, stats.st_size);
-  ret = read (fd, balsa_app.signature, stats.st_size);
-  if (ret > 0)
-    balsa_app.signature[ret - 1] = '\0';
-  close (fd);
+  fp = fopen (path, "r");
+  len = readfile(fp, &balsa_app.signature);
+  if (len != 0)
+    balsa_app.signature[len - 1] = '\0';
+  fclose (fp);
   return TRUE;
 }
 

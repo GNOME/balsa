@@ -1,3 +1,10 @@
+2003-04-24 05:57  PeterB
+
+	* src/sendmsg-window.c: Grab gdk lock in a timeout handler; scroll
+	to cursor after wrapping.
+	* libbalsa/misc.c: Mark URLs in a text buffer, so they don't get
+	wrapped.
+
 2003-04-22 15:42  PeterB
 
 	* doc/C/balsa.xml: Fix #110881.

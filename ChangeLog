@@ -1,3 +1,11 @@
+2000-10-17  Pawel Salek <pawsa@theochem.kth.se>
+
+	* configure.in: stop if LDAP enabled but not found. Bump version
+	to pre3.
+	* src/address-book-config.c: parent dialog window
+	* src/address-book.c: open compose window on double clicking
+	* src/main-window.c: remove not needed X11/Xutil.h include
+	
 2000-10-16  Pawel Salek <pawsa@theochem.kth.se>
  
 	* libbalsa/mailbox.c: allow ref'ing messages to make idle_handler

@@ -14,7 +14,7 @@ dnl ############################################################################
 
 BALSA_MAJOR=1
 BALSA_REVISION=0
-BALSA_PATCHLEVEL=pre2
+BALSA_PATCHLEVEL=pre3
 BALSA_RELEASE=1
 use_release=no
 
@@ -224,7 +224,7 @@ if test x"$use_ldap" = xyes ; then
 	AC_MSG_RESULT([yes])
 	AC_CHECK_LIB(ldap, ldap_search, AC_DEFINE(ENABLE_LDAP) LIBS="-lldap -llber $LIBS", use_ldap=no, -llber)
 else
-	AC_MSG_RESULT([no])
+	AC_MSG_ERROR([*** You enabled LDAP but ldap library is not found.])
 fi
 
 

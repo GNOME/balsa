@@ -44,6 +44,8 @@ static void ab_clear_clist(GtkCList * clist);
 static void ab_switch_cb(GtkWidget * widget, gpointer data);
 static void ab_select_row_event(GtkWidget * widget, gint row, gint column,
 				GdkEventButton * event, gpointer data);
+static void open_compose(GtkWidget * widget, gint row, gint column,
+			 GdkEventButton * event, gpointer data);
 static void swap_clist_entry(gint row, GtkWidget * src, GtkWidget * dst);
 
 /*#define AB_ADD_CB_USED*/
@@ -194,6 +196,28 @@ ab_select_row_event(GtkWidget * widget, gint row, gint column,
 			 );
 
 }
+
+static void
+open_compose(GtkWidget * widget, gint row, gint column,
+	     GdkEventButton * event, gpointer data)
+{
+    BalsaSendmsg *snd;
+    gchar *addr;
+    gpointer adr_struct;
+
+    if (event == NULL)
+	return;
+    if (event->type == GDK_2BUTTON_PRESS || event->type == GDK_3BUTTON_PRESS) {
+	snd = sendmsg_window_new(GTK_WIDGET(balsa_app.main_window), NULL, 
+			   SEND_NORMAL);
+	adr_struct = gtk_clist_get_row_data(GTK_CLIST(data), row);
+	addr = libbalsa_address_to_gchar(LIBBALSA_ADDRESS(adr_struct));
+	gtk_entry_set_text(GTK_ENTRY(snd->to[1]), addr);
+	g_free(addr);
+	gtk_widget_grab_focus(snd->subject[1]);
+    }
+}
+
 
 static void
 ab_switch_cb(GtkWidget * widget, gpointer data)
@@ -513,7 +537,9 @@ address_book_cb(GtkWidget * widget, gpointer data)
 	gtk_signal_connect(GTK_OBJECT(add_clist), "select_row",
 			   GTK_SIGNAL_FUNC(ab_select_row_event),
 			   (gpointer) add_clist);
-    }
+    } else gtk_signal_connect(GTK_OBJECT(book_clist), "select_row",
+			      GTK_SIGNAL_FUNC(open_compose),
+			      (gpointer) book_clist);
 
     hbox = gtk_hbutton_box_new();
     gtk_hbutton_box_set_layout_default(GTK_BUTTONBOX_START);

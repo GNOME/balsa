@@ -24,7 +24,6 @@
 #include <string.h>
 #include <gnome.h>
 #include <gdk/gdkx.h>
-#include <X11/Xutil.h>
 
 #ifdef USE_PIXBUF
 #include <gdk-pixbuf/gdk-pixbuf.h>
@@ -139,7 +138,6 @@ static void show_about_box(void);
 /* callbacks */
 static void check_new_messages_cb(GtkWidget *, gpointer data);
 static void send_outbox_messages_cb(GtkWidget *, gpointer data);
-
 
 static void new_message_cb(GtkWidget * widget, gpointer data);
 static void replyto_message_cb(GtkWidget * widget, gpointer data);

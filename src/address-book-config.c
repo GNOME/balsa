@@ -513,6 +513,7 @@ handle_close(AddressBookConfig * abc)
 					GNOME_STOCK_BUTTON_CANCEL, NULL);
 	    g_free(msg);
 	    gnome_dialog_set_default(GNOME_DIALOG(ask), 1);
+	    gnome_dialog_set_parent(GNOME_DIALOG(ask),GTK_WINDOW(abc->window));
 	    clicked_button = gnome_dialog_run_and_close(GNOME_DIALOG(ask));
 	    if(clicked_button == 0) return;
 	    else abc->cancelled = TRUE;

@@ -1,3 +1,7 @@
+2004-12-30 10:40  PeterB
+
+	* libbalsa/send.c: convert file name to utf-8 for GMime.
+
 2004-12-29 11:49  PeterB
 
 	* src/main-window.c: use BALSA_PIXMAP_CLOSE_MBOX instead of

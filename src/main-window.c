@@ -222,18 +222,7 @@ static GnomeUIInfo file_menu[] = {
      N_("Opens the address book"),
      address_book_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
      GNOME_STOCK_MENU_BOOK_RED, 'B', 0, NULL},
-
     GNOMEUIINFO_SEPARATOR,
-
-#if 0
-    {
-     GNOME_APP_UI_ITEM, "Test new init",
-     "Test the new initialization druid",
-     balsa_init_begin, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     GNOME_STOCK_MENU_MAIL_RCV, '\0', GDK_CONTROL_MASK, NULL},
-    GNOMEUIINFO_SEPARATOR,
-#endif
-
     GNOMEUIINFO_MENU_EXIT_ITEM(balsa_exit, NULL),
 
     GNOMEUIINFO_END
@@ -277,15 +266,15 @@ static GnomeUIInfo shown_hdrs_menu[] = {
 static GnomeUIInfo view_menu[] = {
 #define MENU_VIEW_MAILBOX_LIST_POS 0
     GNOMEUIINFO_TOGGLEITEM(N_("_Show Mailbox Tree"),
-			   "Toggle display of mailbox and folder tree",
+			   N_("Toggle display of mailbox and folder tree"),
 			   show_mbtree_cb, NULL),
 #define MENU_VIEW_MAILBOX_TABS_POS 1
     GNOMEUIINFO_TOGGLEITEM(N_("Show Mailbox _Tabs"),
-			   "Toggle display of mailbox notebook tabs",
+			   N_("Toggle display of mailbox notebook tabs"),
 			   show_mbtabs_cb, NULL),
     GNOMEUIINFO_SEPARATOR,
 #define MENU_VIEW_WRAP_POS 3
-    GNOMEUIINFO_TOGGLEITEM(N_("_Wrap"), "Wrap message lines",
+    GNOMEUIINFO_TOGGLEITEM(N_("_Wrap"), N_("Wrap message lines"),
 			   wrap_message_cb, NULL),
     GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_RADIOLIST(shown_hdrs_menu),
@@ -390,11 +379,11 @@ static GnomeUIInfo mailbox_menu[] = {
 			   GNOME_STOCK_PIXMAP_REMOVE),
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_COMMIT_POS 7
-    GNOMEUIINFO_ITEM_STOCK(N_("Co_mmit Current"),
-			   N_
-			   ("Commit the changes in the currently opened mailbox"),
-			   mailbox_commit_changes,
-			   GNOME_STOCK_MENU_REFRESH),
+    GNOMEUIINFO_ITEM_STOCK(
+	N_("Co_mmit Current"),
+	N_("Commit the changes in the currently opened mailbox"),
+	mailbox_commit_changes,
+	GNOME_STOCK_MENU_REFRESH),
 #define MENU_MAILBOX_CLOSE_POS 8
     GNOMEUIINFO_ITEM_STOCK(N_("_Close"), N_("Close mailbox"),
 			   mailbox_close_cb, GNOME_STOCK_MENU_CLOSE),
@@ -736,10 +725,7 @@ enable_message_menus(LibBalsaMessage * message)
 {
     gboolean enable;
 
-    if (message)
-	enable = TRUE;
-    else
-	enable = FALSE;
+    enable = (message != NULL);
 
     /* Handle menu items which require write access to mailbox */
     if (message && message->mailbox->readonly) {

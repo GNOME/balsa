@@ -432,9 +432,6 @@ libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox)
 
     if (mailbox->open_ref == 0) {
 	libbalsa_mailbox_free_messages(mailbox);
-	mailbox->messages = 0;
-	mailbox->total_messages = 0;
-	mailbox->unread_messages = 0;
 
 	/* now close the mail stream and expunge deleted
 	 * messages -- the expunge may not have to be done */
@@ -599,6 +596,7 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
    removes all the messages from the mailbox.
    Messages are unref'ed and not directly destroyed because they migt
    be ref'ed from somewhere else.
+   Mailbox lock MUST BE HELD before calling this function.
 */
 void
 libbalsa_mailbox_free_messages(LibBalsaMailbox * mailbox)
@@ -623,6 +621,9 @@ libbalsa_mailbox_free_messages(LibBalsaMailbox * mailbox)
 
     g_list_free(mailbox->message_list);
     mailbox->message_list = NULL;
+    mailbox->messages = 0;
+    mailbox->total_messages = 0;
+    mailbox->unread_messages = 0;
 }
 
 LibBalsaMailboxType libbalsa_mailbox_valid(gchar * filename)
@@ -709,12 +710,9 @@ libbalsa_mailbox_commit_changes(LibBalsaMailbox * mailbox)
     }
 #if 0
     libbalsa_lock_mutt();
-    res = 0;			/* FIXME: mx_sync_mailbox (CLIENT_CONTEXT(mailbox), NULL); */
+    res = 0; /* FIXME: mx_sync_mailbox (CLIENT_CONTEXT(mailbox), NULL); */
     if (res) {
 	libbalsa_mailbox_free_messages(mailbox);
-	mailbox->messages = 0;
-	mailbox->total_messages = 0;
-	mailbox->unread_messages = 0;
 	libbalsa_mailbox_load_messages(mailbox);
     }
     libbalsa_unlock_mutt();

@@ -1,3 +1,9 @@
+2000-11-25  Pawel Salek  <pawsa@theochem.kth.se>
+	* src/main-window.c: remove deprecated code and translate texts in
+	menus.
+	* libbalsa/mailbox_imap.c: handle error on IMAP mailbox checking.
+	* libbalsa/mailbox.c: clean up ibbalsa_mailbox_free_messages()
+	
 2000-11-24  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Atsuhiko Yamanaka's <ymnk@jcraft.com> patch for multithreaded msg view.

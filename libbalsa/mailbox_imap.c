@@ -310,6 +310,12 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
     return stream;
 }
 
+/* libbalsa_mailbox_imap_check:
+   checks imap mailbox for new messages.
+   Only open mailboxes are checked, although closed can be checked too
+   with OPTIMAPPASIVE option set.
+   NOTE: mx_check_mailbox can close mailbox(). Be cautious.
+*/
 static void
 libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 {
@@ -329,6 +335,9 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 	if ((i = mx_check_mailbox(CLIENT_CONTEXT(mailbox), &index_hint, 0))
 	    < 0) {
 	    g_print("mx_check_mailbox() failed on %s\n", mailbox->name);
+	    if(CLIENT_CONTEXT_CLOSED(mailbox)||
+	       !CLIENT_CONTEXT(mailbox)->id_hash)
+		libbalsa_mailbox_free_messages(mailbox);
 	} else if (i == M_NEW_MAIL || i == M_REOPENED) {
 	    mailbox->new_messages =
 		CLIENT_CONTEXT(mailbox)->msgcount - mailbox->messages;

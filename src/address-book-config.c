@@ -40,6 +40,7 @@ struct _AddressBookConfig {
     GtkWidget *name_entry;
     GtkWidget *expand_aliases_button;
 
+    gchar* help_path;
     GtkType create_type;
 
     union {
@@ -47,8 +48,12 @@ struct _AddressBookConfig {
 	    GtkWidget *path;
 	} vcard;
 	struct {
+		GtkWidget *path;
+	} externq;
+	struct {
 	    GtkWidget *path;
 	} ldif;
+	
 #ifdef ENABLE_LDAP
 	struct {
 	    GtkWidget *host_name;
@@ -62,17 +67,29 @@ struct _AddressBookConfig {
 
 static GtkWidget *create_choice_page(AddressBookConfig * abc);
 static GtkWidget *create_vcard_page(AddressBookConfig * abc);
+static GtkWidget *create_externq_page(AddressBookConfig * abc);
 static GtkWidget *create_ldif_page(AddressBookConfig * abc);
 #ifdef ENABLE_LDAP
 static GtkWidget *create_ldap_page(AddressBookConfig * abc);
 #endif
 
+static void help_button_cb(GtkWidget * button, AddressBookConfig * abc);
 static void cancel_button_cb(GtkWidget * button, AddressBookConfig * abc);
 static void next_button_cb(GtkWidget * button, AddressBookConfig * abc);
 static void add_button_cb(GtkWidget * button, AddressBookConfig * abc);
 static void update_button_cb(GtkWidget * button, AddressBookConfig * abc);
 
 static void set_the_page(GtkWidget * button, AddressBookConfig * abc);
+
+static GtkWidget*
+add_button(const char* butt, GtkWidget* bbox, GtkSignalFunc cb, gpointer abc)
+{
+    GtkWidget* button = gnome_stock_button(butt);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked", cb, abc);
+    gtk_container_add(GTK_CONTAINER(bbox), button);
+    gtk_widget_show(button);
+    return button;
+}
 
 /*
  * Create and run the address book configuration window.
@@ -105,7 +122,8 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
     gnome_dialog_set_parent(GNOME_DIALOG(abc->window),
 			    GTK_WINDOW(balsa_app.main_window));
     gnome_dialog_close_hides(GNOME_DIALOG(abc->window), TRUE);
-    gtk_window_set_wmclass(GTK_WINDOW(abc->window), "address_book_config_dialog", "Balsa");
+    gtk_window_set_wmclass(GTK_WINDOW(abc->window), 
+			   "address_book_config_dialog", "Balsa");
 
     abc->notebook = gtk_notebook_new();
     gtk_container_set_border_width(GTK_CONTAINER(abc->window), 5);
@@ -123,16 +141,9 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
 				  BALSA_BUTTON_HEIGHT / 2);
 
     if (address_book == NULL) {
-	button = gnome_stock_button(GNOME_STOCK_BUTTON_NEXT);
-	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			   GTK_SIGNAL_FUNC(next_button_cb),
-			   (gpointer) abc);
-	gtk_container_add(GTK_CONTAINER(bbox), button);
-	gtk_widget_show(button);
-	abc->continue_button = button;
-
+	abc->continue_button = 
+	    add_button(GNOME_STOCK_BUTTON_NEXT, bbox, next_button_cb, abc);
 	page = create_choice_page(abc);
-
     } else {
 	GtkWidget *pixmap;
 	pixmap = gnome_stock_pixmap_widget(NULL, GNOME_STOCK_PIXMAP_SAVE);
@@ -146,7 +157,9 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
 
 	if (LIBBALSA_IS_ADDRESS_BOOK_VCARD(address_book)) {
 	    page = create_vcard_page(abc);
-	} else if (LIBBALSA_IS_ADDRESS_BOOK_LDIF(address_book)) {
+	}else if (LIBBALSA_IS_ADDRESS_BOOK_EXTERN(address_book)) {
+		page = create_externq_page(abc);
+	}else if (LIBBALSA_IS_ADDRESS_BOOK_LDIF(address_book)) {
 	    page = create_ldif_page(abc);
 #ifdef ENABLE_LDAP
 	} else if (LIBBALSA_IS_ADDRESS_BOOK_LDAP(address_book)) {
@@ -163,11 +176,8 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
     num = gtk_notebook_page_num(GTK_NOTEBOOK(abc->notebook), page);
     gtk_notebook_set_page(GTK_NOTEBOOK(abc->notebook), num);
 
-    button = gnome_stock_button(GNOME_STOCK_BUTTON_CANCEL);
-    gtk_signal_connect(GTK_OBJECT(button), "clicked",
-		       GTK_SIGNAL_FUNC(cancel_button_cb), (gpointer) abc);
-    gtk_widget_show(button);
-    gtk_container_add(GTK_CONTAINER(bbox), button);
+    add_button(GNOME_STOCK_BUTTON_CANCEL, bbox, cancel_button_cb, abc);
+    add_button(GNOME_STOCK_BUTTON_HELP,   bbox, help_button_cb,   abc);
 
     gtk_widget_show_all(abc->notebook);
     if (address_book)
@@ -186,10 +196,18 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
 	if (abc->create_type == LIBBALSA_TYPE_ADDRESS_BOOK_VCARD) {
 	    gchar *path =
 		gnome_file_entry_get_full_path(GNOME_FILE_ENTRY
-					       (abc->ab_specific.vcard.path), FALSE);
+					       (abc->ab_specific.vcard.path),
+					       FALSE);
 	    if (path != NULL) 
 		address_book = libbalsa_address_book_vcard_new(name, path);
             g_free(path);
+ 	} else if (abc->create_type == LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN) {
+	    gchar *path =
+ 		gnome_file_entry_get_full_path(GNOME_FILE_ENTRY
+ 					       (abc->ab_specific.externq.path),
+					       FALSE);
+ 	    if (path != NULL) 
+ 		address_book = libbalsa_address_book_externq_new(name, path);
 	} else if (abc->create_type == LIBBALSA_TYPE_ADDRESS_BOOK_LDIF) {
 	    gchar *path =
 		gnome_file_entry_get_full_path(GNOME_FILE_ENTRY
@@ -229,6 +247,18 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
 	    if (path) {
 		g_free(vcard->path);
 		vcard->path = path;
+	    }
+ 	} else if (LIBBALSA_IS_ADDRESS_BOOK_EXTERN(address_book)) {
+ 	    LibBalsaAddressBookExtern *externq;
+ 	    gchar *path =
+ 		gnome_file_entry_get_full_path(GNOME_FILE_ENTRY
+ 					       (abc->ab_specific.externq.path),
+					       FALSE);
+ 
+ 	    externq = LIBBALSA_ADDRESS_BOOK_EXTERN(address_book);
+ 	    if (path) {
+ 		g_free(externq->path);
+ 		externq->path = path;
 	    }
 	} else if (LIBBALSA_IS_ADDRESS_BOOK_LDIF(address_book)) {
 	    LibBalsaAddressBookLdif *ldif;
@@ -278,6 +308,8 @@ create_choice_page(AddressBookConfig * abc)
     GtkWidget *vbox;
     GtkWidget *radio_button;
 
+    abc->help_path = "ab-conf.html#CHOICE";
+
     vbox = gtk_vbox_new(FALSE, 0);
     gtk_widget_show(vbox);
 
@@ -290,8 +322,7 @@ create_choice_page(AddressBookConfig * abc)
     /* ... vCard Address Book */
     radio_button =
 	gtk_radio_button_new_with_label(NULL,
-					_
-					("VCard Address Book (GnomeCard)"));
+					_("VCard Address Book (GnomeCard)"));
     gtk_box_pack_start(GTK_BOX(vbox), radio_button, FALSE, FALSE, 0);
     gtk_signal_connect(GTK_OBJECT(radio_button), "clicked",
 		       GTK_SIGNAL_FUNC(set_the_page), (gpointer) abc);
@@ -301,6 +332,19 @@ create_choice_page(AddressBookConfig * abc)
     gtk_widget_show(radio_button);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio_button), TRUE);
     abc->create_type = LIBBALSA_TYPE_ADDRESS_BOOK_VCARD;
+
+	/* ... External query Address Book */
+    radio_button = gtk_radio_button_new_with_label
+	(gtk_radio_button_group(GTK_RADIO_BUTTON(radio_button)),
+	 _("External query (a program)"));
+    gtk_box_pack_start(GTK_BOX(vbox), radio_button, FALSE, FALSE, 0);
+    gtk_signal_connect(GTK_OBJECT(radio_button), "clicked",
+		       GTK_SIGNAL_FUNC(set_the_page), (gpointer) abc);
+    gtk_object_set_user_data(GTK_OBJECT(radio_button),
+			     GINT_TO_POINTER
+			     (LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN));
+    gtk_widget_show(radio_button);
+
 
     /* ... LDIF Address Book */
     radio_button = gtk_radio_button_new_with_label
@@ -350,6 +394,7 @@ create_vcard_page(AddressBookConfig * abc)
     LibBalsaAddressBookVcard* ab;
     ab = (LibBalsaAddressBookVcard*)abc->address_book; /* may be NULL */
 
+    abc->help_path = "ab-conf.html#VCARD";
     table = gtk_table_new(2, 3, FALSE);
 
     /* mailbox name */
@@ -366,7 +411,7 @@ create_vcard_page(AddressBookConfig * abc)
 
     abc->ab_specific.vcard.path =
 	gnome_file_entry_new("VCARD ADDRESS BOOK PATH",
-			     _("Select path for address book"));
+			     _("Select path for VCARD address book"));
     gtk_table_attach(GTK_TABLE(table), abc->ab_specific.vcard.path, 1, 2,
 		     1, 2, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
@@ -386,6 +431,53 @@ create_vcard_page(AddressBookConfig * abc)
 }
 
 static GtkWidget *
+create_externq_page(AddressBookConfig * abc)
+{
+    GtkWidget *table;
+    GnomeDialog* mcw = GNOME_DIALOG(abc->window);
+    GtkWidget *label;
+    guint keyval;
+    LibBalsaAddressBookExtern* ab;
+    ab = (LibBalsaAddressBookExtern*)abc->address_book; /* may be NULL */
+
+    abc->help_path = "ab-conf.html#EXTERN";
+    table = gtk_table_new(2, 3, FALSE);
+
+    /* mailbox name */
+
+    create_label(_("_Address Book Name"), table, 0, &keyval);
+    abc->name_entry = create_entry(mcw, table, NULL, NULL, 0, 
+				   ab ? abc->address_book->name : NULL, 
+				   keyval);
+
+    label = gtk_label_new(_("Program location"));
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
+    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 1, 2,
+		     GTK_FILL, GTK_FILL, 10, 10);
+
+    abc->ab_specific.externq.path =
+	gnome_file_entry_new("EXTERN ADDRESS BOOK PATH",
+			     _("Select program for address book"));
+    gtk_table_attach(GTK_TABLE(table), abc->ab_specific.externq.path, 1, 2,
+		     1, 2, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
+
+    abc->expand_aliases_button =
+	create_check(mcw, _("_Expand aliases as you type"), table, 3,
+		     ab ? abc->address_book->expand_aliases : TRUE);
+
+    if (ab) {
+	GtkWidget *entry;
+	entry = GTK_WIDGET(gnome_file_entry_gtk_entry
+			   (GNOME_FILE_ENTRY(abc->ab_specific.externq.path)));
+	gtk_entry_set_text(GTK_ENTRY(entry), ab->path);
+    }
+    gtk_widget_show_all(table);
+    return table;
+
+}
+
+
+static GtkWidget *
 create_ldif_page(AddressBookConfig * abc)
 {
     GtkWidget *table;
@@ -393,6 +485,7 @@ create_ldif_page(AddressBookConfig * abc)
     int keyval;
     GnomeDialog* mcw = GNOME_DIALOG(abc->window);
 
+    abc->help_path = "ab-conf.html#LDIF";
     table = gtk_table_new(2, 3, FALSE);
 
     /* mailbox name */
@@ -410,7 +503,7 @@ create_ldif_page(AddressBookConfig * abc)
 
     abc->ab_specific.ldif.path =
 	gnome_file_entry_new("LDIF ADDRESS BOOK PATH",
-			     _("Select path for address book"));
+			     _("Select path for LDIF address book"));
     gtk_table_attach(GTK_TABLE(table), abc->ab_specific.ldif.path, 1, 2,
 		     1, 2, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
@@ -453,6 +546,7 @@ create_ldap_page(AddressBookConfig * abc)
 
     ab = (LibBalsaAddressBookLdap*)abc->address_book; /* may be NULL */
 
+    abc->help_path = "ab-conf.html#LDAP";
     /* mailbox name */
 
     create_label(_("_Address Book Name"), table, 0, &keyval);
@@ -501,6 +595,15 @@ set_the_page(GtkWidget * button, AddressBookConfig * abc)
 }
 
 static void
+help_button_cb(GtkWidget * button, AddressBookConfig * abc)
+{
+    static GnomeHelpMenuEntry help_entry = { NULL, NULL };
+    help_entry.name = gnome_app_id;
+    help_entry.path = abc->help_path;
+    gnome_help_display(NULL, &help_entry);
+}
+
+static void
 cancel_button_cb(GtkWidget * button, AddressBookConfig * abc)
 {
     abc->cancelled = TRUE;
@@ -529,6 +632,8 @@ next_button_cb(GtkWidget * button, AddressBookConfig * abc)
 
     if (abc->create_type == LIBBALSA_TYPE_ADDRESS_BOOK_VCARD)
 	page = create_vcard_page(abc);
+	else if (abc->create_type == LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN)
+	page = create_externq_page(abc);
     else if (abc->create_type == LIBBALSA_TYPE_ADDRESS_BOOK_LDIF)
 	page = create_ldif_page(abc);
 #ifdef ENABLE_LDAP

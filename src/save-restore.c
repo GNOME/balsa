@@ -28,6 +28,14 @@
 #include "quote-color.h"
 #include "toolbar-prefs.h"
 
+#ifdef BALSA_SHOW_ALL
+#include "filter-file.h"
+#include "filter-funcs.h"
+
+#define MAILBOX_FILTERS_SECTION_PREFIX "filters-mailbox-"
+#define MAILBOX_FILTERS_URL_KEY "Mailbox-URL"
+#endif
+
 #define BALSA_CONFIG_PREFIX "balsa/"
 #define FOLDER_SECTION_PREFIX "folder-"
 #define MAILBOX_SECTION_PREFIX "mailbox-"
@@ -53,6 +61,11 @@ static void config_identities_load(void);
 
 static void check_for_old_sigs(GList * id_list_tmp);
 
+#ifdef BALSA_SHOW_ALL
+static void config_filters_load(void);
+void config_filters_save(void);
+#endif
+
 #define folder_section_path(mn) \
     BALSA_MAILBOX_NODE(mn)->config_prefix ? \
     g_strdup(BALSA_MAILBOX_NODE(mn)->config_prefix) : \
@@ -72,10 +85,8 @@ gint config_load(void)
 {
     if(!config_global_load())  /* initializes balsa_app.mailbox_nodes */
 	return FALSE;          /* needed in the next step             */
-				
     config_section_init(MAILBOX_SECTION_PREFIX, config_mailbox_init);
     config_section_init(FOLDER_SECTION_PREFIX,  config_folder_init);
-
     return TRUE;
 }
 
@@ -376,10 +387,8 @@ config_mailbox_init(const gchar * prefix)
     g_return_val_if_fail(prefix != NULL, FALSE);
 
     mailbox = libbalsa_mailbox_new_from_config(prefix);
-
     if (mailbox == NULL)
 	return FALSE;
-
     if (LIBBALSA_IS_MAILBOX_REMOTE(mailbox))
 	gtk_signal_connect(GTK_OBJECT
 			   (LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)),
@@ -395,7 +404,6 @@ config_mailbox_init(const gchar * prefix)
 
 	node = g_node_new(balsa_mailbox_node_new_from_mailbox(mailbox));
 	g_node_append(balsa_app.mailbox_nodes, node);
-
 	if (strcmp("Inbox/", key) == 0)
 	    balsa_app.inbox = mailbox;
 	else if (strcmp("Outbox/", key) == 0)
@@ -442,6 +450,18 @@ config_global_load(void)
 #endif
     config_address_books_load();
     config_identities_load();
+
+#ifdef BALSA_SHOW_ALL
+    /* We must load filters before mailboxes, because they refer to the filters list */
+    config_filters_load();
+    if (filter_errno!=FILTER_NOERR) {
+	filter_perror(_("Error during filters loading : "));
+ 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+			     _("Error during filters loading : %s\n%s"),
+ 			     filter_strerror(filter_errno),
+			     _("Filters may not be correct"));
+    }
+#endif
 
     /* find and convert old-style signature entries */
     check_for_old_sigs(balsa_app.identities);
@@ -926,7 +946,7 @@ gint config_save(void)
     gnome_config_set_string("ESMTPCertificatePassphrase", balsa_app.smtp_certificate_passphrase);
 #endif 
 #endif 
-   gnome_config_set_int("EncodingStyle", balsa_app.encoding_style);
+    gnome_config_set_int("EncodingStyle", balsa_app.encoding_style);
     gnome_config_set_bool("WordWrap", balsa_app.wordwrap);
     gnome_config_set_int("WrapLength", balsa_app.wraplength);
     gnome_config_set_bool("SendRFC2646FormatFlowed",
@@ -1215,6 +1235,198 @@ save_color(gchar * key, GdkColor * color)
     gnome_config_set_string(key, str);
     g_free(str);
 }
+
+#ifdef BALSA_SHOW_ALL
+
+static void
+config_filters_load(void)
+{
+    LibBalsaFilter* fil;
+    void *iterator;
+    gchar * key,* tmp;
+    gint pref_len = strlen(FILTER_SECTION_PREFIX);
+    gint non_critical_error=FILTER_NOERR;
+
+    filter_errno=FILTER_NOERR;
+    iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
+    while ((filter_errno==FILTER_NOERR) &&
+	   (iterator = gnome_config_iterator_next(iterator, &key, NULL))) {
+
+	if (strncmp(key, FILTER_SECTION_PREFIX, pref_len) == 0) {
+	    tmp=g_strconcat(BALSA_CONFIG_PREFIX,key,"/",NULL);
+	    gnome_config_push_prefix(tmp);
+	    g_free(tmp);	    
+	    fil = libbalsa_filter_new_from_config();
+	    FILTER_SETFLAG(fil,FILTER_VALID);
+	    FILTER_SETFLAG(fil,FILTER_COMPILED);
+	    gnome_config_pop_prefix();
+
+	    if (fil) {
+		libbalsa_conditions_new_from_config(BALSA_CONFIG_PREFIX,key,fil);
+		if (filter_errno==FILTER_EFILESYN) {
+		    /* Don't abort on syntax error, just remember it
+		     * FIXME : we could make a GSList of errors to report them to user 
+		     */
+		    non_critical_error=FILTER_EFILESYN;
+		    filter_errno=FILTER_NOERR;
+		}
+		else if (filter_errno!=FILTER_NOERR) {
+		    /* Critical error, we abort the loading process
+		     */
+		    libbalsa_filter_free(fil,NULL);
+		    return;
+		}
+		balsa_app.filters = g_slist_prepend(balsa_app.filters,(gpointer)fil);
+	    }
+	}
+	g_free(key);	
+    }
+    if (filter_errno==FILTER_NOERR)
+	filter_errno=non_critical_error;
+}
+
+void
+config_filters_save(void)
+{
+    GSList *list;
+    LibBalsaFilter* fil;
+    gchar * tmp,* section_name;
+    gint i=0;
+
+    for(list = balsa_app.filters; list; list = g_slist_next(list)) {
+	fil = (LibBalsaFilter*)(list->data);
+	section_name=g_strdup_printf(FILTER_SECTION_PREFIX"%d",i);
+	tmp=g_strconcat(BALSA_CONFIG_PREFIX,section_name,"/",NULL);
+	gnome_config_push_prefix(tmp);
+	g_free(tmp);
+	libbalsa_filter_save_config(fil);
+	gnome_config_pop_prefix();
+
+	libbalsa_filter_clean_conditions(BALSA_CONFIG_PREFIX,section_name);
+
+	if (fil->conditions)
+	    libbalsa_conditions_save_config(fil->conditions,BALSA_CONFIG_PREFIX,section_name);
+
+	g_free(section_name);
+	gnome_config_sync();
+	i++;
+    }
+}
+
+/* Looks for a mailbox filters section with MBOX_URL field equals to mbox->url
+ * returns the section name or NULL if none found
+ * The returned string has to be freed by the caller
+ */
+
+gchar*
+mailbox_filters_section_lookup(const gchar * url)
+{
+    gint pref_len=strlen(MAILBOX_FILTERS_SECTION_PREFIX);
+    guint url_len;
+
+    gchar * tmp, *section;
+    void * iterator;
+    gboolean res;
+
+    g_return_val_if_fail(url && url[0],NULL);
+    url_len=strlen(url);
+    iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
+    while ((iterator = gnome_config_iterator_next(iterator, &tmp, NULL))) {
+	if (strncmp(tmp, MAILBOX_FILTERS_SECTION_PREFIX, pref_len) == 0) {
+	    section = g_strconcat(BALSA_CONFIG_PREFIX, tmp, "/", NULL);
+	    g_free(tmp);
+	    gnome_config_push_prefix(section);
+	    tmp=gnome_config_get_string(MAILBOX_FILTERS_URL_KEY);
+	    gnome_config_pop_prefix();
+	    res=strncmp(tmp,url,url_len)==0;
+	    g_free(tmp);
+	    if (res) return section;
+	    g_free(section);
+	}
+    }
+    return NULL;
+}
+
+
+/* Clean the section holding the content of filter and all conditions sections related to it
+ */
+void
+clean_filter_config_section(const gchar* name)
+{
+    void *iterator;
+    gchar * key,* section,* fil_name;
+    gint pref_len = strlen(FILTER_SECTION_PREFIX);
+    gboolean found=FALSE;
+
+    iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
+    while (!found && 
+           (iterator = gnome_config_iterator_next(iterator, &key, NULL))) {
+
+	if (strncmp(key, FILTER_SECTION_PREFIX, pref_len) == 0) {
+	    section=g_strconcat(BALSA_CONFIG_PREFIX,key,"/",NULL);
+	    gnome_config_push_prefix(section);
+	    fil_name=gnome_config_get_string("Name");
+	    gnome_config_pop_prefix();
+	    if (strcmp(fil_name,name)==0) {
+		libbalsa_filter_clean_conditions(BALSA_CONFIG_PREFIX,key);
+		gnome_config_clean_section(section);
+		found=TRUE;
+	    }
+	    g_free(section);
+	    g_free(fil_name);
+	}
+	g_free(key);
+    }
+	
+}
+
+void
+config_mailbox_filters_save(LibBalsaMailbox * mbox)
+{
+    gchar * tmp;
+
+    g_return_if_fail(mbox);
+    tmp = mailbox_filters_section_lookup(mbox->url);
+    if (!mbox->filters) {
+	if (tmp) {
+	    gnome_config_clean_section(tmp);
+	    g_free(tmp);
+	}
+	return;
+    }
+    if (!tmp) {
+	/* If there was no existing filters section for this mailbox we create one */
+	tmp=config_get_unused_section(MAILBOX_FILTERS_SECTION_PREFIX);
+	gnome_config_push_prefix(tmp);
+	g_free(tmp);
+	gnome_config_set_string(MAILBOX_FILTERS_URL_KEY,mbox->url);
+    }
+    else {
+	gnome_config_push_prefix(tmp);
+	g_free(tmp);
+    }
+    libbalsa_mailbox_filters_save_config(mbox);
+    gnome_config_pop_prefix();
+    gnome_config_sync();
+}
+
+void
+config_mailbox_filters_load(LibBalsaMailbox * mbox)
+{
+    gchar * section;
+
+    g_slist_free(mbox->filters);
+    mbox->filters=NULL;
+    section=mailbox_filters_section_lookup(mbox->url);
+    if (section) {
+	gnome_config_push_prefix(section);
+	g_free(section);
+	libbalsa_mailbox_filters_load_config(mbox);
+	gnome_config_pop_prefix();
+    }
+}
+
+#endif
 
 static void
 load_color(gchar * key, GdkColor * color)

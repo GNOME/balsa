@@ -229,4 +229,5 @@ guint libbalsa_message_get_lines(LibBalsaMessage* msg);
 glong libbalsa_message_get_length(LibBalsaMessage* msg);
 #endif
 glong libbalsa_message_get_no(LibBalsaMessage* msg);
+void libbalsa_message_headers_update(LibBalsaMessage * message);
 #endif				/* __LIBBALSA_MESSAGE_H__ */

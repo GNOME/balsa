@@ -325,6 +325,11 @@ balsa_app_init(void)
     balsa_app.address_book_list = NULL;
     balsa_app.default_address_book = NULL;
 
+#ifdef BALSA_SHOW_ALL
+    /* Filters */
+    balsa_app.filters=NULL;
+#endif
+
     /* spell check */
     balsa_app.module = SPELL_CHECK_MODULE_ASPELL;
     balsa_app.suggestion_mode = SPELL_CHECK_SUGGEST_NORMAL;
@@ -380,14 +385,12 @@ do_load_mailboxes(void)
 	fprintf(stderr, "do_load_mailboxes: Unknown inbox mailbox type\n");
 	return FALSE;
     }
-
     /* expand subtrees; move later to an idle callback or a separate 
        thread to construct folders that are expensive to build (IMAP over
        dialup).
     */
     g_node_traverse(balsa_app.mailbox_nodes, G_POST_ORDER, G_TRAVERSE_ALL, -1,
                     append_subtree_f, NULL);
-    
     return TRUE;
 }
 

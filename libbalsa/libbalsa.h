@@ -48,6 +48,8 @@ typedef struct header MuttHeader;
 #include "address-book.h"
 #include "address-book-vcard.h"
 #include "address-book-ldif.h"
+#include "address-book-extern.h"
+
 #if ENABLE_LDAP
 #include "address-book-ldap.h"
 #endif
@@ -60,10 +62,6 @@ typedef struct header MuttHeader;
 #include "mailbox_mbox.h"
 #include "mailbox_mh.h"
 #include "mailbox_maildir.h"
-
-#ifdef BALSA_SHOW_ALL
-#include "filter.h"
-#endif
 
 /*
  * Initialize the library

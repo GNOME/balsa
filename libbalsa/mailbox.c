@@ -36,6 +36,10 @@
 #include "threads.h"
 #endif
 
+#ifdef BALSA_SHOW_ALL
+#include "mailbox-filter.h"
+#endif
+
 /* Class functions */
 static void libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass);
 static void libbalsa_mailbox_init(LibBalsaMailbox * mailbox);
@@ -265,6 +269,10 @@ libbalsa_mailbox_init(LibBalsaMailbox * mailbox)
 
     mailbox->readonly = FALSE;
     mailbox->mailing_list_address = NULL;
+
+#ifdef BALSA_SHOW_ALL
+    mailbox->filters=NULL;
+#endif
 }
 
 /* libbalsa_mailbox_destroy:
@@ -315,7 +323,6 @@ libbalsa_mailbox_new_from_config(const gchar * prefix)
 	gnome_config_pop_prefix();
 	return NULL;
     }
-
     type = gtk_type_from_name(type_str);
     if (type == 0) {
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
@@ -429,6 +436,7 @@ libbalsa_mailbox_save_config(LibBalsaMailbox * mailbox,
     gnome_config_push_prefix(prefix);
     gtk_signal_emit(GTK_OBJECT(mailbox),
 		    libbalsa_mailbox_signals[SAVE_CONFIG], prefix);
+
     gnome_config_pop_prefix();
 }
 
@@ -442,6 +450,7 @@ libbalsa_mailbox_load_config(LibBalsaMailbox * mailbox,
     gnome_config_push_prefix(prefix);
     gtk_signal_emit(GTK_OBJECT(mailbox),
 		    libbalsa_mailbox_signals[LOAD_CONFIG], prefix);
+
     gnome_config_pop_prefix();
 }
 
@@ -534,6 +543,7 @@ libbalsa_mailbox_real_save_config(LibBalsaMailbox * mailbox,
 				  const gchar * prefix)
 {
     gchar *tmp;
+
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
     gnome_config_set_string("Type",
@@ -547,10 +557,8 @@ libbalsa_mailbox_real_save_config(LibBalsaMailbox * mailbox,
     } else {
 	gnome_config_clean_key("MailingListAddress");
     }
-
     g_free(mailbox->config_prefix);
     mailbox->config_prefix = g_strdup(prefix);
-
 }
 
 static void
@@ -615,7 +623,6 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
 
 	message = translate_message(cur);
 	message->mailbox = mailbox;
-	message->header = cur;
 
 	gtk_signal_connect(GTK_OBJECT(message), "clear-flags",
 			   GTK_SIGNAL_FUNC(message_status_changed_cb),
@@ -731,7 +738,6 @@ libbalsa_mailbox_commit(LibBalsaMailbox* mailbox)
     int rc;
     int index_hint;
 
-    printf("libbalsa_mailbox_commit: enter\n");
     if (CLIENT_CONTEXT_CLOSED(mailbox))
 	return FALSE;
 
@@ -743,7 +749,7 @@ libbalsa_mailbox_commit(LibBalsaMailbox* mailbox)
     mailbox->messages = CLIENT_CONTEXT(mailbox)->msgcount;
     UNLOCK_MAILBOX(mailbox);
 
-    printf("libbalsa_mailbox_commit: synced\n");
+    printf("libbalsa_mailbox_commit: synced, res=%i\n", rc);
     return rc ==0;
 }
 
@@ -854,109 +860,13 @@ static LibBalsaMessage *
 translate_message(HEADER * cur)
 {
     LibBalsaMessage *message;
-    ADDRESS *addy;
-    LibBalsaAddress *addr;
-    ENVELOPE *cenv;
-    LIST *tmp;
-    gchar *p;
 
     if (!cur)
 	return NULL;
 
-    cenv = cur->env;
-
     message = libbalsa_message_new();
-
-    message->date = cur->date_sent;
-    message->from = libbalsa_address_new_from_libmutt(cenv->from);
-    message->sender = libbalsa_address_new_from_libmutt(cenv->sender);
-    message->reply_to = libbalsa_address_new_from_libmutt(cenv->reply_to);
-    message->dispnotify_to = 
-	libbalsa_address_new_from_libmutt(cenv->dispnotify_to);
-
-    for (addy = cenv->to; addy; addy = addy->next) {
-	addr = libbalsa_address_new_from_libmutt(addy);
-	if(addr) message->to_list = g_list_append(message->to_list, addr);
-    }
-
-    for (addy = cenv->cc; addy; addy = addy->next) {
-	addr = libbalsa_address_new_from_libmutt(addy);
-	if(addr) message->cc_list = g_list_append(message->cc_list, addr);
-    }
-
-    for (addy = cenv->bcc; addy; addy = addy->next) {
-	addr = libbalsa_address_new_from_libmutt(addy);
-	if(addr) message->bcc_list = g_list_append(message->bcc_list, addr);
-    }
-
-    /* Get fcc from message */
-    for (tmp = cenv->userhdrs; tmp;) {
-	if (g_strncasecmp("X-Mutt-Fcc:", tmp->data, 11) == 0) {
-	    p = tmp->data + 11;
-	    SKIPWS(p);
-
-	    if (p)
-		message->fcc_mailbox = g_strdup(p);
-	    else
-		message->fcc_mailbox = NULL;
-	} else if (g_strncasecmp("X-Mutt-Fcc:", tmp->data, 18) == 0) {
-	    /* Is X-Mutt-Fcc correct? */
-	    p = tmp->data + 18;
-	    SKIPWS(p);
-
-	    message->in_reply_to = g_strdup(p);
-	} else if (g_strncasecmp ("In-Reply-To:", tmp->data, 12) == 0){
-	    p = tmp->data + 12;
-	    while(*p!='\0'&& *p!='<')p++;
-	    if(*p!='\0'){
-		message->in_reply_to = g_strdup (p);
-		p=message->in_reply_to;
-		while(*p!='\0' && *p!='>')p++;
-		if(*p=='>')*(p+1)='\0';
-	    }
-	}
-	tmp = tmp->next;
-    }
-
-#ifdef MESSAGE_COPY_CONTENT
-    message->subj = g_strdup(cenv->subject);
-#endif
-    message->message_id = g_strdup(cenv->message_id);
-
-    for (tmp = cenv->references; tmp != NULL; tmp = tmp->next) {
-	message->references = g_list_append(message->references,
-					    g_strdup(tmp->data));
-    }
-
-    /* more! */
-
-    if(cenv->references!=NULL){
-	LIST* p=cenv->references;
-	while(p!=NULL){
-	    message->references_for_threading = 
-		g_list_prepend(message->references_for_threading, 
-			       g_strdup(p->data));
-            p=p->next;
-	}
-    }
-
-#if 0
-    /* According to  RFC 1036 (section 2.2.5), MessageIDs in References header
-     * must be in the oldest first order; the direct parent should be last. 
-     * It seems, however, some MUAs ignore this rule.
-     * For example, one of them adds the direct parent to the head of
-     * the References header.
-     */
-    if(message->in_reply_to != NULL &&
-       message->references_for_threading != NULL &&
-       1<g_list_length(message->references_for_threading) &&
-       strcmp(message->in_reply_to, 
-	      (g_list_first(message->references_for_threading))->data)==0){
-	GList *foo=message->references_for_threading;
-        message->references_for_threading=g_list_remove(foo, foo->data);
-    }
-#endif
-
+    message->header = cur;
+    libbalsa_message_headers_update(message);
     return message;
 }
 

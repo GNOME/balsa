@@ -1,3 +1,24 @@
+2001-11-25  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Merge filters.
+	
+	* libinit_balsa/Makefile.am: KISS - do no use private headers.
+	* src/balsa-message.c: fix MDN for imap.
+	* src/balsa-index.c: compile without filters.
+
+	* libbalsa/address-book-extern.[hc]:
+	* src/address-book-config.c: external program address book
+	(Jelmer Vernooij <jelmer@nl.linux.org>).
+	
+2001-11-21  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/filter.h, libbalsa/mailbox-filter.h: make ANSI-compatible.
+
+	Peter Bloomfield:
+	* libbalsa/mailbox.c, message.[hc]: implement proper message 
+	translation.
+	* src/sendmsg-window.c: "reply to group" parse improvements.
+
 2001-11-25  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/balsa-message.c: slight c correction

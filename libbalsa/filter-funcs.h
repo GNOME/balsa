@@ -27,21 +27,36 @@
  */
 
 
-#ifndef _FUNCS_H
-#define _FUNCS_H
+#ifndef __FILTER_FUNCS_H__
+#define __FILTER_FUNCS_H__
 
-/*
- * Files including this one need to
- * #include "filter.h"
- * first.
+#include "filter.h"
+#include "filter-private.h"
+
+/* Conditions */
+
+LibBalsaCondition* libbalsa_condition_new(void);
+
+void libbalsa_condition_free(LibBalsaCondition*); 
+void libbalsa_conditions_free(GSList * conditions);
+
+LibBalsaConditionRegex* libbalsa_condition_regex_new(void);
+LibBalsaCondition* libbalsa_condition_clone(LibBalsaCondition* cnd);
+void libbalsa_condition_regex_free(LibBalsaConditionRegex *, gpointer);
+void regexs_free(GSList *);
+
+/* Filters */
+/* Free a filter
+ * free_condition is a gint into a gpointer : if <>0 the function frees filter conditions also
  */
+LibBalsaFilter *libbalsa_filter_new(void);
+void libbalsa_filter_free(LibBalsaFilter *, gpointer free_condition);
+void libbalsa_filter_clear_filters(GSList *,gint free_conditions);
+void libbalsa_filter_append_condition(LibBalsaFilter*, LibBalsaCondition *);
+void libbalsa_filter_prepend_condition(LibBalsaFilter*, LibBalsaCondition*);
+void libbalsa_filter_delete_regex(LibBalsaFilter*,LibBalsaCondition*,
+                                  LibBalsaConditionRegex *, gpointer);
+gboolean libbalsa_filter_compile_regexs(LibBalsaFilter *);
 
-void filter_free(filter *, gpointer);
-GList *filter_clear_filters(GList *);
-filter *filter_new(void);
-gint filter_append_regex(filter *, gchar *);
-void filter_delete_regex(filter_regex *, gpointer);
-void filter_regcomp(filter_regex *, gpointer);
-gint filter_compile_regexs(filter *);
-
-#endif				/* _FUNCS_H */
+gboolean libbalsa_filter_export_sieve(LibBalsaFilter* fil, gchar* filename);
+#endif				/* __FILTER_FUNCS_H__ */

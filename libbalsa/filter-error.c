@@ -28,20 +28,25 @@
 #include "config.h"
 
 #include "filter.h"
+#include <gnome.h>
 
+/*
+ * Error reporting use this global gint. All function that positions it will destroy previous error, so
+ * be sure to check it after each function in which error can occur.
+ */
+
+gint filter_errno;
 
 /*
  * The filter_errlist is an array of strings indexed by filter_errno
  * for use in filter_perror() and filter_strerror()
  */
 gchar *filter_errlist[] = {
-    "No error",
-    "No filter configuration file found",
-    "Unable to read filter configuration file",
-    "Syntax error in the filter configuration file",
-    "No message to filter",
-    "Unable to allocate memory",
-    "Error in regular expression syntax"
+    N_("No error"),
+    N_("Syntax error in the filter configuration file"),
+    N_("Unable to allocate memory"),
+    N_("Error in regular expression syntax"),
+    N_("Attempt to apply an invalid filter")
 };
 
 
@@ -61,7 +66,7 @@ gchar *filter_errlist[] = {
 gchar *
 filter_strerror(gint error)
 {
-    return (filter_errlist[(error > 0) ? error : -error]);
+    return _(filter_errlist[(error > 0) ? error : -error]);
 }				/* end filter_strerror() */
 
 
@@ -80,5 +85,5 @@ filter_perror(const gchar * s)
     gchar *error_string;
 
     error_string = filter_strerror(filter_errno);
-    g_warning("%s: %s\n", s, error_string);
+    g_warning("%s: %s\n", s,error_string);
 }				/* end filter_perror */

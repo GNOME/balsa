@@ -1,3 +1,10 @@
+2001-06-20  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-mblist.c: get rid of one more balsa_index_reset();
+	clean up the code.
+	* libbalsa/message.c: fix message counting and uninitialized
+	variable usage.
+	
 2001-06-19  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Fix the message index flipping on message transfer and deletion.

@@ -1487,9 +1487,10 @@ balsa_mblist_unread_messages_changed_cb(LibBalsaMailbox * mailbox,
 
     /* freeze here to speed things up and prevent ugly flickering */
     gtk_clist_freeze(GTK_CLIST(mblist));
-    balsa_mblist_update_node_style(GTK_CTREE(mblist),
-				   node,
-				   gtk_ctree_node_get_row_data(GTK_CTREE(mblist), node));
+    balsa_mblist_update_node_style(
+	GTK_CTREE(mblist),
+	node,
+	gtk_ctree_node_get_row_data(GTK_CTREE(mblist), node));
     gtk_clist_thaw(GTK_CLIST(mblist));
 }
 
@@ -1509,7 +1510,6 @@ mblist_drag_cb (GtkWidget* widget, GdkDragContext* context,
                 guint info, guint32 time, gpointer data)
 {
     BalsaMBList* bmbl;
-    BalsaIndex* bindex;
     GtkCTree* ctree;
     GtkCTreeNode* node;
     LibBalsaMailbox* mailbox;
@@ -1517,7 +1517,7 @@ mblist_drag_cb (GtkWidget* widget, GdkDragContext* context,
     GList* messages = NULL;
     BalsaMailboxNode* mbnode;
     gint row, column;
-    gint i = 0;
+    gint i;
     LibBalsaMessage** message_array;
 
 
@@ -1526,11 +1526,10 @@ mblist_drag_cb (GtkWidget* widget, GdkDragContext* context,
     message_array = (LibBalsaMessage**) selection_data->data;
 
     /* convert pointer array to GList */
-    while (message_array[i] != NULL) {
+    for (i=0; message_array[i]; i++)
         messages = g_list_append (messages, message_array[i]);
-        i++;
-    }
-    
+
+    g_return_if_fail(messages);
     orig_mailbox = ((LibBalsaMessage*) messages->data)->mailbox;
 
     /* find the node and mailbox */
@@ -1564,9 +1563,7 @@ mblist_drag_cb (GtkWidget* widget, GdkDragContext* context,
             }
             
             libbalsa_mailbox_commit_changes (orig_mailbox);
-
-            if ((bindex = balsa_find_index_by_mailbox (mailbox)))
-                balsa_index_reset (bindex);
+	    balsa_mblist_update_mailbox(balsa_app.mblist, mailbox);
         }
     }
 
@@ -1578,20 +1575,21 @@ static gboolean
 mblist_drag_motion_cb (GtkWidget* mblist, GdkDragContext* context, 
                        gint x, gint y, guint time, gpointer user_data)
 {
-	gint row, col;
-	gint flag;
-
-	flag = gtk_clist_get_selection_info (GTK_CLIST (mblist), x, y, 
-                                             &row, &col);
-
-	if (flag) {
-		gtk_signal_handler_block_by_func (GTK_OBJECT (mblist),
-		GTK_SIGNAL_FUNC (select_mailbox), (gpointer) NULL);
-		
-		gtk_clist_select_row (GTK_CLIST (mblist), row, col);
-		
-		gtk_signal_handler_unblock_by_func (GTK_OBJECT (mblist), GTK_SIGNAL_FUNC (select_mailbox), (gpointer) NULL);
-	}
+    gint row, col;
+    gint flag;
+    
+    flag = gtk_clist_get_selection_info (GTK_CLIST (mblist), x, y, 
+					 &row, &col);
+    
+    if (flag) {
+	gtk_signal_handler_block_by_func(GTK_OBJECT (mblist),
+					 GTK_SIGNAL_FUNC (select_mailbox), 
+					 NULL);
+	gtk_clist_select_row (GTK_CLIST (mblist), row, col);
+	gtk_signal_handler_unblock_by_func(GTK_OBJECT (mblist), 
+					   GTK_SIGNAL_FUNC (select_mailbox),
+					   NULL);
+    }
 	
-	return FALSE;
+    return FALSE;
 }

@@ -190,6 +190,8 @@ g_mime_gpgme_context_finalize(GObject * object)
 	ctx->sig_state = NULL;
     }
 
+    g_object_unref(GMIME_CIPHER_CONTEXT(ctx)->session);
+
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
@@ -775,6 +777,7 @@ g_mime_gpgme_context_new(GMimeSession * session,
     /* check if the requested protocol is available */
     if (!g_mime_gpgme_context_check_protocol
 	(GMIME_GPGME_CONTEXT_GET_CLASS(ctx), protocol, error)) {
+	gpgme_release(gpgme_ctx);
 	g_object_unref(G_OBJECT(ctx));
 	return NULL;
     }

@@ -1,6 +1,7 @@
 2003-01-10  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* parse.c: follow rfc2045 closer.
+	restore parsing dispnotify_to (Albrecht Dreﬂ).
 
 2003-01-03  Pawel Salek  <pawsa@theochem.kth.se>
 

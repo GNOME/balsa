@@ -37,6 +37,7 @@
 
 #ifdef LIBMUTT
 #define sleep(a) 
+static char *extract_message_id (const char *s);
 #endif
 
 /* Reads an arbitrarily long header field, and looks ahead for continuation
@@ -473,7 +474,7 @@ BODY *mutt_read_mime_header (FILE *fp, int digest)
         if(id) 
 	{
 	  mutt_set_parameter("id", id, &p->parameter);
-	  safe_free(&id);
+	  FREE(&id);
 	}
       }
 #endif
@@ -1050,7 +1051,7 @@ int mutt_parse_rfc822_line (ENVELOPE *e, HEADER *hdr, char *line, char *p, short
     }
 #ifdef LIBMUTT
     /* BALSA: we implement extra feature for balsa.*/
-    else if (!mutt_strcasecmp ("isposition-notification-to", line + 1))
+    else if (!ascii_strcasecmp ("isposition-notification-to", line + 1))
       {
         e->dispnotify_to = rfc822_parse_adrlist (e->dispnotify_to, p);
         matched = 1;
@@ -1355,6 +1356,10 @@ ENVELOPE *mutt_read_rfc822_header (FILE *f, HEADER *hdr, short user_hdrs,
     rfc2047_decode_adrlist (e->to);
     rfc2047_decode_adrlist (e->cc);
     rfc2047_decode_adrlist (e->reply_to);
+#ifdef LIBMUTT 
+    /* BALSA: added dispnotify_to field */
+    rfc2047_decode_adrlist (e->dispnotify_to);
+#endif
     rfc2047_decode_adrlist (e->mail_followup_to);
     rfc2047_decode_adrlist (e->return_path);
     rfc2047_decode_adrlist (e->sender);

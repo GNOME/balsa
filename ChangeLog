@@ -1,3 +1,8 @@
+2000-10-30  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* configure.in: Added a check for gnome-libs >= 1.2.1, since there
+	are bugs in gnome-config prior to this which we are hitting.
+
 2000-10-29  Matthew Guenther  <guentherm@asme.org>
 
 	* TODO: More stuff to do

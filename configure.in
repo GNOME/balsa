@@ -74,6 +74,23 @@ LDFLAGS="$balsa_save_LDFLAGS"
 LIBS="$balsa_save_LIBS"
 
 dnl ######################################################################################
+dnl Check for a recent enough version of gnome-libs.
+dnl ######################################################################################
+
+AC_MSG_CHECKING([for gnome-libs version >= 1.2.1])
+vers=`gnome-config --version gnome-libs | sed 's/^gnome-libs //'`
+case $vers
+	in
+		1.0.*|1.2.0)
+			AC_MSG_RESULT([no])
+			AC_MSG_ERROR([Balsa requires a version of gnome-libs newer than 1.2.1] )
+			;;
+		*) 
+			AC_MSG_RESULT([yes])
+			;;
+esac
+
+dnl ######################################################################################
 dnl Check for gnome-window-icon stuff.
 dnl ######################################################################################
 AC_CHECK_HEADERS(libgnomeui/gnome-window-icon.h)

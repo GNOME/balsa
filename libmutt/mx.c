@@ -386,7 +386,7 @@ int mx_get_magic (const char *path)
     return M_IMAP;
 #endif /* USE_IMAP */
 
-  if (stat (path, &st) == -1)
+  if (stat (path, &st) != 0)
   {
     dprint (1, (debugfile, "mx_get_magic(): unable to stat %s: %s (errno %d).\n",
 		path, strerror (errno), errno));
@@ -408,9 +408,6 @@ int mx_get_magic (const char *path)
     if (access (tmp, F_OK) == 0)
       return (M_MH);
 
-    snprintf (tmp, sizeof (tmp), "%s/.xmhcache", path);
-    if (access (tmp, F_OK) == 0)
-      return (M_MH);
   }
   else if (st.st_size == 0)
   {

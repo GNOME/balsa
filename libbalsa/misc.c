@@ -189,13 +189,12 @@ readfile (FILE * fp, char **buf)
   while (offset < size)
     {
       r = read (fd, *buf + offset, size - offset);
+      if (r == 0)
+	return offset;
+      
       if (r > 0)
 	{
 	  offset += r;
-	}
-      else if (!r)
-	{
-	  return offset;
 	}
       else if ((errno != EAGAIN) && (errno != EINTR))
 	{
@@ -203,6 +202,6 @@ readfile (FILE * fp, char **buf)
 	  return -1;
 	}
     }
-
+  
   return size;
 }

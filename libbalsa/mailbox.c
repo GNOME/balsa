@@ -549,7 +549,7 @@ load_messages (Mailbox * mailbox, gint emit)
 {
   glong msgno;
   Message *message;
-  HEADER *cur;
+  HEADER *cur = 0;
 
   for (msgno = mailbox->messages - mailbox->new_messages + 1;
        msgno <= mailbox->messages;
@@ -1066,6 +1066,364 @@ translate_message (HEADER * cur)
 
   return message;
 }
+static char*
+content_type2str(int contenttype)
+{
+  switch (contenttype)
+    {
+    case TYPEOTHER:
+      return "OTHER";
+    case TYPEAUDIO:
+      return "AUDIO";
+    case TYPEAPPLICATION:
+      return "APPLICATION";
+    case TYPEIMAGE:
+      return "IMAGE";
+    case TYPEMULTIPART:
+      return "MULTIPART";
+    case TYPETEXT:
+      return "TEXT";
+    case TYPEVIDEO:
+      return "VIDEO";
+    }
+}
+
+static gchar tmp_file_name[PATH_MAX+1];
+gchar *
+text2html (char *buff)
+{
+  int i = 0, len = strlen (buff);
+  gchar *str;
+  GString *gs = g_string_new (NULL);
+
+  for (i = 0; i < len; i++)
+    {
+      if (buff[i] == '\r' && buff[i + 1] == '\n' &&
+	  buff[i + 2] == '\r' && buff[i + 3] == '\n')
+	{
+	  gs = g_string_append (gs, "</tt></p><p><tt>\n");
+	  i += 3;
+	}
+      else if (buff[i] == '\r' && buff[i + 1] == '\n')
+	{
+	  gs = g_string_append (gs, "<br>\n");
+	  i++;
+	}
+      else if (buff[i] == '\n' && buff[i + 1] == '\r')
+	{
+	  gs = g_string_append (gs, "<br>\n");
+	  i++;
+	}
+      else if (buff[i] == '\n' && buff[i + 1] == '\n')
+	{
+	  gs = g_string_append (gs, "</tt></p><p><tt>\n");
+	  i++;
+	}
+      else if (buff[i] == '\n')
+	{
+	  gs = g_string_append (gs, "<br>\n");
+	}
+      else if (buff[i] == '\r')
+	{
+	  gs = g_string_append (gs, "<br>\n");
+	}
+      else if (buff[i] == ' ' && buff[i + 1] == ' ' && buff[i + 2] == ' ' && buff[i + 3] == ' ')
+	{
+	  gs = g_string_append (gs, "&nbsp; &nbsp; ");
+	  i += 3;
+	}
+      else if (buff[i] == ' ' && buff[i + 1] == ' ' && buff[i + 2] == ' ')
+	{
+	  gs = g_string_append (gs, "&nbsp; &nbsp;");
+	  i += 2;
+	}
+      else if (buff[i] == ' ' && buff[i + 1] == ' ')
+	{
+	  gs = g_string_append (gs, "&nbsp; ");
+	  i++;
+	}
+      else
+	switch (buff[i])
+	  {
+	    /* for single spaces (not multiple (look above)) do *not*
+	     * replace with a &nbsp; or lines will not wrap! bad
+	     * thing(tm)
+	     */
+	  case '\t':
+	    gs = g_string_append (gs, "&nbsp; &nbsp; &nbsp; &nbsp; ");
+	    break;
+	  case ' ':
+	    gs = g_string_append (gs, " ");
+	    break;
+	  case '<':
+	    gs = g_string_append (gs, "&lt;");
+	    break;
+	  case '>':
+	    gs = g_string_append (gs, "&gt;");
+	    break;
+	  case '"':
+	    gs = g_string_append (gs, "&quot;");
+	    break;
+	  case '&':
+	    gs = g_string_append (gs, "&amp;");
+	    break;
+/* 
+ * Weird stuff, but stuff that should be taken care of too
+ * I might be missing something, lemme know?
+ */
+	  case '©':
+	    gs = g_string_append (gs, "&copy;");
+	    break;
+	  case '®':
+	    gs = g_string_append (gs, "&reg;");
+	    break;
+	  case 'à':
+	    gs = g_string_append (gs, "&agrave;");
+	    break;
+	  case 'À':
+	    gs = g_string_append (gs, "&Agrave;");
+	    break;
+	  case 'â':
+	    gs = g_string_append (gs, "&acirc;");
+	    break;
+	  case 'ä':
+	    gs = g_string_append (gs, "&auml;");
+	    break;
+	  case 'Ä':
+	    gs = g_string_append (gs, "&Auml;");
+	    break;
+	  case 'Â':
+	    gs = g_string_append (gs, "&Acirc;");
+	    break;
+	  case 'å':
+	    gs = g_string_append (gs, "&aring;");
+	    break;
+	  case 'Å':
+	    gs = g_string_append (gs, "&Aring;");
+	    break;
+	  case 'æ':
+	    gs = g_string_append (gs, "&aelig;");
+	    break;
+	  case 'Æ':
+	    gs = g_string_append (gs, "&AElig;");
+	    break;
+	  case 'ç':
+	    gs = g_string_append (gs, "&ccedil;");
+	    break;
+	  case 'Ç':
+	    gs = g_string_append (gs, "&Ccedil;");
+	    break;
+	  case 'é':
+	    gs = g_string_append (gs, "&eacute;");
+	    break;
+	  case 'É':
+	    gs = g_string_append (gs, "&Eacute;");
+	    break;
+	  case 'è':
+	    gs = g_string_append (gs, "&egrave;");
+	    break;
+	  case 'È':
+	    gs = g_string_append (gs, "&Egrave;");
+	    break;
+	  case 'ê':
+	    gs = g_string_append (gs, "&ecirc;");
+	    break;
+	  case 'Ê':
+	    gs = g_string_append (gs, "&Ecirc;");
+	    break;
+	  case 'ë':
+	    gs = g_string_append (gs, "&euml;");
+	    break;
+	  case 'Ë':
+	    gs = g_string_append (gs, "&Euml;");
+	    break;
+	  case 'ï':
+	    gs = g_string_append (gs, "&iuml;");
+	    break;
+	  case 'Ï':
+	    gs = g_string_append (gs, "&Iuml;");
+	    break;
+	  case 'ô':
+	    gs = g_string_append (gs, "&ocirc;");
+	    break;
+	  case 'Ô':
+	    gs = g_string_append (gs, "&Ocirc;");
+	    break;
+	  case 'ö':
+	    gs = g_string_append (gs, "&ouml;");
+	    break;
+	  case 'Ö':
+	    gs = g_string_append (gs, "&Ouml;");
+	    break;
+	  case 'ø':
+	    gs = g_string_append (gs, "&oslash;");
+	    break;
+	  case 'Ø':
+	    gs = g_string_append (gs, "&Oslash;");
+	    break;
+	  case 'ß':
+	    gs = g_string_append (gs, "&szlig;");
+	    break;
+	  case 'ù':
+	    gs = g_string_append (gs, "&ugrave;");
+	    break;
+	  case 'Ù':
+	    gs = g_string_append (gs, "&Ugrave;");
+	    break;
+	  case 'û':
+	    gs = g_string_append (gs, "&ucirc;");
+	    break;
+	  case 'Û':
+	    gs = g_string_append (gs, "&Ucirc;");
+	    break;
+	  case 'ü':
+	    gs = g_string_append (gs, "&uuml;");
+	    break;
+	  case 'Ü':
+	    gs = g_string_append (gs, "&Uuml;");
+	    break;
+
+	  default:
+	    gs = g_string_append_c (gs, buff[i]);
+	    break;
+	  }
+    }
+
+  str = gs->str;
+  g_string_free (gs, 0);
+  return str;
+}
+
+
+static gchar*
+other2html(BODY* bdy, FILE* fp)
+{
+  STATE  s;
+  char*  ptr;
+  size_t alloced;
+  gchar* retval;
+  
+  fseek(fp, bdy->offset, 0);
+  s.fpin  = fp;
+  mutt_mktemp(tmp_file_name);
+  
+  s.fpout = fopen(tmp_file_name,"r+");
+  mutt_decode_attachment(bdy, &s);
+  fflush(s.fpout);
+  alloced = readfile(s.fpout, &ptr);
+  ptr[alloced - 1] = '\0';
+  retval = text2html(ptr);
+  free(ptr);
+  fclose(s.fpout);
+  return retval;
+}
+
+static gchar*
+audio2html(BODY* bdy, FILE* fp)
+{
+  return "<font size=+1>AUDIO<font size=-1>";
+}
+
+
+static gchar*
+application2html(BODY* bdy, FILE* fp)
+{
+  return "<font size=+1>APPLICATION<font size=-1>";
+}
+
+static gchar*
+image2html(BODY* bdy, FILE* fp)
+{
+  return "<font size+1>IMAGE<font size=-1>";
+}
+
+static gchar*
+message2html(BODY* bdy, FILE* fp)
+{
+  return "<font size=+1>MESSAGE<font size=-1>";
+}
+
+static gchar*
+multipart2html(BODY* bdy, FILE* fp)
+{
+  return "<font size=+1>MULTIPART<font size=-1>";
+}
+
+
+static gchar*
+video2html(BODY* bdy, FILE* fp)
+{
+  return "<font size=+1>VIDEO<font size=-1>";
+}
+
+static gchar*
+mimetext2html(BODY* bdy, FILE* fp)
+{
+  STATE  s;
+  char*  ptr = 0;
+  size_t alloced;
+  gchar* retval;
+  
+  fseek(fp, bdy->offset, 0);
+  s.fpin  = fp;
+  mutt_mktemp(tmp_file_name);
+  s.prefix = 0;
+  s.fpout = fopen(tmp_file_name,"w+");
+  mutt_decode_attachment(bdy, &s);
+  fflush(s.fpout);
+  alloced = readfile(s.fpout, &ptr);
+  ptr[alloced - 1] = '\0';
+  if (strcmp(bdy->subtype,"html") == 0)
+    {
+      return ptr;
+    }
+  retval = text2html(ptr);
+  free(ptr);
+  fclose(s.fpout);
+  return retval;
+}
+
+
+static gchar*
+part2html(BODY* bdy, FILE* fp, STATE* s)
+{
+  GString* buf = g_string_new("");
+  gchar*   retval;
+  
+  switch (bdy->type)
+    {
+    case TYPEOTHER:
+      g_string_append(buf, other2html(bdy, fp));
+      break;
+    case TYPEAUDIO:
+      g_string_append(buf, audio2html(bdy, fp));
+      break;
+    case TYPEAPPLICATION:
+      g_string_append(buf, application2html(bdy, fp));
+      break;
+    case TYPEIMAGE:
+      g_string_append(buf, image2html(bdy, fp));
+      break;
+    case TYPEMESSAGE:
+      g_string_append(buf, message2html(bdy, fp));
+      break;
+    case TYPEMULTIPART:
+      g_string_append(buf, multipart2html(bdy, fp));
+      break;
+    case TYPETEXT:
+      g_string_append(buf, mimetext2html(bdy, fp));
+      break;
+    case TYPEVIDEO:
+      g_string_append(buf, video2html(bdy, fp));
+      break;
+    }
+  retval = g_strdup(buf->str);
+  g_string_free(buf, 1);
+  return retval;
+}
+      
+
+
 
 void
 message_body_ref (Message * message)
@@ -1095,12 +1453,73 @@ message_body_ref (Message * message)
   /*
    * load message body
    */
-  if ((msg = mx_open_message (CLIENT_CONTEXT (message->mailbox), cur->msgno)) != NULL)
+  msg = mx_open_message(CLIENT_CONTEXT(message->mailbox), cur->msgno);
+  
+  if (cur->content->type == TYPEMULTIPART)
     {
-      b = cur->content;
-
+      cur->content->parts = mutt_parse_multipart(msg->fp,
+						 mutt_get_parameter ("boundary", cur->content->parameter),
+						 cur->content->offset + cur->content->length,
+						 strcasecmp("digest", cur->content->subtype) == 0);
+    }
+  else
+    {
+      cur->content->parts = mutt_parse_messageRFC822(msg->fp, cur->content);
+    }
+  if (msg != NULL)
+    {
+      GString* mbuf = g_string_new("");
+      BODY* bdy = cur->content;
+      gchar msg_filename[PATH_MAX];
+      FILE* msg_stream;
+      
       if (balsa_app.debug)
 	g_print (_ ("Loading message: %s/%s\n"), TYPE (b->type), b->subtype);
+
+      b = cur->content;
+      fprintf(stderr,"After loading message\n");
+      fprintf(stderr,"header->mime    = %d\n", cur->mime);
+      fprintf(stderr,"header->offset  = %d\n", cur->offset);
+      fprintf(stderr,"header->content = %p\n", cur->content);
+      fprintf(stderr," \n\nDumping Message\n");
+      fprintf(stderr,"Dumping a %s[%d] message\n", content_type2str(cur->content->type), cur->content->type);
+      bdy = cur->content->parts;
+      switch(message->mailbox->type)
+	{
+	case MAILBOX_MH:
+	case MAILBOX_MAILDIR:
+	  snprintf(msg_filename, PATH_MAX, "%s/%s", MAILBOX_LOCAL(message->mailbox)->path, cur->path);
+	  errno = 0;
+	  msg_stream = fopen(msg_filename, "r");
+	  if (!msg_stream || ferror(msg_stream)) {
+	    fprintf(stderr,"Open of %s failed. Errno = %d, errmsg = '%s'\n",
+		    msg_filename, errno, sys_errlist[errno]);
+	    return;
+	  }
+	  break;
+	default:
+	  msg_stream = fopen(MAILBOX_LOCAL (message->mailbox)->path, "r");
+	  break;
+	}
+
+      while (bdy)
+	{
+	  fprintf(stderr,"h->c->type      = %s[%d]\n",content_type2str(bdy->type), bdy->type);
+	  fprintf(stderr,"h->c->subtype   = %s\n", bdy->subtype);
+	  fprintf(stderr,"======\n");
+	  g_string_append(mbuf, part2html(bdy, msg_stream, 0));
+	  g_string_append(mbuf, "<BR><HR><BR>\n");
+	  bdy = bdy->next;
+	}
+      
+      mx_close_message (&msg);
+      body = body_new ();
+      body->buffer = g_strdup (mbuf->str);
+      message->body_list = g_list_append (message->body_list, body);
+      message->body_ref++;
+      g_string_free(mbuf, 0);
+#if 0      
+  
 
       memset (&s, 0, sizeof (s));
       mutt_mktemp (tmpfile);
@@ -1137,8 +1556,8 @@ message_body_ref (Message * message)
 
       mx_close_message (&msg);
       unlink (tmpfile);
+#endif
     }
-
   /*
    * emit read message
    */

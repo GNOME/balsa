@@ -22,6 +22,7 @@
 #include <gtk-xmhtml/gtk-xmhtml.h>
 #include <stdio.h>
 #include <string.h>
+
 #include "balsa-message.h"
 #include "misc.h"
 
@@ -184,10 +185,9 @@ balsa_message_set (BalsaMessage * bmessage,
 
   g_return_if_fail (bmessage != NULL);
   g_return_if_fail (message != NULL);
-
+  
   if (bmessage->message == message)
     return;
-
   message_body_unref (bmessage->message);
   bmessage->message = message;
   message_body_ref (bmessage->message);
@@ -199,6 +199,7 @@ balsa_message_set (BalsaMessage * bmessage,
   g_free (buff);
 }
 
+
 static gchar *
 message2html (Message * message)
 {
@@ -206,8 +207,8 @@ message2html (Message * message)
   Body *body;
   gchar *buff;
   gchar tbuff[1024];
-
-
+  FILE* msg_stream;
+    
   g_string_append (mbuff, "<html><body bgcolor=#ffffff><p>");
 
 
@@ -257,228 +258,25 @@ message2html (Message * message)
       g_free (buff);
     }
 
-  g_string_append (mbuff, "<br></p><p><tt>");
+  g_string_append (mbuff, "<br></p><p>");
 
+	
+
+  
   if (message->body_list)
     {
       body = (Body *) message->body_list->data;
       if (body)
 	if (body->buffer)
 	  {
-	    buff = text2html (body->buffer);
-	    g_string_append (mbuff, buff);
-	    g_free (buff);
+	    g_string_append (mbuff, body->buffer);
 	  }
     }
 
-  g_string_append (mbuff, "</tt></p></body></html>");
+  g_string_append (mbuff, "</p></body></html>");
   buff = mbuff->str;
   g_string_free (mbuff, 0);
   return buff;
 }
 
 
-static gchar *
-text2html (char *buff)
-{
-  int i = 0, len = strlen (buff);
-  gchar *str;
-  GString *gs = g_string_new (NULL);
-
-  for (i = 0; i < len; i++)
-    {
-      if (buff[i] == '\r' && buff[i + 1] == '\n' &&
-	  buff[i + 2] == '\r' && buff[i + 3] == '\n')
-	{
-	  gs = g_string_append (gs, "</tt></p><p><tt>\n");
-	  i += 3;
-	}
-      else if (buff[i] == '\r' && buff[i + 1] == '\n')
-	{
-	  gs = g_string_append (gs, "<br>\n");
-	  i++;
-	}
-      else if (buff[i] == '\n' && buff[i + 1] == '\r')
-	{
-	  gs = g_string_append (gs, "<br>\n");
-	  i++;
-	}
-      else if (buff[i] == '\n' && buff[i + 1] == '\n')
-	{
-	  gs = g_string_append (gs, "</tt></p><p><tt>\n");
-	  i++;
-	}
-      else if (buff[i] == '\n')
-	{
-	  gs = g_string_append (gs, "<br>\n");
-	}
-      else if (buff[i] == '\r')
-	{
-	  gs = g_string_append (gs, "<br>\n");
-	}
-      else if (buff[i] == ' ' && buff[i + 1] == ' ' && buff[i + 2] == ' ' && buff[i + 3] == ' ')
-	{
-	  gs = g_string_append (gs, "&nbsp; &nbsp; ");
-	  i += 3;
-	}
-      else if (buff[i] == ' ' && buff[i + 1] == ' ' && buff[i + 2] == ' ')
-	{
-	  gs = g_string_append (gs, "&nbsp; &nbsp;");
-	  i += 2;
-	}
-      else if (buff[i] == ' ' && buff[i + 1] == ' ')
-	{
-	  gs = g_string_append (gs, "&nbsp; ");
-	  i++;
-	}
-      else
-	switch (buff[i])
-	  {
-	    /* for single spaces (not multiple (look above)) do *not*
-	     * replace with a &nbsp; or lines will not wrap! bad
-	     * thing(tm)
-	     */
-	  case '\t':
-	    gs = g_string_append (gs, "&nbsp; &nbsp; &nbsp; &nbsp; ");
-	    break;
-	  case ' ':
-	    gs = g_string_append (gs, " ");
-	    break;
-	  case '<':
-	    gs = g_string_append (gs, "&lt;");
-	    break;
-	  case '>':
-	    gs = g_string_append (gs, "&gt;");
-	    break;
-	  case '"':
-	    gs = g_string_append (gs, "&quot;");
-	    break;
-	  case '&':
-	    gs = g_string_append (gs, "&amp;");
-	    break;
-/* 
- * Weird stuff, but stuff that should be taken care of too
- * I might be missing something, lemme know?
- */
-	  case '©':
-	    gs = g_string_append (gs, "&copy;");
-	    break;
-	  case '®':
-	    gs = g_string_append (gs, "&reg;");
-	    break;
-	  case 'à':
-	    gs = g_string_append (gs, "&agrave;");
-	    break;
-	  case 'À':
-	    gs = g_string_append (gs, "&Agrave;");
-	    break;
-	  case 'â':
-	    gs = g_string_append (gs, "&acirc;");
-	    break;
-	  case 'ä':
-	    gs = g_string_append (gs, "&auml;");
-	    break;
-	  case 'Ä':
-	    gs = g_string_append (gs, "&Auml;");
-	    break;
-	  case 'Â':
-	    gs = g_string_append (gs, "&Acirc;");
-	    break;
-	  case 'å':
-	    gs = g_string_append (gs, "&aring;");
-	    break;
-	  case 'Å':
-	    gs = g_string_append (gs, "&Aring;");
-	    break;
-	  case 'æ':
-	    gs = g_string_append (gs, "&aelig;");
-	    break;
-	  case 'Æ':
-	    gs = g_string_append (gs, "&AElig;");
-	    break;
-	  case 'ç':
-	    gs = g_string_append (gs, "&ccedil;");
-	    break;
-	  case 'Ç':
-	    gs = g_string_append (gs, "&Ccedil;");
-	    break;
-	  case 'é':
-	    gs = g_string_append (gs, "&eacute;");
-	    break;
-	  case 'É':
-	    gs = g_string_append (gs, "&Eacute;");
-	    break;
-	  case 'è':
-	    gs = g_string_append (gs, "&egrave;");
-	    break;
-	  case 'È':
-	    gs = g_string_append (gs, "&Egrave;");
-	    break;
-	  case 'ê':
-	    gs = g_string_append (gs, "&ecirc;");
-	    break;
-	  case 'Ê':
-	    gs = g_string_append (gs, "&Ecirc;");
-	    break;
-	  case 'ë':
-	    gs = g_string_append (gs, "&euml;");
-	    break;
-	  case 'Ë':
-	    gs = g_string_append (gs, "&Euml;");
-	    break;
-	  case 'ï':
-	    gs = g_string_append (gs, "&iuml;");
-	    break;
-	  case 'Ï':
-	    gs = g_string_append (gs, "&Iuml;");
-	    break;
-	  case 'ô':
-	    gs = g_string_append (gs, "&ocirc;");
-	    break;
-	  case 'Ô':
-	    gs = g_string_append (gs, "&Ocirc;");
-	    break;
-	  case 'ö':
-	    gs = g_string_append (gs, "&ouml;");
-	    break;
-	  case 'Ö':
-	    gs = g_string_append (gs, "&Ouml;");
-	    break;
-	  case 'ø':
-	    gs = g_string_append (gs, "&oslash;");
-	    break;
-	  case 'Ø':
-	    gs = g_string_append (gs, "&Oslash;");
-	    break;
-	  case 'ß':
-	    gs = g_string_append (gs, "&szlig;");
-	    break;
-	  case 'ù':
-	    gs = g_string_append (gs, "&ugrave;");
-	    break;
-	  case 'Ù':
-	    gs = g_string_append (gs, "&Ugrave;");
-	    break;
-	  case 'û':
-	    gs = g_string_append (gs, "&ucirc;");
-	    break;
-	  case 'Û':
-	    gs = g_string_append (gs, "&Ucirc;");
-	    break;
-	  case 'ü':
-	    gs = g_string_append (gs, "&uuml;");
-	    break;
-	  case 'Ü':
-	    gs = g_string_append (gs, "&Uuml;");
-	    break;
-
-	  default:
-	    gs = g_string_append_c (gs, buff[i]);
-	    break;
-	  }
-    }
-
-  str = gs->str;
-  g_string_free (gs, 0);
-  return str;
-}

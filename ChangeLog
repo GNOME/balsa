@@ -1,3 +1,61 @@
+1998-08-06  Michael Lausch  <mla@gams.co.at>
+
+	* libbalsa/mailbox.c (content_type2str): new function. Returns
+	String representation of MIME content.
+	(text2html): Temproarily moved to mailbox.c from
+	balsa-message. Will be moved back when MIME part handling is
+	fixed.
+	(other2html): new function. Formats an unknown MIME part into
+	HTML. Should use a <A> tag, currently prints the part as text which
+	is _wrong_.
+	(audio2html): new function. Formats a `audio' part in HTML. Should 
+	use a <A> tag. Currently just prints AUDIO
+	(application2html): new function. Formats an `applicaton' in
+	HTML. Should use a <A> tag. Currently just prints APPLICATION.
+	(image2html): new function. Formats a `image' part in HTML. Should 
+	use a <A> tag or a <IMG> tag. Currently just prints IMAGE.
+	(message2html): new function. Formats a `message' in HTML. Should
+	render the message like a top level message. Currently just prints 
+	MESSAGE. 
+	(multipart2html): new function. Should render a MULITPART
+	part. Currently just prints MULTIPART.
+	(video2html): new function. Formats a `video' in
+	HTML. Should use a <A> tag. Currently just prints VIDEO.
+	(mimetext2html): new function. Renders a text message into
+	HTML. subtype html is unchanged, all oethers are passed to
+	text2html. 
+	(part2html): calls one of the part formatting functions depending
+	on the type attribute of the MIME part. Subtype handling is done
+	by the correspodning functions.
+	(message_body_ref): Now renders the message in HTML with MIME
+	handling. THIS WILL CHANGE. Next version will only put the
+	type/subtype attributes into the balsa message structure.
+
+	* src/balsa-message.c (message2html): message body is already
+	HTML'ized. not further formating necessary. THIS WILL BE CHANGED
+	very soon.
+
+	temporarily moved ther text2html function into the mailbox file. 
+
+	* libmutt/mx.c (mx_get_magic): fixed M_MH recognition
+	semantics. .xmhcache file only exists of exmh was used. 
+
+	* libbalsa/misc.c (readfile): fixed readfile function.
+	
+
+1998-08-03  Michael Lausch  <mla@gams.co.at>
+
+	* src/local-mailbox.c (read_dir): changed isnumname to
+	is_mh_message. MH messages filenames are a lot more variable then
+	expected.
+	(read_folders_from_file): new function. Reads the folder cache
+	file and add mailboxes.
+	(is_mh_message): new function. Applies some heuristics on the
+	filename to find out if it is a MH message name (,[0-9]+ and
+	[0-9].~[0-9]+~) are considered to be MH messages.
+	
+	new variable folder_cache_name.
+	
 Sat Aug 01 20:25:23 1998  George Lebl  <jirka@5z.com>
 
 	* src/index-child.c: fixed up the destroy handler

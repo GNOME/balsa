@@ -3125,7 +3125,7 @@ balsa_window_index_changed_cb(GtkWidget * widget, gpointer data)
 static void
 balsa_window_idle_replace(BalsaWindow * window, LibBalsaMessage * message)
 {
-    if (window->current_message != message) {
+    if (!message || window->current_message != message) {
         window->current_message = message;
         if (balsa_app.previewpane) {
             guint set_message_id;

@@ -373,7 +373,9 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox)
 	return FALSE;
     }
 
-    fd = open(path, O_RDWR);
+    if (!mailbox->readonly)
+	mailbox->readonly = access (path, W_OK) ? 1 : 0;
+    fd = open(path, mailbox->readonly ? O_RDONLY : O_RDWR);
     if (fd == -1) {
 	return FALSE;
     }
@@ -391,8 +393,6 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox)
     mbox->messages_info =
 	g_array_new(FALSE, FALSE, sizeof(struct message_info));
 
-    if (!mailbox->readonly)
-	mailbox->readonly = access (path, W_OK) ? 1 : 0;
     mailbox->unread_messages = 0;
     if (st.st_size != 0)
 	parse_mailbox(mbox);

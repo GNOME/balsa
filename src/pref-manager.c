@@ -87,7 +87,6 @@ open_preferences_manager ()
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
   gtk_box_pack_start (GTK_BOX (vbox), notebook, TRUE, TRUE, 5);
   gtk_widget_show (notebook);
-  gtk_widget_realize (notebook);
 
   /* identity page */
   label = gtk_label_new ("Identity");

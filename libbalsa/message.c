@@ -494,6 +494,7 @@ message_delete(Message *message)
 {
   g_return_if_fail(message != NULL);
   g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
+  g_return_if_fail(message->mailbox != NULL);
 
   gtk_signal_emit(GTK_OBJECT(message), message_signals[SET_DELETED], TRUE);
 }

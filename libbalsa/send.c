@@ -373,29 +373,28 @@ balsa_send_message_real(MessageQueueItem *first_message)
 //   return TRUE;
 
   /* We give back all the resources used and delete the messages send*/
-            
+
+#ifndef BALSA_USE_THREADS
+  balsa_mailbox_open(balsa_app.outbox);
+#endif
     current_message = first_message;
     
     while (current_message != NULL)
     {
-	   
-         if (current_message->delete == 1)
-         {
-	         if ((balsa_app.sentbox->type == MAILBOX_MAILDIR ||
-	                 balsa_app.sentbox->type == MAILBOX_MH ||
-	                 balsa_app.sentbox->type == MAILBOX_MBOX) )
-			 
-
-		       	mutt_write_fcc (
-				MAILBOX_LOCAL (balsa_app.sentbox)->path,
-				current_message->message, NULL, 0, NULL);
-	       
-
+	
+	if (current_message->delete == 1)
+	{
+	    if ( current_message->fcc&&MAILBOX_IS_LOCAL(current_message->fcc) )
+		mutt_write_fcc (
+		    MAILBOX_LOCAL (current_message->fcc)->path,
+		    current_message->message, NULL, 0, NULL);
+	    
 #ifdef BALSA_USE_THREADS
 		 MSGSENDTHREAD(delete_message, MSGSENDTHREADDELETE," ",
 		                         current_message->orig, NULL, 0);
+#else
+		 message_delete (current_message->orig);
 #endif
-		 
 	 }
 	 else
          {
@@ -417,7 +416,8 @@ balsa_send_message_real(MessageQueueItem *first_message)
                              NULL, NULL, 0);
     
     pthread_exit(0); 
-  
+#else
+  balsa_mailbox_close(balsa_app.outbox);
 #endif
 
    return TRUE;
@@ -931,11 +931,9 @@ balsa_create_msg (Message *message, HEADER *msg, char *tmpfile, int queu)
   }
   
 
-  if ((list = message->body_list) == NULL )
-  {
-     message_body_ref (message);
-     list = message->body_list;
-  }
+  if(message->mailbox)
+      message_body_ref (message);
+  list = message->body_list;
   
   last = msg->content;
   while (last && last->next)
@@ -969,7 +967,8 @@ balsa_create_msg (Message *message, HEADER *msg, char *tmpfile, int queu)
 	  tempfp = NULL;
 	}
       else
-        msg->content = body->mutt_body ;
+	  /* safe_free bug patch: steal it! */
+      { msg->content = mutt_copy_body(body->mutt_body, NULL); }
 
       if (newbdy)
 	{
@@ -1021,28 +1020,33 @@ balsa_create_msg (Message *message, HEADER *msg, char *tmpfile, int queu)
         }
 
   }
-  else
+  else /* the message is in the queue */
   {
-   
        msg_tmp = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];  
        mutt_parse_mime_message (CLIENT_CONTEXT (message->mailbox), msg_tmp);
-       mensaje = mx_open_message(CLIENT_CONTEXT (message->mailbox),msg_tmp->msgno);
+       mensaje = mx_open_message(CLIENT_CONTEXT (message->mailbox),
+				 msg_tmp->msgno);
 	       
        mutt_mktemp (tmpfile);
        if ((tempfp = safe_fopen (tmpfile, "w")) == NULL)
-          return (-1);
-       _mutt_copy_message (tempfp, mensaje->fp , msg_tmp, msg_tmp->content ,0 ,0);
+	   return FALSE;
+       _mutt_copy_message (tempfp, mensaje->fp, msg_tmp, msg_tmp->content,
+			   0, 0);
 		       
 
        if (fclose (tempfp) != 0)
        {
            mutt_perror (tmpfile);
            unlink (tmpfile);
-           return (-1);
+	   if(message->mailbox)
+	       message_body_unref (message);
+           return FALSE;
        }
 
   }	 
 
+  if(message->mailbox)
+      message_body_unref (message);
  return TRUE;
 }
 

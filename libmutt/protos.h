@@ -79,6 +79,7 @@ ADDRESS *mutt_expand_aliases (ADDRESS *);
 ADDRESS *mutt_parse_adrlist (ADDRESS *, const char *);
 
 BODY *mutt_dup_body (BODY *);
+BODY *mutt_copy_body (BODY *, HEADER *hdr);
 BODY *mutt_make_file_attach (const char *);
 BODY *mutt_make_message_attach (CONTEXT *, HEADER *, int);
 BODY *mutt_remove_multipart (BODY *);

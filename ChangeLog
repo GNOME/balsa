@@ -1,3 +1,12 @@
+2000-05-17  Pawel Salek <pawsa@theochem.kth.se>
+
+	Infamous safe_free bug fix.	
+	* libmutt/protos.h, libmutt/lib.c: mutt_copy_body() func added.
+	The hdr parameter is most likely redundant.
+	* libbalsa/send.c: copy the bodies instead of plain linking to them.
+	delete sent messages from outbox.
+	*libbalsa/message.c(message_delete): handle loose messages.
+	
 2000-05-16  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/sendmsg-window.c: Celtic language support fixed.

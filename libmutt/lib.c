@@ -54,6 +54,50 @@ BODY *mutt_dup_body (BODY *b)
   return bn;
 }
 
+BODY *
+mutt_copy_body(BODY * b, HEADER * hdr)
+{
+    PARAMETER *p;
+    BODY * body = mutt_dup_body(b);
+
+    if(b->xtype)
+	body->xtype = safe_strdup(b->xtype);
+    if(b->subtype)
+	body->subtype = safe_strdup(b->subtype);
+
+    p = b->parameter; body->parameter = NULL;
+    while(p) {
+	mutt_set_parameter(p->attribute, p->value, &body->parameter);
+	p = p->next;
+    }
+
+    if(b->description)
+	body->description = safe_strdup(b->description);
+    if(b->form_name)
+	body->form_name = safe_strdup(b->form_name);
+
+    if(b->filename)
+	body->filename = safe_strdup(b->filename);
+
+    if(b->d_filename)
+	body->d_filename = safe_strdup(b->d_filename);
+
+    if(b->content) {
+	body->content = safe_calloc (1, sizeof (CONTENT));
+	memcpy(body->content, b->content, sizeof (CONTENT));
+    }
+    if(b->next)
+	body->next = mutt_copy_body(b->next, hdr);
+
+    if(b->parts)
+	body->parts = mutt_copy_body(b->parts, hdr);
+    if(b->hdr) 
+	fprintf(stderr,"FIXME: Don't know how to copy it (pawels)\n");
+    body->hdr = hdr;
+
+    return body;
+}
+
 void mutt_free_body (BODY **p)
 {
   BODY *a = *p, *b;

@@ -1,4 +1,8 @@
-199-12-04  David Pickens  <dsp@iAesthetic.com>
+1999-12-05  Héctor García Álvarez <hector@scouts-es.org>
+        * Rewrited send and SMTP funtions
+	* libbalsa/send.c: Added ofline message writing funcionality
+
+1999-12-04  David Pickens  <dsp@iAesthetic.com>
 	* Added mail check every x minutes option
 
 1999-12-02  David Pickens  <dsp@iAesthetic.com>

@@ -1,5 +1,7 @@
-2004-09-09 08:36  PeterB
+2004-09-09 08:49  PeterB
 
+	* src/: pref-manager.c, save-restore.c: auto-expunge timeout in
+	minutes instead of hours.
 	* src/: balsa-index.c, main-window.c: update the mailbox's last_use
 	time stamp only on expose/conceal and changing a deleted flag, not
 	on other mailbox changes.

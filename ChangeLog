@@ -1,3 +1,18 @@
+2004-03-30 15:39  PeterB
+
+	* libbalsa/: mailbox_local.c, mailbox_maildir.c, mailbox_mbox.c,
+	mailbox_mh.c: use libbalsa_mailbox_run_filters_on_reception in
+	libbalsa_mailbox_local_load_messages instead of the individual
+	drivers.
+	* libbalsa/mailbox_imap.c: implement
+	LibBalsaMailboxImap::search_stamp; new api for
+	libbalsa_mailbox_run_filters_on_reception; remove dead code.
+	* libbalsa/: mailbox.c, mailbox.h: scrap
+	libbalsa_mailbox_invalidate_iters, and invalidate them only when
+	really necessary; clean up
+	libbalsa_mailbox_run_filters_on_reception; use separate keys for
+	added and promoted.
+
 2004-03-29 21:34  PeterB
 
 	* src/main-window.c: clear BalsaWindow::current_message in destroy

@@ -1,3 +1,8 @@
+2000-11-29  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/expand-alias.c: Don't expand with address books which don't
+	have expansion enabled.
+
 2000-11-27  Matthew Guenther  <guentherm@asme.org>
 
 	* TODO: cleaning up

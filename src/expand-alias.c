@@ -173,7 +173,11 @@ expand_input(gchar ** input, gint * tabs)
 
 	ab_list = balsa_app.address_book_list;
 	while(ab_list) {
-	    libbalsa_address_book_load(LIBBALSA_ADDRESS_BOOK(ab_list->data));
+	    if ( !LIBBALSA_ADDRESS_BOOK(ab_list->data)->expand_aliases ) {
+		ab_list = g_list_next(ab_list);
+		continue;
+	    }
+
 	    partial_res = libbalsa_address_book_alias_complete(LIBBALSA_ADDRESS_BOOK(ab_list->data), str, &partial_prefix);
 	    
 	    if ( partial_res != NULL ) {

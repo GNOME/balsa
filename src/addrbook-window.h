@@ -21,11 +21,8 @@ typedef struct _AddressbookEntry AddressbookEntry;
 struct _AddressbookEntry
   {
     gint num;
-
     gchar *name;
-
     gchar *comment;
-
     GList *emails;
   };
 

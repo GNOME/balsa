@@ -28,38 +28,31 @@
 #include "mailbox.h"
 
 
+static void load_global_settings ();
 static void setup_local_mailboxes ();
 
 
 void
 init_balsa_app (int argc, char *argv[])
 {
-  struct passwd *pw;
-
-        gtk_widget_push_visual (gdk_imlib_get_visual ());
-        gtk_widget_push_colormap (gdk_imlib_get_colormap ());
-  balsa_app.main_window = create_main_window ();
-        gtk_widget_pop_colormap ();
-        gtk_widget_pop_visual ();
-
-
-
   /* include linkage for the c-client library */
 #include "linkage.c"
 
-
-  /* set user information */
-  pw = getpwuid (getuid ());
-  balsa_app.user_name = g_strdup (pw->pw_name);
-  
-  balsa_app.local_mail_directory = g_malloc (strlen (pw->pw_dir) + 
-					     strlen (DEFAULT_MAIL_SUBDIR) + 2);
-  sprintf (balsa_app.local_mail_directory, "%s/%s", pw->pw_dir, DEFAULT_MAIL_SUBDIR);
-
-
+  /* initalize application structure before ALL ELSE */
+  balsa_app.user = NULL;
+  balsa_app.user_name = NULL;
+  balsa_app.local_mail_directory = NULL;
+  balsa_app.smtp_server = NULL;
   balsa_app.current_mailbox = NULL;
   balsa_app.mailbox_list = NULL;
+  balsa_app.main_window = NULL;
+  balsa_app.addressbook_list = NULL;
+
+  load_global_settings ();
   setup_local_mailboxes ();
+
+  /* create main window */
+  balsa_app.main_window = create_main_window ();
 }
 
 
@@ -103,4 +96,57 @@ setup_local_mailboxes ()
             }
         }
     }
+}
+
+
+static gchar *
+get_string_set_default (const char *path, 
+			const char *value)
+{
+  GString *buffer;
+  gboolean unset;
+  gchar *result;
+
+  result = NULL;
+  buffer = g_string_new (NULL);
+
+  g_string_sprintf (buffer, "%s=%s", path, value);
+  result = gnome_config_get_string_with_default (buffer->str, &unset);
+  if (unset)
+    gnome_config_set_string (path, value);
+
+  g_string_free (buffer, 1);
+  return result;
+}
+
+
+static void
+load_global_settings ()
+{
+  GString *path;
+  struct passwd *pw;
+
+  pw = getpwuid (getuid ());
+
+  /* set to Global configure section */
+  gnome_config_push_prefix ("/balsa/Global/");
+  
+  /* user id */
+  balsa_app.user = get_string_set_default ("user", pw->pw_name);
+
+  /* user's text name */
+  balsa_app.user_name = get_string_set_default ("user name", pw->pw_gecos);
+
+  /* directory */
+  path = g_string_new (NULL);
+  g_string_sprintf (path, "%s/mail", pw->pw_dir);
+  balsa_app.local_mail_directory= get_string_set_default ("local mail directory", path->str);
+  g_string_free (path, 1);
+
+  /* smtp server */
+  balsa_app.smtp_server = get_string_set_default ("smtp server", "localhost");
+
+  /* save changes */
+  gnome_config_pop_prefix ();
+  gnome_config_sync ();
 }

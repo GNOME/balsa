@@ -36,6 +36,7 @@ static void balsa_index_size_allocate (GtkWidget * widget,
 				       GtkAllocation * allocation);
 
 
+/* internal functions */
 static void append_messages (BalsaIndex *bindex,
 			     glong first,
 			     glong last);
@@ -43,12 +44,15 @@ static void append_messages (BalsaIndex *bindex,
 static void update_new_message_pixmap (BalsaIndex *bindex,
 				       glong mesgno);
 
+
+/* clist callbacks */
+static void realize_clist (GtkWidget * widget,
+			   gpointer * data);
 static void select_message (GtkWidget * widget, 
 			    gint row,
 			    gint column,
 			    GdkEventButton * bevent,
 			    gpointer * data);
-
 static void unselect_message (GtkWidget * widget, 
 			      gint row,
 			      gint column,
@@ -155,7 +159,6 @@ static void
 balsa_index_init (BalsaIndex * bindex)
 {
   GtkCList *clist;
-
   static gchar *titles[] =
   {
     "N",
@@ -166,10 +169,13 @@ balsa_index_init (BalsaIndex * bindex)
   };
 
   GTK_WIDGET_SET_FLAGS (bindex, GTK_NO_WINDOW);
-
   bindex->stream = NIL;
   bindex->last_message = 0;
+  bindex->new_xpm = NULL;
+  bindex->new_xpm_mask = NULL;
 
+
+  /* create the clist */
   GTK_BIN (bindex)->child = (GtkWidget *) clist = gtk_clist_new_with_titles (5, titles);
   gtk_widget_set_parent (GTK_WIDGET (clist), GTK_WIDGET (bindex));
   gtk_clist_set_policy (clist, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
@@ -181,6 +187,12 @@ balsa_index_init (BalsaIndex * bindex)
   gtk_clist_set_column_width (clist, 3, 250);
   gtk_clist_set_column_width (clist, 4, 100);
 
+
+  gtk_signal_connect_after (GTK_OBJECT (clist),
+			    "realize",
+			    (GtkSignalFunc) realize_clist,
+			    (gpointer) bindex);
+
   gtk_signal_connect (GTK_OBJECT (clist),
                       "select_row",
                       (GtkSignalFunc) select_message,
@@ -191,13 +203,9 @@ balsa_index_init (BalsaIndex * bindex)
                       (GtkSignalFunc) unselect_message,
                       (gpointer) bindex);
 
+
   gtk_widget_show (GTK_WIDGET (clist));
   gtk_widget_ref (GTK_WIDGET (clist));
-
-  bindex->new_xpm = gdk_pixmap_create_from_xpm_d (clist->clist_window, 
-						  &bindex->new_xpm_mask, 
-						  &GTK_WIDGET (clist)->style->white,
-						  gball_xpm);
 }
 
 GtkWidget *
@@ -258,14 +266,35 @@ balsa_index_append_new_messages (BalsaIndex * bindex)
     }
 }
 
+
 void
 balsa_index_select_next (BalsaIndex * bindex)
 {
+  gint row;
+  GtkCList *clist;
+
+  clist = GTK_CLIST (GTK_BIN (bindex)->child);
+  row = (gint) clist->selection->data + 1;
+  
+  gtk_clist_select_row (clist, row, -1);
+
+  if (gtk_clist_row_is_visible (clist, row) != GTK_VISIBILITY_FULL)
+    gtk_clist_moveto (clist, row, 0, 1.0, 0.0);
 }
 
 void
 balsa_index_select_previous (BalsaIndex * bindex)
 {
+  gint row;
+  GtkCList *clist;
+
+  clist = GTK_CLIST (GTK_BIN (bindex)->child);
+  row = (gint) clist->selection->data - 1;
+  
+  gtk_clist_select_row (clist, row, -1);
+
+  if (gtk_clist_row_is_visible (clist, row) != GTK_VISIBILITY_FULL)
+    gtk_clist_moveto (clist, row, 0, 0.0, 0.0);
 }
 
 
@@ -386,6 +415,28 @@ update_new_message_pixmap (BalsaIndex *bindex,
 			mesgno - 1, 0,
 			NULL);
 }
+
+
+/*
+ * CLIST Callbacks
+ */
+
+static void
+realize_clist (GtkWidget * widget,
+	       gpointer * data)
+{
+  BalsaIndex *bindex;
+
+  bindex = BALSA_INDEX (data);
+  
+  if (!bindex->new_xpm)
+    bindex->new_xpm =
+      gdk_pixmap_create_from_xpm_d (GTK_CLIST (widget)->clist_window, 
+				    &bindex->new_xpm_mask, 
+				    &widget->style->white,
+				    gball_xpm);
+}
+
 
 static void
 select_message (GtkWidget * widget, 

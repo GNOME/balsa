@@ -7,9 +7,9 @@ balsa_SOURCES =	\
 	c-client.c		\
 	index.c			\
 	mailbox.c		\
+	mailbox-manager.c	\
 	main-window.c		\
 	main.c			\
-	options.c		\
 	sendmsg-window.c	\
 	addrbook-window.c
 

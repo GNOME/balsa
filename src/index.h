@@ -24,11 +24,12 @@
 #include "balsa-app.h"
 #include "mailbox.h"
 
-void index_update (Mailbox * mailbox);
-
 void index_select (GtkWidget * widget, 
 		   MAILSTREAM * stream,
 		   glong mesgno);
+void index_next_message ();
+void index_previous_message ();
+
 
 void mailbox_menu_update ();
 

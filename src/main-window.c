@@ -24,7 +24,7 @@
 #include "sendmsg-window.h"
 #include "index.h"
 #include "mailbox.h"
-#include "options.h"
+#include "mailbox-manager.h"
 #include "addrbook-window.h"
 #include "../config.h"
 
@@ -71,7 +71,6 @@ create_main_window ()
   /* main window */
   mw->window = gnome_app_new ("balsa", "Balsa");
   gtk_window_set_wmclass (GTK_WINDOW (mw->window), "balsa_app", "Balsa");
-
   gtk_widget_set_usize (mw->window, 660, 400);
 
   gtk_signal_connect (GTK_OBJECT (mw->window),
@@ -230,7 +229,7 @@ create_toolbar (MainWindow *mw)
 			     "Open Previous Message",
 			     NULL,
 			     new_icon (p10_xpm, window),
-			     NULL,
+			     GTK_SIGNAL_FUNC (index_previous_message),
 			     "Open Previous Message");
 
   toolbarbutton =
@@ -239,7 +238,7 @@ create_toolbar (MainWindow *mw)
 			     "Open Next Message", 
 			     NULL,
 			     new_icon (p11_xpm, window), 
-			     NULL,
+			     GTK_SIGNAL_FUNC (index_next_message),
 			     "Open Next Message");
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
@@ -417,11 +416,11 @@ create_menu (GtkWidget * window)
   /* TOOLS Menu */
   menu = gtk_menu_new ();
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Account manager"));
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Mailbox Manager..."));
   gtk_widget_show (w);
   gtk_signal_connect_object (GTK_OBJECT (w),
 			     "activate",
-			     (GtkSignalFunc) personality_box,
+			     (GtkSignalFunc) open_mailbox_manager,
 			     NULL);
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;

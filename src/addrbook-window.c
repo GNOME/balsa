@@ -142,3 +142,8 @@ void addressbook_window_new(GtkWidget *widget, gpointer data)
   gtk_widget_show (window);
 }
 
+gint
+delete_event (GtkWidget *w, gpointer p)
+{
+
+}

@@ -33,6 +33,19 @@ index_select (GtkWidget * widget,
 		     stream, mesgno);
 }
 
+void 
+index_next_message ()
+{
+  balsa_index_select_next (balsa_app.main_window->index);
+}
+
+void
+index_previous_message ()
+{
+ balsa_index_select_previous (balsa_app.main_window->index);
+}
+
+
 /* remove the old mailbox menu, and create a new one
  * from the current postoffice  */
 void

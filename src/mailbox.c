@@ -24,6 +24,34 @@
 #include "balsa-index.h"
 #include "index.h"
 
+
+gchar *
+mailbox_type_description (MailboxType type)
+{
+  switch (type)
+    {
+    case MAILBOX_MBOX:
+      return "mbox";
+      break;
+
+    case MAILBOX_POP3:
+      return "POP3";
+      break;
+
+    case MAILBOX_IMAP:
+      return "IMAP";
+      break;
+      
+    case MAILBOX_NNTP:
+      return "NNTP";
+      break;
+
+    default:
+      return "";
+    }
+}
+
+
 Mailbox *
 mailbox_new (MailboxType type)
 {
@@ -78,6 +106,73 @@ mailbox_new (MailboxType type)
   
   return mailbox;
 }
+
+
+void
+mailbox_free (Mailbox * mailbox)
+{
+  MailboxMBox *mbox;
+  MailboxPOP3 *pop3;
+  MailboxIMAP *imap;
+  MailboxNNTP *nntp;
+
+  if (!mailbox)
+    return;
+
+  if (mailbox->stream)
+    mailbox_close (mailbox);
+
+  if (mailbox->name)
+    g_free (mailbox->name);
+
+  switch (mailbox->type)
+    {
+    case MAILBOX_MBOX:
+      mbox = (MailboxMBox *) mailbox;
+      if (mbox->path)
+	g_free(mbox->path);
+      break;
+      
+    case MAILBOX_POP3:
+      pop3 = (MailboxPOP3 *) mailbox;
+      if (pop3->user)
+	g_free (pop3->user);
+
+      if (pop3->passwd)
+	g_free (pop3->passwd);
+
+      if (pop3->server)
+	g_free (pop3->server);
+      break;
+      
+    case MAILBOX_IMAP:
+      imap = (MailboxIMAP *) mailbox;
+      if (imap->user)
+	g_free (imap->user);
+
+      if (imap->passwd)
+	g_free (imap->passwd);
+
+      if (imap->server)
+	g_free (imap->server);
+      break;
+      
+    case MAILBOX_NNTP:
+      nntp = (MailboxNNTP *) mailbox;
+      if (nntp->user)
+	g_free (nntp->user);
+
+      if (nntp->passwd)
+	g_free (nntp->passwd);
+
+      if (nntp->server)
+	g_free (nntp->server);
+      break;
+    }
+
+  g_free (mailbox);
+}
+
 
 int
 mailbox_open (Mailbox * mailbox)

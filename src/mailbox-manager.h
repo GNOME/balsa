@@ -17,33 +17,10 @@
  * 02111-1307, USA.
  */
 
-#ifndef __BALSA_APP_H__
-#define __BALSA_APP_H__
+#ifndef __mailbox_manager_h__
+#define __mailbox_manager_h__
 
-#include <gnome.h>
-#include "c-client.h"
-#include "mailbox.h"
-#include "main-window.h"
+void open_mailbox_manager ();
 
-
-/* global balsa application structure */
-struct
-  {
-    gchar *user;
-    gchar *user_name;
-    gchar *local_mail_directory;
-
-    gchar *smtp_server;
-
-    Mailbox *current_mailbox;
-    GList *mailbox_list;
-
-    MainWindow *main_window;
-
-    GList *addressbook_list;
-  }
-balsa_app;
-
-void init_balsa_app (int argc, char *argv[]);
-
-#endif /* __BALSA_APP_H__ */
+#endif
+/* __mailbox_manager_h__ */

@@ -318,7 +318,10 @@ read_dir_cb(BalsaMailboxNode* mb)
 			       (LocalCheck *) check_local_path,
 			       (LocalMark *) mark_local_path,
 			       (LocalHandler *) add_local_folder,
-			       (LocalHandler *) add_local_mailbox);
+			       (LocalHandler *) add_local_mailbox,
+                               (mb->mailbox ?
+                                G_TYPE_FROM_INSTANCE(mb->mailbox) :
+                                (GType) 0));
 }
 
 static void
@@ -488,6 +491,12 @@ balsa_mailbox_node_new_from_mailbox(LibBalsaMailbox * mb)
     load_mailbox_view(mbn);
     g_signal_connect(G_OBJECT(mbn), "show-prop-dialog", 
 		     G_CALLBACK(mailbox_conf_edit), NULL);
+    if (LIBBALSA_IS_MAILBOX_MH(mb) || LIBBALSA_IS_MAILBOX_MAILDIR(mb)) {
+	mbn->name = g_strdup(libbalsa_mailbox_local_get_path(mb));
+	mbn->dir = g_strdup(mbn->name);
+	g_signal_connect(G_OBJECT(mbn), "append-subtree", 
+                         G_CALLBACK(read_dir_cb), NULL);
+    }
     return mbn;
 }
 

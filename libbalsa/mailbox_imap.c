@@ -43,6 +43,7 @@ static void libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass *
 static void libbalsa_mailbox_imap_init(LibBalsaMailboxImap * mailbox);
 static void libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox,
 				       gboolean append);
+static void libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox);
 static FILE *libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox *
 						      mailbox,
 						      LibBalsaMessage *
@@ -101,6 +102,7 @@ libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass * klass)
     object_class->destroy = libbalsa_mailbox_imap_destroy;
 
     libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_imap_open;
+    libbalsa_mailbox_class->close_mailbox = libbalsa_mailbox_imap_close;
     libbalsa_mailbox_class->get_message_stream =
 	libbalsa_mailbox_imap_get_message_stream;
 
@@ -275,8 +277,11 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, gboolean append)
 	mailbox->total_messages = 0;
 	mailbox->unread_messages = 0;
 	mailbox->new_messages = CLIENT_CONTEXT(mailbox)->msgcount;
+	imap_allow_reopen (CLIENT_CONTEXT(mailbox));
 	libbalsa_mailbox_load_messages(mailbox);
 
+	if(mailbox->open_ref == 0)
+	    libbalsa_notify_unregister_mailbox(LIBBALSA_MAILBOX(mailbox));
 	/* increment the reference count */
 	mailbox->open_ref++;
 
@@ -288,6 +293,17 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, gboolean append)
     }
     UNLOCK_MAILBOX(mailbox);
 }
+
+static void
+libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox)
+{
+    if (LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox)
+	(*LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox) 
+	    (LIBBALSA_MAILBOX(mailbox));
+    if(mailbox->open_ref == 0)
+	libbalsa_notify_register_mailbox(LIBBALSA_MAILBOX(mailbox));
+}
+
 
 /* libbalsa_mailbox_imap_get_message_stream:
    we make use of fact that imap_fetch_message doesn't set msg->path field. 
@@ -319,32 +335,34 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
 static void
 libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 {
-    if (mailbox->open_ref == 0) {
-	if ( libbalsa_notify_check_mailbox(mailbox) )
+    if(mailbox->open_ref == 0) {
+	if (libbalsa_notify_check_mailbox(mailbox) ) 
 	    libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE); 
     } else {
 	gint i = 0;
+	long newmsg;
 	gint index_hint;
-
+	
 	LOCK_MAILBOX(mailbox);
-
+	
+	newmsg = CLIENT_CONTEXT(mailbox)->msgcount - mailbox->messages;
 	index_hint = CLIENT_CONTEXT(mailbox)->vcount;
 	libbalsa_lock_mutt();
 	imap_allow_reopen(CLIENT_CONTEXT(mailbox));
-	if ((i = mx_check_mailbox(CLIENT_CONTEXT(mailbox), &index_hint, 0))
+	if (newmsg == 0 && 
+	    (i = mx_check_mailbox(CLIENT_CONTEXT(mailbox), &index_hint, 0))
 	    < 0) {
 	    g_print("mx_check_mailbox() failed on %s\n", mailbox->name);
 	    if(CLIENT_CONTEXT_CLOSED(mailbox)||
 	       !CLIENT_CONTEXT(mailbox)->id_hash)
 		libbalsa_mailbox_free_messages(mailbox);
-	} else if (i == M_NEW_MAIL || i == M_REOPENED) {
+	} else if (newmsg || i == M_NEW_MAIL || i == M_REOPENED) {
 	    mailbox->new_messages =
 		CLIENT_CONTEXT(mailbox)->msgcount - mailbox->messages;
 	    libbalsa_mailbox_load_messages(mailbox);
 	}
-
+	
 	libbalsa_unlock_mutt();
-
 	UNLOCK_MAILBOX(mailbox);
     }
 }

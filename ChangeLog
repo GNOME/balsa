@@ -1,3 +1,11 @@
+2001-02-09  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/address-book-vcard.c: KISS: print data directly to file.
+	* libbalsa/mailbox.c: fix crash in the cllose retrying code.
+	* libbalsa/mailbox_imap.c: improve imap mailbox checking.
+	* src/print.c: fix printing after recent BalsAIndex structure
+	modification. Remove old crap (this could be done better, I guess).
+	
 2001-02-07  Matthew Guenther  <guentherm@asme.org>
 
 	* src/balsa-mblist.c: change sorting function to automatically

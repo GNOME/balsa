@@ -407,7 +407,6 @@ libbalsa_address_book_vcard_store_address(LibBalsaAddressBook * ab,
 					  LibBalsaAddress * new_address)
 {
     GList *list;
-    gchar *output;
     LibBalsaAddress *address;
     FILE *fp;
 
@@ -435,29 +434,16 @@ libbalsa_address_book_vcard_store_address(LibBalsaAddressBook * ab,
     }
 
     fprintf(fp, "\nBEGIN:VCARD\n");
-    if (new_address->full_name) {
-	output = g_strdup_printf("FN:%s\n", new_address->full_name);
-	fprintf(fp, output);
-	g_free(output);
-    }
-    if (new_address->first_name && new_address->last_name) {
-	output =
-	    g_strdup_printf("N:%s;%s\n", new_address->last_name,
-			    new_address->first_name);
-	fprintf(fp, output);
-	g_free(output);
-    }
-    if (new_address->organization) {
-	output = g_strdup_printf("ORG:%s\n", new_address->organization);
-	fprintf(fp, output);
-	g_free(output);
-    }
+    if (new_address->full_name) 
+	fprintf(fp, "FN:%s\n", new_address->full_name);
+    if (new_address->first_name && new_address->last_name)
+	fprintf(fp, "N:%s;%s\n", new_address->last_name,
+		new_address->first_name);
+    if (new_address->organization)
+	fprintf(fp, "ORG:%s\n", new_address->organization);
     list = new_address->address_list;
     while (list) {
-	output =
-	    g_strdup_printf("EMAIL;INTERNET:%s\n", (gchar *) list->data);
-	fprintf(fp, output);
-	g_free(output);
+	fprintf(fp, "EMAIL;INTERNET:%s\n", (gchar *) list->data);
 	list = g_list_next(list);
     }
     fprintf(fp, "END:VCARD\n");

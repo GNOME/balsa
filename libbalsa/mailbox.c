@@ -447,27 +447,27 @@ libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox)
 
 	/* now close the mail stream and expunge deleted
 	 * messages -- the expunge may not have to be done */
-	if (CLIENT_CONTEXT_OPEN(mailbox)) {
-	    /* We are careful to take/release locks in the correct order here */
-	    libbalsa_lock_mutt();
-	    cnt = 0;
-	    while( cnt < RETRIES_COUNT &&
-		   (check = mx_close_mailbox(CLIENT_CONTEXT(mailbox), NULL))) {
-		libbalsa_unlock_mutt();
-		UNLOCK_MAILBOX(mailbox);
-		g_print
-		    ("libbalsa_mailbox_real_close: %d trial failed.\n", cnt);
-		usleep(1000);
-		libbalsa_mailbox_check(mailbox);
-		LOCK_MAILBOX(mailbox);
-		libbalsa_lock_mutt();
-		cnt++;
-	    }
+	/* We are careful to take/release locks in the correct order here */
+	libbalsa_lock_mutt();
+	cnt = 0;
+	while( CLIENT_CONTEXT_OPEN(mailbox) && cnt < RETRIES_COUNT &&
+	       (check = mx_close_mailbox(CLIENT_CONTEXT(mailbox), NULL))) {
 	    libbalsa_unlock_mutt();
-	    if(cnt>=RETRIES_COUNT)
-		g_print("libbalsa_mailbox_real_close: changes to %s lost.\n",
-			mailbox->name);
-	    
+	    UNLOCK_MAILBOX(mailbox);
+	    g_print
+		("libbalsa_mailbox_real_close: %d trial failed.\n", cnt);
+	    usleep(1000);
+	    libbalsa_mailbox_check(mailbox);
+	    LOCK_MAILBOX(mailbox);
+	    libbalsa_lock_mutt();
+	    cnt++;
+	}
+	libbalsa_unlock_mutt();
+	if(cnt>=RETRIES_COUNT)
+	    g_print("libbalsa_mailbox_real_close: changes to %s lost.\n",
+		    mailbox->name);
+	
+	if(CLIENT_CONTEXT(mailbox)) {
 	    free(CLIENT_CONTEXT(mailbox));
 	    CLIENT_CONTEXT(mailbox) = NULL;
 	}

@@ -73,6 +73,10 @@ static void trash_cb(GtkWidget * widget, gpointer);
 static void message_window_move_message (MessageWindow * mw,
 					 LibBalsaMailbox * mailbox);
 static void reset_show_all_headers(MessageWindow *mw);
+#ifdef HAVE_GTKHTML
+static void mw_zoom_cb(GtkWidget * widget, MessageWindow * mw);
+static void mw_select_part_cb(BalsaMessage * bm, MessageWindow * mw);
+#endif                          /* HAVE_GTKHTML */
 
 static GnomeUIInfo shown_hdrs_menu[] = {
     GNOMEUIINFO_RADIOITEM(N_("N_o Headers"), NULL,
@@ -112,6 +116,24 @@ static GnomeUIInfo view_menu[] = {
     GNOMEUIINFO_TOGGLEITEM(N_("_Wrap"), NULL, wrap_message_cb, NULL),
     GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_RADIOLIST(shown_hdrs_menu),
+#ifdef HAVE_GTKHTML
+    GNOMEUIINFO_SEPARATOR,
+#define MENU_VIEW_ZOOM_IN MENU_VIEW_WRAP_POS + 4
+    { GNOME_APP_UI_ITEM, N_("Zoom _In"), N_("Increase magnification"),
+	mw_zoom_cb, GINT_TO_POINTER(1), NULL, GNOME_APP_PIXMAP_STOCK,
+	GTK_STOCK_ZOOM_IN, '+', GDK_CONTROL_MASK, NULL},
+#define MENU_VIEW_ZOOM_OUT MENU_VIEW_ZOOM_IN + 1
+    { GNOME_APP_UI_ITEM, N_("Zoom _Out"), N_("Decrease magnification"),
+	mw_zoom_cb, GINT_TO_POINTER(-1), NULL, GNOME_APP_PIXMAP_STOCK,
+	GTK_STOCK_ZOOM_OUT, '-', GDK_CONTROL_MASK, NULL},
+#define MENU_VIEW_ZOOM_100 MENU_VIEW_ZOOM_OUT + 1
+	/* To warn msgfmt that the % sign isn't a
+	 * format specifier: */
+	/* xgettext:no-c-format */
+    { GNOME_APP_UI_ITEM, N_("Zoom _100%"), N_("No magnification"),
+	mw_zoom_cb, GINT_TO_POINTER(0), NULL, GNOME_APP_PIXMAP_STOCK,
+	GTK_STOCK_ZOOM_100, 0, 0, NULL},
+#endif                          /* HAVE_GTKHTML */
     GNOMEUIINFO_END
 };
 
@@ -164,6 +186,13 @@ static GnomeUIInfo message_menu[] = {
      N_("View source form of the message"),
      view_msg_source_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
      BALSA_PIXMAP_MENU_SAVE, 'v', GDK_CONTROL_MASK, NULL},
+     GNOMEUIINFO_SEPARATOR,
+#define MENU_MESSAGE_NEXT_UNREAD_POS 11
+    {
+     GNOME_APP_UI_ITEM, N_("Next Unread Message"),
+     N_("Next Unread Message"), next_unread_cb, NULL, NULL,
+     GNOME_APP_PIXMAP_STOCK, BALSA_PIXMAP_MENU_NEXT_UNREAD, 'N',
+     GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_END
 };
 
@@ -191,6 +220,14 @@ struct _MessageWindow {
     int headers_shown;
     int show_all_headers;
     guint idle_handler_id;
+
+    /* Pointers to our copies of widgets. */
+    GtkWidget *next_unread;
+#ifdef HAVE_GTKHTML
+    GtkWidget *zoom_in;
+    GtkWidget *zoom_out;
+    GtkWidget *zoom_100;
+#endif /* HAVE_GTKHTML */
 };
 
 static void
@@ -397,6 +434,21 @@ message_window_new(LibBalsaMessage * message)
 
     gnome_app_create_menus_with_data(GNOME_APP(mw->window), main_menu, mw);
 
+    /* Save the widgets that we need to change--they'll be overwritten
+     * if another message window is opened. */
+    mw->next_unread = message_menu[MENU_MESSAGE_NEXT_UNREAD_POS].widget;
+#ifdef HAVE_GTKHTML
+    mw->zoom_in  = view_menu[MENU_VIEW_ZOOM_IN].widget;
+    mw->zoom_out = view_menu[MENU_VIEW_ZOOM_OUT].widget;
+    mw->zoom_100 = view_menu[MENU_VIEW_ZOOM_100].widget;
+    /* Use Ctrl+= as an alternative accelerator for zoom-in, because
+     * Ctrl++ is a 3-key combination. */
+    gtk_widget_add_accelerator(view_menu[MENU_VIEW_ZOOM_IN].widget,
+			       "activate",
+			       GNOME_APP(mw->window)->accel_group,
+			       '=', GDK_CONTROL_MASK, (GtkAccelFlags) 0);
+#endif                          /* HAVE_GTKHTML */
+
     submenu = balsa_mblist_mru_menu(GTK_WINDOW(mw->window),
                                     &balsa_app.folder_mru,
                                     G_CALLBACK(mru_menu_cb), mw);
@@ -407,6 +459,11 @@ message_window_new(LibBalsaMessage * message)
     mw->bmessage = balsa_message_new();
     
     gnome_app_set_contents(GNOME_APP(mw->window), mw->bmessage);
+
+#ifdef HAVE_GTKHTML
+    g_signal_connect(mw->bmessage, "select-part",
+		     G_CALLBACK(mw_select_part_cb), mw);
+#endif				/* HAVE_GTKHTML */
 
     if (balsa_app.shown_headers >= HEADERS_NONE &&
 	balsa_app.shown_headers <= HEADERS_ALL)
@@ -645,10 +702,12 @@ mw_set_buttons_sensitive(MessageWindow * mw)
     GtkWidget *toolbar =
 	balsa_toolbar_get_from_gnome_app(GNOME_APP(mw->window));
     LibBalsaMailbox *mailbox = mw->message->mailbox;
+    gint other_unread =
+	mailbox->unread_messages - LIBBALSA_MESSAGE_IS_UNREAD(mw->message);
 
+    gtk_widget_set_sensitive(mw->next_unread, other_unread > 0);
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT_UNREAD,
-				       mailbox
-				       && mailbox->unread_messages > 0);
+				       other_unread > 0);
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT_FLAGGED,
 				       mailbox
 				       && libbalsa_mailbox_total_messages
@@ -748,3 +807,24 @@ reset_show_all_headers(MessageWindow *mw)
     mw->show_all_headers = FALSE;
     balsa_toolbar_set_button_active(toolbar, BALSA_PIXMAP_SHOW_HEADERS, FALSE);
 }
+
+#ifdef HAVE_GTKHTML
+static void
+mw_zoom_cb(GtkWidget * widget, MessageWindow * mw)
+{
+    GtkWidget *bm = mw->bmessage;
+    gint in_out =
+	GPOINTER_TO_INT(g_object_get_data
+			(G_OBJECT(widget), GNOMEUIINFO_KEY_UIDATA));
+    balsa_message_zoom(BALSA_MESSAGE(bm), in_out);
+}
+
+static void
+mw_select_part_cb(BalsaMessage * bm, MessageWindow * mw)
+{
+    gboolean enable = bm && balsa_message_can_zoom(bm);
+    gtk_widget_set_sensitive(mw->zoom_in,  enable);
+    gtk_widget_set_sensitive(mw->zoom_out, enable);
+    gtk_widget_set_sensitive(mw->zoom_100, enable);
+}
+#endif				/* HAVE_GTKHTML */

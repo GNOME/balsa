@@ -1,3 +1,22 @@
+2000-04-04 Pawel Salek <pawsa@theochem.kth.se>
+	
+	* src/address-book.c: Fellmann Joaquim's <joaquim@hrnet.fr>
+	patch (with minor changes) - lookup fix.
+	* src/balsa-index.c: removed old crust.
+	* src/main-window.c: fix a memory leak.
+	
+2000-04-04 Ian Campbell <ijc25@cam.ac.uk>
+	
+	* libbalsa/misc.[ch]: Added function 'mailbox_node_destroy'
+	* libbalsa/send.c: Removed some unused variables
+	* src/balsa-index-page.c: Added some #ifdef MSG_STATUS_USED 
+	  around functions which are only used inside similar #ifdefs
+	* src/balsa-mblist.c: Use mailbox_node_destory as the handler
+	  in set_row_data, fixes a memory leak
+	* src/local-mailbox.c: Fix a memory leak
+	* src/mblist-window.h: Fix a prototype.
+	* src/save-restore.c: Fix memory leak.
+	
 2000-04-03  Peter Williams  <peter@beta.newton.cx>
 
 	* src/main-window.c (wrap_message_cb): Fixed

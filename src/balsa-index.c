@@ -372,14 +372,6 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
 			 MESSAGE_APPEND_MASK,
 			 (gpointer) bindex);
 
-  /* here we play a little trick on clist; in GTK_SELECTION_BROWSE mode
-   * (the default for this index), the first row appended automagicly gets
-   * selected.  this causes a delay in the index getting filled out, and
-   * makes it appear as if the message is displayed before the index; so we set
-   * the clist selection mode to a mode that doesn't automagicly select, select
-   * manually, then switch back */
-  /* gtk_clist_set_selection_mode (GTK_CLIST (bindex),
-     GTK_SELECTION_EXTENDED); */
   gtk_clist_freeze(GTK_CLIST (bindex));
   list = mailbox->message_list;
   while (list)
@@ -389,8 +381,6 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
     i++;
   }
   gtk_clist_thaw(GTK_CLIST (bindex));
-  /* gtk_clist_set_selection_mode (GTK_CLIST (bindex),
-     GTK_SELECTION_EXTENDED); */
 
   /* FIXME this might could be cleaned up some */
   if (bindex->first_new_message == 0)

@@ -141,6 +141,7 @@ add_mailbox (const gchar * name, const gchar * path, MailboxType type,
   if (isdir && type == MAILBOX_UNKNOWN)
     {
       gchar *tmppath;
+      gchar *dirname;
       MailboxNode *mbnode;
 
       mbnode = mailbox_node_new (path, NULL, TRUE);
@@ -154,8 +155,11 @@ add_mailbox (const gchar * name, const gchar * path, MailboxType type,
 
       g_free(tmppath);
 
+      dirname = g_dirname(path);
       rnode = find_my_node (balsa_app.mailbox_nodes, G_LEVEL_ORDER, 
-			    G_TRAVERSE_ALL, g_dirname (path));
+			    G_TRAVERSE_ALL, dirname);
+      g_free(dirname);
+
       if (rnode)
 	g_node_append (rnode, node);
       else

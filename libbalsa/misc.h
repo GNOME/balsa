@@ -61,6 +61,8 @@ struct _MailboxNode
 };
 
 MailboxNode *mailbox_node_new (const gchar * name, Mailbox * mb, gint i);
+void mailbox_node_destroy(MailboxNode *mbn);
+
 gchar *g_get_host_name (void);
 
 gboolean find_word(const gchar * word, const gchar* str);

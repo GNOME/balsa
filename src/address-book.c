@@ -345,10 +345,11 @@ ab_find(GtkWidget * group_entry)
 	g_return_if_fail(book_clist); 
 
 	entry_text = gtk_entry_get_text(GTK_ENTRY(group_entry)); 
-	gtk_clist_freeze(GTK_CLIST(book_clist)); 
-
 	if (strlen(entry_text) == 0)
-		return;
+	  return;
+
+	gtk_clist_unselect_all(GTK_CLIST(book_clist));
+	gtk_clist_freeze(GTK_CLIST(book_clist)); 
 
 	num = 0; 
 	while ( (row = gtk_clist_get_row_data(GTK_CLIST(book_clist), num))!= NULL) { 
@@ -360,6 +361,7 @@ ab_find(GtkWidget * group_entry)
 		num++; 
 	} 
 	gtk_clist_thaw(GTK_CLIST(book_clist)); 
+	gtk_clist_select_row(GTK_CLIST(book_clist), num, 0);
 	return;
 } 
 

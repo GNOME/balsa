@@ -136,7 +136,7 @@ add_mutt_body_plain (void)
 gboolean
 balsa_send_message (Message * message)
 {
-  MessageQueueItem *first_message, *current_message , *new_message, *this_last;
+  MessageQueueItem *first_message, *current_message , *new_message;
   GList *lista;
   Message *queu;
   int message_number = 0;
@@ -768,15 +768,15 @@ int balsa_smtp_send (MessageQueueItem *first_message, char *server)
   struct hostent *he;
   char buffer[525]; /* Maximum allow by RFC */
   int n, s, error = 0, SmtpPort=25;
-  MessageQueueItem *current_message, *next_message;
+  MessageQueueItem *current_message;
 #ifdef BALSA_USE_THREADS
   SendThreadMessage *error_message, *finish_message;
   char error_msg[256];
-  char msgbuf[160];
-  MailThreadMessage *threadmsg;
+/*    char msgbuf[160]; */
+/*    MailThreadMessage *threadmsg; */
 
-//  sprintf( msgbuf, "SMTP: Hola cara de bola");
-//  MSGMAILTHREAD( threadmsg, MSGMAILTHREAD_SOURCE, msgbuf );
+/*    sprintf( msgbuf, "SMTP: Hola cara de bola"); */
+/*    MSGMAILTHREAD( threadmsg, MSGMAILTHREAD_SOURCE, msgbuf ); */
 
 #endif
  

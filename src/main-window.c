@@ -138,7 +138,9 @@ static void show_no_headers_cb(GtkWidget * widget, gpointer data);
 static void show_selected_cb(GtkWidget * widget, gpointer data);
 static void show_all_headers_cb(GtkWidget * widget, gpointer data);
 
+#ifdef BALSA_SHOW_ALL
 static void filter_dlg_cb (GtkWidget * widget, gpointer data);
+#endif
 
 gboolean balsa_close_mailbox_on_timer(GtkWidget *widget, gpointer *data);
 
@@ -289,10 +291,12 @@ static GnomeUIInfo message_menu[] =
   GNOMEUIINFO_END
 };
 
+#if 0
 static GnomeUIInfo open_mailboxes[] =
 {
   GNOMEUIINFO_END
 };
+#endif
 
 static GnomeUIInfo mailbox_menu[] =
 {
@@ -636,10 +640,11 @@ static void balsa_window_real_open_mailbox(BalsaWindow *window, Mailbox *mailbox
 /*  label = gtk_label_new("blah"); PKGW: dunno why this was here. */
 
 	page = balsa_index_page_new(window);
-	if( balsa_index_page_load_mailbox(BALSA_INDEX_PAGE(page), mailbox) )
+	if( balsa_index_page_load_mailbox(BALSA_INDEX_PAGE(page), mailbox) ) {
 		/* The function will display a dialog on error */
+	        gtk_object_destroy( GTK_OBJECT(page) );
 		return;
-
+	}
 	label = gtk_label_new(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->mailbox->name);
 	
 	/* store for easy access */
@@ -1429,12 +1434,13 @@ show_all_headers_cb(GtkWidget * widget, gpointer data) {
       balsa_index_redraw_current ( BALSA_INDEX(index) );
 }
 
-
+#ifdef BALSA_SHOW_ALL
 static void
 filter_dlg_cb (GtkWidget * widget, gpointer data)
 {
   filter_edit_dialog (NULL);
 }
+#endif
 
 /*FIXME unused (#if0'ed out in GNOMEUI defs)
 static void

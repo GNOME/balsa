@@ -46,9 +46,17 @@ mailbox_node_new (const gchar * name, Mailbox * mb, gint i)
   mbn->IsDir = i;
   mbn->expanded = FALSE;
   mbn->style = 0;
+
   return mbn;
 }
 
+void mailbox_node_destroy(MailboxNode * mbn)
+{
+  g_return_if_fail(mbn != NULL);
+
+  g_free(mbn->name);
+  g_free(mbn);
+}
 gchar *
 g_get_host_name (void)
 {

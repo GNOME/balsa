@@ -737,6 +737,7 @@ config_global_load (void)
   else
     balsa_app.shown_headers = atoi (field);
 
+  g_free(balsa_app.selected_headers);
   if ((field = pl_dict_get_str (globals, "SelectedHeaders")) == NULL)
     balsa_app.selected_headers = g_strdup (DEFAULT_SELECTED_HDRS);
   else

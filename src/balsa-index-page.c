@@ -501,6 +501,7 @@ index_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer data)
 }
 
 
+#ifdef MSG_STATUS_USED
 /*
  * CLIST Callbacks
  */
@@ -522,7 +523,9 @@ message_status_set_new_cb (GtkWidget * widget, BalsaIndex *bindex)
       list = list->next;
     }    	   
 }
+#endif
 
+#ifdef MSG_STATUS_USED
 static void
 message_status_set_read_cb (GtkWidget * widget, BalsaIndex *bindex)
 {
@@ -541,7 +544,9 @@ message_status_set_read_cb (GtkWidget * widget, BalsaIndex *bindex)
       list = list->next;
     }
 }
+#endif
 
+#ifdef MSG_STATUS_USED
 static void
 message_status_set_answered_cb (GtkWidget * widget, BalsaIndex *bindex)
 {
@@ -560,6 +565,7 @@ message_status_set_answered_cb (GtkWidget * widget, BalsaIndex *bindex)
       list = list->next;
     }
 }
+#endif
 
 static GtkWidget *
 create_menu (BalsaIndex * bindex)

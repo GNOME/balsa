@@ -324,7 +324,8 @@ balsa_mblist_insert_mailbox (BalsaMBList * mblist,
 				  NULL, NULL,
 				  TRUE, FALSE);
   mbnode = mailbox_node_new (mailbox->name, mailbox, FALSE);
-  gtk_ctree_node_set_row_data (GTK_CTREE (mblist), ctnode, mbnode);
+  gtk_ctree_node_set_row_data_full (GTK_CTREE (mblist), ctnode, mbnode,
+				    (GtkDestroyNotify)mailbox_node_destroy);
 
 #ifdef BALSA_SHOW_INFO
   if (mblist->display_content_info){
@@ -888,7 +889,10 @@ balsa_mblist_mailbox_style (GtkCTree * ctree, GtkCTreeNode *node, MailboxNode *m
     if (mbnode->style & MBNODE_STYLE_ICONFULL) {
       style = gtk_widget_get_style (GTK_WIDGET (ctree));
       gtk_ctree_node_set_row_style (ctree, node, style);
-      gtk_style_unref (style);
+      /* this unref is not needed, since the style is unref'd in */
+      /* gtk_ctree_node_set_row_style, and we have made no additional */
+      /* ref's of our own */
+      /*  gtk_style_unref (style); */
       
       tmp_is_leaf = GTK_CTREE_ROW (node)->is_leaf;
       tmp_expanded = GTK_CTREE_ROW (node)->expanded;
@@ -992,7 +996,10 @@ balsa_mblist_folder_style (GtkCTree* ctree, GtkCTreeNode* node, gpointer data)
       /* This folder's style needs to be reset to the vanilla style */
       style = gtk_widget_get_style (GTK_WIDGET (ctree));
       gtk_ctree_node_set_row_style (ctree, node, style);
-      gtk_style_unref (style);
+      /* this unref is not needed, since the style is unref'd in */
+      /* gtk_ctree_node_set_row_style, and we have made no additional */
+      /* ref's of our own */
+      /*  gtk_style_unref (style); */
     
       mbnode->style &= ~MBNODE_STYLE_ICONFULL;
       return;

@@ -38,7 +38,7 @@ GtkWidget *balsa_mailbox_list_window_new(BalsaWindow *window);
 
 Mailbox *mblist_get_selected_mailbox (void);
 Mailbox *mblist_find_mbox_by_name (const gchar *name);
-GList * mblist_find_all_unread_mboxes();
+GList * mblist_find_all_unread_mboxes(void);
 void mblist_open_mailbox (Mailbox * mailbox);
 
 #endif /* MBLIST_WINDOW_H */

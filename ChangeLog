@@ -1,5 +1,10 @@
 2001-10-08  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* libbalsa/source-viewer.c: missing negation.
+	* configure.in: add explicit library list for pspell.
+
+2001-10-08  Pawel Salek  <pawsa@theochem.kth.se>
+
 	The mailbox commiting, the proper way.
 	* libbalsa/libbalsa.h: define MuttHeader.
 	* libbalsa/mailbox.[hc]: the proper mailbox_commit().

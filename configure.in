@@ -52,7 +52,7 @@ GNOME_X_CHECKS
 
 AC_CHECK_LIB(pspell, new_pspell_manager,,[
 	AC_MSG_ERROR([*** libpspell(-devel) not found.  Please check http://www.balsa.net for information on the required files.])
-])
+], -lstdc++ -lpspell-modules)
 
 dnl Reset
 # LDFLAGS="$balsa_save_LDFLAGS"

@@ -95,7 +95,7 @@ libbalsa_show_message_source(LibBalsaMessage* msg)
     HEADER* hdr;
     long length;
     g_return_if_fail(msg);
-    g_return_if_fail(CLIENT_CONTEXT_CLOSED(msg->mailbox));
+    g_return_if_fail(!CLIENT_CONTEXT_CLOSED(msg->mailbox));
     g_return_if_fail(msg->header);
 
     hdr = msg->header;

@@ -1,3 +1,8 @@
+2002-11-05  Peter Bloomfield <PeterB@cvs.gnome.org>
+
+        * libbalsa/files.c, src/sendmsg-window.c: move tests for icon
+          files to libbalsa.
+
 2002-11-02  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/main-window.c: use (locked) balsa_app.mailbox_nodes for

@@ -141,19 +141,18 @@ libbalsa_make_string_from_list(const GList * the_list)
 gchar *
 libbalsa_make_string_from_list_p(const GList * the_list)
 {
-    gchar *str;
     const GList *list;
     GString *gs = g_string_new(NULL);
-    LibBalsaAddress *addy;
 
     for (list = the_list; list; list = list->next) {
-	addy = list->data;
-	str = libbalsa_address_to_gchar_p(addy, 0);
-	if (str) {
+        LibBalsaAddress *addy = list->data;
+        gchar *str = libbalsa_address_to_gchar_p(addy, 0);
+
+        if (str) {
             if (gs->len > 0)
-	        g_string_append(gs, ", ");
-	    g_string_append(gs, str);
-	    g_free(str);
+                g_string_append(gs, ", ");
+            g_string_append(gs, str);
+            g_free(str);
         }
     }
 

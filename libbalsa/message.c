@@ -633,81 +633,13 @@ libbalsa_message_set_status_icons(LibBalsaMessage * message)
 	message->status_icon = LIBBALSA_MESSAGE_STATUS_ICONS_NUM;
 }
 
-static gboolean
-libbalsa_message_is_multipart_locked(LibBalsaMessage * message)
-{
-    const GMimeContentType *content_type;
-
-    if (message->mime_msg == NULL)
-	return message->is_multipart;
-
-    content_type =
-	g_mime_object_get_content_type(GMIME_OBJECT
-				       (message->mime_msg->mime_part));
-    return g_mime_content_type_is_type(content_type, "multipart", "*");
-}
-
-static gboolean
-libbalsa_message_has_attachment_locked(LibBalsaMessage * message)
-{
-    const GMimeContentType *content_type;
-
-    if (message->mime_msg == NULL)
-	return message->has_attachment;
-
-    /* FIXME: This is wrong, but less so than earlier versions; a message
-       has attachments if main message or one of the parts has 
-       Content-type: multipart/mixed AND members with
-       Content-disposition: attachment. Unfortunately, part list may
-       not be available at this stage. */
-    content_type =
-	g_mime_object_get_content_type(GMIME_OBJECT
-				       (message->mime_msg->mime_part));
-    return g_mime_content_type_is_type(content_type, "multipart", "mixed");
-}
-
-#ifdef HAVE_GPGME
-static gboolean
-libbalsa_message_is_pgp_signed_locked(LibBalsaMessage * message)
-{
-    const GMimeContentType *content_type;
-
-    if (message->mime_msg == NULL)
-	return message->is_pgp_signed;
-
-    content_type =
-	g_mime_object_get_content_type(GMIME_OBJECT
-				       (message->mime_msg->mime_part));
-    return g_mime_content_type_is_type(content_type, "multipart",
-				       "signed");
-}
-
-static gboolean
-libbalsa_message_is_pgp_encrypted_locked(LibBalsaMessage * message)
-{
-    const GMimeContentType *content_type;
-
-    if (message->mime_msg == NULL)
-	return message->is_pgp_encrypted;
-
-    content_type =
-	g_mime_object_get_content_type(GMIME_OBJECT
-				       (message->mime_msg->mime_part));
-    return g_mime_content_type_is_type(content_type, "multipart",
-				       "encrypted");
-}
-#endif
-
-/* Mailbox must be locked before calling. */
 static void
 libbalsa_message_set_attach_icons(LibBalsaMessage * message)
 {
-    g_assert(message->mailbox && message->mailbox->lock);
-
-    if (libbalsa_message_has_attachment_locked(message))
+    if (libbalsa_message_has_attachment(message))
 	message->attach_icon = LIBBALSA_MESSAGE_ATTACH_ATTACH;
 #ifdef HAVE_GPGME
-    else if (libbalsa_message_is_pgp_signed_locked(message)) {
+    else if (libbalsa_message_is_pgp_signed(message)) {
 	switch (message->sig_state) {
 	case LIBBALSA_MESSAGE_SIGNATURE_GOOD:
 	    message->attach_icon = LIBBALSA_MESSAGE_ATTACH_GOOD;
@@ -721,7 +653,7 @@ libbalsa_message_set_attach_icons(LibBalsaMessage * message)
 	default:
 	    message->attach_icon = LIBBALSA_MESSAGE_ATTACH_SIGN;
 	}
-    } else if (libbalsa_message_is_pgp_encrypted_locked(message))
+    } else if (libbalsa_message_is_pgp_encrypted(message))
 	message->attach_icon = LIBBALSA_MESSAGE_ATTACH_ENCR;
 #endif
     else
@@ -976,64 +908,73 @@ libbalsa_message_body_unref(LibBalsaMessage * message)
 gboolean
 libbalsa_message_is_multipart(LibBalsaMessage * message)
 {
-    gboolean res;
+    const GMimeContentType *content_type;
 
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
-    g_return_val_if_fail(message->mailbox, FALSE);
 
-    LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
-    res = libbalsa_message_is_multipart_locked(message);
-    UNLOCK_MAILBOX(message->mailbox);
-    return res;
+    if (message->mime_msg == NULL)
+	return message->is_multipart;
+
+    content_type =
+	g_mime_object_get_content_type(GMIME_OBJECT
+				       (message->mime_msg->mime_part));
+    return g_mime_content_type_is_type(content_type, "multipart", "*");
 }
 
 gboolean
 libbalsa_message_has_attachment(LibBalsaMessage * message)
 {
-    gboolean res;
+    const GMimeContentType *content_type;
 
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
-    g_return_val_if_fail(message->mailbox, FALSE);
 
-    LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
+    if (message->mime_msg == NULL)
+	return message->has_attachment;
 
     /* FIXME: This is wrong, but less so than earlier versions; a message
-              has attachments if main message or one of the parts has 
-	      Content-type: multipart/mixed AND members with
-	      Content-disposition: attachment. Unfortunately, part list may
-	      not be available at this stage. */
-    res = libbalsa_message_has_attachment_locked(message);
-    UNLOCK_MAILBOX(message->mailbox);
-    return res;
+       has attachments if main message or one of the parts has 
+       Content-type: multipart/mixed AND members with
+       Content-disposition: attachment. Unfortunately, part list may
+       not be available at this stage. */
+    content_type =
+	g_mime_object_get_content_type(GMIME_OBJECT
+				       (message->mime_msg->mime_part));
+    return g_mime_content_type_is_type(content_type, "multipart", "mixed");
 }
 
 #ifdef HAVE_GPGME
-gboolean 
+gboolean
 libbalsa_message_is_pgp_signed(LibBalsaMessage * message)
 {
-    gboolean res;
+    const GMimeContentType *content_type;
 
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
-    g_return_val_if_fail(message->mailbox, FALSE);
 
-    LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
-    res = libbalsa_message_is_pgp_signed_locked(message);
-    UNLOCK_MAILBOX(message->mailbox);
-    return res;
+    if (message->mime_msg == NULL)
+	return message->is_pgp_signed;
+
+    content_type =
+	g_mime_object_get_content_type(GMIME_OBJECT
+				       (message->mime_msg->mime_part));
+    return g_mime_content_type_is_type(content_type, "multipart",
+				       "signed");
 }
 
-gboolean 
+gboolean
 libbalsa_message_is_pgp_encrypted(LibBalsaMessage * message)
 {
-    gboolean res;
+    const GMimeContentType *content_type;
 
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
-    g_return_val_if_fail(message->mailbox, FALSE);
 
-    LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
-    res = libbalsa_message_is_pgp_encrypted_locked(message);
-    UNLOCK_MAILBOX(message->mailbox);
-    return res;
+    if (message->mime_msg == NULL)
+	return message->is_pgp_encrypted;
+
+    content_type =
+	g_mime_object_get_content_type(GMIME_OBJECT
+				       (message->mime_msg->mime_part));
+    return g_mime_content_type_is_type(content_type, "multipart",
+				       "encrypted");
 }
 #endif
 
@@ -1345,14 +1286,14 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
 
     if (message->mailbox) {
 	message->has_attachment =
-	    libbalsa_message_has_attachment_locked(message);
+	    libbalsa_message_has_attachment(message);
 	message->is_multipart =
-	    libbalsa_message_is_multipart_locked(message);
+	    libbalsa_message_is_multipart(message);
 #ifdef HAVE_GPGME
 	message->is_pgp_encrypted =
-	    libbalsa_message_is_pgp_encrypted_locked(message);
+	    libbalsa_message_is_pgp_encrypted(message);
 	message->is_pgp_signed =
-	    libbalsa_message_is_pgp_signed_locked(message);
+	    libbalsa_message_is_pgp_signed(message);
 #endif
     }
 }
@@ -1622,7 +1563,6 @@ libbalsa_message_load_envelope_from_file(LibBalsaMessage *message,
     return ret;
 }
 
-/* Mailbox must locked before calling. */
 void
 libbalsa_message_set_icons(LibBalsaMessage * message)
 {

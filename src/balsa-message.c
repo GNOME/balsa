@@ -223,7 +223,7 @@ message2html (Message * message)
       g_string_append (mbuff, "<br><b>To: </b>");
 
       /* to */
-      buff = text2html (make_string_from_list(message->to_list));
+      buff = text2html (make_string_from_list (message->to_list));
       g_string_append (mbuff, buff);
       g_free (buff);
     }
@@ -235,8 +235,8 @@ message2html (Message * message)
       /* from */
       if (message->from->personal)
 	snprintf (tbuff, 1024, "%s <%s>",
-		 message->from->personal,
-		 message->from->mailbox);
+		  message->from->personal,
+		  message->from->mailbox);
       else
 	snprintf (tbuff, 1024, "%s", message->from->mailbox);
 
@@ -261,11 +261,14 @@ message2html (Message * message)
     {
       body = (Body *) message->body_list->data;
       if (body)
-	{
-	  buff = text2html (body->buffer);
-	  g_string_append (mbuff, buff);
-	  g_free (buff);
-	}
+	if (body->buffer)
+	  {
+	    g_print (body->buffer);
+	    buff = text2html (body->buffer);
+	    g_print (buff);
+	    g_string_append (mbuff, buff);
+	    g_free (buff);
+	  }
     }
 
   g_string_append (mbuff, "</tt></p></body></html>");

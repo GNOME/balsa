@@ -1078,7 +1078,8 @@ message_body_ref (Message * message)
   STATE s;
   gchar *buf;
   gchar tmpfile[PATH_MAX];
-
+  size_t size;
+  
   if (!message)
     return;
 
@@ -1111,7 +1112,11 @@ message_body_ref (Message * message)
       fclose (fp);
 
       fflush (s.fpout);
-      readfile (s.fpout, &buf);
+      size = readfile (s.fpout, &buf);
+
+      buf[size-1] = '\0';
+      
+   g_print("<<<\"%s\">>>\n", buf);
 
       fclose (s.fpout);
 

@@ -1,3 +1,14 @@
+2004-11-19 12:30  PeterB
+
+	* libbalsa/: address-entry.c, address-entry.h: implement
+	libbalsa_address_entry_show_matches, to force address completion
+	with expensive address books.
+	* src/sendmsg-window.c: make ctrl+R context-dependent--its action
+	is now libbalsa_address_entry_show_matches when the focus widget is
+	a GtkEntry.
+	* src/balsa-index.c: check msgnos->len instead of
+	index->selected->len before moving messages.
+
 2004-11-17 18:18  PeterB
 
 	* libbalsa/mailbox_mbox.c: use fstat instead of stat while mailbox

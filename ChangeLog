@@ -1,3 +1,7 @@
+2004-02-01 09:11  PeterB
+
+	* libbalsa/address-entry.h: include "address.h".
+
 2004-01-31 16:05  PeterB
 
 	* libbalsa/address-entry.c: replace control characters with spaces;

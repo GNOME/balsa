@@ -157,6 +157,15 @@ struct option_t MuttVars[] = {
   ** If this variable is set, Mutt will always use SSL when
   ** connecting to IMAP servers.
   */
+# ifndef USE_NSS  
+  { "ssl_starttls", DT_QUAD, R_NONE, OPT_SSLSTARTTLS, M_YES },
+  /*
+  ** .pp
+  ** If set (the default), mutt will attempt to use STARTTLS on servers
+  ** advertising the capability. When unset, mutt will not attempt to
+  ** use STARTTLS regardless of the server's capabilities.
+  */
+# endif  
 # endif
 { "imap_list_subscribed",     DT_BOOL, R_NONE, OPTIMAPLSUB, 0 },
   /*

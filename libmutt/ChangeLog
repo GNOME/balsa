@@ -1,3 +1,7 @@
+2001-11-08  Carlos Morgado  <chbm@chbm.nu>
+
+	* configure.in: build with --with-gss=no
+
 2001-11-07  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* configure.in: change GSS detection to balsa style. Frankly, I think

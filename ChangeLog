@@ -1,3 +1,7 @@
+2001-11-08  Carlos Morgado  <chbm@chbm.nu>
+
+	* configure.in: gss stuff tweak
+
 2001-11-07  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* configure.in: reorder GSS linking order (as hinted by RH).

@@ -537,10 +537,10 @@ if test "x$with_gss" != xno  ; then
            done
 	fi
    fi
-   if -z "$gssdir"; then
+   if test -z "$gssdir"; then
       AC_MSG_ERROR([GSS requested but no GSS headers found ,$gssdir,.])
    else
-      AC_MSG_RESULT(yes)
+      AC_MSG_RESULT($gsslib)
       AC_CHECK_LIB(gssapi, gss_init_sec_context, [
 	  LIBS="$LIBS -L$gssdir/lib -lgssapi -lkrb5"
       ],[
@@ -548,7 +548,12 @@ if test "x$with_gss" != xno  ; then
       ], -lkrb5 -ldes -lasn1 -lroken -lcrypt -lcom_err -L$gssdir/lib)
       CFLAGS="$CFLAGS -I$gssdir/include"
    fi
+else
+   AC_MSG_RESULT(no)
+   gssdir=no
 fi
+AM_CONDITIONAL(USE_GSS, test x$gssdir != xno)
+
 
 dnl ###########################################################################
 dnl turn warnings into errors to enforce clean code

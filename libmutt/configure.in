@@ -248,19 +248,27 @@ if test "x$with_gss" != xno  ; then
            done
 	fi
    fi
-   if -z "$gssdir"; then
+   if test -z "$gssdir"; then
       AC_MSG_ERROR([GSS requested but no GSS headers found ,$gssdir,.])
    else
-      AC_MSG_RESULT(yes)
+      AC_MSG_RESULT($gssdir)
       AC_CHECK_LIB(gssapi, gss_init_sec_context, [
 	  LIBS="$LIBS -L$gssdir/lib -lgssapi -lkrb5"
       ],[
 	  LIBS="$LIBS -L$gssdir/lib -lgssapi_krb5"
       ], -lkrb5 -ldes -lasn1 -lroken -lcrypt -lcom_err -L$gssdir/lib)
       CFLAGS="$CFLAGS -I$gssdir/include"
-   fi
+    fi
+else 
+   AC_MSG_RESULT(no)
+   gssdir=no
 fi
 AM_CONDITIONAL(USE_GSS, test x$gssdir != xno)
+
+
+dnl ##########################################################################
+dnl Enable SSL ?
+dnl ##########################################################################
 
 AC_ARG_WITH(ssl, [    --with-ssl[=PFX]         Compile in SSL socket support for IMAP],
 [	if test "$with_ssl" != "no"
@@ -289,7 +297,7 @@ AC_ARG_WITH(ssl, [    --with-ssl[=PFX]         Compile in SSL socket support for
 	  LIBS="$saved_LIBS"
 	  MUTTLIBS="$MUTTLIBS -lssl -lcrypto"
 	  need_ssl=yes
-
+          
           dnl Some systems avoid certain patent-encumbered SSL routines
           AC_CHECK_HEADER(openssl/rc5.h,,AC_DEFINE(NO_RC5))
           AC_CHECK_HEADER(openssl/idea.h,,AC_DEFINE(NO_IDEA))

@@ -621,10 +621,10 @@ libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
 static void
 libbalsa_message_set_status_icons(LibBalsaMessage * message)
 {
-    if (LIBBALSA_MESSAGE_IS_UNREAD(message))
-	message->status_icon = LIBBALSA_MESSAGE_STATUS_UNREAD;
-    else if (LIBBALSA_MESSAGE_IS_DELETED(message))
+    if (LIBBALSA_MESSAGE_IS_DELETED(message))
 	message->status_icon = LIBBALSA_MESSAGE_STATUS_DELETED;
+    else if (LIBBALSA_MESSAGE_IS_UNREAD(message))
+	message->status_icon = LIBBALSA_MESSAGE_STATUS_UNREAD;
     else if (LIBBALSA_MESSAGE_IS_FLAGGED(message))
 	message->status_icon = LIBBALSA_MESSAGE_STATUS_FLAGGED;
     else if (LIBBALSA_MESSAGE_IS_REPLIED(message))
@@ -665,9 +665,9 @@ libbalsa_message_set_flag(LibBalsaMessage * message, LibBalsaMessageFlag set, Li
 {
     message->flags |= set;
     message->flags &= ~clear;
+    libbalsa_message_set_status_icons(message);
     libbalsa_mailbox_change_message_flags(message->mailbox, message->msgno,
 					  set, clear);
-    libbalsa_message_set_status_icons(message);
 }
 
 void
@@ -694,16 +694,16 @@ libbalsa_messages_change_flag(GList * messages,
                               LibBalsaMessageFlag flag,
                               gboolean set)
 {
+    GList *list;
     GList * notif_list = NULL;
     LibBalsaMessage * message;
 
     /* Construct the list of messages that actually change state */
-    while (messages) {
-	message = LIBBALSA_MESSAGE(messages->data);
+    for (list = messages; list; list = list->next) {
+	message = LIBBALSA_MESSAGE(list->data);
  	if ( (set && !(message->flags & flag)) ||
              (!set && (message->flags & flag)) )
 	    notif_list = g_list_prepend(notif_list, message);
-	messages = g_list_next(messages);
     }
     
     if (notif_list) {

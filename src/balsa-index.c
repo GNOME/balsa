@@ -1006,7 +1006,8 @@ bndx_find_row_func(LibBalsaMessage * message,
 
     if (flag) {
         /* looking for flagged messages */
-        if (!LIBBALSA_MESSAGE_HAS_FLAG(message, flag))
+        if (LIBBALSA_MESSAGE_IS_DELETED(message)
+	    || !LIBBALSA_MESSAGE_HAS_FLAG(message, flag))
             return FALSE;
     } else if (conditions) {
 	if (!libbalsa_mailbox_message_match(message->mailbox, message,
@@ -1152,7 +1153,8 @@ thread_has_unread(BalsaIndex * index, GtkTreeIter * iter)
         gtk_tree_model_get(model, &child_iter,
                            LB_MBOX_MESSAGE_COL, &message, -1);
 
-        if (LIBBALSA_MESSAGE_IS_UNREAD(message) ||
+        if ((!LIBBALSA_MESSAGE_IS_DELETED(message) &&
+	     LIBBALSA_MESSAGE_IS_UNREAD(message)) ||
             thread_has_unread(index, &child_iter))
             return TRUE;
     } while (gtk_tree_model_iter_next(model, &child_iter));

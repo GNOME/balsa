@@ -960,7 +960,8 @@ libbalsa_mailbox_copy_message(LibBalsaMessage * message,
     LOCK_MAILBOX_RETURN_VAL(dest, -1);
 
     retval = LIBBALSA_MAILBOX_GET_CLASS(dest)->add_message(dest, message);
-    if (retval > 0 && LIBBALSA_MESSAGE_IS_UNREAD(message))
+    if (retval > 0 && !LIBBALSA_MESSAGE_IS_DELETED(message)
+	&& LIBBALSA_MESSAGE_IS_UNREAD(message))
 	dest->has_unread_messages = TRUE;
 
     UNLOCK_MAILBOX(dest);
@@ -1456,7 +1457,8 @@ mbox_model_get_value(GtkTreeModel *tree_model,
 	g_value_set_pointer(value, msg); break;
     case LB_MBOX_WEIGHT_COL:
 	g_value_set_uint(value,
-			 (msg && LIBBALSA_MESSAGE_IS_UNREAD(msg)) ?
+			 (msg && !LIBBALSA_MESSAGE_IS_DELETED(msg)
+			  && LIBBALSA_MESSAGE_IS_UNREAD(msg)) ?
 			 PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
 	break;
     }

@@ -306,9 +306,8 @@ libbalsa_mailbox_link_message(LibBalsaMailboxLocal *mailbox,
     msg->mailbox = mbx;
     mailbox->msg_list = g_list_prepend(mailbox->msg_list, msg);
 
-    if (LIBBALSA_MESSAGE_IS_DELETED(msg))
-        return;
-    if (LIBBALSA_MESSAGE_IS_UNREAD(msg))
+    if (LIBBALSA_MESSAGE_IS_UNREAD(msg)
+	&& !LIBBALSA_MESSAGE_IS_DELETED(msg))
         mbx->unread_messages++;
     libbalsa_mailbox_msgno_inserted(mbx, msg->msgno);
 }

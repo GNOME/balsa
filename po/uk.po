@@ -1056,19 +1056,19 @@ msgstr "Стерти поштову скриньку"
 
 #: src/mblist-window.c:422
 msgid "Mark as Inbox"
-msgstr ""
+msgstr "Помитити як Вх╕дн╕"
 
 #: src/mblist-window.c:423
 msgid "Mark as Sentbox"
-msgstr ""
+msgstr "Пом╕тити як В╕д╕слан╕"
 
 #: src/mblist-window.c:424
 msgid "Mark as Trash"
-msgstr ""
+msgstr "Пом╕тити як См╕тник"
 
 #: src/mblist-window.c:425
 msgid "Mark as Draftbox"
-msgstr ""
+msgstr "Пом╕тити як Чорновики"
 
 #: src/mblist-window.c:448 src/mblist-window.c:464 src/mblist-window.c:482
 #: src/mblist-window.c:497

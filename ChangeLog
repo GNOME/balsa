@@ -1,3 +1,8 @@
+2001-02-21  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/mailbox_local.c: (libbalsa_mailbox_local_set_path) fix
+	bug reported on list, create local mbox when needed.
+
 2001-02-18  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-index.c: fix threading.

@@ -170,9 +170,14 @@ libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 
     if ( LIBBALSA_MAILBOX_LOCAL(mailbox)->path != NULL ) {
 	if (g_strcasecmp(path, LIBBALSA_MAILBOX_LOCAL(mailbox)->path) == 0)
-	    return 0;
-	if ((i = rename(LIBBALSA_MAILBOX_LOCAL(mailbox)->path, path)) != 0)
-	    return i;
+	    i = 0;
+	else
+	    i = rename(LIBBALSA_MAILBOX_LOCAL(mailbox)->path, path);
+    } else {
+	/* doesn't yet exist, we touch it */
+	i = open( path, O_CREAT | O_NDELAY | O_RDONLY , 0600 );
+	if(i>-1)
+	    close(i);
     }
 
     /* update mailbox data */
@@ -180,7 +185,7 @@ libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
     g_free(mailbox->path);
     mailbox->path = g_strdup(path);
     libbalsa_notify_register_mailbox(LIBBALSA_MAILBOX(mailbox));
-    return 0;
+    return i;
 }
 
 void

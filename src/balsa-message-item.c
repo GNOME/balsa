@@ -176,39 +176,24 @@ bm_item_new (BalsaMessage * bm)
   GnomeCanvasGroup *parent;
 
   GnomeCanvasItem *new;
-  GtkWidget *html;
+
+  gchar *buff;
 
   parent = gnome_canvas_root (GNOME_CANVAS (bm));
 
   g_return_val_if_fail (parent != NULL, NULL);
   g_return_val_if_fail (GNOME_IS_CANVAS_GROUP (parent), NULL);
 
-  html = gtk_xmhtml_new ();
+  new = gnome_canvas_item_new(parent,
+		  gnome_canvas_text_get_type(),
+		  "text", "",
+		  "x", 10.0,
+		  "y", 10.0,
+                  "font", "-adobe-helvetica-medium-r-normal--12-*-72-72-p-*-iso8859-1",
+                  "anchor", GTK_ANCHOR_NW,
+                  "fill_color", "black",
+		  NULL); 
 
-  /* create the HTML widget to render the message */
-  gtk_xmhtml_source (GTK_XMHTML (html), "");
-  gtk_widget_show (html);
-  gtk_widget_ref (html);
-  gtk_signal_connect (GTK_OBJECT (html),
-		      "activate",
-		      GTK_SIGNAL_FUNC (bm_item_handle_mime_part),
-		      NULL);
-
-  new = gnome_canvas_item_new (parent,
-			       gnome_canvas_widget_get_type (),
-			       "widget", html,
-			       "x", 0.0, "y", 0.0,
-			       "width", 100.0, "height", 40.0,
-			       "anchor", GTK_ANCHOR_NW,
-			       "size_pixels", FALSE, NULL);
-#if 0
-  new = gnome_canvas_item_new (parent,
-			       gnome_canvas_rect_get_type (),
-			       "x1", 0.0, "y1", 0.0,
-			       "x2", 500.0, "y2", 300.0,
-			       "fill_color", "blue", NULL);
-#endif
-  gtk_widget_show (html);
   return GNOME_CANVAS_ITEM (new);
 }
 
@@ -218,12 +203,9 @@ bm_item_set (BalsaMessage * bmessage,
 	     Message * message)
 {
   gchar *buff;
-  GtkWidget *html;
 
   g_return_if_fail (bmessage != NULL);
   g_return_if_fail (message != NULL);
-#if 0
-  html = GNOME_CANVAS_WIDGET (item)->widget;
 
   if (bmessage->message == message)
     return;
@@ -234,8 +216,7 @@ bm_item_set (BalsaMessage * bmessage,
   /* set message contents */
   buff = content2html (message);
 
-  gtk_xmhtml_source (GTK_XMHTML (html), buff);
+  gnome_canvas_item_set(item, "text", buff, NULL);
 
   message_body_unref (bmessage->message);
-#endif
 }

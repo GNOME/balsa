@@ -272,10 +272,9 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   gtk_container_border_width (GTK_CONTAINER (vbox), 2);
   gtk_widget_show (vbox);
 
-  table = gtk_table_new (5, 3, FALSE);
+  table = gtk_table_new (5, 2, FALSE);
   gtk_table_set_row_spacings (GTK_TABLE (table), 2);
   gtk_table_set_col_spacings (GTK_TABLE (table), 2);
-  gtk_table_set_col_spacing(GTK_TABLE(table), 1, 10);
   gtk_box_pack_start (GTK_BOX (vbox), table, TRUE, TRUE, 0);
   gtk_widget_show (table);
 
@@ -287,7 +286,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   gtk_widget_show (label);
   msg->to = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), msg->to, 1, 2, 0, 1,
-		    GTK_FILL, GTK_FILL, 0, 0);
+		    GTK_FILL|GTK_EXPAND, GTK_FILL, 0, 0);
   if (type == 1)
     {
       gtk_entry_set_text (GTK_ENTRY (msg->to), get_header_replyto (bindex->stream, row));
@@ -302,7 +301,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   gtk_widget_show (label);
   msg->from = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), msg->from, 1, 2, 1, 2,
-		    GTK_FILL, GTK_FILL, 0, 0);
+		    GTK_FILL|GTK_EXPAND, GTK_FILL, 0, 0);
   GTK_WIDGET_UNSET_FLAGS (msg->from, GTK_CAN_FOCUS);
   gtk_entry_set_editable (GTK_ENTRY (msg->from), FALSE);
 
@@ -332,7 +331,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
     }
 
   gtk_table_attach (GTK_TABLE (table), msg->subject, 1, 2, 2, 3,
-		    GTK_FILL, GTK_FILL, 0, 0);
+		    GTK_FILL|GTK_EXPAND, GTK_FILL, 0, 0);
   gtk_widget_show (msg->subject);
 
   label = gtk_label_new ("cc:");
@@ -342,7 +341,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   gtk_widget_show (label);
   msg->cc = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), msg->cc, 1, 2, 3, 4,
-		    GTK_FILL, GTK_FILL, 0, 0);
+		    GTK_FILL|GTK_EXPAND, GTK_FILL, 0, 0);
   gtk_widget_show (msg->cc);
 
   label = gtk_label_new ("bcc:");
@@ -352,13 +351,13 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   gtk_widget_show (label);
   msg->bcc = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), msg->bcc, 1, 2, 4, 5,
-		    GTK_FILL, GTK_FILL, 0, 0);
+		    GTK_FILL|GTK_EXPAND, GTK_FILL, 0, 0);
   gtk_widget_show (msg->bcc);
 
 
 
   table = gtk_table_new (2, 2, FALSE);
-  gtk_box_pack_start (GTK_BOX (vbox), table, TRUE, TRUE, 0);
+  gtk_box_pack_end (GTK_BOX (vbox), table, TRUE, TRUE, 0);
   gtk_widget_show (table);
 
   msg->text = gtk_text_new (NULL, NULL);

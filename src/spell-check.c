@@ -1174,11 +1174,13 @@ next_word (BalsaSpellCheck* spell_check)
         line_array_base = g_strsplit (text, "\n", -1);
         line_array = line_array_base;
         line = g_strconcat (*line_array, "\n", NULL);
-                
-        while (!in_line && line && is_a_quote (line, &quoted_rex)) {
+        
+        while (!in_line && line && !balsa_app.check_quoted &&
+               is_a_quote (line, &quoted_rex)) {
                 if (balsa_app.debug) {
-                        balsa_information (LIBBALSA_INFORMATION_DEBUG, "BalsaSpellCheck: Ignore Quoted: %s\n", 
-                                 line);
+                        balsa_information (LIBBALSA_INFORMATION_DEBUG,
+                                           "BalsaSpellCheck: Ignore Quoted: %s\n", 
+                                           line);
                 }
                 
                 offset += strlen (line); 
@@ -1186,13 +1188,17 @@ next_word (BalsaSpellCheck* spell_check)
 
                 g_free (line);
                 line = *(++line_array);
-
                 if (line)
                         line = g_strconcat (line, "\n", NULL);
         }
+                
+        
+        if (!in_line && line && !balsa_app.check_sig)
+                if (g_strncasecmp (line, "-- \n", 4) == 0)
+                        at_end = TRUE;
 
         /* match the next word */      
-        if (line) {
+        if (!at_end && line) {
                 rm[0].rm_so = 0;
                 rm[0].rm_eo = 0;
                 regexec (&new_word_rex, line, 1, rm, 0);
@@ -1211,17 +1217,19 @@ next_word (BalsaSpellCheck* spell_check)
         } else {
                 at_end = TRUE;
         }
-        
+
         g_strfreev (line_array_base);
         g_free (text);
         regfree (&quoted_rex);
         regfree (&new_word_rex);
 
         /* check to see if we're at the end yet */
-        if (spell_check->end_pos >= spell_check->length) 
-                at_end = TRUE;
-        else if (spell_check->start_pos == spell_check->end_pos)
-                at_end = !next_word (spell_check);
+        if (!at_end) {
+                if (spell_check->end_pos >= spell_check->length) 
+                        at_end = TRUE;
+                else if (spell_check->start_pos == spell_check->end_pos)
+                        at_end = !next_word (spell_check);
+        }
 
         if (at_end) {
                 in_line = FALSE;

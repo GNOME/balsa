@@ -1,3 +1,14 @@
+2000-09-19  Matthew Guenther <guentherm@asme.org>
+
+	* README: Add (another!) note about pspell library dependency.
+	* src/balsa-app.h: Add check_sig, check_quoted, default to FALSE.
+	* src/pref-manager.c: Add preference whether to check the
+	signature and quoted text when spell checking messages.
+	* src/save-restore.c: Save signature, quoted text checking
+	preference.
+	* src/spell-check.c: Signature checking disabling, quoted text
+	checking preference, fix problem with selecting next word.
+	
 2000-09-19  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/main.c, src/sendmsg-window.c: quit when -m option launch

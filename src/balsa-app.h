@@ -80,6 +80,8 @@
 #define DEFAULT_PSPELL_MODULE SPELL_CHECK_MODULE_ISPELL
 #define DEFAULT_PSPELL_SUGGEST_MODE SPELL_CHECK_SUGGEST_NORMAL
 #define DEFAULT_PSPELL_IGNORE_SIZE 0
+#define DEFAULT_CHECK_SIG FALSE
+#define DEFAULT_CHECK_QUOTED FALSE
 
 
 enum
@@ -264,6 +266,8 @@ extern struct BalsaApplication
   SpellCheckModule module;
   SpellCheckSuggestMode suggestion_mode;
   guint ignore_size;
+  gboolean check_sig;
+  gboolean check_quoted;
 
   /* Information messages */
   BalsaInformationShow information_message;

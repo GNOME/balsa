@@ -365,6 +365,9 @@ config_global_load (void)
   balsa_app.module = d_get_gint ("PspellModule", DEFAULT_PSPELL_MODULE);
   balsa_app.suggestion_mode = d_get_gint ("PspellSuggestMode", DEFAULT_PSPELL_SUGGEST_MODE);
   balsa_app.ignore_size = d_get_gint ("PspellIgnoreSize", DEFAULT_PSPELL_IGNORE_SIZE);
+  balsa_app.check_sig = d_get_gint ("SpellCheckSignature", DEFAULT_CHECK_SIG);
+  balsa_app.check_quoted = d_get_gint ("SpellCheckQuoted", 
+                                       DEFAULT_CHECK_QUOTED);
 
   gnome_config_pop_prefix();
 
@@ -520,6 +523,8 @@ config_save (void)
   gnome_config_set_int ("PspellModule", balsa_app.module);
   gnome_config_set_int ("PspellSuggestMode", balsa_app.suggestion_mode);
   gnome_config_set_int ("PspellIgnoreSize", balsa_app.ignore_size);
+  gnome_config_set_int ("SpellCheckSignature", balsa_app.check_sig);
+  gnome_config_set_int ("SpellCheckQuoted", balsa_app.check_quoted);
 
   gnome_config_pop_prefix();
 

@@ -102,6 +102,8 @@ typedef struct _PropertyUI {
         GtkWidget* suggestion_mode;
         gint suggestion_mode_index;
         GtkWidget* ignore_length;
+        GtkWidget* spell_check_sig;
+        GtkWidget* spell_check_quoted;
 
 } PropertyUI;
 
@@ -305,6 +307,15 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 	gtk_signal_connect (GTK_OBJECT (pui->rb_smtp_server), "toggled",
 			    GTK_SIGNAL_FUNC (smtp_changed), NULL);
+
+        gtk_signal_connect (GTK_OBJECT (pui->spell_check_sig), "toggled",
+                            GTK_SIGNAL_FUNC (properties_modified_cb), 
+                            property_box);
+
+        gtk_signal_connect (GTK_OBJECT (pui->spell_check_quoted), "toggled",
+                            GTK_SIGNAL_FUNC (properties_modified_cb),
+                            property_box);
+
 	gtk_signal_connect (GTK_OBJECT (pui->smtp_server), "changed",
 			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 	gtk_signal_connect (GTK_OBJECT (pui->mail_directory), "changed",
@@ -554,6 +565,10 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
         balsa_app.module = pui->module_index;
         balsa_app.suggestion_mode = pui->suggestion_mode_index;
         balsa_app.ignore_size = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (pui->ignore_length));
+        balsa_app.check_sig = 
+                GTK_TOGGLE_BUTTON (pui->spell_check_sig)->active;
+        balsa_app.check_quoted = 
+                GTK_TOGGLE_BUTTON (pui->spell_check_quoted)->active;
         
 	/* date format */
 	g_free (balsa_app.date_string);
@@ -718,6 +733,11 @@ set_prefs (void)
                                      balsa_app.suggestion_mode);
         gtk_spin_button_set_value (GTK_SPIN_BUTTON (pui->ignore_length), 
                                    balsa_app.ignore_size);
+        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->spell_check_sig),
+                                      balsa_app.check_sig);
+        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->spell_check_quoted), balsa_app.check_quoted);
+
+        
 	/* date format */
 	if(balsa_app.date_string) 
                 gtk_entry_set_text (GTK_ENTRY (pui->date_format),
@@ -1568,7 +1588,7 @@ create_printing_page ( )
 
 static GtkWidget* create_spelling_page (void)
 {
-        GtkWidget* frame;
+        GtkWidget* frame0;
         GtkWidget* vbox0;
         GtkWidget* vbox1;
         GtkWidget* hbox0;
@@ -1582,19 +1602,25 @@ static GtkWidget* create_spelling_page (void)
         GtkWidget* omenu;
         GtkObject* ignore_adj;
         GtkWidget* ignore_spin;
+
+        GtkWidget* frame1;
+        GtkWidget* vbox2;
+        GtkWidget* sig_check_toggle;
+        GtkWidget* check_quoted_toggle;
         
         const guint padding = 5;
 
-        vbox0 = gtk_vbox_new (FALSE, padding*2);
+        vbox0 = gtk_vbox_new (FALSE, 0);
+        gtk_container_set_border_width (GTK_CONTAINER (vbox0), padding);
 
         /* pspell frame */
-        frame = gtk_frame_new (_("Pspell Settings"));
-        gtk_box_pack_start (GTK_BOX (vbox0), frame, FALSE, FALSE, 0);
-        gtk_container_set_border_width (GTK_CONTAINER (frame), padding*2);
+        frame0 = gtk_frame_new (_("Pspell Settings"));
+        gtk_box_pack_start (GTK_BOX (vbox0), frame0, FALSE, FALSE, 0);
+        gtk_container_set_border_width (GTK_CONTAINER (frame0), padding);
         vbox1 = gtk_vbox_new (FALSE, padding);
         
         gtk_container_set_border_width (GTK_CONTAINER (vbox1), padding);
-        gtk_container_add (GTK_CONTAINER (frame), vbox1);
+        gtk_container_add (GTK_CONTAINER (frame0), vbox1);
         
         /* do the module menu */
         omenu = create_spelling_option_menu (spell_check_modules_name, 
@@ -1636,8 +1662,24 @@ static GtkWidget* create_spelling_page (void)
         pui->ignore_length = ignore_spin;
 
 
-        /* ignore quoted check box */
+        /* ignore signature check box */
+        frame1 = gtk_frame_new (_ ("Misc Spelling Settings"));
+        gtk_box_pack_start (GTK_BOX (vbox0), frame1, FALSE, FALSE, 0);
+        gtk_container_set_border_width (GTK_CONTAINER (frame1), padding);
+        vbox2 = gtk_vbox_new (FALSE, padding);
         
+        gtk_container_set_border_width (GTK_CONTAINER (vbox2), padding);
+        gtk_container_add (GTK_CONTAINER (frame1), vbox2);
+
+        sig_check_toggle = gtk_check_button_new_with_label ("Check signature");
+        gtk_box_pack_start (GTK_BOX (vbox2), sig_check_toggle, 
+                            FALSE, FALSE, 0);
+        pui->spell_check_sig = sig_check_toggle;
+
+        check_quoted_toggle = gtk_check_button_new_with_label ("Check quoted");
+        gtk_box_pack_start (GTK_BOX (vbox2), check_quoted_toggle,
+                            FALSE, FALSE, 0);
+        pui->spell_check_quoted = check_quoted_toggle;
         
         gtk_widget_show_all (vbox0);
         return vbox0;

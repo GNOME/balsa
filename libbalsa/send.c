@@ -782,6 +782,22 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
     return TRUE;
 }
 
+static void
+disp_recipient_status(smtp_recipient_t recipient,
+                      const char *mailbox, void *arg)
+{
+  const smtp_status_t *status = smtp_recipient_status (recipient);
+
+  if(status->code != 0) {
+      libbalsa_information(
+                           LIBBALSA_INFORMATION_WARNING, 
+                           _("Could not send the message to %s:\n"
+                             "%d: %s\n"
+                             "Message left in your outbox.\n"), 
+                           mailbox, status->code, status->text);
+      (*(int*)arg)++;
+  }
+}
 
 static void
 handle_successful_send (smtp_message_t message, void *be_verbose)
@@ -811,11 +827,27 @@ handle_successful_send (smtp_message_t message, void *be_verbose)
         libbalsa_messages_flag(messages, FALSE);
 	g_list_free(messages);
 	/* XXX - Show the poor user the status codes and message. */
-        if(*(gboolean*)be_verbose)
+        if(*(gboolean*)be_verbose) {
+            int cnt = 0;
+            status = smtp_reverse_path_status(message);
+            if(status->code != 250) {
+                libbalsa_information(
+                                     LIBBALSA_INFORMATION_ERROR, 
+                                     _("Relaying refused:\n"
+                                       "%d: %s\n"
+                                       "Message left in your outbox.\n"), 
+                                     status->code, status->text);
+                cnt++;
+            }
+            smtp_enumerate_recipients (message, disp_recipient_status, &cnt);
+            if(cnt==0) { /* other error */
             libbalsa_information(
-	    LIBBALSA_INFORMATION_WARNING, 
-	    _("Message submission problem, placing it into your outbox.\n" 
-	      "System will attempt to resubmit the message until you delete it."));
+           LIBBALSA_INFORMATION_WARNING,
+           _("Message submission problem, placing it into your outbox.\n"
+             "System will attempt to resubmit the message until you delete it."));
+
+            }
+        }
     }
     if (mqi != NULL && mqi->refcount <= 0)
         msg_queue_item_destroy(mqi);
@@ -1142,7 +1174,9 @@ balsa_send_message_real(SendMessageInfo* info) {
    libmutt calls. Also, structure info should be freed before exiting.
 */
 
-static guint balsa_send_message_real(SendMessageInfo* info) {
+static guint
+balsa_send_message_real(SendMessageInfo* info)
+{
     MessageQueueItem *mqi, *next_message;
     int i;
 #ifdef BALSA_USE_THREADS

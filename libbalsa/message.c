@@ -698,17 +698,6 @@ libbalsa_messages_change_flag(GList * messages,
     g_array_free(msgnos, TRUE);
 }
 
-void
-libbalsa_message_clear_recent(LibBalsaMessage * message)
-{
-    g_return_if_fail(message->mailbox);
-
-    libbalsa_lock_mailbox(message->mailbox);
-    RETURN_IF_MAILBOX_CLOSED(message->mailbox);
-    libbalsa_message_set_flag(message, 0, LIBBALSA_MESSAGE_FLAG_RECENT);
-    libbalsa_unlock_mailbox(message->mailbox);
-}
-
 #ifdef DEBUG
 static char *
 mime_content_type2str(int contenttype)

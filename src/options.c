@@ -27,7 +27,11 @@ static GtkWidget *account_list;
 static personality_box_options *options = NULL;
 
 void update_personality_box (GtkWidget *, personality_box_options *);
-void personality_pop3_edit(GtkWidget *,gpointer);
+
+void personality_edit (GtkWidget *, gpointer);
+void personality_pop3_edit (Personality *);
+void personality_imap_edit (Personality *);
+void personality_mbox_edit (Personality *);
 
 gint
 delete_event (GtkWidget * widget, gpointer data)
@@ -482,10 +486,10 @@ personality_box (GtkWidget * widget, gpointer data)
   gtk_widget_set_usize (button, 70, 30);
   gtk_box_pack_start (GTK_BOX (vbox), button, TRUE, FALSE, 10);
 
-   gtk_signal_connect_object (GTK_OBJECT (button),
-   "clicked",
-   (GtkSignalFunc) personality_pop3_edit,
-   NULL);
+  gtk_signal_connect_object (GTK_OBJECT (button),
+			     "clicked",
+			     (GtkSignalFunc) personality_edit,
+			     NULL);
 
   gtk_widget_show (button);
 
@@ -536,7 +540,9 @@ personality_box (GtkWidget * widget, gpointer data)
 	  fprintf (stderr, "%s\n", ((Personality *) (list->data))->name);
 	  list_items[0] = ((Personality *) (list->data))->name;
 	  list_items[1] = "POP3";
-	  gtk_clist_append (GTK_CLIST (account_list), list_items);
+	  gtk_clist_set_row_data (GTK_CLIST (account_list),
+		    gtk_clist_append (GTK_CLIST (account_list), list_items),
+				  ((Personality *) (list->data)));
 
 	  list = list->next;
 	}
@@ -571,8 +577,42 @@ personality_box (GtkWidget * widget, gpointer data)
   gtk_widget_show (window);
 }
 
+gint selected_clist_row (GtkWidget * clist)
+{
+  GList *l;
+  GtkCListRow *row;
+  gint x;
+
+  x = 0;
+  l = GTK_CLIST (clist)->row_list;
+  while (l)
+    {
+      row = l->data;
+      l = l->next;
+
+      if (row->state == GTK_STATE_SELECTED)
+	{
+	  return x;
+	}
+
+      x++;
+    }
+  return -1;
+}
+
 void
-personality_pop3_edit (GtkWidget * widget, gpointer data)
+personality_edit (GtkWidget * widget, gpointer something)
+{
+  gint row = selected_clist_row (account_list);
+  gpointer *data = gtk_clist_get_row_data (GTK_CLIST (account_list), row);
+  if (((Personality *) (data))->type == 0) personality_pop3_edit( (Personality *)(data) );
+  if (((Personality *) (data))->type == 1) personality_imap_edit((Personality *)(data));
+  if (((Personality *) (data))->type == 2) personality_mbox_edit((Personality *)(data));
+}
+
+
+void
+personality_pop3_edit (Personality *currentpers)
 {
   GList *list;
   GtkWidget *window;
@@ -584,9 +624,6 @@ personality_pop3_edit (GtkWidget * widget, gpointer data)
   GtkWidget *newbutton;
   GtkWidget *okbutton, *cancelbutton;
   GtkWidget *menuitem;
-  Personality *currentpers;
-
-  optionspersselected = g_malloc0 (sizeof (Personality));
 
   options = g_malloc (sizeof (personality_box_options));
 
@@ -607,7 +644,7 @@ personality_pop3_edit (GtkWidget * widget, gpointer data)
 
   options->accountname = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), options->accountname, 1, 2, 0, 1, GTK_EXPAND | GTK_FILL | GTK_SHRINK,
-GTK_SHRINK, 0, 0);
+		    GTK_SHRINK, 0, 0);
   gtk_widget_show (options->accountname);
 
 /* ---------------------------------- */
@@ -623,7 +660,7 @@ GTK_SHRINK, 0, 0);
 
   options->realname = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), options->realname, 1, 2, 2, 3, GTK_EXPAND | GTK_FILL | GTK_SHRINK,
-GTK_SHRINK, 0, 0);
+		    GTK_SHRINK, 0, 0);
   gtk_widget_show (options->realname);
 
 
@@ -634,7 +671,7 @@ GTK_SHRINK, 0, 0);
 
   options->replyto = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), options->replyto, 1, 2, 3, 4, GTK_EXPAND | GTK_FILL | GTK_SHRINK,
-GTK_SHRINK, 0, 0);
+		    GTK_SHRINK, 0, 0);
   gtk_widget_show (options->replyto);
 
 /* ---------------------------------- */
@@ -650,7 +687,7 @@ GTK_SHRINK, 0, 0);
 
   options->pop3_pop3server = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), options->pop3_pop3server, 1, 2, 5, 6, GTK_EXPAND | GTK_FILL | GTK_SHRINK,
-GTK_SHRINK, 0, 0);
+		    GTK_SHRINK, 0, 0);
   gtk_widget_show (options->pop3_pop3server);
 
   label = gtk_label_new ("SMTP server:");
@@ -660,7 +697,7 @@ GTK_SHRINK, 0, 0);
 
   options->pop3_smtpserver = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), options->pop3_smtpserver, 1, 2, 6, 7, GTK_EXPAND | GTK_FILL | GTK_SHRINK,
-GTK_SHRINK, 0, 0);
+		    GTK_SHRINK, 0, 0);
   gtk_widget_show (options->pop3_smtpserver);
 
   label = gtk_label_new ("Username:");
@@ -670,7 +707,7 @@ GTK_SHRINK, 0, 0);
 
   options->pop3_username = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), options->pop3_username, 1, 2, 7, 8, GTK_EXPAND | GTK_FILL | GTK_SHRINK,
-GTK_SHRINK, 0, 0);
+		    GTK_SHRINK, 0, 0);
   gtk_widget_show (options->pop3_username);
 
   label = gtk_label_new ("Password:");
@@ -680,7 +717,7 @@ GTK_SHRINK, 0, 0);
 
   options->pop3_password = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), options->pop3_password, 1, 2, 8, 9, GTK_EXPAND | GTK_FILL | GTK_SHRINK,
-GTK_SHRINK, 0, 0);
+		    GTK_SHRINK, 0, 0);
   gtk_widget_show (options->pop3_password);
 
   label = gtk_label_new ("Default mailbox:");
@@ -690,7 +727,7 @@ GTK_SHRINK, 0, 0);
 
   options->pop3_default_mailbox = gtk_option_menu_new ();
   gtk_table_attach (GTK_TABLE (table), options->pop3_default_mailbox, 1, 2, 9, 10, GTK_EXPAND | GTK_FILL | GTK_SHRINK,
-GTK_SHRINK, 0, 0);
+		    GTK_SHRINK, 0, 0);
   gtk_widget_show (options->pop3_default_mailbox);
 
   label = gtk_label_new ("Check mail:");
@@ -700,7 +737,7 @@ GTK_SHRINK, 0, 0);
 
   options->pop3_check_mail = gtk_check_button_new ();
   gtk_table_attach (GTK_TABLE (table), options->pop3_check_mail, 1, 2, 10, 11, GTK_EXPAND | GTK_FILL | GTK_SHRINK,
-GTK_SHRINK, 0, 0);
+		    GTK_SHRINK, 0, 0);
   gtk_widget_show (options->pop3_check_mail);
 
   okbutton = gnome_stock_button (GNOME_STOCK_BUTTON_OK);
@@ -727,23 +764,21 @@ GTK_SHRINK, 0, 0);
 			     GTK_SIGNAL_FUNC (gtk_widget_destroy),
 			     GTK_OBJECT (window));
 
-/*
-  gtk_entry_set_text (GTK_ENTRY (options->realname), currentpers->realname);
-  gtk_entry_set_text (GTK_ENTRY (options->replyto), currentpers->replyto);
 
-  gtk_entry_set_text (GTK_ENTRY (options->pop3_pop3server), currentpers->p_pop3server);
-  gtk_entry_set_text (GTK_ENTRY (options->pop3_smtpserver), currentpers->p_smtpserver);
-  gtk_entry_set_text (GTK_ENTRY (options->pop3_username), currentpers->p_username);
-  gtk_entry_set_text (GTK_ENTRY (options->pop3_password), currentpers->p_password);
+   gtk_entry_set_text (GTK_ENTRY (options->accountname), currentpers->name);
+   gtk_entry_set_text (GTK_ENTRY (options->realname), currentpers->realname);
+   gtk_entry_set_text (GTK_ENTRY (options->replyto), currentpers->replyto);
 
-  optionspersselected = currentpers;
-*/
+   gtk_entry_set_text (GTK_ENTRY (options->pop3_pop3server), currentpers->p_pop3server);
+   gtk_entry_set_text (GTK_ENTRY (options->pop3_smtpserver), currentpers->p_smtpserver);
+   gtk_entry_set_text (GTK_ENTRY (options->pop3_username), currentpers->p_username);
+   gtk_entry_set_text (GTK_ENTRY (options->pop3_password), currentpers->p_password);
 
   gtk_widget_show (window);
 }
 
 void
-personality_imap_edit (GtkWidget * widget, gpointer data)
+personality_imap_edit (Personality *currentpers)
 {
   GList *list;
   GtkWidget *window;
@@ -755,9 +790,6 @@ personality_imap_edit (GtkWidget * widget, gpointer data)
   GtkWidget *newbutton;
   GtkWidget *okbutton, *cancelbutton;
   GtkWidget *menuitem;
-  Personality *currentpers;
-
-  optionspersselected = g_malloc0 (sizeof (Personality));
 
   options = g_malloc (sizeof (personality_box_options));
 
@@ -778,7 +810,7 @@ personality_imap_edit (GtkWidget * widget, gpointer data)
 
   options->accountname = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), options->accountname, 1, 2, 0, 1, GTK_EXPAND | GTK_FILL | GTK_SHRINK,
-GTK_SHRINK, 0, 0);
+		    GTK_SHRINK, 0, 0);
   gtk_widget_show (options->accountname);
 
 /* ---------------------------------- */
@@ -794,7 +826,7 @@ GTK_SHRINK, 0, 0);
 
   options->realname = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), options->realname, 1, 2, 2, 3, GTK_EXPAND | GTK_FILL | GTK_SHRINK,
-GTK_SHRINK, 0, 0);
+		    GTK_SHRINK, 0, 0);
   gtk_widget_show (options->realname);
 
 
@@ -805,7 +837,7 @@ GTK_SHRINK, 0, 0);
 
   options->replyto = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), options->replyto, 1, 2, 3, 4, GTK_EXPAND | GTK_FILL | GTK_SHRINK,
-GTK_SHRINK, 0, 0);
+		    GTK_SHRINK, 0, 0);
   gtk_widget_show (options->replyto);
 
 /* ---------------------------------- */
@@ -821,7 +853,7 @@ GTK_SHRINK, 0, 0);
 
   options->imap_imapserver = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), options->imap_imapserver, 1, 2, 5, 6, GTK_EXPAND | GTK_FILL | GTK_SHRINK,
-GTK_SHRINK, 0, 0);
+		    GTK_SHRINK, 0, 0);
   gtk_widget_show (options->imap_imapserver);
 
   label = gtk_label_new ("SMTP server:");
@@ -831,7 +863,7 @@ GTK_SHRINK, 0, 0);
 
   options->imap_smtpserver = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), options->imap_smtpserver, 1, 2, 6, 7, GTK_EXPAND | GTK_FILL | GTK_SHRINK,
-GTK_SHRINK, 0, 0);
+		    GTK_SHRINK, 0, 0);
   gtk_widget_show (options->imap_smtpserver);
 
   label = gtk_label_new ("Username:");
@@ -841,7 +873,7 @@ GTK_SHRINK, 0, 0);
 
   options->imap_username = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), options->imap_username, 1, 2, 7, 8, GTK_EXPAND | GTK_FILL | GTK_SHRINK,
-GTK_SHRINK, 0, 0);
+		    GTK_SHRINK, 0, 0);
   gtk_widget_show (options->imap_username);
 
   label = gtk_label_new ("Password:");
@@ -851,7 +883,7 @@ GTK_SHRINK, 0, 0);
 
   options->imap_password = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), options->imap_password, 1, 2, 8, 9, GTK_EXPAND | GTK_FILL | GTK_SHRINK,
-GTK_SHRINK, 0, 0);
+		    GTK_SHRINK, 0, 0);
   gtk_widget_show (options->imap_password);
 
   label = gtk_label_new ("Default mailbox:");
@@ -861,7 +893,7 @@ GTK_SHRINK, 0, 0);
 
   options->imap_default_mailbox = gtk_option_menu_new ();
   gtk_table_attach (GTK_TABLE (table), options->imap_default_mailbox, 1, 2, 9, 10, GTK_EXPAND | GTK_FILL | GTK_SHRINK,
-GTK_SHRINK, 0, 0);
+		    GTK_SHRINK, 0, 0);
   gtk_widget_show (options->imap_default_mailbox);
 
   label = gtk_label_new ("Check mail:");
@@ -871,7 +903,7 @@ GTK_SHRINK, 0, 0);
 
   options->imap_check_mail = gtk_check_button_new ();
   gtk_table_attach (GTK_TABLE (table), options->imap_check_mail, 1, 2, 10, 11, GTK_EXPAND | GTK_FILL | GTK_SHRINK,
-GTK_SHRINK, 0, 0);
+		    GTK_SHRINK, 0, 0);
   gtk_widget_show (options->imap_check_mail);
 
   okbutton = gnome_stock_button (GNOME_STOCK_BUTTON_OK);
@@ -898,18 +930,20 @@ GTK_SHRINK, 0, 0);
 			     GTK_SIGNAL_FUNC (gtk_widget_destroy),
 			     GTK_OBJECT (window));
 
-/*
-  gtk_entry_set_text (GTK_ENTRY (options->realname), currentpers->realname);
-  gtk_entry_set_text (GTK_ENTRY (options->replyto), currentpers->replyto);
+   gtk_entry_set_text (GTK_ENTRY (options->accountname), currentpers->name);
+   gtk_entry_set_text (GTK_ENTRY (options->realname), currentpers->realname);
+   gtk_entry_set_text (GTK_ENTRY (options->replyto), currentpers->replyto);
 
-  gtk_entry_set_text (GTK_ENTRY (options->imap_imapserver), currentpers->i_imapserver);
-  gtk_entry_set_text (GTK_ENTRY (options->imap_smtpserver), currentpers->i_smtpserver);
-  gtk_entry_set_text (GTK_ENTRY (options->imap_username), currentpers->i_username);
-  gtk_entry_set_text (GTK_ENTRY (options->imap_password), currentpers->i_password);
-
-  optionspersselected = currentpers;
-*/
+   gtk_entry_set_text (GTK_ENTRY (options->imap_imapserver), currentpers->i_imapserver);
+   gtk_entry_set_text (GTK_ENTRY (options->imap_smtpserver), currentpers->i_smtpserver);
+   gtk_entry_set_text (GTK_ENTRY (options->imap_username), currentpers->i_username);
+   gtk_entry_set_text (GTK_ENTRY (options->imap_password), currentpers->i_password);
 
   gtk_widget_show (window);
+}
+
+void
+personality_mbox_edit (Personality *pers)
+{
 }
 

@@ -334,7 +334,7 @@ imap_handle_idle_disable(ImapMboxHandle *h)
     sio_write(h->sio,"DONE\r\n",6); sio_flush(h->sio);
     /* tagged OK will be ignored */
   }
-  return FALSE;
+  return TRUE;
 }
 
 void

@@ -1,3 +1,9 @@
+2005-02-20  Pawel Salek
+
+	* balsa.spec.in: icon-related updates.
+	* libbalsa/imap/imap-commands.c: enable IDLE only when really disabled.
+	* libinit_balsa/balsa-druid-page-user.c: do not require incoming server
+
 2005-02-20 12:05  PeterB
 
 	* src/: balsa-icons.h, balsa-index.c, main-window.c: remove

@@ -721,8 +721,8 @@ imap_assure_needed_flags(ImapMboxHandle *h, ImapMsgFlag needed_flags)
         rc = imap_cmd_step(h, cmdno[i]);
       } while (rc == IMR_UNTAGGED);
     }
+    imap_handle_idle_enable(h, 30);
   }
-  imap_handle_idle_enable(h, 30);
   h->search_cb = cb; h->search_arg = arg;
   if(rc == IMR_OK) {
     for(i=0; i<h->flag_cache->len; i++) {

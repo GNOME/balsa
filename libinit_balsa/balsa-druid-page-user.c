@@ -154,7 +154,7 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
                                 &(user->remember_passwd));
     balsa_init_add_table_entry(table, row, _("_Refer to this account as:"),
                                "",
-                               &(user->ed3), druid, &(user->account_name));
+                               NULL, druid, &(user->account_name));
     gtk_table_set_row_spacing(table, row++, 10);
     g_signal_connect(user->incoming_srv, "changed",
                      (GCallback)srv_changed_cb, user);

@@ -1068,69 +1068,75 @@ translate_message(HEADER * cur)
     return message;
 }
 
+/* Callback for the "messages-status-changed" signal.
+ * mb:          the mailbox--must not be NULL;
+ * messages:    the list of messages--must not be NULL;
+ * flag:        the flag that changed.
+ */
 static void
 messages_status_changed_cb(LibBalsaMailbox * mb, GList * messages,
-			   gint flag)
+                           gint flag)
 {
     gint new_in_list = 0;
     gint nb_in_list = 0;
     gboolean new_state;
-    GList * lst;
-
-    if (!messages)
-	return;
+    GList *lst;
 
     switch (flag) {
     case LIBBALSA_MESSAGE_FLAG_DELETED:
-	/* Deleted state has changed, update counts */
-	new_state = 
-	    LIBBALSA_MESSAGE(messages->data)->flags & LIBBALSA_MESSAGE_FLAG_DELETED;
+        /* Deleted state has changed, update counts */
+        new_state = (LIBBALSA_MESSAGE(messages->data)->flags
+                     & LIBBALSA_MESSAGE_FLAG_DELETED);
 
-	for (;messages;messages = g_list_next(messages)) {
-	    nb_in_list++;
-	    if (LIBBALSA_MESSAGE(messages->data)->flags & LIBBALSA_MESSAGE_FLAG_NEW)
-		new_in_list++;
-	}
+        for (; messages; messages = g_list_next(messages)) {
+            nb_in_list++;
+            if (LIBBALSA_MESSAGE(messages->data)->flags
+                & LIBBALSA_MESSAGE_FLAG_NEW)
+                new_in_list++;
+        }
 
-	if (new_state) {
-	    /* messages have been deleted */
-	    mb->total_messages -= nb_in_list;
-	
-	    if (new_in_list) {
-		mb->unread_messages -= new_in_list;
-		if (mb->unread_messages <= 0)
-		    libbalsa_mailbox_set_unread_messages_flag(mb, FALSE);
-	    }
-	} else {
-	    /* message has been undeleted */
-	    mb->total_messages += nb_in_list;
-	    if (new_in_list) {
-		mb->unread_messages += new_in_list;
-		libbalsa_mailbox_set_unread_messages_flag(mb, TRUE);
-	    }
-	}
-	break;
+        if (new_state) {
+            /* messages have been deleted */
+            mb->total_messages -= nb_in_list;
+
+            if (new_in_list) {
+                mb->unread_messages -= new_in_list;
+                if (mb->unread_messages <= 0)
+                    libbalsa_mailbox_set_unread_messages_flag(mb, FALSE);
+            }
+        } else {
+            /* message has been undeleted */
+            mb->total_messages += nb_in_list;
+            if (new_in_list) {
+                mb->unread_messages += new_in_list;
+                libbalsa_mailbox_set_unread_messages_flag(mb, TRUE);
+            }
+        }
+        break;
     case LIBBALSA_MESSAGE_FLAG_NEW:
-	if (LIBBALSA_MESSAGE(messages->data)->flags & LIBBALSA_MESSAGE_FLAG_NEW) {
-	    gboolean unread_before = mb->unread_messages>0;
+        if (LIBBALSA_MESSAGE(messages->data)->flags
+            & LIBBALSA_MESSAGE_FLAG_NEW) {
+            gboolean unread_before = mb->unread_messages > 0;
 
-	    /* Count only messages with the deleted flag not set */
-	    for (lst = messages;lst;lst = g_list_next(lst))
-		if (!(LIBBALSA_MESSAGE(lst->data)->flags & LIBBALSA_MESSAGE_FLAG_DELETED))
-		    mb->unread_messages++;
-	    if (!unread_before && mb->unread_messages>0)
-		libbalsa_mailbox_set_unread_messages_flag(mb, TRUE);
-	} else {
-	    /* Count only messages with the deleted flag not set */
-	    for (lst = messages;lst;lst = g_list_next(lst))
-		if (!(LIBBALSA_MESSAGE(lst->data)->flags & LIBBALSA_MESSAGE_FLAG_DELETED))
-		    mb->unread_messages--;
-	    if (mb->unread_messages<=0)
-		libbalsa_mailbox_set_unread_messages_flag(mb, FALSE);	    
-	}
+            /* Count only messages with the deleted flag not set */
+            for (lst = messages; lst; lst = g_list_next(lst))
+                if (!(LIBBALSA_MESSAGE(lst->data)->flags
+                      & LIBBALSA_MESSAGE_FLAG_DELETED))
+                    mb->unread_messages++;
+            if (!unread_before && mb->unread_messages > 0)
+                libbalsa_mailbox_set_unread_messages_flag(mb, TRUE);
+        } else {
+            /* Count only messages with the deleted flag not set */
+            for (lst = messages; lst; lst = g_list_next(lst))
+                if (!(LIBBALSA_MESSAGE(lst->data)->flags
+                      & LIBBALSA_MESSAGE_FLAG_DELETED))
+                    mb->unread_messages--;
+            if (mb->unread_messages <= 0)
+                libbalsa_mailbox_set_unread_messages_flag(mb, FALSE);
+        }
     case LIBBALSA_MESSAGE_FLAG_REPLIED:
     case LIBBALSA_MESSAGE_FLAG_FLAGGED:
-	break;
+        break;
     }
 }
 

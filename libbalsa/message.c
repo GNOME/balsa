@@ -701,42 +701,44 @@ libbalsa_messages_flag(GList * messages, gboolean flag)
 void
 libbalsa_messages_delete(GList * messages, gboolean del)
 {
-    LibBalsaMessage * message = NULL;
-    GList * notif_list = NULL;
+    LibBalsaMessage *message = NULL;
+    GList *notif_list = NULL;
 
     /* Construct the list of messages that actually change state */
     while (messages) {
-      message = LIBBALSA_MESSAGE(messages->data);
-      if ( (del && !(message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)) ||
-	   (!del && (message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)) )
-	  notif_list = g_list_prepend(notif_list, message);
-      messages = g_list_next(messages);
+        message = LIBBALSA_MESSAGE(messages->data);
+        if ((del && !(message->flags & LIBBALSA_MESSAGE_FLAG_DELETED))
+            || (!del && (message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)))
+            notif_list = g_list_prepend(notif_list, message);
+        messages = g_list_next(messages);
     }
     if (notif_list) {
-	HEADER * cur;
-	LibBalsaMailbox * mbox = LIBBALSA_MESSAGE(notif_list->data)->mailbox;
-	GList * lst = notif_list;
+        HEADER *cur;
+        LibBalsaMailbox *mbox =
+            LIBBALSA_MESSAGE(notif_list->data)->mailbox;
+        GList *lst = notif_list;
 
-	LOCK_MAILBOX(mbox);
-	RETURN_IF_CLIENT_CONTEXT_CLOSED(mbox);
-	libbalsa_lock_mutt();
+        LOCK_MAILBOX(mbox);
+        RETURN_IF_CLIENT_CONTEXT_CLOSED(mbox);
+        libbalsa_lock_mutt();
 
-	while (lst) {
-	    message = LIBBALSA_MESSAGE(lst->data);
-	    cur = message->header;
-	    mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_DELETE, del);
-	    if (del)
-		message->flags |= LIBBALSA_MESSAGE_FLAG_DELETED;
-	    else message->flags &= ~LIBBALSA_MESSAGE_FLAG_DELETED;
-	    lst = g_list_next(lst);
-	}
-	libbalsa_unlock_mutt();
-	UNLOCK_MAILBOX(message->mailbox);
-	
-	/* Emission of notification to the owning mailbox */
-	libbalsa_mailbox_messages_status_changed(mbox, notif_list,
-						 LIBBALSA_MESSAGE_FLAG_DELETED);
-	g_list_free(notif_list);
+        do {
+            message = LIBBALSA_MESSAGE(lst->data);
+            g_assert(message->mailbox == mbox);
+            cur = message->header;
+            mutt_set_flag(CLIENT_CONTEXT(mbox), cur, M_DELETE, del);
+            if (del)
+                message->flags |= LIBBALSA_MESSAGE_FLAG_DELETED;
+            else
+                message->flags &= ~LIBBALSA_MESSAGE_FLAG_DELETED;
+        } while ((lst = g_list_next(lst)) != NULL);
+        libbalsa_unlock_mutt();
+        UNLOCK_MAILBOX(mbox);
+
+        /* Emission of notification to the owning mailbox */
+        libbalsa_mailbox_messages_status_changed(mbox, notif_list,
+                                                 LIBBALSA_MESSAGE_FLAG_DELETED);
+        g_list_free(notif_list);
     }
 }
 

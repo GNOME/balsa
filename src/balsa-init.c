@@ -48,6 +48,7 @@ struct _InitWindow
   {
     GtkWidget *window;
     GtkWidget *notebook;
+    GtkWidget *bbox;
     GtkWidget *next;
     GtkWidget *prev;
   };
@@ -99,7 +100,6 @@ balsa_init_window_new (void)
   GtkWidget *vbox;
   GtkWidget *pixmap;
   GtkWidget *label;
-  GtkWidget *bbox;
   gchar *logo;
 
   iw = g_malloc0 (sizeof (InitWindow));
@@ -148,18 +148,18 @@ balsa_init_window_new (void)
 			    create_mailboxes_page (),
 			    label);
 
-  bbox = gtk_hbutton_box_new ();
-  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (iw->window)->action_area), bbox, TRUE, TRUE, 0);
-  gtk_button_box_set_spacing (GTK_BUTTON_BOX (bbox), 5);
-  gtk_button_box_set_layout (GTK_BUTTON_BOX (bbox), GTK_BUTTONBOX_SPREAD);
-  gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox),
+  iw->bbox = gtk_hbutton_box_new ();
+  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (iw->window)->action_area), iw->bbox, TRUE, TRUE, 0);
+  gtk_button_box_set_spacing (GTK_BUTTON_BOX (iw->bbox), 5);
+  gtk_button_box_set_layout (GTK_BUTTON_BOX (iw->bbox), GTK_BUTTONBOX_SPREAD);
+  gtk_button_box_set_child_size (GTK_BUTTON_BOX (iw->bbox),
 				 BALSA_BUTTON_WIDTH,
 				 BALSA_BUTTON_HEIGHT);
-  gtk_widget_show (bbox);
+  gtk_widget_show (iw->bbox);
 
 
-  iw->prev = gtk_button_new_with_label (_ ("Previous..."));
-  gtk_container_add (GTK_CONTAINER (bbox), iw->prev);
+  iw->prev = gnome_stock_button (GNOME_STOCK_BUTTON_PREV);
+  gtk_container_add (GTK_CONTAINER (iw->bbox), iw->prev);
   gtk_widget_show (iw->prev);
 
   gtk_widget_set_sensitive (iw->prev, FALSE);
@@ -169,8 +169,8 @@ balsa_init_window_new (void)
 		      (GtkSignalFunc) prev_cb,
 		      NULL);
 
-  iw->next = gtk_button_new_with_label (_ ("Next..."));
-  gtk_container_add (GTK_CONTAINER (bbox), iw->next);
+  iw->next = gnome_stock_button (GNOME_STOCK_BUTTON_NEXT);
+  gtk_container_add (GTK_CONTAINER (iw->bbox), iw->next);
   gtk_widget_show (iw->next);
 
   gtk_signal_connect (GTK_OBJECT (iw->next),
@@ -459,8 +459,18 @@ next_cb (GtkWidget * widget, gpointer data)
       break;
 
     case IW_PAGE_MBOXS:
-      gtk_label_set (GTK_LABEL (GTK_BIN (iw->next)->child), "Finish");
-      gtk_notebook_next_page (GTK_NOTEBOOK (iw->notebook));
+      {
+	GtkWidget *pixmap;
+	gtk_widget_destroy (iw->next);
+	pixmap = gnome_stock_pixmap_widget (NULL, GNOME_STOCK_PIXMAP_SAVE);
+	iw->next = gnome_pixmap_button (pixmap, _ ("Finish"));
+	gtk_container_add (GTK_CONTAINER (iw->bbox), iw->next);
+	gtk_signal_connect (GTK_OBJECT (iw->next), "clicked",
+			    (GtkSignalFunc) next_cb, NULL);
+	gtk_widget_show (iw->next);
+
+	gtk_notebook_next_page (GTK_NOTEBOOK (iw->notebook));
+      }
       break;
 
     default:
@@ -474,7 +484,12 @@ next_cb (GtkWidget * widget, gpointer data)
 static void
 prev_cb (GtkWidget * widget, gpointer data)
 {
-  gtk_label_set (GTK_LABEL (GTK_BIN (iw->next)->child), "Next...");
+  gtk_widget_destroy (iw->next);
+  iw->next = gnome_stock_button (GNOME_STOCK_BUTTON_NEXT);
+  gtk_container_add (GTK_CONTAINER (iw->bbox), iw->next);
+  gtk_signal_connect (GTK_OBJECT (iw->next), "clicked",
+		      (GtkSignalFunc) next_cb, NULL);
+  gtk_widget_show (iw->next);
 
   gtk_notebook_prev_page (GTK_NOTEBOOK (iw->notebook));
   gtk_widget_set_sensitive (iw->next, TRUE);

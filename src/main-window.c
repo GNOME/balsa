@@ -464,6 +464,7 @@ show_about_box (void)
     "Jay Painter <jpaint@gimp.org>",
     NULL
   };
+  gchar *logo;
 
 
   /* only show one about box at a time */
@@ -472,12 +473,14 @@ show_about_box (void)
   else
     about_box_visible = TRUE;
 
+  logo = gnome_unconditional_pixmap_file("balsa/balsa_logo.png");
   about = gnome_about_new ("Balsa",
 			   BALSA_VERSION,
 			   "Copyright (C) 1997-98",
 			   authors,
 			   _ ("The Balsa email client is part of the GNOME desktop environment.  Information on Balsa can be found at http://www.balsa.net/\n\nIf you need to report bugs, please do so at: http://www.gnome.org/cgi-bin/bugs"),
-			   "balsa_logo.png");
+			   logo);
+  g_free(logo);
 
   gtk_signal_connect (GTK_OBJECT (about),
 		      "destroy",
@@ -643,8 +646,9 @@ static void
 mailbox_close_child (GtkWidget * widget, gpointer data)
 {
   if (balsa_app.current_index_child)
-    gnome_mdi_remove_child (mdi, GNOME_MDI_CHILD (balsa_app.current_index_child),
-			    TRUE);
+    gnome_mdi_remove_child (mdi,
+		    GNOME_MDI_CHILD (balsa_app.current_index_child),
+    TRUE);
 }
 
 static void

@@ -8,3 +8,5 @@ cat-id-tbl.c
 balsa.pot
 stamp-cat-id
 messages
+missing
+POTFILES.skip

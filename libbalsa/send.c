@@ -613,7 +613,7 @@ static int smtp_answer (int fd)
  * a file were the message is in MIME format (converted using libmutt)
  * and the server (so it will be easier to add support for multiple 
  * personalityes) and it returns 1 if everything is ok or 0 if something
- * when wrong  */
+ * went wrong. */
 
 static int libbalsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
 {
@@ -622,7 +622,7 @@ static int libbalsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
 	char *tmp, *tmpbuffer;
 	ADDRESS *address;
 #ifdef BALSA_USE_THREADS  
-	int total, send = 0;
+	int total, sent = 0;
 	struct stat st;
 	float percent=0;
 	SendThreadMessage *progress_message;
@@ -713,20 +713,13 @@ static int libbalsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
 			if (*(tmp-1)!='\r') {
 				write (s,tmpbuffer,len);
 				write (s, "\r\n",2);
-#ifdef BALSA_USE_THREADS
-				send = send + len + 2 ;
-	    
-				percent = (float)send/total ;
-#endif
 			} else {
 				write (s,tmpbuffer,len);
 				write (s, "\n",1);
-#ifdef BALSA_USE_THREADS
-				send = send + len + 1;
-
-				percent = (float)send/total ;
-#endif		
 			}
+#ifdef BALSA_USE_THREADS
+				sent += len;
+#endif		
 			tmpbuffer=tmp+1;
 			left=left-(len+1);
 			if (left<=0)
@@ -736,9 +729,8 @@ static int libbalsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
 		write (s, tmpbuffer,left); 
     
 #ifdef BALSA_USE_THREADS
-		send = send + left;
-		percent = (float)send/total ;
-    
+		sent += left;
+		percent = ((float)sent)/(float)total;
 		MSGSENDTHREAD(progress_message, MSGSENDTHREADPROGRESS, "",
 			      NULL, NULL, percent);
 #endif
@@ -859,7 +851,6 @@ static int libbalsa_smtp_send (MessageQueueItem *first_message, char *server)
 	close (s);
   
 #ifdef BALSA_USE_THREADS
-  
 	MSGSENDTHREAD (finish_message, MSGSENDTHREADFINISHED,"",NULL,NULL,0); 
 #endif
 

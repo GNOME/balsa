@@ -1433,11 +1433,12 @@ send_progress_notify_cb( )
                  gtk_widget_show_all( send_dialog );
                }						       
        
-	    if( percent > 1.0 || percent < 0.0 )
-	      {
-		percent = 1.0;
+	    if( percent > 1.0 || percent < 0.0 ) {
 		if( balsa_app.debug )
-		  fprintf(stderr, "progress bar percentage out of range %f\n", percent);
+		  fprintf(stderr, "progress bar percentage out of range %f\n",
+			  percent);
+		percent = 1.0;
+
 	      }
 	      
 	    if ( GTK_IS_WIDGET ( send_dialog ) ) 

@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1998-1999 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1998-2000 Stuart Parmenter and others, see AUTHORS file.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,22 @@
  * 02111-1307, USA.
  */
 
+/* FONT SELECTION DISCUSSION:
+   the current usage is limited to fonts, font sets cannot be used because:
+
+   - gdk caches font set based on their names and changing locale will
+     not help when using wildcards(!) for the charset (and explicitly
+     specified in XLFD charset is ignored anyway, as XCreateFontSet(3x)
+     says).
+
+   - the option would be to use setlocale to hit gdk_fontset_load()
+     but...  there is an yet unidentified problem that leads to a
+     nasty deferred setup-depentent crash with double free symptoms,
+     when the selected font set is unavailable on the machine (and
+     probably in other cases, too). I am tempted to write a test
+     program and send it over to GDK gurus.
+
+   Locale data is then used exclusively for the spelling checking.  */
 #include "config.h"
 
 #include "libbalsa.h"
@@ -329,57 +345,57 @@ static GnomeUIInfo main_menu[] =
    type information.  
 */
 struct {
-  gchar *locale, *charset, *lang_name;
-  GtkSignalFunc callback;
+  const gchar *locale, *charset, *lang_name;
+  gboolean use_fontset;
 } locales[] = {
 #define LOC_BRAZILIAN_POS 0
-  {"pt_BR", "ISO-8859-1",  N_("Brazilian")},
+  {"pt_BR", "ISO-8859-1",  N_("Brazilian"), FALSE},
 #define LOC_CATALAN_POS   1
-  {"ca_ES", "ISO-8859-1",  N_("Catalan")},
+  {"ca_ES", "ISO-8859-1",  N_("Catalan"),   FALSE},
 #define LOC_DANISH_POS    2
-  {"da_DK", "ISO-8859-1",  N_("Danish")},
+  {"da_DK", "ISO-8859-1",  N_("Danish"),    FALSE},
 #define LOC_GERMAN_POS    3
-  {"de_DE", "ISO-8859-1",  N_("German")},
+  {"de_DE", "ISO-8859-1",  N_("German"),    FALSE},
 #define LOC_DUTCH_POS     4
-  {"nl_NL", "ISO-8859-1",  N_("Dutch")},
+  {"nl_NL", "ISO-8859-1",  N_("Dutch"),     FALSE},
 #define LOC_ENGLISH_POS   5
-  {"en_GB", "ISO-8859-1",  N_("English")},
+  {"en_GB", "ISO-8859-1",  N_("English"),   FALSE},
 #define LOC_ESTONIAN_POS  6
-  {"et_EE", "ISO-8859-1",  N_("Estonian")},
+  {"et_EE", "ISO-8859-1",  N_("Estonian"),  FALSE},
 #define LOC_FINNISH_POS   7
-  {"fi_FI", "ISO-8859-1",  N_("Finnish")},
+  {"fi_FI", "ISO-8859-1",  N_("Finnish"),   FALSE},
 #define LOC_FRENCH_POS    8
-  {"fr_FR", "ISO-8859-1",  N_("French")},
+  {"fr_FR", "ISO-8859-1",  N_("French"),    FALSE},
 #define LOC_GREEK_POS     9
-  {"el_GR", "ISO-8859-7",  N_("Greek")},
+  {"el_GR", "ISO-8859-7",  N_("Greek"),     FALSE},
 #define LOC_HUNGARIAN_POS 10
-  {"hu_HU", "ISO-8859-2",  N_("Hungarian")},
+  {"hu_HU", "ISO-8859-2",  N_("Hungarian"), FALSE},
 #define LOC_ITALIAN_POS   11
-  {"it_IT", "ISO-8859-1",  N_("Italian")},
+  {"it_IT", "ISO-8859-1",  N_("Italian"),   FALSE},
 #define LOC_JAPANESE_POS  12
-  {"ja_JP", "euc-jp",      N_("Japanese")},
+  {"ja_JP", "euc-jp",      N_("Japanese"),  TRUE},
 #define LOC_KOREAN_POS    13
-  {"ko_OK", "euc-kr",      N_("Korean")},
+  {"ko_OK", "euc-kr",      N_("Korean"),    TRUE},
 #define LOC_BALTIC_POS    14
-  {"lt_LT", "ISO-8859-13", N_("Baltic")},
+  {"lt_LT", "ISO-8859-13", N_("Baltic"),    FALSE},
 #define LOC_NORWEGIAN_POS 15
-  {"no_NO", "ISO-8859-1", N_("Norwegian")},
+  {"no_NO", "ISO-8859-1", N_("Norwegian"),  FALSE},
 #define LOC_POLISH_POS    16
-  {"pl_PL", "ISO-8859-2", N_("Polish")},
+  {"pl_PL", "ISO-8859-2", N_("Polish"),     FALSE},
 #define LOC_PORTUGESE_POS 17
-  {"pt_PT", "ISO-8859-1", N_("Portugese")},
+  {"pt_PT", "ISO-8859-1", N_("Portugese"),  FALSE},
 #define LOC_RUSSIAN_POS   18
-  {"ru_RU", "ISO-8859-5", N_("Russian")},
+  {"ru_RU", "ISO-8859-5", N_("Russian"),    FALSE},
 #define LOC_SLOVAK_POS    19
-  {"sl_SI", "ISO-8859-2", N_("Slovak")},
+  {"sl_SI", "ISO-8859-2", N_("Slovak"),     FALSE},
 #define LOC_SPANISH_POS   20
-  {"es_ES", "ISO-8859-1", N_("Spanish")},
+  {"es_ES", "ISO-8859-1", N_("Spanish"),    FALSE},
 #define LOC_SWEDISH_POS   21
-  {"sv_SE", "ISO-8859-1", N_("Swedish")},
+  {"sv_SE", "ISO-8859-1", N_("Swedish"),    FALSE},
 #define LOC_TURKISH_POS   22
-  {"tr_TR", "ISO-8859-9", N_("Turkish")},
+  {"tr_TR", "ISO-8859-9", N_("Turkish"),    FALSE},
 #define LOC_UKRAINIAN_POS 23
-  {"uk_UK", "KOI-8-U",    N_("Ukrainian")}
+  {"uk_UK", "KOI-8-U",    N_("Ukrainian"),  FALSE}
 };
 
 static gint mail_headers_page;
@@ -437,6 +453,7 @@ balsa_sendmsg_destroy (BalsaSendmsg * bsm)
    if(balsa_app.debug) printf("balsa_sendmsg_destroy: Freeing bsm\n");
    gtk_widget_destroy (bsm->window);
    g_list_free(bsm->spell_check_disable_list);
+   if(bsm->font) { gdk_font_unref(bsm->font); bsm->font = NULL; }
    g_free(bsm);
    
 #ifdef BALSA_USE_THREADS
@@ -449,15 +466,21 @@ balsa_sendmsg_destroy (BalsaSendmsg * bsm)
 }
 
 /* language menu helper functions */
+/* find_locale_index_by_locale:
+   finds the longest fit so the one who has en_GB will gent en_US if en_GB
+   is not defined.
+*/
 static gint find_locale_index_by_locale(const gchar* locale)
 {
-  int len, i;
+  int i, j, maxfit=-1, maxpos;
 
-  len = strlen(locale);
-  i = ELEMENTS(locales)-1;
-  while( i>=0 && g_strncasecmp (locales[i].locale, locale, len) !=0)
-    i--;
-  return i>=0 ? i : LOC_ENGLISH_POS;
+  if(!locale) return LOC_ENGLISH_POS; 
+  for(i=0; i < ELEMENTS(locales); i++) {
+    for(j=0; locale[j] && locales[i].locale[j] == locale[j]; j++)
+      ;
+    if(j>maxfit) {maxfit = j; maxpos = i; }
+  }
+  return maxpos;
 }
 
 /* fill_language_menu:
@@ -467,7 +490,9 @@ static void fill_language_menu()
 {
   int idxsys;
   idxsys = find_locale_index_by_locale(setlocale(LC_CTYPE, NULL));
-  lang_menu[LANG_CURRENT_POS].label    = locales[idxsys].lang_name;
+  printf("idxsys: %d %s for %s\n", idxsys, locales[idxsys].lang_name, 
+	 setlocale(LC_CTYPE, NULL));
+  lang_menu[LANG_CURRENT_POS].label = (char*)locales[idxsys].lang_name;
 }
 
 /* remove_attachment - right mouse button callback */
@@ -1776,7 +1801,6 @@ toggle_entry (BalsaSendmsg * bmsg, GtkWidget *entry[], int pos, int cnt)
 {
    GtkWidget* parent;
 
-
    if( GTK_CHECK_MENU_ITEM(bmsg->view_checkitems[pos])->active) {
       while(cnt--)
 	 gtk_widget_show( GTK_WIDGET(entry[cnt]) );
@@ -1855,7 +1879,6 @@ init_menus(BalsaSendmsg *msg)
    } else 
      i = find_locale_index_by_locale(setlocale(LC_CTYPE, NULL));
 
-   if(balsa_app.debug) printf("locale pos: %i\n", i);
    set_locale(NULL, msg, i);
 
    /* gray 'send' and 'postpone' */
@@ -1871,64 +1894,57 @@ init_menus(BalsaSendmsg *msg)
 
 static gint 
 set_locale(GtkWidget* w, BalsaSendmsg *msg, gint idx) {
-   gchar *font_name, *old_locale;
+   gchar *font_name, *tmp;
 
+   if(msg->font) gdk_font_unref(msg->font);
    msg->charset = locales[idx].charset;
    msg->locale  = locales[idx].locale;
+   tmp = g_strdup_printf("%s (%s, %s)", _(locales[idx].lang_name),
+			 locales[idx].locale, locales[idx].charset);
+   gtk_label_set_text(GTK_LABEL(GTK_BIN(msg->current_language_menu)->child), 
+		      tmp);
+   g_free(tmp);
 
    font_name = get_font_name(balsa_app.message_font, msg->charset);
-
-   if(balsa_app.debug)
-     printf("Set locale %s\nwith font: %s.\n", msg->locale, font_name);
-   old_locale = setlocale(LC_CTYPE, msg->locale);
-   if(!old_locale) {
-     balsa_information(LIBBALSA_INFORMATION_WARNING, 
-		       _("Locale %s (%s) is not available on this computer."), 
-		       msg->locale, locales[idx].lang_name); 
-     gtk_widget_set_sensitive(w, FALSE);
-   }  else {
-     if(msg->font) gdk_font_unref(msg->font); 
-     msg->font = gdk_fontset_load (font_name);
-     setlocale(LC_CTYPE, old_locale);
-     if(!msg->font) {
-       printf("Cannot find font: %s for locale %s\n", font_name, msg->locale);
-     } else {
-       
-       /* Set the new message style */
+   msg->font = locales[idx].use_fontset ? 
+     gdk_fontset_load (font_name) : gdk_font_load(font_name);
+     printf("find font: %s for locale %s (%d)\n", font_name, msg->locale,
+	    locales[idx].use_fontset);
+   if(!msg->font) {
+     printf("Cannot find font: %s for locale %s\n", font_name, msg->locale);
+   } else {
+     gdk_font_ref(msg->font);
+     /* Set the new message style */
 #if 0
-       { GtkStyle *style;
-       style = gtk_style_copy (gtk_widget_get_style (GTK_WIDGET (msg->text)));
-       //gdk_font_unref(style->font);
-       style->font = msg->font;
-       gtk_widget_set_style(GTK_WIDGET (msg->text), style);
-       gtk_style_unref(style);
-       }
+     { GtkStyle *style;
+     style = gtk_style_copy (gtk_widget_get_style (GTK_WIDGET (msg->text)));
+     /* gdk_font_unref(style->font); */
+     style->font = msg->font;
+     gtk_widget_set_style(GTK_WIDGET (msg->text), style);
+     gtk_style_unref(style);
+     }
 #else
-       { gchar *str; gint txt_len, point;
-       gtk_text_freeze( GTK_TEXT(msg->text) );
-       point   = gtk_editable_get_position( GTK_EDITABLE(msg->text) ); 
-       txt_len = gtk_text_get_length( GTK_TEXT(msg->text) );
-       str     = gtk_editable_get_chars( GTK_EDITABLE(msg->text), 0, txt_len);
-       
-       if(str) {
-	 gtk_text_set_point( GTK_TEXT(msg->text), 0);
-	 gtk_text_forward_delete ( GTK_TEXT(msg->text), txt_len); 
-	 gtk_text_insert(GTK_TEXT(msg->text), msg->font, NULL, NULL, 
-			 str, txt_len);
-	 g_free(str);
-       }
-       gtk_text_thaw( GTK_TEXT(msg->text) );
-       }
+     { gchar *str; gint txt_len, point;
+     gtk_text_freeze( GTK_TEXT(msg->text) );
+     point   = gtk_editable_get_position( GTK_EDITABLE(msg->text) ); 
+     txt_len = gtk_text_get_length( GTK_TEXT(msg->text) );
+     str     = gtk_editable_get_chars( GTK_EDITABLE(msg->text), 0, txt_len);
+     
+     if(str) {
+       gtk_text_set_point( GTK_TEXT(msg->text), 0);
+       gtk_text_forward_delete ( GTK_TEXT(msg->text), txt_len); 
+       gtk_text_insert(GTK_TEXT(msg->text), msg->font, NULL, NULL, 
+		       str, txt_len);
+       g_free(str);
+     }
+     gtk_text_thaw( GTK_TEXT(msg->text) );
+     }
 #endif
-       gtk_label_set(GTK_LABEL(GTK_BIN(msg->current_language_menu)->child), 
-		     _(locales[idx].lang_name));
-     } /* endif: font found */
-     g_free(font_name);
-   }   /* endif: locale set */
+   } /* endif: font found */
+   g_free(font_name);
 
   return FALSE;
 }
-
 
 /* spell_check_cb
  * 
@@ -1950,7 +1966,7 @@ spell_check_cb (GtkWidget* widget, BalsaSendmsg* msg)
   balsa_spell_check_set_module(sc, spell_check_modules_name[balsa_app.module]);
   balsa_spell_check_set_suggest_mode (sc, spell_check_suggest_mode_name[balsa_app.suggestion_mode]);
   balsa_spell_check_set_ignore_length (sc, balsa_app.ignore_size);
-  balsa_spell_check_set_font (sc, msg->font);
+  if(msg->font) balsa_spell_check_set_font (sc, msg->font);
   gtk_notebook_set_page (GTK_NOTEBOOK (msg->notebook), spell_check_page);
 
   /* disable menu and toolbar items so message can't be modified */

@@ -1,3 +1,12 @@
+2000-09-26  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/send.c: compute correctly the sent data percentage.
+	* src/main-window.c: print the percentage correctly (actually, the
+	checking code is redundant..)
+	* src/sendmsg-window.c: updates to the language selection
+	code. setlocale() calls led to really weird hangs (X-server
+	dependent?), got rid of them for this release.
+		
 2000-09-26  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/main-window.c: simplify select_part_cb.

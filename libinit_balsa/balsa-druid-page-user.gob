@@ -59,7 +59,7 @@ class Balsa:Druid:Page:User from Balsa:Druid:Page {
 	init( self ) {
 		GtkTable *table;
 		GtkLabel *label;
-		gchar *preset;
+		gchar *preset, *domain;
 		char hostbuf[512];
 
 		self->_priv->emaster.setbits = 0;
@@ -87,7 +87,13 @@ class Balsa:Druid:Page:User from Balsa:Druid:Page {
 		preset = g_get_real_name();
 		balsa_init_add_table_entry( table, 0, _("Name:"), preset, &( self->_priv->ed0 ), GTK_WIDGET( self ), &( self->_priv->name ) );
 		
+			
 		gethostname( hostbuf, 511 );
+		domain = libbalsa_get_domainname();
+		if( domain ) {
+		   preset = g_strconcat( g_get_user_name(), "@", domain, NULL );	
+		   g_free(domain);
+		} else 
 		preset = g_strconcat( g_get_user_name(), "@", hostbuf, NULL );
 		balsa_init_add_table_entry( table, 1, _("Email address:"), preset, &( self->_priv->ed1 ), GTK_WIDGET( self ), &( self->_priv->email ) );
 		g_free( preset );

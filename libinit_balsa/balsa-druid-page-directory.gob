@@ -45,6 +45,8 @@ enum __ed_types {
 #include "save-restore.h"
 #include "balsa-druid-page-error.h"
 #include "misc.h"
+#include "mutt.h"
+#include "url.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -67,6 +69,8 @@ static void unconditional_mailbox(const gchar *path, const gchar *prettyname,
 {
 	gchar *dup;
 	gchar *index;
+	ciss_url_t url;
+	gboolean ssl=FALSE;
 
 	if( (*error) != NULL )
 		return;
@@ -90,12 +94,43 @@ static void unconditional_mailbox(const gchar *path, const gchar *prettyname,
 	}
 
 	index[-1] = '/';
-	g_free ( dup );
 
-	/* The mailbox currently may not be IMAP or POP3 */
-	/* Due to the above test for a / at the start of the filename */
+	url_parse_ciss (&url, dup);
 
+	switch(url.scheme) {
+	case U_IMAPS:
+	  ssl=TRUE;
+	case U_IMAP:
+	  *box = (LibBalsaMailbox*)libbalsa_mailbox_imap_new();
+	  libbalsa_mailbox_imap_set_path((LibBalsaMailboxImap *)*box, url.path);
+	  break;
+	case U_POPS:
+	  ssl=TRUE;
+	case U_POP:
+	  *box = (LibBalsaMailbox*)libbalsa_mailbox_pop3_new();
+	  break;
+	case U_FILE:
+	  *box = (LibBalsaMailbox*)libbalsa_mailbox_local_new(url.path, TRUE);
+	  break;
+	default:
 	*box = (LibBalsaMailbox*)libbalsa_mailbox_local_new(path, TRUE);
+	}
+
+	if( url.host && LIBBALSA_IS_MAILBOX_REMOTE(*box) ) {
+	  if( !url.port )
+	    url.port = LIBBALSA_MAILBOX_REMOTE_SERVER(*box)->port;
+
+	  libbalsa_server_set_host(LIBBALSA_MAILBOX_REMOTE_SERVER(*box),
+				   url.host, url.port
+#ifdef USE_SSL
+				   , ssl
+#endif
+				   );
+	  libbalsa_server_set_username(LIBBALSA_MAILBOX_REMOTE_SERVER(*box),
+				       getenv("USER"));
+	}
+	g_free ( dup );
+	
 
 	if( *box == NULL ) {
 	  if(strcmp( "/var/spool/mail/", path )) {
@@ -146,6 +181,7 @@ class Balsa:Druid:Page:Directory from Balsa:Druid:Page {
 		GtkLabel *label;
 		int i;
 		GtkWidget **init_widgets[NUM_EDs];
+		gchar *imap_inbox = libbalsa_guess_imap_inbox();
 		gchar *init_presets[NUM_EDs] = { NULL, NULL, NULL, NULL, NULL };
 
 		self->_priv->paths_locked = FALSE;
@@ -166,7 +202,12 @@ class Balsa:Druid:Page:Directory from Balsa:Druid:Page {
 			GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL,
 			8, 4 );
 
+		if( 0 /* FIXME: libbalsa_mailbox_exists(imap_inbox) */ )
+		  init_presets[INBOX] = imap_inbox;
+		else {
+		  g_free(imap_inbox);
 		init_presets[INBOX] = libbalsa_guess_mail_spool();
+		}
 
 		init_widgets[INBOX] = &( self->_priv->inbox );
 		init_widgets[OUTBOX] = &( self->_priv->outbox );

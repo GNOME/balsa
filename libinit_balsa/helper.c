@@ -31,6 +31,8 @@
 #include "helper.h"
 #include "balsa-druid-page.h"
 #include "libbalsa.h"
+#include "mutt.h"
+#include "url.h"
 
 /*
  * #ifdef BALSA_LOCAL_INSTALL
@@ -137,6 +139,10 @@ gboolean balsa_init_create_to_directory( const gchar *dir, gchar **complaint )
     struct stat sb;
     gchar *sofar;
     guint32 i;
+    url_scheme_t scheme=url_check_scheme(dir);
+
+    if( scheme == U_IMAP || scheme == U_POP) 
+      return FALSE;		/* *** For now */
 
     if( dir[0] != '/' ) {
 	(*complaint) = g_strdup_printf( _("The path %s must be relative to the filesystem root (start with /)."), dir );

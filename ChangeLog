@@ -1,14 +1,21 @@
 2001-11-13  Pawel Salek  <pawsa@theochem.kth.se>
 
-	* configure.in: remember to have pthread libs at the end.
-
+	* configure.in: remember to have pthread libs at the end. 
+	Better test for vfs.
+	* src/Makefile.am: add PTHREAD libs in configure so they are
+	always at the end.
+	
 	Toralf Lund
 	* libbalsa/libbalsa.[hc]: helper guessing functions.
 	* libbalsa/message.[hc]: implement _is_multipart().
 	* src/address-book-config.c: use helper functions.
 	* src/folder-conf.c: ditto.
 	* src/main-window.c: use _is_multipart().
-
+	* libbalsa/address-book-ldap.c: UTF-8 conversions + better filter.
+	* libinit_balsa/balsa-druid-page-directory.gob:
+	* libinit_balsa/balsa-druid-page-user.gob:
+	* libinit_balsa/helper.c: better, IMAP-enabled guesses.
+	
 2001-11-12  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* Makefile.am: drop rpm-po.patch workaround dead.
@@ -17,7 +24,7 @@
 	* libbalsa/message.c: don't set new messages new (#64415).
 	* src/balsa-index.c: forward multiple messages (#64378).+freeze/thaw.
 	* src/balsa-message.c: query VFS for attachment handlers (#62054).
-	* src/folder-conf.c: help button closed dialog (#62054).
+	* src/folder-conf.c: help button closed dialog (#64349).
 	* src/sendmsg-window.[hc]: second part of multiple msg forwarding.
 
 2001-11-12  Carlos Morgado  <chbm@chbm.nu>

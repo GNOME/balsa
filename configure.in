@@ -110,14 +110,13 @@ AM_PATH_GNOME_PRINT([0.25.0], [
 dnl ###########################################################################
 dnl Check for gnome-vfs
 dnl ###########################################################################
-AC_CHECK_HEADER(libgnomevfs/gnome-vfs-mime-handlers.h,
-[],
-[ AC_MSG_ERROR(
-[ gnome-vfs-mime-handlers.h not found. 
-  Make sure you have gnome-vfs-devel installed.])
-]
-)
-gnome_libs="$gnome_libs vfs"
+AC_MSG_CHECKING(whether to Gnome-VFS is available)
+if gnome-config --libs vfs > /dev/null 2>&1; then
+       	AC_MSG_RESULT(yes)
+	gnome_libs="$gnome_libs vfs"
+else
+        AC_MSG_ERROR([Gnome-VFS library is needed to build balsa])
+fi
 
 dnl ###########################################################################
 dnl All the linguas, all the time.
@@ -326,14 +325,6 @@ AC_DEFINE_UNQUOTED( GNOME_LIB_PREFIX, "$GNOME_LIB_PREFIX" )
 AC_DEFINE_UNQUOTED( GNOME_DATA_PREFIX, "$GNOME_DATA_PREFIX" )
 AC_DEFINE_UNQUOTED( BALSA_COMMON_PREFIXES, `echo $BALSA_COMMON_PREFIXES` ) 
 dnl bleah
-
-dnl ##########################################################################
-dnl Things needed by CVS user
-dnl ##########################################################################
-
-if test x"$BALSA_FROM_CVS" = xyes ; then
-	GOB_CHECK(0.93.4)
-fi
 
 dnl ##########################################################################
 dnl Have ESMTP ?
@@ -593,11 +584,12 @@ if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
 fi
 
 dnl ###########################################################################
-dnl Check for CVS nature, for warnings + extra program checks
+dnl Check for CVS nature, GOB, warnings + extra program checks
 dnl have it at the end so configure tests do not die on warnings.
 dnl ###########################################################################
 
 if test -d "${srcdir}/CVS" ; then
+	GOB_CHECK(0.93.4)
 	BALSA_FROM_CVS=yes
 	CFLAGS="$CFLAGS -Werror"
 else

@@ -431,6 +431,8 @@ lbm_mh_parse_sequences(LibBalsaMailboxMh * mailbox)
     mailbox->mtime_sequences = st.st_mtime;
 
     fd = open(sequences_filename, O_RDONLY);
+    if (fd < 0)
+	return;
     gmime_stream = g_mime_stream_fs_new(fd);
     gmime_stream_buffer = g_mime_stream_buffer_new(gmime_stream,
 					GMIME_STREAM_BUFFER_BLOCK_READ);
@@ -514,7 +516,7 @@ lbm_mh_check(LibBalsaMailboxMh * mh, const gchar * path)
     GByteArray *line;
     gboolean retval = FALSE;
 
-    if (!(fd = open(mh->sequences_filename, O_RDONLY)))
+    if ((fd = open(mh->sequences_filename, O_RDONLY)) < 0)
 	return retval;
 
     gmime_stream = g_mime_stream_fs_new(fd);

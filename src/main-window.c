@@ -814,7 +814,6 @@ balsa_window_enable_continue(void)
 {
     /* Check msg count in draftbox */
     if (balsa_app.draftbox) {
-
         /* This is commented out because it causes long delays and
          * flickering of the mailbox list if large numbers of messages
          * are selected.  Checking the has_unread_messages flag works
@@ -823,15 +822,11 @@ balsa_window_enable_continue(void)
 /* 	libbalsa_mailbox_open(balsa_app.draftbox, FALSE); */
 /* 	if (balsa_app.draftbox->total_messages > 0) { */
 
-        if (balsa_app.draftbox->has_unread_messages) {
-	    gtk_widget_set_sensitive(main_toolbar[TOOLBAR_CONTINUE_POS].widget, TRUE);
-	    gtk_widget_set_sensitive(file_menu[MENU_FILE_CONTINUE_POS].widget,
-				     TRUE);
-	} else {
-	    gtk_widget_set_sensitive(main_toolbar[TOOLBAR_CONTINUE_POS].widget, FALSE);
-	    gtk_widget_set_sensitive(file_menu[MENU_FILE_CONTINUE_POS].widget,
-				     FALSE);
-	}
+	gboolean n = balsa_app.draftbox->open_ref == 0
+	    || balsa_app.draftbox->total_messages;
+
+	gtk_widget_set_sensitive(main_toolbar[TOOLBAR_CONTINUE_POS].widget,n);
+	gtk_widget_set_sensitive(file_menu[MENU_FILE_CONTINUE_POS].widget, n);
 
 /* 	libbalsa_mailbox_close(balsa_app.draftbox); */
     }

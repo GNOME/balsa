@@ -1,10 +1,13 @@
+2000-11-02  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/main-window.c(balsa_window_enable_continue): try to
+	enable continue menu/button in fast and reasonable way.
+
 2000-11-02  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/balsa-index-page.c (create_menu): Wrap the transfer submenu
 	in a scrolled window, do some magic to retain a sensible size for
 	the menu. Fixes bug 18083.
-
-2000-11-01  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/balsa-message.c (balsa_message_set): Check for messages with
 	no parts and don't crash.

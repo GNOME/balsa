@@ -552,7 +552,14 @@ filters_edit_dialog(void)
 
 	FILTER_CLRFLAG(cpfil,FILTER_COMPILED);
 	/* Copy conditions */
-        cpfil->condition = libbalsa_condition_clone(fil->condition);
+        if (fil->condition)
+            /* Copy conditions */
+            cpfil->condition = libbalsa_condition_clone(fil->condition);
+        else
+            balsa_information(LIBBALSA_INFORMATION_WARNING,
+                              _("Filter \"%s\" has no condition."),
+                              fil->name);
+
 #if FIXME
         /* If this condition is a match on a user header,
            add the user header name to the combo list */

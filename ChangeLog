@@ -5,6 +5,10 @@
 	* src/filter-edit-{callbacks,dialog}.c: edit conditions correctly.
 	* src/save-restore.c: append filters to the filter list.
 
+	* libbalsa/mailbox_imap.c: enable server-side copy under certain
+	conditions.
+	* libbalsa/imap/imap-commands.[hc]: add imap_mbox_handle_copy().
+
 2004-01-10 05:28  PeterB
 
 	* libbalsa/mailbox.c, libbalsa/mailbox.h, libbalsa/mailbox_imap.c,

@@ -302,6 +302,21 @@ imap_mbox_lsub(ImapMboxHandle *handle, const char* what)
 
 
 /* 6.3.11 APPEND Command */
+static gchar*
+enum_flag_to_str(ImapMsgFlag flg)
+{
+  GString *flags_str = g_string_new("");
+  unsigned idx;
+
+  for(idx=0; idx < ELEMENTS(msg_flags); idx++) {
+    if((flg & (1<<idx)) == 0) continue;
+    if(*flags_str->str) g_string_append_c(flags_str, ' ');
+    g_string_append_c(flags_str, '\\');
+    g_string_append(flags_str, msg_flags[idx]);
+  }
+  return g_string_free(flags_str, FALSE);
+}
+
 ImapResponse
 imap_mbox_append(ImapMboxHandle *handle, const char *mbox,
                  ImapMsgFlags flags, size_t sz,
@@ -310,7 +325,15 @@ imap_mbox_append(ImapMboxHandle *handle, const char *mbox,
   unsigned cmdno;
   ImapResponse rc;
   /* FIXME: quoting */
-  gchar *cmd = g_strdup_printf("APPEND \"%s\" {%d}", mbox, sz);
+  gchar *cmd;
+
+  if(flags) {
+    gchar *str = enum_flag_to_str(flags);
+    cmd = g_strdup_printf("APPEND \"%s\" (%s) {%d}", mbox, str, sz);
+    g_free(str);
+  } else 
+    cmd = g_strdup_printf("APPEND \"%s\" {%d}", mbox, sz);
+
   rc = imap_cmd_start(handle, cmd, &cmdno);
   g_free(cmd);
   if (rc<0) /* irrecoverable connection error. */
@@ -605,23 +628,16 @@ imap_mbox_store_flag_m(ImapMboxHandle *h, unsigned msgcnt, unsigned*seqno,
                        ImapMsgFlag flg, gboolean state)
 {
   ImapResponse res;
-  unsigned idx;
-  gchar* cmd, *seq;
+  gchar* cmd, *seq, *str;
   struct msg_set csd;
-  GString *flags_str = g_string_new("");
 
   csd.msgcnt = msgcnt; csd.seqno = seqno;
   if(msgcnt == 0) return IMR_OK;
-  for(idx=0; idx < ELEMENTS(msg_flags); idx++) {
-    if((flg & (1<<idx)) == 0) continue;
-    if(*flags_str->str) g_string_append_c(flags_str, ' ');
-    g_string_append_c(flags_str, '\\');
-    g_string_append(flags_str, msg_flags[idx]);
-  }
+  str = enum_flag_to_str(flg);
   seq = coalesce_seq_range(1, msgcnt, (CoalesceFunc)cf_set, &csd);
   cmd = g_strdup_printf("Store %s %cFlags.Silent (%s)", seq,
-                        state ? '+' : '-', flags_str->str);
-  g_string_free(flags_str, TRUE);
+                        state ? '+' : '-', str);
+  g_free(str);
   g_free(seq);
   res = imap_cmd_exec(h, cmd);
   g_free(cmd);
@@ -633,19 +649,12 @@ imap_mbox_store_flag(ImapMboxHandle *h, unsigned seq, ImapMsgFlag flg,
                      gboolean state)
 {
   ImapResponse rc;
-  unsigned idx;
-  gchar* cmd;
-  GString *flags_str = g_string_new("");
+  gchar* cmd, *str;
 
-  for(idx=0; idx < ELEMENTS(msg_flags); idx++) {
-    if((flg & (1<<idx)) == 0) continue;
-    if(*flags_str->str) g_string_append_c(flags_str, ' ');
-    g_string_append_c(flags_str, '\\');
-    g_string_append(flags_str, msg_flags[idx]);
-  }
+  str = enum_flag_to_str(flg);
   cmd = g_strdup_printf("STORE %d %cFLAGS (%s)", seq,
-                        state ? '+' : '-', flags_str->str);
-  g_string_free(flags_str, TRUE);
+                        state ? '+' : '-', str);
+  g_free(str);
   rc = imap_cmd_exec(h, cmd);
   g_free(cmd);
   return rc;
@@ -653,7 +662,17 @@ imap_mbox_store_flag(ImapMboxHandle *h, unsigned seq, ImapMsgFlag flg,
 
 
 /* 6.4.7 COPY Command */
-/* FIXME: implement */
+/** imap_mbox_handle_copy() copies given seqno from the mailbox
+    selected in handle to given mailbox on same server. */
+ImapResponse
+imap_mbox_handle_copy(ImapMboxHandle* handle, unsigned seqno,
+                      const gchar *dest)
+{
+  gchar *cmd = g_strdup_printf("COPY %u \"%s\"", seqno, dest);
+  ImapResponse rc = imap_cmd_exec(handle, cmd);
+  g_free(cmd);
+  return rc;
+}
 
 /* 6.4.8 UID Command */
 /* FIXME: implement */

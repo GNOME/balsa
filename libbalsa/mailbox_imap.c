@@ -1689,7 +1689,20 @@ libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
     GError *error = NULL;
     gssize len;
 
-    if ( LIBBALSA_MESSAGE_IS_UNREAD(message) )
+    if(message->mailbox &&
+       LIBBALSA_IS_MAILBOX_IMAP(message->mailbox) &&
+       LIBBALSA_MAILBOX_REMOTE(message->mailbox)->server ==
+       LIBBALSA_MAILBOX_REMOTE(mailbox)->server) {
+        ImapMboxHandle *handle = 
+            LIBBALSA_MAILBOX_IMAP(message->mailbox)->handle;
+        g_return_val_if_fail(handle, -1); /* message is there but
+                                           * the source mailbox closed! */
+        rc = imap_mbox_handle_copy(handle, message->msgno,
+                                   LIBBALSA_MAILBOX_IMAP(mailbox)->path);
+        return rc == IMR_OK ? 1 : -1;
+    }
+
+    if (!LIBBALSA_MESSAGE_IS_UNREAD(message) )
 	IMSG_FLAG_SET(imap_flags,IMSGF_SEEN);
     if ( LIBBALSA_MESSAGE_IS_DELETED(message ) ) 
 	IMSG_FLAG_SET(imap_flags,IMSGF_DELETED);

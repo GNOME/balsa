@@ -44,6 +44,8 @@ ImapResponse imap_mbox_store_flag(ImapMboxHandle *r, unsigned seq,
 ImapResponse imap_mbox_store_flag_m(ImapMboxHandle* h, unsigned msgcnt,
                                     unsigned *seqno, ImapMsgFlag flg, 
                                     gboolean state);
+ImapResponse imap_mbox_handle_copy(ImapMboxHandle* handle, unsigned seqno,
+                                   const gchar *dest);
 
 ImapResponse imap_mbox_handle_fetch_range(ImapMboxHandle* handle,
                                           unsigned lo, unsigned hi,

@@ -68,6 +68,8 @@ void mblist_open_mailbox (Mailbox * mailbox);
 void mblist_close_mailbox (Mailbox * mailbox);
 static void mailbox_select_cb (BalsaMBList *, Mailbox *, GtkCTreeNode *, GdkEventButton *);
 static gint mblist_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer data);
+/*PKGW*/
+static void size_allocate_cb( GtkWidget *widget, GtkAllocation *alloc );
 
 static GtkWidget *mblist_create_context_menu (GtkCTree * ctree, Mailbox * mailbox);
 
@@ -96,7 +98,9 @@ GtkWidget *balsa_mailbox_list_window_new(BalsaWindow *window)
   gtk_widget_pop_colormap ();
   gtk_widget_pop_visual ();
   
-  gtk_widget_set_usize (GTK_WIDGET (mblw->ctree), balsa_app.mblist_width, balsa_app.mblist_height);
+  /* PKGW TEST: what happens if we do this?
+   *  gtk_widget_set_usize (GTK_WIDGET (mblw->ctree), balsa_app.mblist_width, balsa_app.mblist_height);
+   */
 
 /*
    gtk_ctree_show_stub (mblw->ctree, FALSE);
@@ -126,6 +130,9 @@ GtkWidget *balsa_mailbox_list_window_new(BalsaWindow *window)
     GTK_SIGNAL_FUNC (mailbox_select_cb), NULL);
   gtk_signal_connect (GTK_OBJECT (mblw->ctree), "button_press_event",
   GTK_SIGNAL_FUNC (mblist_button_press_cb), NULL);
+  /* PKGW: We want to catch size changes for balsa_app.mblist_width */
+  gtk_signal_connect( GTK_OBJECT( mblw->ctree ), "size_allocate",
+		      GTK_SIGNAL_FUNC( size_allocate_cb ), NULL );
 
  /* callback when dragged object moves in the mblist window */
   gtk_signal_connect (GTK_OBJECT (mblw->ctree), "drag_motion",
@@ -260,6 +267,12 @@ mblist_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer data)
   return FALSE; /* never reached but this avoid compiler warning */
 }
 
+/*PKGW*/
+static void size_allocate_cb( GtkWidget *widget, GtkAllocation *alloc )
+{
+    printf( "size_allocate_cb()\n" );
+    balsa_app.mblist_width = alloc->width;
+}
 
 static void
 mailbox_select_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row, GdkEventButton * event)

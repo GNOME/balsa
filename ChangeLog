@@ -1,3 +1,22 @@
+1999-11-14  Peter Williams  <peter@wgwill.ne.mediaone.net>
+
+	* src/main-window.c (balsa_window_new), src/balsa-index-page.c,
+	balsa-mblist.c: Replaced gtk_widget_set_usize()'s with code that
+	properly sets the position of the large paned widget.
+
+	* src/mblist-window.c (balsa_mailbox_list_window_new): Added
+	signal handle on size_allocate to set balsa_app.mblist_width.
+
+	* src/balsa-mblist.c (balsa_mblist_destroy): Fixed erroneous
+	setting mblist_width/height to 1x1
+
+1999-11-13  Peter Williams  <peter@wgwill.ne.mediaone.net>
+
+	* src/mailbox-conf.c (mailbox_conf_set_values): Fixed typo in
+	IMAP configuration.
+
+	* src/save-restore.c (rot): Fixed bad assertions.
+
 1999-11-12  Peter Williams  <peter@wgwill.ne.mediaone.net>
 
 	* src/main-window.c (balsa_window_real_close_mailbox): Implemented

@@ -374,7 +374,8 @@ mailbox_conf_set_values (Mailbox * mailbox)
 	  {
 	    gchar tmp[10];
 	    sprintf (tmp, "%i", MAILBOX_IMAP(mailbox)->server->port);
-	    gtk_entry_set_text (GTK_ENTRY (mcw->imap_server), tmp);
+	    /*PKGW: typo here */
+	    gtk_entry_set_text (GTK_ENTRY (mcw->imap_port), tmp);
 	  }
 	}
       gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_IMAP);

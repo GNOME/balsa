@@ -52,14 +52,16 @@ rot (gchar * pass)
 {
   gchar *buff;
   gint len = 0, i = 0;
+
+  /*PKGW: let's do the assert() BEFORE we coredump... */
+  assert( pass != NULL );
+
   len = strlen (pass);
   buff = g_strdup (pass);
 
-
-  assert (pass != NULL);
-  assert (buff != NULL);	/* TODO: using assert for this case is wrong!
-				 * The error should be handled gracefully.
-				 */
+  /* Used to assert( buff ); this is wrong. If g_strdup
+     fails we're screwed anyway to let the upcoming coredump
+     occur. */
 
   for (i = 0; i < len; i++)
     {
@@ -691,16 +693,20 @@ config_global_load (void)
     balsa_app.mblist_width = 100;
   else
     balsa_app.mblist_width = atoi (field);
+
   /* FIXME this can be removed later */
-  //  if (balsa_app.mblist_width < 100)
-  //	  balsa_app.mblist_width = 170;
+  /* PKGW: why comment this out? Breaks my Transfer context menu. */
+  if (balsa_app.mblist_width < 100)
+      balsa_app.mblist_width = 170;
+
   if ((field = pl_dict_get_str (globals, "MailboxListHeight")) == NULL)
     balsa_app.mblist_height = 170;
   else
     balsa_app.mblist_height = atoi (field);
   /* FIXME this can be removed later */
-  //  if (balsa_app.mblist_height < 100)
-  //	  balsa_app.mblist_height = 200;
+  /* PKGW see above */
+  if (balsa_app.mblist_height < 100)
+      balsa_app.mblist_height = 200;
 
 
 

@@ -105,8 +105,10 @@ balsa_mblist_destroy (GtkObject * obj)
   del = BALSA_MBLIST (obj);
 
   /* this happens too late.. so these are set to 1x1 */
-  balsa_app.mblist_width = GTK_WIDGET(del)->allocation.width;
-  balsa_app.mblist_height = GTK_WIDGET(del)->allocation.height;
+  /* PKGW: ... so 1x1 is the dimension that gets saved on exit. No.
+   * balsa_app.mblist_width = GTK_WIDGET(del)->allocation.width;
+   * balsa_app.mblist_height = GTK_WIDGET(del)->allocation.height;
+   */
 
   if (GTK_OBJECT_CLASS(parent_class)->destroy)
     (*GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(del));

@@ -417,6 +417,8 @@ balsa_window_new ()
   window->mblist = balsa_mailbox_list_window_new(window);
   gtk_paned_pack1(GTK_PANED(hpaned), window->mblist, TRUE, TRUE);
   gtk_paned_pack2(GTK_PANED(hpaned), vpaned, TRUE, TRUE);
+  /*PKGW: do it this way, without the usizes.*/
+  gtk_paned_set_position( GTK_PANED(hpaned), balsa_app.mblist_width );
 
   gtk_paned_pack1(GTK_PANED(vpaned), window->notebook, TRUE, TRUE);
   gtk_paned_pack2(GTK_PANED(vpaned), preview, TRUE, TRUE);

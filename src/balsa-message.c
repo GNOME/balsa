@@ -779,12 +779,12 @@ balsa_message_focus_out_part(GtkWidget * widget, GdkEventFocus * event,
 static void
 save_dialog_ok(GtkWidget* save_dialog, BalsaPartInfo * info)
 {
-    const gchar *filename;
+    gchar *filename;
     gboolean do_save, result;
 
     gtk_widget_hide(save_dialog); 
     filename 
-        = gtk_file_selection_get_filename(GTK_FILE_SELECTION(save_dialog));
+        = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(save_dialog));
     
     g_free(balsa_app.save_dir);
     balsa_app.save_dir = g_path_get_dirname(filename);
@@ -812,41 +812,41 @@ save_dialog_ok(GtkWidget* save_dialog, BalsaPartInfo * info)
                               _("Could not save %s: %s"),
                               filename, strerror(errno));
     }
+    g_free(filename);
 }
 
 static void
 save_part(BalsaPartInfo * info)
 {
-    gchar *cont_type, *title, *filename;
+    gchar *cont_type, *title;
     GtkWidget *save_dialog;
     
     g_return_if_fail(info != 0);
 
     cont_type = libbalsa_message_body_get_mime_type(info->body);
     title = g_strdup_printf(_("Save %s MIME Part"), cont_type);
-    save_dialog = gtk_file_selection_new(title);
+    save_dialog =
+        gtk_file_chooser_dialog_new(title,
+                                    GTK_WINDOW(balsa_app.main_window),
+                                    GTK_FILE_CHOOSER_ACTION_SAVE,
+                                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                    GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
     g_free(title);
     g_free(cont_type);
-    gtk_window_set_wmclass(GTK_WINDOW(save_dialog), "save_part", "Balsa");
 
     if (balsa_app.save_dir)
-        filename = g_strdup_printf("%s/%s", balsa_app.save_dir,
-                                   info->body->filename 
-                                   ? info->body->filename : "");
-    else if(!balsa_app.save_dir && info->body->filename)
-        filename = g_strdup(info->body->filename);
-    else filename = NULL;
+        gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(save_dialog),
+                                            balsa_app.save_dir);
 
-    if (filename) {
+    if (info->body->filename) {
+	gchar *filename = g_strdup(info->body->filename);
         libbalsa_utf8_sanitize(&filename, balsa_app.convert_unknown_8bit, 
                                NULL);
-        gtk_file_selection_set_filename(GTK_FILE_SELECTION(save_dialog),
-                                        filename);
+        gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(save_dialog),
+                                          filename);
         g_free(filename);
     }
 
-    gtk_window_set_transient_for(GTK_WINDOW(save_dialog),
-                                 GTK_WINDOW(balsa_app.main_window));
     gtk_window_set_modal(GTK_WINDOW(save_dialog), TRUE);
     if(gtk_dialog_run(GTK_DIALOG(save_dialog)) == GTK_RESPONSE_OK)
         save_dialog_ok(save_dialog, info);

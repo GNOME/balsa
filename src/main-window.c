@@ -929,7 +929,10 @@ balsa_window_real_open_mailbox(BalsaWindow * window,
     enable_mailbox_menus(mailbox);
 }
 
+/* balsa_window_real_close_mailbox:
+   this function overloads libbalsa_mailbox_close_mailbox.
 
+*/
 static void
 balsa_window_real_close_mailbox(BalsaWindow * window,
 				LibBalsaMailbox * mailbox)
@@ -1449,8 +1452,6 @@ send_progress_notify_cb()
     SendThreadMessage **currentpos;
     void *msgbuffer;
     uint count;
-    GSList *node;
-    LibBalsaMessage *message;
     float percent;
 
     msgbuffer = malloc(2049);
@@ -1498,14 +1499,9 @@ send_progress_notify_cb()
 		gtk_widget_show_all(send_dialog);
 	    }
 
-	    if (percent > 1.0 || percent < 0.0) {
-		if (balsa_app.debug)
-		    fprintf(stderr,
-			    "progress bar percentage out of range %f\n",
-			    percent);
-		percent = 1.0;
+	    if (percent > 1.0 || percent < 0.0)
+		percent = 1.0; /* PS: never executed to my knowledge */
 
-	    }
 
 	    if (GTK_IS_WIDGET(send_dialog))
 		gtk_progress_bar_update(GTK_PROGRESS_BAR(send_dialog_bar),
@@ -1514,33 +1510,6 @@ send_progress_notify_cb()
 		gnome_appbar_set_progress(balsa_app.appbar, percent);
 
 	    /* display progress x of y, y = of_total */
-	    break;
-
-	case MSGSENDTHREADDELETE:
-	    /* passes message to be deleted */
-
-	    if (threadmessage->msg != NULL) {
-		if (threadmessage->msg->mailbox != NULL)
-		    list = g_slist_append(list, threadmessage->msg);
-	    }
-
-	    if (!strcmp(threadmessage->message_string, "LAST")
-		&& threadmessage->msg == NULL) {
-		libbalsa_mailbox_open(balsa_app.outbox, FALSE);
-		node = list;
-
-		while (node != NULL) {
-		    message = node->data;
-		    if (message->mailbox)
-			libbalsa_message_delete(message);
-		    gtk_object_destroy(GTK_OBJECT(message));
-		    node = node->next;
-		}
-		libbalsa_mailbox_close(balsa_app.outbox);
-		g_slist_free(list);
-		list = NULL;
-	    }
-
 	    break;
 
 	case MSGSENDTHREADFINISHED:

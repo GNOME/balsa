@@ -75,7 +75,7 @@
 
 #define DEFAULT_MESSAGE_FONT "-*-fixed-medium-r-normal-*-*-*-*-*-c-*-iso8859-1"
 #define DEFAULT_SUBJECT_FONT "-*-fixed-bold-r-normal-*-*-*-*-*-c-*-iso8859-1"
-#define DEFAULT_DATE_FORMAT "%a, %d %b %Y %H:%M:%S"
+#define DEFAULT_DATE_FORMAT "%Y.%m.%d %H:%M:%S %z"
 #define DEFAULT_SELECTED_HDRS "from to date cc subject"
 #define DEFAULT_CHARSET "ISO-8859-1"
 #define DEFAULT_ENCODING ENC8BIT

@@ -401,7 +401,7 @@ struct {
 #define LOC_RUSSIAN_KOI_POS   20
     {"ru_RU", "KOI-8-R", N_("Russian (KOI)")},
 #define LOC_SLOVAK_POS    21
-    {"sl_SI", "ISO-8859-2", N_("Slovak")},
+    {"sk_SK", "ISO-8859-2", N_("Slovak")},
 #define LOC_SPANISH_POS   22
     {"es_ES", "ISO-8859-1", N_("Spanish")},
 #define LOC_SWEDISH_POS   23

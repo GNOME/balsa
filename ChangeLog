@@ -1,3 +1,12 @@
+2000-11-07  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/send.c: fix message multiplication in threaded code on
+	failed relaying. Plug memory leak in local MTA mode.
+	* src/balsa-app.h: change default date format.
+	* src/balsa-message.c: release selection, fix  #29362 and #30395.
+	* src/main-window.c: remove deprecated code message deletion on sending
+	* src/sendmsg-window.c: fix Slovak locale.
+	
 2000-11-06  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* configure.in: don't postfix BALSA_COMMON_PREFIXES with a comma.

@@ -1542,6 +1542,7 @@ balsa_message_previous_part(BalsaMessage * bmessage)
 
 /* 
  * If part == -1 then change to no part
+ * must release selection before hiding a text widget.
  */
 static void
 select_part(BalsaMessage * bm, gint part)
@@ -1549,6 +1550,10 @@ select_part(BalsaMessage * bm, gint part)
     BalsaPartInfo *info;
 
     if (bm->current_part && bm->current_part->widget) {
+	if(GTK_IS_EDITABLE(bm->current_part->widget))
+	    gtk_editable_claim_selection(
+		GTK_EDITABLE(bm->current_part->widget), FALSE, 
+		GDK_CURRENT_TIME);
 	gtk_widget_hide(bm->current_part->widget);
 	gtk_container_remove(GTK_CONTAINER(bm->table),
 			     bm->current_part->widget);

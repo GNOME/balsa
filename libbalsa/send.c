@@ -55,15 +55,12 @@ struct _MessageQueueItem {
     MessageQueueItem *next_message;
     gchar *fcc;
     char tempfile[_POSIX_PATH_MAX];
-    int delete;
+    enum {MQI_WAITING, MQI_FAILED,MQI_SENT} status;
 };
 
-MessageQueueItem *last_message;
+MessageQueueItem *message_queue;
 int total_messages_left;
 
-/* make sure that you use malloc/free pair, g_lib routines /claimed/ to 
-   be not MT-safe.
-*/
 static MessageQueueItem *
 msg_queue_item_new(LibBalsaMessage * message)
 {
@@ -74,7 +71,7 @@ msg_queue_item_new(LibBalsaMessage * message)
     mqi->message = mutt_new_header();
     mqi->next_message = NULL;
     mqi->fcc = g_strdup(message->fcc_mailbox);
-    mqi->delete = 0;
+    mqi->status = MQI_WAITING;
     mqi->tempfile[0] = '\0';
 
     return mqi;
@@ -92,10 +89,9 @@ msg_queue_item_destroy(MessageQueueItem * mqi)
     g_free(mqi);
 }
 
-static guint balsa_send_message_real(MessageQueueItem * first_message);
+static guint balsa_send_message_real(LibBalsaMailbox* outbox);
 static void encode_descriptions(BODY * b);
-static int libbalsa_smtp_send(MessageQueueItem * first_message,
-			      char *server);
+static int libbalsa_smtp_send(char *server);
 static int libbalsa_smtp_protocol(int s, char *tempfile, HEADER * msg);
 static gboolean libbalsa_create_msg(LibBalsaMessage * message,
 				    HEADER * msg, char *tempfile,
@@ -158,41 +154,58 @@ add_mutt_body_plain(const gchar * charset, gint encoding_style)
     return body;
 }
 
+#if 0
+/* you never know when you will need this one... */
+static void dump_queue(const char*msg)
+{
+    MessageQueueItem *mqi = message_queue;
+    printf("dumping message queue at %s:\n", msg);
+    while(mqi) {
+	printf("item: %p\n", mqi);
+	mqi = mqi->next_message;
+    }
+}
+#endif
+/* libbalsa_message_send:
+   send the given messsage (if any, it can be NULL) and all the messages
+   in given outbox.
+   NOTE that we do not close outbox after reading. send_real/thread message 
+   handler does that.
+   FIXME: split this into two funtions: one saves the message to outbox,
+   other one processes the queue. This make it easy to implement function
+   like "send message later".
+*/
 gboolean
 libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 		      gint encoding)
 {
-    MessageQueueItem *first_message, *current_message, *new_message;
+    MessageQueueItem *mqi, *new_message;
     GList *lista;
     LibBalsaMessage *queu;
-    int message_number = 0;
 #ifdef BALSA_USE_THREADS
     GtkWidget *send_dialog_source = NULL;
+    pthread_mutex_lock(&send_messages_lock);
 #endif
 
     if (message != NULL) {
-	first_message = msg_queue_item_new(message);
-	if (!libbalsa_create_msg(message, first_message->message,
-				 first_message->tempfile, encoding, 0)) {
-	    msg_queue_item_destroy(first_message);
-	    return FALSE;
-	}
-	message_number++;
-    } else {
-	first_message = NULL;
+	mqi = msg_queue_item_new(message);
+	if (libbalsa_create_msg(message, mqi->message,
+				 mqi->tempfile, encoding, 0)) {
+	    /* save message so it is not lost if we quit before sending it */
+	    mutt_write_fcc(LIBBALSA_MAILBOX_LOCAL(outbox)->path,
+			   mqi->message, NULL, 0, NULL);
+	    libbalsa_mailbox_check(outbox);
+	} 
+	msg_queue_item_destroy(mqi);
     }
-
-    current_message = first_message;
-
-    /* We do messages in queue now only if where are not sending them already */
+    
+ /* We do messages in queue now only if where are not sending them already */
 
 #ifdef BALSA_USE_THREADS
-
-    pthread_mutex_lock(&send_messages_lock);
     if (sending_mail == FALSE) {
 	/* We create here the progress bar */
 	send_dialog = gnome_dialog_new("Sending Mail...", "Hide", NULL);
-
+	
 	gnome_dialog_set_close(GNOME_DIALOG(send_dialog), TRUE);
 	send_dialog_source = gtk_label_new("Sending Mail....");
 	gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
@@ -209,41 +222,32 @@ libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 	gtk_widget_show_all(send_dialog);
 	/* Progress bar done */
 #endif
-
-	last_message = first_message;
 	libbalsa_mailbox_open(outbox, FALSE);
 	lista = outbox->message_list;
-
+	
+	mqi = message_queue;
 	while (lista != NULL) {
 	    queu = LIBBALSA_MESSAGE(lista->data);
-
+	    
 	    new_message = msg_queue_item_new(queu);
 	    if (!libbalsa_create_msg(queu, new_message->message,
 				     new_message->tempfile, encoding, 1)) {
 		msg_queue_item_destroy(new_message);
 	    } else {
-		if (current_message)
-		    current_message->next_message = new_message;
+		if (mqi)
+		    mqi->next_message = new_message;
 		else
-		    first_message = new_message;
+		    message_queue = new_message;
 
-		current_message = new_message;
-		last_message = new_message;
-		message_number++;
+		mqi = new_message;
+		total_messages_left++;
 	    }
 	    lista = lista->next;
 	}
-
-	libbalsa_mailbox_close(outbox);
-
 #ifdef BALSA_USE_THREADS
     }
-
-    total_messages_left = total_messages_left + message_number;
-
-    if (sending_mail == TRUE) {
+    if (sending_mail) {
 	/* add to the queue of messages waiting to be sent */
-	last_message->next_message = first_message;
 	pthread_mutex_unlock(&send_messages_lock);
     } else {
 	/* start queue of messages to send and initiate thread */
@@ -251,7 +255,7 @@ libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 	pthread_mutex_unlock(&send_messages_lock);
 	pthread_create(&send_mail,
 		       NULL,
-		       (void *) &balsa_send_message_real, first_message);
+		       (void *) &balsa_send_message_real, outbox);
 	/* Detach so we don't need to pthread_join
 	 * This means that all resources will be
 	 * reclaimed as soon as the thread exits
@@ -260,171 +264,134 @@ libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 	
     }
 #else				/*non-threaded code */
-    balsa_send_message_real(first_message);
+    balsa_send_message_real(outbox);
 #endif
     return TRUE;
 }
 
-/* balsa_send_message_real:
-   does the acutal message sending. Suffers from severe memory leaks.
-   One of them: local MDA mode, more than one messages to send (some of
-   them loaded from outbox). Only first one will be sent and memory released.
-   FIXME ...
+static void
+handle_successful_send(MessageQueueItem *mqi)
+{
+    LibBalsaMailbox *save_box;
+    gdk_threads_enter();
+    save_box = balsa_find_mbox_by_name(mqi->fcc);
+    gdk_threads_leave();
+    
+    if (save_box && LIBBALSA_IS_MAILBOX_LOCAL(save_box)) {
+	libbalsa_lock_mutt();
+	mutt_write_fcc(LIBBALSA_MAILBOX_LOCAL(save_box)->path,
+		       mqi->message, NULL, 0, NULL);
+	libbalsa_unlock_mutt();
+	if (save_box->open_ref > 0)
+	    libbalsa_mailbox_check(save_box);
+    }
+    if (mqi->orig->mailbox) {
+	libbalsa_message_delete(mqi->orig);
+    }
+    mqi->status = MQI_SENT;
+}
 
+/* get_msg2send: 
+   returns first waiting message on the message_queue.
+*/
+static MessageQueueItem* get_msg2send()
+{
+    MessageQueueItem* res = message_queue;
+#ifdef BALSA_USE_THREADS
+    pthread_mutex_lock(&send_messages_lock);
+#endif
+    while(res && res->status != MQI_WAITING)
+	res = res->next_message;
+
+#ifdef BALSA_USE_THREADS
+    pthread_mutex_unlock(&send_messages_lock);
+#endif
+    return res;
+}
+
+/* balsa_send_message_real:
+   does the acutal message sending. 
    This function may be called as a thread and should therefore do
    proper gdk_threads_{enter/leave} stuff around GTK,libbalsa or
-   libmutt calls
+   libmutt calls.
+   FIXME: translate error messages AFTER 1.0.0 release. balsa didn't print 
+   them before so it doesn't matter much and I don't want to confuse 
+   translation people.
 */
-static guint balsa_send_message_real(MessageQueueItem * first_message) {
-#ifdef BALSA_USE_THREADS
-    SendThreadMessage *threadmsg, *delete_message;
-#endif
-    MessageQueueItem *current_message, *next_message;
-    LibBalsaMailbox *save_box;
+static guint balsa_send_message_real(LibBalsaMailbox* outbox) {
+    MessageQueueItem *mqi, *next_message;
     int i;
-    
-    if (!first_message) {
 #ifdef BALSA_USE_THREADS
+    SendThreadMessage *threadmsg;
+    pthread_mutex_lock(&send_messages_lock);
+    if (!message_queue) {
 	sending_mail = FALSE;
-#endif
+	pthread_mutex_unlock(&send_messages_lock);
+	MSGSENDTHREAD(threadmsg, MSGSENDTHREADFINISHED, "", NULL, NULL, 0);
 	return TRUE;
     }
-    
-    /* the local MDA code is so simple that we handle it in short-circuit
-       fashion.
-    */ if (!balsa_app.smtp) {
-#ifdef BALSA_USE_THREADS
-	pthread_mutex_lock(&send_messages_lock);
-	sending_mail = FALSE;
-	total_messages_left = 0;
-	pthread_mutex_unlock(&send_messages_lock);
-#endif
-	
-#ifdef BALSA_USE_THREADS
-	gdk_threads_enter();
-#endif
-	
-	libbalsa_lock_mutt();
-	i = mutt_invoke_sendmail(first_message->message->env->to,
-				 first_message->message->env->cc,
-				 first_message->message->env->bcc,
-				 first_message->tempfile,
-				 (first_message->message->content->
-				  encoding == ENC8BIT));
-	libbalsa_unlock_mutt();
-
-	if (i != 0)
-	    save_box = balsa_app.outbox;
-	else
-	    save_box = balsa_find_mbox_by_name(first_message->fcc);
-
-	if (save_box && LIBBALSA_IS_MAILBOX_LOCAL(save_box)) {
-	    libbalsa_lock_mutt();
-	    mutt_write_fcc(LIBBALSA_MAILBOX_LOCAL(save_box)->path,
-			   first_message->message, NULL, 1, NULL);
-	    libbalsa_unlock_mutt();
-
-	    if (save_box->open_ref > 0) {
-		libbalsa_mailbox_check(save_box);
-
-	    }
-	}
-	msg_queue_item_destroy(first_message);
-
-#ifdef BALSA_USE_THREADS
-	gdk_threads_leave();
-#endif
-
-#ifdef BALSA_USE_THREADS
-	MSGSENDTHREAD(threadmsg, MSGSENDTHREADFINISHED, "", NULL, NULL,
-		      0);
-	pthread_exit(0);
-#endif
-
-
-	return TRUE;
-    }
-
-    /* The hell of SMTP only code follows below... */
-    /* libbalsa_smtp_send doesn't expect the GDK lock to be held */
-    i = libbalsa_smtp_send(first_message, balsa_app.smtp_server);
-
-#ifdef BALSA_USE_THREADS
-    if (i == -1) {
-	pthread_mutex_lock(&send_messages_lock);
-	sending_mail = FALSE;
-	total_messages_left = 0;
-	pthread_mutex_unlock(&send_messages_lock);
-
-	MSGSENDTHREAD(threadmsg, MSGSENDTHREADFINISHED, "", NULL, NULL,
-		      0);
-    }
-#endif
-
-    /* We give a message to the user because an error has ocurred in the protocol
-	 * A mistyped address? A server not allowing relay? We can pop a window to ask */
-
-    if (i == -2)
-	fprintf(stderr,
-		"SMTP protocol error (wrong address, relaying denied)\n");
-
-    /* We give back all the resources used and delete the sent messages */
-
-#ifndef BALSA_USE_THREADS
-    libbalsa_mailbox_open(balsa_app.outbox, FALSE);
-#endif
-    current_message = first_message;
-
-    while (current_message != NULL) {
-	if (current_message->delete == 1) {
-#ifdef BALSA_USE_THREADS
-	    gdk_threads_enter();
-#endif
-	    save_box = balsa_find_mbox_by_name(current_message->fcc);
-
-#ifdef BALSA_USE_THREADS
-	    gdk_threads_leave();
-#endif
-
-	    if (save_box && LIBBALSA_IS_MAILBOX_LOCAL(save_box)) {
-		libbalsa_lock_mutt();
-		mutt_write_fcc(LIBBALSA_MAILBOX_LOCAL(save_box)->path,
-			       current_message->message, NULL, 0,
-			       NULL);
-		libbalsa_unlock_mutt();
-	    }
-#ifdef BALSA_USE_THREADS
-	    MSGSENDTHREAD(delete_message, MSGSENDTHREADDELETE, " ",
-			  current_message->orig, NULL, 0);
+    pthread_mutex_unlock(&send_messages_lock);
 #else
-	    if (current_message->orig->mailbox)
-		libbalsa_message_delete(current_message->orig);
+    if(!message_queue) return TRUE;
 #endif
-	} else {
-	    if (current_message->orig->mailbox == NULL) {
-		libbalsa_lock_mutt();
-		mutt_write_fcc(LIBBALSA_MAILBOX_LOCAL
-			       (balsa_app.outbox)->path,
-			       current_message->message, NULL, 0,
-			       NULL);
-		libbalsa_unlock_mutt();
-	    }
+
+    if (!balsa_app.smtp) {	
+	while ( (mqi = get_msg2send()) != NULL) {
+	    libbalsa_lock_mutt();
+	    i = mutt_invoke_sendmail(mqi->message->env->to,
+				     mqi->message->env->cc,
+				     mqi->message->env->bcc,
+				     mqi->tempfile,
+				     (mqi->message->content->encoding
+				      == ENC8BIT));
+	    libbalsa_unlock_mutt();
+	    mqi->status = (i==0?MQI_SENT : MQI_FAILED);
+	    total_messages_left--; /* whatever the status is, one less to do*/
 	}
-
-	next_message = current_message->next_message;
-	msg_queue_item_destroy(current_message);
-	current_message = next_message;
+    } else {
+	i = libbalsa_smtp_send(balsa_app.smtp_server);
+	
+/* We give a message to the user because an error has ocurred in the protocol
+ * A mistyped address? A server not allowing relay? We can pop a window to ask
+ */
+	if (i == -2) {
+#if 0
+	    MSGSENDTHREAD(threadmsg, MSGSENDTHREADERROR, 
+			  "SMTP protocol error. Cannot relay", NULL, NULL, 0);
+#else
+	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+				 "SMTP protocol error. Cannot relay.");
+#endif
+	}
     }
-
+    /* We give back all the resources used and delete the sent messages */
+    
 #ifdef BALSA_USE_THREADS
-    MSGSENDTHREAD(delete_message, MSGSENDTHREADDELETE, "LAST",
-		  NULL, NULL, 0);
+    pthread_mutex_lock(&send_messages_lock);
+#endif
+    mqi = message_queue;
+    
+    while (mqi != NULL) {
+	if (mqi->status == MQI_SENT) 
+	    handle_successful_send(mqi);
+	next_message = mqi->next_message;
+	msg_queue_item_destroy(mqi);
+	mqi = next_message;
+    }
+    
     gdk_threads_enter();
-    libbalsa_mailbox_close(balsa_app.outbox);
+    libbalsa_mailbox_close(outbox);
+    libbalsa_mailbox_commit_changes(outbox);
     gdk_threads_leave();
+
+    message_queue = NULL;
+    total_messages_left = 0;
+#ifdef BALSA_USE_THREADS
+    sending_mail = FALSE;
+    pthread_mutex_unlock(&send_messages_lock);
+    MSGSENDTHREAD(threadmsg, MSGSENDTHREADFINISHED, "", NULL, NULL, 0);
     pthread_exit(0);
 #endif
-
     return TRUE;
 }
 
@@ -684,8 +651,7 @@ static int libbalsa_smtp_protocol(int s, char *tempfile,
     /* Now we are ready to send the message */
 
 #ifdef BALSA_USE_THREADS
-    sprintf(send_message, "Messages to be sent: %d ",
-	    total_messages_left);
+    sprintf(send_message, "Messages to be sent: %d ", total_messages_left);
     MSGSENDTHREAD(progress_message, MSGSENDTHREADPROGRESS,
 		  send_message, NULL, NULL, 0);
 #endif
@@ -759,8 +725,7 @@ static int libbalsa_smtp_protocol(int s, char *tempfile,
  * -2    Error during protocol 
  * 1     Everything when perfect */
 /* Does not expect the GDK lock to be held */
-static int libbalsa_smtp_send(MessageQueueItem * first_message,
-			      char *server) {
+static int libbalsa_smtp_send(char *server) {
 
     struct sockaddr_in sin;
     struct hostent *he;
@@ -834,25 +799,23 @@ static int libbalsa_smtp_send(MessageQueueItem * first_message,
     if (smtp_answer(s) == 0)
 	return -2;
 
-    current_message = first_message;
-    while (current_message != NULL) {
-	if (
-	    (libbalsa_smtp_protocol
-	     (s, current_message->tempfile,
-	      current_message->message)) == 0) {
+    while ( (current_message = get_msg2send())!= NULL) {
+	if (libbalsa_smtp_protocol(s, current_message->tempfile,
+				   current_message->message) == 0) {
+	    current_message->status = MQI_FAILED;
 	    error = 1;
 	    snprintf(buffer, 512, "RSET %s\r\n", server);
 	    write(s, buffer, strlen(buffer));
 	    if (smtp_answer(s) == 0)
 		return -2;
 	} else {
-	    current_message->delete = 1;
+	    current_message->status = MQI_SENT;
 	}
 
 #ifdef BALSA_USE_THREADS
 	pthread_mutex_lock(&send_messages_lock);
 
-	total_messages_left = total_messages_left - 1;
+	total_messages_left--;
 	if (current_message->next_message == NULL)
 	    sending_mail = FALSE;
 
@@ -1046,7 +1009,7 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 	    return FALSE;
 
 	_mutt_copy_message(tempfp, mensaje->fp, msg_tmp,
-			   msg_tmp->content, 0, 0);
+			   msg_tmp->content, 0, CH_NOSTATUS);
 
 	if (fclose(tempfp) != 0) {
 	    mutt_perror(tmpfile);

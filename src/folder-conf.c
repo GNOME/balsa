@@ -312,7 +312,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     fcw->has_bugs = 
         balsa_server_conf_add_checkbox(&fcw->bsc,
                                        _("Enable _bug workarounds"));
-    if(!s || 
+    if(s &&
        libbalsa_imap_server_has_bug(LIBBALSA_IMAP_SERVER(s), ISBUG_FETCH))
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fcw->has_bugs),
                                      TRUE);

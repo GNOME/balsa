@@ -1,3 +1,11 @@
+2004-09-07  Pawel Salek
+
+	* libbalsa/send.c: make the error messages match reality.
+	* src/balsa-index.c: disable tree view searching conflicting with
+	shortcuts.
+	* src/sendmsg-window.[ch]: unregister identities listener (crash).
+	* src/folder-conf.c: bug workaround disabled by default.
+
 2004-09-07 08:05  PeterB
 
 	* src/balsa-message.c: remove assertion; do not set charset--now

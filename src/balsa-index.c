@@ -416,6 +416,9 @@ bndx_instance_init(BalsaIndex * index)
     g_signal_connect_after(tree_view, "size-allocate",
                            G_CALLBACK(bndx_column_resize),
                            NULL);
+#if GTK_CHECK_VERSION(2,4,9)
+    gtk_tree_view_set_enable_search(tree_view, FALSE);
+#endif
 
     gtk_drag_source_set(GTK_WIDGET (index), 
                         GDK_BUTTON1_MASK | GDK_SHIFT_MASK | GDK_CONTROL_MASK,

@@ -784,6 +784,8 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
 
     g_signal_handler_disconnect(G_OBJECT(balsa_app.main_window),
                                 bsmsg->delete_sig_id);
+    g_signal_handler_disconnect(G_OBJECT(balsa_app.main_window),
+                                bsmsg->identities_changed_id);
     if(balsa_app.debug) g_message("balsa_sendmsg_destroy()_handler: Start.");
 
     if (bsmsg->orig_message) {
@@ -3051,7 +3053,7 @@ sendmsg_window_get_toolbar_model(void)
 }
 
 static void
-bsmsg_identites_changed_cb(BalsaSendmsg *bsmsg)
+bsmsg_identities_changed_cb(BalsaSendmsg *bsmsg)
 {
     GtkWidget *toolbar =
         balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
@@ -3137,8 +3139,10 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     gnome_app_set_toolbar(GNOME_APP(window), GTK_TOOLBAR(toolbar));
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_IDENTITY,
                                        g_list_length(balsa_app.identities)>1);
-    g_signal_connect_swapped(balsa_app.main_window, "identities-changed",
-                             (GCallback)bsmsg_identites_changed_cb, bsmsg);
+    bsmsg->identities_changed_id = 
+        g_signal_connect_swapped(balsa_app.main_window, "identities-changed",
+                                 (GCallback)bsmsg_identities_changed_cb,
+                                 bsmsg);
     sw_buffer_set_undo(bsmsg, TRUE, FALSE);
 
     bsmsg->ready_widgets[0] = file_menu[MENU_FILE_SEND_POS].widget;

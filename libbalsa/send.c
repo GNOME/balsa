@@ -1144,12 +1144,20 @@ balsa_send_message_real(SendMessageInfo* info)
             libbalsa_information
                 (LIBBALSA_INFORMATION_ERROR,
                  _("SMTP server refused connection.\n"
-                   "Balsa by default uses submission service (587).\n"
-                   "If you want to submit mail using relay service (25),"
-                   "specify it explicitly via: \"host:smtp\".\n"
-                   "Message is left in outbox."));
+                   "Check your internet connection."));
+        case -EHOSTUNREACH:
+            libbalsa_information
+                (LIBBALSA_INFORMATION_ERROR,
+                 _("SMTP server cannot be reached.\n"
+                   "Check your internet connection."));
             break;
         case SMTP_ERR_NOTHING_TO_DO: /* silence this one? */
+            break;
+        case SMTP_ERR_EAI_AGAIN:
+            /* this is really problem with DNS but it is nowadays
+               caused by general connection problems. */
+            libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+                                 _("Message left in Outbox (try again later)"));
             break;
         default:
             libbalsa_information (LIBBALSA_INFORMATION_ERROR,

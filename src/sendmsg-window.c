@@ -509,6 +509,7 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
   switch (type)
     {
     case SEND_REPLY:
+    case SEND_REPLY_ALL:
       window = gnome_app_new ("balsa", _ ("Reply to "));
       msg->orig_message = message;
       break;
@@ -570,7 +571,7 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
   switch (type)
     {
     case SEND_REPLY:
-    case SEND_REPLY_TO_ALL:
+    case SEND_REPLY_ALL:
       {
 	gchar *tmp;
 
@@ -613,6 +614,21 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
       break;
     }
 
+
+  if (type == SEND_REPLY_ALL)
+    {
+      gchar *tmp;
+
+      tmp = make_string_from_list (message->to_list);
+      gtk_entry_set_text (GTK_ENTRY (msg->cc), tmp);
+
+      gtk_entry_append_text (GTK_ENTRY (msg->cc), ", ");
+
+      tmp = make_string_from_list (message->cc_list);
+      gtk_entry_append_text (GTK_ENTRY (msg->cc), tmp);
+
+      g_free (tmp);
+    }
 
   gtk_box_pack_end (GTK_BOX (vbox),
 		    create_text_area (msg),

@@ -66,7 +66,6 @@ AC_CHECK_LIB(krb, krb_sendauth)
 AC_CHECK_LIB(acap, acap_OpenConnection)
 
 
-AM_FUNC_OBSTACK
 AM_HDR_SIGACTION
 AM_HDR_SIGSET
 

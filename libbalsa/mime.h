@@ -20,7 +20,6 @@
 #ifndef __MIME_H__
 #define __MIME_H__
 
-#include <obstack.h>
 #include <stdio.h>
 
 #include "mailbox.h"

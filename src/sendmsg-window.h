@@ -29,7 +29,7 @@ extern "C"
     {
       SEND_NORMAL,
       SEND_REPLY,
-      SEND_REPLY_TO_ALL,
+      SEND_REPLY_ALL,
       SEND_FORWARD
     }
   SendType;

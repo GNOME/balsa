@@ -62,6 +62,7 @@ static void check_new_messages_cb (GtkWidget *, gpointer data);
 
 static void new_message_cb (GtkWidget * widget, gpointer data);
 static void replyto_message_cb (GtkWidget * widget, gpointer data);
+static void replytoall_message_cb (GtkWidget * widget, gpointer data);
 static void forward_message_cb (GtkWidget * widget, gpointer data);
 
 static void next_message_cb (GtkWidget * widget, gpointer data);
@@ -267,6 +268,11 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
   gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) replyto_message_cb, NULL);
   gtk_menu_append (GTK_MENU (menu), w);
 
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_RPL, _ ("Reply to all"));
+  gtk_widget_add_accelerator (w, "activate", accel, 'A', 0, GTK_ACCEL_VISIBLE);
+  gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) replytoall_message_cb, NULL);
+  gtk_menu_append (GTK_MENU (menu), w);
+
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_FWD, _ ("Forward"));
   gtk_widget_add_accelerator (w, "activate", accel, 'F', 0, GTK_ACCEL_VISIBLE);
   gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) forward_message_cb, NULL);
@@ -443,6 +449,15 @@ create_toolbar (GnomeMDI * mdi, GtkWidget * app)
 			     NULL);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
+  toolbarbutton =
+    gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+			     _ ("Reply to all"),
+			     _ ("Reply to all"),
+			     NULL,
+	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_RPL),
+			     (GtkSignalFunc) replytoall_message_cb,
+			     NULL);
+  GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
   toolbarbutton =
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
@@ -584,7 +599,28 @@ replyto_message_cb (GtkWidget * widget, gpointer data)
       sendmsg_window_new (widget, message, SEND_REPLY);
       list = list->next;
     }
+}
 
+static void
+replytoall_message_cb (GtkWidget * widget, gpointer data)
+{
+  GtkCList *clist;
+  GList *list;
+  Message *message;
+
+  g_return_if_fail (widget != NULL);
+
+  if (!balsa_app.current_index_child)
+    return;
+
+  clist = GTK_CLIST (GTK_BIN (balsa_app.current_index_child->index)->child);
+  list = clist->selection;
+  while (list)
+    {
+      message = gtk_clist_get_row_data (clist, (gint) list->data);
+      sendmsg_window_new (widget, message, SEND_REPLY_ALL);
+      list = list->next;
+    }
 }
 
 

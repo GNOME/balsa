@@ -257,8 +257,13 @@ struct _MessageWindow {
     guint idle_handler_id;
 
     /* Pointers to our copies of widgets. */
+    GtkWidget *next;
+    GtkWidget *previous;
     GtkWidget *next_unread;
     GtkWidget *next_flagged;
+    GtkWidget *next_part;
+    GtkWidget *previous_part;
+    GtkWidget *trash;
 #ifdef HAVE_GTKHTML
     GtkWidget *zoom_in;
     GtkWidget *zoom_out;
@@ -329,14 +334,12 @@ mw_set_part_buttons_sensitive(MessageWindow * mw)
     enable = balsa_message_has_next_part(msg);
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT_PART,
                                        enable);
-    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_NEXT_PART_POS].
-                             widget, enable);
+    gtk_widget_set_sensitive(mw->next_part, enable);
 
     enable = balsa_message_has_previous_part(msg);
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_PREVIOUS_PART,
                                        enable);
-    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_PREVIOUS_PART_POS].
-                             widget, enable);
+    gtk_widget_set_sensitive(mw->previous_part, enable);
 }
 
 static gboolean
@@ -490,11 +493,10 @@ bindex_closed_cb(gpointer data, GObject *bindex)
 }
 
 static void
-mw_disable_trash(GtkWidget * toolbar)
+mw_disable_trash(MessageWindow * mw, GtkWidget * toolbar)
 {
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_TRASH, FALSE);
-    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_TRASH_POS].widget,
-                             FALSE);
+    gtk_widget_set_sensitive(mw->trash, FALSE);
 }
 
 void
@@ -556,8 +558,13 @@ message_window_new(LibBalsaMessage * message)
 
     /* Save the widgets that we need to change--they'll be overwritten
      * if another message window is opened. */
-    mw->next_unread  = message_menu[MENU_MESSAGE_NEXT_UNREAD_POS].widget;
-    mw->next_flagged = message_menu[MENU_MESSAGE_NEXT_FLAGGED_POS].widget;
+    mw->next          = message_menu[MENU_MESSAGE_NEXT_POS].widget;
+    mw->previous      = message_menu[MENU_MESSAGE_PREVIOUS_POS].widget;
+    mw->next_unread   = message_menu[MENU_MESSAGE_NEXT_UNREAD_POS].widget;
+    mw->next_flagged  = message_menu[MENU_MESSAGE_NEXT_FLAGGED_POS].widget;
+    mw->next_part     = message_menu[MENU_MESSAGE_NEXT_PART_POS].widget;
+    mw->previous_part = message_menu[MENU_MESSAGE_PREVIOUS_PART_POS].widget;
+    mw->trash =         message_menu[MENU_MESSAGE_TRASH_POS].widget;
 #ifdef HAVE_GTKHTML
     mw->zoom_in  = view_menu[MENU_VIEW_ZOOM_IN].widget;
     mw->zoom_out = view_menu[MENU_VIEW_ZOOM_OUT].widget;
@@ -577,10 +584,10 @@ message_window_new(LibBalsaMessage * message)
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(move_menu), submenu);
     if(message->mailbox->readonly) {
 	gtk_widget_set_sensitive(move_menu, FALSE);
-	mw_disable_trash(toolbar);
+	mw_disable_trash(mw, toolbar);
     }
     if (message->mailbox == balsa_app.trash)
-	mw_disable_trash(toolbar);
+	mw_disable_trash(mw, toolbar);
     mw->bmessage = balsa_message_new();
     
     gnome_app_set_contents(GNOME_APP(mw->window), mw->bmessage);
@@ -813,6 +820,7 @@ mw_set_buttons_sensitive(MessageWindow * mw)
         balsa_toolbar_get_from_gnome_app(GNOME_APP(mw->window));
     LibBalsaMailbox *mailbox = mw->message->mailbox;
     BalsaIndex *index = mw->bindex;
+    guint current_msgno = mw->message->msgno;
     gboolean enable;
 
     if (!mailbox) {
@@ -820,16 +828,14 @@ mw_set_buttons_sensitive(MessageWindow * mw)
         return;
     }
 
-    enable = index && index->next_message;
+    enable = index && balsa_index_next_msgno(index, current_msgno) > 0;
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT, enable);
-    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_NEXT_POS].widget,
-                             enable);
+    gtk_widget_set_sensitive(mw->next, enable);
 
-    enable = index && index->prev_message;
+    enable = index && balsa_index_previous_msgno(index, current_msgno) > 0;
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_PREVIOUS,
                                        enable);
-    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_PREVIOUS_POS].
-                             widget, enable);
+    gtk_widget_set_sensitive(mw->previous, enable);
 
     enable = index && index->mailbox_node->mailbox->unread_messages > 0;
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT_UNREAD,

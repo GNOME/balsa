@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.5\n"
 "POT-Creation-Date: 1999-12-03 01:17+0100\n"
-"PO-Revision-Date: 1999-12-03 02:08+01:00\n"
+"PO-Revision-Date: 1999-12-03 14:58+01:00\n"
 "Last-Translator: Kenneth Christiansen - <kenneth@ripen.dk>\n"
 "Language-Team: Danish <sslug-locale@sslug.dk>\n"
 "MIME-Version: 1.0\n"
@@ -204,7 +204,7 @@ msgstr ""
 
 #: src/balsa-init.c:751
 msgid "Your mailbox directory:"
-msgstr "Din postkasse mappe:"
+msgstr "Din postkassemappe:"
 
 #: src/balsa-message.c:159 src/balsa-message.c:162
 msgid "Save MIME Part"
@@ -684,7 +684,7 @@ msgstr "Slet den valgte postkasse"
 
 #: src/main-window.c:238
 msgid "C_lose current"
-msgstr "_Luk nuværende"
+msgstr "L_uk nuværende"
 
 #: src/main-window.c:238
 msgid "Close the currently opened mailbox"

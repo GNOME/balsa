@@ -235,8 +235,8 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   gchar *tmp;
   gchar *c;
 
-  Message *message;
-  Body *body;
+  Message *message = NULL;
+  Body *body = NULL;
 
   msg = g_malloc (sizeof (BalsaSendmsg));
   switch (type)
@@ -262,7 +262,10 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
       if (!clist->selection)
 	return;
 
-      row = (gint) clist->selection->data + 1;
+      row = (gint) clist->selection->data;
+
+      message = (Message *) gtk_clist_get_row_data (clist, row);
+
       msg->window = gnome_app_new ("balsa", "Forward message");
       break;
     }
@@ -360,7 +363,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
       else if (type == 2)
 	{
 	  if (strlen (tmp) < 2)
-	    gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Re: ");
+	    gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Fw: ");
 	  else
 	    {
 	      if (!((tmp[0] == 'F' || tmp[0] == 'f') &&
@@ -430,26 +433,28 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   gtk_text_freeze (GTK_TEXT (msg->text));
   if (type != 0)
     {
-      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "\n\n", 2);
+      if (message->body_list)
+	{
+	  body = (Body *) message->body_list->data;
+	  c = body->buffer;
+	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "\n\n", 2);
 
-      c = message->from->personal;
+	  c = message->from->personal;
 
-      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
+	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
 
-      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, " on ", 4);
+	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, " on ", 4);
 
-      c = message->date;
-      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
-      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, " wrote:\n", 8);
+	  c = message->date;
+	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
+	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, " wrote:\n", 8);
 
-      body = (Body *) message->body_list->data;
-      c = body->buffer;
+	  c = gt_replys (c);
 
-      c = gt_replys (c);
+	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
 
-      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
-
-      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "\n\n", 2);
+	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "\n\n", 2);
+	}
     }
   if (balsa_app.signature)
     gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, balsa_app.signature, strlen (balsa_app.signature));

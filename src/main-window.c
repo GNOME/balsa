@@ -25,14 +25,154 @@
 #include "mailbox.h"
 #include "options.h"
 #include "../config.h"
-
+#include "pixmaps/p1.xpm"
+#include "pixmaps/p2.xpm"
+#include "pixmaps/p3.xpm"
+#include "pixmaps/p4.xpm"
+#include "pixmaps/p5.xpm"
+#include "pixmaps/p6.xpm"
+#include "pixmaps/p7.xpm"
+#include "pixmaps/p8.xpm"
+#include "pixmaps/p9.xpm"
+#include "pixmaps/p10.xpm"
+#include "pixmaps/p11.xpm"
+#include "pixmaps/p12.xpm"
+#include "pixmaps/p13.xpm"
+#include "pixmaps/p14.xpm"
+#include "pixmaps/p15.xpm"
+#include "pixmaps/p16.xpm"
 
 void show_about_box (GtkWidget * widget, gpointer data);
-
-/* from main.c -- exit balsa */
 extern void balsa_exit ();
-
 static GtkWidget *menu_items[18];
+
+GtkTooltips *tooltips;
+
+GtkWidget *
+new_icon (gchar ** xpm, GtkWidget * window)
+{
+  GdkPixmap *pixmap;
+  GtkWidget *pixmapwid;
+  GdkBitmap *mask;
+
+  pixmap = gdk_pixmap_create_from_xpm_d (window->window, &mask,
+					 0, xpm);
+  pixmapwid = gtk_pixmap_new (pixmap, mask);
+  return pixmapwid;
+}
+
+GtkWidget *
+create_toolbar (GtkWidget * window)
+{
+  GtkWidget *toolbar;
+  GtkWidget *toolbarbutton;
+
+  tooltips = gtk_tooltips_new ();
+
+  toolbar = gtk_toolbar_new (0, 0);
+  gtk_widget_realize (window);
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+				   "Delete message", "Delete message", NULL,
+					   new_icon (p1_xpm, window), NULL,
+					   "Delete message");
+
+  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+					   "Open Inbox", "Open Inbox", NULL,
+					   new_icon (p2_xpm, window), NULL,
+					   "Open Inbox");
+
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+					 "Open Outbox", "Open Outbox", NULL,
+					   new_icon (p3_xpm, window), NULL,
+					   "Open Outbox");
+
+  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+					 "Check Email", "Check Email", NULL,
+					   new_icon (p4_xpm, window), NULL,
+					   "Check Email");
+
+  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+				 "Compose Message", "Compose Message", NULL,
+	    new_icon (p5_xpm, window), GTK_SIGNAL_FUNC (sendmsg_window_new),
+					   "Compose Message");
+
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+					   "Reply", "Reply", NULL,
+	    new_icon (p6_xpm, window), GTK_SIGNAL_FUNC (sendmsg_window_new),
+					   "Reply");
+
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+				       "Reply to All", "Reply to All", NULL,
+					   new_icon (p7_xpm, window), NULL,
+					   "Reply to All");
+
+  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+					   "Forward", "Forward", NULL,
+					   new_icon (p8_xpm, window), NULL,
+					   "Forward");
+
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+					   "Redirect", "Redirect", NULL,
+					   new_icon (p9_xpm, window), NULL,
+					   "Redirect");
+
+  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+		     "Open Previous Message", "Open Previous Message", NULL,
+					   new_icon (p10_xpm, window), NULL,
+					   "Open Previous Message");
+
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+			     "Open Next Message", "Open Next Message", NULL,
+					   new_icon (p11_xpm, window), NULL,
+					   "Open Next Message");
+
+  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+					 "Attach file", "Attach file", NULL,
+					   new_icon (p12_xpm, window), NULL,
+					   "Attach file");
+
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+					 "Spell Check", "Spell Check", NULL,
+					   new_icon (p13_xpm, window), NULL,
+					   "Spell Check");
+
+  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+				       "Address Book", "Address Book", NULL,
+					   new_icon (p14_xpm, window), NULL,
+					   "Address Book");
+
+  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+					   "Print", "Print", NULL,
+					   new_icon (p15_xpm, window), NULL,
+					   "Print");
+
+  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+		   "Context Sensitive Help", "Context Sensitive Help", NULL,
+					   new_icon (p16_xpm, window), NULL,
+					   "Context Sensitive Help");
+
+  gtk_widget_show (toolbar);
+  return toolbar;
+}
+
 
 static GtkWidget *
 create_menu (GtkWidget * window)
@@ -333,11 +473,10 @@ create_main_window ()
 
   gnome_app_set_menus (GNOME_APP (mw->window),
 		       GTK_MENU_BAR (create_menu (mw->window)));
-/*
-   gnome_app_set_toolbar(GNOME_APP(mw->window),
-   GTK_TOOLBAR(create_toolbar(mw->window)));
 
- */
+  gnome_app_set_toolbar (GNOME_APP (mw->window),
+			 GTK_TOOLBAR (create_toolbar (mw->window)));
+
   gtk_widget_show (mw->window);
   return mw;
 }

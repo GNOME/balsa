@@ -6,6 +6,8 @@
 	use '_(' not '_ ('  to make marked strings show up in the .pot file.
 	redundant string allocation, double object destroying, missing 
 	personal name, translations of VCARD keywords.
+	* src/balsa-index.c: the index From/To information depends on the
+	mailbox (rewritten Stephen Waters' <swaters@amicus.com> patch).
 	
 2000-06-01  Peter Williams  <peter@newton.cx>
 	Remove the totally ignored IDL stuff

@@ -329,7 +329,7 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
 {
   GList *list;
   guint i = 0;
-
+  
   g_return_if_fail (bindex != NULL);
 
   if (bindex->mailbox == mailbox)
@@ -353,6 +353,14 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
    */
   bindex->mailbox = mailbox;
 
+  /*
+   * rename "from" column to "to" for outgoing mail
+   */
+  if (mailbox == balsa_app.sentbox ||
+      mailbox == balsa_app.draftbox ||
+      mailbox == balsa_app.outbox)
+    gtk_clist_set_column_title (GTK_CLIST (bindex), 3, _("To") );
+  
   if (mailbox->open_ref == 0)
     mailbox_open_ref (mailbox);
 
@@ -393,39 +401,51 @@ void
 balsa_index_add (BalsaIndex * bindex,
 		 Message * message)
 {
-  gchar buff1[1024], buff2[1024];
+  gchar buff1[32];
   gchar *text[6];
   gint row;
-
+  GList *list;
+  Address *addy = NULL;
+;
+    
   g_return_if_fail (bindex != NULL);
   g_return_if_fail (message != NULL);
 
   if (bindex->mailbox == NULL)
     return;
 
-  text[0] = buff1;
+  text[0] = "";
   text[1] = NULL;		/* flags */
   text[2] = NULL;		/* attachments */
-  text[3] = buff2;
 
-  if (message->from)
-    {
-      if (message->from->personal)
-	snprintf (text[3], 1024, "%s", message->from->personal);
-      else
-	snprintf (text[3], 1024, "%s", message->from->mailbox);
-    }
+
+  if (bindex->mailbox ==  balsa_app.sentbox ||
+      bindex->mailbox ==  balsa_app.draftbox ||
+      bindex->mailbox ==  balsa_app.outbox)
+  {
+      if (message->to_list)
+      {
+          list = g_list_first (message->to_list);
+          addy = list->data;
+      }
+  } else {
+      if (message->from)
+	  addy = message->from;
+  }
+
+  if(addy)
+      text[3] = addy->personal ? addy->personal : addy->mailbox;
   else
-    text[3] = NULL;
+      text[3] = "";
+  
   text[4] = message->subject;
-
   text[5] = message->date;
 
   row = gtk_clist_append (GTK_CLIST (bindex), text);
 
   /* set message number */
-  sprintf (text[0], "%d", row + 1);
-  gtk_clist_set_text (GTK_CLIST (bindex), row, 0, text[0]);
+  sprintf (buff1, "%d", row + 1);
+  gtk_clist_set_text(GTK_CLIST (bindex), row, 0, buff1);
 
   gtk_clist_set_row_data (GTK_CLIST (bindex), row, (gpointer) message);
 

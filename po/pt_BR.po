@@ -2630,309 +2630,309 @@ msgstr "Caixa de mensagem não selecionada."
 msgid "Sorry, no semicolons are allowed in the name!\n"
 msgstr "Lamento, ponto e vírgulas não permitidos no nome!\n"
 
-#~ msgid "Error: "
-#~ msgstr "Erro: "
+msgid "Error: "
+msgstr "Erro: "
 
-#~ msgid ""
-#~ "Unable to open address book %s for reading.\n"
-#~ " - %s\n"
-#~ msgstr ""
-#~ "Não foi possível abrir livro de endereços %s para leitura.\n"
-#~ " - %s\n"
+msgid ""
+"Unable to open address book %s for reading.\n"
+" - %s\n"
+msgstr ""
+"Não foi possível abrir livro de endereços %s para leitura.\n"
+" - %s\n"
 
-#~ msgid "OK"
-#~ msgstr "OK"
+msgid "OK"
+msgstr "OK"
 
-#~ msgid ""
-#~ "Unable to open %s for read.\n"
-#~ " - %s\n"
-#~ msgstr ""
-#~ "Não pôde abrir %s para leitura.\n"
-#~ " - %s\n"
+msgid ""
+"Unable to open %s for read.\n"
+" - %s\n"
+msgstr ""
+"Não pôde abrir %s para leitura.\n"
+" - %s\n"
 
-#~ msgid "The Card Name field must be non-empty.\n"
-#~ msgstr "O campo do nome do cartão não deve estar vazio.\n"
+msgid "The Card Name field must be non-empty.\n"
+msgstr "O campo do nome do cartão não deve estar vazio.\n"
 
-#~ msgid ""
-#~ "There is already an address book entry for %s.\n"
-#~ "Run GnomeCard if you would like to edit your address book entries.\n"
-#~ msgstr ""
-#~ "Já existe uma entrada de livro de endereço para %s.\n"
-#~ "Executar GnomeCard se deseja editar suas entradas do livro de endereço.\n"
+msgid ""
+"There is already an address book entry for %s.\n"
+"Run GnomeCard if you would like to edit your address book entries.\n"
+msgstr ""
+"Já existe uma entrada de livro de endereço para %s.\n"
+"Executar GnomeCard se deseja editar suas entradas do livro de endereço.\n"
 
-#~ msgid "Balsa does not know how to display this message part"
-#~ msgstr "O Balsa não sabe como apresentar esta parte da mensagem"
+msgid "Balsa does not know how to display this message part"
+msgstr "O Balsa não sabe como apresentar esta parte da mensagem"
 
-#~ msgid "You need to fill in the password field"
-#~ msgstr "Você precisa preencher o campo Senha"
+msgid "You need to fill in the password field"
+msgstr "Você precisa preencher o campo Senha"
 
-#~ msgid "You need to fill in the password field."
-#~ msgstr "Você precisa preencher o campo Senha."
+msgid "You need to fill in the password field."
+msgstr "Você precisa preencher o campo Senha."
 
-#~ msgid "Pr_int"
-#~ msgstr "_Imprimir"
+msgid "Pr_int"
+msgstr "_Imprimir"
 
-#~ msgid "Print current mail"
-#~ msgstr "Imprime a mensagem atual"
+msgid "Print current mail"
+msgstr "Imprime a mensagem atual"
 
-#~ msgid "List"
-#~ msgstr "Listar"
+msgid "List"
+msgstr "Listar"
 
-#~ msgid "_Add"
-#~ msgstr "A_diciona"
+msgid "_Add"
+msgstr "A_diciona"
 
-#~ msgid ""
-#~ "In order to store an address, you must open a mailbox and select a message.\n"
-#~ msgstr ""
-#~ "Para armazenar um endereço, a caixa de mensagens dever ser aberta "
-#~ "eselecionar a mensagem.\n"
+msgid ""
+"In order to store an address, you must open a mailbox and select a message.\n"
+msgstr ""
+"Para armazenar um endereço, a caixa de mensagens dever ser aberta "
+"eselecionar a mensagem.\n"
 
-#~ msgid "Close Mailbox"
-#~ msgstr "Fechar caixa de mensagens"
+msgid "Close Mailbox"
+msgstr "Fechar caixa de mensagens"
 
-#~ msgid "Edit Mailbox Properties"
-#~ msgstr "Editar propriedades da caixa de mensagens"
+msgid "Edit Mailbox Properties"
+msgstr "Editar propriedades da caixa de mensagens"
 
-#~ msgid "Delete Mailbox"
-#~ msgstr "Apagar caixa de mensagens"
+msgid "Delete Mailbox"
+msgstr "Apagar caixa de mensagens"
 
-#~ msgid "Select your address book file"
-#~ msgstr "Selecione seu arquivo do livro de endereços"
+msgid "Select your address book file"
+msgstr "Selecione seu arquivo do livro de endereços"
 
-#~ msgid "_Western (ISO-8859-1)"
-#~ msgstr "_Western (ISO-8859-1)"
+msgid "_Western (ISO-8859-1)"
+msgstr "_Western (ISO-8859-1)"
 
-#~ msgid "W_estern (ISO-8859-15)"
-#~ msgstr "W_estern (ISO-8859-15)"
+msgid "W_estern (ISO-8859-15)"
+msgstr "W_estern (ISO-8859-15)"
 
-#~ msgid "_Central European (ISO-8859-2)"
-#~ msgstr "_Central European (ISO-8859-2)"
+msgid "_Central European (ISO-8859-2)"
+msgstr "_Central European (ISO-8859-2)"
 
-#~ msgid "_South European (ISO-8859-3)"
-#~ msgstr "_South European (ISO-8859-3)"
+msgid "_South European (ISO-8859-3)"
+msgstr "_South European (ISO-8859-3)"
 
-#~ msgid "_Baltic (ISO-8859-13)"
-#~ msgstr "_Baltic (ISO-8859-13)"
+msgid "_Baltic (ISO-8859-13)"
+msgstr "_Baltic (ISO-8859-13)"
 
-#~ msgid "Cy_rillic (ISO-8859-5)"
-#~ msgstr "Cy_rillic (ISO-8859-5)"
+msgid "Cy_rillic (ISO-8859-5)"
+msgstr "Cy_rillic (ISO-8859-5)"
 
-#~ msgid "_Hebrew (ISO-8859-8)"
-#~ msgstr "_Hebrew (ISO-8859-8)"
+msgid "_Hebrew (ISO-8859-8)"
+msgstr "_Hebrew (ISO-8859-8)"
 
-#~ msgid "_Turkish (ISO-8859-9)"
-#~ msgstr "_Turkish (ISO-8859-9)"
+msgid "_Turkish (ISO-8859-9)"
+msgstr "_Turkish (ISO-8859-9)"
 
-#~ msgid "Ce_ltic (ISO-8859-14)"
-#~ msgstr "Ce_ltic (ISO-8859-14)"
+msgid "Ce_ltic (ISO-8859-14)"
+msgstr "Ce_ltic (ISO-8859-14)"
 
-#~ msgid "Ru_ssian (KOI8-R)"
-#~ msgstr "Ru_ssian (KOI8-R)"
+msgid "Ru_ssian (KOI8-R)"
+msgstr "Ru_ssian (KOI8-R)"
 
-#~ msgid "_ISO Charset"
-#~ msgstr "_ISO Mapa de caracteres"
+msgid "_ISO Charset"
+msgstr "_ISO Mapa de caracteres"
 
 # 2
-#~ msgid "Mailbox: Closing %s Refcount: %d\n"
-#~ msgstr "Mailbox: Fechando %s Refcont: %d\n"
+msgid "Mailbox: Closing %s Refcount: %d\n"
+msgstr "Mailbox: Fechando %s Refcont: %d\n"
 
 # 3
-#~ msgid "An error occurred when attempting to creat(2) the file \"%s\"."
-#~ msgstr "Um erro ocorreu tentando criar(2) o arquivo \"%s\"."
+msgid "An error occurred when attempting to creat(2) the file \"%s\"."
+msgstr "Um erro ocorreu tentando criar(2) o arquivo \"%s\"."
 
 # 6
-#~ msgid "Ok"
-#~ msgstr "Ok"
+msgid "Ok"
+msgstr "Ok"
 
 # 7
-#~ msgid ""
-#~ "<tr><td bgcolor=\"#f0f0f0\"> You received an encoded file of type "
-#~ "application/"
-#~ msgstr ""
-#~ "<tr><td bgcolor=\"#f0f0f0\"> Você recebeu um arquivo codificado tipo "
-#~ "application/"
+msgid ""
+"<tr><td bgcolor=\"#f0f0f0\"> You received an encoded file of type "
+"application/"
+msgstr ""
+"<tr><td bgcolor=\"#f0f0f0\"> Você recebeu um arquivo codificado tipo "
+"application/"
 
 # 8
-#~ msgid "<P>The parameters of this message are:<BR>"
-#~ msgstr "<p>Os parâmetros desta mensagem são:<BR>"
+msgid "<P>The parameters of this message are:<BR>"
+msgstr "<p>Os parâmetros desta mensagem são:<BR>"
 
 # 9
-#~ msgid "<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n"
-#~ msgstr "<table border=0><tr><th>Atributo</th><th>Valor</th></tr>\n"
+msgid "<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n"
+msgstr "<table border=0><tr><th>Atributo</th><th>Valor</th></tr>\n"
 
 # 10
-#~ msgid "Open of %s failed. Errno = %d, "
-#~ msgstr "Abertura de %s falhou. Erro no. = %d,"
+msgid "Open of %s failed. Errno = %d, "
+msgstr "Abertura de %s falhou. Erro no. = %d,"
 
 # 14
-#~ msgid "All of the fields must be filled in"
-#~ msgstr "Todos os campos devem ser completados"
+msgid "All of the fields must be filled in"
+msgstr "Todos os campos devem ser completados"
 
 # 16
-#~ msgid "Close the selected mailbox"
-#~ msgstr "Fecha a caixa de mensagens selecionada"
+msgid "Close the selected mailbox"
+msgstr "Fecha a caixa de mensagens selecionada"
 
 # 17
-#~ msgid "C_lose current"
-#~ msgstr "F_echar a atual"
+msgid "C_lose current"
+msgstr "F_echar a atual"
 
 # 18
-#~ msgid "Close the currently opened mailbox"
-#~ msgstr "Fecha a caixa de mensagens atual"
+msgid "Close the currently opened mailbox"
+msgstr "Fecha a caixa de mensagens atual"
 
 # 19
-#~ msgid "O_pened"
-#~ msgstr "A_bertos"
+msgid "O_pened"
+msgstr "A_bertos"
 
 # 20
-#~ msgid "Mail_boxes"
-#~ msgstr "Caixas de _Entrada"
+msgid "Mail_boxes"
+msgstr "Caixas de _Entrada"
 
 # 21
-#~ msgid "View mailbox content informations "
-#~ msgstr "Ver informações da caixa mensagens"
+msgid "View mailbox content informations "
+msgstr "Ver informações da caixa mensagens"
 
 # 22
-#~ msgid "On %s "
-#~ msgstr "Em %s"
+msgid "On %s "
+msgstr "Em %s"
 
 # 23
-#~ msgid "New Local Mailbox"
-#~ msgstr "Nova caixa de mensagens local"
+msgid "New Local Mailbox"
+msgstr "Nova caixa de mensagens local"
 
 # 24
-#~ msgid "Mailbox name:"
-#~ msgstr "Nome da caixa de mensagens:"
+msgid "Mailbox name:"
+msgstr "Nome da caixa de mensagens:"
 
 # 25
-#~ msgid "Path to mailbox:"
-#~ msgstr "Caminho para caixa de mensagem:"
+msgid "Path to mailbox:"
+msgstr "Caminho para caixa de mensagem:"
 
 # 27
-#~ msgid "Create Mail Directory?"
-#~ msgstr "Criar diretório de mensagens"
+msgid "Create Mail Directory?"
+msgstr "Criar diretório de mensagens"
 
 # 28
-#~ msgid "Configure %s"
-#~ msgstr "Configurar %s"
+msgid "Configure %s"
+msgstr "Configurar %s"
 
 # 30
-#~ msgid "Your mailbox directory:"
-#~ msgstr "Seu diretório da caixa de mensagens:"
+msgid "Your mailbox directory:"
+msgstr "Seu diretório da caixa de mensagens:"
 
 # 31
-#~ msgid "Welcome To Balsa!"
-#~ msgstr "Bem-vindo ao Balsa!"
+msgid "Welcome To Balsa!"
+msgstr "Bem-vindo ao Balsa!"
 
 # 32
-#~ msgid "welcome"
-#~ msgstr "bem-vindo"
+msgid "welcome"
+msgstr "bem-vindo"
 
 # 33
-#~ msgid "general"
-#~ msgstr "principal"
+msgid "general"
+msgstr "principal"
 
 # 34
-#~ msgid "mailboxs"
-#~ msgstr "caixas de mensagens"
+msgid "mailboxs"
+msgstr "caixas de mensagens"
 
 # 35
-#~ msgid "You seem to be running Balsa for the first time.\n"
-#~ msgstr "Parece que você está executando o Balsa pela primeira vez.\n"
+msgid "You seem to be running Balsa for the first time.\n"
+msgstr "Parece que você está executando o Balsa pela primeira vez.\n"
 
 # 36
-#~ msgid ""
-#~ "The following steps will setup Balsa by asking a few simple questions.  "
-#~ msgstr ""
-#~ "Os passos a seguir irão configurar o Balsa perguntando algumas poucas "
-#~ "informações"
+msgid ""
+"The following steps will setup Balsa by asking a few simple questions.  "
+msgstr ""
+"Os passos a seguir irão configurar o Balsa perguntando algumas poucas "
+"informações"
 
 # 37
-#~ msgid ""
-#~ "Once you have completed these steps, you can always change them at a later "
-#~ "time through Balsa's preferences.  "
-#~ msgstr ""
-#~ "Assim que tiver completado estes passos, você pode sempre alterá-los mais "
-#~ "tarde nas preferências do Balsa"
+msgid ""
+"Once you have completed these steps, you can always change them at a later "
+"time through Balsa's preferences.  "
+msgstr ""
+"Assim que tiver completado estes passos, você pode sempre alterá-los mais "
+"tarde nas preferências do Balsa"
 
 # 38
-#~ msgid ""
-#~ "Please check the about box in Balsa's main window for more information on "
-#~ "contacting the authors or reporting bugs."
-#~ msgstr ""
-#~ "Cheque a caixa Sobre na janela do Balsa para maiores informações para "
-#~ "contatar os autores ou reportar erros."
+msgid ""
+"Please check the about box in Balsa's main window for more information on "
+"contacting the authors or reporting bugs."
+msgstr ""
+"Cheque a caixa Sobre na janela do Balsa para maiores informações para "
+"contatar os autores ou reportar erros."
 
 # 39
-#~ msgid "Inbox Path:"
-#~ msgstr "Caminho da caixa de entrada:"
+msgid "Inbox Path:"
+msgstr "Caminho da caixa de entrada:"
 
 # 40
-#~ msgid "Outbox Path:"
-#~ msgstr "Caminho da caixa de saída:"
+msgid "Outbox Path:"
+msgstr "Caminho da caixa de saída:"
 
 # 41
-#~ msgid "Draftbox Path:"
-#~ msgstr "Caminho da caixa de rascunhos:"
+msgid "Draftbox Path:"
+msgstr "Caminho da caixa de rascunhos:"
 
 # 42
-#~ msgid "Trash Path:"
-#~ msgstr "Caminho da lixeira:"
+msgid "Trash Path:"
+msgstr "Caminho da lixeira:"
 
 # 43
-#~ msgid ""
-#~ "If you wish to use IMAP for these\n"
-#~ "please change them inside Balsa\n"
-#~ msgstr ""
-#~ "Se você deseja usar IMAP para isto\n"
-#~ "altere nas preferências do Balsa\n"
+msgid ""
+"If you wish to use IMAP for these\n"
+"please change them inside Balsa\n"
+msgstr ""
+"Se você deseja usar IMAP para isto\n"
+"altere nas preferências do Balsa\n"
 
 # 44
-#~ msgid ""
-#~ "Mailbox \"%s\" is not valid.\n"
-#~ "\n"
-#~ "Would you like to create it?"
-#~ msgstr ""
-#~ "Caixa de entrada \"%s\" não é válida.\n"
-#~ "\n"
-#~ "Criar uma?"
+msgid ""
+"Mailbox \"%s\" is not valid.\n"
+"\n"
+"Would you like to create it?"
+msgstr ""
+"Caixa de entrada \"%s\" não é válida.\n"
+"\n"
+"Criar uma?"
 
 # 45
-#~ msgid "Unable to procede without a valid mailbox.  Please try again."
-#~ msgstr "Não é possível continuar sem uma caixa de entrada. Tente novamente."
+msgid "Unable to procede without a valid mailbox.  Please try again."
+msgstr "Não é possível continuar sem uma caixa de entrada. Tente novamente."
 
 # 47
-#~ msgid "Change Status"
-#~ msgstr "Alterar status"
+msgid "Change Status"
+msgstr "Alterar status"
 
 # 48
-#~ msgid "Read"
-#~ msgstr "Ler"
+msgid "Read"
+msgstr "Ler"
 
 # 49
-#~ msgid "Replied"
-#~ msgstr "Responder"
+msgid "Replied"
+msgstr "Responder"
 
 # 50
-#~ msgid "Forwarded"
-#~ msgstr "Reenviar"
+msgid "Forwarded"
+msgstr "Reenviar"
 
 # 51
-#~ msgid "Mailboxes/Opened/"
-#~ msgstr "Caixas de entrada abertas"
+msgid "Mailboxes/Opened/"
+msgstr "Caixas de entrada abertas"
 
 # 52
-#~ msgid "Include signature when sending mail"
-#~ msgstr "Incluir assinatura quando enviar mensagem"
+msgid "Include signature when sending mail"
+msgstr "Incluir assinatura quando enviar mensagem"
 
 # 53
-#~ msgid "Include signature when forwarding mail"
-#~ msgstr "Incluir assinatura quando encaminhar mensagem"
+msgid "Include signature when forwarding mail"
+msgstr "Incluir assinatura quando encaminhar mensagem"
 
 # 54
-#~ msgid "Include signature when replying to mail"
-#~ msgstr "Incluir assinatura quando responder mensagem"
+msgid "Include signature when replying to mail"
+msgstr "Incluir assinatura quando responder mensagem"
 
 # 55
-#~ msgid "Linesize:"
-#~ msgstr "Tamanho da linha"
+msgid "Linesize:"
+msgstr "Tamanho da linha"

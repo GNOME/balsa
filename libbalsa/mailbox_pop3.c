@@ -300,6 +300,12 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     }	
     libbalsa_mailbox_open(tmp_mailbox);
     if ((m->inbox) && (tmp_mailbox->messages)) {
+	GList *list;
+
+	for (list = tmp_mailbox->message_list; list; list = list->next)
+	    ((LibBalsaMessage *) list->data)->flags |=
+		LIBBALSA_MESSAGE_FLAG_NEW;
+
 	if (!libbalsa_messages_move(tmp_mailbox->message_list, m->inbox)) {    
 	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 				 _("Error placing messages from %s on %s\n"

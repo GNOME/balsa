@@ -1,6 +1,10 @@
-Makefile
-Makefile.in
 .deps
 .libs
+Balsa-common.c
+Balsa-skels.c
+Balsa-stubs.c
+Balsa.h
+Makefile
+Makefile.in
 balsa
 balsa-ab

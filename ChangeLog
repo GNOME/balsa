@@ -1,3 +1,8 @@
+2004-01-18  Pawel Salek
+
+	* NEWS, configure.in: release 2.0.16.
+	* src/Makefile.am: fix the build.
+
 2004-01-17 21:46  PeterB
 
 	* src/balsa-message.c: backport nested messages from HEAD; make

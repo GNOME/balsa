@@ -1,3 +1,10 @@
+* Balsa-2.0.16 release. Release date 2004-01-18
+
+- update GPGME support: 124905.
+- libgtkhtml3 support added.
+- use bonobo to avoid running of multiple balsa instances.
+- fix bugs: 103639, 124550, 127422, 129316 and number of others.
+
 * Balsa-2.0.15 release. Release date 2003-09-28
 
 - imap folder scanning speedup.

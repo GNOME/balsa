@@ -60,13 +60,16 @@ balsa_BASE_SRCLIST =	\
 	toolbar-prefs.c		\
 	toolbar-prefs.h
 
-balsa_IDL_SRCLIST = Balsa-common.c Balsa-skels.c Balsa-stubs.c Balsa.h balsa-bonobo.c balsa-bonobo.h
+balsa_IDL_SRCLIST = Balsa-common.c Balsa-skels.c Balsa-stubs.c Balsa.h \
+	balsa-bonobo.c balsa-bonobo.h
 
 
 balsa_SOURCES = $(balsa_BASE_SRCLIST) $(balsa_IDL_SRCLIST)
 
 EXTRA_DIST = Balsa.idl
 
+# auto* *SHOULD* figure this out *grr*
+$(balsa_BASE_SRCLIST): $(balsa_IDL_SRCLIST)
 
 idldir = $(datadir)/idl
 idl_DATA = Balsa.idl

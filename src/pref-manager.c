@@ -383,6 +383,16 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
 #endif
   balsa_app.check_mail_auto = GTK_TOGGLE_BUTTON(pui->check_mail_auto)->active;
   balsa_app.check_mail_timer = atoi( gtk_entry_get_text (GTK_ENTRY(pui->check_mail_minutes)));
+  if( balsa_app.check_mail_timer < 1)
+    {
+      balsa_app.check_mail_timer = 10;
+      gtk_entry_set_text( GTK_ENTRY(pui->check_mail_minutes), "10");
+    }
+
+  if(balsa_app.check_mail_auto)
+    update_timer( TRUE, balsa_app.check_mail_timer );
+  else
+    update_timer( FALSE, 0);
 
   /* arp */
   g_free (balsa_app.quote_str);
@@ -1074,17 +1084,11 @@ pop3_del_cb (GtkWidget * widget, gpointer data)
 void timer_modified_cb( GtkWidget *widget, GnomePropertyBox *pbox)
 {
   if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->check_mail_auto)))
-    {
       gtk_editable_set_editable( GTK_EDITABLE(pui->check_mail_minutes),
 				 TRUE );
-      update_timer( TRUE, atoi( gtk_entry_get_text( GTK_ENTRY(pui->check_mail_minutes))));
-    }
   else
-    {
       gtk_editable_set_editable( GTK_EDITABLE(pui->check_mail_minutes),
 				 FALSE );
-      update_timer( FALSE, 0 );
-    }
 
   properties_modified_cb( widget, pbox );
 

@@ -694,6 +694,9 @@ config_global_load (void)
   else
     balsa_app.check_mail_timer = atoi (field);
 
+  if (balsa_app.check_mail_timer < 1 )
+    balsa_app.check_mail_timer = 10;
+
   if( balsa_app.check_mail_auto )
     update_timer( TRUE, balsa_app.check_mail_timer );
 

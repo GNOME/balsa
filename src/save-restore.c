@@ -1010,7 +1010,7 @@ gint config_save(void)
     gnome_config_set_int("ESMTPTLSMode", balsa_app.smtp_tls_mode);
 #if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     if(balsa_app.smtp_certificate_passphrase) {
-        gchar* tmp = balsa_app.smtp_certificate_passphrase;
+        gchar* tmp = libbalsa_rot(balsa_app.smtp_certificate_passphrase);
         gnome_config_private_set_string("ESMTPCertificatePassphrase", tmp);
         g_free(tmp);
     }

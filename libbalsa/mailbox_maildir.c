@@ -414,7 +414,7 @@ static void parse_mailbox(LibBalsaMailbox * mailbox, const gchar *subdir)
             g_ptr_array_add(mailbox->mindex, NULL);
 	    msg_info->key=key;
 	    msg_info->filename=g_strdup(filename);
-	    msg_info->orig_flags = flags;
+	    msg_info->flags = msg_info->orig_flags = flags;
 	    msg_info->msgno = msgno_2_msg_info->len;
 	} else
 	    g_free(key);
@@ -570,6 +570,7 @@ free_message_info(struct message_info *msg_info)
     g_free(msg_info->filename);
     if (msg_info->message) {
 	msg_info->message->mailbox = NULL;
+	msg_info->message->msgno   = 0;
 	g_object_remove_weak_pointer(G_OBJECT(msg_info->message),
 				     (gpointer) & msg_info->message);
     }

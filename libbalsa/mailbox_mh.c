@@ -296,6 +296,8 @@ lbm_mh_compare_fileno(const struct message_info ** a,
     return (*a)->fileno - (*b)->fileno;
 }
 
+#define INVALID_FLAG ((unsigned) -1)
+
 static void
 lbm_mh_parse_mailbox(LibBalsaMailboxMh * mh)
 {
@@ -329,6 +331,7 @@ lbm_mh_parse_mailbox(LibBalsaMailboxMh * mh)
 				    GINT_TO_POINTER(fileno));
 	    if (!msg_info) {
 		msg_info = g_new0(struct message_info, 1);
+		msg_info->flags = INVALID_FLAG;
 		g_hash_table_insert(mh->messages_info,
 				    GINT_TO_POINTER(fileno), msg_info);
 		g_ptr_array_add(mh->msgno_2_msg_info, msg_info);
@@ -455,6 +458,7 @@ lbm_mh_free_message_info(struct message_info *msg_info)
 	return;
     if (msg_info->message) {
 	msg_info->message->mailbox = NULL;
+	msg_info->message->msgno   = 0;
 	g_object_remove_weak_pointer(G_OBJECT(msg_info->message),
 				     (gpointer) &msg_info->message);
     }
@@ -690,6 +694,8 @@ static void
 lbm_mh_flag_line(struct message_info *msg_info, LibBalsaMessageFlag flag,
 		 struct line_info *li)
 {
+    if (msg_info->flags == INVALID_FLAG)
+	msg_info->flags = msg_info->orig_flags;
     if (!(msg_info->flags & flag))
 	return;
 
@@ -760,6 +766,8 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     msgno = 1;
     while (msgno <= mh->msgno_2_msg_info->len) {
 	msg_info = lbm_mh_message_info_from_msgno(mh, msgno);
+	if (msg_info->flags == INVALID_FLAG)
+	    msg_info->flags = msg_info->orig_flags;
 
 	if (expunge && (msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED)) {
 	    /* MH just moves files out of the way when you delete them */
@@ -933,6 +941,8 @@ libbalsa_mailbox_mh_get_message(LibBalsaMailbox * mailbox, guint msgno)
 	}
 	g_free(filename);
 
+	if (msg_info->flags == INVALID_FLAG)
+	    msg_info->flags = msg_info->orig_flags;
 	message->flags = msg_info->flags;
 	message->mailbox = mailbox;
 	message->msgno = msgno;
@@ -1057,6 +1067,8 @@ libbalsa_mailbox_mh_change_message_flags(LibBalsaMailbox * mailbox, guint msgno,
 	lbm_mh_message_info_from_msgno(LIBBALSA_MAILBOX_MH(mailbox), msgno);
 
     g_return_if_fail (msg_info != NULL);
+    if (msg_info->flags == INVALID_FLAG)
+	msg_info->flags = msg_info->orig_flags;
     msg_info->flags |= set;
     msg_info->flags &= ~clear;
 

@@ -1,3 +1,9 @@
+2003-11-17 20:02  PeterB
+
+	* libbalsa/mailbox.c, libbalsa/mailbox_local.c, libbalsa/message.c,
+	src/balsa-index.c: Link DELETED messages into the mailbox;
+	LIBBALSA_MESSAGE_FLAG_DELETED conceals other flags.
+
 2003-11-18  Carlos Morgado  <chbm gnome.org>
 
 	* configure.in: 

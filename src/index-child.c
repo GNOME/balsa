@@ -571,18 +571,13 @@ index_child_setup_dnd ( GnomeMDIChild * child )
   IndexChild *ic;
 
   ic = INDEX_CHILD(child);
-#if 0
-  gtk_drag_dest_set (GTK_WIDGET (ic->index), GTK_DEST_DEFAULT_ALL,
-		     drag_types, ELEMENTS (drag_types),
-		     GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
-#endif
-  gtk_signal_connect (GTK_OBJECT (ic->index), "drag_data_get",
-      GTK_SIGNAL_FUNC (index_child_drag_data_get), NULL);
    
   gtk_drag_source_set (GTK_WIDGET (ic->index), GDK_BUTTON1_MASK | GDK_BUTTON3_MASK,
 		       drag_types, ELEMENTS (drag_types),
-		       GDK_ACTION_MOVE );
+		       GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
   
+  gtk_signal_connect (GTK_OBJECT (ic->index), "drag_data_get",
+      GTK_SIGNAL_FUNC (index_child_drag_data_get), NULL);
 
 
 }
@@ -616,7 +611,7 @@ index_child_drag_data_get (GtkWidget *widget, GdkDragContext *context,
   
   clist = GTK_CLIST (widget);
   bindex = BALSA_INDEX (widget);
-
+  printf("flaf\n");
   
   /* retrieve the selected rows */
   balsa_index_get_selected_rows (bindex, &selected_rows, &nb_selected_rows);
@@ -634,5 +629,6 @@ index_child_drag_data_get (GtkWidget *widget, GdkDragContext *context,
 			  selection_data->target,
 			  8 * sizeof(Message *), (gchar *)message_list, nb_selected_rows * sizeof(Message *));
   g_free( message_list );
+  
 }
 

@@ -163,7 +163,7 @@ static GnomeUIInfo mailbox_menu[] =
 			  mailbox_close_child, GNOME_STOCK_MENU_CLOSE),
 
   GNOMEUIINFO_ITEM_STOCK (N_ ("Commit current"), N_("Commit the changes in the currently opened mailbox"),
-			  mailbox_commit_changes, GNOME_STOCK_MENU_CLOSE),
+			  mailbox_commit_changes, GNOME_STOCK_MENU_REFRESH),
 
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_END

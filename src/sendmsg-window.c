@@ -518,6 +518,7 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 	    newsubject = g_strdup_printf ("Re: %s", message->subject);
 	    break;
 	  }
+	newsubject = g_strdup(message->subject);
       }
       break;
 

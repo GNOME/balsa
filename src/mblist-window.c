@@ -134,7 +134,7 @@ mblist_open_window (GnomeMDI * mdi)
 
   gtk_drag_dest_set (GTK_WIDGET (mblw->ctree), GTK_DEST_DEFAULT_ALL,
 		     dnd_mb_target, ELEMENTS (dnd_mb_target),
-		     GDK_ACTION_MOVE ); 
+		     GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK ); 
   
   
   gtk_signal_connect (GTK_OBJECT (mblw->ctree), "select_mailbox",
@@ -144,7 +144,10 @@ mblist_open_window (GnomeMDI * mdi)
   gtk_signal_connect (GTK_OBJECT (mblw->ctree), "drag_motion",
 		      GTK_SIGNAL_FUNC (mblist_drag_motion), NULL);
 
-  /* callback when object dropped on a mailbox */
+  /* callbacks when object dropped on a mailbox */
+  gtk_signal_connect (GTK_OBJECT (mblw->ctree), "drag_drop",
+		      GTK_SIGNAL_FUNC (mblist_drag_drop), NULL);
+
   gtk_signal_connect (GTK_OBJECT (mblw->ctree), "drag_data_received",
 		      GTK_SIGNAL_FUNC (mblist_drag_data_received), NULL);
 
@@ -161,7 +164,7 @@ mblist_open_window (GnomeMDI * mdi)
   gtk_widget_show (bbox);
 
   button = gtk_button_new_with_label ("Open box");
-  gtk_container_add (GTK_CONTAINER (bbox), button);
+s  gtk_container_add (GTK_CONTAINER (bbox), button);
   gtk_signal_connect_object (GTK_OBJECT (button), "clicked",
 			     GTK_SIGNAL_FUNC (mblist_open_cb), NULL);
   gtk_widget_show (button);
@@ -412,7 +415,7 @@ mblist_drag_data_received (GtkWidget * widget,
 
   gint row;
   /*--*/
-
+  printf("flouf\n");
   /* find the mailbox on which the messages have been dropped */
   if (!gtk_clist_get_selection_info (clist, x, y, &row, NULL))
     return;
@@ -437,12 +440,10 @@ mblist_drag_data_received (GtkWidget * widget,
   gtk_drag_finish (context, FALSE, FALSE, time);
 
 
-  
-
 }
 
 
-/* data moved in the window callback */
+/* callback : data moved in the window */
 static gboolean
 mblist_drag_motion         (GtkWidget          *widget,
                             GdkDragContext     *context,
@@ -458,9 +459,28 @@ mblist_drag_motion         (GtkWidget          *widget,
 
 
   mb_selected = gtk_clist_get_selection_info (clist, x, y, &row, NULL);
-  
+  //printf("X=%d, Y=%d\n", x,y);
+  if (row<0) return FALSE;
   node = gtk_ctree_node_nth( ctree, row );
   if (node) gtk_ctree_select(ctree, node);
-    
+
+  return TRUE;
+}
+/* callback data dropped in the window */
+static gboolean
+mblist_drag_drop (GtkWidget          *widget,
+		  GdkDragContext     *context,
+		  gint                x,
+		  gint                y,
+		  guint               time)
+{
+
+
+  printf("drop\n");
+  
+  gtk_drag_get_data (widget, context, 
+		     GPOINTER_TO_INT (context->targets->data), 
+		     time);
+  
   return TRUE;
 }

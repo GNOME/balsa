@@ -1,5 +1,13 @@
 1999-01-11  bertrand  <Bertrand.Guiheneuf@inria.fr>
 
+	* src/index-child.c src/mblist-window.c : add some dnd trace code
+	cause dnd does not work anymore.
+
+	* src/sendmsg-window.c (sendmsg_window_new): bugfix when replying
+	to a message with subject begining with Re:
+
+1999-01-11  bertrand  <Bertrand.Guiheneuf@inria.fr>
+
 	added the code to commit the changes which are flagged (generally
 	deletion). The code is OK, but some general issues remain to be fixed.
 	(in particular, the problem which open_unref automatically syncing

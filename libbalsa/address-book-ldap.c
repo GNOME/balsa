@@ -53,9 +53,6 @@ char* attrs[] = {
     NULL
 };
 /* End of FIXME */
-#define LDAP_CODESET "UTF-8"
-#define BALSA_CODESET "ISO-8859-1"
-
 
 static LibBalsaAddressBookClass *parent_class = NULL;
 
@@ -328,53 +325,6 @@ libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab,
     return LBABERR_OK;
 }
 
-/* ldap_get_string:
-   Return native version of an LDAP encoded string.
- 
- */
-
-static gchar*
-ldap_get_string(const gchar *ldap_string)
-{
-    char *in=(char *)ldap_string;
-    size_t len=strlen(in), outlen=len;
-    char *native_string=calloc(outlen+1, sizeof(char)), *out=native_string;
-    iconv_t conv=iconv_open(BALSA_CODESET, LDAP_CODESET);
-
-    while(len>0 && outlen>0) {
-	if(iconv(conv, &in, &len, &out, &outlen)!=0) {
-	    in++;		/* *** */
-	    len--;
-	}
-    }
-    iconv_close(conv);
-    
-    return (gchar *)native_string;
-}
-
-/* ldap_set_string:
-   Return native LDAP encoded version of string.
- */
-
-static gchar*
-ldap_set_string(const gchar *native_string)
-{
-    char *in=(char *)native_string;
-    size_t len=strlen(in), outlen=2*len; /* Worst case */
-    char *ldap_string=calloc(outlen+1, sizeof(char)), *out=ldap_string;
-    iconv_t conv=iconv_open(LDAP_CODESET, BALSA_CODESET);
-
-    while(len>0 && outlen>0) {
-	if(iconv(conv, &in, &len, &out, &outlen)!=0) {
-	    in++;		/* *** */
-	    len--;
-	}
-    }
-    iconv_close(conv);
-    
-    return (gchar *)ldap_string;
-}
-
 
 /* libbalsa_address_book_ldap_get_address:
  * loads a single address from connection specified by LDAPMessage.
@@ -402,13 +352,13 @@ libbalsa_address_book_ldap_get_address(LibBalsaAddressBook * ab,
 	if ((vals = ldap_get_values(ldap_ab->directory, e, attr)) != NULL) {
 	    for (i = 0; vals[i] != NULL; i++) {
 		if ((g_ascii_strcasecmp(attr, "sn") == 0) && (!last))
-		    last = ldap_get_string(vals[i]);
+		    last = g_strdup(vals[i]);
 		if ((g_ascii_strcasecmp(attr, "cn") == 0) && (!id))
-		    id = ldap_get_string(vals[i]);
+		    id = g_strdup(vals[i]);
 		if ((g_ascii_strcasecmp(attr, "givenName") == 0) && (!first))
-		    first = ldap_get_string(vals[i]);
+		    first = g_strdup(vals[i]);
 		if ((g_ascii_strcasecmp(attr, "mail") == 0) && (!email))
-		    email = ldap_get_string(vals[i]);
+		    email = g_strdup(vals[i]);
 	    }
 	    ldap_value_free(vals);
 	}
@@ -586,7 +536,6 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
     LibBalsaAddress *addr;
     GList *res = NULL;
     gchar* filter;
-    gchar* escaped;
     gchar* ldap;
     int rc;
     LDAPMessage * e, *result;
@@ -606,9 +555,7 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
      * or failure, but not all the matches.
      */
     *new_prefix = NULL;
-    escaped = rfc_2254_escape(prefix);
-    ldap=ldap_set_string(escaped);
-    g_free(escaped);
+    ldap = rfc_2254_escape(prefix);
 
     filter = g_strdup_printf("(&(mail=*)(|(cn=%s*)(sn=%s*)(mail=%s@*)))", 
 			     ldap, ldap, ldap);

@@ -334,6 +334,10 @@ scan_mailboxes_idle_cb()
 		     balsa_app.open_mailbox_vector);
 	balsa_app.open_mailbox_vector = NULL;
     }
+
+    if (cmd_open_inbox || balsa_app.open_inbox_upon_startup)
+	g_idle_add((GSourceFunc) initial_open_inbox, NULL);
+
     return FALSE; 
 }
 /* -------------------------- main --------------------------------- */
@@ -434,8 +438,6 @@ main(int argc, char *argv[])
     if (cmd_check_mail_on_startup || balsa_app.check_mail_upon_startup)
 	check_new_messages_cb(NULL, NULL);
 
-    if (cmd_open_inbox || balsa_app.open_inbox_upon_startup)
-	g_idle_add((GSourceFunc) initial_open_inbox, NULL);
 
     signal( SIGPIPE, SIG_IGN );
     g_idle_add((GSourceFunc) scan_mailboxes_idle_cb, NULL);

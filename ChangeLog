@@ -1,3 +1,9 @@
+2003-03-26  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/address-book-ldap.c: LDAP uses UTF-8 and so do we.
+	* src/main.c: fix -i CLO (bug 109293).
+	* src/save-restore.c: fix --without-esmtp (bug 109234).
+
 2003-03-24  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* NEWS, configure.in: release 2.0.10

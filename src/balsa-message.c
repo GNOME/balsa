@@ -1119,7 +1119,8 @@ part2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
       if (balsa_app.debug)
 	fprintf (stderr, "part: message\n");
       message2canvas (message, bdy, fp, group);
-      fprintf (stderr, "part end: multipart\n");
+      if (balsa_app.debug)
+	      fprintf (stderr, "part end: multipart\n");
       break;
     case TYPEMULTIPART:
       if (balsa_app.debug)

@@ -1,3 +1,8 @@
+2000-05-12  Peter Williams  <peter@beta.newton.cx>
+
+	* src/balsa-message.c (part2canvas): Only print "part end: multipart"
+	  in debug mode.
+
 2000-05-07  Pablo Saratxaga <pablo@mandrakesoft.com>
 
 	* src/address-book.c,src/filter-edit-dialog.c: i18n fixes from

@@ -887,7 +887,7 @@ balsa_mblist_mailbox_style (GtkCTree * ctree, GtkCTreeNode *node, MailboxNode *m
 #ifdef BALSA_SHOW_INFO
     /* If we have a count of the unread messages, and we are showing
        * columns, put the number in the unread column */
-    if (display_info && mailbox->unread_messages > 0) {
+    if (display_info /*&& mailbox->unread_messages > 0*/ ) {
       text = g_strdup_printf ("%ld", mailbox->unread_messages);
       gtk_ctree_node_set_text (ctree, node, 1, text);
       g_free(text);

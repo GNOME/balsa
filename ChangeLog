@@ -1,3 +1,10 @@
+2004-07-07  Pawel Salek
+
+	* NEWS: release 2.0.18.
+	* src/toolbar-factory.c: fix 141090.
+	* libbalsa/address-book-{ldif,vcard}.c: handle better empty books.
+	* Makefile.am: add intltoop-*.in files to EXTRA_DIST.
+
 2004-07-04  Pawel Salek
 
 	* Makefile.am, balsa.desktop.in: port patches from 142769.

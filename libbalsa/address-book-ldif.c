@@ -622,10 +622,10 @@ libbalsa_address_book_ldif_add_address(LibBalsaAddressBook * ab,
     LibBalsaAddress *address;
     FILE *fp;
     gchar *value, *value_spec;
+    LibBalsaABErr res = LBABERR_OK;
 
-    if(!load_ldif_file(ab)) 
-        return LBABERR_CANNOT_READ;
-    
+    load_ldif_file(ab); /* Ignore error if any; we may be adding */
+                        /* the first entry in the book. */    
     
     for(list = LIBBALSA_ADDRESS_BOOK_LDIF(ab)->address_list;
 	list;
@@ -694,12 +694,13 @@ libbalsa_address_book_ldif_add_address(LibBalsaAddressBook * ab,
     for(list = new_address->address_list; list; list = g_list_next(list)) {
 	if (list->data && *(gchar*)(list->data)) {
 	    value_spec = string_to_value_spec((gchar *) list->data);
-	    fprintf(fp, "mail:%s\n", value_spec);
+	    if(fprintf(fp, "mail:%s\n", value_spec) < 0)
+                res = LBABERR_CANNOT_WRITE;
 	    g_free(value_spec);
 	}
     }
     fclose(fp);
-    return LBABERR_OK;
+    return res;
 }
 
 static LibBalsaABErr

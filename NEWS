@@ -1,4 +1,9 @@
-* Balsa-2.0.17 release. Release date 2004-01-18
+* Balsa-2.0.18 release. Release date 2004-07-07
+
+- multiple GPG-related fixes.
+- bugs fixed: 139607, 116604, 116604, 142769, 141090.
+
+* Balsa-2.0.17 release. Release date 2004-03-27
 
 - build on GNOME-2.6
 - fix some GPGME interaction problems.

@@ -16,6 +16,9 @@ EXTRA_DIST = \
 	balsa.1.in \
 	balsa.spec.in \
 	balsa.desktop.in \
+	intltool-extract.in	\
+	intltool-merge.in	\
+	intltool-update.in	\
 	gnome-balsa2.png \
 	HACKING			\
 	docs/mh-mail-HOWTO	\
@@ -60,9 +63,9 @@ dist-hook: balsa.spec
 ## to automatically rebuild aclocal.m4 if any of the macros in
 ## `macros/' change
 bzdist: distdir
-	@test -n "$(TAR)" || { echo "TAR undefined. Run make bzdist TAR=gtar"; false; }
+	@test -n "$(AMTAR)" || { echo "AMTAR undefined. Run make bzdist AMTAR=gtar"; false; }
 	-chmod -R a+r $(distdir)
-	$(TAR) chojf $(distdir).tar.bz2 $(distdir)
+	$(AMTAR) chojf $(distdir).tar.bz2 $(distdir)
 	-rm -rf $(distdir)
 
 ACLOCAL_AMFLAGS = -I m4  

@@ -246,43 +246,6 @@ config_mailbox_add (Mailbox * mailbox, char *key)
   return config_save (BALSA_CONFIG_FILE);
 }				/* config_mailbox_add */
 
-/*
- * Find  the named mailbox from the balsa_app.mailbox_nodes by it's
- * name
- */
-
-static gint
-find_mailbox_func (GNode * g1, gpointer data)
-{
-  MailboxNode *n1 = (MailboxNode *) g1->data;
-  gpointer *d = data;
-  gchar *name = *(gchar **) data;
-
-  if (!n1)
-    return FALSE;
-  if (strcmp (n1->name, name) != 0)
-    {
-      return FALSE;
-    }
-  *(++d) = g1;
-  return TRUE;
-}
-
-
-static GNode *
-find_gnode_in_mbox_list (GNode * gnode_list, gchar * mbox_name)
-{
-  gpointer d[2];
-  GNode *retval;
-
-  d[0] = mbox_name;
-  d[1] = NULL;
-
-  g_node_traverse (gnode_list, G_IN_ORDER, G_TRAVERSE_LEAFS, -1, find_mailbox_func, d);
-  retval = d[1];
-  return retval;
-}
-
 /* Remove the specified mailbox from the list of accounts.  Note that
    the mailbox is referenced by its 'Name' field here, so you had
    better make sure those stay unique.  Returns TRUE if the mailbox
@@ -291,7 +254,7 @@ gint
 config_mailbox_delete (gchar * name)
 {
   proplist_t accounts, mbox, temp_str;
-  GNode *gnode;
+
   if (balsa_app.proplist == NULL)
     {
       fprintf (stderr, "config_mailbox_delete: No configuration loaded!\n");
@@ -312,16 +275,6 @@ config_mailbox_delete (gchar * name)
 
   accounts = PLRemoveDictionaryEntry (accounts, mbox);
 
-  /* Don't forget to remove the node from balsa's mailbox list */
-  gnode = find_gnode_in_mbox_list (balsa_app.mailbox_nodes, name);
-  if (!gnode)
-    {
-      fprintf (stderr, "Oooop! mailbox not found in balsa_app.mailbox nodes?\n");
-    }
-  else
-    {
-      g_node_unlink (gnode);
-    }
   config_save (BALSA_CONFIG_FILE);
   return TRUE;
 }				/* config_mailbox_delete */

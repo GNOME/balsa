@@ -22,6 +22,7 @@
 #include <fcntl.h>
 
 #include <gnome.h>
+#include <string.h>
 #include "balsa-app.h"
 #include "mailbox-conf.h"
 #include "main-window.h"
@@ -98,10 +99,47 @@ static GtkWidget *create_pop_mailbox_page (void);
 static GtkWidget *create_imap_mailbox_page (void);
 
 
+/*
+ * Find  the named mailbox from the balsa_app.mailbox_nodes by it's
+ * name
+ */
+
+static gint
+find_mailbox_func (GNode * g1, gpointer data)
+{
+  MailboxNode *n1 = (MailboxNode *) g1->data;
+  gpointer *d = data;
+  gchar *name = *(gchar **) data;
+
+  if (!n1)
+    return FALSE;
+  if (strcmp (n1->name, name) != 0)
+    {
+      return FALSE;
+    }
+  *(++d) = g1;
+  return TRUE;
+}
+
+
+static GNode *
+find_gnode_in_mbox_list (GNode * gnode_list, gchar * mbox_name)
+{
+  gpointer d[2];
+  GNode *retval;
+
+  d[0] = mbox_name;
+  d[1] = NULL;
+
+  g_node_traverse (gnode_list, G_IN_ORDER, G_TRAVERSE_LEAFS, -1, find_mailbox_func, d);
+  retval = d[1];
+  return retval;
+}
 
 void
 mailbox_conf_delete (Mailbox * mailbox)
 {
+  GNode * gnode;
 
   gint clicked_button;
   GtkWidget *ask = gnome_message_box_new (_ ("This will remove the mailbox permanently.\n"
@@ -119,6 +157,18 @@ mailbox_conf_delete (Mailbox * mailbox)
 
   /* Close the mailbox, in case it was open */
   mblist_close_mailbox (mailbox);
+
+  /* Don't forget to remove the node from balsa's mailbox list */
+  gnode = find_gnode_in_mbox_list (balsa_app.mailbox_nodes, mailbox->name);
+  if (!gnode)
+    {
+      fprintf (stderr, "Oooop! mailbox not found in balsa_app.mailbox "
+	       "nodes?\n");
+    }
+  else
+    {
+      g_node_unlink (gnode);
+    }
 
   /* Delete it from the config file and internal nodes */
   config_mailbox_delete (mailbox->name);

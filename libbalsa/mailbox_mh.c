@@ -603,10 +603,16 @@ libbalsa_mailbox_mh_check(LibBalsaMailbox * mailbox)
 	    modified = 1;
     }
 
-    if (st.st_mtime > mh->mtime)
+    if (mh->mtime == 0)
+	/* First check--just cache the mtime. */
+	mh->mtime = st.st_mtime;
+    else if (st.st_mtime > mh->mtime)
 	modified = 1;
 
-    if (st_sequences.st_mtime > mh->mtime_sequences)
+    if (mh->mtime_sequences == 0)
+	/* First check--just cache the mtime. */
+	mh->mtime_sequences = st_sequences.st_mtime;
+    else if (st_sequences.st_mtime > mh->mtime_sequences)
 	modified = 1;
 
     if (!modified)

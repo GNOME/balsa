@@ -541,6 +541,12 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 	return;
     }
 
+    if (mbox->mtime == 0) {
+	/* First check--just cache the mtime and size. */
+	mbox->mtime = st.st_mtime;
+	mbox->size = st.st_size;
+	return;
+    }
     if (st.st_mtime == mbox->mtime && st.st_size == mbox->size)
 	return;
 

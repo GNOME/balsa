@@ -525,17 +525,26 @@ libbalsa_mailbox_maildir_check(LibBalsaMailbox * mailbox)
 
     if (stat(mdir->tmpdir, &st) == -1)
 	return;
-    if (st.st_mtime > mdir->mtime)
+    if (mdir->mtime == 0)
+	/* First check--just cache the mtime. */
+	mdir->mtime = st.st_mtime;
+    else if (st.st_mtime > mdir->mtime)
 	modified = 1;
 
     if (stat(mdir->curdir, &st_cur) == -1)
 	return;
-    if (st_cur.st_mtime > mdir->mtime_cur)
+    if (mdir->mtime_cur == 0)
+	/* First check--just cache the mtime. */
+	mdir->mtime_cur = st_cur.st_mtime;
+    else if (st_cur.st_mtime > mdir->mtime_cur)
 	modified = 1;
 
     if (stat(mdir->newdir, &st_new) == -1)
 	return;
-    if (st_new.st_mtime > mdir->mtime_new)
+    if (mdir->mtime_new == 0)
+	/* First check--just cache the mtime. */
+	mdir->mtime_new = st_new.st_mtime;
+    else if (st_new.st_mtime > mdir->mtime_new)
 	modified = 1;
 
     if (!modified)

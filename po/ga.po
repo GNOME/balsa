@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: balsa branch-2-0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2000-06-01 20:26-0400\n"
-"PO-Revision-Date: 2004-01-14 07:10+0000\n"
+"PO-Revision-Date: 2004-01-22 07:10+0000\n"
 "Last-Translator: Alastair McKinstry <mckinstry@computer.org> \n"
 "Language-Team: Gaeilge <gaeilge-a@listserv.heanet.ie>\n"
 "MIME-Version: 1.0\n"
@@ -399,11 +399,11 @@ msgstr "Do:"
 
 #: src/balsa-message.c:653
 msgid "Cc:"
-msgstr ""
+msgstr "Cc:"
 
 #: src/balsa-message.c:654
 msgid "Bcc:"
-msgstr ""
+msgstr "Bcc:"
 
 #: src/balsa-message.c:657
 msgid "Fcc:"
@@ -534,7 +534,7 @@ msgstr ""
 
 #: src/filter-edit-dialog.c:313
 msgid "Body"
-msgstr ""
+msgstr "Corp"
 
 #: src/filter-edit-dialog.c:362
 msgid "Match string:"
@@ -551,7 +551,7 @@ msgstr "Scríos"
 
 #: src/filter-edit-dialog.c:454
 msgid "Command:"
-msgstr ""
+msgstr "Ordú:"
 
 #. The name entry
 #: src/filter-edit-dialog.c:490
@@ -870,7 +870,7 @@ msgstr ""
 
 #: src/main-window.c:282
 msgid "_Undelete"
-msgstr ""
+msgstr "_Athdealaigh"
 
 #: src/main-window.c:282
 msgid "Undelete the message"
@@ -922,7 +922,7 @@ msgstr "Dún an bosca phoist"
 
 #: src/main-window.c:321
 msgid "Empty _Trash"
-msgstr ""
+msgstr "Folamh _Buscar"
 
 #: src/main-window.c:321
 msgid "Delete Messages from the trash mailbox"
@@ -1120,7 +1120,7 @@ msgstr "Roghanna Phost"
 
 #: src/pref-manager.c:199 src/pref-manager.c:1223
 msgid "Display"
-msgstr "Radharc"
+msgstr "Taispeán"
 
 #: src/pref-manager.c:202 src/pref-manager.c:1248 src/pref-manager.c:1293
 msgid "Printing"
@@ -1380,7 +1380,7 @@ msgstr "Ordú Priontáil:"
 
 #: src/sendmsg-window.c:109
 msgid "Send"
-msgstr ""
+msgstr "Post"
 
 #: src/sendmsg-window.c:109
 msgid "Send this mail"
@@ -1388,7 +1388,7 @@ msgstr ""
 
 #: src/sendmsg-window.c:113
 msgid "Attach"
-msgstr ""
+msgstr "Ceangal"
 
 #: src/sendmsg-window.c:113
 msgid "Add attachments to this message"
@@ -2144,10 +2144,10 @@ msgid "New message to %s: %s"
 msgstr "Teachtaireacht nua do %s: %s"
 
 msgid "Choose Address Book"
-msgstr "Tóg Leabhar Sheoladh"
+msgstr "Roghnaigh Leabhar Sheoladh"
 
 msgid "Choose Address"
-msgstr "Tóg Seoladh"
+msgstr "Roghnaigh Seoladh"
 
 msgid "Reply to all recipients"
 msgstr ""

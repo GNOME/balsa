@@ -4506,7 +4506,7 @@ libbalsa_msg_try_decrypt(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	    if (chk_crypto->chk_mode == LB_MAILBOX_CHK_CRYPT_ALWAYS) {
 		libbalsa_information
 		    (LIBBALSA_INFORMATION_ERROR,
-		     _("The decryption can not be performed because this message "
+		     _("The decryption cannot be performed because this message "
 		       "is displayed more than once.\n"
 		       "Please close the other instances of this message and try "
 		       "again."));
@@ -4613,7 +4613,7 @@ libbalsa_msg_try_mp_signed(LibBalsaMessage * message, LibBalsaMessageBody *body,
 	     LIBBALSA_INFORMATION_ERROR : LIBBALSA_INFORMATION_MESSAGE,
 	     _("The message sent by %s with subject \"%s\" contains a signed "
 	       "part, but its structure is invalid. The signature, if there "
-	       "is any, can not be checked."),
+	       "is any, cannot be checked."),
 	     chk_crypto->sender, chk_crypto->subject);
 	return;
     }
@@ -4725,10 +4725,10 @@ libbalsa_msg_part_2440(LibBalsaMessage * message, LibBalsaMessageBody * body,
             libbalsa_information
                 (LIBBALSA_INFORMATION_ERROR, "%s\n%s",
 		 rfc2440mode == GMIME_PART_RFC2440_ENCRYPTED ?
-                 _("The decryption can not be performed because "
+                 _("The decryption cannot be performed because "
 		   "this message is displayed more than once.") :
                  _("The signature check and removal of the OpenPGP armor "
-		   "can not be performed because "
+		   "cannot be performed because "
 		   "this message is displayed more than once."),
                  _("Please close the other instances of this message "
 		   "and try again."));

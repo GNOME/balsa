@@ -66,6 +66,7 @@ static void balsa_address_book_dist_mode_toggled(GtkWidget * w,
 static void balsa_address_book_menu_changed(GtkWidget * widget, 
 					    BalsaAddressBook *ab);
 static void balsa_address_book_run_gnomecard(GtkWidget * widget, gpointer data);
+static void balsa_address_book_response_cb(BalsaAddressBook *ab, gint resp);
 static void balsa_address_book_find(GtkWidget * group_entry, BalsaAddressBook *ab);
 
 /* address and recipient list management ... */
@@ -168,11 +169,10 @@ balsa_address_book_init(BalsaAddressBook *ab)
     titles[1] = _(titles[1]);
 #endif
 
-#if 0
     gtk_signal_connect(GTK_OBJECT(ab), "response",
-		       GTK_SIGNAL_FUNC(balsa_address_book_button_clicked), 
+		       GTK_SIGNAL_FUNC(balsa_address_book_response_cb), 
                        NULL);
-#endif
+
     vbox = GTK_DIALOG(ab)->vbox;
 
     gtk_window_set_wmclass(GTK_WINDOW(ab), "addressbook", "Balsa");
@@ -293,6 +293,7 @@ balsa_address_book_init(BalsaAddressBook *ab)
 		       ab);
     
     w = balsa_stock_button_with_label(GNOME_STOCK_PIXMAP_BACK, "");
+    gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
     gtk_widget_show(w);
     gtk_signal_connect(GTK_OBJECT(w), "clicked",
 		       GTK_SIGNAL_FUNC(balsa_address_book_remove_from_recipient_list),
@@ -778,11 +779,20 @@ address_book_entry_unref(AddressBookEntry *entry)
     g_free(entry);
 }
 
-#if 0
+/* balsa_address_book_response_cb:
+   Normally, we should not destroy the window in the response callback.
+   This time, we can make an exception - nobody is waiting for the result
+   anyway.
+*/
 static void
-balsa_address_book_button_clicked (BalsaAddressBook *ab, gint response)
+balsa_address_book_response_cb(BalsaAddressBook *ab, gint response)
 {
-    if ( !ab->composing )
-	gtk_widget_destroy(GTK_WIDGET(ab));
+    switch(response) {
+    case GTK_RESPONSE_CLOSE:
+        if ( !ab->composing )
+            gtk_widget_destroy(GTK_WIDGET(ab));
+        break;
+    default: /* nothing */
+    }
 }
-#endif
+

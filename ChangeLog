@@ -1,3 +1,10 @@
+2002-06-26  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/Makefile.am, balsa.spec.in: remove last gdbm experiment traces.
+	* src/address-book-config.[hc]: proper parenting.
+	* src/address-book.c: handle close button (#86495). Show both arrows.
+	* src/pref-manager.c: add some mnemonics.
+
 2002-06-25  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/libbalsa.c: improve certificate window layout. Use GtkDialog

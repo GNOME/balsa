@@ -94,7 +94,8 @@ static void set_the_page(GtkWidget * button, AddressBookConfig * abc);
  *
  */
 LibBalsaAddressBook *
-balsa_address_book_config_new(LibBalsaAddressBook * address_book)
+balsa_address_book_config_new(LibBalsaAddressBook * address_book,
+                              GtkWindow* parent)
 {
     AddressBookConfig *abc;
     GtkWidget *bbox;
@@ -109,8 +110,7 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
     abc->window = gtk_dialog_new();
     gtk_window_set_title(GTK_WINDOW(abc->window),
                          _("Address Book Configuration")); 
-    gtk_window_set_transient_for(GTK_WINDOW(abc->window), 
-                                 GTK_WINDOW(balsa_app.main_window));
+    gtk_window_set_transient_for(GTK_WINDOW(abc->window), parent);
     gtk_window_set_wmclass(GTK_WINDOW(abc->window), 
 			   "address_book_config_dialog", "Balsa");
 

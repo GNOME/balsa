@@ -24,6 +24,7 @@
 #include "libbalsa.h"
 
 LibBalsaAddressBook *balsa_address_book_config_new(LibBalsaAddressBook *
-						   address_book);
+						   address_book,
+                                                   GtkWindow* parent);
 
 #endif				/* __ADDRESS_BOOK_CONFIG_H__ */

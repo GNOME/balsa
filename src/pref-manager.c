@@ -1315,7 +1315,7 @@ attach_information_menu(const gchar* label,gint row, GtkTable *table,
 static GtkWidget*
 box_start_check(const gchar* label, GtkWidget* box)
 {
-    GtkWidget *res = gtk_check_button_new_with_label(label);
+    GtkWidget *res = gtk_check_button_new_with_mnemonic(label);
     gtk_box_pack_start(GTK_BOX(box), res, FALSE, TRUE, 0);
     return res;
 }
@@ -1323,7 +1323,7 @@ box_start_check(const gchar* label, GtkWidget* box)
 static void
 add_button_to_box(const gchar*label, GtkSignalFunc cb, GtkWidget* box)
 {
-    GtkWidget *button = gtk_button_new_with_label(label);
+    GtkWidget *button = gtk_button_new_with_mnemonic(label);
     gtk_signal_connect_object(GTK_OBJECT(button), "clicked", cb, NULL);
     gtk_box_pack_start(GTK_BOX(box), button, FALSE, FALSE, 0);
 }
@@ -1419,9 +1419,9 @@ create_mailserver_page(gpointer data)
                        GTK_SIGNAL_FUNC(mail_servers_cb), NULL);
 
     vbox1 = vbox_in_container(hbox1);
-    add_button_to_box(_("Add"),    GTK_SIGNAL_FUNC(server_add_cb),  vbox1);
-    add_button_to_box(_("Modify"), GTK_SIGNAL_FUNC(server_edit_cb), vbox1);
-    add_button_to_box(_("Delete"), GTK_SIGNAL_FUNC(server_del_cb),  vbox1);
+    add_button_to_box(_("_Add"),    GTK_SIGNAL_FUNC(server_add_cb),  vbox1);
+    add_button_to_box(_("_Modify"), GTK_SIGNAL_FUNC(server_edit_cb), vbox1);
+    add_button_to_box(_("_Delete"), GTK_SIGNAL_FUNC(server_del_cb),  vbox1);
 
     frame4 = gtk_frame_new(_("Local mail"));
     gtk_table_attach(GTK_TABLE(table3), frame4, 0, 1, 1, 2,
@@ -1579,8 +1579,8 @@ incoming_page(gpointer data)
 		     1, (GtkAttachOptions) (0), (GtkAttachOptions) (0), 0,
 		     0);
 
-    pui->check_mail_auto = gtk_check_button_new_with_label(
-	_("Check mail automatically every:"));
+    pui->check_mail_auto = gtk_check_button_new_with_mnemonic(
+	_("_Check mail automatically every:"));
     gtk_table_attach(GTK_TABLE(table7), pui->check_mail_auto, 0, 1, 0, 1,
 		     (GtkAttachOptions) (GTK_FILL),
 		     (GtkAttachOptions) (0), 0, 0);
@@ -1588,13 +1588,13 @@ incoming_page(gpointer data)
     hbox1 = gtk_hbox_new(FALSE, 5);
     gtk_box_pack_start(GTK_BOX(vbox2), hbox1,
 		       TRUE, FALSE, 0);
-    pui->check_imap = gtk_check_button_new_with_label(
-	_("Check IMAP mailboxes"));
+    pui->check_imap = gtk_check_button_new_with_mnemonic(
+	_("Check _IMAP mailboxes"));
     gtk_box_pack_start(GTK_BOX(hbox1), pui->check_imap,
 		       FALSE, FALSE, 0);
     
-    pui->check_imap_inbox = gtk_check_button_new_with_label(
-	_("Check INBOX only"));
+    pui->check_imap_inbox = gtk_check_button_new_with_mnemonic(
+	_("Check INBOX _only"));
     gtk_box_pack_start(GTK_BOX(hbox1), pui->check_imap_inbox,
 		       FALSE, FALSE, 0);
     
@@ -2431,13 +2431,13 @@ create_address_book_page(gpointer data)
     gtk_clist_set_column_widget(GTK_CLIST(pui->address_books), 2, label);
 
     vbox = vbox_in_container(hbox);
-    add_button_to_box(_("Add"),
+    add_button_to_box(_("_Add"),
                       GTK_SIGNAL_FUNC(address_book_add_cb),         vbox);
-    add_button_to_box(_("Modify"),
+    add_button_to_box(_("_Modify"),
                       GTK_SIGNAL_FUNC(address_book_edit_cb),        vbox);
-    add_button_to_box(_("Delete"),         
+    add_button_to_box(_("_Delete"),         
                       GTK_SIGNAL_FUNC(address_book_delete_cb),      vbox);
-    add_button_to_box(_("Set as default"), 
+    add_button_to_box(_("_Set as default"), 
                       GTK_SIGNAL_FUNC(set_default_address_book_cb), vbox);
 
     update_address_books();
@@ -2510,7 +2510,9 @@ address_book_edit_cb(GtkWidget * widget, gpointer data)
 
     g_assert(address_book != NULL);
 
-    address_book = balsa_address_book_config_new(address_book);
+    address_book = 
+        balsa_address_book_config_new(address_book,
+                                      GTK_WINDOW(property_box));
     if (address_book) {
 	config_address_book_save(address_book);
 	update_address_books();
@@ -2540,7 +2542,9 @@ static void
 address_book_add_cb(GtkWidget * widget, gpointer data)
 {
     LibBalsaAddressBook *address_book;
-    address_book = balsa_address_book_config_new(NULL);
+    address_book = 
+        balsa_address_book_config_new(NULL,
+                                      GTK_WINDOW(property_box));
 
     if (address_book != NULL) {
 	balsa_app.address_book_list =

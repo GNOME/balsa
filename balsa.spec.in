@@ -32,12 +32,10 @@ BuildRequires:  gdk-pixbuf-devel
 %if %redhat
 BuildRequires:  gnome-vfs-devel
 BuildRequires:  pspell-devel
-BuildRequires:  gdbm-devel
 %endif
 %if %mdk
 BuildRequires:  libgnome-vfs0-devel
 BuildRequires:  libpspell4-devel
-BuildRequires:  libgdbm2-devel
 %endif
 
 %description

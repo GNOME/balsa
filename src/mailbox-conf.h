@@ -24,6 +24,8 @@
 
 #include "mailbox-node.h"
 
+typedef struct _BalsaMailboxConfView BalsaMailboxConfView;
+
 void mailbox_conf_new(GtkType mailbox_type);
 void mailbox_conf_edit(BalsaMailboxNode * mbnode);
 void mailbox_conf_delete(BalsaMailboxNode * mbnode);
@@ -35,4 +37,11 @@ void mailbox_conf_add_mh_cb(GtkWidget * widget, gpointer data);
 void mailbox_conf_add_imap_cb(GtkWidget * widget, gpointer data);
 void mailbox_conf_delete_cb(GtkWidget * widget, gpointer data);
 void mailbox_conf_edit_cb(GtkWidget * widget, gpointer data);
+
+/* Helpers for dialogs. */
+BalsaMailboxConfView *mailbox_conf_view_new(LibBalsaMailbox * mailbox,
+                                            GtkWindow * window,
+                                            GtkWidget * table, gint row);
+void mailbox_conf_view_check(BalsaMailboxConfView * mcc,
+                             LibBalsaMailbox * mailbox);
 #endif				/* __MAILBOX_CONF_H__ */

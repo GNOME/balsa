@@ -372,10 +372,6 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     GtkWidget *notebook;
     GnomeApp *active_win = GNOME_APP(data);
     gint i;
-#if BALSA_MAJOR < 2
-    static GnomeHelpMenuEntry help_entry = { NULL, "preferences" };
-    help_entry.name = gnome_app_id;
-#endif
 
     /* only one preferences manager window */
     if (already_open) {

@@ -44,4 +44,24 @@ BalsaMailboxConfView *mailbox_conf_view_new(LibBalsaMailbox * mailbox,
                                             GtkWidget * table, gint row);
 void mailbox_conf_view_check(BalsaMailboxConfView * mcc,
                              LibBalsaMailbox * mailbox);
+
+
+typedef struct {
+    GtkWidget *use_ssl;
+    GtkWidget *tls_mode;
+    GtkTable  *table;      /* internal */
+    GtkWidget *tls_option; /* internal */
+    unsigned   used_rows;  /* internal */
+} BalsaServerConf;
+
+GtkWidget* balsa_server_conf_get_advanced_widget(BalsaServerConf *bsc,
+                                                 LibBalsaServer *s,
+                                                 int extra_rows);
+GtkWidget*      balsa_server_conf_add_checkbox(BalsaServerConf *bsc,
+                                               const char *label);
+void            balsa_server_conf_set_values(BalsaServerConf *bsc,
+                                             LibBalsaServer *server);
+gboolean        balsa_server_conf_get_use_ssl(BalsaServerConf *bsc);
+LibBalsaTlsMode balsa_server_conf_get_tls_mode(BalsaServerConf *bsc);
+
 #endif				/* __MAILBOX_CONF_H__ */

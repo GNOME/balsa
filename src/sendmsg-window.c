@@ -2370,14 +2370,19 @@ set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message,
 }
 
 static gboolean
-wrap_body_timeout(BalsaSendmsg * msg)
+sw_wrap_timeout_cb(BalsaSendmsg * msg)
 {
     GtkTextBuffer *buffer =
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(msg->text));
+    GtkTextIter now;
+
+    gtk_text_buffer_get_iter_at_mark(buffer, &now,
+                                     gtk_text_buffer_get_insert(buffer));
 
     msg->wrap_timeout_id = 0;
     g_signal_handler_block(buffer, msg->changed_sig_id);
-    wrap_body_cb(NULL, msg);
+    libbalsa_unwrap_buffer(buffer, &now, 1);
+    libbalsa_wrap_view(GTK_TEXT_VIEW(msg->text), balsa_app.wraplength);
     g_signal_handler_unblock(buffer, msg->changed_sig_id);
 
     return FALSE;
@@ -2386,10 +2391,12 @@ wrap_body_timeout(BalsaSendmsg * msg)
 static void
 text_changed(GtkWidget * w, BalsaSendmsg * msg)
 {
-    if (msg->wrap_timeout_id)
-        g_source_remove(msg->wrap_timeout_id);
-    msg->wrap_timeout_id =
-        g_timeout_add(500, (GSourceFunc) wrap_body_timeout, msg);
+    if (msg->flow) {
+        if (msg->wrap_timeout_id)
+            g_source_remove(msg->wrap_timeout_id);
+        msg->wrap_timeout_id =
+            g_timeout_add(500, (GSourceFunc) sw_wrap_timeout_cb, msg);
+    }
 
     msg->modified = TRUE;
 }
@@ -3492,27 +3499,32 @@ wrap_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
     GtkTextBuffer *buffer =
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
-    GtkTextIter now;
+    GtkTextIter start, end;
 
-    gtk_text_buffer_get_iter_at_mark(buffer, &now,
-                                     gtk_text_buffer_get_insert(buffer));
+    gtk_text_buffer_get_bounds(buffer, &start, &end);
 
     if (bsmsg->flow) {
-        libbalsa_unwrap_buffer(buffer, &now, widget ? -1 : 1);
+        g_signal_handler_block(buffer, bsmsg->changed_sig_id);
+        libbalsa_unwrap_buffer(buffer, &start, -1);
         libbalsa_wrap_view(GTK_TEXT_VIEW(bsmsg->text), balsa_app.wraplength);
+        g_signal_handler_unblock(buffer, bsmsg->changed_sig_id);
     } else {
-        gint pos = gtk_text_iter_get_offset(&now);
-        GtkTextIter start, end;
+        GtkTextIter now;
+        gint pos;
         gchar *the_text;
 
-        gtk_text_buffer_get_bounds(buffer, &start, &end);
+        gtk_text_buffer_get_iter_at_mark(buffer, &now,
+                                         gtk_text_buffer_get_insert(buffer));
+        pos = gtk_text_iter_get_offset(&now);
+
         the_text = gtk_text_iter_get_text(&start, &end);
         libbalsa_wrap_string(the_text, balsa_app.wraplength);
         gtk_text_buffer_set_text(buffer, "", 0);
         libbalsa_insert_with_url(buffer, the_text, NULL, NULL, NULL);
+        g_free(the_text);
+
         gtk_text_buffer_get_iter_at_offset(buffer, &now, pos);
         gtk_text_buffer_place_cursor(buffer, &now);
-        g_free(the_text);
     }
 }
 

@@ -305,22 +305,27 @@ lb_imap_server_cleanup(LibBalsaImapServer * imap_server)
     g_mutex_lock(imap_server->lock);
 
     idle_marker = time(NULL) - CONNECTION_CLEANUP_IDLE_TIME;
-    for(list = g_list_first(imap_server->free_handles);
-	list; list = g_list_next(list)) {
+
+    list = imap_server->free_handles;
+    while (list) {
+	GList *next = list->next;
 	struct handle_info *info = list->data;
+
 	if (info->last_used < idle_marker) {
-	    GList *next = g_list_next(list);
 	    imap_server->free_handles =
 		g_list_delete_link(imap_server->free_handles, list);
 	    lb_imap_server_info_free(info);
-	    list = next;
 	}
+
+	list = next;
     }
 
     idle_marker -=
 	CONNECTION_CLEANUP_NOOP_TIME - CONNECTION_CLEANUP_IDLE_TIME;
+
     for (list = imap_server->used_handles; list; list = list->next) {
 	struct handle_info *info = list->data;
+
 	if (info->last_used < idle_marker) {
 	    if (imap_mbox_handle_noop(info->handle) != IMR_OK)
 		libbalsa_information(LIBBALSA_INFORMATION_WARNING,

@@ -809,6 +809,10 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
   gnome_app_create_menus_with_data (GNOME_APP (window), main_menu, msg);
   gnome_app_create_toolbar_with_data (GNOME_APP (window), main_toolbar, msg);
 
+  msg->ready_widgets[0] = file_menu[MENU_FILE_SEND_POS    ].widget;
+  msg->ready_widgets[1] = file_menu[MENU_FILE_POSTPONE_POS].widget;
+  msg->ready_widgets[2] = file_menu[TOOL_SEND_POS         ].widget;
+  msg->ready_widgets[3] = file_menu[TOOL_POSTPONE_POS     ].widget;
 /* create the top portion with the to, from, etc in it */
   gtk_paned_add1 (GTK_PANED(paned), create_info_pane (msg, type));
 
@@ -1420,15 +1424,13 @@ reflow_body_cb (GtkWidget * widget, BalsaSendmsg *bsmsg) {
 }
 
 static void
-check_readiness(GtkEditable *w, BalsaSendmsg *bsmsg) 
+check_readiness(GtkEditable *w, BalsaSendmsg *msg) 
 {
-   gint state = is_ready_to_send(bsmsg);
+   gint i;
+   gint state = is_ready_to_send(msg);
 
-   gtk_widget_set_sensitive(file_menu[MENU_FILE_SEND_POS    ].widget, state);
-   gtk_widget_set_sensitive(file_menu[MENU_FILE_POSTPONE_POS].widget, state);
-
-   gtk_widget_set_sensitive(main_toolbar[TOOL_SEND_POS    ].widget, state);
-   gtk_widget_set_sensitive(main_toolbar[TOOL_POSTPONE_POS].widget, state);
+   for(i=0; i<sizeof(msg->ready_widgets)/sizeof(msg->ready_widgets[0]); i++) 
+      gtk_widget_set_sensitive(msg->ready_widgets[i], state);
 }
 
 static gint 

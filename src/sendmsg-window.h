@@ -49,6 +49,7 @@ extern "C"
 	 Message *orig_message;
 	 SendType type;
 	 const gchar * charset;
+	 GtkWidget * ready_widgets[4];
    };
 
   BalsaSendmsg * sendmsg_window_new (GtkWidget *, Message *, SendType);

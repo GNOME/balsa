@@ -12,8 +12,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.9.3.1\n"
-"POT-Creation-Date: 2000-09-01 18:55+0000\n"
-"PO-Revision-Date: 2000-09-01 19:14:14+0000\n"
+"POT-Creation-Date: 2000-09-03 17:39+0000\n"
+"PO-Revision-Date: 2000-09-03 17:45:34+0900\n"
 "Last-Translator: Simos Xenitellis <simos@hellug.gr>\n"
 "Language-Team: Greek <nls@tux.hellug.gr>\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #
-#: libbalsa/mailbox_imap.c:241
+#: libbalsa/mailbox_imap.c:248
 #, c-format
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxImap: ¶νοιγμα %s Αρ. αναφορών: %d\n"
@@ -38,12 +38,12 @@ msgstr "LibBalsaMailboxLocal: ¶νοιγμα %s Αρ. αναφορών: %d\n"
 msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxPop3: ¶νοιγμα %s Αρ. αναφορών: %d\n"
 
-#: libbalsa/send.c:787
+#: libbalsa/send.c:784
 #, c-format
 msgid "Could not find address for host %s."
 msgstr "Δε βρέθηκε η διεύθυνση για το σύστημα %s."
 
-#: libbalsa/send.c:790
+#: libbalsa/send.c:787
 #, c-format
 msgid "Error: Could not find address for host %s."
 msgstr "Σφάλμα: Δε βρέθηκε η διεύθυνση για το σύστημα %s."
@@ -398,8 +398,42 @@ msgstr "Αδύνατο η εγγραφή μηνύματος"
 msgid "Unable to get APOP seed from server"
 msgstr "Αδύνατη η λήψη σπόρου APOP από τον εξυπηρέτη"
 
+#: libmutt/imap/auth.c:110
+msgid "Authenticating (CRAM-MD5)..."
+msgstr "Αυθεντικοποίηση (CRAM-MD5)..."
+
+#: libmutt/imap/auth.c:197
+msgid "Authenticating (anonymous)..."
+msgstr "Αυθεντικοποίηση (ανώνυμη)..."
+
+#: libmutt/imap/auth.c:283
+msgid "Anonymous authentication not supported."
+msgstr "Η ανώνυμη αυθεντικοποίηση δεν υποστηρίζεται."
+
+#: libmutt/imap/auth.c:296
+msgid "GSSAPI authentication failed."
+msgstr "Αποτυχία της αυθεντικοποίησης GSSAPI."
+
+#: libmutt/imap/auth.c:324
+msgid "CRAM-MD5 authentication failed."
+msgstr "Αποτυχία της αυθεντικοποίησης CRAM-MD5."
+
+#: libmutt/imap/auth.c:339
+msgid "Skipping CRAM-MD5 authentication."
+msgstr "Παράκαμψη της αυθεντικοποίησης CRAM-MD5."
+
+#
+#: libmutt/imap/auth.c:361
+msgid "Logging in..."
+msgstr "Σύνδεση..."
+
+#. Login failed, try again
+#: libmutt/imap/auth.c:373
+msgid "Login failed."
+msgstr "Αποτυχία σύνδεσης με αυθεντικοποίηση."
+
 #. now begin login
-#: libmutt/imap/auth_gss.c:83
+#: libmutt/imap/auth_gss.c:88
 msgid "Authenticating (GSSAPI)..."
 msgstr "Αυθεντικοποίηση (GSSAPI)..."
 

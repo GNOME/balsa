@@ -69,7 +69,6 @@ libmutt_a_SOURCES = \
 	lib.h		\
 	mailbox.h	\
 	mapping.h	\
-	mbyte.h		\
 	md5.h		\
 	mime.h		\
 	mutt.h		\

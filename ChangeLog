@@ -1,3 +1,10 @@
+2002-02-26  Pawel Salek <pawsa@theochem.kth.se>
+
+	* configure.in: release balsa-1.3.2
+	* INSTALL, balsa.1.in, balsa.spec.in: update URLs.
+	* src/spell-check.c, README:  address #68186.
+	* libbalsa/mailbox_pop3.c, src/main-window.c: fix #72253.
+
 2002-02-25  Carlos Morgado  <chbm@chbm.nu>
 
 	* libbalsa/Makefile.am: added LIBMUTT for some libmutt/*.h ...

@@ -1,3 +1,7 @@
+2002-02-26  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* Makefile.am: mbyte.h is not in libmutt.
+
 2002-02-17  Carlos Morgado  <chbm@chbm.nu>
 
 	* configure.in: USE_NSS

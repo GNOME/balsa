@@ -1,31 +1,33 @@
 # Irish (Gaeilge) translations for balsa.pot (GNOME)
-# Copyright (C) 1998 Free Software Foundation, Inc.
+# Copyright (C) 1998,2004 Free Software Foundation, Inc.
 # Alastair McKinstry <mckinstry@computer.org>, 1998.
+# Se√°n √≥ Ceallaigh <s_oceallaigh@yahoo.com>, 2000.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: balsa 0.4.9\n"
+"Project-Id-Version: balsa branch-2-0\n"
+"Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2000-06-01 20:26-0400\n"
-"PO-Revision-Date: 2000-08-27 11:00+0000\n"
-"Last-Translator: Se·n ” Ceallaigh <s_oceallaigh@yahoo.com> \n"
+"PO-Revision-Date: 2004-01-14 07:10+0000\n"
+"Last-Translator: Alastair McKinstry <mckinstry@computer.org> \n"
 "Language-Team: Gaeilge <gaeilge-a@listserv.heanet.ie>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8-bit\n"
 
 #: libbalsa/mailbox.c:196
 msgid "Error: "
-msgstr "Earr·id: "
+msgstr "Earr√°id: "
 
 #: libbalsa/mailbox.c:631
 #, c-format
 msgid "Mailbox: Opening %s Refcount: %d\n"
-msgstr "Bosca Poist: Ag osc·il: %s Cuntas tagartha: %d\n"
+msgstr ""
 
 #: libbalsa/mailbox.c:651
 #, c-format
 msgid "Mailbox: Closing %s Refcount: %d\n"
-msgstr "Bosca Poist: Ag d˙nadh %s, Cuntas tagartha: %d\n"
+msgstr "Bosca Poist: Ag d√∫nadh %s, Cuntas tagartha: %d\n"
 
 #.
 #. ISPRIME(9)
@@ -40,11 +42,11 @@ msgstr "Asbhosca:"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:57
 msgid "Sentbox:"
-msgstr "Bosca Seolta"
+msgstr "Bosca _Seolta:"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:57
 msgid "Draftbox:"
-msgstr "Bosca DrÈachta"
+msgstr "Bosca _Dr√©achta:"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:57
 msgid "Trash:"
@@ -98,31 +100,31 @@ msgstr ""
 #: libinit_balsa/balsa-druid-page-user.gob:83 src/address-book.c:205
 #: src/address-book.c:450
 msgid "Name:"
-msgstr "Ainm"
+msgstr "Ainm:"
 
 #: libinit_balsa/balsa-druid-page-user.gob:87
 msgid "Email address:"
-msgstr "RÌomhsheoladh:"
+msgstr "Seoladh E-Post:"
 
 #: libinit_balsa/balsa-druid-page-user.gob:91
 msgid "SMTP Server:"
-msgstr "FreastalaÌ SMTP:"
+msgstr "Freastala√≠ SMTP:"
 
 #: libinit_balsa/balsa-druid-page-user.gob:94
 msgid "Local Mail Directory:"
-msgstr "¡it fillte·n Phoist:"
+msgstr "Fillte√°n √Åiti√∫l phost:"
 
 #: libinit_balsa/balsa-druid-page-user.gob:104
 msgid "User Settings"
-msgstr "RoghnaÌ ⁄s·ideoir"
+msgstr "Roghna√≠ √ös√°ideoir"
 
 #: libinit_balsa/balsa-druid-page-user.gob:152
 msgid "Local Mail Problem"
-msgstr "Postbhosca ¡iti˙il"
+msgstr "Phoist √Åiti√∫l"
 
 #: libinit_balsa/balsa-druid-page-welcome.gob:47
 msgid "Welcome to Balsa!"
-msgstr "F·ilte go Balsa!"
+msgstr "F√°ilte go Balsa!"
 
 #: libinit_balsa/balsa-druid-page-welcome.gob:50
 msgid ""
@@ -166,7 +168,7 @@ msgstr "Suimigh Seoladh Nua"
 
 #: src/address-book.c:212
 msgid "E-Mail Address:"
-msgstr "RÌomhsheoladh:"
+msgstr "Seoladh E-Post:"
 
 #: src/address-book.c:291 src/balsa-index-page.c:1046
 #, c-format
@@ -207,7 +209,7 @@ msgstr "Post"
 
 #: src/address-book.c:506
 msgid "Run GnomeCard"
-msgstr "De·n GnomeCard"
+msgstr "De√°n GnomeCard"
 
 #: src/address-book.c:512
 msgid "Re-Import"
@@ -321,15 +323,15 @@ msgstr "END:VCARD\n"
 
 #: src/balsa-index.c:252
 msgid "From"
-msgstr "”"
+msgstr "√ì"
 
 #: src/balsa-index.c:253 src/filter-edit-dialog.c:349
 msgid "Subject"
-msgstr "¡bair"
+msgstr "√Åbair"
 
 #: src/balsa-index.c:254
 msgid "Date"
-msgstr "D·ta"
+msgstr "D√°ta"
 
 #: src/balsa-mblist.c:221 src/mailbox-conf.c:1186
 msgid "Mailbox"
@@ -341,7 +343,7 @@ msgstr ""
 
 #: src/balsa-mblist.c:221
 msgid "Total"
-msgstr "Ioml·n"
+msgstr "Ioml√°n"
 
 #: src/balsa-mblist.c:824
 #, c-format
@@ -350,11 +352,11 @@ msgstr ""
 
 #: src/balsa-message.c:165 src/balsa-message.c:170
 msgid "Save MIME Part"
-msgstr "S·bh·il an cuid MIME"
+msgstr "S√°bh√°il an cuid MIME"
 
 #: src/balsa-message.c:166 src/balsa-message.c:226
 msgid "Save"
-msgstr "S·bh·il"
+msgstr "S√°bh√°il"
 
 #: src/balsa-message.c:166 src/balsa-message.c:226 src/mailbox-conf.c:667
 #: src/sendmsg-window.c:128 src/sendmsg-window.c:419 src/sendmsg-window.c:1088
@@ -368,12 +370,12 @@ msgstr ""
 
 #: src/balsa-message.c:225 src/balsa-message.c:230
 msgid "Save Text"
-msgstr "S·bh·il Teacs"
+msgstr "S√°bh√°il Teacs"
 
 #: src/balsa-message.c:301 src/balsa-message.c:315
 #, c-format
 msgid " Open of %s failed:%s "
-msgstr ""
+msgstr "Teip ag osc√°ilt %s: %s"
 
 #: src/balsa-message.c:302 src/balsa-message.c:317
 msgid "Ok"
@@ -381,19 +383,19 @@ msgstr "Ceart go leor"
 
 #: src/balsa-message.c:644
 msgid "Date:"
-msgstr "D·ta"
+msgstr "D√°ta:"
 
 #. From:
 #: src/balsa-message.c:648 src/filter-edit-dialog.c:337
 #: src/sendmsg-window.c:591
 msgid "From:"
-msgstr "”"
+msgstr "√ì"
 
 #. To:
 #: src/balsa-message.c:652 src/filter-edit-dialog.c:325
 #: src/sendmsg-window.c:593
 msgid "To:"
-msgstr ""
+msgstr "Do:"
 
 #: src/balsa-message.c:653
 msgid "Cc:"
@@ -410,7 +412,7 @@ msgstr ""
 #. Subject:
 #: src/balsa-message.c:658 src/sendmsg-window.c:599
 msgid "Subject:"
-msgstr "¡bair"
+msgstr "√Åbair"
 
 #: src/balsa-message.c:734
 #, c-format
@@ -444,7 +446,7 @@ msgstr ""
 #: src/balsa-message.c:1214
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
-msgstr ""
+msgstr "Teip ag osc√°il %s. Errno = %d, "
 
 #: src/filter-edit-dialog.c:30
 msgid "Inbound"
@@ -476,7 +478,7 @@ msgstr "Gach rud"
 
 #: src/filter-edit-dialog.c:45
 msgid "Simple"
-msgstr "SimplÌ"
+msgstr "Simpl√≠"
 
 #: src/filter-edit-dialog.c:46
 msgid "Regular Expression"
@@ -516,7 +518,7 @@ msgstr "Suas"
 
 #: src/filter-edit-dialog.c:205
 msgid "Down"
-msgstr "SÌos"
+msgstr "S√≠os"
 
 #: src/filter-edit-dialog.c:271
 msgid "Match in:"
@@ -545,11 +547,11 @@ msgstr "Suim"
 
 #: src/filter-edit-dialog.c:425 src/sendmsg-window.c:340
 msgid "Remove"
-msgstr "Bain As"
+msgstr "Scr√≠os"
 
 #: src/filter-edit-dialog.c:454
 msgid "Command:"
-msgstr "Ord˙"
+msgstr ""
 
 #. The name entry
 #: src/filter-edit-dialog.c:490
@@ -649,7 +651,7 @@ msgstr ""
 
 #: src/mailbox-conf.c:237
 msgid "Mailbox Configurator"
-msgstr "¡baltachtaÌ Boscaphost"
+msgstr "√Åbaltachta√≠ Boscaphost"
 
 #: src/mailbox-conf.c:292 src/mailbox-conf.c:1145
 msgid "Update"
@@ -711,42 +713,42 @@ msgstr ""
 
 #: src/mailbox-conf.c:848
 msgid "New mailbox type:"
-msgstr "Cine·l boscaphost Nua:"
+msgstr "Saghas boscaphoist nua:"
 
 #. radio buttons
 #. local mailbox
 #: src/mailbox-conf.c:854
 msgid "Local mailbox"
-msgstr "postbhosca ¡iti˙il"
+msgstr "postbhosca √Åiti√∫il"
 
 #: src/mailbox-conf.c:862
 msgid "IMAP server"
-msgstr "FreastalaÌ IMAP"
+msgstr "Freastala√≠ IMAP"
 
 #. mailbox name
 #: src/mailbox-conf.c:885 src/mailbox-conf.c:920 src/mailbox-conf.c:1037
 msgid "Mailbox Name:"
-msgstr "Pasfhocal Boscaphoist"
+msgstr "Ainm Boscaphoist:"
 
 #. path to file
 #: src/mailbox-conf.c:895
 msgid "Mailbox path:"
-msgstr "Pasfhocal Boscaphoist"
+msgstr "Sl√≠ Boscaphoist"
 
 #. pop server
 #: src/mailbox-conf.c:937 src/mailbox-conf.c:1047
 msgid "Server:"
-msgstr "FreastalaÌ:"
+msgstr "Freastala√≠:"
 
 #. pop port
 #: src/mailbox-conf.c:956 src/mailbox-conf.c:1061
 msgid "Port:"
-msgstr ""
+msgstr "Port:"
 
 #. username
 #: src/mailbox-conf.c:975 src/mailbox-conf.c:1076
 msgid "Username:"
-msgstr "Do Ainm:"
+msgstr "Ainm  √ös√°ideoir:"
 
 #. toggle for check
 #: src/mailbox-conf.c:1007 src/main-window.c:362
@@ -756,11 +758,11 @@ msgstr ""
 #. toggle for deletion from server
 #: src/mailbox-conf.c:1015
 msgid "Delete from server"
-msgstr "Bain as freastalaÌ"
+msgstr "Bain as freastala√≠"
 
 #: src/mailbox-conf.c:1104
 msgid "Folder path:"
-msgstr "SlÌ fhillte·n:"
+msgstr "Sl√≠ fhillte√°n:"
 
 #: src/main-window.c:167
 msgid "_Get new mail"
@@ -776,11 +778,11 @@ msgstr ""
 
 #: src/main-window.c:180
 msgid "Pr_int"
-msgstr "_PrÌont·il"
+msgstr "Pr_√≠ont√°il"
 
 #: src/main-window.c:180
 msgid "Print current mail"
-msgstr "PrÌont·il an scÈala seo"
+msgstr "Pr√≠ont√°il an sc√©ala seo"
 
 #: src/main-window.c:205
 msgid "N_o headers"
@@ -796,19 +798,19 @@ msgstr ""
 
 #: src/main-window.c:218 src/main-window.c:392
 msgid "Next"
-msgstr "Eile"
+msgstr "Aniar"
 
 #: src/main-window.c:218
 msgid "Next Message"
-msgstr "Osc·il an ScÈal Eile"
+msgstr "Osc√°il an Sc√©al Eile"
 
 #: src/main-window.c:224 src/main-window.c:387
 msgid "Previous"
-msgstr "Riomh"
+msgstr "Siar"
 
 #: src/main-window.c:224
 msgid "Preivous Message"
-msgstr "Osc·il an riomh scÈala"
+msgstr "Osc√°il an riomh sc√©ala"
 
 #: src/main-window.c:230 src/main-window.c:397
 msgid "Next Unread"
@@ -828,7 +830,7 @@ msgstr ""
 
 #: src/main-window.c:245 src/message-window.c:54
 msgid "_Reply"
-msgstr "_Freagrar"
+msgstr "_Freagrair"
 
 #: src/main-window.c:245
 msgid "Reply to the current message"
@@ -836,7 +838,7 @@ msgstr ""
 
 #: src/main-window.c:252 src/message-window.c:60
 msgid "Reply to _all"
-msgstr ""
+msgstr "Freagrair do _gach rud"
 
 #: src/main-window.c:253
 msgid "Reply to all recipients of the current message"
@@ -844,7 +846,7 @@ msgstr ""
 
 #: src/main-window.c:260 src/message-window.c:67
 msgid "_Forward"
-msgstr ""
+msgstr "Sheoladh _Chuig duine"
 
 #: src/main-window.c:260
 msgid "Forward the current message"
@@ -880,7 +882,7 @@ msgstr ""
 
 #: src/main-window.c:305
 msgid "List"
-msgstr "LÌosta"
+msgstr "L√≠osta"
 
 #: src/main-window.c:309
 msgid "_Add"
@@ -912,11 +914,11 @@ msgstr ""
 
 #: src/main-window.c:318
 msgid "_Close"
-msgstr "_D˙n"
+msgstr "_D√∫n"
 
 #: src/main-window.c:318
 msgid "Close mailbox"
-msgstr "D˙n an bosca phoist"
+msgstr "D√∫n an bosca phoist"
 
 #: src/main-window.c:321
 msgid "Empty _Trash"
@@ -936,7 +938,7 @@ msgstr ""
 
 #: src/main-window.c:336
 msgid "_Show mailbox tree"
-msgstr "Taispe·n an crann bhoscaphoist"
+msgstr "_Taispe√°n an crann bhoscaphoist"
 
 #: src/main-window.c:339
 msgid "Show mailbox _tabs"
@@ -944,7 +946,7 @@ msgstr ""
 
 #: src/main-window.c:353
 msgid "_Message"
-msgstr "_Sce·l"
+msgstr "_Teachtaireacht"
 
 #: src/main-window.c:354
 msgid "Mail_box"
@@ -956,7 +958,7 @@ msgstr "Coisc R-phoist"
 
 #: src/main-window.c:366
 msgid "Delete Message"
-msgstr "Dealaigh an ScÈala"
+msgstr "Dealaigh an Teachtaireacht"
 
 #: src/main-window.c:370
 msgid "Compose"
@@ -964,7 +966,7 @@ msgstr ""
 
 #: src/main-window.c:370
 msgid "Compose Message"
-msgstr ""
+msgstr "Teachtaireacht nua"
 
 #: src/main-window.c:382
 msgid "Continue"
@@ -972,28 +974,28 @@ msgstr ""
 
 #: src/main-window.c:387
 msgid "Open Previous message"
-msgstr "Osc·il an riomh scÈala"
+msgstr ""
 
 #: src/main-window.c:392
 msgid "Open Next message"
-msgstr "Osc·il an che·d scÈala eile"
+msgstr "Osc√°il an che√°d teachtaireacht eile"
 
 #: src/main-window.c:397
 msgid "Open Next Unread Message"
-msgstr "Osc·il an che·d scÈala eile"
+msgstr "Osc√°il an che√°d teachtaireacht eile"
 
 #: src/main-window.c:402 src/print.c:82 src/sendmsg-window.c:125
 #: src/sendmsg-window.c:153
 msgid "Print"
-msgstr "PrÌont·il"
+msgstr "Pr√≠ont√°il"
 
 #: src/main-window.c:402
 msgid "Print current message"
-msgstr "PrÌont·il an scÈala seo"
+msgstr "Pr√≠ont√°il an sc√©ala seo"
 
 #: src/main-window.c:888
 msgid "Copyright (C) 1997-2000"
-msgstr "CÛipcheart  (C) 1997-2000"
+msgstr "C√≥ipcheart  (C) 1997-2000"
 
 #: src/main-window.c:890
 msgid ""
@@ -1021,19 +1023,19 @@ msgstr "AINMBOSCAPHOIST"
 
 #: src/main.c:83
 msgid "Opens first unread mailbox"
-msgstr "OscaÌl an chÈad boscaphoist [unread]"
+msgstr "Osca√≠l an ch√©ad boscaphoist [unread]"
 
 #: src/mblist-window.c:376
 msgid "Open Mailbox"
-msgstr "Osc·il Boscaphoist"
+msgstr "Osc√°il Boscaphoist"
 
 #: src/mblist-window.c:382
 msgid "Close Mailbox"
-msgstr "D˙n Boscaphoist"
+msgstr "D√∫n Boscaphoist"
 
 #: src/mblist-window.c:389
 msgid "Add New Mailbox"
-msgstr "Suimigh Boscaphoist Nua"
+msgstr "Suimigh an Boscaphoist Nua"
 
 #: src/mblist-window.c:397
 msgid "Edit Mailbox Properties"
@@ -1050,7 +1052,7 @@ msgstr ""
 
 #: src/message-window.c:54
 msgid "Reply to this message"
-msgstr "Freagrair an sce·l seo"
+msgstr "Freagrair an sce√°l seo"
 
 #: src/message-window.c:61
 msgid "Reply to all recipients of this message"
@@ -1058,7 +1060,7 @@ msgstr ""
 
 #: src/message-window.c:67
 msgid "Forward this message"
-msgstr ""
+msgstr "Freagrair an teachtaireacht seo"
 
 #: src/pref-manager.c:124
 msgid "Text"
@@ -1066,7 +1068,7 @@ msgstr "Teacs"
 
 #: src/pref-manager.c:125
 msgid "Icons"
-msgstr "DealbhaÌ"
+msgstr "Dealbha√≠"
 
 #: src/pref-manager.c:126
 msgid "Both"
@@ -1106,11 +1108,11 @@ msgstr "Comhionannas"
 
 #: src/pref-manager.c:190 src/pref-manager.c:723 src/pref-manager.c:801
 msgid "Signature"
-msgstr "SÌni˙"
+msgstr "S√≠ni√∫"
 
 #: src/pref-manager.c:193
 msgid "Mail Servers"
-msgstr "FreastalaÌ Phoist"
+msgstr "Freastala√≠ Phoist"
 
 #: src/pref-manager.c:196
 msgid "Mail Options"
@@ -1122,7 +1124,7 @@ msgstr "Radharc"
 
 #: src/pref-manager.c:202 src/pref-manager.c:1248 src/pref-manager.c:1293
 msgid "Printing"
-msgstr "Ag PrÌont·il"
+msgstr "Ag Pr√≠ont√°il"
 
 #: src/pref-manager.c:205 src/pref-manager.c:1334 src/pref-manager.c:1352
 msgid "Encoding"
@@ -1150,7 +1152,7 @@ msgstr ""
 
 #: src/pref-manager.c:735
 msgid "Select your signature file"
-msgstr "Comhad SÌni˙:"
+msgstr ""
 
 #: src/pref-manager.c:745
 msgid "sending mail"
@@ -1170,25 +1172,23 @@ msgstr ">"
 
 #: src/pref-manager.c:774
 msgid "Signature file:"
-msgstr "Comhad SÌni˙:"
+msgstr "Comhad S√≠ni√∫:"
 
 #: src/pref-manager.c:781
 msgid "Reply prefix:"
 msgstr ""
 
 #: src/pref-manager.c:788
-#, fuzzy
 msgid "Use signature file when:"
-msgstr "Comhad SÌni˙:"
+msgstr ""
 
 #: src/pref-manager.c:795
 msgid "enable signature separator"
 msgstr ""
 
 #: src/pref-manager.c:832
-#, fuzzy
 msgid "Remote Mailbox Servers"
-msgstr "FreastalaÌ Phoist"
+msgstr ""
 
 #: src/pref-manager.c:857
 msgid "Type"
@@ -1196,7 +1196,7 @@ msgstr "Saghas"
 
 #: src/pref-manager.c:861
 msgid "Mailbox name"
-msgstr "Ainm boscaphoist"
+msgstr "Ainm Boscaphoist"
 
 #: src/pref-manager.c:880
 msgid "Modify"
@@ -1204,12 +1204,11 @@ msgstr ""
 
 #: src/pref-manager.c:892
 msgid "Local mail"
-msgstr "Phoist ¡iti˙l"
+msgstr "Phoist √Åiti√∫l"
 
 #: src/pref-manager.c:907
-#, fuzzy
 msgid "Select your local mail directory"
-msgstr "¡it fillte·n Phoist:"
+msgstr ""
 
 #: src/pref-manager.c:917
 msgid "Outgoing mail"
@@ -1233,11 +1232,11 @@ msgstr ""
 
 #: src/pref-manager.c:995
 msgid "Checking"
-msgstr "Ag Coisc litri˙"
+msgstr "Ag Coisc litri√∫"
 
 #: src/pref-manager.c:1005
 msgid "Minutes"
-msgstr "Noime·id"
+msgstr "Noime√°id"
 
 #: src/pref-manager.c:1019
 msgid "Check mail automatically every:"
@@ -1265,7 +1264,7 @@ msgstr ""
 
 #: src/pref-manager.c:1122
 msgid "Main window"
-msgstr "PrÌomh fhuinneog"
+msgstr "Pr√≠omh fhuinneog"
 
 #: src/pref-manager.c:1130
 msgid "use preview pane"
@@ -1289,7 +1288,7 @@ msgstr ""
 
 #: src/pref-manager.c:1156
 msgid "Toolbars"
-msgstr "Uirlischl·ir"
+msgstr "Uirlischl√°ir"
 
 #: src/pref-manager.c:1173
 msgid "Display progress dialog"
@@ -1313,7 +1312,7 @@ msgstr ""
 
 #: src/pref-manager.c:1280
 msgid "Print command:"
-msgstr ""
+msgstr "Ord√∫ Priont√°il:"
 
 #: src/pref-manager.c:1286
 msgid "Break line at:"
@@ -1333,7 +1332,7 @@ msgstr ""
 
 #: src/pref-manager.c:1397
 msgid "Font"
-msgstr "ClÛfhoireann"
+msgstr "Cl√≥fhoireann"
 
 #: src/pref-manager.c:1425
 msgid "Select a font to use"
@@ -1341,7 +1340,7 @@ msgstr ""
 
 #: src/pref-manager.c:1429
 msgid "Browse..."
-msgstr ""
+msgstr "Brabhs√°il..."
 
 #: src/pref-manager.c:1434
 msgid "Preview pane"
@@ -1377,11 +1376,11 @@ msgstr ""
 
 #: src/print.c:103
 msgid "Print Command:"
-msgstr "Ord˙ Priont·il"
+msgstr "Ord√∫ Priont√°il:"
 
 #: src/sendmsg-window.c:109
 msgid "Send"
-msgstr "Post"
+msgstr ""
 
 #: src/sendmsg-window.c:109
 msgid "Send this mail"
@@ -1405,11 +1404,11 @@ msgstr ""
 
 #: src/sendmsg-window.c:121
 msgid "Spelling"
-msgstr "Litri˙"
+msgstr "Litri√∫"
 
 #: src/sendmsg-window.c:121
 msgid "Check Spelling"
-msgstr "Coisc litri˙"
+msgstr "Coisc litri√∫"
 
 #: src/sendmsg-window.c:136
 msgid "_Include File..."
@@ -1421,12 +1420,11 @@ msgstr ""
 
 #: src/sendmsg-window.c:145
 msgid "_Send"
-msgstr "_Post"
+msgstr ""
 
 #: src/sendmsg-window.c:145
-#, fuzzy
 msgid "Send the currently edited message"
-msgstr "PrÌont·il an scÈala seo"
+msgstr ""
 
 #: src/sendmsg-window.c:149
 msgid "_Postpone"
@@ -1434,7 +1432,7 @@ msgstr ""
 
 #: src/sendmsg-window.c:153
 msgid "Print the edited message"
-msgstr "PrÌont·il an scÈala seo"
+msgstr "Pr√≠ont√°il an sc√©ala seo"
 
 #: src/sendmsg-window.c:171
 msgid "_Wrap body"
@@ -1454,15 +1452,15 @@ msgstr ""
 
 #: src/sendmsg-window.c:187
 msgid "Fr_om"
-msgstr ""
+msgstr "_√ì"
 
 #: src/sendmsg-window.c:189
 msgid "_To"
-msgstr ""
+msgstr "_D√≥"
 
 #: src/sendmsg-window.c:191
 msgid "_Subject"
-msgstr "¡bair"
+msgstr "_√Åbair"
 
 #: src/sendmsg-window.c:193
 msgid "_Cc"
@@ -1486,7 +1484,7 @@ msgstr ""
 
 #: src/sendmsg-window.c:203
 msgid "_Comments"
-msgstr ""
+msgstr "Nota√≠"
 
 #: src/sendmsg-window.c:205
 msgid "_Keywords"
@@ -1494,35 +1492,35 @@ msgstr ""
 
 #: src/sendmsg-window.c:216
 msgid "_Western (ISO-8859-1)"
-msgstr ""
+msgstr "_Iartharach (ISO-8850-14)"
 
 #: src/sendmsg-window.c:218
 msgid "W_estern (ISO-8859-15)"
-msgstr ""
+msgstr "Ia_rtharach (ISO-8850-14)"
 
 #: src/sendmsg-window.c:220
 msgid "_Central European (ISO-8859-2)"
-msgstr ""
+msgstr "L√°r-Eorpach (ISO-8850-14)"
 
 #: src/sendmsg-window.c:222
 msgid "_South European (ISO-8859-3)"
-msgstr ""
+msgstr "Eorpach _Dheasach (ISO-8859-3)"
 
 #: src/sendmsg-window.c:224
 msgid "_Baltic (ISO-8859-13)"
-msgstr ""
+msgstr "_Baltach (ISO-8850-14)"
 
 #: src/sendmsg-window.c:226
 msgid "Cy_rillic (ISO-8859-5)"
-msgstr ""
+msgstr "_Cirilleach (ISO-8850-14)"
 
 #: src/sendmsg-window.c:228
 msgid "_Hebrew (ISO-8859-8)"
-msgstr ""
+msgstr "_Eabhrais (ISO-8850-14)"
 
 #: src/sendmsg-window.c:230
 msgid "_Turkish (ISO-8859-9)"
-msgstr ""
+msgstr "_Tuirc√≠s (ISO-8850-14)"
 
 #: src/sendmsg-window.c:232
 msgid "_Celtic (ISO-8859-14)"
@@ -1559,7 +1557,7 @@ msgstr ""
 #. cc:
 #: src/sendmsg-window.c:602
 msgid "cc:"
-msgstr "cc:"
+msgstr ""
 
 #. bcc:
 #: src/sendmsg-window.c:605
@@ -1574,7 +1572,7 @@ msgstr "fcc:"
 #. Reply To:
 #: src/sendmsg-window.c:637
 msgid "Reply To:"
-msgstr "Freagrair"
+msgstr "Freagrair Do:"
 
 #. Attachment list
 #: src/sendmsg-window.c:641
@@ -1603,11 +1601,11 @@ msgstr ""
 #: src/sendmsg-window.c:775
 #, c-format
 msgid "%s wrote:\n"
-msgstr ""
+msgstr "scr√≠obh %s:\n"
 
 #: src/sendmsg-window.c:845
 msgid "Reply to "
-msgstr ""
+msgstr "Freagrair do"
 
 #: src/sendmsg-window.c:850
 msgid "Forward message"
@@ -1619,7 +1617,7 @@ msgstr ""
 
 #: src/sendmsg-window.c:860
 msgid "New message"
-msgstr "ScÈala nua"
+msgstr "Teachtaireach nua"
 
 #: src/sendmsg-window.c:1087
 msgid "Could not open the file.\n"
@@ -1627,7 +1625,7 @@ msgstr ""
 
 #: src/sendmsg-window.c:1093
 msgid "Loading..."
-msgstr "Ag LÛd·il..."
+msgstr "Ag L√≥d√°il..."
 
 #: src/sendmsg-window.c:1118
 msgid "Include file"
@@ -1640,3 +1638,565 @@ msgstr ""
 #: src/sendmsg-window.c:1416
 msgid "Error executing lpr"
 msgstr ""
+
+msgid "No error"
+msgstr "Gan earraidh"
+
+msgid "Unknown error"
+msgstr "Earraidh gan aithne"
+
+msgid "_Nickname:"
+msgstr "_Leasainm:"
+
+msgid "O_rganization:"
+msgstr "_Eagru:"
+
+msgid "_Email Address:"
+msgstr "Seoladh _R-phost:"
+
+msgid "(No subject)"
+msgstr "(Gan √Åbair)"
+
+msgid "_Full Name:"
+msgstr "Ainm _Fhada:"
+
+msgid "_Bcc:"
+msgstr "_Bcc:"
+
+msgid "Signature _Path:"
+msgstr "_Sl√≠ S√≠ni√∫:"
+
+msgid "unknown error"
+msgstr "earraidh gan aithne"
+
+msgid "LDAP Directory for %s"
+msgstr "Eolaire LDAP do %s"
+
+msgid "%s: Opening %s Refcount: %d\n"
+msgstr "%s: Ag osc√°il: %s Cuntas tagartha: %d\n"
+
+msgid "Could not create a MailDir at %s (%s)"
+msgstr "Teip ag cruthaigh MailDir san %s (%s)"
+
+msgid "Mail address: %s"
+msgstr "R√≠omhsheoladh: %s"
+
+msgid "The signature is invalid."
+msgstr "Is sini√∫ neabhail√≠ ann."
+
+msgid "unknown"
+msgstr "gan aithne"
+
+msgid "Key ID"
+msgstr "Eochar ID"
+
+msgid "To"
+msgstr "Do"
+
+msgid "GnomeCard Address Book"
+msgstr "Leabhar Sheoladh GnomeCard"
+
+msgid "Mailbox closed"
+msgstr "Boscaphoist d√∫nta."
+
+msgid "Bad mailbox name"
+msgstr "Ainm boscaphoist"
+
+msgid "Unknown"
+msgstr "Gan aithint"
+
+msgid "ro"
+msgstr "la"
+
+msgid "Exit  "
+msgstr "Ealu as"
+
+msgid "Help"
+msgstr "C√∫idi√∫"
+
+msgid "Reading %s... %d"
+msgstr "Ag Le√°mh %s...%d"
+
+msgid "Writing %s..."
+msgstr "As Scr√≠obh %s..."
+
+msgid "Mailbox is unchanged."
+msgstr ""
+
+msgid "Purge %d deleted message?"
+msgstr ""
+
+msgid "Purge %d deleted messages?"
+msgstr ""
+
+msgid "Can't write message"
+msgstr ""
+
+msgid "Modify Address Book"
+msgstr ""
+
+msgid "New Address Book type:"
+msgstr ""
+
+msgid "LDIF Address Book"
+msgstr "Leabhar Sheoladh LDIF"
+
+msgid "LDAP Address Book"
+msgstr "Leabhar Sheoladh LDAP"
+
+msgid "A_ddress Book Name"
+msgstr "Ainm Leabhar Sheoladh"
+
+msgid "_File Name"
+msgstr "Ainm _Comhad"
+
+msgid "_Password"
+msgstr "_Pasfhocal"
+
+msgid "Password needed"
+msgstr ""
+
+msgid "Couldn't open mailbox \"%s\""
+msgstr ""
+
+msgid "Size"
+msgstr "M√©id"
+
+msgid "_Reply..."
+msgstr "_Freagrar..."
+
+msgid "Reply To _All..."
+msgstr "Freagrair do _Gach Rud..."
+
+msgid "Failed to find mailbox"
+msgstr ""
+
+msgid "Message parts"
+msgstr ""
+
+msgid "Reply-To:"
+msgstr "Freagrair-Do:"
+
+msgid "Mail server: %s\n"
+msgstr "Freastala√≠ Phoist: %s\n"
+
+msgid "Subject: %s\n"
+msgstr "√Åbair: %s\n"
+
+msgid "rfc822 message"
+msgstr "Teachtaireacht rfc822"
+
+msgid "Save..."
+msgstr "S√°bh√°il..."
+
+msgid "detected a good signature"
+msgstr ""
+
+msgid "PGP signature: %s"
+msgstr "S√≠ni√∫ PGP: %s"
+
+msgid "Replied"
+msgstr ""
+
+msgid "_Remove"
+msgstr "_Scr√≠os"
+
+msgid "C_lear"
+msgstr "_B√°naigh"
+
+msgid "_From:"
+msgstr "_√ì:"
+
+msgid "_Cc:"
+msgstr ""
+
+msgid "Ne_w"
+msgstr "_Nua"
+
+msgid "On reception"
+msgstr ""
+
+msgid "_Up"
+msgstr "S_uas"
+
+msgid "Do_wn"
+msgstr "S_√≠os"
+
+msgid "Use_r name:"
+msgstr "Ainm _√ös√°ideoir:"
+
+msgid "_Password:"
+msgstr "_Pasfhocal:"
+
+msgid "Pr_efix"
+msgstr ""
+
+msgid "Select parent folder"
+msgstr ""
+
+msgid "Question"
+msgstr "Ceist"
+
+msgid "_Folder name:"
+msgstr "Ainm _Fhillte√°n:"
+
+msgid "Select Identity"
+msgstr ""
+
+msgid "Mailbox Path"
+msgstr "Sl√≠ Boscaphoist"
+
+msgid "Identity:"
+msgstr ""
+
+msgid "C_hange..."
+msgstr ""
+
+msgid "_From"
+msgstr "_√ì"
+
+msgid "Local _mbox mailbox..."
+msgstr ""
+
+msgid "Local Mail_dir mailbox..."
+msgstr ""
+
+msgid "Local M_H mailbox..."
+msgstr ""
+
+msgid "Remote _IMAP mailbox..."
+msgstr ""
+
+msgid "_Open"
+msgstr "_Osc√°il"
+
+msgid "Mark as D_raftbox"
+msgstr ""
+
+msgid "_Message..."
+msgstr "_Teachtaireaht..."
+
+msgid "Local mbox mailbox..."
+msgstr ""
+
+msgid "Add a new mbox style mailbox"
+msgstr ""
+
+msgid "Local Maildir mailbox..."
+msgstr ""
+
+msgid "Add a new Maildir style mailbox"
+msgstr ""
+
+msgid "Add a new MH style mailbox"
+msgstr ""
+
+msgid "Remote IMAP mailbox..."
+msgstr ""
+
+msgid "Send and Receive messages"
+msgstr ""
+
+msgid "_Print..."
+msgstr "_Pr√≠ont√°il..."
+
+msgid "_Address Book..."
+msgstr "Leabhar _Sheoladh..."
+
+msgid "Zoom _In"
+msgstr "S√∫m√°il _Isteach"
+
+msgid "Zoom _Out"
+msgstr "S√∫m√°il _Amach"
+
+msgid "Reply to _All..."
+msgstr "Freagrair do _Gach Rud..."
+
+msgid "Reply to _Group..."
+msgstr ""
+
+msgid "Forward the current message inline"
+msgstr ""
+
+msgid "Next Part"
+msgstr ""
+
+msgid "Next part in message"
+msgstr ""
+
+msgid "Previous Part"
+msgstr ""
+
+msgid "Previous part in message"
+msgstr ""
+
+msgid "Save current part in message"
+msgstr ""
+
+msgid "Next Flagged Message"
+msgstr ""
+
+msgid "Select all"
+msgstr ""
+
+msgid "_Edit..."
+msgstr "_Eagar..."
+
+msgid "_Delete..."
+msgstr "_Dealaigh..."
+
+msgid "Customize toolbars"
+msgstr "Saincheap barra√≠ na n-uirlis√≠"
+
+msgid "_Identities..."
+msgstr ""
+
+msgid "translator_credits"
+msgstr "Alastair McKinstry, Se√°n √≥ Ceallaigh"
+
+msgid "Search mailbox"
+msgstr "D√∫n an bosca phoist"
+
+msgid "In:"
+msgstr "Inbhosca:"
+
+msgid "S_ubject"
+msgstr "_√Åbair"
+
+msgid "east european"
+msgstr "eorpach oirthear"
+
+msgid "south european"
+msgstr "eorpach deisceartach"
+
+msgid "north european"
+msgstr "eorpach thuaisceartach"
+
+msgid "cyrillic (iso/windows)"
+msgstr "cirilleach (iso/windows)"
+
+msgid "arabic"
+msgstr "arabais"
+
+msgid "greek"
+msgstr "gr√©igis"
+
+msgid "hebrew"
+msgstr "eabhrais"
+
+msgid "turkish"
+msgstr "tuircis"
+
+msgid "nordic"
+msgstr "nordach"
+
+msgid "thai"
+msgstr "t√©alainnis"
+
+msgid "baltic"
+msgstr "baltach"
+
+msgid "celtic"
+msgstr "ceilteach"
+
+msgid "west european (euro)"
+msgstr "Eorpach Iartharch (euro)"
+
+msgid "russian (koi)"
+msgstr "r√∫isis (koi)"
+
+msgid "ukranian (koi)"
+msgstr "√öcr√°inis (koi)"
+
+msgid "japanese"
+msgstr "seap√°inis"
+
+msgid "korean"
+msgstr "c√≥ir√©is"
+
+msgid "Address Books"
+msgstr "Leabhair Sheoladh"
+
+msgid "%s (default)"
+msgstr "%s (gn√°th)"
+
+msgid "User"
+msgstr "√ös√°ideoir"
+
+msgid "Use TLS"
+msgstr "√ös√°id TLS"
+
+msgid "Check _IMAP mailboxes"
+msgstr "Coisc R-phoist"
+
+msgid "Toolbar Buttons"
+msgstr "Cnaip√≠ san Uirlischl√°ir"
+
+msgid "Main Window"
+msgstr "Pr√≠omh fhuinneog"
+
+msgid "Information Messages"
+msgstr ""
+
+msgid "Warning Messages"
+msgstr ""
+
+msgid "Error Messages"
+msgstr ""
+
+msgid "Debug Messages"
+msgstr ""
+
+msgid "Mailbox Colors"
+msgstr "Dathanna Boscaphost"
+
+msgid "Message Colors"
+msgstr "Dathanna Teachtaireacht"
+
+msgid "Message Font"
+msgstr "Cl√≥. Teachtaireacht"
+
+msgid "Pspell Settings"
+msgstr "Roghnachais Pspell"
+
+msgid "Check signature"
+msgstr ""
+
+msgid "Hide deleted messages"
+msgstr ""
+
+msgid "Address Book Name"
+msgstr "Ainm do Leabhar Sheoladh"
+
+msgid "Type:"
+msgstr "Saghas:"
+
+msgid "File name:"
+msgstr "Ainm comhas:"
+
+msgid "Change..."
+msgstr ""
+
+msgid "I_nclude Message(s)"
+msgstr ""
+
+msgid "Attach _Message(s)"
+msgstr ""
+
+msgid "Sa_ve"
+msgstr "_S√°bh√°il"
+
+msgid "Save this message"
+msgstr "S√°bh√°il teachtaireacht seo"
+
+msgid "Insert Si_gnature"
+msgstr ""
+
+msgid "_Quote Message(s)"
+msgstr ""
+
+msgid "Select the Identity to use for the message"
+msgstr ""
+
+msgid "_Czech"
+msgstr "_Seic√≠s"
+
+msgid "_Serbian"
+msgstr "_Serrb√≠s"
+
+msgid "_Swedish"
+msgstr "_Sualainn√≠s"
+
+msgid "_Turkish"
+msgstr "Tuirc√≠s"
+
+msgid "_Sign Message"
+msgstr ""
+
+msgid "_Encrypt Message"
+msgstr ""
+
+msgid "_Options"
+msgstr "_Roghanna"
+
+msgid "attach as reference"
+msgstr ""
+
+msgid "F_rom:"
+msgstr "√ì:"
+
+msgid "S_ubject:"
+msgstr "_√Åbair:"
+
+msgid "F_cc:"
+msgstr ""
+
+msgid "Message-ID: %s\n"
+msgstr ""
+
+msgid "References:"
+msgstr "Roghnachais:"
+
+msgid "Reply to %s: %s"
+msgstr "Freagrair do %s: %s"
+
+msgid "New message to %s: %s"
+msgstr "Teachtaireacht nua do %s: %s"
+
+msgid "Choose Address Book"
+msgstr "T√≥g Leabhar Sheoladh"
+
+msgid "Choose Address"
+msgstr "T√≥g Seoladh"
+
+msgid "Reply to all recipients"
+msgstr ""
+
+msgid ""
+"Reply\n"
+"to group"
+msgstr ""
+
+msgid "Open previous"
+msgstr "Osc√°il an teachaireacht roimhe"
+
+msgid "Open next"
+msgstr "Osc√°il an che√°d teachtaireacht eile"
+
+msgid "Open next flagged message"
+msgstr ""
+
+msgid ""
+"Trash /\n"
+"Delete"
+msgstr ""
+
+msgid "Move the current message to trash"
+msgstr ""
+
+msgid "Postpone current message"
+msgstr ""
+
+msgid "Set identity to use for this message"
+msgstr ""
+
+msgid "Close"
+msgstr "D√∫n"
+
+msgid "Close current mailbox"
+msgstr "D√∫n an boscaphoist reatha"
+
+msgid "Sign"
+msgstr "S√≠ni√∫"
+
+msgid "Redo"
+msgstr ""
+
+msgid "Customize Toolbars"
+msgstr ""
+
+msgid "Message window"
+msgstr "Fhuinneog teachtaireacht"
+
+msgid "Toolbar options"
+msgstr "Roghnachais Uirlischl√°ir"

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.9.2\n"
 "POT-Creation-Date: 2000-08-16 19:02+0900\n"
-"PO-Revision-Date: 2000-08-16 10:50:29+0900\n"
+"PO-Revision-Date: 2000-09-05 12:40+0900\n"
 "Last-Translator: Sung-Hyun Nam <namsh@kldp.org>\n"
 "Language-Team: Korean <ko@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -21,11 +21,11 @@ msgstr "받은우편함:"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:60
 msgid "Outbox:"
-msgstr "보낸우편함:"
+msgstr "보낼우편함:"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:60
 msgid "Sentbox:"
-msgstr "임시보관함:"
+msgstr "보낸우편함:"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:60
 msgid "Draftbox:"
@@ -228,11 +228,11 @@ msgstr "받은우편함"
 
 #: src/balsa-app.c:241
 msgid "Outbox"
-msgstr "보낸우편함"
+msgstr "보낼우편함"
 
 #: src/balsa-app.c:246
 msgid "Sentbox"
-msgstr "임시보관함"
+msgstr "보낸보관함"
 
 #: src/balsa-app.c:251
 msgid "Draftbox"
@@ -619,7 +619,7 @@ msgstr ""
 #. The action area
 #: src/filter-edit-dialog.c:671
 msgid "Action to perform:"
-msgstr ""
+msgstr "수행할 동작:"
 
 #. The disposition area
 #: src/filter-edit-dialog.c:692
@@ -636,7 +636,7 @@ msgstr ""
 
 #: src/filter-edit-dialog.c:710
 msgid "Stop filtering here"
-msgstr ""
+msgstr "여기에서 필터링 중단"
 
 #: src/filter-edit-dialog.c:738
 msgid "Match"
@@ -644,11 +644,11 @@ msgstr ""
 
 #: src/filter-edit-dialog.c:741
 msgid "Action"
-msgstr ""
+msgstr "동작"
 
 #: src/filter-edit-dialog.c:755
 msgid "Revert"
-msgstr ""
+msgstr "복구"
 
 #: src/filter-edit-dialog.c:783
 msgid "Balsa Filters"
@@ -662,6 +662,9 @@ msgid ""
 "system.\n"
 "Are you sure you want to remove this mailbox?"
 msgstr ""
+"우편함 %s가 시스템에서 영원히 삭제될"
+" 것입니다.\n"
+"이 우편함을 지우시겠습니까?"
 
 #: src/mailbox-conf.c:186
 #, c-format
@@ -670,10 +673,13 @@ msgid ""
 "You may use \"Add Mailbox\" later to access this mailbox again\n"
 "Are you sure you want to remove this mailbox?"
 msgstr ""
+"우편함 목록에서 우편함 %s가 삭제될 것입니다\n"
+"나중에 \"우편함 추가\"를 이용해서 이 우편함을 다시 사용할 수 있습니다\n"
+"이 우편함을 지우시겠습니까?"
 
 #: src/mailbox-conf.c:214
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
-msgstr ""
+msgstr "으윽! 우편함을 balsa_app.mailbox 노드에서 찾을 수 없네요?\n"
 
 #: src/mailbox-conf.c:268
 msgid "Mailbox Configurator"
@@ -726,7 +732,7 @@ msgstr ""
 
 #: src/mailbox-conf.c:846
 msgid "New mailbox type:"
-msgstr ""
+msgstr "새 우편함 형식:"
 
 #. radio buttons
 #. local mailbox
@@ -792,19 +798,19 @@ msgstr "새 편지 받기(_G)"
 
 #: src/main-window.c:166
 msgid "Fetch new incoming mail"
-msgstr ""
+msgstr "새로 도착한 편지 가져오기"
 
 #: src/main-window.c:172
 msgid "_Send queued mail"
-msgstr ""
+msgstr "큐에 있는 편지 보내기(_S)"
 
 #: src/main-window.c:172
 msgid "Send mail from the outbox"
-msgstr ""
+msgstr "보낼우편함에서 편지 보내기"
 
 #: src/main-window.c:178
 msgid "Opens the address book"
-msgstr ""
+msgstr "주소록 열기"
 
 #: src/main-window.c:185
 msgid "Pr_int"
@@ -844,35 +850,35 @@ msgstr "이전 메시지"
 
 #: src/main-window.c:234 src/main-window.c:435
 msgid "Next Unread"
-msgstr ""
+msgstr "다음 안읽은 메시지"
 
 #: src/main-window.c:234
 msgid "Next Unread Message"
-msgstr ""
+msgstr "다음 안읽은 메시지"
 
 #: src/main-window.c:241 src/message-window.c:95
 msgid "Next Part"
-msgstr ""
+msgstr "다음 부분"
 
 #: src/main-window.c:241 src/message-window.c:95
 msgid "Next Part in Message"
-msgstr ""
+msgstr "메시지의 다음 부분"
 
 #: src/main-window.c:247 src/message-window.c:100
 msgid "Previous Part"
-msgstr ""
+msgstr "이전 부분"
 
 #: src/main-window.c:247 src/message-window.c:100
 msgid "Previous Part in Message"
-msgstr ""
+msgstr "메시지의 이전 부분"
 
 #: src/main-window.c:253 src/message-window.c:105
 msgid "Save Current Part"
-msgstr ""
+msgstr "현재 부분 저장"
 
 #: src/main-window.c:254 src/message-window.c:106
 msgid "Save Current Part in Message"
-msgstr ""
+msgstr "메시지의 현재 부분 저장"
 
 #: src/main-window.c:262
 msgid "_New"
@@ -972,11 +978,11 @@ msgstr "선택된 우편함 삭제"
 
 #: src/main-window.c:356
 msgid "Co_mmit current"
-msgstr ""
+msgstr "현재 상태 저장(_m)"
 
 #: src/main-window.c:356
 msgid "Commit the changes in the currently opened mailbox"
-msgstr ""
+msgstr "열려진 우편함의 현재 수정된 사항 저장"
 
 #: src/main-window.c:358
 msgid "_Close"

@@ -1410,15 +1410,16 @@ libbalsa_keystroke_comma(LibBalsaAddressEntry *address_entry)
  *     Changes the appearance of the widget.
  *************************************************************/
 static void
-libbalsa_keystroke_add_key(LibBalsaAddressEntry *address_entry, gchar *add)
+libbalsa_keystroke_add_key(LibBalsaAddressEntry *address_entry, guint32 ukeyval)
 {
     emailData *addy;
-    gchar *left, *right;
+    gchar *left, *right, *add_str;
+    glong add_str_len;
     GtkEditable *editable;
 
     g_return_if_fail(address_entry != NULL);
     g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry));
-    g_return_if_fail(add != NULL);
+    g_return_if_fail(ukeyval != 0);
 
     editable = GTK_EDITABLE(address_entry);
     addy = address_entry->active->data;
@@ -1436,7 +1437,7 @@ libbalsa_keystroke_add_key(LibBalsaAddressEntry *address_entry, gchar *add)
      * If this is at the beginning, and the user pressed ' ',
      * ignore it.
      */
-    if (!addy->cursor && *add == ' ') return;
+    if (!addy->cursor && g_unichar_isspace(ukeyval)) return;
     
      /*
      * Split the string at the correct cursor position.
@@ -1447,9 +1448,11 @@ libbalsa_keystroke_add_key(LibBalsaAddressEntry *address_entry, gchar *add)
     /*
      * Add the keystroke to the end of user input.
      */
-    libbalsa_emailData_set_user(addy, g_strconcat(left, add, right, NULL));
+    add_str = g_ucs4_to_utf8(&ukeyval, 1, NULL, &add_str_len, NULL);
+    libbalsa_emailData_set_user(addy, g_strconcat(left, add_str, right, NULL));
     g_free(left);
-    addy->cursor += strlen(add);
+    addy->cursor += add_str_len;
+    g_free(add_str);
 
     /*
      * Now search for (any) match.
@@ -1747,7 +1750,8 @@ libbalsa_address_entry_key_press(GtkWidget *widget, GdkEventKey *event)
 	 */
 	if (event->length > 0) {
 	    return_val = TRUE;
-	    libbalsa_keystroke_add_key(address_entry, event->string);
+	    libbalsa_keystroke_add_key(address_entry,
+				       gdk_keyval_to_unicode(event->keyval));
 	}
 	break;
     }

@@ -251,6 +251,25 @@ libbalsa_address_book_vcard_load(LibBalsaAddressBook * ab,
     return LBABERR_OK;
 }
 
+static gchar *
+validate_vcard_string(gchar * vcstr)
+{
+    gchar * utf8res;
+    gsize b_written;
+
+    /* check if it's a utf8 clean string and return it in this case */
+    if (g_utf8_validate(vcstr, -1, NULL))
+	return vcstr;
+
+    /* try to convert from the user's locale setting */
+    utf8res = g_locale_to_utf8(vcstr, -1, NULL, &b_written, NULL);
+    if (!utf8res)
+	return vcstr;
+
+    g_free(vcstr);
+    return utf8res;
+}
+
 /* FIXME: Could stat the file to see if it has changed since last time
    we read it */
 static gboolean
@@ -308,18 +327,9 @@ load_vcard_file(LibBalsaAddressBook *ab)
 
 		address->address_list = g_list_reverse(address_list);
 
-		if (name) {
-                    gsize bread, bwritten;
-                    GError *err = NULL;
-                    gchar *cved = g_locale_to_utf8(name, -1, 
-                                                   &bread, &bwritten, &err);
-                    if(err) g_error_free(err); /* ignore errors */
-		    if(cved) {
-                        address->full_name = cved; g_free(name);
-                    } else
-                        address->full_name = name; /* conv error */
-                        
-                } else if (id)
+		if (name)
+		    address->full_name = name;
+                else if (id)
 		    address->full_name = g_strdup(id);
 		else
 		    address->full_name = g_strdup(_("No-Name"));
@@ -346,11 +356,13 @@ load_vcard_file(LibBalsaAddressBook *ab)
 
 	if (g_ascii_strncasecmp(string, "FN:", 3) == 0) {
 	    id = g_strdup(string + 3);
+	    id = validate_vcard_string(id);
 	    continue;
 	}
 
 	if (g_ascii_strncasecmp(string, "N:", 2) == 0) {
 	    name = extract_name(string + 2);
+	    name = validate_vcard_string(name);
 	    continue;
 	}
 

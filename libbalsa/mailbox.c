@@ -874,6 +874,8 @@ message_new ()
   message->body_ref = 0;
   message->body_list = NULL;
 
+  message->offset = 0;
+
   return message;
 }
 
@@ -1001,6 +1003,7 @@ translate_message (ENVELOPE * cenv)
   message->from = translate_address (cenv->from);
   message->sender = translate_address (cenv->sender);
   message->reply_to = translate_address (cenv->reply_to);
+
   for (addy=cenv->to;addy;addy=addy->next)
   {
     addr = translate_address(addy);

@@ -48,7 +48,11 @@ void imap_disallow_reopen (CONTEXT *ctx);
 
 /* browse.c */
 int imap_browse (char* path, struct browser_state* state);
-int imap_mailbox_create (const char* folder);
+/* BALSA: changed prototype for imap_mailbox_create: */
+int imap_mailbox_create (const char* folder, const char* subfolder,
+			 int subscribe);
+/* BALSA: prototype for new function imap_mailbox_delete: */
+int imap_mailbox_delete (const char *path);
 
 /* message.c */
 int imap_append_message (CONTEXT* ctx, MESSAGE* msg);

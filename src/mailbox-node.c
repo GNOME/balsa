@@ -310,8 +310,8 @@ balsa_mailbox_node_new_from_config(const gchar* prefix)
     return folder;
 }
 
-BalsaMailboxNode*
-balsa_mailbox_node_new_imap(LibBalsaServer* s, const char*p)
+static BalsaMailboxNode*
+balsa_mailbox_node_new_imap_node(LibBalsaServer* s, const char*p)
 {
     BalsaMailboxNode * folder = balsa_mailbox_node_new();
     g_assert(s);
@@ -319,6 +319,18 @@ balsa_mailbox_node_new_imap(LibBalsaServer* s, const char*p)
     folder->server = s;
     gtk_object_ref(GTK_OBJECT(s));
     folder->dir = g_strdup(p);
+    gtk_signal_connect(GTK_OBJECT(folder), "append-subtree", 
+		       imap_dir_cb, NULL);
+
+    return folder;
+}
+
+BalsaMailboxNode*
+balsa_mailbox_node_new_imap(LibBalsaServer* s, const char*p)
+{
+    BalsaMailboxNode * folder = balsa_mailbox_node_new_imap_node(s, p);
+    g_assert(s);
+
     folder->mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_imap_new());
     libbalsa_mailbox_remote_set_server(
 	LIBBALSA_MAILBOX_REMOTE(folder->mailbox), s);
@@ -330,17 +342,11 @@ balsa_mailbox_node_new_imap(LibBalsaServer* s, const char*p)
 BalsaMailboxNode*
 balsa_mailbox_node_new_imap_folder(LibBalsaServer* s, const char*p)
 {
-    BalsaMailboxNode * folder = balsa_mailbox_node_new();
+    BalsaMailboxNode * folder = balsa_mailbox_node_new_imap_node(s, p);
     g_assert(s);
-
-    folder->server = s;
-    gtk_object_ref(GTK_OBJECT(s));
-    folder->dir = g_strdup(p);
 
     gtk_signal_connect(GTK_OBJECT(folder), "show-prop-dialog", 
 		        folder_conf_imap_node, NULL);
-    gtk_signal_connect(GTK_OBJECT(folder), "append-subtree", 
-		       imap_dir_cb, NULL);
     return folder;
 }
 
@@ -394,7 +400,9 @@ void balsa_mailbox_node_rescan(BalsaMailboxNode* mn)
 {
     GNode *gnode;
 
-    g_return_if_fail(mn->mailbox == NULL);
+    g_return_if_fail(mn->mailbox == NULL ||
+		     LIBBALSA_IS_MAILBOX_IMAP(mn->mailbox));
+
     gnode = balsa_find_mbnode(balsa_app.mailbox_nodes, mn);
 
     if(gnode) {
@@ -536,6 +544,8 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
     add_menu_entry(submenu, NULL, NULL, mbnode);
     add_menu_entry(submenu, _("Remote IMAP folder..."), 
 		   folder_conf_add_imap_cb, NULL);
+    add_menu_entry(submenu, _("Remote IMAP subfolder..."), 
+		   folder_conf_add_imap_sub_cb, NULL);
     gtk_widget_show(submenu);
     
     menuitem = gtk_menu_item_new_with_label(_("New"));
@@ -775,17 +785,18 @@ static GNode* add_imap_entry(GNode*root, const char* fn,
     g_free(parent_name);
 
     g_return_val_if_fail(parent, NULL);
+    mbnode = balsa_mailbox_node_new_imap_node(BALSA_MAILBOX_NODE
+					 (root->data)->server, fn);
     if(mailbox)
-	mbnode = 
-	    balsa_mailbox_node_new_from_mailbox(LIBBALSA_MAILBOX(mailbox));
+	mbnode->mailbox = LIBBALSA_MAILBOX(mailbox);
     else {
 	const gchar *basename = strrchr(fn, delim);
 	if(!basename) basename = fn;
 	else basename++;
-	mbnode = balsa_mailbox_node_new();
 	mbnode->name = g_strdup(basename);
     }
-    mbnode->dir = g_strdup(fn);
+    mbnode->parent = BALSA_MAILBOX_NODE(parent->data);
+    mbnode->subscribed = mbnode->parent->subscribed;
     return g_node_append(parent, g_node_new(mbnode));
 }
 

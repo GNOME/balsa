@@ -175,7 +175,20 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 				    _("Cancel"), NULL);
 	cancel_button = 2;
 	g_free(msg);
-    } else { /* deleting remote mailbox */
+    } else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox) && !mailbox->config_prefix) {
+	/* deleting remote IMAP mailbox in a folder set */
+	msg = g_strdup_printf(
+	    _("This will remove the mailbox %s and all its messages from your IMAP server.\n"
+	      "If %s has subfolders, it will still appear as a node in the folder tree.\n"
+	      "You may use \"New IMAP subfolder\" later to add a mailbox with this name.\n"
+	      "What would you like to do?"),
+			      mailbox->name, mailbox->name);
+	ask = gnome_message_box_new(msg, GNOME_MESSAGE_BOX_QUESTION,
+				    _("Remove from server"),
+				    _("Cancel"), NULL);
+	cancel_button = 1;
+	g_free(msg);
+    } else { /* deleting other remote mailbox */
 	msg = g_strdup_printf(_("This will remove the mailbox %s from the list of mailboxes\n"
 				"You may use \"Add Mailbox\" later to access this mailbox again\n"
 				"What would you like to do?"),
@@ -206,6 +219,14 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
     /* Close the mailbox, in case it was open */
     if (!LIBBALSA_IS_MAILBOX_POP3(mailbox))
 	mblist_close_mailbox(mailbox);
+
+    /* Remove mailbox on IMAP server */
+    if (LIBBALSA_IS_MAILBOX_IMAP(mailbox) && !mailbox->config_prefix) {
+	BalsaMailboxNode *parent = mbnode->parent;
+	libbalsa_imap_delete_folder(LIBBALSA_MAILBOX_IMAP(mailbox));
+	balsa_mailbox_node_rescan(parent); /* see it as server sees it */
+	return;
+    }
 
     /* Delete local files */
     if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox) && button == 1)

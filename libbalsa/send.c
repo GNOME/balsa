@@ -32,6 +32,8 @@
 #include "libbalsa_private.h"
 
 #include "mailbackend.h"
+#include "mailbox_imap.h"
+#include "information.h"
 
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
@@ -225,6 +227,10 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 		       LibBalsaMailbox * fccbox, gint encoding)
 {
     MessageQueueItem *mqi;
+    LibBalsaMailboxImap *imapfccbox;
+    LibBalsaServer *server;
+    char imappath[_POSIX_PATH_MAX];
+
 
     g_return_if_fail(message);
 
@@ -236,10 +242,44 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 	mutt_write_fcc(LIBBALSA_MAILBOX_LOCAL(outbox)->path,
 		       mqi->message, NULL, 0, NULL);
 	libbalsa_unlock_mutt();
-	if (fccbox && LIBBALSA_IS_MAILBOX_LOCAL(fccbox)) {
+	if (fccbox && (LIBBALSA_IS_MAILBOX_LOCAL(fccbox)
+		|| LIBBALSA_IS_MAILBOX_IMAP(fccbox))) {
 	    libbalsa_lock_mutt();
+	    if (LIBBALSA_IS_MAILBOX_LOCAL(fccbox)) {
 	    mutt_write_fcc(LIBBALSA_MAILBOX_LOCAL(fccbox)->path,
 			   mqi->message, NULL, 0, NULL);
+	    } else if (LIBBALSA_IS_MAILBOX_IMAP(fccbox)) {
+		imapfccbox = LIBBALSA_MAILBOX_IMAP(fccbox);
+		server = LIBBALSA_MAILBOX_REMOTE(fccbox)->server;
+		if(!CLIENT_CONTEXT_OPEN(fccbox)) /* Has not been opened */
+		{
+			/* We cannot use LIBBALSA_REMOTE_MAILBOX_SERVER() here because */
+			/* it will lock up when NO IMAP mailbox has been accessed since */
+			/* balsa was started. This should be safe because we have already */
+			/* established that fccbox is in fact an IMAP mailbox */
+			if(server == (LibBalsaServer *)0) {
+				libbalsa_unlock_mutt();
+				libbalsa_information(LIBBALSA_INFORMATION_ERROR, "Unable to open sentbox - could not get server information");
+				return;
+			}
+			if (!(server->passwd && *server->passwd) &&
+			!(server->passwd = libbalsa_server_get_password(server, fccbox))) {
+				libbalsa_unlock_mutt();
+				libbalsa_information(LIBBALSA_INFORMATION_ERROR, "Unable to open sentbox - could not get passwords for server");
+				return;
+			}
+			reset_mutt_passwords(server);
+		}
+
+		/* Passwords are guaranteed to be set now */
+
+		snprintf(imappath, _POSIX_PATH_MAX, "{%s:%d}%s",
+		    server->host,
+		    server->port,
+		    imapfccbox->path);
+		mutt_write_fcc(imappath,
+			   mqi->message, NULL, 0, NULL);
+	    }
 	    libbalsa_unlock_mutt();
 	    libbalsa_mailbox_check(fccbox);
 	}

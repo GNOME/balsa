@@ -1,3 +1,11 @@
+2001-07-11  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Peter Bloomfield's <bloomfld@eos.ncsu.edu> patch for
+	creation and deletetion of IMAP subfolders.
+	* imap/browse.c: imap_mailbox_delete implemented().
+	* imap/imap.h: add imap_mailbox_delete().
+	* imap/imap_private.h: make imap_delete_mailbox() private.
+	
 2001-05-26  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* lib.c (mutt_free_envelope): release ENVELOPE::dispnotify_to

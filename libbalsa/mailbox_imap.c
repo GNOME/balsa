@@ -211,7 +211,7 @@ server_host_settings_changed_cb(LibBalsaServer * server, gchar * host,
     server_settings_changed(server, mailbox);
 }
 
-static void
+void
 reset_mutt_passwords(LibBalsaServer* server)
 {
     if (ImapUser)
@@ -469,4 +469,34 @@ void
 libbalsa_imap_close_all_connections(void)
 {
     imap_logout_all();
+}
+
+void
+libbalsa_imap_new_subfolder(const gchar *parent, const gchar *folder,
+			    gboolean subscribe, LibBalsaServer *server)
+{
+    gchar *imap_path = g_strdup_printf("imap://%s:%i/%s", server->host,
+                                                server->port, parent);
+    imap_mailbox_create(imap_path, folder, subscribe);
+    g_free(imap_path);
+}
+
+void
+libbalsa_imap_delete_folder(LibBalsaMailboxImap *mailbox)
+{
+    /*
+	should be able to do this using the existing public method
+	from libmutt/imap/imap.h:
+    imap_delete_mailbox(CLIENT_CONTEXT(LIBBALSA_MAILBOX(mailbox)),
+			mailbox->path);
+	but it segfaults because ctx->data is NULL
+	instead of being a pointer to an IMAP_DATA structure!
+
+	instead we'll use our own new method:
+    */
+    LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+    gchar *imap_path = g_strdup_printf("imap://%s:%i/%s", server->host,
+				server->port, mailbox->path);
+    imap_mailbox_delete(imap_path);
+    g_free(imap_path);
 }

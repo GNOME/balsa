@@ -486,14 +486,26 @@ balsa_find_mbnode(GNode* gnode, BalsaMailboxNode* mbnode)
    remove all children of given node leaving the node itself intact.
    Applicable to balsa_app.mailbox_nodes and its children.
  */
-static void 
+static gboolean
 destroy_mailbox_node(GNode* node, GNode* root)
 { 
-    g_return_if_fail(node->data);
+    BalsaMailboxNode *mbnode = BALSA_MAILBOX_NODE(node->data);
+
+    g_return_val_if_fail(mbnode, FALSE);
 		     
+    if (mbnode->mailbox)
+	balsa_window_close_mbnode(balsa_app.main_window, mbnode);
     mblist_remove_mailbox_node(balsa_app.mblist, 
-			       BALSA_MAILBOX_NODE(node->data));
-    gtk_object_unref((GtkObject*)node->data); 
+			       mbnode);
+    gtk_object_unref((GtkObject*)mbnode); 
+    return FALSE;
+}
+
+static void 
+destroy_mailbox_tree(GNode* node, GNode* root)
+{ 
+    g_node_traverse(node, G_IN_ORDER, G_TRAVERSE_ALL, -1,
+		    (GNodeTraverseFunc)destroy_mailbox_node, root);
 }
 
 void
@@ -506,8 +518,10 @@ balsa_remove_children_mailbox_nodes(GNode* gnode)
 	printf("Destroying children of %p %s\n",
 	       gnode->data, BALSA_MAILBOX_NODE(gnode->data)->name
 	       ? BALSA_MAILBOX_NODE(gnode->data)->name : "");
+    gtk_clist_freeze(GTK_CLIST(balsa_app.mblist));
     g_node_children_foreach(gnode, G_TRAVERSE_ALL,
-                    (GNodeForeachFunc)destroy_mailbox_node, gnode);
+                    (GNodeForeachFunc)destroy_mailbox_tree, gnode);
+    gtk_clist_thaw(GTK_CLIST(balsa_app.mblist));
 
     while( (walk = gnode->children) ) {
 	g_node_unlink(walk);

@@ -1,3 +1,31 @@
+2001-07-11  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/sendmsg-window.c: fix widget disabling when check-spelling. 
+	
+	Peter Bloomfield's <bloomfld@eos.ncsu.edu> patch for
+	creation and deletetion of IMAP subfolders.
+	* libbalsa/mailbox_imap.[hc]: implement libbalsa_imap_new_subfolder(),
+	libbalsa_imap_delete_folder()
+	* src/balsa-app.c: fix destroy_mailbox_tree().
+	* src/folder-conf.c:  folder_conf_imap_sub_node(), 
+	and other functions for IMAP browsing implemented.
+	* src/mailbox-conf.c: IMAP (sub)folder removal.
+	* src/mailbox-node.c: IMAP subfolder creation. some cleanup.
+	* src/main-window.c: IMAP subfolder creation menu entry.
+
+	Lynn Kerby's <lfk@kerbit.net> fix for paper size:
+	* src/print.c: warn if the papersize read from the conf is invalid.
+
+	christophe barbe <christophe.barbe@online.fr>
+	* src/balsa-index.c: automatic scrollbars, reasonable width of the
+	popup menu of trafer folder for message transfer.
+
+	Manuel McLure <manuel@mclure.org>+M. Thielker <balsa@t-data.com>
+	IMAP mailbox can be used as sentbox. #51537
+	* libbalsa/mailbox_imap.[hc]: make reset_mutt_passwords() global
+	* libbalsa/send.c: implement the fcc operation (path setting and
+	authorization).
+	
 2001-07-09  Pawel Salek  <pawsa@theochem.kth.se>
 
 	M. Thielker <balsa@t-data.com>: hush gcc-3.0 warnings.

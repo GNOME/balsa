@@ -247,9 +247,23 @@ int imap_browse (char* path, struct browser_state* state)
   return -1;
 }
 
-#if 0
+/*
+BALSA: this function was excluded with #if 0 ... #endif, but it's
+needed for IMAP folder management.
+
+For Balsa use, the subfolder name needs to be passed as an argument
+rather than input in response to a prompt.  Also, it's convenient
+to subscribe the new subfolder here, if the server needs it.
+
+Balsa code is conditional on #ifdef LIBMUTT.
+*/
+#ifndef LIBMUTT
 /* imap_mailbox_create: Prompt for a new mailbox name, and try to create it */
 int imap_mailbox_create (const char* folder)
+#else
+int imap_mailbox_create (const char* folder, const char* subfolder,
+                         int subscribe)
+#endif
 {
   IMAP_DATA* idata;
   IMAP_MBOX mx;
@@ -279,14 +293,68 @@ int imap_mailbox_create (const char* folder)
     buf[n] = '\0';
   }
   
+#ifndef LIBMUTT
   if (mutt_get_field (_("Create mailbox: "), buf, sizeof (buf), M_FILE) < 0)
     goto fail;
+#else
+  strfcpy (buf + n, subfolder, sizeof (buf) - n);
+#endif
 
   if (imap_create_mailbox (idata, buf) < 0)
     goto fail;
 
+#ifndef LIBMUTT
   mutt_message _("Mailbox created.");
   sleep (1);
+#else
+  if (subscribe) {
+    snprintf(buf, sizeof (buf), "%s%c%s", folder, idata->delim, subfolder);
+    if (imap_subscribe(buf, 1) < 0)
+      goto fail;
+  }
+#endif
+
+  FREE (&mx.mbox);
+  return 0;
+
+ fail:
+  FREE (&mx.mbox);
+  return -1;
+}
+
+/*
+BALSA: this function is needed because the lower-level imap_delete_mailbox
+segfaults when called from Balsa.  It doesn't especially belong here,
+but it roughly complements imap_mailbox_create above.
+*/
+#ifdef LIBMUTT
+int imap_mailbox_delete(const char *folder)
+{
+  IMAP_DATA* idata;
+  IMAP_MBOX mx;
+
+  if (imap_parse_path (folder, &mx) < 0)
+  {
+    dprint (1, (debugfile, "imap_mailbox_delete: Bad path %s\n",
+      folder));
+    return -1;
+  }
+
+  if (!(idata = imap_conn_find (&mx.account, M_IMAP_CONN_NONEW)))
+  {
+    dprint (1, (debugfile,
+               "imap_mailbox_delete: Couldn't find open connection to %s",
+               mx.account.host));
+    goto fail;
+  }
+
+  /* imap_delete_mailbox takes the CONTEXT as an argument,
+   * but expects the data field to point to IMAP_DATA:
+   */
+  if (!idata->ctx->data)
+    idata->ctx->data = idata;
+  if (!*mx.mbox || imap_delete_mailbox (idata->ctx, mx.mbox) < 0)
+    goto fail;
 
   FREE (&mx.mbox);
   return 0;

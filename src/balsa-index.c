@@ -1901,7 +1901,7 @@ create_menu(BalsaIndex * bindex)
 
     scroll = gtk_scrolled_window_new (NULL, NULL);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(scroll), 
-                                    GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
+                                    GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
     bmbl = balsa_mblist_new();
     gtk_signal_connect(GTK_OBJECT(bmbl), "tree_select_row",
@@ -1912,8 +1912,10 @@ create_menu(BalsaIndex * bindex)
     gtk_widget_size_request(bmbl, &req);
     if ( req.height > balsa_app.mw_height )
 	req.height = balsa_app.mw_height;
-    if ( req.width > gdk_screen_width() ) 
-	req.width = gdk_screen_width() - 2*GTK_CONTAINER(scroll)->border_width; 
+	/* For the mailbox list width, we use the one used on the main window
+	 * This is the user choice and required because the mblist widget
+	 *  save the size in balsa_app.mblist_width */
+	req.width=balsa_app.mblist_width;
     gtk_widget_set_usize(GTK_WIDGET(bmbl), req.width, req.height);
 
     gtk_container_add(GTK_CONTAINER(scroll), bmbl);

@@ -805,9 +805,19 @@ print_info_new(const gchar * paper, LibBalsaMessage * msg,
 {
     gchar *the_charset;
     GnomeFont *font;
+    GList *papers;
     PrintInfo *pi = g_new0(PrintInfo, 1);
 
     pi->paper = gnome_paper_with_name(paper);
+    if (pi->paper == NULL) {
+     	papers = gnome_paper_name_list();
+	balsa_information(LIBBALSA_INFORMATION_WARNING,
+			  _("Balsa could not find paper type \"%s\".\n"), paper);
+	balsa_information(LIBBALSA_INFORMATION_WARNING,
+			  _("Using paper type \"%s\" from /etc/paper.config instead\n"),
+			  (char *)papers->data);
+	pi->paper = gnome_paper_with_name((char *)papers->data);
+    }
     pi->master = gnome_print_master_new_from_dialog(dlg);
     pi->pc = gnome_print_master_get_context(pi->master);
 

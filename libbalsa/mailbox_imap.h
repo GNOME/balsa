@@ -61,4 +61,11 @@ void libbalsa_mailbox_imap_subscribe(LibBalsaMailboxImap * mailbox,
 
 void libbalsa_imap_close_all_connections(void);
 
+void libbalsa_imap_new_subfolder(const gchar * parent, const gchar * folder,
+				 gboolean subscribe, LibBalsaServer * server);
+
+void libbalsa_imap_delete_folder(LibBalsaMailboxImap * mailbox);
+
+void reset_mutt_passwords(LibBalsaServer *);
+
 #endif				/* __LIBBALSA_MAILBOX_IMAP_H__ */

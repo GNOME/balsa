@@ -151,7 +151,6 @@ static GnomeUIInfo main_toolbar[] = {
     GNOMEUIINFO_ITEM_STOCK(N_("Attach"),
 			   N_("Add attachments to this message"),
 			   attach_clicked, GNOME_STOCK_PIXMAP_ATTACH),
-
     GNOMEUIINFO_SEPARATOR,
 #define TOOL_POSTPONE_POS 4
     GNOMEUIINFO_ITEM_STOCK(N_("Postpone"),
@@ -164,19 +163,24 @@ static GnomeUIInfo main_toolbar[] = {
                            change_identity_dialog_cb,
                            BALSA_PIXMAP_IDENTITY),
     GNOMEUIINFO_SEPARATOR,
-#define TOOL_SPELLING_POS 7
+#define TOOL_SPELLING_POS 8
     GNOMEUIINFO_ITEM_STOCK(N_("Spelling"),
 			   N_
 			   ("Run a spell check on the current message"),
 			   spell_check_cb, GNOME_STOCK_PIXMAP_SPELLCHECK),
     GNOMEUIINFO_SEPARATOR,
-#define TOOL_PRINT_POS 9
+#define TOOL_PRINT_POS 10
     GNOMEUIINFO_ITEM_STOCK(N_("Print"), N_("Print"),
 			   print_message_cb, GNOME_STOCK_PIXMAP_PRINT),
     GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_ITEM_STOCK(N_("Cancel"), N_("Cancel this message"),
 			   close_window, GNOME_STOCK_PIXMAP_CLOSE),
     GNOMEUIINFO_END
+};
+
+static const int main_toolbar_spell_disable[] = { 
+    TOOL_SEND_POS,  TOOL_ATTACH_POS,   TOOL_POSTPONE_POS, 
+    TOOL_IDENT_POS, TOOL_SPELLING_POS, TOOL_PRINT_POS 
 };
 
 static GnomeUIInfo file_menu[] = {
@@ -1424,16 +1428,13 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	if (i != MAIN_FILE_MENU)
 	    list = g_list_append(list, (gpointer) main_menu[i].widget);
     }
-
     for (i = 0; i < MENU_FILE_CLOSE_POS; ++i) {
 	if (i != MENU_FILE_SEPARATOR1_POS && i != MENU_FILE_SEPARATOR2_POS)
 	    list = g_list_append(list, (gpointer) file_menu[i].widget);
     }
-
-    for (i = 0; i <= TOOL_PRINT_POS; ++i) {
-	list = g_list_append(list, (gpointer) main_toolbar[i].widget);
-    }
-
+    for(i=0; i<ELEMENTS(main_toolbar_spell_disable); i++)
+	list = g_list_prepend(
+	    list, main_toolbar[main_toolbar_spell_disable[i]].widget);
     msg->spell_check_disable_list = list;
 
     /* create the top portion with the to, from, etc in it */
@@ -2410,12 +2411,8 @@ spell_check_set_sensitive(BalsaSendmsg * msg, gboolean state)
 {
     GList *list;
 
-    list = msg->spell_check_disable_list;
-
-    while (list) {
+    for(list = msg->spell_check_disable_list; list; list = list->next)
 	gtk_widget_set_sensitive(GTK_WIDGET(list->data), state);
-	list = list->next;
-    }
 
     if (state)
 	check_readiness(NULL, msg);

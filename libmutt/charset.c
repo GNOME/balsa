@@ -68,6 +68,10 @@ PreferredMIMENames[] =
   
   { "csISO2022KR",	"iso-2022-kr" 	},
   { "csEUCKR",		"euc-kr"      	},
+#ifdef LIBMUTT
+  /* this is probably wrong but seems to work */
+  { "ks_c_5601-1987",	"euc-kr"      	},
+#endif
   { "csISO2022JP",	"iso-2022-jp"	},
   { "csISO2022JP2",	"iso-2022-jp-2" },
 

@@ -1,3 +1,7 @@
+2002-05-20  Carlos Morgado  <chbm@chbm.nu>
+
+	* charset.c (PreferredMIMENames): add PoS ks_c_5601-1987
+
 2002-05-15  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* imap/imap.c: add imap_uid_search()

@@ -721,9 +721,15 @@ time_t mutt_parse_date (const char *s, HEADER *h)
 	break;
 
       case 2: /* year */
+	      /* OH NO! WE ARE NOT Y2K COMPLIANT! */
 	tm.tm_year = atoi (t);
 	if (tm.tm_year >= 1900)
 	  tm.tm_year -= 1900;
+	else if(tm.tm_year <= 70)
+		tm.tm_year += 100;
+	/* We assume that no one has pre-1970 email lying
+	 * around. I shudder at the thought of who would...
+	 */
 	break;
 
       case 3: /* time of day */

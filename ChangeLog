@@ -1,3 +1,11 @@
+2000-06-23  Peter Williams  <peter@beta.newton.cx>
+
+	* libmutt/parse.c (mutt_parse_date): Add a check
+	to provide Y2K compliancy. No shit :-) We assume
+	messages with two-digit dates that are less than 70
+	are in 2000, I don't think anyone has email from before
+	1970....
+
 2000-06-21  Peter Williams  <peterw@curious-george.helixcode.com>
 
 	* libinit_balsa/balsa-druid-page-*.gob: Whoops, don't just

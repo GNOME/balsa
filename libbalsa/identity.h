@@ -72,8 +72,8 @@ extern "C"
 
 
 /* Function prototypes */
-    GtkObject* libbalsa_identity_new(void);
-    GtkObject* libbalsa_identity_new_with_name(const gchar* ident_name);
+    GObject* libbalsa_identity_new(void);
+    GObject* libbalsa_identity_new_with_name(const gchar* ident_name);
     
     void libbalsa_identity_set_identity_name(LibBalsaIdentity*, const gchar*);
     void libbalsa_identity_set_address(LibBalsaIdentity*, LibBalsaAddress*);

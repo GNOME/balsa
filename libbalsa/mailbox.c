@@ -586,14 +586,6 @@ libbalsa_mailbox_real_set_unread_messages_flag(LibBalsaMailbox * mailbox,
     mailbox->has_unread_messages = flag;
 }
 
-void
-libbalsa_mailbox_sort(LibBalsaMailbox * mailbox, LibBalsaMailboxSort sort)
-{
-    libbalsa_lock_mutt();
-    mutt_sort_headers(CLIENT_CONTEXT(mailbox), sort);
-    libbalsa_unlock_mutt();
-}
-
 static GHashTable*
 libbalsa_mailbox_real_get_matching(LibBalsaMailbox* mailbox, 
                                    int op, GSList* conditions)

@@ -161,12 +161,6 @@ void libbalsa_mailbox_set_unread_messages_flag(LibBalsaMailbox * mailbox,
 
 FILE *libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox,
 					  LibBalsaMessage * message);
-/*
- * sorting mailbox
- */
-void libbalsa_mailbox_sort(LibBalsaMailbox * mailbox,
-			   LibBalsaMailboxSort sort);
-
 gint libbalsa_mailbox_sync_backend(LibBalsaMailbox * mailbox, gboolean delete);
 
 void libbalsa_mailbox_check(LibBalsaMailbox * mailbox);

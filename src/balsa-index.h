@@ -78,14 +78,9 @@ extern "C" {
  * contents is loaded into the index */
     gboolean balsa_index_load_mailbox_node(BalsaIndex * bindex,
                                            BalsaMailboxNode * mbnode);
-    void balsa_index_refresh(BalsaIndex * bindex);
     void balsa_index_update_tree(BalsaIndex *bindex, gboolean expand);
     void balsa_index_set_threading_type(BalsaIndex * bindex, int thtype);
-    void balsa_index_set_sort_order(BalsaIndex * bindex, int column, 
-				    GtkSortType order);
-    void balsa_index_set_first_new_message(BalsaIndex * bindex);
 
-/* adds a new message */
     void balsa_index_redraw_current(BalsaIndex *);
 
 /* move or copy a list of messages */
@@ -102,12 +97,6 @@ extern "C" {
     void balsa_index_select_row(BalsaIndex * bindex, gint row);
 
     void balsa_index_find(BalsaIndex * bindex,gint op,GSList * conditions,gboolean previous);
-
-/* retrieve the selection */
-    void balsa_index_get_selected_rows(BalsaIndex * bindex,
-				       GtkCTreeNode *** rows,
-				       guint * nb_rows);
-
 
 /* balsa index page stuff */
     void balsa_message_reply(GtkWidget * widget, gpointer user_data);
@@ -131,9 +120,6 @@ extern "C" {
     gint balsa_find_notebook_page_num(LibBalsaMailbox * mailbox);
     void balsa_index_update_message(BalsaIndex * index);
 
-    /* Threading Stuff */
-    void balsa_index_threading(BalsaIndex* bindex);
-
     /* Updating index columns when preferences change */
     void balsa_index_refresh_date (GtkNotebook *, GtkNotebookPage *,
 				   gint, gpointer);
@@ -144,6 +130,9 @@ extern "C" {
      * changed */
     void balsa_index_hide_deleted(gboolean hide);
     void balsa_index_sync_backend(LibBalsaMailbox * mailbox);
+
+    /* Threading Stuff, implementation is in balsa-index-threading.c */
+    void balsa_index_threading(BalsaIndex* bindex);
 
 #ifdef __cplusplus
 }

@@ -50,9 +50,6 @@
 
 #include "filter.h"
 
-/* constants */
-#define BUFFER_SIZE 1024
-
 #define CLIST_WORKAROUND
 #if defined(CLIST_WORKAROUND)
 #define DO_CLIST_WORKAROUND(s) if((s)->row_list) (s)->row_list->prev = NULL;
@@ -88,6 +85,12 @@ static void clist_click_column(GtkCList * clist, gint column,
 			       gpointer data);
 
 /* statics */
+static void balsa_index_set_sort_order(BalsaIndex * bindex, int column, 
+				    GtkSortType order);
+static void balsa_index_set_first_new_message(BalsaIndex * bindex);
+/* adds a new message */
+static void balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message);
+/* retrieve the selection */
 static void balsa_index_set_col_images(BalsaIndex *, GtkCTreeNode*,
 				       LibBalsaMessage *);
 static void balsa_index_set_style(BalsaIndex * bindex, GtkCTreeNode *node);
@@ -520,7 +523,7 @@ clist_click_column(GtkCList * clist, gint column, gpointer data)
  * index's first_new_message field to point at that message.  If no
  * unread messages are found, first_new_message is set to NULL
  */
-void 
+static void
 balsa_index_set_first_new_message(BalsaIndex * bindex)
 {
     GtkCTreeNode *node =
@@ -1596,45 +1599,6 @@ mailbox_messages_delete_cb(BalsaIndex * bindex, GList * messages)
     gtk_clist_thaw(GTK_CLIST(bindex->ctree));
 }
 
-/* 
- * get_selected_rows :
- *
- * return the rows currently selected in the index
- *
- * @bindex : balsa index widget to retrieve the selection from
- * @rows : a pointer on the return array of rows. This array will
- *        contain the selected rows.
- * @nb_rows : a pointer on the returned number of selected rows  
- *
- */
-void
-balsa_index_get_selected_rows(BalsaIndex * bindex, GtkCTreeNode ***rows,
-			      guint * nb_rows)
-{
-    GList *list_of_selected_rows;
-    GtkCList *clist;
-    guint nb_selected_rows;
-    GtkCTreeNode **selected_rows;
-    guint row_count;
-
-    clist = GTK_CLIST(bindex->ctree);
-
-    /* retreive the selection  */
-    list_of_selected_rows = clist->selection;
-    nb_selected_rows = g_list_length(list_of_selected_rows);
-
-    selected_rows = (GtkCTreeNode **) g_malloc(nb_selected_rows * sizeof(GtkCTreeNode *));
-    for (row_count = 0; row_count < nb_selected_rows; row_count++) {
-	selected_rows[row_count] = (GtkCTreeNode *) (list_of_selected_rows->data);
-	list_of_selected_rows = list_of_selected_rows->next;
-    }
-
-    /* return the result of the search */
-    *nb_rows = nb_selected_rows;
-    *rows = selected_rows;
-
-    return;
-}
 
 /* balsa_index_close_and_destroy:
  */
@@ -2384,7 +2348,7 @@ balsa_index_set_threading_type(BalsaIndex * bindex, int thtype)
     balsa_window_set_threading_menu(thtype);
 }
 
-void
+static void
 balsa_index_set_sort_order(BalsaIndex * bindex, int column, GtkSortType order)
 {
     GtkCList * clist;

@@ -7,6 +7,7 @@ libbalsa/address-book-ldif.c
 libbalsa/address-book-vcard.c
 libbalsa/address-book.c
 libbalsa/address-entry.c
+libbalsa/address.c
 libbalsa/body.c
 libbalsa/filter-error.c
 libbalsa/filter-file.c

@@ -99,10 +99,13 @@ run_filters_on_mailbox(GtkTreeView * filter_list, LibBalsaMailbox * mbox)
     sent_to_trash = 0;
     for (lst = filters; lst; lst = g_slist_next(lst)) {
 	LibBalsaFilter *filter = lst->data;
-	LibBalsaMailboxSearchIter *search_iter =
-	    libbalsa_mailbox_search_iter_new(filter->condition);
+	LibBalsaMailboxSearchIter *search_iter;
 	guint msgno;
 	GArray *messages;
+
+	if (!filter->condition)
+	    continue;
+	search_iter = libbalsa_mailbox_search_iter_new(filter->condition);
 
 	/* Build a list of matching messages;
 	 * - to use the existing search_iter methods, we go repeatedly

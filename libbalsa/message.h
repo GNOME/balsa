@@ -33,7 +33,13 @@
 #include <auth-client.h>
 #endif
 
-/* #define MESSAGE_COPY_CONTENT 1 */
+/* do copy content, otherwise we get too many races conditions.
+   Most common was to grab subject and then see libmutt delete its data
+   under us (get_subject errors). The solution would be to 
+   lock data harder seem to require a major reengineering.
+*/
+#define MESSAGE_COPY_CONTENT 1
+
 #define LIBBALSA_TYPE_MESSAGE                      (libbalsa_message_get_type())
 #define LIBBALSA_MESSAGE(obj)                      (GTK_CHECK_CAST(obj, LIBBALSA_TYPE_MESSAGE, LibBalsaMessage))
 #define LIBBALSA_MESSAGE_CLASS(klass)              (GTK_CHECK_CLASS_CAST(klass, LIBBALSA_TYPE_MESSAGE, LibBalsaMessageClass))

@@ -1204,72 +1204,84 @@ fe_condition_remove_pressed(GtkWidget * widget, gpointer data)
  * to replace filters name that have changed in the filters list of mailboxes
  * and to invalidate previously constructed list of filters, to force reloading
  */
-static
-gboolean update_filters_mailbox(GNode * node,gpointer throwaway)
+static gboolean
+update_filters_mailbox(GtkTreeModel * model, GtkTreePath * path,
+		       GtkTreeIter * iter, gpointer data)
 {
-    BalsaMailboxNode *mbnode = (BalsaMailboxNode *) node->data;
-    gchar * tmp;
+    BalsaMailboxNode *mbnode;
+    LibBalsaMailbox *mailbox;
+    gchar *tmp;
 
-    if (mbnode->mailbox) {
-        /* First we free the filters list (which is now obsolete) */
-        g_slist_free(mbnode->mailbox->filters);
-        mbnode->mailbox->filters=NULL;
-        /* Second we replace old filters name by the new ones
-         * Note : deleted filters are also removed */
-        if (!filters_names_changes) 
-            return FALSE;
-        tmp=mailbox_filters_section_lookup(mbnode->mailbox->url ? mbnode->mailbox->url : mbnode->mailbox->name);
-        if (tmp) {
-            gchar **filters_names=NULL;
-            gboolean def;
-            guint nb_filters;
-            
-            gnome_config_push_prefix(tmp);
-            gnome_config_get_vector_with_default(MAILBOX_FILTERS_KEY,&nb_filters,&filters_names,&def);
-            if (!def) {
-                guint i;
-                GList * lst;
-                
-                for (i=0;i<nb_filters;) {
-                    for (lst=filters_names_changes;
-                         lst &&
-                         strcmp(((filters_names_rec *)lst->data)->old_name,filters_names[i])!=0;
-                         lst=g_list_next(lst));
+    gtk_tree_model_get(model, iter, 0, &mbnode, -1);
+    mailbox = mbnode->mailbox;
+    g_object_unref(mbnode);
+    if (!mailbox)
+	return FALSE;
 
-                        if (lst) {
-                            g_free(filters_names[i]);
-                            if (((filters_names_rec *)lst->data)->new_name) {
-                                /* Name changing */
-                                filters_names[i++]=g_strdup(((filters_names_rec *)lst->data)->new_name);
-                            }
-                            else {
-                                /* Name removing */
-                                guint j;
-                                
-                                for (j=i;j<nb_filters-1;j++)
-                                    filters_names[j]=filters_names[j+1];
-                                /* We put NULL to be sure that
-                                 * g_strfreev does not free already
-                                 * freed memory. */
-                                filters_names[--nb_filters]=NULL;
-                            }
-                        }
-                        else i++;
-                }
-            }
-            
-            if (nb_filters) {
-                gnome_config_set_vector(MAILBOX_FILTERS_KEY,nb_filters,(const gchar **)filters_names);      
-                gnome_config_pop_prefix();
-            }
-            else {
-                gnome_config_pop_prefix();
-                gnome_config_clean_section(tmp);
-            }
-            g_strfreev(filters_names);
-            g_free(tmp);
-        }
+    /* First we free the filters list (which is now obsolete) */
+    g_slist_free(mailbox->filters);
+    mailbox->filters = NULL;
+    /* Second we replace old filters name by the new ones
+     * Note : deleted filters are also removed */
+    if (!filters_names_changes)
+	return FALSE;
+    tmp = mailbox_filters_section_lookup(mailbox->url ?
+					 mailbox->url : mailbox->name);
+    if (tmp) {
+	gchar **filters_names = NULL;
+	gboolean def;
+	guint nb_filters;
+
+	gnome_config_push_prefix(tmp);
+	gnome_config_get_vector_with_default(MAILBOX_FILTERS_KEY,
+					     &nb_filters, &filters_names,
+					     &def);
+	if (!def) {
+	    guint i;
+	    GList *lst;
+
+	    for (i = 0; i < nb_filters;) {
+		for (lst = filters_names_changes;
+		     lst &&
+		     strcmp(((filters_names_rec *) lst->data)->old_name,
+			    filters_names[i]) != 0;
+		     lst = g_list_next(lst));
+
+		if (lst) {
+		    g_free(filters_names[i]);
+		    if (((filters_names_rec *) lst->data)->new_name) {
+			/* Name changing */
+			filters_names[i++] =
+			    g_strdup(((filters_names_rec *) lst->data)->
+				     new_name);
+		    } else {
+			/* Name removing */
+			guint j;
+
+			for (j = i; j < nb_filters - 1; j++)
+			    filters_names[j] = filters_names[j + 1];
+			/* We put NULL to be sure that
+			 * g_strfreev does not free already
+			 * freed memory. */
+			filters_names[--nb_filters] = NULL;
+		    }
+		} else
+		    i++;
+	    }
+	}
+
+	if (nb_filters) {
+	    gnome_config_set_vector(MAILBOX_FILTERS_KEY, nb_filters,
+				    (const gchar **) filters_names);
+	    gnome_config_pop_prefix();
+	} else {
+	    gnome_config_pop_prefix();
+	    gnome_config_clean_section(tmp);
+	}
+	g_strfreev(filters_names);
+	g_free(tmp);
     }
+
     return FALSE;
 }
 
@@ -1352,11 +1364,9 @@ fe_dialog_response(GtkWidget * dialog, gint response, gpointer data)
                           GINT_TO_POINTER(TRUE));
 
         /* Update mailboxes filters */
-        balsa_mailbox_nodes_lock(TRUE);
-        g_node_traverse(balsa_app.mailbox_nodes,
-                        G_LEVEL_ORDER,
-                        G_TRAVERSE_ALL, 10, update_filters_mailbox, NULL);
-        balsa_mailbox_nodes_unlock(TRUE);
+	gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
+			       (GtkTreeModelForeachFunc)
+			       update_filters_mailbox, NULL);
 
         config_filters_save();
 

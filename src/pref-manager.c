@@ -921,7 +921,6 @@ apply_prefs(GtkDialog * pbox)
      * close window and free memory
      */
     config_save();
-    balsa_mblist_repopulate(balsa_app.mblist_tree_store);
     balsa_window =
 	GTK_WIDGET(g_object_get_data(G_OBJECT(pbox), "balsawindow"));
     balsa_window_refresh(BALSA_WINDOW(balsa_window)); 
@@ -1248,13 +1247,11 @@ enum {
 };
 
 static void
-add_other_server(GNode * node, gpointer data)
+add_other_server(BalsaMailboxNode * mbnode, GtkTreeModel * model)
 {
-    GtkTreeView *tree_view = GTK_TREE_VIEW(data);
     gchar *protocol = NULL;
     gchar *name = NULL;
     gboolean append = FALSE;
-    BalsaMailboxNode *mbnode = node->data;
 
     if (mbnode) {
 	LibBalsaMailbox *mailbox = mbnode->mailbox;
@@ -1272,7 +1269,6 @@ add_other_server(GNode * node, gpointer data)
 	    append = TRUE;
 	}
 	if (append) {
-            GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
             GtkTreeIter iter;
 
             gtk_list_store_append(GTK_LIST_STORE(model), &iter);
@@ -1296,9 +1292,10 @@ update_mail_servers(void)
     GtkTreeView *tree_view;
     GtkTreeModel *model;
     GtkTreeIter iter;
-    GList *list = balsa_app.inbox_input;
+    GList *list;
     gchar *protocol;
-
+    GtkTreeModel *app_model;
+    gboolean valid;
     BalsaMailboxNode *mbnode;
 
     if(pui == NULL) return;
@@ -1307,24 +1304,21 @@ update_mail_servers(void)
     model = gtk_tree_view_get_model(tree_view);
 
     gtk_list_store_clear(GTK_LIST_STORE(model));
-    while (list) {
-	mbnode = list->data;
-	if (mbnode) {
-	    if (LIBBALSA_IS_MAILBOX_POP3(mbnode->mailbox))
-		protocol = "POP3";
-	    else if (LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox))
-		protocol = "IMAP";
-	    else 
-		protocol = _("Unknown");
+    for (list = balsa_app.inbox_input; list; list = list->next) {
+	if (!(mbnode = list->data))
+	    continue;
+	if (LIBBALSA_IS_MAILBOX_POP3(mbnode->mailbox))
+	    protocol = "POP3";
+	else if (LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox))
+	    protocol = "IMAP";
+	else
+	    protocol = _("Unknown");
 
-            gtk_list_store_append(GTK_LIST_STORE(model), &iter);
-            gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-                               MS_PROT_COLUMN, protocol,
-                               MS_NAME_COLUMN, mbnode->mailbox->name,
-                               MS_DATA_COLUMN, mbnode,
-                               -1);
-	}
-	list = list->next;
+	gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+	gtk_list_store_set(GTK_LIST_STORE(model), &iter,
+			   MS_PROT_COLUMN, protocol,
+			   MS_NAME_COLUMN, mbnode->mailbox->name,
+			   MS_DATA_COLUMN, mbnode, -1);
     }
     /*
      * add other remote servers
@@ -1332,10 +1326,14 @@ update_mail_servers(void)
      * we'll check everything at the top level in the mailbox_nodes
      * list:
      */
-    balsa_mailbox_nodes_lock(FALSE);
-    g_node_children_foreach(balsa_app.mailbox_nodes, G_TRAVERSE_ALL,
-			    (GNodeForeachFunc) add_other_server, tree_view);
-    balsa_mailbox_nodes_unlock(FALSE);
+    app_model = GTK_TREE_MODEL(balsa_app.mblist_tree_store);
+    for (valid = gtk_tree_model_get_iter_first(app_model, &iter);
+	 valid; valid = gtk_tree_model_iter_next(app_model, &iter)) {
+	gtk_tree_model_get(app_model, &iter, 0, &mbnode, -1);
+	add_other_server(mbnode, model);
+	g_object_unref(mbnode);
+    }
+
     if (gtk_tree_model_get_iter_first(model, &iter))
         gtk_tree_selection_select_iter(gtk_tree_view_get_selection(tree_view),
                                        &iter);

@@ -156,20 +156,24 @@ ask_password_mt(LibBalsaServer * server, LibBalsaMailbox * mbox)
 #endif
 
 static gboolean
-set_passwd_from_matching_server(GNode *nd, gpointer data)
+set_passwd_from_matching_server(GtkTreeModel *model,
+				GtkTreePath *path,
+				GtkTreeIter *iter,
+				gpointer data)
 {
     LibBalsaServer *server;
     LibBalsaServer *master;
     LibBalsaMailbox *mbox;
     BalsaMailboxNode *node;
 
-    g_return_val_if_fail(nd != NULL, FALSE);
-    node = (BalsaMailboxNode *)nd->data;
-    g_return_val_if_fail(BALSA_IS_MAILBOX_NODE(node), FALSE);
-    if(node->server)
+    gtk_tree_model_get(model, iter, 0, &node, -1);
+    g_return_val_if_fail(node != NULL, FALSE);
+    if(node->server) {
         server = node->server;
-    else {
+	g_object_unref(node);
+    } else {
         mbox = node->mailbox;
+	g_object_unref(node);
         if(!mbox) /* eg. a collection of mboxes */
             return FALSE;
         g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mbox), FALSE);
@@ -205,20 +209,28 @@ gchar *
 ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
 {
     gchar *password;
-    
-    g_return_val_if_fail(server != NULL, NULL);
 
+    g_return_val_if_fail(server != NULL, NULL);
+    
     password = NULL;
     if (mbox) {
-        balsa_mailbox_nodes_lock(FALSE);
-        g_node_traverse(balsa_app.mailbox_nodes, G_IN_ORDER, G_TRAVERSE_LEAFS,
-		-1, set_passwd_from_matching_server, server);
-        balsa_mailbox_nodes_unlock(FALSE);
+	gboolean is_sub_thread =
+	    (pthread_self() != libbalsa_get_main_thread());
+
+	if (is_sub_thread)
+	    gdk_threads_enter();
+	gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
+			       (GtkTreeModelForeachFunc)
+			       set_passwd_from_matching_server, server);
+	if (is_sub_thread)
+	    gdk_threads_leave();
+
 	if (server->passwd != NULL) {
 	    password = server->passwd;
 	    server->passwd = NULL;
 	}
     }
+
     if (!password)
 #ifdef BALSA_USE_THREADS
 	return (pthread_self() == libbalsa_get_main_thread()) ?
@@ -318,8 +330,6 @@ balsa_app_init(void)
     balsa_app.sentbox = NULL;
     balsa_app.draftbox = NULL;
     balsa_app.trash = NULL;
-
-    balsa_app.mailbox_nodes = NULL;
 
     balsa_app.new_messages_timer = 0;
     balsa_app.new_messages = 0;
@@ -458,39 +468,6 @@ balsa_app_init(void)
     config_views_load();
 }
 
-/* Word of comment: previous definition of this function used access()
-function before attempting creat/unlink operation. In PS opinion, the
-speed gain is negligible or negative: the number of called system
-functions in present case is constant and equal to 1; the previous
-version called system function either once or twice per directory. */
-static gboolean
-destroy_mbnode(GNode * node, gpointer data)
-{
-    BalsaMailboxNode *mbnode = (BalsaMailboxNode *) node->data;
-
-    if(mbnode == NULL) /* true for root node only */
-	return FALSE;
-    
-    /* FIXME: Balsa now uses the `exposed' state of mailboxes to set
-     * initial expansion. This code is kept only for the transition
-     * after an upgrade. All "%s/.expanded" files are removed when Balsa
-     * exits. */
-    if (!mbnode->mailbox) {
-	gchar *tmpfile = g_strdup_printf("%s/.expanded", mbnode->name);
-#if 0
-	if (mbnode->expanded)
-	    close(creat(tmpfile, S_IRUSR | S_IWUSR));
-	else
-#endif
-	    unlink(tmpfile);
-
-	g_free(tmpfile);
-    }
-
-    g_object_unref(G_OBJECT(mbnode));
-    return FALSE;
-}
-
 void
 balsa_app_destroy(void)
 {
@@ -508,19 +485,6 @@ balsa_app_destroy(void)
 
     /* close all mailboxes */
     gtk_widget_destroy(balsa_app.notebook);
-    balsa_mailbox_nodes_lock(TRUE);
-    g_node_traverse(balsa_app.mailbox_nodes,
-		    G_LEVEL_ORDER,
-		    G_TRAVERSE_ALL, -1, destroy_mbnode, NULL);
-    g_node_destroy(balsa_app.mailbox_nodes);
-    balsa_app.mailbox_nodes = NULL;
-    balsa_mailbox_nodes_unlock(TRUE);
-    g_object_unref(G_OBJECT(balsa_app.inbox));
-    g_object_unref(G_OBJECT(balsa_app.outbox));
-    g_object_unref(G_OBJECT(balsa_app.sentbox));
-    g_object_unref(G_OBJECT(balsa_app.draftbox));
-    g_object_unref(G_OBJECT(balsa_app.trash));
-    libbalsa_imap_close_all_connections();
     /* g_slist_free(opt_attach_list); */
     g_object_unref(balsa_app.colormap);
     if(balsa_app.debug) g_print("balsa_app: Finished cleaning up.\n");
@@ -659,130 +623,124 @@ balsa_stock_button_with_label(const char *icon, const char *text)
  */
 struct _BalsaFind {
     gconstpointer data;
-    GNode *gnode;
+    BalsaMailboxNode *mbnode;
 };
 typedef struct _BalsaFind BalsaFind;
 
 static gint
-find_mailbox(GNode * gnode, BalsaFind * bf)
+find_mailbox(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
+	     gpointer user_data)
 {
-    BalsaMailboxNode *mbnode = (BalsaMailboxNode *) gnode->data;
+    BalsaFind *bf = user_data;
+    BalsaMailboxNode *mbnode;
 
-    if (!mbnode || mbnode->mailbox != bf->data)
-        return FALSE;
+    gtk_tree_model_get(model, iter, 0, &mbnode, -1);
+    if (mbnode->mailbox == bf->data) {
+	bf->mbnode = mbnode;
+	return TRUE;
+    }
+    g_object_unref(mbnode);
 
-    bf->gnode = gnode;
-    return TRUE;
+    return FALSE;
 }
 
 /* balsa_find_mailbox:
    looks for given mailbox in the GNode tree, usually but not limited to
-   balsa_app.mailbox_nodes
+   balsa_app.mailbox_nodes; caller must unref mbnode if non-NULL.
 */
-GNode *
-balsa_find_mailbox(GNode * root, LibBalsaMailbox * mailbox)
+BalsaMailboxNode *
+balsa_find_mailbox(LibBalsaMailbox * mailbox)
 {
     BalsaFind bf;
+    gboolean is_sub_thread = (pthread_self() != libbalsa_get_main_thread());
+
+g_assert(!g_mutex_trylock(gdk_threads_mutex));
+
+    if (is_sub_thread)
+	gdk_threads_enter();
 
     bf.data = mailbox;
-    bf.gnode = NULL;
-    g_node_traverse(root, G_IN_ORDER, G_TRAVERSE_ALL, -1,
-                    (GNodeTraverseFunc) find_mailbox, &bf);
-    return bf.gnode;
-}
+    bf.mbnode = NULL;
+    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
+			   find_mailbox, &bf);
 
-/* balsa_find_mbnode:
- * find the gnode with mbnode as data
- */
-GNode *
-balsa_find_mbnode(GNode * root, BalsaMailboxNode * mbnode)
-{
-    return g_node_find(root, G_IN_ORDER, G_TRAVERSE_ALL, mbnode);
-}
+    if (is_sub_thread)
+	gdk_threads_leave();
 
-static gboolean
-find_dir(GNode * gnode, BalsaFind * bf)
-{
-    BalsaMailboxNode *mbnode;
-
-    if (gnode->data == NULL)
-        return FALSE;
-
-    mbnode = (BalsaMailboxNode *) gnode->data;
-
-    if (mbnode->dir == NULL || strcmp(mbnode->dir, bf->data))
-        return FALSE;
-
-    bf->gnode = gnode;
-    return TRUE;
+    return bf.mbnode;
 }
 
 /* balsa_find_dir:
    looks for a mailbox node with dir equal to path.
-   returns NULL on failure
+   returns NULL on failure; caller must unref mbnode when non-NULL.
 */
-GNode *
-balsa_find_dir(GNode * root, const gchar * path)
+static gint
+find_path(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
+	  BalsaFind * bf)
 {
-    BalsaFind bf;
+    BalsaMailboxNode *mbnode;
 
-    bf.data = path;
-    bf.gnode = NULL;
-    g_node_traverse(root, G_LEVEL_ORDER, G_TRAVERSE_ALL, -1,
-                    (GNodeTraverseFunc) find_dir, &bf);
-    return bf.gnode;
+    gtk_tree_model_get(model, iter, 0, &mbnode, -1);
+    if (mbnode->dir && !strcmp(mbnode->dir, bf->data)) {
+	bf->mbnode = mbnode;
+	return TRUE;
+    }
+    g_object_unref(mbnode);
+
+    return FALSE;
 }
 
-static gboolean
-find_url(GNode * gnode, BalsaFind * bf)
+BalsaMailboxNode *
+balsa_find_dir(const gchar * path)
 {
+    BalsaFind bf;
+    gboolean is_sub_thread = (pthread_self() != libbalsa_get_main_thread());
+
+    if (is_sub_thread)
+	gdk_threads_enter();
+
+    bf.data = path;
+    bf.mbnode = NULL;
+    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
+			   (GtkTreeModelForeachFunc) find_path, &bf);
+
+    if (is_sub_thread)
+	gdk_threads_leave();
+
+    return bf.mbnode;
+}
+
+static gint
+find_url(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
+	 BalsaFind * bf)
+{
+    BalsaMailboxNode *mbnode;
     LibBalsaMailbox *mailbox;
 
-    if (gnode->data == NULL)
-        return FALSE;
+    gtk_tree_model_get(model, iter, 0, &mbnode, -1);
+    if ((mailbox = mbnode->mailbox) && !strcmp(mailbox->url, bf->data)) {
+	bf->mbnode = mbnode;
+	return TRUE;
+    }
+    g_object_unref(mbnode);
 
-    mailbox = ((BalsaMailboxNode *) gnode->data)->mailbox;
-
-    if (!mailbox || !mailbox->url || strcmp(mailbox->url, bf->data))
-        return FALSE;
-
-    bf->gnode = gnode;
-    return TRUE;
+    return FALSE;
 }
 
 /* balsa_find_url:
-   looks for a mailbox with the given url.
-   returns the GNode whose mbnode points to the mailbox, 
-   or NULL on failure
-*/
-static GNode *
-balsa_find_url(GNode * root, const gchar * url)
+ * looks for a mailbox node with the given url.
+ * returns NULL on failure; caller must unref mbnode when non-NULL.
+ */
+static BalsaMailboxNode *
+balsa_find_url(const gchar * url)
 {
     BalsaFind bf;
 
     bf.data = url;
-    bf.gnode = NULL;
-    g_node_traverse(root, G_LEVEL_ORDER, G_TRAVERSE_ALL, -1,
-                    (GNodeTraverseFunc) find_url, &bf);
-    return bf.gnode;
-}
-
-/* balsa_find_mailbox_node_by_url:
- * looks for a mailbox node with the given url.
- * returns NULL on failure
- */
-BalsaMailboxNode *
-balsa_find_mailbox_node_by_url(const gchar * url)
-{
-    GNode *gnode;
-    BalsaMailboxNode *mbnode;
-
-    balsa_mailbox_nodes_lock(FALSE);
-    gnode = balsa_find_url(balsa_app.mailbox_nodes, url);
-    mbnode = gnode ? gnode->data : NULL;
-    balsa_mailbox_nodes_unlock(FALSE);
-
-    return mbnode;
+    bf.mbnode = NULL;
+    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
+			   (GtkTreeModelForeachFunc) find_url, &bf);
+    return bf.mbnode;
 }
 
 /* balsa_find_mailbox_by_url:
@@ -792,9 +750,59 @@ balsa_find_mailbox_node_by_url(const gchar * url)
 LibBalsaMailbox *
 balsa_find_mailbox_by_url(const gchar * url)
 {
-    BalsaMailboxNode *mbnode = balsa_find_mailbox_node_by_url(url);
+    BalsaMailboxNode *mbnode;
+    LibBalsaMailbox *mailbox = NULL;
+    gboolean is_sub_thread = (pthread_self() != libbalsa_get_main_thread());
 
-    return mbnode ? mbnode->mailbox : NULL;
+    if (is_sub_thread)
+	gdk_threads_enter();
+
+    if ((mbnode = balsa_find_url(url))) {
+	mailbox = mbnode->mailbox;
+	g_object_unref(mbnode);
+    }
+
+    if (is_sub_thread)
+	gdk_threads_leave();
+
+    return mailbox;
+}
+
+struct balsa_find_iter_by_data_info {
+    GtkTreeIter *iter;
+    gpointer data;
+    gboolean found;
+};
+
+static gboolean
+balsa_find_iter_by_data_func(GtkTreeModel * model, GtkTreePath * path,
+			       GtkTreeIter * iter, gpointer user_data)
+{
+    struct balsa_find_iter_by_data_info *bf = user_data;
+    BalsaMailboxNode *mbnode;
+
+    gtk_tree_model_get(model, iter, 0, &mbnode, -1);
+    if (mbnode == bf->data || mbnode->mailbox == bf->data) {
+	*bf->iter = *iter;
+	bf->found = TRUE;
+    }
+    g_object_unref(mbnode);
+
+    return bf->found;
+}
+
+gboolean
+balsa_find_iter_by_data(GtkTreeIter * iter , gpointer data)
+{
+    struct balsa_find_iter_by_data_info bf;
+    GtkTreeModel *model = GTK_TREE_MODEL(balsa_app.mblist_tree_store);
+
+    bf.iter = iter;
+    bf.data = data;
+    bf.found = FALSE;
+    gtk_tree_model_foreach(model, balsa_find_iter_by_data_func, &bf);
+
+    return bf.found;
 }
 
 /* End of search utilities. */
@@ -803,57 +811,40 @@ balsa_find_mailbox_by_url(const gchar * url)
    remove all children of given node leaving the node itself intact.
    Applicable to balsa_app.mailbox_nodes and its children.
  */
-static gboolean
-destroy_mailbox_node(GNode* node, GNode* root)
-{ 
-    BalsaMailboxNode *mbnode = BALSA_MAILBOX_NODE(node->data);
-
-    g_return_val_if_fail(mbnode, FALSE);
-		     
-    if (mbnode->mailbox) {
-        /* Clear the view member, so that the view info is preserved. */
-        mbnode->mailbox->view = NULL;
-	balsa_window_close_mbnode(balsa_app.main_window, mbnode);
-        mbnode->mailbox = NULL;
-    }
-    balsa_mblist_remove_mailbox_node(balsa_app.mblist_tree_store, 
-                                     mbnode);
-    g_object_unref(G_OBJECT(mbnode)); 
-    return FALSE;
-}
-
-#if 0
-static void 
-destroy_mailbox_tree(GNode* node, GNode* root)
-{ 
-}
-#endif
-
 void
-balsa_remove_children_mailbox_nodes(GNode* gnode)
+balsa_remove_children_mailbox_nodes(BalsaMailboxNode * mbnode)
 {
-    GNode* walk, *next_sibling;
-    g_return_if_fail(gnode);
+    GtkTreeModel *model = GTK_TREE_MODEL(balsa_app.mblist_tree_store);
+    GtkTreeIter parent;
+    GtkTreeIter iter;
+    gboolean valid;
 
-    if(balsa_app.debug)
+    if (balsa_app.debug)
 	printf("Destroying children of %p %s\n",
-	       gnode->data, BALSA_MAILBOX_NODE(gnode->data)->name
-	       ? BALSA_MAILBOX_NODE(gnode->data)->name : "");
-    for(walk = g_node_first_child(gnode); walk; walk = next_sibling) {
-        BalsaMailboxNode *mbnode = BALSA_MAILBOX_NODE(walk->data);
-        next_sibling = g_node_next_sibling(walk);
-        if(mbnode==NULL) continue;
-        if(mbnode->parent == NULL) {
-            printf("sparing %s %s\n", 
-                   mbnode->mailbox ? "mailbox" : "folder ",
-                   mbnode->mailbox ? mbnode->mailbox->name : mbnode->name);
-            continue;
-        }
-        g_node_traverse(walk, G_IN_ORDER, G_TRAVERSE_ALL, -1,
-                        (GNodeTraverseFunc)destroy_mailbox_node, gnode);
-	g_node_unlink(walk);
-	g_node_destroy(walk);
+	       mbnode, mbnode && mbnode->name ? mbnode->name : "");
+
+    if (mbnode) {
+	if (!balsa_find_iter_by_data(&parent, mbnode)
+	    || !gtk_tree_model_iter_children(model, &iter, &parent))
+	    return;
+    } else {
+	if (!gtk_tree_model_get_iter_first(model, &iter))
+	    return;
     }
+
+    do {
+	gtk_tree_model_get(model, &iter, 0, &mbnode, -1);
+	if (mbnode->parent)
+	    valid =
+		gtk_tree_store_remove(balsa_app.mblist_tree_store, &iter);
+	else {
+	    printf("sparing %s %s\n",
+		   mbnode->mailbox ? "mailbox" : "folder ",
+		   mbnode->mailbox ? mbnode->mailbox->name : mbnode->name);
+	    valid = gtk_tree_model_iter_next(model, &iter);
+	}
+	g_object_unref(G_OBJECT(mbnode)); 
+    } while (valid);
 }
 
 /* create_label:
@@ -951,95 +942,3 @@ balsa_find_index_by_mailbox(LibBalsaMailbox * mailbox)
     /* didn't find a matching mailbox */
     return NULL;
 }
-
-#ifdef BALSA_USE_THREADS
-/* balsa_mailbox_nodes_(un)lock:
-   locks/unlocks balsa_app.mailbox_nodes structure so we can modify it
-   from a thread.
-   exclusive asks for exclusive access.
-   NO-OPs in the non-MT build.
-*/
-static pthread_mutex_t mailbox_nodes_lock = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t  mailbox_nodes_cond = PTHREAD_COND_INITIALIZER;
-
-/* a list of outstanding locks */
-static GList *nodes_lock_list;
-
-/* what we need to know about a lock */
-struct _NodesLockItem {
-    gboolean exclusive;
-    pthread_t id;
-};
-typedef struct _NodesLockItem NodesLockItem;
-
-/*
- * balsa_mailbox_nodes_lock
- *
- * requests a lock
- */
-void
-balsa_mailbox_nodes_lock(gboolean exclusive)
-{
-    GList *list;
-    NodesLockItem *nli;
-    pthread_t id = pthread_self();
-
-    pthread_mutex_lock(&mailbox_nodes_lock);
-    do {
-        /* if anyone else has a lock, and either we're asking for an
-         * exclusive lock or they hold an exclusive lock, we need to
-         * wait until someone gives up a lock, and then recheck all the
-         * outstanding locks */
-        for (list = nodes_lock_list; list; list = g_list_next(list)) {
-            nli = list->data;
-            if (nli->id != id && (exclusive || nli->exclusive)) {
-                pthread_cond_wait(&mailbox_nodes_cond, &mailbox_nodes_lock);
-                break; /* with list != NULL */
-            }
-	}               /* end of for loop, with list == NULL */
-    } while (list != NULL);
-    /* we're the only thread with locks, so we'll just add this one
-     * to the list */
-    nli = g_new(NodesLockItem, 1);
-    nli->id = id;
-    nli->exclusive = exclusive;
-    nodes_lock_list = g_list_prepend(nodes_lock_list, nli);
-    pthread_mutex_unlock(&mailbox_nodes_lock);
-}
-
-/*
- * balsa_mailbox_nodes_unlock
- *
- * give up a lock
- */
-void
-balsa_mailbox_nodes_unlock(gboolean exclusive)
-{
-    GList *list;
-    NodesLockItem *nli = NULL;
-    pthread_t id = pthread_self();
-
-    pthread_mutex_lock(&mailbox_nodes_lock);
-    for (list = nodes_lock_list; list; list = g_list_next(list)) {
-        nli = list->data;
-        if (nli->id == id) {
-            if (nli->exclusive == exclusive)
-                break;
-            else
-                g_warning("Unlocking an incorrectly nested mailbox_nodes lock");
-        }
-    }
-
-    if (nli) {
-        nodes_lock_list = g_list_remove(nodes_lock_list, nli);
-        g_free(nli);
-        pthread_cond_signal(&mailbox_nodes_cond);
-    } else         g_warning("No mailbox_nodes lock to unlock");
-    pthread_mutex_unlock(&mailbox_nodes_lock);
-}
-#else
-void
-balsa_mailbox_nodes_lock(gboolean exclusive) {}
-void
-balsa_mailbox_nodes_unlock(gboolean exclusive) {}
-#endif

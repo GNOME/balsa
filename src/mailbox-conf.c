@@ -290,6 +290,7 @@ mailbox_conf_delete_cb(GtkWidget * widget, gpointer data)
                            _("No mailbox selected."));
     else
 	mailbox_conf_delete(mbnode);
+    g_object_unref(mbnode);
 }
 
 /* This can be used  for both mailbox and folder edition */
@@ -299,13 +300,13 @@ mailbox_conf_edit_cb(GtkWidget * widget, gpointer data)
     BalsaMailboxNode *mbnode = 
         balsa_mblist_get_selected_node(balsa_app.mblist);
     balsa_mailbox_node_show_prop_dialog(mbnode);
+    g_object_unref(mbnode);
 }
 
 /* END OF COMMONLY USED CALLBACKS SECTION ------------------------ */
 void
 mailbox_conf_delete(BalsaMailboxNode * mbnode)
 {
-    GNode *gnode;
     gint button;
     GtkWidget *ask;
     LibBalsaMailbox* mailbox = mbnode->mailbox;
@@ -401,8 +402,11 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 	/* a chain of folders might go away, so we'd better rescan from
 	 * higher up
 	 */
-	while (!parent->mailbox && parent->parent)
-		parent = parent->parent;
+	while (!parent->mailbox && parent->parent) {
+	    mbnode = parent;
+	    parent = parent->parent;
+	}
+	balsa_mblist_mailbox_node_remove(mbnode);
 	balsa_mailbox_node_rescan(parent); /* see it as server sees it */
 	return;
     }
@@ -416,26 +420,9 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
     if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
 	balsa_app.inbox_input = g_list_remove(balsa_app.inbox_input, 
 					      mbnode);
-    } else {
-        /* FIXME: shouldn't we get an exclusive lock on the mailbox
-         * nodes, and hold it until after we've unlinked the gnode ? */
-        balsa_mailbox_nodes_lock(FALSE);
-	gnode = balsa_find_mailbox(balsa_app.mailbox_nodes, mailbox);
-        balsa_mailbox_nodes_unlock(FALSE);
-	if (!gnode) {
-	    fprintf(stderr,
-		    _("Oooop! mailbox not found in balsa_app.mailbox "
-		      "nodes?\n"));
-	    return;
-	} else {
-            balsa_mblist_remove_mailbox_node(balsa_app.mblist_tree_store,
-                                             mbnode);
-	    g_node_unlink(gnode);
-	    g_node_destroy(gnode); /* this will remove mbnode */
- 	}
-    }
+    } else
+	balsa_mblist_mailbox_node_remove(mbnode);
     update_mail_servers();
-    g_object_unref(G_OBJECT(mbnode));
 }
 
 static void
@@ -807,16 +794,17 @@ mailbox_conf_update(MailboxConfWindow *mcw)
 	    g_free(filename);
 	    return;
 	}
-	g_free(filename);
         if(mcw->mailbox_name) {
 	    name = gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name));
             g_free(mailbox->name);
             mailbox->name = g_strdup(name);
-        } else { /* shortcut: this will destroy mailbox */
-            balsa_mailbox_local_rescan_parent(mailbox); 
-            balsa_mblist_repopulate(balsa_app.mblist_tree_store);
+        } else {
+	    mailbox->name = g_path_get_basename(filename);
+            balsa_mailbox_local_append(mailbox);
+	    g_free(filename);
             return;
         }
+	g_free(filename);
     } else if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
 	update_pop_mailbox(mcw);
     } else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
@@ -829,18 +817,15 @@ mailbox_conf_update(MailboxConfWindow *mcw)
     if (LIBBALSA_IS_MAILBOX_POP3(mcw->mailbox))
 	/* redraw the pop3 server list */
 	update_mail_servers();
-    else /* redraw the main mailbox list */
-	balsa_mblist_repopulate(balsa_app.mblist_tree_store);
 }
 
 /*
  * Add a new mailbox, based on the contents of the dialog.
  */
 static void
-mailbox_conf_add(MailboxConfWindow *mcw)
+mailbox_conf_add(MailboxConfWindow * mcw)
 {
-    GNode *node;
-    BalsaMailboxNode * mbnode;
+    BalsaMailboxNode *mbnode;
     gboolean save_to_config = TRUE;
 
     mcw->mailbox = g_object_new(mcw->mailbox_type, NULL);
@@ -868,14 +853,8 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 	    || strncmp(balsa_app.local_mail_directory, path,
 		       strlen(balsa_app.local_mail_directory)) != 0;
         printf("Save to config: %d\n", save_to_config);
-	if(save_to_config) {
-            gchar* fn = strrchr(path, '/');
-            mcw->mailbox->name = g_strdup(fn? fn+1 : path);
-	    node =g_node_new(mbnode);
-            balsa_mailbox_nodes_lock(TRUE);
-	    g_node_append(balsa_app.mailbox_nodes, node);
-            balsa_mailbox_nodes_unlock(TRUE);
-	}
+	mcw->mailbox->name = g_path_get_basename(path);
+	balsa_mailbox_local_append(mcw->mailbox);
     } else if ( LIBBALSA_IS_MAILBOX_POP3(mcw->mailbox) ) {
 	/* POP3 Mailboxes */
 	update_pop_mailbox(mcw);
@@ -883,11 +862,7 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 	    g_list_append(balsa_app.inbox_input, mbnode);
     } else if ( LIBBALSA_IS_MAILBOX_IMAP(mcw->mailbox) ) {
 	update_imap_mailbox(mcw);
-
-	node = g_node_new(mbnode);
-        balsa_mailbox_nodes_lock(TRUE);
-	g_node_append(balsa_app.mailbox_nodes, node);
-        balsa_mailbox_nodes_unlock(TRUE);
+	balsa_mblist_mailbox_node_append(NULL, mbnode);
 	update_mail_servers();
     } else {
 	g_assert_not_reached();
@@ -896,8 +871,6 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 
     if(save_to_config)
 	config_mailbox_add(mcw->mailbox, NULL);
-    else
-        balsa_mailbox_local_rescan_parent(mcw->mailbox);
 
     if (LIBBALSA_IS_MAILBOX_POP3(mcw->mailbox))
 	/* redraw the pop3 server list */
@@ -912,7 +885,6 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 	    g_hash_table_insert(balsa_app.mailbox_views,
 				g_strdup(mcw->mailbox->url),
 				mcw->mailbox->view);
-	balsa_mblist_repopulate(balsa_app.mblist_tree_store);
     }
 }
 

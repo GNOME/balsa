@@ -185,7 +185,7 @@ extern struct BalsaApplication {
     LibBalsaMailbox *outbox;
     LibBalsaMailbox *trash;
 
-    GNode *mailbox_nodes;
+    BalsaMailboxNode *root_node;
 
     /* timer for mm_exists callback */
     gint new_messages_timer;
@@ -407,14 +407,13 @@ GtkWidget *balsa_stock_button_with_label(const char *icon,
 gboolean open_mailboxes_idle_cb(gchar * names[]);
 
 /* Search functions */
-GNode *balsa_find_mailbox(GNode * root, LibBalsaMailbox * mailbox);
-GNode *balsa_find_mbnode(GNode * root, BalsaMailboxNode * mbnode);
-GNode *balsa_find_dir(GNode * root, const gchar * path);
-BalsaMailboxNode *balsa_find_mailbox_node_by_url(const gchar * url);
+BalsaMailboxNode *balsa_find_mailbox(LibBalsaMailbox * mailbox);
+BalsaMailboxNode *balsa_find_dir(const gchar * path);
 LibBalsaMailbox *balsa_find_mailbox_by_url(const gchar * url);
-
-void  balsa_remove_children_mailbox_nodes(GNode* gnode);
+gboolean balsa_find_iter_by_data(GtkTreeIter * iter, gpointer data);
 BalsaIndex* balsa_find_index_by_mailbox(LibBalsaMailbox* mailbox);
+
+void  balsa_remove_children_mailbox_nodes(BalsaMailboxNode * mbnode);
 
 GtkWidget *create_label(const gchar * label, GtkWidget * table, gint row);
 GtkWidget *create_entry(GtkDialog *mcw, GtkWidget * table, 
@@ -422,8 +421,5 @@ GtkWidget *create_entry(GtkDialog *mcw, GtkWidget * table,
 			const gchar * initval, GtkWidget* hotlabel);
 GtkWidget *create_check(GtkDialog *mcw, const gchar * label, 
 			GtkWidget * table, gint row, gboolean initval);
-
-void balsa_mailbox_nodes_lock(gboolean exclusive);
-void balsa_mailbox_nodes_unlock(gboolean exclusive);
 
 #endif				/* __BALSA_APP_H__ */

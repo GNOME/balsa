@@ -288,7 +288,7 @@ check_special_mailboxes(void)
 static void
 config_init(void)
 {
-    while(!config_load() || check_special_mailboxes()) {
+    while(!config_load()) {
 	balsa_init_begin();
         config_defclient_save();
     }
@@ -297,6 +297,7 @@ config_init(void)
 static void
 mailboxes_init(void)
 {
+    check_special_mailboxes();
     if (!balsa_app.inbox) {
 	g_warning("*** error loading mailboxes\n");
 	balsa_init_begin();
@@ -391,28 +392,30 @@ initial_open_inbox()
     return FALSE;
 }
 
-static gint
-append_subtree_f(GNode* gn, gpointer data)
-{
-    g_return_val_if_fail(gn->data, FALSE);
-    balsa_mailbox_node_append_subtree(BALSA_MAILBOX_NODE(gn->data),
-				      gn);
-    return FALSE;
-}
-
 /* scan_mailboxes:
    this is an idle handler. Expands subtrees.
-   FIXME: make sure that append_subtree_f does not use gtk.
 */
 static gboolean
 scan_mailboxes_idle_cb()
 {
+    gboolean valid;
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+
     gdk_threads_enter();
-    balsa_mailbox_nodes_lock(TRUE);
-    g_node_traverse(balsa_app.mailbox_nodes, G_POST_ORDER, G_TRAVERSE_ALL, -1,
-                    append_subtree_f, NULL);
-    balsa_mailbox_nodes_unlock(TRUE);
-    balsa_mblist_repopulate(balsa_app.mblist_tree_store);
+    model = GTK_TREE_MODEL(balsa_app.mblist_tree_store);
+    /* The model contains only nodes from config. */
+    for (valid = gtk_tree_model_get_iter_first(model, &iter); valid;
+	 valid = gtk_tree_model_iter_next(model, &iter)) {
+	BalsaMailboxNode *mbnode;
+
+	gtk_tree_model_get(model, &iter, 0, &mbnode, -1);
+	balsa_mailbox_node_append_subtree(mbnode);
+	g_object_unref(mbnode);
+    }
+    /* The root-node (typically ~/mail) isn't in the model, so its
+     * children will be appended to the top level. */
+    balsa_mailbox_node_append_subtree(balsa_app.root_node);
     gdk_threads_leave();
 
     if (cmd_open_unread_mailbox || balsa_app.open_unread_mailbox)
@@ -487,8 +490,6 @@ main(int argc, char *argv[])
     
     /* checking for valid config files */
     config_init();
-    /* load mailboxes */
-    mailboxes_init();
 
     default_icon = balsa_pixmap_finder("balsa_icon.png");
     if(default_icon) { /* may be NULL for developer installations */
@@ -501,8 +502,14 @@ main(int argc, char *argv[])
 
     window = balsa_window_new();
     balsa_app.main_window = BALSA_WINDOW(window);
+    g_object_add_weak_pointer(G_OBJECT(window),
+			      (gpointer) &balsa_app.main_window);
     g_signal_connect(G_OBJECT(window), "destroy",
                      G_CALLBACK(balsa_cleanup), NULL);
+
+    /* load mailboxes */
+    config_load_sections();
+    mailboxes_init();
 
     /* session management */
     client = gnome_master_client();

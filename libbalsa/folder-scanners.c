@@ -40,7 +40,7 @@
 #include "imap-server.h"
 
 static void
-libbalsa_scanner_mdir(GNode *rnode,
+libbalsa_scanner_mdir(gpointer rnode,
                         const gchar * prefix, 
                         LocalHandler folder_handler, 
                         LocalHandler mailbox_handler)
@@ -86,7 +86,7 @@ libbalsa_scanner_mdir(GNode *rnode,
 }
 
 void
-libbalsa_scanner_local_dir(GNode *rnode, const gchar * prefix, 
+libbalsa_scanner_local_dir(gpointer rnode, const gchar * prefix, 
                            LocalHandler folder_handler, 
                            LocalHandler mailbox_handler)
 {
@@ -301,7 +301,7 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
 }
 
 void
-libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server, 
+libbalsa_scanner_imap_dir(gpointer rnode, LibBalsaServer * server, 
                           const gchar* path, gboolean subscribed, 
                           gboolean list_inbox,
                           ImapCheck check_imap_path,

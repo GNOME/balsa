@@ -37,6 +37,7 @@ void config_mailbox_set_as_special(LibBalsaMailbox * mailbox,
 				   specialType which);
 
 gint config_load(void);
+void config_load_sections(void);
 gint config_save(void);
 void config_defclient_save(void);
 

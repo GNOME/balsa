@@ -473,9 +473,19 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
 	    g_array_new(FALSE, FALSE, sizeof(LibBalsaMailboxLocalInfo));
 
     if(!mailbox->msg_tree) { /* first reference */
+	/* libbalsa_mailbox_local_load_messages may result in applying
+	 * filters, and related code assumes that the gdk lock isn't
+	 * held in subthreads. */
+	gboolean is_sub_thread =
+	    (pthread_self() != libbalsa_get_main_thread());
+	if (is_sub_thread)
+	    gdk_threads_leave();
         mailbox->msg_tree = g_node_new(NULL);
         libbalsa_mailbox_local_load_messages(mailbox, 0);
+	if (is_sub_thread)
+	    gdk_threads_enter();
     }
+
     if (thread_type == LB_MAILBOX_THREADING_JWZ)
 	lbml_threading_jwz(mailbox, mailbox->msg_tree);
     else

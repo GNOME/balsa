@@ -35,6 +35,7 @@
  * in gtk2>=2.3.5 b. may expose some bugs in gtk.
  */
 #define TREE_VIEW_FIXED_HEIGHT 1
+#undef TREE_VIEW_FIXED_HEIGHT
 
 #include "config.h"
 
@@ -220,7 +221,8 @@ bndx_destroy(GtkObject * obj)
 	    libbalsa_mailbox_search_iter_free(index->search_iter);
 	    index->search_iter = NULL;
 	}
-        g_object_unref(index->mailbox_node);
+	g_object_weak_unref(G_OBJECT(index->mailbox_node),
+			    (GWeakNotify) gtk_widget_destroy, index);
 	index->mailbox_node = NULL;
     }
 
@@ -776,7 +778,8 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
      * set the new mailbox
      */
     index->mailbox_node = mbnode;
-    g_object_ref(G_OBJECT(mbnode));
+    g_object_weak_ref(G_OBJECT(mbnode),
+		      (GWeakNotify) gtk_widget_destroy, index);
     /*
      * rename "from" column to "to" for outgoing mail
      */
@@ -1370,6 +1373,9 @@ balsa_find_notebook_page_num(LibBalsaMailbox * mailbox)
     GtkWidget *page;
     guint i;
 
+    if (!balsa_app.notebook)
+	return -1;
+
     for (i = 0;
          (page =
           gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), i));
@@ -1622,7 +1628,7 @@ create_stock_menu_item(GtkWidget * menu, const gchar * type,
 static void
 sendmsg_window_destroy_cb(GtkWidget * widget, gpointer data)
 {
-    balsa_window_enable_continue();
+    balsa_window_enable_continue(balsa_app.main_window);
 }
 
 void

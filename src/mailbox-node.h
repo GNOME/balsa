@@ -57,6 +57,7 @@ typedef enum {
     MBNODE_STYLE_NEW_MAIL = 1 << 1,
     MBNODE_STYLE_UNREAD_MESSAGES = 1 << 2,
     MBNODE_STYLE_TOTAL_MESSAGES = 1 << 3,
+    MBNODE_STYLE_UNREAD_CHILD = 1 << 4
 } BalsaMailboxNodeStyle;
 
 struct _BalsaMailboxNode {
@@ -83,7 +84,7 @@ struct _BalsaMailboxNodeClass {
     void (*save_config) (BalsaMailboxNode * mn, const gchar * prefix);
     void (*load_config) (BalsaMailboxNode * mn, const gchar * prefix);
     GtkWidget* (*show_prop_dialog) (BalsaMailboxNode * mn);
-    void (*append_subtree) (BalsaMailboxNode * mn, GNode* root);
+    void (*append_subtree) (BalsaMailboxNode * mn);
 };
 
 GType balsa_mailbox_node_get_type(void);
@@ -98,13 +99,13 @@ BalsaMailboxNode *balsa_mailbox_node_new_from_config(const gchar* prefix);
 
 GtkWidget *balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode);
 void balsa_mailbox_node_show_prop_dialog(BalsaMailboxNode * mbnode);
-void balsa_mailbox_node_append_subtree(BalsaMailboxNode * mbnode, GNode *r);
+void balsa_mailbox_node_append_subtree(BalsaMailboxNode * mbnode);
 void balsa_mailbox_node_load_config(BalsaMailboxNode* mn, const gchar* prefix);
 void balsa_mailbox_node_save_config(BalsaMailboxNode* mn, const gchar* prefix);
 void balsa_mailbox_node_show_prop_dialog_cb(GtkWidget * widget, gpointer data);
 
 /* applicable only to local mailboxes (mailbox collections) */
-void balsa_mailbox_local_rescan_parent(LibBalsaMailbox* mbx);
+void balsa_mailbox_local_append(LibBalsaMailbox* mbx);
 /* applicable only to folders (mailbox collections) */
 void balsa_mailbox_node_rescan(BalsaMailboxNode* mn);
 /* applicable to any mailbox node */

@@ -147,7 +147,6 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
 {
     gboolean insert;
     LibBalsaServer *s;
-    GNode *gnode;
     const gchar *username;
     const gchar *host;
 
@@ -194,12 +193,8 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->list_inbox));
 
     if (insert) {
-        balsa_mailbox_nodes_lock(TRUE);
-        g_node_append(balsa_app.mailbox_nodes,
-                      gnode = g_node_new(fcw->mbnode));
-        balsa_mailbox_node_append_subtree(fcw->mbnode, gnode);
-        balsa_mailbox_nodes_unlock(TRUE);
-        balsa_mblist_repopulate(balsa_app.mblist_tree_store);
+	balsa_mblist_mailbox_node_append(NULL, fcw->mbnode);
+        balsa_mailbox_node_append_subtree(fcw->mbnode);
         config_folder_add(fcw->mbnode, NULL);
         update_mail_servers();
     } else {
@@ -370,6 +365,7 @@ browse_button_select_row_cb(GtkTreeSelection * selection,
                                       GTK_RESPONSE_OK, selected);
     if (selected)
         gtk_tree_model_get(model, &iter, 0, &bbd->mbnode, -1);
+    /* bbd->mbnode is unreffed when bbd is freed. */
 }
 
 static void
@@ -401,17 +397,30 @@ browse_button_response(GtkDialog * dialog, gint response,
 
 static gboolean
 folder_selection_func(GtkTreeSelection * selection, GtkTreeModel * model,
-                      GtkTreePath * path, gboolean path_currently_selected,
-                      SubfolderDialogData * sdd)
+		      GtkTreePath * path, gboolean path_currently_selected,
+		      SubfolderDialogData * sdd)
 {
     GtkTreeIter iter;
     BalsaMailboxNode *mbnode;
+    gboolean retval;
 
     gtk_tree_model_get_iter(model, &iter, path);
     gtk_tree_model_get(model, &iter, 0, &mbnode, -1);
+    retval = (mbnode->server
+	      && mbnode->server->type == LIBBALSA_SERVER_IMAP
+	      && (sdd->mbnode == NULL
+		  || sdd->mbnode->server == mbnode->server));
+    g_object_unref(mbnode);
 
-    return (mbnode->server && mbnode->server->type == LIBBALSA_SERVER_IMAP
-            && (sdd->mbnode == NULL || sdd->mbnode->server == mbnode->server));
+    return retval;
+}
+
+static void
+browse_button_data_free(BrowseButtonData *bbd)
+{
+    if (bbd->mbnode)
+	g_object_unref(bbd->mbnode);
+    g_free(bbd);
 }
 
 static void
@@ -453,7 +462,8 @@ browse_button_cb(GtkWidget * widget, SubfolderDialogData * sdd)
     bbd->dialog = GTK_DIALOG(dialog);
     bbd->button = widget;
     bbd->mbnode = NULL;
-    g_object_weak_ref(G_OBJECT(dialog), (GWeakNotify) g_free, bbd);
+    g_object_weak_ref(G_OBJECT(dialog),
+		      (GWeakNotify) browse_button_data_free, bbd);
     g_signal_connect(G_OBJECT(selection), "changed",
                      G_CALLBACK(browse_button_select_row_cb), bbd);
     g_signal_connect(G_OBJECT(tree_view), "row-activated",
@@ -542,22 +552,22 @@ folder, parent);
                 if (sdd->old_parent
                     && !strncmp(parent, sdd->old_parent, strlen(parent))) {
                     /* moved it up the tree */
-                    GNode *n = balsa_find_dir(balsa_app.mailbox_nodes,
-                                              parent);
-                    if (n)
-                        balsa_mailbox_node_rescan
-                            (BALSA_MAILBOX_NODE(n->data));
-                    else
+		    BalsaMailboxNode *mbnode = balsa_find_dir(parent);
+                    if (mbnode) {
+                        balsa_mailbox_node_rescan(mbnode);
+			g_object_unref(mbnode);
+		    } else
                         printf("Parent not found!?\n");
                 } else if (sdd->old_parent
                            && !strncmp(parent, sdd->old_parent,
                                        strlen(sdd->old_parent))) {
                     /* moved it down the tree */
-                    GNode *n = balsa_find_dir(balsa_app.mailbox_nodes,
-                                              sdd->old_parent);
-                    if (n)
-                        balsa_mailbox_node_rescan
-                            (BALSA_MAILBOX_NODE(n->data));
+		    BalsaMailboxNode *mbnode =
+			balsa_find_dir(sdd->old_parent);
+                    if (mbnode) {
+                        balsa_mailbox_node_rescan(mbnode);
+			g_object_unref(mbnode);
+		    }
                 } else {
                     /* moved it sideways: a chain of folders might
                      * go away, so we'd better rescan from higher up
@@ -694,7 +704,6 @@ void
 folder_conf_delete(BalsaMailboxNode* mbnode)
 {
     GtkWidget* ask;
-    GNode* gnode;
     gint response;
 
     if(!mbnode->config_prefix) {
@@ -724,21 +733,9 @@ folder_conf_delete(BalsaMailboxNode* mbnode)
     config_folder_delete(mbnode);
 
     /* Remove the node from balsa's mailbox list */
-    balsa_mailbox_nodes_lock(FALSE);
-    gnode = balsa_find_mbnode(balsa_app.mailbox_nodes, mbnode);
-    balsa_mailbox_nodes_unlock(FALSE);
-    if(gnode) {
-        balsa_mailbox_nodes_lock(TRUE);
-	balsa_remove_children_mailbox_nodes(gnode);
-        balsa_mailbox_nodes_unlock(TRUE);
-        balsa_mblist_remove_mailbox_node(balsa_app.mblist_tree_store,
-                                         mbnode);
-	g_node_unlink(gnode);
-	g_node_destroy(gnode);
-	g_object_unref(G_OBJECT(mbnode));
-	update_mail_servers();
-    } else g_warning("folder node %s (%p) not found in hierarchy.\n",
-		     mbnode->name, mbnode);
+    balsa_mblist_mailbox_node_remove(mbnode);
+    g_object_unref(G_OBJECT(mbnode));
+    update_mail_servers();
 }
 
 void

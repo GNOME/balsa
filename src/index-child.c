@@ -59,7 +59,6 @@ index_child_get_type ()
 
 /* callbacks */
 static void index_select_cb (GtkWidget * widget, Message * message, GdkEventButton *, gpointer data);
-static void index_button_press_cb (GtkWidget *, GdkEventButton *);
 static GtkWidget *create_menu (BalsaIndex * bindex, Message * message);
 
 /* menu item callbacks */
@@ -135,7 +134,6 @@ index_child_destroy (GtkObject * obj)
 static GtkWidget *
 index_child_create_view (GnomeMDIChild * child)
 {
-  GtkWidget *messagebox;
   GtkWidget *vpane;
   IndexChild *ic;
 
@@ -202,7 +200,7 @@ index_select_cb (GtkWidget * widget,
 
   /* this way we only display one message, not lots and lots */
   if (!handler)
-    handler = gtk_idle_add (idle_handler_cb, widget);
+    handler = gtk_idle_add ((GtkFunction)idle_handler_cb, widget);
 
 }
 
@@ -213,8 +211,6 @@ static GtkWidget *
 create_menu (BalsaIndex * bindex, Message * message)
 {
   GtkWidget *menu, *menuitem, *submenu, *smenuitem;
-  Mailbox *mailbox;
-  GList *list;
 
   menu = gtk_menu_new ();
   menuitem = gtk_menu_item_new_with_label (_ ("Transfer"));

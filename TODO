@@ -2,6 +2,13 @@ TODO LIST:
 
 For 0.4.5 release:
 
+ * mutt_error - message box
+ 
+ * fix it so you can add more than one mailbox
+     this appears to be caused by the fact that it is currently adding them
+     with the key "generic" which would then be duplicated, and/or overwritten
+     when adding a new mailbox.  this should be fixed shortly.
+
  * mailbox-conf - (is run from right clicking on the mailbox list).  This
    may need to use multiple windows, but I don't really want to do this.
    Adding mailboxes under a folder, should add them to that tree limb, and

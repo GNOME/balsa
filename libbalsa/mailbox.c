@@ -139,7 +139,7 @@ static Message *translate_message (HEADER * cur);
 static Address *translate_address (ADDRESS * caddr);
 
 static void
-do_mutt_error(gchar* str, ...)
+do_mutt_error(char* str, ...)
 {
   va_list ap;
   va_start(ap, str);
@@ -154,7 +154,6 @@ mailbox_init (gchar * inbox_path)
   struct utsname utsname;
   char *p;
   gchar *tmp;
-  gchar buffer[256];
 
   Spoolfile = inbox_path;
 
@@ -167,33 +166,9 @@ mailbox_init (gchar * inbox_path)
   Realname = g_get_real_name ();
 
   Hostname = g_get_host_name();
-  mutt_error = do_mutt_error;
-#if 0
-  /* some systems report the FQDN instead of just the hostname */
-  if ((p = strchr (utsname.nodename, '.')))
-    {
-      Hostname = mutt_substrdup (utsname.nodename, p);
-      p++;
-      strfcpy (buffer, p, sizeof (buffer));	/* save the domain for below */
-    }
-  else
-    Hostname = g_strdup (utsname.nodename);
 
-#ifndef DOMAIN
-#define DOMAIN buffer
-  if (!p && getdnsdomainname (buffer, sizeof (buffer)) == -1)
-    Fqdn = safe_strdup ("@");
-  else
-#endif /* DOMAIN */
-    {
-#ifdef HIDDEN_HOST
-      Fqdn = safe_strdup (DOMAIN);
-#else
-      Fqdn = safe_malloc (strlen (DOMAIN) + strlen (Hostname) + 2);
-      sprintf (Fqdn, "%s.%s", Hostname, DOMAIN);
-#endif /* HIDDEN_HOST */
-    }
-#endif
+  mutt_error = &do_mutt_error;
+
   Fqdn = g_strdup(Hostname);
 
   Sendmail = SENDMAIL;
@@ -1335,7 +1310,6 @@ message_body_ref (Message * message)
   Body *body;
   HEADER *cur;
   MESSAGE *msg;
-  BODY *b;
 
   if (!message)
     return;
@@ -1365,13 +1339,13 @@ message_body_ref (Message * message)
       BODY *bdy = cur->content;
 
       if (balsa_app.debug)
-	g_print (_ ("Loading message: %s/%s\n"), TYPE (b->type), b->subtype);
-      b = cur->content;
+	g_print (_ ("Loading message: %s/%s\n"), TYPE (bdy->type), bdy->subtype);
+
       if (balsa_app.debug)
 	{
 	  fprintf (stderr, "After loading message\n");
 	  fprintf (stderr, "header->mime    = %d\n", cur->mime);
-	  fprintf (stderr, "header->offset  = %d\n", cur->offset);
+	  fprintf (stderr, "header->offset  = %ld\n", cur->offset);
 	  fprintf (stderr, "header->content = %p\n", cur->content);
 	  fprintf (stderr, " \n\nDumping Message\n");
 	  fprintf (stderr, "Dumping a %s[%d] message\n",

@@ -27,12 +27,6 @@ GtkWidget *append_menuitem_connect (GtkMenu * menu,
 				    gpointer data,
 				    gpointer user_data);
 
-gchar *get_string_set_default (const char *path,
-			       const char *value);
-
-gint get_int_set_default (const char *path,
-			  const gint value);
-
 gint g_list_index (GList * list, gpointer data);
 
 gchar *address_to_gchar(Address *addr);

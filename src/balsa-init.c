@@ -179,7 +179,6 @@ create_welcome_page ()
 {
   GtkWidget *vbox;
   GtkWidget *text;
-  GtkWidget *label;
 
   gchar *buf;
 

@@ -70,53 +70,6 @@ mailbox_node_new (gchar * name, Mailbox * mb, gint i)
 }
 
 gchar *
-get_string_set_default (const char *path,
-			const char *value)
-{
-  GString *buffer;
-  gboolean unset;
-  gchar *result;
-
-  result = NULL;
-  buffer = g_string_new (NULL);
-
-  if (value)
-    {
-      g_string_sprintf (buffer, "%s=%s", path, value);
-      result = gnome_config_get_string_with_default (buffer->str, &unset);
-    }
-  else
-    result = gnome_config_get_string_with_default (path, &unset);
-
-  if (unset)
-    gnome_config_set_string (path, value);
-
-  g_string_free (buffer, 1);
-  return result;
-}
-
-
-gint
-get_int_set_default (const char *path,
-		     const gint value)
-{
-  GString *buffer;
-  gboolean unset;
-  gint result;
-
-  result = 0;
-  buffer = g_string_new (NULL);
-
-  g_string_sprintf (buffer, "%s=%d", path, value);
-  result = gnome_config_get_int_with_default (buffer->str, &unset);
-  if (unset)
-    gnome_config_set_int (path, value);
-
-  g_string_free (buffer, 1);
-  return result;
-}
-
-gchar *
 g_get_host_name (void)
 {
   struct utsname utsname;

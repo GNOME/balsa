@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1998-08-23 10:18-0400\n"
+"POT-Creation-Date: 1998-08-23 12:51-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -79,33 +79,33 @@ msgstr ""
 msgid "SMTP server:"
 msgstr ""
 
-#: src/balsa-init.c:307
+#: src/balsa-init.c:308
 msgid "Inbox Path:"
 msgstr ""
 
-#: src/balsa-init.c:315
+#: src/balsa-init.c:320
 msgid "Outbox Path:"
 msgstr ""
 
-#: src/balsa-init.c:323
+#: src/balsa-init.c:332
 msgid "Trash Path:"
 msgstr ""
 
-#: src/balsa-init.c:331
+#: src/balsa-init.c:343
 msgid ""
 "If you wish to use IMAP for these\n"
 "please change them inside Balsa\n"
 msgstr ""
 
-#: src/balsa-init.c:349
+#: src/balsa-init.c:361
 msgid "Balsa is now ready to run.  Click finish to save your settings"
 msgstr ""
 
-#: src/balsa-init.c:353
+#: src/balsa-init.c:365
 msgid "Finish"
 msgstr ""
 
-#: src/balsa-init.c:405
+#: src/balsa-init.c:417
 msgid "Invalid Mailbox!"
 msgstr ""
 
@@ -150,16 +150,22 @@ msgstr ""
 msgid "Local Mailbox Loaded as: %s\n"
 msgstr ""
 
-#: src/mailbox-conf.c:119
+#: src/mailbox-conf.c:107
+msgid ""
+"This will remove the mailbox permanently.\n"
+"Are you sure you want to delete this mailbox?"
+msgstr ""
+
+#: src/mailbox-conf.c:150
 msgid "Mailbox Configurator"
 msgstr ""
 
-#: src/mailbox-conf.c:330
+#: src/mailbox-conf.c:366
 #, c-format
 msgid "Cannot create mailbox '%s': %s\n"
 msgstr ""
 
-#: src/mailbox-conf.c:331
+#: src/mailbox-conf.c:367
 msgid "Cancel"
 msgstr ""
 
@@ -316,12 +322,16 @@ msgid ""
 "http://www.gnome.org/cgi-bin/bugs"
 msgstr ""
 
-#: src/mblist-window.c:474
+#: src/mblist-window.c:485
 msgid "Add Mailbox"
 msgstr ""
 
-#: src/mblist-window.c:479
+#: src/mblist-window.c:491
 msgid "Edit Mailbox"
+msgstr ""
+
+#: src/mblist-window.c:497
+msgid "Delete Mailbox"
 msgstr ""
 
 #. identity page
@@ -392,17 +402,17 @@ msgstr ""
 msgid "Forward message"
 msgstr ""
 
-#: libbalsa/mailbox.c:473
+#: libbalsa/mailbox.c:460
 #, c-format
 msgid "Mailbox: Opening %s Refcount: %d\n"
 msgstr ""
 
-#: libbalsa/mailbox.c:498
+#: libbalsa/mailbox.c:485
 #, c-format
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr ""
 
-#: libbalsa/mailbox.c:1356
+#: libbalsa/mailbox.c:1342
 #, c-format
 msgid "Loading message: %s/%s\n"
 msgstr ""

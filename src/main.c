@@ -53,16 +53,16 @@ balsa_exit ()
     {
       mailbox = list->data;
       list = list->next;
-
-      g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
+      if (balsa_app.debug)
+	g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
 
       while (mailbox->open_ref > 0)
 	mailbox_open_unref (mailbox);
     }
 
 #if 0
-  gtk_timeout_remove(balsa_app.check_mail_timer);
-  gtk_timeout_remove(balsa_app.new_messages_timer);
+  gtk_timeout_remove (balsa_app.check_mail_timer);
+  gtk_timeout_remove (balsa_app.new_messages_timer);
 #endif
 
   save_global_settings ();

@@ -32,3 +32,6 @@ struct _addyb_item
     GList *email;
     gchar *comments;
   };
+
+
+AddressBook *addressbook_read_pine (gchar *);

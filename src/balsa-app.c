@@ -22,6 +22,7 @@
 #include <unistd.h>
 
 #include "balsa-app.h"
+#include "addrbook.h"
 #include "balsa-index.h"
 #include "balsa-init.h"
 #include "local-mailbox.h"
@@ -84,6 +85,8 @@ init_balsa_app (int argc, char *argv[])
   load_local_mailboxes ();
   my_special_mailbox ();
 
+  addressbook_read_pine("/home/pavlov/.addressbook");
+  
   /* start timers */
 #if 0
   balsa_app.new_messages_timer = gtk_timeout_add (5, check_for_new_messages, NULL);

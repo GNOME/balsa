@@ -38,21 +38,21 @@
 
 typedef struct _MainWindow MainWindow;
 struct _MainWindow
-{
-  GtkWidget *window;
-  GtkWidget *menubar;
-  GtkWidget *toolbar;
-  GtkWidget *mailbox_option_menu;
-  GtkWidget *mailbox_menu;
-  GtkWidget *move_menu;
-  GtkWidget *index;
-  GtkWidget *message_area;
-  GtkWidget *status_bar;
+  {
+    GtkWidget *window;
+    GtkWidget *menubar;
+    GtkWidget *toolbar;
+    GtkWidget *mailbox_option_menu;
+    GtkWidget *mailbox_menu;
+    GtkWidget *move_menu;
+    GtkWidget *index;
+    GtkWidget *message_area;
+    GtkWidget *status_bar;
 
-  /* non-widgets */
-  Mailbox *mailbox;
-  guint watcher_id;
-};
+    /* non-widgets */
+    Mailbox *mailbox;
+    guint watcher_id;
+  };
 static MainWindow *mw = NULL;
 
 static gint about_box_visible = FALSE;
@@ -91,7 +91,7 @@ static void mailbox_select_cb (GtkWidget * widget);
 
 static void about_box_destroy_cb ();
 
-static void mailbox_listener (MailboxWatcherMessage *mw_message);
+static void mailbox_listener (MailboxWatcherMessage * mw_message);
 
 
 void
@@ -279,7 +279,7 @@ refresh_main_window ()
 
     }
   gtk_option_menu_set_menu (GTK_OPTION_MENU (mw->mailbox_option_menu), mw->mailbox_menu);
-  
+
   /* now set the mailbox-menu back to it's previous state */
   if (mw->mailbox)
     main_window_set_mailbox (mw->mailbox);
@@ -837,9 +837,9 @@ mailbox_select_cb (GtkWidget * widget)
   if (mailbox == mainwindow->mailbox)
     return;
 
-  watcher_id = mailbox_watcher_set (mailbox, 
-				    (MailboxWatcherFunc) mailbox_listener, 
-				    MESSAGE_NEW_MASK, 
+  watcher_id = mailbox_watcher_set (mailbox,
+				    (MailboxWatcherFunc) mailbox_listener,
+				    MESSAGE_NEW_MASK,
 				    (gpointer) mainwindow);
 
   /* try to open the new mailbox */
@@ -884,8 +884,9 @@ about_box_destroy_cb ()
 
 
 
-void 
-mailbox_listener (MailboxWatcherMessage *mw_message)
+void
+mailbox_listener (MailboxWatcherMessage * mw_message)
 {
-  g_print ("%s\n", mw_message->message->subject);
+  if (balsa_app.debug)
+    g_print ("%s\n", mw_message->message->subject);
 }

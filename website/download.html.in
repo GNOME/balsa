@@ -64,7 +64,7 @@
 	<td colspan="2"><p>&nbsp;</p></td>
 </tr>
 <tr>
-	<td colspan="2">Daniele Cruciani's <a href="http://www.cli.di.unipi.it/~cruciani/Package/">Debian package</a> (experimental).</td>
+	<td colspan="2"><a href="http://www.cli.di.unipi.it/~cruciani/Package/">Daniele Cruciani's</a> or <a href="http://www.tvec.net/users/wabbit/">Randall Gibson's</a> Debian package (experimental).</td>
 </tr>
 <tr>
 	<td colspan="2"><p>&nbsp;</p></td>
@@ -76,15 +76,15 @@
 	<th colspan="2" align=left><big>Experimental release</big></th>
 </tr>
 <tr>
-<td colspan="2"><b>2000.08.06</b>: This is pretty much all we have in CVS: new
+<td colspan="2"><b>2000.08.15</b>: This is pretty much all we have in CVS: new
 message browser, improved address book handling, more reliable mailbox
 backend, alias expansion. The code has however some experimental and unfinished
 features enabled so be warned! The POP problems some people
-experienced have not been really addressed yet.</p>
+experienced have been adressed only partially.</p>
 <ul>
-<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.1.tar.gz">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.1.tar.gz</a>
-<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.1-1.src.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.1-1.src.rpm</a>
-<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.1-1.i386.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.1-1.i386.rpm</a>
+<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.2.tar.gz">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.2.tar.gz</a>
+<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.2-1.src.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.2-1.src.rpm</a>
+<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.2-1.i386.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.2-1.i386.rpm</a>
 </ul>
 </td>
 </tr>

@@ -198,14 +198,15 @@ libbalsa_mailbox_imap_update_url(LibBalsaMailboxImap* mailbox)
 {
     LibBalsaServer* s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
     g_free(LIBBALSA_MAILBOX(mailbox)->url);
-    LIBBALSA_MAILBOX(mailbox)->url =  g_strdup_printf("imap%s://%s:%i/%s", 
+    LIBBALSA_MAILBOX(mailbox)->url =  
+        g_strdup_printf("imap%s://%s:%i/%s", 
 #ifdef USE_SSL
-						      s->use_ssl ? "s" : "",
+                        s->use_ssl ? "s" : "",
 #else
-						      "",
+                        "",
 #endif
-						      s->host, s->port, 
-						      mailbox->path);
+                        s->host, s->port, 
+                        mailbox->path? mailbox->path : "");
 }
 
 /* Unregister an old notification and add a current one */

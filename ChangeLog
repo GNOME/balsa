@@ -1,6 +1,7 @@
 2001-10-18  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/send.c: fix libmutt locking (Emmanuel).
+	* libbalsa/mailbox_imap.c: fix #62555.
 
 	Philip Van Hoof <freax@pandora.be>:
 	* src/balsa-index.c: a View Source right mouse button menu entry.

@@ -52,6 +52,7 @@
 struct _LibBalsaMailboxImap {
     LibBalsaMailboxRemote mailbox;
     ImapMboxHandle *handle;     /* stream that has this mailbox selected */
+    guint handle_refs;		/* reference counter */
 
     gchar *path;		/* Imap local path (third part of URL) */
     ImapAuthType auth_type;	/* accepted authentication type */
@@ -246,7 +247,8 @@ libbalsa_mailbox_imap_init(LibBalsaMailboxImap * mailbox)
     mailbox->matching_messages = NULL;
     mailbox->op = FILTER_NOOP;
     mailbox->conditions = NULL;
-
+    mailbox->handle = NULL;
+    mailbox->handle_refs = 0;
 }
 
 /* libbalsa_mailbox_imap_finalize:
@@ -472,7 +474,10 @@ libbalsa_mailbox_imap_get_handle(LibBalsaMailboxImap *mimap)
             return NULL;
         imap_server = LIBBALSA_IMAP_SERVER(server);
         mimap->handle = libbalsa_imap_server_get_handle(imap_server);
-    }
+	mimap->handle_refs = 1;
+    } else
+	++mimap->handle_refs;
+
     return mimap->handle;
 }
 
@@ -556,6 +561,28 @@ imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
     }
 }
 
+#ifdef BALSA_USE_THREADS
+static pthread_mutex_t imap_handle_lock = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t imap_handle_cond = PTHREAD_COND_INITIALIZER;
+#endif				/* BALSA_USE_THREADS */
+
+static void
+libbalsa_mailbox_imap_release_handle(LibBalsaMailboxImap * mimap)
+{
+    g_assert(mimap->handle != NULL);
+    g_assert(mimap->handle_refs > 0);
+
+    if (--mimap->handle_refs == 0) {
+	RELEASE_HANDLE(mimap, mimap->handle);
+	mimap->handle = NULL;
+#ifdef BALSA_USE_THREADS
+	pthread_mutex_lock(&imap_handle_lock);
+	pthread_cond_broadcast(&imap_handle_cond);
+	pthread_mutex_unlock(&imap_handle_lock);
+#endif				/* BALSA_USE_THREADS */
+    }
+}
+
 static ImapMboxHandle *
 libbalsa_mailbox_imap_get_selected_handle(LibBalsaMailboxImap *mimap)
 {
@@ -571,7 +598,15 @@ libbalsa_mailbox_imap_get_selected_handle(LibBalsaMailboxImap *mimap)
 	return NULL;
     imap_server = LIBBALSA_IMAP_SERVER(server);
     if(mimap->handle)
-        RELEASE_HANDLE(mimap, mimap->handle);
+        libbalsa_mailbox_imap_release_handle(mimap);
+
+#ifdef BALSA_USE_THREADS
+    pthread_mutex_lock(&imap_handle_lock);
+    while (mimap->handle)
+	pthread_cond_wait(&imap_handle_cond, &imap_handle_lock);
+    pthread_mutex_unlock(&imap_handle_lock);
+#endif				/* BALSA_USE_THREADS */
+
     mimap->handle =
         libbalsa_imap_server_get_handle_with_user(imap_server, mimap);
     if (!mimap->handle)
@@ -601,6 +636,7 @@ libbalsa_mailbox_imap_get_selected_handle(LibBalsaMailboxImap *mimap)
     g_signal_connect(G_OBJECT(mimap->handle),
                      "expunge-notify", G_CALLBACK(imap_expunge_cb),
                      mimap);
+    mimap->handle_refs = 1;
     return mimap->handle;
 }
 
@@ -706,6 +742,7 @@ libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox)
 	    mbox->op = FILTER_NOOP;
 	}
 	free_messages_info(mbox);
+	libbalsa_mailbox_imap_release_handle(mbox);
     }
 }
 
@@ -721,7 +758,7 @@ get_cache_stream(LibBalsaMailbox *mailbox, unsigned uid)
     uidval = imap_mbox_handle_get_validity(mimap->handle);
 
     cache_name = get_cache_name(mimap, "body");
-    msg_name   = g_strdup_printf("%s/%u", cache_name, uidval);
+    msg_name   = g_strdup_printf("%s/%u-%u", cache_name, uidval, uid);
     stream = fopen(msg_name,"rb");
     if(!stream) {
         FILE *cache;
@@ -761,6 +798,8 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
 
     stream = get_cache_stream(mailbox, IMAP_MESSAGE_UID(message));
     gmime_stream = g_mime_stream_file_new(stream);
+    g_mime_stream_set_bounds(gmime_stream, 0,
+			     g_mime_stream_length(gmime_stream));
     return gmime_stream;
 }
 
@@ -1121,7 +1160,7 @@ libbalsa_imap_rename_subfolder(LibBalsaMailboxImap* imap,
 	rc = imap_mbox_subscribe(handle, new_path, TRUE);
     g_free(new_path);
 
-    RELEASE_HANDLE(imap, handle);
+    libbalsa_mailbox_imap_release_handle(imap);
     return rc == IMR_OK;
 }
 
@@ -1163,7 +1202,7 @@ libbalsa_imap_delete_folder(LibBalsaMailboxImap *mailbox)
     imap_mbox_subscribe(handle, mailbox->path, FALSE);
     imap_mbox_delete(handle, mailbox->path);
 
-    RELEASE_HANDLE(mailbox, handle);
+    libbalsa_mailbox_imap_release_handle(mailbox);
 }
 
 gchar *
@@ -1627,7 +1666,7 @@ libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
 				 imap_flags, outstream);
     g_mime_stream_unref(outstream);
 
-    RELEASE_HANDLE(mailbox, handle);
+    libbalsa_mailbox_imap_release_handle(LIBBALSA_MAILBOX_IMAP(mailbox));
 
     g_object_unref ( G_OBJECT(message ) );    
     UNLOCK_MAILBOX(mailbox);

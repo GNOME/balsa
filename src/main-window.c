@@ -507,9 +507,6 @@ balsa_window_new ()
   /* set the toolbar style */
   balsa_window_refresh(window);
 
-  if (balsa_app.check_mail_upon_startup)
-    check_new_messages_cb(NULL, NULL);
-
   /* we can only set icon after realization, as we have no windows before. */
   gtk_signal_connect (GTK_OBJECT (window), "realize",
 		      GTK_SIGNAL_FUNC (set_icon), NULL);
@@ -560,6 +557,9 @@ balsa_window_new ()
   gtk_widget_show(hpaned);
   gtk_widget_show(window->notebook);
   gtk_widget_show(preview);
+
+  if (balsa_app.check_mail_upon_startup)
+    check_new_messages_cb(NULL, NULL);
 
   if(balsa_app.browse_wrap)
      gtk_check_menu_item_set_active(
@@ -872,11 +872,15 @@ check_new_messages_auto_cb (gpointer data)
   return TRUE;
 }
 
+/* check_new_messages_cb:
+   check new messages in inbox, or in the Mailbox given as extra data,
+   if not NULL
+*/
 static void
 check_new_messages_cb (GtkWidget * widget, gpointer data)
 {
   GtkWidget *index = NULL;
-  Mailbox *mbox;
+  Mailbox *mbox = NULL;
 
   if(data)
     {
@@ -886,8 +890,6 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
       else
 	mbox = balsa_app.inbox;
     }
-  else
-    mbox = balsa_app.inbox;
 
 
 #ifdef BALSA_USE_THREADS
@@ -940,12 +942,14 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
 #else
   check_all_pop3_hosts (balsa_app.inbox, balsa_app.inbox_input); 
   check_all_imap_hosts (balsa_app.inbox, balsa_app.inbox_input);
-  mailbox_check_new_messages( mbox );
-  if(mbox !=balsa_app.inbox)
-     load_messages (balsa_app.inbox, 1);
+
+  if( mbox )
+     mailbox_check_new_messages( mbox );
+  /* if(mbox != balsa_app.inbox)
+     load_messages (balsa_app.inbox, 1); */
   /* "There can be only one" - can one of them be removed? */
   balsa_mblist_have_new (balsa_app.mblist);
-  if(mblist_get_selected_mailbox() == mbox)
+  if(mbox && mblist_get_selected_mailbox() == mbox)
      balsa_mblist_update_mailbox(balsa_app.mblist, mbox); 
 #endif
 }
@@ -971,7 +975,7 @@ check_messages_thread( Mailbox *mbox )
 
   MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, NULL, "Local Mail", 0,0);
 
-  if( CLIENT_CONTEXT_OPEN(mbox)) {
+  if( mbox && CLIENT_CONTEXT_OPEN(mbox)) {
     mailbox_check_new_messages( mbox );
     MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_LOAD, mbox, mbox->name, 0,0 );
   }

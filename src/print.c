@@ -31,6 +31,7 @@
 #include <libgnomeprint/gnome-print.h>
 #include <libgnomeprint/gnome-font.h>
 
+#include <libgnomeprintui/gnome-font-dialog.h>
 #ifdef HAVE_LGPRINT22
 #  include <libgnomeprint/gnome-print-job.h>
 #  include <libgnomeprintui/gnome-print-job-preview.h>
@@ -110,11 +111,11 @@ typedef struct _CommonInfo CommonInfo;
 struct _FontInfo {
     gchar **font_name;
     GnomeFont *font;
+    GtkWidget* font_status, *name_label;
     CommonInfo *common_info;
 };
 
 struct _CommonInfo {
-    GHashTable *font_table;
     FontInfo header_font_info;
     FontInfo body_font_info;
     FontInfo footer_font_info;
@@ -979,41 +980,14 @@ scan_body(PrintInfo * pi, LibBalsaMessageBody * body)
 
 /*
  * get the GnomeFont from a name returned by the font picker
- *
- * if this looks ugly, it's because it is! 
- * the font picker returns lower case names, but gnome_font_find uses a
- * case-sensitive hash table lookup, so we have to find the correct name
- * for ourselves
- * also, the name is the face (e.g. "helvetica") with the weight (e.g.
- * "medium") appended, so we have to progressively strip off such words
- * and keep checking
+ * libgnomeui-2.2, gtk-2.2, libgnomeprint-2.2
+ * gnome_font_picker returns "URW Palladio L, Bold 12",
+ * gnome_font_find_by_name expects "URW Palladio L Bold 12".
  */
 static GnomeFont *
-find_font(const gchar * name, GHashTable * font_table)
+find_font(const gchar * name)
 {
-    gchar *copy = g_strdup(name);
-    gchar *p;
-    gdouble size;
-    GnomeFont *font = NULL;
-    gchar *found = NULL;
-
-    p = strrchr(copy, ' ');
-    if (p) {
-        size = atof(p + 1);
-        do {
-            *p = 0;
-            found = g_hash_table_lookup(font_table, copy);
-        } while (!found && (p = strrchr(copy, ' ')));
-    } else {
-        size = 12;
-        found = g_hash_table_lookup(font_table, copy);
-    }
-
-    if (found)
-        font = gnome_font_find(found, size);
-    g_free(copy);
-
-    return font;
+    return gnome_font_find_from_full_name(name);
 }
 
 static gdouble
@@ -1153,18 +1127,53 @@ set_dialog_buttons_sensitive(CommonInfo * ci)
                                       sensitive);
 }
 
+static void
+set_font_status(FontInfo *fi)
+{
+    gtk_label_set_text(GTK_LABEL(fi->name_label), *fi->font_name);
+    if(fi->font) 
+	gtk_label_set_text(GTK_LABEL(fi->font_status),
+			   _("Font available for printing"));
+    else {
+	GnomeFont* fncl = 
+	    gnome_font_find_closest_from_full_name(*fi->font_name);
+	gchar* fn = gnome_font_get_full_name(fncl);
+	gchar *msg = 
+	    g_strdup_printf(_("Font <b>not</b> available for printing. "
+			      "Closest: %s"), fn);
+
+	gtk_label_set_markup(GTK_LABEL(fi->font_status), msg);
+	g_free(fn); g_free(msg);
+    }
+}
 /*
- * callback for the font picker's "font-set" signal
+ * callback for the button's font change signal.
  */
 static void
-font_set_cb(GtkWidget * widget, const gchar * font_name, FontInfo *fi)
+font_change_cb(GtkWidget * widget, FontInfo *fi)
 {
-    g_free(*fi->font_name);
-    *fi->font_name = g_strdup(font_name);
-    if (fi->font)
-        g_object_unref(G_OBJECT(fi->font));
-    fi->font = find_font(font_name, fi->common_info->font_table);
-    set_dialog_buttons_sensitive(fi->common_info);
+    GtkWidget* dialog = gnome_font_dialog_new(_("Select Font"));
+    GtkWidget* fontsel = 
+	gnome_font_dialog_get_fontsel(GNOME_FONT_DIALOG(dialog));
+    if(fi->font) {
+	gnome_font_selection_set_font(GNOME_FONT_SELECTION(fontsel), 
+				      fi->font);
+    } else {
+	printf("font unknown\n");
+    }
+    switch(gtk_dialog_run(GTK_DIALOG(dialog))) {
+    case GTK_RESPONSE_OK: 
+	g_free(*fi->font_name);
+	if(fi->font) gnome_font_unref(fi->font);
+	fi->font = 
+	    gnome_font_selection_get_font(GNOME_FONT_SELECTION(fontsel));
+	*fi->font_name = gnome_font_get_full_name(fi->font);
+	set_font_status(fi);
+	set_dialog_buttons_sensitive(fi->common_info);
+	break;
+    default: break;
+    }
+    gtk_widget_destroy(dialog);
 }
 
 /*
@@ -1174,15 +1183,21 @@ static GtkWidget *
 font_frame(gchar * title, FontInfo * fi)
 {
     GtkWidget  *frame = gtk_frame_new(title);
-    GtkWidget *widget = gnome_font_picker_new();
+    GtkWidget *vbox    = gtk_vbox_new(FALSE, 3);
+    GtkWidget *hbox    = gtk_hbox_new(FALSE, 3);
+    GtkWidget *button = gtk_button_new_with_label(_("Change..."));
 
-    gnome_font_picker_set_font_name(GNOME_FONT_PICKER(widget), *fi->font_name);
-    gnome_font_picker_set_preview_text(GNOME_FONT_PICKER(widget), title);
-    gnome_font_picker_set_mode(GNOME_FONT_PICKER(widget),
-                               GNOME_FONT_PICKER_MODE_FONT_INFO);
-    g_signal_connect(G_OBJECT(widget), "font-set", 
-                     G_CALLBACK(font_set_cb), fi);
-    gtk_container_add(GTK_CONTAINER(frame), widget);
+    fi->name_label = gtk_label_new(*fi->font_name);
+    gtk_box_pack_start(GTK_BOX(hbox), fi->name_label, TRUE, TRUE, 5);
+    gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 5);
+    g_signal_connect(G_OBJECT(button), "clicked", 
+		     G_CALLBACK(font_change_cb), fi);
+
+    gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 5);
+    gtk_container_add(GTK_CONTAINER(frame), vbox);
+    fi->font_status = gtk_label_new("");
+    set_font_status(fi);
+    gtk_box_pack_start(GTK_BOX(vbox), fi->font_status, TRUE, TRUE, 3);
     gtk_container_set_border_width(GTK_CONTAINER(frame), 3);
 
     return frame;
@@ -1241,23 +1256,6 @@ print_dialog(CommonInfo * ci)
 }
 
 /*
- * functions for a case-insensitive hash table
- */
-static guint
-strcase_hash(const gchar * key) {
-    gchar *tmp = g_ascii_strdown(key, -1);
-    guint ret_val = g_str_hash(tmp);
-    g_free(tmp);
-    return ret_val;
-}
-
-static gboolean
-strcase_equal(const gchar * a, const gchar * b)
-{
-    return g_ascii_strcasecmp(a, b) == 0;
-}
-
-/*
  * the FontInfo structure contains info used in the "font-set" callback
  * that's specific to a font, and a pointer to the CommonInfo structure
  */
@@ -1266,7 +1264,7 @@ font_info_setup(FontInfo * fi, gchar ** font_name, CommonInfo * ci)
 {
     fi->font_name = font_name;
     fi->common_info = ci;
-    fi->font = find_font(*font_name, ci->font_table);
+    fi->font = find_font(*font_name);
     if (!fi->font)
 	balsa_information(LIBBALSA_INFORMATION_ERROR,
 			  _("Balsa could not find font \"%s\".\n"
@@ -1288,17 +1286,8 @@ font_info_cleanup(FontInfo * fi)
 static void
 common_info_setup(CommonInfo * ci)
 {
-    GList *list;
-
-    ci->font_table = g_hash_table_new((GHashFunc)  strcase_hash,
-                                      (GEqualFunc) strcase_equal);
-    for (list = gnome_font_list(); list; list = g_list_next(list)) {
-        gchar *name = list->data;
-        g_hash_table_insert(ci->font_table, name, name);
-    }
-
     font_info_setup(&ci->header_font_info, &balsa_app.print_header_font, ci);
-    font_info_setup(&ci->body_font_info, &balsa_app.print_body_font, ci);
+    font_info_setup(&ci->body_font_info,   &balsa_app.print_body_font,   ci);
     font_info_setup(&ci->footer_font_info, &balsa_app.print_footer_font, ci);
 }
 
@@ -1309,7 +1298,6 @@ common_info_setup(CommonInfo * ci)
 static void
 common_info_destroy(CommonInfo * ci)
 {
-    g_hash_table_destroy(ci->font_table);
     font_info_cleanup(&ci->header_font_info);
     font_info_cleanup(&ci->body_font_info);
     font_info_cleanup(&ci->footer_font_info);

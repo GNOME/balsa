@@ -1,3 +1,8 @@
+2003-01-28  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/print.c: fix Bug 104586
+	* src/balsa-app.h: change print font defaults.
+
 2003-01-27  PeterB
 
 	* src/main-window.c: Grab focus to the mailbox index when opening

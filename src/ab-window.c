@@ -232,8 +232,6 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     /* The address book selection menu */
 #if GTK_CHECK_VERSION(2, 4, 0)
     combo_box = gtk_combo_box_new_text();
-    g_signal_connect(combo_box, "changed",
-                     G_CALLBACK(balsa_ab_window_menu_changed), ab);
 #else
     ab_menu = gtk_menu_new();
 #endif /* GTK_CHECK_VERSION(2, 4, 0) */
@@ -271,6 +269,8 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 	ab_list = g_list_next(ab_list);
     }
 #if GTK_CHECK_VERSION(2, 4, 0)
+    g_signal_connect(combo_box, "changed",
+                     G_CALLBACK(balsa_ab_window_menu_changed), ab);
     if (balsa_app.address_book_list->next)
 	/* More than one address book. */
 	gtk_widget_show(combo_box);

@@ -264,7 +264,6 @@ balsa_message_set (BalsaMessage * bmessage,
   fprintf (stderr, buff);
 #endif
 
-
   /* set message contents */
   gtk_xmhtml_source (GTK_XMHTML (GTK_BIN (bmessage)->child), buff);
   g_free (buff);

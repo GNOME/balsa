@@ -257,6 +257,9 @@ restore_global_settings ()
   /* toolbar style */
   balsa_app.toolbar_style = get_int_set_default ("toolbar style", (gint) balsa_app.toolbar_style);
 
+  /* debuging */
+  balsa_app.debug = get_int_set_default ("debug", (gint) balsa_app.debug);
+
 
   /* save changes */
   gnome_config_pop_prefix ();
@@ -276,6 +279,7 @@ save_global_settings ()
   gnome_config_set_string ("smtp server", balsa_app.smtp_server);
   gnome_config_set_string ("local mail directory", balsa_app.local_mail_directory);
   gnome_config_set_int ("toolbar style", (gint) balsa_app.toolbar_style);
+  gnome_config_set_int ("debug", (gint) balsa_app.debug);
 
   gnome_config_pop_prefix ();
   gnome_config_sync ();

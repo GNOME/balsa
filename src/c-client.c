@@ -118,68 +118,80 @@ mm_exists (MAILSTREAM * stream,
 void
 mm_expunged (MAILSTREAM * stream, unsigned long number)
 {
-#ifdef DEBUG
-#endif
+  if (balsa_app.debug)
+    {
+
+    }
 }
 
 
 void
 mm_flags (MAILSTREAM * stream, unsigned long number)
 {
-#ifdef DEBUG
-  g_print ("Flags changed for message number: %d\n", number);
-#endif
+  if (balsa_app.debug)
+    {
+      g_print ("Flags changed for message number: %d\n", number);
+    }
 }
 
 
 void
 mm_notify (MAILSTREAM * stream, char *string, long errflg)
 {
-#ifdef DEBUG
-  g_print ("%s\n", string);
-#endif
+  if (balsa_app.debug)
+    {
+      g_print ("%s\n", string);
+    }
 }
 
 
 void
 mm_list (MAILSTREAM * stream, int delimiter, char *mailbox, long attributes)
 {
-#ifdef DEBUG
-#endif
+  if (balsa_app.debug)
+    {
+
+    }
 }
 
 
 void
 mm_lsub (MAILSTREAM * stream, int delimiter, char *mailbox, long attributes)
 {
-#ifdef DEBUG
-#endif
+  if (balsa_app.debug)
+    {
+
+    }
 }
 
 
 void
 mm_status (MAILSTREAM * stream, char *mailbox, MAILSTATUS * status)
 {
-#ifdef DEBUG
-#endif
+  if (balsa_app.debug)
+    {
+
+    }
 }
 
 
 void
 mm_log (char *string, long errflg)
 {
-#ifdef DEBUG
-  g_print ("%s\n", string);
-#endif
+  if (balsa_app.debug)
+    {
+      g_print ("%s\n", string);
+    }
 }
 
 
 void
 mm_dlog (char *string)
 {
-#ifdef DEBUG
-  g_print ("%s\n", string);
-#endif
+  if (balsa_app.debug)
+    {
+      g_print ("%s\n", string);
+    }
 }
 
 
@@ -216,18 +228,20 @@ mm_login (NETMBX * mb, char *user, char *pwd, long trial)
 void
 mm_critical (MAILSTREAM * stream)
 {
-#ifdef DEBUG
-  g_print ("fixing to do some critical stuff to mail stream, do not interupt\n");
-#endif
+  if (balsa_app.debug)
+    {
+      g_print ("fixing to do some critical stuff to mail stream, do not interupt\n");
+    }
 }
 
 
 void
 mm_nocritical (MAILSTREAM * stream)
 {
-#ifdef DEBUG
-  g_print ("no longer in critical mode\n");
-#endif
+  if (balsa_app.debug)
+    {
+      g_print ("no longer in critical mode\n");
+    }
 }
 
 
@@ -241,7 +255,8 @@ mm_diskerror (MAILSTREAM * stream, long errcode, long serious)
 void
 mm_fatal (char *string)
 {
-#ifdef DEBUG
-  g_print ("%s\n", string);
-#endif
+  if (balsa_app.debug)
+    {
+      g_print ("%s\n", string);
+    }
 }

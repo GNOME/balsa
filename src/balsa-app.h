@@ -65,6 +65,8 @@ extern struct BalsaApplication
   /* GUI settings */
   GtkToolbarStyle toolbar_style;
 
+
+  gint debug;
 }
 balsa_app;
 

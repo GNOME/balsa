@@ -85,7 +85,7 @@ mailboxes_init (void)
   gint num;
   gint i;
 
-  gnome_config_get_vector("/balsa/Global/Accounts", &num, &mailboxes);
+  gnome_config_get_vector ("/balsa/Global/Accounts", &num, &mailboxes);
 
   for (i = 0; num > i; i++)
     {
@@ -126,9 +126,8 @@ setup_local_mailboxes ()
 	    {
 	      if (drv = mail_valid (NIL, g_strdup (filename), "error, cannot load. darn"))
 		{
-#ifdef DEBUG
-		     printf("%s - %s\n", d->d_name, drv->name);
-#endif
+		  if (balsa_app.debug)
+		    printf ("%s - %s\n", d->d_name, drv->name);
 		  if (!strcmp (drv->name, "mbx"))
 		    {
 		      mbx = (MailboxMBX *) mailbox_new (MAILBOX_MBX);
@@ -137,8 +136,7 @@ setup_local_mailboxes ()
 
 		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbx);
 		    }
-
-		  if (!strcmp (drv->name, "mbox"))
+		  else if (!strcmp (drv->name, "mbox"))
 		    {
 		      mbox = (MailboxMBox *) mailbox_new (MAILBOX_MBOX);
 		      mbox->name = g_strdup (d->d_name);
@@ -146,7 +144,7 @@ setup_local_mailboxes ()
 
 		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbox);
 		    }
-		  if (!strcmp (drv->name, "unix"))
+		  else if (!strcmp (drv->name, "unix"))
 		    {
 		      unixmb = (MailboxUNIX *) mailbox_new (MAILBOX_UNIX);
 		      unixmb->name = g_strdup (d->d_name);
@@ -182,37 +180,37 @@ my_special_mailbox ()
 
 
 
-   MailboxPOP3 *pop3;
-   MailboxMBX *mbx;
-   MailboxMH *mh;
+  MailboxPOP3 *pop3;
+  MailboxMBX *mbx;
+  MailboxMH *mh;
 
-   pop3 = (MailboxPOP3 *) mailbox_new (MAILBOX_POP3);
-   pop3->name = g_strdup ("MyPOP Box");
-   pop3->user = g_strdup ("pavlov");
-   pop3->passwd = g_strdup ("");
-   pop3->server = g_strdup ("venus");
+  pop3 = (MailboxPOP3 *) mailbox_new (MAILBOX_POP3);
+  pop3->name = g_strdup ("MyPOP Box");
+  pop3->user = g_strdup ("pavlov");
+  pop3->passwd = g_strdup ("");
+  pop3->server = g_strdup ("venus");
 
-   balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, pop3);
+  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, pop3);
 
-   mh = (MailboxMH *) mailbox_new (MAILBOX_MH);
-   mh->name = g_strdup ("gnome-list");
-   mh->path = g_strdup ("gnome");
-   balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mh);
+  mh = (MailboxMH *) mailbox_new (MAILBOX_MH);
+  mh->name = g_strdup ("gnome-list");
+  mh->path = g_strdup ("gnome");
+  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mh);
 
-   mbx = (MailboxMBX *) mailbox_new (MAILBOX_MBX);
-   mbx->name = g_strdup ("gnome-list-mbx");
-   mbx->path = g_strdup ("/home/pavlov/gnomecvs.mbx");
-   balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbx);
+  mbx = (MailboxMBX *) mailbox_new (MAILBOX_MBX);
+  mbx->name = g_strdup ("gnome-list-mbx");
+  mbx->path = g_strdup ("/home/pavlov/gnomecvs.mbx");
+  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbx);
 
-   mh = (MailboxMH *) mailbox_new (MAILBOX_MH);
-   mh->name = g_strdup ("Gnome CVS");
-   mh->path = g_strdup ("gnomecvs");
-   balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mh);
+  mh = (MailboxMH *) mailbox_new (MAILBOX_MH);
+  mh->name = g_strdup ("Gnome CVS");
+  mh->path = g_strdup ("gnomecvs");
+  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mh);
 
-   mh = (MailboxMH *) mailbox_new (MAILBOX_MH);
-   mh->name = g_strdup ("gtk-list");
-   mh->path = g_strdup ("gtk+");
-   balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mh);
+  mh = (MailboxMH *) mailbox_new (MAILBOX_MH);
+  mh->name = g_strdup ("gtk-list");
+  mh->path = g_strdup ("gtk+");
+  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mh);
 
 #endif
 }

@@ -38,10 +38,14 @@ struct _PreferencesManagerWindow
 
 
   /* view */
+     /* toolbar */
   GtkWidget *toolbar_text;
   GtkWidget *toolbar_icons;
   GtkWidget *toolbar_both;
 
+
+     /* misc */
+  GtkWidget *debug;
 
   /* non-widgets */
   GtkToolbarStyle toolbar_style;
@@ -60,6 +64,7 @@ static void ok_preferences_manager ();
 static void cancel_preferences_manager ();
 
 static void set_toolbar_style_cb (GtkWidget * widget, gpointer data);
+static void set_debug_cb (GtkWidget * widget, gpointer data);
 
 
 
@@ -292,6 +297,7 @@ refresh_preferences_manager ()
       break;
     }
 
+    gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (pmw->debug), balsa_app.debug);
 
 }
 
@@ -421,7 +427,7 @@ create_view_page ()
   gtk_container_border_width (GTK_CONTAINER (vbox), 10);
   gtk_widget_show (vbox);
 
-
+/* Toolbars */
   frame = gtk_frame_new ("Toolbars");
   gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
   gtk_widget_show (frame);
@@ -480,6 +486,30 @@ create_view_page ()
   gtk_widget_show (pmw->toolbar_both);
 
 
+/* Misc */
+  frame = gtk_frame_new ("Misc");
+  gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
+  gtk_widget_show (frame);
+
+
+  table = gtk_table_new (2, 1, FALSE);
+  gtk_container_border_width (GTK_CONTAINER (table), 5);
+  gtk_container_add (GTK_CONTAINER (frame), table);
+  gtk_widget_show (table);
+
+
+  pmw->debug = gtk_check_button_new_with_label ("Debug");
+  gtk_table_attach (GTK_TABLE (table), pmw->debug, 0, 1, 0, 1,
+		    GTK_FILL, GTK_FILL | GTK_EXPAND, 
+		    0, 0);
+
+  gtk_signal_connect (GTK_OBJECT (pmw->debug),
+		      "toggled",
+		      (GtkSignalFunc) set_debug_cb,
+		      NULL);
+
+  gtk_widget_show (pmw->debug);
+
   return vbox;
 }
 
@@ -499,3 +529,16 @@ set_toolbar_style_cb (GtkWidget * widget, gpointer data)
 
   pref->toolbar_style = (GtkToolbarStyle) data;
 }
+
+
+/*
+ * callbacks
+ */
+static void
+set_debug_cb (GtkWidget * widget, gpointer data)
+{
+  g_return_if_fail (widget != NULL);
+
+  balsa_app.debug = GTK_TOGGLE_BUTTON(widget)->active;
+}
+

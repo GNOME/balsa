@@ -71,7 +71,7 @@
 
 2004-02-11 21:48  PeterB
 
-	* src/balsa-message.c: possible fix for bug #109252.
+	* src/balsa-message.c: possible fix for bug #134173.
 	* libbalsa/send.c: msg_queue_item_new() doesn't need to set
 	LibBalsaMessage; use libbalsa_mailbox_get_message() instead of
 	LIBBALSA_MAILBOX_LOCAL(outbox)->msg_list; lock/unlock only if

@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -85,7 +85,7 @@ static void set_the_page(GtkWidget * button, AddressBookConfig * abc);
 static GtkWidget*
 add_button(const char* butt, GtkWidget* bbox, GtkSignalFunc cb, gpointer abc)
 {
-    GtkWidget* button = gnome_stock_button(butt);
+    GtkWidget* button = gtk_button_new_from_stock(butt);
     gtk_signal_connect(GTK_OBJECT(button), "clicked", cb, abc);
     gtk_container_add(GTK_CONTAINER(bbox), button);
     gtk_widget_show(button);
@@ -112,7 +112,7 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
     GtkWidget *bbox;
     GtkWidget *button;
     GtkWidget *page;
-    gchar *name;
+    const gchar *name;
     gint num;
 
     abc = g_new0(AddressBookConfig, 1);
@@ -143,12 +143,15 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
 
     if (address_book == NULL) {
 	abc->continue_button = 
-	    add_button(GNOME_STOCK_BUTTON_NEXT, bbox, next_button_cb, abc);
+	    add_button(GNOME_STOCK_BUTTON_NEXT, bbox,
+                       GTK_SIGNAL_FUNC(next_button_cb), abc);
 	page = create_choice_page(abc);
     } else {
 	GtkWidget *pixmap;
-	pixmap = gnome_stock_pixmap_widget(NULL, GNOME_STOCK_PIXMAP_SAVE);
-	button = gnome_pixmap_button(pixmap, _("Update"));
+	button = gtk_button_new_with_label(_("Update"));
+	pixmap = gtk_image_new_from_stock(GNOME_STOCK_PIXMAP_SAVE,
+                                          GTK_ICON_SIZE_BUTTON);
+	gtk_container_add(GTK_CONTAINER(button), pixmap);
 	gtk_container_add(GTK_CONTAINER(bbox), button);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
 			   (GtkSignalFunc) update_button_cb,
@@ -177,8 +180,10 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
     num = gtk_notebook_page_num(GTK_NOTEBOOK(abc->notebook), page);
     gtk_notebook_set_page(GTK_NOTEBOOK(abc->notebook), num);
 
-    add_button(GNOME_STOCK_BUTTON_CANCEL, bbox, cancel_button_cb, abc);
-    add_button(GNOME_STOCK_BUTTON_HELP,   bbox, help_button_cb,   abc);
+    add_button(GNOME_STOCK_BUTTON_CANCEL, bbox,
+               GTK_SIGNAL_FUNC(cancel_button_cb), abc);
+    add_button(GNOME_STOCK_BUTTON_HELP,   bbox,
+               GTK_SIGNAL_FUNC(help_button_cb),   abc);
 
     gtk_widget_show_all(abc->notebook);
     if (address_book)
@@ -222,10 +227,10 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
             g_free(path);
 #ifdef ENABLE_LDAP
 	} else if (abc->create_type == LIBBALSA_TYPE_ADDRESS_BOOK_LDAP) {
-	    gchar *host_name =
+	    const gchar *host_name =
 		gtk_entry_get_text(GTK_ENTRY
 				   (abc->ab_specific.ldap.host_name));
-	    gchar *base_dn =
+	    const gchar *base_dn =
 		gtk_entry_get_text(GTK_ENTRY
 				   (abc->ab_specific.ldap.base_dn));
 	    address_book =
@@ -288,10 +293,10 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
 #ifdef ENABLE_LDAP
 	} else if (LIBBALSA_IS_ADDRESS_BOOK_LDAP(address_book)) {
 	    LibBalsaAddressBookLdap *ldap;
-	    gchar *host_name =
+	    const gchar *host_name =
 		gtk_entry_get_text(GTK_ENTRY
 				   (abc->ab_specific.ldap.host_name));
-	    gchar *base_dn =
+	    const gchar *base_dn =
 		gtk_entry_get_text(GTK_ENTRY
 				   (abc->ab_specific.ldap.base_dn));
 
@@ -625,10 +630,8 @@ set_the_page(GtkWidget * button, AddressBookConfig * abc)
 static void
 help_button_cb(GtkWidget * button, AddressBookConfig * abc)
 {
-    static GnomeHelpMenuEntry help_entry = { NULL, NULL };
-    help_entry.name = gnome_app_id;
-    help_entry.path = abc->help_path;
-    gnome_help_display(NULL, &help_entry);
+    GError *error;
+    gnome_help_display_uri(abc->help_path, &error);
 }
 
 static void
@@ -648,8 +651,10 @@ next_button_cb(GtkWidget * button, AddressBookConfig * abc)
     bbox = GNOME_DIALOG(abc->window)->action_area;
 
     gtk_widget_destroy(abc->continue_button);
-    pixmap = gnome_stock_pixmap_widget(NULL, GNOME_STOCK_PIXMAP_NEW);
-    abc->continue_button = gnome_pixmap_button(pixmap, _("Add"));
+    abc->continue_button = gtk_button_new_with_label(_("Add"));
+    pixmap = gtk_image_new_from_stock(GNOME_STOCK_PIXMAP_NEW,
+                                      GTK_ICON_SIZE_BUTTON);
+    gtk_container_add(GTK_CONTAINER(abc->continue_button), pixmap);
     gtk_signal_connect(GTK_OBJECT(abc->continue_button), "clicked",
 		       GTK_SIGNAL_FUNC(add_button_cb), (gpointer) abc);
 

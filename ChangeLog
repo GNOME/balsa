@@ -1,3 +1,10 @@
+2002-02-24  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/Makefile.am, src/address-book-config.c,
+	src/address-book.[hc], src/spell-check.[ch]: src directory Gnome2
+	porting work	
+	* libbalsa/send.c: extra signal callback type cast.
+
 2002-02-22  Pawel Salek <pawsa@theochem.kth.se>
 
 	* autogen.sh, configure.in: previouse updates were not universal.

@@ -79,7 +79,8 @@ balsa_SOURCES = $(balsa_BASE_SRCLIST) $(balsa_IDL_SRCLIST)
 INCLUDES = \
 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\" \
 	-I$(top_srcdir) \
-	-I$(top_srcdir)/libbalsa
+	-I$(top_srcdir)/libbalsa \
+	$(BALSA_CFLAGS)
 
 balsa_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a	\

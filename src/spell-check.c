@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -99,6 +99,8 @@ static void balsa_spell_check_fix(BalsaSpellCheck * spell_check,
 				  gboolean fix_al);
 static void balsa_spell_check_learn(BalsaSpellCheck * spell_check,
 				    LearnType learn);
+static void balsa_iter_move(GtkTextIter *iter, gint chars);
+static void balsa_spell_check_set_highlight(BalsaSpellCheck * spell_check);
 
 
 /* marshallers */
@@ -122,8 +124,9 @@ balsa_spell_check_get_type()
 	    sizeof(BalsaSpellCheckClass),
 	    (GtkClassInitFunc) balsa_spell_check_class_init,
 	    (GtkObjectInitFunc) balsa_spell_check_init,
-	    (GtkArgSetFunc) NULL,
-	    (GtkArgGetFunc) NULL
+	    (gpointer) NULL,
+	    (gpointer) NULL,
+	    (GtkClassInitFunc) NULL
 	};
 
 	balsa_spell_check_type =
@@ -164,13 +167,10 @@ balsa_spell_check_class_init(BalsaSpellCheckClass * klass)
 
     balsa_spell_check_signals[DONE_SPELLCHECK] =
 	gtk_signal_new("done-spell-check", GTK_RUN_LAST,
-		       object_class->type,
+		       balsa_spell_check_get_type(),
 		       GTK_SIGNAL_OFFSET(BalsaSpellCheckClass,
 					 done_spell_check),
 		       gtk_marshal_NONE__NONE, GTK_TYPE_NONE, 0);
-
-    gtk_object_class_add_signals(object_class, balsa_spell_check_signals,
-				 LAST_SIGNAL);
 
     object_class->destroy = balsa_spell_check_destroy;
     object_class->set_arg = balsa_spell_check_set_arg;
@@ -272,13 +272,13 @@ balsa_spell_check_new(void)
  * Create a new spell check widget, assigning the GtkText to check.
  * */
 GtkWidget *
-balsa_spell_check_new_with_text(GtkText * check_text)
+balsa_spell_check_new_with_text(GtkTextView * check_text)
 {
     BalsaSpellCheck *spell_check;
 
     spell_check =
 	BALSA_SPELL_CHECK(gtk_type_new(balsa_spell_check_get_type()));
-    spell_check->text = check_text;
+    spell_check->view = check_text;
 
     return GTK_WIDGET(spell_check);
 }
@@ -290,12 +290,12 @@ balsa_spell_check_new_with_text(GtkText * check_text)
  * */
 void
 balsa_spell_check_set_text(BalsaSpellCheck * spell_check,
-			   GtkText * check_text)
+			   GtkTextView * check_text)
 {
     g_return_if_fail(check_text != NULL);
-    g_return_if_fail(GTK_IS_TEXT(check_text));
+    g_return_if_fail(GTK_IS_TEXT_VIEW(check_text));
 
-    spell_check->text = check_text;
+    spell_check->view = check_text;
 }
 
 
@@ -307,11 +307,13 @@ void
 balsa_spell_check_set_font(BalsaSpellCheck * spell_check,
 			   GdkFont * text_font)
 {
+    /* GtkTextBuffer doesn't seem to know about fonts!
     if (spell_check->font)
 	gdk_font_unref(spell_check->font);
 
     spell_check->font = text_font;
     gdk_font_ref(spell_check->font);
+    */
 }
 
 
@@ -424,20 +426,9 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
     const guint padding = 4;
 
     /* Set spell checker */
-    spell_check->highlight_colour = g_malloc0(sizeof(GdkColor));
-    spell_check->highlight_colour->red = 65535;
-    spell_check->highlight_colour->green = 0;
-    spell_check->highlight_colour->blue = 0;
+    balsa_spell_check_set_highlight(spell_check);
 
-    gdk_colormap_alloc_color(balsa_app.colormap,
-			     spell_check->highlight_colour, TRUE, TRUE);
-
-    spell_check->font = NULL;
-    spell_check->start_pos = 0;
-    spell_check->end_pos = 0;
-    spell_check->length = 0;
     spell_check->original_text = NULL;
-    spell_check->original_pos = 0;
     spell_check->word_list = NULL;
     spell_check->suggestions = NULL;
 
@@ -523,7 +514,7 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
 			 _("Finish spell checking"), NULL);
     gtk_box_pack_end(GTK_BOX(vbox1), done, FALSE, FALSE, 0);
 
-    cancel = gnome_stock_button(GNOME_STOCK_BUTTON_CANCEL);
+    cancel = gtk_button_new_from_stock(GNOME_STOCK_BUTTON_CANCEL);
     gtk_tooltips_set_tip(balsa_app.tooltips, cancel,
 			 _("Revert all changes and finish spell checking"),
 			 NULL);
@@ -725,6 +716,8 @@ balsa_spell_check_start(BalsaSpellCheck * spell_check)
 {
     PspellCanHaveError *spell_error;
     gchar *string;
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(spell_check->view);
+    GtkTextIter start, end;
 
 
     /* Config the spell check */
@@ -767,14 +760,15 @@ balsa_spell_check_start(BalsaSpellCheck * spell_check)
     spell_check->spell_config =
 	pspell_manager_config(spell_check->spell_manager);
 
-    gtk_text_set_editable(spell_check->text, FALSE);
-    spell_check->original_pos =
-	gtk_editable_get_position(GTK_EDITABLE(spell_check->text));
+    gtk_text_view_set_editable(GTK_TEXT_VIEW(spell_check->view), FALSE);
+    spell_check->original_mark =
+        gtk_text_buffer_get_insert(buffer);
 
     /* Get the original text so we can always revert */
+    gtk_text_buffer_get_start_iter(buffer, &start);
+    gtk_text_buffer_get_end_iter(buffer, &end);
     spell_check->original_text =
-	gtk_editable_get_chars(GTK_EDITABLE(spell_check->text), 0, -1);
-    spell_check->length = strlen(spell_check->original_text);
+	gtk_text_buffer_get_text(buffer, &start, &end, TRUE);
 
     if (balsa_app.debug)
 	balsa_information(LIBBALSA_INFORMATION_DEBUG,
@@ -794,8 +788,7 @@ balsa_spell_check_start(BalsaSpellCheck * spell_check)
 static void
 balsa_spell_check_next(BalsaSpellCheck * spell_check)
 {
-    gchar *word;
-
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(spell_check->view);
 
     if (!next_word(spell_check)) {
 	balsa_spell_check_finish(spell_check, TRUE);
@@ -811,23 +804,13 @@ balsa_spell_check_next(BalsaSpellCheck * spell_check)
 
     /* replace the current word with the same word in a different
      * colour */
-    gtk_text_freeze(spell_check->text);
-    word = gtk_editable_get_chars(GTK_EDITABLE(spell_check->text),
-				  spell_check->start_pos,
-				  spell_check->end_pos);
-    gtk_text_set_point(spell_check->text, spell_check->start_pos);
-
-    gtk_text_forward_delete(spell_check->text,
-			    spell_check->end_pos - spell_check->start_pos);
-    gtk_text_insert(spell_check->text, spell_check->font,
-		    spell_check->highlight_colour, NULL,
-		    word, spell_check->end_pos - spell_check->start_pos);
-    g_free(word);
+    gtk_text_buffer_apply_tag_by_name(buffer, "highlight",
+                                      &spell_check->start_iter,
+                                      &spell_check->end_iter);
 
     /* scroll text window to show current word */
-    gtk_text_thaw(spell_check->text);
-    gtk_editable_set_position(GTK_EDITABLE(spell_check->text),
-			      spell_check->start_pos);
+    gtk_text_view_scroll_to_iter(GTK_TEXT_VIEW(spell_check->view),
+                                 &spell_check->start_iter, 0.1, FALSE, 0, 0);
 }
 
 
@@ -840,12 +823,13 @@ static void
 balsa_spell_check_learn(BalsaSpellCheck * spell_check,
 			LearnType learn_type)
 {
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(spell_check->view);
     gchar *word;
     gint result;
 
-    word = gtk_editable_get_chars(GTK_EDITABLE(spell_check->text),
-				  spell_check->start_pos,
-				  spell_check->end_pos);
+    word =
+        gtk_text_buffer_get_text(buffer, &spell_check->start_iter,
+                                 &spell_check->end_iter, FALSE);
 
     if (balsa_app.debug)
 	balsa_information(LIBBALSA_INFORMATION_DEBUG,
@@ -888,17 +872,17 @@ balsa_spell_check_learn(BalsaSpellCheck * spell_check,
 static void
 balsa_spell_check_fix(BalsaSpellCheck * spell_check, gboolean fix_all)
 {
-    gchar *new_word = NULL;
-    gchar *old_word = NULL;
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(spell_check->view);
+    gchar *new_word;
+    gchar *old_word;
     gchar *wrong_word = NULL;
-    gint saved_start_pos;
-    gint saved_end_pos;
+    GtkTextIter saved_start_iter;
+    GtkTextIter saved_end_iter;
 
 
-    new_word = NULL;
-    old_word = gtk_editable_get_chars(GTK_EDITABLE(spell_check->text),
-				      spell_check->start_pos,
-				      spell_check->end_pos);
+    old_word =
+        gtk_text_buffer_get_text(buffer, &spell_check->start_iter,
+                                 &spell_check->end_iter, FALSE);
     new_word = gtk_editable_get_chars(GTK_EDITABLE(spell_check->entry),
 				      0, -1);
 
@@ -926,30 +910,27 @@ balsa_spell_check_fix(BalsaSpellCheck * spell_check, gboolean fix_all)
 			  "BalsaSpellCheck: Replace %s with %s\n",
 			  old_word, new_word);
 
-    gtk_text_freeze(spell_check->text);
     switch_word(spell_check, old_word, new_word);
 
 
     if (fix_all) {
-	saved_start_pos = spell_check->start_pos;
-	saved_end_pos = spell_check->end_pos;
+	saved_start_iter = spell_check->start_iter;
+	saved_end_iter = spell_check->end_iter;
 
 	while (next_word(spell_check)) {
-	    wrong_word =
-		gtk_editable_get_chars(GTK_EDITABLE(spell_check->text),
-				       spell_check->start_pos,
-				       spell_check->end_pos);
+            wrong_word =
+                gtk_text_buffer_get_text(buffer, &spell_check->start_iter,
+                                         &spell_check->end_iter, FALSE);
 	    if (g_strcasecmp(old_word, wrong_word) == 0) {
 		switch_word(spell_check, wrong_word, new_word);
 	    }
 	    g_free(wrong_word);
 	}
 
-	spell_check->start_pos = saved_start_pos;
-	spell_check->end_pos = saved_end_pos;
+	spell_check->start_iter = saved_start_iter;
+	spell_check->end_iter = saved_end_iter;
     }
 
-    gtk_text_thaw(spell_check->text);
     g_free(new_word);
     g_free(old_word);
     finish_check(spell_check);
@@ -999,7 +980,8 @@ void
 balsa_spell_check_finish(BalsaSpellCheck * spell_check,
 			 gboolean keep_changes)
 {
-    gint length;
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(spell_check->view);
+    GtkTextIter original;
 
 
     finish_check(spell_check);
@@ -1008,15 +990,7 @@ balsa_spell_check_finish(BalsaSpellCheck * spell_check,
 	pspell_manager_save_all_word_lists(spell_check->spell_manager);
     } else {
 	/* replace corrected text with original text */
-	gtk_text_freeze(spell_check->text);
-	length = gtk_text_get_length(spell_check->text);
-	gtk_text_set_point(spell_check->text, 0);
-	gtk_text_forward_delete(spell_check->text, length);
-	gtk_text_insert(spell_check->text, spell_check->font,
-			NULL, NULL,
-			spell_check->original_text,
-			strlen(spell_check->original_text));
-	gtk_text_thaw(spell_check->text);
+        gtk_text_buffer_set_text(buffer, spell_check->original_text, -1);
     }
 
     g_free(spell_check->original_text);
@@ -1026,13 +1000,11 @@ balsa_spell_check_finish(BalsaSpellCheck * spell_check,
     delete_pspell_manager(spell_check->spell_manager);
     spell_check->spell_manager = NULL;
 
-    gtk_editable_set_position(GTK_EDITABLE(spell_check->text),
-			      spell_check->original_pos);
+    gtk_text_buffer_get_iter_at_mark(buffer, &original,
+                                     spell_check->original_mark);
+    gtk_text_buffer_place_cursor(buffer, &original);
 
-    gtk_text_set_editable(spell_check->text, TRUE);
-    spell_check->start_pos = 0;
-    spell_check->end_pos = 0;
-    spell_check->length = 0;
+    gtk_text_view_set_editable(spell_check->view, TRUE);
 
     if (balsa_app.debug)
 	balsa_information(LIBBALSA_INFORMATION_DEBUG,
@@ -1087,12 +1059,13 @@ static gboolean
 check_word(BalsaSpellCheck * spell_check)
 {
     gboolean correct;
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(spell_check->view);
     gchar *word = NULL;
 
 
-    word = gtk_editable_get_chars(GTK_EDITABLE(spell_check->text),
-				  spell_check->start_pos,
-				  spell_check->end_pos);
+    word = gtk_text_buffer_get_text(buffer,
+				    &spell_check->start_iter,
+				    &spell_check->end_iter, FALSE);
 
     if (word) {
 
@@ -1138,7 +1111,7 @@ check_word(BalsaSpellCheck * spell_check)
 static void
 finish_check(BalsaSpellCheck * spell_check)
 {
-    gchar *word;
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(spell_check->view);
 
     /* get rid of the suggestions */
     gtk_clist_freeze(spell_check->list);
@@ -1151,18 +1124,9 @@ finish_check(BalsaSpellCheck * spell_check)
     spell_check->suggestions = NULL;
 
     /* we need to make sure there's no highlighted text left */
-    gtk_text_freeze(spell_check->text);
-    word = gtk_editable_get_chars(GTK_EDITABLE(spell_check->text),
-				  spell_check->start_pos,
-				  spell_check->end_pos);
-    gtk_text_set_point(spell_check->text, spell_check->start_pos);
-    gtk_text_forward_delete(spell_check->text,
-			    spell_check->end_pos - spell_check->start_pos);
-    gtk_text_insert(spell_check->text, spell_check->font,
-		    NULL, NULL,
-		    word, spell_check->end_pos - spell_check->start_pos);
-    g_free(word);
-    gtk_text_thaw(spell_check->text);
+    gtk_text_buffer_remove_tag_by_name(buffer, "highlight",
+                                       &spell_check->start_iter,
+                                       &spell_check->end_iter);
 }
 
 
@@ -1194,6 +1158,8 @@ check_pspell_errors(PspellManager * manager)
 static gboolean
 next_word(BalsaSpellCheck * spell_check)
 {
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(spell_check->view);
+    GtkTextIter end;
     regex_t quoted_rex;
     gchar *text;
     gchar *line;
@@ -1250,9 +1216,10 @@ next_word(BalsaSpellCheck * spell_check)
     }
 
     /* get the message text */
-    spell_check->start_pos = spell_check->end_pos;
-    text = gtk_editable_get_chars(GTK_EDITABLE(spell_check->text),
-				  spell_check->end_pos, -1);
+    spell_check->start_iter = spell_check->end_iter;
+    gtk_text_buffer_get_end_iter(buffer, &end);
+    text = gtk_text_buffer_get_text(buffer, &spell_check->end_iter,
+                                    &end, FALSE);
 
     /* skip quoted text */
     line_array_base = g_strsplit(text, "\n", -1);
@@ -1292,12 +1259,12 @@ next_word(BalsaSpellCheck * spell_check)
 	pcre_exec(new_word_rex, NULL, line, line_len, 0, 0, rm ,3);
 
 	if (rm[0] == rm[1]) {
-	    spell_check->start_pos += line_len + offset;
-	    spell_check->end_pos += line_len + offset;
+            balsa_iter_move(&spell_check->start_iter, line_len + offset);
+            balsa_iter_move(&spell_check->end_iter, line_len + offset);
 	    in_line = FALSE;
 	} else {
-	    spell_check->start_pos += (rm[0] + offset);
-	    spell_check->end_pos += (rm[1] + offset);
+            balsa_iter_move(&spell_check->start_iter, rm[0] + offset);
+            balsa_iter_move(&spell_check->end_iter, rm[0] + offset);
 	    in_line = TRUE;
 	}
 #else
@@ -1306,12 +1273,12 @@ next_word(BalsaSpellCheck * spell_check)
 	regexec(new_word_rex, line, 1, &rm, 0);
 
 	if (rm.rm_so == rm.rm_eo) {
-	    spell_check->start_pos += line_len + offset;
-	    spell_check->end_pos += line_len + offset;
+            balsa_iter_move(&spell_check->start_iter, line_len + offset);
+            balsa_iter_move(&spell_check->end_iter, line_len + offset);
 	    in_line = FALSE;
 	} else {
-	    spell_check->start_pos += (rm.rm_so + offset);
-	    spell_check->end_pos += (rm.rm_eo + offset);
+            balsa_iter_move(&spell_check->start_iter, rm[0] + offset);
+            balsa_iter_move(&spell_check->end_iter, rm[0] + offset);
 	    in_line = TRUE;
 	}
 #endif
@@ -1327,16 +1294,17 @@ next_word(BalsaSpellCheck * spell_check)
 
     /* check to see if we're at the end yet */
     if (!at_end) {
-	if (spell_check->end_pos >= spell_check->length)
+        if (!gtk_text_iter_get_char(&spell_check->end_iter))
 	    at_end = TRUE;
-	else if (spell_check->start_pos == spell_check->end_pos)
+	else if (gtk_text_iter_get_offset(&spell_check->start_iter)
+                 == gtk_text_iter_get_offset(&spell_check->end_iter))
 	    at_end = !next_word(spell_check);
     }
 
     if (at_end) {
 	in_line = FALSE;
-	spell_check->start_pos = spell_check->length;
-	spell_check->end_pos = spell_check->length;
+        gtk_text_buffer_get_end_iter(buffer, &spell_check->end_iter);
+        spell_check->start_iter = spell_check->end_iter;
 	return FALSE;
     } else {
 	return !at_end;
@@ -1354,6 +1322,7 @@ static void
 switch_word(BalsaSpellCheck * spell_check, const gchar * old_word,
 	    const gchar * new_word)
 {
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(spell_check->view);
     gint old_length;
     gint new_length;
     gint drift;
@@ -1364,16 +1333,44 @@ switch_word(BalsaSpellCheck * spell_check, const gchar * old_word,
     /* calculate the difference in lengths between the new
      * and old word
      * */
-    old_length = spell_check->end_pos - spell_check->start_pos;
+    old_length =
+        gtk_text_iter_get_offset(&spell_check->end_iter) -
+        gtk_text_iter_get_offset(&spell_check->start_iter);
     new_length = strlen(new_word);
     drift = new_length - old_length;
-    spell_check->end_pos += drift;
-    spell_check->original_pos += drift;
-    spell_check->length += drift;
+    balsa_iter_move(&spell_check->end_iter, drift);
 
     /* remove and replace the current word. */
-    gtk_text_set_point(spell_check->text, spell_check->start_pos);
-    gtk_text_forward_delete(spell_check->text, old_length);
-    gtk_text_insert(spell_check->text, spell_check->font, NULL,
-		    NULL, new_word, new_length);
+    gtk_text_buffer_delete(buffer, &spell_check->start_iter,
+                           &spell_check->end_iter);
+    gtk_text_buffer_insert(buffer, &spell_check->start_iter, new_word, -1);
+}
+
+/*
+ * balsa_iter_move:
+ *   convenience function for moving a GtkTextIter.
+ */
+static void
+balsa_iter_move(GtkTextIter * iter, gint chars)
+{
+    GtkTextBuffer *buffer = gtk_text_iter_get_buffer(iter);
+    gint offset = gtk_text_iter_get_offset(iter);
+    offset += chars;
+    gtk_text_buffer_get_iter_at_offset(buffer, iter, offset);
+}
+
+/*
+ * balsa_spell_check_set_highlight:
+ *   make sure the spell-check has a highlighting tag.
+ */
+static void
+balsa_spell_check_set_highlight(BalsaSpellCheck * spell_check)
+{
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(spell_check->view);
+    GtkTextTagTable *table = gtk_text_buffer_get_tag_table(buffer);
+    GtkTextTag *tag = gtk_text_tag_table_lookup(table, "highlight");
+
+    if (!tag)
+        gtk_text_buffer_create_tag(buffer, "highlight",
+                                   "foreground", "red", NULL);
 }

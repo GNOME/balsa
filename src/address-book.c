@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -222,7 +222,8 @@ balsa_address_book_init(BalsaAddressBook *ab)
 	gtk_object_set_data(GTK_OBJECT(menu_item), "address-book",
 			    address_book);
 	gtk_signal_connect(GTK_OBJECT(menu_item), "activate",
-			   balsa_address_book_menu_changed, ab);
+			   GTK_SIGNAL_FUNC(balsa_address_book_menu_changed), 
+                           ab);
 	
 	if (address_book == balsa_app.default_address_book)
 	    gtk_menu_set_active(GTK_MENU(ab_menu), default_offset);
@@ -283,8 +284,8 @@ balsa_address_book_init(BalsaAddressBook *ab)
     
     /* FIXME: Can make a stock button in one call... */
     w = gtk_button_new();
-    stock_widget = gnome_stock_pixmap_widget(GTK_WIDGET(ab),
-					     GNOME_STOCK_PIXMAP_FORWARD);
+    stock_widget = gtk_image_new_from_stock(GNOME_STOCK_PIXMAP_FORWARD,
+                                            GTK_ICON_SIZE_BUTTON);
     gtk_container_add(GTK_CONTAINER(w), stock_widget);
     gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
     gtk_widget_show(stock_widget);
@@ -295,8 +296,8 @@ balsa_address_book_init(BalsaAddressBook *ab)
     
     w = gtk_button_new();
     gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
-    stock_widget = gnome_stock_pixmap_widget(GTK_WIDGET(ab),
-					     GNOME_STOCK_PIXMAP_BACK);
+    stock_widget = gtk_image_new_from_stock(GNOME_STOCK_PIXMAP_BACK,
+                                            GTK_ICON_SIZE_BUTTON);
     gtk_container_add(GTK_CONTAINER(w), stock_widget);
     gtk_widget_show(stock_widget);
     gtk_widget_show(w);
@@ -326,16 +327,20 @@ balsa_address_book_init(BalsaAddressBook *ab)
     gtk_hbutton_box_set_layout_default(GTK_BUTTONBOX_START);
     gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
     gtk_widget_show(GTK_WIDGET(hbox));
-    stock_widget = gnome_stock_pixmap_widget(GTK_WIDGET(ab), GNOME_STOCK_PIXMAP_OPEN);
-    w = gnome_pixmap_button(stock_widget, _("Run GnomeCard"));
+    stock_widget = gtk_image_new_from_stock(GNOME_STOCK_PIXMAP_OPEN,
+                                            GTK_ICON_SIZE_BUTTON);
+    w = gtk_button_new_with_label(_("Run GnomeCard"));
+    gtk_container_add(GTK_CONTAINER(w), stock_widget);
     gtk_signal_connect(GTK_OBJECT(w), "clicked",
 		       GTK_SIGNAL_FUNC(balsa_address_book_run_gnomecard), NULL);
     gtk_container_add(GTK_CONTAINER(hbox), w);
     gtk_widget_show(GTK_WIDGET(w));
 
     /* FIXME: Should strive to not need this?? */
-    stock_widget = gnome_stock_pixmap_widget(GTK_WIDGET(ab), GNOME_STOCK_PIXMAP_ADD);
-    w =	gnome_pixmap_button(stock_widget, _("Re-Import"));
+    stock_widget = gtk_image_new_from_stock(GNOME_STOCK_PIXMAP_ADD,
+                                            GTK_ICON_SIZE_BUTTON);
+    w = gtk_button_new_with_label(_("Re-Import"));
+    gtk_container_add(GTK_CONTAINER(w), stock_widget);
     gtk_signal_connect(GTK_OBJECT(w), "clicked", GTK_SIGNAL_FUNC(balsa_address_book_reload),
 		       ab);
     gtk_container_add(GTK_CONTAINER(hbox), w);
@@ -644,7 +649,7 @@ balsa_address_book_load_cb(LibBalsaAddressBook *libbalsa_ab, LibBalsaAddress *ad
 static void
 balsa_address_book_find(GtkWidget * group_entry, BalsaAddressBook *ab)
 {
-    gchar *entry_text;
+    const gchar *entry_text;
     gpointer row;
     gchar *new;
     gint num;

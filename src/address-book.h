@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,8 +21,6 @@
 
 #ifndef __ADDRESS_BOOK_H__
 #define __ADDRESS_BOOK_H__
-
-BEGIN_GNOME_DECLS
 
 #define BALSA_TYPE_ADDRESS_BOOK            (balsa_address_book_get_type ())
 #define BALSA_ADDRESS_BOOK(obj)            (GTK_CHECK_CAST ((obj), BALSA_TYPE_ADDRESS_BOOK, BalsaAddressBook))
@@ -70,7 +68,6 @@ GtkWidget *balsa_address_book_new(gboolean composing);
 
 gchar *balsa_address_book_get_recipients(BalsaAddressBook *ab);
 
-END_GNOME_DECLS
 
 #endif				/* __ADDRESS_BOOK_H__ */
 

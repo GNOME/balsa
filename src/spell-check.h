@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,6 @@
 extern "C" {
 #endif				/* __cplusplus */
 
-
 #define BALSA_TYPE_SPELL_CHECK         (balsa_spell_check_get_type ())
 #define BALSA_SPELL_CHECK(obj)         GTK_CHECK_CAST (obj, BALSA_TYPE_SPELL_CHECK, BalsaSpellCheck)
 #define BALSA_SPELL_CHECK_CLASS(klass) GTK_CHECK_CLASS_CAST (klass, BALSA_TYPE_SPELL_CHECK, BalsaSpellCheckClass)
@@ -48,9 +47,10 @@ extern "C" {
     struct _BalsaSpellCheck {
 	GtkFrame frame;
 
-	GtkText *text;
+	GtkTextView *view;
+        /* GtkTextBuffer doesn't seem to know about fonts!
 	GdkFont *font;
-	GdkColor *highlight_colour;
+        */
 	GtkCList *list;
 	GtkEntry *entry;
 
@@ -62,12 +62,11 @@ extern "C" {
 
 	/* restoration information */
 	gchar *original_text;
-	gint original_pos;
+	GtkTextMark *original_mark;
 
 	/* word selection */
-	guint start_pos;
-	guint end_pos;
-	guint length;
+	GtkTextIter start_iter;
+	GtkTextIter end_iter;
 
 	/* config stuff */
 	gchar *module;
@@ -84,7 +83,7 @@ extern "C" {
 	void (*done_spell_check) (BalsaSpellCheck * spell_check);
     };
 
-    guint balsa_spell_check_get_type(void);
+    GtkType balsa_spell_check_get_type(void);
 
 /* argument setters */
     void balsa_spell_check_set_module(BalsaSpellCheck *, const gchar *);
@@ -97,9 +96,9 @@ extern "C" {
 
 /* function prototypes */
     GtkWidget *balsa_spell_check_new(void);
-    GtkWidget *balsa_spell_check_new_with_text(GtkText * text);
+    GtkWidget *balsa_spell_check_new_with_text(GtkTextView * view);
     void balsa_spell_check_set_text(BalsaSpellCheck * spell_check,
-				    GtkText * text);
+				    GtkTextView * view);
     void balsa_spell_check_set_font(BalsaSpellCheck * spell_check,
 				    GdkFont * font);
     void balsa_spell_check_start(BalsaSpellCheck * spell_check);

@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -33,6 +33,7 @@
 
 #include "mailbackend.h"
 #include "mailbox_imap.h"
+#include "misc.h"
 #include "information.h"
 
 #ifdef BALSA_USE_THREADS
@@ -233,7 +234,7 @@ ensure_send_progress_dialog()
 
     gtk_widget_show_all(send_dialog);
     gtk_signal_connect(GTK_OBJECT(send_dialog), "destroy", 
-		       send_dialog_destroy_cb, NULL);
+		       GTK_SIGNAL_FUNC(send_dialog_destroy_cb), NULL);
     /* Progress bar done */
 }
 

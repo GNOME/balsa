@@ -2203,6 +2203,8 @@ balsa_gtk_html_popup(HtmlView * view)
     menuitem = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_100, NULL);
     g_signal_connect_swapped(G_OBJECT(menuitem), "activate",
 			     G_CALLBACK(html_view_zoom_reset), view);
+    g_signal_connect(G_OBJECT(menu), "selection-done",
+                     G_CALLBACK(gtk_widget_destroy), NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
     gtk_widget_show_all(menu);
     gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,

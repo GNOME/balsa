@@ -215,6 +215,8 @@ struct _LibBalsaMailboxClass {
     void (*fetch_message_structure)(LibBalsaMailbox *mailbox,
                                     LibBalsaMessage * message,
                                     LibBalsaFetchFlag flags);
+    void (*release_message) (LibBalsaMailbox * mailbox,
+			     LibBalsaMessage * message);
     const gchar *(*get_message_part) (LibBalsaMessage     *message,
                                       LibBalsaMessageBody *part, ssize_t*);
     GMimeStream *(*get_message_stream) (LibBalsaMailbox * mailbox,
@@ -288,6 +290,14 @@ void libbalsa_mailbox_prepare_threading(LibBalsaMailbox *mailbox,
 void libbalsa_mailbox_fetch_message_structure(LibBalsaMailbox *mailbox,
 					      LibBalsaMessage *message,
 					      LibBalsaFetchFlag flags);
+
+/** libbalsa_mailbox_release_message() is called when the message
+    content and structure are no longer needed. It's passed to the
+    maildir and mh backends to unref the mime_message, but is a noop
+    for other backends.
+*/
+void libbalsa_mailbox_release_message(LibBalsaMailbox * mailbox,
+				      LibBalsaMessage * message);
 
 /** libbalsa_mailbox_get_message_stream() returns an allocated block containing
     selected, single part of the message.

@@ -53,6 +53,8 @@ static void libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox);
 static void libbalsa_mailbox_real_set_unread_messages_flag(LibBalsaMailbox
 							   * mailbox,
 							   gboolean flag);
+static void libbalsa_mailbox_real_release_message (LibBalsaMailbox * mailbox,
+						   LibBalsaMessage * message);
 static gboolean libbalsa_mailbox_real_can_match(LibBalsaMailbox* mailbox,
 						GSList * conditions);
 static void libbalsa_mailbox_real_save_config(LibBalsaMailbox * mailbox,
@@ -225,6 +227,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
     klass->get_message = NULL;
     klass->prepare_threading = NULL;
     klass->fetch_message_structure = NULL;
+    klass->release_message = libbalsa_mailbox_real_release_message;
     klass->get_message_part = NULL;
     klass->get_message_stream = NULL;
     klass->change_message_flags = NULL;
@@ -616,6 +619,13 @@ libbalsa_mailbox_real_set_unread_messages_flag(LibBalsaMailbox * mailbox,
     mailbox->has_unread_messages = flag;
 }
 
+static void
+libbalsa_mailbox_real_release_message(LibBalsaMailbox * mailbox,
+				      LibBalsaMessage * message)
+{
+    /* Default is noop. */
+}
+
 #if 0
 /* Default handler : just call match_conditions
    IMAP is the only mailbox type that implements its own way for that
@@ -920,6 +930,20 @@ libbalsa_mailbox_fetch_message_structure(LibBalsaMailbox *mailbox,
         return;
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)
         ->fetch_message_structure(mailbox, message, flags);
+}
+
+void
+libbalsa_mailbox_release_message(LibBalsaMailbox * mailbox,
+				 LibBalsaMessage * message)
+{
+    g_return_if_fail(mailbox != NULL);
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+    g_return_if_fail(message != NULL);
+    g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
+    g_return_if_fail(mailbox == message->mailbox);
+
+    LIBBALSA_MAILBOX_GET_CLASS(mailbox)
+	->release_message(mailbox, message);
 }
 
 const gchar*

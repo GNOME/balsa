@@ -57,7 +57,8 @@ GObject *libbalsa_mailbox_local_new(const gchar * path, gboolean create);
 gint libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 				     const gchar * path);
 
-#define libbalsa_mailbox_local_get_path(mbox) ((LIBBALSA_MAILBOX(mbox))->url+7)
+#define libbalsa_mailbox_local_get_path(mbox) \
+	((const gchar *) (LIBBALSA_MAILBOX(mbox))->url+7)
 
 void libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox);
 void libbalsa_mailbox_local_remove_files(LibBalsaMailboxLocal *mailbox);

@@ -122,7 +122,7 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
 }
 
 void
-libbalsa_set_spool(gchar * spool)
+libbalsa_set_spool(const gchar * spool)
 {
     if (Spoolfile)
 	g_free(Spoolfile);

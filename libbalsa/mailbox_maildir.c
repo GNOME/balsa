@@ -478,7 +478,7 @@ static void libbalsa_mailbox_maildir_check(LibBalsaMailbox * mailbox)
 	    libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
     } else {
 	struct stat st, st_cur, st_new;
-	gchar *path;
+	const gchar *path;
 	int modified = 0;
 	LibBalsaMailboxMaildir *mdir;
 
@@ -574,7 +574,8 @@ static int libbalsa_mailbox_maildir_open_temp (const gchar *dest_path,
     return fd;
 }
 
-static void maildir_sync(gchar *key, struct message_info *msg_info, gchar *path)
+static void
+maildir_sync(gchar *key, struct message_info *msg_info, const gchar *path)
 {
     gboolean move = FALSE;
 
@@ -633,11 +634,14 @@ static gboolean libbalsa_mailbox_maildir_sync(LibBalsaMailbox * mailbox)
      *  move/rename and record change if mark_move
      * record mtime of dirs
      */
+    gchar *path;
+
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_MAILDIR(mailbox), FALSE);
 
+    path = g_strdup(libbalsa_mailbox_local_get_path(mailbox));
     g_hash_table_foreach(LIBBALSA_MAILBOX_MAILDIR(mailbox)->messages_info,
-			 (GHFunc)maildir_sync,
-			 libbalsa_mailbox_local_get_path(mailbox));
+			 (GHFunc)maildir_sync, path);
+    g_free(path);
 
     /* FIXME: record mtime of dirs */
 
@@ -734,7 +738,7 @@ libbalsa_mailbox_maildir_load_message(LibBalsaMailbox * mailbox, guint msgno)
 static int libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
 						LibBalsaMessage * message )
 {
-    char *path;
+    const char *path;
     char *tmp;
     int fd;
     GMimeStream *out_stream;

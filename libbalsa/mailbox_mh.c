@@ -479,7 +479,7 @@ static void libbalsa_mailbox_mh_check(LibBalsaMailbox * mailbox)
     } else {
 	struct stat st, st_sequences;
 	LibBalsaMailboxMh *mh;
-	gchar *path;
+	const gchar *path;
 	int modified = 0;
 
 	g_return_if_fail (LIBBALSA_IS_MAILBOX_MH(mailbox));
@@ -594,7 +594,7 @@ static gboolean libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox)
     gint first_flagged, last_flagged;
     gint first_replied, last_replied;
     GMimeStream *unseen_line, *flagged_line, *replied_line;
-    gchar *path;
+    const gchar *path;
     gchar *tmp;
     gint msg_count;
     gint i;
@@ -977,7 +977,7 @@ static int libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
 					   LibBalsaMessage * message )
 {
     LibBalsaMailboxMh *mh;
-    char *path;
+    const char *path;
     char *tmp;
     int fd;
     GMimeStream *out_stream;

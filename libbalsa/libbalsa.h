@@ -65,7 +65,7 @@ typedef struct _LibBalsaServer LibBalsaServer;
  * Initialize the library
  */
 void libbalsa_init(LibBalsaInformationFunc information_callback);
-void libbalsa_set_spool(gchar * spool);
+void libbalsa_set_spool(const gchar * spool);
 
 void libbalsa_show_message_source(LibBalsaMessage * msg,
                                   const gchar * font,

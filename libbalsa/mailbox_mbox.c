@@ -242,7 +242,7 @@ libbalsa_mailbox_mbox_remove_files(LibBalsaMailboxLocal *mailbox)
 
 static int mbox_lock(LibBalsaMailbox * mailbox, GMimeStream *stream)
 {
-    gchar *path = libbalsa_mailbox_local_get_path(mailbox);
+    const gchar *path = libbalsa_mailbox_local_get_path(mailbox);
     int fd;
     if (stream)
 	fd = GMIME_STREAM_FS(stream)->fd;
@@ -253,7 +253,7 @@ static int mbox_lock(LibBalsaMailbox * mailbox, GMimeStream *stream)
 
 static void mbox_unlock(LibBalsaMailbox * mailbox, GMimeStream *stream)
 {
-    gchar *path = libbalsa_mailbox_local_get_path(mailbox);
+    const gchar *path = libbalsa_mailbox_local_get_path(mailbox);
     int fd;
     if (stream)
 	fd = GMIME_STREAM_FS(stream)->fd;
@@ -397,7 +397,7 @@ static void libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
     } else {
 	struct stat st;
 	gchar buffer[10];
-	gchar *path;
+	const gchar *path;
 	LibBalsaMailboxMbox *mbox;
 
 	LOCK_MAILBOX(mailbox);
@@ -492,7 +492,7 @@ static gboolean libbalsa_mailbox_mbox_close_backend(LibBalsaMailbox * mailbox)
 static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox)
 {
     int fd;
-    gchar *path;
+    const gchar *path;
     struct stat st;
     gint messages;
     struct message_info *msg_info;

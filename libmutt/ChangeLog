@@ -1,3 +1,8 @@
+2003-01-22  Christian Neumair  <chris@gnome-de.org>
+
+	* .cvsignore: Added missing file.
+	* configure.in: Added AC_PREREQ. Fixes #102119.
+
 2003-01-10  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* parse.c: follow rfc2045 closer.

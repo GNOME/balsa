@@ -1,5 +1,7 @@
-2004-11-22 15:49  PeterB
+2004-11-22 19:31  PeterB
 
+	* src/balsa-app.c: make use of recursive gdk_threads_*; check
+	whether balsa_app.mblist_tree_store has been finalized.
 	* libbalsa/imap/pop3.c: double-check pop->sio before destroying.
 
 2004-11-21 15:14  PeterB

@@ -305,6 +305,7 @@ standard_button_cb(GtkWidget *widget, ToolbarPage * page)
     balsa_toolbar_model_clear(page->model);
     balsa_toolbar_refresh(page->toolbar);
     tp_page_refresh_available(page);
+    tp_page_refresh_current(page);
 }
 
 /* Callback for the "row-activated" signal for the available list. */

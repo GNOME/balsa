@@ -500,6 +500,7 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 					    mailbox->type != MAILBOX_MBOX));
 	  g_node_append (balsa_app.mailbox_nodes, node);
 	  config_mailbox_add (mailbox, NULL);
+	  add_mailboxes_for_checking (mailbox);
 	}
 	break;
 
@@ -511,6 +512,7 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 	MAILBOX_POP3 (mailbox)->server = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_server)));
 	balsa_app.inbox_input = g_list_append (balsa_app.inbox_input, mailbox);
 	config_mailbox_add (mailbox, NULL);
+	add_mailboxes_for_checking (mailbox);
 	break;
 
       case MC_PAGE_IMAP:
@@ -532,6 +534,7 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 	g_node_append (balsa_app.mailbox_nodes, node);
 
 	config_mailbox_add (mailbox, NULL);
+	add_mailboxes_for_checking (mailbox);
 #endif
 	break;
       case MC_PAGE_NEW:

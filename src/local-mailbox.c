@@ -108,18 +108,30 @@ add_mailbox (gchar * name, gchar * path, MailboxType type, gint isdir)
 	  node = g_node_new (mailbox_node_new (g_strdup (path), mailbox, TRUE));
 	  rnode = find_my_node (balsa_app.mailbox_nodes, G_LEVEL_ORDER, G_TRAVERSE_ALL, g_dirname (path));
 	  if (rnode)
-	    g_node_append (rnode, node);
+	    {
+	      add_mailboxes_for_checking (mailbox);
+	      g_node_append (rnode, node);
+	    }
 	  else
-	    g_node_append (balsa_app.mailbox_nodes, node);
+	    {
+	      add_mailboxes_for_checking (mailbox);
+	      g_node_append (balsa_app.mailbox_nodes, node);
+	    }
 	}
       else
 	{
 	  node = g_node_new (mailbox_node_new (g_strdup (path), mailbox, FALSE));
 	  rnode = find_my_node (balsa_app.mailbox_nodes, G_LEVEL_ORDER, G_TRAVERSE_ALL, g_dirname (path));
 	  if (rnode)
-	    g_node_append (rnode, node);
+	    {
+	      add_mailboxes_for_checking (mailbox);
+	      g_node_append (rnode, node);
+	    }
 	  else
-	    g_node_append (balsa_app.mailbox_nodes, node);
+	    {
+	      add_mailboxes_for_checking (mailbox);
+	      g_node_append (balsa_app.mailbox_nodes, node);
+	    }
 	}
       if (balsa_app.debug)
 	g_print (_ ("Local Mailbox Loaded as: %s\n"), mailbox_type_description (mailbox->type));

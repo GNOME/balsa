@@ -506,6 +506,7 @@ complete_cb (GtkWidget * widget, gpointer data)
   mailbox->name = g_strdup ("Inbox");
   MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->inbox)));
   config_mailbox_add (mailbox, "Inbox");
+  add_mailboxes_for_checking (mailbox);
   mailbox_free (mailbox);
 
   type = mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->inbox)));
@@ -513,6 +514,7 @@ complete_cb (GtkWidget * widget, gpointer data)
   mailbox->name = g_strdup ("Outbox");
   MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->outbox)));
   config_mailbox_add (mailbox, "Outbox");
+  add_mailboxes_for_checking (mailbox);
   mailbox_free (mailbox);
 
   type = mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->trash)));
@@ -520,6 +522,7 @@ complete_cb (GtkWidget * widget, gpointer data)
   mailbox->name = g_strdup ("Trash");
   MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->trash)));
   config_mailbox_add (mailbox, "Trash");
+  add_mailboxes_for_checking (mailbox);
   mailbox_free (mailbox);
 
   config_global_save ();

@@ -161,6 +161,7 @@ mblist_open_window (GnomeMDI * mdi)
   gtk_widget_pop_colormap ();
   gtk_widget_pop_visual ();
 
+  gtk_ctree_show_stub(mblw->ctree, FALSE);
   gtk_ctree_set_line_style (mblw->ctree, GTK_CTREE_LINES_DOTTED);
   gtk_clist_set_policy (GTK_CLIST (mblw->ctree), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_clist_set_row_height (GTK_CLIST (mblw->ctree), 16);
@@ -301,8 +302,6 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 
   if (mbnode->mailbox)
     {
-      add_mailboxes_for_checking (mbnode->mailbox);
-
       if (mbnode->mailbox->type == MAILBOX_IMAP)
 	{
 	  gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,

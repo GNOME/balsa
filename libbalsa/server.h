@@ -53,7 +53,7 @@ struct _LibBalsaServer {
 #endif
 
     gchar *user;
-    gchar *passwd;
+    gchar *passwd; /* NULL means "ask for it". Empty ("") is a legal one */
     gboolean remember_passwd;
 };
 

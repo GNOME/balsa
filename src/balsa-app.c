@@ -47,9 +47,6 @@ const gchar *pspell_suggest_modes[] = {
     "bad-spellers"
 };
 
-gchar * ask_password_real(LibBalsaServer *, LibBalsaMailbox *);
-gboolean check_mailbox_password(GNode *, gpointer);
-
 /* ask_password:
    asks the user for the password to the mailbox on given remote server.
 */
@@ -59,7 +56,7 @@ handle_password(gchar * string, gchar ** target)
     *target = string;
 }
 
-gchar *
+static gchar *
 ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
 {
     GtkWidget *dialog;
@@ -415,15 +412,6 @@ balsa_app_init(void)
     balsa_app.drag_default_is_move=0;
 }
 
-static gint
-append_subtree_f(GNode* gn, gpointer data)
-{
-    g_return_val_if_fail(gn->data, FALSE);
-    balsa_mailbox_node_append_subtree(BALSA_MAILBOX_NODE(gn->data),
-				      gn);
-    return FALSE;
-}
-
 gboolean
 do_load_mailboxes(void)
 {
@@ -436,12 +424,6 @@ do_load_mailboxes(void)
 	fprintf(stderr, "do_load_mailboxes: Unknown inbox mailbox type\n");
 	return FALSE;
     }
-    /* expand subtrees; move later to an idle callback or a separate 
-       thread to construct folders that are expensive to build (IMAP over
-       dialup).
-    */
-    g_node_traverse(balsa_app.mailbox_nodes, G_POST_ORDER, G_TRAVERSE_ALL, -1,
-                    append_subtree_f, NULL);
     return TRUE;
 }
 

@@ -624,7 +624,7 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
     server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
 
     /* try getting password, quit on cancel */
-    if (!(server->passwd && *server->passwd) &&
+    if (!server->passwd &&
 	!(server->passwd = libbalsa_server_get_password(server, mailbox))) {
 	mailbox->disconnected = TRUE;
 	UNLOCK_MAILBOX(mailbox);

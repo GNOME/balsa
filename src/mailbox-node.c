@@ -310,6 +310,9 @@ balsa_mailbox_node_new_from_config(const gchar* prefix)
 		       folder_conf_imap_node, NULL);
     gtk_signal_connect(GTK_OBJECT(folder), "append-subtree", 
 		       imap_dir_cb, NULL);
+    gtk_signal_connect(GTK_OBJECT(folder->server),
+                       "get-password", GTK_SIGNAL_FUNC(ask_password),
+                       NULL);
     balsa_mailbox_node_load_config(folder, prefix);
 
     folder->dir = gnome_config_get_string("Directory");

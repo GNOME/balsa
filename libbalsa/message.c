@@ -791,6 +791,7 @@ mime_content_type2str(int contenttype)
    references the body of given message.
    NO OP for 'loose' messages (i.e not associated with any mailbox).
    returns TRUE for success, FALSE for failure (broken IMAP connection etc).
+   NOTE: all accesses to message->mailbox must lock mailbox first!
 */
 gboolean
 libbalsa_message_body_ref(LibBalsaMessage * message)
@@ -802,17 +803,20 @@ libbalsa_message_body_ref(LibBalsaMessage * message)
     g_return_val_if_fail(message, FALSE);
     if (!message->mailbox) return FALSE;
 
-    g_return_val_if_fail(CLIENT_CONTEXT(message->mailbox)->hdrs, FALSE);
-    cur = message->header;
-    g_return_val_if_fail(cur != NULL, FALSE);
-
     LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE); 
+    if(CLIENT_CONTEXT(message->mailbox)->hdrs==NULL ||
+       (cur = message->header) == NULL) {
+        g_warning("Context damaged.");
+        UNLOCK_MAILBOX(message->mailbox); 
+        return FALSE;
+    }
+
     if (message->body_ref > 0) {
 	message->body_ref++;
         UNLOCK_MAILBOX(message->mailbox); 
 	return TRUE;
     }
-    
+
     if(! message->mailbox->disconnected ) {
 	/*
 	 * load message body
@@ -820,7 +824,6 @@ libbalsa_message_body_ref(LibBalsaMessage * message)
 	libbalsa_lock_mutt();
 	msg = mx_open_message(CLIENT_CONTEXT(message->mailbox), cur->msgno);
 	libbalsa_unlock_mutt();
-	UNLOCK_MAILBOX(message->mailbox);
 	
 	if (!msg) { /*FIXME: crude but necessary error handling */
 	    message->mailbox->disconnected = TRUE;
@@ -828,6 +831,7 @@ libbalsa_message_body_ref(LibBalsaMessage * message)
 	    balsa_information(LIBBALSA_INFORMATION_DEBUG,
 			      "disconnected mode!");
 
+            UNLOCK_MAILBOX(message->mailbox);
 	    if(CLIENT_CONTEXT_CLOSED(message->mailbox) ||
 	       CLIENT_CONTEXT(message->mailbox)->hdrs == NULL) 
 		libbalsa_mailbox_close(message->mailbox);
@@ -835,6 +839,7 @@ libbalsa_message_body_ref(LibBalsaMessage * message)
 	} 
 	/* mx_open_message may have downloaded more headers (IMAP): */
 	libbalsa_message_headers_update(message);
+	UNLOCK_MAILBOX(message->mailbox);
 
 	fseek(msg->fp, cur->content->offset, 0);	
     } else {

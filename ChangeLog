@@ -1,3 +1,13 @@
+2002-04-15  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/folder-scanners.c:
+	* libbalsa/mailbox_imap.c: 
+	* libbalsa/server.h:
+	* src/balsa-app.c: allow for non-saved folder passwords.
+	* src/mailbox-node.c: connect get-password signal.
+	* src/main.c: scan in a thread (when MT).
+	* libbalsa/message.c: safer mailbox locking scheme?
+
 2002-04-14  Pawel Salek <pawsa@theochem.kth.se>
 
 	* balsa.spec.in: provide Mandrake support 

@@ -12,10 +12,10 @@ Stuart
  * bug tigert about getting new icons for toolbar
  * add choice for POP3/IMAP/MBOX to new account box.
  * fix deleting accounts
+ * remove attach and spell check from main-window toolbar
 
 sendmsg-window TODO:
- * gnomize sendmsg-window
- * move attach and spell check to toolbar for sendmsg-window
+ * free EVERYTHING in the sendmsg-window when it is closed.
  * look at smtp code crashing if gtk_text is empty
  * sendmsg-window crashes if it is used to send an email
    and then gone back into.

@@ -152,6 +152,12 @@ enum _BalsaMDNReply {
     BALSA_MDN_REPLY_ALWAYS,
 };
 
+typedef enum _MwActionAfterMove MwActionAfterMove;
+enum _MwActionAfterMove {
+    NEXT_UNREAD,
+    NEXT,
+    CLOSE
+};
 
 /* global balsa application structure */
 extern struct BalsaApplication {
@@ -293,6 +299,9 @@ extern struct BalsaApplication {
     gboolean previewpane;
     gboolean source_escape_specials;
     gboolean debug;
+
+    /* what to do with message window after moving the message */
+    MwActionAfterMove mw_action_after_move;
 
     /* external editor */
     gboolean edit_headers;

@@ -803,6 +803,9 @@ config_global_load(void)
 	balsa_app.expunge_timeout = 
 	    gnome_config_get_int("AutoExpungeHours=2") * 3600;
 
+    balsa_app.mw_action_after_move = gnome_config_get_int(
+        "MessageWindowActionAfterMove");
+
     gnome_config_pop_prefix();
 
     /* Source browsing ... */
@@ -1183,6 +1186,8 @@ config_save(void)
     gnome_config_set_bool("AutoExpunge", balsa_app.expunge_auto);
     gnome_config_set_int("AutoExpungeMinutes",
                          balsa_app.expunge_timeout / 60);
+    gnome_config_set_int("MessageWindowActionAfterMove",
+        balsa_app.mw_action_after_move);
 
     gnome_config_pop_prefix();
 

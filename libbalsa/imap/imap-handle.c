@@ -2160,9 +2160,9 @@ ir_body_fld_enc(struct siobuf* sio, ImapBody *body)
   gchar* str = imap_get_string(sio);
   ImapBodyEncoding enc;
 
-  if(!str) return IMR_PROTOCOL;
-
-  if     (g_ascii_strcasecmp(str, "7BIT")==0)             enc = IMBENC_7BIT;
+  /* if(!str) return IMR_PROTOCOL; required - but forgive this error */
+  if     (str == NULL) enc = IMBENC_OTHER;
+  else if(g_ascii_strcasecmp(str, "7BIT")==0)             enc = IMBENC_7BIT;
   else if(g_ascii_strcasecmp(str, "8BIT")==0)             enc = IMBENC_8BIT;
   else if(g_ascii_strcasecmp(str, "BINARY")==0)           enc = IMBENC_BINARY;
   else if(g_ascii_strcasecmp(str, "BASE64")==0)           enc = IMBENC_BASE64;
@@ -2803,6 +2803,7 @@ ir_fetch_seq(ImapMboxHandle *h, unsigned seqno)
   int c;
   ImapResponse rc;
 
+  if(seqno<1 || seqno > h->exists) return IMR_PROTOCOL;
   if(sio_getc(h->sio) != '(') return IMR_PROTOCOL;
   if(h->msg_cache[seqno-1] == NULL)
     h->msg_cache[seqno-1] = imap_message_new();

@@ -89,6 +89,7 @@ typedef struct _PropertyUI {
     GtkWidget *expunge_on_close;
     GtkWidget *expunge_auto;
     GtkWidget *expunge_minutes;
+    GtkWidget *action_after_move_menu;
 
     GtkWidget *previewpane;
     GtkWidget *alternative_layout;
@@ -242,6 +243,7 @@ static GtkWidget *misc_spelling_group(GtkWidget * page);
 static GtkWidget *create_misc_page(gpointer);
 static GtkWidget *misc_group(GtkWidget * page);
 static GtkWidget *deleting_messages_group(GtkWidget * page);
+static GtkWidget *moving_messages_group(GtkWidget * page);
     
 /* Startup page */
 static GtkWidget *create_startup_page(gpointer);
@@ -289,6 +291,7 @@ static gint pm_combo_box_get_level(GtkWidget * combo_box);
 #endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
 /* special helpers */
+static GtkWidget *create_action_after_move_menu(void);
 static GtkWidget *create_information_message_menu(void);
 static GtkWidget *create_encoding_menu(void);
 static GtkWidget *create_mdn_reply_menu(void);
@@ -879,6 +882,14 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.expunge_timeout =
 	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
 					 (pui->expunge_minutes)) * 60;
+#if GTK_CHECK_VERSION(2, 4, 0)
+    balsa_app.mw_action_after_move =
+	         pm_combo_box_get_level(pui->action_after_move_menu);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
+    menu_item = gtk_menu_get_active(GTK_MENU(pui->action_after_move_menu));
+    balsa_app.mw_action_after_move = GPOINTER_TO_INT(
+            g_object_get_data(G_OBJECT(menu_item), "balsa-data"));
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     /* external editor */
     balsa_app.edit_headers = GTK_TOGGLE_BUTTON(pui->edit_headers)->active;
@@ -1195,11 +1206,16 @@ set_prefs(void)
 			      (float) balsa_app.expunge_timeout / 60);
     gtk_widget_set_sensitive(pui->expunge_minutes,
 			     GTK_TOGGLE_BUTTON(pui->expunge_auto)->active);
-
-
     gtk_widget_set_sensitive(pui->check_mail_minutes,
 			     GTK_TOGGLE_BUTTON(pui->check_mail_auto)->
 			     active);
+#if GTK_CHECK_VERSION(2, 4, 0)
+    pm_combo_box_set_level(pui->action_after_move_menu,
+            balsa_app.mw_action_after_move);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
+    gtk_menu_set_active(GTK_MENU(pui->action_after_move_menu),
+            balsa_app.mw_action_after_move);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->wordwrap),
 				 balsa_app.wordwrap);
@@ -2717,6 +2733,7 @@ create_misc_page(gpointer data)
 
     pm_page_add(page, misc_group(page));
     pm_page_add(page, deleting_messages_group(page));
+    pm_page_add(page, moving_messages_group(page));
 
     return page;
 }
@@ -2805,6 +2822,45 @@ deleting_messages_group(GtkWidget * page)
 
     label = gtk_label_new(_("minutes"));
     gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 0);
+
+    return group;
+}
+
+static GtkWidget *
+moving_messages_group(GtkWidget * page)
+{
+    GtkWidget *group;
+    GtkWidget *label;
+
+    group = pm_group_new(_("Message Window"));
+
+    label = gtk_label_new(_("Action after moving/trashing a message"));
+    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+
+    GtkWidget *table = create_table(4, 2, page);
+    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 3, 4,
+		     (GtkAttachOptions) (GTK_FILL),
+		     (GtkAttachOptions) (0), 0, 0);
+    pm_group_add(group, table);
+
+#if GTK_CHECK_VERSION(2, 4, 0)
+    pui->action_after_move_menu = create_action_after_move_menu();
+    pm_combo_box_set_level(pui->action_after_move_menu,
+                           balsa_app.mw_action_after_move);
+    gtk_table_attach(GTK_TABLE(table), pui->action_after_move_menu, 1, 2, 3, 4,
+           (GtkAttachOptions) (GTK_FILL),
+		     (GtkAttachOptions) (0), 0, 0);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
+    optionmenu = gtk_option_menu_new ();
+    pui->action_after_move_menu = create_action_after_move_menu();
+    gtk_option_menu_set_menu (GTK_OPTION_MENU (optionmenu),
+			      pui->action_after_move_menu);
+    gtk_option_menu_set_history (GTK_OPTION_MENU (optionmenu),
+				 balsa_app.mw_action_after_move);
+    gtk_table_attach(GTK_TABLE(table), optionmenu, 1, 2, 3,
+		     (GtkAttachOptions) (GTK_FILL),
+		     (GtkAttachOptions) (0), 0, 0);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     return group;
 }
@@ -3435,6 +3491,24 @@ convert_8bit_cb(GtkWidget * widget, GtkWidget * pbox)
 
     gtk_widget_set_sensitive(pui->convert_unknown_8bit_codeset,
 			     GTK_TOGGLE_BUTTON(pui->convert_unknown_8bit[1])->active);
+}
+
+static GtkWidget *
+create_action_after_move_menu(void)
+{
+#if GTK_CHECK_VERSION(2, 4, 0)
+    GtkWidget *combo_box = pm_combo_box_new();
+    add_show_menu(_("Show next unread message"), NEXT_UNREAD, combo_box);
+    add_show_menu(_("Show next message"), NEXT, combo_box);
+    add_show_menu(_("Close message window"), CLOSE, combo_box);
+    return combo_box;
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
+    GtkWidget *menu = gtk_menu_new();
+    add_show_menu(_("Show next unread message"), NEXT_UNREAD, menu);
+    add_show_menu(_("Show next message"), NEXT, menu);
+    add_show_menu(_("Close message window"), CLOSE, menu);
+    return menu;
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 
 #if ENABLE_ESMTP

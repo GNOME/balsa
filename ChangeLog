@@ -1,3 +1,15 @@
+2004-12-18  Pawel Salek
+
+	* libbalsa/imap/imap-handle.c: forgive errors in BODYSTRUCTURE response
+	(work around #160083).
+
+2004-12-18  Craig Routledge
+	
+	* src/balsa-app.[ch]: add mw_action_after_move.
+	* src/message-window.c: use it.
+	* src/pref-manager.c: configure it.
+	* src/save-restore.c: save/restore it.
+
 2004-12-16 14:34  PeterB
 
 	* libbalsa/body.c: if body->mime_part is a GMimeMessagePart, get

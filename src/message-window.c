@@ -61,6 +61,8 @@ static void wrap_message_cb(GtkWidget * widget, gpointer data);
 static void size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
 static void mw_set_buttons_sensitive(MessageWindow * mw);
 
+static void mw_set_selected(MessageWindow * mw, void (*select_func)(BalsaIndex *));
+
 static void copy_cb(GtkWidget * widget, MessageWindow * mw);
 static void select_all_cb(GtkWidget * widget, gpointer);
 
@@ -223,7 +225,7 @@ static GnomeUIInfo message_menu[] = {
 #define MENU_MESSAGE_TRASH_POS 16
     {
      GNOME_APP_UI_ITEM, N_("_Move to Trash"),
-     N_("Move the current message to Trash mailbox"),
+     N_("Move the message to Trash mailbox"),
      trash_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
      GNOME_STOCK_TRASH, 'D', 0, NULL},
     GNOMEUIINFO_END
@@ -277,6 +279,7 @@ static void
 message_window_move_message(MessageWindow * mw, LibBalsaMailbox * mailbox)
 {
     GArray *messages;
+    LibBalsaMessage *original = mw->bindex->current_message;
 
     g_return_if_fail(mailbox != NULL);
 
@@ -288,8 +291,27 @@ message_window_move_message(MessageWindow * mw, LibBalsaMailbox * mailbox)
     g_array_append_val(messages, mw->message->msgno);
     balsa_index_transfer(mw->bindex, messages, mailbox, FALSE);
     g_array_free(messages, TRUE);
-    
-    close_message_window(NULL, (gpointer) mw);
+
+    if ( balsa_app.mw_action_after_move == NEXT_UNREAD )
+    {
+        /* Try selecting the next unread message.
+           If there are no more, close the window anyways. */
+        mw_set_selected( mw, balsa_index_select_next_unread );
+
+        if ( mw->bindex->current_message == original )
+            close_message_window(NULL, (gpointer) mw);
+    }
+    else if ( balsa_app.mw_action_after_move == NEXT )
+    {
+        mw_set_selected( mw, balsa_index_select_next );
+
+        if ( mw->bindex->current_message == original )
+            close_message_window(NULL, (gpointer) mw);
+    }
+    else
+    {
+        close_message_window(NULL, (gpointer) mw);
+    }
 }
 
 static void
@@ -908,7 +930,6 @@ static void print_cb(GtkWidget * widget, gpointer data)
 static void trash_cb(GtkWidget * widget, gpointer data)
 {
     MessageWindow *mw = (MessageWindow *) (data);
-
     message_window_move_message(mw, balsa_app.trash);
 }
 

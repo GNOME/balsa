@@ -267,9 +267,7 @@ encode_descriptions (BODY *b)
 	{
 	    if (t->description)
 		{
-		    libbalsa_lock_mutt();
 		    rfc2047_encode_string (&t->description);
-		    libbalsa_unlock_mutt();
 		}
 	    if (t->parts)
 		encode_descriptions (t->parts);
@@ -291,6 +289,8 @@ add_mutt_body_plain(const gchar * charset, gint encoding_style,
     body->subtype = g_strdup("plain");
     body->unlink = 1;
     body->use_disp = 0;
+    body->force_charset = 1;
+    body->disposition = DISPINLINE;
 
     body->encoding = encoding_style;
 
@@ -1283,6 +1283,7 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 	    }
 	} else if (body->buffer) {
 	    newbdy = add_mutt_body_plain(body->charset, encoding, flow);
+	    newbdy->disposition = DISPINLINE;
 	    if (body->mime_type) {
 		/* change the type and subtype within the mutt body */
 		gchar *type, *subtype;
@@ -1314,16 +1315,22 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 	body = body->next;
     }
 
-    libbalsa_lock_mutt();
-    if (msg->content) {
-	if (msg->content->next)
-	    msg->content = mutt_make_multipart(msg->content);
-    }
-    mutt_prepare_envelope(msg->env);
-    libbalsa_unlock_mutt();
-
-    encode_descriptions(msg->content);
-
+    { /* scope */
+	gchar *cset = g_strdup(libbalsa_message_charset(message));
+	
+	libbalsa_lock_mutt();
+	mutt_set_charset(cset);
+	if (msg->content) {
+	    if (msg->content->next)
+		msg->content = mutt_make_multipart(msg->content);
+	}
+	mutt_prepare_envelope(msg->env, FALSE);
+	encode_descriptions(msg->content);
+	mutt_set_charset(NULL);
+	g_free(cset);
+	libbalsa_unlock_mutt();
+    } 
+    
     if ((reply_message != NULL) && (reply_message->mailbox != NULL))
 	/* Just saves the message ID, mailbox type and mailbox name. We could
 	 * search all mailboxes for the ID but that would not be too fast. We
@@ -1497,17 +1504,23 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 
 	body = body->next;
     }
+    
+    { /* scope */
+	gchar *cset = g_strdup(libbalsa_message_charset(message));
+	
+	libbalsa_lock_mutt();
+	mutt_set_charset(cset);
+	if (msg->content && msg->content->next)
+	    msg->content = mutt_make_multipart(msg->content);
+	mutt_prepare_envelope(msg->env, TRUE);
+	encode_descriptions(msg->content);
+	mutt_set_charset(NULL);
+	g_free(cset);
+	libbalsa_unlock_mutt();
+    }
 
-    libbalsa_lock_mutt();
-    if (msg->content && msg->content->next)
-        msg->content = mutt_make_multipart(msg->content);
-    mutt_prepare_envelope(msg->env);
-    libbalsa_unlock_mutt();
-
-    encode_descriptions(msg->content);
-
-/* We create the message in MIME format here, we use the same format 
- * for local delivery and for SMTP */
+    /* We create the message in MIME format here, we use the same format 
+     * for local delivery and for SMTP */
     if (queu == 0) {
         libbalsa_lock_mutt();
 	mutt_mktemp(tmpfile);

@@ -1,3 +1,15 @@
+2002-05-28  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/message.c: 
+	* libbalsa/mailbox.h: 
+	* libbalsa/mailbox.c: 
+	* libbalsa/mailbox_imap.c: 
+	* libbalsa/body.h: 
+	* libbalsa/body.c: 
+	* libbalsa/send.c: 
+	* src/sendmsg-window.c: upport of all my stuff since start of
+	BALSA_2 from HEAD 
+
 2002-05-21  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* libbalsa/abook-completion.c:

@@ -50,6 +50,7 @@ struct _LibBalsaMessageBody {
     gboolean attach_as_extbody; /* if an attachment shall be appended as external-body (sending) */
     gchar *temp_filename;	/* Holds the filename of a the temporary file where this part is saved */
     gchar *charset;		/* the charset, used for sending, replying. */
+    guint disposition;      /* content-disposition */
 
     LibBalsaMessageBody *next;	/* Next part in the message */
     LibBalsaMessageBody *parts;	/* The parts of a multipart or message/rfc822 message */

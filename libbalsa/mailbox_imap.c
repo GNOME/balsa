@@ -487,7 +487,6 @@ load_cache(LibBalsaMailbox* mailbox)
         nextkey = gdbm_nextkey(dbf, key);
         free(key.dptr); key = nextkey;
     }
-    free(key.dptr);
 
     gdbm_close(dbf);
     return TRUE;
@@ -614,13 +613,12 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
 
     /* FIXME: temporarily disabled, until better way of loading headers
        is invented. */
-#ifdef HAVE_GDBM_H
-    /*
+#if defined(HAVE_GDBM_H) && defined(CACHE_IMAP_HEADERS_TOO)
       if(load_cache(mailbox)) {
 	mailbox->open_ref++;
 	UNLOCK_MAILBOX(mailbox);
 	return TRUE;
-        } */
+      } 
 #endif
     imap = LIBBALSA_MAILBOX_IMAP(mailbox);
     server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
@@ -628,6 +626,7 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
     /* try getting password, quit on cancel */
     if (!server->passwd &&
 	!(server->passwd = libbalsa_server_get_password(server, mailbox))) {
+	mailbox->disconnected = TRUE;
 	UNLOCK_MAILBOX(mailbox);
 	return FALSE;
     }
@@ -661,6 +660,7 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
 	UNLOCK_MAILBOX(mailbox);
 	gdk_threads_enter();
     }
+    mailbox->disconnected = FALSE;
     return CLIENT_CONTEXT_OPEN(mailbox);
 }
 

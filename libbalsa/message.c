@@ -431,6 +431,13 @@ libbalsa_message_move(LibBalsaMessage * message, LibBalsaMailbox * dest)
 gboolean
 libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
 {
+    gboolean r = TRUE;
+    HEADER *cur;
+    LibBalsaMessage *message;
+    GList *d = NULL;
+    GList *p;
+    LibBalsaMailboxAppendHandle* handle;
+
     g_return_val_if_fail(messages, FALSE);
 
     if (LIBBALSA_MESSAGE(messages->data)->mailbox->readonly) {
@@ -440,19 +447,50 @@ libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
 	    LIBBALSA_MESSAGE(messages->data)->mailbox->name);
 	return FALSE;
     }
-
-    if (libbalsa_messages_copy (messages, dest)) {
-        libbalsa_messages_delete (messages);
-        return TRUE;
-    } else {
-        return FALSE;
+    
+    handle = libbalsa_mailbox_open_append(dest);
+    if (!handle) {
+	libbalsa_information(
+			     LIBBALSA_INFORMATION_ERROR,
+			     _("Couldn't open destination mailbox (%s) for writing"),
+			     dest->name);
+	return FALSE;
     }
+    
+    libbalsa_lock_mutt();
+    for(p=messages; p; 	p=g_list_next(p)) {
+	message=(LibBalsaMessage *)(p->data);
+	if(CLIENT_CONTEXT_CLOSED(message->mailbox)) continue;
+	if(!CLIENT_CONTEXT(message->mailbox)->hdrs) {
+            printf("Ugly libmutt error, why did it fastclose mailbox!?");
+            break;
+        }
+	cur = message->header;
+	mutt_parse_mime_message(CLIENT_CONTEXT(message->mailbox), cur); 
+	if(!mutt_append_message(handle->context,
+				CLIENT_CONTEXT(message->mailbox), cur, 
+				0,0))
+	    d = g_list_append(d, message);
+	else
+	    r = FALSE;
+    }
+    libbalsa_unlock_mutt();
+
+    /* it would be faster to inline real_set_deleted_flag but this is
+       cleaner */
+    libbalsa_messages_delete(d);
+    g_list_free(d);
+
+    libbalsa_mailbox_close_append(handle);
+    libbalsa_mailbox_check(dest);
+    return r;
 }
 
 /* FIXME: look at the flags for mutt_append_message */
 gboolean
 libbalsa_message_copy(LibBalsaMessage * message, LibBalsaMailbox * dest)
 {
+    gboolean r = TRUE;
     HEADER *cur;
     LibBalsaMailboxAppendHandle* handle;
     g_return_val_if_fail(message->mailbox, FALSE);
@@ -472,13 +510,15 @@ libbalsa_message_copy(LibBalsaMessage * message, LibBalsaMailbox * dest)
 
     libbalsa_lock_mutt();
     mutt_parse_mime_message(CLIENT_CONTEXT(message->mailbox), cur);
-    mutt_append_message(handle->context,
-			CLIENT_CONTEXT(message->mailbox), cur, 0, 0);
+    if(mutt_append_message(handle->context,
+			   CLIENT_CONTEXT(message->mailbox), cur,
+			   0,0))
+	r = FALSE;
     libbalsa_unlock_mutt();
 
     libbalsa_mailbox_close_append(handle);
     libbalsa_mailbox_check(dest);
-    return TRUE;
+    return r;
 }
 
 /* libbalsa_message_save:
@@ -511,6 +551,7 @@ libbalsa_message_save(LibBalsaMessage * message, const gchar *filename)
 gboolean
 libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
 {
+    gboolean r=TRUE;
     HEADER *cur;
     LibBalsaMessage *message;
     GList *p;
@@ -538,14 +579,16 @@ libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
         }
 	cur = message->header;
 	mutt_parse_mime_message(CLIENT_CONTEXT(message->mailbox), cur); 
-	mutt_append_message(handle->context,
-			    CLIENT_CONTEXT(message->mailbox), cur, 0, 0);
+	if(mutt_append_message(handle->context,
+			       CLIENT_CONTEXT(message->mailbox), cur, 
+			       0, 0))
+	    r = FALSE;
     }
     libbalsa_unlock_mutt();
 
     libbalsa_mailbox_close_append(handle);
     libbalsa_mailbox_check(dest);
-    return TRUE;
+    return r;
 }
 
 static void
@@ -801,25 +844,45 @@ libbalsa_message_body_ref(LibBalsaMessage * message)
 	message->body_ref++;
 	return TRUE;
     }
-    /*
-     * load message body
-     */
-    libbalsa_lock_mutt();
-    msg = mx_open_message(CLIENT_CONTEXT(message->mailbox), cur->msgno);
-    libbalsa_unlock_mutt();
 
-    if (!msg) { /*FIXME: crude but necessary error handling */
-        if(CLIENT_CONTEXT_CLOSED(message->mailbox) ||
-           CLIENT_CONTEXT(message->mailbox)->hdrs == NULL) 
-            libbalsa_mailbox_close(message->mailbox);
-        return FALSE;
-    } 
-
-    /* mx_open_message may have downloaded more headers (IMAP): */
-    libbalsa_message_headers_update(message);
-
-    fseek(msg->fp, cur->content->offset, 0);
-
+    if(! message->mailbox->disconnected ) {
+	/*
+	 * load message body
+	 */
+	libbalsa_lock_mutt();
+	msg = mx_open_message(CLIENT_CONTEXT(message->mailbox), cur->msgno);
+	libbalsa_unlock_mutt();
+	UNLOCK_MAILBOX(message->mailbox);
+	
+	if (!msg) { /*FIXME: crude but necessary error handling */
+	    message->mailbox->disconnected = TRUE;
+	    message->mailbox->readonly = TRUE;
+	    balsa_information(LIBBALSA_INFORMATION_DEBUG,
+			      "disconnected mode!");
+	    
+	    if(CLIENT_CONTEXT_CLOSED(message->mailbox) ||
+	       CLIENT_CONTEXT(message->mailbox)->hdrs == NULL) 
+		libbalsa_mailbox_close(message->mailbox);
+	    return FALSE;
+	} 
+	/* mx_open_message may have downloaded more headers (IMAP): */
+	libbalsa_message_headers_update(message);
+	
+	fseek(msg->fp, cur->content->offset, 0);        
+    } else {
+	UNLOCK_MAILBOX(message->mailbox);
+	msg = (MESSAGE *)g_malloc (sizeof (MESSAGE));
+	msg->fp = libbalsa_mailbox_get_message_stream(message->mailbox,
+						      message);
+	if(!msg->fp) {
+	    return FALSE;
+	}
+	rewind(msg->fp);
+	/* ugly ugly ugly */
+	cur->env = mutt_read_rfc822_header (msg->fp, cur, 1, 0); 
+	rewind(msg->fp);
+     }
+    
     if (cur->content->type == TYPEMULTIPART) {
 	libbalsa_lock_mutt();
 	cur->content->parts = 
@@ -834,11 +897,11 @@ libbalsa_message_body_ref(LibBalsaMessage * message)
     } else
 	if (mutt_is_message_type
 	    (cur->content->type, cur->content->subtype)) {
-	libbalsa_lock_mutt();
-	cur->content->parts =
-	    mutt_parse_messageRFC822(msg->fp, cur->content);
-	libbalsa_unlock_mutt();
-    }
+	    libbalsa_lock_mutt();
+	    cur->content->parts =
+		mutt_parse_messageRFC822(msg->fp, cur->content);
+	    libbalsa_unlock_mutt();
+	}
     if (msg != NULL) {
 #ifdef DEBUG
 	fprintf(stderr, "After loading message\n");
@@ -856,9 +919,14 @@ libbalsa_message_body_ref(LibBalsaMessage * message)
 
 	message->body_ref++;
 
-	libbalsa_lock_mutt();
-	mx_close_message(&msg);
-	libbalsa_unlock_mutt();
+	if(! message->mailbox->disconnected ) {
+	    libbalsa_lock_mutt();
+	    mx_close_message(&msg);
+	    libbalsa_unlock_mutt();
+	} else {
+	    fclose(msg->fp);
+	    g_free(msg);
+	}
     }
 
     /*

@@ -335,7 +335,6 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 {
   Mailbox *mailbox;
   MailboxType type;
-  GNode *node;
 
   mailbox = mcw->mailbox;
 
@@ -377,7 +376,6 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 	  mailbox = mailbox_new (type);
 	  mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->local_mailbox_name)));
 	  MAILBOX_LOCAL (mailbox)->path = g_strdup (filename);
-	  node = g_node_new (mailbox_node_new (g_strdup (mailbox->name), mailbox, FALSE));
 	  config_mailbox_add (mailbox, "generic");
 	}
 	break;
@@ -401,7 +399,6 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 	MAILBOX_IMAP (mailbox)->server = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->imap_server)));
 	MAILBOX_IMAP (mailbox)->port = strtol (gtk_entry_get_text (GTK_ENTRY (mcw->imap_port)), (char **) NULL, 10);
 
-	node = g_node_new (mailbox_node_new (g_strdup (mailbox->name), mailbox, FALSE));
 	config_mailbox_add (mailbox, "generic");
 	break;
       case MC_PAGE_NEW:

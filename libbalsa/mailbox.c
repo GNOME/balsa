@@ -18,6 +18,8 @@
  */
 
 #include "config.h"
+#include <glib.h>
+#include <stdarg.h>
 
 #include <stdio.h>
 #include <sys/utsname.h>
@@ -136,6 +138,14 @@ static void send_watcher_delete_message (Mailbox * mailbox, Message * message);
 static Message *translate_message (HEADER * cur);
 static Address *translate_address (ADDRESS * caddr);
 
+static void
+do_mutt_error(gchar* str, ...)
+{
+  va_list ap;
+  va_start(ap, str);
+  g_warning(str, ap);
+  va_end(ap);
+}
 
 /* We're gonna set Mutt global vars here */
 void
@@ -157,6 +167,7 @@ mailbox_init (gchar * inbox_path)
   Realname = g_get_real_name ();
 
   Hostname = g_get_host_name();
+  mutt_error = do_mutt_error;
 #if 0
   /* some systems report the FQDN instead of just the hostname */
   if ((p = strchr (utsname.nodename, '.')))
@@ -323,7 +334,7 @@ Mailbox *
 mailbox_new (MailboxType type)
 {
   Mailbox *mailbox;
-
+  
   switch (type)
     {
     case MAILBOX_MBOX:
@@ -346,6 +357,7 @@ mailbox_new (MailboxType type)
       MAILBOX_IMAP (mailbox)->passwd = NULL;
       MAILBOX_IMAP (mailbox)->server = NULL;
       MAILBOX_IMAP (mailbox)->path = NULL;
+      MAILBOX_IMAP (mailbox)->tmp_file_path = NULL;
       break;
 
     default:

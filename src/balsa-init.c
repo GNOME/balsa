@@ -76,7 +76,7 @@ static GtkWidget *create_welcome_page (void);
 static GtkWidget *create_general_page (void);
 static GtkWidget *create_mailboxes_page (void);
 
-static void create_mailbox_if_not_present(gchar * filename);
+static void create_mailbox_if_not_present (gchar * filename);
 
 /*
  * Balsa Initializing Stuff
@@ -220,7 +220,7 @@ create_general_page (void)
   GtkWidget *label;
 
   GString *str;
-  char * name;
+  char *name;
 
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_container_border_width (GTK_CONTAINER (vbox), 10);
@@ -278,17 +278,17 @@ create_general_page (void)
   str = g_string_new (g_get_user_name ());
   g_string_append_c (str, '@');
 
-  g_string_append (str, g_get_host_name());
+  g_string_append (str, g_get_host_name ());
   gtk_entry_set_text (GTK_ENTRY (prefs->email), str->str);
   g_string_free (str, TRUE);
 
   name = g_get_real_name ();
   if (name != NULL)
     {
-      char * p;
+      char *p;
 
       /* Don't include other fields of the GECOS */
-      p = strchr(name, ',');
+      p = strchr (name, ',');
       if (p != NULL)
 	*p = '\0';
 
@@ -369,54 +369,90 @@ delete_init_window (GtkWidget * widget, gpointer data)
 /* Check to see if the specified file exists; if it doesn't, try to
    create it */
 static void
-create_mailbox_if_not_present(gchar * filename)
+create_mailbox_if_not_present (gchar * filename)
 {
-  FILE * f;
+  FILE *f;
 
   /* Make sure the mailbox exists */
-  if ((f = fopen(filename, "r")) == NULL)
+  if ((f = fopen (filename, "r")) == NULL)
     {
       /* If it doesn't exist, try to create it */
-      f = fopen(filename, "w");
+      f = fopen (filename, "w");
       if (f != NULL)
-	fclose(f);
+	fclose (f);
     }
-} /* create_mailbox_if_not_present */
+  else
+    fclose (f);
+}				/* create_mailbox_if_not_present */
+
+static void
+check_mailboxes_for_finish (GtkWidget * widget, gpointer data)
+{
+  GtkWidget *ask;
+  GString *str;
+  gchar *mbox;
+  gint clicked_button;
+
+  str = g_string_new (NULL);
+
+  mbox = gtk_entry_get_text (GTK_ENTRY (prefs->inbox));
+  if (mailbox_valid (mbox) == MAILBOX_UNKNOWN)
+    {
+      g_string_sprintf (str, "Mailbox \"%s\" is not valid.\n\nWould you like to create it?", mbox);
+      goto BADMAILBOX;
+    }
+
+  mbox = gtk_entry_get_text (GTK_ENTRY (prefs->outbox));
+  if (mailbox_valid (mbox) == MAILBOX_UNKNOWN)
+    {
+      g_string_sprintf (str, "Mailbox \"%s\" is not valid.\n\nWould you like to create it?", mbox);
+      goto BADMAILBOX;
+    }
+
+  mbox = gtk_entry_get_text (GTK_ENTRY (prefs->trash));
+  if (mailbox_valid (mbox) == MAILBOX_UNKNOWN)
+    {
+      g_string_sprintf (str, "Mailbox \"%s\" is not valid.\n\nWould you like to create it?", mbox);
+      goto BADMAILBOX;
+    }
+  else
+    {
+      g_string_free (str, TRUE);
+      complete_cb (widget, data);
+      return;
+    }
+
+
+BADMAILBOX:
+  ask = gnome_message_box_new (str->str,
+			       GNOME_MESSAGE_BOX_QUESTION,
+			       GNOME_STOCK_BUTTON_YES,
+			       GNOME_STOCK_BUTTON_NO,
+			       NULL);
+  clicked_button = gnome_dialog_run (GNOME_DIALOG (ask));
+  g_string_free (str, TRUE);
+  if (clicked_button == 0)
+    {
+      create_mailbox_if_not_present (mbox);
+      check_mailboxes_for_finish (widget, data);
+      return;
+    }
+  else
+    {
+      ask = gnome_message_box_new ("Unable to procede without a valid mailbox.  Please try again.",
+				   GNOME_MESSAGE_BOX_ERROR,
+				   GNOME_STOCK_BUTTON_OK,
+				   NULL);
+    }
+}
 
 static void
 next_cb (GtkWidget * widget, gpointer data)
 {
-  GtkWidget *messagebox;
-  gchar *errstr, *mbox;
-
   switch (gtk_notebook_current_page (GTK_NOTEBOOK (iw->notebook)) + 1)
     {
     case IW_PAGE_FINISHED:
-      mbox = gtk_entry_get_text (GTK_ENTRY(prefs->inbox));
-      create_mailbox_if_not_present(mbox);
-      if (mailbox_valid (mbox) == MAILBOX_UNKNOWN)
-	{
-	  errstr = g_strdup (_ ("Inbox path is invalid."));
-	  goto BADMAILBOX;
-	}
-
-      mbox = gtk_entry_get_text (GTK_ENTRY(prefs->outbox));
-      create_mailbox_if_not_present(mbox);
-      if (mailbox_valid (mbox) == MAILBOX_UNKNOWN)
-	{
-	  errstr = g_strdup (_ ("Outbox path is invalid."));
-	  goto BADMAILBOX;
-	}
-
-      mbox = gtk_entry_get_text (GTK_ENTRY(prefs->trash));
-      create_mailbox_if_not_present(mbox);
-      if (mailbox_valid (mbox) == MAILBOX_UNKNOWN)
-	{
-	  errstr = g_strdup (_ ("Trash path is invalid."));
-	  goto BADMAILBOX;
-	}
-      else
-	complete_cb (widget, NULL);
+      check_mailboxes_for_finish (widget, data);
       break;
 
     case IW_PAGE_MBOXS:
@@ -430,17 +466,6 @@ next_cb (GtkWidget * widget, gpointer data)
       break;
     }
   return;
-
-
-BADMAILBOX:
-  messagebox = gnome_message_box_new (errstr,
-				      GNOME_MESSAGE_BOX_ERROR,
-				      GNOME_STOCK_BUTTON_OK,
-				      NULL);
-  gtk_widget_set_usize (messagebox, MESSAGEBOX_WIDTH, MESSAGEBOX_HEIGHT);
-  gtk_window_position (GTK_WINDOW (messagebox), GTK_WIN_POS_CENTER);
-  gtk_widget_show (messagebox);
-
 }
 
 static void

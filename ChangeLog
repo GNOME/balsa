@@ -1,3 +1,9 @@
+2003-02-27  Carlos Morgado  <chbm@cprm.net>
+
+	* libbalsa/libbalsa.c: 
+	* libbalsa/misc.c: 
+	be a bit smarter about finding domainname
+
 2003-02-20  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-message.c: HTML resize fix ported (bug 106508)

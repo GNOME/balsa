@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa VERSION\n"
-"POT-Creation-Date: 1999-04-20 06:45-0400\n"
+"POT-Creation-Date: 1999-07-15 16:09+0200\n"
 "PO-Revision-Date: 1998-10-02 21:43+0200\n"
 "Last-Translator: Vincent Renardias <vincent@ldsol.com>\n"
 "Language-Team: Vincent Renardias <vincent@ldsol.com>\n"
@@ -31,11 +31,11 @@ msgstr "Bienvenu dans Balsa!"
 
 #: src/balsa-init.c:137
 msgid "welcome"
-msgstr ""
+msgstr "bienvenue"
 
 #: src/balsa-init.c:142
 msgid "general"
-msgstr ""
+msgstr "général"
 
 #: src/balsa-init.c:147
 #, fuzzy
@@ -165,43 +165,39 @@ msgstr "Ok"
 
 #. this is the first row, so we'll use 0.0 here
 #: src/balsa-message.c:519
-#, fuzzy
 msgid "Date:"
-msgstr "Date"
+msgstr "Date:"
 
 #. To:
 #: src/balsa-message.c:526 src/filter-edit-dialog.c:291
 #: src/sendmsg-window.c:315
 msgid "To:"
-msgstr ""
+msgstr "À:"
 
 #: src/balsa-message.c:534
 msgid "Cc:"
-msgstr ""
+msgstr "Cc:"
 
 #. From:
 #: src/balsa-message.c:544 src/filter-edit-dialog.c:303
 #: src/sendmsg-window.c:338
-#, fuzzy
 msgid "From:"
-msgstr "De"
+msgstr "De:"
 
 #. Subject:
 #: src/balsa-message.c:558 src/sendmsg-window.c:358
-#, fuzzy
 msgid "Subject:"
-msgstr "Sujet"
+msgstr "Sujet:"
 
 #: src/balsa-message.c:650
 msgid ""
 "<tr><td bgcolor=\"#f0f0f0\"> You received an encoded file of type "
 "application/"
-msgstr ""
+msgstr "<tr><td bgcolor=\"#f0f0f0\"> Vous avez reçu un fichier de type application/"
 
 #: src/balsa-message.c:654
-#, fuzzy
 msgid "<P>The parameters of this message are:<BR>"
-msgstr "Ajouter un attachement à ce message"
+msgstr "<P>Les paramètres de ce message sont:<BR>"
 
 #: src/balsa-message.c:655
 msgid "<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n"
@@ -218,20 +214,19 @@ msgstr ""
 
 #: src/filter-edit-dialog.c:101
 msgid "Name"
-msgstr ""
+msgstr "Nom"
 
 #: src/filter-edit-dialog.c:165
 msgid "Up"
-msgstr ""
+msgstr "Haut"
 
 #: src/filter-edit-dialog.c:171
 msgid "Down"
-msgstr ""
+msgstr "Bas"
 
 #: src/filter-edit-dialog.c:188
-#, fuzzy
 msgid "New"
-msgstr "_Nouveau"
+msgstr "Nouveau"
 
 #: src/filter-edit-dialog.c:194 src/index-child.c:449 src/main-window.c:211
 #: src/pref-manager.c:471
@@ -247,9 +242,8 @@ msgid "All"
 msgstr ""
 
 #: src/filter-edit-dialog.c:267
-#, fuzzy
 msgid "Header"
-msgstr "Lu"
+msgstr "Entête"
 
 #: src/filter-edit-dialog.c:279
 #, fuzzy

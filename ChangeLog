@@ -1,3 +1,11 @@
+2005-04-05 20:36  PeterB
+
+	* src/sendmsg-window.c, src/sendmsg-window.h, libbalsa/filter.c,
+	libbalsa/mailbox_local.c, libbalsa/mime.c, libbalsa/mime.h: yet
+	another shot at finding the best charset in the compose window.
+	* src/sendmsg-window.c: destroy file-chooser dialogs with
+	their parent.
+
 2005-04-05 Pawel Salek
 
 	* libbalsa/imap/imap-handle.c: proper types for list-response

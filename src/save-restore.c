@@ -50,7 +50,6 @@ static gint config_folder_init(const gchar * prefix);
 static gint config_mailbox_init(const gchar * prefix);
 static gchar *config_get_unused_section(const gchar * prefix);
 
-static gchar **mailbox_list_to_vector(GList * mailbox_list);
 static void save_color(gchar * key, GdkColor * color);
 static void load_color(gchar * key, GdkColor * color);
 static void save_mru(GList *mru);
@@ -551,7 +550,6 @@ config_warning_idle(const gchar * text)
 static gint
 config_global_load(void)
 {
-    gint open_mailbox_count;
     gboolean def_used;
     BalsaMailboxNode *root_node;
 
@@ -965,15 +963,6 @@ config_global_load(void)
     
     balsa_app.remember_open_mboxes =
 	gnome_config_get_bool("RememberOpenMailboxes=false");
-    gnome_config_get_vector("OpenMailboxes", &open_mailbox_count,
-			    &balsa_app.open_mailbox_vector);
-    if (balsa_app.remember_open_mboxes && open_mailbox_count > 0
-        && **balsa_app.open_mailbox_vector) {
-	printf("Opening %d mailboxes on startup.\n", open_mailbox_count);
-    } else {
-	g_strfreev(balsa_app.open_mailbox_vector);
-	balsa_app.open_mailbox_vector = NULL;
-    }
 
     balsa_app.empty_trash_on_exit =
 	gnome_config_get_bool("EmptyTrash=false");
@@ -1010,7 +999,6 @@ config_global_load(void)
 gint
 config_save(void)
 {
-    gchar **open_mailboxes_vector;
     gint i;
 
     config_address_books_save();
@@ -1234,12 +1222,6 @@ config_save(void)
     gnome_config_set_bool("AutoCommitMailbox", balsa_app.commit_mailbox_auto);
     gnome_config_set_int("AutoCommitMailboxTimeout", balsa_app.commit_mailbox_timeout/60);
 
-    open_mailboxes_vector =
-	mailbox_list_to_vector(balsa_app.open_mailbox_list);
-    gnome_config_set_vector("OpenMailboxes",
-			    g_list_length(balsa_app.open_mailbox_list),
-			    (const char **) open_mailboxes_vector);
-    g_strfreev(open_mailboxes_vector);
     gnome_config_set_bool("RememberOpenMailboxes",
 			  balsa_app.remember_open_mboxes);
     gnome_config_set_bool("EmptyTrash", balsa_app.empty_trash_on_exit);
@@ -1467,34 +1449,63 @@ config_views_load(void)
     iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
     while ((iterator = gnome_config_iterator_next(iterator, &key, &val))) {
 	if (strncmp(key, VIEW_SECTION_PREFIX, pref_len) == 0) {
-	    gchar* url;
+	    gchar *url;
 	    tmp = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
 	    gnome_config_push_prefix(tmp);
 	    g_free(tmp);
 	    url = gnome_config_get_string_with_default("URL", &def);
-	    if(!def) {
-                BalsaMailboxNode *mbnode =
-                    balsa_find_mailbox_node_by_url(url);
-		LibBalsaMailbox *mbx = mbnode ? mbnode->mailbox : NULL;
+	    if (!def) {
+                LibBalsaMailboxView *view;
+                gchar *address;
 
-		if (mbx) {
-                    gboolean exposed;
+                view = libbalsa_mailbox_view_new();
+                g_hash_table_insert(balsa_app.mailbox_views,
+                                    g_strdup(url), view);
 
-                    libbalsa_mailbox_load_view(mbx);
+                address =
+                    gnome_config_get_string_with_default
+                    ("MailingListAddress", &def);
+                view->mailing_list_address =
+                    def ? NULL : libbalsa_address_new_from_string(address);
+                g_free(address);
 
-                    exposed =
-                        gnome_config_get_bool_with_default("Exposed", &def);
-                    if (def) exposed = FALSE;
-                    if (exposed)
-                        while ((mbnode = mbnode->parent))
-                            mbnode->expanded = TRUE;
-                }
-	    }
-	    gnome_config_pop_prefix();
-	    g_free(url);
-	}
-	g_free(key);
-	g_free(val);
+                view->identity_name = gnome_config_get_string("Identity");
+
+                view->threading_type =
+                    gnome_config_get_int_with_default("Threading", &def);
+                if (def)
+                    view->threading_type = LB_MAILBOX_THREADING_SIMPLE;
+
+                view->sort_type =
+                    gnome_config_get_int_with_default("SortType", &def);
+                if (def)
+                    view->sort_type = LB_MAILBOX_SORT_TYPE_ASC;
+
+                view->sort_field =
+                    gnome_config_get_int_with_default("SortField", &def);
+                if (def)
+                    view->sort_field = LB_MAILBOX_SORT_DATE;
+
+                view->show =
+                    gnome_config_get_int_with_default("Show", &def);
+                if (def)
+                    view->show = LB_MAILBOX_SHOW_UNSET;
+
+                view->exposed =
+                    gnome_config_get_bool_with_default("Exposed", &def);
+                if (def)
+                    view->exposed = FALSE;
+
+                view->open =
+                    gnome_config_get_bool_with_default("Open", &def);
+                if (def)
+                    view->open = FALSE;
+            }
+            gnome_config_pop_prefix();
+            g_free(url);
+        }
+        g_free(key);
+        g_free(val);
     }
 }
 
@@ -1505,27 +1516,35 @@ static gboolean
 save_view(GNode * node, int *cnt)
 {
     gchar *prefix;
-    gboolean exposed;
+    LibBalsaMailboxView *view;
     BalsaMailboxNode* mn = BALSA_MAILBOX_NODE(node->data);
     g_return_val_if_fail(mn, FALSE);
     
     if(!mn->mailbox) return FALSE;
+
+    view = mn->mailbox->view;
     prefix = g_strdup_printf("%s%d/",
 			     BALSA_CONFIG_PREFIX VIEW_SECTION_PREFIX, 
 			     ++(*cnt));
     gnome_config_push_prefix(prefix);
     g_free(prefix);
     gnome_config_set_string("URL", mn->mailbox->url);
-    libbalsa_mailbox_save_view(mn->mailbox);
-
-    exposed = TRUE;
-    while ((mn = mn->parent)) {
-        if (!mn->expanded) {
-            exposed = FALSE;
-            break;
-        }
+    if (view->mailing_list_address) {
+       gchar* tmp = libbalsa_address_to_gchar(view->mailing_list_address, 0);
+       gnome_config_set_string("MailingListAddress", tmp);
+       g_free(tmp);
+    } else {
+       gnome_config_clean_key("MailingListAddress");
     }
-    gnome_config_set_bool("Exposed", exposed);
+    if(view->identity_name)
+       gnome_config_set_string("Identity", view->identity_name);
+    else gnome_config_clean_key("Identity");
+    gnome_config_set_int("Threading",   view->threading_type);
+    gnome_config_set_int("SortType",    view->sort_type);
+    gnome_config_set_int("SortField",   view->sort_field);
+    gnome_config_set_int("Show", view->show);
+    gnome_config_set_bool("Exposed", view->exposed);
+    gnome_config_set_bool("Open", view->open);
 
     gnome_config_pop_prefix();
     return FALSE;
@@ -1542,23 +1561,6 @@ config_views_save(void)
     g_node_traverse(balsa_app.mailbox_nodes, G_IN_ORDER, G_TRAVERSE_ALL, -1,
 		   (GNodeTraverseFunc) save_view, &cnt);
     balsa_mailbox_nodes_unlock(FALSE);
-}
-
-static gchar **
-mailbox_list_to_vector(GList * mailbox_list)
-{
-    GList *list;
-    gchar **res;
-    gint i;
-
-    i = g_list_length(mailbox_list) + 1;
-    res = g_new0(gchar *, i);
-
-    res[--i] = NULL;
-    for(list = mailbox_list; list; list = g_list_next(list))
-	res[--i] = g_strdup(LIBBALSA_MAILBOX(list->data)->url);
-
-    return res;
 }
 
 static void

@@ -1,3 +1,8 @@
+2004-09-24 16:32  PeterB
+
+	* libbalsa/body.c: use content-type "text/plain" when
+	body->content_type is NULL.
+
 2004-09-21  Pawel Salek
 
 	* doc/C/balsa.xml: identity doc update from Craig Routledge.

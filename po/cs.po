@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-10-07 11:07+0200\n"
-"PO-Revision-Date: 2003-10-07 20:35+0200\n"
+"POT-Creation-Date: 2003-10-14 14:02+0200\n"
+"PO-Revision-Date: 2003-10-17 22:11+0200\n"
 "Last-Translator: Miloslav Trmac <mitr@volny.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -369,14 +369,12 @@ msgstr "Vypadá to, že poštovní schránka %s není typu Maildir."
 msgid "Could not create a MailDir directory at %s (%s)"
 msgstr "Nelze vytvořit MailDir adresář na %s (%s)"
 
-# ???
 #: libbalsa/mailbox_maildir.c:131 libbalsa/mailbox_maildir.c:139
 #: libbalsa/mailbox_maildir.c:149
 #, c-format
 msgid "Could not create a MailDir at %s (%s)"
 msgstr "Nelze vytvořit MailDir na %s (%s)"
 
-# ???
 #: libbalsa/mailbox_maildir.c:210 libbalsa/mailbox_mh.c:189
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
@@ -416,7 +414,6 @@ msgstr "Nezdá se, že by poštovní schránka %s byla typu Mh."
 msgid "Could not create MH directory at %s (%s)"
 msgstr "Nelze vytvořit MH adresář na %s (%s)"
 
-# ???
 #: libbalsa/mailbox_mh.c:131
 #, c-format
 msgid "Could not create MH structure at %s (%s)"
@@ -484,7 +481,6 @@ msgstr ""
 msgid "connection error"
 msgstr "chyba spojení"
 
-# libbalsa/pop3.c:49 # !!! execution, not exection
 #: libbalsa/pop3.c:58
 msgid "POP command execution failed"
 msgstr "Provedení příkazu protokolu POP se nezdařilo"
@@ -905,20 +901,20 @@ msgstr "gpgme nemohlo získat data ze souboru: %s"
 msgid "gpgme could not create new data: %s"
 msgstr "gpgme nemohlo vytvořit nová data: %s"
 
-#: libbalsa/send.c:218 libbalsa/send.c:225
+#: libbalsa/send.c:222 libbalsa/send.c:229
 msgid "Sending Mail..."
 msgstr "Posílá se pošta..."
 
-#: libbalsa/send.c:221 src/main-window.c:1809
+#: libbalsa/send.c:225 src/main-window.c:1816
 msgid "_Hide"
 msgstr "S_krýt"
 
-#: libbalsa/send.c:371
+#: libbalsa/send.c:375
 msgid "Unable to open sentbox - could not get IMAP server information"
 msgstr ""
 "Nelze otevřít schránku sentbox - nelze získat informace z IMAP serveru."
 
-#: libbalsa/send.c:787
+#: libbalsa/send.c:792
 #, c-format
 msgid ""
 "Could not send the message to %s:\n"
@@ -929,7 +925,7 @@ msgstr ""
 "%d: %s\n"
 "Zpráva zanechána ve schránce 'Pošta k odeslání'.\n"
 
-#: libbalsa/send.c:829
+#: libbalsa/send.c:834
 #, c-format
 msgid ""
 "Relaying refused:\n"
@@ -940,7 +936,7 @@ msgstr ""
 "%d: %s\n"
 "Zpráva zanechána ve schránce 'Pošta k odeslání'.\n"
 
-#: libbalsa/send.c:839
+#: libbalsa/send.c:844
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
@@ -948,33 +944,33 @@ msgstr ""
 "Problém při předání zprávy, ukládá se do schránky 'Pošta k odeslání'.\n"
 "Systém se bude pokoušet znovu poslat zprávu, dokud ji nesmažete."
 
-#: libbalsa/send.c:869
+#: libbalsa/send.c:874
 msgid "Connected to MTA"
 msgstr "Připojeno k MTA"
 
-#: libbalsa/send.c:876 src/balsa-message.c:1231 src/print.c:349
+#: libbalsa/send.c:881 src/balsa-message.c:1231 src/print.c:349
 #: src/sendmsg-window.c:670 src/sendmsg-window.c:2143 src/store-address.c:303
 msgid "From:"
 msgstr "Od:"
 
-#: libbalsa/send.c:879 src/balsa-index.c:360
+#: libbalsa/send.c:884 src/balsa-index.c:360
 msgid "From"
 msgstr "Od"
 
-#: libbalsa/send.c:887 src/balsa-message.c:1240 src/print.c:353
+#: libbalsa/send.c:892 src/balsa-message.c:1240 src/print.c:353
 #: src/sendmsg-window.c:669 src/sendmsg-window.c:2150 src/store-address.c:304
 msgid "To:"
 msgstr "Pro:"
 
-#: libbalsa/send.c:890 src/balsa-index.c:845
+#: libbalsa/send.c:895 src/balsa-index.c:845
 msgid "To"
 msgstr "Pro"
 
-#: libbalsa/send.c:926
+#: libbalsa/send.c:931
 msgid "Disconnected"
 msgstr "Odpojeno"
 
-#: libbalsa/send.c:1119
+#: libbalsa/send.c:1118
 msgid ""
 "SMTP server refused connection.\n"
 "Balsa by default uses submission service (587).\n"
@@ -988,7 +984,7 @@ msgstr ""
 "zadat pomocí \"host:smtp\".\n"
 "Zpráva byla ponechána ve schránce 'Pošta k odeslání'."
 
-#: libbalsa/send.c:1129
+#: libbalsa/send.c:1128
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
@@ -997,7 +993,7 @@ msgstr ""
 "Problém se serverem SMTP (%d): %s\n"
 "Vaše zpráva zůstala v poštovní schránce 'Pošta k odeslání'"
 
-#: libbalsa/send.c:1541 libbalsa/send.c:1765
+#: libbalsa/send.c:1542 libbalsa/send.c:1766
 msgid "This message will not be encrpyted for the BCC: recipient(s)."
 msgstr "Tato zpráva nebude šifrována pro příjemce skrytých kopií."
 
@@ -1027,7 +1023,7 @@ msgstr "_Doručená pošta:"
 
 #: libinit_balsa/balsa-druid-page-directory.c:38
 msgid "_Outbox:"
-msgstr "Pošta na _odeslání:"
+msgstr "Pošta k _odeslání:"
 
 #: libinit_balsa/balsa-druid-page-directory.c:38
 msgid "_Sentbox:"
@@ -1075,8 +1071,8 @@ msgid ""
 "Please verify the locations of your default mail files.\n"
 "These will be created if necessary."
 msgstr ""
-"Ověřte, prosím, umístění vašich standardních poštovních souborů.\n"
-"Jestliže to bude potřeba, budou vytvořeny."
+"Ověřte prosím umístění vašich implicitních souborů pošty.\n"
+"V případě potřeby budou vytvořeny."
 
 #: libinit_balsa/balsa-druid-page-directory.c:242
 msgid "Mail Files"
@@ -1114,7 +1110,7 @@ msgstr "Zadejte prosím vaše osobní informace."
 
 #: libinit_balsa/balsa-druid-page-user.c:74
 msgid "_Name:"
-msgstr "Jmé_no:"
+msgstr "_Jméno:"
 
 #: libinit_balsa/balsa-druid-page-user.c:84
 msgid "_Local Mail Directory:"
@@ -1150,14 +1146,8 @@ msgid ""
 "  Please check the about box in Balsa's main window for more information "
 "about contacting the authors or reporting bugs."
 msgstr ""
-"Zdá se, že jste program Balsa spustili poprvé. V následujících krocích bude "
-"provedeno jeho základní nastavení pomocí několika jednoduchých otázek. I po "
-"dokončení těchto kroků můžete vše dále měnit v nastavení programu Balsa. "
-"Pokud bude nutné vytvořit nějaké soubory či adresáře, bude tak učiněno "
-"automaticky.\n"
-"Prohlédněte si též prosím okno \"O programu\" - přístupné z menu\"Nápověda\" "
-"hlavního okna - kde získáte informace o spojení na autory a o ohlašování "
-"chyb v programu."
+"Zdá se, že jste program Balsa spustili poprvé. V následujících krocích bude provedeno jeho základní nastavení pomocí několika jednoduchých otázek. I po dokončení těchto kroků můžete vše dále měnit v nastavení programu Balsa. Pokud bude nutné vytvořit nějaké soubory či adresáře, bude tak učiněno automaticky.\n"
+"Prohlédněte si též prosím okno \"O programu\" - přístupné z menu \"Nápověda\" hlavního okna - kde získáte informace o spojení na autory a o ohlašování chyb v programu."
 
 #: libinit_balsa/balsa-initdruid.c:83
 msgid ""
@@ -2623,17 +2613,17 @@ msgstr "_Všechny"
 msgid "C_lear"
 msgstr "Vy_mazat"
 
-#: src/filter-edit-callbacks.c:999 src/main-window.c:2740
+#: src/filter-edit-callbacks.c:999 src/main-window.c:2747
 msgid "_Body"
 msgstr "_Těle"
 
 #. To:
-#: src/filter-edit-callbacks.c:1006 src/main-window.c:2741
+#: src/filter-edit-callbacks.c:1006 src/main-window.c:2748
 #: src/sendmsg-window.c:1846
 msgid "_To:"
 msgstr "_Pro:"
 
-#: src/filter-edit-callbacks.c:1013 src/main-window.c:2742
+#: src/filter-edit-callbacks.c:1013 src/main-window.c:2749
 msgid "_From:"
 msgstr "_Od:"
 
@@ -2641,7 +2631,7 @@ msgstr "_Od:"
 msgid "_Subject"
 msgstr "Pře_dmět"
 
-#: src/filter-edit-callbacks.c:1028 src/main-window.c:2744
+#: src/filter-edit-callbacks.c:1028 src/main-window.c:2751
 msgid "_Cc:"
 msgstr "_Kopie:"
 
@@ -2887,7 +2877,7 @@ msgstr "Vzdálená IMAP složka"
 
 #: src/folder-conf.c:269 src/folder-conf.c:659 src/mailbox-conf.c:477
 msgid "_Update"
-msgstr "Akt_ualizovat"
+msgstr "_Aktualizovat"
 
 #: src/folder-conf.c:269 src/folder-conf.c:659
 msgid "_Create"
@@ -2922,7 +2912,7 @@ msgstr "Pouze přihlášené složk_y"
 
 #: src/folder-conf.c:321
 msgid "_Always show INBOX"
-msgstr "Vždy uk_azovat INBOX"
+msgstr "Vždy zobrazovat _INBOX"
 
 #: src/folder-conf.c:324
 msgid "Pr_efix"
@@ -2930,7 +2920,7 @@ msgstr "_Předpona"
 
 #: src/folder-conf.c:330 src/mailbox-conf.c:1076
 msgid "Use SS_L (IMAPS)"
-msgstr "Použít SS_L (IMAPS)"
+msgstr "Používat _SSL (IMAPS)"
 
 #: src/folder-conf.c:462
 msgid "Select parent folder"
@@ -2996,7 +2986,6 @@ msgstr "Podsložka _složky:"
 msgid "_Browse..."
 msgstr "_Probírat..."
 
-# src/folder-conf.c:177 # !!! "...ration. I do not...", not "...ration.I do not..."
 #: src/folder-conf.c:729
 msgid ""
 "This folder is not stored in configuration. I do not yet know how to remove "
@@ -3070,7 +3059,6 @@ msgstr ""
 msgid "Remove from _list"
 msgstr "Odstranit se _seznamu"
 
-# src/mailbox-conf.c:164 # !!! "...and delete files."
 #: src/mailbox-conf.c:267
 msgid "Remove from list and _disk"
 msgstr "Odstranit ze seznamu a z _disku"
@@ -3162,7 +3150,7 @@ msgstr "Používat ověřování totožnosti _APOP"
 
 #: src/mailbox-conf.c:959
 msgid "_Delete messages from server after download"
-msgstr "Po stažení o_dstranit zprávy ze serveru"
+msgstr "Po stažení _odstranit zprávy ze serveru"
 
 #: src/mailbox-conf.c:964
 msgid "_Filter messages through procmail"
@@ -3174,7 +3162,7 @@ msgstr "Příkaz fi_ltru:"
 
 #: src/mailbox-conf.c:976
 msgid "_Enable check for new mail"
-msgstr "Povol_ení zjišťování nové pošty"
+msgstr "Povolit z_jišťování nové pošty"
 
 #: src/mailbox-conf.c:986
 msgid "Use SS_L (pop3s)"
@@ -3479,7 +3467,7 @@ msgstr "Promyšlenější třídění vláken algoritmem JWZ"
 
 #: src/main-window.c:398
 msgid "_Show Mailbox Tree"
-msgstr "Zobrazit _strom poštovních schránek"
+msgstr "Zobrazovat _strom poštovních schránek"
 
 #: src/main-window.c:399
 msgid "Toggle display of mailbox and folder tree"
@@ -3487,7 +3475,7 @@ msgstr "Přepnout zobrazování stromu poštovních schránek a složek"
 
 #: src/main-window.c:402
 msgid "Show Mailbox _Tabs"
-msgstr "Zobrazit zá_ložky poštovních schránek"
+msgstr "Zobrazovat zá_ložky poštovních schránek"
 
 #: src/main-window.c:403
 msgid "Toggle display of mailbox notebook tabs"
@@ -3776,7 +3764,7 @@ msgstr ""
 "Program Balsa nyní odesílá zprávu.\n"
 "Přerušit odesílání?"
 
-#: src/main-window.c:1407
+#: src/main-window.c:1414
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -3784,7 +3772,7 @@ msgstr ""
 "Nelze otevřít poštovní schránku!\n"
 "Ověřte, prosím, nastavení poštovní schránky."
 
-#: src/main-window.c:1689
+#: src/main-window.c:1696
 msgid "translator_credits"
 msgstr ""
 "Marcel Telka <marcel@telka.sk>\n"
@@ -3792,7 +3780,7 @@ msgstr ""
 "Michal Bukovjan <bukm@centrum.cz>\n"
 "Miloslav Trmač <mitr@volny.cz>"
 
-#: src/main-window.c:1704
+#: src/main-window.c:1711
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://balsa.gnome.org/\n"
@@ -3805,73 +3793,73 @@ msgstr ""
 "Pokud chcete oznámit chyby v programu, učiňte tak prosím na adrese http://"
 "bugzilla.gnome.org/"
 
-#: src/main-window.c:1806
+#: src/main-window.c:1813
 msgid "Checking Mail..."
 msgstr "Kontroluje se pošta..."
 
-#: src/main-window.c:2104
+#: src/main-window.c:2111
 msgid "Finished Checking."
 msgstr "Kontrola pošty dokončena."
 
-#: src/main-window.c:2168
+#: src/main-window.c:2175
 #, c-format
 msgid "Sending error: %s"
 msgstr "Chyba při odesílání: %s"
 
-#: src/main-window.c:2264
+#: src/main-window.c:2271
 msgid "Balsa: New mail"
 msgstr "Balsa: Nová pošta"
 
 #
-#: src/main-window.c:2276
+#: src/main-window.c:2283
 #, c-format
 msgid "You have received %d new messages."
 msgstr "Obdrželi jste %d nových zpráv."
 
-#: src/main-window.c:2277
+#: src/main-window.c:2284
 msgid "You have received 1 new message."
 msgstr "Obdrželi jste 1 novou zprávu."
 
-#: src/main-window.c:2700
+#: src/main-window.c:2707
 msgid "Search mailbox"
 msgstr "Prohledávat poštovní schránku"
 
-#: src/main-window.c:2713
+#: src/main-window.c:2720
 msgid "_Reverse search"
 msgstr "Ob_rácené hledání"
 
-#: src/main-window.c:2716
+#: src/main-window.c:2723
 msgid "_Search for:"
 msgstr "_Hledat:"
 
-#: src/main-window.c:2729
+#: src/main-window.c:2736
 msgid "In:"
 msgstr "V:"
 
-#: src/main-window.c:2743
+#: src/main-window.c:2750
 msgid "S_ubject"
 msgstr "_Předmět"
 
-#: src/main-window.c:2858
+#: src/main-window.c:2865
 msgid "You can apply filters only on mailbox\n"
 msgstr "Filtry lze aplikovat pouze na poštovní schránky\n"
 
-#: src/main-window.c:2902 src/main-window.c:2921
+#: src/main-window.c:2909 src/main-window.c:2928
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Potvrzení změn v poštovní schránce %s selhalo."
 
-#: src/main-window.c:3050
+#: src/main-window.c:3057
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (jen pro čtení)"
 
-#: src/main-window.c:3052
+#: src/main-window.c:3059
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: src/main-window.c:3150
+#: src/main-window.c:3157
 msgid "Cannot access the message's body\n"
 msgstr "Nelze přistupovat k tělu zprávy\n"
 
@@ -3979,7 +3967,7 @@ msgstr "Tisknutelné znaky (quoted)"
 
 #: src/pref-manager.c:337
 msgid "While Retrieving Messages"
-msgstr "Při vybírání zpráv"
+msgstr "Při získávání zpráv"
 
 #: src/pref-manager.c:338
 msgid "Until Closed"
@@ -4132,7 +4120,7 @@ msgstr "Název poštovní schránky"
 
 #: src/pref-manager.c:1555 src/pref-manager.c:2707
 msgid "_Modify"
-msgstr "U_pravit"
+msgstr "_Upravit"
 
 #: src/pref-manager.c:1570
 msgid "Local Mail"
@@ -4161,7 +4149,7 @@ msgstr "Heslo"
 #. STARTTLS
 #: src/pref-manager.c:1606
 msgid "Use TLS"
-msgstr "Použít TLS"
+msgstr "Používat TLS"
 
 #: src/pref-manager.c:1624
 msgid "Certificate Pass Phrase"
@@ -4177,19 +4165,19 @@ msgstr "Odchozí"
 
 #: src/pref-manager.c:1668
 msgid "Checking"
-msgstr "Zjišťování"
+msgstr "Kontrola"
 
 #: src/pref-manager.c:1673
 msgid "_Check mail automatically every:"
-msgstr "Zjišťovat poštu automati_cky každých:"
+msgstr "_Kontrolovat poštu automaticky každých:"
 
 #: src/pref-manager.c:1690
 msgid "Check _IMAP mailboxes"
-msgstr "Zjišťovat poštu ve schránkách typu _IMAP"
+msgstr "Kontrolovat schránky _IMAP"
 
 #: src/pref-manager.c:1696
 msgid "Check INBOX _only"
-msgstr "Zjišťovat p_ouze ve schránce INBOX"
+msgstr "Kontrolovat _pouze INBOX"
 
 #: src/pref-manager.c:1701
 msgid "Display message if new mail has arrived in an open mailbox"
@@ -4197,7 +4185,7 @@ msgstr "Zobrazit zprávu, pokud dorazila nová pošta do otevřené schránky"
 
 #: src/pref-manager.c:1706
 msgid "Do background check quietly (no messages in status bar)"
-msgstr "Provádět zjišťování tiše na pozadí (žádné zprávy ve stavové liště)"
+msgstr "Kontrolovat tiše na pozadí (žádné zprávy ve stavové liště)"
 
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
@@ -4273,7 +4261,7 @@ msgstr "Zalamování"
 
 #: src/pref-manager.c:1909
 msgid "Wrap Outgoing Text at:"
-msgstr "Zalomit odcházející text na pozici:"
+msgstr "Zalamovat odchozí text na pozici:"
 
 #: src/pref-manager.c:1937
 msgid "Toolbar Buttons"
@@ -4301,7 +4289,7 @@ msgstr "Předpona odpovědi:"
 
 #: src/pref-manager.c:1993
 msgid "Edit headers in external editor"
-msgstr "Úprava hlaviček v externím editoru"
+msgstr "Upravovat hlavičky v externím editoru"
 
 #: src/pref-manager.c:1995
 msgid "Automatically quote original when replying"
@@ -4341,11 +4329,11 @@ msgstr "Používat panel náhledu"
 
 #: src/pref-manager.c:2054
 msgid "Show mailbox statistics in left pane"
-msgstr "Zobrazit statistiky poštovní schránky v levém panelu"
+msgstr "Zobrazovat statistiky poštovní schránky v levém panelu"
 
 #: src/pref-manager.c:2056
 msgid "Use alternative main window layout"
-msgstr "Použít alternativní uspořádání hlavního okna"
+msgstr "Používat alternativní uspořádání hlavního okna"
 
 #: src/pref-manager.c:2058
 msgid "Automatically view message when mailbox opened"
@@ -4397,9 +4385,8 @@ msgstr "Závažná chybová hlášení"
 
 #: src/pref-manager.c:2163
 msgid "Debug Messages"
-msgstr "Ladící hlášení"
+msgstr "Ladicí hlášení"
 
-#
 #: src/pref-manager.c:2188
 msgid "Mailbox Colors"
 msgstr "Barvy poštovní schránky"
@@ -4530,11 +4517,11 @@ msgstr "Volby"
 
 #: src/pref-manager.c:2591
 msgid "Open Inbox upon startup"
-msgstr "Otevřít schránku s doručenou poštou po startu"
+msgstr "Po spuštění otevřít schránku s doručenou poštou"
 
 #: src/pref-manager.c:2593
 msgid "Check mail upon startup"
-msgstr "Zjišťovat došlou poštu po startu"
+msgstr "Po spuštění kontrolovat poštu"
 
 #: src/pref-manager.c:2595
 msgid "Remember open mailboxes between sessions"
@@ -4550,7 +4537,7 @@ msgid ""
 "To see more of the tree at startup, choose a greater depth."
 msgstr ""
 "Vyberte úroveň 1 pro rychlý start, to odloží zkoumání některých složek.\n"
-"Chcete-li zobrazit více ze stromu po spuštění programu, zvolte větší hloubku."
+"Chcete-li po spuštění programu vidět ze stromu více, zvolte větší hloubku."
 
 #: src/pref-manager.c:2622
 msgid "Scan tree to depth"
@@ -4566,7 +4553,7 @@ msgstr "Doplňovat přezdívky"
 
 #: src/pref-manager.c:2711
 msgid "_Set as default"
-msgstr "Na_stavit jako výchozí"
+msgstr "Nastavit jako _implicitní"
 
 #: src/pref-manager.c:2867
 msgid "Remote POP3 mailbox..."
@@ -4842,15 +4829,11 @@ msgstr "Klíčo_vá slova"
 
 #: src/sendmsg-window.c:342
 msgid "_Brazilian"
-msgstr "_Brazilsky"
+msgstr "Brazilská portugalština"
 
-# this is a problem for translation; Catalan is spelled with "K" in
-# the beginning in Czech and hence doesn't belong to A-J (not to
-# mention the alphabetical order); the same for English ("Angličtina"
-# in czech) and other languages
 #: src/sendmsg-window.c:343
 msgid "_Catalan"
-msgstr "_Katalánsky"
+msgstr "_Katalánština"
 
 #: src/sendmsg-window.c:344
 msgid "_Chinese Simplified"
@@ -4862,15 +4845,15 @@ msgstr "_Tradiční čínština"
 
 #: src/sendmsg-window.c:346
 msgid "_Czech"
-msgstr "_Česky"
+msgstr "_Čeština"
 
 #: src/sendmsg-window.c:347
 msgid "_Danish"
-msgstr "_Dánsky"
+msgstr "_Dánština"
 
 #: src/sendmsg-window.c:348
 msgid "_Dutch"
-msgstr "_Holandsky"
+msgstr "_Holandština"
 
 #: src/sendmsg-window.c:349
 msgid "_English (American)"
@@ -4886,103 +4869,103 @@ msgstr "_Esperanto"
 
 #: src/sendmsg-window.c:352
 msgid "_Estonian"
-msgstr "_Estonsky"
+msgstr "_Estonština"
 
 #: src/sendmsg-window.c:353
 msgid "_Finnish"
-msgstr "_Finsky"
+msgstr "_Finština"
 
 #: src/sendmsg-window.c:354
 msgid "_French"
-msgstr "_Francouzsky"
+msgstr "_Francouzština"
 
 #: src/sendmsg-window.c:355
 msgid "_German"
-msgstr "_Německy"
+msgstr "_Němčina"
 
 #: src/sendmsg-window.c:356
 msgid "_Greek"
-msgstr "_Řecky"
+msgstr "_Řečtina"
 
 #: src/sendmsg-window.c:357
 msgid "_Hebrew"
-msgstr "_Hebrejsky"
+msgstr "_Hebrejština"
 
 #: src/sendmsg-window.c:358
 msgid "_Hungarian"
-msgstr "_Maďarsky"
+msgstr "_Maďarština"
 
 #: src/sendmsg-window.c:359
 msgid "_Italian"
-msgstr "_Italsky"
+msgstr "_Italština"
 
 #: src/sendmsg-window.c:360
 msgid "_Japanese"
-msgstr "_Japonsky"
+msgstr "_Japonština"
 
 #: src/sendmsg-window.c:361
 msgid "_Korean"
-msgstr "_Korejsky"
+msgstr "_Korejština"
 
 #: src/sendmsg-window.c:362
 msgid "_Latvian"
-msgstr "_Lotyšsky"
+msgstr "_Lotyština"
 
 #: src/sendmsg-window.c:363
 msgid "_Lithuanian"
-msgstr "_Litevsky"
+msgstr "_Litevština"
 
 #: src/sendmsg-window.c:364
 msgid "_Norwegian"
-msgstr "_Norsky"
+msgstr "_Norština"
 
 #: src/sendmsg-window.c:365
 msgid "_Polish"
-msgstr "_Polsky"
+msgstr "_Polština"
 
 #: src/sendmsg-window.c:366
 msgid "_Portugese"
-msgstr "_Portugalsky"
+msgstr "_Portugalština"
 
 #: src/sendmsg-window.c:367
 msgid "_Romanian"
-msgstr "_Rumunsky"
+msgstr "_Rumunština"
 
 #: src/sendmsg-window.c:368
 msgid "_Russian (ISO)"
-msgstr "_Rusky (ISO)"
+msgstr "_Ruština (ISO)"
 
 #: src/sendmsg-window.c:369
 msgid "_Russian (KOI)"
-msgstr "_Rusky (KOI)"
+msgstr "_Ruština (KOI)"
 
 #: src/sendmsg-window.c:370
 msgid "_Serbian"
-msgstr "_Srbsky"
+msgstr "_Srbština"
 
 #: src/sendmsg-window.c:371
 msgid "_Serbian (Latin)"
-msgstr "_Srbsky (latinka)"
+msgstr "_Srbština (latinka)"
 
 #: src/sendmsg-window.c:372
 msgid "_Slovak"
-msgstr "_Slovensky"
+msgstr "_Slovenština"
 
 #: src/sendmsg-window.c:373
 msgid "_Spanish"
-msgstr "_Španělsky"
+msgstr "_Španělština"
 
 #: src/sendmsg-window.c:374
 msgid "_Swedish"
-msgstr "_Švédsky"
+msgstr "_Švédština"
 
 #: src/sendmsg-window.c:375
 msgid "_Turkish"
-msgstr "_Turecky"
+msgstr "_Turečtina"
 
 #: src/sendmsg-window.c:376
 msgid "_Ukrainian"
-msgstr "_Ukrajinsky"
+msgstr "_Ukrajinština"
 
 #: src/sendmsg-window.c:377
 msgid "_Generic UTF-8"
@@ -4998,7 +4981,7 @@ msgstr "_GnuPG používá starý režim OpenPGP"
 
 #: src/sendmsg-window.c:406
 msgid "_Request Disposition Notification"
-msgstr "Vyžadovat oznámení o do_ručení"
+msgstr "Vyžadovat _oznámení o doručení"
 
 #: src/sendmsg-window.c:409
 msgid "_Format = Flowed"
@@ -5028,7 +5011,6 @@ msgstr "_Zobrazit"
 msgid "_Language"
 msgstr "_Jazyk"
 
-#
 #: src/sendmsg-window.c:468
 msgid "_Options"
 msgstr "V_olby"
@@ -5330,13 +5312,12 @@ msgstr "Zjistit"
 
 #: src/toolbar-factory.c:93
 msgid "Check for new email"
-msgstr "Zjišťovat novou poštu"
+msgstr "Kontrolovat novou poštu"
 
 #: src/toolbar-factory.c:94
 msgid "Compose"
 msgstr "Vytvořit"
 
-#
 #: src/toolbar-factory.c:95
 msgid "Compose message"
 msgstr "Vytvořit zprávu"
@@ -5408,8 +5389,6 @@ msgstr ""
 "Následující\n"
 "nečtená"
 
-# "nepřečtená"
-#
 #: src/toolbar-factory.c:111
 msgid "Open next unread message"
 msgstr "Otevřít následující nepřečtenou zprávu"
@@ -5422,7 +5401,6 @@ msgstr ""
 "Následující\n"
 "označená"
 
-# "nepřečtená"
 #: src/toolbar-factory.c:113
 msgid "Open next flagged message"
 msgstr "Otevřít následující označenou zprávu"
@@ -5652,9 +5630,6 @@ msgstr "Dole"
 
 #~ msgid "Couldn't enable TLS on the LDAP connection: %s"
 #~ msgstr "Nelze povolit TLS na spojení LDAP: %s"
-
-#~ msgid "TLS requested but TLS support not compiled in."
-#~ msgstr "Vyžadování TLS, ale podpora TLS není zabudována."
 
 #~ msgid ""
 #~ "Failed to bind to server: %s\n"

@@ -508,7 +508,7 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
 
     send_lock();
 
-    if (!libbalsa_mailbox_open(outbox)) {
+    if (!libbalsa_mailbox_open(outbox, NULL)) {
 	send_unlock();
 	return FALSE;
     }
@@ -971,7 +971,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gboolean debug)
 #endif
 
     ensure_send_progress_dialog();
-    if (!libbalsa_mailbox_open(outbox)) {
+    if (!libbalsa_mailbox_open(outbox, NULL)) {
 	sending_threads--;
 	send_unlock();
 	return FALSE;

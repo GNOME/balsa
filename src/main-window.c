@@ -1546,6 +1546,7 @@ real_open_mbnode(BalsaMailboxNode * mbnode)
     GtkWidget *scroll;
     gint page_num;
     gboolean failurep;
+    GError *err = NULL;
 
 #ifdef BALSA_USE_THREADS
     static pthread_mutex_t open_lock = PTHREAD_MUTEX_INITIALIZER;
@@ -1577,13 +1578,15 @@ real_open_mbnode(BalsaMailboxNode * mbnode)
 
     balsa_window_increase_activity(window);
     failurep = balsa_index_load_mailbox_node(BALSA_INDEX (index),
-                                             mbnode);
+                                             mbnode, &err);
     balsa_window_decrease_activity(window);
 
     if(failurep) {
         libbalsa_information(
             LIBBALSA_INFORMATION_ERROR,
-            _("Unable to Open Mailbox!\nPlease check the mailbox settings."));
+            _("Unable to Open Mailbox!\n%s."), 
+	    err ? err->message : _("Unknown error"));
+	g_clear_error(&err);
         gtk_object_destroy(GTK_OBJECT(index));
         gdk_threads_leave();
 #ifdef BALSA_USE_THREADS
@@ -3367,7 +3370,7 @@ empty_trash(void)
     GList *msg_list = NULL;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.trash));
-    if (!libbalsa_mailbox_open(balsa_app.trash))
+    if (!libbalsa_mailbox_open(balsa_app.trash, NULL))
 	return;
 
     for (msgno = libbalsa_mailbox_total_messages(balsa_app.trash);

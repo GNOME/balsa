@@ -129,6 +129,7 @@ imap_mbox_handle_init(ImapMboxHandle *handle)
   handle->has_capabilities = FALSE;
   handle->exists = 0;
   handle->recent = 0;
+  handle->last_msg = NULL;
   handle->msg_cache = NULL;
   handle->doing_logout = FALSE;
 #ifdef USE_TLS
@@ -552,6 +553,12 @@ imap_mbox_handle_get_delim(ImapMboxHandle* handle,
 
 }
 
+char*
+imap_mbox_handle_get_last_msg(ImapMboxHandle *handle)
+{
+  return g_strdup(handle->last_msg ? handle->last_msg : "");
+}
+
 void
 imap_mbox_handle_connect_notify(ImapMboxHandle* handle,
                                 ImapMboxNotifyCb cb, void *data)
@@ -573,6 +580,7 @@ imap_mbox_handle_finalize(GObject* gobject)
   close(handle->sd);
   g_free(handle->host);    handle->host   = NULL;
   g_free(handle->mbox);    handle->mbox   = NULL;
+  g_free(handle->last_msg);handle->last_msg = NULL;
 
   g_hash_table_destroy(handle->cmd_queue); handle->cmd_queue = NULL;
 
@@ -1355,6 +1363,7 @@ ir_ok(ImapMboxHandle *h)
     rc = IMR_OK;
   else if( (l=strlen(line))>0) { 
     line[l-2] = '\0'; 
+    imap_mbox_handle_set_msg(h, line);
     if(h->info_cb)
       h->info_cb(h, rc, line, h->info_arg);
     else
@@ -1372,6 +1381,7 @@ ir_no(ImapMboxHandle *h)
   sio_gets(h->sio, line, sizeof(line));
   /* look for information response codes here: section 7.1 of the draft */
   if( strlen(line)>2) {
+    imap_mbox_handle_set_msg(h, line);
     if(h->info_cb)
       h->info_cb(h, IMR_NO, line, h->info_arg);
     else
@@ -1387,6 +1397,7 @@ ir_bad(ImapMboxHandle *h)
   sio_gets(h->sio, line, sizeof(line));
   /* look for information response codes here: section 7.1 of the draft */
   if( strlen(line)>2) {
+    imap_mbox_handle_set_msg(h, line);
     if(h->info_cb)
       h->info_cb(h, IMR_BAD, line, h->info_arg);
     else
@@ -1652,7 +1663,16 @@ imap_get_address(struct siobuf* sio)
   ImapAddress *res = NULL;
   int i, c;
 
-  if((c=sio_getc(sio)) != '(') {
+  /* DEERFIELD's IMAP SERVER sends address lists wrong. 
+   * but we do not enable the workaround by default. */
+#define WORKAROUND_FOR_NON_COMPLIANT_DEERFIELD_IMAP_SERVER 1
+#if WORKAROUND_FOR_NON_COMPLIANT_DEERFIELD_IMAP_SERVER
+  while((c=sio_getc (sio))==' ')
+    ;
+#else
+  c=sio_getc (sio);
+#endif
+  if(c != '(') {
     sio_ungetc(sio);
     return NULL;
   }

@@ -294,7 +294,8 @@ pop_auth_apop(PopHandle *pop, const char *greeting, GError **err)
 
   memset(stamp, '\0', sizeof(stamp));
 
-  if( !get_apop_stamp(greeting, stamp) ) return IMAP_AUTH_UNAVAIL;
+  if( pop->disable_apop ||
+      !get_apop_stamp(greeting, stamp) ) return IMAP_AUTH_UNAVAIL;
 
   if(pop->user_cb)
     pop->user_cb(IME_GET_USER_PASS, pop->user_arg,

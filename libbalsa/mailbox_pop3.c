@@ -53,7 +53,8 @@ static void libbalsa_mailbox_pop3_class_init(LibBalsaMailboxPop3Class *
 					     klass);
 static void libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 * mailbox);
 
-static gboolean libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox);
+static gboolean libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox,
+					   GError **err);
 static void libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox);
 
 static void libbalsa_mailbox_pop3_save_config(LibBalsaMailbox * mailbox,
@@ -173,7 +174,7 @@ libbalsa_mailbox_pop3_config_changed(LibBalsaMailboxPop3* mailbox)
 }
 
 static gboolean
-libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox)
+libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox, GError **err)
 {
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_POP3(mailbox), FALSE);
 
@@ -478,6 +479,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     
     PopHandle * pop = pop_new();
     pop_set_option(pop, IMAP_POP_OPT_FILTER_CR, TRUE);
+    pop_set_option(pop, IMAP_POP_OPT_DISABLE_APOP, m->disable_apop);
     pop_set_timeout(pop, 60000); /* wait 1.5 minute for packets */
     pop_set_usercb(pop, libbalsa_server_user_cb, server);
     pop_set_monitorcb(pop, monitor_cb, NULL);
@@ -590,7 +592,8 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 	return;
     }
 
-    if (libbalsa_mailbox_open(tmp_mailbox) &&
+    /* FIXME: check error code of the mailbox_open */
+    if (libbalsa_mailbox_open(tmp_mailbox, NULL) && 
         m->inbox &&
         libbalsa_mailbox_total_messages(tmp_mailbox)) {
 	guint msgno = libbalsa_mailbox_total_messages(tmp_mailbox);
@@ -648,7 +651,7 @@ libbalsa_mailbox_pop3_save_config(LibBalsaMailbox * mailbox,
 
     gnome_config_set_bool("Check", pop->check);
     gnome_config_set_bool("Delete", pop->delete_from_server);
-    gnome_config_set_bool("Apop", pop->use_apop);
+    gnome_config_set_bool("DisableApop", pop->disable_apop);
     gnome_config_set_bool("Filter", pop->filter);
     if(pop->filter_cmd)
         gnome_config_set_string("FilterCmd", pop->filter_cmd);
@@ -674,7 +677,7 @@ libbalsa_mailbox_pop3_load_config(LibBalsaMailbox * mailbox,
 
     pop->check = gnome_config_get_bool("Check=false");
     pop->delete_from_server = gnome_config_get_bool("Delete=false");
-    pop->use_apop = gnome_config_get_bool("Apop=false");
+    pop->disable_apop = gnome_config_get_bool("DisableApop=false");
     pop->filter = gnome_config_get_bool("Filter=false");
     pop->filter_cmd = gnome_config_get_string("FilterCmd");
     if(pop->filter_cmd && *pop->filter_cmd == '\0') {

@@ -61,7 +61,8 @@ static GMimeStream *libbalsa_mailbox_mbox_get_message_stream(LibBalsaMailbox *
 							     message);
 static void libbalsa_mailbox_mbox_remove_files(LibBalsaMailboxLocal *mailbox);
 
-static gboolean libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox);
+static gboolean libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox,
+					   GError **err);
 static void libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox);
 static void libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox);
 static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox,
@@ -378,7 +379,7 @@ free_messages_info(GArray * messages_info)
 }
 
 static gboolean
-libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox)
+libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox, GError **err)
 {
     LibBalsaMailboxMbox *mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
     struct stat st;
@@ -390,6 +391,8 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox)
     path = libbalsa_mailbox_local_get_path(mailbox);
 
     if (stat(path, &st) == -1) {
+	g_set_error(err, LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_OPEN_ERROR,
+		    _("Mailbox does not exist."));
 	return FALSE;
     }
 
@@ -397,12 +400,16 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox)
 	mailbox->readonly = access (path, W_OK) ? 1 : 0;
     fd = open(path, mailbox->readonly ? O_RDONLY : O_RDWR);
     if (fd == -1) {
+	g_set_error(err, LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_OPEN_ERROR,
+		    _("Cannot open mailbox."));
 	return FALSE;
     }
     gmime_stream = g_mime_stream_fs_new(fd);
 
     if (mbox_lock(mailbox, gmime_stream)) {
 	g_mime_stream_unref(gmime_stream);
+	g_set_error(err, LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_OPEN_ERROR,
+		    _("Cannot lock mailbox."));
 	return FALSE;
     }
 

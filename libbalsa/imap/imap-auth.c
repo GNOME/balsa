@@ -80,8 +80,10 @@ imap_auth_login(ImapMboxHandle* handle)
   if(!ok && handle->user_cb)
     handle->user_cb(IME_GET_USER_PASS, handle->user_arg,
                     "LOGIN", &user, &pass, &ok);
-  if(!ok || user == NULL || pass == NULL)
+  if(!ok || user == NULL || pass == NULL) {
+    imap_mbox_handle_set_msg(handle, "Authentication cancelled");
     return IMAP_AUTH_FAILURE;
+  }
 
   imap_quote_string(q_user, sizeof (q_user), user);
   imap_quote_string(q_pass, sizeof (q_pass), pass);

@@ -204,7 +204,7 @@ struct _LibBalsaMailboxClass {
                              int prog, int tot, const gchar* msg);
 
     /* Virtual Functions */
-    gboolean (*open_mailbox) (LibBalsaMailbox * mailbox);
+    gboolean (*open_mailbox) (LibBalsaMailbox * mailbox, GError **err);
     void (*close_mailbox) (LibBalsaMailbox * mailbox);
     LibBalsaMessage *(*get_message) (LibBalsaMailbox * mailbox, guint msgno);
     void (*prepare_threading)(LibBalsaMailbox *mailbox, guint lo, guint hi);
@@ -258,7 +258,7 @@ LibBalsaMailbox *libbalsa_mailbox_new_from_config(const gchar * prefix);
  * open and close a mailbox 
  */
 /* XXX these need to return a value if they failed */
-gboolean libbalsa_mailbox_open(LibBalsaMailbox * mailbox);
+gboolean libbalsa_mailbox_open(LibBalsaMailbox * mailbox, GError **err);
 gboolean libbalsa_mailbox_is_valid(LibBalsaMailbox * mailbox);
 gboolean libbalsa_mailbox_is_open(LibBalsaMailbox *mailbox);
 void libbalsa_mailbox_close(LibBalsaMailbox * mailbox);

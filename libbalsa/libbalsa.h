@@ -68,14 +68,16 @@ typedef struct _LibBalsaCondition LibBalsaCondition;
  * Error domains for GError: only one for now, more to come.
  */
 enum {
-    LIBBALSA_SCANNER_ERROR
+    LIBBALSA_SCANNER_ERROR,
+    LIBBALSA_MAILBOX_ERROR
 };
 
 /*
  * Error codes for GError: only one for now, more to come.
  */
 enum {
-    LIBBALSA_SCANNER_ERROR_IMAP
+    LIBBALSA_SCANNER_ERROR_IMAP,
+    LIBBALSA_MAILBOX_OPEN_ERROR
 };
 
 
@@ -122,4 +124,4 @@ void libbalsa_message(const char *fmt, ...);
 gchar * libbalsa_rot(const gchar * pass);
 
 
-#endif				/* __LIBBALSA_H__ */
+#endif                          /* __LIBBALSA_H__ */

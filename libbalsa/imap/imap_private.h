@@ -45,6 +45,7 @@ struct _ImapMboxHandle {
   unsigned unseen; /* msgno of first unseen message */
   ImapUID  uidnext;
   ImapUID  uidval;
+  gchar *last_msg; /* last server message; for error reporting purposes */
 
   ImapMessage **msg_cache;
   MboxView mbox_view;
@@ -108,6 +109,8 @@ int imap_setup_ssl(struct siobuf *sio, const char* host, SSL *ssl,
 ImapConnectionState imap_mbox_handle_get_state(ImapMboxHandle *h);
 void imap_mbox_handle_set_state(ImapMboxHandle *h,
                                 ImapConnectionState newstate);
+#define imap_mbox_handle_set_msg(h,s) \
+  do{g_free((h)->last_msg); (h)->last_msg = g_strdup(s); }while(0)
 
 /* even more private functions */
 int imap_cmd_start(ImapMboxHandle* handle, const char* cmd, unsigned* cmdno);

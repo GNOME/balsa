@@ -741,7 +741,7 @@ static LibBalsaCondition cond_undeleted =
 
 gboolean
 balsa_index_load_mailbox_node (BalsaIndex * index,
-                               BalsaMailboxNode* mbnode)
+                               BalsaMailboxNode* mbnode, GError **err)
 {
     GtkTreeView *tree_view;
     LibBalsaMailbox* mailbox;
@@ -759,7 +759,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
     gnome_appbar_push(balsa_app.appbar, msg);
     g_free(msg);
     gdk_threads_leave();
-    successp = libbalsa_mailbox_open(mailbox);
+    successp = libbalsa_mailbox_open(mailbox, err);
     gdk_threads_enter();
     gnome_appbar_pop(balsa_app.appbar);
 

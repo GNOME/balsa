@@ -2863,7 +2863,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	 * mail even if the mailbox is closed.
 	 */
 	if (message->mailbox)
-	    libbalsa_mailbox_open(message->mailbox);
+	    libbalsa_mailbox_open(message->mailbox, NULL);
     }
 
     g_signal_connect(G_OBJECT(bsmsg->window), "delete-event",
@@ -3814,12 +3814,15 @@ postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static void
 save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
+    GError *err = NULL;
     if (!message_postpone(bsmsg))
         return;
-    if(!libbalsa_mailbox_open(balsa_app.draftbox)) {
+    if(!libbalsa_mailbox_open(balsa_app.draftbox, &err)) {
 	balsa_information_parented(GTK_WINDOW(bsmsg->window),
 				   LIBBALSA_INFORMATION_WARNING,
-				   _("Could not open draftbox."));
+				   _("Could not open draftbox: %s"),
+				   err ? err->message : _("Unknown error"));
+	g_clear_error(&err);
 	return;
     }
 

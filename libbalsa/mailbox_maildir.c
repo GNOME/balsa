@@ -59,7 +59,8 @@ static GMimeStream *libbalsa_mailbox_maildir_get_message_stream(LibBalsaMailbox 
 							   message);
 static void libbalsa_mailbox_maildir_remove_files(LibBalsaMailboxLocal *mailbox);
 
-static gboolean libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox);
+static gboolean libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox,
+					      GError **err);
 static void libbalsa_mailbox_maildir_close_mailbox(LibBalsaMailbox * mailbox);
 static void libbalsa_mailbox_maildir_check(LibBalsaMailbox * mailbox);
 static gboolean libbalsa_mailbox_maildir_sync(LibBalsaMailbox * mailbox,
@@ -432,7 +433,7 @@ parse_mailbox_subdirs(LibBalsaMailbox * mailbox)
 }
 
 static gboolean
-libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox)
+libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox, GError **err)
 {
     struct stat st;
     LibBalsaMailboxMaildir *mdir;
@@ -444,6 +445,8 @@ libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox)
     path = libbalsa_mailbox_local_get_path(mailbox);
 
     if (stat(path, &st) == -1) {
+	g_set_error(err, LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_OPEN_ERROR,
+		    _("Mailbox does not exist."));
 	return FALSE;
     }
 

@@ -98,7 +98,7 @@ struct _MailboxConfWindow {
 	    GtkWidget *password;
 	    GtkWidget *check;
 	    GtkWidget *delete_from_server;
-	    GtkWidget *use_apop;
+	    GtkWidget *disable_apop; /* on servers that should support it */
 	    GtkWidget *filter;
 	    GtkWidget *filter_cmd;
 #ifdef USE_SSL
@@ -525,8 +525,8 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 #endif
 #endif
 
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.use_apop),
-				     pop3->use_apop);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.disable_apop),
+				     pop3->disable_apop);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.check),
 				     pop3->check);
 
@@ -664,8 +664,8 @@ update_pop_mailbox(MailboxConfWindow *mcw)
 );
     mailbox->check =
 	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.check));
-    mailbox->use_apop =
-	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.use_apop));
+    mailbox->disable_apop =
+	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.disable_apop));
     mailbox->delete_from_server =
 	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
 				     (mcw->mb_data.pop3.delete_from_server));
@@ -956,8 +956,8 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
     gtk_entry_set_visibility(GTK_ENTRY(mcw->mb_data.pop3.password), FALSE);
 
     /* toggle for apop */
-    mcw->mb_data.pop3.use_apop = 
-	create_check(mcw->window, _("Use _APOP Authentication"), table, 5,
+    mcw->mb_data.pop3.disable_apop = 
+	create_check(mcw->window, _("Disable _APOP"), table, 5,
 		     FALSE);
 
     /* toggle for deletion from server */

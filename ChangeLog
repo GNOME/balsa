@@ -1,3 +1,19 @@
+2004-05-04  Pawel Salek
+
+	* libbalsa/folder-scanners.c: report IMAP server messages.
+	* libbalsa/imap-server.[hc],libbalsa.h: ditto.
+	* libbalsa/mailbox.[ch]: more detailed error messages.
+	* libbalsa/mailbox_{imap,maildir,mbox,mh,pop3}.c: ditto.
+	* libbalsa/send.c: adjust to changed API.
+	* libbalsa/imap/{auth-cram,imap-auth}.c:
+	* libbalsa/imap/imap{-handle.c,_private.h}:
+	store last server msg.
+	* libbalsa/imap/pop3.c: respect DISABLE_APOP flag.
+	* src/balsa-index.[hc]: adjust to changed API.
+	* src/filter-run-dialog.c:
+	* src/{main,sendmsg}-window.c: ditto.
+	* src/mailbox-conf.c: reenable APOP disabling.
+
 2004-05-03  Pawel Salek
 
 	* configure.in: use GTK_CHECK_VERSION instead of HAVE_GTK24.

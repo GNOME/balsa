@@ -78,7 +78,8 @@ static void libbalsa_mailbox_imap_finalize(GObject * object);
 static void libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass *
 					     klass);
 static void libbalsa_mailbox_imap_init(LibBalsaMailboxImap * mailbox);
-static gboolean libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox);
+static gboolean libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox,
+					   GError **err);
 static void libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox);
 static GMimeStream *libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox *
 							     mailbox,
@@ -467,7 +468,7 @@ clean_cache(LibBalsaMailbox* mailbox)
 }
 
 static ImapMboxHandle *
-libbalsa_mailbox_imap_get_handle(LibBalsaMailboxImap *mimap)
+libbalsa_mailbox_imap_get_handle(LibBalsaMailboxImap *mimap, GError **err)
 {
 
     g_return_val_if_fail(LIBBALSA_MAILBOX_IMAP(mimap), NULL);
@@ -478,7 +479,7 @@ libbalsa_mailbox_imap_get_handle(LibBalsaMailboxImap *mimap)
         if (!LIBBALSA_IS_IMAP_SERVER(server))
             return NULL;
         imap_server = LIBBALSA_IMAP_SERVER(server);
-        mimap->handle = libbalsa_imap_server_get_handle(imap_server);
+        mimap->handle = libbalsa_imap_server_get_handle(imap_server, err);
 	mimap->handle_refs = 1;
     } else
 	++mimap->handle_refs;
@@ -662,7 +663,8 @@ libbalsa_mailbox_imap_release_handle(LibBalsaMailboxImap * mimap)
 }
 
 static ImapMboxHandle *
-libbalsa_mailbox_imap_get_selected_handle(LibBalsaMailboxImap *mimap)
+libbalsa_mailbox_imap_get_selected_handle(LibBalsaMailboxImap *mimap,
+					  GError **err)
 {
     LibBalsaServer *server;
     LibBalsaImapServer *imap_server;
@@ -676,14 +678,19 @@ libbalsa_mailbox_imap_get_selected_handle(LibBalsaMailboxImap *mimap)
 	return NULL;
     imap_server = LIBBALSA_IMAP_SERVER(server);
     if(!mimap->handle) {
-        mimap->handle = libbalsa_imap_server_get_handle_with_user(imap_server,
-                                                                  mimap);
+        mimap->handle = 
+	    libbalsa_imap_server_get_handle_with_user(imap_server,
+						      mimap, err);
         if (!mimap->handle)
             return NULL;
     }
     rc = imap_mbox_select(mimap->handle, mimap->path,
 			  &(LIBBALSA_MAILBOX(mimap)->readonly));
     if (rc != IMR_OK) {
+	gchar *msg = imap_mbox_handle_get_last_msg(mimap->handle);
+	g_set_error(err, LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_OPEN_ERROR,
+		    msg);
+	g_free(msg);
 	RELEASE_HANDLE(mimap, mimap->handle);
         mimap->handle = NULL;
 	return NULL;
@@ -739,7 +746,7 @@ lbm_imap_get_unseen(LibBalsaMailboxImap * mimap)
    opens IMAP mailbox. On failure leaves the object in sane state.
 */
 static gboolean
-libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
+libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, GError **err)
 {
     LibBalsaMailboxImap *mimap;
     LibBalsaServer *server;
@@ -751,7 +758,7 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
     mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
 
-    mimap->handle = libbalsa_mailbox_imap_get_selected_handle(mimap);
+    mimap->handle = libbalsa_mailbox_imap_get_selected_handle(mimap, err);
     if (!mimap->handle) {
         mimap->opened         = FALSE;
 	mailbox->disconnected = TRUE;
@@ -1278,7 +1285,7 @@ libbalsa_imap_rename_subfolder(LibBalsaMailboxImap* imap,
     ImapMboxHandle* handle;
     gchar *new_path;
 
-    handle = libbalsa_mailbox_imap_get_handle(imap);
+    handle = libbalsa_mailbox_imap_get_handle(imap, NULL);
     if (!handle)
 	return FALSE;
 
@@ -1304,7 +1311,8 @@ libbalsa_imap_new_subfolder(const gchar *parent, const gchar *folder,
     char delim[2];
     if (!LIBBALSA_IS_IMAP_SERVER(server))
 	return;
-    handle = libbalsa_imap_server_get_handle(LIBBALSA_IMAP_SERVER(server));
+    handle = libbalsa_imap_server_get_handle(LIBBALSA_IMAP_SERVER(server),
+					     NULL);
     if (!handle)
 	return;
     delim[0] = imap_mbox_handle_get_delim(handle, parent);
@@ -1323,7 +1331,7 @@ libbalsa_imap_delete_folder(LibBalsaMailboxImap *mailbox)
 {
     ImapMboxHandle* handle;
 
-    handle = libbalsa_mailbox_imap_get_handle(mailbox);
+    handle = libbalsa_mailbox_imap_get_handle(mailbox, NULL);
     if (!handle)
 	return;
 
@@ -1921,7 +1929,8 @@ libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
     len = g_mime_stream_tell(outstream);
     g_mime_stream_reset(outstream);
 
-    handle = libbalsa_mailbox_imap_get_handle(LIBBALSA_MAILBOX_IMAP(mailbox));
+    handle = libbalsa_mailbox_imap_get_handle(LIBBALSA_MAILBOX_IMAP(mailbox),
+					      NULL);
     rc = imap_mbox_append_stream(handle,
 				 LIBBALSA_MAILBOX_IMAP(mailbox)->path,
 				 imap_flags, outstream, len);

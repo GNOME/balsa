@@ -41,9 +41,9 @@
 
 static void
 libbalsa_scanner_mdir(GNode *rnode,
-	       		const gchar * prefix, 
-			LocalHandler folder_handler, 
-			LocalHandler mailbox_handler)
+                        const gchar * prefix, 
+                        LocalHandler folder_handler, 
+                        LocalHandler mailbox_handler)
 {
     DIR *dpc;
     struct dirent *de;
@@ -53,42 +53,42 @@ libbalsa_scanner_mdir(GNode *rnode,
 
     dpc = opendir(prefix);
     if (!dpc)
-	return;
+        return;
     
     /*
      * if we don't find any subdirectories inside, we'll go
      * and ignore this one too...
      */
     while ((de = readdir(dpc)) != NULL) {
-	if (de->d_name[0] == '.')
-	    continue;
-	snprintf(filename, PATH_MAX, "%s/%s", prefix, de->d_name);
-	/* ignore file if it can't be read. */
-	if (stat(filename, &st) == -1 || access(filename, R_OK) == -1)
-	    continue;
-	
-	if (S_ISDIR(st.st_mode)) {
-	    /*
-	     * if we think that this looks like a mailbox, include it as such.
-	     * otherwise we'll lose the mail in this folder
-	     */
-	    GType foo = libbalsa_mailbox_type_from_path(filename);
-	    if( (foo == LIBBALSA_TYPE_MAILBOX_MH) ||
-		(foo == LIBBALSA_TYPE_MAILBOX_MAILDIR ) ) {
-		parent_node = mailbox_handler(rnode, de->d_name, filename);
-		libbalsa_scanner_mdir(parent_node, filename, 
-				      folder_handler, mailbox_handler);
-	    }
-	} 
-	/* ignore regular files */
+        if (de->d_name[0] == '.')
+            continue;
+        snprintf(filename, PATH_MAX, "%s/%s", prefix, de->d_name);
+        /* ignore file if it can't be read. */
+        if (stat(filename, &st) == -1 || access(filename, R_OK) == -1)
+            continue;
+        
+        if (S_ISDIR(st.st_mode)) {
+            /*
+             * if we think that this looks like a mailbox, include it as such.
+             * otherwise we'll lose the mail in this folder
+             */
+            GType foo = libbalsa_mailbox_type_from_path(filename);
+            if( (foo == LIBBALSA_TYPE_MAILBOX_MH) ||
+                (foo == LIBBALSA_TYPE_MAILBOX_MAILDIR ) ) {
+                parent_node = mailbox_handler(rnode, de->d_name, filename);
+                libbalsa_scanner_mdir(parent_node, filename, 
+                                      folder_handler, mailbox_handler);
+            }
+        } 
+        /* ignore regular files */
     }
     closedir(dpc);
 }
 
 void
 libbalsa_scanner_local_dir(GNode *rnode, const gchar * prefix, 
-			   LocalHandler folder_handler, 
-			   LocalHandler mailbox_handler)
+                           LocalHandler folder_handler, 
+                           LocalHandler mailbox_handler)
 {
     DIR *dpc;
     struct dirent *de;
@@ -99,38 +99,38 @@ libbalsa_scanner_local_dir(GNode *rnode, const gchar * prefix,
 
     dpc = opendir(prefix);
     if (!dpc)
-	return;
+        return;
 
     while ((de = readdir(dpc)) != NULL) {
-	if (de->d_name[0] == '.')
-	    continue;
-	snprintf(filename, PATH_MAX, "%s/%s", prefix, de->d_name);
+        if (de->d_name[0] == '.')
+            continue;
+        snprintf(filename, PATH_MAX, "%s/%s", prefix, de->d_name);
 
-	/* ignore file if it can't be read. */
-	if (stat(filename, &st) == -1 || access(filename, R_OK) == -1)
-	    continue;
-	
-	if (S_ISDIR(st.st_mode)) {
-	    mailbox_type = libbalsa_mailbox_type_from_path(filename);
+        /* ignore file if it can't be read. */
+        if (stat(filename, &st) == -1 || access(filename, R_OK) == -1)
+            continue;
+        
+        if (S_ISDIR(st.st_mode)) {
+            mailbox_type = libbalsa_mailbox_type_from_path(filename);
 
-	    if ( (mailbox_type == LIBBALSA_TYPE_MAILBOX_MH) ||
-		 (mailbox_type == LIBBALSA_TYPE_MAILBOX_MAILDIR) ) {
-		current_node = mailbox_handler(rnode, de->d_name, filename);
-		libbalsa_scanner_mdir(current_node, filename, 
-				        folder_handler, mailbox_handler);
-	    } else {
+            if ( (mailbox_type == LIBBALSA_TYPE_MAILBOX_MH) ||
+                 (mailbox_type == LIBBALSA_TYPE_MAILBOX_MAILDIR) ) {
+                current_node = mailbox_handler(rnode, de->d_name, filename);
+                libbalsa_scanner_mdir(current_node, filename, 
+                                        folder_handler, mailbox_handler);
+            } else {
                 gchar *name = g_path_get_basename(prefix);
 
-		current_node = folder_handler(rnode, name, filename);
-		libbalsa_scanner_local_dir(current_node, filename, 
-					   folder_handler, mailbox_handler);
+                current_node = folder_handler(rnode, name, filename);
+                libbalsa_scanner_local_dir(current_node, filename, 
+                                           folder_handler, mailbox_handler);
                 g_free(name);
-	    }
-	} else {
-	    mailbox_type = libbalsa_mailbox_type_from_path(filename);
-	    if (mailbox_type != 0)
-		mailbox_handler(rnode, de->d_name, filename);
-	}
+            }
+        } else {
+            mailbox_type = libbalsa_mailbox_type_from_path(filename);
+            if (mailbox_type != 0)
+                mailbox_handler(rnode, de->d_name, filename);
+        }
     }
     closedir(dpc);
 }
@@ -150,29 +150,29 @@ struct browser_state
 
 static void
 libbalsa_imap_add_folder(char *folder, int delim, int noselect, int noscan,
-			 int marked, struct browser_state *state)
+                         int marked, struct browser_state *state)
 {
     if (folder[strlen(folder) - 1] == delim)
-	return;
+        return;
 
     state->delim = delim;
 
     /* this extra check is needed for subscribed folder handling. 
      * Read RFC when in doubt. */
     if (!g_list_find_custom(state->subfolders, folder,
-			    (GCompareFunc) strcmp)
-	&& !noscan)
-	state->subfolders =
-	    g_list_append(state->subfolders, g_strdup(folder));
+                            (GCompareFunc) strcmp)
+        && !noscan)
+        state->subfolders =
+            g_list_append(state->subfolders, g_strdup(folder));
 
     state->handle_imap_path(folder, delim, noselect, noscan, marked,
-			    state->cb_data);
+                            state->cb_data);
 }
 
 static void
 libbalsa_imap_list_cb(ImapMboxHandle * handle, int delim,
-		      ImapMboxFlags * flags, char *folder,
-		      struct browser_state *state)
+                      ImapMboxFlags * flags, char *folder,
+                      struct browser_state *state)
 {
     gboolean noselect, marked;
     gboolean noscan;
@@ -183,20 +183,20 @@ libbalsa_imap_list_cb(ImapMboxHandle * handle, int delim,
     /* These flags are different, but both mean that we don't need to
      * scan the folder: */
     noscan = (IMAP_MBOX_HAS_FLAG(*flags, IMLIST_NOINFERIORS)
-	      || IMAP_MBOX_HAS_FLAG(*flags, IMLIST_HASNOCHILDREN))
-	&& !IMAP_MBOX_HAS_FLAG(*flags, IMLIST_HASCHILDREN);
+              || IMAP_MBOX_HAS_FLAG(*flags, IMLIST_HASNOCHILDREN))
+        && !IMAP_MBOX_HAS_FLAG(*flags, IMLIST_HASCHILDREN);
     marked = IMAP_MBOX_HAS_FLAG(*flags, IMLIST_MARKED);
     if (state->subscribed)
-	state->mark_imap_path(folder, noselect, noscan, state->cb_data);
+        state->mark_imap_path(folder, noselect, noscan, state->cb_data);
     else
-	libbalsa_imap_add_folder(folder, delim, noselect, noscan,
+        libbalsa_imap_add_folder(folder, delim, noselect, noscan,
                                  marked, state);
 }
 
 static void
 libbalsa_imap_lsub_cb(ImapMboxHandle * handle, int delim,
-		      ImapMboxFlags * flags, char *folder,
-		      struct browser_state *state)
+                      ImapMboxFlags * flags, char *folder,
+                      struct browser_state *state)
 {
     gboolean noselect, marked;
     gboolean noscan;
@@ -205,8 +205,8 @@ libbalsa_imap_lsub_cb(ImapMboxHandle * handle, int delim,
 
     noselect = (IMAP_MBOX_HAS_FLAG(*flags, IMLIST_NOSELECT) != 0);
     noscan = (IMAP_MBOX_HAS_FLAG(*flags, IMLIST_NOINFERIORS)
-	      || IMAP_MBOX_HAS_FLAG(*flags, IMLIST_HASNOCHILDREN))
-	&& !IMAP_MBOX_HAS_FLAG(*flags, IMLIST_HASCHILDREN);
+              || IMAP_MBOX_HAS_FLAG(*flags, IMLIST_HASNOCHILDREN))
+        && !IMAP_MBOX_HAS_FLAG(*flags, IMLIST_HASCHILDREN);
     marked = IMAP_MBOX_HAS_FLAG(*flags, IMLIST_MARKED);
 
     libbalsa_imap_add_folder(folder, delim, noselect, noscan, marked, state);
@@ -228,8 +228,8 @@ libbalsa_imap_lsub_cb(ImapMboxHandle * handle, int delim,
  */
 static gboolean
 libbalsa_imap_browse(const gchar * path, struct browser_state *state,
-		     ImapMboxHandle* handle, LibBalsaServer * server,
-		     ImapCheck check_imap_path, guint * depth,
+                     ImapMboxHandle* handle, LibBalsaServer * server,
+                     ImapCheck check_imap_path, guint * depth,
                      GError **error)
 {
     gchar *imap_path;
@@ -249,7 +249,7 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
      * Note that flags in the LSUB response aren't authoritative
      * (UW-Imap is the only server thought to give incorrect flags). */
     if (state->subscribed) 
-	rc = imap_mbox_lsub(handle, imap_path);
+        rc = imap_mbox_lsub(handle, imap_path);
     if(rc != IMR_OK) {
         g_free(imap_path);
         g_set_error(error,
@@ -265,7 +265,7 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
      *   authoritative flags.
      */
     if (!state->subscribed || state->subfolders)
-	rc = imap_mbox_list(handle, imap_path);
+        rc = imap_mbox_list(handle, imap_path);
     g_free(imap_path);
     if(rc != IMR_OK) {
         g_set_error(error,
@@ -302,12 +302,12 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
 
 void
 libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server, 
-			  const gchar* path, gboolean subscribed, 
+                          const gchar* path, gboolean subscribed, 
                           gboolean list_inbox,
                           ImapCheck check_imap_path,
                           ImapMark mark_imap_path,
-			  ImapHandler handle_imap_path,
-			  gpointer cb_data,
+                          ImapHandler handle_imap_path,
+                          gpointer cb_data,
                           GError **error)
 {
     struct browser_state state;
@@ -316,14 +316,16 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     gulong list_handler_id, lsub_handler_id;
 
     if (!LIBBALSA_IS_IMAP_SERVER(server))
-	    return;
-    handle = libbalsa_imap_server_get_handle(LIBBALSA_IMAP_SERVER(server));
+            return;
+    handle = 
+        libbalsa_imap_server_get_handle(LIBBALSA_IMAP_SERVER(server), error);
     if (!handle) { /* FIXME: propagate error here and translate message */
-        g_set_error(error,
-                    LIBBALSA_SCANNER_ERROR,
-                    LIBBALSA_SCANNER_ERROR_IMAP,
-                    "Could not connect to the server");
-	return;
+        if(!*error)
+            g_set_error(error,
+                        LIBBALSA_SCANNER_ERROR,
+                        LIBBALSA_SCANNER_ERROR_IMAP,
+                        "Could not connect to the server");
+        return;
     }
 
     state.handle_imap_path = handle_imap_path;
@@ -333,13 +335,13 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     state.delim            = imap_mbox_handle_get_delim(handle, path);
 
     list_handler_id =
-	g_signal_connect(G_OBJECT(handle), "list-response",
-			 G_CALLBACK(libbalsa_imap_list_cb),
-			 (gpointer) & state);
+        g_signal_connect(G_OBJECT(handle), "list-response",
+                         G_CALLBACK(libbalsa_imap_list_cb),
+                         (gpointer) & state);
     lsub_handler_id = subscribed ?
-	g_signal_connect(G_OBJECT(handle), "lsub-response",
-			 G_CALLBACK(libbalsa_imap_lsub_cb),
-			 (gpointer) & state) : 0;
+        g_signal_connect(G_OBJECT(handle), "lsub-response",
+                         G_CALLBACK(libbalsa_imap_lsub_cb),
+                         (gpointer) & state) : 0;
 
     if (list_inbox) {
         /* force INBOX into the mailbox list
@@ -356,6 +358,6 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
 
     g_signal_handler_disconnect(G_OBJECT(handle), list_handler_id);
     if (lsub_handler_id)
-	g_signal_handler_disconnect(G_OBJECT(handle), lsub_handler_id);
+        g_signal_handler_disconnect(G_OBJECT(handle), lsub_handler_id);
     libbalsa_imap_server_release_handle(LIBBALSA_IMAP_SERVER(server), handle);
 }

@@ -58,8 +58,10 @@ imap_auth_cram(ImapMboxHandle* handle)
   if(!ok && handle->user_cb)
     handle->user_cb(IME_GET_USER_PASS, handle->user_arg, 
                     "CRAM-MD5", &user, &pass, &ok);
-  if(!ok || user == NULL || pass == NULL)
+  if(!ok || user == NULL || pass == NULL) {
+    imap_mbox_handle_set_msg(handle, "Authentication cancelled");
     return IMAP_AUTH_FAILURE;
+  }
 
   /* start the interaction */
   if(imap_cmd_start(handle, "AUTHENTICATE CRAM-MD5", &cmdno) <0)
@@ -121,10 +123,7 @@ imap_auth_cram(ImapMboxHandle* handle)
     rc = imap_cmd_step (handle, cmdno);
   while (rc == IMR_UNTAGGED);
 
-  if (rc != IMR_OK) {
-    fprintf(stderr, "Error receiving server response on CRAM-MD5.\n");
-    return IMAP_AUTH_FAILURE;
-  } else return IMAP_SUCCESS;
+  return rc == IMR_OK ? IMAP_SUCCESS : IMAP_AUTH_FAILURE;
 }
 
 /* hmac_md5: produce CRAM-MD5 challenge response. */

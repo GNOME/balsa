@@ -33,6 +33,7 @@
 
 #include "balsa-druid-page-error.h"
 #include "balsa-app.h"
+#include "balsa-identity.h"
 %}
 
 class Balsa:Druid:Page:User from Balsa:Druid:Page {
@@ -136,17 +137,24 @@ class Balsa:Druid:Page:User from Balsa:Druid:Page {
 	next( Gnome:Druid:Page *_self, Gtk:Widget *druid (check type null) ) {
 		gchar *uhoh;
 		BalsaDruidPageUser *self = BALSA_DRUID_PAGE_USER( _self );
-
-		if( balsa_app.address->full_name )
-			g_free( balsa_app.address->full_name );
-		balsa_app.address->full_name = g_strdup( gtk_entry_get_text( GTK_ENTRY( self->_priv->name ) ) );
-
-		if( balsa_app.address->address_list ) {
-			g_list_foreach(balsa_app.address->address_list, (GFunc)g_free, NULL);
-			g_list_free(balsa_app.address->address_list);
-			balsa_app.address->address_list	= NULL;
+		BalsaIdentity* ident;
+		
+		if (balsa_app.identities == NULL) {
+			ident = BALSA_IDENTITY(balsa_identity_new());
+			balsa_app.identities = g_list_append(balsa_app.identities, ident);
+		} else {
+			ident = balsa_app.current_ident;
 		}
-		balsa_app.address->address_list = g_list_append(balsa_app.address->address_list, 
+		if( ident->address->full_name )
+			g_free( ident->address->full_name );
+		ident->address->full_name = g_strdup( gtk_entry_get_text( GTK_ENTRY( self->_priv->name ) ) );
+
+		if( ident->address->address_list ) {
+			g_list_foreach(ident->address->address_list, (GFunc)g_free, NULL);
+			g_list_free(ident->address->address_list);
+			ident->address->address_list = NULL;
+		}
+		ident->address->address_list = g_list_append(ident->address->address_list, 
 								g_strdup( gtk_entry_get_text( GTK_ENTRY( self->_priv->email ) ) ) );
 
 #if ENABLE_ESMTP
@@ -168,6 +176,7 @@ class Balsa:Druid:Page:User from Balsa:Druid:Page {
 			PARENT_HANDLER( _self, druid );
 		}
 
+		balsa_identity_set_current(ident);
 		return TRUE;
 	}
 }

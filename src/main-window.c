@@ -217,6 +217,7 @@ static void notebook_drag_received_cb (GtkWidget* widget,
 
 
 static GtkWidget *balsa_notebook_label_new (BalsaMailboxNode* mbnode);
+static void ident_manage_dialog_cb(GtkWidget*, gpointer);
 
 
 static GnomeUIInfo file_new_menu[] = {
@@ -524,6 +525,9 @@ static GnomeUIInfo mailbox_menu[] = {
 static GnomeUIInfo settings_menu[] = {
 #define MENU_SETTINGS_PREFERENCES_POS 0
     GNOMEUIINFO_MENU_PREFERENCES_ITEM (open_preferences_manager, NULL),
+    GNOMEUIINFO_ITEM_STOCK(N_("Identities..."), 
+                           N_("Create and set current identities"), 
+                           ident_manage_dialog_cb, GNOME_STOCK_MENU_PROP),
     GNOMEUIINFO_END
 };
 
@@ -2819,3 +2823,18 @@ balsa_window_increment_progress(BalsaWindow* window)
     }
 #endif
 }
+
+
+static void
+ident_manage_dialog_cb(GtkWidget* widget, gpointer user_data)
+{
+    GtkWidget* dialog;
+    
+
+    /* create dialog  */
+    dialog = balsa_identity_config_dialog();
+    gnome_dialog_run(GNOME_DIALOG(dialog));
+}
+
+
+

@@ -1,3 +1,20 @@
+2001-06-18  Matthew Guenther  <guentherm@asme.org>
+
+	* libinit_balsa/balsa-druid-page-user.gob: Change initialization
+	to store user information in a default identity instead of
+	balsa_app.
+	* src/balsa-identity.[hc]: New files that define the BalsaIdentity
+	object type.
+	* src/pref-manager.c: Remove configuration items that are now
+	configured per identity.
+	* src/balsa-app.[hc]: Added a list of loaded identities, and a
+	pointer to the currently selected default identity.  
+	* src/main-window.c: Added menu item to open the identity manager.
+	* src/save-restore.c: rewrote config_identities_(save/load) to
+	handle multiple identities, using config_identity_(save/load).
+	* src/sendmsg-window.c: Added the ability to change the identity
+	used to compose an identity on a per message basis.
+	
 2001-06-18  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/sendmsg-window.h:

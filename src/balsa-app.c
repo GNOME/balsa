@@ -27,6 +27,7 @@
 #include "spell-check.h"
 #include "main-window.h"
 #include "information.h"
+#include "balsa-identity.h"
 
 /* Global application structure */
 struct BalsaApplication balsa_app;
@@ -191,14 +192,19 @@ balsa_app_init(void)
      * initalize application structure before ALL ELSE 
      * to some reasonable defaults
      */
-    balsa_app.address = libbalsa_address_new();
-    balsa_app.replyto = NULL;
-    balsa_app.domain = NULL;
-    balsa_app.bcc = NULL;
+    balsa_app.identities = NULL;
+    balsa_app.current_ident = NULL;
+
+/* The following is taken care of by identity initialization now */
+/*     balsa_app.address = libbalsa_address_new(); */
+/*     balsa_app.replyto = NULL; */
+/*     balsa_app.domain = NULL; */
+/*     balsa_app.bcc = NULL; */
+/*     balsa_app.signature_path = NULL; */
+/*     balsa_app.sig_separator = TRUE; */
 
     balsa_app.local_mail_directory = NULL;
-    balsa_app.signature_path = NULL;
-    balsa_app.sig_separator = TRUE;
+
 #if ENABLE_ESMTP
     balsa_app.smtp_server = NULL;
     balsa_app.smtp_user = NULL;

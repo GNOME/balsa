@@ -28,6 +28,7 @@
 #include "balsa-mblist.h"
 #include "main-window.h"
 #include "information-dialog.h"
+#include "balsa-identity.h"
 
 #if ENABLE_ESMTP
 #include <auth-client.h>		/* part of libESMTP */
@@ -144,6 +145,7 @@ enum _BalsaMDNReply {
 #endif
 
 
+
 /* global balsa application structure */
 extern struct BalsaApplication {
     /* personal information */
@@ -153,6 +155,9 @@ extern struct BalsaApplication {
     gchar *bcc;
     gchar *reply_string;
     gchar *forward_string;
+
+    GList* identities;
+    BalsaIdentity* current_ident;
 
     gchar *local_mail_directory;
 #if ENABLE_ESMTP

@@ -109,6 +109,9 @@ static void address_book_cb(GtkWidget *widget, BalsaSendmsg *smd_msg_wind);
 
 static gint set_locale(GtkWidget *, BalsaSendmsg *, gint);
 
+static void change_msg_identity_cb(GtkWidget*, BalsaSendmsg*);
+
+
 /* Standard DnD types */
 enum {
     TARGET_URI_LIST,
@@ -237,6 +240,11 @@ static GnomeUIInfo edit_menu[] = {
      (gpointer) spell_check_cb, NULL, NULL,
      GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_PIXMAP_SPELLCHECK,
      GDK_s, GDK_CONTROL_MASK | GDK_SHIFT_MASK, NULL},
+    GNOMEUIINFO_SEPARATOR,
+#define EDIT_MENU_SELECT_IDENT 12
+    GNOMEUIINFO_ITEM_NONE(N_("Select Identity..."), 
+                          N_("Select the Identity to use for the message"),
+                          change_msg_identity_cb),
     GNOMEUIINFO_END
 };
 
@@ -345,6 +353,8 @@ static GnomeUIInfo lang_menu[] = {
     GNOMEUIINFO_END
 };
 
+
+
 static GnomeUIInfo opts_menu[] = {
 #define OPTS_MENU_DISPNOTIFY_POS 0
     GNOMEUIINFO_TOGGLEITEM(N_("_Request Disposition Notification"), NULL, toggle_reqdispnotify_cb, NULL),
@@ -377,7 +387,7 @@ static GnomeUIInfo main_menu[] = {
     GNOMEUIINFO_SUBTREE(N_("_Show"), view_menu),
 #define MAIN_CHARSET_MENU 3
     GNOMEUIINFO_SUBTREE(N_("_Language"), lang_menu),
-#define MAIN_OPTION_MENU
+#define MAIN_OPTION_MENU 4
     GNOMEUIINFO_SUBTREE(N_("_Options"), opts_menu),
     GNOMEUIINFO_END
 };
@@ -573,6 +583,46 @@ fill_language_menu()
 	       setlocale(LC_CTYPE, NULL));
     lang_menu[LANG_CURRENT_POS].label = (char *) locales[idxsys].lang_name;
 }
+
+
+static void 
+change_msg_identity_cb(GtkWidget* widget, BalsaSendmsg* msg)
+{
+    BalsaIdentity* ident;
+    gchar* from;
+
+
+    gtk_quit_remove(msg->quituid);
+
+    ident = balsa_identity_select_dialog(_("Select Identity"));
+
+    if (ident == NULL) {
+        msg->quituid = gtk_quit_add(0, autopostpone_message, msg);
+        return;
+    }
+        
+    msg->ident = ident;
+
+    /* change entries to reflect new identity */
+    from = g_strdup_printf("%s <%s>", ident->address->full_name, 
+                           (gchar*)ident->address->address_list->data);
+    gtk_entry_set_text(GTK_ENTRY(msg->from[1]), from);
+    g_free(from);
+    
+    gtk_entry_set_text(GTK_ENTRY(msg->reply_to[1]), ident->replyto);
+    gtk_entry_set_text(GTK_ENTRY(msg->bcc[1]), ident->bcc);
+    
+    /* change the subject to use the reply/forward strings */
+
+    /* remove/add the signature depending on the new settings, change
+     * the signature if path changed */
+
+    /* update the current messages identity */
+
+    msg->quituid = gtk_quit_add(0, autopostpone_message, msg);
+}
+
+
 
 /* remove_attachment - right mouse button callback */
 static void
@@ -1309,6 +1359,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     }
     msg->window = window;
     msg->type = type;
+    msg->ident = balsa_app.current_ident;
 
     gtk_signal_connect(GTK_OBJECT(msg->window), "delete_event",
 		       GTK_SIGNAL_FUNC(delete_event_cb), msg);
@@ -1316,6 +1367,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 		       GTK_SIGNAL_FUNC(delete_event_cb), msg);
 
     fill_language_menu();
+
     gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, msg);
     gnome_app_create_toolbar_with_data(GNOME_APP(window), main_toolbar,
 				       msg);

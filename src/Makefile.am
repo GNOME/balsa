@@ -9,6 +9,8 @@ balsa_BASE_SOURCES =	\
 	balsa-app.h		\
 	balsa-icons.c		\
 	balsa-icons.h		\
+	balsa-identity.c	\
+	balsa-identity.h	\
 	balsa-index.c		\
 	balsa-index.h		\
 	balsa-index-threading.c	\

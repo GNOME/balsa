@@ -76,7 +76,7 @@ extern struct BalsaApplication
   gint mw_height;
   gint mblist_width;
   gint mblist_height;
-#ifdef SHOW_INFO
+#ifdef BALSA_SHOW_INFO
   gboolean mblist_show_mb_content_info;
 #endif
 

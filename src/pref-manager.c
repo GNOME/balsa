@@ -41,7 +41,7 @@ typedef struct _PropertyUI
     GtkWidget *previewpane;
     GtkWidget *debug;		/* enable/disable debugging */
 
-#ifdef SHOW_INFO
+#ifdef BALSA_SHOW_INFO
     GtkWidget *mblist_show_mb_content_info;
 #endif
     /* arp */
@@ -172,7 +172,7 @@ open_preferences_manager (void)
 		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
   gtk_signal_connect (GTK_OBJECT (pui->debug), "toggled",
 		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
-#ifdef SHOW_INFO
+#ifdef BALSA_SHOW_INFO
   gtk_signal_connect (GTK_OBJECT (pui->mblist_show_mb_content_info), "toggled",
 		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
 #endif
@@ -251,7 +251,7 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
       }
   balsa_app.debug = GTK_TOGGLE_BUTTON (pui->debug)->active;
   balsa_app.previewpane = GTK_TOGGLE_BUTTON (pui->previewpane)->active;
-#ifdef SHOW_INFO
+#ifdef BALSA_SHOW_INFO
   if (balsa_app.mblist_show_mb_content_info != GTK_TOGGLE_BUTTON (pui->mblist_show_mb_content_info)->active)
    {
      balsa_app.mblist_show_mb_content_info = !balsa_app.mblist_show_mb_content_info;
@@ -300,7 +300,7 @@ set_prefs (void)
 
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->previewpane), balsa_app.previewpane);
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->debug), balsa_app.debug);
-#ifdef SHOW_INFO
+#ifdef BALSA_SHOW_INFO
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->mblist_show_mb_content_info), balsa_app.mblist_show_mb_content_info);
 #endif
   /* arp */
@@ -557,7 +557,7 @@ create_display_page ()
 
   pui->previewpane = gtk_check_button_new_with_label (_ ("Use preview pane"));
   gtk_container_add (GTK_CONTAINER (frame), GTK_WIDGET (pui->previewpane));
-#ifdef SHOW_INFO
+#ifdef BALSA_SHOW_INFO
   /* mailbox list window */
   frame = gtk_frame_new ("Mailbox list window");
   gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);

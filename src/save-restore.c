@@ -638,7 +638,7 @@ config_global_load (void)
     balsa_app.previewpane = TRUE;
   else
     balsa_app.previewpane = atoi (field);
-#ifdef SHOW_INFO
+#ifdef BALSA_SHOW_INFO
   /* show mailbox content info */
   if ((field = pl_dict_get_str (globals, "ShowMailboxContentInfo")) == NULL)
     balsa_app.mblist_show_mb_content_info = TRUE;
@@ -733,7 +733,7 @@ config_global_save (void)
 
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.previewpane);
     pl_dict_add_str_str (globals, "UsePreviewPane", tmp);
-#ifdef SHOW_INFO
+#ifdef BALSA_SHOW_INFO
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.mblist_show_mb_content_info);
     pl_dict_add_str_str (globals, "ShowMailboxContentInfo", tmp);
 #endif

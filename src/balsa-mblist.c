@@ -151,7 +151,7 @@ balsa_mblist_class_init (BalsaMBListClass * klass)
 static void
 balsa_mblist_set_arg (GtkObject * object, GtkArg * arg, guint arg_id)
 {
-#ifdef SHOW_INFO
+#ifdef BALSA_SHOW_INFO
   BalsaMBList *bmbl;
 
   bmbl = BALSA_MBLIST (object);
@@ -173,7 +173,7 @@ balsa_mblist_set_arg (GtkObject * object, GtkArg * arg, guint arg_id)
 static void
 balsa_mblist_get_arg (GtkObject * object, GtkArg * arg, guint arg_id)
 {
-#ifdef SHOW_INFO
+#ifdef BALSA_SHOW_INFO
   BalsaMBList *bmbl;
 
   bmbl = BALSA_MBLIST (object);
@@ -200,17 +200,19 @@ balsa_mblist_init (BalsaMBList * tree)
   {"mailbox", "unread", "total"};
   gtk_widget_push_visual (gdk_imlib_get_visual ());
   gtk_widget_push_colormap (gdk_imlib_get_colormap ());
-#ifdef SHOW_INFO
+#ifdef BALSA_SHOW_INFO
   gtk_ctree_construct (GTK_CTREE (tree), 3, 0, titles);
 #else
   gtk_ctree_construct (GTK_CTREE (tree), 1, 0, titles);
 #endif
-#ifdef SHOW_INFO
+#ifdef BALSA_SHOW_INFO
   if (tree->display_content_info)
     gtk_clist_column_titles_show (GTK_CLIST (tree));
   else
-    gtk_clist_column_titles_hide (GTK_CLIST (tree));
 #endif
+	  /* we want this on by default */
+    gtk_clist_column_titles_hide (GTK_CLIST (tree));
+
   gtk_widget_pop_colormap ();
   gtk_widget_pop_visual ();
 
@@ -224,7 +226,7 @@ balsa_mblist_init (BalsaMBList * tree)
   gtk_ctree_set_expander_style (GTK_CTREE (tree), GTK_CTREE_EXPANDER_CIRCULAR);
   gtk_clist_set_row_height (GTK_CLIST (tree), 16);
   gtk_clist_set_column_width (GTK_CLIST (tree), 0, 80);
-#ifdef SHOW_INFO
+#ifdef BALSA_SHOW_INFO
   if (tree->display_content_info)
     {
       gtk_clist_set_column_width (GTK_CLIST (tree), 1, 45);
@@ -264,7 +266,7 @@ balsa_mblist_insert_mailbox (BalsaMBList * mblist,
 				  NULL, NULL,
 				  FALSE, FALSE);
   gtk_ctree_node_set_row_data (GTK_CTREE (mblist), ctnode, mailbox);
-#ifdef SHOW_INFO
+#ifdef BALSA_SHOW_INFO
   if (bmbl->display_content_info)
     {
       mailbox_gather_content_info (balsa_app.trash);
@@ -289,7 +291,7 @@ balsa_mblist_redraw (BalsaMBList * bmbl)
 
   gtk_clist_clear (GTK_CLIST (ctree));
 
-#ifdef SHOW_INFO
+#ifdef BALSA_SHOW_INFO
   if (bmbl->display_content_info)
     {
       gtk_clist_column_titles_show (GTK_CLIST (ctree));

@@ -157,16 +157,16 @@ static GnomeUIInfo mailbox_menu[] =
   },
 #endif
   GNOMEUIINFO_ITEM_STOCK (N_ ("_Open"), N_("Open the selected mailbox"),
-			  mblist_menu_open_cb, GNOME_STOCK_MENU_PROP),
+			  mblist_menu_open_cb, GNOME_STOCK_MENU_OPEN),
   GNOMEUIINFO_ITEM_STOCK (N_ ("_Close"), N_("Close the selected mailbox"),
-			  mblist_menu_close_cb, GNOME_STOCK_MENU_PROP),
+			  mblist_menu_close_cb, GNOME_STOCK_MENU_CLOSE),
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_ITEM_STOCK (N_ ("_Add"), N_("Add a new mailbox"),
-			  mblist_menu_add_cb, GNOME_STOCK_MENU_PROP),
+			  mblist_menu_add_cb, GNOME_STOCK_PIXMAP_ADD),
   GNOMEUIINFO_ITEM_STOCK (N_ ("_Edit"), N_("Edit the selected mailbox"),
-			  mblist_menu_edit_cb, GNOME_STOCK_MENU_PROP),
+			  mblist_menu_edit_cb, GNOME_STOCK_MENU_PREF),
   GNOMEUIINFO_ITEM_STOCK (N_ ("_Delete"), N_("Delete the selected mailbox"),
-			  mblist_menu_delete_cb, GNOME_STOCK_MENU_TRASH),
+			  mblist_menu_delete_cb, GNOME_STOCK_PIXMAP_REMOVE),
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_ITEM_STOCK (N_ ("C_lose current"), N_("Close the currently opened mailbox"),
 			  mailbox_close_child, GNOME_STOCK_MENU_CLOSE),
@@ -178,9 +178,10 @@ static GnomeUIInfo mailbox_menu[] =
 };
 static GnomeUIInfo settings_menu[] =
 {
+#ifdef BALSA_SHOW_ALL
   GNOMEUIINFO_ITEM_STOCK (N_ ("_Filters..."), N_("Manage filters"),
 			  filter_dlg_cb, GNOME_STOCK_MENU_PROP),
-
+#endif
   GNOMEUIINFO_MENU_PREFERENCES_ITEM(open_preferences_manager, NULL),
 
   GNOMEUIINFO_END
@@ -216,8 +217,10 @@ static GnomeUIInfo main_toolbar[] =
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_ITEM_STOCK (N_ ("Previous"), N_ ("Open Previous Message"), previous_message_cb, GNOME_STOCK_PIXMAP_BACK),
   GNOMEUIINFO_ITEM_STOCK (N_ ("Next"), N_ ("Open Next Message"), next_message_cb, GNOME_STOCK_PIXMAP_FORWARD),
+#ifdef BALSA_SHOW_ALL
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_ITEM_STOCK (N_ ("Print"), N_ ("Print current message"), NULL, GNOME_STOCK_PIXMAP_PRINT),
+#endif
   GNOMEUIINFO_END
 };
 

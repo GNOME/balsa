@@ -78,10 +78,6 @@ void
 mblist_open_window (GnomeMDI * mdi)
 {
   GtkWidget *dock_item;
-#if 0
-  GtkWidget *bbox;
-  GtkWidget *button;
-#endif
   gint height;
 
   GnomeApp *app = GNOME_APP (mdi->active_window);
@@ -128,7 +124,7 @@ mblist_open_window (GnomeMDI * mdi)
   gtk_widget_show (GTK_WIDGET (mblw->sw));
   gtk_widget_show (GTK_WIDGET (mblw->ctree));
   gtk_widget_show (dock_item);
-#ifdef SHOW_INFO
+#ifdef BALSA_SHOW_INFO
   /* set the "show_content_info" property and redraw the mailbox list */
   gtk_object_set(GTK_OBJECT (mblw->ctree), "show_content_info", balsa_app.mblist_show_mb_content_info, NULL);
 #endif
@@ -157,30 +153,6 @@ mblist_open_window (GnomeMDI * mdi)
 
   gtk_signal_connect (GTK_OBJECT (mblw->ctree), "drag_data_received",
 		      GTK_SIGNAL_FUNC (mblist_drag_data_received), NULL);
-
-  
-#if 0
-  bbox = gtk_hbutton_box_new ();
-  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (mblw->window)->action_area),
-		      bbox, TRUE, TRUE, 0);
-  gtk_button_box_set_spacing (GTK_BUTTON_BOX (bbox), 2);
-  gtk_button_box_set_layout (GTK_BUTTON_BOX (bbox), GTK_BUTTONBOX_SPREAD);
-  gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox),
-				 BALSA_BUTTON_WIDTH / 2,
-				 BALSA_BUTTON_HEIGHT / 2);
-  gtk_widget_show (bbox);
-
-  button = gtk_button_new_with_label ("Open box");
-s  gtk_container_add (GTK_CONTAINER (bbox), button);
-  gtk_signal_connect_object (GTK_OBJECT (button), "clicked",
-			     GTK_SIGNAL_FUNC (mblist_open_cb), NULL);
-  gtk_widget_show (button);
-
-  button = gtk_button_new_with_label ("Close box");
-  gtk_container_add (GTK_CONTAINER (bbox), button);
-  gtk_signal_connect_object (GTK_OBJECT (button), "clicked", GTK_SIGNAL_FUNC (mblist_close_cb), NULL);
-  gtk_widget_show (button);
-#endif
 }
 
 
@@ -348,6 +320,18 @@ mb_del_cb (GtkWidget * widget, Mailbox * mailbox)
   mailbox_conf_delete (mailbox);
 }
 
+/* FIXME make these use gnome_popup_menu stuff
+static GnomeUIInfo mailbox_menu[] =
+  GNOMEUIINFO_ITEM_STOCK (_ ("_Open Mailbox"), N_("Open the selected mailbox"),
+                          mb_open_cb, GNOME_STOCK_MENU_OPEN),
+  GNOMEUIINFO_ITEM_STOCK (N_ ("_Close"), N_("Close the selected mailbox"),
+                          mblist_menu_close_cb, GNOME_STOCK_MENU_CLOSE),
+  GNOMEUIINFO_SEPARATOR,
+  GNOMEUIINFO_ITEM_STOCK (N_ ("_Add"), N_("Add a new mailbox"),
+                          mblist_menu_add_cb, GNOME_STOCK_PIXMAP_ADD),
+  GNOMEUIINFO_END
+};
+*/
 
 static GtkWidget *
 mblist_create_context_menu (GtkCTree * ctree, Mailbox * mailbox)

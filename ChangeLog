@@ -1,3 +1,11 @@
+2004-12-20 12:33  PeterB
+
+	* src/: balsa-index.c, balsa-index.h: re-implement
+	balsa_index_{next,previous}_msgno.
+	* src/message-window.c: save more menu items; use
+	balsa_index_{next,previous}_msgno() to correctly manage menu item
+	and button sensitivity.
+
 2004-12-18  Pawel Salek
 
 	* libbalsa/imap/imap-handle.c: forgive errors in BODYSTRUCTURE response

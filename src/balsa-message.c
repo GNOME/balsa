@@ -832,6 +832,8 @@ save_part(BalsaPartInfo * info)
                                     GTK_FILE_CHOOSER_ACTION_SAVE,
                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                     GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+    gtk_dialog_set_default_response(GTK_DIALOG(save_dialog),
+                                    GTK_RESPONSE_OK);
     g_free(title);
     g_free(cont_type);
 

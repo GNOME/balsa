@@ -1477,41 +1477,27 @@ balsa_message_continue(GtkWidget * widget, gpointer user_data)
 }
 
 
-void
-balsa_message_delete(GtkWidget * widget, gpointer user_data)
+static void
+do_delete(BalsaIndex* index, gboolean move_to_trash)
 {
     GList *list;
-    BalsaIndex* index;
     BalsaIndex *trash = NULL;
     LibBalsaMessage *message;
-    gboolean to_trash;
     gboolean select_next = TRUE;
     GList *messages=NULL;
-
-
-    g_return_if_fail(widget != NULL);
-    g_return_if_fail(user_data != NULL);
-
-    index = BALSA_INDEX(user_data);
-    list = GTK_CLIST(index->ctree)->selection;
-
-    if (index->mailbox_node->mailbox == balsa_app.trash)
-	to_trash = FALSE;
-    else
-	to_trash = TRUE;
 
     /* select the previous message if we're at the bottom of the index */
     if (GTK_CLIST(index->ctree)->rows - 1 == 
         bi_get_largest_selected(GTK_CLIST(index->ctree)))
         select_next = FALSE;
 
-    while (list) {
+    
+    for(list = GTK_CLIST(index->ctree)->selection; list; list = list->next) {
 	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
-	messages=g_list_append(messages, message);
-	list = list->next;
+	messages= g_list_append(messages, message);
     }
-    if(messages){
-	if (to_trash)
+    if(messages) {
+	if (move_to_trash)
 	    libbalsa_messages_move(messages, balsa_app.trash);
 	else
 	    libbalsa_messages_delete(messages);
@@ -1520,11 +1506,10 @@ balsa_message_delete(GtkWidget * widget, gpointer user_data)
     
     /* select another message depending on where we are in the list */
     if (GTK_CLIST(index->ctree)->rows > 1) {
-        if (select_next) {
+        if (select_next)
             balsa_index_select_next(index);
-        } else {
+	else
             balsa_index_select_previous(index);
-        }
     } else {
         /* Update the style and message counts in the mailbox list */
         balsa_mblist_update_mailbox(balsa_app.mblist, 
@@ -1537,13 +1522,26 @@ balsa_message_delete(GtkWidget * widget, gpointer user_data)
      * If messages moved to trash mailbox and it's open in the
      * notebook, reset the contents.
      */
-    if (to_trash == TRUE)
-	if ((trash = balsa_find_index_by_mailbox (balsa_app.trash)))
-	    balsa_index_reset(trash);
+    if (move_to_trash && 
+	(trash = balsa_find_index_by_mailbox(balsa_app.trash)))
+	balsa_index_reset(trash);
 
     balsa_index_redraw_current(index);
 }
 
+void
+balsa_message_move_to_trash(GtkWidget * widget, gpointer user_data)
+{
+    g_return_if_fail(user_data != NULL);
+    do_delete(BALSA_INDEX(user_data), TRUE);
+}
+
+void
+balsa_message_delete(GtkWidget * widget, gpointer user_data)
+{
+    g_return_if_fail(user_data != NULL);
+    do_delete(BALSA_INDEX(user_data), FALSE);
+}
 
 void
 balsa_message_undelete(GtkWidget * widget, gpointer user_data)
@@ -1855,16 +1853,16 @@ create_menu(BalsaIndex * bindex)
 			   _("Forward..."), balsa_message_forward, bindex,
 			   TRUE);
 
+    create_stock_menu_item(menu, GNOME_STOCK_MENU_TRASH,
+			   _("Delete"), balsa_message_delete, bindex,
+			   !mailbox->readonly);
     if (mailbox == balsa_app.trash) {
 	create_stock_menu_item(menu, GNOME_STOCK_MENU_UNDELETE,
 			       _("Undelete"), balsa_message_undelete,
 			       bindex, !mailbox->readonly);
-	create_stock_menu_item(menu, GNOME_STOCK_MENU_UNDELETE,
-			       _("Delete"), balsa_message_delete, bindex,
-			       !mailbox->readonly);
     } else {
 	create_stock_menu_item(menu, GNOME_STOCK_MENU_TRASH,
-			       _("Move To Trash"), balsa_message_delete,
+			       _("Move To Trash"), balsa_message_move_to_trash,
 			       bindex, !mailbox->readonly);
     }
 

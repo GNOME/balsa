@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 1996-8 Michael R. Elkins <me@cs.hmc.edu>
  * Copyright (C) 1996-9 Brandon Long <blong@fiction.net>
- * Copyright (C) 1999-2000 Brendan Cully <brendan@kublai.com>
+ * Copyright (C) 1999-2001 Brendan Cully <brendan@kublai.com>
  * 
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -35,96 +35,31 @@
 
 #include <errno.h>
 
-/* imap_continue: display a message and ask the user if she wants to
- *   go on. */
-int imap_continue (const char* msg, const char* resp)
+/* -- public functions -- */
+
+/* imap_expand_path: IMAP implementation of mutt_expand_path. Rewrite
+ *   an IMAP path in canonical and absolute form.
+ * Inputs: a buffer containing an IMAP path, and the number of bytes in
+ *   that buffer.
+ * Outputs: The buffer is rewritten in place with the canonical IMAP path.
+ * Returns 0 on success, or -1 if imap_parse_path chokes or url_ciss_tostring
+ *   fails, which it might if there isn't enough room in the buffer. */
+int imap_expand_path (char* path, size_t len)
 {
-  imap_error (msg, resp);
-  return mutt_yesorno (_("Continue?"), 0);
-}
+  IMAP_MBOX mx;
+  ciss_url_t url;
+  int rc;
 
-/* imap_error: show an error and abort */
-void imap_error (const char *where, const char *msg)
-{
-  mutt_error (_("%s [%s]\n"), where, msg);
-  sleep (2);
-}
+  if (imap_parse_path (path, &mx) < 0)
+    return -1;
 
-/*
- * Fix up the imap path.  This is necessary because the rest of mutt
- * assumes a hierarchy delimiter of '/', which is not necessarily true
- * in IMAP.  Additionally, the filesystem converts multiple hierarchy
- * delimiters into a single one, ie "///" is equal to "/".  IMAP servers
- * are not required to do this.
- */
-char *imap_fix_path (IMAP_DATA *idata, char *mailbox, char *path, 
-    size_t plen)
-{
-  int x = 0;
+  mutt_account_tourl (&mx.account, &url);
+  url.path = mx.mbox;
 
-  if (!mailbox || !*mailbox)
-  {
-    strfcpy (path, "INBOX", plen);
-    return path;
-  }
+  rc = url_ciss_tostring (&url, path, len);
+  FREE (&mx.mbox);
 
-  while (mailbox && *mailbox && (x < (plen - 1)))
-  {
-    if ((*mailbox == '/') || (*mailbox == idata->delim))
-    {
-      while ((*mailbox == '/') || (*mailbox == idata->delim)) mailbox++;
-      path[x] = idata->delim;
-    }
-    else
-    {
-      path[x] = *mailbox;
-      mailbox++;
-    }
-    x++;
-  }
-  path[x] = '\0';
-  return path;
-}
-
-/* imap_get_literal_count: write number of bytes in an IMAP literal into
- *   bytes, return 0 on success, -1 on failure. */
-int imap_get_literal_count(const char *buf, long *bytes)
-{
-  char *pc;
-  char *pn;
-
-  if (!(pc = strchr (buf, '{')))
-    return (-1);
-  pc++;
-  pn = pc;
-  while (isdigit (*pc))
-    pc++;
-  *pc = 0;
-  *bytes = atoi(pn);
-  return (0);
-}
-
-/* imap_get_qualifier: in a tagged response, skip tag and status for
- *   the qualifier message. Used by imap_copy_message for TRYCREATE */
-char* imap_get_qualifier (char* buf)
-{
-  char *s = buf;
-
-  /* skip tag */
-  s = imap_next_word (s);
-  /* skip OK/NO/BAD response */
-  s = imap_next_word (s);
-
-  return s;
-}
-
-/* imap_next_word: return index into string where next IMAP word begins */
-char *imap_next_word (char *s)
-{
-  while (*s && !ISSPACE (*s))
-    s++;
-  SKIPWS (s);
-  return s;
+  return rc;
 }
 
 /* imap_parse_path: given an IMAP mailbox name, return host, port
@@ -214,6 +149,231 @@ int imap_parse_path (const char* path, IMAP_MBOX* mx)
     mx->account.port = IMAP_SSL_PORT;
 
   return 0;
+}
+
+/* imap_pretty_mailbox: called by mutt_pretty_mailbox to make IMAP paths
+ *   look nice. */
+void imap_pretty_mailbox (char* path)
+{
+  IMAP_MBOX home, target;
+  ciss_url_t url;
+  char* delim;
+  int tlen;
+  int hlen = 0;
+  char home_match = 0;
+
+  if (imap_parse_path (path, &target) < 0)
+    return;
+
+  tlen = mutt_strlen (target.mbox);
+  /* check whether we can do '=' substitution */
+  if (! imap_parse_path (Maildir, &home))
+  {
+    hlen = mutt_strlen (home.mbox);
+    if (tlen && mutt_account_match (&home.account, &target.account) &&
+	!mutt_strncmp (home.mbox, target.mbox, hlen))
+    {
+      if (! hlen)
+	home_match = 1;
+      else
+	for (delim = ImapDelimChars; *delim != '\0'; delim++)
+	  if (target.mbox[hlen] == *delim)
+	    home_match = 1;
+    }
+    FREE (&home.mbox);
+  }
+
+  /* do the '=' substitution */
+  if (home_match) {
+    *path++ = '=';
+    /* copy remaining path, skipping delimiter */
+    if (! hlen)
+      hlen = -1;
+    memcpy (path, target.mbox + hlen + 1, tlen - hlen - 1);
+    path[tlen - hlen - 1] = '\0';
+  }
+  else
+  {
+    mutt_account_tourl (&target.account, &url);
+    url.path = target.mbox;
+    /* FIXME: That hard-coded constant is bogus. But we need the actual
+     *   size of the buffer from mutt_pretty_mailbox. And these pretty
+     *   operations usually shrink the result. Still... */
+    url_ciss_tostring (&url, path, 1024);
+  }
+
+  FREE (&target.mbox);
+}
+
+/* -- library functions -- */
+
+/* imap_continue: display a message and ask the user if she wants to
+ *   go on. */
+int imap_continue (const char* msg, const char* resp)
+{
+  imap_error (msg, resp);
+  return mutt_yesorno (_("Continue?"), 0);
+}
+
+/* imap_error: show an error and abort */
+void imap_error (const char *where, const char *msg)
+{
+  mutt_error (_("%s [%s]\n"), where, msg);
+  mutt_sleep (2);
+}
+
+/* imap_new_idata: Allocate and initialise a new IMAP_DATA structure.
+ *   Returns NULL on failure (no mem) */
+IMAP_DATA* imap_new_idata (void) {
+  IMAP_DATA* idata;
+
+  idata = safe_calloc (1, sizeof (IMAP_DATA));
+  if (!idata)
+    return NULL;
+
+  idata->conn = NULL;
+  idata->state = IMAP_DISCONNECTED;
+  idata->seqno = 0;
+
+  idata->cmd.buf = NULL;
+  idata->cmd.blen = 0;
+  idata->cmd.state = IMAP_CMD_OK;
+
+  return idata;
+}
+
+/* imap_free_idata: Release and clear storage in an IMAP_DATA structure. */
+void imap_free_idata (IMAP_DATA** idata) {
+  if (!idata)
+    return;
+
+  FREE (&((*idata)->cmd.buf));
+  FREE (idata);
+}
+
+/*
+ * Fix up the imap path.  This is necessary because the rest of mutt
+ * assumes a hierarchy delimiter of '/', which is not necessarily true
+ * in IMAP.  Additionally, the filesystem converts multiple hierarchy
+ * delimiters into a single one, ie "///" is equal to "/".  IMAP servers
+ * are not required to do this.
+ */
+char *imap_fix_path (IMAP_DATA *idata, char *mailbox, char *path, 
+    size_t plen)
+{
+  int x = 0;
+
+  if (!mailbox || !*mailbox)
+  {
+    strfcpy (path, "INBOX", plen);
+    return path;
+  }
+
+  while (mailbox && *mailbox && (x < (plen - 1)))
+  {
+    if ((*mailbox == '/') || (*mailbox == idata->delim))
+    {
+      while ((*mailbox == '/') || (*mailbox == idata->delim)) mailbox++;
+      path[x] = idata->delim;
+    }
+    else
+    {
+      path[x] = *mailbox;
+      mailbox++;
+    }
+    x++;
+  }
+  path[x] = '\0';
+  return path;
+}
+
+/* imap_get_literal_count: write number of bytes in an IMAP literal into
+ *   bytes, return 0 on success, -1 on failure. */
+int imap_get_literal_count(const char *buf, long *bytes)
+{
+  char *pc;
+  char *pn;
+
+  if (!(pc = strchr (buf, '{')))
+    return (-1);
+  pc++;
+  pn = pc;
+  while (isdigit (*pc))
+    pc++;
+  *pc = 0;
+  *bytes = atoi(pn);
+  return (0);
+}
+
+/* imap_get_qualifier: in a tagged response, skip tag and status for
+ *   the qualifier message. Used by imap_copy_message for TRYCREATE */
+char* imap_get_qualifier (char* buf)
+{
+  char *s = buf;
+
+  /* skip tag */
+  s = imap_next_word (s);
+  /* skip OK/NO/BAD response */
+  s = imap_next_word (s);
+
+  return s;
+}
+
+/* imap_next_word: return index into string where next IMAP word begins */
+char *imap_next_word (char *s)
+{
+  while (*s && !ISSPACE (*s))
+    s++;
+  SKIPWS (s);
+  return s;
+}
+
+/* imap_parse_date: date is of the form: DD-MMM-YYYY HH:MM:SS +ZZzz */
+time_t imap_parse_date (char *s)
+{
+  struct tm t;
+  time_t tz;
+
+  t.tm_mday = (s[0] == ' '? s[1] - '0' : (s[0] - '0') * 10 + (s[1] - '0'));  
+  s += 2;
+  if (*s != '-')
+    return 0;
+  s++;
+  t.tm_mon = mutt_check_month (s);
+  s += 3;
+  if (*s != '-')
+    return 0;
+  s++;
+  t.tm_year = (s[0] - '0') * 1000 + (s[1] - '0') * 100 + (s[2] - '0') * 10 + (s[3] - '0') - 1900;
+  s += 4;
+  if (*s != ' ')
+    return 0;
+  s++;
+
+  /* time */
+  t.tm_hour = (s[0] - '0') * 10 + (s[1] - '0');
+  s += 2;
+  if (*s != ':')
+    return 0;
+  s++;
+  t.tm_min = (s[0] - '0') * 10 + (s[1] - '0');
+  s += 2;
+  if (*s != ':')
+    return 0;
+  s++;
+  t.tm_sec = (s[0] - '0') * 10 + (s[1] - '0');
+  s += 2;
+  if (*s != ' ')
+    return 0;
+  s++;
+
+  /* timezone */
+  tz = ((s[1] - '0') * 10 + (s[2] - '0')) * 3600 +
+    ((s[3] - '0') * 10 + (s[4] - '0')) * 60;
+  if (s[0] == '+')
+    tz = -tz;
+
+  return (mutt_mktime (&t, 0) + tz);
 }
 
 /* imap_qualify_path: make an absolute IMAP folder target, given IMAP_MBOX
@@ -346,7 +506,7 @@ int imap_wordcasecmp(const char *a, const char *b)
   }
   tmp[i+1] = 0;
 
-  return mutt_strcasecmp(a, tmp);
+  return ascii_strcasecmp(a, tmp);
 }
 
 /* 

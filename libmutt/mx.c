@@ -24,7 +24,7 @@
 #include "mailbox.h"
 #include "copy.h"
 #include "keymap.h"
-
+#include "url.h"
 
 #ifdef HAVE_PGP
 #include "pgp.h"
@@ -318,9 +318,37 @@ void mx_unlink_empty (const char *path)
 
 int mx_is_imap(const char *p)
 {
-  return p && (*p == '{');
+  url_scheme_t scheme;
+
+  if (!p)
+    return 0;
+
+  if (*p == '{')
+    return 1;
+
+  scheme = url_check_scheme (p);
+  if (scheme == U_IMAP || scheme == U_IMAPS)
+    return 1;
+
+  return 0;
 }
 
+#endif
+
+#ifdef USE_POP
+int mx_is_pop (const char *p)
+{
+  url_scheme_t scheme;
+
+  if (!p)
+    return 0;
+
+  scheme = url_check_scheme (p);
+  if (scheme == U_POP || scheme == U_POPS)
+    return 1;
+
+  return 0;
+}
 #endif
 
 int mx_get_magic (const char *path)
@@ -420,20 +448,33 @@ int mx_get_magic (const char *path)
  */
 int mx_set_magic (const char *s)
 {
-  if (mutt_strcasecmp (s, "mbox") == 0)
+  if (ascii_strcasecmp (s, "mbox") == 0)
     DefaultMagic = M_MBOX;
-  else if (mutt_strcasecmp (s, "mmdf") == 0)
+  else if (ascii_strcasecmp (s, "mmdf") == 0)
     DefaultMagic = M_MMDF;
-  else if (mutt_strcasecmp (s, "mh") == 0)
+  else if (ascii_strcasecmp (s, "mh") == 0)
     DefaultMagic = M_MH;
-  else if (mutt_strcasecmp (s, "maildir") == 0)
+  else if (ascii_strcasecmp (s, "maildir") == 0)
     DefaultMagic = M_MAILDIR;
-  else if (mutt_strcasecmp (s, "kendra") == 0)
+  else if (ascii_strcasecmp (s, "kendra") == 0)
     DefaultMagic = M_KENDRA;
   else
     return (-1);
 
   return 0;
+}
+
+/* mx_access: Wrapper for access, checks permissions on a given mailbox.
+ *   We may be interested in using ACL-style flags at some point, currently
+ *   we use the normal access() flags. */
+int mx_access (const char* path, int flags)
+{
+#ifdef USE_IMAP
+  if (mx_is_imap (path))
+    return imap_access (path, flags);
+#endif
+
+  return access (path, flags);
 }
 
 static int mx_open_mailbox_append (CONTEXT *ctx)
@@ -866,12 +907,18 @@ int mx_close_mailbox (CONTEXT *ctx, int *index_hint)
     if (i == 0) /* success */
       mutt_clear_error ();
     else if (i == -1) /* horrible error, bail */
+    {
+      ctx->closing=0;
       return -1;
+    }
     else /* use regular append-copy mode */
 #endif
     {
       if (mx_open_mailbox (mbox, M_APPEND, &f) == NULL)
+      {
+	ctx->closing = 0;
 	return -1;
+      }
 
       for (i = 0; i < ctx->msgcount; i++)
       {
@@ -885,6 +932,7 @@ int mx_close_mailbox (CONTEXT *ctx, int *index_hint)
 	  else
 	  {
 	    mx_close_mailbox (&f, NULL);
+	    ctx->closing = 0;
 	    return -1;
 	  }
 	}
@@ -906,7 +954,10 @@ int mx_close_mailbox (CONTEXT *ctx, int *index_hint)
   if (ctx->magic == M_IMAP)
   {
     if ((check = imap_sync_mailbox (ctx, purge, index_hint)) != 0)
+    {
+      ctx->closing = 0;
       return check;
+    }
   }
   else
 #endif
@@ -921,7 +972,10 @@ int mx_close_mailbox (CONTEXT *ctx, int *index_hint)
     if (ctx->changed || ctx->deleted)
     {
       if ((check = sync_mailbox (ctx, index_hint)) != 0)
+      {
+	ctx->closing = 0;
 	return check;
+      }
     }
   }
 

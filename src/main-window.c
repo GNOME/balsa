@@ -161,6 +161,7 @@ static void next_part_cb(GtkWidget * widget, gpointer data);
 static void previous_part_cb(GtkWidget * widget, gpointer data);
 static void save_current_part_cb(GtkWidget * widget, gpointer data);
 
+static void trash_message_cb(GtkWidget * widget, gpointer data);
 static void delete_message_cb(GtkWidget * widget, gpointer data);
 static void undelete_message_cb(GtkWidget * widget, gpointer data);
 static void toggle_flagged_message_cb(GtkWidget * widget, gpointer data);
@@ -441,23 +442,27 @@ static GnomeUIInfo message_menu[] = {
 #define MENU_MESSAGE_DELETE_POS 9
     /* D */
     {
-	GNOME_APP_UI_ITEM, N_("_Delete"), N_("Delete the current message"),
-	delete_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+	GNOME_APP_UI_ITEM, N_("_Move to Trash"), 
+	N_("Move the current message to Trash mailbox"),
+	trash_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
 	GNOME_STOCK_MENU_TRASH, 'D', 0, NULL
     },
-#define MENU_MESSAGE_UNDEL_POS 10
+#define MENU_MESSAGE_DELETE_POS 10
+    GNOMEUIINFO_ITEM_STOCK(N_("_Delete"), 
+			   N_("Delete the current message"),
+			   delete_message_cb, GNOME_STOCK_MENU_TRASH),
+#define MENU_MESSAGE_UNDEL_POS 11
     /* U */
     {
 	GNOME_APP_UI_ITEM, N_("_Undelete"), N_("Undelete the message"),
 	undelete_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
 	GNOME_STOCK_MENU_UNDELETE, 'U', 0, NULL
     },
-
-#define MENU_MESSAGE_TOGGLE_POS 11
+#define MENU_MESSAGE_TOGGLE_POS 12
     /* ! */
     GNOMEUIINFO_SUBTREE(N_("_Toggle"), message_toggle_menu),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MESSAGE_STORE_ADDRESS_POS 13
+#define MENU_MESSAGE_STORE_ADDRESS_POS 14
     /* S */
     {
 	GNOME_APP_UI_ITEM, N_("_Store Address..."),
@@ -1936,6 +1941,14 @@ save_current_part_cb(GtkWidget * widget, gpointer data)
     bw = BALSA_WINDOW(data);
     if (bw->preview)
 	balsa_message_save_current_part(BALSA_MESSAGE(bw->preview));
+}
+
+static void
+trash_message_cb(GtkWidget * widget, gpointer data)
+{
+    balsa_message_move_to_trash(widget,
+				balsa_window_find_current_index(
+				    BALSA_WINDOW(data)));
 }
 
 static void

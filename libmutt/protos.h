@@ -272,6 +272,10 @@ int mutt_save_message (HEADER *, int, int, int, int *);
 int mutt_search_command (int, int);
 #ifdef LIBMUTT
 int mutt_send_message(HEADER *);
+#define ascii_strcasecmp g_strcasecmp
+#define ascii_strncasecmp g_strncasecmp
+#define mutt_sleep(a)
+#define mutt_allow_interrupt(a)
 #endif
 int mutt_compose_menu (HEADER *, char *, size_t, HEADER *);
 int mutt_strcmp (const char *, const char *);

@@ -45,6 +45,8 @@ WHERE char *ImapUser INITVAL (NULL);
 WHERE char *ImapCRAMKey INITVAL (NULL);
 WHERE char *ImapPass INITVAL (NULL);
 WHERE short ImapCheckTimeout;
+/* BALSA: set initial value to something sensible */
+WHERE char *ImapDelimChars INITVAL ("/.");
 WHERE char *ImapHomeNamespace INITVAL (NULL);
 WHERE char *ImapPreconnect INITVAL (NULL);
 #endif

@@ -110,6 +110,7 @@ extern "C" {
     void balsa_message_forward(GtkWidget * widget, gpointer user_data);
     void balsa_message_continue(GtkWidget * widget, gpointer user_data);
 
+    void balsa_message_move_to_trash(GtkWidget * widget, gpointer user_data);
     void balsa_message_delete(GtkWidget * widget, gpointer user_data);
     void balsa_message_undelete(GtkWidget * widget, gpointer user_data);
 

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 1996-8 Michael R. Elkins <me@cs.hmc.edu>
  * Copyright (C) 1996-9 Brandon Long <blong@fiction.net>
- * Copyright (C) 1999-2000 Brendan Cully <brendan@kublai.com>
+ * Copyright (C) 1999-2001 Brendan Cully <brendan@kublai.com>
  * 
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@
 static void cmd_finish (IMAP_DATA* idata);
 static void cmd_handle_fatal (IMAP_DATA* idata);
 static int cmd_handle_untagged (IMAP_DATA* idata);
-static void cmd_make_sequence (char* buf, size_t buflen);
+static void cmd_make_sequence (IMAP_DATA* idata);
 static void cmd_parse_capabilities (IMAP_DATA* idata, char* s);
 static void cmd_parse_expunge (IMAP_DATA* idata, char* s);
 static void cmd_parse_myrights (IMAP_DATA* idata, char* s);
@@ -62,25 +62,25 @@ int imap_cmd_start (IMAP_DATA* idata, const char* cmd)
 {
   char* out;
   int outlen;
-  int rc = 0;
+  int rc;
 
   if (idata->status == IMAP_FATAL)
   {
     cmd_handle_fatal (idata);
-    return IMAP_CMD_FAIL;
+    return IMAP_CMD_BAD;
   }
 
-  cmd_make_sequence (idata->seq, sizeof (idata->seq));
+  cmd_make_sequence (idata);
   /* seq, space, cmd, \r\n\0 */
-  outlen = strlen (idata->seq) + strlen (cmd) + 4;
+  outlen = strlen (idata->cmd.seq) + strlen (cmd) + 4;
   out = (char*) safe_malloc (outlen);
-  snprintf (out, outlen, "%s %s\r\n", idata->seq, cmd);
+  snprintf (out, outlen, "%s %s\r\n", idata->cmd.seq, cmd);
 
   rc = mutt_socket_write (idata->conn, out);
 
   FREE (&out);
 
-  return (rc < 0) ? IMAP_CMD_FAIL : 0;
+  return (rc < 0) ? IMAP_CMD_BAD : 0;
 }
 
 /* imap_cmd_step: Reads server responses from an IMAP command, detects
@@ -89,33 +89,35 @@ int imap_cmd_start (IMAP_DATA* idata, const char* cmd)
  *   large!). */
 int imap_cmd_step (IMAP_DATA* idata)
 {
+  IMAP_COMMAND* cmd = &idata->cmd;
   unsigned int len = 0;
   int c;
 
   if (idata->status == IMAP_FATAL)
   {
     cmd_handle_fatal (idata);
-    return IMAP_CMD_FAIL;
+    return IMAP_CMD_BAD;
   }
 
   /* read into buffer, expanding buffer as necessary until we have a full
    * line */
   do
   {
-    if (len == idata->blen)
+    if (len == cmd->blen)
     {
-      safe_realloc ((void**) &idata->buf, idata->blen + IMAP_CMD_BUFSIZE);
-      idata->blen = idata->blen + IMAP_CMD_BUFSIZE;
-      dprint (3, (debugfile, "imap_cmd_step: grew buffer to %u bytes\n", idata->blen));
+      safe_realloc ((void**) &cmd->buf, cmd->blen + IMAP_CMD_BUFSIZE);
+      cmd->blen = cmd->blen + IMAP_CMD_BUFSIZE;
+      dprint (3, (debugfile, "imap_cmd_step: grew buffer to %u bytes\n",
+		  cmd->blen));
     }
 
-    if ((c = mutt_socket_readln (idata->buf + len, idata->blen - len,
+    if ((c = mutt_socket_readln (cmd->buf + len, cmd->blen - len,
       idata->conn)) < 0)
     {
       dprint (1, (debugfile, "imap_cmd_step: Error while reading server response, closing connection.\n"));
+      mutt_socket_close (idata->conn);
       idata->status = IMAP_FATAL;
-      cmd_handle_fatal (idata);
-      return IMAP_CMD_FAIL;
+      return IMAP_CMD_BAD;
     }
 
     len += c;
@@ -123,30 +125,32 @@ int imap_cmd_step (IMAP_DATA* idata)
   /* if we've read all the way to the end of the buffer, we haven't read a
    * full line (mutt_socket_readln strips the \r, so we always have at least
    * one character free when we've read a full line) */
-  while (len == idata->blen);
+  while (len == cmd->blen);
 
-  /* don't let one large string make idata->buf hog memory forever */
-  if ((idata->blen > IMAP_CMD_BUFSIZE) && (len <= IMAP_CMD_BUFSIZE))
+  /* don't let one large string make cmd->buf hog memory forever */
+  if ((cmd->blen > IMAP_CMD_BUFSIZE) && (len <= IMAP_CMD_BUFSIZE))
   {
-    safe_realloc ((void**) &idata->buf, IMAP_CMD_BUFSIZE);
-    idata->blen = IMAP_CMD_BUFSIZE;
-    dprint (3, (debugfile, "imap_cmd_step: shrank buffer to %u bytes\n", idata->blen));
+    safe_realloc ((void**) &cmd->buf, IMAP_CMD_BUFSIZE);
+    cmd->blen = IMAP_CMD_BUFSIZE;
+    dprint (3, (debugfile, "imap_cmd_step: shrank buffer to %u bytes\n", cmd->blen));
   }
   
   /* handle untagged messages. The caller still gets its shot afterwards. */
-  if (!strncmp (idata->buf, "* ", 2) &&
+  if (!strncmp (cmd->buf, "* ", 2) &&
       cmd_handle_untagged (idata))
-    return IMAP_CMD_FAIL;
+    return IMAP_CMD_BAD;
 
   /* server demands a continuation response from us */
-  if (!strncmp (idata->buf, "+ ", 2))
+  if (!strncmp (cmd->buf, "+ ", 2))
+  {
     return IMAP_CMD_RESPOND;
+  }
 
   /* tagged completion code */
-  if (!mutt_strncmp (idata->buf, idata->seq, SEQLEN))
+  if (!mutt_strncmp (cmd->buf, cmd->seq, SEQLEN))
   {
     cmd_finish (idata);
-    return imap_code (idata->buf) ? IMAP_CMD_DONE : IMAP_CMD_NO;
+    return imap_code (cmd->buf) ? IMAP_CMD_OK : IMAP_CMD_NO;
   }
 
   return IMAP_CMD_CONTINUE;
@@ -157,7 +161,7 @@ int imap_code (const char *s)
 {
   s += SEQLEN;
   SKIPWS (s);
-  return (mutt_strncasecmp ("OK", s, 2) == 0);
+  return (ascii_strncasecmp ("OK", s, 2) == 0);
 }
 
 /* imap_exec: execute a command, and wait for the response from the server.
@@ -181,11 +185,11 @@ int imap_exec (IMAP_DATA* idata, const char* cmd, int flags)
   }
 
   /* create sequence for command */
-  cmd_make_sequence (idata->seq, sizeof (idata->seq));
+  cmd_make_sequence (idata);
   /* seq, space, cmd, \r\n\0 */
-  outlen = strlen (idata->seq) + strlen (cmd) + 4;
+  outlen = strlen (idata->cmd.seq) + strlen (cmd) + 4;
   out = (char*) safe_malloc (outlen);
-  snprintf (out, outlen, "%s %s\r\n", idata->seq, cmd);
+  snprintf (out, outlen, "%s %s\r\n", idata->cmd.seq, cmd);
 
   rc = mutt_socket_write_d (idata->conn, out,
     flags & IMAP_CMD_PASS ? IMAP_LOG_PASS : IMAP_LOG_CMD);
@@ -201,21 +205,31 @@ int imap_exec (IMAP_DATA* idata, const char* cmd, int flags)
   if (rc == IMAP_CMD_NO && (flags & IMAP_CMD_FAIL_OK))
     return -2;
 
-  if (rc != IMAP_CMD_DONE)
+  if (rc != IMAP_CMD_OK)
   {
     char *pc;
 
     if (flags & IMAP_CMD_FAIL_OK)
       return -2;
 
-    dprint (1, (debugfile, "imap_exec: command failed: %s\n", idata->buf));
-    pc = idata->buf;
+    dprint (1, (debugfile, "imap_exec: command failed: %s\n", idata->cmd.buf));
+    pc = idata->cmd.buf;
     pc = imap_next_word (pc);
     mutt_error ("%s", pc);
-    sleep (2);
+    mutt_sleep (2);
 
     return -1;
   }
+
+  return 0;
+}
+
+/* imap_cmd_running: Returns whether an IMAP command is in progress. */
+int imap_cmd_running (IMAP_DATA* idata)
+{
+  if (idata->cmd.state == IMAP_CMD_CONTINUE ||
+      idata->cmd.state == IMAP_CMD_RESPOND)
+    return 1;
 
   return 0;
 }
@@ -226,10 +240,7 @@ int imap_exec (IMAP_DATA* idata, const char* cmd, int flags)
 static void cmd_finish (IMAP_DATA* idata)
 {
   if (!(idata->state == IMAP_SELECTED) || idata->ctx->closing)
-  {
-    mutt_clear_error ();
     return;
-  }
   
   if ((idata->reopen & IMAP_REOPEN_ALLOW) &&
       (idata->reopen & (IMAP_EXPUNGE_PENDING|IMAP_NEWMAIL_PENDING)))
@@ -264,12 +275,12 @@ static void cmd_handle_fatal (IMAP_DATA* idata)
 {
   if ((idata->state == IMAP_SELECTED) &&
       (idata->reopen & IMAP_REOPEN_ALLOW) &&
-      !idata->ctx->closing) {
-      mx_fastclose_mailbox (idata->ctx);
+      !idata->ctx->closing)
+  {
+    idata->status = IMAP_BYE;
+    idata->state = IMAP_DISCONNECTED;
+    mx_fastclose_mailbox (idata->ctx);
   }
-  mutt_socket_close(idata->conn);
-  idata->status = IMAP_BYE;
-  idata->state  = IMAP_DISCONNECTED;
 }
 
 /* cmd_handle_untagged: fallback parser for otherwise unhandled messages. */
@@ -279,7 +290,7 @@ static int cmd_handle_untagged (IMAP_DATA* idata)
   char* pn;
   int count;
 
-  s = imap_next_word (idata->buf);
+  s = imap_next_word (idata->cmd.buf);
 
   if ((idata->state == IMAP_SELECTED) && isdigit (*s))
   {
@@ -289,7 +300,7 @@ static int cmd_handle_untagged (IMAP_DATA* idata)
     /* EXISTS and EXPUNGE are always related to the SELECTED mailbox for the
      * connection, so update that one.
      */
-    if (mutt_strncasecmp ("EXISTS", s, 6) == 0)
+    if (ascii_strncasecmp ("EXISTS", s, 6) == 0)
     {
       dprint (2, (debugfile, "Handling EXISTS\n"));
 
@@ -304,7 +315,6 @@ static int cmd_handle_untagged (IMAP_DATA* idata)
 	 */
 	mutt_error _("Fatal error.  Message count is out of sync!");
 	idata->status = IMAP_FATAL;
-	cmd_handle_fatal (idata);
 	return -1;
       }
       /* at least the InterChange server sends EXISTS messages freely,
@@ -324,15 +334,15 @@ static int cmd_handle_untagged (IMAP_DATA* idata)
 	idata->newMailCount = count;
       }
     }
-    else if (mutt_strncasecmp ("EXPUNGE", s, 7) == 0)
+    else if (ascii_strncasecmp ("EXPUNGE", s, 7) == 0)
       /* pn vs. s: need initial seqno */
       cmd_parse_expunge (idata, pn);
   }
-  else if (mutt_strncasecmp ("CAPABILITY", s, 10) == 0)
+  else if (ascii_strncasecmp ("CAPABILITY", s, 10) == 0)
     cmd_parse_capabilities (idata, s);
-  else if (mutt_strncasecmp ("MYRIGHTS", s, 8) == 0)
+  else if (ascii_strncasecmp ("MYRIGHTS", s, 8) == 0)
     cmd_parse_myrights (idata, s);
-  else if (mutt_strncasecmp ("BYE", s, 3) == 0)
+  else if (ascii_strncasecmp ("BYE", s, 3) == 0)
   {
     dprint (2, (debugfile, "Handling BYE\n"));
 
@@ -343,33 +353,36 @@ static int cmd_handle_untagged (IMAP_DATA* idata)
     /* server shut down our connection */
     s += 3;
     SKIPWS (s);
-    mutt_error (_("One of IMAP connections has been closed: %s"), s);
-    cmd_handle_fatal(idata);
+    mutt_error ("%s", s);
+    idata->status = IMAP_BYE;
+    if (idata->state == IMAP_SELECTED)
+      mx_fastclose_mailbox (idata->ctx);
+    mutt_socket_close (idata->conn);
+    idata->state = IMAP_DISCONNECTED;
     /* BALSA: line below needed to be able to reuse this connection later */
-    idata->conn->data = NULL; 
+    idata->conn->data = NULL;
+
     return -1;
   }
-  else if (option (OPTIMAPSERVERNOISE) && (mutt_strncasecmp ("NO", s, 2) == 0))
+  else if (option (OPTIMAPSERVERNOISE) && (ascii_strncasecmp ("NO", s, 2) == 0))
   {
     dprint (2, (debugfile, "Handling untagged NO\n"));
 
     /* Display the warning message from the server */
-    mutt_error ("untagged NO: %s", s+3);
-    sleep (2);
+    mutt_error ("%s", s+3);
+    mutt_sleep (2);
   }
 
   return 0;
 }
 
 /* cmd_make_sequence: make a tag suitable for starting an IMAP command */
-static void cmd_make_sequence (char* buf, size_t buflen)
+static void cmd_make_sequence (IMAP_DATA* idata)
 {
-  static int sequence = 0;
-  
-  snprintf (buf, buflen, "a%04d", sequence++);
+  snprintf (idata->cmd.seq, sizeof (idata->cmd.seq), "a%04d", idata->seqno++);
 
-  if (sequence > 9999)
-    sequence = 0;
+  if (idata->seqno > 9999)
+    idata->seqno = 0;
 }
 
 /* cmd_parse_capabilities: set capability bits according to CAPABILITY

@@ -29,7 +29,6 @@
 #include <gdk/gdkx.h>
 
 #include "balsa-app.h"
-#include "mailbackend.h"
 #include "balsa-message.h"
 #include "mime.h"
 #include "misc.h"

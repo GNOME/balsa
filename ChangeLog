@@ -1,3 +1,12 @@
+2001-05-23  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/folder-scanners.c: patch for MH nested mailboxes from 
+	Gordon Oliver <gordo@pincoya.com>.
+	* src/main-window.c:
+	* src/balsa-index.[ch]: make distinction between "Move to Trash" and
+	"Delete" message clear.
+	* src/balsa-message.c: remove dependence on libmutt.
+	
 2001-05-22  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Merge libESMTP branch to HEAD. Affected file list:

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1996-9 Brandon Long <blong@fiction.net>
- * Copyright (C) 1999-2000 Brendan Cully <brendan@kublai.com>
+ * Copyright (C) 1999-2001 Brendan Cully <brendan@kublai.com>
  * 
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -139,7 +139,7 @@ int imap_browse (char* path, struct browser_state* state)
           }
         }
       }
-      while (mutt_strncmp (idata->buf, idata->seq, SEQLEN));
+      while (mutt_strncmp (idata->cmd.buf, idata->cmd.seq, SEQLEN));
     }
 
     /* if we're descending a folder, mark it as current in browser_state */
@@ -224,6 +224,8 @@ int imap_browse (char* path, struct browser_state* state)
   if (browse_add_list_result (idata, buf, state, 0))
     goto fail;
 
+  mutt_clear_error ();
+
   qsort(&(state->entry[nsup]),state->entrylen-nsup,sizeof(state->entry[0]),
 	(int (*)(const void*,const void*)) compare_names);
   if (home_namespace)
@@ -237,7 +239,6 @@ int imap_browse (char* path, struct browser_state* state)
       }
   }
 
-  mutt_clear_error ();
   FREE (&mx.mbox);
   return 0;
 
@@ -333,7 +334,7 @@ static int browse_add_list_result (IMAP_DATA* idata, const char* cmd,
           isparent);
     }
   }
-  while ((mutt_strncmp (idata->buf, idata->seq, SEQLEN) != 0));
+  while ((mutt_strncmp (idata->cmd.buf, idata->cmd.seq, SEQLEN) != 0));
 
   FREE (&mx.mbox);
   return 0;
@@ -431,8 +432,8 @@ static int browse_get_namespace (IMAP_DATA* idata, char* nsbuf, int nsblen,
     if ((rc = imap_cmd_step (idata)) != IMAP_CMD_CONTINUE)
       break;
 
-    s = imap_next_word (idata->buf);
-    if (mutt_strncasecmp ("NAMESPACE", s, 9) == 0)
+    s = imap_next_word (idata->cmd.buf);
+    if (ascii_strncasecmp ("NAMESPACE", s, 9) == 0)
     {
       /* There are three sections to the response, User, Other, Shared,
        * and maybe more by extension */
@@ -504,7 +505,7 @@ static int browse_get_namespace (IMAP_DATA* idata, char* nsbuf, int nsblen,
   }
   while (rc == IMAP_CMD_CONTINUE);
 
-  if (rc != IMAP_CMD_DONE)
+  if (rc != IMAP_CMD_OK)
     return -1;
 
   return 0;
@@ -543,7 +544,7 @@ static int browse_verify_namespace (IMAP_DATA* idata,
 	return -1;
       nsi->listable |= (name != NULL);
     }
-    while ((mutt_strncmp (idata->buf, idata->seq, SEQLEN) != 0));
+    while ((mutt_strncmp (idata->cmd.buf, idata->cmd.seq, SEQLEN) != 0));
   }
 
   return 0;

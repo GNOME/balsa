@@ -29,14 +29,12 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <stdlib.h>
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <string.h>
 #include <errno.h>
 
-#ifdef LIBMUTT
-#define mutt_allow_interrupt(a) 
-#endif
 /* support for multiple socket connections */
 static CONNECTION *Connections = NULL;
 
@@ -60,6 +58,7 @@ int mutt_socket_close (CONNECTION* conn)
     rc = conn->close (conn);
 
   conn->fd = -1;
+
   return rc;
 }
 
@@ -201,7 +200,7 @@ CONNECTION* mutt_conn_find (const CONNECTION* start, const ACCOUNT* account)
     mutt_nss_socket_setup (conn);
 #else
     mutt_error _("SSL is unavailable.");
-    sleep (2);
+    mutt_sleep (2);
     FREE (&conn);
 
     return NULL;
@@ -235,10 +234,10 @@ static int socket_connect (int fd, struct sockaddr* sa)
     dprint (1, (debugfile, "Preconnect result: %d\n", rc));
     if (rc)
     {
-	save_errno = errno;
-	mutt_perror (_("Preconnect command failed."));
-	sleep (1);
-
+      save_errno = errno;
+      mutt_perror (_("Preconnect command failed."));
+      mutt_sleep (1);
+      
       return save_errno;
     }
   }
@@ -320,7 +319,12 @@ int raw_socket_open (CONNECTION* conn)
 
   /* we accept v4 or v6 STREAM sockets */
   memset (&hints, 0, sizeof (hints));
-  hints.ai_family = AF_UNSPEC;
+
+  if (option (OPTUSEIPV6))
+    hints.ai_family = AF_UNSPEC;
+  else
+    hints.ai_family = AF_INET;
+
   hints.ai_socktype = SOCK_STREAM;
 
   snprintf (port, sizeof (port), "%d", conn->account.port);
@@ -340,9 +344,10 @@ int raw_socket_open (CONNECTION* conn)
   for (cur = res; cur != NULL; cur = cur->ai_next)
   {
     fd = socket (cur->ai_family, cur->ai_socktype, cur->ai_protocol);
+    fcntl(fd,F_SETFD,FD_CLOEXEC);
     if (fd >= 0)
     {
-      if ((rc = socket_connect (fd, res->ai_addr)) == 0)
+      if ((rc = socket_connect (fd, cur->ai_addr)) == 0)
       {
 	conn->fd = fd;
 	break;

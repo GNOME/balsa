@@ -407,29 +407,22 @@ lbm_local_update_view_filter(LibBalsaMailbox * mailbox,
 	 msgno++) {
         LibBalsaMessage *msg = 
             libbalsa_mailbox_get_message(mailbox, msgno);
-	/* FIXME: If the message flags have changed, a message in the
-	 * current view may no longer match the view-filter's
-	 * conditions; to be sure, we should do something like
-	 * gboolean in_view =
-	 *     g_node_find(mailbox->msg_tree, G_PRE_ORDER,
-	 *                 G_TRAVERSE_ALL, GUINT_TO_POINTER(msgno))
-	 *     != NULL;
-	 * (or update the view when the flags change ;-)
-	 */
-        gboolean old_match = 
-            (!mailbox->view_filter || 
-             libbalsa_condition_matches(mailbox->view_filter, msg, TRUE));
-        gboolean new_match = 
+        gboolean match = 
             (!view_filter ||
 	     libbalsa_condition_matches(view_filter, msg, TRUE));
-        if(old_match && !new_match) {
-            printf("removing %d (%ld) from view\n", msgno, msg->msgno);
-	    libbalsa_mailbox_msgno_filt_out(mailbox, msgno);
-        }
-        if(!old_match && new_match) {
-            printf("adding %d (%ld) to the view\n", msgno, msg->msgno);
-	    libbalsa_mailbox_msgno_filt_in(mailbox, msgno);
-        }
+	      
+	if (g_node_find(mailbox->msg_tree, G_PRE_ORDER,
+	                  G_TRAVERSE_ALL, GUINT_TO_POINTER(msgno))) {
+	    if (!match) {
+		printf("removing %d (%ld) from view\n", msgno, msg->msgno);
+		libbalsa_mailbox_msgno_filt_out(mailbox, msgno);
+	    }
+	} else {
+	    if (match) {
+		printf("adding %d (%ld) to the view\n", msgno, msg->msgno);
+		libbalsa_mailbox_msgno_filt_in(mailbox, msgno);
+	    }
+	}
     }
     printf("%s finished\n", __func__);
     if(mailbox->view_filter)

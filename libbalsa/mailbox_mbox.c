@@ -1324,6 +1324,22 @@ lbm_mbox_crlf_filter(GMimeStream * stream)
 
 /* Encode text parts as quoted-printable, and armor any "From " lines.
  */
+
+/* The preface and postface of a multipart may contain From_ lines;
+ * we'll just space-stuff them. */
+static gchar *
+lbm_mbox_armor_face(const gchar * face)
+{
+    gchar **lines;
+    gchar *new_face;
+
+    lines = g_strsplit(face, "\nFrom ", 0);
+    new_face = g_strjoinv("\n From ", lines);
+    g_strfreev(lines);
+
+    return new_face;
+}
+
 static void
 lbm_mbox_armor_part(GMimeObject ** part)
 {
@@ -1346,9 +1362,21 @@ lbm_mbox_armor_part(GMimeObject ** part)
     }
 
     if (GMIME_IS_MULTIPART(*part)) {
+	const gchar *face;
+	gchar *new_face;
 	const GMimeContentType *content_type =
 	    g_mime_object_get_content_type(*part);
 	GList *subpart;
+
+	face = g_mime_multipart_get_preface(GMIME_MULTIPART(*part));
+	new_face = lbm_mbox_armor_face(face);
+	g_mime_multipart_set_preface(GMIME_MULTIPART(*part), new_face);
+	g_free(new_face);
+
+	face = g_mime_multipart_get_postface(GMIME_MULTIPART(*part));
+	new_face = lbm_mbox_armor_face(face);
+	g_mime_multipart_set_postface(GMIME_MULTIPART(*part), new_face);
+	g_free(new_face);
 
 	if (g_mime_content_type_is_type(content_type, "multipart", "signed"))
 	    /* Don't change the coding of its parts. */

@@ -47,7 +47,7 @@ struct _IndexChildClass
   };
 
 IndexChild *index_child_new (GnomeMDI *, Mailbox *);
-void index_child_changed(GnomeMDI *, GnomeMDIChild *);
+void index_child_changed(GnomeMDI *, GnomeMDIChild* new);
 IndexChild *index_child_get_active(GnomeMDI *);
 guint index_child_get_type (void);
 

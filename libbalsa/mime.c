@@ -46,6 +46,8 @@ static void headers2html (Message * message, struct obstack *html_bfr);
 
 #define obstack_append_string(o, s)   obstack_grow(o, s, strlen(s))
 
+static gint part_idx;
+static gint part_nesting_depth;
 
 static void
 text2html (gchar * buff, struct obstack *html_buff)
@@ -255,7 +257,7 @@ other2html (Message* message, BODY * bdy, FILE * fp, struct obstack *html_bfr)
   gchar *ptr;
   size_t alloced;
 
-  obstack_append_string(html_bfr,"<tr><td bgcolor=\"#eeffee\">");
+  obstack_append_string(html_bfr,"<tr><td bgcolor=\"#f0f0f0\">");
   fseek (fp, bdy->offset, 0);
   s.fpin = fp;
   mutt_mktemp (tmp_file_name);
@@ -277,7 +279,7 @@ other2html (Message* message, BODY * bdy, FILE * fp, struct obstack *html_bfr)
 void
 audio2html (Message* message, BODY * bdy, FILE * fp, struct obstack *html_bfr)
 {
-  obstack_append_string(html_bfr,"<tr><td bgcolor=\"#eeffee\">");
+  obstack_append_string(html_bfr,"<tr><td bgcolor=\"#f0f0f0\">");
   obstack_append_string (html_bfr, "<font size=+1>AUDIO<font size=-1>");
   obstack_append_string(html_bfr,"</tr></td>");
 }
@@ -290,20 +292,22 @@ application2html (Message * message, BODY * bdy, FILE * fp, struct obstack *html
   PARAMETER *bdy_parameter = bdy->parameter;
 
   obstack_append_string (html_bfr,
-			 "<tr><td bgcolor=\"#dddddd\"> "
+			 "<tr><td bgcolor=\"#f0f0f0\"> "
 			 "You received an encoded file of type application/");
   obstack_append_string (html_bfr, bdy->subtype);
   obstack_append_string (html_bfr, "<BR>");
   obstack_append_string (html_bfr, "<P>The parameters of this message are:<BR>");
-
+  obstack_append_string (html_bfr, "<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n");
   while (bdy_parameter)
     {
+      obstack_append_string (html_bfr, "<tr><td>");
       obstack_append_string (html_bfr, bdy_parameter->attribute);
-      obstack_append_string (html_bfr, "=>");
+      obstack_append_string (html_bfr, "</td><td>");
       obstack_append_string (html_bfr, bdy_parameter->value);
-      obstack_append_string (html_bfr, "<BR>");
+      obstack_append_string (html_bfr, "</td></tr>");
       bdy_parameter = bdy_parameter->next;
     }
+  obstack_append_string (html_bfr,"</table>");
   snprintf (link_bfr, 128,
 	    "<A HREF=\"memory://%p:%p BODY\"> APPLICATION</A>"
 	    "</td></tr>", message, bdy);
@@ -313,7 +317,7 @@ application2html (Message * message, BODY * bdy, FILE * fp, struct obstack *html
 void
 image2html (Message* message, BODY * bdy, FILE * fp, struct obstack *html_bfr)
 {
-  obstack_append_string(html_bfr,"<tr><td bgcolor=\"#eeffee\">");
+  obstack_append_string(html_bfr,"<tr><td bgcolor=\"#f0f0f0\">");
   obstack_append_string (html_bfr, "<font size+1>IMAGE<font size=-1>");
   obstack_append_string(html_bfr,"</td></tr>");
 }
@@ -321,7 +325,7 @@ image2html (Message* message, BODY * bdy, FILE * fp, struct obstack *html_bfr)
 void
 message2html (Message* message, BODY * bdy, FILE * fp, struct obstack *html_bfr)
 {
-  obstack_append_string(html_bfr,"<tr><td bgcolor=\"#eeffee\">");
+  obstack_append_string(html_bfr,"<tr><td bgcolor=\"#f0f0f0\">");
   obstack_append_string (html_bfr, "<font size=+1>MESSAGE<font size=-1>");
   obstack_append_string(html_bfr,"</td></tr>");
 }
@@ -330,7 +334,24 @@ void
 multipart2html (Message* message, BODY * bdy, FILE * fp, struct obstack *html_bfr)
 {
   BODY* p;
-  
+  PARAMETER *bdy_parameter = bdy->parameter;
+
+  if (balsa_app.debug)
+    {
+      obstack_append_string (html_bfr, "<tr><td>Multipart message parameter are:<BR>");
+      obstack_append_string (html_bfr, "<table border=\"0\" width=\"50%\" bgcolor=\"#dddddd\">\n");
+      obstack_append_string (html_bfr, "<tr><th>Attribute</th><th>Value</th></tr>\n");
+      while (bdy_parameter)
+	{
+	  obstack_append_string (html_bfr, "<tr><td>");
+	  obstack_append_string (html_bfr, bdy_parameter->attribute);
+	  obstack_append_string (html_bfr, "</td><td>");
+	  obstack_append_string (html_bfr, bdy_parameter->value);
+	  obstack_append_string (html_bfr, "</td></tr>");
+	  bdy_parameter = bdy_parameter->next;
+	}
+      obstack_append_string (html_bfr,"</table></td></tr>");
+    }
   for (p = bdy->parts; p; p = p->next)
     {
       part2html(message, p, fp, html_bfr);
@@ -341,7 +362,7 @@ multipart2html (Message* message, BODY * bdy, FILE * fp, struct obstack *html_bf
 void
 video2html (Message* message, BODY * bdy, FILE * fp, struct obstack *html_bfr)
 {
-  obstack_append_string(html_bfr,"<tr><td bgcolor=\"#eeffee\">");
+  obstack_append_string(html_bfr,"<tr><td bgcolor=\"#f0f0f0\">");
   obstack_append_string (html_bfr, "<font size=+1>VIDEO<font size=-1>");
   obstack_append_string(html_bfr,"</td></tr>");
 }
@@ -354,7 +375,7 @@ mimetext2html (Message* message, BODY * bdy, FILE * fp, struct obstack *html_bfr
   size_t alloced;
 
   
-  obstack_append_string(html_bfr,"<tr><td bgcolor=\"#eeffee\">");
+  obstack_append_string(html_bfr,"<tr><td bgcolor=\"#f0f0f0\">");
   fseek (fp, bdy->offset, 0);
   s.fpin = fp;
   s.prefix = '\0';
@@ -392,27 +413,46 @@ part2html (Message * message, BODY * bdy, FILE * fp, struct obstack *html_bfr)
   switch (bdy->type)
     {
     case TYPEOTHER:
+      if (balsa_app.debug)
+	fprintf(stderr,"part: other\n");
       other2html (message, bdy, fp, html_bfr);
       break;
     case TYPEAUDIO:
+      if (balsa_app.debug)
+	fprintf(stderr,"part: audio\n");
       audio2html (message, bdy, fp, html_bfr);
       break;
     case TYPEAPPLICATION:
+      if (balsa_app.debug)
+	fprintf(stderr,"part: application\n");
       application2html (message, bdy, fp, html_bfr);
       break;
     case TYPEIMAGE:
+      if (balsa_app.debug)
+	fprintf(stderr,"part: image\n");
       image2html (message, bdy, fp, html_bfr);
       break;
     case TYPEMESSAGE:
+      if (balsa_app.debug)
+	fprintf(stderr,"part: message\n");
       message2html (message, bdy, fp, html_bfr);
+      fprintf(stderr,"part end: multipart\n");
       break;
     case TYPEMULTIPART:
+      if (balsa_app.debug)
+	fprintf(stderr,"part: multipart\n");
       multipart2html (message, bdy, fp, html_bfr);
+      if (balsa_app.debug)
+	fprintf(stderr,"part end: multipart\n");
       break;
     case TYPETEXT:
+      if (balsa_app.debug)
+	fprintf(stderr,"part: text\n");
       mimetext2html (message, bdy, fp, html_bfr);
       break;
     case TYPEVIDEO:
+      if (balsa_app.debug)
+	fprintf(stderr,"part: video\n");
       video2html (message, bdy, fp, html_bfr);
       break;
     }
@@ -479,7 +519,7 @@ content2html (Message * message)
   gchar msg_filename[PATH_MAX];
   static struct obstack *html_buffer = 0;
   static gchar *html_buffer_content = (gchar *) - 1;
-
+  
   if (!html_buffer)
     {
       html_buffer = g_malloc (sizeof (struct obstack));
@@ -490,11 +530,13 @@ content2html (Message * message)
       obstack_free (html_buffer, html_buffer_content);
     }
 
-
+  part_idx = 0;
+  part_nesting_depth = 0;
+  
   obstack_append_string (html_buffer, "<HTML>\n");
   obstack_append_string (html_buffer, "<HEAD><TITLE>Message</TITLE></HEAD>\n");
   obstack_append_string (html_buffer, "<BODY BGCOLOR=\"#ffffff\">\n");
-
+  
   headers2html (message, html_buffer);
 
   obstack_append_string(html_buffer, "\n<BR><table border=\"0\" width=\"100%\" cellspacing=\"7\">");
@@ -576,32 +618,44 @@ content2reply (Message * message)
   body_list = message->body_list;
   while (body_list)
     {
+      BODY* b;
       body = (Body *) body_list->data;
-      switch (body->mutt_body->type)
+
+      b = body->mutt_body;
+      while (b)
 	{
-	case TYPETEXT:
-	  {
-	    STATE s;
-	    fseek (msg_stream, body->mutt_body->offset, 0);
-	    s.fpin = msg_stream;
-	    mutt_mktemp (tmp_file_name);
-	    s.prefix = "> ";
-	    s.fpout = fopen (tmp_file_name, "w+");
-	    mutt_decode_attachment (body->mutt_body, &s);
-	    fflush (s.fpout);
-	    alloced = readfile (s.fpout, &ptr);
-	    if (ptr)
-	      ptr[alloced - 1] = '\0';
-	    if (reply)
+	  switch (body->mutt_body->type)
+	    {
+	    case TYPEMULTIPART:
 	      {
-		reply = g_string_append (reply, "\n");
-		reply = g_string_append (reply, ptr);
+		b = b->parts;
+		continue;
 	      }
-	    else
-	      reply = g_string_new (ptr);
-	    fclose (s.fpout);
-	    unlink (tmp_file_name);
-	  }
+	    case TYPETEXT:
+	      {
+		STATE s;
+		fseek (msg_stream, body->mutt_body->offset, 0);
+		s.fpin = msg_stream;
+		mutt_mktemp (tmp_file_name);
+		s.prefix = "> ";
+		s.fpout = fopen (tmp_file_name, "w+");
+		mutt_decode_attachment (body->mutt_body, &s);
+		fflush (s.fpout);
+		alloced = readfile (s.fpout, &ptr);
+		if (ptr)
+		  ptr[alloced - 1] = '\0';
+		if (reply)
+		  {
+		    reply = g_string_append (reply, "\n");
+		    reply = g_string_append (reply, ptr);
+		  }
+		else
+		  reply = g_string_new (ptr);
+		fclose (s.fpout);
+		unlink (tmp_file_name);
+	      }
+	    }
+	  b = b->next;
 	}
       body_list = g_list_next (body_list);
     }

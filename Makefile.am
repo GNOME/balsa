@@ -1,4 +1,4 @@
-SUBDIRS = macros po intl sounds images libmutt libbalsa src
+SUBDIRS = macros po intl sounds images libmutt libbalsa idl src
 
 balsa_MANS=balsa.1
 

@@ -37,8 +37,8 @@ balsa_SOURCES =	\
 	sendmsg-window.h
 
 
-INCLUDES=-I. -I${top_srcdir}/libbalsa -I${top_srcdir} \
-    -I${top_builddir}/libmutt $(GNOME_INCLUDEDIR)
+INCLUDES=-I. -I${top_srcdir}/libbalsa -I${top_srcdir} -I$(top_srcdir)/idl \
+	    -I${top_builddir}/libmutt $(GNOME_INCLUDEDIR)
 
 balsa_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a \
@@ -49,6 +49,9 @@ balsa_LDADD = \
 	$(GNOME_LIBDIR) \
 	$(GNOMEUI_LIBS) \
 	$(GTKXMHTML_LIBS) \
+	$(top_builddir)/idl/libbalsasrv.a \
+	-lgnorba          \
+	$(ORB_LIBS)       \
 	$(INTLLIBS)
 
 dist-hook:

@@ -1323,20 +1323,17 @@ message_body_ref (Message * message)
       return;
     }
   fseek (msg->fp, cur->content->offset, 0);
+
   if (cur->content->type == TYPEMULTIPART)
     {
       cur->content->parts = mutt_parse_multipart (msg->fp,
-		   mutt_get_parameter ("boundary", cur->content->parameter),
-				cur->content->offset + cur->content->length,
-			 strcasecmp ("digest", cur->content->subtype) == 0);
+						  mutt_get_parameter ("boundary", cur->content->parameter),
+						  cur->content->offset + cur->content->length,
+						  strcasecmp ("digest", cur->content->subtype) == 0);
     }
   if (msg != NULL)
     {
       BODY *bdy = cur->content;
-
-      if (balsa_app.debug)
-	g_print (_ ("Loading message: %s/%s\n"), TYPE (bdy), bdy->subtype);
-
       if (balsa_app.debug)
 	{
 	  fprintf (stderr, "After loading message\n");
@@ -1348,13 +1345,11 @@ message_body_ref (Message * message)
 		   mime_content_type2str (cur->content->type),
 		   cur->content->type);
 	}
-      if (cur->content->type != TYPEMULTIPART)
-	{
-	  body = body_new ();
-	  body->mutt_body = cur->content;
-	  message->body_list = g_list_append (message->body_list, body);
-	}
-      else
+      body = body_new ();
+      body->mutt_body = cur->content;
+      message->body_list = g_list_append (message->body_list, body);
+#if 0
+      if (cur->content->type == TYPEMULTIPART)
 	{
 	  bdy = cur->content->parts;
 	  while (bdy)
@@ -1370,9 +1365,10 @@ message_body_ref (Message * message)
 	      body->mutt_body = bdy;
 	      message->body_list = g_list_append (message->body_list, body);
 	      bdy = bdy->next;
-
+	      
 	    }
 	}
+#endif
       message->body_ref++;
       mx_close_message (&msg);
     }

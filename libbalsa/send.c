@@ -195,3 +195,9 @@ balsa_send_message (Message * message, gchar * smtp_server, glong debug)
 
   return TRUE;
 }
+
+gint
+send_file_as_msg(gchar* to, gchar* filename)
+{
+  ;
+}

@@ -1,0 +1,5 @@
+module balsa {
+  interface simple_send {
+    long send_file_as_message(in string to, in string filename);
+  };
+};

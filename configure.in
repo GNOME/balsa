@@ -70,6 +70,26 @@ AM_FUNC_OBSTACK
 AM_HDR_SIGACTION
 AM_HDR_SIGSET
 
+
+dnl ORBit support
+AC_CHECK_PROG(ORBIT_CONFIG, orbit-config, orbit-config)
+if test -n "$ORBIT_CONFIG"; then
+	ORBIT_LIBS="`orbit-config --libs client server`"
+	ORBIT_CFLAGS="`orbit-config --cflags client server`"
+fi
+AC_SUBST(ORBIT_CFLAGS)
+AC_SUBST(ORBIT_LIBS)
+AM_CONDITIONAL(ORBIT_INSTALLED, test -n "$ORBIT_LIBS")
+
+ORB_LIBS="$ORBIT_LIBS"
+ORB_CFLAGS="$ORBIT_CFLAGS"
+
+AC_SUBST(ORB_LIBS)
+AC_SUBST(ORB_CFLAGS)
+
+
+
+
 dnl Automake @VARIABLE@ exports.
 AC_SUBST(BALSA_MAJOR)
 AC_SUBST(BALSA_REVISION)
@@ -87,5 +107,6 @@ intl/Makefile
 sounds/Makefile
 images/Makefile
 libbalsa/Makefile
+idl/Makefile
 src/Makefile
 ],[sed -e "/POTFILES =/r po/POTFILES" po/Makefile.in > po/Makefile])

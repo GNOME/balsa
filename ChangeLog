@@ -1,16 +1,3 @@
-1998-08-03  Michael Lausch  <mla@gams.co.at>
-
-	* src/local-mailbox.c (read_dir): changed isnumname to
-	is_mh_message. MH messages filenames are a lot more variable then
-	expected.
-	(read_folders_from_file): new function. Reads the folder cache
-	file and add mailboxes.
-	(is_mh_message): new function. Applies some heuristics on the
-	filename to find out if it is a MH message name (,[0-9]+ and
-	[0-9].~[0-9]+~) are considered to be MH messages.
-	
-	new variable folder_cache_name.
-	
 Sat Aug 01 20:25:23 1998  George Lebl  <jirka@5z.com>
 
 	* src/index-child.c: fixed up the destroy handler

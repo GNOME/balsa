@@ -29,18 +29,6 @@
 #include "mailbox.h"
 #include "misc.h"
 
-
-/*
-  name of folders cache file. This file is constructed when it
-  doesn't exist and it contains the name of all folders. Speeds up MH 
-  startup!!!
-*/   
-static char folder_cache_name[PATH_MAX+1];
-/*
-  Stream for the folder_cache file.
-*/  
-static FILE* folder_cache = 0;
-
 static gboolean
 do_traverse (GNode * node, gpointer data)
 {
@@ -128,26 +116,14 @@ add_mailbox (gchar * name, gchar * path, MailboxType type, gint isdir)
 }
 
 static int
-is_mh_message (gchar * str)
+strisnum (gchar * str)
 {
   gint i, len;
   len = strlen (str);
-
-  /* check for ,[0-9]+ deleted messages */
-  if (len && *str == ',' && is_mh_message(&str[1]))
-    return 1;
-
   for (i = 0; i < len; i++)
     {
       if (!isdigit (str[i]))
-	{
-	  /* check for emacs backup files. They are created when a
-	     message is edited or a msg is saved in the drafts
-	     folder.
-	  */
-	  if (str[i+1] && str[i+1] == '~')
-	    return 1;
-	}
+	return 0;
     }
   return 1;
 }
@@ -162,14 +138,12 @@ read_dir (gchar * prefix, struct dirent *d)
   struct stat st;
   MailboxType mailbox_type;
 
-  
   if (!d)
     return;
 
   if (d->d_name[0] == '.')
     return;
 
-  
   sprintf (filename, "%s/%s", prefix, d->d_name);
 
   if (stat (filename, &st) == -1)
@@ -178,15 +152,10 @@ read_dir (gchar * prefix, struct dirent *d)
   if (S_ISDIR (st.st_mode))
     {
       mailbox_type = mailbox_valid (filename);
-      if (mailbox_type == MAILBOX_MH) {
+      if (mailbox_type == MAILBOX_MH)
 	add_mailbox (d->d_name, filename, mailbox_type, 1);
-	fprintf(folder_cache, "%s\n", filename);
-      }
       else
-	{
-	  add_mailbox (d->d_name, filename, MAILBOX_UNKNOWN, 1);
-	  fprintf(folder_cache, "%s\n", filename);
-	}
+	add_mailbox (d->d_name, filename, MAILBOX_UNKNOWN, 1);
       dpc = opendir (filename);
       if (!dpc)
 	return;
@@ -196,53 +165,13 @@ read_dir (gchar * prefix, struct dirent *d)
     }
   else
     {
-      if (!is_mh_message (d->d_name))
+      if (!strisnum (d->d_name))
 	{
 
 	  mailbox_type = mailbox_valid (filename);
 	  if (mailbox_type != MAILBOX_UNKNOWN)
-	    {
-	      add_mailbox (d->d_name, filename, mailbox_type, 0);
-	      fprintf(folder_cache, "%s\n", filename);
-	    }
+	    add_mailbox (d->d_name, filename, mailbox_type, 0);
 	}
-    }
-}
-
-static void
-read_folders_from_file(FILE* folder_cache)
-{
-  char folder[PATH_MAX+1];
-  char filename[PATH_MAX+1];
-  MailboxType mailbox_type;
-  char* ptr;
-  struct stat st;
-  int rc;
-  
-  while (fgets(filename, sizeof (filename), folder_cache))
-    {
-      filename[strlen(filename)-1] = '\0';
-
-      fprintf(stderr,"Read folder_cache_line: '%s'\n", filename);
-
-      while ((rc = stat(filename, &st)) < 0 && errno == EBUSY)
-	{
-	  ;
-	}
-      if (rc < 0) {
-	fprintf(stderr, "Folder '%s' does not exist any more\n");
-	continue;
-      }
-
-      ptr = strrchr(filename, '/');
-      if (!ptr)
-	{
-	  fprintf(stderr,"Bogus folder name '%s'. No '/' in name\n");
-	  continue;
-	}
-      strcpy(folder, ptr+1);
-      mailbox_type = mailbox_valid(filename);
-      add_mailbox(folder, filename, mailbox_type, S_ISDIR(st.st_mode));
     }
 }
 
@@ -251,30 +180,16 @@ load_local_mailboxes ()
 {
   DIR *dp;
   struct dirent *d;
-  struct stat st;
 
   dp = opendir (balsa_app.local_mail_directory);
   if (!dp)
     return;
-  
-  sprintf(folder_cache_name, "%s/%s", balsa_app.local_mail_directory, ".balsa_fcache");
-  
-  if (stat (folder_cache_name, &st) == 0)
+
+  while ((d = readdir (dp)) != NULL)
     {
-      folder_cache = fopen(folder_cache_name, "r");
-      read_folders_from_file(folder_cache);
+      if (d->d_name[0] == '.')
+	continue;
+      read_dir (balsa_app.local_mail_directory, d);
     }
-  else
-    {
-      folder_cache = fopen(folder_cache_name,"w");
-      
-      while ((d = readdir (dp)) != NULL)
-	{
-	  if (d->d_name[0] == '.')
-	    continue;
-	  read_dir (balsa_app.local_mail_directory, d);
-	}
-      closedir (dp);
-    }
-  fclose(folder_cache);
+  closedir (dp);
 }

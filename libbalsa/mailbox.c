@@ -1116,8 +1116,6 @@ message_body_ref (Message * message)
 
       buf[size-1] = '\0';
       
-   g_print("<<<\"%s\">>>\n", buf);
-
       fclose (s.fpout);
 
       body = body_new ();

@@ -1840,11 +1840,23 @@ fe_revert_pressed(GtkWidget * widget, gpointer data)
  * so that we can refresh the notebook page
  */
 static void
-fill_condition_list(GtkTreeModel *model, LibBalsaCondition *condition)
+fill_condition_list(GtkTreeModel *model, LibBalsaCondition *condition,
+		    ConditionMatchType type)
 {
     GtkTreeIter iter;
-    if(!condition || condition->type == CONDITION_OR ||
-       condition->type == CONDITION_AND) return;
+    if (!condition)
+	return;
+    if (condition->type == CONDITION_OR
+	|| condition->type == CONDITION_AND)  {
+	/* A nested boolean operator must be the same as the top level
+	 * operator. */
+	if (condition->type != type)
+	    /* We'll silently ignore a mismatch. */
+	    return;
+	fill_condition_list(model, condition->match.andor.left, type);
+	fill_condition_list(model, condition->match.andor.right, type);
+	return;
+    }
 
     gtk_list_store_prepend(GTK_LIST_STORE(model), &iter);
     gtk_list_store_set(GTK_LIST_STORE(model), &iter,
@@ -1900,7 +1912,7 @@ fe_filters_list_selection_changed(GtkTreeSelection * selection,
 
     /* Populate the conditions list */
     filter_errno=FILTER_NOERR;
-    fill_condition_list(model, fil->condition);
+    fill_condition_list(model, fil->condition, fil->condition->type);
     if (filter_errno!=FILTER_NOERR)
         gtk_widget_destroy(fe_window);
 

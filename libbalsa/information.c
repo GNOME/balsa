@@ -28,12 +28,10 @@
 
 struct information_data {
     GtkWindow *parent;
+    LibBalsaInformationType message_type;
     gchar *msg;
 };
-static gboolean libbalsa_message_idle_handler(struct information_data*);
-static gboolean libbalsa_warning_idle_handler(struct information_data*);
-static gboolean libbalsa_error_idle_handler(struct information_data*);
-static gboolean libbalsa_debug_idle_handler(struct information_data*);
+static gboolean libbalsa_information_idle_handler(struct information_data*);
 
 LibBalsaInformationFunc libbalsa_real_information_func;
 
@@ -52,6 +50,8 @@ libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
                           const char *fmt, va_list ap)
 {
     struct information_data *data = g_new(struct information_data, 1);
+
+    g_return_if_fail(fmt != NULL);
     g_assert(libbalsa_real_information_func != NULL);
 
     /* We format the string here. It must be free()d in the idle
@@ -59,25 +59,11 @@ libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
      * function runs we will no longer be in this stack frame. 
      */
     data->parent = parent;
+    data->message_type = type;
     data->msg = g_strdup_vprintf(fmt, ap);
     if(parent)
         g_object_add_weak_pointer(G_OBJECT(parent), (gpointer) &data->parent);
-    switch (type) {
-    case LIBBALSA_INFORMATION_MESSAGE:
-	g_idle_add((GSourceFunc) libbalsa_message_idle_handler, data);
-	break;
-    case LIBBALSA_INFORMATION_WARNING:
-	g_idle_add((GSourceFunc) libbalsa_warning_idle_handler, data);
-	break;
-    case LIBBALSA_INFORMATION_ERROR:
-	g_idle_add((GSourceFunc) libbalsa_error_idle_handler, data);
-	break;
-    case LIBBALSA_INFORMATION_DEBUG:
-	g_idle_add((GSourceFunc) libbalsa_debug_idle_handler, data);
-	break;
-    default:
-	g_assert_not_reached();
-    }
+    g_idle_add((GSourceFunc) libbalsa_information_idle_handler, data);
 }
 
 void
@@ -103,65 +89,14 @@ libbalsa_information_parented(GtkWindow *parent, LibBalsaInformationType type,
 }
 
 /*
- * These are all idle handlers, so we need to grab the GDK lock 
+ * This is an idle handler, so we need to grab the GDK lock 
  */
 static gboolean
-libbalsa_message_idle_handler(struct information_data *data)
+libbalsa_information_idle_handler(struct information_data *data)
 {
     gdk_threads_enter();
     libbalsa_real_information_func(data->parent,
-                                   LIBBALSA_INFORMATION_MESSAGE,
-                                   data->msg);
-    gdk_threads_leave();
-
-    if(data->parent)
-        g_object_remove_weak_pointer(G_OBJECT(data->parent), 
-                                     (gpointer) &data->parent);
-    g_free(data->msg);
-    g_free(data);
-    return FALSE;
-}
-
-static gboolean
-libbalsa_warning_idle_handler(struct information_data *data)
-{
-    gdk_threads_enter();
-    libbalsa_real_information_func(data->parent,
-                                   LIBBALSA_INFORMATION_WARNING,
-                                   data->msg);
-    gdk_threads_leave();
-
-    if(data->parent)
-        g_object_remove_weak_pointer(G_OBJECT(data->parent), 
-                                     (gpointer) &data->parent);
-    g_free(data->msg);
-    g_free(data);
-    return FALSE;
-}
-
-static gboolean
-libbalsa_error_idle_handler(struct information_data *data)
-{
-    gdk_threads_enter();
-    libbalsa_real_information_func(data->parent,
-                                   LIBBALSA_INFORMATION_ERROR, 
-                                   data->msg);
-    gdk_threads_leave();
-
-    if(data->parent)
-        g_object_remove_weak_pointer(G_OBJECT(data->parent), 
-                                     (gpointer) &data->parent);
-    g_free(data->msg);
-    g_free(data);
-    return FALSE;
-}
-
-static gboolean
-libbalsa_debug_idle_handler(struct information_data *data)
-{
-    gdk_threads_enter();
-    libbalsa_real_information_func(data->parent,
-                                   LIBBALSA_INFORMATION_DEBUG,
+                                   data->message_type,
                                    data->msg);
     gdk_threads_leave();
 

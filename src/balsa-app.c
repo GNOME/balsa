@@ -96,7 +96,6 @@ static gboolean
 ask_passwd_idle(gpointer data)
 {
     AskPasswdData* apd = (AskPasswdData*)data;
-    printf("ask_passwd_idle\n");
     gdk_threads_enter();
     apd->res = ask_password_real(apd->server, apd->mbox);
     gdk_threads_leave();
@@ -110,7 +109,6 @@ ask_password_mt(LibBalsaServer * server, LibBalsaMailbox * mbox)
     static pthread_mutex_t ask_passwd_lock = PTHREAD_MUTEX_INITIALIZER;
     AskPasswdData apd;
 
-    printf("ask_password_mt\n");
     gdk_threads_leave();
     pthread_mutex_lock(&ask_passwd_lock);
     pthread_cond_init(&apd.cond, NULL);
@@ -178,7 +176,6 @@ ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
     g_return_val_if_fail(server != NULL, NULL);
 
     password = NULL;
-    printf("ask_password\n");
     if (mbox) {
         g_node_traverse(balsa_app.mailbox_nodes, G_IN_ORDER, G_TRAVERSE_LEAFS,
 		-1, set_passwd_from_matching_server, server);
@@ -187,7 +184,6 @@ ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
 	    server->passwd = NULL;
 	}
     }
-    printf("ask_password: password=%s\n", password);
     if (!password)
 #ifdef BALSA_USE_THREADS
 	return ask_password_mt(server, mbox);

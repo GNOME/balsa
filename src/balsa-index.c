@@ -24,6 +24,7 @@
 #include <gnome.h>
 #include "balsa-app.h"
 #include "balsa-index.h"
+#include "main-window.h"
 
 #include "pixmaps/envelope.xpm"
 #include "pixmaps/replied.xpm"
@@ -418,7 +419,7 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
   if (bindex->first_new_message == 0)
     bindex->first_new_message = i;
 
- main_window_set_cursor(NULL);
+ main_window_set_cursor(-1);
 
  gtk_idle_add ((GtkFunction) moveto_handler, bindex);
 }

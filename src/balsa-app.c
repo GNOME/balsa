@@ -149,6 +149,10 @@ balsa_app_init (void)
   balsa_app.charset = NULL;
 
   balsa_app.checkbox = 0;
+
+  /* compose: shown headers */
+  balsa_app.compose_headers = NULL;
+
   balsa_app.PrintCommand.breakline = FALSE;
   balsa_app.PrintCommand.linesize = 78;
   balsa_app.PrintCommand.PrintCommand = NULL;

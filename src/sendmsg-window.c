@@ -191,6 +191,16 @@ static gchar* iso_charset_names[] = {
    "ISO-8859-9",
 };
 
+typedef struct {
+      gchar * name;
+      guint length; 
+      
+} headerMenuDesc;
+
+headerMenuDesc headerDescs[] = { {"to", 3}, {"from", 3}, {"subject",2},
+				  {"cc", 3}, {"bcc",  3}, {"fcc",    2},
+				  {"replyto", 3}, {"attachments", 4} };
+
 static GnomeUIInfo iso_menu[] = {
   { GNOME_APP_UI_RADIOITEMS, NULL, NULL, iso_charset_menu, NULL, NULL,
     GNOME_APP_PIXMAP_NONE, NULL, 0, 0, NULL },
@@ -221,12 +231,29 @@ delete_event_cb (GtkWidget * widget, GdkEvent *e, gpointer data)
   return TRUE;
 }
 
-/* the balsa_sendmsg destructor */
+/* the balsa_sendmsg destructor; copies first the shown headers setting
+   to the balsa_app structure.
+*/
 static void
 balsa_sendmsg_destroy (BalsaSendmsg * bsm)
 {
+   int i;
+   gchar  newStr[sizeof(headerDescs)/sizeof(headerDescs[0])*20];
+
    g_assert(bsm != NULL);
    
+   newStr[0] = '\0';
+
+   for(i=0; i<sizeof(headerDescs)/sizeof(headerDescs[0]); i++)
+      if(GTK_CHECK_MENU_ITEM(view_menu[i].widget)->active) {
+	 strcat(newStr, headerDescs[i].name);
+	 strcat(newStr, " ");
+      }
+   if(balsa_app.compose_headers) // should never fail...
+      g_free(balsa_app.compose_headers);
+   
+   balsa_app.compose_headers = g_strdup(newStr);
+
    gtk_widget_destroy (bsm->window);
    if(balsa_app.debug) printf("balsa_sendmsg_destroy: Freeing bsm\n");
    g_free (bsm);
@@ -242,7 +269,7 @@ remove_attachment (GtkWidget * widget, GnomeIconList * ilist)
   gtk_object_remove_data (GTK_OBJECT (ilist), "selectednumbertoremove");
 }
 
-/* the menu is createn on right-button click an an attachement */
+/* the menu is created on right-button click on an attachement */
 static GtkWidget *
 create_popup_menu (GnomeIconList * ilist, gint num)
 {
@@ -465,57 +492,10 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   gtk_table_set_row_spacings (GTK_TABLE (table), 2);
   gtk_table_set_col_spacings (GTK_TABLE (table), 2);
 
-  /* To: */
-  create_email_entry(table, _("To:"), 0, GNOME_STOCK_MENU_BOOK_RED, msg->to );
-
-#if 0
-  msg->to[0] = gtk_label_new (_("To:"));
-  gtk_misc_set_alignment (GTK_MISC (msg->to[0]), 0.0, 0.5);
-  gtk_table_attach (GTK_TABLE (table), msg->to[0], 0, 1, 0, 1,
-		    GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
-
-  msg->to[1] = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), msg->to[1], 1, 2, 0, 1,
-		    GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_SHRINK, 0, 0);
-
-  msg->to[2] = gtk_button_new ();
-  gtk_button_set_relief (GTK_BUTTON (msg->to[2]), GTK_RELIEF_NONE);
-  GTK_WIDGET_UNSET_FLAGS (msg->to[2], GTK_CAN_FOCUS);
-  gtk_container_add (GTK_CONTAINER (msg->to[2]),
-	       gnome_stock_pixmap_widget (NULL, GNOME_STOCK_MENU_BOOK_RED));
-  gtk_table_attach (GTK_TABLE (table), msg->to[2], 2, 3, 0, 1,
-		    0, 0, 0, 0);
-  gtk_signal_connect(GTK_OBJECT(msg->to[2]), "clicked", 
-		     GTK_SIGNAL_FUNC(address_book_cb),
-		     (gpointer) msg->to[1]);
-  gtk_signal_connect (GTK_OBJECT (msg->to[1]), "drag_data_received",
-		      GTK_SIGNAL_FUNC (to_add), NULL);
-  gtk_drag_dest_set (GTK_WIDGET (msg->to[1]), GTK_DEST_DEFAULT_ALL,
-		     email_field_drop_types, ELEMENTS (email_field_drop_types),
-		     GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
-#endif
-
   /* From: */
-  create_email_entry(table, _("From:"), 1, GNOME_STOCK_MENU_BOOK_BLUE, msg->from );
-
-#if 0
-  msg->from[0] = gtk_label_new (_("From:"));
-  gtk_misc_set_alignment (GTK_MISC (msg->from[0]), 0.0, 0.5);
-  gtk_table_attach (GTK_TABLE (table), msg->from[0], 0, 1, 1, 2,
-		    GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
-
-  msg->from[1] = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), msg->from[1], 1, 2, 1, 2,
-		    GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_SHRINK, 0, 0);
-
-  msg->from[2] = gtk_button_new ();
-  gtk_button_set_relief (GTK_BUTTON (msg->from[2]), GTK_RELIEF_NONE);
-  GTK_WIDGET_UNSET_FLAGS (msg->from[2], GTK_CAN_FOCUS);
-  gtk_container_add (GTK_CONTAINER (msg->from[2]),
-	      gnome_stock_pixmap_widget (NULL, GNOME_STOCK_MENU_BOOK_BLUE));
-  gtk_table_attach (GTK_TABLE (table), msg->from[2], 2, 3, 1, 2,
-		    0, 0, 0, 0);
-#endif
+  create_email_entry(table, _("From:"),0,GNOME_STOCK_MENU_BOOK_BLUE,msg->from);
+  /* To: */
+  create_email_entry(table, _("To:"), 1, GNOME_STOCK_MENU_BOOK_RED, msg->to );
 
   /* Subject: */
   msg->subject[0] = gtk_label_new (_("Subject:"));
@@ -813,6 +793,10 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
     g_free (from);
   }
 
+  /* Reply To */
+  if(balsa_app.replyto) 
+    gtk_entry_set_text (GTK_ENTRY (msg->reply_to[1]), balsa_app.replyto);
+
   /* Bcc: */
   {
     if (balsa_app.bcc)
@@ -953,7 +937,7 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 
   /* set the menus  - and charset index - and display the window */
   /* FIXME: this will also reset the font, copying the text back and 
-     forth which is sub-optimal
+     forth which is sub-optimal.
   */
   set_menus(msg); 
   gtk_widget_show (window);
@@ -1066,7 +1050,6 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   Body *body;
   gchar *tmp;
   gchar *def_charset;
-  GList * from_list;
 
   tmp = gtk_entry_get_text (GTK_ENTRY (bsmsg->to[1]));
   {
@@ -1091,13 +1074,8 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 
   message = message_new ();
 
-  /* we should just copy balsa_app.address */
-  message->from = address_new ();
-  from_list =  make_list_from_string (gtk_entry_get_text 
-			       (GTK_ENTRY (bsmsg->from[1])));
-  message->from = from_list->data;
-  from_list = g_list_remove(from_list,message->from);
-  if(from_list) address_list_free(from_list);
+  message->from = make_address_from_string(gtk_entry_get_text 
+					   (GTK_ENTRY (bsmsg->from[1])));
 
   message->subject = g_strdup (gtk_entry_get_text 
 			       (GTK_ENTRY (bsmsg->subject[1])));
@@ -1134,16 +1112,9 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
     }
   }
 
-  if( (tmp = gtk_entry_get_text( GTK_ENTRY( bsmsg->reply_to[1] ) )) != NULL &&
-      strlen( tmp ) > 0 ) {
-	  message->reply_to = make_address_from_string( tmp );
-  }
-
-  message->reply_to = address_new ();
-
-  message->reply_to->personal = g_strdup (balsa_app.address->personal);
-  message->reply_to->mailbox = g_strdup (balsa_app.replyto);
-
+  if( (tmp = gtk_entry_get_text (GTK_ENTRY (bsmsg->reply_to[1]))) != NULL &&
+      strlen(tmp)>0) 
+     message->reply_to = make_address_from_string(tmp);
 
   body = body_new ();
 
@@ -1495,41 +1466,33 @@ static gint toggle_attachments_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
    return toggle_entry(bsmsg->attachments, MENU_TOGGLE_ATTACHMENTS_POS,4);
 }
 
-/* note that hiding the entries must be done seperately */
+static gint
+findWord(const gchar * word, const gchar* str) {
+   char* ptr;
+   int len = strlen(word);
+
+   if( (ptr=strstr(str, word)) != NULL) {
+      return (ptr==str || *(ptr-1)==' ') && 
+	 ( *(ptr+len)==' ' || *(ptr+len)=='\0');
+   } return FALSE;
+}
+
 static void set_menus(BalsaSendmsg *msg)
 {
    unsigned i;
-   gtk_check_menu_item_set_active(
-      GTK_CHECK_MENU_ITEM(view_menu[MENU_TOGGLE_TO_POS].widget), TRUE );
 
-   gtk_check_menu_item_set_active(
-      GTK_CHECK_MENU_ITEM(view_menu[MENU_TOGGLE_FROM_POS].widget), FALSE);
-   toggle_entry(msg->from,  MENU_TOGGLE_FROM_POS,3); 
+   for(i=0; i<sizeof(headerDescs)/sizeof(headerDescs[0]); i++)
+      if(findWord(headerDescs[i].name, balsa_app.compose_headers) ) {
+	 // show... (well, it's already been shown).
+	    gtk_check_menu_item_set_active(
+	    GTK_CHECK_MENU_ITEM(view_menu[i].widget), TRUE );
+      } else {
+	 // or hide...
+	 GTK_SIGNAL_FUNC(view_menu[i].moreinfo)(view_menu[i].widget,msg);
+      }
 
-   gtk_check_menu_item_set_active(
-      GTK_CHECK_MENU_ITEM(view_menu[MENU_TOGGLE_SUBJECT_POS].widget), TRUE );
-
-   gtk_check_menu_item_set_active(
-      GTK_CHECK_MENU_ITEM(view_menu[MENU_TOGGLE_CC_POS].widget), TRUE );
-
-   gtk_check_menu_item_set_active(
-      GTK_CHECK_MENU_ITEM(view_menu[MENU_TOGGLE_BCC_POS].widget), FALSE );
-   toggle_entry(msg->bcc,  MENU_TOGGLE_BCC_POS,3); 
-
-   gtk_check_menu_item_set_active(
-      GTK_CHECK_MENU_ITEM(view_menu[MENU_TOGGLE_FCC_POS].widget), FALSE );
-   toggle_entry(msg->fcc,  MENU_TOGGLE_BCC_POS,2); 
-
-   gtk_check_menu_item_set_active(
-      GTK_CHECK_MENU_ITEM(view_menu[MENU_TOGGLE_REPLY_POS].widget), FALSE );
-   toggle_entry(msg->reply_to, MENU_TOGGLE_BCC_POS,3); 
-
-   gtk_check_menu_item_set_active(
-      GTK_CHECK_MENU_ITEM(view_menu[MENU_TOGGLE_ATTACHMENTS_POS].widget),
-      FALSE);
-   toggle_entry(msg->attachments,  MENU_TOGGLE_ATTACHMENTS_POS,4); 
-
-   /* this should be read from the preferences set up. If not found, 
+   /* set the charset:
+      read from the preferences set up. If not found, 
       set to the 0th set.
    */
    i = sizeof(iso_charset_names)/sizeof(iso_charset_names[0])-1;
@@ -1545,7 +1508,7 @@ static void set_menus(BalsaSendmsg *msg)
 }
 
 /* create_font_name returns iso8859 font name based on given font 
-   wildcard 'base' and given charmap (PS: verify the name).
+   wildcard 'base' and given character set encoding.
    Algorithm: copy max first 12 fields, cutting additionally 
    at most two last, if they are constant.
 */

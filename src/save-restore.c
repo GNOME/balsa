@@ -859,6 +859,13 @@ config_global_load (void)
   else
       balsa_app.encoding_style = atoi(field);
 
+  /* shown headers in the compose window */
+  g_free (balsa_app.compose_headers);
+  if ((field = pl_dict_get_str (globals, "ComposeHeaders")) == NULL)
+     balsa_app.compose_headers = g_strdup("to subject cc");
+  else
+    balsa_app.compose_headers = g_strdup (field);
+
   if (( field = pl_dict_get_str (globals, "PrintCommand")) == NULL) 
       balsa_app.PrintCommand.PrintCommand = g_strdup("a2ps -d -q %s");
   else 
@@ -1038,6 +1045,8 @@ config_global_save (void)
   else
       pl_dict_add_str_str(globals, "Charset", DEFAULT_CHARSET);
 
+  if (balsa_app.compose_headers != NULL)
+     pl_dict_add_str_str (globals, "ComposeHeaders",balsa_app.compose_headers);
 
   if (balsa_app.PrintCommand.PrintCommand != NULL)
       pl_dict_add_str_str(globals, "PrintCommand", balsa_app.PrintCommand.PrintCommand);

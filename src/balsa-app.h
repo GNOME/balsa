@@ -175,6 +175,9 @@ extern struct BalsaApplication
   /* printing */
   Printing_t PrintCommand;
 
+  /* compose: shown headers */
+  gchar* compose_headers; 
+
   /* appbar */
   GnomeAppBar* appbar;
   GtkWidget* notebook;

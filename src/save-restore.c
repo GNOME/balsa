@@ -589,6 +589,7 @@ static gint
 config_global_load(void)
 {
     gboolean def_used;
+    guint tmp;
 
     config_address_books_load();
     config_identities_load();
@@ -784,9 +785,13 @@ config_global_load(void)
     balsa_app.pwindow_option = d_get_gint("ProgressWindow", WHILERETR);
 
     /* ... deleting messages: defaults enshrined here */
-    libbalsa_mailbox_set_filter(NULL,
-                                gnome_config_get_bool("HideDeleted=true")
-				? 1 : 0);
+    tmp = libbalsa_mailbox_get_filter(NULL);
+    if (gnome_config_get_bool("HideDeleted=true"))
+	tmp |= (1 << 0);
+    else
+	tmp &= ~(1 << 0);
+    libbalsa_mailbox_set_filter(NULL, tmp);
+
     balsa_app.expunge_on_close =
         gnome_config_get_bool("ExpungeOnClose=true");
     balsa_app.expunge_auto = gnome_config_get_bool("AutoExpunge=true");

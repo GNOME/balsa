@@ -1,5 +1,15 @@
 2001-11-03  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* src/balsa-app.h: add open_inbox_on_startup.
+	* src/main.c: check it and act.
+	* src/pref-manager.c, save-restore.c: configure, save, restore it.
+	* src/expand-alias.c: remove some debugging output.
+	* src/main-window.c: copy&select all probably belong to message menu.
+	(Philip Van Hoof <freax@pandora.be>). Wrap after pref change (PB).
+	* src/store-address.c: full-blown address storing (Peter Bloomfield).
+
+2001-11-03  Pawel Salek  <pawsa@theochem.kth.se>
+
 	* balsa.spec.in: require libesmtp-0.8.6 (perhaps not strictly
 	necessary).
 	* help/C/Makefile.am: include index.html in the tarball.

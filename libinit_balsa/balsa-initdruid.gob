@@ -25,7 +25,7 @@
 %}
 
 %{
-#include "save-restore.h" 
+#include "cfg-balsa.h" 
 
 #include "balsa-druid-page.h"
 #include "balsa-druid-page-welcome.h"

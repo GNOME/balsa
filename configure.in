@@ -62,27 +62,6 @@ dnl this should come after `AC_PROG_CC'
 GNOME_X_CHECKS
 
 dnl ######################################################################################
-dnl Check for proplist, but don't add it to the LIBS
-dnl And give proplist the GTK+ libs but don't put them in LIBS etc.
-dnl ######################################################################################
-
-balsa_save_LDFLAGS="$LDFLAGS"
-balsa_save_LIBS="$LIBS"
-
-dnl LDFLAGS += gtk ldflags
-dnl LIBS += gtk libs
-LDFLAGS="$LDFLAGS `echo $GTK_LIBS | sed 's/\(.*\)\(-lgtk.*\)/\1/'`"
-LIBS="$LIBS $GTK_LIBS"
-
-AC_CHECK_LIB(PropList, PLGetProplistWithPath,,[
-	AC_MSG_ERROR([*** libPropList not found. Please check http://www.balsa.net for information on the required files.])
-])
-
-dnl Reset
-LDFLAGS="$balsa_save_LDFLAGS"
-LIBS="$balsa_save_LIBS"
-
-dnl ######################################################################################
 dnl All the linguas, all the time.
 dnl ######################################################################################
 
@@ -293,6 +272,17 @@ AC_SUBST(at_DATADIRNAME)
 AC_SUBST(at_exec_prefix)
 
 dnl ######################################################################################
+dnl Offset tool
+dnl ######################################################################################
+
+BALSA_OFFSET_TOOL([src/Makefile.offset],[src/cfg-balsa.c],
+[	
+	CFLAGS="\${CFLAGS} -I\${top_builddir} -I\${top_builddir}/src -I\${top_builddir}/libmutt "
+	CFLAGS="\${CFLAGS} -I\${top_srcdir} -I\${top_srcdir}/libmutt -I\${top_srcdir}/libbalsa "
+	CFLAGS="\${CFLAGS} -I\${top_srcdir}/src"
+])
+
+dnl ######################################################################################
 dnl Things needed by CVS user
 dnl ######################################################################################
 
@@ -314,6 +304,7 @@ balsa.1
 balsa.spec
 po/Makefile.in
 macros/Makefile
+macros/offset-tool.sh
 intl/Makefile
 sounds/Makefile
 images/Makefile

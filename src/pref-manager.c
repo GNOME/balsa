@@ -24,9 +24,9 @@
 #include "pref-manager.h"
 #include "mailbox-conf.h"
 #include "main-window.h"
-#include "save-restore.h"
-#include "../libmutt/mime.h"
-#include "../libmutt/mutt.h"
+#include "cfg-balsa.h"
+#include "libmutt/mime.h"
+#include "libmutt/mutt.h"
 
 #define NUM_TOOLBAR_MODES 3
 #define NUM_MDI_MODES 4
@@ -53,7 +53,6 @@ typedef struct _PropertyUI {
 	GtkWidget *wraplength;
 	GtkWidget *bcc;	  
 	GtkWidget *check_mail_upon_startup;
-	GtkWidget *remember_open_mboxes;
 #ifdef BALSA_SHOW_INFO
 	GtkWidget *mblist_show_mb_content_info;
 #endif
@@ -306,8 +305,6 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 
 	gtk_signal_connect (GTK_OBJECT (pui->check_mail_upon_startup), "toggled",
 			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
-	gtk_signal_connect (GTK_OBJECT (pui->remember_open_mboxes), "toggled",
-			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 
 	gtk_signal_connect (GTK_OBJECT (pui->empty_trash), "toggled",
 			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
@@ -457,7 +454,6 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
 
 
 	balsa_app.check_mail_upon_startup = GTK_TOGGLE_BUTTON(pui->check_mail_upon_startup)->active;
-	balsa_app.remember_open_mboxes = GTK_TOGGLE_BUTTON(pui->remember_open_mboxes)->active;
 	balsa_app.empty_trash_on_exit = GTK_TOGGLE_BUTTON(pui->empty_trash)->active;
 
 	/* date format */
@@ -480,7 +476,7 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
 	/*
 	 * close window and free memory
 	 */
-	config_global_save ();
+	cfg_save();
         balsa_mblist_redraw (balsa_app.mblist);
         balsa_window = GTK_WIDGET (gtk_object_get_data (GTK_OBJECT (pbox), "balsawindow"));
         balsa_window_refresh (BALSA_WINDOW (balsa_window));
@@ -574,15 +570,10 @@ set_prefs (void)
 	gtk_entry_set_text(GTK_ENTRY(pui->PrintCommand), balsa_app.PrintCommand.PrintCommand);
 	sprintf(tmp, "%d", balsa_app.PrintCommand.linesize);
 	gtk_entry_set_text(GTK_ENTRY(pui->PrintLinesize), tmp);
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->PrintBreakline),
-				      balsa_app.PrintCommand.breakline);
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->PrintBreakline), balsa_app.PrintCommand.breakline);
 
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (
-	    pui->check_mail_upon_startup), balsa_app.check_mail_upon_startup);
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (
-	    pui->remember_open_mboxes), balsa_app.remember_open_mboxes);
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (
-	    pui->empty_trash), balsa_app.empty_trash_on_exit);
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->check_mail_upon_startup), balsa_app.check_mail_upon_startup);
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->empty_trash), balsa_app.empty_trash_on_exit);
 
 	/* date format */
 	if(balsa_app.date_string) 
@@ -828,7 +819,7 @@ create_mailserver_page ( )
 	table3 = gtk_table_new (3, 1, FALSE);
 	gtk_widget_show (table3);
 
-	frame3 = gtk_frame_new (_("Remote Mailbox Servers"));
+	frame3 = gtk_frame_new (_("Remote Malibox Servers"));
 	gtk_widget_show (frame3);
 	gtk_table_attach (GTK_TABLE (table3), frame3, 0, 1, 0, 1,
 			  (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
@@ -1487,17 +1478,11 @@ create_startup_page ( )
 	gtk_container_add (GTK_CONTAINER (frame), vb1);
 	gtk_container_set_border_width (GTK_CONTAINER (vb1), 5);	
 
-	pui->check_mail_upon_startup = gtk_check_button_new_with_label (
-	    _("Check mail upon startup"));
+	pui->check_mail_upon_startup = gtk_check_button_new_with_label (_("Check mail upon startup"));
 	gtk_widget_show (pui->check_mail_upon_startup);
-	gtk_box_pack_start (GTK_BOX (vb1), pui->check_mail_upon_startup, 
-			    FALSE, FALSE, 0);
-	pui->remember_open_mboxes = gtk_check_button_new_with_label (
-	    _("Remember open mailboxes between sessions"));
-	gtk_widget_show (pui->remember_open_mboxes);
-	gtk_box_pack_start (GTK_BOX (vb1), pui->remember_open_mboxes, 
-			    FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX (vb1), pui->check_mail_upon_startup, FALSE, FALSE, 0);
 	
+
 	return vbox1;
 
 }

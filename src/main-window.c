@@ -50,6 +50,7 @@
 #include "mblist-window.h"
 #include "main-window.h"
 #include "print.h"
+#include "cfg-balsa.h"
 #include "address-book.h"
 
 #ifdef BALSA_USE_THREADS
@@ -86,7 +87,6 @@ enum {
   GSList *list = NULL;
   
 extern void load_messages (Mailbox * mailbox, gint emit);
-extern void config_mailbox_update(Mailbox * mailbox, char * name);
 
 void progress_dialog_destroy_cb ( GtkWidget *, gpointer data);
 static void check_messages_thread( Mailbox *mbox );
@@ -1092,8 +1092,7 @@ mail_progress_notify_cb( )
 	      }
 	    break;
 	  case MSGMAILTHREAD_UPDATECONFIG:
-	    config_mailbox_update( threadmessage->mailbox, 
-		      MAILBOX_POP3(threadmessage->mailbox)->mailbox.name ); 
+		  cfg_mailbox_write_simple( threadmessage->mailbox );
 	    break;
 	  case MSGMAILTHREAD_LOAD:
 	    LOCK_MAILBOX(threadmessage->mailbox);

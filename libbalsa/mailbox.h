@@ -24,7 +24,7 @@
 #include <gtk/gtk.h>
 
 #include "libmutt/mutt.h"
-
+#include "cfg-backend.h"
 
 #define BALSA_TYPE_MAILBOX			(balsa_mailbox_get_type())
 #define BALSA_MAILBOX(obj)			(GTK_CHECK_CAST ((obj), BALSA_TYPE_MAILBOX, Mailbox))
@@ -126,6 +126,9 @@ struct _Mailbox
   gchar *name;
   void *private;
   guint open_ref;
+
+  /* Our config prefix */
+  cfg_location_t *cfgloc;
 
   gboolean lock;
 

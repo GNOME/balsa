@@ -29,7 +29,7 @@
 #include "main-window.h"
 #include "misc.h"
 #include "pref-manager.h"
-#include "save-restore.h"
+#include "cfg-balsa.h"
 
 /* we'll create the notebook pages in the
  * order of these enumerated types so they 
@@ -198,7 +198,7 @@ mailbox_conf_delete (Mailbox * mailbox)
 	}
     }
   /* Delete it from the config file and internal nodes */
-  config_mailbox_delete (mailbox->name);
+  cfg_mailbox_delete_simple( mailbox );
 
   /* Close the mailbox, in case it was open */
   if (mailbox->type != MAILBOX_POP3)
@@ -536,7 +536,7 @@ conf_update_mailbox (Mailbox * mailbox, gchar * old_mbox_name)
 	    GTK_ENTRY (mcw->local_mailbox_name)));
 	MAILBOX_LOCAL (mailbox)->path = g_strdup (filename);
 
-	config_mailbox_update (mailbox, old_mbox_name);
+	cfg_mailbox_write_simple( mailbox );
       }
       break;
 
@@ -561,7 +561,7 @@ conf_update_mailbox (Mailbox * mailbox, gchar * old_mbox_name)
       MAILBOX_POP3 (mailbox)->check = GTK_TOGGLE_BUTTON (mcw->pop_check)->active;
       MAILBOX_POP3 (mailbox)->delete_from_server = GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server)->active;
 
-      config_mailbox_update (mailbox, old_mbox_name);
+      cfg_mailbox_write_simple( mailbox );
       break;
 
     case MAILBOX_IMAP:
@@ -621,7 +621,7 @@ conf_update_mailbox (Mailbox * mailbox, gchar * old_mbox_name)
       MAILBOX_IMAP (mailbox)->server->port = strtol (
 	  gtk_entry_get_text (GTK_ENTRY (mcw->imap_port)), (char **) NULL, 10);
 
-      config_mailbox_update (mailbox, old_mbox_name);
+      cfg_mailbox_write_simple( mailbox );
       break;
 
     case MAILBOX_UNKNOWN:
@@ -686,7 +686,7 @@ conf_add_mailbox ()
 	node = g_node_new (mailbox_node_new (mailbox->name, mailbox,
 					     mailbox->type != MAILBOX_MBOX));
 	g_node_append (balsa_app.mailbox_nodes, node);
-	config_mailbox_add (mailbox, NULL);
+	cfg_mailbox_write_simple( mailbox );
 	add_mailboxes_for_checking (mailbox);
       }
       break;
@@ -711,7 +711,7 @@ conf_add_mailbox ()
       MAILBOX_POP3 (mailbox)->delete_from_server = GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server)->active;
 
       balsa_app.inbox_input = g_list_append (balsa_app.inbox_input, mailbox);
-      config_mailbox_add (mailbox, NULL);
+      cfg_mailbox_write_simple( mailbox );
       add_mailboxes_for_checking (mailbox);
       break;
 
@@ -749,7 +749,7 @@ conf_add_mailbox ()
       node = g_node_new (mailbox_node_new (mailbox->name, mailbox, FALSE));
       g_node_append (balsa_app.mailbox_nodes, node);
 
-      config_mailbox_add (mailbox, NULL);
+      cfg_mailbox_write_simple( mailbox );
       add_mailboxes_for_checking (mailbox);
       break;
 

@@ -20,7 +20,6 @@
 #define __BALSA_APP_H__
 
 #include <gnome.h>
-#include <proplist.h>
 #include "libbalsa.h"
 #include "balsa-mblist.h"
 #include "balsa-index-page.h"
@@ -71,7 +70,14 @@
 #define DEFAULT_CHARSET "ISO-8859-1"
 #define DEFAULT_ENCODING ENC8BIT
 #define DEFAULT_LINESIZE 78
+#define DEFAULT_QUOTE "> "
+#define DEFAULT_COMPOSE_HEADERS "to subject cc"
+#define DEFAULT_SMTP_SERVER "localhost"
 
+#define DEFAULT_MBLIST_WIDTH 120
+#define DEFAULT_NOTEBOOK_HEIGHT 200
+#define DEFAULT_WRAPLENGTH 79
+#define DEFAULT_PRINTCOMMAND "a2ps -d -q %s"
 enum
 {
   WHILERETR,
@@ -96,7 +102,6 @@ enum ShownHeaders {
 /* global balsa application structure */
 extern struct BalsaApplication
 {
-  proplist_t proplist;
   /* personal information */
   Address *address;
   gchar *replyto;
@@ -181,9 +186,8 @@ extern struct BalsaApplication
   /* command line options */
 
   gint check_mail_upon_startup;
-  gint remember_open_mboxes;
   gint open_unread_mailbox;
-  gchar *open_mailbox; /* ';'-separated, from last session or command line */
+  gchar *open_mailbox;
   gchar* compose_email;
 
   /* font used to display messages */
@@ -210,6 +214,13 @@ extern struct BalsaApplication
 }
 balsa_app;
 
+typedef struct BalsaFudgeColor_t
+{
+	gint pixel;
+	gint red;
+	gint green;
+	gint blue;
+} BalsaFudgeColor;
 
 void balsa_app_init (void);
 gint do_load_mailboxes (void);

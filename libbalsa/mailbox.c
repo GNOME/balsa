@@ -442,6 +442,9 @@ static void balsa_mailbox_destroy (GtkObject *object)
     while (mailbox->open_ref > 0)
       mailbox_open_unref (mailbox);
 
+  if( mailbox->cfgloc )
+	  cfg_location_free( mailbox->cfgloc );
+
   g_free(mailbox->name);
   g_free(mailbox->private);
 

@@ -27,7 +27,8 @@
 %}
 
 %{
-#include "save-restore.h"
+#include "cfg-balsa.h"
+#include "balsa-app.h"
 %}
 
 class Balsa:Druid:Page:Finish from Balsa:Druid:Page {
@@ -68,7 +69,19 @@ class Balsa:Druid:Page:Finish from Balsa:Druid:Page {
 
 	override (Gnome:Druid:Page) void
 	finish( Gnome:Druid:Page *_self, Gtk:Widget *druid (check type null) ) {
-		config_global_save();
+		cfg_save();
+
+		gtk_object_destroy( GTK_OBJECT( balsa_app.inbox ) );
+		balsa_app.inbox = NULL;
+		gtk_object_destroy( GTK_OBJECT( balsa_app.outbox ) );
+		balsa_app.outbox = NULL;
+		gtk_object_destroy( GTK_OBJECT( balsa_app.sentbox ) );
+		balsa_app.sentbox = NULL;
+		gtk_object_destroy( GTK_OBJECT( balsa_app.draftbox ) );
+		balsa_app.draftbox = NULL;
+		gtk_object_destroy( GTK_OBJECT( balsa_app.trash ) );
+		balsa_app.trash = NULL;
+
 		balsa_initdruid_finished( BALSA_INITDRUID( druid ) );
 	}
 }

@@ -28,7 +28,7 @@
 
 %{
 #include "balsa-app.h"
-#include "save-restore.h"
+#include "cfg-balsa.h"
 #include "balsa-druid-page-error.h"
 
 #include <sys/types.h>
@@ -37,9 +37,9 @@
 #include <string.h>
 #include <unistd.h>
 
-static void unconditional_mailbox( const gchar *path, const gchar *prettyname, gchar **error );
+static Mailbox *unconditional_mailbox( const gchar *path, const gchar *prettyname, gchar **error );
 
-static void unconditional_mailbox( const gchar *path, const gchar *prettyname, gchar **error )
+static Mailbox *unconditional_mailbox( const gchar *path, const gchar *prettyname, gchar **error )
 {
 	struct stat sb;
 	gchar *dup;
@@ -49,7 +49,7 @@ static void unconditional_mailbox( const gchar *path, const gchar *prettyname, g
 	Mailbox *box;
 
 	if( (*error) != NULL )
-		return;
+		return NULL;
 
 	dup = g_strdup( path );
 	index = g_basename( dup );
@@ -58,7 +58,7 @@ static void unconditional_mailbox( const gchar *path, const gchar *prettyname, g
 		(*error) = g_strdup_printf( _("The pathname \"%s\" must be specified"
 			" canonically -- it must start with a \'/\'."), dup );
 		g_free( dup );
-		return;
+		return NULL;
 	}
 
 	index[-1] = '\0'; /*Split off the dirs from the file.*/
@@ -66,7 +66,7 @@ static void unconditional_mailbox( const gchar *path, const gchar *prettyname, g
 	if( balsa_init_create_to_directory( dup, error ) ) {
 		/*TRUE->error*/
 		g_free( dup );
-		return;
+		return NULL;
 	}
 
 	index[-1] = '/';
@@ -76,7 +76,7 @@ static void unconditional_mailbox( const gchar *path, const gchar *prettyname, g
 			(*error) = g_strdup_printf( _("An error occurred when attempting "
 				"to creat(2) the file \"%s\"."), dup );
 			g_free( dup );
-			return;
+			return NULL;
 		}
 
 		close( fd );
@@ -84,16 +84,16 @@ static void unconditional_mailbox( const gchar *path, const gchar *prettyname, g
 		(*error) = g_strdup_printf( _("The mailbox \"%s\" does not appear to be valid."),
 			dup );
 		g_free( dup );
-		return;
+		return NULL;
 	}
 
 	mt = mailbox_valid( dup );
 	box = BALSA_MAILBOX( mailbox_new( mt ) );
 	box->name = g_strdup( gettext( prettyname ) );
 	(MAILBOX_LOCAL( box ))->path = dup;
-	config_mailbox_add( box, (char *) prettyname );
+	cfg_mailbox_write_simple( box );
 	add_mailboxes_for_checking( box );
-	gtk_object_destroy( GTK_OBJECT( box ) );
+	return box;
 }
 
 %}
@@ -239,15 +239,15 @@ class Balsa:Druid:Page:Directory from Balsa:Druid:Page {
 		gchar *error = NULL;
 		BalsaDruidPageDirectory *self = BALSA_DRUID_PAGE_DIRECTORY( _self );	
 
-		unconditional_mailbox( gtk_entry_get_text( GTK_ENTRY( self->_priv->inbox ) ),
+		balsa_app.inbox = unconditional_mailbox( gtk_entry_get_text( GTK_ENTRY( self->_priv->inbox ) ),
 			"Inbox", &error );
-		unconditional_mailbox( gtk_entry_get_text( GTK_ENTRY( self->_priv->outbox ) ),
+		balsa_app.outbox = unconditional_mailbox( gtk_entry_get_text( GTK_ENTRY( self->_priv->outbox ) ),
 			"Outbox", &error );
-		unconditional_mailbox( gtk_entry_get_text( GTK_ENTRY( self->_priv->sentbox ) ),
+		balsa_app.sentbox = unconditional_mailbox( gtk_entry_get_text( GTK_ENTRY( self->_priv->sentbox ) ),
 			"Sentbox", &error );
-		unconditional_mailbox( gtk_entry_get_text( GTK_ENTRY( self->_priv->draftbox ) ),
+		balsa_app.draftbox = unconditional_mailbox( gtk_entry_get_text( GTK_ENTRY( self->_priv->draftbox ) ),
 			"Draftbox", &error );
-		unconditional_mailbox( gtk_entry_get_text( GTK_ENTRY( self->_priv->trash ) ),
+		balsa_app.trash = unconditional_mailbox( gtk_entry_get_text( GTK_ENTRY( self->_priv->trash ) ),
 			"Trash", &error );
 
 		self->_priv->paths_locked = TRUE;

@@ -3,6 +3,10 @@ CFLAGS += -Wall -Wmissing-prototypes -Wpointer-arith
 noinst_LIBRARIES = libbalsa.a
 
 libbalsa_a_SOURCES = 		\
+	cfg-backend.c		\
+	cfg-backend.h		\
+	cfg-engine.c		\
+	cfg-engine.h		\
 	filter-funcs.h		\
 	filter-private.h	\
 	filter.h		\

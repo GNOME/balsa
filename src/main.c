@@ -36,9 +36,10 @@
 #include "mblist-window.h"
 #include "main-window.h"
 #include "libbalsa.h"
+#include "cfg-balsa.h"
 #include "misc.h"
-#include "save-restore.h"
 #include "main.h"
+
 #include "balsa-impl.c"
 
 #include "libinit_balsa/init_balsa.h"
@@ -100,10 +101,8 @@ balsa_init (int argc, char **argv)
   PortableServer_POAManager pm;
   static struct poptOption options[] = {
          {"checkmail", 'c', POPT_ARG_NONE, &(balsa_app.check_mail_upon_startup), 0, N_("Get new mail on startup"), NULL},
-         {"compose", 'm', POPT_ARG_STRING, &(balsa_app.compose_email), 
-	  0, N_("Compose a new email to EMAIL@ADDRESS"), "EMAIL@ADDRESS"},
-         {"open-mailbox", 'o', POPT_ARG_STRING, &(balsa_app.open_mailbox), 
-	  0, N_("Opens MAILBOXNAME"),N_("MAILBOXNAME")},
+         {"compose", 'm', POPT_ARG_STRING, &(balsa_app.compose_email), 0, N_("Compose a new email to EMAIL@ADDRESS"), "EMAIL@ADDRESS"},
+         {"open-mailbox", 'o', POPT_ARG_STRING, &(balsa_app.open_mailbox), 0, N_("Opens MAILBOXNAME"),N_("MAILBOXNAME")},
          {"open-unread-mailbox", 'u', POPT_ARG_NONE, &(balsa_app.open_unread_mailbox), 0, N_("Opens first unread mailbox"), NULL},
          {NULL, '\0', 0, NULL, 0} /* end the list */
   };
@@ -137,23 +136,10 @@ balsa_init (int argc, char **argv)
 static void
 config_init (void)
 {
-  if (config_load (BALSA_CONFIG_FILE) == FALSE)
-    {
-      fprintf (stderr, "*** Could not load config file %s!\n",
-	       BALSA_CONFIG_FILE);
-      balsa_init_begin ();
-      //return;
-    }
-
-  /* Load all the global settings.  If there's an error, then some crucial
-     piece of the global settings was not available, and we need to run
-     balsa-init. */
-  if (config_global_load () == FALSE)
-    {
-      fprintf (stderr, "*** config_global_load failed\n");
-      balsa_init_begin ();
-      return;
-    }
+	if( cfg_load() ) {
+		balsa_init_begin ();
+		cfg_load();
+	}
 }
 
 static void
@@ -241,7 +227,6 @@ main (int argc, char *argv[])
   config_init ();
 
   /* load mailboxes */
-  config_mailboxes_init ();
   mailboxes_init ();
 
 #ifdef BALSA_USE_THREADS
@@ -257,6 +242,7 @@ main (int argc, char *argv[])
 
   window = balsa_window_new();
   balsa_app.main_window = BALSA_WINDOW (window);
+  gtk_widget_show(window);
 
 
   gdk_rgb_init();
@@ -265,10 +251,8 @@ main (int argc, char *argv[])
     BalsaSendmsg *snd;
     snd=sendmsg_window_new(window,NULL,SEND_NORMAL);
     gtk_entry_set_text(GTK_ENTRY(snd->to[1]),balsa_app.compose_email);
-    gtk_widget_grab_focus(balsa_app.compose_email[0] 
-			  ? snd->subject[1] : snd->to[1]);
-  } else gtk_widget_show(window);
-
+    gtk_widget_grab_focus(snd->subject[1]);
+  }
 
 #ifdef USE_PIXBUF
   gtk_widget_set_default_colormap(gdk_rgb_get_cmap());
@@ -292,9 +276,8 @@ main (int argc, char *argv[])
      gchar** names= g_strsplit(balsa_app.open_mailbox,";",20);
      while(names[i]) {
 	Mailbox *mbox = mblist_find_mbox_by_name(names[i]);
-	if(balsa_app.debug)
-	    fprintf(stderr,"opening %s => %p..\n", names[i], mbox);
 	if(mbox) {
+	   printf("opening %s..\n", mbox->name);
 	   mblist_open_mailbox(mbox);
 	}
 	i++;
@@ -423,8 +406,8 @@ balsa_exit (void)
 	mailbox_open_unref (mailbox);
     }
 
-  if (balsa_app.proplist)
-    config_global_save ();
+
+    cfg_save();
 
   gnome_sound_shutdown ();
 

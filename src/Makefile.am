@@ -36,11 +36,12 @@ balsa_SOURCES =	\
 	pref-manager.h		\
 	print.c			\
 	print.h			\
-	save-restore.c		\
-	save-restore.h		\
 	sendmsg-window.c	\
 	sendmsg-window.h	\
-	threads.h
+	threads.h		\
+	cfg-balsa.c		\
+	cfg-balsa.h
+
 #	index-child.h		\
 #	spell-check.c		\
 #	spell-check.h		\
@@ -55,13 +56,16 @@ INCLUDES = \
 	-I$(top_srcdir)/libmutt \
 	 $(GNOME_INCLUDEDIR)
 
+@BALSA_OFFSET_MAKERULES@
+
+BUILT_SOURCES = cfg-offsets.h Makefile.offset
+
 #libbalsa appearing twice is not a bug -- it is mutually dependent with libmutt
 balsa_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a \
 	$(top_builddir)/libmutt/libmutt.a \
 	$(top_builddir)/libbalsa/libbalsa.a \
 	$(top_builddir)/libinit_balsa/libinit_balsa.a \
-	-lPropList	\
 	@LIBESD_LIB@	\
 	$(GNOME_LIBDIR) \
 	$(top_builddir)/idl/libbalsasrv.a \
@@ -76,3 +80,7 @@ balsa_DEPENDENCIES = \
 dist-hook:
 	mkdir $(distdir)/pixmaps
 	cp $(srcdir)/pixmaps/*.xpm $(distdir)/pixmaps
+
+# test_cfg_SOURCES = cfg-backend.c test-cfg.c
+# test_cfg_LDADD = $(GNOME_LIBDIR) $(GNOMEGNORBA_LIBS) $(INTLLIBS)
+# noinst_PROGRAMS = test_cfg

@@ -32,7 +32,6 @@
 #include "misc.h"
 #include "main.h"
 #include "libbalsa.h"
-#include "save-restore.h"
 #include "balsa-index-page.h"
 #include "main-window.h"
 

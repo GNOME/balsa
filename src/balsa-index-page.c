@@ -20,6 +20,7 @@
 #include "config.h"
 
 #include <gnome.h>
+#include <errno.h>
 #include "balsa-app.h"
 #include "balsa-index.h"
 #include "balsa-message.h"
@@ -631,6 +632,14 @@ create_menu (BalsaIndex * bindex)
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
 
+  menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_BOOK_RED, _ ("Store Address"));
+  gtk_signal_connect (GTK_OBJECT (menuitem),
+		      "activate",
+		      (GtkSignalFunc) balsa_message_store_address,
+		      bindex);
+  gtk_menu_append (GTK_MENU (menu), menuitem);
+  gtk_widget_show (menuitem);
+
   menuitem = gtk_menu_item_new_with_label (_ ("Transfer"));
   submenu = gtk_menu_new ();
   smenuitem = gtk_menu_item_new ();
@@ -979,4 +988,118 @@ balsa_message_undelete (GtkWidget * widget, gpointer index)
     list = list->next;
   }
   balsa_index_select_next (index);
+}
+
+/* This function edits the GnomeCard.gcrd file directly,
+ * in order to add the address of the sender of the currently
+ * highlighted message in the index-page to the address
+ * book. It appends a VCARD entry for the user to the end of
+ * GnomeCard.gcrd, using the the sender's personal name (the
+ * one displayed in the email From: field) as the "File as"
+ * field. If there is already an entry with the sender's
+ * personal name as the "File as" field
+ * balsa_message_store_address displays a dialogue
+ * box saying so, then returns.
+ */
+#define LINE_LEN 256
+void
+balsa_message_store_address (GtkWidget * widget, gpointer index)
+{
+  GList   *list;
+  Message *message;
+  FILE *gc; 
+  gchar string[LINE_LEN];
+  gint in_vcard = FALSE;
+  gchar *new_name = NULL, *new_email = NULL;
+
+  g_return_if_fail (widget != NULL);
+  g_return_if_fail(index != NULL);
+
+  list = GTK_CLIST(index)->selection;
+
+  if(list->next)
+  {
+     GtkWidget *box;
+     char * msg  = g_strdup( _("You may only store one address at a time.\n") );
+     box = gnome_message_box_new(msg,
+                                 GNOME_MESSAGE_BOX_ERROR, _("OK"), NULL );
+     gtk_window_set_modal( GTK_WINDOW( box ), TRUE );
+     gnome_dialog_run( GNOME_DIALOG( box ) );
+     gtk_widget_destroy( GTK_WIDGET( box ) );
+     g_free(msg);
+     return;
+  }
+    
+  message = gtk_clist_get_row_data(GTK_CLIST(index), GPOINTER_TO_INT(list->data));
+  
+  new_name = g_strdup( message->from->personal );
+  new_email = g_strdup( message->from->mailbox );
+  
+  gc = fopen(gnome_util_prepend_user_home(".gnome/GnomeCard.gcrd"), "r+"); 
+  if (!gc) 
+  { 
+     GtkWidget *box;
+     char * msg  = g_strdup_printf(
+        _("Unable to open ~/.gnome/GnomeCard.gcrd for read.\n - %s\n"), 
+        g_unix_error_string(errno)); 
+     box = gnome_message_box_new(msg,
+                                 GNOME_MESSAGE_BOX_ERROR, _("OK"), NULL );
+     gtk_window_set_modal( GTK_WINDOW( box ), TRUE );
+     gnome_dialog_run( GNOME_DIALOG( box ) );
+     gtk_widget_destroy( GTK_WIDGET( box ) );
+     g_free(new_name);
+     g_free(new_email);
+     g_free(msg);
+     return; 
+  }
+    
+  while (fgets(string, sizeof(string), gc)) 
+  { 
+     if ( g_strncasecmp(string, "BEGIN:VCARD", 11) == 0 ) {
+        in_vcard = TRUE;
+        continue;
+     }
+        
+     if ( g_strncasecmp(string, "END:VCARD", 9) == 0 ) {
+        in_vcard = FALSE;
+        continue;
+     }
+     
+     if (!in_vcard) continue;
+     
+     g_strchomp(string);
+     
+     if ( g_strncasecmp(string, "FN:", 3) == 0 )
+     {
+        gchar *id = g_strdup(string+3);
+        if( g_strcasecmp(id, new_name) == 0 )
+        {
+           GtkWidget *box;
+           char * msg  =  g_strdup_printf(
+              _("There is already an address book entry for %s.\nRun GnomeCard if you would like to edit your address book entries.\n"),
+              new_name); 
+           box = gnome_message_box_new(msg,
+                                       GNOME_MESSAGE_BOX_ERROR, _("OK"), NULL );
+           gtk_window_set_modal( GTK_WINDOW( box ), TRUE );
+           gnome_dialog_run( GNOME_DIALOG( box ) );
+           gtk_widget_destroy( GTK_WIDGET( box ) );
+           g_free(new_name);
+           g_free(new_email);
+           g_free(msg);
+           g_free(id);
+           fclose(gc);
+           return;
+        }
+        g_free(id);
+        continue;
+     }
+  }
+  fprintf(gc, g_strdup_printf( _("\nBEGIN:VCARD\n")));
+  fprintf(gc, g_strdup_printf( _("FN:%s\n"), new_name));
+  fprintf(gc, g_strdup_printf( _("EMAIL;INTERNET:%s\n"), new_email));
+  fprintf(gc, g_strdup_printf( _("END:VCARD\n")));
+  g_free(new_name);
+  g_free(new_email);
+  fclose(gc);
+  return;
 }

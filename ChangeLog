@@ -1,5 +1,11 @@
 2000-05-28  Matthew Guenther <mguenthe@netcom.ca>
 
+	* src/balsa-index-page.[ch]: patch to add "Store Address" menu
+	item to right-click menu in index, stores message From address in
+	address book.  From Thomas Fitzsimmons <fitzsim@ecf.utoronto.ca>.
+
+2000-05-28  Matthew Guenther <mguenthe@netcom.ca>
+
 	* help/C/balsa.sgml: Fixed section levels and ids so that the
 	Preferences dialog context-sensitive help will work properly.
 

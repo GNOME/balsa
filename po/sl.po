@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2001-04-18 13:01+0200\n"
+"POT-Creation-Date: 2001-05-10 18:56+0200\n"
 "PO-Revision-Date: 2000-07-07 12:30+0200\n"
 "Last-Translator: Andraz Tori <andraz.tori1@guest.arnes.si>\n"
 "Language-Team: Slovenian <sl@li.org>\n"
@@ -71,12 +71,12 @@ msgstr "Ne morem nalo¾iti adresarja %s"
 #: libbalsa/address-book.c:184
 #, c-format
 msgid "No such address book type: %s"
-msgstr "Ni tak¹nega tipa adresarja: %s"
+msgstr "Ni tak¹ne vrste adresarja: %s"
 
 #: libbalsa/address-book.c:194
 #, c-format
 msgid "Could not create a address book of type %s"
-msgstr "Nisem mogel ustvariti adresarja tipa %s"
+msgstr "Nisem mogel ustvariti adresarja vrste %s"
 
 #. Non-threaded locking mechanism
 #: libbalsa/libbalsa_private.h:99 libbalsa/libbalsa_private.h:111
@@ -97,12 +97,12 @@ msgstr "Ne morem nalo¾iti po¹tnega predala %s"
 #: libbalsa/mailbox.c:309
 #, c-format
 msgid "No such mailbox type: %s"
-msgstr "Ni tak¹nega tipa po¹tnega predala: %s"
+msgstr "Ni tak¹ne vrste po¹tnega predala: %s"
 
 #: libbalsa/mailbox.c:326
 #, c-format
 msgid "Could not create a mailbox of type %s"
-msgstr "Nisem mogel ustvariti po¹tnega predala tipa %s"
+msgstr "Nisem mogel ustvariti po¹tnega predala vrste %s"
 
 #: libbalsa/mailbox_imap.c:290
 #, c-format
@@ -117,7 +117,7 @@ msgstr "LibBalsaMailboxLocal: Odpiram %s, ©tevec referenc: %d\n"
 #: libbalsa/mailbox_maildir.c:114
 #, c-format
 msgid "Mailbox %s does not appear to be a Maildir mailbox."
-msgstr "Po¹tni predal %s ne izgleda, da bi bil tipa Maildir."
+msgstr "Po¹tni predal %s ne izgleda, da bi bil oblike Maildir."
 
 #: libbalsa/mailbox_maildir.c:123
 #, c-format
@@ -157,12 +157,12 @@ msgstr ""
 #: libbalsa/mailbox_mbox.c:113
 #, c-format
 msgid "Mailbox %s does not appear to be an Mbox mailbox."
-msgstr "Po¹tni predal %s ne izgleda, da bi bil tipa Mbox."
+msgstr "Po¹tni predal %s ne izgleda, da bi bil oblike Mbox."
 
 #: libbalsa/mailbox_mh.c:112
 #, c-format
 msgid "Mailbox %s does not appear to be a Mh mailbox."
-msgstr "Po¹tni predal %s ne izgleda, da bi bil tipa Mh."
+msgstr "Po¹tni predal %s ne izgleda, da bi bil oblike Mh."
 
 #: libbalsa/mailbox_mh.c:122
 #, c-format
@@ -988,7 +988,7 @@ msgstr "Posodobi"
 
 #: src/address-book-config.c:256
 msgid "New Address Book type:"
-msgstr "Nov tip adresarja:"
+msgstr "Nova vrsta adresarja:"
 
 #: src/address-book-config.c:266
 msgid "VCard Address Book (GnomeCard)"
@@ -1208,22 +1208,22 @@ msgid " Could not save %s:%s "
 msgstr " Nisem mogel shraniti %s:%s "
 
 #. Subject:
-#: src/balsa-message.c:672 src/print.c:159 src/sendmsg-window.c:960
+#: src/balsa-message.c:672 src/print.c:311 src/sendmsg-window.c:960
 msgid "Subject:"
 msgstr "Zadeva:"
 
-#: src/balsa-message.c:675 src/print.c:162
+#: src/balsa-message.c:675 src/print.c:320
 msgid "Date:"
 msgstr "Datum:"
 
 #. From:
-#: src/balsa-message.c:680 src/filter-edit-dialog.c:316 src/print.c:149
+#: src/balsa-message.c:680 src/filter-edit-dialog.c:316 src/print.c:300
 #: src/sendmsg-window.c:951
 msgid "From:"
 msgstr "Od:"
 
 #. To:
-#: src/balsa-message.c:684 src/filter-edit-dialog.c:306 src/print.c:154
+#: src/balsa-message.c:684 src/filter-edit-dialog.c:306 src/print.c:306
 #: src/sendmsg-window.c:954
 msgid "To:"
 msgstr "Za:"
@@ -1262,13 +1262,12 @@ msgstr "balsa/pixbuf: Nisem mogel nalo¾iti slike. Verjetno je pokvarjena."
 #: src/balsa-message.c:827
 msgid "No open or view action defined in GNOME MIME for this content type"
 msgstr ""
-"Za ta tip vsebine dejanje odpiranja ali pogleda ni doloèeno (med gnome MIME "
-"tipi)"
+"Za to vrsto vsebine dejanje odpiranja ali pogleda ni doloèeno (med tipi MIME GNOMEa)"
 
 #: src/balsa-message.c:831
 #, c-format
 msgid "Content Type: %s"
-msgstr "Tip vsebine: %s"
+msgstr "Vrsta vsebine: %s"
 
 #: src/balsa-message.c:836
 #, c-format
@@ -1705,7 +1704,7 @@ msgstr "Krajevni po¹tni predal..."
 
 #: src/mailbox-node.c:532 src/main-window.c:240
 msgid "Local MH mailbox..."
-msgstr "Krajevni po¹tni predal tipa 'MH'..."
+msgstr "Krajevni po¹tni predal oblike 'MH'..."
 
 #: src/mailbox-node.c:534 src/main-window.c:245
 msgid "Remote IMAP mailbox..."
@@ -1770,19 +1769,19 @@ msgstr "Sestavi novo sporoèilo"
 
 #: src/main-window.c:231
 msgid "Add a new mbox style mailbox"
-msgstr "Dodaj nov po¹tni predal tipa 'Mbox'"
+msgstr "Dodaj nov po¹tni predal oblike 'Mbox'"
 
 #: src/main-window.c:236
 msgid "Add a new Maildir style mailbox"
-msgstr "Dodaj nov po¹tni predal tipa 'maildir'"
+msgstr "Dodaj nov po¹tni predal oblike 'maildir'"
 
 #: src/main-window.c:241
 msgid "Add a new MH style mailbox"
-msgstr "Dodaj nov po¹tni predal tipa 'MH'"
+msgstr "Dodaj nov po¹tni predal oblike 'MH'"
 
 #: src/main-window.c:246
 msgid "Add a new IMAP mailbox"
-msgstr "Dodaj nov po¹tni predal tipa 'IMAP'"
+msgstr "Dodaj nov po¹tni predal oblike 'IMAP'"
 
 #: src/main-window.c:252
 msgid "Add a new IMAP folder"
@@ -2400,7 +2399,7 @@ msgstr "Oddaljeni sre¾niki po¹tnih predalov"
 
 #: src/pref-manager.c:1220 src/pref-manager.c:1959
 msgid "Type"
-msgstr "Tip"
+msgstr "Vrsta"
 
 #: src/pref-manager.c:1223
 msgid "Mailbox Name"
@@ -2603,6 +2602,7 @@ msgid "Message Colors"
 msgstr "Barve sporoèila"
 
 #: src/pref-manager.c:1674
+#, c-format
 msgid "Quote level %d color"
 msgstr "%d barva stopnje citata"
 
@@ -2718,7 +2718,7 @@ msgstr "Tiskaj na konzolo"
 msgid "Ask me"
 msgstr "Vpra¹aj me"
 
-#: src/print.c:40
+#: src/print.c:42
 msgid ""
 "This version of balsa is compiled without gnome-print support.\n"
 "Printing is not possible."
@@ -2726,7 +2726,23 @@ msgstr ""
 "Ta razlièica balse je prevedena brez podpore gnome-print-u.\n"
 "Tisk ni mo¾en."
 
-#: src/print.c:263
+#. print the page number
+#: src/print.c:256
+#, c-format
+msgid "Page: %i/%i"
+msgstr "Stran: %i/%i"
+
+#. gather some info about this part
+#. four fields, one terminator
+#: src/print.c:580
+msgid "Type:"
+msgstr "Vrsta:"
+
+#: src/print.c:583
+msgid "Filename:"
+msgstr "Ime datoteke:"
+
+#: src/print.c:904
 #, c-format
 msgid ""
 "Balsa could not find font %s\n"
@@ -2735,18 +2751,13 @@ msgstr ""
 "Balsa ni mogla najti pisave %s\n"
 "Tisk ni mo¾en"
 
-#: src/print.c:304
+#: src/print.c:945
 msgid "Print message"
 msgstr "Natisni sporoèilo"
 
-#: src/print.c:330
+#: src/print.c:971
 msgid "Balsa: message print preview"
 msgstr "Balsa: predogled tiskanja sporoèila"
-
-#: src/print.c:444
-#, c-format
-msgid "Page: %i/%i"
-msgstr "Stran: %i/%i"
 
 #: src/sendmsg-window.c:136
 msgid "Send"
@@ -3111,7 +3122,7 @@ msgstr "Nalagam..."
 msgid "Include file"
 msgstr "Vkljuèi datoteko"
 
-#: src/sendmsg-window.c:1890
+#: src/sendmsg-window.c:1899
 msgid ""
 "Balsa has been compiled without gnome-print support.\n"
 "Printing is not possible."
@@ -3341,7 +3352,7 @@ msgstr "Oprostite, dvopièja v imenu niso dovoljena!\n"
 #~ msgstr "Ne morem dostopati do po¹tnega predala '%s'"
 
 #~ msgid "New mailbox type:"
-#~ msgstr "Tip novega predala:"
+#~ msgstr "Vrsta novega predala:"
 
 #~ msgid "Use APOP"
 #~ msgstr "UporabI APOP"
@@ -3522,7 +3533,7 @@ msgstr "Oprostite, dvopièja v imenu niso dovoljena!\n"
 #~ msgstr "V redu"
 
 #~ msgid "Content Type: %s/%s"
-#~ msgstr "Tip Vsebine: %s/%s"
+#~ msgstr "Vrsta vsebine: %s/%s"
 
 #~ msgid "Mailbox: Opening %s Refcount: %d\n"
 #~ msgstr "Malbox: Odpiram %s ©tevec referenc: %d\n"

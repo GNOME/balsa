@@ -11,9 +11,9 @@
 AddressBook *
 addressbook_read_pine (gchar * file)
 {
-  int fd, ret, i, j=0;
+  int fd, ret, i, j = 0;
 
-  int ine = 0, tabnum = 0;
+  int ine = 0, ein = 0, tabnum = 0;
 
   char buff[4096];
   char tmp[4096];
@@ -32,42 +32,80 @@ addressbook_read_pine (gchar * file)
     {
       if (buff[i] == '\r' && buff[i + 1] == '\n')
 	{
-	  tabnum = ine = 0;
+	  tmp[j] = '\0';
+	  g_print ("%i: %s\n", tabnum, tmp);
+	  *tmp = '\0';
+	  j = 0;
 	  i++;
+	  if (buff[i + 1] == ' ' && buff[i + 2] == ' ' && buff[i + 3] == ' ')
+	    i += 3;
+	  else
+	    tabnum = 0;
 	}
       else if (buff[i] == '\n' && buff[i + 1] == '\r')
 	{
-	  tabnum = ine = 0;
+	  tmp[j] = '\0';
+	  g_print ("%i: \"%s\"\n", tabnum, tmp);
+	  *tmp = '\0';
+	  j = 0;
 	  i++;
+	  if (buff[i + 1] == ' ' && buff[i + 2] == ' ' && buff[i + 3] == ' ')
+	    i += 3;
+	  else
+	    tabnum = 0;
 	}
       else if (buff[i] == '\n')
 	{
-	  tabnum = ine = 0;
+	  tmp[j] = '\0';
+	  if (j < 1)
+	    {
+	      g_print ("%i: \"%s\"\n", tabnum, tmp);
+	      *tmp = '\0';
+	      j = 0;
+	      if (buff[i + 1] == ' ' && buff[i + 2] == ' ' && buff[i + 3] == ' ')
+		i += 3;
+	      else
+		tabnum = 0;
+	    }
 	}
       else if (buff[i] == '\r')
 	{
-	  tabnum = ine = 0;
-	}
-
-      else switch (buff[i])
-	{
-	case '\t':
-	  g_print("%i: %s\n",tabnum, tmp);
+	  tmp[j] = '\0';
+	  g_print ("%i: %s\n", tabnum, tmp);
 	  *tmp = '\0';
-	  j=0;
-	  tabnum++;
-	  break;
-	case '(':
-	  ine = 1;
-	  break;
-	case ')':
-	  ine = 0;
-	  break;
-	default:
-	  tmp[j] = buff[i];
-	  j++;
-	  break;
+	  j = 0;
+	  if (buff[i + 1] == ' ' && buff[i + 2] == ' ' && buff[i + 3] == ' ')
+	    i += 3;
+	  else
+	    tabnum = 0;
 	}
+      else
+	switch (buff[i])
+	  {
+	  case '\t':
+	    if (strlen (tmp) < 1)
+	      break;
+	    tmp[j] = '\0';
+	    g_print ("%i: \"%s\"\n", tabnum, tmp);
+	    *tmp = '\0';
+	    j = 0;
+	    tabnum++;
+	    break;
+	  case '(':
+	    ine = 1;
+	    break;
+	  case ')':
+	    ine = 0;
+	    break;
+	  case '\0':
+	    tmp[j] = '\0';
+	    g_print ("%i: \"%s\"\n", tabnum, tmp);
+	    break;
+	  default:
+	    tmp[j] = buff[i];
+	    j++;
+	    break;
+	  }
     }
 
   close (fd);

@@ -645,6 +645,8 @@ static gboolean libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox,
 		g_mime_object_unref(GMIME_OBJECT(msg_info->mime_message));
 	    msg_info->filename = NULL;
 	    msg_info->mime_message = NULL;
+	    libbalsa_mailbox_msgno_removed(msg_info->message->mailbox,
+					   msg_info->message->msgno);
 	    continue;
 	}
 

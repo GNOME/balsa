@@ -584,8 +584,10 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     {
 	msg_info = &g_array_index(mbox->messages_info,
 		       struct message_info, i);
-	if ((msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED) == 0)
-	{
+	if ((msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED))
+	    libbalsa_mailbox_msgno_removed(msg_info->message->mailbox,
+					   msg_info->message->msgno);
+	else {
 	    j++;
 
 	    /*

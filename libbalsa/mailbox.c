@@ -761,7 +761,9 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     g_assert(iter.user_data != NULL);
     iter.stamp = mailbox->stamp;
     path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
-    g_signal_emit_by_name(mailbox, "row-deleted", path, &iter);
+    g_signal_emit(mailbox, libbalsa_mailbox_signals[MESSAGES_REMOVED],
+		  (GQuark) 0, path, &iter);
+    mailbox->total_messages--;
     gtk_tree_path_free(path);
     g_node_destroy(dt.node);
 }
@@ -794,7 +796,9 @@ messages_status_changed_cb(LibBalsaMailbox * mb, GList * messages,
 
         if (new_state) {
             /* messages have been deleted */
-            mb->total_messages -= nb_in_list;
+            /* we'll decrement mb->total_messages in
+	     * libbalsa_mailbox_msgno_removed:
+	     * mb->total_messages -= nb_in_list; */
 
             if (new_in_list) {
                 mb->unread_messages -= new_in_list;
@@ -957,6 +961,7 @@ libbalsa_mailbox_change_message_flags(LibBalsaMailbox * mailbox,
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->change_message_flags(mailbox,
 							      msgno, set,
 							      clear);
+    libbalsa_mailbox_msgno_changed(mailbox, msgno);
 }
 
 /*

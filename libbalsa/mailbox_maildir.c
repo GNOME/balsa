@@ -587,6 +587,8 @@ maildir_sync(gchar *key, struct message_info *msg_info, const gchar *path)
 				      msg_info->filename);
 	unlink (orig);
 	g_free(orig);
+	libbalsa_mailbox_msgno_removed(msg_info->message->mailbox,
+				       msg_info->message->msgno);
 	return;
     }
 

@@ -1,5 +1,9 @@
-2003-11-04 08:21  PeterB
+2003-11-04 16:25  PeterB
 
+	* src/main-window.c: Check for unreffed mbnode.
+	* libbalsa/mailbox_mbox.c: Build removed_list carefully.
+	* libbalsa/mailbox.c: Grab gdk lock before emitting signal to a
+	GtkTreeView.
 	* libbalsa/mailbox_mbox.c: Give lbm_mbox_sync_real() a `closing'
 	argument instead of `reparse', for consistency; drop a local
 	variable; no need to check

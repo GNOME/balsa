@@ -1071,7 +1071,7 @@ create_text_area(BalsaSendmsg * msg)
     table = gtk_scrolled_window_new(GTK_TEXT(msg->text)->hadj,
 				    GTK_TEXT(msg->text)->vadj);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(table),
-    				   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+    				   GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
     gtk_container_add(GTK_CONTAINER(table), msg->text);
 
     gtk_widget_show_all(GTK_WIDGET(table));
@@ -1193,6 +1193,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     BalsaSendmsg *msg = NULL;
     GList *list;
     gint i;
+    gint width;
 
     msg = g_malloc(sizeof(BalsaSendmsg));
     msg->font     = NULL;
@@ -1439,11 +1440,26 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
      */
     init_menus(msg);
     gtk_notebook_set_page(GTK_NOTEBOOK(msg->notebook), mail_headers_page);
+
+    /*
+     * Set the size of the text widget according to the user
+     * preferences (font and line_wrap).
+     */
+    if (balsa_app.wraplength > 0)
+	/* Text of wrap + text of gtk_text next-line character */
+	width = balsa_app.wraplength + 1;
+    else
+	width = 82;
     gtk_window_set_default_size(GTK_WINDOW(window),
-				(82 * 7) +
-				(2 * msg->text->style->klass->xthickness),
-				35 * 12);
+	    			/* Width of the text. */
+				(width * (gdk_char_width(msg->font, 'M'))) +
+				/* Width of the borders inside/outside box */
+				(2 * msg->text->style->klass->xthickness) +
+				/* Size of the scrollbar */
+				(24),
+				35 * (gdk_char_height(msg->font, 'M')));
     gtk_window_set_wmclass(GTK_WINDOW(window), "compose", "Balsa");
+
     gtk_widget_show(window);
 
 

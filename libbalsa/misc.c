@@ -858,16 +858,28 @@ libbalsa_unwrap_buffer(GtkTextBuffer * buffer, GtkTextIter * iter,
 	if (num_paras < 0) {
 	    /* This is a wrap_body call, not a continuous wrap, so we'll
 	     * remove spaces before a hard newline. */
-	    *iter = start;
-	    while (gtk_text_iter_get_line_offset(&start) >
-		   (qd ? qd + 1 : 0)) {
-		gtk_text_iter_backward_char(&start);
-		if (gtk_text_iter_get_char(&start) != ' ') {
-		    gtk_text_iter_forward_char(&start);
-		    break;
+	    GtkTextIter tmp_iter;
+
+	    /* Make sure it's not a usenet sig separator: */
+	    tmp_iter = start;
+	    if (!(gtk_text_iter_backward_char(&tmp_iter)
+		  && gtk_text_iter_get_char(&tmp_iter) == ' '
+		  && gtk_text_iter_backward_char(&tmp_iter)
+		  && gtk_text_iter_get_char(&tmp_iter) == '-'
+		  && gtk_text_iter_backward_char(&tmp_iter)
+		  && gtk_text_iter_get_char(&tmp_iter) == '-'
+		  && gtk_text_iter_get_line_offset(&tmp_iter) == qd)) {
+		*iter = start;
+		while (gtk_text_iter_get_line_offset(&start) >
+		       (qd ? qd + 1 : 0)) {
+		    gtk_text_iter_backward_char(&start);
+		    if (gtk_text_iter_get_char(&start) != ' ') {
+			gtk_text_iter_forward_char(&start);
+			break;
+		    }
 		}
+		gtk_text_buffer_delete(buffer, &start, iter);
 	    }
-	    gtk_text_buffer_delete(buffer, &start, iter);
 	    if (!gtk_text_iter_forward_line(iter))
 		return;
 	}

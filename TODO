@@ -13,17 +13,17 @@ Stuart
  * #mh/ requires a .mh_profile in ~ which looks something
    like:  "Path: Mail", telling it to get mh folders from
    ~/Mail
- * clean up progress bar code
+ * if the MAIL env isn't set, the first time balsa is ran
+   with a clean ~/.gnome/balsa, the "Default" mailbox isn't
+   there, but every time after it is.. look into.
 
 sendmsg-window TODO:
  * free EVERYTHING in the sendmsg-window when it is closed.
  * look at smtp code crashing if gtk_text is empty
- * sendmsg-window crashes if it is used to send an email
-   and then gone back into.
-
 
 Jay
 ---------------------------------------------------------
  * clear xmhtml widget when changing mailboxes
+ * delete messages
  * more stuff goes here...
 

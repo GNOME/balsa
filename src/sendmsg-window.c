@@ -229,7 +229,7 @@ sendmsg_window_new (GtkWidget * widget, gpointer data)
 		      GTK_SIGNAL_FUNC (delete_event), NULL);
   gtk_signal_connect (GTK_OBJECT (msg->window), "delete_event",
 		      GTK_SIGNAL_FUNC (delete_event), NULL);
-
+  gtk_widget_set_usize (msg->window, 600, 340);
 
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox);

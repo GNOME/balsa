@@ -7,5 +7,7 @@ libbalsa_a_SOURCES = \
 	mailbox.c	\
 	send.c
 
+libbalsa_a_LIBADD = @LIBOBJS@
+
 INCLUDES=-I. -I${top_srcdir}/src -I${top_srcdir}/libmutt \
 	$(GNOME_INCLUDEDIR)

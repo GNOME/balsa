@@ -11,8 +11,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2002-12-17 01:53+0100\n"
-"PO-Revision-Date: 2002-12-17 01:53+0100\n"
+"POT-Creation-Date: 2002-12-21 17:41+0100\n"
+"PO-Revision-Date: 2002-12-21 17:42+0100\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -190,7 +190,7 @@ msgid "Domain:"
 msgstr "Domän:"
 
 #. bcc:
-#: libbalsa/identity.c:667 src/balsa-message.c:742 src/print.c:329
+#: libbalsa/identity.c:667 src/balsa-message.c:742 src/print.c:355
 #: src/sendmsg-window.c:1847 src/store-address.c:275
 msgid "Bcc:"
 msgstr "Osynlig kopia:"
@@ -1713,7 +1713,7 @@ msgstr "Vidarebefordra _inuti..."
 msgid "_Store Address..."
 msgstr "_Lagra adress..."
 
-#: src/balsa-index.c:2113 src/mailbox-node.c:773 src/main-window.c:526
+#: src/balsa-index.c:2113 src/mailbox-node.c:779 src/main-window.c:526
 #: src/pref-manager.c:1510 src/pref-manager.c:2599
 msgid "_Delete"
 msgstr "_Ta bort"
@@ -1784,15 +1784,15 @@ msgstr " Kunde inte spara %s: %s"
 msgid "Save MIME Part"
 msgstr "Spara MIME-delen"
 
-#: src/balsa-message.c:722 src/print.c:300
+#: src/balsa-message.c:722 src/print.c:326
 msgid "Subject:"
 msgstr "Ämne:"
 
-#: src/balsa-message.c:726 src/print.c:306
+#: src/balsa-message.c:726 src/print.c:332
 msgid "Date:"
 msgstr "Datum:"
 
-#: src/balsa-message.c:731 src/filter-edit-callbacks.c:995 src/print.c:317
+#: src/balsa-message.c:731 src/filter-edit-callbacks.c:995 src/print.c:343
 #: src/store-address.c:272
 msgid "From:"
 msgstr "Från:"
@@ -1801,22 +1801,22 @@ msgstr "Från:"
 msgid "Reply-To:"
 msgstr "Svara-till:"
 
-#: src/balsa-message.c:740 src/filter-edit-callbacks.c:988 src/print.c:327
+#: src/balsa-message.c:740 src/filter-edit-callbacks.c:988 src/print.c:353
 #: src/store-address.c:273
 msgid "To:"
 msgstr "Till:"
 
 #. cc:
-#: src/balsa-message.c:741 src/filter-edit-callbacks.c:1009 src/print.c:328
+#: src/balsa-message.c:741 src/filter-edit-callbacks.c:1009 src/print.c:354
 #: src/sendmsg-window.c:1842 src/store-address.c:274
 msgid "Cc:"
 msgstr "Kopia:"
 
-#: src/balsa-message.c:745 src/print.c:330
+#: src/balsa-message.c:745 src/print.c:356
 msgid "Fcc:"
 msgstr "Vidarebefordrad kopia:"
 
-#: src/balsa-message.c:750 src/print.c:336
+#: src/balsa-message.c:750 src/print.c:362
 msgid "Disposition-Notification-To:"
 msgstr "Dispositionsbekräftelse-till:"
 
@@ -1906,17 +1906,17 @@ msgstr "Spara del"
 msgid "View part with %s"
 msgstr "Visa del med %s"
 
-#: src/balsa-message.c:1497
+#: src/balsa-message.c:1505
 #, c-format
 msgid "Calling URL %s..."
 msgstr "Anropar URL:en %s..."
 
-#: src/balsa-message.c:1506 src/balsa-message.c:2016 src/balsa-message.c:2528
+#: src/balsa-message.c:1514 src/balsa-message.c:2024 src/balsa-message.c:2536
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "Fel vid visning av %s: %s\n"
 
-#: src/balsa-message.c:1537
+#: src/balsa-message.c:1545
 #, c-format
 msgid ""
 "Error writing to temporary file %s.\n"
@@ -1925,26 +1925,26 @@ msgstr ""
 "Fel vid skrivning till temporära filen %s.\n"
 "Kontrollera rättigheterna för katalogen."
 
-#: src/balsa-message.c:1545
+#: src/balsa-message.c:1553
 #, c-format
 msgid "Cannot open temporary file %s."
 msgstr "Kan inte öppna temporära filen %s."
 
-#: src/balsa-message.c:1819
+#: src/balsa-message.c:1827
 #, c-format
 msgid "Open with %s"
 msgstr "Öppna med %s"
 
-#: src/balsa-message.c:1957
+#: src/balsa-message.c:1965
 msgid "Save..."
 msgstr "Spara..."
 
-#: src/balsa-message.c:2097 src/balsa-message.c:2142
+#: src/balsa-message.c:2105 src/balsa-message.c:2150
 #, c-format
 msgid "could not create temporary file %s"
 msgstr "kunde inte skapa temporär fil %s"
 
-#: src/balsa-message.c:2813
+#: src/balsa-message.c:2821
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -1955,7 +1955,7 @@ msgstr ""
 "meddelandedispositionsbekräftelse (MDN) skickas tillbaka till \"%s\".\n"
 "Vill du skicka denna bekräftelse?"
 
-#: src/balsa-message.c:2820
+#: src/balsa-message.c:2828
 msgid "reply to MDN?"
 msgstr "svara till MDN?"
 
@@ -2266,12 +2266,12 @@ msgid "On exit"
 msgstr "Vid avslut"
 
 #. up button
-#: src/filter-run-dialog.c:349 src/toolbar-prefs.c:483
+#: src/filter-run-dialog.c:349 src/toolbar-prefs.c:490
 msgid "Up"
 msgstr "Upp"
 
 #. down button
-#: src/filter-run-dialog.c:354 src/toolbar-prefs.c:499
+#: src/filter-run-dialog.c:354 src/toolbar-prefs.c:506
 msgid "Down"
 msgstr "Ner"
 
@@ -2604,91 +2604,91 @@ msgstr "Använd SS_L (imaps)"
 msgid "The folder edition to be written."
 msgstr "Mappversionen att skriva."
 
-#: src/mailbox-node.c:367
+#: src/mailbox-node.c:373
 #, c-format
 msgid "Scanning %s. Please wait..."
 msgstr "Genomsöker %s. Var vänlig vänta..."
 
-#: src/mailbox-node.c:730
+#: src/mailbox-node.c:736
 msgid "Local _mbox mailbox..."
 msgstr "Lokal _mbox-brevlåda..."
 
-#: src/mailbox-node.c:732
+#: src/mailbox-node.c:738
 msgid "Local Mail_dir mailbox..."
 msgstr "Lokal Mail_dir-brevlåda..."
 
-#: src/mailbox-node.c:734
+#: src/mailbox-node.c:740
 msgid "Local M_H mailbox..."
 msgstr "Lokal M_H-brevlåda..."
 
-#: src/mailbox-node.c:736
+#: src/mailbox-node.c:742
 msgid "Remote _IMAP mailbox..."
 msgstr "_IMAP-fjärrbrevlåda..."
 
-#: src/mailbox-node.c:739
+#: src/mailbox-node.c:745
 msgid "Remote IMAP _folder..."
 msgstr "IMAP-fjärr_mapp..."
 
-#: src/mailbox-node.c:741
+#: src/mailbox-node.c:747
 msgid "Remote IMAP _subfolder..."
 msgstr "IMAP-fjärr_undermapp..."
 
-#: src/mailbox-node.c:745 src/main-window.c:282
+#: src/mailbox-node.c:751 src/main-window.c:282
 msgid "_New"
 msgstr "_Nytt"
 
 #. clicked on the empty space
-#: src/mailbox-node.c:752 src/mailbox-node.c:784 src/mailbox-node.c:805
+#: src/mailbox-node.c:758 src/mailbox-node.c:790 src/mailbox-node.c:811
 msgid "_Rescan"
 msgstr "_Läs om"
 
-#: src/mailbox-node.c:761
+#: src/mailbox-node.c:767
 msgid "_Open"
 msgstr "_Öppna"
 
-#: src/mailbox-node.c:764 src/main-window.c:610
+#: src/mailbox-node.c:770 src/main-window.c:610
 msgid "_Close"
 msgstr "_Stäng"
 
-#: src/mailbox-node.c:770
+#: src/mailbox-node.c:776
 msgid "_Properties..."
 msgstr "_Egenskaper..."
 
-#: src/mailbox-node.c:780
+#: src/mailbox-node.c:786
 msgid "_Subscribe"
 msgstr "_Prenumerera"
 
-#: src/mailbox-node.c:782
+#: src/mailbox-node.c:788
 msgid "_Unsubscribe"
 msgstr "_Säg upp prenumeration"
 
-#: src/mailbox-node.c:790
+#: src/mailbox-node.c:796
 msgid "Mark as _Inbox"
 msgstr "Markera som _inkorg"
 
-#: src/mailbox-node.c:793
+#: src/mailbox-node.c:799
 msgid "_Mark as Sentbox"
 msgstr "_Markera som skickatkorg"
 
-#: src/mailbox-node.c:796
+#: src/mailbox-node.c:802
 msgid "Mark as _Trash"
 msgstr "Markera som _papperskorg"
 
-#: src/mailbox-node.c:799
+#: src/mailbox-node.c:805
 msgid "Mark as D_raftbox"
 msgstr "Markera som u_tkastkorg"
 
 #. FIXME : No test on mailbox type is made yet, should we ?
-#: src/mailbox-node.c:802
+#: src/mailbox-node.c:808
 msgid "_Edit/Apply filters"
 msgstr "_Redigera/Tillämpa filter"
 
-#: src/mailbox-node.c:891
+#: src/mailbox-node.c:897
 #, c-format
 msgid "Local mailbox %s loaded as: %s\n"
 msgstr "Lokala brevlådan %s inläst som: %s\n"
 
-#: src/mailbox-node.c:923
+#: src/mailbox-node.c:929
 #, c-format
 msgid "Local folder %s\n"
 msgstr "Lokal mapp %s\n"
@@ -3586,7 +3586,7 @@ msgid "Colors"
 msgstr "Färger"
 
 #. create a 2nd notebook page for the fonts
-#: src/pref-manager.c:1917 src/print.c:1185
+#: src/pref-manager.c:1917 src/print.c:1211
 msgid "Fonts"
 msgstr "Typsnitt"
 
@@ -3870,43 +3870,43 @@ msgstr "Krävs"
 msgid "Error displaying link_id %s: %s\n"
 msgstr "Fel vid visning av link_id %s: %s\n"
 
-#: src/print.c:219
+#: src/print.c:245
 #, c-format
 msgid "Page: %i/%i"
 msgstr "Sida: %i/%i"
 
 #. gather some info about this part
 #. four fields, one terminator
-#: src/print.c:727
+#: src/print.c:753
 msgid "Type:"
 msgstr "Typ:"
 
-#: src/print.c:730
+#: src/print.c:756
 msgid "Filename:"
 msgstr "Filnamn:"
 
-#: src/print.c:1176
+#: src/print.c:1202
 msgid "Print message"
 msgstr "Skriv ut meddelande"
 
-#: src/print.c:1188
+#: src/print.c:1214
 msgid "Header font"
 msgstr "Huvudtypsnitt"
 
-#: src/print.c:1190
+#: src/print.c:1216
 msgid "Body font"
 msgstr "Meddelandetexttypsnitt"
 
-#: src/print.c:1192
+#: src/print.c:1218
 msgid "Footer font"
 msgstr "Sidfotstypsnitt"
 
 #. highlight cited stuff
-#: src/print.c:1196
+#: src/print.c:1222
 msgid "Highlight cited text"
 msgstr "Färgmarkera citerad text"
 
-#: src/print.c:1242
+#: src/print.c:1268
 #, c-format
 msgid ""
 "Balsa could not find font \"%s\".\n"
@@ -3916,7 +3916,7 @@ msgstr ""
 "Använd sidan \"Typsnitt\" på dialogen \"Skriv ut meddelande\" för att ändra "
 "det."
 
-#: src/print.c:1341
+#: src/print.c:1367
 msgid "Balsa: message print preview"
 msgstr "Balsa: förhandsgranska meddelandeutskrift"
 
@@ -4753,20 +4753,25 @@ msgstr "Verktygsradsalternativ"
 msgid "_Wrap button labels"
 msgstr "_Radbryt knapprubriker"
 
+#: src/toolbar-prefs.c:376
+#, c-format
+msgid "Error displaying toolbar help: %s\n"
+msgstr "Fel vid visning av verktygsradshjälp: %s\n"
+
 #. Preview display
-#: src/toolbar-prefs.c:403
+#: src/toolbar-prefs.c:410
 msgid "Preview"
 msgstr "Förhandsgranska"
 
-#: src/toolbar-prefs.c:431
+#: src/toolbar-prefs.c:438
 msgid "_Restore toolbar to standard buttons"
 msgstr "_Återställ verktygsrad till standardknappar"
 
-#: src/toolbar-prefs.c:450
+#: src/toolbar-prefs.c:457
 msgid "Available buttons"
 msgstr "Tillgängliga knappar"
 
-#: src/toolbar-prefs.c:466
+#: src/toolbar-prefs.c:473
 msgid "Current toolbar"
 msgstr "Anpassa verktygsrad"
 

@@ -1,5 +1,7 @@
-2004-08-16 09:30  PeterB
+2004-08-16 13:20  PeterB
 
+	* libbalsa/mailbox_maildir.c: plug file descriptor leak; test for
+	NULL return from libbalsa_mailbox_get_message_stream.
 	* libbalsa/mailbox_mbox.c:
 	* src/sendmsg-window.c: plug leaks.
 

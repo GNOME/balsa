@@ -750,7 +750,6 @@ libbalsa_filter_new(void)
     newfil->popup_text = NULL;
     newfil->action    = FILTER_NOTHING;
     newfil->action_string = NULL;
-    newfil->matching_messages=NULL;
 
     filter_errno=FILTER_NOERR;
     return (newfil);

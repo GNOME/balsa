@@ -197,12 +197,6 @@ typedef struct _LibBalsaFilter {
      * - FIXME if action is FILTER_PRINT it could be the print command ?
      */
     gchar * action_string;
-
-    /* The following fields are used when the filter runs */
-
-    /* List of matching messages */
-    GList * matching_messages;
-
 } LibBalsaFilter;
 
 /*

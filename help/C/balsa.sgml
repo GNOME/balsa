@@ -2025,15 +2025,27 @@
 	      mail folders.</para></listitem></varlistentry>
 
 	<varlistentry><term><guilabel>Remote SMTP
-	      Server</guilabel></term><listitem><para>If your computer is not
-	      equipped with sendmail or you do not wish to use it, select
-	      this radio button and enter a host name to contact via
-	      SMTP.  </para></listitem></varlistentry>
+	      Server</guilabel></term><listitem><para>Specify the domain
+	      name and optionally the port for of the SMTP server you
+	      use for submitting mail.  Please note that the default
+	      port number is 587.  The syntax is hostname[:port].  Port
+	      can be a decimal number or the name of the service as
+	      specified in /etc/services.  Typically you can just set
+	      this to localhost:25.</para></listitem></varlistentry>
 
-	<varlistentry><term><guilabel>Local Mail User
-	      Agent</guilabel></term><listitem><para><application>Balsa</application>
-	      will attempt to use sendmail to send mail. Unfortunately, you
-	      cannot specify the command to execute right now.</para></listitem></varlistentry>
+	<varlistentry><term><guilabel>User</guilabel></term>
+	      <listitem><para>If the remote SMTP server requires
+	      authentication, enter your user name here.  Note that the
+	      exact format depends on the MTA in use.  For example, some
+	      systems expect a user name, others may require an email
+	      address.</para></listitem></varlistentry>
+
+	<varlistentry><term><guilabel>Pass Phrase</guilabel></term>
+	      <listitem><para>If the remote SMTP server requires
+	      authentication, enter your pass phrase here.  Some systems
+	      refer to the pass phrase as a password.  Limitations on
+	      the length of the pass phrase depend on the SMTP server.
+	      </para></listitem></varlistentry>
       </variablelist>
     </sect2>
 

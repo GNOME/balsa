@@ -1,5 +1,8 @@
 2000-04-19  Peter Williams  <peter@beta.newton.cx>
 
+	* libmutt/mx.c, libbalsa/send.c: Remove
+	  some leftover stderr output.
+	
 	* TODO, README, INSTALL: Documentation updates.
 	
 	* configure.in: Made this look all pretty, and

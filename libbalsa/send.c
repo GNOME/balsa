@@ -146,7 +146,8 @@ balsa_send_message (Message * message)
 #endif  
 //  GtkWidget *send_dialog_message = NULL;
 
-  fprintf(stderr,"Comienzo la funcion\n");
+  /*fprintf(stderr,"Comienzo la funcion\n");
+   */
 
   if (message != NULL )
   {

@@ -709,19 +709,22 @@ static int sync_mailbox (CONTEXT *ctx)
 #endif
   int rc = -1;
 
-  fprintf( stderr, "sync_mailbox\n" );
+/* fprintf( stderr, "sync_mailbox\n" );
+ */
 
   if (!ctx->quiet)
     mutt_message ("Writing %s...", ctx->path);
 
-  fprintf( stderr, "Writing %s...\n", ctx->path );
+/*  fprintf( stderr, "Writing %s...\n", ctx->path );
+ */
 
   switch (ctx->magic)
   {
     case M_MBOX:
     case M_MMDF:
       rc = mbox_sync_mailbox (ctx);
-      fprintf( stderr, "Result: %d \n", rc );
+      /*  fprintf( stderr, "Result: %d \n", rc );
+       */
 #ifdef BUFFY_SIZE
       tmp = mutt_find_mailbox (ctx->path);
 #endif

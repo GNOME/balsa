@@ -2,7 +2,6 @@
 # Copyright (C) 1998 Free Software Foundation, Inc.
 # Alastair McKinstry <mckinstry@computer.org>, 1998.
 #
-# , fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.4.9\n"
@@ -22,7 +21,6 @@ msgstr "Ó"
 msgid "Subject"
 msgstr "Ábair"
 
-# , fuzzy
 #: src/balsa-index.c:249
 msgid "Date"
 msgstr "Dáta"
@@ -49,17 +47,14 @@ msgstr ""
 msgid "Ok"
 msgstr "Ceart go leor"
 
-# , fuzzy
 #. this is the first row, so we'll use 0.0 here
 #: src/balsa-message.c:521
-#, fuzzy
 msgid "Date:"
 msgstr "Dáta"
 
 #. From:
 #: src/balsa-message.c:530 src/filter-edit-dialog.c:339
 #: src/sendmsg-window.c:364
-#, fuzzy
 msgid "From:"
 msgstr "Ó"
 
@@ -79,7 +74,6 @@ msgstr ""
 
 #. Subject:
 #: src/balsa-message.c:568 src/sendmsg-window.c:384
-#, fuzzy
 msgid "Subject:"
 msgstr "Ábair"
 
@@ -119,7 +113,6 @@ msgid "Down"
 msgstr "Síos"
 
 #: src/filter-edit-dialog.c:224
-#, fuzzy
 msgid "New"
 msgstr "_Nua"
 
@@ -136,9 +129,8 @@ msgid "All"
 msgstr "Gach rud"
 
 #: src/filter-edit-dialog.c:303
-#, fuzzy
 msgid "Header"
-msgstr "Léigh"
+msgstr ""
 
 #: src/filter-edit-dialog.c:315
 msgid "Body"
@@ -163,9 +155,8 @@ msgstr "Ordú"
 
 #. The name entry
 #: src/filter-edit-dialog.c:492
-#, fuzzy
 msgid "Filter name:"
-msgstr "Do Ainm:"
+msgstr ""
 
 #. The "Process when:" option menu
 #: src/filter-edit-dialog.c:511
@@ -226,16 +217,13 @@ msgstr ""
 msgid "Match"
 msgstr ""
 
-# , fuzzy
 #: src/filter-edit-dialog.c:743
-#, fuzzy
 msgid "Action"
-msgstr "Faoi"
+msgstr ""
 
 #: src/filter-edit-dialog.c:757
-#, fuzzy
 msgid "Revert"
-msgstr "Bain As"
+msgstr ""
 
 #: src/filter-edit-dialog.c:785
 msgid "Balsa Filters"
@@ -341,31 +329,26 @@ msgstr "Freastalaí IMAP"
 
 #. mailbox name
 #: src/mailbox-conf.c:836 src/mailbox-conf.c:871
-#, fuzzy
 msgid "Mailbox Name:"
 msgstr "Pasfhocal Boscaphoist"
 
 #. path to file
 #: src/mailbox-conf.c:846
-#, fuzzy
 msgid "Mailbox path:"
 msgstr "Pasfhocal Boscaphoist"
 
 #. pop server
 #: src/mailbox-conf.c:888 src/mailbox-conf.c:969
-#, fuzzy
 msgid "Server:"
-msgstr "Freastalaí SMTP:"
+msgstr "Freastalaí:"
 
 #. username
 #: src/mailbox-conf.c:907 src/mailbox-conf.c:998
-#, fuzzy
 msgid "Username:"
 msgstr "Do Ainm:"
 
 #. password field
 #: src/mailbox-conf.c:924 src/mailbox-conf.c:1013
-#, fuzzy
 msgid "Password:"
 msgstr "Pasfhocal Boscaphoist"
 
@@ -381,18 +364,16 @@ msgstr "Bain as freastalaí"
 
 #. imap server port number
 #: src/mailbox-conf.c:983
-#, fuzzy
 msgid "Port:"
-msgstr "Príontáil"
+msgstr ""
 
 #: src/mailbox-conf.c:1026
 msgid "Folder path:"
-msgstr ""
+msgstr "Slí fhillteán:"
 
 #: src/mailbox-conf.c:1104
-#, fuzzy
 msgid "Mailbox"
-msgstr "postbhosca Áitiúil"
+msgstr "postbhosca"
 
 #: src/main-window.c:144
 msgid "_Get new mail"
@@ -403,12 +384,10 @@ msgid "Fetch new incoming mail"
 msgstr ""
 
 #: src/main-window.c:152
-#, fuzzy
 msgid "Pr_int"
-msgstr "Príontáil"
+msgstr "_Príontáil"
 
 #: src/main-window.c:152
-#, fuzzy
 msgid "Print current mail"
 msgstr "Príontáil an scéala seo"
 
@@ -449,9 +428,8 @@ msgid "_Continue"
 msgstr ""
 
 #: src/main-window.c:204
-#, fuzzy
 msgid "Continue editing current message"
-msgstr "Príontáil an scéala seo"
+msgstr ""
 
 #: src/main-window.c:211 src/main-window.c:254
 msgid "_Delete"
@@ -542,9 +520,8 @@ msgid "Delete Messages from the trash mailbox"
 msgstr ""
 
 #: src/main-window.c:265
-#, fuzzy
 msgid "O_pened"
-msgstr "_Oscail"
+msgstr ""
 
 #: src/main-window.c:271
 msgid "_Filters..."
@@ -599,17 +576,14 @@ msgid "Previous"
 msgstr "Riomh"
 
 #: src/main-window.c:323
-#, fuzzy
 msgid "Open Previous message"
 msgstr "Oscáil an riomh scéala"
 
-# , fuzzy
 #: src/main-window.c:328
 msgid "Next"
 msgstr "Eile"
 
 #: src/main-window.c:328
-#, fuzzy
 msgid "Open Next message"
 msgstr "Oscáil an cheád scéala eile"
 
@@ -649,9 +623,7 @@ msgstr ""
 msgid "Forward this message"
 msgstr ""
 
-# , fuzzy
 #: src/pref-manager.c:91
-#, fuzzy
 msgid "Text"
 msgstr "Teacs"
 
@@ -676,9 +648,8 @@ msgid "quoted"
 msgstr ""
 
 #: src/pref-manager.c:119
-#, fuzzy
 msgid "While Retrieving Messages"
-msgstr "Dealaigh an Scéala"
+msgstr ""
 
 #: src/pref-manager.c:120
 msgid "Until Closed"
@@ -690,7 +661,7 @@ msgstr ""
 
 #: src/pref-manager.c:174
 msgid "Balsa Preferences"
-msgstr ""
+msgstr "Roghnachais Balse"
 
 #. identity page
 #: src/pref-manager.c:194 src/pref-manager.c:604
@@ -719,9 +690,8 @@ msgstr ""
 
 #. Printing page
 #: src/pref-manager.c:228 src/pref-manager.c:1039
-#, fuzzy
 msgid "Printing"
-msgstr "Príontáil"
+msgstr "Ag Príontáil"
 
 #. your name
 #: src/pref-manager.c:612
@@ -740,14 +710,12 @@ msgstr ""
 
 #. Signature stuff
 #: src/pref-manager.c:643
-#, fuzzy
 msgid "Signature"
 msgstr "Síniú"
 
 #: src/pref-manager.c:651
-#, fuzzy
 msgid "Signature file:"
-msgstr "Síniú"
+msgstr "Comhad Síniú:"
 
 #: src/pref-manager.c:662
 msgid "Include signature when sending mail"
@@ -767,11 +735,11 @@ msgstr ""
 
 #: src/pref-manager.c:710
 msgid "Type"
-msgstr "Cineál"
+msgstr "Saghas"
 
 #: src/pref-manager.c:711
 msgid "Mailbox name"
-msgstr ""
+msgstr "Ainm boscaphoist"
 
 #: src/pref-manager.c:736
 msgid "Modify"
@@ -779,7 +747,7 @@ msgstr ""
 
 #: src/pref-manager.c:746
 msgid "Local Mail"
-msgstr ""
+msgstr "Phoist Áitiúl"
 
 #: src/pref-manager.c:752
 msgid "Local mail directory:"
@@ -798,7 +766,6 @@ msgstr ""
 msgid "Local mail user agent"
 msgstr ""
 
-# , fuzzy
 #. Toolbars
 #: src/pref-manager.c:823
 msgid "Toolbars"
@@ -807,7 +774,7 @@ msgstr "Uirlischláir"
 #. Main window
 #: src/pref-manager.c:840
 msgid "Main window"
-msgstr ""
+msgstr "Príomh fhuinneog"
 
 #: src/pref-manager.c:843
 msgid "Use preview pane"
@@ -871,9 +838,8 @@ msgid "Add attachments to this message"
 msgstr ""
 
 #: src/sendmsg-window.c:78
-#, fuzzy
 msgid "Postpone"
-msgstr "Greamaigh"
+msgstr ""
 
 #: src/sendmsg-window.c:78
 msgid "Continue this message later"
@@ -953,9 +919,8 @@ msgid "Forward message"
 msgstr ""
 
 #: src/sendmsg-window.c:577
-#, fuzzy
 msgid "Continue message"
-msgstr "Scéala nua"
+msgstr ""
 
 #: src/sendmsg-window.c:582
 msgid "New message"
@@ -1014,18 +979,16 @@ msgid ""
 msgstr ""
 
 #: balsa-druid-page-directory.gob:157
-#, fuzzy
 msgid "Inbox:"
-msgstr "Inbhosca"
+msgstr "Inbhosca:"
 
 #. This used to set all the mail directories to their proper values
 #. * as in the prepare code. But at this point balsa_app.local_mail_directory
 #. * is NULL, so we use a dummy value.
 #.
 #: balsa-druid-page-directory.gob:166
-#, fuzzy
 msgid "Outbox:"
-msgstr  "Asbhosca"
+msgstr  "Asbhosca:"
 
 #: balsa-druid-page-directory.gob:169
 msgid "Sentbox:"
@@ -1036,22 +999,18 @@ msgid "Draftbox:"
 msgstr ""
 
 #: balsa-druid-page-directory.gob:175
-#, fuzzy
 msgid "Trash:"
-msgstr "Bruscar"
+msgstr "Bruscar:"
 
 #: balsa-druid-page-directory.gob:186
-#, fuzzy
 msgid "Mail Files"
-msgstr "Comhaid Phoist"
+msgstr "Comhaid Phoist:"
 
 #: balsa-druid-page-directory.gob:243
-#, fuzzy
 msgid "Inbox"
 msgstr "Inbhosca"
 
 #: balsa-druid-page-directory.gob:245
-#, fuzzy
 msgid "Outbox"
 msgstr "Asbhosca"
 
@@ -1064,7 +1023,6 @@ msgid "Draftbox"
 msgstr ""
 
 #: balsa-druid-page-directory.gob:251
-#, fuzzy
 msgid "Trash"
 msgstr "Bruscar"
 
@@ -1086,24 +1044,19 @@ msgstr ""
 msgid "Please enter information about yourself."
 msgstr ""
 
-# , fuzzy
 #: balsa-druid-page-user.gob:82
-#, fuzzy
 msgid "Name:"
 msgstr "Ainm"
 
 #: balsa-druid-page-user.gob:86
-#, fuzzy
 msgid "Email address:"
 msgstr "Seoladh E-Post:"
 
 #: balsa-druid-page-user.gob:90
-#, fuzzy
 msgid "SMTP Server:"
 msgstr "Freastalaí SMTP:"
 
 #: balsa-druid-page-user.gob:93
-#, fuzzy
 msgid "Local Mail Directory:"
 msgstr "Áit fillteán Phoist:"
 
@@ -1112,16 +1065,12 @@ msgid "User Settings"
 msgstr "Roghnaí Úsáideoir"
 
 #: balsa-druid-page-user.gob:151
-#, fuzzy
 msgid "Local Mail Problem"
 msgstr "postbhosca Áitiúil"
 
 #: balsa-druid-page-welcome.gob:47
-#, fuzzy
 msgid "Welcome to Balsa!"
-msgstr ""
-"Fáilte go Balsa!\n"
-"\n"
+msgstr "Fáilte go Balsa!\n"
 
 #: balsa-druid-page-welcome.gob:50
 msgid ""
@@ -1159,9 +1108,8 @@ msgstr ""
 msgid "Configure Balsa"
 msgstr "Cumraigh Balsa"
 
-#, fuzzy
 msgid "E_xit"
-msgstr "_Eagar"
+msgstr "_Ealu"
 
 msgid "File"
 msgstr "Comhad"
@@ -1176,33 +1124,10 @@ msgid "Cut"
 msgstr "Gearr"
 
 msgid "Copy"
-msgstr "Csip"
+msgstr "Cóip"
 
-#, fuzzy
 msgid "Edit..."
-msgstr "_Eagar"
+msgstr "Eagar..."
 
-#, fuzzy
 msgid "New..."
-msgstr "_Nua"
-
-#~ msgid "Welcome To Balsa!"
-#~ msgstr "Fáilte go Balsa!"
-
-#~ msgid "Finish"
-#~ msgstr "Críoch"
-
-#~ msgid "Transfer"
-#~ msgstr "Astrigh"
-
-#~ msgid "Change Status"
-#~ msgstr "Cuir Stádais"
-
-#~ msgid "Unread"
-#~ msgstr "Míléigh"
-
-#~ msgid "Replied"
-#~ msgstr "Freagraigh"
-
-#~ msgid "Mailboxes/<Separator>"
-#~ msgstr "Boscaiphoist/<Separator>"
+msgstr "Nua..."

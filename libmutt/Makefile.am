@@ -84,8 +84,7 @@ libmutt_a_SOURCES = \
 	rfc822.h	\
 	sort.h		\
 	url.h		\
-	$(SSLSOURCES)
-	$(SASLSOURCES)
+	$(SSLSOURCES)	$(SASLSOURCES)
 
 SUBDIRS = imap
 

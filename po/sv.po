@@ -8,8 +8,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.9.4\n"
-"POT-Creation-Date: 2000-09-29 23:04+0200\n"
-"PO-Revision-Date: 2000-09-29 23:09+0200\n"
+"POT-Creation-Date: 2000-10-02 22:18+0200\n"
+"PO-Revision-Date: 2000-10-02 22:26+0200\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -617,46 +617,46 @@ msgstr "Adressbokskonfiguration"
 msgid "Update"
 msgstr "Uppdatera"
 
-#: src/address-book-config.c:233
+#: src/address-book-config.c:234
 msgid "New Address Book type:"
 msgstr "Typ av ny adressbok:"
 
 #. radio buttons ...
 #. ... vCard Address Book
-#: src/address-book-config.c:240
+#: src/address-book-config.c:241
 msgid "VCard Address Book (GnomeCard)"
 msgstr "VCard-adressbok (GnomeCard)"
 
-#: src/address-book-config.c:256
+#: src/address-book-config.c:257
 msgid "LDAP Address Book"
 msgstr "LDAP-adressbok"
 
-#: src/address-book-config.c:263
+#: src/address-book-config.c:264
 msgid "Balsa is not compiled with LDAP support"
 msgstr "Balsa är inte kompilerat med LDAP-stöd"
 
 #. mailbox name
-#: src/address-book-config.c:283 src/address-book-config.c:338
+#: src/address-book-config.c:284 src/address-book-config.c:339
 msgid "Address Book Name:"
 msgstr "Adressboksnamn:"
 
-#: src/address-book-config.c:294
+#: src/address-book-config.c:295
 msgid "Path"
 msgstr "Sökväg"
 
-#: src/address-book-config.c:305 src/address-book-config.c:377
+#: src/address-book-config.c:306 src/address-book-config.c:378
 msgid "Expand aliases as you type"
 msgstr "Expandera alias när du skriver"
 
-#: src/address-book-config.c:351
+#: src/address-book-config.c:352
 msgid "Host name"
 msgstr "Värdnamn"
 
-#: src/address-book-config.c:364
+#: src/address-book-config.c:365
 msgid "Base Domain Name"
 msgstr "Basdomännamn"
 
-#: src/address-book-config.c:427 src/filter-edit-dialog.c:414
+#: src/address-book-config.c:428 src/filter-edit-dialog.c:414
 #: src/mailbox-conf.c:292 src/mailbox-conf.c:931 src/pref-manager.c:1099
 #: src/pref-manager.c:2015
 msgid "Add"
@@ -684,41 +684,41 @@ msgstr ""
 "Kunde inte öppna brevlådan!\n"
 "Var vänlig och kontrollera inställningarna för brevlådan."
 
-#: src/balsa-index-page.c:480
+#: src/balsa-index-page.c:481
 msgid "Reply..."
 msgstr "Svara..."
 
-#: src/balsa-index-page.c:483
-msgid "Reply to all..."
+#: src/balsa-index-page.c:484
+msgid "Reply To All..."
 msgstr "Svara till alla..."
 
-#: src/balsa-index-page.c:486
+#: src/balsa-index-page.c:487
 msgid "Forward..."
 msgstr "Vidarebefordra..."
 
-#: src/balsa-index-page.c:490
+#: src/balsa-index-page.c:491
 msgid "Undelete"
 msgstr "Återskapa"
 
-#: src/balsa-index-page.c:492 src/filter-edit-dialog.c:228
+#: src/balsa-index-page.c:493 src/filter-edit-dialog.c:228
 #: src/main-window.c:435 src/mblist-window.c:452 src/pref-manager.c:1112
 #: src/pref-manager.c:2027
 msgid "Delete"
 msgstr "Ta bort"
 
-#: src/balsa-index-page.c:495
-msgid "Move to Trash"
+#: src/balsa-index-page.c:496
+msgid "Move To Trash"
 msgstr "Flytta till papperskorgen"
 
-#: src/balsa-index-page.c:500
+#: src/balsa-index-page.c:501
 msgid "Store Address..."
 msgstr "Lagra adress..."
 
-#: src/balsa-index-page.c:503 src/main-window.c:352
-msgid "Toggle flagged"
+#: src/balsa-index-page.c:504
+msgid "Toggle Flagged"
 msgstr "Flagga av/på"
 
-#: src/balsa-index-page.c:512
+#: src/balsa-index-page.c:513
 msgid "Transfer"
 msgstr "Överför"
 
@@ -750,7 +750,7 @@ msgstr "Olästa"
 msgid "Total"
 msgstr "Totalt"
 
-#: src/balsa-mblist.c:755
+#: src/balsa-mblist.c:756
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr "Visad brevlåda: %s med %ld meddelanden, %ld nya"
@@ -763,8 +763,8 @@ msgstr "Spara MIME-delen"
 msgid "Save"
 msgstr "Spara"
 
-#: src/balsa-message.c:264 src/sendmsg-window.c:149 src/sendmsg-window.c:596
-#: src/sendmsg-window.c:1665 src/sendmsg-window.c:1688
+#: src/balsa-message.c:264 src/sendmsg-window.c:154 src/sendmsg-window.c:605
+#: src/sendmsg-window.c:1674 src/sendmsg-window.c:1697
 msgid "Cancel"
 msgstr "Avbryt"
 
@@ -784,13 +784,13 @@ msgstr "Datum:"
 
 #. From:
 #: src/balsa-message.c:569 src/filter-edit-dialog.c:337 src/print.c:336
-#: src/sendmsg-window.c:832
+#: src/sendmsg-window.c:841
 msgid "From:"
 msgstr "Från:"
 
 #. To:
 #: src/balsa-message.c:573 src/filter-edit-dialog.c:325 src/print.c:341
-#: src/sendmsg-window.c:834
+#: src/sendmsg-window.c:843
 msgid "To:"
 msgstr "Till:"
 
@@ -807,7 +807,7 @@ msgid "Fcc:"
 msgstr "Vidarebefordrad kopia:"
 
 #. Subject:
-#: src/balsa-message.c:580 src/print.c:345 src/sendmsg-window.c:839
+#: src/balsa-message.c:580 src/print.c:345 src/sendmsg-window.c:848
 msgid "Subject:"
 msgstr "Ämne:"
 
@@ -947,7 +947,7 @@ msgstr "Meddelandetext"
 msgid "Match string:"
 msgstr "Matcha sträng:"
 
-#: src/filter-edit-dialog.c:425 src/sendmsg-window.c:516
+#: src/filter-edit-dialog.c:425 src/sendmsg-window.c:525
 msgid "Remove"
 msgstr "Ta bort"
 
@@ -1212,15 +1212,15 @@ msgid "Continue editing current message"
 msgstr "Fortsätt redigera aktuellt meddelande"
 
 #: src/main-window.c:204
-msgid "_Get new mail"
-msgstr "_Hämta ny e-post"
+msgid "_Get New Mail"
+msgstr "_Hämta nya brev"
 
 #: src/main-window.c:204
 msgid "Fetch new incoming mail"
 msgstr "Hämta nya inkommande brev"
 
 #: src/main-window.c:211
-msgid "_Send queued mail"
+msgid "_Send Queued Mail"
 msgstr "_Skicka köade brev"
 
 #: src/main-window.c:211
@@ -1243,8 +1243,8 @@ msgstr "_Filter..."
 msgid "Manage filters"
 msgstr "Hantera filter"
 
-#: src/main-window.c:267 src/message-window.c:61
-msgid "N_o headers"
+#: src/main-window.c:267
+msgid "N_o Headers"
 msgstr "_Inga huvuden"
 
 #: src/main-window.c:267
@@ -1252,15 +1252,15 @@ msgid "Display no headers"
 msgstr "Visa inga huvuden"
 
 #: src/main-window.c:269
-msgid "S_elected headers"
+msgid "S_elected Headers"
 msgstr "Valda huvud_en"
 
 #: src/main-window.c:269
 msgid "Display selected headers"
 msgstr "Visa valda huvuden"
 
-#: src/main-window.c:271 src/message-window.c:65
-msgid "All _headers"
+#: src/main-window.c:271
+msgid "All _Headers"
 msgstr "Alla _huvuden"
 
 #: src/main-window.c:271
@@ -1268,11 +1268,11 @@ msgid "Display all headers"
 msgstr "Visa alla huvuden"
 
 #: src/main-window.c:279
-msgid "_Show mailbox tree"
+msgid "_Show Mailbox Tree"
 msgstr "_Visa brevlådeträd"
 
 #: src/main-window.c:281
-msgid "Show mailbox _tabs"
+msgid "Show Mailbox _Tabs"
 msgstr "Visa brevlåde_flikar"
 
 #: src/main-window.c:284 src/message-window.c:97
@@ -1287,8 +1287,8 @@ msgstr "_Svara..."
 msgid "Reply to the current message"
 msgstr "Svara på aktuellt meddelande"
 
-#: src/main-window.c:302 src/message-window.c:113
-msgid "Reply to _all..."
+#: src/main-window.c:302
+msgid "Reply To _All..."
 msgstr "Svara till _alla..."
 
 #: src/main-window.c:303
@@ -1344,8 +1344,12 @@ msgid "Undelete the message"
 msgstr "Återskapa meddelandet"
 
 #: src/main-window.c:352
-msgid "_Toggle flagged"
+msgid "_Toggle Flagged"
 msgstr "_Flagga av/på"
+
+#: src/main-window.c:352
+msgid "Toggle flagged"
+msgstr "Flagga av/på"
 
 #: src/main-window.c:360
 msgid "_Store Address..."
@@ -1384,7 +1388,7 @@ msgid "Delete the selected mailbox"
 msgstr "Ta bort den valda brevlådan"
 
 #: src/main-window.c:396
-msgid "Co_mmit current"
+msgid "Co_mmit Current"
 msgstr "S_para aktuell"
 
 #: src/main-window.c:396
@@ -1440,6 +1444,10 @@ msgid "Reply"
 msgstr "Svara"
 
 #: src/main-window.c:452
+msgid "Reply To All"
+msgstr "Svara till alla"
+
+#: src/main-window.c:452
 msgid "Reply to all"
 msgstr "Svara till alla"
 
@@ -1471,7 +1479,7 @@ msgstr "Nästa olästa"
 msgid "Open Next Unread Message"
 msgstr "Öppna nästa olästa meddelande"
 
-#: src/main-window.c:480 src/print.c:59 src/sendmsg-window.c:146
+#: src/main-window.c:480 src/print.c:59 src/sendmsg-window.c:151
 msgid "Print"
 msgstr "Skriv ut"
 
@@ -1495,22 +1503,22 @@ msgstr ""
 "\n"
 "Om du behöver rapportera något fel kan du göra det på http://bugs.gnome.org/"
 
-#: src/main-window.c:1417
+#: src/main-window.c:1419
 #, c-format
 msgid "Sending error: %s"
 msgstr "Fel vid sänding: %s"
 
-#: src/main-window.c:1762
+#: src/main-window.c:1764
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Sparande av brevlådan %s misslyckades."
 
-#: src/main-window.c:1948
+#: src/main-window.c:1950
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (skrivskyddad)"
 
-#: src/main-window.c:1950
+#: src/main-window.c:1952
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
@@ -1597,13 +1605,25 @@ msgstr "Markera som utkastkorg"
 msgid "No mailbox selected."
 msgstr "Ingen brevlåda markerad."
 
+#: src/message-window.c:61
+msgid "N_o headers"
+msgstr "_Inga huvuden"
+
 #: src/message-window.c:63
 msgid "_Selected headers"
 msgstr "_Valda huvuden"
 
+#: src/message-window.c:65
+msgid "All _headers"
+msgstr "Alla _huvuden"
+
 #: src/message-window.c:107
 msgid "Reply to this message"
 msgstr "Svara på detta meddelande"
+
+#: src/message-window.c:113
+msgid "Reply to _all..."
+msgstr "Svara till _alla..."
 
 #: src/message-window.c:114
 msgid "Reply to all recipients of this message"
@@ -2058,239 +2078,239 @@ msgstr "Balsa: förhandsgranska meddelandeutskrift"
 msgid "Page: %i/%i"
 msgstr "Sida: %i/%i"
 
-#: src/sendmsg-window.c:129
+#: src/sendmsg-window.c:134
 msgid "Send"
 msgstr "Skicka"
 
-#: src/sendmsg-window.c:129
+#: src/sendmsg-window.c:134
 msgid "Send this mail"
 msgstr "Skicka detta brev"
 
-#: src/sendmsg-window.c:133
+#: src/sendmsg-window.c:138
 msgid "Attach"
 msgstr "Bifoga"
 
-#: src/sendmsg-window.c:133
+#: src/sendmsg-window.c:138
 msgid "Add attachments to this message"
 msgstr "Bifoga extra filer till detta meddelande"
 
-#: src/sendmsg-window.c:137
+#: src/sendmsg-window.c:142
 msgid "Postpone"
 msgstr "Senarelägg"
 
-#: src/sendmsg-window.c:137
+#: src/sendmsg-window.c:142
 msgid "Continue this message later"
 msgstr "Fortsätt detta meddelande senare"
 
-#: src/sendmsg-window.c:141 src/sendmsg-window.c:210
+#: src/sendmsg-window.c:146 src/sendmsg-window.c:215
 msgid "Check Spelling"
 msgstr "Kontrollera stavning"
 
-#: src/sendmsg-window.c:142
+#: src/sendmsg-window.c:147
 msgid "Run a spelling check on the current message"
 msgstr "Kör en stavningskontroll på det aktuella meddelandet"
 
-#: src/sendmsg-window.c:157
+#: src/sendmsg-window.c:162
 msgid "_Include File..."
 msgstr "_Inkludera fil..."
 
-#: src/sendmsg-window.c:161
-msgid "_Attach file..."
+#: src/sendmsg-window.c:166
+msgid "_Attach File..."
 msgstr "_Bifoga fil..."
 
-#: src/sendmsg-window.c:166
+#: src/sendmsg-window.c:171
 msgid "_Send"
 msgstr "_Skicka"
 
-#: src/sendmsg-window.c:166
+#: src/sendmsg-window.c:171
 msgid "Send the currently edited message"
 msgstr "Skicka det aktuella redigerade meddelandet"
 
-#: src/sendmsg-window.c:170
+#: src/sendmsg-window.c:175
 msgid "_Postpone"
 msgstr "Senareläg_g"
 
-#: src/sendmsg-window.c:174
+#: src/sendmsg-window.c:179
 msgid "Print..."
 msgstr "Skriv ut..."
 
-#: src/sendmsg-window.c:174
+#: src/sendmsg-window.c:179
 msgid "Print the edited message"
 msgstr "Skriv ut det redigerade meddelandet"
 
-#: src/sendmsg-window.c:191
-msgid "Select all"
+#: src/sendmsg-window.c:196
+msgid "Select All"
 msgstr "Markera alla"
 
-#: src/sendmsg-window.c:196
-msgid "_Wrap body"
+#: src/sendmsg-window.c:201
+msgid "_Wrap Body"
 msgstr "_Radbryt"
 
-#: src/sendmsg-window.c:196
+#: src/sendmsg-window.c:201
 msgid "Wrap message lines"
 msgstr "Bryt rader i meddelandetexten"
 
-#: src/sendmsg-window.c:201
-msgid "_Reflow paragraph"
+#: src/sendmsg-window.c:206
+msgid "_Reflow Paragraph"
 msgstr "_Justera stycke"
 
-#: src/sendmsg-window.c:205
-msgid "R_eflow message"
+#: src/sendmsg-window.c:210
+msgid "R_eflow Message"
 msgstr "Just_era meddelande"
 
-#: src/sendmsg-window.c:220
+#: src/sendmsg-window.c:225
 msgid "Fr_om"
 msgstr "Fr_ån"
 
-#: src/sendmsg-window.c:222
+#: src/sendmsg-window.c:227
 msgid "_To"
 msgstr "_Till"
 
-#: src/sendmsg-window.c:224
+#: src/sendmsg-window.c:229
 msgid "_Subject"
 msgstr "_Ämne"
 
-#: src/sendmsg-window.c:226
+#: src/sendmsg-window.c:231
 msgid "_Cc"
 msgstr "_Kopia"
 
-#: src/sendmsg-window.c:228
+#: src/sendmsg-window.c:233
 msgid "_Bcc"
 msgstr "_Osynlig kopia"
 
-#: src/sendmsg-window.c:230
+#: src/sendmsg-window.c:235
 msgid "_Fcc"
 msgstr "_Vidarebefordrad osynlig kopia"
 
-#: src/sendmsg-window.c:232
+#: src/sendmsg-window.c:237
 msgid "_Reply To"
 msgstr "_Svara till"
 
-#: src/sendmsg-window.c:234
+#: src/sendmsg-window.c:239
 msgid "_Attachments"
 msgstr "_Bifogade dokument"
 
-#: src/sendmsg-window.c:236
+#: src/sendmsg-window.c:241
 msgid "_Comments"
 msgstr "_Kommentarer"
 
-#: src/sendmsg-window.c:238
+#: src/sendmsg-window.c:243
 msgid "_Keywords"
 msgstr "_Nyckelord"
 
-#: src/sendmsg-window.c:272 src/sendmsg-window.c:380
+#: src/sendmsg-window.c:277 src/sendmsg-window.c:385
 msgid "Baltic"
 msgstr "Baltisk"
 
-#: src/sendmsg-window.c:273 src/sendmsg-window.c:352
+#: src/sendmsg-window.c:278 src/sendmsg-window.c:357
 msgid "Brazilian"
 msgstr "Brasiliansk"
 
-#: src/sendmsg-window.c:274 src/sendmsg-window.c:354
+#: src/sendmsg-window.c:279 src/sendmsg-window.c:359
 msgid "Catalan"
 msgstr "Katalansk"
 
-#: src/sendmsg-window.c:275 src/sendmsg-window.c:356
+#: src/sendmsg-window.c:280 src/sendmsg-window.c:361
 msgid "Danish"
 msgstr "Dansk"
 
-#: src/sendmsg-window.c:276 src/sendmsg-window.c:360
+#: src/sendmsg-window.c:281 src/sendmsg-window.c:365
 msgid "Dutch"
 msgstr "Nederländsk"
 
-#: src/sendmsg-window.c:277 src/sendmsg-window.c:362
+#: src/sendmsg-window.c:282 src/sendmsg-window.c:367
 msgid "English"
 msgstr "Engelsk"
 
-#: src/sendmsg-window.c:278 src/sendmsg-window.c:364
+#: src/sendmsg-window.c:283 src/sendmsg-window.c:369
 msgid "Estonian"
 msgstr "Estländsk"
 
-#: src/sendmsg-window.c:279 src/sendmsg-window.c:366
+#: src/sendmsg-window.c:284 src/sendmsg-window.c:371
 msgid "Finnish"
 msgstr "Finsk"
 
-#: src/sendmsg-window.c:280 src/sendmsg-window.c:368
+#: src/sendmsg-window.c:285 src/sendmsg-window.c:373
 msgid "French"
 msgstr "Fransk"
 
-#: src/sendmsg-window.c:281 src/sendmsg-window.c:358
+#: src/sendmsg-window.c:286 src/sendmsg-window.c:363
 msgid "German"
 msgstr "Tysk"
 
-#: src/sendmsg-window.c:282 src/sendmsg-window.c:370
+#: src/sendmsg-window.c:287 src/sendmsg-window.c:375
 msgid "Greek"
 msgstr "Grekisk"
 
-#: src/sendmsg-window.c:283 src/sendmsg-window.c:372
+#: src/sendmsg-window.c:288 src/sendmsg-window.c:377
 msgid "Hungarian"
 msgstr "Ungersk"
 
-#: src/sendmsg-window.c:288 src/sendmsg-window.c:374
+#: src/sendmsg-window.c:293 src/sendmsg-window.c:379
 msgid "Italian"
 msgstr "Italiensk"
 
-#: src/sendmsg-window.c:289 src/sendmsg-window.c:376
+#: src/sendmsg-window.c:294 src/sendmsg-window.c:381
 msgid "Japanese"
 msgstr "Japansk"
 
-#: src/sendmsg-window.c:290 src/sendmsg-window.c:378
+#: src/sendmsg-window.c:295 src/sendmsg-window.c:383
 msgid "Korean"
 msgstr "Koreansk"
 
-#: src/sendmsg-window.c:291 src/sendmsg-window.c:382
+#: src/sendmsg-window.c:296 src/sendmsg-window.c:387
 msgid "Norwegian"
 msgstr "Norsk"
 
-#: src/sendmsg-window.c:292 src/sendmsg-window.c:384
+#: src/sendmsg-window.c:297 src/sendmsg-window.c:389
 msgid "Polish"
 msgstr "Polsk"
 
-#: src/sendmsg-window.c:293 src/sendmsg-window.c:386
+#: src/sendmsg-window.c:298 src/sendmsg-window.c:391
 msgid "Portugese"
 msgstr "Portugisisk"
 
-#: src/sendmsg-window.c:294 src/sendmsg-window.c:388
+#: src/sendmsg-window.c:299 src/sendmsg-window.c:393
 msgid "Russian"
 msgstr "Rysk"
 
-#: src/sendmsg-window.c:295 src/sendmsg-window.c:390
+#: src/sendmsg-window.c:300 src/sendmsg-window.c:395
 msgid "Slovak"
 msgstr "Slovakisk"
 
-#: src/sendmsg-window.c:296 src/sendmsg-window.c:392
+#: src/sendmsg-window.c:301 src/sendmsg-window.c:397
 msgid "Spanish"
 msgstr "Spansk"
 
-#: src/sendmsg-window.c:297 src/sendmsg-window.c:394
+#: src/sendmsg-window.c:302 src/sendmsg-window.c:399
 msgid "Swedish"
 msgstr "Svensk"
 
-#: src/sendmsg-window.c:298 src/sendmsg-window.c:396
+#: src/sendmsg-window.c:303 src/sendmsg-window.c:401
 msgid "Turkish"
 msgstr "Turkisk"
 
-#: src/sendmsg-window.c:299 src/sendmsg-window.c:398
+#: src/sendmsg-window.c:304 src/sendmsg-window.c:403
 msgid "Ukrainian"
 msgstr "Ukrainsk"
 
-#: src/sendmsg-window.c:306
+#: src/sendmsg-window.c:311
 msgid "_A-H"
 msgstr "_A-H"
 
-#: src/sendmsg-window.c:307
+#: src/sendmsg-window.c:312
 msgid "_I-Z"
 msgstr "_I-Z"
 
-#: src/sendmsg-window.c:338
+#: src/sendmsg-window.c:343
 msgid "_Show"
 msgstr "_Visa"
 
-#: src/sendmsg-window.c:340
+#: src/sendmsg-window.c:345
 msgid "_Language"
 msgstr "_Språk"
 
-#: src/sendmsg-window.c:573
+#: src/sendmsg-window.c:582
 msgid ""
 "The attachment pixmap (balsa/attachment.png) cannot be found.\n"
 "This means you cannot attach any files.\n"
@@ -2298,60 +2318,60 @@ msgstr ""
 "Bifogningsbilden (balsa/attachment.png) kan inte hittas.\n"
 "Det betyder att du inte kan bifoga några filer.\n"
 
-#: src/sendmsg-window.c:586
+#: src/sendmsg-window.c:595
 #, c-format
 msgid "Cannot get info on file '%s': %s\n"
 msgstr "Kan inte få information om filen \"%s\": %s\n"
 
-#: src/sendmsg-window.c:590
+#: src/sendmsg-window.c:599
 #, c-format
 msgid "Attachment is not a regular file: '%s'\n"
 msgstr "Filen som skall bifogas är ingen vanlig fil: \"%s\"\n"
 
-#: src/sendmsg-window.c:655
+#: src/sendmsg-window.c:664
 msgid "Attach file"
 msgstr "Bifoga fil"
 
 #. cc:
-#: src/sendmsg-window.c:843
+#: src/sendmsg-window.c:852
 msgid "cc:"
 msgstr "Kopia:"
 
 #. bcc:
-#: src/sendmsg-window.c:848
+#: src/sendmsg-window.c:857
 msgid "bcc:"
 msgstr "Osynlig kopia:"
 
 #. fcc:
-#: src/sendmsg-window.c:852
+#: src/sendmsg-window.c:861
 msgid "fcc:"
 msgstr "Vidarebefordrad osynlig kopia:"
 
 #. Reply To:
-#: src/sendmsg-window.c:882
+#: src/sendmsg-window.c:891
 msgid "Reply To:"
 msgstr "Svara till:"
 
 #. Attachment list
-#: src/sendmsg-window.c:888
+#: src/sendmsg-window.c:897
 msgid "Attachments:"
 msgstr "Bifogade filer:"
 
 #. Comments:
-#: src/sendmsg-window.c:931
+#: src/sendmsg-window.c:940
 msgid "Comments:"
 msgstr "Kommentarer:"
 
 #. Keywords:
-#: src/sendmsg-window.c:934
+#: src/sendmsg-window.c:943
 msgid "Keywords:"
 msgstr "Nyckelord:"
 
-#: src/sendmsg-window.c:1042
+#: src/sendmsg-window.c:1051
 msgid "you"
 msgstr "du"
 
-#: src/sendmsg-window.c:1046
+#: src/sendmsg-window.c:1055
 #, c-format
 msgid ""
 "\n"
@@ -2360,7 +2380,7 @@ msgstr ""
 "\n"
 "Den %s skrev %s:\n"
 
-#: src/sendmsg-window.c:1049
+#: src/sendmsg-window.c:1058
 #, c-format
 msgid ""
 "\n"
@@ -2369,40 +2389,40 @@ msgstr ""
 "\n"
 "%s skrev:\n"
 
-#: src/sendmsg-window.c:1126
+#: src/sendmsg-window.c:1135
 msgid "Reply to "
 msgstr "Svara till "
 
-#: src/sendmsg-window.c:1131
+#: src/sendmsg-window.c:1140
 msgid "Forward message"
 msgstr "Eftersänd meddelande"
 
-#: src/sendmsg-window.c:1136
+#: src/sendmsg-window.c:1145
 msgid "Continue message"
 msgstr "Fortsätt meddelande"
 
-#: src/sendmsg-window.c:1141
+#: src/sendmsg-window.c:1150
 msgid "New message"
 msgstr "Nytt meddelande"
 
-#: src/sendmsg-window.c:1400
+#: src/sendmsg-window.c:1409
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Kunde inte öppna filen %s.\n"
 
-#: src/sendmsg-window.c:1402
+#: src/sendmsg-window.c:1411
 msgid "Loading..."
 msgstr "Laddar..."
 
-#: src/sendmsg-window.c:1427
+#: src/sendmsg-window.c:1436
 msgid "Include file"
 msgstr "Inkludera fil"
 
-#: src/sendmsg-window.c:1663
+#: src/sendmsg-window.c:1672
 msgid "Cannot execute print command."
 msgstr "Kan inte köra utskriftskommandot."
 
-#: src/sendmsg-window.c:1687
+#: src/sendmsg-window.c:1696
 msgid "Error executing lpr"
 msgstr "Fel vid körning av lpr"
 

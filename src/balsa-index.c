@@ -95,13 +95,9 @@ static void bndx_changed_find_row(BalsaIndex * index);
 static void bndx_hide_deleted(BalsaIndex * index, gboolean hide);
 
 /* mailbox callbacks */
-static void message_status_changed_cb(GtkTreeModel *model, GtkTreePath *path,
-                                      GtkTreeIter *iter, BalsaIndex *bindex);
+static void bndx_row_changed_cb(GtkTreeModel *model, GtkTreePath *path,
+				GtkTreeIter *iter, BalsaIndex *bindex);
 static void mailbox_messages_added_cb  (BalsaIndex * index, GList * messages);
-static void mailbox_messages_removed_cb(BalsaIndex * index, GList * messages);
-static void bndx_messages_status_changed_cb(LibBalsaMailbox * mb,
-					    GList * messages, gint flag,
-					    BalsaIndex * index);
 
 /* GtkTree* callbacks */
 static void bndx_selection_changed(GtkTreeSelection * selection,
@@ -796,18 +792,12 @@ balsa_index_load_mailbox_node (BalsaIndex * index, BalsaMailboxNode* mbnode)
     }
 
     g_signal_connect(G_OBJECT(mailbox), "row-changed",
-		     G_CALLBACK(message_status_changed_cb),
+		     G_CALLBACK(bndx_row_changed_cb),
 		     (gpointer) index);
 
     g_signal_connect_swapped(G_OBJECT(mailbox), "messages-added",
 			     G_CALLBACK(mailbox_messages_added_cb),
 			     (gpointer) index);
-    g_signal_connect_swapped(G_OBJECT(mailbox), "messages-removed",
-			     G_CALLBACK(mailbox_messages_removed_cb),
-			     (gpointer) index);
-    g_signal_connect(mailbox, "messages-status-changed", 
-		     G_CALLBACK(bndx_messages_status_changed_cb),
-		     (gpointer) index);
 
     /* Set the tree store, load messages, and do threading. */
     bndx_load_and_thread(index, mailbox->view->threading_type);
@@ -1223,40 +1213,21 @@ balsa_index_set_column_widths(BalsaIndex * index)
 }
 
 /* Mailbox Callbacks... */
-/* mailbox_messages_changed_status:
-   We must be *extremely* careful here - message might have changed 
-   its status because the mailbox was forcibly closed and message
-   became invalid. See for example #70807.
-   Some of the messages might have been expunged (mailbox==null).
-*/
+/* "row-changed" is a GtkTreeModel signal, but is emitted by
+ * LibBalsaMailbox.
+ */
 static void
-message_status_changed_cb(GtkTreeModel *model, GtkTreePath *path,
-                          GtkTreeIter *iter, BalsaIndex *bindex)
+bndx_row_changed_cb(GtkTreeModel *model, GtkTreePath *path,
+		    GtkTreeIter *iter, BalsaIndex *bindex)
 {
-#if 0
-    if (!libbalsa_mailbox_is_valid(mb)) return;
-    if (flag == LIBBALSA_MESSAGE_FLAG_DELETED &&
-        LIBBALSA_MESSAGE_IS_DELETED(messages->data) &&
-	(balsa_app.hide_deleted || balsa_app.delete_immediately)) {
-	/* These messages are flagged as deleted, but we must remove them from
-	   the index because of the prefs
-	 */
-        return;
+    if (bindex->current_message) {
+	glong msgno;
+
+	gtk_tree_model_get(model, iter, LB_MBOX_MSGNO_COL, &msgno, -1);
+	if (bindex->current_message->msgno == msgno
+	    && LIBBALSA_MESSAGE_IS_DELETED(bindex->current_message))
+	    bndx_select_next_threaded(bindex);
     }
-
-    if (flag == LIBBALSA_MESSAGE_FLAG_DELETED
-        && bindex->current_message
-        && LIBBALSA_MESSAGE_IS_DELETED(bindex->current_message)) {
-        GtkTreeIter iter;
-
-        if (bndx_find_row(bindex, &iter, FALSE, (LibBalsaMessageFlag) 0,
-                          FILTER_NOOP, NULL, messages))
-            bndx_expand_to_row_and_select(bindex, &iter, TRUE);
-        return;
-    }
-
-    bndx_changed_find_row(bindex);
-#endif
     g_get_current_time (&bindex->last_use);
 }
 
@@ -1335,38 +1306,6 @@ mailbox_messages_added_cb(BalsaIndex * bindex, GList *messages)
     g_object_add_weak_pointer(G_OBJECT(bindex), (gpointer) &arg->bindex);
     g_list_foreach(arg->messages, (GFunc)g_object_ref, NULL);
     g_idle_add((GSourceFunc)mailbox_messages_func_idle, arg);
-}
-
-/* mailbox_messages_remove_cb : callback to sync with backend; the signal is
-   emitted by the mailbox to tell the frontend that it has removed mails
-   (this is in general when the mailbox is committed because it then removes
-   all mails flagged as deleted; the other case is when prefs about how to handle
-   deletions are changed : "hide deleted messages/delete immediately")
- */
-static void
-mailbox_messages_removed_cb(BalsaIndex * bindex, GList * messages)
-{
-#if 0
-#if 1
-    g_warning("%s called but not implemented.\n", __func__);
-#else
-    struct index_list_pair *arg = g_new(struct index_list_pair,1);
-    arg->func = bndx_messages_remove; 
-    arg->bindex  = bindex; arg->messages = g_list_copy(messages);
-    g_object_add_weak_pointer(G_OBJECT(bindex), (gpointer) &arg->bindex);
-    g_list_foreach(arg->messages, (GFunc)g_object_ref, NULL);
-    g_idle_add((GSourceFunc)mailbox_messages_func_idle, arg);
-#endif
-#endif
-}
-
-static void
-bndx_messages_status_changed_cb(LibBalsaMailbox * mb, GList * messages,
-				gint flag, BalsaIndex * index)
-{
-    if (flag == LIBBALSA_MESSAGE_FLAG_DELETED && index->current_message
-	&& LIBBALSA_MESSAGE_IS_DELETED(index->current_message))
-	bndx_select_next_threaded(index);
 }
 
 static void

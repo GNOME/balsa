@@ -24,8 +24,12 @@
       multithreaded retrieval and sending of messages; support for all
       configurations of local mail folders; automatic mail checking;
       mail printing; inline attachment viewing; and the proverbial
-      much, much more.
-      </para>
+      much, much more.</para>
+
+      <para>This document will introduce a person who understands
+      email to using Balsa. However, it will not explain email to a
+      confused individual. If you're looking for that, try asking a
+      friend; they'll explain it best.</para>
     </abstract>
   </artheader>
 
@@ -34,18 +38,15 @@
 
     <para>Balsa is a graphical mail client similar to Eudora on
     Windows. It supports the standard features of any good reader and
-    has new features added continually.</para>
+    has new features added continually. See the abstract above for
+    a quick feature rundown.</para>
 
     <para>Balsa is written using GTK+ and Gnome. It is based on libmutt,
     the backend code to Mutt, but expands far beyond being a graphical
-    Mutt. Balsa supports: IMAP and POP3 accounts; sending mail via 
-    sendmail or direct SMTP; optional multithreaded mail retrieval and
-    sending; support for all configurations of local mail folders; 
-    automatic mail checking; mail printing; inline attachment viewing;
-    and the proverbial much, much more.</para>
+    Mutt.</para>
 
     <para>If you want to learn more about Balsa, your best bet is the
-    mailling list <email>balsa-list@gnome.org</email>, which can be 
+    mailing list <email>balsa-list@gnome.org</email>, which can be 
     subscribed to by sending a message with a subject of subscribe to
     <email>balsa-list-request@gnome.org</email>. Bugs can be reported
     via <application>bug-buddy</application>, <application>gnome-bug
@@ -61,6 +62,12 @@
     create five standard local mailboxes: the Inbox, Outbox, Sentbox, Draftbox,
     and Trash. (These can be changed to be IMAP or POP3 mailboxes 
     later.)</para>
+
+    <para>Don't worry. Balsa cooperates with other <acronym>MUA</>'s very well.
+    They share the same locking semantics for mailboxes. If Balsa shares
+    the same mail directory as <application>Pine</> or <application>Mutt</>,
+    it will detect new folders as they are created. So if you have to telnet in
+    to your mail machine, you won't be stuck.</>
 
     <para>There are many more settings in Balsa's 
     <link linkend="deadend">preferences window</link>, but most of
@@ -100,6 +107,37 @@
        in subdirectories of your local mail directory initially hidden but
        accessible by expanding the tree. POP3 and IMAP mailboxes will also
        be displayed as being at the top level of the tree.</para>
+
+       <para>Useful mailbox list menu items are:</para>
+
+      <variablelist>
+        <varlistentry><term><GUIMenu>Mailboxes</GUIMenu><GUIMenuItem>Open</GUIMenuItem></term>
+        <listitem><para>Open the mailbox selected in the mailbox list.</para></listitem></varlistentry>
+
+        <varlistentry><term><GUIMenu>Mailboxes</GUIMenu><GUIMenuItem>Close</GUIMenuItem></term>
+        <listitem><para>Close the mailbox selected in the mailbox list.</para></listitem></varlistentry>
+
+        <varlistentry><term><GUIMenu>Mailboxes</GUIMenu><GUIMenuItem>Close Current</GUIMenuItem></term>
+        <listitem><para>Close the mailbox shown in the message index.</para></listitem></varlistentry>
+
+        <varlistentry><term><GUIMenu>Mailboxes</GUIMenu><GUIMenuItem>Commit</GUIMenuItem></term>
+        <listitem><para>Commit changes to the mailbox shown in the mailbox list.</para></listitem></varlistentry>
+
+        <varlistentry><term><GUIMenu>Mailboxes</GUIMenu><GUIMenuItem>Commit Current</GUIMenuItem></term>
+        <listitem><para>Commit changes to the mailbox shown in the message index.</para></listitem></varlistentry>
+
+        <varlistentry><term><GUIMenu>Mailboxes</GUIMenu><GUIMenuItem>Add</GUIMenuItem></term>
+        <listitem><para>Create a new local mailbox.</para></listitem></varlistentry>
+
+        <varlistentry><term><GUIMenu>Mailboxes</GUIMenu><GUIMenuItem>Edit</GUIMenuItem></term>
+        <listitem><para>Edit the properties of the mailbox selected in the mailbox list.</para></listitem></varlistentry>
+
+        <varlistentry><term><GUIMenu>Mailboxes</GUIMenu><GUIMenuItem>Delete</GUIMenuItem></term>
+        <listitem><para>Remove the currently selected maibox -- delete its data as well as Balsa's record of it.</para></listitem></varlistentry>
+      </variablelist>
+
+      <para>You can assign keybindings to these commands, and all menu items in GNOME, by
+      clicking and releasing on the menu, selecting the item, and pressing a key combination.</para>
     </sect2>
 
     <sect2 id="subwin-msgindex">
@@ -125,9 +163,146 @@
 
         <varlistentry><term>p</term><listitem><para>Go to the previous message</para>
         </listitem></varlistentry>
+
+        <varlistentry><term>d</term><listitem><para>Delete the current message</para>
+        </listitem></varlistentry>
+
+        <varlistentry><term>u</term><listitem><para>Undelete the current message</para>
+        </listitem></varlistentry>
+
+        <varlistentry><term>r</term><listitem><para>Reply to the current message</para>
+        </listitem></varlistentry>
+
+        <varlistentry><term>a</term><listitem><para>Reply-to-all the current message</para>
+        </listitem></varlistentry>
+
+        <varlistentry><term>f</term><listitem><para>Forward the current message</para>
+        </listitem></varlistentry>
+
+      </variablelist>
+
+      <para>There are also menu items for many of the same functions.</para>
+
+      <variablelist>
+        <varlistentry><term><GUIMenu>Mailboxes</GUIMenu>
+        <GUIMenuItem>Close Current</GUIMenuItem></term>
+        <listitem><para>Close the currently displayed mailbox.</para>
+        </listitem></varlistentry>
+
+        <varlistentry><term><GUIMenu>Mailboxes</GUIMenu>
+        <GUIMenuItem>Commit Current</GUIMenuItem></term>
+        <listitem><para>Commits your changes the currently displayed mailbox.</para>
+        </listitem></varlistentry>
+
+        <varlistentry><term><GUIMenu>Message</GUIMenu>
+        <GUIMenuItem>Reply</GUIMenuItem></term>
+        <listitem><para>Replies to the current message.</para>
+        </listitem></varlistentry>
+
+        <varlistentry><term><GUIMenu>Message</GUIMenu>
+        <GUIMenuItem>Reply to All</GUIMenuItem></term>
+        <listitem><para>Replies-to-all the current message.</para>
+        </listitem></varlistentry>
+
+        <varlistentry><term><GUIMenu>Message</GUIMenu>
+        <GUIMenuItem>Forward</GUIMenuItem></term>
+        <listitem><para>Forwards to the current message.</para>
+        </listitem></varlistentry>
+
+        <varlistentry><term><GUIMenu>Message</GUIMenu>
+        <GUIMenuItem>Continue</GUIMenuItem></term>
+        <listitem><para>Continues the current message -- opens it unmodified in a composition
+        window. This works for any message.</para>
+        </listitem></varlistentry>
+
+        <varlistentry><term><GUIMenu>Message</GUIMenu>
+        <GUIMenuItem>Delete</GUIMenuItem></term>
+        <listitem><para>Deletes to the current message.</para>
+        </listitem></varlistentry>
+
+        <varlistentry><term><GUIMenu>Message</GUIMenu>
+        <GUIMenuItem>Undelete</GUIMenuItem></term>
+        <listitem><para>Undeletes to the current message.</para>
+        </listitem></varlistentry>
+
       </variablelist>
     </sect2>
+
+    <sect2 id="subwin-msgview">
+      <title>The Message View</title>
+
+      <para>The message view displays the message that is selected in message list. It
+      will attempt to display images in the message. Balsa does not understand HTML. (Someday,
+      maybe.) Attachments will be shown as blue links that look like &quot;--APPLICATION--&quot;.
+      Clicking on the link will let you save (but not view) it.</para>
+
+      <para>You are not restricted to that pane. Double-click on a message in the message index
+      to open it in a separate window.</para>
+
+      <para>Balsa's message view is a little deficient. It will not line-wrap messages and
+      cannot handle MIME data other than images. Hopefully this will be fixed one day.</para>
+    </sect2>
   </sect1>
+
+  <sect1 id="win-config">
+    <title>The Preferences Window</>
+
+    <para>Balsa has many more options than the initial druid reveals. To access the configuration
+    window, select <guimenu>Settings</><guimenuitem>preferences</>. You will see a notebook. The
+    tabs and options are explained below</.
+
+    <sect2 id="cfgtab-identity">
+      <title>Identity</>
+
+      <para>This page lets you specify how you present yourself to the rest of the world.</>
+
+      <variablelist>
+        <varlistentry><term>Your Name</><listitem><para>This doesn't <emphasis>have</> to be your
+        name, I guess. But it's the word prefixing your email address in mail you send.</></></>
+
+        <varlistentry><term>E-Mail address</><listitem><para>As you wish it to appear in your 
+        &quot;From&quot; header.</></></>
+
+        <varlistentry><term>Reply-To address</><listitem><para>The address that you wish people
+        to reply to your email with (if you have a home and a work address, for instance).</></></>
+
+        <varlistentry><term>Signature file</><listitem><para>The file to append to all your messages.
+        You also get to control when the signature is appended.</></></>
+     </>
+   </>
+
+   <sect2 id="cfgtab-mail-servers">
+     <title>Mail Servers</>
+
+     <para>This page lets you specify how you get remove POP3 mail, send mail, etc.</>
+
+     <variablelist>
+       <varlistentry><term>Remote Mailbox Servers</><listitem><para>These are POP3 servers that you recieve
+       email from. The three buttons let you create, modify, and remove records. POP3 mailboxes
+       will not show up in the mailbox list.</></></>
+
+       <varlistentry><term>Local Mail Directrory</><listitem><para>This is the directory that Balsa
+       will scan looking for mail folders.</></></>
+
+       <varlistentry><term>Remote SMTP Server</><listitem><para>If your computer is not equipped with sendmail
+       or you do not wish to use it, select this radio button and enter a hostname to contact via
+       SMTP.</></></>
+
+       <varlistentry><term>Local Mail User Agent</><listitem><para>Balsa will attempt to use sendmail to
+       send mail. Unfortunately, you cannot specify the command to execute right now.</></></>
+
+       <varlistentry><term>Check Mail Automatically Every...</><listitem><para>If selected, Balsa will connect
+       to your POP3 servers at the given interval and check for mail. <note><para>Using &quot;0&quot; as
+       an interval is a <emphasis>really</> bad idea.</></></></></>
+     </>
+   </>
+ 
+   <sect2 id="cfgtab-display">
+     <title>Display</title>
+
+     <para>This page controls how Balsa appears to you.</para>
+   </>  
+  </>
 
   <sect1 id="common-tasks">
     <title>Common Tasks with Balsa</title>
@@ -216,6 +391,14 @@
       <listitem><para><link linkend="inw-frozen">Balsa's frozen!
       </link></para></listitem>
 
+      <listitem><para><link linkend="inw-no-print">It won't print!
+      </link></para></listitem>
+
+      <listitem><para><link linkend="inw-didnt-delete">I though I deleted that message!
+      </link></para></listitem>
+
+      <listitem><para><link linkend="inw-spooky-win">What's that window that flashed on the screen?
+      </></></>
     </itemizedlist>
 
     <sect2 id="inw-main-to-imap">
@@ -239,6 +422,38 @@
       </itemizedlist>
     </sect2>
 
+    <sect2 id="inw-no-print">
+      <title>It won't print!</title>
+
+      <para>Your print command is probably wrong. It defaults to 
+      &quot;a2ps -d -q %s&quot;. Use the configuration window to change
+      it to something that works.</para>
+    </sect2>
+
+    <sect2 id="inw-didnt-delete">
+      <title>I thought I deleted that message!</title>
+
+      <para>There are some problems with libmutt and deleting messages. We believe
+      them to be solved now, but they may be lingering. Known causes of messages
+      seeming to be deleted but not really are:</para>
+
+      <itemizedlist mark="bullet">
+        <listitem><para>Mail arrives in the folder before the deletion is committed.
+        This is believed to be solved.</para></listitem>
+
+        <listitem><para>Many messages were deleted and the folder was closed and reopened
+        quickly. This is also believed to be solved.</para></listitem>
+
+      </itemizedlist>
+    </sect2>
+
+    <sect2 id="inw-spooky-win">
+      <title>What's that window that flashed on the screen?</>
+
+      <para>Were you checking your mail? Probably. This is the window that displays
+      progress for retrieving POP3 mail. If you don't have any POP3 accounts, it will
+      still appear -- but it'll disappear almost instantly.</>
+    </>
   </sect1>
 
   <sect1 id="deadend">
@@ -248,9 +463,25 @@
 
   <glossary>
     <glossentry>
+      <glossterm>libmutt</glossterm>
+      <glossdef><para>The library based on Mutt's code used by Balsa to handle local mail.</para></glossdef>
+    </glossentry>
+   
+    <glossentry>
       <glossterm>mailbox list</glossterm>
       <glossdef><para>The list of mailboxes found in Balsa's lefthand pane.</para></glossdef>
     </glossentry>
+
+    <glossentry>
+      <glossterm>message index</glossterm>
+      <glossdef><para>The list of messages in Balsa's upper-righthand pane.</para></glossdef>
+    </glossentry>
+
+    <glossentry>
+      <glossterm>message view</glossterm>
+      <glossdef><para>The message display in Balsa's lower-righthand pane.</para></glossdef>
+    </glossentry>
+
   </glossary>
 </article>
 

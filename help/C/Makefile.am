@@ -3,18 +3,13 @@
 
 HTML_FILES = \
 	t1.htm \
-	x23.htm \
-	x30.htm \
-	x42.htm \
-	x53.htm \
-	x57.htm \
-	x88.htm \
-	x90.htm \
-	x99.htm \
-	x114.htm \
-	g56.htm \
-	g102.htm \
-	g117.htm
+	x24.htm \
+	x35.htm \
+	x188.htm \
+	x244.htm \
+	x277.htm \
+	x324.htm \
+	g327.htm
 
 EXTRA_DIST = \
 	balsa.sgml		\
@@ -24,10 +19,14 @@ EXTRA_DIST = \
 $(HTML_FILES): html-stamp
 	@if test ! -f $@ ; then \
 		echo Warning: documentation Makefile.am needs updating: $@ does not exist 1>&2 ; \
+		if test -z `cat topic.dat |grep $@` ; then \
+			echo Warning: topic.data references old file $@ 1>&2 ; \
+ 		fi ; \
 	fi
 
 if HAVE_DB2HTML
 html-stamp: balsa.sgml
+	rm -f *.htm
 	(cd $(srcdir) && db2html balsa.sgml) 1>/dev/null
 	cd $(srcdir) && mv balsa/*.htm .
 	rm -rf $(srcdir)/balsa/

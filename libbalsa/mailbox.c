@@ -888,6 +888,9 @@ message_free (Message * message)
   address_free (message->reply_to);
   g_free (message->subject);
 
+  g_list_free(message->to_list);
+  g_list_free(message->cc_list);
+
   g_free (message->in_reply_to);
   g_free (message->message_id);
   g_free (message->newsgroups);
@@ -984,6 +987,8 @@ static Message *
 translate_message (ENVELOPE * cenv)
 {
   Message *message;
+  ADDRESS *addy;
+  Address *addr;
 
   if (!cenv)
     return NULL;
@@ -996,6 +1001,21 @@ translate_message (ENVELOPE * cenv)
   message->from = translate_address (cenv->from);
   message->sender = translate_address (cenv->sender);
   message->reply_to = translate_address (cenv->reply_to);
+  for (addy=cenv->to;addy;addy=addy->next)
+  {
+    addr = translate_address(addy);
+    message->to_list = g_list_append(message->to_list, addr);
+  }
+  for (addy=cenv->cc;addy;addy=addy->next)
+  {
+    addr = translate_address(addy);
+    message->cc_list = g_list_append(message->cc_list, addr);
+  }
+  for (addy=cenv->bcc;addy;addy=addy->next)
+  {
+    addr = translate_address(addy);
+    message->bcc_list = g_list_append(message->bcc_list, addr);
+  }
 
   message->subject = g_strdup (cenv->subject);
 

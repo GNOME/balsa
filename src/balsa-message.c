@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "balsa-message.h"
+#include "misc.h"
 
 #define HTML_HEAD "<html><body bgcolor=#ffffff><p><tt>\n"
 #define HTML_FOOT "</tt></p></body></html>\n"
@@ -216,11 +217,21 @@ message2html (Message * message)
       g_free (buff);
     }
 
+  if (message->to_list)
+    {
+      g_string_append (mbuff, "<br><b>To: </b>");
+
+      /* to */
+      buff = text2html (make_string_from_list(message->to_list));
+      g_string_append (mbuff, buff);
+      g_free (buff);
+    }
+
   if (message->from)
     {
       g_string_append (mbuff, "<br><b>From: </b>");
 
-      /* to */
+      /* from */
       if (message->from->personal)
 	sprintf (tbuff, "%s <%s@%s>",
 		 message->from->personal,

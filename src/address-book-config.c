@@ -119,7 +119,7 @@ edit_book_response(GtkWidget * dialog, gint response,
     case GTK_RESPONSE_HELP:
         help_button_cb(abc);
         return;
-    case GTK_RESPONSE_ACCEPT:
+    case GTK_RESPONSE_APPLY:
         if (handle_close(abc))
             break;
         else

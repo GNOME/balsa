@@ -25,6 +25,7 @@
 #include <errno.h>
 #include "balsa-app.h"
 #include "balsa-index.h"
+#include "balsa-icons.h"
 #include "balsa-message.h"
 #include "main-window.h"
 #include "message-window.h"
@@ -329,6 +330,9 @@ idle_handler_cb(GtkWidget * widget)
     LibBalsaMessage *message;
     gpointer data;
 
+    if (handler == 0)
+        return FALSE;
+
     gdk_threads_enter();
 
     message = gtk_object_get_data(GTK_OBJECT(widget), "message");
@@ -360,14 +364,14 @@ idle_handler_cb(GtkWidget * widget)
 	gtk_object_unref(GTK_OBJECT(message));
 
     gtk_object_unref(GTK_OBJECT(data));
-    /* Update the style and message counts in the mailbox list */
-    /* ijc: Are both of these needed now */
-    balsa_mblist_update_mailbox(balsa_app.mblist,
-				BALSA_INDEX(widget)->mailbox);
-    balsa_mblist_have_new(balsa_app.mblist);
-
     gtk_object_remove_data(GTK_OBJECT(widget), "message");
     gtk_object_remove_data(GTK_OBJECT(widget), "data");
+
+    /* Update the style and message counts in the mailbox list */
+    /* ijc: Are both of these needed now */
+    /* MBG: I don't think so */
+    balsa_mblist_update_mailbox(balsa_app.mblist,
+				BALSA_INDEX(widget)->mailbox);
 
     gdk_threads_leave();
 
@@ -521,7 +525,7 @@ create_menu(BalsaIndex * bindex)
     create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_RPL, _("Reply..."),
 			   balsa_message_reply, bindex, TRUE);
 
-    create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_RPL,
+    create_stock_menu_item(menu, BALSA_PIXMAP_MAIL_RPL_ALL_MENU,
 			   _("Reply To All..."), balsa_message_replytoall,
 			   bindex, TRUE);
 
@@ -546,14 +550,16 @@ create_menu(BalsaIndex * bindex)
 			   _("Store Address..."),
 			   balsa_store_address, bindex, TRUE);
 
-    menuitem = gtk_menu_item_new_with_label(_("Toggle Flagged"));
-    gtk_widget_set_sensitive(menuitem, !bindex->mailbox->readonly);
-    gtk_signal_connect(GTK_OBJECT(menuitem),
-		       "activate",
-		       (GtkSignalFunc) balsa_message_toggle_flagged,
-		       bindex);
-    gtk_menu_append(GTK_MENU(menu), menuitem);
-    gtk_widget_show(menuitem);
+    /* menuitem = gtk_menu_item_new_with_label(_("Toggle Flagged")); */
+    create_stock_menu_item (menu, BALSA_PIXMAP_FLAGGED, _("Toggle Flagged"),
+                            balsa_message_toggle_flagged, bindex, TRUE);
+/*     gtk_widget_set_sensitive(menuitem, !bindex->mailbox->readonly); */
+/*     gtk_signal_connect(GTK_OBJECT(menuitem), */
+/* 		       "activate", */
+/* 		       (GtkSignalFunc) balsa_message_toggle_flagged, */
+/* 		       bindex); */
+/*     gtk_menu_append(GTK_MENU(menu), menuitem); */
+/*     gtk_widget_show(menuitem); */
 
     menuitem = gtk_menu_item_new_with_label(_("Transfer"));
     gtk_widget_set_sensitive(menuitem, !bindex->mailbox->readonly);

@@ -59,17 +59,6 @@
 
 #include "libinit_balsa/init_balsa.h"
 
-#include "pixmaps/reply_to_all.xpm"
-#include "pixmaps/reply_to_all_menu.xpm"
-#include "pixmaps/next_unread.xpm"
-#include "pixmaps/next_unread_menu.xpm"
-
-#define BALSA_PIXMAP_MAIL_RPL_ALL 	"reply_to_all"
-#define BALSA_PIXMAP_MAIL_RPL_ALL_MENU	"reply_to_all_menu"
-
-#define BALSA_PIXMAP_NEXT_UNREAD "next_unread"
-#define BALSA_PIXMAP_NEXT_UNREAD_MENU "next_unread_menu"
-
 #define MAILBOX_DATA "mailbox_data"
 
 #define APPBAR_KEY "balsa_appbar"
@@ -188,8 +177,6 @@ static void notebook_switch_page_cb(GtkWidget * notebook,
 				    GtkNotebookPage * page,
 				    guint page_num);
 static void send_msg_window_destroy_cb(GtkWidget * widget, gpointer data);
-static void register_balsa_pixmaps(void);
-static void register_balsa_pixmap(gchar * name, gchar ** data, guint xsize, guint ysize);
 
 static GnomeUIInfo file_new_menu[] = {
 #define MENU_FILE_NEW_MESSAGE_POS 0
@@ -267,10 +254,11 @@ static GnomeUIInfo edit_menu[] = {
     /*  GNOMEUIINFO_MENU_FIND_ITEM(NULL, NULL); */
     /*  GNOMEUIINFO_MENU_FIND_AGAIN_ITEM(NULL, NULL); */
     /*  GNOMEUIINFO_MENU_REPLACE_ITEM(NULL, NULL); */
-    GNOMEUIINFO_SEPARATOR,
-#define MENU_EDIT_PREFERENCES_POS 3
-    GNOMEUIINFO_MENU_PREFERENCES_ITEM(open_preferences_manager, NULL),
+/*     GNOMEUIINFO_SEPARATOR, */
+/* #define MENU_EDIT_PREFERENCES_POS 3 */
+/*     GNOMEUIINFO_MENU_PREFERENCES_ITEM(open_preferences_manager, NULL), */
 #ifdef BALSA_SHOW_ALL
+    GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_ITEM_STOCK(N_("_Filters..."), N_("Manage filters"),
 			   filter_dlg_cb, GNOME_STOCK_MENU_PROP),
 #endif
@@ -363,8 +351,8 @@ static GnomeUIInfo message_menu[] = {
     /* ! */
     {
      GNOME_APP_UI_ITEM, N_("_Toggle Flagged"), N_("Toggle flagged"),
-     toggle_flagged_message_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
-     NULL, 'X', 0, NULL},
+     toggle_flagged_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+     BALSA_PIXMAP_FLAGGED, 'X', 0, NULL},
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MESSAGE_STORE_ADDRESS_POS 12
     /* S */
@@ -420,6 +408,12 @@ static GnomeUIInfo mailbox_menu[] = {
     GNOMEUIINFO_END
 };
 
+static GnomeUIInfo settings_menu[] = {
+#define MENU_SETTINGS_PREFERENCES_POS 0
+    GNOMEUIINFO_MENU_PREFERENCES_ITEM (open_preferences_manager, NULL),
+    GNOMEUIINFO_END
+};
+
 static GnomeUIInfo help_menu[] = {
     GNOMEUIINFO_MENU_ABOUT_ITEM(show_about_box, NULL),
     GNOMEUIINFO_SEPARATOR,
@@ -433,6 +427,7 @@ static GnomeUIInfo main_menu[] = {
     GNOMEUIINFO_MENU_VIEW_TREE(view_menu),
     GNOMEUIINFO_SUBTREE(N_("_Message"), message_menu),
     GNOMEUIINFO_SUBTREE(N_("Mail_box"), mailbox_menu),
+    GNOMEUIINFO_MENU_SETTINGS_TREE (settings_menu),
     GNOMEUIINFO_MENU_HELP_TREE(help_menu),
     GNOMEUIINFO_END
 };
@@ -2103,32 +2098,6 @@ static void
 select_part_cb(BalsaMessage * bm, gpointer data)
 {
     enable_edit_menus(bm);
-}
-
-static void
-register_balsa_pixmap(gchar * name, gchar ** data, guint xsize, guint ysize)
-{
-    GnomeStockPixmapEntryData *entry;
-    entry = g_malloc0(sizeof(*entry));
-
-    entry->type = GNOME_STOCK_PIXMAP_TYPE_DATA;
-    entry->xpm_data = data;
-    entry->width = xsize;
-    entry->height = ysize;
-    gnome_stock_pixmap_register(name, GNOME_STOCK_PIXMAP_REGULAR,
-				(GnomeStockPixmapEntry *) entry);
-}
-
-static void
-register_balsa_pixmaps(void)
-{
-    register_balsa_pixmap(BALSA_PIXMAP_MAIL_RPL_ALL, reply_to_all_xpm, 24, 24);
-    register_balsa_pixmap(BALSA_PIXMAP_MAIL_RPL_ALL_MENU,
-			  reply_to_all_menu_xpm, 16, 15);
-
-    register_balsa_pixmap (BALSA_PIXMAP_NEXT_UNREAD, next_unread_xpm, 24, 24);
-    register_balsa_pixmap (BALSA_PIXMAP_NEXT_UNREAD_MENU, 
-                           next_unread_menu_xpm, 16, 15);
 }
 
 static void

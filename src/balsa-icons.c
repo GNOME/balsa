@@ -44,6 +44,11 @@
 
 #include "pixmaps/flagged.xpm"
 
+#include "pixmaps/reply_to_all.xpm"
+#include "pixmaps/reply_to_all_menu.xpm"
+#include "pixmaps/next_unread.xpm"
+#include "pixmaps/next_unread_menu.xpm"
+
 typedef struct _BalsaIcon BalsaIcon;
 struct _BalsaIcon {
     GdkPixmap *p;
@@ -67,8 +72,6 @@ static BalsaIcon envelope;
 
 static BalsaIcon arrow;
 static BalsaIcon multipart;
-
-static BalsaIcon flagged;
 
 static void
 create_icon(gchar ** data, GdkPixmap ** pmap, GdkBitmap ** bmap)
@@ -97,8 +100,6 @@ balsa_icons_init(void)
 
     create_icon(arrow_xpm, &arrow.p, &arrow.b);
     create_icon(multipart_xpm, &multipart.p, &multipart.b);
-
-    create_icon(flagged_xpm, &flagged.p, &flagged.b);
 }
 
 GdkPixmap *
@@ -134,9 +135,6 @@ balsa_icon_get_pixmap(BalsaIconName name)
 	return arrow.p;
     case BALSA_ICON_MULTIPART:
 	return multipart.p;
-
-    case BALSA_ICON_FLAGGED:
-	return flagged.p;
     }
     return NULL;
 }
@@ -175,8 +173,34 @@ balsa_icon_get_bitmap(BalsaIconName name)
     case BALSA_ICON_MULTIPART:
 	return multipart.b;
 
-    case BALSA_ICON_FLAGGED:
-	return flagged.b;
     }
     return NULL;
+}
+
+void
+register_balsa_pixmap(gchar * name, gchar ** data, guint xsize, guint ysize)
+{
+    GnomeStockPixmapEntryData *entry;
+    entry = g_malloc0(sizeof(*entry));
+
+    entry->type = GNOME_STOCK_PIXMAP_TYPE_DATA;
+    entry->xpm_data = data;
+    entry->width = xsize;
+    entry->height = ysize;
+    gnome_stock_pixmap_register(name, GNOME_STOCK_PIXMAP_REGULAR,
+				(GnomeStockPixmapEntry *) entry);
+}
+
+void
+register_balsa_pixmaps(void)
+{
+    register_balsa_pixmap(BALSA_PIXMAP_MAIL_RPL_ALL, reply_to_all_xpm, 24, 24);
+    register_balsa_pixmap(BALSA_PIXMAP_MAIL_RPL_ALL_MENU,
+			  reply_to_all_menu_xpm, 16, 15);
+
+    register_balsa_pixmap (BALSA_PIXMAP_NEXT_UNREAD, next_unread_xpm, 24, 24);
+    register_balsa_pixmap (BALSA_PIXMAP_NEXT_UNREAD_MENU, 
+                           next_unread_menu_xpm, 16, 15);
+
+    register_balsa_pixmap (BALSA_PIXMAP_FLAGGED, flagged_xpm, 16, 16);
 }

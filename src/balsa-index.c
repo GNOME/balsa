@@ -719,16 +719,21 @@ clist_set_col_img_from_flag(BalsaIndex * bindex, gint row,
 			    LibBalsaMessage * message)
 {
     guint tmp;
+    GdkPixmap* pixmap;
+    GdkPixmap* bitmap;
+
     /* HEADER* current; */
 
     if (message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)
 	gtk_clist_set_pixmap(GTK_CLIST(bindex), row, 1,
 			     balsa_icon_get_pixmap(BALSA_ICON_TRASH),
 			     balsa_icon_get_bitmap(BALSA_ICON_TRASH));
-    else if (message->flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)
-	gtk_clist_set_pixmap(GTK_CLIST(bindex), row, 1,
-			     balsa_icon_get_pixmap(BALSA_ICON_FLAGGED),
-			     balsa_icon_get_bitmap(BALSA_ICON_FLAGGED));
+    else if (message->flags & LIBBALSA_MESSAGE_FLAG_FLAGGED) {
+        gnome_stock_pixmap_gdk (BALSA_PIXMAP_FLAGGED, "regular", 
+                                &pixmap, &bitmap);
+	gtk_clist_set_pixmap(GTK_CLIST(bindex), row, 1, pixmap, bitmap);
+    }
+    
     /*
        if (message->flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)
        gtk_clist_set_pixmap (GTK_CLIST (bindex), row, 1, , mailbox_mask);

@@ -22,6 +22,14 @@
 #ifndef __BALSA_ICONS_H__
 #define __BALSA_ICONS_H__
 
+#define BALSA_PIXMAP_MAIL_RPL_ALL 	"reply_to_all"
+#define BALSA_PIXMAP_MAIL_RPL_ALL_MENU	"reply_to_all_menu"
+
+#define BALSA_PIXMAP_NEXT_UNREAD "next_unread"
+#define BALSA_PIXMAP_NEXT_UNREAD_MENU "next_unread_menu"
+
+#define BALSA_PIXMAP_FLAGGED "flagged"
+
 typedef enum {
     BALSA_ICON_INBOX,
     BALSA_ICON_OUTBOX,
@@ -40,12 +48,11 @@ typedef enum {
 
     BALSA_ICON_ARROW,
     BALSA_ICON_MULTIPART,
-
-    BALSA_ICON_FLAGGED
 } BalsaIconName;
 
 void balsa_icons_init(void);
 GdkPixmap *balsa_icon_get_pixmap(BalsaIconName icon);
 GdkBitmap *balsa_icon_get_bitmap(BalsaIconName icon);
-
+void register_balsa_pixmaps(void);
+void register_balsa_pixmap(gchar * name, gchar ** data, guint xsize, guint ysize);
 #endif

@@ -774,6 +774,7 @@ balsa_mblist_mailbox_style(GtkCTree * ctree, GtkCTreeNode * node,
     if (mailbox == balsa_app.sentbox || mailbox == balsa_app.outbox ||
 	mailbox == balsa_app.draftbox || mailbox == balsa_app.trash)
 	return;
+
     if (mailbox->has_unread_messages) {
 
 	/* set the style of the unread maibox list, even if it's already 

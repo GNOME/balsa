@@ -1,3 +1,26 @@
+2000-10-29  Matthew Guenther  <guentherm@asme.org>
+
+	* TODO: More stuff to do
+
+	* src/balsa-icons.[ch]: Move register_balsa_pixmap stuff here, add
+	flagged pixmap to registered pixmaps as BALSA_PIXMAP_FLAGGED so we
+	can use it in menus.  Removed BALSA_ICON_FLAGGED stuff.
+
+	* src/balsa-index.c (clist_set_col_img_from_flag): Use gnome_stock
+	version of flagged pixmap instead of manually loaded one.
+
+	* src/balsa-index-page.c (idle_handler_cb, create_menu): Safeguard
+	to reduce idle handler calls, again attempting to reduce selection
+	delays.  Also add flagged icon to popup menu.
+
+	* src/main-window.c: Remove register_balsa_pixmap* functions and
+	accessories.  Add icon to Toggle Flagged menu item.  Move
+	Preferences menu item to Settings menu, every other GNOME program
+	I looked at has it this way.
+
+	* pixmaps/flagged.xpm: Changed width to 16 so it didn't get
+	mangled by gnome-stock stuff.
+	
 2000-10-26  Matthew Guenther  <guentherm@asme.org>
 
 	* TODO: Add some future projects (after 1.0).
@@ -3651,4 +3674,4 @@ Tue Jul 28 04:01:40 1998 Stuart Parmenter <pavlov@innerx.net>
 	Updated README to remove INSTALL file info, and such.  Added a description,
 	etc.
 
-=== Exit status: OK
+

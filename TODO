@@ -36,10 +36,13 @@ status, etc.
 	mailbox (mbox, Maildir,...)
 	- Should be able to put mailbox in subdirectories
 
-- MIME supporting icons.  use the new gnome metadata stuff that gmc uses?
-	- Use mime icons for attachments for incoming & outgoing messages
-	- Index attachment indicator should have a different icon depending 
-	on the mime category (text/*, application/*, image/*, etc.)
+- [MOSTLY] MIME supporting icons.  use the new gnome metadata stuff
+that gmc uses?
+	- [DONE] Use mime icons for attachments for incoming &
+	outgoing messages
+	- Index attachment indicator should have a different icon
+	depending on the mime category (text/*, application/*,
+	image/*, etc.)
 
 - [PARTIAL] New mail notification
 	- [PARTIAL] via sound
@@ -79,6 +82,7 @@ status, etc.
 	- Virtual folders?  Probably require some form of mailbox
 	indexing system
 	
+- Split Preferences window into several more managable chunks.
 
 ----------------------------------
 Old list.. may or may not be in above list

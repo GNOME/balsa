@@ -1,3 +1,11 @@
+2003-07-15  Pawel Salek  <pawsa theochem.kth.se>
+
+	* libbalsa/mailbox_pop3.c: do not try saving NULL config strings.
+	* libbalsa/server.c: default remember_passwd to FALSE.
+	* src/balsa-app.c: make switching remembering passwds easier.
+	* src/main-window.c: simplify asking for passwd (also bug 117386).
+	* configure.in: replace --enable-ldap with more apriopriate --with-ldap
+
 2003-07-14  Pawel Salek  <pawsa theochem.kth.se>
 
 	* src/sendmsg-window.c: display mark by the selected language entry.

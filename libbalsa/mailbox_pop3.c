@@ -354,9 +354,10 @@ libbalsa_mailbox_pop3_save_config(LibBalsaMailbox * mailbox,
     gnome_config_set_bool("Delete", pop->delete_from_server);
     gnome_config_set_bool("Apop", pop->use_apop);
     gnome_config_set_bool("Filter", pop->filter);
-    gnome_config_set_string("FilterCmd", pop->filter_cmd);
-
-    gnome_config_set_string("Lastuid", pop->last_popped_uid);
+    if(pop->filter_cmd)
+        gnome_config_set_string("FilterCmd", pop->filter_cmd);
+    if(pop->last_popped_uid)
+        gnome_config_set_string("Lastuid", pop->last_popped_uid);
 
     if (LIBBALSA_MAILBOX_CLASS(parent_class)->save_config)
 	LIBBALSA_MAILBOX_CLASS(parent_class)->save_config(mailbox, prefix);

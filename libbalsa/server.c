@@ -318,7 +318,7 @@ libbalsa_server_load_config(LibBalsaServer * server)
 	server->use_ssl = FALSE;
 #endif
     server->user = gnome_config_private_get_string("Username");
-    server->remember_passwd = gnome_config_get_bool("RememberPasswd=true");
+    server->remember_passwd = gnome_config_get_bool("RememberPasswd=false");
     if(server->remember_passwd)
         server->passwd = gnome_config_private_get_string("Password");
     if(server->passwd && server->passwd[0] == '\0') {
@@ -336,12 +336,19 @@ libbalsa_server_load_config(LibBalsaServer * server)
     }
 }
 
+/* libbalsa_server_save_config:
+   save config.
+   It is bit tricky to decide the value of the remember_passwd field.
+   Should empty values be remembered? Even if they are, balsa will 
+   still ask for the password if it is empty.
+*/
 void
 libbalsa_server_save_config(LibBalsaServer * server)
 {
     gnome_config_set_string("Server", server->host);
     gnome_config_private_set_string("Username", server->user);
-    gnome_config_set_bool("RememberPasswd", server->remember_passwd);
+    gnome_config_set_bool("RememberPasswd", 
+                          server->remember_passwd && server->passwd != NULL);
 
     if (server->remember_passwd && server->passwd != NULL) {
 	gchar *buff = libbalsa_rot(server->passwd);

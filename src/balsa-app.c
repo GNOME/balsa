@@ -51,24 +51,31 @@ const gchar *pspell_suggest_modes[] = {
     "bad-spellers"
 };
 
+static void
+rememb_toggle_cb(GObject* button, LibBalsaServer *s)
+{
+    s->remember_passwd = 
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
+}
+
 /* ask_password:
    asks the user for the password to the mailbox on given remote server.
 */
 static gchar *
 ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
 {
-    GtkWidget *dialog, *entry;
+    GtkWidget *dialog, *entry, *rememb;
     gchar *prompt, *passwd = NULL;
 
     g_return_val_if_fail(server != NULL, NULL);
     if (mbox)
 	prompt =
 	    g_strdup_printf(_("Opening remote mailbox %s.\n"
-                              "The password for %s@%s:"),
+                              "The _password for %s@%s:"),
 			    mbox->name, server->user, server->host);
     else
 	prompt =
-	    g_strdup_printf(_("Mailbox password for %s@%s:"), server->user,
+	    g_strdup_printf(_("Mailbox _password for %s@%s:"), server->user,
 			    server->host);
 
     dialog = gtk_dialog_new_with_buttons(_("Password needed"),
@@ -78,14 +85,21 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
                                          GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                          NULL); 
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),
-                      gtk_label_new(prompt));
+                      gtk_label_new_with_mnemonic(prompt));
     g_free(prompt);
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),
                       entry = gtk_entry_new());
-    gtk_widget_show_all(GTK_WIDGET(GTK_DIALOG(dialog)->vbox));
     gtk_entry_set_width_chars(GTK_ENTRY(entry), 20);
     gtk_entry_set_visibility(GTK_ENTRY(entry), FALSE);
 
+    rememb =  gtk_check_button_new_with_mnemonic(_("_Remember password"));
+    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), rememb);
+    if(server->remember_passwd)
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(rememb), TRUE);
+    g_signal_connect(G_OBJECT(rememb), "toggled", 
+                     G_CALLBACK(rememb_toggle_cb), server);
+
+    gtk_widget_show_all(GTK_WIDGET(GTK_DIALOG(dialog)->vbox));
     gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
     gtk_widget_grab_focus (entry);
@@ -156,7 +170,8 @@ set_passwd_from_matching_server(GNode *nd, gpointer data)
         server = node->server;
     else {
         mbox = node->mailbox;
-        g_return_val_if_fail(mbox != NULL, FALSE);
+        if(!mbox) /* eg. a collection of mboxes */
+            return FALSE;
         g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mbox), FALSE);
 
         if (!LIBBALSA_IS_MAILBOX_REMOTE(mbox)) return FALSE;

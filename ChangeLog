@@ -1,7 +1,9 @@
-2003-10-01 16:55  PeterB
+2003-10-01 18:45  PeterB
 
-	* libbalsa/mailbox_local.c: Implement threading, based on previous
-	balsa-index-threading.c code.
+	* libbalsa/mailbox_local.c: Use LibBalsaMailboxLocal::msg_list
+	instead of libbalsa_mailbox_get_message() to access messages;
+	implement threading, based on previous balsa-index-threading.c
+	code.
 
 2003-10-01  Pawel Salek <pawsa theochem.kth.se>
 

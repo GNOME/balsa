@@ -2831,11 +2831,11 @@ part_context_menu_mail(GtkWidget * menu_item, BalsaPartInfo * info)
 			  balsa_app.smtp_server,
 			  balsa_app.smtp_authctx,
 			  balsa_app.smtp_tls_mode,
-			  FALSE);
+			  FALSE, balsa_app.debug);
 #else
     libbalsa_message_send(message, balsa_app.outbox, NULL,
 			  balsa_app.encoding_style,
-			  FALSE);
+			  FALSE, balsa_app.debug);
 #endif
     g_object_unref(G_OBJECT(message));    
 }
@@ -3563,10 +3563,10 @@ handle_mdn_request(LibBalsaMessage *message)
 			      balsa_app.encoding_style,  
 			      balsa_app.smtp_server,
 			      balsa_app.smtp_authctx,
-			      balsa_app.smtp_tls_mode, TRUE);
+			      balsa_app.smtp_tls_mode, TRUE, balsa_app.debug);
 #else
 	libbalsa_message_send(mdn, balsa_app.outbox, NULL,
-			      balsa_app.encoding_style, TRUE);
+			      balsa_app.encoding_style, TRUE, balsa_app.debug);
 #endif
 	g_object_unref(G_OBJECT(mdn));
     }
@@ -3670,10 +3670,10 @@ mdn_dialog_response(GtkWidget * dialog, gint response, gpointer user_data)
                               balsa_app.encoding_style,
                               balsa_app.smtp_server,
                               balsa_app.smtp_authctx,
-                              balsa_app.smtp_tls_mode, TRUE);
+                              balsa_app.smtp_tls_mode, TRUE, balsa_app.debug);
 #else
         libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
-                              balsa_app.encoding_style, TRUE);
+                              balsa_app.encoding_style, TRUE, balsa_app.debug);
 #endif
     }
 

@@ -254,12 +254,14 @@ LibBalsaMsgCreateResult libbalsa_message_send(LibBalsaMessage* message,
 					      LibBalsaMailbox* fccbox,
 					      gint encoding, gchar* smtp_server,
 					      auth_context_t smtp_authctx,
-					      gint tls_mode, gboolean flow);
+					      gint tls_mode, gboolean flow,
+                                              gboolean debug);
 #else
 LibBalsaMsgCreateResult libbalsa_message_send(LibBalsaMessage* message,
 					      LibBalsaMailbox* outbox,  
 					      LibBalsaMailbox* fccbox,
-					      gint encoding, gboolean flow);
+					      gint encoding, gboolean flow,
+                                              gboolean debug);
 #endif
 gboolean libbalsa_message_postpone(LibBalsaMessage * message,
 				   LibBalsaMailbox * draftbox,

@@ -30,10 +30,10 @@
 gboolean libbalsa_process_queue(LibBalsaMailbox * outbox,
                                 gchar * smtp_server,
                                 auth_context_t smtp_authctx,
-                                gint tls_mode);
+                                gint tls_mode, gboolean debug);
 #else
 
-gboolean libbalsa_process_queue(LibBalsaMailbox* outbox);
+gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gboolean debug);
 
 #endif
 

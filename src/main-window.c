@@ -1900,9 +1900,9 @@ send_receive_messages_cb(GtkWidget * widget, gpointer data)
 #if ENABLE_ESMTP
     libbalsa_process_queue(balsa_app.outbox, balsa_app.smtp_server,
                            balsa_app.smtp_authctx,
-                           balsa_app.smtp_tls_mode);
+                           balsa_app.smtp_tls_mode, balsa_app.debug);
 #else
-    libbalsa_process_queue(balsa_app.outbox);
+    libbalsa_process_queue(balsa_app.outbox, balsa_app.debug);
 #endif
 }
 
@@ -1922,9 +1922,9 @@ send_outbox_messages_cb(GtkWidget * widget, gpointer data)
 #if ENABLE_ESMTP
     libbalsa_process_queue(balsa_app.outbox, balsa_app.smtp_server,
                            balsa_app.smtp_authctx,
-                           balsa_app.smtp_tls_mode);
+                           balsa_app.smtp_tls_mode, balsa_app.debug);
 #else
-    libbalsa_process_queue(balsa_app.outbox);
+    libbalsa_process_queue(balsa_app.outbox, balsa_app.debug);
 #endif
 }
 

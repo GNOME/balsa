@@ -3498,11 +3498,11 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 				       balsa_app.smtp_server,
 				       balsa_app.smtp_authctx,
 				       balsa_app.smtp_tls_mode,
-				       bsmsg->flow);
+				       bsmsg->flow, balsa_app.debug);
 #else
         result = libbalsa_message_send(message, balsa_app.outbox, fcc,
 				       balsa_app.encoding_style,
-				       bsmsg->flow); 
+				       bsmsg->flow, balsa_app.debug); 
 #endif
     if (result == LIBBALSA_MESSAGE_CREATE_OK && bsmsg->orig_message
         && bsmsg->orig_message->mailbox) {

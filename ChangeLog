@@ -1,3 +1,10 @@
+2003-10-13  Pawel Salek  <pawsa theochem.kth.se>
+
+	* libbalsa/message.h: libbalsa_message_send() accepts debug argument.
+	* libbalsa/send.[hc]: use it.
+	* src/balsa-message.c: pass debug argument.
+	* src/{sendmsg,main}-window.c: ditto.
+
 2003-10-09 12:09  PeterB
 
 	* src/main-window.c: Add accelerators for zoom in/out.

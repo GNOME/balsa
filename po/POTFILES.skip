@@ -1,15 +1,3 @@
 #keep it sorted alphabetically.
-# nothing interesting here, just helper function
-libmutt/attach.c
-# flags.c: one string used by the mutt's threading code.
-libmutt/flags.c
-# keymaps_def.h: mutt key help.
-libmutt/keymap_defs.h
-# libmutt/muttlib.c: no strings compiled into balsa.
-libmutt/muttlib.c
-#libmutt/pattern.c: only pattern_free used. No strings to translate there.
-libmutt/pattern.c
-#libmutt/recvattach.c: only mutt_is_message_type used. no translation there.
-libmutt/recvattach.c
 # orbit not yet used.
 src/orbit-glue.c

@@ -1,3 +1,33 @@
+2004-10-04 16:39  PeterB
+
+	* libbalsa /: mailbox.c, mailbox.h: implement new _msgno_has_flags
+	subclass method; scrap old _change_message_flags method;
+	lock mailbox in libbalsa_mailbox_messages_move; scrap
+	libbalsa_mailbox_messages_status_changed.
+	* libbalsa/mailbox_imap.c: implement new _msgno_has_flags
+	subclass method; scrap old _change_message_flags method;
+	replace libbalsa_mailbox_messages_status_changed update of
+	unread_messages.
+	* libbalsa/mailbox_local.c: check for possible loop in simple
+	threading.
+	* libbalsa/: mailbox_maildir.c, mailbox_mbox.c, mailbox_mh.c:
+	implement new _msgno_has_flags subclass method; add subclass
+	methods for current _messages_change_flags method; scrap old
+	_change_message_flags method.
+	* libbalsa/mailbox_pop3.c: use mailbox+msgno methods.
+	* libbalsa/: message.c, message.h: scrap
+	libbalsa_messages_{copy,move}.
+	* libbalsa/send.c: use libbalsa_mailbox_messages_change_flags
+	instead of libbalsa_messages_change_flag.
+	* src/: balsa-index.c, balsa-index.h: new balsa_index_transfer api;
+	change BalsaIndex::selected from GList of messages to Garray of
+	msgnos; use mailbox+msgno methods; new drag&drop convention.
+	* src/balsa-mblist.c: use new balsa_index_transfer api; use new
+	drag&drop convention.
+	* src/main-window.c: use new api for balsa_index_transfer; fix
+	drag&drop to notebook tab; use mailbox+msgno method to empty trash.
+	* src/message-window.c: use new api for balsa_index_transfer.
+
 2004-10-04  Pawel Salek
 
 	* libbalsa/imap/imap-handle.c: fix bug in flag cache update on

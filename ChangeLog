@@ -1,3 +1,8 @@
+2004-01-15 10:40  PeterB
+
+	* src/balsa-message.c: Set embedded headers in the same style of
+	widget as message headers.
+
 2004-01-14 17:53  PeterB
 
 	* src/balsa-bonobo.c: use new api for add_attachment.

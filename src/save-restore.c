@@ -736,7 +736,22 @@ config_global_load (void)
   else
       balsa_app.encoding_style = atoi(field);
 
-  return TRUE;
+  if (( field = pl_dict_get_str (globals, "PrintCommand")) == NULL) 
+      balsa_app.PrintCommand.PrintCommand = g_strdup("a2ps -d -q %s");
+  else 
+      balsa_app.PrintCommand.PrintCommand = g_strdup(field);
+
+  if (( field = pl_dict_get_str (globals, "PrintLinesize")) == NULL)
+      balsa_app.PrintCommand.linesize = DEFAULT_LINESIZE;
+  else
+      balsa_app.PrintCommand.linesize = atoi(field);
+
+  if (( field = pl_dict_get_str (globals, "PrintBreakline")) == NULL )
+      balsa_app.PrintCommand.breakline = FALSE;
+  else
+      balsa_app.PrintCommand.breakline = atoi(field);
+
+ return TRUE;
 }				/* config_global_load */
 
 gint
@@ -822,6 +837,20 @@ config_global_save (void)
       pl_dict_add_str_str(globals, "Charset", balsa_app.charset);
   else
       pl_dict_add_str_str(globals, "Charset", DEFAULT_CHARSET);
+
+
+  if (balsa_app.PrintCommand.PrintCommand != NULL)
+      pl_dict_add_str_str(globals, "PrintCommand", balsa_app.PrintCommand.PrintCommand);
+  else
+      pl_dict_add_str_str(globals, "PrintCommand", "a2ps -d -q %s");
+
+  {
+      char tmp[MAX_PROPLIST_KEY_LEN];
+      snprintf (tmp, sizeof (tmp), "%d", balsa_app.PrintCommand.linesize);
+      pl_dict_add_str_str (globals, "PrintLinesize", tmp);
+      snprintf (tmp, sizeof (tmp), "%d", balsa_app.PrintCommand.breakline);
+      pl_dict_add_str_str (globals, "PrintBreakline", tmp);
+  }
 
   /* Add it to configuration file */
   temp_str = PLMakeString ("Globals");

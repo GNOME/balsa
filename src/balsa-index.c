@@ -1006,7 +1006,7 @@ bndx_find_row(BalsaIndex * index, GtkTreeIter * pos,
         /* The current_message is NULL (or we otherwise can't find
          * it); if we're looking for a plain next or prev, just return
          * FALSE. */
-        if (!(flag || conditions))
+        if (!(flag || conditions || exclude))
             return FALSE;
 
         wrap = FALSE;
@@ -2491,10 +2491,9 @@ bndx_messages_remove(BalsaIndex * index, GList * messages)
 
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(index));
 
-    if (index->current_message &&
-        !g_list_find(messages, index->current_message))
-        next_message = index->current_message;
-    else if (bndx_find_row(index, &iter, FALSE, 0, FILTER_NOOP, NULL,
+    /* Find the next message to display, if the current message is being
+     * removed. */
+    if (bndx_find_row(index, &iter, FALSE, 0, FILTER_NOOP, NULL,
                            messages))
         gtk_tree_model_get(model, &iter, BNDX_MESSAGE_COLUMN,
                            &next_message, -1);
@@ -2507,6 +2506,12 @@ bndx_messages_remove(BalsaIndex * index, GList * messages)
         g_signal_emit_by_name(selection, "changed");
         return;
     }
+
+    /* If there is no current message, don't select one; if there is,
+     * and it's not being removed, keep it. */
+    if (!index->current_message ||
+        !g_list_find(messages, index->current_message))
+        next_message = index->current_message;
 
     /* check the list of messages to be removed */
     for (list = messages; list; list = g_list_next(list)) {
@@ -2560,7 +2565,8 @@ bndx_messages_remove(BalsaIndex * index, GList * messages)
     /* rethread and select the next message */
     balsa_index_threading(index,
                           index->mailbox_node->mailbox->threading_type);
-    bndx_select_message(index, next_message);
+    if (next_message)
+        bndx_select_message(index, next_message);
     g_get_current_time (&index->last_use);
 }
 

@@ -1496,6 +1496,8 @@ balsa_close_commit_mailbox_on_timer(GtkWidget * widget, gpointer * data)
     GtkWidget *page;
     int i, c, time;
 
+    if (!balsa_app.notebook)
+        return FALSE;
     if (! (balsa_app.close_mailbox_auto || balsa_app.commit_mailbox_auto) )
         return TRUE;
 

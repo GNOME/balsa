@@ -42,7 +42,7 @@ extern "C" {
     typedef struct _BalsaSendmsgAddress BalsaSendmsgAddress;
 
     struct _BalsaSendmsgAddress {
-        BalsaSendmsg *msg;
+        BalsaSendmsg *bsmsg;
         GtkWidget *label;
         gint min_addresses, max_addresses;
         gboolean ready;
@@ -91,6 +91,7 @@ extern "C" {
 	GtkWidget *gpg_radio[2];
 #endif
         GtkWidget *header_table;
+        GtkWidget *focus_widget;
     };
 
     BalsaSendmsg *sendmsg_window_new(GtkWidget *, LibBalsaMessage *,

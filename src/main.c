@@ -319,6 +319,7 @@ scan_mailboxes_idle_cb()
                     append_subtree_f, NULL);
     balsa_mailbox_nodes_unlock(TRUE);
     config_views_load();
+    balsa_mblist_repopulate(balsa_app.mblist_tree_store);
     gdk_threads_leave();
 
     if (cmd_open_unread_mailbox || balsa_app.open_unread_mailbox)

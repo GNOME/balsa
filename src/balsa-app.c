@@ -449,14 +449,22 @@ destroy_mbnode(GNode * node, gpointer data)
     if(mbnode == NULL) /* true for root node only */
 	return FALSE;
     
+    /* FIXME: Balsa now uses the `exposed' state of mailboxes to set
+     * initial expansion. This code is kept only for the transition
+     * after an upgrade. All "%s/.expanded" files are removed when Balsa
+     * exits. */
     if (!mbnode->mailbox) {
 	gchar *tmpfile = g_strdup_printf("%s/.expanded", mbnode->name);
+#if 0
 	if (mbnode->expanded)
 	    close(creat(tmpfile, S_IRUSR | S_IWUSR));
 	else
+#endif
 	    unlink(tmpfile);
+
 	g_free(tmpfile);
     }
+
     g_object_unref(G_OBJECT(mbnode));
     return FALSE;
 }
@@ -752,6 +760,24 @@ balsa_find_url(GNode * root, const gchar * url)
     return bf.gnode;
 }
 
+/* balsa_find_mailbox_node_by_url:
+ * looks for a mailbox node with the given url.
+ * returns NULL on failure
+ */
+BalsaMailboxNode *
+balsa_find_mailbox_node_by_url(const gchar * url)
+{
+    GNode *gnode;
+    BalsaMailboxNode *mbnode;
+
+    balsa_mailbox_nodes_lock(FALSE);
+    gnode = balsa_find_url(balsa_app.mailbox_nodes, url);
+    mbnode = gnode ? gnode->data : NULL;
+    balsa_mailbox_nodes_unlock(FALSE);
+
+    return mbnode;
+}
+
 /* balsa_find_mailbox_by_url:
  * looks for a mailbox with the given url.
  * returns NULL on failure
@@ -759,15 +785,9 @@ balsa_find_url(GNode * root, const gchar * url)
 LibBalsaMailbox *
 balsa_find_mailbox_by_url(const gchar * url)
 {
-    GNode *gnode;
-    LibBalsaMailbox *mailbox;
+    BalsaMailboxNode *mbnode = balsa_find_mailbox_node_by_url(url);
 
-    balsa_mailbox_nodes_lock(FALSE);
-    gnode = balsa_find_url(balsa_app.mailbox_nodes, url);
-    mailbox = gnode ? ((BalsaMailboxNode *) gnode->data)->mailbox : NULL;
-    balsa_mailbox_nodes_unlock(FALSE);
-
-    return mailbox;
+    return mbnode ? mbnode->mailbox : NULL;
 }
 
 /* End of search utilities. */

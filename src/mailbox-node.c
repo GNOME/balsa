@@ -66,6 +66,7 @@ static void balsa_mailbox_node_real_load_config(BalsaMailboxNode* mn,
 static GNode *imap_scan_create_mbnode(GNode * root, imap_scan_item * isi,
                                       char delim);
 static void imap_scan_attach_mailbox(GNode* node, imap_scan_item * isi);
+static gboolean imap_scan_children_idle(BalsaMailboxNode ** mn);
 
 static GNode* add_local_mailbox(GNode*root, const char*d_name, const char* fn);
 static GNode* add_local_folder(GNode*root, const char*d_name, const char* fn);
@@ -400,9 +401,15 @@ balsa_mailbox_node_new_from_dir(const gchar* dir)
     gchar *tmppath;
 
     mbn = BALSA_MAILBOX_NODE(balsa_mailbox_node_new());
+
+    /* FIXME: Balsa now uses the `exposed' state of mailboxes to set
+     * initial expansion. This code is kept only for the transition
+     * after an upgrade. All "%s/.expanded" files are removed when Balsa
+     * exits. */
     tmppath = g_strdup_printf("%s/.expanded", dir);
     mbn->expanded = (access(tmppath, F_OK) != -1);
     g_free(tmppath);
+
     mbn->name = g_strdup(dir);
     mbn->dir  = g_strdup(dir);
     g_signal_connect(G_OBJECT(mbn), "show-prop-dialog", 
@@ -605,12 +612,21 @@ balsa_mailbox_node_rescan(BalsaMailboxNode * mn)
     if (!balsa_app.mailbox_nodes)
         return;
 
+    g_object_add_weak_pointer(G_OBJECT(mn), (gpointer) &mn);
     tmp_node = g_node_new(mn);
     balsa_mailbox_node_append_subtree(mn, tmp_node);
+    if (mn)
+        g_object_remove_weak_pointer(G_OBJECT(mn), (gpointer) &mn);
 
+    if (!mn || !balsa_app.mailbox_nodes) {
+        balsa_remove_children_mailbox_nodes(tmp_node);
+        g_node_destroy(tmp_node);
+        return;
+    }
+
+    config_views_save();
     balsa_mailbox_nodes_lock(TRUE);
-    if (balsa_app.mailbox_nodes
-        && (gnode = balsa_find_mbnode(balsa_app.mailbox_nodes, mn))) {
+    if ((gnode = balsa_find_mbnode(balsa_app.mailbox_nodes, mn))) {
         GNode *child;
 	gboolean expanded = mn->expanded;
 
@@ -642,11 +658,13 @@ balsa_mailbox_node_rescan(BalsaMailboxNode * mn)
  * Note that rescanning local_mail_directory will *not* trigger rescanning
  * eventual IMAP servers.
  */
+#define BALSA_MAILBOX_NODE_LIST_KEY "balsa-mailbox-node-list"
+
 void
 balsa_mailbox_node_scan_children(BalsaMailboxNode * mbnode)
 {
     GNode *gnode;
-    GSList *list = NULL, *l;
+    GSList *list = NULL;
 
     balsa_mailbox_nodes_lock(FALSE);
 
@@ -654,13 +672,13 @@ balsa_mailbox_node_scan_children(BalsaMailboxNode * mbnode)
                         G_TRAVERSE_ALL, mbnode);
     if (gnode) {
         for (gnode = gnode->children; gnode; gnode = gnode->next) {
-            mbnode = BALSA_MAILBOX_NODE(gnode->data);
-            if ((LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox)
-                 || (!mbnode->mailbox && mbnode->server
-                     && mbnode->server->type == LIBBALSA_SERVER_IMAP))
-                && !mbnode->scanned) {
-                list = g_slist_prepend(list, mbnode);
-                g_object_add_weak_pointer(G_OBJECT(mbnode), & list->data);
+            BalsaMailboxNode *mn = BALSA_MAILBOX_NODE(gnode->data);
+            if ((LIBBALSA_IS_MAILBOX_IMAP(mn->mailbox)
+                 || (!mn->mailbox && mn->server
+                     && mn->server->type == LIBBALSA_SERVER_IMAP))
+                && !mn->scanned) {
+                list = g_slist_prepend(list, mn);
+                g_object_add_weak_pointer(G_OBJECT(mn), & list->data);
             }
         }
     } else
@@ -668,23 +686,61 @@ balsa_mailbox_node_scan_children(BalsaMailboxNode * mbnode)
 
     balsa_mailbox_nodes_unlock(FALSE);
 
-    for (l = list; l; l = g_slist_next(l)) {
-        gboolean has_unread_messages = FALSE;
-        if (!l->data)
-            continue;
-        mbnode = l->data;
-        if (mbnode->mailbox)
-            has_unread_messages = mbnode->mailbox->has_unread_messages;
-        balsa_mailbox_node_rescan(mbnode);
-        if (!l->data)
-            continue;
-        if (mbnode->mailbox)
-            mbnode->mailbox->has_unread_messages = has_unread_messages;
-        mbnode->scanned = TRUE;
-        g_object_remove_weak_pointer(G_OBJECT(mbnode), & l->data);
+    if (list && !g_object_get_data(G_OBJECT(mbnode),
+                                   BALSA_MAILBOX_NODE_LIST_KEY)) {
+        BalsaMailboxNode **mn = g_new(BalsaMailboxNode *, 1);
+        *mn = mbnode;
+        g_object_add_weak_pointer(G_OBJECT(mbnode), (gpointer) mn);
+        g_object_set_data(G_OBJECT(mbnode), BALSA_MAILBOX_NODE_LIST_KEY,
+                          g_slist_reverse(list));
+        g_idle_add((GSourceFunc) imap_scan_children_idle, mn);
+    }
+}
+
+static gboolean
+imap_scan_children_idle(BalsaMailboxNode ** mbnode)
+{
+    GSList *list;
+    GSList *l;
+
+    gdk_threads_enter();
+
+    if (!*mbnode) {
+        g_free(mbnode);
+        gdk_threads_leave();
+        return FALSE;
     }
 
+    list = g_object_get_data(G_OBJECT(*mbnode), BALSA_MAILBOX_NODE_LIST_KEY);
+    for (l = list; l; l = g_slist_next(l)) {
+        BalsaMailboxNode *mn;
+        gboolean has_unread_messages = FALSE;
+        
+        if (!l->data)
+            continue;
+        mn = l->data;
+        if (mn->mailbox)
+            has_unread_messages = mn->mailbox->has_unread_messages;
+        balsa_mailbox_node_rescan(mn);
+        if (!l->data)
+            continue;
+        if (mn->mailbox)
+            mn->mailbox->has_unread_messages = has_unread_messages;
+        mn->scanned = TRUE;
+        g_object_remove_weak_pointer(G_OBJECT(mn), & l->data);
+    }
     g_slist_free(list);
+
+    if (*mbnode) {
+        g_object_set_data(G_OBJECT(*mbnode), BALSA_MAILBOX_NODE_LIST_KEY,
+                          NULL);
+        g_object_remove_weak_pointer(G_OBJECT(*mbnode), (gpointer) mbnode);
+    }
+    g_free(mbnode);
+
+    gdk_threads_leave();
+
+    return FALSE;
 }
 
 /* ---------------------------------------------------------------------
@@ -787,10 +843,6 @@ mb_unsubscribe_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 static void
 mb_rescan_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 {
-    /* no need for this:
-    g_return_if_fail(mbnode->mailbox == NULL);
-     * balsa_mailbox_node_rescan() does a more refined test.
-     */
     balsa_mailbox_node_rescan(mbnode);
 }
 

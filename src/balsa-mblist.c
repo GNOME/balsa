@@ -548,13 +548,7 @@ bmbl_child_toggled_cb(GtkTreeModel * model, GtkTreePath * path,
     gtk_tree_model_get(model, iter, MBNODE_COLUMN, &mbnode, -1);
     if (mbnode && mbnode->expanded
         && !gtk_tree_view_row_expanded(tree_view, path)) {
-        g_signal_handlers_block_by_func(G_OBJECT(tree_view),
-                                        G_CALLBACK(bmbl_tree_expand),
-                                        NULL);
         gtk_tree_view_expand_row(tree_view, path, FALSE);
-        g_signal_handlers_unblock_by_func(G_OBJECT(tree_view),
-                                          G_CALLBACK(bmbl_tree_expand),
-                                          NULL);
     }
 }
 

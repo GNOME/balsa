@@ -553,6 +553,7 @@ config_global_load(void)
 {
     gint open_mailbox_count;
     gboolean def_used;
+    BalsaMailboxNode *root_node;
 
     config_address_books_load();
     config_identities_load();
@@ -944,9 +945,11 @@ config_global_load(void)
 	gnome_config_pop_prefix();
 	return FALSE;
     }
+    root_node =
+        balsa_mailbox_node_new_from_dir(balsa_app.local_mail_directory);
+    root_node->expanded = TRUE;
     balsa_mailbox_nodes_lock(TRUE);
-    balsa_app.mailbox_nodes = g_node_new(balsa_mailbox_node_new_from_dir(
-        balsa_app.local_mail_directory));
+    balsa_app.mailbox_nodes = g_node_new(root_node);
     balsa_mailbox_nodes_unlock(TRUE);
 
     balsa_app.open_inbox_upon_startup =
@@ -1470,8 +1473,22 @@ config_views_load(void)
 	    g_free(tmp);
 	    url = gnome_config_get_string_with_default("URL", &def);
 	    if(!def) {
-		LibBalsaMailbox* mbx = balsa_find_mailbox_by_url(url);
-		if(mbx) libbalsa_mailbox_load_view(mbx);
+                BalsaMailboxNode *mbnode =
+                    balsa_find_mailbox_node_by_url(url);
+		LibBalsaMailbox *mbx = mbnode ? mbnode->mailbox : NULL;
+
+		if (mbx) {
+                    gboolean exposed;
+
+                    libbalsa_mailbox_load_view(mbx);
+
+                    exposed =
+                        gnome_config_get_bool_with_default("Exposed", &def);
+                    if (def) exposed = FALSE;
+                    if (exposed)
+                        while ((mbnode = mbnode->parent))
+                            mbnode->expanded = TRUE;
+                }
 	    }
 	    gnome_config_pop_prefix();
 	    g_free(url);
@@ -1488,6 +1505,7 @@ static gboolean
 save_view(GNode * node, int *cnt)
 {
     gchar *prefix;
+    gboolean exposed;
     BalsaMailboxNode* mn = BALSA_MAILBOX_NODE(node->data);
     g_return_val_if_fail(mn, FALSE);
     
@@ -1499,6 +1517,16 @@ save_view(GNode * node, int *cnt)
     g_free(prefix);
     gnome_config_set_string("URL", mn->mailbox->url);
     libbalsa_mailbox_save_view(mn->mailbox);
+
+    exposed = TRUE;
+    while ((mn = mn->parent)) {
+        if (!mn->expanded) {
+            exposed = FALSE;
+            break;
+        }
+    }
+    gnome_config_set_bool("Exposed", exposed);
+
     gnome_config_pop_prefix();
     return FALSE;
 }

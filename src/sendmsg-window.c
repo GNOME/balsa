@@ -2524,11 +2524,11 @@ static const gchar* compose_toolbar[] = {
     "",
     BALSA_PIXMAP_IDENTITY,
     "",
-    GNOME_STOCK_PIXMAP_SPELLCHECK,
+    GTK_STOCK_SPELL_CHECK,
     "",
     BALSA_PIXMAP_PRINT,
     "",
-    GNOME_STOCK_PIXMAP_CLOSE,
+    GTK_STOCK_CLOSE,
 };
 
 /* Create the toolbar model for the compose window's toolbar.

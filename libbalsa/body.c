@@ -131,6 +131,9 @@ libbalsa_message_body_set_mime_body(LibBalsaMessageBody * body,
     if (body->mime_part)
 	g_object_unref(G_OBJECT(body->mime_part));	
     body->mime_part = mime_part;
+    if (GMIME_IS_PART(mime_part))
+	body->filename =
+	    g_strdup(g_mime_part_get_filename(GMIME_PART(mime_part)));
 
     if      (g_mime_content_type_is_type(type, "audio", "*"))
 	body->body_type = LIBBALSA_MESSAGE_BODY_TYPE_AUDIO;

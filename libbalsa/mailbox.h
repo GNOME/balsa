@@ -82,7 +82,8 @@ struct _LibBalsaMailbox {
     gboolean is_directory;
     gboolean readonly;
 
-    glong messages;
+    glong messages; /* NOTE: this is used for internal msg counting;
+		     * it is often different from g_list_count(messages) */  
     glong new_messages;
     GList *message_list;
 

@@ -1,3 +1,17 @@
+2001-10-08  Pawel Salek  <pawsa@theochem.kth.se>
+
+	The mailbox commiting, the proper way.
+	* libbalsa/libbalsa.h: define MuttHeader.
+	* libbalsa/mailbox.[hc]: the proper mailbox_commit().
+	* libbalsa/mailbox_imap.c: drop LibBalsaMessage::msgno field.
+	* libbalsa/mailbox_local.c: fix message counting.
+	* libbalsa/message.[hc]: replace gulong::msgno with MuttHeader::header.
+	* libbalsa/send.c: msgno->header.
+	* libbalsa/source-viewer.c: ditto.
+	* src/balsa-index-threading.c: use LIBBALSA_MESSAGE_GET_NO()
+	* src/balsa-index.c: ditto.
+	* libbalsa/pop3.c: be even more defensive.
+	
 2001-10-08  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/main-window.c: 'mark all' menu entry, clean up 

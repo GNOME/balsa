@@ -109,8 +109,8 @@ static void
 libbalsa_message_init(LibBalsaMessage * message)
 {
     message->flags = 0;
-    message->msgno = 0;
     message->mailbox = NULL;
+    message->header = NULL;
     message->remail = NULL;
     message->date = 0;
     message->from = NULL;
@@ -290,8 +290,8 @@ libbalsa_message_destroy(GtkObject * object)
 const gchar *
 libbalsa_message_pathname(LibBalsaMessage * message)
 {
-    g_return_val_if_fail(message->mailbox, NULL);
-    return CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno]->path;
+    g_return_val_if_fail(message->header, NULL);
+    return message->header->path;
 }
 
 static const gchar *
@@ -356,55 +356,53 @@ create_hdr_pair(const gchar * name, gchar * value)
 GList *
 libbalsa_message_user_hdrs(LibBalsaMessage * message)
 {
-    HEADER *cur;
     LIST *tmp;
     GList *res = NULL;
     gchar **pair;
+    ENVELOPE *env;
 
     g_return_val_if_fail(message->mailbox, NULL);
     if(CLIENT_CONTEXT(message->mailbox)->hdrs == NULL) 
 	/* oops, mutt closed the mailbox on error, we should do the same */
 	return NULL;
 
-    cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
-    g_assert(cur != NULL);
-    g_assert(cur->env != NULL);
-
-    if (cur->env->return_path)
+    g_assert(message->header != NULL);
+    g_assert(message->header->env != NULL);
+    env = message->header->env;
+    
+    if (env->return_path)
 	res =
 	    g_list_append(res,
 			  create_hdr_pair("Return-Path",
-					  ADDRESS_to_gchar(cur->env->
-							   return_path)));
+					  ADDRESS_to_gchar(env->return_path)));
 
-    if (cur->env->sender)
+    if (env->sender)
 	res =
 	    g_list_append(res,
 			  create_hdr_pair("Sender",
-					  ADDRESS_to_gchar(cur->env->
-							   sender)));
+					  ADDRESS_to_gchar(env->sender)));
 
-    if (cur->env->mail_followup_to)
+    if (env->mail_followup_to)
 	res =
 	    g_list_append(res,
 			  create_hdr_pair("Mail-Followup-To",
-					  ADDRESS_to_gchar(cur->env->
+					  ADDRESS_to_gchar(env->
 							   mail_followup_to)));
 
-    if (cur->env->message_id)
+    if (env->message_id)
 	res =
 	    g_list_append(res,
 			  create_hdr_pair("Message-ID",
-					  g_strdup(cur->env->message_id)));
-
-    for (tmp = cur->env->references; tmp; tmp = tmp->next) {
+					  g_strdup(env->message_id)));
+    
+    for (tmp = env->references; tmp; tmp = tmp->next) {
 	res =
 	    g_list_append(res,
 			  create_hdr_pair("References",
 					  g_strdup(tmp->data)));
     }
 
-    for (tmp = cur->env->userhdrs; tmp; tmp = tmp->next) {
+    for (tmp = env->userhdrs; tmp; tmp = tmp->next) {
 	pair = g_strsplit(tmp->data, ":", 1);
 	g_strchug(pair[1]);
 	res = g_list_append(res, pair);
@@ -462,7 +460,7 @@ libbalsa_message_copy(LibBalsaMessage * message, LibBalsaMailbox * dest)
     g_return_val_if_fail(message->mailbox, FALSE);
     RETURN_VAL_IF_CONTEXT_CLOSED(message->mailbox, FALSE);
 
-    cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
+    cur = message->header;
 
     handle = libbalsa_mailbox_open_append(dest);
 
@@ -490,7 +488,6 @@ libbalsa_message_copy(LibBalsaMessage * message, LibBalsaMailbox * dest)
 gboolean
 libbalsa_message_save(LibBalsaMessage * message, const gchar *filename)
 {
-    HEADER *cur;
     FILE *outfile;
     int res;
 
@@ -500,11 +497,9 @@ libbalsa_message_save(LibBalsaMessage * message, const gchar *filename)
     if( (outfile = fopen(filename, "w")) == NULL) return FALSE;
     g_return_val_if_fail(outfile, FALSE);
 
-    cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
-
     libbalsa_lock_mutt();
     res = mutt_copy_message(outfile, CLIENT_CONTEXT(message->mailbox), 
-			    cur, 0, 0);
+			    message->header, 0, 0);
     libbalsa_unlock_mutt();
 
     fclose(outfile);
@@ -537,7 +532,8 @@ libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
     libbalsa_lock_mutt();
     for(p=messages; p; 	p=g_list_next(p)) {
 	message=(LibBalsaMessage *)(p->data);
-	cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
+	if(CLIENT_CONTEXT_CLOSED(message->mailbox)) continue;
+	cur = message->header;
 	mutt_parse_mime_message(CLIENT_CONTEXT(message->mailbox), cur);
 	mutt_append_message(handle->context,
 			    CLIENT_CONTEXT(message->mailbox), cur, 0, 0);
@@ -568,7 +564,7 @@ libbalsa_message_real_set_answered_flag(LibBalsaMessage * message,
     LOCK_MAILBOX(message->mailbox);
     RETURN_IF_CLIENT_CONTEXT_CLOSED(message->mailbox);
 
-    cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
+    cur = message->header;
 
     libbalsa_lock_mutt();
     mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_REPLIED, TRUE);
@@ -590,7 +586,7 @@ libbalsa_message_real_set_read_flag(LibBalsaMessage * message,
     LOCK_MAILBOX(message->mailbox);
     RETURN_IF_CLIENT_CONTEXT_CLOSED(message->mailbox);
     
-    cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
+    cur = message->header;
     if (set && (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)) {
 	libbalsa_lock_mutt();
 	mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_READ, TRUE);
@@ -627,7 +623,7 @@ libbalsa_message_real_set_flagged(LibBalsaMessage * message, gboolean set)
     LOCK_MAILBOX(message->mailbox);
     RETURN_IF_CLIENT_CONTEXT_CLOSED(message->mailbox);
 
-    cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
+    cur = message->header;
     if (!set && (message->flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)) {
 	libbalsa_lock_mutt();
 	mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_FLAG,
@@ -657,7 +653,7 @@ libbalsa_message_real_set_deleted_flag(LibBalsaMessage * message,
     LOCK_MAILBOX(message->mailbox);
     RETURN_IF_CLIENT_CONTEXT_CLOSED(message->mailbox);
 
-    cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
+    cur = message->header;
     if (set && !(message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)) {
 	libbalsa_lock_mutt();
 	mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_DELETE,
@@ -833,9 +829,8 @@ libbalsa_message_body_ref(LibBalsaMessage * message)
 	return TRUE;
     }
     g_return_val_if_fail(CLIENT_CONTEXT(message->mailbox)->hdrs, FALSE);
-    cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
-    if (cur == NULL)
-	return FALSE;
+    cur = message->header;
+    g_return_val_if_fail(cur != NULL, FALSE);
 
     /*
      * load message body
@@ -929,7 +924,7 @@ libbalsa_message_has_attachment(LibBalsaMessage * message)
     g_return_val_if_fail(message->mailbox, FALSE);
     g_return_val_if_fail(CLIENT_CONTEXT(message->mailbox)->hdrs, FALSE);
 
-    msg_header = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
+    msg_header = message->header;	
 
     /* FIXME: Can be simplified into 1 if */
     if (msg_header->content->type != TYPETEXT) {
@@ -1045,9 +1040,9 @@ libbalsa_message_set_dispnotify(LibBalsaMessage *message,
 const gchar*
 libbalsa_message_get_subject(LibBalsaMessage* msg)
 {
-    if(msg->mailbox) {
+    if(msg->header) { /* a message in a mailbox... */
 	/* g_print("Returning libmutt's pointer\n"); */
-	return CLIENT_CONTEXT(msg->mailbox)->hdrs[msg->msgno]->env->subject;
+	return msg->header->env->subject;
     } else
 	return msg->subj;
 }
@@ -1056,12 +1051,19 @@ libbalsa_message_get_subject(LibBalsaMessage* msg)
 guint
 libbalsa_message_get_lines(LibBalsaMessage* msg)
 {
-    return CLIENT_CONTEXT(msg->mailbox)->hdrs[msg->msgno]->lines;
+    return msg->header->lines;
 }
 glong
 libbalsa_message_get_length(LibBalsaMessage* msg)
 {
-    return CLIENT_CONTEXT(msg->mailbox)->hdrs[msg->msgno]->content->length;
+    return msg->header->content->length;
 }
+
+glong
+libbalsa_message_get_no(LibBalsaMessage* msg)
+{
+    return msg->header->msgno;
+}
+
 
 #endif

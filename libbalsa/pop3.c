@@ -145,7 +145,7 @@ getApopStamp (char *buff, char *stamp) {
     g_return_val_if_fail(buff, FALSE);
     g_return_val_if_fail(stamp, FALSE);
     start = strchr(buff, '<');
-    finish = strchr(buff, '>');
+    finish = strchr(start, '>');
     
     if(start && finish) {
         len = strlen(start) - strlen(finish) + 1;

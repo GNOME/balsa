@@ -1468,8 +1468,7 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
     } else {
 	/* the message is in the queue */
 
-	msg_tmp =
-	    CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
+	msg_tmp = message->header;
 	mutt_parse_mime_message(CLIENT_CONTEXT(message->mailbox),
 				msg_tmp);
 	mensaje =

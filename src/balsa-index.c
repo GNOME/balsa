@@ -434,15 +434,10 @@ numeric_compare(GtkCList * clist, gconstpointer ptr1, gconstpointer ptr2)
     if (!m1 || !m2)
 	return 0;
 
-    t1 = m1->msgno;
-    t2 = m2->msgno;
+    t1 = LIBBALSA_MESSAGE_GET_NO(m1);
+    t2 = LIBBALSA_MESSAGE_GET_NO(m2);
 
-    if (t1 < t2)
-	return 1;
-    if (t1 > t2)
-	return -1;
-
-    return 0;
+    return t2-t1;
 }
 
 static gint
@@ -703,7 +698,7 @@ balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message)
     if (mailbox == NULL)
 	return;
 
-    sprintf(buff1, "%ld", message->msgno + 1);
+    sprintf(buff1, "%ld", LIBBALSA_MESSAGE_GET_NO(message)+1);
     text[0] = buff1;		/* set message number */
     text[1] = NULL;		/* flags */
     text[2] = NULL;		/* attachments */
@@ -1179,9 +1174,7 @@ button_event_press_cb(GtkWidget * widget, GdkEventButton * event,
     BalsaIndex *bindex;
     GtkCList* clist;
 
-    if (!event)
-	return;
-    
+    g_return_if_fail(event);
 
     bindex = BALSA_INDEX(data);
     clist = GTK_CLIST (bindex->ctree);
@@ -1191,6 +1184,7 @@ button_event_press_cb(GtkWidget * widget, GdkEventButton * event,
     if (event && event->button == 3) {
         if (handler != 0)
             gtk_idle_remove(handler);
+	handler = 0;
 
 	gtk_menu_popup(GTK_MENU(create_menu(bindex)),
 		       NULL, NULL, NULL, NULL,

@@ -552,7 +552,7 @@ dump(GNode *node, int indent)
 	    LIBBALSA_MESSAGE_GET_SUBJECT(
 		((LibBalsaMessage *)(((GNode*)(node)->data)))) : "empty"),
 	   ((node->data!=NULL) ?
-	    (int)(((LibBalsaMessage *)(((GNode*)(node)->data)))->msgno+1) :
+	    (int)LIBBALSA_MESSAGE_GET_NO((((LibBalsaMessage *)(((GNode*)(node)->data))))+1) :
 	    -1)
 	);
     while(children) {

@@ -59,10 +59,7 @@ struct _LibBalsaMessage {
     /* flags */
     LibBalsaMessageFlag flags;
 
-    /* the ordered numberic index of this message in 
-     * the mailbox beginning from 1, not 0 */
-    glong msgno;
-
+    MuttHeader* header;
     /* remail header if any */
     gchar *remail;
 
@@ -120,6 +117,7 @@ struct _LibBalsaMessage {
 #define LIBBALSA_MESSAGE_GET_LINES(m)  libbalsa_message_get_lines(m)
 #endif
 };
+#define LIBBALSA_MESSAGE_GET_NO(m)  libbalsa_message_get_no(m)
 
 struct _LibBalsaMessageClass {
     GtkObjectClass parent_class;
@@ -228,4 +226,5 @@ const gchar* libbalsa_message_get_subject(LibBalsaMessage* message);
 guint libbalsa_message_get_lines(LibBalsaMessage* msg);
 glong libbalsa_message_get_length(LibBalsaMessage* msg);
 #endif
+glong libbalsa_message_get_no(LibBalsaMessage* msg);
 #endif				/* __LIBBALSA_MESSAGE_H__ */

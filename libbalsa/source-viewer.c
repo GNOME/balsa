@@ -95,9 +95,10 @@ libbalsa_show_message_source(LibBalsaMessage* msg)
     HEADER* hdr;
     long length;
     g_return_if_fail(msg);
-    g_return_if_fail(msg->mailbox);
+    g_return_if_fail(CLIENT_CONTEXT_CLOSED(msg->mailbox));
+    g_return_if_fail(msg->header);
 
-    hdr = CLIENT_CONTEXT(msg->mailbox)->hdrs[msg->msgno];
+    hdr = msg->header;
     f = libbalsa_mailbox_get_message_stream(msg->mailbox, msg);
     fseek(f, hdr->offset, 0);
     length = (hdr->content->offset- hdr->offset) + hdr->content->length;

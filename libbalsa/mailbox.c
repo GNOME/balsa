@@ -613,7 +613,7 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
 
 	message = translate_message(cur);
 	message->mailbox = mailbox;
-	message->msgno = msgno;
+	message->header = cur;
 
 	gtk_signal_connect(GTK_OBJECT(message), "clear-flags",
 			   GTK_SIGNAL_FUNC(message_status_changed_cb),
@@ -630,9 +630,6 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
 	gtk_signal_connect(GTK_OBJECT(message), "set-flagged",
 			   GTK_SIGNAL_FUNC(message_status_changed_cb),
 			   mailbox);
-
-	mailbox->messages++;
-	mailbox->total_messages++;
 
 	if (!cur->read) {
 	    message->flags |= LIBBALSA_MESSAGE_FLAG_NEW;
@@ -657,6 +654,8 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
 	/* take over the ownership */
 	mailbox->message_list =
 	    g_list_append(mailbox->message_list, message);
+	mailbox->total_messages++;
+	mailbox->messages++;
 	gtk_object_ref ( GTK_OBJECT(message) );
 	gtk_object_sink( GTK_OBJECT(message) );
 
@@ -712,45 +711,35 @@ libbalsa_mailbox_free_messages(LibBalsaMailbox * mailbox)
 
 /* libbalsa_mailbox_commit:
    commits the data to storage (file, IMAP server, etc).
-   Then, it needs to find out:
-   b. new message indexes.
-   a. messages that have been deleted by third party (other proceess
-   accessing shared mailbox).
-   Returns TRUE on success, FALSE on failure.
-*/
+
+   While the connection via pointers to mutt's HEADERs may seem
+   fragile, it is sufficient to notice that the only situation when
+   HEADERs are destroyed are mx_sync_mailbox or mx_close_mailbox(). In
+   first case, only deleted messages are destroyed, in the second --
+   all of them.
+
+   This simple picture is somewhat blurred by the fact that mutt
+   sometimes recovers from errors by mx_fastclose_mailbox(). Hm...
+
+   Returns TRUE on success, FALSE on failure.  */
 gboolean
 libbalsa_mailbox_commit(LibBalsaMailbox* mailbox)
 {
-    GList *deleted_list = NULL, *list;
     int rc;
+    int index_hint;
 
     printf("libbalsa_mailbox_commit: enter\n");
     if (CLIENT_CONTEXT_CLOSED(mailbox))
 	return FALSE;
 
-    LOCK_MAILBOX(mailbox);
+    LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
     libbalsa_lock_mutt();
-    rc = mx_sync_mailbox(CLIENT_CONTEXT(mailbox), NULL);
-
-    for(list = g_list_first(mailbox->message_list); list; list = list->next) {
-	LibBalsaMessage* message = list->data;
-	HEADER *h2 = hash_find(CLIENT_CONTEXT(mailbox)->id_hash,
-			       message->message_id);
-	if(h2 ==NULL) {
-	    printf("Deleting message-id: %s\n", message->message_id);
-	    deleted_list = g_list_append(deleted_list, message);
-	} else
-	    message->msgno = h2->msgno;
-    }
+    index_hint = CLIENT_CONTEXT(mailbox)->vcount;
+    rc = mx_sync_mailbox(CLIENT_CONTEXT(mailbox), &index_hint);
     libbalsa_unlock_mutt();
+    mailbox->messages = CLIENT_CONTEXT(mailbox)->msgcount;
     UNLOCK_MAILBOX(mailbox);
 
-    if(deleted_list) {
-	gtk_signal_emit(GTK_OBJECT(mailbox),
-			libbalsa_mailbox_signals[MESSAGES_DELETE], 
-			deleted_list);
-	g_list_free(deleted_list);
-    }
     printf("libbalsa_mailbox_commit: synced\n");
     return rc ==0;
 }
@@ -849,16 +838,6 @@ libbalsa_mailbox_sync_backend(LibBalsaMailbox * mailbox)
     g_return_val_if_fail(CLIENT_CONTEXT_OPEN(mailbox), 0);
     LOCK_MAILBOX_RETURN_VAL(mailbox, 0);
     libbalsa_mailbox_sync_backend_real(mailbox);
-
-#if 0
-    libbalsa_lock_mutt();
-    res = 0; /* FIXME: mx_sync_mailbox (CLIENT_CONTEXT(mailbox), NULL); */
-    if (res) {
-	libbalsa_mailbox_free_messages(mailbox);
-	libbalsa_mailbox_load_messages(mailbox);
-    }
-    libbalsa_unlock_mutt();
-#endif
     UNLOCK_MAILBOX(mailbox);
     return res;
 }

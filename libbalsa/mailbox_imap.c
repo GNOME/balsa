@@ -306,7 +306,8 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
 	mailbox->messages = 0;
 	mailbox->total_messages = 0;
 	mailbox->unread_messages = 0;
-	mailbox->new_messages = CLIENT_CONTEXT(mailbox)->msgcount;
+	mailbox->new_messages = CLIENT_CONTEXT(mailbox)->msgcount
+	- CLIENT_CONTEXT(mailbox)->deleted;
 	if(mailbox->open_ref == 0)
 	    libbalsa_notify_unregister_mailbox(LIBBALSA_MAILBOX(mailbox));
 	/* increment the reference count */
@@ -374,11 +375,12 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox), NULL);
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), NULL);
-    g_return_val_if_fail(CLIENT_CONTEXT(mailbox), NULL);
+    RETURN_VAL_IF_CONTEXT_CLOSED(message->mailbox, FALSE);
 
     msg = safe_calloc(1, sizeof(MESSAGE));
     msg->magic = CLIENT_CONTEXT(mailbox)->magic;
-    if (!imap_fetch_message(msg, CLIENT_CONTEXT(mailbox), message->msgno))
+    if (!imap_fetch_message(msg, CLIENT_CONTEXT(mailbox), 
+			    message->header->msgno))
 	stream = msg->fp;
     FREE(&msg);
     return stream;
@@ -405,7 +407,8 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 	g_return_if_fail(CLIENT_CONTEXT(mailbox));
 	
 	LOCK_MAILBOX(mailbox);
-	newmsg = CLIENT_CONTEXT(mailbox)->msgcount - mailbox->messages;
+	newmsg = CLIENT_CONTEXT(mailbox)->msgcount  
+	    - CLIENT_CONTEXT(mailbox)->deleted - mailbox->messages;
 	index_hint = CLIENT_CONTEXT(mailbox)->vcount;
 
 	libbalsa_lock_mutt();

@@ -303,7 +303,6 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
     GMimeParser *gmime_parser;
     struct message_info msg_info;
     struct message_info * msg_info_p = &msg_info;
-    GMimeMessage *mime_message;
     unsigned msgno = 0;
 
     gmime_parser = g_mime_parser_new_with_stream(mbox->gmime_stream);
@@ -314,31 +313,38 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
 				   (GMimeParserHeaderRegexFunc)
 				   lbm_mbox_header_cb, &msg_info_p);
 
+    msg_info.message = NULL;
     while (!g_mime_stream_eos(mbox->gmime_stream)) {
-	msg_info.status = -1;
-	msg_info.x_status  = -1;
-	mime_message = g_mime_parser_construct_message(gmime_parser);
-	msg_info.start = g_mime_parser_get_from_offset(gmime_parser);
-	msg_info.end = g_mime_parser_tell(gmime_parser);
-	if (msg_info.end > msg_info.start) {
-            LibBalsaMessage *msg;
-	    msg_info.from = g_mime_parser_get_from(gmime_parser);
-            msg = lbm_mbox_message_new(mime_message, &msg_info);
-	    msg_info.flags = msg_info.orig_flags;
-	    if (msg) {
-                LibBalsaMailboxIndexEntry *entry;
-		msg->flags   = msg_info.orig_flags;
-                msg->length  = msg_info.end - msg_info.start; 
-                msg->mailbox = LIBBALSA_MAILBOX(mbox);
-                msg->msgno   = ++msgno;
-                entry = libbalsa_mailbox_index_entry_new_from_msg(msg);
-                g_object_unref(msg);
-		g_ptr_array_add(LIBBALSA_MAILBOX(mbox)->mindex, entry);
-		msg_info.message = NULL;
-		g_array_append_val(mbox->messages_info, msg_info);
-	    }
+	GMimeMessage *mime_message;
+        LibBalsaMessage *msg;
+
+        msg_info.status = msg_info.x_status = -1;
+        mime_message   = g_mime_parser_construct_message(gmime_parser);
+        msg_info.start = g_mime_parser_get_from_offset(gmime_parser);
+        msg_info.end   = g_mime_parser_tell(gmime_parser);
+        if (msg_info.end <= msg_info.start
+            || !(msg_info.from = g_mime_parser_get_from(gmime_parser))) {
+	    g_object_unref(mime_message);
+            continue;
 	}
-	g_mime_object_unref(GMIME_OBJECT(mime_message));
+
+        msg = lbm_mbox_message_new(mime_message, &msg_info);
+        g_object_unref(mime_message);
+        if (!msg) {
+            g_free(msg_info.from);
+            continue;
+        }
+
+        msg_info.flags = msg_info.orig_flags;
+        g_array_append_val(mbox->messages_info, msg_info);
+
+        msg->flags = msg_info.orig_flags;
+        msg->length = msg_info.end - msg_info.start;
+        msg->mailbox = LIBBALSA_MAILBOX(mbox);
+        msg->msgno = ++msgno;
+        g_ptr_array_add(LIBBALSA_MAILBOX(mbox)->mindex, 
+                        libbalsa_mailbox_index_entry_new_from_msg(msg));
+        g_object_unref(msg);
     }
 
     g_object_unref(G_OBJECT(gmime_parser));

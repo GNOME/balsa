@@ -1,3 +1,7 @@
+2000-09-07  Carlos Morgado <chbm@chbm.nu>
+	
+	* idl/balsa.idl: Gnome::Balsa::App, new Attachment
+
 2000-09-07  Berend De Schouwer  <bds@jhb.ucs.co.za>
 	LDAP directory lookup.
 	* acconfig.h: add ENABLE_LDAP

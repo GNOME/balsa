@@ -1,3 +1,9 @@
+2001-05-15  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Daniel Foster <daniel-l@34SP.com>:
+	* libbalsa/address-entry.c: more natural address pasting.
+	* src/sendmsg-window.c: menu entry for appending the signature
+
 2001-05-14  Carlos Morgado  <chbm@chbm.nu>
 
 	* libbalsa/send.c (libbalsa_process_queue): small patch from Brian 

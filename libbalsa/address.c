@@ -417,7 +417,10 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries,
     gchar *carrier = NULL;
     gint cnt, cnt2;
 
-    new_email = g_strdup(address ? address->address_list->data : ""); 
+    new_email = g_strdup(address
+                         && address->address_list
+                         && address->address_list->data ?
+                         address->address_list->data : "");
     /* initialize the organization... */
     if (!address || address->organization == NULL)
 	new_organization = g_strdup("");

@@ -1689,7 +1689,8 @@ append_str(const char *buf, int buflen, void *arg)
     struct part_data *dt = (struct part_data*)arg;
 
     if(dt->pos + buflen > dt->body->octets) {
-        g_error("IMAP server sends too much data?\n");
+        fprintf(stderr, "IMAP server sends too much data but we just "
+                "ignore that looser.\n");
         buflen = dt->body->octets-dt->pos;
     }
     memcpy(dt->block + dt->pos, buf, buflen);

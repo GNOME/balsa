@@ -553,7 +553,12 @@ delete_handler(BalsaSendmsg* bsmsg)
 	reply = gtk_dialog_run(GTK_DIALOG(d));
         gtk_widget_destroy(d);
 	if(reply == GTK_RESPONSE_YES)
-	    message_postpone(bsmsg);
+	    if(!message_postpone(bsmsg)) {
+                balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                           LIBBALSA_INFORMATION_WARNING,
+                                           _("Could not postpone message."));
+                reply = GTK_RESPONSE_CANCEL;
+            }
 	/* cancel action  when reply = "yes" or "no" */
 	return (reply != GTK_RESPONSE_YES) && (reply != GTK_RESPONSE_NO);
     }
@@ -3695,8 +3700,12 @@ static void
 postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
     if (is_ready_to_send(bsmsg)) {
-        message_postpone(bsmsg);
-        gtk_widget_destroy(bsmsg->window);
+        if(message_postpone(bsmsg))
+            gtk_widget_destroy(bsmsg->window);
+        else
+            balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                       LIBBALSA_INFORMATION_WARNING,
+                                       _("Could not postpone message."));
     }
 }
 
@@ -3704,10 +3713,8 @@ postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static void
 save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    if (!message_postpone(bsmsg))
-	return;
-
-    if (!libbalsa_mailbox_open(balsa_app.draftbox)) {
+    if (!message_postpone(bsmsg) ||
+        !libbalsa_mailbox_open(balsa_app.draftbox)) {
 	balsa_information_parented(GTK_WINDOW(bsmsg->window),
 				   LIBBALSA_INFORMATION_WARNING,
 				   _("Could not save message."));

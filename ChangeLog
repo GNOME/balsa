@@ -1,3 +1,8 @@
+2004-04-07  Pawel Salek
+
+	* libbalsa/mailbox_imap.c: do not quit when talking to non-IMAP servers
+	* src/sendmsg-window.c: check message_postpone() return code.
+
 2004-04-07 06:55  PeterB
 
 	* libbalsa/imap/pop3.c: free pop->host.

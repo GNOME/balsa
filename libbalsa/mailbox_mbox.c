@@ -881,6 +881,101 @@ static void update_message_status_headers(GMimeMessage *message,
 	g_mime_object_remove_header(GMIME_OBJECT(message), "X-Status");
 }
 
+/* Encode text parts as quoted-printable, and armor any "From " lines.
+ */
+static void
+lbm_mbox_armor_part(GMimeObject ** part)
+{
+    const GMimeContentType *mime_type;
+    GMimePart *mime_part;
+    GMimeStream *mem;
+    GMimeStream *fstream;
+    GMimeFilter *filter;
+    GMimeParser *parser;
+
+    while (GMIME_IS_MESSAGE_PART(*part)) {
+	GMimeMessage *message =
+	    g_mime_message_part_get_message(GMIME_MESSAGE_PART(*part));
+	part = &message->mime_part;
+	g_mime_object_unref(GMIME_OBJECT(message));
+    }
+
+    if (GMIME_IS_MULTIPART(*part)) {
+	const GMimeContentType *content_type =
+	    g_mime_object_get_content_type(*part);
+	GList *subpart;
+
+	if (g_mime_content_type_is_type(content_type, "*", "signed"))
+	    /* Don't change the coding of its parts. */
+	    return;
+
+	for (subpart = GMIME_MULTIPART(*part)->subparts; subpart;
+	     subpart = subpart->next)
+	    lbm_mbox_armor_part((GMimeObject **) &subpart->data);
+
+	return;
+    }
+
+    if (!GMIME_IS_PART(*part))
+	return;
+
+    mime_part = GMIME_PART(*part);
+    mime_type = g_mime_part_get_content_type(mime_part);
+    if (!g_mime_content_type_is_type(mime_type, "text", "*"))
+	return;
+
+    g_mime_part_set_encoding(mime_part, GMIME_PART_ENCODING_QUOTEDPRINTABLE);
+
+    mem = g_mime_stream_mem_new();
+    g_mime_part_write_to_stream(mime_part, mem);
+    g_mime_object_unref(GMIME_OBJECT(mime_part));
+
+    g_mime_stream_reset(mem);
+    fstream = g_mime_stream_filter_new_with_stream(mem);
+    g_mime_stream_unref(mem);
+
+    filter = g_mime_filter_from_new(GMIME_FILTER_FROM_MODE_ARMOR);
+    g_mime_stream_filter_add(GMIME_STREAM_FILTER(fstream), filter);
+    g_object_unref(filter);
+
+    parser = g_mime_parser_new_with_stream(fstream);
+    g_mime_stream_unref(fstream);
+
+    *part = g_mime_parser_construct_part(parser);
+    g_object_unref(parser);
+}
+
+static GMimeStream *
+lbm_mbox_armor_stream(GMimeStream * stream)
+{
+    GMimeStream *fstream;
+    GMimeFilter *filter;
+    GMimeParser *parser;
+    GMimeMessage *message;
+    GMimeStream *mem;
+
+    /* CRLF filter before parsing the message. */
+    fstream = g_mime_stream_filter_new_with_stream(stream);
+    filter = g_mime_filter_crlf_new(GMIME_FILTER_CRLF_DECODE,
+				    GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+    g_mime_stream_filter_add(GMIME_STREAM_FILTER(fstream), filter);
+    g_object_unref(filter);
+
+    parser = g_mime_parser_new_with_stream(fstream);
+    g_mime_stream_unref(fstream);
+
+    message = g_mime_parser_construct_message(parser);
+    g_object_unref(parser);
+
+    lbm_mbox_armor_part(&message->mime_part);
+
+    mem = g_mime_stream_mem_new();
+    g_mime_message_write_to_stream(message, mem);
+    g_mime_object_unref(GMIME_OBJECT(message));
+
+    g_mime_stream_reset(mem);
+    return mem;
+}
 
 /* Called with mailbox locked. */
 static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
@@ -896,7 +991,6 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     int fd;
     GMimeStream *orig = NULL;
     GMimeStream *dest = NULL;
-    GMimeFilter* crlffilter;
 
     ctime_r(&(message->headers->date), date_string);
 
@@ -934,12 +1028,7 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
 	if (!tmp)
 	    goto AMCLEANUP;
 	
-	crlffilter = 
-	    g_mime_filter_crlf_new (  GMIME_FILTER_CRLF_DECODE,
-				      GMIME_FILTER_CRLF_MODE_CRLF_ONLY );
-	orig = g_mime_stream_filter_new_with_stream (tmp);
-	g_mime_stream_filter_add ( GMIME_STREAM_FILTER (orig), crlffilter );
-	g_object_unref (crlffilter);
+	orig = lbm_mbox_armor_stream(tmp);
 	g_mime_stream_unref (tmp);
     }
 
@@ -948,7 +1037,7 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
 	 g_mime_stream_write_to_stream (orig, dest) < 0) {
         libbalsa_information ( LIBBALSA_INFORMATION_ERROR,
 			       _("Error copying message to mailbox %s!\n"
-				 "Mailbox might have be corrupted!"),
+				 "Mailbox might have been corrupted!"),
 			       mailbox->name );
         goto AMCLEANUP;
     }

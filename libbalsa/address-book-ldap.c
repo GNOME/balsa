@@ -39,7 +39,6 @@
 
 static const int DEBUG_LDAP = 0;
 /* FIXME: Configurable... */
-static const int LDAP_CACHE_TIMEOUT=300;	/* Seconds */
 /* don't search when prefix has length shorter than LDAP_MIN_LEN */
 static const unsigned LDAP_MIN_LEN=2;
 /* Which parameters do we want back? */
@@ -187,7 +186,6 @@ static void
 libbalsa_address_book_ldap_close_connection(LibBalsaAddressBookLdap * ab)
 {
     if (ab->directory) {
-	ldap_destroy_cache(ab->directory);
 	ldap_unbind(ab->directory);
 	ab->directory = NULL;
     }
@@ -195,7 +193,6 @@ libbalsa_address_book_ldap_close_connection(LibBalsaAddressBookLdap * ab)
 
 /*
  * Opens the ldap connection, and binds to the server.
- * Also enables LDAP caching.
  */
 static gboolean
 libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab)
@@ -223,7 +220,6 @@ libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab)
 	ldap_unbind_s(ab->directory);
 	return FALSE;
     }
-    // ldap_enable_cache(ab->directory, LDAP_CACHE_TIMEOUT, 0);
     return TRUE;
 }
 

@@ -48,9 +48,16 @@ AM_PATH_GLIB([1.2.0],[],[
 dnl this should come after `AC_PROG_CC'
 GNOME_X_CHECKS
 
-AC_CHECK_LIB(pspell, new_pspell_manager,,[
-	AC_MSG_ERROR([*** libpspell(-devel) not found.  Please check http://balsa.gnome.org/ for information on the required files.])
-], -lstdc++ -lpspell-modules)
+dnl ###########################################################################
+dnl Spell check detection.
+dnl ###########################################################################
+
+AC_CHECK_LIB(aspell, new_aspell_speller,,[
+    AC_CHECK_LIB(pspell, new_pspell_manager,,[
+        AC_MSG_ERROR([*** Neither aspell >=0.50 (recommended) nor pspell (deprecated) library was found. Please check http://balsa.gnome.org for information on the required files. Alternatively, check config.log for clues.])
+     ], -lstdc++ -lpspell-modules)
+  ], -lstdc++)
+
 
 dnl Reset
 # LDFLAGS="$balsa_save_LDFLAGS"
@@ -573,7 +580,7 @@ AC_ARG_ENABLE(more-warnings,
 set_more_warnings="$enableval", set_more_warnings=yes)
 
 if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
-	for option in -Wsign-promo -Wsign-compare -Wpointer-arith -Wnested-externs -Wchar-subscripts -Wuninitialized -Wmissing-prototypes -Wreturn-type -Wimplicit; do
+	for option in -Wsign-compare -Wpointer-arith -Wnested-externs -Wchar-subscripts -Wuninitialized -Wmissing-prototypes -Wreturn-type -Wimplicit; do
                 SAVE_CFLAGS="$CFLAGS"
                 CFLAGS="$CFLAGS $option"
                 AC_MSG_CHECKING([whether gcc understands $option])

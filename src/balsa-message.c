@@ -1164,8 +1164,15 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
                       (gpointer) bm);
 
     is_new = LIBBALSA_MESSAGE_IS_UNREAD(message);
-    if(!libbalsa_message_body_ref(bm->message, TRUE, TRUE))
+    if(!libbalsa_message_body_ref(message, TRUE, TRUE)) {
+	LibBalsaMailbox *mailbox = message->mailbox;
+	libbalsa_mailbox_check(mailbox);
+	balsa_information(LIBBALSA_INFORMATION_WARNING,
+                          _("Could not access message; "
+                            "mailbox \"%s\" was changed."),
+			  mailbox->name);
         return FALSE;
+    }
 
 #ifdef HAVE_GPGME
     balsa_message_set_crypto(message);
@@ -3661,6 +3668,19 @@ static void
 select_part(BalsaMessage * bm, BalsaPartInfo *info)
 {
     hide_all_parts(bm);
+
+    if (bm->message) {
+	LibBalsaMailbox *mailbox = bm->message->mailbox;
+	/* Make sure message still exists. */
+	libbalsa_mailbox_check(mailbox);
+	if (!bm->message || !bm->message->mailbox) {
+	    balsa_information(LIBBALSA_INFORMATION_WARNING,
+                              _("Could not access message; "
+                                "mailbox \"%s\" was changed."),
+                              mailbox->name);
+	    return;
+	}
+    }
 
     bm->current_part = part_info_from_body(bm, add_part(bm, info));
 

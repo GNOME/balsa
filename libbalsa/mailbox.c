@@ -1732,6 +1732,8 @@ lbm_check_unseen_child(GNode * node, LibBalsaMailbox * mailbox)
     if (msgno == 0)
 	return FALSE;
     entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
+    if (!entry)
+	return FALSE;
     entry->has_unseen_child = 0;
     if (entry->status_icon == LIBBALSA_MESSAGE_STATUS_UNREAD) {
 	while ((node = node->parent)

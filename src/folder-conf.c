@@ -291,7 +291,8 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     fcw->enable_persistent = 
         balsa_server_conf_add_checkbox(&fcw->bsc,
                                        _("Enable _persistent cache"));
-    if(libbalsa_imap_server_has_persistent_cache(LIBBALSA_IMAP_SERVER(s)))
+    if(!s || 
+       libbalsa_imap_server_has_persistent_cache(LIBBALSA_IMAP_SERVER(s)))
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fcw->enable_persistent),
                                      TRUE);
 #endif

@@ -1151,9 +1151,10 @@ void
 libbalsa_message_set_references_from_string(LibBalsaMessage * message,
 					    const gchar *str)
 {
-    g_return_if_fail(message->references == NULL);
-
-    if(str) /* empty references are acceptable but require no action. */
+ /* Empty references are acceptable but require no action. Similarly,
+    if references were set already, there is not reason to set them
+    again - they are immutable anyway. */
+    if(!message->references && str)
         message->references = references_decode(str);
 }
 

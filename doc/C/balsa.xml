@@ -2780,10 +2780,15 @@ This is version 2.719 of the Balsa manual.
     
 <para>
   The folder configuration edit dialog allows you to configure entire
-  mailbox sets on remote IMAP servers.  <emphasis>Note</emphasis> that
-  this IMAP folder support is still experimental and you may
-  experience some difficulties if you have bad luck.
+  mailbox sets on remote IMAP servers. Entire configuration is split
+  into basic and advanced parts.
 </para>
+
+<sect2>
+<title>Basic IMAP folder configuration</title>
+
+<para>The basic IMAP folder configuration tab is probably the only
+part you need to fill in.</para>
 
 <itemizedlist mark="bullet">
 
@@ -2794,11 +2799,6 @@ This is version 2.719 of the Balsa manual.
 
   <listitem><para>Server is the host name or IP number of the 
   IMAP server.</para></listitem>
-
-  <listitem><para>Port is the port number to be used for the
-  connection. The default value is 143 but you may want to modify it
-  if you use connection forwarding or your IMAP server runs on a
-  nonstandard port number.</para></listitem> 
 
   <listitem><para>User name is the name used for authorization on the
   IMAP server.</para></listitem>
@@ -2814,6 +2814,54 @@ This is version 2.719 of the Balsa manual.
   but if your IMAP server stores also other kind of files you may
   specify for instance &quot;mail&quot;.</para></listitem>
 </itemizedlist>
+</sect2>
+
+<sect2>
+<title>Advanced IMAP folder configuration</title>
+
+<para>Sometimes, it is necessary to tune the folder configuration in
+order to assure a secure connection, adjust to server limits or just
+obtain better performance. This functionality is provided by the
+Advanced IMAP folder configuration tab.</para>
+
+<itemizedlist mark="bullet">
+<listitem>
+<para><quote>Use SSL</quote> check box should be active is the connection
+is to be made to IMAPS service on port 993. Connection to this port
+will be encrypted from the start. Not all servers provide this service
+- many provide only negotiated TLS encryption.</para>
+</listitem>
+
+<listitem>
+<para><quote>Use TLS</quote> option list determines instruct balsa how
+to negotiate the TLS encryption. Balsa can never attempt to negotiate
+it, can start TLS encryption whenever it is supported by server, or
+can abort the connection if TLS is inavailable or fails for some
+reason.</para>
+</listitem>
+
+<listitem>
+<para><quote>Max. number of connections</quote> limits the number of
+concurrent connections open to the IMAP server. A number around 15-40
+is a sane option as it avoids time-consuming and load-creating
+reselections of imap mailboxes. Some IMAP servers -- notably Courier
+-- limit the number of connections open from single IP number to 4 by
+default. The limit in balsa has to be in such a case adjusted
+accordingly.</para>
+</listitem>
+
+<listitem>
+<para><quote>Enable persistent cache</quote> check box chooses whether
+&Balsa; should try to store downloaded messages between sessions or
+throw them away when it is closed. The optimal choice depends on the
+local configuration. If the connection to the IMAP server is slow and
+local storage in the home directory fast and cheap, it is recommended
+to enable persistent message cache. If the home directory is slow
+(eg. NFS-mounted) and the connection to the imap server - fast,
+persistent cache becomes just a burden and should be disabled.</para>
+</listitem>
+</itemizedlist>
+</sect2>
 
 <sect2 id="subfolder-config">
 <title>IMAP Subfolder Properties</title>

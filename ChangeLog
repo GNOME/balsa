@@ -1,3 +1,11 @@
+2004-07-29  Pawel Salek
+
+	* balsa.spec.in: switch ssl on in binaries.
+	* doc/C/balsa.xml: document advanced IMAP folder configuration.
+	* libbalsa/message.c: trying to set references again is ok.
+	* src/folder-conf.c: fix crash on new folder configuration caused
+	by persistent cache code.
+
 2004-07-29 17:03  PeterB
 
 	* src/folder-conf.c: non-modal folder properties dialog.

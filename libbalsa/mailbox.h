@@ -40,6 +40,9 @@
     (G_TYPE_CHECK_INSTANCE_TYPE ((obj), LIBBALSA_TYPE_MAILBOX))
 #define LIBBALSA_IS_MAILBOX_CLASS(klass) \
     (G_TYPE_CHECK_CLASS_TYPE ((klass), LIBBALSA_TYPE_MAILBOX))
+#define LIBBALSA_MAILBOX_GET_CLASS(mailbox) \
+    (G_TYPE_INSTANCE_GET_CLASS ((mailbox), LIBBALSA_TYPE_MAILBOX, \
+				LibBalsaMailboxClass))
 
 #define MAILBOX_OPEN(mailbox)     libbalsa_mailbox_is_open(mailbox)
 

@@ -1353,20 +1353,14 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 	body = body->next;
     }
 
-    { /* scope */
-	gchar *cset = g_strdup(libbalsa_message_charset(message));
-        gchar *save_charset = Charset;
-	
+    { /* scope CHARSET */
 	libbalsa_lock_mutt();
-	mutt_set_charset(cset);
 	if (msg->content) {
 	    if (msg->content->next)
 		msg->content = mutt_make_multipart(msg->content);
 	}
 	mutt_prepare_envelope(msg->env, FALSE);
 	encode_descriptions(msg->content);
-	mutt_set_charset(save_charset);
-	g_free(cset);
 	libbalsa_unlock_mutt();
     } 
     
@@ -1518,17 +1512,11 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
     }
     
     { /* scope */
-	gchar *cset = g_strdup(libbalsa_message_charset(message));
-        gchar *save_charset = Charset;
-	
 	libbalsa_lock_mutt();
-	mutt_set_charset(cset);
 	if (msg->content && msg->content->next)
 	    msg->content = mutt_make_multipart(msg->content);
 	mutt_prepare_envelope(msg->env, TRUE);
 	encode_descriptions(msg->content);
-	mutt_set_charset(save_charset);
-	g_free(cset);
 	libbalsa_unlock_mutt();
     }
 

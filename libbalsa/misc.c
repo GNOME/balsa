@@ -675,32 +675,6 @@ libbalsa_flowed_rfc2646(LibBalsaMessageBody * body)
     return flowed;
 }
 
-/* libbalsa_set_charset:
-   is a thin wrapper around mutt_set_charset() to get rid of mutt dependices
-   in balsa.
-*/
-void mutt_set_charset (char *charset);
-const char*
-libbalsa_set_charset(const gchar * charset)
-{
-    const char * old_charset = Charset;
-    libbalsa_lock_mutt();
-    mutt_set_charset((gchar *) charset);
-    SendCharset = (char*)charset;
-    libbalsa_unlock_mutt();
-    return old_charset;
-}
-
-const char*
-libbalsa_set_send_charset(const gchar * charset)
-{
-    const char * old_charset = SendCharset;
-    libbalsa_lock_mutt();
-    SendCharset = (char*)charset;
-    libbalsa_unlock_mutt();
-    return old_charset;
-}
-
 /* libbalsa_marshal_BOOLEAN__VOID:
    Marshalling function
 */

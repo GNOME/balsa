@@ -309,17 +309,17 @@ balsa_index_init (BalsaIndex * bindex)
 		      GTK_SIGNAL_FUNC (clist_click_column),
 		      NULL);
 
-  gtk_clist_set_policy (clist, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_clist_set_policy (GTK_CLIST(clist), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_clist_set_selection_mode (clist, GTK_SELECTION_EXTENDED);
   gtk_clist_set_column_justification (clist, 0, GTK_JUSTIFY_RIGHT);
   gtk_clist_set_column_justification (clist, 1, GTK_JUSTIFY_CENTER);
   gtk_clist_set_column_justification (clist, 2, GTK_JUSTIFY_CENTER);
-  gtk_clist_set_column_width (clist, 0, 30);
-  gtk_clist_set_column_width (clist, 1, 16);
-  gtk_clist_set_column_width (clist, 2, 16);
-  gtk_clist_set_column_width (clist, 3, 150);
-  gtk_clist_set_column_width (clist, 4, 250);
-  gtk_clist_set_column_width (clist, 5, 100);
+  gtk_clist_set_column_width (clist, 0, 40);
+  gtk_clist_set_column_width (clist, 1, 40);
+  gtk_clist_set_column_width (clist, 2, 40);
+  gtk_clist_set_column_width (clist, 3, 170);
+  gtk_clist_set_column_width (clist, 4, 260);
+  gtk_clist_set_column_width (clist, 5, 80);
   gtk_clist_set_row_height (clist, 16);
 
   gtk_signal_connect (GTK_OBJECT (clist),

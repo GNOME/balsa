@@ -38,7 +38,7 @@ static void encode_descriptions (BODY * b);
 BODY *add_mutt_body_plain (void);
 
 /* from mutt's send.c */
-static void 
+static void
 encode_descriptions (BODY * b)
 {
   BODY *t;
@@ -162,7 +162,11 @@ balsa_send_message (Message * message, gchar * smtp_server, glong debug)
       list = list->next;
     }
 
-  msg->content = mutt_make_multipart (msg->content);
+  if (msg->content)
+    {
+      if (msg->content->next)
+	msg->content = mutt_make_multipart (msg->content);
+    }
 
   mutt_prepare_envelope (msg->env);
 

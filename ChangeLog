@@ -1,3 +1,8 @@
+2004-07-03  Carlos Morgado  <chbm gnome.org>
+
+	* src/mailbox-node.c: patch from PeterB to fix 
+	the multiple INBOXmbnodes problem 
+
 2004-05-09  Albrecht Dreß
 
 	* src/balsa-message.[hc]: The patch as in

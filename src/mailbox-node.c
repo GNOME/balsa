@@ -439,10 +439,9 @@ imap_dir_cb_real(void* r)
 	n = imap_scan_create_mbnode(mb, item, imap_tree.delim);
 	if(item->selectable)
 	    imap_scan_attach_mailbox(n, item);
-        if(item->marked) {
+        if(item->marked)
             libbalsa_mailbox_set_unread_messages_flag(n->mailbox, TRUE);
-        }
-	balsa_mblist_mailbox_node_append(n->parent, n);
+	balsa_mblist_mailbox_node_redraw(n);
 	g_object_unref(n);
         
     }
@@ -1148,7 +1147,22 @@ imap_scan_create_mbnode(BalsaMailboxNode * root, imap_scan_item * isi,
     BalsaMailboxNode *mbnode;
     BalsaMailboxNode *parent;
     const gchar *basename;
-    gchar *url;
+    gchar *url = libbalsa_imap_url(root->server, isi->fn);
+
+    mbnode = balsa_find_url(url);
+    if (mbnode) {
+	/* A mailbox with this url is already in the tree... */
+	BalsaMailboxNode *special =
+	    remove_special_mailbox_by_url(url, &isi->special);
+	if (!special) {
+	    /* ...and it's not special, so we'll return this mbnode. */
+	    g_free(url);
+	    return mbnode;
+	}
+	g_object_unref(mbnode);
+	g_object_unref(special);
+    }
+    g_free(url);
 
     parent_name = get_parent_folder_name(isi->fn, delim);
     parent = balsa_find_dir(root->server, parent_name);
@@ -1157,12 +1171,6 @@ imap_scan_create_mbnode(BalsaMailboxNode * root, imap_scan_item * isi,
 	g_object_ref(parent);
     }
     g_free(parent_name);
-
-    url = libbalsa_imap_url(root->server, isi->fn);
-    mbnode = remove_special_mailbox_by_url(url, &isi->special);
-    g_free(url);
-    if (mbnode != NULL)
-        g_object_unref(mbnode);
 
     mbnode = balsa_mailbox_node_new_imap_node(root->server, isi->fn);
     basename = strrchr(isi->fn, delim);
@@ -1176,6 +1184,7 @@ imap_scan_create_mbnode(BalsaMailboxNode * root, imap_scan_item * isi,
     mbnode->scanned = isi->scanned;
 
     g_object_ref(mbnode);
+    balsa_mblist_mailbox_node_append(mbnode->parent, mbnode);
     g_object_unref(parent);
 
     return mbnode;

@@ -1,5 +1,8 @@
-2004-08-19 08:47  PeterB
+2004-08-19 09:38  PeterB
 
+	* libbalsa/mailbox_imap.c, libbalsa/server.c, libbalsa/server.h,
+	src/mailbox-node.c, src/save-restore.c: really connect only once to
+	server's "get-password" signal.
 	* src/mailbox-node.c: connect only once to server's "get-password"
 	signal.
 	* libbalsa/mailbox_imap.c: allow subscribe and unsubscribe for a

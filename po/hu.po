@@ -1501,9 +1501,8 @@ msgid "Toggle flagged"
 msgstr "Megjelölt kapcsolása"
 
 #: src/main-window.c:335
-#, fuzzy
 msgid "Toggle New"
-msgstr "Kapcsoló"
+msgstr "Új kapcsolása"
 
 #: src/main-window.c:347 src/message-window.c:103
 msgid "_Reply..."
@@ -2020,7 +2019,6 @@ msgid "Remote SMTP server"
 msgstr "Távoli SMTP kiszolgáló"
 
 #: src/pref-manager.c:1285
-#, fuzzy
 msgid "Local mail transport agent"
 msgstr "Helyi levéltovábbító"
 
@@ -2037,7 +2035,6 @@ msgid "Checking"
 msgstr "Ellenõrzés"
 
 #: src/pref-manager.c:1340 src/pref-manager.c:1815
-#, fuzzy
 msgid "minutes"
 msgstr "percenként"
 
@@ -2200,9 +2197,8 @@ msgid "Select a font to use"
 msgstr "Válaszd ki használandó betûkészletet"
 
 #: src/pref-manager.c:1846 src/pref-manager.c:1889
-#, fuzzy
 msgid "Select..."
-msgstr "_Törlés..."
+msgstr "Kijelölés..."
 
 #: src/pref-manager.c:1854 src/pref-manager.c:1897
 msgid "Preview pane"
@@ -2310,9 +2306,8 @@ msgid "Send"
 msgstr "Küldés"
 
 #: src/sendmsg-window.c:136 src/sendmsg-window.c:178
-#, fuzzy
 msgid "Send this message"
-msgstr "A szerkesztett levél küldése"
+msgstr "Az aktuális levél küldése"
 
 #: src/sendmsg-window.c:141
 msgid "Attach"
@@ -2559,9 +2554,8 @@ msgid "_Language"
 msgstr "_Nyelv"
 
 #: src/sendmsg-window.c:372
-#, fuzzy
 msgid "_Options"
-msgstr "Beállítások"
+msgstr "_Beállítások"
 
 #: src/sendmsg-window.c:638
 msgid ""

@@ -1020,7 +1020,6 @@ imap_body_append_child(ImapBody* body, ImapBody* child)
 void
 imap_body_set_id(ImapBody *body, char *id)
 {
-  if(id) printf("part ID='%s'\n", id);
   body->content_id = id;
 }
 /* ================ END OF BODY STRUCTURE FUNCTIONS ==================== */

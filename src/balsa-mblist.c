@@ -748,7 +748,7 @@ bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
     LibBalsaMailbox *orig_mailbox;
     BalsaIndex *orig_index;
 
-    if (!selection_data)
+    if (!selection_data || !selection_data->data)
 	/* Drag'n'drop is weird... */
 	return;
 

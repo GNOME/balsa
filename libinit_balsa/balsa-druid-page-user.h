@@ -55,6 +55,7 @@ extern "C" {
 #endif
         GtkWidget *name;
         GtkWidget *email;
+        GtkWidget *account_name;
 #if !defined(ENABLE_TOUCH_UI)
         GtkWidget *localmaildir;
 #endif /* ENABLE_TOUCH_UI */

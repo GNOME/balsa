@@ -1,3 +1,10 @@
+2005-01-06  Pawel Salek
+
+	* libbalsa/imap/imap-handle.c: silence debugging output.
+	* libinit_balsa/balsa-druid-page-user.[hc]: port initial wizard
+	improvements.
+	* src/balsa-mblist.c: protect against D&D crashes.
+
 2005-01-05 09:05  PeterB
 
 	* libbalsa/mailbox_local.c: use second GNode tree in jwz-threading.

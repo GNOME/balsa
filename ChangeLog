@@ -1,3 +1,10 @@
+2001-10-17  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/address-book-ldif.c: never ever modify the list while
+	iterating over it: fix #62468.
+	* src/save-restore.c: remove unused identity/Indentities string.
+	keep identity order (Steve Wall).
+	
 2001-10-16  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Total icon lift-up by Ali Akcaagac.

@@ -1116,7 +1116,7 @@ config_identities_load()
 	if (strncmp(key, IDENTITY_SECTION_PREFIX, pref_len) == 0) {
 	    tmp = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
 	    ident = libbalsa_identity_new_config(tmp, key+pref_len);
-	    balsa_app.identities = g_list_append(balsa_app.identities, ident);
+	    balsa_app.identities = g_list_prepend(balsa_app.identities, ident);
 	    g_free(tmp);
 	    if(g_strcasecmp(default_ident, ident->identity_name) == 0)
 		balsa_app.current_ident = ident;
@@ -1156,14 +1156,8 @@ config_identities_save(void)
     conf_vec = g_malloc(sizeof(gchar*) * g_list_length(balsa_app.identities));
 
     g_assert(conf_vec != NULL);
-
-    for (list = balsa_app.identities; list; list = g_list_next(list)) {
-        ident = LIBBALSA_IDENTITY(list->data);
-        conf_vec[i++] = ident->identity_name;
-    }
     
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "identity/");
-    gnome_config_set_vector("Identities", i, (const char**) conf_vec);
     gnome_config_set_string("CurrentIdentity", 
                             balsa_app.current_ident->identity_name);
     gnome_config_pop_prefix();

@@ -147,6 +147,19 @@ libbalsa_address_book_ldif_init(LibBalsaAddressBookLdif * ab)
 }
 
 static void
+ab_ldif_clear(LibBalsaAddressBookLdif *addr_ldif)
+{
+    g_list_foreach(addr_ldif->address_list, (GFunc) gtk_object_unref, NULL);
+    g_list_free(addr_ldif->address_list);
+    addr_ldif->address_list = NULL;
+    
+    g_list_foreach(addr_ldif->name_complete->items, 
+		   (GFunc)completion_data_free, NULL);
+    g_list_foreach(addr_ldif->alias_complete->items, 
+		   (GFunc)completion_data_free, NULL);
+}
+
+static void
 libbalsa_address_book_ldif_destroy(GtkObject * object)
 {
     LibBalsaAddressBookLdif *addr_ldif;
@@ -155,17 +168,12 @@ libbalsa_address_book_ldif_destroy(GtkObject * object)
 
     g_free(addr_ldif->path);
 
-    g_list_foreach(addr_ldif->address_list, (GFunc) gtk_object_unref, NULL);
-    g_list_free(addr_ldif->address_list);
-    addr_ldif->address_list = NULL;
+    ab_ldif_clear(addr_ldif);
 
-    g_list_foreach(addr_ldif->name_complete->items, 
-		   (GFunc)completion_data_free, NULL);
-    g_list_foreach(addr_ldif->alias_complete->items, 
-		   (GFunc)completion_data_free, NULL);
-
-    g_completion_free(addr_ldif->name_complete);
+    g_completion_free(addr_ldif->name_complete); 
+    addr_ldif->name_complete = NULL;
     g_completion_free(addr_ldif->alias_complete);
+    addr_ldif->alias_complete = NULL;
 
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
 	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
@@ -200,7 +208,8 @@ read_line(FILE* f)
 	g_string_append(res, buf);
 	if((len=strlen(buf))> 0 && buf[len-1] == '\n') break;
     }
-
+    g_strchomp(res->str);
+    if(res->str[res->len] == '\n') res->str[res->len] = '\0';
     str = emptyp ? NULL : res->str;
     g_string_free(res, emptyp);
     return str;
@@ -297,21 +306,22 @@ static LibBalsaAddress *find_addr(GList *ab_list, const gchar *id)
 
 static void expand_addr_list(LibBalsaAddress *address, GList *ab_list)
 {
-    GList *member=address->address_list;
-    GList *member_list=NULL;
+    GList *member, *notfound = NULL;
+    GList *member_list=NULL, *l;
     
-    while(member) {
+    for(member=address->address_list; member; member=g_list_next(member) ) {
 	gchar *member_data=member->data;
 	LibBalsaAddress *ref=find_addr(ab_list, member_data);
 
 	if(ref) {
 	    member_list=g_list_append(member_list, ref);
 	    gtk_object_ref(GTK_OBJECT(ref));
-	    member=g_list_remove(member, member_data);
 	    g_free(member_data);
 	} else
-	    member=g_list_next(member);
+            notfound = g_list_append(notfound, member_data);
     }
+    g_list_free(address->address_list);
+    address->address_list = notfound;
     address->member_list=member_list;
 }
 
@@ -345,15 +355,8 @@ load_ldif_file(LibBalsaAddressBook *ab)
     if ( !ldif_address_book_need_reload(addr_ldif) )
 	return;
 
-    g_list_foreach(addr_ldif->address_list, (GFunc) gtk_object_unref, NULL);
-    g_list_free(addr_ldif->address_list);
-    addr_ldif->address_list = NULL;
+    ab_ldif_clear(addr_ldif);
     
-    g_list_foreach(addr_ldif->name_complete->items, 
-		   (GFunc)completion_data_free, NULL);
-    g_list_foreach(addr_ldif->alias_complete->items, 
-		   (GFunc)completion_data_free, NULL);
-
     g_completion_clear_items(addr_ldif->name_complete);
     g_completion_clear_items(addr_ldif->alias_complete);
     
@@ -391,6 +394,8 @@ load_ldif_file(LibBalsaAddressBook *ab)
 		address = address_new_prefill(address_list, nickname, 
 					      givenname, surname, fullname,
 					      organization, id);
+                gtk_object_ref(GTK_OBJECT(address));
+                gtk_object_sink(GTK_OBJECT(address));
 		list = g_list_append(list, address);
 		address_list = NULL;
 	    } else {            /* record without e-mail address, ignore */

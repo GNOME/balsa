@@ -1,12 +1,12 @@
 # Norwegian (bokmål dialect) translation of balsa.
-# Copyright (C) 1998,1999 Free Software Foundation, Inc.
-# Kjartan Maraas <kmaraas@fib.hl.no>, 1998,1999.
+# Copyright (C) 1998, 1999 Free Software Foundation, Inc.
+# Kjartan Maraas <kmaraas@fib.hl.no>, 1998, 1999.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: balsa 0.4.8\n"
+"Project-Id-Version: balsa 0.4.9\n"
 "POT-Creation-Date: 1999-02-16 21:15+0100\n"
-"PO-Revision-Date: 1998-02-16 21:32+0100\n"
+"PO-Revision-Date: 1998-03-02 19:51+0100\n"
 "Last-Translator: Kjartan Maraas <kmaraas@fib.hl.no>\n"
 "Language-Team: Norwegian <no@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -228,7 +228,7 @@ msgstr "_Hent ny post"
 
 #: src/main-window.c:90
 msgid "Fetch new incoming mail"
-msgstr "_Hent ny innkommende post"
+msgstr "Hent ny innkommende post"
 
 #: src/main-window.c:107
 msgid "_New"
@@ -284,7 +284,7 @@ msgstr "Liste"
 
 #: src/main-window.c:155
 msgid "_Open"
-msgstr "Åpne"
+msgstr "_Åpne"
 
 #: src/main-window.c:155
 msgid "Open the selected mailbox"
@@ -292,7 +292,7 @@ msgstr "Åpne valgte postboks"
 
 #: src/main-window.c:157
 msgid "_Close"
-msgstr "Lukk"
+msgstr "L_ukk"
 
 #: src/main-window.c:157
 msgid "Close the selected mailbox"
@@ -300,7 +300,7 @@ msgstr "Lukk valgte postboks"
 
 #: src/main-window.c:159
 msgid "_Add"
-msgstr "Legg til"
+msgstr "Le_gg til"
 
 #: src/main-window.c:159
 msgid "Add a new mailbox"
@@ -308,7 +308,7 @@ msgstr "Legg til en ny postboks"
 
 #: src/main-window.c:161
 msgid "_Edit"
-msgstr "Rediger"
+msgstr "Re_diger"
 
 #: src/main-window.c:161
 msgid "Edit the selected mailbox"
@@ -320,7 +320,7 @@ msgstr "Slett valgte postboks"
 
 #: src/main-window.c:166
 msgid "C_lose current"
-msgstr "Lukk nåværende"
+msgstr "Lu_kk nåværende"
 
 #: src/main-window.c:166
 msgid "Close the currently opened mailbox"
@@ -328,7 +328,7 @@ msgstr "Lukk nåværende åpnet postboks"
 
 #: src/main-window.c:169
 msgid "Co_mmit current"
-msgstr "Aktiver nåværende"
+msgstr "Akt_iver nåværende"
 
 #: src/main-window.c:169
 msgid "Commit the changes in the currently opened mailbox"
@@ -336,7 +336,7 @@ msgstr "Aktiver endringene i nåværende åpnet postboks"
 
 #: src/main-window.c:177
 msgid "_Filters..."
-msgstr "Filtre..."
+msgstr "_Filtre..."
 
 #: src/main-window.c:177
 msgid "Manage filters"
@@ -344,7 +344,7 @@ msgstr "Håndter filtre"
 
 #: src/main-window.c:195
 msgid "_Message"
-msgstr "Melding"
+msgstr "_Melding"
 
 #: src/main-window.c:196
 msgid "Mail_boxes"
@@ -599,4 +599,3 @@ msgstr "Postboks: Åpning av %s referansetall: %d\n"
 #, c-format
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr "Postboks: Lukker %s referansetall: %d\n"
-

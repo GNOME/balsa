@@ -24,6 +24,7 @@
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
+#include "misc.h"
 
 #include <stdio.h>
 #include <gnome.h>
@@ -32,7 +33,7 @@
 static void close_cb(GtkWidget* w, gpointer data);
 static void copy_cb(GtkWidget * w, gpointer data);
 static void select_all_cb(GtkWidget* w, gpointer data);
-static void escape_cb(GtkWidget * widget, gpointer data);
+static void lsv_escape_cb(GtkWidget * widget, gpointer data);
 
 static GnomeUIInfo file_menu[] = {
 #define MENU_FILE_INCLUDE_POS 1
@@ -56,7 +57,7 @@ static GnomeUIInfo view_menu[] = {
 #define MENU_VIEW_ESCAPE_POS 0
     GNOMEUIINFO_TOGGLEITEM(N_("_Escape Special Characters"),
                            N_("Escape special and non-ASCII characters"),
-                           escape_cb, NULL),
+                           lsv_escape_cb, NULL),
     GNOMEUIINFO_END
 };
 
@@ -100,12 +101,13 @@ close_cb(GtkWidget* w, gpointer data)
 struct _LibBalsaSourceViewerInfo {
     LibBalsaMessage *msg;
     GtkWidget *text;
+    GtkWidget *window;
 };
 
 typedef struct _LibBalsaSourceViewerInfo LibBalsaSourceViewerInfo;
 
 static void
-libbalsa_show_file(FILE * f, long length, LibBalsaSourceViewerInfo * lsvi,
+lsv_show_file(FILE * f, long length, LibBalsaSourceViewerInfo * lsvi,
                    gboolean escape)
 {
     GtkTextBuffer *buffer;
@@ -142,7 +144,7 @@ libbalsa_show_file(FILE * f, long length, LibBalsaSourceViewerInfo * lsvi,
 }
 
 static void
-escape_cb(GtkWidget * widget, gpointer data)
+lsv_escape_cb(GtkWidget * widget, gpointer data)
 {
     LibBalsaSourceViewerInfo *lsvi =
         g_object_get_data(G_OBJECT(data), "lsvi");
@@ -155,9 +157,24 @@ escape_cb(GtkWidget * widget, gpointer data)
     f = libbalsa_mailbox_get_message_stream(msg->mailbox, msg);
     fseek(f, hdr->offset, 0);
     length = (hdr->content->offset - hdr->offset) + hdr->content->length;
-    libbalsa_show_file(f, length, lsvi,
-                       GTK_CHECK_MENU_ITEM(widget)->active);
+    lsv_show_file(f, length, lsvi, GTK_CHECK_MENU_ITEM(widget)->active);
     fclose(f);
+}
+
+static void
+lsv_msg_weak_ref_notify(LibBalsaSourceViewerInfo * lsvi)
+{
+    lsvi->msg = NULL;
+    gtk_widget_destroy(lsvi->window);
+}
+
+static void
+lsv_window_destroy_notify(LibBalsaSourceViewerInfo * lsvi)
+{
+    if (lsvi->msg)
+        g_object_weak_unref(G_OBJECT(lsvi->msg),
+                            (GWeakNotify) lsv_msg_weak_ref_notify, lsvi);
+    g_free(lsvi);
 }
 
 /* libbalsa_show_message_source:
@@ -194,8 +211,12 @@ libbalsa_show_message_source(LibBalsaMessage * msg, const gchar * font)
 
     lsvi = g_new(LibBalsaSourceViewerInfo, 1);
     lsvi->msg = msg;
+    g_object_weak_ref(G_OBJECT(msg),
+                      (GWeakNotify) lsv_msg_weak_ref_notify, lsvi);
     lsvi->text = text;
-    g_object_set_data_full(G_OBJECT(window), "lsvi", lsvi, g_free);
+    lsvi->window = window;
+    g_object_set_data_full(G_OBJECT(window), "lsvi", lsvi,
+                           (GDestroyNotify) lsv_window_destroy_notify);
 
     gtk_widget_show_all(window);
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM

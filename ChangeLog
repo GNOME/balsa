@@ -1,3 +1,9 @@
+2004-01-24 10:07  PeterB
+
+	* libbalsa/mailbox.c, libbalsa/mailbox.h, src/balsa-index.c: New
+	mailbox column LB_MBOX_STYLE_COL, which is PANGO_STYLE_OBLIQUE for
+	a message with unread children.
+
 2004-01-23 00:36  PeterB
 
 	* libbalsa/body.c: Make sure subject in embedded header is valid

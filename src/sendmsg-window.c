@@ -446,7 +446,7 @@ address_book_cb(GtkWidget *widget, BalsaSendmsg *snd_msg_wind)
     GtkEntry *entry;
     gint button;
 
-    entry = GTK_ENTRY(gtk_object_get_data(GTK_OBJECT(widget), "address-entry"));
+    entry = GTK_ENTRY(gtk_object_get_data(GTK_OBJECT(widget), "address-entry-widget"));
 
     ab = balsa_address_book_new(TRUE);
     gnome_dialog_set_parent(GNOME_DIALOG(ab), GTK_WINDOW(snd_msg_wind->window));
@@ -465,7 +465,9 @@ address_book_cb(GtkWidget *widget, BalsaSendmsg *snd_msg_wind)
 static gint
 delete_event_cb(GtkWidget * widget, GdkEvent * e, gpointer data)
 {
+    g_message("delete_event_cb(): Start.");
     balsa_sendmsg_destroy((BalsaSendmsg *) data);
+    g_message("delete_event_cb(): Stop.");
     return TRUE;
 }
 
@@ -478,7 +480,7 @@ balsa_sendmsg_destroy(BalsaSendmsg * bsm)
     g_assert(bsm != NULL);
     g_assert(ELEMENTS(headerDescs) == ELEMENTS(bsm->view_checkitems));
 
-
+    g_message("balsa_sendmsg_destroy(): Start.");
     if (bsm->orig_message) {
 	if (bsm->orig_message->mailbox)
 	    libbalsa_mailbox_close(bsm->orig_message->mailbox);
@@ -502,6 +504,7 @@ balsa_sendmsg_destroy(BalsaSendmsg * bsm)
     if (balsa_app.compose_email)
 	balsa_exit();
 #endif
+    g_message("balsa_sendmsg_destroy(): Stop.");
 }
 
 /* language menu helper functions */
@@ -815,8 +818,6 @@ create_address_entry(GtkWidget * table, const gchar * label, int y_pos,
     arr[1] = libbalsa_address_entry_new();
     gtk_table_attach(GTK_TABLE(table), arr[1], 1, 2, y_pos, y_pos + 1,
 		     GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_SHRINK, 0, 0);
-    gtk_signal_connect(GTK_OBJECT(arr[1]), "activate",
-		       GTK_SIGNAL_FUNC(next_entrybox), arr[1]);
 }
 
 
@@ -846,8 +847,6 @@ create_string_entry(GtkWidget * table, const gchar * label, int y_pos,
     arr[1] = gtk_entry_new_with_max_length(2048);
     gtk_table_attach(GTK_TABLE(table), arr[1], 1, 2, y_pos, y_pos + 1,
 		     GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_SHRINK, 0, 0);
-    gtk_signal_connect(GTK_OBJECT(arr[1]), "activate",
-		       GTK_SIGNAL_FUNC(next_entrybox), arr[1]);
 }
 
 /*
@@ -871,9 +870,6 @@ static void
 create_email_entry(GtkWidget * table, const gchar * label, int y_pos,
 		   const gchar * icon, BalsaSendmsg *smw, GtkWidget * arr[])
 {
-
-    gint *focus_counter;
-
     create_address_entry(table, label, y_pos, arr);
 
     arr[2] = gtk_button_new();
@@ -887,7 +883,7 @@ create_email_entry(GtkWidget * table, const gchar * label, int y_pos,
     gtk_signal_connect(GTK_OBJECT(arr[2]), "clicked",
 		       GTK_SIGNAL_FUNC(address_book_cb),
 		       smw);
-    gtk_object_set_data(GTK_OBJECT(arr[2]), "address-entry", 
+    gtk_object_set_data(GTK_OBJECT(arr[2]), "address-entry-widget", 
 			arr[1]);
     gtk_signal_connect(GTK_OBJECT(arr[1]), "drag_data_received",
 		       GTK_SIGNAL_FUNC(to_add), NULL);
@@ -896,23 +892,22 @@ create_email_entry(GtkWidget * table, const gchar * label, int y_pos,
 		      ELEMENTS(email_field_drop_types),
 		      GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
 
-    gtk_signal_connect(GTK_OBJECT(arr[1]), "key-press-event",
-		       GTK_SIGNAL_FUNC(key_pressed_cb), arr[1]);
-    gtk_signal_connect(GTK_OBJECT(arr[1]), "button-press-event",
-		       GTK_SIGNAL_FUNC(button_pressed_cb), arr[1]);
-
     /*
-     * And these make sure we rescan the input if the user plays
-     * around.
+     * This must remain here, until someone can fix
+     * libbalsa/address-entry.c/libbalsa_address_entry_class_init()
+     * to assign it when the widget gets created.
+     *
+     * Berend De Schouwer <bds@jhb.ucs.co.za>
      */
     gtk_signal_connect(GTK_OBJECT(arr[1]), "focus-out-event",
-		       GTK_SIGNAL_FUNC(lost_focus_cb), arr[1]);
-    gtk_signal_connect(GTK_OBJECT(arr[1]), "destroy",
-		       GTK_SIGNAL_FUNC(destroy_cb), arr[1]);
-    focus_counter = g_malloc(sizeof(gint));
-    *focus_counter = 1;
-    gtk_object_set_data(GTK_OBJECT(arr[1]), "focus_c", focus_counter);
+		       GTK_SIGNAL_FUNC(libbalsa_address_entry_focus_out),
+		       arr[1]);
+    libbalsa_address_entry_set_find_match(LIBBALSA_ADDRESS_ENTRY(arr[1]),
+		       expand_alias_find_match);
+    libbalsa_address_entry_set_domain(LIBBALSA_ADDRESS_ENTRY(arr[1]),
+		       balsa_app.domain);
 }
+
 
 /* create_info_pane 
    creates upper panel with the message headers: From, To, ... and 
@@ -944,20 +939,13 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
 
     /* Subject: */
     create_string_entry(table, _("Subject:"), 2, msg->subject);
-    gtk_object_set_data(GTK_OBJECT(msg->to[1]), "next_in_line",
-			msg->subject[1]);
-
     /* cc: */
     create_email_entry(table, _("cc:"), 3, GNOME_STOCK_MENU_BOOK_YELLOW,
 		       msg, msg->cc);
-    gtk_object_set_data(GTK_OBJECT(msg->subject[1]), "next_in_line",
-			msg->cc[1]);
 
     /* bcc: */
     create_email_entry(table, _("bcc:"), 4, GNOME_STOCK_MENU_BOOK_GREEN,
 		       msg, msg->bcc);
-    gtk_object_set_data(GTK_OBJECT(msg->cc[1]), "next_in_line",
-			msg->bcc[1]);
 
     /* fcc: */
     msg->fcc[0] = gtk_label_new(_("fcc:"));
@@ -970,8 +958,6 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     msg->fcc[1] = gtk_combo_new();
     gtk_combo_set_use_arrows(GTK_COMBO(msg->fcc[1]), 0);
     gtk_combo_set_use_arrows_always(GTK_COMBO(msg->fcc[1]), 0);
-    gtk_object_set_data(GTK_OBJECT(msg->bcc[1]), "next_in_line",
-			msg->fcc[1]);
 
     glist = g_list_append(glist, balsa_app.sentbox->name);
     glist = g_list_append(glist, balsa_app.draftbox->name);
@@ -987,8 +973,6 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     /* Reply To: */
     create_email_entry(table, _("Reply To:"), 6, GNOME_STOCK_MENU_BOOK_RED,
 		       msg, msg->reply_to);
-    gtk_object_set_data(GTK_OBJECT(msg->fcc[1]), "next_in_line",
-			msg->reply_to[1]);
 
     /* Attachment list */
     msg->attachments[0] = gtk_label_new(_("Attachments:"));
@@ -1091,9 +1075,6 @@ create_text_area(BalsaSendmsg * msg)
     gtk_container_add(GTK_CONTAINER(table), msg->text);
 
     gtk_widget_show_all(GTK_WIDGET(table));
-
-    gtk_object_set_data(GTK_OBJECT(msg->reply_to[1]), "next_in_line",
-			msg->text);
 
     return table;
 }
@@ -1781,9 +1762,9 @@ send_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
      * First, check if aliasing is on, and get it to nullify the
      * match.  Otherwise we send mail to "John (John Doe <jdoe@public.com>)"
      */
-    expand_alias_clear_to_send(bsmsg->to[1]);
-    expand_alias_clear_to_send(bsmsg->cc[1]);
-    expand_alias_clear_to_send(bsmsg->bcc[1]);
+    libbalsa_address_entry_clear_to_send(bsmsg->to[1]);
+    libbalsa_address_entry_clear_to_send(bsmsg->cc[1]);
+    libbalsa_address_entry_clear_to_send(bsmsg->bcc[1]);
     return send_message_handler(bsmsg, FALSE);
 }
 

@@ -24,6 +24,16 @@
 #ifndef __LIBBALSA_ADDRESS_ENTRY_H__
 #define __LIBBALSA_ADDRESS_ENTRY_H__
 
+#define FOCUS_LOST 0
+#define FOCUS_TAINTED 1
+#define FOCUS_CACHED 2
+
+/*************************************************************************
+ *                                                                       *
+ * Structures that the widget uses extensively.                          *
+ *                                                                       *
+ *************************************************************************/
+
 /*
  * A structure that describes an e-mail entry.  That is, it contains
  * the user input, and the alias expansian of ONE e-mail entry.
@@ -67,9 +77,11 @@ typedef struct {
 } inputData;
 
 
-/*
- * A subclass of gtkentry to allow alias completion.
- */
+/*************************************************************************
+ *                                                                       *
+ * A subclass of gtkentry to allow alias completion.                     *
+ *                                                                       *
+ *************************************************************************/
 
 #define LIBBALSA_TYPE_ADDRESS_ENTRY		(libbalsa_address_entry_get_type())
 #define LIBBALSA_ADDRESS_ENTRY(obj)		(GTK_CHECK_CAST (obj, LIBBALSA_TYPE_ADDRESS_ENTRY, LibBalsaAddressEntry))
@@ -83,21 +95,46 @@ typedef struct _LibBalsaAddressEntryClass LibBalsaAddressEntryClass;
 struct _LibBalsaAddressEntry {
     GtkEntry parent;
 
-    inputData *input;
+    inputData *input;		/* A GList of email addresses. */
+    gint focus;			/* Used to keep track of the validity of
+				   the 'input' variable. */
+    gchar *domain;		/* The domain to add if the user omits one. */
+    gint alias_start_pos,       /* Used with selection_start/stop_pos to */
+         alias_end_pos;         /* colorise text */
+
+    /*
+     * Function to find matches.  User defined.
+     */
+    void (* find_match)  (emailData *addy);
 };
+
 
 struct _LibBalsaAddressEntryClass {
     GtkEntryClass parent_class;
+
+    /*
+     * Keeps track of various gtk_entry functions.
+     *
+     * Why?  Duplicating the code in libbalsa/address-entry.c causes
+     *       code bloat, and means that there are bugs that get fixed
+     *       in GTK+, that don't get fixed in LibBalsa.
+     */
+    gint (* gtk_entry_button_press) (GtkWidget *, GdkEventButton *event);
 };
 
-/*
- * API
- */
+
+/*************************************************************************
+ *                                                                       *
+ * Functions that outside programs are allowed to call to act on the     *
+ * widget.                                                               *
+ *                                                                       *
+ *************************************************************************/
+
 GtkType libbalsa_address_entry_get_type(void);
 GtkWidget *libbalsa_address_entry_new(void);
-inputData *libbalsa_address_entry_get_input(LibBalsaAddressEntry *entry);
-void libbalsa_address_entry_set_input(LibBalsaAddressEntry *entry,
-		inputData *data);
-void libbalsa_address_entry_show(LibBalsaAddressEntry *entry);
+gint libbalsa_address_entry_focus_out(GtkWidget *, GdkEventFocus *);
+void libbalsa_address_entry_set_find_match(LibBalsaAddressEntry *, void *);
+void libbalsa_address_entry_set_domain(LibBalsaAddressEntry *, void *);
+void libbalsa_address_entry_clear_to_send(GtkWidget *);
 
 #endif

@@ -161,7 +161,7 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
     if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
 	/* FIXME: Should prompt to remove file aswell */
 	msg = g_strdup_printf(_("This will remove the mailbox %s from the list of mailboxes.\n"
-				"You may also the disk file associated with this mailbox.\n"
+				"You may also delete the disk file or files associated with this mailbox.\n"
 				"If you do not remove the file on disk you may \"Add  Mailbox\" to access the mailbox again.\n"
 				"What would you like to do?"),
 			      mailbox->name);

@@ -26,14 +26,7 @@
 extern "C" {
 #endif				/* __cplusplus */
 
-    void next_entrybox(GtkWidget *, GtkWidget *);
-    gboolean key_pressed_cb(GtkWidget *, GdkEventKey *, gpointer);
-    gboolean button_pressed_cb(GtkWidget *, GdkEventButton *, gpointer);
-    gboolean lost_focus_cb(GtkWidget *, GdkEventFocus *, gpointer);
-    void destroy_cb(GtkWidget *, gpointer);
-    void alias_load_addressbook(void);
-    void alias_free_addressbook(void);
-    void expand_alias_clear_to_send(GtkWidget *);
+	void expand_alias_find_match(emailData *addy);
 
 #ifdef __cplusplus
 }

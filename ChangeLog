@@ -1,3 +1,16 @@
+2000-05-11  Peter Williams  <peter@beta.newton.cx>
+
+	* src/cfg-memory-widgets.[ch]: New files -- new 'memory'
+	functions that make widgets automagically record their state
+	into a config location. This will be able to be used for proper SM,
+	but in the meantime obviates the need for all thos index_num_width's
+	et al in balsa_app.
+	
+	* src/mblist-window.c, src/Makefile.am, src/balsa-app.[ch],
+	src/balsa-index.c, src/balsa-mblist.c, src/cfg-balsa.c, 
+	src/main-window.c, src/mblist-window.c: Changes to accomodate memory
+	widgets.
+
 2000-05-09  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/address-book.c: preleminary handling of gcard address lists.

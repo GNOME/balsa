@@ -1338,6 +1338,7 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
     BalsaIndex *index = BALSA_INDEX(data);
     GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(index));
     struct BndxSelectionChangedInfo sci;
+    GtkTreeIter iter;
 
     sci.message = NULL;
     sci.current_message = index->current_message;
@@ -1350,7 +1351,7 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
 
     /* we don't clear the current message if the tree contains any
      * messages */
-    if (sci.message || gtk_tree_model_iter_n_children(model, NULL) == 0) {
+    if (sci.message || !gtk_tree_model_get_iter_first(model, &iter)) {
         index->current_message = sci.message;
         bndx_changed_find_row(index);
     }

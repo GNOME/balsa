@@ -297,8 +297,10 @@ idle_handler_cb(GtkWidget * widget)
 		    NULL, NULL, NULL, NULL,
 		    bevent->button, bevent->time);
   } else if (bmsg) {
-    if (BALSA_MESSAGE(bmsg))
-      balsa_message_set(BALSA_MESSAGE(bmsg), message);
+      if (BALSA_MESSAGE(bmsg)) {
+	  balsa_message_set(BALSA_MESSAGE(bmsg), message);
+	  message_read( message );
+      }
   }
 
   handler = 0;
@@ -315,20 +317,20 @@ index_select_cb (GtkWidget * widget,
 		 GdkEventButton * bevent,
 		 gpointer data)
 {
-  g_return_if_fail (widget != NULL);
-  g_return_if_fail (BALSA_IS_INDEX (widget));
-  g_return_if_fail (message != NULL);
+    g_return_if_fail (widget != NULL);
+    g_return_if_fail (BALSA_IS_INDEX (widget));
+    g_return_if_fail (message != NULL);
+    
+    set_imap_username (message->mailbox);
 
-  set_imap_username (message->mailbox);
+    gtk_object_set_data (GTK_OBJECT (widget), "message", message);
+    gtk_object_set_data (GTK_OBJECT (widget), "bevent", bevent);
+    gtk_object_set_data (GTK_OBJECT (widget), "data", data);
 
-  gtk_object_set_data (GTK_OBJECT (widget), "message", message);
-  gtk_object_set_data (GTK_OBJECT (widget), "bevent", bevent);
-  gtk_object_set_data (GTK_OBJECT (widget), "data", data);
-
-  /* this way we only display one message, not lots and lots */
-  if (!handler)
-    handler = gtk_idle_add ((GtkFunction) idle_handler_cb, widget);
-
+    /* this way we only display one message, not lots and lots */
+    if (!handler) {
+	handler = gtk_idle_add ((GtkFunction) idle_handler_cb, widget);
+    }
 }
 
 
@@ -437,7 +439,6 @@ create_menu (BalsaIndex * bindex)
 }
 
 
-#if 0
 static void
 message_status_set_new_cb (GtkWidget * widget, Message * message)
 {
@@ -464,7 +465,6 @@ message_status_set_answered_cb (GtkWidget * widget, Message * message)
 
   message_reply (message);
 }
-#endif
 
 static void
 transfer_messages_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row, GdkEventButton * event, BalsaIndex * bindex)

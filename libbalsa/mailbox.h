@@ -264,9 +264,19 @@ gint mailbox_check_new_messages (Mailbox * mailbox);
 /*
  * watchers
  */
-guint mailbox_watcher_set (Mailbox * mailbox, MailboxWatcherFunc func, guint16 mask, gpointer data);
-void mailbox_watcher_remove (Mailbox * mailbox, guint id);
-void mailbox_watcher_remove_by_data (Mailbox * mailbox, gpointer data);
+extern guint mailbox_watcher_set (Mailbox * mailbox, MailboxWatcherFunc func, guint16 mask, gpointer data);
+extern void  mailbox_watcher_remove (Mailbox * mailbox, guint id);
+extern void  mailbox_watcher_remove_by_data (Mailbox * mailbox, gpointer data);
+extern void  send_watcher_mark_clear_message (Mailbox * mailbox, Message * message);
+extern void  send_watcher_mark_answer_message (Mailbox * mailbox, Message * message);
+extern void  send_watcher_mark_read_message (Mailbox * mailbox, Message * message);
+extern void  send_watcher_mark_unread_message (Mailbox * mailbox, Message * message);
+extern void  send_watcher_mark_delete_message (Mailbox * mailbox, Message * message);
+extern void  send_watcher_mark_undelete_message (Mailbox * mailbox, Message * message);
+extern void  send_watcher_new_message (Mailbox * mailbox, Message * message, gint remaining);
+extern void  send_watcher_delete_message (Mailbox * mailbox, Message * message);
+extern void  send_watcher_append_message (Mailbox * mailbox, Message * message);
+
 
 
 /*

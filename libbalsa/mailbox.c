@@ -73,15 +73,16 @@ static void free_messages (Mailbox * mailbox);
 
 static gint _mailbox_open_ref (Mailbox * mailbox, gint flag);
 
-static void send_watcher_mark_clear_message (Mailbox * mailbox, Message * message);
-static void send_watcher_mark_answer_message (Mailbox * mailbox, Message * message);
-static void send_watcher_mark_read_message (Mailbox * mailbox, Message * message);
-static void send_watcher_mark_unread_message (Mailbox * mailbox, Message * message);
-static void send_watcher_mark_delete_message (Mailbox * mailbox, Message * message);
-static void send_watcher_mark_undelete_message (Mailbox * mailbox, Message * message);
-static void send_watcher_new_message (Mailbox * mailbox, Message * message, gint remaining);
-static void send_watcher_delete_message (Mailbox * mailbox, Message * message);
-static void send_watcher_append_message (Mailbox * mailbox, Message * message);
+/* PKGW: These were static. Why? */
+void send_watcher_mark_clear_message (Mailbox * mailbox, Message * message);
+void send_watcher_mark_answer_message (Mailbox * mailbox, Message * message);
+void send_watcher_mark_read_message (Mailbox * mailbox, Message * message);
+void send_watcher_mark_unread_message (Mailbox * mailbox, Message * message);
+void send_watcher_mark_delete_message (Mailbox * mailbox, Message * message);
+void send_watcher_mark_undelete_message (Mailbox * mailbox, Message * message);
+void send_watcher_new_message (Mailbox * mailbox, Message * message, gint remaining);
+void send_watcher_delete_message (Mailbox * mailbox, Message * message);
+void send_watcher_append_message (Mailbox * mailbox, Message * message);
 
 static Message *translate_message (HEADER * cur);
 static Address *translate_address (ADDRESS * caddr);
@@ -859,7 +860,7 @@ free_messages (Mailbox * mailbox)
 /*
  * sending messages to watchers
  */
-static void
+void
 send_watcher_mark_clear_message (Mailbox * mailbox, Message * message)
 {
   GList *list;
@@ -884,7 +885,7 @@ send_watcher_mark_clear_message (Mailbox * mailbox, Message * message)
     }
 }
 
-static void
+void
 send_watcher_mark_answer_message (Mailbox * mailbox, Message * message)
 {
   GList *list;
@@ -909,7 +910,7 @@ send_watcher_mark_answer_message (Mailbox * mailbox, Message * message)
     }
 }
 
-static void
+void
 send_watcher_mark_read_message (Mailbox * mailbox, Message * message)
 {
   GList *list;
@@ -934,7 +935,7 @@ send_watcher_mark_read_message (Mailbox * mailbox, Message * message)
     }
 }
 
-static void
+void
 send_watcher_mark_unread_message (Mailbox * mailbox, Message * message)
 {
   GList *list;
@@ -959,7 +960,7 @@ send_watcher_mark_unread_message (Mailbox * mailbox, Message * message)
     }
 }
 
-static void
+void
 send_watcher_mark_delete_message (Mailbox * mailbox, Message * message)
 {
   GList *list;
@@ -985,7 +986,7 @@ send_watcher_mark_delete_message (Mailbox * mailbox, Message * message)
 }
 
 
-static void
+void
 send_watcher_mark_undelete_message (Mailbox * mailbox, Message * message)
 {
   GList *list;
@@ -1011,7 +1012,7 @@ send_watcher_mark_undelete_message (Mailbox * mailbox, Message * message)
 }
 
 
-static void
+void
 send_watcher_new_message (Mailbox * mailbox, Message * message, gint remaining)
 {
   GList *list;
@@ -1038,7 +1039,7 @@ send_watcher_new_message (Mailbox * mailbox, Message * message, gint remaining)
     }
 }
 
-static void
+void
 send_watcher_append_message (Mailbox * mailbox, Message * message)
 {
   GList *list;
@@ -1065,7 +1066,7 @@ send_watcher_append_message (Mailbox * mailbox, Message * message)
 }
 
 
-static void
+void
 send_watcher_delete_message (Mailbox * mailbox, Message * message)
 {
   GList *list;

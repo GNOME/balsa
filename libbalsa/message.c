@@ -237,7 +237,9 @@ message_copy (Message * message, Mailbox * dest)
 
   dest->total_messages++;
   if (message->flags & MESSAGE_FLAG_NEW ) dest->unread_messages++;
-  //  send_watcher_append_message (dest, message);
+
+  /*PKGW test: commented out why? */
+  send_watcher_append_message (dest, message);
   mailbox_open_unref (dest);
 }
 
@@ -260,7 +262,9 @@ message_move (Message * message, Mailbox * dest)
   
   dest->total_messages++;
   if (message->flags & MESSAGE_FLAG_NEW ) dest->unread_messages++;
-  //  send_watcher_append_message (dest, message);
+  
+  /*PKGW test: commented out why? */
+  send_watcher_append_message (dest, message);
   
   mailbox_open_unref (dest);
   
@@ -280,12 +284,14 @@ libbalsa_message_real_clear_flags(Message *message)
   sprintf (tmp, "%ld", message->msgno);
   mail_clearflag (CLIENT_STREAM (message->mailbox), tmp, "\\DELETED");
   mail_clearflag (CLIENT_STREAM (message->mailbox), tmp, "\\ANSWERED");
+#endif
+
+  LOCK_MAILBOX (message->mailbox);
 
   message->flags = 0;
   send_watcher_mark_clear_message (message->mailbox, message);
 
-  UNLOCK_MAILBOX (mailbox);
-#endif
+  UNLOCK_MAILBOX (message->mailbox);
 }
 
 static void
@@ -299,7 +305,7 @@ libbalsa_message_real_set_answered_flag(Message *message, gboolean set)
   cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
 
   mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_REPLIED, TRUE);
-
+  send_watcher_mark_answer_message (message->mailbox, message);
   message->flags |= MESSAGE_FLAG_REPLIED;
 
   UNLOCK_MAILBOX (message->mailbox);
@@ -320,11 +326,13 @@ libbalsa_message_real_set_read_flag(Message *message, gboolean set)
 
     message->flags &= ~MESSAGE_FLAG_NEW;
     message->mailbox->unread_messages-- ;
+    send_watcher_mark_read_message (message->mailbox, message);
   } else {
     mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, MFLAG_READ, TRUE);
 
     message->flags |= MESSAGE_FLAG_NEW;
     message->mailbox->unread_messages++;
+    send_watcher_mark_unread_message (message->mailbox, message);
   }
 
   UNLOCK_MAILBOX (message->mailbox);
@@ -333,30 +341,33 @@ libbalsa_message_real_set_read_flag(Message *message, gboolean set)
 static void
 libbalsa_message_real_set_deleted_flag(Message *message, gboolean set)
 {
-  HEADER *cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
+    HEADER *cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
+    
+    LOCK_MAILBOX (message->mailbox);
+    RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
+    
+    if (set) {
+	mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_DELETE, TRUE);
+	
+	message->flags |= MESSAGE_FLAG_DELETED;
+	if (message->flags & MESSAGE_FLAG_NEW)
+	    message->mailbox->unread_messages--;
+	message->mailbox->total_messages--;
 
-  LOCK_MAILBOX (message->mailbox);
-  RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
+	send_watcher_mark_delete_message( message->mailbox, message );
+    } else {
+	mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_DELETE, FALSE);
+	
+	message->flags &= ~MESSAGE_FLAG_DELETED;
+	if (message->flags & MESSAGE_FLAG_NEW)
+	    message->mailbox->unread_messages++;
+	message->mailbox->total_messages++;
 
-  if (set) {
-    mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_DELETE, TRUE);
-
-    message->flags |= MESSAGE_FLAG_DELETED;
-    if (message->flags & MESSAGE_FLAG_NEW) message->mailbox->unread_messages--;
-    message->mailbox->total_messages--;
-  } else {
-    mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_DELETE, FALSE);
-
-    message->flags &= ~MESSAGE_FLAG_DELETED;
-    if (message->flags & MESSAGE_FLAG_NEW) message->mailbox->unread_messages++;
-    message->mailbox->total_messages++;
-  }
-
-  UNLOCK_MAILBOX (message->mailbox);
+	send_watcher_mark_undelete_message( message->mailbox, message );
+    }
+    
+    UNLOCK_MAILBOX (message->mailbox);
 }
-
-
-
 
 void
 message_clear_flags(Message *message)

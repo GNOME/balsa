@@ -1,3 +1,8 @@
+2004-04-19 09:17  PeterB
+
+	* src/balsa-message.c: emit "row-changed" signal after updating the
+	attach icon.
+
 2004-04-18  Albrecht Dress
 
 	large GPG patch as in 124905, attachment 26752.

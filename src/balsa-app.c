@@ -635,7 +635,7 @@ destroy_mailbox_node(GNode* node, GNode* root)
 	balsa_window_close_mbnode(balsa_app.main_window, mbnode);
     mblist_remove_mailbox_node(balsa_app.mblist, 
 			       mbnode);
-    gtk_object_unref((GtkObject*)mbnode); 
+    gtk_object_destroy((GtkObject*)mbnode); 
     return FALSE;
 }
 

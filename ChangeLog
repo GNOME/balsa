@@ -1,3 +1,13 @@
+2002-03-18  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* libbalsa/mailbox.c: LIBBALSA_TYPE_MESSAGE -> GTK_TYPE_POINTER
+	* src/balsa-app.c: destroy mailbox_node instead of unref'ing it.
+	* balsa-index.c: omit unused arg in balsa_index_signals[SELECT_MESSAGE]
+	* src/main-window.c: adjust to the arg removal. 
+	* balsa_window_select_message_cb(): pick up BalsaIndex *index from
+	an argument instead of balsa_window_find_current_index(); change
+	notebook tab icon from GTK_ICON_SIZE_BUTTON to GTK_ICON_SIZE_MENU.
+
 2002-03-17  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/balsa-app.[hc]: add a convenience function

@@ -124,7 +124,6 @@ static gboolean balsa_close_mailbox_on_timer(GtkWidget * widget,
 
 static void balsa_window_select_message_cb(GtkWidget * widget,
 					   LibBalsaMessage * message,
-					   GdkEventButton * bevent,
 					   gpointer data);
 static void balsa_window_unselect_message_cb(GtkWidget * widget,
 					     LibBalsaMessage * message,
@@ -1251,7 +1250,7 @@ balsa_notebook_label_new (BalsaMailboxNode* mbnode)
                BALSA_PIXMAP_OTHER_CLOSE);
 #else
        close_pix = gtk_image_new_from_stock(BALSA_PIXMAP_OTHER_CLOSE,
-                                            GTK_ICON_SIZE_BUTTON);
+                                            GTK_ICON_SIZE_MENU);
 #endif                          /* BALSA_MAJOR < 2 */
 
        gtk_button_set_relief(GTK_BUTTON (but), GTK_RELIEF_NONE);
@@ -3070,13 +3069,16 @@ notebook_switch_page_cb(GtkWidget * notebook,
 static void
 balsa_window_select_message_cb(GtkWidget * widget,
                                LibBalsaMessage * message,
-                               GdkEventButton * bevent, gpointer data)
+                               gpointer data)
 {
     BalsaIndex *index;
 
+    /*
     index = 
         BALSA_INDEX(balsa_window_find_current_index(balsa_app.main_window));
     g_return_if_fail(index);
+        */
+    index = BALSA_INDEX(widget);
     enable_mailbox_menus(index->mailbox_node);
     enable_message_menus(message);
 }

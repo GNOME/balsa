@@ -131,7 +131,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
 		       GTK_SIGNAL_OFFSET(LibBalsaMailboxClass,
 					 message_status_changed),
 		       gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 1,
-		       LIBBALSA_TYPE_MESSAGE);
+		       GTK_TYPE_POINTER);
 
     libbalsa_mailbox_signals[OPEN_MAILBOX] =
 	gtk_signal_new("open-mailbox",

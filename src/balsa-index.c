@@ -257,9 +257,8 @@ balsa_index_class_init(BalsaIndexClass * klass)
 		       GTK_RUN_FIRST,
 		       balsa_index_get_type(),
 		       GTK_SIGNAL_OFFSET(BalsaIndexClass, select_message),
-		       gtk_marshal_NONE__POINTER_POINTER,
-		       GTK_TYPE_NONE, 2, GTK_TYPE_POINTER,
-		       GTK_TYPE_POINTER);
+		       gtk_marshal_NONE__POINTER,
+		       GTK_TYPE_NONE, 1, GTK_TYPE_POINTER);
     balsa_index_signals[UNSELECT_MESSAGE] =
 	gtk_signal_new("unselect_message",
 		       GTK_RUN_FIRST,

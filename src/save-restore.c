@@ -121,17 +121,43 @@ delete_mailbox_config (gchar * name)
 
 
 void
-update_mailbox_config (Mailbox * mailbox)
+update_mailbox_config (Mailbox * mailbox, gchar* old_mbox_name)
 {
   GString *gstring;
-
+  gchar **mblist;
+  gchar  *mbox_name;
   GList *list = NULL;
   Mailbox *mb;
-
+  gint    nboxes;
+  
   gint i = 0;
 
   gstring = g_string_new (NULL);
 
+  gnome_config_get_vector ("/balsa/Global/Accounts", &nboxes, &mblist);
+  for (i = 0, mbox_name = mblist[0]; i < nboxes; mbox_name++)
+    {
+      if (strcmp(mbox_name, old_mbox_name) == 0)
+	break;
+      i++;
+    }
+  if (i == nboxes)
+    {
+      g_warning("mailbox not found in `Accounts' resource");
+      /*
+	@mla@ FIXME this is definitly wrong. Could be a `normal'
+	mbox, which the user wants to rename. Have to look into this
+	later.
+      */
+      mblist = g_realloc(mblist, (nboxes+1) * sizeof (gchar*));
+      mblist[nboxes++] = mailbox->name;
+    }
+  else
+    {
+      mblist[i]      = mailbox->name;
+    }
+  gnome_config_set_vector ("/balsa/Global/Accounts", nboxes, mblist);
+  i = 0;
   g_string_truncate (gstring, 0);
   g_string_sprintf (gstring, "/balsa/%s/", mailbox->name);
   gnome_config_push_prefix (gstring->str);

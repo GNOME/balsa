@@ -191,17 +191,17 @@ balsa_ab_window_list(BalsaAbWindow * ab, GCallback row_activated_cb)
 static void
 balsa_ab_window_init(BalsaAbWindow *ab)
 {
-#if GTK_CHECK_VERSION(2, 4, 0)
-    GtkWidget *combo_box;
-#else
-    GtkWidget *ab_option, *ab_menu, *menu_item,
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     GtkWidget *find_label,
 	*vbox, *vbox2,
 	*w,
 	*hbox,
 	*box2,
 	*scrolled_window,
+#if GTK_CHECK_VERSION(2, 4, 0)
+	*combo_box,
+#else
+	*ab_option, *ab_menu, *menu_item,
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 	*frame, *label;
     GList *ab_list;
     LibBalsaAddressBook *address_book;

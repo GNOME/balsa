@@ -40,6 +40,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+/* for uint32_t */
+#include <stdint.h>
+
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
 #endif

@@ -836,15 +836,9 @@ apply_prefs(GtkDialog * pbox)
 					 (pui->check_mail_minutes));
     balsa_app.quiet_background_check =
 	GTK_TOGGLE_BUTTON(pui->quiet_background_check)->active;
-#if GTK_CHECK_VERSION(2, 4, 0)
     balsa_app.msg_size_limit =
         gtk_spin_button_get_value(GTK_SPIN_BUTTON(pui->msg_size_limit)) *
         1024;
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-    balsa_app.msg_size_limit =
-	gtk_spin_button_get_value_as_float(GTK_SPIN_BUTTON
-                                           (pui->msg_size_limit))*1024;
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     balsa_app.check_imap =
 	GTK_TOGGLE_BUTTON(pui->check_imap)->active;
     balsa_app.check_imap_inbox =

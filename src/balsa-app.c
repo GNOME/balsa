@@ -29,6 +29,10 @@
 #include "main-window.h"
 #include "information.h"
 
+#ifdef BALSA_USE_THREADS
+#include <pthread.h>
+#endif
+
 /* Global application structure */
 struct BalsaApplication balsa_app;
 
@@ -83,31 +87,72 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
     return passwd;
 }
 
-gboolean
-check_mailbox_password(GNode *nd, gpointer data)
+#ifdef BALSA_USE_THREADS
+typedef struct {
+    pthread_cond_t cond;
+    LibBalsaServer* server;
+    LibBalsaMailbox* mbox;
+    gchar* res;
+} AskPasswdData;
+
+/* ask_passwd_idle:
+   called in MT mode by the main thread.
+ */
+static gboolean
+ask_passwd_idle(gpointer data)
+{
+    AskPasswdData* apd = (AskPasswdData*)data;
+    gdk_threads_enter();
+    apd->res = ask_password_real(apd->server, apd->mbox);
+    gdk_threads_leave();
+    pthread_cond_signal(&apd->cond);
+    return FALSE;
+}
+
+static gchar *
+ask_password_mt(LibBalsaServer * server, LibBalsaMailbox * mbox)
+{
+    static pthread_mutex_t ask_passwd_lock = PTHREAD_MUTEX_INITIALIZER;
+    AskPasswdData apd;
+
+    gdk_threads_leave();
+    pthread_mutex_lock(&ask_passwd_lock);
+    pthread_cond_init(&apd.cond, NULL);
+    apd.server = server;
+    apd.mbox   = mbox;
+    gtk_idle_add(ask_passwd_idle, &apd);
+    pthread_cond_wait(&apd.cond, &ask_passwd_lock);
+    
+    pthread_cond_destroy(&apd.cond);
+    pthread_mutex_unlock(&ask_passwd_lock);
+    pthread_mutex_destroy(&ask_passwd_lock);
+    gdk_threads_enter();
+    return apd.res;
+}
+#endif
+
+static gboolean
+set_passwd_from_matching_server(GNode *nd, gpointer data)
 {
     LibBalsaServer *server;
     LibBalsaServer *master;
     LibBalsaMailbox *mbox;
     BalsaMailboxNode *node;
 
-    /*
-     * What follows is a mixture of g_return_val_if_fail(), and
-     * if() return FALSE;  It uses the if()... return FALSE;
-     * constructs if the error is /expected/.
-     *
-     * I probably overdid it, but this way the code worked first time...
-     */
     g_return_val_if_fail(nd != NULL, FALSE);
     node = (BalsaMailboxNode *)nd->data;
     g_return_val_if_fail(BALSA_IS_MAILBOX_NODE(node), FALSE);
-    mbox = node->mailbox;
-    g_return_val_if_fail(mbox != NULL, FALSE);
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mbox), FALSE);
+    if(node->server)
+        server = node->server;
+    else {
+        mbox = node->mailbox;
+        g_return_val_if_fail(mbox != NULL, FALSE);
+        g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mbox), FALSE);
 
-    if (!LIBBALSA_IS_MAILBOX_REMOTE(mbox)) return FALSE;
-    server = LIBBALSA_MAILBOX_REMOTE_SERVER(mbox);
-    g_return_val_if_fail(server != NULL, FALSE);
+        if (!LIBBALSA_IS_MAILBOX_REMOTE(mbox)) return FALSE;
+        server = LIBBALSA_MAILBOX_REMOTE_SERVER(mbox);
+        g_return_val_if_fail(server != NULL, FALSE);
+    }
     g_return_val_if_fail(server->host != NULL, FALSE);
     g_return_val_if_fail(server->user != NULL, FALSE);
     if (server->passwd == NULL) return FALSE;
@@ -139,14 +184,18 @@ ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
     password = NULL;
     if (mbox) {
         g_node_traverse(balsa_app.mailbox_nodes, G_IN_ORDER, G_TRAVERSE_LEAFS,
-		-1, check_mailbox_password, server);
+		-1, set_passwd_from_matching_server, server);
 	if (server->passwd != NULL) {
 	    password = server->passwd;
 	    server->passwd = NULL;
 	}
     }
     if (!password)
+#ifdef BALSA_USE_THREADS
+	return ask_password_mt(server, mbox);
+#else
 	return ask_password_real(server, mbox);
+#endif
     else
 	return password;
 }

@@ -301,6 +301,9 @@ balsa_mailbox_node_new_from_config(const gchar* prefix)
     printf("Server loaded, host: %s, port %d\n", folder->server->host,
 	   folder->server->port);
 #endif
+    gtk_signal_connect(GTK_OBJECT(folder->server),
+		       "get-password", GTK_SIGNAL_FUNC(ask_password),
+		       NULL);
     gtk_signal_connect(GTK_OBJECT(folder), "show-prop-dialog", 
 		       folder_conf_imap_node, NULL);
     gtk_signal_connect(GTK_OBJECT(folder), "append-subtree", 

@@ -80,8 +80,8 @@ typedef struct _LibBalsaCondition {
  * a filter is defined by 
  * - a list of conditions and a gint conditions_op
  *   specifying the logical op to apply on the result of the condition match
- * - an action to perform on match : move, copy, print or trash the matching message,
- *   emit a sound, popup a text, execute a command
+ * - an action to perform on match : move, copy, print or trash the
+ *   matching message, emit a sound, popup a text, execute a command
  */
 
 typedef enum {
@@ -131,16 +131,18 @@ typedef struct _LibBalsaFilter {
     /* The action */
     FilterActionType action;
     /* action_string depends on action : 
-     * - if action is FILTER_MOVE, or FILTER_COPY, action_string is the name of the
-     *   mailbox to move/copy the matching message
+     * - if action is FILTER_MOVE, or FILTER_COPY, action_string is
+     *   the name of the mailbox to move/copy the matching message
      * - if action is FILTER_RUN, action_string is the command to run
-         for now this is the way to specify parameters (replaced by pieces of the
-	 matching message) for the running command, proposition :
-	 %f,%t,%c,%s are replaced by the corresponding header (from,to,cc,subject) field of the matching message
-	 on the command line with enclosing quotes if necessary, e.g. : 
-	 command_to_run %t %s -----> command_to_run manu@wanadoo.fr "about filters"
-	 If you want the body, we must find a way to pipe it to the std input of the command (FIXME what do we do for
-	 different parts, attachments and so on?)
+         for now this is the way to specify parameters (replaced by
+         pieces of the matching message) for the running command,
+         proposition : %f,%t,%c,%s are replaced by the corresponding
+         header (from,to,cc,subject) field of the matching message on
+         the command line with enclosing quotes if necessary, e.g. :
+         command_to_run %t %s -----> command_to_run manu@wanadoo.fr
+         "about filters" If you want the body, we must find a way to
+         pipe it to the std input of the command (FIXME what do we do
+         for different parts, attachments and so on?)
      * - if action is FILTER_TRASH it's NULL
      * - FIXME if action is FILTER_PRINT it could be the print command ?
      */
@@ -154,19 +156,21 @@ typedef struct _LibBalsaFilter {
 } LibBalsaFilter;
 
 /*
- * Exported filter functions
- * A lot are, to have a fine-grained API so we can use filter engine for a lot of different
- * purpose : search functions, virtual folders..., not only filtering
+ * Exported filter functions A lot are, to have a fine-grained API so
+ * we can use filter engine for a lot of different purpose : search
+ * functions, virtual folders..., not only filtering
  */
 
 gint match_condition(LibBalsaCondition* cond,LibBalsaMessage* message);
 
 gint match_conditions(FilterOpType op,GSList* cond,LibBalsaMessage* message);
+gchar* libbalsa_filter_build_imap_query(FilterOpType, GSList* conditions);
 
 /* Filtering functions */
-/* FIXME : perhaps I should try to use multithreading -> but we must therefore use lock very well */
-
-/* prepare_filters_to_run will test all filters for correctness, compile regexs if needed
+/* FIXME : perhaps I should try to use multithreading -> but we must
+   therefore use lock very well */
+/* prepare_filters_to_run will test all filters for correctness,
+   compile regexs if needed
  * Return 
  * - TRUE on success (all filters are valid, ready to be applied)
  * - FALSE if there are invalid filters

@@ -1,3 +1,7 @@
+2002-05-15  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* imap/imap.c: add imap_uid_search()
+	
 2002-05-10  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* mutt.h: undefine M_READ because it conflicts with Solaris headers.

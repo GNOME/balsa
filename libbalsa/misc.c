@@ -748,11 +748,12 @@ libbalsa_marshal_POINTER__OBJECT(GtkObject * object, GtkSignalFunc func,
    Marshalling function
 */
 typedef gpointer(*GtkSignal_POINTER__POINTER_POINTER) (GtkObject *object,
-						       gpointer *param1,
-						       gpointer *param2,
+						       gpointer param1,
+						       gpointer param2,
 						       gpointer user_data);
 void
-libbalsa_marshall_POINTER__POINTER_POINTER(GtkObject *object, GtkSignalFunc func,
+libbalsa_marshall_POINTER__POINTER_POINTER(GtkObject *object, 
+                                           GtkSignalFunc func,
 					   gpointer func_data, GtkArg *args)
 {
     GtkSignal_POINTER__POINTER_POINTER rfunc;
@@ -760,7 +761,29 @@ libbalsa_marshall_POINTER__POINTER_POINTER(GtkObject *object, GtkSignalFunc func
 
     return_val = GTK_RETLOC_POINTER(args[2]);
     rfunc = (GtkSignal_POINTER__POINTER_POINTER) func;
-    *return_val = (*rfunc) (object, GTK_VALUE_POINTER(args[0]), GTK_VALUE_POINTER(args[1]), func_data);
+    *return_val = (*rfunc) (object, GTK_VALUE_POINTER(args[0]), 
+                            GTK_VALUE_POINTER(args[1]), func_data);
+}
+
+/* libbalsa_marshall_POINTER__INT_POINTER:
+   Marshalling function
+*/
+typedef gpointer(*GtkSignal_POINTER__INT_POINTER) (GtkObject *object,
+                                                   int param1,
+                                                   gpointer param2,
+                                                   gpointer user_data);
+void
+libbalsa_marshal_POINTER__INT_POINTER(GtkObject *object, 
+                                      GtkSignalFunc func,
+                                      gpointer func_data, GtkArg *args)
+{
+    GtkSignal_POINTER__INT_POINTER rfunc;
+    gpointer *return_val;
+
+    return_val = GTK_RETLOC_POINTER(args[2]);
+    rfunc = (GtkSignal_POINTER__INT_POINTER) func;
+    *return_val = (*rfunc) (object, GTK_VALUE_INT(args[0]), 
+                            GTK_VALUE_POINTER(args[1]), func_data);
 }
 
 

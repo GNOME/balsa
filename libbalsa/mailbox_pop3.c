@@ -37,6 +37,9 @@
 
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
+#else
+/* FIXME: */
+void config_mailbox_update(LibBalsaMailbox* );
 #endif
 
 #include "mailbox-filter.h"

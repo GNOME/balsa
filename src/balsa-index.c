@@ -531,6 +531,7 @@ balsa_index_set_first_new_message(BalsaIndex * bindex)
 struct BalsaIndexScanInfo {
     gpointer node;                      /* current ctree node */
     GList *selection;                   /* copy of clist->selection */
+    GHashTable* matching;               /* matching messages */
     LibBalsaMessageFlag flag;           /* look only for matching nodes */
     GtkCTreeNode *first;                /* returns first matching */
     GtkCTreeNode *previous;             /* returns last matching
@@ -538,9 +539,6 @@ struct BalsaIndexScanInfo {
     GtkCTreeNode *next;                 /* returns first matching
                                            after selection */
     GtkCTreeNode *last;                 /* returns last matching */
-    gint conditions_op;
-    /* This list is not owned by the struct, so it is not its responsability to free it */
-    GSList * conditions;
 };
 
 /* 
@@ -960,10 +958,9 @@ balsa_index_scan_node(GtkCTree * ctree, GtkCTreeNode * node,
            search  condition combinations  are  valid: matching  flag,
            matching filter, or something else. This makes this chunk
 	   ambigous. */
-	found |= (b->flag == 0 && !b->conditions && 
+	found |= (b->flag == 0 && !b->matching && 
              gtk_ctree_is_viewable(ctree, node))
-	    || (b->conditions && 
-                match_conditions(b->conditions_op,b->conditions,message));
+	    || (b->matching && g_hash_table_lookup(b->matching,message));
         if (found) {
             if (b->first == NULL)
                 /* first matching message */
@@ -1017,8 +1014,11 @@ balsa_index_find_node(BalsaIndex * bindex, gboolean previous,
         GTK_CLIST(bindex->ctree)->selection
         ? g_list_last(GTK_CLIST(bindex->ctree)->selection)->data : NULL;
     bi->flag = flag;
-    bi->conditions_op=op;
-    bi->conditions=conditions;
+    if(conditions) {
+        bi->matching = 
+            libbalsa_mailbox_get_matching(bindex->mailbox_node->mailbox, 
+                                          op, conditions);
+    }
     gtk_ctree_pre_recursive(bindex->ctree, NULL, (GtkCTreeFunc)
                             balsa_index_scan_node, bi);
     node = previous ? bi->previous : bi->next;
@@ -1027,6 +1027,7 @@ balsa_index_find_node(BalsaIndex * bindex, gboolean previous,
          * matching */
         node = bi->first;
     g_free(bi);
+    if(bi->matching) g_hash_table_destroy(bi->matching);
     return node;
 }
 

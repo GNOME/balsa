@@ -1,3 +1,9 @@
+2004-06-04 08:28  PeterB
+
+	* src/: balsa-app.c, balsa-index.c, filter-run-callbacks.c,
+	main-window.c, main-window.h, pref-manager.c: don't refer to
+	balsa_app.main_window in src/main-window.c.
+
 2004-06-02 12:51  PeterB
 
 	* src/toolbar-factory.c: simplify balsa_toolbar_remove_all; make

@@ -476,38 +476,39 @@ balsa_spell_check_init (BalsaSpellCheck* spell_check)
         /* setup buttons to perform actions */
         change = gnome_stock_button_with_label (GNOME_STOCK_PIXMAP_REDO, 
                                                 "Change");
-        set_tooltip (change, _("Replace the current word with the selected suggestion"));
+	gtk_tooltips_set_tip(balsa_app.tooltips, change, _("Replace the current word with the selected suggestion"), NULL);
         gtk_box_pack_start (GTK_BOX (vbox1), change, FALSE, FALSE, 0);
 
         change_all = gnome_stock_button_with_label (GNOME_STOCK_PIXMAP_REFRESH,
                                                     "Change All");
-        set_tooltip (change_all, _ ("Replace all occurances of the current word with the selected suggestion"));
+	gtk_tooltips_set_tip(balsa_app.tooltips, change_all, _ ("Replace all occurances of the current word with the selected suggestion"), NULL);
         gtk_box_pack_start (GTK_BOX (vbox2), change_all, 
                             FALSE, FALSE, 0);
         
         ignore = gnome_stock_button_with_label (GNOME_STOCK_PIXMAP_FORWARD,
                                                 "Ignore");
-        set_tooltip (ignore, _ ("Skip the current word"));
+
+        gtk_tooltips_set_tip (balsa_app.tooltips, ignore, _ ("Skip the current word"), NULL);
         gtk_box_pack_start (GTK_BOX (vbox1), ignore, FALSE, FALSE, 0);
         
         ignore_all = gnome_stock_button_with_label (GNOME_STOCK_PIXMAP_LAST,
                                                     "Ignore All");
-        set_tooltip (ignore_all, _ ("Skip all occurances of the current word"));
+        gtk_tooltips_set_tip (balsa_app.tooltips, ignore_all, _ ("Skip all occurances of the current word"), NULL);
         gtk_box_pack_start (GTK_BOX (vbox2), ignore_all, 
                             FALSE, FALSE, 0);
 
         learn = gnome_stock_button_with_label (GNOME_STOCK_PIXMAP_BOOK_OPEN,
                                                "Learn");
-        set_tooltip (learn, _ ("Add the current word to your personal dictionar"));
+        gtk_tooltips_set_tip (balsa_app.tooltips, learn, _ ("Add the current word to your personal dictionar"), NULL);
         gtk_box_pack_start (GTK_BOX (vbox1), learn, FALSE, FALSE, 0);
         
         done = gnome_stock_button_with_label (GNOME_STOCK_BUTTON_OK, 
                                               "Done");
-        set_tooltip (done, _ ("Finish spell checking"));
+        gtk_tooltips_set_tip (balsa_app.tooltips, done, _ ("Finish spell checking"), NULL);
         gtk_box_pack_end (GTK_BOX (vbox1), done, FALSE, FALSE, 0);
 
         cancel = gnome_stock_button (GNOME_STOCK_BUTTON_CANCEL);
-        set_tooltip (cancel, _ ("Revert all changes and finish spell checking"));
+        gtk_tooltips_set_tip (balsa_app.tooltips, cancel, _ ("Revert all changes and finish spell checking"), NULL);
         gtk_box_pack_end (GTK_BOX (vbox2), cancel, FALSE, FALSE, 0);
         
         /* connect signal handlers */
@@ -933,6 +934,11 @@ static void balsa_spell_check_destroy (GtkObject* object)
         
         if (spell_check->spell_manager) 
                 balsa_spell_check_finish (spell_check, TRUE);
+
+        g_free(spell_check->module);		spell_check->module = NULL;
+        g_free(spell_check->suggest_mode);	spell_check->suggest_mode = NULL;
+        g_free(spell_check->language_tag);	spell_check->language_tag = NULL;
+        g_free(spell_check->character_set);	spell_check->character_set = NULL;
         
         if (GTK_OBJECT_CLASS (parent_class)->destroy)
                 (* GTK_OBJECT_CLASS (parent_class)->destroy) (object);
@@ -1015,6 +1021,7 @@ setup_suggestions (BalsaSpellCheck* spell_check)
                 
                 row_text[0] = g_strdup (new_word);
                 gtk_clist_append (spell_check->list, row_text);
+		g_free(row_text[0]);
         }
         gtk_clist_thaw (spell_check->list);
 }

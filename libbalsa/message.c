@@ -206,27 +206,27 @@ libbalsa_message_destroy(GtkObject *object)
         message->remail = NULL;
 
 	if ( message->from ) {
-		gtk_object_destroy (GTK_OBJECT(message->from));         
+		gtk_object_unref (GTK_OBJECT(message->from));         
 		message->from = NULL;
 	}
 	if ( message->sender ) {
-		gtk_object_destroy (GTK_OBJECT(message->sender));       
+		gtk_object_unref (GTK_OBJECT(message->sender));       
 		message->sender = NULL;
 	}
 	if ( message->reply_to ) {
-		gtk_object_destroy (GTK_OBJECT(message->reply_to));     
+		gtk_object_unref (GTK_OBJECT(message->reply_to));     
 		message->reply_to = NULL;
 	}
 	
-	g_list_foreach(message->to_list, (GFunc)gtk_object_destroy, NULL);
+	g_list_foreach(message->to_list, (GFunc)gtk_object_unref, NULL);
 	g_list_free(message->to_list);
 	message->to_list = NULL;
 
-	g_list_foreach(message->cc_list, (GFunc)gtk_object_destroy, NULL);
+	g_list_foreach(message->cc_list, (GFunc)gtk_object_unref, NULL);
 	g_list_free(message->cc_list);
 	message->cc_list = NULL;
 
-	g_list_foreach(message->bcc_list, (GFunc)gtk_object_destroy, NULL);
+	g_list_foreach(message->bcc_list, (GFunc)gtk_object_unref, NULL);
 	g_list_free(message->bcc_list);
 	message->bcc_list = NULL;
 

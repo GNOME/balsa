@@ -479,7 +479,10 @@ BODY *mutt_parse_messageRFC822 (FILE *fp, BODY *parent)
 
   parent->hdr = mutt_new_header ();
   parent->hdr->offset = ftell (fp);
-  parent->hdr->env = mutt_read_rfc822_header (fp, parent->hdr, 0, 0);
+
+  /* BALSA: Pass user_hdrs=1 */
+  parent->hdr->env = mutt_read_rfc822_header (fp, parent->hdr, 1, 0);
+
   msg = parent->hdr->content;
 
   /* ignore the length given in the content-length since it could be wrong

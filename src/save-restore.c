@@ -207,6 +207,8 @@ config_mailboxes_init (void)
       config_mailbox_init (tmp);
       g_free(tmp);
     }
+    g_free(key);
+    g_free(val);
   }
   return TRUE; /* hm... check_basic_mailboxes? */
 }				/* config_mailboxes_init */
@@ -612,6 +614,8 @@ config_get_unused_section (const gchar *prefix)
       if(strlen(key+(pref_len-1))>1 && (curr = atoi(key+pref_len)+1) && curr>max)
 	max = curr;
     }
+    g_free(key);
+    g_free(val);
   }
   name =  g_strdup_printf(BALSA_CONFIG_PREFIX "%s%d/", prefix, max);
   if(balsa_app.debug)
@@ -652,7 +656,10 @@ config_address_books_load(void)
 
       g_free(tmp);
     }
+    g_free(key);
+    g_free(val);
   }
+  g_free(default_address_book_prefix);
 }
 
 static void

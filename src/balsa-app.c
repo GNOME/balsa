@@ -198,6 +198,8 @@ balsa_app_init (void)
   balsa_app.error_message = 0;
   balsa_app.debug_message = 0;
 
+  /* Tooltips */
+  balsa_app.tooltips = gtk_tooltips_new();
 }
 
 gboolean
@@ -295,12 +297,4 @@ GtkWidget*
 gnome_stock_button_with_label (const char* icon, const char* label)
 {
   return gnome_pixmap_button (gnome_stock_new_with_icon (icon), label);
-}
-
-void
-set_tooltip (GtkWidget* widget, const gchar* tip)
-{
-  GtkTooltips* t = gtk_tooltips_new ();
-  
-  gtk_tooltips_set_tip (t, widget, tip, NULL);
 }

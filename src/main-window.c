@@ -1315,8 +1315,8 @@ mail_progress_notify_cb( )
 		  break;
 
 	  default:
-	    fprintf ( stderr, " Unknown: %s \n", 
-		      threadmessage->message_string );
+	    fprintf ( stderr, " Unknown (%d): %s \n", 
+		      threadmessage->message_type, threadmessage->message_string );
 	    
 	  }
 	free( threadmessage );

@@ -103,6 +103,7 @@ static void balsa_gtk_html_size_request (GtkWidget *widget, GtkRequisition *requ
 #endif
 static void balsa_icon_list_size_request (GtkWidget *widget, GtkRequisition *requisition, gpointer data);
 
+static void part_info_init (BalsaMessage *bm, BalsaPartInfo *info);
 static void part_info_init_image (BalsaMessage *bm, BalsaPartInfo *info);
 static void part_info_init_other (BalsaMessage *bm, BalsaPartInfo *info);
 static void part_info_init_mimetext (BalsaMessage *bm, BalsaPartInfo *info);
@@ -1101,34 +1102,17 @@ find_part_icon(BalsaPartInfo *info, gchar *content_type)
 }
 
 static void
-display_part (BalsaMessage *bm, LibBalsaMessageBody * body)
+part_info_init (BalsaMessage *bm, BalsaPartInfo *info)
 {
-  BalsaPartInfo *info = NULL;
-  gchar *pix = NULL;
-  gchar *content_type = NULL;
-  gchar *icon_title = NULL;
-  gint pos;
-  GtkWidget *menu_item;
+  LibBalsaMessageBodyType type;
+
+  g_return_if_fail (bm != NULL);
+  g_return_if_fail (info != NULL);
+  g_return_if_fail (info->body != NULL);
   
+  type = libbalsa_message_body_type(info->body);
 
-  if ( libbalsa_message_body_is_multipart(body) ) {
-    if (balsa_app.debug)
-      fprintf (stderr, "part: multipart\n");
-    display_multipart (bm, body);
-    if (balsa_app.debug)
-      fprintf (stderr, "part end: multipart\n");
-    return; /* we don't want a multipart icon */
-  }
-
-  bm->part_count++;
-
-  info = (BalsaPartInfo*)g_new0(BalsaPartInfo, 1);
-  info->body = body;
-  info->message = bm->message;
-  info->popup_menu = gtk_menu_new();
-  info->can_display = FALSE;
-
-  switch ( libbalsa_message_body_type(body) )
+  switch ( type )
   {
   case LIBBALSA_MESSAGE_BODY_TYPE_OTHER:
     if (balsa_app.debug)
@@ -1177,6 +1161,41 @@ display_part (BalsaMessage *bm, LibBalsaMessageBody * body)
     break;
   }
 
+  /* The widget is unref'd in free_icon_data */
+  if ( info->widget )
+    gtk_object_ref(GTK_OBJECT(info->widget));
+
+  return;
+}
+
+static void
+display_part (BalsaMessage *bm, LibBalsaMessageBody * body)
+{
+  BalsaPartInfo *info = NULL;
+  gchar *pix = NULL;
+  gchar *content_type = NULL;
+  gchar *icon_title = NULL;
+  gint pos;
+  GtkWidget *menu_item;
+  
+
+  if ( libbalsa_message_body_is_multipart(body) ) {
+    if (balsa_app.debug)
+      fprintf (stderr, "part: multipart\n");
+    display_multipart (bm, body);
+    if (balsa_app.debug)
+      fprintf (stderr, "part end: multipart\n");
+    return; /* we don't want a multipart icon */
+  }
+
+  bm->part_count++;
+
+  info = (BalsaPartInfo*)g_new0(BalsaPartInfo, 1);
+  info->body = body;
+  info->message = bm->message;
+  info->popup_menu = gtk_menu_new();
+  info->can_display = FALSE;
+
   content_type = libbalsa_message_body_get_content_type(body);
 
   if ( body->filename )
@@ -1196,10 +1215,6 @@ display_part (BalsaMessage *bm, LibBalsaMessageBody * body)
   
   pos = gnome_icon_list_append ( GNOME_ICON_LIST(bm->part_list), 
 				 pix, icon_title);
-
-  /* The widget is unref'd in free_icon_data */
-  if ( info->widget )
-    gtk_object_ref(GTK_OBJECT(info->widget));
 
   gnome_icon_list_set_icon_data_full (GNOME_ICON_LIST(bm->part_list), pos,
 				      info,
@@ -1340,6 +1355,9 @@ select_part(BalsaMessage *bm, gint part)
   if ( part != -1 ) {
     info = (BalsaPartInfo*)gnome_icon_list_get_icon_data
       (GNOME_ICON_LIST(bm->part_list), part);
+
+    if ( info && !info->widget )
+      part_info_init(bm, info);
 
     if ( info && info->widget ) {
       gtk_widget_show(info->widget);

@@ -376,6 +376,7 @@ balsa_sendmsg_destroy (BalsaSendmsg * bsm)
        gtk_object_unref( GTK_OBJECT(bsm->orig_message) );
    }
 
+   
 #ifdef BALSA_USE_THREADS
    if(balsa_app.compose_email && !sending_mail)
      balsa_exit(); 

@@ -1,3 +1,18 @@
+2000-09-21  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/balsa-message.c: Patch from Timothy Alan Chandler
+	<fusion@heavywater.net> to only render a part when needed. I made
+	this non optional, since that seems reasonable.
+	* src/expand-alias.c: Implement case-insensitive
+	expansion. Non-optional for now. Fix a couple of leaks.
+	* src/message.c: 
+	* src/save-restore.c:
+	* src/spell-check.c:
+	* src/balsa-app.[ch]:
+	  Fix leaks shown up by memprof.
+	
+	* libmutt/parse.c: Pass user_hdrs=1 to mutt_read_rfc822_header.
+	
 2000-09-20  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* libbalsa/message.[ch]: Change return type of

@@ -414,7 +414,7 @@ static GnomeUIInfo threading_menu[] = {
 
 static GnomeUIInfo view_menu[] = {
 #define MENU_VIEW_MAILBOX_LIST_POS 0
-    GNOMEUIINFO_TOGGLEITEM(N_("_Show Mailbox Tree"),
+    GNOMEUIINFO_TOGGLEITEM(N_("_Show Mailbox Tree (F9)"),
                            N_("Toggle display of mailbox and folder tree"),
                            show_mbtree_cb, NULL),
 #define MENU_VIEW_MAILBOX_TABS_POS 1
@@ -749,8 +749,8 @@ static GnomeUIInfo main_menu[] = {
     GNOMEUIINFO_MENU_FILE_TREE(file_menu),
     GNOMEUIINFO_MENU_EDIT_TREE(edit_menu),
     GNOMEUIINFO_MENU_VIEW_TREE(view_menu),
-    GNOMEUIINFO_SUBTREE(N_("_Message"), message_menu),
     GNOMEUIINFO_SUBTREE(N_("Mail_box"), mailbox_menu),
+    GNOMEUIINFO_SUBTREE(N_("_Message"), message_menu),
     GNOMEUIINFO_MENU_SETTINGS_TREE (settings_menu),
     GNOMEUIINFO_MENU_HELP_TREE(help_menu),
     GNOMEUIINFO_END
@@ -993,6 +993,21 @@ balsa_window_new()
 			       "activate", GNOME_APP(window)->accel_group,
 			       '=', GDK_CONTROL_MASK, (GtkAccelFlags) 0);
 #endif				/* HAVE_GTKHTML */
+
+    /* Use Del as an alternative accelerator for Ctrl+D
+     * (toggle deleted). */
+    gtk_widget_add_accelerator(message_toggle_menu
+			       [MENU_MESSAGE_TOGGLE_DELETED_POS].widget,
+			       "activate", GNOME_APP(window)->accel_group,
+			       GDK_Delete, (GdkModifierType) 0,
+			       (GtkAccelFlags) 0);
+
+    /* Use F9 as an accelerator for `Show mailbox tree' */
+    gtk_widget_add_accelerator(view_menu
+			       [MENU_VIEW_MAILBOX_LIST_POS].widget,
+			       "activate", GNOME_APP(window)->accel_group,
+			       GDK_F9, (GdkModifierType) 0,
+			       (GtkAccelFlags) 0);
 
     model = balsa_window_get_toolbar_model();
     toolbar = balsa_toolbar_new(model);

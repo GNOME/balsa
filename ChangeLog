@@ -1,5 +1,7 @@
-2004-12-01 17:39  PeterB
+2004-12-01 21:23  PeterB
 
+	* src/: balsa-message.c, message-window.c: use error return from
+	libbalsa_message_body_ref() better.
 	* src/balsa-message.c: check for NULL sig_body.
 	* libbalsa/misc.c, libbalsa/misc.h, src/main-window.c,
 	src/main-window.h, src/message-window.c, src/sendmsg-window.c: move

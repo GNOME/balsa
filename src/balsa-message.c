@@ -2888,6 +2888,7 @@ static void add_vfs_menu_item(BalsaPartInfo *info, GtkMenu * menu,
     g_free (menu_label);
 }
 
+#if !GTK_CHECK_VERSION(2, 4, 0)
 static gboolean in_gnome_vfs(const GnomeVFSMimeApplication *default_app, 
                              const GList *short_list, const gchar *cmd) 
 {
@@ -2923,6 +2924,7 @@ static gboolean in_gnome_vfs(const GnomeVFSMimeApplication *default_app,
     
     return FALSE;
 }
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
 /* helper: fill the passed menu with vfs items */
 static void
@@ -2931,6 +2933,10 @@ fill_part_menu_by_content_type(BalsaPartInfo *info, GtkMenu * menu,
 {
     GtkWidget* menu_item;
     GList* list;
+#if GTK_CHECK_VERSION(2, 4, 0)
+    GnomeVFSMimeApplication *def_app;
+    GList *app_list;
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     GList* key_list, *app_list;
     gchar* key;
     const gchar* cmd;
@@ -2938,18 +2944,29 @@ fill_part_menu_by_content_type(BalsaPartInfo *info, GtkMenu * menu,
     gchar** split_key;
     gint i;
     GnomeVFSMimeApplication *def_app, *app;
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     
+#if !GTK_CHECK_VERSION(2, 4, 0)
     key_list = list = gnome_vfs_mime_get_key_list(content_type);
     /* gdk_threads_leave(); releasing GDK lock was necessary for broken
      * gnome-vfs versions */
     app_list = gnome_vfs_mime_get_short_list_applications(content_type);
     /* gdk_threads_enter(); */
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     if((def_app=gnome_vfs_mime_get_default_application(content_type))) {
         add_vfs_menu_item(info, menu, def_app);
     }
     
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+    app_list = gnome_vfs_mime_get_all_applications(content_type);
+    for (list = app_list; list; list = list->next) {
+        GnomeVFSMimeApplication *app = list->data;
+        if (app && (!def_app || strcmp(app->name, def_app->name) != 0))
+            add_vfs_menu_item(info, menu, app);
+    }
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     while (list) {
         key = list->data;
 
@@ -3004,6 +3021,7 @@ fill_part_menu_by_content_type(BalsaPartInfo *info, GtkMenu * menu,
 
         list = g_list_next (list);
     }
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     gnome_vfs_mime_application_free(def_app);
     
 
@@ -3012,7 +3030,9 @@ fill_part_menu_by_content_type(BalsaPartInfo *info, GtkMenu * menu,
                       G_CALLBACK (part_context_menu_save), (gpointer) info);
     gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
 
+#if !GTK_CHECK_VERSION(2, 4, 0)
     g_list_free (key_list);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     gnome_vfs_mime_application_list_free (app_list);
 }
 

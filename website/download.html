@@ -114,26 +114,31 @@ fixes has been resolved as well.  See <tt>NEWS</tt> and/or
 
 <a name="gnome2"></a>
 <dl>
-<dt>GNOME2 preview release - 2.0.1 - released on 2002.06.10</dt>
+<dt>GNOME2 preview release - 2.0.2 - released on 2002.09.15</dt>
 <dd>
 <ul>
 <li>
-<a href="http://balsa.gnome.org/balsa-2.0.1.tar.bz2">balsa-2.0.1.tar.bz2</a>
+<a href="http://balsa.gnome.org/balsa-2.0.2.tar.bz2">balsa-2.0.2.tar.bz2</a>
 </li>
 <li>
-<a href="http://balsa.gnome.org/balsa-2.0.1-1.i386.rpm">balsa-2.0.1-1.i386.rpm</a> built on RH-7.2 - <b>but please build it yourself from src.rpm!</b>
+<a href="http://balsa.gnome.org/balsa-2.0.2-1.i386.rpm">balsa-2.0.2-1.i386.rpm</a> built on RH beta (null) - <b>but please build it yourself from src.rpm!</b>
 </li>
 <li>
-<a href="http://balsa.gnome.org/balsa-2.0.1-1.src.rpm">balsa-2.0.1-1.src.rpm</a></li>
+<a href="http://balsa.gnome.org/balsa-2.0.2-1.src.rpm">balsa-2.0.2-1.src.rpm</a></li>
 </dd>
 </dl>
 
-<p>Balsa-2.0.1 is a technology preview. It can be used daily but it
-knows how to crash, too. While it is 98% functional, it still has some
+<p>Balsa-2.0.2 is a technology preview. It can be used daily but it
+knows how to crash, too. While it is 99% functional, it still has some
 rough edges (notably in the i18n area). The binary is built on a
 development computer and can require libraries that are different than
 on yours. This is why rebuilding from the source is
-recommended. Try</p> <pre>rpm --recompile balsa-2.0.1-1.src.rpm</pre>
+recommended. Try</p> <pre>rpm --recompile balsa-2.0.2-1.src.rpm</pre>
+<p><b>Please note</b> also that pspell distributed with RH makes balsa
+hang on <tt>fork()</tt> call, i.e. when any external program is to be forked
+from balsa. The solution is to remove <tt>-lc</tt> from dependency_libs 
+in <tt>/usr/lib/libpspell.la</tt>.
+</p>
 
 <a name="req"></a>
 <h2 class="heading">Requirements</h2>

@@ -9,27 +9,15 @@ Note: This list is not complete, but here for the authors
 
 Stuart
 ---------------------------------------------------------
- * Save the choice of text/icons/both for the toolbar.
  * #mh/ requires a .mh_profile in ~ which looks something
    like:  "Path: Mail", telling it to get mh folders from
    ~/Mail
- * if the MAIL env isn't set, the first time balsa is ran
-   with a clean ~/.gnome/balsa, the "Default" mailbox isn't
-   there, but every time after it is.. look into.
- * lockfile so that Balsa can only be run once.  c-client
-   doesn't like like two programms accessing the same
-   mailboxes at the same time.
-
-sendmsg-window TODO:
- * look at smtp code crashing if gtk_text is empty
--- need to check 4-29-98
+ * Quote messages in replyto
+ * Do not add Re: if one already exists
 
 
 Jay
 ---------------------------------------------------------
- * clear xmhtml widget when changing mailboxes
- * delete messages
- * more stuff goes here...
 
 
 

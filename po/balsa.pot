@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1998-05-02 16:07-0400\n"
+"POT-Creation-Date: 1998-05-06 17:42-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,102 +18,82 @@ msgstr ""
 msgid "Send"
 msgstr ""
 
-#: src/addrbook-manager.c:179 src/sendmsg-window.c:143
+#: src/addrbook-manager.c:179 src/sendmsg-window.c:148
 msgid "Close"
 msgstr ""
 
-#: src/main-window.c:454 src/sendmsg-window.c:151
+#: src/main-window.c:449 src/sendmsg-window.c:156
 msgid "Message"
 msgstr ""
 
-#: src/sendmsg-window.c:158
+#: src/sendmsg-window.c:163
 msgid "Cut"
 msgstr ""
 
-#: src/sendmsg-window.c:165
+#: src/sendmsg-window.c:170
 msgid "Copy"
 msgstr ""
 
-#: src/sendmsg-window.c:172
+#: src/sendmsg-window.c:177
 msgid "Paste"
 msgstr ""
 
-#: src/sendmsg-window.c:179
+#: src/sendmsg-window.c:184
 msgid "Edit"
 msgstr ""
 
-#: src/addrbook-manager.c:194 src/sendmsg-window.c:187
+#: src/addrbook-manager.c:194 src/sendmsg-window.c:192
 msgid "Contents"
 msgstr ""
 
-#: src/addrbook-manager.c:199 src/main-window.c:511 src/sendmsg-window.c:192
+#: src/addrbook-manager.c:199 src/main-window.c:506 src/sendmsg-window.c:197
 msgid "Help"
 msgstr ""
 
-#: src/addrbook-manager.c:187 src/main-window.c:343
+#: src/addrbook-manager.c:187 src/main-window.c:366
 msgid "File"
 msgstr ""
 
-#: src/main-window.c:292
+#: src/main-window.c:336
 msgid "Get New Mail"
 msgstr ""
 
-#: src/main-window.c:311
-msgid "Save mailbox..."
-msgstr ""
-
-#: src/main-window.c:320
-msgid "Print..."
-msgstr ""
-
-#: src/main-window.c:331
+#: src/main-window.c:354
 msgid "Exit"
 msgstr ""
 
-#: src/main-window.c:353
+#: src/main-window.c:376
 msgid "New"
 msgstr ""
 
-#: src/main-window.c:366
+#: src/main-window.c:389
 msgid "Reply"
 msgstr ""
 
-#: src/main-window.c:382
-msgid "Reply to All"
-msgstr ""
-
-#: src/main-window.c:391
+#: src/main-window.c:402
 msgid "Foward"
 msgstr ""
 
-#: src/main-window.c:406
-msgid "Redirect"
-msgstr ""
-
-#: src/main-window.c:411
-msgid "Send again"
-msgstr ""
-
-#: src/main-window.c:423
+#: src/main-window.c:418
 msgid "Delete"
 msgstr ""
 
-#: src/main-window.c:439
+#: src/main-window.c:434
 msgid "Undelete"
 msgstr ""
 
-#: src/main-window.c:464
+#: src/main-window.c:459
 msgid "Preferences..."
 msgstr ""
 
-#: src/main-window.c:476
+#: src/main-window.c:471
 msgid "Mailbox Manager..."
 msgstr ""
 
-#: src/main-window.c:488
+#: src/main-window.c:483
 msgid "Settings"
 msgstr ""
 
-#: src/main-window.c:498
+#: src/main-window.c:493
 msgid "About"
 msgstr ""

@@ -1881,7 +1881,7 @@ static gboolean
 bndx_find_message(BalsaIndex * index, GtkTreePath ** path,
 		  GtkTreeIter * iter, LibBalsaMessage * message)
 {
-    return message
+    return message && message->msgno > 0
 	&& libbalsa_mailbox_msgno_find(index->mailbox_node->mailbox,
 				       message->msgno, path, iter);
 }

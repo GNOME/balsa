@@ -1442,6 +1442,7 @@ libbalsa_mailbox_msgno_find(LibBalsaMailbox * mailbox, guint seqno,
     GtkTreeIter tmp_iter;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+    g_return_val_if_fail(seqno > 0, FALSE);
 
     tmp_iter.user_data =
         g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,

@@ -2,6 +2,7 @@
 
 	* src/sendmsg-window.c: disentangle charset/attachment
 	initialization order.
+	* libbalsa/filter.c: compare filter names correctly (Emmanuel).
 
 2004-03-10 11:39  PeterB
 

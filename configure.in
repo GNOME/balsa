@@ -178,7 +178,7 @@ dnl ###########################################################################
 
 dnl datadir='${prefix}/share', so we must eval it or something. This works
 BALSA_STD_PREFIX=`eval "echo ${prefix}"`
-BALSA_DATA_PREFIX=`eval "echo ${datadir}"`
+BALSA_DATA_PREFIX=`eval "echo ${datadir}/balsa"`
 
 dnl Consolidate them!
 AC_PROG_AWK

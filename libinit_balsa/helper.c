@@ -59,14 +59,11 @@ balsa_init_get_png(const gchar * fname)
     GdkPixbuf *img;
     GError *err = NULL;
 #endif                          /* BALSA_MAJOR < 2 */
-    gchar *fullname, *fullpath;
+    gchar *fullpath;
 
     g_return_val_if_fail(fname != NULL, NULL);
 
-    fullname = g_strconcat("balsa/", fname, NULL);
-    /*fullpath = gnome_pixmap_file(fullname); */
-    fullpath = balsa_pixmap_finder(fullname);
-    g_free(fullname);
+    fullpath = balsa_pixmap_finder(fname);
 
     if (!fullpath)
         return NULL;

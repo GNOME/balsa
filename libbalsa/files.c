@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -102,7 +102,7 @@ balsa_file_finder(const gchar * filename, const gchar * splice,
  *   locate a suitable icon (pixmap graphic) based on 'mime-type' and/or
  *   'filename', either of which can be NULL.  If both arguments are
  *   non-NULL, 'mime-type' has priority.  If both are NULL, the default
- *   'balsa/attachment.png' icon will be returned.  This function *MUST*
+ *   'attachment.png' icon will be returned.  This function *MUST*
  *   return the complete path to the icon file.
  */
 gchar *
@@ -117,7 +117,7 @@ libbalsa_icon_finder(const char *mime_type, const char *filename)
     else if(filename)
         content_type = libbalsa_lookup_mime_type(filename);
     else
-        return balsa_pixmap_finder ("balsa/attachment.png");
+        return balsa_pixmap_finder ("attachment.png");
 
     /* FIXME:
        or icon_file = gnome_desktop_item_find_icon(GVMGI(content_Type)?) */
@@ -141,7 +141,7 @@ libbalsa_icon_finder(const char *mime_type, const char *filename)
 	 * In pratice I don't think we will ever make it this far...
 	 */
 	if ( icon == NULL )
-	    icon = balsa_pixmap_finder ("balsa/attachment.png");
+	    icon = balsa_pixmap_finder ("attachment.png");
 	
 	g_free (gnome_icon);
     }

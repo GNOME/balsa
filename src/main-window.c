@@ -3013,7 +3013,7 @@ set_icon(GnomeApp * app)
     ic_win = gdk_window_new(NULL, &att, GDK_WA_VISUAL | GDK_WA_COLORMAP);
     gdk_window_set_icon(w, ic_win, NULL, NULL);
 
-    if( (filename = balsa_pixmap_finder("balsa/balsa_icon.png")) ) {
+    if( (filename = balsa_pixmap_finder("balsa_icon.png")) ) {
 #if BALSA_MAJOR < 2
         pb = gdk_pixbuf_new_from_file(filename);
 #else

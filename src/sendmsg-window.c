@@ -1391,7 +1391,7 @@ add_attachment(GnomeIconList * iconlist, char *filename,
 	} else
 	    balsa_information
 		(LIBBALSA_INFORMATION_ERROR,
-		 _("Default attachment pixmap (balsa/attachment.png) cannot be found:\n"
+		 _("Default attachment pixmap (attachment.png) cannot be found:\n"
 		   "Your balsa installation is corrupted."));
     }
     g_free ( pix ) ;
@@ -2202,9 +2202,7 @@ static void
 fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 {
     GString *body = NULL;
-    gchar *signature, *tmp;
-    gsize bytes_read, bytes_written;
-    GError * err = NULL;
+    gchar *signature;
     gboolean reply_any = (type == SEND_REPLY || type == SEND_REPLY_ALL
                           || type == SEND_REPLY_GROUP);
     gboolean forwd_any = (type == SEND_FORWARD_ATTACH
@@ -2243,19 +2241,10 @@ fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 	g_free(signature);
     }
 
-    tmp = g_convert(body->str, body->len, "UTF-8", 
-                    msg->charset ? msg->charset : "US-ASCII", 
-                    &bytes_read, &bytes_written, &err);
-    if(err) { 
-        g_warning("Error charset conversion on body quoting.\n"); 
-        g_error_free(err); 
-    } else {
-        gtk_text_buffer_set_text(buffer, tmp, bytes_written);
-        gtk_text_buffer_get_start_iter(buffer, &start);
-        gtk_text_buffer_place_cursor(buffer, &start);
-    }
+    gtk_text_buffer_set_text(buffer, body->str, body->len);
+    gtk_text_buffer_get_start_iter(buffer, &start);
+    gtk_text_buffer_place_cursor(buffer, &start);
     g_string_free(body, TRUE);
-    g_free(tmp);
 }
 
 static gint insert_signature_cb(GtkWidget *widget, BalsaSendmsg *msg)

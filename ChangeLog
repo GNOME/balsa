@@ -1,3 +1,12 @@
+2002-04-23  Pawel Salek <pawsa@theochem.kth.se>
+
+	* Makefile.am, balsa.spec.in, {sounds,images}/Makefile.am:
+	* configure.in, libbalsa/files.c, libinit_balsa/helper.c:
+	* src/main-window.c, src/main.c:
+	make it possible to build 2.0.0 rpm. (mostly icon locations).
+	* src/sendmsg-window.c: libmutt does not conversion to UTF-8.
+	* src/balsa-message.c: nail down wrong VIEWPORT conversions (Peter B).
+
 2002-04-21 Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/balsa-app.c: reliable nested mailbox_nodes locking.

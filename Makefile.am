@@ -3,10 +3,10 @@ SUBDIRS = po sounds images help libmutt libbalsa libinit_balsa src
 
 man_MANS=balsa.1
 
-pixmapdir = $(gnomedatadir)/pixmaps
+pixmapdir = $(datadir)/balsa/pixmaps
 pixmap_DATA = gnome-balsa2.png
 
-desktopdir = $(gnomedatadir)/gnome/apps/Internet
+desktopdir = $(datadir)/gnome/apps/Internet
 desktop_DATA = balsa.desktop
 
 EXTRA_DIST = \

@@ -184,6 +184,7 @@ static BalsaPartInfo* part_info_new(LibBalsaMessageBody* body,
 				    LibBalsaMessage* msg);
 static void part_info_free(BalsaPartInfo* info);
 static GtkTextTag * quote_tag(GtkTextBuffer * buffer, gint level);
+static gboolean resize_idle(GtkWidget * widget);
 
 guint balsa_message_get_type()
 {
@@ -1481,22 +1482,6 @@ handle_url(const message_url_t* url)
 
 /* END OF HELPER FUNCTIONS ----------------------------------------------- */
 
-static gboolean
-text_view_timeout(GtkWidget * widget)
-{
-    gboolean retval = TRUE;
-    
-    gdk_threads_enter();
-    if (!(GTK_TEXT_VIEW(widget)->first_validate_idle
-          || GTK_TEXT_VIEW(widget)->incremental_validate_idle)) {
-        gtk_widget_queue_resize(widget);
-        retval = FALSE;
-    }
-    gdk_threads_leave();
-
-    return retval;
-}
-
 static void
 part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 {
@@ -1552,7 +1537,6 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 #endif
     } else {
         GtkWidget *item;
-        GtkWidget *viewport;
         GtkTextBuffer *buffer;
         regex_t rex;
         GList *url_list = NULL;
@@ -1569,8 +1553,6 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         }
 
         item = gtk_text_view_new();
-        viewport = gtk_viewport_new(NULL, NULL);
-        gtk_container_add(GTK_CONTAINER(viewport), item);
         buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(item));
 
         gtk_text_view_set_left_margin(GTK_TEXT_VIEW(item), 2);
@@ -1636,12 +1618,11 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 
         gtk_widget_show(item);
         info->focus_widget = item;
-        info->widget = viewport;
+        info->widget = item;
         info->can_display = TRUE;
         /* size allocation may not be correct, so we'll check back later
          */
-        gtk_timeout_add(1000, (GtkFunction) text_view_timeout,
-                        item);
+        gtk_idle_add((GtkFunction) resize_idle, item);
     }
 
     fclose(fp);
@@ -1651,13 +1632,10 @@ static void
 part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info, gchar * ptr,
 		    size_t len)
 {
-    GtkWidget *viewport;
     GtkWidget *html;
     HtmlDocument *document;
 
     html = html_view_new();
-    viewport = gtk_viewport_new(NULL, NULL);
-    gtk_container_add(GTK_CONTAINER(viewport), html);
 
     document = html_document_new();
     html_view_set_document(HTML_VIEW(html), document);
@@ -1665,7 +1643,6 @@ part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info, gchar * ptr,
     html_document_open_stream(document, "text/html");
     html_document_write_stream(document, ptr, len);
     html_document_close_stream (document);
-    /* gtk_html_set_editable(GTK_HTML(html), FALSE); */
 
     gtk_signal_connect(GTK_OBJECT(html), "size_request",
 		       (GtkSignalFunc) balsa_gtk_html_size_request,
@@ -1680,7 +1657,7 @@ part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info, gchar * ptr,
     gtk_widget_show(html);
 
     info->focus_widget = html;
-    info->widget = viewport;
+    info->widget = html;
     info->can_display = TRUE;
 }
 #endif
@@ -2289,6 +2266,7 @@ static void add_multipart(BalsaMessage *bm, LibBalsaMessageBody *parent)
     }
 }
 
+static GtkWidget *old_widget, *new_widget;
 static gdouble old_upper, new_upper;
 static gint resize_idle_id;
 
@@ -2299,6 +2277,7 @@ resize_idle(GtkWidget * widget)
     resize_idle_id = 0;
     if (GTK_IS_WIDGET(widget))
         gtk_widget_queue_resize(widget);
+    old_widget = new_widget;
     old_upper = new_upper;
     gdk_threads_leave();
 
@@ -2310,12 +2289,14 @@ vadj_change_cb(GtkAdjustment *vadj, GtkWidget *widget)
 {
     gdouble upper = vadj->upper;
 
-    /* do nothing if the height hasn't changed
+    /* do nothing if it's the same widget and the height hasn't changed
      *
      * an HtmlView widget seems to grow by 4 pixels each time we resize
      * it, whence the following unobvious test: */
-    if (upper >= old_upper && upper <= old_upper + 4)
+    if (widget == old_widget
+        && upper >= old_upper && upper <= old_upper + 4)
         return;
+    new_widget = widget;
     new_upper = upper;
     if (resize_idle_id) 
         gtk_idle_remove(resize_idle_id);
@@ -2340,9 +2321,9 @@ static BalsaPartInfo *add_part(BalsaMessage *bm, gint part)
 	if (info->widget) {
 	    gtk_container_add(GTK_CONTAINER(bm->content), info->widget);
 	    gtk_widget_show(info->widget);
-            if (GTK_IS_VIEWPORT(info->widget)) {
+            if (GTK_IS_LAYOUT(info->widget)) {
                 GtkAdjustment *vadj =
-                    gtk_viewport_get_vadjustment(GTK_VIEWPORT(info->widget));
+                    gtk_layout_get_vadjustment(GTK_LAYOUT(info->widget));
                 gtk_signal_connect(GTK_OBJECT(vadj), "changed",
                                    (GtkSignalFunc) vadj_change_cb,
                                    info->widget);

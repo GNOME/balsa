@@ -374,7 +374,7 @@ main(int argc, char *argv[])
     /* create all the pretty icons that balsa uses that
      * arn't part of gnome-libs */
     balsa_icons_init();
-    default_icon = balsa_pixmap_finder("balsa/balsa_icon.png");
+    default_icon = balsa_pixmap_finder("balsa_icon.png");
 #ifdef HAVE_LIBGNOMEUI_GNOME_WINDOW_ICON_H
     gnome_window_icon_set_default_from_file(default_icon);
 #endif

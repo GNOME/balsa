@@ -4693,6 +4693,7 @@ libbalsa_msg_try_mp_signed(LibBalsaMessage * message, LibBalsaMessageBody *body,
 	     LIBBALSA_INFORMATION_WARNING : LIBBALSA_INFORMATION_MESSAGE,
 	     _("The message sent by %s with subject \"%s\" contains a %s "
 	       "signed part, but this crypto protocol is not available."),
+	     chk_crypto->sender, chk_crypto->subject,
 	     signres & LIBBALSA_PROTECT_RFC3156 ? _("PGP") : _("S/MIME"));
 	return;
     }

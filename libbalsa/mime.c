@@ -21,6 +21,7 @@
  */
 
 #include <string.h>
+#include <libgnome/gnome-i18n.h>
 #include "config.h"
 
 #include "libbalsa.h"
@@ -46,16 +47,13 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
                   gboolean flow)
 {
     gchar *res = NULL;
-    const gchar *const_res;
     size_t allocated;
     GString *reply = NULL;
-    const GMimeContentType *type;
-    GMimeStream *stream, *filter_stream;
-    GByteArray *array;
-    const char *charset;
+    gchar *mime_type;
     gboolean is_html;
     gboolean is_enriched;
     gboolean is_richtext;
+    FILE *fp;
 
     switch (libbalsa_message_body_type(body)) {
     case LIBBALSA_MESSAGE_BODY_TYPE_OTHER:
@@ -71,42 +69,32 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
                                        llen, ignore_html, flow);
 	break;
     case LIBBALSA_MESSAGE_BODY_TYPE_TEXT:
-	type=g_mime_object_get_content_type(body->mime_part);
-
 	/* don't return text/html stuff... */
-	is_html = g_mime_content_type_is_type(type, "text", "html");
-	is_enriched = g_mime_content_type_is_type(type, "text", "enriched");
-	is_richtext = g_mime_content_type_is_type(type, "text", "richtext");
+	mime_type   = libbalsa_message_body_get_content_type(body);
+	is_html     = !strcmp(mime_type, "text/html");
+	is_enriched = !strcmp(mime_type, "text/enriched");
+	is_richtext = !strcmp(mime_type, "text/richtext");
+	g_free(mime_type);
+
 	if (ignore_html && (is_html || is_enriched || is_richtext))
 	    break;
 
-	stream = g_mime_stream_mem_new();
-	array = g_byte_array_new();
-	g_mime_stream_mem_set_byte_array(GMIME_STREAM_MEM(stream), array);
-
-	filter_stream = g_mime_stream_filter_new_with_stream(stream);
-	charset = libbalsa_message_body_charset(body);
-	if (!charset)
-	    charset="us-ascii";
-	if (g_ascii_strcasecmp(charset, "unknown-8bit")) {
-	    GMimeFilter *filter =
-		g_mime_filter_charset_new(charset, "UTF-8");
-	    g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream),
-				     filter);
-	    g_object_unref(filter);
+	if (!libbalsa_message_body_save_temporary(body)) {
+	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+				 _("Error writing to temporary file %s.\n"
+				   "Check the directory permissions."),
+				 body->temp_filename);
+	    return NULL;
 	}
-	const_res=g_mime_part_get_content(GMIME_PART(body->mime_part),
-					  &allocated);
-	if (!allocated || g_mime_stream_write(filter_stream, (char*)const_res,
-					      allocated) == -1 ||
-	    g_mime_stream_flush(filter_stream) == -1) {
-	    res = g_strdup("");
-	} else {
-	    g_mime_stream_write(stream, "", 1);
-	    res = g_byte_array_free(array, FALSE);
+	if (!(fp = fopen(body->temp_filename, "r"))) {
+	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+				 _("Cannot open temporary file %s."),
+				 body->temp_filename);
+	    return NULL;
 	}
-	g_mime_stream_unref(filter_stream);
-	g_mime_stream_unref(stream);
+	allocated = libbalsa_readfile(fp, &res);
+	if (!res)
+	    return NULL;
 
 #ifdef HAVE_GTKHTML
 	if (is_html || is_enriched || is_richtext) {

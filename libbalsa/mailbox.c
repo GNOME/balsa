@@ -1362,7 +1362,7 @@ mimetext2html(BODY* bdy, FILE* fp)
   STATE  s;
   char*  ptr = 0;
   size_t alloced;
-  gchar* retval;
+  gchar* retval = NULL;
   
   fseek(fp, bdy->offset, 0);
   s.fpin  = fp;
@@ -1372,6 +1372,8 @@ mimetext2html(BODY* bdy, FILE* fp)
   mutt_decode_attachment(bdy, &s);
   fflush(s.fpout);
   alloced = readfile(s.fpout, &ptr);
+  if (alloced != 0)
+  {
   ptr[alloced - 1] = '\0';
   if (strcmp(bdy->subtype,"html") == 0)
     {
@@ -1379,6 +1381,7 @@ mimetext2html(BODY* bdy, FILE* fp)
     }
   retval = text2html(ptr);
   free(ptr);
+  }
   fclose(s.fpout);
   return retval;
 }

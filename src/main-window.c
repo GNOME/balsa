@@ -4330,10 +4330,8 @@ balsa_window_idle_cb(BalsaWindow * window)
 
     gdk_threads_enter();
 
-    if (!balsa_message_set(BALSA_MESSAGE(window->preview),
-                           window->current_message))
-        balsa_information(LIBBALSA_INFORMATION_ERROR,
-                          _("Cannot access the message's body\n"));
+    balsa_message_set(BALSA_MESSAGE(window->preview),
+                      window->current_message);
 
     index = g_object_get_data(G_OBJECT(window), BALSA_INDEX_GRAB_FOCUS);
     if (index) {

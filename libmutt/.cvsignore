@@ -5,6 +5,10 @@ libmutt.a
 configure
 config.log
 config.status
+libmutt/ltmain.sh
+libmutt/config.guess
+libmutt/config.sub
+libmutt/ltconfig
 muttconfig.h
 libtool
 .libs

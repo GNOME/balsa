@@ -2986,7 +2986,7 @@ balsa_help_pbox_display(gint page_num)
     gchar *link_id = g_strdup_printf("preferences-%d", page_num);
     GError *err = NULL;
 
-    gnome_help_display("balsa-manual", link_id, &err);
+    gnome_help_display("balsa", link_id, &err);
     if (err) {
         g_print(_("Error displaying link_id %s: %s\n"), link_id, err->message);
         g_error_free(err);

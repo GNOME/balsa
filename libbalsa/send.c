@@ -1380,7 +1380,8 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 		encoding = g_mime_part_get_encoding(mime_part);
 		fd = open(body->filename, O_RDONLY);
 		stream = g_mime_stream_fs_new(fd);
-		content = g_mime_data_wrapper_new_with_stream(stream, encoding);
+		content = g_mime_data_wrapper_new_with_stream(stream,
+			GMIME_PART_ENCODING_DEFAULT);
 		g_mime_stream_unref(stream);
 		g_mime_part_set_content_object(mime_part, content);
 		g_object_unref(content);

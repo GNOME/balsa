@@ -70,7 +70,7 @@ WHERE char Signature[_POSIX_PATH_MAX];
 WHERE char SimpleSearch[SHORT_STRING];
 WHERE char Spoolfile[_POSIX_PATH_MAX];
 WHERE char StChars[4]; /* -*%\0 */
-WHERE char Status[STRING];
+WHERE char StatusString[STRING];
 WHERE char Tempdir[_POSIX_PATH_MAX];
 WHERE char Tochars[8]; /* " +TCF" */
 WHERE char Username[SHORT_STRING];

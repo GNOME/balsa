@@ -1354,7 +1354,7 @@ void mutt_init (int skip_sys_rc, LIST *commands)
   snprintf (Signature, sizeof (Signature), "%s/.signature", Homedir);
   strfcpy (SimpleSearch, "~f %s | ~s %s", sizeof (SimpleSearch));
   strfcpy (StChars, "-*%", sizeof (StChars));
-  strfcpy (Status, "-%r-Mutt: %f [Msgs:%?M?%M/?%m%?n? New:%n?%?o? Old:%o?%?d? Del:%d?%?F? Flag:%F?%?t? Tag:%t?%?p? Post:%p?%?b? Inc:%b?%?l? %l?]---(%s/%S)-%>-(%P)---", sizeof (Status));
+  strfcpy (StatusString, "-%r-Mutt: %f [Msgs:%?M?%M/?%m%?n? New:%n?%?o? Old:%o?%?d? Del:%d?%?F? Flag:%F?%?t? Tag:%t?%?p? Post:%p?%?b? Inc:%b?%?l? %l?]---(%s/%S)-%>-(%P)---", sizeof (Status));
 
   if ((p = getenv ("TMPDIR")) != NULL)
     strfcpy (Tempdir, p, sizeof (Tempdir));

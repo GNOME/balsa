@@ -34,18 +34,15 @@
 #define BUFFER_SIZE 1024
 
 
-GdkPixmap *new_pix;
-GdkPixmap *replied_pix;
-GdkPixmap *forwarded_pix;
-GdkPixmap *deleted_pix;
+static GdkPixmap *new_pix;
+static GdkPixmap *replied_pix;
+static GdkPixmap *forwarded_pix;
+static GdkPixmap *deleted_pix;
 
-GdkBitmap *new_mask;
-GdkBitmap *replied_mask;
-GdkBitmap *forwarded_mask;
-GdkBitmap *deleted_mask;
-
-GdkColor *transparent = NULL;
-
+static GdkBitmap *new_mask;
+static GdkBitmap *replied_mask;
+static GdkBitmap *forwarded_mask;
+static GdkBitmap *deleted_mask;
 
 /* gtk widget */
 static void balsa_index_class_init (BalsaIndexClass * klass);
@@ -165,6 +162,7 @@ balsa_index_marshal_signal_1 (GtkObject * object,
 static void
 balsa_index_init (BalsaIndex * bindex)
 {
+  GdkImlibImage *im;
 /*
  * status
  * priority
@@ -185,8 +183,35 @@ balsa_index_init (BalsaIndex * bindex)
   titles[4] = _ ("Subject");
   titles[5] = _ ("Date");
 
+  im = gdk_imlib_create_image_from_xpm_data (envelope_xpm);
+  gdk_imlib_render (im, im->rgb_width, im->rgb_height);
+  new_pix = gdk_imlib_copy_image (im);
+  new_mask = gdk_imlib_copy_mask (im);
+  gdk_imlib_destroy_image (im);
+
+  im = gdk_imlib_create_image_from_xpm_data (replied_xpm);
+  gdk_imlib_render (im, im->rgb_width, im->rgb_height);
+  replied_pix = gdk_imlib_copy_image (im);
+  replied_mask = gdk_imlib_copy_mask (im);
+  gdk_imlib_destroy_image (im);
+
+  im = gdk_imlib_create_image_from_xpm_data (forwarded_xpm);
+  gdk_imlib_render (im, im->rgb_width, im->rgb_height);
+  forwarded_pix = gdk_imlib_copy_image (im);
+  forwarded_mask = gdk_imlib_copy_mask (im);
+  gdk_imlib_destroy_image (im);
+
+  im = gdk_imlib_create_image_from_xpm_data (trash_xpm);
+  gdk_imlib_render (im, im->rgb_width, im->rgb_height);
+  deleted_pix = gdk_imlib_copy_image (im);
+  deleted_mask = gdk_imlib_copy_mask (im);
+  gdk_imlib_destroy_image (im);
+
   GTK_WIDGET_SET_FLAGS (bindex, GTK_NO_WINDOW);
   bindex->mailbox = NULL;
+
+  gtk_widget_push_visual (gdk_imlib_get_visual ());
+  gtk_widget_push_colormap (gdk_imlib_get_colormap ());
 
   /* create the clist */
   GTK_BIN (bindex)->child =
@@ -194,6 +219,8 @@ balsa_index_init (BalsaIndex * bindex)
 
   gtk_widget_set_parent (GTK_WIDGET (clist), GTK_WIDGET (bindex));
 
+  gtk_widget_pop_colormap ();
+  gtk_widget_pop_visual ();
 
   gtk_clist_set_policy (clist, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_clist_set_selection_mode (clist, GTK_SELECTION_EXTENDED);
@@ -220,15 +247,6 @@ balsa_index_init (BalsaIndex * bindex)
 
   gtk_widget_show (GTK_WIDGET (clist));
   gtk_widget_ref (GTK_WIDGET (clist));
-
-  new_pix = gdk_pixmap_colormap_create_from_xpm_d (NULL, gtk_widget_get_colormap (GTK_WIDGET (clist)),
-				      &new_mask, transparent, envelope_xpm);
-  replied_pix = gdk_pixmap_colormap_create_from_xpm_d (NULL, gtk_widget_get_colormap (GTK_WIDGET (clist)),
-				   &replied_mask, transparent, replied_xpm);
-  forwarded_pix = gdk_pixmap_colormap_create_from_xpm_d (NULL, gtk_widget_get_colormap (GTK_WIDGET (clist)),
-			       &forwarded_mask, transparent, forwarded_xpm);
-  deleted_pix = gdk_pixmap_colormap_create_from_xpm_d (NULL, gtk_widget_get_colormap (GTK_WIDGET (clist)),
-				     &deleted_mask, transparent, trash_xpm);
 }
 
 

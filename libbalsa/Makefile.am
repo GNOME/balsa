@@ -11,6 +11,7 @@ libbalsa_a_SOURCES = 		\
 	mime.h			\
 	misc.h			\
 	send.h			\
+	filter-edit-callbacks.c	\
 	libbalsa.c		\
 	misc.c			\
 	mime.c			\

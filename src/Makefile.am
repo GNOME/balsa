@@ -7,6 +7,7 @@ balsa_SOURCES =	\
 	balsa-index.c		\
 	balsa-init.c		\
 	balsa-message.c		\
+	filter-edit-dialog.c	\
 	index-child.c		\
 	local-mailbox.c		\
 	mailbox-conf.c		\

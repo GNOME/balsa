@@ -81,9 +81,9 @@ static gboolean mailbox_nodes_to_ctree (GtkCTree *, guint, GNode *, GtkCTreeNode
 void
 mblist_open_window (GnomeMDI * mdi)
 {
+  GdkImlibImage *im;
   GtkWidget *bbox;
   GtkWidget *button;
-  GdkColor *transparent = NULL;
   gint height;
 
   if (mblw)
@@ -99,26 +99,47 @@ mblist_open_window (GnomeMDI * mdi)
 
   gtk_widget_realize (mblw->window);
 
-  open_folder = gdk_pixmap_create_from_xpm_d (mblw->window->window,
-				&open_mask, transparent, mini_dir_open_xpm);
+  im = gdk_imlib_create_image_from_xpm_data (mini_dir_open_xpm);
+  gdk_imlib_render (im, im->rgb_width, im->rgb_height);
+  open_folder = gdk_imlib_copy_image (im);
+  open_mask = gdk_imlib_copy_mask (im);
+  gdk_imlib_destroy_image (im);
 
-  closed_folder = gdk_pixmap_create_from_xpm_d (mblw->window->window,
-			    &closed_mask, transparent, mini_dir_closed_xpm);
+  im = gdk_imlib_create_image_from_xpm_data (mini_dir_closed_xpm);
+  gdk_imlib_render (im, im->rgb_width, im->rgb_height);
+  closed_folder = gdk_imlib_copy_image (im);
+  closed_mask = gdk_imlib_copy_mask (im);
+  gdk_imlib_destroy_image (im);
 
-  tray_empty = gdk_pixmap_create_from_xpm_d (mblw->window->window,
-			   &tray_empty_mask, transparent, plain_folder_xpm);
+  im = gdk_imlib_create_image_from_xpm_data (plain_folder_xpm);
+  gdk_imlib_render (im, im->rgb_width, im->rgb_height);
+  tray_empty = gdk_imlib_copy_image (im);
+  tray_empty_mask = gdk_imlib_copy_mask (im);
+  gdk_imlib_destroy_image (im);
 
-  tray_full = gdk_pixmap_create_from_xpm_d (mblw->window->window,
-			     &tray_full_mask, transparent, full_folder_xpm);
+  im = gdk_imlib_create_image_from_xpm_data (full_folder_xpm);
+  gdk_imlib_render (im, im->rgb_width, im->rgb_height);
+  tray_full = gdk_imlib_copy_image (im);
+  tray_full_mask = gdk_imlib_copy_mask (im);
+  gdk_imlib_destroy_image (im);
 
-  inboxpix = gdk_pixmap_create_from_xpm_d (mblw->window->window,
-				       &inbox_mask, transparent, inbox_xpm);
+  im = gdk_imlib_create_image_from_xpm_data (inbox_xpm);
+  gdk_imlib_render (im, im->rgb_width, im->rgb_height);
+  inboxpix = gdk_imlib_copy_image (im);
+  inbox_mask = gdk_imlib_copy_mask (im);
+  gdk_imlib_destroy_image (im);
 
-  outboxpix = gdk_pixmap_create_from_xpm_d (mblw->window->window,
-				     &outbox_mask, transparent, outbox_xpm);
+  im = gdk_imlib_create_image_from_xpm_data (outbox_xpm);
+  gdk_imlib_render (im, im->rgb_width, im->rgb_height);
+  outboxpix = gdk_imlib_copy_image (im);
+  outbox_mask = gdk_imlib_copy_mask (im);
+  gdk_imlib_destroy_image (im);
 
-  trashpix = gdk_pixmap_create_from_xpm_d (mblw->window->window,
-				       &trash_mask, transparent, trash_xpm);
+  im = gdk_imlib_create_image_from_xpm_data (trash_xpm);
+  gdk_imlib_render (im, im->rgb_width, im->rgb_height);
+  trashpix = gdk_imlib_copy_image (im);
+  trash_mask = gdk_imlib_copy_mask (im);
+  gdk_imlib_destroy_image (im);
 
   mblw->mdi = mdi;
   gtk_signal_connect (GTK_OBJECT (mblw->window),
@@ -131,7 +152,14 @@ mblist_open_window (GnomeMDI * mdi)
 		      (GtkSignalFunc) gtk_false,
 		      NULL);
 
+  gtk_widget_push_visual (gdk_imlib_get_visual ());
+  gtk_widget_push_colormap (gdk_imlib_get_colormap ());
+
   mblw->ctree = GTK_CTREE (gtk_ctree_new (1, 0));
+
+  gtk_widget_pop_colormap ();
+  gtk_widget_pop_visual ();
+
   gtk_ctree_set_line_style (mblw->ctree, GTK_CTREE_LINES_DOTTED);
   gtk_clist_set_policy (GTK_CLIST (mblw->ctree), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_clist_set_row_height (GTK_CLIST (mblw->ctree), 16);
@@ -374,25 +402,25 @@ close_cb (GtkWidget * widget, gpointer data)
   mailbox = gtk_ctree_node_get_row_data (mblw->ctree, ctnode);
 #endif
 
-  mblist_close_mailbox(mailbox);
+  mblist_close_mailbox (mailbox);
 
 }
 
 void
-mblist_close_mailbox(Mailbox* mailbox)
+mblist_close_mailbox (Mailbox * mailbox)
 {
   GnomeMDIChild *child;
-  
+
   if (mailbox)
     {
       child = gnome_mdi_find_child (mblw->mdi, mailbox->name);
       if (child)
 	{
-	  mailbox_watcher_remove(mailbox, BALSA_INDEX(INDEX_CHILD(child)->index)->watcher_id);
+	  mailbox_watcher_remove (mailbox, BALSA_INDEX (INDEX_CHILD (child)->index)->watcher_id);
 	  gnome_mdi_remove_child (mblw->mdi, child, TRUE);
 	}
     }
-}    
+}
 
 
 static void
@@ -472,13 +500,13 @@ mb_add_cb (GtkWidget * widget, Mailbox * mailbox)
 }
 
 static void
-mb_del_cb(GtkWidget* wifget, Mailbox* mailbox)
+mb_del_cb (GtkWidget * wifget, Mailbox * mailbox)
 {
   if (mailbox->type == MAILBOX_UNKNOWN)
     return;
-  mailbox_conf_delete(mailbox);
+  mailbox_conf_delete (mailbox);
 }
-    
+
 
 static GtkWidget *
 create_menu (GtkCTree * ctree, Mailbox * mailbox)
@@ -495,12 +523,12 @@ create_menu (GtkCTree * ctree, Mailbox * mailbox)
   gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
 		      GTK_SIGNAL_FUNC (mb_conf_cb), mailbox);
   gtk_menu_append (GTK_MENU (menu), menuitem);
-  gtk_widget_show(menuitem);
-  
-  menuitem = gtk_menu_item_new_with_label(_("Delete Mailbox"));
-  gtk_signal_connect(GTK_OBJECT(menuitem),"activate",
-		     GTK_SIGNAL_FUNC(mb_del_cb), mailbox);
-  gtk_menu_append(GTK_MENU(menu), menuitem);
+  gtk_widget_show (menuitem);
+
+  menuitem = gtk_menu_item_new_with_label (_ ("Delete Mailbox"));
+  gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
+		      GTK_SIGNAL_FUNC (mb_del_cb), mailbox);
+  gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
 
   return menu;

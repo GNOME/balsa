@@ -19,8 +19,19 @@ dist-hook: balsa.spec
 	cp balsa.spec $(distdir)
 
 @MAINT@RPM: balsa.spec
+@MAINT@	rm -f *.rpm
 @MAINT@	$(MAKE) distdir="$(PACKAGE)-@BALSA_SHORT_VERSION@" dist
+@MAINT@	cp $(top_srcdir)/rpm-po.patch $(top_builddir)/rpm-po.patch
 @MAINT@	rpm -ta "./$(PACKAGE)-@BALSA_SHORT_VERSION@.tar.gz"
+@MAINT@	rm $(top_builddir)/rpm-po.patch
+@MAINT@	-test -f "/usr/src/redhat/SRPMS/$(PACKAGE)-@VERSION@.src.rpm" && cp "/usr/src/redhat/SRPMS/$(PACKAGE)-@VERSION@.src.rpm" .
+@MAINT@	-for ping in /usr/src/redhat/RPMS/* ; do \
+@MAINT@		if test -d $$ping ; then \
+@MAINT@			arch=`echo $$ping |sed -e 's,/.*/\([^/][^/]*\),\1,'` ; \
+@MAINT@			f="$$ping/$(PACKAGE)-@VERSION@.$$arch.rpm" ; \
+@MAINT@			test -f $$f && cp $$f . ; \
+@MAINT@		fi ; \
+@MAINT@	done
 
 @MAINT@snapshot:
 @MAINT@	$(MAKE) distdir=$(PACKAGE)-`date +"%y%m%d"` dist

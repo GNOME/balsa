@@ -478,9 +478,7 @@ address_book_cb(GtkWidget *widget, BalsaSendmsg *snd_msg_wind)
 static gint
 delete_event_cb(GtkWidget * widget, GdkEvent * e, gpointer data)
 {
-	release_toolbars(((BalsaSendmsg *) data)->window);
     balsa_sendmsg_destroy((BalsaSendmsg *) data);
-    g_message("delete_event_cb(): Stop.");
     return TRUE;
 }
 
@@ -505,6 +503,7 @@ balsa_sendmsg_destroy(BalsaSendmsg * bsm)
 
     if (balsa_app.debug)
 	printf("balsa_sendmsg_destroy: Freeing bsm\n");
+    release_toolbars(bsm->window);
     gtk_widget_destroy(bsm->window);
     g_list_free(bsm->spell_check_disable_list);
     if (bsm->font) {

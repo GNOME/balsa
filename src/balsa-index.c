@@ -295,6 +295,7 @@ balsa_index_init(BalsaIndex * bindex)
     gtk_clist_set_column_justification(clist, 0, GTK_JUSTIFY_RIGHT);
     gtk_clist_set_column_justification(clist, 1, GTK_JUSTIFY_CENTER);
     gtk_clist_set_column_justification(clist, 2, GTK_JUSTIFY_CENTER);
+    gtk_clist_set_column_justification(clist, 6, GTK_JUSTIFY_RIGHT);
 
     /* Set the width of any new columns to the current column widths being used */
     gtk_clist_set_column_width(clist, 0, balsa_app.index_num_width);

@@ -1,3 +1,15 @@
+2001-07-25  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/pop3.c: use pclose() on popen()-ed FILE.
+	* src/toolbar-factory.c: ugly but reliable toolbar clearing.
+	* src/sendmsg-window.c: release_toolbar on destroying.
+	
+	Albrecht Dreﬂ <albrecht.dress@arcormail.de>:
+	* src/balsa-index.c: justify the message size to right.
+	* src/main-window.c: set locale.
+	* src/spell-check.c: use new PCRE to handle national characters
+	better.
+
 2001-07-24  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/misc.c(libbalsa_set_charset): set SendCharset as well.

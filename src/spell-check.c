@@ -31,6 +31,7 @@
 #include <stdio.h>
 
 #ifdef HAVE_PCRE
+#  include <pcre.h>
 #  include <pcreposix.h>
 #else
 #  include <sys/types.h>
@@ -1193,9 +1194,7 @@ check_pspell_errors(PspellManager * manager)
 static gboolean
 next_word(BalsaSpellCheck * spell_check)
 {
-    regex_t new_word_rex;
     regex_t quoted_rex;
-    regmatch_t rm[1];
     gchar *text;
     gchar *line;
     gchar **line_array;
@@ -1207,22 +1206,47 @@ next_word(BalsaSpellCheck * spell_check)
 
 #ifdef HAVE_PCRE
     const gchar *new_word_regex = "\\b[[:alpha:]']+\\b";
+    static pcre *new_word_rex = NULL;
+    static const guchar *locale_tables = NULL;
+    gint rm[3];
 #else
-    const gchar *new_word_regex = "\\<[[:alpha:]']*\\>";
+    const gchar *new_word_regex = "\\<[[:alpha:]']+\\>";
+    static regex_t *new_word_rex = NULL;
+    regmatch_t rm;
 #endif
 
-    /* compile the regular expressions */
+    /* 
+     * compile the regular expressions if necessary (note: balsa_app.quote_regex
+     * may change, so compile it new every time!)
+     */
     if (regcomp(&quoted_rex, balsa_app.quote_regex, REG_EXTENDED)) {
 	balsa_information(LIBBALSA_INFORMATION_ERROR,
 			  "BalsaSpellCheck: Quoted text regular expression compilation failed\n");
 	return FALSE;
     }
 
-    if (regcomp(&new_word_rex, new_word_regex, REG_EXTENDED | REG_NEWLINE)) {
-	balsa_information(LIBBALSA_INFORMATION_ERROR,
-			  "BalsaSpellCheck: New word regular expression compilation failed\n");
-	regfree(&quoted_rex);
-	return FALSE;
+    if (!new_word_rex) {
+#ifdef HAVE_PCRE
+	const gchar *errptr;
+	gint erroffs;
+
+	locale_tables = pcre_maketables();
+	if (!(new_word_rex = 
+	      pcre_compile(new_word_regex, PCRE_CASELESS, &errptr, &erroffs, locale_tables))) {
+	    balsa_information(LIBBALSA_INFORMATION_ERROR,
+			      "BalsaSpellCheck: New word regular expression compilation failed (%s)\n", errptr);
+	    regfree(&quoted_rex);
+	    return FALSE;
+	}
+#else
+	new_word_rex = g_malloc(sizeof(regex_t));
+	if (regcomp(new_word_rex, new_word_regex, REG_EXTENDED | REG_NEWLINE)) {
+	    balsa_information(LIBBALSA_INFORMATION_ERROR,
+			      "BalsaSpellCheck: New word regular expression compilation failed\n");
+	    regfree(&quoted_rex);
+	    return FALSE;
+	}
+#endif
     }
 
     /* get the message text */
@@ -1262,19 +1286,34 @@ next_word(BalsaSpellCheck * spell_check)
 
     /* match the next word */
     if (!at_end && line) {
-	rm[0].rm_so = 0;
-	rm[0].rm_eo = 0;
-	regexec(&new_word_rex, line, 1, rm, 0);
+#ifdef HAVE_PCRE
+	rm[0] = rm[1] = 0;
+	pcre_exec(new_word_rex, NULL, line, strlen(line), 0, 0, rm ,3);
 
-	if (rm[0].rm_so == rm[0].rm_eo) {
+	if (rm[0] == rm[1]) {
 	    spell_check->start_pos += strlen(line) + offset;
 	    spell_check->end_pos += strlen(line) + offset;
 	    in_line = FALSE;
 	} else {
-	    spell_check->start_pos += (rm[0].rm_so + offset);
-	    spell_check->end_pos += (rm[0].rm_eo + offset);
+	    spell_check->start_pos += (rm[0] + offset);
+	    spell_check->end_pos += (rm[1] + offset);
 	    in_line = TRUE;
 	}
+#else
+	rm.rm_so = 0;
+	rm.rm_eo = 0;
+	regexec(new_word_rex, line, 1, &rm, 0);
+
+	if (rm.rm_so == rm.rm_eo) {
+	    spell_check->start_pos += strlen(line) + offset;
+	    spell_check->end_pos += strlen(line) + offset;
+	    in_line = FALSE;
+	} else {
+	    spell_check->start_pos += (rm.rm_so + offset);
+	    spell_check->end_pos += (rm.rm_eo + offset);
+	    in_line = TRUE;
+	}
+#endif
 
 	g_free(line);
     } else {
@@ -1284,7 +1323,6 @@ next_word(BalsaSpellCheck * spell_check)
     g_strfreev(line_array_base);
     g_free(text);
     regfree(&quoted_rex);
-    regfree(&new_word_rex);
 
     /* check to see if we're at the end yet */
     if (!at_end) {

@@ -507,7 +507,7 @@ fetch_procmail(int s, gint first_msg, gint msgs, gint tot_bytes,
 	
 	err = fetch_single_msg(s, msg, i, first_msg, msgs, &num_bytes, 
 			       tot_bytes, prog_cb);
-	if (fclose (msg) != 0 && err == POP_OK) err = POP_PROCMAIL_ERR;
+	if (pclose (msg) != 0 && err == POP_OK) err = POP_PROCMAIL_ERR;
 	
 	if (err != POP_OK)  break; /* the 'for' loop */
 	if (delete_on_server) delete_msg(s, i); /* ignore errors */

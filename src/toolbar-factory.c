@@ -134,41 +134,30 @@ static GtkToolbar *get_bar_instance(GtkWidget *window,
 static int get_position_value(BalsaToolbarType toolbar, char *id);
 
 #ifdef NEW_GTK
-#define mygtk_toolbar_remove_space(bar,j) gtk_toolbar_remove_space((bar),(j))
+#define mygtk_toolbar_remove_all(bar,j) gtk_toolbar_remove_all(bar)
 #else
-/* this is boldly copied from current CVS */
+/* this should go to GTK because it modifies its internal structures. */
 static void
-mygtk_toolbar_remove_space(GtkToolbar *toolbar, gint position)
+mygtk_toolbar_remove_all(GtkToolbar *toolbar)
 {
     GList *children;
-    GtkToolbarChild *child;
-    gint i;
     
     g_return_if_fail (GTK_IS_TOOLBAR (toolbar));
     
-    i = 0;
     for (children = toolbar->children; children; children = children->next) {
-	child = children->data;
+	GtkToolbarChild *child = children->data;
 	
-      if (i == position) {
-          if (child->type == GTK_TOOLBAR_CHILD_SPACE) {
-              toolbar->children = g_list_remove_link (toolbar->children, 
-						      children);
-              g_free (child);
-              g_list_free (children);
-              toolbar->num_children--;
-              
-              gtk_widget_queue_resize (GTK_WIDGET (toolbar));
-	      return;
-	  }
-          else {
-              g_warning ("Toolbar position %d is not a space", position);
-	      return;
-	  }
-      }
-      ++i;
+	if (child->type != GTK_TOOLBAR_CHILD_SPACE) {
+	    gtk_widget_ref (child->widget);
+	    gtk_widget_unparent (child->widget);
+	    gtk_widget_destroy (child->widget);
+	    gtk_widget_unref (child->widget);
+	}
+	g_free (child);
     }
-  g_warning ("Toolbar position %d doesn't exist", position);
+    g_list_free (toolbar->children);
+    toolbar->children = NULL;
+    gtk_widget_queue_resize (GTK_WIDGET (toolbar));
 }
 #endif
 
@@ -420,7 +409,6 @@ get_toolbar(GtkWidget *window, BalsaToolbarType toolbar)
 
     memset((char *)&tmpdata, 0, sizeof(tmpdata));
 
-    g_print("get_toolbar called.\n");
     for(i=0; i<MAXTOOLBARITEMS; i++) {
 	tmpdata[i]=toolbar_data[toolbar][i];
 	tmpdata[i].widget=NULL;
@@ -437,30 +425,10 @@ get_toolbar(GtkWidget *window, BalsaToolbarType toolbar)
 	++toolbar_map_entries;
 	bar=GTK_TOOLBAR(gtk_toolbar_new(GTK_ORIENTATION_HORIZONTAL,
 					GTK_TOOLBAR_BOTH));
-	
     } else {
 	bar=GTK_TOOLBAR(toolbar_map[i].toolbar);
-	index=get_toolbar_index(toolbar);
-	if(index == -1) {
-	    g_warning("toolbar map exists but toolbar index not.\n");
-	    return NULL;
-	}
-	/* remove all items from the existing bar. 
-	   First spaces by position, then widgets by pointer. */
-	position = 0;
-	for(j=0; balsa_app.toolbars[index][j]; j++) {
-	    button=get_toolbar_button_index(balsa_app.toolbars[index][j]);
-	    if(button == -1) continue;
-	    if(!*(balsa_app.toolbars[index][j])) {
-		mygtk_toolbar_remove_space(bar, j+position);
-		position--;
-	    }
-	}
-	for(j=0; j<MAXTOOLBARITEMS; j++) {
-	    if(toolbar_data[toolbar][j].widget)
-		gtk_container_remove(GTK_CONTAINER(bar), 
-				     toolbar_data[toolbar][j].widget);
-	}
+	/* remove all items from the existing bar. */
+	mygtk_toolbar_remove_all(bar);
     }
 
     toolbar_map[i].toolbar=GTK_WIDGET(bar);

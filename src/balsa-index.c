@@ -244,6 +244,7 @@ bndx_destroy(GtkObject * obj)
                                              G_SIGNAL_MATCH_DATA,
                                              0, 0, NULL, NULL,
                                              index);
+	gtk_tree_view_set_model(GTK_TREE_VIEW(index), NULL);
 	libbalsa_mailbox_close(mailbox);
         g_object_unref(G_OBJECT(index->mailbox_node));
 	index->mailbox_node = NULL;

@@ -1,3 +1,12 @@
+2001-12-17  Stanislav Visnovsky  <visnovsky@nenya.ms.mff.cuni.cz>
+
+	* POTFILES.in: Added libbalsa/filter-error.c, 
+	  libbalsa/filter-file.c, libbalsa/filter.c, libbalsa/libbalsa.c,
+	  src/filter-edit-callbacks.c, src/filter-export-callbacks.c, 
+	  src/filter-export-dialog.c, src/filter-run-callbacks.c, 
+	  src/filter-run-dialog.c, src/save-restore.c, src/toolbar-factory.c
+	  Thanks to Marcel Telka <marcel@telka.sk>.
+
 2001-12-14  Takeshi Aihana <aihana@gnome.gr.jp>
 
 	* ja.po: Updated Japanese translation.

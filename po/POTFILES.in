@@ -5,7 +5,11 @@ libbalsa/address-book-vcard.c
 libbalsa/address-book-ldif.c
 libbalsa/address-book.c
 libbalsa/address-entry.c
+libbalsa/filter-error.c
+libbalsa/filter-file.c
+libbalsa/filter.c
 libbalsa/folder-scanners.c
+libbalsa/libbalsa.c
 libbalsa/libbalsa_private.h
 libbalsa/identity.c
 libbalsa/mailbox.c
@@ -52,6 +56,10 @@ src/balsa-index-threading.c
 src/balsa-mblist.c
 src/balsa-message.c
 src/filter-edit-dialog.c
+src/filter-edit-callbacks.c
+src/filter-export-dialog.c
+src/filter-run-callbacks.c
+src/filter-run-dialog.c
 src/folder-conf.c
 src/information-dialog.c
 src/mailbox-conf.c
@@ -61,7 +69,9 @@ src/main.c
 src/message-window.c
 src/pref-manager.c
 src/print.c
+src/save-restore.c
 src/sendmsg-window.c
 src/spell-check.c
 src/store-address.c
+src/toolbar-factory.c
 src/toolbar-prefs.c

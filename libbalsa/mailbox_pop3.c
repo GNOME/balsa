@@ -114,6 +114,8 @@ libbalsa_mailbox_pop3_class_init(LibBalsaMailboxPop3Class * klass)
 		       GTK_SIGNAL_OFFSET(LibBalsaMailboxPop3Class,
 					 config_changed),
 		       gtk_marshal_NONE__NONE, GTK_TYPE_NONE, 0);
+    gtk_object_class_add_signals(object_class, libbalsa_mailbox_pop3_signals,
+				 LAST_SIGNAL);
 
     object_class->destroy = libbalsa_mailbox_pop3_destroy;
 

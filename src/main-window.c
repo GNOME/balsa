@@ -85,7 +85,7 @@ main_window_set_cursor (gint type)
   GdkCursor *cursor;
 
   if (mdi->windows == NULL)
-	  return;
+    return;
 
   for (list = mdi->windows; list; list = list->next)
     {
@@ -464,31 +464,54 @@ new_message_cb (GtkWidget * widget, gpointer data)
 {
   g_return_if_fail (widget != NULL);
 
-  sendmsg_window_new (widget, NULL, 0);
+  sendmsg_window_new (widget, NULL, SEND_NORMAL);
 }
 
 
 static void
 replyto_message_cb (GtkWidget * widget, gpointer data)
 {
+  GtkCList *clist;
+  GList *list;
+  Message *message;
+
   g_return_if_fail (widget != NULL);
 
   if (!balsa_app.current_index_child)
     return;
 
-  sendmsg_window_new (widget, BALSA_INDEX (balsa_app.current_index_child->index), 1);
+  clist = GTK_CLIST (GTK_BIN (balsa_app.current_index_child->index)->child);
+  list = clist->selection;
+  while (list)
+    {
+      message = gtk_clist_get_row_data (clist, (gint) list->data);
+      sendmsg_window_new (widget, message, SEND_REPLY);
+      list = list->next;
+    }
+
 }
 
 
 static void
 forward_message_cb (GtkWidget * widget, gpointer data)
 {
+  GtkCList *clist;
+  GList *list;
+  Message *message;
+
   g_return_if_fail (widget != NULL);
 
   if (!balsa_app.current_index_child)
     return;
 
-  sendmsg_window_new (widget, BALSA_INDEX (balsa_app.current_index_child->index), 2);
+  clist = GTK_CLIST (GTK_BIN (balsa_app.current_index_child->index)->child);
+  list = clist->selection;
+  while (list)
+    {
+      message = gtk_clist_get_row_data (clist, (gint) list->data);
+      sendmsg_window_new (widget, message, SEND_FORWARD);
+      list = list->next;
+    }
 }
 
 

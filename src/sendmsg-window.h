@@ -25,6 +25,15 @@ extern "C"
 {
 #endif				/* __cplusplus */
 
+  typedef enum
+    {
+      SEND_NORMAL,
+      SEND_REPLY,
+      SEND_REPLY_TO_ALL,
+      SEND_FORWARD
+    }
+  SendType;
+
 
   typedef struct _BalsaSendmsg BalsaSendmsg;
 
@@ -33,11 +42,11 @@ extern "C"
       GtkWidget *to, *from, *subject, *cc, *bcc;
       GtkWidget *text;
       GtkWidget *window;
-      gint type;
-      Message*  orig_message;
-  };
+      Message *orig_message;
+      SendType type;
+    };
 
-  void sendmsg_window_new (GtkWidget *, BalsaIndex *, gint);
+  void sendmsg_window_new (GtkWidget *, Message *, SendType);
 
 #ifdef __cplusplus
 }

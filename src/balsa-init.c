@@ -77,6 +77,8 @@ static DirConfState inbox =    { N_("Inbox"), NULL, &outbox };
 static gboolean generic_next_cb( GnomeDruidPage *page, GnomeDruid *druid );
 static gboolean generic_back_cb( GnomeDruidPage *page, GnomeDruid *druid );
 
+static void     start_prepare_cb( GnomeDruidPage *start, GnomeDruid *druid );
+
 static void     user_prepare_cb( GnomeDruidPage *user, GnomeDruid *druid );
 static gboolean user_next_cb( GnomeDruidPage *user, GnomeDruid *druid );
 static void     entry_changed_cb( GtkEntry *entry );
@@ -140,6 +142,7 @@ balsa_init_window_new (void)
 						   "main window for more information about contacting the authors or\n"
 						   "reporting bugs."),
 						 logo, watermark ); 
+    gtk_signal_connect( GTK_OBJECT( page ), "prepare", GTK_SIGNAL_FUNC( start_prepare_cb ), NULL );
     gtk_signal_connect( GTK_OBJECT( page ), "next", GTK_SIGNAL_FUNC( generic_next_cb ), NULL );
     gnome_druid_append_page( GNOME_DRUID( druid ), GNOME_DRUID_PAGE( page ) );
     gnome_druid_set_page( GNOME_DRUID( druid ), GNOME_DRUID_PAGE( page ) );
@@ -225,6 +228,7 @@ static gboolean generic_next_cb( GnomeDruidPage *page, GnomeDruid *druid )
 {
     GtkWidget *next = gtk_object_get_data( GTK_OBJECT( page ), "next" );
     gtk_object_set_data( GTK_OBJECT( next ), "prev", page );
+    gnome_druid_set_buttons_sensitive( GNOME_DRUID( druid ), TRUE, TRUE, TRUE );
     gnome_druid_set_page( GNOME_DRUID( druid ), GNOME_DRUID_PAGE( next ) );
     return TRUE;
 }
@@ -233,8 +237,16 @@ static gboolean generic_back_cb( GnomeDruidPage *page, GnomeDruid *druid )
 {
     GtkWidget *back = gtk_object_get_data( GTK_OBJECT( page ), "prev" );
     gtk_object_set_data( GTK_OBJECT( back ), "next", page );
+    gnome_druid_set_buttons_sensitive( GNOME_DRUID( druid ), TRUE, TRUE, TRUE );
     gnome_druid_set_page( GNOME_DRUID( druid ), GNOME_DRUID_PAGE( back ) );
     return TRUE;
+}
+
+/* ********************************************************************** */
+
+static void start_prepare_cb( GnomeDruidPage *start, GnomeDruid *druid )
+{
+    gnome_druid_set_buttons_sensitive( GNOME_DRUID( druid ), FALSE, TRUE, TRUE );
 }
 
 /* ********************************************************************** */

@@ -38,8 +38,7 @@
 #define MESSAGEBOX_WIDTH 450
 #define MESSAGEBOX_HEIGHT 150
 
-#define DEFAULT_MESSAGE_FONT "-adobe-helvetica-medium-r-normal--12-*-72-72-p-*-iso8859-1"
-
+#define DEFAULT_MESSAGE_FONT "-*-fixed-medium-r-normal-*-*-*-*-*-c-*-iso8859-1"
 #define DEFAULT_CHARSET "ISO-8859-1"
 #define DEFAULT_ENCODING ENC8BIT
 #define DEFAULT_LINESIZE 78

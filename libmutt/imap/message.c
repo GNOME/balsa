@@ -574,8 +574,8 @@ int imap_append_message (CONTEXT *ctx, MESSAGE *msg)
 int imap_copy_messages (CONTEXT* ctx, HEADER* h, char* dest, int delete)
 {
   IMAP_DATA* idata;
-  char buf[HUGE_STRING];
-  char cmd[LONG_STRING];
+  BUFFER cmd;
+  char uid[11];
   char mbox[LONG_STRING];
   char mmbox[LONG_STRING];
   int rc;
@@ -598,7 +598,16 @@ int imap_copy_messages (CONTEXT* ctx, HEADER* h, char* dest, int delete)
     return 1;
   }
 
-  imap_fix_path (idata, mx.mbox, cmd, sizeof (cmd));
+  if (h && h->attach_del)
+  {
+    dprint (3, (debugfile, "imap_copy_messages: Message contains attachments to be deleted\n"));
+    return 1;
+  }
+  
+  imap_fix_path (idata, mx.mbox, mbox, sizeof (mbox));
+
+  memset (&cmd, 0, sizeof (cmd));
+  mutt_buffer_addstr (&cmd, "UID COPY ");
 
   /* Null HEADER* means copy tagged messages */
   if (!h)
@@ -607,33 +616,35 @@ int imap_copy_messages (CONTEXT* ctx, HEADER* h, char* dest, int delete)
      * and APPEND. TODO: Copy what we can with COPY, fall through for the
      * remainder. */
     for (n = 0; n < ctx->msgcount; n++)
+    {
+      if (ctx->hdrs[n]->tagged && ctx->hdrs[n]->attach_del)
       {
-	if (ctx->hdrs[n]->tagged && ctx->hdrs[n]->attach_del)
-	  {
-	    dprint (3, (debugfile, "imap_copy_messages: Message contains attachments to be deleted\n"));
-	    return 1;
-	  }
+	dprint (3, (debugfile, "imap_copy_messages: Message contains attachments to be deleted\n"));
+	return 1;
       }
-    
-    rc = imap_make_msg_set (idata, buf, sizeof (buf), M_TAG, 0);
+    }
+
+    rc = imap_make_msg_set (idata, &cmd, M_TAG, 0);
     if (!rc)
     {
       dprint (1, (debugfile, "imap_copy_messages: No messages tagged\n"));
       goto fail;
     }
-    mutt_message (_("Copying %d messages to %s..."), rc, cmd);
+    mutt_message (_("Copying %d messages to %s..."), rc, mbox);
   }
   else
   {
-    mutt_message (_("Copying message %d to %s..."), h->index+1, cmd);
-    snprintf (buf, sizeof (buf), "%u", HEADER_DATA (h)->uid);
+    mutt_message (_("Copying message %d to %s..."), h->index+1, mbox);
+    snprintf (uid, sizeof (uid), "%u", HEADER_DATA (h)->uid);
+    mutt_buffer_addstr (&cmd, uid);
   }
 
   /* let's get it on */
-  strncpy (mbox, cmd, sizeof (mbox));
-  imap_munge_mbox_name (mmbox, sizeof (mmbox), cmd);
-  snprintf (cmd, sizeof (cmd), "UID COPY %s %s", buf, mmbox);
-  rc = imap_exec (idata, cmd, IMAP_CMD_FAIL_OK);
+  mutt_buffer_addstr (&cmd, " ");
+  imap_munge_mbox_name (mmbox, sizeof (mmbox), mbox);
+  mutt_buffer_addstr (&cmd, mmbox);
+
+  rc = imap_exec (idata, cmd.data, IMAP_CMD_FAIL_OK);
   if (rc == -2)
   {
     /* bail out if command failed for reasons other than nonexistent target */
@@ -643,8 +654,8 @@ int imap_copy_messages (CONTEXT* ctx, HEADER* h, char* dest, int delete)
       goto fail;
     }
     dprint (2, (debugfile, "imap_copy_messages: server suggests TRYCREATE\n"));
-    snprintf (buf, sizeof (buf), _("Create %s?"), mbox);
-    if (option (OPTCONFIRMCREATE) && mutt_yesorno (buf, 1) < 1)
+    snprintf (mmbox, sizeof (mmbox), _("Create %s?"), mbox);
+    if (option (OPTCONFIRMCREATE) && mutt_yesorno (mmbox, 1) < 1)
     {
       mutt_clear_error ();
       goto fail;
@@ -653,7 +664,7 @@ int imap_copy_messages (CONTEXT* ctx, HEADER* h, char* dest, int delete)
       goto fail;
 
     /* try again */
-    rc = imap_exec (idata, cmd, 0);
+    rc = imap_exec (idata, cmd.data, 0);
   }
   if (rc != 0)
   {
@@ -682,10 +693,14 @@ int imap_copy_messages (CONTEXT* ctx, HEADER* h, char* dest, int delete)
     }
   }
 
+  if (cmd.data)
+    FREE (&cmd.data);
   FREE (&mx.mbox);
   return 0;
 
  fail:
+  if (cmd.data)
+    FREE (&cmd.data);
   FREE (&mx.mbox);
   return -1;
 }

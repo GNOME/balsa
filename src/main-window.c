@@ -2127,7 +2127,7 @@ view_msg_source_cb(GtkWidget * widget, gpointer data)
     bw = BALSA_WINDOW(data);
     if (bw->preview) {
 	LibBalsaMessage * msg = BALSA_MESSAGE(bw->preview)->message;
-	libbalsa_show_message(msg);
+	libbalsa_show_message_source(msg);
     }
 }
 

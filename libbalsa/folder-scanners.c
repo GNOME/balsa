@@ -156,10 +156,10 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     state.rnode = rnode;
     state.mailbox_handler = (void(*)())mailbox_handler;
     state.folder_handler = (void(*)())folder_handler;
-    if(!FileMask.rx) {
+    if(!FileMask.rx) { /* allocate it once, on the first run */
        FileMask.rx = (regex_t *) safe_malloc (sizeof (regex_t));
        if( (i=REGCOMP(FileMask.rx,"!^\\.[^.]",0)) != 0) {
-	   g_warning("FileMask regexp compilation failed with code%i.",
+	   g_warning("FileMask regexp compilation failed with code %i.",
 		     i);
 	   safe_free((void**)&FileMask.rx);
 	   return;
@@ -198,7 +198,6 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     }
     g_list_foreach((GList*)state.subfolders, (GFunc)g_free, NULL);
     g_list_free((GList*)state.subfolders);
-    regfree(FileMask.rx);
     libbalsa_unlock_mutt();
     
 }

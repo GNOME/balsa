@@ -5,6 +5,7 @@
 	* libbalsa/libbalsa.h: add libbalsa_show_message_source() header.
 	* libbalsa/source-viewer.c: the actual code for message source
 	browsing.
+	* libbalsa/folder-scanners.c: do not double free regex.
 	
 2001-07-28  Pawel Salek  <pawsa@theochem.kth.se>
 

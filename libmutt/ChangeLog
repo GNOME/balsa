@@ -1,3 +1,16 @@
+2001-07-31  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* muttlib.c: added.
+	* Makefile.am: updated with muttlib.c
+	* libmutt/protos.h: added some muttlib prototypes.
+	* imap/README, imap/TODO: updated (if anybody cares).
+	* imap/auth.c, imap/auth_sasl.c: authenticator iterator bug fixed. 
+	* imap/command.c: fix rereading capabilities after STARTLS
+	* imap/imap.c:misc fixes.
+	* imap/imap_private.h: API changed.
+	* imap/message.c: support for attachment deletion.
+	* imap/util.c: fix imap_next_word().
+
 2001-07-27  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* imap/command.c: fix autologout problem.

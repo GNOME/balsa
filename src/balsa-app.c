@@ -94,7 +94,7 @@ init_balsa_app (int argc, char *argv[])
 
   /* Check to see if this is the first time we've run balsa */
 
-  if (!gnome_config_get_string ("/balsa/Global/Accounts"))
+  if (!gnome_config_get_string ("/balsa/Global/real name"))
     {
       initialize_balsa (argc, argv);
       return;

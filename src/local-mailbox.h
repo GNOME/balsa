@@ -16,50 +16,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
+#ifndef __LOCAL_MAILBOX_H__
+#define __LOCAL_MAILBOX_H__
 
-#include "config.h"
-#include <gnome.h>
-#include "balsa-app.h"
-#include "c-client.h"
-#include "mailbox.h"
-#include "save-restore.h"
+void load_local_mailboxes ();
 
-
-int
-main (int argc, char *argv[])
-{
-  gnome_init ("balsa", NULL, argc, argv, 0, NULL);
-  init_balsa_app (argc, argv);
-
-
-  open_main_window ();
-  if (balsa_app.mailbox_list)
-    main_window_set_mailbox ((Mailbox *) balsa_app.mailbox_list->data);
-
-
-  gtk_main ();
-  return 0;
-}
-
-
-void
-balsa_exit ()
-{
-  GList *list;
-  Mailbox *mailbox;
-
-
-  list = balsa_app.mailbox_list;
-  while (list)
-    {
-      mailbox = list->data;
-      list = list->next;
-
-      if (mailbox->stream != NIL)
-	mailbox_close (mailbox);
-    }
-
-
-  save_global_settings ();
-  gtk_exit (0);
-}
+#endif /* __LOCAL_MAILBOX_H__ */

@@ -28,7 +28,7 @@
 <h2 class="heading">Download</h2>
 
 <dl>
-<dt>Current stable source. Please note that 1.3.4 is considered quite
+<dt>Current stable source. Please note that 1.3.5 is considered quite
 stable too and provides large set of new features.</dt>
 <dd>
 <a href="http://balsa.gnome.org/balsa-1.2.4.tar.bz2">balsa-1.2.4.tar.bz2</a> (1.9MB)
@@ -68,9 +68,9 @@ Get the sources from the home page or grab the RPM built on Redhat 7.2:</p>
 <dl>
 <dt>libESMTP packages</dt>
 <dd>
-<a href="http://balsa.gnome.org/libesmtp-0.8.9-1.i386.rpm">libesmtp-0.8.9-1.i386.rpm</a> (80kB)</li>
+<a href="http://balsa.gnome.org/libesmtp-0.8.12-1.i386.rpm">libesmtp-0.8.12-1.i386.rpm</a> (95kB)
 <br>
-<a href="http://balsa.gnome.org/libesmtp-0.8.9-1.src.rpm">libesmtp-0.8.9-1.src.rpm</a> (247kB)</li>
+<a href="http://balsa.gnome.org/libesmtp-0.8.12-1.src.rpm">libesmtp-0.8.12-1.src.rpm</a> (246kB)
 </dd>
 </dl>
 
@@ -85,26 +85,47 @@ Get the sources from the home page or grab the RPM built on Redhat 7.2:</p>
 
 <a name="dev"></a>
 <dl>
-<dt>Development release - 1.3.4 - released on 2002.03.26</dt>
-<dd>
-<a href="http://balsa.gnome.org/balsa-1.3.4.tar.gz">balsa-1.3.4.tar.gz</a> (3.1MB)</li>
+<dt>Development release - 1.3.5 - released on 2002.04.24</dt>
+<a href="http://balsa.gnome.org/balsa-1.3.5.tar.bz2">balsa-1.3.5.tar.bz2</a> (2.2MB)</li>
 <br>
-<a href="http://balsa.gnome.org/balsa-1.3.4.tar.bz2">balsa-1.3.4.tar.bz2</a> (2.2MB)</li>
+<a href="http://balsa.gnome.org/balsa-1.3.5-1.i386.rpm">balsa-1.3.5-1.i386.rpm</a> (1.4MB) built on RH-7.2
 <br>
-<a href="http://balsa.gnome.org/balsa-1.3.4-1.i386.rpm">balsa-1.3.4-1.i386.rpm</a> (1.4MB) built on RH-7.2
+<a href="ftp://chbm.nu/pub/RH62/balsa-1.3.5-1_rh62-ximian.i386.rpm">balsa-1.3.5-1_rh62-ximian.i386.rpm</a> (1.4M) 
 <br>
-<a href="ftp://chbm.nu/pub/RH62/balsa-1.3.4-1_rh62-ximian.i386.rpm">balsa-1.3.4-1_rh62-ximian.i386.rpm</a> (1.4M) 
-<br>
-<a href="http://balsa.gnome.org/balsa-1.3.4-1.src.rpm">balsa-1.3.4-1.src.rpm</a> (2.2MB)</li>
+<a href="http://balsa.gnome.org/balsa-1.3.5-1.src.rpm">balsa-1.3.5-1.src.rpm</a> (2.2MB)</li>
 </dd>
 </dl>
 
-<p>Balsa-1.3.4 fixes some ugly MT-related crashes (or so we hope). It
+<p>Balsa 1.3.5 protects ESMTP passwords and pass-phrases.It scans new
+mailboxes in a thread. It has improved message include function.  It
+preserves correctly References: headers over message postpone.  Number
+of crashes and other bugs fixed as well as some portability fixes.  It
 requires gnome-1.4 or newer: gdk_pixbuf, gnome-vfs and some other,
 delayed IMAP tree scanning, &quot;reply to group&quot; functional.
 See <tt>NEWS</tt> and/or <tt>ChangeLog</tt> for more details.</p>
 
 <br>
+
+<a name="2.0.0"></a>
+<dl>
+<dt>GNOME2 preview release - 2.0.0 - released on 2002.04.24</dt>
+<dd>
+<ul>
+<li>
+<a href="http://balsa.gnome.org/balsa-2.0.0.tar.bz2">balsa-2.0.0.tar.bz2</a>
+</li>
+<li>
+<a href="http://balsa.gnome.org/balsa-2.0.0-1.i386.rpm">balsa-2.0.0-1.i386.rpm</a> built on RH-7.2 - <b>but please build it yourself from src.rpm!</b>
+</li>
+<li>
+<a href="http://balsa.gnome.org/balsa-2.0.0-1.src.rpm">balsa-2.0.0-1.src.rpm</a></li>
+</dd>
+</dl>
+
+<p>Balsa-2.0.0 is a technology preview. It can be used daily but it
+knows how to crash, too. While it is 97% functional, it still has some
+rough edges (notably in the i18n area). The binary is built on a development computer and can require libraries that are different than on yours. This is why rebuilding from the source is recommended. Try</p>
+<pre>rpm --recompile balsa-2.0.0-1.src.rpm</pre>
 
 <a name="req"></a>
 <h2 class="heading">Requirements</h2>

@@ -2107,7 +2107,7 @@ libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
 				    LibBalsaMailboxSearchIter *
 				    search_iter)
 {
-    if (mailbox->stamp != search_iter->stamp) {
+    if (search_iter && search_iter->stamp != mailbox->stamp) {
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 			     _("Message filtering  for IMAP mailbox %s"
 			       " failed: mailbox changed"), mailbox->url);

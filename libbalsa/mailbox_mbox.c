@@ -477,6 +477,10 @@ libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox)
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX_MBOX(mailbox));
 
+    LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox);
+    if (MAILBOX_OPEN(mailbox))
+	return;
+
     mbox = (LibBalsaMailboxMbox *) mailbox;
 
     if (mbox->messages_info) {
@@ -489,8 +493,6 @@ libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox)
 	g_mime_stream_unref(mbox->gmime_stream);
 	mbox->gmime_stream = NULL;	// chbm: is this correct ?
     }
-
-    LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox);
 }
 
 static gboolean

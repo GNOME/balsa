@@ -578,6 +578,10 @@ libbalsa_mailbox_maildir_close_mailbox(LibBalsaMailbox * mailbox)
 
     g_return_if_fail (LIBBALSA_IS_MAILBOX_MAILDIR(mailbox));
 
+    LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox);
+    if (MAILBOX_OPEN(mailbox))
+	return;
+
     mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
 
     lbm_maildir_sync_real(mdir, TRUE);
@@ -590,8 +594,6 @@ libbalsa_mailbox_maildir_close_mailbox(LibBalsaMailbox * mailbox)
 	g_ptr_array_free(mdir->msgno_2_msg_info, TRUE);
 	mdir->msgno_2_msg_info = NULL;
     }
-
-    LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox);
 }
 
 static int libbalsa_mailbox_maildir_open_temp (const gchar *dest_path,

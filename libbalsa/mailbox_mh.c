@@ -590,6 +590,10 @@ libbalsa_mailbox_mh_close_mailbox(LibBalsaMailbox * mailbox)
 
     g_return_if_fail (LIBBALSA_IS_MAILBOX_MH(mailbox));
 
+    LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox);
+    if (MAILBOX_OPEN(mailbox))
+	return;
+
     libbalsa_mailbox_mh_sync(mailbox, TRUE);
 
     mh = LIBBALSA_MAILBOX_MH(mailbox);
@@ -601,8 +605,6 @@ libbalsa_mailbox_mh_close_mailbox(LibBalsaMailbox * mailbox)
 	g_ptr_array_free(mh->msgno_2_msg_info, TRUE);
 	mh->msgno_2_msg_info = NULL;
     }
-
-    LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox);
 }
 
 static int

@@ -60,7 +60,7 @@ typedef struct _PropertyUI {
 #endif
 #endif
     GtkWidget *mail_directory;
-    GtkRadioButton *encoding_type[NUM_ENCODING_MODES];
+    GtkWidget *encoding_menu;
     GtkWidget *check_mail_auto;
     GtkWidget *check_mail_minutes;
     GtkWidget *quiet_background_check;
@@ -170,6 +170,7 @@ static GtkWidget *create_spelling_page(gpointer);
 static GtkWidget *create_address_book_page(gpointer);
 
 static GtkWidget *create_information_message_menu(void);
+static GtkWidget *create_encoding_menu(void);
 static GtkWidget *create_mdn_reply_menu(void);
 #if ENABLE_ESMTP
 static GtkWidget *create_tls_mode_menu(void);
@@ -232,9 +233,9 @@ guint encoding_type[NUM_ENCODING_MODES] = {
 };
 
 gchar *encoding_type_label[NUM_ENCODING_MODES] = {
-    N_("7bits"),
-    N_("8bits"),
-    N_("quoted")
+    N_("7 Bits"),
+    N_("8 Bits"),
+    N_("Quoted")
 };
 
 guint pwindow_type[NUM_PWINDOW_MODES] = {
@@ -387,11 +388,6 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 #endif
 #endif
 
-    for (i = 0; i < NUM_ENCODING_MODES; i++) {
-	gtk_signal_connect(GTK_OBJECT(pui->encoding_type[i]), "clicked",
-			   GTK_SIGNAL_FUNC(properties_modified_cb),
-                           property_box);
-    }
     gtk_signal_connect(GTK_OBJECT(pui->mail_directory), "changed",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
@@ -657,12 +653,10 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
 
     /* if (balsa_app.alt_layout_is_active != balsa_app.alternative_layout)  */
 	balsa_change_window_layout(balsa_app.main_window);
-    
-    for (i = 0; i < NUM_ENCODING_MODES; i++)
-	if (GTK_TOGGLE_BUTTON(pui->encoding_type[i])->active) {
-	    balsa_app.encoding_style = encoding_type[i];
-	    break;
-	}
+
+    menu_item = gtk_menu_get_active(GTK_MENU(pui->encoding_menu));
+    balsa_app.encoding_style =
+	GPOINTER_TO_INT(gtk_object_get_user_data(GTK_OBJECT(menu_item)));
 
     if (balsa_app.mblist_show_mb_content_info !=
 	GTK_TOGGLE_BUTTON(pui->mblist_show_mb_content_info)->active) {
@@ -749,7 +743,7 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     balsa_app.message_font =
 	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->message_font)));
     g_free(balsa_app.subject_font);
-    balsa_app.subject_font = 
+    balsa_app.subject_font =
 	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->subject_font)));
 
     g_free(balsa_app.quote_regex);
@@ -939,12 +933,13 @@ set_prefs(void)
 			     GTK_TOGGLE_BUTTON(pui->pgdownmod)->active);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->debug),
 				 balsa_app.debug);
-    for (i = 0; i<NUM_ENCODING_MODES; i++)
+
+    for (i = 0; i < NUM_ENCODING_MODES; i++)
 	if (balsa_app.encoding_style == encoding_type[i]) {
-	    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
-					 (pui->encoding_type[i]), TRUE);
+	    gtk_menu_set_active(GTK_MENU(pui->encoding_menu), i);
 	    break;
 	}
+
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
 				 (pui->mblist_show_mb_content_info),
 				 balsa_app.mblist_show_mb_content_info);
@@ -1019,7 +1014,7 @@ set_prefs(void)
 			     GTK_TOGGLE_BUTTON(pui->wordwrap)->active);
 
     /* external editor */
-    gtk_entry_set_text(GTK_ENTRY(pui->extern_editor_command), 
+    gtk_entry_set_text(GTK_ENTRY(pui->extern_editor_command),
                        balsa_app.extern_editor_command);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->edit_headers),
                                  balsa_app.edit_headers);
@@ -1534,9 +1529,9 @@ create_mailoptions_page(gpointer data)
     note = gtk_notebook_new();
     gtk_container_set_border_width(GTK_CONTAINER(note), 5);
 
-    gtk_notebook_append_page(GTK_NOTEBOOK(note), incoming_page(data), 
+    gtk_notebook_append_page(GTK_NOTEBOOK(note), incoming_page(data),
 			     gtk_label_new(_("Incoming")));
-    gtk_notebook_append_page(GTK_NOTEBOOK(note), outgoing_page(data), 
+    gtk_notebook_append_page(GTK_NOTEBOOK(note), outgoing_page(data),
 			     gtk_label_new(_("Outgoing")));
 
     return note;
@@ -1667,7 +1662,10 @@ incoming_page(gpointer data)
     gtk_container_add (GTK_CONTAINER(mdn_frame), mdn_vbox);
     gtk_container_set_border_width (GTK_CONTAINER(mdn_vbox), 5);
 
-    mdn_label = gtk_label_new (_("When I receive a message and its sender requested to return a\nMessage Disposition Notification (MDN), send it in the following cases:"));
+    mdn_label = gtk_label_new (_("When I receive a message and its sender "
+				 "requested to return a\n"
+				 "Message Disposition Notification (MDN), "
+				 "send it in the following cases:"));
     gtk_box_pack_start (GTK_BOX (mdn_vbox), mdn_label, FALSE, FALSE, 0);
     gtk_label_set_justify (GTK_LABEL (mdn_label), GTK_JUSTIFY_LEFT);
     gtk_misc_set_alignment (GTK_MISC (mdn_label), 0, 0.5);
@@ -1678,7 +1676,9 @@ incoming_page(gpointer data)
     gtk_table_set_row_spacings(GTK_TABLE(mdn_table), 5);
     gtk_table_set_col_spacings(GTK_TABLE(mdn_table), 10);
 
-    mdn_label = gtk_label_new (_("the message header looks clean\n(the notify-to address is equal to the return path, I am in the to or cc list)"));
+    mdn_label = gtk_label_new (_("the message header looks clean\n"
+				 "(the notify-to address is equal to the "
+				 "return path, I am in the to or cc list)"));
     gtk_label_set_justify (GTK_LABEL (mdn_label), GTK_JUSTIFY_LEFT);
     gtk_misc_set_alignment (GTK_MISC (mdn_label), 0, 0.5);
     gtk_table_attach (GTK_TABLE (mdn_table), mdn_label, 0, 1, 0, 1,
@@ -1692,7 +1692,7 @@ incoming_page(gpointer data)
 				 balsa_app.mdn_reply_clean);
     gtk_table_attach (GTK_TABLE (mdn_table), mdn_optionmenu, 1, 2, 0, 1,
 		      GTK_FILL | GTK_EXPAND, 0, 0, 0);
- 
+
     mdn_label = gtk_label_new (_("the message header looks suspicious"));
     gtk_label_set_justify (GTK_LABEL (mdn_label), GTK_JUSTIFY_LEFT);
     gtk_misc_set_alignment (GTK_MISC (mdn_label), 0, 0.5);
@@ -1702,7 +1702,7 @@ incoming_page(gpointer data)
 
     mdn_optionmenu = gtk_option_menu_new ();
     pui->mdn_reply_notclean_menu = create_mdn_reply_menu();
-    gtk_option_menu_set_menu (GTK_OPTION_MENU (mdn_optionmenu), 
+    gtk_option_menu_set_menu (GTK_OPTION_MENU (mdn_optionmenu),
 			      pui->mdn_reply_notclean_menu);
     gtk_option_menu_set_history (GTK_OPTION_MENU (mdn_optionmenu),
 				 balsa_app.mdn_reply_notclean);
@@ -1722,7 +1722,8 @@ outgoing_page(gpointer data)
     GtkObject *spinbutton_adj;
     GtkWidget *label;
     GtkWidget *vbox1, *vbox2;
-    GSList *group;
+    GtkWidget *hbox;
+    GtkWidget *optionmenu;
     gint i;
 
     vbox1 = gtk_vbox_new(FALSE, 0);
@@ -1798,15 +1799,14 @@ outgoing_page(gpointer data)
     gtk_box_pack_start(GTK_BOX(vbox2), pui->forward_attached,
 		       FALSE, TRUE, 0);
 
-	pui->always_queue_sent_mail =
+    pui->always_queue_sent_mail =
 	gtk_check_button_new_with_label(_("Send button always queues outgoing mail in outbox"));
-	gtk_box_pack_start(GTK_BOX(vbox2), pui->always_queue_sent_mail,
-				FALSE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox2), pui->always_queue_sent_mail,
+		       FALSE, TRUE, 0);
 
-	pui->copy_to_sentbox =
+    pui->copy_to_sentbox =
 	gtk_check_button_new_with_label(_("Copy outgoing messages to sentbox"));
-	gtk_box_pack_start(GTK_BOX(vbox2), pui->copy_to_sentbox,
-				FALSE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox2), pui->copy_to_sentbox, FALSE, TRUE, 0);
 
     frame2 = gtk_frame_new(_("Encoding"));
     gtk_box_pack_start(GTK_BOX(vbox1), frame2, FALSE, FALSE, 0);
@@ -1814,16 +1814,18 @@ outgoing_page(gpointer data)
 
     vbox2 = vbox_in_container(frame2);
 
-    group = NULL;
-    for (i = 0; i < NUM_ENCODING_MODES; i++) {
-	pui->encoding_type[i] =
-	    GTK_RADIO_BUTTON(gtk_radio_button_new_with_label
-			     (group, _(encoding_type_label[i])));
-	gtk_box_pack_start(GTK_BOX(vbox2),
-			   GTK_WIDGET(pui->encoding_type[i]), FALSE, TRUE,
-			   0);
-	group = gtk_radio_button_group(pui->encoding_type[i]);
-    }
+    hbox = gtk_hbox_new(FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox2), hbox, FALSE, FALSE, 0);
+
+    optionmenu = gtk_option_menu_new ();
+    pui->encoding_menu = create_encoding_menu();
+    gtk_option_menu_set_menu (GTK_OPTION_MENU (optionmenu), pui->encoding_menu);
+    for (i = 0; i < NUM_ENCODING_MODES; i++)
+	if (balsa_app.encoding_style == encoding_type[i]) {
+	    gtk_option_menu_set_history (GTK_OPTION_MENU (optionmenu), i);
+	    break;
+	}
+    gtk_box_pack_start(GTK_BOX(hbox), optionmenu, FALSE, FALSE, 0);
 
     return vbox1;
 
@@ -2745,6 +2747,17 @@ create_information_message_menu(void)
     add_show_menu(_("Show dialog"),      BALSA_INFORMATION_SHOW_DIALOG, menu);
     add_show_menu(_("Show in list"),     BALSA_INFORMATION_SHOW_LIST,   menu);
     add_show_menu(_("Print to console"), BALSA_INFORMATION_SHOW_STDERR, menu);
+    return menu;
+}
+
+static GtkWidget *
+create_encoding_menu(void)
+{
+    gint i;
+
+    GtkWidget *menu = gtk_menu_new();
+    for (i = 0; i < NUM_ENCODING_MODES; i++)
+	add_show_menu(_(encoding_type_label[i]), encoding_type[i], menu );
     return menu;
 }
 

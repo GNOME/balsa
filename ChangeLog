@@ -1,5 +1,7 @@
-2003-09-23 08:06  PeterB
+2003-09-23 11:08  PeterB
 
+	* src/pref-manager.c: Clarify toolbar button default actions.
+	* doc/C/balsa.xml: Update help files.
 	* src/sendmsg-window.c: Make In-Reply-To header comply with RFC
 	2822.
 

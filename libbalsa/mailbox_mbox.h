@@ -39,19 +39,6 @@
 typedef struct _LibBalsaMailboxMbox LibBalsaMailboxMbox;
 typedef struct _LibBalsaMailboxMboxClass LibBalsaMailboxMboxClass;
 
-struct _LibBalsaMailboxMbox {
-    LibBalsaMailboxLocal parent;
-
-    GArray* messages_info;
-    GMimeStream *gmime_stream;
-    gint size;
-    time_t mtime;
-};
-
-struct _LibBalsaMailboxMboxClass {
-    LibBalsaMailboxLocalClass klass;
-};
-
 GType libbalsa_mailbox_mbox_get_type(void);
 GObject *libbalsa_mailbox_mbox_new(const gchar * path, gboolean create);
 gint libbalsa_mailbox_mbox_create(const gchar * path, gboolean create);

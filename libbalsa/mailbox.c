@@ -220,6 +220,8 @@ libbalsa_mailbox_init(LibBalsaMailbox *mailbox)
 	mailbox->unread_messages = 0;
 	mailbox->total_messages = 0;
 	mailbox->message_list = NULL;
+
+	mailbox->readonly = FALSE;
 }
 
 /* libbalsa_mailbox_destroy:

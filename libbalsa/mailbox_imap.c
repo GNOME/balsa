@@ -243,6 +243,8 @@ libbalsa_mailbox_imap_open (LibBalsaMailbox *mailbox, gboolean append)
 	libbalsa_unlock_mutt();
 	g_free (tmp);
 
+	mailbox->readonly = CLIENT_CONTEXT(mailbox)->readonly;
+
 	if (CLIENT_CONTEXT_OPEN (mailbox)) {
 		mailbox->messages = 0;
 		mailbox->total_messages = 0;

@@ -81,6 +81,7 @@ struct _LibBalsaMailbox
 
 	gboolean lock;
 	gboolean is_directory;
+	gboolean readonly;
 
 	glong messages;
 	glong new_messages;

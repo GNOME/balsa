@@ -151,6 +151,9 @@ balsa_store_address (GtkWidget * widget, gpointer index)
 		ab_list = balsa_app.address_book_list;
 		while (ab_list) {
 			address_book = LIBBALSA_ADDRESS_BOOK(ab_list->data);
+			if ( current_address_book == NULL )
+				current_address_book = address_book;
+
 			menu_item = gtk_menu_item_new_with_label ( address_book->name );
 			gtk_widget_show ( menu_item );
 			gtk_menu_append(GTK_MENU(ab_menu), menu_item);
@@ -218,6 +221,11 @@ store_address_dialog_button_clicked_cb(GtkWidget *widget, gint which, GtkWidget 
 		gint cnt2 = 0;
 		gchar *entry_str = NULL;
 		gint entry_str_len = 0;
+
+		if ( current_address_book == NULL ) {
+			balsa_information(LIBBALSA_INFORMATION_WARNING, _("No address book selected...."));
+			return;
+		}
 
 		/* FIXME: This problem should be solved in the VCard implementation in libbalsa */
 		/* semicolons mess up how GnomeCard processes the fields, so disallow them */

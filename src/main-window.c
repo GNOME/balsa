@@ -1741,7 +1741,11 @@ static void notebook_switch_page_cb( GtkWidget *notebook,
     window = BALSA_INDEX_PAGE(index_page)->window;
 
     if ( mailbox->name ) {
-        title = g_strdup_printf("Balsa: %s", mailbox->name);
+      if ( mailbox->readonly ) {
+        title = g_strdup_printf(_("Balsa: %s (readonly)"), mailbox->name);
+      } else {
+        title = g_strdup_printf(_("Balsa: %s"), mailbox->name);
+      }
         gtk_window_set_title(GTK_WINDOW(window), title);
         g_free(title);
     } else {

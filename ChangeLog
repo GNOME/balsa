@@ -1,3 +1,11 @@
+2000-09-15  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/mailbox.[ch], libbalsa/mailbox_local.c,
+	libbalsa/mailbox_imap.c: Add readonly flag.
+	* src/main-window.c: Set titlebar using the readonly flag.
+	* src/store-address.c: Fix for when there is no default address
+	book.
+
 2000-09-14  Matthew Guenther  <guentherm@asme.org>
 	
 	* help/C/balsa.sgml: Some updates to reflect changed features.

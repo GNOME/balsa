@@ -1,5 +1,9 @@
-2004-10-15 07:21  PeterB
+2004-10-15 13:16  PeterB
 
+	* src/message-window.c: manage sensitivity of next/previous part
+	controls, and of move-to-trash controls.
+	* src/: balsa-message.c, balsa-message.h, main-window.c: manage
+	sensitivity of next/previous part controls.
 	* src/balsa-message.c: test for missing body_list.
 	* src/main-window.c: allow remote trashbox to be emptied.
 

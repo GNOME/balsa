@@ -24,3 +24,4 @@ gnomeConf.sh
 config.h.in
 COPYING
 intl
+gmon.out

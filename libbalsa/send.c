@@ -1,4 +1,4 @@
-/* Balsa E-Mail Client 
+/* Balsa E-Mail Client  
  * Copyright (C) 1997-1999 Stuart Parmenter
  *
  * This program is free software; you can redistribute it and/or modify
@@ -443,18 +443,24 @@ int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
   snprintf (buffer, 512,"MAIL FROM:%s\r\n", msg->env->from->mailbox);
   write (s, buffer, strlen (buffer));
   if (smtp_answer (s) == 0)
+  {
+    fprintf(stderr,"%s",buffer);
     return 0;
+  }
 
   address = msg->env->to;
   while (address != NULL)
   {	  
-      snprintf (buffer, 512,"RCPT TO: %s\r\n", address->mailbox);
+      snprintf (buffer, 512,"RCPT TO:%s\r\n", address->mailbox);
       write (s, buffer, strlen (buffer));
       address=address->next;
     /* We check for a positive answer */
         
       if (smtp_answer (s) == 0)
-         return 0;
+      {
+	 fprintf(stderr,"%s",buffer);
+	 return 0;
+      }
     
      /*  let's go to the next address */
       
@@ -463,12 +469,15 @@ int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
   address = msg->env->cc;
   while (address != NULL)
   {
-      snprintf (buffer, sizeof(buffer),"RCPT TO: %s\r\n", address->mailbox);
+      snprintf (buffer, sizeof(buffer),"RCPT TO:%s\r\n", address->mailbox);
       write (s, buffer, strlen (buffer));
       address=address->next;
 
       if (smtp_answer (s) == 0)
-          return 0;
+      {
+	 fprintf(stderr,"%s",buffer);
+	 return 0;
+      }
    }
 
   address = msg->env->bcc;
@@ -479,7 +488,10 @@ int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
       address=address->next;
 
       if (smtp_answer (s) == 0)
-          return 0;
+      {
+	 fprintf(stderr,"%s",buffer);
+	 return 0;
+      }
    }
 
 
@@ -488,7 +500,10 @@ int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
   snprintf (buffer, 512,"DATA\r\n");
   write (s, buffer, strlen (buffer));
   if (smtp_answer (s) == 0)
-    return 0;
+  {
+     fprintf(stderr,"%s",buffer);	    
+     return 0;
+  }
 
   if ((fp=open(tempfile,O_RDONLY))==-1)
     return -1;
@@ -524,8 +539,11 @@ int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
   write (s, buffer, strlen (buffer));
 
   if (smtp_answer (s) == 0)
-    return 0;
-
+  {
+     fprintf(stderr,"%s",buffer);
+     return 0;
+  }
+  
   close (fp);
   
   return 1;

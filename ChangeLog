@@ -6,7 +6,11 @@
 	* src/balsa-message.c, src/sendmsg-window.c:
 	Martynas Kunigëlis <mkunigelis@alna.lt> patch for Baltic language
 	support.
-	
+
+2000-05-01  Matthew Guenther <mguenthe@netcom.ca>
+	* libbalsa/send.c (balsa_lookup_mime_type): fixed GNOME mime 
+	type lookup 
+
 2000-04-27  Pawel Salek <pawsa@theochem.kth.se>
 	* src/sendmsg-window.c: one g_free() too much.
 	* src/main.c: code cleanup.

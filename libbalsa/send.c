@@ -893,15 +893,11 @@ int balsa_smtp_send (MessageQueueItem *first_message, char *server)
 gchar** balsa_lookup_mime_type (const gchar* path)
 {
         gchar** tmp;
+        gchar* mime_type;
+        
 
-        const gchar* mime_type = gnome_mime_type_or_default (path, "");
-
-        if (mime_type != "") {
-                tmp = g_strsplit (mime_type , "/", 2 );
-                g_free ((gchar*)mime_type);
-        } else {
-                tmp = g_strsplit ("application/octet-stream", "/", 2);
-        }                
+        mime_type = gnome_mime_type_or_default_of_file (path, "application/octet-stream");
+        tmp = g_strsplit (mime_type , "/", 2 );
 
         return tmp;
 }
@@ -995,6 +991,7 @@ gboolean balsa_create_msg (Message *message, HEADER *msg, char *tmpfile, int que
          * types */
         mime_type = balsa_lookup_mime_type ((const gchar*)body->filename);
         newbdy->type = mutt_check_mime_type (mime_type[0]);
+        g_free (newbdy->subtype);
         newbdy->subtype = g_strdup(mime_type[1]);
         g_strfreev (mime_type);
       }

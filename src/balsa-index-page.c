@@ -36,14 +36,14 @@ enum
 };
 #endif
 
+
+/* #define DND_USED */
+#ifdef DND_USED
 /* DND declarations */
 enum
 {
   TARGET_MESSAGE,
 };
-
-/*#define DND_USED*/
-#ifdef DND_USED
 
 static GtkTargetEntry drag_types[] =
 {
@@ -51,7 +51,8 @@ static GtkTargetEntry drag_types[] =
 };
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
-static void index_child_setup_dnd ( GnomeMDIChild * child );
+static void 
+index_child_setup_dnd ( GnomeMDIChild * child );
 #endif
 
 /* -- end of DND declarations */
@@ -174,10 +175,11 @@ balsa_index_page_window_init(BalsaIndexPage *bip)
 		     (GtkSignalFunc) index_button_press_cb, bip);
   
   /* setup the dnd stuff for the messages */
-  gtk_object_set(GTK_OBJECT(index), "use_drag_icons", FALSE, NULL);
-  gtk_object_set(GTK_OBJECT(index), "reorderable", FALSE, NULL);
-  // XXX
-  //  index_child_setup_dnd(child);
+/*   gtk_object_set(GTK_OBJECT(index), "use_drag_icons", FALSE, NULL); */
+/*   gtk_object_set(GTK_OBJECT(index), "reorderable", FALSE, NULL); */
+  
+  /* FIXME: DND support is broken */
+  /* index_child_setup_dnd(child); */
 
   bip->index = index;
   bip->sw = sw;
@@ -715,14 +717,15 @@ transfer_messages_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row,
     balsa_index_page_reset(page);
 	
 }
-/* DND features                                              */
 
 #ifdef DND_USED
-
+/* DND features */
 /*--*/
 /* forward declaration of the dnd callbacks */
-static void index_child_drag_data_get (GtkWidget *widget, GdkDragContext *context,
-			  GtkSelectionData *selection_data, guint info, guint32 time);
+static void index_child_drag_data_get (GtkWidget *widget, 
+                                       GdkDragContext *context, 
+                                       GtkSelectionData *selection_data, 
+                                       guint info, guint32 time);
 
 /*--*/
 

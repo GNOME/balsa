@@ -2749,7 +2749,7 @@ part_context_menu_vfs_cb(GtkWidget * menu_item, BalsaPartInfo * info)
                     (app->expects_uris ==
                      GNOME_VFS_MIME_APPLICATION_ARGUMENT_TYPE_URIS);
                 gchar *exe_str =
-                    g_strdup_printf("%s %s%s", app->command,
+                    g_strdup_printf("%s \"%s%s\"", app->command,
                                     tmp ? "file:" : "",
                                     info->body->temp_filename);
                 

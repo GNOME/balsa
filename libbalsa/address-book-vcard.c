@@ -52,6 +52,7 @@ static void libbalsa_address_book_vcard_init(LibBalsaAddressBookVcard *ab);
 static void libbalsa_address_book_vcard_finalize(GObject * object);
 
 static LibBalsaABErr libbalsa_address_book_vcard_load(LibBalsaAddressBook* ab,
+                                                      const gchar *filter,
                                                       LibBalsaAddressBookLoadFunc
                                                       callback, 
                                                       gpointer closure);
@@ -208,6 +209,7 @@ vcard_address_book_need_reload(LibBalsaAddressBookVcard *ab)
 
 static LibBalsaABErr
 libbalsa_address_book_vcard_load(LibBalsaAddressBook * ab,
+                                 const gchar *filter,
                                  LibBalsaAddressBookLoadFunc callback,
                                  gpointer closure)
 {

@@ -114,6 +114,7 @@ const gchar *libbalsa_address_get_phrase(LibBalsaAddress * address);
     is provided. The edit entries are set in entries array 
     and enumerated with LibBalsaAddressField constants
 */
-GtkWidget* libbalsa_address_get_edit_widget(LibBalsaAddress *addr,
+GtkWidget *libbalsa_address_get_edit_widget(LibBalsaAddress *addr,
                                             GtkWidget **entries);
+LibBalsaAddress *libbalsa_address_new_from_edit_entries(GtkWidget **widget);
 #endif				/* __LIBBALSA_ADDRESS_H__ */

@@ -42,6 +42,9 @@ struct _BalsaAbWindow
     /* The current address book */
     LibBalsaAddressBook *current_address_book;
 
+    /* the filter entry */
+    GtkWidget *filter_entry;
+
     /* The address list */
     GtkWidget *address_list;
 

@@ -1,3 +1,15 @@
+2003-08-10  Pawel Salek  <pawsa theochem.kth.se>
+
+	* libbalsa/address-book*.[hc]:
+	* libbalsa/address-book-*.[hc]: add ability of filtering entries
+	on loading to improve handling of large address books.
+	* libbalsa/address.[hc]: lb_addr__new_from_edit_entries implemented.
+	* src/ab-main.c: further work.
+	* src/ab-window.[hc]: filtering support.
+	* src/address-book-config.c: close ldap connection after changing
+	config.
+	* src/store-address.c: factor out common code to address.c
+	
 2003-08-08  Pawel Salek  <pawsa theochem.kth.se>
 
 	* libbalsa/address-book-ldap.c: implement "{add,modify,remove}-address"

@@ -192,7 +192,6 @@ static void
 balsa_ab_window_init(BalsaAbWindow *ab)
 {
     GtkWidget *find_label,
-	*find_entry,
 	*vbox, *vbox2,
 	*w,
 	*hbox,
@@ -265,9 +264,9 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     find_label = gtk_label_new(_("Search for Name:"));
     gtk_widget_show(find_label);
 
-    find_entry = gtk_entry_new();
-    gtk_widget_show(find_entry);
-    g_signal_connect(G_OBJECT(find_entry), "changed",
+    ab->filter_entry = gtk_entry_new();
+    gtk_widget_show(ab->filter_entry);
+    g_signal_connect(G_OBJECT(ab->filter_entry), "changed",
 		     G_CALLBACK(balsa_ab_window_find), ab);
     
     /* Horizontal layout */
@@ -284,7 +283,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     box2 = gtk_hbox_new(FALSE, 1);
     gtk_box_pack_start(GTK_BOX(vbox2), box2, FALSE, FALSE, 1);
     gtk_box_pack_start(GTK_BOX(box2), find_label, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(box2), find_entry, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(box2), ab->filter_entry, TRUE, TRUE, 0);
     gtk_widget_show(GTK_WIDGET(box2));
 
 
@@ -349,7 +348,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_widget_show(GTK_WIDGET(w));
 
     w = balsa_stock_button_with_label(GTK_STOCK_ADD, 
-                                      _("Re-Import"));
+                                      _("_Re-Import"));
     g_signal_connect(G_OBJECT(w), "clicked",
                      G_CALLBACK(balsa_ab_window_reload),
 		       ab);
@@ -391,7 +390,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_widget_show(box2);
     gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 1);
     
-    gtk_widget_grab_focus(find_entry);
+    gtk_widget_grab_focus(ab->filter_entry);
 }
 
 static void
@@ -655,6 +654,7 @@ balsa_ab_window_load(BalsaAbWindow *ab)
 {
     GtkTreeModel *model;
     LibBalsaABErr err;
+    const gchar *filter;
     g_return_if_fail(BALSA_IS_AB_WINDOW(ab));
 
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(ab->address_list));
@@ -663,7 +663,9 @@ balsa_ab_window_load(BalsaAbWindow *ab)
     if (ab->current_address_book == NULL)
 	return;
 
+    filter = gtk_entry_get_text(GTK_ENTRY(ab->filter_entry));
     if( (err=libbalsa_address_book_load(ab->current_address_book, 
+                                        filter,
                                         (LibBalsaAddressBookLoadFunc)
                                         balsa_ab_window_load_cb,
                                         ab)) != LBABERR_OK) {

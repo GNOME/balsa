@@ -808,6 +808,7 @@ modify_book(AddressBookConfig * abc)
         g_free(ldap->bind_dn);  ldap->bind_dn = g_strdup(bind_dn);
         g_free(ldap->passwd);   ldap->passwd  = g_strdup(passwd);
         ldap->enable_tls = enable_tls;
+        libbalsa_address_book_ldap_close_connection(ldap);
 #endif
     } else
         g_assert_not_reached();

@@ -48,6 +48,7 @@ static void libbalsa_address_book_ldif_init(LibBalsaAddressBookLdif *ab);
 static void libbalsa_address_book_ldif_finalize(GObject * object);
 
 static LibBalsaABErr libbalsa_address_book_ldif_load(LibBalsaAddressBook * ab,
+                                                     const gchar *filter,
                                                      LibBalsaAddressBookLoadFunc 
                                                      callback,
                                                      gpointer closure);
@@ -381,8 +382,9 @@ ldif_address_book_need_reload(LibBalsaAddressBookLdif *ab)
 
 static LibBalsaABErr
 libbalsa_address_book_ldif_load(LibBalsaAddressBook * ab, 
-				LibBalsaAddressBookLoadFunc callback, 
-				gpointer closure)
+                                const gchar *filter,
+                                LibBalsaAddressBookLoadFunc callback, 
+                                gpointer closure)
 {
     GList *lst;
 

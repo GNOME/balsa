@@ -65,6 +65,7 @@ LibBalsaAddressBook *libbalsa_address_book_ldap_new(const gchar *name,
 						    const gchar *bind_dn,
 						    const gchar *passwd,
                                                     gboolean enable_tls);
+void libbalsa_address_book_ldap_close_connection(LibBalsaAddressBookLdap *ab);
 
 
 #endif				/* __LIBBALSA_ADDRESS_BOOK_LDAP_H__ */

@@ -204,7 +204,6 @@ store_address_from_entries(GtkWindow *window, StoreAddressInfo * info,
 {
     LibBalsaAddress *address;
     LibBalsaABErr rc;
-    gint cnt;
     gchar *msg;
 
     if (info->current_address_book == NULL) {
@@ -213,51 +212,7 @@ store_address_from_entries(GtkWindow *window, StoreAddressInfo * info,
         return FALSE;
     }
 
-    /* FIXME: This problem should be solved in the VCard
-       implementation in libbalsa: semicolons mess up how GnomeCard
-       processes the fields, so disallow them */
-    for (cnt = 0; cnt < NUM_FIELDS; cnt++) {
-        const gchar *entry_str =
-            gtk_entry_get_text(GTK_ENTRY(entries[cnt]));
-
-        if (strchr(entry_str, ';')) {
-            balsa_information(LIBBALSA_INFORMATION_ERROR,
-                              _("Sorry, no semicolons are allowed "
-                                "in the name!\n"));
-
-            gtk_editable_select_region(GTK_EDITABLE(entries[cnt]), 0, -1);
-
-            gtk_widget_grab_focus(GTK_WIDGET(entries[cnt]));
-
-            return FALSE;
-        }
-    }
-
-    address = libbalsa_address_new();
-    address->full_name = 
-        g_strstrip(gtk_editable_get_chars
-    	       (GTK_EDITABLE(entries[FULL_NAME]), 0, -1));
-    address->first_name =
-        g_strstrip(gtk_editable_get_chars
-    	       (GTK_EDITABLE(entries[FIRST_NAME]), 0, -1));
-    address->middle_name =
-        g_strstrip(gtk_editable_get_chars
-    	       (GTK_EDITABLE(entries[MIDDLE_NAME]), 0, -1));
-    address->last_name =
-        g_strstrip(gtk_editable_get_chars
-    	       (GTK_EDITABLE(entries[LAST_NAME]), 0, -1));
-    address->nick_name =
-        g_strstrip(gtk_editable_get_chars
-    	       (GTK_EDITABLE(entries[NICK_NAME]), 0, -1));
-    address->organization =
-        g_strstrip(gtk_editable_get_chars
-    	       (GTK_EDITABLE(entries[ORGANIZATION]), 0, -1));
-    address->address_list =
-        g_list_append(address->address_list,
-    		  g_strstrip(gtk_editable_get_chars
-    			     (GTK_EDITABLE(entries[EMAIL_ADDRESS]),
-    			      0, -1)));
-
+    address = libbalsa_address_new_from_edit_entries(entries);
     rc = libbalsa_address_book_add_address(info->current_address_book,
                                            address);
     switch(rc) {

@@ -96,9 +96,9 @@ libbalsa_address_book_class_init(LibBalsaAddressBookClass * klass)
 		       G_SIGNAL_RUN_LAST,
 		       G_STRUCT_OFFSET(LibBalsaAddressBookClass, load),
                        NULL, NULL,
-		       libbalsa_INT__POINTER_POINTER,
-                       G_TYPE_INT, 2,
-		       G_TYPE_POINTER, G_TYPE_POINTER);
+		       libbalsa_INT__POINTER_POINTER_POINTER,
+                       G_TYPE_INT, 3,
+		       G_TYPE_POINTER, G_TYPE_POINTER, G_TYPE_POINTER);
     libbalsa_address_book_signals[ADD_ADDRESS] =
 	g_signal_new("add-address",
 		       G_TYPE_FROM_CLASS(object_class),
@@ -235,6 +235,7 @@ libbalsa_address_book_new_from_config(const gchar * prefix)
 
 LibBalsaABErr
 libbalsa_address_book_load(LibBalsaAddressBook * ab,
+                           const gchar *filter,
                            LibBalsaAddressBookLoadFunc callback,
                            gpointer closure)
 {
@@ -242,7 +243,7 @@ libbalsa_address_book_load(LibBalsaAddressBook * ab,
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab), LBABERR_OK);
 
     g_signal_emit(G_OBJECT(ab), libbalsa_address_book_signals[LOAD], 0,
-                  callback, closure, &res);
+                  filter, callback, closure, &res);
 
     return res;
 }

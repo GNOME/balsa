@@ -21,6 +21,7 @@
 
 #include "config.h"
 
+#include <string.h>
 #include <gnome.h>
 #ifdef GTKHTML_HAVE_GCONF
 # include <gconf/gconf.h>
@@ -39,11 +40,15 @@
 #include "address-book-vcard.h"
 
 struct ABMainWindow {
-    LibBalsaAddressBook* address_book;
+    GtkWidget *entry_list; /* GtkListView widget */
     GtkWidget *edit_box;
     GtkWidget *edit_widget;
     GtkWidget *entries[NUM_FIELDS];
-} ab_main_window = { NULL, NULL, NULL, { NULL } };
+
+    GList *address_book_list;
+    LibBalsaAddressBook* address_book;
+    LibBalsaAddress *displayed_address;
+} contacts_app;
     
 
 static void bab_cleanup(void);
@@ -54,50 +59,33 @@ static gint bab_save_session(GnomeClient * client, gint phase,
                              gpointer client_data);
 static gint bab_kill_session(GnomeClient * client, gpointer client_data);
 
+#define BALSA_CONFIG_PREFIX "balsa/"
+#define ADDRESS_BOOK_SECTION_PREFIX "address-book-"
 static void
 bab_config_init(void)
 {
-}
+    LibBalsaAddressBook *address_book;
+    void *iterator;
+    gchar *key, *val, *tmp;
+    int pref_len = strlen(ADDRESS_BOOK_SECTION_PREFIX);
 
-static GtkItemFactoryEntry menu_items[] = {
-  { "/_File",         NULL,         NULL, 0, "<Branch>" },
-  { "/File/_New",     "<control>N", NULL, 0, NULL },
-  { "/File/_Open",    "<control>O", (GtkItemFactoryCallback)NULL,
-0, NULL },
-  { "/File/_Save",    "<control>S", NULL, 0, NULL },
-  { "/File/Save _As", NULL,         NULL, 0, NULL },
-  { "/File/sep1",     NULL,         NULL, 0, "<Separator>" },
-  { "/File/sep2",     NULL,         NULL, 0, "<Separator>" },
-  { "/File/_Quit",     "<control>Q", (GtkItemFactoryCallback)gtk_main_quit, 
-    0, NULL },
-  { "/_Entry",         NULL,        NULL, 0, "<Branch>" },
-  { "/Entry/_New Person", NULL,   (GtkItemFactoryCallback)NULL, 0, NULL },
-  { "/Entry/_New Group",  NULL,   (GtkItemFactoryCallback)NULL, 0, NULL },
-  { "/Entry/_Delete",  NULL,   (GtkItemFactoryCallback)NULL, 0, NULL },
-  { "/Entry/_Edit...", NULL,   (GtkItemFactoryCallback)NULL, 0, NULL },
-  { "/_Help",          NULL,         NULL, 0, "<LastBranch>" },
-  { "/_Help/_About",   NULL,         NULL, 0, NULL },
-};
+    iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
+    while ((iterator = gnome_config_iterator_next(iterator, &key, &val))) {
 
-static void
-get_main_menu(GtkWidget  *window, GtkWidget **menubar)
-{
-    GtkItemFactory *item_factory;
-    GtkAccelGroup *accel_group;
-    gint nmenu_items = sizeof(menu_items)/sizeof(menu_items[0]);
-    
-    accel_group = gtk_accel_group_new();
-    item_factory = gtk_item_factory_new (GTK_TYPE_MENU_BAR, "<main>",
-                                       accel_group);
-    gtk_item_factory_create_items (item_factory, nmenu_items,
-                                   menu_items, window);
+	if (strncmp(key, ADDRESS_BOOK_SECTION_PREFIX, pref_len) == 0) {
+	    tmp = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
 
-    /* Attach the new accelerator group to the window. */
-    gtk_window_add_accel_group (GTK_WINDOW (window), accel_group);
-    
-    if (menubar)
-        /* Finally, return the actual menu bar created by the item factory. */
-        *menubar = gtk_item_factory_get_widget (item_factory, "<main>");
+	    address_book = libbalsa_address_book_new_from_config(tmp);
+	    if (address_book)
+		contacts_app.address_book_list =
+		    g_list_append(contacts_app.address_book_list,
+				  address_book);
+	    g_free(tmp);
+	}
+	g_free(key);
+	g_free(val);
+    }
+
 }
 
 enum {
@@ -105,95 +93,6 @@ enum {
     LIST_COLUMN_ADDRESS,
     N_COLUMNS
 };
-
-
-static void
-ab_set_edit_widget(GtkWidget *w)
-{
-    g_return_if_fail(w);
-
-    if(ab_main_window.edit_widget)
-        gtk_widget_destroy(ab_main_window.edit_widget);
-    ab_main_window.edit_widget = w;
-    gtk_container_add(GTK_CONTAINER(ab_main_window.edit_box), w);
-    gtk_widget_show_all(w);
-}
-
-static void
-list_selection_changed_cb(GtkTreeSelection *selection, gpointer data)
-{
-    GtkTreeIter iter;
-    GtkTreeModel *model;
-    GValue gv = {0,};
-    GtkWidget *ew;
-    LibBalsaAddress *address;
-
-    gtk_tree_selection_get_selected(selection, &model, &iter);
-    gtk_tree_model_get_value(model, &iter, LIST_COLUMN_ADDRESS, &gv);
-    address = LIBBALSA_ADDRESS(g_value_get_object(&gv));
-    if(address) {
-        ew = libbalsa_address_get_edit_widget(address, ab_main_window.entries);
-        ab_set_edit_widget(ew);
-    } else ab_set_edit_widget(NULL);
-    g_value_unset(&gv);
-}
-
-
-
-static GtkWidget *
-bab_window_list_new(gpointer cb_data)
-{
-    GtkListStore *store;
-    GtkWidget *tree;
-    GtkCellRenderer *renderer;
-    GtkTreeViewColumn *column;
-    GtkTreeSelection *selection;
-
-    store =
-        gtk_list_store_new(N_COLUMNS,
-                           G_TYPE_STRING,   /* LIST_COLUMN_NAME           */
-                           G_TYPE_OBJECT);  /* LIST_COLUMN_ADDRESS        */
-    /*
-    gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(store), 0,
-                                    balsa_ab_window_compare_entries,
-                                    GINT_TO_POINTER(0), NULL);
-    */
-    gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(store), 0,
-                                         GTK_SORT_ASCENDING);
-
-    tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
-    g_object_unref(store);
-
-    renderer = gtk_cell_renderer_text_new();
-    column =
-        gtk_tree_view_column_new_with_attributes(_("Name"),
-                                                 renderer,
-                                                 "text",
-                                                 LIST_COLUMN_NAME, NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
-
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
-    gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
-
-    g_signal_connect(G_OBJECT(selection), "changed", 
-                     G_CALLBACK(list_selection_changed_cb), cb_data);
-
-    gtk_widget_show(tree);
-    return tree;
-}
-
-#define ELEMENTS(x) (sizeof(x)/sizeof((x)[0])) 
-static GtkWidget*
-bab_get_edit_button_box(void)
-{
-    GtkWidget *box;
-    box = gtk_hbutton_box_new();
-    gtk_container_add(GTK_CONTAINER(box),
-                      gtk_button_new_from_stock(GTK_STOCK_APPLY));
-    gtk_container_add(GTK_CONTAINER(box),
-                      gtk_button_new_from_stock(GTK_STOCK_CANCEL));
-    return box;
-}
 
 
 /*
@@ -242,51 +141,242 @@ bab_load_cb(LibBalsaAddressBook *libbalsa_ab,
     }
 }
 
-static LibBalsaAddressBook*
-libbalsa_address_book_from_file(const gchar* fname, GtkWidget* list,
-                                LibBalsaABErr* err)
-{
-    LibBalsaAddressBook* ab;
-    GtkTreeModel* model = gtk_tree_view_get_model(GTK_TREE_VIEW(list));
-    gtk_list_store_clear(GTK_LIST_STORE(model));
-
-    ab = libbalsa_address_book_vcard_new("Address Book", fname);
-    if( (*err=libbalsa_address_book_load(ab, (LibBalsaAddressBookLoadFunc)
-                                         bab_load_cb, model))
-        != LBABERR_OK) {
-        g_object_unref(ab); ab = NULL;
-        printf("error loading vcard addres book from %s: %d %d\n", fname,
-               *err, LBABERR_OK);
-    }
-    return ab;
-}
-
 static gboolean
-bab_set_address_book(const gchar* fl, GtkWidget* list)
+bab_set_address_book(LibBalsaAddressBook *ab, GtkWidget* list)
 {
-    LibBalsaABErr err;
-    LibBalsaAddressBook* new_address_book = 
-        libbalsa_address_book_from_file(fl, list, &err);
-    if(!new_address_book) {
-        printf("Error.\n");
-        return FALSE;
+    LibBalsaABErr ab_err;
+    GtkTreeModel* model = gtk_tree_view_get_model(GTK_TREE_VIEW(list));
+    
+    g_return_val_if_fail(ab, FALSE);
+    contacts_app.address_book = ab;
+
+
+    gtk_list_store_clear(GTK_LIST_STORE(model));
+    if( (ab_err=libbalsa_address_book_load(ab, NULL,
+                                           (LibBalsaAddressBookLoadFunc)
+                                           bab_load_cb, model))
+        != LBABERR_OK) {
+        printf("error loading vcard addres book from %s: %d\n", 
+               ab->name, ab_err);
     }
-    if(ab_main_window.address_book)
-        g_object_unref(ab_main_window.address_book);
-    ab_main_window.address_book = new_address_book;
 
     return TRUE;
 }
+
+static void
+select_address_book_cb(gpointer callback_data, guint callback_action,
+                       GtkWidget *w)
+{
+    GList *l = g_list_nth(contacts_app.address_book_list,
+                          GPOINTER_TO_INT(callback_data));
+    if(!l) return;
+    bab_set_address_book(LIBBALSA_ADDRESS_BOOK(l->data),
+                         contacts_app.entry_list);
+}
+
+static GtkItemFactoryEntry menu_items[] = {
+  { "/_File",         NULL,         NULL, 0, "<Branch>" },
+  { "/File/_New",     "<control>N", NULL, 0, NULL },
+  { "/File/_Open",    "<control>O", (GtkItemFactoryCallback)NULL,
+0, NULL },
+  { "/File/_Save",    "<control>S", NULL, 0, NULL },
+  { "/File/Save _As", NULL,         NULL, 0, NULL },
+  { "/File/sep1",     NULL,         NULL, 0, "<Separator>" },
+  { "/File/_Quit",     "<control>Q", (GtkItemFactoryCallback)gtk_main_quit, 
+    0, NULL },
+  { "/File/sep2",     NULL,         NULL, 0, "<Separator>" },
+  { "/_Entry",         NULL,        NULL, 0, "<Branch>" },
+  { "/Entry/_New Person", NULL,   (GtkItemFactoryCallback)NULL, 0, NULL },
+  { "/Entry/_New Group",  NULL,   (GtkItemFactoryCallback)NULL, 0, NULL },
+  { "/Entry/_Delete",  NULL,   (GtkItemFactoryCallback)NULL, 0, NULL },
+  { "/Entry/_Edit...", NULL,   (GtkItemFactoryCallback)NULL, 0, NULL },
+  { "/_Help",          NULL,         NULL, 0, "<LastBranch>" },
+  { "/_Help/_About",   NULL,         NULL, 0, NULL },
+};
+
+static void
+get_main_menu(GtkWidget  *window, GtkWidget **menubar, GList* address_books)
+{
+    GtkItemFactory *item_factory;
+    GtkAccelGroup *accel_group;
+    gint nmenu_items = sizeof(menu_items)/sizeof(menu_items[0]);
+    GList *ab;
+    int cnt;
+    gchar *first_ab_path = NULL;
+
+    accel_group = gtk_accel_group_new();
+    item_factory = gtk_item_factory_new (GTK_TYPE_MENU_BAR, "<main>",
+                                       accel_group);
+    gtk_item_factory_create_items (item_factory, nmenu_items,
+                                   menu_items, window);
+    
+    for(cnt=1, ab= address_books; ab; ab = ab->next, cnt++) {
+        LibBalsaAddressBook *address_book = LIBBALSA_ADDRESS_BOOK(ab->data);
+        GtkItemFactoryEntry gife;
+        gife.path = g_strdup_printf("/File/_%d:%s", cnt,
+                                    address_book->name);
+        gife.accelerator = cnt<=9 
+            ? g_strdup_printf("<control>%d", cnt) : NULL;
+        gife.callback = select_address_book_cb;
+        gife.callback_action = 0;
+        gife.item_type = first_ab_path ? first_ab_path : "<RadioItem>";
+        gife.extra_data = NULL;
+        gtk_item_factory_create_item(item_factory, &gife, 
+                                     GINT_TO_POINTER(cnt-1), 1);
+        g_free(gife.accelerator);
+        g_free(gife.path);
+        if(!first_ab_path)
+            first_ab_path = g_strdup_printf("/File/1:%s",
+                                    address_book->name);
+    }
+    g_free(first_ab_path);
+    /* Attach the new accelerator group to the window. */
+    gtk_window_add_accel_group (GTK_WINDOW (window), accel_group);
+    
+    if (menubar)
+        /* Finally, return the actual menu bar created by the item factory. */
+        *menubar = gtk_item_factory_get_widget (item_factory, "<main>");
+}
+
+
+static void
+ab_set_edit_widget(GtkWidget *w)
+{
+    g_return_if_fail(w);
+
+    if(contacts_app.edit_widget)
+        gtk_widget_destroy(contacts_app.edit_widget);
+    contacts_app.edit_widget = w;
+    gtk_container_add(GTK_CONTAINER(contacts_app.edit_box), w);
+    gtk_widget_show_all(w);
+}
+
+static void
+list_selection_changed_cb(GtkTreeSelection *selection, gpointer data)
+{
+    GtkTreeIter iter;
+    GtkTreeModel *model;
+    GValue gv = {0,};
+    GtkWidget *ew;
+    LibBalsaAddress *address;
+
+    gtk_tree_selection_get_selected(selection, &model, &iter);
+    gtk_tree_model_get_value(model, &iter, LIST_COLUMN_ADDRESS, &gv);
+    address = LIBBALSA_ADDRESS(g_value_get_object(&gv));
+    if(address) {
+        ew = libbalsa_address_get_edit_widget(address, contacts_app.entries);
+        ab_set_edit_widget(ew);
+    } else ab_set_edit_widget(NULL);
+    g_value_unset(&gv);
+    contacts_app.displayed_address = address;
+    printf("selection_changed_cb: %s\n",
+           contacts_app.displayed_address->first_name);
+}
+
+
+
+static GtkWidget *
+bab_window_list_new(gpointer cb_data)
+{
+    GtkListStore *store;
+    GtkWidget *tree;
+    GtkCellRenderer *renderer;
+    GtkTreeViewColumn *column;
+    GtkTreeSelection *selection;
+
+    store =
+        gtk_list_store_new(N_COLUMNS,
+                           G_TYPE_STRING,   /* LIST_COLUMN_NAME           */
+                           G_TYPE_OBJECT);  /* LIST_COLUMN_ADDRESS        */
+    /*
+    gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(store), 0,
+                                    balsa_ab_window_compare_entries,
+                                    GINT_TO_POINTER(0), NULL);
+    */
+    gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(store), 0,
+                                         GTK_SORT_ASCENDING);
+
+    tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+    g_object_unref(store);
+
+    renderer = gtk_cell_renderer_text_new();
+    column =
+        gtk_tree_view_column_new_with_attributes(_("Name"),
+                                                 renderer,
+                                                 "text",
+                                                 LIST_COLUMN_NAME, NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
+
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
+    gtk_tree_selection_set_mode(selection, GTK_SELECTION_BROWSE);
+
+    g_signal_connect(G_OBJECT(selection), "changed", 
+                     G_CALLBACK(list_selection_changed_cb), cb_data);
+
+    gtk_widget_show(tree);
+    return tree;
+}
+
+static void
+apply_button_cb(GtkWidget *w, gpointer data)
+{
+    LibBalsaAddress * newval =
+        libbalsa_address_new_from_edit_entries(contacts_app.entries);
+    libbalsa_address_book_modify_address(contacts_app.address_book,
+                                         contacts_app.displayed_address,
+                                         newval);
+    /* FIXME: error handling here! */
+    g_object_unref(newval);
+}
+
+static void
+remove_button_cb(GtkWidget *w, gpointer data)
+{
+    /* FIXME: removal code really needs some work.
+     * in particular, the list of entries is not updated after 
+     * address removal. */
+    libbalsa_address_book_remove_address(contacts_app.address_book,
+                                         contacts_app.displayed_address);
+    contacts_app.displayed_address = NULL;
+    /* FIXME: error handling here! */    
+}
+static void
+cancel_button_cb(GtkWidget *w, gpointer data)
+{
+}
+
+#define ELEMENTS(x) (sizeof(x)/sizeof((x)[0])) 
+static GtkWidget*
+bab_get_edit_button_box(void)
+{
+    GtkWidget *box, *button;
+    box = gtk_hbutton_box_new();
+    gtk_container_add(GTK_CONTAINER(box),
+                      button=gtk_button_new_from_stock(GTK_STOCK_APPLY));
+    g_signal_connect(G_OBJECT(button), "clicked",
+                     G_CALLBACK(apply_button_cb), (gpointer) NULL);
+     gtk_container_add(GTK_CONTAINER(box),
+                      button=gtk_button_new_from_stock(GTK_STOCK_REMOVE));
+    g_signal_connect(G_OBJECT(button), "clicked",
+                     G_CALLBACK(remove_button_cb), (gpointer) NULL);
+    gtk_container_add(GTK_CONTAINER(box),
+                      button=gtk_button_new_from_stock(GTK_STOCK_CANCEL));
+    g_signal_connect(G_OBJECT(button), "clicked",
+                     G_CALLBACK(cancel_button_cb), (gpointer) NULL);
+    return box;
+}
+
+
 
 static GtkWidget*
 bab_window_new()
 {
     GtkWidget* menubar, *main_vbox, *search_hbox, *cont_box, *vbox, *scroll;
-    GtkWidget *find_label, *find_entry, *list;
+    GtkWidget *find_label, *find_entry;
     GtkWidget *wnd = gnome_app_new("Contacts", "Contacts");
-    gchar* fl;
+    GList *first_ab;
 
-    get_main_menu(GTK_WIDGET(wnd), &menubar);
+    get_main_menu(GTK_WIDGET(wnd), &menubar, contacts_app.address_book_list);
     gnome_app_set_menus(GNOME_APP(wnd), GTK_MENU_BAR(menubar));
     /* main vbox */
     main_vbox = gtk_vbox_new(FALSE, 1);
@@ -296,14 +386,15 @@ bab_window_new()
     gtk_widget_show(search_hbox);
     gtk_box_pack_start(GTK_BOX(main_vbox), search_hbox, FALSE, FALSE, 1);
 
-    find_label = gtk_label_new_with_mnemonic(_("_Search for Name:"));
+    find_label = gtk_label_new_with_mnemonic(_("F_ilter:"));
     gtk_widget_show(find_label);
     gtk_box_pack_start(GTK_BOX(search_hbox), find_label, FALSE, FALSE, 1);
     find_entry = gtk_entry_new();
     gtk_widget_show(find_entry);
     gtk_box_pack_start(GTK_BOX(search_hbox), find_entry, TRUE, TRUE, 1);
     gtk_widget_show(search_hbox);
-    
+    gtk_label_set_mnemonic_widget(GTK_LABEL(find_label), find_entry);
+
     cont_box = gtk_hbox_new(FALSE, 1);
     gtk_box_pack_start(GTK_BOX(main_vbox), cont_box, TRUE,TRUE, 1);
 
@@ -313,13 +404,13 @@ bab_window_new()
 				   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_box_pack_start(GTK_BOX(cont_box), scroll, TRUE,TRUE, 1);
     
-    list=bab_window_list_new(NULL);
-    gtk_container_add(GTK_CONTAINER(scroll), list);
+    contacts_app.entry_list = bab_window_list_new(NULL);
+    gtk_container_add(GTK_CONTAINER(scroll), contacts_app.entry_list);
 
     vbox = gtk_vbox_new(FALSE, 1);
     gtk_box_pack_start(GTK_BOX(cont_box), vbox, TRUE,TRUE, 1);
-    ab_main_window.edit_box = gtk_vbox_new(FALSE, 1);
-    gtk_box_pack_start(GTK_BOX(vbox), ab_main_window.edit_box,
+    contacts_app.edit_box = gtk_vbox_new(FALSE, 1);
+    gtk_box_pack_start(GTK_BOX(vbox), contacts_app.edit_box,
                        TRUE,TRUE, 1);
     gtk_box_pack_start(GTK_BOX(vbox), bab_get_edit_button_box(),
                        TRUE,TRUE, 1);
@@ -330,9 +421,10 @@ bab_window_new()
     gtk_window_set_default_size(GTK_WINDOW(wnd), 500, 400);
     gnome_app_set_contents(GNOME_APP(wnd), main_vbox);
 
-    fl = g_strconcat(g_get_home_dir(),"/.GnomeCard.gcrd", NULL);
-    bab_set_address_book(fl, list);
-    g_free(fl);
+    first_ab = g_list_first(contacts_app.address_book_list);
+    if(first_ab)
+        bab_set_address_book(LIBBALSA_ADDRESS_BOOK(first_ab->data),
+                             contacts_app.entry_list);
     return wnd;
 }
 
@@ -351,8 +443,7 @@ bab_init(void)
 #if ENABLE_LDAP
     LIBBALSA_TYPE_ADDRESS_BOOK_LDAP;
 #endif
-    ab_main_window.edit_box    = NULL;
-    ab_main_window.edit_widget = NULL;
+    memset(&contacts_app, 0, sizeof(contacts_app));
 }
 
 int

@@ -792,14 +792,18 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries)
 		;
 
 	    /* get first name */
-	    first_name = g_strdup(names[0]);
+	    first_name = g_strdup(address->first_name 
+                                  ? address->first_name : names[0]);
 
 	    /* get last name */
-	    if (cnt == 1)
-		last_name = g_strdup("");
-	    else
-		last_name = g_strdup(names[cnt - 1]);
-
+            if(address->last_name)
+                last_name = g_strdup(address->last_name);
+            else {
+                if (cnt == 1)
+                    last_name = g_strdup("");
+                else
+                    last_name = g_strdup(names[cnt - 1]);
+            }
 	    /* get middle name */
 	    middle_name = g_strdup("");
 
@@ -866,4 +870,49 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries)
     g_free(new_email);
     g_free(new_organization);
     return table;
+}
+
+LibBalsaAddress*
+libbalsa_address_new_from_edit_entries(GtkWidget **entries)
+{
+    LibBalsaAddress *address;
+    char *p, *addr;
+    /* FIXME: This problem should be solved in the VCard
+       implementation in libbalsa: semicolons mess up how GnomeCard
+       processes the fields, so disallow them and replace them
+       by commas. */
+
+    address = libbalsa_address_new();
+    address->full_name = 
+        g_strstrip(gtk_editable_get_chars
+    	       (GTK_EDITABLE(entries[FULL_NAME]), 0, -1));
+    while( (p=strchr(address->full_name,';'))) *p = ',';
+    address->first_name =
+        g_strstrip(gtk_editable_get_chars
+    	       (GTK_EDITABLE(entries[FIRST_NAME]), 0, -1));
+    while( (p=strchr(address->first_name,';'))) *p = ',';
+    address->middle_name =
+        g_strstrip(gtk_editable_get_chars
+    	       (GTK_EDITABLE(entries[MIDDLE_NAME]), 0, -1));
+    while( (p=strchr(address->middle_name,';'))) *p = ',';
+    address->last_name =
+        g_strstrip(gtk_editable_get_chars
+    	       (GTK_EDITABLE(entries[LAST_NAME]), 0, -1));
+    while( (p=strchr(address->last_name,';'))) *p = ',';
+    address->nick_name =
+        g_strstrip(gtk_editable_get_chars
+    	       (GTK_EDITABLE(entries[NICK_NAME]), 0, -1));
+    while( (p=strchr(address->nick_name,';'))) *p = ',';
+    address->organization =
+        g_strstrip(gtk_editable_get_chars
+    	       (GTK_EDITABLE(entries[ORGANIZATION]), 0, -1));
+    while( (p=strchr(address->organization,';'))) *p = ',';
+
+    addr = g_strstrip(gtk_editable_get_chars
+                      (GTK_EDITABLE(entries[EMAIL_ADDRESS]),
+                       0, -1));
+    while( (p=strchr(addr, ';'))) *p = ',';
+
+    address->address_list = g_list_append(address->address_list,addr);
+    return address;
 }

@@ -64,6 +64,7 @@ struct _LibBalsaAddressBookClass {
     GObjectClass parent;
 
     LibBalsaABErr (*load) (LibBalsaAddressBook * ab,
+                           const gchar *filter,
                            LibBalsaAddressBookLoadFunc callback,
                            gpointer closure);
 
@@ -105,6 +106,7 @@ LibBalsaAddressBook *libbalsa_address_book_new_from_config(const gchar *
   address==NULL.  
 */
 LibBalsaABErr libbalsa_address_book_load(LibBalsaAddressBook * ab,
+                                         const char *filter,
                                          LibBalsaAddressBookLoadFunc callback,
                                          gpointer closure);
 

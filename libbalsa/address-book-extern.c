@@ -46,6 +46,7 @@ static void libbalsa_address_book_externq_init(LibBalsaAddressBookExtern *ab);
 static void libbalsa_address_book_externq_finalize(GObject * object);
 
 static LibBalsaABErr libbalsa_address_book_externq_load(LibBalsaAddressBook* ab, 
+                                                        const gchar *filter,
                                                         LibBalsaAddressBookLoadFunc 
                                                         callback, 
                                                         gpointer closure);
@@ -184,6 +185,7 @@ libbalsa_address_book_externq_new(const gchar * name, const gchar * load,
 
 static LibBalsaABErr
 libbalsa_address_book_externq_load(LibBalsaAddressBook * ab, 
+                                   const gchar *filter,
                                    LibBalsaAddressBookLoadFunc callback, 
                                    gpointer closure)
 {

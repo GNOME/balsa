@@ -1,3 +1,8 @@
+2000-10-06  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* Various files: Allow the subject to be displayed in another font
+	(ie bold)
+
 2000-10-06  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* NEWS,README,configure.in: release balsa-1.0.pre2

@@ -69,35 +69,52 @@ ab_cancel_cb(GtkWidget * widget, gpointer data)
 	return FALSE;
 }
 
+/* ab_okay_cb:
+   processes the OK button pressed event. 
+   keep watch on memory leaks.
+*/
 static gint
 ab_okay_cb(GtkWidget * widget, gpointer data)
 {
-	gpointer        row;
-	gchar          *text;
-	gchar           new[512];
-
-	if (composing) {
-
-		text = gtk_entry_get_text(GTK_ENTRY(ab_entry));
-		strcpy(new, text);
-
-		while ((row = gtk_clist_get_row_data(GTK_CLIST(add_clist), 0))) {
-			AddressData    *addy = (AddressData *) row;
-			sprintf(new, "%s%s%s <%s>", new, 
-				((*new != '\0') ? ", " : ""), 
-				addy->name, addy->addy);
-			g_free (addy->name);
-			g_free (addy->addy);
-                        g_free (addy->id);
-			g_free (addy);
-			gtk_clist_remove(GTK_CLIST(add_clist), 0);
-		}
-
-		gtk_entry_set_text(GTK_ENTRY(ab_entry), new);
-	}
-	ab_cancel_cb(widget, data);
+    gpointer        row;
+    gchar          *addr_str, *str, *new_addr;
+    
+    if (composing) {
 	
-	return FALSE;
+	addr_str = g_strdup( gtk_entry_get_text(GTK_ENTRY(ab_entry)) );
+	g_strchomp(addr_str);
+	
+	while ((row = gtk_clist_get_row_data(GTK_CLIST(add_clist), 0))) {
+	    AddressData    *addy = (AddressData *) row;
+	
+	    if(strchr(addy->addy,',') != NULL)
+		str = addy->addy;
+	    else {
+		str = g_strdup_printf("%s <%s>", addy->name, addy->addy);
+		g_free(addy->addy);
+	    }
+	    g_free (addy->name);
+	    g_free (addy->id);
+	    g_free (addy);
+	    gtk_clist_remove(GTK_CLIST(add_clist), 0);
+	    
+	    if(*addr_str) {
+		new_addr = g_strconcat(addr_str,", ", str, NULL);
+		g_free(str);
+	    }
+	    else
+		new_addr = str;
+
+	    g_free(addr_str);
+	    addr_str = new_addr;
+	}
+	
+	gtk_entry_set_text(GTK_ENTRY(ab_entry), addr_str);
+	g_free(addr_str);
+    }
+    ab_cancel_cb(widget, data);
+    
+    return FALSE;
 }
 
 static void 
@@ -335,9 +352,15 @@ ab_load(GtkWidget * widget, gpointer data)
 	 continue;
       }
 
-      /* fetch only first internet e-mail field */
-      if (!email && g_strncasecmp (string, "EMAIL;INTERNET:",15) == 0)
-	 email = g_strdup(string+15);
+      /* fetch all internet e-mail fields */
+      if (g_strncasecmp (string, "EMAIL;INTERNET:",15) == 0) {
+	  if(email) {
+	      gchar * new = g_strconcat(email,", ", string+15, NULL);
+	      g_free(email); 
+	      email = new;
+	  } else 
+	      email = g_strdup(string+15);
+      }
    }	 
 
    gtk_clist_set_column_width(GTK_CLIST(book_clist), 0, 

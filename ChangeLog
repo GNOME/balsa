@@ -1,5 +1,7 @@
-2003-11-24 09:00  PeterB
+2003-11-24 14:42  PeterB
 
+	* libbalsa/: mailbox.c, mailbox_imap.c, mailbox_local.c: Remove
+	some now-redundant g_mime_stream_set_bounds() calls.
 	* libbalsa/imap/: imap-commands.c, imap-commands.h: Add length
 	argument to imap_mbox_append_stream().
 	* libbalsa/: mailbox.c, mailbox_maildir.c, mailbox_mbox.c,

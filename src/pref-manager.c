@@ -20,30 +20,38 @@
 #include "pref-manager.h"
 #include "balsa-app.h"
 
+
+
 typedef struct _PreferencesManagerWindow PreferencesManagerWindow;
 struct _PreferencesManagerWindow
-  {
-    GtkWidget *window;
-
-    /* identity */
-    GtkWidget *real_name;
-    GtkWidget *email;
-    GtkWidget *organization;
-
-    /* local */
-    GtkWidget *mail_directory;
-
-    /* servers */
-    GtkWidget *smtp_server;
-
-  };
+{
+  GtkWidget *window;
+  
+  /* identity */
+  GtkWidget *real_name;
+  GtkWidget *email;
+  GtkWidget *organization;
+  
+  /* local */
+  GtkWidget *mail_directory;
+  
+  /* servers */
+  GtkWidget *smtp_server;
+  
+};
 
 static PreferencesManagerWindow *pmw = NULL;
 
-static gint preferences_manager_destroy ();
 
-static GtkWidget *create_identity_page ();
-static void refresh_identity_data ();
+
+/* notebook pages */
+static GtkWidget * create_identity_page ();
+
+
+/* callbacks */
+static void ok_preferences_manager ();
+static void cancel_preferences_manager ();
+
 
 
 
@@ -53,6 +61,7 @@ open_preferences_manager ()
   GtkWidget *label;
   GtkWidget *vbox;
   GtkWidget *hbox;
+  GtkWidget *bbox;
   GtkWidget *button;
   GtkWidget *notebook;
 
@@ -63,30 +72,43 @@ open_preferences_manager ()
 
   pmw = g_malloc (sizeof (PreferencesManagerWindow));
 
-  pmw->window = gtk_window_new (GTK_WINDOW_DIALOG);
-  gtk_container_border_width (GTK_CONTAINER (pmw->window), 3);
+
+
+  pmw->window = gtk_dialog_new ();
+  gtk_widget_set_usize (pmw->window,
+			PREFERENCES_MANAGER_WIDTH,
+			PREFERENCES_MANAGER_HEIGHT);
   gtk_window_set_title (GTK_WINDOW (pmw->window), "Preferences");
-  gtk_window_set_wmclass (GTK_WINDOW (pmw->window), "preferences_manager",
+  gtk_window_set_wmclass (GTK_WINDOW (pmw->window), 
+			  "preferences_manager",
 			  "Balsa");
-  gtk_widget_set_usize (pmw->window, 400, 300);
   gtk_window_position (GTK_WINDOW (pmw->window), GTK_WIN_POS_CENTER);
+
+  gtk_container_border_width (GTK_CONTAINER (pmw->window), 0);
+
+  gtk_signal_connect (GTK_OBJECT (pmw->window),
+		      "destroy",
+		      (GtkSignalFunc) cancel_preferences_manager,
+		      NULL);
 
   gtk_signal_connect (GTK_OBJECT (pmw->window),
 		      "delete_event",
-		      GTK_SIGNAL_FUNC (preferences_manager_destroy),
+		      (GtkSignalFunc) gtk_false,
 		      NULL);
 
 
-  vbox = gtk_vbox_new (FALSE, 0);
-  gtk_container_add (GTK_CONTAINER (pmw->window), vbox);
-  gtk_widget_show (vbox);
+  /* get the vbox from the dialog window */
+  hbox = gtk_hbox_new (FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (pmw->window)->vbox), hbox, TRUE, TRUE, 5);
+  gtk_widget_show (hbox);
 
 
   /* notbook */
   notebook = gtk_notebook_new ();
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
-  gtk_box_pack_start (GTK_BOX (vbox), notebook, TRUE, TRUE, 5);
+  gtk_box_pack_start (GTK_BOX (hbox), notebook, TRUE, TRUE, 5);
   gtk_widget_show (notebook);
+
 
   /* identity page */
   label = gtk_label_new ("Identity");
@@ -95,21 +117,86 @@ open_preferences_manager ()
 			    label);
 
 
+  /* ok/cancel buttons (bottom dialog) */
+  bbox = gtk_hbutton_box_new ();
+  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (pmw->window)->action_area), bbox, TRUE, TRUE, 0);
+  gtk_button_box_set_layout (GTK_BUTTON_BOX (bbox), GTK_BUTTONBOX_END);
+  gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox),
+				 BALSA_BUTTON_WIDTH,
+				 BALSA_BUTTON_HEIGHT);
+  gtk_widget_show (bbox);
+
+
+  button = gnome_stock_button (GNOME_STOCK_BUTTON_OK);
+  gtk_container_add (GTK_CONTAINER (bbox), button);
+
+  gtk_signal_connect_object (GTK_OBJECT (button),
+			     "clicked",
+			     (GtkSignalFunc) ok_preferences_manager,
+			     GTK_OBJECT (pmw->window));
+
+  gtk_widget_show (button);
+
+
+  button = gnome_stock_button (GNOME_STOCK_BUTTON_CANCEL);
+  gtk_container_add (GTK_CONTAINER (bbox), button);
+
+  gtk_signal_connect_object (GTK_OBJECT (button),
+			     "clicked",
+			     (GtkSignalFunc) gtk_widget_destroy,
+			     GTK_OBJECT (pmw->window));
+
+  gtk_widget_show (button);
+
+
+
+
   /* set data and show the whole thing */
-  refresh_identity_data ();
+  refresh_preferences_manager ();
   gtk_widget_show (pmw->window);
 }
 
-static gint
-preferences_manager_destroy ()
-{
-  g_free (pmw);
-  pmw = NULL;
 
-  return FALSE;
+static void
+ok_preferences_manager ()
+{
 }
 
 
+static void
+cancel_preferences_manager ()
+{
+  g_free (pmw);
+  pmw = NULL;
+}
+
+
+
+/*
+ * refresh data in the preferences window
+ */
+void
+refresh_preferences_manager ()
+{
+  gchar *email;
+
+  email = g_malloc (strlen (balsa_app.username) + 1 + strlen (balsa_app.hostname) + 2);
+  sprintf (email, "%s@%s\0", balsa_app.username, balsa_app.hostname);
+
+
+  gtk_entry_set_text (GTK_ENTRY (pmw->real_name), balsa_app.real_name);
+  gtk_entry_set_text (GTK_ENTRY (pmw->email), email);
+  gtk_entry_set_text (GTK_ENTRY (pmw->organization), balsa_app.organization);
+
+
+  g_free (email);
+}
+
+
+
+/*
+ * identity notebook page
+ */
 static GtkWidget *
 create_identity_page ()
 {
@@ -125,7 +212,7 @@ create_identity_page ()
 
 
   table = gtk_table_new (3, 2, FALSE);
-  gtk_box_pack_start (GTK_BOX (vbox), table, TRUE, TRUE, 10);
+  gtk_box_pack_start (GTK_BOX (vbox), table, TRUE, TRUE, 0);
   gtk_widget_show (table);
 
 
@@ -133,35 +220,32 @@ create_identity_page ()
   label = gtk_label_new ("Your Name:");
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
-		    GTK_EXPAND | GTK_FILL,
-		    GTK_EXPAND | GTK_FILL,
-		    10, 0);
+		    GTK_FILL, GTK_FILL,
+		    10, 10);
   gtk_widget_show (label);
 
 
   pmw->real_name = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), pmw->real_name, 1, 2, 0, 1,
-		    GTK_EXPAND | GTK_FILL,
-		    GTK_EXPAND | GTK_FILL,
-		    0, 0);
+		    GTK_EXPAND | GTK_FILL, GTK_FILL,
+		    0, 10);
   gtk_widget_show (pmw->real_name);
+
 
 
   /* email address */
   label = gtk_label_new ("E-Mail Address:");
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
-		    GTK_EXPAND | GTK_FILL,
-		    GTK_EXPAND | GTK_FILL,
-		    10, 0);
+		    GTK_FILL, GTK_FILL,
+		    10, 10);
   gtk_widget_show (label);
 
 
   pmw->email = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), pmw->email, 1, 2, 1, 2,
-		    GTK_EXPAND | GTK_FILL,
-		    GTK_EXPAND | GTK_FILL,
-		    0, 0);
+		    GTK_EXPAND | GTK_FILL, GTK_FILL,
+		    0, 10);
   gtk_widget_show (pmw->email);
 
 
@@ -169,47 +253,17 @@ create_identity_page ()
   label = gtk_label_new ("Organization:");
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 2, 3,
-		    GTK_EXPAND | GTK_FILL,
-		    GTK_EXPAND | GTK_FILL,
-		    10, 0);
+		    GTK_FILL, GTK_FILL,
+		    10, 10);
   gtk_widget_show (label);
 
 
   pmw->organization = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), pmw->organization, 1, 2, 2, 3,
-		    GTK_EXPAND | GTK_FILL,
-		    GTK_EXPAND | GTK_FILL,
-		    0, 0);
+		    GTK_EXPAND | GTK_FILL, GTK_FILL,
+		    0, 10);
   gtk_widget_show (pmw->organization);
 
 
-  button = gtk_button_new_with_label ("Close");
-  gtk_widget_set_usize (button, 70, 30);
-  gtk_box_pack_start (GTK_BOX (vbox), button, TRUE, FALSE, 10);
-  gtk_widget_show (button);
-
-  gtk_signal_connect (GTK_OBJECT (button),
-		      "clicked",
-		      GTK_SIGNAL_FUNC (preferences_manager_destroy),
-		      NULL);
-
-  gtk_signal_connect_object (GTK_OBJECT (button),
-			     "clicked",
-			     GTK_SIGNAL_FUNC (gtk_widget_destroy),
-			     GTK_OBJECT (pmw->window));
-
   return vbox;
-}
-
-
-static void
-refresh_identity_data ()
-{
-  gchar *email;
-  email = g_malloc (strlen (balsa_app.username) + 1 + strlen (balsa_app.hostname) + 2);
-  sprintf (email, "%s@%s\0", balsa_app.username, balsa_app.hostname);
-  gtk_entry_set_text (GTK_ENTRY (pmw->real_name), balsa_app.real_name);
-  gtk_entry_set_text (GTK_ENTRY (pmw->email), email);
-  gtk_entry_set_text (GTK_ENTRY (pmw->organization), balsa_app.organization);
-  g_free (email);
 }

@@ -26,6 +26,17 @@
 #include "main-window.h"
 
 
+/* global definitions */
+#define BALSA_BUTTON_HEIGHT  30
+#define BALSA_BUTTON_WIDTH  70
+
+#define PREFERENCES_MANAGER_WIDTH 350
+#define PREFERENCES_MANAGER_HEIGHT 400
+
+#define MAILBOX_MANAGER_WIDTH 350
+#define MAILBOX_MANAGER_HEIGHT 400
+
+
 /* global balsa application structure */
 struct
   {

@@ -34,6 +34,8 @@ static void setup_local_mailboxes ();
 static void my_special_mailbox ();
 void mailbox_add_gnome_config (gint, gchar *, gchar *, gint);
 
+
+
 void
 init_balsa_app (int argc, char *argv[])
 {
@@ -65,6 +67,8 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.main_window = create_main_window ();
   balsa_app.timer = gtk_timeout_add (5*60*1000, current_mailbox_check, NULL);
 }
+
+
 
 static gint
 options_init (void)
@@ -213,6 +217,7 @@ options_init (void)
 }
 
 
+
 void
 mailbox_add_gnome_config (gint num, gchar * name, gchar * path, gint type)
 {
@@ -238,6 +243,8 @@ mailbox_add_gnome_config (gint num, gchar * name, gchar * path, gint type)
   g_string_free (gstring, 1);
 }
 
+
+
 static void
 setup_local_mailboxes ()
 {
@@ -250,6 +257,7 @@ setup_local_mailboxes ()
   MailboxMBox *mbox;
   MailboxUNIX *unixmb;
   gint i = 0;
+
 
   /* check the MAIL environment variable for a spool directory */
 /* We'll make this the default if no other mailboxes are loaded... */
@@ -314,7 +322,8 @@ setup_local_mailboxes ()
 static void
 my_special_mailbox ()
 {
-/*
+#if 0
+
    MailboxPOP3 *pop3;
    MailboxMBX *mbx;
    MailboxMH *mh;
@@ -346,7 +355,8 @@ my_special_mailbox ()
    mh->name = g_strdup ("gtk-list");
    mh->path = g_strdup ("gtk+");
    balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mh);
- */
+
+#endif
 }
 
 static gchar *

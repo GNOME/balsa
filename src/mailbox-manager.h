@@ -21,6 +21,7 @@
 #define __mailbox_manager_h__
 
 void open_mailbox_manager ();
+void refresh_mailbox_manager ();
 
 #endif
 /* __mailbox_manager_h__ */

@@ -19,7 +19,15 @@
 #ifndef __pref_manager_h__
 #define __pref_manager_h__
 
+
+/* open the preferences manager window */
 void open_preferences_manager ();
+
+
+/* refresh any data displayed in the preferences manager
+ * window in case it has changed */
+void refresh_preferences_manager ();
+
 
 #endif
 /* __pref_manager_h__ */

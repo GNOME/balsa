@@ -24,19 +24,38 @@
 
 typedef struct _MailboxManagerWindow MailboxManagerWindow;
 struct _MailboxManagerWindow
-  {
-    GtkWidget *window;
-    GtkWidget *list;
-  };
+{
+  GtkWidget *window;
+  GtkWidget *list;
+};
+
 static MailboxManagerWindow *mmw = NULL;
 
-static gint mailbox_manager_destroy ();
-static void update_mailbox_list ();
-static void select_row_cb (GtkWidget * widget,
-			   gint row,
-			   gint column,
-			   GdkEventButton * bevent);
 
+
+/* widget panels */
+static GtkWidget * create_mailbox_list_frame ();
+static GtkWidget * create_mailbox_edit_frame ();
+
+static GtkWidget *nb_main_new_mailbox (void);
+static GtkWidget *nb_main_edit_local (void);
+static GtkWidget *nb_main_edit_pop3 (void);
+static GtkWidget *nb_main_edit_imap (void);
+static GtkWidget *nb_main_edit_nntp (void);
+static GtkWidget *nb_main_delete_yesno (void);
+
+
+static GtkWidget *nb_add_create (void);
+static GtkWidget *nb_add_new_local (void);
+static GtkWidget *nb_add_new_pop3 (void);
+static GtkWidget *nb_add_new_imap (void);
+static GtkWidget *nb_add_new_nntp (void);
+
+
+/* callbacks */
+static void close_mailbox_manager ();
+
+static void select_row_cb (GtkWidget * widget, gint row, gint column, GdkEventButton * bevent);
 static void new_cb (GtkWidget *, GtkWidget *);
 static void edit_cb (GtkWidget *, GtkWidget *);
 static void duplicate_cb (GtkWidget *, GtkWidget *);
@@ -46,38 +65,18 @@ static void nb_add_cb1 (GtkWidget *, GtkWidget *);
 static void nb_add_cb2 (GtkWidget *, GtkWidget *);
 static void nb_add_cb3 (GtkWidget *, GtkWidget *);
 
-static GtkWidget *nb_main_create (void);
-static GtkWidget *nb_main_new_mailbox (void);
-static GtkWidget *nb_main_edit_local (void);
-static GtkWidget *nb_main_edit_pop3 (void);
-static GtkWidget *nb_main_edit_imap (void);
-static GtkWidget *nb_main_edit_nntp (void);
-static GtkWidget *nb_main_delete_yesno (void);
 
-static GtkWidget *nb_add_create (void);
-static GtkWidget *nb_add_new_local (void);
-static GtkWidget *nb_add_new_pop3 (void);
-static GtkWidget *nb_add_new_imap (void);
-static GtkWidget *nb_add_new_nntp (void);
 
 void
 open_mailbox_manager ()
 {
   GtkWidget *label;
   GtkWidget *vbox;
-  GtkWidget *vboxm;
-  GtkWidget *table;
   GtkWidget *hbox;
+  GtkWidget *bbox;
   GtkWidget *button;
-  GtkWidget *vpane;
-  GtkWidget *bcontents;
-  GtkWidget *notebook = nb_main_create ();
+  GtkWidget *frame;
 
-  static gchar *titles[] =
-  {
-    "Account",
-    "Type"
-  };
 
 
   /* only one mailbox manager window */
@@ -86,165 +85,85 @@ open_mailbox_manager ()
 
   mmw = g_malloc (sizeof (MailboxManagerWindow));
 
-  mmw->window = gtk_window_new (GTK_WINDOW_DIALOG);
-  gtk_container_border_width (GTK_CONTAINER (mmw->window), 3);
+
+  /* dialog window */
+  mmw->window = gtk_dialog_new ();
   gtk_window_set_title (GTK_WINDOW (mmw->window), "Mailbox Manager");
   gtk_window_set_wmclass (GTK_WINDOW (mmw->window), "mailbox_manager", "Balsa");
   gtk_window_position (GTK_WINDOW (mmw->window), GTK_WIN_POS_CENTER);
+  gtk_container_border_width (GTK_CONTAINER (mmw->window), 0);
+
+  gtk_signal_connect (GTK_OBJECT (mmw->window),
+		      "destroy",
+		      (GtkSignalFunc) close_mailbox_manager,
+		      NULL);
 
   gtk_signal_connect (GTK_OBJECT (mmw->window),
 		      "delete_event",
-		      GTK_SIGNAL_FUNC (mailbox_manager_destroy),
+		      (GtkSignalFunc) gtk_false,
 		      NULL);
 
-  vpane = gtk_vpaned_new ();
-  gtk_container_add (GTK_CONTAINER (mmw->window), vpane);
-  gtk_widget_show (vpane);
 
-
-  vboxm = gtk_vbox_new (FALSE, 0);
-  gtk_paned_add1 (GTK_PANED (vpane), vboxm);
-  gtk_widget_show (vboxm);
-
+  
   hbox = gtk_hbox_new (FALSE, 0);
-  gtk_container_border_width (GTK_CONTAINER (hbox), 10);
-  gtk_box_pack_start (GTK_BOX (vboxm), hbox, TRUE, TRUE, 10);
+  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (mmw->window)->vbox), hbox, TRUE, TRUE, 5);
   gtk_widget_show (hbox);
 
 
-  /* accounts clist */
-  mmw->list = gtk_clist_new_with_titles (2, titles);
-  gtk_clist_column_titles_passive (GTK_CLIST (mmw->list));
-  gtk_clist_set_selection_mode (GTK_CLIST (mmw->list), GTK_SELECTION_BROWSE);
+  /* dialog frames */
+  frame = gtk_frame_new ("Mailbox List");
+  gtk_container_add (GTK_CONTAINER (frame), create_mailbox_list_frame ());
+  gtk_box_pack_start (GTK_BOX (hbox), frame, TRUE, TRUE, 5);
+  gtk_widget_show (frame);
 
-  gtk_clist_set_column_width (GTK_CLIST (mmw->list), 0, 100);
-  gtk_clist_set_column_width (GTK_CLIST (mmw->list), 1, 50);
-
-  gtk_clist_set_policy (GTK_CLIST (mmw->list),
-			GTK_POLICY_AUTOMATIC,
-			GTK_POLICY_AUTOMATIC);
-
-  gtk_box_pack_start (GTK_BOX (hbox), mmw->list, TRUE, TRUE, 10);
-
-  gtk_signal_connect (GTK_OBJECT (mmw->list),
-		      "select_row",
-		      (GtkSignalFunc) select_row_cb,
-		      NULL);
-
-  update_mailbox_list ();
-  gtk_widget_show (mmw->list);
-
-  /* one vbox to hold them all... */
-  vbox = gtk_vbox_new (FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (hbox), vbox, FALSE, FALSE, 10);
-  gtk_widget_show (vbox);
+  
+  frame = gtk_frame_new ("Edit/New Mailbox");
+  gtk_container_add (GTK_CONTAINER (frame), create_mailbox_edit_frame ());
+  gtk_box_pack_start (GTK_BOX (hbox), frame, TRUE, TRUE, 5);
+  gtk_widget_show (frame);
 
 
-  /* new account button */
-  button = gtk_button_new_with_label ("New");
-  gtk_widget_set_usize (button, 70, 30);
-  gtk_box_pack_start (GTK_BOX (vbox), button, TRUE, FALSE, 10);
-
-  gtk_signal_connect (GTK_OBJECT (button),
-		      "clicked",
-		      (GtkSignalFunc) new_cb,
-		      notebook);
-
-  gtk_widget_show (button);
+  /* close button (bottom dialog) */
+  bbox = gtk_hbutton_box_new ();
+  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (mmw->window)->action_area), bbox, TRUE, TRUE, 0);
+  gtk_button_box_set_layout (GTK_BUTTON_BOX (bbox), GTK_BUTTONBOX_END);
+  gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox),
+				 BALSA_BUTTON_WIDTH,
+				 BALSA_BUTTON_HEIGHT);
+  gtk_widget_show (bbox);
 
 
-  /* edit account button */
-  button = gtk_button_new_with_label ("Edit");
-  gtk_widget_set_usize (button, 70, 30);
-  gtk_box_pack_start (GTK_BOX (vbox), button, TRUE, FALSE, 10);
-  gtk_signal_connect (GTK_OBJECT (button),
-		      "clicked",
-		      (GtkSignalFunc) edit_cb,
-		      notebook);
-
-  gtk_widget_show (button);
-
-
-  /* duplicate account button */
-  button = gtk_button_new_with_label ("Duplicate");
-  gtk_widget_set_usize (button, 70, 30);
-  gtk_box_pack_start (GTK_BOX (vbox), button, TRUE, FALSE, 10);
-
-  gtk_signal_connect (GTK_OBJECT (button),
-		      "clicked",
-		      (GtkSignalFunc) duplicate_cb,
-		      notebook);
-
-  gtk_widget_show (button);
-
-
-  /* delete account button */
-  button = gtk_button_new_with_label ("Delete");
-  gtk_widget_set_usize (button, 70, 30);
-  gtk_box_pack_start (GTK_BOX (vbox), button, TRUE, FALSE, 10);
-
-  gtk_signal_connect (GTK_OBJECT (button),
-		      "clicked",
-		      (GtkSignalFunc) delete_cb,
-		      notebook);
-
-  gtk_widget_show (button);
-
-  /* close window button */
-  button = gtk_button_new_with_label ("Close");
-  gtk_widget_set_usize (button, 70, 30);
-  gtk_box_pack_start (GTK_BOX (vbox), button, TRUE, FALSE, 10);
-  gtk_widget_show (button);
-
-  gtk_signal_connect (GTK_OBJECT (button),
-		      "clicked",
-		      GTK_SIGNAL_FUNC (mailbox_manager_destroy),
-		      NULL);
+  button = gnome_stock_button (GNOME_STOCK_BUTTON_CLOSE);
+  gtk_container_add (GTK_CONTAINER (bbox), button);
 
   gtk_signal_connect_object (GTK_OBJECT (button),
 			     "clicked",
 			     GTK_SIGNAL_FUNC (gtk_widget_destroy),
 			     GTK_OBJECT (mmw->window));
 
-  gtk_paned_add2 (GTK_PANED (vpane), notebook);
+  gtk_widget_show (button);
+
 
 
   /* show the whole thing */
+  refresh_mailbox_manager ();
   gtk_widget_show (mmw->window);
 }
 
-static GtkWidget *
-nb_main_create ()
-{
-  GtkWidget *notebook;
 
-  notebook = gtk_notebook_new ();
-  gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), FALSE);
-  gtk_notebook_set_show_border ( GTK_NOTEBOOK(notebook), FALSE);
-  gtk_widget_show (notebook);
-
-  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), nb_main_new_mailbox (), gtk_label_new("new"));	/* 0 */
-  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), nb_main_edit_local (), gtk_label_new("editlocal"));/* 1 */
-  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), nb_main_edit_pop3 (), gtk_label_new("editpop3"));	/* 2 */
-  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), nb_main_edit_imap (), gtk_label_new("editimap"));	/* 3 */
-  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), nb_main_edit_nntp (), gtk_label_new("editnntp"));	/* 4 */
-  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), nb_main_delete_yesno (), gtk_label_new("yesno"));	/* 5 */
-
-  return notebook;
-}
-
-static gint
-mailbox_manager_destroy ()
+void
+close_mailbox_manager ()
 {
   g_free (mmw);
   mmw = NULL;
-
-  return FALSE;
 }
 
+
+
+
 /* sets the list of mailboxes in the mailbox manager window */
-static void
-update_mailbox_list ()
+void
+refresh_mailbox_manager ()
 {
   GList *list;
   Mailbox *mailbox;
@@ -271,6 +190,134 @@ update_mailbox_list ()
 }
 
 
+
+static GtkWidget *
+create_mailbox_list_frame ()
+{
+  GtkWidget *vbox;
+  GtkWidget *bbox;
+  GtkWidget *button;
+
+
+  static gchar *titles[] =
+  {
+    "Account",
+    "Type"
+  };
+
+
+  /* return widget */
+  vbox = gtk_vbox_new (FALSE, 0);
+  gtk_container_border_width (GTK_CONTAINER (vbox), 5);
+  gtk_widget_show (vbox);
+
+
+  /* accounts clist */
+  mmw->list = gtk_clist_new_with_titles (2, titles);
+  gtk_clist_column_titles_passive (GTK_CLIST (mmw->list));
+  gtk_clist_set_selection_mode (GTK_CLIST (mmw->list), GTK_SELECTION_SINGLE);
+
+  gtk_clist_set_column_width (GTK_CLIST (mmw->list), 0, 100);
+  gtk_clist_set_column_width (GTK_CLIST (mmw->list), 1, 50);
+
+  gtk_clist_set_policy (GTK_CLIST (mmw->list),
+			GTK_POLICY_AUTOMATIC,
+			GTK_POLICY_AUTOMATIC);
+
+  gtk_box_pack_start (GTK_BOX (vbox), mmw->list, TRUE, TRUE, 10);
+
+  gtk_signal_connect (GTK_OBJECT (mmw->list),
+		      "select_row",
+		      (GtkSignalFunc) select_row_cb,
+		      NULL);
+
+  gtk_widget_show (mmw->list);
+
+
+  /* one button bbox */
+  bbox = gtk_hbutton_box_new ();
+  gtk_box_pack_start (GTK_BOX (vbox), bbox, TRUE, TRUE, 0);
+  gtk_button_box_set_layout (GTK_BUTTON_BOX (bbox), GTK_BUTTONBOX_END);
+  gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox),
+				 BALSA_BUTTON_WIDTH,
+				 BALSA_BUTTON_HEIGHT);
+  gtk_widget_show (bbox);
+
+
+  /* duplicate account button */
+  button = gtk_button_new_with_label ("Duplicate");
+  gtk_container_add (GTK_CONTAINER (bbox), button);
+
+  gtk_signal_connect (GTK_OBJECT (button),
+		      "clicked",
+		      (GtkSignalFunc) duplicate_cb,
+		      NULL);
+
+  gtk_widget_show (button);
+
+
+  /* delete account button */
+  button = gtk_button_new_with_label ("Delete");
+  gtk_container_add (GTK_CONTAINER (bbox), button);
+
+  gtk_signal_connect (GTK_OBJECT (button),
+		      "clicked",
+		      (GtkSignalFunc) delete_cb,
+		      NULL);
+
+  gtk_widget_show (button);
+
+
+  return vbox;
+}
+
+
+
+static GtkWidget *
+create_mailbox_edit_frame ()
+{
+  GtkWidget *notebook;
+
+
+  notebook = gtk_notebook_new ();
+  gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), FALSE);
+  gtk_notebook_set_show_border ( GTK_NOTEBOOK(notebook), FALSE);
+  gtk_widget_show (notebook);
+
+
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), 
+			    nb_main_new_mailbox (), 
+			    gtk_label_new("new"));	/* 0 */
+
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
+			    nb_main_edit_local (), 
+			    gtk_label_new("editlocal"));/* 1 */
+
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
+			    nb_main_edit_pop3 (),
+			    gtk_label_new("editpop3"));	/* 2 */
+
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
+			    nb_main_edit_imap (),
+			    gtk_label_new("editimap"));	/* 3 */
+
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
+			    nb_main_edit_nntp (),
+			    gtk_label_new("editnntp"));	/* 4 */
+
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
+			    nb_main_delete_yesno (),
+			    gtk_label_new("yesno"));	/* 5 */
+
+
+  return notebook;
+}
+
+
+
+/*
+ * callbacks
+ */
 static void
 select_row_cb (GtkWidget * widget,
 	       gint row,
@@ -278,6 +325,8 @@ select_row_cb (GtkWidget * widget,
 	       GdkEventButton * bevent)
 {
 }
+
+
 
 static void
 new_cb (GtkWidget * widget, GtkWidget * notebook)
@@ -287,11 +336,13 @@ new_cb (GtkWidget * widget, GtkWidget * notebook)
   gtk_notebook_set_page (GTK_NOTEBOOK (notebook), 0);
 }
 
+
 static void
 nb_add_cb (GtkWidget *widget, GtkWidget *notebook)
 {
 	gtk_notebook_set_page(GTK_NOTEBOOK(notebook), 0);
 }
+
 
 static void
 nb_add_cb1 (GtkWidget *widget, GtkWidget *notebook)
@@ -299,17 +350,20 @@ nb_add_cb1 (GtkWidget *widget, GtkWidget *notebook)
 	gtk_notebook_set_page(GTK_NOTEBOOK(notebook), 1);
 }
 
+
 static void
 nb_add_cb2 (GtkWidget *widget, GtkWidget *notebook)
 {
 	gtk_notebook_set_page(GTK_NOTEBOOK(notebook), 2);
 }
 
+
 static void
 nb_add_cb3 (GtkWidget *widget, GtkWidget *notebook)
 {
 	gtk_notebook_set_page(GTK_NOTEBOOK(notebook), 3);
 }
+
 
 static void
 edit_cb (GtkWidget * widget, GtkWidget * notebook)
@@ -359,6 +413,7 @@ duplicate_cb (GtkWidget * widget, GtkWidget * notebook)
   gtk_notebook_set_page (GTK_NOTEBOOK (notebook), 0);
 }
 
+
 static void
 delete_cb (GtkWidget * widget, GtkWidget * notebook)
 {
@@ -367,6 +422,7 @@ delete_cb (GtkWidget * widget, GtkWidget * notebook)
   gtk_notebook_set_page (GTK_NOTEBOOK (notebook), 5);
 }
 
+
 static GtkWidget *
 nb_add_create ()
 {
@@ -374,16 +430,29 @@ nb_add_create ()
 
   notebook = gtk_notebook_new ();
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), FALSE);
-  gtk_notebook_set_show_border ( GTK_NOTEBOOK(notebook), FALSE);
+  gtk_notebook_set_show_border (GTK_NOTEBOOK(notebook), FALSE);
   gtk_widget_show (notebook);
 
-  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), nb_add_new_local (), gtk_label_new("local")); /* 0 */
-  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), nb_add_new_pop3 (), gtk_label_new("pop3"));   /* 1 */
-  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), nb_add_new_imap (), gtk_label_new("imap"));   /* 2 */
-  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), nb_add_new_nntp (), gtk_label_new("nntp"));   /* 3 */
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), 
+			    nb_add_new_local (), 
+			    gtk_label_new("local")); /* 0 */
+
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
+			    nb_add_new_pop3 (),
+			    gtk_label_new("pop3"));   /* 1 */
+
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
+			    nb_add_new_imap (),
+			    gtk_label_new("imap"));   /* 2 */
+
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
+			    nb_add_new_nntp (),
+			    gtk_label_new("nntp"));   /* 3 */
+
 
   return notebook;
 }
+
 
 static GtkWidget *
 nb_add_new_local ()
@@ -399,7 +468,7 @@ nb_add_new_local ()
   gtk_widget_show (vbox);
 
   table = gtk_table_new (1, 2, FALSE);
-  gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), table, TRUE, TRUE, 0);
   gtk_widget_show (table);
 
   label = gtk_label_new ("Path:");
@@ -419,6 +488,7 @@ nb_add_new_local ()
   return vbox;
 }
 
+
 static GtkWidget *
 nb_add_new_pop3 ()
 {
@@ -432,7 +502,7 @@ nb_add_new_pop3 ()
   gtk_widget_show (vbox);
 
   table = gtk_table_new (3, 2, FALSE);
-  gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), table, TRUE, TRUE, 0);
   gtk_widget_show (table);
 
   /* POP server name */
@@ -488,6 +558,7 @@ nb_add_new_pop3 ()
   return vbox;
 }
 
+
 static GtkWidget *
 nb_add_new_imap ()
 {
@@ -498,11 +569,12 @@ nb_add_new_imap ()
   GtkWidget *label;
   GtkWidget *button;
 
+
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox);
 
   table = gtk_table_new (4, 2, FALSE);
-  gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), table, TRUE, TRUE, 0);
   gtk_widget_show (table);
 
   label = gtk_label_new ("IMAP server:");
@@ -567,6 +639,7 @@ nb_add_new_imap ()
   return vbox;
 }
 
+
 static GtkWidget *
 nb_add_new_nntp ()
 {
@@ -577,11 +650,12 @@ nb_add_new_nntp ()
   GtkWidget *label;
   GtkWidget *button;
 
+
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox);
 
   table = gtk_table_new (4, 2, FALSE);
-  gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), table, TRUE, TRUE, 0);
   gtk_widget_show (table);
 
   label = gtk_label_new ("NNTP server:");
@@ -646,8 +720,10 @@ nb_add_new_nntp ()
   return vbox;
 }
 
-/* New mailbox */
 
+/*
+ * New mailbox
+ */
 static GtkWidget *
 nb_main_new_mailbox (void)
 {
@@ -662,12 +738,15 @@ nb_main_new_mailbox (void)
   GtkWidget *menuofmailboxtypes;
   GtkWidget *menuitem;
 
+
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox);
 
+
   table = gtk_table_new (3, 2, FALSE);
-  gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), table, TRUE, TRUE, 0);
   gtk_widget_show (table);
+
 
   label = gtk_label_new ("Name:");
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
@@ -676,12 +755,14 @@ nb_main_new_mailbox (void)
 		    0, 0);
   gtk_widget_show (label);
 
+
   entry = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), entry, 1, 2, 0, 1,
 		    GTK_EXPAND | GTK_FILL,
 		    GTK_EXPAND | GTK_FILL,
 		    0, 0);
   gtk_widget_show (entry);
+
 
   label = gtk_label_new ("Type:");
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
@@ -772,18 +853,21 @@ nb_main_new_mailbox (void)
   gtk_option_menu_set_menu (GTK_OPTION_MENU (mailboxtype),
 			    menuofmailboxtypes);
 
-  gtk_box_pack_start (GTK_BOX (vbox), notebook, FALSE, FALSE, 1);
+  gtk_box_pack_start (GTK_BOX (vbox), notebook, TRUE, TRUE, 0);
+
 
   button = gtk_button_new_with_label ("Add");
-  gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 1);
+  gtk_widget_set_usize (button, BALSA_BUTTON_WIDTH, BALSA_BUTTON_HEIGHT);
+  gtk_box_pack_start (GTK_BOX (vbox), button, TRUE, TRUE, 0);
   gtk_widget_show (button);
 
   return vbox;
 }
 
 
-/* Edit - Local mailboxes */
-
+/*
+ * Edit - Local mailboxes
+ */
 static GtkWidget *
 nb_main_edit_local (void)
 {
@@ -798,7 +882,7 @@ nb_main_edit_local (void)
   gtk_widget_show (vbox);
 
   table = gtk_table_new (3, 2, FALSE);
-  gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 1);
+  gtk_box_pack_start (GTK_BOX (vbox), table, TRUE, TRUE, 0);
   gtk_widget_show (table);
 
 
@@ -831,15 +915,16 @@ nb_main_edit_local (void)
   gtk_widget_show (entry);
 
   button = gtk_button_new_with_label ("Update");
-  gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 1);
+  gtk_box_pack_start (GTK_BOX (vbox), button, TRUE, TRUE, 0);
   gtk_widget_show (button);
 
   return vbox;
 }
 
 
-/* Edit - POP3 */
-
+/*
+ * Edit - POP3
+ */
 static GtkWidget *
 nb_main_edit_pop3 (void)
 {
@@ -854,7 +939,7 @@ nb_main_edit_pop3 (void)
   gtk_widget_show (vbox);
 
   table = gtk_table_new (4, 2, FALSE);
-  gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 1);
+  gtk_box_pack_start (GTK_BOX (vbox), table, TRUE, TRUE, 0);
   gtk_widget_show (table);
 
 
@@ -925,16 +1010,20 @@ nb_main_edit_pop3 (void)
 		    0, 0);
   gtk_widget_show (entry);
 
+
+
   button = gtk_button_new_with_label ("Update");
-  gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 1);
+  gtk_box_pack_start (GTK_BOX (vbox), button, TRUE, TRUE, 0);
   gtk_widget_show (button);
+
 
   return vbox;
 }
 
 
-/* Edit - IMAP */
-
+/* 
+ * Edit - IMAP
+ */
 static GtkWidget *
 nb_main_edit_imap (void)
 {
@@ -949,7 +1038,7 @@ nb_main_edit_imap (void)
   gtk_widget_show (vbox);
 
   table = gtk_table_new (5, 2, FALSE);
-  gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 1);
+  gtk_box_pack_start (GTK_BOX (vbox), table, TRUE, TRUE, 0);
   gtk_widget_show (table);
 
 
@@ -1040,8 +1129,9 @@ nb_main_edit_imap (void)
 }
 
 
-/* Edit - NNTP */
-
+/*
+ * Edit - NNTP
+ */
 static GtkWidget *
 nb_main_edit_nntp (void)
 {
@@ -1056,7 +1146,7 @@ nb_main_edit_nntp (void)
   gtk_widget_show (vbox);
 
   table = gtk_table_new (5, 2, FALSE);
-  gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 1);
+  gtk_box_pack_start (GTK_BOX (vbox), table, TRUE, TRUE, 0);
   gtk_widget_show (table);
 
 
@@ -1146,7 +1236,9 @@ nb_main_edit_nntp (void)
   return vbox;
 }
 
-/* Confirm delete */
+/*
+ * Confirm delete
+ */
 static GtkWidget *
 nb_main_delete_yesno (void)
 {
@@ -1155,7 +1247,7 @@ nb_main_delete_yesno (void)
   GtkWidget *label;
   GtkWidget *button;
 
-  vbox = gtk_vbox_new (TRUE, 0);
+  vbox = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox);
 
   label = gtk_label_new ("Are you sure you wish to delete this mailbox?");
@@ -1163,22 +1255,19 @@ nb_main_delete_yesno (void)
   gtk_widget_show (label);
 
   hbox = gtk_hbox_new (TRUE, 0);
-  gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox, TRUE, TRUE, 0);
   gtk_widget_show (hbox);
 
   button = gtk_button_new_with_label ("Yes");
-  gtk_widget_set_usize (button, 60, 25);
-  gtk_box_pack_start (GTK_BOX (hbox), button, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
   gtk_widget_show (button);
 
   button = gtk_button_new_with_label ("No");
-  gtk_widget_set_usize (button, 60, 25);
-  gtk_box_pack_start (GTK_BOX (hbox), button, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
   gtk_widget_show (button);
 
   button = gtk_button_new_with_label ("Unsure, ask me later");
-  gtk_widget_set_usize (button, 150, 25);
-  gtk_box_pack_end (GTK_BOX (hbox), button, FALSE, FALSE, 0);
+  gtk_box_pack_end (GTK_BOX (hbox), button, TRUE, TRUE, 0);
   gtk_widget_show (button);
 
   return vbox;

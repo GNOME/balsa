@@ -1,5 +1,7 @@
-2004-01-13 21:49  PeterB
+2004-01-13 23:45  PeterB
 
+	* libbalsa/mailbox.c: Flag partial messages so we don't keep making
+	the whole message.
 	* src/print.c: Use GMime filter to print text/enriched and
 	text/richtext parts as html.
 	* src/balsa-message.c: Detect when GMime can filter text/enriched

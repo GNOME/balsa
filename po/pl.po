@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-04-23 14:28+0200\n"
+"POT-Creation-Date: 2004-04-28 07:50+0200\n"
 "PO-Revision-Date: 2003-07-27 23:38+0100\n"
 "Last-Translator: Gnome PL Team <translators@gnome.pl>\n"
 "Language-Team: Polish <translation-team-pl@lists.sourceforge.net>\n"
@@ -1101,7 +1101,7 @@ msgstr "Wysyłanie listu..."
 msgid "_Hide"
 msgstr "U_kryj"
 
-#: libbalsa/send.c:752
+#: libbalsa/send.c:755
 #, c-format
 msgid ""
 "Could not send the message to %s:\n"
@@ -1112,7 +1112,7 @@ msgstr ""
 "%d: %s\n"
 "List pozostał w skrzynce poczty wychodzącej.\n"
 
-#: libbalsa/send.c:797
+#: libbalsa/send.c:800
 #, c-format
 msgid ""
 "Relaying refused:\n"
@@ -1123,7 +1123,7 @@ msgstr ""
 "%d: %s\n"
 "List pozostał w skrzynce poczty wychodzącej.\n"
 
-#: libbalsa/send.c:807
+#: libbalsa/send.c:810
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
@@ -1132,33 +1132,33 @@ msgstr ""
 "w folderze \"Poczta wychodząca\". System będzie próbował wysłać\n"
 "list aż do chwili jego usunięcia."
 
-#: libbalsa/send.c:837
+#: libbalsa/send.c:840
 msgid "Connected to MTA"
 msgstr "Nawiązano połączenie z MTA"
 
-#: libbalsa/send.c:844 src/balsa-message.c:1234 src/print.c:367
+#: libbalsa/send.c:847 src/balsa-message.c:1234 src/print.c:367
 #: src/sendmsg-window.c:678 src/sendmsg-window.c:2245 src/store-address.c:303
 msgid "From:"
 msgstr "Od:"
 
-#: libbalsa/send.c:847 src/balsa-index.c:310
+#: libbalsa/send.c:850 src/balsa-index.c:310
 msgid "From"
 msgstr "Od"
 
-#: libbalsa/send.c:855 src/balsa-message.c:1243 src/print.c:371
+#: libbalsa/send.c:858 src/balsa-message.c:1243 src/print.c:371
 #: src/sendmsg-window.c:677 src/sendmsg-window.c:2252 src/store-address.c:304
 msgid "To:"
 msgstr "Dla:"
 
-#: libbalsa/send.c:858 src/balsa-index.c:775
+#: libbalsa/send.c:861 src/balsa-index.c:775
 msgid "To"
 msgstr "Dla"
 
-#: libbalsa/send.c:894
+#: libbalsa/send.c:897
 msgid "Disconnected"
 msgstr "Rozłączony"
 
-#: libbalsa/send.c:1111
+#: libbalsa/send.c:1118
 msgid ""
 "SMTP server refused connection.\n"
 "Balsa by default uses submission service (587).\n"
@@ -1172,7 +1172,7 @@ msgstr ""
 "to jawnie poprzez \"host:smtp\".\n"
 "List pozostał w skrzynce z pocztą wychodzącą."
 
-#: libbalsa/send.c:1121
+#: libbalsa/send.c:1128
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
@@ -1181,14 +1181,14 @@ msgstr ""
 "Wystąpił problem przy komunikacji z serwerem SMTP (%d): %s\n"
 "List pozostał w skrzynce poczty wychodzącej."
 
-#: libbalsa/send.c:1431
+#: libbalsa/send.c:1438
 #, c-format
 msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 msgstr ""
 "Nie można ustalić zestawu znaków dla pliku tekstowego \"%s\"; wysyłanie jako "
 "typ mime \"%s\""
 
-#: libbalsa/send.c:1725 libbalsa/send.c:1801
+#: libbalsa/send.c:1732 libbalsa/send.c:1808
 msgid "This message will not be encrpyted for the BCC: recipient(s)."
 msgstr "List nie zostanie zaszyfrowany dla odbiorców z pola BCC:."
 
@@ -4296,11 +4296,11 @@ msgstr ""
 msgid "Balsa: message print preview"
 msgstr "Balsa: podgląd wydruku listu"
 
-#: src/save-restore.c:564
+#: src/save-restore.c:563
 msgid "Error during filters loading: "
 msgstr "Błąd przy wczytywaniu filtrów: "
 
-#: src/save-restore.c:566
+#: src/save-restore.c:565
 #, c-format
 msgid ""
 "Error during filters loading: %s\n"
@@ -4309,13 +4309,13 @@ msgstr ""
 "Błąd przy wczytywaniu filtrów: %s\n"
 "Filtry mogą być niepoprawne."
 
-#: src/save-restore.c:677
+#: src/save-restore.c:676
 msgid "The option not to recognize \"format=flowed\" text has been removed."
 msgstr ""
 "Opcja powodująca nierozpoznawanie ustawienia \"format=flowed\" została "
 "usunięta."
 
-#: src/save-restore.c:915
+#: src/save-restore.c:914
 msgid ""
 "The option not to send \"format=flowed\" is now on the Options menu of the "
 "compose window."
@@ -4323,18 +4323,22 @@ msgstr ""
 "Opcja \"Przeformatowywanie\", dotycząca ustawienia \"format=flowed\", "
 "znajduje się teraz w menu Opcje okna tworzenia listu."
 
-#: src/save-restore.c:947
+#: src/save-restore.c:946
 msgid ""
 "The option to request a MDN is now on the Options menu of the compose window."
 msgstr ""
 "Opcja żądania powiadomienia o otrzymaniu listu (MDN) jest teraz dostępna w "
 "menu opcje okna tworzenia listu."
 
-#: src/save-restore.c:1811
+#: src/save-restore.c:1649
+msgid "Filter with no condition was ignored"
+msgstr "Filtr nie zawierający warunku został pominięty"
+
+#: src/save-restore.c:1827
 msgid "Error opening GConf database\n"
 msgstr "Błąd przy otwieraniu bazy GConf\n"
 
-#: src/save-restore.c:1819 src/save-restore.c:1830
+#: src/save-restore.c:1835 src/save-restore.c:1846
 #, c-format
 msgid "Error setting GConf field: %s\n"
 msgstr "Błąd przy ustawianiu GConf: %s\n"

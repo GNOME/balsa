@@ -78,6 +78,7 @@ static void delete_message_cb (GtkWidget * widget);
 static void undelete_message_cb (GtkWidget * widget);
 
 static void mblist_window_cb (GtkWidget * widget);
+static void mailbox_close_child(GtkWidget *widget);
 
 static void about_box_destroy_cb ();
 
@@ -308,6 +309,19 @@ static GtkMenuBar *create_menu (GnomeMDI * mdi, GtkWidget *app)
   gtk_signal_connect (GTK_OBJECT (w),
 		      "activate",
 		      (GtkSignalFunc) mblist_window_cb,
+		      NULL);
+
+  gtk_menu_append (GTK_MENU (menu), w);
+  menu_items[i++] = w;
+
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_CLOSE, _ ("Close"));
+  gtk_widget_show (w);
+
+  gtk_object_set_user_data (GTK_OBJECT (w), (gpointer) mw);
+
+  gtk_signal_connect (GTK_OBJECT (w),
+		      "activate",
+		      (GtkSignalFunc) mailbox_close_child,
 		      NULL);
 
   gtk_menu_append (GTK_MENU (menu), w);
@@ -643,6 +657,12 @@ mblist_window_cb (GtkWidget * widget)
 
       mblist_add_mailbox (mailbox);
     }
+}
+
+static void
+mailbox_close_child(GtkWidget *widget)
+{
+  gtk_object_destroy(GTK_OBJECT(balsa_app.current_index_child));
 }
 
 static void

@@ -36,7 +36,6 @@ struct _IndexChild
     Mailbox *mailbox;
 
     guint watcher_id;
-    GtkWidget *window;
     GtkWidget *index;
     GtkAccelGroup *accel;
   };

@@ -143,4 +143,5 @@ mailbox_select_cb (GtkCTree * ctree, GList * row, gint column)
       gnome_mdi_add_child (mblw->mdi, GNOME_MDI_CHILD (index_child));
       gnome_mdi_add_view (mblw->mdi, GNOME_MDI_CHILD (index_child));
     }
+/* TODO TODO FIXME remove index-child from list here */
 }

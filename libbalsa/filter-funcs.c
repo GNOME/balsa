@@ -10,7 +10,6 @@
 #include "filter-private.h"
 #include "filter-funcs.h"
 
-
 /*
  * filter_init()
  *
@@ -30,7 +29,7 @@
 GList *
 filter_init (gchar * filter_file)
 {
-  GList *list;
+  GList *list = NULL;
   gint rc;
 
   rc = filter_load (list, filter_file);
@@ -134,7 +133,7 @@ filter_clear_filters (GList * filter_list)
  *    filter* - pointer to the new filter
  */
 filter *
-filter_new ()
+filter_new (void)
 {
   filter *newfil;
 

@@ -213,6 +213,8 @@ GtkWidget *fe_popup_entry;
 /* callback for browse */
 void fe_sound_browse_clicked (GtkWidget * widget,
 			      gpointer throwaway);
+void browse_fileselect_clicked (GtkWidget * widget,
+				gpointer data);
 /* action field */
 GtkWidget *fe_action_frame;
 GtkWidget *fe_action_table;

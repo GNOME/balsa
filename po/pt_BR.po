@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-20 11:00+0200\n"
-"PO-Revision-Date: 2004-09-20 15:16-0300\n"
+"PO-Revision-Date: 2004-09-21 14:16-0300\n"
 "Last-Translator: Raphael Higino <raphaelh@uai.com.br>\n"
 "Language-Team: Brazilian Portuguese <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
@@ -284,7 +284,7 @@ msgstr "Nome _Completo:"
 
 #: libbalsa/identity.c:787
 msgid "_Mailing Address:"
-msgstr "Endereço a enviar:"
+msgstr "En_dereço para Envio:"
 
 #: libbalsa/identity.c:789
 msgid "Reply _To:"
@@ -320,7 +320,7 @@ msgstr "Incl_uir assinatura"
 
 #: libbalsa/identity.c:809
 msgid "Include Signature When For_warding"
-msgstr "Incluir assinatura quando encaminhar"
+msgstr "Incluir assinatura ao encamin_har"
 
 #: libbalsa/identity.c:812
 msgid "Include Signature When Rep_lying"
@@ -614,29 +614,28 @@ msgstr "Não é possível abrir a caixa de mensagens."
 
 # 11
 #: libbalsa/mailbox_mbox.c:441
-#, fuzzy
 msgid "Cannot lock mailbox."
-msgstr "Não pode carregar caixa de mensagem %s"
+msgstr "Não é possível travar a caixa de mensagens."
 
 #: libbalsa/mailbox_mbox.c:1500
-#, fuzzy, c-format
+#, c-format
 msgid "%s: could not open %s."
-msgstr "Não foi possível abrir %s"
+msgstr "%s: não foi possível abrir %s."
 
 #: libbalsa/mailbox_mbox.c:1508
-#, fuzzy, c-format
+#, c-format
 msgid "%s: could not get new mime stream."
-msgstr "%s: não foi possível criar novos dados: %s"
+msgstr "%s: não foi possível obter um novo fluxo mime."
 
 #: libbalsa/mailbox_mbox.c:1518
-#, fuzzy, c-format
+#, c-format
 msgid "%s: could not get message stream."
-msgstr "%s: não foi possível obter dados: %s"
+msgstr "%s: não foi possível obter o fluxo de mensagens."
 
 #: libbalsa/mailbox_mbox.c:1533
-#, fuzzy, c-format
+#, c-format
 msgid "Error copying message to mailbox %s!"
-msgstr "Não foi possível abrir a caixa de mensagens \"%s\""
+msgstr "Erro ao copiar a mensagem para a caixa de mensagens %s!"
 
 #: libbalsa/mailbox_mh.c:172
 #, c-format
@@ -659,19 +658,19 @@ msgid "Retrieving Message %d of %d"
 msgstr "Recebendo Mensagen %d de %d"
 
 #: libbalsa/mailbox_pop3.c:361
-#, fuzzy, c-format
+#, c-format
 msgid "Received %ld kB of %ld"
-msgstr "Recebido %d bytes de %d"
+msgstr "Recebidos %ld kB de %ld"
 
 #: libbalsa/mailbox_pop3.c:375
-#, fuzzy, c-format
+#, c-format
 msgid "Saving POP message to %s failed."
-msgstr "Movendo mensagens lidas para %s..."
+msgstr "Falha ao salvar a mensagem POP em %s."
 
 #: libbalsa/mailbox_pop3.c:385
 #, c-format
 msgid "Transfering POP message to %s failed."
-msgstr ""
+msgstr "Falha ao transferir a mensagem POP para %s."
 
 #: libbalsa/mailbox_pop3.c:463 libbalsa/mailbox_pop3.c:474
 #, c-format
@@ -683,31 +682,29 @@ msgstr ""
 "%s"
 
 #: libbalsa/mailbox_pop3.c:502
-#, fuzzy, c-format
+#, c-format
 msgid "POP3 mailbox %s error: %s\n"
-msgstr ""
-"Erro de acesso na caixa postal POP3 %s:\n"
-"%s"
+msgstr "Erro na caixa postal POP3 %s: %s\n"
 
 #: libbalsa/mailbox_pop3.c:535
 #, c-format
 msgid "POP3 message %d oversized: %d kB - skipped."
-msgstr ""
+msgstr "A mensagem POP3 %d excedeu o tamanho: %d kB - ignorada."
 
 #: libbalsa/mailbox_pop3.c:546
 #, c-format
 msgid "POP3 error: cannot open %s for writing."
-msgstr ""
+msgstr "Erro de POP3: não é possível abrir %s para gravação."
 
 #: libbalsa/mailbox_pop3.c:554
 #, c-format
 msgid "POP3 error: cannot close %s."
-msgstr ""
+msgstr "Erro de POP3: não é possível fechar %s."
 
 #: libbalsa/mailbox_pop3.c:580
-#, fuzzy, c-format
+#, c-format
 msgid "POP3 error: %s."
-msgstr "Erro no envio: %s"
+msgstr "Erro de POP3: %s."
 
 #: libbalsa/mailbox_pop3.c:603
 #, c-format
@@ -724,11 +721,9 @@ msgstr ""
 "As mensagens foram deixadas em %s\n"
 
 #: libbalsa/mailbox_pop3.c:645
-#, fuzzy, c-format
+#, c-format
 msgid "POP3 temp mailbox %s was not removed (system error message: %s)"
-msgstr ""
-"Erro de arquivo temporário na caixa postal POP3 %s:\n"
-"%s"
+msgstr "A caixa postal POP3 temporária %s não foi removida: (mensagem de erro do sistema: %s)"
 
 #: libbalsa/message.c:482
 #, c-format
@@ -737,10 +732,9 @@ msgstr ""
 "Impossível mover mensagens. Caixa postal de origem (%s) apenas para leitura."
 
 #: libbalsa/message.c:634 libbalsa/message.c:674
-#, fuzzy, c-format
+#, c-format
 msgid "Mailbox (%s) is readonly: cannot change flags."
-msgstr ""
-"Impossível mover mensagens. Caixa postal de origem (%s) apenas para leitura."
+msgstr "A caixa postal (%s) é apenas para leitura: não é possível alterar as marcas."
 
 #: libbalsa/mime.c:92
 msgid ""
@@ -815,57 +809,50 @@ msgstr ""
 #: libbalsa/rfc3156.c:618 libbalsa/rfc3156.c:723 libbalsa/rfc3156.c:728
 #: libbalsa/rfc3156.c:803 libbalsa/rfc3156.c:808
 msgid "creating a gpgme context failed"
-msgstr ""
+msgstr "falha ao criar um contexto gpgme"
 
 #: libbalsa/rfc3156.c:253 libbalsa/rfc3156.c:631
-#, fuzzy
 msgid "Enter passphrase to unlock the secret key for signing"
-msgstr "Digite a frase secreta para descriptografar a mensagem"
+msgstr "Digite a frase secreta para destravar a chave secreta para assinar"
 
 #: libbalsa/rfc3156.c:274 libbalsa/rfc3156.c:278 libbalsa/rfc3156.c:660
-#, fuzzy
 msgid "signing failed"
-msgstr "%s: falha na assinatura: %s"
+msgstr "falha na assinatura"
 
 #: libbalsa/rfc3156.c:351 libbalsa/rfc3156.c:356 libbalsa/rfc3156.c:663
-#, fuzzy
 msgid "encryption failed"
-msgstr "%s: falha na criptografia: %s"
+msgstr "falha na criptografia"
 
 #: libbalsa/rfc3156.c:479 libbalsa/rfc3156.c:484 libbalsa/rfc3156.c:739
 #: libbalsa/rfc3156.c:745
-#, fuzzy
 msgid "signature verification failed"
-msgstr "%s: falha na verificação da assinatura: %s"
+msgstr "falha na verificação da assinatura"
 
 #: libbalsa/rfc3156.c:546 libbalsa/rfc3156.c:819
 msgid "Enter passphrase to decrypt message"
 msgstr "Digite a frase secreta para descriptografar a mensagem"
 
 #: libbalsa/rfc3156.c:558 libbalsa/rfc3156.c:563
-#, fuzzy
 msgid "decryption failed"
-msgstr "%s: descriptografia falhou: %s"
+msgstr "falha na descriptografia"
 
 #: libbalsa/rfc3156.c:656 libbalsa/rfc3156.c:670
-#, fuzzy
 msgid "signing and encryption failed"
-msgstr "%s: falha na assinatura e criptografia: %s"
+msgstr "falha na assinatura e criptografia"
 
 #: libbalsa/rfc3156.c:673
-#, fuzzy, c-format
+#, c-format
 msgid "signing failed: %s"
-msgstr "%s: falha na assinatura: %s"
+msgstr "falha na assinatura: %s"
 
 #: libbalsa/rfc3156.c:676
-#, fuzzy, c-format
+#, c-format
 msgid "encryption failed: %s"
-msgstr "%s: falha na criptografia: %s"
+msgstr "falha na criptografia: %s"
 
 #: libbalsa/rfc3156.c:828 libbalsa/rfc3156.c:835
-#, fuzzy
 msgid "decryption and signature verification failed"
-msgstr "%s: falha na descriptografia e na verificação da assinatura: %s"
+msgstr "falha na descriptografia e na verificação da assinatura"
 
 #: libbalsa/rfc3156.c:866
 msgid "The signature is valid."
@@ -881,11 +868,10 @@ msgid ""
 msgstr "A assinatura é válida mas a chave usada para verificá-la expirou."
 
 #: libbalsa/rfc3156.c:874
-#, fuzzy
 msgid ""
 "The signature is valid but the key used to verify the signature has been "
 "revoked."
-msgstr "A assinatura é válida mas a chave usada para verificá-la expirou."
+msgstr "A assinatura é válida, mas a chave usada para verificá-la foi revogada."
 
 #: libbalsa/rfc3156.c:877
 msgid "The signature is invalid (Note: might be caused by gmime bug!)."
@@ -944,12 +930,10 @@ msgid "bad validity"
 msgstr "validade ruim"
 
 #: libbalsa/rfc3156.c:919
-#, fuzzy
 msgid "PGP signature: "
-msgstr "Assinatura PGP: %s"
+msgstr "Assinatura PGP: "
 
 #: libbalsa/rfc3156.c:921
-#, fuzzy
 msgid "S/MIME signature: "
 msgstr "Assinatura S/MIME: "
 
@@ -1031,55 +1015,47 @@ msgstr ""
 
 #: libbalsa/rfc3156.c:978
 msgid " revoked"
-msgstr ""
+msgstr " revogada"
 
 #: libbalsa/rfc3156.c:983
-#, fuzzy
 msgid " expired"
-msgstr "Respondido"
+msgstr " expirou"
 
 #: libbalsa/rfc3156.c:988
 msgid " disabled"
-msgstr ""
+msgstr " desabilitada"
 
 #: libbalsa/rfc3156.c:993
-#, fuzzy
 msgid " invalid"
-msgstr "[data inválida]"
+msgstr " inválida"
 
 #: libbalsa/rfc3156.c:996
 #, c-format
 msgid ""
 "\n"
 "Key attributes:%s"
-msgstr ""
+msgstr "\nAtributos da chave: %s"
 
 #: libbalsa/rfc3156.c:998
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\n"
 "Key attribute:%s"
-msgstr ""
-"\n"
-"Chave criada em: %s"
+msgstr "\nAtributo da chave: %s"
 
 #: libbalsa/rfc3156.c:1002
 #, c-format
 msgid ""
 "\n"
 "Issuer name: %s"
-msgstr ""
-"\n"
-"Nome do remetente: %s"
+msgstr "\nNome do emissor: %s"
 
 #: libbalsa/rfc3156.c:1005
 #, c-format
 msgid ""
 "\n"
 "Issuer serial number: %s"
-msgstr ""
-"\n"
-"Número de serie do remetente: %s"
+msgstr "\nNúmero de série do emissor: %s"
 
 #: libbalsa/rfc3156.c:1008
 #, c-format
@@ -1182,7 +1158,7 @@ msgstr "Enviando mensagem..."
 
 #: libbalsa/send.c:240 src/main-window.c:2595
 msgid "_Hide"
-msgstr "Esconder"
+msgstr "_Ocultar"
 
 #: libbalsa/send.c:764
 #, c-format
@@ -1193,7 +1169,7 @@ msgid ""
 msgstr ""
 "Não foi possível enviar a mensagem para %s:\n"
 "%d: %s\n"
-"A mensagem ficou em sua caixa de saída.\n"
+"A mensagem ficou na sua caixa de saída.\n"
 
 #: libbalsa/send.c:818
 #, c-format
@@ -1204,7 +1180,7 @@ msgid ""
 msgstr ""
 "Envio recusado:\n"
 "%d: %s\n"
-"Mensagem deixada na caixa de saída.\n"
+"A mensagem ficou na sua caixa de saída.\n"
 
 #: libbalsa/send.c:828
 msgid ""
@@ -1254,7 +1230,7 @@ msgstr ""
 
 #: libbalsa/send.c:1162
 msgid "Message left in Outbox (try again later)"
-msgstr ""
+msgstr "A mensagem ficou na Caixa de Saída (tente novamente mais tarde)"
 
 #: libbalsa/send.c:1166
 #, c-format
@@ -1268,18 +1244,17 @@ msgstr ""
 #: libbalsa/send.c:1514
 #, c-format
 msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
-msgstr ""
+msgstr "Não é possível determinar o conjunto de caracteres para o arquivo texto '%s'; enviar como o tipo mime '%s'"
 
 #: libbalsa/send.c:1808 libbalsa/send.c:1884
-#, fuzzy
 msgid "This message will not be encrypted for the BCC: recipient(s)."
-msgstr "Esta mensagem não será criptografada para o(s) destinatário(s) CCO."
+msgstr "Essa mensagem não será criptografada para o(s) destinatário(s) CCO."
 
 #. host, authentication method
 #: libbalsa/server.c:377
 #, c-format
 msgid "Logging in to %s using %s"
-msgstr ""
+msgstr "Autenticando-se em %s usando %s"
 
 #: libbalsa/source-viewer.c:52 src/main-window.c:647
 msgid "_Select Text"
@@ -1287,7 +1262,7 @@ msgstr "_Selecionar texto"
 
 #: libbalsa/source-viewer.c:53 src/main-window.c:648
 msgid "Select entire mail"
-msgstr "Selecione email completo"
+msgstr "Selecione e-mail completo"
 
 #: libbalsa/source-viewer.c:62
 msgid "_Escape Special Characters"
@@ -1323,23 +1298,23 @@ msgstr "Cliente padrão"
 
 #: libinit_balsa/balsa-druid-page-directory.c:42
 msgid "_Inbox:"
-msgstr "Caixa de entrada:"
+msgstr "Caixa de _entrada:"
 
 #: libinit_balsa/balsa-druid-page-directory.c:42
 msgid "_Outbox:"
-msgstr "Caixa de saída:"
+msgstr "Caixa de _saída:"
 
 #: libinit_balsa/balsa-druid-page-directory.c:42
 msgid "_Sentbox:"
-msgstr "Enviadas:"
+msgstr "E_nviadas:"
 
 #: libinit_balsa/balsa-druid-page-directory.c:42
 msgid "_Draftbox:"
-msgstr "Rascunhos:"
+msgstr "_Rascunhos:"
 
 #: libinit_balsa/balsa-druid-page-directory.c:43
 msgid "_Trash:"
-msgstr "Lixeira:"
+msgstr "_Lixeira:"
 
 #: libinit_balsa/balsa-druid-page-directory.c:70
 #, c-format
@@ -1383,7 +1358,7 @@ msgid ""
 "   -- The Balsa development team"
 msgstr ""
 "Você configurou o Balsa com sucesso. Divirta-se!\n"
-"   -- O time de desenvolvimento Balsa"
+"   -- A equipe de desenvolvimento do Balsa"
 
 #: libinit_balsa/balsa-druid-page-finish.c:46
 msgid "All Done!"
@@ -1414,33 +1389,31 @@ msgstr ""
 
 #: libinit_balsa/balsa-druid-page-user.c:62
 msgid "Yes, remember it"
-msgstr ""
+msgstr "Sim, lembre-se"
 
 #: libinit_balsa/balsa-druid-page-user.c:62
 msgid "No, type it in every time"
-msgstr ""
+msgstr "Não, quero digitá-la toda vez"
 
 #: libinit_balsa/balsa-druid-page-user.c:95
 msgid "Name of mail server for incoming _mail:"
-msgstr ""
+msgstr "Nome do servidor de e-mail para _mensagens de entrada:"
 
 #: libinit_balsa/balsa-druid-page-user.c:100
-#, fuzzy
 msgid "_Type of mail server:"
-msgstr "Tipo de acesso: servidor de mensagem\n"
+msgstr "_Tipo do servidor de e-mail:"
 
 #: libinit_balsa/balsa-druid-page-user.c:104
 msgid "Connect using _SSL:"
-msgstr ""
+msgstr "Conectar usando _SSL:"
 
 #: libinit_balsa/balsa-druid-page-user.c:107
 msgid "Your e-mail _login name:"
-msgstr ""
+msgstr "O _login do seu e-mail:"
 
 #: libinit_balsa/balsa-druid-page-user.c:110
-#, fuzzy
 msgid "Your _password:"
-msgstr "Senha:"
+msgstr "Sua _senha:"
 
 #: libinit_balsa/balsa-druid-page-user.c:118
 msgid "_SMTP Server:"
@@ -1449,21 +1422,19 @@ msgstr "Servidor _SMTP:"
 #. 2.1
 #: libinit_balsa/balsa-druid-page-user.c:123
 msgid "Your real _name:"
-msgstr ""
+msgstr "Seu _nome real:"
 
 #: libinit_balsa/balsa-druid-page-user.c:129
 msgid "Your _Email Address, for this email account:"
-msgstr ""
+msgstr "Seu endereço de _e-mail, para essa conta:"
 
 #: libinit_balsa/balsa-druid-page-user.c:134
-#, fuzzy
 msgid "_Remember your password:"
-msgstr "Lembrar senha"
+msgstr "_Lembrar sua senha:"
 
 #: libinit_balsa/balsa-druid-page-user.c:139
-#, fuzzy
 msgid "_Local mail directory:"
-msgstr "Diretório _local de email:"
+msgstr "Diretório de e-mail _local:"
 
 #: libinit_balsa/balsa-druid-page-user.c:156
 msgid "User Settings"
@@ -1537,12 +1508,11 @@ msgstr "Inicialização do programa"
 
 #: sounds/email.soundlist.in.h:1
 msgid "E-mail"
-msgstr ""
+msgstr "E-mail"
 
 #: sounds/email.soundlist.in.h:2
-#, fuzzy
 msgid "New mail notification"
-msgstr "Sem magnificiência"
+msgstr "Notificação de novas mensagens"
 
 #: src/ab-main.c:338 src/ab-window.c:167 src/filter-edit-dialog.c:193
 #: src/filter-export-dialog.c:88 src/filter-run-dialog.c:220
@@ -1561,7 +1531,7 @@ msgstr "Endereço de E-mail"
 #. Entry widget for finding an address
 #: src/ab-window.c:264
 msgid "_Search for Name:"
-msgstr "Procuar pelo Nome:"
+msgstr "_Procurar pelo Nome:"
 
 #: src/ab-window.c:324
 msgid "Send-To"

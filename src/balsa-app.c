@@ -657,10 +657,6 @@ balsa_find_mailbox(LibBalsaMailbox * mailbox)
     BalsaFind bf;
     gboolean is_sub_thread = libbalsa_am_i_subthread();
 
-#ifdef BALSA_USE_THREADS
-    g_assert(!g_mutex_trylock(gdk_threads_mutex));
-#endif
-
     if (is_sub_thread)
 	gdk_threads_enter();
 

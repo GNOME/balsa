@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.4.9\n"
-"POT-Creation-Date: 1999-12-30 21:13+0100\n"
-"PO-Revision-Date: 1999-12-30 21:14+01:00\n"
+"POT-Creation-Date: 2000-01-03 20:53+0100\n"
+"PO-Revision-Date: 2000-01-03 20:58+01:00\n"
 "Last-Translator: Kjartan Maraas <kmaraas@online.no>\n"
 "Language-Team: Norwegian <no@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -72,27 +72,31 @@ msgstr "Cc:"
 msgid "Bcc:"
 msgstr "Bcc:"
 
+#: src/balsa-message.c:567
+msgid "Fcc:"
+msgstr "Fcc:"
+
 #. Subject:
-#: src/balsa-message.c:567 src/sendmsg-window.c:385
+#: src/balsa-message.c:575 src/sendmsg-window.c:385
 msgid "Subject:"
 msgstr "Emne:"
 
-#: src/balsa-message.c:659
+#: src/balsa-message.c:667
 msgid ""
 "<tr><td bgcolor=\"#f0f0f0\"> You received an encoded file of type "
 "application/"
 msgstr ""
 "<tr><td bgcolor=\"#f0f0f0\"> Du mottok en kodet fil av type applikasjon/"
 
-#: src/balsa-message.c:663
+#: src/balsa-message.c:671
 msgid "<P>The parameters of this message are:<BR>"
 msgstr "<P>Parameterene til denne meldingen er: <BR>"
 
-#: src/balsa-message.c:664
+#: src/balsa-message.c:672
 msgid "<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n"
 msgstr "<table border=0><tr><th>Attributt</th><th>Verdi</th></tr>\n"
 
-#: src/balsa-message.c:891
+#: src/balsa-message.c:899
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Åpning av %s feilet. Errno = %d, "
@@ -117,7 +121,7 @@ msgstr "Ned"
 msgid "New"
 msgstr "Ny"
 
-#: src/filter-edit-dialog.c:230 src/main-window.c:306 src/pref-manager.c:751
+#: src/filter-edit-dialog.c:230 src/main-window.c:306 src/pref-manager.c:970
 msgid "Delete"
 msgstr "Slett"
 
@@ -142,7 +146,7 @@ msgid "Match string:"
 msgstr "Finn streng:"
 
 #: src/filter-edit-dialog.c:416 src/mailbox-conf.c:281 src/mailbox-conf.c:1069
-#: src/pref-manager.c:741
+#: src/pref-manager.c:957
 msgid "Add"
 msgstr "Legg til"
 
@@ -633,208 +637,275 @@ msgstr "Svar til alle mottakere av denne meldingen"
 msgid "Forward this message"
 msgstr "Videresend denne meldingen"
 
-#: src/pref-manager.c:92
+#: src/pref-manager.c:118
 msgid "Text"
 msgstr "Tekst"
 
-#: src/pref-manager.c:93
+#: src/pref-manager.c:119
 msgid "Icons"
 msgstr "Ikoner"
 
-#: src/pref-manager.c:94
+#: src/pref-manager.c:120
 msgid "Both"
 msgstr "Begge"
 
-#: src/pref-manager.c:106
+#: src/pref-manager.c:132
 msgid "7bits"
 msgstr "7bits"
 
-#: src/pref-manager.c:107
+#: src/pref-manager.c:133
 msgid "8bits"
 msgstr "8bits"
 
-#: src/pref-manager.c:108
+#: src/pref-manager.c:134
 msgid "quoted"
 msgstr "sitert"
 
-#: src/pref-manager.c:120
+#: src/pref-manager.c:146
 msgid "While Retrieving Messages"
 msgstr "Under henting av meldinger"
 
-#: src/pref-manager.c:121
+#: src/pref-manager.c:147
 msgid "Until Closed"
 msgstr "Til programmet lukkes"
 
-#: src/pref-manager.c:122
+#: src/pref-manager.c:148
 msgid "Never"
 msgstr "Aldri"
 
-#: src/pref-manager.c:175
+#: src/pref-manager.c:182
 msgid "Balsa Preferences"
 msgstr "Balsa innstillinger"
 
-#. identity page
-#: src/pref-manager.c:195 src/pref-manager.c:614
+#: src/pref-manager.c:260 src/pref-manager.c:744
 msgid "Identity"
 msgstr "Identitet"
 
-#. mailboxes page
-#: src/pref-manager.c:202
-msgid "Mail Servers"
-msgstr "Posttjenere"
-
-#. display page
-#: src/pref-manager.c:209
-msgid "Display"
-msgstr "Vis"
-
-#. Misc page
-#: src/pref-manager.c:216 src/pref-manager.c:900
-msgid "Misc"
-msgstr "Forskjellig"
-
-#. Encoding page
-#: src/pref-manager.c:223 src/pref-manager.c:1004
-msgid "Encoding"
-msgstr "Koding"
-
-#. Printing page
-#: src/pref-manager.c:229 src/pref-manager.c:1059
-msgid "Printing"
-msgstr "Skriver ut"
-
-#. your name
-#: src/pref-manager.c:622
-msgid "Your name:"
-msgstr "Ditt navn:"
-
-#. email address
-#: src/pref-manager.c:632
-msgid "E-Mail address:"
-msgstr "E-post adresse:"
-
-#. reply-to address
-#: src/pref-manager.c:642
-msgid "Reply-to address:"
-msgstr "Svar-til adresse:"
-
-#. Signature stuff
-#: src/pref-manager.c:653
+#: src/pref-manager.c:269 src/pref-manager.c:814 src/pref-manager.c:885
 msgid "Signature"
 msgstr "Signatur"
 
-#: src/pref-manager.c:661
+#: src/pref-manager.c:277
+msgid "Mail Servers"
+msgstr "Posttjenere"
+
+#: src/pref-manager.c:285
+msgid "Mail Options"
+msgstr "Alternativer for post"
+
+#: src/pref-manager.c:293 src/pref-manager.c:1278
+msgid "Display"
+msgstr "Vis"
+
+#: src/pref-manager.c:301 src/pref-manager.c:1303 src/pref-manager.c:1348
+msgid "Printing"
+msgstr "Skriver ut"
+
+#: src/pref-manager.c:309 src/pref-manager.c:1389 src/pref-manager.c:1407
+msgid "Encoding"
+msgstr "Koding"
+
+#: src/pref-manager.c:317 src/pref-manager.c:1431
+msgid "Misc"
+msgstr "Forskjellig"
+
+#: src/pref-manager.c:325
+msgid "Startup"
+msgstr "Oppstart"
+
+#: src/pref-manager.c:768
+msgid "Your name:"
+msgstr "Ditt navn:"
+
+#: src/pref-manager.c:775
+msgid "E-mail address:"
+msgstr "E-post adresse:"
+
+#: src/pref-manager.c:781
+msgid "Reply-to address:"
+msgstr "Svar-til adresse:"
+
+#: src/pref-manager.c:826
+msgid "Select your signature file"
+msgstr "Velg din signaturfil:"
+
+#: src/pref-manager.c:836
+msgid "sending mail"
+msgstr "sender e-post"
+
+#: src/pref-manager.c:842
+msgid "replying to mail"
+msgstr "svarer på e-post"
+
+#: src/pref-manager.c:848
+msgid "forwarding mail"
+msgstr "videresender e-post"
+
+#: src/pref-manager.c:863
+msgid ">"
+msgstr ">"
+
+#: src/pref-manager.c:865
 msgid "Signature file:"
 msgstr "Signaturfil:"
 
-#: src/pref-manager.c:672
-msgid "Include signature when sending mail"
-msgstr "Inkludér signatur når du sender post"
-
-#: src/pref-manager.c:676
-msgid "Include signature when forwarding mail"
-msgstr "Inkludér signatur når du videresender post"
-
-#: src/pref-manager.c:680
-msgid "Include signature when replying to mail"
-msgstr "Inkludér signatur når du svarer på post"
-
-#: src/pref-manager.c:711
-msgid "Remote Mailbox Servers"
-msgstr "Eksterne postbokstjenere"
-
-#: src/pref-manager.c:720
-msgid "Type"
-msgstr "Type"
-
-#: src/pref-manager.c:721
-msgid "Mailbox name"
-msgstr "Navn på postboks"
-
-#: src/pref-manager.c:746
-msgid "Modify"
-msgstr "Modifiser"
-
-#: src/pref-manager.c:756
-msgid "Local Mail"
-msgstr "Lokal post"
-
-#: src/pref-manager.c:762
-msgid "Local mail directory:"
-msgstr "Lokal postmappe:"
-
-#. smtp server
-#: src/pref-manager.c:769
-msgid "Outgoing Mail"
-msgstr "Utgående post"
-
-#: src/pref-manager.c:778
-msgid "Remote SMTP Server"
-msgstr "Ekstern SMTP tjener"
-
-#: src/pref-manager.c:788
-msgid "Local mail user agent"
-msgstr "Brukeragent for lokal post"
-
-#. Toolbars
-#: src/pref-manager.c:833
-msgid "Toolbars"
-msgstr "Verktøylinjer"
-
-#. Main window
-#: src/pref-manager.c:850
-msgid "Main window"
-msgstr "Hovedvindu"
-
-#: src/pref-manager.c:853
-msgid "Use preview pane"
-msgstr "Bruk forhåndsvisningsområde"
-
-#. Progress Dialog
-#: src/pref-manager.c:857
-msgid "Display Progress Dialog"
-msgstr "Vis progresjonssdialog"
-
-#: src/pref-manager.c:877
-msgid "View mailbox content informations "
-msgstr "Vis informasjon om postboksinnhold"
-
-#: src/pref-manager.c:908
-msgid "Debug"
-msgstr "Avlusing"
-
-#: src/pref-manager.c:914
+#: src/pref-manager.c:872
 msgid "Reply prefix:"
 msgstr "Svarprefiks:"
 
-#. bcc address
-#: src/pref-manager.c:924
+#: src/pref-manager.c:879
+msgid "Use signature file when:"
+msgstr "Bruk signaturfil når:"
+
+#: src/pref-manager.c:916
+msgid "Remote Malibox Servers"
+msgstr "Eksterne postbokstjenere"
+
+#: src/pref-manager.c:941
+msgid "Type"
+msgstr "Type"
+
+#: src/pref-manager.c:945
+msgid "Mailbox name"
+msgstr "Navn på postboks"
+
+#: src/pref-manager.c:964
+msgid "Modify"
+msgstr "Modifiser"
+
+#: src/pref-manager.c:976
+msgid "Local mail"
+msgstr "Lokal e-post"
+
+#: src/pref-manager.c:991
+msgid "Select your local mail directory"
+msgstr "Velg din lokale e-postmappe:"
+
+#: src/pref-manager.c:1001
+msgid "Outgoing mail"
+msgstr "Utgående e-post"
+
+#: src/pref-manager.c:1020
+msgid "Remote SMTP Server"
+msgstr "Ekstern SMTP tjener"
+
+#: src/pref-manager.c:1027
+msgid "Local mail user agent"
+msgstr "Brukeragent for lokal post"
+
+#: src/pref-manager.c:1056
+msgid "Incoming"
+msgstr "Innkommende"
+
+#: src/pref-manager.c:1060
+msgid "Outgoing"
+msgstr "Utgående"
+
+#: src/pref-manager.c:1079
+msgid "Checking"
+msgstr "Sjekker"
+
+#: src/pref-manager.c:1089
+msgid "Minutes"
+msgstr "Minutter"
+
+#: src/pref-manager.c:1103
+msgid "Check mail automatically every:"
+msgstr "Sjekk etter e-post automatisk hvert:"
+
+#: src/pref-manager.c:1126
+msgid "Word Wrap"
+msgstr "Ordbryting"
+
+#: src/pref-manager.c:1152
+msgid "Characters"
+msgstr "Tegn"
+
+#: src/pref-manager.c:1158
+msgid "Other options"
+msgstr "Andre alternativer"
+
+#: src/pref-manager.c:1169
 msgid "Default Bcc to:"
 msgstr "Forvalgt Bcc til:"
 
-#: src/pref-manager.c:954
-msgid "Font:"
-msgstr "Skrifttype:"
+#: src/pref-manager.c:1205
+msgid "Main window"
+msgstr "Hovedvindu"
 
-#: src/pref-manager.c:969
-msgid "Browse..."
-msgstr "Bla gjennom..."
+#: src/pref-manager.c:1215
+msgid "use preview pane"
+msgstr "bruk forhåndsvisningsområde"
 
-#: src/pref-manager.c:1015
-msgid "Charset:"
-msgstr "Tengsett:"
+#.
+#. * This is not ready, yet!
+#. *
+#. * -Ragnar-
+#. *
+#.
+#: src/pref-manager.c:1226
+msgid "View all headers"
+msgstr "Vis alle headere"
 
-#: src/pref-manager.c:1069
+#: src/pref-manager.c:1232
+msgid "View mailbox content informations"
+msgstr "Vis informasjon om postboksinnhold"
+
+#: src/pref-manager.c:1241
+msgid "Toolbars"
+msgstr "Verktøylinjer"
+
+#: src/pref-manager.c:1260
+msgid "Display progress dialog"
+msgstr "Vis progresjonssdialog"
+
+#: src/pref-manager.c:1331
+msgid "characters"
+msgstr "tegn"
+
+#: src/pref-manager.c:1335
 msgid "Print command:"
 msgstr "Utskriftskommando:"
 
-#: src/pref-manager.c:1080
-msgid "Linesize:"
-msgstr "Linjestørrelse:"
+#: src/pref-manager.c:1341
+msgid "Break line at:"
+msgstr "Bryt linjer ved:"
 
-#: src/pref-manager.c:1092
-msgid "Break line"
-msgstr "Bryt linjer"
+#: src/pref-manager.c:1375
+msgid "Charset"
+msgstr "Tegnsett"
+
+#: src/pref-manager.c:1441
+msgid "Debug"
+msgstr "Avlusing"
+
+#: src/pref-manager.c:1445
+msgid "Empty trash on exit"
+msgstr "Tøm søppel ved avslutting"
+
+#: src/pref-manager.c:1449
+msgid "Font"
+msgstr "Skrifttype"
+
+#: src/pref-manager.c:1477
+msgid "Select a font to use"
+msgstr "Velg skrifttype som skal brukes"
+
+#: src/pref-manager.c:1481
+msgid "Browse..."
+msgstr "Bla gjennom..."
+
+#: src/pref-manager.c:1486
+msgid "Preview pane"
+msgstr "Forhåndsvisningsområde"
+
+#: src/pref-manager.c:1506
+msgid "Options"
+msgstr "Alternativer"
+
+#: src/pref-manager.c:1516
+msgid "Check mail upon startup"
+msgstr "Hent ny post ved oppstart"
 
 #: src/sendmsg-window.c:75
 msgid "Send"
@@ -949,30 +1020,30 @@ msgstr "Ny melding"
 #. * 	tmp = g_strdup_printf (buf);
 #. * so the date attribution can fully (and properly) translated.
 #.
-#: src/sendmsg-window.c:759
+#: src/sendmsg-window.c:766
 #, c-format
 msgid "On %s "
 msgstr "På %s "
 
-#: src/sendmsg-window.c:769 src/sendmsg-window.c:772
+#: src/sendmsg-window.c:776 src/sendmsg-window.c:779
 msgid "you"
 msgstr "du"
 
-#: src/sendmsg-window.c:774
+#: src/sendmsg-window.c:781
 msgid " wrote:\n"
 msgstr " skrev:\n"
 
-#: libbalsa/mailbox.c:591
+#: libbalsa/mailbox.c:593
 #, c-format
 msgid "Mailbox: Opening %s Refcount: %d\n"
 msgstr "Postboks: Åpning av %s referansetall: %d\n"
 
-#: libbalsa/mailbox.c:611
+#: libbalsa/mailbox.c:613
 #, c-format
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr "Postboks: Lukker %s referansetall: %d\n"
 
-#: balsa-druid-page-directory.gob:58
+#: libinit_balsa/balsa-druid-page-directory.gob:58
 #, c-format
 msgid ""
 "The pathname \"%s\" must be specified canonically -- it must start with a "
@@ -980,17 +1051,17 @@ msgid ""
 msgstr ""
 "Stinavnet \"%s\" må spesifiseres skikkelig -- det må starte med en '/'."
 
-#: balsa-druid-page-directory.gob:76
+#: libinit_balsa/balsa-druid-page-directory.gob:76
 #, c-format
 msgid "An error occurred when attempting to creat(2) the file \"%s\"."
 msgstr "En feil oppstod ved forsøk på å kjøre creat(2) på filen \"%s\"."
 
-#: balsa-druid-page-directory.gob:84
+#: libinit_balsa/balsa-druid-page-directory.gob:84
 #, c-format
 msgid "The mailbox \"%s\" does not appear to be valid."
 msgstr "Postboksen \"%s\" ser ikke ut til å være gyldig."
 
-#: balsa-druid-page-directory.gob:146
+#: libinit_balsa/balsa-druid-page-directory.gob:146
 msgid ""
 "Please confirm the locations of your default mail files.\n"
 "These will be created if necessary."
@@ -998,7 +1069,7 @@ msgstr ""
 "Vennligst bekreft plasseringen av standard postfiler.\n"
 "Disse vil bli opprettet hvis nødvendig."
 
-#: balsa-druid-page-directory.gob:157
+#: libinit_balsa/balsa-druid-page-directory.gob:157
 msgid "Inbox:"
 msgstr "Innboks:"
 
@@ -1006,51 +1077,51 @@ msgstr "Innboks:"
 #. * as in the prepare code. But at this point balsa_app.local_mail_directory
 #. * is NULL, so we use a dummy value.
 #.
-#: balsa-druid-page-directory.gob:166
+#: libinit_balsa/balsa-druid-page-directory.gob:166
 msgid "Outbox:"
 msgstr "Utboks:"
 
-#: balsa-druid-page-directory.gob:169
+#: libinit_balsa/balsa-druid-page-directory.gob:169
 msgid "Sentbox:"
 msgstr "Sendt:"
 
-#: balsa-druid-page-directory.gob:172
+#: libinit_balsa/balsa-druid-page-directory.gob:172
 msgid "Draftbox:"
 msgstr "Skisser:"
 
-#: balsa-druid-page-directory.gob:175
+#: libinit_balsa/balsa-druid-page-directory.gob:175
 msgid "Trash:"
 msgstr "Søppel:"
 
-#: balsa-druid-page-directory.gob:186
+#: libinit_balsa/balsa-druid-page-directory.gob:186
 msgid "Mail Files"
 msgstr "Post filer"
 
-#: balsa-druid-page-directory.gob:243
+#: libinit_balsa/balsa-druid-page-directory.gob:243
 msgid "Inbox"
 msgstr "Innboks"
 
-#: balsa-druid-page-directory.gob:245
+#: libinit_balsa/balsa-druid-page-directory.gob:245
 msgid "Outbox"
 msgstr "Utboks"
 
-#: balsa-druid-page-directory.gob:247
+#: libinit_balsa/balsa-druid-page-directory.gob:247
 msgid "Sentbox"
 msgstr "Sendt"
 
-#: balsa-druid-page-directory.gob:249
+#: libinit_balsa/balsa-druid-page-directory.gob:249
 msgid "Draftbox"
 msgstr "Skisser"
 
-#: balsa-druid-page-directory.gob:251
+#: libinit_balsa/balsa-druid-page-directory.gob:251
 msgid "Trash"
 msgstr "Søppel"
 
-#: balsa-druid-page-directory.gob:259
+#: libinit_balsa/balsa-druid-page-directory.gob:259
 msgid "Problem Creating Mailboxes"
 msgstr "Problem ved oppretting av postbokser"
 
-#: balsa-druid-page-finish.gob:44
+#: libinit_balsa/balsa-druid-page-finish.gob:44
 msgid ""
 "You've successfully set up Balsa. Have fun!\n"
 "   -- The Balsa development team"
@@ -1058,43 +1129,43 @@ msgstr ""
 "Du har fullført oppsettet av Balsa. Kos deg!\n"
 "   -- Balsa utviklingsteamet"
 
-#: balsa-druid-page-finish.gob:56
+#: libinit_balsa/balsa-druid-page-finish.gob:56
 msgid "All Done!"
 msgstr "Ferdig!"
 
-#: balsa-druid-page-user.gob:74
+#: libinit_balsa/balsa-druid-page-user.gob:74
 msgid "Please enter information about yourself."
 msgstr "Vennligst skriv inn informasjon om deg selv."
 
-#: balsa-druid-page-user.gob:82
+#: libinit_balsa/balsa-druid-page-user.gob:82
 msgid "Name:"
 msgstr "Navn:"
 
-#: balsa-druid-page-user.gob:86
+#: libinit_balsa/balsa-druid-page-user.gob:86
 msgid "Email address:"
 msgstr "E-post adresse:"
 
-#: balsa-druid-page-user.gob:90
+#: libinit_balsa/balsa-druid-page-user.gob:90
 msgid "SMTP Server:"
 msgstr "SMTP-tjener:"
 
-#: balsa-druid-page-user.gob:93
+#: libinit_balsa/balsa-druid-page-user.gob:93
 msgid "Local Mail Directory:"
 msgstr "Lokal postmappe:"
 
-#: balsa-druid-page-user.gob:103
+#: libinit_balsa/balsa-druid-page-user.gob:103
 msgid "User Settings"
 msgstr "Brukerinnstillinger"
 
-#: balsa-druid-page-user.gob:151
+#: libinit_balsa/balsa-druid-page-user.gob:151
 msgid "Local Mail Problem"
 msgstr "Lokal problem med e-post"
 
-#: balsa-druid-page-welcome.gob:47
+#: libinit_balsa/balsa-druid-page-welcome.gob:47
 msgid "Welcome to Balsa!"
 msgstr "Velkommen til Balsa!"
 
-#: balsa-druid-page-welcome.gob:50
+#: libinit_balsa/balsa-druid-page-welcome.gob:50
 msgid ""
 "You seem to be running Balsa for the first time. The following\n"
 "steps will set up Balsa by asking a few simple questions. Once\n"
@@ -1111,7 +1182,7 @@ msgstr ""
 "bli gjort automatisk. Vennligst se Om-boksen i Balsa's hovedvindu for mer \n"
 "informasjon om hvordan du kan kontakte forfatterene eller rapportere feil."
 
-#: balsa-initdruid.gob:91
+#: libinit_balsa/balsa-initdruid.gob:91
 msgid ""
 "This will exit Balsa. Do you\n"
 "really want to do this?"

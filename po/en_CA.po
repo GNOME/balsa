@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-11-09 17:18-0500\n"
-"PO-Revision-Date: 2004-11-09 14:48-0400\n"
+"POT-Creation-Date: 2004-11-14 01:58-0500\n"
+"PO-Revision-Date: 2004-11-14 14:48-0400\n"
 "Last-Translator: Adam Weinberger <adamw@gnome.org>\n"
 "Language-Team: en_CA <adamw@FreeBSD.org>\n"
 "MIME-Version: 1.0\n"
@@ -67,7 +67,7 @@ msgid "Cannot add duplicate entry"
 msgstr "Cannot add duplicate entry"
 
 #: libbalsa/address-book.c:407 src/main-window.c:2203 src/main-window.c:4191
-#: src/sendmsg-window.c:4159
+#: src/sendmsg-window.c:4180
 msgid "Unknown error"
 msgstr "Unknown error"
 
@@ -257,12 +257,12 @@ msgstr "%s: multiple keys for %s"
 
 #. should "re" be localized ?
 #: libbalsa/identity.c:92 libbalsa/mailbox_local.c:1111
-#: libbalsa/mailbox_local.c:1113 src/sendmsg-window.c:2709
-#: src/sendmsg-window.c:2710
+#: libbalsa/mailbox_local.c:1113 src/sendmsg-window.c:2711
+#: src/sendmsg-window.c:2712
 msgid "Re:"
 msgstr "Re:"
 
-#: libbalsa/identity.c:93 src/sendmsg-window.c:2739 src/sendmsg-window.c:2740
+#: libbalsa/identity.c:93 src/sendmsg-window.c:2741 src/sendmsg-window.c:2742
 msgid "Fwd:"
 msgstr "Fwd:"
 
@@ -1866,27 +1866,27 @@ msgstr "_Move to"
 msgid "_View Source"
 msgstr "_View Source"
 
-#: src/balsa-index.c:2093
+#: src/balsa-index.c:2095
 #, c-format
 msgid "Failed to copy messages to mailbox \"%s\": %s"
 msgstr "Failed to copy messages to mailbox \"%s\": %s"
 
-#: src/balsa-index.c:2094
+#: src/balsa-index.c:2096
 #, c-format
 msgid "Failed to copy message to mailbox \"%s\": %s"
 msgstr "Failed to copy message to mailbox \"%s\": %s"
 
-#: src/balsa-index.c:2106
+#: src/balsa-index.c:2108
 #, c-format
 msgid "Copied to \"%s\"."
 msgstr "Copied to \"%s\"."
 
-#: src/balsa-index.c:2107
+#: src/balsa-index.c:2109
 #, c-format
 msgid "Moved to \"%s\"."
 msgstr "Moved to \"%s\"."
 
-#: src/balsa-index.c:2227
+#: src/balsa-index.c:2229
 #, c-format
 msgid "Committing mailbox %s failed."
 msgstr "Committing mailbox %s failed."
@@ -1895,23 +1895,23 @@ msgstr "Committing mailbox %s failed."
 msgid "Mailbox"
 msgstr "Mailbox"
 
-#: src/balsa-mblist.c:1004 src/balsa-mblist.c:1040
+#: src/balsa-mblist.c:1004 src/balsa-mblist.c:1042
 msgid "Failed to find mailbox"
 msgstr "Failed to find mailbox"
 
-#: src/balsa-mblist.c:1623
+#: src/balsa-mblist.c:1625
 msgid "_Other..."
 msgstr "_Other..."
 
-#: src/balsa-mblist.c:1691
+#: src/balsa-mblist.c:1693
 msgid "Choose destination folder"
 msgstr "Choose destination folder"
 
-#: src/balsa-mblist.c:1893
+#: src/balsa-mblist.c:1895
 msgid "Other..."
 msgstr "Other..."
 
-#: src/balsa-mblist.c:2186
+#: src/balsa-mblist.c:2188
 #, c-format
 msgid "Shown mailbox: %s with %d message, "
 msgid_plural "Shown mailbox: %s with %d messages, "
@@ -1920,7 +1920,7 @@ msgstr[1] "Shown mailbox: %s with %d messages, "
 
 #. xgettext: this is the second part of the message
 #. * "Shown mailbox: %s with %d messages, %ld new".
-#: src/balsa-mblist.c:2192
+#: src/balsa-mblist.c:2194
 #, c-format
 msgid "%ld new"
 msgid_plural "%ld new"
@@ -1957,7 +1957,7 @@ msgstr "Save selected..."
 msgid "(No sender)"
 msgstr "(No sender)"
 
-#: src/balsa-message.c:1199 src/balsa-message.c:3734
+#: src/balsa-message.c:1199 src/balsa-message.c:3754
 #, c-format
 msgid "Could not access message; mailbox \"%s\" was changed."
 msgstr "Could not access message: mailbox \"%s\" was changed."
@@ -2084,7 +2084,7 @@ msgstr "View _part with %s"
 msgid "Calling URL %s..."
 msgstr "Calling URL %s..."
 
-#: src/balsa-message.c:2296 src/balsa-message.c:3117 src/balsa-message.c:3869
+#: src/balsa-message.c:2296 src/balsa-message.c:3137 src/balsa-message.c:3889
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "Error showing %s: %s\n"
@@ -2151,21 +2151,21 @@ msgstr "encrypted: "
 msgid "Open with %s"
 msgstr "Open with %s"
 
-#: src/balsa-message.c:3010
+#: src/balsa-message.c:3028
 msgid "Save..."
 msgstr "Save..."
 
-#: src/balsa-message.c:3195
+#: src/balsa-message.c:3215
 #, c-format
 msgid "Could not create temporary file %s"
 msgstr "Could not create temporary file %s"
 
-#: src/balsa-message.c:3240
+#: src/balsa-message.c:3260
 #, c-format
 msgid "could not create temporary file %s"
 msgstr "could not create temporary file %s"
 
-#: src/balsa-message.c:4146
+#: src/balsa-message.c:4166
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2176,11 +2176,11 @@ msgstr ""
 "a Message Disposition Notification(MDN) to be returned to `%s'.\n"
 "Do you want to send this notification?"
 
-#: src/balsa-message.c:4153
+#: src/balsa-message.c:4173
 msgid "Reply to MDN?"
 msgstr "Reply to MDN?"
 
-#: src/balsa-message.c:4472
+#: src/balsa-message.c:4492
 #, c-format
 msgid ""
 "This is an inline %s signed %s message part:\n"
@@ -2189,19 +2189,19 @@ msgstr ""
 "This is an inline %s signed %s message part:\n"
 "%s"
 
-#: src/balsa-message.c:4474 src/print.c:1303
+#: src/balsa-message.c:4494 src/print.c:1303
 msgid "OpenPGP"
 msgstr "OpenPGP"
 
-#: src/balsa-message.c:4474 src/balsa-message.c:4736 src/print.c:1303
+#: src/balsa-message.c:4494 src/balsa-message.c:4756 src/print.c:1303
 msgid "S/MIME"
 msgstr "S/MIME"
 
-#: src/balsa-message.c:4492
+#: src/balsa-message.c:4512
 msgid "_Run gpg to import this key"
 msgstr "_Run gpg to import this key"
 
-#: src/balsa-message.c:4609 src/balsa-message.c:4833
+#: src/balsa-message.c:4629 src/balsa-message.c:4853
 msgid ""
 "This operation can not be performed because this message is displayed more "
 "than once.\n"
@@ -2211,7 +2211,7 @@ msgstr ""
 "than once.\n"
 "Please close the other instances of this message and try again."
 
-#: src/balsa-message.c:4645
+#: src/balsa-message.c:4665
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains an encrypted part, but "
@@ -2220,7 +2220,7 @@ msgstr ""
 "The message sent by %s with subject \"%s\" contains an encrypted part, but "
 "it's structure is invalid."
 
-#: src/balsa-message.c:4653
+#: src/balsa-message.c:4673
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
@@ -2229,7 +2229,7 @@ msgstr ""
 "The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
 "but this crypto protocol is not available."
 
-#: src/balsa-message.c:4666
+#: src/balsa-message.c:4686
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
@@ -2238,7 +2238,7 @@ msgstr ""
 "The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
 "but this crypto protocol is not available."
 
-#: src/balsa-message.c:4720
+#: src/balsa-message.c:4740
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a signed part, but it's "
@@ -2247,7 +2247,7 @@ msgstr ""
 "The message sent by %s with subject \"%s\" contains a signed part, but it's "
 "structure is invalid. The signature, if there is any, can not be checked."
 
-#: src/balsa-message.c:4733
+#: src/balsa-message.c:4753
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a %s signed part, but "
@@ -2256,23 +2256,23 @@ msgstr ""
 "The message sent by %s with subject \"%s\" contains a %s signed part, but "
 "this crypto protocol is not available."
 
-#: src/balsa-message.c:4736
+#: src/balsa-message.c:4756
 msgid "PGP"
 msgstr "PGP"
 
-#: src/balsa-message.c:4755 src/balsa-message.c:4860
+#: src/balsa-message.c:4775 src/balsa-message.c:4880
 msgid "Detected a good signature"
 msgstr "Detected a good signature"
 
-#: src/balsa-message.c:4761
+#: src/balsa-message.c:4781
 msgid "Detected a good signature with insufficient validity"
 msgstr "Detected a good signature with insufficient validity"
 
-#: src/balsa-message.c:4766 src/balsa-message.c:4864
+#: src/balsa-message.c:4786 src/balsa-message.c:4884
 msgid "Detected a good signature with insufficient validity/trust"
 msgstr "Detected a good signature with insufficient validity/trust"
 
-#: src/balsa-message.c:4773 src/balsa-message.c:4870
+#: src/balsa-message.c:4793 src/balsa-message.c:4890
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" "
@@ -2283,7 +2283,7 @@ msgstr ""
 "returned:\n"
 "%s"
 
-#: src/balsa-message.c:4785
+#: src/balsa-message.c:4805
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" failed "
@@ -3785,7 +3785,7 @@ msgstr ""
 "Balsa is sending a mail now.\n"
 "Abort sending?"
 
-#: src/main-window.c:1379
+#: src/main-window.c:1379 src/main-window.c:4877
 msgid "Subject or Sender _Contains:"
 msgstr "Subject or Sender _Contains:"
 
@@ -3913,6 +3913,10 @@ msgstr "Balsa: %s (readonly)"
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
+
+#: src/main-window.c:4876
+msgid "Subject or Receiver _Contains:"
+msgstr "Subject or Receiver _Contains:"
 
 #: src/main.c:217
 msgid "Get new mail on startup"
@@ -4305,7 +4309,7 @@ msgstr "MB"
 msgid "Quoted and Flowed Text"
 msgstr "Quoted and Flowed Text"
 
-#: src/pref-manager.c:1937 src/sendmsg-window.c:4343
+#: src/pref-manager.c:1937 src/sendmsg-window.c:4364
 msgid "Quoted Text Regular Expression"
 msgstr "Quoted Text Regular Expression"
 
@@ -5210,7 +5214,7 @@ msgid "Attach file"
 msgstr "Attach file"
 
 #: src/sendmsg-window.c:1894 src/sendmsg-window.c:1957
-#: src/sendmsg-window.c:3355
+#: src/sendmsg-window.c:3357
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -5270,11 +5274,35 @@ msgstr "On %s, %s wrote:\n"
 msgid "%s wrote:\n"
 msgstr "%s wrote:\n"
 
-#: src/sendmsg-window.c:3511
+#: src/sendmsg-window.c:2670
+msgid "No signature found!"
+msgstr "No signature found!"
+
+#: src/sendmsg-window.c:3475
+#, c-format
+msgid "Error executing signature generator %s"
+msgstr "Error executing signature generator %s"
+
+#: src/sendmsg-window.c:3487
+#, c-format
+msgid "Cannot open signature file '%s' for reading"
+msgstr "Cannot open signature file '%s' for reading"
+
+#: src/sendmsg-window.c:3497
+#, c-format
+msgid "Error reading signature from %s"
+msgstr "Error reading signature from %s"
+
+#: src/sendmsg-window.c:3501
+#, c-format
+msgid "Signature in %s is not a UTF-8 text."
+msgstr "Signature in %s is not a UTF-8 text."
+
+#: src/sendmsg-window.c:3532
 msgid "Choose charset"
 msgstr "Choose charset"
 
-#: src/sendmsg-window.c:3518
+#: src/sendmsg-window.c:3539
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file.\n"
@@ -5284,16 +5312,16 @@ msgstr ""
 "Please choose the charset used to encode the file.\n"
 "(choose Generic UTF-8 if unsure)."
 
-#: src/sendmsg-window.c:3585
+#: src/sendmsg-window.c:3606
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Could not open the file %s.\n"
 
-#: src/sendmsg-window.c:3607
+#: src/sendmsg-window.c:3628
 msgid "Include file"
 msgstr "Include file"
 
-#: src/sendmsg-window.c:3926
+#: src/sendmsg-window.c:3947
 #, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
@@ -5304,7 +5332,7 @@ msgstr ""
 "Please choose a language for this message.\n"
 "For multi-language messages, choose UTF-8."
 
-#: src/sendmsg-window.c:3967
+#: src/sendmsg-window.c:3988
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
@@ -5314,70 +5342,70 @@ msgstr ""
 "the first part will be signed and/or encrypted. You should select MIME mode "
 "if the complete message shall be protected. Do you really want to proceed?"
 
-#: src/sendmsg-window.c:3983
+#: src/sendmsg-window.c:4004
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "sending message with gpg mode %d"
 
-#: src/sendmsg-window.c:4030
+#: src/sendmsg-window.c:4051
 msgid "Message could not be created"
 msgstr "Message could not be created"
 
-#: src/sendmsg-window.c:4032
+#: src/sendmsg-window.c:4053
 msgid "Message could not be queued in outbox"
 msgstr "Message could not be queued in outbox"
 
-#: src/sendmsg-window.c:4034
+#: src/sendmsg-window.c:4055
 msgid "Message could not be saved in sentbox"
 msgstr "Message could not be saved in sentbox"
 
-#: src/sendmsg-window.c:4036
+#: src/sendmsg-window.c:4057
 msgid "Message could not be sent"
 msgstr "Message could not be sent"
 
-#: src/sendmsg-window.c:4040
+#: src/sendmsg-window.c:4061
 #, c-format
 msgid "Send failed: %s"
 msgstr "Send failed: %s"
 
-#: src/sendmsg-window.c:4128
+#: src/sendmsg-window.c:4149
 msgid "Could not postpone message."
 msgstr "Could not postpone message."
 
-#: src/sendmsg-window.c:4142
+#: src/sendmsg-window.c:4163
 msgid "Message postponed."
 msgstr "Message postponed."
 
-#: src/sendmsg-window.c:4158
+#: src/sendmsg-window.c:4179
 #, c-format
 msgid "Could not open draftbox: %s"
 msgstr "Could not open draftbox: %s"
 
-#: src/sendmsg-window.c:4180
+#: src/sendmsg-window.c:4201
 msgid "Message saved."
 msgstr "Message saved."
 
-#: src/sendmsg-window.c:4342
+#: src/sendmsg-window.c:4363
 #, c-format
 msgid "Could not compile %s"
 msgstr "Could not compile %s"
 
-#: src/sendmsg-window.c:4852
+#: src/sendmsg-window.c:4873
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Reply to %s: %s"
 
-#: src/sendmsg-window.c:4857
+#: src/sendmsg-window.c:4878
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Forward message to %s: %s"
 
-#: src/sendmsg-window.c:4861
+#: src/sendmsg-window.c:4882
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Continue message to %s: %s"
 
-#: src/sendmsg-window.c:4865
+#: src/sendmsg-window.c:4886
 #, c-format
 msgid "New message to %s: %s"
 msgstr "New message to %s: %s"

@@ -47,9 +47,9 @@ static gint about_box_visible = FALSE;
 
 /* main window widget components */
 static gint progress_timeout (gpointer data);
+static void create_menu (GnomeMDI *);
 
 static void app_created (GnomeMDI *, GnomeApp * app);
-static GtkMenuBar *create_menu (GnomeMDI *, GtkWidget * app);
 static GtkToolbar *create_toolbar (GnomeMDI *, GtkWidget * app);
 
 
@@ -136,12 +136,13 @@ main_window_init (void)
 		      NULL);
 
   /* meubar and toolbar */
-  gtk_signal_connect (GTK_OBJECT (mdi), "create_menus", GTK_SIGNAL_FUNC (create_menu), NULL);
   gtk_signal_connect (GTK_OBJECT (mdi), "create_toolbar", GTK_SIGNAL_FUNC (create_toolbar), NULL);
   gtk_signal_connect (GTK_OBJECT (mdi), "child_changed", GTK_SIGNAL_FUNC (index_child_changed), NULL);
   gtk_signal_connect (GTK_OBJECT (mdi), "app_created", GTK_SIGNAL_FUNC (app_created), NULL);
   gnome_mdi_set_child_list_path (mdi, _ ("Mailboxes/<Separator>"));
 
+  create_menu(mdi);
+  
   gnome_mdi_set_mode (mdi, balsa_app.mdi_style);
 
   refresh_main_window ();
@@ -220,13 +221,9 @@ refresh_main_window (void)
  * the menubar for the main window
  */
 
-static GtkMenuBar *
-create_menu (GnomeMDI * mdi, GtkWidget * app)
+static void
+create_menu (GnomeMDI * mdi)
 {
-  GtkWidget *menubar;
-  GtkWidget *w;
-  GtkWidget *menu;
-  GtkAccelGroup *accel;
   static GnomeUIInfo file_menu[] = {
     /* Ctrl-M */
     {GNOME_APP_UI_ITEM, N_("_Get new mail"), NULL, check_new_messages_cb, NULL,
@@ -284,9 +281,7 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
     GNOMEUIINFO_END
   };
 
-  gnome_app_create_menus(GNOME_APP(app), main_menu);
-
-  return NULL;
+  gnome_mdi_set_menu_template(mdi, main_menu);
 }
 
 

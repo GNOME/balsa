@@ -1,3 +1,8 @@
+2004-09-30 13:48  PeterB
+
+	* src/mailbox-node.c: do not connect twice to the
+	"show-prop-dialog" signal.
+
 2004-09-29 19:32  PeterB
 
 	* src/balsa-mblist.c: don't check for click in expander column.

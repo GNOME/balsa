@@ -25,6 +25,7 @@
 #include "index.h"
 #include "mailbox.h"
 #include "options.h"
+#include "addrbook-window.h"
 #include "../config.h"
 
 
@@ -249,7 +250,7 @@ create_toolbar (MainWindow *mw)
 			     "Address Book",
 			     NULL,
 			     new_icon (p14_xpm, window),
-			     NULL,
+			     GTK_SIGNAL_FUNC (addressbook_window_new),
 			     "Address Book");
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));

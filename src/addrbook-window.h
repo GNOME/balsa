@@ -17,15 +17,17 @@
  * 02111-1307, USA.
  */
 
-#include <gnome.h>
+typedef struct _AddressbookEntry AddressbookEntry;
+struct _AddressbookEntry
+  {
+    gint num;
 
-#include "addressbook.h"
-#include "balsa-app.h"
-#include "index.h"
-#include "mailbox.h"
-#include "../config.h"
+    gchar *name;
 
-void addressbook_init()
-{
+    gchar *comment;
 
-}
+    GList *emails;
+  };
+
+void addressbook_init();
+void addressbook_window_new(GtkWidget *, gpointer);

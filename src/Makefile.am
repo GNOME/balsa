@@ -11,7 +11,7 @@ balsa_SOURCES =	\
 	main.c			\
 	options.c		\
 	sendmsg-window.c	\
-	addressbook.c
+	addrbook-window.c
 
 INCLUDES=-I. -I$(srcdir)/../imap/c-client $(GNOME_INCLUDEDIR)
 
@@ -19,5 +19,4 @@ balsa_LDADD = ../imap/c-client/c-client.a \
 	$(GNOME_LIBDIR) \
 	$(GNOMEUI_LIBS) \
 	$(GTKXMHTML_LIBS) \
-	$(X_LIBS) \
 	$(INTLLIBS)

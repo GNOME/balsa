@@ -172,7 +172,7 @@ static GtkMenuBar *create_menu (GnomeMDI * mdi)
 
   accel = gtk_accel_group_new ();
   mw->menubar = menubar = gtk_menu_bar_new ();
-  
+
   gtk_widget_show (menubar);
 
 
@@ -408,11 +408,6 @@ static GtkToolbar *create_toolbar (GnomeMDI *mdi)
 
   mw->toolbar = toolbar = gtk_toolbar_new (GTK_ORIENTATION_HORIZONTAL, GTK_TOOLBAR_ICONS);
 
-  window = GTK_WIDGET(GNOME_MDI(mdi)->active_window);
-  gtk_widget_realize(window);
-
-  gtk_widget_show (toolbar);
-
   toolbarbutton =
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
 			     "Check",
@@ -612,32 +607,18 @@ static void
 delete_message_cb (GtkWidget * widget)
 {
   GList *list;
-  IndexChild *ic;
-  MainWindow *mainwindow;
 
-  g_return_if_fail (widget != NULL);
+  if (!balsa_app.current_index)
+    return;
 
-  mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
-  ic = index_child_get_active(mainwindow->mdi);
-  if (!ic) return;
-/*
-  list = BALSA_INDEX (mainwindow->index)->selection;
+  list = BALSA_INDEX (balsa_app.current_index)->selection;
   while (list)
     {
       message_delete ((Message *) list->data);
       list = list->next;
     }
 
-  balsa_index_select_next (BALSA_INDEX (mainwindow->index));
-*/
-  list = BALSA_INDEX (ic->index)->selection;
-  while (list)
-    {
-      message_delete ((Message *) list->data);
-      list = list->next;
-    }
-
-  balsa_index_select_next (BALSA_INDEX (ic->index));
+  balsa_index_select_next (BALSA_INDEX (balsa_app.current_index));
 }
 
 
@@ -645,13 +626,14 @@ static void
 undelete_message_cb (GtkWidget * widget)
 {
   GList *list;
-  MainWindow *mainwindow;
 
-  g_return_if_fail (widget != NULL);
-#if 0
-  mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
-  balsa_index_select_next (BALSA_INDEX (mainwindow->index));
-#endif
+  list = BALSA_INDEX (balsa_app.current_index)->selection;
+  while (list)
+    {
+      message_undelete ((Message *) list->data);
+      list = list->next;
+    }
+  balsa_index_select_next (BALSA_INDEX (balsa_app.current_index));
 }
 
 

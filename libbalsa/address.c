@@ -275,7 +275,7 @@ static gchar *rfc2822_list(GList *list)
     str=g_string_new((gchar *)list->data);
 
     for(addr_entry=g_list_next(list); addr_entry; 
-	addr_entry=g_list_next(list)) {
+	addr_entry=g_list_next(addr_entry)) {
 	g_string_sprintfa(str, ", %s", (gchar *)addr_entry->data);
     }
     retc=str->str;

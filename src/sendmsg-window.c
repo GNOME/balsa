@@ -120,6 +120,11 @@ static void bsmsg_update_gpg_ui_on_ident_change(BalsaSendmsg *bsmsg,
                                                 LibBalsaIdentity *new_ident);
 #endif
 
+#if defined(ENABLE_TOUCH_UI)
+static gboolean bsmsg_check_format_compatibility(GtkWindow *parent,
+                                                 const char *filename);
+#endif /* ENABLE_TOUCH_UI */
+
 static void spell_check_cb(GtkWidget * widget, BalsaSendmsg *);
 static void sw_spell_check_response(BalsaSpellCheck * spell_check,
                                     gint response, BalsaSendmsg * bsmsg);
@@ -1466,6 +1471,11 @@ add_attachment(BalsaSendmsg * bsmsg, char *filename,
         g_free(content_type);
 	return FALSE;
     }
+
+#if defined(ENABLE_TOUCH_UI)
+    if(!bsmsg_check_format_compatibility(GTK_WINDOW(bsmsg->window), filename))
+        return FALSE;
+#endif /* ENABLE_TOUCH_UI */
 
     pix = libbalsa_icon_finder(forced_mime_type, filename, &content_type);
 
@@ -4608,3 +4618,74 @@ bsmsg_setup_gpg_ui(BalsaSendmsg *bsmsg, GtkWidget *toolbar)
    }
 }
 #endif /* HAVE_GPGME */
+
+#if defined(ENABLE_TOUCH_UI)
+static gboolean
+bsmsg_check_format_compatibility(GtkWindow *parent, const gchar *filename)
+{
+    static const struct {
+        const char *linux_extension, *linux_program;
+        const char *other_extension, *other_program;
+    } compatibility_table[] = {
+        { ".abw",      "AbiWord",  ".doc", "Microsoft Word"  },
+        { ".gnumeric", "Gnumeric", ".xls", "Microsoft Excel" }
+    };
+    GtkDialog *dialog;
+    GtkWidget *label, *checkbox = NULL;
+    unsigned i, fn_len = strlen(filename);
+    int response;
+    gchar *str;
+
+    if(!balsa_app.do_file_format_check)
+        return TRUE; /* blank accept from the User */
+
+    for(i=0; i<ELEMENTS(compatibility_table); i++) {
+        unsigned le_len = strlen(compatibility_table[i].linux_extension);
+        int offset = fn_len - le_len;
+        
+        if(offset>0 &&
+           strcmp(filename+offset, compatibility_table[i].linux_extension)==0)
+            break; /* a match has been found */
+    }
+    if(i>=ELEMENTS(compatibility_table))
+        return TRUE; /* no potential compatibility problems */
+
+    /* time to ask the user for his/her opinion */
+    dialog = (GtkDialog*)gtk_dialog_new_with_buttons
+        ("Compatibility check", parent,
+         GTK_DIALOG_MODAL| GTK_DIALOG_DESTROY_WITH_PARENT,
+         GTK_STOCK_CANCEL,                   GTK_RESPONSE_CANCEL,
+         "_Attach it in the current format", GTK_RESPONSE_OK, NULL);
+
+    gtk_dialog_set_default_response(dialog, GTK_RESPONSE_OK);
+    str = g_strdup_printf
+        ("This file is currently in the %s's own format.\n"
+         "If you need to send it to people who use %s, "
+         "then open the file in the %s, use \"Save As\" "
+         "on the \"File\" menu, and select the \"%s\" format. "
+         "When you click \"OK\" it will save a new "
+         "\"%s\" version of the file, with \"%s\" on the end "
+         "of the document name, which you can then attach instead.",
+         compatibility_table[i].linux_program,
+         compatibility_table[i].other_program,
+         compatibility_table[i].linux_program,
+         compatibility_table[i].other_program,
+         compatibility_table[i].other_program,
+         compatibility_table[i].other_extension);
+    gtk_box_set_spacing(GTK_BOX(dialog->vbox), 10);
+    gtk_box_pack_start_defaults(GTK_BOX(dialog->vbox),
+                       label = gtk_label_new(str));
+    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+    g_free(str);
+    checkbox = gtk_check_button_new_with_mnemonic
+        ("_Do not show this dialog any more.");
+    gtk_box_pack_start_defaults(GTK_BOX(dialog->vbox), checkbox);
+    gtk_widget_show(checkbox);
+    gtk_widget_show(label);
+    response = gtk_dialog_run(dialog);
+    balsa_app.do_file_format_check = 
+        !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(checkbox));
+    gtk_widget_destroy(GTK_WIDGET(dialog));
+    return response == GTK_RESPONSE_OK;
+}
+#endif /* ENABLE_TOUCH_UI */

@@ -949,7 +949,7 @@ bmbl_row_activated_cb(GtkTreeView * tree_view, GtkTreePath * path,
 struct update_mbox_data {
     LibBalsaMailbox *mailbox;
     GtkTreeStore *store;
-    guint total_messages;
+    gint total_messages; /* to be compatible with update_mailbox() arg. */
     gboolean notify;
 };
 static void bmbl_update_mailbox(GtkTreeStore * store,
@@ -989,7 +989,9 @@ bmbl_mailbox_changed_cb(LibBalsaMailbox * mailbox, GtkTreeStore * store)
     g_object_add_weak_pointer(G_OBJECT(mailbox), (gpointer) &umd->mailbox);
     umd->store = store;
     g_object_add_weak_pointer(G_OBJECT(store), (gpointer) &umd->store);
-    umd->total_messages = libbalsa_mailbox_total_messages(mailbox);
+    umd->total_messages = 
+        MAILBOX_OPEN(mailbox) 
+        ? (gint)libbalsa_mailbox_total_messages(mailbox) : -1;
     umd->notify = (mailbox->state == LB_MAILBOX_STATE_OPEN
                    || mailbox->state == LB_MAILBOX_STATE_CLOSED);
     g_idle_add((GSourceFunc)update_mailbox_idle, umd);
@@ -1344,6 +1346,7 @@ bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter, gint total_messages)
     gtk_tree_model_get(model, iter, MBNODE_COLUMN, &mbnode, -1);
     mailbox = mbnode->mailbox;
 
+    /* SHOW UNREAD for special mailboxes? */
     if (!(mailbox == balsa_app.sentbox || mailbox == balsa_app.outbox ||
           mailbox == balsa_app.draftbox || mailbox == balsa_app.trash)) {
         if (mailbox->has_unread_messages) {

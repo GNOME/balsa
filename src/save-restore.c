@@ -546,7 +546,7 @@ config_mailbox_init(const gchar * prefix)
 	    g_object_add_weak_pointer(G_OBJECT(mailbox), (gpointer) special);
 	}
 
-	balsa_mblist_mailbox_node_append(NULL, mbnode);
+        balsa_mblist_mailbox_node_append(NULL, mbnode);
     }
     return TRUE;
 }				/* config_mailbox_init */
@@ -763,6 +763,11 @@ config_global_load(void)
     balsa_app.pgdown_percent = gnome_config_get_int("PageDownPercent=50");
     if (balsa_app.pgdown_percent < 10)
 	balsa_app.pgdown_percent = 10;
+#if defined(ENABLE_TOUCH_UI)
+    balsa_app.do_file_format_check =
+        gnome_config_get_bool("FileFormatCheck=true");
+    balsa_app.enable_view_filter = gnome_config_get_bool("ViewFilter=false");
+#endif /* ENABLE_TOUCH_UI */
 
     /* ... Progress Window Dialog */
     balsa_app.pwindow_option = d_get_gint("ProgressWindow", WHILERETR);
@@ -1142,6 +1147,10 @@ config_save(void)
     gnome_config_set_bool("MsgSizeAsLines", balsa_app.line_length);
     gnome_config_set_bool("PageDownMod", balsa_app.pgdownmod);
     gnome_config_set_int("PageDownPercent", balsa_app.pgdown_percent);
+#if defined(ENABLE_TOUCH_UI)
+    gnome_config_set_bool("FileFormatCheck", balsa_app.do_file_format_check);
+    gnome_config_set_bool("ViewFilter",      balsa_app.enable_view_filter);
+#endif /* ENABLE_TOUCH_UI */
     gnome_config_set_bool("HideDeleted", balsa_app.hide_deleted);
     gnome_config_set_bool("ExpungeOnClose", balsa_app.expunge_on_close);
 

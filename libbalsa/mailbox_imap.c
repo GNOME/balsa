@@ -567,11 +567,24 @@ mi_get_imsg(LibBalsaMailboxImap *mimap, unsigned msgno)
     csd.msgno_arr    = g_malloc(MAX_CHUNK_LENGTH*sizeof(csd.msgno_arr[0]));
     csd.cnt          = 0;
     csd.has_it       = 0;
-    g_node_traverse(LIBBALSA_MAILBOX(mimap)->msg_tree,
-                    G_PRE_ORDER, G_TRAVERSE_ALL, -1, collect_seq_cb,
-                    &csd);
-    if(csd.cnt>MAX_CHUNK_LENGTH) csd.cnt = MAX_CHUNK_LENGTH;
-    qsort(csd.msgno_arr, csd.cnt, sizeof(csd.msgno_arr[0]), cmp_msgno);
+    if(LIBBALSA_MAILBOX(mimap)->msg_tree) {
+        g_node_traverse(LIBBALSA_MAILBOX(mimap)->msg_tree,
+                        G_PRE_ORDER, G_TRAVERSE_ALL, -1, collect_seq_cb,
+                        &csd);
+        if(csd.cnt>MAX_CHUNK_LENGTH) csd.cnt = MAX_CHUNK_LENGTH;
+        qsort(csd.msgno_arr, csd.cnt, sizeof(csd.msgno_arr[0]), cmp_msgno);
+    } else {
+        /* It may happen that we want to perform an automatic
+           operation on a mailbox without view (like filtering on
+           reception). The searching will be done server side but
+           current eg. _copy() instructions will require that
+           LibBalsaMessage object are present, and these require that
+           some basic information is fetched from the server.  */
+        unsigned i, total_msgs = mimap->messages_info->len;
+        csd.cnt = msgno+MAX_CHUNK_LENGTH>total_msgs
+            ? total_msgs-msgno+1 : MAX_CHUNK_LENGTH;
+        for(i=0; i<csd.cnt; i++) csd.msgno_arr[i] = msgno+i;
+    }
     II(rc,mimap->handle,
        imap_mbox_handle_fetch_set(mimap->handle, csd.msgno_arr,
                                   csd.cnt,
@@ -601,8 +614,10 @@ imap_flags_cb(unsigned cnt, const unsigned seqno[], LibBalsaMailboxImap *mimap)
     for(i=0; i<cnt; i++) {
         struct message_info *msg_info = 
             message_info_from_msgno(mimap, seqno[i]);
-        ImapMessage *imsg  = mi_get_imsg(mimap, seqno[i]);
         if(msg_info->message) {
+            /* we still should make sure the info is there since the 
+             * libimap connection might have been severed. */
+            ImapMessage *imsg  = mi_get_imsg(mimap, seqno[i]);
             LibBalsaMessageFlag old_flags = msg_info->message->flags;
             GList *list;
             
@@ -946,7 +961,12 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), NULL);
 
     libbalsa_lock_mailbox(mailbox);
-    RETURN_VAL_IF_CONTEXT_CLOSED(message->mailbox, NULL);
+    /* this may get called when the mailbox is being opened ie,
+       open_ref==0 */
+    if(!LIBBALSA_MAILBOX_IMAP(mailbox)->handle) {
+        libbalsa_unlock_mailbox(mailbox);
+        return NULL;
+    }
 
     stream = get_cache_stream(mailbox, IMAP_MESSAGE_UID(message));
     libbalsa_unlock_mailbox(mailbox);

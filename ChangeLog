@@ -1,3 +1,14 @@
+2004-08-05  Pawel Salek
+
+	* libbalsa/mailbox_imap.c: re-try patches affected filter-on-reception.
+	* src/balsa-app.h: add do_file_format_check and enable_view_filter.
+	* src/save-restore.c: save and restore them.
+	* src/balsa-mblist.c: make sure idle updater does not overwrite
+	total message count.
+	* src/main-window.c: more touchpad changes. Add a button to SoS filter.
+	Remove SoS filter from the Tab-chain.
+	* src/sendmsg-window.c: warn windows-oriented users.
+
 2004-08-05 17:05  PeterB
 
 	* src/mailbox-conf.c: redraw fewer display elements and rescan less

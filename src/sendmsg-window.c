@@ -2238,7 +2238,6 @@ uri2gslist(const char *uri_list)
 
   while (*uri_list) {
     char	*linebreak = strchr(uri_list, 13);
-    char	*uri;
     int	length;
     
     if (!linebreak || linebreak[1] != '\n')
@@ -2247,8 +2246,13 @@ uri2gslist(const char *uri_list)
     length = linebreak - uri_list;
 
     if (length && uri_list[0] != '#' && strncmp(uri_list,"file://",7)==0) {
-	uri = g_strndup(uri_list+7, length-7);
-	list = g_slist_append(list, uri);
+	gchar *this_uri = g_strndup(uri_list, length);
+	gchar *uri;
+
+	uri = g_filename_from_uri(this_uri, NULL, NULL);
+	g_free(this_uri);
+	if (uri)
+	    list = g_slist_append(list, uri);
       }
 
     uri_list = linebreak + 2;

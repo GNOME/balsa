@@ -572,7 +572,7 @@ balsa_message_init(BalsaMessage * bm)
     /* gtk_widget_show(GTK_WIDGET(bm)); */
 
     /* scrolled window for the contents */
-    scroll = gtk_scrolled_window_new(NULL, NULL);
+    bm->scroll = scroll = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
                                    GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_AUTOMATIC);
@@ -2329,7 +2329,16 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
     if (html_type) {
 #ifdef HAVE_GTKHTML
 	alloced = libbalsa_html_filter(html_type, &ptr, alloced);
+	/* Force vertical scrollbar while we render the html, otherwise
+	 * the widget will make itself too wide to accept one, forcing
+	 * otherwise unnecessary horizontal scrolling. */
+        gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(bm->scroll),
+                                       GTK_POLICY_AUTOMATIC,
+                                       GTK_POLICY_ALWAYS);
         part_info_init_html(bm, info, ptr, alloced);
+        gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(bm->scroll),
+                                       GTK_POLICY_AUTOMATIC,
+                                       GTK_POLICY_AUTOMATIC);
 #else
         part_info_init_unknown(bm, info);
 #endif

@@ -52,6 +52,7 @@ struct _BalsaMessage {
 	/* Widgets to hold content */
         GtkWidget *cont_viewport;
 	GtkWidget *content;
+	GtkWidget *scroll;
 	gboolean content_has_focus;
 
         /* Widget to hold structure tree */

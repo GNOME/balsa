@@ -80,6 +80,7 @@ static gint include_file_cb(GtkWidget *, BalsaSendmsg *);
 static gint send_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint send_message_toolbar_cb(GtkWidget *, BalsaSendmsg *);
 static gint queue_message_cb(GtkWidget *, BalsaSendmsg *);
+static gint message_postpone(BalsaSendmsg * bsmsg);
 static gint postpone_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint print_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint attach_clicked(GtkWidget *, gpointer);
@@ -490,7 +491,7 @@ delete_handler(BalsaSendmsg* bsmsg)
 	gtk_box_pack_start_defaults(GTK_BOX(d->vbox), l);
 	reply = gnome_dialog_run_and_close(GNOME_DIALOG(d));
 	if(reply == 0)
-	    postpone_message_cb(NULL, bsmsg);
+	    message_postpone(bsmsg);
 	/* cancel action  when reply = "yes" or "no" */
 	return (reply != 0) && (reply != 1);
     }
@@ -2177,41 +2178,46 @@ queue_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     return send_message_handler(bsmsg, TRUE);
 }
 
+static gboolean
+message_postpone(BalsaSendmsg * bsmsg)
+{
+    gboolean successp;
+    LibBalsaMessage *message;
+    message = bsmsg2message(bsmsg, FALSE);
+
+    if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
+        bsmsg->type == SEND_REPLY_GROUP))
+	successp = libbalsa_message_postpone(message, balsa_app.draftbox,
+				  bsmsg->orig_message,
+				  message->fcc_mailbox,
+				  balsa_app.encoding_style);
+    else
+	successp = libbalsa_message_postpone(message, balsa_app.draftbox, 
+                                  NULL,
+				  message->fcc_mailbox,
+				  balsa_app.encoding_style);
+    if(successp) {
+	if (bsmsg->type == SEND_CONTINUE && bsmsg->orig_message) {
+	    libbalsa_message_delete(bsmsg->orig_message);
+	    libbalsa_mailbox_sync_backend(bsmsg->orig_message->mailbox);
+	}
+    }
+    gtk_object_destroy(GTK_OBJECT(message));
+    return successp;
+}
 
 /* "postpone message" menu and toolbar callback */
 static gint
 postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    LibBalsaMessage *message;
-    gboolean thereturn = FALSE;
+    gboolean thereturn;
     
     if (!is_ready_to_send(bsmsg)) 
         return FALSE;
 
-    message = bsmsg2message(bsmsg, FALSE);
+    thereturn = message_postpone(bsmsg);
 
-    if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
-        bsmsg->type == SEND_REPLY_GROUP))
-	thereturn = libbalsa_message_postpone(message, balsa_app.draftbox,
-				  bsmsg->orig_message,
-				  message->fcc_mailbox,
-				  balsa_app.encoding_style);
-    else
-	thereturn = libbalsa_message_postpone(message, balsa_app.draftbox, 
-                                  NULL,
-				  message->fcc_mailbox,
-				  balsa_app.encoding_style);
-    if(!thereturn)
-	return FALSE;
-    
-    if (bsmsg->type == SEND_CONTINUE && bsmsg->orig_message) {
-	libbalsa_message_delete(bsmsg->orig_message);
-	libbalsa_mailbox_sync_backend(bsmsg->orig_message->mailbox);
-    }
-
-    gtk_object_destroy(GTK_OBJECT(message));
     gtk_widget_destroy(bsmsg->window);
-
     return TRUE;
 }
 

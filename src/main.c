@@ -319,6 +319,7 @@ main(int argc, char *argv[])
 
     window = balsa_window_new();
     balsa_app.main_window = BALSA_WINDOW(window);
+    gtk_signal_connect(GTK_OBJECT(window), "destroy", balsa_cleanup, NULL);
 
     /* session management */
     client = gnome_master_client();
@@ -371,7 +372,6 @@ main(int argc, char *argv[])
     gtk_main();
     gdk_threads_leave();
     
-    balsa_cleanup();
     gdk_colormap_unref(balsa_app.colormap);
 
 #ifdef BALSA_USE_THREADS
@@ -424,7 +424,6 @@ close_all_mailboxes(GNode * node, gpointer data)
 static void
 balsa_cleanup(void)
 {
-
     g_node_traverse(balsa_app.mailbox_nodes,
 		    G_LEVEL_ORDER,
 		    G_TRAVERSE_ALL, 10, close_all_mailboxes, NULL);
@@ -442,6 +441,7 @@ balsa_cleanup(void)
 
     gnome_sound_shutdown();
     libbalsa_imap_close_all_connections();
+    if(balsa_app.debug) g_print("Finished cleaning up.\n");
 }
 
 static gint

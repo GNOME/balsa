@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,10 +19,6 @@
  * 02111-1307, USA.
  */
 
-/*
- * FIXME : should have a combo box for mailbox name when selecting a move or copy action
- */
-
 #include "config.h"
 
 #include <gnome.h>
@@ -31,10 +27,12 @@
 #include "filter-funcs.h"
 #include "message.h"
 
-/* List of filter_run_dialog_box opened : this is !=NULL when filter_run_dialog boxes are opened
- * We test that because you don't want to be able to modify filters that are being used in other dialog boxes
- * FIXME : we can perhaps imagine a way to "refresh" the other dialog boxes when filters have been modified
- * but it'll be complex, and I'm not sure it is worth it
+/* List of filter_run_dialog_box opened : this is !=NULL when
+ * filter_run_dialog boxes are opened We test that because you don't
+ * want to be able to modify filters that are being used in other
+ * dialog boxes FIXME : we can perhaps imagine a way to "refresh" the
+ * other dialog boxes when filters have been modified but it'll be
+ * complex, and I'm not sure it is worth it
  *
  * Defined in filter-run.dialog.c
  */
@@ -67,7 +65,9 @@ GtkWidget *fe_popup_entry;
 
 /* action field */
 GtkWidget *fe_action_option_menu;
-GtkWidget *fe_action_entry;
+
+/* Mailboxes option menu */
+GtkWidget * fe_mailboxes;
 
 /* Different buttons that need to be greyed or ungreyed */
 GtkWidget * fe_delete_button,* fe_apply_button,* fe_revert_button;
@@ -256,6 +256,27 @@ build_left_side(void)
     return vbox;
 }				/* end build_left_side() */
 
+/* Used to populate mailboxes option menu */
+
+static void
+add_mailbox_to_option_menu(GtkCTree * ctree,GtkCTreeNode *node,gpointer menu)
+{
+    GtkWidget * item;
+    BalsaMailboxNode *mbnode = gtk_ctree_node_get_row_data(ctree, node);
+
+    g_print("Nouveau noeud\n");
+    if (mbnode->mailbox) {
+	/* OK this node is a mailbox */
+	g_print("Mailbox\n");
+	item =
+	    gtk_menu_item_new_with_label(mbnode->mailbox->name);
+	gtk_object_set_data(GTK_OBJECT(item), "mailbox",
+			    mbnode->mailbox);
+	
+	gtk_menu_append(GTK_MENU(menu), item);
+	gtk_widget_show(item);
+    }
+}
 /*
  * build_match_page()
  *
@@ -336,11 +357,13 @@ build_match_page()
     fe_condition_edit_button = gtk_button_new_with_label(_("Edit"));
     gtk_box_pack_start(GTK_BOX(box), fe_condition_edit_button, TRUE, TRUE, 0);
     gtk_signal_connect(GTK_OBJECT(fe_condition_edit_button),
-		       "clicked", GTK_SIGNAL_FUNC(fe_edit_condition), GINT_TO_POINTER(0));
+		       "clicked", GTK_SIGNAL_FUNC(fe_edit_condition), 
+                       GINT_TO_POINTER(0));
     button = gtk_button_new_with_label(_("New"));
     gtk_box_pack_start(GTK_BOX(box), button, TRUE, TRUE, 0);
     gtk_signal_connect(GTK_OBJECT(button),
-		       "clicked", GTK_SIGNAL_FUNC(fe_edit_condition), GINT_TO_POINTER(1));
+		       "clicked", GTK_SIGNAL_FUNC(fe_edit_condition), 
+                       GINT_TO_POINTER(1));
     fe_condition_delete_button = gtk_button_new_with_label(_("Remove"));
     gtk_box_pack_start(GTK_BOX(box), fe_condition_delete_button, TRUE, TRUE, 0);
     gtk_signal_connect(GTK_OBJECT(fe_condition_delete_button),
@@ -360,8 +383,10 @@ static GtkWidget *
 build_action_page()
 {
     GtkWidget *page, *frame, *table;
-
     GtkWidget *box = NULL;
+    GtkWidget *menu,* item;
+    GtkCTreeNode * node;
+    gint i;
 
     page = gtk_vbox_new(TRUE, 5);
 
@@ -413,8 +438,25 @@ build_action_page()
 					      (fe_action_selected));
     gtk_box_pack_start(GTK_BOX(box), fe_action_option_menu, TRUE, FALSE,
 		       1);
-    fe_action_entry = gtk_entry_new_with_max_length(1023);
-    gtk_box_pack_start(GTK_BOX(box), fe_action_entry, TRUE, FALSE, 1);
+
+    /* We populate the option menu with mailboxes name
+     * FIXME : This is done once for all, but user could
+     * remove or add mailboxes behind us : we should connect
+     * ourselves to signals to refresh the options in these cases
+     */
+
+    menu = gtk_menu_new();
+    for(node=gtk_ctree_node_nth(GTK_CTREE(balsa_app.mblist), 0);
+	node; 
+	node=GTK_CTREE_NODE_NEXT(node))
+	gtk_ctree_pre_recursive(GTK_CTREE(balsa_app.mblist), 
+				node,
+				add_mailbox_to_option_menu,
+				menu);
+    fe_mailboxes = gtk_option_menu_new();
+    gtk_option_menu_set_menu(GTK_OPTION_MENU(fe_mailboxes), menu);
+    gtk_option_menu_set_history(GTK_OPTION_MENU(fe_mailboxes), 0);
+    gtk_box_pack_start(GTK_BOX(box), fe_mailboxes, TRUE, FALSE, 1);
 
     return page;
 }				/* end build_action_page() */
@@ -485,7 +527,9 @@ filters_edit_dialog(void)
     GSList * cnds,* filter_list;
 
     if (fr_dialogs_opened) {
-	balsa_information(LIBBALSA_INFORMATION_ERROR,_("There are opened filter run dialogs, close them before you can modify filters"));
+	balsa_information(LIBBALSA_INFORMATION_ERROR,
+                          _("A filter run dialog is open."
+                            "Close it before you can modify filters."));
 	return;
     }
     if (fe_already_open) {
@@ -521,7 +565,8 @@ filters_edit_dialog(void)
 
     /* Populate the clist of filters */
 
-    for(filter_list=balsa_app.filters;filter_list;filter_list=g_slist_next(filter_list)) {
+    for(filter_list=balsa_app.filters; 
+        filter_list; filter_list=g_slist_next(filter_list)) {
 
 	fil=(LibBalsaFilter*)filter_list->data;
 	/* Make a copy of the current filter */

@@ -1,3 +1,8 @@
+2001-12-21  Emmanuel <e.allaud@wanadoo.fr>
+
+	* src/filter-edit-callbacks.c:
+	* src/filter-edit-dialog.c:replace mailbox selection with a combo.
+
 2001-12-19  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/balsa-mblist.c: check messages on repopulating mailbox list.

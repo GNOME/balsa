@@ -103,7 +103,9 @@ extern GtkWidget *fe_popup_entry;
 
 /* action field */
 extern GtkWidget *fe_action_option_menu;
-extern GtkWidget *fe_action_entry;
+
+/* Mailboxes option menu */
+extern GtkWidget * fe_mailboxes;
 
 /* Different buttons that need to be greyed or ungreyed */
 extern GtkWidget * fe_delete_button;
@@ -130,7 +132,8 @@ static GnomeDialog * condition_dialog=NULL;
 static gboolean is_new_condition;
 
 /*
- * Struct used to keep track of filter name changes (we must update config files accordingly)
+ * Struct used to keep track of filter name changes (we must update
+ * config files accordingly)
  */
 
 typedef struct _filters_names_rec {
@@ -157,7 +160,8 @@ static GList * new_filters_names=NULL;
  *
  * Arguments:
  *    gchar *name - the preferred choice for a name
- *    current_row - the row to exclude from the search (-1 means we don't exclude any row)
+ *    current_row - the row to exclude from the search (-1 means we
+ *    don't exclude any row)
  * Returns:
  *    0 if it exists another filter of name "name", else returns 1
  */
@@ -374,7 +378,6 @@ condition_validate(LibBalsaCondition* new_cnd)
         if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fe_matching_fields_cc)))
             CONDITION_SETMATCH(new_cnd,CONDITION_MATCH_CC);
         if (new_cnd->match_fields==CONDITION_EMPTY) {
-            /* balsa_information(LIBBALSA_INFORMATION_ERROR,_("You must specify at least one field for matching"));*/
             condition_error(_("You must specify at least one field for matching"));
             return FALSE;
         }
@@ -436,7 +439,8 @@ condition_validate(LibBalsaCondition* new_cnd)
     /* Set the type specific fields of the condition */
     switch (new_cnd->type) {
     case CONDITION_SIMPLE:
-        new_cnd->match.string=g_strdup(gtk_entry_get_text(GTK_ENTRY(fe_type_simple_entry)));
+        new_cnd->match.string =
+            g_strdup(gtk_entry_get_text(GTK_ENTRY(fe_type_simple_entry)));
         break;
 
     case CONDITION_REGEX:
@@ -501,7 +505,8 @@ fill_condition_widgets(LibBalsaCondition* cnd)
     gtk_notebook_set_page(GTK_NOTEBOOK(fe_type_notebook),
                           cnd->type-1);
 
-    gtk_option_menu_set_history(GTK_OPTION_MENU(fe_search_option_menu), cnd->type-1);
+    gtk_option_menu_set_history(GTK_OPTION_MENU(fe_search_option_menu), 
+                                cnd->type-1);
 
     /* First update matching fields
      * but if type is date or flag, these are meaning less so we disable them */
@@ -588,10 +593,13 @@ condition_dialog_button_clicked(GtkWidget * dialog, gint button,
                     /* It was a new condition, so add it to the list */
                     row=gtk_clist_append(fe_conditions_list,str);
                     gtk_clist_select_row(fe_conditions_list,row,-1);
-                    /* We make the buttons sensitive if they were unsensitive */
+                    /* We make the buttons sensitive if they were
+                       unsensitive */
                     if (fe_conditions_list->rows==1) {
-                        gtk_widget_set_sensitive(fe_condition_delete_button,TRUE);
-                        gtk_widget_set_sensitive(fe_condition_edit_button,TRUE);
+                        gtk_widget_set_sensitive(fe_condition_delete_button,
+                                                 TRUE);
+                        gtk_widget_set_sensitive(fe_condition_edit_button,
+                                                 TRUE);
                     }
                 }
                 /* Associate the new condition to the row in the clist*/
@@ -601,7 +609,8 @@ condition_dialog_button_clicked(GtkWidget * dialog, gint button,
             }
         }
     case 1:  /* Cancel button */
-        /* we only hide it because it is too expensive to destroy and rebuild each time */
+        /* we only hide it because it is too expensive to destroy and
+           rebuild each time */
         gtk_widget_hide_all(dialog);
         break;
     case 2:  /* Help button */
@@ -619,7 +628,8 @@ static void build_type_notebook()
     GtkWidget *box;
     GtkWidget *button;
     gint row,col;
-    static gchar * flag_names[]={N_("New"),N_("Deleted"),N_("Replied"),N_("Flagged")};
+    static gchar * flag_names[]=
+        {N_("New"), N_("Deleted"), N_("Replied"), N_("Flagged")};
 
     /* The notebook */
 
@@ -639,7 +649,8 @@ static void build_type_notebook()
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
     fe_type_simple_entry = gtk_entry_new();
     gtk_signal_connect(GTK_OBJECT(fe_type_simple_entry),
-                       "changed", GTK_SIGNAL_FUNC(fe_condition_changed_cb), NULL);
+                       "changed", GTK_SIGNAL_FUNC(fe_condition_changed_cb), 
+                       NULL);
     gtk_table_attach(GTK_TABLE(page),
                      fe_type_simple_entry,
                      0, 5, 1, 2,
@@ -716,21 +727,24 @@ static void build_type_notebook()
     page = gtk_table_new(5, 3, FALSE);
     gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook), page, NULL);
 
-    fe_type_date_label = gtk_label_new(_("Match when date is in the interval:"));
+    fe_type_date_label = 
+        gtk_label_new(_("Match when date is in the interval:"));
     gtk_table_attach(GTK_TABLE(page),
                      fe_type_date_label,
                      0, 5, 0, 1,
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
     fe_type_date_low_entry = gtk_entry_new();
     gtk_signal_connect(GTK_OBJECT(fe_type_date_low_entry),
-                       "changed", GTK_SIGNAL_FUNC(fe_condition_changed_cb), NULL);
+                       "changed", GTK_SIGNAL_FUNC(fe_condition_changed_cb), 
+                       NULL);
     gtk_table_attach(GTK_TABLE(page),
                      fe_type_date_low_entry,
                      0, 2, 1, 2,
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
     fe_type_date_high_entry = gtk_entry_new();
     gtk_signal_connect(GTK_OBJECT(fe_type_date_high_entry),
-                       "changed", GTK_SIGNAL_FUNC(fe_condition_changed_cb), NULL);
+                       "changed", GTK_SIGNAL_FUNC(fe_condition_changed_cb),
+                       NULL);
     gtk_table_attach(GTK_TABLE(page),
                      fe_type_date_high_entry,
                      3, 5, 1, 2,
@@ -748,7 +762,8 @@ static void build_type_notebook()
 
     page = gtk_table_new(1, 2, FALSE);
     gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook), page, NULL);
-    fe_type_flag_label = gtk_label_new(_("Match when one of these flags is set:"));
+    fe_type_flag_label =
+        gtk_label_new(_("Match when one of these flags is set:"));
     gtk_table_attach(GTK_TABLE(page),
                      fe_type_flag_label,
                      0, 1, 0, 1,
@@ -766,7 +781,8 @@ static void build_type_notebook()
 
     for (row=0;row<2;row++)
         for (col=0;col<2;col++) {
-            fe_type_flag_buttons[row*2+col] = gtk_check_button_new_with_label(_(flag_names[row*2+col]));
+            fe_type_flag_buttons[row*2+col] = 
+                gtk_check_button_new_with_label(_(flag_names[row*2+col]));
             gtk_signal_connect(GTK_OBJECT(fe_type_flag_buttons[row*2+col]),
                                "toggled",
                                GTK_SIGNAL_FUNC(fe_condition_changed_cb),
@@ -774,7 +790,8 @@ static void build_type_notebook()
             gtk_table_attach(GTK_TABLE(page),
                              fe_type_flag_buttons[row*2+col],
                              col, col+1,row,row+1,
-                             GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
+                             GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 
+                             2, 2);
         }
     button = gtk_button_new_with_label(_("Match when one flag is set/when no flag is set"));
     gtk_signal_connect(GTK_OBJECT(button),
@@ -795,7 +812,8 @@ void build_condition_dialog()
      * the filter */
     
     fe_match_frame = gtk_frame_new(_("Match in:"));
-    gtk_frame_set_label_align(GTK_FRAME(fe_match_frame), GTK_POS_LEFT, GTK_POS_TOP);
+    gtk_frame_set_label_align(GTK_FRAME(fe_match_frame), 
+                              GTK_POS_LEFT, GTK_POS_TOP);
     gtk_frame_set_shadow_type(GTK_FRAME(fe_match_frame), GTK_SHADOW_ETCHED_IN);
     gtk_table_attach(GTK_TABLE(page),
                      fe_match_frame,
@@ -810,19 +828,25 @@ void build_condition_dialog()
                      button,
                      0, 1, 2, 3,
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2); 
-    gtk_signal_connect(GTK_OBJECT(button),"clicked",GTK_SIGNAL_FUNC(fe_match_fields_buttons_cb),GINT_TO_POINTER(1));
+    gtk_signal_connect(GTK_OBJECT(button),"clicked",
+                       GTK_SIGNAL_FUNC(fe_match_fields_buttons_cb),
+                       GINT_TO_POINTER(1));
     button = gtk_button_new_with_label(_("All headers"));
     gtk_table_attach(GTK_TABLE(table),
                      button,
                      1, 2, 2, 3,
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
-    gtk_signal_connect(GTK_OBJECT(button),"clicked",GTK_SIGNAL_FUNC(fe_match_fields_buttons_cb),GINT_TO_POINTER(2));
+    gtk_signal_connect(GTK_OBJECT(button),"clicked",
+                       GTK_SIGNAL_FUNC(fe_match_fields_buttons_cb),
+                       GINT_TO_POINTER(2));
     button = gtk_button_new_with_label(_("Clear"));
     gtk_table_attach(GTK_TABLE(table),
                      button,
                      2, 3, 2, 3,
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
-    gtk_signal_connect(GTK_OBJECT(button),"clicked",GTK_SIGNAL_FUNC(fe_match_fields_buttons_cb),GINT_TO_POINTER(3));
+    gtk_signal_connect(GTK_OBJECT(button),"clicked",
+                       GTK_SIGNAL_FUNC(fe_match_fields_buttons_cb),
+                       GINT_TO_POINTER(3));
     
     fe_matching_fields_body = gtk_check_button_new_with_label(_("Body"));
     gtk_table_attach(GTK_TABLE(table),
@@ -881,9 +905,9 @@ void build_condition_dialog()
     box = gtk_hbox_new(FALSE, 5);
     gtk_container_add(GTK_CONTAINER(frame), box);
 
-    fe_search_option_menu = build_option_menu(fe_search_type,
-                                              ELEMENTS(fe_search_type),
-                                              GTK_SIGNAL_FUNC(fe_typesmenu_cb));
+    fe_search_option_menu = 
+        build_option_menu(fe_search_type, ELEMENTS(fe_search_type),
+                          GTK_SIGNAL_FUNC(fe_typesmenu_cb));
     gtk_box_pack_start(GTK_BOX(box), fe_search_option_menu, FALSE, FALSE, 5);
 
     build_type_notebook();
@@ -908,7 +932,8 @@ fe_edit_condition(GtkWidget * throwaway,gpointer is_new_cnd)
     LibBalsaCondition* cnd=NULL;
     gint row=-1;
 
-    if (!fe_filters_list->selection || (!is_new_cnd && !fe_conditions_list->selection)) return;
+    if (!fe_filters_list->selection || 
+        (!is_new_cnd && !fe_conditions_list->selection)) return;
 
     is_new_condition=GPOINTER_TO_INT(is_new_cnd);
     if (!is_new_condition) {
@@ -920,16 +945,10 @@ fe_edit_condition(GtkWidget * throwaway,gpointer is_new_cnd)
     else condition_has_changed=TRUE;
     /* We construct the dialog box if it wasn't done before */
     if (!condition_dialog) {
-        condition_dialog=GNOME_DIALOG(gnome_dialog_new("",
-                                                       GNOME_STOCK_BUTTON_OK,
-                                                       GNOME_STOCK_BUTTON_CANCEL,
-                                                       GNOME_STOCK_BUTTON_HELP, NULL));
-
-        if (!condition_dialog) {
-            libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-                                 _("Error : not enough memory"));
-            return;
-        }
+        condition_dialog=
+            GNOME_DIALOG(gnome_dialog_new("", GNOME_STOCK_BUTTON_OK,
+                                          GNOME_STOCK_BUTTON_CANCEL,
+                                          GNOME_STOCK_BUTTON_HELP, NULL));
 
         gtk_signal_connect(GTK_OBJECT(condition_dialog),
                            "clicked", condition_dialog_button_clicked, NULL);
@@ -940,7 +959,8 @@ fe_edit_condition(GtkWidget * throwaway,gpointer is_new_cnd)
     }
     title = g_strconcat(_("Edit condition for filter: "),
                         ((LibBalsaFilter*)
-                         gtk_clist_get_row_data(fe_filters_list,GPOINTER_TO_INT(fe_filters_list->selection->data)))->name,
+                         gtk_clist_get_row_data(fe_filters_list,
+                                                GPOINTER_TO_INT(fe_filters_list->selection->data)))->name,
                         NULL);
     gtk_window_set_title(GTK_WINDOW(condition_dialog),title);
     g_free(title);
@@ -1081,9 +1101,6 @@ void fe_destroy_window_cb(GtkWidget * widget,gpointer throwaway)
         fe_free_associated_filters();
 
     for (lst=filters_names_changes;lst;lst=g_list_next(lst)) {
-        /*g_print("Old=%s <> New=%s\n",
-                ((filters_names_rec *)lst->data)->old_name,
-                ((filters_names_rec *)lst->data)->new_name);*/
         g_free(((filters_names_rec *)lst->data)->old_name);
         g_free(((filters_names_rec *)lst->data)->new_name);
         g_free((filters_names_rec *)lst->data);
@@ -1161,7 +1178,7 @@ fe_dialog_button_clicked(GtkWidget * dialog, gint button, gpointer data)
 void
 fe_action_selected(GtkWidget * widget, gpointer data)
 {
-    gtk_widget_set_sensitive(GTK_WIDGET(fe_action_entry),
+    gtk_widget_set_sensitive(GTK_WIDGET(fe_mailboxes),
                              GPOINTER_TO_INT(data)!=FILTER_TRASH);
 }                       /* end fe_action_selected() */
 
@@ -1221,15 +1238,18 @@ change_filter_name(gchar * old_name,gchar * new_name)
         GList * lst;
         filters_names_rec * p=NULL;
 
-        /* First we check if the filter that changes has been created in this session (looking new_filters_names list)
-         * if yes we update new_filters_names, and that's all because we have no reference to
-         * it in any mailbox, because it's new
+        /* First we check if the filter that changes has been created
+         * in this session (looking new_filters_names list) if yes we
+         * update new_filters_names, and that's all because we have no
+         * reference to it in any mailbox, because it's new
          */
 
-        for (lst=new_filters_names;lst && strcmp(old_name,(gchar *) lst->data)!=0;lst=g_list_next(lst));
+        for (lst=new_filters_names;
+             lst && strcmp(old_name,(gchar*)lst->data)!=0;
+             lst=g_list_next(lst));
         if (lst) {          
             /* Found it ! Update new_filters_names */
-            g_free((gchar*)lst->data);
+            g_free(lst->data);
             if (new_name)
                 lst->data=g_strdup(new_name);
             else {
@@ -1255,11 +1275,12 @@ change_filter_name(gchar * old_name,gchar * new_name)
             p->old_name=g_strdup(old_name);
             filters_names_changes=g_list_prepend(filters_names_changes,p);
         }
-        /* Record exists yet, test if we can collapse it (in case his old_name==new_name)
-         * It's only a small optimization
+        /* Record exists yet, test if we can collapse it (in case his
+         * old_name==new_name) It's only a small optimization
          */
         else if (new_name && strcmp(p->old_name,new_name)==0) {
-            filters_names_changes=g_list_remove_link(filters_names_changes,lst);
+            filters_names_changes=
+                g_list_remove_link(filters_names_changes,lst);
             g_list_free_1(lst);
             return;
         }
@@ -1361,7 +1382,7 @@ fe_delete_pressed(GtkWidget * widget, gpointer data)
         /* We clear all widgets */
         gtk_entry_set_text(GTK_ENTRY(fe_name_entry),"");
         gtk_entry_set_text(GTK_ENTRY(fe_popup_entry),"");
-        gtk_entry_set_text(GTK_ENTRY(fe_action_entry),"");
+	gtk_option_menu_set_history(GTK_OPTION_MENU(fe_mailboxes), 0);
         gtk_entry_set_text(GTK_ENTRY(gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(fe_sound_entry))),"");
         gtk_clist_clear(fe_conditions_list);
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_sound_button),FALSE);
@@ -1382,7 +1403,7 @@ void
 fe_apply_pressed(GtkWidget * widget, gpointer data)
 {
     LibBalsaFilter *fil,*old;
-    gchar *temp,*action_str;
+    gchar *temp,*mailbox_name=NULL;
     GtkWidget * menu;
     gint row,i;
     FilterActionType action;
@@ -1393,25 +1414,28 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
     row = GPOINTER_TO_INT(fe_filters_list->selection->data);
     /* quick check before we malloc */
     temp = gtk_entry_get_text(GTK_ENTRY(fe_name_entry));
-    if ((!temp) || (temp[0] == '\0')
-        || (!unique_filter_name(temp,row))) {
-        balsa_information(LIBBALSA_INFORMATION_ERROR,_("Invalid filter name\n"));
+    if (!temp || temp[0] == '\0') {
+        balsa_information(LIBBALSA_INFORMATION_ERROR,
+                          _("No filter name specified."));
+        return;
+    } 
+    if(!unique_filter_name(temp,row)) {
+        balsa_information(LIBBALSA_INFORMATION_ERROR,
+                          _("Filter %s already exists."), temp);
         return;
     }
     
-    action_str=gtk_entry_get_text(GTK_ENTRY(fe_action_entry));
-
     /* Retrieve the selected item in the action menu */
     menu=gtk_menu_get_active(GTK_MENU(gtk_option_menu_get_menu(GTK_OPTION_MENU(fe_action_option_menu))));
     /* Set the type associated with the selected item */
     action=GPOINTER_TO_INT(gtk_object_get_data(GTK_OBJECT(menu),"value"));
     
-    if (action!=FILTER_RUN && action!=FILTER_TRASH) {
-        if (!action_str || action_str[0] == '\0' || !mblist_find_mbox_by_name(balsa_app.mblist,action_str)) {
-            balsa_information(LIBBALSA_INFORMATION_ERROR,
-                              _("Invalid mailbox name\n"));
-            return;
-        }
+    if (action!=FILTER_TRASH) {
+	/* Retrieve the selected malibox */
+	menu=gtk_menu_get_active(GTK_MENU(gtk_option_menu_get_menu(GTK_OPTION_MENU(fe_mailboxes))));
+	/* FIXME : this could lead to something weird if user has
+           removed the mailbox behind us */
+	mailbox_name=LIBBALSA_MAILBOX(gtk_object_get_data(GTK_OBJECT(menu),"mailbox"))->name;
     }
 
     if (!fe_conditions_list->rows) {
@@ -1469,7 +1493,7 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
     fil->action=action;
 
     if (fil->action!=FILTER_TRASH)
-        fil->action_string=g_strdup(action_str);
+        fil->action_string=g_strdup(mailbox_name);
 
     if (GTK_TOGGLE_BUTTON(fe_popup_button)->active) {
         static gchar defstring[19] = N_("Filter has matched");
@@ -1560,7 +1584,8 @@ void fe_clist_select_row(GtkWidget * widget, gint row, gint column,
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_popup_button),
                                  FILTER_CHKFLAG(fil,FILTER_POPUP));
     gtk_entry_set_text(GTK_ENTRY(fe_popup_entry),
-                       FILTER_CHKFLAG(fil,FILTER_POPUP) ? fil->popup_text : "");
+                       FILTER_CHKFLAG(fil,FILTER_POPUP) 
+                       ? fil->popup_text : "");
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_sound_button),
                                  FILTER_CHKFLAG(fil,FILTER_SOUND));
     gtk_entry_set_text(GTK_ENTRY(gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(fe_sound_entry))),
@@ -1571,8 +1596,21 @@ void fe_clist_select_row(GtkWidget * widget, gint row, gint column,
     gtk_option_menu_set_history(GTK_OPTION_MENU(fe_op_codes_option_menu), 
                                 fil->conditions_op-1);
 
-    if (fil->action!=FILTER_TRASH)
-        gtk_entry_set_text(GTK_ENTRY(fe_action_entry),fil->action_string==NULL ? "" : fil->action_string);
+    if (fil->action!=FILTER_TRASH && fil->action_string) {
+	gint i;
+	GList * items;
+	
+	items=
+	    gtk_container_children(GTK_CONTAINER(gtk_option_menu_get_menu(GTK_OPTION_MENU(fe_mailboxes))));
+	for (i=0;items;
+	     items=g_list_next(items)) {
+	    gchar * name=LIBBALSA_MAILBOX(gtk_object_get_data(GTK_OBJECT(items->data),"mailbox"))->name;
+	    if (name && !strcmp(name,fil->action_string))
+		break;
+	    else i++;
+	}
+	gtk_option_menu_set_history(GTK_OPTION_MENU(fe_mailboxes), i);
+    }
 
     /* We free the conditions */
     fe_free_associated_conditions();

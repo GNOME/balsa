@@ -1,3 +1,7 @@
+2004-08-16 08:41  PeterB
+
+	* src/sendmsg-window.c: plug leak.
+
 2004-08-15  Pawel Salek
 
 	* NEWS, configure.in: release 2.2.3.

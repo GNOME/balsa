@@ -26,12 +26,10 @@ static Personality *optionspersselected;
 static GtkWidget *account_list;
 static personality_box_options *options = NULL;
 
-void update_personality_box (GtkWidget *, personality_box_options *);
-
-void personality_edit (GtkWidget *, gpointer);
-void personality_pop3_edit (Personality *);
-void personality_imap_edit (Personality *);
-void personality_mbox_edit (Personality *);
+static void personality_edit (GtkWidget *, gpointer);
+static void personality_pop3_edit (Personality *);
+static void personality_imap_edit (Personality *);
+static void personality_mbox_edit (Personality *);
 
 gint
 delete_event (GtkWidget * widget, gpointer data)
@@ -343,7 +341,7 @@ void
 change_options (GtkWidget * widget, personality_box_options * options)
 {
   GString *gstring = g_string_new (NULL);
-  Personality *currentpers = gtk_object_get_user_data (GTK_OBJECT (widget));
+  Personality *currentpers = options->pers;
 
   gnome_config_pop_prefix ();
   gnome_config_sync ();
@@ -358,46 +356,45 @@ change_options (GtkWidget * widget, personality_box_options * options)
   gnome_config_set_string ("Realname", gtk_entry_get_text (GTK_ENTRY (options->realname)));
   gnome_config_set_string ("Replyto", gtk_entry_get_text (GTK_ENTRY (options->replyto)));
 
-  gnome_config_set_string ("POP3_pop3server", gtk_entry_get_text (GTK_ENTRY (options->pop3_pop3server)));
-  gnome_config_set_string ("POP3_smtpserver", gtk_entry_get_text (GTK_ENTRY (options->pop3_smtpserver)));
-  gnome_config_set_string ("POP3_username", gtk_entry_get_text (GTK_ENTRY (options->pop3_username)));
-  gnome_config_set_string ("POP3_password", gtk_entry_get_text (GTK_ENTRY (options->pop3_password)));
+  if (currentpers->type == 0)
+    {
+      gnome_config_set_string ("POP3_pop3server", gtk_entry_get_text (GTK_ENTRY (options->pop3_pop3server)));
+      gnome_config_set_string ("POP3_smtpserver", gtk_entry_get_text (GTK_ENTRY (options->pop3_smtpserver)));
+      gnome_config_set_string ("POP3_username", gtk_entry_get_text (GTK_ENTRY (options->pop3_username)));
+      gnome_config_set_string ("POP3_password", gtk_entry_get_text (GTK_ENTRY (options->pop3_password)));
 
-  gnome_config_set_string ("IMAP_imapserver", gtk_entry_get_text (GTK_ENTRY (options->imap_imapserver)));
-  gnome_config_set_string ("IMAP_smtpserver", gtk_entry_get_text (GTK_ENTRY (options->imap_smtpserver)));
-  gnome_config_set_string ("IMAP_username", gtk_entry_get_text (GTK_ENTRY (options->imap_username)));
-  gnome_config_set_string ("IMAP_password", gtk_entry_get_text (GTK_ENTRY (options->imap_password)));
+      currentpers->p_pop3server = gtk_entry_get_text (GTK_ENTRY (options->pop3_pop3server));
+      currentpers->p_smtpserver = gtk_entry_get_text (GTK_ENTRY (options->pop3_smtpserver));
+      currentpers->p_username = gtk_entry_get_text (GTK_ENTRY (options->pop3_username));
+      currentpers->p_password = gtk_entry_get_text (GTK_ENTRY (options->pop3_password));
+    }
 
-  gnome_config_set_string ("LOCAL_mblocation", gtk_entry_get_text (GTK_ENTRY (options->local_mblocation)));
-  gnome_config_set_string ("LOCAL_smtpserver", gtk_entry_get_text (GTK_ENTRY (options->local_smtpserver)));
+  if (currentpers->type == 1)
+    {
+      gnome_config_set_string ("IMAP_imapserver", gtk_entry_get_text (GTK_ENTRY (options->imap_imapserver)));
+      gnome_config_set_string ("IMAP_smtpserver", gtk_entry_get_text (GTK_ENTRY (options->imap_smtpserver)));
+      gnome_config_set_string ("IMAP_username", gtk_entry_get_text (GTK_ENTRY (options->imap_username)));
+      gnome_config_set_string ("IMAP_password", gtk_entry_get_text (GTK_ENTRY (options->imap_password)));
+
+      currentpers->i_imapserver = gtk_entry_get_text (GTK_ENTRY (options->imap_imapserver));
+      currentpers->i_smtpserver = gtk_entry_get_text (GTK_ENTRY (options->imap_smtpserver));
+      currentpers->i_username = gtk_entry_get_text (GTK_ENTRY (options->imap_username));
+      currentpers->i_password = gtk_entry_get_text (GTK_ENTRY (options->imap_password));
+    }
+
+  if (currentpers->type == 2)
+    {
+      gnome_config_set_string ("LOCAL_mblocation", gtk_entry_get_text (GTK_ENTRY (options->local_mblocation)));
+      gnome_config_set_string ("LOCAL_smtpserver", gtk_entry_get_text (GTK_ENTRY (options->local_smtpserver)));
+
+      currentpers->l_mblocation = gtk_entry_get_text (GTK_ENTRY (options->local_mblocation));
+      currentpers->l_smtpserver = gtk_entry_get_text (GTK_ENTRY (options->local_smtpserver));
+    }
 
   gnome_config_pop_prefix ();
   gnome_config_sync ();
 }
 
-void
-update_personality_box (GtkWidget * widget, personality_box_options * options)
-{
-  char *buffer;
-  Personality *currentpers = gtk_object_get_user_data (GTK_OBJECT (widget));
-
-  change_options (widget, options);
-
-  gtk_entry_set_text (GTK_ENTRY (options->realname), currentpers->realname);
-  gtk_entry_set_text (GTK_ENTRY (options->replyto), currentpers->replyto);
-
-  gtk_entry_set_text (GTK_ENTRY (options->pop3_pop3server), currentpers->p_pop3server);
-  gtk_entry_set_text (GTK_ENTRY (options->pop3_smtpserver), currentpers->p_smtpserver);
-  gtk_entry_set_text (GTK_ENTRY (options->pop3_username), currentpers->p_username);
-  gtk_entry_set_text (GTK_ENTRY (options->pop3_password), currentpers->p_password);
-
-  gtk_entry_set_text (GTK_ENTRY (options->imap_imapserver), currentpers->i_imapserver);
-  gtk_entry_set_text (GTK_ENTRY (options->imap_smtpserver), currentpers->i_smtpserver);
-  gtk_entry_set_text (GTK_ENTRY (options->imap_username), currentpers->i_username);
-  gtk_entry_set_text (GTK_ENTRY (options->imap_password), currentpers->i_password);
-
-  optionspersselected = currentpers;
-}
 
 /*
    --------------------------------------------
@@ -577,7 +574,8 @@ personality_box (GtkWidget * widget, gpointer data)
   gtk_widget_show (window);
 }
 
-gint selected_clist_row (GtkWidget * clist)
+gint
+selected_clist_row (GtkWidget * clist)
 {
   GList *l;
   GtkCListRow *row;
@@ -600,19 +598,22 @@ gint selected_clist_row (GtkWidget * clist)
   return -1;
 }
 
-void
+static void
 personality_edit (GtkWidget * widget, gpointer something)
 {
   gint row = selected_clist_row (account_list);
   gpointer *data = gtk_clist_get_row_data (GTK_CLIST (account_list), row);
-  if (((Personality *) (data))->type == 0) personality_pop3_edit( (Personality *)(data) );
-  if (((Personality *) (data))->type == 1) personality_imap_edit((Personality *)(data));
-  if (((Personality *) (data))->type == 2) personality_mbox_edit((Personality *)(data));
+  if (((Personality *) (data))->type == 0)
+    personality_pop3_edit ((Personality *) (data));
+  if (((Personality *) (data))->type == 1)
+    personality_imap_edit ((Personality *) (data));
+  if (((Personality *) (data))->type == 2)
+    personality_mbox_edit ((Personality *) (data));
 }
 
 
-void
-personality_pop3_edit (Personality *currentpers)
+static void
+personality_pop3_edit (Personality * currentpers)
 {
   GList *list;
   GtkWidget *window;
@@ -628,7 +629,7 @@ personality_pop3_edit (Personality *currentpers)
   options = g_malloc (sizeof (personality_box_options));
 
   window = gtk_window_new (GTK_WINDOW_DIALOG);
-  gtk_window_set_title (GTK_WINDOW (window), "Settings");
+  gtk_window_set_title (GTK_WINDOW (window), "Edit POP3 account...");
   gtk_signal_connect (GTK_OBJECT (window), "delete_event",
 		      GTK_SIGNAL_FUNC (delete_event), NULL);
   gtk_container_border_width (GTK_CONTAINER (window), 3);
@@ -745,6 +746,7 @@ personality_pop3_edit (Personality *currentpers)
   gtk_table_attach (GTK_TABLE (table), okbutton, 0, 1, 11, 12, GTK_SHRINK, GTK_SHRINK, 0, 0);
   gtk_widget_show (okbutton);
 
+  options->pers = currentpers;
   gtk_signal_connect (GTK_OBJECT (okbutton), "clicked",
 		      GTK_SIGNAL_FUNC (change_options), options);
 
@@ -765,20 +767,20 @@ personality_pop3_edit (Personality *currentpers)
 			     GTK_OBJECT (window));
 
 
-   gtk_entry_set_text (GTK_ENTRY (options->accountname), currentpers->name);
-   gtk_entry_set_text (GTK_ENTRY (options->realname), currentpers->realname);
-   gtk_entry_set_text (GTK_ENTRY (options->replyto), currentpers->replyto);
+  gtk_entry_set_text (GTK_ENTRY (options->accountname), currentpers->name);
+  gtk_entry_set_text (GTK_ENTRY (options->realname), currentpers->realname);
+  gtk_entry_set_text (GTK_ENTRY (options->replyto), currentpers->replyto);
 
-   gtk_entry_set_text (GTK_ENTRY (options->pop3_pop3server), currentpers->p_pop3server);
-   gtk_entry_set_text (GTK_ENTRY (options->pop3_smtpserver), currentpers->p_smtpserver);
-   gtk_entry_set_text (GTK_ENTRY (options->pop3_username), currentpers->p_username);
-   gtk_entry_set_text (GTK_ENTRY (options->pop3_password), currentpers->p_password);
+  gtk_entry_set_text (GTK_ENTRY (options->pop3_pop3server), currentpers->p_pop3server);
+  gtk_entry_set_text (GTK_ENTRY (options->pop3_smtpserver), currentpers->p_smtpserver);
+  gtk_entry_set_text (GTK_ENTRY (options->pop3_username), currentpers->p_username);
+  gtk_entry_set_text (GTK_ENTRY (options->pop3_password), currentpers->p_password);
 
   gtk_widget_show (window);
 }
 
-void
-personality_imap_edit (Personality *currentpers)
+static void
+personality_imap_edit (Personality * currentpers)
 {
   GList *list;
   GtkWidget *window;
@@ -794,7 +796,7 @@ personality_imap_edit (Personality *currentpers)
   options = g_malloc (sizeof (personality_box_options));
 
   window = gtk_window_new (GTK_WINDOW_DIALOG);
-  gtk_window_set_title (GTK_WINDOW (window), "Settings");
+  gtk_window_set_title (GTK_WINDOW (window), "Edit IMAP account...");
   gtk_signal_connect (GTK_OBJECT (window), "delete_event",
 		      GTK_SIGNAL_FUNC (delete_event), NULL);
   gtk_container_border_width (GTK_CONTAINER (window), 3);
@@ -930,20 +932,19 @@ personality_imap_edit (Personality *currentpers)
 			     GTK_SIGNAL_FUNC (gtk_widget_destroy),
 			     GTK_OBJECT (window));
 
-   gtk_entry_set_text (GTK_ENTRY (options->accountname), currentpers->name);
-   gtk_entry_set_text (GTK_ENTRY (options->realname), currentpers->realname);
-   gtk_entry_set_text (GTK_ENTRY (options->replyto), currentpers->replyto);
+  gtk_entry_set_text (GTK_ENTRY (options->accountname), currentpers->name);
+  gtk_entry_set_text (GTK_ENTRY (options->realname), currentpers->realname);
+  gtk_entry_set_text (GTK_ENTRY (options->replyto), currentpers->replyto);
 
-   gtk_entry_set_text (GTK_ENTRY (options->imap_imapserver), currentpers->i_imapserver);
-   gtk_entry_set_text (GTK_ENTRY (options->imap_smtpserver), currentpers->i_smtpserver);
-   gtk_entry_set_text (GTK_ENTRY (options->imap_username), currentpers->i_username);
-   gtk_entry_set_text (GTK_ENTRY (options->imap_password), currentpers->i_password);
+  gtk_entry_set_text (GTK_ENTRY (options->imap_imapserver), currentpers->i_imapserver);
+  gtk_entry_set_text (GTK_ENTRY (options->imap_smtpserver), currentpers->i_smtpserver);
+  gtk_entry_set_text (GTK_ENTRY (options->imap_username), currentpers->i_username);
+  gtk_entry_set_text (GTK_ENTRY (options->imap_password), currentpers->i_password);
 
   gtk_widget_show (window);
 }
 
-void
-personality_mbox_edit (Personality *pers)
+static void
+personality_mbox_edit (Personality * pers)
 {
 }
-

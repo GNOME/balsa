@@ -181,7 +181,14 @@ void build_left_side()
 		     10, 0);
     gtk_widget_show(fe_box_updown);
 
+    gtk_widget_push_visual (gdk_imlib_get_visual ());
+    gtk_widget_push_colormap (gdk_imlib_get_colormap ());
+
     fe_clist = gtk_clist_new_with_titles(2, titles);
+
+    gtk_widget_pop_colormap ();
+    gtk_widget_pop_visual ();
+	  
     gtk_clist_set_policy(GTK_CLIST(fe_clist),
 			 GTK_POLICY_AUTOMATIC,
 			 GTK_POLICY_AUTOMATIC);

@@ -1,3 +1,13 @@
+1999-01-15 bertrand <Bertrand.Guiheneuf@inria.fr>
+
+	* src/index-child.c (index_button_press_cb): new function
+	to handle double click properly regarding to new gtk+ 
+	code.
+	(index_select_cb): no more double click handling code.
+	(index_child_create_view): connect scrolled windows
+	adjustments to the canvas adjustments.
+	Set the step increment.
+
 1999-01-14  bertrand <Bertrand.Guiheneuf@inria.fr>
 
 

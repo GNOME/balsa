@@ -76,6 +76,7 @@ index_child_get_type (void)
 /* callbacks */
 static void index_select_cb (GtkWidget * widget, Message * message, GdkEventButton *, gpointer data);
 static GtkWidget *create_menu (BalsaIndex * bindex);
+static void index_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer data);
 
 /* menu item callbacks */
 static void message_status_set_new_cb (GtkWidget *, Message *);
@@ -232,7 +233,8 @@ index_child_create_view (GnomeMDIChild * child, gpointer data)
   GtkWidget *sw;
   GtkWidget *vpane = NULL;
   IndexChild *ic;
-
+  GtkAdjustment *vadj, *hadj;
+ 
   ic = INDEX_CHILD (child);
 
   if (balsa_app.previewpane)
@@ -256,8 +258,16 @@ index_child_create_view (GnomeMDIChild * child, gpointer data)
 				      GTK_POLICY_AUTOMATIC,
 				      GTK_POLICY_AUTOMATIC);
       ic->message = balsa_message_new ();
-      gtk_widget_set_usize (ic->message, -1, 250);
+      /* gtk_widget_set_usize (ic->message, -1, 250);*/
       gtk_container_add (GTK_CONTAINER (sw), ic->message);
+      
+      vadj = gtk_layout_get_vadjustment( GTK_LAYOUT(ic->message) );
+      hadj = gtk_layout_get_hadjustment( GTK_LAYOUT(ic->message) );
+		
+      gtk_scrolled_window_set_vadjustment( GTK_SCROLLED_WINDOW(sw), vadj);
+      gtk_scrolled_window_set_hadjustment( GTK_SCROLLED_WINDOW(sw), hadj);
+      vadj->step_increment = 10;
+      hadj->step_increment = 10;
       gtk_paned_add2 (GTK_PANED (vpane), sw);
 
 
@@ -283,7 +293,10 @@ index_child_create_view (GnomeMDIChild * child, gpointer data)
   balsa_index_set_mailbox (BALSA_INDEX (ic->index), ic->mailbox);
   gtk_signal_connect (GTK_OBJECT (ic->index), "select_message",
 		      (GtkSignalFunc) index_select_cb, ic);
-
+  
+  gtk_signal_connect (GTK_OBJECT (ic->index), "button_press_event",
+		      (GtkSignalFunc) index_button_press_cb, ic);
+  
   /* setup the dnd stuff for the messages */
   gtk_object_set( GTK_OBJECT(ic->index), "use_drag_icons", FALSE, NULL);
   gtk_object_set( GTK_OBJECT(ic->index), "reorderable", FALSE, NULL);
@@ -338,11 +351,6 @@ index_select_cb (GtkWidget * widget,
 
   set_imap_username (message->mailbox);
 
-  if (bevent && bevent->type == GDK_2BUTTON_PRESS)
-    {
-      message_window_new (message);
-      return;
-    }
   gtk_object_set_data (GTK_OBJECT (widget), "message", message);
   gtk_object_set_data (GTK_OBJECT (widget), "bevent", bevent);
   gtk_object_set_data (GTK_OBJECT (widget), "data", data);
@@ -353,6 +361,31 @@ index_select_cb (GtkWidget * widget,
 
 }
 
+
+static void
+index_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer data)
+{
+  gint on_message;
+  guint row, column;
+  Message *current_message;
+  GtkCList *clist;
+  Mailbox *mailbox;
+
+  clist = GTK_CLIST(widget);
+  on_message=gtk_clist_get_selection_info (clist, event->x, event->y, &row, &column);
+  
+  if (on_message)
+    {
+      mailbox = gtk_clist_get_row_data (clist, row);
+      current_message = (Message *) gtk_clist_get_row_data (clist, row);
+      if (event && event->type == GDK_2BUTTON_PRESS)
+	{
+	  message_window_new (current_message);
+	  return;
+	} 
+    }
+
+}
 /*
  * CLIST Callbacks
  */

@@ -1295,7 +1295,7 @@ balsa_message_set_embedded_hdr(GtkTreeModel * model, GtkTreePath * path,
 
     gtk_tree_model_get(model, iter, PART_INFO_COLUMN, &info, -1);
     if (info) {
-        if (info->body && info->body->embhdrs)
+        if (info->body && info->body->embhdrs && info->widget)
             display_embedded_headers(bm, info->body, info->widget);
         g_object_unref(G_OBJECT(info));
     }

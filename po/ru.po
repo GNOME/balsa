@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 0.4\n"
-"POT-Creation-Date: 2000-08-29 18:43+0400\n"
-"PO-Revision-Date: 2000-08-29 18:43+04:00\n"
+"POT-Creation-Date: 2000-08-30 12:38+0400\n"
+"PO-Revision-Date: 2000-08-30 12:38+04:00\n"
 "Last-Translator: Valek Filippov <frob@df.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -219,29 +219,33 @@ msgstr "Импортировать только первый адрес"
 msgid "Import all adresses"
 msgstr "Импортировать все адреса"
 
-#: src/balsa-app.c:239 src/balsa-app.c:244 src/balsa-app.c:249
-#: src/balsa-app.c:254 src/balsa-app.c:259
+#: src/balsa-app.c:119
+msgid "Balsa Warning"
+msgstr "Предупреждение Balsa"
+
+#: src/balsa-app.c:290 src/balsa-app.c:295 src/balsa-app.c:300
+#: src/balsa-app.c:305 src/balsa-app.c:310
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
 msgstr "Balsa не может открыть ваш почтовый ящик \"%s\""
 
-#: src/balsa-app.c:239
+#: src/balsa-app.c:290
 msgid "Inbox"
 msgstr "Входящие"
 
-#: src/balsa-app.c:244
+#: src/balsa-app.c:295
 msgid "Outbox"
 msgstr "Исходящие"
 
-#: src/balsa-app.c:249
+#: src/balsa-app.c:300
 msgid "Sentbox"
 msgstr "Отправленные"
 
-#: src/balsa-app.c:254
+#: src/balsa-app.c:305
 msgid "Draftbox"
 msgstr "Черновики"
 
-#: src/balsa-app.c:259
+#: src/balsa-app.c:310
 msgid "Trash"
 msgstr "Мусорная корзина"
 
@@ -393,7 +397,7 @@ msgstr "Показан почтовый ящик: %s c %ld сообщениями, %ld новых"
 msgid "Save MIME Part"
 msgstr "Сохранить MIME-закодированную часть"
 
-#: src/balsa-message.c:241 src/balsa-message.c:1182
+#: src/balsa-message.c:241 src/balsa-message.c:1187
 msgid "Save"
 msgstr "Сохранить"
 
@@ -474,7 +478,7 @@ msgstr "Имя файла: %s"
 msgid "Save part"
 msgstr "Сохранить часть"
 
-#: src/balsa-message.c:1255
+#: src/balsa-message.c:1260
 #, c-format
 msgid "could not create temporary file %s"
 msgstr "невозможно создать временный файл %s"
@@ -1088,12 +1092,12 @@ msgstr ""
 "Сообщить об обнаруженных ошибках можно по адресу "
 "http://www.gnome.org/cgi-bin/bugs"
 
-#: src/main-window.c:1263
+#: src/main-window.c:1262
 #, c-format
 msgid "Sending error: %s"
 msgstr "Ошибка отправки: %s"
 
-#: src/main-window.c:1489
+#: src/main-window.c:1488
 msgid ""
 "In order to store an address, you must open a mailbox and select a message.\n"
 msgstr ""
@@ -1779,7 +1783,7 @@ msgstr "Не удалось выполнить команду печати."
 msgid "Error executing lpr"
 msgstr "Ошибка выполнения lpr"
 
-#: libbalsa/mailbox_imap.c:231
+#: libbalsa/mailbox_imap.c:233
 #, c-format
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxImap: Открыто %s Число ссылок: %d\n"
@@ -1789,14 +1793,10 @@ msgstr "LibBalsaMailboxImap: Открыто %s Число ссылок: %d\n"
 msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxLocal: Открыто %s Число ссылок: %d\n"
 
-#: libbalsa/mailbox_pop3.c:181
+#: libbalsa/mailbox_pop3.c:177
 #, c-format
 msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxPop3: Открыто %s Число ссылок: %d\n"
-
-#: libbalsa/mailbox_pop3.c:300
-msgid "Error: "
-msgstr "Ошибка: "
 
 #: libmutt/mbox.c:134 libmutt/mbox.c:292
 msgid "Reading %s... %d (%d%%)"
@@ -1956,6 +1956,9 @@ msgstr "%d сохранено."
 #: libmutt/mx.c:1375
 msgid "Can't write message"
 msgstr "Невозможно записать письмо"
+
+#~ msgid "Error: "
+#~ msgstr "Ошибка: "
 
 #~ msgid "List"
 #~ msgstr "Список"

@@ -19,9 +19,10 @@
 #ifndef __SAVE_RESTORE_H__
 #define __SAVE_RESTORE_H__
 
-void add_mailbox_config (gint, gchar *, gchar *, gint);
+void add_mailbox_config (gchar *, gchar *, gint);
 void delete_mailbox_config (gchar *);
-gint load_mailboxes(gchar *);
+void update_mailbox_config (gchar *, gchar *, gchar *);
+gint load_mailboxes (gchar *);
 void restore_global_settings ();
 void save_global_settings ();
 

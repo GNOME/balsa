@@ -24,7 +24,7 @@
 
 
 void
-add_mailbox_config (gint num, gchar * name, gchar * path, gint type)
+add_mailbox_config (gchar * name, gchar * path, gint type)
 {
   GString *gstring;
   gchar **mblist;
@@ -86,6 +86,25 @@ delete_mailbox_config (gchar * name)
 	  mblist[i] = g_strdup (mailbox->name);
 	}
     }
+  gnome_config_sync ();
+  g_string_free (gstring, 1);
+}
+
+void
+change_mailbox_config(gchar *name, gchar *setting, gchar *value)
+{
+  GString *gstring;
+
+  gstring = g_string_new (NULL);
+
+  g_string_truncate (gstring, 0);
+  g_string_sprintf (gstring, "/balsa/%s/", name);
+  gnome_config_push_prefix (gstring->str);
+  gnome_config_set_string (setting, value);
+  gnome_config_pop_prefix ();
+
+  gnome_config_sync ();
+  g_string_free (gstring, 1);
 }
 
 gint

@@ -198,7 +198,7 @@ balsa_information_list(LibBalsaInformationType type, char *msg)
 	GtkWidget *scrolled_window;
 
 	information_dialog =
-	    gtk_dialog_new_with_buttons(_("Balsa Information"), 
+	    gtk_dialog_new_with_buttons(_("Information - Balsa"), 
                                         GTK_WINDOW(balsa_app.main_window),
                                         GTK_DIALOG_DESTROY_WITH_PARENT,
                                         GTK_STOCK_CLEAR, GTK_RESPONSE_APPLY,
@@ -207,11 +207,14 @@ balsa_information_list(LibBalsaInformationType type, char *msg)
 	/* Default is to close */
 	gtk_dialog_set_default_response(GTK_DIALOG(information_dialog), 
                                         GTK_RESPONSE_CLOSE);
+	gtk_dialog_set_has_separator(GTK_DIALOG(information_dialog), FALSE);
 
 	/* Reset the policy gtk_dialog_new makes itself non-resizable */
 	gtk_window_set_resizable(GTK_WINDOW(information_dialog), TRUE);
-	gtk_window_set_default_size(GTK_WINDOW(information_dialog), 350,
-				    200);
+	gtk_window_set_default_size(GTK_WINDOW(information_dialog), 350, 200);
+	gtk_container_set_border_width(GTK_CONTAINER(GTK_WINDOW(
+				       information_dialog)), 6);
+	gtk_box_set_spacing(GTK_BOX(GTK_DIALOG(information_dialog)->vbox), 12);
 	gtk_window_set_wmclass(GTK_WINDOW(information_dialog),
 			       "Information", "Balsa");
 
@@ -226,6 +229,8 @@ balsa_information_list(LibBalsaInformationType type, char *msg)
 				       GTK_POLICY_AUTOMATIC);
 	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(information_dialog)->vbox),
 			   scrolled_window, TRUE, TRUE, 1);
+	gtk_container_set_border_width(GTK_CONTAINER(GTK_SCROLLED_WINDOW(
+				       scrolled_window)), 6);
 	gtk_widget_show(scrolled_window);
 
 	/* The list itself */

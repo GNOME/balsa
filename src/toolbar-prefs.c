@@ -133,7 +133,7 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
     }
 
     customize_widget =
-        gtk_dialog_new_with_buttons(_("Customize"),
+        gtk_dialog_new_with_buttons(_("Customize Toolbars"),
                                     GTK_WINDOW(active_window),
                                     GTK_DIALOG_DESTROY_WITH_PARENT,
                                     GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,

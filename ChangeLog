@@ -1,3 +1,12 @@
+2003-11-14 05:27  PeterB
+
+	* libbalsa/: mailbox.c, mailbox.h: Implement
+	libbalsa_mailbox_msgno_find()--gets an iter and a path for a given
+	message number.
+	* src/: balsa-index.c, balsa-index.h: Remove ref_table member; use
+	libbalsa_mailbox_msgno_find() in bndx_find_message(); remove weak
+	pointers when we don't need them.
+
 2003-11-13 21:45  PeterB
 
 	* libbalsa/: mailbox.c, mailbox_imap.c, mailbox_maildir.c,

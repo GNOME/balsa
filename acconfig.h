@@ -33,3 +33,9 @@
 #undef BALSA_USE_EXPERIMENTAL_INIT
 /* Use GOB */
 #undef BALSA_HAVE_GOB
+/* We have root privs */
+#undef BALSA_SYSTEM_INSTALL
+/* We don't have root or won't use it */
+#undef BALSA_LOCAL_INSTALL
+/* Our data directory prefix */
+#undef BALSA_RESOURCE_PREFIX

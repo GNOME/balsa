@@ -31,6 +31,11 @@
 #include "helper.h"
 #include "balsa-druid-page.h"
 
+#ifdef BALSA_LOCAL_INSTALL
+#define gnome_pixmap_file( s ) g_strdup( g_strconcat( BALSA_RESOURCE_PREFIX, "/pixmaps/", s, NULL ) )
+#define gnome_unconditional_pixmap_file( s ) g_strdup( g_strconcat( BALSA_RESOURCE_PREFIX, "/pixmaps", s, NULL ) )
+#endif
+
 /* ************************************************************************** */
 
 GdkImlibImage *balsa_init_get_png( const gchar *fname );

@@ -100,12 +100,20 @@ AC_SUBST(LIBESD_LIB)
 
 
 dnl Enable all
-AC_ARG_ENABLE(all, [  --enable-all            Enable incomplete features [default=no]],
-AC_DEFINE(BALSA_SHOW_ALL),)
+AC_ARG_ENABLE(all, [  --enable-all            Enable incomplete features [default=no]],[
+	AC_DEFINE(BALSA_SHOW_ALL)
+	use_all=yes
+],[
+	use_all=no
+])
 
 dnl Enable information in the mailbox list
-AC_ARG_ENABLE(info, [  --enable-info           Enable mailbox info (broken) [default=no]],
-AC_DEFINE(BALSA_SHOW_INFO),)
+AC_ARG_ENABLE(info, [  --enable-info           Enable mailbox info (broken) [default=no]],[
+	AC_DEFINE(BALSA_SHOW_INFO)
+	use_info=yes
+],[
+	use_info=no
+])
 
 dnl Use threading
 AC_ARG_ENABLE(threads, [  --enable-threads        Use threading for mail retrieval (unstable) [default=no]],[
@@ -113,6 +121,21 @@ AC_ARG_ENABLE(threads, [  --enable-threads        Use threading for mail retriev
 ],[
 	use_threads=no
 ])
+
+dnl Allow user-level install. AIEEEEE FIXME FIXME XXXX
+AC_ARG_ENABLE(system-install, [  --enable-system-install   Install Balsa icons globally (requires write access to Gnome files)],[
+	use_sys_install=$enableval
+],[
+	use_sys_install=no
+])
+if test x"$use_sys_install" = xyes ; then
+	AC_DEFINE(BALSA_SYSTEM_INSTALL)
+	AM_CONDITIONAL(sys_install,true)
+else
+	AC_DEFINE(BALSA_LOCAL_INSTALL)
+	AC_DEFINE_UNQUOTED(BALSA_RESOURCE_PREFIX,"${prefix}")
+	AM_CONDITIONAL(sys_install,false)
+fi
 
 AC_MSG_CHECKING([whether to use threads])
 if test x"$use_threads" = xyes ; then
@@ -142,6 +165,10 @@ else
 fi
 AM_CONDITIONAL(USE_GOB,[test x"$BALSA_USE_GOB" = "xtrue"])
 
+dnl For the docs!
+AC_CHECK_PROG(have_db2html, db2html, true, false)
+AM_CONDITIONAL(HAVE_DB2HTML, $have_db2html)
+
 dnl Create files.
 AC_OUTPUT([
 Makefile 
@@ -151,8 +178,17 @@ macros/Makefile
 intl/Makefile
 sounds/Makefile
 images/Makefile
+help/Makefile
+help/C/Makefile
 libbalsa/Makefile
 libinit_balsa/Makefile
 idl/Makefile
 src/Makefile
 ])
+
+echo "========= Final configuration ==================="
+echo "   Installing into prefix: $prefix"
+echo "     Using multithreading: $use_threads"
+echo "Using incomplete features: $use_all"
+echo "Using broken mailbox info: $use_info"
+echo "  Install into Gnome dirs: $use_sys_install (requires write access to Gnome directories)"

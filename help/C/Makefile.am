@@ -17,22 +17,24 @@ EXTRA_DIST = \
 	$(HTML_FILES)
 
 $(HTML_FILES): html-stamp
-	@if test ! -f $@ ; then \
-		echo Warning: documentation Makefile.am needs updating: $@ does not exist 1>&2 ; \
-		if test -z `cat topic.dat |grep $@` ; then \
-			echo Warning: topic.data references old file $@ 1>&2 ; \
+	@short=`echo $@ |sed -e "s,^.*/,,"` ; \
+	if test ! -f "$(srcdir)/$${short}" ; then \
+		echo Warning: documentation Makefile.am needs updating: $${short} does not exist 1>&2 ; \
+		if test -z "`cat $(srcdir)/topic.dat |grep $${short}`" ; then \
+			echo Warning: topic.dat references old file $short 1>&2 ; \
  		fi ; \
 	fi
 
 if HAVE_DB2HTML
 html-stamp: balsa.sgml
-	rm -f *.htm
+	rm -f $(srcdir)/*.htm
 	(cd $(srcdir) && db2html balsa.sgml) 1>/dev/null
-	cd $(srcdir) && mv balsa/*.htm .
+	mv $(srcdir)/balsa/*.htm $(srcdir)
 	rm -rf $(srcdir)/balsa/
-	@for f in *.htm ; do \
-		if test -z "`echo "${HTML_FILES}" | grep "$$f"`" ; then \
-			echo Warning: documentation Makefile.am needs updating: $$f is not listed in HTML_FILES 1>&2 ; \
+	@for f in $(srcdir)/*.htm ; do \
+		short=`echo $$f |sed -e "s,^.*/,,"` ; \
+		if test -z "`echo "${HTML_FILES}" | grep "$${short}"`" ; then \
+			echo Warning: documentation Makefile.am needs updating: $${short} is not listed in HTML_FILES 1>&2 ; \
 		fi ; \
 	done
 	touch html-stamp
@@ -41,7 +43,11 @@ html-stamp: balsa.sgml
 	touch html-stamp
 endif
 
+if sys_install
 helpdir = $(gnomedatadir)/gnome/help/balsa/C
+else
+helpdir = $(datadir)/gnome/help/balsa/C
+endif
 
 help_DATA = topic.dat $(HTML_FILES)
 

@@ -25,6 +25,12 @@
 #include "balsa-mblist.h"
 #include "balsa-index-page.h"
 
+/* Work around nonprivileged installs so we can find icons */
+#ifdef BALSA_LOCAL_INSTALL
+#define gnome_pixmap_file( s ) g_strdup( g_strconcat( BALSA_RESOURCE_PREFIX, "/pixmaps/", s, NULL ) )
+#define gnome_unconditional_pixmap_file( s ) g_strdup( g_strconcat( BALSA_RESOURCE_PREFIX, "/pixmaps", s, NULL ) )
+#endif
+
 /* global definitions */
 #define BALSA_BUTTON_HEIGHT  30
 #define BALSA_BUTTON_WIDTH  70

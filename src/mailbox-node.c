@@ -71,8 +71,8 @@ static gboolean imap_scan_children_idle(BalsaMailboxNode ** mn);
 static GNode* add_local_mailbox(GNode*root, const char*d_name, const char* fn);
 static GNode* add_local_folder(GNode*root, const char*d_name, const char* fn);
 
-static void add_imap_mailbox(const char *fn, char delim, gpointer data);
-static void add_imap_folder(const char *fn, char delim, gpointer data);
+static void add_imap_mailbox(const char *fn, char delim, int noselect,
+			     int noinferiors, void *data);
 static gint check_imap_url(LibBalsaServer * server, const char *fn,
                            guint depth);
 static void mark_imap_entry(const char *fn, gpointer data);
@@ -348,7 +348,7 @@ imap_dir_cb_real(void* r)
                               mb->list_inbox, 
                               check_imap_url,
                               mark_imap_entry,
-			      add_imap_folder, add_imap_mailbox,
+			      add_imap_mailbox,
 			      &imap_tree);
     if (!balsa_app.mailbox_nodes) {
         /* Quitt'n time! */
@@ -1210,26 +1210,18 @@ imap_scan_destroy_tree(imap_scan_tree * tree)
 }
 
 static void
-add_imap_mailbox(const char* fn, char delim, void* data)
-{ 
-    const gchar *basename = strrchr(fn, delim);
-    if(!basename) basename = fn;
-    else { 
-	if(*++basename == '.' && delim != '.') /* ignore mailboxes
-						  that begin with a dot */
-	    return; 
+add_imap_mailbox(const char *fn, char delim, int noselect, int noinferiors,
+		 void *data)
+{
+    if (!noselect) {
+	const gchar *basename = strrchr(fn, delim);
+	if (basename && *++basename == '.' && delim != '.')
+	    /* ignore mailboxes that begin with a dot */
+	    return;
     }
-    if(balsa_app.debug) 
+    if (balsa_app.debug)
 	printf("add_imap_mailbox: Adding mailbox of path %s\n", fn);
-    add_imap_entry(fn, delim, TRUE, TRUE, data);
-}
-
-static void
-add_imap_folder(const char* fn, char delim, void* data)
-{ 
-    if(balsa_app.debug) 
-	printf("add_imap_folder: Adding folder of path %s\n", fn);
-    add_imap_entry(fn, delim, FALSE, FALSE, data); 
+    add_imap_entry(fn, delim, noinferiors, !noselect, data);
 }
 
 /*

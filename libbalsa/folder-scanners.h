@@ -26,7 +26,8 @@ typedef GNode* (LocalHandler)(GNode*root, const char*d_name, const char* fn);
 typedef gboolean ImapCheck(LibBalsaServer * server, const char *fn,
                            guint depth);
 typedef void ImapMark(const char * fn, gpointer data);
-typedef void (ImapHandler) (const char *fn, char delim, gpointer data);
+typedef void ImapHandler(const char *fn, char delim, gint noselect,
+			 gint noinferiors, gpointer data);
 
 /* read_dir used by mailbox-node append-subtree callback */
 void libbalsa_scanner_local_dir(GNode *rnode, const gchar * prefix, 
@@ -38,7 +39,6 @@ void libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
 			       gboolean list_inbox,
                                ImapCheck check_imap_path,
                                ImapMark mark_imap_path,
-			       ImapHandler folder_handler, 
 			       ImapHandler mailbox_handler,
 			       gpointer cb_data);
 

@@ -197,7 +197,6 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
                           gboolean list_inbox,
                           ImapCheck check_imap_path,
                           ImapMark mark_imap_path,
-			  ImapHandler folder_handler, 
 			  ImapHandler mailbox_handler,
 			  gpointer cb_data)
 {
@@ -208,7 +207,6 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     state.imap_browse = 1;
     state.rnode = rnode;
     state.mailbox_handler = (void(*)())mailbox_handler;
-    state.folder_handler  = (void(*)())folder_handler;
     state.cb_data         = cb_data;
     if(!FileMask.rx) { /* allocate it once, on the first run */
        FileMask.rx = (regex_t *) safe_malloc (sizeof (regex_t));
@@ -234,8 +232,7 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
          * and we'll mark it as scanned, because the only reason for
          * using this option is to pickup an INBOX that isn't in the
          * tree specified by the prefix */
-        mailbox_handler("INBOX", '/', cb_data);
-        folder_handler("INBOX", '/', cb_data);
+        mailbox_handler("INBOX", '/', FALSE, TRUE, cb_data);
         mark_imap_path("INBOX", cb_data);
     }
 
@@ -259,34 +256,23 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
  * The calling sequence is:
  * libbalsa_scanner_imap_dir->libmutt::imap_browse-> imap_add_folder.
  */
-void imap_add_folder (char delim, char *folder, int noselect,
-  int noinferiors, struct browser_state *state, short isparent)
+void
+imap_add_folder(char delim, char *folder, int noselect, int noinferiors,
+		struct browser_state *state, short isparent)
 {
-    int isFolder = 0;
-    int isMailbox = 0;
+    if (isparent)
+	return;
 
-    if(isparent) return;
+    imap_unmunge_mbox_name(folder);
 
-    imap_unmunge_mbox_name (folder);
-
-    if(!noselect) {
-	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-                             "ADDING MAILBOX %s\n", folder);
-	++isMailbox;
-    }
     /* this extra check is needed for subscribed folder handling. 
      * Read RFC when in doubt. */
-    if(!g_list_find_custom(state->subfolders, folder,
-			   (GCompareFunc)strcmp) && !noinferiors) {
-	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-                             "ADDING FOLDER  %s\n", folder);
-	    
-	state->subfolders = g_list_append(state->subfolders,
-					  g_strdup(folder));
-	++isFolder;
-    }
-    if (isMailbox)
-	state->mailbox_handler(folder, delim, state->cb_data);
-    else if (isFolder)
-	state->folder_handler(folder, delim, state->cb_data);
+    if (!g_list_find_custom(state->subfolders, folder,
+			    (GCompareFunc) strcmp)
+	&& !noinferiors)
+	state->subfolders =
+	    g_list_append(state->subfolders, g_strdup(folder));
+
+    state->mailbox_handler(folder, delim, noselect, noinferiors,
+			   state->cb_data);
 }

@@ -5,8 +5,10 @@
 	* src/sendmsg-window.c: fix misspellings pointed out by Kelemen Gábor.
 	* libbalsa/address-book-gpe.c: improve completion support.
 	
-2004-08-23 16:38  PeterB
+2004-08-23 22:02  PeterB
 
+	* libbalsa/server.c: form of "set-host" signal is conditional on on
+	USE_SSL.
 	* src/folder-conf.c: add weak pointer to avoid critical warning
 	when Balsa exits with a folder-properties window open.
 	* src/: folder-conf.c, mailbox-conf.c: connect new folder or

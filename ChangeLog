@@ -1,3 +1,8 @@
+2003-01-03 PeterB
+
+	* libbalsa/identity.c: Avoid potential race when destroying `Select
+	Identity' dialog; use g_signal_connect_swapped to trim down code.
+
 2003-01-03 20:09  PeterB
 
 	* libbalsa/identity.c (libbalsa_identity_select_dialog,

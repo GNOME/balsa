@@ -271,7 +271,6 @@ dnl			AC_DEFINE(HAVE_SMIME,1,[Defined when supporting S/MIME])
 else
 	AC_MSG_RESULT(no)
 fi
-echo "GPG $gpgmecfg"
 AM_CONDITIONAL([BUILD_WITH_GPGME], [test $gpgmecfg = "yes"])
 
 
@@ -514,6 +513,10 @@ dnl ##########################################################################
 
 AC_ARG_WITH(gss, [  --with-gss              Enable GSS [default=no]],
     [with_gss=$withval],[with_gss=no])
+if test "x$with_ssl" != xno  ; then
+    AC_CHECK_HEADER(gssapi/gssapi.h,
+        [AC_DEFINE(HAVE_GSSAPI,1,[If defined, build GSSAPI IMAP support.])])
+fi
 
 dnl ##########################################################################
 dnl Check versions

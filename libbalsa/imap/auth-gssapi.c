@@ -27,7 +27,7 @@
 
 #include "imap-auth.h"
 
-#if defined(USE_TLS)
+#if defined(HAVE_GSSAPI)
 #include <gssapi/gssapi.h>
 #include <gssapi/gssapi_generic.h>
 
@@ -318,10 +318,10 @@ ag_negotiate_parameters(ImapMboxHandle *handle, const char * user,
                     IMR_NO, the user was not allowed to access the
                     mailbox. */
 }
-#else /* defined(USE_TLS) */
+#else /* defined(HAVE_GSSAPI) */
 
 ImapResult
 imap_auth_gssapi(ImapMboxHandle* handle)
 { return IMAP_AUTH_UNAVAIL; }
 
-#endif /* defined(USE_TLS) */
+#endif /* defined(HAVE_GSSAPI) */

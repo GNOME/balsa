@@ -72,17 +72,13 @@ EXTRA_DIST = \
 idldir = $(datadir)/idl
 idl_DATA = Balsa.idl
 
-# auto* *SHOULD* figure this out *grr*
-$(balsa_BASE_SRCLIST): $(balsa_IDL_SRCLIST)
-
-$(balsa_IDL_SRCLIST): $(idl_DATA) 
-	$(ORBIT_IDL) -I $(LIBBONOBO_IDL) -I $(BONOBO_ACTIVATION_IDL) $(idl_DATA)
-
 INCLUDES = \
 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\" \
 	-I$(top_builddir) -I$(top_srcdir) \
 	-I$(top_srcdir)/libbalsa \
 	$(BALSA_CFLAGS)
+
+DEFS = -DG_DISABLE_DEPRECATED 
 
 balsa_LDADD = \
 	$(top_builddir)/libinit_balsa/libinit_balsa.a \
@@ -107,4 +103,9 @@ dist-hook:
 	cp $(srcdir)/pixmaps/*.{xpm,png} $(distdir)/pixmaps
 
 
-DEFS = -DG_DISABLE_DEPRECATED 
+#auto* *SHOULD* figure this out *grr*
+$(srcdir)/balsa-bonobo.c: Balsa.h
+
+$(balsa_IDL_SRCLIST): $(srcdir)/$(idl_DATA) 
+	$(ORBIT_IDL) -I $(LIBBONOBO_IDL) -I $(BONOBO_ACTIVATION_IDL) \
+	$(srcdir)/$(idl_DATA)

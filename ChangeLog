@@ -4,6 +4,9 @@
 	default address book available.
 	* src/save-restore.c: clean up the old lists before loading (145701).
 	* configure.in: bump the version number to test the release.
+	check for gssapi.h header.
+	* libbalsa/imap/auth-gssapi.c: depend on HAVE_GSSAPI.
+	* src/Makefile.am: fix most of distcheck target.
 
 2004-07-09  Carlos Morgado  <chbm gnome.org>
 

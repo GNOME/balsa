@@ -112,7 +112,6 @@ static void balsa_window_real_close_mbnode(BalsaWindow *window,
 					   BalsaMailboxNode *mbnode);
 static void balsa_window_destroy(GtkObject * object);
 
-GtkWidget *balsa_window_find_current_index(BalsaWindow * window);
 static gboolean balsa_close_commit_mailbox_on_timer(GtkWidget * widget, 
 					     gpointer * data);
 
@@ -2243,14 +2242,13 @@ check_new_messages_cb(GtkWidget * widget, gpointer data)
 }
 
 void
-check_new_messages_count(LibBalsaMailbox * mailbox)
+check_new_messages_count(LibBalsaMailbox * mailbox, gboolean notify)
 {
     struct count_info {
         gint unread_messages;
         gint has_unread_messages;
     } *info;
     static const gchar count_info_key[] = "balsa-window-count-info";
-    gint num_new, has_new;
 
     info = g_object_get_data(G_OBJECT(mailbox), count_info_key);
     if (!info) {
@@ -2259,15 +2257,19 @@ check_new_messages_count(LibBalsaMailbox * mailbox)
                                g_free);
     }
 
-    num_new = mailbox->unread_messages - info->unread_messages;
-    if (num_new < 0)
-        num_new = 0;
-    has_new = mailbox->has_unread_messages - info->has_unread_messages;
-    if (has_new < 0)
-        has_new = 0;
+    if (notify) {
+        gint num_new, has_new;
 
-    if (num_new || has_new)
-        display_new_mail_notification(num_new, has_new);
+        num_new = mailbox->unread_messages - info->unread_messages;
+        if (num_new < 0)
+            num_new = 0;
+        has_new = mailbox->has_unread_messages - info->has_unread_messages;
+        if (has_new < 0)
+            has_new = 0;
+
+        if (num_new || has_new)
+            display_new_mail_notification(num_new, has_new);
+    }
 
     info->unread_messages = mailbox->unread_messages;
     info->has_unread_messages = mailbox->has_unread_messages;

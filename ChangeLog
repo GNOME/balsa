@@ -6,7 +6,9 @@
 	* src/expand-alias.c: remove some debugging output.
 	* src/main-window.c: copy&select all probably belong to message menu.
 	(Philip Van Hoof <freax@pandora.be>). Wrap after pref change (PB).
+	missing "send&receive" menu entry.
 	* src/store-address.c: full-blown address storing (Peter Bloomfield).
+	* src/toolbar-prefs.c: handle selecting and unselecting rows properly.
 
 2001-11-03  Pawel Salek  <pawsa@theochem.kth.se>
 

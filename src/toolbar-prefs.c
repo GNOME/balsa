@@ -157,12 +157,15 @@ static void add_button_cb(GtkWidget *, gpointer);
 static void remove_button_cb(GtkWidget *, gpointer);
 static void back_button_cb(GtkWidget *, gpointer);
 static void forward_button_cb(GtkWidget *, gpointer);
-static void list_selected_cb(GtkCList *clist, gint row, gint column,
-			     GdkEventButton *event, gpointer user_data);
-static void destination_selected_cb(GtkCList *clist, gint row, gint column,
-				    GdkEventButton *event, gpointer user_data);
+static void source_selected_cb(GtkCList *clist, gint row, gint column,
+                               GdkEventButton *event, gpointer user_data);
+static void source_unselected_cb(GtkCList *clist, gint row, gint column,
+                                 GdkEventButton *event, gpointer user_data);
+static void dest_selecteded_cb(GtkCList *clist, gint row, gint column,
+                               GdkEventButton *event, gpointer user_data);
+static void dest_unselected_cb(GtkCList *clist, gint row, gint column,
+                               GdkEventButton *event, gpointer user_data);
 static void recreate_preview(BalsaToolbarType toolbar, gboolean preview_only);
-static void set_button_states(BalsaToolbarType toolbar);
 static void remove_toolbar_item(BalsaToolbarType toolbar, int item);
 static void get_toolbar_data(BalsaToolbarType toolbar);
 static void apply_toolbar_prefs(GtkWidget *widget, gpointer data);
@@ -307,31 +310,6 @@ get_toolbar_data(BalsaToolbarType toolbar)
 }
 
 static void
-set_button_states(BalsaToolbarType toolbar)
-{
-    if(toolbar_pages[toolbar].selected_destination == -1) {
-	gtk_widget_set_sensitive(toolbar_pages[toolbar].back_button, FALSE);
-	gtk_widget_set_sensitive(toolbar_pages[toolbar].forward_button, FALSE);
-	gtk_widget_set_sensitive(toolbar_pages[toolbar].remove_button, FALSE);
-	return;
-    }
-    gtk_widget_set_sensitive(toolbar_pages[toolbar].remove_button, TRUE);
-    
-    if(toolbar_item_count[toolbar] <= 1) {
-	gtk_widget_set_sensitive(toolbar_pages[toolbar].forward_button, FALSE);
-	gtk_widget_set_sensitive(toolbar_pages[toolbar].back_button, FALSE);
-	return;
-    }
-    
-    gtk_widget_set_sensitive(toolbar_pages[toolbar].back_button, 
-			     toolbar_pages[toolbar].selected_destination > 0);
-    
-    gtk_widget_set_sensitive(toolbar_pages[toolbar].forward_button, 
-			     toolbar_pages[toolbar].selected_destination <
-			     toolbar_item_count[toolbar]-1);
-}
-
-static void
 remove_all_buttons(GtkToolbar *bar)
 {
     GList *lp;
@@ -440,7 +418,6 @@ recreate_preview(BalsaToolbarType toolbar, gboolean preview_only)
 			       gtk_clist_optimal_column_width(
 				   GTK_CLIST(toolbar_pages[toolbar].destination), 1));
     
-    set_button_states(toolbar);
     gtk_widget_show_all(toolbar_pages[toolbar].preview);
     
 }
@@ -531,34 +508,53 @@ remove_button_cb(GtkWidget *widget, gpointer data)
     pos=toolbar_pages[toolbar].selected_destination;
     remove_toolbar_item(toolbar, pos);
     populate_list(toolbar_pages[toolbar].list, toolbar);
-    recreate_preview(toolbar, TRUE);
     gtk_clist_remove(list, toolbar_pages[toolbar].selected_destination);
     gnome_property_box_changed(GNOME_PROPERTY_BOX(customize_widget));
+    recreate_preview(toolbar, TRUE);
 }
 
 static void
-list_selected_cb(GtkCList *clist, gint row, gint column,
-		 GdkEventButton *event, gpointer user_data)
+source_selected_cb(GtkCList *clist, gint row, gint column,
+                   GdkEventButton *event, gpointer user_data)
 {
-    int toolbar;
-
-    toolbar=GPOINTER_TO_INT(user_data);
+    int toolbar = GPOINTER_TO_INT(user_data);
     toolbar_pages[toolbar].selected_source=row;
     gtk_widget_set_sensitive(toolbar_pages[toolbar].add_button, TRUE);
 }
+static void
+source_unselected_cb(GtkCList *clist, gint row, gint column,
+                     GdkEventButton *event, gpointer user_data)
+{
+    int toolbar = GPOINTER_TO_INT(user_data);
+    toolbar_pages[toolbar].selected_source=-1;
+    gtk_widget_set_sensitive(toolbar_pages[toolbar].add_button, FALSE);
+}
 
 static void
-destination_selected_cb(GtkCList *clist, gint row, gint column,
-			GdkEventButton *event, gpointer user_data)
+dest_selected_cb(GtkCList *clist, gint row, gint column,
+                 GdkEventButton *event, gpointer user_data)
 {
-    int toolbar;
-    
-    toolbar=GPOINTER_TO_INT(user_data);
+    int toolbar = GPOINTER_TO_INT(user_data);
     
     toolbar_pages[toolbar].selected_destination=row;
-    gtk_widget_set_sensitive(toolbar_pages[toolbar].back_button, TRUE);
-    gtk_widget_set_sensitive(toolbar_pages[toolbar].forward_button, TRUE);
-    gtk_widget_set_sensitive(toolbar_pages[toolbar].remove_button, TRUE);
+    gtk_widget_set_sensitive(toolbar_pages[toolbar].remove_button,  TRUE);
+    gtk_widget_set_sensitive(toolbar_pages[toolbar].back_button, 
+			     toolbar_pages[toolbar].selected_destination > 0);
+    gtk_widget_set_sensitive(toolbar_pages[toolbar].forward_button, 
+			     toolbar_pages[toolbar].selected_destination <
+			     toolbar_item_count[toolbar]-1);
+}
+
+static void
+dest_unselected_cb(GtkCList *clist, gint row, gint column,
+                   GdkEventButton *event, gpointer user_data)
+{
+    int toolbar = GPOINTER_TO_INT(user_data);
+    
+    toolbar_pages[toolbar].selected_destination=-1;
+    gtk_widget_set_sensitive(toolbar_pages[toolbar].remove_button,  FALSE);
+    gtk_widget_set_sensitive(toolbar_pages[toolbar].back_button,    FALSE);
+    gtk_widget_set_sensitive(toolbar_pages[toolbar].forward_button, FALSE);
 }
 
 static void
@@ -629,11 +625,9 @@ add_button_cb(GtkWidget *widget, gpointer data)
     gtk_clist_select_row(list, row, 0);
     gtk_clist_moveto(list, row, 0, 0, 0);
 
-    recreate_preview(toolbar, TRUE);
-    set_button_states(toolbar);
     gtk_widget_show_all(toolbar_pages[toolbar].preview);
-    set_button_states(toolbar);
     gnome_property_box_changed(GNOME_PROPERTY_BOX(customize_widget));
+    recreate_preview(toolbar, TRUE);
 }
 
 static void
@@ -648,6 +642,8 @@ populate_list(GtkWidget *list, int toolbar)
 
     legal=get_legal_toolbar_buttons(toolbar);
 
+    /* FIXME: clear does not emit unselect-row signal for selected rows? */
+    gtk_clist_unselect_all(GTK_CLIST(list)); 
     gtk_clist_clear(GTK_CLIST(list));
 
     gtk_clist_set_row_height(GTK_CLIST(list), 24);
@@ -826,7 +822,6 @@ create_toolbar_page(BalsaToolbarType toolbar)
 
     /* A CList to show the available items */
     list_scroll=gtk_scrolled_window_new(NULL, NULL);
-    /* gtk_widget_set_usize(list_scroll, 200, 200); */
 
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(list_scroll),
 				   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
@@ -916,10 +911,14 @@ create_toolbar_page(BalsaToolbarType toolbar)
 
     /* UI signals */
     gtk_signal_connect(GTK_OBJECT(list), "select-row",
-		       list_selected_cb, (gpointer)toolbar);
+		       source_selected_cb, (gpointer)toolbar);
+    gtk_signal_connect(GTK_OBJECT(list), "unselect-row",
+		       source_unselected_cb, (gpointer)toolbar);
 
     gtk_signal_connect(GTK_OBJECT(destination), "select-row",
-		       destination_selected_cb, (gpointer)toolbar);
+		       dest_selected_cb, (gpointer)toolbar);
+    gtk_signal_connect(GTK_OBJECT(destination), "unselect-row",
+		       dest_unselected_cb, (gpointer)toolbar);
 
     gtk_signal_connect(GTK_OBJECT(add_button), "clicked",
 		       add_button_cb, (gpointer)toolbar);

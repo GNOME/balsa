@@ -315,14 +315,21 @@ static GnomeUIInfo file_menu[] = {
      N_("Send messages from the outbox"),
      send_outbox_messages_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
      BALSA_PIXMAP_MENU_SEND, 'T', GDK_CONTROL_MASK, NULL},
-    GNOMEUIINFO_SEPARATOR,
-#define MENU_FILE_PRINT_POS 6
+#define MENU_FILE_SEND_RECEIVE_POS 5
+    /* Ctrl-B */
+    {
+     GNOME_APP_UI_ITEM, N_("Send and _Receive Mail"),
+     N_("Send and Receive messages"),
+     send_receive_messages_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+     BALSA_PIXMAP_MENU_SEND_RECEIVE, 'B', GDK_CONTROL_MASK, NULL},
+     GNOMEUIINFO_SEPARATOR,
+#define MENU_FILE_PRINT_POS 7
     { GNOME_APP_UI_ITEM, N_("_Print..."), 
       N_("Print currently selected messages"),
       message_print_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
       BALSA_PIXMAP_MENU_PRINT, 'P', GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
-#define MENU_FILE_ADDRESS_POS 8
+#define MENU_FILE_ADDRESS_POS 9
     {
      GNOME_APP_UI_ITEM, N_("_Address Book..."),
      N_("Open the address book"),

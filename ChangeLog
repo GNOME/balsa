@@ -1,3 +1,7 @@
+2001-11-20  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-index.c: context menu improvement.
+
 2001-11-17  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Filters by Emmanuel Allaud <e.allaud@wanadoo.fr> as submitted in

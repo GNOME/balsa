@@ -683,7 +683,7 @@ void
 set_prefs(void)
 {
     GtkWidget *entry_widget;
-    gint i;
+    unsigned i;
     gchar* tmp;
 
     for (i = 0; i < NUM_TOOLBAR_MODES; i++)
@@ -733,7 +733,7 @@ set_prefs(void)
 			     GTK_TOGGLE_BUTTON(pui->pgdownmod)->active);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->debug),
 				 balsa_app.debug);
-    for (i = 0; i < NUM_ENCODING_MODES; i++)
+    for (i = 0; i<NUM_ENCODING_MODES; i++)
 	if (balsa_app.encoding_style == encoding_type[i]) {
 	    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
 					 (pui->encoding_type[i]), TRUE);

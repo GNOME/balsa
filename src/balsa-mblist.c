@@ -463,7 +463,7 @@ balsa_mblist_init(BalsaMBList * tree)
     GtkStyle* style;
     GdkFont* font;
     gint text_height;
-    int i;
+    unsigned i;
     char *titles[3] = { N_("Mailbox"), N_("Unread"), N_("Total") };
     for (i = 0; i < ELEMENTS(titles); i++) titles[i] = _(titles[i]);
 

@@ -244,7 +244,7 @@ extern struct BalsaApplication {
 
     GtkToolbarStyle toolbar_style;
     GnomeMDIMode mdi_style;
-    gint pwindow_option;
+    guint pwindow_option;
     gboolean wordwrap;
     gint wraplength;
     gboolean browse_wrap;

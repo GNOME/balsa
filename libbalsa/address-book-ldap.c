@@ -38,7 +38,7 @@
 /* FIXME: Configurable... */
 static const int LDAP_CACHE_TIMEOUT=300;	/* Seconds */
 /* don't search when prefix has length shorter than LDAP_MIN_LEN */
-static const int LDAP_MIN_LEN=2;
+static const unsigned LDAP_MIN_LEN=2;
 /* Which parameters do we want back? */
 char* attrs[] = {
     "cn",

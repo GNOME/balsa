@@ -57,7 +57,7 @@
 typedef struct {
     gchar *user;
     gchar *match;
-    gint cursor;
+    unsigned cursor;
     gint tabs;
 } emailData;
 

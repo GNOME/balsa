@@ -94,7 +94,8 @@ static void libbalsa_address_entry_make_backing_pixmap(LibBalsaAddressEntry *,
 static void libbalsa_address_entry_queue_draw(LibBalsaAddressEntry *);
 static void libbalsa_address_entry_draw_cursor_on_drawable(
 					LibBalsaAddressEntry *, GdkDrawable *);
-static void libbalsa_address_entry_delete_text(GtkEditable *, gint, gint);
+static void libbalsa_address_entry_delete_text(GtkEditable *, 
+					       unsigned, unsigned);
 static void libbalsa_address_entry_draw(GtkWidget *, GdkRectangle *);
 static gint libbalsa_address_entry_button_press(GtkWidget *, GdkEventButton *);
 static void libbalsa_address_entry_draw_cursor(LibBalsaAddressEntry *);
@@ -491,7 +492,7 @@ libbalsa_inputData_free(inputData * data)
 static gboolean
 libbalsa_is_an_email(gchar *str) {
     gboolean found;
-    gint i;
+    unsigned i;
     
     found = FALSE;
     for (i = 0; i < strlen(str); i++)
@@ -1208,12 +1209,12 @@ libbalsa_address_entry_queue_draw(LibBalsaAddressEntry *address_entry)
  *     Modifies the text in the widget.
  *************************************************************/
 static void
-libbalsa_address_entry_delete_text(GtkEditable *editable, gint start_pos,
-								gint end_pos)
+libbalsa_address_entry_delete_text(GtkEditable *editable, 
+				   unsigned start_pos, unsigned end_pos)
 {
     GdkWChar *text;
     gint deletion_length;
-    gint i;
+    unsigned i;
     GtkEntry *entry;
   
     g_return_if_fail(editable != NULL);
@@ -1239,8 +1240,9 @@ libbalsa_address_entry_delete_text(GtkEditable *editable, gint start_pos,
 	if (GTK_WIDGET_REALIZED (entry)) {
 	    gint deletion_width = 
 		entry->char_offset[end_pos] - entry->char_offset[start_pos];
-	    for (i = 0 ; i <= entry->text_length - end_pos; i++)
-		entry->char_offset[start_pos+i] = entry->char_offset[end_pos+i] - deletion_width;
+	    for (i = 0; i <= entry->text_length - end_pos; i++)
+		entry->char_offset[start_pos+i] = 
+		    entry->char_offset[end_pos+i] - deletion_width;
 	}
 
 	for (i = end_pos; i < entry->text_length; i++)
@@ -1549,7 +1551,7 @@ libbalsa_delete_backward_character(LibBalsaAddressEntry *address_entry)
     emailData *addy, *extra;
     gchar *left, *right, *str;
     GList *list;
-    gint i;
+    unsigned i;
     inputData *input;
 
     input = address_entry->input;
@@ -1605,7 +1607,7 @@ libbalsa_delete_backward_character(LibBalsaAddressEntry *address_entry)
     } else {
        left = g_strndup(addy->user, (addy->cursor - 1));
        right = addy->user;
-       for (i = 0; i < (addy->cursor); i++) right++;
+       for (i = 0; i < addy->cursor; i++) right++;
        str = g_strconcat(left, right, NULL);
        g_free(addy->user);
        g_free(left);
@@ -1644,7 +1646,6 @@ libbalsa_delete_forward_character(LibBalsaAddressEntry *address_entry)
     emailData *addy, *extra;
     gchar *left, *right, *str;
     GList *list;
-    gint i;
     inputData *input;
     
     input = address_entry->input;
@@ -1690,6 +1691,7 @@ libbalsa_delete_forward_character(LibBalsaAddressEntry *address_entry)
      * Normal character needs deleting.
      */
     } else {
+	unsigned i;
 	left = g_strndup(addy->user, addy->cursor);
 	right = addy->user;
 	for (i = 0; i <= addy->cursor; i++) right++;
@@ -1956,7 +1958,6 @@ libbalsa_keystroke_comma(LibBalsaAddressEntry *address_entry)
     inputData *input;
     emailData *addy, *extra;
     GList *list;
-    gint i;
     gchar *left, *right, *str;
     
     g_return_if_fail(address_entry != NULL);
@@ -1974,8 +1975,7 @@ libbalsa_keystroke_comma(LibBalsaAddressEntry *address_entry)
 	libbalsa_alias_accept_match(addy);
     } else {
 	if ((addy->cursor > 0) && (addy->cursor < strlen(addy->user))) {
-	    right = addy->user;
-	    for (i = 0; i < addy->cursor; i++) right++;
+	    right = & addy->user[addy->cursor];
 	} else {
 	    right = NULL;
 	}
@@ -2066,8 +2066,7 @@ libbalsa_keystroke_add_key(LibBalsaAddressEntry *address_entry, gchar *add)
      * Split the string at the correct cursor position.
      */
     left = g_strndup(addy->user, addy->cursor);
-    right = addy->user;
-    for (i = 0; i < addy->cursor; i++) right++;
+    right = & addy->user[addy->cursor];
     
     /*
      * Add the keystroke to the end of user input.

@@ -540,7 +540,7 @@ balsa_sendmsg_destroy(BalsaSendmsg * bsm)
 static gint
 find_locale_index_by_locale(const gchar * locale)
 {
-    int i, j, maxfit = -1, maxpos = 0;
+    unsigned i, j, maxfit = 0, maxpos = 0;
 
     if (!locale || strcmp(locale, "C") == 0)
 	return LOC_ENGLISH_POS;
@@ -1415,7 +1415,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     BalsaSendmsg *msg = NULL;
     GList *list;
     gchar* tmp;
-    gint i;
+    unsigned i;
 
     msg = g_malloc(sizeof(BalsaSendmsg));
     msg->font     = NULL;
@@ -2232,7 +2232,7 @@ reflow_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static void
 check_readiness(GtkEditable * w, BalsaSendmsg * msg)
 {
-    gint i;
+    unsigned i;
     gboolean state = is_ready_to_send(msg);
 
     for (i = 0; i < ELEMENTS(msg->ready_widgets); i++)
@@ -2246,7 +2246,7 @@ check_readiness(GtkEditable * w, BalsaSendmsg * msg)
 static gint
 toggle_entry(BalsaSendmsg * bmsg, GtkWidget * entry[], int pos, int cnt)
 {
-    int i;
+    unsigned i;
     GtkWidget *parent;
     gchar str[ELEMENTS(headerDescs) * 20]; /* assumes that longest header ID
 					      has no more than 19 chars   */
@@ -2363,7 +2363,7 @@ toggle_queue_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static void
 init_menus(BalsaSendmsg * msg)
 {
-    int i;
+    unsigned i;
 
     g_assert(ELEMENTS(headerDescs) == ELEMENTS(msg->view_checkitems));
 

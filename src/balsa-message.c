@@ -1139,7 +1139,7 @@ typedef enum {
 } url_proto_t;
 
 typedef struct _message_url_t {
-    gint line, start, end;       /* text line and pos in the line */
+    guint line, start, end;  /* text line and pos in the line */
     gchar *url;                  /* the link */
     url_proto_t url_protocol;    /* which service to call (protocol) */
 } message_url_t;
@@ -1407,7 +1407,7 @@ calc_text_end(const gchar *buf, gint *xpos, gint *linepos, GdkFont *fnt,
 static gboolean
 mail_text_draw(GtkWidget *widget, GdkRectangle *area, gpointer data)
 {
-    gint winwidth, linepos, textline;
+    guint winwidth, linepos, textline;
     gchar **l = NULL, **lines = NULL, *buf;
     GdkFont *fnt = (GdkFont *)data;
     GList *hotarea_list = 

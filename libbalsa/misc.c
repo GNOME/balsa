@@ -68,7 +68,8 @@ struct {
 gchar *
 libbalsa_escape_specials(const gchar* str)
 {
-    int special_cnt = 0, length = 0,i;
+    int special_cnt = 0, length = 0;
+    unsigned i;
     const gchar *str_ptr;
     gchar *res, *res_ptr;
     
@@ -101,7 +102,7 @@ libbalsa_deescape_specials(const gchar* str)
 {
     const gchar *src;
     gchar *dest;
-    int i;
+    unsigned i;
     gchar* res = g_strdup(str);
 
     g_return_val_if_fail(str, NULL);
@@ -185,12 +186,11 @@ size_t libbalsa_readfile(FILE * fp, char **buf)
     lseek(fd, 0, SEEK_SET);
 
     *buf = (char *) g_malloc(size + 1);
-    if (*buf == NULL) {
+    if (*buf == NULL)
 	return -1;
-    }
 
     offset = 0;
-    while (offset < size) {
+    while ((size_t)offset < size) {
 	r = read(fd, *buf + offset, size - offset);
 	if (r == 0)
 	    return offset;

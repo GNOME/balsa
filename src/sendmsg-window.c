@@ -3881,6 +3881,9 @@ address_changed_cb(LibBalsaAddressEntry * address_entry,
 static void
 set_ready(LibBalsaAddressEntry * address_entry, BalsaSendmsgAddress *sma)
 {
+#if NEW_ADDRESS_ENTRY_WIDGET
+    gint len = libbalsa_address_entry_addresses(address_entry);
+#else /* NEW_ADDRESS_ENTRY_WIDGET */
     gint len = 0;
     const gchar *tmp = gtk_entry_get_text(GTK_ENTRY(address_entry));
 
@@ -3896,8 +3899,9 @@ set_ready(LibBalsaAddressEntry * address_entry, BalsaSendmsgAddress *sma)
             /* error */
             len = -1;
         }
-        
+
     }
+#endif /* NEW_ADDRESS_ENTRY_WIDGET */
 
     if (len < sma->min_addresses
         || (sma->max_addresses >= 0 && len > sma->max_addresses)) {

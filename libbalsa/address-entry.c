@@ -2403,6 +2403,7 @@ lbae_completion_match_selected(GtkEntryCompletion * completion,
     }
     gtk_editable_set_position(editable, cursor);
     g_signal_handlers_unblock_by_func(editable, lbae_entry_changed, NULL);
+    g_signal_emit_by_name(editable, "changed");
 
     return TRUE;
 }
@@ -2555,5 +2556,35 @@ libbalsa_address_entry_show_matches(GtkEntry * entry)
     g_signal_handlers_unblock_by_func(entry, lbae_entry_changed, NULL);
 
     return TRUE;
+}
+
+/*************************************************************
+ *     Number of complete addresses.
+ *************************************************************/
+static void
+lbae_count_addresses(InternetAddressList * list, gint * addresses)
+{
+    for (; list && *addresses >= 0; list = list->next) {
+        InternetAddress *ia = list->address;
+        if (ia->type == INTERNET_ADDRESS_NAME) {
+            if (strpbrk(ia->value.addr, "@%!"))
+                ++(*addresses);
+            else
+                *addresses = -1;
+        } else if (ia->type == INTERNET_ADDRESS_GROUP)
+            lbae_count_addresses(ia->value.members, addresses);
+    }
+}
+
+gint
+libbalsa_address_entry_addresses(GtkEntry * entry)
+{
+    gint addresses = 0;
+    InternetAddressList *list =
+	internet_address_parse_string(gtk_entry_get_text(entry));
+    lbae_count_addresses(list, &addresses);
+    internet_address_list_destroy(list);
+
+    return addresses;
 }
 #endif /* NEW_ADDRESS_ENTRY_WIDGET */

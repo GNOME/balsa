@@ -71,8 +71,7 @@ libbalsa_a_SOURCES = 		\
 	send.h			\
 	server.c		\
 	server.h		\
-	source-viewer.c		\
-	threads.h
+	source-viewer.c
 
 
 

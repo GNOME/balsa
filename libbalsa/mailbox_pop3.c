@@ -22,10 +22,6 @@
 
 #include "config.h"
 
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
-#endif
-
 #include <stdio.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -38,7 +34,6 @@
 
 #include "mailbox-filter.h"
 #include "filter-file.h"
-#include "threads.h"
 
 #include <libgnome/gnome-config.h> 
 #include <libgnome/gnome-i18n.h> 
@@ -250,7 +245,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     gdk_threads_leave();
         
     msgbuf = g_strdup_printf("POP3: %s", mailbox->name);
-    libbalsa_mailbox_progress_notify(mailbox, MSGMAILTHREAD_SOURCE,0,0,msgbuf);
+    libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_SOURCE,0,0,msgbuf);
     g_free(msgbuf);
 
     if(m->last_popped_uid) 
@@ -352,9 +347,9 @@ progress_cb(void* mailbox, char *msg, int prog, int tot)
     int msg_type;
 
     switch(tot) {
-    case -1: msg_type = MSGMAILTHREAD_FINISHED; break;
+    case -1: msg_type = LIBBALSA_NTFY_FINISHED; break;
     case 0:
-    default: msg_type = MSGMAILTHREAD_MSGINFO;  break;
+    default: msg_type = LIBBALSA_NTFY_MSGINFO;  break;
     }
 
     libbalsa_mailbox_progress_notify(LIBBALSA_MAILBOX(mailbox), 

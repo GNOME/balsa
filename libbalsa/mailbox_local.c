@@ -27,17 +27,9 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
-#endif
-
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 #include "mailbackend.h"
-
-#ifdef BALSA_USE_THREADS
-#include "threads.h"
-#endif
 
 #include <libgnome/gnome-config.h> 
 #include <libgnome/gnome-i18n.h> 

@@ -44,10 +44,6 @@
 #include "imap/imap_private.h"
 #include "mailbackend.h"
 
-#ifdef BALSA_USE_THREADS
-#include "threads.h"
-#endif
-
 #include "imap/imap.h"
 #include "mutt_socket.h"
 

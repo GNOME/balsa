@@ -40,10 +40,6 @@
 #include "misc.h"
 #include "information.h"
 
-#ifdef BALSA_USE_THREADS
-#include "threads.h"
-#endif
-
 #if ENABLE_ESMTP
 #include <stdarg.h>
 

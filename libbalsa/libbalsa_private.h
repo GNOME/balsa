@@ -36,7 +36,8 @@ gchar *libbalsa_make_string_from_list_p(const GList * the_list);
 
 
 #ifdef BALSA_USE_THREADS
-
+#include <pthread.h>
+extern pthread_mutex_t mailbox_lock;
 /*  #define DEBUG */
 
 #ifdef DEBUG

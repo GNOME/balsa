@@ -37,4 +37,36 @@ gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 
 #endif
 
+#ifdef BALSA_USE_THREADS
+extern pthread_t send_mail;
+extern pthread_mutex_t send_messages_lock;
+extern int send_thread_pipes[2];
+
+typedef struct {
+    int message_type;
+    char message_string[256];
+    LibBalsaMessage *msg;
+    LibBalsaMailbox *mbox;
+    float of_total;
+} SendThreadMessage;
+
+#define  MSGSENDTHREAD(t_message, type, string, s_msg, s_mbox, messof) \
+  t_message = malloc( sizeof( SendThreadMessage )); \
+  t_message->message_type = type; \
+  strncpy(t_message->message_string, string, sizeof(t_message->message_string)); \
+  t_message->msg = s_msg; \
+  t_message->mbox = s_mbox; \
+  t_message->of_total = messof; \
+  write( send_thread_pipes[1], (void *) &t_message, sizeof(void *) );
+
+enum {
+    MSGSENDTHREADERROR,
+    MSGSENDTHREADPROGRESS,
+    MSGSENDTHREADPOSTPONE,
+    MSGSENDTHREADDELETE,
+    MSGSENDTHREADFINISHED
+};
+
+#endif /* BALSA_USE_THREADS */
+
 #endif /* __SEND_H__ */

@@ -23,19 +23,11 @@
 
 #include <ctype.h>
 
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
-#endif
-
 
 #include "libbalsa.h"
 #include "mailbackend.h"
 #include "misc.h"
 #include "message.h"
-
-#ifdef BALSA_USE_THREADS
-#include "threads.h"
-#endif
 
 #include <libgnome/gnome-config.h> 
 #include <libgnome/gnome-i18n.h> 

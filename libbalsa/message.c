@@ -37,20 +37,12 @@
 #include <glib.h>
 #include <libgnome/gnome-i18n.h> 
 
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
-#endif
-
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 
 #include "mailbackend.h"
 /* needed for truncate_string */
 #include "misc.h"
-
-#ifdef BALSA_USE_THREADS
-#include "threads.h"
-#endif
 
 static void libbalsa_message_class_init(LibBalsaMessageClass * klass);
 static void libbalsa_message_init(LibBalsaMessage * message);

@@ -11,6 +11,7 @@ config.status
 config.sub
 configure
 configure.scan
+intl
 libtool
 ltconfig
 ltmain.sh

@@ -140,6 +140,9 @@ libbalsa_message_finalize(GObject * object)
 
     message = LIBBALSA_MESSAGE(object);
 
+    if (message->mailbox)
+	libbalsa_mailbox_release_message(message->mailbox, message);
+
     libbalsa_message_headers_destroy(message->headers);
     message->headers = NULL;
 
@@ -1043,6 +1046,8 @@ libbalsa_message_body_unref(LibBalsaMessage * message)
 #endif
 	libbalsa_message_body_free(message->body_list);
 	message->body_list = NULL;
+	if (message->mailbox)
+	    libbalsa_mailbox_release_message(message->mailbox, message);
    }
    if(message->mailbox) { UNLOCK_MAILBOX(message->mailbox); }
 }
@@ -1354,8 +1359,9 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
 	libbalsa_message_headers_from_gmime(message->headers,
 					    message->mime_msg);
 
-	g_mime_message_get_date(message->mime_msg, &message->headers->date,
-				&offset);
+	if (!message->headers->date)
+	    g_mime_message_get_date(message->mime_msg,
+				    &message->headers->date, &offset);
 	if (!message->sender)
 	    message->sender =
 		libbalsa_address_new_from_gmime(g_mime_message_get_sender
@@ -1586,8 +1592,6 @@ libbalsa_message_set_header_from_string(LibBalsaMessage *message, gchar *line)
         message->headers->from = libbalsa_address_new_from_string(value);
     } else
     if (g_ascii_strcasecmp(name, "Reply-To") == 0) {
-	if (message->headers->reply_to)
-	    g_object_unref(message->headers->reply_to);
         message->headers->reply_to = libbalsa_address_new_from_string(value);
     } else
     if (g_ascii_strcasecmp(name, "To") == 0) {

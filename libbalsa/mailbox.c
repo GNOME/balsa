@@ -746,11 +746,10 @@ libbalsa_mailbox_type_from_path(const gchar * path)
  * those assumptions, to help track down instances when they fail.
  */
 
-static void
-lbm_emit(LibBalsaMailbox * mailbox, const gchar * signal,
-	 GtkTreePath * path, GtkTreeIter * iter)
-{
 #ifdef BALSA_USE_THREADS
+static gboolean
+lbm_threads_enter(void)
+{
     gboolean unlock = g_mutex_trylock(gdk_threads_mutex);
     gboolean is_main_thread =
 	(pthread_self() == libbalsa_get_main_thread());
@@ -765,29 +764,33 @@ lbm_emit(LibBalsaMailbox * mailbox, const gchar * signal,
 	    unlock = TRUE;
 	}
     }
-    g_signal_emit_by_name(mailbox, signal, path, iter);
 
-    if (unlock)
-	gdk_threads_leave();
-#else
-    g_signal_emit_by_name(mailbox, signal, path, iter);
-#endif
+    return unlock;
 }
+#else
+#define lbm_threads_enter() FALSE
+#endif
 
 void
 libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
 {
     GtkTreeIter iter;
     GtkTreePath *path;
+    gboolean unlock;
+
+    unlock = lbm_threads_enter();
 
     iter.user_data = g_node_find(mailbox->msg_tree, G_PRE_ORDER,
 				 G_TRAVERSE_ALL, GUINT_TO_POINTER(seqno));
     g_assert(iter.user_data != NULL);
+
     iter.stamp = mailbox->stamp;
     path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
-
-    lbm_emit(mailbox, "row-changed", path, &iter);
+    g_signal_emit_by_name(mailbox, "row-changed", path, &iter);
     gtk_tree_path_free(path);
+
+    if (unlock)
+	gdk_threads_leave();
 }
 
 void
@@ -795,17 +798,22 @@ libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno)
 {
     GtkTreeIter iter;
     GtkTreePath *path;
+    gboolean unlock;
 
+    unlock = lbm_threads_enter();
+
+    /* Insert node into the message tree before getting path. */
     iter.user_data = g_node_new(GUINT_TO_POINTER(seqno));
-
-    /* Invalidate iters. */
-    mailbox->stamp++;
     iter.stamp = mailbox->stamp;
     g_node_append(mailbox->msg_tree, iter.user_data);
-    path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
 
-    lbm_emit(mailbox, "row-inserted", path, &iter);
+    path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
+    g_signal_emit_by_name(mailbox, "row-inserted", path, &iter);
+    mailbox->stamp++;
     gtk_tree_path_free(path);
+
+    if (unlock)
+	gdk_threads_leave();
 }
 
 struct remove_data { unsigned seqno; GNode *node; };
@@ -827,6 +835,9 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     GtkTreeIter iter;
     GtkTreePath *path;
     struct remove_data dt;
+    gboolean unlock;
+
+    unlock = lbm_threads_enter();
 
     dt.seqno = seqno;
     dt.node = NULL;
@@ -835,21 +846,25 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
                     decrease_post, &dt);
     if (!dt.node) {
 	g_warning("msgno %d not found", seqno);
+	if (unlock)
+	    gdk_threads_leave();
 	return;
     }
 
     iter.user_data = dt.node;
-
-    /* Invalidate iters. */
-    mailbox->stamp++;
     iter.stamp = mailbox->stamp;
     path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
 
-    /* Prune msg_tree before emitting the signal. */
+    /* Prune msg_tree after getting the path and before emitting the
+     * signal. */
     g_node_destroy(dt.node);
 
-    lbm_emit(mailbox, "row-deleted", path, NULL);
+    g_signal_emit_by_name(mailbox, "row-deleted", path);
+    mailbox->stamp++;
     gtk_tree_path_free(path);
+
+    if (unlock)
+	gdk_threads_leave();
 }
 
 /* Find a message in the tree-model, by its message number. */

@@ -89,8 +89,9 @@ is_mh_message(gchar * str)
 #endif
 
 void
-scanner_local_dir(GNode *rnode, const gchar * prefix, 
-		  LocalHandler folder_handler, LocalHandler mailbox_handler)
+libbalsa_scanner_local_dir(GNode *rnode, const gchar * prefix, 
+			   LocalHandler folder_handler, 
+			   LocalHandler mailbox_handler)
 {
     DIR *dpc;
     struct dirent *de;
@@ -122,8 +123,8 @@ scanner_local_dir(GNode *rnode, const gchar * prefix,
 	    } else {
 		name = g_basename(prefix);
 		current_node = folder_handler(rnode, name, filename);
-		scanner_local_dir(current_node, filename, 
-				  folder_handler, mailbox_handler);
+		libbalsa_scanner_local_dir(current_node, filename, 
+					   folder_handler, mailbox_handler);
 	    }
 	} else {
 	    mailbox_type = libbalsa_mailbox_type_from_path(filename);
@@ -140,9 +141,10 @@ scanner_local_dir(GNode *rnode, const gchar * prefix,
 void imap_add_folder (char delim, char *folder, int noselect, int noinferiors,
 		      struct browser_state *state, short isparent);
 void
-scanner_imap_dir(GNode *rnode, LibBalsaServer * server, 
-		 const gchar* path, gboolean subscribed, int depth,
-		 ImapHandler folder_handler, ImapHandler mailbox_handler)
+libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server, 
+			  const gchar* path, gboolean subscribed, int depth,
+			  ImapHandler folder_handler, 
+			  ImapHandler mailbox_handler)
 {
     gchar* imap_path;
     GList* list = NULL, *el;
@@ -171,20 +173,25 @@ scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     safe_free((void **)&ImapCRAMKey);ImapCRAMKey = safe_strdup(server->passwd);
 
     /* subscribed triggers a bug in libmutt, disable it now */
-    if( 0 /* subscribed */) {
-	state.subfolders = g_list_append(NULL, g_strdup(""));
+    if(subscribed)
 	set_option(OPTIMAPLSUB);
-    } else {
+    else
 	unset_option(OPTIMAPLSUB);
-	state.subfolders = g_list_append(NULL, g_strdup(path));
-    }
+    state.subfolders = g_list_append(NULL, g_strdup(path));
+    state.folder = NULL;
+
     for(i=0; state.subfolders && i<depth; i++) {
 	list = state.subfolders;
 	state.subfolders = NULL;
-	printf("Deph: %i\n", i);
+	printf("Deph: %i -------------------------------------------\n", i);
 	for(el= g_list_first(list); el; el = g_list_next(el)) {
-	    imap_path = g_strdup_printf("{%s:%i}%s", server->host, 
-					server->port, (char*)el->data);
+	    if(*(char*)el->data)
+		imap_path = g_strdup_printf("{%s:%i}%s/", server->host, 
+					    server->port, (char*)el->data);
+	    else 
+		imap_path = g_strdup_printf("{%s:%i}%s", server->host, 
+					    server->port, (char*)el->data);
+	    FREE(&state.folder);
 	    imap_browse ((char*)imap_path,  &state);
 	    g_free(imap_path);
 	}
@@ -198,19 +205,27 @@ scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     
 }
 
+/* this function ovverrides mutt's one. */
 void imap_add_folder (char delim, char *folder, int noselect,
   int noinferiors, struct browser_state *state, short isparent)
 {
-    printf("imap_add_folder. delim: '%c', folder: '%s', noselect: %d\n"
+    /* printf("imap_add_folder. delim: '%c', folder: '%s', noselect: %d\n"
 	   "noinferiors: %d, isparent: %d\n", delim, folder, noselect,
-	   noinferiors, isparent);
+	   noinferiors, isparent); */
     if(isparent) return;
-    if(noinferiors)
+    if(!noselect) {
+	printf("ADDING MAILBOX %s\n", folder);
 	state->mailbox_handler(state->rnode, folder, delim);
-    else {
-	printf("ADDING FOLDER %s\n", folder);
-	state->subfolders = g_list_append(state->subfolders, 
-					  g_strdup(folder));
-	state->folder_handler(state->rnode, folder, delim);
+    } else {
+	/* this extra check is needed for subscribed folder handling. 
+	   Read RFC when iin doubt. */
+	if(!g_list_find_custom(state->subfolders, folder,
+			       (GCompareFunc)strcmp)) {
+	    printf("ADDING FOLDER %s\n", folder);
+	    
+	    state->subfolders = g_list_append(state->subfolders, 
+					      g_strdup(folder));
+	    state->folder_handler(state->rnode, folder, delim);
+	}
     }
 }

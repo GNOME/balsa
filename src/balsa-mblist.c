@@ -698,7 +698,7 @@ mailbox_nodes_to_ctree(GtkCTree * ctree, guint depth, GNode * gnode,
 				    balsa_icon_get_pixmap(in),
 				    balsa_icon_get_bitmap(in),
 				    NULL, NULL,
-				    G_NODE_IS_LEAF(gnode), FALSE);
+				    mbnode->mailbox!=NULL, FALSE);
 	}
 	gtk_signal_connect(GTK_OBJECT(mbnode->mailbox),
 			   "set-unread-messages-flag",
@@ -714,7 +714,7 @@ mailbox_nodes_to_ctree(GtkCTree * ctree, guint depth, GNode * gnode,
 				(BALSA_ICON_DIR_CLOSED),
 				balsa_icon_get_pixmap(BALSA_ICON_DIR_OPEN),
 				balsa_icon_get_bitmap(BALSA_ICON_DIR_OPEN),
-				G_NODE_IS_LEAF(gnode), mbnode->expanded);
+				mbnode->mailbox!=NULL, mbnode->expanded);
 	gtk_ctree_node_set_selectable(ctree, cnode, FALSE);
     }
     gtk_ctree_node_set_text(ctree, cnode, 1, "");
@@ -722,34 +722,6 @@ mailbox_nodes_to_ctree(GtkCTree * ctree, guint depth, GNode * gnode,
     gtk_ctree_node_set_row_data(ctree, cnode, mbnode);
     return TRUE;
 }
-
-#if 0
-static void
-button_event_press_cb(GtkCTree * ctree, GdkEventButton * event,
-		      gpointer user_data)
-{
-    gint row, column;
-    GtkCTreeNode *ctrow;
-    BalsaMailboxNode *mbnode;
-
-    if (!event || event->button != 3)
-	return;
-
-    if (event->button == 1 && event->type == GDK_2BUTTON_PRESS) {
-	gtk_clist_get_selection_info(GTK_CLIST(ctree), event->x, event->y,
-				     &row, &column);
-	ctrow = gtk_ctree_node_nth(ctree, row);
-	mbnode = gtk_ctree_node_get_row_data(ctree, ctrow);
-
-	gtk_ctree_select(ctree, ctrow);
-
-	if (mbnode->mailbox && LIBBALSA_IS_MAILBOX(mbnode->mailbox))
-	    gtk_signal_emit(GTK_OBJECT(BALSA_MBLIST(ctree)),
-			    balsa_mblist_signals[SELECT_MAILBOX],
-			    mbnode->mailbox, ctrow, event);
-    }
-}
-#endif
 
 /* select_mailbox
  *

@@ -126,6 +126,9 @@ libbalsa_mailbox_imap_init(LibBalsaMailboxImap * mailbox)
     remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
     remote->server =
 	LIBBALSA_SERVER(libbalsa_server_new(LIBBALSA_SERVER_IMAP));
+    gtk_object_ref(GTK_OBJECT(remote->server));
+    gtk_object_sink(GTK_OBJECT(remote->server));
+
     remote->server->port = 143;
 
     gtk_signal_connect(GTK_OBJECT(remote->server), "set-username",
@@ -156,7 +159,7 @@ libbalsa_mailbox_imap_destroy(GtkObject * object)
 
     libbalsa_notify_unregister_mailbox(LIBBALSA_MAILBOX(mailbox));
 
-    gtk_object_destroy(GTK_OBJECT(remote->server));
+    gtk_object_unref(GTK_OBJECT(remote->server));
 
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
 	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
@@ -414,6 +417,20 @@ libbalsa_mailbox_imap_load_config(LibBalsaMailbox * mailbox,
 
     server_settings_changed(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
 			    mailbox);
+}
+
+void libbalsa_mailbox_imap_subscribe(LibBalsaMailboxImap * mailbox, 
+				     gboolean subscribe)
+{
+    gchar* p;
+    LibBalsaServer* server;
+    g_return_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox));
+
+    server = LIBBALSA_MAILBOX_REMOTE(mailbox)->server;
+    p = g_strdup_printf("{%s:%i}%s", server->host, server->port, 
+			LIBBALSA_MAILBOX_IMAP(mailbox)->path);
+    imap_subscribe(p, subscribe);
+    g_free(p);
 }
 
 /* imap_close_all_connections:

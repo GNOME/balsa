@@ -1,3 +1,15 @@
+2001-03-03  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/folder-scanners.[hc]: repsect libbalsa_ namespace.
+	Scanning IMPA folders both in LIST and LSUB modes works now with
+	UW-IMAP server.
+	* libbalsa/mailbox_imap.c: support for subscribing to remote
+	folders.
+	* src/balsa-mblist.c: show empty folders properly.
+	* src/folder-conf.c:
+	* src/balsa-app.[hc]: improve edition of IMAP folders.
+	* src/mailbox-node.c: same. + subscription support.
+	
 2001-03-02  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox_imap.c: take care of Timeout to allow checking 

@@ -412,32 +412,64 @@ find_gnode_in_mbox_list(GNode * gnode_list, LibBalsaMailbox * mailbox)
 }
 
 static gint
-find_by_mbnode(GNode * g1, gpointer data)
+find_mbnode(GNode * g1, gpointer data)
 {
     BalsaMailboxNode *mbnode = (BalsaMailboxNode *) g1->data;
     gpointer *d = data;
-    BalsaMailboxNode *mn = *(BalsaMailboxNode **) data;
+    BalsaMailboxNode *mb = *(BalsaMailboxNode **) data;
 
-    if (!mbnode || mbnode != mn)
-        return FALSE;
+    if (mbnode != mb) return FALSE;
 
-    *(++d) = g1;
+    d[1] = g1;
     return TRUE;
 }
 
-GNode*
-find_gnode_of_folder(GNode * gnode_list, BalsaMailboxNode* mbnode)
+GNode *
+balsa_find_mbnode(GNode* gnode, BalsaMailboxNode* mbnode)
 {
     gpointer d[2];
-    GNode *retval;
 
     d[0] = mbnode;
     d[1] = NULL;
 
-    g_node_traverse(gnode_list, G_IN_ORDER, G_TRAVERSE_LEAFS, -1,
-                    find_by_mbnode, d);
-    retval = d[1];
-    return retval;
+    g_node_traverse(gnode, G_IN_ORDER, G_TRAVERSE_ALL, -1,
+                    find_mbnode, d);
+    return (GNode*)d[1];
+}
+
+
+
+/* balsa_remove_children_mailbox_nodes:
+   remove all children of given node leaving the node itself intact.
+   Applicable to balsa_app.mailbox_nodes and its children.
+ */
+static void 
+destroy_mailbox_node(GNode* node, GNode* root)
+{ 
+    g_return_if_fail(node->data);
+		     
+    mblist_remove_mailbox_node(balsa_app.mblist, 
+			       BALSA_MAILBOX_NODE(node->data));
+    gtk_object_unref((GtkObject*)node->data); 
+}
+
+void
+balsa_remove_children_mailbox_nodes(GNode* gnode)
+{
+    GNode* walk;
+    g_return_if_fail(gnode);
+
+    if(balsa_app.debug)
+	printf("Destroying children of %p %s\n",
+	       gnode->data, BALSA_MAILBOX_NODE(gnode->data)->name
+	       ? BALSA_MAILBOX_NODE(gnode->data)->name : "");
+    g_node_children_foreach(gnode, G_TRAVERSE_ALL,
+                    (GNodeForeachFunc)destroy_mailbox_node, gnode);
+
+    while( (walk = gnode->children) ) {
+	g_node_unlink(walk);
+	g_node_destroy(walk);
+    }
 }
 
 /* create_label:

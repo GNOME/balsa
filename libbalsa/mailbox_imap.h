@@ -56,6 +56,9 @@ GtkObject *libbalsa_mailbox_imap_new(void);
 void libbalsa_mailbox_imap_set_path(LibBalsaMailboxImap * mailbox,
 				    const gchar * path);
 
+void libbalsa_mailbox_imap_subscribe(LibBalsaMailboxImap * mailbox, 
+				     gboolean subscribe);
+
 void libbalsa_imap_close_all_connections(void);
 
 #endif				/* __LIBBALSA_MAILBOX_IMAP_H__ */

@@ -26,13 +26,14 @@ typedef GNode* (LocalHandler)(GNode*root, const char*d_name, const char* fn);
 typedef GNode* (ImapHandler)(GNode*root, const char* fn, char delim);
 
 /* read_dir used by mailbox-node append-subtree callback */
-void scanner_local_dir(GNode *rnode, const gchar * prefix, 
-		       LocalHandler folder_handler, 
-		       LocalHandler mailbox_handler);
+void libbalsa_scanner_local_dir(GNode *rnode, const gchar * prefix, 
+				LocalHandler folder_handler, 
+				LocalHandler mailbox_handler);
 
-void scanner_imap_dir(GNode *rnode, LibBalsaServer* server, 
-		      const gchar* path, gboolean subscribed, int depth,
-		      ImapHandler folder_handler, 
-		      ImapHandler mailbox_handler);
+void libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer* server, 
+			       const gchar* path, gboolean subscribed,
+			       int depth,
+			       ImapHandler folder_handler, 
+			       ImapHandler mailbox_handler);
 
 #endif				/* __FOLDER_SCANNERS_H__ */

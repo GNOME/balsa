@@ -47,13 +47,6 @@ static void validate_folder(GtkWidget *w, FolderDialogData * fcw)
     gnome_dialog_set_sensitive(fcw->dialog, 0, sensitive);
 }
 
-static void subscribed_func(GtkWidget* tb, FolderDialogData * fcw)
-{
-    gtk_widget_set_sensitive
-	(fcw->prefix, 
-	 !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->subscribed)));
-}
-
 void
 folder_conf_imap_node(BalsaMailboxNode *mn)
 {
@@ -116,17 +109,14 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 
     fcw.subscribed = 
 	create_check(fcw.dialog, _("_Subscribed folders only"), table, 5);
-    gtk_signal_connect(GTK_OBJECT(fcw.subscribed), "toggled", 
-		       subscribed_func, &fcw);
     create_label(_("_Prefix"), table, 6, &keyval);
     fcw.prefix = create_entry(fcw.dialog, table, NULL, NULL, 6, 
 			      mn ? mn->dir : NULL, keyval);
 
     gtk_widget_show_all(GTK_WIDGET(fcw.dialog));
     gnome_dialog_close_hides(fcw.dialog, TRUE);
-    gtk_widget_grab_focus(fcw.folder_name);
 
-    /* all the widgets are ready, set their values */
+    /* all the widgets are ready, set the values */
     if(mn && mn->subscribed)
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fcw.subscribed), TRUE);
     validate_folder(NULL, &fcw);
@@ -165,8 +155,16 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 	    balsa_mailbox_node_append_subtree(mn, gnode);
 	    config_folder_add(mn, NULL);
 	} else {
-	    gnode = find_gnode_of_folder(balsa_app.mailbox_nodes, mn);
-	    /* FIXME: remove children here and insert new ones */
+	    gnode = balsa_find_mbnode(balsa_app.mailbox_nodes, mn);
+	    if(gnode) {
+		/* the expanded state needs to be preserved; it would 
+		   be reset when all the children are removed */
+		gboolean expanded = mn->expanded;
+		balsa_remove_children_mailbox_nodes(gnode);
+		balsa_mailbox_node_append_subtree(mn, gnode);
+		mn->expanded = expanded;
+	    } else g_warning("folder node %s (%p) not found in hierarchy.\n",
+			     mn->name, mn);
 	    config_folder_update(mn);
 	}
 	balsa_mblist_repopulate(balsa_app.mblist);

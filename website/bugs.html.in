@@ -11,14 +11,14 @@
 			<dd align="left"><img src="@website_root@/images/balsa.jpg" alt="balsa" align="middle" width="476" height="122">
 			<big><big><b>Reporting Bugs</b></big></big><br></dd>
 
-			<p>To report Balsa's bugs, please first check <a href="http://bugs.gnome.org/db/pa/lbalsa.html">the Balsa
-			bug tracker</a> to see if your bug has already been reported. You can probably see that we currently have
-			tons of duplicate bugs, so <b>please</b> do this for us. If your bug has already been reported, read the
-			report and see if you can help by providing any more information. You can do this by sending an email to
-			&lt;bug-number&gt;@bugs.gnome.org .</p>
+<p>To report Balsa's bugs, please first check <a
+href="http://bugzilla.gnome.org/query.cgi">the GNOME bug tracker</a>
+to see if your bug has already been reported. Do not create yet
+another report for a registered bug, rather add a comment to the
+existing report confirming the bug.</p>
 
-			<p>If you decide to write a new bug report, please collect some information before submitting it. We need
-			to know:</p>
+<p>Please, provide detailed information, particularly when filing a
+new bug report. Most often, we need to know:</p>
 
 			<ul>
 			<li>Your system information: processor, version of Linux, locale, etc. Bug-buddy, gnome-bug, and the like can
@@ -29,8 +29,7 @@
 				quickly.</li>
 			</ul>
 
-			<p>Your bug report can be submitted via the gnome-bug script, which comes with gnome-core, or 
-			<a href="http://www.andrew.cmu.edu/~jberkman/bug-buddy/">bug-buddy</a>, which automates the process
+			<p>Your bug report can be submitted via the bug-buddy, which automates the process
 			of generating stack traces described below. In general, you will have to fill in some blanks, and write
 			some text about the bug. Whatever data you can get your hands on, paste into there.</p>
 

@@ -1,3 +1,7 @@
+2002-05-15  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* imap/imap.c: add imap_uid_search()
+	
 2002-03-10  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* configure.in, lib.h: add proper NLS support.

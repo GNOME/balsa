@@ -816,6 +816,47 @@ libbalsa_marshal_POINTER__POINTER_POINTER (GClosure     *closure,
     g_value_set_pointer (return_value, v_return);
 }
 
+/* POINTER:INT,POINTER (/dev/stdin:1) */
+void
+libbalsa_marshal_POINTER__INT_POINTER (GClosure     *closure,
+                                       GValue       *return_value,
+                                       guint         n_param_values,
+                                       const GValue *param_values,
+                                       gpointer      invocation_hint,
+                                       gpointer      marshal_data)
+{
+  typedef gpointer (*GMarshalFunc_POINTER__INT_POINTER) (gpointer     data1,
+                                                         gint         arg_1,
+                                                         gpointer     arg_2,
+                                                         gpointer     data2);
+  register GMarshalFunc_POINTER__INT_POINTER callback;
+  register GCClosure *cc = (GCClosure*) closure;
+  register gpointer data1, data2;
+  gpointer v_return;
+
+  g_return_if_fail (return_value != NULL);
+  g_return_if_fail (n_param_values == 3);
+
+  if (G_CCLOSURE_SWAP_DATA (closure))
+    {
+      data1 = closure->data;
+      data2 = g_value_peek_pointer (param_values + 0);
+    }
+  else
+    {
+      data1 = g_value_peek_pointer (param_values + 0);
+      data2 = closure->data;
+    }
+  callback = (GMarshalFunc_POINTER__INT_POINTER) (marshal_data ? marshal_data : cc->callback);
+
+  v_return = callback (data1,
+                       g_value_get_int (param_values + 1),
+                       g_value_get_pointer (param_values + 2),
+                       data2);
+
+  g_value_set_pointer (return_value, v_return);
+}
+
 
 /* Delete the contents of a directory (not the directory itself).
    Return TRUE if everything was OK.

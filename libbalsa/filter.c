@@ -209,6 +209,53 @@ match_conditions(FilterOpType op, GSList * cond, LibBalsaMessage * message)
     return cond==NULL;	      
 }
 
+/* libbalsa_filter_build_imap_query:
+   returns an IMAP compatible query (RFC-2060)
+   coresponding to given list of conditions.
+*/
+static GString*
+extend_query(GString* query, const char* imap_str, const char* str,
+             FilterOpType op)
+{
+    const char* prepstr =
+        (op==FILTER_OP_OR && query->str[0]!='\0') ? "OR ": NULL;
+    if(query->str[0]!='\0')
+        g_string_prepend_c(query, ' ');
+    g_string_prepend_c(query, '"');
+    g_string_prepend(query, str);
+    g_string_prepend(query, " \"");
+    g_string_prepend(query, imap_str);
+    if(prepstr) 
+        g_string_prepend(query, prepstr);
+    return query;
+}
+
+gchar*
+libbalsa_filter_build_imap_query(FilterOpType op, GSList* condlist)
+{
+    GString* query = g_string_new("");
+    gchar* str;
+    
+    for (;condlist; condlist=g_slist_next(condlist)) {
+        LibBalsaCondition* cond = (LibBalsaCondition*)condlist->data;
+        if (cond->type != CONDITION_SIMPLE) continue;
+
+	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_TO))
+            query = extend_query(query, "TO", cond->match.string, op);
+	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_FROM))
+            query = extend_query(query, "FROM", cond->match.string, op);
+	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_SUBJECT))
+            query = extend_query(query, "SUBJECT", cond->match.string, op);
+	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_CC))
+            query = extend_query(query, "CC", cond->match.string, op);
+	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY))
+            query = extend_query(query, "TEXT", cond->match.string, op);
+    }
+    str = query->str;
+    g_string_free(query, FALSE);
+    return str;
+}
+
 /*--------- Filtering functions -------------------------------*/
 
 /* FIXME : Add error reporting for each filter */

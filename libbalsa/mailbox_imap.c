@@ -37,6 +37,7 @@
 
 #include <gnome.h> /* for gnome-i18n.h, gnome-config and gnome-util */
 
+#include "filter.h"
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 #include "mx.h"
@@ -68,6 +69,9 @@ static FILE *libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox *
 						      LibBalsaMessage *
 						      message);
 static void libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox);
+static GHashTable* libbalsa_mailbox_imap_get_matching(LibBalsaMailbox* mailbox,
+                                                      int op,
+                                                      GSList* conditions);
 
 static void libbalsa_mailbox_imap_save_config(LibBalsaMailbox * mailbox,
 					      const gchar * prefix);
@@ -131,6 +135,7 @@ libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass * klass)
 	libbalsa_mailbox_imap_get_message_stream;
 
     libbalsa_mailbox_class->check = libbalsa_mailbox_imap_check;
+    libbalsa_mailbox_class->get_matching = libbalsa_mailbox_imap_get_matching;
 
     libbalsa_mailbox_class->save_config =
 	libbalsa_mailbox_imap_save_config;
@@ -822,6 +827,50 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 	    UNLOCK_MAILBOX(mailbox);
 	}
     }
+}
+typedef struct {
+    GHashTable * uids;
+    GHashTable * res;
+} ImapSearchData;
+
+static void
+imap_matched(unsigned uid, ImapSearchData* data)
+{
+    LibBalsaMessage* m = 
+        g_hash_table_lookup(data->uids,GUINT_TO_POINTER(uid)); 
+    if(m) 
+        g_hash_table_insert(data->res, m, m);
+    else
+        printf("Could not find UID: %ud in message list\n", uid);
+}
+
+int imap_uid_search(CONTEXT* ctx, const char* query, 
+                    void(*cb)(unsigned, ImapSearchData*), void*);
+static GHashTable*
+libbalsa_mailbox_imap_get_matching(LibBalsaMailbox* mailbox, 
+                                  int op, GSList* conditions)
+{
+    gchar* query;
+    gboolean match;
+    ImapSearchData cbdata;
+    GList* msgs;
+
+    cbdata.uids = g_hash_table_new(NULL, NULL);
+    cbdata.res  = g_hash_table_new(NULL, NULL);
+    query = libbalsa_filter_build_imap_query(op, conditions);
+    if(query) {
+        for(msgs= mailbox->message_list; msgs; msgs = msgs->next){
+            LibBalsaMessage *m = LIBBALSA_MESSAGE(msgs->data);
+            unsigned uid = ((IMAP_HEADER_DATA*)m->header->data)->uid;
+            g_hash_table_insert(cbdata.uids, GUINT_TO_POINTER(uid), m);
+        }
+        
+        match = imap_uid_search(CLIENT_CONTEXT(mailbox), query,
+                                imap_matched, &cbdata);
+        g_free(query);
+    }
+    g_hash_table_destroy(cbdata.uids);
+    return cbdata.res;
 }
 
 static void

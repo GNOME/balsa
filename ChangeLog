@@ -1,3 +1,11 @@
+2002-05-15  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/filter.[ch]: build_imap_query() added.
+	* libbalsa/mailbox.[hc]: libbalsa_mailbox_real_get_matching_added().
+	* libbalsa/mailbox_imap.c: optimized searching for imap.
+	* libbalsa/misc.[hc]: libbalsa_marshal_POINTER__INT_POINTER() added.
+	* src/balsa-index.c: restructure to use new searching code.
+
 2002-05-14  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/balsa-index-threading.c: cleanup by Emmanuel (extended).

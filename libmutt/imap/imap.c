@@ -1476,3 +1476,57 @@ int imap_complete(char* dest, size_t dlen, char* path) {
   FREE (&mx.mbox);
   return -1;
 }
+
+#ifdef LIBMUTT
+static int uid_search_parse_response(IMAP_DATA* idata,
+                                     void(*cb)(unsigned, void*), 
+                                     void* cbdata)
+{
+  int rc = -1, cnt=0;
+  unsigned uid;
+  char* buf;
+  if (idata->cmd.buf[0] != '*')
+    return -1;
+  buf = imap_next_word (idata->cmd.buf+1);
+  if(strncmp(buf,"SEARCH", 6))
+    return -2;
+  /* skip to message number */
+  buf = imap_next_word (imap_next_word(buf));
+  while(*buf) {
+    uid = atoi (buf);
+    cb(uid, cbdata);
+    buf = imap_next_word (buf);
+    cnt ++;
+  }
+  return cnt;
+}
+
+/* imap_uid_search:
+   ...
+*/
+int imap_uid_search(CONTEXT* ctx, const char* query, 
+                    void(*cb)(unsigned, void*), void* cbdata)
+{ 
+  IMAP_DATA* idata;
+  int cnt, rc;
+  BUFFER cmd;
+  char num[11];
+
+  memset (&cmd, 0, sizeof (cmd));
+  mutt_buffer_addstr (&cmd, "UID SEARCH ");
+  mutt_buffer_addstr (&cmd, query);
+  idata = ctx->data;
+  imap_cmd_start (idata, cmd.data);
+  cnt = 0;
+  do
+    {
+      rc = imap_cmd_step (idata);
+      if (rc != IMAP_CMD_CONTINUE)
+	break;
+      cnt += uid_search_parse_response(idata, cb, cbdata);
+    }  while (rc != IMAP_CMD_OK);
+
+  printf("imap_uid_search(%s): %d msgs matched.\n", query, cnt);
+  return cnt;
+}
+#endif

@@ -121,6 +121,9 @@ balsa_app_init (void)
 
   /* arp */
   balsa_app.quote_str = NULL;
+
+  /* font */
+  balsa_app.message_font = NULL;
 }
 
 gint

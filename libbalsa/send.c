@@ -391,6 +391,10 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 
     session = smtp_create_session ();
     smtp_set_server (session, smtp_server);
+ 
+    /* Now tell libESMTP it can use the SMTP AUTH extension.  */
+    smtp_auth_set_context (session, smtp_authctx);
+ 
     /* At present Balsa can't handle one recipient only out of many
        failing.  Make libESMTP require all specified recipients to
        succeed before transferring a message.  */
@@ -460,8 +464,8 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 	    }
 
 	    if (queu->dispnotify_to) {
-		phrase = libbalsa_address_get_phrase(queu->reply_to);
-		mailbox = libbalsa_address_get_mailbox(queu->reply_to, 0);
+		phrase = libbalsa_address_get_phrase(queu->dispnotify_to);
+		mailbox = libbalsa_address_get_mailbox(queu->dispnotify_to, 0);
 		smtp_set_header (message, "Disposition-Notification-To",
 				 phrase, mailbox);
 	    }

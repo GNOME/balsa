@@ -1,3 +1,7 @@
+2001-05-14  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/send.c (libbalsa_process_queue): small patch from Brian 
+
 2001-05-13  Carlos Morgado  <chbm@chbm.nu>
 
 	* libinit_balsa/balsa-druid-page-user.gob:

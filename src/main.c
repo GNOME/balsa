@@ -46,6 +46,7 @@
 #include "misc.h"
 #include "save-restore.h"
 #include "main.h"
+#include "information.h"
 
 #include "libinit_balsa/init_balsa.h"
 
@@ -212,7 +213,7 @@ main (int argc, char *argv[])
   balsa_app_init ();
 
   /* Initialize libbalsa */
-  libbalsa_init(balsa_warning);
+  libbalsa_init((LibBalsaInformationFunc)balsa_information);
 
 #ifdef USE_PIXBUF
   gtk_widget_set_default_colormap(gdk_rgb_get_cmap());

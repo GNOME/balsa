@@ -46,7 +46,7 @@ static proplist_t pl_dict_add_str_str (proplist_t dict_arg, gchar * string1,
 				       gchar * string2);
 static gchar *pl_dict_get_str (proplist_t dict, gchar * str);
 static gint d_get_gint (proplist_t dict, gchar * key, gint def_val);
-static gchar* config_get_pkey(proplist_t mbox);
+ static gchar* config_get_pkey(proplist_t mbox);
 static proplist_t config_mailbox_get_key_by_pkey (const gchar * pkey);
 static gint config_mailbox_init (proplist_t mbox, gchar * key);
 static gint config_mailbox_get_highest_number (proplist_t accounts);
@@ -724,6 +724,11 @@ config_global_load (void)
   balsa_app.sig_whenforward = d_get_gint (globals, "SigForward",   TRUE);
   balsa_app.sig_separator   = d_get_gint (globals, "SigSeparator", TRUE);
 
+  balsa_app.information_message = d_get_gint (globals, "ShowInformationMessages", BALSA_INFORMATION_SHOW_NONE);
+  balsa_app.warning_message = d_get_gint (globals, "ShowWarningMessages", BALSA_INFORMATION_SHOW_LIST);
+  balsa_app.error_message = d_get_gint (globals, "ShowErrorMessages", BALSA_INFORMATION_SHOW_DIALOG);
+  balsa_app.debug_message = d_get_gint (globals, "ShowDebugMessages", BALSA_INFORMATION_SHOW_NONE);
+
   /* smtp server */
   if ((field = pl_dict_get_str (globals, "SMTPServer")) == NULL)
     ;				/* an optional field for now */
@@ -957,6 +962,11 @@ config_global_save (void)
   d_add_gint (globals, "SigForward", balsa_app.sig_whenforward);
   d_add_gint (globals, "SigReply",   balsa_app.sig_whenreply);
   d_add_gint (globals, "SigSeparator", balsa_app.sig_separator);
+
+  d_add_gint (globals, "ShowInformationMessages", balsa_app.information_message );
+  d_add_gint (globals, "ShowWarningMessages", balsa_app.warning_message );
+  d_add_gint (globals, "ShowErrorMessages", balsa_app.error_message );
+  d_add_gint (globals, "ShowDebugMessages", balsa_app.debug_message );
 
   d_add_gint (globals, "ToolbarStyle", balsa_app.toolbar_style);
   d_add_gint (globals, "PWindowOption", balsa_app.pwindow_option);

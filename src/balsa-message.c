@@ -936,12 +936,12 @@ part_info_init_mimetext (BalsaMessage *bm, BalsaPartInfo *info)
 
 
   if(!libbalsa_message_body_save_temporary ( info->body, NULL )) {
-    balsa_warning("Error writing to temporary file %s.\nCheck the directory permissions.", info->body->temp_filename);
+    balsa_information( LIBBALSA_INFORMATION_WARNING,"Error writing to temporary file %s.\nCheck the directory permissions.", info->body->temp_filename);
     return;
   }
   
   if( (fp = fopen( info->body->temp_filename, "r")) == NULL) {
-    balsa_warning("Cannot open temporary file %s.", info->body->temp_filename);
+    balsa_information( LIBBALSA_INFORMATION_WARNING,"Cannot open temporary file %s.", info->body->temp_filename);
     return;
   }
 
@@ -1260,7 +1260,7 @@ part_context_menu_view(GtkWidget *menu_item, BalsaPartInfo *info)
 
   if((cmd=gnome_mime_get_value(content_type, "view")) != NULL) {
       if(!libbalsa_message_body_save_temporary (info->body, NULL)) {
-	balsa_warning(_("could not create temporary file %s"),
+	balsa_information( LIBBALSA_INFORMATION_WARNING,_("could not create temporary file %s"),
 		      info->body->temp_filename);
 	g_free(content_type);
 	return;

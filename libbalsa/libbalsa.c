@@ -43,22 +43,16 @@ int mutt_yesorno (const char *msg, int def);
 int mutt_any_key_to_continue (const char *s);
 void mutt_clear_error (void);
 
-static void (*libbalsa_real_error_func)(const char *fmt,...);
-
-static void libbalsa_error_idle_handler(gchar *msg);
+static void libbalsa_mutt_error(const char *fmt, ...);
 
 void
 mutt_message (const char *fmt,...)
 {
-#ifdef DEBUG
-	va_list ap;
-	char outstr[522];
+	va_list va_args;
 
-	va_start (ap, fmt);
-	vsprintf (outstr, fmt, ap);
-	va_end (ap);
-	g_print ("mutt_message: %s\n", outstr);
-#endif
+	va_start(va_args, fmt);
+	libbalsa_information_varg( LIBBALSA_INFORMATION_MESSAGE, fmt, va_args);
+	va_end(va_args);
 }
 
 void
@@ -69,6 +63,7 @@ mutt_exit (int code)
 int
 mutt_yesorno (const char *msg, int def)
 {
+	libbalsa_information ( LIBBALSA_INFORMATION_DEBUG, "YES/NO: %s (%d)", msg, def);
 	return 1;
 }
 
@@ -79,7 +74,7 @@ mutt_clear_error (void)
 
 /* We're gonna set Mutt global vars here */
 void
-libbalsa_init ( void (*error_func) (const char *fmt,...) )
+libbalsa_init (LibBalsaInformationFunc information_callback)
 {
 	struct utsname utsname;
 	char *p;
@@ -103,9 +98,9 @@ libbalsa_init ( void (*error_func) (const char *fmt,...) )
 
 	Hostname = libbalsa_get_hostname ();
 
-	libbalsa_real_error_func = error_func;
+	libbalsa_real_information_func = information_callback;
 
-	mutt_error = libbalsa_error;
+	mutt_error = libbalsa_mutt_error;
 	
 	Fqdn = g_strdup (Hostname);
 
@@ -197,43 +192,15 @@ libbalsa_guess_mail_spool( void )
 }
 
 /*
- * This function is hooked into the mutt_error callback and may also be called from
- * libbalsa.
+ * This function is hooked into the mutt_error callback
  *
- * We are adding an idle handler - we do not need to hold the gdk lock for this.
- *
- * We can't just grab the GDK lock and call the real_error function since this
- * runs a dialog, which has a nested g_main loop - glib doesn't like haveing main 
- * loops active in two threads at one time. When the idle handler gets run it is 
- * from the main thread.
- *
- */ 
-void libbalsa_error(const char *fmt, ...)
+ */
+static void libbalsa_mutt_error(const char *fmt, ...)
 {
-	gchar *msg;
 	va_list va_args;
 
-	g_assert ( libbalsa_real_error_func != NULL );
-
-	/* We format the string here. It must be free()d in the idle
-	 * handler We parse the args here because by the time the idle
-	 * function runs we will no longer be in this stack frame. 
-	 */
 	va_start(va_args, fmt);
-	msg = g_strdup_vprintf(fmt, va_args);
+	libbalsa_information_varg( LIBBALSA_INFORMATION_WARNING, fmt, va_args);
 	va_end(va_args);
-
-	gtk_idle_add ((GtkFunction)libbalsa_error_idle_handler, msg);
 }
 
-/*
- * This is an idle handler, so we need to grab the GDK lock 
- */
-static void libbalsa_error_idle_handler(gchar *msg)
-{
-	gdk_threads_enter();
-	libbalsa_real_error_func(msg);
-	gdk_threads_leave();
-
-	g_free(msg);
-}

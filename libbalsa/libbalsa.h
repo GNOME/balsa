@@ -45,6 +45,8 @@ typedef struct body MuttBody;
 #include "mime.h"
 #include "notify.h"
 
+#include "information.h"
+
 #include "server.h"
 
 #include "mailbox.h"
@@ -60,12 +62,10 @@ typedef struct body MuttBody;
 /*
  * Initialize the library
  */
-void libbalsa_init (void (*error_func) (const char *fmt,...));
+void libbalsa_init (LibBalsaInformationFunc information_callback);
 void libbalsa_set_spool (gchar *spool);
 
 gchar *libbalsa_guess_mail_spool( void );
-
-void libbalsa_error(const char *fmt, ...);
 
 void libbalsa_lock_mutt(void);
 void libbalsa_unlock_mutt(void);

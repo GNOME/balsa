@@ -20,6 +20,8 @@ balsa_SOURCES =	\
 	filter-edit.h		\
 	filter-edit-callbacks.c	\
 	filter-edit-dialog.c	\
+	information-dialog.h	\
+	information-dialog.c	\
 	local-mailbox.c		\
 	local-mailbox.h		\
 	mailbox-conf.c		\

@@ -1,3 +1,24 @@
+2000-09-06  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libinit_balsa/libinit.c: Add gdk_threads_{enter,leave} calls
+	around the gtk_main here. Prevents a lock up when we do the
+	gtk_main for the main body of the application.
+	* libbalsa/Makefile.am, libbalsa/information.[ch]: Implement a
+	libbalsa_information function which will call a callback provided
+	when libbalsa is initialised. The message can include a severity
+	level.
+	* libbalsa/libbalsa.[ch]: Setup balsa_information from libbalsa_init,
+	route mutt_message, mutt_yesno and mutt_error through
+	balsa_information.
+	* src/balsa-app.[ch], src/information-dialog.[ch]: Implement a
+	balsa_information to pass to libbalsa as a callback, provide
+	options of displaying certain types of message not at all, in a
+	dialog or in a list of messages. balsa_information also replaces
+	balsa_error and balsa_warning.
+	* save-restore.c, src/pref-manager.c: Prefs for the above.
+	* src/balsa-message.c, src/main-window.c: Use balsa_information
+	instead of balsa_warning.
+
 2000-09-06  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/Makefile.am: include libimap.a only once - and it still works!

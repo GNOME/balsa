@@ -36,45 +36,13 @@
 #include "save-restore.h"
 #include "balsa-index-page.h"
 #include "main-window.h"
+#include "information.h"
 
 /* Global application structure */
 struct BalsaApplication balsa_app;
-static GtkWidget *warning_list = NULL;
 
 /* prototypes */
 static gboolean check_special_mailboxes (void);
-
-static void balsa_warning_button_cb ( GnomeDialog *dialog, gint button, gpointer data );
-
-void
-balsa_error (const char *fmt,...)
-{
-  GtkWidget *messagebox;
-  gchar *outstr;
-  va_list ap;
-
-  va_start (ap, fmt);
-  outstr = g_strdup_vprintf(fmt, ap);
-  va_end (ap);
-
-  g_warning (outstr);
-
-  /* Sometimes a different thread makes GTK+
-   * calls in here. How do we handle this???
-   */
-  
-  messagebox = gnome_error_dialog_parented (outstr, GTK_WINDOW(balsa_app.main_window));
-
-  gtk_window_set_position (GTK_WINDOW (messagebox), GTK_WIN_POS_CENTER);
-
-  g_free ( outstr );
-
-  /* Don't do this - the window is already realized [ijc] */
-  /*  gtk_window_set_wmclass (GTK_WINDOW (messagebox), "error", "Balsa"); */
-
-  balsa_exit();
-
-}
 
 /* ask_password:
    asks the user for the password to the mailbox on given remote server.
@@ -102,83 +70,6 @@ gchar* ask_password(LibBalsaServer* server, LibBalsaMailbox *mbox)
   g_free(prompt);
   gnome_dialog_run_and_close(GNOME_DIALOG(dialog));
   return passwd;
-}
-
-/* Handle button clicks in the warning window */
-/* Button 0 is clear, button 1 is close */
-static void
-balsa_warning_button_cb ( GnomeDialog *dialog, gint button, gpointer data )
-{
-  switch ( button ) {
-  case 0:
-    gtk_clist_clear ( GTK_CLIST(warning_list) );
-    break;
-  case 1:
-    gtk_object_destroy ( GTK_OBJECT(dialog) );
-    break;
-  default:
-    g_error ("Unknown button %d pressed in warning dialog", button);
-    break;
-  }
-}
-
-/*
- * Pops up a dialog containing a list of warnings.
- *
- * This is because their can be many warnings (eg while you are away) and popping up 
- * hundreds of windows is ugly.
- */
-void
-balsa_warning (const char *fmt,...)
-{
-  gchar *outstr[1];
-  va_list ap;
-
-  va_start (ap, fmt);
-  outstr[0] = g_strdup_vprintf (fmt, ap);
-  va_end (ap);
-
-  if ( warning_list == NULL ) {
-    GtkWidget *warning_dialog;
-    GtkWidget *scrolled_window;
-
-    warning_dialog = gnome_dialog_new ( _("Balsa Warning"), "Clear", GNOME_STOCK_BUTTON_CLOSE, NULL);
-    /* Default is to close */
-    gnome_dialog_set_default ( GNOME_DIALOG(warning_dialog), 1 );
-    gnome_dialog_set_parent ( GNOME_DIALOG ( warning_dialog ), GTK_WINDOW( balsa_app.main_window ) );
-
-    /* Reset the policy gnome_dialog_new makes itself non-resizable */
-    gtk_window_set_policy ( GTK_WINDOW ( warning_dialog ), TRUE, TRUE, FALSE );
-    gtk_window_set_default_size ( GTK_WINDOW ( warning_dialog ), 350, 200 );
-    gtk_window_set_wmclass ( GTK_WINDOW(warning_dialog), "Warning", "Balsa" );
-
-    gtk_signal_connect ( GTK_OBJECT(warning_dialog), "clicked",
-			 GTK_SIGNAL_FUNC(balsa_warning_button_cb), NULL );
-
-    /* A scrolled window for the list. */
-    scrolled_window = gtk_scrolled_window_new ( NULL, NULL );
-    gtk_scrolled_window_set_policy ( GTK_SCROLLED_WINDOW ( scrolled_window ), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
-    gtk_box_pack_start ( GTK_BOX( GNOME_DIALOG(warning_dialog)->vbox ), scrolled_window, TRUE, TRUE, 1 );
-    gtk_widget_show ( scrolled_window );
-
-    /* The list itself */
-    warning_list = gtk_clist_new ( 1 );
-    gtk_signal_connect ( GTK_OBJECT(warning_list), "destroy", 
-			 gtk_widget_destroyed, &warning_list );
-    gtk_clist_set_reorderable ( GTK_CLIST(warning_list), FALSE );
-    gtk_container_add ( GTK_CONTAINER(scrolled_window), warning_list );
-    gtk_clist_set_column_auto_resize ( GTK_CLIST(warning_list), 0, TRUE );
-    gtk_widget_show ( warning_list ) ;
-
-    gtk_widget_show ( warning_dialog );
-  }
-
-  gtk_clist_append ( GTK_CLIST(warning_list), outstr );
-
-  gnome_appbar_set_status(balsa_app.appbar, outstr[0]);
-
-  g_free(outstr[0]);
-
 }
 
 void
@@ -280,6 +171,13 @@ balsa_app_init (void)
   balsa_app.ab_dist_list_mode = FALSE;
   balsa_app.ab_location = 
       gnome_util_prepend_user_home(DEFAULT_ADDRESS_BOOK_PATH);
+
+  /* Information messages */
+  balsa_app.information_message = 0;
+  balsa_app.warning_message = 0;
+  balsa_app.error_message = 0;
+  balsa_app.debug_message = 0;
+
 }
 
 gboolean
@@ -313,27 +211,27 @@ check_special_mailboxes (void)
 	gboolean bomb = FALSE;
 
 	if( balsa_app.inbox == NULL ) {
-		balsa_warning( _("Balsa cannot open your \"%s\" mailbox."),  _("Inbox") );
+		balsa_information ( LIBBALSA_INFORMATION_WARNING, _("Balsa cannot open your \"%s\" mailbox."),  _("Inbox") );
 		bomb = TRUE;
 	}
 
 	if( balsa_app.outbox == NULL ) {
-		balsa_warning( _("Balsa cannot open your \"%s\" mailbox."),  _("Outbox") );
+		balsa_information( LIBBALSA_INFORMATION_WARNING, _("Balsa cannot open your \"%s\" mailbox."),  _("Outbox") );
 		bomb = TRUE;
 	} 
 
 	if( balsa_app.sentbox == NULL ) {
-		balsa_warning( _("Balsa cannot open your \"%s\" mailbox."),  _("Sentbox") );
+		balsa_information( LIBBALSA_INFORMATION_WARNING, _("Balsa cannot open your \"%s\" mailbox."),  _("Sentbox") );
 		bomb = TRUE;
 	}
 
 	if( balsa_app.draftbox == NULL ) {
-		balsa_warning( _("Balsa cannot open your \"%s\" mailbox."),  _("Draftbox") );
+		balsa_information( LIBBALSA_INFORMATION_WARNING, _("Balsa cannot open your \"%s\" mailbox."),  _("Draftbox") );
 		bomb = TRUE;
 	}
 
 	if( balsa_app.trash == NULL ) {
-		balsa_warning( _("Balsa cannot open your \"%s\" mailbox."),  _("Trash") );
+		balsa_information( LIBBALSA_INFORMATION_WARNING, _("Balsa cannot open your \"%s\" mailbox."),  _("Trash") );
 		bomb = TRUE;
 	}
 

@@ -57,6 +57,12 @@ typedef struct _PropertyUI {
 	GtkWidget *remember_open_mboxes;
 	GtkWidget *mblist_show_mb_content_info;
 
+        /* Information messages */
+        GtkWidget *information_message_menu;
+        GtkWidget *warning_message_menu;
+        GtkWidget *error_message_menu;
+        GtkWidget *debug_message_menu;
+
 	/* arp */
 	GtkWidget *quote_str;
 	
@@ -101,6 +107,8 @@ static GtkWidget *create_printing_page ( void );
 static GtkWidget *create_encondig_page ( void );
 static GtkWidget *create_misc_page ( void );
 static GtkWidget *create_startup_page ( void );
+
+static GtkWidget *create_information_message_menu (void);
 
 static GtkWidget *incoming_page ( void );
 static GtkWidget *outgoing_page ( void );
@@ -380,6 +388,7 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
 {
 	gint i;
         GtkWidget *balsa_window;
+	GtkWidget *menu_item;
 
         if (page_num != -1)
                 return;
@@ -515,6 +524,16 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
 	balsa_app.alias_find_flag =
 	   GTK_TOGGLE_BUTTON(pui->alias_find_flag)->active;
 
+	/* Information dialogs */
+	menu_item = gtk_menu_get_active ( GTK_MENU(pui->information_message_menu) );
+	balsa_app.information_message = GPOINTER_TO_INT (gtk_object_get_user_data(GTK_OBJECT(menu_item)));
+	menu_item = gtk_menu_get_active ( GTK_MENU(pui->warning_message_menu) );
+	balsa_app.warning_message = GPOINTER_TO_INT (gtk_object_get_user_data(GTK_OBJECT(menu_item)));
+	menu_item = gtk_menu_get_active ( GTK_MENU(pui->error_message_menu) );
+	balsa_app.error_message = GPOINTER_TO_INT (gtk_object_get_user_data(GTK_OBJECT(menu_item)));
+	menu_item = gtk_menu_get_active ( GTK_MENU(pui->debug_message_menu) );
+	balsa_app.debug_message = GPOINTER_TO_INT (gtk_object_get_user_data(GTK_OBJECT(menu_item)));
+
 	/* XXX */
 	/*  refresh_main_window (); */
 	
@@ -642,6 +661,17 @@ set_prefs (void)
 			    balsa_app.ab_location);
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (
 	    pui->alias_find_flag), balsa_app.alias_find_flag);
+
+	/* Information Message */
+	gtk_menu_set_active(GTK_MENU(pui->information_message_menu),
+			    balsa_app.information_message);
+	gtk_menu_set_active(GTK_MENU(pui->warning_message_menu),
+			    balsa_app.warning_message);
+	gtk_menu_set_active(GTK_MENU(pui->error_message_menu),
+			    balsa_app.error_message);
+	gtk_menu_set_active(GTK_MENU(pui->debug_message_menu),
+			    balsa_app.debug_message);
+
 }
 
 void
@@ -1173,12 +1203,13 @@ create_display_page ( )
 	GtkWidget *vbox3;
 	GtkWidget *frame9;
 	GtkWidget *vbox4;
-	GtkWidget *label18;
 	GSList    *group;
 	GtkWidget *vbox2;
 	/*GtkWidget *frame16;*/
 	GtkWidget *format_frame, *format_table, *format_widget;
-	
+	GtkWidget *information_frame, *information_table, *label;
+	GtkWidget *option_menu;
+
 	vbox2 = gtk_vbox_new (FALSE, 0);
 	
 	frame7 = gtk_frame_new (_("Main window"));
@@ -1267,7 +1298,60 @@ create_display_page ( )
 		group = gtk_radio_button_group (pui->pwindow_type[i]);
 	}
 
-	label18 = gtk_label_new (_("Display"));
+	/* Information messages frame... */
+	information_frame = gtk_frame_new ( _("Information Messages") );
+	gtk_box_pack_start( GTK_BOX(vbox2), information_frame, FALSE, FALSE, 0 );
+	gtk_container_set_border_width( GTK_CONTAINER( information_frame ), 5 );
+
+	information_table = gtk_table_new (4, 2, FALSE);
+	gtk_container_add (GTK_CONTAINER (information_frame), information_table);
+	gtk_table_set_row_spacings (GTK_TABLE (information_table), 1);
+	gtk_table_set_col_spacings (GTK_TABLE (information_table), 5);
+	gtk_container_set_border_width (GTK_CONTAINER (information_table), 5);	
+
+	label = gtk_label_new ( _("Informational Messages") );
+	gtk_table_attach (GTK_TABLE (information_table), label, 0, 1, 0, 1,
+			  GTK_FILL, 0 , 0, 0);
+
+	option_menu = gtk_option_menu_new();
+	pui->information_message_menu = create_information_message_menu();
+	gtk_option_menu_set_menu ( GTK_OPTION_MENU(option_menu), pui->information_message_menu);
+	gtk_option_menu_set_history ( GTK_OPTION_MENU(option_menu), balsa_app.information_message);
+	gtk_table_attach (GTK_TABLE (information_table), option_menu, 1, 2, 0, 1,
+			  GTK_EXPAND | GTK_FILL, 0, 0, 0);
+	
+	label = gtk_label_new ( _("Warning Messages") );
+	gtk_table_attach (GTK_TABLE (information_table), label, 0, 1, 1, 2,
+			  GTK_FILL, 0, 0, 0);
+
+	option_menu = gtk_option_menu_new();
+	pui->warning_message_menu = create_information_message_menu();
+	gtk_option_menu_set_menu ( GTK_OPTION_MENU(option_menu), pui->warning_message_menu);
+	gtk_option_menu_set_history ( GTK_OPTION_MENU(option_menu), balsa_app.warning_message);
+	gtk_table_attach (GTK_TABLE (information_table), option_menu, 1, 2, 1, 2,
+			  GTK_EXPAND | GTK_FILL, 0, 0, 0);
+
+	label = gtk_label_new ( _("Error Messages") );
+	gtk_table_attach (GTK_TABLE (information_table), label, 0, 1, 2, 3,
+			  GTK_FILL, 0, 0, 0);
+
+	option_menu = gtk_option_menu_new();
+	pui->error_message_menu = create_information_message_menu();
+	gtk_option_menu_set_menu ( GTK_OPTION_MENU(option_menu), pui->error_message_menu);
+	gtk_option_menu_set_history ( GTK_OPTION_MENU(option_menu), balsa_app.error_message);
+	gtk_table_attach (GTK_TABLE (information_table), option_menu, 1, 2, 2, 3,
+			  GTK_EXPAND | GTK_FILL, 0, 0, 0);
+	
+	label = gtk_label_new ( _("Debug Messages") );
+	gtk_table_attach (GTK_TABLE (information_table), label, 0, 1, 3, 4,
+			  GTK_FILL, 0, 0, 0);
+
+	option_menu = gtk_option_menu_new();
+	pui->debug_message_menu = create_information_message_menu();
+	gtk_option_menu_set_menu ( GTK_OPTION_MENU(option_menu), pui->debug_message_menu);
+	gtk_option_menu_set_history ( GTK_OPTION_MENU(option_menu), balsa_app.debug_message);
+	gtk_table_attach (GTK_TABLE (information_table), option_menu, 1, 2, 3, 4,
+			  GTK_EXPAND | GTK_FILL, 0, 0, 0);
 
 	gtk_widget_show_all (vbox2);
 	return vbox2;
@@ -1760,4 +1844,33 @@ print_modified_cb( GtkWidget *widget, GtkWidget *pbox)
 	
 	properties_modified_cb( widget, pbox );
 
+}
+
+static GtkWidget *
+create_information_message_menu (void)
+{
+  GtkWidget *menu;
+  GtkWidget *menu_item;
+
+  menu = gtk_menu_new();
+  
+  menu_item = gtk_menu_item_new_with_label( _("Show Nothing") );
+  gtk_object_set_user_data( GTK_OBJECT(menu_item), GINT_TO_POINTER(BALSA_INFORMATION_SHOW_NONE));
+  gtk_signal_connect (GTK_OBJECT (menu_item), "activate",
+		      GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
+  gtk_menu_append ( GTK_MENU(menu), menu_item );
+
+  menu_item = gtk_menu_item_new_with_label( _("Show Dialog") );
+  gtk_object_set_user_data( GTK_OBJECT(menu_item), GINT_TO_POINTER(BALSA_INFORMATION_SHOW_DIALOG));
+  gtk_signal_connect (GTK_OBJECT (menu_item), "activate",
+		      GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
+  gtk_menu_append ( GTK_MENU(menu), menu_item );
+
+  menu_item = gtk_menu_item_new_with_label( _("Show In List") );
+  gtk_object_set_user_data( GTK_OBJECT(menu_item), GINT_TO_POINTER(BALSA_INFORMATION_SHOW_LIST));
+  gtk_signal_connect (GTK_OBJECT (menu_item), "activate",
+		      GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
+  gtk_menu_append ( GTK_MENU(menu), menu_item );
+
+  return menu;
 }

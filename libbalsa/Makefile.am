@@ -41,7 +41,9 @@ libbalsa_a_SOURCES = 		\
 	send.c			\
 	server.c		\
 	server.h		\
-	threads.h		
+	threads.h		\
+	information.h		\
+	information.c
 
 
 libbalsa_a_LIBADD = @LIBOBJS@

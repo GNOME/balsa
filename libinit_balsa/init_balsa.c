@@ -38,5 +38,8 @@ void balsa_init_begin( void )
     druid = GTK_WIDGET( balsa_initdruid_new( GTK_WINDOW( window ) ) );
 
     gtk_widget_show_all( GTK_WIDGET( window ) );
+
+    gdk_threads_enter();
     gtk_main();
+    gdk_threads_leave();
 }

@@ -1259,7 +1259,7 @@ send_progress_notify_cb( )
 	switch( threadmessage->message_type )  
 	  {
 	  case MSGSENDTHREADERROR:
-	    balsa_warning( _("Sending error: %s"), 
+	    balsa_information( LIBBALSA_INFORMATION_WARNING, _("Sending error: %s"), 
 			  threadmessage->message_string);
 	    break;
 	    
@@ -1585,7 +1585,7 @@ mailbox_commit_changes (GtkWidget * widget, gpointer data)
 
   current_mailbox = BALSA_INDEX(index)->mailbox;
   if(libbalsa_mailbox_commit_changes(current_mailbox) != 0) 
-    balsa_warning(_("Commiting mailbox %s failed."), current_mailbox->name);
+    balsa_information( LIBBALSA_INFORMATION_WARNING,_("Commiting mailbox %s failed."), current_mailbox->name);
 }
 
 static void

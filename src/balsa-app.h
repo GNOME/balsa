@@ -24,6 +24,7 @@
 #include "libbalsa.h"
 #include "balsa-mblist.h"
 #include "balsa-index-page.h"
+#include "information-dialog.h"
 
 /* Work around nonprivileged installs so we can find icons */
 #ifdef BALSA_LOCAL_INSTALL
@@ -228,6 +229,13 @@ extern struct BalsaApplication
   gboolean ab_dist_list_mode;
   gchar * ab_location;
   gboolean alias_find_flag;
+
+  /* Information messages */
+  BalsaInformationShow information_message;
+  BalsaInformationShow warning_message;
+  BalsaInformationShow error_message;
+  BalsaInformationShow debug_message;
+       
 }
 balsa_app;
 
@@ -236,8 +244,6 @@ void balsa_app_init (void);
 gboolean do_load_mailboxes (void);
 void update_timer( gboolean update, guint minutes );
 
-void balsa_error (const char *fnt,...);
-void balsa_warning (const char *fmt,...);
 gchar* ask_password(LibBalsaServer* server, LibBalsaMailbox *mbox);
 
 LibBalsaMailbox *balsa_find_mbox_by_name (const gchar *name);

@@ -506,7 +506,10 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
 
     send_lock();
 
-    libbalsa_mailbox_open(outbox);
+    if (!libbalsa_mailbox_open(outbox)) {
+	send_unlock();
+	return FALSE;
+    }
     if (!libbalsa_mailbox_total_messages(outbox)) {
 	libbalsa_mailbox_close(outbox);
 	send_unlock();
@@ -963,8 +966,12 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gboolean debug)
 #endif
 
     ensure_send_progress_dialog();
-    libbalsa_mailbox_open(outbox);
-    lista = outbox->message_list;
+    if (!libbalsa_mailbox_open(outbox)) {
+	sending_threads--;
+	send_unlock();
+	return FALSE;
+    }
+    lista = outbox->message_list; /* FIXME: breaks a non-libESMTP build? */
     if (!lista) {
 	libbalsa_mailbox_close(outbox);
 	sending_threads--;

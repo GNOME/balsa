@@ -6,111 +6,77 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2002-12-25 04:52+0100\n"
-"PO-Revision-Date: 2002-12-26 15:09+0200\n"
-"Last-Translator: Artis Trops <hornet@navigators.lv>\n"
+"POT-Creation-Date: 2002-12-27 04:56+0100\n"
+"PO-Revision-Date: 2002-12-27 23:24+0200\n"
+"Last-Translator: Artis Trops <hornet@navigator.lv>\n"
 "Language-Team: Latvian <ll10nt@os.lv>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: libbalsa/address-book-extern.c:220
-#, c-format
-msgid "Could not open external query address book %s while trying to parse output from: %s"
-msgstr "Nevarēju atvērt ārējā pieprasījuma adrešu grāmatiņu %s, mēģinot parsēt izvadi no: %s"
-
 #. The externq database doesn't support Id's, sorry!
-#: libbalsa/address-book-extern.c:243
-#: libbalsa/address-book-ldap.c:385
-#: libbalsa/address-book-ldif.c:271
-#: libbalsa/address-book-vcard.c:270
+#: libbalsa/address-book-extern.c:242
+#: libbalsa/address-book-ldap.c:382
+#: libbalsa/address-book-ldif.c:270
+#: libbalsa/address-book-vcard.c:272
 msgid "No-Id"
 msgstr "Nav-Id"
 
-#: libbalsa/address-book-extern.c:247
-#: libbalsa/address-book-ldap.c:389
-#: libbalsa/address-book-ldif.c:274
-#: libbalsa/address-book-ldif.c:548
-#: libbalsa/address-book-ldif.c:552
-#: libbalsa/address-book-vcard.c:288
+#: libbalsa/address-book-extern.c:246
+#: libbalsa/address-book-ldap.c:386
+#: libbalsa/address-book-ldif.c:273
+#: libbalsa/address-book-ldif.c:542
+#: libbalsa/address-book-ldif.c:546
+#: libbalsa/address-book-vcard.c:290
 msgid "No-Name"
 msgstr "Nav-Nosaukuma"
 
-#: libbalsa/address-book-extern.c:275
-#, c-format
-msgid "Could not add address to address book %s while trying to execute: %s"
-msgstr "Nevarēju pievienot adresi adrešu grāmatiņai %s,  mēģinot izpildīt: %s"
-
 #: libbalsa/address-book-ldap.c:215
-msgid ""
-"Failed to initialise LDAP server.\n"
+msgid "Failed to initialise LDAP server.\n"
 "Check that the servername is valid."
-msgstr ""
-"Nevarēju inicializēt LDAP serveri.\n"
+msgstr "Nevarēju inicializēt LDAP serveri.\n"
 "Pārbaudi, vai servera nosaukums ir derīgs."
 
 #: libbalsa/address-book-ldap.c:225
 #, c-format
-msgid ""
-"Failed to bind to server: %s\n"
+msgid "Failed to bind to server: %s\n"
 "Check that the servername is valid."
-msgstr ""
-"Neizdevās saistīties ar serveri: %s\n"
+msgstr "Neizdevās saistīties ar serveri: %s\n"
 "Pārbaudiet, vai servera nosaukums ir derīgs."
 
-#: libbalsa/address-book-ldap.c:274
-#: libbalsa/address-book-ldap.c:598
+#: libbalsa/address-book-ldap.c:595
 #, c-format
 msgid "Failed to do a search: %s.Check that the base name is valid."
 msgstr "Neizdevās izpildīt meklēšanu: %s.Pārbaudiet, vai bāzes vārds ir derīgs."
 
-#: libbalsa/address-book-ldif.c:225
-#, c-format
-msgid "Could not stat ldif address book: %s"
-msgstr "Nevarēju stat ldif adrešu grāmatiņu: %s"
-
-#: libbalsa/address-book-ldif.c:363
-#, c-format
-msgid "Could not open LDIF address book %s."
-msgstr "Nevarēju atvērt LDIF adrešu grāmatiņu %s."
-
-#: libbalsa/address-book-ldif.c:566
-#: libbalsa/address-book-vcard.c:426
-#, c-format
-msgid "%s is already in address book."
-msgstr "%s jau ir adrešu grāmatā."
-
-#: libbalsa/address-book-ldif.c:577
-#, c-format
-msgid ""
-"Cannot open LDIF address book %s for saving\n"
-""
-msgstr ""
-"Nevarēju atvērt LDIF adrešu grāmatiņu %s aglabāšanai\n"
-""
-
-#: libbalsa/address-book-vcard.c:189
-#, c-format
-msgid "Could not stat vcard address book: %s"
-msgstr "Nevarēju stat vcard adrešu grāmatiņu: %s"
-
-#: libbalsa/address-book-vcard.c:248
-#, c-format
-msgid "Could not open vCard address book %s."
-msgstr "Nevarēju atvērt vCard adrešu grāmatiņu %s."
-
-#: libbalsa/address-book-vcard.c:436
-#, c-format
-msgid ""
-"Cannot open vCard address book %s for saving\n"
-""
-msgstr ""
-"Nevarēju atvērt vCard adrešu grāmatiņu %s aglabāšanai\n"
-""
-
+#: libbalsa/address-book.c:329
 #: libbalsa/filter-error.c:45
 msgid "No error"
 msgstr "Nav kļūdu"
+
+#: libbalsa/address-book.c:330
+msgid "Cannot read from address book"
+msgstr "Nevaru nolasīt no adrešu grāmatiņas"
+
+#: libbalsa/address-book.c:331
+msgid "Cannot write to address book"
+msgstr "Nevaru ierakstīt adrešu grāmatiņā"
+
+#: libbalsa/address-book.c:332
+msgid "Cannot connect to server"
+msgstr "Nevaru pieslēgties serverim"
+
+#: libbalsa/address-book.c:333
+msgid "Cannot search in the address book"
+msgstr "Nevaru meklēt šajā adrešu grāmatiņā"
+
+#: libbalsa/address-book.c:335
+msgid "Cannot add duplicate entry"
+msgstr "Nevaru pievienot dublikāta ierakstu"
+
+#: libbalsa/address-book.c:336
+msgid "Unknown error"
+msgstr "Nezināma kļūda"
 
 #: libbalsa/filter-error.c:46
 msgid "Syntax error in the filter configuration file"
@@ -138,26 +104,26 @@ msgstr "Nederīgi filtri %s pastkastītei %s"
 msgid "Unable to load message body to match filter"
 msgstr "Nespēju ielādēt vēstules rumpi, lai atbilstu filtram"
 
-#: libbalsa/filter.c:354
+#: libbalsa/filter.c:424
 #, c-format
 msgid "Invalid filter : %s"
 msgstr "Nederīgs filtrs : %s"
 
-#: libbalsa/filter.c:436
-#: libbalsa/filter.c:455
+#: libbalsa/filter.c:506
+#: libbalsa/filter.c:525
 #, c-format
 msgid "Bad mailbox name for filter : %s"
 msgstr "Nepareizs pastkastītes nosaukums filtram : %s"
 
-#: libbalsa/filter.c:440
+#: libbalsa/filter.c:510
 msgid "Error when copying messages"
 msgstr "Kļūda kopējot vēstules"
 
-#: libbalsa/filter.c:448
+#: libbalsa/filter.c:518
 msgid "Error when trashing messages"
 msgstr "Kļūda dzēšot vēstules"
 
-#: libbalsa/filter.c:459
+#: libbalsa/filter.c:529
 msgid "Error when moving messages"
 msgstr "Klūda pārvietojot vēstules"
 
@@ -181,95 +147,88 @@ msgid "Fwd:"
 msgstr "Fwd:"
 
 #: libbalsa/identity.c:657
-msgid "Identity Name:"
-msgstr "Identitātes Nosaukums:"
+msgid "_Identity Name:"
+msgstr "_Identitātes Nosaukums:"
 
 #: libbalsa/identity.c:659
-msgid "Full Name:"
-msgstr "Pilns Vārds:"
+msgid "_Full Name:"
+msgstr "_Pilns Vārds:"
 
 #: libbalsa/identity.c:661
-msgid "Mailing Address:"
-msgstr "Pasta Adrese:"
+msgid "_Mailing Address:"
+msgstr "_Pasta sarakstes Adrese:"
 
+#. Reply To:
 #: libbalsa/identity.c:663
-msgid "Reply To:"
-msgstr "Atbildēt Uz:"
+#: src/sendmsg-window.c:1881
+msgid "_Reply To:"
+msgstr "_Atbildēt Uz:"
 
 #: libbalsa/identity.c:665
-msgid "Domain:"
-msgstr "Domēns:"
+msgid "_Domain:"
+msgstr "_Domēns:"
 
-#. bcc:
 #: libbalsa/identity.c:667
-#: src/balsa-message.c:787
-#: src/print.c:355
-#: src/sendmsg-window.c:1847
-#: src/store-address.c:275
-msgid "Bcc:"
-msgstr "Bcc:"
+msgid "_Bcc:"
+msgstr "_Bcc:"
 
 #: libbalsa/identity.c:669
-msgid "Reply String:"
-msgstr "Atbildes Virkne:"
+msgid "Reply _String:"
+msgstr "Atbildes _Virkne:"
 
 #: libbalsa/identity.c:671
-msgid "Forward String:"
-msgstr "Pāsūtes Virkne:"
+msgid "F_orward String:"
+msgstr "Pā_rsūtes Virkne:"
 
 #: libbalsa/identity.c:673
-msgid "Signature Path:"
-msgstr "Paraksta Ceļš:"
+msgid "Signature _Path:"
+msgstr "Paraksta _Ceļš:"
 
 #: libbalsa/identity.c:677
-msgid "Execute Signature"
-msgstr "Izpildīt  Parakstu"
+msgid "_Execute Signature"
+msgstr "_Izpildīt  Parakstu"
 
 #: libbalsa/identity.c:680
-msgid "Include Signature"
-msgstr "Iekļaut Parakstu"
+msgid "Incl_ude Signature"
+msgstr "Ie_kļaut Parakstu"
 
 #: libbalsa/identity.c:683
-msgid "Include Signature When Forwarding"
-msgstr "Iekļaut Parakstu Kad Pārsūta"
+msgid "Include Signature When For_warding"
+msgstr "Iekļaut Parakstu Kad Pārsū_ta"
 
 #: libbalsa/identity.c:686
-msgid "Include Signature When Replying"
-msgstr "Iekļaut Parakstu Kad Atbild"
+msgid "Include Signature When Rep_lying"
+msgstr "Iekļaut Parakstu Kad At_bild"
 
 #: libbalsa/identity.c:689
-msgid "Add Signature Separator"
-msgstr "Pievienot Paraksta Atdalītāju"
+msgid "_Add Signature Separator"
+msgstr "_Pievienot Paraksta Atdalītāju"
 
 #: libbalsa/identity.c:692
-msgid "Prepend Signature"
-msgstr "Pievienot Parakstu"
+msgid "Prepend Si_gnature"
+msgstr "Pievienot _Parakstu"
 
-#: libbalsa/identity.c:798
+#: libbalsa/identity.c:799
 msgid "Error: The identity does not have a name"
 msgstr "Kļūda: Identitātei nav nosaukuma"
 
-#: libbalsa/identity.c:815
+#: libbalsa/identity.c:816
 msgid "Error: An identity with that name already exists"
 msgstr "Kļūda: Identitāte ar šādu nosaukumu jau eksistē"
 
-#: libbalsa/identity.c:952
+#: libbalsa/identity.c:953
 msgid "Do you really want to delete the selected identity?"
 msgstr "Vai patiesi vēlaties dzēst izvēlēto identitāti?"
 
-#: libbalsa/identity.c:974
+#: libbalsa/identity.c:975
 #: src/address-book-config.c:535
 #: src/folder-conf.c:167
 #: src/folder-conf.c:419
 #, c-format
-msgid ""
-"Error displaying %s: %s\n"
-""
-msgstr ""
-"Kļūda parādot %s: %s\n"
-""
+msgid "Error displaying %s: %s\n"
+msgstr "Kļūda parādot %s: %s\n"
 
-#: libbalsa/identity.c:1022
+#: libbalsa/identity.c:1023
 msgid "Manage Identities"
 msgstr "Pārvaldīt Idenitātes"
 
@@ -284,22 +243,14 @@ msgid "LDAP Directory for %s"
 msgstr "LDAP Direktorija priekš %s"
 
 #: libbalsa/libbalsa.c:507
-msgid ""
-"<b>This certificate belongs to:</b>\n"
-""
-msgstr ""
-"<b>Šis sertifikāts pieder:</b>\n"
-""
+msgid "<b>This certificate belongs to:</b>\n"
+msgstr "<b>Šis sertifikāts pieder:</b>\n"
 
 #: libbalsa/libbalsa.c:515
-msgid ""
-"\n"
+msgid "\n"
 "<b>This certificate was issued by:</b>\n"
-""
-msgstr ""
-"\n"
+msgstr "\n"
 "<b>Šo sertifikātuir izsniedzis:</b>\n"
-""
 
 #: libbalsa/libbalsa.c:524
 #, c-format
@@ -334,22 +285,14 @@ msgstr "_Atraidīt"
 #: libbalsa/libbalsa_private.h:105
 #: libbalsa/libbalsa_private.h:117
 #, c-format
-msgid ""
-"*** ERROR: Mailbox Lock Exists: %s ***\n"
-""
-msgstr ""
-"*** KĻŪDA: Pastkastītes Slēdzis Eksistē: %s ***\n"
-""
+msgid "*** ERROR: Mailbox Lock Exists: %s ***\n"
+msgstr "*** KĻŪDA: Pastkastītes Slēdzis Eksistē: %s ***\n"
 
 #: libbalsa/libbalsa_private.h:135
 #: libbalsa/libbalsa_private.h:144
 #, c-format
-msgid ""
-"*** ERROR: Mailbox Stream Closed: %s ***\n"
-""
-msgstr ""
-"*** KĻŪDA: Pastkasstītes Datu Straume Aizvērta: %s ***\n"
-""
+msgid "*** ERROR: Mailbox Stream Closed: %s ***\n"
+msgstr "*** KĻŪDA: Pastkasstītes Datu Straume Aizvērta: %s ***\n"
 
 #: libbalsa/mailbox.c:374
 #, c-format
@@ -368,21 +311,13 @@ msgstr "Nevarēju izveidot pastkastīti ar tipu %s"
 
 #: libbalsa/mailbox_imap.c:653
 #, c-format
-msgid ""
-"LibBalsaMailboxImap: Opening %s Refcount: %d\n"
-""
-msgstr ""
-"LibBalsaMailboxImap: Atveru %s Refcount: %d\n"
-""
+msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
+msgstr "LibBalsaMailboxImap: Atveru %s Refcount: %d\n"
 
 #: libbalsa/mailbox_local.c:280
 #, c-format
-msgid ""
-"LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
-""
-msgstr ""
-"LibBalsaMailboxLocal: Atveru %s Refcount: %d\n"
-""
+msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
+msgstr "LibBalsaMailboxLocal: Atveru %s Refcount: %d\n"
 
 #: libbalsa/mailbox_maildir.c:115
 #, c-format
@@ -410,22 +345,18 @@ msgstr "%s atvēršana neizdevās. Kļnr = %d, "
 #: libbalsa/mailbox_maildir.c:229
 #: libbalsa/mailbox_mh.c:208
 #, c-format
-msgid ""
-"Could not remove contents of %s:\n"
+msgid "Could not remove contents of %s:\n"
 "%s"
-msgstr ""
-"Nevarēju izņemt %s saturu:\n"
+msgstr "Nevarēju izņemt %s saturu:\n"
 "%s"
 
 #: libbalsa/mailbox_maildir.c:235
 #: libbalsa/mailbox_mbox.c:178
 #: libbalsa/mailbox_mh.c:214
 #, c-format
-msgid ""
-"Could not remove %s:\n"
+msgid "Could not remove %s:\n"
 "%s"
-msgstr ""
-"Nevarēju izņemt %s:\n"
+msgstr "Nevarēju izņemt %s:\n"
 "%s"
 
 #: libbalsa/mailbox_mbox.c:113
@@ -450,68 +381,52 @@ msgstr "Nevarēju izveidot MH struktūru %s (%s)"
 
 #: libbalsa/mailbox_pop3.c:211
 #, c-format
-msgid ""
-"LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
-""
-msgstr ""
-"LibBalsaMailboxPop3: Atveru %s Refcount: %d\n"
-""
+msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
+msgstr "LibBalsaMailboxPop3: Atveru %s Refcount: %d\n"
 
 #: libbalsa/mailbox_pop3.c:266
 #, c-format
-msgid ""
-"POP3 mailbox %s temp file error:\n"
+msgid "POP3 mailbox %s temp file error:\n"
 "%s"
-msgstr ""
-"POP3 pastkastītes %s pagaidu faila kļūda:\n"
+msgstr "POP3 pastkastītes %s pagaidu faila kļūda:\n"
 "%s"
 
 #: libbalsa/mailbox_pop3.c:282
 #, c-format
-msgid ""
-"POP3 mailbox %s accessing error:\n"
+msgid "POP3 mailbox %s accessing error:\n"
 "%s"
-msgstr ""
-"POP3 pastkastītes %s piekļuves kļūda:\n"
+msgstr "POP3 pastkastītes %s piekļuves kļūda:\n"
 "%s"
 
 #: libbalsa/mailbox_pop3.c:304
 #, c-format
-msgid ""
-"POP3 mailbox %s temp mailbox error:\n"
-""
-msgstr ""
-"POP3 pastkastītes %s pagaidu pastkastītes kļūda:\n"
-""
+msgid "POP3 mailbox %s temp mailbox error:\n"
+msgstr "POP3 pastkastītes %s pagaidu pastkastītes kļūda:\n"
 
 #: libbalsa/mailbox_pop3.c:329
 #, c-format
-msgid ""
-"Error placing messages from %s on %s\n"
+msgid "Error placing messages from %s on %s\n"
 "Messages are left in %s\n"
-""
-msgstr ""
-"Kļūda pārvietojot vēstules no %s uz %s\n"
+msgstr "Kļūda pārvietojot vēstules no %s uz %s\n"
 "Vēstules palika %s\n"
-""
 
-#: libbalsa/message.c:458
+#: libbalsa/message.c:477
 #, c-format
 msgid "Source mailbox (%s) is readonly. Cannot move message"
 msgstr "Avota pastkastīte (%s) ir tikai lasāma. Nevaru pārvietot vēstuli"
 
-#: libbalsa/message.c:485
+#: libbalsa/message.c:504
 #, c-format
 msgid "Source mailbox (%s) is readonly. Cannot move messages"
 msgstr "Avota pastkastīte (%s) ir tikai lasāma. Nevaru pārvietot vēstules"
 
-#: libbalsa/message.c:494
-#: libbalsa/message.c:608
+#: libbalsa/message.c:513
+#: libbalsa/message.c:627
 #, c-format
 msgid "Couldn't open destination mailbox (%s) for writing"
 msgstr "Nevarēju atvērt mērķa pastkastīti (%s) rakstīšanai"
 
-#: libbalsa/message.c:547
+#: libbalsa/message.c:566
 #, c-format
 msgid "Couldn't open destination mailbox (%s) for copying"
 msgstr "Nevarēju atvērt mērķa pastkastīti (%s) kopēšanai"
@@ -577,11 +492,9 @@ msgid "Unable to open sentbox - could not get IMAP server information"
 msgstr "Nevarēu atvērt nosūtītās - nevarēju saņemt IMAP servera informāciju"
 
 #: libbalsa/send.c:772
-msgid ""
-"Message submission problem, placing it into your outbox.\n"
+msgid "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
-msgstr ""
-"Vēstules sūtīšanas problēma, novietoju to jūsu izsūtnē.\n"
+msgstr "Vēstules sūtīšanas problēma, novietoju to jūsu izsūtnē.\n"
 "Sistēma mēģinās vēstuli sūtīt atkārtoti līdz jūs to izdzēsīsiet."
 
 #: libbalsa/send.c:800
@@ -631,11 +544,9 @@ msgstr ""
 
 #: libbalsa/send.c:1039
 #, c-format
-msgid ""
-"SMTP server problem (%d): %s\n"
+msgid "SMTP server problem (%d): %s\n"
 "Message is left in outbox."
-msgstr ""
-"SMTP servera problēma (%d): %s\n"
+msgstr "SMTP servera problēma (%d): %s\n"
 "Vēstule atstāta izsūtnē."
 
 #: libbalsa/source-viewer.c:46
@@ -653,24 +564,24 @@ msgid "Message Source"
 msgstr "Vēstules Avots"
 
 #: libinit_balsa/balsa-druid-page-directory.c:38
-msgid "Inbox:"
-msgstr "Iesūtne:"
+msgid "_Inbox:"
+msgstr "_Iesūtne:"
 
 #: libinit_balsa/balsa-druid-page-directory.c:38
-msgid "Outbox:"
-msgstr "Izsūtne:"
+msgid "_Outbox:"
+msgstr "_Izsūtne:"
 
 #: libinit_balsa/balsa-druid-page-directory.c:38
-msgid "Sentbox:"
-msgstr "Nosūtītās:"
+msgid "_Sentbox:"
+msgstr "_Nosūtītās:"
 
 #: libinit_balsa/balsa-druid-page-directory.c:38
-msgid "Draftbox:"
-msgstr "Sagataves:"
+msgid "_Draftbox:"
+msgstr "_Sagataves:"
 
 #: libinit_balsa/balsa-druid-page-directory.c:39
-msgid "Trash:"
-msgstr "Miskaste:"
+msgid "_Trash:"
+msgstr "_Miskaste:"
 
 #: libinit_balsa/balsa-druid-page-directory.c:64
 #, c-format
@@ -698,11 +609,9 @@ msgid "The mailbox \"%s\" does not appear to be valid."
 msgstr "Pastkastīte \"%s\" neizskatās,  ka būtu derīga."
 
 #: libinit_balsa/balsa-druid-page-directory.c:181
-msgid ""
-"Please verify the locations of your default mail files.\n"
+msgid "Please verify the locations of your default mail files.\n"
 "These will be created if necessary."
-msgstr ""
-"Lūdzu pārbaudiet jūsu noklusēto pasta failu lokācijas.\n"
+msgstr "Lūdzu pārbaudiet jūsu noklusēto pasta failu lokācijas.\n"
 "Tās tiks izveidotas pēc vajadzības."
 
 #: libinit_balsa/balsa-druid-page-directory.c:242
@@ -711,19 +620,15 @@ msgstr "Pasta Faili"
 
 #: libinit_balsa/balsa-druid-page-directory.c:351
 #, c-format
-msgid ""
-"Problem Creating Mailboxes\n"
+msgid "Problem Creating Mailboxes\n"
 "%s"
-msgstr ""
-"Problēma Izveidojot Pastkastītes\n"
+msgstr "Problēma Izveidojot Pastkastītes\n"
 "%s"
 
 #: libinit_balsa/balsa-druid-page-finish.c:42
-msgid ""
-"You've successfully set up Balsa. Have fun!\n"
+msgid "You've successfully set up Balsa. Have fun!\n"
 "   -- The Balsa development team"
-msgstr ""
-"Jūs esat veiksmīgi uzstādījis Balsa. Gūstiet prieku!\n"
+msgstr "Jūs esat veiksmīgi uzstādījis Balsa. Gūstiet prieku!\n"
 "   -- Balsa izstrādes komanda"
 
 #: libinit_balsa/balsa-druid-page-finish.c:49
@@ -740,20 +645,20 @@ msgid "Please enter information about yourself."
 msgstr "Lūdzu ievadiet informāciju par sevi:"
 
 #: libinit_balsa/balsa-druid-page-user.c:74
-msgid "Name:"
-msgstr "Vārds:"
+msgid "_Name:"
+msgstr "_Vārds:"
 
 #: libinit_balsa/balsa-druid-page-user.c:79
-msgid "Email address:"
-msgstr "Epasta adrese:"
+msgid "_Email address:"
+msgstr "_Epasta adrese:"
 
 #: libinit_balsa/balsa-druid-page-user.c:84
-msgid "Local Mail Directory:"
-msgstr "Lokālā Pasta Direktorija:"
+msgid "_Local Mail Directory:"
+msgstr "_Lokālā Pasta Direktorija:"
 
 #: libinit_balsa/balsa-druid-page-user.c:91
-msgid "SMTP Server:"
-msgstr "SMTP Serveris:"
+msgid "_SMTP Server:"
+msgstr "_SMTP Serveris:"
 
 #: libinit_balsa/balsa-druid-page-user.c:113
 msgid "User Settings"
@@ -761,11 +666,9 @@ msgstr "Lietotāja Uzstādījumi"
 
 #: libinit_balsa/balsa-druid-page-user.c:197
 #, c-format
-msgid ""
-"Local Mail Problem\n"
+msgid "Local Mail Problem\n"
 "%s"
-msgstr ""
-"Lokālā Pasta Problēma\n"
+msgstr "Lokālā Pasta Problēma\n"
 "%s"
 
 #: libinit_balsa/balsa-druid-page-welcome.c:37
@@ -773,43 +676,35 @@ msgid "Welcome to Balsa!"
 msgstr "Laipni lūgti Balsa!"
 
 #: libinit_balsa/balsa-druid-page-welcome.c:40
-msgid ""
-"You seem to be running Balsa for the first time. The following steps will set up Balsa by asking a few simple questions. Once you have completed these steps, you can always change them later in Balsa's preferences. If any files or directories need to be created, it will be done so automatically.\n"
+msgid "You seem to be running Balsa for the first time. The following steps will set up Balsa by asking a few simple questions. Once you have completed these steps, you can always change them later in Balsa's preferences. If any files or directories need to be created, it will be done so automatically.\n"
 "  Please check the about box in Balsa's main window for more information about contacting the authors or reporting bugs."
-msgstr ""
-"Izskatās, ka jūs palaidāt Balsa pirmo reizi. Turpmākie soļi uzstādīs Balsa, vaicājot pāris vienkāršus jautājumus. Tiklīdz, kad šos soļus būsiet veicis, jūs vienmēr tos vēlāk varēsiet izmainīt Balsa preferencēs. Ja kādu failu vai direktoriju būs nepieciešams izveidot, tas tiks izdarīts automātiski.\n"
+msgstr "Izskatās, ka jūs palaidāt Balsa pirmo reizi. Turpmākie soļi uzstādīs Balsa, vaicājot pāris vienkāršus jautājumus. Tiklīdz, kad šos soļus būsiet veicis, jūs vienmēr tos vēlāk varēsiet izmainīt Balsa preferencēs. Ja kādu failu vai direktoriju būs nepieciešams izveidot, tas tiks izdarīts automātiski.\n"
 "  Lūdzu pārbaudiet par lodziņu Balsa's galvenajā logā papildus informācijai par to, kā kontaktēties ar autoriem vai paziņot par kļūdām."
 
 #: libinit_balsa/balsa-initdruid.c:83
-msgid ""
-"This will exit Balsa.\n"
+msgid "This will exit Balsa.\n"
 "Do you really want to do this?"
-msgstr ""
-"Šis aizvērs Balsa.\n"
+msgstr "Šis aizvērs Balsa.\n"
 "Vai patiesi vēlaties to darīt?"
 
 #: libinit_balsa/helper.c:76
 #, c-format
-msgid ""
-"Error loading %s: %s\n"
-""
-msgstr ""
-"Kļūda lādējot %s: %s\n"
-""
+msgid "Error loading %s: %s\n"
+msgstr "Kļūda lādējot %s: %s\n"
 
-#: libinit_balsa/helper.c:177
+#: libinit_balsa/helper.c:178
 #, c-format
 msgid "The path %s must be relative to the filesystem root (start with /)."
 msgstr "Ceļam %s jābūt reatīvam attiecībā pret failsistēmas sakni (jāsākas ar /)."
 
-#: libinit_balsa/helper.c:190
-#: libinit_balsa/helper.c:214
+#: libinit_balsa/helper.c:191
+#: libinit_balsa/helper.c:215
 #, c-format
 msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
 msgstr "Nevarēju izveidot direktoriju: mkdir() neizdevās ceļā \"%s\"."
 
-#: libinit_balsa/helper.c:200
-#: libinit_balsa/helper.c:223
+#: libinit_balsa/helper.c:201
+#: libinit_balsa/helper.c:224
 #, c-format
 msgid "The file with pathname \"%s\" is not a directory."
 msgstr "Fails ar ceļu \"%s\" nav direktorija."
@@ -819,12 +714,8 @@ msgid "Configure Balsa"
 msgstr "Konfigurēt Balsa"
 
 #: libmutt/handler.c:1333
-msgid ""
-"[-- Error:  Could not display any parts of Multipart/Alternative! --]\n"
-""
-msgstr ""
-"[-- Kļūda:  Nevarēju parādīt nevienu daļu no Vairākdaļu/Alternatīvas! --]\n"
-""
+msgid "[-- Error:  Could not display any parts of Multipart/Alternative! --]\n"
+msgstr "[-- Kļūda:  Nevarēju parādīt nevienu daļu no Vairākdaļu/Alternatīvas! --]\n"
 
 #: libmutt/handler.c:1453
 #, c-format
@@ -833,21 +724,13 @@ msgstr "[-- Piesaiste #%d"
 
 #: libmutt/handler.c:1464
 #, c-format
-msgid ""
-"[-- Type: %s/%s, Encoding: %s, Size: %s --]\n"
-""
-msgstr ""
-"[-- Tips: %s/%s, Kodējums: %s, Izmērs: %s --]\n"
-""
+msgid "[-- Type: %s/%s, Encoding: %s, Size: %s --]\n"
+msgstr "[-- Tips: %s/%s, Kodējums: %s, Izmērs: %s --]\n"
 
 #: libmutt/handler.c:1523
 #, c-format
-msgid ""
-"[-- Autoview using %s --]\n"
-""
-msgstr ""
-"[-- Autoskatīt lietojot %s --]\n"
-""
+msgid "[-- Autoview using %s --]\n"
+msgstr "[-- Autoskatīt lietojot %s --]\n"
 
 #: libmutt/handler.c:1524
 #, c-format
@@ -860,30 +743,18 @@ msgstr "Nevaru izveidot filtru"
 
 #: libmutt/handler.c:1554
 #, c-format
-msgid ""
-"[-- Can't run %s. --]\n"
-""
-msgstr ""
-"[-- Nevaru palaist %s. --]\n"
-""
+msgid "[-- Can't run %s. --]\n"
+msgstr "[-- Nevaru palaist %s. --]\n"
 
 #: libmutt/handler.c:1570
 #: libmutt/handler.c:1590
 #, c-format
-msgid ""
-"[-- Autoview stderr of %s --]\n"
-""
-msgstr ""
-"[-- Autoskatīt stderr no %s --]\n"
-""
+msgid "[-- Autoview stderr of %s --]\n"
+msgstr "[-- Autoskatīt stderr no %s --]\n"
 
 #: libmutt/handler.c:1632
-msgid ""
-"[-- Error: message/external-body has no access-type parameter --]\n"
-""
-msgstr ""
-"[-- Kļūda: vēstulei/ārējam-rumpim nav pieejas-tipa parametra --]\n"
-""
+msgid "[-- Error: message/external-body has no access-type parameter --]\n"
+msgstr "[-- Kļūda: vēstulei/ārējam-rumpim nav pieejas-tipa parametra --]\n"
 
 #: libmutt/handler.c:1651
 #, c-format
@@ -896,22 +767,14 @@ msgid "(size %s bytes) "
 msgstr "(izmērs %s baiti) "
 
 #: libmutt/handler.c:1660
-msgid ""
-"has been deleted --]\n"
-""
-msgstr ""
-"ir ticis izdzēsts --]\n"
-""
+msgid "has been deleted --]\n"
+msgstr "ir ticis izdzēsts --]\n"
 
 #: libmutt/handler.c:1665
 #: libmutt/handler.c:1670
 #, c-format
-msgid ""
-"[-- on %s --]\n"
-""
-msgstr ""
-"[-- uz %s --]\n"
-""
+msgid "[-- on %s --]\n"
+msgstr "[-- uz %s --]\n"
 
 #: libmutt/handler.c:1682
 #, c-format
@@ -919,30 +782,20 @@ msgid ""
 "[-- This %s/%s attachment is not included, --]\n"
 "[-- and the indicated external source has --]\n"
 "[-- expired. --]\n"
-""
 msgstr ""
 "[-- Šī %s/%s piesaiste nav iekļauta, --]\n"
 "[-- un norādītais ārējais avots ir --]\n"
 "[-- atmiris. --]\n"
-""
 
 #: libmutt/handler.c:1696
 #, c-format
-msgid ""
-"[-- This %s/%s attachment is not included, --]\n"
-""
-msgstr ""
-"[-- Šī %s/%s piesaiste nav iekļauta, --]\n"
-""
+msgid "[-- This %s/%s attachment is not included, --]\n"
+msgstr "[-- Šī %s/%s piesaiste nav iekļauta, --]\n"
 
 #: libmutt/handler.c:1700
 #, c-format
-msgid ""
-"[-- and the indicated access-type %s is unsupported --]\n"
-""
-msgstr ""
-"[-- un norādītais piekļuves-tips %s netiek atbalstīts --]\n"
-""
+msgid "[-- and the indicated access-type %s is unsupported --]\n"
+msgstr "[-- un norādītais piekļuves-tips %s netiek atbalstīts --]\n"
 
 #: libmutt/handler.c:1828
 msgid "Error: multipart/signed has no protocol."
@@ -1186,12 +1039,8 @@ msgstr "Turpināt?"
 
 #: libmutt/imap/util.c:245
 #, c-format
-msgid ""
-"%s [%s]\n"
-""
-msgstr ""
-"%s [%s]\n"
-""
+msgid "%s [%s]\n"
+msgstr "%s [%s]\n"
 
 #: libmutt/lib.c:59
 #: libmutt/lib.c:74
@@ -1309,12 +1158,8 @@ msgstr "Neizdevās atrast pietiekami daudz entropiju jūsu sistēmā"
 
 #: libmutt/mutt_ssl.c:194
 #, c-format
-msgid ""
-"Filling entropy pool: %s...\n"
-""
-msgstr ""
-"Aizpildu entropijas pūlu: %s...\n"
-""
+msgid "Filling entropy pool: %s...\n"
+msgstr "Aizpildu entropijas pūlu: %s...\n"
 
 #: libmutt/mutt_ssl.c:202
 #, c-format
@@ -1457,12 +1302,8 @@ msgstr "Lock skaits pārsniegts, noņemt lock priekš %s?"
 
 #: libmutt/mx.c:131
 #, c-format
-msgid ""
-"Can't dotlock %s.\n"
-""
-msgstr ""
-"Nevaru dotlock %s.\n"
-""
+msgid "Can't dotlock %s.\n"
+msgstr "Nevaru dotlock %s.\n"
 
 #: libmutt/mx.c:189
 msgid "Timeout exceeded while attempting fcntl lock!"
@@ -1490,12 +1331,8 @@ msgstr "%s nav pastkastīte."
 
 #: libmutt/mx.c:587
 #, c-format
-msgid ""
-"Couldn't lock %s\n"
-""
-msgstr ""
-"Nevarēju slēgt %s\n"
-""
+msgid "Couldn't lock %s\n"
+msgstr "Nevarēju slēgt %s\n"
 
 #: libmutt/mx.c:671
 #, c-format
@@ -1646,15 +1483,12 @@ msgstr "Balsa nav kompilēta ar LDAP atbalstu"
 
 #. mailbox name
 #: src/address-book-config.c:286
-#: src/address-book-config.c:331
-#: src/address-book-config.c:393
-#: src/address-book-config.c:453
-msgid "_Address Book Name"
-msgstr "_Adrešu Grāmatiņas Nosaukums"
+msgid "Address _Book Name"
+msgstr "Adrešu _Grāmatiņas Nosaukums"
 
 #: src/address-book-config.c:291
-msgid "File name"
-msgstr "Faila nosaukums"
+msgid "_File Name"
+msgstr "_Faila Nosaukums"
 
 #: src/address-book-config.c:298
 msgid "Select path for VCARD address book"
@@ -1666,6 +1500,13 @@ msgstr "Izvēlies ceļu priekš VCARD adrešu grāmatiņas"
 #: src/address-book-config.c:469
 msgid "_Expand aliases as you type"
 msgstr "_Paplašināt aizstājvārdus, kad jūs rakstāt"
+
+#. mailbox name
+#: src/address-book-config.c:331
+#: src/address-book-config.c:393
+#: src/address-book-config.c:453
+msgid "_Address Book Name"
+msgstr "_Adrešu Grāmatiņas Nosaukums"
 
 #: src/address-book-config.c:336
 msgid "Load program location"
@@ -1699,14 +1540,12 @@ msgstr "_Hostdatora Nosaukums"
 msgid "_Base Domain Name"
 msgstr "_Bāzes Domēna Vārds"
 
-#. FIXME : I saw a lot of different ways to create button with
-#. pixmaps, hope this one is correct
-#. Right/Add button
 #: src/address-book-config.c:553
-#: src/filter-edit-callbacks.c:842
-#: src/filter-run-dialog.c:312
-msgid "Add"
-msgstr "Pievienot"
+#: src/mailbox-conf.c:434
+#: src/pref-manager.c:1508
+#: src/pref-manager.c:2595
+msgid "_Add"
+msgstr "_Pievienot"
 
 #: src/address-book-config.c:632
 #, c-format
@@ -1732,7 +1571,8 @@ msgstr "Ceļš \"%s\" nav pareizs. %s"
 msgid "Do you want to correct the path?"
 msgstr "Vai vēlaties izlabot ceļu?"
 
-#: src/ab-window.c:164
+#: src/ab-main.c:134
+#: src/ab-window.c:165
 #: src/filter-edit-dialog.c:193
 #: src/filter-export-dialog.c:88
 #: src/filter-run-dialog.c:219
@@ -1740,51 +1580,61 @@ msgstr "Vai vēlaties izlabot ceļu?"
 msgid "Name"
 msgstr "Vārds"
 
-#: src/ab-window.c:172
+#: src/ab-main.c:142
+#: src/ab-window.c:173
 msgid "E-Mail Address"
 msgstr "E-Pasta Adrese"
 
-#: src/ab-window.c:205
+#: src/ab-main.c:275
+msgid "_Search for Name:"
+msgstr "_Mēklēt Vārdu:"
+
+#: src/ab-window.c:206
 msgid "Address Book"
 msgstr "Adrešu Grāmatiņa"
 
 #. Entry widget for finding an address
-#: src/ab-window.c:262
+#: src/ab-window.c:263
 msgid "Search for Name:"
 msgstr "Mēklēt Vārdu:"
 
-#: src/ab-window.c:321
+#: src/ab-window.c:322
 msgid "Send-To"
 msgstr "Sūtīt-Uz"
 
-#: src/ab-window.c:341
+#: src/ab-window.c:342
 msgid "Run GnomeCard"
 msgstr "Palaist Gnome-Cartd"
 
-#: src/ab-window.c:349
+#: src/ab-window.c:350
 msgid "Re-Import"
 msgstr "Pār-Importēt"
 
 #. mode switching stuff
-#: src/ab-window.c:359
+#: src/ab-window.c:360
 msgid "Treat multiple addresses as:"
 msgstr "Uzskatīt vairākas adreses kā:"
 
-#: src/ab-window.c:363
+#: src/ab-window.c:364
 msgid "alternative addresses for the same person"
 msgstr "alternatīvās adreses tai pašai personai"
 
-#: src/ab-window.c:368
+#: src/ab-window.c:369
 msgid "a distribution list"
 msgstr "izplatījumu saraksts"
 
+#: src/ab-window.c:669
+#, c-format
+msgid "Error opening address book '%s'\n"
+"%s"
+msgstr "Kļūda atvērot adrešu grāmatiņu '%s'\n"
+"%s"
+
 #: src/balsa-app.c:66
 #, c-format
-msgid ""
-"Opening remote mailbox %s.\n"
+msgid "Opening remote mailbox %s.\n"
 "The password for %s@%s:"
-msgstr ""
-"Atveru attālināto pastkastīti %s.\n"
+msgstr "Atveru attālināto pastkastīti %s.\n"
 "Parole priekš %s@%s:"
 
 #: src/balsa-app.c:71
@@ -1972,6 +1822,14 @@ msgstr "Kam:"
 msgid "Cc:"
 msgstr "Cc:"
 
+#. bcc:
+#: src/balsa-message.c:787
+#: src/print.c:355
+#: src/sendmsg-window.c:1847
+#: src/store-address.c:275
+msgid "Bcc:"
+msgstr "Bcc:"
+
 #: src/balsa-message.c:790
 #: src/print.c:356
 msgid "Fcc:"
@@ -1986,20 +1844,12 @@ msgstr "Rīcības-Paziņojums-Uz:"
 #: src/balsa-message.c:916
 #: src/balsa-message.c:946
 #: src/balsa-message.c:999
-msgid ""
-"Content Type: external-body\n"
-""
-msgstr ""
-"Satura Tips: ārējais-rumpis\n"
-""
+msgid "Content Type: external-body\n"
+msgstr "Satura Tips: ārējais-rumpis\n"
 
 #: src/balsa-message.c:901
-msgid ""
-"Access type: local-file\n"
-""
-msgstr ""
-"Piekļuves tips: lokāls-fails\n"
-""
+msgid "Access type: local-file\n"
+msgstr "Piekļuves tips: lokāls-fails\n"
 
 #: src/balsa-message.c:902
 #: src/balsa-message.c:953
@@ -2008,12 +1858,8 @@ msgid "File name: %s"
 msgstr "Faila nosaukums: %s"
 
 #: src/balsa-message.c:917
-msgid ""
-"Access type: URL\n"
-""
-msgstr ""
-"Piekļuves tips: URL\n"
-""
+msgid "Access type: URL\n"
+msgstr "Piekļuves tips: URL\n"
 
 #: src/balsa-message.c:918
 #, c-format
@@ -2022,57 +1868,33 @@ msgstr "URL: %s"
 
 #: src/balsa-message.c:947
 #, c-format
-msgid ""
-"Access type: %s\n"
-""
-msgstr ""
-"Piekļuves tips: %s\n"
-""
+msgid "Access type: %s\n"
+msgstr "Piekļuves tips: %s\n"
 
 #: src/balsa-message.c:950
 #, c-format
-msgid ""
-"FTP site: %s\n"
-""
-msgstr ""
-"FTP saite: %s\n"
-""
+msgid "FTP site: %s\n"
+msgstr "FTP saite: %s\n"
 
 #: src/balsa-message.c:952
 #, c-format
-msgid ""
-"Directory: %s\n"
-""
-msgstr ""
-"Direktorija: %s\n"
-""
+msgid "Directory: %s\n"
+msgstr "Direktorija: %s\n"
 
 #: src/balsa-message.c:1000
-msgid ""
-"Access type: mail-server\n"
-""
-msgstr ""
-"Piekļuves tips: pasta-serveris\n"
-""
+msgid "Access type: mail-server\n"
+msgstr "Piekļuves tips: pasta-serveris\n"
 
 #: src/balsa-message.c:1001
 #, c-format
-msgid ""
-"Mail server: %s\n"
-""
-msgstr ""
-"Pasta serveris: %s\n"
-""
+msgid "Mail server: %s\n"
+msgstr "Pasta serveris: %s\n"
 
 #: src/balsa-message.c:1003
 #: src/sendmsg-window.c:2133
 #, c-format
-msgid ""
-"Subject: %s\n"
-""
-msgstr ""
-"Temats: %s\n"
-""
+msgid "Subject: %s\n"
+msgstr "Temats: %s\n"
 
 #: src/balsa-message.c:1014
 msgid "Send message to obtain this part"
@@ -2116,20 +1938,14 @@ msgstr "Izsaucu URL %s..."
 #: src/balsa-message.c:2069
 #: src/balsa-message.c:2581
 #, c-format
-msgid ""
-"Error showing %s: %s\n"
-""
-msgstr ""
-"Kļūda parādot %s: %s\n"
-""
+msgid "Error showing %s: %s\n"
+msgstr "Kļūda parādot %s: %s\n"
 
 #: src/balsa-message.c:1590
 #, c-format
-msgid ""
-"Error writing to temporary file %s.\n"
+msgid "Error writing to temporary file %s.\n"
 "Check the directory permissions."
-msgstr ""
-"Kļūda rakstot pagaidu failu %s.\n"
+msgstr "Kļūda rakstot pagaidu failu %s.\n"
 "Pārbaudiet direktorijas atļaujas."
 
 #: src/balsa-message.c:1598
@@ -2247,6 +2063,14 @@ msgstr "Karogoto"
 #: src/filter-edit-callbacks.c:801
 msgid "Contain/Does not contain"
 msgstr "Satur/Nesatur"
+
+#. FIXME : I saw a lot of different ways to create button with
+#. pixmaps, hope this one is correct
+#. Right/Add button
+#: src/filter-edit-callbacks.c:842
+#: src/filter-run-dialog.c:312
+msgid "Add"
+msgstr "Pievienot"
 
 #. Left/Remove button
 #: src/filter-edit-callbacks.c:846
@@ -2460,11 +2284,9 @@ msgstr "Kļūda pielietojot filtrus"
 
 #: src/filter-run-callbacks.c:194
 #, c-format
-msgid ""
-"The destination mailbox of the filter \"%s\" is \"%s\"\n"
+msgid "The destination mailbox of the filter \"%s\" is \"%s\"\n"
 "You can't associate it with the same mailbox (that causes recursion)."
-msgstr ""
-"Turpmākā pastkastīte filtram \"%s\" ir \"%s\"\n"
+msgstr "Turpmākā pastkastīte filtram \"%s\" ir \"%s\"\n"
 "Jūs nevarat asociēt to ar to pašu pastkastīti (tas izraisa rekursiju)."
 
 #: src/filter-run-dialog.c:187
@@ -2589,11 +2411,9 @@ msgid "Cancel"
 msgstr "Atsaukt"
 
 #: src/folder-conf.c:537
-msgid ""
-"An IMAP folder that is not a mailbox\n"
+msgid "An IMAP folder that is not a mailbox\n"
 "has no properties that can be changed."
-msgstr ""
-"IMAP mape, kas nav pastkastīte\n"
+msgstr "IMAP mape, kas nav pastkastīte\n"
 "nav rekvizītu, kas var tikt mainīti."
 
 #: src/folder-conf.c:561
@@ -2627,14 +2447,10 @@ msgstr "Šī mape nav noglabāta konfigurācijā. Es vēl nezinu, kā to izņemt
 
 #: src/folder-conf.c:631
 #, c-format
-msgid ""
-"This will remove the folder \"%s\" from the list.\n"
+msgid "This will remove the folder \"%s\" from the list.\n"
 "You may use \"New IMAP Folder\" later to add this folder again.\n"
-""
-msgstr ""
-"Šis izņems mapi \"%s\" no saraksta.\n"
+msgstr "Šis izņems mapi \"%s\" no saraksta.\n"
 "Jūs vēlāk variet lietot \"Jauna IMAP Mape\", lai pievienotu šo mapi atkal.\n"
-""
 
 #: src/folder-conf.c:636
 msgid "Confirm"
@@ -2727,22 +2543,12 @@ msgid "_Remove from list"
 msgstr "_Izņemt no saraksta"
 
 #: src/mailbox-conf.c:343
-msgid ""
-"Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
-""
-msgstr ""
-"Aaaaa! pastkastīte nav atrasta  balsa_app.mailbox mezglos?\n"
-""
+msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
+msgstr "Aaaaa! pastkastīte nav atrasta  balsa_app.mailbox mezglos?\n"
 
 #: src/mailbox-conf.c:396
 msgid "Mailbox Configurator"
 msgstr "Pastkastītes Konfigurātors"
-
-#: src/mailbox-conf.c:434
-#: src/pref-manager.c:1508
-#: src/pref-manager.c:2595
-msgid "_Add"
-msgstr "_Pievienot"
 
 #: src/mailbox-conf.c:593
 #, c-format
@@ -2751,11 +2557,9 @@ msgstr "%s uz %s"
 
 #: src/mailbox-conf.c:705
 #, c-format
-msgid ""
-"Rename of %s to %s failed:\n"
+msgid "Rename of %s to %s failed:\n"
 "%s"
-msgstr ""
-"Pārsaukšana %s par %s neizdevās:\n"
+msgstr "Pārsaukšana %s par %s neizdevās:\n"
 "%s"
 
 #. mailbox name
@@ -2906,21 +2710,13 @@ msgstr "_Rediģēt/Pielietot filtrus"
 
 #: src/mailbox-node.c:897
 #, c-format
-msgid ""
-"Local mailbox %s loaded as: %s\n"
-""
-msgstr ""
-"Lokālā pastkastīte %s ielādēta kā: %s\n"
-""
+msgid "Local mailbox %s loaded as: %s\n"
+msgstr "Lokālā pastkastīte %s ielādēta kā: %s\n"
 
 #: src/mailbox-node.c:929
 #, c-format
-msgid ""
-"Local folder %s\n"
-""
-msgstr ""
-"Lokālā mape %s\n"
-""
+msgid "Local folder %s\n"
+msgstr "Lokālā mape %s\n"
 
 #: src/main-window.c:241
 msgid "_Message..."
@@ -3353,19 +3149,15 @@ msgid "Mail_box"
 msgstr "Past_kaste"
 
 #: src/main-window.c:743
-msgid ""
-"Balsa is sending a mail now.\n"
+msgid "Balsa is sending a mail now.\n"
 "Abort sending?"
-msgstr ""
-"Balsa pašlaik sūta pastu.\n"
+msgstr "Balsa pašlaik sūta pastu.\n"
 "Pārtraukt sūtīšanu?"
 
 #: src/main-window.c:1370
-msgid ""
-"Unable to Open Mailbox!\n"
+msgid "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
-msgstr ""
-"Nevarēju Atvērt Pastkastīti!\n"
+msgstr "Nevarēju Atvērt Pastkastīti!\n"
 "Lūdzu pārbaudiet pastkastītes uzstādījumus."
 
 #: src/main-window.c:1643
@@ -3448,12 +3240,8 @@ msgid "_Cc:"
 msgstr "_Cc:"
 
 #: src/main-window.c:2811
-msgid ""
-"You can apply filters only on mailbox\n"
-""
-msgstr ""
-"Jūs varat pielietot filtrus tikai pastkastītēm\n"
-""
+msgid "You can apply filters only on mailbox\n"
+msgstr "Jūs varat pielietot filtrus tikai pastkastītēm\n"
 
 #: src/main-window.c:2846
 #: src/main-window.c:2865
@@ -3472,12 +3260,8 @@ msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
 #: src/main-window.c:3151
-msgid ""
-"Cannot access the message's body\n"
-""
-msgstr ""
-"Nevaru piekļūt vēstules rumpim\n"
-""
+msgid "Cannot access the message's body\n"
+msgstr "Nevaru piekļūt vēstules rumpim\n"
 
 #: src/main.c:115
 msgid "Get new mail on startup"
@@ -3775,11 +3559,9 @@ msgid "Message Disposition Notification Requests"
 msgstr "Vēstules Rīcības Paziņošanas Pieprasījumi"
 
 #: src/pref-manager.c:1733
-msgid ""
-"When I receive a message and its sender requested to return a\n"
+msgid "When I receive a message and its sender requested to return a\n"
 "Message Disposition Notification (MDN), send it in the following cases:"
-msgstr ""
-"Kad es saņemu vēstuli un tās sūtītājs pieprasīja atgriezt\n"
+msgstr "Kad es saņemu vēstuli un tās sūtītājs pieprasīja atgriezt\n"
 "Vēstules Izvietojuma Paziņojumu (MDN), sūtīt to sekojošajos gadījumos:"
 
 #: src/pref-manager.c:1744
@@ -4083,11 +3865,9 @@ msgid "IMAP Folder Scanning"
 msgstr "IMAP Mapes Skanēšana"
 
 #: src/pref-manager.c:2501
-msgid ""
-"Choose depth 1 for fast startup; this defers scanning some folders.\n"
+msgid "Choose depth 1 for fast startup; this defers scanning some folders.\n"
 "To see more of the tree at startup, choose a greater depth."
-msgstr ""
-"Izvēlaties dziļumu 1 ātrai sāknēšanai; šis novilcina dažu mapju sāknēšanu.\n"
+msgstr "Izvēlaties dziļumu 1 ātrai sāknēšanai; šis novilcina dažu mapju sāknēšanu.\n"
 "Lai reedzētu vairāk no koka pie sāknēšanas, izvēlaties lielāku dziļumu."
 
 #: src/pref-manager.c:2512
@@ -4144,12 +3924,8 @@ msgstr "Nepieciešams"
 
 #: src/pref-manager.c:2991
 #, c-format
-msgid ""
-"Error displaying link_id %s: %s\n"
-""
-msgstr ""
-"Kļūda parādot link_id %s: %s\n"
-""
+msgid "Error displaying link_id %s: %s\n"
+msgstr "Kļūda parādot link_id %s: %s\n"
 
 #: src/print.c:245
 #, c-format
@@ -4189,11 +3965,9 @@ msgstr "Izgaismot citēto tekstu"
 
 #: src/print.c:1268
 #, c-format
-msgid ""
-"Balsa could not find font \"%s\".\n"
+msgid "Balsa could not find font \"%s\".\n"
 "Use the \"Fonts\" page on the \"Print message\" dialog to change it."
-msgstr ""
-"Balsa nevarēja atrast fontu \"%s\".\n"
+msgstr "Balsa nevarēja atrast fontu \"%s\".\n"
 "Lietojiet \"Fonti\" lapu \"Drukāt vēstui\" dialogā, lai mainītu to."
 
 #: src/print.c:1367
@@ -4206,11 +3980,9 @@ msgstr "Kļūda ielādējot filtrus : "
 
 #: src/save-restore.c:555
 #, c-format
-msgid ""
-"Error during filters loading : %s\n"
+msgid "Error during filters loading : %s\n"
 "%s"
-msgstr ""
-"Kļūda ielādējot filtrus : %s\n"
+msgstr "Kļūda ielādējot filtrus : %s\n"
 "%s"
 
 #: src/save-restore.c:557
@@ -4544,11 +4316,9 @@ msgstr "_Opcijas"
 
 #: src/sendmsg-window.c:590
 #, c-format
-msgid ""
-"The message to '%s' is modified.\n"
+msgid "The message to '%s' is modified.\n"
 "Save message to Draftbox?"
-msgstr ""
-"Vēstule, ko '%s' ir modificēta.\n"
+msgstr "Vēstule, ko '%s' ir modificēta.\n"
 "Saglabāt vēstuli Sagatavēs?"
 
 #: src/sendmsg-window.c:859
@@ -4590,12 +4360,8 @@ msgstr "Piesaiste %s nav parasts fails."
 
 #: src/sendmsg-window.c:1441
 #, c-format
-msgid ""
-"File %s cannot be read\n"
-""
-msgstr ""
-"Fails %s nevar tikt nolasīts\n"
-""
+msgid "File %s cannot be read\n"
+msgstr "Fails %s nevar tikt nolasīts\n"
 
 #: src/sendmsg-window.c:1495
 msgid "Attach file"
@@ -4604,11 +4370,9 @@ msgstr "Piesaistīt failu"
 #: src/sendmsg-window.c:1589
 #: src/sendmsg-window.c:1626
 #: src/sendmsg-window.c:2731
-msgid ""
-"Attaching message failed.\n"
+msgid "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
-msgstr ""
-"Piesaistišana ziņai neizdevās.\n"
+msgstr "Piesaistišana ziņai neizdevās.\n"
 "Iespējamais iemesls: nepietiek pagaidu vietas"
 
 #. From:
@@ -4625,11 +4389,6 @@ msgstr "T_emats:"
 #: src/sendmsg-window.c:1852
 msgid "F_cc:"
 msgstr "F_cc:"
-
-#. Reply To:
-#: src/sendmsg-window.c:1881
-msgid "_Reply To:"
-msgstr "_Atbildēt Uz:"
 
 #. Attachment list
 #: src/sendmsg-window.c:1888
@@ -4652,57 +4411,33 @@ msgstr "tu"
 
 #: src/sendmsg-window.c:2120
 #, c-format
-msgid ""
-"------forwarded message from %s------\n"
-""
-msgstr ""
-"------pārsūtīta vēstule no %s------\n"
-""
+msgid "------forwarded message from %s------\n"
+msgstr "------pārsūtīta vēstule no %s------\n"
 
 #: src/sendmsg-window.c:2126
 #, c-format
-msgid ""
-"Date: %s\n"
-""
-msgstr ""
-"Datums: %s\n"
-""
+msgid "Date: %s\n"
+msgstr "Datums: %s\n"
 
 #: src/sendmsg-window.c:2140
 #, c-format
-msgid ""
-"From: %s\n"
-""
-msgstr ""
-"No: %s\n"
-""
+msgid "From: %s\n"
+msgstr "No: %s\n"
 
 #: src/sendmsg-window.c:2148
 #, c-format
-msgid ""
-"To: %s\n"
-""
-msgstr ""
-"To: %s\n"
-""
+msgid "To: %s\n"
+msgstr "To: %s\n"
 
 #: src/sendmsg-window.c:2156
 #, c-format
-msgid ""
-"CC: %s\n"
-""
-msgstr ""
-"CC: %s\n"
-""
+msgid "CC: %s\n"
+msgstr "CC: %s\n"
 
 #: src/sendmsg-window.c:2162
 #, c-format
-msgid ""
-"Message-ID: %s\n"
-""
-msgstr ""
-"Vēstules-ID: %s\n"
-""
+msgid "Message-ID: %s\n"
+msgstr "Vēstules-ID: %s\n"
 
 #: src/sendmsg-window.c:2169
 #, c-format
@@ -4711,30 +4446,18 @@ msgstr "Atsauces: %s"
 
 #: src/sendmsg-window.c:2186
 #, c-format
-msgid ""
-"On %s %s wrote:\n"
-""
-msgstr ""
-"%s %s rakstīja:\n"
-""
+msgid "On %s %s wrote:\n"
+msgstr "%s %s rakstīja:\n"
 
 #: src/sendmsg-window.c:2188
 #, c-format
-msgid ""
-"%s wrote:\n"
-""
-msgstr ""
-"%s rakstīja:\n"
-""
+msgid "%s wrote:\n"
+msgstr "%s rakstīja:\n"
 
 #: src/sendmsg-window.c:2883
 #, c-format
-msgid ""
-"Could not open the file %s.\n"
-""
-msgstr ""
-"Nevarēju atvērt failu %s.\n"
-""
+msgid "Could not open the file %s.\n"
+msgstr "Nevarēju atvērt failu %s.\n"
 
 #: src/sendmsg-window.c:2888
 msgid "Loading..."
@@ -4818,12 +4541,8 @@ msgid "No address book selected...."
 msgstr "Neviena adrešu grāmatiņa nav izvēlēta..."
 
 #: src/store-address.c:160
-msgid ""
-"Sorry, no semicolons are allowed in the name!\n"
-""
-msgstr ""
-"Atvainojiet, semikoli vārdos nav atļauti!\n"
-""
+msgid "Sorry, no semicolons are allowed in the name!\n"
+msgstr "Atvainojiet, semikoli vārdos nav atļauti!\n"
 
 #: src/store-address.c:216
 msgid "Choose Address Book"
@@ -4890,11 +4609,9 @@ msgid "Reply"
 msgstr "Atbildēt"
 
 #: src/toolbar-factory.c:100
-msgid ""
-"Reply\n"
+msgid "Reply\n"
 "to all"
-msgstr ""
-"Atbildēt\n"
+msgstr "Atbildēt\n"
 "visiem"
 
 #: src/toolbar-factory.c:101
@@ -4902,11 +4619,9 @@ msgid "Reply to all recipients"
 msgstr "Atbildēt visiem saņēmējiem"
 
 #: src/toolbar-factory.c:102
-msgid ""
-"Reply\n"
+msgid "Reply\n"
 "to group"
-msgstr ""
-"Atbildēt\n"
+msgstr "Atbildēt\n"
 "groupai"
 
 #: src/toolbar-factory.c:104
@@ -4934,11 +4649,9 @@ msgid "Open next"
 msgstr "Atvēt nākamo"
 
 #: src/toolbar-factory.c:110
-msgid ""
-"Next\n"
+msgid "Next\n"
 "unread"
-msgstr ""
-"Nākamā\n"
+msgstr "Nākamā\n"
 "nelasītā"
 
 #: src/toolbar-factory.c:111
@@ -4946,11 +4659,9 @@ msgid "Open next unread message"
 msgstr "Atvērt nākamo nelasīto vēstuli"
 
 #: src/toolbar-factory.c:112
-msgid ""
-"Next\n"
+msgid "Next\n"
 "flagged"
-msgstr ""
-"Nākamā\n"
+msgstr "Nākamā\n"
 "karogotā"
 
 #: src/toolbar-factory.c:113
@@ -4958,11 +4669,9 @@ msgid "Open next flagged message"
 msgstr "Atvērt nākamo karogoto vēstuli"
 
 #: src/toolbar-factory.c:114
-msgid ""
-"Trash /\n"
+msgid "Trash /\n"
 "Delete"
-msgstr ""
-"Mistkaste /\n"
+msgstr "Mistkaste /\n"
 "Dzēst"
 
 #: src/toolbar-factory.c:115
@@ -5022,11 +4731,9 @@ msgid "Cancel this message"
 msgstr "Atsaukt šo vēstuli"
 
 #: src/toolbar-factory.c:134
-msgid ""
-"Toggle\n"
+msgid "Toggle\n"
 "new"
-msgstr ""
-"Slēgt\n"
+msgstr "Slēgt\n"
 "jaunas"
 
 #: src/toolbar-factory.c:135
@@ -5042,11 +4749,9 @@ msgid "Mark all messages in current mailbox"
 msgstr "Marķēt visas vēstules pašreizējā pastkastītē"
 
 #: src/toolbar-factory.c:138
-msgid ""
-"All\n"
+msgid "All\n"
 "headers"
-msgstr ""
-"Visasl\n"
+msgstr "Visasl\n"
 "galvenes"
 
 #: src/toolbar-factory.c:139
@@ -5108,12 +4813,8 @@ msgstr "_Apauzt pogu nosaukumus"
 
 #: src/toolbar-prefs.c:376
 #, c-format
-msgid ""
-"Error displaying toolbar help: %s\n"
-""
-msgstr ""
-"Kļūda parādot rīkjoslas plalīdzību: %s\n"
-""
+msgid "Error displaying toolbar help: %s\n"
+msgstr "Kļūda parādot rīkjoslas plalīdzību: %s\n"
 
 #. Preview display
 #: src/toolbar-prefs.c:410

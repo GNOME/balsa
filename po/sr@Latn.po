@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-02-12 05:17+0100\n"
-"PO-Revision-Date: 2004-02-12 05:20+0100\n"
+"POT-Creation-Date: 2004-02-25 17:52+0100\n"
+"PO-Revision-Date: 2004-02-25 17:53+0100\n"
 "Last-Translator: Strahinja Radić <mr99164@alas.matf.bg.ac.yu>\n"
 "Language-Team: Serbian (sr) <serbiangnome-lista@nongnu.org>\n"
 "MIME-Version: 1.0\n"
@@ -463,7 +463,7 @@ msgstr "Nisam mogao da otvorim odredišno sanduče (%s) za upis"
 msgid "Couldn't open destination mailbox (%s) for copying"
 msgstr "Nisam mogao da otvorim odredišno sanduče (%s) za kopiranje"
 
-#: libbalsa/mime.c:107 libbalsa/rfc3156.c:63
+#: libbalsa/mime.c:107 libbalsa/rfc3156.c:67
 msgid ""
 "\n"
 "--\n"
@@ -519,17 +519,17 @@ msgstr "Preuzimam poruku %d od %d"
 msgid "Received %d bytes of %d"
 msgstr "Primljeno %d bajtova od %d"
 
-#: libbalsa/rfc3156.c:153
+#: libbalsa/rfc3156.c:158
 #, c-format
 msgid "Gpgme has been compiled without support for protocol %s."
 msgstr "Gpgme je izgrađen bez podrške za protokol %s."
 
-#: libbalsa/rfc3156.c:157
+#: libbalsa/rfc3156.c:162
 #, c-format
 msgid "Crypto engine %s is not installed properly."
 msgstr "Mehanizam za šifrovanje %s nije ispravno instaliran."
 
-#: libbalsa/rfc3156.c:161
+#: libbalsa/rfc3156.c:166
 #, c-format
 msgid ""
 "Crypto engine %s version %s is installed, but at least version %s is "
@@ -538,17 +538,17 @@ msgstr ""
 "Instalirano je izdanje %2$s mehanizma za šifrovanje %1$s, ali je neophodno bar "
 "izdanje %3$s."
 
-#: libbalsa/rfc3156.c:165
+#: libbalsa/rfc3156.c:170
 #, c-format
 msgid "Unknown problem with engine for protocol %s."
 msgstr "Nepoznat problem sa mehanizmom za protokol %s."
 
-#: libbalsa/rfc3156.c:169
+#: libbalsa/rfc3156.c:174
 #, c-format
 msgid "%s: could not retreive crypto engine information: %s."
 msgstr "%s: nisam mogao da dobavim podatke o mehanizmu šifrovanja: %s"
 
-#: libbalsa/rfc3156.c:172
+#: libbalsa/rfc3156.c:177
 #, c-format
 msgid ""
 "\n"
@@ -557,26 +557,28 @@ msgstr ""
 "\n"
 "Isključi podršku za protokol %s."
 
-#: libbalsa/rfc3156.c:219
+#: libbalsa/rfc3156.c:224
 msgid "PGP Signature: "
 msgstr "PGP potpis: "
 
-#: libbalsa/rfc3156.c:222
+#: libbalsa/rfc3156.c:227
 msgid "S/MIME Signature: "
 msgstr "S/MIME potpis:"
 
-#: libbalsa/rfc3156.c:225
+#: libbalsa/rfc3156.c:230
 msgid "(unknown protocol) "
 msgstr "(nepoznat protokol)"
 
-#: libbalsa/rfc3156.c:230
+#: libbalsa/rfc3156.c:235
 #, c-format
 msgid ""
 "\n"
 "User ID: %s"
-msgstr "\nIB korisnika: %s"
+msgstr ""
+"\n"
+"IB korisnika: %s"
 
-#: libbalsa/rfc3156.c:232
+#: libbalsa/rfc3156.c:237
 #, c-format
 msgid ""
 "\n"
@@ -585,14 +587,16 @@ msgstr ""
 "\n"
 "Potpisao: %s"
 
-#: libbalsa/rfc3156.c:236
+#: libbalsa/rfc3156.c:241
 #, c-format
 msgid ""
 "\n"
 "Mail address: %s"
-msgstr "\nPoštanska adresa: %s"
+msgstr ""
+"\n"
+"Poštanska adresa: %s"
 
-#: libbalsa/rfc3156.c:242
+#: libbalsa/rfc3156.c:247
 #, c-format
 msgid ""
 "\n"
@@ -601,7 +605,7 @@ msgstr ""
 "\n"
 "Datum potpisivanja: %s"
 
-#: libbalsa/rfc3156.c:244
+#: libbalsa/rfc3156.c:249
 #, c-format
 msgid ""
 "\n"
@@ -610,7 +614,7 @@ msgstr ""
 "\n"
 "Ispravnost: %s"
 
-#: libbalsa/rfc3156.c:247
+#: libbalsa/rfc3156.c:252
 #, c-format
 msgid ""
 "\n"
@@ -619,7 +623,7 @@ msgstr ""
 "\n"
 "Poverenje u vlasnika: %s"
 
-#: libbalsa/rfc3156.c:250
+#: libbalsa/rfc3156.c:255
 #, c-format
 msgid ""
 "\n"
@@ -628,7 +632,7 @@ msgstr ""
 "\n"
 "Otisak ključa: %s"
 
-#: libbalsa/rfc3156.c:255
+#: libbalsa/rfc3156.c:260
 #, c-format
 msgid ""
 "\n"
@@ -637,168 +641,177 @@ msgstr ""
 "\n"
 "Datum stvaranja ključa: %s"
 
-#: libbalsa/rfc3156.c:258
+#: libbalsa/rfc3156.c:263
 #, c-format
 msgid ""
 "\n"
 "Issuer name: %s"
-msgstr "\nIzdavač: %s"
+msgstr ""
+"\n"
+"Izdavač: %s"
 
-#: libbalsa/rfc3156.c:261
+#: libbalsa/rfc3156.c:266
 #, c-format
 msgid ""
 "\n"
 "Issuer serial number: %s"
-msgstr "\nSerijski broj izdavača: %s"
+msgstr ""
+"\n"
+"Serijski broj izdavača: %s"
 
-#: libbalsa/rfc3156.c:264
+#: libbalsa/rfc3156.c:269
 #, c-format
 msgid ""
 "\n"
 "Chain ID: %s"
-msgstr "\nIB lanca: %s"
+msgstr ""
+"\n"
+"IB lanca: %s"
 
-#: libbalsa/rfc3156.c:392 libbalsa/rfc3156.c:633 libbalsa/rfc3156.c:909
-#: libbalsa/rfc3156.c:1014 libbalsa/rfc3156.c:1135 libbalsa/rfc3156.c:1254
-#: libbalsa/rfc3156.c:2447 libbalsa/rfc3156.c:2545
+#: libbalsa/rfc3156.c:402 libbalsa/rfc3156.c:655 libbalsa/rfc3156.c:941
+#: libbalsa/rfc3156.c:1050 libbalsa/rfc3156.c:1175 libbalsa/rfc3156.c:1298
+#: libbalsa/rfc3156.c:2491 libbalsa/rfc3156.c:2589
 #, c-format
 msgid "%s: could not create context: %s"
 msgstr "%s: nisam mogao da stvorim kontekst: %s"
 
-#: libbalsa/rfc3156.c:417 libbalsa/rfc3156.c:436 libbalsa/rfc3156.c:652
+#: libbalsa/rfc3156.c:427 libbalsa/rfc3156.c:446 libbalsa/rfc3156.c:674
 #, c-format
 msgid "%s: could not get data from mailbox file: %s"
 msgstr "%s: nisam mogao da dobavim podatke iz datoteke sandučeta: %s"
 
-#: libbalsa/rfc3156.c:449 libbalsa/rfc3156.c:1055
+#: libbalsa/rfc3156.c:459 libbalsa/rfc3156.c:1091
 #, c-format
 msgid "%s: signature verification failed: %s"
 msgstr "%s: provera potpisa nije uspela: %s"
 
-#: libbalsa/rfc3156.c:643
+#: libbalsa/rfc3156.c:665
 msgid "Enter passphrase to decrypt message"
 msgstr "Unesite lozinku za dešifrovanje poruke"
 
-#: libbalsa/rfc3156.c:662 libbalsa/rfc3156.c:942 libbalsa/rfc3156.c:1045
-#: libbalsa/rfc3156.c:1179 libbalsa/rfc3156.c:1276
+#: libbalsa/rfc3156.c:684 libbalsa/rfc3156.c:974 libbalsa/rfc3156.c:1081
+#: libbalsa/rfc3156.c:1219 libbalsa/rfc3156.c:1320
 #, c-format
 msgid "%s: could not create new data object: %s"
 msgstr "%s: nisam mogao da stvorim novi objekat podataka: %s"
 
-#: libbalsa/rfc3156.c:674
+#: libbalsa/rfc3156.c:696
 #, c-format
 msgid "%s: decryption failed: %s"
 msgstr "%s: nije uspelo dešifrovanje: %s"
 
-#: libbalsa/rfc3156.c:688
+#: libbalsa/rfc3156.c:710
 #, c-format
 msgid "%s: could not get decrypted data: %s"
 msgstr "%s: nisam uspeo da dobavim dešifrovane podatke: %s"
 
-#: libbalsa/rfc3156.c:819
+#: libbalsa/rfc3156.c:845
 msgid "The signature is valid."
 msgstr "Potpis je ispravan."
 
-#: libbalsa/rfc3156.c:821
+#: libbalsa/rfc3156.c:847
 msgid "The signature is valid but expired."
 msgstr "Potpis je ispravan ali je istekao."
 
-#: libbalsa/rfc3156.c:823
+#: libbalsa/rfc3156.c:849
 msgid ""
 "The signature is valid but the key used to verify the signature has expired."
 msgstr "Potpis je ispravan ali je ključ za potvrdu potpisa istekao."
 
-#: libbalsa/rfc3156.c:825
+#: libbalsa/rfc3156.c:851
 msgid "The signature is invalid."
 msgstr "Potpis nije ispravan."
 
-#: libbalsa/rfc3156.c:827
+#: libbalsa/rfc3156.c:853
 msgid "The signature could not be verified due to a missing key."
 msgstr "Potpis nije mogao da bude proveren zbog nepostojanja ključa."
 
-#: libbalsa/rfc3156.c:829
+#: libbalsa/rfc3156.c:855
 msgid "This part is not a real PGP signature."
 msgstr "Ovaj deo nije pravi PGP potpis."
 
-# bug: missing dot
-#: libbalsa/rfc3156.c:831
-msgid "The signature could not be verified due to an invalid crypto engine"
+#: libbalsa/rfc3156.c:857
+msgid "The signature could not be verified due to an invalid crypto engine."
 msgstr ""
 "Potpis nije mogao da bude proveren zbog neispravnog mehanizma šifrovanja."
 
-#: libbalsa/rfc3156.c:833
+#: libbalsa/rfc3156.c:859 libbalsa/rfc3156.c:2714
+msgid "GnuPG is rebuilding the trust database and is currently unavailable."
+msgstr "GnuPG ponovo izgrađuje bazu poverenika i trenutno je nedostupan."
+
+#: libbalsa/rfc3156.c:861
 msgid "An error prevented the signature verification."
 msgstr "Greška je sprečila proveru potpisa."
 
-#: libbalsa/rfc3156.c:843
+#: libbalsa/rfc3156.c:871
 msgid "The user ID is of unknown validity."
 msgstr "Ne može se proceniti ispravnost korisničkog IB."
 
-#: libbalsa/rfc3156.c:845
+#: libbalsa/rfc3156.c:873
 msgid "The validity of the user ID is undefined."
 msgstr "Ispravnost korisničkog IB nije zadata."
 
-#: libbalsa/rfc3156.c:847
+#: libbalsa/rfc3156.c:875
 msgid "The user ID is never valid."
 msgstr "Korisnički IB nikad nije ispravan."
 
-#: libbalsa/rfc3156.c:849
+#: libbalsa/rfc3156.c:877
 msgid "The user ID is marginally valid."
 msgstr "Korisnički IB je delom ispravan."
 
-#: libbalsa/rfc3156.c:851
+#: libbalsa/rfc3156.c:879
 msgid "The user ID is fully valid."
 msgstr "Korisnički IB je u potpunosti ispravan."
 
-#: libbalsa/rfc3156.c:853
+#: libbalsa/rfc3156.c:881
 msgid "The user ID is ultimately valid."
 msgstr "Korisniči IB je uvek ispravan."
 
-#: libbalsa/rfc3156.c:855 libbalsa/rfc3156.c:1534
+#: libbalsa/rfc3156.c:883 libbalsa/rfc3156.c:1578
 msgid "bad validity"
 msgstr "loša ispravnost"
 
-#: libbalsa/rfc3156.c:928 libbalsa/rfc3156.c:1159
+#: libbalsa/rfc3156.c:960 libbalsa/rfc3156.c:1199
 msgid "Enter passsphrase to OpenPGP sign the first message part"
 msgstr "Unesite lozinku za potpisivanje prvog dela poruke pomoću OpenPGP-a"
 
-#: libbalsa/rfc3156.c:935 libbalsa/rfc3156.c:1035 libbalsa/rfc3156.c:1171
-#: libbalsa/rfc3156.c:1267
+#: libbalsa/rfc3156.c:967 libbalsa/rfc3156.c:1071 libbalsa/rfc3156.c:1211
+#: libbalsa/rfc3156.c:1311
 #, c-format
 msgid "%s: could not get data from buffer: %s"
 msgstr "%s: ne mogu da dobavim podatke iz bafera: %s"
 
-#: libbalsa/rfc3156.c:951 libbalsa/rfc3156.c:2486
+#: libbalsa/rfc3156.c:983 libbalsa/rfc3156.c:2530
 #, c-format
 msgid "%s: signing failed: %s"
 msgstr "%s: potpisivanje nije uspelo: %s"
 
-#: libbalsa/rfc3156.c:963 libbalsa/rfc3156.c:1082 libbalsa/rfc3156.c:1211
-#: libbalsa/rfc3156.c:1319 libbalsa/rfc3156.c:2503 libbalsa/rfc3156.c:2596
+#: libbalsa/rfc3156.c:995 libbalsa/rfc3156.c:1118 libbalsa/rfc3156.c:1251
+#: libbalsa/rfc3156.c:1363 libbalsa/rfc3156.c:2547 libbalsa/rfc3156.c:2640
 #, c-format
 msgid "%s: could not get data: %s"
 msgstr "%s: nisam mogao da dobavim podatke: %s"
 
-#: libbalsa/rfc3156.c:1193
+#: libbalsa/rfc3156.c:1233
 #, c-format
 msgid "%s: signing and encryption failed: %s"
 msgstr "%s: potpisivanje i šifrovanje nije uspelo: %s"
 
-#: libbalsa/rfc3156.c:1197 libbalsa/rfc3156.c:2582
+#: libbalsa/rfc3156.c:1237 libbalsa/rfc3156.c:2626
 #, c-format
 msgid "%s: encryption failed: %s"
 msgstr "%s: šifrovanje nije uspelo: %s"
 
-#: libbalsa/rfc3156.c:1283
+#: libbalsa/rfc3156.c:1327
 msgid "Enter passsphrase to decrypt message part"
 msgstr "Unesite lozinku radi dešifrovanja dela poruke"
 
-#: libbalsa/rfc3156.c:1290
+#: libbalsa/rfc3156.c:1334
 #, c-format
 msgid "%s: decryption and signature verification failed: %s"
 msgstr "%s: neuspešno dešifrovanje i provera potpisa: %s"
 
-#: libbalsa/rfc3156.c:1336
+#: libbalsa/rfc3156.c:1380
 #, c-format
 msgid ""
 "The OpenPGP encrypted message part contains 8-bit characters, but no header "
@@ -807,12 +820,12 @@ msgstr ""
 "Poruka šifrovana pomoću OpenPGP-a sadrži 8-bitne znake, ali ne i zaglavlje \n"
 "koje opisuje korišćeni skup znakova (posmatrano kao %s)"
 
-#: libbalsa/rfc3156.c:1411
+#: libbalsa/rfc3156.c:1455
 #, c-format
 msgid "Could not launch %s to get the public key %s."
 msgstr "Ne mogu da pokrenem %s radi dobavljanja javnog ključa %s."
 
-#: libbalsa/rfc3156.c:1459
+#: libbalsa/rfc3156.c:1503
 #, c-format
 msgid ""
 "Running gpg failed with return value %d:\n"
@@ -821,7 +834,7 @@ msgstr ""
 "Neuspešno pokretanje gpg-a, sa rezultatom %d:\n"
 "%s"
 
-#: libbalsa/rfc3156.c:1466
+#: libbalsa/rfc3156.c:1510
 #, c-format
 msgid ""
 "Running gpg successful:\n"
@@ -830,86 +843,86 @@ msgstr ""
 "Uspešno pokretanje gpg-a:\n"
 "%s"
 
-#: libbalsa/rfc3156.c:1522
+#: libbalsa/rfc3156.c:1566
 msgid "unknown"
 msgstr "nepoznato"
 
-#: libbalsa/rfc3156.c:1524
+#: libbalsa/rfc3156.c:1568
 msgid "undefined"
 msgstr "nije zadano"
 
-#: libbalsa/rfc3156.c:1526
+#: libbalsa/rfc3156.c:1570
 msgid "never"
 msgstr "nikad"
 
-#: libbalsa/rfc3156.c:1528
+#: libbalsa/rfc3156.c:1572
 msgid "marginal"
 msgstr "skoro"
 
-#: libbalsa/rfc3156.c:1530
+#: libbalsa/rfc3156.c:1574
 msgid "full"
 msgstr "u potpunosti"
 
-#: libbalsa/rfc3156.c:1532
+#: libbalsa/rfc3156.c:1576
 msgid "ultimate"
 msgstr "uvek"
 
-#: libbalsa/rfc3156.c:1597
+#: libbalsa/rfc3156.c:1641
 msgid "User ID"
 msgstr "IB korisnika"
 
-#: libbalsa/rfc3156.c:1597
+#: libbalsa/rfc3156.c:1641
 msgid "Key ID"
 msgstr "IB ključa"
 
-#: libbalsa/rfc3156.c:1597
+#: libbalsa/rfc3156.c:1641
 msgid "Validity"
 msgstr "Ispravnost"
 
-#: libbalsa/rfc3156.c:1597
+#: libbalsa/rfc3156.c:1641
 msgid "Owner trust"
 msgstr "Poverenje u vlasnika"
 
-#: libbalsa/rfc3156.c:1598
+#: libbalsa/rfc3156.c:1642
 msgid "Length"
 msgstr "Dužina"
 
 #. FIXME: create dialog according to the Gnome HIG
-#: libbalsa/rfc3156.c:1635
+#: libbalsa/rfc3156.c:1679
 msgid "Select key"
 msgstr "Izaberite ključ"
 
-#: libbalsa/rfc3156.c:1645
+#: libbalsa/rfc3156.c:1689
 #, c-format
 msgid "Select the private key for the signer %s"
 msgstr "Izaberite privatni ključ za potpisnika %s"
 
-#: libbalsa/rfc3156.c:1648
+#: libbalsa/rfc3156.c:1692
 #, c-format
 msgid "Select the public key for the recipient %s"
 msgstr "Izaberite javni ključ za primaoca %s"
 
-#: libbalsa/rfc3156.c:1740
+#: libbalsa/rfc3156.c:1784
 #, c-format
 msgid "%s: could not list keys for %s: %s"
 msgstr "%s: nisam mogao da pobrojim ključeve za %s: %s"
 
-#: libbalsa/rfc3156.c:1749
+#: libbalsa/rfc3156.c:1793
 #, c-format
 msgid "%s: could not retrieve key for %s: %s"
 msgstr "%s: nisam mogao da preuzmem ključ za %s: %s"
 
-#: libbalsa/rfc3156.c:1785
+#: libbalsa/rfc3156.c:1829
 #, c-format
 msgid "could not get a private key for %s"
 msgstr "nisam mogao da dobavim privatni ključ za %s"
 
-#: libbalsa/rfc3156.c:1815
+#: libbalsa/rfc3156.c:1859
 #, c-format
 msgid "could not get a public key for %s"
 msgstr "nisam mogao da preuzmem javni ključ za %s"
 
-#: libbalsa/rfc3156.c:2233
+#: libbalsa/rfc3156.c:2277
 #, c-format
 msgid ""
 "The passphrase for this key was bad, please try again!\n"
@@ -920,7 +933,7 @@ msgstr ""
 "\n"
 "Ključ: %s"
 
-#: libbalsa/rfc3156.c:2237
+#: libbalsa/rfc3156.c:2281
 #, c-format
 msgid ""
 "Please enter the passphrase for the secret key!\n"
@@ -931,28 +944,32 @@ msgstr ""
 "\n"
 "Ključ: %s"
 
-#: libbalsa/rfc3156.c:2249
+#: libbalsa/rfc3156.c:2293
 msgid "remember passphrase for"
 msgstr "zapamti lozinku za"
 
-#: libbalsa/rfc3156.c:2254 src/pref-manager.c:1684 src/pref-manager.c:2514
+#: libbalsa/rfc3156.c:2298 src/pref-manager.c:1684 src/pref-manager.c:2514
 #: src/pref-manager.c:2535
 msgid "minutes"
 msgstr "minuta"
 
-#: libbalsa/rfc3156.c:2466
+#: libbalsa/rfc3156.c:2510
 msgid "Enter passsphrase to sign message"
 msgstr "Unesite lozinku da biste potpisali poruku"
 
-#: libbalsa/rfc3156.c:2470 libbalsa/rfc3156.c:2564
+#: libbalsa/rfc3156.c:2514 libbalsa/rfc3156.c:2608
 #, c-format
 msgid "%s: could not get data from file: %s"
 msgstr "%s: nisam mogao da dobavim podatke iz datoteke: %s"
 
-#: libbalsa/rfc3156.c:2477 libbalsa/rfc3156.c:2572
+#: libbalsa/rfc3156.c:2521 libbalsa/rfc3156.c:2616
 #, c-format
 msgid "%s: could not create new data: %s"
 msgstr "%s: nisam mogao da stvorim nove podatke: %s"
+
+#: libbalsa/rfc3156.c:2715
+msgid "Try again later."
+msgstr "Pokušajte kasnije."
 
 #: libbalsa/send.c:222 libbalsa/send.c:229
 msgid "Sending Mail..."
@@ -2499,7 +2516,7 @@ msgstr "Sačuvaj..."
 msgid "could not create temporary file %s"
 msgstr "nisam mogao da stvorim privremenu datoteku %s"
 
-#: src/balsa-message.c:3504
+#: src/balsa-message.c:3510
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2510,11 +2527,11 @@ msgstr ""
 "Obaveštenje o prispeću poruke (OPP) bude vraćeno na „%s“.\n"
 "Želite li da pošaljem ovo obaveštenje?"
 
-#: src/balsa-message.c:3511
+#: src/balsa-message.c:3517
 msgid "Reply to MDN?"
 msgstr "Da odgovorim na OBP?"
 
-#: src/balsa-message.c:3725
+#: src/balsa-message.c:3731
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a signed part, but it's "
@@ -2523,15 +2540,15 @@ msgstr ""
 "Poruka koju je poslao %s sa temom „%s“ sadrži deo sa potpisom, ali je "
 "struktura neispravna. Potpis, ako uopšte postoji, se ne može proveriti."
 
-#: src/balsa-message.c:3741 src/balsa-message.c:3962
+#: src/balsa-message.c:3747 src/balsa-message.c:3968
 msgid "detected a good signature"
 msgstr "otkrio sam dobar potpis"
 
-#: src/balsa-message.c:3746 src/balsa-message.c:3971
+#: src/balsa-message.c:3752 src/balsa-message.c:3977
 msgid "detected a good signature with insufficient validity/trust"
 msgstr "prepoznao sam ispravan potpis sa nedovoljno ispravnosti/poverenja"
 
-#: src/balsa-message.c:3751 src/balsa-message.c:3986
+#: src/balsa-message.c:3757 src/balsa-message.c:3992
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" "
@@ -2541,7 +2558,7 @@ msgstr ""
 "Proveravanje potpisa poruke koju je poslao %s sa temom „%s“ je vratilo:\n"
 "%s"
 
-#: src/balsa-message.c:3758
+#: src/balsa-message.c:3764
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" failed "
@@ -2550,7 +2567,7 @@ msgstr ""
 "Proveravanje potpisa poruke koju je poslao %s sa temom „%s“ nije uspelo i "
 "vratilo je grešku!"
 
-#: src/balsa-message.c:3763
+#: src/balsa-message.c:3769
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a S/MIME signed part, "
@@ -2559,7 +2576,7 @@ msgstr ""
 "Poruka koju je poslao %s sa temom „%s“ sadrži deo potpisan pomoću S/MIME, "
 "ali Balsa (za sada) ne ume da radi sa ovim načinom zapisa."
 
-#: src/balsa-message.c:3804
+#: src/balsa-message.c:3810
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains an encrypted part, but "
@@ -2568,7 +2585,7 @@ msgstr ""
 "Poruka koju je poslao %s sa temom „%s“ sadrži šifrovani deo, ali je "
 "struktura neispravna."
 
-#: src/balsa-message.c:3812
+#: src/balsa-message.c:3818
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
@@ -2577,11 +2594,11 @@ msgstr ""
 "Poruka koju je poslao %s sa temom „%s“ sadrži deo šifrovan pomoću S/MIME, "
 "ali Balsa (za sada) ne ume da radi sa ovim načinom zapisa."
 
-#: src/balsa-message.c:3899 src/balsa-message.c:4107
+#: src/balsa-message.c:3905 src/balsa-message.c:4113
 msgid "run gpg to import this key"
 msgstr "pokreni gpg radi uvoza ovog ključa"
 
-#: src/balsa-message.c:4072
+#: src/balsa-message.c:4078
 #, c-format
 msgid "PGP signature: %s"
 msgstr "PGP potpis: %s"
@@ -3111,19 +3128,19 @@ msgstr ""
 msgid "Confirm"
 msgstr "Potvrdi"
 
-#: src/information-dialog.c:207
+#: src/information-dialog.c:216
 msgid "Information - Balsa"
 msgstr "Informacija - Balsa"
 
-#: src/information-dialog.c:267
+#: src/information-dialog.c:277
 msgid "WARNING: "
 msgstr "UPOZORENjE: "
 
-#: src/information-dialog.c:270
+#: src/information-dialog.c:280
 msgid "ERROR: "
 msgstr "GREŠKA: "
 
-#: src/information-dialog.c:273
+#: src/information-dialog.c:283
 msgid "FATAL: "
 msgstr "KOBNO: "
 

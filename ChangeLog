@@ -1,3 +1,7 @@
+2004-12-15 06:43  PeterB
+
+	* libbalsa/body.c: add some checks.
+
 2004-12-13 09:41  PeterB
 
 	* libbalsa/html.c: do not write zero bytes, to avoid a

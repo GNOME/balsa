@@ -1,5 +1,7 @@
 2000-07-15  Kjartan Maraas  <kmaraas@gnome.org>
 
+	* nl.po: Updated Dutch translation from Dennis Smit
+	<synap@area101.penguin.nl>.
 	* POTFILES.in: Clean up a little. Remove files that aren't
 	in the build. Also I question the value of _() marking code
 	that is in #ifdef DEBUG clauses.

@@ -1,3 +1,8 @@
+2002-04-28  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/libbalsa.c (libbalsa_init): add SendCharset default
+	* libbalsa/send.c: fix header encoding (#79661)
+
 2002-04-27  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox_{local,pop3}.c: push_prefix() before loading

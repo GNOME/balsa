@@ -1142,6 +1142,12 @@ message2HEADER(LibBalsaMessage * message, HEADER * hdr) {
 
     libbalsa_lock_mutt();
 
+    /* unreasonable default, libmutt want's something here 
+       but will pick a proper encoding if this doesn't fit
+       it's only for headers anyway so we want to least 
+       complicated choice here */
+    mutt_set_charset("iso-8859-15");
+
     if (!hdr->env)
 	hdr->env = mutt_new_envelope();
 
@@ -1398,6 +1404,7 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
     gchar **mime_type;
     gboolean res = TRUE;
 
+    
     message2HEADER(message, msg);
     message_add_references(message, msg);
 

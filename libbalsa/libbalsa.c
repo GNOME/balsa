@@ -168,6 +168,8 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
     ReplyRegexp.rx = (regex_t *) safe_malloc (sizeof (regex_t));
     REGCOMP(ReplyRegexp.rx,"^(re([\\[0-9\\]+])*|aw):[ \t]*",0);
 
+    SendCharset = "us-ascii:iso-8859-1:utf-8";    
+
     libbalsa_notify_init();
 
     /* Register our types */

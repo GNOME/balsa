@@ -66,9 +66,10 @@ void libbalsa_message_body_set_mutt_body(LibBalsaMessageBody * body,
 					 MuttBody * mutt_body);
 
 gboolean libbalsa_message_body_save(LibBalsaMessageBody * body,
-				    gchar * prefixm, gchar * filename);
+				    const gchar * prefixm,
+                                    const gchar * filename);
 gboolean libbalsa_message_body_save_temporary(LibBalsaMessageBody * body,
-					      gchar * prefix);
+					      const gchar * prefix);
 
 gchar *libbalsa_message_body_get_parameter(LibBalsaMessageBody * body,
 					   const gchar * param);

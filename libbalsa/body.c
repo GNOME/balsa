@@ -146,7 +146,7 @@ libbalsa_message_body_get_parameter(LibBalsaMessageBody * body,
 */
 gboolean
 libbalsa_message_body_save_temporary(LibBalsaMessageBody * body,
-				     gchar * prefix)
+				     const gchar * prefix)
 {
     /* FIXME: Role our own mktemp that doesn't need a large array (use g_strdup_printf) */
     if (body->temp_filename == NULL) {
@@ -177,8 +177,9 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body,
    NOTE: has to use safe_fopen to set the file access privileges to safe.
 */
 gboolean
-libbalsa_message_body_save(LibBalsaMessageBody * body, gchar * prefix,
-			   gchar * filename)
+libbalsa_message_body_save(LibBalsaMessageBody * body,
+                           const gchar * prefix,
+			   const gchar * filename)
 {
     FILE *stream;
     STATE s;

@@ -828,7 +828,11 @@ typedef struct
 {
   FILE *fpin;
   FILE *fpout;
+#ifdef LIBMUTT
+  const char *prefix;
+#else
   char *prefix;
+#endif
   int flags;
 } STATE;
 

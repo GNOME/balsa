@@ -354,10 +354,7 @@ save_dialog_ok(GtkWidget* save_dialog, BalsaPartInfo * info)
 	do_save = TRUE;
     
     if ( do_save ) {
-	result = libbalsa_message_body_save(info->body, NULL,
-                /* FIXME: change arg 3 of libbalsa_message_body_save to
-                 * const gchar *, to avoid this ugly cast: */
-                                            (gchar *) filename);
+	result = libbalsa_message_body_save(info->body, NULL, filename);
 	if (!result) {
 	    gchar *msg;
 	    GtkWidget *msgbox;

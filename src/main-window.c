@@ -125,6 +125,7 @@ static gboolean imap_check_test(const gchar * path);
 static void enable_mailbox_menus(BalsaIndex * index);
 static void enable_message_menus(LibBalsaMessage * message);
 static void enable_edit_menus(BalsaMessage * bm);
+static void enable_view_menus(BalsaMessage * bm);
 static void register_open_mailbox(LibBalsaMailbox *m);
 static void unregister_open_mailbox(LibBalsaMailbox *m);
 static gboolean is_open_mailbox(LibBalsaMailbox *m);
@@ -174,6 +175,7 @@ static void threading_change_cb(GtkWidget * widget, gpointer data);
 static void balsa_window_set_threading_menu(int option);
 static void expand_all_cb(GtkWidget * widget, gpointer data);
 static void collapse_all_cb(GtkWidget * widget, gpointer data);
+static void zoom_cb(GtkWidget * widget, gpointer data);
 
 static void address_book_cb(GtkWindow *widget, gpointer data);
 
@@ -356,7 +358,7 @@ static GnomeUIInfo edit_menu[] = {
 };
 
 static GnomeUIInfo shown_hdrs_menu[] = {
-    GNOMEUIINFO_RADIOITEM(N_("N_o Headers"), N_("Display no headers"),
+    GNOMEUIINFO_RADIOITEM(N_("_No Headers"), N_("Display no headers"),
                           show_no_headers_cb, NULL),
     GNOMEUIINFO_RADIOITEM(N_("S_elected Headers"),
                           N_("Display selected headers"),
@@ -374,7 +376,7 @@ static GnomeUIInfo threading_menu[] = {
                                GINT_TO_POINTER(LB_MAILBOX_THREADING_FLAT),
                                NULL),
 #define MENU_THREADING_SIMPLE_POS 1
-    GNOMEUIINFO_RADIOITEM_DATA(N_("S_imple threading"),
+    GNOMEUIINFO_RADIOITEM_DATA(N_("Si_mple threading"),
                                N_("Simple threading algorithm"),
                                threading_change_cb,
                                GINT_TO_POINTER(LB_MAILBOX_THREADING_SIMPLE),
@@ -417,6 +419,19 @@ static GnomeUIInfo view_menu[] = {
      N_("Collapse all expanded threads"),
      collapse_all_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
      NULL, 'C', GDK_CONTROL_MASK, NULL},
+    GNOMEUIINFO_SEPARATOR,
+#define MENU_VIEW_ZOOM_IN MENU_VIEW_COLLAPSE_ALL_POS + 2
+    { GNOME_APP_UI_ITEM, N_("Zoom _In"), N_("Increase magnification"),
+      zoom_cb, GINT_TO_POINTER(1), NULL, GNOME_APP_PIXMAP_STOCK,
+      GTK_STOCK_ZOOM_IN, 0, 0, NULL},
+#define MENU_VIEW_ZOOM_OUT MENU_VIEW_ZOOM_IN + 1
+    { GNOME_APP_UI_ITEM, N_("Zoom _Out"), N_("Decrease magnification"),
+      zoom_cb, GINT_TO_POINTER(-1), NULL, GNOME_APP_PIXMAP_STOCK,
+      GTK_STOCK_ZOOM_OUT, 0, 0, NULL},
+#define MENU_VIEW_ZOOM_100 MENU_VIEW_ZOOM_OUT + 1
+    { GNOME_APP_UI_ITEM, N_("Zoom _100%"), N_("No magnification"),
+      zoom_cb, GINT_TO_POINTER(0), NULL, GNOME_APP_PIXMAP_STOCK,
+      GTK_STOCK_ZOOM_100, 0, 0, NULL},
     GNOMEUIINFO_END
 };
 
@@ -982,6 +997,7 @@ balsa_window_new()
     enable_mailbox_menus(NULL);
     enable_message_menus(NULL);
     enable_edit_menus(NULL);
+    enable_view_menus(NULL);
     balsa_window_enable_continue();
 
     /* set initial state of toggle preview pane button */
@@ -1156,6 +1172,18 @@ enable_edit_menus(BalsaMessage * bm)
                              enable);
     gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_SELECT_ALL_POS].
                              widget, enable);
+}
+
+/*
+ * Enable/disable the Zoom menu items on the View menu.
+ */
+static void
+enable_view_menus(BalsaMessage * bm)
+{
+    gboolean enable = bm && balsa_message_can_zoom(bm);
+    gtk_widget_set_sensitive(view_menu[MENU_VIEW_ZOOM_IN].widget, enable);
+    gtk_widget_set_sensitive(view_menu[MENU_VIEW_ZOOM_OUT].widget, enable);
+    gtk_widget_set_sensitive(view_menu[MENU_VIEW_ZOOM_100].widget, enable);
 }
 
 /*
@@ -2626,6 +2654,15 @@ collapse_all_cb(GtkWidget * widget, gpointer data)
     balsa_index_update_tree(BALSA_INDEX(index), FALSE);
 }
 
+static void
+zoom_cb(GtkWidget * widget, gpointer data)
+{
+    GtkWidget *bm = BALSA_WINDOW(data)->preview;
+    gint in_out =
+	GPOINTER_TO_INT(g_object_get_data
+			(G_OBJECT(widget), GNOMEUIINFO_KEY_UIDATA));
+    balsa_message_zoom(BALSA_MESSAGE(bm), in_out);
+}
 
 static void
 address_book_cb(GtkWindow *widget, gpointer data)
@@ -3198,6 +3235,7 @@ static void
 select_part_cb(BalsaMessage * bm, gpointer data)
 {
     enable_edit_menus(bm);
+    enable_view_menus(bm);
 }
 
 static void

@@ -12,7 +12,7 @@ Release:   %rel
 Copyright: GPL
 Group:     Applications/Internet
 Source0:   balsa-%{PACKAGE_VERSION}.tar.gz
-Patch1:	   rpm-po.patch
+Patch1:	   @srcdir@/rpm-po.patch
 URL:       http://www.balsa.net/
 BuildRoot: /tmp/balsa-%{PACKAGE_VERSION}-root
 Packager: Michael Fulbright <msf@redhat.com>

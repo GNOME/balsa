@@ -277,22 +277,6 @@ AC_DEFINE_UNQUOTED( GNOME_DATA_PREFIX, "$GNOME_DATA_PREFIX" )
 AC_DEFINE_UNQUOTED( BALSA_COMMON_PREFIXES, `echo $BALSA_COMMON_PREFIXES` ) dnl bleah
 
 dnl ######################################################################################
-dnl This is for the RPM spec, where we patch the @-@ thingies but we don't want
-dnl them substituted in the .infile->file conversion. It's hard to explain, look at
-dnl balsa.spec.in and think about it.
-dnl ######################################################################################
-
-at_prefix="@prefix@"
-at_srcdir="@srcdir@"
-at_DATADIRNAME="@DATADIRNAME@"
-at_exec_prefix="@exec_prefix@"
-
-AC_SUBST(at_prefix)
-AC_SUBST(at_srcdir)
-AC_SUBST(at_DATADIRNAME)
-AC_SUBST(at_exec_prefix)
-
-dnl ######################################################################################
 dnl Things needed by CVS user
 dnl ######################################################################################
 

@@ -1,3 +1,23 @@
+2003-12-26 15:52  PeterB
+
+	* src/balsa-index.c: More care needed with new threading and sync.
+	* libbalsa/: mailbox_maildir.c, mailbox_mbox.c, mailbox_mh.c: Queue
+	sync after changing flags.
+	* libbalsa/: mailbox_local.c, mailbox_local.h: Thread msg_tree in
+	place; sync in idle handler after changing flags.
+	* libbalsa/mailbox_imap.c: After threading, use
+	libbalsa_mailbox_set_msg_tree() to set the new tree; allow sorting
+	with threading.
+	* libbalsa/: mailbox.c, mailbox.h: Lookup and cache GtkTreeModel
+	signals; setup mailbox when opening instead of at init time; thread
+	after adding or moving messages; implement and use
+	lbm_threads_leave(); allow for sync in an idle handler;
+	lock mailbox when threading; implement and use lightweight
+	mbox_model_get_path_helper(); add helpers for subclass threading
+	methods.
+	* libbalsa/imap-server.c: Don't skip the next handle when deleting
+	one.
+
 2003-12-23  Carlos Morgado  <chbm gnome.org>
 
 	* src/balsa-bonobo.c (impl_balsa_composer_sendMessage): 

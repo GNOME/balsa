@@ -9,6 +9,7 @@
 
         * libbalsa/files.c, src/sendmsg-window.c: move tests for icon
           files to libbalsa.
+        * src/balsa-app.c (balsa_app_destroy): fix #96795.
 
 2002-11-02  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 

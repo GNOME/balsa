@@ -474,14 +474,8 @@ balsa_app_destroy(void)
     g_slist_foreach(balsa_app.filters,          (GFunc)libbalsa_filter_free, 
 		    GINT_TO_POINTER(TRUE));
 
-    /* FIXME: stop switching notebook pages in a more elegant way.
-       Probably, the cleanest solution is to call enable_menus_xxx
-       functions from an idle function connected to balsa_message_set. */
-    g_signal_handlers_disconnect_matched(balsa_app.notebook,
-                                         G_SIGNAL_MATCH_DATA,
-                                         0, 0, NULL, NULL, NULL);
-
     /* close all mailboxes */
+    gtk_widget_destroy(balsa_app.notebook);
     balsa_mailbox_nodes_lock(TRUE);
     g_node_traverse(balsa_app.mailbox_nodes,
 		    G_LEVEL_ORDER,

@@ -240,6 +240,7 @@ struct _Body
     gchar *buffer;		/* holds raw data of the MIME part, or NULL */
     gchar *htmlized;		/* holds htmlrep of buffer, or NULL */
     BODY *mutt_body;		/* pointer to BODY struct of mutt message */
+    gchar *filename;		/* holds filename for attachments and such (used mostly for sending) */
   };
 
 

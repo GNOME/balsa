@@ -37,6 +37,7 @@ balsa_send_message (Message * message, gchar * smtp_server, glong debug)
   gchar *text;
   gchar buffer[PATH_MAX];
   gchar *tmp;
+  GList *list;
 
   msg = mutt_new_header ();
 
@@ -89,6 +90,16 @@ balsa_send_message (Message * message, gchar * smtp_server, glong debug)
   fputs (text, tempfp);
   fclose (tempfp);
   tempfp = NULL;
+
+  list = message->body_list;
+  while (list)
+  {
+	  Body *body;
+	  body = list->data;
+	  if (body->filename)
+            msg->content->next = mutt_make_file_attach(body->filename);
+          list = list->next;
+  }
 
   mutt_update_encoding (msg->content);
 

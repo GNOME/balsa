@@ -610,6 +610,18 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 
   message->body_list = g_list_append (message->body_list, body);
 
+  {				/* handle attachments */
+    gint i;
+    Body *abody;
+    for (i = 0; i < GNOME_ICON_LIST (bsmsg->attachments)->icons; i++)
+      {
+	abody = body_new ();
+	abody->filename = (gchar *) gnome_icon_list_get_icon_data (bsmsg->attachments, i);
+	message->body_list = g_list_append (message->body_list, abody);
+      }
+  }
+
+
   if (balsa_send_message (message, balsa_app.smtp_server, balsa_app.debug))
     if (bsmsg->type == SEND_REPLY)
       {
@@ -617,8 +629,6 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 	  message_reply (bsmsg->orig_message);
       }
 
-  body_free (body);
-  message->body_list->data = NULL;
   g_list_free (message->body_list);
   message_free (message);
   balsa_sendmsg_destroy (bsmsg);

@@ -1,3 +1,11 @@
+2001-05-25  Carlos Morgado  <chbm@chbm.nu>
+
+	* libinit_balsa/balsa-druid-page-user.gob: fix 1st page with
+	no esmtp
+
+	* src/save-restore.c (config_global_load): build with no esmtp 
+	and -Werror
+
 2001-05-25  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-app.[hc]: add save_dir field storing the last

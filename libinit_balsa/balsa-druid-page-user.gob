@@ -68,9 +68,14 @@ class Balsa:Druid:Page:User from Balsa:Druid:Page {
 		self->_priv->ed0.master = &( self->_priv->emaster );
 		self->_priv->ed1.master = &( self->_priv->emaster );
 		self->_priv->ed2.master = &( self->_priv->emaster );
+#if ENABLE_ESMTP
 		self->_priv->ed3.master = &( self->_priv->emaster );
 
 		table = GTK_TABLE( gtk_table_new( 5, 2, FALSE ) );
+#else
+		table = GTK_TABLE( gtk_table_new( 4, 2, FALSE ) );
+#endif
+
 
 		label = GTK_LABEL( gtk_label_new( _("Please enter information about yourself.") ) );
 		gtk_label_set_justify( label, GTK_JUSTIFY_CENTER );
@@ -86,13 +91,15 @@ class Balsa:Druid:Page:User from Balsa:Druid:Page {
 		preset = g_strconcat( g_get_user_name(), "@", hostbuf, NULL );
 		balsa_init_add_table_entry( table, 1, _("Email address:"), preset, &( self->_priv->ed1 ), GTK_WIDGET( self ), &( self->_priv->email ) );
 		g_free( preset );
+
+		preset = g_strconcat( g_get_home_dir(), "/mail", NULL );
+		balsa_init_add_table_entry( table, 2, _("Local Mail Directory:"), preset, &(self->_priv->ed2 ), GTK_WIDGET( self ), &( self->_priv->localmaildir ) );
+		g_free( preset );
+
 #if ENABLE_ESMTP
 		preset = "localhost:25";
-		balsa_init_add_table_entry( table, 2, _("SMTP Server:"), preset, &( self->_priv->ed2 ), GTK_WIDGET( self ), &( self->_priv->smtp ) );
+		balsa_init_add_table_entry( table, 3, _("SMTP Server:"), preset, &( self->_priv->ed3 ), GTK_WIDGET( self ), &( self->_priv->smtp ) );
 #endif
-		preset = g_strconcat( g_get_home_dir(), "/mail", NULL );
-		balsa_init_add_table_entry( table, 3, _("Local Mail Directory:"), preset, &( self->_priv->ed3 ), GTK_WIDGET( self ), &( self->_priv->localmaildir ) );
-		g_free( preset );
 
 		gtk_box_pack_start( GTK_BOX( (GNOME_DRUID_PAGE_STANDARD( self ))->vbox ),
 			GTK_WIDGET( table ), TRUE, TRUE, 8 );

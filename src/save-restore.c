@@ -342,8 +342,9 @@ config_global_load(void)
 {
     gchar **open_mailbox_vector;
     gint open_mailbox_count;
+#if ENABLE_ESMTP
     gboolean def_used;
-
+#endif
     config_address_books_load();
     config_identities_load();
 

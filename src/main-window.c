@@ -2262,13 +2262,18 @@ mail_progress_notify_cb()
                             fraction);
                 fraction = 1.0;
             }
-            if (progress_dialog)
+            if (progress_dialog) {
                 gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR
                                               (progress_dialog_bar),
 					      fraction);
-            else
+                gtk_label_set_text(GTK_LABEL(progress_dialog_message),
+                                   threadmessage->message_string);
+            } else {
                 gnome_appbar_set_progress_percentage(balsa_app.appbar, 
                                                      fraction);
+                gnome_appbar_set_status(balsa_app.appbar,
+                                        threadmessage->message_string);
+            }
             break;
         case LIBBALSA_NTFY_FINISHED:
 

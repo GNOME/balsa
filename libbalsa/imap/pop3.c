@@ -187,18 +187,19 @@ pop_exec(PopHandle *pop, const char *cmd, GError **err)
 }
 
 /** pop_get_capa tries to get capabilities */
-static void
+static gboolean
 pop_get_capa(PopHandle *pop, GError **err)
 {
   char buf[POP_LINE_LEN];
+  char *line;
 
   memset(pop->capabilities, '\0', sizeof(pop->capabilities));
   if(!pop_exec(pop, "CAPA\r\n", err)) {
     pop->capabilities[POP_CAP_USER] = 1;
-    return;
+    return FALSE;
   }
 
-  while(sio_gets(pop->sio, buf, sizeof(buf)) &&
+  while( (line=sio_gets(pop->sio, buf, sizeof(buf))) &&
         strcmp(buf, ".\r\n")) {
     unsigned i;
     for(i=0; buf[i]; i++) buf[i] = toupper(buf[i]);
@@ -217,6 +218,14 @@ pop_get_capa(PopHandle *pop, GError **err)
       }
     }
   }
+  if(!line) {
+    pop->state = IMHS_DISCONNECTED;
+    sio_detach(pop->sio); pop->sio = NULL; close(pop->sd);
+    g_set_error(err, IMAP_ERROR, IMAP_POP_SEVERED_ERROR,
+                "Connection severed");
+    return FALSE;
+  }
+  return TRUE;
 }
 /* ===================================================================
    AUTHENTICATION SECTION
@@ -452,7 +461,11 @@ pop_connect(PopHandle *pop, const char *host, GError **err)
                   "Did not get initial greeting.");
       return FALSE;
   }
-  pop_get_capa(pop, NULL); /* ignore error here */
+  if(!pop_get_capa(pop, err)) { /* ignore -ERR */
+    if(g_error_matches(*err, IMAP_ERROR, IMAP_POP_PROTOCOL_ERROR))
+      g_clear_error(err);
+    else return FALSE;
+  }
   
 #ifdef USE_TLS
   if(pop_can_do(pop, POP_CAP_STLS)) {
@@ -495,6 +508,12 @@ unsigned
 pop_get_exists(PopHandle *pop, GError **err)
 {
   return pop->msg_cnt;
+}
+
+unsigned long
+pop_get_total_size(PopHandle *pop)
+{
+  return pop->total_size;
 }
 
 const char*
@@ -614,8 +633,12 @@ pop_complete_retr(PopHandle *pop, PopAsyncCb cb, void *arg)
 {
   char line[POP_LINE_LEN];
   GError *err = NULL;
-  gboolean resp = pop_check_status(pop, &err);
-  PopReqCode rc = resp ? POP_REQ_OK : POP_REQ_ERR;
+  gboolean resp;
+  PopReqCode rc;
+
+  if(pop->state != IMHS_AUTHENTICATED) return;
+  resp = pop_check_status(pop, &err);
+  rc = resp ? POP_REQ_OK : POP_REQ_ERR;
   if(cb)
     cb(rc, arg, &err);
   if(resp) { /* same code as in fetch_message() */
@@ -639,8 +662,10 @@ static void
 pop_complete_dele(PopHandle *pop, PopAsyncCb cb, void *arg)
 {
   GError *err = NULL;
-  PopReqCode res =
-    pop_check_status(pop, &err) ? POP_REQ_OK : POP_REQ_ERR;
+  PopReqCode res;
+
+  if(pop->state != IMHS_AUTHENTICATED) return;
+  res = pop_check_status(pop, &err) ? POP_REQ_OK : POP_REQ_ERR;
   if(cb)
     cb(res, arg, err); /* FIXME: it cannot be taken care of by callback! */
   g_clear_error(&err); /* in case it was not taken care of by callback */
@@ -683,7 +708,7 @@ pop_complete_pending_requests(PopHandle *pop)
   do {
     current_mark = pop->req_insert_pos;
     sio_flush(pop->sio);
-    for(i=0; i<current_mark && pop->state == IMHS_AUTHENTICATED; i++) {
+    for(i=0; i<current_mark; i++) {
       switch(pop->requests[i].type) {
       case POP_REQ_TYPE_RETR:
         pop_complete_retr(pop, pop->requests[i].cb, pop->requests[i].arg);

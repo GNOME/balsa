@@ -53,6 +53,7 @@ static void libbalsa_mailbox_local_save_config(LibBalsaMailbox * mailbox,
 static void libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
 					       const gchar * prefix);
 
+static void libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox);
 static gboolean libbalsa_mailbox_local_message_match(LibBalsaMailbox *
 						     mailbox, guint msgno,
 						     LibBalsaMailboxSearchIter
@@ -133,6 +134,8 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
     libbalsa_mailbox_class->load_config =
 	libbalsa_mailbox_local_load_config;
 
+    libbalsa_mailbox_class->close_mailbox =
+	libbalsa_mailbox_local_close_mailbox;
     libbalsa_mailbox_class->message_match = 
         libbalsa_mailbox_local_message_match;
     libbalsa_mailbox_class->set_threading =
@@ -313,6 +316,19 @@ libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
 	LIBBALSA_MAILBOX_CLASS(parent_class)->load_config(mailbox, prefix);
 
     libbalsa_notify_register_mailbox(mailbox);
+}
+
+static void
+libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxLocal *local  = LIBBALSA_MAILBOX_LOCAL(mailbox);
+
+    if(local->sync_id) {
+        g_source_remove(local->sync_id);
+        local->sync_id = 0;
+    }
+    if (LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox)
+	LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox);
 }
 
 /* Search iters */
@@ -1160,16 +1176,21 @@ _libbalsa_mailbox_local_get_message_stream(LibBalsaMailbox * mailbox,
 static void
 lbml_sync_real(LibBalsaMailboxLocal * local)
 {
+    LibBalsaMailbox *mailbox = (LibBalsaMailbox*)local;
     time_t tstart;
+
     time(&tstart);
-    if (MAILBOX_OPEN(LIBBALSA_MAILBOX(local))
-	&& !libbalsa_mailbox_sync_storage(LIBBALSA_MAILBOX(local), FALSE))
+    LOCK_MAILBOX(mailbox);
+    if (local->sync_id &&                       /* request still pending */
+        MAILBOX_OPEN(mailbox) &&                   /* mailbox still open */
+        !libbalsa_mailbox_sync_storage(mailbox, FALSE))   /* cannot sync */
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 			     _("Failed to sync mailbox \"%s\""),
-			     LIBBALSA_MAILBOX(local)->name);
+			     mailbox->name);
     local->sync_id = 0;
     local->sync_time += time(NULL)-tstart;
     local->sync_cnt++;
+    UNLOCK_MAILBOX(mailbox);
     g_object_unref(local);
 }
 
@@ -1192,10 +1213,16 @@ void
 libbalsa_mailbox_local_queue_sync(LibBalsaMailboxLocal * local)
 {
     guint schedule_delay;
-    if (!local->sync_id)
-	g_object_ref(local);
-    else
-        g_source_remove(local->sync_id);
+
+    /* The optimal behavior here would be to keep rescheduling
+    * requests.  But think of following: the idle handler started and
+    * triggered lbml_sync_real thread. While it waits for the lock,
+    * another queue request is filed but it is too late for removal of
+    * the sync thread. And we get two sync threads executing one after
+    * another, etc. So it is better to do sync bit too often... */
+    if (local->sync_id) 
+        return;
+    g_object_ref(G_OBJECT(local));
     /* queue sync job so that the delay is at least five times longer
      * than the syncing time. Otherwise large mailbox owners will be
      * annnoyed. */

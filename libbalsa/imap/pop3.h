@@ -71,6 +71,7 @@ void     pop_set_usercb    (PopHandle *pop, ImapUserCb user_cb, void *arg_cb);
 void     pop_set_infocb    (PopHandle *pop, PopUserCb user_cb, void *arg_cb);
 gboolean pop_connect       (PopHandle *pop, const char *host, GError **err);
 unsigned pop_get_exists    (PopHandle *pop, GError **err);
+unsigned long pop_get_total_size(PopHandle *pop);
 const char* pop_get_uid    (PopHandle *pop, unsigned msgno, GError **err);
 
 gboolean pop_fetch_message_s(PopHandle *pop, unsigned msgno, 

@@ -61,10 +61,6 @@ static void libbalsa_mailbox_pop3_save_config(LibBalsaMailbox * mailbox,
 static void libbalsa_mailbox_pop3_load_config(LibBalsaMailbox * mailbox,
 					      const gchar * prefix);
 
-#ifdef FIXME
-static void progress_cb(LibBalsaMailbox *m, char *msg, int prog, int tot);
-#endif
-
 GType
 libbalsa_mailbox_pop3_get_type(void)
 {
@@ -306,12 +302,15 @@ struct PopDownloadMode {
    Functions supporting asynchronous retrival of messages.
 */
 struct fetch_data {
+    LibBalsaMailbox *mailbox;
     PopHandle *pop;
-    FILE      *f;
     GError   **err;
     gchar     *msg_name;
     const struct PopDownloadMode *dm;
-    unsigned   msgno;
+    unsigned   msgno, total_messages;
+    unsigned long *current_pos;
+    unsigned long total_size;
+    FILE      *f;
     unsigned   error_occured:1;
     unsigned   delete_on_server:1;
 };
@@ -323,17 +322,29 @@ struct fetch_data {
 static void
 fetch_async_cb(PopReqCode prc, void *arg, ...)
 {
+    static time_t last_update = 0, current_time;
+    static unsigned batch_cnt = 0;
     struct fetch_data *fd = (struct fetch_data*)arg;
     va_list alist;
+    char threadbuf[160];
     
     va_start(alist, arg);
     switch(prc) {
     case POP_REQ_OK: 
 	{/* GError **err = va_arg(alist, GError**); */
-	fd->f  = fd->dm->open(fd->msg_name);
-	if(fd->f == NULL)
-	    printf("fopen failed for %s\n", fd->msg_name);
-	}
+        fd->f  = fd->dm->open(fd->msg_name);
+        if(fd->f == NULL)
+            printf("fopen failed for %s\n", fd->msg_name);
+        else {
+            snprintf(threadbuf, sizeof(threadbuf),
+                     _("Retrieving Message %d of %d"),
+                    fd->msgno, fd->total_messages);
+            libbalsa_mailbox_progress_notify(LIBBALSA_MAILBOX(fd->mailbox),
+                                             LIBBALSA_NTFY_MSGINFO, 
+                                             fd->msgno, fd->total_messages,
+                                             threadbuf);
+        }
+        }
 	break;
     case POP_REQ_ERR:
 	{GError **err = va_arg(alist, GError**);
@@ -346,6 +357,19 @@ fetch_async_cb(PopReqCode prc, void *arg, ...)
     case POP_REQ_DATA:
 	{unsigned len = va_arg(alist, unsigned);
 	char    *buf = va_arg(alist, char*);
+        if( (batch_cnt++ & 0x1f) &&
+            last_update != (current_time = time(NULL))) {
+            snprintf(threadbuf, sizeof(threadbuf),
+                     _("Received %ld kB of %ld"),
+                     (long)(*fd->current_pos/1024),
+                     (long)fd->total_size/1024);
+            libbalsa_mailbox_progress_notify(LIBBALSA_MAILBOX(fd->mailbox), 
+                                             LIBBALSA_NTFY_PROGRESS, 
+                                             *fd->current_pos, fd->total_size,
+                                             threadbuf);
+            last_update = current_time;
+        }
+        *fd->current_pos += len;
 	if(fd->f)
 	    if(fwrite(buf, 1, len, fd->f) != len) {
                 if(!*fd->err)
@@ -356,8 +380,8 @@ fetch_async_cb(PopReqCode prc, void *arg, ...)
             }
 	}
 	break;
-    case POP_REQ_DONE:
-	if(fd->dm->close(fd->f) != 0) {
+        case POP_REQ_DONE:
+            if(fd->dm->close(fd->f) != 0) {
                 if(!*fd->err)
                     g_set_error(fd->err, IMAP_ERROR, IMAP_POP_SAVE_ERROR,
                                 _("Transfering POP message to %s failed."),
@@ -413,6 +437,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     unsigned msgcnt, i;
     GHashTable *uids = NULL, *current_uids = NULL;
     const struct PopDownloadMode *mode;
+    unsigned long current_pos = 0, total_size;
     
     if (!m->check) return;
 
@@ -453,12 +478,9 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     
     PopHandle * pop = pop_new();
     pop_set_option(pop, IMAP_POP_OPT_FILTER_CR, TRUE);
-    pop_set_timeout(pop, 5000); /* wait 1.5 minute for packets */
+    pop_set_timeout(pop, 60000); /* wait 1.5 minute for packets */
     pop_set_usercb(pop, libbalsa_server_user_cb, server);
     pop_set_monitorcb(pop, monitor_cb, NULL);
-#ifdef FIXME
-    pop_set_infocb(pop, progress_cb,      server);
-#endif
 
     if(m->filter) {
         mode       = &pop_filter;
@@ -479,7 +501,8 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     /* ===================================================================
      * Main download loop...
      * =================================================================== */
-    msgcnt = pop_get_exists(pop, NULL);
+    msgcnt     = pop_get_exists(pop, NULL);
+    total_size = pop_get_total_size(pop);
     if(!m->delete_from_server) {
         uids = mp_load_uids();
         current_uids = g_hash_table_new(g_str_hash, g_str_equal);
@@ -497,10 +520,10 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
             if(g_hash_table_lookup(uids, full_uid))
                 continue;
         }
+#if POP_SYNC
         libbalsa_mailbox_progress_notify(mailbox,
                                          LIBBALSA_NTFY_PROGRESS, i, msgcnt,
                                          "next message");
-#if POP_SYNC
         f = mode->open(msg_path);
         if(!f) {
             libbalsa_information(LIBBALSA_INFORMATION_ERROR,
@@ -521,11 +544,15 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
         g_free(msg_path);
 #else 
 	{struct fetch_data *fd = g_new0(struct fetch_data, 1);
-	fd->pop = pop; 
-	fd->err = &err;
+        fd->mailbox  = mailbox;
+	fd->pop      = pop; 
+	fd->err      = &err;
 	fd->msg_name = msg_path;
-	fd->msgno = i;
-	fd->dm = mode;
+	fd->dm       = mode;
+	fd->msgno    = i;
+        fd->total_messages = msgcnt;
+        fd->current_pos    = &current_pos;
+        fd->total_size     = total_size;
 	fd->delete_on_server = m->delete_from_server;
         pop_fetch_message(pop, i, fetch_async_cb, fd, 
 			  (GDestroyNotify)async_notify);
@@ -562,8 +589,10 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 	g_free(tmp_path); g_free(mhs);
 	return;
     }
-    libbalsa_mailbox_open(tmp_mailbox);
-    if ((m->inbox) && (libbalsa_mailbox_total_messages(tmp_mailbox))) {
+
+    if (libbalsa_mailbox_open(tmp_mailbox) &&
+        m->inbox &&
+        libbalsa_mailbox_total_messages(tmp_mailbox)) {
 	guint msgno = libbalsa_mailbox_total_messages(tmp_mailbox);
 	GList *msg_list = NULL;
 
@@ -585,8 +614,10 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 	    remove_tmp = FALSE;
 	}
 	g_list_free(msg_list);
+#if 1
+        libbalsa_mailbox_close(tmp_mailbox);
+#endif
     }
-    libbalsa_mailbox_close(tmp_mailbox);
     libbalsa_mailbox_pop3_config_changed(m);
     
     g_object_unref(G_OBJECT(tmp_mailbox));
@@ -603,28 +634,6 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     g_free(tmp_path);
     g_free(mhs);
 }
-
-
-#ifdef FIXME
-static void
-progress_cb(LibBalsaMailbox* mailbox, char *msg, int prog, int tot)
-{
-    /* tot=-1 means finished */
-    if (tot==-1)
-	libbalsa_mailbox_progress_notify(mailbox,
-					 LIBBALSA_NTFY_PROGRESS, 0,
-					 1, "Finished");
-    else {
-	if (tot>0)
-	    libbalsa_mailbox_progress_notify(mailbox,
-					     LIBBALSA_NTFY_PROGRESS, prog,
-					     tot, msg);
-	libbalsa_mailbox_progress_notify(mailbox,
-					 LIBBALSA_NTFY_MSGINFO, prog,
-                                         tot, msg);
-    }
-}
-#endif
 
 static void
 libbalsa_mailbox_pop3_save_config(LibBalsaMailbox * mailbox,

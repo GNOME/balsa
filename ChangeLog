@@ -1,3 +1,11 @@
+2004-04-04  Pawel Salek
+
+	* libbalsa/mailbox_local.c: make sure to kill the delayed sync handler
+	before closing the mailbox. Lock properly, too.
+	* libbalsa/mailbox_pop3.c: cleanup and improve progress indication.
+	* libbalsa/imap/pop3.[ch]: armour the code against broken connections.
+	* src/main-window.c: change slightly displaying format.
+
 2004-04-03  Pawel Salek
 
 	* libbalsa/imap/pop3.h: implement pipelined pop3 fetching.

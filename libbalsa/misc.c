@@ -306,9 +306,9 @@ gboolean libbalsa_find_word(const gchar * word, const gchar * str)
 	if (g_strncasecmp(word, ptr, len) == 0)
 	    return TRUE;
 	/* skip one word */
-	while (*ptr && !isspace((unsigned char) *ptr))
+	while (*ptr && !isspace((int)*ptr))
 	    ptr++;
-	while (*ptr && isspace((unsigned char) *ptr))
+	while (*ptr && isspace((int) *ptr))
 	    ptr++;
     }
     return FALSE;
@@ -533,11 +533,11 @@ dowrap_rfc2646(gchar * par, gint width, gboolean to_screen,
              * one word per inner loop
              * */
             while (*str) {
-                while (*str && !isspace(*str) && len < MAX_WIDTH) {
+                while (*str && !isspace((int)*str) && len < MAX_WIDTH) {
                     len++;
                     str++;
                 }
-                while (len < MAX_WIDTH && isspace(*str)) {
+                while (len < MAX_WIDTH && isspace((int)*str)) {
                     if (*str == '\t')
                         len += 8 - len % 8;
                     else
@@ -574,7 +574,7 @@ dowrap_rfc2646(gchar * par, gint width, gboolean to_screen,
              * make sure that a line ending in whitespace ends in an
              * actual ' ' 
              * */
-            if (str > start && isspace(str[-1]) && str[-1] != ' ')
+            if (str > start && isspace((int)str[-1]) && str[-1] != ' ')
                 *result_p = g_string_append_c(*result_p, ' ');
             *result_p = g_string_append_c(*result_p, '\n');
         } while (*str);         /* end of loop over output lines */

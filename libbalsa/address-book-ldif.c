@@ -515,7 +515,7 @@ build_name(gchar *id, gchar *givenname, gchar *surname)
 	/* Try to strip the name out. */
 	if (g_strncasecmp(id, "cn=", 3) == 0) {
 	    id += 3;
-	    while (*id && isspace (*id)) id++;
+	    while (*id && isspace ((int)*id)) id++;
 	}
 	while ((end = strchr(id, ',')) != NULL) {
 	    if (g_strncasecmp(end, ",mail=", 6) == 0) {

@@ -1,3 +1,11 @@
+2001-10-06  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in: warn on wrong return type.
+	* libbalsa/misc.c, libbalsa/address-book-ldif.c: Solaris fixes (S.Wall)
+	* libbalsa/pop3.c: quit immediately on refused connection.
+	* libinit_balsa/Makefile.am: automake-1.5 compatibility.
+	* src/sendmsg-window.c, src/balsa-mblist.[hc]: fix return type.
+
 2001-10-05  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* configure.in: warn on missing prototypes.

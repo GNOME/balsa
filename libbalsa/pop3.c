@@ -591,10 +591,11 @@ fetch_pop_mail (const gchar *pop_host, const gchar *pop_user,
 
     DM("POP3 - begin connection");
     status = pop_connect(&s, pop_host, pop_port);
+    if(status != POP_OK) return status;
     DM("POP3 Connected; hello");
 
-    if(status == POP_OK)
-	status = pop_auth(s, pop_user, pop_pass, use_apop);
+    
+    status = pop_auth(s, pop_user, pop_pass, use_apop);
 
     DM("POP3 authentication %s successful", (status ==POP_OK ? "" : "NOT"));
     if(status == POP_OK)

@@ -1368,7 +1368,7 @@ balsa_mblist_focus_mailbox(BalsaMBList * bmbl, LibBalsaMailbox * mailbox)
    remove give mailbox node from the mailbox tree.
    Return TRUE (or equivalent) on success, FALSE on failure.
 */
-gboolean
+void
 mblist_remove_mblist_node(BalsaMBList *mblist, BalsaMailboxNode *mbnode,
 		GtkCTreeNode *node)
 {

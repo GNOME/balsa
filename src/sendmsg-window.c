@@ -86,7 +86,7 @@ static gint postpone_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint save_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint print_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint attach_clicked(GtkWidget *, gpointer);
-static gint close_window_cb(GtkWidget *, gpointer);
+static void close_window_cb(GtkWidget *, gpointer);
 static gchar* check_if_regular_file(const gchar *);
 static void balsa_sendmsg_destroy_handler(BalsaSendmsg * bsm);
 
@@ -513,7 +513,7 @@ delete_event_cb(GtkWidget * widget, GdkEvent * e, gpointer data)
     return delete_handler(bsmsg);
 }
 
-static gint
+static void
 close_window_cb(GtkWidget * widget, gpointer data)
 {
     BalsaSendmsg* bsmsg = (BalsaSendmsg *) data;

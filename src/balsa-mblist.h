@@ -70,9 +70,9 @@ void mblist_close_mailbox(LibBalsaMailbox * mailbox);
 BalsaMailboxNode* mblist_get_selected_node(BalsaMBList *mblist);
 BalsaMailboxNode* mblist_get_node_by_mailbox(BalsaMBList *mblist,
 					     LibBalsaMailbox * mailbox);
-gboolean mblist_remove_mblist_node(BalsaMBList * mblist,
-                                   BalsaMailboxNode * mbnode,
-                                   GtkCTreeNode * cnode);
+void mblist_remove_mblist_node(BalsaMBList * mblist,
+			       BalsaMailboxNode * mbnode,
+			       GtkCTreeNode * cnode);
 gboolean mblist_remove_mailbox_node(BalsaMBList *mblist,
 				    BalsaMailboxNode* mbnode);
 #endif

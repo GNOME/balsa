@@ -123,6 +123,8 @@ struct _CommonInfo {
     GtkWidget *dialog;
     BALSA_GNOME_PRINT_UI *master;
     LibBalsaMessage *message;
+    gboolean have_ref;
+    GObject *parent_object;
 };
 
 typedef void (*prepare_func_t)(PrintInfo * pi, LibBalsaMessageBody * body);
@@ -1326,6 +1328,8 @@ common_info_destroy(CommonInfo * ci)
 
     gtk_widget_destroy(GTK_WIDGET(ci->dialog));
     g_object_unref(ci->master);
+    if (ci->have_ref)
+        g_object_unref(ci->message);
 
     g_free(ci);
 }
@@ -1334,23 +1338,8 @@ common_info_destroy(CommonInfo * ci)
 static void
 common_info_cleanup(CommonInfo * ci)
 {
-    GObject *object = G_OBJECT(ci->message);
-
-    if (ci->message->mailbox) {
-        /* a message we're reading */
-        g_object_set_data(object, BALSA_PRINT_COMMON_INFO_KEY, NULL);
-        g_object_weak_unref(object, (GWeakNotify) common_info_destroy, ci);
-    } else {
-        /* temporary message from the compose window */
-        GtkWindow *window =
-            gtk_window_get_transient_for(GTK_WINDOW(ci->dialog));
-        if (window)
-            g_object_set_data(G_OBJECT(window),
-                              BALSA_PRINT_COMMON_INFO_KEY, NULL);
-        g_object_unref(object);
-    }
-
-    common_info_destroy(ci);
+    /* This triggers common_info_destroy(ci): */
+    g_object_set_data(ci->parent_object, BALSA_PRINT_COMMON_INFO_KEY, NULL);
 }
 
 /* Callback for the "response" signal for the print dialog. */
@@ -1406,33 +1395,45 @@ print_response_cb(GtkDialog * dialog, gint response, CommonInfo * ci)
 void
 message_print(LibBalsaMessage * msg, GtkWindow * parent)
 {
-    GObject *object;
+    GObject *parent_object;
     CommonInfo *ci;
     GnomePrintConfig *config;
 
     g_return_if_fail(msg != NULL);
 
-    /* Show only one dialog per message. */
-    object = msg->mailbox
-        ? G_OBJECT(msg)         /* a message we're reading */
-        : G_OBJECT(parent);     /* temporary message from the compose window */
-    ci = g_object_get_data(object, BALSA_PRINT_COMMON_INFO_KEY);
+    /* Show only one dialog: */
+    parent_object = (parent == GTK_WINDOW(balsa_app.main_window))
+        ? G_OBJECT(msg)         /* per message. */
+        : G_OBJECT(parent);     /* per window. */
+    ci = g_object_get_data(parent_object, BALSA_PRINT_COMMON_INFO_KEY);
     if (ci) {
         gdk_window_raise(ci->dialog->window);
         return;
     }
 
     ci = g_new(CommonInfo, 1);
-    g_object_set_data(object, BALSA_PRINT_COMMON_INFO_KEY, ci);
+
+    /* Close the dialog if the parent object is destroyed. We should also
+     * close if the message is destroyed, but that's covered:
+     * - if called from the main window, the message is the parent;
+     * - if called from the message window, that window is the parent,
+     *   but it's destroyed with the message, so we'll find out;
+     * - if called from the compose window, we ref the message, so it
+     *   can't be destroyed. */
+    g_object_set_data_full(parent_object, BALSA_PRINT_COMMON_INFO_KEY, ci,
+                           (GDestroyNotify) common_info_destroy);
+    ci->parent_object = parent_object;
 
     common_info_setup(ci);
     ci->message = msg;
-    if (msg->mailbox)
-        /* a message we're reading */
-        g_object_weak_ref(G_OBJECT(msg), (GWeakNotify) common_info_destroy, ci);
-    else 
+    if (!msg->mailbox) {
         /* temporary message from the compose window */
         g_object_ref(msg);
+        ci->have_ref = TRUE;
+    } else
+        /* a message we're reading */
+        ci->have_ref = FALSE;
+
     ci->master = BALSA_GNOME_PRINT_UI_NEW;
 
     /* FIXME: this sets the paper size in the GnomePrintConfig. We can

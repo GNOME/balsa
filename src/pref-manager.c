@@ -589,6 +589,7 @@ apply_prefs (GtkWidget * pbox, PropertyUI * pui)
 	g_free (balsa_app.selected_headers);
 	balsa_app.selected_headers = g_strdup (gtk_entry_get_text (
 	   GTK_ENTRY (pui->selected_headers)) );
+	g_strdown(balsa_app.selected_headers);
 
 	// XXX
 	//  refresh_main_window ();
@@ -707,7 +708,7 @@ set_prefs (void)
 	if(balsa_app.date_string) 
 	   gtk_entry_set_text (GTK_ENTRY (pui->date_format),
 			       balsa_app.date_string);
-	if(balsa_app.date_string) 
+	if(balsa_app.selected_headers) 
 	   gtk_entry_set_text (GTK_ENTRY (pui->selected_headers),
 			       balsa_app.selected_headers);
 }

@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <ctype.h>
 
 #include <gnome.h>
 
@@ -86,7 +87,7 @@ make_string_from_list (GList * the_list)
     {
       addy = list->data;
       str = address_to_gchar (addy);
-      gs = g_string_append (gs, str);
+      if(str) gs = g_string_append (gs, str);
       g_free (str);
 
       if (list->next)
@@ -150,7 +151,8 @@ readfile (FILE * fp, char **buf)
 
 /* find_word
    searches given word delimited by blanks or string boundaries in given
-   string. Returns TRUE if the word is found.
+   string. IS case-sensitive (but probably should not). 
+   Returns TRUE if the word is found.
 */
 gboolean
 find_word(const gchar * word, const gchar* str) {
@@ -163,3 +165,31 @@ find_word(const gchar * word, const gchar* str) {
    } return FALSE;
 }
 
+/* wrap_string
+   wraps given string replacing spaces with '\n'.  do changes in place.
+   lnbeg - line beginning position, sppos - space position, 
+   te - tab's extra space.
+*/
+void
+wrap_string(gchar* str, int width)
+{
+   const int minl = width/2;
+   gchar *lnbeg, *sppos, *ptr;
+   gint te = 0;
+
+   g_assert(str != NULL);
+   lnbeg= sppos = ptr = str;
+
+   while(*ptr) {
+      if(*ptr=='\t') te += 7;
+      if(*ptr==' ') sppos = ptr;
+      if(ptr-lnbeg>width-te && sppos>=lnbeg+minl) {
+	 *sppos = '\n';
+	 lnbeg = ptr;te = 0;
+      }
+      if(*ptr=='\n') {
+	 lnbeg = ptr; te = 0;
+      }
+      ptr++;
+   }
+}

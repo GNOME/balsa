@@ -194,14 +194,15 @@ static GnomeUIInfo file_menu[] =
 
 static GnomeUIInfo shown_hdrs_menu[] =
 {
-   GNOMEUIINFO_RADIOITEM( N_ ("_Show no headers"), NULL, 
+   GNOMEUIINFO_RADIOITEM( N_ ("_No headers"), NULL, 
 			  show_no_headers_cb, NULL),
-   GNOMEUIINFO_RADIOITEM( N_ ("Show _selected headers"),NULL,
+   GNOMEUIINFO_RADIOITEM( N_ ("_Selected headers"),NULL,
 			  show_selected_cb, NULL),
-   GNOMEUIINFO_RADIOITEM( N_ ("Show all _headers"), NULL, 
+   GNOMEUIINFO_RADIOITEM( N_ ("All _headers"), NULL, 
 			  show_all_headers_cb, NULL),
    GNOMEUIINFO_END
 };
+
 static GnomeUIInfo message_menu[] =
 {
     /* M */

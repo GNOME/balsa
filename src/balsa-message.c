@@ -636,7 +636,7 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
      add_header_gchar("fcc" , _("Fcc:"),     message->fcc_mailbox->name, row);
   add_header_gchar("subject", _("Subject:"), message->subject,           row);
 
-  /* user headers have no alignment, should they have it? */
+
   if(balsa_app.shown_headers == HEADERS_ALL) {
      GList *p, * lst = message_user_hdrs(message);
      gchar * hdr, *ptr, *val;
@@ -920,35 +920,6 @@ find_body_font(BODY * bdy)
    return font_name;
 }
 
-/* wrap_string
-   wraps given string replacing spaces with '\n'.  do changes in place.
-   KISSed by pawsa.
-   lnbeg - line beginning position, sppos - space position, 
-   te - tab's extra space.
-*/
-void
-wrap_string(gchar* str, int width)
-{
-   const int minl = width/2;
-   gchar *lnbeg, *sppos, *ptr;
-   gint te = 0;
-
-   g_assert(str != NULL);
-   lnbeg= sppos = ptr = str;
-
-   while(*ptr) {
-      if(*ptr=='\t') te += 7;
-      if(*ptr==' ') sppos = ptr;
-      if(ptr-lnbeg>width-te && sppos>=lnbeg+minl) {
-	 *sppos = '\n';
-	 lnbeg = ptr;te = 0;
-      }
-      if(*ptr=='\n') {
-	 lnbeg = ptr; te = 0;
-      }
-      ptr++;
-   }
-}
 
 /* reflows a paragraph in given string. The paragraph to reflow is
 determined by the cursor position. If mode is <0, whole string is

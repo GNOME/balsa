@@ -735,6 +735,7 @@ config_global_load (void)
     balsa_app.selected_headers = g_strdup (DEFAULT_SELECTED_HDRS);
   else
     balsa_app.selected_headers = g_strdup (field);
+  g_strdown(balsa_app.selected_headers);
 
   /* toolbar style */
   if ((field = pl_dict_get_str (globals, "ToolbarStyle")) == NULL)

@@ -41,4 +41,5 @@ MailboxNode *mailbox_node_new (const gchar * name, Mailbox * mb, gint i);
 gchar *g_get_host_name (void);
 
 gboolean find_word(const gchar * word, const gchar* str);
+void wrap_string(gchar* str, int width);
 #endif /* __MISC_H__ */

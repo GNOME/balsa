@@ -1,3 +1,18 @@
+2000-03-08  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/message.c, libbalsa/message.h: Selection of shown
+	headers: none, user selected or (almost) all.
+
+	* libbalsa/misc.c: make_string_from_list didn't handle NULL elements.
+	* libbalsa/misc.h:
+	
+
+2000-03-05  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/message.c, libbalsa/message.h:
+	I18n support in the message window and automatic charset selection
+	for replying and forwarding. Wrapping for message view widget.
+
 2000-03-05  Morten Welinder  <terra@diku.dk>
 
 	* libbalsa/misc.c (make_string_from_list): Plug leak.

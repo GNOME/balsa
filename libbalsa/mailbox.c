@@ -2558,6 +2558,9 @@ lbm_get_mime_msg(LibBalsaMailbox * mailbox, LibBalsaMessage * msg)
     return mime_msg;
 }
 
+/* Try to reassemble messages of type message/partial with the given id;
+ * if successful, flag the parts, so we don't keep creating the whole
+ * message. */
 void
 libbalsa_mailbox_try_reassemble(LibBalsaMailbox * mailbox,
 				const gchar * id)
@@ -2567,13 +2570,15 @@ libbalsa_mailbox_try_reassemble(LibBalsaMailbox * mailbox,
     GMimeMessage *mime_message;
     GPtrArray *partials = g_ptr_array_new();
     guint total = (guint) - 1;
+    GList *messages = NULL;
 
     for (msgno = 1; msgno <= libbalsa_mailbox_total_messages(mailbox);
 	 msgno++) {
 	message = libbalsa_mailbox_get_message(mailbox, msgno);
 	gchar *tmp_id;
 
-	if (!libbalsa_message_is_partial(message, &tmp_id))
+	if (!libbalsa_message_is_partial(message, &tmp_id)
+	    || LIBBALSA_MESSAGE_IS_FLAGGED(message))
 	    continue;
 
 	if (strcmp(tmp_id, id) == 0) {
@@ -2585,6 +2590,8 @@ libbalsa_mailbox_try_reassemble(LibBalsaMailbox * mailbox,
 	    if (g_mime_message_partial_get_total(partial) > 0)
 		total = g_mime_message_partial_get_total(partial);
 	    g_mime_object_unref(GMIME_OBJECT(mime_message));
+
+	    messages = g_list_prepend(messages, message);
 	}
 
 	g_free(tmp_id);
@@ -2599,7 +2606,12 @@ libbalsa_mailbox_try_reassemble(LibBalsaMailbox * mailbox,
 	message->mime_msg = mime_message;
 	libbalsa_mailbox_copy_message(message, mailbox);
 	g_object_unref(message);
+
+	libbalsa_messages_change_flag(messages,
+				      LIBBALSA_MESSAGE_FLAG_FLAGGED,
+				      TRUE);
     }
 
     g_ptr_array_free(partials, TRUE);
+    g_list_free(messages);
 }

@@ -1,3 +1,7 @@
+2003-02-28 15:21  PeterB
+
+	* src/balsa-message.c: Fix header indents.
+
 2003-02-27  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-index.c: add extra protection via weak pointers.

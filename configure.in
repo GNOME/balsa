@@ -207,7 +207,7 @@ dnl ###########################################################################
 AC_MSG_CHECKING(whether to Gnome-VFS is available)
 if gnome-config --libs vfs > /dev/null 2>&1; then
     AC_MSG_RESULT(yes)
-    gnome_libs="$gnome_libs vfs"
+    gnome_libs="$gnome_libs vfs oaf"
 else
     AC_MSG_ERROR([Gnome-VFS(-devel) library is needed to build balsa])
 fi

@@ -1,3 +1,7 @@
+2001-11-19  Carlos Morgado  <chbm@chbm.nu>
+
+	* configure.in: added oaf to vfs flags
+
 2001-11-16  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-index.c: update browsed message on narrowing the

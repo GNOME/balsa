@@ -1,3 +1,16 @@
+2000-09-28  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* Makefile.am: add bzdist target (is it the right way of doing it?)
+	* balsa.spec.in: include bzipped tarball.
+	* help/C/balsa.sgml: add missing closing tag.
+	* libbalsa/message.[ch]: be cautious on message copy and move, 
+	return status.
+	* libbalsa/send.c: use malloc() to allocate structures to be 
+	freed by free(). (doesn't matter /most/ of the time; sometimes does).
+	* src/balsa-message.c: add missing charsets.
+	* src/sendmsg-window.c: use user's language, if this does 
+	not conflict with the message's charset.
+	
 2000-09-27  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/address-book.c: Move addresses on double click.

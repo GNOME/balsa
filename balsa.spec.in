@@ -11,7 +11,7 @@ Version:   %ver
 Release:   %rel
 Copyright: GPL
 Group:     Applications/Internet
-Source0:   balsa-%{PACKAGE_VERSION}.tar.gz
+Source0:   balsa-%{PACKAGE_VERSION}.tar.bz2
 URL:       http://www.balsa.net/
 BuildRoot: /tmp/balsa-%{PACKAGE_VERSION}-root
 Packager: Pawel Salek <pawsa@theochem.kth.se>

@@ -1871,13 +1871,13 @@ init_menus(BalsaSendmsg *msg)
    }
 
    /* set the charset... */
-   if(msg->charset) { /* find by charset */
+   i = find_locale_index_by_locale(setlocale(LC_CTYPE, NULL));
+   if(msg->charset && g_strcasecmp(locales[i].charset, msg->charset)!=0) { 
      i = ELEMENTS(locales)-1;
      while( i>=0 && g_strcasecmp (locales[i].charset, msg->charset) !=0)
        i--;
      if(i<0) i = LOC_ENGLISH_POS;
-   } else 
-     i = find_locale_index_by_locale(setlocale(LC_CTYPE, NULL));
+   }
 
    set_locale(NULL, msg, i);
 

@@ -1943,6 +1943,7 @@
 	      on what notification priority set for it in the <link
 								    linkend="win-config-4">Display</link> page, it can show up
 	      in list or dialog as the program runs.
+	    </para>
 	  </listitem>
 	</varlistentry>
 

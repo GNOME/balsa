@@ -122,8 +122,8 @@ GtkType libbalsa_message_get_type(void);
  */
 LibBalsaMessage *libbalsa_message_new(void);
 
-void libbalsa_message_copy (LibBalsaMessage * message, LibBalsaMailbox * dest);
-void libbalsa_message_move (LibBalsaMessage * message, LibBalsaMailbox * mailbox);
+gboolean libbalsa_message_copy (LibBalsaMessage * message, LibBalsaMailbox * dest);
+gboolean libbalsa_message_move (LibBalsaMessage * message, LibBalsaMailbox * mailbox);
 void libbalsa_message_clear_flags (LibBalsaMessage * message);
 
 void libbalsa_message_read (LibBalsaMessage * message);

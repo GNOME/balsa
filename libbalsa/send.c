@@ -62,12 +62,15 @@ struct _MessageQueueItem
 MessageQueueItem *last_message;
 int total_messages_left;
 
+/* make sure that you use malloc/free pair, g_lib routines /claimed/ to 
+   be not MT-safe.
+*/
 static MessageQueueItem *
 msg_queue_item_new(LibBalsaMessage *message) 
 {
 	MessageQueueItem *mqi;
 
-	mqi = g_new(MessageQueueItem,1);
+	mqi = (MessageQueueItem*)malloc(sizeof(MessageQueueItem));
 	mqi->orig = message;
 	mqi->message = mutt_new_header ();
 	mqi->next_message = NULL;

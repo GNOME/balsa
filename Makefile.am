@@ -48,3 +48,7 @@ dist-hook: balsa.spec
 @MAINT@include macros/macros.dep
 @MAINT@macros/macros.dep: macros/Makefile.am
 @MAINT@	cd macros && $(MAKE) macros.dep
+bzdist: distdir
+	-chmod -R a+r $(distdir)
+	$(TAR) choIf $(distdir).tar.bz2 $(distdir)
+	-rm -rf $(distdir)

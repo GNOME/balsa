@@ -332,16 +332,17 @@ libbalsa_message_user_hdrs(LibBalsaMessage *message)
 }
 
 /* FIXME: look at the flags for mutt_append_message */
-void
+gboolean
 libbalsa_message_copy (LibBalsaMessage * message, LibBalsaMailbox * dest)
 {
 	HEADER *cur;
 
-	RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
+	RETURN_VAL_IF_CONTEXT_CLOSED (message->mailbox, FALSE);
 
 	cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
 
 	libbalsa_mailbox_open(dest, FALSE);
+	if(!CLIENT_CONTEXT(dest)) return FALSE;
 
 	libbalsa_lock_mutt();
 	mutt_append_message (CLIENT_CONTEXT (dest),
@@ -353,22 +354,22 @@ libbalsa_message_copy (LibBalsaMessage * message, LibBalsaMailbox * dest)
 	if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW ) dest->unread_messages++;
 
 	libbalsa_mailbox_close (dest);
-
+	return TRUE;
 }
 
-void
+gboolean
 libbalsa_message_move (LibBalsaMessage * message, LibBalsaMailbox * dest)
 {
 	HEADER *cur;
 
-	g_return_if_fail(message != NULL);
-	g_return_if_fail(dest != NULL);
-	RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
+	g_return_val_if_fail(message != NULL, FALSE);
+	g_return_val_if_fail(dest != NULL, FALSE);
+	RETURN_VAL_IF_CONTEXT_CLOSED (message->mailbox, FALSE);
   
 	cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
 
 	libbalsa_mailbox_open(dest, TRUE);
-
+	if(!CLIENT_CONTEXT(dest)) return FALSE;
 	libbalsa_lock_mutt();
 
 	mutt_parse_mime_message (CLIENT_CONTEXT (message->mailbox), cur);
@@ -385,8 +386,8 @@ libbalsa_message_move (LibBalsaMessage * message, LibBalsaMailbox * dest)
 		dest->unread_messages++;
 
 	libbalsa_mailbox_close (dest);
-  
 	libbalsa_message_delete (message);
+	return TRUE;
 }
 
 static void

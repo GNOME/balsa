@@ -11,8 +11,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2001-10-03 21:57+0200\n"
-"PO-Revision-Date: 2001-10-03 22:20+0200\n"
+"POT-Creation-Date: 2001-10-14 15:39+0200\n"
+"PO-Revision-Date: 2001-10-14 15:45+0200\n"
 "Last-Translator: GNOME PL Team <translators@gnome.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -392,7 +392,7 @@ msgid "connection error"
 msgstr "b³±d przy po³±czeniu"
 
 #: libbalsa/pop3.c:1
-msgid "POP command exection failed"
+msgid "POP command execution failed"
 msgstr "B³±d przy wykonywaniu polecenia POP"
 
 #: libbalsa/pop3.c:1
@@ -728,6 +728,8 @@ msgid ""
 "[-- and the indicated external source has --]\n"
 "[-- expired. --]\n"
 msgstr ""
+"[-- Ten za³±cznik %s/%s nie jest do³±czony, --]\n"
+"[-- a wskazane zewnêtrzne ¼ród³o wygas³o. --\n"
 
 #: libmutt/handler.c:1
 #, c-format
@@ -764,7 +766,7 @@ msgstr "(u¿yj \"%s\", aby wy¶wietliæ tê czê¶æ)"
 
 #: libmutt/handler.c:1
 msgid "(need 'view-attachments' bound to key!)"
-msgstr ""
+msgstr "(wymaga 'view-attachments' powi±zanego z klawiszem!)"
 
 #: libmutt/imap/auth.c:1
 msgid "No authenticators available"
@@ -797,7 +799,7 @@ msgstr "Uwierzytelnienie GSSAPI nie powiod³o siê."
 
 #: libmutt/imap/auth_login.c:1
 msgid "LOGIN disabled on this server."
-msgstr ""
+msgstr "Polecenie LOGIN nie dzia³a na tym serwerze."
 
 #: libmutt/imap/auth_login.c:1
 msgid "Logging in..."
@@ -1479,7 +1481,7 @@ msgstr "Zapisz adres..."
 
 #: src/balsa-index.c:1
 msgid "Toggle"
-msgstr ""
+msgstr "Prze³±cz"
 
 #: src/balsa-index.c:1 src/main-window.c:1
 msgid "Flagged"
@@ -1955,6 +1957,11 @@ msgid ""
 "INBOX and its subfolders will remain.\n"
 "What would you like to do?"
 msgstr ""
+"Zmiana nazwy INBOX jest traktowana w specjalny sposób!\n"
+"Zostanie stworzony %s wewn±trz %s,\n"
+"zawieraj±cy listy z INBOX.\n"
+"INBOX wraz z podfolderami pozostanie.\n"
+"Co chcesz zrobiæ?"
 
 #: src/folder-conf.c:1
 msgid "Rename INBOX"
@@ -1971,6 +1978,8 @@ msgid ""
 "This folder is not stored in configuration.I do not yet know how to remove "
 "it from remote server."
 msgstr ""
+"Ten folder nie jest zapisany w konfiguracji. Nie wiadomo, jak go usun±æ ze "
+"zdalnego serwera."
 
 #: src/folder-conf.c:1
 #, c-format
@@ -2528,6 +2537,14 @@ msgstr "Nastêpny nieprzeczytany list"
 msgid "Next Flagged Message"
 msgstr "Nastêpny oznakowany list"
 
+#: src/main-window.c:1 src/toolbar-prefs.c:1
+msgid "Mark all"
+msgstr "Zaznacz wszystkie"
+
+#: src/main-window.c:1 src/toolbar-prefs.c:1
+msgid "Mark all messages in current mailbox"
+msgstr "Zaznacza wszystkie listy w bie¿±cej skrzynce"
+
 #: src/main-window.c:1
 msgid "_Edit..."
 msgstr "Z_modyfikuj..."
@@ -2615,6 +2632,10 @@ msgstr ""
 "mo¿na odnale¼æ na witrynie http://www.balsa.net/\n"
 "\n"
 "Aby zg³osiæ b³±d w programie, odwied¼ http://bugzilla.gnome.org/"
+
+#: src/main-window.c:1
+msgid "Finished Checking."
+msgstr "Zakoñczono sprawdzanie."
 
 #: src/main-window.c:1
 #, c-format
@@ -3280,6 +3301,14 @@ msgid "_Attach File..."
 msgstr "_Za³±cz plik..."
 
 #: src/sendmsg-window.c:1
+msgid "_Include Message(s)"
+msgstr "_Do³±cz listy"
+
+#: src/sendmsg-window.c:1
+msgid "Attach _Message(s)"
+msgstr "Z_a³±cz listy"
+
+#: src/sendmsg-window.c:1
 msgid "_Send"
 msgstr "_Wy¶lij"
 
@@ -3322,6 +3351,10 @@ msgstr "_Zawijanie tre¶ci"
 #: src/sendmsg-window.c:1
 msgid "Insert _Signature"
 msgstr "Wstaw p_odpis"
+
+#: src/sendmsg-window.c:1
+msgid "_Quote Message(s)"
+msgstr "_Zacytuj listy"
 
 #: src/sendmsg-window.c:1
 msgid "_Reflow Paragraph"
@@ -3577,6 +3610,15 @@ msgstr "Nie mo¿na odczytaæ pliku %s\n"
 msgid "Attach file"
 msgstr "Za³±cz plik"
 
+#: src/sendmsg-window.c:1 src/sendmsg-window.c:1
+#: src/sendmsg-window.c:1
+msgid ""
+"Attaching message failed.\n"
+"Possible reason: not enough temporary space"
+msgstr ""
+"Za³±czenie listu nie powiod³o siê.\n"
+"Mo¿liwa przyczyna: brak miejsca na pliki tymczasowe"
+
 #. Attachment list
 #: src/sendmsg-window.c:1
 msgid "Attachments:"
@@ -3798,10 +3840,8 @@ msgstr "Odpowiada autorowi i wszystkim adresatom listu"
 #: src/toolbar-prefs.c:1
 msgid ""
 "Reply\n"
-"to list"
-msgstr ""
-"Odpowiedz\n"
-"na listê"
+"to group"
+msgstr "Do grupy"
 
 #: src/toolbar-prefs.c:1
 msgid "Forward"
@@ -3912,14 +3952,6 @@ msgid "Toggle new message flag"
 msgstr "Prze³±cza oznaczenie listu jako nowy"
 
 #: src/toolbar-prefs.c:1
-msgid "Mark all"
-msgstr "Zaznacz wszystkie"
-
-#: src/toolbar-prefs.c:1
-msgid "Mark all messages in current mailbox"
-msgstr "Zaznacza wszystkie listy w bie¿±cej skrzynce"
-
-#: src/toolbar-prefs.c:1
 msgid ""
 "All\n"
 "headers"
@@ -3942,6 +3974,16 @@ msgstr "Usuwa listy ze skrzynki ¶mietnika"
 #: src/toolbar-prefs.c:1
 msgid "Close current mailbox"
 msgstr "Zamyka bie¿±c± skrzynkê"
+
+#: src/toolbar-prefs.c:1
+msgid ""
+"Preview\n"
+"pane"
+msgstr "Podgl±d listu"
+
+#: src/toolbar-prefs.c:1
+msgid "Show preview pane"
+msgstr "Podgl±d listu wewn±trz okna"
 
 #: src/toolbar-prefs.c:1
 msgid "Customize"

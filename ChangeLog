@@ -1,3 +1,10 @@
+2003-02-27  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox_imap.c: remove forgotten gdk locks from libbalsa.
+	* src/balsa-app.c: threads do not hold gdk lock here.
+	* src/balsa-index.c: unlock gdk before entering time consuming
+	operation.
+
 2003-02-25 13:37  PeterB
 
 	* src/: balsa-app.c, balsa-index.c, balsa-mblist.c, mailbox-node.c:

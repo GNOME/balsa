@@ -627,7 +627,6 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
 	UNLOCK_MAILBOX(mailbox);
 	return FALSE;
     }
-    gdk_threads_leave();
     libbalsa_lock_mutt();
     reset_mutt_passwords(server);
     CLIENT_CONTEXT(mailbox) = mx_open_mailbox(mailbox->url, 0, NULL);
@@ -647,7 +646,6 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
 	mailbox->open_ref++;
 
 	UNLOCK_MAILBOX(mailbox);
-	gdk_threads_enter();
 	libbalsa_mailbox_load_messages(mailbox);
 #ifdef DEBUG
 	g_print(_("LibBalsaMailboxImap: Opening %s Refcount: %d\n"),
@@ -655,7 +653,6 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
 #endif
     } else {
 	UNLOCK_MAILBOX(mailbox);
-	gdk_threads_enter();
     }
     mailbox->disconnected = FALSE;
     return CLIENT_CONTEXT_OPEN(mailbox);

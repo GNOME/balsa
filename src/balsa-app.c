@@ -127,7 +127,6 @@ ask_password_mt(LibBalsaServer * server, LibBalsaMailbox * mbox)
     static pthread_mutex_t ask_passwd_lock = PTHREAD_MUTEX_INITIALIZER;
     AskPasswdData apd;
 
-    gdk_threads_leave();
     pthread_mutex_lock(&ask_passwd_lock);
     pthread_cond_init(&apd.cond, NULL);
     apd.server = server;
@@ -138,7 +137,6 @@ ask_password_mt(LibBalsaServer * server, LibBalsaMailbox * mbox)
     pthread_cond_destroy(&apd.cond);
     pthread_mutex_unlock(&ask_passwd_lock);
     pthread_mutex_destroy(&ask_passwd_lock);
-    gdk_threads_enter();
     return apd.res;
 }
 #endif

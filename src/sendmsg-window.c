@@ -175,7 +175,9 @@ static GnomeUIInfo iso_charset_menu[] = {
   GNOMEUIINFO_END
 };
 
-/* the same sequence as in iso_charset_menu */
+/* the same sequence as in iso_charset_menu; the array stores charset name
+   included in the MIME type information.
+ */
 static gchar* iso_charset_names[] = {
    "ISO-8859-1",
    "ISO-8859-15",
@@ -1522,6 +1524,60 @@ static void set_menus(BalsaSendmsg *msg)
    msg->charset_idx = i;
 }
 
+/* create_font_name returns iso8859 font name based on given font 
+   wildcard 'base' and given charmap (PS: verify the name).
+   Algorithm: copy max first 12 fields, cutting additionally 
+   at most two last, if they are constant.
+*/
+/* the name should really be one_or_two_const_fields_to_end */
+static gint 
+two_const_fields_to_end(const gchar* ptr) {
+   int cnt = 0;
+   while(*ptr && cnt<3) {
+      if(*ptr   == '*') return 0;
+      if(*ptr++ == '-') cnt++;
+   }
+   return cnt<3;
+}
+
+static gchar* 
+get_font_name(const gchar* base, int code) {
+   static gchar type[] ="iso8859";
+   //g_snprintf(font_name,sizeof(font_name),"%s-%d",base_mask,code);
+   gchar *res;
+   const gchar* ptr = base;
+   int dash_cnt = 0, len;
+
+   g_return_val_if_fail(base != NULL, NULL);
+   g_return_val_if_fail(code >= 0,    NULL);
+
+   while(*ptr && dash_cnt<13) {
+      if(*ptr == '-') dash_cnt++;
+      
+      if(two_const_fields_to_end(ptr)) break;
+      ptr++;
+   }
+
+   // defense against a patologically short base font wildcard implemented
+   // in the chunk below
+   // extra space for dwo dashes and '\0'
+   len = ptr-base;
+   if(dash_cnt>12) len--;
+   if(len<1) len = 1;
+   res = (gchar*)g_malloc(len+sizeof(type)+3+(code>9?2:1));
+   if(balsa_app.debug)
+      fprintf(stderr,"base font name: %s and code :%d\n"
+	      "mallocating %d bytes\n", base, code,
+	      len+sizeof(type)+2+(code>9?2:1) );
+
+   if(len>1) strncpy(res, base, len);
+   else { strncpy(res, "*", 1); len = 1; } 
+
+   sprintf(res+len,"-%s-%d", type, code);
+   return res;
+}   
+
+
 /* hardcoded charset set :
    text is the GtkText message edit widget, code is the iso-8859 character 
    set encoding and pos is the menu position.
@@ -1530,29 +1586,31 @@ static void set_menus(BalsaSendmsg *msg)
    by a mouse click
 */
 
-static gint iso_font_set(BalsaSendmsg *msg, gint code, gint idx) {
-static const char base_mask[] = 
-   "-*-fixed-medium-r-normal--14-*-*-*-c-*-iso8859";
+
+static gint 
+iso_font_set(BalsaSendmsg *msg, gint code, gint idx) {
    guint point, txt_len;
-   gchar* str;
+   gchar* str, *font_name;
    /* ten extra characters for the code only is more than sufficent */
-   gchar font_name[sizeof(base_mask)+10]; 
    
    msg->charset_idx = idx;
 
    if( ! GTK_CHECK_MENU_ITEM(iso_charset_menu[idx].widget)->active)
       return TRUE;
    
-   g_snprintf(font_name,sizeof(font_name),"%s-%d",base_mask,code);
    
+   font_name = get_font_name(balsa_app.message_font, code);
    if(msg->font) gdk_font_unref(msg->font);
 
    if( !( msg->font = gdk_font_load (font_name)) ) {
+      g_free(font_name);
       printf("Cannot find fond: %s\n", font_name);
       return TRUE;
    }
    if(balsa_app.debug) 
       fprintf(stderr,"loaded font with mask: %s\n", font_name);
+   g_free(font_name);
+   
 
    gtk_text_freeze( GTK_TEXT(msg->text) );
    point   = gtk_editable_get_position( GTK_EDITABLE(msg->text) ); 

@@ -20,11 +20,11 @@
  * Handles the clicking of the main buttons at the 
  * bottom of the dialog.  wooo.
  */
-void 
+void
 fe_dialog_button_clicked (GtkWidget * widget,
 			  gpointer data)
 {
-  switch (GPOINTER_TO_INT(data))
+  switch (GPOINTER_TO_INT (data))
     {
     case 2:			/* Cancel button */
       break;
@@ -52,14 +52,14 @@ fe_dialog_button_clicked (GtkWidget * widget,
  * Handles toggling of the type checkbuttons.
  * When they are toggled, the notebook page must change
  */
-void 
+void
 fe_checkbutton_toggled (GtkWidget * widget,
 			gpointer data)
 {
   if (GTK_CHECK_MENU_ITEM (widget)->active)
     {
       gtk_notebook_set_page (GTK_NOTEBOOK (fe_type_notebook),
-			     GPOINTER_TO_INT(data));
+			     GPOINTER_TO_INT (data));
     }
 }				/* end fe_checkbutton_toggled() */
 
@@ -69,36 +69,37 @@ fe_checkbutton_toggled (GtkWidget * widget,
  *
  * Callback for the "Action" option menu
  */
-void fe_action_selected(GtkWidget *widget,
-			gpointer data)
+void 
+fe_action_selected (GtkWidget * widget,
+		    gpointer data)
 {
-    gtk_widget_set_sensitive(GTK_WIDGET(fe_action_entry),
-			     TRUE);
-    switch(GPOINTER_TO_INT(data))
+  gtk_widget_set_sensitive (GTK_WIDGET (fe_action_entry),
+			    TRUE);
+  switch (GPOINTER_TO_INT (data))
     {
-    case 0: /* copy to folder */
-    case 2: /* print on printer */
-    case 3: /* run program */
-	gtk_widget_set_sensitive(GTK_WIDGET(fe_disp_place),
-				 TRUE);
-	break;
+    case 0:			/* copy to folder */
+    case 2:			/* print on printer */
+    case 3:			/* run program */
+      gtk_widget_set_sensitive (GTK_WIDGET (fe_disp_place),
+				TRUE);
+      break;
 
-    case 4: /* send to trash */
-	gtk_widget_set_sensitive(GTK_WIDGET(fe_action_entry),
-				 FALSE);
-	/* fall through */
-    case 1: /* move to folder */
-	if (GTK_TOGGLE_BUTTON(fe_disp_place)->active)
-	    gtk_toggle_button_set_state(GTK_TOGGLE_BUTTON(fe_disp_continue),
-					TRUE);
-	gtk_widget_set_sensitive(GTK_WIDGET(fe_disp_place),
-				 FALSE);
-	break;
+    case 4:			/* send to trash */
+      gtk_widget_set_sensitive (GTK_WIDGET (fe_action_entry),
+				FALSE);
+      /* fall through */
+    case 1:			/* move to folder */
+      if (GTK_TOGGLE_BUTTON (fe_disp_place)->active)
+	gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (fe_disp_continue),
+				     TRUE);
+      gtk_widget_set_sensitive (GTK_WIDGET (fe_disp_place),
+				FALSE);
+      break;
 
     default:
-	break;
+      break;
     }
-} /* end fe_action_selected() */
+}				/* end fe_action_selected() */
 
 
 /*
@@ -106,7 +107,7 @@ void fe_action_selected(GtkWidget *widget,
  *
  * Callback for the "Add" button for the regex type
  */
-void 
+void
 fe_add_pressed (GtkWidget * widget,
 		gpointer throwaway)
 {
@@ -135,7 +136,7 @@ fe_add_pressed (GtkWidget * widget,
  * 
  * Callback for the "remove" button of the regex type
  */
-void 
+void
 fe_remove_pressed (GtkWidget * widget,
 		   gpointer throwaway)
 {
@@ -156,13 +157,13 @@ fe_remove_pressed (GtkWidget * widget,
  *
  * Callback for the checkbuttons in the "Simple" type
  */
-void 
+void
 fe_type_simple_toggled (GtkWidget * widget,
 			gpointer data)
 {
   if (GTK_TOGGLE_BUTTON (widget)->active)
     {
-      switch (GPOINTER_TO_INT(data))
+      switch (GPOINTER_TO_INT (data))
 	{
 	case 1:		/* ALL */
 	  gtk_toggle_button_set_state (
@@ -204,7 +205,7 @@ fe_type_simple_toggled (GtkWidget * widget,
     }
   else
     {
-      switch (GPOINTER_TO_INT(data))
+      switch (GPOINTER_TO_INT (data))
 	{
 	case 1:		/* ALL */
 	  gtk_widget_set_sensitive (
@@ -237,7 +238,7 @@ fe_type_simple_toggled (GtkWidget * widget,
  * Callback for the fileselection dialog buttons of the 
  * sound browse function.
  */
-void 
+void
 browse_fileselect_clicked (GtkWidget * widget,
 			   gpointer data)
 {
@@ -252,7 +253,7 @@ browse_fileselect_clicked (GtkWidget * widget,
  *
  * Callback when the "Browse..." button is clicked
  */
-void 
+void
 fe_sound_browse_clicked (GtkWidget * widget,
 			 gpointer throwaway)
 {
@@ -283,7 +284,7 @@ fe_sound_browse_clicked (GtkWidget * widget,
  *
  * Callback for the "new" button
  */
-void 
+void
 fe_new_pressed (GtkWidget * widget,
 		gpointer throwaway)
 {
@@ -325,26 +326,27 @@ fe_new_pressed (GtkWidget * widget,
  *
  * Callback for the "Delete" button
  */
-void fe_delete_pressed(GtkWidget *widget,
-		       gpointer throwaway)
+void 
+fe_delete_pressed (GtkWidget * widget,
+		   gpointer throwaway)
 {
-    gint row;
-    filter *fil;
+  gint row;
+  filter *fil;
 
-    if (!(GTK_CLIST(fe_clist)->selection))
-	return;
+  if (!(GTK_CLIST (fe_clist)->selection))
+    return;
 
-    row = GPOINTER_TO_INT((GTK_CLIST(fe_clist)->selection)->data);
+  row = GPOINTER_TO_INT ((GTK_CLIST (fe_clist)->selection)->data);
 
-    fil = (filter *)gtk_clist_get_row_data(GTK_CLIST(fe_clist),
+  fil = (filter *) gtk_clist_get_row_data (GTK_CLIST (fe_clist),
 					   row);
 
-    if (fil)
-	filter_free(fil, NULL);
+  if (fil)
+    filter_free (fil, NULL);
 
-    gtk_clist_remove(GTK_CLIST(fe_clist),
-		     row);
-} /* end fe_delete_pressed() */
+  gtk_clist_remove (GTK_CLIST (fe_clist),
+		    row);
+}				/* end fe_delete_pressed() */
 
 
 /*
@@ -352,17 +354,18 @@ void fe_delete_pressed(GtkWidget *widget,
  *
  * Callback for the "Down" button
  */
-void fe_down_pressed(GtkWidget *widget,
-		     gpointer throwaway)
+void 
+fe_down_pressed (GtkWidget * widget,
+		 gpointer throwaway)
 {
-    gint row;
+  gint row;
 
-    if (!(GTK_CLIST(fe_clist)->selection))
-	return;
+  if (!(GTK_CLIST (fe_clist)->selection))
+    return;
 
-    row = GPOINTER_TO_INT((GTK_CLIST(fe_clist)->selection)->data);
-    gtk_clist_swap_rows(GTK_CLIST(fe_clist), row, row + 1);
-} /* end fe_down_pressed */
+  row = GPOINTER_TO_INT ((GTK_CLIST (fe_clist)->selection)->data);
+  gtk_clist_swap_rows (GTK_CLIST (fe_clist), row, row + 1);
+}				/* end fe_down_pressed */
 
 
 /*
@@ -370,17 +373,18 @@ void fe_down_pressed(GtkWidget *widget,
  *
  * Callback for the "Up" button
  */
-void fe_up_pressed(GtkWidget *widget,
-		     gpointer throwaway)
+void 
+fe_up_pressed (GtkWidget * widget,
+	       gpointer throwaway)
 {
-    gint row;
+  gint row;
 
-    if (!(GTK_CLIST(fe_clist)->selection))
-	return;
+  if (!(GTK_CLIST (fe_clist)->selection))
+    return;
 
-    row = GPOINTER_TO_INT((GTK_CLIST(fe_clist)->selection)->data);
-    gtk_clist_swap_rows(GTK_CLIST(fe_clist), row - 1, row);
-} /* end fe_up_pressed */
+  row = GPOINTER_TO_INT ((GTK_CLIST (fe_clist)->selection)->data);
+  gtk_clist_swap_rows (GTK_CLIST (fe_clist), row - 1, row);
+}				/* end fe_up_pressed */
 
 
 /*
@@ -388,7 +392,7 @@ void fe_up_pressed(GtkWidget *widget,
  *
  * Callback for when button is pressed.
  */
-void 
+void
 fe_clist_button_event_press (GtkWidget * widget,
 			     GdkEventButton * bevent,
 			     gpointer data)
@@ -414,16 +418,16 @@ fe_clist_button_event_press (GtkWidget * widget,
 				  column);
 
   if (type == GTK_CELL_PIXMAP)
-  {
+    {
       gtk_clist_set_text (GTK_CLIST (fe_clist),
 			  row,
 			  column,
 			  NULL);
 
-      gtk_clist_select_row(GTK_CLIST(fe_clist), row, -1);
-  }
+      gtk_clist_select_row (GTK_CLIST (fe_clist), row, -1);
+    }
   else
-  {
+    {
       /* now for the pixmap from gdk */
       im = gdk_imlib_create_image_from_xpm_data (enabled_xpm);
       gdk_imlib_render (im, im->rgb_width, im->rgb_height);
@@ -437,11 +441,11 @@ fe_clist_button_event_press (GtkWidget * widget,
 			    pixmap,
 			    mask);
 
-      gtk_clist_select_row(GTK_CLIST(fe_clist), row, -1);
+      gtk_clist_select_row (GTK_CLIST (fe_clist), row, -1);
 
       gdk_pixmap_unref (pixmap);
       gdk_bitmap_unref (mask);
-  }
+    }
 
   gtk_signal_emit_stop_by_name (GTK_OBJECT (fe_clist),
 				"button_press_event");

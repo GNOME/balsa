@@ -214,7 +214,7 @@ mailbox_conf_delete (Mailbox * mailbox)
   if (mailbox->type == MAILBOX_POP3)
     update_pop3_servers ();
   else
-    balsa_mblist_redraw (BALSA_MBLIST(balsa_app.mblist));
+    balsa_mblist_redraw (BALSA_MBLIST (balsa_app.mblist));
 }
 
 
@@ -558,7 +558,7 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 	update_pop3_servers ();
 
       else
-	balsa_mblist_redraw (BALSA_MBLIST(balsa_app.mblist));	/* redraw the main mailbox list */
+	balsa_mblist_redraw (BALSA_MBLIST (balsa_app.mblist));	/* redraw the main mailbox list */
 
       /* TODO cleanup */
 
@@ -579,7 +579,7 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
       if (mailbox->type == MAILBOX_POP3)
 	update_pop3_servers ();
       else
-	balsa_mblist_redraw (BALSA_MBLIST(balsa_app.mblist));
+	balsa_mblist_redraw (BALSA_MBLIST (balsa_app.mblist));
     }
 
   /* close the new mailbox window */
@@ -753,7 +753,7 @@ create_pop_mailbox_page (void)
   gtk_entry_set_visibility (GTK_ENTRY (mcw->pop_password), FALSE);
   gtk_widget_show (mcw->pop_password);
 
-  mcw->pop_check = gtk_check_button_new_with_label("Check");
+  mcw->pop_check = gtk_check_button_new_with_label ("Check");
   gtk_table_attach (GTK_TABLE (table), mcw->pop_check, 0, 2, 4, 5,
 		    GTK_FILL, GTK_FILL,
 		    10, 10);

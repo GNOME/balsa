@@ -42,52 +42,52 @@
 
 /* global balsa application structure */
 extern struct BalsaApplication
-{
-  proplist_t proplist;
-  /* personal information */
-  gchar *real_name;
-  gchar *email;
-  gchar *replyto;
+  {
+    proplist_t proplist;
+    /* personal information */
+    gchar *real_name;
+    gchar *email;
+    gchar *replyto;
 
-  gchar *local_mail_directory;
-  gchar *smtp_server;
+    gchar *local_mail_directory;
+    gchar *smtp_server;
 
-  gchar *signature_path;
-  gchar *signature;
+    gchar *signature_path;
+    gchar *signature;
 
-  BalsaMBList *mblist;
-  IndexChild *current_index_child;
+    BalsaMBList *mblist;
+    IndexChild *current_index_child;
 
-  Mailbox *inbox;
-  GList *inbox_input; /* mailboxes such as POP3, etc that will be appending into inbox */
-  Mailbox *outbox;
-  Mailbox *trash;
-  
-  GNode *mailbox_nodes;
+    Mailbox *inbox;
+    GList *inbox_input;		/* mailboxes such as POP3, etc that will be appending into inbox */
+    Mailbox *outbox;
+    Mailbox *trash;
 
-  /* timer for mm_exists callback */
-  gint new_messages_timer;
-  gint new_messages;
+    GNode *mailbox_nodes;
 
-  /* timer for checking mail every xx minutes */
-  gint check_mail_timer;
+    /* timer for mm_exists callback */
+    gint new_messages_timer;
+    gint new_messages;
 
-  /* GUI settings */
-  gint mw_width;
-  gint mw_height;
-  gint mblist_width;
-  gint mblist_height;
+    /* timer for checking mail every xx minutes */
+    gint check_mail_timer;
 
-  GtkToolbarStyle toolbar_style;
-  GnomeMDIMode mdi_style;
+    /* GUI settings */
+    gint mw_width;
+    gint mw_height;
+    gint mblist_width;
+    gint mblist_height;
 
-  gboolean previewpane;
-  gboolean debug;
-}
+    GtkToolbarStyle toolbar_style;
+    GnomeMDIMode mdi_style;
+
+    gboolean previewpane;
+    gboolean debug;
+  }
 balsa_app;
 
 
 void balsa_app_init (void);
-gint do_load_mailboxes(void);
+gint do_load_mailboxes (void);
 
 #endif /* __BALSA_APP_H__ */

@@ -179,6 +179,9 @@ balsa_init_window_new (void)
 		      NULL);
 
   gtk_widget_show (iw->window);
+
+  /* start up the gtk_main for the initialize window */
+  gtk_main ();
 }
 
 static void
@@ -571,4 +574,7 @@ complete_cb (GtkWidget * widget, gpointer data)
   gtk_widget_destroy (iw->notebook);
   gtk_widget_destroy (iw->window);
   g_free (iw);
+
+  /* end the initialize balsa main loop */
+  gtk_main_quit ();
 }

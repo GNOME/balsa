@@ -26,6 +26,6 @@ void main_window_init (void);
 void close_main_window (void);
 void refresh_main_window (void);
 void main_window_set_mailbox (Mailbox * mailbox);
-void main_window_set_cursor(gint type);
+void main_window_set_cursor (gint type);
 
 #endif /* __main_window_h__ */

@@ -34,28 +34,28 @@ extern "C"
 #define BALSA_IS_MESSAGE(obj)       GTK_CHECK_TYPE (obj, balsa_message_get_type ())
 
 
-typedef struct _BalsaMessage BalsaMessage;
-typedef struct _BalsaMessageClass BalsaMessageClass;
+  typedef struct _BalsaMessage BalsaMessage;
+  typedef struct _BalsaMessageClass BalsaMessageClass;
 
-struct _BalsaMessage
-{
-  GnomeCanvas canvas;
-  GnomeCanvasGroup *headers;
-  GnomeCanvasGroup *body;
-  GList *html; /* list of xmhtml widgets */
-  
-  Message *message;
-};
+  struct _BalsaMessage
+    {
+      GnomeCanvas canvas;
+      GnomeCanvasGroup *headers;
+      GnomeCanvasGroup *body;
+      GList *html;		/* list of xmhtml widgets */
 
-struct _BalsaMessageClass
-{
-    GnomeCanvasClass parent_class;
-};
+      Message *message;
+    };
 
-guint balsa_message_get_type (void);
-GtkWidget * balsa_message_new (void);
-void balsa_message_clear (BalsaMessage * bmessage);
-void balsa_message_set (BalsaMessage * bmessage, Message * message);
+  struct _BalsaMessageClass
+    {
+      GnomeCanvasClass parent_class;
+    };
+
+  guint balsa_message_get_type (void);
+  GtkWidget *balsa_message_new (void);
+  void balsa_message_clear (BalsaMessage * bmessage);
+  void balsa_message_set (BalsaMessage * bmessage, Message * message);
 
 #ifdef __cplusplus
 }

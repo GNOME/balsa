@@ -260,16 +260,16 @@ mailbox_select_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row, Gd
       if (!strcmp (mailbox->name, "Inbox") ||
 	  !strcmp (mailbox->name, "Outbox") ||
 	  !strcmp (mailbox->name, "Trash"))
-        return;
+	return;
 
-	gtk_ctree_set_node_info (GTK_CTREE (bmbl),
-				 row,
-				 mailbox->name, 5,
-				 NULL, NULL,
-				 tray_empty, tray_empty_mask,
-				 FALSE, TRUE);
+      gtk_ctree_set_node_info (GTK_CTREE (bmbl),
+			       row,
+			       mailbox->name, 5,
+			       NULL, NULL,
+			       tray_empty, tray_empty_mask,
+			       FALSE, TRUE);
 
-	gtk_ctree_node_set_row_style(GTK_CTREE(bmbl), row, NULL);
+      gtk_ctree_node_set_row_style (GTK_CTREE (bmbl), row, NULL);
     }
 
   if (event && event->button == 3)

@@ -315,7 +315,7 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 		  GdkFont *font;
 		  GtkStyle *style;
 
-		  style = gtk_style_copy(gtk_widget_get_style(GTK_WIDGET(ctree)));
+		  style = gtk_style_copy (gtk_widget_get_style (GTK_WIDGET (ctree)));
 
 		  font = gdk_font_load ("-adobe-courier-medium-r-*-*-*-120-*-*-*-*-iso8859-1");
 		  style->font = font;

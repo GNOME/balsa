@@ -1,5 +1,5 @@
 /* -*- C -*-
- *
+
  * filter-file.c
  *
  * File functions of the mail filter portion of balsa
@@ -30,39 +30,40 @@
  * Returns:
  *    int - 0 for success, -1 for error.  Sets filter_errno on error.
  */
-gint filter_load(GList *filter_list, gchar *filter_file)
+gint 
+filter_load (GList * filter_list, gchar * filter_file)
 {
-    FILE *fp;
-    gchar *buf;
-    size_t len;
+  FILE *fp;
+  gchar *buf;
+  size_t len;
 
-    if ((! filter_file) || (filter_file[0] == '\0'))
+  if ((!filter_file) || (filter_file[0] == '\0'))
     {
-	filter_errno = FILTER_ENOFILE;
-	return(-FILTER_ENOFILE);
+      filter_errno = FILTER_ENOFILE;
+      return (-FILTER_ENOFILE);
     }
 
-    /* here we'll delete an existing filter list, if there is one */
+  /* here we'll delete an existing filter list, if there is one */
 
-    if (!(fp = fopen(filter_file, "r")))
+  if (!(fp = fopen (filter_file, "r")))
     {
-        gchar filter_file_error[1024];
+      gchar filter_file_error[1024];
 
-	g_snprintf(filter_file_error,
-		   1024,
-		   "Unable to load filter file %s",
-		   filter_file);
-	perror(filter_file_error);
-	filter_errno = FILTER_ENOREAD;
-	return(-FILTER_ENOREAD);
+      g_snprintf (filter_file_error,
+		  1024,
+		  "Unable to load filter file %s",
+		  filter_file);
+      perror (filter_file_error);
+      filter_errno = FILTER_ENOREAD;
+      return (-FILTER_ENOREAD);
     }
 
-    len = readfile(fp, &buf);
-    if (len != 0)
-	buf[len - 1] = '\0';
-    fclose(fp);
+  len = readfile (fp, &buf);
+  if (len != 0)
+    buf[len - 1] = '\0';
+  fclose (fp);
 
-    return(0);
+  return (0);
 }
 
 
@@ -78,6 +79,7 @@ gint filter_load(GList *filter_list, gchar *filter_file)
  * Returns:
  *    gint - 0 for success, -1 for error.  Sets filter_errno on error.
  */
-gint filter_save(GList *filter_list, gchar *filter_file)
+gint 
+filter_save (GList * filter_list, gchar * filter_file)
 {
 }

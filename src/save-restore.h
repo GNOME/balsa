@@ -22,15 +22,15 @@
 /* FIXME XXX This should be a "configure" option.  Stuart? */
 #define BALSA_CONFIG_FILE ".balsarc"
 
-gint config_load(gchar * user_filename);
-gint config_save(gchar * user_filename);
+gint config_load (gchar * user_filename);
+gint config_save (gchar * user_filename);
 
-gint config_mailbox_add (Mailbox * mailbox, char * key_arg);
-gint config_mailbox_delete(gchar * name);
+gint config_mailbox_add (Mailbox * mailbox, char *key_arg);
+gint config_mailbox_delete (gchar * name);
 gint config_mailbox_update (Mailbox * mailbox, gchar * old_mbox_name);
-gint config_mailboxes_init(void);
+gint config_mailboxes_init (void);
 
-gint config_global_load(void);
-gint config_global_save(void);
+gint config_global_load (void);
+gint config_global_save (void);
 
 #endif /* __SAVE_RESTORE_H__ */

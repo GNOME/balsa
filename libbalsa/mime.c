@@ -75,7 +75,7 @@ content2reply (Message * message)
   body_list = message->body_list;
   while (body_list)
     {
-      BODY* b;
+      BODY *b;
       body = (Body *) body_list->data;
 
       b = body->mutt_body;

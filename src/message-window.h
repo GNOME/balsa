@@ -21,6 +21,6 @@
 
 #include "mailbox.h"
 
-void message_window_new(Message *message);
+void message_window_new (Message * message);
 
 #endif /* __MESSAGE_WINDOW_H__ */

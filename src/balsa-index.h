@@ -34,43 +34,43 @@ extern "C"
 #define BALSA_IS_INDEX(obj)       GTK_CHECK_TYPE (obj, balsa_index_get_type ())
 
 
-typedef struct _BalsaIndex BalsaIndex;
-typedef struct _BalsaIndexClass BalsaIndexClass;
+  typedef struct _BalsaIndex BalsaIndex;
+  typedef struct _BalsaIndexClass BalsaIndexClass;
 
-struct _BalsaIndex
-{
-  GtkBin bin;
+  struct _BalsaIndex
+    {
+      GtkBin bin;
 
-  Mailbox *mailbox;
-  guint watcher_id;
-  guint first_new_message;
-};
+      Mailbox *mailbox;
+      guint watcher_id;
+      guint first_new_message;
+    };
 
-struct _BalsaIndexClass
-{
-  GtkBinClass parent_class;
-  
-  void (*select_message) (BalsaIndex *bindex, Message *message);
-};
+  struct _BalsaIndexClass
+    {
+      GtkBinClass parent_class;
+
+      void (*select_message) (BalsaIndex * bindex, Message * message);
+    };
 
 
-guint balsa_index_get_type (void);
-GtkWidget * balsa_index_new (void);
+  guint balsa_index_get_type (void);
+  GtkWidget *balsa_index_new (void);
 
 
 /* sets the mail stream; if it's a new stream, then it's 
  * contents is loaded into the index */
-void balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox);
+  void balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox);
 
 
 /* adds a new message */
-void balsa_index_add (BalsaIndex * bindex, Message * message);
-void balsa_index_update_flag (BalsaIndex * bindex, Message * message);
+  void balsa_index_add (BalsaIndex * bindex, Message * message);
+  void balsa_index_update_flag (BalsaIndex * bindex, Message * message);
 
 
 /* select up/down the index */
-void balsa_index_select_next (BalsaIndex *);
-void balsa_index_select_previous (BalsaIndex *);
+  void balsa_index_select_next (BalsaIndex *);
+  void balsa_index_select_previous (BalsaIndex *);
 
 
 #ifdef __cplusplus

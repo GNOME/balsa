@@ -119,7 +119,12 @@ balsa_app_init (void)
 gint
 do_load_mailboxes (void)
 {
+  load_local_mailboxes ();
   read_signature ();
+  special_mailboxes ();
+
+  if (!balsa_app.inbox)
+    return FALSE;
 
   switch (balsa_app.inbox->type)
     {
@@ -138,10 +143,6 @@ do_load_mailboxes (void)
       fprintf (stderr, "do_load_mailboxes: Unknown mailbox type\n");
       break;
     }
-
-  load_local_mailboxes ();
-  read_signature ();
-  special_mailboxes ();
 
   return TRUE;
 }

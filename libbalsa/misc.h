@@ -29,7 +29,7 @@ GtkWidget *append_menuitem_connect (GtkMenu * menu,
 
 gint g_list_index (GList * list, gpointer data);
 
-gchar *address_to_gchar(Address *addr);
+gchar *address_to_gchar (Address * addr);
 gchar *make_string_from_list (GList *);
 
 size_t readfile (FILE * fp, char **buf);
@@ -43,5 +43,5 @@ struct _MailboxNode
   };
 
 MailboxNode *mailbox_node_new (gchar * name, Mailbox * mb, gint i);
-gchar *g_get_host_name(void);
+gchar *g_get_host_name (void);
 #endif /* __MISC_H__ */

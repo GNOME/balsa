@@ -25,7 +25,7 @@
 
 #include "mailbox.h"
 
-GString * content2reply (Message * message);
+GString *content2reply (Message * message);
 
 
 #endif /* __MIME_H__ */

@@ -58,13 +58,21 @@
 #endif
 
 /* Determine default alignment.  */
-struct fooalign {char x; double d;};
+struct fooalign
+  {
+    char x;
+    double d;
+  };
 #define DEFAULT_ALIGNMENT  \
   ((PTR_INT_TYPE) ((char *) &((struct fooalign *) 0)->d - (char *) 0))
 /* If malloc were really smart, it would round addresses to DEFAULT_ALIGNMENT.
    But in fact it might be less smart and round addresses to as much as
    DEFAULT_ROUNDING.  So we prepare for it to do that.  */
-union fooround {long x; double d;};
+union fooround
+  {
+    long x;
+    double d;
+  };
 #define DEFAULT_ROUNDING (sizeof (union fooround))
 
 /* When we copy a long block of data, this is the unit to do it with.
@@ -135,8 +143,8 @@ struct obstack *_obstack;
       (*(void (*) ()) (h)->freefun) ((old_chunk)); \
   } while (0)
 #endif
-
 
+
 /* Initialize an obstack H for use.  Specify chunk size SIZE (0 means default).
    Objects start on multiples of ALIGNMENT (0 means use default).
    CHUNKFUN is the function to use to allocate chunks,
@@ -152,14 +160,14 @@ _obstack_begin (h, size, alignment, chunkfun, freefun)
      int size;
      int alignment;
 #if defined (__STDC__) && __STDC__
-     POINTER (*chunkfun) (long);
+POINTER (*chunkfun) (long);
      void (*freefun) (void *);
 #else
-     POINTER (*chunkfun) ();
+POINTER (*chunkfun) ();
      void (*freefun) ();
 #endif
 {
-  register struct _obstack_chunk *chunk; /* points to new chunk */
+  register struct _obstack_chunk *chunk;	/* points to new chunk */
 
   if (alignment == 0)
     alignment = DEFAULT_ALIGNMENT;
@@ -167,13 +175,13 @@ _obstack_begin (h, size, alignment, chunkfun, freefun)
     /* Default size is what GNU malloc can fit in a 4096-byte block.  */
     {
       /* 12 is sizeof (mhead) and 4 is EXTRA from GNU malloc.
-	 Use the values for range checking, because if range checking is off,
-	 the extra bytes won't be missed terribly, but if range checking is on
-	 and we used a larger request, a whole extra 4096 bytes would be
-	 allocated.
+         Use the values for range checking, because if range checking is off,
+         the extra bytes won't be missed terribly, but if range checking is on
+         and we used a larger request, a whole extra 4096 bytes would be
+         allocated.
 
-	 These number are irrelevant to the new GNU malloc.  I suspect it is
-	 less sensitive to the size of the request.  */
+         These number are irrelevant to the new GNU malloc.  I suspect it is
+         less sensitive to the size of the request.  */
       int extra = ((((12 + DEFAULT_ROUNDING - 1) & ~(DEFAULT_ROUNDING - 1))
 		    + 4 + DEFAULT_ROUNDING - 1)
 		   & ~(DEFAULT_ROUNDING - 1));
@@ -182,7 +190,7 @@ _obstack_begin (h, size, alignment, chunkfun, freefun)
 
 #if defined (__STDC__) && __STDC__
   h->chunkfun = (struct _obstack_chunk * (*)(void *, long)) chunkfun;
-  h->freefun = (void (*) (void *, struct _obstack_chunk *)) freefun;
+  h->freefun = (void (*)(void *, struct _obstack_chunk *)) freefun;
 #else
   h->chunkfun = (struct _obstack_chunk * (*)()) chunkfun;
   h->freefun = freefun;
@@ -191,7 +199,7 @@ _obstack_begin (h, size, alignment, chunkfun, freefun)
   h->alignment_mask = alignment - 1;
   h->use_extra_arg = 0;
 
-  chunk = h->chunk = CALL_CHUNKFUN (h, h -> chunk_size);
+  chunk = h->chunk = CALL_CHUNKFUN (h, h->chunk_size);
   if (!chunk)
     (*obstack_alloc_failed_handler) ();
   h->next_free = h->object_base = chunk->contents;
@@ -210,15 +218,15 @@ _obstack_begin_1 (h, size, alignment, chunkfun, freefun, arg)
      int size;
      int alignment;
 #if defined (__STDC__) && __STDC__
-     POINTER (*chunkfun) (POINTER, long);
+POINTER (*chunkfun) (POINTER, long);
      void (*freefun) (POINTER, POINTER);
 #else
-     POINTER (*chunkfun) ();
+POINTER (*chunkfun) ();
      void (*freefun) ();
 #endif
      POINTER arg;
 {
-  register struct _obstack_chunk *chunk; /* points to new chunk */
+  register struct _obstack_chunk *chunk;	/* points to new chunk */
 
   if (alignment == 0)
     alignment = DEFAULT_ALIGNMENT;
@@ -226,13 +234,13 @@ _obstack_begin_1 (h, size, alignment, chunkfun, freefun, arg)
     /* Default size is what GNU malloc can fit in a 4096-byte block.  */
     {
       /* 12 is sizeof (mhead) and 4 is EXTRA from GNU malloc.
-	 Use the values for range checking, because if range checking is off,
-	 the extra bytes won't be missed terribly, but if range checking is on
-	 and we used a larger request, a whole extra 4096 bytes would be
-	 allocated.
+         Use the values for range checking, because if range checking is off,
+         the extra bytes won't be missed terribly, but if range checking is on
+         and we used a larger request, a whole extra 4096 bytes would be
+         allocated.
 
-	 These number are irrelevant to the new GNU malloc.  I suspect it is
-	 less sensitive to the size of the request.  */
+         These number are irrelevant to the new GNU malloc.  I suspect it is
+         less sensitive to the size of the request.  */
       int extra = ((((12 + DEFAULT_ROUNDING - 1) & ~(DEFAULT_ROUNDING - 1))
 		    + 4 + DEFAULT_ROUNDING - 1)
 		   & ~(DEFAULT_ROUNDING - 1));
@@ -240,8 +248,8 @@ _obstack_begin_1 (h, size, alignment, chunkfun, freefun, arg)
     }
 
 #if defined(__STDC__) && __STDC__
-  h->chunkfun = (struct _obstack_chunk * (*)(void *,long)) chunkfun;
-  h->freefun = (void (*) (void *, struct _obstack_chunk *)) freefun;
+  h->chunkfun = (struct _obstack_chunk * (*)(void *, long)) chunkfun;
+  h->freefun = (void (*)(void *, struct _obstack_chunk *)) freefun;
 #else
   h->chunkfun = (struct _obstack_chunk * (*)()) chunkfun;
   h->freefun = freefun;
@@ -251,7 +259,7 @@ _obstack_begin_1 (h, size, alignment, chunkfun, freefun, arg)
   h->extra_arg = arg;
   h->use_extra_arg = 1;
 
-  chunk = h->chunk = CALL_CHUNKFUN (h, h -> chunk_size);
+  chunk = h->chunk = CALL_CHUNKFUN (h, h->chunk_size);
   if (!chunk)
     (*obstack_alloc_failed_handler) ();
   h->next_free = h->object_base = chunk->contents;
@@ -277,7 +285,7 @@ _obstack_newchunk (h, length)
 {
   register struct _obstack_chunk *old_chunk = h->chunk;
   register struct _obstack_chunk *new_chunk;
-  register long	new_size;
+  register long new_size;
   register int obj_size = h->next_free - h->object_base;
   register int i;
   int already;
@@ -302,11 +310,11 @@ _obstack_newchunk (h, length)
     {
       for (i = obj_size / sizeof (COPYING_UNIT) - 1;
 	   i >= 0; i--)
-	((COPYING_UNIT *)new_chunk->contents)[i]
-	  = ((COPYING_UNIT *)h->object_base)[i];
+	((COPYING_UNIT *) new_chunk->contents)[i]
+	  = ((COPYING_UNIT *) h->object_base)[i];
       /* We used to copy the odd few remaining bytes as one extra COPYING_UNIT,
-	 but that can cross a page boundary on a machine
-	 which does not do strict alignment for COPYING_UNITS.  */
+         but that can cross a page boundary on a machine
+         which does not do strict alignment for COPYING_UNITS.  */
       already = obj_size / sizeof (COPYING_UNIT) * sizeof (COPYING_UNIT);
     }
   else
@@ -318,7 +326,7 @@ _obstack_newchunk (h, length)
   /* If the object just copied was the only data in OLD_CHUNK,
      free that chunk and remove it from the chain.
      But not if that chunk might contain an empty object.  */
-  if (h->object_base == old_chunk->contents && ! h->maybe_empty_object)
+  if (h->object_base == old_chunk->contents && !h->maybe_empty_object)
     {
       new_chunk->prev = old_chunk->prev;
       CALL_FREEFUN (h, old_chunk);
@@ -386,7 +394,7 @@ _obstack_free (h, obj)
       CALL_FREEFUN (h, lp);
       lp = plp;
       /* If we switch chunks, we can't tell whether the new current
-	 chunk contains an empty object, so assume that it may.  */
+         chunk contains an empty object, so assume that it may.  */
       h->maybe_empty_object = 1;
     }
   if (lp)
@@ -420,7 +428,7 @@ obstack_free (h, obj)
       CALL_FREEFUN (h, lp);
       lp = plp;
       /* If we switch chunks, we can't tell whether the new current
-	 chunk contains an empty object, so assume that it may.  */
+         chunk contains an empty object, so assume that it may.  */
       h->maybe_empty_object = 1;
     }
   if (lp)
@@ -438,7 +446,7 @@ int
 _obstack_memory_used (h)
      struct obstack *h;
 {
-  register struct _obstack_chunk* lp;
+  register struct _obstack_chunk *lp;
   register int nbytes = 0;
 
   for (lp = h->chunk; lp != 0; lp = lp->prev)
@@ -450,20 +458,20 @@ _obstack_memory_used (h)
 
 /* Define the error handler.  */
 #ifndef _
-# ifdef HAVE_LIBINTL_H
-#  include <libintl.h>
-#  ifndef _
-#   define _(Str) gettext (Str)
-#  endif
-# else
-#  define _(Str) (Str)
-# endif
+#ifdef HAVE_LIBINTL_H
+#include <libintl.h>
+#ifndef _
+#define _(Str) gettext (Str)
+#endif
+#else
+#define _(Str) (Str)
+#endif
 #endif
 
 static void
 print_and_abort ()
 {
-  fputs (_("memory exhausted\n"), stderr);
+  fputs (_ ("memory exhausted\n"), stderr);
   exit (obstack_exit_failure);
 }
 
@@ -589,4 +597,4 @@ POINTER (obstack_copy0) (obstack, pointer, length)
 
 #endif /* 0 */
 
-#endif	/* !ELIDE_CODE */
+#endif /* !ELIDE_CODE */

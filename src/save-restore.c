@@ -484,7 +484,7 @@ config_mailbox_init (proplist_t mbox, gchar * key)
       if ((field = pl_dict_get_str (mbox, "Check")) == NULL)
 	MAILBOX_POP3 (mailbox)->check = FALSE;
       else
-        MAILBOX_POP3 (mailbox)->check = atol (field);
+	MAILBOX_POP3 (mailbox)->check = atol (field);
 
       balsa_app.inbox_input =
 	g_list_append (balsa_app.inbox_input, mailbox);

@@ -149,17 +149,9 @@ main (int argc, char *argv[])
   /* checking for valid config files */
   config_init ();
 
-#if 0
-  gtk_main ();
-  
-  if (gtk_main_level() > 0)
-	  gtk_main_quit();
-#endif
-
-  /* DO NOT get here until after initialize_balsa has been finished */
-  
-/* load mailboxes */
-  mailboxes_init();
+  /* load mailboxes */
+  config_mailboxes_init ();
+  mailboxes_init ();
 
   gnome_sound_init ("localhost");
   gnome_sound_play (gnome_sound_file ("balsa/startup.wav"));

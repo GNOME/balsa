@@ -264,10 +264,10 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
     smenuitem = gtk_menu_item_new ();
     bmbl = balsa_mblist_new ();
     /*
-    gtk_signal_connect (GTK_OBJECT (bmbl), "select_mailbox",
-			(GtkSignalFunc) transfer_messages_cb,
-			(gpointer) bindex);
-*/
+       gtk_signal_connect (GTK_OBJECT (bmbl), "select_mailbox",
+       (GtkSignalFunc) transfer_messages_cb,
+       (gpointer) bindex);
+     */
     gtk_widget_set_usize (GTK_WIDGET (bmbl), balsa_app.mblist_width, balsa_app.mblist_height);
     gtk_container_add (GTK_CONTAINER (smenuitem), bmbl);
     gtk_menu_append (GTK_MENU (submenu), smenuitem);
@@ -473,14 +473,14 @@ show_about_box (void)
   else
     about_box_visible = TRUE;
 
-  logo = gnome_unconditional_pixmap_file("balsa/balsa_logo.png");
+  logo = gnome_unconditional_pixmap_file ("balsa/balsa_logo.png");
   about = gnome_about_new ("Balsa",
 			   BALSA_VERSION,
 			   "Copyright (C) 1997-98",
 			   authors,
 			   _ ("The Balsa email client is part of the GNOME desktop environment.  Information on Balsa can be found at http://www.balsa.net/\n\nIf you need to report bugs, please do so at: http://www.gnome.org/cgi-bin/bugs"),
 			   logo);
-  g_free(logo);
+  g_free (logo);
 
   gtk_signal_connect (GTK_OBJECT (about),
 		      "destroy",
@@ -647,8 +647,8 @@ mailbox_close_child (GtkWidget * widget, gpointer data)
 {
   if (balsa_app.current_index_child)
     gnome_mdi_remove_child (mdi,
-		    GNOME_MDI_CHILD (balsa_app.current_index_child),
-    TRUE);
+			    GNOME_MDI_CHILD (balsa_app.current_index_child),
+			    TRUE);
 }
 
 static void

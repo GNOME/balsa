@@ -1,3 +1,4 @@
+
 /* Balsa E-Mail Client
  * Copyright (C) 1998 Stuart Parmenter
  *
@@ -248,7 +249,7 @@ index_child_create_view (GnomeMDIChild * child)
   else
     {
       ic->index = balsa_index_new ();
-      gtk_widget_show(ic->index);
+      gtk_widget_show (ic->index);
     }
 #endif
 
@@ -300,10 +301,10 @@ index_select_cb (GtkWidget * widget,
   set_imap_username (message->mailbox);
 
   if (bevent && bevent->type == GDK_2BUTTON_PRESS)
-  {
-	  message_window_new (message);
-return;
-  }
+    {
+      message_window_new (message);
+      return;
+    }
   gtk_object_set_data (GTK_OBJECT (widget), "message", message);
   gtk_object_set_data (GTK_OBJECT (widget), "bevent", bevent);
   gtk_object_set_data (GTK_OBJECT (widget), "data", data);

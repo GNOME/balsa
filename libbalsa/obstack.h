@@ -21,85 +21,85 @@
 
 /* Summary:
 
-All the apparent functions defined here are macros. The idea
-is that you would use these pre-tested macros to solve a
-very specific set of problems, and they would run fast.
-Caution: no side-effects in arguments please!! They may be
-evaluated MANY times!!
+   All the apparent functions defined here are macros. The idea
+   is that you would use these pre-tested macros to solve a
+   very specific set of problems, and they would run fast.
+   Caution: no side-effects in arguments please!! They may be
+   evaluated MANY times!!
 
-These macros operate a stack of objects.  Each object starts life
-small, and may grow to maturity.  (Consider building a word syllable
-by syllable.)  An object can move while it is growing.  Once it has
-been "finished" it never changes address again.  So the "top of the
-stack" is typically an immature growing object, while the rest of the
-stack is of mature, fixed size and fixed address objects.
+   These macros operate a stack of objects.  Each object starts life
+   small, and may grow to maturity.  (Consider building a word syllable
+   by syllable.)  An object can move while it is growing.  Once it has
+   been "finished" it never changes address again.  So the "top of the
+   stack" is typically an immature growing object, while the rest of the
+   stack is of mature, fixed size and fixed address objects.
 
-These routines grab large chunks of memory, using a function you
-supply, called `obstack_chunk_alloc'.  On occasion, they free chunks,
-by calling `obstack_chunk_free'.  You must define them and declare
-them before using any obstack macros.
+   These routines grab large chunks of memory, using a function you
+   supply, called `obstack_chunk_alloc'.  On occasion, they free chunks,
+   by calling `obstack_chunk_free'.  You must define them and declare
+   them before using any obstack macros.
 
-Each independent stack is represented by a `struct obstack'.
-Each of the obstack macros expects a pointer to such a structure
-as the first argument.
+   Each independent stack is represented by a `struct obstack'.
+   Each of the obstack macros expects a pointer to such a structure
+   as the first argument.
 
-One motivation for this package is the problem of growing char strings
-in symbol tables.  Unless you are "fascist pig with a read-only mind"
---Gosper's immortal quote from HAKMEM item 154, out of context--you
-would not like to put any arbitrary upper limit on the length of your
-symbols.
+   One motivation for this package is the problem of growing char strings
+   in symbol tables.  Unless you are "fascist pig with a read-only mind"
+   --Gosper's immortal quote from HAKMEM item 154, out of context--you
+   would not like to put any arbitrary upper limit on the length of your
+   symbols.
 
-In practice this often means you will build many short symbols and a
-few long symbols.  At the time you are reading a symbol you don't know
-how long it is.  One traditional method is to read a symbol into a
-buffer, realloc()ating the buffer every time you try to read a symbol
-that is longer than the buffer.  This is beaut, but you still will
-want to copy the symbol from the buffer to a more permanent
-symbol-table entry say about half the time.
+   In practice this often means you will build many short symbols and a
+   few long symbols.  At the time you are reading a symbol you don't know
+   how long it is.  One traditional method is to read a symbol into a
+   buffer, realloc()ating the buffer every time you try to read a symbol
+   that is longer than the buffer.  This is beaut, but you still will
+   want to copy the symbol from the buffer to a more permanent
+   symbol-table entry say about half the time.
 
-With obstacks, you can work differently.  Use one obstack for all symbol
-names.  As you read a symbol, grow the name in the obstack gradually.
-When the name is complete, finalize it.  Then, if the symbol exists already,
-free the newly read name.
+   With obstacks, you can work differently.  Use one obstack for all symbol
+   names.  As you read a symbol, grow the name in the obstack gradually.
+   When the name is complete, finalize it.  Then, if the symbol exists already,
+   free the newly read name.
 
-The way we do this is to take a large chunk, allocating memory from
-low addresses.  When you want to build a symbol in the chunk you just
-add chars above the current "high water mark" in the chunk.  When you
-have finished adding chars, because you got to the end of the symbol,
-you know how long the chars are, and you can create a new object.
-Mostly the chars will not burst over the highest address of the chunk,
-because you would typically expect a chunk to be (say) 100 times as
-long as an average object.
+   The way we do this is to take a large chunk, allocating memory from
+   low addresses.  When you want to build a symbol in the chunk you just
+   add chars above the current "high water mark" in the chunk.  When you
+   have finished adding chars, because you got to the end of the symbol,
+   you know how long the chars are, and you can create a new object.
+   Mostly the chars will not burst over the highest address of the chunk,
+   because you would typically expect a chunk to be (say) 100 times as
+   long as an average object.
 
-In case that isn't clear, when we have enough chars to make up
-the object, THEY ARE ALREADY CONTIGUOUS IN THE CHUNK (guaranteed)
-so we just point to it where it lies.  No moving of chars is
-needed and this is the second win: potentially long strings need
-never be explicitly shuffled. Once an object is formed, it does not
-change its address during its lifetime.
+   In case that isn't clear, when we have enough chars to make up
+   the object, THEY ARE ALREADY CONTIGUOUS IN THE CHUNK (guaranteed)
+   so we just point to it where it lies.  No moving of chars is
+   needed and this is the second win: potentially long strings need
+   never be explicitly shuffled. Once an object is formed, it does not
+   change its address during its lifetime.
 
-When the chars burst over a chunk boundary, we allocate a larger
-chunk, and then copy the partly formed object from the end of the old
-chunk to the beginning of the new larger chunk.  We then carry on
-accreting characters to the end of the object as we normally would.
+   When the chars burst over a chunk boundary, we allocate a larger
+   chunk, and then copy the partly formed object from the end of the old
+   chunk to the beginning of the new larger chunk.  We then carry on
+   accreting characters to the end of the object as we normally would.
 
-A special macro is provided to add a single char at a time to a
-growing object.  This allows the use of register variables, which
-break the ordinary 'growth' macro.
+   A special macro is provided to add a single char at a time to a
+   growing object.  This allows the use of register variables, which
+   break the ordinary 'growth' macro.
 
-Summary:
-	We allocate large chunks.
-	We carve out one object at a time from the current chunk.
-	Once carved, an object never moves.
-	We are free to append data of any size to the currently
-	  growing object.
-	Exactly one object is growing in an obstack at any one time.
-	You can run one obstack per control block.
-	You may have as many control blocks as you dare.
-	Because of the way we do it, you can `unwind' an obstack
-	  back to a previous state. (You may remove objects much
-	  as you would with a stack.)
-*/
+   Summary:
+   We allocate large chunks.
+   We carve out one object at a time from the current chunk.
+   Once carved, an object never moves.
+   We are free to append data of any size to the currently
+   growing object.
+   Exactly one object is growing in an obstack at any one time.
+   You can run one obstack per control block.
+   You may have as many control blocks as you dare.
+   Because of the way we do it, you can `unwind' an obstack
+   back to a previous state. (You may remove objects much
+   as you would with a stack.)
+ */
 
 
 /* Don't do the contents of this file more than once.  */
@@ -108,7 +108,8 @@ Summary:
 #define _OBSTACK_H 1
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /* We use subtraction of (char *) 0 instead of casting to int
@@ -157,61 +158,61 @@ extern "C" {
 #endif
 #endif
 
-struct _obstack_chunk		/* Lives at front of each chunk. */
-{
-  char  *limit;			/* 1 past end of this chunk */
-  struct _obstack_chunk *prev;	/* address of prior chunk or NULL */
-  char	contents[4];		/* objects begin here */
-};
+  struct _obstack_chunk		/* Lives at front of each chunk. */
+    {
+      char *limit;		/* 1 past end of this chunk */
+      struct _obstack_chunk *prev;	/* address of prior chunk or NULL */
+      char contents[4];		/* objects begin here */
+    };
 
-struct obstack		/* control current object in current chunk */
-{
-  long	chunk_size;		/* preferred size to allocate chunks in */
-  struct _obstack_chunk *chunk;	/* address of current struct obstack_chunk */
-  char	*object_base;		/* address of object we are building */
-  char	*next_free;		/* where to add next char to current object */
-  char	*chunk_limit;		/* address of char after current chunk */
-  PTR_INT_TYPE temp;		/* Temporary for some macros.  */
-  int   alignment_mask;		/* Mask of alignment for each object. */
+  struct obstack		/* control current object in current chunk */
+    {
+      long chunk_size;		/* preferred size to allocate chunks in */
+      struct _obstack_chunk *chunk;	/* address of current struct obstack_chunk */
+      char *object_base;	/* address of object we are building */
+      char *next_free;		/* where to add next char to current object */
+      char *chunk_limit;	/* address of char after current chunk */
+      PTR_INT_TYPE temp;	/* Temporary for some macros.  */
+      int alignment_mask;	/* Mask of alignment for each object. */
 #if defined (__STDC__) && __STDC__
-  /* These prototypes vary based on `use_extra_arg', and we use
-     casts to the prototypeless function type in all assignments,
-     but having prototypes here quiets -Wstrict-prototypes.  */
-  struct _obstack_chunk *(*chunkfun) (void *, long);
-  void (*freefun) (void *, struct _obstack_chunk *);
-  void *extra_arg;		/* first arg for chunk alloc/dealloc funcs */
+      /* These prototypes vary based on `use_extra_arg', and we use
+         casts to the prototypeless function type in all assignments,
+         but having prototypes here quiets -Wstrict-prototypes.  */
+      struct _obstack_chunk *(*chunkfun) (void *, long);
+      void (*freefun) (void *, struct _obstack_chunk *);
+      void *extra_arg;		/* first arg for chunk alloc/dealloc funcs */
 #else
-  struct _obstack_chunk *(*chunkfun) (); /* User's fcn to allocate a chunk.  */
-  void (*freefun) ();		/* User's function to free a chunk.  */
-  char *extra_arg;		/* first arg for chunk alloc/dealloc funcs */
+      struct _obstack_chunk *(*chunkfun) ();	/* User's fcn to allocate a chunk.  */
+      void (*freefun) ();	/* User's function to free a chunk.  */
+      char *extra_arg;		/* first arg for chunk alloc/dealloc funcs */
 #endif
-  unsigned use_extra_arg:1;	/* chunk alloc/dealloc funcs take extra arg */
-  unsigned maybe_empty_object:1;/* There is a possibility that the current
-				   chunk contains a zero-length object.  This
-				   prevents freeing the chunk if we allocate
-				   a bigger chunk to replace it. */
-  unsigned alloc_failed:1;	/* No longer used, as we now call the failed
+      unsigned use_extra_arg:1;	/* chunk alloc/dealloc funcs take extra arg */
+      unsigned maybe_empty_object:1;	/* There is a possibility that the current
+					   chunk contains a zero-length object.  This
+					   prevents freeing the chunk if we allocate
+					   a bigger chunk to replace it. */
+      unsigned alloc_failed:1;	/* No longer used, as we now call the failed
 				   handler on error, but retained for binary
 				   compatibility.  */
-};
+    };
 
 /* Declare the external functions we use; they are in obstack.c.  */
 
 #if defined (__STDC__) && __STDC__
-extern void _obstack_newchunk (struct obstack *, int);
-extern void _obstack_free (struct obstack *, void *);
-extern int _obstack_begin (struct obstack *, int, int,
-			    void *(*) (long), void (*) (void *));
-extern int _obstack_begin_1 (struct obstack *, int, int,
-			     void *(*) (void *, long),
-			     void (*) (void *, void *), void *);
-extern int _obstack_memory_used (struct obstack *);
+  extern void _obstack_newchunk (struct obstack *, int);
+  extern void _obstack_free (struct obstack *, void *);
+  extern int _obstack_begin (struct obstack *, int, int,
+			     void *(*)(long), void (*)(void *));
+  extern int _obstack_begin_1 (struct obstack *, int, int,
+			       void *(*)(void *, long),
+			       void (*)(void *, void *), void *);
+  extern int _obstack_memory_used (struct obstack *);
 #else
-extern void _obstack_newchunk ();
-extern void _obstack_free ();
-extern int _obstack_begin ();
-extern int _obstack_begin_1 ();
-extern int _obstack_memory_used ();
+  extern void _obstack_newchunk ();
+  extern void _obstack_free ();
+  extern int _obstack_begin ();
+  extern int _obstack_begin_1 ();
+  extern int _obstack_memory_used ();
 #endif
 
 #if defined (__STDC__) && __STDC__
@@ -219,42 +220,42 @@ extern int _obstack_memory_used ();
 /* Do the function-declarations after the structs
    but before defining the macros.  */
 
-void obstack_init (struct obstack *obstack);
+  void obstack_init (struct obstack *obstack);
 
-void * obstack_alloc (struct obstack *obstack, int size);
+  void *obstack_alloc (struct obstack *obstack, int size);
 
-void * obstack_copy (struct obstack *obstack, void *address, int size);
-void * obstack_copy0 (struct obstack *obstack, void *address, int size);
+  void *obstack_copy (struct obstack *obstack, void *address, int size);
+  void *obstack_copy0 (struct obstack *obstack, void *address, int size);
 
-void obstack_free (struct obstack *obstack, void *block);
+  void obstack_free (struct obstack *obstack, void *block);
 
-void obstack_blank (struct obstack *obstack, int size);
+  void obstack_blank (struct obstack *obstack, int size);
 
-void obstack_grow (struct obstack *obstack, void *data, int size);
-void obstack_grow0 (struct obstack *obstack, void *data, int size);
+  void obstack_grow (struct obstack *obstack, void *data, int size);
+  void obstack_grow0 (struct obstack *obstack, void *data, int size);
 
-void obstack_1grow (struct obstack *obstack, int data_char);
-void obstack_ptr_grow (struct obstack *obstack, void *data);
-void obstack_int_grow (struct obstack *obstack, int data);
+  void obstack_1grow (struct obstack *obstack, int data_char);
+  void obstack_ptr_grow (struct obstack *obstack, void *data);
+  void obstack_int_grow (struct obstack *obstack, int data);
 
-void * obstack_finish (struct obstack *obstack);
+  void *obstack_finish (struct obstack *obstack);
 
-int obstack_object_size (struct obstack *obstack);
+  int obstack_object_size (struct obstack *obstack);
 
-int obstack_room (struct obstack *obstack);
-void obstack_make_room (struct obstack *obstack, int size);
-void obstack_1grow_fast (struct obstack *obstack, int data_char);
-void obstack_ptr_grow_fast (struct obstack *obstack, void *data);
-void obstack_int_grow_fast (struct obstack *obstack, int data);
-void obstack_blank_fast (struct obstack *obstack, int size);
+  int obstack_room (struct obstack *obstack);
+  void obstack_make_room (struct obstack *obstack, int size);
+  void obstack_1grow_fast (struct obstack *obstack, int data_char);
+  void obstack_ptr_grow_fast (struct obstack *obstack, void *data);
+  void obstack_int_grow_fast (struct obstack *obstack, int data);
+  void obstack_blank_fast (struct obstack *obstack, int size);
 
-void * obstack_base (struct obstack *obstack);
-void * obstack_next_free (struct obstack *obstack);
-int obstack_alignment_mask (struct obstack *obstack);
-int obstack_chunk_size (struct obstack *obstack);
-int obstack_memory_used (struct obstack *obstack);
+  void *obstack_base (struct obstack *obstack);
+  void *obstack_next_free (struct obstack *obstack);
+  int obstack_alignment_mask (struct obstack *obstack);
+  int obstack_chunk_size (struct obstack *obstack);
+  int obstack_memory_used (struct obstack *obstack);
 
-#endif /* __STDC__ */
+#endif				/* __STDC__ */
 
 /* Non-ANSI C cannot really support alternative functions for these macros,
    so we do not declare them.  */
@@ -263,13 +264,13 @@ int obstack_memory_used (struct obstack *obstack);
    more memory.  This can be set to a user defined function.  The
    default action is to print a message and abort.  */
 #if defined (__STDC__) && __STDC__
-extern void (*obstack_alloc_failed_handler) (void);
+  extern void (*obstack_alloc_failed_handler) (void);
 #else
-extern void (*obstack_alloc_failed_handler) ();
+  extern void (*obstack_alloc_failed_handler) ();
 #endif
 
 /* Exit value used when `print_and_abort' is used.  */
-extern int obstack_exit_failure;
+  extern int obstack_exit_failure;
 
 /* Pointer to beginning of object being allocated or to be allocated next.
    Note that this might not be the final address of the object
@@ -489,7 +490,7 @@ __extension__								\
      __o->next_free = __o->object_base = __obj;				\
    else (obstack_free) (__o, __obj); })
 
-#else /* not __GNUC__ or not __STDC__ */
+#else				/* not __GNUC__ or not __STDC__ */
 
 #define obstack_object_size(h) \
  (unsigned) ((h)->next_free - (h)->object_base)
@@ -589,10 +590,10 @@ __extension__								\
    : (_obstack_free ((h), (h)->temp + (char *) (h)->chunk), 0)))
 #endif
 
-#endif /* not __GNUC__ or not __STDC__ */
+#endif				/* not __GNUC__ or not __STDC__ */
 
 #ifdef __cplusplus
-}	/* C++ */
+}				/* C++ */
 #endif
 
-#endif /* obstack.h */
+#endif				/* obstack.h */

@@ -15,11 +15,11 @@
  * first.
  */
 
-void filter_free(filter *fil,
-			  gpointer throwaway);
-GList *filter_clear_filters(GList *filter_list);
-filter *filter_new();
-gint filter_append_regex(filter *fil,
-			 gchar *reg);
+void filter_free (filter * fil,
+		  gpointer throwaway);
+GList *filter_clear_filters (GList * filter_list);
+filter *filter_new ();
+gint filter_append_regex (filter * fil,
+			  gchar * reg);
 
 #endif /* _FUNCS_H */

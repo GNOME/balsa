@@ -656,7 +656,7 @@ button_event_press_cb (GtkCList * clist, GdkEventButton * event, gpointer data)
     return;
 
   if (!event || event->button != 3)
-   return;
+    return;
 
   gtk_clist_get_selection_info (clist, event->x, event->y, &row, &column);
   bindex = BALSA_INDEX (data);

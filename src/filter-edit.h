@@ -19,41 +19,42 @@
 
 
 typedef struct _option_list
-{
+  {
     gchar *text;
     GtkWidget *widget;
-} option_list;
+  }
+option_list;
 
 
 static option_list fe_run_on[] =
 {
-    { "Inbound", NULL },
-    { "Outbound", NULL },
-    { "Pre-send", NULL },
-    { "Demand", NULL }
+  {"Inbound", NULL},
+  {"Outbound", NULL},
+  {"Pre-send", NULL},
+  {"Demand", NULL}
 };
 
 static option_list fe_process_when[] =
 {
-    { "Matches", NULL },
-    { "Doesn't Match", NULL },
-    { "Never", NULL }
+  {"Matches", NULL},
+  {"Doesn't Match", NULL},
+  {"Never", NULL}
 };
 
 static option_list fe_search_type[] =
 {
-    { "Simple", NULL },
-    { "Regular Expression", NULL },
-    { "External Command", NULL}
+  {"Simple", NULL},
+  {"Regular Expression", NULL},
+  {"External Command", NULL}
 };
 
 static option_list fe_actions[] =
 {
-    { "Copy to folder:", NULL },
-    { "Move to folder:", NULL },
-    { "Print on printer:", NULL },
-    { "Run program:", NULL },
-    { "Send to Trash", NULL}
+  {"Copy to folder:", NULL},
+  {"Move to folder:", NULL},
+  {"Print on printer:", NULL},
+  {"Run program:", NULL},
+  {"Send to Trash", NULL}
 };
 
 /* Dialog window */
@@ -63,8 +64,8 @@ GtkWidget *fe_dialog_ok;
 GtkWidget *fe_dialog_cancel;
 GtkWidget *fe_dialog_help;
 /* and button callbacs */
-void fe_dialog_button_clicked(GtkWidget *widget,
-			      gpointer data);
+void fe_dialog_button_clicked (GtkWidget * widget,
+			       gpointer data);
 
 /* main table */
 GtkWidget *fe_table;
@@ -77,13 +78,13 @@ GtkWidget *fe_table;
 /* clist */
 GtkWidget *fe_clist;
 /* its callbacks */
-void fe_clist_select_row(GtkWidget *widget,
-			 gint row, gint column,
-			 GdkEventButton *bevent,
-			 gpointer data);
-void fe_clist_button_event_press(GtkWidget *widget,
-				 GdkEventButton *bevent,
-				 gpointer data);
+void fe_clist_select_row (GtkWidget * widget,
+			  gint row, gint column,
+			  GdkEventButton * bevent,
+			  gpointer data);
+void fe_clist_button_event_press (GtkWidget * widget,
+				  GdkEventButton * bevent,
+				  gpointer data);
 
 /* boxes for clist control buttons */
 GtkWidget *fe_box_newdelete;
@@ -95,14 +96,14 @@ GtkWidget *fe_delete;
 GtkWidget *fe_up;
 GtkWidget *fe_down;
 /* their callbacks */
-void fe_new_pressed(GtkWidget *widget,
-		    gpointer data);
-void fe_delete_pressed(GtkWidget *widget,
-		       gpointer data);
-void fe_up_pressed(GtkWidget *widget,
-		   gpointer data);
-void fe_down_pressed(GtkWidget *widget,
+void fe_new_pressed (GtkWidget * widget,
 		     gpointer data);
+void fe_delete_pressed (GtkWidget * widget,
+			gpointer data);
+void fe_up_pressed (GtkWidget * widget,
+		    gpointer data);
+void fe_down_pressed (GtkWidget * widget,
+		      gpointer data);
 
 /*
  * Separator
@@ -138,10 +139,10 @@ GtkWidget *fe_box_applyrevert;
 GtkWidget *fe_apply;
 GtkWidget *fe_revert;
 /* their callbacks */
-void fe_apply_pressed(GtkWidget *widget,
-		      gpointer data);
-void fe_revert_pressed(GtkWidget *widget,
+void fe_apply_pressed (GtkWidget * widget,
 		       gpointer data);
+void fe_revert_pressed (GtkWidget * widget,
+			gpointer data);
 
 /* match page widgets */
 
@@ -150,8 +151,8 @@ GtkWidget *fe_type_frame;
 GtkWidget *fe_type_box;
 GtkWidget *fe_search_option_menu;
 /* search type callback */
-void fe_checkbutton_toggled(GtkWidget *widget,
-			    gpointer data);
+void fe_checkbutton_toggled (GtkWidget * widget,
+			     gpointer data);
 
 /* Name field */
 GtkWidget *fe_name_label;
@@ -179,8 +180,8 @@ GtkWidget *fe_type_simple_subject;
 GtkWidget *fe_type_simple_label;
 GtkWidget *fe_type_simple_entry;
 /* And callback */
-void fe_type_simple_toggled(GtkWidget *widget,
-		     gpointer data);
+void fe_type_simple_toggled (GtkWidget * widget,
+			     gpointer data);
 
 /* widgets for the type notebook regex page */
 GtkWidget *fe_type_regex_scroll;
@@ -190,10 +191,10 @@ GtkWidget *fe_type_regex_add;
 GtkWidget *fe_type_regex_remove;
 GtkWidget *fe_type_regex_entry;
 /* callbacks */
-void fe_add_pressed(GtkWidget *widget,
-		    gpointer data);
-void fe_remove_pressed(GtkWidget *widget,
-		       gpointer data);
+void fe_add_pressed (GtkWidget * widget,
+		     gpointer data);
+void fe_remove_pressed (GtkWidget * widget,
+			gpointer data);
 
 /* Entry for the type notebook exec page */
 GtkWidget *fe_type_exec_label;
@@ -210,28 +211,28 @@ GtkWidget *fe_sound_browse;
 GtkWidget *fe_popup_button;
 GtkWidget *fe_popup_entry;
 /* callback for browse */
-void fe_sound_browse_clicked(GtkWidget *widget,
-			     gpointer throwaway);
+void fe_sound_browse_clicked (GtkWidget * widget,
+			      gpointer throwaway);
 /* action field */
 GtkWidget *fe_action_frame;
 GtkWidget *fe_action_table;
 GtkWidget *fe_action_option_menu;
 GtkWidget *fe_action_entry;
 /* callback */
-void fe_action_selected(GtkWidget *widget,
-			gpointer data);
+void fe_action_selected (GtkWidget * widget,
+			 gpointer data);
 
 /*GtkWidget *fe_copy_button;
-GtkWidget *fe_copy_entry;
-GtkWidget *fe_move_button;
-GtkWidget *fe_move_entry;
-GtkWidget *fe_move_label;
-GtkWidget *fe_print_button;
-GtkWidget *fe_print_entry;
-GtkWidget *fe_run_button;
-GtkWidget *fe_run_entry;
-GtkWidget *fe_delete_button;
-GtkWidget *fe_delete_label; */
+   GtkWidget *fe_copy_entry;
+   GtkWidget *fe_move_button;
+   GtkWidget *fe_move_entry;
+   GtkWidget *fe_move_label;
+   GtkWidget *fe_print_button;
+   GtkWidget *fe_print_entry;
+   GtkWidget *fe_run_button;
+   GtkWidget *fe_run_entry;
+   GtkWidget *fe_delete_button;
+   GtkWidget *fe_delete_label; */
 
 /* disposition field */
 GtkWidget *fe_disp_frame;
@@ -239,4 +240,3 @@ GtkWidget *fe_disp_box;
 GtkWidget *fe_disp_place;
 GtkWidget *fe_disp_continue;
 GtkWidget *fe_disp_stop;
-

@@ -197,31 +197,6 @@ libbalsa_imap_server_finalize(GObject * object)
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
-static void 
-libbalsa_imap_server_expunge_notify_cb(ImapMboxHandle *handle, int seqno,
-				       LibBalsaImapServer *imap_server)
-{
-    void *user = NULL;
-    GList *conn;
-    struct handle_info *info;
-
-    g_return_if_fail(handle != NULL);
-    g_return_if_fail(imap_server != NULL);
-
-    g_mutex_lock(imap_server->lock);
-    conn = g_list_find_custom(imap_server->free_handles, handle, by_handle);
-    if (!conn)
-	conn = g_list_find_custom(imap_server->used_handles, handle, by_handle);
-    g_return_if_fail(conn != NULL);
-
-    info = (struct handle_info*)conn->data;
-    user = info->last_user;
-    g_mutex_unlock(imap_server->lock);
-
-    if (LIBBALSA_IS_MAILBOX_IMAP(user))
-	libbalsa_mailbox_imap_expunge_notify(user, seqno);
-}
-
 gint ImapDebug = 0;
 #define BALSA_TEST_IMAP 1
 
@@ -304,9 +279,6 @@ lb_imap_server_info_new(LibBalsaServer *server)
     imap_handle_set_infocb(handle,    is_info_cb, server);
     imap_handle_set_usercb(handle,    libbalsa_server_user_cb, server);
 
-    g_signal_connect(G_OBJECT(handle), "expunge-notify",
-		     G_CALLBACK(libbalsa_imap_server_expunge_notify_cb),
-		     (gpointer)server);
     return info;
 }
 

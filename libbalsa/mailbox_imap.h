@@ -61,8 +61,6 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
 void libbalsa_mailbox_imap_noop(LibBalsaMailboxImap* mbox);
 
 void libbalsa_imap_close_all_connections(void);
-void libbalsa_mailbox_imap_expunge_notify(LibBalsaMailboxImap* mailbox,
-					  int seqno);
 
 void libbalsa_imap_new_subfolder(const gchar * parent, const gchar * folder,
 				 gboolean subscribe, LibBalsaServer * server);

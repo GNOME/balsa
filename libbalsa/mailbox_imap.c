@@ -608,9 +608,15 @@ imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
                 LibBalsaMailboxImap *mimap)
 {
     guint i;
+    gboolean locked;
 
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
     struct message_info *msg_info = message_info_from_msgno(mimap, seqno);
+
+    locked = HAVE_MAILBOX_LOCKED(mailbox);
+    if (!locked)
+	LOCK_MAILBOX(mailbox);
+
     libbalsa_mailbox_msgno_removed(mailbox, seqno);
     ++mimap->search_stamp;
     if(msg_info->message) {
@@ -629,6 +635,9 @@ imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
 	if (msg_info->message)
 	    msg_info->message->msgno = i + 1;
     }
+
+    if (!locked)
+	UNLOCK_MAILBOX(mailbox);
 }
 
 static void
@@ -1249,12 +1258,6 @@ void
 libbalsa_imap_close_all_connections(void)
 {
     libbalsa_imap_server_close_all_connections();
-}
-
-void libbalsa_mailbox_imap_expunge_notify(LibBalsaMailboxImap* mimap,
-					  int seqno)
-{
-    /* FIXME: do something with the notification */
 }
 
 /* libbalsa_imap_rename_subfolder:

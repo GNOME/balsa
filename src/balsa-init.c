@@ -519,7 +519,7 @@ BADMAILBOX:
 static void
 next_cb (GtkWidget * widget, gpointer data)
 {
-  switch (gtk_notebook_current_page (GTK_NOTEBOOK (iw->notebook)) + 1)
+  switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (iw->notebook)) + 1)
     {
     case IW_PAGE_FINISHED:
       check_mailboxes_for_finish (widget, data);
@@ -560,7 +560,7 @@ prev_cb (GtkWidget * widget, gpointer data)
 
   gtk_notebook_prev_page (GTK_NOTEBOOK (iw->notebook));
   gtk_widget_set_sensitive (iw->next, TRUE);
-  if (gtk_notebook_current_page (GTK_NOTEBOOK (iw->notebook)) == IW_PAGE_WELCOME)
+  if (gtk_notebook_get_current_page (GTK_NOTEBOOK (iw->notebook)) == IW_PAGE_WELCOME)
     gtk_widget_set_sensitive (iw->prev, FALSE);
 }
 

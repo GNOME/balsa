@@ -1,3 +1,9 @@
+1999-01-19  Jeff Garzik  <jgarzik@pobox.com>
+
+	* src/balsa-app.c, src/balsa-init.c, src/filter-edit-dialog.c,
+	  src/index-child.c, src/mailbox-conf.c:
+	Renamed deprecated Gtk+ functions.
+
 1999-01-18  bertrand <Bertrand.Guiheneuf@inria.fr>
 
 	* src/save-restore.c: add a new property key

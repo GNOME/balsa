@@ -76,7 +76,7 @@ balsa_error (const char *fmt,...)
 				      GNOME_STOCK_BUTTON_OK,
 				      NULL);
   gtk_widget_set_usize (messagebox, MESSAGEBOX_WIDTH, MESSAGEBOX_HEIGHT);
-  gtk_window_position (GTK_WINDOW (messagebox), GTK_WIN_POS_CENTER);
+  gtk_window_set_position (GTK_WINDOW (messagebox), GTK_WIN_POS_CENTER);
   gtk_widget_show (messagebox);
 
   gtk_signal_connect (GTK_OBJECT (messagebox), "clicked",

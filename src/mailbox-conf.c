@@ -459,7 +459,7 @@ conf_add_mailbox ()
   GString *idstr;
 
   MailboxConfPageType cur_page;
-  cur_page = gtk_notebook_current_page (GTK_NOTEBOOK (mcw->notebook));
+  cur_page = gtk_notebook_get_current_page (GTK_NOTEBOOK (mcw->notebook));
 
   switch (cur_page)		/* see what page we are on */
     {

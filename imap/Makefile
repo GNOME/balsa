@@ -100,7 +100,7 @@ BUILD=$(MAKE) build $(BUILDOPTIONS) EXTRASPECIALS="$(EXTRASPECIALS)"
 
 # Make the IMAP Toolkit
 
-all:	c-client rebuild bundled
+all:	c-client rebuild
 
 
 #  The following ports are defined.  These refer to the *standard* compiler
@@ -248,12 +248,9 @@ an ua:
 	$(TOOLS)/$@ "$(LN)" src/charset c-client
 	$(LN) `pwd`/src/kerberos/* c-client
 	$(TOOLS)/$@ "$(LN)" src/osdep/$(SYSTEM) c-client
-	$(TOOLS)/$@ "$(LN)" src/mtest mtest
-	$(TOOLS)/$@ "$(LN)" src/ipopd ipopd
-	$(TOOLS)/$@ "$(LN)" src/imapd imapd
 	$(LN) $(TOOLS)/$@ .
 
-build:	OSTYPE rebuild rebuildclean bundled
+build:	OSTYPE rebuild rebuildclean
 
 OSTYPE:
 	@echo Building c-client for $(OS)...
@@ -269,15 +266,9 @@ rebuild:
 rebuildclean:
 	$(RM) rebuild
 
-bundled:
-	@echo Building bundled tools...
-	$(CD) mtest;$(MAKE)
-	$(CD) ipopd;$(MAKE)
-	$(CD) imapd;$(MAKE)
-
 clean:
 	@echo Removing old processed sources and binaries...
-	$(RM) an ua OSTYPE c-client mtest imapd ipopd
+	$(RM) an ua OSTYPE c-client
 	$(CD) tools;$(MAKE) clean
 
 

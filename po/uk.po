@@ -1355,10 +1355,6 @@ msgstr "В╕дкрити адресну книгу"
 msgid "_Expand aliases as you type"
 msgstr "Розширювати псевдон╕ми при набор╕"
 
-#: src/address-book-config.c:463
-#, fuzzy Name"
-msgstr "Назва машини"
-
 #: src/address-book-config.c:468
 #, fuzzy
 msgid "_Base Domain Name"

@@ -1,3 +1,8 @@
+1998-12-19  Joel Becker  <jlbec@ocala.cs.miami.edu>
+
+	* src/filter-edit-dialog.c: Enabled the neat new dnd
+ 	reordering of the filter clist.  Yay.
+
 1998-12-19  pavlov@pavlov.net
 
 	Modified files:

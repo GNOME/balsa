@@ -217,6 +217,8 @@ static void build_left_side()
     gtk_clist_set_column_width(GTK_CLIST(fe_clist),
                                0, 16);
     gtk_clist_set_row_height(GTK_CLIST(fe_clist), 16);
+    gtk_clist_set_reorderable(GTK_CLIST(fe_clist), TRUE);
+    gtk_clist_set_use_drag_icons(GTK_CLIST(fe_clist), FALSE);
 
     gtk_container_add(GTK_CONTAINER(fe_scroll), GTK_WIDGET(fe_clist));
 

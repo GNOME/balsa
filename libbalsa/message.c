@@ -819,6 +819,9 @@ libbalsa_message_body_ref(LibBalsaMessage * message)
         return FALSE;
     } 
 
+    /* mx_open_message may have downloaded more headers (IMAP): */
+    libbalsa_message_headers_update(message);
+
     fseek(msg->fp, cur->content->offset, 0);
 
     if (cur->content->type == TYPEMULTIPART) {
@@ -1053,3 +1056,142 @@ libbalsa_message_get_no(LibBalsaMessage* msg)
 
 
 #endif
+
+/* libbalsa_message_headers_update:
+ * set up the various message-> headers from the info in
+ * message->header->env
+ *
+ * called when translate_message (libbalsa/mailbox.c) creates the
+ * message in the first place, and again when libbalsa_message_body_ref
+ * grabs the message body, in case more headers have been downloaded
+ */
+void
+libbalsa_message_headers_update(LibBalsaMessage * message)
+{
+    HEADER *cur;
+    ENVELOPE *cenv;
+    LIST *tmp;
+
+    if (!message || !(cur = message->header) || !(cenv = cur->env))
+        return;
+
+    message->date = cur->date_sent;
+    if (!message->from)
+        message->from =
+            libbalsa_address_new_from_libmutt(cenv->from);
+    if (!message->sender)
+        message->sender =
+            libbalsa_address_new_from_libmutt(cenv->sender);
+    if (!message->reply_to)
+        message->reply_to =
+            libbalsa_address_new_from_libmutt(cenv->reply_to);
+    if (!message->dispnotify_to)
+        message->dispnotify_to =
+            libbalsa_address_new_from_libmutt(cenv->dispnotify_to);
+
+    if (!message->to_list) {
+        ADDRESS *addy;
+        for (addy = cenv->to; addy; addy = addy->next) {
+            LibBalsaAddress *addr =
+                libbalsa_address_new_from_libmutt(addy);
+            if (addr)
+                message->to_list = g_list_append(message->to_list, addr);
+        }
+    }
+
+    if (!message->cc_list) {
+        ADDRESS *addy;
+        for (addy = cenv->cc; addy; addy = addy->next) {
+            LibBalsaAddress *addr =
+                libbalsa_address_new_from_libmutt(addy);
+            if (addr)
+                message->cc_list = g_list_append(message->cc_list, addr);
+        }
+    }
+
+    if (!message->bcc_list) {
+        ADDRESS *addy;
+        for (addy = cenv->bcc; addy; addy = addy->next) {
+            LibBalsaAddress *addr =
+                libbalsa_address_new_from_libmutt(addy);
+            if (addr)
+                message->bcc_list = g_list_append(message->bcc_list, addr);
+        }
+    }
+
+    /* Get fcc from message */
+    for (tmp = cenv->userhdrs; tmp; tmp = tmp->next) {
+        if (!message->fcc_mailbox
+            && g_strncasecmp("X-Mutt-Fcc:", tmp->data, 11) == 0) {
+            gchar *p = tmp->data + 11;
+            SKIPWS(p);
+
+            if (p)
+                message->fcc_mailbox = g_strdup(p);
+#if 0                           /* this looks bogus! */
+        } else if (g_strncasecmp("X-Mutt-Fcc:", tmp->data, 18) == 0) {
+            /* Is X-Mutt-Fcc correct? */
+            p = tmp->data + 18;
+            SKIPWS(p);
+
+            message->in_reply_to = g_strdup(p);
+#endif
+        } else if (!message->in_reply_to
+                   && g_strncasecmp("In-Reply-To:", tmp->data, 12) == 0) {
+            gchar *p = tmp->data + 12;
+            while (*p != '\0' && *p != '<')
+                p++;
+            if (*p != '\0') {
+                message->in_reply_to = g_strdup(p);
+                p = message->in_reply_to;
+                while (*p != '\0' && *p != '>')
+                    p++;
+                if (*p == '>')
+                    *(p + 1) = '\0';
+            }
+        }
+    }
+
+#ifdef MESSAGE_COPY_CONTENT
+    if (!message->subj)
+        message->subj = g_strdup(cenv->subject);
+#endif
+    if (!message->message_id)
+        message->message_id = g_strdup(cenv->message_id);
+
+    if (!message->references)
+        for (tmp = cenv->references; tmp != NULL; tmp = tmp->next) {
+            message->references = g_list_append(message->references,
+                                                g_strdup(tmp->data));
+        }
+
+    /* more! */
+    /* FIXME: message->references_for_threading is just the reverse of
+     * message->references; is there any reason to clutter up the
+     * message structure with it, and allocate memory for another set of
+     * g_strdup's? */
+
+    if (!message->references_for_threading)
+        for (tmp = cenv->references; tmp != NULL; tmp = tmp->next) {
+            message->references_for_threading =
+                g_list_prepend(message->references_for_threading,
+                               g_strdup(tmp->data));
+        }
+#if 0
+    /* According to  RFC 1036 (section 2.2.5), MessageIDs in References header
+     * must be in the oldest first order; the direct parent should be last. 
+     * It seems, however, some MUAs ignore this rule.
+     * For example, one of them adds the direct parent to the head of
+     * the References header.
+     */
+    if (message->in_reply_to != NULL &&
+        message->references_for_threading != NULL &&
+        1 < g_list_length(message->references_for_threading) &&
+        strcmp(message->in_reply_to,
+               (g_list_first(message->references_for_threading))->data) ==
+        0) {
+        GList *foo = message->references_for_threading;
+        message->references_for_threading = g_list_remove(foo, foo->data);
+    }
+#endif
+}

@@ -124,6 +124,8 @@ static void sw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
 static GString *
 quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type);
 static void set_list_post_address(BalsaSendmsg * msg);
+static gboolean set_list_post_rfc2369(BalsaSendmsg * msg, GList * p);
+static gchar *rfc2822_skip_comments(gchar * str);
 
 /* Standard DnD types */
 enum {
@@ -3435,68 +3437,113 @@ set_list_post_address(BalsaSendmsg * msg)
         gtk_entry_set_text(GTK_ENTRY(msg->to[1]), tmp);
         g_free(tmp);
     } else {
-        GList *lst, *p;
-        gchar **pair;
-
-        printf("Looking for list post address:");
-        lst = libbalsa_message_user_hdrs(message);
-        /* RFC 2369: look for "list-post": */
-        for (p = g_list_first(lst); p; p = g_list_next(p)) {
-            pair = p->data;
-            if (libbalsa_find_word(pair[0], "list-post")) {
-                gchar *url = pair[1];
-                printf(" found \"%s:%s\"\n", pair[0], url);
-                if (*url != '<')
-                    /* RFC 2369: the field SHOULD be ignored */
-                    continue;
-                /* RFC 2369: should use the left-most protocol that
-                 * we support */
-                do {
-                    gchar *close = strchr(++url, '>');
-                    if (close)
-                        *close = '\0';
-                    if (g_strncasecmp(url, "mailto:", 7) == 0)
-                        /* we support mailto! */
-                        break;
-                    if (close && *++close
-                        && *(url = g_strchug(close)) == ',')
-                        /* RFC 2369: Any characters following an
-                         * angle bracket enclosed URL SHOULD be
-                         * ignored, unless a comma is the first
-                         * non-whitespace/comment character after
-                         * the closing angle bracket. */
-                        url = strchr(url, '<');
-                    else
-                        url = NULL;
-                } while (url);
-
-                if (url) {
-                    printf("Address: \"%s\"\n", url + 7);
-                    sendmsg_window_process_url(url + 7,
-                                               sendmsg_window_set_field,
-                                               msg);
-                    break;
-                }
-            }
-        }
-
-        if (!p) {
+        GList *lst = libbalsa_message_user_hdrs(message);
+        if (!set_list_post_rfc2369(msg, lst)) {
             /* we didn't find "list-post", so try some nonstandard
              * alternatives: */
-            printf(" no list-post, ");
-            for (p = g_list_first(lst); p; p = g_list_next(p)) {
-                pair = p->data;
+            GList *p;
+            for (p = lst; p; p = g_list_next(p)) {
+                gchar **pair = p->data;
                 if (libbalsa_find_word(pair[0],
                                        "x-beenthere x-mailing-list")) {
-                    printf(" found \"%s:%s\"\n", pair[0], pair[1]);
                     gtk_entry_set_text(GTK_ENTRY(msg->to[1]), pair[1]);
                     break;
                 }
             }
-            if (!p)
-                printf(" no useful x-* headers either!\n");
         }
         g_list_foreach(lst, (GFunc) g_strfreev, NULL);
         g_list_free(lst);
     }
+}
+
+/* set_list_post_rfc2369:
+ * look for "List-Post:" header, and get the address */
+static gboolean
+set_list_post_rfc2369(BalsaSendmsg * msg, GList * p)
+{
+    while (p) {
+        gchar **pair = p->data;
+        if (libbalsa_find_word(pair[0], "list-post")) {
+            /* RFC 2369: To allow for future extension, client
+             * applications MUST follow the following guidelines for
+             * handling the contents of the header fields described in
+             * this document:
+             * 1) Except where noted for specific fields, if the content
+             *    of the field (following any leading whitespace,
+             *    including comments) begins with any character other
+             *    than the opening angle bracket '<', the field SHOULD
+             *    be ignored.
+             * 2) Any characters following an angle bracket enclosed URL
+             *    SHOULD be ignored, unless a comma is the first
+             *    non-whitespace/comment character after the closing
+             *    angle bracket.
+             * 3) If a sub-item (comma-separated item) within the field
+             *    is not an angle-bracket enclosed URL, the remainder of
+             *    the field (the current, and all subsequent sub-items)
+             *    SHOULD be ignored. */
+            gchar *url = pair[1];
+            /* RFC 2369: The client application should use the
+             * left most protocol that it supports, or knows how to
+             * access by a separate application. */
+            while (*(url = rfc2822_skip_comments(url)) == '<') {
+                gchar *close = strchr(++url, '>');
+                if (!close)
+                    /* broken syntax--break and return FALSE */
+                    break;
+                if (g_strncasecmp(url, "mailto:", 7) == 0) {
+                    /* we support mailto! */
+                    *close = '\0';
+                    sendmsg_window_process_url(url + 7,
+                                               sendmsg_window_set_field,
+                                               msg);
+                    return TRUE;
+                }
+                if (!(*++close
+                      && *(close = rfc2822_skip_comments(close)) == ','))
+                    break;
+                url = ++close;
+            }
+            /* RFC 2369: There MUST be no more than one of each field
+             * present in any given message; so we can quit after
+             * (unsuccessfully) processing one. */
+            return FALSE;
+        }
+        /* it wasn't a list-post line */
+        p = g_list_next(p);
+    }
+    /* we didn't find a list-post line */
+    return FALSE;
+}
+
+/* rfc2822_skip_comments:
+ * skip CFWS (comments and folding white space) 
+ *
+ * CRLFs have already been stripped, so we need to look only for
+ * comments and white space
+ *
+ * returns a pointer to the first character following the CFWS,
+ * which may point to a '\0' character but is never a NULL pointer */
+static gchar *
+rfc2822_skip_comments(gchar * str)
+{
+    gint level = 0;
+
+    while (*str) {
+        if (*str == '(')
+            /* start of a comment--they nest */
+            ++level;
+        else if (level > 0) {
+            if (*str == ')')
+                /* end of a comment */
+                --level;
+            else if (*str == '\\' && *++str == '\0')
+                /* quoted-pair: we must test for the end of the string,
+                 * which would be an error; in this case, return a
+                 * pointer to the '\0' character following the '\\' */
+                break;
+        } else if (!isblank(*str))
+            break;
+        ++str;
+    }
+    return str;
 }

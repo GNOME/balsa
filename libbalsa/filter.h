@@ -90,13 +90,13 @@ typedef enum {
     FILTER_MOVE,
     FILTER_PRINT,
     FILTER_RUN,
-    FILTER_TRASH              // Must be the last one
+    FILTER_TRASH              /* Must be the last one */
 } FilterActionType;
 
 typedef enum {
     FILTER_NOOP,
     FILTER_OP_OR,
-    FILTER_OP_AND             // Must be the last one
+    FILTER_OP_AND             /* Must be the last one */
 } FilterOpType;
 
 /*

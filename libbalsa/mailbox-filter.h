@@ -40,11 +40,11 @@
  * leads to apply filters only on those messages in the mailbox that have never been filtered before)
  */
 
-#define FILTER_WHEN_NEVER    0          // Ie manual only
+#define FILTER_WHEN_NEVER    0          /* Ie manual only */
 #define FILTER_WHEN_INCOMING 1 << 0
 #define FILTER_WHEN_CLOSING  1 << 1
 
-#define FILTER_WHEN_NB       2 // How many activation types
+#define FILTER_WHEN_NB       2 /* How many activation types */
 
 /* "filter when" operation macros */
 #define FILTER_WHEN_SETFLAG(x, y) (((x)->when) |= (y))

@@ -1,3 +1,12 @@
+2001-11-21  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/filter.h, libbalsa/mailbox-filter.h: make ANSI-compatible.
+
+	Peter Bloomfield:
+	* libbalsa/mailbox.c, message.[hc]: implement proper message 
+	translation.
+	* src/sendmsg-window.c: "reply to group" parse improvements.
+
 2001-11-20  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/balsa-index.c: context menu improvement.

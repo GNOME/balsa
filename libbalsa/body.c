@@ -108,9 +108,10 @@ libbalsa_message_body_extract_embedded_headers(GMimeMessage* msg)
     ehdr->user_hdrs = libbalsa_message_user_hdrs_from_gmime(msg);
 
     subj = g_mime_message_get_subject(msg);
-    if (subj)
+    if (subj) {
 	ehdr->subject = g_mime_utils_8bit_header_decode(subj);
-    else 
+	libbalsa_utf8_sanitize(&ehdr->subject, TRUE, NULL);
+    } else 
 	ehdr->subject = g_strdup(_("(No subject)"));
     g_mime_message_get_date(msg, &ehdr->date, &offset);
 

@@ -1,3 +1,17 @@
+2001-07-06  Matthew Guenther <guentherm@asme.org>
+
+	* src/balsa-identity.c (config_dialog_ok_cb): Save and sync
+	identity info to disk when the dialog is OK'd.
+	* src/balsa-icons.[ch]: Add new identity icon.
+	* src/main-window.c: Use new icon for Identities... menu item.
+	* src/pref-manager.c: Remove large blocks of commented out code.
+	* src/save-restore.[ch]: Move function config_identities_save to
+	public header file.
+	* src/sendmsg-window.[ch]: Add toolbar button and use new icon for
+	both toolbar and menu item.  Also fix spell-check menu item icon.
+	* src/pixmaps/identity.xpm: New icon for menuitems or buttons
+	relating to identities.
+	
 2001-07-06  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-mblist.c: wrong mailbox was offered to delete when 

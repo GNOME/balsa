@@ -117,8 +117,6 @@ static PropertyUI *pui = NULL;
 static GtkWidget *property_box;
 static gboolean already_open;
 
-/* static GtkWidget *create_identity_page(gpointer); */
-/* static GtkWidget *create_signature_page(gpointer); */
 static GtkWidget *create_mailserver_page(gpointer);
 static GtkWidget *create_mailoptions_page(gpointer);
 static GtkWidget *create_display_page(gpointer);
@@ -227,14 +225,6 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 			(gpointer) active_win);
 
     /* Create the pages */
-/*     gnome_property_box_append_page(GNOME_PROPERTY_BOX(property_box), */
-/* 				   create_identity_page(property_box), */
-/* 				   gtk_label_new(_("Identity"))); */
-
-/*     gnome_property_box_append_page(GNOME_PROPERTY_BOX(property_box), */
-/* 				   create_signature_page(property_box), */
-/* 				   gtk_label_new(_("Signature"))); */
-
     gnome_property_box_append_page(GNOME_PROPERTY_BOX(property_box),
 				   create_mailserver_page(property_box),
 				   gtk_label_new(_("Mail Servers")));
@@ -291,36 +281,6 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     gtk_signal_connect(GTK_OBJECT(pui->mblist_show_mb_content_info),
 		       "toggled", GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
-
-/*     gtk_signal_connect(GTK_OBJECT(pui->real_name), "changed", */
-/* 		       GTK_SIGNAL_FUNC(properties_modified_cb), */
-/* 		       property_box); */
-/*     gtk_signal_connect(GTK_OBJECT(pui->email), "changed", */
-/* 		       GTK_SIGNAL_FUNC(properties_modified_cb), */
-/* 		       property_box); */
-/*     gtk_signal_connect(GTK_OBJECT(pui->replyto), "changed", */
-/* 		       GTK_SIGNAL_FUNC(properties_modified_cb), */
-/* 		       property_box); */
-/*     gtk_signal_connect(GTK_OBJECT(pui->domain), "changed", */
-/* 		       GTK_SIGNAL_FUNC(properties_modified_cb), */
-/* 		       property_box); */
-
-/*     gtk_signal_connect(GTK_OBJECT(pui->sig_sending), "toggled", */
-/* 		       GTK_SIGNAL_FUNC(properties_modified_cb), */
-/* 		       property_box); */
-/*     gtk_signal_connect(GTK_OBJECT(pui->sig_whenforward), "toggled", */
-/* 		       GTK_SIGNAL_FUNC(properties_modified_cb), */
-/* 		       property_box); */
-/*     gtk_signal_connect(GTK_OBJECT(pui->sig_whenreply), "toggled", */
-/* 		       GTK_SIGNAL_FUNC(properties_modified_cb), */
-/* 		       property_box); */
-/*     gtk_signal_connect(GTK_OBJECT(pui->sig_separator), "toggled", */
-/* 		       GTK_SIGNAL_FUNC(properties_modified_cb), */
-/* 		       property_box); */
-/*     gtk_signal_connect(GTK_OBJECT(pui->sig_prepend), "toggled", */
-/* 		       GTK_SIGNAL_FUNC(properties_modified_cb), */
-/* 		       property_box); */
-
     gtk_signal_connect(GTK_OBJECT(pui->spell_check_sig), "toggled",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
@@ -350,9 +310,6 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     gtk_signal_connect(GTK_OBJECT(pui->mail_directory), "changed",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
-/*     gtk_signal_connect(GTK_OBJECT(pui->signature), "changed", */
-/* 		       GTK_SIGNAL_FUNC(properties_modified_cb), */
-/* 		       property_box); */
     gtk_signal_connect(GTK_OBJECT(pui->check_mail_auto), "toggled",
 		       GTK_SIGNAL_FUNC(timer_modified_cb), property_box);
 
@@ -369,15 +326,6 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 		       GTK_SIGNAL_FUNC(wrap_modified_cb), property_box);
     gtk_signal_connect(GTK_OBJECT(pui->wraplength), "changed",
 		       GTK_SIGNAL_FUNC(wrap_modified_cb), property_box);
-/*     gtk_signal_connect(GTK_OBJECT(pui->bcc), "changed", */
-/* 		       GTK_SIGNAL_FUNC(properties_modified_cb), */
-/* 		       property_box); */
-/*     gtk_signal_connect(GTK_OBJECT(pui->reply_string), "changed", */
-/* 		       GTK_SIGNAL_FUNC(properties_modified_cb), */
-/* 		       property_box); */
-/*     gtk_signal_connect(GTK_OBJECT(pui->forward_string), "changed", */
-/* 		       GTK_SIGNAL_FUNC(properties_modified_cb), */
-/* 		       property_box); */
 
     /* arp */
     gtk_signal_connect(GTK_OBJECT(pui->quote_str), "changed",
@@ -491,22 +439,6 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     /*
      * identity page
      */
-/*     gtk_object_destroy(GTK_OBJECT(balsa_app.address)); */
-/*     balsa_app.address = libbalsa_address_new(); */
-
-/*     balsa_app.address->full_name = */
-/* 	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->real_name))); */
-/*     balsa_app.address->address_list = */
-/* 	g_list_append(balsa_app.address->address_list, */
-/* 		      g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->email)))); */
-
-/*     g_free(balsa_app.replyto); */
-/*     balsa_app.replyto = */
-/* 	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->replyto))); */
-
-/*     g_free(balsa_app.domain); */
-/*     balsa_app.domain = */
-/* 	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->domain))); */
 
 #if ENABLE_ESMTP
     g_free(balsa_app.smtp_server);
@@ -522,23 +454,9 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
 	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->smtp_passphrase)));
 #endif
 
-/*     g_free(balsa_app.signature_path); */
-/*     balsa_app.signature_path = */
-/* 	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->signature))); */
-
     g_free(balsa_app.local_mail_directory);
     balsa_app.local_mail_directory =
 	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->mail_directory)));
-
-/*     balsa_app.sig_sending = GTK_TOGGLE_BUTTON(pui->sig_sending)->active; */
-/*     balsa_app.sig_whenforward = */
-/* 	GTK_TOGGLE_BUTTON(pui->sig_whenforward)->active; */
-/*     balsa_app.sig_whenreply = */
-/* 	GTK_TOGGLE_BUTTON(pui->sig_whenreply)->active; */
-/*     balsa_app.sig_separator = */
-/* 	GTK_TOGGLE_BUTTON(pui->sig_separator)->active; */
-/*     balsa_app.sig_prepend = */
-/* 	GTK_TOGGLE_BUTTON(pui->sig_prepend)->active; */
 
     /* 
      * display page 
@@ -599,13 +517,6 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     balsa_app.wordwrap = GTK_TOGGLE_BUTTON(pui->wordwrap)->active;
     balsa_app.wraplength =
 	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(pui->wraplength));
-
-/*     g_free(balsa_app.bcc); */
-/*     balsa_app.bcc = g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->bcc))); */
-/*     g_free(balsa_app.reply_string); */
-/*     balsa_app.reply_string = g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->reply_string))); */
-/*     g_free(balsa_app.forward_string); */
-/*     balsa_app.forward_string = g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->forward_string))); */
 
     balsa_app.close_mailbox_auto =
 	GTK_TOGGLE_BUTTON(pui->close_mailbox_auto)->active;
@@ -738,34 +649,6 @@ set_prefs(void)
 	    break;
 	}
 
-/*     gtk_entry_set_text(GTK_ENTRY(pui->real_name), */
-/* 		       balsa_app.address->full_name); */
-
-/*     if (balsa_app.address->address_list) { */
-/* 	gtk_entry_set_text(GTK_ENTRY(pui->email), */
-/* 			   balsa_app.address->address_list->data); */
-/*     } else */
-/* 	gtk_entry_set_text(GTK_ENTRY(pui->email), ""); */
-
-/*     if (balsa_app.replyto) */
-/* 	gtk_entry_set_text(GTK_ENTRY(pui->replyto), balsa_app.replyto); */
-/*     if (balsa_app.domain) */
-/* 	gtk_entry_set_text(GTK_ENTRY(pui->domain), balsa_app.domain); */
-
-/*     gtk_entry_set_text(GTK_ENTRY(pui->signature), */
-/* 		       balsa_app.signature_path); */
-
-/*     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->sig_sending), */
-/* 				 balsa_app.sig_sending); */
-/*     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->sig_whenforward), */
-/* 				 balsa_app.sig_whenforward); */
-/*     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->sig_whenreply), */
-/* 				 balsa_app.sig_whenreply); */
-/*     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->sig_separator), */
-/* 				 balsa_app.sig_separator); */
-/*     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->sig_prepend), */
-/* 				 balsa_app.sig_prepend); */
-
 #if ENABLE_ESMTP
     if (balsa_app.smtp_server)
 	gtk_entry_set_text(GTK_ENTRY(pui->smtp_server),
@@ -833,13 +716,6 @@ set_prefs(void)
 
     gtk_widget_set_sensitive(pui->wraplength,
 			     GTK_TOGGLE_BUTTON(pui->wordwrap)->active);
-
-/*     gtk_entry_set_text(GTK_ENTRY(pui->bcc), */
-/* 		       balsa_app.bcc ? balsa_app.bcc : ""); */
-/*     gtk_entry_set_text(GTK_ENTRY(pui->reply_string), */
-/* 		       balsa_app.reply_string ? balsa_app.reply_string : ""); */
-/*     gtk_entry_set_text(GTK_ENTRY(pui->forward_string), */
-/* 		       balsa_app.forward_string ? balsa_app.forward_string : ""); */
 
     /* arp */
     gtk_entry_set_text(GTK_ENTRY(pui->quote_str), balsa_app.quote_str);
@@ -1031,15 +907,6 @@ attach_entry(const gchar* label,gint row, GtkTable *table)
     return res;
 }
 
-/* static GtkWidget* */
-/* attach_check(const gchar* label,gint row, GtkTable *table) */
-/* { */
-/*     GtkWidget *res = gtk_check_button_new_with_label(label); */
-/*     gtk_table_attach(table, res, 1, 2, row, row+1, */
-/* 		     (GtkAttachOptions) (GTK_FILL), */
-/* 		     (GtkAttachOptions) (0), 0, 0); */
-/*     return res; */
-/* } */
 
 static GtkWidget*
 attach_information_menu(const gchar* label,gint row, GtkTable *table,
@@ -1102,82 +969,7 @@ color_box(GtkBox* parent, const gchar* title)
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     return picker;
 }
-/* create_identity_page:
-   as all the other create_* functions, creates a page, prefills it
-   and sets up respective signals.    These three parts should be nicely
-   marked in the code, unless there are strong reasons agains it.
-   The argument is the object that accepts modification callbacks
-   (usually the property box).  
-*/
 
-/* static GtkWidget * */
-/* create_identity_page(gpointer data) */
-/* { */
-/*     GtkWidget *frame1; */
-/*     GtkTable  *table; */
-/*     GtkWidget *vbox1; */
-
-/*     vbox1 = gtk_vbox_new(FALSE, 0); */
-
-/*     frame1 = gtk_frame_new(_("Identity")); */
-/*     gtk_box_pack_start(GTK_BOX(vbox1), frame1, FALSE, FALSE, 0); */
-
-/*     table = GTK_TABLE(create_table(4, 2, GTK_CONTAINER(frame1))); */
-/*     pui->real_name = attach_entry(_("Your name:"),       0,table); */
-/*     pui->email     = attach_entry(_("E-mail address:"),  1,table); */
-/*     pui->replyto   = attach_entry(_("Reply-to address:"),2,table); */
-/*     pui->domain    = attach_entry(_("Default domain:"),  3,table); */
-
-/*     return vbox1; */
-/* } */
-
-/* static GtkWidget * */
-/* create_signature_page(gpointer data) */
-/* { */
-/*     GtkWidget *vbox; */
-/*     GtkWidget *frame1; */
-/*     GtkTable *table1; */
-/*     GtkWidget *fileentry1; */
-/*     GtkWidget *label1; */
-
-/*     vbox = gtk_vbox_new(FALSE, 0); */
-
-/*     frame1 = gtk_frame_new(_("Signature")); */
-/*     gtk_box_pack_start(GTK_BOX(vbox), frame1, FALSE, FALSE, 0); */
-
-/*     table1 = GTK_TABLE(create_table(6, 2, GTK_CONTAINER(frame1))); */
-
-/*     label1 = gtk_label_new(_("Use signature file when:")); */
-/*     gtk_table_attach(GTK_TABLE(table1), label1, 0, 1, 0, 1, */
-/* 		     (GtkAttachOptions) (GTK_FILL), */
-/* 		     (GtkAttachOptions) (0), 0, 0); */
-/*     pui->sig_sending   = attach_check(_("sending mail"),     0, table1); */
-/*     pui->sig_whenreply = attach_check(_("replying to mail"), 1, table1); */
-/*     pui->sig_whenforward = attach_check(_("forwarding mail"),2, table1); */
-
-/*     label1 = gtk_label_new(_("Signature file:")); */
-/*     gtk_table_attach(GTK_TABLE(table1), label1, 0, 1, 3, 4, */
-/* 		     (GtkAttachOptions) (GTK_FILL), */
-/* 		     (GtkAttachOptions) (0), 0, 0); */
-/*     gtk_label_set_justify(GTK_LABEL(label1), GTK_JUSTIFY_LEFT); */
-
-/*     fileentry1 = gnome_file_entry_new("SIGNATURE-FILE", */
-/* 				      _("Select your signature file")); */
-/*     gtk_table_attach(GTK_TABLE(table1), fileentry1, 1, 2, 3, 4, */
-/* 		     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), */
-/* 		     (GtkAttachOptions) (0), 0, 0); */
-/*     gnome_file_entry_set_modal(GNOME_FILE_ENTRY(fileentry1), TRUE); */
-
-/*     pui->signature = gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(fileentry1)); */
-
-
-
-
-/*     pui->sig_separator=attach_check(_("Enable signature separator"),5,table1); */
-/*     pui->sig_prepend=attach_check(_("Insert signature before quoted messages"),6,table1); */
-
-/*     return vbox; */
-/* } */
 
 static GtkWidget *
 create_mailserver_page(gpointer data)
@@ -1482,9 +1274,6 @@ outgoing_page(gpointer data)
     gtk_container_add(GTK_CONTAINER(frame2), GTK_WIDGET(table2));
     gtk_container_set_border_width(GTK_CONTAINER(table2), 5);
     pui->quote_str = attach_entry(_("Reply prefix:"), 4, table2);
-/*     pui->bcc = attach_entry(_("Default Bcc to:"), 0, table2); */
-/*     pui->reply_string = attach_entry(_("Default Reply string:"), 1, table2); */
-/*     pui->forward_string = attach_entry(_("Default Forward string:"), 2, table2); */
 
     frame2 = gtk_frame_new(_("Encoding"));
     gtk_box_pack_start(GTK_BOX(vbox1), frame2, FALSE, FALSE, 0);
@@ -1533,6 +1322,8 @@ create_display_page(gpointer data)
     GtkWidget *vbox8;
     GtkWidget *color_frame;
     GtkWidget *vbox12;
+    GtkWidget *vbox13;
+    GtkWidget *hbox5;
     GtkWidget *mbcolor_frame;
     GtkWidget *vbox9;
     GtkWidget *font_frame;
@@ -1543,6 +1334,7 @@ create_display_page(gpointer data)
     GtkWidget *label2;
     GtkWidget *label3;
     GtkWidget *label4;
+    GtkWidget *current_vbox;
 
     
     vbox1 = gtk_vbox_new (FALSE, 0);
@@ -1665,11 +1457,23 @@ create_display_page(gpointer data)
     color_frame = gtk_frame_new(_("Message Colors"));
     gtk_container_set_border_width(GTK_CONTAINER(color_frame), 5);
     gtk_box_pack_start(GTK_BOX(vbox8), color_frame, FALSE, FALSE, 0);
-    vbox12 = vbox_in_container(color_frame);
+    hbox5 = gtk_hbox_new(TRUE, 5);
+    gtk_container_add(GTK_CONTAINER(color_frame), hbox5);
+    vbox12 = gtk_vbox_new(FALSE, 5);
+    vbox13 = gtk_vbox_new(FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(hbox5), vbox12, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox5), vbox13, TRUE, TRUE, 0);
 
-    for(i=0;i<MAX_QUOTED_COLOR;i++) {
+    for(i = 0; i < MAX_QUOTED_COLOR; i++) {
 	gchar *text = g_strdup_printf(_("Quote level %d color"), i+1);
-	pui->quoted_color[i] = color_box( GTK_BOX(vbox12), text);
+
+        if (i < MAX_QUOTED_COLOR/2) {
+            current_vbox = vbox12;
+        } else {
+            current_vbox = vbox13;
+        }
+        
+	pui->quoted_color[i] = color_box( GTK_BOX(current_vbox), text);
 	g_free(text);
     }
 
@@ -1941,7 +1745,7 @@ create_address_book_page(gpointer data)
     frame = gtk_frame_new(_("Address Books"));
     gtk_table_attach(GTK_TABLE(table), frame, 0, 1, 0, 1,
 		     GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
-    gtk_widget_set_usize(frame, -2, 115);
+/*     gtk_widget_set_usize(frame, -2, 115); */
     gtk_container_set_border_width(GTK_CONTAINER(frame), 5);
 
     hbox = gtk_hbox_new(FALSE, 0);
@@ -2240,5 +2044,3 @@ mailbox_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 
     properties_modified_cb(widget, pbox);
 }
-
-

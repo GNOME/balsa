@@ -51,6 +51,8 @@
 
 #include "pixmaps/small-close.xpm"
 
+#include "pixmaps/identity.xpm"
+
 typedef struct _BalsaIcon BalsaIcon;
 struct _BalsaIcon {
     GdkPixmap *p;
@@ -208,4 +210,7 @@ register_balsa_pixmaps(void)
     register_balsa_pixmap (BALSA_PIXMAP_ENVELOPE, envelope_xpm, 16, 16);
 
     register_balsa_pixmap (BALSA_PIXMAP_SMALL_CLOSE, small_close, 8, 9);
+
+    register_balsa_pixmap(BALSA_PIXMAP_IDENTITY, identity_xpm, 24, 24);
+    register_balsa_pixmap(BALSA_PIXMAP_IDENTITY_MENU, identity_xpm, 16, 16);
 }

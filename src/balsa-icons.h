@@ -33,6 +33,9 @@
 
 #define BALSA_PIXMAP_SMALL_CLOSE "small_close"
 
+#define BALSA_PIXMAP_IDENTITY "identity"
+#define BALSA_PIXMAP_IDENTITY_MENU "identity_menu"
+
 typedef enum {
     BALSA_ICON_INBOX,
     BALSA_ICON_OUTBOX,

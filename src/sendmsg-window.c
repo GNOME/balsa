@@ -58,6 +58,7 @@
 #include "balsa-app.h"
 #include "balsa-message.h"
 #include "balsa-index.h"
+#include "balsa-icons.h"
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
@@ -109,8 +110,8 @@ static void address_book_cb(GtkWidget *widget, BalsaSendmsg *smd_msg_wind);
 
 static gint set_locale(GtkWidget *, BalsaSendmsg *, gint);
 
-static void change_msg_identity_cb(GtkWidget*, BalsaSendmsg*);
-
+static void change_identity_dialog_cb(GtkWidget*, BalsaSendmsg*);
+static void update_msg_identity(BalsaSendmsg*, BalsaIdentity*);
 
 /* Standard DnD types */
 enum {
@@ -148,19 +149,25 @@ static GnomeUIInfo main_toolbar[] = {
     GNOMEUIINFO_ITEM_STOCK(N_("Attach"),
 			   N_("Add attachments to this message"),
 			   attach_clicked, GNOME_STOCK_PIXMAP_ATTACH),
+
     GNOMEUIINFO_SEPARATOR,
 #define TOOL_POSTPONE_POS 4
     GNOMEUIINFO_ITEM_STOCK(N_("Postpone"),
 			   N_("Continue this message later"),
 			   postpone_message_cb, GNOME_STOCK_PIXMAP_SAVE),
     GNOMEUIINFO_SEPARATOR,
-#define TOOL_SPELLING_POS 6
+#define TOOL_IDENT_POS 6
+    GNOMEUIINFO_ITEM_STOCK(N_("Select Identity"),
+                           N_("Set identity to use for this message"),
+                           change_identity_dialog_cb,
+                           BALSA_PIXMAP_IDENTITY),
+#define TOOL_SPELLING_POS 7
     GNOMEUIINFO_ITEM_STOCK(N_("Spelling"),
 			   N_
 			   ("Run a spell check on the current message"),
 			   spell_check_cb, GNOME_STOCK_PIXMAP_SPELLCHECK),
     GNOMEUIINFO_SEPARATOR,
-#define TOOL_PRINT_POS 8
+#define TOOL_PRINT_POS 9
     GNOMEUIINFO_ITEM_STOCK(N_("Print"), N_("Print"),
 			   print_message_cb, GNOME_STOCK_PIXMAP_PRINT),
     GNOMEUIINFO_SEPARATOR,
@@ -236,15 +243,16 @@ static GnomeUIInfo edit_menu[] = {
      GDK_r, GDK_CONTROL_MASK | GDK_SHIFT_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
 #define EDIT_MENU_SPELL_CHECK 10
-    {GNOME_APP_UI_ITEM, N_("Check Spelling"), NULL,
-     (gpointer) spell_check_cb, NULL, NULL,
-     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_PIXMAP_SPELLCHECK,
-     GDK_s, GDK_CONTROL_MASK | GDK_SHIFT_MASK, NULL},
+    GNOMEUIINFO_ITEM_STOCK(N_("Check Spelling"), 
+                           N_("Check the spelling of the message"),
+                           spell_check_cb,
+                           GNOME_STOCK_MENU_SPELLCHECK),
     GNOMEUIINFO_SEPARATOR,
 #define EDIT_MENU_SELECT_IDENT 12
-    GNOMEUIINFO_ITEM_NONE(N_("Select Identity..."), 
-                          N_("Select the Identity to use for the message"),
-                          change_msg_identity_cb),
+    GNOMEUIINFO_ITEM_STOCK(N_("Select Identity..."), 
+                           N_("Select the Identity to use for the message"),
+                           change_identity_dialog_cb,
+                           BALSA_PIXMAP_IDENTITY_MENU),
     GNOMEUIINFO_END
 };
 
@@ -586,30 +594,41 @@ fill_language_menu()
 
 
 static void 
-change_msg_identity_cb(GtkWidget* widget, BalsaSendmsg* msg)
+change_identity_dialog_cb(GtkWidget* widget, BalsaSendmsg* msg)
 {
     BalsaIdentity* ident;
-    gchar* from;
 
-
-    gtk_quit_remove(msg->quituid);
 
     ident = balsa_identity_select_dialog(_("Select Identity"));
 
     if (ident == NULL) {
-        msg->quituid = gtk_quit_add( 1, autopostpone_message, msg);
         return;
     }
         
-    msg->ident = ident;
+    update_msg_identity(msg, ident);
+}
+
+/*
+	Drop down list identity update
+*/
+
+
+
+static void
+update_msg_identity(BalsaSendmsg* msg, BalsaIdentity* ident)
+{
+    gchar* tmpstr;
+    
 
     /* change entries to reflect new identity */
-    from = g_strdup_printf("%s <%s>", ident->address->full_name, 
+
+    tmpstr = g_strdup_printf("%s <%s>", ident->address->full_name, 
                            (gchar*)ident->address->address_list->data);
-    gtk_entry_set_text(GTK_ENTRY(msg->from[1]), from);
-    g_free(from);
-    
+    gtk_entry_set_text(GTK_ENTRY(msg->from[1]), tmpstr);
+    g_free(tmpstr);
+
     gtk_entry_set_text(GTK_ENTRY(msg->reply_to[1]), ident->replyto);
+    
     gtk_entry_set_text(GTK_ENTRY(msg->bcc[1]), ident->bcc);
     
     /* change the subject to use the reply/forward strings */
@@ -618,8 +637,6 @@ change_msg_identity_cb(GtkWidget* widget, BalsaSendmsg* msg)
      * the signature if path changed */
 
     /* update the current messages identity */
-
-    msg->quituid = gtk_quit_add( 1, autopostpone_message, msg);
 }
 
 
@@ -1002,6 +1019,7 @@ create_email_entry(GtkWidget * table, const gchar * label, int y_pos,
 }
 
 
+
 /* create_info_pane 
    creates upper panel with the message headers: From, To, ... and 
    returns it.
@@ -1017,13 +1035,14 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     GList     *glist = NULL;
 
 
-    table = gtk_table_new(10, 3, FALSE);
+    table = gtk_table_new(11, 3, FALSE);
     gtk_table_set_row_spacings(GTK_TABLE(table), 2);
     gtk_table_set_col_spacings(GTK_TABLE(table), 2);
 
     /* From: */
     create_email_entry(table, _("From:"), 0, GNOME_STOCK_MENU_BOOK_BLUE,
-		       msg, msg->from);
+                       msg, msg->from);
+
     /* To: */
     create_email_entry(table, _("To:"), 1, GNOME_STOCK_MENU_BOOK_RED,
 		       msg, msg->to);
@@ -1066,6 +1085,8 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     /* Reply To: */
     create_email_entry(table, _("Reply To:"), 6, GNOME_STOCK_MENU_BOOK_RED,
 		       msg, msg->reply_to);
+
+
 
     /* Attachment list */
     msg->attachments[0] = gtk_label_new(_("Attachments:"));
@@ -1363,7 +1384,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     }
     msg->window = window;
     msg->type = type;
-    msg->ident = balsa_app.current_ident;
 
     gtk_signal_connect(GTK_OBJECT(msg->window), "delete_event",
 		       GTK_SIGNAL_FUNC(delete_event_cb), msg);
@@ -1397,7 +1417,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	    list = g_list_append(list, (gpointer) file_menu[i].widget);
     }
 
-    for (i = 0; i <= TOOL_PRINT_POS; i += 2) {
+    for (i = 0; i <= TOOL_PRINT_POS; ++i) {
 	list = g_list_append(list, (gpointer) main_toolbar[i].widget);
     }
 
@@ -1441,20 +1461,22 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	}
     }
 
+/* FIXME: have it get the identity from the To: field 
+ * of the previous message */
     /* From: */
     {
-	gchar *from;
+        gchar *from;
 	from = g_strdup_printf("%s <%s>", balsa_app.address->full_name,
-			       (gchar *) balsa_app.address->
-			       address_list->data);
-	gtk_entry_set_text(GTK_ENTRY(msg->from[1]), from);
-	g_free(from);
-    }
-
+		 	       (gchar *) balsa_app.address->
+                               address_list->data);
+	gtk_entry_set_text(GTK_ENTRY(msg->from[1]), from); 
+	g_free(from); 
+    } 
+    
     /* Reply To */
     if (balsa_app.replyto)
 	gtk_entry_set_text(GTK_ENTRY(msg->reply_to[1]), balsa_app.replyto);
-
+    
     /* Bcc: */
     if (balsa_app.bcc)
 	gtk_entry_set_text(GTK_ENTRY(msg->bcc[1]), balsa_app.bcc);
@@ -1824,9 +1846,9 @@ bsmsg2message(BalsaSendmsg * bsmsg, gboolean dup_filenames)
     g_assert(bsmsg != NULL);
     message = libbalsa_message_new();
 
-    message->from = libbalsa_address_new_from_string(gtk_entry_get_text
-						     (GTK_ENTRY(bsmsg->from
-								[1])));
+    message->from = 
+        libbalsa_address_new_from_string(gtk_entry_get_text
+                                         (GTK_ENTRY(bsmsg->from[1])));
 
     message->subject = g_strdup(gtk_entry_get_text
 				(GTK_ENTRY(bsmsg->subject[1])));
@@ -2228,7 +2250,8 @@ static gint
 toggle_keywords_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
     return toggle_entry(bsmsg, bsmsg->keywords, MENU_TOGGLE_KEYWORDS_POS,
-			2);}
+			2);
+}
 
 static gint
 toggle_reqdispnotify_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
@@ -2236,6 +2259,7 @@ toggle_reqdispnotify_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     balsa_app.req_dispnotify = GTK_CHECK_MENU_ITEM(widget)->active;
     return TRUE;
 }
+
 
 /* init_menus:
    performs the initial menu setup: shown headers as well as correct

@@ -46,7 +46,6 @@ static void config_address_books_load(void);
 static void config_address_books_save(void);
 
 static void config_identities_load(void);
-static void config_identities_save(void);
 
 #define folder_section_path(mn) \
     BALSA_MAILBOX_NODE(mn)->config_prefix ? \
@@ -1073,7 +1072,7 @@ config_identity_save(BalsaIdentity* ident)
 }
 
 
-static void
+void
 config_identities_save(void)
 {
     BalsaIdentity* ident;
@@ -1107,7 +1106,6 @@ config_identities_save(void)
         list = g_list_next(list);
     }
     
-
 }
 
 static gchar **

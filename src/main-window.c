@@ -527,7 +527,8 @@ static GnomeUIInfo settings_menu[] = {
     GNOMEUIINFO_MENU_PREFERENCES_ITEM (open_preferences_manager, NULL),
     GNOMEUIINFO_ITEM_STOCK(N_("Identities..."), 
                            N_("Create and set current identities"), 
-                           ident_manage_dialog_cb, GNOME_STOCK_MENU_PROP),
+                           ident_manage_dialog_cb, 
+                           BALSA_PIXMAP_IDENTITY_MENU),
     GNOMEUIINFO_END
 };
 

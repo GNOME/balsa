@@ -22,6 +22,7 @@
 #include "config.h"
 #include "balsa-app.h"
 #include "balsa-identity.h"
+#include "save-restore.h"
 #include "gnome.h"
 
 
@@ -41,10 +42,10 @@ static void delete_ident_cb(GtkButton* , gpointer);
 static void delete_confirm_cb(gint reply, gpointer user_data);
 static void identity_list_update(GtkCList*);
 static void config_frame_button_select_cb(GtkCList* clist, 
-                                            gint row, 
-                                            gint column, 
-                                            GdkEventButton* event, 
-                                            gpointer user_data);
+                                          gint row, 
+                                          gint column, 
+                                          GdkEventButton* event, 
+                                          gpointer user_data);
 static void config_frame_button_unselect_cb(GtkCList* clist, 
                                             gint row, 
                                             gint column, 
@@ -972,7 +973,7 @@ ident_dialog_update(GnomeDialog* dialog)
     while (list != NULL) {
         exist_ident = BALSA_IDENTITY(list->data);
         
-        if (g_strcasecmp(exist_ident->identity_name, text) == 0) {
+        if (g_strcasecmp(exist_ident->identity_name, text) == 0 && ident != exist_ident) {
             error = gnome_error_dialog_parented(_("Error: An identity with that name already exists"), GTK_WINDOW(balsa_app.main_window));
             gnome_dialog_run_and_close(GNOME_DIALOG(error));
             return FALSE;
@@ -1245,6 +1246,8 @@ static void
 config_dialog_ok_cb(GtkButton* button, gpointer user_data)
 {
     gnome_dialog_close(GNOME_DIALOG(user_data));
+    config_identities_save();
+    gnome_config_sync();
 }
 
 

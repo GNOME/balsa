@@ -281,8 +281,9 @@ static void mbox_unlock(LibBalsaMailbox * mailbox, GMimeStream *stream)
 static void
 lbm_mbox_header_cb(GMimeParser * parser, const char *header,
 		   const char *value, off_t offset,
-		   struct message_info *msg_info)
+		   struct message_info ** msg_info_p)
 {
+    struct message_info *msg_info = *msg_info_p;
     if (g_ascii_strcasecmp(header, "status") == 0 && msg_info->status < 0)
 	msg_info->status = offset;
     else if (g_ascii_strcasecmp(header, "x-status") == 0
@@ -299,6 +300,7 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
 {
     GMimeParser *gmime_parser;
     struct message_info msg_info;
+    struct message_info * msg_info_p = &msg_info;
     GMimeMessage *mime_message;
 
     gmime_parser = g_mime_parser_new_with_stream(mbox->gmime_stream);
@@ -307,7 +309,7 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
     g_mime_parser_set_header_regex(gmime_parser,
 				   "^(X-)?Status",
 				   (GMimeParserHeaderRegexFunc)
-				   lbm_mbox_header_cb, &msg_info);
+				   lbm_mbox_header_cb, &msg_info_p);
 
     while (!g_mime_stream_eos(mbox->gmime_stream)) {
 	msg_info.status = -1;
@@ -688,6 +690,79 @@ lbm_mbox_rewrite_in_place(struct message_info *msg_info,
     return TRUE;
 }
 
+/* Length of the line beginning at offset, including trailing '\n'.
+ * Returns -1 if no '\n' found, or if seek to offset fails. */
+static gint
+lbm_mbox_line_len(GMimeStream * stream, off_t offset)
+{
+    gchar buf[80];
+    gint old;
+
+    if (g_mime_stream_seek(stream, offset, GMIME_STREAM_SEEK_SET) == -1)
+	return -1;
+
+    old = 0;
+    for (;;) {
+	gint i, len;
+
+	len = g_mime_stream_read(stream, buf, sizeof buf);
+	if (len <= 0)
+	    return -1;
+
+	i = 0;
+	do 
+	    if (buf[i++] == '\n')
+		return old + i;
+	while (i < len);
+
+	old += len;
+    }
+}
+
+static gboolean
+lbm_mbox_copy_stream(GMimeStream * src, off_t start, off_t end,
+		     GMimeStream * dest)
+{
+    GMimeStream *substream;
+    gboolean retval;
+
+    if (start >= end)
+	return TRUE;
+
+    substream = g_mime_stream_substream(src, start, end);
+    retval = g_mime_stream_write_to_stream(substream, dest) == end - start;
+    g_object_unref(substream);
+
+    return retval;
+}
+
+/* Write a (X-)Status header to the stream. */
+static gboolean
+lbm_mbox_write_status_hdr(GMimeStream * stream, LibBalsaMessageFlag flags)
+{
+    gboolean retval;
+    GString *header = g_string_new("Status: ");
+    lbm_mbox_status_hdr(flags, header->len + 2, header);
+    g_string_append_c(header, '\n');
+    retval = g_mime_stream_write(stream, header->str,
+				 header->len) == (gint) header->len;
+    g_string_free(header, TRUE);
+    return retval;
+}
+
+static gboolean
+lbm_mbox_write_x_status_hdr(GMimeStream * stream, LibBalsaMessageFlag flags)
+{
+    gboolean retval;
+    GString *header = g_string_new("X-Status: ");
+    lbm_mbox_x_status_hdr(flags, header->len + 3, header);
+    g_string_append_c(header, '\n');
+    retval = g_mime_stream_write(stream, header->str,
+				 header->len) == (gint) header->len;
+    g_string_free(header, TRUE);
+    return retval;
+}
+
 static void lbm_mbox_armor_part(GMimeObject ** part);
 static void update_message_status_headers(GMimeMessage *message,
 					  LibBalsaMessageFlag flags);
@@ -739,16 +814,22 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
     /* Find where we need to start rewriting the mailbox.  We save a lot
      * of time by only rewriting the mailbox from the point where we
      * really need to.
+     * But if we're rewriting it, we start from the first message that's
+     * missing either status header, to reduce the chances of multiple
+     * rewrites.
      */
     messages = mbox->messages_info->len;
+    first = -1;
     for (i = 0; i < messages; i++)
     {
 	msg_info = &g_array_index(mbox->messages_info,
 		       struct message_info, i);
+	if (expunge && (msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED))
+	    break;
+	if (first < 0 && (msg_info->status < 0 || msg_info->x_status < 0))
+	    first = i;
 	if ((msg_info->orig_flags != msg_info->flags
-	     && !lbm_mbox_rewrite_in_place(msg_info, mbox_stream))
-	    || (expunge
-		&& (msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED)))
+	     && !lbm_mbox_rewrite_in_place(msg_info, mbox_stream)))
 	    break;
     }
     if (i >= messages) {
@@ -758,9 +839,11 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
     }
 
     /* save the index of the first changed/deleted message */
-    first = i; 
+    if (first < 0)
+	first = i; 
     /* where to start overwriting */
-    offset = msg_info->start;
+    offset =
+	g_array_index(mbox->messages_info, struct message_info, first).start;
 
     /* Create a temporary file to write the new version of the mailbox in. */
     i = g_file_open_tmp("balsa-tmp-mbox-XXXXXX", &tempfile, &error);
@@ -774,53 +857,71 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
     temp_stream = g_mime_stream_fs_new(i);
 
     for (i = first; i < messages; i++) {
+	guint status_len, x_status_len;
+
 	msg_info = &g_array_index(mbox->messages_info,
 				  struct message_info, i);
 	if (expunge && (msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED))
 	    continue;
 
-	if (msg_info->flags == msg_info->orig_flags) {
-	    g_mime_stream_set_bounds(mbox_stream, msg_info->start,
-				     msg_info->end);
-	    if (g_mime_stream_seek(mbox_stream, msg_info->start,
-				   GMIME_STREAM_SEEK_SET) < 0
-		|| g_mime_stream_write_to_stream(mbox_stream,
-						 temp_stream) <= 0) {
-		g_mime_stream_unref(temp_stream);
-		g_mime_stream_set_bounds(mbox_stream, 0, -1);
-		unlink(tempfile);
-		g_free(tempfile);
-		mbox_unlock(mailbox, mbox_stream);
-		return FALSE;
-	    }
+	if (msg_info->status >= 0) {
+	    status_len = lbm_mbox_line_len(mbox_stream, msg_info->status);
+	    if (status_len < 0)
+		break;
 	} else {
-	    GMimeMessage *mime_msg = msg_info->message->mime_msg;
-
-	    if (mime_msg)
-		g_mime_object_ref(GMIME_OBJECT(mime_msg));
-	    else {
-		mime_msg =
-		    lbm_mbox_get_mime_message(mailbox, msg_info->message);
-	    }
-	    update_message_status_headers(mime_msg, msg_info->flags);
-
-	    lbm_mbox_armor_part(&mime_msg->mime_part);
-	    /* write From_ & message */
-	    if (!msg_info->from
-		|| g_mime_stream_write_string(temp_stream,
-					      msg_info->from) == -1
-		|| g_mime_stream_write_string(temp_stream, "\n") == -1
-		|| g_mime_message_write_to_stream(mime_msg,
-						  temp_stream) == -1
-		|| lbm_mbox_newline(temp_stream) == -1) {
-		g_mime_object_unref(GMIME_OBJECT(mime_msg));
-		g_mime_stream_unref(temp_stream);
-		unlink(tempfile);
-		mbox_unlock(mailbox, mbox_stream);
-		return FALSE;
-	    }
-	    g_mime_object_unref(GMIME_OBJECT(mime_msg));
+	    msg_info->status =
+		msg_info->start + strlen(msg_info->from) + 1;
+	    status_len = 0;
 	}
+
+	if (msg_info->x_status >= 0) {
+	    x_status_len =
+		lbm_mbox_line_len(mbox_stream, msg_info->x_status);
+	    if (x_status_len < 0)
+		break;
+	} else {
+	    msg_info->x_status = msg_info->status;
+	    x_status_len = 0;
+	}
+
+	if (msg_info->status <= msg_info->x_status) {
+	    if (!lbm_mbox_copy_stream(mbox_stream, msg_info->start,
+				      msg_info->status, temp_stream)
+		|| !lbm_mbox_write_status_hdr(temp_stream, msg_info->flags)
+		|| !lbm_mbox_copy_stream(mbox_stream,
+					 msg_info->status + status_len,
+					 msg_info->x_status, temp_stream)
+		|| !lbm_mbox_write_x_status_hdr(temp_stream,
+						msg_info->flags)
+		|| !lbm_mbox_copy_stream(mbox_stream,
+					 msg_info->x_status +
+					 x_status_len, msg_info->end,
+					 temp_stream))
+		break;
+	} else {
+	    if (!lbm_mbox_copy_stream(mbox_stream, msg_info->start,
+				      msg_info->x_status, temp_stream)
+		|| !lbm_mbox_write_x_status_hdr(temp_stream,
+						msg_info->flags)
+		|| !lbm_mbox_copy_stream(mbox_stream,
+					 msg_info->x_status +
+					 x_status_len,
+					 msg_info->status, temp_stream)
+		|| !lbm_mbox_write_status_hdr(temp_stream, msg_info->flags)
+		|| !lbm_mbox_copy_stream(mbox_stream,
+					 msg_info->status + status_len,
+					 msg_info->end, temp_stream))
+		break;
+	}
+    }
+    if (i < messages) {
+	/* We broke on an error. */
+	g_warning("error making temporary copy\n");
+	g_mime_stream_unref(temp_stream);
+	unlink(tempfile);
+	g_free(tempfile);
+	mbox_unlock(mailbox, mbox_stream);
+	return FALSE;
     }
 
     g_mime_stream_set_bounds(mbox_stream, 0, -1);
@@ -914,6 +1015,10 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
     gmime_parser = g_mime_parser_new_with_stream(mbox_stream);
     g_mime_parser_set_scan_from(gmime_parser, TRUE);
     g_mime_parser_set_respect_content_length(gmime_parser, TRUE);
+    g_mime_parser_set_header_regex(gmime_parser,
+				   "^(X-)?Status",
+				   (GMimeParserHeaderRegexFunc)
+				   lbm_mbox_header_cb, &msg_info);
     for (i = first, j = first; i < messages; i++) {
 	msg_info = &g_array_index(mbox->messages_info,
 				  struct message_info, j);
@@ -924,6 +1029,7 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
 
 	    msg_info->message->msgno = j + 1;
 	    msg_info->start = g_mime_parser_tell(gmime_parser);
+	    msg_info->status = msg_info->x_status = -1;
 	    mime_msg = g_mime_parser_construct_message(gmime_parser);
 	    g_free(msg_info->from);
 	    msg_info->from = g_mime_parser_get_from(gmime_parser);

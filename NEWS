@@ -1,3 +1,12 @@
+* Balsa-2.0.1 release. Release date 2002-06-10
+
+This is a second release of GNOME2 port. It shares many improvements
+with the main branch. The changes unique to this port are:
+
+- port objects to GObjects whenever possible.
+- replace GtkCTree with GtkTreeView.
+- redesign identities dialog from scratch.
+
 * Balsa-2.0.0 release. Release date 2002-04-24
 
 This is first release of GNOME2 port.

@@ -132,10 +132,11 @@ GtkObject* libbalsa_mailbox_local_new(const gchar *path, gboolean create)
     g_warning ("Got IMAP as type for local mailbox\n");
     return NULL;
   default:
-    type = MAILBOX_MBOX;
+    type =  LIBBALSA_MAILBOX_LOCAL_MBOX;
   }
   
-  if ( type == LIBBALSA_MAILBOX_LOCAL_MBOX && stat(path, &st) == -1 && errno == -ENOENT )
+  if ( type == LIBBALSA_MAILBOX_LOCAL_MBOX && 
+       (fd=stat(path, &st)) == -1 /* && errno == -ENOENT */ )
   {
     if (!create)
       return NULL;
@@ -143,8 +144,9 @@ GtkObject* libbalsa_mailbox_local_new(const gchar *path, gboolean create)
     fd = creat( path, S_IRUSR | S_IWUSR );
     if( fd == -1 )
     {
-      g_warning ("An error accured while trying to create the mailbox \"%s\"\n",
-		 path);
+      g_warning ("An error:\n%s\n occured while trying to create the mailbox"
+		 "\"%s\"\n",
+		 strerror(errno), path);
       return NULL;
     } else {
       close(fd);

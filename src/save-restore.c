@@ -552,7 +552,7 @@ config_mailbox_init (proplist_t mbox, gchar * key)
       if (path == NULL)
 	return FALSE;
       
-      mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_local_new(path, FALSE));
+      mailbox = (LibBalsaMailbox*)libbalsa_mailbox_local_new(path, FALSE);
       if ( mailbox == NULL ) {
 	fprintf (stderr, "config_mailbox_init: Cannot create "
 		   "local mailbox %s\n", mailbox_name);

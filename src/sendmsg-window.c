@@ -526,7 +526,7 @@ attachments_add (GtkWidget * widget,
 		 GtkSelectionData * selection_data,
 		 guint info,
 		 guint32 time,
-		 GnomeIconList * iconlist)
+		 BalsaSendmsg * bsmsg)
 {
   GList *names, *l;
 
@@ -534,10 +534,14 @@ attachments_add (GtkWidget * widget,
   for (l = names; l; l = l->next)
     {
       char *name = l->data;
-
-      add_attachment (GNOME_ICON_LIST (widget), name);
+      if(g_strncasecmp(name , "file:",5) == 0)
+	 add_attachment (GNOME_ICON_LIST (bsmsg->attachments[1]), name+5);
     }
   gnome_uri_list_free_strings (names);
+
+  /* show attachment list */
+   gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
+     bsmsg->view_checkitems[MENU_TOGGLE_ATTACHMENTS_POS]), TRUE);
 }
 
 /* to_add - e-mail (To, From, Cc, Bcc) field D&D callback */
@@ -743,9 +747,9 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
 				  GTK_POLICY_AUTOMATIC);
 
   msg->attachments[1] = gnome_icon_list_new (100, NULL, FALSE);
-  gtk_signal_connect (GTK_OBJECT (msg->attachments[1]), "drag_data_received",
-		      GTK_SIGNAL_FUNC (attachments_add), NULL);
-  gtk_drag_dest_set (GTK_WIDGET (msg->attachments[1]), GTK_DEST_DEFAULT_ALL,
+  gtk_signal_connect (GTK_OBJECT (msg->window), "drag_data_received",
+		      GTK_SIGNAL_FUNC (attachments_add), msg);
+  gtk_drag_dest_set (GTK_WIDGET (msg->window), GTK_DEST_DEFAULT_ALL,
 		     drop_types, ELEMENTS (drop_types),
 		     GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
 

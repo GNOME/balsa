@@ -94,7 +94,7 @@ static void unconditional_mailbox( const gchar *path, const gchar *prettyname, g
 	/* The mailbox currently may not be IMAP or POP3 */
 	/* Due to the above test for a / at the start of the filename */
 
-	box = LIBBALSA_MAILBOX(libbalsa_mailbox_local_new(path, TRUE));
+	box = (LibBalsaMailbox*)libbalsa_mailbox_local_new(path, TRUE);
 
 	if( box == NULL ) {
 	  (*error) = g_strdup_printf( _("The mailbox \"%s\" does not appear to be valid."),

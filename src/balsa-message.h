@@ -22,8 +22,6 @@
 #ifndef __BALSA_MESSAGE_H__
 #define __BALSA_MESSAGE_H__
 
-#define GTK_ENABLE_BROKEN
-
 #include <gnome.h>
 #include "libbalsa.h"
 

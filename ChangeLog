@@ -1,3 +1,19 @@
+2001-08-13  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Take care of #53566. Stephen P. Wall <Steve_Wall@redcom.com>.
+	(treated as bug fix, not a new feature).
+	* libbalsa/address-book-ldif.{h,c}: LDIF support.
+	* libbalsa/Makefile.am: add address-book-ldif.{h,c}
+	* libbalsa/libbalsa.[hc]: register LibBalsaAddressBookLdif type.
+	* src/address-book-config.c: add LDIF configuration support.
+	* src/address-book.c: list full name instead of Ids.
+	* src/pref-manager.c: recognize LDIF address book type.
+
+	* src/main-window.c: remove debugging output.
+	* help/C/balsa.sgml: information on forcing alias expansion.
+	* src/balsa-index-threading.c: fix msg threading 
+	(Andrew Ferguson <andrew@owsla.cjb.net>).
+
 2001-08-11  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* help/C/balsa.sgml: update LDAP-related tips.

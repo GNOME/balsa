@@ -46,6 +46,7 @@ typedef struct body MuttBody;
 
 #include "address-book.h"
 #include "address-book-vcard.h"
+#include "address-book-ldif.h"
 #if ENABLE_LDAP
 #include "address-book-ldap.h"
 #endif

@@ -455,7 +455,7 @@ balsa_address_book_swap_clist_entry(GtkCList * src, GtkCList * dst)
 
  	gtk_clist_get_text (src, row, LIST_COLUMN_ADDRESS, &address_string);
 
-	listdata[LIST_COLUMN_NAME] = entry->address->id;
+	listdata[LIST_COLUMN_NAME] = entry->address->full_name;
 	listdata[LIST_COLUMN_ADDRESS]= address_string;
 
 	num = gtk_clist_append(dst, listdata);
@@ -608,7 +608,7 @@ balsa_address_book_load_cb(LibBalsaAddressBook *libbalsa_ab, LibBalsaAddress *ad
 
     if ( libbalsa_ab->dist_list_mode && g_list_length(address->address_list) >1) {
 
-	listdata[LIST_COLUMN_NAME] = address->id;
+	listdata[LIST_COLUMN_NAME] = address->full_name;
 	listdata[LIST_COLUMN_ADDRESS] = libbalsa_address_to_gchar(address, -1);
 	
 	rownum = gtk_clist_append(GTK_CLIST(ab->address_clist), listdata);
@@ -622,7 +622,7 @@ balsa_address_book_load_cb(LibBalsaAddressBook *libbalsa_ab, LibBalsaAddress *ad
 	address_list = address->address_list;
 	count = 0;
 	while ( address_list ) {
-	    listdata[LIST_COLUMN_NAME] = address->id;
+	    listdata[LIST_COLUMN_NAME] = address->full_name;
 	    listdata[LIST_COLUMN_ADDRESS] = (gchar *) address_list->data;
 	    
 	    rownum = gtk_clist_append(GTK_CLIST(ab->address_clist), listdata);

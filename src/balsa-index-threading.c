@@ -777,7 +777,7 @@ subject_merge(GNode *node, GHashTable* subject_table,
     if(node2->data!=NULL) {
 	LibBalsaMessage *message2=(LibBalsaMessage *)(node2->data);
 	const gchar* subject2 = LIBBALSA_MESSAGE_GET_SUBJECT(message2);
-	const gchar* chopped_subject2= chop_re(subject);
+	const gchar* chopped_subject2= chop_re(subject2);
 
 	if((subject2==chopped_subject2) && subject!=chopped_subject) {
 	    GSList* foo=root_set;

@@ -1871,13 +1871,10 @@ send_progress_notify_cb()
 
 	case MSGSENDTHREADFINISHED:
 	    /* closes progress dialog */
-	    g_print("MSGSENDTHREADFINISHED start\n");
 	    if (send_dialog)
 		gtk_widget_destroy(send_dialog);
 	    if (balsa_app.compose_email)
 		balsa_exit();
-
-	    g_print("MSGSENDTHREADFINISHED end\n");
 	    break;
 
 	default:

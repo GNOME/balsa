@@ -2594,7 +2594,9 @@
 	    <para>This will expand aliases as you type them.  Read
 	    more about this feature in the <link
 	    linkend="ct-alias-expansion"> Alias Expansion</link>
-	    section.</para>
+	    section. Note that some address book types (like LDAP) may
+	    require that you explicitly request address expansion by
+	    by pressing <keysym>Ctrl-R</keysym>.</para>
 	  </listitem>
 	</varlistentry>
       </variablelist>
@@ -2797,7 +2799,10 @@
         To enable this feature, you must select which address books
         you wish to be searched for aliases to expand.  This can be
         done in the <link linkend="win-config-3">Preferences</link>
-        window, under the <guilabel>Address Books</guilabel> tab.
+        window, under the <guilabel>Address Books</guilabel>
+        tab. Also, some address books are expensive to lookup. You
+        will need then to press <keysym>Ctrl-R</keysym> to explicitly
+        expand the alias.
       </para>
     </sect2>
     <sect2 id="ct-ldap">

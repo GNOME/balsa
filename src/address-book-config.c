@@ -46,6 +46,9 @@ struct _AddressBookConfig {
 	struct {
 	    GtkWidget *path;
 	} vcard;
+	struct {
+	    GtkWidget *path;
+	} ldif;
 #ifdef ENABLE_LDAP
 	struct {
 	    GtkWidget *host_name;
@@ -59,6 +62,7 @@ struct _AddressBookConfig {
 
 static GtkWidget *create_choice_page(AddressBookConfig * abc);
 static GtkWidget *create_vcard_page(AddressBookConfig * abc);
+static GtkWidget *create_ldif_page(AddressBookConfig * abc);
 #ifdef ENABLE_LDAP
 static GtkWidget *create_ldap_page(AddressBookConfig * abc);
 #endif
@@ -142,6 +146,8 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
 
 	if (LIBBALSA_IS_ADDRESS_BOOK_VCARD(address_book)) {
 	    page = create_vcard_page(abc);
+	} else if (LIBBALSA_IS_ADDRESS_BOOK_LDIF(address_book)) {
+	    page = create_ldif_page(abc);
 #ifdef ENABLE_LDAP
 	} else if (LIBBALSA_IS_ADDRESS_BOOK_LDAP(address_book)) {
 	    page = create_ldap_page(abc);
@@ -183,6 +189,12 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
 					       (abc->ab_specific.vcard.path), FALSE);
 	    if (path != NULL) 
 		address_book = libbalsa_address_book_vcard_new(name, path);
+	} else if (abc->create_type == LIBBALSA_TYPE_ADDRESS_BOOK_LDIF) {
+	    gchar *path =
+		gnome_file_entry_get_full_path(GNOME_FILE_ENTRY
+					       (abc->ab_specific.ldif.path), FALSE);
+	    if (path != NULL)
+		address_book = libbalsa_address_book_ldif_new(name, path);
 #ifdef ENABLE_LDAP
 	} else if (abc->create_type == LIBBALSA_TYPE_ADDRESS_BOOK_LDAP) {
 	    gchar *host_name =
@@ -215,6 +227,18 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
 	    if (path) {
 		g_free(vcard->path);
 		vcard->path = g_strdup(path);
+	    }
+	} else if (LIBBALSA_IS_ADDRESS_BOOK_LDIF(address_book)) {
+	    LibBalsaAddressBookLdif *ldif;
+	    gchar *path =
+		gnome_file_entry_get_full_path(GNOME_FILE_ENTRY
+					       (abc->ab_specific.ldif.path), 
+					       FALSE);
+
+	    ldif = LIBBALSA_ADDRESS_BOOK_LDIF(address_book);
+	    if (path) {
+		g_free(ldif->path);
+		ldif->path = g_strdup(path);
 	    }
 #ifdef ENABLE_LDAP
 	} else if (LIBBALSA_IS_ADDRESS_BOOK_LDAP(address_book)) {
@@ -275,6 +299,18 @@ create_choice_page(AddressBookConfig * abc)
     gtk_widget_show(radio_button);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio_button), TRUE);
     abc->create_type = LIBBALSA_TYPE_ADDRESS_BOOK_VCARD;
+
+    /* ... LDIF Address Book */
+    radio_button = gtk_radio_button_new_with_label
+	(gtk_radio_button_group(GTK_RADIO_BUTTON(radio_button)),
+	 _("LDIF Address Book"));
+    gtk_box_pack_start(GTK_BOX(vbox), radio_button, FALSE, FALSE, 0);
+    gtk_signal_connect(GTK_OBJECT(radio_button), "clicked",
+		       GTK_SIGNAL_FUNC(set_the_page), (gpointer) abc);
+    gtk_object_set_user_data(GTK_OBJECT(radio_button),
+			     GINT_TO_POINTER
+			     (LIBBALSA_TYPE_ADDRESS_BOOK_LDIF));
+    gtk_widget_show(radio_button);
 
     /* ... LDAP. */
     /* The dialog will look weird if LDAP isn't enabled
@@ -342,6 +378,59 @@ create_vcard_page(AddressBookConfig * abc)
 			   (GNOME_FILE_ENTRY(abc->ab_specific.vcard.path)));
 	gtk_entry_set_text(GTK_ENTRY(entry), ab->path);
     }
+    gtk_widget_show_all(table);
+    return table;
+
+}
+
+static GtkWidget *
+create_ldif_page(AddressBookConfig * abc)
+{
+    GtkWidget *table;
+    GtkWidget *label;
+    int keyval;
+    GnomeDialog* mcw = GNOME_DIALOG(abc->window);
+
+    table = gtk_table_new(2, 3, FALSE);
+
+    /* mailbox name */
+
+    create_label(_("_Address Book Name"), table, 0, &keyval);
+    abc->name_entry = create_entry(mcw, table, NULL, NULL, 0, 
+				   abc->address_book 
+				   ? abc->address_book->name : NULL, 
+				   keyval);
+
+    label = gtk_label_new(_("File name"));
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
+    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 1, 2,
+		     GTK_FILL, GTK_FILL, 10, 10);
+
+    abc->ab_specific.ldif.path =
+	gnome_file_entry_new("LDIF ADDRESS BOOK PATH",
+			     "Select path for address book");
+    gtk_table_attach(GTK_TABLE(table), abc->ab_specific.ldif.path, 1, 2,
+		     1, 2, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
+
+    abc->expand_aliases_button =
+	create_check(mcw, _("_Expand aliases as you type"), table, 2,
+		     abc->address_book ? 
+		     abc->address_book->expand_aliases : TRUE);
+
+    if (abc->address_book) {
+	LibBalsaAddressBookLdif *ldif;
+	GtkWidget *entry;
+
+	ldif = LIBBALSA_ADDRESS_BOOK_LDIF(abc->address_book);
+	entry =
+	    GTK_WIDGET(gnome_file_entry_gtk_entry
+		       (GNOME_FILE_ENTRY(abc->ab_specific.ldif.path)));
+
+	gtk_entry_set_text(GTK_ENTRY(abc->name_entry),
+			   abc->address_book->name);
+	gtk_entry_set_text(GTK_ENTRY(entry), ldif->path);
+    }
+
     gtk_widget_show_all(table);
     return table;
 
@@ -427,6 +516,8 @@ next_button_cb(GtkWidget * button, AddressBookConfig * abc)
 
     if (abc->create_type == LIBBALSA_TYPE_ADDRESS_BOOK_VCARD)
 	page = create_vcard_page(abc);
+    else if (abc->create_type == LIBBALSA_TYPE_ADDRESS_BOOK_LDIF)
+	page = create_ldif_page(abc);
 #ifdef ENABLE_LDAP
     else if (abc->create_type == LIBBALSA_TYPE_ADDRESS_BOOK_LDAP)
 	page = create_ldap_page(abc);
@@ -469,6 +560,32 @@ handle_close(AddressBookConfig * abc)
 		gtk_entry_get_text(GTK_ENTRY(
 		    gnome_file_entry_gtk_entry(
 			GNOME_FILE_ENTRY(abc->ab_specific.vcard.path)))));
+	    ask = gnome_message_box_new(msg, GNOME_MESSAGE_BOX_QUESTION,
+					GNOME_STOCK_BUTTON_OK,
+					GNOME_STOCK_BUTTON_CANCEL, NULL);
+	    g_free(msg);
+	    gnome_dialog_set_default(GNOME_DIALOG(ask), 1);
+	    gnome_dialog_set_parent(GNOME_DIALOG(ask),GTK_WINDOW(abc->window));
+	    clicked_button = gnome_dialog_run_and_close(GNOME_DIALOG(ask));
+	    if(clicked_button == 0) return;
+	    else abc->cancelled = TRUE;
+	} else g_free(path);
+    }
+    else if( (abc->address_book &&
+	 LIBBALSA_IS_ADDRESS_BOOK_LDIF(abc->address_book)) ||
+	(!abc->address_book&&
+	 abc->create_type == LIBBALSA_TYPE_ADDRESS_BOOK_LDIF)) {
+	gchar *path =
+	    gnome_file_entry_get_full_path(
+		GNOME_FILE_ENTRY(abc->ab_specific.ldif.path), FALSE);
+
+	if(!path) {
+	    gchar *msg = g_strdup_printf(
+		_("The address book file path '%s' is not correct.\n"
+		  "Do you want to correct the file name?"),
+		gtk_entry_get_text(GTK_ENTRY(
+		    gnome_file_entry_gtk_entry(
+			GNOME_FILE_ENTRY(abc->ab_specific.ldif.path)))));
 	    ask = gnome_message_box_new(msg, GNOME_MESSAGE_BOX_QUESTION,
 					GNOME_STOCK_BUTTON_OK,
 					GNOME_STOCK_BUTTON_CANCEL, NULL);

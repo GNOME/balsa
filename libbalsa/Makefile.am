@@ -5,6 +5,8 @@ libbalsa_a_SOURCES = 		\
 	address-book-ldap.h	\
 	address-book-vcard.c	\
 	address-book-vcard.h	\
+	address-book-ldif.h	\
+	address-book-ldif.c	\
 	address-book.c		\
 	address-book.h		\
 	address-entry.c		\

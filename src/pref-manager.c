@@ -885,6 +885,8 @@ update_address_books(void)
 
 	if (LIBBALSA_IS_ADDRESS_BOOK_VCARD(address_book))
 	    text[0] = "VCARD";
+	else if (LIBBALSA_IS_ADDRESS_BOOK_LDIF(address_book))
+	    text[0] = "LDIF";
 #if ENABLE_LDAP
 	else if (LIBBALSA_IS_ADDRESS_BOOK_LDAP(address_book))
 	    text[0] = "LDAP";

@@ -1,6 +1,7 @@
 # src/orbit-glue.c : disabled because it is excluded from the dist file
 libbalsa/address-book-ldap.c
 libbalsa/address-book-vcard.c
+libbalsa/address-book-ldif.c
 libbalsa/address-book.c
 libbalsa/address-entry.c
 libbalsa/folder-scanners.c

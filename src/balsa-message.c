@@ -128,12 +128,6 @@ static void display_embedded_headers(BalsaMessage * bm,
 				     LibBalsaMessageBody * body,
 				     GtkWidget *emb_hdr_view);
 
-static void display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
-			 GtkTreeIter * parent_iter);
-static void display_multipart(BalsaMessage * bm,
-			      LibBalsaMessageBody * body,
-			      GtkTreeIter * parent_iter);
-
 static void save_part(BalsaPartInfo * info);
 
 static BalsaPartInfo *add_part(BalsaMessage *bm, BalsaPartInfo *info);
@@ -1711,18 +1705,6 @@ part_info_mime_button_vfs (BalsaPartInfo* info, const gchar* content_type)
 }
 
 static void
-display_multipart(BalsaMessage * bm, LibBalsaMessageBody * body,
-		  GtkTreeIter *parent_iter)
-{
-    LibBalsaMessageBody *part;
-
-    for (part = body->parts; part; part = part->next) {
-	display_part(bm, part, parent_iter);
-    }
-}
-
-
-static void
 part_info_init_video(BalsaMessage * bm, BalsaPartInfo * info)
 {
     g_print("TODO: part_info_init_video\n");
@@ -2436,19 +2418,15 @@ mpart_content_name(const gchar *content_type)
 
 static void
 display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
-	     GtkTreeIter *parent_iter)
+	     GtkTreeModel * model, GtkTreeIter * iter)
 {
     BalsaPartInfo *info = NULL;
     gchar *pix = NULL;
     gchar *content_type = libbalsa_message_body_get_content_type(body);
     gchar *icon_title = NULL;
     gboolean is_multipart=libbalsa_message_body_is_multipart(body);
-    GtkTreeModel * model;
-    GtkTreeIter iter;
     GdkPixbuf *content_icon;
 
-    model = gtk_tree_view_get_model(GTK_TREE_VIEW(bm->treeview));
-    gtk_tree_store_append (GTK_TREE_STORE(model), &iter, parent_iter);
     pix = libbalsa_icon_finder(content_type, body->filename, NULL);
 	
     if(!is_multipart ||
@@ -2481,7 +2459,7 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
 	    icon_title = g_strdup_printf("(%s)", content_type);
 	
 	part_create_menu (info);
-	info->path = gtk_tree_model_get_path(model, &iter);
+	info->path = gtk_tree_model_get_path(model, iter);
 
 	/* add to the tree view */
 #ifdef HAVE_GPGME
@@ -2512,7 +2490,7 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
 #endif
 	    content_icon =
 		gdk_pixbuf_new_from_file_scaled(pix, 16, 16, GDK_INTERP_BILINEAR, NULL);
-	gtk_tree_store_set (GTK_TREE_STORE(model), &iter, 
+	gtk_tree_store_set (GTK_TREE_STORE(model), iter, 
 			    PART_INFO_COLUMN, info,
 			    MIME_ICON_COLUMN, content_icon,
 			    MIME_TYPE_COLUMN, icon_title, -1);
@@ -2522,7 +2500,7 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
     } else {
 	content_icon =
 	    gdk_pixbuf_new_from_file_scaled(pix, 16, 16, GDK_INTERP_BILINEAR, NULL);
-	gtk_tree_store_set (GTK_TREE_STORE(model), &iter, 
+	gtk_tree_store_set (GTK_TREE_STORE(model), iter, 
 			    PART_INFO_COLUMN, NULL,
 			    MIME_ICON_COLUMN, content_icon,
 			    MIME_TYPE_COLUMN, content_type, -1);
@@ -2530,24 +2508,30 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
 	
     g_object_unref(G_OBJECT(content_icon));
     g_free(pix);
-    if (is_multipart) {
-	if (balsa_app.debug)
-	    fprintf(stderr, "part: multipart\n");
-	display_multipart(bm, body, &iter);
-	if (balsa_app.debug)
-	    fprintf(stderr, "part end: multipart\n");
-    }
     g_free(content_type);
+}
+
+static void
+display_parts(BalsaMessage * bm, LibBalsaMessageBody * body,
+	      GtkTreeIter * parent)
+{
+    GtkTreeModel *model =
+	gtk_tree_view_get_model(GTK_TREE_VIEW(bm->treeview));
+    GtkTreeIter iter;
+
+    while (body) {
+	gtk_tree_store_append(GTK_TREE_STORE(model), &iter, parent);
+	display_part(bm, body, model, &iter);
+	display_parts(bm, body->parts, &iter);
+	body = body->next;
+    }
 }
 
 static void
 display_content(BalsaMessage * bm)
 {
-    LibBalsaMessageBody *body;
-
     balsa_message_clear_tree(bm);
-    for (body = bm->message->body_list; body; body = body->next)
-	display_part(bm, body, NULL);
+    display_parts(bm, bm->message->body_list, NULL);
     gtk_tree_view_columns_autosize(GTK_TREE_VIEW(bm->treeview));
     gtk_tree_view_expand_all(GTK_TREE_VIEW(bm->treeview));
 }
@@ -3129,21 +3113,20 @@ add_multipart_mixed(BalsaMessage * bm, LibBalsaMessageBody * body)
 }
 
 static void add_multipart(BalsaMessage *bm, LibBalsaMessageBody *parent)
-/* This function handles multiparts as specified by RFC2046 5.1 */
+/* This function handles multiparts as specified by RFC2046 5.1 and
+ * message/rfc822 types. */
 {
     GMimeContentType *type;
     type=g_mime_content_type_new_from_string(parent->mime_type);
-    if (g_mime_content_type_is_type(type, "multipart", "*")) {
-        if (g_mime_content_type_is_type(type, "*", "related")) {
-            /* FIXME: more processing required see RFC1872 */
-	    /* Add the first part */
-	    add_body(bm, parent->parts);
-        } else if (g_mime_content_type_is_type(type, "*", "alternative")) {
+    if (g_mime_content_type_is_type(type, "*", "related")) {
+        /* FIXME: more processing required see RFC1872 */
+        /* Add the first part */
+        add_body(bm, parent->parts);
+    } else if (g_mime_content_type_is_type(type, "*", "alternative")) {
 	    /* Add the most suitable part. */
-	    add_body(bm, preferred_part(parent->parts));
-        } else { /* default to multipart/mixed */
-	    add_multipart_mixed(bm, parent->parts);
-	}
+        add_body(bm, preferred_part(parent->parts));
+    } else { /* default to multipart/mixed */
+        add_multipart_mixed(bm, parent->parts);
     }
     g_mime_content_type_destroy(type);
 }

@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 2000 Stuart Parmenter
  *
@@ -36,160 +36,159 @@ static void libbalsa_server_real_set_host(LibBalsaServer *server, const gchar *h
 GtkType
 libbalsa_server_get_type (void)
 {
-  static GtkType server_type = 0;
+	static GtkType server_type = 0;
 
-  if (!server_type)
-    {
-      static const GtkTypeInfo server_info =
-      {
-	"LibBalsaServer",
-	sizeof (LibBalsaServer),
-	sizeof (LibBalsaServerClass),
-	(GtkClassInitFunc) libbalsa_server_class_init,
-	(GtkObjectInitFunc) libbalsa_server_init,
-        /* reserved_1 */ NULL,
-	/* reserved_2 */ NULL,
-	(GtkClassInitFunc) NULL,
-      };
+	if (!server_type) {
+		static const GtkTypeInfo server_info = {
+			"LibBalsaServer",
+			sizeof (LibBalsaServer),
+			sizeof (LibBalsaServerClass),
+			(GtkClassInitFunc) libbalsa_server_class_init,
+			(GtkObjectInitFunc) libbalsa_server_init,
+			/* reserved_1 */ NULL,
+			/* reserved_2 */ NULL,
+			(GtkClassInitFunc) NULL,
+		};
 
-      server_type = gtk_type_unique(gtk_object_get_type(), &server_info);
-    }
+		server_type = gtk_type_unique(gtk_object_get_type(), &server_info);
+	}
 
-  return server_type;
+	return server_type;
 }
 
 enum {
-  SET_USERNAME,
-  SET_PASSWORD,
-  SET_HOST,
-  LAST_SIGNAL
+	SET_USERNAME,
+	SET_PASSWORD,
+	SET_HOST,
+	LAST_SIGNAL
 };
+
 static guint libbalsa_server_signals[LAST_SIGNAL];
 
 static void
 libbalsa_server_class_init (LibBalsaServerClass *klass)
 {
-  GtkObjectClass *object_class;
+	GtkObjectClass *object_class;
 
-  object_class = GTK_OBJECT_CLASS(klass);
+	object_class = GTK_OBJECT_CLASS(klass);
 
-  parent_class = gtk_type_class(gtk_object_get_type());
+	parent_class = gtk_type_class(gtk_object_get_type());
 
-  object_class->destroy = libbalsa_server_destroy;
+	object_class->destroy = libbalsa_server_destroy;
 
-  libbalsa_server_signals[SET_USERNAME] =
-    gtk_signal_new ("set-username",
-		    GTK_RUN_FIRST,
-		    object_class->type,
-		    GTK_SIGNAL_OFFSET (LibBalsaServerClass, set_username),
-		    gtk_marshal_NONE__STRING,
-		    GTK_TYPE_NONE, 1, GTK_TYPE_STRING);
-  libbalsa_server_signals[SET_PASSWORD] =
-    gtk_signal_new ("set-password",
-		    GTK_RUN_FIRST,
-		    object_class->type,
-		    GTK_SIGNAL_OFFSET (LibBalsaServerClass, set_password),
-		    gtk_marshal_NONE__STRING,
-		    GTK_TYPE_NONE, 1, GTK_TYPE_STRING);
-  libbalsa_server_signals[SET_HOST] =
-    gtk_signal_new ("set-host",
-		    GTK_RUN_FIRST,
-		    object_class->type,
-		    GTK_SIGNAL_OFFSET (LibBalsaServerClass, set_host),
-		    gtk_marshal_NONE__POINTER_INT,
-		    GTK_TYPE_NONE, 2, GTK_TYPE_STRING, GTK_TYPE_INT);
+	libbalsa_server_signals[SET_USERNAME] =
+		gtk_signal_new ("set-username",
+				GTK_RUN_FIRST,
+				object_class->type,
+				GTK_SIGNAL_OFFSET (LibBalsaServerClass, set_username),
+				gtk_marshal_NONE__STRING,
+				GTK_TYPE_NONE, 1, GTK_TYPE_STRING);
+	libbalsa_server_signals[SET_PASSWORD] =
+		gtk_signal_new ("set-password",
+				GTK_RUN_FIRST,
+				object_class->type,
+				GTK_SIGNAL_OFFSET (LibBalsaServerClass, set_password),
+				gtk_marshal_NONE__STRING,
+				GTK_TYPE_NONE, 1, GTK_TYPE_STRING);
+	libbalsa_server_signals[SET_HOST] =
+		gtk_signal_new ("set-host",
+				GTK_RUN_FIRST,
+				object_class->type,
+				GTK_SIGNAL_OFFSET (LibBalsaServerClass, set_host),
+				gtk_marshal_NONE__POINTER_INT,
+				GTK_TYPE_NONE, 2, GTK_TYPE_STRING, GTK_TYPE_INT);
 
-  gtk_object_class_add_signals(object_class, libbalsa_server_signals, LAST_SIGNAL);
+	gtk_object_class_add_signals(object_class, libbalsa_server_signals, LAST_SIGNAL);
 
-  klass->set_username = libbalsa_server_real_set_username;
-  klass->set_password = libbalsa_server_real_set_password;
-  klass->set_host = libbalsa_server_real_set_host;
+	klass->set_username = libbalsa_server_real_set_username;
+	klass->set_password = libbalsa_server_real_set_password;
+	klass->set_host = libbalsa_server_real_set_host;
 }
 
 static void
 libbalsa_server_init(LibBalsaServer *server)
 {
-  server->host = NULL;
-  server->port = 0;
-  server->user = NULL;
-  server->passwd = NULL;
+	server->host = NULL;
+	server->port = 0;
+	server->user = NULL;
+	server->passwd = NULL;
 }
 
 static void
 libbalsa_server_destroy (GtkObject *object)
 {
-  LibBalsaServer *server; 
+	LibBalsaServer *server; 
 
-  g_return_if_fail(LIBBALSA_IS_SERVER(object));
+	g_return_if_fail(LIBBALSA_IS_SERVER(object));
 
-  server = LIBBALSA_SERVER(object);
+	server = LIBBALSA_SERVER(object);
 
-  g_free(server->host);
-  g_free(server->user);
-  g_free(server->passwd);
+	g_free(server->host);
+	g_free(server->user);
+	g_free(server->passwd);
 
-  if (GTK_OBJECT_CLASS(parent_class)->destroy)
-    (*GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(object));
+	if (GTK_OBJECT_CLASS(parent_class)->destroy)
+		(*GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(object));
 }
 
 GtkObject*
 libbalsa_server_new(LibBalsaServerType type)
 {
-  LibBalsaServer *server;
-  server = gtk_type_new(LIBBALSA_TYPE_SERVER);
-  server->type = type;
+	LibBalsaServer *server;
+	server = gtk_type_new(LIBBALSA_TYPE_SERVER);
+	server->type = type;
 
-  return GTK_OBJECT(server);
+	return GTK_OBJECT(server);
 }
 
 void libbalsa_server_set_username(LibBalsaServer *server, const gchar *username)
 {
-  g_return_if_fail(server != NULL);
-  g_return_if_fail(LIBBALSA_IS_SERVER(server));
+	g_return_if_fail(server != NULL);
+	g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
-  gtk_signal_emit(GTK_OBJECT(server), libbalsa_server_signals[SET_USERNAME], username);
+	gtk_signal_emit(GTK_OBJECT(server), libbalsa_server_signals[SET_USERNAME], username);
 }
 
 void libbalsa_server_set_password(LibBalsaServer *server, const gchar *passwd)
 {
-  g_return_if_fail(server != NULL);
-  g_return_if_fail(LIBBALSA_IS_SERVER(server));
+	g_return_if_fail(server != NULL);
+	g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
-  gtk_signal_emit(GTK_OBJECT(server), libbalsa_server_signals[SET_PASSWORD], passwd);
+	gtk_signal_emit(GTK_OBJECT(server), libbalsa_server_signals[SET_PASSWORD], passwd);
 }
 
 void libbalsa_server_set_host(LibBalsaServer *server, const gchar *host, gint port)
 {
-  g_return_if_fail(server != NULL);
-  g_return_if_fail(LIBBALSA_IS_SERVER(server));
+	g_return_if_fail(server != NULL);
+	g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
-  gtk_signal_emit(GTK_OBJECT(server), libbalsa_server_signals[SET_HOST], host, port);
+	gtk_signal_emit(GTK_OBJECT(server), libbalsa_server_signals[SET_HOST], host, port);
 }
 
 static void 
 libbalsa_server_real_set_username(LibBalsaServer *server, const gchar *username)
 {
-  g_return_if_fail(LIBBALSA_IS_SERVER(server));
+	g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
-  g_free(server->user);
-  server->user = g_strdup(username);
+	g_free(server->user);
+	server->user = g_strdup(username);
 }
 
 static void
 libbalsa_server_real_set_password(LibBalsaServer *server, const gchar *passwd)
 {
-  g_return_if_fail(LIBBALSA_IS_SERVER(server));
+	g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
-  g_free(server->passwd);
-  server->passwd = g_strdup(passwd);
+	g_free(server->passwd);
+	server->passwd = g_strdup(passwd);
 }
 
 static void 
 libbalsa_server_real_set_host(LibBalsaServer *server, const gchar *host, gint port)
 {
-  g_return_if_fail(LIBBALSA_IS_SERVER(server));
+	g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
-  g_free(server->host);
-  server->host = g_strdup(host);
-  server->port = port;
+	g_free(server->host);
+	server->host = g_strdup(host);
+	server->port = port;
 }

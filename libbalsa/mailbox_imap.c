@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Stuart Parmenter and Jay Painter
  *
@@ -49,239 +49,228 @@ static void set_mutt_username (LibBalsaMailboxImap *mailbox);
 GtkType
 libbalsa_mailbox_imap_get_type (void)
 {
-  static GtkType mailbox_type = 0;
+	static GtkType mailbox_type = 0;
 
-  if (!mailbox_type)
-    {
-      static const GtkTypeInfo mailbox_info =
-      {
-	"LibBalsaMailboxImap",
-	sizeof (LibBalsaMailboxImap),
-	sizeof (LibBalsaMailboxImapClass),
-	(GtkClassInitFunc) libbalsa_mailbox_imap_class_init,
-	(GtkObjectInitFunc) libbalsa_mailbox_imap_init,
-        /* reserved_1 */ NULL,
-	/* reserved_2 */ NULL,
-	(GtkClassInitFunc) NULL,
-      };
+	if (!mailbox_type) {
+		static const GtkTypeInfo mailbox_info =	{
+			"LibBalsaMailboxImap",
+			sizeof (LibBalsaMailboxImap),
+			sizeof (LibBalsaMailboxImapClass),
+			(GtkClassInitFunc) libbalsa_mailbox_imap_class_init,
+			(GtkObjectInitFunc) libbalsa_mailbox_imap_init,
+			/* reserved_1 */ NULL,
+			/* reserved_2 */ NULL,
+			(GtkClassInitFunc) NULL,
+		};
 
-      mailbox_type = gtk_type_unique(libbalsa_mailbox_remote_get_type(), &mailbox_info);
-    }
+		mailbox_type = gtk_type_unique(libbalsa_mailbox_remote_get_type(), &mailbox_info);
+	}
 
-  return mailbox_type;
+	return mailbox_type;
 }
 
 static void
 libbalsa_mailbox_imap_class_init (LibBalsaMailboxImapClass *klass)
 {
-  GtkObjectClass *object_class;
-  LibBalsaMailboxClass *libbalsa_mailbox_class;
+	GtkObjectClass *object_class;
+	LibBalsaMailboxClass *libbalsa_mailbox_class;
 
-  object_class = GTK_OBJECT_CLASS(klass);
-  libbalsa_mailbox_class = LIBBALSA_MAILBOX_CLASS(klass);
+	object_class = GTK_OBJECT_CLASS(klass);
+	libbalsa_mailbox_class = LIBBALSA_MAILBOX_CLASS(klass);
 
-  parent_class = gtk_type_class(libbalsa_mailbox_remote_get_type());
+	parent_class = gtk_type_class(libbalsa_mailbox_remote_get_type());
 
-  object_class->destroy = libbalsa_mailbox_imap_destroy;
+	object_class->destroy = libbalsa_mailbox_imap_destroy;
 
-  libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_imap_open;
-  libbalsa_mailbox_class->get_message_stream = libbalsa_mailbox_imap_get_message_stream;
+	libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_imap_open;
+	libbalsa_mailbox_class->get_message_stream = libbalsa_mailbox_imap_get_message_stream;
 
-  libbalsa_mailbox_class->check = libbalsa_mailbox_imap_check;
+	libbalsa_mailbox_class->check = libbalsa_mailbox_imap_check;
 }
 
 static void
 libbalsa_mailbox_imap_init(LibBalsaMailboxImap *mailbox)
 {
-  LibBalsaMailboxRemote *remote;
-  mailbox->path = NULL;
-  mailbox->tmp_file_path = NULL;
+	LibBalsaMailboxRemote *remote;
+	mailbox->path = NULL;
+	mailbox->tmp_file_path = NULL;
 
-  remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
-  remote->server = LIBBALSA_SERVER(libbalsa_server_new(LIBBALSA_SERVER_POP3));
+	remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
+	remote->server = LIBBALSA_SERVER(libbalsa_server_new(LIBBALSA_SERVER_POP3));
 
-  gtk_signal_connect(GTK_OBJECT(remote->server), "set-username",
-		     GTK_SIGNAL_FUNC(server_user_settings_changed_cb), (gpointer)mailbox);
-  gtk_signal_connect(GTK_OBJECT(remote->server), "set-password",
-		     GTK_SIGNAL_FUNC(server_user_settings_changed_cb), (gpointer)mailbox);
-  gtk_signal_connect(GTK_OBJECT(remote->server), "set-host",
-		     GTK_SIGNAL_FUNC(server_host_settings_changed_cb), (gpointer)mailbox);
+	gtk_signal_connect(GTK_OBJECT(remote->server), "set-username",
+			   GTK_SIGNAL_FUNC(server_user_settings_changed_cb), (gpointer)mailbox);
+	gtk_signal_connect(GTK_OBJECT(remote->server), "set-password",
+			   GTK_SIGNAL_FUNC(server_user_settings_changed_cb), (gpointer)mailbox);
+	gtk_signal_connect(GTK_OBJECT(remote->server), "set-host",
+			   GTK_SIGNAL_FUNC(server_host_settings_changed_cb), (gpointer)mailbox);
 }
 
 static void
 libbalsa_mailbox_imap_destroy (GtkObject *object)
 {
-  LibBalsaMailboxImap *mailbox; 
-  LibBalsaMailboxRemote *remote;
+	LibBalsaMailboxImap *mailbox; 
+	LibBalsaMailboxRemote *remote;
 
-  g_return_if_fail ( LIBBALSA_IS_MAILBOX_IMAP (object) );
+	g_return_if_fail ( LIBBALSA_IS_MAILBOX_IMAP (object) );
 
-  mailbox = LIBBALSA_MAILBOX_IMAP(object);
+	mailbox = LIBBALSA_MAILBOX_IMAP(object);
 
-  remote = LIBBALSA_MAILBOX_REMOTE(object);
+	remote = LIBBALSA_MAILBOX_REMOTE(object);
 
-  g_free(mailbox->path);
+	g_free(mailbox->path);
 
-  libbalsa_notify_unregister_mailbox(LIBBALSA_MAILBOX(mailbox));
+	libbalsa_notify_unregister_mailbox(LIBBALSA_MAILBOX(mailbox));
 
-  gtk_object_destroy(GTK_OBJECT(remote->server));
+	gtk_object_destroy(GTK_OBJECT(remote->server));
 
-  if (GTK_OBJECT_CLASS(parent_class)->destroy)
-    (*GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(object));
+	if (GTK_OBJECT_CLASS(parent_class)->destroy)
+		(*GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(object));
 }
 
 GtkObject*
 libbalsa_mailbox_imap_new(void)
 {
-  LibBalsaMailbox *mailbox;
-  mailbox = gtk_type_new(LIBBALSA_TYPE_MAILBOX_IMAP);
+	LibBalsaMailbox *mailbox;
+	mailbox = gtk_type_new(LIBBALSA_TYPE_MAILBOX_IMAP);
 
-  return GTK_OBJECT(mailbox);
+	return GTK_OBJECT(mailbox);
 }
 
 /* This needs a better name */
 static void
 set_mutt_username (LibBalsaMailboxImap * mb)
 {
-  g_return_if_fail (LIBBALSA_IS_MAILBOX_IMAP(mb));
+	g_return_if_fail (LIBBALSA_IS_MAILBOX_IMAP(mb));
 
-  ImapUser = LIBBALSA_MAILBOX_REMOTE_SERVER(mb)->user;
-  ImapPass = LIBBALSA_MAILBOX_REMOTE_SERVER(mb)->passwd;
+	ImapUser = LIBBALSA_MAILBOX_REMOTE_SERVER(mb)->user;
+	ImapPass = LIBBALSA_MAILBOX_REMOTE_SERVER(mb)->passwd;
 }
 
 /* Unregister an old notification and add a current one */
 static void
 server_settings_changed(LibBalsaServer *server, LibBalsaMailbox *mailbox)
 {
-  libbalsa_notify_unregister_mailbox(LIBBALSA_MAILBOX(mailbox));
+	libbalsa_notify_unregister_mailbox(LIBBALSA_MAILBOX(mailbox));
 
-  if ( server->user && server->passwd && server->host )
-    libbalsa_notify_register_mailbox(mailbox);
+	if ( server->user && server->passwd && server->host )
+		libbalsa_notify_register_mailbox(mailbox);
 }
 
 void libbalsa_mailbox_imap_set_path(LibBalsaMailboxImap *mailbox, gchar *path)
 {
-  g_free(mailbox->path);
-  mailbox->path = g_strdup(path);
+	g_free(mailbox->path);
+	mailbox->path = g_strdup(path);
 
-  server_settings_changed(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox), LIBBALSA_MAILBOX(mailbox));
+	server_settings_changed(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox), LIBBALSA_MAILBOX(mailbox));
 }
 
 static void 
 server_user_settings_changed_cb(LibBalsaServer *server, gchar* string, LibBalsaMailbox *mailbox)
 {
-  server_settings_changed(server, mailbox);
+	server_settings_changed(server, mailbox);
 }
 
 static void
 server_host_settings_changed_cb(LibBalsaServer *server, gchar* host, gint port, LibBalsaMailbox *mailbox)
 {
-  server_settings_changed(server, mailbox);
+	server_settings_changed(server, mailbox);
 }
 
 static void 
 libbalsa_mailbox_imap_open (LibBalsaMailbox *mailbox, gboolean append)
 {
-  LibBalsaMailboxImap *imap;
-  LibBalsaServer *server;
+	LibBalsaMailboxImap *imap;
+	LibBalsaServer *server;
 
-  gchar *tmp;
+	gchar *tmp;
 
-  g_return_if_fail ( LIBBALSA_IS_MAILBOX_IMAP (mailbox) );
+	g_return_if_fail ( LIBBALSA_IS_MAILBOX_IMAP (mailbox) );
 
-  LOCK_MAILBOX (mailbox);
+	LOCK_MAILBOX (mailbox);
 
-  if (CLIENT_CONTEXT_OPEN (mailbox))
-  {
-    if ( append ) 
-    {
-      /* we need the mailbox to be opened fresh i think */
-      mx_close_mailbox( CLIENT_CONTEXT(mailbox), NULL);
-    } else {
-      /* incriment the reference count */
-      mailbox->open_ref++;
+	if (CLIENT_CONTEXT_OPEN (mailbox)) {
+		if ( append ) {
+			/* we need the mailbox to be opened fresh i think */
+			mx_close_mailbox( CLIENT_CONTEXT(mailbox), NULL);
+		} else {
+			/* incriment the reference count */
+			mailbox->open_ref++;
       
-      UNLOCK_MAILBOX (mailbox);
-      return;
-    }
-  }
+			UNLOCK_MAILBOX (mailbox);
+			return;
+		}
+	}
 
-  imap = LIBBALSA_MAILBOX_IMAP(mailbox);
-  server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+	imap = LIBBALSA_MAILBOX_IMAP(mailbox);
+	server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
 
-  tmp = g_strdup_printf("{%s:%i}%s", 
-			server->host,
-			server->port,
-			imap->path);
+	tmp = g_strdup_printf("{%s:%i}%s", 
+			      server->host,
+			      server->port,
+			      imap->path);
 
-  set_mutt_username ( imap );
+	set_mutt_username ( imap );
 
-  if ( append ) 
-    CLIENT_CONTEXT (mailbox) = mx_open_mailbox (tmp, M_APPEND, NULL);
-  else
-    CLIENT_CONTEXT (mailbox) = mx_open_mailbox (tmp, 0, NULL);
+	if ( append ) 
+		CLIENT_CONTEXT (mailbox) = mx_open_mailbox (tmp, M_APPEND, NULL);
+	else
+		CLIENT_CONTEXT (mailbox) = mx_open_mailbox (tmp, 0, NULL);
 
-  g_free (tmp);
+	g_free (tmp);
 
-  if (CLIENT_CONTEXT_OPEN (mailbox))
-    {
-      mailbox->messages = 0;
-      mailbox->total_messages = 0;
-      mailbox->unread_messages = 0;
-      mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount;
-      libbalsa_mailbox_load_messages (mailbox);
+	if (CLIENT_CONTEXT_OPEN (mailbox)) {
+		mailbox->messages = 0;
+		mailbox->total_messages = 0;
+		mailbox->unread_messages = 0;
+		mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount;
+		libbalsa_mailbox_load_messages (mailbox);
 
-      /* increment the reference count */
-      mailbox->open_ref++;
+		/* increment the reference count */
+		mailbox->open_ref++;
 
 #ifdef DEBUG
-      g_print (_("LibBalsaMailboxImap: Opening %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
+		g_print (_("LibBalsaMailboxImap: Opening %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
 #endif
 
-    }
+	}
 
-  UNLOCK_MAILBOX (mailbox);
+	UNLOCK_MAILBOX (mailbox);
 
 }
 
 static FILE*
 libbalsa_mailbox_imap_get_message_stream (LibBalsaMailbox *mailbox, LibBalsaMessage *message)
 {
-  FILE *stream;
+	FILE *stream;
 
-  g_return_val_if_fail (LIBBALSA_IS_MAILBOX_IMAP(mailbox), NULL);
-  g_return_val_if_fail (LIBBALSA_IS_MESSAGE (message), NULL);
+	g_return_val_if_fail (LIBBALSA_IS_MAILBOX_IMAP(mailbox), NULL);
+	g_return_val_if_fail (LIBBALSA_IS_MESSAGE (message), NULL);
 
-  stream = fopen (LIBBALSA_MAILBOX_IMAP (message->mailbox)->tmp_file_path, "r");
+	stream = fopen (LIBBALSA_MAILBOX_IMAP (message->mailbox)->tmp_file_path, "r");
   
-  return stream;
+	return stream;
 }
 
 static void libbalsa_mailbox_imap_check (LibBalsaMailbox *mailbox)
 {
-  if ( mailbox->open_ref == 0 )
-  {
-    if ( libbalsa_notify_check_mailbox(mailbox) )
-      libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
-  }
-  else
-  {
-    gint i = 0;
-    gint index_hint;
+	if ( mailbox->open_ref == 0 ) {
+		if ( libbalsa_notify_check_mailbox(mailbox) )
+			libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
+	} else {
+		gint i = 0;
+		gint index_hint;
 
-    LOCK_MAILBOX(mailbox);
+		LOCK_MAILBOX(mailbox);
 
-    index_hint = CLIENT_CONTEXT (mailbox)->vcount;
+		index_hint = CLIENT_CONTEXT (mailbox)->vcount;
 
-    if ((i = mx_check_mailbox (CLIENT_CONTEXT (mailbox), &index_hint, 0)) < 0)
-    {
-      g_print ("mx_check_mailbox() failed on %s\n", mailbox->name);
-    }
-    else if (i == M_NEW_MAIL || i == M_REOPENED)
-    {
-      mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount - mailbox->messages;
-      libbalsa_mailbox_load_messages (mailbox);
-    }
-    UNLOCK_MAILBOX (mailbox);
-  }
+		if ((i = mx_check_mailbox (CLIENT_CONTEXT (mailbox), &index_hint, 0)) < 0) {
+			g_print ("mx_check_mailbox() failed on %s\n", mailbox->name);
+		} else if (i == M_NEW_MAIL || i == M_REOPENED) {
+			mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount - mailbox->messages;
+			libbalsa_mailbox_load_messages (mailbox);
+		}
+		UNLOCK_MAILBOX (mailbox);
+	}
 }

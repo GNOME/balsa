@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1999 Stuart Parmenter
  *
@@ -29,29 +29,28 @@ typedef enum _LibBalsaMessageBodyType LibBalsaMessageBodyType;
 
 enum _LibBalsaMessageBodyType
 {
-  LIBBALSA_MESSAGE_BODY_TYPE_OTHER,
-  LIBBALSA_MESSAGE_BODY_TYPE_AUDIO,
-  LIBBALSA_MESSAGE_BODY_TYPE_APPLICATION,
-  LIBBALSA_MESSAGE_BODY_TYPE_IMAGE,
-  LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE,
-  LIBBALSA_MESSAGE_BODY_TYPE_MODEL,
-  LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART,
-  LIBBALSA_MESSAGE_BODY_TYPE_TEXT,
-  LIBBALSA_MESSAGE_BODY_TYPE_VIDEO
+	LIBBALSA_MESSAGE_BODY_TYPE_OTHER,
+	LIBBALSA_MESSAGE_BODY_TYPE_AUDIO,
+	LIBBALSA_MESSAGE_BODY_TYPE_APPLICATION,
+	LIBBALSA_MESSAGE_BODY_TYPE_IMAGE,
+	LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE,
+	LIBBALSA_MESSAGE_BODY_TYPE_MODEL,
+	LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART,
+	LIBBALSA_MESSAGE_BODY_TYPE_TEXT,
+	LIBBALSA_MESSAGE_BODY_TYPE_VIDEO
 };
 
 struct _LibBalsaMessageBody
 {
-  LibBalsaMessage *message;     /* The message of which this is a part */
-  gchar *buffer;		/* holds raw data of the MIME part, or NULL */
-  /*  gchar *htmlized; */	/* holds htmlrep of buffer, or NULL */
-  MuttBody *mutt_body;		/* pointer to BODY struct of mutt message */
-  gchar *filename;		/* holds filename for attachments and such (used mostly for sending) */
-  gchar *temp_filename;		/* Holds the filename of a the temporary file where this part is saved */
-  gchar *charset;	        /* the charset, used for sending, replying. */
+	LibBalsaMessage *message;	/* The message of which this is a part */
+	gchar *buffer;			/* holds raw data of the MIME part, or NULL */
+	MuttBody *mutt_body;		/* pointer to BODY struct of mutt message */
+	gchar *filename;		/* holds filename for attachments and such (used mostly for sending) */
+	gchar *temp_filename;		/* Holds the filename of a the temporary file where this part is saved */
+	gchar *charset;			/* the charset, used for sending, replying. */
 
-  LibBalsaMessageBody *next;    /* Next part in the message */
-  LibBalsaMessageBody *parts;   /* The parts of a multipart or message/rfc822 message */
+	LibBalsaMessageBody *next;	/* Next part in the message */
+	LibBalsaMessageBody *parts;	/* The parts of a multipart or message/rfc822 message */
 };
 
 LibBalsaMessageBody *libbalsa_message_body_new(LibBalsaMessage *message);

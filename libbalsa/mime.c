@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -44,66 +44,63 @@ static void process_mime_part (LibBalsaMessage * message, LibBalsaMessageBody * 
 static void
 process_mime_part (LibBalsaMessage * message, LibBalsaMessageBody * body, gchar *reply_prefix_str)
 {
-  FILE *part;
-  size_t alloced;
-  gchar *ptr = 0;
+	FILE *part;
+	size_t alloced;
+	gchar *ptr = 0;
 
-  switch ( libbalsa_message_body_type (body) )
-  {
-  case LIBBALSA_MESSAGE_BODY_TYPE_OTHER:
-  case LIBBALSA_MESSAGE_BODY_TYPE_AUDIO:
-  case LIBBALSA_MESSAGE_BODY_TYPE_APPLICATION:
-  case LIBBALSA_MESSAGE_BODY_TYPE_IMAGE:
-  case LIBBALSA_MESSAGE_BODY_TYPE_MODEL:
-  case LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE:
-  case LIBBALSA_MESSAGE_BODY_TYPE_VIDEO:
-    break;
-  case LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART:
-    process_mime_multipart (message, body, reply_prefix_str);
-    break;
-  case LIBBALSA_MESSAGE_BODY_TYPE_TEXT:
-    libbalsa_message_body_save_temporary(body, reply_prefix_str);
+	switch ( libbalsa_message_body_type (body) ) {
+	case LIBBALSA_MESSAGE_BODY_TYPE_OTHER:
+	case LIBBALSA_MESSAGE_BODY_TYPE_AUDIO:
+	case LIBBALSA_MESSAGE_BODY_TYPE_APPLICATION:
+	case LIBBALSA_MESSAGE_BODY_TYPE_IMAGE:
+	case LIBBALSA_MESSAGE_BODY_TYPE_MODEL:
+	case LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE:
+	case LIBBALSA_MESSAGE_BODY_TYPE_VIDEO:
+		break;
+	case LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART:
+		process_mime_multipart (message, body, reply_prefix_str);
+		break;
+	case LIBBALSA_MESSAGE_BODY_TYPE_TEXT:
+		libbalsa_message_body_save_temporary(body, reply_prefix_str);
     
-    part = fopen (body->temp_filename, "r");
-    alloced = readfile (part, &ptr);
+		part = fopen (body->temp_filename, "r");
+		alloced = readfile (part, &ptr);
     
-    if (reply)
-    {
-      reply = g_string_append (reply, "\n");
-      reply = g_string_append (reply, ptr);
-    }
-    else
-      reply = g_string_new (ptr);
-    
-    break;
-  }
+		if (reply) {
+			reply = g_string_append (reply, "\n");
+			reply = g_string_append (reply, ptr);
+		} else {
+			reply = g_string_new (ptr);
+		}
+
+		break;
+	}
 }
 
 static void
 process_mime_multipart (LibBalsaMessage * message, LibBalsaMessageBody * body, gchar *reply_prefix_str)
 {
-  LibBalsaMessageBody *part;
+	LibBalsaMessageBody *part;
 
-  for (part = body->parts; part; part = part->next)
-    {
-      process_mime_part (message, part, reply_prefix_str);
-    }
+	for (part = body->parts; part; part = part->next) {
+		process_mime_part (message, part, reply_prefix_str);
+	}
 }
 
 GString *
 content2reply (LibBalsaMessage * message,
 	       gchar *reply_prefix_str)    /* arp */
 {
-  LibBalsaMessageBody *body;
+	LibBalsaMessageBody *body;
 
-  reply = 0;
+	reply = 0;
 
-  body = message->body_list;
-  while ( body )
-    {
-      process_mime_part (message, body, reply_prefix_str);
-      body = body->next;
-    }    
+	body = message->body_list;
 
-  return reply;
+	while ( body ) {
+		process_mime_part (message, body, reply_prefix_str);
+		body = body->next;
+	}    
+
+	return reply;
 }

@@ -1,8 +1,11 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 
 #include <gnome.h>
 
 #include "libmutt/mutt.h"
+
+#ifndef __LIBBALSA_PRIVATE_H__
+#define __LIBBALSA_PRIVATE_H__
 
 LibBalsaAddress* libbalsa_address_new_from_libmutt(ADDRESS *caddr);
 
@@ -117,3 +120,4 @@ do {\
     }\
 } while (0)
 
+#endif /* __LIBBALSA_PRIVATE_H__ */

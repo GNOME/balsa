@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-2000 Jay Painter and Stuart Parmenter
  *
@@ -18,8 +18,8 @@
  * 02111-1307, USA.
  */
 
-#ifndef __MAILBOX_H__
-#define __MAILBOX_H__
+#ifndef __LIBBALSA_MAILBOX_H__
+#define __LIBBALSA_MAILBOX_H__
 
 #include <glib.h>
 #include <gtk/gtk.h>
@@ -37,30 +37,30 @@
  */
 typedef enum
 {
-  MAILBOX_MBOX,
-  MAILBOX_MH,
-  MAILBOX_MAILDIR,
-  MAILBOX_POP3,
-  MAILBOX_IMAP,
-  MAILBOX_UNKNOWN
+	MAILBOX_MBOX,
+	MAILBOX_MH,
+	MAILBOX_MAILDIR,
+	MAILBOX_POP3,
+	MAILBOX_IMAP,
+	MAILBOX_UNKNOWN
 } LibBalsaMailboxType;
 
 typedef enum
 {
-  MAILBOX_SORT_DATE = 1,
-  MAILBOX_SORT_SIZE = 2,
-  MAILBOX_SORT_SUBJECT = 3,
-  MAILBOX_SORT_FROM = 4,
-  MAILBOX_SORT_ORDER = 5,
-  MAILBOX_SORT_THREADS = 6,
-  MAILBOX_SORT_RECEIVED = 7,
-  MAILBOX_SORT_TO = 8,
-  MAILBOX_SORT_SCORE = 9,
-  MAILBOX_SORT_ALIAS = 10,
-  MAILBOX_SORT_ADDRESS = 11,
-  MAILBOX_SORT_MASK = 0xf,
-  MAILBOX_SORT_REVERSE = (1 << 4),
-  MAILBOX_SORT_LAST = (1 << 5)
+	MAILBOX_SORT_DATE = 1,
+	MAILBOX_SORT_SIZE = 2,
+	MAILBOX_SORT_SUBJECT = 3,
+	MAILBOX_SORT_FROM = 4,
+	MAILBOX_SORT_ORDER = 5,
+	MAILBOX_SORT_THREADS = 6,
+	MAILBOX_SORT_RECEIVED = 7,
+	MAILBOX_SORT_TO = 8,
+	MAILBOX_SORT_SCORE = 9,
+	MAILBOX_SORT_ALIAS = 10,
+	MAILBOX_SORT_ADDRESS = 11,
+	MAILBOX_SORT_MASK = 0xf,
+	MAILBOX_SORT_REVERSE = (1 << 4),
+	MAILBOX_SORT_LAST = (1 << 5)
 } LibBalsaMailboxSort;
 
 /*
@@ -70,48 +70,48 @@ typedef struct _LibBalsaMailboxClass LibBalsaMailboxClass;
 
 struct _LibBalsaMailbox
 {
-  GtkObject object;
+	GtkObject object;
 
-  gchar *name;
-  gpointer context;
-  guint open_ref;
+	gchar *name;
+	gpointer context;
+	guint open_ref;
 
-  gboolean lock;
-  gboolean is_directory;
+	gboolean lock;
+	gboolean is_directory;
 
-  glong messages;
-  glong new_messages;
-  GList *message_list;
+	glong messages;
+	glong new_messages;
+	GList *message_list;
 
-  /* info fields */
-  gboolean has_unread_messages;
-  glong unread_messages; /* number of unread messages in the mailbox */
-  glong total_messages;  /* total number of messages in the mailbox  */
+	/* info fields */
+	gboolean has_unread_messages;
+	glong unread_messages; /* number of unread messages in the mailbox */
+	glong total_messages;  /* total number of messages in the mailbox  */
 };
 
 struct _LibBalsaMailboxClass
 {
-  GtkObjectClass parent_class;
+	GtkObjectClass parent_class;
 
-  /* Signals */
-  void (* open_mailbox)            (LibBalsaMailbox *mailbox, gboolean append);
-  void (* close_mailbox)           (LibBalsaMailbox *mailbox);
+	/* Signals */
+	void (* open_mailbox)            (LibBalsaMailbox *mailbox, gboolean append);
+	void (* close_mailbox)           (LibBalsaMailbox *mailbox);
 
-  void (* message_new)             (LibBalsaMailbox *mailbox,
-				    LibBalsaMessage *message);
-  void (* message_delete)          (LibBalsaMailbox *mailbox,
-				    LibBalsaMessage *message);
-  void (* message_append)          (LibBalsaMailbox *mailbox,
-				    LibBalsaMessage *message);
-  void (* message_status_changed)  (LibBalsaMailbox *mailbox,
-				    LibBalsaMessage *message);
-  void (* set_unread_messages_flag)(LibBalsaMailbox *mailbox,
-				    gboolean flag);
+	void (* message_new)             (LibBalsaMailbox *mailbox,
+					  LibBalsaMessage *message);
+	void (* message_delete)          (LibBalsaMailbox *mailbox,
+					  LibBalsaMessage *message);
+	void (* message_append)          (LibBalsaMailbox *mailbox,
+					  LibBalsaMessage *message);
+	void (* message_status_changed)  (LibBalsaMailbox *mailbox,
+					  LibBalsaMessage *message);
+	void (* set_unread_messages_flag)(LibBalsaMailbox *mailbox,
+					  gboolean flag);
 
-  /* Virtual Functions */
-  FILE* (* get_message_stream)     (LibBalsaMailbox *mailbox,
-				    LibBalsaMessage *message);
-  void  (* check)                  (LibBalsaMailbox *mailbox);
+	/* Virtual Functions */
+	FILE* (* get_message_stream)     (LibBalsaMailbox *mailbox,
+					  LibBalsaMessage *message);
+	void  (* check)                  (LibBalsaMailbox *mailbox);
 };
 
 GtkType libbalsa_mailbox_get_type (void);
@@ -144,4 +144,4 @@ void libbalsa_mailbox_check (LibBalsaMailbox *mailbox);
  */
 LibBalsaMailboxType libbalsa_mailbox_valid (gchar * filename);
 
-#endif /* __MAILBOX_H__ */
+#endif /* __LIBBALSA_MAILBOX_H__ */

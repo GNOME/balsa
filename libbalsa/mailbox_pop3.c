@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Stuart Parmenter and Jay Painter
  *
@@ -51,217 +51,207 @@ static void error_in_thread( const char *format, ... );
 GtkType
 libbalsa_mailbox_pop3_get_type (void)
 {
-  static GtkType mailbox_type = 0;
+	static GtkType mailbox_type = 0;
 
-  if (!mailbox_type)
-    {
-      static const GtkTypeInfo mailbox_info =
-      {
-	"LibBalsaMailboxPOP3",
-	sizeof (LibBalsaMailboxPop3),
-	sizeof (LibBalsaMailboxPop3Class),
-	(GtkClassInitFunc) libbalsa_mailbox_pop3_class_init,
-	(GtkObjectInitFunc) libbalsa_mailbox_pop3_init,
-        /* reserved_1 */ NULL,
-	/* reserved_2 */ NULL,
-	(GtkClassInitFunc) NULL,
-      };
+	if (!mailbox_type) {
+		static const GtkTypeInfo mailbox_info =	{
+			"LibBalsaMailboxPOP3",
+			sizeof (LibBalsaMailboxPop3),
+			sizeof (LibBalsaMailboxPop3Class),
+			(GtkClassInitFunc) libbalsa_mailbox_pop3_class_init,
+			(GtkObjectInitFunc) libbalsa_mailbox_pop3_init,
+			/* reserved_1 */ NULL,
+			/* reserved_2 */ NULL,
+			(GtkClassInitFunc) NULL,
+		};
 
-      mailbox_type = gtk_type_unique(libbalsa_mailbox_remote_get_type(), &mailbox_info);
-    }
+		mailbox_type = gtk_type_unique(libbalsa_mailbox_remote_get_type(), &mailbox_info);
+	}
 
-  return mailbox_type;
+	return mailbox_type;
 }
 
 static void
 libbalsa_mailbox_pop3_class_init (LibBalsaMailboxPop3Class *klass)
 {
-  GtkObjectClass *object_class;
-  LibBalsaMailboxClass *libbalsa_mailbox_class;
+	GtkObjectClass *object_class;
+	LibBalsaMailboxClass *libbalsa_mailbox_class;
 
-  object_class = GTK_OBJECT_CLASS(klass);
-  libbalsa_mailbox_class = LIBBALSA_MAILBOX_CLASS(klass);
+	object_class = GTK_OBJECT_CLASS(klass);
+	libbalsa_mailbox_class = LIBBALSA_MAILBOX_CLASS(klass);
 
-  parent_class = gtk_type_class(libbalsa_mailbox_remote_get_type());
+	parent_class = gtk_type_class(libbalsa_mailbox_remote_get_type());
 
-  object_class->destroy = libbalsa_mailbox_pop3_destroy;
+	object_class->destroy = libbalsa_mailbox_pop3_destroy;
 
-  libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_pop3_open;
+	libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_pop3_open;
 
-  libbalsa_mailbox_class->check = libbalsa_mailbox_pop3_check;
+	libbalsa_mailbox_class->check = libbalsa_mailbox_pop3_check;
 
 }
 
 static void
 libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 *mailbox)
 {
-  LibBalsaMailboxRemote *remote;
-  mailbox->check = FALSE;
-  mailbox->delete_from_server = FALSE;
+	LibBalsaMailboxRemote *remote;
+	mailbox->check = FALSE;
+	mailbox->delete_from_server = FALSE;
 
-  remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
-  remote->server = LIBBALSA_SERVER(libbalsa_server_new(LIBBALSA_SERVER_POP3));
-  remote->server->port = 110;
+	remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
+	remote->server = LIBBALSA_SERVER(libbalsa_server_new(LIBBALSA_SERVER_POP3));
+	remote->server->port = 110;
 
 }
 
 static void
 libbalsa_mailbox_pop3_destroy (GtkObject *object)
 {
-  LibBalsaMailboxPop3 *mailbox = LIBBALSA_MAILBOX_POP3(object);
-  LibBalsaMailboxRemote *remote = LIBBALSA_MAILBOX_REMOTE(object);
+	LibBalsaMailboxPop3 *mailbox = LIBBALSA_MAILBOX_POP3(object);
+	LibBalsaMailboxRemote *remote = LIBBALSA_MAILBOX_REMOTE(object);
 
-  if (!mailbox)
-    return;
+	if (!mailbox)
+		return;
 
-  g_free (mailbox->last_popped_uid);
+	g_free (mailbox->last_popped_uid);
 
-  gtk_object_destroy(GTK_OBJECT(remote->server));
+	gtk_object_destroy(GTK_OBJECT(remote->server));
 
-  if (GTK_OBJECT_CLASS(parent_class)->destroy)
-    (*GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(object));
+	if (GTK_OBJECT_CLASS(parent_class)->destroy)
+		(*GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(object));
 }
 
 GtkObject *libbalsa_mailbox_pop3_new(void)
 {
-  LibBalsaMailbox *mailbox;
+	LibBalsaMailbox *mailbox;
 
-  mailbox = gtk_type_new(LIBBALSA_TYPE_MAILBOX_POP3);
+	mailbox = gtk_type_new(LIBBALSA_TYPE_MAILBOX_POP3);
 
-  return GTK_OBJECT(mailbox);
+	return GTK_OBJECT(mailbox);
 }
 
 static void libbalsa_mailbox_pop3_open (LibBalsaMailbox *mailbox, gboolean append)
 {
-  LibBalsaMailboxPop3 *pop;
+	LibBalsaMailboxPop3 *pop;
   
-  g_return_if_fail ( LIBBALSA_IS_MAILBOX_POP3(mailbox) );
+	g_return_if_fail ( LIBBALSA_IS_MAILBOX_POP3(mailbox) );
 
-  LOCK_MAILBOX (mailbox);
+	LOCK_MAILBOX (mailbox);
 
 
-  if (CLIENT_CONTEXT_OPEN (mailbox))
-  {
-    if ( append ) 
-    {
-      /* we need the mailbox to be opened fresh i think */
-      mx_close_mailbox( CLIENT_CONTEXT(mailbox), NULL);
-    } else {
-      /* incriment the reference count */
-      mailbox->open_ref++;
+	if (CLIENT_CONTEXT_OPEN (mailbox)) {
+		if ( append ) {
+			/* we need the mailbox to be opened fresh i think */
+			mx_close_mailbox( CLIENT_CONTEXT(mailbox), NULL);
+		} else {
+			/* incriment the reference count */
+			mailbox->open_ref++;
       
-      UNLOCK_MAILBOX (mailbox);
-      return;
-    }
-  }
+			UNLOCK_MAILBOX (mailbox);
+			return;
+		}
+	}
 
-  pop = LIBBALSA_MAILBOX_POP3(mailbox);
+	pop = LIBBALSA_MAILBOX_POP3(mailbox);
 
-  if ( append )
-    CLIENT_CONTEXT (mailbox) = mx_open_mailbox (LIBBALSA_MAILBOX_REMOTE_SERVER(pop)->host, M_APPEND, NULL);
-  else
-    CLIENT_CONTEXT (mailbox) = mx_open_mailbox (LIBBALSA_MAILBOX_REMOTE_SERVER(pop)->host, 0, NULL);
+	if ( append )
+		CLIENT_CONTEXT (mailbox) = mx_open_mailbox (LIBBALSA_MAILBOX_REMOTE_SERVER(pop)->host, M_APPEND, NULL);
+	else
+		CLIENT_CONTEXT (mailbox) = mx_open_mailbox (LIBBALSA_MAILBOX_REMOTE_SERVER(pop)->host, 0, NULL);
 
-  if (CLIENT_CONTEXT_OPEN (mailbox))
-  {
-    mailbox->messages = 0;
-    mailbox->total_messages = 0;
-    mailbox->unread_messages = 0;
-    mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount;
-    libbalsa_mailbox_load_messages (mailbox); /*0*/
+	if (CLIENT_CONTEXT_OPEN (mailbox)) {
+		mailbox->messages = 0;
+		mailbox->total_messages = 0;
+		mailbox->unread_messages = 0;
+		mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount;
+		libbalsa_mailbox_load_messages (mailbox); /*0*/
     
-    /* increment the reference count */
-    mailbox->open_ref++;
+		/* increment the reference count */
+		mailbox->open_ref++;
     
 #ifdef DEBUG
-    g_print (_("LibBalsaMailboxPop3: Opening %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
+		g_print (_("LibBalsaMailboxPop3: Opening %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
 #endif
     
-  }
+	}
   
-  UNLOCK_MAILBOX (mailbox);
+	UNLOCK_MAILBOX (mailbox);
 
 }
 
 static void libbalsa_mailbox_pop3_check (LibBalsaMailbox *mailbox)
 {
-  char uid[80];
+	char uid[80];
 
 #ifdef BALSA_USE_THREADS
-  char msgbuf[160];
-  MailThreadMessage *threadmsg;
-  void (*mutt_error_backup)( const char *, ... );
+	char msgbuf[160];
+	MailThreadMessage *threadmsg;
+	void (*mutt_error_backup)( const char *, ... );
 
-  /* Otherwise we get multithreaded GTK+ calls... baaad */
-  mutt_error_backup = mutt_error;
-  mutt_error = error_in_thread;
+	/* Otherwise we get multithreaded GTK+ calls... baaad */
+	mutt_error_backup = mutt_error;
+	mutt_error = error_in_thread;
 
-/*  Only check if lock has been set */
-  pthread_mutex_lock( &mailbox_lock);
-  if( !checking_mail )
-  {
-    pthread_mutex_unlock( &mailbox_lock);
-    return;
-  }
-  pthread_mutex_unlock( &mailbox_lock );
+	/* Only check if lock has been set */
+	pthread_mutex_lock( &mailbox_lock);
+	if( !checking_mail ) {
+		pthread_mutex_unlock( &mailbox_lock);
+		return;
+	}
+	pthread_mutex_unlock( &mailbox_lock );
 #endif /* BALSA_USE_THREADS */
   
-  if (LIBBALSA_MAILBOX_POP3 (mailbox)->check)
-  {
-    LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
-    PopHost = g_strdup (server->host);
-    PopPort = (server->port);
-    PopPass = g_strdup (server->passwd);
-    PopUser = g_strdup (server->user);
+	if (LIBBALSA_MAILBOX_POP3 (mailbox)->check) {
+		LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+		PopHost = g_strdup (server->host);
+		PopPort = (server->port);
+		PopPass = g_strdup (server->passwd);
+		PopUser = g_strdup (server->user);
 
 #ifdef BALSA_USE_THREADS
-    sprintf( msgbuf, "POP3: %s", mailbox->name );
-    MSGMAILTHREAD( threadmsg, MSGMAILTHREAD_SOURCE, msgbuf );
+		sprintf( msgbuf, "POP3: %s", mailbox->name );
+		MSGMAILTHREAD( threadmsg, MSGMAILTHREAD_SOURCE, msgbuf );
 #endif
     
-    if( LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid == NULL)
-      uid[0] = 0;
-    else
-      strcpy( uid, LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid );
+		if( LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid == NULL)
+			uid[0] = 0;
+		else
+			strcpy( uid, LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid );
     
-    PopUID = uid;
+		PopUID = uid;
 
-    /* Delete it if necessary */
-    if (LIBBALSA_MAILBOX_POP3 (mailbox)->delete_from_server)
-    {
-      set_option(OPTPOPDELETE);
-    }
-    else
-    {
-      unset_option(OPTPOPDELETE);
-    }
+		/* Delete it if necessary */
+		if (LIBBALSA_MAILBOX_POP3 (mailbox)->delete_from_server) {
+			set_option(OPTPOPDELETE);
+		} else {
+			unset_option(OPTPOPDELETE);
+		}
     
-    mutt_fetchPopMail ();
-    g_free (PopHost);
-    g_free (PopPass);
-    g_free (PopUser);
+		mutt_fetchPopMail ();
+		g_free (PopHost);
+		g_free (PopPass);
+		g_free (PopUser);
 
-    if( LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid == NULL ||
-	strcmp(LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid, uid) != 0)
-    {
-      if( LIBBALSA_MAILBOX_POP3( mailbox )->last_popped_uid )
-	g_free ( LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid );
-      LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid = g_strdup ( uid );
+		if( LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid == NULL ||
+		    strcmp(LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid, uid) != 0) {
+			if( LIBBALSA_MAILBOX_POP3( mailbox )->last_popped_uid )
+				g_free ( LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid );
+
+			LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid = g_strdup ( uid );
       
 #ifdef BALSA_USE_THREADS
-      threadmsg = g_new (MailThreadMessage, 1);
-      threadmsg->message_type = MSGMAILTHREAD_UPDATECONFIG;
-      threadmsg->mailbox = (void *) mailbox;
-      write( mail_thread_pipes[1], (void *) &threadmsg, sizeof(void *) );
+			threadmsg = g_new (MailThreadMessage, 1);
+			threadmsg->message_type = MSGMAILTHREAD_UPDATECONFIG;
+			threadmsg->mailbox = (void *) mailbox;
+			write( mail_thread_pipes[1], (void *) &threadmsg, sizeof(void *) );
 #else
-      config_mailbox_update( 
-	mailbox, mailbox_get_pkey(mailbox) );
+			config_mailbox_update( 
+				mailbox, mailbox_get_pkey(mailbox) );
 #endif
-    }
-  }
+		}
+	}
 
 #ifdef BALSA_USE_THREADS
-  mutt_error = mutt_error_backup;
+	mutt_error = mutt_error_backup;
 #endif
 
 }

@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 
 #ifndef __LIBBALSA_MAILBACKEND_H__
 #define __LIBBALSA_MAILBACKEND_H__

@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Stuart Parmenter and Jay Painter
  *
@@ -21,6 +21,8 @@
 #include "config.h"
 #include <gnome.h>
 
+#include "files.h"
+
 static const gchar *permanent_prefixes[] =
 {
 /*	BALSA_DATA_PREFIX,
@@ -32,15 +34,12 @@ static const gchar *permanent_prefixes[] =
 	NULL
 };
 
-gchar *balsa_file_finder( const gchar *filename, const gchar *splice, const gchar **prefixes );
-
 /* filename is the filename (naw!)
  * splice is what to put in between the prefix and the filename, if desired
  * prefixes is a null-termed array of strings of prefixes to try. There are defaults that are always
  *   tried.
  * We ignore proper slashing of names. Ie, /prefix//splice//file won't be caught.
  */
-
 gchar *balsa_file_finder( const gchar *filename, const gchar *splice, const gchar **prefixes )
 {
 	gchar *cat;

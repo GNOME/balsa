@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1999 Stuart Parmenter
  *
@@ -25,8 +25,8 @@
 
 struct _LibBalsaAddress
 {
-  gchar *personal;		/* full text name */
-  gchar *mailbox;		/* user name and host (mailbox name) on remote system */
+	gchar *personal;	/* full text name */
+	gchar *mailbox;		/* user name and host (mailbox name) on remote system */
 };
 
 LibBalsaAddress *libbalsa_address_new(void);

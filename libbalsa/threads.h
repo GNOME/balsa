@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -18,8 +18,9 @@
  * 02111-1307, USA.
  */
 
-#ifndef __THREADS_H__
-#define __THREADS_H__
+#ifndef __LIBBALSA_THREADS_H__
+#define __LIBBALSA_THREADS_H__
+
 #include <stdlib.h>		/* for malloc() */
 
 /*
@@ -45,9 +46,9 @@ extern GtkWidget              *send_dialog_bar ;
 
 typedef struct
 {
-  int message_type;
-  char message_string[160];
-  void *mailbox; /*  Mailbox *  */
+	int message_type;
+	char message_string[160];
+	void *mailbox; /*  Mailbox *  */
 } MailThreadMessage;
   
 #define  MSGMAILTHREAD( message, type, string) \
@@ -57,22 +58,22 @@ typedef struct
   write( mail_thread_pipes[1], (void *) &message, sizeof(void *) );
 
 enum {
-  MSGMAILTHREAD_SOURCE,
-  MSGMAILTHREAD_MSGINFO,
-  MSGMAILTHREAD_UPDATECONFIG,
-  MSGMAILTHREAD_ERROR,
-  MSGMAILTHREAD_LOAD,
-  MSGMAILTHREAD_FINISHED,
-  MSGMAILTHREAD_PROGRESS
+	MSGMAILTHREAD_SOURCE,
+	MSGMAILTHREAD_MSGINFO,
+	MSGMAILTHREAD_UPDATECONFIG,
+	MSGMAILTHREAD_ERROR,
+	MSGMAILTHREAD_LOAD,
+	MSGMAILTHREAD_FINISHED,
+	MSGMAILTHREAD_PROGRESS
 };
 
 typedef struct
 {
-  int message_type;
-  char message_string[256];
-  LibBalsaMessage *msg;
-  LibBalsaMailbox *mbox;
-  float of_total;
+	int message_type;
+	char message_string[256];
+	LibBalsaMessage *msg;
+	LibBalsaMailbox *mbox;
+	float of_total;
 } SendThreadMessage;
 
 #define  MSGSENDTHREAD(t_message, type, string, s_msg, s_mbox, messof) \
@@ -85,12 +86,12 @@ typedef struct
   write( send_thread_pipes[1], (void *) &t_message, sizeof(void *) );
 
 enum {
-  MSGSENDTHREADERROR,
-  MSGSENDTHREADPROGRESS,
-  MSGSENDTHREADPOSTPONE,
-  MSGSENDTHREADLOAD,
-  MSGSENDTHREADDELETE,
-  MSGSENDTHREADFINISHED
+	MSGSENDTHREADERROR,
+	MSGSENDTHREADPROGRESS,
+	MSGSENDTHREADPOSTPONE,
+	MSGSENDTHREADLOAD,
+	MSGSENDTHREADDELETE,
+	MSGSENDTHREADFINISHED
 };
 
-#endif /* __THREADS_H__ */
+#endif /* __LIBBALSA_THREADS_H__ */

@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Stuart Parmenter and Jay Painter
  *
@@ -34,15 +34,15 @@ typedef struct _LibBalsaMailboxImapClass LibBalsaMailboxImapClass;
 
 struct _LibBalsaMailboxImap
 {
-  LibBalsaMailboxRemote mailbox;
+	LibBalsaMailboxRemote mailbox;
 
-  gchar *path;
-  gchar *tmp_file_path;
+	gchar *path;
+	gchar *tmp_file_path;
 };
 
 struct _LibBalsaMailboxImapClass
 {
-  LibBalsaMailboxRemoteClass klass;
+	LibBalsaMailboxRemoteClass klass;
 };
 
 GtkObject *libbalsa_mailbox_imap_new(void);

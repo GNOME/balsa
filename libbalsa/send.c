@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client  
  * Copyright (C) 1997-1999 Stuart Parmenter
  *
@@ -27,7 +27,7 @@
 #include <pthread.h>
 #endif
 
-/* This must go... */
+/* FIXME: This must go... */
 #include "../src/balsa-app.h"
 
 #include "libbalsa.h"
@@ -54,13 +54,13 @@ typedef struct _MessageQueueItem        MessageQueueItem;
 
 struct _MessageQueueItem
 {
-  LibBalsaMessage *orig;
-  HEADER *message;
-  MessageQueueItem *next_message;
-  gchar *fcc;
-  char tempfile[_POSIX_PATH_MAX];
-  int delete;
-} ;
+	LibBalsaMessage *orig;
+	HEADER *message;
+	MessageQueueItem *next_message;
+	gchar *fcc;
+	char tempfile[_POSIX_PATH_MAX];
+	int delete;
+};
 
 MessageQueueItem *last_message;
 int total_messages_left;
@@ -68,39 +68,35 @@ int total_messages_left;
 static MessageQueueItem *
 msg_queue_item_new(LibBalsaMessage *message) 
 {
-  MessageQueueItem *mqi;
+	MessageQueueItem *mqi;
 
-  mqi = g_new(MessageQueueItem,1);
-  mqi->orig = message;
-  mqi->message = mutt_new_header ();
-  mqi->next_message = NULL;
-  mqi->fcc = g_strdup(message->fcc_mailbox);
-  mqi->delete = 0;
-  mqi->tempfile[0] = '\0';
-  return mqi;
+	mqi = g_new(MessageQueueItem,1);
+	mqi->orig = message;
+	mqi->message = mutt_new_header ();
+	mqi->next_message = NULL;
+	mqi->fcc = g_strdup(message->fcc_mailbox);
+	mqi->delete = 0;
+	mqi->tempfile[0] = '\0';
+
+	return mqi;
 }
 
 static void 
 msg_queue_item_destroy(MessageQueueItem* mqi) 
 {
-  if(*mqi->tempfile)
-    unlink (mqi->tempfile);
-  if(mqi->message)
-    mutt_free_header (&mqi->message);
-  if(mqi->fcc)
-    g_free(mqi->fcc);
-  free(mqi);
+	if(*mqi->tempfile)
+		unlink (mqi->tempfile);
+	if(mqi->message)
+		mutt_free_header (&mqi->message);
+	if(mqi->fcc)
+		g_free(mqi->fcc);
+	free(mqi);
 }
 
-/* prototype this so that this file doesn't whine.  this function isn't in
- * mutt any longer, so we had to provide it inside mutt for libmutt :-)
- */
-int mutt_send_message (HEADER * msg);
-guint balsa_send_message_real(MessageQueueItem *first_message);
-
+static guint balsa_send_message_real(MessageQueueItem *first_message);
 static void encode_descriptions (BODY * b);
-int balsa_smtp_send  (MessageQueueItem *first_message, char *server);
-int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg);
+static int balsa_smtp_send  (MessageQueueItem *first_message, char *server);
+static int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg);
 static gboolean balsa_create_msg (LibBalsaMessage * message, HEADER *msg, 
 				  char *tempfile, int queu);
 gchar** balsa_lookup_mime_type (const gchar* path);
@@ -114,156 +110,149 @@ void balsa_send_thread(MessageQueueItem *first_message);
 static void
 encode_descriptions (BODY * b)
 {
-  BODY *t;
-  char tmp[LONG_STRING];
+	BODY *t;
+	char tmp[LONG_STRING];
 
-  for (t = b; t; t = t->next)
-    {
-      if (t->description)
-	{
-	  rfc2047_encode_string (tmp, sizeof (tmp), (unsigned char *) t->description
-	    );
-	  safe_free ((void **) &t->description);
-	  t->description = safe_strdup (tmp);
+	for (t = b; t; t = t->next) {
+		if (t->description) {
+			rfc2047_encode_string (tmp, sizeof (tmp), (unsigned char *) t->description);
+			safe_free ((void **) &t->description);
+			t->description = safe_strdup (tmp);
+		}
+		if (t->parts)
+			encode_descriptions (t->parts);
 	}
-      if (t->parts)
-	encode_descriptions (t->parts);
-    }
 }
 
 
 static BODY *
 add_mutt_body_plain (const gchar* charset)
 {
-  BODY *body;
-  gchar buffer[PATH_MAX];
+	BODY *body;
+	gchar buffer[PATH_MAX];
 
-  body = mutt_new_body ();
+	body = mutt_new_body ();
 
-  body->type = TYPETEXT;
-  body->subtype = g_strdup ("plain");
-  body->unlink = 1;
-  body->use_disp = 0;
+	body->type = TYPETEXT;
+	body->subtype = g_strdup ("plain");
+	body->unlink = 1;
+	body->use_disp = 0;
   
-  body->encoding = balsa_app.encoding_style;
-  body->parameter = mutt_new_parameter();
-  body->parameter->attribute = g_strdup("charset");
-  body->parameter->value = g_strdup(charset ? charset : balsa_app.charset);
-  body->parameter->next = NULL;
+	body->encoding = balsa_app.encoding_style;
+	body->parameter = mutt_new_parameter();
+	body->parameter->attribute = g_strdup("charset");
+	body->parameter->value = g_strdup(charset ? charset : balsa_app.charset);
+	body->parameter->next = NULL;
 
-  mutt_mktemp (buffer);
-  body->filename = g_strdup (buffer);
-  mutt_update_encoding (body);
+	mutt_mktemp (buffer);
+	body->filename = g_strdup (buffer);
+	mutt_update_encoding (body);
 
-  return body;
+	return body;
 }
 
 gboolean
 libbalsa_message_send (LibBalsaMessage * message)
 {
-  MessageQueueItem *first_message, *current_message , *new_message;
-  GList *lista;
-  LibBalsaMessage *queu;
-  int message_number = 0;
+	MessageQueueItem *first_message, *current_message , *new_message;
+	GList *lista;
+	LibBalsaMessage *queu;
+	int message_number = 0;
 #ifdef BALSA_USE_THREADS
-  GtkWidget *send_dialog_source = NULL;
+	GtkWidget *send_dialog_source = NULL;
 #endif  
 
-  if (message != NULL )
-  {
-    first_message = msg_queue_item_new(message);
-    if(!balsa_create_msg (message,first_message->message,
-			  first_message->tempfile,0)) {
-      msg_queue_item_destroy(first_message);
-      return FALSE;
-    }
-    message_number++;
-  }
-  else
-      first_message = NULL;
+	if (message != NULL ) {
+		first_message = msg_queue_item_new(message);
+		if(!balsa_create_msg (message,first_message->message,
+				      first_message->tempfile,0)) {
+			msg_queue_item_destroy(first_message);
+			return FALSE;
+		}
+		message_number++;
+	} else {
+		first_message = NULL;
+	}
 
-  current_message = first_message ;
+	current_message = first_message ;
   
-  /* We do messages in queue now only if where are not sending them already */
+	/* We do messages in queue now only if where are not sending them already */
 
 #ifdef BALSA_USE_THREADS
 
-  pthread_mutex_lock( &send_messages_lock );
-  if (sending_mail == FALSE )
-  {
+	pthread_mutex_lock( &send_messages_lock );
+	if (sending_mail == FALSE ) {
 /* We create here the progress bar */
-  	send_dialog = gnome_dialog_new("Sending Mail...", "Hide", NULL);
+		send_dialog = gnome_dialog_new("Sending Mail...", "Hide", NULL);
 
-  	gnome_dialog_set_close(GNOME_DIALOG(send_dialog), TRUE);
-  	send_dialog_source = gtk_label_new("Sending Mail....");
-  	gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox), 
-                         send_dialog_source, FALSE, FALSE, 0);
+		gnome_dialog_set_close(GNOME_DIALOG(send_dialog), TRUE);
+		send_dialog_source = gtk_label_new("Sending Mail....");
+		gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox), 
+				   send_dialog_source, FALSE, FALSE, 0);
 
-  	send_progress_message = gtk_label_new("");
-  	gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox), 
-                         send_progress_message, FALSE, FALSE, 0);
+		send_progress_message = gtk_label_new("");
+		gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox), 
+				   send_progress_message, FALSE, FALSE, 0);
 
-  	send_dialog_bar = gtk_progress_bar_new();
-	gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
-                         send_dialog_bar, FALSE, FALSE, 0);
+		send_dialog_bar = gtk_progress_bar_new();
+		gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
+				   send_dialog_bar, FALSE, FALSE, 0);
 							      
-  	gtk_widget_show_all( send_dialog );
+		gtk_widget_show_all( send_dialog );
 /* Progress bar done */
 #endif
 
-	last_message = first_message;
-	libbalsa_mailbox_open (balsa_app.outbox, FALSE);
-	lista = balsa_app.outbox->message_list;
+		last_message = first_message;
+		libbalsa_mailbox_open (balsa_app.outbox, FALSE);
+		lista = balsa_app.outbox->message_list;
 	
-	while (lista != NULL)
-	{
-                queu = LIBBALSA_MESSAGE(lista->data);
+		while (lista != NULL) {
+			queu = LIBBALSA_MESSAGE(lista->data);
 
-		new_message = msg_queue_item_new(queu);
-	        if(!balsa_create_msg (queu,new_message->message,
-				      new_message->tempfile,1)) 
-		  msg_queue_item_destroy(new_message);
-		else {
-		  if(current_message)
-		    current_message->next_message = new_message ;
-		  else
-		    first_message = new_message;
-		  
-		  current_message = new_message;
-		  last_message = new_message;
-		  message_number++;
+			new_message = msg_queue_item_new(queu);
+			if(!balsa_create_msg (queu,new_message->message,
+					      new_message->tempfile,1)) {
+				msg_queue_item_destroy(new_message);
+			} else {
+				if(current_message)
+					current_message->next_message = new_message ;
+				else
+					first_message = new_message;
+				
+				current_message = new_message;
+				last_message = new_message;
+				message_number++;
+			}
+			lista = lista->next ;  
 		}
-	        lista = lista->next ;  
-	 }
 	 
-	 libbalsa_mailbox_close (balsa_app.outbox);
+		libbalsa_mailbox_close (balsa_app.outbox);
 	 
 #ifdef BALSA_USE_THREADS	
-  }
+	}
 
-  total_messages_left =  total_messages_left + message_number;
+	total_messages_left =  total_messages_left + message_number;
     
-  if( sending_mail == TRUE )
-    {
-      /* add to the queue of messages waiting to be sent */
-      last_message->next_message = first_message;
-      pthread_mutex_unlock( &send_messages_lock );
-    } else {
-      /* start queue of messages to send and initiate thread */
-      sending_mail = TRUE;
-      pthread_mutex_unlock( &send_messages_lock );
-      pthread_create( &send_mail,
-  		NULL,
-  		(void *) &balsa_send_message_real,
-		first_message );
-    }
+	if( sending_mail == TRUE ) {
+		/* add to the queue of messages waiting to be sent */
+		last_message->next_message = first_message;
+		pthread_mutex_unlock( &send_messages_lock );
+	} else {
+		/* start queue of messages to send and initiate thread */
+		sending_mail = TRUE;
+		pthread_mutex_unlock( &send_messages_lock );
+		pthread_create( &send_mail,
+				NULL,
+				(void *) &balsa_send_message_real,
+				first_message );
+	}
 #else  /*non-threaded code */
 
-  balsa_send_message_real( first_message);
+	balsa_send_message_real( first_message);
 
 #endif
 
-  return TRUE;
+	return TRUE;
 }
 
 /* balsa_send_message_real:
@@ -272,258 +261,251 @@ libbalsa_message_send (LibBalsaMessage * message)
    them loaded from outbox). Only first one will be sent and memory released.
    FIXME ...
 */
-guint
+static guint
 balsa_send_message_real(MessageQueueItem *first_message)
 {
 #ifdef BALSA_USE_THREADS
-  SendThreadMessage *threadmsg, *delete_message ;
+	SendThreadMessage *threadmsg, *delete_message ;
 #endif
-  MessageQueueItem *current_message, *next_message;
-  LibBalsaMailbox *save_box;
-  int i;
+	MessageQueueItem *current_message, *next_message;
+	LibBalsaMailbox *save_box;
+	int i;
   
-  if( !first_message ) {
+	if( !first_message ) {
 #ifdef BALSA_USE_THREADS
-    sending_mail = FALSE;
+		sending_mail = FALSE;
 #endif
-    return TRUE;
-  }
+		return TRUE;
+	}
 
-  /* the local MDA code is so simple that we handle it in short-circuit
-     fashion.
-  */
-  if (!balsa_app.smtp) 
-  {	 
+	/* the local MDA code is so simple that we handle it in short-circuit
+	   fashion.
+	*/
+	if (!balsa_app.smtp) {	 
 #ifdef BALSA_USE_THREADS
-    pthread_mutex_lock( &send_messages_lock );
-    sending_mail = FALSE;
-    total_messages_left = 0;
-    pthread_mutex_unlock( &send_messages_lock );
+		pthread_mutex_lock( &send_messages_lock );
+		sending_mail = FALSE;
+		total_messages_left = 0;
+		pthread_mutex_unlock( &send_messages_lock );
 #endif
     
-    i = mutt_invoke_sendmail (first_message->message->env->to, 
-			      first_message->message->env->cc, 
-			      first_message->message->env->bcc, 
-			      first_message->tempfile,
-			      (first_message->message->content->encoding == ENC8BIT));
+		i = mutt_invoke_sendmail (first_message->message->env->to, 
+					  first_message->message->env->cc, 
+					  first_message->message->env->bcc, 
+					  first_message->tempfile,
+					  (first_message->message->content->encoding == ENC8BIT));
     
-    if (i != 0 ) 
-      save_box = balsa_app.outbox;
-    else
-      save_box = balsa_find_mbox_by_name(first_message->fcc);
+		if (i != 0 ) 
+			save_box = balsa_app.outbox;
+		else
+			save_box = balsa_find_mbox_by_name(first_message->fcc);
     
-    if(save_box && LIBBALSA_IS_MAILBOX_LOCAL(save_box) ) {
-      mutt_write_fcc (LIBBALSA_MAILBOX_LOCAL (save_box)->path, 
-		      first_message->message, NULL, 1, NULL);
+		if(save_box && LIBBALSA_IS_MAILBOX_LOCAL(save_box) ) {
+			mutt_write_fcc (LIBBALSA_MAILBOX_LOCAL (save_box)->path, 
+					first_message->message, NULL, 1, NULL);
       
-      if (save_box->open_ref > 0) {
-	libbalsa_mailbox_check(save_box);
+			if (save_box->open_ref > 0) {
+				libbalsa_mailbox_check(save_box);
 #ifdef BALSA_USE_THREADS
-	MSGSENDTHREAD(threadmsg, MSGSENDTHREADLOAD, 
-		      "Load Sent/Outbox", NULL, save_box, 0);
+				MSGSENDTHREAD(threadmsg, MSGSENDTHREADLOAD, 
+					      "Load Sent/Outbox", NULL, save_box, 0);
 #endif
-      }
-    }
-    msg_queue_item_destroy( first_message );
+			}
+		}
+		msg_queue_item_destroy( first_message );
     
 #ifdef BALSA_USE_THREADS
-    MSGSENDTHREAD (threadmsg, MSGSENDTHREADFINISHED,"",NULL,NULL,0);
-    pthread_exit(0);
+		MSGSENDTHREAD (threadmsg, MSGSENDTHREADFINISHED,"",NULL,NULL,0);
+		pthread_exit(0);
 #endif
     
-    return TRUE;
-  }
+		return TRUE;
+	}
   
-  /* The hell of SMTP only code follows below... */
-  i = balsa_smtp_send (first_message,balsa_app.smtp_server);
+	/* The hell of SMTP only code follows below... */
+	i = balsa_smtp_send (first_message,balsa_app.smtp_server);
   
 #ifdef BALSA_USE_THREADS
-  if (i == -1)
-  {
-    pthread_mutex_lock( &send_messages_lock );
-    sending_mail = FALSE;
-    total_messages_left = 0;
-    pthread_mutex_unlock( &send_messages_lock );
+	if (i == -1) {
+		pthread_mutex_lock( &send_messages_lock );
+		sending_mail = FALSE;
+		total_messages_left = 0;
+		pthread_mutex_unlock( &send_messages_lock );
     
-    MSGSENDTHREAD (threadmsg, MSGSENDTHREADFINISHED,"",NULL,NULL,0); 
-  }
+		MSGSENDTHREAD (threadmsg, MSGSENDTHREADFINISHED,"",NULL,NULL,0); 
+	}
 #endif
   
-  /* We give a message to the user because an error has ocurred in the protocol
-   * A mistyped address? A server not allowing relay? We can pop a window to ask */
+	/* We give a message to the user because an error has ocurred in the protocol
+	 * A mistyped address? A server not allowing relay? We can pop a window to ask */
   
-  if (i==-2)
-    fprintf(stderr,"SMTP protocol error (wrong address, relaying denied)\n");
+	if (i==-2)
+		fprintf(stderr,"SMTP protocol error (wrong address, relaying denied)\n");
   
-  /* return TRUE; */
-  
-  /* We give back all the resources used and delete the sent messages */
+	/* We give back all the resources used and delete the sent messages */
   
 #ifndef BALSA_USE_THREADS
-  libbalsa_mailbox_open(balsa_app.outbox, FALSE);
+	libbalsa_mailbox_open(balsa_app.outbox, FALSE);
 #endif
-  current_message = first_message;
+	current_message = first_message;
   
-  while (current_message != NULL) {
-    if (current_message->delete == 1)
-    {
-      save_box = balsa_find_mbox_by_name(current_message->fcc);
-      if( save_box && LIBBALSA_IS_MAILBOX_LOCAL(save_box) )
-	mutt_write_fcc (LIBBALSA_MAILBOX_LOCAL (save_box)->path,
-			current_message->message, NULL, 0, NULL);
+	while (current_message != NULL) {
+		if (current_message->delete == 1) {
+			save_box = balsa_find_mbox_by_name(current_message->fcc);
+			if( save_box && LIBBALSA_IS_MAILBOX_LOCAL(save_box) )
+				mutt_write_fcc (LIBBALSA_MAILBOX_LOCAL (save_box)->path,
+						current_message->message, NULL, 0, NULL);
       
 #ifdef BALSA_USE_THREADS
-      MSGSENDTHREAD(delete_message, MSGSENDTHREADDELETE," ",
-		    current_message->orig, NULL, 0);
+			MSGSENDTHREAD(delete_message, MSGSENDTHREADDELETE," ",
+				      current_message->orig, NULL, 0);
 #else
-      if(current_message->orig->mailbox)
-	libbalsa_message_delete (current_message->orig);
+			if(current_message->orig->mailbox)
+				libbalsa_message_delete (current_message->orig);
 #endif
-    } else {
-      if(current_message->orig->mailbox == NULL)
-	mutt_write_fcc (
-	  LIBBALSA_MAILBOX_LOCAL (balsa_app.outbox)->path,
-	  current_message->message, NULL, 0, NULL);
-    }
-    
-    next_message = current_message->next_message;
-    msg_queue_item_destroy(current_message);
-    current_message = next_message;
-  }
+		} else {
+			if(current_message->orig->mailbox == NULL)
+				mutt_write_fcc (
+					LIBBALSA_MAILBOX_LOCAL (balsa_app.outbox)->path,
+					current_message->message, NULL, 0, NULL);
+		}
+		
+		next_message = current_message->next_message;
+		msg_queue_item_destroy(current_message);
+		current_message = next_message;
+	}
   
 #ifdef BALSA_USE_THREADS
-  MSGSENDTHREAD(delete_message, MSGSENDTHREADDELETE, "LAST",
-		NULL, NULL, 0);
-  libbalsa_mailbox_close(balsa_app.outbox);
-  pthread_exit(0); 
+	MSGSENDTHREAD(delete_message, MSGSENDTHREADDELETE, "LAST",
+		      NULL, NULL, 0);
+	libbalsa_mailbox_close(balsa_app.outbox);
+	pthread_exit(0); 
 #endif
   
-  return TRUE;
+	return TRUE;
 }
 
 static void
 message2HEADER(LibBalsaMessage * message, HEADER * hdr)
 {
-    gchar * tmp;
+	gchar * tmp;
 
-    if (!hdr->env)
-	hdr->env = mutt_new_envelope ();
+	if (!hdr->env)
+		hdr->env = mutt_new_envelope ();
     
-    hdr->env->userhdrs = mutt_new_list ();
-    {
-	LIST *sptr = UserHeader;
-	LIST *dptr = hdr->env->userhdrs;
-	LIST *delptr = 0;
-	while (sptr)
+	hdr->env->userhdrs = mutt_new_list ();
+
 	{
-	    dptr->data = g_strdup (sptr->data);
-	    sptr = sptr->next;
-	    delptr = dptr;
-	    dptr->next = mutt_new_list ();
-	    dptr = dptr->next;
+		LIST *sptr = UserHeader;
+		LIST *dptr = hdr->env->userhdrs;
+		LIST *delptr = 0;
+
+		while (sptr) {
+			dptr->data = g_strdup (sptr->data);
+			sptr = sptr->next;
+			delptr = dptr;
+			dptr->next = mutt_new_list ();
+			dptr = dptr->next;
+		}
+		g_free (delptr->next);
+		delptr->next = 0;
 	}
-	g_free (delptr->next);
-	delptr->next = 0;
-    }
     
-    tmp = libbalsa_address_to_gchar (message->from);
-    hdr->env->from = rfc822_parse_adrlist (hdr->env->from, tmp);
-    g_free (tmp);
-    
-    if(message->reply_to) {
-	tmp = libbalsa_address_to_gchar (message->reply_to);
-	hdr->env->reply_to = rfc822_parse_adrlist (hdr->env->reply_to, tmp);
+	tmp = libbalsa_address_to_gchar (message->from);
+	hdr->env->from = rfc822_parse_adrlist (hdr->env->from, tmp);
 	g_free (tmp);
-    }
     
-    hdr->env->subject = g_strdup (message->subject);
+	if(message->reply_to) {
+		tmp = libbalsa_address_to_gchar (message->reply_to);
+		hdr->env->reply_to = rfc822_parse_adrlist (hdr->env->reply_to, tmp);
+		g_free (tmp);
+	}
     
-    tmp = make_string_from_list (message->to_list);
-    hdr->env->to = rfc822_parse_adrlist (hdr->env->to, tmp);
-    g_free(tmp);
-    tmp = make_string_from_list (message->cc_list);
-    hdr->env->cc = rfc822_parse_adrlist (hdr->env->cc, tmp);
-    g_free(tmp);
-    tmp = make_string_from_list (message->bcc_list);
-    hdr->env->bcc = rfc822_parse_adrlist (hdr->env->bcc, tmp);
-    g_free(tmp);
+	hdr->env->subject = g_strdup (message->subject);
+    
+	tmp = make_string_from_list (message->to_list);
+	hdr->env->to = rfc822_parse_adrlist (hdr->env->to, tmp);
+	g_free(tmp);
+	tmp = make_string_from_list (message->cc_list);
+	hdr->env->cc = rfc822_parse_adrlist (hdr->env->cc, tmp);
+	g_free(tmp);
+	tmp = make_string_from_list (message->bcc_list);
+	hdr->env->bcc = rfc822_parse_adrlist (hdr->env->bcc, tmp);
+	g_free(tmp);
 }
 
 gboolean
 libbalsa_message_postpone (LibBalsaMessage * message, 
 			   LibBalsaMessage * reply_message, gchar * fcc)
 {
-  HEADER *msg;
-  BODY *last, *newbdy;
-  gchar *tmp;
-  LibBalsaMessageBody *body;
+	HEADER *msg;
+	BODY *last, *newbdy;
+	gchar *tmp;
+	LibBalsaMessageBody *body;
 
-  msg = mutt_new_header ();
-  message2HEADER(message, msg);
+	msg = mutt_new_header ();
+	message2HEADER(message, msg);
 
-  body = message->body_list;
+	body = message->body_list;
 
-  last = msg->content;
-  while (last && last->next)
-    last = last->next;
+	last = msg->content;
+	while (last && last->next)
+		last = last->next;
 
-  while ( body )
-    {
-      FILE *tempfp = NULL;
-      newbdy = NULL;
+	while ( body ) {
+		FILE *tempfp = NULL;
+		newbdy = NULL;
 
-      if (body->filename)
-      	newbdy = mutt_make_file_attach (body->filename);
-      else if (body->buffer)
-	{
-	  newbdy = add_mutt_body_plain (body->charset);
-	  tempfp = safe_fopen (newbdy->filename, "w+");
-	  fputs (body->buffer, tempfp);
-	  fclose (tempfp);
-	  tempfp = NULL;
+		if (body->filename) {
+			newbdy = mutt_make_file_attach (body->filename);
+		} else if (body->buffer) {
+			newbdy = add_mutt_body_plain (body->charset);
+			tempfp = safe_fopen (newbdy->filename, "w+");
+			fputs (body->buffer, tempfp);
+			fclose (tempfp);
+			tempfp = NULL;
+		}
+
+		if (newbdy) {
+			if (last)
+				last->next = newbdy;
+			else
+				msg->content = newbdy;
+
+			last = newbdy;
+		}
+
+		body = body->next;
 	}
 
-      if (newbdy)
-	{
-	  if (last)
-	    last->next = newbdy;
-	  else
-	    msg->content = newbdy;
-
-	  last = newbdy;
+	if (msg->content) {
+		if (msg->content->next)
+			msg->content = mutt_make_multipart (msg->content);
 	}
 
-      body = body->next;
-    }
+	mutt_prepare_envelope (msg->env);
 
-  if (msg->content)
-    {
-      if (msg->content->next)
-	msg->content = mutt_make_multipart (msg->content);
-    }
+	encode_descriptions (msg->content);
 
-  mutt_prepare_envelope (msg->env);
+	if (reply_message != NULL)
+		/* Just saves the message ID, mailbox type and mailbox name. We could
+		 * search all mailboxes for the ID but that would not be too fast. We
+		 * could also add more stuff ID like path, server, ... without this
+		 * if you change the name of the mailbox the flag will not be set. */
+		tmp = g_strdup_printf ("%s\r%s",
+				       reply_message->message_id,
+				       reply_message->mailbox->name);
+	else
+		tmp = NULL;
 
-  encode_descriptions (msg->content);
+	mutt_write_fcc (LIBBALSA_MAILBOX_LOCAL (balsa_app.draftbox)->path, msg, tmp, 1, fcc);
+	g_free(tmp);
 
-  if (reply_message != NULL)
-    /* Just saves the message ID, mailbox type and mailbox name. We could
-     * search all mailboxes for the ID but that would not be too fast. We
-     * could also add more stuff ID like path, server, ... without this
-     * if you change the name of the mailbox the flag will not be set. */
-    tmp = g_strdup_printf ("%s\r%s",
-                           reply_message->message_id,
-                           reply_message->mailbox->name);
-  else
-    tmp = NULL;
-  mutt_write_fcc (LIBBALSA_MAILBOX_LOCAL (balsa_app.draftbox)->path, msg, tmp, 1, fcc);
-  g_free(tmp);
+	if (balsa_app.draftbox->open_ref > 0)
+		libbalsa_mailbox_check (balsa_app.draftbox);
+	mutt_free_header (&msg);
 
-  if (balsa_app.draftbox->open_ref > 0)
-    libbalsa_mailbox_check (balsa_app.draftbox);
-  mutt_free_header (&msg);
-
-  return TRUE;
+	return TRUE;
 }
 
 /* In smtp_answer the check the answer and give back 1 if is a positive answer
@@ -531,35 +513,33 @@ libbalsa_message_postpone (LibBalsaMessage * message,
  * send later. The error will be shown to the user from this funtion */	 
    
 static int smtp_answer (int fd)
-  {
-  char *tmp, buffer[512]; /* Maximum allowed by RFC */
-  char code[4]; /* we use the 3 number code to check the answer */
-  int bytes = 0;
+{
+	char *tmp, buffer[512]; /* Maximum allowed by RFC */
+	char code[4]; /* we use the 3 number code to check the answer */
+	int bytes = 0;
   
-  tmp = buffer; 
+	tmp = buffer; 
 		  
-  bytes = (int)read (fd, tmp, sizeof(buffer));	  
-   
- 
-  /* now we check the posible answers */
+	bytes = (int)read (fd, tmp, sizeof(buffer));	  
+    
+	/* now we check the posible answers */
 
-  strncpy (code, buffer, 3);
+	strncpy (code, buffer, 3);
 
   
 /* I have to check all posible positive code in RFC. Maybe it can be use an 
  * if sentence */
 
-  switch (atoi(code)) 
-    {
-    case 354:
-    case 220:
-    case 250:
-    case 251:
-	return 1;
-    default:
-	fprintf(stderr,"%s",buffer);
-	return 0;
-    }
+	switch (atoi(code)) {
+	case 354:
+	case 220:
+	case 250:
+	case 251:
+		return 1;
+	default:
+		fprintf(stderr,"%s",buffer);
+		return 0;
+	}
 }
 
 /* This funtion recives as arguments the message (to use headers),
@@ -568,160 +548,147 @@ static int smtp_answer (int fd)
  * personalityes) and it returns 1 if everything is ok or 0 if something
  * when wrong  */
 
-int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
+static int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
 {
-  char message[500], buffer[525]; /* Maximum allow by RFC */
-  int fp,left,len;
-  char *tmp, *tmpbuffer;
-  ADDRESS *address;
+	char message[500], buffer[525]; /* Maximum allow by RFC */
+	int fp,left,len;
+	char *tmp, *tmpbuffer;
+	ADDRESS *address;
 #ifdef BALSA_USE_THREADS  
-  int total, send = 0;
-  struct stat st;
-  float percent=0;
-  SendThreadMessage *progress_message;
-  char send_message[100];
+	int total, send = 0;
+	struct stat st;
+	float percent=0;
+	SendThreadMessage *progress_message;
+	char send_message[100];
 #endif
  
-  snprintf (buffer, 512,"MAIL FROM:<%s>\r\n", msg->env->from->mailbox);
-  write (s, buffer, strlen (buffer));
-  if (smtp_answer (s) == 0)
-  {
-    fprintf(stderr,"%s",buffer);
-    return 0;
-  }
+	snprintf (buffer, 512,"MAIL FROM:<%s>\r\n", msg->env->from->mailbox);
+	write (s, buffer, strlen (buffer));
 
-  address = msg->env->to;
-  while (address != NULL)
-  {	  
-      snprintf (buffer, 512,"RCPT TO:<%s>\r\n", address->mailbox);
-      write (s, buffer, strlen (buffer));
-      address=address->next;
-    /* We check for a positive answer */
+	if (smtp_answer (s) == 0) {
+		fprintf(stderr,"%s",buffer);
+		return 0;
+	}
+
+	address = msg->env->to;
+	while (address != NULL) {	  
+		snprintf (buffer, 512,"RCPT TO:<%s>\r\n", address->mailbox);
+		write (s, buffer, strlen (buffer));
+		address=address->next;
+		/* We check for a positive answer */
         
-      if (smtp_answer (s) == 0)
-      {
-	 fprintf(stderr,"%s",buffer);
-	 return 0;
-      }
+		if (smtp_answer (s) == 0) {
+			fprintf(stderr,"%s",buffer);
+			return 0;
+		}
     
-     /*  let's go to the next address */
+		/*  let's go to the next address */
       
-  }
+	}
 
-  address = msg->env->cc;
-  while (address != NULL)
-  {
-      snprintf (buffer, sizeof(buffer),"RCPT TO:<%s>\r\n", address->mailbox);
-      write (s, buffer, strlen (buffer));
-      address=address->next;
+	address = msg->env->cc;
+	while (address != NULL)	{
+		snprintf (buffer, sizeof(buffer),"RCPT TO:<%s>\r\n", address->mailbox);
+		write (s, buffer, strlen (buffer));
+		address=address->next;
 
-      if (smtp_answer (s) == 0)
-      {
-	 fprintf(stderr,"%s",buffer);
-	 return 0;
-      }
-   }
+		if (smtp_answer (s) == 0) {
+			fprintf(stderr,"%s",buffer);
+			return 0;
+		}
+	}
 
-  address = msg->env->bcc;
-  while (address != NULL)
-  {       
-      snprintf (buffer, sizeof(buffer),"RCPT TO:<%s>\r\n", address->mailbox);
-      write (s, buffer, strlen (buffer));
-      address=address->next;
+	address = msg->env->bcc;
+	while (address != NULL) {       
+		snprintf (buffer, sizeof(buffer),"RCPT TO:<%s>\r\n", address->mailbox);
+		write (s, buffer, strlen (buffer));
+		address=address->next;
 
-      if (smtp_answer (s) == 0)
-      {
-	 fprintf(stderr,"%s",buffer);
-	 return 0;
-      }
-   }
+		if (smtp_answer (s) == 0) {
+			fprintf(stderr,"%s",buffer);
+			return 0;
+		}
+	}
 
 
-  /* Now we are ready to send the message */
+	/* Now we are ready to send the message */
 
 #ifdef BALSA_USE_THREADS
   
-  sprintf (send_message, "Messages to be sent: %d ", total_messages_left);
-  MSGSENDTHREAD(progress_message, MSGSENDTHREADPROGRESS, send_message,
-	                      NULL, NULL, 0);
+	sprintf (send_message, "Messages to be sent: %d ", total_messages_left);
+	MSGSENDTHREAD(progress_message, MSGSENDTHREADPROGRESS, send_message,
+		      NULL, NULL, 0);
 #endif
   
-  snprintf (buffer, 512,"DATA\r\n");
-  write (s, buffer, strlen (buffer));
-  if (smtp_answer (s) == 0)
-  {
-     fprintf(stderr,"%s",buffer);	    
-     return 0;
-  }
+	snprintf (buffer, 512,"DATA\r\n");
+	write (s, buffer, strlen (buffer));
+	if (smtp_answer (s) == 0) {
+		fprintf(stderr,"%s",buffer);	    
+		return 0;
+	}
 
-  if ((fp=open(tempfile,O_RDONLY))==-1)
-    return -1;
+	if ((fp=open(tempfile,O_RDONLY))==-1)
+		return -1;
   
 #ifdef BALSA_USE_THREADS 
-  lstat (tempfile, &st);
+	lstat (tempfile, &st);
    
-  total = (int)st.st_size;
+	total = (int)st.st_size;
 #endif  
 
-  while ((left = (int)read(fp, message, 499)) > 0)
-  {
-    message[left] = '\0';
-    tmpbuffer = message;
-    while ((tmp = strstr(tmpbuffer,"\n"))!=NULL)
-    {
-            if(strncmp(tmpbuffer, ".\n", 2) == 0) 
-	       write(s,".",1); /* make sure dots won't hurt */
-	    len = (int)strcspn(tmpbuffer,"\n");
+	while ((left = (int)read(fp, message, 499)) > 0) {
+		message[left] = '\0';
+		tmpbuffer = message;
+		while ((tmp = strstr(tmpbuffer,"\n"))!=NULL) {
+			if(strncmp(tmpbuffer, ".\n", 2) == 0) 
+				write(s,".",1); /* make sure dots won't hurt */
+			len = (int)strcspn(tmpbuffer,"\n");
 	    
-	    if (*(tmp-1)!='\r')
-            {
-		write (s,tmpbuffer,len);
-		write (s, "\r\n",2);
+			if (*(tmp-1)!='\r') {
+				write (s,tmpbuffer,len);
+				write (s, "\r\n",2);
 #ifdef BALSA_USE_THREADS
-		send = send + len + 2 ;
+				send = send + len + 2 ;
 	    
-		percent = (float)send/total ;
+				percent = (float)send/total ;
 #endif
-	    }
-	    else
-	    {
-		write (s,tmpbuffer,len);
-		write (s, "\n",1);
+			} else {
+				write (s,tmpbuffer,len);
+				write (s, "\n",1);
 #ifdef BALSA_USE_THREADS
-		send = send + len + 1;
+				send = send + len + 1;
 
-		percent = (float)send/total ;
+				percent = (float)send/total ;
 #endif		
-	    }
-	    tmpbuffer=tmp+1;
-	    left=left-(len+1);
-	    if (left<=0)
-		 break;
-    }
+			}
+			tmpbuffer=tmp+1;
+			left=left-(len+1);
+			if (left<=0)
+				break;
+		}
     
-    write (s, tmpbuffer,left); 
+		write (s, tmpbuffer,left); 
     
 #ifdef BALSA_USE_THREADS
-    send = send + left;
-    percent = (float)send/total ;
+		send = send + left;
+		percent = (float)send/total ;
     
-    MSGSENDTHREAD(progress_message, MSGSENDTHREADPROGRESS, "",
-	                 NULL, NULL, percent);
+		MSGSENDTHREAD(progress_message, MSGSENDTHREADPROGRESS, "",
+			      NULL, NULL, percent);
 #endif
-  }
+	}
   
-  snprintf (buffer, sizeof(buffer),"\r\n.\r\n");
-  write (s, buffer, strlen (buffer));
+	snprintf (buffer, sizeof(buffer),"\r\n.\r\n");
+	write (s, buffer, strlen (buffer));
 
-  if (smtp_answer (s) == 0)
-  {
-     fprintf(stderr,"%s",buffer);
-     return 0;
-  }
+	if (smtp_answer (s) == 0) {
+		fprintf(stderr,"%s",buffer);
+		return 0;
+	}
   
-  close (fp);
+	close (fp);
   
-  return 1;
+	return 1;
 }
 
 /* The code of returning answer is the following:
@@ -730,116 +697,109 @@ int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
  * -2    Error during protocol 
  * 1     Everything when perfect */
 
-int balsa_smtp_send (MessageQueueItem *first_message, char *server)
+static int balsa_smtp_send (MessageQueueItem *first_message, char *server)
 {
 
-  struct sockaddr_in sin;
-  struct hostent *he;
-  char buffer[525]; /* Maximum allow by RFC */
-  int n, s, error = 0, SmtpPort=25;
-  MessageQueueItem *current_message;
+	struct sockaddr_in sin;
+	struct hostent *he;
+	char buffer[525]; /* Maximum allow by RFC */
+	int n, s, error = 0, SmtpPort=25;
+	MessageQueueItem *current_message;
 #ifdef BALSA_USE_THREADS
-  SendThreadMessage *error_message, *finish_message;
-  char error_msg[256];
+	SendThreadMessage *error_message, *finish_message;
+	char error_msg[256];
 #endif
  
+	/* Here we make the conecction */  
+	s = socket (AF_INET, SOCK_STREAM, IPPROTO_IP);
 
-/* Here we make the conecction */  
-  s = socket (AF_INET, SOCK_STREAM, IPPROTO_IP);
+	memset ((char *) &sin, 0, sizeof(sin));
+	sin.sin_family = AF_INET;
+	sin.sin_port = htons (SmtpPort);
 
-  memset ((char *) &sin, 0, sizeof(sin));
-  sin.sin_family = AF_INET;
-  sin.sin_port = htons (SmtpPort);
-
-  if ((n = inet_addr (NONULL(server))) == -1)
-  {
-    /* Must be a DNS name */
-    if ((he = gethostbyname (NONULL(balsa_app.smtp_server))) == NULL)
-    {
+	if ((n = inet_addr (NONULL(server))) == -1) {
+		/* Must be a DNS name */
+		if ((he = gethostbyname (NONULL(balsa_app.smtp_server))) == NULL) {
 #ifdef BALSA_USE_THREADS
-     sprintf(error_msg, _("Could not find address for host %s."), server);
-     MSGSENDTHREAD(error_message, MSGSENDTHREADERROR,error_msg,NULL,NULL,0); 
+			sprintf(error_msg, _("Could not find address for host %s."), server);
+			MSGSENDTHREAD(error_message, MSGSENDTHREADERROR,error_msg,NULL,NULL,0); 
 #else
-     balsa_warning(_("Error: Could not find address for host %s."), server);
+			balsa_warning(_("Error: Could not find address for host %s."), server);
 #endif
-      return -1;
-    }
-    memcpy ((void *)&sin.sin_addr, *(he->h_addr_list), he->h_length);
-  }
-  else
-    memcpy ((void *)&sin.sin_addr, (void *)&n, sizeof(n));
-  
-  mutt_message ("Connecting to %s", inet_ntoa (sin.sin_addr));
+			return -1;
+		}
+		memcpy ((void *)&sin.sin_addr, *(he->h_addr_list), he->h_length);
+	} else {
+		memcpy ((void *)&sin.sin_addr, (void *)&n, sizeof(n));
+	}
 
-  if (connect (s, (struct sockaddr *) &sin, sizeof (struct sockaddr_in)) == -1)
-  {
+	mutt_message ("Connecting to %s", inet_ntoa (sin.sin_addr));
+
+	if (connect (s, (struct sockaddr *) &sin, sizeof (struct sockaddr_in)) == -1) {
 #ifdef BALSA_USE_THREADS
-     sprintf(error_msg,"Error connecting to %s.",server);
-     MSGSENDTHREAD(error_message, MSGSENDTHREADERROR,error_msg,NULL,NULL,0);
+		sprintf(error_msg,"Error connecting to %s.",server);
+		MSGSENDTHREAD(error_message, MSGSENDTHREADERROR,error_msg,NULL,NULL,0);
 #else
-    fprintf(stderr,"Error connecting to host\n\n");
+		fprintf(stderr,"Error connecting to host\n\n");
 #endif
-    return -1;
-  }
+		return -1;
+	}
   
 /* Here we have to receive whatever is the initial salutation of the smtp server, since now we are not going to make use of the server being esmtp, we don´t care about this salutation */
  
-  if (smtp_answer (s) == 0)
-    return -1;
+	if (smtp_answer (s) == 0)
+		return -1;
 
 /* Here I just follow the RFC */
 	  
-  snprintf (buffer, 512, "HELO %s\r\n", server);
-  write (s, buffer, strlen (buffer));
+	snprintf (buffer, 512, "HELO %s\r\n", server);
+	write (s, buffer, strlen (buffer));
 	  
-  if (smtp_answer (s) == 0)
-    return -2;
+	if (smtp_answer (s) == 0)
+		return -2;
 
-  current_message = first_message;
-  while (current_message != NULL)
-  {
-       if ((balsa_smtp_protocol ( s, current_message->tempfile, 
-				       current_message->message)) == 0 )
-       {
-           error = 1;
-           snprintf (buffer, 512, "RSET %s\r\n", server);
-           write (s, buffer, strlen (buffer));
-           if (smtp_answer (s) == 0)
-                return -2;
-       }
-       else
-	   current_message->delete = 1;
-       
+	current_message = first_message;
+	while (current_message != NULL) {
+		if ((balsa_smtp_protocol ( s, current_message->tempfile, current_message->message)) == 0 ) {
+			error = 1;
+			snprintf (buffer, 512, "RSET %s\r\n", server);
+			write (s, buffer, strlen (buffer));
+			if (smtp_answer (s) == 0)
+				return -2;
+		} else {
+			current_message->delete = 1;
+		}
+
 #ifdef BALSA_USE_THREADS
-       pthread_mutex_lock( &send_messages_lock );
+		pthread_mutex_lock( &send_messages_lock );
        
-       total_messages_left =  total_messages_left - 1;  
-       if (current_message->next_message == NULL)
-	       sending_mail = FALSE;
+		total_messages_left =  total_messages_left - 1;  
+		if (current_message->next_message == NULL)
+			sending_mail = FALSE;
        
-       pthread_mutex_unlock( &send_messages_lock );
+		pthread_mutex_unlock( &send_messages_lock );
 #endif 
-       current_message = current_message->next_message;
-  }     
+		current_message = current_message->next_message;
+	}     
 
 /* We close the conection */
   
-  snprintf (buffer, sizeof(buffer),"QUIT\r\n");
-  write (s, buffer, strlen (buffer));
+	snprintf (buffer, sizeof(buffer),"QUIT\r\n");
+	write (s, buffer, strlen (buffer));
 
-  close (s);
+	close (s);
   
 #ifdef BALSA_USE_THREADS
   
-  MSGSENDTHREAD (finish_message, MSGSENDTHREADFINISHED,"",NULL,NULL,0); 
+	MSGSENDTHREAD (finish_message, MSGSENDTHREADFINISHED,"",NULL,NULL,0); 
 #endif
 
   
-  if (error == 1)
-     return -2;
+	if (error == 1)
+		return -2;
 
   
-  return 1;
+	return 1;
 
 }  
 
@@ -869,151 +829,142 @@ gchar** balsa_lookup_mime_type (const gchar* path)
 static gboolean 
 balsa_create_msg (LibBalsaMessage *message, HEADER *msg, char *tmpfile, int queu)
 {
-  BODY *last, *newbdy;
-  FILE *tempfp;
-  HEADER *msg_tmp;
-  MESSAGE *mensaje;
-  LIST *in_reply_to;
-  LibBalsaMessageBody *body;
+	BODY *last, *newbdy;
+	FILE *tempfp;
+	HEADER *msg_tmp;
+	MESSAGE *mensaje;
+	LIST *in_reply_to;
+	LibBalsaMessageBody *body;
 
-  gchar** mime_type;
+	gchar** mime_type;
 
-  message2HEADER(message, msg);
+	message2HEADER(message, msg);
 
-  /* If the message has references set, add them to he envelope */
-  if (message->references != NULL) {        
-    msg->env->references = mutt_new_list ();
-    msg->env->references->next = NULL;
-    msg->env->references->data =  g_strdup (message->references);
+	/* If the message has references set, add them to he envelope */
+	if (message->references != NULL) {        
+		msg->env->references = mutt_new_list ();
+		msg->env->references->next = NULL;
+		msg->env->references->data =  g_strdup (message->references);
 
-    /* There's no specific header for In-Reply-To, just add it to the user
-     * headers */
-    in_reply_to = mutt_new_list ();
-    in_reply_to->next = msg->env->userhdrs;
-    in_reply_to->data = g_strconcat("In-Reply-To: ", message->in_reply_to, NULL);
-    msg->env->userhdrs = in_reply_to;
-  }
+		/* There's no specific header for In-Reply-To, just add it to the user
+		 * headers */
+		in_reply_to = mutt_new_list ();
+		in_reply_to->next = msg->env->userhdrs;
+		in_reply_to->data = g_strconcat("In-Reply-To: ", message->in_reply_to, NULL);
+		msg->env->userhdrs = in_reply_to;
+	}
   
 
-  if(message->mailbox)
-      libbalsa_message_body_ref (message);
+	if(message->mailbox)
+		libbalsa_message_body_ref (message);
 
-  body = message->body_list;
+	body = message->body_list;
   
-  last = msg->content;
-  while (last && last->next)
-    last = last->next;
+	last = msg->content;
+	while (last && last->next)
+		last = last->next;
   
-  while ( body )
-    {
-      FILE *tempfp = NULL;
-      newbdy = NULL;
+	while ( body ) {
+		FILE *tempfp = NULL;
+		newbdy = NULL;
 
-      if (body->filename) {
-	if( (newbdy = mutt_make_file_attach (body->filename)) == NULL) 
-	  g_warning("Cannot attach file: %s.\nSending without it.", 
-			body->filename);
-	else {
+		if (body->filename) {
+			if( (newbdy = mutt_make_file_attach (body->filename)) == NULL) {
+				g_warning("Cannot attach file: %s.\nSending without it.", 
+					  body->filename);
+			} else {
 
-	  /* Do this here because we don't want to use libmutt's mime
-	   * types */
-	  mime_type = balsa_lookup_mime_type ((const gchar*)body->filename);
-	  newbdy->type = mutt_check_mime_type (mime_type[0]);
-	  g_free (newbdy->subtype);
-	  newbdy->subtype = g_strdup(mime_type[1]);
-	  g_strfreev (mime_type);
-	}
-      }
+				/* Do this here because we don't want to use libmutt's mime
+				 * types */
+				mime_type = balsa_lookup_mime_type ((const gchar*)body->filename);
+				newbdy->type = mutt_check_mime_type (mime_type[0]);
+				g_free (newbdy->subtype);
+				newbdy->subtype = g_strdup(mime_type[1]);
+				g_strfreev (mime_type);
+			}
+		} else if (body->buffer) {
+			newbdy = add_mutt_body_plain (body->charset);
+			tempfp = safe_fopen (newbdy->filename, "w+");
+			fputs (body->buffer, tempfp);
+			fclose (tempfp);
+			tempfp = NULL;
+		} else { 
+			/* safe_free bug patch: steal it! */
+			msg->content = mutt_copy_body(body->mutt_body, NULL); 
+		}
 
-      else if (body->buffer)
-	{
-	  newbdy = add_mutt_body_plain (body->charset);
-	  tempfp = safe_fopen (newbdy->filename, "w+");
-	  fputs (body->buffer, tempfp);
-	  fclose (tempfp);
-	  tempfp = NULL;
-	}
-      else
-	  /* safe_free bug patch: steal it! */
-      { msg->content = mutt_copy_body(body->mutt_body, NULL); }
+		if (newbdy) {
+			if (last)
+				last->next = newbdy;
+			else
+				msg->content = newbdy;
 
-      if (newbdy)
-	{
-	  if (last)
-	    last->next = newbdy;
-	  else
-	    msg->content = newbdy;
+			last = newbdy;
+		}
 
-	  last = newbdy;
+		body = body->next;
 	}
 
-      body = body->next;
-    }
+	if (msg->content) {
+		if (msg->content->next)
+			msg->content = mutt_make_multipart (msg->content);
+	}
 
-  if (msg->content)
-    {
-      if (msg->content->next)
-	msg->content = mutt_make_multipart (msg->content);
-    }
+	mutt_prepare_envelope (msg->env);
 
-  mutt_prepare_envelope (msg->env);
-
-  encode_descriptions (msg->content);
+	encode_descriptions (msg->content);
 
 /* We create the message in MIME format here, we use the same format 
  * for local delivery that for SMTP */
-  if (queu == 0)
-  {
-	mutt_mktemp (tmpfile);
-	if ((tempfp = safe_fopen (tmpfile, "w")) == NULL)
- 	     return (-1);
+	if (queu == 0) {
+		mutt_mktemp (tmpfile);
+		if ((tempfp = safe_fopen (tmpfile, "w")) == NULL)
+			return (-1);
 
-	mutt_write_rfc822_header (tempfp, msg->env, msg->content, 0);
-	fputc ('\n', tempfp); /* tie off the header. */
+		mutt_write_rfc822_header (tempfp, msg->env, msg->content, 0);
+		fputc ('\n', tempfp); /* tie off the header. */
 
-	if ((mutt_write_mime_body (msg->content, tempfp) == -1))
-	{
- 	     fclose(tempfp);
- 	     unlink (tmpfile);
-  	     return (-1);
-   	}
-  	fputc ('\n', tempfp); /* tie off the body. */
+		if ((mutt_write_mime_body (msg->content, tempfp) == -1)) {
+			fclose(tempfp);
+			unlink (tmpfile);
+			return (-1);
+		}
+		fputc ('\n', tempfp); /* tie off the body. */
 
-  	if (fclose (tempfp) != 0)
-   	{
-    	     mutt_perror (tmpfile);
-             unlink (tmpfile);
-             return (-1);
-        }
+		if (fclose (tempfp) != 0) {
+			mutt_perror (tmpfile);
+			unlink (tmpfile);
+			return (-1);
+		}
 
-  }
-  else /* the message is in the queue */
-  {
-       msg_tmp = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];  
-       mutt_parse_mime_message (CLIENT_CONTEXT (message->mailbox), msg_tmp);
-       mensaje = mx_open_message(CLIENT_CONTEXT (message->mailbox),
-				 msg_tmp->msgno);
+	} else {
+		/* the message is in the queue */
+
+		msg_tmp = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];  
+		mutt_parse_mime_message (CLIENT_CONTEXT (message->mailbox), msg_tmp);
+		mensaje = mx_open_message(CLIENT_CONTEXT (message->mailbox),
+					  msg_tmp->msgno);
 	       
-       mutt_mktemp (tmpfile);
-       if ((tempfp = safe_fopen (tmpfile, "w")) == NULL)
-	   return FALSE;
-       _mutt_copy_message (tempfp, mensaje->fp, msg_tmp, msg_tmp->content,
-			   0, 0);
-		       
+		mutt_mktemp (tmpfile);
+		if ((tempfp = safe_fopen (tmpfile, "w")) == NULL)
+			return FALSE;
 
-       if (fclose (tempfp) != 0)
-       {
-           mutt_perror (tmpfile);
-           unlink (tmpfile);
-	   if(message->mailbox)
-	       libbalsa_message_body_unref (message);
-           return FALSE;
-       }
+		_mutt_copy_message (tempfp, mensaje->fp, msg_tmp, msg_tmp->content,
+				    0, 0);
 
-  }	 
+		if (fclose (tempfp) != 0) {
+			mutt_perror (tmpfile);
+			unlink (tmpfile);
+			if(message->mailbox)
+				libbalsa_message_body_unref (message);
+			return FALSE;
+		}
 
-  if(message->mailbox)
-      libbalsa_message_body_unref (message);
- return TRUE;
+	}	 
+
+	if(message->mailbox)
+		libbalsa_message_body_unref (message);
+
+	return TRUE;
 }
 

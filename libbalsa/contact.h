@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1999 Stuart Parmenter
  *
@@ -27,30 +27,30 @@
 
 enum
 {
-    CARD_NAME,
-    FIRST_NAME,
-    LAST_NAME,
-    ORGANIZATION,
-    EMAIL_ADDRESS,
-    NUM_FIELDS
+	CARD_NAME,
+	FIRST_NAME,
+	LAST_NAME,
+	ORGANIZATION,
+	EMAIL_ADDRESS,
+	NUM_FIELDS
 };
 
-    /* possible error values obtained while trying to store a contact vCard */
+/* possible error values obtained while trying to store a contact vCard */
 enum
 {
-    LIBBALSA_CONTACT_CARD_STORED_SUCCESSFULLY,
-    LIBBALSA_CONTACT_UNABLE_TO_OPEN_GNOMECARD_FILE,
-    LIBBALSA_CONTACT_CARD_NAME_FIELD_EMPTY,
-    LIBBALSA_CONTACT_CARD_NAME_EXISTS
+	LIBBALSA_CONTACT_CARD_STORED_SUCCESSFULLY,
+	LIBBALSA_CONTACT_UNABLE_TO_OPEN_GNOMECARD_FILE,
+	LIBBALSA_CONTACT_CARD_NAME_FIELD_EMPTY,
+	LIBBALSA_CONTACT_CARD_NAME_EXISTS
 };
 
 struct _LibBalsaContact
 {
-    gchar *card_name;
-    gchar *first_name;
-    gchar *last_name;
-    gchar *organization;
-    gchar *email_address;
+	gchar *card_name;
+	gchar *first_name;
+	gchar *last_name;
+	gchar *organization;
+	gchar *email_address;
 };
 
 LibBalsaContact *libbalsa_contact_new(void);

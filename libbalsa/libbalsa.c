@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -40,13 +40,13 @@ void
 mutt_message (const char *fmt,...)
 {
 #ifdef DEBUG
-  va_list ap;
-  char outstr[522];
+	va_list ap;
+	char outstr[522];
 
-  va_start (ap, fmt);
-  vsprintf (outstr, fmt, ap);
-  va_end (ap);
-  g_print ("mutt_message: %s\n", outstr);
+	va_start (ap, fmt);
+	vsprintf (outstr, fmt, ap);
+	va_end (ap);
+	g_print ("mutt_message: %s\n", outstr);
 #endif
 }
 
@@ -58,14 +58,8 @@ mutt_exit (int code)
 int
 mutt_yesorno (const char *msg, int def)
 {
-  return 1;
+	return 1;
 }
-
-/*  int */
-/*  mutt_any_key_to_continue (const char *s) */
-/*  { */
-/*    return 1; */
-/*  } */
 
 void
 mutt_clear_error (void)
@@ -76,55 +70,56 @@ mutt_clear_error (void)
 void
 libbalsa_init ( void (*error_func) (const char *fmt,...) )
 {
-  struct utsname utsname;
-  char *p;
-  gchar *tmp;
+	struct utsname utsname;
+	char *p;
+	gchar *tmp;
 
-  Spoolfile = libbalsa_guess_mail_spool();
+	Spoolfile = libbalsa_guess_mail_spool();
 
-  uname (&utsname);
+	uname (&utsname);
 
-  Username = g_get_user_name ();
+	Username = g_get_user_name ();
 
-  Homedir = g_get_home_dir ();
+	Homedir = g_get_home_dir ();
 
-  Realname = g_get_real_name ();
+	Realname = g_get_real_name ();
 
-  Hostname = libbalsa_get_hostname ();
+	Hostname = libbalsa_get_hostname ();
 
-  mutt_error = error_func;
+	mutt_error = error_func;
 
-  Fqdn = g_strdup (Hostname);
+	Fqdn = g_strdup (Hostname);
 
-  Sendmail = SENDMAIL;
+	Sendmail = SENDMAIL;
 
-  Shell = g_strdup ((p = g_getenv ("SHELL")) ? p : "/bin/sh");
-  Tempdir = g_get_tmp_dir ();
+	Shell = g_strdup ((p = g_getenv ("SHELL")) ? p : "/bin/sh");
+	Tempdir = g_get_tmp_dir ();
 
-  if (UserHeader)
-    UserHeader = UserHeader->next;
-  UserHeader = mutt_new_list ();
-  tmp = g_malloc (17 + strlen (VERSION));
-  snprintf (tmp, 17 + strlen (VERSION), "X-Mailer: Balsa %s", VERSION);
-  UserHeader->data = g_strdup (tmp);
-  g_free (tmp);
+	if (UserHeader)
+		UserHeader = UserHeader->next;
+
+	UserHeader = mutt_new_list ();
+	tmp = g_malloc (17 + strlen (VERSION));
+	snprintf (tmp, 17 + strlen (VERSION), "X-Mailer: Balsa %s", VERSION);
+	UserHeader->data = g_strdup (tmp);
+	g_free (tmp);
   
-  set_option(OPTSAVEEMPTY);
-  set_option(OPTCHECKNEW);
+	set_option(OPTSAVEEMPTY);
+	set_option(OPTCHECKNEW);
 
-  libbalsa_notify_init();
+	libbalsa_notify_init();
 }
 
 void
 libbalsa_set_spool (gchar *spool)
 {
-  if ( Spoolfile )
-    g_free(Spoolfile);
+	if ( Spoolfile )
+		g_free(Spoolfile);
 
-  if ( spool ) 
-    Spoolfile = g_strdup (spool);
-  else 
-    Spoolfile = libbalsa_guess_mail_spool();
+	if ( spool ) 
+		Spoolfile = g_strdup (spool);
+	else 
+		Spoolfile = libbalsa_guess_mail_spool();
 }
 
 /* libbalsa_guess_mail_spool
@@ -135,34 +130,34 @@ libbalsa_set_spool (gchar *spool)
 gchar*
 libbalsa_guess_mail_spool( void )
 {
-  int i;
-  gchar *env;
-  gchar *spool;
-  static const gchar *guesses[] = { 
-    "/var/spool/mail/", 
-    "/var/mail/", 
-    "/usr/spool/mail/", 
-    "/usr/mail/", 
-    NULL 
-  };
+	int i;
+	gchar *env;
+	gchar *spool;
+	static const gchar *guesses[] = { 
+		"/var/spool/mail/", 
+		"/var/mail/", 
+		"/usr/spool/mail/", 
+		"/usr/mail/", 
+		NULL 
+	};
   
-  if( (env = getenv( "MAIL" )) != NULL )
-    return g_strdup( env );
+	if( (env = getenv( "MAIL" )) != NULL )
+		return g_strdup( env );
   
-  if( (env = getenv( "USER" )) != NULL ) {
-    for( i = 0; guesses[i] != NULL; i++ ) {
-      spool = g_strconcat( guesses[i], env, NULL );
+	if( (env = getenv( "USER" )) != NULL ) {
+		for( i = 0; guesses[i] != NULL; i++ ) {
+			spool = g_strconcat( guesses[i], env, NULL );
       
-      if( g_file_exists( spool ) )
-	return spool;
+			if( g_file_exists( spool ) )
+				return spool;
       
-      g_free( spool );
-    }
-  }
+			g_free( spool );
+		}
+	}
   
-  /* libmutt's configure.in indicates that this 
-   * ($HOME/mailbox) exists on
-   * some systems, and it's a good enough default if we
-   * can't guess it any other way. */
-  return gnome_util_prepend_user_home( "mailbox" );
+	/* libmutt's configure.in indicates that this 
+	 * ($HOME/mailbox) exists on
+	 * some systems, and it's a good enough default if we
+	 * can't guess it any other way. */
+	return gnome_util_prepend_user_home( "mailbox" );
 }

@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1999 Stuart Parmenter
  *
@@ -39,77 +39,77 @@ typedef enum _LibBalsaMessageFlag LibBalsaMessageFlag;
 
 enum _LibBalsaMessageFlag
 {
-  LIBBALSA_MESSAGE_FLAG_NEW     = 1 << 1,
-  LIBBALSA_MESSAGE_FLAG_DELETED = 1 << 2,
-  LIBBALSA_MESSAGE_FLAG_REPLIED = 1 << 3,
-  LIBBALSA_MESSAGE_FLAG_FLAGGED = 1 << 4
+	LIBBALSA_MESSAGE_FLAG_NEW     = 1 << 1,
+	LIBBALSA_MESSAGE_FLAG_DELETED = 1 << 2,
+	LIBBALSA_MESSAGE_FLAG_REPLIED = 1 << 3,
+	LIBBALSA_MESSAGE_FLAG_FLAGGED = 1 << 4
 };
 
 struct _LibBalsaMessage
 {
-  GtkObject object;
+	GtkObject object;
 
-  /* the mailbox this message belongs to */
-  LibBalsaMailbox *mailbox;
+	/* the mailbox this message belongs to */
+	LibBalsaMailbox *mailbox;
 
-  /* flags */
-  LibBalsaMessageFlag flags;
+	/* flags */
+	LibBalsaMessageFlag flags;
 
-  /* the ordered numberic index of this message in 
-   * the mailbox beginning from 1, not 0 */
-  glong msgno;
+	/* the ordered numberic index of this message in 
+	 * the mailbox beginning from 1, not 0 */
+	glong msgno;
 
-  /* remail header if any */
-  gchar *remail;
+	/* remail header if any */
+	gchar *remail;
 
-  /* message composition date string */
-  time_t date;
+	/* message composition date string */
+	time_t date;
 
-  /* from, sender, and reply addresses */
-  LibBalsaAddress *from;
-  LibBalsaAddress *sender;
-  LibBalsaAddress *reply_to;
+	/* from, sender, and reply addresses */
+	LibBalsaAddress *from;
+	LibBalsaAddress *sender;
+	LibBalsaAddress *reply_to;
 
-  /* subject line */
-  gchar *subject;
+	/* subject line */
+	gchar *subject;
 
-  /* primary, secondary, and blind recipent lists */
-  GList *to_list;
-  GList *cc_list;
-  GList *bcc_list;
+	/* primary, secondary, and blind recipent lists */
+	GList *to_list;
+	GList *cc_list;
+	GList *bcc_list;
 
-  /* File Carbon Copy Mailbox */
-  gchar *fcc_mailbox;
+	/* File Carbon Copy Mailbox */
+	gchar *fcc_mailbox;
 
-  /* replied message ID */
-  gchar *references;
+	/* replied message ID */
+	gchar *references;
 
-  /* replied message ID; from address on date*/
-  gchar *in_reply_to;
+	/* replied message ID; from address on date*/
+	gchar *in_reply_to;
 
-  /* message ID */
-  gchar *message_id;
+	/* message ID */
+	gchar *message_id;
 
-  /* message body */
-  guint body_ref;
-  LibBalsaMessageBody *body_list;
-  /*  GList *body_list; */
+	/* message body */
+	guint body_ref;
+	LibBalsaMessageBody *body_list;
+	/*  GList *body_list; */
 };
 
 struct _LibBalsaMessageClass
 {
-  GtkObjectClass parent_class;
+	GtkObjectClass parent_class;
 
-  /* deal with flags being set/unset */
-  /* Signal: */
-  void (* status_changed) (LibBalsaMessage *message, LibBalsaMessageFlag flag, gboolean);
+	/* deal with flags being set/unset */
+	/* Signal: */
+	void (* status_changed) (LibBalsaMessage *message, LibBalsaMessageFlag flag, gboolean);
 
-  /* Virtual Functions: */
-  void (* clear_flags)    (LibBalsaMessage *message);
-  void (* set_answered)   (LibBalsaMessage *message, gboolean set);
-  void (* set_read)       (LibBalsaMessage *message, gboolean set);
-  void (* set_deleted)    (LibBalsaMessage *message, gboolean set);
-  void (* set_flagged)	  (LibBalsaMessage *message, gboolean set);
+	/* Virtual Functions: */
+	void (* clear_flags)    (LibBalsaMessage *message);
+	void (* set_answered)   (LibBalsaMessage *message, gboolean set);
+	void (* set_read)       (LibBalsaMessage *message, gboolean set);
+	void (* set_deleted)    (LibBalsaMessage *message, gboolean set);
+	void (* set_flagged)	  (LibBalsaMessage *message, gboolean set);
 };
 
 

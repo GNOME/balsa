@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -18,8 +18,8 @@
  * 02111-1307, USA.
  */
 
-#ifndef __MISC_H__
-#define __MISC_H__
+#ifndef __LIBBALSA_MISC_H__
+#define __LIBBALSA_MISC_H__
 
 #include <stdio.h>
 
@@ -45,21 +45,21 @@ size_t readfile (FILE * fp, char **buf);
  * */
 typedef enum
 {
-  MBNODE_STYLE_ICONFULL = 1 << 1,
-  MBNODE_STYLE_UNREAD_MESSAGES = 1 << 2,
-  MBNODE_STYLE_TOTAL_MESSAGES = 1 << 3,
+	MBNODE_STYLE_ICONFULL = 1 << 1,
+	MBNODE_STYLE_UNREAD_MESSAGES = 1 << 2,
+	MBNODE_STYLE_TOTAL_MESSAGES = 1 << 3,
 } MailboxNodeStyle;
 
 
 typedef struct _MailboxNode MailboxNode;
 struct _MailboxNode
 {
-  GtkObject object;
-  gchar *name;
-  LibBalsaMailbox *mailbox;
-  gint IsDir;
-  gint expanded;
-  MailboxNodeStyle style;
+	GtkObject object;
+	gchar *name;
+	LibBalsaMailbox *mailbox;
+	gint IsDir;
+	gint expanded;
+	MailboxNodeStyle style;
 };
 
 MailboxNode *mailbox_node_new (const gchar * name, LibBalsaMailbox * mb, gint i);
@@ -72,4 +72,4 @@ void libbalsa_wrap_string(gchar* str, int width);
 
 void libbalsa_set_charset(const gchar* charset);
 
-#endif /* __MISC_H__ */
+#endif /* __LIBBALSA_MISC_H__ */

@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -28,4 +28,4 @@
 GString * content2reply (LibBalsaMessage * message,
 			 gchar *reply_prefix_str);  /* arp */
 
-#endif /* __MIME_H__ */
+#endif /* __LIBBALSA_MIME_H__ */

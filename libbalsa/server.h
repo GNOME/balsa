@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 2000 Stuart Parmenter
  *
@@ -31,40 +31,38 @@
 
 GtkType libbalsa_server_get_type (void);
 
-/* typedef struct _LibBalsaServer LibBalsaServer; */
 typedef struct _LibBalsaServerClass LibBalsaServerClass;
 
 typedef enum
 {
-  LIBBALSA_SERVER_POP3,
-  LIBBALSA_SERVER_IMAP,
-  LIBBALSA_SERVER_UNKNOWN
-}
-LibBalsaServerType;
+	LIBBALSA_SERVER_POP3,
+	LIBBALSA_SERVER_IMAP,
+	LIBBALSA_SERVER_UNKNOWN
+} LibBalsaServerType;
 
 struct _LibBalsaServer
 {
-  GtkObject object;
+	GtkObject object;
 
-  LibBalsaServerType type;
+	LibBalsaServerType type;
 
-  gchar *host;
-  gint port;
+	gchar *host;
+	gint port;
 
-  gchar *user;
-  gchar *passwd;
+	gchar *user;
+	gchar *passwd;
 };
 
 struct _LibBalsaServerClass
 {
-  GtkObjectClass parent_class;
+	GtkObjectClass parent_class;
 
-  void (* set_username)            (LibBalsaServer *server,
-				    const gchar *name);
-  void (* set_password)            (LibBalsaServer *server,
-				    const gchar *passwd);
-  void (* set_host)                (LibBalsaServer *server,
-				    const gchar *host, gint port);
+	void (* set_username)            (LibBalsaServer *server,
+					  const gchar *name);
+	void (* set_password)            (LibBalsaServer *server,
+					  const gchar *passwd);
+	void (* set_host)                (LibBalsaServer *server,
+					  const gchar *host, gint port);
 };
 
 GtkObject *libbalsa_server_new(LibBalsaServerType type);

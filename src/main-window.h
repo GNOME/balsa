@@ -64,9 +64,12 @@ gboolean send_progress_notify_cb(void);
 gint check_new_messages_auto_cb(gpointer data);
 void check_new_messages_cb(GtkWidget *, gpointer data);
 
+/* functions to manipulate the progress bars of the window */
 void balsa_window_increase_activity(BalsaWindow* window);
 void balsa_window_decrease_activity(BalsaWindow* window);
-
+gboolean balsa_window_setup_progress(BalsaWindow* window, gfloat upper_bound);
+void balsa_window_clear_progress(BalsaWindow* window);
+void balsa_window_increment_progress(BalsaWindow* window);
 
 #if defined(__FILE__) && defined(__LINE__)
 # ifdef __FUNCTION__

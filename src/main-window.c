@@ -68,9 +68,12 @@ enum {
     LAST_SIGNAL
 };
 
-static guint activity_counter = 0;
-static guint activity_started = FALSE;
 gint balsa_window_progress_timeout(gpointer user_data);
+enum {
+    BALSA_PROGRESS_NONE = 0,
+    BALSA_PROGRESS_ACTIVITY,
+    BALSA_PROGRESS_INCREMENT
+};
 
 enum {
     TARGET_MESSAGES
@@ -2413,6 +2416,11 @@ notebook_drag_received_cb (GtkWidget* widget, GdkDragContext* context,
 }
 
 
+/* balsa_window_progress_timeout
+ * 
+ * This function is called at a preset interval to cause the progress
+ * bar to move in activity mode.  
+ **/
 gint
 balsa_window_progress_timeout(gpointer user_data) 
 {
@@ -2433,38 +2441,234 @@ balsa_window_progress_timeout(gpointer user_data)
 }
 
 
-
+/* balsa_window_increase_activity
+ * 
+ * Calling this causes this to the progress bar of the window to
+ * switch into activity mode if it's not already going.  Otherwise it
+ * simply increments the counter (so that multiple threads can
+ * indicate activity simultaneously).
+ **/
 void 
 balsa_window_increase_activity(BalsaWindow* window)
 {
+    gint in_use = 0;
+    gint activity_handler;
+    guint activity_counter = 0;
     GtkProgress* progress_bar;
+    GtkAdjustment* adj;
+    
 
-    if (!activity_counter) {
-        progress_bar = gnome_appbar_get_progress(balsa_app.appbar);
+    progress_bar = gnome_appbar_get_progress(
+        GNOME_APPBAR(GNOME_APP(window)->statusbar));
+    in_use = GPOINTER_TO_INT(gtk_object_get_data(GTK_OBJECT(progress_bar), 
+                                                  "in_use"));
+    
+    if (!in_use) {
+        gtk_object_set_data(GTK_OBJECT(progress_bar), "in_use", 
+                            GINT_TO_POINTER(BALSA_PROGRESS_ACTIVITY));
+
         gtk_progress_set_activity_mode(progress_bar, 1);
-        activity_started = gtk_timeout_add(100, balsa_window_progress_timeout,
+        adj = progress_bar->adjustment;
+        adj->lower = 0;
+        adj->upper = 100;
+        adj->value = 0;
+
+        /* add a timeout to make the activity bar move */
+        activity_handler = gtk_timeout_add(100, balsa_window_progress_timeout,
                                            progress_bar);
+        gtk_object_set_data(GTK_OBJECT(progress_bar), 
+                            "activity_handler", 
+                            GINT_TO_POINTER(activity_handler));
+    } else if (in_use != BALSA_PROGRESS_ACTIVITY) {
+        /* the progress bar is already in use doing something else, so
+         * quit */
+        return;
     }
     
+    /* increment the reference counter */
+    activity_counter = GPOINTER_TO_UINT(
+        gtk_object_get_data(GTK_OBJECT(progress_bar),
+                            "activity_counter"));
     ++activity_counter;
+    gtk_object_set_data(GTK_OBJECT(progress_bar), 
+                        "activity_counter", 
+                        GUINT_TO_POINTER(activity_counter));
 }
 
+
+/* balsa_window_decrease_activity
+ * 
+ * When called, decreases the reference counter of the progress
+ * activity bar, if it goes to zero the progress bar is stopped and
+ * cleared.
+ **/
 void 
 balsa_window_decrease_activity(BalsaWindow* window)
 {
+    gint in_use;
+    gint activity_handler;
+    guint activity_counter = 0;
     GtkProgress* progress_bar;
     
+    progress_bar = gnome_appbar_get_progress(
+        GNOME_APPBAR(GNOME_APP(window)->statusbar));
+    in_use = GPOINTER_TO_INT(
+        gtk_object_get_data(GTK_OBJECT(progress_bar), "in_use"));
+
+    /* make sure the progress bar is being used for activity */
+    if (in_use != BALSA_PROGRESS_ACTIVITY)
+        return;
+
+    activity_counter = GPOINTER_TO_UINT(
+        gtk_object_get_data(GTK_OBJECT(progress_bar),
+                            "activity_counter"));
+    
+    /* decrement the counter if it exists */
     if (activity_counter) {
         --activity_counter;
         
+        /* if the reference count is now zero, clear the bar and make
+         * it available for others to use */
         if (!activity_counter) {
-            gtk_timeout_remove(activity_started);
-            activity_started = FALSE;
-            progress_bar = gnome_appbar_get_progress(balsa_app.appbar);
+            activity_handler = GPOINTER_TO_INT(
+                gtk_object_get_data(GTK_OBJECT(progress_bar),
+                                    "activity_handler"));
+            gtk_timeout_remove(activity_handler);
+            activity_handler = 0;
+            
             gtk_progress_set_activity_mode(progress_bar, 
                                            activity_counter);
             gtk_adjustment_set_value(progress_bar->adjustment, 0);
+            gtk_object_set_data(GTK_OBJECT(progress_bar), 
+                                "activity_handler",
+                                GINT_TO_POINTER(activity_handler));
+            gtk_object_set_data(GTK_OBJECT(progress_bar),
+                                "in_use", 
+                                GINT_TO_POINTER(BALSA_PROGRESS_NONE));
         }
+        /* make sure to store the counter value */
+        gtk_object_set_data(GTK_OBJECT(progress_bar), 
+                            "activity_counter",
+                            GUINT_TO_POINTER(activity_counter));
     }
 }
 
+
+/* balsa_window_setup_progress
+ * 
+ * window: BalsaWindow that contains the progressbar 
+ * upper_bound: Defines the top of the range to be incremented along
+ * 
+ * returns: true if initialization is successful, otherwise returns
+ * false.
+ * 
+ * Initializes the progress bar for incremental operation with a range
+ * from 0 to upper_bound.  If the bar is already in operation, either
+ * in activity mode or otherwise, the function returns false, if the
+ * initialization is successful it returns true.
+ **/
+gboolean
+balsa_window_setup_progress(BalsaWindow* window, gfloat upper_bound)
+{
+    gint in_use;
+    GtkProgress* progress_bar;
+    GtkAdjustment* adj;
+    
+
+    progress_bar = gnome_appbar_get_progress(
+        GNOME_APPBAR(GNOME_APP(window)->statusbar));
+    in_use = GPOINTER_TO_INT(
+        gtk_object_get_data(GTK_OBJECT(progress_bar), "in_use"));
+
+    /* make sure the progress bar is currently unused */
+    if (in_use != BALSA_PROGRESS_NONE) 
+        return FALSE;
+    
+    in_use = BALSA_PROGRESS_INCREMENT;
+    gtk_object_set_data(GTK_OBJECT(progress_bar), 
+                        "in_use", 
+                        GINT_TO_POINTER(in_use));
+    
+    /* set up the adjustment */
+    gtk_progress_set_activity_mode(progress_bar, 0);
+    adj = progress_bar->adjustment;
+    adj->lower = 0;
+    adj->upper = upper_bound;
+    adj->value = 0;
+
+    return TRUE;
+}
+
+
+/* balsa_window_clear_progress
+ * 
+ * Clears the progress bar from incrementing, and makes it availble to
+ * be used by another area of the program.
+ **/
+void 
+balsa_window_clear_progress(BalsaWindow* window)
+{
+    gint in_use = 0;
+    GtkProgress* progress_bar;
+    GtkAdjustment* adj;
+
+    progress_bar = gnome_appbar_get_progress(
+        GNOME_APPBAR(GNOME_APP(window)->statusbar));
+    in_use = GPOINTER_TO_INT(
+        gtk_object_get_data(GTK_OBJECT(progress_bar), "in_use"));
+
+    /* make sure we're using it before it is cleared */
+    if (in_use != BALSA_PROGRESS_INCREMENT)
+        return;
+
+    adj = progress_bar->adjustment;
+    adj->lower = 0;
+    adj->upper = 100;
+    gtk_adjustment_set_value(adj, 0);
+    
+    in_use = BALSA_PROGRESS_NONE;
+    gtk_object_set_data(GTK_OBJECT(progress_bar), 
+                        "in_use", 
+                        GINT_TO_POINTER(in_use));
+}
+
+
+/* balsa_window_increment_progress
+ *
+ * If the progress bar has been initialized using
+ * balsa_window_setup_progress, this function increments the
+ * adjustment by one and executes any pending gtk events.  So the
+ * progress bar will be shown as updated even if called within a loop.
+ **/
+void
+balsa_window_increment_progress(BalsaWindow* window)
+{
+    gint in_use;
+    gfloat new_val;
+    GtkProgress* progress_bar;
+    GtkAdjustment* adj;
+    
+    progress_bar = gnome_appbar_get_progress(
+        GNOME_APPBAR(GNOME_APP(window)->statusbar));
+    in_use = GPOINTER_TO_INT(
+        gtk_object_get_data(GTK_OBJECT(progress_bar), "in_use"));
+
+    /* make sure the progress bar is being incremented */
+    if (in_use != BALSA_PROGRESS_INCREMENT)
+        return;
+
+    new_val = gtk_progress_get_value(progress_bar) + 1;
+    adj = progress_bar->adjustment;
+    
+    /* check for hitting the upper limit, if there pin it */
+    if (new_val > adj->upper) {
+        new_val = adj->upper;
+    }
+    gtk_adjustment_set_value(adj, new_val);
+    
+    /* run some gui events to make sure the progress bar gets drawn to
+     * screen */
+    while (gtk_events_pending()) {
+        gtk_main_iteration_do(FALSE);
+    }
+}

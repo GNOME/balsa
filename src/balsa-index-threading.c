@@ -39,6 +39,7 @@
 #include <glib.h>
 #include "balsa-index.h"
 #include "balsa-index-threading.h"
+#include "main-window.h"
 
 #define MESSAGE(node) ((LibBalsaMessage *)(GTK_CTREE_ROW(node)->row.data))
 
@@ -107,6 +108,9 @@ threading_jwz(BalsaIndex* bindex, int type)
 			 (GHFunc)find_root_set,
 			 &root_set);
 
+    balsa_window_setup_progress(BALSA_WINDOW(bindex->window), 
+                                g_slist_length(root_set)*3);
+    
     foo=root_set;
     while(foo) {
 	g_node_traverse(foo->data,
@@ -117,16 +121,19 @@ threading_jwz(BalsaIndex* bindex, int type)
 			(GNodeTraverseFunc)prune,
 			root_set);
 	foo=g_slist_next(foo);
+        balsa_window_increment_progress(BALSA_WINDOW(bindex->window));
     }
 
     subject_table = g_hash_table_new(g_str_hash, g_str_equal);
     g_slist_foreach(root_set, (GFunc)subject_gather, subject_table);
+
 
     foo = root_set;
     while(foo) {
 	if(foo->data!=NULL)
 	    subject_merge(foo->data, subject_table, root_set, &save_node);
 	foo=g_slist_next(foo);
+        balsa_window_increment_progress(BALSA_WINDOW(bindex->window));
     }
 
     foo = root_set;
@@ -139,6 +146,7 @@ threading_jwz(BalsaIndex* bindex, int type)
 			    (GNodeTraverseFunc)construct,
 			    ctree);
 	foo=g_slist_next(foo);
+        balsa_window_increment_progress(BALSA_WINDOW(bindex->window));
     }
 
     foo=save_node;
@@ -148,10 +156,12 @@ threading_jwz(BalsaIndex* bindex, int type)
 	    g_node_destroy((GNode*)(foo->data));
 	}
 	foo=g_slist_next(foo);
+        balsa_window_increment_progress(BALSA_WINDOW(bindex->window));
     }
     if(save_node!=NULL)
 	g_slist_free(save_node);
 
+    balsa_window_clear_progress(BALSA_WINDOW(bindex->window));
     g_hash_table_destroy(subject_table);
     g_hash_table_foreach(id_table, (GHFunc)free_node, NULL);
     g_hash_table_destroy(id_table);
@@ -874,6 +884,8 @@ threading_simple(BalsaIndex* bindex)
 	sibling=GTK_CTREE_ROW(sibling)->sibling;
     }
     p=root_children;
+    balsa_window_setup_progress(BALSA_WINDOW(bindex->window),
+                                g_list_length(p));
     while(p) {
 	parent=NULL;
 	message=MESSAGE(p->data);
@@ -889,7 +901,9 @@ threading_simple(BalsaIndex* bindex)
 	    }
 	}
 	p=g_list_next(p);
+        balsa_window_increment_progress(BALSA_WINDOW(bindex->window));
     }
+    balsa_window_clear_progress(BALSA_WINDOW(bindex->window));
     g_list_free(root_children);
     g_hash_table_destroy(msg_table);
 }

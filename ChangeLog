@@ -1,3 +1,14 @@
+2001-02-21  Matthew Guenther  <guentherm@asme.org>
+
+	* src/balsa-index-threading.c (threading_jwz, threading_simple):
+	use balsa window progress bar to indicate state of threading.
+	* src/main-window.[ch]: changed progress bar utilities to use
+	attached data instead of global variables, also lookup progress
+	bar relative to the window given.  Make routines to allow
+	functions to increment the progress bar as well as use it in
+	activity mode.
+
+
 2001-02-21  Carlos Morgado  <chbm@chbm.nu>
 
 	* libbalsa/mailbox_local.c: (libbalsa_mailbox_local_set_path) fix

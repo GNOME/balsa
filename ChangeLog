@@ -1,3 +1,12 @@
+2000-10-05  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox_local.[ch]: libbalsa_mailbox_local_set_path() impl.
+	* libinit_balsa/balsa-druid-page-user.gob: don't corrupt 
+	balsa_app.address
+	* src/mailbox-conf.c: use new renaming code.
+	* HACKING: the indentation settled to 4.
+	* src/balsa-mblist.c: don't highlight special mailboxes, fix #26836.
+
 2000-10-05  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* libbalsa/send.c, src/main-window.c: Call pthread_detach on new

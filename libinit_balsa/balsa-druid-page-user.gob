@@ -137,6 +137,7 @@ class Balsa:Druid:Page:User from Balsa:Druid:Page {
 		if( balsa_app.address->address_list ) {
 			g_list_foreach(balsa_app.address->address_list, (GFunc)g_free, NULL);
 			g_list_free(balsa_app.address->address_list);
+			balsa_app.address->address_list	= NULL;
 		}
 		balsa_app.address->address_list = g_list_append(balsa_app.address->address_list, 
 								g_strdup( gtk_entry_get_text( GTK_ENTRY( self->_priv->email ) ) ) );

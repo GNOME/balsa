@@ -226,18 +226,16 @@ mailbox_conf_new (LibBalsaMailbox * mailbox, gint add_mbox)
 
   g_return_if_fail ( ! (mailbox == NULL && add_mbox == FALSE) );
 
-  mcw = g_malloc (sizeof (MailboxConfWindow));
-
-  mcw->mailbox = 0;
+  mcw = g_new0 (MailboxConfWindow, 1);
 
   mcw->the_page = MC_PAGE_LOCAL;	/* default next page to LOCAL */
 
   mcw->mailbox = mailbox;
-
   mcw->add = add_mbox;
 
   mcw->window = gnome_dialog_new (_("Mailbox Configurator"), NULL);
-  gnome_dialog_set_parent (GNOME_DIALOG (mcw->window), GTK_WINDOW (balsa_app.main_window));
+  gnome_dialog_set_parent (GNOME_DIALOG (mcw->window), 
+			   GTK_WINDOW (balsa_app.main_window));
 
   gtk_signal_connect (GTK_OBJECT (mcw->window),
 		      "delete_event",
@@ -283,7 +281,6 @@ mailbox_conf_new (LibBalsaMailbox * mailbox, gint add_mbox)
     gtk_container_add (GTK_CONTAINER (bbox), mcw->ok);
     gtk_signal_connect (GTK_OBJECT (mcw->ok), "clicked",
 			GTK_SIGNAL_FUNC (next_cb), NULL);
-    
   }
   else if ( add_mbox )
   {
@@ -531,34 +528,73 @@ update_imap_mailbox(LibBalsaMailboxImap *mailbox)
   g_free(path);
 }
 
+/* conf_update_mailbox:
+   if changing path of the local mailbox in the local mail directory, just 
+   rename the file, don't insert it to the configuration.
+   FIXME: make sure that the rename breaks nothing. 
+*/
 static MailboxConfStatus
 conf_update_mailbox (LibBalsaMailbox * mailbox)
 {
   MailboxConfStatus field_check;
+  int i;
+  gboolean update_config;
 
   if (!mailbox) return MC_RET_CANCEL;
 
   field_check = check_for_blank_fields(mcw->the_page);
   if(field_check != MC_RET_OK) return field_check;
+  update_config = mailbox->config_prefix != NULL;
   
   if ( LIBBALSA_IS_MAILBOX_LOCAL (mailbox) )
   {
-    gchar *filename;
+    gchar *filename, *name;
     
     filename =
       gtk_entry_get_text (GTK_ENTRY ((mcw->local_mailbox_path)));
+    /* rename */
+    if((i=libbalsa_mailbox_local_set_path(
+      LIBBALSA_MAILBOX_LOCAL (mailbox), filename)) != 0) {
+      balsa_information(LIBBALSA_INFORMATION_WARNING,
+			_("Rename of %s to %s failed:\n%s"),
+			LIBBALSA_MAILBOX_LOCAL (mailbox)->path,
+			filename,
+			strerror(i));
+      return MC_RET_CANCEL;
+    }
+    /* update mailbox data */
+    update_config =  balsa_app.local_mail_directory == NULL
+      || strncmp(balsa_app.local_mail_directory, filename,
+		 strlen(balsa_app.local_mail_directory)) != 0;
+    /* change mailbox name */
+    if(update_config)
+      name = gtk_entry_get_text (GTK_ENTRY (mcw->local_mailbox_name));
+    else {
+      if(strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->local_mailbox_name)),
+		mailbox->name) != 0) {
+      balsa_information(LIBBALSA_INFORMATION_WARNING,
+			_("This is a mailbox in your local directory.\n"
+			  "Change the path instead."));
+      return MC_RET_RETRY;
+      } else {
+	gchar * ptr = strrchr(filename,'/');
+	name = ptr ? ptr+1: filename;
+      }
+    }
     g_free (mailbox->name);
-    g_free (LIBBALSA_MAILBOX_LOCAL (mailbox)->path);
-    mailbox->name = g_strdup (
-      gtk_entry_get_text (GTK_ENTRY (mcw->local_mailbox_name)));
-    LIBBALSA_MAILBOX_LOCAL (mailbox)->path = g_strdup (filename);
+    mailbox->name = g_strdup(name);
   }
   else if ( LIBBALSA_IS_MAILBOX_POP3 (mailbox) ) 
     update_pop_mailbox(LIBBALSA_MAILBOX_POP3(mailbox));    
   else if ( LIBBALSA_IS_MAILBOX_IMAP (mailbox) )
     update_imap_mailbox(LIBBALSA_MAILBOX_IMAP(mailbox));
 
-  config_mailbox_update (mailbox);
+  if(balsa_app.debug) 
+    g_print("Updating configuration data: %s\n", update_config ? "yes":"no");
+
+  if(update_config)
+    config_mailbox_update (mailbox);
+
   return MC_RET_OK;
 }
 

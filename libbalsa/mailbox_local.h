@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -37,24 +37,26 @@ typedef struct _LibBalsaMailboxLocalClass LibBalsaMailboxLocalClass;
 
 enum _LibBalsaMailboxLocalType 
 {
-	LIBBALSA_MAILBOX_LOCAL_MH,
-	LIBBALSA_MAILBOX_LOCAL_MBOX,
-	LIBBALSA_MAILBOX_LOCAL_MAILDIR
+    LIBBALSA_MAILBOX_LOCAL_MH,
+    LIBBALSA_MAILBOX_LOCAL_MBOX,
+    LIBBALSA_MAILBOX_LOCAL_MAILDIR
 };
 
 struct _LibBalsaMailboxLocal
 {
-	LibBalsaMailbox mailbox;
-	LibBalsaMailboxLocalType type;
-
-	gchar *path;
+    LibBalsaMailbox mailbox;
+    LibBalsaMailboxLocalType type;
+    
+    gchar *path;
 };
 
 struct _LibBalsaMailboxLocalClass
 {
-	LibBalsaMailboxClass klass;
+    LibBalsaMailboxClass klass;
 };
 
 GtkObject* libbalsa_mailbox_local_new(const gchar *path, gboolean create);
+gint libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal *mailbox, const gchar *path);
+
 
 #endif /* __LIBBALSA_MAILBOX_LOCAL_H__ */

@@ -22,9 +22,9 @@ Source files
 ------------
 
 All files should have a magic emacs mode line at the top (note older
-files will have c-basic-offset as 2):
+files will have c-basic-offset as 2 or 8):
 
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:bsd; c-basic-offset:4; -*- */
 
 following this a GPL copyright header. Copyright should be attributed as:
 

@@ -83,6 +83,9 @@ extern struct BalsaApplication
 
     gboolean previewpane;
     gboolean debug;
+
+  /* arp --- string to prefix "replied to" messages. */
+  gchar *leadin_str;
   }
 balsa_app;
 

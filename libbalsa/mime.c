@@ -38,7 +38,8 @@ static gchar tmp_file_name[PATH_MAX + 1];
 
 
 GString *
-content2reply (Message * message)
+content2reply (Message * message,
+	       gchar *reply_prefix_str)    /* arp */
 {
   GList *body_list;
   Body *body;
@@ -94,7 +95,7 @@ content2reply (Message * message)
 		fseek (msg_stream, body->mutt_body->offset, 0);
 		s.fpin = msg_stream;
 		mutt_mktemp (tmp_file_name);
-		s.prefix = "> ";
+		s.prefix = reply_prefix_str; /* arp */
 		s.fpout = fopen (tmp_file_name, "w+");
 		mutt_decode_attachment (body->mutt_body, &s);
 		fflush (s.fpout);

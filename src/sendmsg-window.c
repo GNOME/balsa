@@ -683,7 +683,7 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 
 	  g_string_free (str, TRUE);
 
-	  rbdy = content2reply (message);
+	  rbdy = content2reply (message, balsa_app.leadin_str);	/* arp */
 	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, rbdy->str, strlen (rbdy->str));
 	  g_string_free (rbdy, TRUE);
 	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "\n\n", 2);

@@ -41,6 +41,9 @@ typedef struct _PropertyUI
 
     GtkWidget *previewpane;
     GtkWidget *debug;		/* enable/disable debugging */
+
+    /* arp */
+    GtkWidget *leadin_str;
   }
 PropertyUI;
 
@@ -191,8 +194,14 @@ open_preferences_manager (void)
 		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
   gtk_signal_connect (GTK_OBJECT (pui->signature), "changed",
 		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
-  /* set data and show the whole thing */
 
+
+  /* arp */
+  gtk_signal_connect (GTK_OBJECT (pui->leadin_str), "changed",
+		      GTK_SIGNAL_FUNC (properties_modified_cb), 
+		      pui->pbox);
+
+  /* set data and show the whole thing */
   gtk_widget_show_all (GTK_WIDGET (pui->pbox));
 }
 
@@ -249,6 +258,12 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
   balsa_app.debug = GTK_TOGGLE_BUTTON (pui->debug)->active;
   balsa_app.previewpane = GTK_TOGGLE_BUTTON (pui->previewpane)->active;
 
+  /* arp */
+  g_free (balsa_app.leadin_str);
+  balsa_app.leadin_str = 
+    g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->leadin_str)));
+
+
   refresh_main_window ();
 
   /*
@@ -292,6 +307,9 @@ set_prefs (void)
 
   gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (pui->previewpane), balsa_app.previewpane);
   gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (pui->debug), balsa_app.debug);
+
+  /* arp */
+  gtk_entry_set_text (GTK_ENTRY (pui->leadin_str), balsa_app.leadin_str);
 }
 
 void
@@ -530,15 +548,41 @@ create_misc_page ()
   GtkWidget *vbox;
   GtkWidget *frame;
 
+  /* arp */
+  GtkWidget *vbox1;
+  GtkWidget *table;
+  GtkWidget *label;
+
+
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_container_border_width (GTK_CONTAINER (vbox), 10);
 
-/* Misc */
+  /* Misc */
   frame = gtk_frame_new ("Misc");
   gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
 
+  /* arp */
+  vbox1 = gtk_vbox_new (FALSE, 0);
+  gtk_container_add (GTK_CONTAINER (frame), GTK_WIDGET (vbox1));
+
   pui->debug = gtk_check_button_new_with_label (_ ("Debug"));
-  gtk_container_add (GTK_CONTAINER (frame), GTK_WIDGET (pui->debug));
+  gtk_box_pack_start (GTK_BOX (vbox1), GTK_WIDGET (pui->debug), TRUE, TRUE, 2);
+
+
+  /* arp --- table containing leadin label and string. */
+  table = gtk_table_new (1, 2, FALSE);
+
+  label = gtk_label_new (_ ("Reply prefix:"));
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
+		    GTK_FILL, GTK_FILL, 10, 10);
+
+  pui->leadin_str = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), pui->leadin_str, 1, 2, 0, 1,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
+
+  gtk_box_pack_start (GTK_BOX (vbox1), GTK_WIDGET (table), TRUE, TRUE, 2);
+
 
   return vbox;
 }

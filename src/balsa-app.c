@@ -114,6 +114,9 @@ balsa_app_init (void)
   balsa_app.mw_height = MW_DEFAULT_HEIGHT;
   balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
   balsa_app.mdi_style = GNOME_MDI_DEFAULT_MODE;
+
+  /* arp */
+  balsa_app.leadin_str = NULL;
 }
 
 gint

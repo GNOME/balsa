@@ -21,7 +21,7 @@
 
 #include <gnome.h>
 
-
+#include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -82,6 +82,7 @@ static GtkWidget *create_welcome_page (void);
 static GtkWidget *create_general_page (void);
 static GtkWidget *create_mailboxes_page (void);
 
+static int make_parents (gchar *filename);
 static void create_mailbox_if_not_present (gchar * filename);
 
 /*
@@ -380,6 +381,46 @@ delete_init_window (GtkWidget * widget, gpointer data)
   return FALSE;
 }
 
+/* arp
+ * We need to check whether the parent directories also exist. If not, they
+ * need to be made too. We first try to create the mailbox if it doesn't
+ * exist. If that fails, we check how much of the path is missing and
+ * create the missing bits before trying to make the mailbox again.
+ *
+ * Return 0 if all missing parents were created, else !0.
+ */
+static int
+make_parents (gchar *filename)
+{
+  /* "Grow" the path from left-to-right checking if it exists.
+   * If this fails, we need to create the missing dir and continue.
+   */
+  gchar *sep_pos;
+  gchar *path = g_strdup (filename);
+  if (!path)
+    return 1;
+  
+  sep_pos = path + 1;
+  while (*sep_pos)
+    {
+      if (*sep_pos == '/')	/* TODO: use a 'portable' path seperator. */
+	{
+	  *sep_pos = '\0';
+	  if (mkdir (path, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) && 
+	      (errno != EEXIST && errno != EACCES)) /* Oh-oh! */
+	    return 1;
+
+	  *sep_pos = '/';
+	}
+
+      sep_pos++;
+    }
+
+  free (path);
+  return 0;
+}
+
+
 /* Check to see if the specified file exists; if it doesn't, try to
    create it */
 static void
@@ -400,7 +441,13 @@ create_mailbox_if_not_present (gchar * filename)
   g_free (dir);
 
   if (stat (filename, &st) != 0)
-    creat (filename, S_IRUSR | S_IWUSR);
+    if ((creat (filename, S_IRUSR | S_IWUSR) == -1) && 
+	(errno == ENOENT))
+      {
+	/* Make the as much of the path as required. */
+	if (make_parents (filename) == 0)
+	  creat (filename, S_IRUSR | S_IWUSR);
+      }
 }				/* create_mailbox_if_not_present */
 
 static void

@@ -23,6 +23,8 @@
 
 #include "config.h"
 
+#include <assert.h>
+
 #include <gnome.h>
 #include <proplist.h>
 #include <sys/types.h>
@@ -50,6 +52,12 @@ rot (gchar * pass)
   gint len = 0, i = 0;
   len = strlen (pass);
   buff = g_strdup (pass);
+
+
+  assert (pass != NULL);
+  assert (buff != NULL);	/* TODO: using assert for this case is wrong!
+				 * The error should be handled gracefully.
+				 */
 
   for (i = 0; i < len; i++)
     {
@@ -162,7 +170,7 @@ gint
 config_mailbox_add (Mailbox * mailbox, char *key_arg)
 {
   proplist_t mbox_dict, accounts, temp_str;
-  char key[32];
+  char key[MAX_PROPLIST_KEY_LEN];
 
   /* Initialize the key in case it is accidentally used uninitialized */
   strcpy (key, "AnErrorOccurred");
@@ -235,7 +243,7 @@ config_mailbox_add (Mailbox * mailbox, char *key_arg)
 
       /* Add the Port entry */
       {
-	char tmp[32];
+	char tmp[MAX_PROPLIST_KEY_LEN];
 	snprintf (tmp, sizeof (tmp), "%d", MAILBOX_IMAP (mailbox)->port);
 	pl_dict_add_str_str (mbox_dict, "Port", tmp);
       }
@@ -357,17 +365,24 @@ gint
 config_mailbox_update (Mailbox * mailbox, gchar * old_mbox_name)
 {
   proplist_t mbox, mbox_key;
-  gchar *key;
+  gchar key[MAX_PROPLIST_KEY_LEN];
+
 
   mbox = config_mailbox_get_by_name (old_mbox_name);
   mbox_key = config_mailbox_get_key (mbox);
+
   if (mbox_key == NULL)
-    key = "generic";
+    {
+      strcpy (key, "generic");
+    }
   else
-    key = PLGetString (mbox_key);
+    {
+      strcpy (key, PLGetString (mbox_key));
+    }
 
   config_mailbox_delete (old_mbox_name);
   config_mailbox_add (mailbox, key);
+
 
   return config_save (BALSA_CONFIG_FILE);
 }				/* config_mailbox_update */
@@ -653,6 +668,12 @@ config_global_load (void)
   else
     balsa_app.mblist_height = atoi (field);
 
+  /* arp --- LeadinStr for "reply to" leadin. */
+  if ((field = pl_dict_get_str (globals, "LeadinStr")) == NULL)
+    balsa_app.leadin_str = g_strdup ("> ");
+  else
+    balsa_app.leadin_str = g_strdup (field);
+
   return TRUE;
 }				/* config_global_load */
 
@@ -690,8 +711,9 @@ config_global_save (void)
     pl_dict_add_str_str (globals, "SignaturePath",
 			 balsa_app.signature_path);
 
+
   {
-    char tmp[32];
+    char tmp[MAX_PROPLIST_KEY_LEN];
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.toolbar_style);
     pl_dict_add_str_str (globals, "ToolbarStyle", tmp);
 
@@ -716,6 +738,14 @@ config_global_save (void)
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.mblist_height);
     pl_dict_add_str_str (globals, "MailboxListHeight", tmp);
   }
+
+
+  /* arp --- "LeadinStr" into cfg. */
+  if (balsa_app.leadin_str != NULL)
+    pl_dict_add_str_str (globals, "LeadinStr", balsa_app.leadin_str);
+  else
+    pl_dict_add_str_str (globals, "LeadinStr", "> ");
+
 
   /* Add it to configuration file */
   temp_str = PLMakeString ("Globals");

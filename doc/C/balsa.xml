@@ -50,8 +50,8 @@ General advices:
 * Use entities to make the source more readable.
 -->
 
-<article>
-
+<article id="index" lang="en"> 
+<articleinfo>
 <title>Balsa User's Guide</title>
 
 <copyright>
@@ -88,35 +88,7 @@ General advices:
   <para> Macintosh and Apple are trademarks of Apple Computer, Inc.</para>
   <para> All other trademarks are property of their respective owners.</para>
 </legalnotice>
-
-<releaseinfo> 
-This is version 2.718 of the Balsa manual.
-</releaseinfo>
-
-<pubdate>6 Nov 2001</pubdate>
-
-<abstract>
-
-<para>
-  &Balsa; is a graphical mail client. While it is in active
-  development, &Balsa; has many features such as: &IMAP; and
-  &POP3; support;
-  sendmail or direct &SMTP; support;
-  optional multi-threaded retrieval and sending of messages; support
-  for all configurations of local mail folders; automatic mail
-  checking; mail printing; inline attachment viewing; and the
-  proverbial much, much more.
-</para>
-
-<para>
-  This document will introduce a person who understands mail to using
-  &Balsa;. However, it will not explain email
-  to a confused individual. If you're looking for that, try asking a
-  friend or visiting the <ulink
-  url="http://www.cs.queensu.ca/FAQs/email/" type="http">Email
-  FAQ</ulink>.
-</para>
-</abstract>
+  </articleinfo> 
 
 <!-- ################################################################# -->
 <!--                   GENERAL STUFF                                   -->

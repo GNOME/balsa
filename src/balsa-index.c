@@ -442,8 +442,6 @@ balsa_index_delete_message (BalsaIndex * bindex)
 
   sprintf (tmp, "%ld", row + 1);
   mail_setflag (bindex->stream, tmp, "\\DELETED");
-  gtk_clist_select_row (clist, row + 1, -1);
-  gtk_clist_moveto (clist, row + 1, 0, 0.5, 0.0);
 }
 
 void
@@ -464,8 +462,6 @@ balsa_index_undelete_message (BalsaIndex * bindex)
 
   sprintf (tmp, "%ld", row + 1);
   mail_clearflag (bindex->stream, tmp, "\\DELETED");
-  gtk_clist_select_row (clist, row + 1, -1);
-  gtk_clist_moveto (clist, row + 1, 0, 0.5, 0.0);
 }
 
 static void

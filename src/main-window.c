@@ -776,6 +776,8 @@ delete_message_cb (GtkWidget * widget)
   mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
 
   balsa_index_delete_message (BALSA_INDEX (mainwindow->index));
+
+  balsa_index_select_next (BALSA_INDEX (mainwindow->index));
 }
 
 
@@ -789,6 +791,8 @@ undelete_message_cb (GtkWidget * widget)
   mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
 
   balsa_index_undelete_message (BALSA_INDEX (mainwindow->index));
+
+  balsa_index_select_next (BALSA_INDEX (mainwindow->index));
 }
 
 

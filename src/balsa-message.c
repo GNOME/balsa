@@ -2082,14 +2082,14 @@ handle_mdn_request(LibBalsaMessage *message)
 	found = FALSE;
 	while (list && !found) {
 	    addr = list->data;
-	    found = rfc2298_address_equal (balsa_app.address, addr);
+	    found = rfc2298_address_equal (balsa_app.current_ident->address, addr);
 	    list = list->next;
 	}
 	if (!found) {
 	    list = g_list_first(message->cc_list);
 	    while (list && !found) {
 		addr = list->data;
-		found = rfc2298_address_equal (balsa_app.address, addr);
+		found = rfc2298_address_equal (balsa_app.current_ident->address, addr);
 		list = list->next;
 	    }
 	}
@@ -2143,7 +2143,7 @@ static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
     /* create a message with the header set from the incoming message */
     libbalsa_set_charset("ISO-8859-1");  /* how do I detect the *standard* setting? */
     message = libbalsa_message_new();
-    dummy = libbalsa_address_to_gchar(balsa_app.address, 0);
+    dummy = libbalsa_address_to_gchar(balsa_app.current_ident->address, 0);
     message->from = libbalsa_address_new_from_string(dummy);
     g_free (dummy);
     message->subject = g_strdup("Message Disposition Notification");
@@ -2168,7 +2168,7 @@ static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
     
     /* the second part is a rfc2298 compliant message/disposition-notification */
     body = libbalsa_message_body_new(message);
-    dummy = libbalsa_address_to_gchar(balsa_app.address, -1);
+    dummy = libbalsa_address_to_gchar(balsa_app.current_ident->address, -1);
     body->buffer = g_strdup_printf("Reporting-UA: %s;" PACKAGE " " VERSION "\n"
 				   "Final-Recipient: rfc822;%s\n"
 				   "Original-Message-ID: %s\n"

@@ -24,11 +24,11 @@
 
 #include <gnome.h>
 #include "libbalsa.h"
+#include "identity.h"
 #include "balsa-index.h"
 #include "balsa-mblist.h"
 #include "main-window.h"
 #include "information-dialog.h"
-#include "balsa-identity.h"
 
 #if ENABLE_ESMTP
 #include <auth-client.h>		/* part of libESMTP */
@@ -36,8 +36,8 @@
 
 /* Work around nonprivileged installs so we can find icons */
 #ifdef BALSA_LOCAL_INSTALL
-#define gnome_pixmap_file( s ) g_strdup( g_strconcat( BALSA_RESOURCE_PREFIX, "/pixmaps/", s, NULL ) )
-#define gnome_unconditional_pixmap_file( s ) g_strdup( g_strconcat( BALSA_RESOURCE_PREFIX, "/pixmaps", s, NULL ) )
+#define gnome_pixmap_file( s ) g_strconcat( BALSA_RESOURCE_PREFIX, "/pixmaps/", s, NULL ) 
+#define gnome_unconditional_pixmap_file( s ) g_strconcat( BALSA_RESOURCE_PREFIX, "/pixmaps", s, NULL ) 
 #endif
 
 /* global definitions */
@@ -149,15 +149,8 @@ enum _BalsaMDNReply {
 /* global balsa application structure */
 extern struct BalsaApplication {
     /* personal information */
-    LibBalsaAddress *address;
-    gchar *replyto;
-    gchar *domain;
-    gchar *bcc;
-    gchar *reply_string;
-    gchar *forward_string;
-
     GList* identities;
-    BalsaIdentity* current_ident;
+    LibBalsaIdentity* current_ident;
 
     gchar *local_mail_directory;
 #if ENABLE_ESMTP
@@ -166,14 +159,6 @@ extern struct BalsaApplication {
     gchar *smtp_passphrase;
     auth_context_t smtp_authctx;
 #endif
-
-    /* signature stuff */
-    gboolean sig_sending;
-    gboolean sig_whenforward;
-    gboolean sig_whenreply;
-    gboolean sig_separator;
-    gboolean sig_prepend;
-    gchar *signature_path;
 
     BalsaWindow *main_window;
     BalsaMBList *mblist;

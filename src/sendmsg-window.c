@@ -111,7 +111,7 @@ static void address_book_cb(GtkWidget *widget, BalsaSendmsg *smd_msg_wind);
 static gint set_locale(GtkWidget *, BalsaSendmsg *, gint);
 
 static void change_identity_dialog_cb(GtkWidget*, BalsaSendmsg*);
-static void update_msg_identity(BalsaSendmsg*, BalsaIdentity*);
+static void update_msg_identity(BalsaSendmsg*, LibBalsaIdentity*);
 
 static void sw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
 
@@ -603,16 +603,14 @@ fill_language_menu()
 static void 
 change_identity_dialog_cb(GtkWidget* widget, BalsaSendmsg* msg)
 {
-    BalsaIdentity* ident;
+    LibBalsaIdentity* ident;
 
-
-    ident = balsa_identity_select_dialog(_("Select Identity"));
-
-    if (ident == NULL) {
-        return;
-    }
-        
-    update_msg_identity(msg, ident);
+    ident = libbalsa_identity_select_dialog(GTK_WINDOW(msg->window),
+					    _("Select Identity"),
+					    &balsa_app.identities,
+					    &balsa_app.current_ident);
+    if (ident != NULL)        
+	update_msg_identity(msg, ident);
 }
 
 /*
@@ -622,7 +620,7 @@ change_identity_dialog_cb(GtkWidget* widget, BalsaSendmsg* msg)
 
 
 static void
-update_msg_identity(BalsaSendmsg* msg, BalsaIdentity* ident)
+update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
 {
     gchar* tmpstr;
     
@@ -1030,7 +1028,7 @@ create_email_entry(GtkWidget * table, const gchar * label, int y_pos,
     libbalsa_address_entry_set_find_match(LIBBALSA_ADDRESS_ENTRY(arr[1]),
 		       expand_alias_find_match);
     libbalsa_address_entry_set_domain(LIBBALSA_ADDRESS_ENTRY(arr[1]),
-		       balsa_app.domain);
+		       balsa_app.current_ident->domain);
 }
 
 
@@ -1293,11 +1291,11 @@ fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 
     if ((signature = read_signature()) != NULL) {
 	if (((type == SEND_REPLY || type == SEND_REPLY_ALL || type == SEND_REPLY_GROUP) &&
-	     balsa_app.sig_whenreply) ||
-	    ((type == SEND_FORWARD) && balsa_app.sig_whenforward) ||
-	    ((type == SEND_NORMAL) && balsa_app.sig_sending)) {
+	     balsa_app.current_ident->sig_whenreply) ||
+	    (type == SEND_FORWARD && balsa_app.current_ident->sig_whenforward) ||
+	    (type == SEND_NORMAL && balsa_app.current_ident->sig_sending)) {
 
-	    if (balsa_app.sig_separator
+	    if (balsa_app.current_ident->sig_separator
 		&& g_strncasecmp(signature, "--\n", 3)
 		&& g_strncasecmp(signature, "-- \n", 4)) {
 		gchar * tmp = g_strconcat("-- \n", signature, NULL);
@@ -1305,7 +1303,7 @@ fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 		signature = tmp;
 	    }
 
-	    if (balsa_app.sig_prepend && type != SEND_NORMAL) {
+	    if (balsa_app.current_ident->sig_prepend && type != SEND_NORMAL) {
 	    	body = g_string_prepend(body, "\n\n");
 	    	body = g_string_prepend(body, signature);
 	    } else {
@@ -1324,22 +1322,22 @@ fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 
 static gint insert_signature_cb(GtkWidget *widget, BalsaSendmsg *msg)
 {
-	gchar *signature;
-	gint pos=gtk_editable_get_position(GTK_EDITABLE(msg->text));
+    gchar *signature;
+    gint pos=gtk_editable_get_position(GTK_EDITABLE(msg->text));
+    
+    if ((signature = read_signature()) != NULL) {
+	if (balsa_app.current_ident->sig_separator
+	    && g_strncasecmp(signature, "--\n", 3)
+	    && g_strncasecmp(signature, "-- \n", 4)) {
+	    gchar * tmp = g_strconcat("-- \n", signature, NULL);
+	    g_free(signature);
+	    signature = tmp;
+	}
 	
-	if ((signature = read_signature()) != NULL) {
-	    if (balsa_app.sig_separator
-		&& g_strncasecmp(signature, "--\n", 3)
-		&& g_strncasecmp(signature, "-- \n", 4)) {
-		gchar * tmp = g_strconcat("-- \n", signature, NULL);
-		g_free(signature);
-		signature = tmp;
-	    }
-
-		gtk_editable_insert_text(GTK_EDITABLE(msg->text), signature, strlen(signature),
-				     &pos);
-
-		g_free(signature);
+	gtk_editable_insert_text(GTK_EDITABLE(msg->text), signature, 
+				 strlen(signature), &pos);
+	
+	g_free(signature);
     }
     
     return TRUE;
@@ -1432,6 +1430,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	if (i != MENU_FILE_SEPARATOR1_POS && i != MENU_FILE_SEPARATOR2_POS)
 	    list = g_list_append(list, (gpointer) file_menu[i].widget);
     }
+
     for(i=0; i<ELEMENTS(main_toolbar_spell_disable); i++)
 	list = g_list_prepend(
 	    list, main_toolbar[main_toolbar_spell_disable[i]].widget);
@@ -1480,20 +1479,23 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     /* From: */
     {
         gchar *from;
-	from = g_strdup_printf("%s <%s>", balsa_app.address->full_name,
-		 	       (gchar *) balsa_app.address->
+	from = g_strdup_printf("%s <%s>", 
+			       balsa_app.current_ident->address->full_name,
+		 	       (gchar *) balsa_app.current_ident->address->
                                address_list->data);
 	gtk_entry_set_text(GTK_ENTRY(msg->from[1]), from); 
 	g_free(from); 
     } 
     
     /* Reply To */
-    if (balsa_app.replyto)
-	gtk_entry_set_text(GTK_ENTRY(msg->reply_to[1]), balsa_app.replyto);
+    if (balsa_app.current_ident->replyto)
+	gtk_entry_set_text(GTK_ENTRY(msg->reply_to[1]), 
+			   balsa_app.current_ident->replyto);
     
     /* Bcc: */
-    if (balsa_app.bcc)
-	gtk_entry_set_text(GTK_ENTRY(msg->bcc[1]), balsa_app.bcc);
+    if (balsa_app.current_ident->bcc)
+	gtk_entry_set_text(GTK_ENTRY(msg->bcc[1]), 
+			   balsa_app.current_ident->bcc);
 
     /* Fcc: */
     if (type == SEND_CONTINUE && message->fcc_mailbox != NULL)
@@ -1506,7 +1508,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     case SEND_REPLY_ALL:
     case SEND_REPLY_GROUP:
 	if (!message->subject) {
-	    newsubject = g_strdup(balsa_app.reply_string);
+	    newsubject = g_strdup(balsa_app.current_ident->reply_string);
 	    break;
 	}
 
@@ -1516,13 +1518,16 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	} else if (g_strncasecmp(tmp, _("Re:"), strlen(_("Re:"))) == 0) {
 	    tmp += strlen(_("Re:"));
 	} else {
-	    i = strlen(balsa_app.reply_string);
-	    if (g_strncasecmp(tmp, balsa_app.reply_string, i) == 0) {
+	    i = strlen(balsa_app.current_ident->reply_string);
+	    if (g_strncasecmp(tmp, balsa_app.current_ident->reply_string, i)
+		== 0) {
 		tmp += i;
 	    }
 	}
 	while( *tmp && isspace(*tmp) ) tmp++;
-	newsubject = g_strdup_printf("%s %s", balsa_app.reply_string, tmp);
+	newsubject = g_strdup_printf("%s %s", 
+				     balsa_app.current_ident->reply_string, 
+				     tmp);
 	g_strchomp(newsubject);
 	break;
 
@@ -1530,11 +1535,11 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	if (!message->subject) {
 	    if (message->from && message->from->address_list)
 		newsubject = g_strdup_printf("%s from %s",
-					     balsa_app.forward_string,
+					     balsa_app.current_ident->forward_string,
 					     (gchar *) message->
 					     from->address_list->data);
 	    else
-		newsubject = g_strdup(balsa_app.forward_string);
+		newsubject = g_strdup(balsa_app.current_ident->forward_string);
 	} else {
 	    tmp = message->subject;
 	    if (g_strncasecmp(tmp, "fwd:", 4) == 0) {
@@ -1542,19 +1547,24 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	    } else if (g_strncasecmp(tmp, _("Fwd:"), strlen(_("Fwd:"))) == 0) {
 		tmp += strlen(_("Fwd:"));
 	    } else {
-		i = strlen(balsa_app.forward_string);
-		if (g_strncasecmp(tmp, balsa_app.forward_string, i) == 0) {
+		i = strlen(balsa_app.current_ident->forward_string);
+		if (g_strncasecmp(tmp, balsa_app.current_ident->forward_string, i) == 0) {
 		    tmp += i;
 		}
 	    }
 	    while( *tmp && isspace(*tmp) ) tmp++;
 	    if (message->from && message->from->address_list)
-		newsubject = g_strdup_printf("%s %s [%s]",
-					     balsa_app.forward_string, tmp,
-					     (gchar *) message->
-					     from->address_list->data);
+		newsubject = 
+		    g_strdup_printf("%s %s [%s]",
+				    balsa_app.current_ident->forward_string, 
+				    tmp,
+				    (gchar *) message->
+				    from->address_list->data);
 	    else {
-		newsubject = g_strdup_printf("%s %s", balsa_app.forward_string, tmp);
+		newsubject = 
+		    g_strdup_printf("%s %s", 
+				    balsa_app.current_ident->forward_string, 
+				    tmp);
 		g_strchomp(newsubject);
 	    }
 	}
@@ -1685,10 +1695,11 @@ read_signature(void)
     gint siglen;
     gchar *ret, *p, *sigpath;
 
-    if (balsa_app.signature_path == NULL)
+    if (balsa_app.current_ident->signature_path == NULL)
 	return NULL;
 
-    for (p = balsa_app.signature_path; *p != '|' && *p != '\0'; p++);
+    for (p = balsa_app.current_ident->signature_path; 
+	 *p != '|' && *p != '\0'; p++);
     /* Signature is a path to a program */
     if (*p == '|') {
 	p++;
@@ -1707,7 +1718,7 @@ read_signature(void)
     }
     /* Signature is just a regular file. */
     else {
-	if (!(fp = fopen(balsa_app.signature_path, "r")))
+	if (!(fp = fopen(balsa_app.current_ident->signature_path, "r")))
 	    return NULL;
 	len = libbalsa_readfile_nostat(fp, &ret);
 	fclose(fp);
@@ -1872,7 +1883,7 @@ bsmsg2message(BalsaSendmsg * bsmsg, gboolean dup_filenames)
 	message->reply_to = libbalsa_address_new_from_string(tmp);
 
     if (balsa_app.req_dispnotify)
-	libbalsa_message_set_dispnotify(message, balsa_app.address);
+	libbalsa_message_set_dispnotify(message, balsa_app.current_ident->address);
 
     if (bsmsg->orig_message != NULL &&
 	!GTK_OBJECT_DESTROYED(bsmsg->orig_message)) {

@@ -27,7 +27,6 @@ typedef struct _LibBalsaMailbox LibBalsaMailbox;
 typedef struct _LibBalsaMailboxRemote LibBalsaMailboxRemote;
 typedef struct _LibBalsaMessage LibBalsaMessage;
 typedef struct _LibBalsaMessageBody LibBalsaMessageBody;
-typedef struct _ImapDir ImapDir;
 typedef struct _LibBalsaServer LibBalsaServer;
 
 /* Opaque structures */

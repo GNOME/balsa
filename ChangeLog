@@ -1,5 +1,23 @@
 2001-07-11  Pawel Salek  <pawsa@theochem.kth.se>
 
+	Make Identity a clean(?) libbalsa object.
+	* libbalsa/identity.[hc]: new location.
+	* libbalsa/Makefile.am:
+	* src/Makefile.am: updated to reflect new location.
+	* libinit_balsa/balsa-druid-page-user.gob: 
+	BalsaIdentity->LibBalsaIdentity
+	* src/balsa-app.[hc]: remove fields that have been moved to the
+	identity object(s).
+	* src/balsa-index-threading.c: update accordingly.
+	* src/balsa-message.c, src/main-window.c, src/sendmsg-window.c:
+	the same.
+	* src/save-restore.[hc]: make the identity itself responsible for
+	saving.
+	
+	* libbalsa/libbalsa.h: remove some garbage.
+	
+2001-07-11  Pawel Salek  <pawsa@theochem.kth.se>
+
 	* src/sendmsg-window.c: fix widget disabling when check-spelling. 
 	
 	Peter Bloomfield's <bloomfld@eos.ncsu.edu> patch for

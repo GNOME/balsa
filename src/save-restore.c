@@ -30,6 +30,7 @@
 #define FOLDER_SECTION_PREFIX "folder-"
 #define MAILBOX_SECTION_PREFIX "mailbox-"
 #define ADDRESS_BOOK_SECTION_PREFIX "address-book-"
+#define IDENTITY_SECTION_PREFIX "identity-"
 
 static gint config_section_init(const char* section_prefix, 
 				gint (*cb)(const char*));
@@ -44,7 +45,6 @@ static void load_color(gchar * key, GdkColor * color);
 
 static void config_address_books_load(void);
 static void config_address_books_save(void);
-
 static void config_identities_load(void);
 
 #define folder_section_path(mn) \
@@ -898,219 +898,87 @@ static void
 config_address_books_save(void)
 {
     GList *list;
-    LibBalsaAddressBook *ab;
 
-    list = balsa_app.address_book_list;
-    while (list) {
-	ab = LIBBALSA_ADDRESS_BOOK(list->data);
-
-	config_address_book_save(ab);
-	list = g_list_next(list);
-
-    }
-}
-
-
-static void
-config_identity_load(const gchar* ident_name)
-{
-    BalsaIdentity* ident;
-    BalsaIdentity* tmp_ident;
-    BalsaIdentity* loaded_ident = NULL;
-    LibBalsaAddress* ad;
-    GList* list;
-    gchar* tmpstr;
-    gchar* prefix;
-
-    
-    g_return_if_fail(ident_name != NULL);
-    list = balsa_app.identities;
-
-    while (list != NULL) {
-        tmp_ident = BALSA_IDENTITY(list->data);
-        
-        if (g_strcasecmp(ident_name, tmp_ident->identity_name) == 0) {
-            loaded_ident = tmp_ident;
-            break;
-        }
-            
-        list = g_list_next(list);
-    }
-
-    prefix = g_strconcat(BALSA_CONFIG_PREFIX, "identity-", 
-                         ident_name, "/", NULL);
-    gnome_config_push_prefix(prefix);
-
-    ident = BALSA_IDENTITY(balsa_identity_new_with_name(ident_name));
-    ident->address->full_name = gnome_config_get_string("FullName");
-    ident->address->address_list = 
-        g_list_append(ident->address->address_list, 
-                      gnome_config_get_string("Address"));
-    ident->replyto = gnome_config_get_string("ReplyTo");
-    ident->domain = gnome_config_get_string("Domain");
-    ident->bcc = gnome_config_get_string("Bcc");
-
-    /* 
-     * these two have defaults, so we need to use the appropriate
-     * functions to manage the memory. 
-     */
-    if ((tmpstr = gnome_config_get_string("ReplyString"))) {
-        balsa_identity_set_reply_string(ident, tmpstr);
-        g_free(tmpstr);
-    }
-    
-    if ((tmpstr = gnome_config_get_string("ForwardString"))) {
-        balsa_identity_set_forward_string(ident, tmpstr);
-        g_free(tmpstr);
-    }
-    
-    ident->signature_path = gnome_config_get_string("SignaturePath");
-
-    ident->sig_sending = gnome_config_get_bool("SigSending");
-    ident->sig_whenforward = gnome_config_get_bool("SigForward");
-    ident->sig_whenreply = gnome_config_get_bool("SigReply");
-    ident->sig_separator = gnome_config_get_bool("SigSeparator");
-    ident->sig_prepend = gnome_config_get_bool("SigPrepend");
-    gnome_config_pop_prefix();
-    g_free(prefix);
-
-    if (loaded_ident != NULL) {
-        ad = libbalsa_address_new();
-        ad->full_name = g_strdup(ident->address->full_name);
-        ad->address_list = g_list_append(ad->address_list,
-                                         g_strdup(ident->address->address_list->data));
-        balsa_identity_set_address(loaded_ident, ad);
-        balsa_identity_set_replyto(loaded_ident, ident->replyto);
-        balsa_identity_set_domain(loaded_ident, ident->domain);
-        balsa_identity_set_bcc(loaded_ident, ident->bcc);
-        balsa_identity_set_reply_string(loaded_ident, ident->reply_string);
-        balsa_identity_set_forward_string(loaded_ident, ident->forward_string);
-        balsa_identity_set_signature_path(loaded_ident, ident->signature_path);
-        balsa_identity_set_sig_sending(loaded_ident, ident->sig_sending);
-        balsa_identity_set_sig_whenforward(loaded_ident, 
-                                           ident->sig_whenforward);
-        balsa_identity_set_sig_whenreply(loaded_ident, ident->sig_whenreply);
-        balsa_identity_set_sig_separator(loaded_ident, ident->sig_separator);
-        balsa_identity_set_sig_prepend(loaded_ident, ident->sig_prepend);
-        gtk_object_destroy(GTK_OBJECT(ident));
-    } else {
-        balsa_app.identities = g_list_append(balsa_app.identities, ident);
-
-        if (balsa_app.current_ident == NULL) 
-            balsa_identity_set_current(ident);    
-    }
+    for (list=balsa_app.address_book_list; list; list=g_list_next(list))
+	config_address_book_save(LIBBALSA_ADDRESS_BOOK(list->data));
 }
 
 
 static void
 config_identities_load()
 {
-    BalsaIdentity* ident;
-    GList* list;
-    gchar** ident_keys;
-    gchar* default_ident;
-    gint key_count;
-    gint i;
-
+    LibBalsaIdentity* ident;
+    gchar *default_ident;
+    void *iterator;
+    gchar *key, *val, *tmp;
+    int pref_len = strlen(IDENTITY_SECTION_PREFIX);
 
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "identity/");
     default_ident = gnome_config_get_string("CurrentIdentity");
-    gnome_config_get_vector("Identities", &key_count, &ident_keys);
     gnome_config_pop_prefix();
 
-    if (key_count == 0 && g_list_length(balsa_app.identities) == 0) {
-        config_identity_load("default");
-    } 
-    
-    for (i = 0; i < key_count; ++i) {
-        config_identity_load(ident_keys[i]);
+    iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
+    while ((iterator = gnome_config_iterator_next(iterator, &key, &val))) {
+	if (strncmp(key, IDENTITY_SECTION_PREFIX, pref_len) == 0) {
+	    tmp = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
+	    ident = libbalsa_identity_new_config(tmp, key+pref_len);
+	    balsa_app.identities = g_list_append(balsa_app.identities, ident);
+	    g_free(tmp);
+	    if(g_strcasecmp(default_ident, ident->identity_name) == 0)
+		balsa_app.current_ident = ident;
+	}
+	g_free(key);
+	g_free(val);
     }
 
-    list = balsa_app.identities;
-
-    while (list != NULL) {
-        ident = BALSA_IDENTITY(list->data);
-        
-        if (default_ident != NULL && g_strcasecmp(default_ident, ident->identity_name) == 0) {
-            balsa_identity_set_current(ident);
-            break;
-        }
-
-        list = g_list_next(list);
-    }
+    if (g_list_length(balsa_app.identities) == 0)
+        balsa_app.identities = 
+	    g_list_append(balsa_app.identities,
+			  libbalsa_identity_new_config(BALSA_CONFIG_PREFIX
+						       "identity-default/",
+						       "default"));
     
+    if(balsa_app.current_ident == NULL)
+	balsa_app.current_ident = 
+	    LIBBALSA_IDENTITY(balsa_app.identities->data);
+
     g_free(default_ident);
-    g_strfreev(ident_keys);
 }
 
-
-
-static void 
-config_identity_save(BalsaIdentity* ident)
-{
-    gchar* config_key;
-
-    
-    config_key = g_strconcat(BALSA_CONFIG_PREFIX, "identity-", 
-                             ident->identity_name, "/", NULL);
-    gnome_config_push_prefix(config_key);
-    gnome_config_set_string("FullName", ident->address->full_name);
-    
-    if (ident->address->address_list != NULL)
-        gnome_config_set_string("Address", ident->address->address_list->data);
-
-    gnome_config_set_string("ReplyTo", ident->replyto);
-    gnome_config_set_string("Domain", ident->domain);
-    gnome_config_set_string("Bcc", ident->bcc);
-    gnome_config_set_string("ReplyString", ident->reply_string);
-    gnome_config_set_string("ForwardString", ident->forward_string);
-    gnome_config_set_string("SignaturePath", ident->signature_path);
-
-    gnome_config_set_bool("SigSending", ident->sig_sending);
-    gnome_config_set_bool("SigForward", ident->sig_whenforward);
-    gnome_config_set_bool("SigReply", ident->sig_whenreply);
-    gnome_config_set_bool("SigSeparator", ident->sig_separator);
-    gnome_config_set_bool("SigPrepend", ident->sig_prepend);
-
-    gnome_config_pop_prefix();
-    g_free(config_key);
-}
-
-
+/* config_identities_save:
+   saves the balsa_app.identites list.
+*/
 void
 config_identities_save(void)
 {
-    BalsaIdentity* ident;
+    LibBalsaIdentity* ident;
     GList* list;
-    gchar** conf_vec;
+    gchar** conf_vec, *prefix;
     gint i = 0;
 
+    conf_vec = g_malloc(sizeof(gchar*) * g_list_length(balsa_app.identities));
 
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "identity/");
-    list = balsa_app.identities;
-    conf_vec = g_malloc(sizeof(gchar*) * g_list_length(list));
     g_assert(conf_vec != NULL);
 
-    while (list != NULL) {
-        ident = BALSA_IDENTITY(list->data);
-        conf_vec[i] = ident->identity_name;
-        list = g_list_next(list);
-        ++i;
+    for (list = balsa_app.identities; list; list = g_list_next(list)) {
+        ident = LIBBALSA_IDENTITY(list->data);
+        conf_vec[i++] = ident->identity_name;
     }
     
+    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "identity/");
     gnome_config_set_vector("Identities", i, (const char**) conf_vec);
     gnome_config_set_string("CurrentIdentity", 
                             balsa_app.current_ident->identity_name);
-    list = balsa_app.identities;
     gnome_config_pop_prefix();
     g_free(conf_vec);
 
-    while (list != NULL) {
-        ident = BALSA_IDENTITY(list->data);
-        config_identity_save(ident);
-        list = g_list_next(list);
+    for (list = balsa_app.identities; list; list = g_list_next(list)) {
+	ident = LIBBALSA_IDENTITY(list->data);
+	prefix = g_strconcat(BALSA_CONFIG_PREFIX "identity-", 
+			     ident->identity_name, "/", NULL);
+        libbalsa_identity_save(ident, prefix);
+	g_free(prefix);
     }
-    
 }
 
 static gchar **

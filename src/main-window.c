@@ -2833,11 +2833,16 @@ static void
 ident_manage_dialog_cb(GtkWidget* widget, gpointer user_data)
 {
     GtkWidget* dialog;
-    
 
     /* create dialog  */
-    dialog = balsa_identity_config_dialog();
-    gnome_dialog_run(GNOME_DIALOG(dialog));
+    dialog = libbalsa_identity_config_dialog(GTK_WINDOW(balsa_app.main_window),
+					     &balsa_app.identities,
+					     &balsa_app.current_ident);
+    if(gnome_dialog_run(GNOME_DIALOG(dialog)) == 1) {
+	g_print("Saving identities...\n");
+	config_identities_save();
+	gnome_config_sync();
+    }
 }
 
 

@@ -33,7 +33,6 @@
 
 #include "balsa-druid-page-error.h"
 #include "balsa-app.h"
-#include "balsa-identity.h"
 %}
 
 class Balsa:Druid:Page:User from Balsa:Druid:Page {
@@ -137,10 +136,10 @@ class Balsa:Druid:Page:User from Balsa:Druid:Page {
 	next( Gnome:Druid:Page *_self, Gtk:Widget *druid (check type null) ) {
 		gchar *uhoh;
 		BalsaDruidPageUser *self = BALSA_DRUID_PAGE_USER( _self );
-		BalsaIdentity* ident;
+		LibBalsaIdentity* ident;
 		
 		if (balsa_app.identities == NULL) {
-			ident = BALSA_IDENTITY(balsa_identity_new());
+			ident = LIBBALSA_IDENTITY(libbalsa_identity_new());
 			balsa_app.identities = g_list_append(balsa_app.identities, ident);
 		} else {
 			ident = balsa_app.current_ident;
@@ -176,7 +175,7 @@ class Balsa:Druid:Page:User from Balsa:Druid:Page {
 			PARENT_HANDLER( _self, druid );
 		}
 
-		balsa_identity_set_current(ident);
+		balsa_app.current_ident = ident;
 		return TRUE;
 	}
 }

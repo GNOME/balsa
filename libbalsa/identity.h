@@ -1,0 +1,109 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
+/* Balsa E-Mail Client
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option) 
+ * any later version.
+ *  
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * GNU General Public License for more details.
+ *  
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
+ * 02111-1307, USA.
+ */
+
+
+#ifndef __LIBBALSA_IDENTITY_H__
+#define __LIBBALSA_IDENTITY_H__
+
+#include <gtk/gtk.h>
+#include <address.h>
+
+#ifdef __cpluscplus
+extern "C" 
+{
+#endif /* __cplusplus */
+
+    GtkType libbalsa_identity_get_type(void);
+
+#define LIBBALSA_TYPE_IDENTITY          (libbalsa_identity_get_type ())
+#define LIBBALSA_IDENTITY(obj)          (GTK_CHECK_CAST (obj, libbalsa_identity_get_type (), LibBalsaIdentity))
+#define LIBBALSA_IDENTITY_CLASS(klass)  (GTK_CHECK_CLASS_CAST (klass, libbalsa_identity_get_type (), LibBalsaIdentityClass))
+#define LIBBALSA_IS_IDENTITY(obj)       (GTK_CHECK_TYPE (obj, libbalsa_identity_get_type ()))
+#define LIBBALSA_IS_IDENTITY_CLASS(klass) (GTK_CHECK_CLASS_TYPE (klass, BALSA_TYPE_IDENTITY))
+
+    typedef struct _LibBalsaIdentity LibBalsaIdentity;
+    typedef struct _LibBalsaIdentityClass LibBalsaIdentityClass;
+    
+    
+    struct _LibBalsaIdentity 
+    {
+        GtkObject object;
+        
+        gchar* identity_name;
+        
+        LibBalsaAddress* address;
+        gchar* replyto;
+        gchar* domain;
+        gchar* bcc;
+        gchar* reply_string;
+        gchar* forward_string;
+
+        gchar* signature_path;
+        gboolean sig_sending;
+        gboolean sig_whenforward;
+        gboolean sig_whenreply;
+        gboolean sig_separator;
+        gboolean sig_prepend;
+    };
+
+    struct _LibBalsaIdentityClass 
+    {
+        GtkObjectClass parent_class;
+    };
+
+
+/* Function prototypes */
+    GtkObject* libbalsa_identity_new(void);
+    GtkObject* libbalsa_identity_new_with_name(const gchar* ident_name);
+    
+    void libbalsa_identity_set_identity_name(LibBalsaIdentity*, const gchar*);
+    void libbalsa_identity_set_address(LibBalsaIdentity*, LibBalsaAddress*);
+    void libbalsa_identity_set_replyto(LibBalsaIdentity*, const gchar*);
+    void libbalsa_identity_set_domain(LibBalsaIdentity*, const gchar*);
+    void libbalsa_identity_set_bcc(LibBalsaIdentity*, const gchar*);
+    void libbalsa_identity_set_reply_string(LibBalsaIdentity* , const gchar*);
+    void libbalsa_identity_set_forward_string(LibBalsaIdentity*, const gchar*);
+    void libbalsa_identity_set_signature_path(LibBalsaIdentity*, const gchar*);
+    void libbalsa_identity_set_sig_sending(LibBalsaIdentity*, gboolean);
+    void libbalsa_identity_set_sig_whenforward(LibBalsaIdentity*, gboolean);
+    void libbalsa_identity_set_sig_whenreply(LibBalsaIdentity*, gboolean);
+    void libbalsa_identity_set_sig_separator(LibBalsaIdentity*, gboolean);
+    void libbalsa_identity_set_sig_prepend(LibBalsaIdentity*, gboolean);
+
+    GtkWidget* libbalsa_identity_config_frame(gboolean with_buttons, 
+					      GList** identities,
+					      LibBalsaIdentity** current);
+    GtkWidget* libbalsa_identity_config_dialog(GtkWindow* parent, 
+					       GList **identities,
+					       LibBalsaIdentity **current);
+    LibBalsaIdentity* libbalsa_identity_select_dialog(GtkWindow* parent, 
+						      const gchar* prompt,
+						      GList** identities, 
+						      LibBalsaIdentity**);
+
+    LibBalsaIdentity* libbalsa_identity_new_config(const gchar* prefix,
+						   const gchar* name);
+    void libbalsa_identity_save(LibBalsaIdentity* id, const gchar* prefix);
+
+#ifdef __cplusplus
+}
+#endif
+#endif /* __LIBBALSA_IDENTITY_H__ */

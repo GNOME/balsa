@@ -855,9 +855,9 @@ chop_re(gchar* str)
 	    /* should "re" be localized ? */
 	    p+=strlen(_("Re:"));
 	    continue;
-	} else if(g_strncasecmp(p, balsa_app.reply_string,
-				strlen(balsa_app.reply_string))==0) {
-	    p+=strlen(balsa_app.reply_string);
+	} else if(g_strncasecmp(p, balsa_app.current_ident->reply_string,
+				strlen(balsa_app.current_ident->reply_string))==0) {
+	    p+=strlen(balsa_app.current_ident->reply_string);
 	    continue;
 	};
 	break;

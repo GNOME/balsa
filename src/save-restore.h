@@ -51,8 +51,6 @@ gint config_folder_update(BalsaMailboxNode * mbnode);
 void config_address_book_save(LibBalsaAddressBook * ab);
 void config_address_book_delete(LibBalsaAddressBook * ab);
 
-gint config_imapdir_add(ImapDir * dir);
-
 void config_identities_save(void);
 
 #endif				/* __SAVE_RESTORE_H__ */

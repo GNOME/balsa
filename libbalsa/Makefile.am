@@ -23,6 +23,8 @@ libbalsa_a_SOURCES = 		\
 	filter.h		\
 	folder-scanners.c	\
 	folder-scanners.h	\
+	identity.c		\
+	identity.h		\
 	information.c		\
 	information.h		\
 	libbalsa.c		\

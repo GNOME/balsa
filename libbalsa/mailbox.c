@@ -1042,14 +1042,13 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
 
 /* Search iters */
 LibBalsaMailboxSearchIter *
-libbalsa_mailbox_search_iter_new(LibBalsaMailbox * mailbox,
-				 GtkTreeIter * pos,
-				 LibBalsaCondition * condition)
+libbalsa_mailbox_search_iter_new(LibBalsaCondition * condition)
 {
     LibBalsaMailboxSearchIter *iter;
 
     iter = g_new(LibBalsaMailboxSearchIter, 1);
-    iter->iter = pos;
+    iter->mailbox = NULL;
+    iter->stamp = 0;
     iter->condition = libbalsa_condition_clone(condition);
     iter->user_data = NULL;
 
@@ -1057,16 +1056,19 @@ libbalsa_mailbox_search_iter_new(LibBalsaMailbox * mailbox,
 }
 
 void
-libbalsa_mailbox_search_iter_free(LibBalsaMailbox * mailbox,
-				  LibBalsaMailboxSearchIter * iter)
+libbalsa_mailbox_search_iter_free(LibBalsaMailboxSearchIter * search_iter)
 {
-    if (LIBBALSA_MAILBOX_GET_CLASS(mailbox)->search_iter_free)
-	LIBBALSA_MAILBOX_GET_CLASS(mailbox)->search_iter_free(iter);
-    libbalsa_condition_free(iter->condition);
-    g_free(iter);
+    LibBalsaMailbox *mailbox = search_iter->mailbox;
+
+    if (mailbox && LIBBALSA_MAILBOX_GET_CLASS(mailbox)->search_iter_free)
+	LIBBALSA_MAILBOX_GET_CLASS(mailbox)->search_iter_free(search_iter);
+
+    libbalsa_condition_free(search_iter->condition);
+    g_free(search_iter);
 }
 
-/* GNode iterators. */
+/* GNode iterators; they return the root node when they run out of nodes,
+ * and find the appropriate starting node when called with the root. */
 static GNode *
 lbm_next(GNode * node)
 {
@@ -1076,55 +1078,73 @@ lbm_next(GNode * node)
      *              one.  */
     if (node->children)
 	return node->children;
-    else
-	do
-	    if (node->next)
-		return node->next;
-	while ((node = node->parent));
 
-    return NULL;
+    do {
+	if (node->next)
+	    return node->next;
+	node = node->parent;
+    } while (!G_NODE_IS_ROOT(node));
+
+    return node;
+}
+
+static GNode *
+lbm_last_descendant(GNode * node)
+{
+    if (node->children) {
+	GNode *tmp;
+
+	node = node->children;
+	while ((tmp = node->next) || (tmp = node->children))
+	    node = tmp;
+    }
+    return node;
 }
 
 static GNode *
 lbm_prev(GNode * node)
 {
+    if (G_NODE_IS_ROOT(node))
+	return lbm_last_descendant(node);
+
     /* previous is: if we have a sibling,
      *                      if it has children, its last descendant;
      *                      else the sibling;
      *              else our parent. */
-    if (node->prev) {
-	node = node->prev;
-	if (node->children) {
-	    GNode *tmp;
-	    node = node->children;
-	    while ((tmp = node->next) || (tmp = node->children))
-		node = tmp;
-	}
-	return node;
-    }
+    if (node->prev)
+	return lbm_last_descendant(node->prev);
 
-    node = node->parent;
-    return G_NODE_IS_ROOT(node) ? NULL : node;
+    return node->parent;
 }
 
 gboolean
 libbalsa_mailbox_search_iter_step(LibBalsaMailbox * mailbox,
 				  LibBalsaMailboxSearchIter * search_iter,
-				  gboolean forward)
+				  GtkTreeIter * iter,
+				  gboolean forward,
+				  guint stop_msgno)
 {
-    GNode *node = search_iter->iter->user_data;
+    GNode *node = iter->user_data;
     GNode *(*step_func)(GNode *) = forward ?  lbm_next : lbm_prev;
     gboolean (*match_func)(LibBalsaMailbox *, guint, 
 			   LibBalsaMailboxSearchIter *) =
 	LIBBALSA_MAILBOX_GET_CLASS(mailbox)->message_match;
 
-    while ((node = step_func(node)))
-	if (match_func(mailbox, GPOINTER_TO_UINT(node->data), search_iter)) {
-	    search_iter->iter->user_data = node;
+    if (!node)
+	node = mailbox->msg_tree;
+
+    for (;;) {
+	guint msgno;
+
+	node = step_func(node);
+	msgno = GPOINTER_TO_UINT(node->data);
+	if (msgno == stop_msgno)
+	    return FALSE;
+	if (msgno > 0 && match_func(mailbox, msgno, search_iter)) {
+	    iter->user_data = node;
 	    return TRUE;
 	}
-
-    return FALSE;
+    }
 }
 
 /* Find a message in the tree-model, by its message number. */

@@ -186,8 +186,8 @@ struct _LibBalsaMailbox {
 
 /* Search iter */
 typedef struct {
-    GtkTreeIter *iter;		/* input: starting point for search;
-				 * output: found message. */
+    LibBalsaMailbox *mailbox;
+    gint stamp;
     LibBalsaCondition *condition;	
     gpointer user_data;		/* private backend info */
 } LibBalsaMailboxSearchIter;
@@ -347,17 +347,15 @@ gboolean libbalsa_mailbox_message_match(LibBalsaMailbox  *mailbox,
 					LibBalsaMailboxSearchIter *search_iter);
 
 /* Search iter */
-LibBalsaMailboxSearchIter *libbalsa_mailbox_search_iter_new(LibBalsaMailbox
-							    * mailbox,
-							    GtkTreeIter *
-							    pos,
-							    LibBalsaCondition
+LibBalsaMailboxSearchIter *libbalsa_mailbox_search_iter_new(LibBalsaCondition
 							    * condition);
 gboolean libbalsa_mailbox_search_iter_step(LibBalsaMailbox * mailbox,
-					   LibBalsaMailboxSearchIter * iter,
-					   gboolean forward);
-void libbalsa_mailbox_search_iter_free(LibBalsaMailbox * mailbox,
-				       LibBalsaMailboxSearchIter * iter);
+					   LibBalsaMailboxSearchIter 
+					   * search_iter,
+					   GtkTreeIter * iter,
+					   gboolean forward,
+					   guint stop_msgno);
+void libbalsa_mailbox_search_iter_free(LibBalsaMailboxSearchIter * iter);
 
 /* Virtual function (this function is different for IMAP
  */

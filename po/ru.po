@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 1\n"
-"POT-Creation-Date: 2001-02-12 13:47+0300\n"
-"PO-Revision-Date: 2001-02-12 13:48+03:00\n"
+"POT-Creation-Date: 2001-02-14 20:15+0300\n"
+"PO-Revision-Date: 2001-02-14 20:24+03:00\n"
 "Last-Translator: Valek Filippov <frob@df.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -548,159 +548,124 @@ msgstr "%d сохранено."
 msgid "Can't write message"
 msgstr "Невозможно записать письмо"
 
-#: libmutt/imap/auth.c:110
-msgid "Authenticating (CRAM-MD5)..."
-msgstr "Идентификация (CRAM-MD5)..."
-
-#: libmutt/imap/auth.c:202
-msgid "Authenticating (anonymous)..."
-msgstr "Идентификация (аноним)..."
-
-#: libmutt/imap/auth.c:288
-msgid "Anonymous authentication not supported."
-msgstr "Анонимная идентификация не поддерживается."
-
-#: libmutt/imap/auth.c:301
-msgid "GSSAPI authentication failed."
-msgstr "Сбой идентификации GSSAPI."
-
-#: libmutt/imap/auth.c:329
-msgid "CRAM-MD5 authentication failed."
-msgstr "Сбой идентификации CRAM-MD5."
-
-#: libmutt/imap/auth.c:344
-msgid "Skipping CRAM-MD5 authentication."
-msgstr "Пропуск идентификации CRAM-MD5."
-
-#: libmutt/imap/auth.c:366
-msgid "Logging in..."
-msgstr "Регистрация..."
-
-#. Login failed, try again
-#: libmutt/imap/auth.c:378
-msgid "Login failed."
-msgstr "Сбой регистрации."
-
 #. now begin login
-#: libmutt/imap/auth_gss.c:88
+#: libmutt/imap/auth_gss.c:87
 msgid "Authenticating (GSSAPI)..."
 msgstr "Идентификация (GSSAPI)..."
 
-#: libmutt/imap/browse.c:108
+#: libmutt/imap/auth_gss.c:262
+msgid "GSSAPI authentication failed."
+msgstr "Сбой идентификации GSSAPI."
+
+#: libmutt/imap/browse.c:95
 msgid "Getting namespaces..."
 msgstr "Получение пространства имен..."
 
-#: libmutt/imap/browse.c:135
+#: libmutt/imap/browse.c:104
 msgid "Getting folder list..."
 msgstr "Получение списка папок..."
 
-#: libmutt/imap/imap_ssl.c:92
-msgid "Filling entropy pool"
-msgstr "Заполнение пула энтропии"
+#: libmutt/imap/browse.c:281
+msgid "Create mailbox: "
+msgstr "Создать почтовый ящик: "
 
-#: libmutt/imap/imap_ssl.c:124
-msgid "Failed to find enough entropy on your system"
-msgstr "Не удалось обнаружить достаточной энтропии в вашей системе"
+#: libmutt/imap/browse.c:287
+msgid "Mailbox created."
+msgstr "Почтовый ящик создан."
 
-#: libmutt/imap/imap_ssl.c:139
-msgid "SSL disabled due the lack of entropy"
-msgstr "SSL отключено из-за недостатка энтропии"
-
-#: libmutt/imap/imap_ssl.c:219
-msgid "Unable to get certificate from peer"
-msgstr "Не удалось получить сертификат от узла"
-
-#: libmutt/imap/imap_ssl.c:230
+#: libmutt/imap/imap.c:89
 #, c-format
-msgid "SSL connection using %s"
-msgstr "SSL соединение с использованием %s"
+msgid "Closing connection to %s..."
+msgstr "Закрытие соединения c %s..."
 
-#: libmutt/imap/imap_ssl.c:255
-msgid "Unknown"
-msgstr "Неизвестно"
+#: libmutt/imap/imap.c:295
+msgid "This IMAP server is ancient. Mutt does not work with it."
+msgstr "Это IMAP сервер из древности. Mutt не работатет с ним."
 
-#: libmutt/imap/imap_ssl.c:280
-msgid "[unable to calculate]"
-msgstr "[Невозможно вычислить]"
-
-#: libmutt/imap/imap_ssl.c:298
-msgid "[invalid date]"
-msgstr "[неверная дата]"
-
-#: libmutt/imap/imap_ssl.c:373
-msgid "Server certificate is not yet valid"
-msgstr ""
-
-#: libmutt/imap/imap_ssl.c:380
-msgid "Server certificate has expired"
-msgstr "Сертификат сервера устарел"
-
-#: libmutt/imap/imap_ssl.c:454
-msgid "This certificate belongs to:"
-msgstr "Этот сертификат принадлежит:"
-
-#: libmutt/imap/imap_ssl.c:464
-msgid "This certificate was issued by:"
-msgstr "Этот сертификат был выдан:"
-
-#: libmutt/imap/imap_ssl.c:474
-msgid "This certificate is valid"
-msgstr "Этот сертификат действителен"
-
-#: libmutt/imap/imap_ssl.c:475
+#: libmutt/imap/imap.c:497
 #, c-format
-msgid "   from %s"
-msgstr "   из %s"
+msgid "Selecting %s..."
+msgstr "Выделение %s..."
 
-#: libmutt/imap/imap_ssl.c:477
+#. STATUS not supported
+#: libmutt/imap/imap.c:667
+msgid "Unable to append to IMAP mailboxes at this server"
+msgstr "Не удалось добавить почтовые ящики IMAP на этом сервере"
+
+#. command failed cause folder doesn't exist
+#: libmutt/imap/imap.c:676 libmutt/imap/message.c:577
 #, c-format
-msgid "     to %s"
-msgstr "    в %s"
+msgid "Create %s?"
+msgstr "Создать %s?"
 
-#: libmutt/imap/imap_ssl.c:483
+#: libmutt/imap/imap.c:712
+msgid "Closing connection to IMAP server..."
+msgstr "Закрытие соединения с IMAP сервером..."
+
+#: libmutt/imap/imap.c:875
 #, c-format
-msgid "Fingerprint: %s"
-msgstr "Отпечатки пальцев: %s"
+msgid "Marking %d messages deleted..."
+msgstr "Помечание %d сообщений для удаления..."
 
-#: libmutt/imap/imap_ssl.c:485
-msgid "SSL Certificate check"
-msgstr "Проверка SSL сертификата"
+#: libmutt/imap/imap.c:894
+#, c-format
+msgid "Saving message status flags... [%d/%d]"
+msgstr "Сохранение флагов состояния сообщения... [%d/%d]"
 
-#: libmutt/imap/imap_ssl.c:488
-msgid "(r)eject, accept (o)nce, (a)ccept always"
-msgstr ""
+#: libmutt/imap/imap.c:951
+msgid "Expunging messages from server..."
+msgstr "Вычеркивание сообщений с сервера..."
 
-#: libmutt/imap/imap_ssl.c:489
-msgid "roa"
-msgstr ""
+#: libmutt/imap/imap.c:1227
+#, c-format
+msgid "Subscribing to %s..."
+msgstr "Подписывание на %s..."
 
-#: libmutt/imap/imap_ssl.c:493
-msgid "(r)eject, accept (o)nce"
-msgstr ""
+#: libmutt/imap/imap.c:1229
+#, c-format
+msgid "Unsubscribing to %s..."
+msgstr "Отказ от подписки на %s..."
 
-#: libmutt/imap/imap_ssl.c:494
-msgid "ro"
-msgstr ""
+#. Unable to fetch headers for lower versions
+#: libmutt/imap/message.c:74
+msgid "Unable to fetch headers from this IMAP server version."
+msgstr "Не удалось получить заголовки от этой версии сервера IMAP."
 
-#: libmutt/imap/imap_ssl.c:498
-msgid "Exit  "
-msgstr "Выход  "
+#: libmutt/imap/message.c:92
+#, c-format
+msgid "Fetching message headers... [%d/%d]"
+msgstr "Получение заголовков сообщений... [%d/%d]"
 
-#: libmutt/imap/imap_ssl.c:500
-msgid "Help"
-msgstr "Справка"
+#: libmutt/imap/message.c:237
+msgid "Fetching message..."
+msgstr "Получение сообщения..."
 
-#: libmutt/imap/imap_ssl.c:523
-msgid "Warning: Couldn't save certificate"
-msgstr "Внимание: Невозможно сохранить сертификат"
+#: libmutt/imap/message.c:276
+msgid "The message index is incorrect. Try reopening the mailbox."
+msgstr "Индекс сообщения неверен. Попробуйте открыть почтовый ящик еще раз."
 
-#: libmutt/imap/imap_ssl.c:525
-msgid "Certificate saved"
-msgstr "Сертификат сохранен"
+#: libmutt/imap/message.c:467
+msgid "Uploading message ..."
+msgstr "Отправка сообщения..."
+
+#: libmutt/imap/message.c:555
+#, c-format
+msgid "Copying %d messages to %s..."
+msgstr "Копирование %d сообщений в %s..."
+
+#: libmutt/imap/message.c:559
+#, c-format
+msgid "Copying message %d to %s..."
+msgstr "Копирование сообщения %d в %s..."
 
 #: libmutt/imap/util.c:43
 msgid "Continue?"
 msgstr "Продолжить?"
+
+#: libmutt/imap/util.c:49
+#, c-format
+msgid "%s [%s]\n"
+msgstr "%s [%s]\n"
 
 #: src/address-book.c:161 src/filter-edit-dialog.c:130
 msgid "Name"
@@ -818,19 +783,24 @@ msgid "Mailbox password for %s@%s:"
 msgstr "Пароль для почтового ящика %s@%s:"
 
 #. FIXME:
-#: src/balsa-index.c:266
+#: src/balsa-index.c:271
 msgid "From"
 msgstr "Отправитель"
 
-#: src/balsa-index.c:267 src/filter-edit-dialog.c:326
+#: src/balsa-index.c:272 src/filter-edit-dialog.c:326
 msgid "Subject"
 msgstr "Тема"
 
-#: src/balsa-index.c:268
+#: src/balsa-index.c:273
 msgid "Date"
 msgstr "Дата"
 
-#: src/balsa-index.c:546
+#: src/balsa-index.c:555
+#, c-format
+msgid "Opening mailbox %s. Please wait..."
+msgstr "Открытие почтового ящика %s. Пожалуйста подождите..."
+
+#: src/balsa-index.c:577
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -838,60 +808,60 @@ msgstr ""
 "Невозможно открыть почтовый ящик!\n"
 "Проверьте его настройки."
 
-#: src/balsa-index.c:557
+#: src/balsa-index.c:603
 msgid "To"
 msgstr "Кому"
 
-#: src/balsa-index.c:1786
+#: src/balsa-index.c:1831
 msgid "Cannot access the message's body\n"
 msgstr "Нет доступа к содержимому этого сообщения\n"
 
-#: src/balsa-index.c:1823
+#: src/balsa-index.c:1868
 msgid "Reply..."
 msgstr "Ответить..."
 
-#: src/balsa-index.c:1827
+#: src/balsa-index.c:1872
 msgid "Reply To All..."
 msgstr "Ответить всем..."
 
-#: src/balsa-index.c:1831
+#: src/balsa-index.c:1876
 msgid "Reply To Group..."
 msgstr "Ответить группе..."
 
-#: src/balsa-index.c:1835
+#: src/balsa-index.c:1880
 msgid "Forward..."
 msgstr "Переслать..."
 
-#: src/balsa-index.c:1840
+#: src/balsa-index.c:1885
 msgid "Undelete"
 msgstr "Восстановить"
 
-#: src/balsa-index.c:1843 src/filter-edit-dialog.c:224 src/mailbox-node.c:471
+#: src/balsa-index.c:1888 src/filter-edit-dialog.c:224 src/mailbox-node.c:471
 #: src/main-window.c:526 src/pref-manager.c:1235 src/pref-manager.c:2023
 msgid "Delete"
 msgstr "Удалить"
 
-#: src/balsa-index.c:1847
+#: src/balsa-index.c:1892
 msgid "Move To Trash"
 msgstr "Отправить в корзину"
 
-#: src/balsa-index.c:1852
+#: src/balsa-index.c:1897
 msgid "Store Address..."
 msgstr "Сохранить адрес..."
 
-#: src/balsa-index.c:1855
+#: src/balsa-index.c:1900
 msgid "Toggle"
 msgstr "Переключить"
 
-#: src/balsa-index.c:1858 src/main-window.c:347
+#: src/balsa-index.c:1903 src/main-window.c:347
 msgid "Flagged"
 msgstr "Cигнализируемое"
 
-#: src/balsa-index.c:1861 src/balsa-mblist.c:479
+#: src/balsa-index.c:1906 src/balsa-mblist.c:479
 msgid "Unread"
 msgstr "Непрочитанное"
 
-#: src/balsa-index.c:1872
+#: src/balsa-index.c:1917
 msgid "Transfer"
 msgstr "Передать"
 

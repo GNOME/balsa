@@ -1,3 +1,8 @@
+2005-03-14 19:42  PeterB
+
+	* libbalsa/body.c: use string returned by
+	g_mime_filter_windows_real_charset() before it's deallocated.
+
 2005-03-10 10:42  PeterB
 
 	* libbalsa/body.c, libbalsa/filter.c, libbalsa/mailbox_local.c,

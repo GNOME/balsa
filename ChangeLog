@@ -1,3 +1,11 @@
+2004-09-29 19:32  PeterB
+
+	* src/balsa-mblist.c: don't check for click in expander column.
+	* libbalsa/imap/imap-handle.c: larger buffer for section
+	specification.
+	* libbalsa/send.c: remove status headers before sending; clear NEW
+	and FLAGGED flags in fcc copies.
+
 2004-09-29 19:25  Albrecht Dreß <albrecht.dress@arcor.de>
 
 	* src/balsa-message.c: if a '3156 signature is additionally wrapped

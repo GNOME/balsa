@@ -1,3 +1,8 @@
+2003-07-08  Danilo Šegan  <dsegan@gmx.net>
+
+	* balsa.desktop, sounds/balsa.soundlist, sounds/email.soundlist:
+	Added Serbian translations.
+
 2003-07-08  Pawel Salek  <pawsa theochem.kth.se>
 
 	* src/balsa-app.h: add fields for print settings: margins, layout etc.

@@ -23,6 +23,8 @@
 #ifndef __LIBBALSA_IDENTITY_H__
 #define __LIBBALSA_IDENTITY_H__
 
+#include "config.h"
+
 #include <gtk/gtk.h>
 #include <address.h>
 
@@ -70,6 +72,11 @@ extern "C"
         gboolean sig_whenreply;
         gboolean sig_separator;
         gboolean sig_prepend;
+
+#ifdef HAVE_GPGME
+	gboolean gpg_sign;
+	gboolean gpg_encrypt;
+#endif
     };
 
     struct _LibBalsaIdentityClass 
@@ -96,6 +103,11 @@ extern "C"
     void libbalsa_identity_set_sig_whenreply(LibBalsaIdentity*, gboolean);
     void libbalsa_identity_set_sig_separator(LibBalsaIdentity*, gboolean);
     void libbalsa_identity_set_sig_prepend(LibBalsaIdentity*, gboolean);
+
+#ifdef HAVE_GPGME
+    void libbalsa_identity_set_gpg_sign(LibBalsaIdentity*, gboolean);
+    void libbalsa_identity_set_gpg_encrypt(LibBalsaIdentity*, gboolean);
+#endif
 
     void libbalsa_identity_config_dialog(GtkWindow * parent,
                                          GList ** identities,

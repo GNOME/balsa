@@ -1670,6 +1670,31 @@ static gint include_messages_cb(GtkWidget *widget, BalsaSendmsg *bsmsg)
 #endif /* 0 */
 
 /* attachments_add - attachments field D&D callback */
+static GSList*
+uri2gslist(const char *uri_list)
+{
+  GSList *list = NULL;
+
+  while (*uri_list) {
+    char	*linebreak = strchr(uri_list, 13);
+    char	*uri;
+    int	length;
+    
+    if (!linebreak || linebreak[1] != '\n')
+        return list;
+    
+    length = linebreak - uri_list;
+
+    if (length && uri_list[0] != '#' && strncmp(uri_list,"file://",7)==0) {
+	uri = g_strndup(uri_list+7, length-7);
+	list = g_slist_append(list, uri);
+      }
+
+    uri_list = linebreak + 2;
+  }
+  return list;
+}
+
 static void
 attachments_add(GtkWidget * widget,
 		GdkDragContext * context,
@@ -1691,15 +1716,12 @@ attachments_add(GtkWidget * widget,
                                        "Possible reason: not enough temporary space"));
         }
     } else if (info == TARGET_URI_LIST) {
-        GList *uri_list;
-        
-        for (uri_list = (GList *)selection_data->data; uri_list;
-             uri_list = g_list_next(uri_list)) {
-            const gchar *path = gnome_vfs_uri_get_path(uri_list->data);
+        GSList *uri_list = uri2gslist(selection_data->data);
+        for (; uri_list; uri_list = g_slist_next(uri_list)) {
 	    add_attachment(GNOME_ICON_LIST(bsmsg->attachments[1]),
-			   g_strdup(path), FALSE, NULL);
+			   uri_list->data, FALSE, NULL); /* steal strings */
         }
-
+        g_slist_free(uri_list);
 	/* show attachment list */
 	bsmsg->update_config = FALSE;
 	gtk_check_menu_item_set_active(

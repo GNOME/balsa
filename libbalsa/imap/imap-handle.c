@@ -382,6 +382,7 @@ imap_mbox_connect(ImapMboxHandle* handle)
   ImapResponse resp;
   const char *service = "imap";
 
+  handle->has_capabilities = FALSE;
 #ifdef USE_TLS
   handle->using_tls = 0;
   if(handle->over_ssl) service = "imaps";
@@ -1053,8 +1054,6 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
     printf("connection severed.\n");
     close(handle->sd);
     handle->state = IMHS_DISCONNECTED;
-    handle->over_ssl = 0; /* reestablish ssl */
-    handle->has_capabilities = 0; /* and redo capabilities */
     return IMR_SEVERED;
   }
   /* handle untagged messages. The caller still gets its shot afterwards. */

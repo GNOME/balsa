@@ -1,3 +1,10 @@
+* Balsa-2.1.90 release. Release date 2004-06-03
+
+- mailbox scanning improvements.
+- Edit/Find UI more user-friendly.
+- message filtering fixes.
+- reset TLS status of broken IMAP sessions.
+
 * Balsa-2.1.3 release. Release date 2004-05-22
 
 - GPGME fixes.

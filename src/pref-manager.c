@@ -1167,7 +1167,7 @@ create_mailserver_page(gpointer data)
     gtk_box_pack_start(GTK_BOX(hbox1), scrolledwindow3, TRUE, TRUE, 0);
     gtk_container_set_border_width(GTK_CONTAINER(scrolledwindow3), 5);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledwindow3),
-				   GTK_POLICY_NEVER, GTK_POLICY_NEVER);
+				   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
     pui->mail_servers = gtk_clist_new(2);
     gtk_container_add(GTK_CONTAINER(scrolledwindow3), pui->mail_servers);

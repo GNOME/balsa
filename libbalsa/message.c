@@ -116,6 +116,7 @@ libbalsa_message_init(LibBalsaMessage * message)
     message->from = NULL;
     message->sender = NULL;
     message->reply_to = NULL;
+    message->dispnotify_to = NULL;
     message->subj = NULL;
     message->to_list = NULL;
     message->cc_list = NULL;

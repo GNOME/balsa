@@ -1,3 +1,8 @@
+2001-09-04  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/message.c: initialize LibBalsaMessage::dispnotify field.
+	* src/pref-manager.c: automatic scrollbars in the servers window.
+
 2001-09-01  Wang Jian  <lark@linux.net.cn>
 
 	* configure.in(ALL_LINGUAS): Changed from zh_CN.GB2312 to zh_CN

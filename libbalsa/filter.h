@@ -97,7 +97,8 @@ gint filter_run_nth(GList *filter_list,
 		    Message *message, gint n);
 gint filter_run_single(filter *filt,
 		       Message *message);
-
+void filter_free(filter *fil,
+	        gpointer throwaway);
 /*
  * Dialog calls
  */

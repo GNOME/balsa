@@ -225,9 +225,7 @@ static GnomeUIInfo edit_menu[] = {
     GNOMEUIINFO_MENU_CUT_ITEM(cut_cb, NULL),
     GNOMEUIINFO_MENU_COPY_ITEM(copy_cb, NULL),
     GNOMEUIINFO_MENU_PASTE_ITEM(paste_cb, NULL),
-    {GNOME_APP_UI_ITEM, N_("_Select All"), NULL,
-     (gpointer) select_all_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
-     NULL, 'A', GDK_CONTROL_MASK, NULL},
+    GNOMEUIINFO_MENU_SELECT_ALL_ITEM(select_all_cb, NULL),
     GNOMEUIINFO_SEPARATOR,
 #define EDIT_MENU_WRAP_BODY 5
     {GNOME_APP_UI_ITEM, N_("_Wrap Body"), N_("Wrap message lines"),
@@ -3440,6 +3438,7 @@ select_all_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     gtk_text_buffer_get_bounds(buffer, &start, &end);
     gtk_text_buffer_move_mark_by_name(buffer, "insert", &start);
     gtk_text_buffer_move_mark_by_name(buffer, "selection_bound", &end);
+    gtk_widget_grab_focus(bsmsg->text);
 }
 
 static void

@@ -180,6 +180,7 @@ static void collapse_all_cb(GtkWidget * widget, gpointer data);
 static void address_book_cb(GtkWindow *widget, gpointer data);
 
 static void copy_cb(GtkWidget * widget, gpointer data);
+static void ctrl_a_cb(GtkWidget * widget, gpointer data);
 static void select_all_cb(GtkWidget * widget, gpointer);
 static void mark_all_cb(GtkWidget * widget, gpointer);
 
@@ -338,7 +339,7 @@ static GnomeUIInfo edit_menu[] = {
 #define MENU_EDIT_COPY_POS 0
     GNOMEUIINFO_MENU_COPY_ITEM(copy_cb, NULL),
 #define MENU_EDIT_SELECT_ALL_POS 1
-    GNOMEUIINFO_MENU_SELECT_ALL_ITEM(select_all_cb, NULL),
+    GNOMEUIINFO_MENU_SELECT_ALL_ITEM(ctrl_a_cb, NULL),
     GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_MENU_FIND_ITEM(find_cb, NULL),
     GNOMEUIINFO_MENU_FIND_AGAIN_ITEM(find_again_cb, NULL),
@@ -513,7 +514,7 @@ static GnomeUIInfo message_menu[] = {
 		GNOME_APP_UI_ITEM, N_("_Select Text"),
 		N_("Select entire mail"),
 		select_all_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
-		NULL, 'A', GDK_CONTROL_MASK, NULL
+		NULL, 0, (GdkModifierType) 0, NULL
     },  
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MESSAGE_TRASH_POS 14
@@ -584,7 +585,7 @@ static GnomeUIInfo mailbox_menu[] = {
         GNOME_APP_UI_ITEM, N_("Select all"),
         N_("Select all messages in current mailbox"),
         mark_all_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-        BALSA_PIXMAP_MENU_MARK_ALL, 'A',GDK_CONTROL_MASK, NULL
+        BALSA_PIXMAP_MENU_MARK_ALL, 0, (GdkModifierType) 0, NULL
     },
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_EDIT_POS 7
@@ -1066,6 +1067,8 @@ enable_mailbox_menus(BalsaIndex * index)
                                        enable);
 
     /* Menu entries */
+    gtk_widget_set_sensitive(edit_menu[MENU_EDIT_SELECT_ALL_POS].widget,
+                             enable);
     for(i=0; i < ELEMENTS(mailbox_menu_entries); i++)
         gtk_widget_set_sensitive(mailbox_menu[mailbox_menu_entries[i]].widget, enable);
     for(i=0; i < ELEMENTS(threading_menu_entries); i++)
@@ -1152,8 +1155,6 @@ enable_edit_menus(BalsaMessage * bm)
     enable = (bm && balsa_message_can_select(bm));
 
     gtk_widget_set_sensitive(edit_menu[MENU_EDIT_COPY_POS].widget, enable);
-    gtk_widget_set_sensitive(edit_menu[MENU_EDIT_SELECT_ALL_POS].widget,
-                             enable);
 
     gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_COPY_POS].widget, 
                              enable);
@@ -2403,6 +2404,25 @@ copy_cb(GtkWidget * widget, gpointer data)
         balsa_message_copy_clipboard(BALSA_MESSAGE(bw->preview));
 }
 
+/* Callback for the `Edit => Select All' menu item; if the keyboard
+ * focus is in the index, or if there's no message displayed, select all
+ * messages; otherwise, select all text in the displayed message. */
+static void
+ctrl_a_cb(GtkWidget * widget, gpointer data)
+{
+    GtkWidget *index;
+    BalsaWindow *bw = BALSA_WINDOW(data);
+
+    index = balsa_window_find_current_index(balsa_app.main_window);
+    g_return_if_fail(index != NULL);
+
+    if (GTK_WIDGET_HAS_FOCUS(index)
+        || !(bw->preview && BALSA_MESSAGE(bw->preview)->current_part))
+        mark_all_cb(widget, data);
+    else
+        select_all_cb(widget, data);
+}
+
 static void
 select_all_cb(GtkWidget * widget, gpointer data)
 {
@@ -3489,7 +3509,7 @@ mark_all_cb(GtkWidget * widget, gpointer data)
     GtkWidget *index;
     GtkTreeSelection *selection;
 
-    index = balsa_window_find_current_index(balsa_app.main_window);
+    index = balsa_window_find_current_index(BALSA_WINDOW(data));
     g_return_if_fail(index != NULL);
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(index));

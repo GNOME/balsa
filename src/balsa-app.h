@@ -138,14 +138,12 @@ enum _SpellCheckSuggestMode {
 const gchar **spell_check_suggest_mode_name;
 
 
-#ifdef BALSA_MDN_REPLY
 typedef enum _BalsaMDNReply BalsaMDNReply;
 enum _BalsaMDNReply {
     BALSA_MDN_REPLY_NEVER = 0,
     BALSA_MDN_REPLY_ASKME,
     BALSA_MDN_REPLY_ALWAYS,
 };
-#endif
 
 
 /* global balsa application structure */
@@ -332,11 +330,9 @@ extern struct BalsaApplication {
     /* Tooltips */
     GtkTooltips *tooltips;
 
-#ifdef BALSA_MDN_REPLY
     /* how to act if a MDN request is received */
     BalsaMDNReply mdn_reply_clean;
     BalsaMDNReply mdn_reply_notclean;
-#endif
     gboolean recognize_rfc2646_format_flowed;
     gboolean send_rfc2646_format_flowed;
 

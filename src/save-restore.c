@@ -648,14 +648,11 @@ config_global_load(void)
     balsa_app.quiet_background_check=d_get_gint("QuietBackgroundCheck", 0);
     gnome_config_pop_prefix();
 
-#ifdef BALSA_MDN_REPLY
     /* how to react if a message with MDN request is displayed */
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "MDNReply/");
     balsa_app.mdn_reply_clean = gnome_config_get_int("Clean=1");
     balsa_app.mdn_reply_notclean = gnome_config_get_int("Suspicious=0");
-
     gnome_config_pop_prefix();
-#endif
 
     /* Sending options ... */
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Sending/");
@@ -912,14 +909,11 @@ gint config_save(void)
 
     gnome_config_pop_prefix();
 
-#ifdef BALSA_MDN_REPLY
     /* how to react if a message with MDN request is displayed */
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "MDNReply/");
     gnome_config_set_int("Clean", balsa_app.mdn_reply_clean);
     gnome_config_set_int("Suspicious", balsa_app.mdn_reply_notclean);
-
     gnome_config_pop_prefix();
-#endif
 
     /* Sending options ... */
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Sending/");

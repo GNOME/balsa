@@ -170,7 +170,6 @@ static void part_create_menu (BalsaPartInfo* info);
 
 static GtkViewportClass *parent_class = NULL;
 
-#ifdef BALSA_MDN_REPLY
 /* stuff needed for sending Message Disposition Notifications */
 static gboolean rfc2298_address_equal(LibBalsaAddress *a, LibBalsaAddress *b);
 static void handle_mdn_request(LibBalsaMessage *message);
@@ -180,7 +179,6 @@ static GtkWidget* create_mdn_dialog (gchar *sender, gchar *mdn_to_address,
 static void mdn_dialog_delete (GtkWidget *dialog, GdkEvent *event, gpointer user_data);
 static void no_mdn_reply (GtkWidget *widget, gpointer user_data);
 static void send_mdn_reply (GtkWidget *widget, gpointer user_data);
-#endif
 
 static BalsaPartInfo* part_info_new(LibBalsaMessageBody* body,
 				    LibBalsaMessage* msg);
@@ -494,14 +492,12 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 	return TRUE;
     }
 
-#ifdef BALSA_MDN_REPLY
     /*
      * At this point we check if (a) a message has the unread flag set and
      * (b) a Disposition-Notification-To header line is present
      */
     if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW && message->dispnotify_to)
 	handle_mdn_request (message);
-#endif
 
     bm->message = message;
 
@@ -2753,7 +2749,6 @@ balsa_message_select_all(BalsaMessage * bmessage)
 			       -1);
 }
 
-#ifdef BALSA_MDN_REPLY
 /* rfc2298_address_equal
    compares two addresses according to rfc2298: local-part@domain is equal,
    if the local-parts are case sensitive equal, but the domain case-insensitive
@@ -3038,4 +3033,3 @@ static void send_mdn_reply (GtkWidget *widget, gpointer user_data)
     gtk_widget_hide (dialog);
     gtk_object_destroy(GTK_OBJECT(dialog));
 }
-#endif

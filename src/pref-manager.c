@@ -67,9 +67,7 @@ typedef struct _PropertyUI {
     GtkWidget *check_imap;
     GtkWidget *check_imap_inbox;
     GtkWidget *notify_new_mail_dialog;
-#ifdef BALSA_MDN_REPLY
     GtkWidget *mdn_reply_clean_menu, *mdn_reply_notclean_menu;
-#endif
 
     GtkWidget *close_mailbox_auto;
     GtkWidget *drag_default_is_move;
@@ -158,9 +156,7 @@ static GtkWidget *create_spelling_option_menu(const gchar * names[],
 static GtkWidget *create_address_book_page(gpointer);
 
 static GtkWidget *create_information_message_menu(void);
-#ifdef BALSA_MDN_REPLY
 static GtkWidget *create_mdn_reply_menu(void);
-#endif
 #if ENABLE_ESMTP
 static GtkWidget *create_tls_mode_menu(void);
 #endif
@@ -610,14 +606,12 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
 	GTK_TOGGLE_BUTTON(pui->check_imap_inbox)->active;
     balsa_app.notify_new_mail_dialog =
 	GTK_TOGGLE_BUTTON(pui->notify_new_mail_dialog)->active;
-#ifdef BALSA_MDN_REPLY
     menu_item = gtk_menu_get_active(GTK_MENU(pui->mdn_reply_clean_menu));
     balsa_app.mdn_reply_clean =
 	GPOINTER_TO_INT(gtk_object_get_user_data(GTK_OBJECT(menu_item)));
     menu_item = gtk_menu_get_active(GTK_MENU(pui->mdn_reply_notclean_menu));
     balsa_app.mdn_reply_notclean =
 	GPOINTER_TO_INT(gtk_object_get_user_data(GTK_OBJECT(menu_item)));
-#endif
 
     if (balsa_app.check_mail_auto)
 	update_timer(TRUE, balsa_app.check_mail_timer);
@@ -854,12 +848,10 @@ set_prefs(void)
     if(!balsa_app.check_imap)
 	gtk_widget_set_sensitive(GTK_WIDGET(pui->check_imap_inbox), FALSE);
 
-#ifdef BALSA_MDN_REPLY
     gtk_menu_set_active(GTK_MENU(pui->mdn_reply_clean_menu),
 			balsa_app.mdn_reply_clean);
     gtk_menu_set_active(GTK_MENU(pui->mdn_reply_notclean_menu),
 			balsa_app.mdn_reply_notclean);
-#endif
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->close_mailbox_auto),
 				 balsa_app.close_mailbox_auto);
@@ -1407,13 +1399,11 @@ incoming_page(gpointer data)
     GtkWidget *regex_frame;
     GtkWidget *regex_hbox;
     GtkWidget *regex_label;
-#ifdef BALSA_MDN_REPLY
     GtkWidget *mdn_frame;
     GtkWidget *mdn_vbox;
     GtkWidget *mdn_label;
     GtkWidget *mdn_table;
     GtkWidget *mdn_optionmenu;
-#endif
 
     vbox1 = gtk_vbox_new(FALSE, 0);
 
@@ -1512,7 +1502,6 @@ incoming_page(gpointer data)
 
 	
 
-#ifdef BALSA_MDN_REPLY
     /* How to handle received MDN requests */
     mdn_frame = gtk_frame_new (_("Message Disposition Notification requests"));
     gtk_container_set_border_width (GTK_CONTAINER(mdn_frame), 5);
@@ -1563,7 +1552,6 @@ incoming_page(gpointer data)
 				 balsa_app.mdn_reply_notclean);
     gtk_table_attach (GTK_TABLE (mdn_table), mdn_optionmenu, 1, 2, 1, 2,
 		      GTK_FILL | GTK_EXPAND, 0, 0, 0);
-#endif
 
     return vbox1;
 }
@@ -2490,7 +2478,6 @@ create_information_message_menu(void)
     return menu;
 }
 
-#ifdef BALSA_MDN_REPLY
 static GtkWidget *
 create_mdn_reply_menu(void)
 {
@@ -2500,7 +2487,6 @@ create_mdn_reply_menu(void)
     add_show_menu(_("Always"), BALSA_MDN_REPLY_ALWAYS, menu);
     return menu;
 }
-#endif
 
 void
 mailbox_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)

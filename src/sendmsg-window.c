@@ -78,13 +78,13 @@
 static gchar *read_signature(BalsaSendmsg *msg);
 static gint include_file_cb(GtkWidget *, BalsaSendmsg *);
 static gint send_message_cb(GtkWidget *, BalsaSendmsg *);
-static gint send_message_toolbar_cb(GtkWidget *, BalsaSendmsg *);
+static void send_message_toolbar_cb(GtkWidget *, BalsaSendmsg *);
 static gint queue_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint message_postpone(BalsaSendmsg * bsmsg);
-static gint postpone_message_cb(GtkWidget *, BalsaSendmsg *);
-static gint save_message_cb(GtkWidget *, BalsaSendmsg *);
-static gint print_message_cb(GtkWidget *, BalsaSendmsg *);
-static gint attach_clicked(GtkWidget *, gpointer);
+static void postpone_message_cb(GtkWidget *, BalsaSendmsg *);
+static void save_message_cb(GtkWidget *, BalsaSendmsg *);
+static void print_message_cb(GtkWidget *, BalsaSendmsg *);
+static void attach_clicked(GtkWidget *, gpointer);
 static void destroy_attachment (gpointer data);
 static gboolean attach_message(BalsaSendmsg *msg, LibBalsaMessage *message);
 static gint insert_selected_messages(BalsaSendmsg *msg, SendType type);
@@ -183,7 +183,7 @@ static GnomeUIInfo file_menu[] = {
       BALSA_PIXMAP_MENU_SEND, 'Q', GDK_CONTROL_MASK, NULL },
 #define MENU_FILE_POSTPONE_POS 7
     GNOMEUIINFO_ITEM_STOCK(N_("_Postpone"), NULL,
-			   postpone_message_cb, BALSA_PIXMAP_MENU_SAVE),
+			   postpone_message_cb, BALSA_PIXMAP_MENU_POSTPONE),
 #define MENU_FILE_SAVE_POS 8
     GNOMEUIINFO_ITEM_STOCK(N_("_Save"), NULL,
 			   save_message_cb, BALSA_PIXMAP_MENU_SAVE),
@@ -550,10 +550,10 @@ static void
 close_window_cb(GtkWidget * widget, gpointer data)
 {
     BalsaSendmsg* bsmsg = (BalsaSendmsg *) data;
-    if(balsa_app.debug) printf("close_window_cb: start\n");
+    BALSA_DEBUG_MSG("close_window_cb: start\n");
     if(!delete_handler(bsmsg))
 	gtk_widget_destroy(bsmsg->window);
-    if(balsa_app.debug) printf("close_window_cb: end\n");
+    BALSA_DEBUG_MSG("close_window_cb: end\n");
 }
 
 static gint
@@ -1118,7 +1118,7 @@ attach_dialog_ok(GtkWidget * widget, gpointer data)
 }
 
 /* attach_clicked - menu and toolbar callback */
-static gint
+static void
 attach_clicked(GtkWidget * widget, gpointer data)
 {
     GtkWidget *fsw;
@@ -1155,7 +1155,7 @@ attach_clicked(GtkWidget * widget, gpointer data)
 
     gtk_widget_show(fsw);
 
-    return TRUE;
+    return;
 }
 
 /* attach_message:
@@ -2035,6 +2035,44 @@ setup_headers_from_message(BalsaSendmsg* cw, LibBalsaMessage *message)
     set_entry_from_address_list(GTK_ENTRY(cw->bcc[1]), message->bcc_list);
 }
 
+
+static gboolean
+guess_identity(BalsaSendmsg* msg)
+{
+    gboolean done = FALSE;
+    GList *alist;
+    LibBalsaMessage *message = msg->orig_message;
+    if( !message || !message->to_list || !balsa_app.identities)
+        return FALSE; /* use default */
+
+    /*
+     * Loop through all the addresses in the message's To:
+     * field, and look for an identity that matches one of them.
+     */
+    for (alist = message->to_list;!done && alist;alist = alist->next) {
+        LibBalsaAddress *addy;
+        GList *nth_address, *ilist;
+        gchar *address_string;
+        
+        addy = alist->data;
+        nth_address = g_list_nth(addy->address_list, 0);
+        address_string = (gchar*)nth_address->data;
+        for (ilist = balsa_app.identities;
+             !done && ilist;
+             ilist = g_list_next(ilist)) {
+            LibBalsaIdentity* ident;
+            
+            ident = LIBBALSA_IDENTITY(ilist->data);
+            if (!g_strcasecmp(address_string,
+                              (gchar*)(ident->address->address_list->data))) {
+                msg->ident = ident;
+                done = TRUE;
+		}
+        }
+    }
+    return done;
+}
+
 static void
 setup_headers_from_identity(BalsaSendmsg* cw, LibBalsaIdentity *ident)    
 {
@@ -2051,6 +2089,18 @@ BalsaSendmsg *
 sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 		   SendType type)
 {
+    static const struct callback_item {
+        const char* icon_id;
+        GtkSignalFunc callback;
+    } callback_table[] = {
+        { BALSA_PIXMAP_ATTACHMENT,       attach_clicked },
+        { BALSA_PIXMAP_IDENTITY,         change_identity_dialog_cb },
+        { BALSA_PIXMAP_POSTPONE,         postpone_message_cb },
+        { BALSA_PIXMAP_PRINT,            print_message_cb },
+        { BALSA_PIXMAP_SAVE,             save_message_cb },
+        { BALSA_PIXMAP_SEND,             send_message_toolbar_cb },
+        { GNOME_STOCK_PIXMAP_CLOSE,      close_window_cb },
+        { GNOME_STOCK_PIXMAP_SPELLCHECK, spell_check_cb } };
     GtkWidget *window;
     GtkWidget *paned = gtk_vpaned_new();
     BalsaSendmsg *msg = NULL;
@@ -2125,20 +2175,9 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     gtk_widget_set_sensitive(edit_menu[EDIT_MENU_REFLOW_MESSAGE].widget,
                              !msg->flow);
 
-    set_toolbar_button_callback(1, BALSA_PIXMAP_SEND,
-				GTK_SIGNAL_FUNC(send_message_toolbar_cb), msg);
-    set_toolbar_button_callback(1, BALSA_PIXMAP_ATTACHMENT,
-				GTK_SIGNAL_FUNC(attach_clicked), msg);
-    set_toolbar_button_callback(1, BALSA_PIXMAP_SAVE,
-				GTK_SIGNAL_FUNC(save_message_cb), msg);
-    set_toolbar_button_callback(1, BALSA_PIXMAP_IDENTITY,
-				GTK_SIGNAL_FUNC(change_identity_dialog_cb),msg);
-    set_toolbar_button_callback(1, GNOME_STOCK_PIXMAP_SPELLCHECK,
-				GTK_SIGNAL_FUNC(spell_check_cb), msg);
-    set_toolbar_button_callback(1, BALSA_PIXMAP_PRINT,
-				GTK_SIGNAL_FUNC(print_message_cb), msg);
-    set_toolbar_button_callback(1, GNOME_STOCK_PIXMAP_CLOSE,
-				GTK_SIGNAL_FUNC(close_window_cb), msg);
+    for(i=0; i < ELEMENTS(callback_table); i++)
+        set_toolbar_button_callback(TOOLBAR_COMPOSE, callback_table[i].icon_id,
+                                    callback_table[i].callback, msg);
 
     gnome_app_set_toolbar(GNOME_APP(window),
 			  get_toolbar(GTK_WIDGET(window), TOOLBAR_COMPOSE));
@@ -2149,7 +2188,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     msg->ready_widgets[3] = get_tool_widget(window, TOOLBAR_COMPOSE,
                                             BALSA_PIXMAP_SEND);
     msg->ready_widgets[4] = get_tool_widget(window, TOOLBAR_COMPOSE,
-                                            BALSA_PIXMAP_SAVE);
+                                            BALSA_PIXMAP_POSTPONE);
     msg->current_language_menu = lang_menu[LANG_CURRENT_POS].widget;
 
     /* set options - just the Disposition Notification request for now */
@@ -2210,37 +2249,8 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	}
     }
 
-    /* Get the identity from the To: field of the previous message */
-    if (message && message->to_list && balsa_app.identities) {
-	gboolean done = FALSE;
-	GList *alist = message->to_list;
-
-        /*
-         * Loop through all the addresses in the message's To:
-         * field, and look for an identity that matches one of them.
-         */
-	for (;!done && alist;alist = alist->next) {
-            LibBalsaAddress *addy;
-            GList *nth_address, *ilist;
-            gchar *address_string;
-
-	    addy = alist->data;
-	    nth_address = g_list_nth(addy->address_list, 0);
-	    address_string = (gchar*)nth_address->data;
-	    for (ilist = balsa_app.identities;
-		 !done && ilist;
-		 ilist = g_list_next(ilist)) {
-                LibBalsaIdentity* ident;
-
-		ident = LIBBALSA_IDENTITY(ilist->data);
-		if (!g_strcasecmp(address_string,
-			    (gchar*)(ident->address->address_list->data))) {
-		    msg->ident = ident;
-		    done = TRUE;
-		}
-	    }
-	}
-    }
+    /* Get the identity from the To: field of the original message */
+    guess_identity(msg);
 
     /* From: */
     setup_headers_from_identity(msg, msg->ident);
@@ -2758,13 +2768,13 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 }
 
 /* "send message" toolbar callback */
-static gint
+static void
 send_message_toolbar_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
     libbalsa_address_entry_clear_to_send(bsmsg->to[1]);
     libbalsa_address_entry_clear_to_send(bsmsg->cc[1]);
     libbalsa_address_entry_clear_to_send(bsmsg->bcc[1]);
-    return send_message_handler(bsmsg, balsa_app.always_queue_sent_mail);
+    send_message_handler(bsmsg, balsa_app.always_queue_sent_mail);
 }
 
 
@@ -2820,29 +2830,24 @@ message_postpone(BalsaSendmsg * bsmsg)
 }
 
 /* "postpone message" menu and toolbar callback */
-static gint
+static void
 postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    gboolean thereturn;
-    
-    if (!is_ready_to_send(bsmsg)) 
-        return FALSE;
-
-    thereturn = message_postpone(bsmsg);
-
-    gtk_widget_destroy(bsmsg->window);
-    return TRUE;
+    if (is_ready_to_send(bsmsg)) {
+        gboolean thereturn = message_postpone(bsmsg);
+        gtk_widget_destroy(bsmsg->window);
+    }
 }
 
 
-static gint
+static void
 save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
     gboolean thereturn;
     LibBalsaMessage *message;
     
     if (!is_ready_to_send(bsmsg)) 
-        return FALSE;
+        return;
 
     message = bsmsg2message(bsmsg);
     gtk_object_ref(GTK_OBJECT(message));
@@ -2866,11 +2871,9 @@ save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 	gtk_object_ref(GTK_OBJECT(bsmsg->orig_message));
     
     }
-
-    return TRUE;
 }
 
-static gint
+static void
 print_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
 #ifndef HAVE_GNOME_PRINT
@@ -2883,7 +2886,7 @@ print_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     message_print(msg);
     gtk_object_destroy(GTK_OBJECT(msg));
 #endif
-    return TRUE;
+    return;
 }
 
 static void
@@ -2977,7 +2980,8 @@ check_readiness(GtkEditable * w, BalsaSendmsg * msg)
     gboolean state = is_ready_to_send(msg);
 
     for (i = 0; i < ELEMENTS(msg->ready_widgets); i++)
-	gtk_widget_set_sensitive(msg->ready_widgets[i], state);
+        if(msg->ready_widgets[i])
+            gtk_widget_set_sensitive(msg->ready_widgets[i], state);
 }
 
 /* toggle_entry:

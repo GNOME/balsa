@@ -70,64 +70,6 @@ static int customize_open=0;
 GtkWidget *customize_widget;
 static int word_wrap;
 
-button_data toolbar_buttons[]={
-    {"", N_("Separator"), "", 0},
-    {BALSA_PIXMAP_RECEIVE, N_("Check"),
-     N_("Check for new email"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_NEW, N_("Compose"),
-     N_("Compose message"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_CONTINUE, N_("Continue"),
-     N_("Continue message"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_REPLY, N_("Reply"),
-     N_("Reply to the current message"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_REPLY_ALL, N_("Reply\nto all"),
-     N_("Reply to all recipients"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_REPLY_GROUP, N_("Reply\nto group"),
-     N_("Reply to mailing list"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_FORWARD, N_("Forward"),
-     N_("Forward the current message"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_PREVIOUS, N_("Previous"),
-     N_("Open previous"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_NEXT, N_("Next"),
-     N_("Open next"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_NEXT_UNREAD, N_("Next\nunread"),
-     N_("Open next unread message"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_NEXT_FLAGGED, N_("Next\nflagged"),
-     N_("Open next flagged message"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_TRASH, N_("Trash /\nDelete"),
-     N_("Move the current message to trash"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_PRINT, N_("Print"),
-     N_("Print current message"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_SEND, N_("Send"),
-     N_("Send this message"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_SEND_RECEIVE, N_("Send /\nReceive"),
-     N_("Send and Receive messages"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_ATTACHMENT, N_("Attach"),
-     N_("Add attachments to this message"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_SAVE, N_("Save"),
-     N_("Save the current item"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_IDENTITY, N_("Select Identity"),
-     N_("Set identity to use for this message"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {GNOME_STOCK_PIXMAP_SPELLCHECK, N_("Spelling"),
-     N_("Run a spell check"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {GNOME_STOCK_PIXMAP_CLOSE, N_("Cancel"), 
-     N_("Cancel this message"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_MARKED_NEW, N_("Toggle\nnew"),
-     N_("Toggle new message flag"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_MARKED_ALL, N_("Mark all"),
-     N_("Mark all messages in current mailbox"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_SHOW_HEADERS, N_("All\nheaders"),
-     N_("Show all headers"), TOOLBAR_BUTTON_TYPE_TOGGLE},
-    {BALSA_PIXMAP_TRASH_EMPTY, N_("Empty Trash"),
-     N_("Delete messages from the trash mailbox"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_CLOSE_MBOX, N_("Close"),
-     N_("Close current mailbox"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_SHOW_PREVIEW, N_("Preview\npane"),
-     N_("Show preview pane"), TOOLBAR_BUTTON_TYPE_TOGGLE}
-};
-
-static const int toolbar_button_count = sizeof(toolbar_buttons)
-     /sizeof(button_data);
 
 struct toolbar_item {
     GtkWidget *widget;

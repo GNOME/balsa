@@ -34,6 +34,7 @@
 #include "pixmaps/balsa_forward.xpm"
 #include "pixmaps/balsa_next.xpm"
 #include "pixmaps/balsa_previous.xpm"
+#include "pixmaps/balsa_postpone.xpm"
 #include "pixmaps/balsa_print.xpm"
 #include "pixmaps/balsa_save.xpm"
 #include "pixmaps/balsa_send.xpm"
@@ -75,6 +76,7 @@
 #include "pixmaps/menu_reply.xpm"
 #include "pixmaps/menu_reply_all.xpm"
 #include "pixmaps/menu_reply_group.xpm"
+#include "pixmaps/menu_postpone.xpm"
 #include "pixmaps/menu_print.xpm"
 #include "pixmaps/menu_next.xpm"
 #include "pixmaps/menu_previous.xpm"
@@ -224,54 +226,56 @@ register_balsa_pixmaps(void)
 	int w, h;
     } icons[] = {
 	/* Toolbar icons */
-	{ BALSA_PIXMAP_ATTACHMENT,		balsa_attachment_xpm,	24, 24 },
-	{ BALSA_PIXMAP_NEW,			balsa_compose_xpm,	24, 24 },
-	{ BALSA_PIXMAP_CONTINUE,		balsa_continue_xpm,	24, 24 },
-	{ BALSA_PIXMAP_RECEIVE,			balsa_receive_xpm,	24, 24 },
-	{ BALSA_PIXMAP_REPLY,			balsa_reply_xpm,	24, 24 },
-	{ BALSA_PIXMAP_REPLY_ALL,		balsa_reply_all_xpm,	24, 24 },
-	{ BALSA_PIXMAP_REPLY_GROUP,		balsa_reply_group_xpm,	24, 24 },
-	{ BALSA_PIXMAP_FORWARD,			balsa_forward_xpm,	24, 24 },
-	{ BALSA_PIXMAP_NEXT,			balsa_next_xpm,		24, 24 },
-	{ BALSA_PIXMAP_PREVIOUS,		balsa_previous_xpm,	24, 24 },
-	{ BALSA_PIXMAP_PRINT,			balsa_print_xpm,	24, 24 },
-	{ BALSA_PIXMAP_SAVE,			balsa_save_xpm,		24, 24 },
-	{ BALSA_PIXMAP_SEND,			balsa_send_xpm,		24, 24 },
-	{ BALSA_PIXMAP_SEND_RECEIVE,		balsa_send_receive_xpm,	24, 24 },
-	{ BALSA_PIXMAP_TRASH,			balsa_trash_xpm,	24, 24 },
-	{ BALSA_PIXMAP_TRASH_EMPTY,		balsa_trash_empty_xpm,	24, 24 },
-	{ BALSA_PIXMAP_NEXT_UNREAD,		balsa_next_unread_xpm,	24, 24 },
-	{ BALSA_PIXMAP_NEXT_FLAGGED,		balsa_next_flagged_xpm,	24, 24 },
-	{ BALSA_PIXMAP_SHOW_HEADERS,		balsa_show_headers_xpm,	24, 24 },
-	{ BALSA_PIXMAP_SHOW_PREVIEW,		balsa_show_preview_xpm,	24, 24 },
-	{ BALSA_PIXMAP_MARKED_NEW,		balsa_marked_new_xpm,	24, 24 },
-	{ BALSA_PIXMAP_MARKED_ALL,		balsa_marked_all_xpm,	24, 24 },
-	{ BALSA_PIXMAP_IDENTITY,		balsa_identity_xpm,	24, 24 },
-	{ BALSA_PIXMAP_CLOSE_MBOX,		balsa_close_mbox_xpm,	24, 24 },
+	{ BALSA_PIXMAP_ATTACHMENT,	    balsa_attachment_xpm,  24, 24 },
+	{ BALSA_PIXMAP_NEW,		    balsa_compose_xpm,	   24, 24 },
+	{ BALSA_PIXMAP_CONTINUE,	    balsa_continue_xpm,	   24, 24 },
+	{ BALSA_PIXMAP_RECEIVE,		    balsa_receive_xpm,	   24, 24 },
+	{ BALSA_PIXMAP_REPLY,		    balsa_reply_xpm,	   24, 24 },
+	{ BALSA_PIXMAP_REPLY_ALL,	    balsa_reply_all_xpm,   24, 24 },
+	{ BALSA_PIXMAP_REPLY_GROUP,	    balsa_reply_group_xpm, 24, 24 },
+	{ BALSA_PIXMAP_FORWARD,		    balsa_forward_xpm,	   24, 24 },
+	{ BALSA_PIXMAP_NEXT,		    balsa_next_xpm,	   24, 24 },
+	{ BALSA_PIXMAP_PREVIOUS,	    balsa_previous_xpm,	   24, 24 },
+	{ BALSA_PIXMAP_POSTPONE,	    balsa_postpone_xpm,	   24, 24 },
+	{ BALSA_PIXMAP_PRINT,		    balsa_print_xpm,	   24, 24 },
+	{ BALSA_PIXMAP_SAVE,		    balsa_save_xpm,	   24, 24 },
+	{ BALSA_PIXMAP_SEND,		    balsa_send_xpm,	   24, 24 },
+	{ BALSA_PIXMAP_SEND_RECEIVE,	    balsa_send_receive_xpm,24, 24 },
+	{ BALSA_PIXMAP_TRASH,		    balsa_trash_xpm,	   24, 24 },
+	{ BALSA_PIXMAP_TRASH_EMPTY,	    balsa_trash_empty_xpm, 24, 24 },
+	{ BALSA_PIXMAP_NEXT_UNREAD,	    balsa_next_unread_xpm, 24, 24 },
+	{ BALSA_PIXMAP_NEXT_FLAGGED,	    balsa_next_flagged_xpm,24, 24 },
+	{ BALSA_PIXMAP_SHOW_HEADERS,	    balsa_show_headers_xpm,24, 24 },
+	{ BALSA_PIXMAP_SHOW_PREVIEW,	    balsa_show_preview_xpm,24, 24 },
+	{ BALSA_PIXMAP_MARKED_NEW,	    balsa_marked_new_xpm,  24, 24 },
+	{ BALSA_PIXMAP_MARKED_ALL,	    balsa_marked_all_xpm,  24, 24 },
+	{ BALSA_PIXMAP_IDENTITY,	    balsa_identity_xpm,	   24, 24 },
+	{ BALSA_PIXMAP_CLOSE_MBOX,	    balsa_close_mbox_xpm,  24, 24 },
 
 	/* Menu icons */
-	{ BALSA_PIXMAP_MENU_NEW,		menu_new_xpm,		16, 16 },
-	{ BALSA_PIXMAP_MENU_FLAGGED,		menu_flagged_xpm,	16, 16 },
-	{ BALSA_PIXMAP_MENU_IDENTITY,		menu_identity_xpm,	16, 16 },
-	{ BALSA_PIXMAP_MENU_FORWARD,		menu_forward_xpm,	16, 16 },
-	{ BALSA_PIXMAP_MENU_REPLY,		menu_reply_xpm,		16, 16 },
-	{ BALSA_PIXMAP_MENU_REPLY_ALL,		menu_reply_all_xpm,	16, 16 },
-	{ BALSA_PIXMAP_MENU_REPLY_GROUP,	menu_reply_group_xpm,	16, 16 },
-	{ BALSA_PIXMAP_MENU_PRINT,		menu_print_xpm,		16, 16 },
-	{ BALSA_PIXMAP_MENU_NEXT,		menu_next_xpm,		16, 16 },
-	{ BALSA_PIXMAP_MENU_PREVIOUS,		menu_previous_xpm,	16, 16 },
-	{ BALSA_PIXMAP_MENU_SAVE,		menu_save_xpm,		16, 16 },
-	{ BALSA_PIXMAP_MENU_SEND,		menu_send_xpm,		16, 16 },
-	{ BALSA_PIXMAP_MENU_SEND_RECEIVE,	menu_send_receive_xpm,	16, 16 },
-	{ BALSA_PIXMAP_MENU_COMPOSE,		menu_compose_xpm,	16, 16 },
-	{ BALSA_PIXMAP_MENU_ATTACHMENT,		menu_attachment_xpm,	16, 16 },
-	{ BALSA_PIXMAP_MENU_RECEIVE,		menu_receive_xpm,	16, 16 },
-	{ BALSA_PIXMAP_MENU_NEXT_FLAGGED,	menu_next_flagged_xpm,	16, 16 },
-	{ BALSA_PIXMAP_MENU_NEXT_UNREAD,	menu_next_unread_xpm,	16, 16 },
-	{ BALSA_PIXMAP_MENU_MARK_ALL,		menu_mark_all_xpm,	16, 16 },
+	{ BALSA_PIXMAP_MENU_NEW,	    menu_new_xpm,	   16, 16 },
+	{ BALSA_PIXMAP_MENU_FLAGGED,	    menu_flagged_xpm,	   16, 16 },
+	{ BALSA_PIXMAP_MENU_IDENTITY,	    menu_identity_xpm,	   16, 16 },
+	{ BALSA_PIXMAP_MENU_FORWARD,	    menu_forward_xpm,	   16, 16 },
+	{ BALSA_PIXMAP_MENU_REPLY,	    menu_reply_xpm,	   16, 16 },
+	{ BALSA_PIXMAP_MENU_REPLY_ALL,	    menu_reply_all_xpm,	   16, 16 },
+	{ BALSA_PIXMAP_MENU_REPLY_GROUP,    menu_reply_group_xpm,  16, 16 },
+	{ BALSA_PIXMAP_MENU_POSTPONE,	    menu_postpone_xpm,	   16, 16 },
+	{ BALSA_PIXMAP_MENU_PRINT,	    menu_print_xpm,	   16, 16 },
+	{ BALSA_PIXMAP_MENU_NEXT,	    menu_next_xpm,	   16, 16 },
+	{ BALSA_PIXMAP_MENU_PREVIOUS,	    menu_previous_xpm,	   16, 16 },
+	{ BALSA_PIXMAP_MENU_SAVE,	    menu_save_xpm,	   16, 16 },
+	{ BALSA_PIXMAP_MENU_SEND,	    menu_send_xpm,	   16, 16 },
+	{ BALSA_PIXMAP_MENU_SEND_RECEIVE,   menu_send_receive_xpm, 16, 16 },
+	{ BALSA_PIXMAP_MENU_COMPOSE,	    menu_compose_xpm,	   16, 16 },
+	{ BALSA_PIXMAP_MENU_ATTACHMENT,	    menu_attachment_xpm,   16, 16 },
+	{ BALSA_PIXMAP_MENU_RECEIVE,	    menu_receive_xpm,	   16, 16 },
+	{ BALSA_PIXMAP_MENU_NEXT_FLAGGED,   menu_next_flagged_xpm, 16, 16 },
+	{ BALSA_PIXMAP_MENU_NEXT_UNREAD,    menu_next_unread_xpm,  16, 16 },
+	{ BALSA_PIXMAP_MENU_MARK_ALL,	    menu_mark_all_xpm,	   16, 16 },
 
 	/* Other icons */
-	{ BALSA_PIXMAP_OTHER_CLOSE,		other_close_xpm,	9, 9 },
+	{ BALSA_PIXMAP_OTHER_CLOSE,		other_close_xpm,    9, 9 },
     };
 
     unsigned i;

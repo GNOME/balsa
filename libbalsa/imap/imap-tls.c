@@ -378,8 +378,7 @@ imap_handle_starttls(ImapMboxHandle *handle)
     return IMR_OK;
   } else {
     /* ssl is owned now by sio, no need to free it SSL_free(ssl); */
-    sio_detach(handle->sio); handle->sio = NULL; close(handle->sd);
-    handle->state = IMHS_DISCONNECTED;
+    imap_handle_disconnect(handle);
     return IMR_NO;
   }
 }

@@ -244,7 +244,16 @@ imap_handle_set_timeout(ImapMboxHandle *h, int milliseconds)
 }
 
 /* imap_handle_idle_enable: enables calling IDLE command after seconds
-   of inactivity. */
+   of inactivity. IDLE support consists of three subroutines:
+
+1. imap_handle_idle_{enable,disable}() switch to and from the IDLE
+   mode.  switching to the mode is done by registering an idle
+   callback idle_start() with 30 seconds delay time.
+
+2. idle start() sends the IDLE command and registers idle_process() to
+   be notified whenever data is available on the specified descriptor.
+
+3. idle_process() processes the data sent from the server. */
 static gboolean
 idle_process(GIOChannel *source, GIOCondition condition, gpointer data)
 {
@@ -257,10 +266,11 @@ idle_process(GIOChannel *source, GIOCondition condition, gpointer data)
     if ( (rc=imap_cmd_step(h, 0)) == IMR_UNKNOWN ||
          rc == IMR_SEVERED || rc == IMR_BYE || rc == IMR_PROTOCOL ||
          rc  == IMR_BAD) {
-      printf("idle got unexpected response %i!\n"
-             "Last message was: %s!\n", rc, h->last_msg);
+      printf("idle_process() got unexpected response %i!\n"
+             "Last message was: "%s" - shuttong down idle listener\n",
+             rc, h->last_msg);
       /* FIXME: consider aborting connection here. */
-      break;
+      return FALSE;
     }
   }
   return TRUE;
@@ -325,6 +335,17 @@ imap_handle_idle_disable(ImapMboxHandle *h)
     /* tagged OK will be ignored */
   }
   return FALSE;
+}
+
+void
+imap_handle_disconnect(ImapMboxHandle *h)
+{
+  imap_handle_idle_disable(h);
+  if(h->sio) {
+    sio_detach(h->sio); h->sio = NULL;
+  }
+  close(h->sd);
+  h->state = IMHS_DISCONNECTED;
 }
 
 int imap_mbox_is_disconnected (ImapMboxHandle *h)
@@ -509,8 +530,7 @@ imap_mbox_connect(ImapMboxHandle* handle)
                       handle->user_cb, handle->user_arg)) 
       handle->using_tls = 1;
     else {
-      sio_detach(handle->sio); handle->sio = NULL; close(handle->sd);
-      handle->state = IMHS_DISCONNECTED;
+      imap_handle_disconnect(handle);
       return IMAP_UNSECURE;
     }
   }
@@ -521,9 +541,7 @@ imap_mbox_connect(ImapMboxHandle* handle)
   handle->state = IMHS_CONNECTED;
   if (imap_cmd_step(handle, 0) != IMR_UNTAGGED) {
     g_warning("imap_mbox_connect:unexpected initial response\n");
-    sio_detach(handle->sio); handle->sio = NULL;
-    close(handle->sd);
-    handle->state = IMHS_DISCONNECTED;
+    imap_handle_disconnect(handle);
     return IMAP_PROTOCOL_ERROR;
   }
   handle->can_fetch_body = 
@@ -688,9 +706,7 @@ imap_mbox_handle_finalize(GObject* gobject)
     handle->doing_logout = TRUE;
     imap_cmd_exec(handle, "LOGOUT");
   }
-  handle->state = IMHS_DISCONNECTED;
-  if(handle->sio) { sio_detach(handle->sio); handle->sio = NULL; }
-  close(handle->sd);
+  imap_handle_disconnect(handle);
   g_free(handle->host);    handle->host   = NULL;
   g_free(handle->mbox);    handle->mbox   = NULL;
   g_free(handle->last_msg);handle->last_msg = NULL;
@@ -1296,8 +1312,7 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
 #endif
   if( imap_cmd_get_tag(handle->sio, tag, sizeof(tag))<0) {
     printf("connection severed.\n");
-    close(handle->sd);
-    handle->state = IMHS_DISCONNECTED;
+    imap_handle_disconnect(handle);
     return IMR_SEVERED;
   }
   /* handle untagged messages. The caller still gets its shot afterwards. */
@@ -1327,9 +1342,7 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
   /* our command tags are hexadecimal numbers */
   if(sscanf(tag, "%x", &cmdno) != 1) {
     printf("scanning '%s' for tag number failed. Cannot recover.\n", tag);
-    /* sio_detach(handle->sio); leads to a crash */
-    close(handle->sd);
-    handle->state = IMHS_DISCONNECTED;
+    imap_handle_disconnect(handle);
     return IMR_BAD;
   }
 
@@ -1400,10 +1413,8 @@ imap_mbox_gets(ImapMboxHandle *h, char* buf, size_t sz)
   g_return_val_if_fail(h, NULL);
 
   rc = sio_gets(h->sio, buf, sz);
-  if(rc == NULL) {
-    sio_detach(h->sio); h->sio = NULL;
-    h->state = IMHS_DISCONNECTED;
-  }
+  if(rc == NULL)
+      imap_handle_disconnect(h);
   return rc;
 }
 

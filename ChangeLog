@@ -1,3 +1,10 @@
+2005-02-08  Pawel Salek
+
+	* libbalsa/imap/imap-handle.c: unregister IDLE listener on
+	error.
+	* libbalsa/imap/imap-tls.c: related connection shutting cleanup.
+	* libbalsa/imap/imap_private.h: add imap_handle_disconnect() proto.
+
 2005-02-07 20:45  PeterB
 
 	* src/: save-restore.c, toolbar-factory.c, toolbar-factory.h: fix

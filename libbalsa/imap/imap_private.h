@@ -135,6 +135,7 @@ int imap_setup_ssl(struct siobuf *sio, const char* host, SSL *ssl,
                    ImapUserCb user_cb, void *user_arg);
 #endif
 
+void imap_handle_disconnect(ImapMboxHandle *h);
 ImapConnectionState imap_mbox_handle_get_state(ImapMboxHandle *h);
 void imap_mbox_handle_set_state(ImapMboxHandle *h,
                                 ImapConnectionState newstate);

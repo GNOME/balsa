@@ -878,10 +878,10 @@ libbalsa_address_new_from_edit_entries(GtkWidget **entries)
 #define SET_FIELD(f,e)\
   do{ (f) = g_strstrip(gtk_editable_get_chars(GTK_EDITABLE(e), 0, -1));\
       if( !(f) || !*(f)) { g_free(f); (f) = NULL; }                    \
- else { while( (p=strchr(address->full_name,';'))) *p = ','; }  } while(0)
+ else { char *p = (f); while( (p=strchr(p,';'))) *p++ = ','; }  } while(0)
 
     LibBalsaAddress *address;
-    char *p, *addr;
+    char *addr;
     /* FIXME: This problem should be solved in the VCard
        implementation in libbalsa: semicolons mess up how GnomeCard
        processes the fields, so disallow them and replace them

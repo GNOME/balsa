@@ -1,18 +1,19 @@
-# german po for balsa.
+# German translation for Balsa
 # Copyright (C) 2000 Free Software Foundation, Inc.
+# Christian Meyer <linux@chrisime.de>, 2000.
 # Kai Lahmann <kl@linuxfaqs.de>, 2000.
 # Michael Duelli <m.duelli@web.de>, 2000.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa VERISON\n"
-"POT-Creation-Date: 2000-09-07 20:57+0200\n"
-"PO-Revision-Date: 2000-08-28 00:45+02:00\n"
-"Last-Translator: Michael Duelli <m.duelli@web.de>\n"
-"Language-Team: german <de@li.org>\n"
+"POT-Creation-Date: 2000-09-08 19:58+0200\n"
+"PO-Revision-Date: 2000-09-08 19:54+0200\n"
+"Last-Translator: Christian Meyer <linux@chrisime.de>\n"
+"Language-Team: German <gnome-de@gnome.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-1\n"
-"Content-Transfer-Encoding: 8Bit\n"
+"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
 
 #: libbalsa/mailbox_imap.c:251
 #, c-format
@@ -342,9 +343,8 @@ msgid "Can't write message"
 msgstr "Kann Nachricht nicht schreiben?"
 
 #: libmutt/pop.c:136
-#, fuzzy
 msgid "Unable to get APOP seed from server"
-msgstr "APOP ist mit diesem Server nicht möglich"
+msgstr "`APOP seed' kann vom Server nicht geholt werden"
 
 #: libmutt/imap/auth.c:110
 msgid "Authenticating (CRAM-MD5)..."
@@ -371,9 +371,8 @@ msgid "Skipping CRAM-MD5 authentication."
 msgstr "Überspring CRAM-MD% Authentifikation."
 
 #: libmutt/imap/auth.c:361
-#, fuzzy
 msgid "Logging in..."
-msgstr "Lade..."
+msgstr "Einloggen..."
 
 #. Login failed, try again
 #: libmutt/imap/auth.c:373
@@ -457,7 +456,7 @@ msgid "     to %s"
 msgstr "     an %s"
 
 #: libmutt/imap/imap_ssl.c:481
-#, fuzzy, c-format
+#, c-format
 msgid "Fingerprint: %s"
 msgstr "Fingerabdruck: %s"
 
@@ -467,19 +466,19 @@ msgstr "SSL Zertifikat Überprüfung"
 
 #: libmutt/imap/imap_ssl.c:486
 msgid "(r)eject, accept (o)nce, (a)ccept always"
-msgstr ""
+msgstr "(a)blehen, (d)iesmal akzeptieren, (i)mmer akzeptieren"
 
 #: libmutt/imap/imap_ssl.c:487
 msgid "roa"
-msgstr ""
+msgstr "roa"
 
 #: libmutt/imap/imap_ssl.c:491
 msgid "(r)eject, accept (o)nce"
-msgstr ""
+msgstr "(a)blehnen, (d)iesmal akzeptieren"
 
 #: libmutt/imap/imap_ssl.c:492
 msgid "ro"
-msgstr ""
+msgstr "ro"
 
 #: libmutt/imap/imap_ssl.c:496
 msgid "Exit  "
@@ -498,9 +497,8 @@ msgid "Certificate saved"
 msgstr "Zertifikat gespeichert"
 
 #: libmutt/imap/util.c:43
-#, fuzzy
 msgid "Continue?"
-msgstr "Weiter?"
+msgstr "Fortfahren?"
 
 #: src/address-book.c:196
 msgid "Add New Address"
@@ -561,9 +559,9 @@ msgstr ""
 "Das Passwort für %s@%s:"
 
 #: src/balsa-app.c:63
-#, fuzzy, c-format
+#, c-format
 msgid "Mailbox password for %s@%s:"
-msgstr "Postfach-Passwort:"
+msgstr "Postfach Passwort für %s@%s:"
 
 #: src/balsa-app.c:218 src/balsa-app.c:223 src/balsa-app.c:228
 #: src/balsa-app.c:233 src/balsa-app.c:238
@@ -1045,9 +1043,8 @@ msgid "You need to fill in the Mailbox Name field."
 msgstr "Sie müssen das Feld \"Postfachname\" ausfüllen."
 
 #: src/mailbox-conf.c:466
-#, fuzzy
 msgid "You need to fill in the Mailbox Path field."
-msgstr "Sie müssen das Feld \"Postfachname\" ausfüllen."
+msgstr "Sie müssen das Feld \"Postfachpfad\" ausfüllen."
 
 #: src/mailbox-conf.c:475
 msgid "You need to fill in the folderpath field."
@@ -1606,7 +1603,7 @@ msgstr "Start"
 
 #: src/pref-manager.c:242
 msgid "LDAP"
-msgstr ""
+msgstr "LDAP"
 
 #: src/pref-manager.c:797
 msgid "Your name:"
@@ -1770,28 +1767,24 @@ msgstr "Ausgewählte Kopfzeilen:"
 
 #. Information messages frame...
 #: src/pref-manager.c:1343
-#, fuzzy
 msgid "Information Messages"
-msgstr "Nachricht erstellen"
+msgstr "Informationsmitteilungen"
 
 #: src/pref-manager.c:1353
 msgid "Informational Messages"
-msgstr ""
+msgstr "Informative Mitteilungen"
 
 #: src/pref-manager.c:1364
-#, fuzzy
 msgid "Warning Messages"
-msgstr "Beim Abholen von Nachrichten"
+msgstr "Warnmitteilungen"
 
 #: src/pref-manager.c:1375
-#, fuzzy
 msgid "Error Messages"
-msgstr "Vorherige Nachricht"
+msgstr "Fehlermitteilungen"
 
 #: src/pref-manager.c:1386
-#, fuzzy
 msgid "Debug Messages"
-msgstr "Nachricht löschen"
+msgstr "Debug-Mitteilungen"
 
 #: src/pref-manager.c:1448
 msgid "characters"
@@ -1880,35 +1873,32 @@ msgid "Remember open mailboxes between sessions"
 msgstr "Geöffnete Postfächer merken"
 
 #: src/pref-manager.c:1815
-#, fuzzy
 msgid "LDAP Configuration"
-msgstr "Postfach-Einstellungen"
+msgstr "LDAP Konfiguration"
 
 #: src/pref-manager.c:1827
-#, fuzzy
 msgid "LDAP Server:"
-msgstr "SMTP-Server:"
+msgstr "LDAP Server:"
 
 #: src/pref-manager.c:1840
 msgid "Base DN:"
-msgstr ""
+msgstr "Basis DN:"
 
 #: src/pref-manager.c:1853
-#, fuzzy
 msgid "Test"
-msgstr "Text"
+msgstr "Test"
 
 #: src/pref-manager.c:1998
 msgid "Show Nothing"
-msgstr ""
+msgstr "Nichts zeigen"
 
 #: src/pref-manager.c:2004
 msgid "Show Dialog"
-msgstr ""
+msgstr "Dialog zeigen"
 
 #: src/pref-manager.c:2010
 msgid "Show In List"
-msgstr ""
+msgstr "In Liste zeigen"
 
 #: src/print.c:96
 #, c-format
@@ -2202,19 +2192,3 @@ msgstr "Kann Druckbefehl nicht ausführen."
 #: src/sendmsg-window.c:1522
 msgid "Error executing lpr"
 msgstr "Fehler beim Ausführen von 'lpr'"
-
-#~ msgid ""
-#~ "Unable to open address book %s for reading.\n"
-#~ " - %s\n"
-#~ msgstr ""
-#~ "Konnte das Adressbuch %s nicht zum Lesen öffnen.\n"
-#~ " - %s\n"
-
-#~ msgid "Balsa Warning"
-#~ msgstr "Balsa Warnung"
-
-#~ msgid "Quoted text colour"
-#~ msgstr "Zitatfarbe"
-
-#~ msgid "Error: "
-#~ msgstr "Fehler: "

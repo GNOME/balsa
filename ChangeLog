@@ -1,5 +1,12 @@
-2004-01-11 12:32  PeterB
+2004-01-11 15:54  PeterB
 
+	* libbalsa/: mailbox.c, mailbox.h, mailbox_imap.c, mailbox_local.c,
+	message.c, message.h, imap/imap-commands.c, imap/imap-handle.c,
+	imap/imap-handle.h: add GMimeContentType *content_type member to
+	LiBBalsaMessageHeaders and remove related gboolean members from
+	LiBBalsaMessage; fix libbalsa_message_set_header_from_string(); use
+	BODY.PEEK[HEADER.FIELDS (CONTENT-TYPE)] to get content-type for
+	imap messages; untested support for message/partial.
 	* src/balsa-message.c: Plug a memory leak; allow 2-pixel motion
 	tolerance when activating a URL.
 

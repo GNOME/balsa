@@ -1,7 +1,8 @@
-2003-09-30 10:04  PeterB
+2003-09-30 18:09  PeterB
 
-	* libbalsa/mailbox_mbox.c: Dup a const string; unlock with a stream
-	before unref'ing it.
+	* libbalsa/mailbox_mbox.c: Use const variables for the result
+	  of strrchr when the argument is const; dup a const string;
+	  unlock with a stream before unref'ing it.
 
 2003-09-28  Carlos Morgado  <chbm gnome.org>
 

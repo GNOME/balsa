@@ -1,3 +1,11 @@
+2004-08-10 09:00  PeterB
+
+	* src/: balsa-mblist.c, mailbox-node.c, mailbox-node.h,
+	save-restore.c: drop BalsaMailboxNode::expanded; use
+	libbalsa_mailbox_get_exposed to decide whether to expand rows.
+	* libbalsa/information.c: use one idle handler instead of four;
+	check for NULL format string.
+
 2004-08-08  Pawel Salek
 
 	* libbalsa/imap-server.c: failed keep-alives are uninteresting.

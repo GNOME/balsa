@@ -1,5 +1,7 @@
-2003-11-16 11:05  PeterB
+2003-11-16 20:09  PeterB
 
+	* src/balsa-index.c: Select another message when current message is
+	flagged as deleted.
 	* libbalsa/message.c: Don't lock mailbox when looking up message
 	properties.
 

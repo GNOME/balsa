@@ -15,9 +15,8 @@ PKG_NAME="Gnome Balsa"
     exit 1
 }
 
-# GNOME´s autogen.sh does not pass --intl option to gettextize,
-# let's call gettextize ourselves
-gettextize --force --copy --intl
+# GNOME's autogen.sh does not pass --intl option to gettextize,
+function gettextize { `which gettextize` --intl $*; }
 
 # call GNOME´s autogen.sh.
 . $srcdir/macros/autogen.sh

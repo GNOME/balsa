@@ -18,6 +18,7 @@
 
 #include "mutt.h"
 #include "mime.h"
+#include "charset.h"
 #include "rfc2047.h"
 
 #include <ctype.h>
@@ -33,10 +34,21 @@ static void q_encode_string (char *d, size_t dlen, const unsigned char *s)
   char charset[SHORT_STRING];
   size_t cslen, wordlen;
   char *wptr = d;
+  const unsigned char *t;
+  int hibit = 0;
 
-  snprintf (charset, sizeof (charset), "=?%s?Q?",
-	    strcasecmp ("us-ascii", NONULL(Charset)) == 0 ? "unknown-8bit" : NONULL(Charset));
-  cslen = strlen (charset);
+  for(t = s; *t && !hibit; t++)
+    if(*t & 0x80) hibit = 1;
+
+  if(hibit)
+  {
+    snprintf (charset, sizeof (charset), "=?%s?Q?",
+	      mutt_strcasecmp ("us-ascii", Charset) == 0 ? "unknown-8bit" : NONULL(Charset));
+  }
+  else
+    strfcpy(charset, "=?us-ascii?Q?", sizeof(charset));
+
+  cslen = mutt_strlen (charset);
 
   strcpy (wptr, charset);
   wptr += cslen;
@@ -67,7 +79,7 @@ static void q_encode_string (char *d, size_t dlen, const unsigned char *s)
       wordlen++;
       dlen--;
     }
-    else if ((*s & 0x80) || *s == '\t' || strchr (MimeSpecials, *s))
+    else if ((*s & 0x80) || *s == '\t' || *s == '_' || strchr (MimeSpecials, *s))
     {
       if (wordlen >= 70)
       {
@@ -111,7 +123,7 @@ static void b_encode_string (char *d, size_t dlen, const unsigned char *s)
   int wordlen;
 
   snprintf (charset, sizeof (charset), "=?%s?B?", NONULL(Charset));
-  cslen = strlen (charset);
+  cslen = mutt_strlen (charset);
   strcpy (wptr, charset);
   wptr += cslen;
   wordlen = cslen;
@@ -188,13 +200,13 @@ void rfc2047_encode_string (char *d, size_t dlen, const unsigned char *s)
     return;
   }
 
-  if (strcasecmp("us-ascii", NONULL(Charset)) == 0 ||
-      strncasecmp("iso-8859", NONULL(Charset), 8) == 0)
+  if (mutt_strcasecmp("us-ascii", Charset) == 0 ||
+      mutt_strncasecmp("iso-8859", Charset, 8) == 0)
     encoder = q_encode_string;
   else
   {
     /* figure out which encoding generates the most compact representation */
-    len = strlen ((char *) s);
+    len = mutt_strlen ((char *) s);
     if ((count * 2) + len <= (4 * len) / 3)
       encoder = q_encode_string;
     else
@@ -203,14 +215,14 @@ void rfc2047_encode_string (char *d, size_t dlen, const unsigned char *s)
 
   /* Hack to pull the Re: and Fwd: out of the encoded word for better
      handling by agents which do not support RFC2047.  */
-  if (!strncasecmp ("re: ", (char *) s, 4))
+  if (!mutt_strncasecmp ("re: ", (char *) s, 4))
   {
     strncpy (d, (char *) s, 4);
     d += 4;
     dlen -= 4;
     s += 4;
   }
-  else if (!strncasecmp ("fwd: ", (char *) s, 5))
+  else if (!mutt_strncasecmp ("fwd: ", (char *) s, 5))
   {
     strncpy (d, (char *) s, 5);
     d += 5;
@@ -234,6 +246,14 @@ void rfc2047_encode_adrlist (ADDRESS *addr)
       safe_free ((void **) &ptr->personal);
       ptr->personal = safe_strdup (buffer);
     }
+#ifdef EXACT_ADDRESS
+    if (ptr->val)
+    {
+      rfc2047_encode_string (buffer, sizeof (buffer), (const unsigned char *)ptr->val);
+      safe_free ((void **) &ptr->val);
+      ptr->val = safe_strdup (buffer);
+    }
+#endif
     ptr = ptr->next;
   }
 }
@@ -244,15 +264,19 @@ static int rfc2047_decode_word (char *d, const char *s, size_t len)
   char *pp = p;
   char *pd = d;
   int enc = 0, filter = 0, count = 0, c1, c2, c3, c4;
-
+  char *charset = NULL;
+  
   while ((pp = strtok (pp, "?")) != NULL)
   {
     count++;
     switch (count)
     {
       case 2:
-	if (strcasecmp (pp, NONULL(Charset)) != 0)
+	if (mutt_strcasecmp (pp, Charset) != 0)
+        {
 	  filter = 1;
+	  charset = pp;
+	}
 	break;
       case 3:
 	if (toupper (*pp) == 'Q')
@@ -274,6 +298,8 @@ static int rfc2047_decode_word (char *d, const char *s, size_t len)
 	    }
 	    else if (*pp == '=')
 	    {
+	      if (pp[1] == 0 || pp[2] == 0)
+		break;	/* something wrong */
 	      *pd++ = (hexval(pp[1]) << 4) | hexval(pp[2]);
 	      len--;
 	      pp += 2;
@@ -291,22 +317,24 @@ static int rfc2047_decode_word (char *d, const char *s, size_t len)
 	{
 	  while (*pp && len > 0)
 	  {
+	    if (pp[0] == '=' || pp[1] == 0 || pp[1] == '=')
+	      break;  /* something wrong */
 	    c1 = base64val(pp[0]);
 	    c2 = base64val(pp[1]);
 	    *pd++ = (c1 << 2) | ((c2 >> 4) & 0x3);
 	    if (--len == 0) break;
 	    
-	    if (pp[2] == '=') break;
+	    if (pp[2] == 0 || pp[2] == '=') break;
 
 	    c3 = base64val(pp[2]);
 	    *pd++ = ((c2 & 0xf) << 4) | ((c3 >> 2) & 0xf);
 	    if (--len == 0)
 	      break;
 
-	    if (pp[3] == '=')
+	    if (pp[3] == 0 || pp[3] == '=')
 	      break;
 
-	    c4 = base64val(pp[3]);   
+	    c4 = base64val(pp[3]);
 	    *pd++ = ((c3 & 0x3) << 6) | c4;
 	    if (--len == 0)
 	      break;
@@ -319,17 +347,24 @@ static int rfc2047_decode_word (char *d, const char *s, size_t len)
     }
     pp = 0;
   }
-  safe_free ((void **) &p);
+  
   if (filter)
   {
-    pd = d;
-    while (*pd)
+    if(mutt_is_utf8(charset))
     {
-      if (!IsPrint (*pd))
-	*pd = '?';
-      pd++;
+      CHARSET *chs = mutt_get_charset(Charset);
+      mutt_decode_utf8_string(d, chs);
+    }
+    else if (mutt_display_string(d, mutt_get_translation(charset, Charset)) == -1)
+    {
+      for(pd = d; *pd; pd++)
+      {
+        if (!IsPrint (*pd))
+	  *pd = '?';
+      }
     }
   }
+  safe_free ((void **) &p);
   return (0);
 }
 
@@ -375,7 +410,7 @@ void rfc2047_decode (char *d, const char *s, size_t dlen)
     rfc2047_decode_word (d, p, dlen);
     found_encoded = 1;
     s = q + 2;
-    n = strlen (d);
+    n = mutt_strlen (d);
     dlen -= n;
     d += n;
   }
@@ -387,7 +422,11 @@ void rfc2047_decode_adrlist (ADDRESS *a)
   while (a)
   {
     if (a->personal && strstr (a->personal, "=?") != NULL)
-      rfc2047_decode (a->personal, a->personal, strlen (a->personal) + 1);
+      rfc2047_decode (a->personal, a->personal, mutt_strlen (a->personal) + 1);
+#ifdef EXACT_ADDRESS
+    if (a->val && strstr (a->val, "=?") != NULL)
+      rfc2047_decode (a->val, a->val, mutt_strlen (a->val) + 1);
+#endif
     a = a->next;
   }
 }

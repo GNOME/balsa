@@ -59,6 +59,9 @@ enum
   MENU_PAGER,
   MENU_POST,
 
+#ifdef _PGPPATH
+  MENU_PGP,
+#endif
 
 
 
@@ -95,5 +98,8 @@ extern struct binding_t OpBrowser[];
 extern struct binding_t OpEditor[];
 extern struct binding_t OpQuery[];
 
+#ifdef _PGPPATH
+extern struct binding_t OpPgp[];
+#endif /* _PGPPATH */
 
 #endif /* KEYMAP_H */

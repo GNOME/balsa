@@ -30,6 +30,7 @@
 #define REDRAW_STATUS		(1<<4)
 #define REDRAW_FULL		(1<<5)
 #define REDRAW_BODY		(1<<6)
+#define REDRAW_SIGWINCH		(1<<7)
 
 #define M_MODEFMT "-- Mutt: %s"
 
@@ -70,6 +71,7 @@ typedef struct menu_t
 void menu_jump (MUTTMENU *);
 void menu_redraw_full (MUTTMENU *);
 void menu_redraw_index (MUTTMENU *);
+void menu_redraw_status (MUTTMENU *);
 void menu_redraw_motion (MUTTMENU *);
 void menu_redraw_current (MUTTMENU *);
 void menu_first_entry (MUTTMENU *);

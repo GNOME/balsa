@@ -18,8 +18,9 @@
 
 #include "mutt.h"
 #include "buffy.h"
-#include "mx.h"
 #include "mailbox.h"
+#include "mx.h"
+
 #ifdef USE_IMAP
 #include "imap.h"
 #endif
@@ -45,10 +46,11 @@ static short BuffyNotify = 0;	/* # of unnotified new boxes */
 int fseek_last_message (FILE * f)
 {
   long int pos;
-  char buffer[BUFSIZ + 7];	/* 7 for "\n\nFrom " */
+  char buffer[BUFSIZ + 9];	/* 7 for "\n\nFrom " */
   int bytes_read;
   int i;			/* Index into `buffer' for scanning.  */
-  memset (buffer, 0, BUFSIZ+7);
+
+  memset (buffer, 0, sizeof(buffer));
   fseek (f, 0, SEEK_END);
   pos = ftell (f);
 
@@ -62,13 +64,13 @@ int fseek_last_message (FILE * f)
   while ((pos -= bytes_read) >= 0)
   {
     /* we save in the buffer at the end the first 7 chars from the last read */
-    strncpy (buffer + BUFSIZ, buffer, 7);
+    strncpy (buffer + BUFSIZ, buffer, 5+2); /* 2 == 2 * mutt_strlen(CRLF) */
     fseek (f, pos, SEEK_SET);
     bytes_read = fread (buffer, sizeof (char), bytes_read, f);
     if (bytes_read == -1)
       return -1;
     for (i = bytes_read; --i >= 0;)
-      if (!strncmp (buffer + i, "\n\nFrom ", strlen ("\n\nFrom ")))
+      if (!mutt_strncmp (buffer + i, "\n\nFrom ", mutt_strlen ("\n\nFrom ")))
       {				/* found it - go to the beginning of the From */
 	fseek (f, pos + i + 2, SEEK_SET);
 	return 0;
@@ -77,7 +79,7 @@ int fseek_last_message (FILE * f)
   }
 
   /* here we are at the beginning of the file */
-  if (!strncmp ("From ", buffer, 5))
+  if (!mutt_strncmp ("From ", buffer, 5))
   {
     fseek (f, 0, 0);
     return (0);
@@ -96,7 +98,7 @@ int test_last_status_new (FILE * f)
     return (0);
 
   hdr = mutt_new_header ();
-  mutt_read_rfc822_header (f, hdr);
+  mutt_read_rfc822_header (f, hdr, 0);
   if (!(hdr->read || hdr->old))
     result = 1;
   mutt_free_header (&hdr);
@@ -112,7 +114,7 @@ int test_new_folder (const char *path)
 
   typ = mx_get_magic (path);
 
-  if (typ != M_MBOX && typ != M_MMDF)
+  if (typ != M_MBOX && typ != M_MMDF && typ != M_KENDRA)
     return 0;
 
   f = fopen (path, "rb");
@@ -168,10 +170,14 @@ int mutt_parse_mailboxes (BUFFER *path, BUFFER *s, unsigned long data, BUFFER *e
     mutt_extract_token (path, s, 0);
     strfcpy (buf, path->data, sizeof (buf));
     mutt_expand_path (buf, sizeof (buf));
+
+    /* Skip empty tokens. */
+    if(!*buf) continue;
+
     /* simple check to avoid duplicates */
     for (tmp = &Incoming; *tmp; tmp = &((*tmp)->next))
     {
-      if (strcmp (buf, (*tmp)->path) == 0)
+      if (mutt_strcmp (buf, (*tmp)->path) == 0)
 	break;
     }
 
@@ -220,8 +226,20 @@ int mutt_buffy_check (int force)
   DIR *dirp;
   char path[_POSIX_PATH_MAX];
   struct stat contex_sb;
-  int res;
   time_t t;
+#ifdef USE_IMAP
+  static time_t last_imap_check = 0;
+  int do_imap_check = 1;
+
+  if (ImapCheckTime)
+  {
+    time_t now = time (NULL);
+    if (!force && (now - last_imap_check < ImapCheckTime))
+      do_imap_check = 0;
+    else
+      last_imap_check = now;
+  }
+#endif
 
   /* fastest return if there are no mailboxes */
   if (!Incoming)
@@ -234,6 +252,9 @@ int mutt_buffy_check (int force)
   BuffyCount = 0;
   BuffyNotify = 0;
 
+#ifdef USE_IMAP
+  if (!Context || Context->magic != M_IMAP)
+#endif
   /* check device ID and serial number instead of comparing paths */
   if (!Context || !Context->path || stat (Context->path, &contex_sb) != 0)
   {
@@ -243,36 +264,41 @@ int mutt_buffy_check (int force)
   
   for (tmp = Incoming; tmp; tmp = tmp->next)
   {
-    tmp->new = 0;
-
 #ifdef USE_IMAP
     if ((tmp->magic == M_IMAP) || mx_is_imap (tmp->path))
-    {
       tmp->magic = M_IMAP;
-    }
     else
 #endif
-    if (stat (tmp->path, &sb) != 0 ||
-	(!tmp->magic && (tmp->magic = mx_get_magic (tmp->path)) <= 0))
     {
-      /* if the mailbox still doesn't exist, set the newly created flag to
-       * be ready for when it does.
-       */
-      tmp->newly_created = 1;
-      tmp->magic = 0;
+      tmp->new = 0;
+
+      if (stat (tmp->path, &sb) != 0 ||
+        (!tmp->magic && (tmp->magic = mx_get_magic (tmp->path)) <= 0))
+      {
+        /* if the mailbox still doesn't exist, set the newly created flag to
+         * be ready for when it does.
+         */
+        tmp->newly_created = 1;
+        tmp->magic = 0;
 #ifdef BUFFY_SIZE
-      tmp->size = 0;
+        tmp->size = 0;
 #endif
-      continue;
+        continue;
+      }
     }
 
     if (!Context || !Context->path || 
+#ifdef USE_IMAP
+        /* Poll current IMAP folder like any other */
+        tmp->magic == M_IMAP ||
+#endif
 	sb.st_dev != contex_sb.st_dev || sb.st_ino != contex_sb.st_ino)
     {
       switch (tmp->magic)
       {
       case M_MBOX:
       case M_MMDF:
+      case M_KENDRA:
 
 	if (STAT_CHECK)
 	{
@@ -293,8 +319,12 @@ int mutt_buffy_check (int force)
 	break;
 
       case M_MAILDIR:
+      case M_MH:
 
-	snprintf (path, sizeof (path), "%s/new", tmp->path);
+	if(tmp->magic == M_MAILDIR)
+	  snprintf (path, sizeof (path), "%s/new", tmp->path);
+	else
+	  strfcpy (path, tmp->path, sizeof(path));
 	if ((dirp = opendir (path)) == NULL)
 	{
 	  tmp->magic = 0;
@@ -313,27 +343,22 @@ int mutt_buffy_check (int force)
 	closedir (dirp);
 	break;
 
-      case M_MH:
-
-	res = mh_parse_sequences (NULL, tmp->path);
-	if (res >= 0)
-	{
-	  BuffyCount += res;
-	  tmp->new = res;
-	}
-	else
-	{
-	  tmp->magic = 0;
-	}
-	break;
-
 #ifdef USE_IMAP
       case M_IMAP:
-	if (imap_buffy_check (tmp->path) > 0)
-	{
-	  BuffyCount++;
-	  tmp->new = 1;
-	}
+        /* poll on do_imap_check, else return cached value */
+        if (do_imap_check)
+        {
+          tmp->new = 0;
+          if (imap_buffy_check (tmp->path) > 0)
+          {
+            BuffyCount++;
+            tmp->new = 1;
+          }
+        }
+        else
+          if (tmp->new)
+            BuffyCount++;
+
 	break;
 #endif
       }
@@ -417,7 +442,7 @@ void mutt_buffy (char *s)
     count = 0;
     while (count < 3)
     {
-      if (strcmp (s, tmp->path) == 0)
+      if (mutt_strcmp (s, tmp->path) == 0)
 	count++;
       else if (count && tmp->new)
 	break;

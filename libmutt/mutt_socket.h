@@ -19,7 +19,7 @@
 #ifndef _MUTT_SOCKET_H_
 #define _MUTT_SOCKET_H_ 1
 
-typedef struct
+typedef struct _connection
 {
   char *server;
   int port;
@@ -28,6 +28,8 @@ typedef struct
   char inbuf[LONG_STRING];
   int bufpos;
   int available;
+  void *data;
+  struct _connection *next;
 } CONNECTION;
 
 int mutt_socket_readchar (CONNECTION *conn, char *c);
@@ -35,5 +37,7 @@ int mutt_socket_read_line (char *buf, size_t buflen, CONNECTION *conn);
 int mutt_socket_read_line_d (char *buf, size_t buflen, CONNECTION *conn);
 int mutt_socket_write (CONNECTION *conn, const char *buf);
 CONNECTION *mutt_socket_select_connection (char *host, int port, int flags);
+int mutt_socket_open_connection (CONNECTION *conn);
+
 
 #endif /* _MUTT_SOCKET_H_ */

@@ -1,3 +1,8 @@
+2005-03-21 08:08  PeterB
+
+	* configure.in, src/balsa-message.c, src/sendmsg-window.c: check
+	for GnomeVFS version 2.9 instead of 2.8.
+
 2005-03-20 15:03  PeterB
 
 	* libbalsa/libbalsa-conf.c: initialize only once in non-threaded

@@ -1126,7 +1126,7 @@ libbalsa_address_new_from_gmime(const gchar *addr)
 
     if (addr==NULL)
 	return NULL;
-    address = libbalsa_address_new_from_string(g_strdup(addr));
+    address = libbalsa_address_new_from_string(addr);
     return address;
 }
 
@@ -1223,55 +1223,56 @@ libbalsa_message_headers_from_gmime(LibBalsaMessageHeaders *headers,
  * grabs the message body, in case more headers have been downloaded
  */
 void
-libbalsa_message_headers_update(LibBalsaMessage * message)
+libbalsa_message_headers_update(LibBalsaMessage * message,
+				GMimeMessage * mime_msg)
 {
     int offset;
 
     g_return_if_fail(message != NULL);
     g_return_if_fail(message->headers != NULL);
 
-    if (message->mime_msg) {
+    if (mime_msg) {
 	libbalsa_message_headers_from_gmime(message->headers,
-					    message->mime_msg);
+					    mime_msg);
 
 	if (!message->headers->date)
-	    g_mime_message_get_date(message->mime_msg,
+	    g_mime_message_get_date(mime_msg,
 				    &message->headers->date, &offset);
 	if (!message->sender)
 	    message->sender =
 		libbalsa_address_new_from_gmime(g_mime_message_get_sender
-						(message->mime_msg));
+						(mime_msg));
 
 	if (!message->in_reply_to) {
 	    const gchar *header =
-		g_mime_message_get_header(message->mime_msg,
+		g_mime_message_get_header(mime_msg,
 					  "In-Reply-To");
 	    libbalsa_message_set_in_reply_to_from_string(message, header);
 	}
 #ifdef MESSAGE_COPY_CONTENT
 	if (!message->subj) {
 	    const char *subj;
-	    subj = g_mime_message_get_subject(message->mime_msg);
+	    subj = g_mime_message_get_subject(mime_msg);
 	    message->subj = g_mime_utils_8bit_header_decode(subj);
 	    libbalsa_utf8_sanitize(&message->subj, TRUE, NULL);
 	}
 #endif
 	if (!message->message_id) {
 	    const char *value =
-		g_mime_message_get_message_id(message->mime_msg);
+		g_mime_message_get_message_id(mime_msg);
 	    if (value)
 		message->message_id = g_strdup(value);
 	}
 
 	if (!message->references) {
 	    const char *value =
-		g_mime_message_get_header(message->mime_msg, "References");
+		g_mime_message_get_header(mime_msg, "References");
 	    if (value) {
 		libbalsa_message_set_references_from_string(message,
 							    value);
 	    }
 	}
-    }	/* if (message->mime_msg) */
+    }	/* if (mime_msg) */
 
     /* more! */
     if (message->in_reply_to && message->in_reply_to->next) {

@@ -39,7 +39,6 @@
 
 struct message_info {
     LibBalsaMessage *message;
-    GMimeMessage *mime_message;
     off_t start;
     off_t end;
     char *from;
@@ -66,10 +65,15 @@ static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox,
 static LibBalsaMessage *libbalsa_mailbox_mbox_get_message(
 						  LibBalsaMailbox * mailbox,
 						  guint msgno);
-static LibBalsaMessage *libbalsa_mailbox_mbox_load_message(
-						  LibBalsaMailbox * mailbox,
-						  guint msgno,
-						  LibBalsaMessage * message);
+static void libbalsa_mailbox_mbox_fetch_message_structure(LibBalsaMailbox *
+							  mailbox,
+							  LibBalsaMessage *
+							  message,
+							  LibBalsaFetchFlag
+							  flags);
+static LibBalsaMessage *libbalsa_mailbox_mbox_load_message(LibBalsaMailbox
+							   * mailbox,
+							   guint msgno);
 static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
                                              LibBalsaMessage *message );
 static void libbalsa_mailbox_mbox_change_message_flags(LibBalsaMailbox * mailbox, guint msgno,
@@ -128,6 +132,8 @@ libbalsa_mailbox_mbox_class_init(LibBalsaMailboxMboxClass * klass)
     libbalsa_mailbox_class->close_mailbox =
 	libbalsa_mailbox_mbox_close_mailbox;
     libbalsa_mailbox_class->get_message = libbalsa_mailbox_mbox_get_message;
+    libbalsa_mailbox_class->fetch_message_structure =
+	libbalsa_mailbox_mbox_fetch_message_structure;
     libbalsa_mailbox_class->add_message = libbalsa_mailbox_mbox_add_message;
     libbalsa_mailbox_class->change_message_flags =
 	libbalsa_mailbox_mbox_change_message_flags;
@@ -261,6 +267,10 @@ static void mbox_unlock(LibBalsaMailbox * mailbox, GMimeStream *stream)
     libbalsa_unlock_file(path, fd, 1);
 }
 
+static LibBalsaMessage *lbm_mbox_message_new(GMimeMessage * mime_message,
+					     struct message_info
+					     *msg_info);
+
 static void
 parse_mailbox(LibBalsaMailbox * mailbox)
 {
@@ -268,6 +278,7 @@ parse_mailbox(LibBalsaMailbox * mailbox)
     GArray *messages_info;
     struct message_info msg_info;
     LibBalsaMailboxMbox *mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
+    GMimeMessage *mime_message;
 
     gmime_parser = 
 	g_mime_parser_new_with_stream(mbox->gmime_stream);
@@ -276,20 +287,25 @@ parse_mailbox(LibBalsaMailbox * mailbox)
 
     msg_info.message = NULL;
     msg_info.start = g_mime_parser_tell(gmime_parser);
-    msg_info.mime_message = g_mime_parser_construct_message(gmime_parser);
+    mime_message = g_mime_parser_construct_message(gmime_parser);
     while (!g_mime_parser_eos(gmime_parser)) {
 	    msg_info.from = g_mime_parser_get_from(gmime_parser);
 	    msg_info.end = g_mime_parser_tell(gmime_parser);
+	    msg_info.message =
+		lbm_mbox_message_new(mime_message, &msg_info);
 	    g_array_append_val(messages_info, msg_info);
+	    g_mime_object_unref(GMIME_OBJECT(mime_message));
 
 	    msg_info.start = g_mime_parser_tell(gmime_parser);
-	    msg_info.mime_message =
-		g_mime_parser_construct_message(gmime_parser);
+	    mime_message = g_mime_parser_construct_message(gmime_parser);
     }
-    if (msg_info.mime_message) {
+    if (mime_message) {
 	    msg_info.from = g_mime_parser_get_from(gmime_parser);
 	    msg_info.end = g_mime_parser_tell(gmime_parser);
+	    msg_info.message =
+		lbm_mbox_message_new(mime_message, &msg_info);
 	    g_array_append_val(messages_info, msg_info);
+	    g_mime_object_unref(GMIME_OBJECT(mime_message));
     }
     g_object_unref(G_OBJECT(gmime_parser));
 }
@@ -302,8 +318,7 @@ free_message_info(struct message_info *msg_info)
     if (msg_info->message) {
 	msg_info->message->mailbox = NULL;
 	g_object_unref(msg_info->message);
-    } else
-	g_mime_object_unref(GMIME_OBJECT(msg_info->mime_message));
+    }
 }
 
 static void
@@ -473,7 +488,27 @@ libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox)
 	LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox);
 }
 
+static GMimeMessage *
+lbm_mbox_get_mime_message(LibBalsaMailbox * mailbox,
+			  LibBalsaMessage * message)
+{
+    GMimeStream *stream;
+    GMimeParser *parser;
+    GMimeMessage *mime_message;
+
+    stream = libbalsa_mailbox_mbox_get_message_stream(mailbox, message);
+    parser = g_mime_parser_new_with_stream(stream);
+    g_mime_stream_unref(stream);
+
+    mime_message = g_mime_parser_construct_message(parser);
+    g_object_unref(parser);
+
+    return mime_message;
+}
+
 static void lbm_mbox_armor_part(GMimeObject ** part);
+static void update_message_status_headers(GMimeMessage *message,
+					  LibBalsaMessageFlag flags);
 static gboolean
 lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
 		   gboolean expunge,
@@ -599,21 +634,32 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
 		return FALSE;
 	    }
 	} else {
-	    lbm_mbox_armor_part(&msg_info->message->mime_msg->mime_part);
+	    GMimeMessage *mime_msg = msg_info->message->mime_msg;
+
+	    if (mime_msg)
+		g_mime_object_ref(GMIME_OBJECT(mime_msg));
+	    else {
+		mime_msg =
+		    lbm_mbox_get_mime_message(mailbox, msg_info->message);
+		update_message_status_headers(mime_msg, msg_info->flags);
+	    }
+	    lbm_mbox_armor_part(&mime_msg->mime_part);
 	    /* write From_ & message */
 	    if (!msg_info->from
 		|| g_mime_stream_write_string(temp_stream,
 					      msg_info->from) == -1
 		|| g_mime_stream_write_string(temp_stream, "\n") == -1
-		|| g_mime_message_write_to_stream(msg_info->message->mime_msg,
+		|| g_mime_message_write_to_stream(mime_msg,
 						  temp_stream) == -1
 		|| g_mime_stream_write_string(temp_stream, "\n") == -1) {
+		g_mime_object_unref(GMIME_OBJECT(mime_msg));
 		g_mime_stream_unref(temp_stream);
 		unlink(tempfile);
 		mbox_unlock(mailbox, gmime_stream);
 		g_mime_stream_unref(gmime_stream);
 		return FALSE;
 	    }
+	    g_mime_object_unref(GMIME_OBJECT(mime_msg));
 	}
     }
 
@@ -699,29 +745,32 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
 	    g_assert(msg_info->message);
 	    if (!expunge || 
 		(msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED) == 0) {
+		GMimeMessage *mime_msg;
+
 		msg_info->message->msgno = j + 1;
 		msg_info->start = g_mime_parser_tell(gmime_parser);
-		g_mime_object_unref(GMIME_OBJECT(msg_info->message->mime_msg));
-		msg_info->message->mime_msg =
-		    g_mime_parser_construct_message(gmime_parser);
+		mime_msg = g_mime_parser_construct_message(gmime_parser);
 		g_free(msg_info->from);
 		msg_info->from = g_mime_parser_get_from(gmime_parser);
 		msg_info->end = g_mime_parser_tell(gmime_parser);
 		msg_info->orig_flags = msg_info->flags;
-		g_assert(msg_info->message->mime_msg != NULL);
-		g_assert(msg_info->message->mime_msg->mime_part != NULL);
+		g_assert(mime_msg != NULL);
+		g_assert(mime_msg->mime_part != NULL);
 		j++;
-		if (msg_info->message->body_list) {
+		if (!msg_info->message->mime_msg)
+		    g_mime_object_unref(GMIME_OBJECT(mime_msg));
+		else {
+		    g_mime_object_unref(GMIME_OBJECT
+					(msg_info->message->mime_msg));
+		    msg_info->message->mime_msg = mime_msg;
 		    /*
 		     * reinit the message parts info
 		     */
 		    libbalsa_message_body_set_mime_body(msg_info->message->
 							body_list,
-							msg_info->message->
 							mime_msg->
 							mime_part);
 		}
-
 	    } else {
 		libbalsa_mailbox_msgno_removed(mailbox, j + 1);
 		/* FIXME when we get rid of msg_list... */
@@ -761,33 +810,46 @@ libbalsa_mailbox_mbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
     return msg_info->message;
 }
 
+static void
+libbalsa_mailbox_mbox_fetch_message_structure(LibBalsaMailbox * mailbox,
+					      LibBalsaMessage * message,
+					      LibBalsaFetchFlag flags)
+{
+    if (!message->mime_msg)
+	message->mime_msg = lbm_mbox_get_mime_message(mailbox, message);
+
+    LIBBALSA_MAILBOX_CLASS(parent_class)->fetch_message_structure(mailbox,
+								  message,
+								  flags);
+}
+
 static LibBalsaMessage*
-libbalsa_mailbox_mbox_load_message(LibBalsaMailbox *mailbox, guint msgno,
-				   LibBalsaMessage * message)
+libbalsa_mailbox_mbox_load_message(LibBalsaMailbox *mailbox, guint msgno)
 {
     LibBalsaMailboxMbox *mbox;
-    struct message_info *msg_info;
-    GMimeMessage *mime_message;
-    const char *header;
 
     mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
 
-    msg_info = &g_array_index(mbox->messages_info,
-			      struct message_info, msgno - 1);
+    return g_array_index(mbox->messages_info,
+			      struct message_info, msgno - 1).message;
+}
 
-    if (!msg_info)
-	return NULL;
-
-    message->mime_msg = mime_message = msg_info->mime_message;
-    msg_info->mime_message = NULL;
-    msg_info->message = message;
-    g_assert(message->mime_msg != NULL);
-    g_assert(message->mime_msg->mime_part != NULL);
+static LibBalsaMessage *
+lbm_mbox_message_new(GMimeMessage * mime_message,
+		     struct message_info *msg_info)
+{
+    LibBalsaMessage *message;
+    const char *header;
+    LibBalsaMessageFlag flags = 0;
 
     if (mime_message->subject &&
 	!strcmp(mime_message->subject,
-		"DON'T DELETE THIS MESSAGE -- FOLDER INTERNAL DATA"))
+		"DON'T DELETE THIS MESSAGE -- FOLDER INTERNAL DATA")) {
+	g_mime_object_unref(GMIME_OBJECT(mime_message));
 	return NULL;
+    }
+
+    message = libbalsa_message_new();
 
 #ifdef MESSAGE_COPY_CONTENT
     header =
@@ -805,23 +867,25 @@ libbalsa_mailbox_mbox_load_message(LibBalsaMailbox *mailbox, guint msgno,
     header = g_mime_message_get_header (mime_message, "Status");
     if (header) {
 	if (strchr(header, 'R') == NULL) /* not found == not READ */
-	    message->flags |= LIBBALSA_MESSAGE_FLAG_NEW;
+	    flags |= LIBBALSA_MESSAGE_FLAG_NEW;
 	if (strchr(header, 'r') != NULL) /* found == REPLIED */
-	    message->flags |= LIBBALSA_MESSAGE_FLAG_REPLIED;
+	    flags |= LIBBALSA_MESSAGE_FLAG_REPLIED;
 	if (strchr(header, 'O') != NULL) /* found == RECENT */
-	    message->flags |= LIBBALSA_MESSAGE_FLAG_RECENT;
+	    flags |= LIBBALSA_MESSAGE_FLAG_RECENT;
     } else
-	    message->flags |= LIBBALSA_MESSAGE_FLAG_NEW;
+	    flags |= LIBBALSA_MESSAGE_FLAG_NEW;
     header = g_mime_message_get_header (mime_message, "X-Status");
     if (header) {
 	if (strchr(header, 'D') != NULL) /* found == DELETED */
-	    message->flags |= LIBBALSA_MESSAGE_FLAG_DELETED;
+	    flags |= LIBBALSA_MESSAGE_FLAG_DELETED;
 	if (strchr(header, 'F') != NULL) /* found == FLAGGED */
-	    message->flags |= LIBBALSA_MESSAGE_FLAG_FLAGGED;
+	    flags |= LIBBALSA_MESSAGE_FLAG_FLAGGED;
 	if (strchr(header, 'A') != NULL) /* found == REPLIED */
-	    message->flags |= LIBBALSA_MESSAGE_FLAG_REPLIED;
+	    flags |= LIBBALSA_MESSAGE_FLAG_REPLIED;
     }
-    msg_info->orig_flags = msg_info->flags = message->flags;
+
+    message->flags = msg_info->flags = msg_info->orig_flags = flags;
+    libbalsa_message_headers_update(message, mime_message);
 
     return message;
 }
@@ -1044,8 +1108,9 @@ libbalsa_mailbox_mbox_change_message_flags(LibBalsaMailbox * mailbox,
     msg_info->flags |= set;
     msg_info->flags &= ~clear;
 
-    update_message_status_headers(msg_info->message->mime_msg,
-				  msg_info->flags);
+    if (msg_info->message->mime_msg)
+	update_message_status_headers(msg_info->message->mime_msg,
+				      msg_info->flags);
 
     libbalsa_mailbox_local_queue_sync(LIBBALSA_MAILBOX_LOCAL(mailbox));
 }

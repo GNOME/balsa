@@ -54,8 +54,7 @@ struct _LibBalsaMailboxLocal {
 struct _LibBalsaMailboxLocalClass {
     LibBalsaMailboxClass klass;
 
-    LibBalsaMessage *(*load_message)(LibBalsaMailbox *mb, guint msgno,
-				     LibBalsaMessage *message);
+    LibBalsaMessage *(*load_message)(LibBalsaMailbox *mb, guint msgno);
     void (*remove_files)(LibBalsaMailboxLocal *mb);
 };
 

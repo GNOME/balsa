@@ -73,13 +73,9 @@ static void
 libbalsa_mailbox_maildir_fetch_message_structure(LibBalsaMailbox * mailbox,
 						 LibBalsaMessage * message,
 						 LibBalsaFetchFlag flags);
-static void libbalsa_mailbox_maildir_release_message(LibBalsaMailbox *
-						     mailbox,
-						     LibBalsaMessage *
-						     message);
-static LibBalsaMessage *libbalsa_mailbox_maildir_load_message(
-				    LibBalsaMailbox * mailbox, guint msgno,
-				    LibBalsaMessage * message);
+static LibBalsaMessage
+    *libbalsa_mailbox_maildir_load_message(LibBalsaMailbox * mailbox,
+					   guint msgno);
 static int libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
 						LibBalsaMessage * message );
 static void libbalsa_mailbox_maildir_change_message_flags(LibBalsaMailbox * mailbox,
@@ -153,8 +149,6 @@ libbalsa_mailbox_maildir_class_init(LibBalsaMailboxMaildirClass * klass)
     libbalsa_mailbox_class->get_message = libbalsa_mailbox_maildir_get_message;
     libbalsa_mailbox_class->fetch_message_structure =
 	libbalsa_mailbox_maildir_fetch_message_structure;
-    libbalsa_mailbox_class->release_message =
-	libbalsa_mailbox_maildir_release_message;
     libbalsa_mailbox_class->add_message = libbalsa_mailbox_maildir_add_message;
     libbalsa_mailbox_class->change_message_flags =
 	libbalsa_mailbox_maildir_change_message_flags;
@@ -768,21 +762,12 @@ libbalsa_mailbox_maildir_fetch_message_structure(LibBalsaMailbox * mailbox,
 								  flags);
 }
 
-static void
-libbalsa_mailbox_maildir_release_message(LibBalsaMailbox * mailbox,
-					 LibBalsaMessage * message)
-{
-    if (message->mime_msg) {
-	g_object_unref(message->mime_msg);
-	message->mime_msg = NULL;
-    }
-}
-
-static LibBalsaMessage*
-libbalsa_mailbox_maildir_load_message(LibBalsaMailbox * mailbox, guint msgno,
-				      LibBalsaMessage * message)
+static LibBalsaMessage *
+libbalsa_mailbox_maildir_load_message(LibBalsaMailbox * mailbox,
+				      guint msgno)
 {
     struct message_info *msg_info;
+    LibBalsaMessage *message;
     const gchar *path;
     gchar *filename;
 
@@ -791,17 +776,19 @@ libbalsa_mailbox_maildir_load_message(LibBalsaMailbox * mailbox, guint msgno,
     if (!msg_info)
 	return NULL;
 
-    msg_info->message = message;
+    msg_info->message = message = libbalsa_message_new();
     path = libbalsa_mailbox_local_get_path(mailbox);
     filename = g_build_filename(path, msg_info->subdir,
 				msg_info->filename, NULL);
     if (libbalsa_message_load_envelope_from_file(message, filename) == FALSE) {
 	g_free(filename);
-	return NULL;
-    }
-    g_free(filename);
+	/* FIXME: what to do if loading the envelope fails?
+	return NULL; */
+    } else
+	g_free(filename);
 
     message->flags = msg_info->flags = msg_info->orig_flags;
+    libbalsa_message_headers_update(message, NULL);
 
     return message;
 }

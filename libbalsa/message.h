@@ -345,7 +345,8 @@ guint libbalsa_message_get_lines(LibBalsaMessage* msg);
 glong libbalsa_message_get_length(LibBalsaMessage* msg);
 #endif
 glong libbalsa_message_get_no(LibBalsaMessage* msg);
-void libbalsa_message_headers_update(LibBalsaMessage * message);
+void libbalsa_message_headers_update(LibBalsaMessage * message,
+				     GMimeMessage * mime_msg);
 
 gboolean libbalsa_message_load_envelope_from_file(LibBalsaMessage *message,
 						  const char *filename);

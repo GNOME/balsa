@@ -69,6 +69,10 @@ static void libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox *mailbox,
 static void libbalsa_mailbox_local_fetch_structure(LibBalsaMailbox *mailbox,
                                                    LibBalsaMessage *message,
                                                    LibBalsaFetchFlag flags);
+static void libbalsa_mailbox_local_release_message(LibBalsaMailbox *
+						   mailbox,
+						   LibBalsaMessage *
+						   message);
 
 static const gchar* libbalsa_mailbox_local_get_msg_part(LibBalsaMessage *msg,
                                                         LibBalsaMessageBody *,
@@ -140,6 +144,8 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
         libbalsa_mailbox_local_prepare_threading;
     libbalsa_mailbox_class->fetch_message_structure = 
         libbalsa_mailbox_local_fetch_structure;
+    libbalsa_mailbox_class->release_message =
+	        libbalsa_mailbox_local_release_message;
     libbalsa_mailbox_class->get_message_part = 
         libbalsa_mailbox_local_get_msg_part;
     klass->load_message = NULL;
@@ -240,12 +246,12 @@ libbalsa_mailbox_local_load_message(LibBalsaMailbox * mailbox, guint msgno)
     g_return_val_if_fail(msgno <= libbalsa_mailbox_total_messages(mailbox),
 			 NULL);
 
-    message = libbalsa_message_new();
-    LIBBALSA_MAILBOX_LOCAL_GET_CLASS(mailbox)->load_message(mailbox,
-							    msgno,
-							    message);
+    message =
+	LIBBALSA_MAILBOX_LOCAL_GET_CLASS(mailbox)->load_message(mailbox,
+								msgno);
+    g_return_val_if_fail(message != NULL, NULL);
+
     message->msgno = msgno;
-    libbalsa_message_headers_update(message);
     libbalsa_mailbox_link_message(LIBBALSA_MAILBOX_LOCAL(mailbox), message);
     libbalsa_message_set_icons(message);
 
@@ -465,6 +471,17 @@ libbalsa_mailbox_local_fetch_structure(LibBalsaMailbox *mailbox,
                                         mime_message->mime_part);
     libbalsa_message_append_part(message, body);
 }
+
+static void
+libbalsa_mailbox_local_release_message(LibBalsaMailbox * mailbox,
+				       LibBalsaMessage * message)
+{
+    if (message->mime_msg) {
+	g_object_unref(message->mime_msg);
+	message->mime_msg = NULL;
+    }
+}
+
 
 static const gchar*
 libbalsa_mailbox_local_get_msg_part(LibBalsaMessage *msg,

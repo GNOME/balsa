@@ -1,3 +1,8 @@
+2002-10-23  Emmanuel <e.allaud@wanadoo.fr>
+
+	* libbalsa/address-book-ldap.c: do not crash on severed LDAP
+	connection.
+
 2002-10-20  Emmanuel <e.allaud@wanadoo.fr>
 
 	* libbalsa/filter.c: corrects mailbox locking when matching

@@ -522,7 +522,6 @@ moveto_handler(BalsaIndex * bindex)
 gboolean
 balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
 {
-    GtkWidget *messagebox;
     GList *list;
     guint i = 0;
     LibBalsaMailbox* mailbox;
@@ -553,17 +552,9 @@ balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
     libbalsa_mailbox_open(mailbox, FALSE);
 
     if (mailbox->open_ref == 0) {
-	messagebox =
-	    gnome_message_box_new(_
-				  ("Unable to Open Mailbox!\nPlease check the mailbox settings."),
-				  GNOME_MESSAGE_BOX_ERROR,
-				  GNOME_STOCK_BUTTON_OK, NULL);
-	gtk_widget_set_usize(messagebox, MESSAGEBOX_WIDTH,
-			     MESSAGEBOX_HEIGHT);
-	gtk_window_set_position(GTK_WINDOW(messagebox),
-				GTK_WIN_POS_CENTER);
-	gtk_widget_show(messagebox);
-
+	libbalsa_information(
+	    LIBBALSA_INFORMATION_ERROR,
+	    _("Unable to Open Mailbox!\nPlease check the mailbox settings."));
 	bindex->mailbox_node = NULL;
 	return TRUE;
     }
@@ -1159,8 +1150,8 @@ mailbox_message_new_cb(LibBalsaMailbox * mb, LibBalsaMessage * message,
     if(bindex->mailbox_node->mailbox->new_messages==0){
       balsa_index_threading(bindex);
       gtk_clist_sort (GTK_CLIST (bindex->ctree));
+      DO_CLIST_WORKAROUND(GTK_CLIST (bindex->ctree));
     }
-    DO_CLIST_WORKAROUND(GTK_CLIST (bindex->ctree));
     gtk_clist_thaw (GTK_CLIST (bindex->ctree));
 }
 
@@ -1319,25 +1310,13 @@ balsa_index_close_and_destroy(GtkObject * obj)
 
     g_return_if_fail(obj != NULL);
     bindex = BALSA_INDEX(obj);
-    mailbox = bindex->mailbox_node->mailbox;
-
-    /*    printf( "Close and destroy!\n" ); */
-
-/*     if (bindex->sw) { */
-/* 	gtk_widget_destroy(GTK_WIDGET(bindex->sw)); */
-/* 	bindex->sw = NULL; */
-/*     } */
 
     /*page->window references our owner */
-
-    if (mailbox) {
+    if (bindex->mailbox_node && (mailbox = bindex->mailbox_node->mailbox) ) {
         gtk_signal_disconnect_by_data (GTK_OBJECT (mailbox), bindex);
 	libbalsa_mailbox_close(mailbox);
 	bindex->mailbox_node = NULL;
     }
-
-/*     if (parent_class->destroy) */
-/* 	(*parent_class->destroy) (obj); */
 
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
         (*GTK_OBJECT_CLASS(parent_class)->destroy) (obj);
@@ -2056,7 +2035,6 @@ balsa_index_set_threading_type(BalsaIndex * bindex, int thtype)
 
     bindex->threading_type = thtype;
 
-    printf("Setting threading to %d\n", thtype);
     mailbox = bindex->mailbox_node->mailbox;
     
     if(mailbox) {

@@ -1,3 +1,7 @@
+2001-02-03  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-index.c: don't crash on failed open.
+	
 2001-02-01  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* acconfig.h: add USE_PIXBUF

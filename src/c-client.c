@@ -25,6 +25,26 @@
 #include "mailbox.h"
 
 
+
+char *
+get_header_from (MAILSTREAM * stream, unsigned long mesgno)
+{
+  char *t;
+  static STRINGLIST mailrnfromline =
+  {
+    {(unsigned char *) ">from", 5}, NIL};
+  static STRINGLIST mailfromline =
+  {
+    {(unsigned char *) "from", 4,}, &mailrnfromline};
+  t = mail_fetch_header (stream, mesgno, NIL, &mailfromline, NIL, FT_INTERNAL | FT_PEEK);
+  memmove (t, t + 6, strlen (t) - 5);
+  return t;
+}
+
+
+
+
+
 /* 
  * Callbacks from the C-CLIENT Library
  */
@@ -44,12 +64,12 @@ mm_exists (MAILSTREAM * stream,
   if (!balsa_app.main_window)
     return;
   if (number > 0)
-  {
-    balsa_index_append_new_messages (BALSA_INDEX (balsa_app.main_window->index));
+    {
+      balsa_index_append_new_messages (BALSA_INDEX (balsa_app.main_window->index));
 /*
  * system("cat /home/pavlov/balsa/src/sounds/yougotmail.wav>/dev/dsp &");
-*/
-  }
+ */
+    }
 }
 
 

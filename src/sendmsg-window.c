@@ -303,8 +303,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   gtk_table_attach_defaults (GTK_TABLE (table), msg->to, 1, 2, 0, 1);
   if (type == 1)
     {
-      mail_fetchfrom (tmpbuf, bindex->stream, row, (long) BUFFER_SIZE);
-      gtk_entry_set_text (GTK_ENTRY (msg->to), tmpbuf);
+      gtk_entry_set_text (GTK_ENTRY (msg->to), get_header_from (bindex->stream, row));
     }
   gtk_widget_show (msg->to);
 
@@ -339,8 +338,10 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
     {
       mail_fetchsubject (tmpbuf, bindex->stream, row, (long) BUFFER_SIZE);
       gtk_entry_set_text (GTK_ENTRY (msg->subject), tmpbuf);
-      if (type==1) gtk_entry_prepend_text(GTK_ENTRY(msg->subject),"Re: ");
-      else if (type==2) gtk_entry_prepend_text(GTK_ENTRY(msg->subject),"Fw: ");
+      if (type == 1)
+	gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Re: ");
+      else if (type == 2)
+	gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Fw: ");
     }
 
   gtk_table_attach_defaults (GTK_TABLE (table), msg->subject, 1, 2, 2, 3);
@@ -395,7 +396,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
 			 GTK_TOOLBAR (create_toolbar (msg)));
 
   gtk_widget_show (msg->window);
-  g_free(tmpbuf);
+  g_free (tmpbuf);
 }
 
 

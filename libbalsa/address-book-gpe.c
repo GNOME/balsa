@@ -563,7 +563,7 @@ gpe_read_completion(void *arg, int argc, char **argv, char **names)
     if(!a->full_name)
         a->full_name = create_name(a->first_name, a->last_name);
     g_object_set_data(G_OBJECT(a), "urn", GUINT_TO_POINTER(uid));
-    if(!*gc->new_prefix)
+    if(gc->new_prefix && !*gc->new_prefix)
         *gc->new_prefix = libbalsa_address_to_gchar(a, 0);
     gc->res = g_list_prepend(gc->res, a);
 
@@ -596,7 +596,7 @@ libbalsa_address_book_gpe_alias_complete(LibBalsaAddressBook * ab,
 	    return NULL;
     }
 
-    *new_prefix = NULL;
+    if(new_prefix) *new_prefix = NULL;
     gcc.db = gpe_ab->db;
     gcc.prefix = prefix;
     gcc.new_prefix = new_prefix;

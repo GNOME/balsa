@@ -343,7 +343,7 @@ libbalsa_address_book_externq_alias_complete(LibBalsaAddressBook * ab,
 {
     LibBalsaAddressBookExtern *ex;
     GList *res = NULL;
-    *new_prefix = NULL;
+    if(new_prefix) *new_prefix = NULL;
 
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK_EXTERN(ab), NULL);
 
@@ -357,7 +357,7 @@ libbalsa_address_book_externq_alias_complete(LibBalsaAddressBook * ab,
 	
     g_list_reverse(res);
 
-    if(res != NULL)
+    if(res != NULL && new_prefix)
         *new_prefix = libbalsa_address_to_gchar((LibBalsaAddress *)
                                                 g_list_first(res)->data, 0);
 

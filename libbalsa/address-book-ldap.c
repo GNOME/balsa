@@ -831,7 +831,7 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
      * Attempt to search for e-mail addresses.  It returns success
      * or failure, but not all the matches.
      */
-    *new_prefix = NULL;
+    if(new_prefix) *new_prefix = NULL;
     ldap = rfc_2254_escape(prefix);
 
     filter = g_strdup_printf("(&(mail=*)"
@@ -851,7 +851,7 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
 	for(e = ldap_first_entry(ldap_ab->directory, result);
 	    e != NULL; e = ldap_next_entry(ldap_ab->directory, e)) {
 	    addr = libbalsa_address_book_ldap_get_address(ab, e);
-	    if(!*new_prefix) 
+	    if(new_prefix && !*new_prefix) 
 		*new_prefix = libbalsa_address_to_gchar(addr, 0);
 	    res = g_list_prepend(res, addr);
 	}

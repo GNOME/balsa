@@ -1,3 +1,7 @@
+2004-11-07  Pawel Salek
+
+	* libbalsa/address-book-{extern,gpe,ldap}.c: fix crashes in ::complete.
+
 2004-11-07 14:07  PeterB
 
 	* src/balsa-mblist.c: make balsa_app.mblist_tree_store a weak

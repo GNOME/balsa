@@ -97,6 +97,12 @@ sendmsg_window_new (GtkWidget * widget, gpointer data)
 
   msg->from = gtk_entry_new ();
   label = gtk_label_new ("From:");
+
+  msg->from = gtk_combo_new ();
+  gtk_combo_set_popdown_strings (GTK_COMBO (msg->from), NULL);
+  gtk_entry_set_text (GTK_ENTRY (GTK_COMBO(msg->from)->entry), "Default");
+  gtk_editable_select_region (GTK_EDITABLE (GTK_COMBO(msg->from)->entry), 0, -1);
+
 /*
    if (fOptions->realname && fOptions->emailaddy)
    {

@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
+
 #include "options.h"
 #include "index.h"
 #include "mailbox.h"
@@ -394,30 +395,6 @@ change_options (GtkWidget * widget, personality_box_options * options)
   gnome_config_pop_prefix ();
   gnome_config_sync ();
 }
-
-
-/*
-   --------------------------------------------
-   |                 Settings                 |
-   --------------------------------------------
-   | Account:      [--<Default>--]     [New]  |
-   | ---------------------------------------- |
-   | Realname:     [_____________]            |
-   | Reply-to:     [_____________]            |
-   |  ____  ____  _____                       |
-   | |POP3||IMAP||Local|_____________________ |
-   |/                                        \|
-   || POP3 server: [_____________]           ||
-   || SMTP server: [_____________]           ||
-   || Username:    [_____________]           ||
-   || Password:    [_____________]           ||
-   || Default      [-------------]           ||
-   ||    mailbox:                            ||
-   || Check mail:  [x]                       ||
-   |\----------------------------------------/|
-   |       [ OK ]             [Cancel]        |
-   --------------------------------------------
- */
 
 void
 personality_box (GtkWidget * widget, gpointer data)

@@ -1092,19 +1092,19 @@ edit_with_gnome(GtkWidget* widget, BalsaSendmsg* bsmsg)
     tmpfd = mkstemp(filename);
     app = gnome_vfs_mime_get_default_application ("text/plain");
     if (app) {
-#if GTK_CHECK_VERSION(2, 6, 0)
+#if HAVE_GNOME_VFS29
         gboolean adduri = gnome_vfs_mime_application_supports_uris(app);
-#else /* GTK_CHECK_VERSION(2, 6, 0) */
+#else /* HAVE_GNOME_VFS29 */
 	gboolean adduri = (app->expects_uris ==
                            GNOME_VFS_MIME_APPLICATION_ARGUMENT_TYPE_URIS);
-#endif /* GTK_CHECK_VERSION(2, 6, 0) */
+#endif /* HAVE_GNOME_VFS29 */
         argc = 2;
         argv = g_new0 (char *, argc+1);
-#if GTK_CHECK_VERSION(2, 6, 0)
+#if HAVE_GNOME_VFS29
 	argv[0] = g_strdup(gnome_vfs_mime_application_get_exec(app));
-#else /* GTK_CHECK_VERSION(2, 6, 0) */
+#else /* HAVE_GNOME_VFS29 */
         argv[0] = g_strdup(app->command);
-#endif /* GTK_CHECK_VERSION(2, 6, 0) */
+#endif /* HAVE_GNOME_VFS29 */
         argv[1] = g_strdup_printf("%s%s", adduri ? "file://" : "", filename);
 
         /* this does not work really well with gnome-terminal

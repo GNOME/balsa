@@ -1,3 +1,10 @@
+2002-02-20  Pawel Salek <pawsa@theochem.kth.se>
+
+	Start port to GNOME2. Based on Jelmer Vernooij's work.
+	* configure.in, Makefile.am, acconfig.h,
+	libbalsa/Makefile.am: modify just to make it compile
+	* libbalsa/address-book.c, libbalsa/misc.h: make first file compile.
+
 2002-02-17  Matthew Guenther  <guentherm@asme.org>
 
 	* src/sendmsg-window.c: when changing identities change the

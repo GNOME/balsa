@@ -774,7 +774,7 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox), NULL);
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), NULL);
-    RETURN_VAL_IF_CONTEXT_CLOSED(message->mailbox, FALSE);
+    RETURN_VAL_IF_CONTEXT_CLOSED(message->mailbox, NULL);
 
     cache_name = get_cache_name(LIBBALSA_MAILBOX_IMAP(mailbox), "body");
     msg_name   = g_strdup_printf("%s/%u-%u", cache_name, 

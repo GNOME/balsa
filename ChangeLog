@@ -1,3 +1,11 @@
+2003-08-08  Pawel Salek  <pawsa theochem.kth.se>
+
+	* libbalsa/address-book-ldap.c: implement "{add,modify,remove}-address"
+	signals.
+	* libbalsa/libbalsa_private.h: check CLIENT_CONTEXT extra carefully.
+	* libbalsa/mailbox_imap.c: get_stream returns pointer, not bool.
+	* src/store-address.c: make address book selection actually work.
+
 2003-08-07  Pawel Salek  <pawsa theochem.kth.se>
 
 	* libbalsa/address-book.[hc]: add remove-address and modify-address

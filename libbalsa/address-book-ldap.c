@@ -91,8 +91,9 @@ static GList *libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab
 							 const gchar * prefix, 
 							 gchar ** new_prefix);
 
-static LibBalsaAddress *libbalsa_address_book_ldap_get_address(LibBalsaAddressBook * ab,
-							       LDAPMessage * e);
+static LibBalsaAddress*
+libbalsa_address_book_ldap_get_address(LibBalsaAddressBook * ab,
+                                       LDAPMessage * e);
 
 
 static gchar *create_name(gchar *, gchar *);
@@ -319,7 +320,8 @@ libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab,
      */ 
     /* g_print("Performing full lookup...\n"); */
     msgid = ldap_search(ldap_ab->directory, ldap_ab->base_dn,
-                     LDAP_SCOPE_SUBTREE, "(mail=*)", attrs, 0);
+                     LDAP_SCOPE_SUBTREE, 
+                        "(objectClass=inetOrgPerson)", attrs, 0);
     if (msgid == -1) {
         libbalsa_address_book_ldap_close_connection(ldap_ab);
 	return LBABERR_CANNOT_SEARCH;
@@ -350,7 +352,7 @@ libbalsa_address_book_ldap_get_address(LibBalsaAddressBook * ab,
 				       LDAPMessage * e)
 {
     LibBalsaAddressBookLdap *ldap_ab;
-    gchar *name = NULL, *email = NULL, *id = NULL;
+    gchar *email = NULL, *cn = NULL;
     gchar *first = NULL, *last = NULL;
     LibBalsaAddress *address = NULL;
     char *attr;
@@ -369,8 +371,8 @@ libbalsa_address_book_ldap_get_address(LibBalsaAddressBook * ab,
 	    for (i = 0; vals[i] != NULL; i++) {
 		if ((g_ascii_strcasecmp(attr, "sn") == 0) && (!last))
 		    last = g_strdup(vals[i]);
-		if ((g_ascii_strcasecmp(attr, "cn") == 0) && (!id))
-		    id = g_strdup(vals[i]);
+		if ((g_ascii_strcasecmp(attr, "cn") == 0) && (!cn))
+		    cn = g_strdup(vals[i]);
 		if ((g_ascii_strcasecmp(attr, "givenName") == 0) && (!first))
 		    first = g_strdup(vals[i]);
 		if ((g_ascii_strcasecmp(attr, "mail") == 0) && (!email))
@@ -384,14 +386,16 @@ libbalsa_address_book_ldap_get_address(LibBalsaAddressBook * ab,
      */
     if(email == NULL) email = g_strdup("none");
     g_return_val_if_fail(email != NULL, NULL);
-    name = create_name(first, last);
 
     address = libbalsa_address_new();
-    address->nick_name = id ? id : g_strdup(_("No-Id"));
-    if (name)
-	address->full_name = name;
-    else if (id)
-	address->full_name = g_strdup(id ? id : _("No-Name"));
+    address->nick_name = cn ? cn : g_strdup(_("No-Id"));
+    if (cn) 
+	address->full_name = g_strdup(cn);
+    else {
+	address->full_name = create_name(first, last);
+        if(!address->full_name)
+            address->full_name = g_strdup(_("No-Name"));
+    }
     address->first_name = first;
     address->last_name = last;
     address->address_list = g_list_prepend(address->address_list, email);
@@ -428,11 +432,90 @@ create_name(gchar * first, gchar * last)
 	return g_strdup_printf("%s %s", first, last);
 }
 
+#define SETMOD(mods,modarr,op,attr,strv,val) \
+   do { (mods) = &(modarr); (modarr).mod_type=attr; (modarr).mod_op=op;\
+        (strv)[0]=(val); (modarr).mod_values=strv; } while(0)
+
 static LibBalsaABErr
 libbalsa_address_book_ldap_add_address(LibBalsaAddressBook *ab,
                                        LibBalsaAddress *address)
 {
-    /* FIXME: implement */
+    static char *object_class_values[] =
+        { "person", "organizationalPerson", "inetOrgPerson", NULL };
+    gchar *dn;
+    LDAPMod *mods[7];
+    LDAPMod modarr[6];
+    int cnt;
+    char *cn[]   = {NULL, NULL};
+    char *gn[]   = {NULL, NULL};
+#if 0
+    char *org[]  = {NULL, NULL};
+#endif
+    char *sn[]   = {NULL, NULL};
+    char *mail[] = {NULL, NULL};
+    LibBalsaAddressBookLdap *ldap_ab = LIBBALSA_ADDRESS_BOOK_LDAP(ab);
+
+    g_return_val_if_fail(address, LBABERR_CANNOT_WRITE);
+    g_return_val_if_fail(address->address_list, LBABERR_CANNOT_WRITE);
+
+    if (ldap_ab->directory == NULL) {
+        if(!libbalsa_address_book_ldap_open_connection(ldap_ab))
+	    return LBABERR_CANNOT_CONNECT;
+    }
+
+    dn = g_strdup_printf("mail=%s,%s",
+                         (char*)address->address_list->data,
+                         ldap_ab->bind_dn);
+    mods[0] = &modarr[0];
+    modarr[0].mod_op = LDAP_MOD_ADD;
+    modarr[0].mod_type = "objectClass";
+    modarr[0].mod_values = object_class_values;
+    cnt = 1;
+
+    if(address->full_name) {
+        SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_ADD,"cn",cn,address->full_name);
+        cnt++;
+    }
+    if(address->first_name) {
+        SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_ADD,"givenName",gn,
+               address->first_name);
+        cnt++;
+    }
+    if(address->last_name) {
+        SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_ADD,"sn",sn,address->last_name);
+        cnt++;
+    }
+#if 0
+    if(address->organization) {
+        SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_ADD,"organizationName",org,
+               address->organization);
+        cnt++;
+    }
+#endif
+    SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_ADD,"mail",mail,
+               (char*)address->address_list->data);
+    cnt++;
+    mods[cnt] = NULL;
+
+    cnt = 0;
+    do {
+        int rc = ldap_add_s(ldap_ab->directory, dn, mods);
+        switch(rc) {
+        case LDAP_SUCCESS: g_free(dn); return LBABERR_OK;
+        case LDAP_ALREADY_EXISTS: g_free(dn); return LBABERR_DUPLICATE;
+        case LDAP_SERVER_DOWN:
+            libbalsa_address_book_ldap_close_connection(ldap_ab);
+            if(!libbalsa_address_book_ldap_open_connection(ldap_ab)) {
+                g_free(dn);
+                return LBABERR_CANNOT_CONNECT;
+            }
+        /* fall through */
+        default:
+            fprintf(stderr, "ldap_add for dn=\"%s\" failed[0x%x]: %s\n",
+                    dn, rc, ldap_err2string(rc));
+        }
+    } while(cnt++<1);
+    g_free(dn);
     return LBABERR_CANNOT_WRITE;
 }
 
@@ -440,16 +523,146 @@ static LibBalsaABErr
 libbalsa_address_book_ldap_remove_address(LibBalsaAddressBook *ab,
                                           LibBalsaAddress *address)
 {
-    /* FIXME: implement */
+    LibBalsaAddressBookLdap *ldap_ab = LIBBALSA_ADDRESS_BOOK_LDAP(ab);
+    gchar *dn;
+    int cnt;
+
+    g_return_val_if_fail(address, LBABERR_CANNOT_WRITE);
+    g_return_val_if_fail(address->address_list, LBABERR_CANNOT_WRITE);
+
+    if (ldap_ab->directory == NULL) {
+        if(!libbalsa_address_book_ldap_open_connection(ldap_ab))
+	    return LBABERR_CANNOT_CONNECT;
+    }
+
+    dn = g_strdup_printf("mail=%s,%s",
+                         (char*)address->address_list->data,
+                         ldap_ab->bind_dn);
+    cnt = 0;
+    do {
+        int rc = ldap_delete_s(ldap_ab->directory, dn);
+        switch(rc) {
+        case LDAP_SUCCESS: g_free(dn); return LBABERR_OK;
+        case LDAP_SERVER_DOWN:
+            libbalsa_address_book_ldap_close_connection(ldap_ab);
+            if(!libbalsa_address_book_ldap_open_connection(ldap_ab)) {
+                g_free(dn);
+                return LBABERR_CANNOT_CONNECT;
+            }
+            /* fall through */
+        default:
+            fprintf(stderr, "ldap_delete for dn=\"%s\" failed[0x%x]: %s\n",
+                    dn, rc, ldap_err2string(rc));
+        }
+    } while(cnt++<1);
+    g_free(dn);
     return LBABERR_CANNOT_WRITE;
 }
 
+
+/** libbalsa_address_book_ldap_modify_address:
+    modify given address. If mail address has changed, remove and add.
+*/
+#define STREQ(a,b) ((a) && (b) && strcmp((a),(b))==0)
 static LibBalsaABErr
 libbalsa_address_book_ldap_modify_address(LibBalsaAddressBook *ab,
-                                           LibBalsaAddress *address,
-                                           LibBalsaAddress *newval)
+                                          LibBalsaAddress *address,
+                                          LibBalsaAddress *newval)
 {
-    /* FIXME: implement */
+    gchar *dn;
+    LDAPMod *mods[5];
+    LDAPMod modarr[4];
+    int rc, cnt;
+    char *cn[]   = {NULL, NULL};
+    char *gn[]   = {NULL, NULL};
+#if 0
+    char *org[]  = {NULL, NULL};
+#endif
+    char *sn[]   = {NULL, NULL};
+    LibBalsaAddressBookLdap *ldap_ab = LIBBALSA_ADDRESS_BOOK_LDAP(ab);
+
+    g_return_val_if_fail(address, LBABERR_CANNOT_WRITE);
+    g_return_val_if_fail(address->address_list, LBABERR_CANNOT_WRITE);
+    g_return_val_if_fail(newval->address_list, LBABERR_CANNOT_WRITE);
+
+    if(!STREQ(address->address_list->data,newval->address_list->data)) {
+        /* email address has changed, we have to remove old entry and
+         * add a new one. */
+        if( (rc=libbalsa_address_book_ldap_add_address(ab, newval)) 
+            != LBABERR_OK)
+            return rc;
+        return libbalsa_address_book_ldap_remove_address(ab, address);
+    }
+    /* the email address has not changed, continue with changing other 
+     * attributes. */
+    if (ldap_ab->directory == NULL) {
+        if(!libbalsa_address_book_ldap_open_connection(ldap_ab))
+	    return LBABERR_CANNOT_CONNECT;
+    }
+
+    dn = g_strdup_printf("mail=%s,%s",
+                         (char*)address->address_list->data,
+                         ldap_ab->bind_dn);
+    cnt = 0;
+
+    if(!STREQ(address->full_name,newval->full_name)) {
+        if(newval->full_name)
+            SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_REPLACE,"cn",cn,
+                   newval->full_name);
+        else
+            SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_DELETE,"cn",cn,
+                   address->full_name);
+        cnt++;
+    }
+    if(!STREQ(address->first_name,newval->first_name)) {
+        if(newval->first_name)
+            SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_REPLACE,"givenName",gn,
+                   newval->first_name);
+        else
+            SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_DELETE,"givenName",gn,
+                   address->first_name);
+        cnt++;
+    }
+    if(!STREQ(address->last_name,newval->last_name)) {
+        if(newval->last_name)
+            SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_REPLACE,"sn",sn,
+                   newval->last_name);
+        else
+            SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_DELETE,"sn",sn,
+                   address->last_name);
+        cnt++;
+    }
+#if 0
+    if(!STREQ(address->organization,newval->organization)) {
+        if(newval->organization)
+            SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_REPLACE,"organizationName",
+                   org, newval->organization);
+        else
+            SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_DELETE,"organizationName",
+                   org, address->organization);
+        cnt++;
+    }
+#endif
+    mods[cnt] = NULL;
+
+    cnt = 0;
+    do {
+        rc = ldap_modify_s(ldap_ab->directory, dn, mods);
+        switch(rc) {
+        case LDAP_SUCCESS: return LBABERR_OK;
+        case LDAP_SERVER_DOWN:
+            libbalsa_address_book_ldap_close_connection(ldap_ab);
+            if(!libbalsa_address_book_ldap_open_connection(ldap_ab)) {
+                g_free(dn);
+                return LBABERR_CANNOT_CONNECT;
+            }
+            /* fall through */
+        default:
+            fprintf(stderr, "ldap_modify for dn=\2%s\" failed[0x%x]: %s\n",
+                    dn, rc, ldap_err2string(rc));
+        }
+    } while(cnt++<1);
+    g_free(dn);
     return LBABERR_CANNOT_WRITE;
 }
 
@@ -599,7 +812,8 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
     *new_prefix = NULL;
     ldap = rfc_2254_escape(prefix);
 
-    filter = g_strdup_printf("(&(mail=*)(|(cn=%s*)(sn=%s*)(mail=%s@*)))", 
+    filter = g_strdup_printf("(&(objectClass=inetOrgPerson)"
+                             "(|(cn=%s*)(sn=%s*)(mail=%s@*)))", 
 			     ldap, ldap, ldap);
     g_free(ldap);
     result = NULL;

@@ -1,5 +1,10 @@
 2000-11-11  Pawel Salek <pawsa@theochem.kth.se>
 
+	* faq.html: libtool; POP3 filtering code described.
+	* download.html: removed mistake in HTML formatting.
+	
+2000-11-11  Pawel Salek <pawsa@theochem.kth.se>
+
 	* main.html, download.html: 1.0.0 released.
 	
 2000-10-24  Pawel Salek <pawsa@theochem.kth.se>

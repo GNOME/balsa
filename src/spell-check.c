@@ -484,7 +484,7 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
     change_all = gnome_stock_button_with_label(GNOME_STOCK_PIXMAP_REFRESH,
 					       "Change All");
     gtk_tooltips_set_tip(balsa_app.tooltips, change_all,
-			 _("Replace all occurances of the current word with the selected suggestion"),
+			 _("Replace all occurences of the current word with the selected suggestion"),
 			 NULL);
     gtk_box_pack_start(GTK_BOX(vbox2), change_all, FALSE, FALSE, 0);
 
@@ -502,7 +502,7 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
 
     learn = gnome_stock_button_with_label(GNOME_STOCK_PIXMAP_BOOK_OPEN, "Learn");
     gtk_tooltips_set_tip(balsa_app.tooltips, learn,
-			 _("Add the current word to your personal dictionar"),
+			 _("Add the current word to your personal dictionary"),
 			 NULL);
     gtk_box_pack_start(GTK_BOX(vbox1), learn, FALSE, FALSE, 0);
 

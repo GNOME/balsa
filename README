@@ -74,6 +74,10 @@ Libraries:
 older libraries, you will need to recompile balsa from the source.  Balsa 
 also needs the pspell spell checking libraries.
 
+	Make sure you have libtool installed (if you get some error 
+messages during compilation or when running precompiled binaries saying that
+libtdl is missing it means you need to install just that package).
+
 
 Website:
 -------
@@ -116,9 +120,27 @@ privileges. Presently, dotfile locking requires this unconditionally
 In the future, we may relax this requirement and will allow you to
 shoot yourself in your leg.
 
+POP3 mail filtering:
+-------------------
 
-Reporting Bugs:
---------------
+When the respective POP3 'mailbox' has the 'filter' box checked, the
+downloaded mail is passed on to procmail which will use ~/.procmailrc
+file as its configuration, so you can share it between balsa and
+fetchmail and get consistent behavior no matter you use balsa or
+fetchmail for downloading.
+
+Simple example ~/.procmailrc file:
+--------- cut here ----------------
+:0H:
+* ^Subject:.*balsa
+mail/balsa-related-mail
+--------- cut here ----------------
+
+It is recommended to read procmail(1) and procmailrc(1) for more
+real-life examples and syntax explanation.
+
+
+Reporting Bugs: --------------
 	See http://www.balsa.net/bugs.html for instructions.  Do not
 report bugs with GtkHTML - it is quite unstable. Patches are welcome.
 

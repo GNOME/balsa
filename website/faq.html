@@ -13,32 +13,26 @@ body {margin-left: 50pt;}
 <img src="images/balsa.jpg" alt="balsa" align="middle" width="476" height="122">
 <h1>Frequently Asked Questions</h1>
 <ol>
-<li><p>I see many compilation warnings? Is balsa broken?</p>
+<li><p>I see many compilation warnings. Is balsa broken?</p>
 <blockquote>
 It is really a problem with <samp>gcc</samp>. Upgrade <samp>gcc</samp> or
 configure balsa with <kbd>--disable-more-warnings</kbd>.
 </blockquote></li>
 
-<li><p>Balsa refers some <samp>crypto</samp> libraries. What are they?</p>
+<li><p>Balsa refers some <samp>ldl</samp> libraries. What are they?</p>
+
 <blockquote>
-<pre>
-libcom_err.so.3
-libgssapi_krb5.so.2
-libK5crypto.so.2
-libkrb5.so.2
-</pre>
-These are Kerberos/GSSAPI libraries. They are standard on Redhat 6.2 and
-higher. You can recompile balsa to get rid of this dependency.
-</blockquote></li>
+You need to install <samp>libtool</samp> package. Make sure it comes
+with header files (or install respective <samp>devel</samp> package)
+If you want to recompile balsa.
+</blockquote>
 
 <li><p>Does Balsa currently support IMAP?</p>
 <blockquote>
-Yes, although it is currently only in a preliminary state of
-support.  Using the latest CVS versions of Balsa,&nbsp; it is
-possible to access IMAP folders. We support also CRAM-MD5 and GSS
-authorization methods.  Currently not supported are features such as
-listing all IMAP folders on the server, or subscribing to new folders
-on the server.
+Yes, although it is currently only in a preliminary state of support.
+We support also CRAM-MD5 and GSS authorization methods.  Currently not
+supported are features such as listing all IMAP folders on the server,
+or subscribing to new folders on the server.
 </blockquote></li>
 
 <li><p>How do I configure IMAP?</p>
@@ -63,11 +57,32 @@ directory.
 
 <li><p>Does it support filters?</p>
 <blockquote>
-Yes and no.&nbsp; To see the progress of filters you must run
-./configure with the option "--enable-all".&nbsp; This will allow you
-to see the most current filter code.&nbsp; This code is not in active
-development,&nbsp; but new filter tools are being worked on.
-</blockquote></li>
+Yes and no.&nbsp; To see the progress of filters on the GUI part you
+must run ./configure with the option "--enable-all".&nbsp; This will
+allow you to see the most current filter code.&nbsp; This code is not
+in active development,&nbsp; but new filter tools are being worked on.
+</blockquote>
+
+<blockquote>
+On the other hand, the POP3 filtering backend based on
+<samp>procmail</samp> is functional. When the respective POP3
+'mailbox' has the 'filter' box checked, the downloaded mail is passed
+on to procmail which will use ~/.procmailrc file as its configuration,
+so you can share it between balsa and fetchmail and get consistent
+behavior no matter you use balsa or fetchmail for downloading.
+</blockquote>
+<blockquote>
+Simple example ~/.procmailrc file:
+<pre>
+:0H:
+* ^Subject:.*balsa
+mail/balsa-related-mail
+</pre>
+It is recommended to read <samp>procmail(1)</samp> and
+<samp>procmailrc(1)</samp> for more real-life examples and syntax
+explanation.
+</blockquote>
+</li>
 
 <li><p>Does it support file attachments?</p>
 <blockquote>

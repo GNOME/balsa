@@ -500,7 +500,7 @@ message_print(LibBalsaMessage * msg)
     if (!is_font_ok(BALSA_PRINT_HEAD_FONT)
 	|| !is_font_ok(BALSA_PRINT_BODY_FONT))
 	return;
-    dialog = gnome_print_dialog_new(_("Print mesage"),
+    dialog = gnome_print_dialog_new(_("Print message"),
 				    GNOME_PRINT_DIALOG_COPIES);
     gnome_dialog_set_parent(GNOME_DIALOG(dialog),
 			    GTK_WINDOW(balsa_app.main_window));

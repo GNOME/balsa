@@ -1,3 +1,9 @@
+2000-11-27  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/spell-check.c, src/print.c: misspellings removed.
+	* src/balsa-index-threading.{h,c}: reformatted to follow balsa rules.
+	* README: some notes concerning mail filtering and libtool.
+	
 2000-11-26  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/print.c: adapt to new threaded message view.

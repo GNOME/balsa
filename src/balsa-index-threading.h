@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -28,14 +29,14 @@ extern "C"
 {
 #endif				/* __cplusplus */
 
-typedef enum
-{
-  BALSA_INDEX_THREADING_FLAT,
-  BALSA_INDEX_THREADING_SIMPLE,
-  BALSA_INDEX_THREADING_JWZ
-} BalsaIndexThreadingType;
+    typedef enum
+    {
+	BALSA_INDEX_THREADING_FLAT,
+	BALSA_INDEX_THREADING_SIMPLE,
+	BALSA_INDEX_THREADING_JWZ
+    } BalsaIndexThreadingType;
 
-  void balsa_index_threading(BalsaIndex * bindex); 
+    void balsa_index_threading(BalsaIndex * bindex); 
 
 #ifdef __cplusplus
 }

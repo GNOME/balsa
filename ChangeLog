@@ -1,3 +1,18 @@
+2000-04-25  Peter Williams  <peter@beta.newton.cx>
+
+	* macros/offset-tool.sh.in (header): Added --noclean
+	  option to not remove intermediary files.
+	* macros/Makefile.am: Fixed MACROS variable and
+	  EXTRA_DIST and MAINTAINER_CLEANFILES
+	* libbalsa/mailbox.c (check_all_pop3_hosts): Forgot to
+	  fix an old config call for non-threading.
+	* macros/balsa-offset-tool.m4: Change behavior of
+	  the 'extra defs' argument to be evalled inside configure,
+	  not config.status.
+	* configure.in : Add ${GLIB_CFLAGS} to cflags for theo
+	  offset tool (wasn't finding glibconfig.h)
+	* src/save-restore.{c,h}: forgot to remove these.
+
 2000-04-24  Peter Williams  <peter@beta.newton.cx>
 
 	* libbalsa/cfg-{backend,engine}.{c,h}, src/cfg-balsa.{c,h}:

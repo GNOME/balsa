@@ -47,7 +47,7 @@
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
 #else
-#include "src/save-restore.h" /*config_mailbox_update*/
+#include "../src/cfg-balsa.h"
 #endif
 
 #define BUFFER_SIZE 1024
@@ -260,7 +260,7 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
 	/*  MAILBOX_POP3(mailbox)->mailbox.name */
         write( mail_thread_pipes[1], (void *) &threadmsg, sizeof(void *) );
 #else
-	config_mailbox_update( mailbox, MAILBOX_POP3(mailbox)->mailbox.name);
+	cfg_mailbox_write_simple( mailbox );
 #endif
       }
     }

@@ -1434,46 +1434,6 @@ lbm_prev(GNode * node)
     return node->parent;
 }
 
-gboolean
-libbalsa_mailbox_search_iter_step(LibBalsaMailbox * mailbox,
-                                  LibBalsaMailboxSearchIter * search_iter,
-                                  GtkTreeIter * iter,
-                                  gboolean forward,
-                                  guint stop_msgno)
-{
-    GNode *node = iter->user_data;
-    GNode *(*step_func)(GNode *) = forward ?  lbm_next : lbm_prev;
-    gboolean (*match_func)(LibBalsaMailbox *, guint, 
-                           LibBalsaMailboxSearchIter *) =
-        LIBBALSA_MAILBOX_GET_CLASS(mailbox)->message_match;
-    gboolean retval = FALSE;
-
-    libbalsa_lock_mailbox(mailbox);
-
-    if (!node)
-        node = mailbox->msg_tree;
-
-    for (;;) {
-        guint msgno;
-
-        node = step_func(node);
-        msgno = GPOINTER_TO_UINT(node->data);
-        if (msgno == stop_msgno) {
-            retval = FALSE;
-            break;
-        }
-        if (msgno > 0 && match_func(mailbox, msgno, search_iter)) {
-            iter->user_data = node;
-            retval = TRUE;
-            break;
-        }
-    }
-
-    libbalsa_unlock_mailbox(mailbox);
-
-    return retval;
-}
-
 /* Find a message in the tree-model, by its message number. */
 gboolean
 libbalsa_mailbox_msgno_find(LibBalsaMailbox * mailbox, guint seqno,
@@ -3454,4 +3414,60 @@ lbm_queue_check(LibBalsaMailbox * mailbox)
     id = g_idle_add((GSourceFunc) lbm_check_idle, mailbox);
     g_object_set_data(G_OBJECT(mailbox), LB_MAILBOX_CHECK_ID_KEY,
                       GUINT_TO_POINTER(id));
+}
+
+/* Search mailbox for a message matching the condition in search_iter,
+ * starting at iter, either forward or backward, and abandoning the
+ * search if message stop_msgno is reached; return value indicates
+ * success of the search.
+ *
+ * On return:
+ * if return value is TRUE,  iter points to the matching message;
+ * if return value is FALSE, iter is invalid.
+ */
+gboolean
+libbalsa_mailbox_search_iter_step(LibBalsaMailbox * mailbox,
+                                  LibBalsaMailboxSearchIter * search_iter,
+                                  GtkTreeIter * iter,
+                                  gboolean forward,
+                                  guint stop_msgno)
+{
+    GNode *node = iter->user_data;
+    GNode *(*step_func)(GNode *) = forward ?  lbm_next : lbm_prev;
+    gboolean (*match_func)(LibBalsaMailbox *, guint, 
+                           LibBalsaMailboxSearchIter *) =
+        LIBBALSA_MAILBOX_GET_CLASS(mailbox)->message_match;
+    gboolean retval = FALSE;
+
+    libbalsa_lock_mailbox(mailbox);
+
+    if (!node)
+        node = mailbox->msg_tree;
+
+    for (;;) {
+        guint msgno;
+
+        node = step_func(node);
+        msgno = GPOINTER_TO_UINT(node->data);
+        if (msgno == stop_msgno) {
+            retval = FALSE;
+            break;
+        }
+        if (msgno > 0 && match_func(mailbox, msgno, search_iter)) {
+            iter->user_data = node;
+            retval = TRUE;
+            break;
+        }
+    }
+
+    libbalsa_unlock_mailbox(mailbox);
+
+    if (retval)
+	/* Revalidate iter, in case mailbox was changed while we were
+	 * locking it. */
+        VALIDATE_ITER(iter, mailbox);
+    else
+	INVALIDATE_ITER(iter);
+
+    return retval;
 }

@@ -1904,26 +1904,42 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
 static void
 bmbl_mru_selected_cb(GtkTreeSelection * selection, gpointer data)
 {
-    GdkEvent *event = gtk_get_current_event();
-    GtkTreeIter iter;
-    GtkTreeView *tree_view = gtk_tree_selection_get_tree_view(selection);
-    GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
+    GdkEvent *event;
+    GtkTreeView *tree_view;
     GtkTreePath *path;
+    GtkTreeViewColumn *column;
+    GdkRectangle rect;
+    GValue expander_size;
 
-    if (!data || !event)
+    if (!data)
         return;
+
+    event = gtk_get_current_event();
+    if (!event)
+        return;
+
+    tree_view = gtk_tree_selection_get_tree_view(selection);
     if (event->type != GDK_BUTTON_PRESS ||
         !gtk_tree_view_get_path_at_pos(tree_view, event->button.x,
                                        event->button.y, &path,
-                                       NULL, NULL, NULL)) {
+                                       &column, NULL, NULL)) {
         gtk_tree_selection_unselect_all(selection);
         gdk_event_free(event);
         return;
     }
 
-    if (gtk_tree_selection_path_is_selected(selection, path)) {
+    gtk_tree_view_get_cell_area(tree_view, path, column, &rect);
+    g_value_init(&expander_size, G_TYPE_INT);
+    gtk_widget_style_get_property((GtkWidget *) tree_view, "expander-size",
+                                  &expander_size);
+    if (event->button.x < rect.x + g_value_get_int(&expander_size))
+        gtk_tree_selection_unselect_all(selection);
+    else if (gtk_tree_selection_path_is_selected(selection, path)) {
+        GtkTreeModel *model;
+        GtkTreeIter iter;
         BalsaMailboxNode *mbnode;
 
+        model = gtk_tree_view_get_model(tree_view);
         gtk_tree_model_get_iter(model, &iter, path);
         gtk_tree_model_get(model, &iter, 0, &mbnode, -1);
         ((BalsaMBListMRUEntry *) data)->url = g_strdup(mbnode->mailbox->url);
@@ -1934,6 +1950,9 @@ bmbl_mru_selected_cb(GtkTreeSelection * selection, gpointer data)
                              (GTK_WIDGET(tree_view), GTK_TYPE_DIALOG)),
                             GTK_RESPONSE_OK);
     }
+
+    gtk_tree_path_free(path);
+    gdk_event_free(event);
 }
 
 /*

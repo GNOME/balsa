@@ -159,7 +159,8 @@ void libbalsa_message_queue(LibBalsaMessage* message,
 gboolean libbalsa_message_send(LibBalsaMessage* message,
 			       LibBalsaMailbox* outbox,  
 			       LibBalsaMailbox* fccbox,
-			       gint encoding, const gchar* smtp_server);
+			       gint encoding, gchar* smtp_server,
+			       gint smtp_port);
 gboolean libbalsa_message_postpone(LibBalsaMessage * message,
 				   LibBalsaMailbox * draftbox,
 				   LibBalsaMessage * reply_message,

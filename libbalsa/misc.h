@@ -73,7 +73,7 @@ void libbalsa_wrap_string(gchar * str, int width);
 
 void libbalsa_set_charset(const gchar * charset);
 gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
-				const gchar* smtp_server);
+				gchar* smtp_server, gint smtp_port);
 void libbalsa_marshal_POINTER__OBJECT(GtkObject * object,
 				      GtkSignalFunc func,
 				      gpointer func_data, GtkArg * args);

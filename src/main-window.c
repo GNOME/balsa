@@ -1250,7 +1250,7 @@ static void
 send_outbox_messages_cb(GtkWidget * widget, gpointer data)
 {
     libbalsa_process_queue(balsa_app.outbox, balsa_app.encoding_style,
-			   balsa_app.smtp ? balsa_app.smtp_server : NULL);
+			   balsa_app.smtp ? balsa_app.smtp_server : NULL, balsa_app.smtp_port);
 }
 
 /* this one is called only in the threaded code */

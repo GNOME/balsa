@@ -144,6 +144,7 @@ extern struct BalsaApplication {
 
     gchar *local_mail_directory;
     gchar *smtp_server;
+    gint smtp_port;
 
     /* signature stuff */
     gboolean sig_sending;

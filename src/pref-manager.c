@@ -47,7 +47,7 @@ typedef struct _PropertyUI {
 
     GtkWidget *address_books;
 
-    GtkWidget *pop3servers, *smtp_server, *mail_directory;
+    GtkWidget *pop3servers, *smtp_server, *smtp_port, *mail_directory;
     GtkWidget *rb_local_mua, *rb_smtp_server;
     GtkRadioButton *encoding_type[NUM_ENCODING_MODES];
     GtkWidget *check_mail_auto;
@@ -338,6 +338,11 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     gtk_signal_connect(GTK_OBJECT(pui->smtp_server), "changed",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
+
+    gtk_signal_connect(GTK_OBJECT(pui->smtp_port), "changed",
+		       GTK_SIGNAL_FUNC(properties_modified_cb),
+		       property_box);
+
     for (i = 0; i < NUM_ENCODING_MODES; i++) {
 	gtk_signal_connect(GTK_OBJECT(pui->encoding_type[i]), "clicked",
 			   properties_modified_cb, property_box);
@@ -465,6 +470,7 @@ smtp_changed(void)
 {
     balsa_app.smtp = !balsa_app.smtp;
     gtk_widget_set_sensitive(pui->smtp_server, balsa_app.smtp);
+    gtk_widget_set_sensitive(pui->smtp_port, balsa_app.smtp);
 }
 
 /*
@@ -513,6 +519,9 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     g_free(balsa_app.smtp_server);
     balsa_app.smtp_server =
 	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->smtp_server)));
+
+    balsa_app.smtp_port =
+	atoi(gtk_entry_get_text(GTK_ENTRY(pui->smtp_port)));
 
     g_free(balsa_app.signature_path);
     balsa_app.signature_path =
@@ -749,6 +758,13 @@ set_prefs(void)
 	gtk_entry_set_text(GTK_ENTRY(pui->smtp_server),
 			   balsa_app.smtp_server);
 
+    if (balsa_app.smtp_port){
+	
+	char tmp[10];
+
+	sprintf(tmp, "%d", balsa_app.smtp_port);
+	gtk_entry_set_text(GTK_ENTRY(pui->smtp_port),tmp);
+    }
 
     gtk_entry_set_text(GTK_ENTRY(pui->mail_directory),
 		       balsa_app.local_mail_directory);
@@ -784,6 +800,10 @@ set_prefs(void)
     		    	    active);
 
     gtk_widget_set_sensitive(pui->smtp_server,
+			     GTK_TOGGLE_BUTTON(pui->rb_smtp_server)->
+			     active);
+
+    gtk_widget_set_sensitive(pui->smtp_port,
 			     GTK_TOGGLE_BUTTON(pui->rb_smtp_server)->
 			     active);
 
@@ -1137,6 +1157,7 @@ create_mailserver_page(gpointer data)
     GtkWidget *frame3;
     GtkWidget *hbox1;
     GtkWidget *scrolledwindow3;
+    GtkWidget *label1;
     GtkWidget *label14;
     GtkWidget *label15;
     GtkWidget *vbox1;
@@ -1208,7 +1229,7 @@ create_mailserver_page(gpointer data)
 		     (GtkAttachOptions) (GTK_FILL), 0, 0);
     gtk_container_set_border_width(GTK_CONTAINER(frame5), 5);
 
-    table4 = gtk_table_new(2, 2, FALSE);
+    table4 = gtk_table_new(2, 4, FALSE);
     gtk_container_add(GTK_CONTAINER(frame5), table4);
     gtk_container_set_border_width(GTK_CONTAINER(table4), 10);
 
@@ -1217,6 +1238,17 @@ create_mailserver_page(gpointer data)
 		     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
 		     (GtkAttachOptions) (0), 0, 0);
     gtk_widget_set_sensitive(pui->smtp_server, FALSE);
+
+    pui->smtp_port = gtk_entry_new();
+    gtk_table_attach(GTK_TABLE(table4), pui->smtp_port, 3, 4, 0, 1,
+		     (GtkAttachOptions) (GTK_FILL),
+		     (GtkAttachOptions) (0), 0, 0);
+    gtk_widget_set_sensitive(pui->smtp_port, FALSE);
+
+    label1 = gtk_label_new(_("Port"));
+    gtk_table_attach(GTK_TABLE(table4), label1, 2, 3, 0, 1,
+		     (GtkAttachOptions) (GTK_FILL),
+		     (GtkAttachOptions) (0), 5, 0);
 
     pui->rb_smtp_server = 
 	gtk_radio_button_new_with_label(table4_group,
@@ -1235,6 +1267,10 @@ create_mailserver_page(gpointer data)
     gtk_table_attach(GTK_TABLE(table4), pui->rb_local_mua, 0, 1, 1, 2,
 		     (GtkAttachOptions) (GTK_FILL),
 		     (GtkAttachOptions) (0), 0, 0);
+
+    /* this must be here otherwise rb_local_mua never gets active */
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->rb_local_mua),
+				 TRUE);
 
     /* fill in data */
     update_pop3_servers();

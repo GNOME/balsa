@@ -1674,7 +1674,8 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 	successful = libbalsa_message_send(message, balsa_app.outbox, fcc,
 					   balsa_app.encoding_style,  
 					   balsa_app.smtp ? 
-					   balsa_app.smtp_server : NULL);
+					   balsa_app.smtp_server : NULL,
+					   balsa_app.smtp_port);
     if (successful) {
 	if (bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL) {
 	    if (bsmsg->orig_message)

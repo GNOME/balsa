@@ -1,3 +1,15 @@
+2000-11-30  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Lubomir Gelo's <slon@slon.sk> patch for configuring SMTP port.
+	* libbalsa/message.h,libbalsa/misc.h: add port parameter to 
+        libbalsa_message_send() and libbalsa_process_queue()
+	* libbalsa/send.c: use passed port number where needed.
+	* src/balsa-app.[hc]: add smtp_port to balsa_app and set default value.
+	* src/main-window.c: call libbalsa_process_queue() with port
+	* src/pref-manager.c: port no. configuration.
+	* src/save-restore.c: save& restore port no.
+	* src/sendmsg-window.c: call libbalsa_message_send() with port no.
+	
 2000-11-29  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/expand-alias.c: Don't expand with address books which don't

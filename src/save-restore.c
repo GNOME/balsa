@@ -445,6 +445,7 @@ config_global_load(void)
 
     /* ... SMTP server */
     balsa_app.smtp_server = gnome_config_get_string("SMTPServer");
+    balsa_app.smtp_port = gnome_config_get_int("SMTPPort=25");
     balsa_app.smtp = gnome_config_get_bool("SMTP=false");
 
     /* ... outgoing mail */
@@ -613,6 +614,7 @@ gint config_save(void)
 
     gnome_config_set_bool("SMTP", balsa_app.smtp);
     gnome_config_set_string("SMTPServer", balsa_app.smtp_server);
+    gnome_config_set_int("SMTPPort", balsa_app.smtp_port);
     gnome_config_set_int("EncodingStyle", balsa_app.encoding_style);
     gnome_config_set_bool("WordWrap", balsa_app.wordwrap);
     gnome_config_set_int("WrapLength", balsa_app.wraplength);

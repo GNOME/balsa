@@ -102,6 +102,7 @@ balsa_app_init(void)
     balsa_app.signature_path = NULL;
     balsa_app.sig_separator = TRUE;
     balsa_app.smtp_server = NULL;
+    balsa_app.smtp_port = 25;
 
     balsa_app.inbox = NULL;
     balsa_app.inbox_input = NULL;

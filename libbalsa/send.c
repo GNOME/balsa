@@ -55,11 +55,18 @@ struct _MessageQueueItem {
     enum {MQI_WAITING, MQI_FAILED,MQI_SENT} status;
 };
 
+typedef struct _SendMessageInfo SendMessageInfo;
+
+struct _SendMessageInfo{
+    LibBalsaMailbox* outbox;
+    char* server;
+    int port;
+};
+
 /* Variables storing the state of the sending thread.
  * These variables are protected in MT by send_messages_lock mutex */
 static MessageQueueItem *message_queue;
 static int total_messages_left;
-static gchar * send_smtp_server;
 /* end of state variables section */
 
 
@@ -91,9 +98,32 @@ msg_queue_item_destroy(MessageQueueItem * mqi)
     g_free(mqi);
 }
 
-static guint balsa_send_message_real(LibBalsaMailbox* outbox);
+static SendMessageInfo *
+send_message_info_new(LibBalsaMailbox* outbox, const gchar* smtp_server, 
+		      gint smtp_port)
+{
+    SendMessageInfo *smi;
+
+    smi=g_new(SendMessageInfo,1);
+    smi->server = g_strdup(smtp_server);
+    smi->port = smtp_port;
+    smi->outbox = outbox;
+
+    return smi;
+}
+
+static void
+send_message_info_destroy(SendMessageInfo *smi)
+{
+    g_free(smi->server);
+    g_free(smi);
+}
+
+
+
+static guint balsa_send_message_real(SendMessageInfo* info);
 static void encode_descriptions(BODY * b);
-static int libbalsa_smtp_send(const char *server);
+static int libbalsa_smtp_send(const char *server, const int port);
 static int libbalsa_smtp_protocol(int s, char *tempfile, HEADER * msg);
 static gboolean libbalsa_create_msg(LibBalsaMessage * message,
 				    HEADER * msg, char *tempfile,
@@ -209,12 +239,12 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 gboolean
 libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
 		      LibBalsaMailbox* fccbox, gint encoding, 
-		      const gchar* smtp_server)
+		      gchar* smtp_server, gint smtp_port)
 {
 
     if (message != NULL)
 	libbalsa_message_queue(message, outbox, fccbox, encoding);
-    return libbalsa_process_queue(outbox, encoding, smtp_server);
+    return libbalsa_process_queue(outbox, encoding, smtp_server, smtp_port);
 }
 
 /* libbalsa_process_queue:
@@ -225,9 +255,10 @@ libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
 */
 gboolean 
 libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding, 
-		       const gchar* smtp_server)
+		       gchar* smtp_server, gint smtp_port)
 {
     MessageQueueItem *mqi, *new_message;
+    SendMessageInfo *send_message_info;
     GList *lista;
     LibBalsaMessage *queu;
     /* We do messages in queue now only if where are not sending them already */
@@ -286,9 +317,11 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
     sending_mail = TRUE;
 
     if (start_thread) {
-	g_free(send_smtp_server); send_smtp_server = g_strdup(smtp_server);
+
+	send_message_info=send_message_info_new(outbox, smtp_server, smtp_port);
+
 	pthread_create(&send_mail, NULL,
-		       (void *) &balsa_send_message_real, outbox);
+		       (void *) &balsa_send_message_real, send_message_info);
 	/* Detach so we don't need to pthread_join
 	 * This means that all resources will be
 	 * reclaimed as soon as the thread exits
@@ -297,8 +330,9 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
     }
     pthread_mutex_unlock(&send_messages_lock);
 #else				/*non-threaded code */
-    g_free(send_smtp_server); send_smtp_server = g_strdup(smtp_server);
-    balsa_send_message_real(outbox);
+    
+    send_message_info=send_message_info_new(outbox, smtp_server, smtp_port);
+    balsa_send_message_real(send_message_info);
 #endif
     return TRUE;
 }
@@ -333,9 +367,11 @@ static MessageQueueItem* get_msg2send()
    does the acutal message sending. 
    This function may be called as a thread and should therefore do
    proper gdk_threads_{enter/leave} stuff around GTK,libbalsa or
-   libmutt calls.
+   libmutt calls. Also, structure info should be freed before exiting.
 */
-static guint balsa_send_message_real(LibBalsaMailbox* outbox) {
+
+
+static guint balsa_send_message_real(SendMessageInfo* info) {
     MessageQueueItem *mqi, *next_message;
     int i;
 #ifdef BALSA_USE_THREADS
@@ -345,14 +381,18 @@ static guint balsa_send_message_real(LibBalsaMailbox* outbox) {
 	sending_mail = FALSE;
 	pthread_mutex_unlock(&send_messages_lock);
 	MSGSENDTHREAD(threadmsg, MSGSENDTHREADFINISHED, "", NULL, NULL, 0);
+	send_message_info_destroy(info);	
 	return TRUE;
     }
     pthread_mutex_unlock(&send_messages_lock);
 #else
-    if(!message_queue) return TRUE;
+    if(!message_queue){
+	send_message_info_destroy(info);	
+	return TRUE;
+    }	
 #endif
 
-    if (!send_smtp_server) {	
+    if (!info->server) {	
 	while ( (mqi = get_msg2send()) != NULL) {
 	    libbalsa_lock_mutt();
 	    i = mutt_invoke_sendmail(mqi->message->env->to,
@@ -366,7 +406,7 @@ static guint balsa_send_message_real(LibBalsaMailbox* outbox) {
 	    total_messages_left--; /* whatever the status is, one less to do*/
 	}
     } else {
-	i = libbalsa_smtp_send(send_smtp_server);
+	i = libbalsa_smtp_send(info->server, info->port);
 	
 /* We give a message to the user because an error has ocurred in the protocol
  * A mistyped address? A server not allowing relay? We can pop a window to ask
@@ -392,8 +432,8 @@ static guint balsa_send_message_real(LibBalsaMailbox* outbox) {
     }
     
     gdk_threads_enter();
-    libbalsa_mailbox_close(outbox);
-    libbalsa_mailbox_commit_changes(outbox);
+    libbalsa_mailbox_close(info->outbox);
+    libbalsa_mailbox_commit_changes(info->outbox);
     gdk_threads_leave();
 
     message_queue = NULL;
@@ -404,6 +444,7 @@ static guint balsa_send_message_real(LibBalsaMailbox* outbox) {
     MSGSENDTHREAD(threadmsg, MSGSENDTHREADFINISHED, "", NULL, NULL, 0);
     pthread_exit(0);
 #endif
+    send_message_info_destroy(info);	
     return TRUE;
 }
 
@@ -737,12 +778,12 @@ static int libbalsa_smtp_protocol(int s, char *tempfile,
  * -2    Error during protocol 
  * 1     Everything when perfect */
 /* Does not expect the GDK lock to be held */
-static int libbalsa_smtp_send(const char *server) {
+static int libbalsa_smtp_send(const char *server, const int port) {
 
     struct sockaddr_in sin;
     struct hostent *he;
     char buffer[525];	/* Maximum allow by RFC */
-    int n, s, error = 0, SmtpPort = 25;
+    int n, s, error = 0;
     MessageQueueItem *current_message;
 #ifdef BALSA_USE_THREADS
     SendThreadMessage *finish_message;
@@ -754,7 +795,11 @@ static int libbalsa_smtp_send(const char *server) {
 
     memset((char *) &sin, 0, sizeof(sin));
     sin.sin_family = AF_INET;
-    sin.sin_port = htons(SmtpPort);
+
+    if (port > 0)
+	sin.sin_port = htons(port);
+    else 	    
+	sin.sin_port = htons(25);
 
     if ((n = inet_addr(server)) == -1) {
 	/* Must be a DNS name */

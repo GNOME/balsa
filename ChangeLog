@@ -1,3 +1,8 @@
+2001-02-03  Matthew Guenther  <guentherm@asme.org>
+
+	* src/store-address.c (balsa_store_address): Fix cast to GtkCList
+	from BalsaIndex.
+
 2001-02-03  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-index.c: don't crash on failed open.

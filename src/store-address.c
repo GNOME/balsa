@@ -24,6 +24,7 @@
 #include <gnome.h>
 
 #include "balsa-app.h"
+#include "balsa-index.h"
 #include "store-address.h"
 
 #include "libbalsa.h"
@@ -39,8 +40,9 @@ static gint store_address_dialog_close(GtkWidget * widget,
 static void address_book_menu_cb(GtkWidget * widget, gpointer data);
 
 void
-balsa_store_address(GtkWidget * widget, gpointer index)
+balsa_store_address(GtkWidget * widget, gpointer user_data)
 {
+    BalsaIndex* index;
     GList *list = NULL;
     LibBalsaMessage *message = NULL;
     GtkWidget *dialog = NULL;
@@ -65,9 +67,10 @@ balsa_store_address(GtkWidget * widget, gpointer index)
     guint default_ab_offset = 0;
 
     g_return_if_fail(widget != NULL);
-    g_return_if_fail(index != NULL);
+    g_return_if_fail(user_data != NULL);
 
-    list = GTK_CLIST(index)->selection;
+    index = BALSA_INDEX (user_data);
+    list = GTK_CLIST (index->ctree)->selection;
 
     if (list == NULL) {
 	GtkWidget *box = NULL;
@@ -93,7 +96,7 @@ balsa_store_address(GtkWidget * widget, gpointer index)
 	return;
     }
 
-    message = gtk_ctree_node_get_row_data(GTK_CTREE(index), list->data);
+    message = gtk_ctree_node_get_row_data(index->ctree, list->data);
 
     if (message->from->address_list == NULL) {
 	GtkWidget *box = NULL;

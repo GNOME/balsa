@@ -3,7 +3,7 @@
 <article id="balsa">
 
   <artheader>
-    <title>Balsa Documentation</title>
+    <title>Balsa User's Guide</title>
     <author>
       <firstname>Peter</firstname>
       <surname>Williams</surname>
@@ -158,13 +158,13 @@
       the Mailboxes section, and click Add in the POP3 area. A dialog will be
       displayed that will let you set up the new mailbox.</para>
 
-      <note>Under Sawmill, this
+      <note><para>Under Sawmill, this
       dialog may be obscured, causing the appearance that Balsa has locked up. Move
-      the configuration dialog and see if the new dialog was hidden.</note> 
+      the configuration dialog and see if the new dialog was hidden.</para></note> 
 
-      <note>The mailbox
+      <note><para>The mailbox
       may not appear in the list immediately, or in the current session of Balsa at
-      all, but it exists. Yes, this is a bug.</note>
+      all, but it exists. Yes, this is a bug.</para></note>
     </sect2>
 
     <sect2 id="ct-move-msg">
@@ -212,11 +212,33 @@
     <itemizedlist mark="bullet">
       <listitem><para><link linkend="inw-main-to-imap">I want one of the main folders to be IMAP
       </link></para></listitem>
+
+      <listitem><para><link linkend="inw-frozen">Balsa's frozen!
+      </link></para></listitem>
+
     </itemizedlist>
 
     <sect2 id="inw-main-to-imap">
+      <title>I want a basic mailbox to use IMAP</title>
       <para>See <link linkend="ct-main-folder-imap">this section</link>.</para>
     </sect2>
+
+    <sect2 id="inw-frozen">
+      <title>Balsa's frozen!</title>
+      <para>Odds are it isn't. Watch out for:</para>
+      <itemizedlist mark="bullet">
+        <listitem><para>If you don't have threading, Balsa will stop responding
+        when it sends and receives email. Use threading, if possible.</para></listitem>
+
+        <listitem><para>Balsa is opening or closing a large mailbox. This could
+        take a while, especially when this file is accessed via NFS.</para></listitem>
+
+        <listitem><para>A dialog box is being displayed but it is obscured by
+        another one. This seems to happen under Sawmill. Try moving the windows
+        around and see if there's a hidden dialog somewhere.</para></listitem>
+      </itemizedlist>
+    </sect2>
+
   </sect1>
 
   <sect1 id="deadend">

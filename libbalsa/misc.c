@@ -553,3 +553,19 @@ libbalsa_set_charset(const gchar* charset)
 	libbalsa_unlock_mutt();
 }
 
+/* libbalsa_marshal_POINTER__OBJECT:
+   Marshalling function 
+*/
+
+typedef gpointer (*GtkSignal_POINTER__OBJECT)(GtkObject *object, GtkObject *parm, gpointer user_data);
+
+void
+libbalsa_marshal_POINTER__OBJECT (GtkObject * object, GtkSignalFunc func, gpointer func_data, GtkArg * args)
+{
+	GtkSignal_POINTER__OBJECT rfunc;
+	gpointer* return_val;
+  
+	return_val = GTK_RETLOC_POINTER(args[1]);
+	rfunc = (GtkSignal_POINTER__OBJECT)func;
+	*return_val = (*rfunc)(object, GTK_VALUE_OBJECT(args[0]), func_data);
+}

@@ -571,6 +571,8 @@ config_mailbox_init (proplist_t mbox, gchar * key)
       mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_pop3_new ());
       mailbox->name = mailbox_name;
       server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+      gtk_signal_connect(GTK_OBJECT(server), "get-password", 
+			 GTK_SIGNAL_FUNC(ask_password), mailbox);
 
       if ((field = pl_dict_get_str (mbox, "Username")) == NULL)
 	return FALSE;
@@ -645,6 +647,8 @@ config_mailbox_init (proplist_t mbox, gchar * key)
       }
 
       s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+      gtk_signal_connect(GTK_OBJECT(s), "get-password", 
+			 GTK_SIGNAL_FUNC(ask_password), m);
       libbalsa_server_set_username (s, user);
       libbalsa_server_set_password (s, passwd);
       libbalsa_server_set_host (s, host, port);

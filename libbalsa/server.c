@@ -34,11 +34,13 @@ static void libbalsa_server_destroy (GtkObject *object);
 static void libbalsa_server_real_set_username(LibBalsaServer *server, const gchar *username);
 static void libbalsa_server_real_set_password(LibBalsaServer *server, const gchar *passwd);
 static void libbalsa_server_real_set_host(LibBalsaServer *server, const gchar *host, gint port);
+/* static gchar* libbalsa_server_real_get_password(LibBalsaServer *server); */
 
 enum {
 	SET_USERNAME,
 	SET_PASSWORD,
 	SET_HOST,
+	GET_PASSWORD,
 	LAST_SIGNAL
 };
 
@@ -100,11 +102,20 @@ libbalsa_server_class_init (LibBalsaServerClass *klass)
 				gtk_marshal_NONE__POINTER_INT,
 				GTK_TYPE_NONE, 2, GTK_TYPE_STRING, GTK_TYPE_INT);
 
+	libbalsa_server_signals[GET_PASSWORD] =
+		gtk_signal_new ("get-password",
+				GTK_RUN_LAST,
+				object_class->type,
+				GTK_SIGNAL_OFFSET (LibBalsaServerClass, get_password),
+				libbalsa_marshal_POINTER__OBJECT,
+				GTK_TYPE_POINTER, 1, LIBBALSA_TYPE_MAILBOX);
+
 	gtk_object_class_add_signals(object_class, libbalsa_server_signals, LAST_SIGNAL);
 
 	klass->set_username = libbalsa_server_real_set_username;
 	klass->set_password = libbalsa_server_real_set_password;
 	klass->set_host = libbalsa_server_real_set_host;
+	klass->get_password = NULL; /* libbalsa_server_real_get_password; */
 }
 
 static void
@@ -167,6 +178,18 @@ void libbalsa_server_set_host(LibBalsaServer *server, const gchar *host, gint po
 	gtk_signal_emit(GTK_OBJECT(server), libbalsa_server_signals[SET_HOST], host, port);
 }
 
+gchar *libbalsa_server_get_password(LibBalsaServer *server, 
+				    LibBalsaMailbox *mbox) {
+	gchar *retval = NULL;
+
+	g_return_val_if_fail(server != NULL, NULL);
+	g_return_val_if_fail(LIBBALSA_IS_SERVER(server), NULL);
+
+	gtk_signal_emit(GTK_OBJECT(server), 
+			libbalsa_server_signals[GET_PASSWORD], mbox, &retval);
+	return retval;
+ }
+
 static void 
 libbalsa_server_real_set_username(LibBalsaServer *server, const gchar *username)
 {
@@ -194,3 +217,13 @@ libbalsa_server_real_set_host(LibBalsaServer *server, const gchar *host, gint po
 	server->host = g_strdup(host);
 	server->port = port;
 }
+
+#if 0
+static gchar *
+libbalsa_server_real_get_password(LibBalsaServer *server)
+{
+	g_return_val_if_fail(LIBBALSA_IS_SERVER(server), NULL);
+
+	return g_strdup(server->passwd);
+}
+#endif

@@ -87,7 +87,7 @@ static gint balsa_save_session (GnomeClient* client, gint phase,
                                 GnomeSaveStyle save_style, gint is_shutdown, 
                                 GnomeInteractStyle interact_style, 
                                 gint is_fast, gpointer client_data);
-
+static gboolean initial_open_mailboxes(gchar* mboxstr);
 
 static void
 balsa_init (int argc, char **argv)
@@ -130,7 +130,6 @@ config_init (void)
 static void
 mailboxes_init (void)
 {
-  /* initalize our mailbox access crap */
   if ( !do_load_mailboxes () )
     {
       fprintf (stderr, "*** error loading mailboxes\n");
@@ -265,36 +264,8 @@ main (int argc, char *argv[])
   } else gtk_widget_show(window);
 
 
-
-
-  /* open mailboxes if requested so */
-  if (balsa_app.open_unread_mailbox) {
-     GList * i, *gl = mblist_find_all_unread_mboxes();
-     for( i=g_list_first(gl); i; i=g_list_next(i) ) {
-	printf("opening %s..\n", (LIBBALSA_MAILBOX(i->data))->name);
-	mblist_open_mailbox( LIBBALSA_MAILBOX (i->data) );
-     }
-     g_list_free(gl);
-  }
-  if (balsa_app.open_mailbox) {
-     gint i =0;
-     gchar** names= g_strsplit(balsa_app.open_mailbox,";",20);
-     while(names[i]) {
-	LibBalsaMailbox *mbox = balsa_find_mbox_by_name(names[i]);
-	if(balsa_app.debug)
-	    fprintf(stderr,"opening %s => %p..\n", names[i], mbox);
-	if(mbox) {
-	   mblist_open_mailbox(mbox);
-	}
-	i++;
-     }
-     g_strfreev(names);
-  }
-
-  /* TODO: select the first one, if any is open */ 
-  if(gtk_notebook_get_current_page( GTK_NOTEBOOK(balsa_app.notebook) ) >=0 ) 
-     gtk_notebook_set_page( GTK_NOTEBOOK(balsa_app.notebook), 0);
-
+  gtk_idle_add((GtkFunction)initial_open_mailboxes, 
+	       g_strdup(balsa_app.open_mailbox));
   gdk_threads_enter();
   gtk_main();
   gdk_threads_leave();
@@ -308,6 +279,45 @@ main (int argc, char *argv[])
   return 0;
 }
 
+
+/* initial_open_mailboxes:
+   open mailboxes on startup if requested so.
+   This is an idle handler. Be sure to use gdk_threads_{enter/leave}
+ */
+static gboolean
+initial_open_mailboxes(gchar* mboxstr) {
+
+  gdk_threads_enter();
+  if (balsa_app.open_unread_mailbox) {
+    GList * i, *gl = mblist_find_all_unread_mboxes();
+    for( i=g_list_first(gl); i; i=g_list_next(i) ) {
+      printf("opening %s..\n", (LIBBALSA_MAILBOX(i->data))->name);
+      mblist_open_mailbox( LIBBALSA_MAILBOX (i->data) );
+    }
+    g_list_free(gl);
+  }
+
+  if (mboxstr) {
+    gint i =0;
+    gchar** names= g_strsplit(balsa_app.open_mailbox,";",20);
+    while(names[i]) {
+      LibBalsaMailbox *mbox = balsa_find_mbox_by_name(names[i]);
+      if(balsa_app.debug)
+	fprintf(stderr,"opening %s => %p..\n", names[i], mbox);
+      if(mbox)
+	mblist_open_mailbox(mbox);
+      i++;
+    }
+    g_strfreev(names);
+  }
+  
+  if(gtk_notebook_get_current_page( GTK_NOTEBOOK(balsa_app.notebook) ) >=0 ) 
+    gtk_notebook_set_page( GTK_NOTEBOOK(balsa_app.notebook), 0);
+  gdk_threads_leave();
+
+  if(mboxstr) g_free(mboxstr);
+  return FALSE;
+}
 static void
 force_close_mailbox(LibBalsaMailbox *mailbox) {
     if (!mailbox) return;

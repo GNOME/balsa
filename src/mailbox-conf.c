@@ -742,6 +742,8 @@ conf_add_mailbox (LibBalsaMailbox **mbox)
 	libbalsa_server_set_host(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
 				  gtk_entry_get_text(GTK_ENTRY(mcw->imap_server)),
 				  atol(gtk_entry_get_text(GTK_ENTRY(mcw->imap_port))));
+      gtk_signal_connect(GTK_OBJECT(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)), 
+			 "get-password",GTK_SIGNAL_FUNC(ask_password),mailbox);
 
 	if (path == NULL || path[0] == '\0' )
 	    /* FIXME: disable when IMAPDir stuff becomes functional */

@@ -243,46 +243,11 @@ balsa_find_notebook_page(LibBalsaMailbox *mailbox)
     return NULL;
 }
 
-static void
-set_password (gchar *pword, LibBalsaMailbox *mailbox)
-{
-  libbalsa_server_set_password(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox), pword);
-  g_free(pword);
-}
-
 gboolean balsa_index_page_load_mailbox(BalsaIndexPage *page, LibBalsaMailbox * mailbox)
 {
   GtkWidget *messagebox;
-  /*GdkCursor *cursor;*/
 
   page->mailbox = mailbox;
-
-  /* FIXME: This is ugly... */
-  if ((LIBBALSA_IS_MAILBOX_IMAP(mailbox) && !LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->passwd) ||
-      (LIBBALSA_IS_MAILBOX_POP3(mailbox) && !LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->passwd))
-  {
-    GtkWidget *dialog;
-    gint button;
-
-    dialog = gnome_request_dialog (TRUE,
-				   _("Mailbox password:"),
-				   NULL,
-				   0,
-				   (GnomeStringCallback)set_password,
-				   (gpointer)mailbox,
-				   GTK_WINDOW(balsa_app.main_window));
-				   
-    button = gnome_dialog_run(GNOME_DIALOG(dialog));
-
-    gtk_widget_destroy(dialog);
-      
-    if ( button != 0 ) /* OK */
-    {
-      return TRUE;
-    }
-    
-  }
-
   libbalsa_mailbox_open(mailbox, FALSE);
   
   if ( mailbox->open_ref == 0 )

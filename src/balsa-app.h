@@ -238,6 +238,7 @@ void update_timer( gboolean update, guint minutes );
 
 void balsa_error (const char *fnt,...);
 void balsa_warning (const char *fmt,...);
+gchar* ask_password(LibBalsaServer* server, LibBalsaMailbox *mbox);
 
 LibBalsaMailbox *balsa_find_mbox_by_name (const gchar *name);
 

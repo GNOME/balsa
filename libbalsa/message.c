@@ -329,6 +329,8 @@ libbalsa_message_move (LibBalsaMessage * message, LibBalsaMailbox * dest)
 {
 	HEADER *cur;
 
+	g_return_if_fail(message != NULL);
+	g_return_if_fail(dest != NULL);
 	RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
   
 	cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];

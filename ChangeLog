@@ -1,3 +1,16 @@
+2000-09-01  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox_imap.c(open): ask for password if unknown.
+	* libbalsa/message.c: standard input test in message_move.
+	* libbalsa/server.[hc]: get-password signal implemented.
+	* libmutt/imap/Makefile.am: browse.c added.
+	* src/balsa-app.[ch]: ask_password helper function implemented,
+	initial mailbox opening moved to an idle function.
+	* src/balsa-index-page.c: no special exceptions for IMAP and POP3 
+	passwords.
+	* src/save-restore.c: connect get-password signals.
+	* src/mailbox-conf.c: same.
+	
 2000-08-29  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* libbalsa/libbalsa.c: Reimplement libbalsa_error to be callable

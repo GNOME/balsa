@@ -207,8 +207,16 @@ libbalsa_mailbox_imap_open (LibBalsaMailbox *mailbox, gboolean append)
 	
 	libbalsa_lock_mutt();
 
-	ImapUser = LIBBALSA_MAILBOX_REMOTE_SERVER(imap)->user;
-	ImapPass = LIBBALSA_MAILBOX_REMOTE_SERVER(imap)->passwd;
+	/* try getting password, quit on cancel */
+	if(!(server->passwd && *server->passwd) && 
+	   !((server->passwd = libbalsa_server_get_password(server, mailbox))
+	     && *server->passwd)) {
+		libbalsa_unlock_mutt();
+		UNLOCK_MAILBOX (mailbox);
+		return;
+	}
+	ImapUser = server->user;
+	ImapPass = server->passwd;
 
 	if ( append ) 
 		CLIENT_CONTEXT (mailbox) = mx_open_mailbox (tmp, M_APPEND, NULL);

@@ -65,6 +65,7 @@ struct _LibBalsaServerClass
 					  const gchar *passwd);
 	void (* set_host)                (LibBalsaServer *server,
 					  const gchar *host, gint port);
+	gchar* (* get_password)            (LibBalsaServer *server);
 };
 
 GtkObject *libbalsa_server_new(LibBalsaServerType type);
@@ -72,5 +73,6 @@ GtkObject *libbalsa_server_new(LibBalsaServerType type);
 void libbalsa_server_set_username(LibBalsaServer *server, const gchar *username);
 void libbalsa_server_set_password(LibBalsaServer *server, const gchar *passwd);
 void libbalsa_server_set_host(LibBalsaServer *server, const gchar *host, gint port);
+gchar* libbalsa_server_get_password(LibBalsaServer *server, LibBalsaMailbox*mbox);
 
 #endif /* __LIBBALSA_SERVER_H__ */

@@ -1,3 +1,17 @@
+2004-07-31 15:19  PeterB
+
+	* src/: balsa-app.h, balsa-index.c, filter-run-dialog.c,
+	main-window.c, main.c, pref-manager.c, save-restore.c,
+	sendmsg-window.c: new close-mailbox api; remove auto-commit and
+	commit-all, and replace commit with expunge; implement
+	expunge_on_close.
+	* libbalsa/send.c: new close-mailbox api.
+	* libbalsa/: mailbox.c, mailbox.h, mailbox_imap.c, mailbox_local.c,
+	mailbox_maildir.c, mailbox_mbox.c, mailbox_mh.c, mailbox_pop3.c:
+	add expunge argument to mailbox-close api, and implement it.
+	* doc/C/balsa.xml: replace `commit' with `expunge', and some other
+	updates.
+
 2004-07-31 15:05  PeterB
 
 	* libbalsa/mailbox.c: remove a scheduled idle callback if

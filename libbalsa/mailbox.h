@@ -137,7 +137,7 @@ FILE *libbalsa_mailbox_get_message_stream (LibBalsaMailbox *mailbox, LibBalsaMes
  */
 void libbalsa_mailbox_sort (LibBalsaMailbox * mailbox, LibBalsaMailboxSort sort);
 
-void libbalsa_mailbox_commit_changes( LibBalsaMailbox *mailbox );
+gint libbalsa_mailbox_commit_changes( LibBalsaMailbox *mailbox );
 
 void libbalsa_mailbox_check (LibBalsaMailbox *mailbox);
 

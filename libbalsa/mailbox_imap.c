@@ -88,6 +88,8 @@ libbalsa_mailbox_imap_class_init (LibBalsaMailboxImapClass *klass)
 	libbalsa_mailbox_class->get_message_stream = libbalsa_mailbox_imap_get_message_stream;
 
 	libbalsa_mailbox_class->check = libbalsa_mailbox_imap_check;
+
+	ImapCheckTimeout = 10;
 }
 
 static void
@@ -107,6 +109,7 @@ libbalsa_mailbox_imap_init(LibBalsaMailboxImap *mailbox)
 			   GTK_SIGNAL_FUNC(server_user_settings_changed_cb), (gpointer)mailbox);
 	gtk_signal_connect(GTK_OBJECT(remote->server), "set-host",
 			   GTK_SIGNAL_FUNC(server_host_settings_changed_cb), (gpointer)mailbox);
+
 }
 
 static void
@@ -276,8 +279,8 @@ libbalsa_mailbox_imap_get_message_stream (LibBalsaMailbox *mailbox,
 static void libbalsa_mailbox_imap_check (LibBalsaMailbox *mailbox)
 {
 	if ( mailbox->open_ref == 0 ) {
-		if ( libbalsa_notify_check_mailbox(mailbox) )
-			libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
+		/* if ( libbalsa_notify_check_mailbox(mailbox) )
+		   libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE); */
 	} else {
 		gint i = 0;
 		gint index_hint;
@@ -287,7 +290,7 @@ static void libbalsa_mailbox_imap_check (LibBalsaMailbox *mailbox)
 		index_hint = CLIENT_CONTEXT (mailbox)->vcount;
 
 		libbalsa_lock_mutt();
-
+		imap_allow_reopen(CLIENT_CONTEXT (mailbox));
 		if ((i = mx_check_mailbox (CLIENT_CONTEXT (mailbox), &index_hint, 0)) < 0) {
 			g_print ("mx_check_mailbox() failed on %s\n", mailbox->name);
 		} else if (i == M_NEW_MAIL || i == M_REOPENED) {

@@ -329,17 +329,18 @@ dnl ############################################################################
 dnl Enable GSS?
 dnl ######################################################################################
 
-AC_ARG_ENABLE(gss, [  --with-gss            Enable GSS [default=no]],[
-	use_gss=$enableval
+AC_ARG_WITH(gss, [  --with-gss            Enable GSS [default=no]],[
+	with_gss=$withval
 ],[
-	use_gss=no
+	with_gss=no
 ])
 
 AC_MSG_CHECKING([whether to build GSS support])
-if test "x$use_gss" != xno  ; then
+if test "x$with_gss" != xno  ; then
 	AC_MSG_RESULT([yes])
 	CFLAGS="$CFLAGS -I$with_gss/include"
 	LIBS="$LIBS -L$with_gss/lib -lgssapi_krb5"
+        echo "with_gss=$with_gss"
 else
 	AC_MSG_RESULT([no])
 fi

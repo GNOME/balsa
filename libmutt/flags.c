@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1996-8 Michael R. Elkins <me@cs.hmc.edu>
+ * Copyright (C) 1996-2000 Michael R. Elkins <me@cs.hmc.edu>
  * 
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
  * 
  *     You should have received a copy of the GNU General Public License
  *     along with this program; if not, write to the Free Software
- *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  */ 
 
 #include "mutt.h"
@@ -39,6 +39,15 @@ void _mutt_set_flag (CONTEXT *ctx, HEADER *h, int flag, int bf, int upd_ctx)
 	{
 	  h->deleted = 1;
 	  if (upd_ctx) ctx->deleted++;
+#ifdef USE_IMAP
+          /* deleted messages aren't treated as changed elsewhere so that the
+           * purge-on-sync option works correctly. This isn't applicable here */
+          if (ctx->magic == M_IMAP)
+          {
+            h->changed = 1;
+	    if (upd_ctx) ctx->changed = 1;
+          }
+#endif
 	}
       }
       else if (h->deleted)
@@ -46,7 +55,7 @@ void _mutt_set_flag (CONTEXT *ctx, HEADER *h, int flag, int bf, int upd_ctx)
 	h->deleted = 0;
 	if (upd_ctx) ctx->deleted--;
 #ifdef USE_IMAP
-/* if you undelete a message, the imap server will probably need to know. */
+        /* see my comment above */
 	if (ctx->magic == M_IMAP) 
 	{
 	  h->changed = 1;

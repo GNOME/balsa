@@ -48,12 +48,12 @@ void libbalsa_notify_register_mailbox (LibBalsaMailbox *mailbox)
 		user = passwd = NULL;
 	} else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
 		LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
-		gchar *imap_path = LIBBALSA_MAILBOX_IMAP(mailbox)->path;
+		/* imap notify is broken. Fix it first. */
+		return;
 		if ( server->user && server->passwd ) {
-			path = g_strdup_printf("{%s:%i}%s", 
-					       server->host,
-					       server->port,
-					       imap_path);
+			path = g_strdup_printf(
+				"{%s:%i}%s", server->host,server->port,
+				LIBBALSA_MAILBOX_IMAP(mailbox)->path);
 			user   = server->user;
 			passwd = server->passwd;
 		} else {

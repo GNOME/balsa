@@ -108,7 +108,7 @@ libbalsa_mailbox_class_init (LibBalsaMailboxClass *klass)
 				GTK_TYPE_NONE, 1, LIBBALSA_TYPE_MESSAGE);
 
 	libbalsa_mailbox_signals[OPEN_MAILBOX] =
-		gtk_signal_new ("open_mailbox",
+		gtk_signal_new ("open-mailbox",
 				GTK_RUN_FIRST,
 				object_class->type,
 				GTK_SIGNAL_OFFSET (LibBalsaMailboxClass, open_mailbox),
@@ -116,7 +116,7 @@ libbalsa_mailbox_class_init (LibBalsaMailboxClass *klass)
 				GTK_TYPE_NONE, 1, GTK_TYPE_BOOL);
 
 	libbalsa_mailbox_signals[CLOSE_MAILBOX] =
-		gtk_signal_new ("close_mailbox",
+		gtk_signal_new ("close-mailbox",
 				GTK_RUN_LAST,
 				object_class->type,
 				GTK_SIGNAL_OFFSET (LibBalsaMailboxClass, close_mailbox),
@@ -178,7 +178,6 @@ libbalsa_mailbox_class_init (LibBalsaMailboxClass *klass)
 
 	klass->get_message_stream = NULL;
 	klass->check = NULL;
-
 }
 
 static void
@@ -461,12 +460,16 @@ libbalsa_mailbox_valid (gchar * filename)
 
 	return ret;
 }
-
-void libbalsa_mailbox_commit_changes( LibBalsaMailbox *mailbox )
+/* libbalsa_mailbox_commit_changes:
+   commits the changes to the file. note that the msg numbers are changed 
+   after commit so one has to re-read messages from mutt structures.
+*/
+gint libbalsa_mailbox_commit_changes( LibBalsaMailbox *mailbox )
 {
 	GList *message_list;
 	GList *tmp_message_list;
 	LibBalsaMessage *current_message;
+	gint res;
 
 	libbalsa_mailbox_open (mailbox, FALSE);
 
@@ -484,11 +487,18 @@ void libbalsa_mailbox_commit_changes( LibBalsaMailbox *mailbox )
       
 	}
 
-	/* [MBG] This should prevent segfaults */
-	/*   if (CLIENT_CONTEXT (mailbox) != NULL) */
-	/*     mx_sync_mailbox (CLIENT_CONTEXT(mailbox)); */
-
+	libbalsa_lock_mutt();
+	res = 0; /* FIXME: mx_sync_mailbox (CLIENT_CONTEXT(mailbox), NULL); */
 	libbalsa_mailbox_close (mailbox);
+	if(res) {
+		libbalsa_mailbox_free_messages (mailbox);
+		mailbox->messages = 0;
+		mailbox->total_messages = 0;
+		mailbox->unread_messages = 0;
+		libbalsa_mailbox_load_messages (mailbox);
+	}
+	libbalsa_unlock_mutt();
+	return res;
 }
 
 /* internal c-client translation */

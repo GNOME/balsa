@@ -3,7 +3,7 @@
 %define rel      @BALSA_RELEASE@
 %define prefix   /usr
 
-%define config_opts --prefix=%{prefix} --sysconfdir=/etc --enable-threads --disable-system-install --disable-more-warnings
+%define config_opts --prefix=%{prefix} --sysconfdir=/etc --enable-threads --disable-system-install --disable-more-warnings --with-gss=/usr/kerberos
 
 Summary:   Balsa Mail Client
 Name:      balsa

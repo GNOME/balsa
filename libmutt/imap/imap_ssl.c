@@ -17,7 +17,7 @@
  */
 
 /* for SSL NO_* defines */
-#include "config.h"
+#include "muttconfig.h"
 
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
@@ -35,6 +35,11 @@
 #include "mutt_menu.h"
 #include "mutt_curses.h"
 #include "imap_ssl.h"
+
+#ifdef LIBMUTT
+#define _(a) (a)
+#define sleep(a) 
+#endif
 
 #if OPENSSL_VERSION_NUMBER >= 0x00904000L
 #define READ_X509_KEY(fp, key)	PEM_read_X509(fp, key, NULL, NULL)

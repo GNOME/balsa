@@ -1,3 +1,18 @@
+2000-09-04  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in: Fixed GSS configuration issue (I wonder how come
+	it worked before): CPPFLAGS set in libmutt/configure.in was
+	overwriteen by a value set in libmutt/Makefile.am. CFLAGS is now
+	set instead but I don't think this is the cleanest way of doing
+	it.
+	* balsa.spec.in: compile with GSS enabled.
+	* libbalsa/mailbox.c: use '-' instead of '_' in signal names;
+	first approach to fixing libbalsa_mailbox_commit_changes, return 
+	the commit's result.
+	* libbalsa/mailbox_imap.c(mailbox_check): allow_reopen. disable
+	checking closing mailboxes before buffy code gets fixed.
+	* libbalsa/notify.c: disable registering imap mailboxes.
+	* 
 2000-09-02  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* README: added a comment on GSS
@@ -11,6 +26,13 @@
 	* libmutt/imap/auth_gss.c: compile it.
 	* libmutt/imap/message.c: include <string.h>
 	* src/save-restore.c: major code cleanup.
+	* libmutt/Makefile.am: use DEFS for defining compilation constants.
+	* libmutt/flags.c: sync with mutt 1.2.5.
+	* libmutt/mutt.h: add M_NEW_SSL_SOCKET constant as in mutt-1.2.5.
+	* libmutt/imap/Makefile.am: use DEFS instaed of CPPFLAGS.
+	* libmutt/imap/imap_ssl.c: first approach. It require more work
+	because it includes user interface.
+	* src/main-window.c: check commit_changes return value.
 	
 2000-09-01  Pawel Salek  <pawsa@theochem.kth.se>
 

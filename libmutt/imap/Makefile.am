@@ -13,7 +13,7 @@ endif
 
 EXTRA_DIST = BUGS README TODO imap_ssl.c imap_ssl.h auth_gss.c browse.c
 
-CPPFLAGS=-DSHAREDIR=\"$(sharedir)\" -DSYSCONFDIR=\"$(sysconfdir)\" -DLIBMUTT
+DEFS = -DSHAREDIR=\"$(sharedir)\" -DSYSCONFDIR=\"$(sysconfdir)\" -DLIBMUTT
 INCLUDES = -I$(top_srcdir)
 
 noinst_LIBRARIES = libimap.a

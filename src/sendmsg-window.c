@@ -65,6 +65,8 @@ static gint toggle_bcc_cb (GtkWidget *, BalsaSendmsg *);
 static gint toggle_fcc_cb (GtkWidget *, BalsaSendmsg *);
 static gint toggle_reply_cb (GtkWidget *, BalsaSendmsg *);
 static gint toggle_attachments_cb (GtkWidget *, BalsaSendmsg *);
+static gint toggle_comments_cb (GtkWidget *, BalsaSendmsg *);
+static gint toggle_keywords_cb (GtkWidget *, BalsaSendmsg *);
 
 static gint set_iso_charset(BalsaSendmsg*, gint , gint );
 static gint iso_1_cb(GtkWidget* , BalsaSendmsg *);
@@ -194,6 +196,10 @@ static GnomeUIInfo view_menu[] =
   GNOMEUIINFO_TOGGLEITEM( N_ ("_Reply To"), NULL, toggle_reply_cb, NULL),
 #define MENU_TOGGLE_ATTACHMENTS_POS 7
   GNOMEUIINFO_TOGGLEITEM( N_ ("_Attachments"),NULL,toggle_attachments_cb,NULL),
+#define MENU_TOGGLE_COMMENTS_POS 8
+  GNOMEUIINFO_TOGGLEITEM( N_ ("_Comments"), NULL, toggle_comments_cb, NULL),
+#define MENU_TOGGLE_KEYWORDS_POS 9
+  GNOMEUIINFO_TOGGLEITEM( N_ ("_Keywords"), NULL, toggle_keywords_cb, NULL),
   GNOMEUIINFO_END
 };
 
@@ -236,8 +242,9 @@ typedef struct {
 } headerMenuDesc;
 
 headerMenuDesc headerDescs[] = { {"to", 3}, {"from", 3}, {"subject",2},
-				  {"cc", 3}, {"bcc",  3}, {"fcc",    2},
-				  {"replyto", 3}, {"attachments", 4} };
+				 {"cc", 3}, {"bcc",  3}, {"fcc",    2},
+				 {"replyto", 3}, {"attachments", 4},
+				 {"comments", 2}, {"keywords",2}};
 
 static GnomeUIInfo iso_menu[] = {
    GNOMEUIINFO_RADIOLIST(iso_charset_menu),
@@ -494,16 +501,24 @@ to_add (GtkWidget * widget,
 }
 
 static void
-create_email_entry(GtkWidget* table, const gchar * label, int y_pos, 
-		   const gchar* icon, GtkWidget* arr[]) {
+create_string_entry(GtkWidget* table, const gchar * label, int y_pos, 
+		    GtkWidget* arr[])
+{
    arr[0] = gtk_label_new (label);
    gtk_misc_set_alignment (GTK_MISC (arr[0]), 0.0, 0.5);
    gtk_table_attach (GTK_TABLE (table), arr[0], 0, 1, y_pos, y_pos+1,
 		     GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
-
+   
    arr[1] = gtk_entry_new ();
    gtk_table_attach (GTK_TABLE (table), arr[1], 1, 2, y_pos, y_pos+1,
 		     GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_SHRINK, 0, 0);
+}
+
+static void
+create_email_entry(GtkWidget* table, const gchar * label, int y_pos, 
+		   const gchar* icon, GtkWidget* arr[]) {
+
+   create_string_entry(table, label, y_pos, arr);
 
    arr[2] = gtk_button_new ();
    gtk_button_set_relief (GTK_BUTTON (arr[2]), GTK_RELIEF_NONE);
@@ -533,7 +548,7 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   GtkWidget *table;
   GtkWidget *frame;
 
-  table = gtk_table_new (8, 3, FALSE);
+  table = gtk_table_new (10, 3, FALSE);
   gtk_table_set_row_spacings (GTK_TABLE (table), 2);
   gtk_table_set_col_spacings (GTK_TABLE (table), 2);
 
@@ -546,14 +561,7 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
 
   
   /* Subject: */
-  msg->subject[0] = gtk_label_new (_("Subject:"));
-  gtk_misc_set_alignment (GTK_MISC (msg->subject[0]), 0.0, 0.5);
-  gtk_table_attach (GTK_TABLE (table), msg->subject[0], 0, 1, 2, 3,
-		    GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
-
-  msg->subject[1] = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), msg->subject[1], 1, 2, 2, 3,
-		    GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_SHRINK, 0, 0);
+  create_string_entry(table, _("Subject:"), 2, msg->subject);
 
   /* cc: */
   create_email_entry(table, _("cc:"),3, GNOME_STOCK_MENU_BOOK_YELLOW, msg->cc);
@@ -633,6 +641,13 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
 
   msg->attachments[2] = sw;
   msg->attachments[3] = frame;
+
+
+  /* Comments: */
+  create_string_entry(table, _("Comments:"), 8, msg->comments);
+
+  /* Keywords: */
+  create_string_entry(table, _("Keywords:"), 9, msg->keywords);
 
   gtk_widget_show_all( GTK_WIDGET(table) );
 
@@ -1460,6 +1475,11 @@ static gint toggle_attachments_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
 { 
    return toggle_entry(bsmsg->attachments, MENU_TOGGLE_ATTACHMENTS_POS,4);
 }
+
+static gint toggle_comments_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
+{return toggle_entry(bsmsg->comments, MENU_TOGGLE_COMMENTS_POS,2); }
+static gint toggle_keywords_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
+{return toggle_entry(bsmsg->keywords, MENU_TOGGLE_KEYWORDS_POS,2); }
 
 static void set_menus(BalsaSendmsg *msg)
 {

@@ -43,6 +43,7 @@ extern "C"
 	 GtkWidget *window;
 	 GtkWidget* to[3], *from[3], *subject[2], *cc[3], *bcc[3], *fcc[3],
 	    *reply_to[3];
+	 GtkWidget *comments[2], *keywords[2];
 	 GtkWidget *attachments[4];
 	 GtkWidget *text;
 	 GdkFont   *font;

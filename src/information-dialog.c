@@ -56,7 +56,7 @@ balsa_information_list_response_cb(GtkWidget * dialog, gint response,
     }
 }
 
-static void
+void
 balsa_information_real(GtkWindow *parent, LibBalsaInformationType type,
                        const char *msg)
 {

@@ -376,7 +376,7 @@ main(int argc, char *argv[])
     balsa_app_init();
 
     /* Initialize libbalsa */
-    libbalsa_init((LibBalsaInformationFunc) balsa_information_parented);
+    libbalsa_init((LibBalsaInformationFunc) balsa_information_real);
     libbalsa_filters_set_url_mapper(balsa_find_mailbox_by_url);
     libbalsa_filters_set_filter_list(&balsa_app.filters);
     

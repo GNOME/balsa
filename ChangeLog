@@ -1,3 +1,8 @@
+2003-10-14  Pawel Salek  <pawsa theochem.kth.se>
+
+	* src/information-dialog.[ch]:
+	* src/main.c: fix bug 124568.
+
 2003-10-14 08:35  PeterB
 
 	* src/message-window.c: Trash the message in the window, not the

@@ -100,8 +100,14 @@ GtkWidget *balsa_window_find_current_index(BalsaWindow *window);
 void       balsa_window_open_mailbox( BalsaWindow *window, LibBalsaMailbox *mailbox );
 void       balsa_window_close_mailbox( BalsaWindow *window, LibBalsaMailbox *mailbox );
 
+static void balsa_window_select_message_cb (GtkWidget * widget, LibBalsaMessage * message, GdkEventButton * bevent, gpointer data);
+static void balsa_window_unselect_message_cb (GtkWidget * widget, LibBalsaMessage * message, GdkEventButton * bevent, gpointer data);
+
 static void check_mailbox_list (GList *list);
 static gint mailbox_check_func ( GNode *mbox, gpointer data );
+
+static void enable_mailbox_menus(LibBalsaMailbox *mailbox);
+static void enable_message_menus(LibBalsaMessage *message);
 
 static gint about_box_visible = FALSE;
 
@@ -179,12 +185,10 @@ static GnomeUIInfo file_menu[] =
     GNOME_STOCK_MENU_BOOK_RED, 'B', 0, NULL
   },
 
-  /* Ctrl-I */
-  {
-    GNOME_APP_UI_ITEM, N_ ("Pr_int"), N_("Print current mail"),
-    message_print_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-    GNOME_STOCK_MENU_PRINT, 'I', GDK_CONTROL_MASK, NULL
-  },
+  GNOMEUIINFO_SEPARATOR,
+
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Empty _Trash"), N_("Delete Messages from the trash mailbox"), 
+			  mailbox_empty_trash, GNOME_STOCK_PIXMAP_REMOVE),
   GNOMEUIINFO_SEPARATOR,
 
   #if 0
@@ -214,75 +218,14 @@ static GnomeUIInfo shown_hdrs_menu[] =
 
 static GnomeUIInfo message_menu[] =
 {
-#define MENU_MESSAGE_NEXT_POS 0
-  {
-    GNOME_APP_UI_ITEM, N_ ("Next"), N_ ("Next Message"),
-    next_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-    GNOME_STOCK_MENU_FORWARD, 'N', 0, NULL
-  },
-#define MENU_MESSAGE_PREV_POS 1
-  {
-    GNOME_APP_UI_ITEM, N_ ("Previous"), N_ ("Previous Message"),
-    previous_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-    GNOME_STOCK_MENU_BACK, 'P', 0, NULL
-  },
-#define MENU_MESSAGE_NEXT_UNREAD_POS 2
-  {
-    GNOME_APP_UI_ITEM, N_ ("Next Unread"), N_ ("Next Unread Message"),
-    next_unread_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-    GNOME_STOCK_MENU_FORWARD, 'N', GDK_CONTROL_MASK, NULL
-  },
-  GNOMEUIINFO_SEPARATOR,
-#define MENU_MESSAGE_NEXT_PART 4
-  {
-    GNOME_APP_UI_ITEM, N_ ("Next Part"), N_ ("Next Part in Message"),
-    next_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-    GNOME_STOCK_MENU_FORWARD, '.', GDK_CONTROL_MASK, NULL
-  },
-#define MENU_MESSAGE_PREVIOUS_PART 5
-  {
-    GNOME_APP_UI_ITEM, N_ ("Previous Part"), N_ ("Previous Part in Message"),
-    previous_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-    GNOME_STOCK_MENU_BACK, ',', GDK_CONTROL_MASK, NULL
-  },
-#define MENU_MESSAGE_SAVE_PART 6
-  {
-    GNOME_APP_UI_ITEM, N_ ("Save Current Part"), 
-    N_ ("Save Current Part in Message"),
-    save_current_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-    GNOME_STOCK_MENU_SAVE, 's', GDK_CONTROL_MASK, NULL
-  },
-  GNOMEUIINFO_SEPARATOR,
-#define MENU_MESSAGE_NEW_POS 8
+#define MENU_MESSAGE_NEW_POS 0
     /* M */
   {
     GNOME_APP_UI_ITEM, N_ ("_New"), N_("Compose a new message"),
     new_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_MAIL, 'M', 0, NULL
   },
-#define MENU_MESSAGE_REPLY_POS 9
-    /* R */
-  {
-    GNOME_APP_UI_ITEM, N_ ("_Reply"), N_("Reply to the current message"),
-    replyto_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-    GNOME_STOCK_MENU_MAIL_RPL, 'R', 0, NULL
-  },
-#define MENU_MESSAGE_REPLY_ALL_POS 10
-    /* A */
-  {
-    GNOME_APP_UI_ITEM, N_ ("Reply to _all"),
-    N_("Reply to all recipients of the current message"),
-    replytoall_message_cb, NULL, NULL, GNOME_APP_PIXMAP_DATA,
-    reply_to_all_menu_xpm, 'A', 0, NULL
-  },
-#define MENU_MESSAGE_FORWARD_POS 11
-    /* F */
-  {
-    GNOME_APP_UI_ITEM, N_ ("_Forward"), N_("Forward the current message"),
-    forward_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-    GNOME_STOCK_MENU_MAIL_FWD, 'F', 0, NULL
-  },
-#define MENU_MESSAGE_CONTINUE_POS 12
+#define MENU_MESSAGE_CONTINUE_POS 1
     /* C */
   {
     GNOME_APP_UI_ITEM, N_ ("_Continue"), 
@@ -290,22 +233,71 @@ static GnomeUIInfo message_menu[] =
     continue_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_MAIL, 'C', 0, NULL
   },
+#define MENU_MESSAGE_PRINT_POS 2
+  /* Ctrl-I */
+  {
+    GNOME_APP_UI_ITEM, N_ ("Pr_int"), N_("Print current mail"),
+    message_print_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_PRINT, 'I', GDK_CONTROL_MASK, NULL
+  },
+#define MENU_MESSAGE_REPLY_POS 3
+    /* R */
+  {
+    GNOME_APP_UI_ITEM, N_ ("_Reply"), N_("Reply to the current message"),
+    replyto_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_MAIL_RPL, 'R', 0, NULL
+  },
+#define MENU_MESSAGE_REPLY_ALL_POS 4
+    /* A */
+  {
+    GNOME_APP_UI_ITEM, N_ ("Reply to _all"),
+    N_("Reply to all recipients of the current message"),
+    replytoall_message_cb, NULL, NULL, GNOME_APP_PIXMAP_DATA,
+    reply_to_all_menu_xpm, 'A', 0, NULL
+  },
+#define MENU_MESSAGE_FORWARD_POS 5
+    /* F */
+  {
+    GNOME_APP_UI_ITEM, N_ ("_Forward"), N_("Forward the current message"),
+    forward_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_MAIL_FWD, 'F', 0, NULL
+  },
   GNOMEUIINFO_SEPARATOR,
-#define MENU_MESSAGE_DELETE_POS 14
+#define MENU_MESSAGE_NEXT_PART_POS 7
+  {
+    GNOME_APP_UI_ITEM, N_ ("Next Part"), N_ ("Next Part in Message"),
+    next_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_FORWARD, '.', GDK_CONTROL_MASK, NULL
+  },
+#define MENU_MESSAGE_PREVIOUS_PART_POS 8
+  {
+    GNOME_APP_UI_ITEM, N_ ("Previous Part"), N_ ("Previous Part in Message"),
+    previous_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_BACK, ',', GDK_CONTROL_MASK, NULL
+  },
+#define MENU_MESSAGE_SAVE_PART_POS 9
+  {
+    GNOME_APP_UI_ITEM, N_ ("Save Current Part"), 
+    N_ ("Save Current Part in Message"),
+    save_current_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_SAVE, 's', GDK_CONTROL_MASK, NULL
+  },
+  GNOMEUIINFO_SEPARATOR,
+#define MENU_MESSAGE_DELETE_POS 11
     /* D */
   {
     GNOME_APP_UI_ITEM, N_ ("_Delete"), N_("Delete the current message"),
     delete_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_TRASH, 'D', 0, NULL
   },
-#define MENU_MESSAGE_UNDEL_POS 15
+#define MENU_MESSAGE_UNDEL_POS 12
     /* U */
   {
     GNOME_APP_UI_ITEM, N_ ("_Undelete"), N_("Undelete the message"),
     undelete_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_UNDELETE, 'U', 0, NULL
   },
-#define MENU_MESSAGE_TOGGLE_FLAGGED_POS 16
+#define MENU_MESSAGE_TOGGLE_FLAGGED_POS 13
   /* ! */
   {
       GNOME_APP_UI_ITEM, N_("_Toggle flagged"), N_("Toggle flagged"),
@@ -313,7 +305,7 @@ static GnomeUIInfo message_menu[] =
       NULL, 'X', 0, NULL
   },
   GNOMEUIINFO_SEPARATOR,
-#define MENU_MESSAGE_STORE_ADDRESS_POS 18
+#define MENU_MESSAGE_STORE_ADDRESS_POS 15
       /* S */
   {
     GNOME_APP_UI_ITEM, N_ ("_Store Address"), N_("Store address of sender in addressbook"),
@@ -321,7 +313,7 @@ static GnomeUIInfo message_menu[] =
     GNOME_STOCK_MENU_BOOK_RED, 'S', 0, NULL
   },
   GNOMEUIINFO_SEPARATOR,
-#define MENU_MESSAGE_WRAP_POS 20
+#define MENU_MESSAGE_WRAP_POS 17
   GNOMEUIINFO_TOGGLEITEM( N_ ("_Wrap"), "Wrap message lines", wrap_message_cb, NULL),
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_RADIOLIST(shown_hdrs_menu),
@@ -330,21 +322,44 @@ static GnomeUIInfo message_menu[] =
 
 static GnomeUIInfo mailbox_menu[] =
 {
+#define MENU_MAILBOX_NEXT_POS 0
+  {
+    GNOME_APP_UI_ITEM, N_ ("Next Message"), N_ ("Next Message"),
+    next_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_FORWARD, 'N', 0, NULL
+  },
+#define MENU_MAILBOX_PREV_POS 1
+  {
+    GNOME_APP_UI_ITEM, N_ ("Previous Message"), N_ ("Previous Message"),
+    previous_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_BACK, 'P', 0, NULL
+  },
+#define MENU_MAILBOX_NEXT_UNREAD_POS 2
+  {
+    GNOME_APP_UI_ITEM, N_ ("Next Unread Message"), N_ ("Next Unread Message"),
+    next_unread_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_FORWARD, 'N', GDK_CONTROL_MASK, NULL
+  },
+  GNOMEUIINFO_SEPARATOR,
+#define MENU_MAILBOX_ADD_NEW_POS 4
   GNOMEUIINFO_ITEM_STOCK (N_ ("_Add"), N_("Add a new mailbox"),
 			  mblist_menu_add_cb, GNOME_STOCK_PIXMAP_ADD),
+#define MENU_MAILBOX_EDIT_POS 5
   GNOMEUIINFO_ITEM_STOCK (N_ ("_Edit"), N_("Edit the selected mailbox"),
 			  mblist_menu_edit_cb, GNOME_STOCK_MENU_PREF),
+#define MENU_MAILBOX_DELETE_POS 6
   GNOMEUIINFO_ITEM_STOCK (N_ ("_Delete"), N_("Delete the selected mailbox"),
 			  mblist_menu_delete_cb, GNOME_STOCK_PIXMAP_REMOVE),
   GNOMEUIINFO_SEPARATOR,
+#define MENU_MAILBOX_COMMIT_POS 8
   GNOMEUIINFO_ITEM_STOCK (N_ ("Co_mmit current"), N_("Commit the changes in the currently opened mailbox"),
 			  mailbox_commit_changes, GNOME_STOCK_MENU_REFRESH),
+#define MENU_MAILBOX_CLOSE_POS 9
   GNOMEUIINFO_ITEM_STOCK (N_ ("_Close"), N_("Close mailbox"),
 			  mailbox_close_cb, GNOME_STOCK_MENU_CLOSE),
-  GNOMEUIINFO_SEPARATOR,
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Empty _Trash"), N_("Delete Messages from the trash mailbox"), mailbox_empty_trash, GNOME_STOCK_PIXMAP_REMOVE),
   GNOMEUIINFO_END
 };
+
 static GnomeUIInfo settings_menu[] =
 {
 #ifdef BALSA_SHOW_ALL
@@ -362,6 +377,7 @@ static GnomeUIInfo settings_menu[] =
   GNOMEUIINFO_TOGGLEITEM( N_ ("Show mailbox _tabs"), "Toggle display of mailbox notebook tabs", show_mbtabs_cb, NULL),
   GNOMEUIINFO_END
 };
+
 static GnomeUIInfo help_menu[] =
 {
   GNOMEUIINFO_MENU_ABOUT_ITEM(show_about_box, NULL),
@@ -369,6 +385,7 @@ static GnomeUIInfo help_menu[] =
   GNOMEUIINFO_HELP ("balsa"),
   GNOMEUIINFO_END
 };
+
 static GnomeUIInfo main_menu[] =
 {
   GNOMEUIINFO_MENU_FILE_TREE(file_menu),
@@ -381,46 +398,57 @@ static GnomeUIInfo main_menu[] =
 
 static GnomeUIInfo main_toolbar[] =
 {
+#define TOOLBAR_CHECK_POS 0
   GNOMEUIINFO_ITEM_STOCK (N_ ("Check"), N_ ("Check Email"),
                           check_new_messages_cb,
                           GNOME_STOCK_PIXMAP_MAIL_RCV),
   GNOMEUIINFO_SEPARATOR,
+#define TOOLBAR_DELETE_POS 2
   GNOMEUIINFO_ITEM_STOCK (N_ ("Delete"), N_ ("Delete Message"),
                           delete_message_cb,
                           GNOME_STOCK_PIXMAP_TRASH),
   GNOMEUIINFO_SEPARATOR,
+#define TOOLBAR_COMPOSE_POS 4
   GNOMEUIINFO_ITEM_STOCK (N_ ("Compose"), N_ ("Compose Message"),
                           new_message_cb,
                           GNOME_STOCK_PIXMAP_MAIL_NEW),
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Reply"), N_ ("Reply"),
-                          replyto_message_cb,
-                          GNOME_STOCK_PIXMAP_MAIL_RPL),
-  GNOMEUIINFO_ITEM (N_ ("Reply to all"), N_ ("Reply to all"),
-                    replytoall_message_cb,
-                    reply_to_all_xpm),
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Forward"), N_ ("Forward"),
-                          forward_message_cb,
-                          GNOME_STOCK_PIXMAP_MAIL_FWD),
+#define TOOLBAR_CONTINUE_POS 5
   GNOMEUIINFO_ITEM_STOCK (N_ ("Continue"), N_ ("Continue"),
                           continue_message_cb,
                           GNOME_STOCK_PIXMAP_MAIL),
+#define TOOLBAR_REPLY_POS 6
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Reply"), N_ ("Reply"),
+                          replyto_message_cb,
+                          GNOME_STOCK_PIXMAP_MAIL_RPL),
+#define TOOLBAR_REPLY_ALL_POS 7
+  GNOMEUIINFO_ITEM (N_ ("Reply to all"), N_ ("Reply to all"),
+                    replytoall_message_cb,
+                    reply_to_all_xpm),
+#define TOOLBAR_FORWARD_POS 8
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Forward"), N_ ("Forward"),
+                          forward_message_cb,
+                          GNOME_STOCK_PIXMAP_MAIL_FWD),
   GNOMEUIINFO_SEPARATOR,
+#define TOOLBAR_PREVIOUS_POS 10
   {
     GNOME_APP_UI_ITEM, N_ ("Previous"), N_("Open Previous message"),
     previous_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_PIXMAP_BACK, 0, 0, NULL
   },
+#define TOOLBAR_NEXT_POS 11
   {
     GNOME_APP_UI_ITEM, N_ ("Next"), N_("Open Next message"),
     next_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_PIXMAP_FORWARD, 0, 0, NULL
   },
+#define TOOLBAR_NEXT_UNREAD_POS 12
   {
     GNOME_APP_UI_ITEM, N_ ("Next Unread"), N_ ("Open Next Unread Message"),
     next_unread_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_PIXMAP_FORWARD, 0, 0, NULL
   },
   GNOMEUIINFO_SEPARATOR,
+#define TOOLBAR_PRINT_POS 14
   GNOMEUIINFO_ITEM_STOCK (N_ ("Print"), N_ ("Print current message"), 
 			  message_print_cb, GNOME_STOCK_PIXMAP_PRINT),
 
@@ -526,6 +554,10 @@ balsa_window_new ()
   gnome_app_create_menus_with_data (GNOME_APP(window), main_menu, window);
   gnome_app_create_toolbar_with_data (GNOME_APP(window), main_toolbar, window);
 
+  /* Disable menu items at start up */
+  enable_mailbox_menus(NULL);
+  enable_message_menus(NULL);
+
   /* we can only set icon after realization, as we have no windows before. */
   gtk_signal_connect (GTK_OBJECT (window), "realize",
 		      GTK_SIGNAL_FUNC (set_icon), NULL);
@@ -612,6 +644,101 @@ balsa_window_new ()
   return GTK_WIDGET (window);
 }
 
+/*
+ * Enable or disable menu items/toolbar buttons which depend 
+ * on if there is a mailbox open. 
+ */
+static void
+enable_mailbox_menus(LibBalsaMailbox *mailbox)
+{
+  gboolean enable;
+
+  if ( mailbox == NULL ) 
+    enable = FALSE;
+  else
+    enable = TRUE;
+
+  if ( mailbox && mailbox->readonly ) {
+    gtk_widget_set_sensitive ( mailbox_menu[MENU_MAILBOX_COMMIT_POS].widget, FALSE );
+  } else {
+    gtk_widget_set_sensitive ( mailbox_menu[MENU_MAILBOX_COMMIT_POS].widget, enable );
+  }
+
+  /* Toolbar */
+  gtk_widget_set_sensitive ( main_toolbar[TOOLBAR_PREVIOUS_POS].widget, enable);
+  gtk_widget_set_sensitive ( main_toolbar[TOOLBAR_NEXT_POS].widget, enable);
+  gtk_widget_set_sensitive ( main_toolbar[TOOLBAR_NEXT_UNREAD_POS].widget, enable);
+
+  gtk_widget_set_sensitive ( mailbox_menu[MENU_MAILBOX_NEXT_POS].widget, enable );
+  gtk_widget_set_sensitive ( mailbox_menu[MENU_MAILBOX_PREV_POS].widget, enable );
+  gtk_widget_set_sensitive ( mailbox_menu[MENU_MAILBOX_NEXT_UNREAD_POS].widget, enable );
+  gtk_widget_set_sensitive ( mailbox_menu[MENU_MAILBOX_CLOSE_POS].widget, enable );
+}
+
+/*
+ * Enable or disable menu items/toolbar buttons which depend 
+ * on if there is a message selected. 
+ */
+static void
+enable_message_menus(LibBalsaMessage *message)
+{
+  GnomeUIInfo *info;
+  gboolean enable;
+
+  if ( message )
+    enable = TRUE;
+  else
+    enable = FALSE;
+
+  /* Handle menu items which require write access to mailbox */
+  if ( message && message->mailbox->readonly ) {
+    gtk_widget_set_sensitive ( message_menu[MENU_MESSAGE_DELETE_POS].widget, FALSE);
+    gtk_widget_set_sensitive ( message_menu[MENU_MESSAGE_UNDEL_POS].widget, FALSE);
+    gtk_widget_set_sensitive ( message_menu[MENU_MESSAGE_TOGGLE_FLAGGED_POS].widget, FALSE);
+
+    gtk_widget_set_sensitive ( main_toolbar[TOOLBAR_DELETE_POS].widget, FALSE);
+  } else {
+    gtk_widget_set_sensitive ( message_menu[MENU_MESSAGE_DELETE_POS].widget, enable);
+    gtk_widget_set_sensitive ( message_menu[MENU_MESSAGE_UNDEL_POS].widget, enable);
+    gtk_widget_set_sensitive ( message_menu[MENU_MESSAGE_TOGGLE_FLAGGED_POS].widget, enable);
+    
+    gtk_widget_set_sensitive ( main_toolbar[TOOLBAR_DELETE_POS].widget, enable);
+  }
+
+  /* Handle items which require multiple parts to the mail */
+  if ( message && !libbalsa_message_has_attachment (message) ) {
+    gtk_widget_set_sensitive ( message_menu[MENU_MESSAGE_NEXT_PART_POS].widget, FALSE);
+    gtk_widget_set_sensitive ( message_menu[MENU_MESSAGE_PREVIOUS_PART_POS].widget, FALSE);
+  } else {
+    gtk_widget_set_sensitive ( message_menu[MENU_MESSAGE_NEXT_PART_POS].widget, enable);
+    gtk_widget_set_sensitive ( message_menu[MENU_MESSAGE_PREVIOUS_PART_POS].widget, enable);
+  }
+
+
+  gtk_widget_set_sensitive ( message_menu[MENU_MESSAGE_PRINT_POS].widget, enable);
+  gtk_widget_set_sensitive ( message_menu[MENU_MESSAGE_SAVE_PART_POS].widget, enable);
+  gtk_widget_set_sensitive ( message_menu[MENU_MESSAGE_REPLY_POS].widget, enable);
+  gtk_widget_set_sensitive ( message_menu[MENU_MESSAGE_REPLY_ALL_POS].widget, enable);
+  gtk_widget_set_sensitive ( message_menu[MENU_MESSAGE_FORWARD_POS].widget, enable);
+
+  gtk_widget_set_sensitive ( message_menu[MENU_MESSAGE_STORE_ADDRESS_POS].widget, enable);
+  gtk_widget_set_sensitive ( message_menu[MENU_MESSAGE_WRAP_POS].widget, enable);
+
+  /* The headers radio buttons */
+  info = shown_hdrs_menu;
+  while ( info->widget ) {
+    gtk_widget_set_sensitive ( info->widget, enable );
+    info++;
+  }
+
+  /* Toolbar */
+  gtk_widget_set_sensitive ( main_toolbar[TOOLBAR_REPLY_POS].widget, enable);
+  gtk_widget_set_sensitive ( main_toolbar[TOOLBAR_REPLY_ALL_POS].widget, enable);
+  gtk_widget_set_sensitive ( main_toolbar[TOOLBAR_FORWARD_POS].widget, enable);
+  gtk_widget_set_sensitive ( main_toolbar[TOOLBAR_PRINT_POS].widget, enable);
+
+}
+
 void
 balsa_window_set_cursor (BalsaWindow *window,
 			 GdkCursor *cursor)
@@ -657,9 +784,18 @@ void balsa_window_close_mailbox(BalsaWindow *window, LibBalsaMailbox *mailbox)
 static void balsa_window_real_open_mailbox(BalsaWindow *window, LibBalsaMailbox *mailbox)
 {
 	GtkObject *page;
+	BalsaIndex *index;
 	GtkWidget *label;
 
 	page = balsa_index_page_new(window);
+
+	index = BALSA_INDEX(BALSA_INDEX_PAGE(page)->index);
+
+	gtk_signal_connect(GTK_OBJECT(index), "select_message",
+			   GTK_SIGNAL_FUNC(balsa_window_select_message_cb), NULL);
+	gtk_signal_connect(GTK_OBJECT(index), "unselect_message",
+			   GTK_SIGNAL_FUNC(balsa_window_unselect_message_cb), NULL);
+
 	if( balsa_index_page_load_mailbox(BALSA_INDEX_PAGE(page), mailbox) ) {
 		/* The function will display a dialog on error */
 	        gtk_object_destroy( GTK_OBJECT(page) );
@@ -678,6 +814,10 @@ static void balsa_window_real_open_mailbox(BalsaWindow *window, LibBalsaMailbox 
 				  GTK_WIDGET(BALSA_INDEX_PAGE(page)->sw)));
 
 	balsa_app.open_mailbox_list = g_list_prepend(balsa_app.open_mailbox_list, mailbox);
+
+	/* Enable relavent menu items... */
+	enable_mailbox_menus(mailbox);
+
 }
 
 
@@ -708,6 +848,10 @@ static void balsa_window_real_close_mailbox(BalsaWindow *window, LibBalsaMailbox
       gtk_window_set_title(GTK_WINDOW(window), "Balsa");
       balsa_message_clear (BALSA_MESSAGE( window->preview ));
       gnome_appbar_set_default (balsa_app.appbar, "Mailbox closed");
+
+      /* Disable menus */
+      enable_mailbox_menus(NULL);
+      enable_message_menus(NULL);
     }
 
     balsa_app.open_mailbox_list = g_list_remove(balsa_app.open_mailbox_list, mailbox);
@@ -1735,13 +1879,16 @@ static void notebook_switch_page_cb( GtkWidget *notebook,
 {
     GtkWidget *index_page;
     GtkWidget *window;
+    GtkWidget *index;
     LibBalsaMailbox *mailbox;
+    LibBalsaMessage *message;
     gchar *title;
 
     index_page = gtk_object_get_data (GTK_OBJECT (page->child), "indexpage");
 
     mailbox = BALSA_INDEX_PAGE(index_page)->mailbox;
     window = BALSA_INDEX_PAGE(index_page)->window;
+    index = BALSA_INDEX_PAGE(index_page)->index;
 
     if ( mailbox->name ) {
       if ( mailbox->readonly ) {
@@ -1756,4 +1903,29 @@ static void notebook_switch_page_cb( GtkWidget *notebook,
     }
 
     balsa_index_update_message (BALSA_INDEX_PAGE (index_page));
+
+    if ( GTK_CLIST(index)->selection ) {
+      message = message = gtk_clist_get_row_data(GTK_CLIST(index), 
+						 GPOINTER_TO_INT(GTK_CLIST(index)->selection->data));
+      enable_message_menus(message);
+    } else {
+      enable_message_menus(NULL);
+    }
+
+    enable_mailbox_menus(mailbox);
 }
+
+static void 
+balsa_window_select_message_cb (GtkWidget * widget, LibBalsaMessage * message, GdkEventButton * bevent, gpointer data)
+{
+  enable_mailbox_menus(message->mailbox);
+  enable_message_menus(message);
+}
+
+static void
+balsa_window_unselect_message_cb (GtkWidget * widget, LibBalsaMessage * message, GdkEventButton * bevent, gpointer data)
+{
+  enable_mailbox_menus(message->mailbox);
+  enable_message_menus(NULL);
+}
+

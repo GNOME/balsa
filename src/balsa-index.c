@@ -323,12 +323,12 @@ balsa_index_init (BalsaIndex * bindex)
   gtk_clist_set_sort_type (clist, GTK_SORT_DESCENDING);
     
   gtk_signal_connect (GTK_OBJECT (clist),
-		      "select_row",
+		      "select-row",
 		      (GtkSignalFunc) select_message,
 		      (gpointer) bindex);
 
   gtk_signal_connect (GTK_OBJECT (clist),
-		      "unselect_row",
+		      "unselect-row",
 		      (GtkSignalFunc) unselect_message,
 		      (gpointer) bindex);
 

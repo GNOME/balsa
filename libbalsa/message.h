@@ -153,7 +153,7 @@ gboolean libbalsa_message_postpone (LibBalsaMessage * message,
 gchar *libbalsa_message_date_to_gchar (LibBalsaMessage * message, const gchar *date_string);
 const gchar *libbalsa_message_pathname (LibBalsaMessage * message);
 const gchar *libbalsa_message_charset  (LibBalsaMessage *message);
-gint libbalsa_message_has_attachment (LibBalsaMessage* message);
+gboolean libbalsa_message_has_attachment (LibBalsaMessage* message);
 
 GList *libbalsa_message_user_hdrs(LibBalsaMessage *message);
 gchar* libbalsa_message_get_text_content(LibBalsaMessage* msg, gint line_len);

@@ -705,24 +705,24 @@ libbalsa_message_body_unref (LibBalsaMessage * message)
 	}
 }
 
-gint libbalsa_message_has_attachment (LibBalsaMessage* message)
+gboolean libbalsa_message_has_attachment (LibBalsaMessage* message)
 {
-	gint tmp;
+	gboolean ret;
 	HEADER* msg_header;
   
 	msg_header = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
 
 	/* FIXME: Can be simplified into 1 if */
 	if (msg_header->content->type != TYPETEXT) {
-		tmp = 1;
+		ret = TRUE;
 	} else {
 		if (g_strcasecmp ("plain", msg_header->content->subtype) == 0)
-			tmp = 0;
+			ret = FALSE;
 		else
-			tmp = 1;
+			ret = TRUE;
 	}
 
-	return tmp;
+	return ret;
 }
 
 gchar *libbalsa_message_date_to_gchar (LibBalsaMessage *message, const gchar *date_string)

@@ -1,3 +1,12 @@
+2000-09-20  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/message.[ch]: Change return type of
+	libbalsa_message_has_attachment() from gint to gboolean.
+	* src/balsa-index.c, src/main-window.c: Set Sensitivity of menu
+	items andtoolbar buttons depending on open mailbox, selected
+	message etc. The context menus still need to be updated to do
+	something similar.
+
 2000-09-20  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/message.[hc]: libbalsa_message_get_text_content() added

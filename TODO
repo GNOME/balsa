@@ -2,7 +2,7 @@ TODO LIST:
 
 Milestone 1.4 targets:
 ----------------------
-- Merge upcoming stable mutt into libmutt
+- [DONE] Merge upcoming stable mutt into libmutt
 - Filters
 - have pop3 mailbox indexes on servers that support it
 - split server/mailbox configuration logically, redo secure connection 
@@ -14,7 +14,7 @@ New features/unfinished things:
 -------------------------------
 - [PARTIAL] Filters (patches semi-ready)
 - [PARTIAL] CORBA (for intelligent handling of multiple instances of balsa).
-- IMAP - update message flags immediately. Client-side caching
+- [PARTIAL] IMAP - update message flags immediately. Client-side caching
 - migrate to gnome-vfs, currently used gnome-mime is buggy.
 
 UI:

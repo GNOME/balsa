@@ -340,7 +340,7 @@ libbalsa_identity_select_dialog(GtkWindow* parent, const gchar* prompt,
     struct IdentitySelectDialog isd;
     GtkWidget* frame1 = gtk_frame_new(NULL);
     GtkWidget* clist = gtk_clist_new(2);
-    GtkWidget* dialog;
+    GtkWidget* dialog, *scrolledwindow;
     gint choice = 1;
 
     isd.ident = NULL;
@@ -353,10 +353,15 @@ libbalsa_identity_select_dialog(GtkWindow* parent, const gchar* prompt,
                               GNOME_STOCK_BUTTON_OK,
                               GNOME_STOCK_BUTTON_CANCEL,
                               NULL);
+    gtk_window_set_wmclass(GTK_WINDOW(dialog), "select-identity", "Balsa");
 
     gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(dialog)->vbox), 
                        frame1, TRUE, TRUE, 0);
-    gtk_container_add(GTK_CONTAINER(frame1), clist);
+    scrolledwindow = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledwindow),
+                                   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+    gtk_container_add(GTK_CONTAINER(scrolledwindow), clist);
+    gtk_container_add(GTK_CONTAINER(frame1), scrolledwindow);
     gtk_container_set_border_width(GTK_CONTAINER(frame1), padding);
     gtk_widget_show_all(frame1);
 

@@ -9,6 +9,8 @@
 	* src/main-window.c: disable thread cancelation in arbitrary places.
 	* src/main.c: cancel all threads on quit.
 
+	* libbalsa/identity.c: add a scrollbar to identity window, fix #89118
+
 2002-07-28 Steve Wall <hitched97@myrealbox.com>
 
 	* src/balsa-message.c: fix #85728.

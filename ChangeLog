@@ -1,5 +1,6 @@
-2005-03-29 19:25  PeterB
+2005-03-29 21:16  PeterB
 
+	* src/balsa-message.c: fix bug 172005.
 	* libbalsa/rfc3156.c: pass NULL to g_locale_to_utf8 instead of
 	(ssize_t *), to keep gcc4 quiet.
 	* src/: balsa-message.c, sendmsg-window.c: use glib macros to cast

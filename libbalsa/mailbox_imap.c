@@ -1351,6 +1351,16 @@ lbm_imap_construct_body(LibBalsaMessageBody *lbbody, ImapBody *imap_body)
     case IMBMEDIA_OTHER:
         lbbody->body_type = LIBBALSA_MESSAGE_BODY_TYPE_OTHER; break;
     }
+
+    switch (imap_body->content_dsp) {
+    case IMBDISP_INLINE:
+	lbbody->content_dsp = GMIME_DISPOSITION_INLINE; break;
+    case IMBDISP_ATTACHMENT:
+	lbbody->content_dsp = GMIME_DISPOSITION_ATTACHMENT; break;
+    case IMBDISP_OTHER:
+	lbbody->content_dsp = imap_body->content_dsp_other; break;
+    }
+
     lbbody->mime_type = g_ascii_strdown(imap_body_get_mime_type(imap_body),-1);
     lbbody->filename  = g_strdup(imap_body->desc);
     lbbody->filename  = g_strdup(imap_body_get_param(imap_body, "name"));
@@ -1394,8 +1404,6 @@ is_child_of(LibBalsaMessageBody *body, LibBalsaMessageBody *child,
 {
     int i = 1;
     for(i=1; body;  body = body->next) {
-        if(body->body_type == LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART)
-            continue;
         if(body==child) {
             g_string_printf(s, "%u", i);
             return TRUE;
@@ -1414,8 +1422,13 @@ static gchar*
 get_section_for(LibBalsaMessage *msg, LibBalsaMessageBody *part)
 {
     GString *section = g_string_new("");
+    LibBalsaMessageBody *parent;
 
-    if(!is_child_of(msg->body_list, part, section)) {
+    parent = msg->body_list;
+    if (libbalsa_message_body_is_multipart(parent))
+	parent = parent->parts;
+
+    if(!is_child_of(parent, part, section)) {
         g_warning("Internal error, part not found.\n");
         g_string_free(section, TRUE);
         return g_strdup("1");

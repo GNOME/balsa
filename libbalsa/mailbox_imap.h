@@ -97,4 +97,7 @@ void libbalsa_imap_delete_folder(LibBalsaMailboxImap * mailbox);
 
 void reset_mutt_passwords(LibBalsaServer *);
 
+gchar *libbalsa_imap_path(LibBalsaServer * server, const gchar * path);
+gchar *libbalsa_imap_url(LibBalsaServer * server, const gchar * path);
+
 #endif				/* __LIBBALSA_MAILBOX_IMAP_H__ */

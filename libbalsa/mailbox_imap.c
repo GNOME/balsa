@@ -236,18 +236,10 @@ libbalsa_mailbox_imap_new(void)
 void
 libbalsa_mailbox_imap_update_url(LibBalsaMailboxImap* mailbox)
 {
-    LibBalsaServer* s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
-    gchar* enc = libbalsa_urlencode(s->user);
+    LibBalsaServer *s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+
     g_free(LIBBALSA_MAILBOX(mailbox)->url);
-    LIBBALSA_MAILBOX(mailbox)->url =  
-        g_strdup_printf("imap%s://%s@%s/%s", 
-#ifdef USE_SSL
-                        s->use_ssl ? "s" : "",
-#else
-                        "",
-#endif
-                        enc, s->host, mailbox->path? mailbox->path : "");
-    g_free(enc);
+    LIBBALSA_MAILBOX(mailbox)->url = libbalsa_imap_url(s, mailbox->path);
 }
 
 /* Unregister an old notification and add a current one */
@@ -1192,13 +1184,7 @@ void
 libbalsa_imap_new_subfolder(const gchar *parent, const gchar *folder,
 			    gboolean subscribe, LibBalsaServer *server)
 {
-    gchar *imap_path = g_strdup_printf("imap%s://%s/%s",
-#ifdef USE_SSL
-				       server->use_ssl ? "s" : "",
-#else
-				       "",
-#endif
-				       server->host, parent);
+    gchar *imap_path = libbalsa_imap_path(server, parent);
 
     imap_mailbox_create(imap_path, folder, subscribe);
     g_free(imap_path);
@@ -1227,5 +1213,41 @@ libbalsa_imap_delete_folder(LibBalsaMailboxImap *mailbox)
     libbalsa_mailbox_imap_close(LIBBALSA_MAILBOX(mailbox));
 }
 
+gchar *
+libbalsa_imap_path(LibBalsaServer * server, const gchar * path)
+{
+    gchar *imap_path = path && *path
+        ? g_strdup_printf("imap%s://%s/%s/",
+#ifdef USE_SSL
+                                       server->use_ssl ? "s" : "",
+#else
+                                       "",
+#endif
+                                       server->host, path)
+        : g_strdup_printf("imap%s://%s/",
+#ifdef USE_SSL
+                                       server->use_ssl ? "s" : "",
+#else
+                                       "",
+#endif
+                                       server->host);
 
+    return imap_path;
+}
 
+gchar *
+libbalsa_imap_url(LibBalsaServer * server, const gchar * path)
+{
+    gchar *enc = libbalsa_urlencode(server->user);
+    gchar *url = g_strdup_printf("imap%s://%s@%s/%s",
+#ifdef USE_SSL
+                                 server->use_ssl ? "s" : "",
+#else
+                                 "",
+#endif
+                                 enc, server->host,
+                                 path ? path : "");
+    g_free(enc);
+
+    return url;
+}

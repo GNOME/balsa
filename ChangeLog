@@ -1,3 +1,9 @@
+2001-10-30  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in: use jw for help. bump the version number
+	(no, it's not the release yet!).
+	* help/C/Makefile.am: use jw for help.
+
 2001-10-27  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/message.c: react on libmutt errors.

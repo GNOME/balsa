@@ -30,7 +30,11 @@ all: index.html
 # This is where the SGML bit is cool
 # older db2html don't support the stylesheets, detect it.
 index.html: $(SGML_FILES)
-	-db2html $<
+	if test "$(HAVE_JW)" = 'yes' ; then 		\
+		jw -c /etc/sgml/catalog balsa.sgml -o balsa; \
+	else 						\
+		db2html balsa.sgml; 	\
+	fi
 	-cp balsa/index.html index.html
 	-cd balsa && ../win-config-gen $(NUM_PREF_PAGES)
 

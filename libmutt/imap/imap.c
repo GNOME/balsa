@@ -391,9 +391,14 @@ int imap_open_connection (IMAP_DATA* idata)
     /* Attempt STARTTLS if available and desired. */
     if (mutt_bit_isset (idata->capabilities, STARTTLS) && !idata->conn->ssf)
     {
+#ifndef LIBMUTT
       if ((rc = query_quadoption (OPT_SSLSTARTTLS,
         _("Secure connection with TLS?"))) == -1)
 	goto err_close_conn;
+#else
+      mutt_error  (_("Connecting to %s ..."), idata->conn->account.host);
+      rc = M_YES;
+#endif
       if (rc == M_YES) {
 	if ((rc = imap_exec (idata, "STARTTLS", IMAP_CMD_FAIL_OK)) == -1)
 	  goto bail;

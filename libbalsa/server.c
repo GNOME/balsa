@@ -36,7 +36,11 @@ static void libbalsa_server_real_set_username(LibBalsaServer * server,
 static void libbalsa_server_real_set_password(LibBalsaServer * server,
 					      const gchar * passwd);
 static void libbalsa_server_real_set_host(LibBalsaServer * server,
-					  const gchar * host, gint port);
+					  const gchar * host, gint port
+#ifdef USE_SSL
+					  ,gboolean use_ssl
+#endif
+					  );
 /* static gchar* libbalsa_server_real_get_password(LibBalsaServer *server); */
 
 enum {
@@ -99,8 +103,8 @@ libbalsa_server_class_init(LibBalsaServerClass * klass)
     libbalsa_server_signals[SET_HOST] =
 	gtk_signal_new("set-host", GTK_RUN_FIRST, object_class->type,
 		       GTK_SIGNAL_OFFSET(LibBalsaServerClass, set_host),
-		       gtk_marshal_NONE__POINTER_INT, GTK_TYPE_NONE, 2,
-		       GTK_TYPE_STRING, GTK_TYPE_INT);
+		       gtk_marshal_NONE__POINTER_INT_INT, GTK_TYPE_NONE, 3,
+		       GTK_TYPE_STRING, GTK_TYPE_INT, GTK_TYPE_BOOL);
 
     libbalsa_server_signals[GET_PASSWORD] =
 	gtk_signal_new("get-password",
@@ -127,6 +131,9 @@ libbalsa_server_init(LibBalsaServer * server)
     server->port = 0;
     server->user = NULL;
     server->passwd = NULL;
+#ifdef USE_SSL
+    server->use_ssl = FALSE;
+#endif
 }
 
 /* leave object in sane state (NULLified fields) */
@@ -180,13 +187,22 @@ libbalsa_server_set_password(LibBalsaServer * server, const gchar * passwd)
 
 void
 libbalsa_server_set_host(LibBalsaServer * server, const gchar * host,
-			 gint port)
+			 gint port
+#ifdef USE_SSL
+			 , gboolean use_ssl
+#endif
+)
 {
     g_return_if_fail(server != NULL);
     g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
     gtk_signal_emit(GTK_OBJECT(server), libbalsa_server_signals[SET_HOST],
-		    host, port);
+		    host, port
+#ifdef USE_SSL
+		    , use_ssl
+#endif
+		    );
+
 }
 
 gchar *
@@ -227,14 +243,22 @@ libbalsa_server_real_set_password(LibBalsaServer * server,
 
 static void
 libbalsa_server_real_set_host(LibBalsaServer * server, const gchar * host,
-			      gint port)
+			      gint port
+#ifdef USE_SSL
+			      , gboolean use_ssl
+#endif
+			      )
 {
     g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
     g_free(server->host);
     server->host = g_strdup(host);
     server->port = port;
+#ifdef USE_SSL
+    server->use_ssl = use_ssl;
+#endif 
 }
+
 
 #if 0
 static gchar *
@@ -281,6 +305,11 @@ libbalsa_server_load_config(LibBalsaServer * server, gint default_port)
     server->port = gnome_config_get_int_with_default("Port", &d);
     if (d)
 	server->port = default_port;
+#ifdef USE_SSL
+    server->use_ssl = gnome_config_get_bool_with_default("SSL", &d);
+    if (d)
+	server->use_ssl = FALSE;
+#endif
     server->user = gnome_config_private_get_string("Username");
     server->passwd = gnome_config_private_get_string("Password");
     if(server->passwd && server->passwd[0] == '\0') {
@@ -312,4 +341,7 @@ libbalsa_server_save_config(LibBalsaServer * server)
 	gnome_config_private_set_string("Password", buff);
 	g_free(buff);
     }
+#ifdef USE_SSL
+    gnome_config_set_bool("SSL", server->use_ssl );
+#endif
 }

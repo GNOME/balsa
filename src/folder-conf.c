@@ -32,6 +32,9 @@ typedef struct {
     GnomeDialog *dialog;
     GtkWidget * folder_name, *server, *port, *username, *password, 
 	*subscribed, *prefix;
+#ifdef USE_SSL
+    GtkWidget *use_ssl;
+#endif
 } FolderDialogData;
 
 /* folder_conf_imap_node:
@@ -119,6 +122,12 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     create_label(_("_Prefix"), table, 6, &keyval);
     fcw.prefix = create_entry(fcw.dialog, table, NULL, NULL, 6, 
 			      mn ? mn->dir : NULL, keyval);
+    
+#ifdef USE_SSL
+    fcw.use_ssl = create_check(fcw.dialog,
+			       _("Use SSL (IMAPS)"),
+			       table, 7, s->use_ssl);
+#endif
 
     gtk_widget_show_all(GTK_WIDGET(fcw.dialog));
     gnome_dialog_close_hides(fcw.dialog, TRUE);
@@ -142,7 +151,11 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 	
 	port_no = atoi(gtk_entry_get_text(GTK_ENTRY(fcw.port)));
 	libbalsa_server_set_host(s, gtk_entry_get_text(GTK_ENTRY(fcw.server)), 
-				 port_no);
+				 port_no
+#ifdef USE_SSL
+				 , gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw.use_ssl))
+#endif
+);
 	libbalsa_server_set_username
 	    (s, gtk_entry_get_text(GTK_ENTRY(fcw.username)));
 	libbalsa_server_set_password

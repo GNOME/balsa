@@ -458,6 +458,7 @@ if test "x$with_ssl" != xno  ; then
 	AC_MSG_RESULT([yes])
 	LIBS="$LIBS -lssl -lcrypto"
 	test "$with_ssl" != yes && LIBS="$LIBS -L$with_ssl/lib"
+	AC_DEFINE(USE_SSL)
 else
 	AC_MSG_RESULT([no])
 fi

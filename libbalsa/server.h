@@ -25,6 +25,7 @@
 
 #include <gtk/gtkobject.h>
 
+
 #define LIBBALSA_TYPE_SERVER			(libbalsa_server_get_type())
 #define LIBBALSA_SERVER(obj)			(GTK_CHECK_CAST (obj, LIBBALSA_TYPE_SERVER, LibBalsaServer))
 #define LIBBALSA_SERVER_CLASS(klass)		(GTK_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_SERVER, LibBalsaServerClass))
@@ -48,6 +49,9 @@ struct _LibBalsaServer {
 
     gchar *host;
     gint port;
+#ifdef USE_SSL
+    gboolean use_ssl;
+#endif
 
     gchar *user;
     gchar *passwd;
@@ -59,7 +63,11 @@ struct _LibBalsaServerClass {
     void (*set_username) (LibBalsaServer * server, const gchar * name);
     void (*set_password) (LibBalsaServer * server, const gchar * passwd);
     void (*set_host) (LibBalsaServer * server,
-		      const gchar * host, gint port);
+		      const gchar * host, gint port
+#ifdef USE_SSL
+		      , gboolean use_ssl
+#endif
+		      );
     gchar *(*get_password) (LibBalsaServer * server);
 };
 
@@ -70,7 +78,11 @@ void libbalsa_server_set_username(LibBalsaServer * server,
 void libbalsa_server_set_password(LibBalsaServer * server,
 				  const gchar * passwd);
 void libbalsa_server_set_host(LibBalsaServer * server, const gchar * host,
-			      gint port);
+			      gint port
+#ifdef USE_SSL
+			      , gboolean use_ssl
+#endif
+			      );
 gchar *libbalsa_server_get_password(LibBalsaServer * server,
 				    LibBalsaMailbox * mbox);
 

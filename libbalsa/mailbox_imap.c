@@ -63,7 +63,11 @@ static void server_user_settings_changed_cb(LibBalsaServer * server,
 					    LibBalsaMailbox * mailbox);
 static void server_host_settings_changed_cb(LibBalsaServer * server,
 					    gchar * host, gint port,
+#ifdef USE_SSL
+					    gboolean use_ssl,
+#endif
 					    LibBalsaMailbox * mailbox);
+
 
 GtkType libbalsa_mailbox_imap_get_type(void)
 {
@@ -142,7 +146,6 @@ libbalsa_mailbox_imap_init(LibBalsaMailboxImap * mailbox)
     gtk_signal_connect(GTK_OBJECT(remote->server), "set-host",
 		       GTK_SIGNAL_FUNC(server_host_settings_changed_cb),
 		       (gpointer) mailbox);
-
 }
 
 static void
@@ -185,8 +188,14 @@ libbalsa_mailbox_imap_update_url(LibBalsaMailboxImap* mailbox)
 {
     LibBalsaServer* s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
     g_free(LIBBALSA_MAILBOX(mailbox)->url);
-    LIBBALSA_MAILBOX(mailbox)->url =
-	g_strdup_printf("imap://%s:%i/%s", s->host, s->port, mailbox->path);
+    LIBBALSA_MAILBOX(mailbox)->url =  g_strdup_printf("imap%s://%s:%i/%s", 
+#ifdef USE_SSL
+						      s->use_ssl ? "s" : "",
+#else
+						      "",
+#endif
+						      s->host, s->port, 
+						      mailbox->path);
 }
 
 /* Unregister an old notification and add a current one */
@@ -223,10 +232,14 @@ server_user_settings_changed_cb(LibBalsaServer * server, gchar * string,
 
 static void
 server_host_settings_changed_cb(LibBalsaServer * server, gchar * host,
-				gint port, LibBalsaMailbox * mailbox)
+				gint port, 
+#ifdef USE_SSL
+				gboolean use_ssl,
+#endif
+				LibBalsaMailbox * mailbox)
 {
-    server_settings_changed(server, mailbox);
     libbalsa_mailbox_imap_update_url(LIBBALSA_MAILBOX_IMAP(mailbox));
+    server_settings_changed(server, mailbox);
 }
 
 void
@@ -477,8 +490,14 @@ libbalsa_imap_rename_subfolder(const gchar *dir, const gchar *parent,
 			       const gchar *folder, gboolean subscribe, 
 			       LibBalsaServer *server)
 {
-    gchar *imap_prefix = g_strdup_printf("imap://%s:%i/", server->host,
-                                                server->port);
+    gchar *imap_prefix =  g_strdup_printf("imap%s://%s:%i/  ", 
+#ifdef USE_SSL
+					  server->use_ssl ? "s" : "",
+#else
+					  "",
+#endif
+					  server->host, server->port);
+
     imap_mailbox_rename(imap_prefix, dir, parent, folder, subscribe);
     g_free(imap_prefix);
 }
@@ -487,8 +506,15 @@ void
 libbalsa_imap_new_subfolder(const gchar *parent, const gchar *folder,
 			    gboolean subscribe, LibBalsaServer *server)
 {
-    gchar *imap_path = g_strdup_printf("imap://%s:%i/%s", server->host,
-                                                server->port, parent);
+    gchar *imap_path = g_strdup_printf("imap%s://%s:%i/%s",
+#ifdef USE_SSL
+				       server->use_ssl ? "s" : "",
+#else
+				       "",
+#endif
+				       server->host,
+				       server->port, parent);
+
     imap_mailbox_create(imap_path, folder, subscribe);
     g_free(imap_path);
 }
@@ -513,3 +539,4 @@ libbalsa_imap_delete_folder(LibBalsaMailboxImap *mailbox)
     */
     imap_mailbox_delete(LIBBALSA_MAILBOX(mailbox)->url);
 }
+

@@ -287,9 +287,15 @@ balsa_mailbox_node_new_from_config(const gchar* prefix)
     gtk_object_sink(GTK_OBJECT(folder->server)); 
     printf("Loading its configuration...\n");
     libbalsa_server_load_config(folder->server, 143);
-  
+
+#ifdef USE_SSL  
+    printf("Server loaded, host: %s, port %d %s\n", folder->server->host,
+	   folder->server->port,
+	   folder->server->use_ssl ? "SSL" : "no SSL");
+#else
     printf("Server loaded, host: %s, port %d\n", folder->server->host,
 	   folder->server->port);
+#endif
     gtk_signal_connect(GTK_OBJECT(folder), "show-prop-dialog", 
 		       folder_conf_imap_node, NULL);
     gtk_signal_connect(GTK_OBJECT(folder), "append-subtree", 
@@ -842,7 +848,12 @@ add_imap_entry(GNode*root, const char* fn, char delim)
 
     g_return_val_if_fail(parent, NULL);
 
-    url = g_strdup_printf("imap://%s:%i/%s", 
+    url = g_strdup_printf("imap%s://%s:%i/%s",
+#ifdef USE_SSL
+			  BALSA_MAILBOX_NODE(root->data)->server->use_ssl ? "s" : "",
+#else
+			  "",
+#endif
 			  BALSA_MAILBOX_NODE(root->data)->server->host,
 			  BALSA_MAILBOX_NODE(root->data)->server->port,
 			  fn);

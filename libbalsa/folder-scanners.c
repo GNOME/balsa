@@ -184,11 +184,22 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
 	printf("Deph: %i -------------------------------------------\n", i);
 	for(el= g_list_first(list); el; el = g_list_next(el)) {
 	    if(*(char*)el->data)
-		imap_path = g_strdup_printf("imap://%s:%i/%s/", server->host, 
-					    server->port, (char*)el->data);
+		imap_path = g_strdup_printf("imap%s://%s:%i/%s/", 
+#ifdef USE_SSL
+					    server->use_ssl ? "s" : "",
+#else
+					    "",
+#endif
+					    server->host, server->port, 
+					    (char*)el->data);
 	    else 
-		imap_path = g_strdup_printf("imap://%s:%i/", server->host, 
-					    server->port);
+		imap_path = g_strdup_printf("imap%s://%s:%i/", 
+#ifdef USE_SSL
+					    server->use_ssl ? "s" : "",
+#else
+					    "",
+#endif
+					    server->host, server->port);
 	    FREE(&state.folder);
 	    imap_browse ((char*)imap_path,  &state);
 	    g_free(imap_path);

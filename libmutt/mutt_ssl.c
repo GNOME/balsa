@@ -267,6 +267,8 @@ int ssl_socket_open (CONNECTION * conn)
 
   data->ctx = SSL_CTX_new (SSLv23_client_method ());
 
+#ifndef LIBMUTT
+  /* how will we configure this in balsa ? */
   /* disable SSL protocols as needed */
   if (!option(OPTTLSV1)) 
   {
@@ -280,6 +282,7 @@ int ssl_socket_open (CONNECTION * conn)
   {
     SSL_CTX_set_options(data->ctx, SSL_OP_NO_SSLv3);
   }
+#endif
 
   data->ssl = SSL_new (data->ctx);
   SSL_set_fd (data->ssl, conn->fd);
@@ -308,6 +311,7 @@ int ssl_negotiate (sslsockdata* ssldata)
    *   reads or writes. Bummer. */
   SSL_set_mode (ssldata->ssl, SSL_MODE_AUTO_RETRY);
 #endif
+
 
   if ((err = SSL_connect (ssldata->ssl)) != 1)
   {
@@ -340,10 +344,14 @@ int ssl_negotiate (sslsockdata* ssldata)
   if (!ssl_check_certificate (ssldata))
     return -1;
 
+#ifdef LIBMUTT
+  mutt_error (_("SSL connection using %s (%s)"), 
+	      SSL_get_cipher_version (ssldata->ssl), SSL_get_cipher_name (ssldata->ssl));
+#else
   mutt_message (_("SSL connection using %s (%s)"), 
-    SSL_get_cipher_version (ssldata->ssl), SSL_get_cipher_name (ssldata->ssl));
+		SSL_get_cipher_version (ssldata->ssl), SSL_get_cipher_name (ssldata->ssl));
   mutt_sleep (0);
-
+#endif
   return 0;
 }
 
@@ -560,8 +568,14 @@ static int ssl_check_certificate (sslsockdata * data)
     return 1;
   }
 
-#if LIBMUTT
-  return 0;
+#ifdef LIBMUTT
+  /* we always accept the certificate BAD BAD BAD !
+     how do we get a dialog in here ?
+  */
+  mutt_error(X509_NAME_oneline (X509_get_subject_name (data->cert),
+				buf, sizeof (buf)) );
+  mutt_error(_("This certificate accepted but not verified !!!"));
+  return 1;
 #else
   /* interactive check from user */
   menu = mutt_new_menu ();

@@ -1,3 +1,12 @@
+2001-08-19  Carlos Morgado  <chbm@chbm.nu>
+
+	* imap/imap.c:  
+	* mutt_ssl.c: 
+	override certificate question to the user and enable all 
+	SSL protocols. this will accept unchecked certs and warn 
+	the user as errors.  makes tls work, figure out a way of 
+	poping up a dialog
+
 2001-08-06  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* buffy.c: use callback to check, if given IMAP mailbox should be

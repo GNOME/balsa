@@ -1,3 +1,18 @@
+2001-08-19  Carlos Morgado  <chbm@chbm.nu>
+
+	* acconfig.h:
+	* configure.in: USE_SSL
+	
+	* src/mailbox-node.c: 
+	* libbalsa/folder-scanners.c: generate imaps paths 
+	* src/mailbox-conf.c: 
+	* src/folder-conf.c: ssl toogle in mbox config dialogs
+	* libbalsa/server.h: 
+	* libbalsa/server.c: 
+	* libbalsa/mailbox_imap.c: know about ssl
+
+	Merged patch from Manuel A. McLure <manuel@mclure.org> and myself.
+		
 2001-08-17  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/save-restore.c: 

@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2003-01-28 11:00+0100\n"
-"PO-Revision-Date: 2003-01-28 22:32+0200\n"
+"POT-Creation-Date: 2003-02-02 11:02+0100\n"
+"PO-Revision-Date: 2003-02-02 21:38--300\n"
 "Last-Translator: Artis Trops <hornet@navigator.lv>\n"
 "Language-Team: Latvian <ll10nt@os.lv>\n"
 "MIME-Version: 1.0\n"
@@ -1487,8 +1487,8 @@ msgstr "Balsa nav kompilēta ar LDAP atbalstu"
 #: src/address-book-config.c:334
 #: src/address-book-config.c:396
 #: src/address-book-config.c:456
-msgid "Address _Book Name"
-msgstr "Adrešu _Grāmatiņas Nosaukums"
+msgid "A_ddress Book Name"
+msgstr "A_drešu Grāmatiņas Nosaukums"
 
 #: src/address-book-config.c:294
 msgid "_File Name"
@@ -1666,63 +1666,63 @@ msgstr "Nepieciešama parole"
 msgid "Multiple mailboxes named \"%s\""
 msgstr "Vairākas pastkastītes ar nosaukumu \"%s\""
 
-#: src/balsa-index.c:241
+#: src/balsa-index.c:325
 msgid "From"
 msgstr "No"
 
-#: src/balsa-index.c:242
+#: src/balsa-index.c:340
 msgid "Subject"
 msgstr "Temats"
 
-#: src/balsa-index.c:243
+#: src/balsa-index.c:361
 msgid "Date"
 msgstr "Datums"
 
-#: src/balsa-index.c:244
+#: src/balsa-index.c:374
 msgid "Size"
 msgstr "Izmērs"
 
-#: src/balsa-index.c:569
+#: src/balsa-index.c:589
 #, c-format
 msgid "Opening mailbox %s. Please wait..."
 msgstr "Atveru pastkastīti %s. Lūdzu uzgaidiet..."
 
-#: src/balsa-index.c:606
+#: src/balsa-index.c:626
 msgid "To"
 msgstr "Kam"
 
-#: src/balsa-index.c:2094
+#: src/balsa-index.c:2103
 msgid "_View Source"
 msgstr "_Skatīt Avotu"
 
-#: src/balsa-index.c:2096
+#: src/balsa-index.c:2105
 #: src/main-window.c:444
 #: src/message-window.c:126
 msgid "_Reply..."
 msgstr "_Atbildēt..."
 
-#: src/balsa-index.c:2098
+#: src/balsa-index.c:2107
 msgid "Reply To _All..."
 msgstr "Atbildēt _Visiem..."
 
-#: src/balsa-index.c:2100
+#: src/balsa-index.c:2109
 msgid "Reply To _Group..."
 msgstr "Atbildēt _Grupai..."
 
-#: src/balsa-index.c:2102
+#: src/balsa-index.c:2111
 msgid "_Forward Attached..."
 msgstr "_Pārsūtīt Piesaistītu..."
 
-#: src/balsa-index.c:2104
+#: src/balsa-index.c:2113
 msgid "Forward _Inline..."
 msgstr "Pārsūtīt _Iekļaujot..."
 
-#: src/balsa-index.c:2106
+#: src/balsa-index.c:2115
 #: src/main-window.c:546
 msgid "_Store Address..."
 msgstr "_Noglabāt Adresi..."
 
-#: src/balsa-index.c:2119
+#: src/balsa-index.c:2128
 #: src/filter-edit-dialog.c:216
 #: src/mailbox-node.c:866
 #: src/main-window.c:528
@@ -1731,28 +1731,28 @@ msgstr "_Noglabāt Adresi..."
 msgid "_Delete"
 msgstr "_Dzēst"
 
-#: src/balsa-index.c:2124
+#: src/balsa-index.c:2133
 #: src/main-window.c:535
 msgid "_Undelete"
 msgstr "_Atdzēst"
 
-#: src/balsa-index.c:2129
+#: src/balsa-index.c:2138
 msgid "Move To _Trash"
 msgstr "Pārvietot Uz _Atkritumkasti"
 
-#: src/balsa-index.c:2133
+#: src/balsa-index.c:2142
 msgid "T_oggle"
 msgstr "_Slēgt"
 
-#: src/balsa-index.c:2136
+#: src/balsa-index.c:2145
 msgid "_Flagged"
 msgstr "_Karogotā"
 
-#: src/balsa-index.c:2139
+#: src/balsa-index.c:2148
 msgid "_Unread"
 msgstr "_Nelasītas"
 
-#: src/balsa-index.c:2147
+#: src/balsa-index.c:2156
 msgid "_Move to"
 msgstr "_Pārvietot uz"
 
@@ -1801,17 +1801,17 @@ msgid "Save MIME Part"
 msgstr "Saglabāt MIME Daļu"
 
 #: src/balsa-message.c:767
-#: src/print.c:327
+#: src/print.c:328
 msgid "Subject:"
 msgstr "Temats:"
 
 #: src/balsa-message.c:771
-#: src/print.c:333
+#: src/print.c:334
 msgid "Date:"
 msgstr "Datums:"
 
 #: src/balsa-message.c:776
-#: src/print.c:344
+#: src/print.c:345
 #: src/store-address.c:275
 msgid "From:"
 msgstr "No:"
@@ -1821,14 +1821,14 @@ msgid "Reply-To:"
 msgstr "Atbildēt-Uz:"
 
 #: src/balsa-message.c:785
-#: src/print.c:354
+#: src/print.c:355
 #: src/store-address.c:276
 msgid "To:"
 msgstr "Kam:"
 
 #. cc:
 #: src/balsa-message.c:786
-#: src/print.c:355
+#: src/print.c:356
 #: src/sendmsg-window.c:1831
 #: src/store-address.c:277
 msgid "Cc:"
@@ -1836,19 +1836,19 @@ msgstr "Cc:"
 
 #. bcc:
 #: src/balsa-message.c:787
-#: src/print.c:356
+#: src/print.c:357
 #: src/sendmsg-window.c:1836
 #: src/store-address.c:278
 msgid "Bcc:"
 msgstr "Bcc:"
 
 #: src/balsa-message.c:790
-#: src/print.c:357
+#: src/print.c:358
 msgid "Fcc:"
 msgstr "Fcc:"
 
 #: src/balsa-message.c:795
-#: src/print.c:363
+#: src/print.c:364
 msgid "Disposition-Notification-To:"
 msgstr "Rīcības-Paziņojums-Uz:"
 
@@ -2124,30 +2124,29 @@ msgid "C_lear"
 msgstr "A_ttīrīt"
 
 #: src/filter-edit-callbacks.c:992
-#: src/main-window.c:2708
+#: src/main-window.c:2701
 msgid "_Body"
 msgstr "_Rumpis"
 
 #. To:
 #: src/filter-edit-callbacks.c:999
-#: src/main-window.c:2709
+#: src/main-window.c:2702
 #: src/sendmsg-window.c:1820
 msgid "_To:"
 msgstr "_Kam:"
 
 #: src/filter-edit-callbacks.c:1006
-#: src/main-window.c:2710
+#: src/main-window.c:2703
 msgid "_From:"
 msgstr "_No:"
 
 #: src/filter-edit-callbacks.c:1014
-#: src/main-window.c:2711
 #: src/sendmsg-window.c:285
 msgid "_Subject"
 msgstr "_Temats"
 
 #: src/filter-edit-callbacks.c:1021
-#: src/main-window.c:2712
+#: src/main-window.c:2705
 msgid "_Cc:"
 msgstr "_Cc:"
 
@@ -3254,43 +3253,47 @@ msgstr "Jūs esat saņēmis %d jaunas vēstules."
 msgid "You have received 1 new message."
 msgstr "Jūs esat saņēmis 1 jaunu vēstuli."
 
-#: src/main-window.c:2663
+#: src/main-window.c:2661
 msgid "Search mailbox"
 msgstr "Meklēt pastkastīti"
 
-#: src/main-window.c:2681
+#: src/main-window.c:2674
 msgid "_Reverse search"
 msgstr "_Apgriezt meklēšanu"
 
-#: src/main-window.c:2684
+#: src/main-window.c:2677
 msgid "_Search for:"
 msgstr "_Meklēt:"
 
-#: src/main-window.c:2697
+#: src/main-window.c:2690
 msgid "In:"
 msgstr "Iekš:"
 
-#: src/main-window.c:2834
+#: src/main-window.c:2704
+msgid "S_ubject"
+msgstr "T_emats"
+
+#: src/main-window.c:2819
 msgid "You can apply filters only on mailbox\n"
 msgstr "Jūs varat pielietot filtrus tikai pastkastītēm\n"
 
-#: src/main-window.c:2869
-#: src/main-window.c:2888
+#: src/main-window.c:2854
+#: src/main-window.c:2873
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Izdarīšana pastkastītē %s neizdevās."
 
-#: src/main-window.c:3081
+#: src/main-window.c:3066
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (tikai lasīt)"
 
-#: src/main-window.c:3083
+#: src/main-window.c:3068
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: src/main-window.c:3174
+#: src/main-window.c:3159
 msgid "Cannot access the message's body\n"
 msgstr "Nevaru piekļūt vēstules rumpim\n"
 
@@ -3792,7 +3795,7 @@ msgstr "Nederīgas vai nepilnīgas adreses iezīmes krāsa"
 
 #. create a 2nd notebook page for the fonts
 #: src/pref-manager.c:2204
-#: src/print.c:1215
+#: src/print.c:1249
 msgid "Fonts"
 msgstr "Fonti"
 
@@ -3966,50 +3969,67 @@ msgstr "Nepieciešams"
 msgid "Error displaying link_id %s: %s\n"
 msgstr "Kļūda parādot link_id %s: %s\n"
 
-#: src/print.c:246
+#: src/print.c:247
 #, c-format
 msgid "Page: %i/%i"
 msgstr "Lapa: %i/%i"
 
 #. gather some info about this part
 #. four fields, one terminator
-#: src/print.c:754
+#: src/print.c:755
 msgid "Type:"
 msgstr "Tips"
 
-#: src/print.c:757
+#: src/print.c:758
 msgid "Filename:"
 msgstr "Faila nosaukums:"
 
-#: src/print.c:1206
+#: src/print.c:1155
+msgid "Font available for printing"
+msgstr "Fonts pieejams drukāšanai"
+
+#: src/print.c:1161
+#, c-format
+msgid "Font <b>not</b> available for printing. Closest: %s"
+msgstr "Fonts <b>nav</b> pieejams drukāšanai. Tuvākais: %s"
+
+#: src/print.c:1174
+msgid "Select Font"
+msgstr "Izvēlēties Fontu"
+
+#: src/print.c:1207
+msgid "Change..."
+msgstr "Mainīt..."
+
+#: src/print.c:1240
 msgid "Print message"
 msgstr "Drukāt vēstuli"
 
-#: src/print.c:1218
+#: src/print.c:1252
 msgid "Header font"
 msgstr "Galvenes fonts"
 
-#: src/print.c:1220
+#: src/print.c:1254
 msgid "Body font"
 msgstr "Rumpja fonts"
 
-#: src/print.c:1222
+#: src/print.c:1256
 msgid "Footer font"
 msgstr "Kājenes fonts"
 
 #. highlight cited stuff
-#: src/print.c:1226
+#: src/print.c:1260
 msgid "Highlight cited text"
 msgstr "Izgaismot citēto tekstu"
 
-#: src/print.c:1272
+#: src/print.c:1289
 #, c-format
 msgid "Balsa could not find font \"%s\".\n"
 "Use the \"Fonts\" page on the \"Print message\" dialog to change it."
 msgstr "Balsa nevarēja atrast fontu \"%s\".\n"
 "Lietojiet \"Fonti\" lapu \"Drukāt vēstui\" dialogā, lai mainītu to."
 
-#: src/print.c:1374
+#: src/print.c:1384
 msgid "Balsa: message print preview"
 msgstr "Balsa: vēstules drukas pirmsapskate"
 

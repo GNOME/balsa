@@ -142,6 +142,8 @@ static void mailbox_close_cb (GtkWidget * widget, gpointer data);
 static void mailbox_commit_changes (GtkWidget * widget, gpointer data);
 static void mailbox_empty_trash(GtkWidget * widget, gpointer data);
 
+static void show_mbtree_cb(GtkWidget * widget, gpointer data);
+static void show_mbtabs_cb(GtkWidget * widget, gpointer data);
 static void about_box_destroy_cb (void);
 
 static void set_icon (GnomeApp * app);
@@ -292,7 +294,13 @@ static GnomeUIInfo settings_menu[] =
 			  filter_dlg_cb, GNOME_STOCK_MENU_PROP),
 #endif
   GNOMEUIINFO_MENU_PREFERENCES_ITEM(open_preferences_manager, NULL),
-
+  GNOMEUIINFO_SEPARATOR,
+#define MENU_SETTINGS_MBLIST_POS 3
+  GNOMEUIINFO_TOGGLEITEM( N_ ("_Show mailbox tree"), NULL, 
+			  show_mbtree_cb, NULL),
+#define MENU_SETTINGS_TABS_POS 4
+  GNOMEUIINFO_TOGGLEITEM( N_ ("Show mailbox _tabs"), NULL, 
+			  show_mbtabs_cb, NULL),
   GNOMEUIINFO_END
 };
 static GnomeUIInfo help_menu[] =
@@ -485,7 +493,8 @@ balsa_window_new ()
   vpaned = gtk_vpaned_new();
   hpaned = gtk_hpaned_new();
   window->notebook = gtk_notebook_new();
-  gtk_notebook_set_show_tabs(GTK_NOTEBOOK(window->notebook), FALSE);
+  gtk_notebook_set_show_tabs(GTK_NOTEBOOK(window->notebook), 
+			     balsa_app.show_notebook_tabs);
   gtk_notebook_set_show_border(GTK_NOTEBOOK(window->notebook), FALSE);
   gtk_signal_connect( GTK_OBJECT(window->notebook), "size_allocate", 
 		      GTK_SIGNAL_FUNC(notebook_size_alloc_cb), NULL );
@@ -503,7 +512,10 @@ balsa_window_new ()
   gtk_paned_pack1(GTK_PANED(hpaned), window->mblist, TRUE, TRUE);
   gtk_paned_pack2(GTK_PANED(hpaned), vpaned, TRUE, TRUE);
   /*PKGW: do it this way, without the usizes.*/
-  gtk_paned_set_position( GTK_PANED(hpaned), balsa_app.mblist_width );
+  if(balsa_app.show_mblist) {
+     gtk_widget_show(window->mblist);
+     gtk_paned_set_position( GTK_PANED(hpaned), balsa_app.mblist_width );
+  }
 
   gtk_paned_pack1(GTK_PANED(vpaned), window->notebook, TRUE, TRUE);
   gtk_paned_pack2(GTK_PANED(vpaned), preview, TRUE, TRUE);
@@ -513,7 +525,6 @@ balsa_window_new ()
   gtk_widget_show(vpaned);
   gtk_widget_show(hpaned);
   gtk_widget_show(window->notebook);
-  gtk_widget_show(window->mblist);
   gtk_widget_show(preview);
 
   if(balsa_app.browse_wrap)
@@ -525,7 +536,17 @@ balsa_window_new ()
      gtk_check_menu_item_set_active(
 	GTK_CHECK_MENU_ITEM(shown_hdrs_menu[balsa_app.shown_headers].widget),
 	TRUE);
-  
+
+  if(balsa_app.show_mblist)
+     gtk_check_menu_item_set_active(
+	GTK_CHECK_MENU_ITEM(settings_menu[MENU_SETTINGS_MBLIST_POS].widget),
+	TRUE);
+
+  if(balsa_app.show_notebook_tabs)
+     gtk_check_menu_item_set_active(
+	GTK_CHECK_MENU_ITEM(settings_menu[MENU_SETTINGS_TABS_POS].widget),
+	TRUE);
+
   return GTK_WIDGET (window);
 }
 
@@ -1409,6 +1430,28 @@ mailbox_empty_trash(GtkWidget * widget, gpointer data)
   if((page=balsa_find_notebook_page(balsa_app.trash)))
     balsa_index_page_reset( page );
 
+}
+
+static void show_mbtree_cb(GtkWidget * widget, gpointer data)
+{
+   GtkWidget* parent;
+   parent = GTK_WIDGET(GTK_WIDGET(balsa_app.mblist)->parent)->parent;
+   g_assert(parent!=NULL);
+
+   if(GTK_CHECK_MENU_ITEM(widget)->active) {
+      gtk_widget_show(GTK_WIDGET(balsa_app.mblist));
+      gtk_paned_set_position( GTK_PANED(parent), balsa_app.mblist_width);
+   }
+   else {
+      gtk_widget_hide(GTK_WIDGET(balsa_app.mblist));
+      gtk_paned_set_position    (GTK_PANED(parent), 0);
+   }
+}
+
+static void show_mbtabs_cb(GtkWidget * widget, gpointer data)
+{
+   gtk_notebook_set_show_tabs(GTK_NOTEBOOK(balsa_app.notebook), 
+			      GTK_CHECK_MENU_ITEM(widget)->active);
 }
 
 static void

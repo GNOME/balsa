@@ -159,6 +159,8 @@ extern struct BalsaApplication
   gboolean browse_wrap;
   enum ShownHeaders shown_headers;
   gchar * selected_headers;
+  gboolean show_mblist;
+  gboolean show_notebook_tabs;
 
   gboolean empty_trash_on_exit;
   gboolean previewpane;

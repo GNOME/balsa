@@ -743,6 +743,16 @@ config_global_load (void)
     balsa_app.selected_headers = g_strdup (field);
   g_strdown(balsa_app.selected_headers);
 
+  if ((field = pl_dict_get_str (globals, "ShowMBList")) == NULL)
+    balsa_app.show_mblist = TRUE;
+  else
+    balsa_app.show_mblist = atoi (field);
+
+  if ((field = pl_dict_get_str (globals, "ShowTabs")) == NULL)
+    balsa_app.show_notebook_tabs = FALSE;
+  else
+    balsa_app.show_notebook_tabs = atoi (field);
+
   /* toolbar style */
   if ((field = pl_dict_get_str (globals, "ToolbarStyle")) == NULL)
     balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
@@ -1068,6 +1078,12 @@ config_global_save (void)
      pl_dict_add_str_str (globals, "SelectedHeaders", 
 			  balsa_app.selected_headers);
   else pl_dict_add_str_str (globals, "SelectedHeaders", DEFAULT_SELECTED_HDRS);
+
+  snprintf (tmp, sizeof (tmp), "%d", balsa_app.show_mblist );
+  pl_dict_add_str_str (globals, "ShowMBList", tmp);
+
+  snprintf (tmp, sizeof (tmp), "%d", balsa_app.show_notebook_tabs );
+  pl_dict_add_str_str (globals, "ShowTabs", tmp);
 
   /* arp --- "LeadinStr" into cfg. */
   if (balsa_app.quote_str != NULL)

@@ -1,25 +1,21 @@
 dnl -*- mode: m4 -*-
+AC_INIT(src/balsa-app.h)
 AC_PREREQ(2.52)
 dnl ###########################################################################
 dnl Versioning
-dnl   BALSA_VERSION is what we use.
 dnl ###########################################################################
-
 
 BALSA_MAJOR=2
 BALSA_REVISION=0
 BALSA_PATCHLEVEL=0
 
-VERSION="$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}"
+AC_SUBST(BALSA_MAJOR)
+AC_SUBST(BALSA_REVISION)
+AC_SUBST(BALSA_PATCHLEVEL)
 
-dnl ###########################################################################
-dnl Startup
-dnl ###########################################################################
-AC_INIT(balsa,"$VERSION",http://bugzilla.gnome.org/enter_bug.cgi?product=balsa)
+AM_INIT_AUTOMAKE(balsa, "$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}")
 AC_CONFIG_SRCDIR(src/main.c)
 AM_CONFIG_HEADER(config.h)
-
-AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 
 AM_MAINTAINER_MODE
 
@@ -31,7 +27,12 @@ AC_PROG_INTLTOOL
 AM_HDR_SIGACTION
 AM_HDR_SIGSET
 
-
+AC_DEFINE_UNQUOTED(BALSA_MAJOR, $BALSA_MAJOR,
+                   [Define to the Balsa major version])
+AC_DEFINE_UNQUOTED(BALSA_REVISION, $BALSA_REVISION,
+                   [Define to the Balsa revision])
+AC_DEFINE_UNQUOTED(BALSA_PATCHLEVEL, $BALSA_PATCHLEVEL,
+                   [Define to the Balsa patch level])
 
 dnl ##########################################################################
 dnl Check for GtkHTML if available
@@ -95,15 +96,6 @@ gnomelocaledir='${prefix}/${DATADIRNAME}/locale'
 AC_SUBST(gnomelocaledir)
 
 dnl ###########################################################################
-dnl Substitutions, defines, part I
-dnl ###########################################################################
-
-AC_DEFINE_UNQUOTED(BALSA_MAJOR, $BALSA_MAJOR)
-AC_DEFINE_UNQUOTED(BALSA_REVISION, $BALSA_REVISION)
-AC_DEFINE_UNQUOTED(BALSA_PATCHLEVEL, $BALSA_PATCHLEVEL)
-AC_DEFINE_UNQUOTED(BALSA_VERSION, "$BALSA_VERSION")
-
-dnl ###########################################################################
 dnl More checks
 dnl ###########################################################################
 
@@ -123,20 +115,12 @@ dnl
 dnl GNOME_ORBIT_HOOK([],dontfail)
 dnl AM_CONDITIONAL(ORBIT_INSTALLED, test -n "$ORBIT_LIBS")
 
-dnl ###########################################################################
-dnl More substitutions
-dnl ###########################################################################
-
-AC_SUBST(BALSA_MAJOR)
-AC_SUBST(BALSA_REVISION)
-AC_SUBST(BALSA_PATCHLEVEL)
-AC_SUBST(BALSA_RELEASE)
-AC_SUBST(BALSA_VERSION)
 
 dnl ###########################################################################
 dnl Enable all? (=broken stuff)
 dnl ###########################################################################
 
+AC_DEFINE(BALSA_SHOW_ALL, true)
 AM_CONDITIONAL(BALSA_SHOW_ALL, true)
 
 dnl ###########################################################################
@@ -149,9 +133,9 @@ AC_ARG_ENABLE(threads, [  --enable-threads        Use threading for mail retriev
 	use_threads=yes
 ])
 
-dnl FIXME: Better way to check for threads...
-AC_DEFINE(BALSA_USE_THREADS, test x"$use_threads" = xyes)
-
+if test x"$use_threads" = xyes; then 
+        AC_DEFINE(BALSA_USE_THREADS, 1)
+fi
 
 dnl ###########################################################################
 dnl Remember our prefixes
@@ -299,7 +283,9 @@ if test x"$check_pcre" = xyes ; then
 	if test x"$have_pcre" = xyes ; then
 	       	AC_MSG_RESULT(yes)
 		BALSA_CFLAGS="$BALSA_CFLAGS `pcre-config --cflags-posix`"
-		BALSA_LIBS="$BALSA_LIBS `pcre-config --libs-posix`"
+                PCRE_LIBS="`pcre-config --libs-posix`"
+                AC_SUBST(PCRE_LIBS)
+		BALSA_LIBS="$BALSA_LIBS $PCRE_LIBS"
 		AC_DEFINE(HAVE_PCRE)
 	else
 	        AC_MSG_RESULT(not found)
@@ -441,7 +427,7 @@ dnl ###########################################################################
 
 if test -d "${srcdir}/CVS" ; then
 	BALSA_FROM_CVS=yes
-	BALSA_CFLAGS="$BALSA_CFLAGS -Werror"
+	BALSA_CFLAGS="$BALSA_CFLAGS -Werror -Wall"
 else
 	BALSA_FROM_CVS=no
 fi

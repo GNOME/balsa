@@ -1,3 +1,7 @@
+2002-02-22  Pawel Salek <pawsa@theochem.kth.se>
+
+	* autogen.sh, configure.in: previouse updates were not universal.
+
 2002-02-20  Pawel Salek <pawsa@theochem.kth.se>
 
 	Start port to GNOME2. Based on Jelmer Vernooij's work.

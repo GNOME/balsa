@@ -1,3 +1,9 @@
+2004-01-31 16:07  PeterB
+
+	* libbalsa/address-entry.c: replace control characters with spaces;
+	fill input after button press event (should fix vanishing
+	addresses); don't add null addresses to list.
+
 2004-01-28  Pawel Salek
 
 	* libbalsa/imap/imap-commands.c: temporary workaround for

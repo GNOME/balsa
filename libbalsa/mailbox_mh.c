@@ -444,8 +444,10 @@ lbm_mh_free_message_info(struct message_info *msg_info)
     if (msg_info->mime_message)
 	g_object_remove_weak_pointer(G_OBJECT(msg_info->mime_message),
 				     (gpointer) & msg_info->mime_message);
-    if (msg_info->message)
+    if (msg_info->message) {
+	msg_info->message->mailbox = NULL;
 	g_object_unref(msg_info->message);
+    }
     g_free(msg_info);
 }
 
@@ -907,6 +909,7 @@ libbalsa_mailbox_mh_load_message(LibBalsaMailbox * mailbox, guint msgno)
     return message;
 }
 
+/* Called with mailbox locked. */
 static int
 libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
 					   LibBalsaMessage * message )
@@ -921,12 +924,8 @@ libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
     struct message_info *msg_info;
     GMimeStream *in_stream;
 
-    g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MH(mailbox), -1);
-    g_return_val_if_fail (LIBBALSA_IS_MESSAGE(message), -1);
-
     mh = LIBBALSA_MAILBOX_MH(mailbox);
 
-    LOCK_MAILBOX_RETURN_VAL(mailbox, -1);
     g_object_ref ( G_OBJECT(message ) );
 
     lbm_mh_parse_both(mh);
@@ -934,10 +933,7 @@ libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
     path = libbalsa_mailbox_local_get_path(mailbox);
     fd = libbalsa_mailbox_mh_open_temp(path, &tmp);
     if (fd == -1)
-    {
-	UNLOCK_MAILBOX(mailbox);
 	return -1;
-    }
     out_stream = g_mime_stream_fs_new(fd);
     {
 	GMimeStream *tmp = libbalsa_mailbox_get_message_stream( message->mailbox, message );
@@ -954,7 +950,6 @@ libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
 	g_mime_stream_unref(out_stream);
 	unlink (tmp);
 	g_free(tmp);
-	UNLOCK_MAILBOX(mailbox);
 	return -1;
     }
     g_mime_stream_unref(out_stream);
@@ -977,18 +972,15 @@ libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
 	{
 	    unlink (tmp);
 	    g_free(tmp);
-	    UNLOCK_MAILBOX(mailbox);
 	    /* FIXME: report error ... */
 	    return -1;
 	}
     } while (--retries > 0);
     g_free(tmp);
 
-    if (retries == 0) {
-	UNLOCK_MAILBOX(mailbox);
+    if (retries == 0)
 	/* FIXME: report error ... */
 	return -1;
-    }
 
     mh->last_fileno = fileno;
 
@@ -1005,7 +997,6 @@ libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
     }
 
     g_object_unref ( G_OBJECT(message ) );    
-    UNLOCK_MAILBOX(mailbox);
 
     return 1;
 }

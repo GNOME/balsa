@@ -302,8 +302,10 @@ static void free_messages_info(GArray *messages_info)
 	msg_info = &g_array_index(messages_info, struct message_info, i);
 	g_free(msg_info->from);
 	g_mime_object_unref(GMIME_OBJECT(msg_info->mime_message));
-	if (msg_info->message)
+	if (msg_info->message) {
+	    msg_info->message->mailbox = NULL;
 	    g_object_unref(msg_info->message);
+	}
     }
     messages_info->len=0;
 }
@@ -854,6 +856,7 @@ static void update_message_status_headers(GMimeMessage *message,
 }
 
 
+/* Called with mailbox locked. */
 static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
                                              LibBalsaMessage *message )
 {
@@ -869,10 +872,6 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     GMimeStream *dest = NULL;
     GMimeFilter* crlffilter;
 
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX_MBOX(mailbox), FALSE);
-    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
-                                                                               
-    LOCK_MAILBOX_RETURN_VAL(mailbox, -1);
     g_object_ref ( G_OBJECT(message ) );
 
     ctime_r(&(message->headers->date), date_string);
@@ -896,10 +895,8 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     path = libbalsa_mailbox_local_get_path(mailbox);
     /* open in read-write mode */
     fd = open(path, O_RDWR);
-    if (fd < 0) {
-        UNLOCK_MAILBOX(mailbox);
+    if (fd < 0)
         return -1;
-    }
     
     lseek (fd, 0, SEEK_END);
     dest = g_mime_stream_fs_new (fd);
@@ -938,7 +935,6 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     g_object_unref ( G_OBJECT(message ) );  
     mbox_unlock (mailbox, dest);
     g_mime_stream_unref ( GMIME_STREAM(dest) );
-    UNLOCK_MAILBOX(mailbox);
     g_free(from);
     return 1;
 }

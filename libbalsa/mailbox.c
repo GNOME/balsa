@@ -914,12 +914,23 @@ messages_status_changed_cb(LibBalsaMailbox * mb, GList * messages,
     UNLOCK_MAILBOX(mb);
 }
 
-int libbalsa_mailbox_copy_message(LibBalsaMessage *message, LibBalsaMailbox *dest)
+int
+libbalsa_mailbox_copy_message(LibBalsaMessage * message,
+			      LibBalsaMailbox * dest)
 {
-    int retval = LIBBALSA_MAILBOX_GET_CLASS(dest)->add_message ( dest, message );
+    int retval;
+
+    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), -1);
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(dest), -1);
+
+    LOCK_MAILBOX_RETURN_VAL(dest, -1);
+
+    retval = LIBBALSA_MAILBOX_GET_CLASS(dest)->add_message(dest, message);
     if (retval > 0 && LIBBALSA_MESSAGE_IS_UNREAD(message))
 	dest->has_unread_messages = TRUE;
-    
+
+    UNLOCK_MAILBOX(dest);
+
     return retval;
 }
 

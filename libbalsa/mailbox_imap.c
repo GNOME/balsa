@@ -694,8 +694,10 @@ free_messages_info(LibBalsaMailboxImap * mbox)
     for (i = 0; i < messages_info->len; i++) {
 	struct message_info *msg_info =
 	    &g_array_index(messages_info, struct message_info, i);
-	if (msg_info->message)
+	if (msg_info->message) {
+	    msg_info->message->mailbox = NULL;
 	    g_object_unref(msg_info->message);
+	}
     }
     g_array_free(mbox->messages_info, TRUE);
     mbox->messages_info = NULL;
@@ -1640,6 +1642,7 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
 
 /* libbalsa_mailbox_imap_add_message: 
    can be called for a closed mailbox.
+   Called with mailbox locked.
 */
 int
 libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
@@ -1652,9 +1655,6 @@ libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
     GMimeFilter *crlffilter;
     ImapMboxHandle *handle;
 
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox), FALSE);
-    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
-
     g_object_ref ( G_OBJECT(message ) );
 
     if ( LIBBALSA_MESSAGE_IS_UNREAD(message) )
@@ -1666,8 +1666,6 @@ libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
     if ( LIBBALSA_MESSAGE_IS_REPLIED(message) )
 	IMSG_FLAG_SET(imap_flags,IMSGF_ANSWERED);
 
-    LOCK_MAILBOX_RETURN_VAL(mailbox, -1);
-    
     handle = libbalsa_mailbox_imap_get_handle(LIBBALSA_MAILBOX_IMAP(mailbox));
     stream = libbalsa_mailbox_get_message_stream(message->mailbox, message);
 
@@ -1688,7 +1686,6 @@ libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
     libbalsa_mailbox_imap_release_handle(LIBBALSA_MAILBOX_IMAP(mailbox));
 
     g_object_unref ( G_OBJECT(message ) );    
-    UNLOCK_MAILBOX(mailbox);
     
     return rc == IMR_OK ? 1 : -1;
 }

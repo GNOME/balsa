@@ -204,6 +204,7 @@ static void mailbox_tab_close_cb(GtkWidget * widget, gpointer data);
 
 static void hide_changed_cb(GtkWidget * widget, gpointer data);
 static void show_name_cb(GtkWidget * widget, gpointer data);
+static void show_patch_cb(GtkWidget * widget, gpointer data);
 static void mailbox_commit_changes(GtkWidget * widget, gpointer data);
 static void mailbox_commit_all(GtkWidget * widget, gpointer data);
 
@@ -652,6 +653,8 @@ static GnomeUIInfo mailbox_menu[] = {
     /* the next one is for testing only */
     GNOMEUIINFO_ITEM_STOCK(N_("Show from _name"),  "",
                            show_name_cb, GTK_STOCK_FIND),
+    GNOMEUIINFO_ITEM_STOCK(N_("Show _Patches"),  "",
+                           show_patch_cb, GTK_STOCK_FIND),
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_MARK_ALL_POS (MENU_MAILBOX_HIDE_POS+2)
     {
@@ -3154,18 +3157,41 @@ show_name_cb(GtkWidget * widget, gpointer data)
           libbalsa_condition_new_bool_ptr
           (TRUE, CONDITION_AND,
            libbalsa_condition_new_string
-           (TRUE, CONDITION_MATCH_FROM, "Dreß",NULL),
+           (TRUE, CONDITION_MATCH_FROM, g_strdup("Dreß"),NULL),
            libbalsa_condition_new_string
-           (FALSE, CONDITION_MATCH_SUBJECT|CONDITION_MATCH_BODY, "rfc",NULL)),
+           (FALSE, CONDITION_MATCH_SUBJECT|CONDITION_MATCH_BODY,
+            g_strdup("rfc"),NULL)),
           libbalsa_condition_new_flag_enum
           (FALSE, LIBBALSA_MESSAGE_FLAG_FLAGGED)),
          libbalsa_condition_new_bool_ptr
          (FALSE, CONDITION_AND,
           libbalsa_condition_new_string
-          (FALSE, CONDITION_MATCH_FROM, "helgaker",NULL),
+          (FALSE, CONDITION_MATCH_FROM, g_strdup("helgaker"),NULL),
           libbalsa_condition_new_string
-          (TRUE, CONDITION_MATCH_SUBJECT, "huddinge",NULL))),
+          (TRUE, CONDITION_MATCH_SUBJECT, g_strdup("huddinge"),NULL))),
          libbalsa_condition_new_date(FALSE, &t1, NULL));
+
+    if(filter)
+        filter = libbalsa_condition_new_bool_ptr
+            (FALSE, CONDITION_AND, name, filter);
+    else 
+        filter = name;
+    libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE);
+}
+
+static void
+show_patch_cb(GtkWidget * widget, gpointer data)
+{
+    GtkWidget *index = balsa_window_find_current_index(balsa_app.main_window);
+    LibBalsaMailbox *mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
+    LibBalsaCondition *filter, *name;
+    filter = balsa_window_get_view_filter(balsa_app.main_window);
+    /* (((not body "dreß" and (subject "rfc" or body "rfc") and flagged)
+     * or (from "helgaker" and not subject "huddinge") and 
+     * sent in last three months.
+     * This probably can be moved to a special "debug" menu. */
+    name = libbalsa_condition_new_string
+        (FALSE, CONDITION_MATCH_SUBJECT, g_strdup("PATCH"),NULL);
 
     if(filter)
         filter = libbalsa_condition_new_bool_ptr

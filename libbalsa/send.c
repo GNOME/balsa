@@ -27,6 +27,7 @@
 
 #include <fcntl.h>
 #include <errno.h>
+#include <stdlib.h>
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>

@@ -19,18 +19,21 @@
 
 /* IMAP login/authentication code, GSSAPI method, see RFC2222 and RFC2078 */
 
+#include "config.h"
 
 #define _XOPEN_SOURCE 500
 #include <stdio.h>
 #include <string.h>
 
+#include "imap-auth.h"
+
+#if defined(USE_TLS)
 #include <gssapi/gssapi.h>
 #include <gssapi/gssapi_generic.h>
 
 
-#include "siobuf.h"
-#include "imap-auth.h"
 #include "imap_private.h"
+#include "siobuf.h"
 #include "util.h"
 
 #define LONG_STRING 2048
@@ -315,3 +318,10 @@ ag_negotiate_parameters(ImapMboxHandle *handle, const char * user,
                     IMR_NO, the user was not allowed to access the
                     mailbox. */
 }
+#else /* defined(USE_TLS) */
+
+ImapResult
+imap_auth_gssapi(ImapMboxHandle* handle)
+{ return IMAP_AUTH_UNAVAIL; }
+
+#endif /* defined(USE_TLS) */

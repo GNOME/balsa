@@ -1,5 +1,13 @@
-2004-07-16 08:02  PeterB
+2004-07-16 20:46  PeterB
 
+	* src/: mailbox-node.c, mailbox-node.h: check more carefully for
+	pre-existing imap folder; use BALSA_MAILBOX_NODE_NEW_MAILBOX
+	GObject data to mark an mbnode with a newly attached mailbox.
+	* src/balsa-mblist.c: connect to the mailbox's "changed" signal in
+	bmbl_store_redraw_mbnode instead of in
+	balsa_mblist_mailbox_node_append; use
+	BALSA_MAILBOX_NODE_NEW_MAILBOX GObject data on mbnode to decide
+	when we need to connect.
 	* libbalsa/mailbox_local.c: free threading info on closing.
 
 2004-07-15  Pawel Salek

@@ -9,6 +9,7 @@
 	* src/main.c: close LDAP on exit.
 	* src/pref-manager.c: add LDAP page.
 	* src/save-restore.c: save and read LDAP data.
+	* src/ldap-addressbook.[hc]: LDAP support files.
 	
 2000-09-07  Ian Campbell  <ijc25@cam.ac.uk>
 

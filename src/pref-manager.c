@@ -20,10 +20,11 @@
 #include "config.h"
 
 #include <gnome.h>
-#include "pref-manager.h"
 #include "balsa-app.h"
-#include "save-restore.h"
+#include "pref-manager.h"
+#include "mailbox-conf.h"
 #include "main-window.h"
+#include "save-restore.h"
 
 #define NUM_TOOLBAR_MODES 3
 #define NUM_MDI_MODES 4
@@ -92,8 +93,15 @@ static void cancel_prefs (void);
 /* set defaults */
 static void set_prefs (void);
 
+/* callbacks */
 static void properties_modified_cb (GtkWidget *, GnomePropertyBox *);
 
+static void pop3_add_cb (GtkWidget * widget, gpointer data);
+static void pop3_edit_cb (GtkWidget * widget, gpointer data);
+static void pop3_del_cb (GtkWidget * widget, gpointer data);
+
+
+/* and now the important stuff: */
 
 void
 open_preferences_manager (void)
@@ -205,7 +213,7 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
   g_free (balsa_app.real_name);
   balsa_app.real_name = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->real_name)));
 
-  g_free(balsa_app.email);
+  g_free (balsa_app.email);
   balsa_app.email = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->email)));
 
   g_free (balsa_app.smtp_server);
@@ -367,6 +375,25 @@ create_mailservers_page ()
   gtk_clist_set_policy (GTK_CLIST (pui->pop3servers), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_box_pack_start (GTK_BOX (hbox), pui->pop3servers, TRUE, TRUE, 2);
 
+  {
+    Mailbox *mailbox;
+    GList *list = balsa_app.inbox_input;
+    gchar *text[1];
+    gint row;
+
+    while (list)
+      {
+	mailbox = list->data;
+	if (mailbox)
+	  {
+	    text[0] = mailbox->name;
+	    row = gtk_clist_append (GTK_CLIST (pui->pop3servers), text);
+	    gtk_clist_set_row_data (GTK_CLIST (pui->pop3servers), row, mailbox);
+	  }
+	list = list->next;
+      }
+  }
+
   bbox = gtk_vbutton_box_new ();
   gtk_box_pack_start (GTK_BOX (hbox), bbox, FALSE, TRUE, 2);
   gtk_button_box_set_spacing (GTK_BUTTON_BOX (bbox), 2);
@@ -375,10 +402,18 @@ create_mailservers_page ()
 
   button = gtk_button_new_with_label ("Add");
   gtk_container_add (GTK_CONTAINER (bbox), button);
+  gtk_signal_connect_object (GTK_OBJECT (button), "clicked",
+			     GTK_SIGNAL_FUNC (pop3_add_cb), NULL);
+
   button = gtk_button_new_with_label ("Modify");
   gtk_container_add (GTK_CONTAINER (bbox), button);
+  gtk_signal_connect_object (GTK_OBJECT (button), "clicked",
+			     GTK_SIGNAL_FUNC (pop3_edit_cb), NULL);
+
   button = gtk_button_new_with_label ("Delete");
   gtk_container_add (GTK_CONTAINER (bbox), button);
+  gtk_signal_connect_object (GTK_OBJECT (button), "clicked",
+			     GTK_SIGNAL_FUNC (pop3_del_cb), NULL);
 
   frame = gtk_frame_new ("Local Mail");
   gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
@@ -489,4 +524,47 @@ static void
 properties_modified_cb (GtkWidget * widget, GnomePropertyBox * pbox)
 {
   gnome_property_box_changed (pbox);
+}
+
+static void
+pop3_edit_cb (GtkWidget * widget, gpointer data)
+{
+  GtkCList *clist = GTK_CLIST (pui->pop3servers);
+  gint row;
+
+  Mailbox *mailbox = NULL;
+
+  if (!clist->selection)
+    return;
+
+  row = (gint) clist->selection->data;
+
+  mailbox = gtk_clist_get_row_data (clist, row);
+
+  mailbox_conf_new (mailbox, FALSE);
+}
+
+static void
+pop3_add_cb (GtkWidget * widget, gpointer data)
+{
+  mailbox_conf_new (NULL, FALSE);
+}
+
+static void
+pop3_del_cb (GtkWidget * widget, gpointer data)
+{
+  GtkCList *clist = GTK_CLIST (pui->pop3servers);
+  gint row;
+
+  Mailbox *mailbox = NULL;
+
+  if (!clist->selection)
+    return;
+
+  row = (gint) clist->selection->data;
+
+  if (mailbox->type != MAILBOX_POP3)
+    return;
+
+  mailbox_conf_delete (mailbox);
 }

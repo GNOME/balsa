@@ -20,6 +20,7 @@
 #include "config.h"
 
 #include <stdio.h>
+#include <time.h>
 #include <gnome.h>
 
 #include "mailbackend.h"
@@ -127,7 +128,7 @@ static void send_watcher_mark_undelete_message (Mailbox * mailbox, Message * mes
 static void send_watcher_new_message (Mailbox * mailbox, Message * message, gint remaining);
 static void send_watcher_delete_message (Mailbox * mailbox, Message * message);
 
-static Message *translate_message (ENVELOPE * cenv);
+static Message *translate_message (HEADER * cur);
 static Address *translate_address (ADDRESS * caddr);
 
 
@@ -471,7 +472,7 @@ load_messages (Mailbox * mailbox, gint emit)
       if (!cur)
 	continue;
 
-      message = translate_message (cur->env);
+      message = translate_message (cur);
       message->mailbox = mailbox;
       message->msgno = msgno;
 
@@ -926,20 +927,29 @@ message_undelete (Message * message)
 
 /* internal c-client translation */
 static Message *
-translate_message (ENVELOPE * cenv)
+translate_message (HEADER * cur)
 {
   Message *message;
   ADDRESS *addy;
   Address *addr;
+  ENVELOPE *cenv;
+  gchar rettime[27];
+  struct tm *footime;
 
-  if (!cenv)
+  if (!cur)
     return NULL;
+
+  cenv = cur->env;
 
   message = message_new ();
 /*
    message->remail = g_strdup (cenv->remail);
-   message->date = g_strdup (cenv->date);
  */
+  footime = localtime (&cur->date_sent);
+
+  strftime (rettime, sizeof (rettime), "%a, %d %b %Y %H:%M:%S", footime);
+
+  message->date = g_strdup (rettime);
   message->from = translate_address (cenv->from);
   message->sender = translate_address (cenv->sender);
   message->reply_to = translate_address (cenv->reply_to);
@@ -992,12 +1002,12 @@ message_body_ref (Message * message)
    */
   if ((msg = mx_open_message (CLIENT_CONTEXT (message->mailbox), cur->msgno)) != NULL)
     {
- /*     mutt_view_attachment (msg->fp, cur->content, M_REGULAR);
-*/ 
-      message->body_list = g_list_append(message->body_list,
-		      g_strdup(msg->fp));
+      /*     mutt_view_attachment (msg->fp, cur->content, M_REGULAR);
+       */
+      message->body_list = g_list_append (message->body_list,
+					  g_strdup (cur->content));
       message->body_ref++;
-	    mx_close_message (&msg);
+      mx_close_message (&msg);
     }
 
 #if 0

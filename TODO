@@ -19,10 +19,10 @@ New features/unfinished things:
  * update libmutt
 
 UI:
- * Remove use of GNOME MDI
-   * Same look as now, except mailbox list in a splitter and not a handlebox
+ D Remove use of GNOME MDI
+   D Same look as now, except mailbox list in a splitter and not a handlebox
  D Mailbox list in the main window
-     - Allow the mailbox tree to be resized
+     D Allow the mailbox tree to be resized
  * finish move and copy
  * put deleted items in the trash and remove them from the current clist
  * mailboxes with new mail should have bold text

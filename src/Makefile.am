@@ -12,7 +12,7 @@ balsa_SOURCES =	\
 	balsa-message.c		\
 	filter-edit-callbacks.c	\
 	filter-edit-dialog.c	\
-	index-child.c		\
+	balsa-index-page.c	\
 	local-mailbox.c		\
 	mailbox-conf.c		\
 	main-window.c		\

@@ -155,6 +155,8 @@ mailboxes_init (void)
 int
 main (int argc, char *argv[])
 {
+  GtkWidget *window;
+
   /* Initialize the i18n stuff */
   bindtextdomain (PACKAGE, GNOMELOCALEDIR);
   textdomain (PACKAGE);
@@ -176,7 +178,8 @@ main (int argc, char *argv[])
 
   gnome_triggers_do ("", "program", "balsa", "startup", NULL);
 
-  main_window_init ();
+  window = balsa_window_new();
+  gtk_widget_show(window);
 
   gtk_main ();
   return 0;

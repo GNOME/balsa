@@ -1,5 +1,3 @@
-
-
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -28,17 +26,18 @@
 
 #include <gnome.h>
 #include "mailbox.h"
+#include "main-window.h"
 
 
+void mblist_menu_add_cb (GtkWidget * widget, gpointer data);
+void mblist_menu_edit_cb (GtkWidget * widget, gpointer data);
+void mblist_menu_delete_cb (GtkWidget * widget, gpointer data);
+void mblist_menu_open_cb (GtkWidget * widget, gpointer data);
+void mblist_menu_close_cb (GtkWidget * widget, gpointer data);
 
-extern void mblist_menu_add_cb (GtkWidget * widget, gpointer data);
-extern void mblist_menu_edit_cb (GtkWidget * widget, gpointer data);
-extern void mblist_menu_delete_cb (GtkWidget * widget, gpointer data);
-extern void mblist_menu_open_cb (GtkWidget * widget, gpointer data);
-extern void mblist_menu_close_cb (GtkWidget * widget, gpointer data);
+GtkWidget *balsa_mailbox_list_window_new(BalsaWindow *window);
 
-extern void mblist_open_window (GnomeMDI * mdi);
-extern Mailbox *mblist_get_selected_mailbox (void);
+Mailbox *mblist_get_selected_mailbox (void);
 
 
 

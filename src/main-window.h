@@ -22,11 +22,54 @@
 
 #include "mailbox.h"
 
-void main_window_init (void);
+
+#define BALSA_TYPE_WINDOW		       (balsa_window_get_type ())
+#define BALSA_WINDOW(obj)		       (GTK_CHECK_CAST (obj, BALSA_TYPE_WINDOW, BalsaWindow))
+#define BALSA_WINDOW_CLASS(klass)	       (GTK_CHECK_CLASS_CAST (klass, BALSA_TYPE_WINDOW, BalsaWindowClass))
+#define BALSA_IS_WINDOW(obj)		       (GTK_CHECK_TYPE (obj, BALSA_TYPE_WINDOW))
+#define BALSA_IS_WINDOW_CLASS(klass)	       (GTK_CHECK_CLASS_TYPE (klass, BALSA_TYPE_WINDOW))
+
+
+typedef struct _BalsaWindow       BalsaWindow;
+typedef struct _BalsaWindowClass  BalsaWindowClass;
+
+struct _BalsaWindow
+{
+  GnomeApp window;
+
+  GtkWidget *progress_bar;
+  GtkWidget *notebook;
+  GtkWidget *preview; // message is child
+};
+
+struct _BalsaWindowClass
+{
+  GnomeAppClass parent_class;
+
+  void (* open_mailbox)  (BalsaWindow *window,
+			  Mailbox     *mailbox);
+
+  void (* close_mailbox) (BalsaWindow *window,
+			  Mailbox     *mailbox);
+
+  void (* set_cursor)  (BalsaWindow *window,
+			GdkCursor   *cursor);
+
+};
+
+GtkType balsa_window_get_type (void);
+GtkWidget *balsa_window_new(void);
+void balsa_window_set_cursor(BalsaWindow *window, GdkCursor *cursor);
+void balsa_window_refresh(BalsaWindow *window);
+void balsa_window_open_mailbox();
+void balsa_window_close_mailbox();
+
+/*
 void close_main_window (void);
 void refresh_main_window (void);
 void main_window_set_mailbox (Mailbox * mailbox);
 void main_window_set_cursor (gint type);
 void mblist_close_mailbox (Mailbox * mailbox);
+*/
 
 #endif /* __main_window_h__ */

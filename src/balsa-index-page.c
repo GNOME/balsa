@@ -26,18 +26,19 @@
 #include "main-window.h"
 #include "message-window.h"
 #include "misc.h"
-#include "index-child.h"
+#include "balsa-index-page.h"
 
-static GnomeMDIChildClass *parent_class = NULL;
 
-static void index_child_class_init (IndexChildClass *);
-static void index_child_init (IndexChild *);
+enum
+{
+  LAST_SIGNAL
+};
 
 /* DND declarations */
 enum
-  {
-    TARGET_MESSAGE,
-  };
+{
+  TARGET_MESSAGE,
+};
 
 static GtkTargetEntry drag_types[] =
 {
@@ -49,29 +50,6 @@ static void index_child_setup_dnd ( GnomeMDIChild * child );
 
 /* -- end of DND declarations */
 
-guint
-index_child_get_type (void)
-{
-  static guint index_type = 0;
-
-  if (!index_type)
-    {
-
-      GtkTypeInfo index_info =
-      {
-	"IndexChild",
-	sizeof (IndexChild),
-	sizeof (IndexChildClass),
-	(GtkClassInitFunc) index_child_class_init,
-	(GtkObjectInitFunc) index_child_init,
-	(GtkArgSetFunc) NULL,
-	(GtkArgGetFunc) NULL,
-      };
-
-      index_type = gtk_type_unique (gnome_mdi_child_get_type (), &index_info);
-    }
-  return index_type;
-}
 
 /* callbacks */
 static void index_select_cb (GtkWidget * widget, Message * message, GdkEventButton *, gpointer data);
@@ -79,6 +57,7 @@ static GtkWidget *create_menu (BalsaIndex * bindex);
 static void index_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer data);
 
 /* menu item callbacks */
+
 static void message_status_set_new_cb (GtkWidget *, Message *);
 static void message_status_set_read_cb (GtkWidget *, Message *);
 static void message_status_set_answered_cb (GtkWidget *, Message *);
@@ -86,250 +65,212 @@ static void delete_message_cb (GtkWidget *, BalsaIndex *);
 static void undelete_message_cb (GtkWidget *, BalsaIndex *);
 static void transfer_messages_cb (BalsaMBList *, Mailbox *, GtkCTreeNode *, GdkEventButton *, BalsaIndex *);
 
-void
-index_child_changed (GnomeMDI * mdi, GnomeMDIChild * mdi_child)
+
+static GtkObjectClass *parent_class = NULL;
+static guint signals[LAST_SIGNAL] = { 0 };
+
+static void balsa_index_page_class_init(BalsaIndexPageClass *class);
+static void balsa_index_page_init(BalsaIndexPage *page);
+
+GtkType
+balsa_index_page_get_type (void)
 {
-  if (mdi->active_child)
-    balsa_app.current_index_child = INDEX_CHILD (mdi->active_child);
-  else
-    balsa_app.current_index_child = NULL;
+  static GtkType window_type = 0;
+
+  if (!window_type)
+    {
+      static const GtkTypeInfo window_info =
+      {
+	"BalsaIndexPage",
+	sizeof (BalsaIndexPage),
+	sizeof (BalsaIndexPageClass),
+	(GtkClassInitFunc) balsa_index_page_class_init,
+	(GtkObjectInitFunc) balsa_index_page_init,
+        /* reserved_1 */ NULL,
+	/* reserved_2 */ NULL,
+	(GtkClassInitFunc) NULL,
+      };
+
+      window_type = gtk_type_unique (GTK_TYPE_OBJECT, &window_info);
+    }
+
+  return window_type;
 }
 
-IndexChild *
-index_child_get_active (GnomeMDI * mdi)
+
+static void
+balsa_index_page_class_init(BalsaIndexPageClass *class)
 {
-  if (mdi)
-    return INDEX_CHILD (mdi->active_child);
-  else
-    return NULL;
+  GtkObjectClass *object_class;
+
+  object_class = (GtkObjectClass *) class;
+
+  //  object_class->destroy = index_child_destroy;
+
+  parent_class = gtk_type_class(GTK_TYPE_OBJECT);
 }
+
+static void
+balsa_index_page_init(BalsaIndexPage *page)
+{
+
+}
+
+GtkObject *balsa_index_page_new(BalsaWindow *window)
+{
+  BalsaIndexPage *bip;
+  GtkWidget *sw;
+  GtkWidget *index;
+  GtkAdjustment *vadj, *hadj;
+
+  bip = gtk_type_new(BALSA_TYPE_INDEX_PAGE);
+ 
+  sw = gtk_scrolled_window_new (NULL, NULL);
+
+  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (sw),
+				 GTK_POLICY_AUTOMATIC,
+				 GTK_POLICY_AUTOMATIC);
+  index = balsa_index_new ();
+  //  gtk_widget_set_usize (index, -1, 200);
+  gtk_container_add(GTK_CONTAINER(sw), index);
+
+  gtk_widget_show(index);
+  gtk_widget_show(sw);
+
+  gtk_signal_connect(GTK_OBJECT(index), "select_message",
+		     (GtkSignalFunc) index_select_cb, bip);
+  
+  gtk_signal_connect(GTK_OBJECT (index), "button_press_event",
+		     (GtkSignalFunc) index_button_press_cb, bip);
+  
+  /* setup the dnd stuff for the messages */
+  gtk_object_set(GTK_OBJECT(index), "use_drag_icons", FALSE, NULL);
+  gtk_object_set(GTK_OBJECT(index), "reorderable", FALSE, NULL);
+  // XXX
+  //  index_child_setup_dnd(child);
+
+  bip->window = window;
+  bip->index = index;
+  bip->sw = sw;
+
+  return GTK_OBJECT(bip);
+}
+
+
 
 static void
 set_password (GtkWidget * widget, GtkWidget * entry)
 {
   Mailbox *mailbox;
 
-  mailbox = gtk_object_get_data (GTK_OBJECT (entry), "mailbox");
+  mailbox = gtk_object_get_data(GTK_OBJECT(entry), "mailbox");
+
   if (!mailbox)
     return;
+
   if (mailbox->type == MAILBOX_IMAP)
-    MAILBOX_IMAP (mailbox)->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (entry)));
+    MAILBOX_IMAP(mailbox)->passwd = g_strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
+
   if (mailbox->type == MAILBOX_POP3)
-    MAILBOX_POP3 (mailbox)->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (entry)));
+    MAILBOX_POP3(mailbox)->passwd = g_strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
+
   gtk_object_remove_data (GTK_OBJECT (entry), "mailbox");
 }
 
 
-IndexChild *
-index_child_new (GnomeMDI * mdi, Mailbox * mailbox)
+void balsa_index_page_load_mailbox(BalsaIndexPage *page, Mailbox * mailbox)
 {
-  IndexChild *child;
-  GnomeMDIChild *mdichild;
   GtkWidget *messagebox;
+  GdkCursor *cursor;
 
-  main_window_set_cursor (GDK_WATCH);
+  page->mailbox = mailbox;
 
+#if 0
+  // XXX
+  cursor = gdk_cursor_new(GDK_WATCH);
+  balsa_window_set_cursor(page, cursor);
+  gdk_cursor_destroy(cursor);
+#endif
+
+  if ((mailbox->type == MAILBOX_IMAP && !MAILBOX_IMAP(mailbox)->passwd) ||
+      (mailbox->type == MAILBOX_POP3 && !MAILBOX_POP3(mailbox)->passwd))
   {
     GtkWidget *hbox;
     GtkWidget *label;
     GtkWidget *dialog;
     GtkWidget *entry;
 
-    if ((mailbox->type == MAILBOX_IMAP && MAILBOX_IMAP (mailbox)->passwd == NULL)
-	||
-	(mailbox->type == MAILBOX_POP3 && MAILBOX_POP3 (mailbox)->passwd == NULL))
-      {
+    dialog = gnome_dialog_new(_("Mailbox password:"),
+			       GNOME_STOCK_BUTTON_OK, GNOME_STOCK_BUTTON_CANCEL, NULL);
 
-	dialog = gnome_dialog_new (_ ("Mailbox password:"),
-		    GNOME_STOCK_BUTTON_OK, GNOME_STOCK_BUTTON_CANCEL, NULL);
+    hbox = gtk_hbox_new (FALSE, 0);
+    gtk_box_pack_start (GTK_BOX(GNOME_DIALOG(dialog)->vbox), hbox, FALSE, FALSE, 10);
 
-	hbox = gtk_hbox_new (FALSE, 0);
-	gtk_box_pack_start (GTK_BOX (GNOME_DIALOG (dialog)->vbox), hbox, FALSE, FALSE, 10);
+    label = gtk_label_new(_("Password:"));
+    gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 10);
 
-	label = gtk_label_new (_("Password:"));
-	gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 10);
+    entry = gtk_entry_new ();
+    gtk_entry_set_visibility(GTK_ENTRY(entry), FALSE);
+    gtk_object_set_data(GTK_OBJECT(entry), "mailbox", mailbox);
+    gtk_box_pack_start(GTK_BOX(hbox), entry, FALSE, FALSE, 10);
 
-	entry = gtk_entry_new ();
-	gtk_entry_set_visibility (GTK_ENTRY (entry), FALSE);
-	gtk_object_set_data (GTK_OBJECT (entry), "mailbox", mailbox);
-	gtk_box_pack_start (GTK_BOX (hbox), entry, FALSE, FALSE, 10);
-
-	gtk_widget_show_all (dialog);
-	gnome_dialog_button_connect (GNOME_DIALOG (dialog), 0, set_password, entry);
-	gtk_window_set_modal (GTK_WINDOW (dialog), TRUE);
-	gnome_dialog_run (GNOME_DIALOG (dialog));
-	gtk_widget_destroy (dialog);
-	dialog = NULL;
-      }
+    gtk_widget_show_all(dialog);
+    gnome_dialog_button_connect(GNOME_DIALOG(dialog), 0, set_password, entry);
+    gtk_window_set_modal(GTK_WINDOW(dialog), TRUE);
+    gnome_dialog_run(GNOME_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+    dialog = NULL;
   }
 
   /* check to see if its still null */
-  if ((mailbox->type == MAILBOX_IMAP && MAILBOX_IMAP (mailbox)->passwd == NULL)
-      ||
-  (mailbox->type == MAILBOX_POP3 && MAILBOX_POP3 (mailbox)->passwd == NULL))
-    {
-      return NULL;
-    }
+  if ((mailbox->type == MAILBOX_IMAP && !MAILBOX_IMAP(mailbox)->passwd) ||
+      (mailbox->type == MAILBOX_POP3 && !MAILBOX_POP3(mailbox)->passwd))
+  {
+    return;
+  }
 
-  if (!mailbox_open_ref (mailbox))
-    {
-      messagebox = gnome_message_box_new (_ ("Unable to Open Mailbox!"),
-					  GNOME_MESSAGE_BOX_ERROR,
-					  GNOME_STOCK_BUTTON_OK,
-					  NULL);
-      gtk_widget_set_usize (messagebox, MESSAGEBOX_WIDTH, MESSAGEBOX_HEIGHT);
-      gtk_window_set_position (GTK_WINDOW (messagebox), GTK_WIN_POS_CENTER);
-      gtk_widget_show (messagebox);
-      return NULL;
-    }
+  if (!mailbox_open_ref(mailbox))
+  {
+    messagebox = gnome_message_box_new(_("Unable to Open Mailbox!"),
+					GNOME_MESSAGE_BOX_ERROR,
+					GNOME_STOCK_BUTTON_OK,
+					NULL);
+    gtk_widget_set_usize (messagebox, MESSAGEBOX_WIDTH, MESSAGEBOX_HEIGHT);
+    gtk_window_set_position (GTK_WINDOW (messagebox), GTK_WIN_POS_CENTER);
+    gtk_widget_show (messagebox);
+    return;
+  }
 
-  mdichild = gnome_mdi_find_child (mdi, mailbox->name);
-  if (mdichild)
-    {
-      GtkWidget *view;
-      view = (mdichild->views)->data;
-      gnome_mdi_set_active_view(mdi, view);
-      return NULL;
-    }
-
-  child = gtk_type_new (index_child_get_type ());
-  if (child)
-    {
-      child->mailbox = mailbox;
-      child->mdi = mdi;
-
-      GNOME_MDI_CHILD (child)->name = g_strdup (mailbox->name);
-    }
-
-  return child;
-}
-
-static void
-index_child_destroy (GtkObject * obj)
-{
-  IndexChild *ic;
-
-  ic = INDEX_CHILD (obj);
-
-  mailbox_open_unref (ic->mailbox);
-  if (GTK_OBJECT_CLASS (parent_class)->destroy)
-    (*GTK_OBJECT_CLASS (parent_class)->destroy) (GTK_OBJECT (ic));
-}
-
-static gboolean
-check_for_new_mail (GtkWidget * widget)
-{
-  g_return_val_if_fail (BALSA_IS_INDEX (widget), FALSE);
-
-  mailbox_check_new_messages (BALSA_INDEX (widget)->mailbox);
-  g_print ("Checking for new mail in: %s\n", BALSA_INDEX (widget)->mailbox->name);
-
-  return TRUE;
-}
-
-static GtkWidget *
-index_child_create_view (GnomeMDIChild * child, gpointer data)
-{
-  GtkWidget *sw;
-  GtkWidget *vpane = NULL;
-  IndexChild *ic;
-  GtkAdjustment *vadj, *hadj;
- 
-  ic = INDEX_CHILD (child);
-
-  if (balsa_app.previewpane)
-    {
-
-      vpane = gtk_vpaned_new ();
-
-      /* balsa_index */
-      sw = gtk_scrolled_window_new (NULL, NULL);
-      gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw),
-				      GTK_POLICY_AUTOMATIC,
-				      GTK_POLICY_AUTOMATIC);
-      ic->index = balsa_index_new ();
-      gtk_widget_set_usize (ic->index, -1, 200);
-      gtk_container_add (GTK_CONTAINER (sw), ic->index);
-      gtk_paned_add1 (GTK_PANED (vpane), sw);
-
-      /* balsa_message */
-      sw = gtk_scrolled_window_new (NULL, NULL);
-      gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw),
-				      GTK_POLICY_AUTOMATIC,
-				      GTK_POLICY_AUTOMATIC);
-      ic->message = balsa_message_new ();
-      /* gtk_widget_set_usize (ic->message, -1, 250);*/
-      gtk_container_add (GTK_CONTAINER (sw), ic->message);
-      
-      vadj = gtk_layout_get_vadjustment( GTK_LAYOUT(ic->message) );
-      hadj = gtk_layout_get_hadjustment( GTK_LAYOUT(ic->message) );
-		
-      gtk_scrolled_window_set_vadjustment( GTK_SCROLLED_WINDOW(sw), vadj);
-      gtk_scrolled_window_set_hadjustment( GTK_SCROLLED_WINDOW(sw), hadj);
-      vadj->step_increment = 10;
-      hadj->step_increment = 10;
-      gtk_paned_add2 (GTK_PANED (vpane), sw);
-
-
-
-      gtk_widget_show_all (vpane);
-
-    }
-  else
-    {
-      sw = gtk_scrolled_window_new (NULL, NULL);
-      gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw),
-				      GTK_POLICY_AUTOMATIC,
-				      GTK_POLICY_AUTOMATIC);
-      ic->index = balsa_index_new ();
-      gtk_widget_set_usize (ic->index, 1, 200);
-      gtk_container_add (GTK_CONTAINER (sw), ic->index);
-
-      gtk_widget_show (ic->index);
-      gtk_widget_show (sw);
-    }
-
-
-  balsa_index_set_mailbox (BALSA_INDEX (ic->index), ic->mailbox);
-  gtk_signal_connect (GTK_OBJECT (ic->index), "select_message",
-		      (GtkSignalFunc) index_select_cb, ic);
-  
-  gtk_signal_connect (GTK_OBJECT (ic->index), "button_press_event",
-		      (GtkSignalFunc) index_button_press_cb, ic);
-  
-  /* setup the dnd stuff for the messages */
-  gtk_object_set( GTK_OBJECT(ic->index), "use_drag_icons", FALSE, NULL);
-  gtk_object_set( GTK_OBJECT(ic->index), "reorderable", FALSE, NULL);
-  index_child_setup_dnd ( child );
-
-  if (balsa_app.previewpane)
-    return (vpane);
-  else
-    return sw;
+  balsa_index_set_mailbox(BALSA_INDEX(page->index), mailbox);
 }
 
 static gint handler = 0;
+
+
 static gboolean
-idle_handler_cb (GtkWidget * widget)
+idle_handler_cb(GtkWidget * widget)
 {
   GdkEventButton *bevent;
+  BalsaMessage *bmsg;
   Message *message;
   gpointer data;
 
-  bevent = gtk_object_get_data (GTK_OBJECT (widget), "bevent");
-  message = gtk_object_get_data (GTK_OBJECT (widget), "message");
-  data = gtk_object_get_data (GTK_OBJECT (widget), "data");
+  bevent = gtk_object_get_data(GTK_OBJECT (widget), "bevent");
+  message = gtk_object_get_data(GTK_OBJECT (widget), "message");
+  data = gtk_object_get_data(GTK_OBJECT (widget), "data");
+
+  /* get the preview pane from the index page's BalsaWindow parent */
+  bmsg = BALSA_MESSAGE(BALSA_WINDOW(BALSA_INDEX_PAGE(data)->window)->preview);
 
   if (bevent && bevent->button == 3)
-    gtk_menu_popup (GTK_MENU (create_menu (BALSA_INDEX (widget))),
+  {
+    gtk_menu_popup (GTK_MENU(create_menu(BALSA_INDEX(widget))),
 		    NULL, NULL, NULL, NULL,
 		    bevent->button, bevent->time);
-
-  else if (INDEX_CHILD (data)->message)
-    {
-      if (BALSA_MESSAGE (INDEX_CHILD (data)->message))
-	balsa_message_set (BALSA_MESSAGE (INDEX_CHILD (data)->message), message);
-    }
+  } else if (bmsg) {
+    if (BALSA_MESSAGE(bmsg))
+      balsa_message_set(BALSA_MESSAGE(bmsg), message);
+  }
 
   handler = 0;
 
@@ -375,17 +316,17 @@ index_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer data)
   on_message=gtk_clist_get_selection_info (clist, event->x, event->y, &row, &column);
   
   if (on_message)
+  {
+    mailbox = gtk_clist_get_row_data (clist, row);
+    current_message = (Message *) gtk_clist_get_row_data (clist, row);
+    if (event && event->type == GDK_2BUTTON_PRESS)
     {
-      mailbox = gtk_clist_get_row_data (clist, row);
-      current_message = (Message *) gtk_clist_get_row_data (clist, row);
-      if (event && event->type == GDK_2BUTTON_PRESS)
-	{
-	  message_window_new (current_message);
-	  return;
-	} 
-    }
-
+      message_window_new (current_message);
+      return;
+    } 
+  }
 }
+
 /*
  * CLIST Callbacks
  */
@@ -465,6 +406,8 @@ create_menu (BalsaIndex * bindex)
   return menu;
 }
 
+
+#if 0
 static void
 message_status_set_new_cb (GtkWidget * widget, Message * message)
 {
@@ -491,6 +434,7 @@ message_status_set_answered_cb (GtkWidget * widget, Message * message)
 
   message_reply (message);
 }
+#endif
 
 static void
 transfer_messages_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row, GdkEventButton * event, BalsaIndex * bindex)
@@ -562,28 +506,6 @@ undelete_message_cb (GtkWidget * widget, BalsaIndex * bindex)
     balsa_index_select_next (bindex);
 }
 
-static void
-index_child_class_init (IndexChildClass * class)
-{
-  GtkObjectClass *object_class;
-  GnomeMDIChildClass *child_class;
-
-  object_class = (GtkObjectClass *) class;
-  child_class = GNOME_MDI_CHILD_CLASS (class);
-
-  object_class->destroy = index_child_destroy;
-  child_class->create_view = index_child_create_view;
-
-  parent_class = gtk_type_class (gnome_mdi_child_get_type ());
-}
-
-static void
-index_child_init (IndexChild * child)
-{
-
-}
-
-
 
 /* DND features                                              */
 
@@ -603,6 +525,7 @@ static void index_child_drag_data_get (GtkWidget *widget, GdkDragContext *contex
 static void 
 index_child_setup_dnd ( GnomeMDIChild * child )
 {
+#if 0
   IndexChild *ic;
   GdkPixmap *drag_pixmap;
   GdkPixmap *drag_mask;
@@ -624,7 +547,7 @@ index_child_setup_dnd ( GnomeMDIChild * child )
   gdk_pixmap_unref (drag_pixmap);
   gdk_pixmap_unref (drag_mask);
 
-
+#endif
 }
 
 

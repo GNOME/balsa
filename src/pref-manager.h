@@ -21,7 +21,7 @@
 
 
 /* open the preferences manager window */
-void open_preferences_manager (void);
+void open_preferences_manager (GtkWidget *widget, gpointer data);
 
 /* refresh any data displayed in the preferences manager
  * window in case it has changed */

@@ -31,6 +31,7 @@
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "balsa-index.h"
+#include "balsa-index-page.h"
 #include "balsa-mblist.h"
 #include "balsa-message.h"
 #include "mailbox.h"
@@ -42,8 +43,8 @@
 typedef struct _MBListWindow MBListWindow;
 struct _MBListWindow
   {
-    GnomeMDI *mdi;
-    GtkWidget *sw;
+    GtkWidget *window;
+
     GtkCTree *ctree;
     GtkCTreeNode *parent;
   };
@@ -74,36 +75,23 @@ static void mblist_drag_data_received (GtkWidget * widget, GdkDragContext * cont
 static gboolean mblist_drag_motion (GtkWidget *widget, GdkDragContext *context, gint x, gint y, guint time);
 static gboolean mblist_drag_leave (GtkWidget *widget, GdkDragContext *context, guint time);
 
-void
-mblist_open_window (GnomeMDI * mdi)
+
+GtkWidget *balsa_mailbox_list_window_new(BalsaWindow *window)
 {
-  GtkWidget *dock_item;
+  GtkWidget *widget;
+
   gint height;
 
-  GnomeApp *app = GNOME_APP (mdi->active_window);
+  mblw = g_malloc0(sizeof(MBListWindow));
+  mblw->window = GTK_WIDGET(window);
 
-  mblw = g_malloc0 (sizeof (MBListWindow));
+  gtk_widget_push_visual(gdk_imlib_get_visual());
+  gtk_widget_push_colormap(gdk_imlib_get_colormap());
 
-  mblw->mdi = mdi;
-
-  gtk_widget_push_visual (gdk_imlib_get_visual ());
-  gtk_widget_push_colormap (gdk_imlib_get_colormap ());
-
-  dock_item = gnome_dock_item_new ("MailboxList",
-				   GNOME_DOCK_ITEM_BEH_NEVER_HORIZONTAL
-				   | GNOME_DOCK_ITEM_BEH_EXCLUSIVE);
-  gnome_dock_item_set_shadow_type (GNOME_DOCK_ITEM (dock_item), GTK_SHADOW_NONE);
-
-  mblw->sw = gtk_scrolled_window_new (NULL, NULL);
+  widget = gtk_scrolled_window_new (NULL, NULL);
   mblw->ctree = GTK_CTREE (balsa_mblist_new ());
   balsa_app.mblist = BALSA_MBLIST (mblw->ctree);
-  gtk_container_add (GTK_CONTAINER (mblw->sw), GTK_WIDGET (mblw->ctree));
-  gtk_container_add (GTK_CONTAINER (dock_item), GTK_WIDGET (mblw->sw));
-
-  gnome_app_add_dock_item (app,
-			   GNOME_DOCK_ITEM (dock_item),
-			   GNOME_DOCK_LEFT,
-			   0, 0, 0);
+  gtk_container_add(GTK_CONTAINER(widget), GTK_WIDGET(mblw->ctree));
 
   gtk_widget_pop_colormap ();
   gtk_widget_pop_visual ();
@@ -115,15 +103,13 @@ mblist_open_window (GnomeMDI * mdi)
  */
   gtk_ctree_set_line_style (mblw->ctree, GTK_CTREE_LINES_DOTTED);
 
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (mblw->sw),
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(widget),
 				  GTK_POLICY_AUTOMATIC,
 				  GTK_POLICY_AUTOMATIC);
 
   gtk_clist_set_row_height (GTK_CLIST (mblw->ctree), 16);
 
-  gtk_widget_show (GTK_WIDGET (mblw->sw));
-  gtk_widget_show (GTK_WIDGET (mblw->ctree));
-  gtk_widget_show (dock_item);
+  gtk_widget_show(GTK_WIDGET(mblw->ctree));
 #ifdef BALSA_SHOW_INFO
   /* set the "show_content_info" property and redraw the mailbox list */
   gtk_object_set(GTK_OBJECT (mblw->ctree), "show_content_info", balsa_app.mblist_show_mb_content_info, NULL);
@@ -153,6 +139,8 @@ mblist_open_window (GnomeMDI * mdi)
 
   gtk_signal_connect (GTK_OBJECT (mblw->ctree), "drag_data_received",
 		      GTK_SIGNAL_FUNC (mblist_drag_data_received), NULL);
+
+  return widget;
 }
 
 
@@ -160,18 +148,15 @@ mblist_open_window (GnomeMDI * mdi)
 void
 mblist_open_mailbox (Mailbox * mailbox)
 {
-  IndexChild *index_child;
+  //  IndexChild *index_child;
 
   if (!mblw)
     return;
-    
-  index_child = index_child_new (mblw->mdi, mailbox);
-  if (index_child)
-    {
-      gnome_mdi_add_child (mblw->mdi, GNOME_MDI_CHILD (index_child));
-      gnome_mdi_add_view (mblw->mdi, GNOME_MDI_CHILD (index_child));
-    }
-  main_window_set_cursor (-1);
+
+  balsa_window_open_mailbox(BALSA_WINDOW(mblw->window), mailbox);
+  //  index_child = index_child_new (mblw->window, mailbox);
+
+  balsa_window_set_cursor(BALSA_WINDOW(mblw->window), NULL);
     
   /* I don't know what is the purpose of that code, so I put
      it in comment until somebody tells me waht it  is useful 
@@ -199,20 +184,11 @@ mblist_open_mailbox (Mailbox * mailbox)
 void
 mblist_close_mailbox (Mailbox * mailbox)
 {
-  GnomeMDIChild *child;
 
   if (!mblw)
     return;
 
-  if (mailbox)
-    {
-      child = gnome_mdi_find_child (mblw->mdi, mailbox->name);
-      if (child)
-	{
-	  mailbox_watcher_remove (mailbox, BALSA_INDEX (INDEX_CHILD (child)->index)->watcher_id);
-	  gnome_mdi_remove_child (mblw->mdi, child, TRUE);
-	}
-    }
+  balsa_window_close_mailbox(BALSA_WINDOW(mblw->window), mailbox);
 }
  
 

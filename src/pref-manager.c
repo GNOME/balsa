@@ -62,7 +62,7 @@ typedef struct _PropertyUI
 PropertyUI;
 
 /* main window, from main-window.c */
-extern GnomeMDI *mdi;
+//extern GnomeMDI *mdi;
 
 static PropertyUI *pui;
 
@@ -125,12 +125,12 @@ static void pop3_del_cb (GtkWidget * widget, gpointer data);
 /* and now the important stuff: */
 
 void
-open_preferences_manager (void)
+open_preferences_manager(GtkWidget *widget, gpointer data)
 {
   static GnomeHelpMenuEntry help_entry = { NULL, "properties" };
   GtkWidget *label;
   gint i;
-  GnomeApp *active_win;
+  GnomeApp *active_win = GNOME_APP(data);
 
   /* only one preferences manager window */
   if (pui)
@@ -143,7 +143,7 @@ open_preferences_manager (void)
 
   pui->pbox = GNOME_PROPERTY_BOX (gnome_property_box_new ());
   gtk_window_set_title(GTK_WINDOW(pui->pbox), _("Balsa Preferences"));
-  active_win = GNOME_APP(gnome_mdi_get_active_window(mdi));
+  //  active_win = GNOME_APP(gnome_mdi_get_active_window(mdi));
   gnome_dialog_set_parent(GNOME_DIALOG(pui->pbox), GTK_WINDOW(active_win));
 
   gtk_signal_connect (GTK_OBJECT (pui->pbox), "destroy",
@@ -336,7 +336,8 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
 	break;
       }
 
-  refresh_main_window ();
+  // XXX
+  //  refresh_main_window ();
 
   /*
    * close window and free memory

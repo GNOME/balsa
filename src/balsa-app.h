@@ -23,7 +23,7 @@
 #include <proplist.h>
 #include "mailbox.h"
 #include "balsa-mblist.h"
-#include "index-child.h"
+#include "balsa-index-page.h"
 
 /* global definitions */
 #define BALSA_BUTTON_HEIGHT  30
@@ -58,7 +58,6 @@ extern struct BalsaApplication
   gchar *signature;
   
   BalsaMBList *mblist;
-  IndexChild *current_index_child;
   
   Mailbox *inbox;
   GList *inbox_input;		/* mailboxes such as POP3, etc that will be appending into inbox */

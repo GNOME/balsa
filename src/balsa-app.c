@@ -34,7 +34,7 @@
 #include "main.h"
 #include "mailbox.h"
 #include "save-restore.h"
-#include "index-child.h"
+#include "balsa-index-page.h"
 #include "main-window.h"
 
 /* Global application structure */
@@ -106,7 +106,6 @@ balsa_app_init (void)
   balsa_app.trash = NULL;
 
   balsa_app.mailbox_nodes = g_node_new (NULL);
-  balsa_app.current_index_child = NULL;
 
   balsa_app.new_messages_timer = 0;
   balsa_app.new_messages = 0;

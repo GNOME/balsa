@@ -111,7 +111,7 @@ static void bmbl_row_activated_cb(GtkTreeView * tree_view,
                                   GtkTreeViewColumn * column,
                                   gpointer data);
 static void bmbl_mailbox_changed_cb(LibBalsaMailbox * mailbox,
-				    GtkTreeStore * store);
+				    gpointer data);
 /* helpers */
 static gboolean bmbl_find_all_unread_mboxes_func(GtkTreeModel * model,
                                                  GtkTreePath * path,
@@ -884,7 +884,6 @@ bmbl_row_activated_cb(GtkTreeView * tree_view, GtkTreePath * path,
 
 struct update_mbox_data {
     LibBalsaMailbox *mailbox;
-    GtkTreeStore *store;
     gint total_messages; /* to be compatible with update_mailbox() arg. */
     gboolean notify;
 };
@@ -892,19 +891,18 @@ static void bmbl_update_mailbox(GtkTreeStore * store,
 				LibBalsaMailbox * mailbox,
 				gint total_messages);
 static gboolean
-update_mailbox_idle(struct update_mbox_data*umd)
+update_mailbox_idle(struct update_mbox_data *umd)
 {
     gdk_threads_enter();
-    if (umd->mailbox)
+    if (umd->mailbox) {
         g_object_remove_weak_pointer(G_OBJECT(umd->mailbox),
-                                     (gpointer) &umd->mailbox);
-    if (umd->store)
-        g_object_remove_weak_pointer(G_OBJECT(umd->store),
-                                     (gpointer) &umd->store);
-    if (umd->mailbox && umd->store) {
-        bmbl_update_mailbox(umd->store, umd->mailbox, umd->total_messages);
-	check_new_messages_count(umd->mailbox, umd->notify);
-	g_object_set_data(G_OBJECT(umd->mailbox), "mblist-update", NULL);
+                                     (gpointer) & umd->mailbox);
+        if (balsa_app.mblist_tree_store) {
+            bmbl_update_mailbox(balsa_app.mblist_tree_store, umd->mailbox,
+                                umd->total_messages);
+            check_new_messages_count(umd->mailbox, umd->notify);
+        }
+        g_object_set_data(G_OBJECT(umd->mailbox), "mblist-update", NULL);
     }
     gdk_threads_leave();
     g_free(umd);
@@ -912,11 +910,10 @@ update_mailbox_idle(struct update_mbox_data*umd)
 }
 
 static void
-bmbl_mailbox_changed_cb(LibBalsaMailbox * mailbox, GtkTreeStore * store)
+bmbl_mailbox_changed_cb(LibBalsaMailbox * mailbox, gpointer data)
 {
     struct update_mbox_data *umd;
     g_return_if_fail(mailbox);
-    g_return_if_fail(store);
     if( (umd = g_object_get_data(G_OBJECT(mailbox), "mblist-update")) ) {
         if(!MAILBOX_CLOSED(mailbox))
             umd->total_messages = libbalsa_mailbox_total_messages(mailbox);
@@ -926,8 +923,6 @@ bmbl_mailbox_changed_cb(LibBalsaMailbox * mailbox, GtkTreeStore * store)
     g_object_set_data(G_OBJECT(mailbox), "mblist-update", umd);
     umd->mailbox = mailbox;
     g_object_add_weak_pointer(G_OBJECT(mailbox), (gpointer) &umd->mailbox);
-    umd->store = store;
-    g_object_add_weak_pointer(G_OBJECT(store), (gpointer) &umd->store);
     umd->total_messages = 
         !MAILBOX_CLOSED(mailbox) 
         ? (gint)libbalsa_mailbox_total_messages(mailbox) : -1;
@@ -1136,7 +1131,7 @@ bmbl_real_disconnect_mbnode_signals(BalsaMailboxNode * mbnode,
         g_signal_handlers_disconnect_by_func(mbnode->mailbox,
                                              G_CALLBACK
                                              (bmbl_mailbox_changed_cb),
-                                             model);
+                                             NULL);
 }
 
 /* bmbl_store_redraw_mbnode
@@ -1198,7 +1193,7 @@ bmbl_store_redraw_mbnode(GtkTreeIter * iter, BalsaMailboxNode * mbnode)
 	    /* Now we have a mailbox: */
 	    g_signal_connect(mbnode->mailbox, "changed",
 			     G_CALLBACK(bmbl_mailbox_changed_cb),
-			     balsa_app.mblist_tree_store);
+			     NULL);
 	    /* If necessary, expand rows to expose this mailbox after
 	     * setting its mbnode in the tree-store. */
 	    expose = libbalsa_mailbox_get_exposed(mbnode->mailbox);

@@ -100,7 +100,7 @@ GtkWidget *progress_dialog_bar = NULL;
 GSList *list = NULL;
 static int quiet_check=0;
 
-static void check_messages_thread(gpointer data);
+static void check_messages_thread(GSList * list);
 
 #endif
 static void display_new_mail_notification(int num_new, int has_new);
@@ -126,7 +126,8 @@ static gboolean balsa_window_idle_cb(BalsaWindow * window);
 
 static void check_mailbox_list(GList * list);
 static gboolean mailbox_check_func(GtkTreeModel * model,
-				   GtkTreePath * path, GtkTreeIter * iter);
+				   GtkTreePath * path, GtkTreeIter * iter,
+				   GSList ** list);
 static gboolean imap_check_test(const gchar * path);
 
 static void enable_message_menus(BalsaWindow * window,
@@ -2565,7 +2566,7 @@ check_mailbox_list(GList * mailbox_list)
 /*Callback to check a mailbox in a balsa-mblist */
 static gboolean
 mailbox_check_func(GtkTreeModel * model, GtkTreePath * path,
-		   GtkTreeIter * iter)
+		   GtkTreeIter * iter, GSList ** list)
 {
     BalsaMailboxNode *mbnode;
 
@@ -2577,7 +2578,8 @@ mailbox_check_func(GtkTreeModel * model, GtkTreePath * path,
 	    imap_check_test(mbnode->dir ? mbnode->dir :
 			    libbalsa_mailbox_imap_get_path
 			    (LIBBALSA_MAILBOX_IMAP(mbnode->mailbox)))) {
-	    libbalsa_mailbox_check(mbnode->mailbox);
+	    g_object_ref(mbnode->mailbox);
+	    *list = g_slist_prepend(*list, mbnode->mailbox);
 	}
     }
     g_object_unref(mbnode);
@@ -2666,6 +2668,7 @@ ensure_check_mail_dialog(BalsaWindow * window)
 void
 check_new_messages_real(GtkWidget *widget, gpointer data, int type)
 {
+    GSList *list = NULL;
 #ifdef BALSA_USE_THREADS
     BalsaWindow * window = data;
 
@@ -2688,9 +2691,13 @@ check_new_messages_real(GtkWidget *widget, gpointer data, int type)
          (balsa_app.pwindow_option == UNTILCLOSED && progress_dialog)))
 	ensure_check_mail_dialog(window);
 
+    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
+			   (GtkTreeModelForeachFunc) mailbox_check_func,
+			   &list);
+
     /* initiate threads */
     pthread_create(&get_mail_thread,
-                   NULL, (void *) &check_messages_thread, (void *)0);
+                   NULL, (void *) &check_messages_thread, (void *) list);
     
     /* Detach so we don't need to pthread_join
      * This means that all resources will be
@@ -2704,7 +2711,10 @@ check_new_messages_real(GtkWidget *widget, gpointer data, int type)
 
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
 			   (GtkTreeModelForeachFunc) mailbox_check_func,
-			   NULL);
+			   &list);
+    g_slist_foreach(list, (GFunc) libbalsa_mailbox_check, NULL);
+    g_slist_foreach(list, (GFunc) g_object_unref, NULL);
+    g_slist_free(list);
 #endif
 }
 
@@ -2806,7 +2816,7 @@ message_print_cb(GtkWidget * widget, gpointer data)
 /* this one is called only in the threaded code */
 #ifdef BALSA_USE_THREADS
 static void
-check_messages_thread(gpointer data)
+check_messages_thread(GSList * list)
 {
     /*  
      *  It is assumed that this will always be called as a pthread,
@@ -2822,11 +2832,9 @@ check_messages_thread(gpointer data)
     MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_SOURCE, NULL,
                   "Local Mail", 0, 0);
 
-    if (GTK_IS_TREE_MODEL(balsa_app.mblist_tree_store))
-        gtk_tree_model_foreach((GtkTreeModel *)
-                               balsa_app.mblist_tree_store,
-                               (GtkTreeModelForeachFunc)
-                               mailbox_check_func, NULL);
+    g_slist_foreach(list, (GFunc) libbalsa_mailbox_check, NULL);
+    g_slist_foreach(list, (GFunc) g_object_unref, NULL);
+    g_slist_free(list);
 
     MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_FINISHED, NULL, "Finished",
                   0, 0);

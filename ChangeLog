@@ -1,6 +1,17 @@
 2004-01-18  Pawel Salek
 
 	* libbalsa/html.c: compile against libgtkhtml2.
+	* libbalsa/imap-server.c: remove servers from hash on finalize.
+	* libbalsa/address.c: set fallback charset globally.
+	* libbalsa/mailbox.c: ditto. Make iterators work correctly even
+	for closed mailboxes.
+	* libbalsa/mailbox_imap.c: sanitize subjects.
+	* libbalsa/mailbox_mbox.c: keep quiet if you have nothing to say.
+	* libbalsa/misc.[hc]: support for setting fallback codeset.
+	* libbalsa/rfc3156.c: adjust apriopriately.
+	* libbalsa/source-viewer.c: same.
+	* src/{balsa-message,pref-manager,print,save-restore,sendmsg-window}.c:
+	ditto.
 
 2004-01-17 16:40  PeterB
 

@@ -21,6 +21,7 @@
 #include <string.h>
 #include <gtk/gtk.h>
 #include <gnome.h>
+#include "balsa-app.h"
 #include "addrbook-window.h"
 
 gint delete_event (GtkWidget *, gpointer);
@@ -57,14 +58,14 @@ addyb_item_new (gchar * name, gchar * comments)
 		      "select_row",
 		      GTK_SIGNAL_FUNC (update_addyb_window),
 		      NULL);
-  g_list_append (balsa - app.addressbook_list, new_item);
+  g_list_append (balsa_app.addressbook_list, new_item);
 }
 
 static void
 addyb_email_item_new (addyb_item * ai, gchar * addy)
 {
   gchar *list_item[1];
-  new_item->email = NULL;
+  ai->email = NULL;
   list_item[0] = addy;
   gtk_clist_set_row_data (GTK_CLIST (addyb_list),
 		       gtk_clist_append (GTK_CLIST (email_list), list_item),
@@ -73,7 +74,7 @@ addyb_email_item_new (addyb_item * ai, gchar * addy)
 		      "select_row",
 		      NULL,
 		      NULL);
-  g_list_append (new_item->email, addy);
+  g_list_append (ai->email, addy);
 }
 
 static void

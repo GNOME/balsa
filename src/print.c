@@ -28,30 +28,6 @@
 #include "print.h"
 #include "misc.h"
 
-#ifndef HAVE_GNOME_PRINT
-
-/*
- * PUBLIC: message_print_cb
- *
- * creates print dialog box.  this should be the only routine global to
- * the world.
- */
-void
-message_print_cb(GtkWidget * widget, gpointer cbdata)
-{
-    balsa_information(LIBBALSA_INFORMATION_ERROR, _(
-	"This version of balsa is compiled without gnome-print support.\n"
-	"Printing is not possible."));
-}
-void
-message_print(LibBalsaMessage *msg)
-{
-    balsa_information(LIBBALSA_INFORMATION_ERROR, _(
-	"This version of balsa is compiled without gnome-print support.\n"
-	"Printing is not possible."));
-}
-#else
-
 #include <ctype.h>
 #include <libgnomeprint/gnome-print.h>
 #include <libgnomeprint/gnome-print-dialog.h>
@@ -1162,7 +1138,6 @@ message_print(LibBalsaMessage * msg)
 
     print_info_destroy(pi);
 }
-#endif
 
 
 

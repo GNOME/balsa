@@ -102,8 +102,9 @@ void available_list_select_row_cb(GtkWidget *widget, gint row, gint column,
 
 void selected_list_select_row_cb(GtkWidget *widget,gint row,gint column,
 				 GdkEventButton *event, gpointer data);
-void selected_list_select_row_event_cb(GtkWidget *widget,
-				       GdkEventButton *event, gpointer data);
+gboolean selected_list_select_row_event_cb(GtkWidget * widget,
+                                           GdkEventButton * event,
+                                           gpointer data);
 
 #ifdef __cplusplus
 }

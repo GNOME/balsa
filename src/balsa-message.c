@@ -175,7 +175,8 @@ static void handle_mdn_request(LibBalsaMessage *message);
 static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg, gboolean manual);
 static GtkWidget* create_mdn_dialog (gchar *sender, gchar *mdn_to_address,
 				     LibBalsaMessage *send_msg);
-static void mdn_dialog_delete (GtkWidget *dialog, GdkEvent *event, gpointer user_data);
+static gboolean mdn_dialog_delete(GtkWidget * dialog, GdkEvent * event,
+                                  gpointer user_data);
 static void no_mdn_reply (GtkWidget *widget, gpointer user_data);
 static void send_mdn_reply (GtkWidget *widget, gpointer user_data);
 
@@ -488,6 +489,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 
     if (message == NULL) {
 	gtk_widget_hide(bm->header_text);
+	gtk_widget_hide(bm->part_list);
 	return TRUE;
     }
 
@@ -2887,8 +2889,8 @@ static GtkWidget* create_mdn_dialog (gchar *sender, gchar *mdn_to_address,
   return mdn_dialog;
 }
 
-static void mdn_dialog_delete (GtkWidget *dialog, GdkEvent *event, 
-			       gpointer user_data)
+static gboolean mdn_dialog_delete (GtkWidget *dialog, GdkEvent *event, 
+			           gpointer user_data)
 {
     LibBalsaMessage *send_msg;
 
@@ -2897,6 +2899,8 @@ static void mdn_dialog_delete (GtkWidget *dialog, GdkEvent *event,
     gtk_object_destroy(GTK_OBJECT(send_msg));
     gtk_widget_hide (dialog);
     gtk_object_destroy(GTK_OBJECT(dialog));
+
+    return TRUE;
 }
 
 static void no_mdn_reply (GtkWidget *widget, gpointer user_data)

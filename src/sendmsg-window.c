@@ -1053,7 +1053,7 @@ remove_attachment(GtkWidget * widget, GnomeIconList * ilist)
 
 
 /* ask if an attachment shall be message/external-body */
-static void
+static gboolean
 extbody_dialog_delete(GtkWidget *dialog, GdkEvent *event, 
 		      gpointer user_data)
 {
@@ -1062,6 +1062,8 @@ extbody_dialog_delete(GtkWidget *dialog, GdkEvent *event,
     gtk_object_remove_data(GTK_OBJECT(ilist), "selectednumbertoextbody");
     gtk_widget_hide (dialog);
     gtk_object_destroy(GTK_OBJECT(dialog));
+
+    return TRUE;
 }
 
 static void
@@ -1537,7 +1539,6 @@ insert_selected_messages(BalsaSendmsg *msg, SendType type)
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(msg->text));
     GtkWidget *index =
 	balsa_window_find_current_index(balsa_app.main_window);
-    GString *text = g_string_new("");
     
     if (index) {
 	GList *node;
@@ -1549,13 +1550,10 @@ insert_selected_messages(BalsaSendmsg *msg, SendType type)
 		gtk_ctree_node_get_row_data(ctree, GTK_CTREE_NODE(node->data));
 	    GString *body = quoteBody(msg, message, type);
 	    
-	    g_string_append(text, body->str);
+            gtk_text_buffer_insert_at_cursor(buffer, body->str, body->len);
 	    g_string_free(body, TRUE);
 	}
     }
-    
-    gtk_text_buffer_insert_at_cursor(buffer, text->str, text->len);
-    g_string_free(text, TRUE);
     
     return TRUE;
 }
@@ -1997,27 +1995,19 @@ drag_data_quote(GtkWidget * widget,
                 GtkSelectionData * selection_data,
                 guint info, guint32 time, BalsaSendmsg * bsmsg)
 {
-    if (info == TARGET_MESSAGES) {
-        LibBalsaMessage **message_array =
-            (LibBalsaMessage **) selection_data->data;
-        GString *text = g_string_new(NULL);
-        GtkTextBuffer *buffer =
-            gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
-        GtkTextIter orig_pos;
-
-        gtk_text_buffer_get_iter_at_mark(buffer, &orig_pos,
-                                         gtk_text_buffer_get_insert
-                                         (buffer));
-
-        while (*message_array) {
-            GString *body = quoteBody(bsmsg, *message_array++, SEND_REPLY);
-
-            g_string_append(text, body->str);
-            g_string_free(body, TRUE);
-        }
-        gtk_text_buffer_insert_at_cursor(buffer, text->str, text->len);
-        gtk_text_buffer_place_cursor(buffer, &orig_pos);
-        g_string_free(text, TRUE);
+    LibBalsaMessage **message_array;
+    GtkTextBuffer *buffer;
+    
+    if (info != TARGET_MESSAGES)
+        return;
+    
+    message_array = (LibBalsaMessage **) selection_data->data;
+    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
+    
+    while (*message_array) {
+        GString *body = quoteBody(bsmsg, *message_array++, SEND_REPLY);
+        gtk_text_buffer_insert_at_cursor(buffer, body->str, body->len);
+        g_string_free(body, TRUE);
     }
 }
 
@@ -2030,6 +2020,8 @@ create_text_area(BalsaSendmsg * msg)
     GtkWidget *table;
 
     msg->text = gtk_text_view_new();
+    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(msg->text), 2);
+    gtk_text_view_set_right_margin(GTK_TEXT_VIEW(msg->text), 2);
     /* set the message font */
     gtk_widget_modify_font(msg->text,
                            pango_font_description_from_string
@@ -3344,16 +3336,9 @@ save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static void
 print_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-#ifndef HAVE_GNOME_PRINT
-    balsa_information(
-	LIBBALSA_INFORMATION_ERROR,
-	_("Balsa has been compiled without gnome-print support.\n"
-	  "Printing is not possible."));
-#else
     LibBalsaMessage *msg = bsmsg2message(bsmsg);
     message_print(msg);
     gtk_object_destroy(GTK_OBJECT(msg));
-#endif
     return;
 }
 

@@ -1236,6 +1236,20 @@ balsa_window_close_mbnode(BalsaWindow * window, BalsaMailboxNode * mbnode)
                     mbnode);
 }
 
+static void
+mailbox_tab_size_request(GtkWidget * widget, GtkRequisition * requisition,
+                         gpointer user_data)
+{
+    gint border_width = GTK_CONTAINER(widget)->border_width;
+    GtkRequisition child_requisition;
+    
+    requisition->width = border_width * 2;
+    requisition->height = border_width * 2;
+    gtk_widget_size_request(GTK_BIN(widget)->child, &child_requisition);
+    requisition->width += child_requisition.width;
+    requisition->height += child_requisition.height;
+}
+
 static GtkWidget *
 balsa_notebook_label_new (BalsaMailboxNode* mbnode)
 {
@@ -1248,8 +1262,10 @@ balsa_notebook_label_new (BalsaMailboxNode* mbnode)
        close_pix = gnome_stock_pixmap_widget(GTK_WIDGET(balsa_app.main_window),
                BALSA_PIXMAP_OTHER_CLOSE);
 #else
-       close_pix = gtk_image_new_from_stock(BALSA_PIXMAP_OTHER_CLOSE,
+       close_pix = gtk_image_new_from_stock(GNOME_STOCK_PIXMAP_CLOSE,
                                             GTK_ICON_SIZE_MENU);
+       gtk_signal_connect(GTK_OBJECT(but), "size-request",
+                          GTK_SIGNAL_FUNC(mailbox_tab_size_request), NULL);
 #endif                          /* BALSA_MAJOR < 2 */
 
        gtk_button_set_relief(GTK_BUTTON (but), GTK_RELIEF_NONE);

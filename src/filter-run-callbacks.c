@@ -239,8 +239,10 @@ void available_list_select_row_cb(GtkWidget *widget, gint row, gint column,
 	fr_add_pressed(NULL,data);
 }
 
-void selected_list_select_row_event_cb(GtkWidget *widget,
-				       GdkEventButton *bevent, gpointer data)
+gboolean
+selected_list_select_row_event_cb(GtkWidget *widget,
+                                  GdkEventButton *bevent,
+                                  gpointer data)
 {
     GtkCellType type;
     gint res,row,column;
@@ -248,15 +250,15 @@ void selected_list_select_row_event_cb(GtkWidget *widget,
     GdkBitmap *mask;
     BalsaFilterRunDialog * p;
 
-    if ( bevent == NULL )
-	return;
+    if (bevent == NULL || bevent->button != 1)
+	return FALSE;
 
     p=BALSA_FILTER_RUN_DIALOG(data);
     res = gtk_clist_get_selection_info(p->selected_filters,
                                        bevent->x,
                                        bevent->y, &row, &column);
-    if ((bevent->button != 1) || !res || (column == 0))
-        return;
+    if (!res || column == 0)
+        return FALSE;
     
     type = gtk_clist_get_cell_type(p->selected_filters, row, column);
     
@@ -278,6 +280,8 @@ void selected_list_select_row_event_cb(GtkWidget *widget,
     gtk_signal_emit_stop_by_name(GTK_OBJECT(p->selected_filters),
 				 "button_press_event");
     p->filters_modified=TRUE;
+
+    return TRUE;
 }
 
 void selected_list_select_row_cb(GtkWidget *widget,gint row,gint column,

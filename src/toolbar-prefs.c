@@ -107,17 +107,20 @@ static void remove_toolbar_item(BalsaToolbarType toolbar, int item);
 static void get_toolbar_data(BalsaToolbarType toolbar);
 static void apply_toolbar_prefs(GtkWidget *widget, gpointer data);
 static void wrap_toggled_cb(GtkWidget *widget, gpointer data);
-static void page_active_cb(GtkWidget *widget, GdkEvent *event, gpointer data);
+static gboolean page_active_cb(GtkWidget * widget, GdkEvent * event,
+                               gpointer data);
 static void clist_set_pixmap_from_stock(GtkCList * clist, gint row,
                                         const gchar * stock_id);
 
-static void
+static gboolean
 page_active_cb(GtkWidget *widget, GdkEvent *event, gpointer data)
 {
     GtkToggleButton *btn;
     
     btn=(GtkToggleButton *)data;
     gtk_toggle_button_set_active(btn, word_wrap);
+
+    return FALSE;
 }
 
 static void
@@ -263,7 +266,7 @@ recreate_preview(BalsaToolbarType toolbar, gboolean preview_only)
     GtkWidget *btn;
     int index;
     int i;
-    char *text, *wrap;
+    char *text;
     char *list_data[2];
     int row;
     
@@ -285,9 +288,9 @@ recreate_preview(BalsaToolbarType toolbar, gboolean preview_only)
 	    index=toolbar_items[toolbar][i].id;
 	    if(index == -1)
 		continue;
-	    text=wrap=g_strdup(_(toolbar_buttons[index].button_text));
+	    text = g_strdup(_(toolbar_buttons[index].button_text));
 	    if(!word_wrap)
-		replace_nl_with_space(wrap);
+		replace_nl_with_space(text);
 
 	    btn=gtk_toolbar_append_item(
 		bar, text,
@@ -303,7 +306,7 @@ recreate_preview(BalsaToolbarType toolbar, gboolean preview_only)
 		NULL,
 		NULL);
 	    if(word_wrap) 
-		replace_nl_with_space(wrap);
+		replace_nl_with_space(text);
 
 	    toolbar_items[toolbar][i].widget=btn;
 	    if(!preview_only) {
@@ -337,7 +340,7 @@ recreate_preview(BalsaToolbarType toolbar, gboolean preview_only)
 				   GTK_CLIST(toolbar_pages[toolbar].destination), 1));
     
     gtk_widget_show_all(toolbar_pages[toolbar].preview);
-    
+
 }
 
 static void
@@ -493,7 +496,7 @@ add_button_cb(GtkWidget *widget, gpointer data)
     int row;
     char *list_data[2];
     GdkPixmap *pixmap, *mask;
-    char *text, *wrap;
+    char *text;
     int i;
 
     toolbar=GPOINTER_TO_INT(data);
@@ -536,12 +539,8 @@ add_button_cb(GtkWidget *widget, gpointer data)
 	toolbar_items[toolbar][row].id=add_item;
     }
 
-    text=wrap=g_strdup(_(toolbar_buttons[add_item].button_text));
-    while(*wrap) {
-	if(*wrap == '\n')
-	    *wrap=' ';
-	++wrap;
-    }
+    text = g_strdup(_(toolbar_buttons[add_item].button_text));
+    replace_nl_with_space(text);
 
     gtk_clist_set_text(list, row, 1, text);
     g_free(text);
@@ -562,7 +561,7 @@ populate_list(GtkWidget *list, int toolbar)
 {
     int i, j, row;
     char *tmp[2];
-    char *text, *wrap;
+    char *text;
     char **legal;
 
     legal=get_legal_toolbar_buttons(toolbar);
@@ -595,12 +594,8 @@ populate_list(GtkWidget *list, int toolbar)
 	    clist_set_pixmap_from_stock(GTK_CLIST(list), row,
                                         toolbar_buttons[i].pixmap_id);
 	}
-	text = wrap = g_strdup(_(toolbar_buttons[i].button_text));
-	while(*wrap) {
-	    if(*wrap == '\n')
-		*wrap=' ';
-	    ++wrap;
-	}
+	text = g_strdup(_(toolbar_buttons[i].button_text));
+        replace_nl_with_space(text);
 	gtk_clist_set_text(GTK_CLIST(list), row, 1, text);
 	gtk_clist_set_row_data(GTK_CLIST(list), row,
 			       (gpointer)i);

@@ -1,3 +1,19 @@
+2002-04-10 Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-mblist.c: squash reason of a warning message.
+	* src/balsa-message.c: mdn_dialog_delete should return a gboolean
+	value.
+	* src/filter-run-callbacks.c, src/filter-run.h:
+	selected_list_select_row_event_cb should return a gboolean value.
+	* src/main-window.c: make notebook tabs a more modest size.
+	* src/print.c: gnome-print support uncoditionally compiled in.
+	* src/sendmsg-window.c: extbody_dialog_delete should return a
+	gboolean value. Fix GtkTextIter error when quoting by dragging,
+	and simplify quoting messages.
+
+	* src/toolbar-prefs.c: page_active_cb should return a gboolean value;
+	use replace_nl_with_space() uniformly.
+	
 2002-04-07  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/balsa-message.c: GtkViewport is a thinner wrapper than a

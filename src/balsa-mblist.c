@@ -144,7 +144,10 @@ balsa_mblist_get_type(void)
 GtkWidget *
 balsa_mblist_new()
 {
-    BalsaMBList *new = gtk_type_new(balsa_mblist_get_type());
+    BalsaMBList *new = g_object_new(balsa_mblist_get_type(),
+                                    "n_columns", 3,
+                                    "tree_column", 0,
+                                    NULL);
     GtkCList *clist = GTK_CLIST(new);
     BalsaMBList *tree = BALSA_MBLIST(new);
     
@@ -513,10 +516,6 @@ balsa_mblist_init(BalsaMBList * tree)
     GdkFont* font;
     gint text_height;
 
-    gtk_object_set(GTK_OBJECT(tree),
-                   "GtkCTree::n_columns", 3,
-                   "tree_column", 0,
-                   NULL);
 #if BALSA_MAJOR < 2
     ctree->tree_column = 0;
 #endif                          /* BALSA_MAJOR < 2 */

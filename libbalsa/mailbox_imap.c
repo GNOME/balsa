@@ -285,6 +285,9 @@ libbalsa_mailbox_imap_finalize(GObject * object)
     g_free(mailbox->path); mailbox->path = NULL;
 
     if(remote->server) {
+        g_signal_handlers_disconnect_by_func(remote->server,
+                                             server_host_settings_changed_cb,
+                                             remote);
 	g_object_unref(G_OBJECT(remote->server));
 	remote->server = NULL;
     }

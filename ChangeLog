@@ -1,3 +1,8 @@
+2004-01-25 20:07  PeterB
+
+	* libbalsa/address-entry.c, libbalsa/send.c, src/balsa-mblist.c,
+	src/main.c, src/sendmsg-window.c: plug memory leaks.
+
 2004-01-25  Pawel Salek
 
 	Do not store authorization data in ImapMboxHandle.

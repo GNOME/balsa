@@ -668,12 +668,6 @@ config_global_load(void)
         g_free(tmp);
     }
 
-    /* ... Message window title format */
-    g_free(balsa_app.message_title_format);
-    balsa_app.message_title_format =
-        gnome_config_get_string("MessageTitleFormat="
-                                DEFAULT_MESSAGE_TITLE_FORMAT);
-
     balsa_app.expand_tree = gnome_config_get_bool("ExpandTree=false");
 
     {                             /* scope */
@@ -1094,8 +1088,6 @@ config_save(void)
     gnome_config_set_string("DateFormat", balsa_app.date_string);
     gnome_config_set_int("ShownHeaders", balsa_app.shown_headers);
     gnome_config_set_string("SelectedHeaders", balsa_app.selected_headers);
-    gnome_config_set_string("MessageTitleFormat",
-                            balsa_app.message_title_format);
     gnome_config_set_bool("ExpandTree", balsa_app.expand_tree);
     gnome_config_set_int("ThreadingType",
 			 libbalsa_mailbox_get_threading_type(NULL));

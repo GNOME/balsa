@@ -273,7 +273,6 @@ extern struct BalsaApplication {
     ShownHeaders shown_headers;
     gboolean show_all_headers;
     gchar *selected_headers;
-    gchar *message_title_format;
     gboolean expand_tree;
     gboolean show_mblist;
     gboolean show_notebook_tabs;

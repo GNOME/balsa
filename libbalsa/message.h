@@ -333,8 +333,6 @@ gboolean libbalsa_message_postpone(LibBalsaMessage * message,
 /*
  * misc message releated functions
  */
-gchar *libbalsa_message_title(LibBalsaMessage * message,
-                              const gchar * format);
 gchar **libbalsa_create_hdr_pair(const gchar * name, gchar * value);
 
 const gchar *libbalsa_message_pathname(LibBalsaMessage * message);

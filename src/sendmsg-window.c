@@ -2035,21 +2035,23 @@ drag_data_quote(GtkWidget * widget,
 static GtkWidget *
 create_text_area(BalsaSendmsg * msg)
 {
+    GtkTextView *text_view;
     GtkTextBuffer *buffer;
     GtkWidget *table;
 
     msg->text = gtk_text_view_new();
-    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(msg->text), 2);
-    gtk_text_view_set_right_margin(GTK_TEXT_VIEW(msg->text), 2);
+    text_view = GTK_TEXT_VIEW(msg->text);
+    gtk_text_view_set_left_margin(text_view, 2);
+    gtk_text_view_set_right_margin(text_view, 2);
     /* set the message font */
     gtk_widget_modify_font(msg->text,
                            pango_font_description_from_string
                            (balsa_app.message_font));
-    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(msg->text));
+    buffer = gtk_text_view_get_buffer(text_view);
     gtk_text_buffer_create_tag(buffer, "soft", NULL);
     gtk_text_buffer_create_tag(buffer, "url", NULL);
-    gtk_text_view_set_editable(GTK_TEXT_VIEW(msg->text), TRUE);
-    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(msg->text), GTK_WRAP_WORD);
+    gtk_text_view_set_editable(text_view, TRUE);
+    gtk_text_view_set_wrap_mode(text_view, GTK_WRAP_WORD);
 
     table = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(table),
@@ -2405,18 +2407,27 @@ set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message,
 static gboolean
 sw_wrap_timeout_cb(BalsaSendmsg * msg)
 {
-    GtkTextBuffer *buffer =
-        gtk_text_view_get_buffer(GTK_TEXT_VIEW(msg->text));
+    GtkTextView *text_view;
+    GtkTextBuffer *buffer;
     GtkTextIter now;
 
+    gdk_threads_enter();
+
+    text_view = GTK_TEXT_VIEW(msg->text);
+    buffer = gtk_text_view_get_buffer(text_view);
     gtk_text_buffer_get_iter_at_mark(buffer, &now,
                                      gtk_text_buffer_get_insert(buffer));
 
     msg->wrap_timeout_id = 0;
     g_signal_handler_block(buffer, msg->changed_sig_id);
     libbalsa_unwrap_buffer(buffer, &now, 1);
-    libbalsa_wrap_view(GTK_TEXT_VIEW(msg->text), balsa_app.wraplength);
+    libbalsa_wrap_view(text_view, balsa_app.wraplength);
     g_signal_handler_unblock(buffer, msg->changed_sig_id);
+    gtk_text_view_scroll_to_mark(text_view,
+                                 gtk_text_buffer_get_insert(buffer),
+                                 0, FALSE, 0, 0);
+
+    gdk_threads_leave();
 
     return FALSE;
 }
@@ -3561,8 +3572,8 @@ select_all_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static void
 wrap_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    GtkTextBuffer *buffer =
-        gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
+    GtkTextView *text_view = GTK_TEXT_VIEW(bsmsg->text);
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(text_view);
     GtkTextIter start, end;
 
     gtk_text_buffer_get_bounds(buffer, &start, &end);
@@ -3570,7 +3581,7 @@ wrap_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     if (bsmsg->flow) {
         g_signal_handler_block(buffer, bsmsg->changed_sig_id);
         libbalsa_unwrap_buffer(buffer, &start, -1);
-        libbalsa_wrap_view(GTK_TEXT_VIEW(bsmsg->text), balsa_app.wraplength);
+        libbalsa_wrap_view(text_view, balsa_app.wraplength);
         g_signal_handler_unblock(buffer, bsmsg->changed_sig_id);
     } else {
         GtkTextIter now;
@@ -3590,6 +3601,9 @@ wrap_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
         gtk_text_buffer_get_iter_at_offset(buffer, &now, pos);
         gtk_text_buffer_place_cursor(buffer, &now);
     }
+    gtk_text_view_scroll_to_mark(text_view,
+                                 gtk_text_buffer_get_insert(buffer),
+                                 0, FALSE, 0, 0);
 }
 
 static void
@@ -3877,6 +3891,7 @@ set_locale(GtkWidget * w, BalsaSendmsg * msg, gint idx)
 static void
 spell_check_cb(GtkWidget * widget, BalsaSendmsg * msg)
 {
+    GtkTextView *text_view = GTK_TEXT_VIEW(msg->text);
     BalsaSpellCheck *sc;
 
     if (msg->spell_checker) {
@@ -3894,7 +3909,7 @@ spell_check_cb(GtkWidget * widget, BalsaSendmsg * msg)
     g_object_add_weak_pointer(G_OBJECT(sc), (gpointer) &msg->spell_checker);
 
     /* configure the spell checker */
-    balsa_spell_check_set_text(sc, GTK_TEXT_VIEW(msg->text));
+    balsa_spell_check_set_text(sc, text_view);
     balsa_spell_check_set_language(sc, msg->locale);
 
     balsa_spell_check_set_character_set(sc, msg->charset);
@@ -3907,7 +3922,7 @@ spell_check_cb(GtkWidget * widget, BalsaSendmsg * msg)
     balsa_spell_check_set_ignore_length(sc, balsa_app.ignore_size);
     g_signal_connect(G_OBJECT(sc), "response",
                      G_CALLBACK(sw_spell_check_response), msg);
-    gtk_text_view_set_editable(GTK_TEXT_VIEW(msg->text), FALSE);
+    gtk_text_view_set_editable(text_view, FALSE);
 
     balsa_spell_check_start(sc);
 }

@@ -2983,8 +2983,19 @@ static void add_multipart(BalsaMessage *bm, LibBalsaMessageBody *parent)
             if(body) {
                 add_body(bm, body);
                 for(body=body->next; body; body=body->next) {
-                    if(libbalsa_message_body_is_inline(body))
-                        add_body(bm, body);
+#ifdef HAVE_GPGME
+		    /* signature parts may be attachments, sowe need a special
+		       check here... */
+		    gchar * part_type =
+			libbalsa_message_body_get_content_type(body);
+		    if(libbalsa_message_body_is_inline(body) ||
+		       !g_ascii_strcasecmp(part_type, "application/pgp-signature"))
+			add_body(bm, body);
+		    g_free(part_type);
+#else
+		    if(libbalsa_message_body_is_inline(body))
+			add_body(bm, body);
+#endif
                 }
             }
         }

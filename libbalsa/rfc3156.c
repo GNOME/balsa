@@ -364,9 +364,8 @@ libbalsa_body_check_signature(LibBalsaMessageBody* body)
     gpgme_error_t err;
     gpgme_data_t sig, plain;
     MailDataMBox plainStream;
-    FILE *sigStream;
     LibBalsaSignatureInfo *sig_status;
-    BODY *msg_body, *sign_body;
+    BODY *msg_body;
     LibBalsaMessage *msg;
     struct gpgme_data_cbs cbs = 
 	{ (gpgme_data_read_cb_t)read_cb_MailDataMBox, /* read method */
@@ -431,24 +430,21 @@ libbalsa_body_check_signature(LibBalsaMessageBody* body)
 	return FALSE;
     }
 
-    /* create the signature data stream */
-    if (body->next->decrypt_file)
-	sigStream = safe_fopen(body->next->decrypt_file, "r");
-    else
-	sigStream = 
-	    libbalsa_mailbox_get_message_stream(msg->mailbox, msg);
-    sign_body = body->next->mutt_body;
-    if ((err = gpgme_data_new_from_filepart(&sig, NULL, sigStream,
-					    sign_body->offset,
-					    sign_body->length)) != 
+    /*
+     * Create the signature data stream. Save the part to a temp file to avoid
+     * using gpgme_data_new_from_filepart() which usually needs LFS 2b enabled
+     * since gpgme 0.4.5. Furthermore, this will enable processing S/MIME
+     * signatures in the future as they are are base64 encoded.
+     */
+    libbalsa_message_body_save_temporary(body->next, NULL);
+    if ((err = gpgme_data_new_from_file(&sig, body->next->temp_filename, 1)) != 
 	GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("%s: could not get data from mailbox file: %s"), 
+			     _("%s: could not get data from file: %s"), 
 			     gpgme_strsource(err), gpgme_strerror(err));
 	gpgme_data_release(plain);
 	gpgme_release(ctx);
 	fclose(plainStream.mailboxFile);
-	fclose(sigStream);
 	return FALSE;
     }
 
@@ -466,7 +462,6 @@ libbalsa_body_check_signature(LibBalsaMessageBody* body)
     gpgme_data_release(plain);
     gpgme_release(ctx);
     fclose(plainStream.mailboxFile);
-    fclose(sigStream);
 
     return TRUE;
 }
@@ -627,12 +622,18 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, GtkWindow *parent)
     gpgme_ctx_t ctx;
     gpgme_error_t err;
     gpgme_data_t cipher, plain;
+    MailDataMBox cipherStream;
     PassphraseCB cb_data;
     BODY *cipher_body, *result;
     gchar fname[PATH_MAX];
-    FILE *tempfp, *src;
+    FILE *tempfp;
     gchar *plainData;
     size_t plainSize;
+    struct gpgme_data_cbs cbs = 
+		{ (gpgme_data_read_cb_t)read_cb_MailDataMBox, /* read method */
+		  NULL,                                       /* write method */
+		  NULL,                                       /* seek method */
+		  cb_data_release };                          /* release method */
 
     /* paranoia checks */
     g_return_val_if_fail(body != NULL, NULL);
@@ -643,12 +644,6 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, GtkWindow *parent)
     if (gpg_updates_trustdb(TRUE))
 	return body;
 
-    /* get the encrypted message stream */
-    if (body->decrypt_file)
-	src = safe_fopen(body->decrypt_file, "r");
-    else
-	src = libbalsa_mailbox_get_message_stream(message->mailbox, message);
-    
     /* try to create a gpgme context */
     if ((err = gpgme_new(&ctx)) != GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
@@ -665,16 +660,29 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, GtkWindow *parent)
     cb_data.title = _("Enter passphrase to decrypt message");
     gpgme_set_passphrase_cb(ctx, get_passphrase_cb, &cb_data);
     
-    /* create the cipher data stream */
+    /*
+     * create the cipher data stream using the callback function set to avoid
+     * gpgme_data_new_from_filepart() which may or may not work depending upon
+     * the LFS setting in balsa and gpgme and the gpgme version...
+     */
+    if (body->decrypt_file)
+	cipherStream.mailboxFile = safe_fopen(body->decrypt_file, "r");
+    else
+	cipherStream.mailboxFile =
+	    libbalsa_mailbox_get_message_stream(message->mailbox, message);
     cipher_body = body->next->mutt_body;
-    if ((err = gpgme_data_new_from_filepart(&cipher, NULL, src, 
-					    cipher_body->offset,
-					    cipher_body->length)) != GPG_ERR_NO_ERROR) {
+    fseek(cipherStream.mailboxFile, cipher_body->offset, 0);
+    cipherStream.bytes_left = cipher_body->offset - cipher_body->hdr_offset +
+	cipher_body->length;
+    cipherStream.last_was_cr = FALSE; /* not needed for this op... */
+    
+    if ((err = gpgme_data_new_from_cbs(&cipher, &cbs, &cipherStream)) !=
+	GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 			     _("%s: could not get data from mailbox file: %s"), 
 			     gpgme_strsource(err), gpgme_strerror(err));
 	gpgme_release(ctx);
-	fclose(src);
+	fclose(cipherStream.mailboxFile);
 	return body;
     }
 
@@ -685,7 +693,7 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, GtkWindow *parent)
 			     gpgme_strsource(err), gpgme_strerror(err));
 	gpgme_data_release(cipher);
 	gpgme_release(ctx);
-	fclose(src);
+	fclose(cipherStream.mailboxFile);
 	return body;
     }
 
@@ -698,10 +706,10 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, GtkWindow *parent)
 	gpgme_data_release(plain);
 	gpgme_data_release(cipher);
 	gpgme_release(ctx);
-	fclose(src);
+	fclose(cipherStream.mailboxFile);
 	return body;
     }
-    fclose(src);
+    fclose(cipherStream.mailboxFile);
     gpgme_data_release(cipher);
 
     /* save the decrypted data to a file */

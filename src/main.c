@@ -446,7 +446,11 @@ main(int argc, char *argv[])
 #ifdef HAVE_GPGME
     /* initialise the gpgme library */
     g_message("init gpgme version %s", gpgme_check_version(NULL));
-#endif
+#ifdef ENABLE_NLS
+    gpgme_set_locale(NULL, LC_CTYPE, setlocale(LC_CTYPE, NULL));
+    gpgme_set_locale(NULL, LC_MESSAGES, setlocale(LC_MESSAGES, NULL));
+#endif /* ENABLE_NLS */
+#endif /* HAVE_GPGME */
 
 #ifdef BALSA_USE_THREADS
     /* initiate thread mutexs, variables */

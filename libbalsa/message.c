@@ -1131,7 +1131,7 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
             message->in_reply_to = g_strdup(p);
 #endif
         } else if (!message->in_reply_to
-                   && g_strncasecmp("In-Reply-To:", tmp->data, 12) == 0) {
+                   && g_strncasecmp("In-Reply-To", tmp->data, 12) == 0) {
             gchar *p = tmp->data + 12;
             while (*p != '\0' && *p != '<')
                 p++;

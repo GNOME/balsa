@@ -378,10 +378,8 @@ balsa_app_init(void)
     balsa_app.address_book_list = NULL;
     balsa_app.default_address_book = NULL;
 
-#ifdef BALSA_SHOW_ALL
     /* Filters */
     balsa_app.filters=NULL;
-#endif
 
     /* spell check */
     balsa_app.module = SPELL_CHECK_MODULE_ASPELL;
@@ -627,8 +625,10 @@ destroy_mailbox_node(GNode* node, GNode* root)
 
     g_return_val_if_fail(mbnode, FALSE);
 		     
-    if (mbnode->mailbox)
+    if (mbnode->mailbox) {
 	balsa_window_close_mbnode(balsa_app.main_window, mbnode);
+        mbnode->mailbox = NULL;
+    }
     mblist_remove_mailbox_node(balsa_app.mblist, 
 			       mbnode);
     gtk_object_destroy((GtkObject*)mbnode); 

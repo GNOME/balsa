@@ -1,7 +1,13 @@
-%define config_opts --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --mandir=%{_mandir} --libdir=%{_libdir} --bindir=%{_bindir} --includedir=%{_includedir} --datadir=%{_datadir} --enable-threads --disable-system-install --disable-more-warnings --disable-pcre --enable-all
-# we disable PCRE because it introduces dependency on KDE packages,
-# it is better to reduce number of dependencies in the standard build
-# and link against glibc version of regex library.
+#redhat and mdk are exclusive
+%define redhat 1
+%define mdk    0
+%if %redhat
+%define config_opts --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --mandir=%{_mandir} --libdir=%{_libdir} --bindir=%{_bindir} --includedir=%{_includedir} --datadir=%{_datadir} --enable-threads --disable-system-install --disable-more-warnings
+%endif
+%if %mdk || 1
+%define config_opts --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --mandir=%{_mandir} --libdir=%{_libdir} --bindir=%{_bindir} --includedir=%{_includedir} --datadir=%{_datadir} --enable-threads --disable-more-warnings --enable-gtkhtml --with-ssl
+%endif
+
 Summary:   Balsa Mail Client
 Name:      balsa
 Version:   @BALSA_VERSION@
@@ -9,7 +15,7 @@ Release:   1
 Copyright: GPL
 Group:     Applications/Internet
 Source0:   %{name}-%{version}.tar.bz2
-URL:       http://www.balsa.net/
+URL:       http://balsa.gnome.org/
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Packager: Pawel Salek <pawsa@theochem.kth.se>
 Requires: gtk+ >= 1.2.7
@@ -23,8 +29,16 @@ BuildRequires:  libesmtp >= 0.8.6
 BuildRequires:  gnome-libs-devel >= 1.2.13
 BuildRequires:  gtk+-devel >= 1.2.7
 BuildRequires:  gdk-pixbuf-devel
+%if %redhat
 BuildRequires:  gnome-vfs-devel
 BuildRequires:  pspell-devel
+BuildRequires:  gdbm-devel
+%endif
+%if %mdk
+BuildRequires:  libgnome-vfs0-devel
+BuildRequires:  libpspell4-devel
+BuildRequires:  libgdbm2-devel
+%endif
 
 %description
 Balsa is an e-mail reader.  This client is part of the GNOME
@@ -57,15 +71,7 @@ fi
 %install
 rm -rf "$RPM_BUILD_ROOT"
 
-
-make prefix=$RPM_BUILD_ROOT%{_prefix} \
-    sysconfdir=$RPM_BUILD_ROOT%{_sysconfdir} \
-    bindir=$RPM_BUILD_ROOT%{_bindir} \
-    libdir=$RPM_BUILD_ROOT%{_libdir} \
-    includedir=$RPM_BUILD_ROOT%{_includedir} \
-    datadir=$RPM_BUILD_ROOT%{_datadir} \
-    mandir=$RPM_BUILD_ROOT%{_mandir} \
-    infodir=$RPM_BUILD_ROOT%{_infodir} install
+make DESTDIR="$RPM_BUILD_ROOT" install
 
 %find_lang %{name}
 
@@ -79,8 +85,8 @@ make prefix=$RPM_BUILD_ROOT%{_prefix} \
 %doc docs/vconvert.awk docs/pine2vcard
 %{_bindir}/balsa
 %{_datadir}/gnome/apps/Internet/balsa.desktop
-%{_datadir}/gnome/help/balsa-manual/*
-%{_datadir}/balsa/*
+%{_datadir}/gnome/help/balsa/*
+%{_datadir}/pixmaps/*
 %{_datadir}/sounds/balsa/*
 %{_mandir}/man1/balsa.1*
 %config %{_sysconfdir}/sound/events/*

@@ -56,10 +56,8 @@
 #include "threads.h"
 #endif
 
-#ifdef BALSA_SHOW_ALL
 #include "filter.h"
 #include "filter-funcs.h"
-#endif
 
 #include "libinit_balsa/init_balsa.h"
 
@@ -200,13 +198,11 @@ static void mark_all_cb(GtkWidget * widget, gpointer);
 
 static void select_part_cb(BalsaMessage * bm, gpointer data);
 
-#ifdef BALSA_SHOW_ALL
 static void find_real(BalsaIndex * bindex,gboolean again);
 static void find_cb(GtkWidget * widget, gpointer data);
 static void find_again_cb(GtkWidget * widget, gpointer data);
 static void filter_dlg_cb(GtkWidget * widget, gpointer data);
 static void filter_export_cb(GtkWidget * widget, gpointer data);
-#endif
 
 static void mailbox_close_cb(GtkWidget * widget, gpointer data);
 static void mailbox_tab_close_cb(GtkWidget * widget, gpointer data);
@@ -356,7 +352,6 @@ static GnomeUIInfo edit_menu[] = {
     GNOMEUIINFO_MENU_COPY_ITEM(copy_cb, NULL),
 #define MENU_EDIT_SELECT_ALL_POS 1
     GNOMEUIINFO_MENU_SELECT_ALL_ITEM(select_all_cb, NULL),
-#ifdef BALSA_SHOW_ALL
     GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_MENU_FIND_ITEM(find_cb, NULL),
     GNOMEUIINFO_MENU_FIND_AGAIN_ITEM(find_again_cb, NULL),
@@ -369,7 +364,6 @@ static GnomeUIInfo edit_menu[] = {
                            filter_dlg_cb, GNOME_STOCK_MENU_PROP),
     GNOMEUIINFO_ITEM_STOCK(N_("_Export filters"), N_("Export filters as Sieve scripts"),
 			   filter_export_cb, GNOME_STOCK_MENU_PROP),
-#endif
     GNOMEUIINFO_END
 };
 
@@ -819,6 +813,7 @@ balsa_window_new()
     appbar =
         GNOME_APPBAR(gnome_appbar_new(TRUE, TRUE, GNOME_PREFERENCES_USER));
     gnome_app_set_statusbar(GNOME_APP(window), GTK_WIDGET(appbar));
+    gtk_progress_bar_set_pulse_step(gnome_appbar_get_progress(appbar), 0.01);
     gtk_object_set_data(GTK_OBJECT(window), APPBAR_KEY, appbar);
     balsa_app.appbar = appbar;
     gnome_app_install_appbar_menu_hints(GNOME_APPBAR(balsa_app.appbar),
@@ -1930,7 +1925,7 @@ mail_progress_notify_cb()
     MailThreadMessage **currentpos;
     void *msgbuffer;
     uint count;
-    gfloat percent;
+    gfloat fraction;
     GtkWidget *errorbox;
 
     msgbuffer = g_malloc(MSG_BUFFER_SIZE);
@@ -2001,21 +1996,22 @@ mail_progress_notify_cb()
             break;
 
         case MSGMAILTHREAD_PROGRESS:
-            percent = (gfloat) threadmessage->num_bytes /
+            fraction = (gfloat) threadmessage->num_bytes /
                 (gfloat) threadmessage->tot_bytes;
-            if (percent > 1.0 || percent < 0.0) {
+            if (fraction > 1.0 || fraction < 0.0) {
                 if (balsa_app.debug)
                     fprintf(stderr,
-                            "progress bar percentage out of range %f\n",
-                            percent);
-                percent = 1.0;
+                            "progress bar fraction out of range %f\n",
+                            fraction);
+                fraction = 1.0;
             }
             if (progress_dialog)
-                gtk_progress_bar_update(GTK_PROGRESS_BAR(progress_dialog_bar),
-					percent);
+                gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR
+                                              (progress_dialog_bar),
+					      fraction);
             else
                 gnome_appbar_set_progress_percentage(balsa_app.appbar, 
-                                                     percent);
+                                                     fraction);
             break;
         case MSGMAILTHREAD_FINISHED:
 
@@ -2024,8 +2020,8 @@ mail_progress_notify_cb()
             } else if (progress_dialog) {
                 gtk_label_set_text(GTK_LABEL(progress_dialog_source),
                                    _("Finished Checking."));
-                gtk_progress_bar_update(GTK_PROGRESS_BAR
-                                        (progress_dialog_bar), 0.0);
+                gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR
+                                              (progress_dialog_bar), 0.0);
             } else {
                 gnome_appbar_refresh(balsa_app.appbar);
                 gnome_appbar_set_progress_percentage(balsa_app.appbar, 0.0);
@@ -2067,7 +2063,7 @@ send_progress_notify_cb()
     SendThreadMessage **currentpos;
     void *msgbuffer;
     uint count;
-    float percent;
+    float fraction;
 
     msgbuffer = malloc(2049);
 
@@ -2104,20 +2100,21 @@ send_progress_notify_cb()
             break;
 
         case MSGSENDTHREADPROGRESS:
-            percent = threadmessage->of_total;
+            fraction = threadmessage->of_total;
 
-            if (percent == 0 && send_dialog) {
+            if (fraction == 0 && send_dialog) {
                 gtk_label_set_text(GTK_LABEL(send_progress_message),
                                    threadmessage->message_string);
                 gtk_widget_show_all(send_dialog);
             }
 
             if (send_dialog)
-                gtk_progress_bar_update(GTK_PROGRESS_BAR(send_dialog_bar),
-                                        percent);
+                gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR
+                                              (send_dialog_bar),
+                                              fraction);
             else
                 gnome_appbar_set_progress_percentage(balsa_app.appbar,
-                                                     percent);
+                                                     fraction);
 
             /* display progress x of y, y = of_total */
             break;
@@ -2610,8 +2607,6 @@ address_book_cb(GtkWindow *widget, gpointer data)
     gtk_widget_show(GTK_WIDGET(ab));
 }
 
-#ifdef BALSA_SHOW_ALL
-
 static GtkToggleButton*
 add_check_button(GtkWidget* table, const gchar* label, gint x, gint y)
 {
@@ -2806,7 +2801,6 @@ filter_export_cb(GtkWidget * widget, gpointer data)
 {
     filters_export_dialog();
 }
-#endif
 
 /* closes the mailbox on the notebook's active page */
 static void
@@ -3251,17 +3245,8 @@ notebook_drag_motion_cb(GtkWidget * widget, GdkDragContext * context,
 gint
 balsa_window_progress_timeout(gpointer user_data) 
 {
-    gfloat new_val;
-    GtkAdjustment* adj;
-    
     gdk_threads_enter();
-    /* calculate the new value of the progressbar */
-    new_val = gtk_progress_get_value(GTK_PROGRESS(user_data)) + 1;
-    adj = GTK_PROGRESS(user_data)->adjustment;
-    if (new_val > adj->upper) {
-        new_val = adj->lower;
-    }
-    gtk_progress_set_value(GTK_PROGRESS(user_data), new_val);
+    gtk_progress_bar_pulse(GTK_PROGRESS_BAR(user_data));
     gdk_threads_leave();
 
     /* return true so it continues to be called */
@@ -3282,25 +3267,17 @@ balsa_window_increase_activity(BalsaWindow* window)
     gint in_use = 0;
     gint activity_handler;
     guint activity_counter = 0;
-    GtkProgress *progress_bar;
-    GtkAdjustment* adj;
-    
+    GtkProgressBar *progress_bar;
 
     progress_bar =
-        GTK_PROGRESS(gnome_appbar_get_progress
-                     (GNOME_APPBAR(GNOME_APP(window)->statusbar)));
+        GTK_PROGRESS_BAR(gnome_appbar_get_progress
+                         (GNOME_APPBAR(GNOME_APP(window)->statusbar)));
     in_use = GPOINTER_TO_INT(gtk_object_get_data(GTK_OBJECT(progress_bar), 
                                                   "in_use"));
     
     if (!in_use) {
         gtk_object_set_data(GTK_OBJECT(progress_bar), "in_use", 
                             GINT_TO_POINTER(BALSA_PROGRESS_ACTIVITY));
-
-        gtk_progress_set_activity_mode(GTK_PROGRESS(progress_bar), 1);
-        gtk_object_get(GTK_OBJECT(progress_bar), "adjustment", &adj, NULL);
-        adj->lower = 0;
-        adj->upper = 100;
-        adj->value = 0;
 
         /* add a timeout to make the activity bar move */
         activity_handler = gtk_timeout_add(100, balsa_window_progress_timeout,
@@ -3337,11 +3314,11 @@ balsa_window_decrease_activity(BalsaWindow* window)
     gint in_use;
     gint activity_handler;
     guint activity_counter = 0;
-    GtkProgress* progress_bar;
+    GtkProgressBar *progress_bar;
     
     progress_bar =
-        GTK_PROGRESS(gnome_appbar_get_progress
-                     (GNOME_APPBAR(GNOME_APP(window)->statusbar)));
+        GTK_PROGRESS_BAR(gnome_appbar_get_progress
+                         (GNOME_APPBAR(GNOME_APP(window)->statusbar)));
     in_use = GPOINTER_TO_INT(
         gtk_object_get_data(GTK_OBJECT(progress_bar), "in_use"));
 
@@ -3366,15 +3343,13 @@ balsa_window_decrease_activity(BalsaWindow* window)
             gtk_timeout_remove(activity_handler);
             activity_handler = 0;
             
-            gtk_progress_set_activity_mode(progress_bar, 
-                                           activity_counter);
-            gtk_adjustment_set_value(progress_bar->adjustment, 0);
             gtk_object_set_data(GTK_OBJECT(progress_bar), 
                                 "activity_handler",
                                 GINT_TO_POINTER(activity_handler));
             gtk_object_set_data(GTK_OBJECT(progress_bar),
                                 "in_use", 
                                 GINT_TO_POINTER(BALSA_PROGRESS_NONE));
+            gtk_progress_bar_set_fraction(progress_bar, 0);
         }
         /* make sure to store the counter value */
         gtk_object_set_data(GTK_OBJECT(progress_bar), 
@@ -3401,13 +3376,11 @@ gboolean
 balsa_window_setup_progress(BalsaWindow* window, gfloat upper_bound)
 {
     gint in_use;
-    GtkProgress* progress_bar;
-    GtkAdjustment* adj;
-    
+    GtkProgressBar *progress_bar;
 
     progress_bar =
-        GTK_PROGRESS(gnome_appbar_get_progress
-                     (GNOME_APPBAR(GNOME_APP(window)->statusbar)));
+        GTK_PROGRESS_BAR(gnome_appbar_get_progress
+                         (GNOME_APPBAR(GNOME_APP(window)->statusbar)));
     in_use = GPOINTER_TO_INT(
         gtk_object_get_data(GTK_OBJECT(progress_bar), "in_use"));
 
@@ -3420,13 +3393,6 @@ balsa_window_setup_progress(BalsaWindow* window, gfloat upper_bound)
                         "in_use", 
                         GINT_TO_POINTER(in_use));
     
-    /* set up the adjustment */
-    gtk_progress_set_activity_mode(progress_bar, 0);
-    adj = progress_bar->adjustment;
-    adj->lower = 0;
-    adj->upper = upper_bound;
-    adj->value = 0;
-
     return TRUE;
 }
 
@@ -3440,12 +3406,11 @@ void
 balsa_window_clear_progress(BalsaWindow* window)
 {
     gint in_use = 0;
-    GtkProgress* progress_bar;
-    GtkAdjustment* adj;
+    GtkProgressBar *progress_bar;
 
     progress_bar =
-        GTK_PROGRESS(gnome_appbar_get_progress
-                     (GNOME_APPBAR(GNOME_APP(window)->statusbar)));
+        GTK_PROGRESS_BAR(gnome_appbar_get_progress
+                         (GNOME_APPBAR(GNOME_APP(window)->statusbar)));
     in_use = GPOINTER_TO_INT(
         gtk_object_get_data(GTK_OBJECT(progress_bar), "in_use"));
 
@@ -3453,11 +3418,8 @@ balsa_window_clear_progress(BalsaWindow* window)
     if (in_use != BALSA_PROGRESS_INCREMENT)
         return;
 
-    adj = progress_bar->adjustment;
-    adj->lower = 0;
-    adj->upper = 100;
-    gtk_adjustment_set_value(adj, 0);
-    
+    gtk_progress_bar_set_fraction(progress_bar, 0);
+
     in_use = BALSA_PROGRESS_NONE;
     gtk_object_set_data(GTK_OBJECT(progress_bar), 
                         "in_use", 
@@ -3476,13 +3438,11 @@ void
 balsa_window_increment_progress(BalsaWindow* window)
 {
     gint in_use;
-    gfloat new_val;
-    GtkProgress* progress_bar;
-    GtkAdjustment* adj;
+    GtkProgressBar *progress_bar;
     
     progress_bar =
-        GTK_PROGRESS(gnome_appbar_get_progress
-                     (GNOME_APPBAR(GNOME_APP(window)->statusbar)));
+        GTK_PROGRESS_BAR(gnome_appbar_get_progress
+                         (GNOME_APPBAR(GNOME_APP(window)->statusbar)));
     in_use = GPOINTER_TO_INT(
         gtk_object_get_data(GTK_OBJECT(progress_bar), "in_use"));
 
@@ -3490,25 +3450,7 @@ balsa_window_increment_progress(BalsaWindow* window)
     if (in_use != BALSA_PROGRESS_INCREMENT)
         return;
 
-    new_val = gtk_progress_get_value(progress_bar) + 1;
-    adj = progress_bar->adjustment;
-    
-    /* check for hitting the upper limit, if there pin it */
-    if (new_val > adj->upper) {
-        new_val = adj->upper;
-    }
-    
-    gtk_adjustment_set_value(adj, new_val);
-#ifdef BALSA_USE_THREADS
-    /* run some gui events to make sure the progress bar gets drawn to
-     * screen; it's not needed when we compile in MT-enabled mode because
-     * the events will be processed by the main thread as soon as it gets
-     * the gdk_lock. Or so I believed. */
-#else
-    while (gtk_events_pending()) {
-        gtk_main_iteration_do(FALSE);
-    }
-#endif
+    gtk_progress_bar_pulse(progress_bar);
 }
 
 

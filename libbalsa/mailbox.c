@@ -39,9 +39,7 @@
 #include <libgnome/gnome-config.h> 
 #include <libgnome/gnome-i18n.h> 
 
-#ifdef BALSA_SHOW_ALL
 #include "mailbox-filter.h"
-#endif
 #include "libbalsa_private.h"
 
 /* GTK_CLASS_TYPE for 1.2<->1.3/2.0 GTK+ compatibility */
@@ -277,10 +275,7 @@ libbalsa_mailbox_init(LibBalsaMailbox * mailbox)
     mailbox->readonly = FALSE;
     mailbox->mailing_list_address = NULL;
 
-#ifdef BALSA_SHOW_ALL
     mailbox->filters=NULL;
-#endif
-
     mailbox->identity_name=NULL;
 }
 

@@ -1,47 +1,37 @@
 bin_PROGRAMS = balsa
 
-filter_src = \
-	filter-edit.h		\
-	filter-edit-callbacks.c	\
-	filter-edit-dialog.c	\
-	filter-export-callbacks.c \
-	filter-export-dialog.c	\
-	filter-export.h		\
-	filter-run.h		\
-	filter-run-callbacks.c	\
-	filter-run-dialog.c
-
-if BALSA_SHOW_ALL
-extra_src  = $(filter_src)
-else
-extra_src  = 
-endif
-
-EXTRA_DIST = $(filter_src)
-
 balsa_BASE_SRCLIST =	\
-	address-book.c		\
-	address-book.h		\
 	address-book-config.c	\
 	address-book-config.h	\
+	address-book.c		\
+	address-book.h		\
 	balsa-app.c		\
 	balsa-app.h		\
 	balsa-icons.c		\
 	balsa-icons.h		\
-	balsa-index.c		\
-	balsa-index.h		\
 	balsa-index-threading.c	\
 	balsa-index-threading.h	\
+	balsa-index.c		\
+	balsa-index.h		\
 	balsa-mblist.c		\
 	balsa-mblist.h		\
 	balsa-message.c		\
 	balsa-message.h		\
 	expand-alias.c		\
 	expand-alias.h		\
+	filter-edit-callbacks.c	\
+	filter-edit-dialog.c	\
+	filter-edit.h		\
+	filter-export-callbacks.c \
+	filter-export-dialog.c	\
+	filter-export.h		\
+	filter-run-callbacks.c	\
+	filter-run-dialog.c	\
+	filter-run.h		\
 	folder-conf.c		\
 	folder-conf.h		\
-	information-dialog.h	\
 	information-dialog.c	\
+	information-dialog.h	\
 	mailbox-conf.c		\
 	mailbox-conf.h		\
 	mailbox-node.c		\
@@ -55,22 +45,22 @@ balsa_BASE_SRCLIST =	\
 	pref-manager.h		\
 	print.c			\
 	print.h			\
+	quote-color.c		\
+	quote-color.h		\
 	save-restore.c		\
 	save-restore.h		\
 	sendmsg-window.c	\
 	sendmsg-window.h	\
-	store-address.h		\
-	store-address.c		\
-	quote-color.c		\
-	quote-color.h		\
-	threads.h		\
 	spell-check.c		\
 	spell-check.h		\
-	toolbar-prefs.c		\
-	toolbar-prefs.h		\
+	store-address.c		\
+	store-address.h		\
+	threads.h		\
 	toolbar-factory.c	\
 	toolbar-factory.h	\
-	$(extra_src)
+	toolbar-prefs.c		\
+	toolbar-prefs.h
+
 
 balsa_IDL_SRCLIST = # balsa-common.c balsa-skels.c balsa-stubs.c		
 

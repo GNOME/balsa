@@ -95,10 +95,8 @@ struct _LibBalsaMailbox {
     /* Mailing list contained in this mailbox. Or NULL */
     LibBalsaAddress *mailing_list_address;
 
-#ifdef BALSA_SHOW_ALL
     /* Associated filters (struct mailbox_filter) */
     GSList * filters;
-#endif
 
     /* Default identity associated with the mailbox */
     gchar *identity_name;

@@ -102,9 +102,7 @@ extern "C" {
     void balsa_index_select_previous(BalsaIndex *);
     void balsa_index_select_row(BalsaIndex * bindex, gint row);
 
-#ifdef BALSA_SHOW_ALL
     void balsa_index_find(BalsaIndex * bindex,gint op,GSList * conditions,gboolean previous);
-#endif /* BALSA_SHOW_ALL */
 
 /* retrieve the selection */
     void balsa_index_get_selected_rows(BalsaIndex * bindex,

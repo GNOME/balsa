@@ -37,6 +37,7 @@
 #include "filter-file.h"
 #include "balsa-app.h"
 #include "save-restore.h"
+#include "mailbox-filter.h"
 
 /* Defined in filter-edit-dialog.c*/
 extern option_list fe_search_type[4];
@@ -1035,7 +1036,7 @@ gboolean update_filters_mailbox(GNode * node,gpointer throwaway)
          * Note : deleted filters are also removed */
         if (!filters_names_changes) 
             return FALSE;
-        tmp=mailbox_filters_section_lookup(mbnode->mailbox->url);
+        tmp=mailbox_filters_section_lookup(mbnode->mailbox->url ? mbnode->mailbox->url : mbnode->mailbox->name);
         if (tmp) {
             gchar **filters_names=NULL;
             gboolean def;

@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -43,9 +43,8 @@
 #include "src/mailbox-conf.h"
 #endif
 
-#ifdef BALSA_SHOW_ALL
 #include "mailbox-filter.h"
-#endif
+#include "filter-file.h"
 
 #include <libgnome/gnome-config.h> 
 #include <libgnome/gnome-i18n.h> 
@@ -120,7 +119,7 @@ libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 * mailbox)
     LibBalsaMailboxRemote *remote;
     mailbox->check = FALSE;
     mailbox->delete_from_server = FALSE;
-	mailbox->inbox = NULL;
+    mailbox->inbox = NULL;
 
     remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
     remote->server =
@@ -300,15 +299,17 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     }	
     libbalsa_mailbox_open(tmp_mailbox);
     if((m->inbox) && (tmp_mailbox->messages)) {
+       GSList * filters;
 
-#ifdef BALSA_SHOW_ALL
-       GSList * filters= 
-           libbalsa_mailbox_filters_when(LIBBALSA_MAILBOX(m)->filters,
-                                         FILTER_WHEN_INCOMING);
+       /* Load associated filters if needed */
+       if (!mailbox->filters)                                
+           config_mailbox_filters_load(mailbox);
+
+       filters = libbalsa_mailbox_filters_when(LIBBALSA_MAILBOX(m)->filters,
+                                               FILTER_WHEN_INCOMING);
 
        /* We apply filter if needed */
        filters_run_on_messages(filters, tmp_mailbox->message_list);
-#endif /*BALSA_SHOW_ALL*/
 
 	if (!libbalsa_messages_move(tmp_mailbox->message_list, m->inbox)) {    
 	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,

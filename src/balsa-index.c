@@ -48,9 +48,7 @@
 #include "sendmsg-window.h"
 #include "store-address.h"
 
-#ifdef BALSA_SHOW_ALL
 #include "filter.h"
-#endif /* BALSA_SHOW_ALL */
 
 /* constants */
 #define BUFFER_SIZE 1024
@@ -101,11 +99,8 @@ static void balsa_index_check_visibility(GtkCList * clist,
                                          gfloat row_align);
 static GtkCTreeNode *balsa_index_find_node(BalsaIndex * bindex,
                                            gboolean previous,
-                                           LibBalsaMessageFlag flag
-#ifdef BALSA_SHOW_ALL
-					   ,gint op,GSList * conditions
-#endif
-					   );
+                                           LibBalsaMessageFlag flag,
+					   gint op,GSList * conditions);
 static void balsa_index_select_next_threaded(BalsaIndex * bindex);
 static void balsa_index_transfer_messages(BalsaIndex * bindex,
                                           LibBalsaMailbox * mailbox);
@@ -530,11 +525,8 @@ void
 balsa_index_set_first_new_message(BalsaIndex * bindex)
 {
     GtkCTreeNode *node =
-        balsa_index_find_node(bindex, FALSE, LIBBALSA_MESSAGE_FLAG_NEW
-#ifdef BALSA_SHOW_ALL
-			      , FILTER_NOOP, NULL
-#endif /* BALSA_SHOW_ALL */
-			      );
+        balsa_index_find_node(bindex, FALSE, LIBBALSA_MESSAGE_FLAG_NEW,
+			      FILTER_NOOP, NULL);
     if (node)
         bindex->first_new_message =
             LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data
@@ -551,11 +543,9 @@ struct BalsaIndexScanInfo {
     GtkCTreeNode *next;                 /* returns first matching
                                            after selection */
     GtkCTreeNode *last;                 /* returns last matching */
-#ifdef BALSA_SHOW_ALL
     gint conditions_op;
     /* This list is not owned by the struct, so it is not its responsability to free it */
     GSList * conditions;
-#endif /* BALSA_SHOW_ALL */
 };
 
 /* 
@@ -971,7 +961,6 @@ balsa_index_scan_node(GtkCTree * ctree, GtkCTreeNode * node,
          * are looking for flagged messages, we want those that match,
          * viewable or not */
 	gboolean found = (b->flag & message->flags);
-#if BALSA_SHOW_ALL
 	/* FIXME: simplify this. It  is not clear what is the scanning
            search  condition combinations  are  valid: matching  flag,
            matching filter, or something else. This makes this chunk
@@ -980,9 +969,6 @@ balsa_index_scan_node(GtkCTree * ctree, GtkCTreeNode * node,
              gtk_ctree_is_viewable(ctree, node))
 	    || (b->conditions && 
                 match_conditions(b->conditions_op,b->conditions,message));
-#else
-	found |= (b->flag == 0 && gtk_ctree_is_viewable(ctree, node));
-#endif
         if (found) {
             if (b->first == NULL)
                 /* first matching message */
@@ -1024,11 +1010,7 @@ balsa_index_select_node(BalsaIndex * bindex, GtkCTreeNode * node)
  */
 static GtkCTreeNode *
 balsa_index_find_node(BalsaIndex * bindex, gboolean previous,
-                      LibBalsaMessageFlag flag
-#ifdef BALSA_SHOW_ALL
-		      ,gint op,GSList * conditions
-#endif /* BALSA_SHOW_ALL */
-		      )
+                      LibBalsaMessageFlag flag, gint op, GSList* conditions)
 {
     GtkCTreeNode *node;
     struct BalsaIndexScanInfo *bi;
@@ -1040,10 +1022,8 @@ balsa_index_find_node(BalsaIndex * bindex, gboolean previous,
         GTK_CLIST(bindex->ctree)->selection
         ? g_list_last(GTK_CLIST(bindex->ctree)->selection)->data : NULL;
     bi->flag = flag;
-#ifdef BALSA_SHOW_ALL
     bi->conditions_op=op;
     bi->conditions=conditions;
-#endif /* BALSA_SHOW_ALL */
     gtk_ctree_pre_recursive(bindex->ctree, NULL, (GtkCTreeFunc)
                             balsa_index_scan_node, bi);
     node = previous ? bi->previous : bi->next;
@@ -1059,51 +1039,35 @@ void
 balsa_index_select_next(BalsaIndex * bindex)
 {
     balsa_index_select_node(bindex, 
-			    balsa_index_find_node(bindex, 
-						  FALSE, 0
-#ifdef BALSA_SHOW_ALL
-						  , FILTER_NOOP, NULL
-#endif /* BALSA_SHOW_ALL */
-						  ));
+			    balsa_index_find_node(bindex, FALSE, 0, 
+                                                  FILTER_NOOP, NULL));
 }
 
 void
 balsa_index_select_previous(BalsaIndex * bindex)
 {
     balsa_index_select_node(bindex,
-			    balsa_index_find_node(bindex, 
-						  TRUE, 0
-#ifdef BALSA_SHOW_ALL
-						  , FILTER_NOOP, NULL
-#endif /* BALSA_SHOW_ALL */
-						  ));
+			    balsa_index_find_node(bindex, TRUE, 0,
+						  FILTER_NOOP, NULL));
 }
 
 void
 balsa_index_select_next_unread(BalsaIndex * bindex)
 {
     balsa_index_select_node(bindex,
-			    balsa_index_find_node(bindex, 
-						  FALSE, LIBBALSA_MESSAGE_FLAG_NEW
-#ifdef BALSA_SHOW_ALL
-						  , FILTER_NOOP, NULL
-#endif /* BALSA_SHOW_ALL */
-						  ));
+			    balsa_index_find_node(bindex, FALSE, 
+                                                  LIBBALSA_MESSAGE_FLAG_NEW,
+						  FILTER_NOOP, NULL));
 }
 
 void
 balsa_index_select_next_flagged(BalsaIndex * bindex)
 {
     balsa_index_select_node(bindex,
-			    balsa_index_find_node(bindex, 
-						  FALSE, LIBBALSA_MESSAGE_FLAG_FLAGGED
-#ifdef BALSA_SHOW_ALL
-						  , FILTER_NOOP, NULL
-#endif /* BALSA_SHOW_ALL */
-						  ));
+			    balsa_index_find_node(bindex, FALSE, 
+                                                  LIBBALSA_MESSAGE_FLAG_FLAGGED,
+						  FILTER_NOOP, NULL));
 }
-
-#ifdef BALSA_SHOW_ALL
 
 void
 balsa_index_find(BalsaIndex * bindex,gint op,GSList* conditions,
@@ -1114,7 +1078,6 @@ balsa_index_find(BalsaIndex * bindex,gint op,GSList* conditions,
                                                   conditions));
 }
 
-#endif /* BALSA_SHOW_ALL */
 /* balsa_index_scan_selection:
  * callback for pre-recursive search for next message after moving one
  * or more message out of the mailbox

@@ -53,12 +53,8 @@ void config_address_book_delete(LibBalsaAddressBook * ab);
 
 void config_identities_save(void);
 
-#ifdef BALSA_SHOW_ALL
 void config_filters_save(void);
-void config_mailbox_filters_load(LibBalsaMailbox * mbox);
 void config_mailbox_filters_save(LibBalsaMailbox * mbox);
-gchar * mailbox_filters_section_lookup(const gchar * url);
 void clean_filter_config_section(const gchar * name);
-#endif
 
 #endif				/* __SAVE_RESTORE_H__ */

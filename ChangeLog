@@ -1,3 +1,17 @@
+2002-04-28  Pawel Salek <pawsa@theochem.kth.se>
+
+	* configure.in, {libbalsa,src}/Makefile.am, libbalsa/mailbox.[ch]:
+	* libbalsa/mailbox_{local,pop3}.c, libbalsa/message.c: 
+	* src/balsa-app.[hc], src/balsa-index.[hc], src/mailbox-node.c: 
+	* src/main-window.c, src/save-restore.[hc], balsa.spec.in:
+	filters/searching not optional any longer.
+ 	Emmanuel Allaud's patch (+minor modifications) to fix filtering on
+ 	receiving 	
+
+	* src/main-window.c: do not use deprecated API (Peter Bloomfield).
+	* src/balsa-app.c: do not crash when replying a message from a
+	mailbox tree that was rescanned in meantime (Peter).
+	
 2002-04-24  Pawel Salek <pawsa@theochem.kth.se>
 
 	* NEWS, configure.in: release balsa-2.0.0

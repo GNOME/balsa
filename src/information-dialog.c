@@ -145,6 +145,9 @@ balsa_information_list(LibBalsaInformationType type, char *msg)
     gint new_row;
 
     outstr[0] = msg;
+    /* this may break UNICODE strings */
+    for(;*msg; msg++)
+	if(*msg == '\n') *msg= ' ';
 
     if (information_list == NULL) {
 	GtkWidget *information_dialog;

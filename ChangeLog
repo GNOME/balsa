@@ -6,6 +6,11 @@
 	* src/main-window.c: fix non-MT build.
 	* src/main.c: fix non-NLS build.
 
+	* help/C/balsa.sgml: some basic info about different mailbox types.
+	More inline text is needed.
+	* src/folder-conf.c: folder fixes from Peter Bloomfield.
+	* src/information-dialog.c: break lines for status.
+
 2001-07-25  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/pop3.c: use pclose() on popen()-ed FILE.

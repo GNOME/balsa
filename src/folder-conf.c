@@ -184,38 +184,43 @@ typedef struct {
 } SubfolderDialogData;
 
 static void
-validate_sub_folder(GtkWidget *w, SubfolderDialogData * fcw)
+validate_sub_folder(GtkWidget * w, SubfolderDialogData * fcw)
 {
-    gboolean sensitive = TRUE;
     BalsaMailboxNode *mn = fcw->mbnode;
-
-    /* We'll allow a null parent name, although some IMAP servers
+    /*
+     * Allow typing in the parent_folder entry box only if we already
+     * have the server information in mn:
+     */
+    gboolean have_server = (mn && mn->server
+			    && mn->server->type == LIBBALSA_SERVER_IMAP);
+    gtk_editable_set_editable(GTK_EDITABLE(fcw->parent_folder),
+			      have_server);
+    /*
+     * We'll allow a null parent name, although some IMAP servers
      * will deny permission:
      */
-    /* if (!*gtk_entry_get_text(GTK_ENTRY(fcw->parent_folder)))	   */
-    /*     sensitive = FALSE;					   */
-    /* else if (!*gtk_entry_get_text(GTK_ENTRY(fcw->folder_name))) */
-    if (!*gtk_entry_get_text(GTK_ENTRY(fcw->folder_name)))
-	sensitive = FALSE;
-    else if (!mn || !mn->server || mn->server->type != LIBBALSA_SERVER_IMAP)
-	sensitive = FALSE;
-    gnome_dialog_set_sensitive(fcw->dialog, 0, sensitive);
+    gnome_dialog_set_sensitive(fcw->dialog, 0, have_server &&
+			       *gtk_entry_get_text(GTK_ENTRY
+						   (fcw->folder_name)));
 }
 
 /* callbacks for a `Browse...' button: */
 static void
-browse_button_select_row_cb(GtkCTree *ctree, GList *node, gint column,
+browse_button_select_row_cb(GtkCTree * ctree, GList * node, gint column,
 			    gpointer data)
 {
     BalsaMailboxNode *mbnode = gtk_ctree_node_get_row_data(ctree,
 							   GTK_CTREE_NODE
 							   (node));
     if (mbnode) {
-	SubfolderDialogData *fcw = (SubfolderDialogData *)data;
+	SubfolderDialogData *fcw = (SubfolderDialogData *) data;
 	gchar *path = mbnode->dir;
 	fcw->mbnode = mbnode;
 	if (path)
 	    gtk_entry_set_text(GTK_ENTRY(fcw->parent_folder), path);
+	gnome_dialog_close(GNOME_DIALOG
+			   (gtk_widget_get_ancestor
+			    (GTK_WIDGET(ctree), GTK_TYPE_WINDOW)));
     }
 }
 
@@ -287,7 +292,7 @@ browse_button_cb(GtkWidget * widget, gpointer data)
     GtkWidget *ctree = GTK_WIDGET(gtk_ctree_new(1, 0));
 
     dialog = gnome_dialog_new(_("Select parent folder"),
-			      GNOME_STOCK_BUTTON_OK, NULL);
+			      GNOME_STOCK_BUTTON_CANCEL, NULL);
     gnome_dialog_set_parent(GNOME_DIALOG(dialog),
 			    GTK_WINDOW(balsa_app.main_window));
     scroll = gtk_scrolled_window_new (NULL, NULL);
@@ -335,9 +340,10 @@ browse_button_cb(GtkWidget * widget, gpointer data)
    If mn is NULL, setup it with default values for folder creation.
 */
 void
-folder_conf_imap_sub_node(BalsaMailboxNode *mn)
+folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 {
-    static GnomeHelpMenuEntry help_entry = { NULL, "subfolder-config.html" };
+    static GnomeHelpMenuEntry help_entry =
+	{ NULL, "folder-config.html#SUBFOLDER-CONFIG" };
     GtkWidget *frame, *table, *subtable, *browse_button;
     SubfolderDialogData fcw;
     guint keyval;

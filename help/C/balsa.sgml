@@ -247,7 +247,11 @@
 			    Open a dialog box to create a new mailbox.
 			    There are various items like this,
 			    corresponding to the different types of
-			    mailbox that Balsa supports.
+			    mailbox that Balsa supports. See the <link
+			    linkend="mbox-formats">discussion of
+			    different mailbox formats</link> and their
+			    advantages and disadvantages.
+
 			  </para>
 			</listitem>
 			
@@ -2613,6 +2617,45 @@
 	</varlistentry>
       </variablelist>
     </sect2>
+  </sect1>
+
+  <sect1 id="mbox-formats">
+    <title>Available mailbox formats</title>
+    <para>Balsa handles several mailbox formats, including mbox</para>
+    <para>The further information can be found in the following
+    documents:
+<itemizedlist>
+	<listitem>
+	  <para>Benchmarking mbox versus maildir
+<ulink type="http" url="http://www.courier-mta.org/mbox-vs-maildir/">http://www.courier-mta.org/mbox-vs-maildir/</ulink></para>
+	</listitem>
+
+	<listitem>
+	  <para>Mailbox Format Characteristics
+<ulink type="http"
+       url="http://www.washington.edu/imap/documentation/formats.txt.html">http://www.washington.edu/imap/documentation/formats.txt.html</ulink></para>
+	</listitem>
+
+	<listitem>
+	  <para>maildir(5) manual page (from qmail)
+<ulink type="http" url="http://www.qmail.org/qmail-manual-html/man5/maildir.html">http://www.qmail.org/qmail-manual-html/man5/maildir.html</ulink></para>
+	</listitem>
+
+	<listitem>
+	  <para>Using maildir format
+<ulink type="http" url="http://cr.yp.to/proto/maildir.html">http://cr.yp.to/proto/maildir.html</ulink></para>
+	</listitem>
+
+	<listitem>
+	  <para>mbox(5) manual page (from qmail)
+<ulink type="http" url="http://www.qmail.org/qmail-manual-html/man5/mbox.html">http://www.qmail.org/qmail-manual-html/man5/mbox.html</ulink></para>
+	</listitem>
+
+	<listitem>
+	  <para>Mailbox formats (from Mail-Administrator HOWTO)
+<ulink type="http" url="http://linuxdocs.org/HOWTOs/Mail-Administrator-HOWTO-3.html#ss3.5">http://linuxdocs.org/HOWTOs/Mail-Administrator-HOWTO-3.html#ss3.5</ulink></para>
+	</listitem>
+      </itemizedlist></para>
   </sect1>
 
   <sect1 id="common-tasks">

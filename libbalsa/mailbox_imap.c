@@ -1928,9 +1928,10 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
             libbalsa_message_set_headers_from_string(message, hdr);
             message->has_all_headers = 1;
         }
+        return TRUE;
     }
 
-    return TRUE;
+    return FALSE;
 }
 
 static void

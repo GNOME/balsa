@@ -148,7 +148,8 @@ gboolean
 libbalsa_message_body_save_temporary(LibBalsaMessageBody * body,
 				     gchar * prefix)
 {
-    /* FIXME: Role our own mktemp that doesn't need a large array (use g_strdup_printf) */
+    /* FIXME: Role our own mktemp that doesn't need a large array (use
+       g_strdup_printf) */
     if (body->temp_filename == NULL) {
 	gchar tmp_file_name[PATH_MAX + 1];
 
@@ -199,7 +200,7 @@ libbalsa_message_body_save(LibBalsaMessageBody * body, gchar * prefix,
 	return FALSE;
 
     enc = mutt_get_parameter ("charset", body->mutt_body->parameter);
-    if(!g_strcasecmp(enc,"utf-8"))
+    if(enc && !g_strcasecmp(enc,"UTF-8"))
 	s.flags = M_CHARCONV;
     else
 	s.flags = 0;

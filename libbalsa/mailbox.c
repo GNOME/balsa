@@ -735,11 +735,19 @@ void
 libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno)
 {
     GtkTreeIter iter;
+    GtkTreePath *path;
 
     iter.user_data = g_node_new(GUINT_TO_POINTER(seqno));
-    g_node_append(mailbox->msg_tree, iter.user_data);
+
+    /* Invalidate iters. */
+    mailbox->stamp++;
     iter.stamp = mailbox->stamp;
-    g_signal_emit_by_name(mailbox, "row-inserted", NULL, &iter);
+    path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
+
+    /* Grow msg_tree before emitting the signal. */
+    g_node_append(mailbox->msg_tree, iter.user_data);
+    g_signal_emit_by_name(mailbox, "row-inserted", path, &iter);
+    gtk_tree_path_free(path);
 }
 
 struct remove_data { unsigned seqno; GNode *node; };
@@ -769,12 +777,16 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
                     decrease_post, &dt);
     iter.user_data = dt.node;
     g_assert(iter.user_data != NULL);
+
+    /* Invalidate iters. */
+    mailbox->stamp++;
     iter.stamp = mailbox->stamp;
     path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
-    g_signal_emit_by_name(mailbox, "row-deleted", path, &iter);
-    mailbox->total_messages--;
-    gtk_tree_path_free(path);
+
+    /* Prune msg_tree before emitting the signal. */
     g_node_destroy(dt.node);
+    g_signal_emit_by_name(mailbox, "row-deleted", path);
+    gtk_tree_path_free(path);
 }
 
 
@@ -805,10 +817,6 @@ messages_status_changed_cb(LibBalsaMailbox * mb, GList * messages,
 
         if (new_state) {
             /* messages have been deleted */
-            /* we'll decrement mb->total_messages in
-	     * libbalsa_mailbox_msgno_removed:
-	     * mb->total_messages -= nb_in_list; */
-
             if (new_in_list) {
                 mb->unread_messages -= new_in_list;
                 if (mb->unread_messages <= 0)
@@ -816,7 +824,6 @@ messages_status_changed_cb(LibBalsaMailbox * mb, GList * messages,
             }
         } else {
             /* message has been undeleted */
-            mb->total_messages += nb_in_list;
             if (new_in_list) {
                 mb->unread_messages += new_in_list;
                 libbalsa_mailbox_set_unread_messages_flag(mb, TRUE);
@@ -964,12 +971,24 @@ GMimeStream *
 libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox,
 				    LibBalsaMessage * message)
 {
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
-    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), NULL);
-    g_return_val_if_fail(message->mailbox == mailbox, NULL);
+    GMimeStream *mime_stream;
 
-    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->get_message_stream(mailbox,
-								   message);
+    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), NULL);
+    g_return_val_if_fail(mailbox != NULL || message->mime_msg != NULL,
+			 NULL);
+
+    if (mailbox)
+	mime_stream = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->
+	    get_message_stream(mailbox, message);
+    else {
+	mime_stream = g_mime_stream_mem_new();
+	g_mime_message_write_to_stream(message->mime_msg, mime_stream);
+	g_mime_stream_seek(mime_stream, 0, GMIME_STREAM_SEEK_SET);
+	g_mime_stream_set_bounds(mime_stream, 0,
+				 g_mime_stream_length(mime_stream));
+    }
+
+    return mime_stream;
 }
 
 void

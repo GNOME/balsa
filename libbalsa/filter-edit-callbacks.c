@@ -42,7 +42,7 @@ void fe_dialog_button_clicked(GtkWidget *widget,
     /* destroy the dialog */
     gtk_widget_destroy(fe_dialog);
     /* more destruction is needed.  But that is for later */
-}
+} /* end fe_dialog_button_clicked */
 	
 
 /*
@@ -59,4 +59,52 @@ void fe_checkbutton_toggled(GtkWidget *widget,
 	gtk_notebook_set_page(GTK_NOTEBOOK(fe_type_notebook),
 			      (gint)data);
     }
-}
+} /* end fe_checkbutton_toggled() */
+
+
+/*
+ * fe_add_pressed()
+ *
+ * Callback for the "Add" button for the regex type
+ */
+void fe_add_pressed(GtkWidget *widget,
+		    gpointer throwaway)
+{
+    gchar *text;
+    GList *list;
+    GtkWidget *list_item;
+
+    list = NULL;
+
+    text = gtk_entry_get_text(GTK_ENTRY(fe_type_regex_entry));
+
+    if ((text == NULL) || (strlen(text) == 0))
+	return;
+    list_item = gtk_list_item_new_with_label(text);
+    gtk_widget_show(list_item);
+    list = g_list_append(list,
+			 list_item);
+    gtk_list_append_items(GTK_LIST(fe_type_regex_list),
+			  list);
+    gtk_entry_set_text(GTK_ENTRY(fe_type_regex_entry), "");
+} /* end fe_add_pressed() */
+
+
+/*
+ * fe_remove_pressed()
+ * 
+ * Callback for the "remove" button of the regex type
+ */
+void fe_remove_pressed(GtkWidget *widget,
+		       gpointer throwaway)
+{
+    GList *selected;
+
+    selected = (GList *)GTK_LIST(fe_type_regex_list)->selection;
+
+    if (! selected)
+	return;
+
+    gtk_list_remove_items(GTK_LIST(fe_type_regex_list),
+			  selected);
+} /* end fe_remove_pressed() */

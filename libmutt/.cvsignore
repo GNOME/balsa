@@ -2,3 +2,12 @@ Makefile
 Makefile.in
 .deps
 libmutt.a
+configure
+config.log
+config.status
+muttconfig.h
+libtool
+.libs
+_libs
+config.cache
+aclocal.m4

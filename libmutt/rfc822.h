@@ -19,7 +19,7 @@
 #ifndef rfc822_h
 #define rfc822_h
 
-#include "config.h"
+#include "muttconfig.h"
 
 /* possible values for RFC822Error */
 enum

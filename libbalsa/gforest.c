@@ -18,14 +18,14 @@
  */
 
 #include <glib.h>
-#include "gforrest.h"
+#include "gforest.h"
 
 GForest *
 g_forest_new (void)
 {
   GForest *gf;
 
-  gf = g_malloc (sizeof (GForrest));
+  gf = g_malloc (sizeof (GForest));
   gf->key = NULL;
   gf->data = NULL;
   gf->list = NULL;

@@ -6,5 +6,5 @@ libmutt_a_SOURCES = \
 	rfc1524.c rfc2047.c rfc822.c score.c sendlib.c sigblock.c \
 	sort.c system.c thread.c
 
-INCLUDES=-I. -Irx $(GNOME_INCLUDEDIR) -DLIBMUTT=1 -DHAVE_FTRUNCATE=1 -DSHAREDIR=\"/etc\" -DRETSIGTYPE=int -DEXECSHELL=\"/bin/sh\"
-
+CPPFLAGS=-DSHAREDIR=\"$(sharedir)\" -DLIBMUTT -DVERSION=\"$(VERSION)\"
+INCLUDES=-I.

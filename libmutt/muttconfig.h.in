@@ -1,9 +1,16 @@
+/* muttconfig.h.in.  Generated automatically from configure.in by autoheader.  */
 
-/* Enable debugging info */
-#define DEBUG
+/* Define to `int' if <sys/types.h> doesn't define.  */
+#undef pid_t
 
-/* Disable the X-Mailer header? */
-#undef NO_XMAILER
+/* Define as the return type of signal handlers (int or void).  */
+#undef RETSIGTYPE
+
+/* Define if you have the ANSI C header files.  */
+#undef STDC_HEADERS
+
+/* Define if `sys_siglist' is declared by <signal.h>.  */
+#undef SYS_SIGLIST_DECLARED
 
 /* What is your domain name? */
 #undef DOMAIN
@@ -44,9 +51,6 @@
 /* Should I just use the domain name? (--enable-hidden-host) */
 #undef HIDDEN_HOST
 
-/* Does your system have the srand48() suite? */
-#undef HAVE_SRAND48
-
 /* Where to find sendmail on your system */
 #undef SENDMAIL
 
@@ -77,3 +81,45 @@
 
 /* Does your system have the vsnprintf() call? */
 #undef HAVE_VSNPRINTF
+
+/* The number of bytes in a long.  */
+#undef SIZEOF_LONG
+
+/* Define if you have the ftruncate function.  */
+#undef HAVE_FTRUNCATE
+
+/* Define if you have the regcomp function.  */
+#undef HAVE_REGCOMP
+
+/* Define if you have the setegid function.  */
+#undef HAVE_SETEGID
+
+/* Define if you have the srand48 function.  */
+#undef HAVE_SRAND48
+
+/* Define if you have the strcasecmp function.  */
+#undef HAVE_STRCASECMP
+
+/* Define if you have the strerror function.  */
+#undef HAVE_STRERROR
+
+/* Define if you have the strftime function.  */
+#undef HAVE_STRFTIME
+
+/* Define if you have the <stdarg.h> header file.  */
+#undef HAVE_STDARG_H
+
+/* Define if you have the <sys/ioctl.h> header file.  */
+#undef HAVE_SYS_IOCTL_H
+
+/* Define if you have the intl library (-lintl).  */
+#undef HAVE_LIBINTL
+
+/* Define if you have the nsl library (-lnsl).  */
+#undef HAVE_LIBNSL
+
+/* Define if you have the socket library (-lsocket).  */
+#undef HAVE_LIBSOCKET
+
+/* Define if you have the x library (-lx).  */
+#undef HAVE_LIBX

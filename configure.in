@@ -9,16 +9,11 @@ BALSA_REVISION=3
 BALSA_PATCHLEVEL=5
 BALSA_VERSION="$BALSA_MAJOR.$BALSA_REVISION.$BALSA_PATCHLEVEL"
 VERSION="$BALSA_MAJOR.$BALSA_REVISION.$BALSA_PATCHLEVEL"
+
+dnl configure libmutt
+AC_CONFIG_SUBDIRS(libmutt)
+
 AM_INIT_AUTOMAKE(balsa, [$VERSION])
-
-dnl
-dnl mutt version info
-dnl
-MUTT_MAJOR=0
-MUTT_REVISION=93
-MUTT_PATCHLEVEL=1
-MUTT_VERSION="$MUTT_MAJOR.$MUTT_REVISION.$MUTT_PATCHLEVEL"
-
 
 AM_MAINTAINER_MODE
 AM_ACLOCAL_INCLUDE(macros)
@@ -53,11 +48,6 @@ AC_DEFINE_UNQUOTED(BALSA_REVISION, $BALSA_REVISION)
 AC_DEFINE_UNQUOTED(BALSA_PATCHLEVEL, $BALSA_PATCHLEVEL)
 AC_DEFINE_UNQUOTED(BALSA_VERSION, "$BALSA_VERSION")
 
-AC_DEFINE_UNQUOTED(MUTT_MAJOR, $MUTT_MAJOR)
-AC_DEFINE_UNQUOTED(MUTT_REVISION, $MUTT_REVISION)
-AC_DEFINE_UNQUOTED(MUTT_PATCHLEVEL, $MUTT_PATCHLEVEL)
-AC_DEFINE_UNQUOTED(MUTT_VERSION, "$MUTT_VERSION")
-
 AC_CHECK_LIB(crypt, crypt)
 
 dnl Automake @VARIABLE@ exports.
@@ -66,40 +56,6 @@ AC_SUBST(BALSA_REVISION)
 AC_SUBST(BALSA_PATCHLEVEL)
 AC_SUBST(BALSA_VERSION)
 
-AC_SUBST(MUTT_MAJOR)
-AC_SUBST(MUTT_REVISION)
-AC_SUBST(MUTT_PATCHLEVEL)
-AC_SUBST(MUTT_VERSION)
-
-dnl
-dnl Mutt required stuff
-dnl
-
-AC_PATH_PROG(SENDMAIL, sendmail, no, `echo $PATH | sed "s/:/ /"` /usr/sbin /usr/lib)
-AC_DEFINE_UNQUOTED(SENDMAIL, "$ac_cv_path_SENDMAIL")
-
-
-dnl SCO uses chsize() instead of ftruncate()
-AC_CHECK_FUNCS(ftruncate, break, [AC_CHECK_LIB(x, chsize)])
-
-dnl SCO has strftime() in libintl
-AC_CHECK_FUNCS(strftime, break, [AC_CHECK_LIB(intl, strftime)])
-
-AC_ARG_ENABLE(pop, [  --enable-pop               Enable POP3 support],
-[       AC_DEFINE(USE_POP)
-        AC_CHECK_LIB(socket, socket)
-        AC_CHECK_LIB(nsl, gethostbyname)
-        libmutt_a_SOURCES="$libmutt_a_SOURCES pop.c"
-])
-
-AC_ARG_ENABLE(imap, [  --enable-imap              Enable IMAP support],
-[       AC_DEFINE(USE_IMAP)
-        AC_CHECK_LIB(socket, socket)
-        AC_CHECK_LIB(nsl, gethostbyname)
-        libmutt_a_SOURCES="$libmutt_a_SOURCES imap.c"
-])
-
-
 dnl Create files.
 AC_OUTPUT([
 Makefile 
@@ -107,6 +63,5 @@ po/Makefile.in
 macros/Makefile
 intl/Makefile
 libbalsa/Makefile
-libmutt/Makefile
 src/Makefile
 ],[sed -e "/POTFILES =/r po/POTFILES" po/Makefile.in > po/Makefile])

@@ -40,7 +40,7 @@
  *
  **************************************************************/
 
-#include "config.h"
+#include "muttconfig.h"
 
 #if !defined(HAVE_SNPRINTF) || !defined(HAVE_VSNPRINTF)
 

@@ -935,7 +935,7 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
     add_menu_entry(menu, NULL, NULL, mbnode);
 
     if (mbnode->mailbox) {
-	if (mbnode->mailbox->open_ref == 0)
+	if (!MAILBOX_OPEN(mbnode->mailbox))
 	    add_menu_entry(menu, _("_Open"),
                            G_CALLBACK(mb_open_cb), mbnode);
 	else

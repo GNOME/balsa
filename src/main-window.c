@@ -1253,7 +1253,7 @@ enable_empty_trash(TrashState status)
     GtkWidget *toolbar =
         balsa_toolbar_get_from_gnome_app(GNOME_APP(balsa_app.main_window));
     gboolean set = TRUE;
-    if (balsa_app.trash->open_ref) {
+    if (MAILBOX_OPEN(balsa_app.trash)) {
         set = balsa_app.trash->total_messages > 0;
     } else {
         switch(status) {
@@ -1303,7 +1303,7 @@ balsa_window_enable_continue(void)
 /*      libbalsa_mailbox_open(balsa_app.draftbox, FALSE); */
 /*      if (balsa_app.draftbox->total_messages > 0) { */
 
-        gboolean n = balsa_app.draftbox->open_ref == 0
+        gboolean n = !MAILBOX_OPEN(balsa_app.draftbox)
             || balsa_app.draftbox->total_messages;
 
         balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_CONTINUE, n);
@@ -2978,7 +2978,7 @@ mailbox_commit_each(GNode *node, gpointer data)
     
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(box), FALSE);
 
-    if(box->open_ref == 0)
+    if(!MAILBOX_OPEN(box))
 	return FALSE;
 
     if (!libbalsa_mailbox_sync_storage(box, TRUE))

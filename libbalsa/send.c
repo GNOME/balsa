@@ -1580,7 +1580,7 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 
     g_free(tmp);
 
-    if (draftbox->open_ref > 0)
+    if (MAILBOX_OPEN(draftbox))
 	libbalsa_mailbox_check(draftbox);
 
     return thereturn!=-1;

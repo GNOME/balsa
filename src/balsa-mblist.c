@@ -1260,7 +1260,7 @@ bmbl_store_add_mbnode(GtkTreeStore * store, GtkTreeIter * iter,
                        TOTAL_COLUMN,  "",
                        -1);
     g_free(name);
-    if (mbnode->mailbox && mbnode->mailbox->open_ref>0)
+    if (mbnode->mailbox && MAILBOX_OPEN(mbnode->mailbox))
 	bmbl_node_style(GTK_TREE_MODEL(store), iter);    
     return TRUE;
 }
@@ -1573,7 +1573,7 @@ bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter)
     }
     /* We only want to do this if the mailbox is open, otherwise leave
      * the message numbers untouched in the display */
-    if (mailbox->open_ref && (mailbox->total_messages >= 0)) {
+    if (MAILBOX_OPEN(mailbox) && (mailbox->total_messages >= 0)) {
         if (mailbox->total_messages > 0) {
             text = g_strdup_printf("%ld", mailbox->total_messages);
             gtk_tree_store_set(GTK_TREE_STORE(model), iter,

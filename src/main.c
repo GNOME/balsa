@@ -597,9 +597,7 @@ main(int argc, char *argv[])
 
     default_icon = balsa_pixmap_finder("balsa_icon.png");
     if(default_icon) { /* may be NULL for developer installations */
-#if 0	/* FIXME replacement? */
-        gnome_window_icon_set_default_from_file(default_icon);
-#endif
+        gtk_window_set_default_icon_from_file(default_icon, NULL);
         g_free(default_icon);
     }
 

@@ -4,13 +4,14 @@
 # Marcel Telka <marcel@telka.sk>, 2000, 2001.
 # Adam Purkrt <adampurkrt@yahoo.com>, 2001
 # Michal Bukovjan <bukm@centrum.cz>, 2002,2003
+# Miloslav Trmac <mitr@volny.cz>, 2003.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-07-06 11:54+0200\n"
-"PO-Revision-Date: 2003-07-06 14:03+0200\n"
+"POT-Creation-Date: 2003-07-09 11:53+0200\n"
+"PO-Revision-Date: 2003-07-09 19:15+0200\n"
 "Last-Translator: Miloslav Trmac <mitr@volny.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -925,7 +926,7 @@ msgstr "gpgme nemohlo vytvořit nová data: %s"
 msgid "Sending Mail..."
 msgstr "Posílá se pošta..."
 
-#: libbalsa/send.c:221 src/main-window.c:1818
+#: libbalsa/send.c:221 src/main-window.c:1820
 msgid "_Hide"
 msgstr "S_krýt"
 
@@ -2635,17 +2636,17 @@ msgstr "_Všechny"
 msgid "C_lear"
 msgstr "Vy_mazat"
 
-#: src/filter-edit-callbacks.c:990 src/main-window.c:2748
+#: src/filter-edit-callbacks.c:990 src/main-window.c:2750
 msgid "_Body"
 msgstr "_Těle"
 
 #. To:
-#: src/filter-edit-callbacks.c:997 src/main-window.c:2749
+#: src/filter-edit-callbacks.c:997 src/main-window.c:2751
 #: src/sendmsg-window.c:1806
 msgid "_To:"
 msgstr "_Pro:"
 
-#: src/filter-edit-callbacks.c:1004 src/main-window.c:2750
+#: src/filter-edit-callbacks.c:1004 src/main-window.c:2752
 msgid "_From:"
 msgstr "_Od:"
 
@@ -2653,7 +2654,7 @@ msgstr "_Od:"
 msgid "_Subject"
 msgstr "Pře_dmět"
 
-#: src/filter-edit-callbacks.c:1019 src/main-window.c:2752
+#: src/filter-edit-callbacks.c:1019 src/main-window.c:2754
 msgid "_Cc:"
 msgstr "_Kopie:"
 
@@ -3790,7 +3791,15 @@ msgstr ""
 "Nelze otevřít poštovní schránku!\n"
 "Ověřte, prosím, nastavení poštovní schránky."
 
-#: src/main-window.c:1688
+#: src/main-window.c:1675
+msgid "translator_credits"
+msgstr ""
+"Marcel Telka <marcel@telka.sk>\n"
+"Adam Purkrt <adampurkrt@yahoo.com>\n"
+"Michal Bukovjan <bukm@centrum.cz>\n"
+"Miloslav Trmač <mitr@volny.cz>"
+
+#: src/main-window.c:1690
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://balsa.gnome.org/\n"
@@ -3803,73 +3812,73 @@ msgstr ""
 "Pokud chcete oznámit chyby v programu, učiňte tak prosím na adrese http://"
 "bugzilla.gnome.org/"
 
-#: src/main-window.c:1815
+#: src/main-window.c:1817
 msgid "Checking Mail..."
 msgstr "Kontroluje se pošta..."
 
-#: src/main-window.c:2115
+#: src/main-window.c:2117
 msgid "Finished Checking."
 msgstr "Kontrola pošty dokončena."
 
-#: src/main-window.c:2179
+#: src/main-window.c:2181
 #, c-format
 msgid "Sending error: %s"
 msgstr "Chyba při odesílání: %s"
 
-#: src/main-window.c:2275
+#: src/main-window.c:2277
 msgid "Balsa: New mail"
 msgstr "Balsa: Nová pošta"
 
 #
-#: src/main-window.c:2287
+#: src/main-window.c:2289
 #, c-format
 msgid "You have received %d new messages."
 msgstr "Obdrželi jste %d nových zpráv."
 
-#: src/main-window.c:2288
+#: src/main-window.c:2290
 msgid "You have received 1 new message."
 msgstr "Obdrželi jste 1 novou zprávu."
 
-#: src/main-window.c:2708
+#: src/main-window.c:2710
 msgid "Search mailbox"
 msgstr "Prohledávat poštovní schránku"
 
-#: src/main-window.c:2721
+#: src/main-window.c:2723
 msgid "_Reverse search"
 msgstr "Ob_rácené hledání"
 
-#: src/main-window.c:2724
+#: src/main-window.c:2726
 msgid "_Search for:"
 msgstr "_Hledat:"
 
-#: src/main-window.c:2737
+#: src/main-window.c:2739
 msgid "In:"
 msgstr "V:"
 
-#: src/main-window.c:2751
+#: src/main-window.c:2753
 msgid "S_ubject"
 msgstr "_Předmět"
 
-#: src/main-window.c:2866
+#: src/main-window.c:2868
 msgid "You can apply filters only on mailbox\n"
 msgstr "Filtry lze aplikovat pouze na poštovní schránky\n"
 
-#: src/main-window.c:2910 src/main-window.c:2929
+#: src/main-window.c:2912 src/main-window.c:2931
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Potvrzení změn v poštovní schránce %s selhalo."
 
-#: src/main-window.c:3122
+#: src/main-window.c:3124
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (jen pro čtení)"
 
-#: src/main-window.c:3124
+#: src/main-window.c:3126
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: src/main-window.c:3222
+#: src/main-window.c:3224
 msgid "Cannot access the message's body\n"
 msgstr "Nelze přistupovat k tělu zprávy\n"
 
@@ -4619,7 +4628,7 @@ msgstr "Vyžadováno"
 msgid "Error displaying link_id %s: %s\n"
 msgstr "Chyba při zobrazení link_id %s: %s\n"
 
-#: src/print.c:252
+#: src/print.c:253
 #, c-format
 msgid "Page: %i/%i"
 msgstr "Strana: %i/%i"
@@ -4685,7 +4694,7 @@ msgstr ""
 "Program Balsa nemohl nalézt písmo \"%s\".\n"
 "Použijte stránku \"Písma\" v dialogu \"Tisk zpráv\" a změňte jej."
 
-#: src/print.c:1541
+#: src/print.c:1558
 msgid "Balsa: message print preview"
 msgstr "Balsa: náhled před tiskem"
 
@@ -4706,14 +4715,14 @@ msgstr ""
 msgid "The option not to recognize \"format=flowed\" text has been removed."
 msgstr "Volba nerozpoznávat text \"format=flowed\" byla odstraněna."
 
-#: src/save-restore.c:894
+#: src/save-restore.c:910
 msgid ""
 "The option not to send \"format=flowed\" is now on the Options menu of the "
 "compose window."
 msgstr ""
 "Volba neodesílat \"format=flowed\" je nyní v menu Volby editačního okna."
 
-#: src/save-restore.c:929
+#: src/save-restore.c:945
 msgid ""
 "The option to request a MDN is now on the Options menu of the compose window."
 msgstr "Volba požadovat MDN je nyní v menu Volby editačního okna."

@@ -90,8 +90,12 @@ void mutt_fetchPopMail (void)
   char msgbuf[SHORT_STRING];
 #ifdef BALSA_USE_THREADS
   MailThreadMessage *threadmsg;
+  char uid[80], last_uid[80];
+  char threadbuf[160];
 #endif
   int s, i, last = 0, msgs, bytes, err = 0;
+  int num_bytes, tot_bytes;
+
   CONTEXT ctx;
   MESSAGE *msg = NULL;
 

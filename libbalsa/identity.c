@@ -692,17 +692,17 @@ setup_ident_dialog(GtkWindow* parent,
 				"identity-sigexecutable",
 				ident->sig_executable);
  
-    ident_dialog_add_checkbutton(dialog, _("Append Signature"), 
+    ident_dialog_add_checkbutton(dialog, _("Include Signature"), 
                                  "identity-sigappend", 
                                  ident->sig_sending);
     ident_dialog_add_checkbutton(dialog, 
-                                 _("Append Signature When Forwarding"),
+                                 _("Include Signature When Forwarding"),
                                  "identity-whenforward", 
                                  ident->sig_whenforward);
-    ident_dialog_add_checkbutton(dialog, _("Append Signature When Replying"),
+    ident_dialog_add_checkbutton(dialog, _("Include Signature When Replying"),
                                  "identity-whenreply", 
                                  ident->sig_whenreply);
-    ident_dialog_add_checkbutton(dialog, _("Include Signature Separator"),
+    ident_dialog_add_checkbutton(dialog, _("Add Signature Separator"),
                                  "identity-sigseparator", 
                                  ident->sig_separator);
     ident_dialog_add_checkbutton(dialog, _("Prepend Signature"),
@@ -1186,15 +1186,15 @@ libbalsa_identity_display_frame(void)
 			      _("Execute Signature"), "identity-sigexecutable");
 
     display_frame_add_boolean(GTK_FRAME(frame1), GTK_BOX(vbox1), 
-                              _("Append Signature"), "identity-sigappend");
+                              _("Include Signature"), "identity-sigappend");
     display_frame_add_boolean(GTK_FRAME(frame1), GTK_BOX(vbox1), 
-                              _("Append Signature When Forwarding"), 
+                              _("Include Signature When Forwarding"), 
                               "identity-whenforward");
     display_frame_add_boolean(GTK_FRAME(frame1), GTK_BOX(vbox1), 
-                              _("Append Signature When Replying"), 
+                              _("Include Signature When Replying"), 
                               "identity-whenreply");
     display_frame_add_boolean(GTK_FRAME(frame1), GTK_BOX(vbox1), 
-                              _("Include Signature Separator"), 
+                              _("Add Signature Separator"), 
                               "identity-sigseparator");
     display_frame_add_boolean(GTK_FRAME(frame1), GTK_BOX(vbox1), 
                               _("Prepend Signature"), 

@@ -126,6 +126,12 @@ static gint set_locale(GtkWidget *, BalsaSendmsg *, gint);
 
 static void edit_with_gnome(GtkWidget* widget, BalsaSendmsg* msg);
 static void change_identity_dialog_cb(GtkWidget*, BalsaSendmsg*);
+static void repl_identity_signature(BalsaSendmsg* msg, 
+                                    LibBalsaIdentity* new_ident,
+                                    LibBalsaIdentity* old_ident,
+                                    gint* replace_offset, gint siglen, 
+                                    gchar* new_sig);
+static gchar* prep_signature(LibBalsaIdentity* ident, gchar* sig);
 static void update_msg_identity(BalsaSendmsg*, LibBalsaIdentity*);
 
 static void sw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
@@ -169,6 +175,7 @@ static void reflow_par_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void reflow_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static gint insert_signature_cb(GtkWidget *, BalsaSendmsg *);
 static gint quote_messages_cb(GtkWidget *, BalsaSendmsg *);
+
 
 static GnomeUIInfo file_menu[] = {
 #define MENU_FILE_INCLUDE_POS 0
@@ -850,11 +857,98 @@ change_identity_dialog_cb(GtkWidget* widget, BalsaSendmsg* msg)
 
 
 static void
+repl_identity_signature(BalsaSendmsg* msg, LibBalsaIdentity* new_ident,
+                        LibBalsaIdentity* old_ident, gint* replace_offset, 
+                        gint siglen, gchar* new_sig) 
+{
+    gint ins_pos;
+    gint length_delta = 0;
+    gint newsiglen = strlen(new_sig);
+
+    
+    gtk_text_freeze(GTK_TEXT(msg->text));
+    gtk_editable_delete_text(GTK_EDITABLE(msg->text), *replace_offset,
+                             *replace_offset + siglen);
+            
+    /* FIXME [MBG]: maybe also check below to see if this is a reply
+     * or forward and compare identity settings to determine
+     * whether to add signature */
+
+    /* see if sig location is probably going to be the same */
+    if (new_ident->sig_prepend == old_ident->sig_prepend) {
+        ins_pos = *replace_offset;
+        gtk_editable_insert_text(GTK_EDITABLE(msg->text), 
+                                 new_sig, newsiglen, &ins_pos);
+
+        /* account for sig length difference in replacement offset */
+        *replace_offset += newsiglen - siglen;
+    } else if (new_ident->sig_prepend) {
+        /* sig location not the same between idents, take a WAG and
+         * put it at the start of the message */
+        ins_pos = 0;
+        gtk_editable_insert_text(GTK_EDITABLE(msg->text),
+                                 new_sig, newsiglen, &ins_pos);
+        *replace_offset += newsiglen;
+    } else {
+        /* put it at the end of the message */
+        ins_pos = gtk_text_get_length(GTK_TEXT(msg->text));
+        gtk_editable_insert_text(GTK_EDITABLE(msg->text),
+                                 new_sig, newsiglen, &ins_pos);
+    }
+    
+    gtk_text_thaw(GTK_TEXT(msg->text));
+}
+
+
+static gchar*
+prep_signature(LibBalsaIdentity* ident, gchar* sig)
+{
+    gchar* sig_tmp;
+
+
+    if (ident->sig_separator) {
+        sig_tmp = g_strconcat("\n-- \n", sig, NULL);
+        g_free(sig);
+        sig = sig_tmp;
+    } else {
+        sig_tmp = g_strconcat("\n", sig, NULL);
+        g_free(sig);
+        sig = sig_tmp;
+    }
+
+    return sig;
+}
+
+
+/*
+ * update_msg_identity
+ * 
+ * Change the specified BalsaSendmsg current identity, and update the
+ * corresponding fields. 
+ * */
+static void
 update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
 {
+    gint replace_offset = 0;
+    gint siglen;
+    gint ins_pos;
+    gint i = 0;
+    
+    gchar* old_sig;
+    gchar* new_sig;
+    gchar* message_text;
+    gchar* compare_str;
+    gchar** message_split;
     gchar* tmpstr=libbalsa_address_to_gchar(ident->address, 0);
     
-    /* change entries to reflect new identity */
+    LibBalsaIdentity* old_ident;
+
+    
+    g_return_if_fail(msg->ident != ident);
+    g_return_if_fail(ident != NULL);
+
+
+/* change entries to reflect new identity */
     libbalsa_address_entry_set_text(LIBBALSA_ADDRESS_ENTRY
                                     (msg->from[1]), tmpstr);
     g_free(tmpstr);
@@ -866,11 +960,67 @@ update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
     
     /* change the subject to use the reply/forward strings */
 
-    /* remove/add the signature depending on the new settings, change
+    /* -----------------------------------------------------------
+     * remove/add the signature depending on the new settings, change
      * the signature if path changed */
 
-    /* update the current messages identity */
-    msg->ident=ident;
+    /* reconstruct the old signature to search with */
+    old_ident = msg->ident;
+    old_sig = read_signature(msg);
+    old_sig = prep_signature(old_ident, old_sig);
+    siglen = strlen(old_sig);
+
+    /* switch identities in msg here so we can use read_signature
+     * again */
+    msg->ident = ident;
+    new_sig = read_signature(msg);
+    new_sig = prep_signature(ident, new_sig);
+
+    /* split on sig separator */
+    message_text = gtk_editable_get_chars(GTK_EDITABLE(msg->text), 0, -1);
+    message_split = g_strsplit(message_text, "\n-- \n", 0);
+    
+    while (message_split[i]) {
+        /* put sig separator back to search */
+        compare_str = g_strconcat("\n-- \n", message_split[i], NULL);
+
+        /* try to find occurance of old signature */        
+        if (g_strncasecmp(old_sig, compare_str, siglen) == 0) {
+            repl_identity_signature(msg, ident, old_ident, &replace_offset, 
+                                    siglen, new_sig);
+        }
+
+        if (i == 0) {
+            replace_offset += strlen(message_split[i]);
+        } else {
+            replace_offset += strlen(compare_str);
+        }
+
+        g_free(compare_str);
+        i++;
+    }
+
+
+    /* if no sig seperators found, do a slower brute force approach */
+    if (!message_split[1]) {
+        compare_str = message_text;
+        replace_offset = 0;
+        
+        while (*compare_str) {
+            if (g_strncasecmp(old_sig, compare_str, siglen) == 0) {
+                repl_identity_signature(msg, ident, old_ident, &replace_offset,
+                                        siglen, new_sig);
+            }
+
+            replace_offset++;
+            compare_str++;
+        }
+    }
+
+    g_strfreev(message_split);
+    g_free(old_sig);
+    g_free(new_sig);
+    g_free(message_text);
 }
 
 
@@ -1617,7 +1767,7 @@ create_email_entry(GtkWidget * table, const gchar * label, int y_pos,
     libbalsa_address_entry_set_find_match(LIBBALSA_ADDRESS_ENTRY(arr[1]),
 		       expand_alias_find_match);
     libbalsa_address_entry_set_domain(LIBBALSA_ADDRESS_ENTRY(arr[1]),
-		       balsa_app.current_ident->domain);
+		       smw->ident->domain);
     gtk_signal_connect(GTK_OBJECT(arr[1]), "changed",
                        GTK_SIGNAL_FUNC(address_changed_cb), sma);
 
@@ -2078,11 +2228,11 @@ fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 	body = g_string_new("");
 
     if ((signature = read_signature(msg)) != NULL) {
-	if ((reply_any && balsa_app.current_ident->sig_whenreply)
-       || (forwd_any && balsa_app.current_ident->sig_whenforward)
-       || (type == SEND_NORMAL && balsa_app.current_ident->sig_sending)) {
+	if ((reply_any && msg->ident->sig_whenreply)
+       || (forwd_any && msg->ident->sig_whenforward)
+       || (type == SEND_NORMAL && msg->ident->sig_sending)) {
 
-	    if (balsa_app.current_ident->sig_separator
+	    if (msg->ident->sig_separator
 		&& g_strncasecmp(signature, "--\n", 3)
 		&& g_strncasecmp(signature, "-- \n", 4)) {
 		gchar * tmp = g_strconcat("-- \n", signature, NULL);
@@ -2090,7 +2240,7 @@ fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 		signature = tmp;
 	    }
 
-	    if (balsa_app.current_ident->sig_prepend && type != SEND_NORMAL) {
+	    if (msg->ident->sig_prepend && type != SEND_NORMAL) {
 	    	g_string_prepend(body, "\n\n");
 	    	g_string_prepend(body, signature);
 	    } else {
@@ -2113,7 +2263,7 @@ static gint insert_signature_cb(GtkWidget *widget, BalsaSendmsg *msg)
     gint pos=gtk_editable_get_position(GTK_EDITABLE(msg->text));
     
     if ((signature = read_signature(msg)) != NULL) {
-	if (balsa_app.current_ident->sig_separator
+	if (msg->ident->sig_separator
 	    && g_strncasecmp(signature, "--\n", 3)
 	    && g_strncasecmp(signature, "-- \n", 4)) {
 	    gchar * tmp = g_strconcat("-- \n", signature, NULL);
@@ -2257,6 +2407,13 @@ setup_headers_from_message(BalsaSendmsg* cw, LibBalsaMessage *message)
 }
 
 
+/* 
+ * guess_identity
+ * 
+ * Attempt to determine if a message should be associated with a
+ * particular identity, other than the default.  The to_list of the
+ * original message needs to be set in order for it to work.
+ **/
 static gboolean
 guess_identity(BalsaSendmsg* msg)
 {
@@ -2366,7 +2523,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	msg->orig_message = NULL;
 	break;
     }
-    if (message) { /* ref message so we don't loose it even if it is deleted */
+    if (message) { /* ref message so we don't lose it even if it is deleted */
 	gtk_object_ref(GTK_OBJECT(message));
 	/* reference the original mailbox so we don't loose the
 	   mail even if the mailbox is closed. Alternatively,
@@ -2436,6 +2593,9 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	    list, get_tool_widget(window, 1, main_toolbar_spell_disable[i]));
     msg->spell_check_disable_list = list;
 
+    /* Get the identity from the To: field of the original message */
+    guess_identity(msg);
+
     /* create the top portion with the to, from, etc in it */
     gtk_paned_add1(GTK_PANED(paned), create_info_pane(msg, type));
 
@@ -2457,9 +2617,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     } else if ( type == SEND_REPLY_GROUP ) {
         set_list_post_address(msg);
     }
-
-    /* Get the identity from the To: field of the original message */
-    guess_identity(msg);
 
     /* From: */
     setup_headers_from_identity(msg, msg->ident);
@@ -2872,7 +3029,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     g_free(tmp);
 
     if (balsa_app.req_dispnotify)
-	libbalsa_message_set_dispnotify(message, balsa_app.current_ident->address);
+	libbalsa_message_set_dispnotify(message, bsmsg->ident->address);
 
     if (bsmsg->orig_message != NULL &&
 	!GTK_OBJECT_DESTROYED(bsmsg->orig_message)) {

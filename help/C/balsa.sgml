@@ -2969,7 +2969,7 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
 
 <variablelist>
   <varlistentry>
-    <term><guilabel>Your Name</guilabel></term>
+    <term><guilabel>Full Name</guilabel></term>
     <listitem>
       <para>
         This doesn't <emphasis>have</emphasis> to be your name, I
@@ -3012,14 +3012,14 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
   </varlistentry>
 
   <varlistentry>
-  <term><guilabel>Use Signature File When</guilabel></term>
+  <term><guilabel>Include Signature File When</guilabel></term>
   <listitem>
     <variablelist>
       <varlistentry>
 	<term><guilabel>Sending Mail</guilabel></term>
 	<listitem>
 	  <para>
-            Include the signature file when sending email.
+            Include the signature file when sending a new email.
           </para>
 	</listitem>
       </varlistentry>
@@ -3076,7 +3076,7 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
            the path to the program with a "|" prepended to it.  For
            example:
          </para>
-         <para><quote>|/home/user/dynsig.pl</quote></para>
+         <para><command>|/home/user/dynsig.pl</command></para>
        </listitem>
      </itemizedlist>
    </para>
@@ -3097,7 +3097,7 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
 </varlistentry>
 
 <varlistentry>
-  <term><guilabel>Enable Signature Separator</guilabel></term>
+  <term><guilabel>Add Signature Separator</guilabel></term>
   <listitem>
     <para>
       When checked, this has &Balsa; insert the standard signature

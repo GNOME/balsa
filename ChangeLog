@@ -1,3 +1,12 @@
+2002-02-17  Matthew Guenther  <guentherm@asme.org>
+
+	* src/sendmsg-window.c: when changing identities change the
+	signature as well as the email addresses
+	* src/identity.c: change the signature inclusion terms used
+	identity dialog to more accurately reflect what they do
+	* help/C/balsa.sgml: update documentation to reflect changes to
+	identity dialog
+	
 2002-02-16  Matthew Guenther  <guentherm@asme.org>
 
 	* src/balsa-index.c (balsa_index_set_threading_type): expand or

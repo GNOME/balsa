@@ -1,6 +1,6 @@
 # Slovenian translation file for Balsa.
-# Copyright (C) 2000 Free Software Foundation, Inc.
-# Andraz Tori <andraz.tori1@guest.arnes.si> 2000
+# Copyright (C) 2002 Free Software Foundation, Inc.
+# Andraz Tori <andraz.tori1@guest.arnes.si> 2002
 #
 msgid ""
 msgstr ""

@@ -515,7 +515,6 @@ create_menu (BalsaIndex * bindex)
   menu = gtk_menu_new ();
   menuitem = gtk_menu_item_new_with_label ("Transfer to");
 
-
   list = g_list_first (balsa_app.mailbox_list);
   submenu = gtk_menu_new ();
   while (list)

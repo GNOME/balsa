@@ -198,7 +198,6 @@ create_identity_page ()
 			     GTK_SIGNAL_FUNC (gtk_widget_destroy),
 			     GTK_OBJECT (pmw->window));
 
-
   return vbox;
 }
 

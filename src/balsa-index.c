@@ -75,13 +75,14 @@ static gboolean bndx_set_style_recursive(BalsaIndex * index,
 static void bndx_set_parent_style(BalsaIndex * index, GtkTreePath * path);
 static void bndx_check_visibility(BalsaIndex * index);
 static void bndx_scroll_to_row(BalsaIndex * index, GtkTreePath * path);
-static void bndx_find_row(BalsaIndex * index,
-                          GtkTreeIter * prev, GtkTreeIter * next,
-                          LibBalsaMessageFlag flag,
-                          FilterOpType op, GSList * conditions,
-                          GList * exclude);
+static gboolean bndx_find_row(BalsaIndex * index,
+                              GtkTreeIter * pos, gboolean reverse_search,
+                              LibBalsaMessageFlag flag,
+                              FilterOpType op, GSList * conditions,
+                              GList * exclude);
 static void bndx_expand_to_row_and_select(BalsaIndex * index,
-                                          GtkTreeIter * iter);
+                                          GtkTreeIter * iter,
+                                          gboolean select);
 static void bndx_select_message(BalsaIndex * index,
                                 LibBalsaMessage * message);
 static void bndx_changed_find_row(BalsaIndex * index);
@@ -517,8 +518,8 @@ bndx_expand_to_row(BalsaIndex * index, GtkTreePath * path)
 }
 
 /* 
- * Description: moves to the first unread message in the index, and
- * selects it.
+ * Description: moves to the first unread message in the index, or the
+ * last message if none is unread, and selects it.
  */
 static void
 bndx_moveto(BalsaIndex * index)
@@ -534,20 +535,11 @@ bndx_moveto(BalsaIndex * index)
         return;
     }
 
-    bndx_find_row(index, NULL, &iter, LIBBALSA_MESSAGE_FLAG_NEW,
-                  FILTER_NOOP, NULL, NULL);
-    if (!iter.stamp)
+    if (!bndx_find_row(index, &iter, FALSE, LIBBALSA_MESSAGE_FLAG_NEW,
+                       FILTER_NOOP, NULL, NULL))
         gtk_tree_model_iter_nth_child(model, &iter, NULL, rows - 1);
-
-    if (balsa_app.view_message_on_open)
-        bndx_expand_to_row_and_select(index, &iter);
-    else {
-        GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
-
-        bndx_expand_to_row(index, path);
-        bndx_scroll_to_row(index, path);
-        gtk_tree_path_free(path);
-    }
+    bndx_expand_to_row_and_select(index, &iter,
+                                  balsa_app.view_message_on_open);
 }
 
 /* balsa_index_load_mailbox_node:
@@ -719,7 +711,6 @@ balsa_index_add(BalsaIndex * index, LibBalsaMessage * message)
 
     bndx_set_col_images(index, &iter, message);
     path = gtk_tree_model_get_path(model, &iter);
-    bndx_set_parent_style(index, path);
     gtk_tree_path_free(path);
 }
 
@@ -804,20 +795,17 @@ bndx_messages_remove(BalsaIndex * index, GList * messages)
     if (index->current_message &&
         !g_list_find(remove, index->current_message))
         next_message = index->current_message;
+    else if (bndx_find_row(index, &iter, FALSE, 0, FILTER_NOOP, NULL,
+                           remove))
+        gtk_tree_model_get(model, &iter, BNDX_MESSAGE_COLUMN,
+                           &next_message, -1);
     else {
-        bndx_find_row(index, NULL, &iter, 0, FILTER_NOOP, NULL, remove);
-        if (iter.stamp)
-            gtk_tree_model_get(model, &iter,
-                               BNDX_MESSAGE_COLUMN, &next_message,
-                               -1);
-        else {
-            g_signal_handler_block(selection, index->selection_changed_id);
-            gtk_tree_store_clear(GTK_TREE_STORE(model));
-            g_signal_handler_unblock(selection, index->selection_changed_id);
-            g_signal_emit_by_name(selection, "changed");
-            g_list_free(remove);
-            return;
-        }
+        g_signal_handler_block(selection, index->selection_changed_id);
+        gtk_tree_store_clear(GTK_TREE_STORE(model));
+        g_signal_handler_unblock(selection, index->selection_changed_id);
+        g_signal_emit_by_name(selection, "changed");
+        g_list_free(remove);
+        return;
     }
 
     /* check the list of messages to be removed */
@@ -895,20 +883,21 @@ bndx_messages_remove(BalsaIndex * index, GList * messages)
  * making sure the selected row is within bounds and made visible.
  * */
 static void
-bndx_select_row(BalsaIndex * index, GtkTreePath * path)
+bndx_select_row(BalsaIndex * index, GtkTreePath * path, gboolean select)
 {
-    GtkTreeSelection *selection;
-
     g_return_if_fail(index != NULL);
     g_return_if_fail(BALSA_IS_INDEX(index));
     if (!path)
         return;
 
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(index));
-    gtk_tree_selection_unselect_all(selection);
-    /* select path, and make sure this path gets the keyboard focus */
-    gtk_tree_selection_select_path(selection, path);
-    gtk_tree_view_set_cursor(GTK_TREE_VIEW(index), path, NULL, FALSE);
+    if (select) {
+        GtkTreeSelection *selection =
+            gtk_tree_view_get_selection(GTK_TREE_VIEW(index));
+        gtk_tree_selection_unselect_all(selection);
+        /* select path, and make sure this path gets the keyboard focus */
+        gtk_tree_selection_select_path(selection, path);
+        gtk_tree_view_set_cursor(GTK_TREE_VIEW(index), path, NULL, FALSE);
+    }
 
     bndx_scroll_to_row(index, path);
 }
@@ -964,140 +953,239 @@ bndx_check_visibility(BalsaIndex * index)
  *   like balsa_index_select_next_unread
  */
 
-struct BndxScanInfo {
-    GtkTreeView *tree_view;     /* the tree                     */
-    LibBalsaMessage *message;   /* current message              */
-    GHashTable *matching;       /* matching messages            */
-    LibBalsaMessageFlag flag;   /* look only for matching nodes */
-    GList *exclude;             /* messages excluded from scan  */
-    /* we can use GtkTreeIter::stamp to decide validity         */
-    GtkTreeIter first;          /* returns first matching       */
-    GtkTreeIter prev;           /* returns last matching
-                                   before selection             */
-    GtkTreeIter next;           /* returns first matching
-                                   after selection              */
-    GtkTreeIter last;           /* returns last matching        */
-};
-
-/* balsa_index_scan_node:
- * callback for pre-recursive search for previous and next
- * after search:
- * - b->prev is last viewable message before current, NULL if none,
- *     NULL if no current message
- * - b->next is first viewable message after current, NULL if none,
- *     first message if no current message
- */
 static gboolean
-bndx_find_row_func(GtkTreeModel *model, GtkTreePath *path,
-                   GtkTreeIter *iter, gpointer data)
+bndx_find_row_func(LibBalsaMessage * message,
+                   LibBalsaMessageFlag flag,
+                   GHashTable * matching,
+                   GSList * conditions,
+                   FilterOpType op,
+                   GList * exclude,
+                   gboolean viewable)
 {
-    struct BndxScanInfo *b = data;
-    LibBalsaMessage *message;
-
-    gtk_tree_model_get(model, iter, BNDX_MESSAGE_COLUMN, &message, -1);
-
-    if (message == b->message) {
-        b->prev = b->last;
-        b->next.stamp = 0;
-        return FALSE;
-    }
-
     if (LIBBALSA_MESSAGE_IS_DELETED(message))
         return FALSE;
 
-    if (b->flag) {
+    if (flag) {
         /* looking for flagged messages */
-        if (!LIBBALSA_MESSAGE_HAS_FLAG(message, b->flag))
+        if (!LIBBALSA_MESSAGE_HAS_FLAG(message, flag))
             return FALSE;
-    } else if (b->matching) {
+    } else if (matching) {
         /* looking for messages that match some conditions */
-        if (!g_hash_table_lookup(b->matching, message))
+        if (!g_hash_table_lookup(matching, message))
             return FALSE;
-    } else if (b->exclude) {
+    } else if (conditions) {
+	if (!match_conditions(op, conditions, message, FALSE))
+	    return FALSE;
+    } else if (exclude) {
         /* looking for messages not in the excluded list */
-        if (g_list_find(b->exclude, message))
+        if (g_list_find(exclude, message))
             return FALSE;
     } else {
         /* if there are no flags, no conditions, and no excluded list,
          * we want any viewable message */
-        if (!bndx_row_is_viewable(b->tree_view, path))
+        if (!viewable)
             return FALSE;
     }
 
-    if (!b->first.stamp)
-        /* first matching message */
-        b->first = *iter;
-    if (!b->next.stamp)
-        /* first message, or first after current */
-        b->next = *iter;
-    /* last becomes prev, which we always want to be viewable */
-    if (bndx_row_is_viewable(b->tree_view, path))
-        b->last = *iter;
-
-    return FALSE;
+    return TRUE;
 }
 
 /* bndx_expand_to_row_and_select:
  * make sure it's viewable, then pass it to bndx_select_row
  * no-op if it's NULL
+ *
+ * Note: iter must be valid; it isn't checked here.
  */
 static void
-bndx_expand_to_row_and_select(BalsaIndex * index, GtkTreeIter * iter)
+bndx_expand_to_row_and_select(BalsaIndex * index, GtkTreeIter * iter,
+                              gboolean select)
 {
     GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(index));
     GtkTreePath *path;
 
-    if (!iter->stamp)
-        return;
     path = gtk_tree_model_get_path(model, iter);
     bndx_expand_to_row(index, path);
-    bndx_select_row(index, path);
+    bndx_select_row(index, path, select);
     gtk_tree_path_free(path);
+}
+
+/* Two helpers : pass to next (previous) message.
+   Return : FALSE if search is done (this depends
+   on the search type : certain wrap around,
+   others not)
+
+   On success, path and iter both point to the new message row.
+   On failure:
+       bndx_find_next leaves them pointing to the head of the last thread;
+       bndx_find_prev leaves them unchanged, pointing to the first message.
+*/
+static gboolean
+bndx_find_next(GtkTreeView * tree_view, GtkTreePath * path,
+               GtkTreeIter * iter, gboolean wrap)
+{
+    GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
+    GtkTreeIter tmp;
+
+    /* First go deeper (children) */
+    if (gtk_tree_model_iter_children(model, &tmp, iter)) {
+	gtk_tree_path_down(path);
+	*iter = tmp;
+	return TRUE;
+    }
+    /* If no children, check sibling */
+    else if (tmp = *iter, gtk_tree_model_iter_next(model, &tmp)) {
+	gtk_tree_path_next(path);
+        *iter = tmp;
+	return TRUE;
+    }
+    /* if no children, no sibling, go back up */
+    else while (gtk_tree_model_iter_parent(model, &tmp, iter)) {
+	gtk_tree_path_up(path);
+	*iter = tmp;
+	/* look for an "uncle" ie the next node after the parent */
+	if (gtk_tree_model_iter_next(model, &tmp)) {
+	    gtk_tree_path_next(path);
+	    *iter = tmp;
+	    return TRUE;
+	}
+    }
+    /* No more next, so wrap if we are doing a flag search */
+    if (wrap) {
+        while (gtk_tree_path_up(path))
+            /* Nothing. */;
+        gtk_tree_path_down(path);
+	gtk_tree_model_get_iter_first(model, iter);
+	return TRUE;
+    }
+    return FALSE;
+}
+
+static gboolean
+bndx_find_prev(GtkTreeView * tree_view, GtkTreePath * path,
+               GtkTreeIter * iter)
+{
+    GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
+    GtkTreeIter tmp;
+
+    /* First check sibling */
+    if (gtk_tree_path_prev(path)) {
+	gtk_tree_model_get_iter(model, iter, path);
+	/* OK There is a previous subtree, so go to the last leaf
+	   of this subtree */
+	if (gtk_tree_model_iter_children(model, &tmp, iter)) {
+	    gtk_tree_path_down(path);
+	    *iter = tmp;
+	    while (TRUE)
+		if (gtk_tree_model_iter_next(model, &tmp)) {
+		    gtk_tree_path_next(path);
+		    *iter = tmp;
+                } else if (gtk_tree_model_iter_children(model, &tmp, iter)) {
+		    gtk_tree_path_down(path);
+		    *iter = tmp;
+		}
+		else break;
+	}
+	return TRUE;
+    }
+    /* If no prev sibling, the previous is the parent (if it exists) */
+    if (gtk_tree_model_iter_parent(model, &tmp, iter)) {
+	gtk_tree_path_up(path);
+	*iter = tmp;
+	return TRUE;
+    }
+    return FALSE;
 }
 
 /* bndx_find_row:
  * common search code--look for next or previous, with or without flag
+ *
+ * Returns TRUE if the search succeeds.
+ * On success, *pos points to the new message.
+ * On failure, *pos is unchanged.
  */
-static void
-bndx_find_row(BalsaIndex * index, GtkTreeIter * prev,
-              GtkTreeIter * next, LibBalsaMessageFlag flag,
+static gboolean
+bndx_find_row(BalsaIndex * index, GtkTreeIter * pos,
+              gboolean reverse_search, LibBalsaMessageFlag flag,
               FilterOpType op, GSList * conditions, GList * exclude)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
-    struct BndxScanInfo bi;
+    GtkTreePath *path;
+    GtkTreeIter iter;
+    gboolean first_time = TRUE;
+    gboolean found;
+    gboolean wrap = (flag != (LibBalsaMessageFlag) 0);
+    GHashTable *matching;       /* matching messages (IMAP search) */
 
-    g_return_if_fail(index != NULL);
+    g_return_val_if_fail(index != NULL, FALSE);
 
-    bi.tree_view = tree_view;
-    bi.message = index->current_message;
-    bi.flag = flag;
-    bi.matching =
-        conditions ? libbalsa_mailbox_get_matching(index->mailbox_node->
-                                                   mailbox, op,
-                                                   conditions) : NULL;
-    bi.exclude = exclude;
-    bi.prev.stamp = bi.next.stamp = bi.first.stamp = bi.last.stamp = 0;
-    gtk_tree_model_foreach(model, bndx_find_row_func, &bi);
-    if (bi.matching)
-        g_hash_table_destroy(bi.matching);
+    if (!bndx_find_message(index, &path, &iter, index->current_message)) {
+        /* The current_message is NULL (or we otherwise can't find
+         * it); if we're looking for a plain next or prev, just return
+         * FALSE. */
+        if (!(flag || conditions))
+            return FALSE;
 
-    if (prev)
-        *prev = bi.prev;
-    if (next) {
-        *next = bi.next;
-        if (!bi.next.stamp) {
-            /* not valid--look for another message */
-            if (flag != 0)
-                /* looking for new or flagged messages, cycle back to
-                 * first matching */
-                *next = bi.first;
-            else if (exclude != NULL)
-                /* for next message when deleting or moving, fall back to
-                 * previous */
-                *next = bi.prev;
+        wrap = FALSE;
+        /* Search from the first message, unless... */
+        if (!gtk_tree_model_get_iter_first(model, &iter))
+            /* ...index is empty, or... */
+            return FALSE;
+        if (reverse_search) {
+            /* ...search from the last message. */
+            GtkTreeIter tmp = iter;
+
+	    for (;;)
+		if (gtk_tree_model_iter_next(model, &tmp))
+		    iter = tmp;
+                else if (gtk_tree_model_iter_children(model, &tmp, &iter))
+		    iter = tmp;
+		else break;
         }
+        path = gtk_tree_model_get_path(model, &iter);
     }
+
+    if (LIBBALSA_IS_MAILBOX_IMAP(index->mailbox_node->mailbox)
+        && conditions)
+        matching =
+            libbalsa_mailbox_get_matching(index->mailbox_node->mailbox, op,
+                                          conditions);
+    else
+        matching = NULL;
+
+    found = FALSE;
+    do {
+        LibBalsaMessage *message;
+
+        gtk_tree_model_get(model, &iter, BNDX_MESSAGE_COLUMN, &message, -1);
+        /* Check if we have wrapped and reached the current message */
+        if (message == index->current_message) {
+            if (first_time)
+                first_time = FALSE;
+            else
+                break;
+        } else
+            found = bndx_find_row_func(message, flag, matching, conditions,
+                                       op, exclude,
+                                       bndx_row_is_viewable(tree_view,
+                                                            path));
+    } while (!found &&
+             (reverse_search ? bndx_find_prev(tree_view, path, &iter)
+              : bndx_find_next(tree_view, path, &iter, wrap)));
+
+    gtk_tree_path_free(path);
+    if (matching)
+        g_hash_table_destroy(matching);
+
+    if (found) {
+        if (pos)
+            *pos = iter;
+    } else if (!reverse_search && exclude)
+        /* for next message when deleting or moving, fall back to previous */
+        return bndx_find_row(index, pos, TRUE, flag, op, conditions,
+                             exclude);
+
+    return found;
 }
 
 /*
@@ -1110,11 +1198,10 @@ bndx_find_row_and_select(BalsaIndex * index,
                          GSList * conditions,
                          gboolean previous)
 {
-    GtkTreeIter prev;
-    GtkTreeIter next;
+    GtkTreeIter pos;
 
-    bndx_find_row(index, &prev, &next, flag, op, conditions, NULL);
-    bndx_expand_to_row_and_select(index, previous ? &prev : &next);
+    if (bndx_find_row(index, &pos, previous, flag, op, conditions, NULL))
+        bndx_expand_to_row_and_select(index, &pos, TRUE);
 }
 
 void
@@ -1211,32 +1298,26 @@ bndx_set_col_images(BalsaIndex * index, GtkTreeIter * iter,
 }
 
 static gboolean
-thread_has_unread(BalsaIndex * index, GtkTreePath * path)
+thread_has_unread(BalsaIndex * index, GtkTreeIter * iter)
 {
     GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(index));
-    GtkTreePath *child_path;
-    GtkTreeIter iter;
-    gboolean ret_val = FALSE;
+    GtkTreeIter child_iter;
 
-    child_path = gtk_tree_path_copy(path);
-    gtk_tree_path_down(child_path);
+    if (!gtk_tree_model_iter_children(model, &child_iter, iter))
+        return FALSE;
 
-    while (gtk_tree_model_get_iter(model, &iter, child_path)) {
+    do {
         LibBalsaMessage *message;
 
-        gtk_tree_model_get(model, &iter, BNDX_MESSAGE_COLUMN, &message, -1);
+        gtk_tree_model_get(model, &child_iter,
+                           BNDX_MESSAGE_COLUMN, &message, -1);
 
         if (LIBBALSA_MESSAGE_IS_UNREAD(message) ||
-            thread_has_unread(index, child_path)) {
-            ret_val = TRUE;
-            break;
-        }
+            thread_has_unread(index, &child_iter))
+            return TRUE;
+    } while (gtk_tree_model_iter_next(model, &child_iter));
 
-        gtk_tree_path_next(child_path);
-    }
-
-    gtk_tree_path_free(child_path);
-    return ret_val;
+    return FALSE;
 }
 
 
@@ -1256,7 +1337,7 @@ bndx_set_style(BalsaIndex * index, GtkTreePath * path)
         return FALSE;
 
     if (!gtk_tree_view_row_expanded(tree_view, path)
-        && thread_has_unread(index, path)) {
+        && thread_has_unread(index, &iter)) {
         gtk_tree_store_set(store, &iter,
                            BNDX_COLOR_COLUMN, &balsa_app.mblist_unread_color,
                            BNDX_WEIGHT_COLUMN, PANGO_WEIGHT_BOLD,
@@ -1381,7 +1462,7 @@ bndx_button_event_press_cb(GtkWidget * widget, GdkEventButton * event,
             gtk_tree_view_get_selection(tree_view);
 
         if (!gtk_tree_selection_path_is_selected(selection, path))
-            bndx_select_row(index, path);
+            bndx_select_row(index, path, TRUE);
         gtk_tree_path_free(path);
     }
 
@@ -1520,16 +1601,12 @@ balsa_index_set_column_widths(BalsaIndex * index)
 static void
 bndx_changed_find_row(BalsaIndex * index)
 {
-    GtkTreeIter prev;
-    GtkTreeIter next;
+    index->next_message =
+        bndx_find_row(index, NULL, FALSE, 0, FILTER_NOOP, NULL, NULL);
+    index->prev_message =
+        bndx_find_row(index, NULL, TRUE,  0, FILTER_NOOP, NULL, NULL);
 
-    bndx_find_row(index, &prev, &next, 0, FILTER_NOOP, NULL, NULL);
-    index->prev_message = prev.stamp;
-    index->next_message = next.stamp;
-
-    g_signal_emit(G_OBJECT(index),
-		  balsa_index_signals[INDEX_CHANGED], 0);
-
+    g_signal_emit(G_OBJECT(index), balsa_index_signals[INDEX_CHANGED], 0);
 }
 
 /* Mailbox Callbacks... */
@@ -1566,9 +1643,9 @@ mailbox_messages_changed_status_cb(LibBalsaMailbox * mb,
         && LIBBALSA_MESSAGE_IS_DELETED(bindex->current_message)) {
         GtkTreeIter iter;
 
-        bndx_find_row(bindex, NULL, &iter, (LibBalsaMessageFlag) 0,
-                      FILTER_NOOP, NULL, messages);
-        bndx_expand_to_row_and_select(bindex, &iter);
+        if (bndx_find_row(bindex, &iter, FALSE, (LibBalsaMessageFlag) 0,
+                          FILTER_NOOP, NULL, messages))
+            bndx_expand_to_row_and_select(bindex, &iter, TRUE);
         return;
     }
 
@@ -1583,15 +1660,21 @@ mailbox_messages_changed_status_cb(LibBalsaMailbox * mb,
 static void
 mailbox_messages_added(BalsaIndex * bindex, GList *messages)
 {
-    LibBalsaMessage * message;
+    GList *list;
 
-    while (messages) {
-	message = LIBBALSA_MESSAGE(messages->data);
-	balsa_index_add(bindex, message);
-	messages = g_list_next(messages);
-    }
+    for (list = messages; list; list = g_list_next(list))
+	balsa_index_add(bindex, (LibBalsaMessage *) list->data);
     balsa_index_threading(bindex, 
 			  bindex->mailbox_node->mailbox->threading_type);
+    for (list = messages; list; list = g_list_next(list)) {
+        GtkTreePath *path;
+
+        if (bndx_find_message(bindex, &path, NULL,
+                              (LibBalsaMessage *) list->data)) {
+            bndx_set_parent_style(bindex, path);
+            gtk_tree_path_free(path);
+        }
+    }
     bndx_select_message(bindex, bindex->current_message);
 
     balsa_mblist_update_mailbox(balsa_app.mblist_tree_store, 
@@ -2544,5 +2627,5 @@ bndx_select_message(BalsaIndex * index, LibBalsaMessage * message)
     GtkTreeIter iter;
 
     if (bndx_find_message(index, NULL, &iter, message))
-        bndx_expand_to_row_and_select(index, &iter);
+        bndx_expand_to_row_and_select(index, &iter, TRUE);
 }

@@ -10,8 +10,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2000-12-12 23:18+0100\n"
-"PO-Revision-Date: 2000-12-12 23:29+0100\n"
+"POT-Creation-Date: 2000-12-14 12:47+0100\n"
+"PO-Revision-Date: 2000-12-14 12:54+0100\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -107,6 +107,34 @@ msgstr "LibBalsaMailboxImap: Öppnar %s Refräknare: %d\n"
 #, c-format
 msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxLocal: Öppnar %s Refräknare: %d\n"
+
+#: libbalsa/mailbox_maildir.c:114
+#, c-format
+msgid "Mailbox %s does not appear to be a Maildir mailbox."
+msgstr "Brevlådan %s verkar inte vara en epostkatalogsbrevlåda."
+
+#: libbalsa/mailbox_maildir.c:123
+msgid "Sorry. Balsa doesn't (yet) know how to create a maildir mailbox"
+msgstr "Tyvärr. Balsa kan (ännu) inte skapa en epostkatalogsbrevlåda"
+
+#: libbalsa/mailbox_maildir.c:155 libbalsa/mailbox_mh.c:155
+#, c-format
+msgid "Open of %s failed. Errno = %d, "
+msgstr "Öppnande av %s misslyckades. Felnummer = %d, "
+
+#: libbalsa/mailbox_mbox.c:115
+#, c-format
+msgid "Mailbox %s does not appear to be an Mbox mailbox."
+msgstr "Brevlådan %s verkar inte vara en Mbox-brevlåda."
+
+#: libbalsa/mailbox_mh.c:114
+#, c-format
+msgid "Mailbox %s does not appear to be a Mh mailbox."
+msgstr "Brevlådan %s verkar inte vara en MH-brevlåda."
+
+#: libbalsa/mailbox_mh.c:123
+msgid "Sorry. Balsa doesn't (yet) know how to create a mh mailbox"
+msgstr "Tyvärr. Balsa kan (ännu) inte skapa en MH-brevlåda"
 
 #: libbalsa/mailbox_pop3.c:199
 #, c-format
@@ -1185,7 +1213,7 @@ msgstr "FEL: "
 msgid "FATAL: "
 msgstr "ÖDESDIGER: "
 
-#: src/local-mailbox.c:196
+#: src/local-mailbox.c:192
 #, c-format
 msgid "Local Mailbox Loaded as: %s\n"
 msgstr "Lokal brevlåda inläst som: %s\n"

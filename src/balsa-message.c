@@ -3299,26 +3299,19 @@ balsa_message_can_select(BalsaMessage * bmessage)
     return GTK_IS_EDITABLE(w) || GTK_IS_TEXT_VIEW(w);
 }
 
-void
-balsa_message_select_all(BalsaMessage * bmessage)
+gboolean
+balsa_message_grab_focus(BalsaMessage * bmessage)
 {
     GtkWidget *w;
 
-    g_return_if_fail(bmessage != NULL);
-    g_return_if_fail(bmessage->current_part != NULL);
-    g_return_if_fail((w = bmessage->current_part->focus_widget) != NULL);
+    g_return_val_if_fail(bmessage != NULL, FALSE);
+    g_return_val_if_fail(bmessage->current_part != NULL, FALSE);
+    g_return_val_if_fail((w =
+                          bmessage->current_part->focus_widget) != NULL,
+                         FALSE);
 
-    if (GTK_IS_EDITABLE(w))
-        gtk_editable_select_region(GTK_EDITABLE(w), 0, -1);
-    else if (GTK_IS_TEXT_VIEW(w)) {
-        GtkTextBuffer *buffer =
-            gtk_text_view_get_buffer(GTK_TEXT_VIEW(w));
-        GtkTextIter start, end;
-
-        gtk_text_buffer_get_bounds(buffer, &start, &end);
-        gtk_text_buffer_place_cursor(buffer, &start);
-        gtk_text_buffer_move_mark_by_name(buffer, "selection_bound", &end);
-    }
+    gtk_widget_grab_focus(w);
+    return TRUE;
 }
 
 /* rfc2298_address_equal

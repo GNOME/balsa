@@ -94,7 +94,7 @@ void balsa_message_set_displayed_headers(BalsaMessage * bmessage,
 void balsa_message_set_wrap(BalsaMessage * bmessage, gboolean wrap);
 
 gboolean balsa_message_can_select(BalsaMessage * bmessage);
-void balsa_message_select_all(BalsaMessage * bmessage);
+gboolean balsa_message_grab_focus(BalsaMessage * bmessage);
 
 void reflow_string(gchar * str, gint mode, gint * cur_pos, int width);
 

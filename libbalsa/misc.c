@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2003 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -153,6 +153,37 @@ libbalsa_deescape_specials(const gchar* str)
     *dest = '\0';
     return res;
 }
+
+/* libbalsa_urlencode: 
+ * Taken from PHP's urlencode()
+ */
+gchar*
+libbalsa_urlencode(const gchar* str)
+{
+    static const unsigned char hexchars[] = "0123456789ABCDEF";
+    gchar *retval = NULL;
+    gchar *x = NULL;
+    
+    g_return_val_if_fail(str != NULL, NULL);
+    
+    retval = malloc(strlen(str) * 3 + 1);
+    
+    for (x = retval; *str != '\0'; str++, x++) {
+       *x = *str;
+       if (*x == ' ') {
+           *x = '+';
+       } else if (!isalnum(*x) && strchr("_-.", *x) == NULL) {
+           /* Allow only alnum chars and '_', '-', '.'; escape the rest */
+           *x++ = '%';
+           *x++ = hexchars[*str >> 4];
+           *x = hexchars[*str & 0x0F];
+       }
+    }
+    
+    *x = '\0';
+    return retval;
+}
+
 
 /* FIXME: Move to address.c and change name to
  *   libbalsa_address_list_to_string or something */

@@ -1,3 +1,8 @@
+2003-02-08  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/misc.[hc]: implement libbalsa_urlencode() as in bug #105605.
+	* libbalsa/mailbox_imap.c: use it.
+
 2003-02-08  PeterB
 
 	* src/balsa-index-threading.c: When a message is duplicated, use

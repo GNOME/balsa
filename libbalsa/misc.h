@@ -2,7 +2,7 @@
 /* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2003 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -46,6 +46,7 @@ gchar *libbalsa_get_hostname(void);
 gchar *libbalsa_get_domainname(void);
 gchar *libbalsa_escape_specials(const gchar* str);
 gchar *libbalsa_deescape_specials(const gchar* str);
+gchar *libbalsa_urlencode(const gchar* str);
 
 gboolean libbalsa_find_word(const gchar * word, const gchar * str);
 void libbalsa_wrap_string(gchar * str, int width);

@@ -64,7 +64,6 @@ add_mailbox_config (Mailbox * mailbox)
       gnome_config_set_string ("Path", MAILBOX_LOCAL (mailbox)->path);
       node = g_node_new (mailbox_node_new (mailbox->name, mailbox,
 					   mailbox->type != MAILBOX_MBOX));
-      g_node_append (balsa_app.mailbox_nodes, node);
       break;
     case MAILBOX_POP3:
       gnome_config_set_int ("Type", 1);

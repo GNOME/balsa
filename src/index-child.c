@@ -158,6 +158,32 @@ index_child_create_view (GnomeMDIChild * child)
   return (vpane);
 }
 
+static gint handler = 0;
+static gboolean
+idle_handler_cb (GtkWidget * widget)
+{
+  GdkEventButton *bevent;
+  Message *message;
+  gpointer data;
+
+  bevent = gtk_object_get_data (GTK_OBJECT (widget), "bevent");
+  message = gtk_object_get_data (GTK_OBJECT (widget), "message");
+  data = gtk_object_get_data (GTK_OBJECT (widget), "data");
+
+  if (bevent && bevent->button == 1 && bevent->type == GDK_2BUTTON_PRESS)
+    message_window_new (message);
+  else if (bevent && bevent->button == 3)
+    gtk_menu_popup (GTK_MENU (create_menu (BALSA_INDEX (widget), message)), NULL, NULL, NULL, NULL, bevent->button, bevent->time);
+  else
+    balsa_message_set (BALSA_MESSAGE (((IndexChild *) data)->message), message);
+  handler = 0;
+
+  gtk_object_remove_data (GTK_OBJECT (widget), "bevent");
+  gtk_object_remove_data (GTK_OBJECT (widget), "message");
+  gtk_object_remove_data (GTK_OBJECT (widget), "data");
+  return FALSE;
+}
+
 static void
 index_select_cb (GtkWidget * widget,
 		 Message * message,
@@ -170,12 +196,14 @@ index_select_cb (GtkWidget * widget,
 
   set_imap_username (message->mailbox);
 
-  if (bevent && bevent->button == 1 && bevent->type == GDK_2BUTTON_PRESS)
-    message_window_new (message);
-  else if (bevent && bevent->button == 3)
-    gtk_menu_popup (GTK_MENU (create_menu (BALSA_INDEX (widget), message)), NULL, NULL, NULL, NULL, bevent->button, bevent->time);
-  else
-    balsa_message_set (BALSA_MESSAGE (((IndexChild *) data)->message), message);
+  gtk_object_set_data (GTK_OBJECT (widget), "message", message);
+  gtk_object_set_data (GTK_OBJECT (widget), "bevent", bevent);
+  gtk_object_set_data (GTK_OBJECT (widget), "data", data);
+
+  /* this way we only display one message, not lots and lots */
+  if (!handler)
+    handler = gtk_idle_add (idle_handler_cb, widget);
+
 }
 
 /*

@@ -376,7 +376,7 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
   if (bindex->first_new_message == 0)
     bindex->first_new_message = i;
 
-  gtk_timeout_add (5, moveto_timer_hack, bindex);
+  gtk_timeout_add (5, moveto_timer_hack, (gpointer)bindex);
 }
 
 void

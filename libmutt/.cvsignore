@@ -11,5 +11,5 @@ libtool
 _libs
 config.cache
 aclocal.m4
-stamp.h
-stamp-in.h
+stamp-h
+stamp-h.in

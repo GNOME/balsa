@@ -85,3 +85,29 @@ balsa_mailbox_imap_destroy (GtkObject *object)
   if (GTK_OBJECT_CLASS(parent_class)->destroy)
     (*GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(object));
 }
+
+/* mailbox_imap_has_new_messages:
+   returns non-zero when the IMAP mbox in question has new messages.
+   should it load new messages, too?
+*/
+gint
+mailbox_imap_has_new_messages(MailboxIMAP *mailbox)
+{
+    gint res;
+    gchar * tmp;
+
+    g_assert(mailbox!=NULL);
+
+    if(MAILBOX(mailbox)->has_unread_messages)
+	return MAILBOX(mailbox)->has_unread_messages;
+
+    tmp = g_strdup_printf("{%s:%i}%s", 
+			  mailbox->server->host,
+			  mailbox->server->port,
+			  mailbox->path);
+    set_imap_username ( MAILBOX(mailbox) );
+    res = imap_buffy_check (tmp);
+    g_free(tmp);
+    /* if(res) MAILBOX(mailbox)->has_unread_messages = res; */
+    return res;
+}

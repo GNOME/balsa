@@ -32,7 +32,6 @@
 #include "misc.h"
 #include "mailbox.h"
 
-
 enum
 {
   SELECT_MAILBOX,
@@ -745,7 +744,9 @@ balsa_mblist_check_new (GtkCTree *ctree, GtkCTreeNode *node, gpointer data)
    * messages */
      mailbox->has_unread_messages = 
              mailbox_have_new_messages (MAILBOX_LOCAL (mailbox)->path);
-  } 
+  } else if ( MAILBOX_IS_IMAP(mailbox) && mailbox->open_ref > 0)
+      mailbox->has_unread_messages = 
+	  mailbox_imap_has_new_messages( MAILBOX_IMAP(mailbox) );
   
   balsa_mblist_mailbox_style (ctree, node, cnode_data
 #ifdef BALSA_SHOW_INFO

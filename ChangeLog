@@ -1,3 +1,7 @@
+2004-10-15 07:05  PeterB
+
+	* src/main-window.c: allow remote trashbox to be emptied.
+
 2004-10-14 22:34  PeterB
 
 	* libbalsa/mailbox.c, libbalsa/mailbox.h, src/save-restore.c: use

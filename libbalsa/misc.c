@@ -423,6 +423,11 @@ libbalsa_wrap_string(gchar * str, int width)
 /* Updated 2003 to implement DelSp=Yes as in
  * http://www.ietf.org/internet-drafts/draft-gellens-format-bis-01.txt
  */
+/* Now documented in RFC 3676:
+ * http://www.ietf.org/rfc/rfc3676.txt
+ * or
+ * http://www.faqs.org/rfcs/rfc3676.html
+ */
 
 #define MAX_WIDTH	997	/* enshrined somewhere */
 #define QUOTE_CHAR	'>'
@@ -606,8 +611,12 @@ dowrap_rfc2646(GList * list, gint width, gboolean to_screen,
              * */
             if (str > start && isspace((int)str[-1]) && str[-1] != ' ')
                 g_string_append_c(result, ' ');
-            if (*str)           /* line separator */
-                g_string_append_c(result, '\n');
+            if (*str) {         /* line separator */
+                if (to_screen || str == start)
+		    g_string_append_c(result, '\n');
+		else		/* DelSP = Yes */
+		    g_string_append(result, " \n");
+	    }
         } while (*str);         /* end of loop over output lines */
 
         g_free(text->str);

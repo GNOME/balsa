@@ -65,19 +65,14 @@ make_gradient(GdkColor colors[], gint first, gint last)
 gint
 is_a_quote(const gchar * str, regex_t * rex)
 {
-    gint cnt = 0, off;
-    regmatch_t rm[1];
+    gint cnt;
 
     g_return_val_if_fail(rex != NULL, 0);
 
     if (str == NULL)
 	return 0;
 
-    off = 0;
-    while (regexec(rex, str + off, 1, rm, 0) == 0) {
-	off += rm[0].rm_eo;
-	cnt++;
-    }
+    libbalsa_match_regex(str, rex, &cnt, NULL);
 
     return cnt;
 }

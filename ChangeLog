@@ -1,3 +1,9 @@
+2004-08-02 11:11  Darko Obradovic
+
+	* src/balsa-app.h, src/message-window.c, src/pref-manager.c,
+	src/save-restore.c, libbalsa/message.c, libbalsa/message.h:
+	make message title localizable, not configurable.
+
 2004-07-07  Pawel Salek
 
 	* NEWS: release 2.0.18.

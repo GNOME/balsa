@@ -335,18 +335,20 @@ mimetext2html (BODY * bdy, FILE * fp, struct obstack *bfr)
   fflush (s.fpout);
   alloced = readfile (s.fpout, &ptr);
   if (ptr)
-    ptr[alloced - 1] = '\0';
-  if (strcmp (bdy->subtype, "html") == 0 ||
-      strcmp (bdy->subtype, "enriched") == 0)
     {
-      obstack_append_string (bfr, ptr);
+      ptr[alloced - 1] = '\0';
+      if (strcmp (bdy->subtype, "html") == 0 ||
+	  strcmp (bdy->subtype, "enriched") == 0)
+	{
+	  obstack_append_string (bfr, ptr);
+	  g_free (ptr);
+	  unlink (tmp_file_name);
+	  return;
+	}
+      obstack_append_string (bfr, "<tt>");
+      text2html (ptr, bfr);
       g_free (ptr);
-      unlink (tmp_file_name);
-      return;
     }
-  obstack_append_string (bfr, "<tt>");
-  text2html (ptr, bfr);
-  g_free (ptr);
   fclose (s.fpout);
   unlink (tmp_file_name);
   return;
@@ -500,14 +502,14 @@ content2html (Message * message)
 GString *
 content2reply (Message * message)
 {
-  GList     *body_list;
-  Body      *body;
-  FILE      *msg_stream;
-  gchar      msg_filename[PATH_MAX];
-  size_t     alloced;
-  gchar     *ptr = 0;
-  GString   *reply = 0;
-  
+  GList *body_list;
+  Body *body;
+  FILE *msg_stream;
+  gchar msg_filename[PATH_MAX];
+  size_t alloced;
+  gchar *ptr = 0;
+  GString *reply = 0;
+
   switch (message->mailbox->type)
     {
     case MAILBOX_MH:
@@ -541,29 +543,29 @@ content2reply (Message * message)
 	case TYPETEXT:
 	  {
 	    STATE s;
-	    fseek(msg_stream, body->mutt_body->offset, 0);
+	    fseek (msg_stream, body->mutt_body->offset, 0);
 	    s.fpin = msg_stream;
-	    mutt_mktemp(tmp_file_name);
+	    mutt_mktemp (tmp_file_name);
 	    s.prefix = "> ";
-	    s.fpout  = fopen(tmp_file_name, "w+");
-	    mutt_decode_attachment(body->mutt_body, &s);
-	    fflush(s.fpout);
-	    alloced = readfile(s.fpout, &ptr);
+	    s.fpout = fopen (tmp_file_name, "w+");
+	    mutt_decode_attachment (body->mutt_body, &s);
+	    fflush (s.fpout);
+	    alloced = readfile (s.fpout, &ptr);
 	    if (ptr)
 	      ptr[alloced - 1] = '\0';
 	    if (reply)
 	      {
-		reply = g_string_append(reply,"\n");
-		reply = g_string_append(reply, ptr);
+		reply = g_string_append (reply, "\n");
+		reply = g_string_append (reply, ptr);
 	      }
 	    else
-	      reply = g_string_new(ptr);
-	    fclose(s.fpout);
-	    unlink(tmp_file_name);
+	      reply = g_string_new (ptr);
+	    fclose (s.fpout);
+	    unlink (tmp_file_name);
 	  }
 	}
       body_list = g_list_next (body_list);
     }
-  fclose(msg_stream);
+  fclose (msg_stream);
   return reply;
 }

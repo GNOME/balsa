@@ -982,13 +982,13 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
     message->sig_state = 
         balsa_message_scan_signatures(message->body_list, message);
     if (message->sig_state != LIBBALSA_MESSAGE_SIGNATURE_UNKNOWN) {
-        GList *notify = NULL;
-        notify = g_list_append(notify, message);
+        GList *notify = g_list_prepend(NULL, message);
         /* send the message the signal to update the signature status icon.
            The flag value must not match anything in src/balsa-index.c,
            mailbox_messages_changed_status().  */
-        g_signal_emit_by_name(G_OBJECT(message->mailbox), 
-                              "messages-status-changed", notify, 42);
+	libbalsa_mailbox_messages_status_changed(message->mailbox, notify,
+						 42);
+	g_list_free1(notify);
     }
 #endif
 
@@ -2007,9 +2007,7 @@ static void
 part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 {
     FILE *fp;
-    gboolean is_html;
-    gboolean is_enriched;
-    gboolean is_richtext;
+    LibBalsaHTMLType html_type;
     gchar *content_type;
     gchar *ptr = NULL;
     size_t alloced;
@@ -2036,25 +2034,16 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         return;
 
     content_type = libbalsa_message_body_get_content_type(info->body);
-    is_html = (strcmp(content_type, "text/html") == 0);
-    is_enriched = (strcmp(content_type, "text/enriched") == 0);
-    is_richtext = (strcmp(content_type, "text/richtext") == 0);
+    html_type = libbalsa_html_type(content_type);
     g_free(content_type);
 
     /* This causes a memory leak */
     /* if( info->body->filename == NULL ) */
     /*   info->body->filename = g_strdup( "textfile" ); */
 
-    if (is_html || is_enriched || is_richtext) {
+    if (html_type) {
 #ifdef HAVE_GTKHTML
-        if (is_enriched || is_richtext) {
-            gchar *tmp;
-
-            tmp = libbalsa_html_from_rich(ptr, alloced, is_richtext);
-            g_free(ptr);
-            ptr = tmp;
-            alloced = strlen(tmp);
-        }
+	alloced = libbalsa_html_filter(html_type, &ptr, alloced);
         part_info_init_html(bm, info, ptr, alloced);
 #else
         part_info_init_unknown(bm, info);
@@ -3097,11 +3086,7 @@ preferred_part(LibBalsaMessageBody *parts)
             preferred = body;
 #ifdef HAVE_GTKHTML
         else if (!balsa_app.display_alt_plain
-                 && (g_ascii_strcasecmp(content_type, "text/html") == 0
-                     || g_ascii_strcasecmp(content_type,
-                                           "text/enriched") == 0
-                     || g_ascii_strcasecmp(content_type,
-                                           "text/richtext") == 0))
+		 && libbalsa_html_type(content_type))
             preferred = body;
 #endif                          /* HAVE_GTKHTML */
 

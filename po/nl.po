@@ -5,14 +5,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa.HEAD.nl\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-09-20 22:49+0100\n"
-"PO-Revision-Date: 2004-09-17 21:44+0200\n"
+"POT-Creation-Date: 2004-09-24 11:00+0200\n"
+"PO-Revision-Date: 2004-09-24 18:26+0200\n"
 "Last-Translator: Michiel Sikkes <michiel@eyesopened.nl>\n"
 "Language-Team: Dutch <vertaling@nl.linux.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);"
 
 #: balsa.desktop.in.h:1
 msgid "Balsa"
@@ -96,7 +96,7 @@ msgstr "O_rganisatie:"
 msgid "_Email Address:"
 msgstr "_E-mailadres:"
 
-#: libbalsa/body.c:115 libbalsa/mailbox_local.c:976 libbalsa/message.c:914
+#: libbalsa/body.c:115 libbalsa/mailbox_local.c:976 libbalsa/message.c:917
 msgid "(No subject)"
 msgstr "(Geen onderwerp)"
 
@@ -495,32 +495,32 @@ msgstr "Kan geen postbus van het type %s aanmaken"
 #. ImapIssue macro handles reconnecting. We might issue a
 #. LIBBALSA_INFORMATION_MMESSAGE here but it would be overwritten by
 #. login information...
-#: libbalsa/mailbox_imap.c:500
+#: libbalsa/mailbox_imap.c:501
 msgid "IMAP connection has been severed. Reconnecting..."
 msgstr "IMAP connectie is verbroken. Opnieuw aan het verbinden..."
 
-#: libbalsa/mailbox_imap.c:503
+#: libbalsa/mailbox_imap.c:504
 #, c-format
 msgid "IMAP server has shut the connection: %s Reconnecting..."
 msgstr "IMAP server heeft de verbinding verbroken: %s reconnecting..."
 
-#: libbalsa/mailbox_imap.c:851
+#: libbalsa/mailbox_imap.c:868
 #, c-format
 msgid "IMAP SEARCH UNSEEN request failed for mailbox %s"
 msgstr "IMAP SEARCH UNSEEN verzoek voor postbus %s is mislukt"
 
-#: libbalsa/mailbox_imap.c:914 libbalsa/mailbox_maildir.c:480
+#: libbalsa/mailbox_imap.c:931 libbalsa/mailbox_maildir.c:480
 #: libbalsa/mailbox_mbox.c:461 libbalsa/mailbox_mh.c:502
 #, c-format
 msgid "%s: Opening %s Refcount: %d\n"
 msgstr "%s: Openen %s Reftelling: %d\n"
 
-#: libbalsa/mailbox_imap.c:978 libbalsa/mailbox_imap.c:1991
+#: libbalsa/mailbox_imap.c:995 libbalsa/mailbox_imap.c:2008
 #, c-format
 msgid "Downloading %ld kB"
 msgstr "Bezig met downloaden... %ld kB"
 
-#: libbalsa/mailbox_imap.c:1345
+#: libbalsa/mailbox_imap.c:1362
 #, c-format
 msgid ""
 "IMAP SEARCH command failed for mailbox %s\n"
@@ -529,17 +529,17 @@ msgstr ""
 "IMAP zoekopdracht mislukt voor postbus %s\n"
 "Teruggeschakeld naar standaard zoekmethode"
 
-#: libbalsa/mailbox_imap.c:1405
+#: libbalsa/mailbox_imap.c:1422
 #, c-format
 msgid "No path found for mailbox \"%s\", using \"%s\""
 msgstr "Geen pad gevonden voor mailbox \"%s\", met het gebruik van \"%s\""
 
-#: libbalsa/mailbox_imap.c:2171
+#: libbalsa/mailbox_imap.c:2188
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "Bezig met uploaden... %ld kB"
 
-#: libbalsa/mailbox_imap.c:2321
+#: libbalsa/mailbox_imap.c:2338
 msgid "Server-side threading not supported."
 msgstr "Server-size threading is niet ondersteund."
 
@@ -715,12 +715,12 @@ msgstr ""
 msgid "POP3 temp mailbox %s was not removed (system error message: %s)"
 msgstr "POP3 tijdelijke postbus %s is niet verwijderd (syteemfout: %s)"
 
-#: libbalsa/message.c:482
+#: libbalsa/message.c:485
 #, c-format
 msgid "Source mailbox (%s) is readonly. Cannot move messages"
 msgstr "Bron postbus (%s) is alleen-lezen. Kan berichten niet verplaatsen"
 
-#: libbalsa/message.c:634 libbalsa/message.c:674
+#: libbalsa/message.c:637 libbalsa/message.c:677
 #, c-format
 msgid "Mailbox (%s) is readonly: cannot change flags."
 msgstr "Postbus (%s) is alleen-lezen: kan markeringen niet aanpassen."
@@ -1201,7 +1201,7 @@ msgstr ""
 msgid "Connected to MTA"
 msgstr "Verbinden met MTA"
 
-#: libbalsa/send.c:865 src/balsa-message.c:1462 src/print.c:369
+#: libbalsa/send.c:865 src/balsa-message.c:1462 src/print.c:370
 #: src/sendmsg-window.c:859 src/sendmsg-window.c:2464 src/store-address.c:303
 msgid "From:"
 msgstr "Van:"
@@ -1210,7 +1210,7 @@ msgstr "Van:"
 msgid "From"
 msgstr "Van"
 
-#: libbalsa/send.c:877 src/balsa-message.c:1471 src/print.c:373
+#: libbalsa/send.c:877 src/balsa-message.c:1471 src/print.c:374
 #: src/sendmsg-window.c:858 src/sendmsg-window.c:2471 src/store-address.c:304
 msgid "To:"
 msgstr "Aan:"
@@ -1924,12 +1924,12 @@ msgstr "(Geen afzender)"
 msgid "Could not access message; mailbox \"%s\" was changed."
 msgstr "Kon bericht niet openen; mailbox \"%s\" is veranderd."
 
-#: src/balsa-message.c:1453 src/print.c:358 src/sendmsg-window.c:863
+#: src/balsa-message.c:1453 src/print.c:359 src/sendmsg-window.c:863
 #: src/sendmsg-window.c:2459
 msgid "Subject:"
 msgstr "Onderwerp:"
 
-#: src/balsa-message.c:1457 src/print.c:364 src/sendmsg-window.c:2453
+#: src/balsa-message.c:1457 src/print.c:365 src/sendmsg-window.c:2453
 msgid "Date:"
 msgstr "Datum:"
 
@@ -1938,22 +1938,22 @@ msgid "Reply-To:"
 msgstr "Antwoord naar:"
 
 #. cc:
-#: src/balsa-message.c:1472 src/print.c:374 src/sendmsg-window.c:862
+#: src/balsa-message.c:1472 src/print.c:375 src/sendmsg-window.c:862
 #: src/sendmsg-window.c:2150 src/sendmsg-window.c:2478 src/store-address.c:305
 msgid "Cc:"
 msgstr "Cc:"
 
 #. bcc:
-#: src/balsa-message.c:1473 src/print.c:375 src/sendmsg-window.c:861
+#: src/balsa-message.c:1473 src/print.c:376 src/sendmsg-window.c:861
 #: src/sendmsg-window.c:2155 src/store-address.c:306
 msgid "Bcc:"
 msgstr "Bcc:"
 
-#: src/balsa-message.c:1476 src/print.c:376
+#: src/balsa-message.c:1476 src/print.c:377
 msgid "Fcc:"
 msgstr "Fcc:"
 
-#: src/balsa-message.c:1481 src/print.c:381
+#: src/balsa-message.c:1481 src/print.c:382
 msgid "Disposition-Notification-To:"
 msgstr "Disposition-Notification-To:"
 
@@ -4641,12 +4641,12 @@ msgstr "Vraag mij"
 msgid "Error displaying link_id %s: %s\n"
 msgstr "Fout bij weergeven van %s: %s\n"
 
-#: src/print.c:258 src/print.c:724
+#: src/print.c:259 src/print.c:725
 #, c-format
 msgid "Page: %i/%i"
 msgstr "Pagina: %i/%i"
 
-#: src/print.c:666
+#: src/print.c:667
 msgid ""
 "Preparing an HTML part, which must start on a new page.\n"
 "Print this part?"
@@ -4656,63 +4656,68 @@ msgstr ""
 
 #. gather some info about this part
 #. four fields, one terminator
-#: src/print.c:981
+#: src/print.c:982
 msgid "Type:"
 msgstr "Type:"
 
-#: src/print.c:984
+#: src/print.c:985
 msgid "File name:"
 msgstr "Bestandsnaam:"
 
-#: src/print.c:1526
+#: src/print.c:1299
+#, c-format
+msgid "This is an inline OpenPGP signed %s message part:"
+msgstr "Dit is een door OpenPGP ondertekend %s berichtgedeelte:"
+
+#: src/print.c:1544
 msgid "Font available for printing"
 msgstr "Lettertype beschikbaar voor afdrukken"
 
-#: src/print.c:1532
+#: src/print.c:1550
 #, c-format
 msgid "Font <b>not</b> available for printing. Closest: %s"
 msgstr ""
 "Lettertype <b>niet</b> beschikbaar voor afdrukken. Beste alternatief: %s"
 
-#: src/print.c:1545
+#: src/print.c:1563
 msgid "Select Font"
 msgstr "Kies lettertype"
 
-#: src/print.c:1578
+#: src/print.c:1596
 msgid "Change..."
 msgstr "Aanpassen...."
 
-#: src/print.c:1612
+#: src/print.c:1630
 msgid "Print message"
 msgstr "Druk bericht af"
 
 #. create a 2nd notebook page for the fonts
-#: src/print.c:1623
+#: src/print.c:1641
 msgid "_Fonts"
 msgstr "_Lettertypen"
 
-#: src/print.c:1626
+#: src/print.c:1644
 msgid "Header font"
 msgstr "Lettertype voor kopregels"
 
-#: src/print.c:1628
+#: src/print.c:1646
 msgid "Body font"
 msgstr "Lettertype voor inhoud"
 
-#: src/print.c:1630
+#: src/print.c:1648
 msgid "Footer font"
 msgstr "Voetnootlettertype"
 
 #. highlight cited stuff
-#: src/print.c:1634
+#: src/print.c:1652
 msgid "Highlight cited text"
 msgstr "Geciteerde tekst oplichten"
 
-#: src/print.c:1638
+#: src/print.c:1656
 msgid "_Enable highlighting of cited text"
 msgstr "Geciteerde tekst _markeren"
 
-#: src/print.c:1664
+#: src/print.c:1682
 #, c-format
 msgid ""
 "Balsa could not find font \"%s\".\n"
@@ -4721,7 +4726,7 @@ msgstr ""
 "Balsa kan het lettertype \"%s\" niet vinden.\n"
 "Gebruik de pagina \"Lettertypes\" in het afdrukvenster om deze te veranderen."
 
-#: src/print.c:1769
+#: src/print.c:1787
 msgid "Balsa: message print preview"
 msgstr "Balsa: bericht afdrukvoorbeeld"
 

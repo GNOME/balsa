@@ -326,6 +326,7 @@ balsa_app_init(void)
     balsa_app.mw_height = MW_DEFAULT_HEIGHT;
     balsa_app.sw_width = 0;
     balsa_app.sw_height = 0;
+    balsa_app.toolbar_wrap_button_text = TRUE;
     balsa_app.pwindow_option = WHILERETR;
     balsa_app.wordwrap = TRUE;
     balsa_app.wraplength = 72;

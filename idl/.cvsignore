@@ -1,8 +1,0 @@
-Makefile
-Makefile.in
-.deps
-balsa-skels.c
-balsa-stubs.c
-balsa-common.c
-balsa.h
-balsa-skelimpl.c

@@ -1518,7 +1518,8 @@ balsa_close_commit_mailbox_on_timer(GtkWidget * widget, gpointer * data)
         }
 	if (i == c)
             continue;
-        if (time > (balsa_app.close_mailbox_timeout)) {
+        if (balsa_app.close_mailbox_auto &&
+	    time > balsa_app.close_mailbox_timeout) {
             if (balsa_app.debug)
                 fprintf(stderr, "Closing Page %d, time: %d\n", i, time);
             unregister_open_mailbox(index->mailbox_node->mailbox);

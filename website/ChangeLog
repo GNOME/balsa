@@ -1,4 +1,9 @@
-2000-08-28  Pawel Salek <pawsa@theochem.kth.se>
+2000-09-05  Pawel Salek <pawsa@theochem.kth.se>
+
+	* download.html: don't generate it. Mention krb5 requirements for
+	binary rpms.
+	
+2000-09-05  Pawel Salek <pawsa@theochem.kth.se>
 
 	* main.html, download.html.in: 0.9.4 announcement.
 

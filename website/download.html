@@ -16,9 +16,21 @@ body {margin-left: 50pt;}
 <ol>
 <li>A basic <a href="http://www.gnome.org/start/">GNOME installation</a>.</li>
 
-<li>Balsa needs <samp>libPropList</samp>. Check if you don't have it already on your system, subsequently try to download suitable rpm. If you cannot do it for some reason, grab <a href="http://windowmaker.org/ftp/pub/beta/srcs/libPropList-0.10.1.tar.gz">libPropList.tar.gz</a>,
-It must be installed with a prefix of <samp>/usr</samp> if you
-wish to also use a Balsa RPM. Note, that in this last case you might need to ignore dependices warnings when installing rpm.</li>
+<li>Balsa needs <samp>libPropList</samp>. Check if you don't have it
+already on your system, subsequently try to download suitable rpm. If
+you cannot do it for some reason, grab 
+<a href="http://windowmaker.org/ftp/pub/beta/srcs/libPropList-0.10.1.tar.gz">libPropList.tar.gz</a>,
+It must be installed with a prefix of <samp>/usr</samp> if you wish to
+also use a Balsa RPM. Note, that in this last case you might need to
+ignore dependices warnings when installing rpm.</li>
+
+<li>balsa-0.9.4 binary rpms are compiled on RH-6.2 with update
+packages installed. The binaries come with GSS authorisation
+enabled. You need Kerberos libraries (<samp>krb5-libs</samp> and
+<samp>krb5-config</samp>) provided with RH-6.2 and up, for
+example. Alternatively, you can recompile balsa from the source
+(<samp>man rpm</samp> is your friend) with GSS disabled.</li>
+
 </ol>
 
 <h2>Download</h2>

@@ -1,3 +1,8 @@
+2000-09-04  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/pref-manager.c: renamed quoted colours to primary and secondary.
+	* configure.in: bumed version number to 0.9.4
+	
 2000-09-04  Carlos Morgado <chbm@chbm.nu>
 
 	* libmutt/Makefile.am: removed socket.c from files list (replaced

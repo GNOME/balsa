@@ -1,4 +1,4 @@
-Balsa E-Mail Client 0.9.3
+Balsa E-Mail Client 0.9.4
 
   This is a non-stable, development release. See ChangeLog for the list
   of the recent changes.
@@ -85,6 +85,11 @@ Mailbox locking:
 use fcntl (although it can be enabled) since this locking method is
 very fragile and often not portable (see for example
 http://www.washington.edu/pine/tech-notes/low-level.html#locking).
+
+Make sure that your spool directory has drwxrwxrwt (01777) access
+privileges. Presently, dotfile locking requires this unconditionally
+In the future, we may relax this requirement and will allow you to
+shoot yourself in your leg.
 
 Reporting Bugs:
 	See http://www.balsa.net/bugs.html for instructions.  Do not

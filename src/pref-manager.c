@@ -1542,7 +1542,7 @@ create_misc_page ( )
 	gtk_container_set_border_width
 	   (GTK_CONTAINER (pui->quoted_color_start), 5);
 
-	quoted_color_label_start = gtk_label_new (_("Quoted text colour"));
+	quoted_color_label_start = gtk_label_new (_("Primary colour"));
 	gtk_widget_show (quoted_color_label_start);
 	gtk_box_pack_start (GTK_BOX (quoted_color_box_start),
 	      quoted_color_label_start, FALSE, FALSE, 5);
@@ -1564,7 +1564,7 @@ create_misc_page ( )
 	gtk_container_set_border_width
 	   (GTK_CONTAINER (pui->quoted_color_end), 5);
 
-	quoted_color_label_end = gtk_label_new (_("Quoted text colour"));
+	quoted_color_label_end = gtk_label_new (_("Secondary colour"));
 	gtk_widget_show (quoted_color_label_end);
 	gtk_box_pack_start (GTK_BOX (quoted_color_box_end),
 	      quoted_color_label_end, FALSE, FALSE, 5);

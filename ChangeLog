@@ -1,3 +1,17 @@
+2004-10-11 14:55  Craig Routledge <webstuff@craigroutledge.com>
+
+	* src/: balsa-icons.c, balsa-icons.h, message-window.c,
+	toolbar-factory.c, pixmaps/balsa_next_part.xpm,
+	pixmaps/balsa_previous_part.xpm, pixmaps/menu_next_part.xpm,
+	pixmaps/menu_previous_part.xpm: Adds several accelerators and
+	next/previous message to message window.
+
+2004-10-11 14:54  PeterB
+
+	* src/: balsa-index.c, balsa-index.h: implement
+	balsa_index_{next,previous,next_unread,next_flagged}_msgno for
+	message window's use.
+
 2004-10-10  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: first shot at systematic ImapCacheManager

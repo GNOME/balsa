@@ -1,5 +1,9 @@
 2001-02-11  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* mx.c, sendlib.c: fixed mistakes in importing.
+	
+2001-02-11  Pawel Salek  <pawsa@theochem.kth.se>
+
 	Sync with mutt-unstable-20010210.
 
 	* Makefile.am:

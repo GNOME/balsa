@@ -649,7 +649,7 @@ static CONTENT *mutt_get_content_info (const char *fname)
       if (ch == ' ') whitespace++;
       info->ascii++;
     }
-    if (mutt_is_utf8 (ch) )
+    if (ch>127)
       info->nonasc = 1;
     if (linelen > 1) dot = 0;
     if (ch != ' ' && ch != '\t') whitespace = 0;

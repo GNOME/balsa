@@ -530,6 +530,27 @@ create_menu (BalsaIndex * bindex)
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
 
+  menuitem = gtk_menu_item_new_with_label ("Copy to");
+
+  list = g_list_first (balsa_app.mailbox_list);
+  submenu = gtk_menu_new ();
+  while (list)
+    {
+      mailbox = list->data;
+      smenuitem = gtk_menu_item_new_with_label (mailbox->name);
+      gtk_menu_append(GTK_MENU(submenu), smenuitem);
+      gtk_widget_show (smenuitem);
+      list = list->next;
+    }
+
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), submenu);
+  gtk_menu_append (GTK_MENU (menu), menuitem);
+  gtk_widget_show (menuitem);
+
+  menuitem = gtk_menu_item_new_with_label ("Delete");
+  gtk_menu_append (GTK_MENU (menu), menuitem);
+  gtk_widget_show (menuitem);
+
   return menu;
 }
 

@@ -197,7 +197,7 @@ create_toolbar (MainWindow *mw)
 			     "Check", 
 			     "Check Email", 
 			     NULL,
-			     new_icon (p4_xpm, window),
+			     gnome_stock_pixmap_widget(window,GNOME_STOCK_PIXMAP_MAIL_RCV),
 			     GTK_SIGNAL_FUNC (current_mailbox_check),
 			     "Check Email");
   GTK_WIDGET_UNSET_FLAGS(toolbarbutton, GTK_CAN_FOCUS);
@@ -252,9 +252,11 @@ create_toolbar (MainWindow *mw)
 			     "Previous",
 			     "Open Previous Message",
 			     NULL,
-			     new_icon (p10_xpm, window),
+			     gnome_stock_pixmap_widget(window, GNOME_STOCK_PIXMAP_BACK),
 			     GTK_SIGNAL_FUNC (index_previous_message),
 			     "Open Previous Message");
+
+
   GTK_WIDGET_UNSET_FLAGS(toolbarbutton, GTK_CAN_FOCUS);
 
   toolbarbutton =
@@ -262,7 +264,7 @@ create_toolbar (MainWindow *mw)
 			     "Next",
 			     "Open Next Message", 
 			     NULL,
-			     new_icon (p11_xpm, window), 
+			     gnome_stock_pixmap_widget(window, GNOME_STOCK_PIXMAP_FORWARD),
 			     GTK_SIGNAL_FUNC (index_next_message),
 			     "Open Next Message");
   GTK_WIDGET_UNSET_FLAGS(toolbarbutton, GTK_CAN_FOCUS);

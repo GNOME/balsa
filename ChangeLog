@@ -1,5 +1,8 @@
 2000-04-19  Peter Williams  <peter@beta.newton.cx>
 
+	* configure.in: Made this look all pretty, and
+	  added some extra 'checking' messages.
+
 	* src/main-window.c (show_about_box): Added some
 	  authors.
 

@@ -1,21 +1,43 @@
+dnl ######################################################################################
+dnl Startup
+dnl ######################################################################################
+
 AC_INIT(src/main.c)
 AM_CONFIG_HEADER(config.h)
 
-dnl
-dnl take care of version
-dnl
+dnl ######################################################################################
+dnl Versioning
+dnl   BALSA_VERSION is what we use, except when we want...
+dnl   BALSA_SHORT_VERSION, which doesn't have the release appended. For RPM, which
+dnl                        keeps the release as a separate field
+dnl ######################################################################################
 
 BALSA_MAJOR=0
 BALSA_REVISION=8
 BALSA_PATCHLEVEL=0
 BALSA_RELEASE="pre1"
 
+dnl It's okay to set BALSA_RELEASE= ; this handles it
+
+if test x"$BALSA_RELEASE" = x ; then
+	brsffx=
+else
+	brsffx="-${BALSA_RELEASE}"
+fi
+
 BALSA_SHORT_VERSION="$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}"
-BALSA_VERSION="$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}-${BALSA_RELEASE}"
+BALSA_VERSION="$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}${brsffx}"
 VERSION="$BALSA_VERSION"
 
-dnl configure libmutt
+dnl ######################################################################################
+dnl Configure libmutt, later
+dnl ######################################################################################
+
 AC_CONFIG_SUBDIRS(libmutt)
+
+dnl ######################################################################################
+dnl Now that we have versioning, checks and stuff
+dnl ######################################################################################
 
 AM_INIT_AUTOMAKE(balsa, [$VERSION])
 
@@ -23,7 +45,10 @@ AM_MAINTAINER_MODE
 AM_ACLOCAL_INCLUDE(macros)
 AC_ISC_POSIX
 
-AM_PATH_GLIB([1.2.0],,AC_MSG_ERROR([You need GLib installed -- GNOME requires this as well.]),gthread)
+AM_PATH_GLIB([1.2.0],[],[
+	AC_MSG_ERROR([You need GLib installed -- GNOME requires this as well.])
+],gthread)
+
 GNOME_INIT
 
 AC_PROG_CC
@@ -33,37 +58,57 @@ AM_PROG_LEX
 AC_PROG_YACC
 AM_PROG_LIBTOOL
 
-
 dnl this should come after `AC_PROG_CC'
 GNOME_X_CHECKS
+
+dnl ######################################################################################
+dnl Check for proplist, but don't add it to the LIBS
+dnl And give proplist the GTK+ libs but don't put them in LIBS etc.
+dnl ######################################################################################
 
 balsa_save_LDFLAGS="$LDFLAGS"
 balsa_save_LIBS="$LIBS"
 
+dnl LDFLAGS += gtk ldflags
+dnl LIBS += gtk libs
 LDFLAGS="$LDFLAGS `echo $GTK_LIBS | sed 's/\(.*\)\(-lgtk.*\)/\1/'`"
 LIBS="$LIBS $GTK_LIBS"
 
-AC_CHECK_LIB(PropList, PLGetProplistWithPath, ,
-AC_MSG_ERROR([*** libPropList not found.  Please check http://www.balsa.net for information on the required files.]),)
+AC_CHECK_LIB(PropList, PLGetProplistWithPath,,[
+	AC_MSG_ERROR([*** libPropList not found. Please check http://www.balsa.net for information on the required files.])
+])
 
+dnl Reset
 LDFLAGS="$balsa_save_LDFLAGS"
 LIBS="$balsa_save_LIBS"
+
+dnl ######################################################################################
+dnl All the linguas, all the time.
+dnl ######################################################################################
 
 ALL_LINGUAS="ca da de el es et fi fr ga ja ko no it nl pl ru pt_BR sv tr uk zh_CN"
 LINGUAS="$ALL_LINGUAS"
 AM_GNU_GETTEXT
 
+dnl ######################################################################################
+dnl Substitutions, defines, part I
+dnl ######################################################################################
 
 AC_SUBST(CFLAGS)
 AC_SUBST(CPPFLAGS)
 AC_SUBST(LDFLAGS)
 
+dnl No choice about this
 gnome_cv_use_gnome=yes
 
 AC_DEFINE_UNQUOTED(BALSA_MAJOR, $BALSA_MAJOR)
 AC_DEFINE_UNQUOTED(BALSA_REVISION, $BALSA_REVISION)
 AC_DEFINE_UNQUOTED(BALSA_PATCHLEVEL, $BALSA_PATCHLEVEL)
 AC_DEFINE_UNQUOTED(BALSA_VERSION, "$BALSA_VERSION")
+
+dnl ######################################################################################
+dnl More checks
+dnl ######################################################################################
 
 AC_CHECK_LIB(crypt, crypt)
 
@@ -75,20 +120,32 @@ dnl AC_CHECK_LIB(acap, acap_OpenConnection)
 AM_HDR_SIGACTION
 AM_HDR_SIGSET
 
+dnl ######################################################################################
 dnl ORBit support
-dnl Use 'failure' instead of 'dontfail' to make us bomb if no orbit.
+dnl Use 'failure' instead of 'dontfail' to make us bomb if no orbit. Probably should
+dnl   use 'failure'.
+dnl ######################################################################################
+
 GNOME_ORBIT_HOOK([],dontfail)
 AM_CONDITIONAL(ORBIT_INSTALLED, test -n "$ORBIT_LIBS")
 
-dnl Automake @VARIABLE@ exports.
+dnl ######################################################################################
+dnl More substitutions
+dnl ######################################################################################
+
 AC_SUBST(BALSA_MAJOR)
 AC_SUBST(BALSA_REVISION)
 AC_SUBST(BALSA_PATCHLEVEL)
 AC_SUBST(BALSA_RELEASE)
 AC_SUBST(BALSA_SHORT_VERSION)
 AC_SUBST(BALSA_VERSION)
+
 AC_SUBST(LIBOBJS)
 AC_SUBST(LIBESD_LIB)
+
+dnl ######################################################################################
+dnl Check for CVS nature, for warnings + extra program checks
+dnl ######################################################################################
 
 if test -d "${srcdir}/CVS" ; then
 	BALSA_FROM_CVS=yes
@@ -96,32 +153,44 @@ else
 	BALSA_FROM_CVS=no
 fi
 
+AC_MSG_CHECKING([for CVS information])
+AC_MSG_RESULT($BALSA_FROM_CVS)
+
 dnl ######################################################################################
-dnl Enable all?
+dnl Enable all? (=broken stuff)
 dnl ######################################################################################
 
 AC_ARG_ENABLE(all, [  --enable-all            Enable incomplete features [default=no]],[
-	AC_DEFINE(BALSA_SHOW_ALL)
-	use_all=yes
+	use_all=$enableval
 ],[
 	use_all=no
 ])
+
+AC_MSG_CHECKING([whether to build unfinished features])
+if test x"$use_all" = xyes ; then
+	AC_MSG_RESULT([yes])
+	AC_DEFINE(BALSA_SHOW_ALL)
+else
+	AC_MSG_RESULT([no])
+fi
 
 dnl ######################################################################################
 dnl Enable information in the mailbox list?
 dnl ######################################################################################
 
 AC_ARG_ENABLE(info, [  --enable-info           Enable mailbox info [default=yes]],[
-	if test "$enableval" = "yes" ; then
-		AC_DEFINE(BALSA_SHOW_INFO)
-		use_info="$enableval"
-	else
-		use_info="$enableval"
-	fi
+	use_info=$enableval
 ],[
-	AC_DEFINE(BALSA_SHOW_INFO)
-	use_info='yes'
+	use_info=yes
 ])
+
+AC_MSG_CHECKING([whether to use 'mailbox info'])
+if test x"$use_info" = xyes ; then
+	AC_MSG_RESULT([yes])
+	AC_DEFINE(BALSA_SHOW_INFO)
+else
+	AC_MSG_RESULT([no])
+fi
 
 dnl ######################################################################################
 dnl Use threading?
@@ -150,7 +219,7 @@ else
 fi
 
 dnl ######################################################################################
-dnl Install into gnome locations? (may require priveleges that we don't have)
+dnl Install into gnome locations? (may require priveliges that we don't have)
 dnl ######################################################################################
 
 AC_ARG_ENABLE([system-install], [  --disable-system-install Don't install some files into Gnome's prefix],[
@@ -179,6 +248,7 @@ AC_SUBST(gnomeconfdir)
 
 dnl ######################################################################################
 dnl Remember our prefixes
+dnl   The way prefix et al are defined makes us jump through some hoops.
 dnl ######################################################################################
 
 dnl datadir='${prefix}/share', so we must eval it or something. This works
@@ -206,13 +276,17 @@ AC_DEFINE_UNQUOTED( GNOME_LIB_PREFIX, "$GNOME_LIB_PREFIX" )
 AC_DEFINE_UNQUOTED( GNOME_DATA_PREFIX, "$GNOME_DATA_PREFIX" )
 AC_DEFINE_UNQUOTED( BALSA_COMMON_PREFIXES, `echo $BALSA_COMMON_PREFIXES` ) dnl bleah
 
-dnl This is for the rpm spec, where we patch the @-@ thingies but we don't want
-dnl them substituted in the .infile->file conversion
+dnl ######################################################################################
+dnl This is for the RPM spec, where we patch the @-@ thingies but we don't want
+dnl them substituted in the .infile->file conversion. It's hard to explain, look at
+dnl balsa.spec.in and think about it.
+dnl ######################################################################################
 
 at_prefix="@prefix@"
 at_srcdir="@srcdir@"
 at_DATADIRNAME="@DATADIRNAME@"
 at_exec_prefix="@exec_prefix@"
+
 AC_SUBST(at_prefix)
 AC_SUBST(at_srcdir)
 AC_SUBST(at_DATADIRNAME)
@@ -226,7 +300,7 @@ if test x"$BALSA_FROM_CVS" = xyes ; then
 	AC_CHECK_PROG(HAS_GOB, gob, yes, no)
 
 	if test x"$HAS_GOB" = xno ; then
-		AC_MSG_ERROR([As a CVS user, you need to get gob to build Balsa. It is available from Gnome CVS in the module 'gob])
+		AC_MSG_ERROR([As a CVS user, you need to get gob to build Balsa. It is available from Gnome CVS in the module 'gob'])
 	fi
 fi
 
@@ -251,8 +325,12 @@ idl/Makefile
 src/Makefile
 ])
 
+dnl ######################################################################################
+dnl Summary
+dnl ######################################################################################
+
 echo ""
-echo "========= Final configuration ==================="
+echo "================ Final configuration ==================="
 echo "    Installing into prefix: $prefix"
 echo "      Using multithreading: $use_threads"
 echo " Using incomplete features: $use_all"
@@ -262,7 +340,6 @@ echo "            Gnome's prefix: $use_system_install (may require root privileg
 echo ""
 
 if test x"$BALSA_FROM_CVS" = xyes ; then
-	echo ""
 	echo "============================== NOTICE ================================"
 	echo "                 You are using Balsa from CVS source."
 	echo "  The program is likely to be unstable, contain incomplete features,"

@@ -1,6 +1,5 @@
 CFLAGS += -Wall -Wmissing-prototypes -Wpointer-arith
 
-if USE_EXINIT
 noinst_LIBRARIES = libinit_balsa.a
 
 libinit_balsa_a_SOURCES = 		\
@@ -25,7 +24,6 @@ BUILT_SOURCES =				\
 	balsa-druid-page-user.h		\
 	balsa-druid-page-directory.h	\
 	balsa-druid-page-finish.h	
-endif
 
 GOBFILES =				\
 	balsa-initdruid.gob		\

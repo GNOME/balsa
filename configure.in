@@ -131,48 +131,15 @@ else
 fi
 
 dnl Fancypants new init
-AC_ARG_WITH([experimental-init],
-[  --with-experimental-init=[none|c|gob]
-                                  Test incomplete new init code (developers only). none: don't use it;
-                                  c: use the C code only; gob: use gob to generate the source],
-[
-	use_exinit=$withval
-],[
-	use_exinit=none
-])
-AC_MSG_CHECKING(whether to use experimental initialization code)
-case $use_exinit in
-none)
-	AC_MSG_RESULT(no)
-	BALSA_USE_EXINIT=false
+AC_PATH_PROG(GOB,[gob],[false],)
+if test x"$GOB" = "xfalse" ; then
+	#AC_DEFINE(BALSA_USE_EXPERIMENTAL_INIT)
+	#LIBINIT_BALSA_LIB="\$(top_builddir)/libinit_balsa/libinit_balsa.a"
 	BALSA_USE_GOB=false
-	LIBINIT_BALSA_LIB=""
-	;;
-c)
-	AC_MSG_RESULT(c only)
-	AC_DEFINE(BALSA_USE_EXPERIMENTAL_INIT)
-	LIBINIT_BALSA_LIB="\$(top_builddir)/libinit_balsa/libinit_balsa.a"
-	BALSA_USE_EXINIT=true
-	BALSA_USE_GOB=false
-	;;
-gob)
-	AC_MSG_RESULT(with gob)
-	AC_PATH_PROG(GOB,[gob],[error],)
-	if test x"$GOB" = "xerror" ; then
-		AC_MSG_ERROR([gob must be in PATH to use --with-experimental-init=gob])
-	fi
-	AC_DEFINE(BALSA_USE_EXPERIMENTAL_INIT)
-	AC_DEFINE(BALSA_HAVE_GOB)
-	LIBINIT_BALSA_LIB="\$(top_builddir)/libinit_balsa/libinit_balsa.a"
-	BALSA_USE_EXINIT=true
+else
 	BALSA_USE_GOB=true
-	;;
-*)
-	AC_MSG_ERROR([You need to specify one of 'none', 'c', or 'gob' with --with-experimental-init, not $use_exinit])
-	;;
-esac
-AC_SUBST(LIBINIT_BALSA_LIB)
-AM_CONDITIONAL(USE_EXINIT,[test x"$BALSA_USE_EXINIT" = "xtrue"])
+	AC_DEFINE(BALSA_HAVE_GOB)
+fi
 AM_CONDITIONAL(USE_GOB,[test x"$BALSA_USE_GOB" = "xtrue"])
 
 dnl Create files.

@@ -33,13 +33,14 @@
 
 #include "balsa-app.h"
 #include "balsa-icons.h"
-#include "balsa-init.h"
 #include "main-window.h"
 #include "libbalsa.h"
 #include "misc.h"
 #include "save-restore.h"
 #include "main.h"
 #include "balsa-impl.c"
+
+#include "libinit_balsa/init_balsa.h"
 
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
@@ -62,13 +63,6 @@ GIOChannel              *send_thread_msg_receive;
 
 static void threads_init( gboolean init );
 #endif /* BALSA_USE_THREADS */
-
-#ifdef BALSA_USE_EXPERIMENTAL_INIT
-#if 1  /*Don't use it for real init until it is "finished" -- it is! */
-#include "libinit_balsa/init_balsa.h"
-#define initialize_balsa balsa_init_begin
-#endif
-#endif /*BALSA_USE_EXINIT*/
 
 static void balsa_init (int argc, char **argv);
 static void config_init (void);
@@ -141,7 +135,7 @@ config_init (void)
     {
       fprintf (stderr, "*** Could not load config file %s!\n",
 	       BALSA_CONFIG_FILE);
-      initialize_balsa ();
+      balsa_init_begin ();
       //return;
     }
 
@@ -151,7 +145,7 @@ config_init (void)
   if (config_global_load () == FALSE)
     {
       fprintf (stderr, "*** config_global_load failed\n");
-      initialize_balsa ();
+      balsa_init_begin ();
       return;
     }
 }
@@ -163,7 +157,7 @@ mailboxes_init (void)
   if (do_load_mailboxes () == FALSE)
     {
       fprintf (stderr, "*** error loading mailboxes\n");
-      initialize_balsa ();
+      balsa_init_begin ();
       return;
     }
 
@@ -176,7 +170,7 @@ mailboxes_init (void)
     {
       fprintf (stderr, 
                "*** One of inbox/outbox/sentbox/draftbox/trash is NULL\n");
-      initialize_balsa ();
+      balsa_init_begin ();
       return;
     }
 }

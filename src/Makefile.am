@@ -13,8 +13,6 @@ balsa_SOURCES =	\
 	balsa-index.h		\
 	balsa-index-page.c	\
 	balsa-index-page.h	\
-	balsa-init.c		\
-	balsa-init.h		\
 	balsa-mblist.c		\
 	balsa-mblist.h		\
 	balsa-message.c		\
@@ -63,7 +61,7 @@ balsa_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a \
 	$(top_builddir)/libmutt/libmutt.a \
 	$(top_builddir)/libbalsa/libbalsa.a \
-	@LIBINIT_BALSA_LIB@ \
+	$(top_builddir)/libinit_balsa/libinit_balsa.a \
 	-lPropList	\
 	@LIBESD_LIB@	\
 	$(GNOME_LIBDIR) \
@@ -74,7 +72,7 @@ balsa_LDADD = \
 balsa_DEPENDENCIES = \
 	$(top_builddir)/libbalsa/libbalsa.a \
 	$(top_builddir)/libmutt/libmutt.a \
-	@LIBINIT_BALSA_LIB@
+	$(top_builddir)/libinit_balsa/libinit_balsa.a
 
 dist-hook:
 	mkdir $(distdir)/pixmaps

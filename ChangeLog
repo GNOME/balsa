@@ -1,3 +1,10 @@
+1999-12-14  Peter Williams <peter@newton.cx>
+	* configure.in, libinit_balsa/Makefile.am,
+	  src/Makefile.am, src/main.c, po/POTFILES.in
+	  src/main-window.c, src/balsa-init.[ch]: Made 
+	    libinit_balsa mandatory and removed old init
+	    code.
+
 1999-12-14  Ragnar Henriksen <ragnar@juniks.org>
 	* removed a newline tag after name in addressbook.
 	  It could cause strange things, I didn't see this the

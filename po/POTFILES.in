@@ -1,6 +1,5 @@
 src/balsa-app.c
 src/balsa-index.c
-src/balsa-init.c
 src/balsa-message.c
 src/filter-edit-dialog.c
 src/local-mailbox.c
@@ -17,3 +16,13 @@ libbalsa/mailbox.c
 libbalsa/mime.c
 libbalsa/misc.c
 libbalsa/send.c
+
+libinit_balsa/balsa-druid-page.c
+libinit_balsa/balsa-druid-page-error.c
+libinit_balsa/balsa-druid-page-directory.c
+libinit_balsa/balsa-druid-page-finish.c
+libinit_balsa/balsa-druid-page-user.c
+libinit_balsa/balsa-druid-page-welcome.c
+libinit_balsa/balsa-initdruid.c
+libinit_balsa/helper.c
+libinit_balsa/init_balsa.c

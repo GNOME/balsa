@@ -52,9 +52,7 @@
 #include "threads.h"
 #endif
 
-#ifdef BALSA_USE_EXPERIMENTAL_INIT
 #include "libinit_balsa/init_balsa.h"
-#endif
 
 #define MAILBOX_DATA "mailbox_data"
 
@@ -149,7 +147,8 @@ static GnomeUIInfo file_menu[] =
   },
   GNOMEUIINFO_SEPARATOR,
 
-  #ifdef BALSA_USE_EXPERIMENTAL_INIT
+/*#ifdef BALSA_USE_EXPERIMENTAL_INIT*/
+  #if 0
   {
       GNOME_APP_UI_ITEM, "Test new init", "Test the new initialization druid",
       balsa_init_begin, NULL, NULL, GNOME_APP_PIXMAP_STOCK,

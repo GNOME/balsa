@@ -28,7 +28,6 @@
 
 #include "balsa-app.h"
 #include "balsa-index.h"
-#include "balsa-init.h"
 #include "local-mailbox.h"
 #include "misc.h"
 #include "main.h"

@@ -681,6 +681,10 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
 
             add_recipients(bcc_message, NULL, bcc_recip, "Cc");
 
+	    /* Prohibit status headers. */
+	    smtp_set_header_option(message, "Status", Hdr_PROHIBIT);
+	    smtp_set_header_option(message, "X-Status", Hdr_PROHIBIT);
+
 
 	    /* Estimate the size of the message.  This need not be exact
 	       but it's better to err on the large side since some message

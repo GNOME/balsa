@@ -316,7 +316,8 @@ libbalsa_mailbox_local_check(LibBalsaMailbox * mailbox)
 	if (i < 0) {
 	    g_print("mx_check_mailbox() failed on %s\n", mailbox->name);
 	} 
-	if( i == M_REOPENED && LIBBALSA_IS_MAILBOX_MBOX(mailbox)) {
+	if (i == M_REOPENED && (LIBBALSA_IS_MAILBOX_MBOX(mailbox)
+                                || LIBBALSA_IS_MAILBOX_MH(mailbox))) {
 	    /* redo everything from the start instead of looking
 	       only at new messages, but only for mboxes, maildir
 	       seems to break with this */

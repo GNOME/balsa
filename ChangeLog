@@ -1,4 +1,4 @@
-2001-03-30  Pawel Salek  <pawsa@theochem.kth.se>
+2001-04-03  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/main-window.c: lock GDK in balsa_window_progress_timeout().
 	

@@ -725,17 +725,63 @@ libbalsa_mailbox_sync_backend(LibBalsaMailbox * mailbox, gboolean delete)
 }
 #endif
 
-static void
-libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint msgno)
+void
+libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
 {
     GtkTreeIter iter;
 
     iter.user_data = g_node_find(mailbox->msg_tree, G_PRE_ORDER,
-				 G_TRAVERSE_ALL, GUINT_TO_POINTER(msgno));
+				 G_TRAVERSE_ALL, GUINT_TO_POINTER(seqno));
     g_assert(iter.user_data != NULL);
     iter.stamp = mailbox->stamp;
     g_signal_emit_by_name(mailbox, "row-changed", NULL, &iter);
 }
+
+void
+libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno)
+{
+    GtkTreeIter iter;
+
+    iter.user_data = g_node_new(GUINT_TO_POINTER(seqno));
+    g_node_append(mailbox->msg_tree, iter.user_data);
+    iter.stamp = mailbox->stamp;
+    g_signal_emit_by_name(mailbox, "row-inserted", NULL, &iter);
+}
+
+struct remove_data { unsigned seqno; GNode *node; };
+static gboolean
+decrease_post(GNode *node, gpointer data)
+{
+    struct remove_data *dt = (struct remove_data*)data;
+    unsigned seqno = GPOINTER_TO_UINT(node->data);
+    if(seqno == dt->seqno) 
+        dt->node = node;
+    else if(seqno>dt->seqno)
+        node->data = GUINT_TO_POINTER(seqno-1);
+    return FALSE;
+}
+
+void
+libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
+{
+    GtkTreeIter iter;
+    GtkTreePath *path;
+    struct remove_data dt;
+
+    dt.seqno = seqno;
+    dt.node = NULL;
+
+    g_node_traverse(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL, -1,
+                    decrease_post, &dt);
+    iter.user_data = dt.node;
+    g_assert(iter.user_data != NULL);
+    iter.stamp = mailbox->stamp;
+    path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
+    g_signal_emit_by_name(mailbox, "row-deleted", path, &iter);
+    gtk_tree_path_free(path);
+    g_node_destroy(dt.node);
+}
+
 
 /* Callback for the "messages-status-changed" signal.
  * mb:          the mailbox--must not be NULL;

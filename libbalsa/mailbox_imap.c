@@ -41,7 +41,7 @@
 #include "filter-funcs.h"
 #include "filter.h"
 #include "mailbox-filter.h"
-#include "libbalsa.h"
+#include "message.h"
 #include "libbalsa_private.h"
 #include "misc.h"
 #include "imap-handle.h"
@@ -483,14 +483,68 @@ libbalsa_mailbox_imap_get_handle(LibBalsaMailboxImap *mimap)
 static void
 lbimap_update_flags(LibBalsaMessage *message, ImapMessage *imsg)
 {
+    message->flags = 0;
+    if (!IMSG_FLAG_SEEN(imsg->flags))
+        message->flags |= LIBBALSA_MESSAGE_FLAG_NEW;
+    if (IMSG_FLAG_DELETED(imsg->flags))
+        message->flags |= LIBBALSA_MESSAGE_FLAG_DELETED;
+    if (IMSG_FLAG_FLAGGED(imsg->flags))
+        message->flags |= LIBBALSA_MESSAGE_FLAG_FLAGGED;
+    if (IMSG_FLAG_ANSWERED(imsg->flags))
+        message->flags |= LIBBALSA_MESSAGE_FLAG_REPLIED;
+    if (IMSG_FLAG_RECENT(imsg->flags))
+	message->flags |= LIBBALSA_MESSAGE_FLAG_RECENT;
 }
 
+/** imap_flags_cb() is called by the imap backend when flags are
+   fetched. Note that we may not have yet the preprocessed data in
+   LibBalsaMessage.  We ignore the info in this case.
+*/
 static void
 imap_flags_cb(unsigned seqno, LibBalsaMailboxImap *mimap)
 {
     struct message_info *msg_info = message_info_from_msgno(mimap, seqno);
     ImapMessage *imsg  = imap_mbox_handle_get_msg(mimap->handle, seqno);
-    lbimap_update_flags(msg_info->message, imsg);
+    if(msg_info->message) {
+        printf("updating flags...\n");
+        lbimap_update_flags(msg_info->message, imsg);
+        libbalsa_message_set_icons(msg_info->message);
+        libbalsa_mailbox_msgno_changed(LIBBALSA_MAILBOX(mimap), seqno);
+    }
+}
+
+static void
+imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
+{
+    unsigned cnt = imap_mbox_handle_get_exists(mimap->handle);
+    LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
+    printf("%s old=%u new=%u\n", __func__,
+           (unsigned)mailbox->total_messages, cnt);
+    if(cnt<(unsigned)mailbox->total_messages) { /* remove messages */
+        printf("%s: expunge ignored?", __func__);
+    } else { /* new messages arrived */
+        unsigned i;
+        for(i=mailbox->total_messages+1; i<=cnt; i++) {
+            struct message_info a = {0};
+            g_array_append_val(mimap->messages_info, a);
+            libbalsa_mailbox_msgno_inserted(mailbox, i);
+        }
+    }
+    mailbox->total_messages = cnt;
+}
+
+static void
+imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
+                LibBalsaMailboxImap *mimap)
+{
+    LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
+    struct message_info *msg_info = message_info_from_msgno(mimap, seqno);
+    printf("%s\n", __func__);
+    libbalsa_mailbox_msgno_removed(mailbox, seqno);
+    if(msg_info->message)
+        g_object_unref(G_OBJECT(msg_info->message));
+    g_array_remove_index(mimap->messages_info, seqno-1);
+    mailbox->total_messages--;
 }
 
 static ImapMboxHandle *
@@ -530,7 +584,14 @@ libbalsa_mailbox_imap_get_selected_handle(LibBalsaMailboxImap *mimap)
     LIBBALSA_MAILBOX(mimap)->total_messages
 	= imap_mbox_handle_get_exists(mimap->handle);
 
+    /* FIXME: these handlers should be disconnected when mailbox is closed. */
     imap_handle_set_flagscb(mimap->handle, (ImapFlagsCb)imap_flags_cb, mimap);
+    g_signal_connect(G_OBJECT(mimap->handle),
+                     "exists-notify", G_CALLBACK(imap_exists_cb),
+                     mimap);
+    g_signal_connect(G_OBJECT(mimap->handle),
+                     "expunge-notify", G_CALLBACK(imap_expunge_cb),
+                     mimap);
     return mimap->handle;
 }
 
@@ -544,7 +605,7 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
 {
     LibBalsaMailboxImap *mimap;
     LibBalsaServer *server;
-    int i;
+    unsigned i;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox), FALSE);
 
@@ -575,7 +636,7 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
     mimap->messages_info = g_array_sized_new(FALSE, TRUE, 
 					     sizeof(struct message_info),
 					     mailbox->total_messages);
-    for(i=0; i<mailbox->total_messages; i++) {
+    for(i=0; i<(unsigned)mailbox->total_messages; i++) {
 	struct message_info a = {0};
 	g_array_append_val(mimap->messages_info, a);
     }
@@ -692,7 +753,9 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 	if (libbalsa_notify_check_mailbox(mailbox) )
 	    libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
     } else {
+        LOCK_MAILBOX(mailbox);
 	libbalsa_mailbox_imap_noop(LIBBALSA_MAILBOX_IMAP(mailbox));
+        UNLOCK_MAILBOX(mailbox);
 
 	run_filters_on_reception(LIBBALSA_MAILBOX_IMAP(mailbox));
     }
@@ -1189,16 +1252,7 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
 
     imsg = imap_mbox_handle_get_msg(mimap->handle, message->msgno);
 
-    if (!IMSG_FLAG_SEEN(imsg->flags))
-        message->flags |= LIBBALSA_MESSAGE_FLAG_NEW;
-    if (IMSG_FLAG_DELETED(imsg->flags))
-        message->flags |= LIBBALSA_MESSAGE_FLAG_DELETED;
-    if (IMSG_FLAG_FLAGGED(imsg->flags))
-        message->flags |= LIBBALSA_MESSAGE_FLAG_FLAGGED;
-    if (IMSG_FLAG_ANSWERED(imsg->flags))
-        message->flags |= LIBBALSA_MESSAGE_FLAG_REPLIED;
-    if (IMSG_FLAG_RECENT(imsg->flags))
-	message->flags |= LIBBALSA_MESSAGE_FLAG_RECENT;
+    lbimap_update_flags(message, imsg);
 
     envelope = imsg->envelope;
     message->subj = g_mime_utils_8bit_header_decode(envelope->subject);
@@ -1379,6 +1433,7 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
                                    LibBalsaMessageBody *part,
                                    ssize_t *sz)
 {
+    LOCK_MAILBOX_RETURN_VAL(msg->mailbox,NULL);
     if(!part->buffer) {
         struct part_data dt;
         LibBalsaMailboxImap* mimap = LIBBALSA_MAILBOX_IMAP(msg->mailbox);
@@ -1397,6 +1452,7 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
         g_free(section);
     }
     *sz = part->buflen;
+    UNLOCK_MAILBOX(msg->mailbox);
     return part->buffer;
 }
 
@@ -1482,7 +1538,6 @@ libbalsa_mailbox_imap_change_message_flags(LibBalsaMailbox * mailbox,
     if (clear & LIBBALSA_MESSAGE_FLAG_RECENT)
 	imap_mbox_store_flag(handle, msgno, IMSGF_RECENT, 0);
 #endif
-    RELEASE_HANDLE(mailbox, handle);
 }
 
 static void

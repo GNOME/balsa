@@ -1,3 +1,9 @@
+2003-10-11 18:42 Pawel Salek
+
+	* libbalsa/mailbox.[hc]: add 
+	libbalsa_mailbox_msgno_{inserted,changed,removed}().
+	* libbalsa/mailbox_imap.c: handle flag changes, new messages, expunges
+
 2003-10-11  Pawel Salek
 
 	* libbalsa/mailbox.c: simplify libbalsa_mailbox_is_open().

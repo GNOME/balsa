@@ -368,6 +368,11 @@ void libbalsa_mailbox_set_threading(LibBalsaMailbox *mailbox,
 LibBalsaMailboxView *libbalsa_mailbox_view_new(void);
 void libbalsa_mailbox_view_free(LibBalsaMailboxView * view);
 
+/** force update of given msgno */
+void libbalsa_mailbox_msgno_changed(LibBalsaMailbox  *mailbox, guint seqno);
+void libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno);
+void libbalsa_mailbox_msgno_removed(LibBalsaMailbox  *mailbox, guint seqno);
+
 /* set icons */
 void libbalsa_mailbox_set_unread_icon(GdkPixbuf * pixbuf);
 void libbalsa_mailbox_set_trash_icon(GdkPixbuf * pixbuf);

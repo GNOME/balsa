@@ -1467,22 +1467,6 @@ balsa_window_new()
 
     gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, window);
 
-#ifdef HAVE_GTKHTML
-    /* Use Ctrl+= as an alternative accelerator for zoom-in, because
-     * Ctrl++ is a 3-key combination. */
-    gtk_widget_add_accelerator(MENU_VIEW_ZOOM_IN_WIDGET,
-			       "activate", GNOME_APP(window)->accel_group,
-			       '=', GDK_CONTROL_MASK, (GtkAccelFlags) 0);
-#endif				/* HAVE_GTKHTML */
-
-    /* Use Del as an alternative accelerator for Ctrl+D
-     * (toggle deleted). */
-    gtk_widget_add_accelerator(message_toggle_menu
-			       [MENU_MESSAGE_TOGGLE_DELETED_POS].widget,
-			       "activate", GNOME_APP(window)->accel_group,
-			       GDK_Delete, (GdkModifierType) 0,
-			       (GtkAccelFlags) 0);
-
     model = balsa_window_get_toolbar_model();
     toolbar = balsa_toolbar_new(model);
     for(i=0; i < ELEMENTS(callback_table); i++)
@@ -2516,7 +2500,7 @@ show_about_box(void)
         NULL
     };
 
-    const gchar *translator_credits = _("translator_credits");
+    const gchar *translator_credits = _("translator-credits");
     /* FIXME: do we need error handling for this? */
     GdkPixbuf *balsa_logo = 
         gdk_pixbuf_new_from_file(BALSA_DATA_PREFIX
@@ -2541,7 +2525,7 @@ show_about_box(void)
                               "http://bugzilla.gnome.org/"),
                             authors,
                             documenters,
-                            strcmp(translator_credits, "translator_credits") != 0 ? translator_credits : NULL,
+                            strcmp(translator_credits, "translator-credits") != 0 ? translator_credits : NULL,
                             balsa_logo
                             );
 
@@ -4184,12 +4168,14 @@ empty_trash(BalsaWindow * window)
     GArray *messages;
     GError *err = NULL;
 
+    g_object_ref(balsa_app.trash);
     if(!libbalsa_mailbox_open(balsa_app.trash, &err)) {
 	balsa_information_parented(GTK_WINDOW(window),
 				   LIBBALSA_INFORMATION_WARNING,
 				   _("Could not open trash: %s"),
 				   err ? err->message : _("Unknown error"));
 	g_clear_error(&err);
+        g_object_unref(balsa_app.trash);
 	return;
     }
 
@@ -4204,6 +4190,7 @@ empty_trash(BalsaWindow * window)
 
     /* We want to expunge deleted messages: */
     libbalsa_mailbox_close(balsa_app.trash, TRUE);
+    g_object_unref(balsa_app.trash);
     enable_empty_trash(window, TRASH_EMPTY);
 }
 

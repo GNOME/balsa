@@ -121,12 +121,11 @@ libbalsa_wait_for_sending_thread(gint max_time)
 
 
 static MessageQueueItem *
-msg_queue_item_new(LibBalsaMessage * message)
+msg_queue_item_new(void)
 {
     MessageQueueItem *mqi;
 
     mqi = g_new(MessageQueueItem, 1);
-    mqi->orig = message;
 #if !ENABLE_ESMTP
     mqi->next_message = NULL;
     mqi->status = MQI_WAITING;
@@ -495,12 +494,13 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
 {
     MessageQueueItem *new_message;
     SendMessageInfo *send_message_info;
-    GList *lista, *recip, *bcc_recip;
+    GList *recip, *bcc_recip;
     LibBalsaMessage *msg;
     smtp_session_t session;
     smtp_message_t message, bcc_message;
     const gchar *phrase, *mailbox, *subject;
     long estimate;
+    guint msgno;
 
     send_lock();
 
@@ -510,12 +510,6 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
 	send_unlock();
 	return TRUE;
     }
-    /* FIXME: we should not need to create the msg_list in such a
-     * silly way.  Instead, we should properly iterate over messages
-     * in the mailbox via either get_first/get_next() (susceptible to
-     * problems when an external session changes content of the
-     * mailbox) or _forall(mailbox, cb, cbdata) */
-    libbalsa_mailbox_set_threading(outbox, LB_MAILBOX_THREADING_FLAT);
     /* We create here the progress bar */
     ensure_send_progress_dialog();
 
@@ -538,18 +532,18 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
        succeed before transferring a message.  */
     smtp_option_require_all_recipients (session, 1);
 
-    for (lista = LIBBALSA_MAILBOX_LOCAL(outbox)->msg_list; 
-         lista; lista = lista->next) {
+    for (msgno = libbalsa_mailbox_total_messages(outbox);
+	 msgno > 0; msgno--) {
         LibBalsaMsgCreateResult created;
 
-	msg = LIBBALSA_MESSAGE(lista->data);
+	msg = libbalsa_mailbox_get_message(outbox, msgno);
         if (LIBBALSA_MESSAGE_HAS_FLAG(msg,
                                       (LIBBALSA_MESSAGE_FLAG_FLAGGED |
                                        LIBBALSA_MESSAGE_FLAG_DELETED)))
             continue;
 
         libbalsa_message_body_ref(msg, TRUE);
-	new_message = msg_queue_item_new(msg);
+	new_message = msg_queue_item_new();
         created = libbalsa_fill_msg_queue_item_from_queu(msg, new_message);
         libbalsa_message_body_unref(msg);
 
@@ -594,8 +588,7 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
 		g_mime_stream_write_to_stream(filter_stream, mem_stream);
 		g_mime_stream_unref(filter_stream);
 		g_mime_stream_reset(mem_stream);
-		if (new_message->stream)
-		    g_mime_stream_unref(new_message->stream);
+		g_mime_stream_unref(new_message->stream);
 		new_message->stream = mem_stream;
 	    }
 
@@ -950,7 +943,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gboolean debug)
             continue;
 
         libbalsa_message_body_ref(queu, TRUE);
-	new_message = msg_queue_item_new(queu);
+	new_message = msg_queue_item_new();
         created = libbalsa_fill_msg_queue_item_from_queu(queu, new_message);
         libbalsa_message_body_unref(queu);
 	
@@ -1110,13 +1103,13 @@ balsa_send_message_real(SendMessageInfo* info)
      * gdk_threads_leave();
      */
 
-    send_lock();
 #ifdef BALSA_USE_THREADS
+    send_lock();
     MSGSENDTHREAD(threadmsg, MSGSENDTHREADFINISHED, "", NULL, NULL, 0);
     sending_threads--;
+    send_unlock();
 #endif
         
-    send_unlock();
     smtp_destroy_session (info->session);
     send_message_info_destroy(info);	
     return TRUE;

@@ -436,12 +436,10 @@ unwrap_rfc2646(gchar * str, gboolean from_screen)
             if (*str)
                 str++;
 
-            if (len > 0) {
-                g_string_append_len(string, p, len);
-                if (p[--len] != ' ' || sig_sep) {
-                    chomp = FALSE;
-                    break;
-                }
+            g_string_append_len(string, p, len);
+            if (len == 0 || p[--len] != ' ' || sig_sep) {
+                chomp = FALSE;
+                break;
             }
         }
         text->str = string->str;

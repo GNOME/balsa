@@ -1,3 +1,6 @@
+<<<<<<< balsa-app.h
+:pserver:pablo@cvs.gnome.org:/cvs/gnome
+=======
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -214,3 +217,4 @@ gint do_load_mailboxes (void);
 void update_timer( gboolean update, guint minutes );
 
 #endif /* __BALSA_APP_H__ */
+>>>>>>> 1.54

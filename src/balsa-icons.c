@@ -1,3 +1,6 @@
+<<<<<<< balsa-icons.c
+/cvs/gnome/gtk+/examples/progressbar
+=======
 /* Balsa E-Mail Client
  * Copyright (C) 1998-1999 Stuart Parmenter
  *
@@ -165,3 +168,4 @@ balsa_icon_get_bitmap (BalsaIconName name)
     }
   return NULL;
 }
+>>>>>>> 1.6

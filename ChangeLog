@@ -1,3 +1,7 @@
+2000-04-20  Pablo Saratxaga <pablo@mandrakesoft.com>
+
+	* configure.in (ALL_LINGUAS): added Lithuanian language
+
 2000-04-20  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/pref-manager.c: #8601 bug fix.

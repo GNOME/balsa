@@ -1,3 +1,7 @@
+2004-10-02  Pawel Salek
+
+	* NEWS, configure.in: release 2.2.5
+
 2004-10-01 10:03  PeterB
 
 	* libbalsa/mailbox_mbox.c: must test g_mime_parser_eos while

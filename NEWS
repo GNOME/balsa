@@ -1,3 +1,10 @@
+* Balsa-2.2.5 release. Release date 2004-09-02
+
+- sent messages saved to sentbox only after being sent.
+- use of fixed-height with gtk2>=2.4.9 to speed up large mailboxes.
+- GPG is expected to be fully functional now.
+- mbox mailbox driver fixes.
+
 * Balsa-2.2.4 release. Release date 2004-08-28
 
 - periodic expunge configurable.

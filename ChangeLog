@@ -1,3 +1,9 @@
+2004-03-06 10:11  PeterB
+
+	* libbalsa/body.c, libbalsa/mailbox-filter.c,
+	libbalsa/mailbox_imap.c, libbalsa/imap/imap-commands.c,
+	src/balsa-index.c, src/balsa-message.c: plug memory leaks.
+
 2004-02-05  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: use single API for one and multiple

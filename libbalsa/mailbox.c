@@ -2009,6 +2009,11 @@ mbox_model_iter_nth_child(GtkTreeModel	* tree_model,
     GNode *node;
 
     INVALIDATE_ITER(iter);
+    if(!LIBBALSA_MAILBOX(tree_model)->msg_tree) 
+        return FALSE; /* really, this should be never called when
+                       * msg_tree == NULL but the FALSE response is
+                       * fair as well and only a bit dirtier.
+                       * I have more critical problems to debug now. */
     g_return_val_if_fail(parent == NULL
                          ||VALID_ITER(parent, tree_model), FALSE);
 

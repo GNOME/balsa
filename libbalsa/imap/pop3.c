@@ -475,8 +475,10 @@ pop_connect(PopHandle *pop, const char *host, GError **err)
 #endif
   
   if(!pop_authenticate(pop, line, err)) {
-    sio_detach(pop->sio); pop->sio = NULL; close(pop->sd);
-    pop->state = IMHS_DISCONNECTED;
+    if(pop->state != IMHS_DISCONNECTED) { /* we might have been already off */
+      sio_detach(pop->sio); pop->sio = NULL; close(pop->sd);
+      pop->state = IMHS_DISCONNECTED;
+    }
     return FALSE;
   }
   pop->state = IMHS_AUTHENTICATED;

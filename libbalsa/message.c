@@ -341,41 +341,24 @@ static void
 prepend_header_misc(const char *name, const char *value,
 			 gpointer user_data)
 {
+    char lcname[17]; /* one byte longer than the longest ignored header */
+    static const char ignored_headers[] =
+        "subject date from to cc bcc return-path sender mail-followup-to "
+        "message-id references in-reply-to status lines";
+    unsigned i;
     GList *res = *(GList **)user_data;
     if (!*value)
 	/* Empty header */
 	return;
     /* Standard Headers*/
-    if (g_ascii_strcasecmp(name, "Subject") == 0)
-	return;
-    if (g_ascii_strcasecmp(name, "Date") == 0)
-	return;
-    if (g_ascii_strcasecmp(name, "From") == 0)
-	return;
-    if (g_ascii_strcasecmp(name, "To") == 0)
-	return;
-    if (g_ascii_strcasecmp(name, "Cc") == 0)
-	return;
-    if (g_ascii_strcasecmp(name, "Bcc") == 0)
-	return;
-    /* Added in libbalsa_message_user_hdrs */
-    if (g_ascii_strcasecmp(name, "Return-Path") == 0)
-	return;
-    if (g_ascii_strcasecmp(name, "Sender") == 0)
-	return;
-    if (g_ascii_strcasecmp(name, "Mail-Followup-To") == 0)
-	return;
-    if (g_ascii_strcasecmp(name, "Message-ID") == 0)
-	return;
-    if (g_ascii_strcasecmp(name, "References") == 0)
-	return;
-    if (g_ascii_strcasecmp(name, "In-Reply-To") == 0)
-	return;
-    /* Internal headers */
-    if (g_ascii_strcasecmp(name, "Status") == 0)
-	return;
-    if (g_ascii_strcasecmp(name, "Lines") == 0)
-	return;
+    for(i=0; name[i] && i<sizeof(lcname)-1; i++)
+        lcname[i] = tolower(name[i]);
+    if(name[i]) /* too long to be on the ignored-headers list */
+        return;
+    lcname[i] = '\0';
+    if(strstr(ignored_headers, lcname))
+        return;
+
     res = g_list_prepend(res, libbalsa_create_hdr_pair(name, g_strdup(value)));
     *(GList **)user_data = res;
 }

@@ -1,3 +1,11 @@
+2004-04-06  Pawel Salek
+
+	* libbalsa/mailbox.c: make nth_child return correct answer for closed
+	mailboxes.
+	* libbalsa/message.c: simplify prepend_header_misc().
+	* libbalsa/imap/pop3.c: gracefully handle timeouts after initial
+	greeting but before authentication.
+
 2003-04-05  Emmanuel Allaud
 
 	* src/mailbox-conf.c: fix crash on IMAP mailbox configuration.

@@ -1,3 +1,7 @@
+2004-07-28 08:49  PeterB
+
+	* src/main-window.c: new mail notification with --disable-threads.
+
 2004-07-28  Pawel Salek
 
 	* libbalsa/identity.[hc]: add a callback routine to notify when

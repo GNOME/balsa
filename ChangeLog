@@ -1,3 +1,10 @@
+2003-06-27 10:21  PeterB
+
+	* libbalsa/identity.c: Use ident_dialog_update() to validate and
+	update the current identity before creating a new one (fixes
+	#116027) and before changing the default identity; update name in
+	identity list as user edits the entry.
+
 2003-06-26 21:18  PeterB
 
 	* src/balsa-message.c: Compile with --disable-gtkhtml.

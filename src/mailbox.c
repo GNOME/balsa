@@ -18,19 +18,20 @@
 #include <stdio.h>
 #include <gtk/gtk.h>
 #include "mailbox.h"
+#include "balsa-app.h"
 #include "balsa-index.h"
 #include "index.h"
 
 Mailbox *
-mailbox_new (MailboxType * type)
+mailbox_new (MailboxType type)
 {
-  Mailbox mailbox;
+  Mailbox *mailbox;
   MailboxMBox *mbox;
   MailboxPOP3 *pop3;
   MailboxIMAP *imap;
   MailboxNNTP *nntp;
 
-  mailbox = g_malloc (sizeof (Mailbox));
+  mailbox = g_malloc (sizeof (MailboxUnion));
 
   switch (type)
     {
@@ -80,9 +81,11 @@ int
 mailbox_open (Mailbox * mailbox)
 {
   Mailbox *old_mailbox;
-  MailboxCommon *mcommon;
+  MailboxMBox *mbox;
+  MailboxPOP3 *pop3;
+  MailboxIMAP *imap;
+  MailboxNNTP *nntp;
 
-  mcommon = (MailboxCommon *) mailbox;
 
   /* don't open a mailbox if it's already open 
    * -- runtime sanity */
@@ -95,12 +98,25 @@ mailbox_open (Mailbox * mailbox)
 
   /* try to open the mailbox -- return
    * FALSE on failure */
-  mailbox->stream = mail_open (NIL, mailbox->path, NIL);
-  if (mailbox->stream == NIL)
+  switch (mailbox->type)
     {
+    case MAILBOX_MBOX:
+      mbox = (MailboxMBox *) mailbox;
+
+      mbox->stream = mail_open (NIL, mbox->path, NIL);
+      if (mbox->stream == NIL)
+	{
+	  balsa_app.current_mailbox = old_mailbox;
+	  return FALSE;
+	}
+      break;
+
+    default:
       balsa_app.current_mailbox = old_mailbox;
       return FALSE;
+      break;
     }
+
 
   /* close the old open mailbox */
   if (old_mailbox != NIL)
@@ -117,13 +133,9 @@ mailbox_open (Mailbox * mailbox)
 void
 mailbox_close (Mailbox * mailbox)
 {
-  MailboxCommon *mcommon;
-
-  mcommon = (MailboxCommon *) mailbox;
-
   /* now close the mail stream and expunge deleted
    * messages -- the expunge may not have to be done */
-  mcommon->stream = mail_close_full (mailbox->stream, CL_EXPUNGE);
+  mailbox->stream = mail_close_full (mailbox->stream, CL_EXPUNGE);
 }
 
 
@@ -132,8 +144,5 @@ mailbox_close (Mailbox * mailbox)
 void
 current_mailbox_check ()
 {
-  MailboxCommon *mcommon;
-
-  mcommon = (MailboxCommon *) balsa_app.current_mailbox;
-  mail_ping (mcommon->stream);
+  mail_ping (balsa_app.current_mailbox->stream);
 }

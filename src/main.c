@@ -24,7 +24,7 @@
 int
 main (int argc, char *argv[])
 {
-  gnome_init ("balsa", &argc, &argv);
+  gnome_init ("balsa", NULL, argc, argv, 0, NULL);
 
   init_balsa_app (argc, argv);
   options_init ();

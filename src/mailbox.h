@@ -15,13 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-#ifndef __mailbox_h__
-#define __mailbox_h__
+#ifndef __MAILBOX_H__
+#define __MAILBOX_H__
 
-#include "balsa-app.h"
+#include "c-client.h"
 
-
-enum
+typedef enum
   {
     MAILBOX_MBOX,
     MAILBOX_POP3,
@@ -31,20 +30,15 @@ enum
 MailboxType;
 
 
-typedef union _Mailbox Mailbox;
-typedef struct _MailboxCommon MailboxCommon;
-typedef struct _MailboxMBox MailboxMBox;
-typedef struct _MailboxPOP3 MailboxPOP3;
-typedef struct _MailboxIMAP MailboxIMAP;
-
-
-struct _MailboxCommon
+typedef struct _Mailbox Mailbox;
+struct _Mailbox
   {
     MailboxType type;
     gchar *name;
     MAILSTREAM *stream;
   };
 
+typedef struct _MailboxMBox MailboxMBox;
 struct _MailboxMBox
   {
     MailboxType type;
@@ -54,6 +48,7 @@ struct _MailboxMBox
     gchar *path;
   };
 
+typedef struct _MailboxPOP3 MailboxPOP3;
 struct _MailboxPOP3
   {
     MailboxType type;
@@ -65,6 +60,7 @@ struct _MailboxPOP3
     gchar *server;
   };
 
+typedef struct _MailboxIMAP MailboxIMAP;
 struct _MailboxIMAP
   {
     MailboxType type;
@@ -76,6 +72,7 @@ struct _MailboxIMAP
     gchar *server;
   };
 
+typedef struct _MailboxNNTP MailboxNNTP;
 struct _MailboxNNTP
   {
     MailboxType type;
@@ -87,10 +84,11 @@ struct _MailboxNNTP
     gchar *server;
   };
 
-union _Mailbox
+typedef union _MailboxUnion MailboxUnion;
+union _MailboxUnion
   {
     MailboxType type;
-    MailboxCommon common;
+    Mailbox mailbox;
     MailboxMBox mbox;
     MailboxPOP3 pop3;
     MailboxIMAP imap;
@@ -98,7 +96,7 @@ union _Mailbox
   };
 
 
-Mailbox * mailbox_new (MailboxType * type);
+Mailbox * mailbox_new (MailboxType type);
 
 int mailbox_open (Mailbox * mailbox);
 
@@ -106,4 +104,4 @@ void mailbox_close (Mailbox * mailbox);
 
 void current_mailbox_check ();
 
-#endif /* __mailbox_h__ */
+#endif /* __MAILBOX_H__ */

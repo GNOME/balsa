@@ -26,7 +26,7 @@
 #include "mailbox.h"
 
 
-static void setup_mailboxes ();
+static void setup_local_mailboxes ();
 
 
 void
@@ -52,26 +52,29 @@ init_balsa_app (int argc, char *argv[])
 
   balsa_app.current_mailbox = NULL;
   balsa_app.mailbox_list = NULL;
-  setup_mailboxes ();
+  setup_local_mailboxes ();
 }
 
 
 static void
-setup_mailboxes ()
+setup_local_mailboxes ()
 {
   GList *list;
   DIR *dp;
   struct dirent *d;
   struct stat st;
   char filename[PATH_MAX + 1];
-  Mailbox *mailbox;
+  MailboxMBox *mbox;
 
 
   /* check the MAIL environment variable for a spool directory */
   if (getenv ("MAIL"))
     {
-      mailbox = mailbox_new ("INBOX", getenv ("MAIL"));
-      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mailbox);
+      mbox = (MailboxMBox *) mailbox_new (MAILBOX_MBOX);
+      mbox->name = g_strdup ("INBOX");
+      mbox->path = g_strdup (getenv ("MAIL"));
+
+      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbox);
     }
 
   if (dp = opendir (balsa_app.local_mail_directory))
@@ -85,10 +88,12 @@ setup_mailboxes ()
 
           if (S_ISREG (st.st_mode))
             {
-              mailbox = mailbox_new (d->d_name, filename);
-              balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mailbox);
+              mbox = (MailboxMBox *) mailbox_new (MAILBOX_MBOX);
+	      mbox->name = g_strdup (d->d_name);
+	      mbox->path = g_strdup (filename);
+
+              balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbox);
             }
         }
     }
-
 }

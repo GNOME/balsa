@@ -175,7 +175,9 @@ item_event (GnomeCanvasItem * item, GdkEvent * event, gpointer data)
       gtk_widget_show (file_entry);
       gnome_dialog_button_connect (GNOME_DIALOG (save_dialog), 0, save_MIME_part, info);
       gtk_window_set_modal(GTK_WINDOW(save_dialog), TRUE);
-      gnome_dialog_run_and_close (GNOME_DIALOG (save_dialog));
+      gnome_dialog_run (GNOME_DIALOG (save_dialog));
+      gtk_widget_destroy(save_dialog);
+      save_dialog = NULL;
       break;
     default:
       break;

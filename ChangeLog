@@ -1,3 +1,8 @@
+1998-12-09  Jeff Garzik  <jgarzik@pobox.com>
+
+	* src/balsa-message.c, src/index-child.c:
+	Fixed gnome-dialog-run-and-close breakage.
+
 1998-12-08  Jaka Mocnik  <jaka.mocnik@kiss.uni-lj.si>
 
 	* src/index-child.c, src/balsa-message.c: changed gnome_dialog_set_modal()

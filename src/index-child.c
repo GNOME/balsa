@@ -141,7 +141,9 @@ index_child_new (GnomeMDI * mdi, Mailbox * mailbox)
 	gtk_widget_show_all (dialog);
 	gnome_dialog_button_connect (GNOME_DIALOG (dialog), 0, set_password, entry);
 	gtk_window_set_modal (GTK_WINDOW (dialog), TRUE);
-	gnome_dialog_run_and_close (GNOME_DIALOG (dialog));
+	gnome_dialog_run (GNOME_DIALOG (dialog));
+	gtk_widget_destroy(dialog);
+	dialog = NULL;
       }
   }
 
@@ -196,7 +198,7 @@ index_child_destroy (GtkObject * obj)
 static gboolean
 check_for_new_mail (GtkWidget * widget)
 {
-  g_return_if_fail (BALSA_IS_INDEX (widget));
+  g_return_val_if_fail (BALSA_IS_INDEX (widget), FALSE);
 
   mailbox_check_new_messages (BALSA_INDEX (widget)->mailbox);
   g_print ("Checking for new mail in: %s\n", BALSA_INDEX (widget)->mailbox->name);

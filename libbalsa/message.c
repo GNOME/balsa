@@ -1198,7 +1198,8 @@ libbalsa_message_headers_from_gmime(LibBalsaMessageHeaders *headers,
 
     /* Get fcc from message */
     if (!headers->fcc_url)
-        headers->fcc_url = g_strdup(g_mime_message_get_header(mime_msg, "X-Mutt-Fcc"));
+	headers->fcc_url =
+	    g_strdup(g_mime_message_get_header(mime_msg, "X-Balsa-Fcc"));
 }
 
 /* libbalsa_message_headers_update:

@@ -76,7 +76,7 @@ typedef struct
   char message_string[256];
   Message *msg;
   Mailbox *mbox;
-  uint of_total;
+  float of_total;
 } SendThreadMessage;
 
 #define  MSGSENDTHREAD(t_message, type, string, s_msg, s_mbox, messof) \
@@ -93,7 +93,8 @@ enum {
   MSGSENDTHREADPROGRESS,
   MSGSENDTHREADPOSTPONE,
   MSGSENDTHREADLOAD,
-  MSGSENDTHREADDELETE
+  MSGSENDTHREADDELETE,
+  MSGSENDTHREADFINISHED
 };
 
 #endif /* __THREADS_H__ */

@@ -77,7 +77,11 @@ enum {
   GtkWidget *progress_dialog_bar = NULL;
   GtkWidget *send_progress = NULL;
   GtkWidget *send_progress_message = NULL;
-
+  GtkWidget *send_dialog = NULL;
+  GtkWidget *send_dialog_bar = NULL;
+//  int total_messages_left;
+  GSList *list = NULL;
+  
 extern void load_messages (Mailbox * mailbox, gint emit);
 extern void config_mailbox_update(Mailbox * mailbox, char * name);
 
@@ -1040,7 +1044,10 @@ send_progress_notify_cb( )
     SendThreadMessage **currentpos;
     void *msgbuffer;
     uint count;
-
+    GSList *node;
+    Message *message;
+    float percent;
+    
     msgbuffer = malloc( 2049 );
 
     g_io_channel_read( send_thread_msg_receive, msgbuffer, 
@@ -1062,26 +1069,91 @@ send_progress_notify_cb( )
 	  fprintf( stderr, "Send_Message: %lu, %d, %s\n", 
 		   (unsigned long) threadmessage, threadmessage->message_type,
 		   threadmessage->message_string );
+	 
 	switch( threadmessage->message_type )  
 	  {
 	  case MSGSENDTHREADERROR:
 	    fprintf(stderr, "Send Error %s\n", threadmessage->message_string);
 	    break;
+	    
 	  case MSGSENDTHREADLOAD:
 	    LOCK_MAILBOX (threadmessage->mbox);
 	    load_messages (threadmessage->mbox, 1);
 	    UNLOCK_MAILBOX (threadmessage->mbox);
 	    break;
+	    
 	  case MSGSENDTHREADPOSTPONE:
+
 	    fprintf(stderr, "Send Postpone %s\n", 
 		    threadmessage->message_string);
 	    break;
+
 	  case MSGSENDTHREADPROGRESS:
-            /* display progress x of y, y = of_total */
+
+	    percent = threadmessage->of_total ;
+		
+	    if ( percent == 0)
+	       { 
+		 gtk_label_set_text( GTK_LABEL(send_progress_message),
+	                                threadmessage->message_string );
+                 gtk_widget_show_all( send_dialog );
+               }						       
+       
+	    if( percent > 1.0 || percent < 0.0 )
+	      {
+		percent = 1.0;
+		if( balsa_app.debug )
+		  fprintf(stderr, "progress bar percentage out of range %f\n", percent);
+	      }
+	      
+	    if ( GTK_IS_WIDGET ( send_dialog ) ) 
+	      gtk_progress_bar_update(GTK_PROGRESS_BAR(send_dialog_bar),
+				      percent);
+	    else 
+	      gnome_appbar_set_progress(balsa_app.appbar, percent);   
+	    
+	    /* display progress x of y, y = of_total */
 	    break;
+	    
 	  case MSGSENDTHREADDELETE:
-	    /* passes message to be deleted */
+            /* passes message to be deleted */
+
+	    if (threadmessage->msg != NULL )
+	    {
+	    	   if (threadmessage->msg->mailbox != NULL)
+                       list = g_slist_append (list, threadmessage->msg);
+	    } 
+	    
+	    if (!strcmp (threadmessage->message_string, "LAST") &&
+	                 threadmessage->msg == NULL)
+            {
+                balsa_mailbox_open (balsa_app.outbox);
+		node = list;
+		
+                while (node != NULL)
+                {
+			message = node->data;
+                	message_delete (message);
+			node = node->next;
+                }
+                balsa_mailbox_close (balsa_app.outbox);
+                g_slist_free (list);
+		list = NULL;
+            }
+            
 	    break;
+
+	  case MSGSENDTHREADFINISHED:
+            /* closes progress dialog */
+      
+	    if( GTK_IS_WIDGET ( send_dialog ))
+	      {
+		gtk_widget_destroy( send_dialog );
+		send_dialog = NULL;
+	      }
+	                 
+	    break; 
+	     
 	  default:
 	    fprintf ( stderr, " Unknown: %s \n", 
 		      threadmessage->message_string );
@@ -1090,6 +1162,8 @@ send_progress_notify_cb( )
 	currentpos++;
 	count -= sizeof(void *);
       }
+      
+  
     free( msgbuffer );
 	
     return TRUE;

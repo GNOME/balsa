@@ -37,6 +37,9 @@ extern GIOChannel             *send_thread_msg_send;
 extern GIOChannel             *send_thread_msg_receive;
 extern GtkWidget              *send_progress;
 extern GtkWidget              *send_progress_message;
+extern GtkWidget              *send_dialog ;
+extern GtkWidget              *send_dialog_bar ;
+
 
 typedef struct
 {
@@ -67,7 +70,7 @@ typedef struct
   char message_string[256];
   Message *msg;
   Mailbox *mbox;
-  uint of_total;
+  float of_total;
 } SendThreadMessage;
 
 #define  MSGSENDTHREAD(t_message, type, string, s_msg, s_mbox, messof) \
@@ -84,7 +87,8 @@ enum {
   MSGSENDTHREADPROGRESS,
   MSGSENDTHREADPOSTPONE,
   MSGSENDTHREADLOAD,
-  MSGSENDTHREADDELETE
+  MSGSENDTHREADDELETE,
+  MSGSENDTHREADFINISHED
 };
 
 #endif /* __THREADS_H__ */

@@ -26,6 +26,7 @@
 #include "libbalsa.h"
 #include "mailbackend.h"
 #include "misc.h"
+#include "html.h"
 
 /* FIXME: The content of this file could go to message.c */
 
@@ -39,6 +40,7 @@ static GString *process_mime_multipart(LibBalsaMessage * message,
    returns string representation of given message part.
    NOTE: may return NULL(!).
 */
+
 GString *
 process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 		  gchar * reply_prefix_str, gint llen, gboolean ignore_html,
@@ -48,6 +50,7 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
     size_t alloced;
     gchar *res = NULL;
     GString *reply = NULL;
+    gboolean is_html;
 
     switch (libbalsa_message_body_type(body)) {
     case LIBBALSA_MESSAGE_BODY_TYPE_OTHER:
@@ -64,8 +67,9 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	break;
     case LIBBALSA_MESSAGE_BODY_TYPE_TEXT:
 	/* don't return text/html stuff... */
-	if (ignore_html && body->mutt_body->subtype &&
-	    !strcmp("html", body->mutt_body->subtype))
+	is_html = (body->mutt_body->subtype
+		   && !strcmp("html", body->mutt_body->subtype));
+	if (ignore_html && is_html)
 	    break;
 
 	libbalsa_message_body_save_temporary(body, NULL);
@@ -77,6 +81,24 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	fclose(part);
 	if (!res)
 	    break;
+
+#ifdef HAVE_GTKHTML
+	if (is_html) {
+	    GtkWidget *html;
+	    GString *str;
+
+	    str = g_string_new(NULL);
+	    html = libbalsa_html_new(res, alloced, str, NULL, NULL);
+	    gtk_widget_destroy(html);
+	    g_free(res);
+	    if (str->len)
+		res = g_string_free(str, FALSE);
+	    else {
+		g_string_free(str, TRUE);
+		break;
+	    }
+	}
+#endif /* HAVE_GTKHTML */
 
 #ifdef HAVE_GPGME
 	/* if this is a RFC 2440 signed part, strip the signature status */

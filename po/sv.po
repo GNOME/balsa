@@ -10,8 +10,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2001-09-03 17:03+0200\n"
-"PO-Revision-Date: 2001-09-03 20:12+0200\n"
+"POT-Creation-Date: 2001-09-04 22:56+0200\n"
+"PO-Revision-Date: 2001-09-04 23:04+0200\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -352,22 +352,22 @@ msgstr ""
 "Fel vid placering av meddelanden från %s på %s\n"
 "Meddelanden är kvar i %s\n"
 
-#: libbalsa/message.c:422
+#: libbalsa/message.c:423
 #, c-format
 msgid "Source mailbox (%s) is readonly. Cannot move message"
 msgstr "Källbrevlådan (%s) är skrivskyddad. Kan inte flytta meddelande"
 
-#: libbalsa/message.c:442
+#: libbalsa/message.c:443
 #, c-format
 msgid "Source mailbox (%s) is readonly. Cannot move messages"
 msgstr "Källbrevlådan (%s) är skrivskyddad. Kan inte flytta meddelanden"
 
-#: libbalsa/message.c:471
+#: libbalsa/message.c:472
 #, c-format
 msgid "Couldn't open destination mailbox (%s) for copying"
 msgstr "Kunde inte öppna målbrevlådan (%s) för kopiering"
 
-#: libbalsa/message.c:504
+#: libbalsa/message.c:505
 #, c-format
 msgid "Couldn't open destination mailbox (%s) for writing"
 msgstr "Kunde inte öppna målbrevlådan (%s) för skrivande"
@@ -635,7 +635,7 @@ msgstr "Konfigurera Balsa"
 #. didn't find anything that we could display!
 #: libmutt/handler.c:1308
 msgid "[-- Error:  Could not display any parts of Multipart/Alternative! --]\n"
-msgstr "[-- Fel:  Kunde inte visa några delar av Multipart/Alternativ! --]\n"
+msgstr "[-- Fel:  Kunde inte visa några delar av Multipart/Alternative! --]\n"
 
 #: libmutt/handler.c:1426
 #, c-format
@@ -1226,12 +1226,12 @@ msgstr "Brevlådan är oförändrad."
 #: libmutt/mx.c:983
 #, c-format
 msgid "%d kept, %d moved, %d deleted."
-msgstr "%d behållda, %d flyttade, %d borttagna."
+msgstr "%d behållna, %d flyttade, %d borttagna."
 
 #: libmutt/mx.c:986 libmutt/mx.c:1152
 #, c-format
 msgid "%d kept, %d deleted."
-msgstr "%d behållda, %d borttagna."
+msgstr "%d behållna, %d borttagna."
 
 #: libmutt/mx.c:1094
 #, c-format

@@ -1,3 +1,10 @@
+2000-05-25  Pawel Salek <pawsa@theochem.kth.se>
+
+	* help/C/balsa.sgml: Preperties window help started.
+	* src/mailbox-conf.c(conf_add_mailbox): plug a memory leak
+	* src/main-window.c(send_progress_notify_cb): free properly messages 
+	sent from outbox in the MT mode.
+	
 2000-05-24  Peter Williams  <peter@beta.newton.cx>
 
 	* help/C/balsa.sgml: Add FAQ about address book not

@@ -699,8 +699,10 @@ conf_add_mailbox ()
       field_check = check_for_blank_fields(mailbox);
       if(field_check == -2)
 	break;
-      else if(field_check == -1)
-	return NULL;
+      else if(field_check == -1) {
+	  gtk_object_destroy(GTK_OBJECT(mailbox));
+	  return NULL;
+      }
 
       mailbox->name = g_strdup (gtk_entry_get_text (
 	  GTK_ENTRY (mcw->pop_mailbox_name)));

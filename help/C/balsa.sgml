@@ -154,7 +154,7 @@
       <title>Main Window</title>
       <screenshot>
 	<screeninfo>Main Window</screeninfo>
-	<graphic fileref="images/main-window" format="png" srccredit="Matthew Guenther" align="center"></graphic>
+	<graphic fileref="images/main-window.png" format="png" srccredit="Matthew Guenther" align="center"></graphic>
       </screenshot>
     </figure>
 
@@ -1801,15 +1801,24 @@
   </sect1>
 
   <sect1 id="authours">
-    <title>Authours</title>
+    <title>Authors</title>
     
     <para>
       <application>Balsa</application> was written by
-      many people, including:
+      many people, including (in alphabetical order):
 
       <itemizedlist>
 	<listitem>
-	  <para>Stuart Parameter (<email>pavlov@pavlov.net</email>)</para>
+	  <para>Hector Garcia Alvarez (<email>hector@scouts-es.org</email>)</para>
+	</listitem>	
+
+	<listitem><para>
+	Matthew Guenther  (<email>mguenthe@netcom.ca</email>)
+	</para></listitem>
+
+	<listitem>
+	  <para>Bruno Pires Marinho
+	  (<email>bapm@camoes.rnl.ist.utl.pt</email>)</para>
 	</listitem>
 
 	<listitem>
@@ -1817,28 +1826,27 @@
 	</listitem>	
 	
 	<listitem>
-	  <para>Peter Williams (<email>peter@newton.cx</email>)</para>
-	</listitem>	
-	
+	  <para>Stuart Parameter (<email>pavlov@pavlov.net</email>)</para>
+	</listitem>
+
 	<listitem>
 	  <para>David Pickens (<email>dpickens@iaesthetic.com</email>)</para>
 	</listitem>	
 	
 	<listitem>
-	  <para>Hector Garcia Alvarez (<email>hector@scouts-es.org</email>)</para>
+	  <para>Pawel Salek (<email>pawsa@theochem.kth.se</email>)</para>
+	</listitem>	
+
+	<listitem>
+	  <para>Peter Williams (<email>peter@newton.cx</email>)</para>
 	</listitem>	
 	
-	<listitem>
-	  <para>Bruno Pires Marinho
-	  (<email>bapm@camoes.rnl.ist.utl.pt</email>)</para>
-	</listitem>
-
       </itemizedlist>
       To find more information about it, please visit the
       <application>Balsa</application> <ulink
-      url="http://www.balsa.net" type="http">Web page</ulink>.  Please
+      url="http://www.balsa.net/" type="http">Web page</ulink>.  Please
       send all comments, suggestions, and bug reports to the <ulink
-      url="http://bugs.gnome.org" type="http">GNOME bug tracking
+      url="http://bugs.gnome.org/" type="http">GNOME bug tracking
       database</ulink>. Instructions for submitting bug reports can be
       found on-line at <ulink
       url="http://www.balsa.net/bugs.html" type="http">
@@ -1861,6 +1869,125 @@
     </para>
   </sect1>
 
+<!-- properties help -->  
+  <sect1 id="win-config-0">
+    <title>Identity</title>
+
+    <para>This tab lets you define your identity.</para>
+
+    <itemizedlist mark="bullet">
+      <listitem><para>The 'Your name' field defines your name. Type
+      your first and last name here. The e-mails you send will contain
+      this text in the 'From' line.</para></listitem>
+
+      <listitem><para>The 'E-mail address' field defines the address
+      that will appear in the 'From' line. This will be your default
+      reply address, too, unless you specify explicitely a different
+      one in the entry below. </para></listitem>
+
+      <listitem><para>The 'Reply-to' address allows you to explicitly
+      specify a reply-to address, if it is different from your e-mail
+      address.</para></listitem>
+
+    </itemizedlist>
+  </sect1>
+
+  <sect1 id="win-config-1">
+    <title>Signature</title>
+
+    <para>This tab lets you define your signature and the cases, when
+    it should be used.</para>
+  </sect1>
+
+  <sect1 id="win-config-2">
+    <title>Mail servers</title>
+
+    <para>This tab lets you specify where  do you get your mail from, and
+    how do you send it..</para>
+
+    <para>The 'Remote Mailbox servers' allows you to specify POP
+    servers you have accounts on. You can specify multiple
+    servers. When adding a server, you will be asked to give:</para>
+
+    <itemizedlist>
+    <listitem><para>mailbox name that will identify the mailbox
+    </para></listitem>
+
+    <listitem><para>The server you have the POP mailbox on.
+    </para></listitem>
+
+    <listitem><para>The port that will be used to connect to the
+    server.  The port number is usually 110 but you may change it if
+    you for example use some kind of connection tunneling,
+    </para></listitem>
+
+    <listitem><para>The user name on the mailbox server.
+    </para></listitem>
+
+    <listitem><para>Corresponding password.
+    </para></listitem>
+    
+    <listitem><para>What does the check check box mean?</para>
+    </listitem>
+
+    <listitem><para>You can select the 'delete from server' button to
+    remove the downoladed messages from the server.</para></listitem>
+    </itemizedlist>
+    
+    <para>'Local mail' entry determines the directory where are
+    located your mialboxes. Balsa will scan this directory for
+    mailboxes and will show them in the mailbox list</para>
+
+    <para>You specify the way you want to send your e-mail in the
+    'Outgoing mail' box. You can use local mail transport agent (MTA,
+    the agent is expected to be sendmail-compatible) or you can ask
+    balsa to relay the mail directly to a remote host. If your host is
+    properly configured, the use of MTA is usually better since it
+    will be system reponsibility to relay - or queue - the mail. On
+    the other hand, using direct SMTP connection may be preferable for
+    systems where you cannot change the relay policy yourself.</para>
+  </sect1>
+
+  <sect1 id="win-config-3">
+    <title>Mail options</title>
+    <para>Time...</para>
+  </sect1>
+  
+  <sect1 id="win-config-4">
+    <title>Display</title>
+    <para>Time...</para>
+  </sect1>
+
+  <sect1 id="win-config-5">
+    <title>Printing</title>
+    <para>Time...</para>
+  </sect1>
+
+  <sect1 id="win-config-6">
+    <title>Encoding</title>
+    <para>Time...</para>
+  </sect1>
+
+  <sect1 id="win-config-7">
+    <title>Misc</title>
+    <para>Time...</para>
+  </sect1>
+
+  <sect1 id="win-config-8">
+    <title>Startup</title>
+    <para>You can select here functions that are to be executed when
+    balsa starts.</para>
+    <itemizedlist>
+    <listitem><para>'check mail upon startup' asks balsa to query the
+    mailbox servers for new mail.</para></listitem>
+    
+    <listitem><para>when 'remember open mailboxes between sessions'
+    is marked, balsa will reopen mailboxes that were open when you
+    quit balsa last time.</para></listitem>
+    </itemizedlist>
+  </sect1>
+
+<!-- EOPAWSA -->
   <glossary id="glossary">
     <glossentry id="glossary-druid">
       <glossterm>druid</glossterm>

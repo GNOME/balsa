@@ -41,6 +41,8 @@ struct
     GList *mailbox_list;
 
     MainWindow *main_window;
+
+    GList *addressbook;
   }
 balsa_app;
 

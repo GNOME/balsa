@@ -62,7 +62,7 @@ create_toolbar (BalsaSendmsg *mw)
   toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
 					 "Send", "Send", NULL,
 					   new_icon (p8_xpm, window), GTK_SIGNAL_FUNC (send_smtp_message),
-					   "Send");
+					   mw);
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
@@ -96,6 +96,22 @@ create_toolbar (BalsaSendmsg *mw)
   return toolbar;
 }
 
+void balsa_sendmsg_destroy(BalsaSendmsg *bsm)
+{
+/*
+gtk_widget_destroy(bsm->toolbar);
+gtk_widget_destroy(bsm->to);
+gtk_widget_destroy(bsm->from);
+gtk_widget_destroy(bsm->subject);
+gtk_widget_destroy(bsm->cc);
+gtk_widget_destroy(bsm->bcc);
+gtk_widget_destroy(bsm->hscrollbar);
+gtk_widget_destroy(bsm->vscrollbar);
+gtk_widget_destroy(bsm->sendbutton);
+*/
+gtk_widget_destroy(bsm->window);
+
+}
 
 static GtkWidget *
 create_menu (GtkWidget * window)
@@ -403,4 +419,5 @@ send_smtp_message (GtkWidget * widget, BalsaSendmsg * bsmsg)
   mail_free_envelope (&msg);
   mail_free_body (&body);
   g_string_free (text, 1);
+  balsa_sendmsg_destroy(bsmsg);
 }

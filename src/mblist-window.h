@@ -16,11 +16,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
-#ifndef __INDEX_MAILBOX_H__
-#define __INDEX_MAILBOX_H__
+#ifndef __MBLIST_WINDOW_H__
+#define __MBLIST_WINDOW_H__
 
 #include "mailbox.h"
 
-void create_new_index (Mailbox * mailbox);
+void mblist_open_window (void);
+void mblist_add_mailbox (Mailbox * mailbox);
+void mblist_remove_mailbox (Mailbox * mailbox);
 
-#endif /* __INDEX_MAILBOX_H__ */
+#endif /* __MBLIST_WINDOW_H__ */

@@ -10,6 +10,7 @@ balsa_SOURCES =	\
 	mailbox-manager.c	\
 	main-window.c		\
 	main.c			\
+	mblist-window.c		\
 	misc.c			\
 	new-mailbox.c		\
 	pref-manager.c		\

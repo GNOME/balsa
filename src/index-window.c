@@ -76,13 +76,13 @@ create_new_index (Mailbox * mailbox)
 		      (GtkSignalFunc) gtk_false,
 		      NULL);
 
-  vbox = gtk_vbox_new(TRUE, 0);
+  vbox = gtk_vbox_new (TRUE, 0);
   gnome_app_set_contents (GNOME_APP (iw->window), vbox);
-  gtk_widget_show(vbox);
+  gtk_widget_show (vbox);
 
-  iw->index = balsa_index_new();
-  gtk_box_pack_start(GTK_BOX(vbox), iw->index, TRUE, TRUE, 0);
-  gtk_widget_show(iw->index);
+  iw->index = balsa_index_new ();
+  gtk_box_pack_start (GTK_BOX (vbox), iw->index, TRUE, TRUE, 0);
+  gtk_widget_show (iw->index);
 
   balsa_index_set_mailbox (BALSA_INDEX (iw->index), iw->mailbox);
   iw->watcher_id = mailbox_watcher_set (mailbox,
@@ -128,9 +128,9 @@ get_index_window_data (GtkObject * object)
 static void
 close_index_window (GtkWidget * widget)
 {
-    IndexWindow *iw = get_index_window_data (GTK_OBJECT (widget));
-    gtk_widget_destroy (iw->window);
-    gtk_widget_destroy (iw->index);
+  IndexWindow *iw = get_index_window_data (GTK_OBJECT (widget));
+  gtk_widget_destroy (iw->window);
+  gtk_widget_destroy (iw->index);
 }
 
 static void
@@ -139,14 +139,14 @@ destroy_index_window (GtkWidget * widget)
   IndexWindow *iw = get_index_window_data (GTK_OBJECT (widget));
 
 #if 0
-	    /* remove the mailbox from the open mailbox list */
-   open_mailbox_list = g_list_remove (open_mailbox_list, nmw);
+  /* remove the mailbox from the open mailbox list */
+  open_mailbox_list = g_list_remove (open_mailbox_list, nmw);
 
 #endif
 
-   close_index_window(widget);
-   
-   g_free (iw);
+  close_index_window (widget);
+
+  g_free (iw);
 }
 
 

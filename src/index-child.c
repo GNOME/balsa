@@ -57,7 +57,7 @@ index_child_get_type ()
 /* callbacks */
 static void mailbox_listener (MailboxWatcherMessage * iw_message);
 static void index_select_cb (GtkWidget * widget, Message * message, GdkEventButton *, gpointer data);
-
+static void index_button_press_cb (GtkWidget *, GdkEventButton *);
 static GtkWidget *create_menu (BalsaIndex * bindex, Message * message);
 
 /* menu item callbacks */
@@ -135,11 +135,14 @@ index_child_create_view (GnomeMDIChild * child)
   gtk_widget_show (iw->index);
 
   balsa_index_set_mailbox (BALSA_INDEX (iw->index), iw->mailbox);
+/*
+  GTK_WIDGET_UNSET_FLAGS (GTK_CLIST (iw->index)->vscrollbar, GTK_CAN_FOCUS);
+*/
+  gtk_signal_connect (GTK_OBJECT (iw->index), "select_message",
+		      (GtkSignalFunc) index_select_cb, iw);
 
-  gtk_signal_connect (GTK_OBJECT (iw->index),
-		      "select_message",
-		      (GtkSignalFunc) index_select_cb,
-		      iw);
+  gtk_signal_connect (GTK_OBJECT (iw->index), "button_press_event",
+		      (GtkSignalFunc) index_button_press_cb, NULL);
 
   iw->watcher_id = mailbox_watcher_set (iw->mailbox,
 				      (MailboxWatcherFunc) mailbox_listener,
@@ -210,6 +213,19 @@ index_select_cb (GtkWidget * widget,
     gtk_menu_popup (GTK_MENU (create_menu (BALSA_INDEX (widget), message)), NULL, NULL, NULL, NULL, bevent->button, bevent->time);
   else
     balsa_message_set (BALSA_MESSAGE (((IndexChild *) data)->message), message);
+}
+
+static void index_button_press_cb (GtkWidget * clist, GdkEventButton * event)
+{
+  gint row;
+  Message *message;
+
+  if (!GTK_CLIST(clist)->selection);
+  return;
+  row = GTK_CLIST(clist)->selection->data;
+  message = gtk_clist_get_row_data (GTK_CLIST (clist), row);
+  if (event && event->button == 3)
+    gtk_menu_popup (GTK_MENU (create_menu (BALSA_INDEX (GTK_CLIST(clist)), message)), NULL, NULL, NULL, NULL, event->button, event->time);
 }
 /*
  * CLIST Callbacks

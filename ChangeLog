@@ -1,3 +1,7 @@
+2003-04-03 12:14  PeterB
+
+	* src/sendmsg-window.c: Wrap initial text.
+
 2003-04-03  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
 
 	* libbalsa/rfc3156.[hc]: fix EOL character conversion.  Implement

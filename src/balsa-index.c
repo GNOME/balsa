@@ -82,6 +82,8 @@ static void bndx_find_row(BalsaIndex * index,
                           GList * exclude);
 static void bndx_expand_to_row_and_select(BalsaIndex * index,
                                           GtkTreeIter * iter);
+static void bndx_select_message(BalsaIndex * index,
+                                LibBalsaMessage * message);
 static void bndx_changed_find_row(BalsaIndex * index);
 static void bndx_messages_remove(BalsaIndex * index, GList * messages);
 
@@ -875,15 +877,12 @@ bndx_messages_remove(BalsaIndex * index, GList * messages)
         if (bndx_find_message(index, NULL, &iter, list->data))
             gtk_tree_store_remove(GTK_TREE_STORE(model), &iter);
     g_signal_handler_unblock(selection, index->selection_changed_id);
-    g_signal_emit_by_name(selection, "changed");
     g_list_free(remove);
 
-    /* select next message */
-    if (bndx_find_message(index, &path, NULL, next_message)) {
-        gtk_tree_selection_unselect_all(selection);
-        gtk_tree_view_set_cursor(GTK_TREE_VIEW(index), path, NULL, FALSE);
-        gtk_tree_path_free(path);
-    }
+    /* rethread and select the next message */
+    balsa_index_threading(index, 
+			  index->mailbox_node->mailbox->threading_type);
+    bndx_select_message(index, next_message);
 }
 
 
@@ -1590,6 +1589,7 @@ mailbox_messages_added(BalsaIndex * bindex, GList *messages)
     }
     balsa_index_threading(bindex, 
 			  bindex->mailbox_node->mailbox->threading_type);
+    bndx_select_message(bindex, bindex->current_message);
 
     balsa_mblist_update_mailbox(balsa_app.mblist_tree_store, 
 				bindex->mailbox_node->mailbox);
@@ -2171,7 +2171,6 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
     GtkTreePath *path;
-    GtkTreeIter iter;
     gulong handler =
         expand ? index->row_expanded_id : index->row_collapsed_id;
 
@@ -2191,8 +2190,7 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
      * overhead is slight
      * select is needed in both cases, as a previous collapse could have
      * deselected the current message */
-    if (bndx_find_message(index, NULL, &iter, index->current_message))
-        bndx_expand_to_row_and_select(index, &iter);
+    bndx_select_message(index, index->current_message);
 
     g_signal_handler_unblock(index, handler);
 }
@@ -2208,7 +2206,6 @@ balsa_index_set_threading_type(BalsaIndex * index, int thtype)
         gtk_tree_view_get_selection(GTK_TREE_VIEW(index));
     GList *list;
     LibBalsaMailbox* mailbox = NULL;
-    GtkTreeIter iter;
 
     g_return_if_fail (index);
     g_return_if_fail (index->mailbox_node != NULL);
@@ -2228,13 +2225,9 @@ balsa_index_set_threading_type(BalsaIndex * index, int thtype)
     /* expand tree if specified in config */
     balsa_index_update_tree(index, balsa_app.expand_tree);
 
-    /* set the menu apriopriately */
-    balsa_window_set_threading_menu(thtype);
-
     /* reselect current message */
     g_signal_handler_unblock(selection, index->selection_changed_id);
-    if (bndx_find_message(index, NULL, &iter, index->current_message))
-        bndx_expand_to_row_and_select(index, &iter);
+    bndx_select_message(index, index->current_message);
 }
 
 static void
@@ -2556,4 +2549,13 @@ balsa_index_move_subtree(GtkTreeModel * model, GtkTreePath * root,
     bndx_copy_tree(node, model, new_parent, ref_table);
     g_node_destroy(node);
     gtk_tree_store_remove(GTK_TREE_STORE(model), &root_iter);
+}
+
+static void
+bndx_select_message(BalsaIndex * index, LibBalsaMessage * message)
+{
+    GtkTreeIter iter;
+
+    if (bndx_find_message(index, NULL, &iter, message))
+        bndx_expand_to_row_and_select(index, &iter);
 }

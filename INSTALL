@@ -20,6 +20,16 @@ Please make sure you have the following things:
 	for links to these packages. Or try http://www.gnome.org, 
 	http://www.gtk.org, and http://www.enlightenment.org.
 
+	Note that some of these modules have their own requirements.
+	Installation of pspell is known to be troublesome, make sure 
+	you have read - and understood - all the details. Feedback
+	should to to pspell team, not balsa team.
+
+	You need also gnome-doc-tools for building the help system.
+	They are available from
+
+	http://people.redhat.com/dcm/software.html
+
 Build Instructions:
 
 	For more information and configuration options see 'README'.
@@ -45,6 +55,6 @@ Notes:
 	http://mail.gnome.org/archives/balsa-list/2000-October/msg00101.html
 	and make sure you have at least /usr/lib/libgnome.so.32.3.11.
 
-	gcc 2.96 distributed with RedHat 7.0 has problems to compile 
-	src/files.c. Use older compilers instead (you may want to try
-	CC=kgcc ./configure).
+	Experimental gcc 2.96 distributed with RedHat 7.0 generates 
+	spurious warning messages. You have to configure balsa with 
+	explicitly specified --disable-more-warnings option.

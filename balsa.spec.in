@@ -3,7 +3,7 @@
 %define rel      @BALSA_RELEASE@
 %define prefix   /usr
 
-%define config_opts --prefix=%{prefix} --sysconfdir=/etc --enable-threads --disable-system-install --disable-more-warnings
+%define config_opts --prefix=%{prefix} --sysconfdir=/etc --mandir=%{_mandir} --enable-threads --disable-system-install --disable-more-warnings
 
 Summary:   Balsa Mail Client
 Name:      balsa
@@ -70,7 +70,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/locale/*/LC_MESSAGES/balsa.mo
 /usr/share/pixmaps/*
 /usr/share/sounds/balsa/*
-%{_mandir}/man1/*
+%{_mandir}/man1/balsa.1*
 %config /etc/sound/events/*
 
 

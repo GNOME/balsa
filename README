@@ -1,8 +1,7 @@
 Balsa E-Mail Client 1.0.x
 =========================
 
-  This is a second test release. See ChangeLog for the list
-  of the recent changes and NEWS for highlights.
+See ChangeLog for the list of the recent changes and NEWS for highlights.
 
 Copyright (C) 1997-2000 Jay Painter, Stuart Parmenter and others
 See 'COPYING' for licence information.
@@ -135,10 +134,12 @@ Known issues:
 	http://mail.gnome.org/archives/balsa-list/2000-October/msg00101.html
 	and make sure you have at least /usr/lib/libgnome.so.32.3.11.
 
-*	Experimental gcc 2.96 distributed with RedHat 7.0 has problems
-	to compile src/files.c. Use older compilers instead (or send
-	us a patch).
+*       Experimental gcc 2.96 distributed with RedHat 7.0 generates 
+	spurious warning messages. You have to configure balsa with 
+	--disable-more-warnings option.
 
 *	Older versions of GtkText are buggy and use sometimes wide
         characters for single byte charsets: some european charsets may
-        be displayed improperly. gtk+-1.2.8 seems to work OK.
+        be displayed improperly. gtk+-1.2.8 seems to work OK. We had 
+	also some reports that turned out to be problem with font server
+	configuration.

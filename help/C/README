@@ -18,6 +18,10 @@ handbook:
 
 http://developer.gnome.org/projects/gdp/handbook.html
 
+In particular, you will need gnome-doc-tools package downloadable from
+
+http://people.redhat.com/dcm/software.html
+
 Also, in order to succesfully build the postscript or pdf versions of
 the manual, the images must be converted into Encapsulated Post Script
 (eps) files.  The makefile expects a script, img2eps to be present to

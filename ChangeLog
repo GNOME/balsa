@@ -1,3 +1,10 @@
+2004-09-29 19:25  Albrecht Dreß <albrecht.dress@arcor.de>
+
+	* src/balsa-message.c: if a '3156 signature is additionally wrapped
+	into the "-----BEGIN PGP MESSAGE-----" armor, it is passed into the
+	'2440 check routine, which in turn destroys the original
+	verification result--plugged.
+
 2004-09-29  Pawel Salek
 
 	* libbalsa/address-book-ldap.c: compare result with LDAP_OPT_SUCCESS

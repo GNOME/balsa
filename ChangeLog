@@ -1,3 +1,10 @@
+2004-03-20 06:52  PeterB
+
+	* src/balsa-index.c: use a LibBalsaMailboxSearchIter, to allow
+	caching of search results.
+	* libbalsa/: mailbox.c, mailbox.h: implement
+	libbalsa_mailbox_search_iter_view.
+
 2004-03-19 21:51  PeterB
 
 	* src/: balsa-index.c, balsa-index.h: maintain list of selected

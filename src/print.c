@@ -1272,6 +1272,7 @@ print_message(PrintInfo * pi)
 	    break;
 	case BALSA_PRINT_TYPE_IMAGE:
 	    print_image(pi, print_task->data);
+	    break;
 #ifdef HAVE_GPGME
 	case BALSA_PRINT_TYPE_GPG_SIGN:
 	    print_gpg_signature(pi, print_task->data);

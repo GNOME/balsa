@@ -70,11 +70,15 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/locale/*/LC_MESSAGES/balsa.mo
 /usr/share/pixmaps/*
 /usr/share/sounds/balsa/*
-%{prefix}/man/*
+%{_mandir}/man1/*
 %config /etc/sound/events/*
 
 
 %changelog
+* Fri Nov 03 2000 Pawel Salek <pawsa@theochem.kth.se>
+
+- use %{_mandir} for location of the manual.
+
 * Fri Oct 20 2000 Pawel Salek <pawsa@theochem.kth.se>
 
 - require gtk+>= 1.2.7, not gnome-libs. 

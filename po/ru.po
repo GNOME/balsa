@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 0.4\n"
-"POT-Creation-Date: 2000-04-26 23:23+0400\n"
-"PO-Revision-Date: 2000-04-27 11:08+04:00\n"
+"POT-Creation-Date: 2000-05-03 13:07+0000\n"
+"PO-Revision-Date: 2000-05-03 13:10+00:00\n"
 "Last-Translator: Valek Filippov <frob@df.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -43,13 +43,13 @@ msgstr "Вероятно почтовый ящик \"%s\" испорчен."
 
 #: libinit_balsa/balsa-druid-page-directory.gob:146
 msgid ""
-"Please confirm the locations of your default mail files.\n"
+"Please verify the locations of your default mail files.\n"
 "These will be created if necessary."
 msgstr ""
 "Пожалуйста подтвердите расположение ваших почтовых файлов.\n"
 "Они будут созданы если необходимо."
 
-#: libinit_balsa/balsa-druid-page-directory.gob:157
+#: libinit_balsa/balsa-druid-page-directory.gob:163
 msgid "Inbox:"
 msgstr "Входящие:"
 
@@ -57,27 +57,27 @@ msgstr "Входящие:"
 #. * as in the prepare code. But at this point balsa_app.local_mail_directory
 #. * is NULL, so we use a dummy value.
 #.
-#: libinit_balsa/balsa-druid-page-directory.gob:166
+#: libinit_balsa/balsa-druid-page-directory.gob:172
 msgid "Outbox:"
 msgstr "Исходящие:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:169
+#: libinit_balsa/balsa-druid-page-directory.gob:175
 msgid "Sentbox:"
 msgstr "Отправленные:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:172
+#: libinit_balsa/balsa-druid-page-directory.gob:178
 msgid "Draftbox:"
 msgstr "Черновики:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:175
+#: libinit_balsa/balsa-druid-page-directory.gob:181
 msgid "Trash:"
 msgstr "Мусорная корзина:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:186
+#: libinit_balsa/balsa-druid-page-directory.gob:192
 msgid "Mail Files"
 msgstr "Файлы с почтой"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:259
+#: libinit_balsa/balsa-druid-page-directory.gob:265
 msgid "Problem Creating Mailboxes"
 msgstr "Проблема при создании почтового ящика"
 
@@ -190,7 +190,7 @@ msgstr ""
 "Не удалось открыть ~/.gnome/GnomeCard.gcrd для чтения.\n"
 "- %s\n"
 
-#: src/address-book.c:276 src/sendmsg-window.c:384
+#: src/address-book.c:276 src/sendmsg-window.c:389
 msgid "OK"
 msgstr "OK"
 
@@ -226,16 +226,41 @@ msgstr "Запустить GnomeCard"
 msgid "Re-Import"
 msgstr "Реимпортировать"
 
-#: src/balsa-index-page.c:287
+#: src/balsa-app.c:217
+#, c-format
+msgid "Balsa cannot open your \"%s\" mailbox."
+msgstr "Balsa не может открыть ваш почтовый ящик \"%s\""
+
+#: src/balsa-app.c:230
+msgid "Inbox"
+msgstr "Входящие"
+
+#: src/balsa-app.c:235
+msgid "Outbox"
+msgstr "Исходящие"
+
+#: src/balsa-app.c:240
+msgid "Sentbox"
+msgstr "Отправленные"
+
+#: src/balsa-app.c:245
+msgid "Draftbox"
+msgstr "Черновики"
+
+#: src/balsa-app.c:250
+msgid "Trash"
+msgstr "Мусорная корзина"
+
+#: src/balsa-index-page.c:289
 msgid "Mailbox password:"
 msgstr "Пароль для почтового ящика:"
 
 #. password field
-#: src/balsa-index-page.c:295 src/mailbox-conf.c:989 src/mailbox-conf.c:1088
+#: src/balsa-index-page.c:297 src/mailbox-conf.c:989 src/mailbox-conf.c:1088
 msgid "Password:"
 msgstr "Пароль:"
 
-#: src/balsa-index-page.c:321
+#: src/balsa-index-page.c:323
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -243,32 +268,32 @@ msgstr ""
 "Невозможно открыть почтовый ящик!\n"
 "Проверьте его настройки."
 
-#: src/balsa-index-page.c:584 src/filter-edit-dialog.c:224
+#: src/balsa-index-page.c:586 src/filter-edit-dialog.c:224
 msgid "New"
 msgstr "Новый"
 
-#: src/balsa-index-page.c:592 src/main-window.c:373
+#: src/balsa-index-page.c:594 src/main-window.c:373
 msgid "Reply"
 msgstr "Ответить"
 
-#: src/balsa-index-page.c:600 src/main-window.c:376
+#: src/balsa-index-page.c:602 src/main-window.c:376
 msgid "Reply to all"
 msgstr "Ответить всем"
 
-#: src/balsa-index-page.c:608 src/main-window.c:379
+#: src/balsa-index-page.c:610 src/main-window.c:379
 msgid "Forward"
 msgstr "Переслать"
 
-#: src/balsa-index-page.c:616 src/filter-edit-dialog.c:230
+#: src/balsa-index-page.c:618 src/filter-edit-dialog.c:230
 #: src/main-window.c:366 src/pref-manager.c:885
 msgid "Delete"
 msgstr "Удалить"
 
-#: src/balsa-index-page.c:624
+#: src/balsa-index-page.c:626
 msgid "Undelete"
 msgstr "Восстановить"
 
-#: src/balsa-index-page.c:632
+#: src/balsa-index-page.c:634
 msgid "Transfer"
 msgstr "Передать"
 
@@ -298,8 +323,8 @@ msgid "Save"
 msgstr "Сохранить"
 
 #: src/balsa-message.c:166 src/balsa-message.c:225 src/mailbox-conf.c:666
-#: src/sendmsg-window.c:125 src/sendmsg-window.c:410 src/sendmsg-window.c:1077
-#: src/sendmsg-window.c:1383 src/sendmsg-window.c:1406
+#: src/sendmsg-window.c:127 src/sendmsg-window.c:415 src/sendmsg-window.c:1081
+#: src/sendmsg-window.c:1387 src/sendmsg-window.c:1410
 msgid "Cancel"
 msgstr "Отменить"
 
@@ -326,13 +351,13 @@ msgstr "Дата:"
 
 #. From:
 #: src/balsa-message.c:646 src/filter-edit-dialog.c:339
-#: src/sendmsg-window.c:582
+#: src/sendmsg-window.c:586
 msgid "From:"
 msgstr "От:"
 
 #. To:
 #: src/balsa-message.c:650 src/filter-edit-dialog.c:327
-#: src/sendmsg-window.c:584
+#: src/sendmsg-window.c:588
 msgid "To:"
 msgstr "Кому:"
 
@@ -349,7 +374,7 @@ msgid "Fcc:"
 msgstr "Fcc:"
 
 #. Subject:
-#: src/balsa-message.c:656 src/sendmsg-window.c:590
+#: src/balsa-message.c:656 src/sendmsg-window.c:594
 msgid "Subject:"
 msgstr "Тема:"
 
@@ -411,7 +436,7 @@ msgstr "Строка для сравнения:"
 msgid "Add"
 msgstr "Добавить"
 
-#: src/filter-edit-dialog.c:427 src/sendmsg-window.c:331
+#: src/filter-edit-dialog.c:427 src/sendmsg-window.c:336
 msgid "Remove"
 msgstr "Удалить"
 
@@ -857,8 +882,8 @@ msgstr "Открыть следующее письмо"
 msgid "Open Next Unread Message"
 msgstr "Открыть следующее непрочитанное письмо"
 
-#: src/main-window.c:402 src/print.c:82 src/sendmsg-window.c:122
-#: src/sendmsg-window.c:150
+#: src/main-window.c:402 src/print.c:82 src/sendmsg-window.c:124
+#: src/sendmsg-window.c:152
 msgid "Print"
 msgstr "Напечатать"
 
@@ -1257,155 +1282,159 @@ msgstr ""
 msgid "Print Command:"
 msgstr "Команда печати:"
 
-#: src/sendmsg-window.c:106
+#: src/sendmsg-window.c:108
 msgid "Send"
 msgstr "Послать"
 
-#: src/sendmsg-window.c:106
+#: src/sendmsg-window.c:108
 msgid "Send this mail"
 msgstr "Послать это письмо"
 
-#: src/sendmsg-window.c:110
+#: src/sendmsg-window.c:112
 msgid "Attach"
 msgstr "Приложить"
 
-#: src/sendmsg-window.c:110
+#: src/sendmsg-window.c:112
 msgid "Add attachments to this message"
 msgstr "Добавить файл как приложение к этому письму"
 
-#: src/sendmsg-window.c:114
+#: src/sendmsg-window.c:116
 msgid "Postpone"
 msgstr "Отложить"
 
-#: src/sendmsg-window.c:114
+#: src/sendmsg-window.c:116
 msgid "Continue this message later"
 msgstr "Закончить это письмо позже"
 
-#: src/sendmsg-window.c:118
+#: src/sendmsg-window.c:120
 msgid "Spelling"
 msgstr "Правописание"
 
-#: src/sendmsg-window.c:118
+#: src/sendmsg-window.c:120
 msgid "Check Spelling"
 msgstr "Проверить орфографию"
 
-#: src/sendmsg-window.c:133
+#: src/sendmsg-window.c:135
 msgid "_Include File..."
 msgstr "Включить файл..."
 
-#: src/sendmsg-window.c:137
+#: src/sendmsg-window.c:139
 msgid "_Attach file..."
 msgstr "Приложить файл..."
 
-#: src/sendmsg-window.c:142
+#: src/sendmsg-window.c:144
 msgid "_Send"
 msgstr "Послать"
 
-#: src/sendmsg-window.c:142
+#: src/sendmsg-window.c:144
 msgid "Send the currently edited message"
 msgstr "Послать текущее письмо"
 
-#: src/sendmsg-window.c:146
+#: src/sendmsg-window.c:148
 msgid "_Postpone"
 msgstr "Отложить"
 
-#: src/sendmsg-window.c:150
+#: src/sendmsg-window.c:152
 msgid "Print the edited message"
 msgstr "Напечатать редактируемое письмо"
 
-#: src/sendmsg-window.c:168
+#: src/sendmsg-window.c:170
 msgid "_Wrap body"
 msgstr "Перенос тела письма"
 
-#: src/sendmsg-window.c:168
+#: src/sendmsg-window.c:170
 msgid "Wrap message lines"
 msgstr "Переносить строки письма"
 
-#: src/sendmsg-window.c:172
+#: src/sendmsg-window.c:174
 msgid "_Reflow paragraph"
 msgstr ""
 
-#: src/sendmsg-window.c:175
+#: src/sendmsg-window.c:177
 msgid "R_eflow message"
 msgstr ""
 
-#: src/sendmsg-window.c:184
+#: src/sendmsg-window.c:186
 msgid "Fr_om"
 msgstr "От"
 
-#: src/sendmsg-window.c:186
+#: src/sendmsg-window.c:188
 msgid "_To"
 msgstr "Кому"
 
-#: src/sendmsg-window.c:188
+#: src/sendmsg-window.c:190
 msgid "_Subject"
 msgstr "Тема"
 
-#: src/sendmsg-window.c:190
+#: src/sendmsg-window.c:192
 msgid "_Cc"
 msgstr "Официальные копии (Сс)"
 
-#: src/sendmsg-window.c:192
+#: src/sendmsg-window.c:194
 msgid "_Bcc"
 msgstr "Скрытые копии"
 
-#: src/sendmsg-window.c:194
+#: src/sendmsg-window.c:196
 msgid "_Fcc"
 msgstr "Fcc:"
 
-#: src/sendmsg-window.c:196
+#: src/sendmsg-window.c:198
 msgid "_Reply To"
 msgstr "Обратный адрес"
 
-#: src/sendmsg-window.c:198
+#: src/sendmsg-window.c:200
 msgid "_Attachments"
 msgstr "Вложения"
 
-#: src/sendmsg-window.c:200
+#: src/sendmsg-window.c:202
 msgid "_Comments"
 msgstr "Комментарии"
 
-#: src/sendmsg-window.c:202
+#: src/sendmsg-window.c:204
 msgid "_Keywords"
 msgstr "Ключевые слова"
 
-#: src/sendmsg-window.c:213
+#: src/sendmsg-window.c:215
 msgid "_Western (ISO-8859-1)"
 msgstr "_Western (ISO-8859-1)"
 
-#: src/sendmsg-window.c:215
+#: src/sendmsg-window.c:217
 msgid "W_estern (ISO-8859-15)"
 msgstr "W_estern (ISO-8859-15)"
 
-#: src/sendmsg-window.c:217
+#: src/sendmsg-window.c:219
 msgid "_Central European (ISO-8859-2)"
 msgstr "Центральная Европа (ISO-8859-2)"
 
-#: src/sendmsg-window.c:219
+#: src/sendmsg-window.c:221
 msgid "_South European (ISO-8859-3)"
 msgstr "Южная Европа (ISO-8859-3)"
 
-#: src/sendmsg-window.c:221
+#: src/sendmsg-window.c:223
+msgid "_Baltic (ISO-8859-13)"
+msgstr "Балтия (ISO-8859-13)"
+
+#: src/sendmsg-window.c:225
 msgid "Cy_rillic (ISO-8859-5)"
 msgstr "Кириллица (ISO-8859-5)"
 
-#: src/sendmsg-window.c:223
+#: src/sendmsg-window.c:227
 msgid "_Hebrew (ISO-8859-8)"
 msgstr "_Hebrew (ISO-8859-8)"
 
-#: src/sendmsg-window.c:225
+#: src/sendmsg-window.c:229
 msgid "_Turkish (ISO-8859-9)"
 msgstr "Турецкий (ISO-8859-9)"
 
-#: src/sendmsg-window.c:262
+#: src/sendmsg-window.c:267
 msgid "_Show"
 msgstr "Показать"
 
-#: src/sendmsg-window.c:263
+#: src/sendmsg-window.c:268
 msgid "_ISO Charset"
 msgstr "Набор символов ISO"
 
-#: src/sendmsg-window.c:382
+#: src/sendmsg-window.c:387
 msgid ""
 "The attachment pixmap (balsa/attachment.png) cannot be found.\n"
 "This means you cannot attach any files.\n"
@@ -1413,101 +1442,101 @@ msgstr ""
 "Изображение вложения (balsa/attachment.png) не было найдено.\n"
 "Это значит что вы не можете вложить какие-либо файлы.\n"
 
-#: src/sendmsg-window.c:400
+#: src/sendmsg-window.c:405
 #, c-format
 msgid "Cannot get info on file '%s': %s\n"
 msgstr "Нет информации про файл '%s': %s\n"
 
-#: src/sendmsg-window.c:404
+#: src/sendmsg-window.c:409
 #, c-format
 msgid "Attachment is not a regular file: '%s'\n"
 msgstr "Приложение не является обычным файлом: '%s'\n"
 
-#: src/sendmsg-window.c:465
+#: src/sendmsg-window.c:469
 msgid "Attach file"
 msgstr "Приложить файл"
 
 #. cc:
-#: src/sendmsg-window.c:593
+#: src/sendmsg-window.c:597
 msgid "cc:"
 msgstr "О. копия(сс):"
 
 #. bcc:
-#: src/sendmsg-window.c:596
+#: src/sendmsg-window.c:600
 msgid "bcc:"
 msgstr "Н.о. копия(bcc):"
 
 #. fcc:
-#: src/sendmsg-window.c:599
+#: src/sendmsg-window.c:603
 msgid "fcc:"
 msgstr "копия(fcc)"
 
 #. Reply To:
-#: src/sendmsg-window.c:627
+#: src/sendmsg-window.c:631
 msgid "Reply To:"
 msgstr "Обратный адрес:"
 
 #. Attachment list
-#: src/sendmsg-window.c:631
+#: src/sendmsg-window.c:635
 msgid "Attachments:"
 msgstr "Вложения:"
 
 #. Comments:
-#: src/sendmsg-window.c:673
+#: src/sendmsg-window.c:677
 msgid "Comments:"
 msgstr "Комментарии:"
 
 #. Keywords:
-#: src/sendmsg-window.c:676
+#: src/sendmsg-window.c:680
 msgid "Keywords:"
 msgstr "Ключевые слова:"
 
-#: src/sendmsg-window.c:753
+#: src/sendmsg-window.c:757
 msgid "you"
 msgstr "вы"
 
-#: src/sendmsg-window.c:762
+#: src/sendmsg-window.c:766
 #, c-format
 msgid "On %s %s wrote:\n"
-msgstr ""
+msgstr "На %s %s написал:\n"
 
-#: src/sendmsg-window.c:764
+#: src/sendmsg-window.c:768
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s написал:\n"
 
-#: src/sendmsg-window.c:834
+#: src/sendmsg-window.c:838
 msgid "Reply to "
 msgstr "Ответить"
 
-#: src/sendmsg-window.c:839
+#: src/sendmsg-window.c:843
 msgid "Forward message"
 msgstr "Переслать письмо"
 
-#: src/sendmsg-window.c:844
+#: src/sendmsg-window.c:848
 msgid "Continue message"
 msgstr "Продолжить письмо"
 
-#: src/sendmsg-window.c:849
+#: src/sendmsg-window.c:853
 msgid "New message"
 msgstr "Новое письмо"
 
-#: src/sendmsg-window.c:1076
+#: src/sendmsg-window.c:1080
 msgid "Could not open the file.\n"
 msgstr "Не удалось открыть файл.\n"
 
-#: src/sendmsg-window.c:1082
+#: src/sendmsg-window.c:1086
 msgid "Loading..."
 msgstr "Загрузка..."
 
-#: src/sendmsg-window.c:1107
+#: src/sendmsg-window.c:1111
 msgid "Include file"
 msgstr "Включить файл"
 
-#: src/sendmsg-window.c:1381
+#: src/sendmsg-window.c:1385
 msgid "Cannot execute print command."
 msgstr "Не удалось выполнить команду печати."
 
-#: src/sendmsg-window.c:1405
+#: src/sendmsg-window.c:1409
 msgid "Error executing lpr"
 msgstr "Ошибка выполнения lpr"

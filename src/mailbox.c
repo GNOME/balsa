@@ -486,4 +486,5 @@ void
 current_mailbox_check ()
 {
   mail_ping (balsa_app.current_mailbox->stream);
+  system("cat /home/pavlov/balsa/src/sounds/yougotmail.wav>/dev/dsp &");
 }

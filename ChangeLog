@@ -1,4 +1,10 @@
-2000-11-08  Pawel Salek  <pawsa@theochem.kth.se>
+2000-11-12  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-mblist.c: additional check on public functions' 
+	arguments. In long term, an audit of the balsa_quit() function
+	is needed (dependencies between GUI and mailbox backend codes).
+	
+2000-11-11  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* README, balsa.1.in: document -m option better.
 	* AUTHORS: update for 1.0.0.

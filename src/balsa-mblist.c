@@ -304,6 +304,7 @@ balsa_mblist_insert_mailbox(BalsaMBList * mblist,
     MailboxNode *mbnode;
     gchar *text[3];
 
+    g_return_if_fail(mblist  != NULL);
     g_return_if_fail(mailbox != NULL);
 
     text[0] = mailbox->name;
@@ -701,6 +702,8 @@ balsa_mblist_update_mailbox(BalsaMBList * mblist,
     GtkCTreeNode *node;
     gchar *desc;
 
+    g_return_if_fail(mblist);
+
     /* try and find the mailbox in both sub trees */
     node = gtk_ctree_find_by_row_data_custom(GTK_CTREE(mblist), NULL,
 					     mailbox,
@@ -997,6 +1000,7 @@ balsa_mblist_focus_mailbox(BalsaMBList * bmbl, LibBalsaMailbox * mailbox)
 {
     GtkCTreeNode *node;
 
+    g_return_val_if_fail(bmbl, FALSE);
     if (!mailbox)
 	return FALSE;
 
@@ -1019,9 +1023,8 @@ balsa_mblist_focus_mailbox(BalsaMBList * bmbl, LibBalsaMailbox * mailbox)
 	}
 
 	return TRUE;
-    } else {
+    } else
 	return FALSE;
-    }
 }
 
 /* balsa_widget_get_bold_font [MBG]
@@ -1087,6 +1090,8 @@ balsa_mblist_unread_messages_changed_cb(LibBalsaMailbox * mailbox,
 {
     GtkCTreeNode *node;
 
+    g_return_if_fail(mblist);
+    g_return_if_fail(mailbox);
     /* try and find the mailbox in both sub trees */
     node = gtk_ctree_find_by_row_data_custom(GTK_CTREE(mblist), NULL,
 					     mailbox,

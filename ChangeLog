@@ -1,3 +1,14 @@
+2004-09-15  Pawel Salek
+
+	* libbalsa/imap-server.c: do not call g_strdup_printf() with null arg.
+	* libbalsa/mailbox_imap.c: more verbose on large messages.
+	* libbalsa/mailbox_mbox.c: rollback on error instead of leaving
+	mailbox in a corrupted state.
+	* libbalsa/imap/imap-commands.c: save one RTT. Use .MIME better.
+	* libbalsa/imap/imap-handle.c: handle BODY[HEADER] response.
+	* src/balsa-mblist.c: assure minimal size of the mailbox selection
+	widget.
+
 2004-09-11 17:30  PeterB
 
 	* libbalsa/send.c: use GMimeMessagePart for an attached message.

@@ -772,18 +772,19 @@ imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
                             unsigned seqno, const char *section,
                             ImapFetchBodyCb body_cb, void *arg)
 {
-  char cmd[40];
-  ImapResponse rc;
+  char cmd[80];
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
   handle->body_cb  = body_cb;
   handle->body_arg = arg;
-  snprintf(cmd, sizeof(cmd), "FETCH %u BODY[%s.MIME]", seqno, section);
-  rc = imap_cmd_exec(handle, cmd);
-  if(rc == IMR_OK) {
-    snprintf(cmd, sizeof(cmd), "FETCH %u BODY[%s]", seqno, section);
-    rc = imap_cmd_exec(handle, cmd);
-  }
-  return rc;
+  /* We should use .MIME only for non-message parts but it tends to
+     work also for messages. */
+  if(strcmp(section, "1") == 0)
+    snprintf(cmd, sizeof(cmd), "FETCH %u (BODY[HEADER] BODY[%s])",
+           seqno, section);
+  else
+    snprintf(cmd, sizeof(cmd), "FETCH %u (BODY[%s.MIME] BODY[%s])",
+             seqno, section, section);
+  return imap_cmd_exec(handle, cmd);
 }
 
 /* 6.4.6 STORE Command */

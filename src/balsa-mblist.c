@@ -1722,9 +1722,10 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
     if (req.height > balsa_app.mw_height)
         req.height = balsa_app.mw_height;
     /* For the mailbox list width, we use the one used on the main
-     * window. This is the user choice and required because the mblist
-     * widget saves the size in balsa_app.mblist_width */
-    req.width = balsa_app.mblist_width;
+     * window enhanced somewhat. This is the user choice and required
+     * because the mblist widget saves the size in
+     * balsa_app.mblist_width */
+    req.width = balsa_app.mblist_width> 200 ? balsa_app.mblist_width : 200;
     gtk_widget_set_size_request(GTK_WIDGET(mblist), req.width, req.height);
 
     gtk_container_add(GTK_CONTAINER(scroll), mblist);

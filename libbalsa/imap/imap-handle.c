@@ -2536,12 +2536,18 @@ ir_msg_att_body(ImapMboxHandle *h, int c, unsigned seqno)
       break;
     }
     c = imap_get_atom(h->sio, buf, sizeof buf);
-    if (c == ' ' && 
-        (g_ascii_strcasecmp(buf, "HEADER.FIELDS") == 0 ||
-         g_ascii_strcasecmp(buf, "HEADER.FIELDS.NOT") == 0))
-      rc = ir_body_header_fields(h->sio, msg);
-    else
-      rc = IMR_PROTOCOL;
+    if (c == ']' &&
+        g_ascii_strcasecmp(buf, "HEADER") == 0) {
+      sio_ungetc (h->sio); /* put the ']' back */
+      rc = ir_body_section(h->sio, h->body_cb, h->body_arg);
+    } else {
+      if (c == ' ' && 
+          (g_ascii_strcasecmp(buf, "HEADER.FIELDS") == 0 ||
+           g_ascii_strcasecmp(buf, "HEADER.FIELDS.NOT") == 0))
+        rc = ir_body_header_fields(h->sio, msg);
+      else
+        rc = IMR_PROTOCOL;
+    }
     break;
   case ' ':
     rc = ir_body(h->sio, sio_getc(h->sio),

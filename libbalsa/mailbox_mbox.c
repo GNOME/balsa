@@ -1472,6 +1472,7 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     GMimeStream *orig;
     GMimeStream *dest;
     gint retval = 1;
+    off_t orig_length;
 
     ctime_r(&(message->headers->date), date_string);
 
@@ -1500,7 +1501,7 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
         return -1;
     }
     
-    lseek (fd, 0, SEEK_END);
+    orig_length = lseek (fd, 0, SEEK_END);
     dest = g_mime_stream_fs_new (fd);
     if (!dest) {
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
@@ -1529,8 +1530,7 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     if (g_mime_stream_write_string(dest, from) < (gint) strlen(from)
 	|| g_mime_stream_write_to_stream (orig, dest) < 0) {
         libbalsa_information ( LIBBALSA_INFORMATION_ERROR,
-			       _("Error copying message to mailbox %s!\n"
-				 "Mailbox might have been corrupted!"),
+			       _("Error copying message to mailbox %s!"),
 			       mailbox->name );
 	retval = -1;
     }
@@ -1539,6 +1539,8 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
 	retval = lbm_mbox_newline(dest);
  
     g_mime_stream_unref(orig);
+    if(retval<0)
+        truncate(path, orig_length);
     mbox_unlock (mailbox, dest);
     g_mime_stream_unref(dest);
     g_free(from);

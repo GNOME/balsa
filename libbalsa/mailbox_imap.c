@@ -85,6 +85,8 @@ static LibBalsaMailboxClass *parent_class = NULL;
 
 static off_t ImapCacheSize = 15*1024*1024; /* 15MB */
 
+ /* issue message if downloaded part has more than this size */
+static unsigned SizeMsgThreshold = 50*1024;
 static void libbalsa_mailbox_imap_finalize(GObject * object);
 static void libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass *
 					     klass);
@@ -954,8 +956,9 @@ libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox, gboolean expunge)
 }
 
 static FILE*
-get_cache_stream(LibBalsaMailbox *mailbox, unsigned uid)
+get_cache_stream(LibBalsaMailbox *mailbox, LibBalsaMessage *msg)
 {
+    unsigned uid = IMAP_MESSAGE_UID(msg);
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     FILE *stream;
     gchar **pair, *path;
@@ -970,7 +973,10 @@ get_cache_stream(LibBalsaMailbox *mailbox, unsigned uid)
 
         libbalsa_assure_balsa_dir();
         mkdir(pair[0], S_IRUSR|S_IWUSR|S_IXUSR); /* ignore errors */
-        /* printf("%s path: %s\n", __FUNCTION__, path); */
+        if(msg->length>(signed)SizeMsgThreshold)
+            libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, 
+                                 _("Downloading %ld kB"),
+                                 msg->length/1024);
         cache = fopen(path, "wb");
         II(rc,mimap->handle,
            imap_mbox_handle_fetch_rfc822_uid(mimap->handle, uid, cache));
@@ -1005,7 +1011,7 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
         return NULL;
     }
 
-    stream = get_cache_stream(mailbox, IMAP_MESSAGE_UID(message));
+    stream = get_cache_stream(mailbox, message);
     libbalsa_unlock_mailbox(mailbox);
 
     return g_mime_stream_file_new(stream);
@@ -1980,9 +1986,14 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
         dt.body  = imap_message_get_body_from_section(im, section);
         dt.block = g_malloc(dt.body->octets+1);
         dt.pos   = 0;
-	/* Imap_mbox_handle_fetch_body fetches the MIME headers of
-	 * the section, followed by the text. We write this unfiltered
-	 * to the cache. */
+        if(dt.body->octets>SizeMsgThreshold)
+            libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, 
+                                 _("Downloading %ld kB"),
+                                 dt.body->octets/1024);
+	/* Imap_mbox_handle_fetch_body fetches the MIME headers of the
+         * section, followed by the text. We write this unfiltered to
+         * the cache. The probably only exception is the main body
+         * which has no headers. In this case, we have to fake them.*/
         II(rc,mimap->handle,
            imap_mbox_handle_fetch_body(mimap->handle, msg->msgno,
                                        section, append_str, &dt));
@@ -2155,6 +2166,10 @@ libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
     len = g_mime_stream_tell(outstream);
     g_mime_stream_reset(outstream);
 
+    if(len>(signed)SizeMsgThreshold)
+        libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, 
+                             _("Uploading %ld kB"),
+                             (long)len/1024);
     handle = libbalsa_mailbox_imap_get_handle(LIBBALSA_MAILBOX_IMAP(mailbox),
 					      NULL);
     rc = imap_mbox_append_stream(handle,

@@ -1,3 +1,13 @@
+2004-11-06 09:41  PeterB
+
+	* libbalsa/: abook-completion.c, abook-completion.h,
+	address-book-extern.c, address-book-extern.h, address-book-ldif.c,
+	address-book-ldif.h, address-book-vcard.c, address-book-vcard.h,
+	address-entry.c: match user input at start of any word in key;
+	use a single GCompletion with a key consisting of full_name,
+	nick_name, and all mailboxes, space-separated; utf8_normalize
+	and utf8_casefold all strings.
+
 2004-11-05 20:31  PeterB
 
 	* libbalsa/identity.c: build with GTK_VERSION < 2.4.0.

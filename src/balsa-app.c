@@ -83,21 +83,6 @@ init_balsa_app (int argc, char *argv[])
   /* initalize our mailbox access crap */
   restore_global_settings ();
 
-  switch (balsa_app.inbox->type)
-    {
-    case MAILBOX_MAILDIR:
-    case MAILBOX_MBOX:
-    case MAILBOX_MH:
-      mailbox_init (MAILBOX_LOCAL (balsa_app.inbox)->path);
-      break;
-
-    case MAILBOX_IMAP:
-      break;
-
-    case MAILBOX_POP3:
-      break;
-    }
-
   read_signature ();
 
   /* Check to see if this is the first time we've run balsa */
@@ -122,6 +107,22 @@ init_balsa_app (int argc, char *argv[])
 void
 do_load_mailboxes ()
 {
+  switch (balsa_app.inbox->type)
+    {
+    case MAILBOX_MAILDIR:
+    case MAILBOX_MBOX:
+    case MAILBOX_MH:
+      mailbox_init (MAILBOX_LOCAL (balsa_app.inbox)->path);
+      break;
+
+    case MAILBOX_IMAP:
+      break;
+
+    case MAILBOX_POP3:
+      break;
+    }
+
+  read_signature ();
   mailboxes_init ();
   load_local_mailboxes ();
   special_mailboxes ();

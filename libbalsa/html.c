@@ -37,16 +37,17 @@
 
 #include "config.h"
 
-#ifdef HAVE_GTKHTML
-
 #include <stdio.h>
 #include <string.h>
+
+#include "html.h"
+
+#ifdef HAVE_GTKHTML
 
 /* We need the declaration of LibBalsaMessage, but including "message.h"
  * directly gets into some kind of circular #include problem, whereas
  * including it indirectly through "libbalsa.h" doesn't! */
 #include "libbalsa.h"
-#include "html.h"
 
 /* Forward reference. */
 static gboolean libbalsa_html_url_requested(GtkWidget * html,
@@ -140,21 +141,23 @@ libbalsa_html_new(const gchar * text, size_t len,
     return lbh_new(text, len, NULL, message, link_clicked_cb);
 }
 
-/* Use an HtmlView widget to convert html text to a string:
+/* Use an HtmlView widget to convert html text to a (null-terminated) string:
  * text			the HTML source;
  * len			length of text;
+ * frees and reallocates the string.
  */
-gchar *
-libbalsa_html_to_string(const gchar * text, size_t len)
+void
+libbalsa_html_to_string(gchar ** text, size_t len)
 {
     GtkWidget *html;
     GString *str;
 
     str = g_string_new(NULL);	/* We want only the text, in str. */
-    html = lbh_new(text, len, str, NULL, NULL);
+    html = lbh_new(*text, len, str, NULL, NULL);
     gtk_widget_destroy(html);
 
-    return g_string_free(str, FALSE);
+    g_free(*text);
+    *text = g_string_free(str, FALSE);
 }
 
 /*
@@ -434,14 +437,30 @@ libbalsa_html_url_requested(GtkWidget * html, const gchar * url,
     return TRUE;
 }
 
-gchar *
-libbalsa_html_from_rich(gchar * text, gint len, gboolean is_richtext)
+/* Filter text/enriched or text/richtext to text/html, if we have GMime
+ * >= 2.1.0; free and reallocate the text. */
+guint
+libbalsa_html_filter(LibBalsaHTMLType html_type, gchar ** text, guint len)
 {
+    guint retval = len;
+#ifdef HAVE_GMIME21
     GMimeStream *stream;
     GByteArray *array;
     GMimeStream *filter_stream;
     GMimeFilter *filter;
     guint32 flags;
+
+    switch (html_type) {
+    case LIBBALSA_HTML_TYPE_ENRICHED:
+	flags = 0;
+	break;
+    case LIBBALSA_HTML_TYPE_RICHTEXT:
+	flags = GMIME_FILTER_ENRICHED_IS_RICHTEXT;
+	break;
+    case LIBBALSA_HTML_TYPE_HTML:
+    default:
+	return retval;
+    }
 
     stream = g_mime_stream_mem_new();
     array = g_byte_array_new();
@@ -450,19 +469,44 @@ libbalsa_html_from_rich(gchar * text, gint len, gboolean is_richtext)
     filter_stream = g_mime_stream_filter_new_with_stream(stream);
     g_mime_stream_unref(stream);
 
-    flags = is_richtext ? GMIME_FILTER_ENRICHED_IS_RICHTEXT : 0;
     filter = g_mime_filter_enriched_new(flags);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream), filter);
     g_object_unref(filter);
 
-    if (len < 0)
-	len = strlen(text);
-    g_mime_stream_write(filter_stream, text, len);
+    g_mime_stream_write(filter_stream, *text, len);
     g_mime_stream_unref(filter_stream);
 
     g_byte_array_append(array, "", 1);
 
-    return g_byte_array_free(array, FALSE);
+    retval = array->len;
+    g_free(*text);
+    *text = g_byte_array_free(array, FALSE);
+#endif			/* HAVE_GMIME21 */
+    return retval;
+}
+
+LibBalsaHTMLType
+libbalsa_html_type(const gchar * mime_type)
+{
+    if (!strcmp(mime_type, "text/html"))
+	return LIBBALSA_HTML_TYPE_HTML;
+#ifdef HAVE_GMIME21
+    if (!strcmp(mime_type, "text/enriched"))
+	return LIBBALSA_HTML_TYPE_ENRICHED;
+    if (!strcmp(mime_type, "text/richtext"))
+	return LIBBALSA_HTML_TYPE_RICHTEXT;
+#endif				/* HAVE_GMIME21 */
+    return LIBBALSA_HTML_TYPE_NONE;
+}
+
+#else				/* HAVE_GTKHTML */
+
+LibBalsaHTMLType
+libbalsa_html_type(const gchar * mime_type)
+{
+    if (!strcmp(mime_type, "text/html"))
+	return LIBBALSA_HTML_TYPE_HTML;
+    return LIBBALSA_HTML_TYPE_NONE;
 }
 
 #endif				/* HAVE_GTKHTML */

@@ -23,10 +23,18 @@
 #ifndef   __LIBBALSA_HTML_H__
 # define  __LIBBALSA_HTML_H__
 
-# ifdef HAVE_GTKHTML
-
 #  include <gtk/gtk.h>
 #  include <libgnomeprint/gnome-print.h>
+
+/* We need this enum even if we're not using GtkHtml. */
+typedef enum {
+    LIBBALSA_HTML_TYPE_NONE = 0,
+    LIBBALSA_HTML_TYPE_HTML,
+    LIBBALSA_HTML_TYPE_ENRICHED,
+    LIBBALSA_HTML_TYPE_RICHTEXT
+} LibBalsaHTMLType;
+
+# ifdef HAVE_GTKHTML
 
 typedef void (*LibBalsaHTMLPrintCallback) (GtkWidget * widget,
 					   GnomePrintContext *
@@ -38,7 +46,7 @@ typedef void (*LibBalsaHTMLPrintCallback) (GtkWidget * widget,
 GtkWidget *libbalsa_html_new(const gchar * text, size_t len,
 			     gpointer message,
 			     GCallback link_clicked_cb);
-gchar *libbalsa_html_to_string(const gchar * text, size_t len);
+void libbalsa_html_to_string(gchar ** text, size_t len);
 gboolean libbalsa_html_can_zoom(GtkWidget * widget);
 void libbalsa_html_zoom(GtkWidget * widget, gint in_out);
 gboolean libbalsa_html_can_select(GtkWidget * widget);
@@ -56,9 +64,11 @@ gint libbalsa_html_print_get_pages_num(GtkWidget * widget,
 				       gdouble header_height,
 				       gdouble footer_height);
 
-gchar *libbalsa_html_from_rich(gchar * text, gint len,
-			       gboolean is_richtext);
+guint libbalsa_html_filter(LibBalsaHTMLType html_type, gchar ** text,
+			   guint len);
 
 # endif				/* HAVE_GTKHTML */
+
+LibBalsaHTMLType libbalsa_html_type(const gchar * mime_type);
 
 #endif				/* __LIBBALSA_HTML_H__ */

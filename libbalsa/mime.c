@@ -50,9 +50,7 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
     size_t allocated;
     GString *reply = NULL;
     gchar *mime_type;
-    gboolean is_html;
-    gboolean is_enriched;
-    gboolean is_richtext;
+    LibBalsaHTMLType html_type;
     FILE *fp;
 
     switch (libbalsa_message_body_type(body)) {
@@ -70,13 +68,11 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	break;
     case LIBBALSA_MESSAGE_BODY_TYPE_TEXT:
 	/* don't return text/html stuff... */
-	mime_type   = libbalsa_message_body_get_content_type(body);
-	is_html     = !strcmp(mime_type, "text/html");
-	is_enriched = !strcmp(mime_type, "text/enriched");
-	is_richtext = !strcmp(mime_type, "text/richtext");
+	mime_type = libbalsa_message_body_get_content_type(body);
+	html_type = libbalsa_html_type(mime_type);
 	g_free(mime_type);
 
-	if (ignore_html && (is_html || is_enriched || is_richtext))
+	if (ignore_html && html_type)
 	    break;
 
 	if (!libbalsa_message_body_save_temporary(body)) {
@@ -97,21 +93,9 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	    return NULL;
 
 #ifdef HAVE_GTKHTML
-	if (is_html || is_enriched || is_richtext) {
-	    gchar *tmp;
-
-	    if (is_enriched || is_richtext) {
-		tmp = libbalsa_html_from_rich(res, allocated, is_richtext);
-		g_free(res);
-		res = tmp;
-		allocated = strlen(res);
-	    }
-
-	    tmp = libbalsa_html_to_string(res, allocated);
-	    if (tmp) {
-		g_free(res);
-		res = tmp;
-	    }
+	if (html_type) {
+	    allocated = libbalsa_html_filter(html_type, &res, allocated);
+	    libbalsa_html_to_string(&res, allocated);
 	}
 #endif /* HAVE_GTKHTML */
 

@@ -482,6 +482,14 @@ dnl ##########################################################################
 AC_ARG_WITH(gss, [  --with-gss              Enable GSS [default=no]],
     [with_gss=$withval],[with_gss=no])
 
+dnl ##########################################################################
+dnl GMime version?
+dnl ##########################################################################
+
+if $PKG_CONFIG --atleast-version=2.1.0 gmime-2.0 ; then
+  AC_DEFINE(HAVE_GMIME21,1,[Defined when GMime version is at least 2.1.0])
+fi
+
 dnl ###########################################################################
 dnl turn warnings into errors to enforce clean code
 dnl ###########################################################################

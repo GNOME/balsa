@@ -1,3 +1,8 @@
+2004-02-03 00:07  PeterB
+
+	* libbalsa/mailbox_imap.c: update unread_messages when server
+	notifies us about a change in LIBBALSA_MESSAGE_FLAG_NEW.
+
 2004-02-02 08:34  PeterB
 
 	* libbalsa/mailbox_pop3.c: use rmdir to remove temp mailbox.

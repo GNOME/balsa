@@ -1437,7 +1437,7 @@ msgstr "Показати закладки скриньок"
 
 #: src/main-window.c:311
 msgid "Toggle display of mailbox notebook tabs"
-msgstr ""
+msgstr "Перемикнути показ закладок поштових скриньок"
 
 #: src/main-window.c:315 src/message-window.c:94
 msgid "_Wrap"

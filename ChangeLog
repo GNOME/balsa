@@ -1,3 +1,8 @@
+2002-12-19  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in, src/print.c: make balsa compile with libgnomeprint-2.2
+	(Artur Flinta <aflinta@at.kernel.pl>).
+
 2002-12-19 12:46  PeterB
 
 	* src/: Makefile.am, balsa-message.h, sendmsg-window.c (file_menu):

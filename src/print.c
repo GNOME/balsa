@@ -30,10 +30,36 @@
 #include <ctype.h>
 #include <libgnomeprint/gnome-print.h>
 #include <libgnomeprint/gnome-font.h>
-#include <libgnomeprint/gnome-print-master.h>
+
+#ifdef HAVE_LGPRINT22
+#  include <libgnomeprint/gnome-print-job.h>
+#  include <libgnomeprintui/gnome-print-job-preview.h>
+#  define BALSA_GNOME_PRINT_UI GnomePrintJob
+#  define BALSA_GNOME_PRINT_UI_GET_CONFIG gnome_print_job_get_config
+#  define BALSA_GNOME_PRINT_UI_GET_PAGE_SIZE_FROM_CONFIG gnome_print_job_get_page_size_from_config
+#  define BALSA_GNOME_PRINT_UI_GET_CONTEXT gnome_print_job_get_context
+#  define BALSA_GNOME_PRINT_DIALOG_NEW gnome_print_dialog_new
+#  define BALSA_GNOME_PRINT_UI_NEW gnome_print_job_new(NULL)
+#  define BALSA_GNOME_PRINT_UI_CLOSE gnome_print_job_close
+#  define BALSA_GNOME_PRINT_UI_PREVIEW_NEW gnome_print_job_preview_new
+#  define BALSA_GNOME_PRINT_UI_PRINT gnome_print_job_print
+#else
+#  include <libgnomeprint/gnome-print-master.h>
+#  include <libgnomeprintui/gnome-print-master-preview.h>
+#  define BALSA_GNOME_PRINT_UI GnomePrintMaster
+#  define BALSA_GNOME_PRINT_UI_GET_CONFIG gnome_print_master_get_config
+#  define BALSA_GNOME_PRINT_UI_GET_PAGE_SIZE_FROM_CONFIG gnome_print_master_get_page_size_from_config
+#  define BALSA_GNOME_PRINT_UI_GET_CONTEXT gnome_print_master_get_context
+#  define BALSA_GNOME_PRINT_DIALOG_NEW gnome_print_dialog_new_from_master
+#  define BALSA_GNOME_PRINT_UI_NEW gnome_print_master_new()
+#  define BALSA_GNOME_PRINT_UI_CLOSE gnome_print_master_close
+#  define BALSA_GNOME_PRINT_UI_PREVIEW_NEW gnome_print_master_preview_new
+#  define BALSA_GNOME_PRINT_UI_PRINT gnome_print_master_print
+#endif
+
 #include <libgnomeprint/gnome-print-paper.h>
 #include <libgnomeprintui/gnome-print-dialog.h>
-#include <libgnomeprintui/gnome-print-master-preview.h>
+
 #include <libbalsa.h>
 #ifdef HAVE_PCRE
 #  include <pcreposix.h>
@@ -990,18 +1016,18 @@ find_font(const gchar * name, GHashTable * font_table)
 }
 
 static PrintInfo *
-print_info_new(LibBalsaMessage * msg, GnomePrintMaster * master,
+print_info_new(LibBalsaMessage * msg, BALSA_GNOME_PRINT_UI * master,
                CommonInfo * ci)
 {
     GnomePrintConfig* config;
     PrintInfo *pi = g_new0(PrintInfo, 1);
 
-    config = gnome_print_master_get_config(master);
-    gnome_print_master_get_page_size_from_config(config, &pi->page_width,
-                                                 &pi->page_height);
+    config = BALSA_GNOME_PRINT_UI_GET_CONFIG(master);
+    BALSA_GNOME_PRINT_UI_GET_PAGE_SIZE_FROM_CONFIG(config, &pi->page_width,
+                                                   &pi->page_height);
     gnome_print_config_unref(config);
 
-    pi->pc = gnome_print_master_get_context(master);
+    pi->pc = BALSA_GNOME_PRINT_UI_GET_CONTEXT(master);
     pi->margin_top = 0.75 * 72;
     pi->margin_bottom = 0.75 * 72;
     pi->margin_left = 0.75 * 72;
@@ -1162,7 +1188,7 @@ font_frame(gchar * title, FontInfo * fi)
  * creates the print dialog, and adds a page for fonts
  */
 static GtkWidget *
-print_dialog(GnomePrintMaster * master, CommonInfo * ci)
+print_dialog(BALSA_GNOME_PRINT_UI * master, CommonInfo * ci)
 {
     GtkWidget  *dialog;
     GtkWidget  *frame;
@@ -1173,8 +1199,8 @@ print_dialog(GnomePrintMaster * master, CommonInfo * ci)
     GtkWidget  *chkbut;
     GList      *childList;
 
-    dialog = gnome_print_dialog_new_from_master(master, _("Print message"),
-				                GNOME_PRINT_DIALOG_COPIES);
+    dialog = BALSA_GNOME_PRINT_DIALOG_NEW(master, _("Print message"),
+				    GNOME_PRINT_DIALOG_COPIES);
     gtk_window_set_wmclass(GTK_WINDOW(dialog), "print", "Balsa");
     dlgVbox = GTK_DIALOG(dialog)->vbox;
     childList = gtk_container_get_children(GTK_CONTAINER(dlgVbox));
@@ -1290,7 +1316,7 @@ void
 message_print(LibBalsaMessage * msg)
 {
     CommonInfo ci;
-    GnomePrintMaster *master;
+    BALSA_GNOME_PRINT_UI *master;
     GnomePrintConfig* config;
     PrintInfo *pi;
     gboolean preview;
@@ -1299,14 +1325,14 @@ message_print(LibBalsaMessage * msg)
 
     common_info_setup(&ci);
 
-    master = gnome_print_master_new();
+    master = BALSA_GNOME_PRINT_UI_NEW;
 
     /* FIXME: this sets the paper size in the GnomePrintConfig. We can
      * change it in the Paper page of the GnomePrintDialog, and retrieve
      * it from the GnomePrintConfig. However, it doesn't get set as the
      * initial value in the Paper page. Is there some Gnome-2-wide
      * repository for data like this? */
-    config = gnome_print_master_get_config(master);
+    config = BALSA_GNOME_PRINT_UI_GET_CONFIG(master);
     gnome_print_config_set(config, GNOME_PRINT_KEY_PAPER_SIZE, 
                            balsa_app.paper_size);
     
@@ -1334,16 +1360,16 @@ message_print(LibBalsaMessage * msg)
 
     /* do the Real Job */
     print_message(pi);
-    gnome_print_master_close(master);
+    BALSA_GNOME_PRINT_UI_CLOSE(master);
     if (preview) {
 	GtkWidget *preview_widget =
-	    gnome_print_master_preview_new(master,
+	    BALSA_GNOME_PRINT_UI_PREVIEW_NEW(master,
 		 			   _("Balsa: message print preview"));
         gtk_window_set_wmclass(GTK_WINDOW(preview_widget), "print-preview",
                                "Balsa");
 	gtk_widget_show(preview_widget);
     } else
-	gnome_print_master_print(master);
+	BALSA_GNOME_PRINT_UI_PRINT(master);
 
     print_info_destroy(pi);
     common_info_cleanup(&ci);

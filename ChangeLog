@@ -1,5 +1,6 @@
-2004-03-16 10:47  PeterB
+2004-03-16 17:13  PeterB
 
+	* libbalsa/mailbox.c: show unread status of deleted messages.
 	* libbalsa/mailbox.c: set the value even if the tree-view is not
 	realized.
 

@@ -1,3 +1,8 @@
+2002-12-10 20:57  PeterB
+
+	* src/toolbar-prefs.c: refresh GtkTreeView list of current buttons
+	when restoring standard layout.
+
 2002-12-08  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/filter-run.h, src/filter-run-dialog.c: GNOME2-ify

@@ -902,16 +902,16 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 	}
 	
 	tmp = message->subject;
-	if ((strlen (tmp) < 2) ||
-	    (toupper (tmp[0]) != 'R' &&
-	     toupper (tmp[1]) != 'E' &&
-	     tmp[2] != ':'))
+	if (strlen (tmp) > 2 &&
+	    toupper (tmp[0]) == 'R' &&
+	    toupper (tmp[1]) == 'E' &&
+	    tmp[2] == ':')
 	{
-	   newsubject = g_strdup_printf ("Re: %s", message->subject);
+	   newsubject = g_strdup(message->subject);
 	   break;
 	}
-	newsubject = g_strdup(message->subject);
-	break;
+	   newsubject = g_strdup_printf ("Re: %s", message->subject);
+	   break;
 	
      case SEND_FORWARD:
 	if (!message->subject) {

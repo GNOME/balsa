@@ -325,7 +325,7 @@ gint
 mailbox_check_new_messages (Mailbox * mailbox)
 {
   LOCK_MAILBOX_RETURN_VAL (mailbox, FALSE);
-  RETURN_VAL_IF_CLIENT_STRAM_CLOSED (mailbox, FALSE);
+  RETURN_VAL_IF_CLIENT_CONTEXT_CLOSED (mailbox, FALSE);
 
   mx_check_mailbox (CLIENT_CONTEXT (mailbox), NULL);
 
@@ -833,7 +833,7 @@ void
 message_move (Message * message, Mailbox * mailbox)
 {
   LOCK_MAILBOX (message->mailbox);
-  RETURN_IF_CLIENT_STRAM_CLOSED (message->mailbox);
+  RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
   UNLOCK_MAILBOX ();
 }
 
@@ -843,7 +843,7 @@ message_reply (Message * message)
   HEADER *cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
 
   LOCK_MAILBOX (message->mailbox);
-  RETURN_IF_CLIENT_STRAM_CLOSED (message->mailbox);
+  RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
 
   mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_REPLIED, 1);
 
@@ -860,7 +860,7 @@ message_clear_flags (Message * message)
   char tmp[BUFFER_SIZE];
 
   LOCK_MAILBOX (message->mailbox);
-  RETURN_IF_CLIENT_STRAM_CLOSED (message->mailbox);
+  RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
 
   mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_REPLIED, 1);
   sprintf (tmp, "%ld", message->msgno);
@@ -881,7 +881,7 @@ message_delete (Message * message)
   HEADER *cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
 
   LOCK_MAILBOX (message->mailbox);
-  RETURN_IF_CLIENT_STRAM_CLOSED (message->mailbox);
+  RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
 
   mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_REPLIED, 1);
 
@@ -898,7 +898,7 @@ message_undelete (Message * message)
   HEADER *cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
 
   LOCK_MAILBOX (message->mailbox);
-  RETURN_IF_CLIENT_STRAM_CLOSED (message->mailbox);
+  RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
 
   mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_DELETE, 1);
 

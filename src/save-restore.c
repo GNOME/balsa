@@ -452,7 +452,7 @@ config_mailbox_init (proplist_t mbox, gchar * key)
 	return FALSE;
       MAILBOX_IMAP (mailbox)->user = g_strdup (field);
 
-      if ((field = pl_dict_get_str (mbox, "Password")) == NULL)
+      if ((field = pl_dict_get_str (mbox, "Password")) != NULL)
 	MAILBOX_IMAP (mailbox)->passwd = g_strdup (field);
       else
 	MAILBOX_POP3 (mailbox)->passwd = NULL;

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 0.4\n"
 "POT-Creation-Date: 1999-02-02 18:02-0500\n"
-"PO-Revision-Date: 1999-02-04 08:40-0500\n"
+"PO-Revision-Date: 1999-02-19 08:40-0500\n"
 "Last-Translator: Alexander Kirillov <kirillov@math.ias.edu>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -59,7 +59,7 @@ msgid ""
 "Please check the about box in Balsa's main window for more information on "
 "contacting the authors or reporting bugs."
 msgstr ""
-"Чтобы узнать адреса авторов, воспользуйтесь кнопкой About   "
+"Чтобы узнать адреса авторов, воспользуйтесь кнопкой \"О программе\"   "
 "в главном окошке Balsa"
 
 #. your name
@@ -87,13 +87,15 @@ msgstr "Путь к почтовому ящику Outbox:"
 
 #: src/balsa-init.c:357
 msgid "Trash Path:"
-msgstr "Путь к Trash"
+msgstr "Путь к корзине"
 
 #: src/balsa-init.c:368
 msgid ""
 "If you wish to use IMAP for these\n"
 "please change them inside Balsa\n"
 msgstr ""
+"Для  использования протокола IMAP"
+"Вам необходимо будет изменить настройку Balsa впоследствии"
 
 #: src/balsa-init.c:533
 msgid "Finish"
@@ -115,7 +117,7 @@ msgstr "Отменить"
 #: src/balsa-message.c:229 src/balsa-message.c:244
 #, c-format
 msgid " Open of %s failed:%s "
-msgstr "Ошибка открытия %s:%s"
+msgstr "Не удалось открыть %s:%s"
 
 #: src/balsa-message.c:230 src/balsa-message.c:245
 msgid "Ok"
@@ -131,7 +133,7 @@ msgstr "Ошибка открытия почтового ящика!"
 
 #: src/index-child.c:399
 msgid "Transfer"
-msgstr ""
+msgstr "Переместить"
 
 #: src/index-child.c:419
 msgid "Change Status"
@@ -200,11 +202,11 @@ msgstr "Обновить"
 #: src/mailbox-conf.c:481
 #, c-format
 msgid "Cannot create mailbox '%s': %s\n"
-msgstr "Ошибка создания почтового ящика '%s': %s\n"
+msgstr "Не удалось создать почтовый ящик '%s': %s\n"
 
 #: src/mailbox-conf.c:522
 msgid " on "
-msgstr ""
+msgstr " на "
 
 #: src/mailbox-conf.c:625
 msgid "New mailbox type:"
@@ -214,11 +216,11 @@ msgstr "Тип нового почтового ящика"
 #. local mailbox
 #: src/mailbox-conf.c:631
 msgid "Local mailbox"
-msgstr ""
+msgstr "Местный почтовый ящик"
 
 #: src/mailbox-conf.c:639
 msgid "IMAP server"
-msgstr ""
+msgstr "IMAP сервер"
 
 #: src/main-window.c:90
 msgid "_Get new mail"
@@ -406,7 +408,7 @@ msgstr "Напечатать текущее письмо"
 
 #: src/main-window.c:287
 msgid "Mailboxes/<Separator>"
-msgstr ""
+msgstr "Почтовые ящики/<Разделитель>"
 
 #: src/main-window.c:404
 msgid ""
@@ -416,8 +418,8 @@ msgid ""
 "If you need to report bugs, please do so at: "
 "http://www.gnome.org/cgi-bin/bugs"
 msgstr ""
-"Программа для электронной почты Balsa является частью рабочего "
-"окружения GNOME. Подробное описание Balsa можно найти по адресу "
+"Программа для электронной почты Balsa является частью рабочей "
+"среды GNOME. Подробное описание Balsa можно найти по адресу "
 "http://www.balsa.net/\n"
 "Сообщить об обнаруженных ошибках можно по адресу "
 "http://www.gnome.org/cgi-bin/bugs"
@@ -470,11 +472,11 @@ msgstr "Файл подписи:"
 
 #: src/pref-manager.c:427
 msgid "Remote Mailbox Servers"
-msgstr ""
+msgstr "Серверы удаленных почтовых ящиков"
 
 #: src/pref-manager.c:436
 msgid "Type"
-msgstr ""
+msgstr "Тип"
 
 #: src/pref-manager.c:437
 msgid "Mailbox name"
@@ -482,41 +484,41 @@ msgstr "Название почтового ящика"
 
 #: src/pref-manager.c:462
 msgid "Modify"
-msgstr ""
+msgstr "Изменить"
 
 #: src/pref-manager.c:472
 msgid "Local Mail"
-msgstr ""
+msgstr "Местная почта"
 
 #: src/pref-manager.c:477
 msgid "Local mail directory:"
-msgstr ""
+msgstr "Каталог местной почты:"
 
 #. smtp server
 #: src/pref-manager.c:484
 msgid "Outgoing Mail"
-msgstr ""
+msgstr "Исходящая почта"
 
 #: src/pref-manager.c:492
 msgid "Remote SMTP Server"
-msgstr ""
+msgstr "Удаленный SMTP сервер"
 
 #: src/pref-manager.c:501
 msgid "Local mail user agent"
-msgstr ""
+msgstr "Местный почтовый клиент (MUA)"
 
 #. Toolbars
 #: src/pref-manager.c:534
 msgid "Toolbars"
-msgstr ""
+msgstr "Панели инструментов"
 
 #: src/pref-manager.c:554
 msgid "Use preview pane"
-msgstr ""
+msgstr "Использовать панель предпросмотра"
 
 #: src/pref-manager.c:561
 msgid "View mailbox content informations "
-msgstr ""
+msgstr "Посмотреть информацию о содержимом п/я"
 
 #: src/pref-manager.c:590
 msgid "Debug"
@@ -556,7 +558,7 @@ msgstr "Послать"
 
 #: src/sendmsg-window.c:84
 msgid "_Attach file..."
-msgstr "Приложить файл"
+msgstr "Приложить файл..."
 
 #: src/sendmsg-window.c:137
 msgid "Remove"
@@ -598,6 +600,4 @@ msgstr ""
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr ""
 
-
- 
 

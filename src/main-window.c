@@ -1810,6 +1810,10 @@ show_about_box(void)
     };
 
     const gchar *translator_credits = _("translator_credits");
+    /* FIXME: do we need error handling for this? */
+    GdkPixbuf *balsa_logo = 
+        gdk_pixbuf_new_from_file(BALSA_DATA_PREFIX
+                                 "/pixmaps/balsa_logo.png", NULL);
 
 
     /* only show one about box at a time */
@@ -1820,10 +1824,7 @@ show_about_box(void)
 
     about = gnome_about_new("Balsa",
                             BALSA_VERSION,
-                            "Copyright \xc2\xa9 1997-2003",
-#if BALSA_MAJOR < 2
-                            authors,
-#endif                          /* BALSA_MAJOR < 2 */
+                            "Copyright \xc2\xa9 1997-2003 The Balsa Developers",
                             _("The Balsa email client is part of "
                               "the GNOME desktop environment.  "
                               "Information on Balsa can be found at "
@@ -1831,16 +1832,11 @@ show_about_box(void)
                               "If you need to report bugs, "
                               "please do so at: "
                               "http://bugzilla.gnome.org/"),
-#if BALSA_MAJOR < 2
-                            "balsa/balsa_logo.png"
-#else
                             authors,
                             documenters,
-			    strcmp (translator_credits, "translator_credits") != 0 ? translator_credits : NULL,
-                            gdk_pixbuf_new_from_file("balsa/balsa_logo.png",
-                                                     NULL)
-#endif                          /* BALSA_MAJOR < 2 */
-                           );
+                            strcmp(translator_credits, "translator_credits") != 0 ? translator_credits : NULL,
+                            balsa_logo
+                            );
 
     g_object_add_weak_pointer(G_OBJECT(about), (gpointer) &about);
 

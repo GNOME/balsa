@@ -1,3 +1,7 @@
+2004-02-08 Darko Obradovic <dobradovic gmx.de>
+
+	* src/main-window.c: fix 114041
+
 2004-02-08  Pawel Salek
 
 	Install as default mailer if requested by user (see bug 131606,

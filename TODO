@@ -2,10 +2,6 @@ TODO LIST:
 
 For 0.4.5 release:
 
- * get reply/forward working
-     need to convert the message body into text and quote it.  mla is working
-     on this.
- 
  * mailbox-conf - (is run from right clicking on the mailbox list).  This
    may need to use multiple windows, but I don't really want to do this.
    Adding mailboxes under a folder, should add them to that tree limb, and
@@ -26,10 +22,17 @@ For 0.4.5 release:
      we have a full mail tray and an empty one.  full should be used to show
      messages with new mail.  the mailbox name should also be in bold.
 
- * get pref-manager working with gnome-propertybox
-    UPDATE: this works.  setting the toolbar type doesn't save.. hmm
 
+  ****************
+  Pretty much done:
+  ****************
 
+    * get pref-manager working with gnome-propertybox
+        UPDATE: this works.  setting the toolbar type doesn't save.. hmm
+
+    * get reply/forward working
+        UPDATE: this works.  may need a few cosmetic changes, but it for the most
+                part works great.
 
 
 later stuff:

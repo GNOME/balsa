@@ -312,15 +312,16 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 	      /* normal mailbox */
 	      if (mailbox_have_new_messages (MAILBOX_LOCAL (mbnode->mailbox)->path))
 		{
-/*
-   GdkFont *font;
-   GtkStyle *style;
-   style = gtk_style_new ();
-   font = gdk_font_load ("-adobe-courier-medium-r-*-*-*-120-*-*-*-*-iso8859-1");
-   style->font = font;
+		  GdkFont *font;
+		  GtkStyle *style;
 
-   gtk_widget_set_style (GTK_CELL_WIDGET ((GTK_CTREE_ROW (cnode)->row).cell)->widget, style);
- */
+		  style = gtk_style_new ();
+
+		  font = gdk_font_load ("-adobe-courier-medium-r-*-*-*-120-*-*-*-*-iso8859-1");
+		  style->font = font;
+
+		  gtk_ctree_node_set_row_style (ctree, cnode, style);
+
 		  gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
 					   NULL, NULL,
 					   tray_full, tray_full_mask,

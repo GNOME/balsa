@@ -149,7 +149,10 @@ imap_search_key_free(ImapSearchKey *s)
       imap_search_key_free(s->d.or.r);
       break;
     case IMSE_FLAG: break;
-    case IMSE_STRING: g_free(s->d.string.s); break;
+    case IMSE_STRING:
+      g_free(s->d.string.usr);
+      g_free(s->d.string.s);
+      break;
     case IMSE_DATE:
     case IMSE_SIZE: break;
     }

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Balsa VERSION\n"
 "POT-Creation-Date: 2001-01-11 18:48+0000\n"
-"PO-Revision-Date: 2001-01-11 18:51+0100\n"
+"PO-Revision-Date: 2001-01-12 13:51+0100\n"
 "Last-Translator: Andras TIMAR <timar@gnome.hu>\n"
 "Language-Team: Hungarian <hu@gnome.hu>\n"
 "MIME-Version: 1.0\n"
@@ -174,7 +174,6 @@ msgid "POP command exection failed"
 msgstr "A POP parancs végrehajtása nem sikerült"
 
 #: libbalsa/pop3.c:50
-#, fuzzy
 msgid "Could not write the message"
 msgstr "A levél mentése nem sikerült"
 
@@ -187,7 +186,6 @@ msgid "Could not open mailbox for spooling"
 msgstr ""
 
 #: libbalsa/pop3.c:53
-#, fuzzy
 msgid "Could not append message"
 msgstr "A levél továbbírása nem sikerült"
 
@@ -201,7 +199,7 @@ msgstr "Kapcsolat elutasítva"
 
 #: libbalsa/pop3.c:56
 msgid "Authentication failed"
-msgstr "Engedélyezés elutasítva"
+msgstr "Hitelesítés sikertelen"
 
 #: libbalsa/pop3.c:323
 #, c-format
@@ -606,7 +604,7 @@ msgstr ""
 
 #: libmutt/imap/imap_ssl.c:219
 msgid "Unable to get certificate from peer"
-msgstr ""
+msgstr "A partner hitelességi bizonyítványának megszerzése nem sikerült."
 
 #: libmutt/imap/imap_ssl.c:230
 #, c-format
@@ -627,59 +625,58 @@ msgstr "[érvénytelen dátum]"
 
 #: libmutt/imap/imap_ssl.c:373
 msgid "Server certificate is not yet valid"
-msgstr "A kiszolgáló hitelesítõ okmánya már nem érvényes"
+msgstr "A kiszolgáló hitelességi bizonyítványa már nem érvényes"
 
 #: libmutt/imap/imap_ssl.c:380
 msgid "Server certificate has expired"
-msgstr "A kiszolgáló hitelesítõ okmánya lejárt"
+msgstr "A kiszolgáló hitelességi bizonyítványa lejárt"
 
 #: libmutt/imap/imap_ssl.c:454
 msgid "This certificate belongs to:"
-msgstr ""
+msgstr "A hitelességi bizonyítvány tulajdonosa:"
 
 #: libmutt/imap/imap_ssl.c:464
 msgid "This certificate was issued by:"
-msgstr ""
+msgstr "A hitelességi bizonyítvány kibocsátója:"
 
 #: libmutt/imap/imap_ssl.c:474
 msgid "This certificate is valid"
-msgstr ""
+msgstr "A hitelességi bizonyítvány érvényes"
 
 #: libmutt/imap/imap_ssl.c:475
 #, c-format
 msgid "   from %s"
-msgstr ""
+msgstr "  %s --"
 
 #: libmutt/imap/imap_ssl.c:477
 #, c-format
 msgid "     to %s"
-msgstr ""
+msgstr "    %s"
 
 #: libmutt/imap/imap_ssl.c:483
 #, c-format
 msgid "Fingerprint: %s"
-msgstr ""
+msgstr "Ujjlenyomat: %s"
 
 #: libmutt/imap/imap_ssl.c:485
 msgid "SSL Certificate check"
-msgstr ""
+msgstr "SSL hitelességi bizonyítvány ellenõrzése"
 
 #: libmutt/imap/imap_ssl.c:488
 msgid "(r)eject, accept (o)nce, (a)ccept always"
-msgstr ""
+msgstr "(v)isszautasít, (e)gyszer elfogad, (m)indig elfogad"
 
 #: libmutt/imap/imap_ssl.c:489
 msgid "roa"
-msgstr ""
+msgstr "vem"
 
 #: libmutt/imap/imap_ssl.c:493
 msgid "(r)eject, accept (o)nce"
-msgstr ""
+msgstr "(v)isszautasít, (e)gyszer elfogad"
 
 #: libmutt/imap/imap_ssl.c:494
-#, fuzzy
 msgid "ro"
-msgstr "Feladó"
+msgstr "ve"
 
 #: libmutt/imap/imap_ssl.c:498
 msgid "Exit  "
@@ -691,11 +688,11 @@ msgstr "Súgó"
 
 #: libmutt/imap/imap_ssl.c:523
 msgid "Warning: Couldn't save certificate"
-msgstr ""
+msgstr "Figyelmeztetés: A hitelességi bizonyítványt nem sikerült elmenteni"
 
 #: libmutt/imap/imap_ssl.c:525
 msgid "Certificate saved"
-msgstr ""
+msgstr "A hitelességi bizonyítvány mentése sikerült"
 
 #: libmutt/imap/util.c:43
 msgid "Continue?"
@@ -741,7 +738,7 @@ msgstr "egy ember különféle címeiként"
 
 #: src/address-book.c:355
 msgid "a distribution list"
-msgstr "terjesztési listaként"
+msgstr "címlistaként"
 
 #: src/address-book-config.c:100
 msgid "Address Book Configuration"
@@ -765,7 +762,7 @@ msgstr "LDAP Címjegyzék"
 
 #: src/address-book-config.c:293
 msgid "Balsa is not compiled with LDAP support"
-msgstr "Az LDAP támogatás nem lett belefordítva a Balsába"
+msgstr "Nincs LDAP támogatás. Újra kell fordítani a Balsát LDAP támogatással."
 
 #. mailbox name
 #: src/address-book-config.c:313 src/address-book-config.c:371
@@ -902,11 +899,11 @@ msgstr "%s postafiók tartalma: %ld levél, %ld új"
 
 #: src/balsa-message.c:290 src/balsa-message.c:293
 msgid "Save MIME Part"
-msgstr "MIME mentése"
+msgstr "MIME részlet mentése"
 
 #: src/balsa-message.c:291
 msgid "Save"
-msgstr "Ment"
+msgstr "Mentés"
 
 #: src/balsa-message.c:291 src/mailbox-conf.c:171 src/mailbox-conf.c:181
 #: src/sendmsg-window.c:159 src/sendmsg-window.c:657 src/sendmsg-window.c:1824
@@ -958,7 +955,7 @@ msgstr "Titkos másolat:"
 
 #: src/balsa-message.c:660
 msgid "Fcc:"
-msgstr "Lev. tárolása:"
+msgstr "Levél tárolása:"
 
 #: src/balsa-message.c:726
 msgid "Could not load image. It is most likely corrupted."
@@ -970,12 +967,12 @@ msgstr "Nem sikerült megjeleníteni a képet\n"
 
 #: src/balsa-message.c:789
 msgid "No open or view action defined in GNOME MIME for this content type"
-msgstr ""
+msgstr "Nincs megtekintési illetve megnyitási mûvelet definiálva a GNOME MIME-ban erre a tartalomtípusra"
 
 #: src/balsa-message.c:793
 #, c-format
 msgid "Content Type: %s"
-msgstr ""
+msgstr "Tartalomtípus: %s"
 
 #: src/balsa-message.c:798
 #, c-format
@@ -1202,7 +1199,7 @@ msgstr "Nincs postafiók kiválasztva"
 
 #. FIXME: Should prompt to remove file aswell
 #: src/mailbox-conf.c:163
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "This will remove the mailbox %s from the list of mailboxes.\n"
 "You may also delete the disk file or files associated with this mailbox.\n"
@@ -1210,9 +1207,11 @@ msgid ""
 "mailbox again.\n"
 "What would you like to do?"
 msgstr ""
-"Ez eltávolítja a %s postafiókot a postafiókok listájáról\n"
-"A \"Postafiók hozzáadása\" hasznalatával a késõbbiekben ismét létrehozhatod\n"
-"Biztos el akarod távolítani ezt a postafiókot?"
+"Ez eltávolítja a %s postafiókot a postafiókok listájáról.\n"
+"Törölheted a postafiókhoz tartozó fájlt vagy fájlokat is a lemezrõl.\n"
+"Ha nem távolítod el a fájlt, késõbb ismét elérheted a postafiókot a\n"
+"\"Postafiók hozzáadása\" hasznalatával.\n"
+"Mit szeretnél csinálni?"
 
 #: src/mailbox-conf.c:169 src/mailbox-conf.c:180
 msgid "Remove from list"
@@ -1235,7 +1234,7 @@ msgstr ""
 
 #: src/mailbox-conf.c:223
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
-msgstr "Hoppá! a balsa_app.mailbox csomóban nem található ez a postafiók?\n"
+msgstr "Hoppá! A balsa_app.mailbox csomóban nem található ez a postafiók?\n"
 
 #: src/mailbox-conf.c:250 src/mailbox-conf.c:305
 msgid "Mailbox Configurator"
@@ -1252,6 +1251,8 @@ msgid ""
 "Rename of %s to %s failed:\n"
 "%s"
 msgstr ""
+"%s átnevezése %s névre nem sikerült:\n"
+"%s"
 
 #: src/mailbox-conf.c:609
 msgid ""
@@ -1259,6 +1260,9 @@ msgid ""
 "Change the path instead.\n"
 "Mailbox not Updated.\n"
 msgstr ""
+"Ez a helyi könyvtáradban levõ postafiók.\n"
+"Inkább változtasd meg az elérési utat.\n"
+"A postafiók nem lett frissítve.\n"
 
 #. mailbox name
 #: src/mailbox-conf.c:809 src/mailbox-conf.c:845 src/mailbox-conf.c:894
@@ -1293,7 +1297,7 @@ msgstr "_Jelszó:"
 #. toggle for apop
 #: src/mailbox-conf.c:866
 msgid "Use _APOP Authentication"
-msgstr ""
+msgstr "_APOP hitelesítés használata"
 
 #. toggle for deletion from server
 #: src/mailbox-conf.c:869
@@ -1308,7 +1312,7 @@ msgstr "Üzene_tek szûrése procmail-en keresztül"
 #. toggle for check
 #: src/mailbox-conf.c:877
 msgid "Periodically _Check This Mailbox For New Mail"
-msgstr ""
+msgstr "Bizonyos idõközönként ellenõrizze, hogy jött-e új levél ebbe a postafiókba"
 
 #: src/mailbox-conf.c:914
 msgid "F_older Path:"
@@ -1316,7 +1320,7 @@ msgstr "_Mappa elérési útja:"
 
 #: src/mailbox-node.c:176
 msgid "The folder edition to be written."
-msgstr ""
+msgstr "A mappa szerkesztése elmentendõ."
 
 #: src/mailbox-node.c:387
 msgid "Local Mbox Mailbox..."
@@ -1365,7 +1369,7 @@ msgstr "Jelöld mint Piszkozat"
 #: src/mailbox-node.c:524
 #, c-format
 msgid "Local Mailbox Loaded as: %s\n"
-msgstr ""
+msgstr "Helyi postafiók betöltése %s néven\n"
 
 #: src/main-window.c:203
 msgid "_Message..."
@@ -1373,7 +1377,7 @@ msgstr "_Levél..."
 
 #: src/main-window.c:203
 msgid "Compose a new message"
-msgstr "Uj levél írása"
+msgstr "Új levél írása"
 
 #: src/main-window.c:209
 msgid "Local Mbox mailbox..."
@@ -1381,7 +1385,7 @@ msgstr "Helyi Mbox postafiók..."
 
 #: src/main-window.c:210
 msgid "Add a new mbox style mailbox"
-msgstr ""
+msgstr "Új mbox postafiók hozzáadása"
 
 #: src/main-window.c:214
 msgid "Local Maildir mailbox..."
@@ -1389,7 +1393,7 @@ msgstr "Helyi Maildir postafiók..."
 
 #: src/main-window.c:215
 msgid "Add a new maildir style mailbox"
-msgstr ""
+msgstr "Új maildir postafiók hozzáadása"
 
 #: src/main-window.c:219
 msgid "Local MH mailbox..."
@@ -1397,7 +1401,7 @@ msgstr "Helyi MH postafiók..."
 
 #: src/main-window.c:220
 msgid "Add a new MH style mailbox"
-msgstr "Új MH postafiók létrehozása"
+msgstr "Új MH postafiók hozzáadása"
 
 #: src/main-window.c:224
 msgid "Remote IMAP mailbox..."
@@ -1481,16 +1485,15 @@ msgstr "_Fanézet használata"
 
 #: src/main-window.c:308
 msgid "Toggle display of mailbox and folder tree"
-msgstr ""
+msgstr "Megjelenítés átváltása a postafiók és a mappák fastruktúrája között"
 
 #: src/main-window.c:311
-#, fuzzy
 msgid "Show Mailbox _Tabs"
-msgstr "Lapnézet használata"
+msgstr "_Postafiókfülek mutatása"
 
 #: src/main-window.c:312
 msgid "Toggle display of mailbox notebook tabs"
-msgstr ""
+msgstr "Postafiókfülek mutatása/elrejtése"
 
 #: src/main-window.c:316 src/message-window.c:94
 msgid "_Wrap"
@@ -1771,7 +1774,7 @@ msgstr "Indításkor levelek ellenõrzése"
 
 #: src/main.c:109
 msgid "Compose a new email to EMAIL@ADDRESS"
-msgstr "Uj levél írása az EMAIL@ADRESS címre"
+msgstr "Új levél írása az EMAIL@ADRESS címre"
 
 #: src/main.c:111
 msgid "Opens MAILBOXNAME"
@@ -2136,7 +2139,7 @@ msgstr "Végzetes hibaüzenetek"
 
 #: src/pref-manager.c:1581
 msgid "Debug Messages"
-msgstr "Nyomkövetõ üzenetek"
+msgstr "Hibakeresési üzenetek"
 
 #: src/pref-manager.c:1641
 msgid "characters"
@@ -2162,11 +2165,11 @@ msgstr "Helyesírás-ellenõrzõ modul"
 
 #: src/pref-manager.c:1718
 msgid "Suggestion Level"
-msgstr ""
+msgstr "Javaslat szintje"
 
 #: src/pref-manager.c:1726
 msgid "Ignore words shorter than"
-msgstr ""
+msgstr "Hagyja figyelmen kívül az ennél rövidebb szavakat"
 
 #. ignore signature check box
 #: src/pref-manager.c:1733
@@ -2183,7 +2186,7 @@ msgstr "Idézet ellenõrzése"
 
 #: src/pref-manager.c:1783
 msgid "Debug"
-msgstr "Debug"
+msgstr "Hibakeresés"
 
 #: src/pref-manager.c:1787
 msgid "Empty trash on exit"
@@ -2191,16 +2194,16 @@ msgstr "Kuka ürítése kilépéskor"
 
 #: src/pref-manager.c:1795
 msgid "Automatically close mailbox if unused more than"
-msgstr ""
+msgstr "Automatikusan zárja be a postafiókot, ha ennél több ideje használatlan"
 
 #. font
 #: src/pref-manager.c:1811
 msgid "Font"
-msgstr "Betûtípus"
+msgstr "Betûkészlet"
 
 #: src/pref-manager.c:1833 src/pref-manager.c:1876
 msgid "Select a font to use"
-msgstr "Válassz egy betûtípust"
+msgstr "Válaszd ki használandó betûkészletet"
 
 #: src/pref-manager.c:1837 src/pref-manager.c:1880
 msgid "Browse..."
@@ -2213,7 +2216,7 @@ msgstr "Elõnézet"
 #. Subject Font
 #: src/pref-manager.c:1853
 msgid "Subject Header Font"
-msgstr ""
+msgstr "Tárgy és fejléc betûtípusa"
 
 #. mblist unread colour
 #: src/pref-manager.c:1895
@@ -2226,15 +2229,15 @@ msgstr "Olvasatlan levelet tartalmazó postafiók színe"
 
 #: src/pref-manager.c:1904
 msgid "Quoted text primary colour"
-msgstr ""
+msgstr "Idézet elsõdleges színe"
 
 #: src/pref-manager.c:1906
 msgid "Quoted text secondary color"
-msgstr ""
+msgstr "Idézet másodlagos színe"
 
 #: src/pref-manager.c:1920
 msgid "Options"
-msgstr "Opciók"
+msgstr "Beállítások"
 
 #: src/pref-manager.c:1927
 msgid "Check mail upon startup"
@@ -2242,7 +2245,7 @@ msgstr "Levelek ellenõrzése indításkor"
 
 #: src/pref-manager.c:1932
 msgid "Remember open mailboxes between sessions"
-msgstr "Használat során nyitvahagyott postafiók megjegyzése "
+msgstr "Használat során nyitvahagyott postafiók megjegyzése"
 
 #: src/pref-manager.c:1977
 msgid "Address Book Name"
@@ -2250,7 +2253,7 @@ msgstr "Címjegyzék neve"
 
 #: src/pref-manager.c:1981
 msgid "Expand aliases"
-msgstr ""
+msgstr "Álnevek feloldása"
 
 #: src/pref-manager.c:1988
 msgid "Set as default"
@@ -2258,15 +2261,15 @@ msgstr "Beállítás alapértelmezettként"
 
 #: src/pref-manager.c:2235
 msgid "Show Nothing"
-msgstr ""
+msgstr "Ne jelenítsen meg semmit"
 
 #: src/pref-manager.c:2236
 msgid "Show Dialog"
-msgstr ""
+msgstr "Párbeszédablak megjelenítése"
 
 #: src/pref-manager.c:2237
 msgid "Show In List"
-msgstr ""
+msgstr "Megjelenítés listában"
 
 #: src/pref-manager.c:2238
 msgid "Print to console"
@@ -2291,6 +2294,8 @@ msgid ""
 "Balsa could not find font %s\n"
 "Printing is not possible"
 msgstr ""
+"A Balsa nem találja ezt a betûkészletet: %s\n"
+"A nyomtatás nem lehetséges"
 
 #: src/print.c:503
 msgid "Print message"
@@ -2298,16 +2303,16 @@ msgstr "Levél nyomtatása"
 
 #: src/print.c:529
 msgid "Balsa: message print preview"
-msgstr ""
+msgstr "Balsa: levél nyomtatási képe"
 
 #: src/print.c:643
 #, c-format
 msgid "Page: %i/%i"
-msgstr "Oldal: %i%i"
+msgstr "Oldal: %i/%i"
 
 #: src/sendmsg-window.c:135
 msgid "Send"
-msgstr "Küld"
+msgstr "Küldés"
 
 #: src/sendmsg-window.c:135
 msgid "Send this mail"
@@ -2315,7 +2320,7 @@ msgstr "Levél küldése"
 
 #: src/sendmsg-window.c:140
 msgid "Attach"
-msgstr "Csatol"
+msgstr "Csatolás"
 
 #: src/sendmsg-window.c:141
 msgid "Add attachments to this message"
@@ -2323,7 +2328,7 @@ msgstr "Fájl csatolása a levélhez"
 
 #: src/sendmsg-window.c:145
 msgid "Postpone"
-msgstr "Elhalaszt"
+msgstr "Elhalasztás"
 
 #: src/sendmsg-window.c:146
 msgid "Continue this message later"
@@ -2331,7 +2336,7 @@ msgstr "Levél folytatása késõbb"
 
 #: src/sendmsg-window.c:150 src/sendmsg-window.c:226
 msgid "Check Spelling"
-msgstr "Helyesírás ellenõrzése"
+msgstr "Helyesírás-ellenõrzés"
 
 #: src/sendmsg-window.c:152
 msgid "Run a spelling check on the current message"
@@ -2355,15 +2360,15 @@ msgstr "A szerkesztett levél küldése"
 
 #: src/sendmsg-window.c:181
 msgid "_Queue"
-msgstr ""
+msgstr "_Várólista"
 
 #: src/sendmsg-window.c:182
 msgid "Queue this message in outbox for sending"
-msgstr ""
+msgstr "A levelet kimenõ mappába helyezi a kiküldésre váró levelek közé"
 
 #: src/sendmsg-window.c:186
 msgid "_Postpone"
-msgstr "Elhalasz_t"
+msgstr "Elhalasz_tás"
 
 #: src/sendmsg-window.c:190
 msgid "Print..."
@@ -2375,7 +2380,7 @@ msgstr "A szerkesztett levél nyomtatása"
 
 #: src/sendmsg-window.c:207
 msgid "Select All"
-msgstr ""
+msgstr "Mindent kijelöl"
 
 #: src/sendmsg-window.c:212
 msgid "_Wrap Body"
@@ -2411,7 +2416,7 @@ msgstr "Titkos m_ásolat"
 
 #: src/sendmsg-window.c:245
 msgid "_Fcc"
-msgstr "Lev. tárolasa"
+msgstr "Levél tárolása"
 
 #: src/sendmsg-window.c:247
 msgid "_Reply To"
@@ -2547,7 +2552,7 @@ msgstr "_K-Z"
 
 #: src/sendmsg-window.c:362
 msgid "_Show"
-msgstr "_Mutatás"
+msgstr "_Megjelenítés"
 
 #: src/sendmsg-window.c:364
 msgid "_Language"
@@ -2588,7 +2593,7 @@ msgstr "Titkos másolat:"
 #. fcc:
 #: src/sendmsg-window.c:951
 msgid "fcc:"
-msgstr "Lev. tárolása:"
+msgstr "Levél tárolása:"
 
 #. Reply To:
 #: src/sendmsg-window.c:974
@@ -2671,33 +2676,31 @@ msgstr "Hiba történt az lpr végrehajtásánál"
 
 #: src/spell-check.c:482
 msgid "Replace the current word with the selected suggestion"
-msgstr ""
+msgstr "A szó kicserélése a kiválasztott javaslattal"
 
 #: src/spell-check.c:489
-#, fuzzy
 msgid "Replace all occurences of the current word with the selected suggestion"
-msgstr "Az aktuális levél minden címzettjének válaszol "
+msgstr "A szó összes elõfordulásának lecserélése a kiválasztott javaslattal"
 
 #: src/spell-check.c:496
 msgid "Skip the current word"
-msgstr ""
+msgstr "Szó átugrása"
 
 #: src/spell-check.c:501
-#, fuzzy
 msgid "Skip all occurances of the current word"
-msgstr "Az aktuális levél minden címzettjének válaszol "
+msgstr "A szó összes elõfordulásának átugrása"
 
 #: src/spell-check.c:507
 msgid "Add the current word to your personal dictionary"
-msgstr ""
+msgstr "A szó hozzáadása a saját szótárhoz"
 
 #: src/spell-check.c:513
 msgid "Finish spell checking"
-msgstr ""
+msgstr "Helyesírás-ellenõrzés befejezése"
 
 #: src/spell-check.c:518
 msgid "Revert all changes and finish spell checking"
-msgstr ""
+msgstr "Változtatások visszavonása és a helyesírás-ellenõrzés befejezése"
 
 #: src/store-address.c:52
 msgid "Card Name:"
@@ -2745,7 +2748,7 @@ msgstr "Nincs címjegyzék kiválasztva..."
 
 #: src/store-address.c:254
 msgid "Sorry, no semicolons are allowed in the name!\n"
-msgstr ""
+msgstr "Sajnálom, de postosvesszõ nem lehet a névben!\n"
 
 #, fuzzy
 #~ msgid "Unable to get APOP seed from server"

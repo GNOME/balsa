@@ -1,22 +1,24 @@
+A hopelessly out-of-date...
 TODO LIST:
 
 /-------------\
 |key:         |
 | * = TODO    |
 | D = DONE    |
+| M = MOSTLY  |
 | P = PARTIAL |
 \-------------/
 
-Things needed for Balsa v0.5
+Things needed for Balsa v0.5 (I said it was out-of-date)
 Fix/update/make-sure-they-work:
- * POP3
- * IMAP
- * balsa-init
+ M POP3
+ P IMAP
+ M balsa-init
 
 New features/unfinished things:
  * Filters
  * CORBA
- * update libmutt
+ M update libmutt
 
 UI:
  D Remove use of GNOME MDI
@@ -32,18 +34,18 @@ UI:
        D move
        * copy
  * MIME supporting icons.  use the new gnome metadata stuff that gmc uses?
- * New mail notification
+ P New mail notification
      P via sound
      * change icon window in case Balsa is minimized to a different icon
- P sending mail (code is awful, redo.  make useful for corba idl, support
+ M sending mail (code is awful, redo.  make useful for corba idl, support
      external editors)
  * auto-open mailboxes on startup
- * Make things optional:
+ P Make things optional:
      - inline images (on by default)
      D check for new mail every xx minutes
      - load mail from local mail directory
- * spell checking in the send window
- * menu and toolbar for message-window
+ P spell checking in the send window
+ P menu and toolbar for message-window
 
 
 ----------------------------------

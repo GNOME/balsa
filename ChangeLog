@@ -1,5 +1,7 @@
 2000-04-19  Peter Williams  <peter@beta.newton.cx>
 
+	* TODO, README, INSTALL: Documentation updates.
+	
 	* configure.in: Made this look all pretty, and
 	  added some extra 'checking' messages.
 

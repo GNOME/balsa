@@ -1,6 +1,6 @@
-Balsa E-Mail Client 0.6.0
+Balsa E-Mail Client 0.8.0-pre1
 
-Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
+Copyright (C) 1997-2000 Jay Painter and Stuart Parmenter
 See 'COPYING' for licence information.
 
 
@@ -12,13 +12,18 @@ Imlib      >= 1.9.2
 gnome-libs >= 1.0.8
 
 If you do not have these, please check http://www.balsa.net/download.html for
-links to these packages.
+links to these packages. Or try http://www.gnome.org, http://www.gtk.org,
+and http://www.enlightenment.org.
 
 Build Instructions:
 
-  * To compile:
-    # ./configure
-    # make
+For more information see 'README'.
 
-  * To install:
-    # make install
+# ./configure
+# make
+
+Installation:
+
+Do the above then
+
+# make install

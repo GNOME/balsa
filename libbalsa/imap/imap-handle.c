@@ -294,7 +294,7 @@ idle_start(gpointer data)
     rc = imap_cmd_step (h, 0);
   } while (rc == IMR_UNTAGGED);
   if(rc != IMR_RESPOND) {
-    g_warning("Expected IMR_RESPOND but got %d\n", rc);
+    g_message("Expected IMR_RESPOND but got %d\n", rc);
     return FALSE;
   }
   while( (c=sio_getc(h->sio)) != -1 && c != '\n');
@@ -540,7 +540,7 @@ imap_mbox_connect(ImapMboxHandle* handle)
 
   handle->state = IMHS_CONNECTED;
   if (imap_cmd_step(handle, 0) != IMR_UNTAGGED) {
-    g_warning("imap_mbox_connect:unexpected initial response\n");
+    g_message("imap_mbox_connect:unexpected initial response\n");
     imap_handle_disconnect(handle);
     return IMAP_PROTOCOL_ERROR;
   }

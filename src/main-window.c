@@ -38,18 +38,7 @@
 
 #define MAILBOX_DATA "mailbox_data"
 
-
-typedef struct _MainWindow MainWindow;
-struct _MainWindow
-  {
-    GnomeMDI *mdi;
-    /* GtkWidget *window;  */
-    GtkWidget *menubar;
-    GtkWidget *toolbar;
-    GtkWidget *mailbox_menu;
-    GtkWidget *move_menu;
-  };
-static MainWindow *mw = NULL;
+static GnomeMDI *mdi = NULL;
 
 static gint about_box_visible = FALSE;
 
@@ -92,31 +81,21 @@ open_main_window ()
   GtkWidget *progress_bar;
 
 
-  if (mw)
-    return;
-
-  mw = g_malloc (sizeof (MainWindow));
-
-  /* structure initalizations */
-  mw->mailbox_menu = NULL;
-  mw->move_menu = NULL;
-
-
   /* main window */
-  mw->mdi = GNOME_MDI (gnome_mdi_new ("balsa", "Balsa"));
+  mdi = GNOME_MDI (gnome_mdi_new ("balsa", "Balsa"));
 
-  gtk_signal_connect (GTK_OBJECT (mw->mdi),
+  gtk_signal_connect (GTK_OBJECT (mdi),
 		      "destroy",
 		      (GtkSignalFunc) balsa_exit,
 		      NULL);
 
   /* meubar and toolbar */
-  gtk_signal_connect (GTK_OBJECT (mw->mdi), "create_menus", GTK_SIGNAL_FUNC (create_menu), NULL);
-  gtk_signal_connect (GTK_OBJECT (mw->mdi), "create_toolbar", GTK_SIGNAL_FUNC (create_toolbar), NULL);
-  gtk_signal_connect (GTK_OBJECT(mw->mdi), "child_changed", GTK_SIGNAL_FUNC(index_child_changed), NULL);
-  gnome_mdi_set_child_list_path(mw->mdi, _("Mailboxes/<Separator>"));
+  gtk_signal_connect (GTK_OBJECT (mdi), "create_menus", GTK_SIGNAL_FUNC (create_menu), NULL);
+  gtk_signal_connect (GTK_OBJECT (mdi), "create_toolbar", GTK_SIGNAL_FUNC (create_toolbar), NULL);
+  gtk_signal_connect (GTK_OBJECT(mdi), "child_changed", GTK_SIGNAL_FUNC(index_child_changed), NULL);
+  gnome_mdi_set_child_list_path(mdi, _("Mailboxes/<Separator>"));
 
-  gnome_mdi_set_mode (mw->mdi, balsa_app.mdi_style);
+  gnome_mdi_set_mode (mdi, balsa_app.mdi_style);
 
   refresh_main_window ();
 }
@@ -129,12 +108,9 @@ open_main_window ()
 void
 close_main_window ()
 {
-  if (!mw)
-    return;
-  if (gnome_mdi_remove_all (mw->mdi, FALSE))
-    gtk_object_destroy (GTK_OBJECT (mw->mdi));
-  g_free (mw);
-  mw = NULL;
+  if (gnome_mdi_remove_all (mdi, FALSE))
+    gtk_object_destroy (GTK_OBJECT (mdi));
+  mdi=NULL;
 }
 
 
@@ -145,15 +121,11 @@ close_main_window ()
 void
 refresh_main_window ()
 {
-  GList *list;
-  GtkWidget *menuitem;
-  Mailbox *mailbox;
-
   /*
    * set the toolbar style
    */
-  gtk_toolbar_set_style (GTK_TOOLBAR (mw->toolbar), balsa_app.toolbar_style);
-  gnome_mdi_set_mode(mw->mdi,balsa_app.mdi_style);
+  gtk_toolbar_set_style (GTK_TOOLBAR(GNOME_APP(mdi->active_window)->toolbar), balsa_app.toolbar_style);
+  gnome_mdi_set_mode(mdi,balsa_app.mdi_style);
 }
 
 /*
@@ -172,7 +144,7 @@ static GtkMenuBar *create_menu (GnomeMDI * mdi, GtkWidget *app)
 
 
   accel = gtk_accel_group_new ();
-  mw->menubar = menubar = gtk_menu_bar_new ();
+  menubar = gtk_menu_bar_new ();
 
   gtk_widget_show (menubar);
 
@@ -304,8 +276,6 @@ static GtkMenuBar *create_menu (GnomeMDI * mdi, GtkWidget *app)
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_PROP, _ ("Mailbox List"));
   gtk_widget_show (w);
 
-  gtk_object_set_user_data (GTK_OBJECT (w), (gpointer) mw);
-
   gtk_signal_connect (GTK_OBJECT (w),
 		      "activate",
 		      (GtkSignalFunc) mblist_window_cb,
@@ -316,8 +286,6 @@ static GtkMenuBar *create_menu (GnomeMDI * mdi, GtkWidget *app)
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_CLOSE, _ ("Close"));
   gtk_widget_show (w);
-
-  gtk_object_set_user_data (GTK_OBJECT (w), (gpointer) mw);
 
   gtk_signal_connect (GTK_OBJECT (w),
 		      "activate",
@@ -395,7 +363,7 @@ static GtkMenuBar *create_menu (GnomeMDI * mdi, GtkWidget *app)
   /*
      gtk_window_add_accel_group (GTK_WINDOW (mw->window), accel);
    */
-  return GTK_MENU_BAR (mw->menubar);
+  return GTK_MENU_BAR (menubar);
 }
 
 
@@ -411,7 +379,7 @@ static GtkToolbar *create_toolbar (GnomeMDI *mdi, GtkWidget *app)
   GtkWidget *toolbarbutton;
   GtkWidget *label;
 
-  mw->toolbar = toolbar = gtk_toolbar_new (GTK_ORIENTATION_HORIZONTAL, GTK_TOOLBAR_ICONS);
+  toolbar = gtk_toolbar_new (GTK_ORIENTATION_HORIZONTAL, GTK_TOOLBAR_ICONS);
 
   window = app;
 
@@ -501,7 +469,7 @@ static GtkToolbar *create_toolbar (GnomeMDI *mdi, GtkWidget *app)
 			     "Open Next Message");
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
-  return GTK_TOOLBAR(mw->toolbar);
+  return GTK_TOOLBAR(toolbar);
 }
 
 
@@ -643,11 +611,8 @@ mblist_window_cb (GtkWidget * widget)
 {
   GList *list;
   Mailbox *mailbox;
-  MainWindow *mainwindow;
 
-  mw = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
-
-  mblist_open_window (mw->mdi);
+  mblist_open_window (mdi);
 
   list = balsa_app.mailbox_list;
   while (list)

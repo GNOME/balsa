@@ -1,3 +1,8 @@
+2001-05-24  Pablo Saratxaga <pablo@mandrakesoft.com>
+
+	* fr.po: fixed a stupid error (Swedish != Swiss)
+	* wa.po: fixed a too long text for an icon
+
 2001-05-23  Kjartan Maraas  <kmraas@gnome.org>
 
 	* no.po: Updated Norwegian translation.

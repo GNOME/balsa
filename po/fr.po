@@ -2631,7 +2631,7 @@ msgstr "Espagnol"
 
 #: src/sendmsg-window.c:322 src/sendmsg-window.c:431
 msgid "Swedish"
-msgstr "Suisse"
+msgstr "Suédois"
 
 #: src/sendmsg-window.c:323 src/sendmsg-window.c:433
 msgid "Turkish"

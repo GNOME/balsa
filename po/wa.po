@@ -2825,7 +2825,7 @@ msgstr "_Messaedje"
 
 #: src/sendmsg-window.c:227
 msgid "Check Spelling"
-msgstr "Coridjî l' ortografeye do messaedje"
+msgstr "Coridjaedje"
 
 #: src/sendmsg-window.c:236
 msgid "Fr_om"
@@ -2861,7 +2861,7 @@ msgstr "_Atatchmints"
 
 #: src/sendmsg-window.c:253
 msgid "_Comments"
-msgstr ""
+msgstr "_Rawetes"
 
 #: src/sendmsg-window.c:256
 msgid "_Keywords"
@@ -2869,123 +2869,119 @@ msgstr ""
 
 #: src/sendmsg-window.c:294 src/sendmsg-window.c:383
 msgid "Brazilian"
-msgstr ""
+msgstr "Braezilyin"
 
 #: src/sendmsg-window.c:295 src/sendmsg-window.c:385
 msgid "Catalan"
-msgstr ""
+msgstr "Catalan"
 
 #: src/sendmsg-window.c:296 src/sendmsg-window.c:387
 msgid "Danish"
-msgstr ""
+msgstr "Danwès"
 
 #: src/sendmsg-window.c:297 src/sendmsg-window.c:391
 msgid "Dutch"
-msgstr ""
+msgstr "Neyerlandès"
 
 #: src/sendmsg-window.c:298 src/sendmsg-window.c:393
 msgid "English"
-msgstr ""
+msgstr "Inglès"
 
 #: src/sendmsg-window.c:299 src/sendmsg-window.c:395
 msgid "Estonian"
-msgstr ""
+msgstr "Estonyin"
 
 #: src/sendmsg-window.c:300 src/sendmsg-window.c:397
 msgid "Finnish"
-msgstr ""
+msgstr "Finwès"
 
 #: src/sendmsg-window.c:301 src/sendmsg-window.c:399
 msgid "French"
-msgstr ""
+msgstr "Francès"
 
 #: src/sendmsg-window.c:302 src/sendmsg-window.c:389
 msgid "German"
-msgstr ""
+msgstr "Almand"
 
 #: src/sendmsg-window.c:303 src/sendmsg-window.c:401
 msgid "Greek"
-msgstr ""
+msgstr "Grek"
 
 #: src/sendmsg-window.c:304 src/sendmsg-window.c:403
 msgid "Hungarian"
-msgstr ""
+msgstr "Hongrwès"
 
 #: src/sendmsg-window.c:305 src/sendmsg-window.c:405
 msgid "Italian"
-msgstr ""
+msgstr "Itålyin"
 
 #: src/sendmsg-window.c:306 src/sendmsg-window.c:407
 msgid "Japanese"
-msgstr ""
+msgstr "Djaponès"
 
 #: src/sendmsg-window.c:311 src/sendmsg-window.c:409
 msgid "Korean"
-msgstr ""
+msgstr "Coreyin"
 
 #: src/sendmsg-window.c:312 src/sendmsg-window.c:411
 msgid "Latvian"
-msgstr ""
+msgstr "Letonyin"
 
 #: src/sendmsg-window.c:313 src/sendmsg-window.c:413
 msgid "Lithuanian"
-msgstr ""
+msgstr "Lituanyin"
 
 #: src/sendmsg-window.c:314 src/sendmsg-window.c:415
 msgid "Norwegian"
-msgstr ""
+msgstr "Norvedjyin"
 
 #: src/sendmsg-window.c:315 src/sendmsg-window.c:417
 msgid "Polish"
-msgstr ""
+msgstr "Polonès"
 
 #: src/sendmsg-window.c:316 src/sendmsg-window.c:419
 msgid "Portugese"
-msgstr ""
+msgstr "Portugès"
 
 #: src/sendmsg-window.c:317 src/sendmsg-window.c:421
 msgid "Romanian"
-msgstr ""
+msgstr "Roumin"
 
 #: src/sendmsg-window.c:318 src/sendmsg-window.c:423
-#, fuzzy
 msgid "Russian (ISO)"
-msgstr "_Russe (KOI8-R)"
+msgstr "Russe (ISO5)"
 
 #: src/sendmsg-window.c:319 src/sendmsg-window.c:425
-#, fuzzy
 msgid "Russian (KOI)"
-msgstr "_Russe (KOI8-R)"
+msgstr "Russe (KOI8-R)"
 
 #: src/sendmsg-window.c:320 src/sendmsg-window.c:427
 msgid "Slovak"
-msgstr ""
+msgstr "Slovake"
 
 #: src/sendmsg-window.c:321 src/sendmsg-window.c:429
 msgid "Spanish"
-msgstr ""
+msgstr "Castiyan"
 
 #: src/sendmsg-window.c:322 src/sendmsg-window.c:431
 msgid "Swedish"
-msgstr ""
+msgstr "Suwedwès"
 
 #: src/sendmsg-window.c:323 src/sendmsg-window.c:433
-#, fuzzy
 msgid "Turkish"
-msgstr "Batch"
+msgstr "Turk"
 
 #: src/sendmsg-window.c:324 src/sendmsg-window.c:435
-#, fuzzy
 msgid "Ukrainian"
-msgstr "_Ucrainyin (KOI8-U)"
+msgstr "Ucrainyin"
 
 #: src/sendmsg-window.c:331
 msgid "_A-J"
-msgstr ""
+msgstr "_A-J"
 
 #: src/sendmsg-window.c:332
 msgid "_K-Z"
-msgstr ""
+msgstr "_K-Z"
 
 #: src/sendmsg-window.c:341
 msgid "_Request Disposition Notification"
@@ -2997,12 +2993,11 @@ msgstr "_Vey"
 
 #: src/sendmsg-window.c:370
 msgid "_Language"
-msgstr ""
+msgstr "_Lingaedjes"
 
 #: src/sendmsg-window.c:372
-#, fuzzy
 msgid "_Options"
-msgstr "Relijhas"
+msgstr "_Tchûzes"
 
 #: src/sendmsg-window.c:652
 #, c-format
@@ -3053,7 +3048,7 @@ msgstr "Atatchmints:"
 #. Comments:
 #: src/sendmsg-window.c:1042
 msgid "Comments:"
-msgstr ""
+msgstr "Rawetes:"
 
 #. Keywords:
 #: src/sendmsg-window.c:1045
@@ -3065,12 +3060,10 @@ msgid "you"
 msgstr ""
 
 #: src/sendmsg-window.c:1144
-#, fuzzy, c-format
 msgid "On %s %s wrote:\n"
 msgstr "Li %s %s scrijha:\n"
 
 #: src/sendmsg-window.c:1147
-#, fuzzy, c-format
 msgid "%s wrote:\n"
 msgstr "%s scrijha:\n"
 
@@ -3099,9 +3092,8 @@ msgid "Fwd:"
 msgstr ""
 
 #: src/sendmsg-window.c:1586
-#, fuzzy, c-format
 msgid "Could not open the file %s.\n"
-msgstr "Dji n' a savou drovî l' fitchî.\n"
+msgstr "Dji n' a savou drovî l' fitchî %s.\n"
 
 #: src/sendmsg-window.c:1588
 msgid "Loading..."

@@ -223,8 +223,10 @@ dir_conf_edit(BalsaMailboxNode* mb)
 static void
 read_dir_cb(BalsaMailboxNode* mb, GNode* r)
 {
+    gdk_threads_leave();
     libbalsa_scanner_local_dir(r, mb->name, 
 			       add_local_folder, add_local_mailbox);
+    gdk_threads_enter();
     /* FIXME: we should just redo local subtree starting from root, but... */
     balsa_mblist_repopulate(balsa_app.mblist_tree_store);
 }

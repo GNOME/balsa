@@ -30,7 +30,6 @@
  */
 
 #include <ctype.h>
-/* FIXME: */
 #include "src/balsa-app.h"
 #include "libbalsa.h"
 #include "libbalsa_private.h"
@@ -121,7 +120,22 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message)
 	    g_free(str);
 	    if (match) break;
 	}
+	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_US_HEAD)) {
+	    if (cond->user_header) {
+		GList * header =
+		    libbalsa_message_find_user_hdr(message, cond->user_header);
+
+		if (header) {
+		    gchar ** tmp = header->data;
+		    if (in_string(tmp[1],cond->match.string)) {
+			match = TRUE;
+			break;
+		    }
+		}
+	    }
+	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY)) {
+	    gboolean is_new = (message->flags & LIBBALSA_MESSAGE_FLAG_NEW);
 	    if (!libbalsa_message_body_ref(message)) {
 		libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                      _("Unable to load message body to "
@@ -129,11 +143,11 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message)
                 return FALSE;  /* We don't want to match if an error occured */
 	    }
 	    body=content2reply(message,NULL,0,FALSE,FALSE);
+	    if(is_new) libbalsa_message_read(message, FALSE);
 	    libbalsa_message_body_unref(message);
 	    if (body) {
 		if (body->str) match=in_string(body->str,cond->match.string);
 		g_string_free(body,TRUE);
-		if (match) break;
 	    }
 	}
 	break;
@@ -144,15 +158,19 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message)
 	    regex=(LibBalsaConditionRegex*) regexs->data;
 	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_TO)) {
 		str=libbalsa_make_string_from_list(message->to_list);
-		if (str) match=REGEXEC(*(regex->compiled),str)==0;
-		g_free(str);
-		if (match) break;
+		if (str) {
+		    match=REGEXEC(*(regex->compiled),str)==0;
+		    g_free(str);
+		    if (match) break;
+		}
 	    }
 	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_FROM)) {
 		str=libbalsa_address_to_gchar(message->from,0);
-		if (str) match=REGEXEC(*(regex->compiled),str)==0;
-		g_free(str);
-		if (match) break;
+		if (str) {
+		    match=REGEXEC(*(regex->compiled),str)==0;
+		    g_free(str);
+		    if (match) break;
+		}
 	    }
 	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_SUBJECT)) {
 		str=(gchar *)LIBBALSA_MESSAGE_GET_SUBJECT(message);
@@ -161,11 +179,28 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message)
 	    }
 	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_CC)) {
 		str=libbalsa_make_string_from_list(message->cc_list);
-		if (str) match=REGEXEC(*(regex->compiled),str)==0;
-		g_free(str);
-		if (match) break;
+		if (str) {
+		    match=REGEXEC(*(regex->compiled),str)==0;
+		    g_free(str);
+		    if (match) break;
+		}
+	    }
+	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_US_HEAD)) {
+		if (cond->user_header) {
+		    GList * header =
+			libbalsa_message_find_user_hdr(message, cond->user_header);
+		    
+		    if (header) {
+			gchar ** tmp = header->data;
+			if (tmp[1]) {
+			    match=REGEXEC(*(regex->compiled),tmp[1])==0;
+			    if (match) break;
+			}
+		    }
+		}
 	    }
 	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY)) {
+                gboolean is_new = (message->flags & LIBBALSA_MESSAGE_FLAG_NEW);
 		if (!libbalsa_message_body_ref(message)) {
 		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                          _("Unable to load message body "
@@ -173,11 +208,11 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message)
 		    return FALSE;
 		}
 		body=content2reply(message,NULL,0,FALSE,FALSE);
+                if(is_new) libbalsa_message_read(message, FALSE);
 		libbalsa_message_body_unref(message);
 		if (body && body->str) 
                     match = REGEXEC(*(regex->compiled),body->str)==0;
-		if (body) g_string_free(body,TRUE);
-		if (match) break;
+		g_string_free(body,TRUE);
 	    }
 	}
         break;
@@ -198,7 +233,7 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message)
 gint
 match_conditions(FilterOpType op, GSList * cond, LibBalsaMessage * message)
 {
-    g_assert((op!=FILTER_NOOP) && cond);
+    g_assert((op!=FILTER_NOOP) && cond && message);
     
     if (op==FILTER_OP_OR) {
 	for (;cond &&!match_condition((LibBalsaCondition*)cond->data, message);
@@ -251,6 +286,7 @@ libbalsa_filter_build_imap_query(FilterOpType op, GSList* condlist)
             query = extend_query(query, "CC", cond->match.string, op);
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY))
             query = extend_query(query, "TEXT", cond->match.string, op);
+	/* FIXME : extend that for user headers matching */
     }
     str = query->str;
     g_string_free(query, FALSE);
@@ -258,8 +294,6 @@ libbalsa_filter_build_imap_query(FilterOpType op, GSList* condlist)
 }
 
 /*--------- Filtering functions -------------------------------*/
-
-/* FIXME : Add error reporting for each filter */
 
 gint
 filters_prepare_to_run(GSList * filters)
@@ -284,24 +318,19 @@ filters_prepare_to_run(GSList * filters)
 /*
  * Run all filters until one matches (so order of filter is important)
  * filters must be valid and compiled (ie filters_prepare_to_run have been called before)
- * Assume that all messages come from ONE mailbox
- * returns TRUE if the trash bin has been filled
- * FIXME : Should position filter_errno on errors (bad command action,bad destination mailbox...)
+ * In general you'll call this function with mailbox lock held (ie you locked the mailbox
+ * you're filtering before calling this function)
  */
 
-gboolean
-filters_run_on_messages(GSList * filter_list, GList * messages)
+void
+libbalsa_filter_match(GSList * filter_list, GList * messages)
 {
     gint match;
     GSList * lst;
-    GList * lst_messages;
     LibBalsaFilter * filt=NULL;
-    LibBalsaMailbox * source_mbox;
-    gboolean result=FALSE;
 
-    if (!filter_list || ! messages) return FALSE;
+    if (!filter_list || ! messages) return;
 
-    source_mbox=LIBBALSA_MESSAGE(messages->data)->mailbox;
     for (;messages;messages=g_list_next(messages)) {
 
 	match=0;
@@ -315,28 +344,49 @@ filters_run_on_messages(GSList * filter_list, GList * messages)
 	    filt->matching_messages=g_list_prepend(filt->matching_messages,LIBBALSA_MESSAGE(messages->data));
 	}
     }
+}
 
-    /* OK we have done all the matching thing, now we take every action for matching messages */
+void libbalsa_filter_match_mailbox(GSList * filter_list, LibBalsaMailbox * mbox)
+{
+    LOCK_MAILBOX(mbox);
+    libbalsa_filter_match(filter_list, mbox->message_list);
+    UNLOCK_MAILBOX(mbox);
+}
+
+/* Apply all filters on their matching messages (call libbalsa_filter_match before)
+ * returns TRUE if the trash bin has been filled
+ * FIXME : Should position filter_errno on errors (bad command action,bad destination mailbox...)
+ */
+
+gboolean
+libbalsa_filter_apply(GSList * filter_list)
+{
+    GSList * lst;
+    GList * lst_messages;
+    LibBalsaFilter * filt=NULL;
+    gboolean result=FALSE;
+    LibBalsaMailbox *mbox;
+
+    if (!filter_list) return FALSE;
 
     for (lst=filter_list;lst;lst=g_slist_next(lst)) {
-	LibBalsaMailbox *mbox;
- 
 	filt=(LibBalsaFilter*)lst->data;
-	if (FILTER_CHKFLAG(filt,FILTER_SOUND)) {
-	    /* FIXME : Emit sound */
-	}
-	if (FILTER_CHKFLAG(filt,FILTER_POPUP)) {
-	    /* FIXME : Print popup text */
-	}
 	if (filt->matching_messages) {
+	    if (filt->sound) {
+	        /* FIXME : Emit sound */
+	    }
+	    if (filt->popup_text) {
+	        /* FIXME : Print popup text */
+	    }
 	    switch (filt->action) {
 	    case FILTER_COPY:
-                mbox =
-                    balsa_find_mailbox_by_name(filt->action_string);
+		mbox =
+                    balsa_find_mailbox_by_url(filt->action_string);
 		if (!mbox)
 		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,_("Bad mailbox name for filter : %s"),filt->name);
 		else if (!libbalsa_messages_copy(filt->matching_messages,mbox))
 		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,_("Error when copying messages"));
+		else if (mbox==balsa_app.trash) result=TRUE;
 		break;
 	    case FILTER_TRASH:
 		if (!balsa_app.trash || !libbalsa_messages_move(filt->matching_messages,balsa_app.trash))
@@ -344,12 +394,13 @@ filters_run_on_messages(GSList * filter_list, GList * messages)
 		else result=TRUE;
 		break;
 	    case FILTER_MOVE:
-                mbox =
-                    balsa_find_mailbox_by_name(filt->action_string);
+		mbox =
+                    balsa_find_mailbox_by_url(filt->action_string);
 		if (!mbox)
 		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,_("Bad mailbox name for filter : %s"),filt->name);
 		else if (!libbalsa_messages_move(filt->matching_messages,mbox))
 		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,_("Error when moving messages"));
+		else if (mbox==balsa_app.trash) result=TRUE;
 		break;
 	    case FILTER_PRINT:
 		/* FIXME : to be implemented */
@@ -369,6 +420,20 @@ filters_run_on_messages(GSList * filter_list, GList * messages)
 	}
     }
     return result;
+}
+
+/* libbalsa_extract_new_messages : returns a sublist of the messages list containing all
+   "new" messages, ie just retrieved mails
+*/
+
+GList * libbalsa_extract_new_messages(GList * messages)
+{
+    GList * extracted=NULL;
+
+    for (;messages;messages=g_list_next(messages))
+	if (!LIBBALSA_MESSAGE(messages->data)->header->old)
+	    extracted = g_list_prepend(extracted,messages->data);
+    return extracted;
 }
 
 /*--------- End of Filtering functions -------------------------------*/

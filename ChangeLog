@@ -1,3 +1,27 @@
+2002-08-27  Peter Bloomfield + Emmanuel
+
+	* libbalsa/filter-file.c: mem leak + redundant code removal + mem
+	leak.
+	* libbalsa/filter-funcs.[hc]: old code did g_strdup on a possibly
+	NULL string, avoid that + small speedup.
+	* libbalsa/filter-private.h: add user header condition type.
+	* libbalsa/filter.[ch]: handle search on user header.
+	* libbalsa/mailbox_pop3.c: handle password, don't leave tmp files
+	behind.
+	* src/balsa-app.c: fix node_lock()'ing.
+	* src/filter-edit-{dialog,callbacks}.c: edit user header
+	conditions.
+	* src/filter-edit.h: remove redundant #include.
+	* src/filter-export-{dialog,callbacks}.c: complete port to
+	GtkDialog.
+	* src/filter-export.h: ditto.
+
+	* src/filter-run-{dialog,callbacks}.c: ditto. some new icons.
+	name should have been replaced by url.
+	* src/filter-run.h: associated changes in function prototypes.
+	* src/mailbox-node.c: leave threads on scanning local mailboxes as
+	well.
+	
 2002-08-27  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/mailbox-node.c: gcc-3.2 compiles non-standard C but we 

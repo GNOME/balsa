@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,7 +21,6 @@
 
 #include "config.h"
 
-#include <gnome.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
 #include "balsa-app.h"
@@ -29,17 +28,18 @@
 #include "mailbox-filter.h"
 #include "save-restore.h"
 #include "pixmaps/other_enabled.xpm"
-#include "balsa-icons.h"
 
-/* fe_already_open is TRUE when the filters dialog is opened, we use this to prevent incoherency if we
- * have both filters dialog and mailbox filters dialog boxes opened at the same time
- * FIXME : we can perhaps imagine a way to "refresh" the other dialog boxes when filters have been modified
- * but it'll be complex, and I'm not sure it is worth it
+/* fe_already_open is TRUE when the filters dialog is opened, we use
+ * this to prevent incoherency if we have both filters dialog and
+ * mailbox filters dialog boxes opened at the same time.
+ * FIXME : we can perhaps imagine a way to "refresh" the other dialog
+ * boxes when filters have been modified but it'll be complex, and I'm
+ * not sure it is worth it.
  *
  * Defined in filter-edit-dialog.c
  */
 
-extern int fe_already_open;
+extern gboolean fe_already_open;
 
 /* BalsaFilterRunDialog signals */
 
@@ -49,16 +49,18 @@ enum {
 };
 
 static gint balsa_filter_run_dialog_signals[LAST_SIGNAL];
-static GnomeDialogClass *parent_class = NULL;
+static GtkDialogClass *parent_class = NULL;
 
 GList * fr_dialogs_opened=NULL;
 
 /* BalsaFilterRunDialog methods */
 
-static void balsa_filter_run_dialog_class_init(BalsaFilterRunDialogClass * klass);
+static void balsa_filter_run_dialog_class_init(BalsaFilterRunDialogClass *
+                                               klass);
 static void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p);
 
-static void fr_refresh(BalsaFilterRunDialog * dialog,GSList * names_changing,gpointer throwaway);
+static void fr_refresh(BalsaFilterRunDialog * dialog,
+                       GSList * names_changing, gpointer throwaway);
 
 static void 
 populate_available_filters_list(GtkCList * clist,GSList * mailbox_filters)
@@ -81,6 +83,15 @@ populate_available_filters_list(GtkCList * clist,GSList * mailbox_filters)
     }
 }
 
+static void
+get_pixmap_and_mask_from_xpm(const char* xpm[],
+                             GdkPixmap **pixmap, GdkBitmap **mask)
+{
+    GdkPixbuf *pb = gdk_pixbuf_new_from_xpm_data(xpm);
+    gdk_pixbuf_render_pixmap_and_mask(pb, pixmap, mask, 0);
+    gdk_pixbuf_unref(pb);
+}
+
 /* Set the icon corresponding to the when type */
 
 static void
@@ -90,7 +101,7 @@ set_icon(GtkCList * clist,gint row,gint when)
     GdkBitmap *mask;
     gint i;
 
-    balsa_icon_create(other_enabled_xpm, &pixmap, &mask);
+    get_pixmap_and_mask_from_xpm(other_enabled_xpm, &pixmap, &mask);
 
     for (i=0;i<FILTER_WHEN_NB;i++)
 	if (when & (1 << i))
@@ -139,7 +150,8 @@ balsa_filter_run_dialog_get_type()
 	};
 
 	balsa_filter_run_dialog_type =
-	    gtk_type_unique(gnome_dialog_get_type(), &balsa_filter_run_dialog_info);
+	    gtk_type_unique(gtk_dialog_get_type(),
+                            &balsa_filter_run_dialog_info);
     }
 
     return balsa_filter_run_dialog_type;
@@ -158,9 +170,10 @@ balsa_filter_run_dialog_class_init(BalsaFilterRunDialogClass * klass)
 		       GTK_RUN_FIRST,
 		       BALSA_TYPE_FILTER_RUN_DIALOG,
 		       GTK_SIGNAL_OFFSET(BalsaFilterRunDialogClass, refresh),
-		       gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, GTK_TYPE_POINTER);
+		       gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 1,
+                       GTK_TYPE_POINTER);
 
-    parent_class = gtk_type_class(gnome_dialog_get_type());
+    parent_class = gtk_type_class(gtk_dialog_get_type());
 
     klass->refresh = fr_refresh;
 }
@@ -179,6 +192,7 @@ balsa_filter_run_dialog_new(LibBalsaMailbox * mbox)
     p->mbox=mbox;
     dialog_title=g_strconcat(_("Balsa Filters of mailbox : "),p->mbox->name,NULL);
     gtk_window_set_title(GTK_WINDOW(p),dialog_title);
+    gtk_window_set_wmclass(GTK_WINDOW(p), "filter-run", "Balsa");
     g_free(dialog_title);
 
     /* Open the mailbox if needed */
@@ -195,7 +209,7 @@ balsa_filter_run_dialog_new(LibBalsaMailbox * mbox)
     if (!populate_selected_filters_list(p->selected_filters,mbox->filters)) {
 	fr_clean_associated_mailbox_filters(p->selected_filters);
 	balsa_information(LIBBALSA_INFORMATION_ERROR,_("Memory allocation error"));
-	gnome_dialog_close(GNOME_DIALOG(p));
+	gtk_widget_destroy(GTK_WIDGET(p));
     }
 
     /* FIXME : The only way I found to have decent sizes */
@@ -234,20 +248,21 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
        \-----------------/
      */
 
-    gnome_dialog_append_buttons(GNOME_DIALOG(p),
-				GNOME_STOCK_BUTTON_APPLY,
-				GNOME_STOCK_BUTTON_OK,
-				GNOME_STOCK_BUTTON_CANCEL,
-				GNOME_STOCK_BUTTON_HELP, NULL);
+    gtk_dialog_add_buttons(GTK_DIALOG(p),
+                           GTK_STOCK_APPLY,  GTK_RESPONSE_APPLY,
+                           GTK_STOCK_OK,     GTK_RESPONSE_OK,
+                           GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                           GTK_STOCK_HELP,   GTK_RESPONSE_HELP,
+                           NULL);
 
-    gtk_signal_connect(GTK_OBJECT(p), "clicked",
-                       GTK_SIGNAL_FUNC(fr_dialog_button_clicked), NULL);
+    gtk_signal_connect(GTK_OBJECT(p), "response",
+                       GTK_SIGNAL_FUNC(fr_dialog_response), NULL);
     gtk_signal_connect(GTK_OBJECT(p), "destroy",
                        GTK_SIGNAL_FUNC(fr_destroy_window_cb), NULL);
 
     hbox = gtk_hbox_new(FALSE,2);
 
-    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(p)->vbox),
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(p)->vbox),
 		       hbox, TRUE, TRUE, 0);
 
     gtk_widget_push_visual(gdk_rgb_get_visual());
@@ -294,16 +309,19 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
 				  BALSA_BUTTON_WIDTH / 2,
 				  BALSA_BUTTON_HEIGHT / 2);
 
-    /* FIXME : I saw a lot of different ways to create button with pixmaps, hope this one is correct*/
+    /* FIXME : I saw a lot of different ways to create button with
+       pixmaps, hope this one is correct*/
     /* Right/Add button */
-    button = balsa_stock_button_with_label(GNOME_STOCK_MENU_FORWARD, "");
-    gtk_signal_connect(GTK_OBJECT(button), "clicked",
-		       GTK_SIGNAL_FUNC(fr_add_pressed), p);
+    button = balsa_stock_button_with_label(GTK_STOCK_GO_FORWARD, _("Add"));
+    gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+                              GTK_SIGNAL_FUNC(fr_add_pressed), 
+                              GTK_OBJECT(p));
     gtk_container_add(GTK_CONTAINER(bbox), button);
     /* Left/Remove button */
-    button = balsa_stock_button_with_label(GNOME_STOCK_MENU_BACK, "");
-    gtk_signal_connect(GTK_OBJECT(button), "clicked",
-		       GTK_SIGNAL_FUNC(fr_remove_pressed), p);
+    button = balsa_stock_button_with_label(GTK_STOCK_GO_BACK, _("Remove"));
+    gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+                              GTK_SIGNAL_FUNC(fr_remove_pressed), 
+                              GTK_OBJECT(p));
     gtk_container_add(GTK_CONTAINER(bbox), button);
 
     gtk_box_pack_start(GTK_BOX(hbox),bbox, TRUE, TRUE, 0);
@@ -343,12 +361,12 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 2);
 
     /* up button */
-    button = balsa_stock_button_with_label(GNOME_STOCK_MENU_UP, _("Up"));
+    button = balsa_stock_button_with_label(GTK_STOCK_GO_UP, _("Up"));
     gtk_signal_connect(GTK_OBJECT(button), "clicked",
 		       GTK_SIGNAL_FUNC(fr_up_pressed), p);
     gtk_container_add(GTK_CONTAINER(bbox), button);
     /* down button */
-    button = balsa_stock_button_with_label(GNOME_STOCK_MENU_DOWN, _("Down"));
+    button = balsa_stock_button_with_label(GTK_STOCK_GO_DOWN, _("Down"));
     gtk_signal_connect(GTK_OBJECT(button), "clicked",
 		       GTK_SIGNAL_FUNC(fr_down_pressed), p);
     gtk_container_add(GTK_CONTAINER(bbox), button);

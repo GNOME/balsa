@@ -72,6 +72,8 @@ libbalsa_condition_new_from_config()
     newc->type          = gnome_config_get_int("Type");
     newc->condition_not = gnome_config_get_bool("Condition-not");
     newc->match_fields  = gnome_config_get_int("Match-fields");
+    if (CONDITION_CHKMATCH(newc,CONDITION_MATCH_US_HEAD))
+	newc->user_header = gnome_config_get_string("User-header");
 
     switch(newc->type) {
     case CONDITION_SIMPLE:
@@ -86,6 +88,8 @@ libbalsa_condition_new_from_config()
 	    newc->match.regexs = g_slist_prepend(newc->match.regexs, newreg);
 	}
 	newc->match.regexs=g_slist_reverse(newc->match.regexs);
+	/* Free the array of (gchar*)'s, but not the strings pointed by them */
+	g_free(regexs);
 	break;
     case CONDITION_DATE:
 	str=gnome_config_get_string("Low-date");
@@ -244,12 +248,10 @@ libbalsa_filter_new_from_config(void)
 	g_free(newf->sound);
 	newf->sound=NULL;
     }
-    else FILTER_SETFLAG(newf,FILTER_SOUND);
-    if (newf->popup_text=='\0') {
+    if (newf->popup_text[0]=='\0') {
 	g_free(newf->popup_text);
 	newf->popup_text=NULL;
     }
-    else FILTER_SETFLAG(newf,FILTER_POPUP);
 
     return newf;
 }
@@ -277,6 +279,10 @@ libbalsa_condition_save_config(LibBalsaCondition * cond)
 	gnome_config_clean_key("High-date");
     }
     if (cond->type!=CONDITION_FLAG) gnome_config_clean_key("Flags");
+    if (!CONDITION_CHKMATCH(cond,CONDITION_MATCH_US_HEAD))
+	gnome_config_clean_key("User-header");
+    else
+	gnome_config_set_string("User-header",cond->user_header);
 
     switch(cond->type) {
     case CONDITION_SIMPLE:
@@ -421,9 +427,6 @@ libbalsa_mailbox_filters_load_config(LibBalsaMailbox* mbox)
 		LibBalsaMailboxFilter* mf = g_new(LibBalsaMailboxFilter,1);
 
 		mf->actual_filter = fil;
-		mf->when          = FILTER_WHEN_NEVER;
-		/* FIXME : When field is not loaded */
-		FILTER_WHEN_SETFLAG(mf,FILTER_WHEN_NEVER);
 		mbox->filters=g_slist_prepend(mbox->filters, mf);
 	    }
 	    else
@@ -439,7 +442,8 @@ libbalsa_mailbox_filters_load_config(LibBalsaMailbox* mbox)
                                              &nb_filters,&filters_names,&def);
 	if (def)
 	    for(lst=mbox->filters;lst;lst=g_slist_next(lst))
-		((LibBalsaMailboxFilter*)lst->data)->when=FILTER_WHEN_NEVER;
+		FILTER_WHEN_SETFLAG((LibBalsaMailboxFilter*)lst->data,
+				    FILTER_WHEN_NEVER);
 	else {
 	    lst=mbox->filters;
 	    for (i=0;i<nb_filters && lst;i++) {
@@ -448,6 +452,7 @@ libbalsa_mailbox_filters_load_config(LibBalsaMailbox* mbox)
 		lst=g_slist_next(lst);
 	    }
 	}
+	g_strfreev(filters_names);
     }
     filter_errno=FILTER_NOERR;
 }

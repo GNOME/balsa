@@ -38,9 +38,8 @@
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
 #else
-/* FIXME: Balsa dependency */
-#include "src/save-restore.h"	/*config_mailbox_update */
-#include "src/mailbox-conf.h"
+/* FIXME: */
+void config_mailbox_update(LibBalsaMailbox* );
 #endif
 
 #include "mailbox-filter.h"
@@ -218,6 +217,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     PopStatus status;
     LibBalsaMailboxPop3 *m = LIBBALSA_MAILBOX_POP3(mailbox);
     LibBalsaServer *server;
+    gboolean remove_tmp = TRUE;
 #ifdef BALSA_USE_THREADS
     gchar *msgbuf;
     MailThreadMessage *threadmsg;
@@ -226,7 +226,9 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     if (!m->check) return;
 
     server = LIBBALSA_MAILBOX_REMOTE_SERVER(m);
-    if(!server->passwd) return;
+    if(!server->passwd &&
+       !(server->passwd = libbalsa_server_get_password(server, mailbox)))
+       return;
 
     /* Unlock GDK - this is safe since libbalsa_error is threadsafe. */
     gdk_threads_leave();
@@ -292,7 +294,8 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     /* Regrab the gdk lock before leaving */
     gdk_threads_enter();
 
-    tmp_mailbox = (LibBalsaMailbox *)libbalsa_mailbox_local_new((const gchar *)tmp_path, FALSE);
+    tmp_mailbox = (LibBalsaMailbox*)
+        libbalsa_mailbox_local_new(tmp_path, FALSE);
     if(!tmp_mailbox)  {
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 			     _("POP3 mailbox %s temp mailbox error:\n"), 
@@ -302,17 +305,20 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     }	
     libbalsa_mailbox_open(tmp_mailbox);
     if((m->inbox) && (tmp_mailbox->messages)) {
-       GSList * filters;
+	GSList * filters; 
 
-       /* Load associated filters if needed */
-       if (!mailbox->filters)                                
-           config_mailbox_filters_load(mailbox);
-
-       filters = libbalsa_mailbox_filters_when(LIBBALSA_MAILBOX(m)->filters,
-                                               FILTER_WHEN_INCOMING);
-
-       /* We apply filter if needed */
-       filters_run_on_messages(filters, tmp_mailbox->message_list);
+	 /* Load associated filters if needed */
+        if (!mailbox->filters)                                
+            config_mailbox_filters_load(mailbox);
+        filters = libbalsa_mailbox_filters_when(mailbox->filters,
+						FILTER_WHEN_INCOMING);
+	if (filters) {
+	    if (filters_prepare_to_run(filters)) {
+		libbalsa_filter_match(filters, tmp_mailbox->message_list);
+		libbalsa_filter_apply(filters);
+	    }
+	    g_slist_free(filters);
+	}
 
 	if (!libbalsa_messages_move(tmp_mailbox->message_list, m->inbox)) {    
 	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
@@ -321,12 +327,13 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 				 mailbox->name, 
 				 LIBBALSA_MAILBOX(m->inbox)->name,
 				 tmp_path);
+	    remove_tmp = FALSE;
 	}
-    } else {
-	unlink((const char*)tmp_path);
     }
     libbalsa_mailbox_close(tmp_mailbox);
     g_object_unref(G_OBJECT(tmp_mailbox));	
+    if(remove_tmp) 
+	unlink(tmp_path);
     g_free(tmp_path);
 }
 
@@ -341,10 +348,15 @@ progress_cb(char *msg, int prog, int tot)
     MailThreadMessage *message;
 
     message = g_new(MailThreadMessage, 1);
-    if (prog == 0 && tot == 0)
-	message->message_type = MSGMAILTHREAD_MSGINFO;
-    else
-	message->message_type = MSGMAILTHREAD_PROGRESS;
+    switch(tot) {
+    case -1: message->message_type = MSGMAILTHREAD_FINISHED; break;
+    case 0:
+        if (prog == 0) {
+            message->message_type = MSGMAILTHREAD_MSGINFO;
+            break;
+        }
+    default: message->message_type = MSGMAILTHREAD_MSGINFO; break;
+    }
     memcpy(message->message_string, msg, strlen(msg) + 1);
     message->num_bytes = prog;
     message->tot_bytes = tot;

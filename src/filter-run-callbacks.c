@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -25,8 +25,6 @@
 
 #include "config.h"
 
-#include <gnome.h>
-
 #include <string.h>
 #include "mailbox-filter.h"
 #include "filter-private.h"
@@ -37,11 +35,19 @@
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
 #include "pixmaps/other_enabled.xpm"
-#include "balsa-icons.h"
 
 /* Global vars */
 
 extern GList * fr_dialogs_opened;
+
+static void
+get_pixmap_and_mask_from_xpm(const char* xpm[],
+                             GdkPixmap **pixmap, GdkBitmap **mask)
+{
+    GdkPixbuf *pb = gdk_pixbuf_new_from_xpm_data(xpm);
+    gdk_pixbuf_render_pixmap_and_mask(pb, pixmap, mask, 0);
+    gdk_pixbuf_unref(pb);
+}
 
 /* FIXME : we should single out invalid filters in the list (eg with colors) */
 /* FIXME : implement error reporting */
@@ -81,15 +87,20 @@ static GSList * build_selected_filters_list(GtkCList * clist,gboolean to_run)
 static gboolean
 run_filters_on_mailbox(GtkCList * clist,LibBalsaMailbox *mbox)
 {
-    GSList * filters=build_selected_filters_list(clist,TRUE);
+    GSList * filters=build_selected_filters_list(clist,TRUE),* lst;
 
     if (!filters) return TRUE;
     if (!filters_prepare_to_run(filters))
 	return FALSE;
-    gtk_clist_freeze(GTK_CLIST(balsa_app.mblist));
-    if (filters_run_on_messages(filters,mbox->message_list))
-	enable_empty_trash(TRASH_FULL);
-    gtk_clist_thaw(GTK_CLIST(balsa_app.mblist));
+    libbalsa_filter_match_mailbox(filters,mbox);
+    for (lst=filters;lst;lst = g_slist_next(lst))
+	if (((LibBalsaFilter*) lst->data)->matching_messages)
+	    break;
+    
+    if (lst) {
+	if (libbalsa_filter_apply(filters))
+	    enable_empty_trash(TRASH_FULL);
+    }
     g_slist_free(filters);
     return TRUE;
 }
@@ -114,27 +125,28 @@ void save_filters(BalsaFilterRunDialog * p)
 }
 
 /* Dialog box button callbacks */
-void fr_dialog_button_clicked(GtkWidget * widget, gint button,
-			      gpointer throwaway)
+void fr_dialog_response(GtkWidget * widget, gint response,
+			gpointer throwaway)
 {
     BalsaFilterRunDialog * p;
 
     p=BALSA_FILTER_RUN_DIALOG(widget);
-    switch (button) {
-    case 0:			/* Apply button */
+    switch (response) {
+    case GTK_RESPONSE_APPLY:    /* Apply button */
 	if (!run_filters_on_mailbox(p->selected_filters,p->mbox))
 	    balsa_information(LIBBALSA_INFORMATION_ERROR,_("Error when applying filters"));
 	return;
-    case 1:                     /* OK button */
+    case GTK_RESPONSE_OK:       /* OK button */
 	save_filters(p);
 	break;
 
-    case 2:			/* Cancel button */
+    case GTK_RESPONSE_CANCEL:   /* Cancel button */
+    case GTK_RESPONSE_NONE:     /* Close window */
 	/* We free the mailbox_filter datas, they are useless now */
 	fr_clean_associated_mailbox_filters(p->selected_filters);
 	
 	break;
-    case 3:			/* Help button */
+    case GTK_RESPONSE_HELP:     /* Help button */
 	/* more of something here */
 	return;
 
@@ -142,7 +154,7 @@ void fr_dialog_button_clicked(GtkWidget * widget, gint button,
 	/* we should NEVER get here */
 	break;
     }
-    gnome_dialog_close(GNOME_DIALOG(p));
+    gtk_widget_destroy(GTK_WIDGET(p));
 }
 
 /* 
@@ -150,15 +162,12 @@ void fr_dialog_button_clicked(GtkWidget * widget, gint button,
  */
 
 void
-fr_add_pressed(GtkWidget * widget, gpointer data)
+fr_add_pressed(BalsaFilterRunDialog* p)
 {
     LibBalsaFilter* fil;
     GList * lst;
     gint row,rows;
     gchar *col[FILTER_WHEN_NB+1];
-    BalsaFilterRunDialog * p;
-
-    p=BALSA_FILTER_RUN_DIALOG(data);
 
     /* We check possibility of recursion here: we do not allow a filter 
        to be applied on a mailbox if its action rule modify this mailbox
@@ -169,7 +178,7 @@ fr_add_pressed(GtkWidget * widget, gpointer data)
             gtk_clist_get_row_data(p->available_filters,
                                    GPOINTER_TO_INT(lst->data));
 	if (fil->action==FILTER_RUN || fil->action==FILTER_TRASH || 
-            strcmp(fil->action_string,p->mbox->name)!=0) {
+            strcmp(fil->action_string,p->mbox->url)!=0) {
 	    /* Ok we can add the filter to this mailbox, there is no recursion problem */
 	    LibBalsaMailboxFilter* mf = g_new(LibBalsaMailboxFilter,1);
 	    mf->actual_filter=fil;
@@ -200,13 +209,10 @@ fr_add_pressed(GtkWidget * widget, gpointer data)
 }
 
 void
-fr_remove_pressed(GtkWidget * widget, gpointer data)
+fr_remove_pressed(BalsaFilterRunDialog * p)
 {
     LibBalsaMailboxFilter* fil;
     gint new_row;
-    BalsaFilterRunDialog * p;
-
-    p=BALSA_FILTER_RUN_DIALOG(data);
 
     if (p->selected_filters->selection) {
 	p->filters_modified=TRUE;
@@ -229,20 +235,12 @@ fr_remove_pressed(GtkWidget * widget, gpointer data)
 void available_list_select_row_cb(GtkWidget *widget, gint row, gint column,
 				  GdkEventButton *event, gpointer data)
 {
-    BalsaFilterRunDialog * p;
-
-    if ( event == NULL )
-	return;
-
-    p=BALSA_FILTER_RUN_DIALOG(data);
-    if (event->type == GDK_2BUTTON_PRESS)
-	fr_add_pressed(NULL,data);
+    if (event && event->type == GDK_2BUTTON_PRESS)
+	fr_add_pressed(BALSA_FILTER_RUN_DIALOG(data));
 }
 
-gboolean
-selected_list_select_row_event_cb(GtkWidget *widget,
-                                  GdkEventButton *bevent,
-                                  gpointer data)
+void selected_list_select_row_event_cb(GtkWidget *widget,
+				       GdkEventButton *bevent, gpointer data)
 {
     GtkCellType type;
     gint res,row,column;
@@ -250,15 +248,15 @@ selected_list_select_row_event_cb(GtkWidget *widget,
     GdkBitmap *mask;
     BalsaFilterRunDialog * p;
 
-    if (bevent == NULL || bevent->button != 1)
-	return FALSE;
+    if ( bevent == NULL )
+	return;
 
     p=BALSA_FILTER_RUN_DIALOG(data);
     res = gtk_clist_get_selection_info(p->selected_filters,
                                        bevent->x,
                                        bevent->y, &row, &column);
-    if (!res || column == 0)
-        return FALSE;
+    if ((bevent->button != 1) || !res || (column == 0))
+        return;
     
     type = gtk_clist_get_cell_type(p->selected_filters, row, column);
     
@@ -269,7 +267,7 @@ selected_list_select_row_event_cb(GtkWidget *widget,
                             1 << (column-1));
     } else {
 	/* now for the pixmap from gdk */
-	balsa_icon_create(other_enabled_xpm, &pixmap, &mask);
+	get_pixmap_and_mask_from_xpm(other_enabled_xpm, &pixmap, &mask);
 	gtk_clist_set_pixmap(p->selected_filters, row, column, pixmap,mask);
 	gdk_pixmap_unref(pixmap);
 	gdk_bitmap_unref(mask);
@@ -280,18 +278,13 @@ selected_list_select_row_event_cb(GtkWidget *widget,
     gtk_signal_emit_stop_by_name(GTK_OBJECT(p->selected_filters),
 				 "button_press_event");
     p->filters_modified=TRUE;
-
-    return TRUE;
 }
 
 void selected_list_select_row_cb(GtkWidget *widget,gint row,gint column,
 				 GdkEventButton *event, gpointer data)
 {
-    if ( event == NULL )
-	return;
-
-    if (event->type == GDK_2BUTTON_PRESS)
-	fr_remove_pressed(NULL,data);
+    if (event && event->type == GDK_2BUTTON_PRESS)
+	fr_remove_pressed(BALSA_FILTER_RUN_DIALOG(data));
 }
 /* 
  *Callbacks for up/down buttons

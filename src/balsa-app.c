@@ -952,11 +952,9 @@ balsa_mailbox_nodes_lock(gboolean exclusive)
     GList *list;
     NodesLockItem *nli;
     pthread_t id = pthread_self();
-    gboolean check = TRUE;
 
     pthread_mutex_lock(&mailbox_nodes_lock);
-    while (check) {
-        check = FALSE;
+    do {
         /* if anyone else has a lock, and either we're asking for an
          * exclusive lock or they hold an exclusive lock, we need to
          * wait until someone gives up a lock, and then recheck all the
@@ -965,10 +963,10 @@ balsa_mailbox_nodes_lock(gboolean exclusive)
             nli = list->data;
             if (nli->id != id && (exclusive || nli->exclusive)) {
                 pthread_cond_wait(&mailbox_nodes_cond, &mailbox_nodes_lock);
-                check = TRUE;
+                break; /* with list != NULL */
             }
-        }
-    }
+	}               /* end of for loop, with list == NULL */
+    } while (list != NULL);
     /* we're the only thread with locks, so we'll just add this one
      * to the list */
     nli = g_new(NodesLockItem, 1);

@@ -34,9 +34,10 @@
 #include "mailbox.h"
 
 /*
- * We define a new gtk type BalsaFilterRunDialog, inheriting from GnomeDialog
- * each object contains the whole set of data needed for managing the dialog box
- * that way there is no global variables (but the list of 
+ * We define a new gtk type BalsaFilterRunDialog, inheriting from
+ * GnomeDialog each object contains the whole set of data needed for
+ * managing the dialog box.
+ * In that way there is no global variables (but the list of 
  * fr = filter run
  */
 
@@ -55,7 +56,7 @@ typedef struct _BalsaFilterRunDialog BalsaFilterRunDialog;
 typedef struct _BalsaFilterRunDialogClass BalsaFilterRunDialogClass;
 
 struct _BalsaFilterRunDialog {
-    GnomeDialog parent;
+    GtkDialog parent;
 
     /* GUI members */
     GtkCList * available_filters,* selected_filters;
@@ -66,7 +67,7 @@ struct _BalsaFilterRunDialog {
 };
 
 struct _BalsaFilterRunDialogClass {
-	GnomeDialogClass parent_class;
+	GtkDialogClass parent_class;
 
 	void (*refresh) (BalsaFilterRunDialog * fr,GSList * filters_changing,gpointer throwaway);
 };
@@ -80,13 +81,13 @@ void fr_clean_associated_mailbox_filters(GtkCList * clist);
 void fr_destroy_window_cb(GtkWidget * widget,gpointer throwaway);
 
 /* Dialog box button callbacks */
-void fr_dialog_button_clicked(GtkWidget * widget, gint button,
+void fr_dialog_response(GtkWidget * widget, gint response,
 			      gpointer data);
 /* 
  *Callbacks for left/right buttons
  */
-void fr_add_pressed(GtkWidget * widget, gpointer data);
-void fr_remove_pressed(GtkWidget * widget, gpointer data);
+void fr_add_pressed(BalsaFilterRunDialog* dialog);
+void fr_remove_pressed(BalsaFilterRunDialog* dialog);
 
 /* 
  *Callbacks for up/down buttons
@@ -102,9 +103,8 @@ void available_list_select_row_cb(GtkWidget *widget, gint row, gint column,
 
 void selected_list_select_row_cb(GtkWidget *widget,gint row,gint column,
 				 GdkEventButton *event, gpointer data);
-gboolean selected_list_select_row_event_cb(GtkWidget * widget,
-                                           GdkEventButton * event,
-                                           gpointer data);
+void selected_list_select_row_event_cb(GtkWidget *widget,
+				       GdkEventButton *event, gpointer data);
 
 #ifdef __cplusplus
 }

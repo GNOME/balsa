@@ -29,13 +29,11 @@
 
 #include "config.h"
 
-#include <gnome.h>
 #include "balsa-app.h"
 #include "filter-export.h"
-#include "filter-funcs.h"
 
 /* To prevent user from silmultaneously edit/export filters */
-extern int fex_already_open;
+extern gboolean fex_already_open;
 
 void 
 fex_destroy_window_cb(GtkWidget * widget,gpointer throwaway)
@@ -43,14 +41,14 @@ fex_destroy_window_cb(GtkWidget * widget,gpointer throwaway)
     fex_already_open=FALSE;
 }
 
-void fex_dialog_buttons_cb(GtkWidget * dialog, gint button, gpointer data)
+void fex_dialog_response(GtkWidget * dialog, gint response, gpointer data)
 {
     GtkCList * clist;
     GList * selected;
     LibBalsaFilter * fil;
     gchar * str;
 
-    if (button==0) { /* OK Button */
+    if (response == GTK_RESPONSE_OK) { /* OK Button */
 	clist=GTK_CLIST(data);
 	for (selected=clist->selection;
              selected; selected=g_list_next(selected)) {
@@ -65,5 +63,5 @@ void fex_dialog_buttons_cb(GtkWidget * dialog, gint button, gpointer data)
 	    g_free(str);
 	}
     }
-    gnome_dialog_close(GNOME_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
 }

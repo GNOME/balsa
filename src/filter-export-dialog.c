@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -29,7 +29,6 @@
 
 #include "config.h"
 
-#include <gnome.h>
 #include "balsa-app.h"
 #include "filter-export.h"
 
@@ -40,7 +39,7 @@ extern GList * fr_dialogs_opened;
 
 gboolean fex_already_open=FALSE;
 
-GnomeDialog * fex_window;
+GtkWidget * fex_window;
 
 /*
  * filters_export_dialog()
@@ -64,16 +63,21 @@ filters_export_dialog(void)
 	return;
     }
     if (fex_already_open) {
-	gdk_window_raise(GTK_WIDGET(fex_window)->window);
+	gdk_window_raise(fex_window->window);
 	return;
     }
     
     fex_already_open=TRUE;
 
-    fex_window = GNOME_DIALOG(gnome_dialog_new(_("Balsa Filters Export"),
-					       GNOME_STOCK_BUTTON_OK,
-					       GNOME_STOCK_BUTTON_CANCEL,
-					       GNOME_STOCK_BUTTON_HELP, NULL));
+    fex_window =
+        gtk_dialog_new_with_buttons(_("Balsa Filters Export"),
+                                    NULL, 0, /* FIXME */
+                                    GTK_STOCK_OK,     GTK_RESPONSE_OK,
+                                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                    GTK_STOCK_HELP,   GTK_RESPONSE_HELP,
+                                    NULL);
+    gtk_window_set_wmclass(GTK_WINDOW(fex_window), "filter-export",
+                           "Balsa");
 
     sw = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
@@ -93,7 +97,8 @@ filters_export_dialog(void)
     gtk_clist_set_auto_sort(clist,TRUE);
 
     gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(clist));
-    gtk_box_pack_start(GTK_BOX(fex_window->vbox), sw, TRUE, TRUE, 2);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(fex_window)->vbox),
+                       sw, TRUE, TRUE, 2);
 
     /* Populate the clist of filters */
 
@@ -109,8 +114,8 @@ filters_export_dialog(void)
 
     gtk_widget_set_usize(GTK_WIDGET(clist),-1,200);
 
-    gtk_signal_connect(GTK_OBJECT(fex_window), "clicked",
-                       GTK_SIGNAL_FUNC(fex_dialog_buttons_cb), clist);
+    gtk_signal_connect(GTK_OBJECT(fex_window), "response",
+                       GTK_SIGNAL_FUNC(fex_dialog_response), clist);
     gtk_signal_connect(GTK_OBJECT(fex_window), "destroy",
 		       GTK_SIGNAL_FUNC(fex_destroy_window_cb), NULL);
 

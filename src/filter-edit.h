@@ -28,8 +28,6 @@
 #ifndef __FILTER_EDIT_H__
 #define __FILTER_EDIT_H__
 
-#include <gnome.h>
-
 #include "filter.h"
 
 /*
@@ -47,14 +45,11 @@ typedef struct _option_list {
     GtkWidget *widget;
 } option_list;
 
-/* Free filters associated with filters clist row */
-void fe_free_associated_filters(void);
-
 /* destroy calback */
 void fe_destroy_window_cb(GtkWidget *,gpointer);
 
 /* button callbacks */
-void fe_dialog_button_clicked(GtkWidget * widget, gint button,
+void fe_dialog_response(GtkWidget * widget, gint response,
 			      gpointer data);
 
 /*---------------- Left side of hbox ----------------*/
@@ -77,9 +72,6 @@ void fe_revert_pressed(GtkWidget * widget, gpointer data);
 /*op codes callback */
 void fe_op_codes_toggled(GtkWidget * widget, gpointer data);
 
-/* Free copied conditions */
-void fe_free_associated_conditions(void);
-
 /* Conditions callbacks */
 void fe_conditions_select_row(GtkWidget * widget, gint row, gint column,
 			      GdkEventButton * bevent, gpointer data);
@@ -90,4 +82,5 @@ void fe_condition_remove_pressed(GtkWidget * widget, gpointer data);
 void fe_action_selected(GtkWidget * widget, gpointer data);
 void fe_enable_right_page(gboolean enabled);
 
+void fe_add_new_user_header(const gchar *);
 #endif /*__FILTER_EDIT_H__ */

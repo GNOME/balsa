@@ -44,6 +44,7 @@ LibBalsaConditionRegex* libbalsa_condition_regex_new(void);
 LibBalsaCondition* libbalsa_condition_clone(LibBalsaCondition* cnd);
 void libbalsa_condition_regex_free(LibBalsaConditionRegex *, gpointer);
 void regexs_free(GSList *);
+void libbalsa_condition_compile_regexs(LibBalsaCondition* cond);
 
 /* Filters */
 /* Free a filter

@@ -41,7 +41,7 @@ extern GList * fr_dialogs_opened;
 
 /* The dialog widget (we need it to be able to close dialog on error) */
 
-GnomeDialog * fe_window;
+GtkWidget * fe_window;
 
 GtkCList * fe_filters_list;
 
@@ -56,6 +56,9 @@ GtkWidget *fe_name_entry;
 
 /* widget for the conditions */
 GtkCList *fe_conditions_list;
+
+/* List of strings in the combo of user headers name */
+GList * fe_user_headers_list;
 
 /* notification field */
 GtkWidget *fe_sound_button;
@@ -154,28 +157,6 @@ build_option_menu(option_list options[], gint num, GtkSignalFunc func)
     return (option_menu);
 }				/* end build_option_menu */
 
-/* Free filters associated with clist row */
-void
-fe_free_associated_filters(void)
-{
-    gint row;
-
-    for (row=0;row<fe_filters_list->rows;row++)
-	libbalsa_filter_free((LibBalsaFilter*)
-                             gtk_clist_get_row_data(fe_filters_list,row),
-                             GINT_TO_POINTER(TRUE));
-}
-
-void
-fe_free_associated_conditions(void)
-{
-    gint row;
-
-    for (row=0; row<fe_conditions_list->rows; row++)
-	libbalsa_condition_free((LibBalsaCondition *)
-                                gtk_clist_get_row_data(fe_conditions_list,row));
-}
-
 static void
 fe_clist_unselect_row(GtkWidget * widget, gint row, gint column, 
                       GdkEventButton *event, gpointer data)
@@ -195,6 +176,7 @@ static GtkWidget *
 build_left_side(void)
 {
     GtkWidget *vbox, *bbox, *button;
+
     GtkWidget *sw;
 
     static gchar *titles[] = { N_("Name") };
@@ -262,8 +244,8 @@ build_left_side(void)
 		       GTK_SIGNAL_FUNC(fe_new_pressed), NULL);
     gtk_container_add(GTK_CONTAINER(bbox), button);
     /* delete button */
-    button = balsa_stock_button_with_label(GNOME_STOCK_MENU_TRASH,
-                                           _("Delete"));
+    fe_delete_button =
+        balsa_stock_button_with_label(GNOME_STOCK_MENU_TRASH, _("Delete"));
     gtk_signal_connect(GTK_OBJECT(fe_delete_button), "clicked",
 		       GTK_SIGNAL_FUNC(fe_delete_pressed), NULL);
     gtk_container_add(GTK_CONTAINER(bbox), fe_delete_button);
@@ -272,24 +254,6 @@ build_left_side(void)
     return vbox;
 }				/* end build_left_side() */
 
-/* Used to populate mailboxes option menu */
-
-static void
-add_mailbox_to_option_menu(GtkCTree * ctree,GtkCTreeNode *node,gpointer menu)
-{
-    GtkWidget * item;
-    BalsaMailboxNode *mbnode = gtk_ctree_node_get_row_data(ctree, node);
-
-    if (mbnode->mailbox) {
-	/* OK this node is a mailbox */
-	item = gtk_menu_item_new_with_label(mbnode->mailbox->name);
-	gtk_object_set_data(GTK_OBJECT(item), "mailbox",
-			    mbnode->mailbox);
-	
-	gtk_menu_append(GTK_MENU(menu), item);
-	gtk_widget_show(item);
-    }
-}
 /*
  * build_match_page()
  *
@@ -396,12 +360,10 @@ build_match_page()
  * Builds the "Action" page of the main notebook
  */
 static GtkWidget *
-build_action_page()
+build_action_page(GtkWindow * window)
 {
     GtkWidget *page, *frame, *table;
-    GtkWidget *box = NULL;
-    GtkWidget *menu;
-    GtkCTreeNode * node;
+    GtkWidget *box;
 
     page = gtk_vbox_new(TRUE, 5);
 
@@ -411,8 +373,9 @@ build_action_page()
     gtk_frame_set_label_align(GTK_FRAME(frame), GTK_POS_LEFT, GTK_POS_TOP);
     gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
     gtk_box_pack_start(GTK_BOX(page), frame, FALSE, FALSE, 2);
+    gtk_container_set_border_width(GTK_CONTAINER(frame), 3);
 
-    table = gtk_table_new(2, 2, FALSE);
+    table = gtk_table_new(3, 2, FALSE);
     gtk_container_add(GTK_CONTAINER(frame), table);
 
     /* Notification buttons */
@@ -451,26 +414,16 @@ build_action_page()
 					      ELEMENTS(fe_actions),
 					      GTK_SIGNAL_FUNC
 					      (fe_action_selected));
-    gtk_box_pack_start(GTK_BOX(box), fe_action_option_menu, TRUE, FALSE,
-		       1);
+    gtk_box_pack_start(GTK_BOX(box), fe_action_option_menu,
+                       TRUE, FALSE, 1);
 
-    /* We populate the option menu with mailboxes name
-     * FIXME : This is done once for all, but user could
-     * remove or add mailboxes behind us : we should connect
-     * ourselves to signals to refresh the options in these cases
-     */
-
-    menu = gtk_menu_new();
-    for(node=gtk_ctree_node_nth(GTK_CTREE(balsa_app.mblist), 0);
-	node; 
-	node=GTK_CTREE_NODE_NEXT(node))
-	gtk_ctree_pre_recursive(GTK_CTREE(balsa_app.mblist), 
-				node,
-				add_mailbox_to_option_menu,
-				menu);
-    fe_mailboxes = gtk_option_menu_new();
-    gtk_option_menu_set_menu(GTK_OPTION_MENU(fe_mailboxes), menu);
-    gtk_option_menu_set_history(GTK_OPTION_MENU(fe_mailboxes), 0);
+    /* FIXME : we use the global mru folder list, perhaps we should use
+       our own. We'll see this later, for now let's make something usable
+       the old way was way too ugly and even unusable for users with zillions
+       of mailboxes. Yes there are ;-)!
+    */
+    fe_mailboxes = balsa_mblist_mru_option_menu(window,
+						&balsa_app.folder_mru);
     gtk_box_pack_start(GTK_BOX(box), fe_mailboxes, TRUE, FALSE, 1);
 
     return page;
@@ -483,7 +436,7 @@ build_action_page()
  * Builds the right side of the dialog
  */
 static GtkWidget *
-build_right_side(void)
+build_right_side(GtkWindow * window)
 {
     GtkWidget *rightside;
     GtkWidget *notebook, *page;
@@ -499,7 +452,7 @@ build_right_side(void)
     page = build_match_page();
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook),
 			     page, gtk_label_new(_("Match")));
-    page = build_action_page();
+    page = build_action_page(window);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook),
 			     page, gtk_label_new(_("Action")));
 
@@ -552,7 +505,7 @@ filters_edit_dialog(void)
 	return;
     }
     if (fe_already_open) {
-	gdk_window_raise(GTK_WIDGET(fe_window)->window);
+	gdk_window_raise(fe_window->window);
 	return;
     }
     
@@ -560,21 +513,27 @@ filters_edit_dialog(void)
 
     piece = build_left_side();
 
-    fe_window = GNOME_DIALOG(gnome_dialog_new(_("Balsa Filters"),
-					      GNOME_STOCK_BUTTON_OK,
-					      GNOME_STOCK_BUTTON_CANCEL,
-					      GNOME_STOCK_BUTTON_HELP, NULL));
+    fe_window = gtk_dialog_new_with_buttons(_("Balsa Filters"),
+                                            NULL, 0, /* FIXME */
+                                            GTK_STOCK_OK,
+                                            GTK_RESPONSE_OK,
+                                            GTK_STOCK_CANCEL,
+                                            GTK_RESPONSE_CANCEL,
+                                            GTK_STOCK_HELP,
+                                            GTK_RESPONSE_HELP,
+					    NULL);
 
-    gtk_signal_connect(GTK_OBJECT(fe_window), "clicked",
-                       GTK_SIGNAL_FUNC(fe_dialog_button_clicked), NULL);
+    gtk_signal_connect(GTK_OBJECT(fe_window), "response",
+                       GTK_SIGNAL_FUNC(fe_dialog_response), NULL);
     gtk_signal_connect(GTK_OBJECT(fe_window), "destroy",
 		       GTK_SIGNAL_FUNC(fe_destroy_window_cb), NULL);
 
     gtk_window_set_policy (GTK_WINDOW (fe_window), TRUE, TRUE, FALSE);
+    gtk_window_set_wmclass(GTK_WINDOW (fe_window), "filter-edit", "Balsa");
 
     /* main hbox */
     hbox = gtk_hbox_new(FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(fe_window->vbox),
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(fe_window)->vbox),
 		       hbox, TRUE, TRUE, 0);
 
     gtk_box_pack_start(GTK_BOX(hbox), piece, FALSE, FALSE, 2);
@@ -582,10 +541,11 @@ filters_edit_dialog(void)
     sep = gtk_vseparator_new();
     gtk_box_pack_start(GTK_BOX(hbox), sep, FALSE, FALSE, 2);
 
-    fe_right_page = piece = build_right_side();
+    fe_right_page = build_right_side(GTK_WINDOW(fe_window));
     gtk_widget_set_sensitive(fe_right_page, FALSE);
-    gtk_box_pack_start(GTK_BOX(hbox), piece, TRUE, TRUE, 2);
+    gtk_box_pack_start(GTK_BOX(hbox), fe_right_page, TRUE, TRUE, 2);
 
+    fe_user_headers_list=NULL;
     /* Populate the clist of filters */
 
     for(filter_list=balsa_app.filters; 
@@ -617,6 +577,12 @@ filters_edit_dialog(void)
             LibBalsaCondition *c = (LibBalsaCondition*)cnds->data;
 	    cpfil->conditions = 
                 g_slist_prepend(cpfil->conditions,libbalsa_condition_clone(c));
+
+	    /* If this condition is a match on a user header,
+	       add the user header name to the combo list */
+	    if (CONDITION_CHKMATCH(c,CONDITION_MATCH_US_HEAD) &&
+		c->user_header && c->user_header[0])
+		fe_add_new_user_header(c->user_header);
         }
 	cpfil->conditions=g_slist_reverse(cpfil->conditions);
 
@@ -630,9 +596,11 @@ filters_edit_dialog(void)
 	gtk_clist_set_row_data(fe_filters_list,row,(gpointer)cpfil);
     }
 
+    /* To make sure we have at least one item in the combo list */
+    fe_add_new_user_header("X-Mailer");
     if (filter_errno!=FILTER_NOERR) {
 	filter_perror(filter_strerror(filter_errno));
-	gnome_dialog_close(fe_window);
+	gtk_widget_destroy(GTK_WIDGET(fe_window));
 	return;
     }
 

@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-09-21 18:29-0400\n"
-"PO-Revision-Date: 2004-09-21 14:48-0400\n"
+"POT-Creation-Date: 2004-09-26 12:51-0400\n"
+"PO-Revision-Date: 2004-09-26 14:48-0400\n"
 "Last-Translator: Adam Weinberger <adamw@gnome.org>\n"
 "Language-Team: en_CA <adamw@FreeBSD.org>\n"
 "MIME-Version: 1.0\n"
@@ -150,7 +150,7 @@ msgstr "Error when trashing messages"
 msgid "Error when moving messages"
 msgstr "Error when moving messages"
 
-#: libbalsa/gmime-gpgme-context.c:287 libbalsa/rfc3156.c:1383
+#: libbalsa/gmime-gpgme-context.c:288 libbalsa/rfc3156.c:1383
 #, c-format
 msgid ""
 "The passphrase for this key was bad, please try again!\n"
@@ -161,7 +161,7 @@ msgstr ""
 "\n"
 "Key: %s"
 
-#: libbalsa/gmime-gpgme-context.c:292 libbalsa/rfc3156.c:1388
+#: libbalsa/gmime-gpgme-context.c:293 libbalsa/rfc3156.c:1388
 #, c-format
 msgid ""
 "Please enter the passphrase for the secret key!\n"
@@ -172,77 +172,77 @@ msgstr ""
 "\n"
 "Key: %s"
 
-#: libbalsa/gmime-gpgme-context.c:410 libbalsa/gmime-gpgme-context.c:492
-#: libbalsa/gmime-gpgme-context.c:503 libbalsa/gmime-gpgme-context.c:618
-#: libbalsa/gmime-gpgme-context.c:708
+#: libbalsa/gmime-gpgme-context.c:411 libbalsa/gmime-gpgme-context.c:493
+#: libbalsa/gmime-gpgme-context.c:504 libbalsa/gmime-gpgme-context.c:619
+#: libbalsa/gmime-gpgme-context.c:709
 #, c-format
 msgid "%s: could not get data from stream: %s"
 msgstr "%s: could not get data from stream: %s"
 
-#: libbalsa/gmime-gpgme-context.c:418 libbalsa/gmime-gpgme-context.c:627
-#: libbalsa/gmime-gpgme-context.c:716
+#: libbalsa/gmime-gpgme-context.c:419 libbalsa/gmime-gpgme-context.c:628
+#: libbalsa/gmime-gpgme-context.c:717
 #, c-format
 msgid "%s: could not create new data object: %s"
 msgstr "%s: could not create new data object: %s"
 
-#: libbalsa/gmime-gpgme-context.c:428
+#: libbalsa/gmime-gpgme-context.c:429
 #, c-format
 msgid "%s: signing failed: %s"
 msgstr "%s: signing failed: %s"
 
-#: libbalsa/gmime-gpgme-context.c:517
+#: libbalsa/gmime-gpgme-context.c:518
 #, c-format
 msgid "%s: signature verification failed: %s"
 msgstr "%s: signature verification failed: %s"
 
-#: libbalsa/gmime-gpgme-context.c:582
+#: libbalsa/gmime-gpgme-context.c:583
 msgid "combined signing and encryption is only defined for RFC 2440"
 msgstr "Combined signing and encryption is only defined for RFC 2440"
 
-#: libbalsa/gmime-gpgme-context.c:652
+#: libbalsa/gmime-gpgme-context.c:653
 #, c-format
 msgid "%s: signing and encryption failed: %s"
 msgstr "%s: signing and encryption failed: %s"
 
-#: libbalsa/gmime-gpgme-context.c:656
+#: libbalsa/gmime-gpgme-context.c:657
 #, c-format
 msgid "%s: encryption failed: %s"
 msgstr "%s: encryption failed: %s"
 
-#: libbalsa/gmime-gpgme-context.c:728
+#: libbalsa/gmime-gpgme-context.c:729
 #, c-format
 msgid "%s: decryption failed: %s"
 msgstr "%s: decryption failed: %s"
 
-#: libbalsa/gmime-gpgme-context.c:763
+#: libbalsa/gmime-gpgme-context.c:764
 #, c-format
 msgid "%s: could not create context: %s"
 msgstr "%s: could not create context: %s"
 
-#: libbalsa/gmime-gpgme-context.c:819
+#: libbalsa/gmime-gpgme-context.c:820
 msgid "the crypto engine for protocol OpenPGP is not available"
 msgstr "the crypto engine for protocol OpenPGP is not available"
 
-#: libbalsa/gmime-gpgme-context.c:829
+#: libbalsa/gmime-gpgme-context.c:830
 msgid "the crypto engine for protocol CMS is not available"
 msgstr "the crypto engine for protocol CMS is not available"
 
-#: libbalsa/gmime-gpgme-context.c:836
+#: libbalsa/gmime-gpgme-context.c:837
 #, c-format
 msgid "invalid crypto engine %d"
 msgstr "invalid crypto engine %d"
 
-#: libbalsa/gmime-gpgme-context.c:865 libbalsa/gmime-gpgme-context.c:876
+#: libbalsa/gmime-gpgme-context.c:866 libbalsa/gmime-gpgme-context.c:877
 #, c-format
 msgid "%s: could not list keys for %s: %s"
 msgstr "%s: could not list keys for %s: %s"
 
-#: libbalsa/gmime-gpgme-context.c:888
+#: libbalsa/gmime-gpgme-context.c:889
 #, c-format
 msgid "%s: could not find a key for %s"
 msgstr "%s: could not find a key for %s"
 
-#: libbalsa/gmime-gpgme-context.c:900
+#: libbalsa/gmime-gpgme-context.c:901
 #, c-format
 msgid "%s: multiple keys for %s"
 msgstr "%s: multiple keys for %s"
@@ -2537,7 +2537,7 @@ msgstr "Revert"
 
 #: src/filter-edit-dialog.c:481
 msgid "A filter run dialog is open.Close it before you can modify filters."
-msgstr "A filter run dialog is open.Close it before you can modify filters."
+msgstr "A filter run dialogue is open.Close it before you can modify filters."
 
 #: src/filter-edit-dialog.c:494
 msgid "Balsa Filters"
@@ -2558,7 +2558,7 @@ msgid ""
 "There are opened filter run dialogs, close them before you can modify "
 "filters."
 msgstr ""
-"There are opened filter run dialogs, close them before you can modify "
+"There are opened filter run dialogues, close them before you can modify "
 "filters."
 
 #: src/filter-export-dialog.c:73
@@ -2623,7 +2623,7 @@ msgid ""
 "The filters dialog is opened, close it before you can run filters on any "
 "mailbox"
 msgstr ""
-"The filters dialog is opened, close it before you can run filters on any "
+"The filters dialogue is opened, close it before you can run filters on any "
 "mailbox"
 
 #: src/folder-conf.c:269
@@ -4352,7 +4352,7 @@ msgstr "percent"
 
 #: src/pref-manager.c:2088
 msgid "Display Progress Dialog"
-msgstr "Display Progress Dialog"
+msgstr "Display Progress Dialogue"
 
 #: src/pref-manager.c:2113
 msgid "Date encoding (for strftime):"
@@ -4574,7 +4574,7 @@ msgstr "Show nothing"
 
 #: src/pref-manager.c:2999
 msgid "Show dialog"
-msgstr "Show dialog"
+msgstr "Show dialogue"
 
 #: src/pref-manager.c:3000
 msgid "Show in list"
@@ -4679,7 +4679,7 @@ msgid ""
 "Use the \"Fonts\" page on the \"Print message\" dialog to change it."
 msgstr ""
 "Balsa could not find font \"%s\".\n"
-"Use the \"Fonts\" page on the \"Print message\" dialog to change it."
+"Use the \"Fonts\" page on the \"Print message\" dialogue to change it."
 
 #: src/print.c:1787
 msgid "Balsa: message print preview"
@@ -5322,7 +5322,7 @@ msgstr "Store Address"
 
 #: src/store-address.c:193
 msgid "Save this address and close the dialog?"
-msgstr "Save this address and close the dialog?"
+msgstr "Save this address and close the dialogue?"
 
 #: src/store-address.c:210
 msgid "No address book selected...."

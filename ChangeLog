@@ -1,3 +1,8 @@
+2004-12-01 08:19  PeterB
+
+	* src/balsa-index.c: block "selection-changed" signal while
+	collapsing all threads.
+
 2004-11-30 19:57  PeterB
 
 	* libbalsa/misc.c: for a GtkTreeView, expand-all before select-all.

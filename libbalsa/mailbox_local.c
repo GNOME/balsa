@@ -193,7 +193,7 @@ libbalsa_mailbox_local_new(const gchar * path, gboolean create)
 */
 gint
 libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
-				const gchar * path)
+                                const gchar * path)
 {
     int i = 0;
 
@@ -201,30 +201,37 @@ libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
     g_return_val_if_fail(path, -1);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox), -1);
 
-    if ( LIBBALSA_MAILBOX(mailbox)->url != NULL ) {
-	const gchar* cur_path = libbalsa_mailbox_local_get_path(mailbox);
-	if (g_ascii_strcasecmp(path, cur_path) == 0)
-	    return 0;
-	else 
-	    i = rename(cur_path, path);
+    if (LIBBALSA_MAILBOX(mailbox)->url != NULL) {
+        const gchar *cur_path = libbalsa_mailbox_local_get_path(mailbox);
+        if (g_ascii_strcasecmp(path, cur_path) == 0)
+            return 0;
+        else {
+            gint exists = access(path, F_OK);
+            if (exists == 0) {  /* 0 == file does exist */
+                i = -1;
+                errno = EEXIST;
+            } else
+                i = rename(cur_path, path);
+        }
     } else {
-	if(LIBBALSA_IS_MAILBOX_MAILDIR(mailbox))
-	    i = libbalsa_mailbox_maildir_create(path, TRUE,
+        if (LIBBALSA_IS_MAILBOX_MAILDIR(mailbox))
+            i = libbalsa_mailbox_maildir_create(path, TRUE,
                                                 LIBBALSA_MAILBOX_MAILDIR
-						(mailbox));
-	else if(LIBBALSA_IS_MAILBOX_MH(mailbox))
-	    i = libbalsa_mailbox_mh_create(path, TRUE);
-	else if(LIBBALSA_IS_MAILBOX_MBOX(mailbox))
-	    i = libbalsa_mailbox_mbox_create(path, TRUE);	    
+                                                (mailbox));
+        else if (LIBBALSA_IS_MAILBOX_MH(mailbox))
+            i = libbalsa_mailbox_mh_create(path, TRUE);
+        else if (LIBBALSA_IS_MAILBOX_MBOX(mailbox))
+            i = libbalsa_mailbox_mbox_create(path, TRUE);
     }
 
     /* update mailbox data */
-    if(!i) {
-	g_free(LIBBALSA_MAILBOX(mailbox)->url);
-	LIBBALSA_MAILBOX(mailbox)->url = g_strconcat("file://", path, NULL);
-	return 0;
+    if (i == 0) {
+        g_free(LIBBALSA_MAILBOX(mailbox)->url);
+        LIBBALSA_MAILBOX(mailbox)->url =
+            g_strconcat("file://", path, NULL);
+        return 0;
     } else
-	return errno ? errno : -1;
+        return errno ? errno : -1;
 }
 
 void

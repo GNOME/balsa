@@ -20,8 +20,6 @@ Nat's ideas:
  * In the message composition window, hitting TAB will bring the cursor to
    the next text entry box.  Make it so that hitting ENTER does the same thing.
 
- * Add a "cancel mail" button to the message composition window.
-
  * XmHTML doesn't seem to support cutting of text for pasting.  This
    sucks.  Fix it.
 

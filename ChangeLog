@@ -1,6 +1,21 @@
-2003-12-30 08:02  PeterB
+2003-12-30 14:15  PeterB
 
-	* src/main-window.c: Compile without gtkhtml.
+	* libbalsa/: html.c, html.h: Provide wrappers to insulate the rest
+	of Balsa from the differences between the gtkhtml[23] APIs.
+	* libbalsa/html.c: file html.c was initially added on branch
+	balsa-2-0.
+	* libbalsa/html.h: file html.h was initially added on branch
+	balsa-2-0.
+	* src/main-window.c: Use copy-text capability of gtkhtml3, when
+	installed; compile without gtkhtml.
+	* src/: balsa-message.c, balsa-message.h, print.c: Use new html api
+	for rendering and printing.
+	* libbalsa/misc.c: Use select-all capability of gtkhtml3 when
+	installed.
+	* libbalsa/mime.c: Include text of html parts when replying.
+	* libbalsa/Makefile.am: Add html.[ch] to dependencies.
+	* configure.in: Detect gtkhtml3 if installed in preference to
+	gtkhtml2, when --enable-gtkhtml is used.
 
 2003-12-26 21:44  PeterB
 

@@ -1,3 +1,7 @@
+2004-02-26  Abel Cheung  <maddog@linux.org.hk>
+
+	* balsa.desktop: Fix badly encoded strings.
+
 2004-02-25  Pawel Salek
 
 	* libbalsa/imap/imap-commands.[hc]: add imap_mbox_filter_msgnos().

@@ -1543,10 +1543,15 @@ libbalsa_mailbox_messages_change_flags(LibBalsaMailbox * mailbox,
 {
     gboolean retval;
     guint i;
-    gboolean real_flag = (set | clear) & LIBBALSA_MESSAGE_FLAGS_REAL;
+    gboolean real_flag;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+
+    real_flag = (set | clear) & LIBBALSA_MESSAGE_FLAGS_REAL;
     g_return_val_if_fail(!mailbox->readonly || !real_flag, FALSE);
+
+    if (msgnos->len == 0)
+	return TRUE;
 
     if (real_flag)
 	libbalsa_lock_mailbox(mailbox);

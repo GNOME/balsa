@@ -292,7 +292,7 @@ fe_negate_condition(GtkWidget * widget, gpointer data)
     case CONDITION_DATE:   
         fe_update_label(fe_type_date_label,   &date_label);   break;
     case CONDITION_FLAG:   
-        fe_update_label(fe_type_flag_label,   &type_label);
+        fe_update_label(fe_type_flag_label,   &flags_label);
    case CONDITION_NONE:
         /* to avoid warnings */
     }
@@ -520,14 +520,17 @@ fill_condition_widgets(LibBalsaCondition* cnd)
     /* Next update type specific fields */
     switch (cnd->type) {
     case CONDITION_SIMPLE:
-        gtk_entry_set_text(GTK_ENTRY(fe_type_simple_entry),cnd->match.string==NULL ? "" : cnd->match.string);
-        fe_update_type_simple_label();
+        gtk_entry_set_text(GTK_ENTRY(fe_type_simple_entry),
+                           cnd->match.string==NULL ? "" : cnd->match.string);
+        fe_update_label(fe_type_simple_label, &simple_label);
         break;
     case CONDITION_REGEX:
         for (regex=cnd->match.regexs;regex;regex=g_slist_next(regex))
-            gtk_clist_append(fe_type_regex_list,&(((LibBalsaConditionRegex *)regex->data)->string));
-        gtk_widget_set_sensitive(fe_regex_remove_button,cnd->match.regexs!=NULL);
-        fe_update_type_regex_label();
+            gtk_clist_append(fe_type_regex_list,
+                             &((LibBalsaConditionRegex*)regex->data)->string);
+        gtk_widget_set_sensitive(fe_regex_remove_button,
+                                 cnd->match.regexs!=NULL);
+        fe_update_label(fe_type_regex_label, &regex_label);
         break;
     case CONDITION_DATE:
         if (cnd->match.interval.date_low==0) str[0]='\0';
@@ -542,14 +545,14 @@ fill_condition_widgets(LibBalsaCondition* cnd)
             strftime(str,sizeof(str),"%x",date);
         }
         gtk_entry_set_text(GTK_ENTRY(fe_type_date_high_entry),str);
-        fe_update_type_date_label();
+        fe_update_label(fe_type_date_label, &date_label);
         break;
     case CONDITION_FLAG:
         for (row=0;row<2;row++)
             for (col=0;col<2;col++)
                 gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_type_flag_buttons[row*2+col]),
                                              cnd->match.flags & (1 << (row*2+col+1)));
-        fe_update_type_flag_label();
+        fe_update_label(fe_type_flag_label,   &flags_label);
         break;
     case CONDITION_NONE:
         /* To avoid warnings :), we should never get there */
@@ -655,7 +658,8 @@ static void build_type_notebook()
     page = gtk_table_new(5, 6, FALSE);
     gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook), page, NULL);
 
-    fe_type_regex_label = gtk_label_new(_("One of the regular expressions matches"));
+    fe_type_regex_label = 
+        gtk_label_new(_("One of the regular expressions matches"));
     gtk_table_attach(GTK_TABLE(page),
                      fe_type_regex_label,
                      0, 5, 0, 1,

@@ -1994,7 +1994,6 @@ mail_progress_notify_cb()
     void *msgbuffer;
     uint count;
     gfloat fraction;
-    GtkWidget *errorbox;
 
     msgbuffer = g_malloc(MSG_BUFFER_SIZE);
     count = read(mail_thread_pipes[0], msgbuffer, MSG_BUFFER_SIZE);
@@ -2097,14 +2096,8 @@ mail_progress_notify_cb()
             break;
 
         case LIBBALSA_NTFY_ERROR:
-            errorbox = 
-                gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
-                                       GTK_DIALOG_DESTROY_WITH_PARENT,
-                                       GTK_MESSAGE_ERROR,
-                                       GTK_BUTTONS_OK,
-                                       threadmessage->message_string);
-            gtk_dialog_run(GTK_DIALOG(errorbox));
-            gtk_widget_destroy(errorbox);
+            balsa_information(LIBBALSA_INFORMATION_ERROR,
+                              threadmessage->message_string);
             break;
 
         default:

@@ -135,13 +135,8 @@ static void
 store_address_from_entries(struct store_address_info * info,
                            GtkWidget ** entries)
 {
-    LibBalsaAddress *address = NULL;
-    GtkWidget *box = NULL;
-    gchar *msg = NULL;
-    gint cnt = 0;
-    gint cnt2 = 0;
-    gchar *entry_str = NULL;
-    gint entry_str_len = 0;
+    LibBalsaAddress *address;
+    gint cnt;
 
     if (info->current_address_book == NULL) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
@@ -152,31 +147,20 @@ store_address_from_entries(struct store_address_info * info,
     /* FIXME: This problem should be solved in the VCard implementation in libbalsa */
     /* semicolons mess up how GnomeCard processes the fields, so disallow them */
     for (cnt = 0; cnt < NUM_FIELDS; cnt++) {
-        entry_str = gtk_editable_get_chars(GTK_EDITABLE(entries[cnt]), 0, -1);
-        entry_str_len = strlen(entry_str);
+        const gchar *entry_str =
+            gtk_entry_get_text(GTK_ENTRY(entries[cnt]));
 
-        for (cnt2 = 0; cnt2 < entry_str_len; cnt2++) {
-            if (entry_str[cnt2] == ';') {
-                msg = _("Sorry, no semicolons are allowed in the name!\n");
+        if (strchr(entry_str, ';')) {
+            balsa_information(LIBBALSA_INFORMATION_ERROR,
+                              _("Sorry, no semicolons are allowed "
+                                "in the name!\n"));
 
-                gtk_editable_select_region(GTK_EDITABLE(entries[cnt]),
-                                           0, -1);
-                
-                gtk_widget_grab_focus(GTK_WIDGET(entries[cnt]));
-                
-                box = gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
-                                             GTK_DIALOG_MODAL,
-                                             GTK_MESSAGE_ERROR,
-                                             GTK_BUTTONS_CLOSE,
-                                             msg);
-                
-                gtk_dialog_run(GTK_DIALOG(box));
-                gtk_widget_destroy(box);
-                g_free(entry_str);
-                return;
-            }
+            gtk_editable_select_region(GTK_EDITABLE(entries[cnt]), 0, -1);
+
+            gtk_widget_grab_focus(GTK_WIDGET(entries[cnt]));
+
+            return;
         }
-        g_free(entry_str);
     }
 
     address = libbalsa_address_new();

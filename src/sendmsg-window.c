@@ -1382,20 +1382,13 @@ gboolean
 add_attachment(GnomeIconList * iconlist, char *filename, 
                gboolean is_a_temp_file, const gchar *forced_mime_type)
 {
-    GtkWidget *msgbox;
     gchar *content_type = NULL;
     gchar *pix, *err_msg;
 
     if (balsa_app.debug)
 	fprintf(stderr, "Trying to attach '%s'\n", filename);
     if ( (err_msg=check_if_regular_file(filename)) != NULL) {
-	msgbox = gtk_message_dialog_new(NULL,
-                                        GTK_DIALOG_MODAL,
-                                        GTK_MESSAGE_ERROR,
-                                        GTK_BUTTONS_CANCEL,
-                                        err_msg);
-	gtk_dialog_run(GTK_DIALOG(msgbox));
-        gtk_widget_destroy(msgbox);
+        balsa_information(LIBBALSA_INFORMATION_ERROR, err_msg);
 	g_free(err_msg);
         g_free(content_type);
 	return FALSE;
@@ -3257,20 +3250,13 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 		    &bytes_read, &bytes_written, &err);
 
     g_free(res);
-    if(err) {
-	gchar *err_msg = 
-	    g_strdup_printf(_("The message cannot be encoded in charset %s.\n"
-			      "Please choose a language for this message."),
-			    bsmsg->charset);
-	GtkWidget* msgbox = gtk_message_dialog_new(GTK_WINDOW(bsmsg->window),
-						   GTK_DIALOG_MODAL,
-						   GTK_MESSAGE_ERROR,
-						   GTK_BUTTONS_OK,
-						   err_msg);
-	gtk_dialog_run(GTK_DIALOG(msgbox));
-        gtk_widget_destroy(msgbox);
-	g_error_free(err);
-	return FALSE;
+    if (err) {
+        balsa_information(LIBBALSA_INFORMATION_ERROR,
+                          _("The message cannot be encoded in charset %s.\n"
+                            "Please choose a language for this message."),
+                          bsmsg->charset);
+        g_error_free(err);
+        return FALSE;
     }
 
     message = bsmsg2message(bsmsg);

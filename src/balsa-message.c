@@ -357,21 +357,10 @@ save_dialog_ok(GtkWidget* save_dialog, BalsaPartInfo * info)
     
     if ( do_save ) {
 	result = libbalsa_message_body_save(info->body, NULL, filename);
-	if (!result) {
-	    gchar *msg;
-	    GtkWidget *msgbox;
-	    
-	    msg = g_strdup_printf(_(" Could not save %s: %s"), 
-				  filename, strerror(errno));
-	    msgbox = gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
-                                            GTK_DIALOG_DESTROY_WITH_PARENT,
-                                            GTK_MESSAGE_ERROR,
-                                            GTK_BUTTONS_CLOSE,
-                                            msg);
-	    g_free(msg);
-	    gtk_dialog_run(GTK_DIALOG(msgbox));
-            gtk_widget_destroy(msgbox);
-	}
+	if (!result)
+            balsa_information(LIBBALSA_INFORMATION_ERROR,
+                              _(" Could not save %s: %s"),
+                              filename, strerror(errno));
     }
 }
 

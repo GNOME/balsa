@@ -115,16 +115,35 @@ balsa_information(LibBalsaInformationType type, const char *fmt, ...)
 static void
 balsa_information_dialog(LibBalsaInformationType type, char *msg)
 {
+    GtkMessageType message_type;
     GtkWidget *messagebox;
 
-    messagebox =
-	gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
-                               GTK_DIALOG_DESTROY_WITH_PARENT,
-                               GTK_MESSAGE_INFO,
-                               GTK_BUTTONS_CLOSE,msg);
+    switch (type) {
+    case LIBBALSA_INFORMATION_MESSAGE:
+        message_type = GTK_MESSAGE_INFO;
+        break;
+    case LIBBALSA_INFORMATION_WARNING:
+        message_type = GTK_MESSAGE_WARNING;
+        break;
+    case LIBBALSA_INFORMATION_ERROR:
+        message_type = GTK_MESSAGE_ERROR;
+        break;
+    case LIBBALSA_INFORMATION_DEBUG:
+        message_type = GTK_MESSAGE_INFO;
+        break;
+    case LIBBALSA_INFORMATION_FATAL:
+        message_type = GTK_MESSAGE_ERROR;
+        break;
+    default:
+        message_type = GTK_MESSAGE_INFO;
+        break;
+    }
 
-    gtk_window_set_position(GTK_WINDOW(messagebox), GTK_WIN_POS_CENTER);
-    gtk_window_set_wmclass(GTK_WINDOW(messagebox), "info-dialog", "Balsa");
+    messagebox =
+        gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
+                               GTK_DIALOG_DESTROY_WITH_PARENT,
+                               message_type, GTK_BUTTONS_CLOSE, msg);
+
     gtk_dialog_run(GTK_DIALOG(messagebox));
     gtk_widget_destroy(messagebox);
 }

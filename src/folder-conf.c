@@ -668,14 +668,9 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     if (mn) {
 	/* update */
 	if (!mn->mailbox) {
-            GtkWidget* dlg = 
-                gtk_message_dialog_new
-                (GTK_WINDOW(balsa_app.main_window),
-                 GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR,
-                 GTK_BUTTONS_CLOSE,
-                 _("An IMAP folder that is not a mailbox\n"
-                   "has no properties that can be changed."));
-            gtk_dialog_run(GTK_DIALOG(dlg)); gtk_widget_destroy(dlg);
+            balsa_information(LIBBALSA_INFORMATION_ERROR,
+                              _("An IMAP folder that is not a mailbox\n"
+                                "has no properties that can be changed."));
 	    return;
 	}
 	sdd->mbnode = mn;
@@ -780,15 +775,10 @@ folder_conf_delete(BalsaMailboxNode* mbnode)
     gint response;
 
     if(!mbnode->config_prefix) {
-	ask = 
-            gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
-                                   GTK_DIALOG_MODAL,
-                                   GTK_MESSAGE_ERROR,
-                                   GTK_BUTTONS_CLOSE,
-	    _("This folder is not stored in configuration."
-	      "I do not yet know how to remove it from remote server."));
-	gtk_dialog_run(GTK_DIALOG(ask));
-        gtk_widget_destroy(ask);
+        balsa_information(LIBBALSA_INFORMATION_ERROR,
+	                  _("This folder is not stored in configuration. "
+	                    "I do not yet know how to remove it "
+                            "from remote server."));
 	return;
     }
 	

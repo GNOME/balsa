@@ -231,14 +231,8 @@ balsa_mailbox_node_new(void)
 static void
 dir_conf_edit(BalsaMailboxNode* mb)
 {
-    GtkWidget *err_dialog =
-	gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
-                               GTK_DIALOG_DESTROY_WITH_PARENT,
-                               GTK_MESSAGE_ERROR,
-                               GTK_BUTTONS_CLOSE,
-                               _("The folder edition to be written."));
-    gtk_dialog_run(GTK_DIALOG(err_dialog));
-    gtk_widget_destroy(err_dialog);
+    balsa_information(LIBBALSA_INFORMATION_ERROR,
+                      _("The folder edition to be written."));
 }
 
 static void

@@ -206,15 +206,10 @@ mailbox_conf_delete_cb(GtkWidget * widget, gpointer data)
     BalsaMailboxNode *mbnode =
         balsa_mblist_get_selected_node(balsa_app.mblist);
 
-    if (mbnode->mailbox == NULL) {
-        GtkWidget *err_dialog =
-            gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
-                                   GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR,
-                                   GTK_BUTTONS_CANCEL,
-                                   _("No mailbox selected."));
-        gtk_dialog_run(GTK_DIALOG(err_dialog));
-        gtk_widget_destroy(err_dialog);
-    } else
+    if (mbnode->mailbox == NULL)
+        balsa_information(LIBBALSA_INFORMATION_ERROR,
+                           _("No mailbox selected."));
+    else
 	mailbox_conf_delete(mbnode);
 }
 

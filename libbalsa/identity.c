@@ -23,6 +23,7 @@
 
 #include "config.h"
 #include "identity.h"
+#include "information.h"
 
 /*
  * The class.
@@ -885,7 +886,7 @@ ident_dialog_update(GtkDialog* dlg)
     LibBalsaIdentity* id;
     LibBalsaIdentity* exist_ident;
     LibBalsaAddress* address;
-    GtkWidget* error, *tree;
+    GtkWidget *tree;
     GList **identities, *list;
     gchar* text;
     
@@ -899,15 +900,8 @@ ident_dialog_update(GtkDialog* dlg)
     g_return_val_if_fail(text != NULL, FALSE);
 
     if (text[0] == '\0') {
-        error =
-            gtk_message_dialog_new(GTK_WINDOW(dlg),
-                                   GTK_DIALOG_DESTROY_WITH_PARENT,
-                                   GTK_MESSAGE_ERROR,
-                                   GTK_BUTTONS_CLOSE,
-                                   _("Error: The identity "
-                                     "does not have a name"));
-        gtk_dialog_run(GTK_DIALOG(error));
-        gtk_widget_destroy(error);
+        libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+                             _("Error: The identity does not have a name"));
         return FALSE;
     }
 
@@ -916,15 +910,9 @@ ident_dialog_update(GtkDialog* dlg)
         
         if (g_ascii_strcasecmp(exist_ident->identity_name, text) == 0
             && id != exist_ident) {
-            error = 
-                gtk_message_dialog_new(GTK_WINDOW(dlg),
-                                       GTK_DIALOG_MODAL,
-                                       GTK_MESSAGE_ERROR,
-                                       GTK_BUTTONS_CLOSE,
-                                       _("Error: An identity with that"
-                                         " name already exists"));
-            gtk_dialog_run(GTK_DIALOG(error));
-            gtk_widget_destroy(error);
+            libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+                                 _("Error: An identity with that"
+                                   " name already exists"));
             return FALSE;
         }
     }

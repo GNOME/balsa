@@ -1,3 +1,7 @@
+2003-09-07  Carlos Morgado  <chbm chbm.net>
+
+	* libbalsa/mailbox_mbox.c: plug leak in close, indent
+
 2003-09-06  Magick <magick@Linux-Fan.com>
 
 	*libbalsa/imap/Makefile.am: add imap_private.h

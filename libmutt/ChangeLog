@@ -1,3 +1,7 @@
+2003-01-10  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* parse.c: follow rfc2045 closer.
+
 2003-01-03  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* imap/message.c,imap/imap.h: pull imap_update_header info() out of

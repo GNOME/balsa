@@ -206,47 +206,48 @@ build_left_side ()
 static void 
 build_type_notebook ()
 {
+    GtkWidget *page;
+    GtkWidget *frame;
+    GtkWidget *table;
+    GtkWidget *scroll;
+    GtkWidget *box;
+    GtkWidget *button;
+
     /* The notebook */
     fe_type_notebook = gtk_notebook_new ();
     gtk_notebook_set_show_tabs (GTK_NOTEBOOK (fe_type_notebook),
                                 FALSE);
     gtk_notebook_set_show_border (GTK_NOTEBOOK (fe_type_notebook),
                                   FALSE);
-    gtk_table_attach (GTK_TABLE (fe_notebook_match_page),
-                      fe_type_notebook,
-                      0, 10, 6, 10,
-                      GTK_FILL | GTK_SHRINK | GTK_EXPAND,
-                      GTK_FILL | GTK_SHRINK | GTK_EXPAND,
-                      5, 5);
     gtk_widget_show (fe_type_notebook);
 
   /* The simple page of the type notebook */
-    fe_type_notebook_simple_page = gtk_table_new (5, 5, FALSE);
+    page = gtk_table_new (5, 5, FALSE);
     gtk_notebook_append_page (GTK_NOTEBOOK (fe_type_notebook),
-                              fe_type_notebook_simple_page,
+                              page,
                               NULL);
-    gtk_widget_show (fe_type_notebook_simple_page);
+    gtk_widget_show (page);
 
-    fe_type_simple_frame = gtk_frame_new ("Match in:");
-    gtk_frame_set_label_align (GTK_FRAME (fe_type_simple_frame),
+    frame = gtk_frame_new ("Match in:");
+    gtk_frame_set_label_align (GTK_FRAME (frame),
                                GTK_POS_LEFT,
                                GTK_POS_TOP);
-    gtk_frame_set_shadow_type (GTK_FRAME (fe_type_simple_frame),
+    gtk_frame_set_shadow_type (GTK_FRAME(frame),
                                GTK_SHADOW_ETCHED_IN);
-    gtk_table_attach (GTK_TABLE (fe_type_notebook_simple_page),
-                      fe_type_simple_frame,
+    gtk_table_attach (GTK_TABLE (page),
+                      frame,
                       0, 5, 0, 4,
                       GTK_FILL | GTK_SHRINK | GTK_EXPAND,
                       GTK_FILL | GTK_SHRINK,
                       5, 5);
-    gtk_widget_show (fe_type_simple_frame);
-    fe_type_simple_table = gtk_table_new (3, 3, TRUE);
-    gtk_container_add (GTK_CONTAINER (fe_type_simple_frame),
-                       fe_type_simple_table);
-    gtk_widget_show (fe_type_simple_table);
+    gtk_widget_show (frame);
+    table = gtk_table_new (3, 3, TRUE);
+    gtk_container_add (GTK_CONTAINER (frame),
+                       table);
+    gtk_widget_show (table);
 
     fe_type_simple_all = gtk_check_button_new_with_label ("All");
-    gtk_table_attach (GTK_TABLE (fe_type_simple_table),
+    gtk_table_attach (GTK_TABLE (table),
                       fe_type_simple_all,
                       0, 1, 0, 1,
                       GTK_FILL | GTK_SHRINK | GTK_EXPAND,
@@ -258,7 +259,7 @@ build_type_notebook ()
                         GINT_TO_POINTER (1));
     gtk_widget_show (fe_type_simple_all);
     fe_type_simple_header = gtk_check_button_new_with_label ("Header");
-    gtk_table_attach (GTK_TABLE (fe_type_simple_table),
+    gtk_table_attach (GTK_TABLE (table),
                       fe_type_simple_header,
                       1, 2, 0, 1,
                       GTK_FILL | GTK_SHRINK | GTK_EXPAND,
@@ -270,7 +271,7 @@ build_type_notebook ()
                         GINT_TO_POINTER (2));
     gtk_widget_show (fe_type_simple_header);
     fe_type_simple_body = gtk_check_button_new_with_label ("Body");
-    gtk_table_attach (GTK_TABLE (fe_type_simple_table),
+    gtk_table_attach (GTK_TABLE (table),
                       fe_type_simple_body,
                       1, 2, 1, 2,
                       GTK_FILL | GTK_SHRINK | GTK_EXPAND,
@@ -282,7 +283,7 @@ build_type_notebook ()
                         GINT_TO_POINTER (3));
     gtk_widget_show (fe_type_simple_body);
     fe_type_simple_to = gtk_check_button_new_with_label ("To:");
-    gtk_table_attach (GTK_TABLE (fe_type_simple_table),
+    gtk_table_attach (GTK_TABLE (table),
                       fe_type_simple_to,
                       2, 3, 0, 1,
                       GTK_FILL | GTK_SHRINK | GTK_EXPAND,
@@ -294,7 +295,7 @@ build_type_notebook ()
                         GINT_TO_POINTER (4));
     gtk_widget_show (fe_type_simple_to);
     fe_type_simple_from = gtk_check_button_new_with_label ("From:");
-    gtk_table_attach (GTK_TABLE (fe_type_simple_table),
+    gtk_table_attach (GTK_TABLE (table),
                       fe_type_simple_from,
                       2, 3, 1, 2,
                       GTK_FILL | GTK_SHRINK | GTK_EXPAND,
@@ -306,7 +307,7 @@ build_type_notebook ()
                         GINT_TO_POINTER (5));
     gtk_widget_show (fe_type_simple_from);
     fe_type_simple_subject = gtk_check_button_new_with_label ("Subject");
-    gtk_table_attach (GTK_TABLE (fe_type_simple_table),
+    gtk_table_attach (GTK_TABLE (table),
                       fe_type_simple_subject,
                       2, 3, 2, 3,
                       GTK_FILL | GTK_SHRINK | GTK_EXPAND,
@@ -319,7 +320,7 @@ build_type_notebook ()
     gtk_widget_show (fe_type_simple_subject);
 
     fe_type_simple_label = gtk_label_new ("Match string:");
-    gtk_table_attach (GTK_TABLE (fe_type_notebook_simple_page),
+    gtk_table_attach (GTK_TABLE (page),
                       fe_type_simple_label,
                       0, 1, 4, 5,
                       GTK_FILL | GTK_SHRINK | GTK_EXPAND,
@@ -327,7 +328,7 @@ build_type_notebook ()
                       5, 5);
     gtk_widget_show (fe_type_simple_label);
     fe_type_simple_entry = gtk_entry_new_with_max_length (1023);
-    gtk_table_attach (GTK_TABLE (fe_type_notebook_simple_page),
+    gtk_table_attach (GTK_TABLE (page),
                       fe_type_simple_entry,
                       1, 5, 4, 5,
                       GTK_FILL | GTK_SHRINK | GTK_EXPAND,
@@ -337,64 +338,64 @@ build_type_notebook ()
 
   /* The regex page of the type notebook */
 
-    fe_type_notebook_regex_page = gtk_table_new (5, 5, FALSE);
+    page = gtk_table_new (5, 5, FALSE);
     gtk_notebook_append_page (GTK_NOTEBOOK (fe_type_notebook),
-                              fe_type_notebook_regex_page,
+                              page,
                               NULL);
-    gtk_widget_show (fe_type_notebook_regex_page);
+    gtk_widget_show (page);
 
-    fe_type_regex_scroll = gtk_scrolled_window_new (NULL, NULL);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (fe_type_regex_scroll),
+    scroll = gtk_scrolled_window_new (NULL, NULL);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll),
                                     GTK_POLICY_AUTOMATIC,
                                     GTK_POLICY_AUTOMATIC);
-    gtk_table_attach (GTK_TABLE (fe_type_notebook_regex_page),
-                      fe_type_regex_scroll,
+    gtk_table_attach (GTK_TABLE (page),
+                      scroll,
                       0, 5, 0, 3,
                       GTK_FILL | GTK_SHRINK | GTK_EXPAND,
                       GTK_FILL | GTK_SHRINK | GTK_EXPAND,
                       2, 2);
-    gtk_widget_show (fe_type_regex_scroll);
+    gtk_widget_show (scroll);
     fe_type_regex_list = gtk_list_new ();
     gtk_list_set_selection_mode (GTK_LIST (fe_type_regex_list),
                                  GTK_SELECTION_SINGLE);
     gtk_scrolled_window_add_with_viewport (
-        GTK_SCROLLED_WINDOW (fe_type_regex_scroll),
+        GTK_SCROLLED_WINDOW (scroll),
         fe_type_regex_list);
     gtk_widget_show (fe_type_regex_list);
 
-    fe_type_regex_box = gtk_hbox_new (TRUE, 5);
-    gtk_table_attach (GTK_TABLE (fe_type_notebook_regex_page),
-                      fe_type_regex_box,
+    box = gtk_hbox_new (TRUE, 5);
+    gtk_table_attach (GTK_TABLE (page),
+                      box,
                       0, 5, 3, 4,
                       GTK_FILL | GTK_SHRINK | GTK_EXPAND,
                       GTK_SHRINK,
                       2, 2);
-    gtk_widget_show (fe_type_regex_box);
-    fe_type_regex_add = gtk_button_new_with_label ("Add");
-    gtk_box_pack_start (GTK_BOX (fe_type_regex_box),
-                        fe_type_regex_add,
+    gtk_widget_show (box);
+    button = gtk_button_new_with_label ("Add");
+    gtk_box_pack_start (GTK_BOX (box),
+                        button,
                         TRUE,
                         TRUE,
                         0);
-    gtk_signal_connect (GTK_OBJECT (fe_type_regex_add),
+    gtk_signal_connect (GTK_OBJECT (button),
                         "clicked",
                         GTK_SIGNAL_FUNC (fe_add_pressed),
                         NULL);
-    gtk_widget_show (fe_type_regex_add);
-    fe_type_regex_remove = gtk_button_new_with_label ("Remove");
-    gtk_box_pack_start (GTK_BOX (fe_type_regex_box),
-                        fe_type_regex_remove,
+    gtk_widget_show (button);
+    button = gtk_button_new_with_label ("Remove");
+    gtk_box_pack_start (GTK_BOX (box),
+                        button,
                         TRUE,
                         TRUE,
                         0);
-    gtk_signal_connect (GTK_OBJECT (fe_type_regex_remove),
+    gtk_signal_connect (GTK_OBJECT (button),
                         "clicked",
                         GTK_SIGNAL_FUNC (fe_remove_pressed),
                         NULL);
-    gtk_widget_show (fe_type_regex_remove);
+    gtk_widget_show (button);
 
     fe_type_regex_entry = gtk_entry_new_with_max_length (1023);
-    gtk_table_attach (GTK_TABLE (fe_type_notebook_regex_page),
+    gtk_table_attach (GTK_TABLE (page),
                       fe_type_regex_entry,
                       0, 5, 4, 5,
                       GTK_FILL | GTK_SHRINK | GTK_EXPAND,
@@ -404,14 +405,14 @@ build_type_notebook ()
 
   /* The exec page of the type notebook */
 
-    fe_type_notebook_exec_page = gtk_table_new (5, 5, FALSE);
+    page = gtk_table_new (5, 5, FALSE);
     gtk_notebook_append_page (GTK_NOTEBOOK (fe_type_notebook),
-                              fe_type_notebook_exec_page,
+                              page,
                               NULL);
-    gtk_widget_show (fe_type_notebook_exec_page);
+    gtk_widget_show (page);
 
     fe_type_exec_label = gtk_label_new ("Command:");
-    gtk_table_attach (GTK_TABLE (fe_type_notebook_exec_page),
+    gtk_table_attach (GTK_TABLE (page),
                       fe_type_exec_label,
                       0, 1, 0, 1,
                       GTK_FILL | GTK_SHRINK | GTK_EXPAND,
@@ -419,7 +420,7 @@ build_type_notebook ()
                       5, 5);
     gtk_widget_show (fe_type_exec_label);
     fe_type_exec_entry = gtk_entry_new_with_max_length (1023);
-    gtk_table_attach (GTK_TABLE (fe_type_notebook_exec_page),
+    gtk_table_attach (GTK_TABLE (page),
                       fe_type_exec_entry,
                       1, 5, 0, 1,
                       GTK_FILL | GTK_SHRINK | GTK_EXPAND,
@@ -437,13 +438,17 @@ build_type_notebook ()
 static GtkWidget *
 build_match_page ()
 {
+    GtkWidget *page;
+    GtkWidget *frame;
+    GtkWidget *box = NULL;
+
     /* The notebook page */
-    fe_notebook_match_page = gtk_table_new (10, 10, FALSE);
+    page = gtk_table_new (10, 10, FALSE);
 
   /* The name entry */
 
     fe_name_label = gtk_label_new ("Filter name:");
-    gtk_table_attach (GTK_TABLE (fe_notebook_match_page),
+    gtk_table_attach (GTK_TABLE (page),
                       fe_name_label,
                       0, 2, 0, 1,
                       GTK_FILL | GTK_SHRINK | GTK_EXPAND,
@@ -451,7 +456,7 @@ build_match_page ()
                       5, 5);
     gtk_widget_show (fe_name_label);
     fe_name_entry = gtk_entry_new_with_max_length (256);
-    gtk_table_attach (GTK_TABLE (fe_notebook_match_page),
+    gtk_table_attach (GTK_TABLE (page),
                       fe_name_entry,
                       2, 10, 0, 1,
                       GTK_FILL | GTK_SHRINK | GTK_EXPAND,
@@ -461,28 +466,28 @@ build_match_page ()
 
   /* The "Process when:" option menu */
 
-    fe_when_frame = gtk_frame_new ("Process when:");
-    gtk_frame_set_label_align (GTK_FRAME (fe_when_frame),
+    frame = gtk_frame_new ("Process when:");
+    gtk_frame_set_label_align (GTK_FRAME (frame),
                                GTK_POS_LEFT,
                                GTK_POS_TOP);
-    gtk_frame_set_shadow_type (GTK_FRAME (fe_when_frame),
+    gtk_frame_set_shadow_type (GTK_FRAME (frame),
                                GTK_SHADOW_ETCHED_IN);
-    gtk_table_attach (GTK_TABLE (fe_notebook_match_page),
-                      fe_when_frame,
+    gtk_table_attach (GTK_TABLE (page),
+                      frame,
                       5, 10, 1, 2,
                       GTK_FILL | GTK_SHRINK | GTK_EXPAND,
                       GTK_SHRINK,
                       5, 5);
-    gtk_widget_show (fe_when_frame);
-    fe_when_box = gtk_vbox_new (TRUE, 5);
-    gtk_container_add (GTK_CONTAINER (fe_when_frame),
-                       fe_when_box);
-    gtk_widget_show (fe_when_box);
+    gtk_widget_show (frame);
+    box = gtk_vbox_new (TRUE, 5);
+    gtk_container_add (GTK_CONTAINER (frame),
+                       box);
+    gtk_widget_show (box);
 
     fe_when_option_menu = build_option_menu (fe_process_when,
                                              ELEMENTS(fe_process_when),
                                              NULL);
-    gtk_box_pack_start (GTK_BOX (fe_when_box),
+    gtk_box_pack_start (GTK_BOX (box),
                         fe_when_option_menu,
                         TRUE,
                         FALSE,
@@ -492,28 +497,28 @@ build_match_page ()
 
   /* The "Run on:" option menu */
 
-    fe_group_frame = gtk_frame_new ("Run on:");
-    gtk_frame_set_label_align (GTK_FRAME (fe_group_frame),
+    frame = gtk_frame_new ("Run on:");
+    gtk_frame_set_label_align (GTK_FRAME (frame),
                                GTK_POS_LEFT,
                                GTK_POS_TOP);
-    gtk_frame_set_shadow_type (GTK_FRAME (fe_group_frame),
+    gtk_frame_set_shadow_type (GTK_FRAME (frame),
                                GTK_SHADOW_ETCHED_IN);
-    gtk_table_attach (GTK_TABLE (fe_notebook_match_page),
-                      fe_group_frame,
+    gtk_table_attach (GTK_TABLE (page),
+                      frame,
                       0, 5, 1, 2,
                       GTK_FILL | GTK_SHRINK | GTK_EXPAND,
                       GTK_SHRINK,
                       5, 5);
-    gtk_widget_show (fe_group_frame);
-    fe_group_box = gtk_vbox_new (TRUE, 5);
-    gtk_container_add (GTK_CONTAINER (fe_group_frame),
-                       fe_group_box);
-    gtk_widget_show (fe_group_box);
+    gtk_widget_show (frame);
+    box = gtk_vbox_new (TRUE, 5);
+    gtk_container_add (GTK_CONTAINER (frame),
+                       box);
+    gtk_widget_show (box);
 
     fe_group_option_menu = build_option_menu (fe_run_on,
                                               ELEMENTS(fe_run_on),
                                               NULL);
-    gtk_box_pack_start (GTK_BOX (fe_group_box),
+    gtk_box_pack_start (GTK_BOX (box),
                         fe_group_option_menu,
                         TRUE,
                         FALSE,
@@ -522,29 +527,29 @@ build_match_page ()
 
   /* the type notebook's option menu */
 
-    fe_type_frame = gtk_frame_new ("Search type:");
-    gtk_frame_set_label_align (GTK_FRAME (fe_type_frame),
+    frame = gtk_frame_new ("Search type:");
+    gtk_frame_set_label_align (GTK_FRAME (frame),
                                GTK_POS_LEFT,
                                GTK_POS_TOP);
-    gtk_frame_set_shadow_type (GTK_FRAME (fe_type_frame),
+    gtk_frame_set_shadow_type (GTK_FRAME (frame),
                                GTK_SHADOW_ETCHED_IN);
-    gtk_container_border_width (GTK_CONTAINER (fe_type_frame), 5);
-    gtk_table_attach (GTK_TABLE (fe_notebook_match_page),
-                      fe_type_frame,
+    gtk_container_border_width (GTK_CONTAINER (frame), 5);
+    gtk_table_attach (GTK_TABLE (page),
+                      frame,
                       0, 10, 5, 6,
                       GTK_FILL | GTK_SHRINK | GTK_EXPAND,
                       GTK_SHRINK,
                       5, 5);
-    gtk_widget_show (fe_type_frame);
-    fe_type_box = gtk_hbox_new (FALSE, 5);
-    gtk_container_add (GTK_CONTAINER (fe_type_frame),
-                       fe_type_box);
-    gtk_widget_show (fe_type_box);
+    gtk_widget_show (frame);
+    box = gtk_hbox_new (FALSE, 5);
+    gtk_container_add (GTK_CONTAINER (frame),
+                       box);
+    gtk_widget_show (box);
 
     fe_search_option_menu = build_option_menu (fe_search_type,
                                                ELEMENTS(fe_search_type),
                                                GTK_SIGNAL_FUNC (fe_checkbutton_toggled));
-    gtk_box_pack_start (GTK_BOX (fe_type_box),
+    gtk_box_pack_start (GTK_BOX (box),
                         fe_search_option_menu,
                         FALSE,
                         FALSE,
@@ -552,7 +557,13 @@ build_match_page ()
     gtk_widget_show (fe_search_option_menu);
 
     build_type_notebook ();
-    return fe_notebook_match_page;
+    gtk_table_attach (GTK_TABLE (page),
+                      fe_type_notebook,
+                      0, 10, 6, 10,
+                      GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+                      GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+                      5, 5);
+    return page;
 }				/* end build_match_page() */
 
 
@@ -566,11 +577,8 @@ build_action_page ()
 {
     GtkWidget *page, *frame, *table;
 
-    GtkWidget *button;
-
     GtkWidget *box = NULL;
-    GtkWidget *radio = NULL;
-
+ 
     page = gtk_vbox_new (TRUE, 5);
 
     /* The notification area */
@@ -583,14 +591,14 @@ build_action_page ()
     table = gtk_table_new (2, 2, FALSE);
     gtk_container_add (GTK_CONTAINER (frame), table);
 
-    /* FIXME uh, lots and lots and lots of global vars */
     /* Notification buttons */
-    button = gtk_check_button_new_with_label ("Play sound:");
-    gtk_table_attach (GTK_TABLE (table), button,
+    fe_sound_button = gtk_check_button_new_with_label ("Play sound:");
+    gtk_table_attach (GTK_TABLE (table), fe_sound_button,
                       0, 1, 0, 1,
                       GTK_FILL | GTK_SHRINK | GTK_EXPAND,
                       GTK_SHRINK,
                       5, 5);
+    gtk_widget_show(fe_sound_button);
 
     fe_sound_entry = gnome_file_entry_new("filter_sounds", "Use Sound...");
     gtk_table_attach (GTK_TABLE (table),
@@ -619,34 +627,24 @@ build_action_page ()
     gtk_widget_show (fe_popup_entry);
 
 
-
     /* The action area */
     frame = gtk_frame_new ("Action to perform:");
     gtk_frame_set_label_align (GTK_FRAME (frame), GTK_POS_LEFT, GTK_POS_TOP);
     gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_IN);
     gtk_box_pack_start (GTK_BOX (page), frame, FALSE, FALSE, 2);
 
-    table = gtk_table_new (2, 2, FALSE);
-    gtk_container_add (GTK_CONTAINER (frame), table);
-    gtk_widget_show (table);
+    box = gtk_vbox_new(TRUE, 2);
+    gtk_container_set_border_width(GTK_CONTAINER(frame), 3);
+    gtk_container_add(GTK_CONTAINER(frame), box);
+    gtk_widget_show(box);
 
     fe_action_option_menu = build_option_menu (fe_actions,
                                                ELEMENTS(fe_actions),
                                                GTK_SIGNAL_FUNC (fe_action_selected));
-    gtk_table_attach (GTK_TABLE (table),
-                      fe_action_option_menu,
-                      0, 2, 0, 1,
-                      GTK_FILL | GTK_SHRINK | GTK_EXPAND,
-                      GTK_SHRINK,
-                      5, 5);
+    gtk_box_pack_start(GTK_BOX(box), fe_action_option_menu, TRUE, FALSE, 1);
     gtk_widget_show (fe_action_option_menu);
     fe_action_entry = gtk_entry_new_with_max_length (1023);
-    gtk_table_attach (GTK_TABLE (table),
-                      fe_action_entry,
-                      0, 2, 1, 2,
-                      GTK_FILL | GTK_SHRINK | GTK_EXPAND,
-                      GTK_SHRINK,
-                      5, 5);
+    gtk_box_pack_start(GTK_BOX(box), fe_action_entry, TRUE, FALSE, 1);
     gtk_widget_show (fe_action_entry);
 
     /* The disposition area */
@@ -659,19 +657,19 @@ build_action_page ()
     box = gtk_vbox_new (TRUE, 2);
     gtk_container_add (GTK_CONTAINER (frame), box);
 
-    fe_disp_place = radio = gtk_radio_button_new_with_label (NULL,
+    fe_disp_place = gtk_radio_button_new_with_label (NULL,
                                                              "Place/leave in default folder");
-    gtk_box_pack_start (GTK_BOX (box), radio, TRUE, FALSE, 1);
+    gtk_box_pack_start (GTK_BOX (box), fe_disp_place, TRUE, FALSE, 1);
 
-    fe_disp_continue = radio = gtk_radio_button_new_with_label (
-        gtk_radio_button_group(GTK_RADIO_BUTTON(radio)),
+    fe_disp_continue = gtk_radio_button_new_with_label (
+        gtk_radio_button_group(GTK_RADIO_BUTTON(fe_disp_place)),
         "Do not place/leave in default folder");
-    gtk_box_pack_start (GTK_BOX (box), radio, TRUE, FALSE, 1);
+    gtk_box_pack_start (GTK_BOX (box), fe_disp_continue, TRUE, FALSE, 1);
 
-    fe_disp_stop = radio = gtk_radio_button_new_with_label (
-        gtk_radio_button_group(GTK_RADIO_BUTTON(radio)),
+    fe_disp_stop = gtk_radio_button_new_with_label (
+        gtk_radio_button_group(GTK_RADIO_BUTTON(fe_disp_continue)),
         "Stop filtering here");
-    gtk_box_pack_start (GTK_BOX (box), radio, TRUE, FALSE, 1);
+    gtk_box_pack_start (GTK_BOX (box), fe_disp_stop, TRUE, FALSE, 1);
 
     return page;
 }				/* end build_action_page() */
@@ -708,10 +706,18 @@ build_right_side ()
     gtk_box_pack_start(GTK_BOX(rightside), bbox, FALSE, FALSE, 0);
 
     button = gnome_stock_button(GNOME_STOCK_BUTTON_APPLY);
+    gtk_signal_connect(GTK_OBJECT(button),
+                       "clicked",
+                       GTK_SIGNAL_FUNC(fe_apply_pressed),
+                       NULL);
     gtk_container_add(GTK_CONTAINER(bbox), button);
 
     pixmap = gnome_stock_new_with_icon (GNOME_STOCK_MENU_UNDO);
     button = gnome_pixmap_button(pixmap, "Revert");
+    gtk_signal_connect(GTK_OBJECT(button),
+                       "clicked",
+                       GTK_SIGNAL_FUNC(fe_revert_pressed),
+                       NULL);
     gtk_container_add(GTK_CONTAINER(bbox), button);
 
     return rightside;

@@ -1,3 +1,11 @@
+2000-06-12  Pawel Salek <pawsa@theochem.kth.se>
+
+	Contributed by Thomas Fitzsimmons  <fitzsim@ecf.utoronto.ca>
+	* libbalsa/{mailbox.c, contact.h}: Contact data structure handling.
+	* src/balsa-index-page.c: Popup menu entry for Storing address,
+	contact dialog box implemented.
+	* src/main-window.c: Menu entry for storing addresses.
+	
 2000-06-12  Fatih Demir	<kabalak@gmx.net>
 	
 	* src/sendmsg-window.c ('iso_charset_menu): Removed the 

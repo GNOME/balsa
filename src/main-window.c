@@ -133,6 +133,7 @@ static void previous_message_cb (GtkWidget * widget, gpointer data);
 
 static void delete_message_cb (GtkWidget * widget, gpointer data);
 static void undelete_message_cb (GtkWidget * widget, gpointer data);
+static void store_address_cb(GtkWidget * widget, gpointer data);
 static void wrap_message_cb (GtkWidget * widget, gpointer data);
 static void show_no_headers_cb(GtkWidget * widget, gpointer data);
 static void show_selected_cb(GtkWidget * widget, gpointer data);
@@ -284,7 +285,15 @@ static GnomeUIInfo message_menu[] =
     GNOME_STOCK_MENU_UNDELETE, 'U', 0, NULL
   },
   GNOMEUIINFO_SEPARATOR,
-#define MENU_MESSAGE_WRAP_POS 13
+#define MENU_MESSAGE_STORE_ADDRESS_POS 13
+      /* S */
+  {
+    GNOME_APP_UI_ITEM, N_ ("_Store Address"), N_("Store address of sender in addressbook"),
+    store_address_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_BOOK_RED, 'S', 0, NULL
+  },
+  GNOMEUIINFO_SEPARATOR,
+#define MENU_MESSAGE_WRAP_POS 15
   GNOMEUIINFO_TOGGLEITEM( N_ ("_Wrap"), NULL, wrap_message_cb, NULL),
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_RADIOLIST(shown_hdrs_menu),
@@ -1401,6 +1410,24 @@ static void
 undelete_message_cb (GtkWidget * widget, gpointer data)
 {
   balsa_message_undelete (widget, balsa_window_find_current_index (BALSA_WINDOW (data)));
+}
+
+static void
+store_address_cb(GtkWidget * widget, gpointer data)
+{
+    if(balsa_window_find_current_index(BALSA_WINDOW (data)) == NULL)
+    {
+       GtkWidget *box;
+       char * msg  = g_strdup( _("In order to store an address, you must open a mailbox and select a message.\n") );
+       box = gnome_message_box_new(msg,
+                                   GNOME_MESSAGE_BOX_ERROR,
+                                   GNOME_STOCK_BUTTON_OK, NULL );
+       gtk_window_set_modal( GTK_WINDOW( box ), TRUE );
+       gnome_dialog_run_and_close( GNOME_DIALOG( box ) );
+       g_free(msg);
+       return;
+    }
+    balsa_message_store_address(widget, balsa_window_find_current_index (BALSA_WINDOW (data)));
 }
 
 static void

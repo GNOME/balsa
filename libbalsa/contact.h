@@ -17,23 +17,42 @@
  * 02111-1307, USA.
  */
 
-#ifndef __LIBBALSA_H__
-#define __LIBBALSA_H__
+#ifndef __CONTACT_H__
+#define __CONTACT_H__
 
-typedef struct _Mailbox Mailbox;
-typedef struct _Message Message;
-typedef struct _Address Address;
-typedef struct _Contact Contact;
-typedef struct _Body Body;
-typedef struct _Server Server;
+#include <glib.h>
 
-#include "mailbox.h"
-#include "message.h"
-#include "address.h"
-#include "contact.h"
-#include "body.h"
-#include "files.h"
+enum
+{
+    CARD_NAME,
+    FIRST_NAME,
+    LAST_NAME,
+    ORGANIZATION,
+    EMAIL_ADDRESS,
+    NUM_FIELDS
+};
 
-void load_messages (Mailbox * mailbox, gint emit);
+    /* possible error values obtained while trying to store a contact vCard */
+enum
+{
+    CONTACT_CARD_STORED_SUCCESSFULLY,
+    CONTACT_UNABLE_TO_OPEN_GNOMECARD_FILE,
+    CONTACT_CARD_NAME_FIELD_EMPTY,
+    CONTACT_CARD_NAME_EXISTS
+};
 
-#endif /* __LIBBALSA_H__ */
+struct _Contact
+{
+    gchar *card_name;
+    gchar *first_name;
+    gchar *last_name;
+    gchar *organization;
+    gchar *email_address;
+};
+
+Contact *contact_new(void);
+void contact_free(Contact *contact);
+void contact_list_free(GList *contact_list);
+gint contact_store(Contact *contact);
+
+#endif /* __CONTACT_H__ */

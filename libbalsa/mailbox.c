@@ -1513,6 +1513,112 @@ make_address_from_string(gchar* str) {
   return addr;
 }
 
+/*
+ * contacts
+ */
+Contact *
+contact_new (void)
+{
+  Contact *contact;
+
+  contact = g_malloc (sizeof (Contact));
+
+  contact->card_name = NULL;
+  contact->first_name = NULL;
+  contact->last_name = NULL;
+  contact->organization = NULL;
+  contact->email_address = NULL;
+  
+  return contact;
+}
+
+
+void
+contact_free (Contact * contact)
+{
+
+  if (!contact)
+    return;
+
+  g_free(contact->card_name);
+  g_free(contact->first_name);
+  g_free(contact->last_name);  
+  g_free(contact->organization);
+  g_free(contact->email_address);
+  
+  g_free(contact);
+}
+
+void contact_list_free(GList * contact_list)
+{
+  GList *list;
+  for (list = g_list_first (contact_list); list; list = g_list_next (list))
+    if(list->data) contact_free (list->data);
+  g_list_free (contact_list);
+}
+
+gint
+contact_store(Contact *contact)
+{
+    FILE *gc; 
+    gchar string[256];
+    gint in_vcard = FALSE;
+
+    if(strlen(contact->card_name) == 0)
+        return CONTACT_CARD_NAME_FIELD_EMPTY;
+
+    gc = fopen(gnome_util_prepend_user_home(".gnome/GnomeCard.gcrd"), "r+");
+    
+    if (!gc) 
+        return CONTACT_UNABLE_TO_OPEN_GNOMECARD_FILE; 
+            
+    while (fgets(string, sizeof(string), gc)) 
+    { 
+        if ( g_strncasecmp(string, "BEGIN:VCARD", 11) == 0 ) {
+            in_vcard = TRUE;
+            continue;
+        }
+                
+        if ( g_strncasecmp(string, "END:VCARD", 9) == 0 ) {
+            in_vcard = FALSE;
+            continue;
+        }
+        
+        if (!in_vcard) continue;
+        
+        g_strchomp(string);
+                
+        if ( g_strncasecmp(string, "FN:", 3) == 0 )
+        {
+            gchar *id = g_strdup(string+3);
+            if(g_strcasecmp(id, contact->card_name) == 0)
+            {
+                g_free(id);
+                fclose(gc);
+                return CONTACT_CARD_NAME_EXISTS;
+            }
+            g_free(id);
+            continue;
+        }
+    }
+
+    fprintf(gc, "\nBEGIN:VCARD\n");
+    fprintf(gc, g_strdup_printf( "FN:%s\n", contact->card_name));
+
+    if(strlen(contact->first_name) || strlen(contact->last_name))
+        fprintf(gc, g_strdup_printf( "N:%s;%s\n", contact->last_name, contact->first_name));
+
+    if(strlen(contact->organization))
+        fprintf(gc, g_strdup_printf( "ORG:%s\n", contact->organization));
+            
+    if(strlen(contact->email_address))
+        fprintf(gc, g_strdup_printf( "EMAIL;INTERNET:%s\n", contact->email_address));
+            
+    fprintf(gc, "END:VCARD\n");
+    
+    fclose(gc);
+    return CONTACT_CARD_STORED_SUCCESSFULLY;
+}
 
 /*
  * body

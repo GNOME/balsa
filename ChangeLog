@@ -1,3 +1,9 @@
+2003-09-21 07:56  PeterB
+
+	* configure.in: Look for libgnomeprint-2.2 before 2.0 (see
+	http://mail.gnome.org/archives/balsa-list/2003-September/msg00109.h
+	tml)
+
 2003-09-20  Pawel Salek  <pawsa theochem.kth.se>
 
 	* libbalsa/address-entry.c: initalize emailData::address and fix

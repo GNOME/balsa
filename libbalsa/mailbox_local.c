@@ -371,10 +371,12 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox, guint msgno)
 	if (libbalsa_mailbox_local_load_message(mailbox, msgno))
 	    ++new_messages;
 
-    if (new_messages)
+    if (new_messages) {
 	libbalsa_mailbox_set_unread_messages_flag(mailbox,
 						  mailbox->
 						  unread_messages > 0);
+	libbalsa_mailbox_run_filters_on_reception(mailbox);
+    }
 }
 
 /*

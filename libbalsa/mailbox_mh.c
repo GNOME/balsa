@@ -542,7 +542,6 @@ libbalsa_mailbox_mh_check(LibBalsaMailbox * mailbox)
     lbm_mh_parse_both(mh);
 
     libbalsa_mailbox_local_load_messages(mailbox, last_msgno);
-    libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
 }
 
 static void

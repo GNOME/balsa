@@ -526,7 +526,6 @@ libbalsa_mailbox_maildir_check(LibBalsaMailbox * mailbox)
     parse_mailbox_subdirs(mailbox);
 
     libbalsa_mailbox_local_load_messages(mailbox, last_msgno);
-    libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
 }
 
 static void

@@ -469,7 +469,6 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 		mbox->size = g_mime_stream_tell(mbox->gmime_stream);
 		mbox_unlock(mailbox, NULL);
 		libbalsa_mailbox_local_load_messages(mailbox, last_msgno);
-		libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
 		return;
 	    }
 	}
@@ -479,7 +478,6 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 	mbox->size = g_mime_stream_tell(mbox->gmime_stream);
 	mbox_unlock(mailbox, NULL);
 	libbalsa_mailbox_local_load_messages(mailbox, 0);
-	libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
 	return;
     }
     /* fatal error */

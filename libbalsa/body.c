@@ -294,9 +294,15 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body)
 	    gint fd;
 	    gchar *tmp_file_name;
 	    gchar *dotpos = NULL;
+	    GError *err = NULL;
 
 	    fd = g_file_open_tmp("balsa-body-XXXXXX", &tmp_file_name,
-				 NULL);
+				 &err);
+	    if (err) {
+		printf("libbalsa_message_body_save_temporary:\n %s\n",
+		       err->message);
+		g_error_free(err);
+	    }
 	    if (fd < 0)
 		return FALSE;
 	    close(fd);

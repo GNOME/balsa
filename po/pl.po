@@ -8,8 +8,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2000-03-26 15:22+0200\n"
-"PO-Revision-Date: 2000-03-24 17:27+0100\n"
+"POT-Creation-Date: 2000-04-04 18:59+0200\n"
+"PO-Revision-Date: 2000-04-04 18:59+0200\n"
 "Last-Translator: GNOME PL Team <gnomepl@pandora.info.bielsko.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -26,7 +26,7 @@ msgstr "Skrzynka: Otwieranie %s Referencji: %d\n"
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr "Skrzynka: Zamykanie %s Referencji: %d\n"
 
-#: balsa-druid-page-directory.gob:1
+#: libinit_balsa/balsa-druid-page-directory.gob:1
 #, c-format
 msgid ""
 "The pathname \"%s\" must be specified canonically -- it must start with a "
@@ -35,17 +35,17 @@ msgstr ""
 "¦cie¿ka %s musi byæ okre¶lona wzglêdem g³ównego katalogu (rozpoczynaæ siê od "
 "/)."
 
-#: balsa-druid-page-directory.gob:1
+#: libinit_balsa/balsa-druid-page-directory.gob:1
 #, c-format
 msgid "An error occurred when attempting to creat(2) the file \"%s\"."
 msgstr "Wyst±pi³ b³±d przy wywo³aniu funkcji creat(2) dla pliku \"%s\"."
 
-#: balsa-druid-page-directory.gob:1
+#: libinit_balsa/balsa-druid-page-directory.gob:1
 #, c-format
 msgid "The mailbox \"%s\" does not appear to be valid."
 msgstr "Skrzynka \"%s\" wydaje siê byæ niepoprawna."
 
-#: balsa-druid-page-directory.gob:1
+#: libinit_balsa/balsa-druid-page-directory.gob:1
 msgid ""
 "Please confirm the locations of your default mail files.\n"
 "These will be created if necessary."
@@ -53,35 +53,35 @@ msgstr ""
 "Potwierd¼ po³o¿enia domy¶lnych plików z poczt±.\n"
 "W razie potrzeby zostan± one utworzone."
 
-#: balsa-druid-page-directory.gob:1
+#: libinit_balsa/balsa-druid-page-directory.gob:1
 msgid "Inbox:"
 msgstr "Poczta nadchodz±ca:"
 
-#: balsa-druid-page-directory.gob:1
+#: libinit_balsa/balsa-druid-page-directory.gob:1
 msgid "Outbox:"
 msgstr "Poczna wychodz±ca:"
 
-#: balsa-druid-page-directory.gob:1
+#: libinit_balsa/balsa-druid-page-directory.gob:1
 msgid "Sentbox:"
 msgstr "Poczta wys³ana:"
 
-#: balsa-druid-page-directory.gob:1
+#: libinit_balsa/balsa-druid-page-directory.gob:1
 msgid "Draftbox:"
 msgstr "Poczta robocza:"
 
-#: balsa-druid-page-directory.gob:1
+#: libinit_balsa/balsa-druid-page-directory.gob:1
 msgid "Trash:"
 msgstr "¦mietnik:"
 
-#: balsa-druid-page-directory.gob:1
+#: libinit_balsa/balsa-druid-page-directory.gob:1
 msgid "Mail Files"
 msgstr "Pliki z listami"
 
-#: balsa-druid-page-directory.gob:1
+#: libinit_balsa/balsa-druid-page-directory.gob:1
 msgid "Problem Creating Mailboxes"
 msgstr "Wyst±pi³ problem przy tworzeniu skrzynek"
 
-#: balsa-druid-page-finish.gob:1
+#: libinit_balsa/balsa-druid-page-finish.gob:1
 msgid ""
 "You've successfully set up Balsa. Have fun!\n"
 "   -- The Balsa development team"
@@ -89,43 +89,44 @@ msgstr ""
 "Balsa zosta³a pomy¶lnie skonfigurowana. Dobrej zabawy!\n"
 "   -- Zespó³ twórców Balsy"
 
-#: balsa-druid-page-finish.gob:1
+#: libinit_balsa/balsa-druid-page-finish.gob:1
 msgid "All Done!"
 msgstr "Gotowe!"
 
-#: balsa-druid-page-user.gob:1
+#: libinit_balsa/balsa-druid-page-user.gob:1
 msgid "Please enter information about yourself."
 msgstr "Wprowad¼ informacje o sobie."
 
-#: balsa-druid-page-user.gob:1 src/address-book.c:1 src/address-book.c:1
+#: libinit_balsa/balsa-druid-page-user.gob:1 src/address-book.c:1
+#: src/address-book.c:1
 msgid "Name:"
 msgstr "Imiê i nazwisko:"
 
-#: balsa-druid-page-user.gob:1
+#: libinit_balsa/balsa-druid-page-user.gob:1
 msgid "Email address:"
 msgstr "Adres e-mail:"
 
-#: balsa-druid-page-user.gob:1
+#: libinit_balsa/balsa-druid-page-user.gob:1
 msgid "SMTP Server:"
 msgstr "Serwer SMTP:"
 
-#: balsa-druid-page-user.gob:1
+#: libinit_balsa/balsa-druid-page-user.gob:1
 msgid "Local Mail Directory:"
 msgstr "Katalog lokalnej poczty:"
 
-#: balsa-druid-page-user.gob:1
+#: libinit_balsa/balsa-druid-page-user.gob:1
 msgid "User Settings"
 msgstr "Ustawienia u¿ytkownika"
 
-#: balsa-druid-page-user.gob:1
+#: libinit_balsa/balsa-druid-page-user.gob:1
 msgid "Local Mail Problem"
 msgstr "Problem z lokaln± skrzynk±"
 
-#: balsa-druid-page-welcome.gob:1
+#: libinit_balsa/balsa-druid-page-welcome.gob:1
 msgid "Welcome to Balsa!"
 msgstr "Witaj w Balsie!"
 
-#: balsa-druid-page-welcome.gob:1
+#: libinit_balsa/balsa-druid-page-welcome.gob:1
 msgid ""
 "You seem to be running Balsa for the first time. The following\n"
 "steps will set up Balsa by asking a few simple questions. Once\n"
@@ -146,7 +147,7 @@ msgstr ""
 "nale¿y\n"
 "wybraæ 'Informacje o...' z menu w oknie g³ównym programu."
 
-#: balsa-initdruid.gob:1
+#: libinit_balsa/balsa-initdruid.gob:1
 msgid ""
 "This will exit Balsa. Do you\n"
 "really want to do this?"
@@ -194,10 +195,13 @@ msgstr ""
 "Nie mo¿na otworzyæ do odczytu ~/.gnome/GnomeCard.gcrd.\n"
 " - %s\n"
 
+#: src/address-book.c:1 src/sendmsg-window.c:1
+msgid "OK"
+msgstr "OK"
+
 #: src/address-book.c:1
-#, c-format
-msgid "EMAIL;INTERNET:%s\n"
-msgstr "EMAIL;INTERNET:%s\n"
+msgid "No-Id"
+msgstr "Bez-Id"
 
 #: src/address-book.c:1
 msgid "No-Name"
@@ -267,6 +271,18 @@ msgstr "Odtwórz"
 #: src/balsa-index-page.c:1
 msgid "Transfer"
 msgstr "Wy¶lij"
+
+#: src/balsa-index.c:1
+msgid "From"
+msgstr "Od"
+
+#: src/balsa-index.c:1 src/filter-edit-dialog.c:1
+msgid "Subject"
+msgstr "Temat"
+
+#: src/balsa-index.c:1
+msgid "Date"
+msgstr "Data"
 
 #: src/balsa-mblist.c:1
 #, c-format
@@ -380,10 +396,6 @@ msgstr "Nag³ówek"
 #: src/filter-edit-dialog.c:1
 msgid "Body"
 msgstr "Tre¶æ"
-
-#: src/filter-edit-dialog.c:1
-msgid "Subject"
-msgstr "Temat"
 
 #: src/filter-edit-dialog.c:1
 msgid "Match string:"
@@ -835,8 +847,8 @@ msgid "Print current message"
 msgstr "Drukuje bie¿±cy list"
 
 #: src/main-window.c:1
-msgid "Copyright (C) 1997-1999"
-msgstr "Copyright (C) 1997-1999"
+msgid "Copyright (C) 1997-2000"
+msgstr "Copyright (C) 1997-2000"
 
 #: src/main-window.c:1
 msgid ""
@@ -1369,10 +1381,6 @@ msgstr ""
 "Poci±ga to za sob± niemo¿no¶æ do³±czania plików.\n"
 
 #: src/sendmsg-window.c:1
-msgid "OK"
-msgstr "OK"
-
-#: src/sendmsg-window.c:1
 #, c-format
 msgid "Cannot get info on file '%s': %s\n"
 msgstr "Nie mo¿na pobraæ informacji o pliku '%s' : %s\n"
@@ -1463,7 +1471,3 @@ msgstr "Nie mo¿na wykonaæ polecenia drukowania."
 #: src/sendmsg-window.c:1
 msgid "Error executing lpr"
 msgstr "B³±d przy wykonywaniu lpr"
-
-#: src/spell-check.c:1
-msgid "Spell Check"
-msgstr "Sprawdzenie pisowni"

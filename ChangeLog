@@ -1,3 +1,8 @@
+2003-09-25  Pawel Salek  <pawsa theochem.kth.se>
+
+	* libbalsa/Makefile.am: remove -DLIBMUTT
+	* libbalsa/gmime-gpgme-context.c: respect HAVE_GPGME
+
 2003-09-25 09:15  PeterB
 
 	* libbalsa/folder-scanners.c, libbalsa/folder-scanners.h,

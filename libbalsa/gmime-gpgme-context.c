@@ -25,6 +25,7 @@
 #include <config.h>
 #endif
 
+#if defined(HAVE_GPGME)
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -705,4 +706,4 @@ g_mime_gpgme_context_new (GMimeSession *session)
 	return cipher;
 }
 
-
+#endif /* HAVE_GPGME */

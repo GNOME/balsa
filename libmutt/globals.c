@@ -21,4 +21,3 @@
 #include "mutt_curses.h"
 #include "keymap.h"
 #include "mailbox.h"
-#include "reldate.h"

@@ -1440,46 +1440,44 @@ balsa_mblist_update_mailbox(GtkTreeStore * store,
     balsa_mblist_set_status_bar(mailbox);
 }
 
+/* bmbl_mbnode_tab_style: find the label widget by recursively searching
+ * containers, and set its style.
+ *
+ * bmbl_mbnode_tab_foreach is the recursive helper.
+ */
 static void
-bmbl_mbnode_tab_style(BalsaMailboxNode *mbnode, gint unread)
+bmbl_mbnode_tab_foreach(GtkWidget * widget, gpointer data)
 {
-   BalsaIndex *index;
-   GtkWidget *label;
-   GList *l, *list;
-   static GdkColor init_color = { 0, 0, 0, 0, };
+    if (GTK_IS_CONTAINER(widget))
+	gtk_container_foreach((GtkContainer *) widget,
+			      bmbl_mbnode_tab_foreach, data);
+    else if (GTK_IS_LABEL(widget)) {
+	gint unread = GPOINTER_TO_INT(data);
+	static GdkColor init_color = { 0, 0, 0, 0, };
+	GdkColor *color =
+	    unread ? &balsa_app.mblist_unread_color : &init_color;
 
-   index = balsa_find_index_by_mailbox(mbnode->mailbox);
-   if (index == NULL)
-      return;
-   
-   label = gtk_notebook_get_tab_label(GTK_NOTEBOOK
-                                      (balsa_app.main_window->notebook),
-                                      gtk_widget_get_parent(GTK_WIDGET
-                                                            (index)));
-   
-   list = gtk_container_get_children(GTK_CONTAINER (label));
-    
-    for (l = list; l; l = l->next) {
-       /* skip anything that isn't a text label */
-       if (!(GTK_IS_LABEL(l->data)))
-          continue;
-
-       gtk_widget_modify_fg(GTK_WIDGET(l->data),
-                            GTK_STATE_NORMAL,
-                            unread ? &balsa_app.mblist_unread_color 
-                            /* FIXME: gtk_widget_modify_fg is documented
-                             * as accepting NULL for the color, meaning
-                             * undo the effect of previous calls, but
-                             * this is currently not implemented
-                             *     : NULL);
-                             */
-                                   : &init_color);
-          
-       break;
+	gtk_widget_modify_fg(widget, GTK_STATE_NORMAL, color);
+	gtk_widget_modify_fg(widget, GTK_STATE_ACTIVE, color);
     }
-    g_list_free(list);
+}
 
-    return;
+static void
+bmbl_mbnode_tab_style(BalsaMailboxNode * mbnode, gint unread)
+{
+    BalsaIndex *index;
+    GtkWidget *label;
+
+    index = balsa_find_index_by_mailbox(mbnode->mailbox);
+    if (index == NULL)
+	return;
+
+    label = gtk_notebook_get_tab_label(GTK_NOTEBOOK
+				       (balsa_app.main_window->notebook),
+				       gtk_widget_get_parent(GTK_WIDGET
+							     (index)));
+
+    bmbl_mbnode_tab_foreach(label, GINT_TO_POINTER(unread));
 }
 
 

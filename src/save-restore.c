@@ -469,10 +469,6 @@ config_mailbox_init (proplist_t mbox, gchar * key)
 	return FALSE;
       MAILBOX_IMAP (mailbox)->path = g_strdup (field);
 
-      /* FIXME Why do I do this for IMAP mailboxes and not for any
-         other kinds?  I Don't understand.  Stuart? */
-      node = g_node_new (mailbox_node_new (mailbox->name, mailbox, FALSE));
-      g_node_append (balsa_app.mailbox_nodes, node);
     }
   else
     {

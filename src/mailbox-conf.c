@@ -91,7 +91,7 @@ static void next_cb (GtkWidget * widget);
 
 /* misc functions */
 static void mailbox_conf_set_values (Mailbox * mailbox);
-
+static void mailbox_remove_files    (gchar* name);
 /* notebook pages */
 static GtkWidget *create_new_page (void);
 static GtkWidget *create_local_mailbox_page (void);
@@ -137,16 +137,40 @@ find_gnode_in_mbox_list (GNode * gnode_list, gchar * mbox_name)
 }
 
 void
+mailbox_remove_files(gchar* mbox_path)
+{
+  gchar cmd[PATH_MAX + 8];
+  snprintf(cmd, sizeof(cmd), "rm -rf '%s'", mbox_path);
+  system(cmd); 
+}
+
+void
 mailbox_conf_delete (Mailbox * mailbox)
 {
-  GNode * gnode;
-
-  gint clicked_button;
-  GtkWidget *ask = gnome_message_box_new (_ ("This will remove the mailbox permanently.\n"
-			   "Are you sure you want to delete this mailbox?"),
-					  GNOME_MESSAGE_BOX_QUESTION,
-		       GNOME_STOCK_BUTTON_YES, GNOME_STOCK_BUTTON_NO, NULL);
-
+  GNode *    gnode;
+  gchar*     msg;
+  gint       clicked_button;
+  GtkWidget* ask;
+  
+  if (mailbox->type == MAILBOX_MH
+      || mailbox->type == MAILBOX_MAILDIR
+      || mailbox->type == MAILBOX_MBOX)
+    {
+      msg = _("This will remove the mailbox and it's files permanently from your system.\n"
+	      "Are you sure you want to remove this mailbox?");
+    }
+  else
+    {
+      msg = _("This will remove the mailbox from the list of mailboxes\n"
+	      "You may use \"Add Mailbox\" later to access this mailbox again\n"
+	      "Are you sure you want to remove this mailbox?");
+    }
+  
+  
+  ask = gnome_message_box_new (msg,
+			       GNOME_MESSAGE_BOX_QUESTION,
+			       GNOME_STOCK_BUTTON_YES, GNOME_STOCK_BUTTON_NO, NULL);
+  
   gnome_dialog_set_default (GNOME_DIALOG (ask), 1);
   gnome_dialog_set_modal (GNOME_DIALOG (ask));
   clicked_button = gnome_dialog_run (GNOME_DIALOG (ask));
@@ -174,8 +198,10 @@ mailbox_conf_delete (Mailbox * mailbox)
   config_mailbox_delete (mailbox->name);
 
   /* Delete local files */
-  /* mailbox_remove(mailbox, TRUE); */
-
+  if (mailbox->type == MAILBOX_MBOX
+      || mailbox->type == MAILBOX_MAILDIR
+      || mailbox->type == MAILBOX_MH)
+    mailbox_remove_files(MAILBOX_LOCAL(mailbox)->path);
   mblist_redraw ();
 }
 
@@ -369,6 +395,11 @@ conf_update_mailbox (Mailbox * mailbox, gchar * old_mbox_name)
       MAILBOX_IMAP (mailbox)->user = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->imap_username)));
       MAILBOX_IMAP (mailbox)->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->imap_password)));
       MAILBOX_IMAP (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->imap_mailbox_path)));
+      if (!MAILBOX_IMAP(mailbox)->path[0])
+	{
+	  g_free(MAILBOX_IMAP(mailbox)->path);
+	  MAILBOX_IMAP (mailbox)->path = g_strdup("INBOX");
+	}
       MAILBOX_IMAP (mailbox)->server = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->imap_server)));
       MAILBOX_IMAP (mailbox)->port = strtol (gtk_entry_get_text (GTK_ENTRY (mcw->imap_port)), (char **) NULL, 10);
 
@@ -450,6 +481,11 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 	MAILBOX_IMAP (mailbox)->user = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->imap_username)));
 	MAILBOX_IMAP (mailbox)->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->imap_password)));
 	MAILBOX_IMAP (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->imap_mailbox_path)));
+	if  (!MAILBOX_IMAP(mailbox)->path[0])
+	  {
+	    g_free(MAILBOX_IMAP(mailbox)->path);
+	    MAILBOX_IMAP(mailbox)->path = g_strdup("INBOX");
+	  }
 	MAILBOX_IMAP (mailbox)->server = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->imap_server)));
 	MAILBOX_IMAP (mailbox)->port = strtol (gtk_entry_get_text (GTK_ENTRY (mcw->imap_port)), (char **) NULL, 10);
 
@@ -656,6 +692,19 @@ create_pop_mailbox_page (void)
   return return_widget;
 }
 
+static void
+set_path_to_inbox(GtkObject* o, gpointer data)
+{
+  
+  MailboxConfWindow* m = (MailboxConfWindow*) data;
+  GtkToggleButton*   b = GTK_TOGGLE_BUTTON(o);
+
+  if (b->active)
+    {
+      fprintf(stderr,"set_path_to_inbox\n");
+      gtk_entry_set_text(GTK_ENTRY(m->imap_mailbox_path), "INBOX");
+    }
+}
 
 static GtkWidget *
 create_imap_mailbox_page (void)
@@ -780,6 +829,10 @@ create_imap_mailbox_page (void)
 
   radio_button = gtk_radio_button_new_with_label (NULL, "INBOX");
   gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (radio_button), TRUE);
+  gtk_signal_connect(GTK_OBJECT(radio_button),
+		     "clicked",
+		     GTK_SIGNAL_FUNC(set_path_to_inbox),
+		     mcw);
   gtk_table_attach (GTK_TABLE (table), radio_button, 0, 1, 0, 1,
 		    GTK_FILL, GTK_FILL | GTK_EXPAND,
 		    0, 0);
@@ -807,6 +860,7 @@ create_imap_mailbox_page (void)
   gtk_widget_show (radio_button);
 
   mcw->imap_mailbox_path = gtk_entry_new ();
+  gtk_entry_set_text(GTK_ENTRY(mcw->imap_mailbox_path), "INBOX");
   gtk_table_attach (GTK_TABLE (table), mcw->imap_mailbox_path, 1, 2, 1, 2,
 		    GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_EXPAND,
 		    0, 0);

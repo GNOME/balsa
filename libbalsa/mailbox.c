@@ -826,8 +826,12 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
 
     g_node_traverse(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL, -1,
                     decrease_post, &dt);
+    if (!dt.node) {
+	g_warning("msgno %d not found", seqno);
+	return;
+    }
+
     iter.user_data = dt.node;
-    g_assert(iter.user_data != NULL);
 
     /* Invalidate iters. */
     mailbox->stamp++;

@@ -93,6 +93,8 @@ static void cancel_prefs (void);
 /* set defaults */
 static void set_prefs (void);
 
+void update_pop3_servers (void);
+
 /* callbacks */
 static void properties_modified_cb (GtkWidget *, GnomePropertyBox *);
 
@@ -291,6 +293,37 @@ set_prefs (void)
   gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (pui->debug), balsa_app.debug);
 }
 
+void
+update_pop3_servers (void)
+{
+  GtkCList *clist;
+  GList *list = balsa_app.inbox_input;
+  gchar *text[1];
+  gint row;
+
+  Mailbox *mailbox;
+
+  if (!pui)
+    return;
+
+  clist = GTK_CLIST (pui->pop3servers);
+
+  gtk_clist_clear (clist);
+
+  gtk_clist_freeze (clist);
+  while (list)
+    {
+      mailbox = list->data;
+      if (mailbox)
+	{
+	  text[0] = mailbox->name;
+	  row = gtk_clist_append (clist, text);
+	  gtk_clist_set_row_data (clist, row, mailbox);
+	}
+      list = list->next;
+    }
+  gtk_clist_thaw (clist);
+}
 
 
 /*
@@ -383,24 +416,7 @@ create_mailservers_page ()
   gtk_clist_set_policy (GTK_CLIST (pui->pop3servers), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_box_pack_start (GTK_BOX (hbox), pui->pop3servers, TRUE, TRUE, 2);
 
-  {
-    Mailbox *mailbox;
-    GList *list = balsa_app.inbox_input;
-    gchar *text[1];
-    gint row;
-
-    while (list)
-      {
-	mailbox = list->data;
-	if (mailbox)
-	  {
-	    text[0] = mailbox->name;
-	    row = gtk_clist_append (GTK_CLIST (pui->pop3servers), text);
-	    gtk_clist_set_row_data (GTK_CLIST (pui->pop3servers), row, mailbox);
-	  }
-	list = list->next;
-      }
-  }
+  update_pop3_servers ();
 
   bbox = gtk_vbutton_box_new ();
   gtk_box_pack_start (GTK_BOX (hbox), bbox, FALSE, TRUE, 2);
@@ -549,6 +565,8 @@ pop3_edit_cb (GtkWidget * widget, gpointer data)
   row = (gint) clist->selection->data;
 
   mailbox = gtk_clist_get_row_data (clist, row);
+  if (!mailbox)
+    return;
 
   mailbox_conf_new (mailbox, FALSE);
 }
@@ -571,6 +589,10 @@ pop3_del_cb (GtkWidget * widget, gpointer data)
     return;
 
   row = (gint) clist->selection->data;
+
+  mailbox = gtk_clist_get_row_data (clist, row);
+  if (!mailbox)
+    return;
 
   if (mailbox->type != MAILBOX_POP3)
     return;

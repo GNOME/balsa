@@ -28,6 +28,7 @@
 #include "mailbox-conf.h"
 #include "main-window.h"
 #include "misc.h"
+#include "pref-manager.h"
 #include "save-restore.h"
 #include "mblist-window.h"
 
@@ -180,30 +181,41 @@ mailbox_conf_delete (Mailbox * mailbox)
       return;
     }
 
-  /* Close the mailbox, in case it was open */
-  mblist_close_mailbox (mailbox);
-
   /* Don't forget to remove the node from balsa's mailbox list */
-  gnode = find_gnode_in_mbox_list (balsa_app.mailbox_nodes, mailbox->name);
-  if (!gnode)
+  if (mailbox->type == MAILBOX_POP3)
     {
-      fprintf (stderr, "Oooop! mailbox not found in balsa_app.mailbox "
-	       "nodes?\n");
+      g_list_remove (balsa_app.inbox_input, mailbox);
     }
   else
     {
-      g_node_unlink (gnode);
+      gnode = find_gnode_in_mbox_list (balsa_app.mailbox_nodes, mailbox->name);
+      if (!gnode)
+	{
+	  fprintf (stderr, "Oooop! mailbox not found in balsa_app.mailbox "
+		   "nodes?\n");
+	}
+      else
+	{
+	  g_node_unlink (gnode);
+	}
     }
-
   /* Delete it from the config file and internal nodes */
   config_mailbox_delete (mailbox->name);
+
+  /* Close the mailbox, in case it was open */
+  if (mailbox->type != MAILBOX_POP3)
+    mblist_close_mailbox (mailbox);
 
   /* Delete local files */
   if (mailbox->type == MAILBOX_MBOX
       || mailbox->type == MAILBOX_MAILDIR
       || mailbox->type == MAILBOX_MH)
     mailbox_remove_files (MAILBOX_LOCAL (mailbox)->path);
-  mblist_redraw ();
+
+  if (mailbox->type == MAILBOX_POP3)
+    update_pop3_servers ();
+  else
+    mblist_redraw ();
 }
 
 
@@ -426,7 +438,10 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
       gchar *old_mbox_name = g_strdup (mailbox->name);
       conf_update_mailbox (mcw->mailbox, old_mbox_name);
       g_free (old_mbox_name);
-      mblist_redraw ();
+      if (mailbox->type == MAILBOX_POP3)
+	update_pop3_servers ();
+      else
+	mblist_redraw ();
       /* TODO cleanup */
       return;
     }
@@ -499,7 +514,10 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 	g_warning ("mailbox_conf_close: Invalid mcw->next_page value\n");
 	break;
       }
-  mblist_redraw ();
+  if (mailbox->type == MAILBOX_POP3)
+    update_pop3_servers ();
+  else
+    mblist_redraw ();
 
   /* close the new mailbox window */
   gtk_widget_destroy (mcw->window);
@@ -671,7 +689,7 @@ create_pop_mailbox_page (void)
 		    GTK_EXPAND | GTK_FILL, GTK_FILL,
 		    0, 10);
 
-  gtk_entry_append_text (GTK_ENTRY (mcw->pop_username), g_get_user_name());
+  gtk_entry_append_text (GTK_ENTRY (mcw->pop_username), g_get_user_name ());
 
   gtk_widget_show (mcw->pop_username);
 
@@ -793,7 +811,7 @@ create_imap_mailbox_page (void)
 		    GTK_EXPAND | GTK_FILL, GTK_FILL,
 		    0, 10);
 
-  gtk_entry_append_text (GTK_ENTRY (mcw->imap_username), g_get_user_name());
+  gtk_entry_append_text (GTK_ENTRY (mcw->imap_username), g_get_user_name ());
 
   gtk_widget_show (mcw->imap_username);
 

@@ -405,13 +405,15 @@ close_cb (GtkWidget * widget, gpointer data)
 #endif
 
   mblist_close_mailbox (mailbox);
-
 }
 
 void
 mblist_close_mailbox (Mailbox * mailbox)
 {
   GnomeMDIChild *child;
+
+  if (!mblw)
+    return;
 
   if (mailbox)
     {
@@ -428,6 +430,9 @@ mblist_close_mailbox (Mailbox * mailbox)
 static void
 close_mblist_window (GtkWidget * widget)
 {
+  if (!mblw)
+    return;
+
   gdk_window_get_size (mblw->window->window,
 		       &balsa_app.mblist_width, &balsa_app.mblist_height);
   gtk_widget_destroy (mblw->window);
@@ -437,6 +442,9 @@ close_mblist_window (GtkWidget * widget)
 static void
 destroy_mblist_window (GtkWidget * widget)
 {
+  if (!mblw)
+    return;
+
   close_mblist_window (widget);
   g_free (mblw);
   mblw = NULL;
@@ -448,6 +456,9 @@ mailbox_select_cb (GtkCTree * ctree, GtkCTreeNode * row, gint column)
   IndexChild *index_child;
   Mailbox *mailbox;
   GdkEventButton *bevent = (GdkEventButton *) gtk_get_current_event ();
+
+  if (!mblw)
+    return;
 
   if (bevent && bevent->button == 1 && bevent->type == GDK_2BUTTON_PRESS)
     {
@@ -476,6 +487,9 @@ button_event_press_cb (GtkCList * clist, GdkEventButton * event, gpointer data)
 {
   gint row, column;
   Mailbox *mailbox;
+
+  if (!mblw)
+    return;
 
   if (event->window != clist->clist_window)
     return;
@@ -516,6 +530,7 @@ static GtkWidget *
 create_menu (GtkCTree * ctree, Mailbox * mailbox)
 {
   GtkWidget *menu, *menuitem;
+
   menu = gtk_menu_new ();
   menuitem = gtk_menu_item_new_with_label (_ ("Add Mailbox"));
   gtk_signal_connect (GTK_OBJECT (menuitem), "activate",

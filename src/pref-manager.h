@@ -27,6 +27,8 @@ void open_preferences_manager (void);
  * window in case it has changed */
 void refresh_preferences_manager (void);
 
+/* update the pop3 server clist */
+void update_pop3_servers (void);
 
 #endif
 /* __pref_manager_h__ */

@@ -219,6 +219,11 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
 					 get_message_stream),
 		       libbalsa_marshal_POINTER__OBJECT, GTK_TYPE_POINTER,
 		       1, LIBBALSA_TYPE_MESSAGE);
+   libbalsa_mailbox_signals[CHECK] =
+       gtk_signal_new("check", GTK_RUN_LAST | GTK_RUN_NO_HOOKS,
+                      GTK_CLASS_TYPE(object_class),
+                      GTK_SIGNAL_OFFSET(LibBalsaMailboxClass, check),
+                      gtk_marshal_NONE__NONE, GTK_TYPE_NONE, 0);
     libbalsa_mailbox_signals[PROGRESS_NOTIFY] =
 	gtk_signal_new("progress-notify", GTK_RUN_FIRST,
 		       GTK_CLASS_TYPE(object_class),

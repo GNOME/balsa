@@ -1596,7 +1596,7 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
         fil->action_string=g_strdup(mailbox_name);
 
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fe_popup_button))) {
-        static gchar defstring[19] = N_("Filter has matched");
+        static gchar defstring[] = N_("Filter has matched");
         gchar *tmpstr;
         
         tmpstr = gtk_entry_get_text(GTK_ENTRY(fe_popup_entry));

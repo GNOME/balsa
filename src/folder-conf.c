@@ -436,7 +436,6 @@ subfolder_conf_clicked_cb(GtkObject* dialog, int buttonno, gpointer data)
 			/* moved it down the tree */
                         GNode* n = balsa_find_dir(balsa_app.mailbox_nodes,
                                                   fcw->old_parent);
-                               fcw->old_parent);
                         if(n)
                             balsa_mailbox_node_rescan
                                 (BALSA_MAILBOX_NODE(n->data));

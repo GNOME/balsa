@@ -589,7 +589,6 @@ libbalsa_message_save(LibBalsaMessage * message, const gchar *filename)
 }
 
 /* libbalsa_messages_copy:
-   makes an assumption that all the messages come from the same mailbox.
 */
 gboolean
 libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
@@ -830,9 +829,10 @@ libbalsa_messages_delete(GList * messages)
 {
     LibBalsaMessage * message;
     g_return_if_fail(messages != NULL);
+    g_return_if_fail(LIBBALSA_IS_MESSAGE(messages->data));
 
     while(messages){
-      message=(LibBalsaMessage *)(messages->data);
+      message=LIBBALSA_MESSAGE(messages->data);
       gtk_signal_emit(GTK_OBJECT(message),
   	  	      libbalsa_message_signals[SET_DELETED], TRUE);
       messages=g_list_next(messages);

@@ -1,3 +1,15 @@
+2002-06-10  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/filter-funcs.c: gcc3 sensitive on fall through.
+	* src/folder-conf.c: remove garbage. Both spotted by Nuno Monteiro.
+
+	Emmanuel:
+	* libbalsa/filter-funcs.c (match_field_decode): simplify.
+	* libbalsa/message.c (libbalsa_messages_copy): remove false comment.
+	* src/filter-edit-callbacks.c: remove redundant size declaration.
+	* src/filter-run-callbacks.c (run_filters_on_mailbox): handle
+	no match correctly.
+
 2002-06-09  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/folder-scanners.c: debug printf->libbalsa_information.

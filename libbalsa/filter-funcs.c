@@ -392,27 +392,24 @@ match_field_decode(LibBalsaCondition* cnd,GString * buffer,gchar * str_format)
 	coma=TRUE;
     }
     if (CONDITION_CHKMATCH(cnd,CONDITION_MATCH_FROM)) {
-	if (coma)
-	    str=g_string_append(str,",\"From\"");
-	else 
-	    str=g_string_append(str,"\"From\"");
+	str=g_string_append(str,coma ? ",\"From\"" : "\"From\"");
 	coma=TRUE;
     }
     if (CONDITION_CHKMATCH(cnd,CONDITION_MATCH_CC)) {
-	if (coma)
-	    str=g_string_append(str,",\"Cc\"");
-	else 
-	    str=g_string_append(str,"\"Cc\"");
+	str=g_string_append(str,coma ? ",\"Cc\"" : "\"Cc\"");
 	coma=TRUE;
     }
     if (CONDITION_CHKMATCH(cnd,CONDITION_MATCH_SUBJECT)) {
-	if (coma)
-	    str=g_string_append(str,",\"Subject\"");
-	else 
-	    str=g_string_append(str,"\"Subject\"");
+	str=g_string_append(str,coma ? ",\"Subject\"" : "\"Subject\"");
 	coma=TRUE;
     }
-    /* FIXME : see how to export conditions matching user headers */
+    if (CONDITION_CHKMATCH(cnd,CONDITION_MATCH_US_HEAD) && cnd->user_header) {
+	if (coma)
+	    str=g_string_append_c(str,',');
+	str=g_string_append_c(str,'\"');
+	str=g_string_append(str,cnd->user_header);
+	str=g_string_append_c(str,'\"');
+    }
     g_string_append(str,"] ");
     if (str->len>3) {
 	gchar * temp=g_strdup_printf(str_format,"header",str->str);
@@ -515,9 +512,9 @@ libbalsa_filter_export_sieve(LibBalsaFilter* fil, gchar* filename)
 	    buffer=g_string_append(buffer,"discard;\n");
 	    break;
 	    /* FIXME how to code other actions */
-        case FILTER_NOTHING:
-        case FILTER_PRINT:
-        case FILTER_RUN:
+        case FILTER_NOTHING: break;
+        case FILTER_PRINT:   break;
+        case FILTER_RUN:     break;
 	}
 	buffer=g_string_append(buffer,"}\n");
     }

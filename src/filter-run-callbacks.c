@@ -90,15 +90,23 @@ static GSList * build_selected_filters_list(GtkCList * clist,gboolean to_run)
 static gboolean
 run_filters_on_mailbox(GtkCList * clist,LibBalsaMailbox *mbox)
 {
-    GSList * filters=build_selected_filters_list(clist,TRUE);
+    GSList * filters=build_selected_filters_list(clist,TRUE),* lst;
 
     if (!filters) return TRUE;
     if (!filters_prepare_to_run(filters))
 	return FALSE;
     gtk_clist_freeze(GTK_CLIST(balsa_app.mblist));
     libbalsa_filter_match_mailbox(filters,mbox);
-    if (libbalsa_filter_apply(filters))
-	enable_empty_trash(TRASH_FULL);
+    for (lst=filters;lst;lst = g_slist_next(lst))
+	if (((LibBalsaFilter*) lst->data)->matching_messages)
+	    break;
+    
+    if (lst) {
+	if (libbalsa_filter_apply(filters))
+	    enable_empty_trash(TRASH_FULL);
+    }
+    /* else balsa_information(LIBBALSA_INFORMATION_WARNING,
+           _("No message has matched the filters\n")); */
     gtk_clist_thaw(GTK_CLIST(balsa_app.mblist));
     g_slist_free(filters);
     return TRUE;

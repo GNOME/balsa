@@ -1,3 +1,8 @@
+2004-02-14 07:17  PeterB
+
+	* libbalsa/mailbox.c: lock mailbox while changing message flags.
+	* libbalsa/body.c: check this body's id only if it has a mime-part.
+
 2004-02-13 23:18  PeterB
 
 	* libbalsa/send.c: prohibit smtp from sending Status and X-Status

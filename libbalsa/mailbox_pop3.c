@@ -216,6 +216,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     PopStatus status;
     LibBalsaMailboxPop3 *m = LIBBALSA_MAILBOX_POP3(mailbox);
     LibBalsaServer *server;
+    gboolean remove_tmp = TRUE;
 #ifdef BALSA_USE_THREADS
     gchar *msgbuf;
     MailThreadMessage *threadmsg;
@@ -292,7 +293,8 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     /* Regrab the gdk lock before leaving */
     gdk_threads_enter();
 
-    tmp_mailbox = (LibBalsaMailbox *)libbalsa_mailbox_local_new((const gchar *)tmp_path, FALSE);
+    tmp_mailbox = (LibBalsaMailbox*)
+        libbalsa_mailbox_local_new(tmp_path, FALSE);
     if(!tmp_mailbox)  {
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 			     _("POP3 mailbox %s temp mailbox error:\n"), 
@@ -324,13 +326,13 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 				 mailbox->name, 
 				 LIBBALSA_MAILBOX(m->inbox)->name,
 				 tmp_path);
-	    libbalsa_mailbox_close(LIBBALSA_MAILBOX(tmp_mailbox));
+            remove_tmp = FALSE;
 	}
-    } else {
-	libbalsa_mailbox_close(LIBBALSA_MAILBOX(tmp_mailbox));
-	unlink((const char*)tmp_path);
-    }
+    } 
+    libbalsa_mailbox_close(LIBBALSA_MAILBOX(tmp_mailbox));
     gtk_object_destroy(GTK_OBJECT(tmp_mailbox));	
+    if(remove_tmp) 
+        unlink(tmp_path);
     g_free(tmp_path);
 }
 

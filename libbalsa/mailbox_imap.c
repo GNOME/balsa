@@ -431,8 +431,10 @@ clean_dir(const char *dir_name)
         struct stat st;
         struct file_info *fi;
         gchar *fname = g_strconcat(dir_name, "/", key->d_name, NULL);
-        if(stat(fname, &st) == -1 || !S_ISREG(st.st_mode))
+        if(stat(fname, &st) == -1 || !S_ISREG(st.st_mode)) {
+	    g_free(fname);
             continue;
+	}
         fi = g_new(struct file_info,1);
         fi->name = fname;
         fi->size = st.st_size;
@@ -441,7 +443,7 @@ clean_dir(const char *dir_name)
     }
     closedir(dir);
 
-    g_list_sort(list, cmp_by_time);
+    list = g_list_sort(list, cmp_by_time);
     sz = 0;
     for(lst = list; lst; lst = lst->next) {
         struct file_info *fi = (struct file_info*)(lst->data);

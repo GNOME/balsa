@@ -86,6 +86,7 @@ mailbox_filters_section_lookup(const gchar * name)
 	}
 	g_free(key);
     }
+    g_free(iterator);
     return section;
 }
 

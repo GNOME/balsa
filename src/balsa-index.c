@@ -947,6 +947,8 @@ bndx_select_next_with_flag(BalsaIndex * index, LibBalsaMessageFlag flag)
 				BNDX_SEARCH_VIEWABLE_ANY,
 				BNDX_SEARCH_START_ANY,
 				BNDX_SEARCH_WRAP_YES);
+
+    libbalsa_mailbox_search_iter_free(search_iter);
 }
 
 void

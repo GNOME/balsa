@@ -312,6 +312,7 @@ imap_mbox_list(ImapMboxHandle *handle, const char* what)
   gchar *cmd = g_strdup_printf("LIST \"%s\" \"%%\"", mbx7);
   ImapResponse rc = imap_cmd_exec(handle, cmd);
   g_free(cmd);
+  g_free(mbx7);
   return rc;
 }
 

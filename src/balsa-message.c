@@ -2367,8 +2367,6 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 	    g_object_set_data(G_OBJECT(item), "url-list", url_list);
         }
 
-        g_free(ptr);
-
         gtk_widget_show(item);
         info->focus_widget = item;
         info->widget = item;
@@ -2380,6 +2378,8 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
                                          (GSourceFunc) resize_idle,
                                          item, g_object_unref);
     }
+
+    g_free(ptr);
 
     fclose(fp);
 }

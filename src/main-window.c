@@ -587,9 +587,9 @@ balsa_window_new ()
     gtk_paned_set_position ( GTK_PANED (vpaned), G_MAXINT);  
 
   uiroot = cfg_memory_default_root();
-  cfg_memory_add_to_window( GTK_WINDOW( window ), uiroot, "Main-Window", 640, 480 );
-  cfg_memory_add_to_paned( GTK_PANED( vpaned ), uiroot, "MBList-Pane", 200 );
-  cfg_memory_add_to_paned( GTK_PANED( hpaned ), uiroot, "Notebook-Pane", 300 );
+  cfg_memory_add_to_window( GTK_WIDGET( window ), uiroot, "Main-Window", 640, 480 );
+  cfg_memory_add_to_paned( GTK_WIDGET( vpaned ), uiroot, "MBList-Pane", 200 );
+  cfg_memory_add_to_paned( GTK_WIDGET( hpaned ), uiroot, "Notebook-Pane", 300 );
   cfg_location_free( uiroot );
 
   gtk_widget_show(vpaned);

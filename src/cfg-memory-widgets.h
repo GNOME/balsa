@@ -30,15 +30,35 @@
 
 /* ************************************************************************ */
 
-void cfg_memory_add_to_window( GtkWindow *window, const cfg_location_t *root, const gchar *name, guint32 default_w, guint32 default_h );
-void cfg_memory_add_to_clist( GtkCList *clist, const cfg_location_t *root, const gchar *name, gint numcolumns, ... );
-void cfg_memory_add_to_paned( GtkPaned *paned, const cfg_location_t *root, const gchar *name, gint offset );
+typedef struct cfg_memory_plex_s {
+	guint32 swapsize;
+	gboolean (*swap_out)( GtkWidget *, gpointer, gpointer );
+	gboolean (*swap_in)( GtkWidget *, gpointer, gpointer );
+	gboolean (*do_default)( GtkWidget *, gpointer );
+	gboolean (*save)( gpointer, const cfg_location_t *, gpointer );
+	gboolean (*load)( gpointer, const cfg_location_t *, gpointer );
+	GtkWidget *(*get_active)( gpointer );
+} cfg_memory_plex_t;
+
+typedef struct cfg_memory_clist_swapdata_s {
+	gint num_cols;
+	gint *widths;
+} cfg_memory_clist_swapdata_t;
+
+/* ************************************************************************ */
+
+void cfg_memory_add_to_window( GtkWidget *window, const cfg_location_t *root, const gchar *name, guint32 default_w, guint32 default_h );
+void cfg_memory_add_to_clist( GtkWidget *clist, const cfg_location_t *root, const gchar *name, gint numcolumns, ... );
+void cfg_memory_add_to_paned( GtkWidget *paned, const cfg_location_t *root, const gchar *name, gint offset );
+void cfg_memory_add_multiplexed( const gchar *name, const cfg_memory_plex_t *plexinfo, gpointer user_data );
 
 void cfg_memory_write_all( const cfg_location_t *root );
 cfg_location_t *cfg_memory_default_root( void );
 
-void cfg_memory_clist_restore( GtkWidget *clist );
-void cfg_memory_clist_backup( GtkWidget *clist );
+void cfg_memory_multiplex_swapout( const gchar *name );
+void cfg_memory_multiplex_swapin( const gchar *name );
+
+extern cfg_memory_plex_t cfg_memory_clist_plexinfo;
 
 /* ************************************************************************ */
 

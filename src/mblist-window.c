@@ -158,7 +158,7 @@ mblist_open_mailbox (Mailbox * mailbox)
 		page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),c); 
 		page = gtk_object_get_data(GTK_OBJECT(page),"indexpage"); 
 
-		cfg_memory_clist_backup( GTK_WIDGET(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)) );
+		cfg_memory_multiplex_swapout( "MessageIndex" );
 
 		g_get_current_time(&BALSA_INDEX_PAGE(page)->last_use); 
 	} 
@@ -174,8 +174,8 @@ mblist_open_mailbox (Mailbox * mailbox)
 			gtk_notebook_set_page(GTK_NOTEBOOK(balsa_app.notebook),i);
 			page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),i);
 			page = gtk_object_get_data(GTK_OBJECT(page),"indexpage");
-			cfg_memory_clist_restore( GTK_WIDGET(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)) );
-			
+
+			cfg_memory_multiplex_swapin( "MessageIndex" );
 			g_get_current_time(&BALSA_INDEX_PAGE(page)->last_use);
 			
 			balsa_mblist_have_new (BALSA_MBLIST(mblw->ctree));
@@ -195,12 +195,9 @@ mblist_open_mailbox (Mailbox * mailbox)
 	
 	balsa_mblist_have_new (BALSA_MBLIST(mblw->ctree));
 
-	if( was_open ) {
-		c = gtk_notebook_get_current_page(GTK_NOTEBOOK(balsa_app.notebook));
-		page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),c); 
-		page = gtk_object_get_data(GTK_OBJECT(page),"indexpage"); 
-		cfg_memory_clist_restore( GTK_WIDGET(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)) );
-	}
+	/* Will load from swap if swapped, from config if saved, from defaults
+	 * if all else fails. */
+	cfg_memory_multiplex_swapin( "MessageIndex" );		
 }
 
 

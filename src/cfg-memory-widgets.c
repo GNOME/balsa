@@ -21,9 +21,11 @@
 #include "config.h"
 #include <gnome.h>
 
+#include "balsa-app.h"
 #include "cfg-backend.h"
 #include "cfg-engine.h"
 #include "sm-balsa.h"
+#include "cfg-memory-widgets.h"
 
 /* ************************************************************************ */
 
@@ -32,10 +34,13 @@ typedef struct generic_memory_s {
 	GSList **list;
 } generic_memory_t;
 
-typedef struct clist_memory_s {
-	gint num_cols;
-	gint *widths;
-} clist_memory_t;
+typedef struct plexinfo_priv_s {
+	const cfg_memory_plex_t *info;
+	gpointer swapdata;
+	gboolean swapped;
+	const gchar *name;
+	gpointer ud;
+} plexinfo_priv_t;
 
 /* ************************************************************************ */
 
@@ -53,17 +58,20 @@ static void clist_save( GtkWidget *clist, const cfg_location_t *home );
 static gboolean paned_load( GtkWidget *paned, const cfg_location_t *home );
 static void paned_save( GtkWidget *paned, const cfg_location_t *home );
 
+static void write_plexes( gpointer key, gpointer value, gpointer user_data );
+
 /* ************************************************************************ */
 
 void cfg_memory_add_to_window( GtkWidget *window, const cfg_location_t *root, const gchar *name, guint32 default_w, guint32 default_h );
 void cfg_memory_add_to_clist( GtkWidget *clist, const cfg_location_t *root, const gchar *name, gint numcolumns, ... );
 void cfg_memory_add_to_paned( GtkWidget *paned, const cfg_location_t *root, const gchar *name, gint offset );
+void cfg_memory_add_multiplexed( const gchar *name, const cfg_memory_plex_t *plexinfo, gpointer user_data );
 
 void cfg_memory_write_all( const cfg_location_t *root );
 cfg_location_t *cfg_memory_default_root( void );
 
-void cfg_memory_clist_restore( GtkWidget *clist );
-void cfg_memory_clist_backup( GtkWidget *clist );
+void cfg_memory_multiplex_swapout( const gchar *name );
+void cfg_memory_multiplex_swapin( const gchar *name );
 
 /* ************************************************************************ */
 
@@ -78,8 +86,7 @@ static const gchar clist_obj_key[] = "balsa-config-clist-info";
 static GSList *memory_windows = NULL;
 static GSList *memory_clists = NULL;
 static GSList *memory_paneds = NULL;
-
-static clist_memory_t cmem;
+static GHashTable *memory_plexes = NULL;
 
 /* ************************************************************************ */
 
@@ -137,6 +144,26 @@ void cfg_memory_add_to_clist( GtkWidget *clist, const cfg_location_t *root, cons
 	}
 }
 
+void cfg_memory_add_multiplexed( const gchar *name, const cfg_memory_plex_t *plexinfo, gpointer user_data )
+{
+	plexinfo_priv_t *priv;
+
+	g_return_if_fail( name );
+	g_return_if_fail( plexinfo );
+
+	if( memory_plexes == NULL )
+		memory_plexes = g_hash_table_new( g_str_hash, g_str_equal );
+
+	priv = g_new( plexinfo_priv_t, 1 );
+	priv->info = plexinfo;
+	priv->swapdata = g_new0( guint8, plexinfo->swapsize );
+	priv->name = name;
+	priv->ud = user_data;
+	priv->swapped = FALSE;
+
+	g_hash_table_insert( memory_plexes, (gpointer) name, priv );
+}
+
 void cfg_memory_add_to_paned( GtkWidget *paned, const cfg_location_t *root, const gchar *name, gint offset )
 {
 	g_return_if_fail( paned );
@@ -174,6 +201,9 @@ void cfg_memory_write_all( const cfg_location_t *root )
 	for( iter = memory_paneds; iter; iter = iter->next )
 		generic_save( GTK_WIDGET( iter->data ), down, paned_save );
 
+	if( memory_plexes )
+		g_hash_table_foreach( memory_plexes, write_plexes, down );
+
 	cfg_location_free( down );
 }
 
@@ -184,28 +214,105 @@ cfg_location_t *cfg_memory_default_root( void )
 
 /* **************************************** */
 
-/* Icky icky icky we really need to fix this notebook thingie */
+/* Aah, that notebook is a real pain in the ass. "Multiplexing" in this context
+ * is mapping one set of config values to more than one widget -- specifically,
+ * every mailbox has one GtkCList for its messageindex, each of which should
+ * sync up and look the same.
+ *
+ * We can't just memory_add_to_clist for each one, because then we get bunches
+ * of widgets trying to write to the same prefix, and loading from.... I tried
+ * it and it really didn't work.
+ *
+ * So instead we multiplex. The swap_{in,out} functions save the widgets' settings
+ * to an in-memory structure, while the save and load functions go from cfg_locations
+ * to the in-memory structure. 'default' will apply defaults to the widget... maybe
+ * this mini-API is a bit weird but whatever, we only use it once.
+ */
 
-void cfg_memory_clist_restore( GtkWidget *clist )
+void cfg_memory_multiplex_swapout( const gchar *name )
 {
-	int i;
+	plexinfo_priv_t *priv;
+	GtkWidget *current;
 
-	for( i = 0; i < cmem.num_cols; i++ )
-		gtk_clist_set_column_width( GTK_CLIST( clist ), i, cmem.widths[i] );
+	g_return_if_fail( name );
 
-	g_free( cmem.widths );
-	cmem.widths = NULL;
+	priv = g_hash_table_lookup( memory_plexes, name );
+	g_return_if_fail( priv );
+
+	current = (priv->info->get_active)( priv->ud );
+	g_return_if_fail( current );
+
+	if( priv->swapped ) {
+		g_warning( "Multiplex group \"%s\" already swapped out, ignoring.", name );
+		return;
+	}
+
+	if( (priv->info->swap_out)( current, priv->swapdata, priv->ud ) )
+		g_warning( "Error while swapping out multiplex group \"%s\", widget %p", name, current );
+
+	priv->swapped = TRUE;
 }
 
-void cfg_memory_clist_backup( GtkWidget *clist )
+void cfg_memory_multiplex_swapin( const gchar *name )
 {
-	int i;
+	plexinfo_priv_t *priv;
+	GtkWidget *current;
 
-	cmem.num_cols = (GTK_CLIST( clist ))->columns;
-	cmem.widths = g_new0( gint, cmem.num_cols );
+	g_return_if_fail( name );
 
-	for( i = 0; i < cmem.num_cols; i++ )
-		cmem.widths[i] = (GTK_CLIST( clist ))->column[i].width;	
+	priv = g_hash_table_lookup( memory_plexes, name );
+	g_return_if_fail( priv );
+
+	current = (priv->info->get_active)( priv->ud );
+	g_return_if_fail( current );
+
+	if( GTK_WIDGET_VISIBLE( current ) == FALSE )
+		return;
+
+	if( priv->swapped == FALSE ) {
+		cfg_location_t *root, *home;
+
+		root = cfg_memory_default_root();
+		home = cfg_location_godown( root, name );
+		cfg_location_free( root );
+
+		if( cfg_location_exists( home ) == FALSE ) {
+			if( (priv->info->do_default)( current, priv->ud ) )
+				g_warning( "Error setting defaults for multiplex group \"%s\"", name );
+		} else if( (priv->info->load)( priv->swapdata, home, priv->ud ) ) {
+			g_warning( "Error loading config data for multiplex group \"%s\"", name );
+		} else {
+			priv->swapped = TRUE;
+			cfg_memory_multiplex_swapin( name );
+		}
+
+		cfg_location_free( home );
+		return;
+	}
+
+	if( (priv->info->swap_in)( current, priv->swapdata, priv->ud ) )
+		g_warning( "Error while swapping out multiplex group \"%s\", widget %p", name, current );
+
+	priv->swapped = FALSE;
+}
+
+static void write_plexes( gpointer key, gpointer value, gpointer user_data )
+{
+	gchar *realkey = (gchar *) key;
+	plexinfo_priv_t *priv = (plexinfo_priv_t *) value;
+	const cfg_location_t *root = (const cfg_location_t *) user_data;
+	cfg_location_t *home;
+
+	cfg_memory_multiplex_swapout( realkey );
+
+	home = cfg_location_godown( root, realkey );
+
+	if( (priv->info->save)( priv->swapdata, home, priv->ud ) )
+		g_warning( "Problem saving multiplex group \"%s\"", realkey );
+
+	cfg_memory_multiplex_swapin( realkey );
+
+	cfg_location_free( home );
 }
 
 /* ************************************************************************ */
@@ -368,3 +475,106 @@ static void paned_save( GtkWidget *paned, const cfg_location_t *home )
 		cfg_location_put_num( home, offset_key, (GTK_WIDGET( child ))->allocation.height );
 }
 
+/* ************************************************************************ */
+
+static gboolean mpclist_swap_out( GtkWidget *current, gpointer dest, gpointer userdata );
+static gboolean mpclist_swap_in( GtkWidget *current, gpointer src, gpointer userdata );
+static gboolean mpclist_do_default( GtkWidget *current, gpointer userdata );
+static gboolean mpclist_save( gpointer swap, const cfg_location_t *home, gpointer userdata );
+static gboolean mpclist_load( gpointer swap, const cfg_location_t *home, gpointer userdata );
+static GtkWidget *mpclist_get_active( gpointer userdata );
+
+static gboolean mpclist_swap_out( GtkWidget *current, gpointer dest, gpointer userdata )
+{
+	int i;
+	cfg_memory_clist_swapdata_t *sd = (cfg_memory_clist_swapdata_t *) dest;
+
+	sd->num_cols = (GTK_CLIST( current ))->columns;
+
+	if( sd->widths )
+		g_free( sd->widths );
+	sd->widths = g_new( gint, sd->num_cols );
+
+	for( i = 0; i < sd->num_cols; i++ )
+		sd->widths[i] = (GTK_CLIST( current ))->column[i].area.width;
+
+	return FALSE;
+}
+
+static gboolean mpclist_swap_in( GtkWidget *current, gpointer src, gpointer userdata )
+{
+	int i;
+	cfg_memory_clist_swapdata_t *sd = (cfg_memory_clist_swapdata_t *) src;
+
+	for( i = 0; i < sd->num_cols; i++ )
+		gtk_clist_set_column_width( GTK_CLIST( current ), i, sd->widths[i] );
+
+	return FALSE;
+}
+
+static gboolean mpclist_do_default( GtkWidget *current, gpointer userdata )
+{
+	return mpclist_swap_in( current, userdata, NULL );
+}
+
+static gboolean mpclist_save( gpointer swap, const cfg_location_t *home, gpointer userdata )
+{
+	cfg_memory_clist_swapdata_t *sd = (cfg_memory_clist_swapdata_t *) swap;
+	gint i;
+	gchar *name;
+
+	cfg_location_put_num( home, col_count_key, sd->num_cols );
+
+	for( i = 0; i < sd->num_cols; i++ ) {
+		name = g_strdup_printf( col_width_format, i );
+		cfg_location_put_num( home, name, sd->widths[i] );
+		g_free( name );
+	}
+
+	return FALSE;
+}
+
+static gboolean mpclist_load( gpointer swap, const cfg_location_t *home, gpointer userdata )
+{
+	int i;
+	gchar *name;
+	cfg_memory_clist_swapdata_t *sd = (cfg_memory_clist_swapdata_t *) swap;
+
+	if( cfg_location_get_num( home, col_count_key, &( sd->num_cols ), 0 ) || sd->num_cols == 0 )
+		return TRUE;
+
+	if( sd->widths )
+		g_free( sd->widths );
+	sd->widths = g_new0( gint, sd->num_cols );
+
+	for( i = 0; i < sd->num_cols; i++ ) {
+		gint dest;
+
+		name = g_strdup_printf( col_width_format, i );
+		cfg_location_get_num( home, name, &dest, 12 );
+
+		g_assert( sd->widths );
+		g_message( "Sanity: %p %p %d", sd, sd->widths, sd->num_cols );
+		(sd->widths)[i] = dest;
+		g_free( name );
+	}
+
+	return FALSE;
+}
+
+static GtkWidget *mpclist_get_active( gpointer userdata )
+{
+	gint page;
+	GtkObject *w;
+
+	page = gtk_notebook_get_current_page( GTK_NOTEBOOK( balsa_app.notebook ) );
+	if( page == -1 )
+		return NULL;
+
+	w = GTK_OBJECT( gtk_notebook_get_nth_page( GTK_NOTEBOOK( balsa_app.notebook ), page ) );
+	w = GTK_OBJECT( gtk_object_get_data( GTK_OBJECT( w ), "indexpage" ) );
+	return GTK_WIDGET( &( (BALSA_INDEX( (BALSA_INDEX_PAGE( w ))->index ))->clist ) );
+}
+
+cfg_memory_plex_t cfg_memory_clist_plexinfo =
+{ sizeof( cfg_memory_clist_swapdata_t ), mpclist_swap_out, mpclist_swap_in, mpclist_do_default, mpclist_save, mpclist_load, mpclist_get_active };

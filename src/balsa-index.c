@@ -85,6 +85,9 @@ static gint balsa_index_signals[LAST_SIGNAL] =
 {0};
 static GtkCListClass *parent_class = NULL;
 
+/* Multiplexing the CList */
+static cfg_memory_clist_swapdata_t mblist_defaults;
+
 static gint
 date_compare (GtkCList * clist,
 	      gconstpointer ptr1,
@@ -200,6 +203,17 @@ balsa_index_class_init (BalsaIndexClass * klass)
 
   klass->select_message = NULL;
   klass->unselect_message = NULL;
+
+  /* Multiplexing! */
+  mblist_defaults.num_cols = 6;
+  mblist_defaults.widths = g_new( gint, mblist_defaults.num_cols );
+  mblist_defaults.widths[0] = NUM_DEFAULT_WIDTH;
+  mblist_defaults.widths[1] = STATUS_DEFAULT_WIDTH;
+  mblist_defaults.widths[2] = ATTACHMENT_DEFAULT_WIDTH;
+  mblist_defaults.widths[3] = FROM_DEFAULT_WIDTH;
+  mblist_defaults.widths[4] = SUBJECT_DEFAULT_WIDTH;
+  mblist_defaults.widths[5] = DATE_DEFAULT_WIDTH;
+  cfg_memory_add_multiplexed( "MessageIndex", &cfg_memory_clist_plexinfo, &mblist_defaults );
 }
 
 static void
@@ -267,11 +281,16 @@ balsa_index_init (BalsaIndex * bindex)
   gtk_clist_set_column_justification (clist, 1, GTK_JUSTIFY_CENTER);
   gtk_clist_set_column_justification (clist, 2, GTK_JUSTIFY_CENTER);
 
-  uiroot = cfg_memory_default_root();
-  cfg_memory_add_to_clist( GTK_CLIST( clist ), uiroot, "MessageIndex", 6, 
-			   NUM_DEFAULT_WIDTH, STATUS_DEFAULT_WIDTH, ATTACHMENT_DEFAULT_WIDTH,
-			   FROM_DEFAULT_WIDTH, SUBJECT_DEFAULT_WIDTH, DATE_DEFAULT_WIDTH );
-  cfg_location_free( uiroot );
+  /*
+   * uiroot = cfg_memory_default_root();
+   *
+   *
+   * cfg_memory_add_to_clist( GTK_CLIST( clist ), uiroot, "MessageIndex", 6, 
+   *		   NUM_DEFAULT_WIDTH, STATUS_DEFAULT_WIDTH, ATTACHMENT_DEFAULT_WIDTH,
+   *		   FROM_DEFAULT_WIDTH, SUBJECT_DEFAULT_WIDTH, DATE_DEFAULT_WIDTH );
+   *
+   * cfg_location_free( uiroot );
+   */
 
   gtk_clist_set_row_height (clist, 16);
   

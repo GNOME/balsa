@@ -80,6 +80,7 @@ static GnomeClient *master_client = NULL;
 static GnomeClient *active_client = NULL;
 static gboolean really_connected = FALSE;
 static gboolean exit_ordered = FALSE;
+static gboolean save_pending = FALSE;
 
 /* ************************************************************************ */
 
@@ -201,23 +202,14 @@ gboolean balsa_sm_save( void )
 {
 	DM( "balsa_sm_save" );
 
+	save_pending = TRUE;
 	gnome_client_request_save( master_client, GNOME_SAVE_BOTH, FALSE,
 				   GNOME_INTERACT_ANY, FALSE, FALSE );
 
-#if 0
-	if( balsa_sm_save_global() )
-		return TRUE;
-	if( balsa_sm_save_local() )
-		return TRUE;
+	/* FIXME: provide some feedback? */
+	while( save_pending )
+		gtk_main_iteration();
 
-	if( really_connected ) {
-		DM( "connected, drop local changes (will be save_session'ed)" );
-		cfg_location_discard( balsa_sm_local_root );
-	}
-
-	DM( "balsa_sm_save: syncing" );
-	cfg_sync();
-#endif
 	return FALSE;
 }
 
@@ -225,16 +217,29 @@ gboolean balsa_sm_save_local( void )
 {
 	DM( "save: only local" );
 
+	save_pending = TRUE;
 	gnome_client_request_save( master_client, GNOME_SAVE_LOCAL, FALSE,
 				   GNOME_INTERACT_ANY, FALSE, FALSE );
+
+	/* FIXME: provide some feedback? */
+	while( save_pending )
+		gtk_main_iteration();
+
 	return FALSE;
 }
 
 gboolean balsa_sm_save_global( void )
 {
 	DM( "save: only global" );
+
+	save_pending = TRUE;
 	gnome_client_request_save( master_client, GNOME_SAVE_GLOBAL, FALSE,
 				   GNOME_INTERACT_ANY, FALSE, FALSE );
+
+	/* FIXME: provide some feedback? */
+	while( save_pending )
+		gtk_main_iteration();
+
 	return FALSE;
 }
 
@@ -591,5 +596,6 @@ static gint save_session( GnomeClient *client, gint phase, GnomeSaveStyle save_s
 		kill_session( NULL, NULL );
 
 	active_client = NULL;
+	save_pending = FALSE;
         return TRUE;
 }

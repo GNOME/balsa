@@ -1,5 +1,17 @@
 2000-06-16  Peter Williams  <peter@beta.newton.cx>
 
+	* libbalsa/sm.c: Wait for the save to go through
+	before exiting balsa_sm_save*.
+
+	* src/cfg-memory-widgets.{c,h}: Whole new system for
+	handling "multiplexed" widgets, when many widgets
+	share one set of attributes (where UI memory is concerned
+	at least). For the notebook view and its CLists.
+
+	* src/balsa-mblist.gob, src/balsa-index.c, 
+	src/main-window.c, src/mblist-window.c: Move over to
+	multiplex API.
+	
 	* src/pref-manager.c (apply_prefs): Changed cfg_save
 	to balsa_sm_save_global.
 

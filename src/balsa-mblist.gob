@@ -112,9 +112,9 @@ class Balsa:MBList from Gtk:CTree {
 
 		uiroot = cfg_memory_default_root();
 		#ifdef BALSA_SHOW_INFO
-			cfg_memory_add_to_clist( GTK_CLIST( self ), uiroot, "MBList", 3, 40, 20, 30 );
+			cfg_memory_add_to_clist( GTK_WIDGET( self ), uiroot, "MBList", 3, 40, 20, 30 );
 		#else
-			cfg_memory_add_to_clist( GTK_CLIST( self ), uiroot, "MBList", 1, 90 );
+			cfg_memory_add_to_clist( GTK_WIDGET( self ), uiroot, "MBList", 1, 90 );
 		#endif
 		cfg_location_free( uiroot );
 

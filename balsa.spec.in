@@ -67,6 +67,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sun Sep 26 1999 Stuart Parmenter <pavlov@balsa.net>
+
+- Updated to version 0.5.0
+
 * Mon Dec 14 1998 Stuart Parmenter <pavlov@pavlov.net>
 
 - Updated to version 0.4.8.

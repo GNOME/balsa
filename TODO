@@ -19,6 +19,8 @@ New features/unfinished things:
  * update libmutt
 
 UI:
+ * Remove use of GNOME MDI
+   * Same look as now, except mailbox list in a splitter and not a handlebox
  D Mailbox list in the main window
      - Allow the mailbox tree to be resized
  * finish move and copy
@@ -26,7 +28,9 @@ UI:
  * mailboxes with new mail should have bold text
  P DND messages into mailboxes
      P Attachments in new mail
-     * move/copy messages via DND
+     P move/copy messages via DND
+       D move
+       * copy
  * MIME supporting icons.  use the new gnome metadata stuff that gmc uses?
  * New mail notification
      P via sound

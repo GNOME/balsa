@@ -1398,6 +1398,7 @@ mailbox_messages_changed_status(LibBalsaMailbox * mb,
     }
 
     if (flag == LIBBALSA_MESSAGE_FLAG_DELETED
+        && bindex->current_message
         && LIBBALSA_MESSAGE_IS_DELETED(bindex->current_message)) {
         GtkTreeIter iter;
 

@@ -42,8 +42,6 @@ static void balsa_index_size_allocate (GtkWidget * widget,
 
 
 /* internal functions */
-static void delete_messages (BalsaIndex * bindex,
-			     glong msgno);
 static void append_messages (BalsaIndex * bindex,
 			     glong first,
 			     glong last);
@@ -170,6 +168,7 @@ balsa_index_init (BalsaIndex * bindex)
   static gchar *titles[] =
   {
     "N",
+    "D",
     "#",
     "From",
     "Subject",
@@ -187,17 +186,18 @@ balsa_index_init (BalsaIndex * bindex)
 
   /* create the clist */
   GTK_BIN (bindex)->child =
-    (GtkWidget *) clist = gtk_clist_new_with_titles (5, titles);
+    (GtkWidget *) clist = gtk_clist_new_with_titles (6, titles);
 
   gtk_widget_set_parent (GTK_WIDGET (clist), GTK_WIDGET (bindex));
   gtk_clist_set_policy (clist, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_clist_set_selection_mode (clist, GTK_SELECTION_BROWSE);
   gtk_clist_set_column_justification (clist, 1, GTK_JUSTIFY_RIGHT);
-  gtk_clist_set_column_width (clist, 0, 25);
-  gtk_clist_set_column_width (clist, 1, 30);
-  gtk_clist_set_column_width (clist, 2, 150);
-  gtk_clist_set_column_width (clist, 3, 250);
-  gtk_clist_set_column_width (clist, 4, 100);
+  gtk_clist_set_column_width (clist, 0, 16);
+  gtk_clist_set_column_width (clist, 1, 7);
+  gtk_clist_set_column_width (clist, 2, 30);
+  gtk_clist_set_column_width (clist, 3, 150);
+  gtk_clist_set_column_width (clist, 4, 250);
+  gtk_clist_set_column_width (clist, 5, 100);
 
 
   gtk_signal_connect_after (GTK_OBJECT (clist),
@@ -411,10 +411,24 @@ balsa_index_size_allocate (GtkWidget * widget,
     }
 }
 
-static void
-delete_messages (BalsaIndex * bindex, glong msgno)
+void
+balsa_delete_message (BalsaIndex * bindex)
 {
-  gtk_clist_remove (GTK_CLIST (GTK_BIN (bindex)->child), msgno);
+  GtkCList *clist;
+  glong row;
+  char tmp[10];
+
+  clist = GTK_CLIST (GTK_BIN (bindex)->child);
+
+  if (!clist->selection)
+    return;
+
+  row = (glong) clist->selection->data;
+
+  gtk_clist_set_text (clist, row, 1, "D");
+
+  sprintf (tmp, "%ld", row + 1);
+  mail_setflag (bindex->stream, tmp, "\\DELETED");
 }
 
 
@@ -424,23 +438,24 @@ append_messages (BalsaIndex * bindex,
 		 glong last)
 {
   glong i;
-  gchar *text[5];
+  gchar *text[6];
   MESSAGECACHE *cache;
 
   text[0] = NULL;
-  text[1] = g_malloc (BUFFER_SIZE);
+  text[1] = NULL;
   text[2] = g_malloc (BUFFER_SIZE);
   text[3] = g_malloc (BUFFER_SIZE);
   text[4] = g_malloc (BUFFER_SIZE);
+  text[5] = g_malloc (BUFFER_SIZE);
 
 
   gtk_clist_freeze (GTK_CLIST (GTK_BIN (bindex)->child));
 
   for (i = first; i <= last; i++)
     {
-      sprintf (text[1], "%d", i);
-      mail_fetchfrom (text[2], bindex->stream, i, (long) BUFFER_SIZE);
-      mail_fetchsubject (text[3], bindex->stream, i, (long) BUFFER_SIZE);
+      sprintf (text[2], "%d", i);
+      mail_fetchfrom (text[3], bindex->stream, i, (long) BUFFER_SIZE);
+      mail_fetchsubject (text[4], bindex->stream, i, (long) BUFFER_SIZE);
 
       if (bindex->progress_bar)
 	{
@@ -450,7 +465,7 @@ append_messages (BalsaIndex * bindex,
 
       mail_fetchstructure (bindex->stream, i, NIL);
       cache = mail_elt (bindex->stream, i);
-      mail_date (text[4], cache);
+      mail_date (text[5], cache);
 
       gtk_clist_append (GTK_CLIST (GTK_BIN (bindex)->child), text);
       update_new_message_pixmap (bindex, i);
@@ -462,11 +477,10 @@ append_messages (BalsaIndex * bindex,
   if (bindex->progress_bar)
     gtk_progress_bar_update (bindex->progress_bar, 0.0);
 
-
-  g_free (text[1]);
   g_free (text[2]);
   g_free (text[3]);
   g_free (text[4]);
+  g_free (text[5]);
 }
 
 

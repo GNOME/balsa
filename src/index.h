@@ -30,6 +30,7 @@ void index_select (GtkWidget * widget,
 void index_next_message ();
 void index_previous_message ();
 
+void index_delete_message();
 
 void mailbox_menu_update ();
 

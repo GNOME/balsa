@@ -79,9 +79,10 @@ void balsa_index_append_new_messages (BalsaIndex * bindex);
 
 
 /* select up/down the index */
-void balsa_index_select_next (BalsaIndex * bindex);
-void balsa_index_select_previous (BalsaIndex * bindex);
+void balsa_index_select_next (BalsaIndex *);
+void balsa_index_select_previous (BalsaIndex *);
 
+void balsa_delete_message(BalsaIndex * bindex);
 
 /* set the pointer to the progress bar that's used to show
  * progress loading images */

@@ -2274,7 +2274,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
             libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
                                    NULL);
             libbalsa_information
-                (LIBBALSA_INFORMATION_WARNING,
+                (LIBBALSA_INFORMATION_MESSAGE,
                  _("The message sent by %s with subject \"%s\" contains 8-bit "
                    "characters, but no header describing the used codeset "
                    "(converted to %s)"),
@@ -4161,7 +4161,7 @@ process_signature(LibBalsaMessageBody *body, const gchar * sender,
     /* check if the protocol is available */
     if (!has_protocol) {
         libbalsa_information
-            (LIBBALSA_INFORMATION_WARNING,
+            (LIBBALSA_INFORMATION_MESSAGE,
              _("The message sent by %s with subject \"%s\" contains "
                "a %s signed part, but this crypto protocol is not available."),
              sender, subject,
@@ -4238,7 +4238,7 @@ balsa_message_scan_signatures(LibBalsaMessageBody *body,
         if (signres & LIBBALSA_PROTECT_SIGN) {
             if (signres & LIBBALSA_PROTECT_ERROR)
                 libbalsa_information
-                    (LIBBALSA_INFORMATION_WARNING,
+                    (LIBBALSA_INFORMATION_MESSAGE,
                      _("The message sent by %s with subject \"%s\" contains "
                        "a signed part, but it's structure is invalid. "
                        "The signature, if there is any, can not be checked."),
@@ -4282,6 +4282,10 @@ balsa_message_scan_signatures(LibBalsaMessageBody *body,
 static void
 balsa_message_set_crypto(LibBalsaMessage * message)
 {
+#define AUTOMATIC_CRYPTO_CHECK TRUE
+    static const LibBalsaInformationType info_level =
+        AUTOMATIC_CRYPTO_CHECK 
+        ? LIBBALSA_INFORMATION_MESSAGE : LIBBALSA_INFORMATION_WARNING;
     /* FIXME: not checking for body_ref == 1 leads to a crash if we have both
      * the encrypted and the unencrypted version open as the body chain of the
      * first one will be unref'd. */
@@ -4297,14 +4301,14 @@ balsa_message_set_crypto(LibBalsaMessage * message)
 
             if (encrres & LIBBALSA_PROTECT_ERROR) {
                 libbalsa_information
-                    (LIBBALSA_INFORMATION_WARNING,
+                    (info_level,
                      _("The message sent by %s with subject \"%s\" contains "
                        "an encrypted part, but it's structure is invalid."),
                                      sender, subject);
             } else if (encrres & LIBBALSA_PROTECT_RFC3156) {
                 if (!balsa_app.has_openpgp)
                     libbalsa_information
-                        (LIBBALSA_INFORMATION_WARNING,
+                        (info_level,
                          _("The message sent by %s with subject \"%s\" "
                            "contains a PGP encrypted part, but this "
                            "crypto protocol is not available."),
@@ -4316,7 +4320,7 @@ balsa_message_set_crypto(LibBalsaMessage * message)
             } else if (encrres & LIBBALSA_PROTECT_SMIMEV3) {
                 if (!balsa_app.has_smime)
                     libbalsa_information
-                        (LIBBALSA_INFORMATION_WARNING,
+                        (info_level,
                          _("The message sent by %s with subject \"%s\" "
                            "contains a S/MIME encrypted part, but this "
                            "crypto protocol is not available."),
@@ -4429,6 +4433,10 @@ part_info_init_crypto_signature(BalsaMessage * bm, BalsaPartInfo * info)
 static gboolean
 part_info_init_mimetext_rfc2440(BalsaMessage * bm, BalsaPartInfo * info)
 {
+#define AUTOMATIC_CRYPTO_CHECK TRUE
+    static const LibBalsaInformationType info_level =
+        AUTOMATIC_CRYPTO_CHECK 
+        ? LIBBALSA_INFORMATION_MESSAGE : LIBBALSA_INFORMATION_WARNING;
     GMimePartRfc2440Mode rfc2440mode;
     gpgme_error_t sig_res;
     GdkPixbuf * content_icon;
@@ -4506,7 +4514,7 @@ part_info_init_mimetext_rfc2440(BalsaMessage * bm, BalsaPartInfo * info)
 #ifdef HAVE_GPG
         rfc2440_no_pubkey = (sig_res == GPG_ERR_NO_PUBKEY);
 #endif
-        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+        libbalsa_information(info_level,
                              _("Checking the signature of the message "
                                "sent by %s with subject \"%s\" returned:\n%s"),
                              sender, subject,

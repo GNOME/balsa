@@ -1,3 +1,8 @@
+2004-07-21  Pawel Salek
+
+	* autogen.sh: require automake 1.7
+	* src/balsa-message.c: make automatic tests more silent.
+
 2004-07-20 09:34  PeterB
 
 	* src/mailbox-conf.c: don't duplicate a local mailbox in the

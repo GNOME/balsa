@@ -1,3 +1,8 @@
+2000-05-06 Pawel Salek <pawsa@theochem.kth.se>
+
+	* libmutt/configure.in: disabled fcntl locks, enabled flock.
+	* README: pointers to locking method discussions.
+	
 2000-05-05 Pawel Salek <pawsa@theochem.kth.se>
 	Mailboxes in the configuration are not referred by name only any more.
 

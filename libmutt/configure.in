@@ -213,18 +213,18 @@ AC_ARG_WITH(domain, [  --with-domain=DOMAIN       Specify your DNS domain name ]
 AC_DEFINE(USE_POP)
 AC_DEFINE(USE_IMAP)
 
-AC_ARG_ENABLE(flock, [  --enable-flock             Use flock() to lock files],
-	[if test $enableval = yes; then
-		AC_DEFINE(USE_FLOCK)
-	fi])
+mutt_cv_flock=yes
+AC_ARG_ENABLE(flock, [  --disable-fcntl            Do NOT use flock() to lock files ],
+	[if test $enableval = no; then mutt_cv_flock=no; fi])
 
-mutt_cv_fcntl=yes
-AC_ARG_ENABLE(fcntl, [  --disable-fcntl            Do NOT use fcntl() to lock files ],
-	[if test $enableval = no; then mutt_cv_fcntl=no; fi])
-
-if test $mutt_cv_fcntl = yes; then
-	AC_DEFINE(USE_FCNTL)
+if test $mutt_cv_flock = yes; then
+	AC_DEFINE(USE_FLOCK)
 fi
+
+AC_ARG_ENABLE(fcntl, [  --enable-fcntl             Use fcntl() to lock files],
+	[if test $enableval = yes; then
+		AC_DEFINE(USE_FCNTL)
+	fi])
 
 AC_ARG_ENABLE(nfs-fix, [  --enable-nfs-fix           Work around an NFS with broken attributes caching ],
 	[if test x$enableval = xyes; then

@@ -58,3 +58,9 @@ Help System:
 	In order to compile the help files, you need to have the
 GNOME DocBook documentation system. Very good documentation
 can be found at: http://www.gnome.org/gdp/gdp-handbook/gettingstarted.html
+
+Mailbox locking:
+	Balsa uses flock+dotfile for mailbox file locking. It does not
+use fcntl (although it can be enabled) since this locking method is
+very fragile and often not portable (see for example
+http://www.washington.edu/pine/tech-notes/low-level.html#locking).

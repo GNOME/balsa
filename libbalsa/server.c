@@ -26,7 +26,6 @@
 #include "libbalsa_private.h"
 #include "misc.h"
 
-#include <libgnome/gnome-defs.h>
 #include <libgnome/gnome-config.h> 
 #include <libgnome/gnome-i18n.h> 
 

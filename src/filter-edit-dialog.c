@@ -97,8 +97,8 @@ build_left_side (GtkWidget **clist_ptr)
 
     static gchar *titles[] =
     {
-        "On",
-        "Name",
+        N_("On"),
+        N_("Name"),
     };
 
 /*
@@ -158,13 +158,13 @@ build_left_side (GtkWidget **clist_ptr)
 
     /* up button */
     pixmap = gnome_stock_new_with_icon (GNOME_STOCK_MENU_UP);
-    button = gnome_pixmap_button (pixmap, "Up");
+    button = gnome_pixmap_button (pixmap, _("Up"));
     gtk_signal_connect (GTK_OBJECT (button), "clicked",
                         GTK_SIGNAL_FUNC (fe_up_pressed), clist);
     gtk_container_add (GTK_CONTAINER (bbox), button);
     /* down button */
     pixmap = gnome_stock_new_with_icon (GNOME_STOCK_MENU_DOWN);
-    button = gnome_pixmap_button (pixmap, "Down");
+    button = gnome_pixmap_button (pixmap, _("Down"));
     gtk_signal_connect (GTK_OBJECT (button), "clicked",
                         GTK_SIGNAL_FUNC (fe_down_pressed), clist);
     gtk_container_add (GTK_CONTAINER (bbox), button);
@@ -181,13 +181,13 @@ build_left_side (GtkWidget **clist_ptr)
 
     /* new button */
     pixmap = gnome_stock_new_with_icon (GNOME_STOCK_MENU_NEW);
-    button = gnome_pixmap_button (pixmap, "New");
+    button = gnome_pixmap_button (pixmap, _("New"));
     gtk_signal_connect (GTK_OBJECT (button), "clicked",
                         GTK_SIGNAL_FUNC (fe_new_pressed), clist);
     gtk_container_add (GTK_CONTAINER (bbox), button);
     /* delete button */
     pixmap = gnome_stock_new_with_icon (GNOME_STOCK_MENU_TRASH);
-    button = gnome_pixmap_button (pixmap, "Delete");
+    button = gnome_pixmap_button (pixmap, _("Delete"));
     gtk_signal_connect (GTK_OBJECT (button), "clicked",
                         GTK_SIGNAL_FUNC (fe_delete_pressed), clist);
     gtk_container_add (GTK_CONTAINER (bbox), button);
@@ -230,7 +230,7 @@ build_type_notebook ()
                               NULL);
     gtk_widget_show (page);
 
-    frame = gtk_frame_new ("Match in:");
+    frame = gtk_frame_new (_("Match in:"));
     gtk_frame_set_label_align (GTK_FRAME (frame),
                                GTK_POS_LEFT,
                                GTK_POS_TOP);
@@ -248,7 +248,7 @@ build_type_notebook ()
                        table);
     gtk_widget_show (table);
 
-    fe_type_simple_all = gtk_check_button_new_with_label ("All");
+    fe_type_simple_all = gtk_check_button_new_with_label (_("All"));
     gtk_table_attach (GTK_TABLE (table),
                       fe_type_simple_all,
                       0, 1, 0, 1,
@@ -260,7 +260,7 @@ build_type_notebook ()
                         GTK_SIGNAL_FUNC (fe_type_simple_toggled),
                         GINT_TO_POINTER (1));
     gtk_widget_show (fe_type_simple_all);
-    fe_type_simple_header = gtk_check_button_new_with_label ("Header");
+    fe_type_simple_header = gtk_check_button_new_with_label (_("Header"));
     gtk_table_attach (GTK_TABLE (table),
                       fe_type_simple_header,
                       1, 2, 0, 1,
@@ -272,7 +272,7 @@ build_type_notebook ()
                         GTK_SIGNAL_FUNC (fe_type_simple_toggled),
                         GINT_TO_POINTER (2));
     gtk_widget_show (fe_type_simple_header);
-    fe_type_simple_body = gtk_check_button_new_with_label ("Body");
+    fe_type_simple_body = gtk_check_button_new_with_label (_("Body"));
     gtk_table_attach (GTK_TABLE (table),
                       fe_type_simple_body,
                       1, 2, 1, 2,
@@ -284,7 +284,7 @@ build_type_notebook ()
                         GTK_SIGNAL_FUNC (fe_type_simple_toggled),
                         GINT_TO_POINTER (3));
     gtk_widget_show (fe_type_simple_body);
-    fe_type_simple_to = gtk_check_button_new_with_label ("To:");
+    fe_type_simple_to = gtk_check_button_new_with_label (_("To:"));
     gtk_table_attach (GTK_TABLE (table),
                       fe_type_simple_to,
                       2, 3, 0, 1,
@@ -296,7 +296,7 @@ build_type_notebook ()
                         GTK_SIGNAL_FUNC (fe_type_simple_toggled),
                         GINT_TO_POINTER (4));
     gtk_widget_show (fe_type_simple_to);
-    fe_type_simple_from = gtk_check_button_new_with_label ("From:");
+    fe_type_simple_from = gtk_check_button_new_with_label (_("From:"));
     gtk_table_attach (GTK_TABLE (table),
                       fe_type_simple_from,
                       2, 3, 1, 2,
@@ -308,7 +308,7 @@ build_type_notebook ()
                         GTK_SIGNAL_FUNC (fe_type_simple_toggled),
                         GINT_TO_POINTER (5));
     gtk_widget_show (fe_type_simple_from);
-    fe_type_simple_subject = gtk_check_button_new_with_label ("Subject");
+    fe_type_simple_subject = gtk_check_button_new_with_label (_("Subject"));
     gtk_table_attach (GTK_TABLE (table),
                       fe_type_simple_subject,
                       2, 3, 2, 3,
@@ -321,7 +321,7 @@ build_type_notebook ()
                         GINT_TO_POINTER (6));
     gtk_widget_show (fe_type_simple_subject);
 
-    fe_type_simple_label = gtk_label_new ("Match string:");
+    fe_type_simple_label = gtk_label_new (_("Match string:"));
     gtk_table_attach (GTK_TABLE (page),
                       fe_type_simple_label,
                       0, 1, 4, 5,
@@ -373,7 +373,7 @@ build_type_notebook ()
                       GTK_SHRINK,
                       2, 2);
     gtk_widget_show (box);
-    button = gtk_button_new_with_label ("Add");
+    button = gtk_button_new_with_label (_("Add"));
     gtk_box_pack_start (GTK_BOX (box),
                         button,
                         TRUE,
@@ -384,7 +384,7 @@ build_type_notebook ()
                         GTK_SIGNAL_FUNC (fe_add_pressed),
                         NULL);
     gtk_widget_show (button);
-    button = gtk_button_new_with_label ("Remove");
+    button = gtk_button_new_with_label (_("Remove"));
     gtk_box_pack_start (GTK_BOX (box),
                         button,
                         TRUE,
@@ -413,7 +413,7 @@ build_type_notebook ()
                               NULL);
     gtk_widget_show (page);
 
-    fe_type_exec_label = gtk_label_new ("Command:");
+    fe_type_exec_label = gtk_label_new (_("Command:"));
     gtk_table_attach (GTK_TABLE (page),
                       fe_type_exec_label,
                       0, 1, 0, 1,
@@ -449,7 +449,7 @@ build_match_page ()
 
   /* The name entry */
 
-    fe_name_label = gtk_label_new ("Filter name:");
+    fe_name_label = gtk_label_new (_("Filter name:"));
     gtk_table_attach (GTK_TABLE (page),
                       fe_name_label,
                       0, 2, 0, 1,
@@ -468,7 +468,7 @@ build_match_page ()
 
   /* The "Process when:" option menu */
 
-    frame = gtk_frame_new ("Process when:");
+    frame = gtk_frame_new (_("Process when:"));
     gtk_frame_set_label_align (GTK_FRAME (frame),
                                GTK_POS_LEFT,
                                GTK_POS_TOP);
@@ -499,7 +499,7 @@ build_match_page ()
 
   /* The "Run on:" option menu */
 
-    frame = gtk_frame_new ("Run on:");
+    frame = gtk_frame_new (_("Run on:"));
     gtk_frame_set_label_align (GTK_FRAME (frame),
                                GTK_POS_LEFT,
                                GTK_POS_TOP);
@@ -529,7 +529,7 @@ build_match_page ()
 
   /* the type notebook's option menu */
 
-    frame = gtk_frame_new ("Search type:");
+    frame = gtk_frame_new (_("Search type:"));
     gtk_frame_set_label_align (GTK_FRAME (frame),
                                GTK_POS_LEFT,
                                GTK_POS_TOP);
@@ -585,7 +585,7 @@ build_action_page ()
 
     /* The notification area */
 
-    frame = gtk_frame_new ("Notification:");
+    frame = gtk_frame_new (_("Notification:"));
     gtk_frame_set_label_align (GTK_FRAME (frame), GTK_POS_LEFT, GTK_POS_TOP);
     gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_IN);
     gtk_box_pack_start (GTK_BOX (page), frame, FALSE, FALSE, 2);
@@ -594,7 +594,7 @@ build_action_page ()
     gtk_container_add (GTK_CONTAINER (frame), table);
 
     /* Notification buttons */
-    fe_sound_button = gtk_check_button_new_with_label ("Play sound:");
+    fe_sound_button = gtk_check_button_new_with_label (_("Play sound:"));
     gtk_table_attach (GTK_TABLE (table), fe_sound_button,
                       0, 1, 0, 1,
                       GTK_FILL | GTK_SHRINK | GTK_EXPAND,
@@ -602,7 +602,7 @@ build_action_page ()
                       5, 5);
     gtk_widget_show(fe_sound_button);
 
-    fe_sound_entry = gnome_file_entry_new("filter_sounds", "Use Sound...");
+    fe_sound_entry = gnome_file_entry_new("filter_sounds", _("Use Sound..."));
     gtk_table_attach (GTK_TABLE (table),
                       fe_sound_entry,
                       1, 2, 0, 1,
@@ -611,7 +611,7 @@ build_action_page ()
                       5, 5);
     gtk_widget_show (fe_sound_entry);
 
-    fe_popup_button = gtk_check_button_new_with_label ("Popup text:");
+    fe_popup_button = gtk_check_button_new_with_label (_("Popup text:"));
     gtk_table_attach (GTK_TABLE (table),
                       fe_popup_button,
                       0, 1, 1, 2,
@@ -630,7 +630,7 @@ build_action_page ()
 
 
     /* The action area */
-    frame = gtk_frame_new ("Action to perform:");
+    frame = gtk_frame_new (_("Action to perform:"));
     gtk_frame_set_label_align (GTK_FRAME (frame), GTK_POS_LEFT, GTK_POS_TOP);
     gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_IN);
     gtk_box_pack_start (GTK_BOX (page), frame, FALSE, FALSE, 2);
@@ -651,7 +651,7 @@ build_action_page ()
 
     /* The disposition area */
 
-    frame = gtk_frame_new ("Disposition:");
+    frame = gtk_frame_new (_("Disposition:"));
     gtk_frame_set_label_align (GTK_FRAME (frame), GTK_POS_LEFT, GTK_POS_TOP);
     gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_IN);
     gtk_box_pack_start (GTK_BOX (page), frame, FALSE, FALSE, 2);
@@ -659,18 +659,17 @@ build_action_page ()
     box = gtk_vbox_new (TRUE, 2);
     gtk_container_add (GTK_CONTAINER (frame), box);
 
-    fe_disp_place = gtk_radio_button_new_with_label (NULL,
-                                                             "Place/leave in default folder");
+    fe_disp_place = gtk_radio_button_new_with_label (NULL, _("Place/leave in default folder"));
     gtk_box_pack_start (GTK_BOX (box), fe_disp_place, TRUE, FALSE, 1);
 
     fe_disp_continue = gtk_radio_button_new_with_label (
         gtk_radio_button_group(GTK_RADIO_BUTTON(fe_disp_place)),
-        "Do not place/leave in default folder");
+        _("Do not place/leave in default folder"));
     gtk_box_pack_start (GTK_BOX (box), fe_disp_continue, TRUE, FALSE, 1);
 
     fe_disp_stop = gtk_radio_button_new_with_label (
         gtk_radio_button_group(GTK_RADIO_BUTTON(fe_disp_continue)),
-        "Stop filtering here");
+        _("Stop filtering here"));
     gtk_box_pack_start (GTK_BOX (box), fe_disp_stop, TRUE, FALSE, 1);
 
     return page;
@@ -698,10 +697,10 @@ build_right_side (GtkWidget *clist)
 
     page = build_match_page ();
     gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
-                              page, gtk_label_new ("Match"));
+                              page, gtk_label_new (_("Match")));
     page = build_action_page ();
     gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
-                              page, gtk_label_new ("Action"));
+                              page, gtk_label_new (_("Action")));
 
     /* button box */
     bbox = gtk_hbutton_box_new ();
@@ -715,7 +714,7 @@ build_right_side (GtkWidget *clist)
     gtk_container_add(GTK_CONTAINER(bbox), button);
 
     pixmap = gnome_stock_new_with_icon (GNOME_STOCK_MENU_UNDO);
-    button = gnome_pixmap_button(pixmap, "Revert");
+    button = gnome_pixmap_button(pixmap, _("Revert"));
     gtk_signal_connect(GTK_OBJECT(button),
                        "clicked",
                        GTK_SIGNAL_FUNC(fe_revert_pressed),
@@ -743,7 +742,7 @@ filter_edit_dialog (GList * filter_list)
     GtkWidget *sep;
     GtkWidget *clist;
 
-    window = gnome_dialog_new (_ ("Balsa Filters"),
+    window = gnome_dialog_new ( _("Balsa Filters"),
                                GNOME_STOCK_BUTTON_OK,
                                GNOME_STOCK_BUTTON_CANCEL,
                                GNOME_STOCK_BUTTON_HELP, NULL);

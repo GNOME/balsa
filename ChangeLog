@@ -1,3 +1,9 @@
+1999-02-24  Sergey Panov  <sipan@mit.edu>
+
+        * src/filter-edit-dialog.c, src/pref-manager.c:
+        added missed _() macros
+
+
 1999-02-11  Sergey Panov  <sipan@mit.edu>
 
 	* src/main.c, src/Makefile.am: turn on internationalization

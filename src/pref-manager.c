@@ -552,17 +552,17 @@ create_display_page ()
     }
 
 /* Main window */
-  frame = gtk_frame_new ("Main window");
+  frame = gtk_frame_new (_("Main window"));
   gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
 
-  pui->previewpane = gtk_check_button_new_with_label (_ ("Use preview pane"));
+  pui->previewpane = gtk_check_button_new_with_label ( _("Use preview pane"));
   gtk_container_add (GTK_CONTAINER (frame), GTK_WIDGET (pui->previewpane));
 #ifdef BALSA_SHOW_INFO
   /* mailbox list window */
   frame = gtk_frame_new ("Mailbox list window");
   gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
 
-  pui->mblist_show_mb_content_info = gtk_check_button_new_with_label (_ ("View mailbox content informations "));
+  pui->mblist_show_mb_content_info = gtk_check_button_new_with_label ( _("View mailbox content informations "));
   gtk_container_add (GTK_CONTAINER (frame), GTK_WIDGET (pui->mblist_show_mb_content_info));
 #endif
   return vbox;
@@ -584,21 +584,21 @@ create_misc_page ()
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 10);
 
   /* Misc */
-  frame = gtk_frame_new ("Misc");
+  frame = gtk_frame_new (_("Misc"));
   gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
 
   /* arp */
   vbox1 = gtk_vbox_new (FALSE, 0);
   gtk_container_add (GTK_CONTAINER (frame), GTK_WIDGET (vbox1));
 
-  pui->debug = gtk_check_button_new_with_label (_ ("Debug"));
+  pui->debug = gtk_check_button_new_with_label (_("Debug"));
   gtk_box_pack_start (GTK_BOX (vbox1), GTK_WIDGET (pui->debug), TRUE, TRUE, 2);
 
 
   /* arp --- table containing leadin label and string. */
   table = gtk_table_new (1, 2, FALSE);
 
-  label = gtk_label_new (_ ("Reply prefix:"));
+  label = gtk_label_new (_("Reply prefix:"));
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
 		    GTK_FILL, GTK_FILL, 10, 10);

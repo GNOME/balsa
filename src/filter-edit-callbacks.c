@@ -124,7 +124,7 @@ fe_action_selected (GtkWidget * widget,
         /* fall through */
 
     case FILTER_MOVE:		/* move to folder */
-        gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (fe_disp_stop),
+        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (fe_disp_stop),
                                      TRUE);
         gtk_widget_set_sensitive (GTK_WIDGET (fe_disp_place),
                                   FALSE);
@@ -209,13 +209,13 @@ fe_type_simple_toggled (GtkWidget * widget,
         switch (GPOINTER_TO_INT (data))
         {
         case 1:                /* ALL */
-            gtk_toggle_button_set_state (
+            gtk_toggle_button_set_active (
                 GTK_TOGGLE_BUTTON (fe_type_simple_header),
                 FALSE);
             gtk_widget_set_sensitive (
                 GTK_WIDGET (fe_type_simple_header),
                 FALSE);
-            gtk_toggle_button_set_state (
+            gtk_toggle_button_set_active (
                 GTK_TOGGLE_BUTTON (fe_type_simple_body),
                 FALSE);
             gtk_widget_set_sensitive (
@@ -223,19 +223,19 @@ fe_type_simple_toggled (GtkWidget * widget,
                 FALSE);
 
         case 2:                /* header */
-            gtk_toggle_button_set_state (
+            gtk_toggle_button_set_active (
                 GTK_TOGGLE_BUTTON (fe_type_simple_to),
                 FALSE);
             gtk_widget_set_sensitive (
                 GTK_WIDGET (fe_type_simple_to),
                 FALSE);
-            gtk_toggle_button_set_state (
+            gtk_toggle_button_set_active (
                 GTK_TOGGLE_BUTTON (fe_type_simple_from),
                 FALSE);
             gtk_widget_set_sensitive (
                 GTK_WIDGET (fe_type_simple_from),
                 FALSE);
-            gtk_toggle_button_set_state (
+            gtk_toggle_button_set_active (
                 GTK_TOGGLE_BUTTON (fe_type_simple_subject),
                 FALSE);
             gtk_widget_set_sensitive (

@@ -356,7 +356,7 @@ mailbox_conf_set_values (Mailbox * mailbox)
 	  gtk_entry_set_text (GTK_ENTRY (mcw->pop_server), MAILBOX_POP3 (mailbox)->server);
 	  gtk_entry_set_text (GTK_ENTRY (mcw->pop_username), MAILBOX_POP3 (mailbox)->user);
 	  gtk_entry_set_text (GTK_ENTRY (mcw->pop_password), MAILBOX_POP3 (mailbox)->passwd);
-	  gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (mcw->pop_check), MAILBOX_POP3 (mailbox)->check);
+	  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (mcw->pop_check), MAILBOX_POP3 (mailbox)->check);
 	}
       gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_POP3);
       break;
@@ -631,7 +631,7 @@ create_new_page (void)
   radio_button = gtk_radio_button_new_with_label (NULL, _ ("Local mailbox"));
   gtk_box_pack_start (GTK_BOX (vbox), radio_button, FALSE, FALSE, 0);
   gtk_signal_connect (GTK_OBJECT (radio_button), "clicked", GTK_SIGNAL_FUNC (set_next_page), (gpointer) MC_PAGE_LOCAL);
-  gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (radio_button), TRUE);
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (radio_button), TRUE);
   gtk_widget_show (radio_button);
 
   /* imap mailbox */

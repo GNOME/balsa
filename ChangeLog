@@ -1,3 +1,11 @@
+1999-01-12  bertrand  <Bertrand.Guiheneuf@inria.fr>
+
+	* src/filter-edit-callbacks.c 
+	* src/mailbox-conf.c 
+	* src/pref-manager.c : 
+	s/gtk_toggle_button_set_state/gtk_toggle_button_set_active/
+	to conform to changes in gtk+.
+	
 1999-01-11  bertrand  <Bertrand.Guiheneuf@inria.fr>
 
 	

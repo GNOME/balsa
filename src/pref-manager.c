@@ -262,7 +262,7 @@ set_prefs (void)
   for (i = 0; i < NUM_TOOLBAR_MODES; i++)
     if (balsa_app.toolbar_style == toolbar_type[i])
       {
-	gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (pui->toolbar_type[i]), TRUE);
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->toolbar_type[i]), TRUE);
 	break;
       }
 
@@ -276,8 +276,8 @@ set_prefs (void)
     gtk_entry_set_text (GTK_ENTRY (pui->smtp_server), balsa_app.smtp_server);
   gtk_entry_set_text (GTK_ENTRY (pui->mail_directory), balsa_app.local_mail_directory);
 
-  gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (pui->previewpane), balsa_app.previewpane);
-  gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (pui->debug), balsa_app.debug);
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->previewpane), balsa_app.previewpane);
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->debug), balsa_app.debug);
 
   /* arp */
   gtk_entry_set_text (GTK_ENTRY (pui->quote_str), balsa_app.quote_str);
@@ -483,7 +483,7 @@ create_mailservers_page ()
   gtk_table_attach (GTK_TABLE (table1), pui->rb_local_mua, 0, 1, 1, 2,
                     (GtkAttachOptions) GTK_EXPAND | GTK_FILL,
 		    (GtkAttachOptions) GTK_EXPAND | GTK_FILL, 0, 0);
-  gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (pui->rb_local_mua), TRUE);
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->rb_local_mua), TRUE);
 
   pui->smtp_server = gtk_entry_new ();
   gtk_widget_show (pui->smtp_server);

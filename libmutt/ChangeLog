@@ -1,3 +1,9 @@
+1999-01-12  bertrand  <Bertrand.Guiheneuf@inria.fr>
+
+	* configure.in 
+	in AC_PATH_PROG(SENDMAIL, sendmail ..
+	don't replace ':' by ' '.
+
 1999-01-08  bertrand  <Bertrand.Guiheneuf@inria.fr>
 
 	* mx.c (mutt_is_spool): removed my previous changes about 

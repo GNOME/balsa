@@ -309,26 +309,29 @@ mailbox_conf_new (Mailbox * mailbox, gint add_mbox, MailboxType type)
   gtk_signal_connect (GTK_OBJECT (mcw->cancel), "clicked",
 		      (GtkSignalFunc) mailbox_conf_close, FALSE);
 
-  mailbox_conf_set_values (mcw->mailbox);
-
-  switch (type)
-    {
-    case MAILBOX_MAILDIR:
-    case MAILBOX_MBOX:
-    case MAILBOX_MH:
-      gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_LOCAL);
-      break;
-    case MAILBOX_POP3:
-      gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_POP3);
-      break;
-    case MAILBOX_IMAP:
-      gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_IMAP);
-      break;
-    default:
-      break;
-    }
-
   gtk_widget_show_all (mcw->window);
+
+  if(type == MAILBOX_UNKNOWN)
+    mailbox_conf_set_values (mcw->mailbox);
+  else {
+    switch (type)
+      {
+      case MAILBOX_MAILDIR:
+      case MAILBOX_MBOX:
+      case MAILBOX_MH:
+	gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_LOCAL);
+	break;
+      case MAILBOX_POP3:
+	gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_POP3);
+	break;
+      case MAILBOX_IMAP:
+	gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_IMAP);
+	break;
+      default:
+	break;
+      }
+  }
+
 }
 
 

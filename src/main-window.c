@@ -659,7 +659,7 @@ static GnomeUIInfo mailbox_menu[] = {
     GNOMEUIINFO_ITEM_STOCK(N_("Reset _Filter"),  "",
                            reset_filter_cb, GTK_STOCK_FIND),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_MARK_ALL_POS (MENU_MAILBOX_HIDE_POS+2)
+#define MENU_MAILBOX_MARK_ALL_POS (MENU_MAILBOX_HIDE_POS+5)
     {
         GNOME_APP_UI_ITEM, N_("Select all"),
         N_("Select all messages in current mailbox"),
@@ -677,7 +677,7 @@ static GnomeUIInfo mailbox_menu[] = {
                            mailbox_conf_delete_cb,
                            GTK_STOCK_REMOVE),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_COMMIT_POS (MENU_MAILBOX_DELETE_POS+1)
+#define MENU_MAILBOX_COMMIT_POS (MENU_MAILBOX_DELETE_POS+2)
     GNOMEUIINFO_ITEM_STOCK(
         N_("Co_mmit Current"),
         N_("Commit the changes in the currently opened mailbox"),
@@ -692,7 +692,7 @@ static GnomeUIInfo mailbox_menu[] = {
     GNOMEUIINFO_ITEM_STOCK(N_("_Close"), N_("Close mailbox"),
                            mailbox_close_cb, GTK_STOCK_CLOSE),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_EMPTY_TRASH_POS (MENU_MAILBOX_CLOSE_POS+1)
+#define MENU_MAILBOX_EMPTY_TRASH_POS (MENU_MAILBOX_CLOSE_POS+2)
     GNOMEUIINFO_ITEM_STOCK(N_("Empty _Trash"),
                            N_("Delete messages from the Trash mailbox"),
                            empty_trash, GTK_STOCK_REMOVE),
@@ -702,7 +702,7 @@ static GnomeUIInfo mailbox_menu[] = {
                            N_("Filter the content of the selected mailbox"),
                            filter_run_cb, GTK_STOCK_PROPERTIES),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_REMOVE_DUPLICATES (MENU_MAILBOX_APPLY_FILTERS+1)
+#define MENU_MAILBOX_REMOVE_DUPLICATES (MENU_MAILBOX_APPLY_FILTERS+2)
     GNOMEUIINFO_ITEM_STOCK(N_("_Remove Duplicates"),
                            N_("Remove duplicated messages "
                               "from the selected mailbox"),
@@ -1121,7 +1121,7 @@ balsa_window_enable_mailbox_menus(BalsaIndex * index)
         MENU_MAILBOX_NEXT_POS,        MENU_MAILBOX_PREV_POS,
         MENU_MAILBOX_NEXT_UNREAD_POS, MENU_MAILBOX_NEXT_FLAGGED_POS,
         MENU_MAILBOX_MARK_ALL_POS,    MENU_MAILBOX_DELETE_POS,
-        MENU_MAILBOX_EDIT_POS,        MENU_MAILBOX_COMMIT_POS,
+        MENU_MAILBOX_EDIT_POS,     /* MENU_MAILBOX_COMMIT_POS, */
 	MENU_MAILBOX_CLOSE_POS,       MENU_MAILBOX_APPLY_FILTERS,
 	MENU_MAILBOX_REMOVE_DUPLICATES
     };
@@ -3324,7 +3324,8 @@ mailbox_commit_changes(GtkWidget * widget, gpointer data)
 
     current_mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
     
-    if (!libbalsa_mailbox_sync_storage(current_mailbox, TRUE))
+    if (!current_mailbox->readonly &&
+	!libbalsa_mailbox_sync_storage(current_mailbox, TRUE))
         balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Commiting mailbox %s failed."),
                           current_mailbox->name);
@@ -3340,7 +3341,7 @@ mailbox_commit_each(GNode *node, gpointer data)
     
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(box), FALSE);
 
-    if(!MAILBOX_OPEN(box))
+    if(!MAILBOX_OPEN(box) || box->readonly)
 	return FALSE;
 
     if (!libbalsa_mailbox_sync_storage(box, TRUE))

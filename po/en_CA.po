@@ -6,8 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa \n"
-"POT-Creation-Date: 2004-04-21 14:02-0400\n"
-"PO-Revision-Date: 2004-04-21 14:07-0400\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2004-04-24 17:43-0400\n"
+"PO-Revision-Date: 2004-04-24 14:07-0400\n"
 "Last-Translator: Adam Weinberger <adamw@gnome.org>\n"
 "Language-Team: en_CA <adamw@FreeBSD.org>\n"
 "MIME-Version: 1.0\n"
@@ -394,7 +395,7 @@ msgstr "%s: %s"
 msgid "Could not send \"%s\" to \"%s\""
 msgstr "Could not send \"%s\" to \"%s\""
 
-#: libbalsa/libbalsa.c:279
+#: libbalsa/libbalsa.c:277
 #, c-format
 msgid "LDAP Directory for %s"
 msgstr "LDAP Directory for %s"
@@ -1135,7 +1136,7 @@ msgstr "To"
 msgid "Disconnected"
 msgstr "Disconnected"
 
-#: libbalsa/send.c:1104
+#: libbalsa/send.c:1111
 msgid ""
 "SMTP server refused connection.\n"
 "Balsa by default uses submission service (587).\n"
@@ -1149,7 +1150,7 @@ msgstr ""
 "via: \"host:smtp\".\n"
 "Message is left in outbox."
 
-#: libbalsa/send.c:1114
+#: libbalsa/send.c:1121
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
@@ -1158,12 +1159,12 @@ msgstr ""
 "SMTP server problem (%d): %s\n"
 "Message is left in outbox."
 
-#: libbalsa/send.c:1424
+#: libbalsa/send.c:1431
 #, c-format
 msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 msgstr "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 
-#: libbalsa/send.c:1718 libbalsa/send.c:1794
+#: libbalsa/send.c:1725 libbalsa/send.c:1801
 msgid "This message will not be encrpyted for the BCC: recipient(s)."
 msgstr "This message will not be encrpyted for the BCC: recipient(s)."
 
@@ -1687,12 +1688,21 @@ msgstr "_Other..."
 msgid "Choose destination folder"
 msgstr "Choose destination folder"
 
-#: src/balsa-mblist.c:2136
+#: src/balsa-mblist.c:2135
 #, c-format
-msgid "Shown mailbox: %s with %d message, %ld new"
-msgid_plural "Shown mailbox: %s with %d messages, %ld new"
-msgstr[0] "Shown mailbox: %s with %d message, %ld new"
-msgstr[1] "Shown mailbox: %s with %d messages, %ld new"
+msgid "Shown mailbox: %s with %d message, "
+msgid_plural "Shown mailbox: %s with %d messages, "
+msgstr[0] "Shown mailbox: %s with %d message, "
+msgstr[1] "Shown mailbox: %s with %d messages, "
+
+#. xgettext: this is the second part of the message
+#. * "Shown mailbox: %s with %d messages, %ld new".
+#: src/balsa-mblist.c:2141
+#, c-format
+msgid "%ld new"
+msgid_plural "%ld new"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/balsa-message.c:469
 msgid "Content"
@@ -2413,6 +2423,7 @@ msgid "Descriptive _Name:"
 msgstr "Descriptive _Name:"
 
 #. pop server
+#. imap server
 #: src/folder-conf.c:303 src/mailbox-conf.c:940 src/mailbox-conf.c:1034
 msgid "_Server:"
 msgstr "_Server:"
@@ -2532,14 +2543,17 @@ msgid "Information - Balsa"
 msgstr "Information - Balsa"
 
 #: src/information-dialog.c:297
+#, c-format
 msgid "WARNING: "
 msgstr "WARNING: "
 
 #: src/information-dialog.c:300
+#, c-format
 msgid "ERROR: "
 msgstr "ERROR: "
 
 #: src/information-dialog.c:303
+#, c-format
 msgid "FATAL: "
 msgstr "FATAL: "
 
@@ -2616,6 +2630,7 @@ msgid "_Remove from list"
 msgstr "_Remove from list"
 
 #: src/mailbox-conf.c:356
+#, c-format
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 
@@ -3045,6 +3060,8 @@ msgid "Decrease magnification"
 msgstr "Decrease magnification"
 
 #. To warn msgfmt that the % sign isn't a format specifier:
+#. To warn msgfmt that the % sign isn't a
+#. * format specifier:
 #: src/main-window.c:441 src/message-window.c:133
 #, no-c-format
 msgid "Zoom _100%"
@@ -5177,4 +5194,3 @@ msgstr "Up"
 #: src/toolbar-prefs.c:508
 msgid "Down"
 msgstr "Down"
-

@@ -32,6 +32,7 @@
 
 #include "filter.h"
 #include "filter-private.h"
+#include <gtk/gtk.h>
 
 /* Conditions */
 
@@ -60,4 +61,11 @@ void libbalsa_filter_delete_regex(LibBalsaFilter*,LibBalsaCondition*,
 gboolean libbalsa_filter_compile_regexs(LibBalsaFilter *);
 
 gboolean libbalsa_filter_export_sieve(LibBalsaFilter* fil, gchar* filename);
+
+/* GtkTreeView helper */
+GtkTreeView *libbalsa_filter_list_new(gboolean with_data,
+                                      const gchar * title,
+                                      GtkSelectionMode mode,
+                                      GCallback selection_changed_cb,
+                                      gboolean sorted);
 #endif				/* __FILTER_FUNCS_H__ */

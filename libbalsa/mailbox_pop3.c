@@ -26,14 +26,15 @@
 #include <pthread.h>
 #endif
 
+#include <stdio.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <gtk/gtk.h>
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 #include "mailbackend.h"
 #include "pop3.h"
 #include "mailbox.h"
-#include <stdio.h>
-#include <fcntl.h>
-#include <errno.h>
 
 #ifdef BALSA_USE_THREADS
 #include "threads.h"

@@ -897,7 +897,7 @@ bndx_messages_remove(BalsaIndex * index, GList * messages)
             gtk_tree_store_remove(GTK_TREE_STORE(model), &iter);
 
     /* if last message is removed, clear the preview */
-    if (!gtk_tree_model_get_iter_first(model, &iter)) {
+    if (gtk_tree_model_iter_n_children(model, NULL) == 0) {
         bndx_set_current_message(index, NULL);
         g_signal_emit(G_OBJECT(index),
                       balsa_index_signals[UNSELECT_ALL_MESSAGES], 0, NULL);
@@ -1436,7 +1436,6 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
 {
     BalsaIndex *index = BALSA_INDEX(data);
     GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(index));
-    GtkTreeIter iter;
     LibBalsaMessage *message = NULL;
 
     gtk_tree_selection_selected_foreach(selection,
@@ -1450,7 +1449,7 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
         g_signal_emit(G_OBJECT(index),
                       balsa_index_signals[SELECT_MESSAGE], 0, message);
         bndx_set_current_message(index, message);
-    } else if (gtk_tree_model_get_iter_first(model, &iter))
+    } else if (gtk_tree_model_iter_n_children(model, NULL) > 0)
         g_signal_emit(G_OBJECT(index),
                       balsa_index_signals[UNSELECT_ALL_MESSAGES], 0, NULL);
 }

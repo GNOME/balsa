@@ -364,7 +364,7 @@ create_choice_page(AddressBookConfig * abc)
     gtk_box_pack_start(GTK_BOX(vbox), radio_button, FALSE, FALSE, 0);
     g_signal_connect(G_OBJECT(radio_button), "clicked",
 		     G_CALLBACK(set_the_page), (gpointer) abc);
-    g_object_set_data(GTK_OBJECT(radio_button), "user_data",
+    g_object_set_data(G_OBJECT(radio_button), "user_data",
                       GINT_TO_POINTER(LIBBALSA_TYPE_ADDRESS_BOOK_LDAP));
     gtk_widget_show(radio_button);
 #else
@@ -569,7 +569,7 @@ create_ldap_page(AddressBookConfig * abc)
 	create_entry(mcw, table, NULL, NULL, 1, 
 		     ab ? ab->host : host, label);
 
-    label = create_label(_("_Base Domain Name"), table, 2, label);
+    label = create_label(_("_Base Domain Name"), table, 2);
     abc->ab_specific.ldap.base_dn = 
 	create_entry(mcw, table, NULL, NULL, 2, 
 		     ab ? ab->base_dn : base, label);

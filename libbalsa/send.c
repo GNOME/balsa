@@ -915,8 +915,8 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 	    }
 	    lista = lista->next;
 	}
-#ifdef BALSA_USE_THREADS
     }
+#ifdef BALSA_USE_THREADS
     
     start_thread = sending_threads==0;
 

@@ -123,6 +123,9 @@ balsa_information_dialog(LibBalsaInformationType type, char *msg)
                                GTK_BUTTONS_CLOSE,msg);
 
     gtk_window_set_position(GTK_WINDOW(messagebox), GTK_WIN_POS_CENTER);
+    gtk_window_set_wmclass(GTK_WINDOW(messagebox), "info-dialog", "Balsa");
+    gtk_dialog_run(GTK_DIALOG(messagebox));
+    gtk_widget_destroy(messagebox);
 }
 
 /*

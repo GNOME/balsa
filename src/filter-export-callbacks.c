@@ -41,27 +41,32 @@ fex_destroy_window_cb(GtkWidget * widget,gpointer throwaway)
     fex_already_open=FALSE;
 }
 
-void fex_dialog_response(GtkWidget * dialog, gint response, gpointer data)
+static void
+fex_dialog_response_func(GtkTreeModel * model, GtkTreePath * path,
+                         GtkTreeIter * iter, gpointer data)
 {
-    GtkCList * clist;
-    GList * selected;
-    LibBalsaFilter * fil;
-    gchar * str;
+    LibBalsaFilter *fil;
+    gchar *str;
 
-    if (response == GTK_RESPONSE_OK) { /* OK Button */
-	clist=GTK_CLIST(data);
-	for (selected=clist->selection;
-             selected; selected=g_list_next(selected)) {
-	    fil=(LibBalsaFilter*)
-                gtk_clist_get_row_data(clist,GPOINTER_TO_INT(selected->data));
-	    str=g_strdup_printf("%s.siv",fil->name);
-	    if (!libbalsa_filter_export_sieve(fil,str))
-		balsa_information(LIBBALSA_INFORMATION_ERROR,
-                                  _("Unable to export filter %s,"
-                                    "an error occured."),
-                                  fil->name);
-	    g_free(str);
-	}
+    gtk_tree_model_get(model, iter, 1, &fil, -1);
+    str = g_strdup_printf("%s.siv", fil->name);
+    if (!libbalsa_filter_export_sieve(fil, str))
+        balsa_information(LIBBALSA_INFORMATION_ERROR,
+                          _("Unable to export filter %s, "
+                            "an error occured."), fil->name);
+    g_free(str);
+}
+
+void
+fex_dialog_response(GtkWidget * dialog, gint response, gpointer data)
+{
+    if (response == GTK_RESPONSE_OK) {  /* OK Button */
+        GtkTreeSelection *selection =
+            gtk_tree_view_get_selection(GTK_TREE_VIEW(data));
+
+        gtk_tree_selection_selected_foreach(selection,
+                                            fex_dialog_response_func,
+                                            NULL);
     }
     gtk_widget_destroy(dialog);
 }

@@ -43,7 +43,7 @@ extern GList * fr_dialogs_opened;
 
 GtkWidget * fe_window;
 
-GtkCList * fe_filters_list;
+GtkTreeView * fe_filters_list;
 
 gboolean fe_already_open=FALSE;
 
@@ -55,7 +55,7 @@ GtkWidget *fe_name_label;
 GtkWidget *fe_name_entry;
 
 /* widget for the conditions */
-GtkCList *fe_conditions_list;
+GtkTreeView *fe_conditions_list;
 
 /* List of strings in the combo of user headers name */
 GList * fe_user_headers_list;
@@ -75,7 +75,8 @@ GtkWidget * fe_mailboxes;
 GtkWidget* fe_right_page;
 
 /* Different buttons that need to be greyed or ungreyed */
-GtkWidget * fe_delete_button,* fe_apply_button,* fe_revert_button;
+GtkWidget *fe_new_button, *fe_delete_button;
+GtkWidget *fe_apply_button, *fe_revert_button;
 GtkWidget * fe_condition_delete_button,* fe_condition_edit_button;
 
 /* ******************************** */
@@ -157,16 +158,6 @@ build_option_menu(option_list options[], gint num, GtkSignalFunc func)
     return (option_menu);
 }				/* end build_option_menu */
 
-static void
-fe_clist_unselect_row(GtkWidget * widget, gint row, gint column, 
-                      GdkEventButton *event, gpointer data)
-{
-    /* unselecting the only row means it is about to be deleted */
-    printf("unselect_row\n"); 
-    if(fe_filters_list->rows<=1) 
-        fe_enable_right_page(FALSE);
-}
-
 /*
  * build_left_side()
  *
@@ -175,11 +166,9 @@ fe_clist_unselect_row(GtkWidget * widget, gint row, gint column,
 static GtkWidget *
 build_left_side(void)
 {
-    GtkWidget *vbox, *bbox, *button;
+    GtkWidget *vbox, *bbox;
 
     GtkWidget *sw;
-
-    static gchar *titles[] = { N_("Name") };
 
     /*
        /--------\
@@ -195,7 +184,7 @@ build_left_side(void)
      */
     vbox = gtk_vbox_new(FALSE, 2);
 
-    /* the clist */
+    /* the list */
     gtk_widget_push_visual(gdk_rgb_get_visual());
     gtk_widget_push_colormap(gdk_rgb_get_cmap());
 
@@ -204,24 +193,14 @@ build_left_side(void)
 				   GTK_POLICY_AUTOMATIC,
 				   GTK_POLICY_AUTOMATIC);
 
-#ifdef ENABLE_NLS
-    titles[0] = _(titles[0]);
-#endif
-    fe_filters_list = GTK_CLIST(gtk_clist_new_with_titles(1, titles));
+    fe_filters_list =
+        libbalsa_filter_list_new(TRUE, _("Name"), GTK_SELECTION_BROWSE,
+                                 G_CALLBACK
+                                 (fe_filters_list_selection_changed),
+                                 TRUE);
 
     gtk_widget_pop_colormap();
     gtk_widget_pop_visual();
-
-    gtk_clist_set_selection_mode(fe_filters_list, GTK_SELECTION_BROWSE);
-    gtk_clist_set_row_height(fe_filters_list, 0);
-    gtk_clist_column_titles_passive(fe_filters_list);
-    gtk_clist_set_sort_column(fe_filters_list,0);
-    gtk_clist_set_sort_type(fe_filters_list,GTK_SORT_ASCENDING);
-    gtk_clist_set_auto_sort(fe_filters_list,TRUE);
-    gtk_signal_connect(GTK_OBJECT(fe_filters_list), "select_row",
-		       GTK_SIGNAL_FUNC(fe_clist_select_row), NULL);
-    gtk_signal_connect(GTK_OBJECT(fe_filters_list), "unselect_row",
-		       GTK_SIGNAL_FUNC(fe_clist_unselect_row), NULL);
 
     gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(fe_filters_list));
 
@@ -238,11 +217,11 @@ build_left_side(void)
     gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 2);
 
     /* new button */
-    button = balsa_stock_button_with_label(GNOME_STOCK_MENU_NEW,
-                                           _("New"));
-    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+    fe_new_button = balsa_stock_button_with_label(GNOME_STOCK_MENU_NEW,
+                                                  _("New"));
+    gtk_signal_connect(GTK_OBJECT(fe_new_button), "clicked",
 		       GTK_SIGNAL_FUNC(fe_new_pressed), NULL);
-    gtk_container_add(GTK_CONTAINER(bbox), button);
+    gtk_container_add(GTK_CONTAINER(bbox), fe_new_button);
     /* delete button */
     fe_delete_button =
         balsa_stock_button_with_label(GNOME_STOCK_MENU_TRASH, _("Delete"));
@@ -313,18 +292,14 @@ build_match_page()
 		     0, 5, 4, 8,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, 2, 2);
-    fe_conditions_list = GTK_CLIST(gtk_clist_new(1));
 
-    gtk_clist_set_selection_mode(fe_conditions_list,GTK_SELECTION_BROWSE);
-    gtk_clist_set_row_height(fe_conditions_list, 0);
-    gtk_clist_set_reorderable(fe_conditions_list, FALSE);
-    gtk_clist_set_use_drag_icons(fe_conditions_list, FALSE);
+    fe_conditions_list =
+        libbalsa_filter_list_new(TRUE, NULL, GTK_SELECTION_BROWSE, NULL,
+                                 FALSE);
+    g_signal_connect(G_OBJECT(fe_conditions_list), "row-activated",
+                     G_CALLBACK(fe_conditions_row_activated), NULL);
 
-    gtk_signal_connect(GTK_OBJECT(fe_conditions_list), "select_row",
-		       GTK_SIGNAL_FUNC(fe_conditions_select_row), NULL);
-
-    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scroll),
-					  GTK_WIDGET(fe_conditions_list));
+    gtk_container_add(GTK_CONTAINER(scroll), GTK_WIDGET(fe_conditions_list));
 
     box = gtk_hbox_new(TRUE, 5);
     gtk_table_attach(GTK_TABLE(page),
@@ -388,6 +363,15 @@ build_action_page(GtkWindow * window)
 	gnome_file_entry_new("filter_sounds", _("Use Sound..."));
     gtk_table_attach(GTK_TABLE(table), fe_sound_entry, 1, 2, 0, 1,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
+    /* fe_sound_entry is initially sensitive, so to be consistent 
+     * we must make fe_sound_button active */
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_sound_button), TRUE);
+    g_signal_connect(G_OBJECT(fe_sound_button), "toggled",
+                     G_CALLBACK(fe_button_toggled), fe_sound_entry);
+    g_signal_connect(G_OBJECT
+                     (gnome_file_entry_gtk_entry
+                      (GNOME_FILE_ENTRY(fe_sound_entry))), "changed",
+                     G_CALLBACK(fe_action_changed), NULL);
 
     fe_popup_button = gtk_check_button_new_with_label(_("Popup text:"));
     gtk_table_attach(GTK_TABLE(table),
@@ -399,6 +383,13 @@ build_action_page(GtkWindow * window)
 		     fe_popup_entry,
 		     1, 2, 1, 2,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
+    /* fe_popup_entry is initially sensitive, so to be consistent 
+     * we must make fe_popup_button active */
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_popup_button), TRUE);
+    g_signal_connect(G_OBJECT(fe_popup_button), "toggled",
+                     G_CALLBACK(fe_button_toggled), fe_popup_entry);
+    g_signal_connect(G_OBJECT(fe_popup_entry), "changed",
+                     G_CALLBACK(fe_action_changed), NULL);
 
     /* The action area */
     frame = gtk_frame_new(_("Action to perform:"));
@@ -424,6 +415,8 @@ build_action_page(GtkWindow * window)
     */
     fe_mailboxes = balsa_mblist_mru_option_menu(window,
 						&balsa_app.folder_mru);
+    g_signal_connect(G_OBJECT(fe_mailboxes), "changed",
+                     G_CALLBACK(fe_action_changed), NULL);
     gtk_box_pack_start(GTK_BOX(box), fe_mailboxes, TRUE, FALSE, 1);
 
     return page;
@@ -488,15 +481,16 @@ build_right_side(GtkWindow * window)
  *
  * Returns immediately, but fires off the filter edit dialog.
  */
+#define BALSA_FILTER_PADDING 6
 void
 filters_edit_dialog(void)
 {
     GtkWidget *hbox;
     GtkWidget *piece;
-    GtkWidget *sep;
-    gint row;
     LibBalsaFilter * cpfil,* fil;
     GSList * cnds,* filter_list;
+    GtkTreeModel *model;
+    GtkTreeIter iter;
 
     if (fr_dialogs_opened) {
 	balsa_information(LIBBALSA_INFORMATION_ERROR,
@@ -532,22 +526,24 @@ filters_edit_dialog(void)
     gtk_window_set_wmclass(GTK_WINDOW (fe_window), "filter-edit", "Balsa");
 
     /* main hbox */
-    hbox = gtk_hbox_new(FALSE, 0);
+    hbox = gtk_hbox_new(FALSE, BALSA_FILTER_PADDING);
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(fe_window)->vbox),
-		       hbox, TRUE, TRUE, 0);
+		       hbox, TRUE, TRUE, BALSA_FILTER_PADDING);
+    gtk_box_pack_start(GTK_BOX(hbox), piece, FALSE, FALSE,
+                       BALSA_FILTER_PADDING);
 
-    gtk_box_pack_start(GTK_BOX(hbox), piece, FALSE, FALSE, 2);
-
-    sep = gtk_vseparator_new();
-    gtk_box_pack_start(GTK_BOX(hbox), sep, FALSE, FALSE, 2);
+    gtk_box_pack_start(GTK_BOX(hbox), gtk_vseparator_new(),
+                       FALSE, FALSE, 0);
 
     fe_right_page = build_right_side(GTK_WINDOW(fe_window));
     gtk_widget_set_sensitive(fe_right_page, FALSE);
-    gtk_box_pack_start(GTK_BOX(hbox), fe_right_page, TRUE, TRUE, 2);
+    gtk_box_pack_start(GTK_BOX(hbox), fe_right_page, TRUE, TRUE,
+                       BALSA_FILTER_PADDING);
 
-    fe_user_headers_list=NULL;
-    /* Populate the clist of filters */
+    fe_user_headers_list = NULL;
 
+    /* Populate the list of filters */
+    model = gtk_tree_view_get_model(fe_filters_list);
     for(filter_list=balsa_app.filters; 
         filter_list; filter_list=g_slist_next(filter_list)) {
 
@@ -590,10 +586,9 @@ filters_edit_dialog(void)
 	if (fil->action_string) 
             cpfil->action_string=g_strdup(fil->action_string);	
 
-	row=gtk_clist_append(fe_filters_list,&(cpfil->name));
-	
-	/* We associate the data with the newly appended row */
-	gtk_clist_set_row_data(fe_filters_list,row,(gpointer)cpfil);
+        gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+        gtk_list_store_set(GTK_LIST_STORE(model), &iter, 
+                           0, cpfil->name, 1, cpfil, -1);
     }
 
     /* To make sure we have at least one item in the combo list */
@@ -605,6 +600,9 @@ filters_edit_dialog(void)
     }
 
     gtk_widget_show_all(GTK_WIDGET(fe_window));
-    if (fe_filters_list->rows)
-	gtk_clist_select_row(fe_filters_list,0,-1);
+    if (gtk_tree_model_get_iter_first(model, &iter)) {
+        GtkTreeSelection *selection =
+            gtk_tree_view_get_selection(fe_filters_list);
+        gtk_tree_selection_select_iter(selection, &iter);
+    }
 }

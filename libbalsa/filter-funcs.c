@@ -527,3 +527,75 @@ libbalsa_filter_export_sieve(LibBalsaFilter* fil, gchar* filename)
     if (fclose(fp)!=0) nb=0;
     return nb==1 ? TRUE : FALSE;
 }             /* end of filter_export_sieve */
+
+/*
+ * compare_filters
+ *
+ * callback for sorting a GtkTreeView
+ */
+static gint
+compare_filters(GtkTreeModel * model, GtkTreeIter * a, GtkTreeIter * b,
+                gpointer user_data)
+{
+    gchar *stra, *strb;
+
+    gtk_tree_model_get(model, a, 0, &stra, -1);
+    gtk_tree_model_get(model, b, 0, &strb, -1);
+
+    return g_ascii_strcasecmp(stra, strb);
+}
+
+/*
+ * libbalsa_filter_list_new
+ *
+ * create a GtkTreeView
+ *
+ * with_data            does the underlying store need a data column?
+ * title                for the string column--if NULL, the header is
+ *                      invisible
+ * mode                 selection mode
+ * selection_changed_cb callback for the "changed" signal of the
+ *                      associated GtkTreeSelection
+ * sorted               does the list need to be sorted?
+ */
+GtkTreeView *
+libbalsa_filter_list_new(gboolean with_data, const gchar * title,
+                         GtkSelectionMode mode,
+                         GCallback selection_changed_cb, gboolean sorted)
+{
+    GtkListStore *list_store;
+    GtkTreeView *view;
+    GtkTreeSelection *selection;
+    GtkCellRenderer *renderer;
+    GtkTreeViewColumn *column;
+
+    list_store = with_data ?
+        gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_POINTER) :
+        gtk_list_store_new(1, G_TYPE_STRING);
+    view = GTK_TREE_VIEW(gtk_tree_view_new_with_model
+                         (GTK_TREE_MODEL(list_store)));
+    g_object_unref(list_store);
+
+    renderer = gtk_cell_renderer_text_new();
+    column =
+        gtk_tree_view_column_new_with_attributes(title, renderer, "text",
+                                                 0, NULL);
+    gtk_tree_view_append_column(view, column);
+    if (!title)
+        gtk_tree_view_set_headers_visible(view, FALSE);
+
+    selection = gtk_tree_view_get_selection(view);
+    gtk_tree_selection_set_mode(selection, mode);
+    if (selection_changed_cb)
+        g_signal_connect(G_OBJECT(selection), "changed",
+                         selection_changed_cb, NULL);
+
+    if (sorted) {
+        gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(list_store), 0,
+                                        compare_filters, NULL, NULL);
+        gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(list_store),
+                                             0, GTK_SORT_ASCENDING);
+    }
+
+    return view;
+}                               /* end of libbalsa_filter_list_new */

@@ -28,14 +28,12 @@
 #ifndef __FILTER_RUN_H__
 #define __FILTER_RUN_H__
 
-#include <gnome.h>
-
 #include "filter.h"
 #include "mailbox.h"
 
 /*
  * We define a new gtk type BalsaFilterRunDialog, inheriting from
- * GnomeDialog each object contains the whole set of data needed for
+ * GtkDialog each object contains the whole set of data needed for
  * managing the dialog box.
  * In that way there is no global variables (but the list of 
  * fr = filter run
@@ -51,6 +49,15 @@ extern "C" {
 #define BALSA_FILTER_RUN_DIALOG_CLASS(klass)  GTK_CHECK_CLASS_CAST(klass, BALSA_TYPE_FILTER_RUN_DIALOG, BalsaFilterRunDialogClass)
 #define BALSA_IS_FILTER_RUN_DIALOG(obj)       GTK_CHECK_TYPE(obj, BALSA_TYPE_FILTER_RUN_DIALOG)
 
+    enum {
+        NAME_COLUMN,
+        DATA_COLUMN,
+        INCOMING_COLUMN,
+        CLOSING_COLUMN,
+        N_COLUMNS
+    };
+
+#define BALSA_FILTER_KEY "balsa-filter-key"
 
 typedef struct _BalsaFilterRunDialog BalsaFilterRunDialog;
 typedef struct _BalsaFilterRunDialogClass BalsaFilterRunDialogClass;
@@ -59,7 +66,7 @@ struct _BalsaFilterRunDialog {
     GtkDialog parent;
 
     /* GUI members */
-    GtkCList * available_filters,* selected_filters;
+    GtkTreeView *available_filters, *selected_filters;
     gboolean filters_modified;
 
     /* Mailbox the filters of which are edited */
@@ -76,13 +83,12 @@ guint balsa_filter_run_dialog_get_type(void);
 
 GtkWidget *balsa_filter_run_dialog_new(LibBalsaMailbox * mbox);
 
-void fr_clean_associated_mailbox_filters(GtkCList * clist);
+void fr_clean_associated_mailbox_filters(GtkTreeView * filter_list);
 
 void fr_destroy_window_cb(GtkWidget * widget,gpointer throwaway);
 
 /* Dialog box button callbacks */
-void fr_dialog_response(GtkWidget * widget, gint response,
-			      gpointer data);
+void fr_dialog_response(GtkWidget * widget, gint response, gpointer data);
 /* 
  *Callbacks for left/right buttons
  */
@@ -96,15 +102,14 @@ void fr_up_pressed(GtkWidget * widget, gpointer data);
 void fr_down_pressed(GtkWidget * widget, gpointer data);
 
 /*
- * Callback for clists (to handle double-click)
+ * Callback for filter lists
  */
-void available_list_select_row_cb(GtkWidget *widget, gint row, gint column,
-				  GdkEventButton *event, gpointer data);
-
-void selected_list_select_row_cb(GtkWidget *widget,gint row,gint column,
-				 GdkEventButton *event, gpointer data);
-void selected_list_select_row_event_cb(GtkWidget *widget,
-				       GdkEventButton *event, gpointer data);
+void available_list_activated(GtkTreeView * treeview, GtkTreePath * path,
+                              GtkTreeViewColumn * column, gpointer data);
+void selected_list_toggled(GtkCellRendererToggle * cellrenderertoggle,
+                           const gchar * path_string, gpointer data);
+void selected_list_activated(GtkTreeView * treeview, GtkTreePath * path,
+                             GtkTreeViewColumn * column, gpointer data);
 
 #ifdef __cplusplus
 }

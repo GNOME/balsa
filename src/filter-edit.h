@@ -54,9 +54,9 @@ void fe_dialog_response(GtkWidget * widget, gint response,
 
 /*---------------- Left side of hbox ----------------*/
 
-/* clist callbacks */
-void fe_clist_select_row(GtkWidget * widget, gint row, gint column,
-			 GdkEventButton * bevent, gpointer data);
+/* list callbacks */
+void fe_filters_list_selection_changed(GtkTreeSelection * selection,
+                                       gpointer data);
 
 /* button callbacks */
 void fe_new_pressed(GtkWidget * widget, gpointer data);
@@ -73,13 +73,17 @@ void fe_revert_pressed(GtkWidget * widget, gpointer data);
 void fe_op_codes_toggled(GtkWidget * widget, gpointer data);
 
 /* Conditions callbacks */
-void fe_conditions_select_row(GtkWidget * widget, gint row, gint column,
-			      GdkEventButton * bevent, gpointer data);
+void fe_conditions_row_activated(GtkTreeView * treeview,
+                                 GtkTreePath * path,
+                                 GtkTreeViewColumn * column,
+			         gpointer data);
 void fe_edit_condition(GtkWidget * widget, gpointer data);
 void fe_condition_remove_pressed(GtkWidget * widget, gpointer data);
 
 /* action callback */
 void fe_action_selected(GtkWidget * widget, gpointer data);
+void fe_button_toggled(GtkWidget * widget, gpointer data);
+void fe_action_changed(GtkWidget * widget, gpointer data);
 void fe_enable_right_page(gboolean enabled);
 
 void fe_add_new_user_header(const gchar *);

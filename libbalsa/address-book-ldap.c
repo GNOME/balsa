@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,6 +27,7 @@
 
 #if ENABLE_LDAP
 
+#include <glib.h>
 #include <gnome.h>
 #include <sys/time.h>
 #include <string.h>
@@ -361,13 +362,13 @@ libbalsa_address_book_ldap_get_address(LibBalsaAddressBook * ab,
 	 */
 	if ((vals = ldap_get_values(ldap_ab->directory, e, attr)) != NULL) {
 	    for (i = 0; vals[i] != NULL; i++) {
-		if ((g_strcasecmp(attr, "sn") == 0) && (!last))
+		if ((strcmp(attr, "sn") == 0) && (!last))
 		    last = ldap_get_string(vals[i]);
-		if ((g_strcasecmp(attr, "cn") == 0) && (!id))
+		if ((strcmp(attr, "cn") == 0) && (!id))
 		    id = ldap_get_string(vals[i]);
-		if ((g_strcasecmp(attr, "givenname") == 0) && (!first))
+		if ((strcmp(attr, "givenname") == 0) && (!first))
 		    first = ldap_get_string(vals[i]);
-		if ((g_strcasecmp(attr, "mail") == 0) && (!email))
+		if ((strcmp(attr, "mail") == 0) && (!email))
 		    email = ldap_get_string(vals[i]);
 	    }
 	    ldap_value_free(vals);

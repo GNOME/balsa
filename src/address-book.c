@@ -407,44 +407,34 @@ balsa_address_book_run_gnomecard(GtkWidget * widget, gpointer data)
 /*
   Returns a string of all the selected recipients.
  */
-static gboolean
-balsa_address_book_get_recipients_func(GtkTreeModel * model,
-                                       GtkTreePath * path,
-                                       GtkTreeIter * iter,
-                                       gpointer data)
-{
-    GString **str = data;
-    LibBalsaAddress *address = NULL;
-    gint which_multiple = 0;
-    gchar *text;
-
-    gtk_tree_model_get(model, iter,
-                       LIST_COLUMN_ADDRESS, &address,
-                       LIST_COLUMN_WHICH, &which_multiple,
-                       -1);
-    text = libbalsa_address_to_gchar(address, which_multiple);
-    if (text) {
-        if ((*str)->len > 0)
-            g_string_append(*str, ", ");
-        g_string_append(*str, text);
-        g_free(text);
-    }
-
-    return FALSE;
-}
-
 gchar *
-balsa_address_book_get_recipients(BalsaAddressBook *ab)
+balsa_address_book_get_recipients(BalsaAddressBook * ab)
 {
     GtkTreeModel *model;
+    GtkTreeIter iter;
+    gboolean valid;
     GString *str = g_string_new(NULL);
     gchar *text;
 
     g_return_val_if_fail(ab->composing, NULL);
 
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(ab->recipient_list));
-    gtk_tree_model_foreach(model, balsa_address_book_get_recipients_func,
-                           &str);
+    for (valid = gtk_tree_model_get_iter_first(model, &iter); valid;
+         valid = gtk_tree_model_iter_next(model, &iter)) {
+        LibBalsaAddress *address = NULL;
+        gint which_multiple = 0;
+
+        gtk_tree_model_get(model, &iter,
+                           LIST_COLUMN_ADDRESS, &address,
+                           LIST_COLUMN_WHICH, &which_multiple, -1);
+        text = libbalsa_address_to_gchar(address, which_multiple);
+        if (text) {
+            if (str->len > 0)
+                g_string_append(str, ", ");
+            g_string_append(str, text);
+            g_free(text);
+        }
+    }
 
     text = str->str;
     g_string_free(str, FALSE);
@@ -733,57 +723,48 @@ balsa_address_book_load_cb(LibBalsaAddressBook *libbalsa_ab,
   Search for an address in the address list.
   Attached to the changed signal of the find entry.
 */
-struct BalsaAddressBookFindInfo {
-    const gchar *entry_text;
-    GtkTreePath *path;
-    GtkTreeSelection *selection;
-};
-
-static gboolean
-balsa_address_book_find_func(GtkTreeModel * model,
-                             GtkTreePath * path,
-                             GtkTreeIter * iter,
-                             gpointer data)
-{
-    gchar *new;
-    struct BalsaAddressBookFindInfo *bfi = data;
-
-    gtk_tree_model_get(model, iter, LIST_COLUMN_NAME, &new, -1);
-    if (g_ascii_strncasecmp(new, bfi->entry_text,
-                            strlen(bfi->entry_text)) == 0) {
-        gtk_tree_selection_select_path(bfi->selection, path);
-        if (bfi->path == NULL)
-            bfi->path = gtk_tree_path_copy(path);
-    }
-    g_free(new);
-
-    return FALSE;
-}
-
 static void
 balsa_address_book_find(GtkWidget * group_entry, BalsaAddressBook * ab)
 {
-    struct BalsaAddressBookFindInfo bfi;
+    const gchar *entry_text;
+    GtkTreeSelection *selection;
     GtkTreeView *tree_view;
     GtkTreeModel *model;
+    GtkTreeIter iter;
+    gboolean valid;
+    gboolean first_path;
 
     g_return_if_fail(BALSA_IS_ADDRESS_BOOK(ab));
 
-    bfi.entry_text = gtk_entry_get_text(GTK_ENTRY(group_entry));
+    entry_text = gtk_entry_get_text(GTK_ENTRY(group_entry));
 
-    if (*bfi.entry_text == '\0')
-	return;
+    if (*entry_text == '\0')
+        return;
 
     tree_view = GTK_TREE_VIEW(ab->address_list);
-    bfi.selection = gtk_tree_view_get_selection(tree_view);
-    gtk_tree_selection_unselect_all(bfi.selection);
-    bfi.path = NULL;
+    selection = gtk_tree_view_get_selection(tree_view);
+    gtk_tree_selection_unselect_all(selection);
+
     model = gtk_tree_view_get_model(tree_view);
-    gtk_tree_model_foreach(model, balsa_address_book_find_func, &bfi);
-    if (bfi.path) {
-        gtk_tree_view_scroll_to_cell(tree_view, bfi.path, NULL,
-                                     TRUE, 0.5, 0);
-        gtk_tree_path_free(bfi.path);
+    first_path = TRUE;
+    for (valid = gtk_tree_model_get_iter_first(model, &iter); valid;
+         valid = gtk_tree_model_iter_next(model, &iter)) {
+        gchar *new;
+
+        gtk_tree_model_get(model, &iter, LIST_COLUMN_NAME, &new, -1);
+        if (g_ascii_strncasecmp(new, entry_text,
+                                strlen(entry_text)) == 0) {
+            GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
+
+            gtk_tree_selection_select_path(selection, path);
+            if (first_path) {
+                gtk_tree_view_scroll_to_cell(tree_view, path, NULL,
+                                             TRUE, 0.5, 0);
+                first_path = FALSE;
+            }
+            gtk_tree_path_free(path);
+        }
+        g_free(new);
     }
 }
 

@@ -1,3 +1,21 @@
+2002-09-07  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* libbalsa/filter-funcs.[ch]: add a utility and a helper for
+	making GtkTreeView filter lists.
+	* src/address-book.c, src/balsa-index.c: tighter GtkTreeView code.
+	* src/filter-edit-{dialog,callbacks}.c, src/filter-edit.h,
+	* src/filter-export-{dialog,callbacks}.c,
+	* src/filter-run-{dialog,callbacks}.c, src/filter-run.h: replace
+	GtkClist with GtkTreeView and friends; add some more sensitivity
+	management.
+	* src/information-dialog.c: show actually the dialog.
+	* libbalsa/address-book-ldap.c: remove deprecated functions (PS).
+	* libbalsa/mailbox_pop3.c: fix build with threads disabled (PS).
+	* libbalsa/send.c: same (Emmanuel).
+	* src/address-book-config.c: fix LDAP dialog creation + GTK_->G_ (PS).
+
+* src/information-dialog.c: show the information dialog.
+
 2002-09-02  Emmanuel <e.allaud@wanadoo.fr>
 
 	* libbalsa/address-book-{ldif,vcard}.c, address-entry.c, address.c:

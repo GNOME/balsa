@@ -13,7 +13,8 @@ balsa_SOURCES =	\
 	pref-manager.c		\
 	save-restore.c		\
 	sendmsg-window.c	\
-	addrbook-manager.c
+	addrbook-manager.c	\
+	balsa-init.c
 
 INCLUDES=-I. -I$(srcdir)/../imap/c-client $(GNOME_INCLUDEDIR)
 

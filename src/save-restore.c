@@ -44,7 +44,7 @@ add_mailbox_config (gchar * name, gchar * path, gint type)
       mblist[i] = g_strdup (mailbox->name);
     }
 
-  gnome_config_set_vector ("/balsa/Global/Accounts", i, mblist);
+  gnome_config_set_vector ("/balsa/Global/Accounts", i, (const char * const *)mblist);
 
   g_string_truncate (gstring, 0);
   g_string_sprintf (gstring, "/balsa/%s/", name);

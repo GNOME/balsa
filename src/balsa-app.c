@@ -28,7 +28,7 @@
 #include "misc.h"
 #include "mailbox.h"
 #include "save-restore.h"
-
+#include "balsa-init.h"
 
 
 /* Global application structure */
@@ -67,7 +67,7 @@ init_balsa_app (int argc, char *argv[])
   /* GUI settings */
   balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
 
-
+  initialize_balsa();
 
   restore_global_settings ();
   mailboxes_init ();

@@ -215,6 +215,7 @@ char *mutt_expand_path (char *s, size_t slen)
   }
   else if (*s == '=' || *s == '+')
     snprintf (p, sizeof (p), "%s/%s", NONULL (Maildir), s + 1);
+#ifndef LIBMUTT
   else if (*s == '@')
   {
     /* elm compatibility, @ expands alias to user name */
@@ -235,6 +236,7 @@ char *mutt_expand_path (char *s, size_t slen)
 	mutt_expand_path (p, sizeof (p));
     }
   }
+#endif
   else
   {
     if (*s == '>')
@@ -491,6 +493,7 @@ int mutt_strcmp (const char *s1, const char *s2)
     return ((s2 == NULL) ? 0 : -1);
 }
 
+#ifndef LIBMUTT
 void mutt_free_alias (ALIAS **p)
 {
   ALIAS *t;
@@ -504,7 +507,7 @@ void mutt_free_alias (ALIAS **p)
     free (t);
   }
 }
-
+#endif
 /* collapse the pathname using ~ or = when possible */
 void mutt_pretty_mailbox (char *s)
 {

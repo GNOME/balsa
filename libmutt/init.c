@@ -386,7 +386,7 @@ static int parse_unlist (BUFFER *buf, BUFFER *s, unsigned long data, BUFFER *err
   remove_from_list ((LIST **) data, s);
   return 0;
 }
-
+#ifndef LIBMUTT
 static int parse_unalias (BUFFER *buf, BUFFER *s, unsigned long data, BUFFER *err)
 {
   ALIAS *tmp, *last = NULL;
@@ -461,7 +461,7 @@ static int parse_alias (BUFFER *buf, BUFFER *s, unsigned long data, BUFFER *err)
     Aliases = tmp;
   return 0;
 }
-
+#endif
 static int
 parse_unmy_hdr (BUFFER *buf, BUFFER *s, unsigned long data, BUFFER *err)
 {
@@ -1007,7 +1007,7 @@ void mutt_nocurses_error (const char *fmt, ...)
   va_end (ap);
   fputc ('\n', stderr);
 }
-
+#ifndef LIBMUTT
 /* reads the specified initialization file.  returns -1 if errors were found
    so that we can pause to let the user know...  */
 static int source_rc (const char *rcfile, BUFFER *err)
@@ -1467,3 +1467,4 @@ void mutt_init (int skip_sys_rc, LIST *commands)
 
   set_option (OPTWEED); /* turn weeding on by default */
 }
+#endif

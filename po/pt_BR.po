@@ -486,7 +486,7 @@ msgstr "Não pode obter certificado do par"
 #: libmutt/imap/imap_ssl.c:229
 #, c-format
 msgid "SSL connection using %s"
-msgstr "Comexão SSL usando %s"
+msgstr "Conexão SSL usando %s"
 
 #: libmutt/imap/imap_ssl.c:254
 msgid "Unknown"
@@ -788,7 +788,7 @@ msgstr "Cancelar"
 #: src/balsa-message.c:298
 msgid "Please choose a filename to save this part of the message as:"
 msgstr ""
-"Favor escolher um nome de arquivo para salvar esta parte da mensagem como:"
+"Favor escolher um nome de arquivo para salvar esta parte damensagem como:"
 
 #: src/balsa-message.c:329
 #, c-format
@@ -2504,7 +2504,7 @@ msgstr "Substituir a palavra atual com a sugestão selecionada"
 #: src/spell-check.c:487
 msgid "Replace all occurances of the current word with the selected suggestion"
 msgstr ""
-"Substituir todas as ocorrências da palavra atual coma sugestão selecionada"
+"Substituir todas as ocorrências da palavra atual coma sugestãoselecionada"
 
 #: src/spell-check.c:494
 msgid "Skip the current word"
@@ -2673,19 +2673,15 @@ msgstr "Ce_ltic (ISO-8859-14)"
 msgid "_ISO Charset"
 msgstr "_ISO Mapa de caracteres"
 
-# 2
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr "Mailbox: Fechando %s Refcont: %d\n"
 
-# 3
 msgid "An error occurred when attempting to creat(2) the file \"%s\"."
 msgstr "Um erro ocorreu tentando criar(2) o arquivo \"%s\"."
 
-# 6
 msgid "Ok"
 msgstr "Ok"
 
-# 7
 msgid ""
 "<tr><td bgcolor=\"#f0f0f0\"> You received an encoded file of type "
 "application/"
@@ -2693,102 +2689,79 @@ msgstr ""
 "<tr><td bgcolor=\"#f0f0f0\"> Você recebeu um arquivo codificado tipo "
 "application/"
 
-# 8
 msgid "<P>The parameters of this message are:<BR>"
 msgstr "<p>Os parâmetros desta mensagem são:<BR>"
 
-# 9
 msgid "<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n"
 msgstr "<table border=0><tr><th>Atributo</th><th>Valor</th></tr>\n"
 
-# 10
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Abertura de %s falhou. Erro no. = %d,"
 
-# 14
 msgid "All of the fields must be filled in"
 msgstr "Todos os campos devem ser completados"
 
-# 16
 msgid "Close the selected mailbox"
 msgstr "Fecha a caixa de mensagens selecionada"
 
-# 17
+#, fuzzy
 msgid "C_lose current"
 msgstr "F_echar a atual"
 
-# 18
 msgid "Close the currently opened mailbox"
 msgstr "Fecha a caixa de mensagens atual"
 
-# 19
 msgid "O_pened"
 msgstr "A_bertos"
 
-# 20
 msgid "Mail_boxes"
 msgstr "Caixas de _Entrada"
 
-# 21
 msgid "View mailbox content informations "
 msgstr "Ver informações da caixa mensagens"
 
-# 22
 msgid "On %s "
 msgstr "Em %s"
 
-# 23
 msgid "New Local Mailbox"
 msgstr "Nova caixa de mensagens local"
 
-# 24
 msgid "Mailbox name:"
 msgstr "Nome da caixa de mensagens:"
 
-# 25
 msgid "Path to mailbox:"
 msgstr "Caminho para caixa de mensagem:"
 
-# 27
 msgid "Create Mail Directory?"
 msgstr "Criar diretório de mensagens"
 
-# 28
 msgid "Configure %s"
 msgstr "Configurar %s"
 
-# 30
 msgid "Your mailbox directory:"
 msgstr "Seu diretório da caixa de mensagens:"
 
-# 31
 msgid "Welcome To Balsa!"
 msgstr "Bem-vindo ao Balsa!"
 
-# 32
 msgid "welcome"
 msgstr "bem-vindo"
 
-# 33
 msgid "general"
 msgstr "principal"
 
-# 34
 msgid "mailboxs"
 msgstr "caixas de mensagens"
 
-# 35
 msgid "You seem to be running Balsa for the first time.\n"
 msgstr "Parece que você está executando o Balsa pela primeira vez.\n"
 
-# 36
 msgid ""
 "The following steps will setup Balsa by asking a few simple questions.  "
 msgstr ""
 "Os passos a seguir irão configurar o Balsa perguntando algumas poucas "
 "informações"
 
-# 37
 msgid ""
 "Once you have completed these steps, you can always change them at a later "
 "time through Balsa's preferences.  "
@@ -2796,7 +2769,6 @@ msgstr ""
 "Assim que tiver completado estes passos, você pode sempre alterá-los mais "
 "tarde nas preferências do Balsa"
 
-# 38
 msgid ""
 "Please check the about box in Balsa's main window for more information on "
 "contacting the authors or reporting bugs."
@@ -2804,23 +2776,18 @@ msgstr ""
 "Cheque a caixa Sobre na janela do Balsa para maiores informações para "
 "contatar os autores ou reportar erros."
 
-# 39
 msgid "Inbox Path:"
 msgstr "Caminho da caixa de entrada:"
 
-# 40
 msgid "Outbox Path:"
 msgstr "Caminho da caixa de saída:"
 
-# 41
 msgid "Draftbox Path:"
 msgstr "Caminho da caixa de rascunhos:"
 
-# 42
 msgid "Trash Path:"
 msgstr "Caminho da lixeira:"
 
-# 43
 msgid ""
 "If you wish to use IMAP for these\n"
 "please change them inside Balsa\n"
@@ -2828,7 +2795,6 @@ msgstr ""
 "Se você deseja usar IMAP para isto\n"
 "altere nas preferências do Balsa\n"
 
-# 44
 msgid ""
 "Mailbox \"%s\" is not valid.\n"
 "\n"
@@ -2838,42 +2804,32 @@ msgstr ""
 "\n"
 "Criar uma?"
 
-# 45
 msgid "Unable to procede without a valid mailbox.  Please try again."
 msgstr "Não é possível continuar sem uma caixa de entrada. Tente novamente."
 
-# 47
 msgid "Change Status"
 msgstr "Alterar status"
 
-# 48
 msgid "Read"
 msgstr "Ler"
 
-# 49
 msgid "Replied"
 msgstr "Responder"
 
-# 50
 msgid "Forwarded"
 msgstr "Reenviar"
 
-# 51
 msgid "Mailboxes/Opened/"
-msgstr "Caixas de entrada/abertas/"
+msgstr "Caixas de entrada abertas"
 
-# 52
 msgid "Include signature when sending mail"
 msgstr "Incluir assinatura quando enviar mensagem"
 
-# 53
 msgid "Include signature when forwarding mail"
 msgstr "Incluir assinatura quando encaminhar mensagem"
 
-# 54
 msgid "Include signature when replying to mail"
 msgstr "Incluir assinatura quando responder mensagem"
 
-# 55
 msgid "Linesize:"
-msgstr "Tamanho da linha:"
+msgstr "Tamanho da linha"

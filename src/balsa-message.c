@@ -236,9 +236,6 @@ static void part_info_init_crypto_signature(BalsaMessage * bm,
 static GdkPixbuf * get_crypto_content_icon(LibBalsaMessageBody * body,
 					   const gchar * content_type,
 					   gchar ** icon_title);
-static void libbalsa_msg_perform_crypto(LibBalsaMessage * message,
-					LibBalsaChkCryptoMode chk_mode,
-					guint max_ref);
 static void message_recheck_crypto_cb(GtkWidget * button, BalsaMessage * bm);
 
 #ifdef HAVE_GPG
@@ -1215,9 +1212,9 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
     }
 
 #ifdef HAVE_GPGME
-    libbalsa_msg_perform_crypto(bm->message, 
-				libbalsa_mailbox_get_crypto_mode(bm->message->mailbox),
-				1);
+    balsa_message_perform_crypto(bm->message, 
+				 libbalsa_mailbox_get_crypto_mode(bm->message->mailbox),
+				 FALSE, 1);
 
     /* calculate the signature summary state */
     prot_state = 
@@ -4463,6 +4460,7 @@ get_crypto_content_icon(LibBalsaMessageBody * body, const gchar * content_type,
 /* this is a helper structure to simplify passing a set of parameters */
 typedef struct {
     LibBalsaChkCryptoMode chk_mode;      /* current check mode */
+    gboolean no_mp_signed;               /* don't check multipart/signed */
     guint max_ref;                       /* maximum allowed ref count */
     gchar * sender;                      /* shortcut to sender */
     gchar * subject;                     /* shortcut to subject */
@@ -4481,24 +4479,6 @@ libbalsa_msg_try_decrypt(LibBalsaMessage * message, LibBalsaMessageBody * body,
     gchar * mime_type;
     LibBalsaMessageBody * this_body;
 
-    /* FIXME: not checking for body_ref > 1 (or > 2 when re-checking, which
-     * adds an extra ref) leads to a crash if we have both the encrypted and
-     * the unencrypted version open as the body chain of the first one will be
-     * unref'd. */
-    if (message->body_ref > chk_crypto->max_ref) {
-	if (chk_crypto->chk_mode == LB_MAILBOX_CHK_CRYPT_ALWAYS) {
-	    libbalsa_information
-		(LIBBALSA_INFORMATION_ERROR,
-		 _("This operation can not be performed because this message "
-		   "is displayed more than once.\n"
-		   "Please close the other instances of this message and try "
-		   "again."));
-	    /* downgrade the check mode to avoid multiple errors popping up */
-	    chk_crypto->chk_mode = LB_MAILBOX_CHK_CRYPT_MAYBE;
-	}
-	return body;
-    }
-
     /* Check for multipart/encrypted or application/pkcs7-mime parts and
        replace this_body by it's decrypted content. Remember that there may be
        weird cases where such parts are nested, so do it in a loop. */
@@ -4507,6 +4487,24 @@ libbalsa_msg_try_decrypt(LibBalsaMessage * message, LibBalsaMessageBody * body,
     while (!g_ascii_strcasecmp(mime_type, "multipart/encrypted") ||
 	   !g_ascii_strcasecmp(mime_type, "application/pkcs7-mime")) {
 	gint encrres;
+
+	/* FIXME: not checking for body_ref > 1 (or > 2 when re-checking, which
+	 * adds an extra ref) leads to a crash if we have both the encrypted and
+	 * the unencrypted version open as the body chain of the first one will be
+	 * unref'd. */
+	if (message->body_ref > chk_crypto->max_ref) {
+	    if (chk_crypto->chk_mode == LB_MAILBOX_CHK_CRYPT_ALWAYS) {
+		libbalsa_information
+		    (LIBBALSA_INFORMATION_ERROR,
+		     _("The decryption can not be performed because this message "
+		       "is displayed more than once.\n"
+		       "Please close the other instances of this message and try "
+		       "again."));
+		/* downgrade the check mode to avoid multiple errors popping up */
+		chk_crypto->chk_mode = LB_MAILBOX_CHK_CRYPT_MAYBE;
+	    }
+	    return body;
+	}
 
 	/* check if the gmime part is present and force loading it if we are
 	   in "always" mode */
@@ -4579,6 +4577,9 @@ libbalsa_msg_try_mp_signed(LibBalsaMessage * message, LibBalsaMessageBody *body,
 			   chk_crypto_t * chk_crypto)
 {
     gint signres;
+
+    if (chk_crypto->no_mp_signed)
+	return;
 
     /* check if the gmime part is present and force loading it if we are in
        "always" mode */
@@ -4703,20 +4704,22 @@ libbalsa_msg_part_2440(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	return;
     rfc2440mode = g_mime_part_check_rfc2440(GMIME_PART(body->mime_part));
        
-    /* if not, or if it is encrypted, but we have more than one instance of
-       this message open, eject (see remark for libbalsa_msg_try_decrypt
-       above) */
+    /* if not, or if we have more than one instance of this message open, eject
+       (see remark for libbalsa_msg_try_decrypt above) - remember that
+       libbalsa_rfc2440_verify would also replace the stream by the "decrypted"
+       (i.e. RFC2440 stuff removed) one! */
     if (rfc2440mode == GMIME_PART_RFC2440_NONE)
 	return;
-    else if (rfc2440mode == GMIME_PART_RFC2440_ENCRYPTED &&
-	     message->body_ref > chk_crypto->max_ref) {
+    if (message->body_ref > chk_crypto->max_ref) {
 	if (chk_crypto->chk_mode == LB_MAILBOX_CHK_CRYPT_ALWAYS) {
 	    libbalsa_information
 		(LIBBALSA_INFORMATION_ERROR,
-		 _("This operation can not be performed because this message "
+		 _("The %s can not be performed because this message "
 		   "is displayed more than once.\n"
 		   "Please close the other instances of this message and try "
-		   "again."));
+		   "again."),
+		 rfc2440mode == GMIME_PART_RFC2440_ENCRYPTED ? _("decryption") :
+		 _("signature check and removal of the OpenPGP armor"));
 	    /* downgrade the check mode to avoid multiple errors popping up */
 	    chk_crypto->chk_mode = LB_MAILBOX_CHK_CRYPT_MAYBE;
 	}
@@ -4808,10 +4811,14 @@ libbalsa_msg_perform_crypto_real(LibBalsaMessage * message,
 
 /*
  * Launches a scan of message with chk_mode and a maximum reference of max_ref.
+ * If no_mp_signed is TRUE, multipart/signed parts are ignored, i.e. only
+ * encrypted (either "really" encrypted or armored) parts are used. This is
+ * useful e.g. for replying.
  */
-static void
-libbalsa_msg_perform_crypto(LibBalsaMessage * message,
-			    LibBalsaChkCryptoMode chk_mode, guint max_ref)
+void
+balsa_message_perform_crypto(LibBalsaMessage * message,
+			     LibBalsaChkCryptoMode chk_mode,
+			     gboolean no_mp_signed, guint max_ref)
 {
     chk_crypto_t chk_crypto;
 
@@ -4824,6 +4831,7 @@ libbalsa_msg_perform_crypto(LibBalsaMessage * message,
     
     /* set up... */
     chk_crypto.chk_mode = chk_mode;
+    chk_crypto.no_mp_signed = no_mp_signed;
     chk_crypto.max_ref = max_ref;
     chk_crypto.sender = bm_sender_to_gchar(message->headers->from, -1);
     chk_crypto.subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
@@ -4874,7 +4882,7 @@ message_recheck_crypto_cb(GtkWidget * button, BalsaMessage * bm)
         return;
     }
 
-    libbalsa_msg_perform_crypto(message, LB_MAILBOX_CHK_CRYPT_ALWAYS, 2);
+    balsa_message_perform_crypto(message, LB_MAILBOX_CHK_CRYPT_ALWAYS, FALSE, 2);
 
     /* calculate the signature summary state */
     prot_state = 

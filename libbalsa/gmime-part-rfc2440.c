@@ -20,6 +20,7 @@
  */
 
 #include <string.h>
+#include <config.h>
 
 #include <gmime/gmime.h>
 #include "gmime-part-rfc2440.h"
@@ -104,6 +105,7 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part,
 {
     GMimeDataWrapper *wrapper;
     GMimeStream *stream, *cipherstream;
+    GByteArray *cipherdata;
     gint result;
 
     g_return_val_if_fail(GMIME_IS_PART(part), -1);
@@ -119,7 +121,9 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part,
     g_mime_stream_reset(stream);
 
     /* construct the stream for the crypto output */
-    cipherstream = g_mime_stream_mem_new();
+    cipherdata = g_byte_array_new();
+    cipherstream = g_mime_stream_mem_new_with_byte_array(cipherdata);
+    g_mime_stream_mem_set_owner(GMIME_STREAM_MEM(cipherstream), TRUE);
 
     /* do the crypto operation */
     ctx->singlepart_mode = TRUE;
@@ -138,16 +142,37 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part,
 	g_object_unref(cipherstream);
 	return -1;
     }
-    g_mime_stream_reset(cipherstream);
+
+    /* add the headers to encrypted ascii armor output: as there is no "insert"
+     * method for the byte array, first remove the leading "BEGIN PGP MESSAGE"
+     * (27 chars) and prepend it again... */
+    if (recipients) {
+	const GMimeContentType *type;
+
+	if ((type = g_mime_part_get_content_type(part))) {
+	    const gchar *charset =
+		g_mime_content_type_get_parameter(type, "charset");
+	    gchar * rfc2440header;
+
+	    rfc2440header =
+		g_strdup_printf("-----BEGIN PGP MESSAGE-----\nCharset: %s\n"
+				"Comment: created by Balsa " BALSA_VERSION
+				" (http://balsa.gnome.org)", charset);
+	    g_byte_array_remove_range(cipherdata, 0, 27);
+	    g_byte_array_prepend(cipherdata, rfc2440header, strlen(rfc2440header));
+	    g_free(rfc2440header);
+	}
+    }
 
     /* replace the content of the part */
+    g_mime_stream_reset(cipherstream);
     wrapper = g_mime_data_wrapper_new();
     g_mime_data_wrapper_set_stream(wrapper, cipherstream);
 
     /*
      * Paranoia: set the encoding of a signed part to quoted-printable (not
      * requested by RFC2440, but it's safer...). If we encrypted use 7-bit
-     * instead, as gpg added it's own armor.
+     * and set the charset to us-ascii instead, as gpg added it's own armor.
      */
     if (recipients == NULL) {
 	if (g_mime_part_get_encoding(part) != GMIME_PART_ENCODING_BASE64)
@@ -159,6 +184,8 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part,
 	g_mime_part_set_encoding(part, GMIME_PART_ENCODING_7BIT);
 	g_mime_data_wrapper_set_encoding(wrapper,
 					 GMIME_PART_ENCODING_7BIT);
+	g_mime_object_set_content_type_parameter(GMIME_OBJECT(part),
+						 "charset", "US-ASCII");
     }
 
     g_mime_part_set_content_object(part, wrapper);
@@ -237,6 +264,7 @@ g_mime_part_rfc2440_decrypt(GMimePart * part,
     GMimeStream *stream, *plainstream;
     GMimeDataWrapper * wrapper;
     gint result;
+    gchar *headbuf = g_malloc0(1024);
 
     g_return_val_if_fail(GMIME_IS_PART(part), -1);
     g_return_val_if_fail(GMIME_IS_GPGME_CONTEXT(ctx), -1);
@@ -244,9 +272,11 @@ g_mime_part_rfc2440_decrypt(GMimePart * part,
 			 NULL, -1);
 
     /* get the raw content */
-    wrapper = g_mime_part_get_content_object(GMIME_PART(part));
+    wrapper = g_mime_part_get_content_object(part);
     stream = g_mime_stream_mem_new();
     g_mime_data_wrapper_write_to_stream(wrapper, stream);
+    g_mime_stream_reset(stream);
+    g_mime_stream_read(stream, headbuf, 1023);
     g_mime_stream_reset(stream);
     g_object_unref(wrapper);
 
@@ -259,8 +289,9 @@ g_mime_part_rfc2440_decrypt(GMimePart * part,
 			      plainstream, err);
 
     if (result == 0) {
-	const GMimeContentType *type;
+	GMimeContentType *type;
 	GMimeStream *filter_stream;
+	GMimeStream *out_stream;
 	GMimeFilter *filter;
 	GMimeDataWrapper *wrapper = g_mime_data_wrapper_new();
 
@@ -272,30 +303,50 @@ g_mime_part_rfc2440_decrypt(GMimePart * part,
 	g_object_unref(filter);
 
 	/* replace the old contents by the decrypted stuff */
-	g_mime_data_wrapper_set_stream(wrapper, filter_stream);
-	g_mime_part_set_content_object(GMIME_PART(part), wrapper);
+	out_stream = g_mime_stream_mem_new();
+	g_mime_data_wrapper_set_stream(wrapper, out_stream);
+	g_mime_part_set_content_object(part, wrapper);
 	g_object_unref(wrapper);
+	g_mime_stream_reset(filter_stream);
+	g_mime_stream_write_to_stream(filter_stream, out_stream);
 	g_object_unref(filter_stream);
 
 	g_mime_part_set_encoding(part, GMIME_PART_ENCODING_8BIT);
 
 	/*
-	 * The following is a hack for mailers like pgp4pine which calculate
-	 * the charset after encryption (which is always us-ascii), even if the
-	 * decrypted part contains 8-bit characters.
+ 	 * Set the charset of the decrypted content to the RFC 2440 "Charset:"
+ 	 * header. If it is not present, RFC 2440 defines that the contents
+ 	 * should be utf-8, but real-life applications (e.g. pgp4pine) tend to
+ 	 * use "some" charset, so "unknown-8bit" is a safe choice in this case
+ 	 * and if no other charset is given.
 	 */
-	if ((type = g_mime_object_get_content_type(GMIME_OBJECT(part)))) {
-	    const gchar *charset =
-		g_mime_content_type_get_parameter(type, "charset");
+	if ((type = (GMimeContentType *)g_mime_part_get_content_type(part))) {
+ 	    gchar *up_headbuf = g_ascii_strup(headbuf, -1);
+ 	    gchar *p;
+ 
+ 	    if ((p = strstr(up_headbuf, "CHARSET: "))) {
+ 		gchar *line_end;
+ 
+ 		p += 9;
+ 		line_end = p;
+ 		while (*line_end > ' ')
+ 		    line_end++;
+ 		*line_end = '\0';
+ 		g_mime_content_type_set_parameter(type,"charset", p);
+ 	    } else {
+		const gchar *charset =
+		    g_mime_content_type_get_parameter(type, "charset");
 
-	    if (!g_ascii_strcasecmp(charset, "us-ascii"))
-		g_mime_content_type_set_parameter((GMimeContentType *)type,
-						  "charset",
-						  "unknown-8bit");
+		if (!g_ascii_strcasecmp(charset, "us-ascii"))
+		    g_mime_content_type_set_parameter(type, "charset",
+						      "unknown-8bit");
+	    }
+	    g_free(up_headbuf);
 	}
     }
     g_object_unref(plainstream);
     g_object_unref(stream);
+    g_free(headbuf);
 
     return result;
 }

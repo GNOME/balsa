@@ -105,6 +105,13 @@ gboolean balsa_message_can_zoom(BalsaMessage * bm);
 void balsa_message_zoom(BalsaMessage * bm, gint in_out);
 #endif				/* HAVE_GTKHTML */
 
+#ifdef HAVE_GPGME
+void balsa_message_perform_crypto(LibBalsaMessage * message,
+				  LibBalsaChkCryptoMode chk_mode,
+				  gboolean no_mp_signed,
+				  guint max_ref);
+#endif
+
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

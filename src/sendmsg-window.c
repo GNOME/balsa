@@ -3773,8 +3773,15 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 
     /* fill in that info:
      * ref the message so that we have all needed headers */
-    if (message)
+    if (message) {
 	libbalsa_message_body_ref(message, TRUE, TRUE);
+#ifdef HAVE_GPGME
+	/* scan the message for encrypted parts - this is only possible if
+	   there is *no* other ref to it */
+	balsa_message_perform_crypto(message, LB_MAILBOX_CHK_CRYPT_ALWAYS,
+				     TRUE, 1);
+#endif
+    }
 
     /* To: */
     if (type == SEND_REPLY || type == SEND_REPLY_ALL) {

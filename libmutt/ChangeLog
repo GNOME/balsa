@@ -1,3 +1,7 @@
+2001-07-27  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* imap/command.c: fix autologout problem.
+	
 2001-07-19  Carlos Morgado  <chbm@chbm.nu>
 
 	* acconfig.h (ICONV_NONTRANS): removed whitespace that confused

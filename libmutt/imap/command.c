@@ -371,6 +371,8 @@ static int cmd_handle_untagged (IMAP_DATA* idata)
       mx_fastclose_mailbox (idata->ctx);
     mutt_socket_close (idata->conn);
     idata->state = IMAP_DISCONNECTED;
+    /* BALSA: line below needed to be able to reuse this connection later */
+    idata->conn->data = NULL;
 
     return -1;
   }

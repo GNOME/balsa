@@ -1,3 +1,11 @@
+2004-02-06 05:20  PeterB
+
+	* libbalsa/mailbox_mbox.c: change parser to check for start < end
+	before adding message; make sure message is terminated with '\n',
+	and add one blank line before From_ line; remove dead code; remove
+	Content-Length headers when armoring; pop up warnings when
+	add_message fails.
+
 2004-02-04  Pawel Salek
 
 	* libbalsa/folder-scanners.[hc]: add IMAP error handling.

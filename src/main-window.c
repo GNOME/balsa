@@ -992,12 +992,6 @@ balsa_window_real_open_mbnode(BalsaWindow * window,
                                    mbnode->threading_type);
     label = gtk_label_new(mbnode->mailbox->name);
 
-    /* we don't want to handle the switch-page signal the first time
-     * otherwise the first unread message gets selected twice. */
-    gtk_signal_handler_block_by_func (GTK_OBJECT (window->notebook), 
-                                      GTK_SIGNAL_FUNC (
-                                          notebook_switch_page_cb), 
-                                      NULL);
     /* store for easy access */
     gtk_notebook_append_page(GTK_NOTEBOOK(window->notebook),
 			     GTK_WIDGET(index), label);
@@ -1005,15 +999,7 @@ balsa_window_real_open_mbnode(BalsaWindow * window,
     /* change the page to the newly selected notebook item */
     page_num = gtk_notebook_page_num(GTK_NOTEBOOK (window->notebook),
                                      GTK_WIDGET (index));
-
     gtk_notebook_set_page(GTK_NOTEBOOK(window->notebook), page_num);
-
-    /* we can unblock the switch-page signal now */
-    gtk_signal_handler_unblock_by_func (GTK_OBJECT (window->notebook), 
-                                        GTK_SIGNAL_FUNC (
-                                            notebook_switch_page_cb),
-                                        NULL);
-
     balsa_app.open_mailbox_list =
 	g_list_prepend(balsa_app.open_mailbox_list, mbnode->mailbox);
 

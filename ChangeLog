@@ -1,5 +1,11 @@
 2001-01-31  Matthew Guenther  <guentherm@asme.org>
 
+	* src/main-window.c (balsa_window_real_open_mailboxnode): previous
+	blocking of signal handler causes problems displaying mailbox name
+	in title bar, removed.
+
+2001-01-31  Matthew Guenther  <guentherm@asme.org>
+
 	* src/balsa-index.c (balsa_index_load_mailbox_node): select the
 	previous message when deleting the last message in the mailbox
 	instead of attempting to select the next one.

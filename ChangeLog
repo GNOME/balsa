@@ -1,3 +1,9 @@
+2005-02-06  Pawel Salek
+
+	* libbalsa/body.[hc]: filter CRLF on saving text parts.
+	* src/balsa-message.c, sendmsg-window.c: adapt to changed API.
+	* libbalsa/html.c: HAVE_GNOME related fixes.
+
 2005-02-05 17:50  PeterB
 
 	* libbalsa/Makefile.am, libinit_balsa/Makefile.am, src/Makefile.am:

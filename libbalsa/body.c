@@ -319,7 +319,7 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body)
 		body->temp_filename = tmp_file_name;
 	    fd = open(body->temp_filename, O_WRONLY | O_EXCL | O_CREAT, 0600);
 	    if (fd >= 0)
-		return libbalsa_message_body_save_fd(body, fd);
+		return libbalsa_message_body_save_fd(body, fd, FALSE);
 	} while (errno == EEXIST && --count > 0);
 
 	/* Either we hit a real error, or we used up 100 attempts. */
@@ -334,7 +334,8 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body)
 	    s.st_uid == getuid())
 	    return TRUE;
 	else
-	    return libbalsa_message_body_save(body, body->temp_filename);
+	    return libbalsa_message_body_save(body, body->temp_filename,
+                                              FALSE);
     }
 }
 
@@ -344,7 +345,7 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body)
 */
 gboolean
 libbalsa_message_body_save(LibBalsaMessageBody * body,
-			   const gchar * filename)
+			   const gchar * filename, gboolean filter_crlf)
 {
     int fd;
     int flags = O_CREAT | O_EXCL | O_WRONLY;
@@ -355,7 +356,7 @@ libbalsa_message_body_save(LibBalsaMessageBody * body,
 
     if ((fd=libbalsa_safe_open(filename, flags)) < 0)
 	return FALSE;
-    return libbalsa_message_body_save_fd(body, fd);
+    return libbalsa_message_body_save_fd(body, fd, filter_crlf);
 }
 
 static GMimeStream *
@@ -495,7 +496,8 @@ libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body, GError ** err)
 }
 
 gboolean
-libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd)
+libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd,
+                              gboolean filter_crlf)
 {
     GMimeStream *stream, *stream_fs;
     gboolean retval = TRUE;
@@ -503,6 +505,13 @@ libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd)
     stream = libbalsa_message_body_get_stream(body);
     stream_fs = g_mime_stream_fs_new(fd);
 
+    if(filter_crlf) {
+        GMimeFilter *filter;
+        filter = g_mime_filter_crlf_new(GMIME_FILTER_CRLF_DECODE,
+                                        GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+        g_mime_stream_filter_add(GMIME_STREAM_FILTER(stream), filter);
+        g_object_unref(filter);
+    }
     if (g_mime_stream_write_to_stream(stream, stream_fs) < 0)
 	retval = FALSE;
     g_object_unref(stream);

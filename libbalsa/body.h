@@ -99,9 +99,11 @@ gssize libbalsa_message_body_get_content(LibBalsaMessageBody * body,
 GdkPixbuf *libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body,
                                             GError ** err);
 
-gboolean libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd);
+gboolean libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd,
+                                       gboolean filter_crlf);
 gboolean libbalsa_message_body_save(LibBalsaMessageBody * body,
-                                    const gchar * filename);
+                                    const gchar * filename,
+                                    gboolean filter_crlf);
 gboolean libbalsa_message_body_save_temporary(LibBalsaMessageBody * body);
 
 gchar *libbalsa_message_body_get_parameter(LibBalsaMessageBody * body,

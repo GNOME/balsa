@@ -3001,10 +3001,10 @@ continueBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message)
 		libbalsa_mktempdir(&tmp_file_name);
 		name = g_strdup_printf("%s/%s", tmp_file_name, body->filename);
 		g_free(tmp_file_name);
-		libbalsa_message_body_save(body, name);
+		libbalsa_message_body_save(body, name, FALSE);
 	    } else {
 		fd = g_file_open_tmp("balsa-continue-XXXXXX", &name, NULL);
-		libbalsa_message_body_save_fd(body, fd);
+		libbalsa_message_body_save_fd(body, fd, FALSE);
 	    }
 	    body_type = libbalsa_message_body_get_mime_type(body);
 	    add_attachment(bsmsg, name, TRUE, body_type);

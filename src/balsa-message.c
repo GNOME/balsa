@@ -806,7 +806,9 @@ save_dialog_ok(GtkWidget* save_dialog, BalsaPartInfo * info)
         do_save = TRUE;
     
     if ( do_save ) {
-        result = libbalsa_message_body_save(info->body, filename);
+        result = libbalsa_message_body_save(info->body, filename,
+                                            info->body->body_type ==
+                                            LIBBALSA_MESSAGE_BODY_TYPE_TEXT);
         if (!result)
             balsa_information(LIBBALSA_INFORMATION_ERROR,
                               _("Could not save %s: %s"),

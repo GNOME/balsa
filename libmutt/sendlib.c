@@ -1523,6 +1523,7 @@ int mutt_send_message (HEADER *msg)
     unlink (tempfile);
     return (-1);
   }
+  fputc ('\n', tempfp); /* tie off the body. */
 
   if (fclose (tempfp) != 0)
   {

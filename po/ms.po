@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Balsa CVS\n"
 "POT-Creation-Date: 2002-04-24 09:57+0800\n"
-"PO-Revision-Date: 2002-04-04 18:07+0800\n"
+"PO-Revision-Date: 2002-08-06 21:26+0200\n"
 "Last-Translator: Hasbullah Bin Pit <sebol@ikhlas.com>\n"
 "Language-Team:  <mypenguin99@yahoogroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -80,7 +80,7 @@ msgstr "%s telah sediada dalam buku alamat."
 #: libbalsa/address-book-ldif.c:574
 #, c-format
 msgid "Cannot open LDIF address book %s for saving\n"
-msgstr "Tidak boleh buka buku alamat LDIF untuk penyimpanan\n"
+msgstr "Tidak boleh buka buku alamat LDIF %s untuk penyimpanan\n"
 
 #: libbalsa/address-book-vcard.c:185
 #, c-format
@@ -1176,7 +1176,7 @@ msgstr "Mengisi pool kumpulan arahan: %s...\n"
 #: libmutt/mutt_ssl.c:204
 #, c-format
 msgid "%s has insecure permissions!"
-msgstr "% mempunyai kebenaran tak selamat!"
+msgstr "%s mempunyai kebenaran tak selamat!"
 
 #: libmutt/mutt_ssl.c:223
 msgid "SSL disabled due the lack of entropy"
@@ -1762,7 +1762,7 @@ msgstr "Jenis akses: pelayan-mail\n"
 #: src/balsa-message.c:956
 #, c-format
 msgid "Mail server: %s\n"
-msgstr "Pelayan mail: *s\n"
+msgstr "Pelayan mail: %s\n"
 
 #: src/balsa-message.c:958 src/sendmsg-window.c:2118
 #, c-format

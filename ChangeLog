@@ -1,3 +1,21 @@
+2004-06-15 10:59  PeterB
+
+	* src/balsa-app.c, src/balsa-app.h, src/balsa-index.c,
+	libbalsa/mailbox.c, libbalsa/mailbox.h, libbalsa/misc.c,
+	libbalsa/misc.h, src/balsa-mblist.c, src/mailbox-conf.c,
+	src/mailbox-node.c, src/main-window.c, src/main.c,
+	src/pref-manager.c, src/save-restore.c, src/sendmsg-window.c:
+	implement accessors for LibBalsaMailboxView; use
+	libbalsa_mailbox_view_default for default values; don't put default
+	values in the config file; implement libbalsa_urldecode to get url
+	from config key; remove balsa_app.threading_type and
+	balsa_app.mailbox_views.
+
+2004-06-15 09:51  PeterB
+
+	* libbalsa/: mailbox.c, mailbox_imap.c: check for NULL message and
+	message-entry.
+
 2004-06-13 09:29  PeterB
 
 	* src/: balsa-index.c, balsa-index.h, main-window.c: implement and

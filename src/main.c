@@ -68,6 +68,12 @@ static void balsa_init (int argc, char **argv);
 static void config_init (void);
 static void mailboxes_init (void);
 static void empty_trash (void);
+static gint balsa_kill_session (GnomeClient* client, gpointer client_data);
+static gint balsa_save_session (GnomeClient* client, gint phase, 
+                                GnomeSaveStyle save_style, gint is_shutdown, 
+                                GnomeInteractStyle interact_style, 
+                                gint is_fast, gpointer client_data);
+
 
 void Exception (CORBA_Environment *);
 
@@ -215,6 +221,7 @@ int
 main (int argc, char *argv[])
 {
   GtkWidget *window;
+  GnomeClient* client;
 
   /* Initialize the i18n stuff */
   bindtextdomain (PACKAGE, GNOMELOCALEDIR);
@@ -245,6 +252,10 @@ main (int argc, char *argv[])
   window = balsa_window_new();
   balsa_app.main_window = BALSA_WINDOW (window);
 
+  /* session management */
+  client = gnome_master_client ();
+  gtk_signal_connect (GTK_OBJECT (client), "save_yourself", GTK_SIGNAL_FUNC (balsa_save_session), argv[0]);
+  gtk_signal_connect (GTK_OBJECT (client), "die", GTK_SIGNAL_FUNC (balsa_kill_session), NULL);
 
   gdk_rgb_init();
 
@@ -429,3 +440,56 @@ static void __lame_hack_to_avoid_unused_warnings( void )
 }
 
 
+static gint
+balsa_kill_session (GnomeClient* client, gpointer client_data)
+{
+        balsa_exit ();
+        return TRUE;
+}
+        
+
+static gint
+balsa_save_session (GnomeClient* client, gint phase, GnomeSaveStyle save_style,
+                    gint is_shutdown, GnomeInteractStyle interact_style, 
+                    gint is_fast, gpointer client_data)
+{
+        gchar** argv;
+        guint argc;
+        
+        /* allocate 0-filled so it will be NULL terminated */
+        argv = g_malloc0 (sizeof (gchar*) * 7);
+        
+        argc = 1;
+        argv[0] = client_data;
+        
+        if (balsa_app.open_unread_mailbox) {
+                argv[argc] = g_strdup ("--open-unread-mailbox");
+                argc++;
+        }
+        
+        if (balsa_app.check_mail_upon_startup) {
+                argv[argc] = g_strdup ("--checkmail");
+                argc++;
+        }
+
+        if (balsa_app.open_mailbox) {
+                argv[argc] = g_strdup ("--open-mailbox");
+                argc++;
+                
+                argv[argc] = g_strconcat ("'", balsa_app.open_mailbox, "'", NULL);
+                argc++;
+        }
+
+        if (balsa_app.compose_email) {
+                argv[argc] = g_strdup ("--compose");
+                argc++;
+
+                argv[argc] = g_strdup (balsa_app.compose_email);
+                argc++;
+        }
+                
+        gnome_client_set_clone_command (client, argc, argv);
+        gnome_client_set_restart_command (client, argc, argv);
+
+        return TRUE;
+}

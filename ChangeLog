@@ -1,3 +1,13 @@
+2000-05-22  Matthew Guenther  <mguenthe@netcom.ca>
+	* src/main.c: added session management to Balsa, functions 
+	balsa_save_session and balsa_kill_session.
+
+2000-05-22  Matthew Guenther  <mguenthe@netcom.ca>
+	* src/balsa-mblist.c (balsa_mblist_mailbox_style): mailbox 
+	counter fix.
+	* src/pref-manager.c (create_misc_page): cleaned up look of color 
+	picker.
+
 2000-05-22  Peter Williams  <peter@beta.newton.cx>
 
 	* libinit_balsa/balsa-druid-page.gob, 

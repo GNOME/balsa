@@ -233,7 +233,6 @@ save_part (BalsaPartInfo *info)
 
   GtkWidget *save_dialog;
   GtkWidget *file_entry;
-  GtkWidget *label;
   gint button;
 
   g_return_if_fail(info != 0);
@@ -665,7 +664,6 @@ static void
 part_info_init_unknown (BalsaMessage *bm, BalsaPartInfo *info)
 {
   GtkWidget *vbox;
-  GtkWidget *label;
   GtkWidget *button;
   gchar *msg;
   const gchar *cmd;

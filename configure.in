@@ -150,68 +150,6 @@ else
 fi
 
 dnl ######################################################################################
-dnl Create website?
-dnl ######################################################################################
-
-AC_ARG_WITH(website, [  --with-website=ROOT     If specified, create the website data with specified root (developer only)],[
-	with_website=$withval
-],[
-	with_website=no
-])
-
-AC_MSG_CHECKING([whether to create the website])
-if test x"$with_website" != xno ; then
-	website_subdir=website
-	website_used=yes
-	website_root="http://www.balsa.net"
-	test -z "$with_website" -a x"$with_website" != xyes || website_root=$withval
-	website_desc="yes; root $website_root"
-else
-	website_subdir=
-	website_used=no
-	website_root=
-	website_desc="no"
-fi
-
-AC_MSG_RESULT([$website_desc])
-AC_SUBST(website_subdir)
-AC_SUBST(website_root)
-
-dnl ######################################################################################
-dnl Website prefix?
-dnl ######################################################################################
-
-AC_ARG_WITH(website-prefix, [  --with-website-prefix=PREFIX Install the website files into PREFIX],[
-	with_website_prefix=$withval
-],[
-	with_website_prefix=no
-])
-
-AC_MSG_CHECKING([whether and where to install the website])
-if test x"$with_website_prefix" != xno ; then
-	if test x"$website_used" = xyes ; then
-		if test x"$with_website_prefix" = xyes ; then
-			AC_MSG_ERROR([--with-website-prefix must be follow by a path])
-		fi
-		website_prefix=$with_website_prefix
-		website_installed=yes
-		website_install_desc="yes; $withval"
-	else
-		AC_MSG_ERROR([You must specify --with-website to use --with-website-prefix])
-	fi
-else
-	website_prefix=
-	website_installed=no
-	website_install_desc=no
-fi
-
-AC_MSG_RESULT([$website_install_desc])
-AC_SUBST(website_prefix)
-AC_SUBST(website_installed)
-AC_SUBST(website_install_desc)
-AM_CONDITIONAL(WEBSITE_INSTALLED, [test x$website_installed = xyes])
-
-dnl ######################################################################################
 dnl Install into gnome locations? (may require priveleges that we don't have)
 dnl ######################################################################################
 
@@ -287,9 +225,6 @@ libbalsa/Makefile
 libinit_balsa/Makefile
 idl/Makefile
 src/Makefile
-website/Makefile
-website/images/Makefile
-website/screens/Makefile
 ])
 
 echo "========= Final configuration ==================="
@@ -297,7 +232,5 @@ echo "    Installing into prefix: $prefix"
 echo "      Using multithreading: $use_threads"
 echo " Using incomplete features: $use_all"
 echo "        Using mailbox info: $use_info"
-echo "      Creating the website: $website_desc"
-echo "    Installing the website: $website_install_desc"
 echo "Installing some files into  "
 echo "            Gnome's prefix: $use_system_install (may require root privileges)"

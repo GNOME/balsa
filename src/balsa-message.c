@@ -287,24 +287,33 @@ balsa_message_class_init(BalsaMessageClass * klass)
 
 }
 
-static void
-bm_scroll_realized(GtkWidget * scroll, BalsaMessage * bm)
-{
-    gtk_widget_modify_bg(scroll, GTK_STATE_NORMAL,
-			 &GTK_WIDGET(bm)->style->dark[GTK_STATE_NORMAL]);
-}
-
-static void
-bm_text_view_realized(GtkWidget * text_view, BalsaMessage * bm)
-{
-    gtk_widget_modify_base(text_view, GTK_STATE_NORMAL,
-			   &GTK_WIDGET(bm)->style->mid[GTK_STATE_NORMAL]);
-}
-
-
+/* Helpers for balsa_message_init. */
 #define BALSA_MESSAGE_TEXT_VIEW "balsa-message-text-view"
 #define bm_header_widget_get_text_view(header_widget) \
     g_object_get_data(G_OBJECT(header_widget), BALSA_MESSAGE_TEXT_VIEW)
+
+/* Callback for the "realized" signal; set header frame and text base
+ * color when first realized. */
+static void
+bm_header_widget_realized(GtkWidget * widget, BalsaMessage * bm)
+{
+    gtk_widget_modify_bg(widget, GTK_STATE_NORMAL,
+			 &GTK_WIDGET(bm)->style->dark[GTK_STATE_NORMAL]);
+    gtk_widget_modify_base(bm_header_widget_get_text_view(widget),
+			   GTK_STATE_NORMAL,
+			   &GTK_WIDGET(bm)->style->mid[GTK_STATE_NORMAL]);
+}
+
+/* Callback for the "style-set" signal; reset colors when theme is
+ * changed. */
+static void
+bm_header_widget_set_style(BalsaMessage * bm,
+			   GtkStyle * previous_style,
+			   GtkWidget * widget)
+{
+    bm_header_widget_realized(widget, bm);
+}
+
 static void bm_modify_font_from_string(GtkWidget * widget,
 				       const char *font);
 
@@ -320,7 +329,9 @@ bm_header_widget_new(BalsaMessage * bm)
     gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(widget),
 					GTK_SHADOW_IN);
     g_signal_connect_after(widget, "realize",
-			   G_CALLBACK(bm_scroll_realized), bm);
+			   G_CALLBACK(bm_header_widget_realized), bm);
+    g_signal_connect_after(bm, "style-set",
+			   G_CALLBACK(bm_header_widget_set_style), widget);
 
     text_view = gtk_text_view_new();
     bm_modify_font_from_string(text_view, balsa_app.message_font);
@@ -331,8 +342,6 @@ bm_header_widget_new(BalsaMessage * bm)
 
     g_signal_connect(text_view, "key_press_event",
 		     G_CALLBACK(balsa_message_key_press_event), bm);
-    g_signal_connect_after(text_view, "realize",
-			   G_CALLBACK(bm_text_view_realized), bm);
     gtk_container_add(GTK_CONTAINER(widget), text_view);
 
     g_object_set_data(G_OBJECT(widget), BALSA_MESSAGE_TEXT_VIEW,
@@ -379,17 +388,44 @@ bm_message_widget_new(GtkWidget * headers, gboolean embedded)
     return retval;
 }
 
+/* Callback for the "style-set" signal; set the message background to
+ * match the base color of any content in a text-view. */
+static void
+bm_on_set_style(GtkWidget * widget,
+	        GtkStyle * previous_style,
+	        BalsaMessage * bm)
+{
+    GtkWidget *target = bm->cont_viewport;
+    GtkStyle *new_style, *text_view_style;
+    int n;
+
+    new_style = gtk_style_copy(target->style);
+    text_view_style =
+	gtk_rc_get_style_by_paths(gtk_widget_get_settings(target),
+				  NULL, NULL, gtk_text_view_get_type());
+    if (text_view_style)
+	for (n = GTK_STATE_NORMAL; n <= GTK_STATE_INSENSITIVE; n++)
+	    new_style->bg[n] = text_view_style->base[n];
+    else {
+	GdkColor color;
+
+	gdk_color_parse("White", &color);
+	for (n = GTK_STATE_NORMAL; n <= GTK_STATE_INSENSITIVE; n++)
+	    new_style->bg[n] = color;
+    }
+    gtk_widget_set_style(target, new_style);
+    g_object_unref(G_OBJECT(new_style));
+}
+
 static void
 balsa_message_init(BalsaMessage * bm)
 {
     GtkWidget *scroll;
     GtkWidget *label;
     GtkWidget *message_widget;
-    GtkWidget *text_view;
     GtkTreeStore *model;
     GtkCellRenderer *renderer;
     GtkTreeSelection *selection;
-    GtkStyle *border_style;
 
     /* Notebook to hold content + structure */
     bm->notebook = gtk_notebook_new();
@@ -409,17 +445,11 @@ balsa_message_init(BalsaMessage * bm)
     bm->cont_viewport = gtk_viewport_new(NULL, NULL);
     gtk_widget_show(bm->cont_viewport);
     gtk_container_add(GTK_CONTAINER(scroll), bm->cont_viewport);
+    g_signal_connect_after(bm->notebook, "style-set",
+			   G_CALLBACK(bm_on_set_style), bm);
 
     /* Widget to hold headers */
     bm->header_container = bm_header_widget_new(bm);
-
-    /* Make background of the view-port the same as the base color of the
-     * text. */
-    text_view = bm_header_widget_get_text_view(bm->header_container);
-    border_style = gtk_style_copy(gtk_widget_get_style(text_view));
-    border_style->bg[GTK_STATE_NORMAL] = border_style->base[GTK_STATE_NORMAL];
-    gtk_widget_set_style(bm->cont_viewport, border_style);
-    g_object_unref(border_style);
 
     /* Widget to hold message */
     message_widget = bm_message_widget_new(bm->header_container, FALSE);

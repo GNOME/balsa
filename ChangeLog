@@ -1,3 +1,7 @@
+2003-04-02  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/misc.h: #include gtk.h is needed to build with gtk-2.2
+
 2003-04-02 09:13  PeterB
 
 	* libbalsa/mime.c, libbalsa/misc.c, libbalsa/misc.h,

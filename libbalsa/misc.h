@@ -30,8 +30,8 @@ pthread_t libbalsa_get_main_thread(void);
 #endif /* BALSA_USE_THREADS */
 
 #include <stdio.h>
+#include <gtk/gtk.h>
 
-#include "libbalsa.h"
 #if ENABLE_ESMTP
 #include <auth-client.h>
 #endif

@@ -815,16 +815,11 @@ messages_status_changed_cb(LibBalsaMailbox * mb, GList * messages,
 
 int libbalsa_mailbox_copy_message(LibBalsaMessage *message, LibBalsaMailbox *dest)
 {
-    GMimeStream *msg_stream;
-    int result;
-
-    msg_stream = libbalsa_mailbox_get_message_stream(message->mailbox, message);
-    if (msg_stream == NULL)
-	return -1;
-    result = libbalsa_mailbox_add_message_stream(dest,
-						 msg_stream, message->flags);
-    g_mime_stream_unref(msg_stream);
-    return result;
+    int retval = LIBBALSA_MAILBOX_GET_CLASS(dest)->add_message ( dest, message );
+    if (retval > 0 && LIBBALSA_MESSAGE_IS_UNREAD(message))
+	dest->has_unread_messages = TRUE;
+    
+    return retval;
 }
 
 void libbalsa_mailbox_messages_status_changed(LibBalsaMailbox * mbox,
@@ -877,19 +872,6 @@ libbalsa_mailbox_load_message(LibBalsaMailbox * mailbox, guint msgno)
 
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->load_message(mailbox,
 							     msgno);
-}
-
-int
-libbalsa_mailbox_add_message_stream(LibBalsaMailbox * mailbox,
-				    GMimeStream * msg,
-				    LibBalsaMessageFlag flags)
-{
-    g_return_val_if_fail(mailbox != NULL, FALSE);
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
-
-    g_mime_stream_reset(msg);
-    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->add_message(mailbox, msg,
-							    flags);
 }
 
 void

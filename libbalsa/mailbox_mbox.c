@@ -70,8 +70,7 @@ static LibBalsaMessage *libbalsa_mailbox_mbox_load_message(
 						  LibBalsaMailbox * mailbox,
 						  guint msgno);
 static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
-					     GMimeStream *stream,
-					     LibBalsaMessageFlag flags);
+                                             LibBalsaMessage *message );
 static void libbalsa_mailbox_mbox_change_message_flags(LibBalsaMailbox * mailbox, guint msgno,
 					   LibBalsaMessageFlag set,
 					   LibBalsaMessageFlag clear);
@@ -135,6 +134,8 @@ libbalsa_mailbox_mbox_class_init(LibBalsaMailboxMboxClass * klass)
     libbalsa_mailbox_local_class->remove_files = 
 	libbalsa_mailbox_mbox_remove_files;
 }
+
+
 
 static void
 libbalsa_mailbox_mbox_init(LibBalsaMailboxMbox * mailbox)
@@ -863,117 +864,102 @@ static void update_message_status_headers(GMimeMessage *message,
 	g_mime_object_remove_header(GMIME_OBJECT(message), "X-Status");
 }
 
+
 static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
-					     GMimeStream *stream,
-					     LibBalsaMessageFlag flags)
+                                             LibBalsaMessage *message )
 {
-    GMimeParser *gmime_parser;
     GMimeMessage *msg;
-    time_t date;
     char date_string[27];
     const char *sender;
-    InternetAddressList *internet_address_list;
-    InternetAddress *internet_address;
-    const char *address;
-
+    gchar *address;
+    char *brack;
+    gchar *from = NULL;
+    ssize_t flen;
     const char *path;
     int fd;
-    GMimeStream* append_stream;
-    GMimeStreamIOVector iovector[6];
+    GMimeStream *orig = NULL;
+    GMimeStream *dest = NULL;
+    GMimeFilter* crlffilter;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_MBOX(mailbox), FALSE);
-
+    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
+                                                                               
     LOCK_MAILBOX_RETURN_VAL(mailbox, -1);
+    g_object_ref ( G_OBJECT(message ) );
 
-    gmime_parser = g_mime_parser_new_with_stream(stream);
-    g_mime_parser_set_scan_from(gmime_parser, FALSE);
-    msg = g_mime_parser_construct_message(gmime_parser);
-    g_object_unref(G_OBJECT(gmime_parser));
+    msg = message->mime_msg;
 
-    update_message_status_headers(msg, flags);
-    iovector[4].data=g_mime_message_to_string(msg);
-    iovector[4].len=strlen(iovector[4].data);
-
-
-    g_mime_message_get_date(msg, &date, NULL);
-    ctime_r(&date, date_string);
-    iovector[3].data=date_string;
-    iovector[3].len=strlen(date_string);
+    ctime_r(&(message->headers->date), date_string);
 
     sender = g_mime_message_get_sender(msg);
-    internet_address_list = internet_address_parse_string(sender);
-    if (internet_address_list == NULL) {
-	g_mime_object_unref(GMIME_OBJECT(msg));
-	g_free(iovector[4].data);
-	UNLOCK_MAILBOX(mailbox);
-	return -1;
-    }
-    internet_address = internet_address_list->address;
-    if (internet_address == NULL) {
-	g_mime_object_unref(GMIME_OBJECT(msg));
-	g_free(iovector[4].data);
-	internet_address_list_destroy(internet_address_list);
-	UNLOCK_MAILBOX(mailbox);
-	return -1;
-    }
-    if (internet_address->type == INTERNET_ADDRESS_NAME) {
-	address = internet_address->value.addr;
+    if ( (brack = strrchr( sender, '<' )) ) {
+        char * a = strrchr ( brack , '>' );
+        if (a) {
+            *a = '\0';
+            address = g_strdup (brack+1);
+        } else
+            address = "none";
     } else {
-	address = "none";
+        address = (gchar *)sender;
     }
-    g_mime_object_unref(GMIME_OBJECT(msg));
-    iovector[1].data=(char*)address;
-    iovector[1].len=strlen(address);
-
-
-
+    from = g_strdup_printf ("From %s %s", address, date_string );
+    
     path = libbalsa_mailbox_local_get_path(mailbox);
     /* open in read-write mode */
     fd = open(path, O_RDWR);
-    if (fd == -1) {
-	g_free(iovector[4].data);
-	internet_address_list_destroy(internet_address_list);
-	UNLOCK_MAILBOX(mailbox);
-	return -1;
+    if (fd < 0) {
+        UNLOCK_MAILBOX(mailbox);
+        return -1;
     }
-    append_stream = g_mime_stream_fs_new(fd);
+    
+    lseek (fd, 0, SEEK_END);
+    dest = g_mime_stream_fs_new (fd);
+    if (!dest)
+        goto AMCLEANUP;
+    mbox_lock ( mailbox, dest );
 
-    mbox_lock(mailbox, append_stream);
-    if (g_mime_stream_seek(append_stream, 0, GMIME_STREAM_SEEK_END) == -1)
     {
-	g_free(iovector[4].data);
-	internet_address_list_destroy(internet_address_list);
-	g_mime_stream_flush(append_stream);
-	mbox_unlock(mailbox, append_stream);
-	g_mime_stream_unref(append_stream);
-	UNLOCK_MAILBOX(mailbox);
-	return -1;
+	GMimeStream *tmp = 
+	    libbalsa_mailbox_get_message_stream( message->mailbox, message );
+	if (!tmp)
+	    goto AMCLEANUP;
+	
+	crlffilter = 
+	    g_mime_filter_crlf_new (  GMIME_FILTER_CRLF_DECODE,
+				      GMIME_FILTER_CRLF_MODE_CRLF_ONLY );
+	orig = g_mime_stream_filter_new_with_stream (tmp);
+	g_mime_stream_filter_add ( GMIME_STREAM_FILTER (orig), crlffilter );
+	g_object_unref (crlffilter);
+	g_mime_stream_unref (tmp);
     }
-    iovector[0].data="From ";
-    iovector[0].len=5;
-    iovector[2].data=" ";
-    iovector[2].len=1;
-    iovector[5].data="\n";
-    iovector[5].len=1;
-    if (g_mime_stream_writev(append_stream, iovector, 6) == -1)
-    {
-	g_free(iovector[4].data);
-	internet_address_list_destroy(internet_address_list);
-	g_mime_stream_flush(append_stream);
-	mbox_unlock(mailbox, append_stream);
-	g_mime_stream_unref(append_stream);
-	UNLOCK_MAILBOX(mailbox);
-	return -1;
+
+    flen = strlen (from);
+    if ( g_mime_stream_write (dest, from, flen) < flen ) {
+        libbalsa_information ( LIBBALSA_INFORMATION_ERROR,
+			       _("Error copying message to mailbox %s!\n"
+				 "Mailbox might have be corrupted!"),
+			       mailbox->name );
+        goto AMCLEANUP;
     }
-    g_free(iovector[4].data);
-    internet_address_list_destroy(internet_address_list);
-    g_mime_stream_flush(append_stream);
-    mbox_unlock(mailbox, append_stream);
-    g_mime_stream_unref(append_stream);
+    if (g_mime_stream_write_to_stream (orig, dest) < 0) {
+        libbalsa_information ( LIBBALSA_INFORMATION_ERROR,
+			       _("Error copying message to mailbox %s!\n"
+				 "Mailbox might have be corrupted!"),
+			       mailbox->name );
+        goto AMCLEANUP;
+    }
+ 
+ 
+ AMCLEANUP:
+    g_mime_stream_unref ( GMIME_STREAM(orig) );
+    g_mime_stream_unref ( GMIME_STREAM(dest) );
+    g_object_unref ( G_OBJECT(message ) );  
+    mbox_unlock (mailbox, dest);
     UNLOCK_MAILBOX(mailbox);
-
+    g_free(from);
     return 1;
 }
+
 
 static void
 libbalsa_mailbox_mbox_change_message_flags(LibBalsaMailbox * mailbox,

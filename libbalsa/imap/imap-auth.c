@@ -25,11 +25,17 @@ imap_authenticate(ImapMboxHandle* handle, const char* user, const char* pass)
 
   g_return_val_if_fail(handle, IMAP_AUTH_UNAVAIL);
 
+  if (imap_mbox_is_authenticated(handle) || imap_mbox_is_selected(handle))
+    return IMAP_SUCCESS;
+
   for(authenticator = imap_authenticators_arr;
       *authenticator; authenticator++) {
     if ((r = (*authenticator)(handle, user, pass)) 
-        != IMAP_AUTH_UNAVAIL)
+        != IMAP_AUTH_UNAVAIL) {
+      if (r == IMAP_SUCCESS)
+	imap_mbox_handle_set_state(handle, IMHS_AUTHENTICATED);
       return r;
+    }
   }
   return r;
 }

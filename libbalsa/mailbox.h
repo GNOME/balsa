@@ -214,8 +214,7 @@ struct _LibBalsaMailboxClass {
     gboolean (*sync) (LibBalsaMailbox * mailbox);
     LibBalsaMessage *(*get_message) (LibBalsaMailbox * mailbox, guint msgno);
     LibBalsaMessage *(*load_message) (LibBalsaMailbox * mailbox, guint msgno);
-    int (*add_message) (LibBalsaMailbox * mailbox, GMimeStream *stream,
-			LibBalsaMessageFlag flags);
+    int (*add_message) (LibBalsaMailbox * mailbox, LibBalsaMessage * message );
     void (*change_message_flags) (LibBalsaMailbox * mailbox, guint msgno,
                                   LibBalsaMessageFlag set,
                                   LibBalsaMessageFlag clear);
@@ -281,9 +280,6 @@ gboolean libbalsa_mailbox_close_backend(LibBalsaMailbox * mailbox);
 gboolean libbalsa_mailbox_sync_storage(LibBalsaMailbox * mailbox);
 LibBalsaMessage *libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox, guint msgno);
 LibBalsaMessage *libbalsa_mailbox_load_message(LibBalsaMailbox * mailbox, guint msgno);
-int libbalsa_mailbox_add_message_stream(LibBalsaMailbox * mailbox,
-					GMimeStream *stream,
-					LibBalsaMessageFlag flags);
 void libbalsa_mailbox_change_message_flags(LibBalsaMailbox * mailbox, guint msgno,
 					   LibBalsaMessageFlag set,
 					   LibBalsaMessageFlag clear);

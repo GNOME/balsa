@@ -393,12 +393,12 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
     mqi = msg_queue_item_new(message);
     if ((result = libbalsa_create_msg(message, mqi, encoding, flow)) ==
 	LIBBALSA_MESSAGE_CREATE_OK) {
-        libbalsa_mailbox_add_message_stream(outbox, mqi->stream, 0);
+        libbalsa_mailbox_copy_message( message, outbox );
 	if (fccbox) {
 		if (LIBBALSA_IS_MAILBOX_LOCAL(fccbox) ||
 		    LIBBALSA_IS_MAILBOX_IMAP(fccbox)) {
-			libbalsa_mailbox_add_message_stream(fccbox,
-							    mqi->stream, 0);
+		    libbalsa_mailbox_copy_message( message, fccbox );
+
 		}
 		libbalsa_mailbox_check(fccbox);
 	}
@@ -1548,12 +1548,8 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 			  gboolean flow) {
     gchar *tmp;
     int thereturn; 
-    GMimeMessage *mime_message;
-    GMimeStream *mem_stream;
 
-    libbalsa_message_create_mime_message(message, encoding, flow, TRUE,
-					 &mime_message);
-
+ 
     if ((reply_message != NULL) && (reply_message->mailbox != NULL))
 	/* Just saves the message ID, mailbox type and mailbox name. We could
 	 * search all mailboxes for the ID but that would not be too fast. We
@@ -1568,13 +1564,9 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 
     /* Do something with tmp and mime_message */
 
-    mem_stream = g_mime_stream_mem_new();
-    g_mime_message_write_to_stream(mime_message, mem_stream);
-    thereturn=libbalsa_mailbox_add_message_stream(draftbox, mem_stream, 0);
-    g_mime_stream_unref(mem_stream);
+    thereturn = libbalsa_mailbox_copy_message( message, draftbox );
 
     g_free(tmp);
-    g_mime_object_unref(GMIME_OBJECT(mime_message));
 
     if (draftbox->open_ref > 0)
 	libbalsa_mailbox_check(draftbox);

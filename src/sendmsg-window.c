@@ -78,28 +78,28 @@ create_toolbar (BalsaSendmsg * bsmw)
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
 #if 0
-   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
-   toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-   "Spell Check", "Spell Check", NULL,
-   new_icon (p13_xpm, window), NULL,
-   "Spell Check");
-   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+					 "Spell Check", "Spell Check", NULL,
+					   new_icon (p13_xpm, window), NULL,
+					   "Spell Check");
+  GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
-   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
-   toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-   "Address Book", "Address Book", NULL,
-   new_icon (p14_xpm, window), NULL,
-   "Address Book");
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+				       "Address Book", "Address Book", NULL,
+					   new_icon (p14_xpm, window), NULL,
+					   "Address Book");
 
-   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
-   toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-   "Print", "Print", NULL,
-   gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_PRINT),
-   NULL, "Print");
-   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+					   "Print", "Print", NULL,
+	       gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_PRINT),
+					   NULL, "Print");
+  GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 #endif
 
 
@@ -147,10 +147,10 @@ create_menu (BalsaSendmsg * bmsg)
 
 
 #if 0
-   w = gnome_stock_menu_item (GNOME_STOCK_MENU_OPEN, _ ("Attach File"));
-   gtk_widget_show (w);
-   gtk_menu_append (GTK_MENU (menu), w);
-   menu_items[i++] = w;
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_OPEN, _ ("Attach File"));
+  gtk_widget_show (w);
+  gtk_menu_append (GTK_MENU (menu), w);
+  menu_items[i++] = w;
 #endif
 
 
@@ -235,9 +235,8 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   gint row;
   gchar *tmp;
   gchar *c;
-  gchar *tmpbuf = g_malloc (1024);
 
-  MESSAGECACHE *cache;
+  Message *message;
 
   msg = g_malloc (sizeof (BalsaSendmsg));
   switch (type)
@@ -251,7 +250,9 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
       if (!clist->selection)
 	return;
 
-      row = (gint) clist->selection->data + 1;
+      row = (gint) clist->selection->data;
+
+      message = (Message *) gtk_clist_get_row_data (clist, row);
 
       msg->window = gnome_app_new ("balsa", "Reply to ");
       break;
@@ -290,15 +291,19 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   gtk_table_attach (GTK_TABLE (table), msg->to, 1, 2, 0, 1,
 		    GTK_FILL | GTK_EXPAND, GTK_FILL, 0, 0);
 
-
-  /* XXX: This stuff is out for now because I'm abstracting out the
-   * c-client */
-#if 0
   if (type == 1)
     {
-      gtk_entry_set_text (GTK_ENTRY (msg->to), get_header_replyto (bindex->stream, row));
+      if (message->reply_to->personal)
+	gtk_entry_set_text (GTK_ENTRY (msg->to), message->reply_to->personal);
+      else
+	{
+	  tmp = g_malloc (strlen (message->from->user) + 1 + strlen (message->from->host) + 1);
+	  sprintf (tmp, "%s@%s", message->from->user, message->from->host);
+	  gtk_entry_set_text (GTK_ENTRY (msg->to), tmp);
+	  g_free (tmp);
+	}
     }
-#endif
+
 
   gtk_widget_show (msg->to);
 
@@ -333,7 +338,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
 
   if (type != 0)
     {
-      tmp = g_strdup ("GET HEADER USE TO BE HERE");
+      tmp = g_strdup (message->subject);
       gtk_entry_set_text (GTK_ENTRY (msg->subject), tmp);
       if (type == 1)
 	{
@@ -422,19 +427,16 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
     {
       gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "\n\n", 2);
 
-#if 0
-      c = get_header ("GET HEADER USE TO BE HERE");
+      c = message->from->personal;
 
       gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
 
       gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, " on ", 4);
-      cache = mail_elt (bindex->stream, row);
-      mail_date (tmpbuf, cache);
 
-      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, tmpbuf, strlen (tmpbuf));
-      g_free (tmpbuf);
+      c = message->date;
+      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
       gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, " wrote:\n", 8);
-
+#if 0
       c = mail_fetchtext (bindex->stream, row);
       c = gt_replys (c);
 

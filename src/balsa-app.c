@@ -80,6 +80,8 @@ init_balsa_app (int argc, char *argv[])
   /* initalize our mailbox access crap */
   mailbox_init ();
 
+  read_signature();
+
   restore_global_settings ();
   mailboxes_init ();
   load_local_mailboxes ();

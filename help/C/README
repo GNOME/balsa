@@ -7,6 +7,9 @@ September 10, 2000 by Matthew Guenther.
 Updated 2001.05.16 by Pawel Salek <pawsa@theochem.kth.se>. If you find
 some information outdated, please report it to Balsa Team.
 
+Update 2002.03.14 by Jelmer Vernooij <jelmer@nl.linux.org>. This information
+is outdated. XML should now be used.
+
 Building SGML:
 =============
 

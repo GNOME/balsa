@@ -5,6 +5,7 @@ dnl ###########################################################################
 dnl Versioning
 dnl ###########################################################################
 
+SCROLLKEEPER_REQUIRED=0.1.4
 BALSA_MAJOR=2
 BALSA_REVISION=0
 BALSA_PATCHLEVEL=0
@@ -72,6 +73,24 @@ $gnome_extras
 AC_SUBST(BALSA_CFLAGS)
 AC_SUBST(BALSA_LIBS)
 AC_SUBST(PTHREAD_LIB)
+
+dnl ###########################################################################
+dnl Check for documentation requirements
+dnl ###########################################################################
+AC_SUBST(SCROLLKEEPER_REQUIRED)
+AC_PATH_PROG(SCROLLKEEPER_CONFIG, scrollkeeper-config,no)
+if test x$SCROLLKEEPER_CONFIG = xno; then
+      AC_MSG_ERROR(Couldn't find scrollkeeper-config, please install the scrollkeeper package)
+fi
+
+AC_PATH_PROG(JW,jw,no)
+if test x$JW = xno; then
+    HAVE_JW="no"
+else
+    HAVE_JW="yes"
+fi
+AM_CONDITIONAL(HAVE_JW, test "x$HAVE_JW" = "xyes")
+AC_SUBST(HAVE_JW)
 
 dnl ###########################################################################
 dnl Configure libmutt, later
@@ -458,6 +477,7 @@ help/Makefile
 help/C/Makefile
 libbalsa/Makefile
 libinit_balsa/Makefile
+omf-install/Makefile
 src/Makefile
 ])
 

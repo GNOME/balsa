@@ -1439,7 +1439,7 @@ create_mailserver_page(gpointer data)
 				      _("Select your local mail directory"));
     gtk_box_pack_start(GTK_BOX(box2), fileentry2, TRUE, TRUE, 0);
     gtk_container_set_border_width(GTK_CONTAINER(fileentry2), 10);
-    gnome_file_entry_set_directory(GNOME_FILE_ENTRY(fileentry2), TRUE);
+    gnome_file_entry_set_directory_entry(GNOME_FILE_ENTRY(fileentry2), TRUE);
     gnome_file_entry_set_modal(GNOME_FILE_ENTRY(fileentry2), TRUE);
 
     pui->mail_directory =

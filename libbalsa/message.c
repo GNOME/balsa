@@ -401,7 +401,7 @@ libbalsa_message_user_hdrs(LibBalsaMessage * message)
     }
 
     for (tmp = env->userhdrs; tmp; tmp = tmp->next) {
-	pair = g_strsplit(tmp->data, ":", 1);
+	pair = g_strsplit(tmp->data, ":", 2);
 	g_strchug(pair[1]);
 	res = g_list_append(res, pair);
     }

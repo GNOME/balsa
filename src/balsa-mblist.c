@@ -708,8 +708,10 @@ balsa_mblist_have_new (BalsaMBList * bmbl)
 {
   balsa_mblist_set_style (bmbl);
   gtk_clist_freeze (GTK_CLIST (&(bmbl->ctree)));
-  gtk_ctree_post_recursive (GTK_CTREE (&(bmbl->ctree)), NULL, balsa_mblist_check_new, NULL);
-  gtk_ctree_post_recursive (GTK_CTREE (&(bmbl->ctree)), NULL, balsa_mblist_folder_style, NULL);
+  gtk_ctree_post_recursive (GTK_CTREE (&(bmbl->ctree)), NULL, 
+			    balsa_mblist_check_new, NULL);
+  gtk_ctree_post_recursive (GTK_CTREE (&(bmbl->ctree)), NULL, 
+			    balsa_mblist_folder_style, NULL);
   gtk_clist_thaw (GTK_CLIST (&(bmbl->ctree)));
 }
 
@@ -810,6 +812,7 @@ balsa_mblist_update_mailbox (BalsaMBList * mblist, Mailbox * mailbox)
   /* moving selection to the respective mailbox.
      this is neccessary when the previous mailbox was closed and
      redundant if the mailboxes were switched (notebook_switch_page)
+     or the mailbox is checked for the new mail arrival
   */
   if(gtk_ctree_node_nth (&mblist->ctree,GTK_CLIST(&mblist->ctree)->focus_row)
      != node) {

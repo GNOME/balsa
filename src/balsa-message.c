@@ -1,4 +1,3 @@
-
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -467,6 +466,10 @@ balsa_message_set (BalsaMessage * bmessage,
 
   balsa_message_clear (bmessage);
 
+  /* mark message as read; no-op if it was read so don't worry.
+     and this is the right place to do the marking.
+  */
+  message_read(message);
   headers2canvas (bmessage, message);
   body2canvas (bmessage, message);
   bm_group = GNOME_CANVAS_GROUP (GNOME_CANVAS (bmessage)->root);

@@ -1,3 +1,8 @@
+2000-03-24  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox.c, src/balsa-mblist.c, src/balsa-message.c:
+	* src/main-window.c: bug hunting - message counting.
+	
 2000-03-24  Matthew Guenther <mguenther@netcom.ca>
 	* src/main-window.c: add next_unread_message_cb, associated menu 
 	and toolbar items.

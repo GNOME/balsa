@@ -94,7 +94,7 @@ static void balsa_window_real_set_cursor(BalsaWindow *window, GdkCursor *cursor)
 static void balsa_window_real_open_mailbox(BalsaWindow *window, Mailbox *mailbox);
 static void balsa_window_real_close_mailbox(BalsaWindow *window, Mailbox *mailbox);
 static void balsa_window_destroy(GtkObject * object);
-void check_messages_thread( Mailbox *mbox );
+static void check_messages_thread( Mailbox *mbox );
 
 static GtkWidget *balsa_window_create_preview_pane(BalsaWindow *window);
 GtkWidget *balsa_window_find_current_index(BalsaWindow *window);
@@ -875,9 +875,20 @@ check_new_messages_auto_cb (gpointer data)
 static void
 check_new_messages_cb (GtkWidget * widget, gpointer data)
 {
-
-  GtkWidget *index;
+  GtkWidget *index = NULL;
   Mailbox *mbox;
+
+  if(data)
+    {
+      index = balsa_window_find_current_index(BALSA_WINDOW(data));
+      if (index)
+	mbox = BALSA_INDEX(index)->mailbox;
+      else
+	mbox = balsa_app.inbox;
+    }
+  else
+    mbox = balsa_app.inbox;
+
 
 #ifdef BALSA_USE_THREADS
 /*  Only Run once -- If already checking mail, return.  */
@@ -919,39 +930,32 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
 			 progress_dialog_bar,
 			 FALSE, FALSE, 0);
       
-
       gtk_widget_show_all( progress_dialog );
     }
-#endif BALSA_USE_THREADS
-
-  if(data)
-    {
-      index = balsa_window_find_current_index(BALSA_WINDOW(data));
-      if (index)
-	mbox = BALSA_INDEX(index)->mailbox;
-      else
-	mbox = balsa_app.inbox;
-    }
-  else
-    mbox = balsa_app.inbox;
-
-#ifdef BALSA_USE_THREADS
 /* initiate threads */
   pthread_create( &get_mail_thread,
   		NULL,
   		(void *) &check_messages_thread,
 		mbox );
 #else
-  check_messages_thread(mbox);
-#endif
-
+  check_all_pop3_hosts (balsa_app.inbox, balsa_app.inbox_input); 
+  check_all_imap_hosts (balsa_app.inbox, balsa_app.inbox_input);
+  mailbox_check_new_messages( mbox );
+  if(mbox !=balsa_app.inbox)
+     load_messages (balsa_app.inbox, 1);
+  /* "There can be only one" - can one of them be removed? */
   balsa_mblist_have_new (balsa_app.mblist);
+  if(mblist_get_selected_mailbox() == mbox)
+     balsa_mblist_update_mailbox(balsa_app.mblist, mbox); 
+#endif
 }
 
-void
+
+/* this one is called only in the threaded code */
+#ifdef BALSA_USE_THREADS
+static void
 check_messages_thread( Mailbox *mbox )
 {
-#ifdef BALSA_USE_THREADS
 /*  
  *  It is assumed that this will always be called as a pthread,
  *  and that the calling procedure will check for an existing lock
@@ -972,26 +976,15 @@ check_messages_thread( Mailbox *mbox )
     MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_LOAD, mbox, mbox->name, 0,0 );
   }
 
-  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_FINISHED, NULL, "Finished", 0, 0 );
+  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_FINISHED, NULL, "Finished", 0,0);
 
   pthread_mutex_lock( &mailbox_lock );
   checking_mail = 0;
   pthread_mutex_unlock( &mailbox_lock );
 
   pthread_exit( 0 );
-
-#else
-  check_all_pop3_hosts (balsa_app.inbox, balsa_app.inbox_input); 
-  check_all_imap_hosts (balsa_app.inbox, balsa_app.inbox_input);
-  mailbox_check_new_messages( mbox );
-  load_messages (balsa_app.inbox, 1);
-#endif
-
-
 }
 
-
-#ifdef BALSA_USE_THREADS
 gboolean
 mail_progress_notify_cb( )
 {
@@ -1059,6 +1052,9 @@ mail_progress_notify_cb( )
 	    LOCK_MAILBOX(threadmessage->mailbox);
 	    load_messages(threadmessage->mailbox, 1);
 	    UNLOCK_MAILBOX(threadmessage->mailbox);
+	    if(mblist_get_selected_mailbox() == threadmessage->mailbox)
+	       balsa_mblist_update_mailbox(balsa_app.mblist, 
+					   threadmessage->mailbox); 
 	    break;
 	  case MSGMAILTHREAD_PROGRESS:
 	    percent = (gfloat)threadmessage->num_bytes/
@@ -1159,6 +1155,9 @@ send_progress_notify_cb( )
 	    LOCK_MAILBOX (threadmessage->mbox);
 	    load_messages (threadmessage->mbox, 1);
 	    UNLOCK_MAILBOX (threadmessage->mbox);
+	    if(mblist_get_selected_mailbox() == threadmessage->mbox)
+	       balsa_mblist_update_mailbox(balsa_app.mblist, 
+					   threadmessage->mbox); 
 	    break;
 	    
 	  case MSGSENDTHREADPOSTPONE:

@@ -584,6 +584,8 @@ _mailbox_open_ref (Mailbox * mailbox, gint flag)
   if (CLIENT_CONTEXT_OPEN (mailbox))
     {
       mailbox->messages = 0;
+      mailbox->total_messages = 0;
+      mailbox->unread_messages = 0;
       mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount;
       load_messages (mailbox, 0);
 
@@ -624,6 +626,8 @@ mailbox_open_unref (Mailbox * mailbox)
     {
       free_messages (mailbox);
       mailbox->messages = 0;
+      mailbox->total_messages = 0;
+      mailbox->unread_messages = 0;
 
       /* now close the mail stream and expunge deleted
        * messages -- the expunge may not have to be done */
@@ -675,13 +679,6 @@ mailbox_check_new_messages (Mailbox * mailbox)
 
       if (mailbox->new_messages > 0)
 	{
-
-	  mailbox->unread_messages += mailbox->new_messages ;
-	  mailbox->total_messages += mailbox->new_messages ;
-	  /* TODO:the preceeding two lines should be put in
-	     load_messages but I don't want to rely on the 'emit' flag
-	     to know if there is REALLY new mail in the
-	     mailbox. -bertrand */
 
 #ifndef BALSA_USE_THREADS
 	  load_messages (mailbox, 1);
@@ -799,9 +796,10 @@ mailbox_watcher_remove_by_data (Mailbox * mailbox, gpointer data)
 }
 
 
-
 /*
- * private
+ * private 
+ * PS: called by mail_progress_notify_cb:
+ * loads incrementally new messages, if any.
  */
 void
 load_messages (Mailbox * mailbox, gint emit)
@@ -809,10 +807,6 @@ load_messages (Mailbox * mailbox, gint emit)
   glong msgno;
   Message *message;
   HEADER *cur = 0;
-
-  mailbox->has_unread_messages = FALSE;
-  mailbox->unread_messages = 0;
-  mailbox->total_messages = 0;
 
   for (msgno = mailbox->messages;
        mailbox->new_messages > 0;

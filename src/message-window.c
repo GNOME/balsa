@@ -20,7 +20,6 @@
 #include "balsa-app.h"
 #include "balsa-index.h"
 #include "balsa-message.h"
-#include "index-window.h"
 #include "main-window.h"
 #include "misc.h"
 

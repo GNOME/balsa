@@ -144,7 +144,7 @@ libbalsa_condition_new_date_parse(gboolean negated, gchar **string)
 
     if(lo == NULL)
         return NULL;
-    if(**string++ != ' ') {
+    if(*(*string)++ != ' ') {
         g_free(lo);
         return NULL;
     }
@@ -171,6 +171,8 @@ libbalsa_condition_new_date_parse(gboolean negated, gchar **string)
     cond->type = CONDITION_DATE;
     cond->match.date.date_low  = tlo;
     cond->match.date.date_high = thi;
+    g_free(lo);
+    g_free(hi);
     return cond;
 }
 

@@ -415,18 +415,19 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries,
     gchar *carrier = NULL;
     gint cnt, cnt2;
 
-    new_email = g_strdup(address->address_list->data);
+    new_email = g_strdup(address ? address->address_list->data : ""); 
     /* initialize the organization... */
-    if (address->organization == NULL)
+    if (!address || address->organization == NULL)
 	new_organization = g_strdup("");
     else
 	new_organization = g_strdup(address->organization);
 
     /* if the message only contains an e-mail address */
-    if (address->full_name == NULL)
+    if (!address || address->full_name == NULL)
 	new_name = g_strdup(new_email);
     else {
         gchar **names;
+        g_assert(address);
 	/* make sure address->personal is not all whitespace */
 	new_name = g_strstrip(g_strdup(address->full_name));
 

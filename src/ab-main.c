@@ -59,7 +59,7 @@ static gint bab_save_session(GnomeClient * client, gint phase,
                              gpointer client_data);
 static gint bab_kill_session(GnomeClient * client, gpointer client_data);
 
-static void ab_set_edit_widget(GtkWidget *w);
+static void ab_set_edit_widget(GtkWidget *w, gboolean can_remove);
 
 #define BALSA_CONFIG_PREFIX "balsa/"
 #define ADDRESS_BOOK_SECTION_PREFIX "address-book-"
@@ -89,6 +89,8 @@ bab_config_init(void)
     }
 
 }
+
+static void ab_warning(const char *fmt, ...);
 
 enum {
     LIST_COLUMN_NAME,
@@ -144,7 +146,8 @@ bab_load_cb(LibBalsaAddressBook *libbalsa_ab,
 }
 
 static gboolean
-bab_set_address_book(LibBalsaAddressBook *ab, GtkWidget* list)
+bab_set_address_book(LibBalsaAddressBook *ab, GtkWidget* list,
+                     const gchar *filter)
 {
     LibBalsaABErr ab_err;
     GtkTreeModel* model = gtk_tree_view_get_model(GTK_TREE_VIEW(list));
@@ -154,11 +157,11 @@ bab_set_address_book(LibBalsaAddressBook *ab, GtkWidget* list)
 
 
     gtk_list_store_clear(GTK_LIST_STORE(model));
-    if( (ab_err=libbalsa_address_book_load(ab, NULL,
+    if( (ab_err=libbalsa_address_book_load(ab, filter,
                                            (LibBalsaAddressBookLoadFunc)
                                            bab_load_cb, model))
         != LBABERR_OK) {
-        printf("error loading vcard addres book from %s: %d\n", 
+        printf("error loading address book from %s: %d\n", 
                ab->name, ab_err);
     }
 
@@ -175,9 +178,30 @@ select_address_book_cb(gpointer callback_data, guint callback_action,
     l = g_list_nth(contacts_app.address_book_list,
                           GPOINTER_TO_INT(callback_data));
     if(!l) return;
-    ab_set_edit_widget(NULL);
+    ab_set_edit_widget(NULL, FALSE);
     bab_set_address_book(LIBBALSA_ADDRESS_BOOK(l->data),
-                         contacts_app.entry_list);
+                         contacts_app.entry_list, NULL);
+}
+
+static void
+address_changed_cb(GtkWidget *w, gpointer data)
+{
+    struct ABMainWindow * aw = (struct ABMainWindow*)data;
+    gtk_widget_set_sensitive(aw->apply_button,  TRUE);
+    gtk_widget_set_sensitive(aw->cancel_button, TRUE);
+}
+
+
+static void
+edit_new_person_cb(gpointer callback_data, guint callback_action, GtkWidget *w)
+{
+    GtkWidget *ew;
+    contacts_app.displayed_address = NULL;
+    ew = libbalsa_address_get_edit_widget(NULL, contacts_app.entries,
+                                          G_CALLBACK(address_changed_cb),
+                                          &contacts_app);
+    ab_set_edit_widget(ew, FALSE);
+    gtk_widget_set_sensitive(contacts_app.remove_button, FALSE);
 }
 
 static GtkItemFactoryEntry menu_items[] = {
@@ -192,10 +216,8 @@ static GtkItemFactoryEntry menu_items[] = {
     0, NULL },
   { "/File/sep2",     NULL,         NULL, 0, "<Separator>" },
   { "/_Entry",         NULL,        NULL, 0, "<Branch>" },
-  { "/Entry/_New Person", NULL,   (GtkItemFactoryCallback)NULL, 0, NULL },
+  { "/Entry/_New Person", NULL,   edit_new_person_cb, 0, NULL },
   { "/Entry/_New Group",  NULL,   (GtkItemFactoryCallback)NULL, 0, NULL },
-  { "/Entry/_Delete",  NULL,   (GtkItemFactoryCallback)NULL, 0, NULL },
-  { "/Entry/_Edit...", NULL,   (GtkItemFactoryCallback)NULL, 0, NULL },
   { "/_Help",          NULL,         NULL, 0, "<LastBranch>" },
   { "/_Help/_About",   NULL,         NULL, 0, NULL },
 };
@@ -246,7 +268,7 @@ get_main_menu(GtkWidget  *window, GtkWidget **menubar, GList* address_books)
 
 
 static void
-ab_set_edit_widget(GtkWidget *w)
+ab_set_edit_widget(GtkWidget *w, gboolean can_remove)
 {
     if(contacts_app.edit_widget)
         gtk_widget_destroy(contacts_app.edit_widget);
@@ -257,16 +279,8 @@ ab_set_edit_widget(GtkWidget *w)
         gtk_widget_show_all(w);
     }
     gtk_widget_set_sensitive(contacts_app.apply_button,  FALSE);
-    gtk_widget_set_sensitive(contacts_app.remove_button, w != NULL);
+    gtk_widget_set_sensitive(contacts_app.remove_button, can_remove);
     gtk_widget_set_sensitive(contacts_app.cancel_button, FALSE);
-}
-
-static void
-address_changed_cb(GtkWidget *w, gpointer data)
-{
-    struct ABMainWindow * aw = (struct ABMainWindow*)data;
-    gtk_widget_set_sensitive(aw->apply_button,  TRUE);
-    gtk_widget_set_sensitive(aw->cancel_button, TRUE);
 }
 
 static void
@@ -286,8 +300,8 @@ list_selection_changed_cb(GtkTreeSelection *selection, gpointer data)
         ew = libbalsa_address_get_edit_widget(address, contacts_app.entries,
                                               G_CALLBACK(address_changed_cb),
                                               data);
-        ab_set_edit_widget(ew);
-    } else ab_set_edit_widget(NULL);
+        ab_set_edit_widget(ew, TRUE);
+    } else ab_set_edit_widget(NULL, FALSE);
     g_value_unset(&gv);
     contacts_app.displayed_address = address;
 }
@@ -341,29 +355,57 @@ apply_button_cb(GtkWidget *w, gpointer data)
 {
     LibBalsaAddress * newval =
         libbalsa_address_new_from_edit_entries(contacts_app.entries);
-    libbalsa_address_book_modify_address(contacts_app.address_book,
-                                         contacts_app.displayed_address,
-                                         newval);
-    gtk_widget_set_sensitive(contacts_app.apply_button,  FALSE);
-    gtk_widget_set_sensitive(contacts_app.cancel_button, FALSE);
-    /* FIXME: error handling here! */
+    LibBalsaABErr err = 
+        contacts_app.displayed_address 
+        ? libbalsa_address_book_modify_address(contacts_app.address_book,
+                                               contacts_app.displayed_address,
+                                               newval)
+        : libbalsa_address_book_add_address(contacts_app.address_book,
+                                            newval);
+    if(err == LBABERR_OK) {
+        gtk_widget_set_sensitive(contacts_app.apply_button,  FALSE);
+        gtk_widget_set_sensitive(contacts_app.remove_button, TRUE);
+        gtk_widget_set_sensitive(contacts_app.cancel_button, FALSE);
+    } else 
+        ab_warning("Cannot add: %s\n",
+                   libbalsa_address_book_strerror(contacts_app.address_book,
+                                                  err));                   
     g_object_unref(newval);
 }
 
 static void
 remove_button_cb(GtkWidget *w, gpointer data)
 {
-    /* FIXME: removal code really needs some work.
-     * in particular, the list of entries is not updated after 
-     * address removal. */
-    libbalsa_address_book_remove_address(contacts_app.address_book,
-                                         contacts_app.displayed_address);
-    contacts_app.displayed_address = NULL;
-    /* FIXME: error handling here! */    
+    LibBalsaABErr err = 
+        libbalsa_address_book_remove_address(contacts_app.address_book,
+                                             contacts_app.displayed_address);
+    if(err == LBABERR_OK) {
+        GtkTreeIter       iter;
+        GtkTreeSelection *selection;
+        GtkTreeView  *v = GTK_TREE_VIEW(contacts_app.entry_list);
+        GtkTreeModel *m = gtk_tree_view_get_model(v);
+        selection       = gtk_tree_view_get_selection(v);
+        if(gtk_tree_selection_get_selected(selection, &m, &iter))
+            gtk_list_store_remove(GTK_LIST_STORE(m), &iter);
+        ab_set_edit_widget(NULL, FALSE);
+        contacts_app.displayed_address = NULL;
+    } else 
+        ab_warning("Cannot remove: %s\n",
+                   libbalsa_address_book_strerror(contacts_app.address_book,
+                                                  err));
 }
 static void
 cancel_button_cb(GtkWidget *w, gpointer data)
 {
+    struct ABMainWindow *abmw = (struct ABMainWindow*)data;
+    if(abmw->displayed_address) {
+        GtkWidget *ew =
+            libbalsa_address_get_edit_widget(abmw->displayed_address,
+                                             abmw->entries,
+                                             G_CALLBACK(address_changed_cb),
+                                             data);
+        ab_set_edit_widget(ew, TRUE);
+    } else ab_set_edit_widget(NULL, FALSE);
 }
 
 #define ELEMENTS(x) (sizeof(x)/sizeof((x)[0])) 
@@ -386,14 +428,16 @@ bab_get_edit_button_box(struct ABMainWindow *abmw)
                       abmw->cancel_button = 
                       gtk_button_new_from_stock(GTK_STOCK_CANCEL));
     g_signal_connect(G_OBJECT(abmw->cancel_button), "clicked",
-                     G_CALLBACK(cancel_button_cb), (gpointer) NULL);
+                     G_CALLBACK(cancel_button_cb), abmw);
     return box;
 }
 
 static void
 bab_filter_entry_activate(GtkWidget *entry, GtkWidget *button)
 {
-    /* do search here */
+    const gchar *filter = gtk_entry_get_text(GTK_ENTRY(entry));
+    bab_set_address_book(contacts_app.address_book, contacts_app.entry_list,
+                         filter);
     gtk_widget_set_sensitive(button, FALSE);
 }
 
@@ -482,7 +526,7 @@ bab_window_new()
     first_ab = g_list_first(contacts_app.address_book_list);
     if(first_ab)
         bab_set_address_book(LIBBALSA_ADDRESS_BOOK(first_ab->data),
-                             contacts_app.entry_list);
+                             contacts_app.entry_list, NULL);
     return wnd;
 }
 
@@ -492,6 +536,23 @@ bab_delete_ok(void)
     return FALSE;
 }
 /* -------------------------- main --------------------------------- */
+static GtkWidget *ab_window = NULL;
+static void
+ab_warning(const char *fmt, ...)
+{
+    GtkWidget *d;
+    va_list va_args;
+    char *msg;
+    va_start(va_args, fmt);
+    msg =  g_strdup_vprintf(fmt, va_args);
+    va_end(va_args);
+    d = gtk_message_dialog_new(GTK_WINDOW(ab_window),
+                               GTK_DIALOG_DESTROY_WITH_PARENT,
+                               GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, msg);
+    gtk_dialog_run(GTK_DIALOG(d));
+    gtk_widget_destroy(d);
+}
+
 static void
 bab_init(void)
 {
@@ -507,7 +568,6 @@ bab_init(void)
 int
 main(int argc, char *argv[])
 {
-    GtkWidget *window;
     GnomeClient *client;
 #ifdef GTKHTML_HAVE_GCONF
     GError *gconf_error;
@@ -543,10 +603,10 @@ main(int argc, char *argv[])
     /* load address book data */
     bab_config_init();
 
-    window = bab_window_new();
-    g_signal_connect(G_OBJECT(window), "destroy",
+    ab_window = bab_window_new();
+    g_signal_connect(G_OBJECT(ab_window), "destroy",
                      G_CALLBACK(bab_cleanup), NULL);
-    g_signal_connect(G_OBJECT(window), "delete-event",
+    g_signal_connect(G_OBJECT(ab_window), "delete-event",
                      G_CALLBACK(bab_delete_ok), NULL);
 
     /* session management */
@@ -556,7 +616,7 @@ main(int argc, char *argv[])
     g_signal_connect(G_OBJECT(client), "die",
 		     G_CALLBACK(bab_kill_session), NULL);
 
-    gtk_widget_show_all(window);
+    gtk_widget_show_all(ab_window);
 
     gdk_threads_enter();
     gtk_main();

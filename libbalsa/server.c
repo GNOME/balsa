@@ -390,8 +390,8 @@ libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...)
         ok = va_arg(alist, int*);
         vfy_result = va_arg(alist, long);
         reason =  X509_verify_cert_error_string(vfy_result);
-        printf("IMAP:TLS: failed cert verification:\n"
-               "%ld : %s.\n", vfy_result, reason);
+        printf("IMAP:TLS: failed cert verification: %ld : %s.\n",
+               vfy_result, reason);
         ssl = va_arg(alist, SSL*);
         cert = SSL_get_peer_certificate(ssl);
 	if(cert) {

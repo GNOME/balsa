@@ -1504,7 +1504,6 @@ part_info_init_application(BalsaMessage * bm, BalsaPartInfo * info)
     }
     g_free(body_type);
 #endif
-    g_print("TODO: part_info_init_application\n");
     part_info_init_unknown(bm, info);
 }
 

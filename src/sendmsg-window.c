@@ -1943,6 +1943,7 @@ attachments_add(GtkWidget * widget,
 	add_extbody_attachment( GNOME_ICON_LIST(bsmsg->attachments[1]),
 				selection_data->data, "text/html", FALSE, TRUE);
     }	
+    gtk_drag_finish(context, TRUE, FALSE, time);
 }
 
 /* to_add - e-mail (To, From, Cc, Bcc) field D&D callback */
@@ -1955,6 +1956,7 @@ to_add(GtkWidget * widget,
        guint info, guint32 time, GnomeIconList * iconlist)
 {
     append_comma_separated(GTK_EDITABLE(widget), selection_data->data);
+    gtk_drag_finish(context, TRUE, FALSE, time);
 }
 
 /*
@@ -2234,6 +2236,25 @@ create_info_pane(BalsaSendmsg * bsmsg, SendType type)
     return table;
 }
 
+static gboolean
+has_file_attached(BalsaSendmsg *bsmsg, const char *fname)
+{
+    guint i, n =
+        gnome_icon_list_get_num_icons(GNOME_ICON_LIST
+                                      (bsmsg->attachments[1]));
+    
+    for (i = 0; i<n; i++) {
+        attachment_t *attach;
+        
+        attach = (attachment_t *)
+            gnome_icon_list_get_icon_data(GNOME_ICON_LIST
+                                          (bsmsg->attachments[1]), i);
+        if(strcmp(attach->filename, fname) == 0)
+            return TRUE;
+    }
+    return FALSE;
+}
+
 /* drag_data_quote - text area D&D callback */
 static void
 drag_data_quote(GtkWidget * widget,
@@ -2245,18 +2266,38 @@ drag_data_quote(GtkWidget * widget,
 {
     LibBalsaMessage **message_array;
     GtkTextBuffer *buffer;
-    
-    if (info != TARGET_MESSAGES)
-        return;
-    
-    message_array = (LibBalsaMessage **) selection_data->data;
-    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
-    
-    while (*message_array) {
-        GString *body = quoteBody(bsmsg, *message_array++, SEND_REPLY);
-        libbalsa_insert_with_url(buffer, body->str, NULL, NULL, NULL);
-        g_string_free(body, TRUE);
+    if (context->action == GDK_ACTION_ASK)
+        context->action = GDK_ACTION_COPY;
+
+    switch(info) {
+    case TARGET_MESSAGES:
+        message_array = (LibBalsaMessage **) selection_data->data;
+        buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
+        
+        while (*message_array) {
+            GString *body = quoteBody(bsmsg, *message_array++, SEND_REPLY);
+            libbalsa_insert_with_url(buffer, body->str, NULL, NULL, NULL);
+            g_string_free(body, TRUE);
+        }
+        break;
+    case TARGET_URI_LIST: {
+        GSList *uri_list = uri2gslist(selection_data->data);
+        for (; uri_list; uri_list = g_slist_next(uri_list)) {
+            /* Since current GtkTextView gets this signal twice for
+             * every action (#150141) we need to check for duplicates,
+             * which is a good idea anyway. */
+            if(!has_file_attached(bsmsg, uri_list->data))
+                add_attachment(bsmsg,  /* steal strings */
+                               uri_list->data, FALSE, NULL);
+        }
+        g_slist_free(uri_list);
     }
+        break;
+    case TARGET_EMAIL:
+    case TARGET_STRING: /* perhaps we should allow dropping in these, too? */
+    default: return;
+    }
+    gtk_drag_finish(context, TRUE, FALSE, time);
 }
 
 /* create_text_area 

@@ -207,6 +207,21 @@ vcard_address_book_need_reload(LibBalsaAddressBookVcard *ab)
     }
 }
 
+static gboolean
+starts_from(const gchar *str, const gchar *filter_hi)
+{
+    if(!str) return FALSE;
+    while(*str && *filter_hi &&
+          g_unichar_toupper(g_utf8_get_char(str)) == 
+          g_utf8_get_char(filter_hi)) {
+        str       = g_utf8_next_char(str);
+        filter_hi = g_utf8_next_char(filter_hi);
+    }
+           
+    return *filter_hi == '\0';
+}
+ 
+
 static LibBalsaABErr
 libbalsa_address_book_vcard_load(LibBalsaAddressBook * ab,
                                  const gchar *filter,
@@ -214,16 +229,25 @@ libbalsa_address_book_vcard_load(LibBalsaAddressBook * ab,
                                  gpointer closure)
 {
     GList *lst;
+    int len = filter ? strlen(filter) : 0;
+    gchar *filter_hi = NULL;
 
     if(!load_vcard_file(ab)) return LBABERR_CANNOT_READ;
+    if(len)
+        filter_hi = g_utf8_strup(filter, -1);
 
-    lst = LIBBALSA_ADDRESS_BOOK_VCARD(ab)->address_list;
-    while (lst) {
-	if ( callback ) 
-	    callback(ab, LIBBALSA_ADDRESS(lst->data), closure);
-	lst = g_list_next(lst);
+    for(lst = LIBBALSA_ADDRESS_BOOK_VCARD(ab)->address_list;
+        lst; 
+        lst = g_list_next(lst) ) {
+        LibBalsaAddress *adr = LIBBALSA_ADDRESS(lst->data);
+        if(callback &&(!len ||
+                       starts_from(adr->last_name, filter_hi) ||
+                       starts_from(adr->full_name, filter_hi) ) )
+	    callback(ab, adr, closure);
     }
     if(callback) callback(ab, NULL, closure);
+    if(len)
+        g_free(filter_hi);
     return LBABERR_OK;
 }
 

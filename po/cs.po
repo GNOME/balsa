@@ -8,8 +8,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa VERSION\n"
-"POT-Creation-Date: 2003-05-06 03:46+0200\n"
-"PO-Revision-Date: 2003-05-06 14:08+0200\n"
+"POT-Creation-Date: 2003-05-07 11:53+0200\n"
+"PO-Revision-Date: 2003-05-07 20:48+0200\n"
 "Last-Translator: Miloslav Trmac <mitr@volny.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -17,19 +17,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. The externq database doesn't support Id's, sorry!
-#: libbalsa/address-book-extern.c:242 libbalsa/address-book-ldap.c:373
+#: libbalsa/address-book-extern.c:242 libbalsa/address-book-ldap.c:371
 #: libbalsa/address-book-ldif.c:405 libbalsa/address-book-vcard.c:272
 msgid "No-Id"
 msgstr "Bez identifikátoru"
 
-#: libbalsa/address-book-extern.c:246 libbalsa/address-book-ldap.c:377
+#: libbalsa/address-book-extern.c:246 libbalsa/address-book-ldap.c:375
 #: libbalsa/address-book-ldif.c:408 libbalsa/address-book-ldif.c:637
 #: libbalsa/address-book-ldif.c:674 libbalsa/address-book-ldif.c:678
 #: libbalsa/address-book-vcard.c:290
 msgid "No-Name"
 msgstr "Beze jména"
 
-#: libbalsa/address-book-ldap.c:221
+#: libbalsa/address-book-ldap.c:220
 msgid ""
 "Failed to initialise LDAP server.\n"
 "Check that the servername is valid."
@@ -37,20 +37,20 @@ msgstr ""
 "Inicializace LDAP serveru selhala.\n"
 "Ověřte, zda je správný název serveru."
 
-#: libbalsa/address-book-ldap.c:234
+#: libbalsa/address-book-ldap.c:233
 msgid "Couldn't set protocol version to LDAPv3."
 msgstr "Nelze nastavit verzi protokolu na LDAPv3."
 
-#: libbalsa/address-book-ldap.c:242
+#: libbalsa/address-book-ldap.c:241
 #, c-format
 msgid "Couldn't enable TLS on the LDAP connection: %s"
 msgstr "Nelze povolit TLS na spojení LDAP: %s"
 
-#: libbalsa/address-book-ldap.c:251
+#: libbalsa/address-book-ldap.c:250
 msgid "TLS requested but TLS support not compiled in."
 msgstr "Vyžadování TLS, ale podpora TLS není zabudována."
 
-#: libbalsa/address-book-ldap.c:262
+#: libbalsa/address-book-ldap.c:261
 #, c-format
 msgid ""
 "Failed to bind to server: %s\n"
@@ -60,7 +60,7 @@ msgstr ""
 "Ověřte, zda je název serveru platný."
 
 # libbalsa/address-book-ldap.c:261 libbalsa/address-book-ldap.c:517#, c-format
-#: libbalsa/address-book-ldap.c:597
+#: libbalsa/address-book-ldap.c:595
 #, c-format
 msgid "Failed to do a search: %s.Check that the base name is valid."
 msgstr "Hledání selhalo: %s. Ověřte, zda je správný název základny."
@@ -123,20 +123,20 @@ msgstr "Nelze načíst tělo zprávy pro srovnání s filtrem"
 msgid "Invalid filter: %s"
 msgstr "Neplatný filtr: %s"
 
-#: libbalsa/filter.c:592 libbalsa/filter.c:611
+#: libbalsa/filter.c:591 libbalsa/filter.c:610
 #, c-format
 msgid "Bad mailbox name for filter: %s"
 msgstr "Chybný název poštovní schránky pro filtr: %s"
 
-#: libbalsa/filter.c:596
+#: libbalsa/filter.c:595
 msgid "Error when copying messages"
 msgstr "Chyba při kopírování zpráv"
 
-#: libbalsa/filter.c:604
+#: libbalsa/filter.c:603
 msgid "Error when trashing messages"
 msgstr "Chyba při vyhazování zpráv"
 
-#: libbalsa/filter.c:615
+#: libbalsa/filter.c:614
 msgid "Error when moving messages"
 msgstr "Chyba při přesunování zpráv"
 
@@ -883,7 +883,29 @@ msgid "Unable to open sentbox - could not get IMAP server information"
 msgstr ""
 "Nelze otevřít schránku sentbox - nelze získat informace z IMAP serveru."
 
-#: libbalsa/send.c:817
+#: libbalsa/send.c:794
+#, c-format
+msgid ""
+"Could not send the message to %s:\n"
+"%d: %s\n"
+"Message left in your outbox.\n"
+msgstr ""
+"Nelze odeslat zprávu %s:\n"
+"%d: %s\n"
+"Zpráva zanechána ve schránce 'Pošta k odeslání'.\n"
+
+#: libbalsa/send.c:836
+#, c-format
+msgid ""
+"Relaying refused:\n"
+"%d: %s\n"
+"Message left in your outbox.\n"
+msgstr ""
+"Předání zprávy odmítnuto:\n"
+"%d: %s\n"
+"Zpráva zanechána ve schránce 'Pošta k odeslání'.\n"
+
+#: libbalsa/send.c:846
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
@@ -891,33 +913,33 @@ msgstr ""
 "Problém při předání zprávy, ukládá se do schránky 'Pošta k odeslání'.\n"
 "Systém se bude pokoušet znovu poslat zprávu, dokud ji nesmažete."
 
-#: libbalsa/send.c:844
+#: libbalsa/send.c:876
 msgid "Connected to MTA"
 msgstr "Připojeno k MTA"
 
-#: libbalsa/send.c:851 src/balsa-message.c:902 src/print.c:356
+#: libbalsa/send.c:883 src/balsa-message.c:902 src/print.c:356
 #: src/sendmsg-window.c:780 src/sendmsg-window.c:2219 src/store-address.c:322
 msgid "From:"
 msgstr "Od:"
 
-#: libbalsa/send.c:854 src/balsa-index.c:360
+#: libbalsa/send.c:886 src/balsa-index.c:360
 msgid "From"
 msgstr "Od"
 
-#: libbalsa/send.c:862 src/balsa-message.c:911 src/print.c:366
+#: libbalsa/send.c:894 src/balsa-message.c:911 src/print.c:366
 #: src/sendmsg-window.c:779 src/sendmsg-window.c:2225 src/store-address.c:323
 msgid "To:"
 msgstr "Pro:"
 
-#: libbalsa/send.c:865 src/balsa-index.c:846
+#: libbalsa/send.c:897 src/balsa-index.c:846
 msgid "To"
 msgstr "Pro"
 
-#: libbalsa/send.c:901
+#: libbalsa/send.c:933
 msgid "Disconnected"
 msgstr "Odpojeno"
 
-#: libbalsa/send.c:1094
+#: libbalsa/send.c:1126
 msgid ""
 "SMTP server refused connection.\n"
 "Balsa by default uses submission service (587).\n"
@@ -931,7 +953,7 @@ msgstr ""
 "zadat pomocí \"host:smtp\".\n"
 "Zpráva byla ponechána ve schránce 'Pošta k odeslání'."
 
-#: libbalsa/send.c:1104
+#: libbalsa/send.c:1136
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
@@ -940,7 +962,7 @@ msgstr ""
 "Problém se serverem SMTP (%d): %s\n"
 "Vaše zpráva zůstala v poštovní schránce 'Pošta k odeslání'"
 
-#: libbalsa/send.c:1513 libbalsa/send.c:1732
+#: libbalsa/send.c:1547 libbalsa/send.c:1766
 msgid "This message will not be encrpyted for the BCC: recipient(s)."
 msgstr "Tato zpráva nebude šifrována pro příjemce skrytých kopií."
 
@@ -2364,7 +2386,7 @@ msgstr "Uložit..."
 msgid "could not create temporary file %s"
 msgstr "nelze vytvořit dočasný soubor %s"
 
-#: src/balsa-message.c:3037
+#: src/balsa-message.c:3046
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2375,7 +2397,7 @@ msgstr ""
 "zaslání oznámení o doručení zprávy (MDN) na adresu `%s'.\n"
 "Chcete poslat toto oznámení?"
 
-#: src/balsa-message.c:3044
+#: src/balsa-message.c:3053
 msgid "Reply to MDN?"
 msgstr "Odpovědět na MDN?"
 

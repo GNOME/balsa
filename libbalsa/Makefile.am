@@ -3,6 +3,7 @@ noinst_LIBRARIES = libbalsa.a
 libbalsa_a_SOURCES = \
 	libbalsa.c	\
 	misc.c		\
+	gforrest.c	\
 	mailbox.c	\
 	send.c
 

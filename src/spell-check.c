@@ -957,7 +957,6 @@ balsa_spell_check_finish (BalsaSpellCheck* spell_check, gboolean keep_changes)
         
 
         finish_check (spell_check);
-        g_free (spell_check->original_text);
 
         if (keep_changes) {
                 pspell_manager_save_all_word_lists(spell_check->spell_manager);
@@ -973,7 +972,9 @@ balsa_spell_check_finish (BalsaSpellCheck* spell_check, gboolean keep_changes)
                                  strlen (spell_check->original_text));
                 gtk_text_thaw (spell_check->text);
         }
-        
+
+        g_free (spell_check->original_text);
+
         check_pspell_errors (spell_check->spell_manager);
         
         delete_pspell_manager (spell_check->spell_manager);

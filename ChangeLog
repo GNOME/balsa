@@ -1,3 +1,12 @@
+2000-10-03  Matthew Guenther  <guentherm@asme.org>
+
+	* src/spell-check.c: Fixed cancelled spell check outputting
+	garbage bug.
+	* help/C/Makefile.am: GDP stylesheet now explicitly required to
+	build sgml, will fail without it.  Also build eps images for pdf
+	manual automatically.
+	* help/C/balsa.sgml: Remove extra <tip> tag.
+	
 2000-10-02  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/address-book-config.c: grab the focus to the name field.

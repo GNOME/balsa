@@ -13,20 +13,33 @@ balsa_help_DATA = \
 
 NUM_PREF_PAGES = 11
 
+GDP_STYLESHEET = \
+	stylesheet/dsssl/docbook-gnome/gdp-both.dsl
+
+MANUAL_IMAGES := $(wildcard images/*.png)
+
+# A pattern rule for the eps files
+
+%.eps : %.png
+	img2eps $<
+
 # Only build html by default
 all: index.html
 
 # This is where the SGML bit is cool
 index.html: $(SGML_FILES)
-	-db2html $<
+	-db2html -d $(GDP_STYLESHEET) $<
 	-cp balsa/index.html index.html
 	-cd balsa && ../win-config-gen $(NUM_PREF_PAGES)
 
-balsa.ps: $(SGML_FILES)
-	-db2ps $<
+epsimages: $(MANUAL_IMAGES)
+
+balsa.pdf: $(SGML_FILES)
+	-for file in $(srcdir)/images/*.png; do img2eps $$file; done
+	-db2pdf -d $(GDP_STYLESHEET) $<
 
 balsa.rtf: $(SGML_FILES)
-	-db2rtf $<
+	-db2rtf -d $(GDP_STYLESHEET) $<
 
 # Dist / install hook thingies
 dist-hook:
@@ -52,3 +65,6 @@ install-data-local: index.html
 	basefile=`basename $$file`; \
 	$(INSTALL_DATA) $$file $(DESTDIR)$(balsa_helpdir)/stylesheet-images/$$basefile;\
 	done
+
+clean-hook:
+	-cd images && rm *.eps

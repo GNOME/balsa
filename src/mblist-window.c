@@ -191,7 +191,11 @@ mblist_redraw ()
     return;
 
   if (mblw->parent)
+#ifndef GTK_HAVE_FEATURES_1_1_2
     gtk_ctree_remove (mblw->ctree, mblw->parent);
+#else
+    gtk_ctree_remove_node (mblw->ctree, mblw->parent);
+#endif
 
   gtk_clist_freeze (GTK_CLIST (mblw->ctree));
 #ifndef GTK_HAVE_FEATURES_1_1_2
@@ -274,7 +278,11 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 				   NULL, NULL,
 				   NULL, NULL,
 				   G_NODE_IS_LEAF (gnode), TRUE);
+#ifndef GTK_HAVE_FEATURES_1_1_2
 	  gtk_ctree_set_row_data (ctree, cnode, mbnode->mailbox);
+#else
+	  gtk_ctree_node_set_row_data (ctree, cnode, mbnode->mailbox);
+#endif
 	}
       else if (mbnode->mailbox && mbnode->name)
 	{
@@ -285,7 +293,11 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 				       NULL, NULL,
 				       NULL, NULL,
 				       G_NODE_IS_LEAF (gnode), TRUE);
+#ifndef GTK_HAVE_FEATURES_1_1_2
 	      gtk_ctree_set_row_data (ctree, cnode, mbnode->mailbox);
+#else
+	      gtk_ctree_node_set_row_data (ctree, cnode, mbnode->mailbox);
+#endif
 	    }
 	  else
 	    {
@@ -302,7 +314,11 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 					 tray_empty, tray_empty_mask,
 					 FALSE, TRUE);
 
+#ifndef GTK_HAVE_FEATURES_1_1_2
 	      gtk_ctree_set_row_data (ctree, cnode, mbnode->mailbox);
+#else
+	      gtk_ctree_node_set_row_data (ctree, cnode, mbnode->mailbox);
+#endif
 	    }
 	}
     }

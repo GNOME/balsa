@@ -3654,8 +3654,6 @@ toggle_entry(BalsaSendmsg * bmsg, GtkWidget * entry[], int pos, int cnt)
 {
     unsigned i;
     GtkWidget *parent;
-    gchar str[ELEMENTS(headerDescs) * 20]; /* assumes that longest header ID
-					      has no more than 19 chars   */
 
     if (GTK_CHECK_MENU_ITEM(bmsg->view_checkitems[pos])->active) {
 	while (cnt--)
@@ -3673,14 +3671,16 @@ toggle_entry(BalsaSendmsg * bmsg, GtkWidget * entry[], int pos, int cnt)
                                2 * parent->style->ythickness);
 
     if(bmsg->update_config) { /* then save the config */
-	str[0] = '\0';
+        GString *str = g_string_new(NULL);
+
 	for (i = 0; i < ELEMENTS(headerDescs); i++)
 	    if (GTK_CHECK_MENU_ITEM(bmsg->view_checkitems[i])->active) {
-		strcat(str, headerDescs[i].name);
-		strcat(str, " ");
+                if (str->len > 0)
+                    g_string_append_c(str, ' ');
+                g_string_append(str, headerDescs[i].name);
 	    }
 	g_free(balsa_app.compose_headers);
-	balsa_app.compose_headers = g_strdup(str);
+	balsa_app.compose_headers = g_string_free(str, FALSE);
     }
 
     return TRUE;

@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.5\n"
-"POT-Creation-Date: 1999-12-07 23:11+0100\n"
-"PO-Revision-Date: 1999-12-06 21:53+01:00\n"
+"POT-Creation-Date: 1999-12-14 03:04+0100\n"
+"PO-Revision-Date: 1999-12-14 03:30+01:00\n"
 "Last-Translator: Kenneth Christiansen - <kenneth@ripen.dk>\n"
 "Language-Team: Danish <sslug-locale@sslug.dk>\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,7 @@ msgstr ""
 msgid "From"
 msgstr "Fra"
 
-#: src/balsa-index.c:232 src/filter-edit-dialog.c:315
+#: src/balsa-index.c:232 src/filter-edit-dialog.c:351
 msgid "Subject"
 msgstr "Emne"
 
@@ -254,7 +254,7 @@ msgid "Date:"
 msgstr "Dato:"
 
 #. To:
-#: src/balsa-message.c:519 src/filter-edit-dialog.c:291
+#: src/balsa-message.c:519 src/filter-edit-dialog.c:327
 #: src/sendmsg-window.c:338
 msgid "To:"
 msgstr "Til:"
@@ -268,7 +268,7 @@ msgid "Bcc:"
 msgstr "Bcc:"
 
 #. From:
-#: src/balsa-message.c:545 src/filter-edit-dialog.c:303
+#: src/balsa-message.c:545 src/filter-edit-dialog.c:339
 #: src/sendmsg-window.c:363
 msgid "From:"
 msgstr "Fra:"
@@ -298,138 +298,138 @@ msgstr "<table border=0><tr><th>Attribut</th><th>Værdi</th></tr>\n"
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Åbning af %s fejlede. Fejlnr. = %d, "
 
-#: src/filter-edit-dialog.c:100
+#: src/filter-edit-dialog.c:136
 msgid "On"
 msgstr "Tænd"
 
-#: src/filter-edit-dialog.c:101
+#: src/filter-edit-dialog.c:137
 msgid "Name"
 msgstr "Navn"
 
-#: src/filter-edit-dialog.c:165
+#: src/filter-edit-dialog.c:201
 msgid "Up"
 msgstr "Op"
 
-#: src/filter-edit-dialog.c:171
+#: src/filter-edit-dialog.c:207
 msgid "Down"
 msgstr "Ned"
 
-#: src/filter-edit-dialog.c:188
+#: src/filter-edit-dialog.c:224
 msgid "New"
 msgstr "Ny"
 
-#: src/filter-edit-dialog.c:194 src/main-window.c:293 src/pref-manager.c:722
+#: src/filter-edit-dialog.c:230 src/main-window.c:292 src/pref-manager.c:722
 msgid "Delete"
 msgstr "Slet"
 
-#: src/filter-edit-dialog.c:237
+#: src/filter-edit-dialog.c:273
 msgid "Match in:"
 msgstr "Find i:"
 
-#: src/filter-edit-dialog.c:255
+#: src/filter-edit-dialog.c:291
 msgid "All"
 msgstr "Alle"
 
-#: src/filter-edit-dialog.c:267
+#: src/filter-edit-dialog.c:303
 msgid "Header"
 msgstr "Hoved"
 
-#: src/filter-edit-dialog.c:279
+#: src/filter-edit-dialog.c:315
 msgid "Body"
 msgstr "Krop"
 
-#: src/filter-edit-dialog.c:328
+#: src/filter-edit-dialog.c:364
 msgid "Match string:"
 msgstr "Find tekst:"
 
-#: src/filter-edit-dialog.c:380 src/mailbox-conf.c:281 src/mailbox-conf.c:1065
+#: src/filter-edit-dialog.c:416 src/mailbox-conf.c:281 src/mailbox-conf.c:1069
 #: src/pref-manager.c:712
 msgid "Add"
 msgstr "Tilføj"
 
-#: src/filter-edit-dialog.c:391 src/sendmsg-window.c:154
+#: src/filter-edit-dialog.c:427 src/sendmsg-window.c:154
 msgid "Remove"
 msgstr "Fjern"
 
-#: src/filter-edit-dialog.c:420
+#: src/filter-edit-dialog.c:456
 msgid "Command:"
 msgstr "Kommando:"
 
 #. The name entry
-#: src/filter-edit-dialog.c:456
+#: src/filter-edit-dialog.c:492
 msgid "Filter name:"
 msgstr "Filternavn:"
 
 #. The "Process when:" option menu
-#: src/filter-edit-dialog.c:475
+#: src/filter-edit-dialog.c:511
 msgid "Process when:"
 msgstr "Behandl når:"
 
 #. The "Run on:" option menu
-#: src/filter-edit-dialog.c:506
+#: src/filter-edit-dialog.c:542
 msgid "Run on:"
 msgstr "Kør ved:"
 
 #. the type notebook's option menu
-#: src/filter-edit-dialog.c:536
+#: src/filter-edit-dialog.c:572
 msgid "Search type:"
 msgstr "Søgetype:"
 
 #. The notification area
-#: src/filter-edit-dialog.c:592
+#: src/filter-edit-dialog.c:628
 msgid "Notification:"
 msgstr "Besked:"
 
 #. Notification buttons
-#: src/filter-edit-dialog.c:601
+#: src/filter-edit-dialog.c:637
 msgid "Play sound:"
 msgstr "Afspil lyd:"
 
-#: src/filter-edit-dialog.c:609
+#: src/filter-edit-dialog.c:645
 msgid "Use Sound..."
 msgstr "Brug lyd..."
 
-#: src/filter-edit-dialog.c:618
+#: src/filter-edit-dialog.c:654
 msgid "Popup text:"
 msgstr "Popup-tekst:"
 
 #. The action area
-#: src/filter-edit-dialog.c:637
+#: src/filter-edit-dialog.c:673
 msgid "Action to perform:"
 msgstr "Handling som skal udføres:"
 
 #. The disposition area
-#: src/filter-edit-dialog.c:658
+#: src/filter-edit-dialog.c:694
 msgid "Disposition:"
 msgstr "Disposition:"
 
-#: src/filter-edit-dialog.c:666
+#: src/filter-edit-dialog.c:702
 msgid "Place/leave in default folder"
 msgstr "Læg/lad ligge i standardmappe"
 
-#: src/filter-edit-dialog.c:671
+#: src/filter-edit-dialog.c:707
 msgid "Do not place/leave in default folder"
 msgstr "Læg/lad ikke ligge i standardmappe"
 
-#: src/filter-edit-dialog.c:676
+#: src/filter-edit-dialog.c:712
 msgid "Stop filtering here"
 msgstr "Stop filtrering her"
 
-#: src/filter-edit-dialog.c:704
+#: src/filter-edit-dialog.c:740
 msgid "Match"
 msgstr "Match"
 
-#: src/filter-edit-dialog.c:707
+#: src/filter-edit-dialog.c:743
 msgid "Action"
 msgstr "Handling"
 
-#: src/filter-edit-dialog.c:721
+#: src/filter-edit-dialog.c:757
 msgid "Revert"
 msgstr "Forkast ændringer"
 
-#: src/filter-edit-dialog.c:749
+#: src/filter-edit-dialog.c:785
 msgid "Balsa Filters"
-msgstr "Balsa filtre"
+msgstr "Balsa-filtre"
 
 #: src/local-mailbox.c:163
 #, c-format
@@ -462,7 +462,7 @@ msgstr "Hovsa! postkassen findes ikke i balsa_app.mailbox noder?\n"
 msgid "Mailbox Configurator"
 msgstr "Postkasseindstillinger"
 
-#: src/mailbox-conf.c:291 src/mailbox-conf.c:1059
+#: src/mailbox-conf.c:291 src/mailbox-conf.c:1063
 msgid "Update"
 msgstr "Opdatér"
 
@@ -520,285 +520,285 @@ msgstr "Kan ikke lave postkasse '%s': %s\n"
 msgid " on "
 msgstr " på "
 
-#: src/mailbox-conf.c:795
+#: src/mailbox-conf.c:799
 msgid "New mailbox type:"
 msgstr "Ny postkassetype:"
 
 #. radio buttons
 #. local mailbox
-#: src/mailbox-conf.c:801
+#: src/mailbox-conf.c:805
 msgid "Local mailbox"
 msgstr "Lokal postkasse"
 
-#: src/mailbox-conf.c:809
+#: src/mailbox-conf.c:813
 msgid "IMAP server"
 msgstr "IMAP server"
 
 #. mailbox name
-#: src/mailbox-conf.c:832 src/mailbox-conf.c:867
+#: src/mailbox-conf.c:836 src/mailbox-conf.c:871
 msgid "Mailbox Name:"
 msgstr "Navn på postkasse:"
 
 #. path to file
-#: src/mailbox-conf.c:842
+#: src/mailbox-conf.c:846
 msgid "Mailbox path:"
 msgstr "Sti til postkasse:"
 
 #. pop server
-#: src/mailbox-conf.c:884 src/mailbox-conf.c:965
+#: src/mailbox-conf.c:888 src/mailbox-conf.c:969
 msgid "Server:"
 msgstr "Server:"
 
 #. username
-#: src/mailbox-conf.c:903 src/mailbox-conf.c:994
+#: src/mailbox-conf.c:907 src/mailbox-conf.c:998
 msgid "Username:"
 msgstr "Brugernavn:"
 
 #. password field
-#: src/mailbox-conf.c:920 src/mailbox-conf.c:1009
+#: src/mailbox-conf.c:924 src/mailbox-conf.c:1013
 msgid "Password:"
 msgstr "Adgangskode:"
 
 #. toggle for check
-#: src/mailbox-conf.c:935 src/main-window.c:289
+#: src/mailbox-conf.c:939 src/main-window.c:288
 msgid "Check"
 msgstr "Check"
 
 #. toggle for deletion from server
-#: src/mailbox-conf.c:943
+#: src/mailbox-conf.c:947
 msgid "Delete from server"
 msgstr "Slet fra server"
 
 #. imap server port number
-#: src/mailbox-conf.c:979
+#: src/mailbox-conf.c:983
 msgid "Port:"
 msgstr "Port:"
 
-#: src/mailbox-conf.c:1022
+#: src/mailbox-conf.c:1026
 msgid "Folder path:"
 msgstr "Sti til mappe:"
 
-#: src/mailbox-conf.c:1100
+#: src/mailbox-conf.c:1104
 msgid "Mailbox"
 msgstr "Postkasse"
 
-#: src/main-window.c:139
+#: src/main-window.c:138
 msgid "_Get new mail"
 msgstr "_Hent ny post"
 
-#: src/main-window.c:139
+#: src/main-window.c:138
 msgid "Fetch new incoming mail"
 msgstr "Hent ny indkommende post"
 
-#: src/main-window.c:147
+#: src/main-window.c:146
 msgid "Pr_int"
 msgstr "_Udskriv"
 
-#: src/main-window.c:147
+#: src/main-window.c:146
 msgid "Print current mail"
 msgstr "Udskriv dette brev"
 
-#: src/main-window.c:173
+#: src/main-window.c:172
 msgid "_New"
 msgstr "_Nyt"
 
-#: src/main-window.c:173
+#: src/main-window.c:172
 msgid "Compose a new message"
 msgstr "Skriv et nyt brev"
 
-#: src/main-window.c:179 src/message-window.c:54
+#: src/main-window.c:178 src/message-window.c:54
 msgid "_Reply"
 msgstr "_Svar"
 
-#: src/main-window.c:179
+#: src/main-window.c:178
 msgid "Reply to the current message"
 msgstr "Svar på dette brev"
 
-#: src/main-window.c:185 src/message-window.c:60
+#: src/main-window.c:184 src/message-window.c:60
 msgid "Reply to _all"
 msgstr "Svar til _alle"
 
-#: src/main-window.c:186
+#: src/main-window.c:185
 msgid "Reply to all recipients of the current message"
 msgstr "Svar til alle modtagere af dette brev"
 
-#: src/main-window.c:192 src/message-window.c:67
+#: src/main-window.c:191 src/message-window.c:67
 msgid "_Forward"
 msgstr "_Videresend"
 
-#: src/main-window.c:192
+#: src/main-window.c:191
 msgid "Forward the current message"
 msgstr "Videresend dette brev"
 
-#: src/main-window.c:198
+#: src/main-window.c:197
 msgid "_Continue"
 msgstr "_Fortsæt"
 
-#: src/main-window.c:198
+#: src/main-window.c:197
 msgid "Continue editing current message"
 msgstr "Fortsæt med at redigere dette brev"
 
-#: src/main-window.c:205 src/main-window.c:248
+#: src/main-window.c:204 src/main-window.c:247
 msgid "_Delete"
 msgstr "Sle_t"
 
-#: src/main-window.c:205
+#: src/main-window.c:204
 msgid "Delete the current message"
 msgstr "Slet dette brev"
 
-#: src/main-window.c:211
+#: src/main-window.c:210
 msgid "_Undelete"
 msgstr "Fortr_yd slet"
 
-#: src/main-window.c:211
+#: src/main-window.c:210
 msgid "Undelete the message"
 msgstr "Fortryd sletning af brev"
 
-#: src/main-window.c:218
+#: src/main-window.c:217
 msgid "Address Book"
 msgstr "Adressebog"
 
-#: src/main-window.c:218
+#: src/main-window.c:217
 msgid "Opens the address book"
 msgstr "Åbner adressebogen"
 
-#: src/main-window.c:235
+#: src/main-window.c:234
 msgid "List"
 msgstr "Liste"
 
-#: src/main-window.c:239
+#: src/main-window.c:238
 msgid "_Open"
 msgstr "Å_bn"
 
-#: src/main-window.c:239
+#: src/main-window.c:238
 msgid "Open the selected mailbox"
 msgstr "Åbn valgte postkasse"
 
-#: src/main-window.c:241
+#: src/main-window.c:240
 msgid "_Close"
 msgstr "_Luk"
 
-#: src/main-window.c:241
+#: src/main-window.c:240
 msgid "Close the selected mailbox"
 msgstr "Luk den valgte postkasse"
 
-#: src/main-window.c:244
+#: src/main-window.c:243
 msgid "_Add"
 msgstr "_Tilføj"
 
-#: src/main-window.c:244
+#: src/main-window.c:243
 msgid "Add a new mailbox"
 msgstr "Tilføj en ny postkasse"
 
-#: src/main-window.c:246
+#: src/main-window.c:245
 msgid "_Edit"
 msgstr "_Redigér"
 
-#: src/main-window.c:246
+#: src/main-window.c:245
 msgid "Edit the selected mailbox"
 msgstr "Redigér den valgte postkasse"
 
-#: src/main-window.c:248
+#: src/main-window.c:247
 msgid "Delete the selected mailbox"
 msgstr "Slet den valgte postkasse"
 
-#: src/main-window.c:251
+#: src/main-window.c:250
 msgid "C_lose current"
 msgstr "L_uk nuværende"
 
-#: src/main-window.c:251
+#: src/main-window.c:250
 msgid "Close the currently opened mailbox"
 msgstr "Luk nuværende åbnede postkasse"
 
-#: src/main-window.c:253
+#: src/main-window.c:252
 msgid "Co_mmit current"
 msgstr "_Aktivér nuværende"
 
-#: src/main-window.c:253
+#: src/main-window.c:252
 msgid "Commit the changes in the currently opened mailbox"
-msgstr "Aktiver ændringerne i nuværende åbnede postkasse"
+msgstr "Aktivér ændringerne i nuværende åbnede postkasse"
 
-#: src/main-window.c:256
+#: src/main-window.c:255
 msgid "O_pened"
 msgstr "Åb_nede"
 
-#: src/main-window.c:262
+#: src/main-window.c:261
 msgid "_Filters..."
 msgstr "_Filtre..."
 
-#: src/main-window.c:262
+#: src/main-window.c:261
 msgid "Manage filters"
 msgstr "Redigér filtre"
 
-#: src/main-window.c:280
+#: src/main-window.c:279
 msgid "_Message"
 msgstr "_Brev"
 
-#: src/main-window.c:281
+#: src/main-window.c:280
 msgid "Mail_boxes"
 msgstr "_Postkasser"
 
-#: src/main-window.c:289
+#: src/main-window.c:288
 msgid "Check Email"
 msgstr "Check epost"
 
-#: src/main-window.c:293
+#: src/main-window.c:292
 msgid "Delete Message"
 msgstr "Slet brev"
 
-#: src/main-window.c:297
+#: src/main-window.c:296
 msgid "Compose"
 msgstr "Skriv"
 
-#: src/main-window.c:297
+#: src/main-window.c:296
 msgid "Compose Message"
 msgstr "Skriv et nyt brev"
 
-#: src/main-window.c:300
+#: src/main-window.c:299
 msgid "Reply"
 msgstr "Svar"
 
-#: src/main-window.c:303
+#: src/main-window.c:302
 msgid "Reply to all"
 msgstr "Svar alle"
 
-#: src/main-window.c:306
+#: src/main-window.c:305
 msgid "Forward"
 msgstr "Videresend"
 
-#: src/main-window.c:309
+#: src/main-window.c:308
 msgid "Continue"
 msgstr "Fortsæt"
 
-#: src/main-window.c:314
+#: src/main-window.c:313
 msgid "Previous"
 msgstr "Forrige"
 
-#: src/main-window.c:314
+#: src/main-window.c:313
 msgid "Open Previous message"
 msgstr "Åbn det forrige brev"
 
-#: src/main-window.c:319
+#: src/main-window.c:318
 msgid "Next"
 msgstr "Næste"
 
-#: src/main-window.c:319
+#: src/main-window.c:318
 msgid "Open Next message"
 msgstr "Åbn det næste brev"
 
-#: src/main-window.c:324 src/sendmsg-window.c:82
+#: src/main-window.c:323 src/sendmsg-window.c:82
 msgid "Print"
 msgstr "Udskriv"
 
-#: src/main-window.c:324
+#: src/main-window.c:323
 msgid "Print current message"
 msgstr "Udskriv dette brev"
 
-#: src/main-window.c:701
+#: src/main-window.c:703
 msgid "Copyright (C) 1997-1999"
 msgstr "Ophavsret (C) 1997-1999"
 
-#: src/main-window.c:703
+#: src/main-window.c:705
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://www.balsa.net/\n"
@@ -810,7 +810,7 @@ msgstr ""
 "\n"
 "Rapportér venligst om fejl på: http://bugs.gnome.org/"
 
-#: src/main.c:104
+#: src/main.c:107
 msgid "Get new mail on startup"
 msgstr "Hent ny post ved opstart"
 
@@ -1150,12 +1150,12 @@ msgstr "du"
 msgid " wrote:\n"
 msgstr " skrev:\n"
 
-#: libbalsa/mailbox.c:586
+#: libbalsa/mailbox.c:588
 #, c-format
 msgid "Mailbox: Opening %s Refcount: %d\n"
 msgstr "Postkasse: Åbning af %s referencetal: %d\n"
 
-#: libbalsa/mailbox.c:606
+#: libbalsa/mailbox.c:608
 #, c-format
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr "Postkasse: Lukker %s referencetal: %d\n"

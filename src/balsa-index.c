@@ -295,6 +295,7 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
   bindex->watcher_id =
     mailbox_watcher_set (mailbox,
 			 (MailboxWatcherFunc) mailbox_listener,
+			 MESSAGE_MARK_ANSWER_MASK |
 			 MESSAGE_MARK_READ_MASK |
 			 MESSAGE_MARK_DELETE_MASK |
 			 MESSAGE_MARK_UNDELETE_MASK |

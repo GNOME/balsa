@@ -51,6 +51,7 @@ typedef enum
 
 typedef enum
 {
+  MESSAGE_MARK_ANSWER,      /* message has been answered */
   MESSAGE_MARK_READ,        /* message has changed from new to read */
   MESSAGE_MARK_DELETE,      /* message has been marked deleted */
   MESSAGE_MARK_UNDELETE,    /* message has been marked undeleted */
@@ -63,13 +64,14 @@ typedef enum
 
 typedef enum
 {
-  MESSAGE_MARK_READ_MASK      = 1 << 1,
-  MESSAGE_MARK_DELETE_MASK    = 1 << 2,
-  MESSAGE_MARK_UNDELETE_MASK  = 1 << 3,
-  MESSAGE_DELETE_MASK         = 1 << 4,
-  MESSAGE_NEW_MASK            = 1 << 5,
-  MESSAGE_FLAGGED_MASK        = 1 << 6,
-  MESSAGE_ANSWERED_MASK       = 1 << 7
+  MESSAGE_MARK_ANSWER_MASK    = 1 << 1,
+  MESSAGE_MARK_READ_MASK      = 1 << 2,
+  MESSAGE_MARK_DELETE_MASK    = 1 << 3,
+  MESSAGE_MARK_UNDELETE_MASK  = 1 << 4,
+  MESSAGE_DELETE_MASK         = 1 << 5,
+  MESSAGE_NEW_MASK            = 1 << 6,
+  MESSAGE_FLAGGED_MASK        = 1 << 7,
+  MESSAGE_ANSWERED_MASK       = 1 << 8
 } MailboxWatcherMessageMask;
 
 

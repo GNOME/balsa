@@ -28,9 +28,11 @@
 #include "mailbox.h"
 #include "misc.h"
 #include "sendmsg-window.h"
+#include "mailbox.h"
 #include "mail.h"
+#include "osdep.h"
+#include "rfc822.h"
 #include "smtp.h"
-
 
 gint delete_event (GtkWidget *, gpointer);
 
@@ -255,6 +257,8 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
       message = (Message *) gtk_clist_get_row_data (clist, row);
 
       msg->window = gnome_app_new ("balsa", "Reply to ");
+
+      message_answer(message);
       break;
     case 2:
       clist = GTK_CLIST (GTK_BIN (bindex)->child);

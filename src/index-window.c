@@ -82,6 +82,7 @@ create_new_index (Mailbox * mailbox)
   iw->mailbox = mailbox;
 
   iw->window = gnome_app_new ("balsa", iw->mailbox->name);
+  gtk_widget_set_usize (iw->window, 700, 250);
 
   iw->accel = gtk_accel_group_new ();
   

@@ -66,8 +66,6 @@ static void show_about_box ();
 
 
 /* callbacks */
-static void move_resize_cb ();
-
 static void new_message_cb (GtkWidget * widget);
 static void replyto_message_cb (GtkWidget * widget);
 static void forward_message_cb (GtkWidget * widget);
@@ -115,13 +113,6 @@ open_main_window ()
 		      "delete_event",
 		      (GtkSignalFunc) gtk_false,
 		      NULL);
-
-  gtk_signal_connect (GTK_OBJECT (mw->window),
-		      "move_resize",
-		      (GtkSignalFunc) move_resize_cb,
-		      NULL);
-
-
 
   /* meubar and toolbar */
   create_menu ();
@@ -534,18 +525,8 @@ show_about_box ()
 
 
 /*
- * callbacks
+ * Callbacks
  */
-static void
-move_resize_cb ()
-{
-  gdk_window_get_geometry (mw->window->window,
-			   NULL,
-			   NULL,
-			   &balsa_app.mw_width,
-			   &balsa_app.mw_height,
-			   NULL);
-}
 
 static void
 new_message_cb (GtkWidget * widget)

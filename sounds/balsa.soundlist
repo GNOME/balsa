@@ -8,6 +8,7 @@ description[et]=Elektronpostiprogramm Balsa
 description[fr]=Lecteur de courrier Balsa
 description[lt]=Balsa el. paðto programa
 description[sv]=Balsa epostprogram
+description[tr]=Basla ePosta uygulamasý
 description[wa]=Manaedjeu d' emilaedjes Balsa
 
 [startup]
@@ -21,4 +22,5 @@ description[et]=Programmi käivitamine
 description[fr]=Démarrage du programme
 description[lt]=Programos paleidimas
 description[sv]=Programstart
+description[tr]=Uygulama baþlangýçý
 description[wa]=Enondaedje do programe

@@ -1,3 +1,8 @@
+2000-04-24  Fatih Demir	<kabalak@gmx.net>
+
+	* sounds/balsa.soundlist & sounds/email.soundlist : 
+		Added [tr] sections ..
+
 2000-04-23  Mikael Hermansson <mikeh@bahnhof.se>
 
 	* src/sendmsg-window.c, src/main.c: show only compose window and

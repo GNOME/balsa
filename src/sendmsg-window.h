@@ -33,7 +33,6 @@ extern "C" {
 	SEND_REPLY_GROUP,       /* by Reply to Group      */
 	SEND_FORWARD_ATTACH,    /* by Forward attached    */
 	SEND_FORWARD_INLINE,    /* by Forward inline      */
-	SEND_INCLUDE_INLINE,	/* by Include message     */
 	SEND_CONTINUE		/* by Continue postponed  */
     } SendType;
 
@@ -60,21 +59,19 @@ extern "C" {
 	GtkWidget *text;
 	GtkWidget *spell_checker;
 	GtkWidget *notebook;
-	GdkFont *font;
 	LibBalsaMessage *orig_message;
 	SendType type;
 	/* language selection related data */
-	const gchar *charset;
+	gchar *charset;
 	const gchar *locale;
 	GtkWidget *current_language_menu;
 	/* identity related data */
 	LibBalsaIdentity* ident;
-        /* fcc mailbox URL */
+        /* fcc mailbox */
         gchar *fcc_url;
 	/* widgets to be disabled when the address is incorrect */
-	GtkWidget *ready_widgets[5];
+	GtkWidget *ready_widgets[3];
 	GtkWidget *view_checkitems[VIEW_MENU_LENGTH];
-	GList *spell_check_disable_list;
 	gboolean update_config; /* is the window being set up or in normal  */
 	                        /* operation and user actions should update */
 	                        /* the config */
@@ -93,7 +90,7 @@ extern "C" {
     void sendmsg_window_set_field(BalsaSendmsg *bsmsg, const gchar* key,
                                   const gchar* val);
 
-    gboolean add_attachment(BalsaSendmsg *bsmsg, char *filename, 
+    gboolean add_attachment(GnomeIconList * iconlist, char *filename, 
                             gboolean is_a_tmp_file, 
                             const gchar *forced_mime_type);
 
@@ -104,6 +101,8 @@ extern "C" {
     BalsaSendmsg *sendmsg_window_new_from_list(GtkWidget * w,
                                                GList * message_list,
                                                SendType type);
+    BalsaToolbarModel *sendmsg_window_get_toolbar_model(void);
+
 #define SENDMSG_WINDOW_QUIT_ON_CLOSE(bsmsg) ((bsmsg)->quit_on_close=TRUE)
 
 #ifdef __cplusplus

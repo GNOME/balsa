@@ -11,4 +11,5 @@ libmutt/muttlib.c
 libmutt/pattern.c
 #libmutt/recvattach.c: only mutt_is_message_type used. no translation there.
 libmutt/recvattach.c
+# orbit not yet used.
 src/orbit-glue.c

@@ -35,8 +35,8 @@
 #include <errno.h>
 
 static gchar *init_mbnames[NUM_EDs] =
-    { N_("Inbox:"), N_("Outbox:"), N_("Sentbox:"), N_("Draftbox:"),
-    N_("Trash:")
+    { N_("_Inbox:"), N_("_Outbox:"), N_("_Sentbox:"), N_("_Draftbox:"),
+    N_("_Trash:")
 };
 
 static void unconditional_mailbox(const gchar * path,
@@ -56,7 +56,7 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
         return;
 
     dup = g_strdup(path);
-    index = (gchar *) g_basename(dup);
+    index = strrchr(dup, G_DIR_SEPARATOR);
 
     if (index == NULL) {
         (*error) =
@@ -68,7 +68,7 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
         return;
     }
 
-    index[-1] = '\0';           /*Split off the dirs from the file. */
+    *index = '\0';           /*Split off the dirs from the file. */
 
     if (balsa_init_create_to_directory(dup, error)) {
         /*TRUE->error */
@@ -76,7 +76,7 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
         return;
     }
 
-    index[-1] = '/';
+    *index = G_DIR_SEPARATOR;
 
     url_parse_ciss(&url, dup);
 
@@ -243,6 +243,7 @@ balsa_druid_page_directory(GnomeDruid * druid, GdkPixbuf * default_logo)
     gnome_druid_page_standard_set_logo(page, default_logo);
     balsa_druid_page_directory_init(dir, page, druid);
     gnome_druid_append_page(druid, GNOME_DRUID_PAGE(page));
+#if BALSA_MAJOR < 2
     gtk_signal_connect(GTK_OBJECT(page), "prepare",
                        GTK_SIGNAL_FUNC(balsa_druid_page_directory_prepare),
                        dir);
@@ -252,6 +253,14 @@ balsa_druid_page_directory(GnomeDruid * druid, GdkPixbuf * default_logo)
     gtk_signal_connect(GTK_OBJECT(page), "back",
                        GTK_SIGNAL_FUNC(balsa_druid_page_directory_back),
                        dir);
+#else
+    g_signal_connect(G_OBJECT(page), "prepare",
+                     G_CALLBACK(balsa_druid_page_directory_prepare), dir);
+    g_signal_connect(G_OBJECT(page), "next",
+                     G_CALLBACK(balsa_druid_page_directory_next), dir);
+    g_signal_connect(G_OBJECT(page), "back",
+                     G_CALLBACK(balsa_druid_page_directory_back), dir);
+#endif                          /* BALSA_MAJOR < 2 */
 }
 
 static void
@@ -332,12 +341,18 @@ balsa_druid_page_directory_next(GnomeDruidPage * page, GtkWidget * druid,
     dir->paths_locked = TRUE;
 
     if (error) {
-        gchar *tmp =
-            g_strconcat(_("Problem Creating Mailboxes"), "\n", error,
-                        NULL);
-        gnome_dialog_run_and_close(GNOME_DIALOG(gnome_error_dialog(tmp)));
+        GtkWidget *dlg =
+            gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_ancestor
+                                          (GTK_WIDGET(druid), 
+                                           GTK_TYPE_WINDOW)),
+                                   GTK_DIALOG_MODAL,
+                                   GTK_MESSAGE_ERROR,
+                                   GTK_BUTTONS_OK,
+                                   _("Problem Creating Mailboxes\n%s"),
+                                   error);
         g_free(error);
-        g_free(tmp);
+        gtk_dialog_run(GTK_DIALOG(dlg));
+        gtk_widget_destroy(dlg);
         return TRUE;
     }
 

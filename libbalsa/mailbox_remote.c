@@ -28,24 +28,28 @@ static void libbalsa_mailbox_remote_class_init(LibBalsaMailboxRemoteClass *
 					       klass);
 static void libbalsa_mailbox_remote_init(LibBalsaMailboxRemote * mailbox);
 
-GtkType libbalsa_mailbox_remote_get_type(void)
+GType
+libbalsa_mailbox_remote_get_type(void)
 {
-    static GtkType mailbox_type = 0;
+    static GType mailbox_type = 0;
 
     if (!mailbox_type) {
-	static const GtkTypeInfo mailbox_info = {
-	    "LibBalsaMailboxRemote",
-	    sizeof(LibBalsaMailbox),
+	static const GTypeInfo mailbox_info = {
 	    sizeof(LibBalsaMailboxClass),
-	    (GtkClassInitFunc) libbalsa_mailbox_remote_class_init,
-	    (GtkObjectInitFunc) libbalsa_mailbox_remote_init,
-	    /* reserved_1 */ NULL,
-	    /* reserved_2 */ NULL,
-	    (GtkClassInitFunc) NULL,
+            NULL,               /* base_init */
+            NULL,               /* base_finalize */
+	    (GClassInitFunc) libbalsa_mailbox_remote_class_init,
+            NULL,               /* class_finalize */
+            NULL,               /* class_data */
+	    sizeof(LibBalsaMailbox),
+            0,                  /* n_preallocs */
+	    (GInstanceInitFunc) libbalsa_mailbox_remote_init
 	};
 
 	mailbox_type =
-	    gtk_type_unique(libbalsa_mailbox_get_type(), &mailbox_info);
+	    g_type_register_static(LIBBALSA_TYPE_MAILBOX,
+	                           "LibBalsaMailboxRemote",
+                                   &mailbox_info, 0);
     }
 
     return mailbox_type;
@@ -65,7 +69,7 @@ libbalsa_mailbox_remote_init(LibBalsaMailboxRemote * mailbox)
 void 
 libbalsa_mailbox_remote_set_server(LibBalsaMailboxRemote*m, LibBalsaServer* s)
 {
-    if(m->server) gtk_object_unref(GTK_OBJECT(m->server));
+    if(m->server) g_object_unref(G_OBJECT(m->server));
     m->server = s;
-    if(s) gtk_object_ref(GTK_OBJECT(s));
+    if(s) g_object_ref(G_OBJECT(s));
 }

@@ -59,14 +59,11 @@ balsa_init_get_png(const gchar * fname)
     GdkPixbuf *img;
     GError *err = NULL;
 #endif                          /* BALSA_MAJOR < 2 */
-    gchar *fullname, *fullpath;
+    gchar *fullpath;
 
     g_return_val_if_fail(fname != NULL, NULL);
 
-    fullname = g_strconcat("balsa/", fname, NULL);
-    /*fullpath = gnome_pixmap_file(fullname); */
-    fullpath = balsa_pixmap_finder(fullname);
-    g_free(fullname);
+    fullpath = balsa_pixmap_finder(fname);
 
     if (!fullpath)
         return NULL;
@@ -90,28 +87,34 @@ balsa_init_add_table_entry(GtkTable * table, guint num, gchar * ltext,
                            const gchar * etext, EntryData * ed,
                            GnomeDruid * druid, GtkWidget ** dest)
 {
-    GtkWidget *w;
+    GtkWidget *l, *e;
 
     ed->num = num;
     ed->druid = druid;
 
-    w = gtk_label_new(ltext);
-    gtk_label_set_justify(GTK_LABEL(w), GTK_JUSTIFY_RIGHT);
-    gtk_misc_set_alignment(GTK_MISC(w), 1.0, 0.5);
-    gtk_table_attach(table, GTK_WIDGET(w), 0, 1, num + 1, num + 2,
+    l = gtk_label_new_with_mnemonic(ltext);
+    gtk_label_set_justify(GTK_LABEL(l), GTK_JUSTIFY_RIGHT);
+    gtk_misc_set_alignment(GTK_MISC(l), 1.0, 0.5);
+    gtk_table_attach(table, GTK_WIDGET(l), 0, 1, num + 1, num + 2,
                      GTK_FILL, GTK_FILL, 8, 4);
 
-    w = gtk_entry_new();
-    gtk_entry_set_text(GTK_ENTRY(w), etext);
-    gtk_signal_connect(GTK_OBJECT(w), "changed",
+    e = gtk_entry_new();
+    gtk_entry_set_text(GTK_ENTRY(e), etext);
+#if BALSA_MAJOR < 2
+    gtk_signal_connect(GTK_OBJECT(e), "changed",
                        GTK_SIGNAL_FUNC(entry_changed_cb), ed);
-    gtk_table_attach(table, GTK_WIDGET(w), 1, 2, num + 1, num + 2,
+#else
+    g_signal_connect(G_OBJECT(e), "changed",
+                     G_CALLBACK(entry_changed_cb), ed);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(l), e);
+#endif                          /* BALSA_MAJOR < 2 */
+    gtk_table_attach(table, GTK_WIDGET(e), 1, 2, num + 1, num + 2,
                      GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 8, 4);
 
     if (etext && etext[0] != '\0')
         ed->master->setbits |= (1 << num);
 
-    (*dest) = w;
+    (*dest) = e;
     ed->master->numentries++;
     ed->master->donemask = (ed->master->donemask << 1) | 1;
 }

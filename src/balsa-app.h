@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -66,18 +66,18 @@
 #define INFO_FIELD_LENGTH 10
 
 /* Default colour for mailboxes with unread messages */
-#define MBLIST_UNREAD_COLOR "rgb:FFFF/0000/0000"
+#define MBLIST_UNREAD_COLOR "dark green"
 
 /*
  * Default colour for quoted text
  * oh no, I used the US spelling.
  */
 #define MAX_QUOTED_COLOR 6
-#define DEFAULT_QUOTED_COLOR "rgb:0000/5000/5000"
-#define DEFAULT_QUOTE_REGEX  "^([ \tA-Z|>:}#])\\1*"
+#define DEFAULT_QUOTED_COLOR "#055"
+#define DEFAULT_QUOTE_REGEX  "^[ \\t]*[|>:}#]"
 
-#define DEFAULT_URL_COLOR    "rgb:A000/0000/0000"
-#define DEFAULT_BAD_ADDRESS_COLOR    "rgb:8000/8000/0000"
+#define DEFAULT_URL_COLOR    "dark blue"
+#define DEFAULT_BAD_ADDRESS_COLOR    "red"
 
 #define MAILBOX_MANAGER_WIDTH 350
 #define MAILBOX_MANAGER_HEIGHT 400
@@ -85,15 +85,13 @@
 #define MESSAGEBOX_WIDTH 450
 #define MESSAGEBOX_HEIGHT 150
 
-#define DEFAULT_MESSAGE_FONT "-*-fixed-medium-r-semicondensed-*-13-*-*-*-c-*-iso8859-1"
-#define DEFAULT_SUBJECT_FONT "-*-fixed-bold-r-normal-*-*-*-*-*-c-*-iso8859-1"
+#define DEFAULT_MESSAGE_FONT "monospace 11"
+#define DEFAULT_SUBJECT_FONT "helvetica Bold 11"
 #define DEFAULT_DATE_FORMAT "%Y.%m.%d %H:%M"
 #define DEFAULT_PAPER_SIZE "A4"
-#define DEFAULT_PRINT_HEADER_FONT "Helvetica"
-#define DEFAULT_PRINT_HEADER_SIZE 11.0
-#define DEFAULT_PRINT_FOOTER_SIZE 7.0
-#define DEFAULT_PRINT_BODY_FONT "Courier"
-#define DEFAULT_PRINT_BODY_SIZE 10.0
+#define DEFAULT_PRINT_HEADER_FONT "Helvetica 11"
+#define DEFAULT_PRINT_BODY_FONT "Courier 10"
+#define DEFAULT_PRINT_FOOTER_FONT "Helvetica 7"
 #define DEFAULT_SELECTED_HDRS "from to date cc subject"
 #define DEFAULT_MESSAGE_TITLE_FORMAT "Message from %F: %s"
 #define DEFAULT_ENCODING ENC8BIT
@@ -176,6 +174,7 @@ extern struct BalsaApplication {
 
     BalsaWindow *main_window;
     BalsaMBList *mblist;
+    GtkTreeStore *mblist_tree_store;
 
     LibBalsaMailbox *inbox;
     GList *inbox_input;		/* mailboxes such as POP3, etc that will be appending into inbox */
@@ -205,10 +204,7 @@ extern struct BalsaApplication {
 
     /* automatically close mailboxes after XX minutes */
     gboolean close_mailbox_auto;
-    gint close_mailbox_timeout; /* seconds */ 
-    /* automatically commit mailboxes after XX minutes */    
-    gboolean commit_mailbox_auto;
-    gint commit_mailbox_timeout; /* seconds */
+    gint close_mailbox_timeout;
     gint check_imap;
     gint check_imap_inbox;
     gint quiet_background_check;
@@ -219,10 +215,12 @@ extern struct BalsaApplication {
     gint mblist_width;
     gint sw_width; /* sendmsg window */
     gint sw_height;
-    int toolbar_count;
-    BalsaToolbarType *toolbar_ids; 
-    char ***toolbars;     /* toolbar_ids[i] is a type of toolbars[i] */
+
+    /* toolbars */
     int toolbar_wrap_button_text;
+    GSList *main_window_toolbar_current;
+    GSList *compose_window_toolbar_current;
+    GSList *message_window_toolbar_current;
 
     /* file paths */
     gchar *attach_dir;
@@ -261,8 +259,6 @@ extern struct BalsaApplication {
     /* label color of bad addresses */
     GdkColor bad_address_color;
 
-    GtkToolbarStyle toolbar_style;
-    GnomeMDIMode mdi_style;
     guint pwindow_option;
     gboolean wordwrap;
     gint wraplength;
@@ -305,9 +301,12 @@ extern struct BalsaApplication {
     gint open_inbox_upon_startup;
     gint check_mail_upon_startup;
     gint remember_open_mboxes;
+    gchar** open_mailbox_vector;
     gint open_unread_mailbox;
-    GList *open_mailbox_list;	/* data is a pointer to the mailbox */
 
+    /* list of currently open mailboxes */
+    GList *open_mailbox_list;  /* data is a pointer to the mailbox */
+    
     /* font used to display messages */
     gchar *message_font;
     gchar *subject_font;
@@ -318,11 +317,9 @@ extern struct BalsaApplication {
 
     /* printing */
     gchar* paper_size; /* A4 or Letter */
-    gchar* print_header_font;  /* font for printing headers and footers */
-    gfloat print_header_size;  /* size fpr printing headers */
-    gfloat print_footer_size;  /* size for printing footers */
+    gchar* print_header_font;  /* font for printing headers */
     gchar* print_body_font;    /* font for printing text parts */
-    gfloat print_body_size;    /* size for printing text parts */
+    gchar* print_footer_font;  /* font for printing footers */
     gboolean print_highlight_cited;
 
     /* compose: shown headers */
@@ -364,6 +361,9 @@ extern struct BalsaApplication {
     gboolean recognize_rfc2646_format_flowed;
     gboolean send_rfc2646_format_flowed;
 
+    /* how to handle multipart/alternative */
+    gboolean display_alt_plain;
+
     GList *folder_mru;
     GList *fcc_mru;
     gint drag_default_is_move;
@@ -375,11 +375,12 @@ extern struct BalsaApplication {
 #define BALSA_IS_MAILBOX_SPECIAL(a) ((a)==balsa_app.inbox || (a)==balsa_app.trash || (a)==balsa_app.outbox||(a)==balsa_app.draftbox || (a)==balsa_app.sentbox)
 
 void balsa_app_init(void);
+void balsa_app_destroy(void);
 gboolean do_load_mailboxes(void);
 void update_timer(gboolean update, guint minutes);
 
 gchar *ask_password(LibBalsaServer * server, LibBalsaMailbox * mbox);
-GtkWidget *gnome_stock_button_with_label(const char *icon,
+GtkWidget *balsa_stock_button_with_label(const char *icon,
 					 const char *label);
 gboolean open_mailboxes_idle_cb(gchar * names[]);
 
@@ -395,14 +396,14 @@ LibBalsaMailbox *balsa_find_mailbox_by_name(const gchar * name);
 void  balsa_remove_children_mailbox_nodes(GNode* gnode);
 BalsaIndex* balsa_find_index_by_mailbox(LibBalsaMailbox* mailbox);
 
-GtkWidget *create_label(const gchar * label, GtkWidget * table, 
-			       gint row, guint *keyval);
-GtkWidget *create_entry(GnomeDialog *mcw, GtkWidget * table, 
+GtkWidget *create_label(const gchar * label, GtkWidget * table, gint row);
+GtkWidget *create_entry(GtkDialog *mcw, GtkWidget * table, 
 			GtkSignalFunc func, gpointer data, gint row, 
-			const gchar * initval, const guint keyval);
-GtkWidget *create_check(GnomeDialog *mcw, const gchar * label, 
+			const gchar * initval, GtkWidget* hotlabel);
+GtkWidget *create_check(GtkDialog *mcw, const gchar * label, 
 			GtkWidget * table, gint row, gboolean initval);
-gchar *balsa_charset_from_message_font(void);
 
+void balsa_mailbox_nodes_lock(gboolean exclusive);
+void balsa_mailbox_nodes_unlock(gboolean exclusive);
 
 #endif				/* __BALSA_APP_H__ */

@@ -25,5 +25,6 @@
 #include "libbalsa.h"
 
 void message_window_new(LibBalsaMessage * message);
+BalsaToolbarModel *message_window_get_toolbar_model(void);
 
 #endif				/* __MESSAGE_WINDOW_H__ */

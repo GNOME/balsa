@@ -24,74 +24,78 @@
 
 #include <gnome.h>
 #include "libbalsa.h"
+#include "filter.h"
 #include "mailbox-node.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif				/* __cplusplus */
 
-    /* Struct used to keep track of the last sort we've made on an index
-       the idea being to avoid unnecessary recalculation */
-
-    struct _BalsaIndexMatch {
-	/* Fields describing the current matching conditions
-	   Remark : conditions is a copy, it is the responsibility
-	   of the owner (here the index) to free it
-	 */
-	gint op;
-	GSList * conditions;
-
-	/* This is the list of matching messages corresponding to the current
-	   conditions (used for IMAP only).
-	   Remark : we drop this list each time the mailbox content has changed
-	   or the conditions or the op has changed
-	*/
-	/* Interval of message numbers where we have done the search */
-	gint msgno_beg, msgno_end;
-	GList * matching_messages;
-    };
-
     GtkType balsa_index_get_type(void);
 
 #define BALSA_TYPE_INDEX          (balsa_index_get_type ())
-#define BALSA_INDEX(obj)          (GTK_CHECK_CAST (obj, balsa_index_get_type (), BalsaIndex))
-#define BALSA_INDEX_CLASS(klass)  (GTK_CHECK_CLASS_CAST (klass, balsa_index_get_type (), BalsaIndexClass))
-#define BALSA_IS_INDEX(obj)       (GTK_CHECK_TYPE (obj, balsa_index_get_type ()))
+#define BALSA_INDEX(obj)          (GTK_CHECK_CAST (obj, BALSA_TYPE_INDEX, BalsaIndex))
+#define BALSA_INDEX_CLASS(klass)  (GTK_CHECK_CLASS_CAST (klass, BALSA_TYPE_INDEX, BalsaIndexClass))
+#define BALSA_IS_INDEX(obj)       (GTK_CHECK_TYPE (obj, BALSA_TYPE_INDEX))
 #define BALSA_IS_INDEX_CLASS(klass) (GTK_CHECK_CLASS_TYPE (klass, BALSA_TYPE_INDEX))
 
 
     typedef struct _BalsaIndex BalsaIndex;
     typedef struct _BalsaIndexClass BalsaIndexClass;
-    typedef struct _BalsaIndexMatch BalsaIndexMatch;
 
     struct _BalsaIndex {
-        GtkScrolledWindow sw;    
+        GtkTreeView tree_view;
         
-        GtkCTree* ctree;
         GtkWidget* window;       
+
+        /* the popup menu and some items we need to refer to */
+        GtkWidget *popup_menu;
+        GtkWidget *delete_item;
+        GtkWidget *undelete_item;
+        GtkWidget *move_to_trash_item;
+        GtkWidget *move_to_item;
 
         BalsaMailboxNode* mailbox_node;
         LibBalsaMessage* first_new_message;
+        LibBalsaMessage* current_message;
+        gboolean prev_message;
+        gboolean next_message;
 
-        int threading_type;
         GTimeVal last_use;
 
 	gchar *date_string;
 	gboolean line_length;
 
-	BalsaIndexMatch * match_struct;
+        /* idle handler data */
+        guint idle_handler_id;
+        GSList *update_flag_list;
+
+        /* signal handler ids */
+        gulong selection_changed_id;
+        gulong row_expanded_id;
+        gulong row_collapsed_id;
     };
 
     struct _BalsaIndexClass {
-	GtkScrolledWindowClass parent_class;
+	GtkTreeViewClass parent_class;
 
-	void (*select_message) (BalsaIndex * bindex,
-				LibBalsaMessage * message);
-	void (*unselect_message) (BalsaIndex * bindex,
-				  LibBalsaMessage * message);
-        void (*unselect_all_messages) (BalsaIndex* bindex);
+        void (*index_changed) (BalsaIndex* bindex);
     };
 
+/* tree model columns */
+    enum {
+        BNDX_MESSAGE_COLUMN,
+        BNDX_INDEX_COLUMN,
+        BNDX_STATUS_COLUMN,
+        BNDX_ATTACH_COLUMN,
+        BNDX_FROM_COLUMN,
+        BNDX_SUBJECT_COLUMN,
+        BNDX_DATE_COLUMN,
+        BNDX_SIZE_COLUMN,
+        BNDX_COLOR_COLUMN,
+        BNDX_WEIGHT_COLUMN,
+        BNDX_N_COLUMNS
+    };
 
 /* function prototypes */
     
@@ -105,22 +109,18 @@ extern "C" {
     void balsa_index_update_tree(BalsaIndex *bindex, gboolean expand);
     void balsa_index_set_threading_type(BalsaIndex * bindex, int thtype);
 
-    void balsa_index_redraw_current(BalsaIndex *);
-
 /* move or copy a list of messages */
-    void balsa_index_transfer(GList * messages,
-                              LibBalsaMailbox * from_mailbox,
-                              LibBalsaMailbox * to_mailbox,
-                              BalsaIndex * from_bindex, gboolean copy);
+    void balsa_index_transfer(BalsaIndex * index, GList * messages,
+                              LibBalsaMailbox * to_mailbox, gboolean copy);
 
 /* select up/down the index */
     void balsa_index_select_next(BalsaIndex *);
     void balsa_index_select_next_unread(BalsaIndex * bindex);
     void balsa_index_select_next_flagged(BalsaIndex * bindex);
     void balsa_index_select_previous(BalsaIndex *);
-    void balsa_index_select_row(BalsaIndex * bindex, gint row);
 
-    void balsa_index_find(BalsaIndex * bindex,gint op,GSList * conditions,gboolean previous);
+    void balsa_index_find(BalsaIndex * bindex, FilterOpType op,
+                          GSList * conditions, gboolean previous);
 
 /* balsa index page stuff */
     void balsa_message_reply(GtkWidget * widget, gpointer user_data);
@@ -142,18 +142,19 @@ extern "C" {
 
     void balsa_index_reset(BalsaIndex * index);
     gint balsa_find_notebook_page_num(LibBalsaMailbox * mailbox);
-    void balsa_index_update_message(BalsaIndex * index);
+    void balsa_index_set_column_widths(BalsaIndex * index);
+    GList * balsa_index_selected_list(BalsaIndex * index);
+    void balsa_index_move_subtree(GtkTreeModel * model, GtkTreePath * root,
+                                  GtkTreePath * new_parent,
+                                  GHashTable * ref_table);
 
     /* Updating index columns when preferences change */
-    void balsa_index_refresh_date (GtkNotebook *, GtkNotebookPage *,
-				   gint, gpointer);
-    void balsa_index_refresh_size (GtkNotebook *, GtkNotebookPage *,
-				   gint, gpointer);
+    void balsa_index_refresh_date (BalsaIndex * index);
+    void balsa_index_refresh_size (BalsaIndex * index);
 
     /* Change the display of all indexes when balsa_app.hide_deleted is
      * changed */
     void balsa_index_hide_deleted(gboolean hide);
-    void balsa_index_sync_backend(LibBalsaMailbox * mailbox);
 
     /* Threading Stuff, implementation is in balsa-index-threading.c */
     void balsa_index_threading(BalsaIndex* bindex,

@@ -63,6 +63,7 @@ typedef struct header MuttHeader;
 #include "mailbox_maildir.h"
 
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
+
 /*
  * Initialize the library
  */

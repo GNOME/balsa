@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -34,57 +34,24 @@
 extern "C" {
 #endif				/* __cplusplus */
 
+#define BALSA_TYPE_SPELL_CHECK \
+        (balsa_spell_check_get_type ())
+#define BALSA_SPELL_CHECK(obj) \
+        GTK_CHECK_CAST (obj, BALSA_TYPE_SPELL_CHECK, BalsaSpellCheck)
+#define BALSA_SPELL_CHECK_CLASS(klass) \
+        GTK_CHECK_CLASS_CAST (klass, BALSA_TYPE_SPELL_CHECK, \
+                BalsaSpellCheckClass)
+#define BALSA_IS_SPELL_CHECK(obj) \
+        GTK_CHECK_TYPE (obj, BALSA_TYPE_SPELL_CHECK)
+#define BALSA_IS_SPELL_CHECK_CLASS(klass) \
+        (GTK_CHECK_CLASS_TYPE ((klass), BALSA_TYPE_SPELL_CHECK))
 
-#define BALSA_TYPE_SPELL_CHECK         (balsa_spell_check_get_type ())
-#define BALSA_SPELL_CHECK(obj)         GTK_CHECK_CAST (obj, BALSA_TYPE_SPELL_CHECK, BalsaSpellCheck)
-#define BALSA_SPELL_CHECK_CLASS(klass) GTK_CHECK_CLASS_CAST (klass, BALSA_TYPE_SPELL_CHECK, BalsaSpellCheckClass)
-#define BALSA_IS_SPELL_CHECK(obj)      GTK_CHECK_TYPE (obj, BALSA_TYPE_SPELL_CHECK)
 
-
+/* opaque structures, declared in spell-check.c */
     typedef struct _BalsaSpellCheck BalsaSpellCheck;
     typedef struct _BalsaSpellCheckClass BalsaSpellCheckClass;
 
-
-    struct _BalsaSpellCheck {
-	GtkFrame frame;
-
-	GtkText *text;
-	GdkFont *font;
-	GdkColor *highlight_colour;
-	GtkCList *list;
-	GtkEntry *entry;
-
-	/* actual spell checking variables */
-	PspellConfig *spell_config;
-	PspellManager *spell_manager;
-	const PspellWordList *word_list;
-	PspellStringEmulation *suggestions;
-
-	/* restoration information */
-	gchar *original_text;
-	gint original_pos;
-
-	/* word selection */
-	guint start_pos;
-	guint end_pos;
-	guint length;
-
-	/* config stuff */
-	gchar *module;
-	gchar *suggest_mode;
-	guint ignore_length;
-	gchar *language_tag;
-	gchar *character_set;
-    };
-
-
-    struct _BalsaSpellCheckClass {
-	GtkFrameClass parent_class;
-
-	void (*done_spell_check) (BalsaSpellCheck * spell_check);
-    };
-
-    guint balsa_spell_check_get_type(void);
+    GtkType balsa_spell_check_get_type(void);
 
 /* argument setters */
     void balsa_spell_check_set_module(BalsaSpellCheck *, const gchar *);
@@ -97,11 +64,9 @@ extern "C" {
 
 /* function prototypes */
     GtkWidget *balsa_spell_check_new(void);
-    GtkWidget *balsa_spell_check_new_with_text(GtkText * text);
+    GtkWidget *balsa_spell_check_new_with_text(GtkTextView * view);
     void balsa_spell_check_set_text(BalsaSpellCheck * spell_check,
-				    GtkText * text);
-    void balsa_spell_check_set_font(BalsaSpellCheck * spell_check,
-				    GdkFont * font);
+				    GtkTextView * view);
     void balsa_spell_check_start(BalsaSpellCheck * spell_check);
     void balsa_spell_check_finish(BalsaSpellCheck * spell_check,
 				  gboolean keep_changes);

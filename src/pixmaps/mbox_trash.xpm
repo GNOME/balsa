@@ -1,5 +1,5 @@
 /* XPM */
-static char * mbox_trash_xpm[] = {
+static const char * mbox_trash_xpm[] = {
 "16 16 142 2",
 "  	c None",
 ". 	c #0E0E0E",

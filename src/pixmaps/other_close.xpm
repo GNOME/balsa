@@ -1,5 +1,5 @@
 /* XPM */
-static char * other_close_xpm[] = {
+static const char * other_close_xpm[] = {
 "9 9 29 1",
 " 	c None",
 ".	c #B6B2BE",

@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -28,14 +28,12 @@
 #ifndef __FILTER_RUN_H__
 #define __FILTER_RUN_H__
 
-#include <gnome.h>
-
 #include "filter.h"
 #include "mailbox.h"
 
 /*
  * We define a new gtk type BalsaFilterRunDialog, inheriting from
- * GnomeDialog each object contains the whole set of data needed for
+ * GtkDialog each object contains the whole set of data needed for
  * managing the dialog box.
  * In that way there is no global variables (but the list of 
  * fr = filter run
@@ -46,19 +44,33 @@ extern "C" {
 #endif				/* __cplusplus */
 
 
-#define BALSA_FILTER_RUN_DIALOG(obj)          GTK_CHECK_CAST (obj, balsa_filter_run_dialog_get_type (),BalsaFilterRunDialog)
-#define BALSA_FILTER_RUN_DIALOG_CLASS(klass)  GTK_CHECK_CLASS_CAST (klass, balsa_filter_run_dialog_get_type (), BalsaFilterRunDialogClass)
-#define BALSA_IS_MESSAGE(obj)                 GTK_CHECK_TYPE (obj, balsa_filter_run_dialog_get_type ())
+#define BALSA_TYPE_FILTER_RUN_DIALOG     \
+     (balsa_filter_run_dialog_get_type())
+#define BALSA_FILTER_RUN_DIALOG(obj)     \
+     G_TYPE_CHECK_INSTANCE_CAST((obj), BALSA_TYPE_FILTER_RUN_DIALOG, BalsaFilterRunDialog)
+#define BALSA_FILTER_RUN_DIALOG_CLASS(klass) \
+     G_TYPE_CHECK_CLASS_CAST((klass), BALSA_TYPE_FILTER_RUN_DIALOG, BalsaFilterRunDialogClass)
+#define BALSA_IS_FILTER_RUN_DIALOG(obj)      \
+     G_TYPE_CHECK_INSTANCE_TYPE((obj), BALSA_TYPE_FILTER_RUN_DIALOG)
 
+enum {
+    NAME_COLUMN,
+    DATA_COLUMN,
+    INCOMING_COLUMN,
+    CLOSING_COLUMN,
+    N_COLUMNS
+};
+
+#define BALSA_FILTER_KEY "balsa-filter-key"
 
 typedef struct _BalsaFilterRunDialog BalsaFilterRunDialog;
 typedef struct _BalsaFilterRunDialogClass BalsaFilterRunDialogClass;
 
 struct _BalsaFilterRunDialog {
-    GnomeDialog parent;
+    GtkDialog parent;
 
     /* GUI members */
-    GtkCList * available_filters,* selected_filters;
+    GtkTreeView *available_filters, *selected_filters;
     gboolean filters_modified;
 
     /* Mailbox the filters of which are edited */
@@ -66,22 +78,22 @@ struct _BalsaFilterRunDialog {
 };
 
 struct _BalsaFilterRunDialogClass {
-	GnomeDialogClass parent_class;
+	GtkDialogClass parent_class;
 
-	void (*refresh) (BalsaFilterRunDialog * fr,GSList * filters_changing,gpointer throwaway);
+	void (*refresh) (BalsaFilterRunDialog * fr,
+                         GSList * filters_changing, gpointer throwaway);
 };
 
-guint balsa_filter_run_dialog_get_type(void);
+GType balsa_filter_run_dialog_get_type(void) G_GNUC_CONST;
 
 GtkWidget *balsa_filter_run_dialog_new(LibBalsaMailbox * mbox);
 
-void fr_clean_associated_mailbox_filters(GtkCList * clist);
+void fr_clean_associated_mailbox_filters(GtkTreeView * filter_list);
 
 void fr_destroy_window_cb(GtkWidget * widget,gpointer throwaway);
 
 /* Dialog box button callbacks */
-void fr_dialog_button_clicked(GtkWidget * widget, gint button,
-			      gpointer data);
+void fr_dialog_response(GtkWidget * widget, gint response, gpointer data);
 /* 
  *Callbacks for left/right buttons
  */
@@ -95,15 +107,14 @@ void fr_up_pressed(GtkWidget * widget, gpointer data);
 void fr_down_pressed(GtkWidget * widget, gpointer data);
 
 /*
- * Callback for clists (to handle double-click)
+ * Callback for filter lists
  */
-void available_list_select_row_cb(GtkWidget *widget, gint row, gint column,
-				  GdkEventButton *event, gpointer data);
-
-void selected_list_select_row_cb(GtkWidget *widget,gint row,gint column,
-				 GdkEventButton *event, gpointer data);
-void selected_list_select_row_event_cb(GtkWidget *widget,
-				       GdkEventButton *event, gpointer data);
+void available_list_activated(GtkTreeView * treeview, GtkTreePath * path,
+                              GtkTreeViewColumn * column, gpointer data);
+void selected_list_toggled(GtkCellRendererToggle * cellrenderertoggle,
+                           const gchar * path_string, gpointer data);
+void selected_list_activated(GtkTreeView * treeview, GtkTreePath * path,
+                             GtkTreeViewColumn * column, gpointer data);
 
 #ifdef __cplusplus
 }

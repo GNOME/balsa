@@ -1,7 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
-/* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,7 +18,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
-
 #include "config.h"
 
 #include <gnome.h>
@@ -32,8 +30,6 @@
 #include "filter-file.h"
 #include "filter-funcs.h"
 #include "mailbox-filter.h"
-
-#include "libbalsa/misc.h"
 
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
@@ -100,94 +96,109 @@ d_get_gint(const gchar * key, gint def_val)
     return def ? def_val : res;
 }
 
-static gfloat
-d_get_gfloat(const gchar * key, gfloat def_val)
-{
-    gint def;
-    gfloat res = gnome_config_get_int_with_default(key, &def);
-    return def ? def_val : res;
-}
-
-static void
-free_toolbar(int i)
-{
-    int j;
-    for(j=0; balsa_app.toolbars[i][j]; j++)
-	g_free(balsa_app.toolbars[i][j]);
-    g_free(balsa_app.toolbars[i]);
-}
-static void
-free_toolbars(void)
-{
-    int i, j;
-    
-    if(!balsa_app.toolbars == 0)
-	return;
-    
-    for(i=0; i<balsa_app.toolbar_count; i++) 
-	free_toolbar(i);
-    g_free((void *)balsa_app.toolbars);
-    g_free((void *)balsa_app.toolbar_ids);
-}
-
-/* load_toolbars:
-   loads customized toolbars for main/message preview and compose windows.
+/* save/load_toolbars:
+   handle customized toolbars for main/message preview and compose windows.
 */
+static struct {
+    const gchar *key;
+    GSList **current;
+} toolbars[] = {
+    { "toolbar-MainWindow",    &balsa_app.main_window_toolbar_current },
+    { "toolbar-ComposeWindow", &balsa_app.compose_window_toolbar_current },
+    { "toolbar-MessageWindow", &balsa_app.message_window_toolbar_current }
+};
+
+static void
+save_toolbars(void)
+{
+    guint i, j;
+
+    gnome_config_clean_section(BALSA_CONFIG_PREFIX "Toolbars/");
+    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Toolbars/");
+    gnome_config_set_int("WrapButtonText",
+                         balsa_app.toolbar_wrap_button_text);
+    gnome_config_pop_prefix();
+
+    for (i = 0; i < ELEMENTS(toolbars); i++) {
+        GSList *list;
+        gchar *key;
+
+        key = g_strconcat(BALSA_CONFIG_PREFIX, toolbars[i].key, "/", NULL);
+        gnome_config_clean_section(key);
+        gnome_config_push_prefix(key);
+        g_free(key);
+
+        for (j = 0, list = *toolbars[i].current; list;
+             j++, list = g_slist_next(list)) {
+            key = g_strdup_printf("Item%d", j);
+            gnome_config_set_string(key, list->data);
+            g_free(key);
+        }
+        gnome_config_pop_prefix();
+    }
+}
+
 static void
 load_toolbars(void)
 {
-    gint i, j, items;
+    guint i, j, items;
     char tmpkey[256];
+    gchar *key;
+    GSList **list;
 
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Toolbars/");
-    
-    balsa_app.toolbar_wrap_button_text=d_get_gint("WrapButtonText", 1);
-    
-    free_toolbars();
-    
-    balsa_app.toolbar_ids=
-	(BalsaToolbarType *)g_malloc(sizeof(BalsaToolbarType)*MAXTOOLBARS);
-    balsa_app.toolbars=	(char ***)g_malloc(sizeof(char *)*MAXTOOLBARS);
-    
-    balsa_app.toolbar_count=d_get_gint("ToolbarCount", 0);
-    if(balsa_app.toolbar_count>=MAXTOOLBARS)   /* most likely, this means   */
-        balsa_app.toolbar_count=MAXTOOLBARS-1; /* configure file corruption */
+    balsa_app.toolbar_wrap_button_text = d_get_gint("WrapButtonText", 1);
+    gnome_config_pop_prefix();
 
-    for(i=0; i<balsa_app.toolbar_count; i++) {
-	balsa_app.toolbars[i]=
-	    (char **)g_malloc(sizeof(char *)*MAXTOOLBARITEMS);
-	
-	sprintf(tmpkey, "Toolbar%dID", i);
-	balsa_app.toolbar_ids[i] = d_get_gint(tmpkey, TOOLBAR_INVALID);
-	
-	if(balsa_app.toolbar_ids[i] == TOOLBAR_INVALID) {
-	    balsa_app.toolbars[i][0]=NULL;
-	    continue;
-	}
-	
-	sprintf(tmpkey, "Toolbar%dItemCount", i);
-	items=d_get_gint(tmpkey, 0);
-        if(items>=MAXTOOLBARITEMS)        /* most likely, this means   */
-            items=MAXTOOLBARITEMS-1;      /* configure file corruption */
-	
-	for(j=0; j<items; j++) {
-	    sprintf(tmpkey, "Toolbar%dItem%d", i, j);
-	    balsa_app.toolbars[i][j]=  gnome_config_get_string(tmpkey);
-	}
-	balsa_app.toolbars[i][j]=NULL;
-	/* validate */
-	for(j=0; balsa_app.toolbars[i][j]; j++) {
-	    if(get_toolbar_button_index(balsa_app.toolbars[i][j])<0) {
-		/* validation failed: roll the toolbar back. */
-		free_toolbar(i); 
-		balsa_app.toolbars[i] = NULL;
-		balsa_app.toolbar_ids[i] = TOOLBAR_INVALID;
-		i--;
-		balsa_app.toolbar_count--;
-		g_warning("I dropped a toolbar. Are you up/downgrading?");
-		break;
-	    }
-	}
+    items = 0;
+    for (i = 0; i < ELEMENTS(toolbars); i++) {
+        key = g_strconcat(BALSA_CONFIG_PREFIX, toolbars[i].key, "/", NULL);
+        gnome_config_push_prefix(key);
+        g_free(key);
+
+        list = toolbars[i].current;
+        for (j = 0;; j++) {
+            gchar *item;
+
+            key = g_strdup_printf("Item%d", j);
+            item = gnome_config_get_string(key);
+            g_free(key);
+
+            if (!item)
+                break;
+            *list = g_slist_append(*list, g_strdup(item));
+            items++;
+        }
+        gnome_config_pop_prefix();
+    }
+
+    if (items)
+        return;
+
+    /* We didn't find new-style toolbar configs, so we'll try the old
+     * style */
+    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Toolbars/");
+    for (i = 0; i < ELEMENTS(toolbars); i++) {
+        guint type;
+
+        sprintf(tmpkey, "Toolbar%dID", i);
+        type = d_get_gint(tmpkey, -1);
+
+        if (type >= ELEMENTS(toolbars)) {
+            continue;
+        }
+
+        sprintf(tmpkey, "Toolbar%dItemCount", i);
+        items = d_get_gint(tmpkey, 0);
+
+        list = toolbars[type].current;
+        for (j = 0; j < items; j++) {
+            gchar *item;
+
+            sprintf(tmpkey, "Toolbar%dItem%d", i, j);
+            item = gnome_config_get_string(tmpkey);
+            *list = g_slist_append(*list, g_strdup(item));
+        }
     }
     gnome_config_pop_prefix();
 }
@@ -235,13 +246,13 @@ config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
                       strlen(balsa_app.local_mail_directory)) != 0) 
             config_mailbox_add(*special, NULL);
         else do_rescan_for = *special;
-	gtk_object_unref(GTK_OBJECT(*special));
+	g_object_unref(G_OBJECT(*special));
     }
     config_mailbox_delete(mailbox);
     config_mailbox_add(mailbox, specialNames[which]);
 
     *special = mailbox;
-    gtk_object_ref(GTK_OBJECT(mailbox));
+    g_object_ref(G_OBJECT(mailbox));
 
     switch(which) {
     case SPECIAL_SENT: 
@@ -443,6 +454,7 @@ pop3_config_updated(LibBalsaMailboxPop3* mailbox)
     threadmsg = g_new(MailThreadMessage, 1);
     threadmsg->message_type = LIBBALSA_NTFY_UPDATECONFIG;
     threadmsg->mailbox = (void *) mailbox;
+    threadmsg->message_string[0] = '\0';
     write(mail_thread_pipes[1], (void *) &threadmsg,
           sizeof(void *));
 #else
@@ -466,18 +478,17 @@ config_mailbox_init(const gchar * prefix)
     if (mailbox == NULL)
 	return FALSE;
     if (LIBBALSA_IS_MAILBOX_REMOTE(mailbox))
-	gtk_signal_connect(GTK_OBJECT
-			   (LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)),
-			   "get-password", GTK_SIGNAL_FUNC(ask_password),
-			   mailbox);
+        g_signal_connect(G_OBJECT(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)),
+                         "get-password", G_CALLBACK(ask_password),
+                         mailbox);
 
     if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
-        gtk_signal_connect(GTK_OBJECT(mailbox),
-                           "config-changed", 
-                           GTK_SIGNAL_FUNC(pop3_config_updated), mailbox);
-        gtk_signal_connect(GTK_OBJECT(mailbox),
-                         "progress-notify", 
-                           GTK_SIGNAL_FUNC(pop3_progress_notify), mailbox);
+        g_signal_connect(G_OBJECT(mailbox),
+                         "config-changed", G_CALLBACK(pop3_config_updated),
+                         mailbox);
+        g_signal_connect(G_OBJECT(mailbox),
+                         "progress-notify", G_CALLBACK(pop3_progress_notify),
+                         mailbox);
 	balsa_app.inbox_input =
 	    g_list_append(balsa_app.inbox_input, 
 			  balsa_mailbox_node_new_from_mailbox(mailbox));
@@ -485,7 +496,9 @@ config_mailbox_init(const gchar * prefix)
         gboolean special = TRUE;
 
 	node = g_node_new(balsa_mailbox_node_new_from_mailbox(mailbox));
+        balsa_mailbox_nodes_lock(TRUE);
 	g_node_append(balsa_app.mailbox_nodes, node);
+        balsa_mailbox_nodes_unlock(TRUE);
 	if (strcmp("Inbox/", key) == 0)
 	    balsa_app.inbox = mailbox;
 	else if (strcmp("Outbox/", key) == 0)
@@ -501,7 +514,7 @@ config_mailbox_init(const gchar * prefix)
             special = FALSE;
 
 	if (special)
-            gtk_object_ref(GTK_OBJECT(mailbox));
+            g_object_ref(G_OBJECT(mailbox));
     }
     return TRUE;
 }				/* config_mailbox_init */
@@ -516,8 +529,10 @@ config_folder_init(const gchar * prefix)
 
     g_return_val_if_fail(prefix != NULL, FALSE);
 
+    balsa_mailbox_nodes_lock(TRUE);
     if( (folder = balsa_mailbox_node_new_from_config(prefix)) )
 	g_node_append(balsa_app.mailbox_nodes, g_node_new(folder));
+    balsa_mailbox_nodes_unlock(TRUE);
 
     return folder != NULL;
 }				/* config_folder_init */
@@ -526,7 +541,6 @@ config_folder_init(const gchar * prefix)
 static gint
 config_global_load(void)
 {
-    gchar **open_mailbox_vector;
     gint open_mailbox_count;
 #if ENABLE_ESMTP
     gboolean def_used;
@@ -537,11 +551,11 @@ config_global_load(void)
     /* We must load filters before mailboxes, because they refer to the filters list */
     config_filters_load();
     if (filter_errno!=FILTER_NOERR) {
-	filter_perror(_("Error during filters loading : "));
+	filter_perror(_("Error during filters loading: "));
  	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("Error during filters loading : %s\n%s"),
- 			     filter_strerror(filter_errno),
-			     _("Filters may not be correct"));
+			     _("Error during filters loading: %s\n"
+			       "Filters may not be correct."),
+ 			     filter_strerror(filter_errno));
     }
 
     /* find and convert old-style signature entries */
@@ -619,9 +633,12 @@ config_global_load(void)
     balsa_app.shown_headers = d_get_gint("ShownHeaders", HEADERS_SELECTED);
 
     g_free(balsa_app.selected_headers);
-    balsa_app.selected_headers =
-	gnome_config_get_string("SelectedHeaders=" DEFAULT_SELECTED_HDRS);
-    g_strdown(balsa_app.selected_headers);
+    {                           /* scope */
+        gchar *tmp = gnome_config_get_string("SelectedHeaders="
+                                             DEFAULT_SELECTED_HDRS);
+        balsa_app.selected_headers = g_ascii_strdown(tmp, -1);
+        g_free(tmp);
+    }
 
     /* ... Message window title format */
     g_free(balsa_app.message_title_format);
@@ -646,8 +663,8 @@ config_global_load(void)
 #warning 'default_quoted_color' array needs to be updated
 #endif
 	gchar *default_quoted_color[6] = {
-	    "rgb:0000/8000/8000", "rgb:8000/0000/0000", "rgb:0000/8000/0000",
-	    "rgb:0000/0000/8000", "rgb:8000/8000/0000", "rgb:8000/0000/8000"};
+	    "#088", "#800", "#080",
+	    "#008", "#880", "#808"};
 	for(i=0;i<MAX_QUOTED_COLOR;i++) {
 	    gchar *text = g_strdup_printf("QuotedColor%d=%s", i, i<6 ?
 			  default_quoted_color[i] : DEFAULT_QUOTED_COLOR);
@@ -671,13 +688,15 @@ config_global_load(void)
     balsa_app.subject_font =
 	gnome_config_get_string("SubjectFont=" DEFAULT_SUBJECT_FONT);
 
-    libbalsa_set_charset(balsa_charset_from_message_font());
-
     /* ... wrap words */
     balsa_app.browse_wrap = gnome_config_get_bool("WordWrap=true");
     balsa_app.browse_wrap_length = gnome_config_get_int("WordWrapLength=79");
     if (balsa_app.browse_wrap_length < 40)
 	balsa_app.browse_wrap_length = 40;
+
+    /* ... handling of Multipart/Alternative */
+    balsa_app.display_alt_plain = 
+	gnome_config_get_bool("DisplayAlternativeAsPlain=false");
 
     gnome_config_pop_prefix();
 
@@ -698,15 +717,13 @@ config_global_load(void)
     if (balsa_app.pgdown_percent < 10)
 	balsa_app.pgdown_percent = 10;
 
-    /* ... style */
-    balsa_app.toolbar_style = d_get_gint("ToolbarStyle", GTK_TOOLBAR_BOTH);
     /* ... Progress Window Dialog */
     balsa_app.pwindow_option = d_get_gint("ProgressWindow", WHILERETR);
     balsa_app.drag_default_is_move = d_get_gint("DragDefaultIsMove", 0);
     balsa_app.delete_immediately =
         gnome_config_get_bool("DeleteImmediately=false");
     balsa_app.hide_deleted =
-        gnome_config_get_bool("HideDeleted=false");
+        gnome_config_get_bool("HideDeleted=true");
 
     gnome_config_pop_prefix();
 
@@ -717,20 +734,21 @@ config_global_load(void)
     g_free(balsa_app.paper_size);
     balsa_app.paper_size =
 	gnome_config_get_string("PaperSize=" DEFAULT_PAPER_SIZE);
+
     g_free(balsa_app.print_header_font);
     balsa_app.print_header_font =
-	gnome_config_get_string("PrintHeaderFont=" DEFAULT_PRINT_HEADER_FONT);
-    balsa_app.print_header_size = 
-	d_get_gfloat("PrintHeaderSize", DEFAULT_PRINT_HEADER_SIZE);
-    balsa_app.print_footer_size =
-	d_get_gfloat("PrintFooterSize", DEFAULT_PRINT_FOOTER_SIZE);
+        gnome_config_get_string("PrintHeaderFont="
+                                DEFAULT_PRINT_HEADER_FONT);
+    g_free(balsa_app.print_footer_font);
+    balsa_app.print_footer_font =
+        gnome_config_get_string("PrintFooterFont="
+                                DEFAULT_PRINT_FOOTER_FONT);
     g_free(balsa_app.print_body_font);
     balsa_app.print_body_font =
-	gnome_config_get_string("PrintBodyFont=" DEFAULT_PRINT_BODY_FONT);
-    balsa_app.print_body_size =
-	d_get_gfloat("PrintBodySize", DEFAULT_PRINT_BODY_SIZE);
+        gnome_config_get_string("PrintBodyFont="
+                                DEFAULT_PRINT_BODY_FONT);
     balsa_app.print_highlight_cited =
-	gnome_config_get_bool("PrintHighlightCited=false");
+        gnome_config_get_bool("PrintHighlightCited=false");
     gnome_config_pop_prefix();
 
     /* Spelling options ... */
@@ -887,8 +905,10 @@ config_global_load(void)
 	gnome_config_pop_prefix();
 	return FALSE;
     }
+    balsa_mailbox_nodes_lock(TRUE);
     balsa_app.mailbox_nodes = g_node_new(balsa_mailbox_node_new_from_dir(
         balsa_app.local_mail_directory));
+    balsa_mailbox_nodes_unlock(TRUE);
 
     balsa_app.open_inbox_upon_startup =
 	gnome_config_get_bool("OpenInboxOnStartup=false");
@@ -896,23 +916,19 @@ config_global_load(void)
     balsa_app.debug = gnome_config_get_bool("Debug=false");
 
     balsa_app.close_mailbox_auto = gnome_config_get_bool("AutoCloseMailbox=true");
-    /* timeouts in minutes in config file for backwards compat */
-    balsa_app.close_mailbox_timeout = gnome_config_get_int("AutoCloseMailboxTimeout=10") * 60;
-    balsa_app.commit_mailbox_auto = gnome_config_get_bool("AutoCommitMailbox=true");
-    balsa_app.commit_mailbox_timeout = gnome_config_get_int("AutoCommitMailboxTimeout=2") * 60;
+    balsa_app.close_mailbox_timeout = gnome_config_get_int("AutoCloseMailboxTimeout=10");
 
     balsa_app.remember_open_mboxes =
 	gnome_config_get_bool("RememberOpenMailboxes=false");
     gnome_config_get_vector("OpenMailboxes", &open_mailbox_count,
-			    &open_mailbox_vector);
+			    &balsa_app.open_mailbox_vector);
     if (balsa_app.remember_open_mboxes && open_mailbox_count > 0
-        && **open_mailbox_vector) {
-	/* FIXME: Open the mailboxes.... */
+        && **balsa_app.open_mailbox_vector) {
 	printf("Opening %d mailboxes on startup.\n", open_mailbox_count);
-	gtk_idle_add((GtkFunction) open_mailboxes_idle_cb,
-		     open_mailbox_vector);
-    } else
-	g_strfreev(open_mailbox_vector);
+    } else {
+	g_strfreev(balsa_app.open_mailbox_vector);
+	balsa_app.open_mailbox_vector = NULL;
+    }
 
     balsa_app.empty_trash_on_exit =
 	gnome_config_get_bool("EmptyTrash=false");
@@ -935,7 +951,7 @@ config_global_load(void)
 
 	/* Folder MRU */
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "FolderMRU/");
-	load_mru(&balsa_app.folder_mru);
+    load_mru(&balsa_app.folder_mru);
     gnome_config_pop_prefix();
 
 	/* FCC MRU */
@@ -949,9 +965,8 @@ config_global_load(void)
 gint
 config_save(void)
 {
-    gchar **open_mailboxes_vector, *tmp;
-    gint i, j;
-	char tmpkey[32];
+    gchar **open_mailboxes_vector;
+    gint i;
 
     config_address_books_save();
     config_identities_save();
@@ -1022,6 +1037,10 @@ config_save(void)
     save_color("UrlColor", &balsa_app.url_color);
     save_color("BadAddressColor", &balsa_app.bad_address_color);
 
+    /* ... handling of Multipart/Alternative */
+    gnome_config_set_bool("DisplayAlternativeAsPlain",
+			  balsa_app.display_alt_plain);
+
     gnome_config_pop_prefix();
 
     /* Interface Options ... */
@@ -1030,7 +1049,6 @@ config_save(void)
     gnome_config_set_bool("ShowPreviewPane", balsa_app.previewpane);
     gnome_config_set_bool("ShowMailboxList", balsa_app.show_mblist);
     gnome_config_set_bool("ShowTabs", balsa_app.show_notebook_tabs);
-    gnome_config_set_int("ToolbarStyle", balsa_app.toolbar_style);
     gnome_config_set_int("ProgressWindow", balsa_app.pwindow_option);
     gnome_config_set_bool("AlternativeLayout", balsa_app.alternative_layout);
     gnome_config_set_bool("ViewMessageOnOpen", balsa_app.view_message_on_open);
@@ -1048,12 +1066,13 @@ config_save(void)
     /* Printing options ... */
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Printing/");
     gnome_config_set_string("PaperSize",balsa_app.paper_size);
-    gnome_config_set_string("PrintHeaderFont", balsa_app.print_header_font);
-    gnome_config_set_float("PrintHeaderSize", balsa_app.print_header_size);
-    gnome_config_set_float("PrintFooterSize", balsa_app.print_footer_size);
+    gnome_config_set_string("PrintHeaderFont",
+                            balsa_app.print_header_font);
     gnome_config_set_string("PrintBodyFont", balsa_app.print_body_font);
-    gnome_config_set_float("PrintBodySize", balsa_app.print_body_size);
-    gnome_config_set_bool("PrintHighlightCited", balsa_app.print_highlight_cited);
+    gnome_config_set_string("PrintFooterFont",
+                            balsa_app.print_footer_font);
+    gnome_config_set_bool("PrintHighlightCited",
+                          balsa_app.print_highlight_cited);
     gnome_config_pop_prefix();
 
     /* Spelling options ... */
@@ -1161,9 +1180,7 @@ config_save(void)
     gnome_config_set_bool("Debug", balsa_app.debug);
 
     gnome_config_set_bool("AutoCloseMailbox", balsa_app.close_mailbox_auto);
-    gnome_config_set_int("AutoCloseMailboxTimeout", balsa_app.close_mailbox_timeout/60);
-    gnome_config_set_bool("AutoCommitMailbox", balsa_app.commit_mailbox_auto);
-    gnome_config_set_int("AutoCommitMailboxTimeout", balsa_app.commit_mailbox_timeout/60);
+    gnome_config_set_int("AutoCloseMailboxTimeout", balsa_app.close_mailbox_timeout);
 
     open_mailboxes_vector =
 	mailbox_list_to_vector(balsa_app.open_mailbox_list);
@@ -1186,24 +1203,9 @@ config_save(void)
 
     gnome_config_pop_prefix();
 
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Toolbars/");
-    gnome_config_set_int("WrapButtonText", balsa_app.toolbar_wrap_button_text);
+    /* Toolbars */
+    save_toolbars();
 
-    gnome_config_set_int("ToolbarCount", balsa_app.toolbar_count);
-    
-    for(i=0; i<balsa_app.toolbar_count; i++) {
-        sprintf(tmpkey, "Toolbar%dID", i);
-        gnome_config_set_int(tmpkey, balsa_app.toolbar_ids[i]);
-        
-        for(j=0;balsa_app.toolbars[i][j];j++) {
-            sprintf(tmpkey, "Toolbar%dItem%d", i, j);
-            gnome_config_set_string(tmpkey, balsa_app.toolbars[i][j]);
-        }
-        sprintf(tmpkey, "Toolbar%dItemCount", i);
-        gnome_config_set_int(tmpkey, j);
-    }
-    gnome_config_pop_prefix();
-    
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Paths/");
     if(balsa_app.attach_dir)
 	gnome_config_set_string("AttachDir", balsa_app.attach_dir);
@@ -1349,7 +1351,7 @@ config_identities_load()
 	    ident = libbalsa_identity_new_config(tmp, key+pref_len);
 	    balsa_app.identities = g_list_prepend(balsa_app.identities, ident);
 	    g_free(tmp);
-	    if(g_strcasecmp(default_ident, ident->identity_name) == 0)
+	    if(g_ascii_strcasecmp(default_ident, ident->identity_name) == 0)
 		balsa_app.current_ident = ident;
 	}
 	g_free(key);
@@ -1378,12 +1380,17 @@ config_identities_save(void)
 {
     LibBalsaIdentity* ident;
     GList* list;
-    gchar* prefix;
+    gchar** conf_vec, *prefix;
 
+    conf_vec = g_malloc(sizeof(gchar*) * g_list_length(balsa_app.identities));
+
+    g_assert(conf_vec != NULL);
+    
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "identity/");
     gnome_config_set_string("CurrentIdentity", 
                             balsa_app.current_ident->identity_name);
     gnome_config_pop_prefix();
+    g_free(conf_vec);
 
     config_clean_sections(IDENTITY_SECTION_PREFIX);
 
@@ -1454,8 +1461,10 @@ config_views_save(void)
 
     config_clean_sections(VIEW_SECTION_PREFIX);
     /* save current */
+    balsa_mailbox_nodes_lock(FALSE);
     g_node_traverse(balsa_app.mailbox_nodes, G_IN_ORDER, G_TRAVERSE_ALL, -1,
 		   (GNodeTraverseFunc) save_view, &cnt);
+    balsa_mailbox_nodes_unlock(FALSE);
 }
 
 static gchar **
@@ -1480,9 +1489,8 @@ save_color(gchar * key, GdkColor * color)
 {
     gchar *str;
 
-    str =
-	g_strdup_printf("rgb:%04x/%04x/%04x", color->red, color->green,
-			color->blue);
+    str = g_strdup_printf("#%04x%04x%04x", color->red, color->green,
+                          color->blue);
     gnome_config_set_string(key, str);
     g_free(str);
 }
@@ -1619,7 +1627,10 @@ load_color(gchar * key, GdkColor * color)
     gchar *str;
 
     str = gnome_config_get_string(key);
-    gdk_color_parse(str, color);
+    if (g_ascii_strncasecmp(str, "rgb:", 4)
+        || sscanf(str + 4, "%4hx/%4hx/%4hx", &color->red, &color->green,
+                  &color->blue) != 3)
+        gdk_color_parse(str, color);
     g_free(str);
 }
 

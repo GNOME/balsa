@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -30,10 +30,10 @@
 #include "address-book.h"
 
 #define LIBBALSA_TYPE_ADDRESS_BOOK_VCARD		(libbalsa_address_book_vcard_get_type())
-#define LIBBALSA_ADDRESS_BOOK_VCARD(obj)		(GTK_CHECK_CAST (obj, LIBBALSA_TYPE_ADDRESS_BOOK_VCARD, LibBalsaAddressBookVcard))
-#define LIBBALSA_ADDRESS_BOOK_VCARD_CLASS(klass)	(GTK_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_ADDRESS_BOOK_VCARD, LibBalsaAddressBookVcardClass))
-#define LIBBALSA_IS_ADDRESS_BOOK_VCARD(obj)		(GTK_CHECK_TYPE (obj, LIBBALSA_TYPE_ADDRESS_BOOK_VCARD))
-#define LIBBALSA_IS_ADDRESS_BOOK_VCARD_CLASS(klass)	(GTK_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_ADDRESS_BOOK_VCARD))
+#define LIBBALSA_ADDRESS_BOOK_VCARD(obj)		(G_TYPE_CHECK_INSTANCE_CAST (obj, LIBBALSA_TYPE_ADDRESS_BOOK_VCARD, LibBalsaAddressBookVcard))
+#define LIBBALSA_ADDRESS_BOOK_VCARD_CLASS(klass)	(G_TYPE_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_ADDRESS_BOOK_VCARD, LibBalsaAddressBookVcardClass))
+#define LIBBALSA_IS_ADDRESS_BOOK_VCARD(obj)		(G_TYPE_CHECK_INSTANCE_TYPE (obj, LIBBALSA_TYPE_ADDRESS_BOOK_VCARD))
+#define LIBBALSA_IS_ADDRESS_BOOK_VCARD_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_ADDRESS_BOOK_VCARD))
 
 typedef struct _LibBalsaAddressBookVcard LibBalsaAddressBookVcard;
 typedef struct _LibBalsaAddressBookVcardClass
@@ -56,7 +56,7 @@ struct _LibBalsaAddressBookVcardClass {
     LibBalsaAddressBookClass parent_class;
 };
 
-GtkType libbalsa_address_book_vcard_get_type(void);
+GType libbalsa_address_book_vcard_get_type(void);
 
 LibBalsaAddressBook *libbalsa_address_book_vcard_new(const gchar * name,
 						     const gchar * path);

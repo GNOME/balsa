@@ -58,6 +58,7 @@ gchar *libbalsa_wrap_rfc2646(gchar * par, gint width,
 gboolean libbalsa_flowed_rfc2646(LibBalsaMessageBody * body);
 
 const char* libbalsa_set_charset(const gchar * charset);
+const char* libbalsa_set_send_charset(const gchar * charset);
 #if ENABLE_ESMTP
 gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 				gchar* smtp_server,
@@ -67,26 +68,13 @@ gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 				gboolean rfc2646);
 #endif
-void libbalsa_marshal_POINTER__NONE(GtkObject *object, GtkSignalFunc func,
-				gpointer func_data, GtkArg *args);
-void libbalsa_marshal_POINTER__OBJECT(GtkObject * object,
-				      GtkSignalFunc func,
-				      gpointer func_data, GtkArg * args);
-void libbalsa_marshall_POINTER__POINTER_POINTER(GtkObject *object, 
-						GtkSignalFunc func,
-						gpointer func_data, 
-                                                GtkArg *args);
-void libbalsa_marshal_POINTER__INT_POINTER(GtkObject *object,
-                                           GtkSignalFunc func,
-                                           gpointer func_data, GtkArg *args);
-void libbalsa_marshal_NONE__INT_INT_INT_STRING(GtkObject *object,
-                                               GtkSignalFunc func,
-                                               gpointer func_data,
-                                               GtkArg *args);
 
 gboolean libbalsa_delete_directory_contents(const gchar *path);
 gchar *libbalsa_truncate_string(const gchar * str, gint length, gint dots);
 gchar *libbalsa_expand_path(const gchar *path);
 void libbalsa_contract_path(gchar *path);
+void libbalsa_mktemp(gchar * name);
+void libbalsa_utf8_sanitize(gchar * text);
+
 
 #endif				/* __LIBBALSA_MISC_H__ */

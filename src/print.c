@@ -22,41 +22,44 @@
 #include "config.h"
 
 #include <gnome.h>
-#include <balsa-app.h>
-#include <iconv.h>
+#include "balsa-app.h"
 
 #include "print.h"
 #include "misc.h"
 
-#ifndef HAVE_GNOME_PRINT
-
-/*
- * PUBLIC: message_print_cb
- *
- * creates print dialog box.  this should be the only routine global to
- * the world.
- */
-void
-message_print_cb(GtkWidget * widget, gpointer cbdata)
-{
-    balsa_information(LIBBALSA_INFORMATION_ERROR, NULL, _(
-	"This version of balsa is compiled without gnome-print support.\n"
-	"Printing is not possible."));
-}
-void
-message_print(LibBalsaMessage *msg)
-{
-    balsa_information(LIBBALSA_INFORMATION_ERROR, NULL, _(
-	"This version of balsa is compiled without gnome-print support.\n"
-	"Printing is not possible."));
-}
-#else
-
 #include <ctype.h>
 #include <libgnomeprint/gnome-print.h>
-#include <libgnomeprint/gnome-print-dialog.h>
-#include <libgnomeprint/gnome-print-master.h>
-#include <libgnomeprint/gnome-print-master-preview.h>
+#include <libgnomeprint/gnome-font.h>
+
+#ifdef HAVE_LGPRINT22
+#  include <libgnomeprint/gnome-print-job.h>
+#  include <libgnomeprintui/gnome-print-job-preview.h>
+#  define BALSA_GNOME_PRINT_UI GnomePrintJob
+#  define BALSA_GNOME_PRINT_UI_GET_CONFIG gnome_print_job_get_config
+#  define BALSA_GNOME_PRINT_UI_GET_PAGE_SIZE_FROM_CONFIG gnome_print_job_get_page_size_from_config
+#  define BALSA_GNOME_PRINT_UI_GET_CONTEXT gnome_print_job_get_context
+#  define BALSA_GNOME_PRINT_DIALOG_NEW gnome_print_dialog_new
+#  define BALSA_GNOME_PRINT_UI_NEW gnome_print_job_new(NULL)
+#  define BALSA_GNOME_PRINT_UI_CLOSE gnome_print_job_close
+#  define BALSA_GNOME_PRINT_UI_PREVIEW_NEW gnome_print_job_preview_new
+#  define BALSA_GNOME_PRINT_UI_PRINT gnome_print_job_print
+#else
+#  include <libgnomeprint/gnome-print-master.h>
+#  include <libgnomeprintui/gnome-print-master-preview.h>
+#  define BALSA_GNOME_PRINT_UI GnomePrintMaster
+#  define BALSA_GNOME_PRINT_UI_GET_CONFIG gnome_print_master_get_config
+#  define BALSA_GNOME_PRINT_UI_GET_PAGE_SIZE_FROM_CONFIG gnome_print_master_get_page_size_from_config
+#  define BALSA_GNOME_PRINT_UI_GET_CONTEXT gnome_print_master_get_context
+#  define BALSA_GNOME_PRINT_DIALOG_NEW gnome_print_dialog_new_from_master
+#  define BALSA_GNOME_PRINT_UI_NEW gnome_print_master_new()
+#  define BALSA_GNOME_PRINT_UI_CLOSE gnome_print_master_close
+#  define BALSA_GNOME_PRINT_UI_PREVIEW_NEW gnome_print_master_preview_new
+#  define BALSA_GNOME_PRINT_UI_PRINT gnome_print_master_print
+#endif
+
+#include <libgnomeprint/gnome-print-paper.h>
+#include <libgnomeprintui/gnome-print-dialog.h>
+
 #include <libbalsa.h>
 #ifdef HAVE_PCRE
 #  include <pcreposix.h>
@@ -64,8 +67,9 @@ message_print(LibBalsaMessage *msg)
 #  include <sys/types.h>
 #  include <regex.h>
 #endif
-#include "balsa-index.h"
 #include "quote-color.h"
+
+#include <string.h>
 
 #define BALSA_PRINT_TYPE_HEADER     1
 #define BALSA_PRINT_TYPE_SEPARATOR  2
@@ -76,14 +80,12 @@ message_print(LibBalsaMessage *msg)
 
 typedef struct _PrintInfo {
     /* gnome print info */
-    const GnomePaper *paper;
-    GnomePrintMaster *master;
     GnomePrintContext *pc;
 
     /* page info */
     gint pages, current_page;
     float ypos;
-    float page_width, page_height;
+    gdouble page_width, page_height;
     float margin_top, margin_bottom, margin_left, margin_right;
     float printable_width, printable_height;
     float pgnum_from_top;
@@ -96,10 +98,31 @@ typedef struct _PrintInfo {
     gchar *footer;
     GList *print_parts;
 
-    /* character conversion info */
-    iconv_t conv_data;
-
+    /* fonts */
+    GnomeFont *header_font;
+    GnomeFont *body_font;
+    GnomeFont *footer_font;
 } PrintInfo;
+
+typedef struct _FontInfo FontInfo;
+typedef struct _CommonInfo CommonInfo;
+
+struct _FontInfo {
+    gchar **font_name;
+    GnomeFont *font;
+    CommonInfo *common_info;
+};
+
+struct _CommonInfo {
+    GHashTable *font_table;
+    FontInfo header_font_info;
+    FontInfo body_font_info;
+    FontInfo footer_font_info;
+    /* Some other per-dialog data: */
+    GtkWidget *dialog;
+    BALSA_GNOME_PRINT_UI *master;
+    LibBalsaMessage *message;
+};
 
 typedef void (*prepare_func_t)(PrintInfo * pi, LibBalsaMessageBody * body);
 
@@ -108,39 +131,6 @@ typedef struct _mime_action_t {
     prepare_func_t prepare_func;
 }mime_action_t;
 
-/*
- * helper function: try to print with the correct charset...
- */
-static void
-gnome_print_show_with_charset(PrintInfo * pi, char const * text, iconv_t conv)
-{
-    /* if we can not convert to utf8, try to print "raw" (which might fail) */
-    if (conv == (iconv_t)(-1))
-	gnome_print_show(pi->pc, text);
-    else {
-	gchar *conv_ibuf, *conv_ibufp, *conv_obuf, *conv_obufp;
-	size_t ibuflen, obuflen;
-	
-	/* as iconv() changes all supplied pointers, we have to remember
-	 * them... */
-	conv_ibuf = conv_ibufp = g_strdup (text);
-	ibuflen = strlen(conv_ibuf) + 1;
-	obuflen = ibuflen * 4 + 1; /* should be sufficient? */
-	conv_obuf = conv_obufp = g_malloc(obuflen);
-	obuflen--;
-	/* the prototype of iconv() changed with glibc 2.2 */
-#if defined __GLIBC__ && __GLIBC__ && __GLIBC_MINOR__ <= 1 || (defined sun)
-	iconv(conv, (const char **)&conv_ibuf, &ibuflen, &conv_obuf, &obuflen);
-#else
-	iconv(conv, &conv_ibuf, &ibuflen, &conv_obuf, &obuflen);
-#endif
-	*conv_obuf = '\0';
-	gnome_print_show(pi->pc, conv_obufp);
-	g_free (conv_ibufp);
-	g_free (conv_obufp);
-    }
-}
-
 static int
 print_wrap_string(gchar ** str, GnomeFont * font, gint width, gint tab_width)
 {
@@ -148,7 +138,7 @@ print_wrap_string(gchar ** str, GnomeFont * font, gint width, gint tab_width)
     gchar *eol;
     gint lines = 1;
     GString *wrapped;
-    gdouble space_width = gnome_font_get_width_string(font, " ");
+    gdouble space_width = gnome_font_get_width_utf8(font, " ");
  
     g_return_val_if_fail(*str, 0);
 
@@ -182,7 +172,7 @@ print_wrap_string(gchar ** str, GnomeFont * font, gint width, gint tab_width)
 		    } else {
 			wrapped = g_string_append_c(wrapped, *ptr);
 			line_width += 
-			    gnome_font_get_width_string_n(font, ptr, 1);
+			    gnome_font_get_width_utf8_sized(font, ptr, 1);
 		    }
 		    pos++;
 		}
@@ -192,8 +182,8 @@ print_wrap_string(gchar ** str, GnomeFont * font, gint width, gint tab_width)
 		wrapped->str[last_space] = '\n';
 		lines++;
 		line_width = 
-		    gnome_font_get_width_string(font, 
-						&wrapped->str[last_space + 1]);
+		    gnome_font_get_width_utf8(font, 
+                                              &wrapped->str[last_space + 1]);
 	    }
 	}
 	line = eol;
@@ -221,11 +211,11 @@ print_foot_lines(PrintInfo * pi, GnomeFont * font, float y,
 	eol = strchr(ptr, '\n');
 	if (eol)
 	    *eol = '\0';
-	width = gnome_font_get_width_string(font, ptr);
+	width = gnome_font_get_width_utf8(font, ptr);
 	gnome_print_moveto(pi->pc, 
 			   pi->margin_left + (pi->printable_width - width) / 2.0,
 			   y);
-	gnome_print_show_with_charset(pi, ptr, pi->conv_data);
+	gnome_print_show(pi->pc, ptr);
 	ptr = eol;
 	if (eol) {
 	    *eol = '\n';
@@ -238,7 +228,7 @@ print_foot_lines(PrintInfo * pi, GnomeFont * font, float y,
 static void
 start_new_page(PrintInfo * pi)
 {
-    GnomeFont *font;
+    gdouble font_size;
     gchar *page_no;
     int width, ypos;
     gchar buf[20];
@@ -256,24 +246,19 @@ start_new_page(PrintInfo * pi)
     page_no = g_strdup_printf(_("Page: %i/%i"), pi->current_page, pi->pages);
     gnome_print_beginpage(pi->pc, buf);
     ypos = pi->page_height - pi->pgnum_from_top;
-    font = gnome_font_new(balsa_app.print_header_font,
-			  balsa_app.print_header_size);
-    gnome_print_setfont(pi->pc, font);
-    width = gnome_font_get_width_string(font, page_no);
+    gnome_print_setfont(pi->pc, pi->header_font);
+    width = gnome_font_get_width_utf8(pi->header_font, page_no);
     gnome_print_moveto(pi->pc, pi->page_width - pi->margin_left - width,
 		       ypos);
-    gnome_print_show_with_charset(pi, page_no, pi->conv_data);
+    gnome_print_show(pi->pc, page_no);
     g_free(page_no);
-    gtk_object_unref(GTK_OBJECT(font));
     
     /* print the footer */
-    font = gnome_font_new(balsa_app.print_header_font,
-			  balsa_app.print_footer_size);
-    gnome_print_setfont(pi->pc, font);
-    print_foot_lines(pi, font, 
-		     pi->margin_bottom - 2 * balsa_app.print_footer_size,
-		     balsa_app.print_footer_size, pi->footer);
-    gtk_object_unref(GTK_OBJECT(font));
+    gnome_print_setfont(pi->pc, pi->footer_font);
+    font_size = gnome_font_get_size(pi->footer_font);
+    print_foot_lines(pi, pi->footer_font, 
+		     pi->margin_bottom - 2 * font_size,
+		     font_size, pi->footer);
     pi->ypos = pi->margin_bottom + pi->printable_height;
 }
 
@@ -326,7 +311,7 @@ static void
 prepare_header(PrintInfo * pi, LibBalsaMessageBody * body)
 {
     gint lines;
-    GnomeFont *font;
+    gdouble font_size;
     HeaderInfo *pdata;
     GString *footer_string = NULL;
     const gchar *subject;
@@ -397,21 +382,16 @@ prepare_header(PrintInfo * pi, LibBalsaMessageBody * body)
     pi->footer = footer_string->str;
     g_string_free(footer_string, FALSE);
 
-    font = gnome_font_new(balsa_app.print_header_font,
-			  balsa_app.print_footer_size);
-    print_wrap_string(&pi->footer, font, pi->printable_width, pi->tab_width);
-    gtk_object_unref(GTK_OBJECT(font));    
+    print_wrap_string(&pi->footer, pi->footer_font, pi->printable_width, pi->tab_width);
     
     /* calculate the label width */
     pdata->header_label_width = 0;
-    font = gnome_font_new(balsa_app.print_header_font,
-			  balsa_app.print_header_size);
     p = g_list_first(pdata->headers);
     while (p) {
 	gchar **strgs = p->data;
 	gint width;
 
-	width = gnome_font_get_width_string(font, strgs[0]);
+	width = gnome_font_get_width_utf8(pi->header_font, strgs[0]);
 	if (width > pdata->header_label_width)
 	    pdata->header_label_width = width;
 	p = g_list_next(p);
@@ -424,24 +404,24 @@ prepare_header(PrintInfo * pi, LibBalsaMessageBody * body)
     while (p) {
 	gchar **strgs = p->data;
 	lines += 
-	    print_wrap_string(&strgs[1], font,
+	    print_wrap_string(&strgs[1], pi->header_font,
 			      pi->printable_width - pdata->header_label_width, 
 			      pi->tab_width);
 	p = g_list_next(p);
     }
 
-    if (pi->ypos - lines * balsa_app.print_header_size < pi->margin_bottom) {
-	lines -= (pi->ypos - pi->margin_bottom) / balsa_app.print_header_size;
+    font_size = gnome_font_get_size(pi->header_font);
+    if (pi->ypos - lines * font_size < pi->margin_bottom) {
+	lines -= (pi->ypos - pi->margin_bottom) / gnome_font_get_size(pi->header_font);
 	pi->pages++;
-	while (lines * balsa_app.print_header_size > pi->printable_height) {
-	    lines -= pi->printable_height / balsa_app.print_header_size;
+	while (lines * font_size > pi->printable_height) {
+	    lines -= pi->printable_height / font_size;
 	    pi->pages++;
 	}
 	pi->ypos = pi->margin_bottom + pi->printable_height -
-	    lines * balsa_app.print_header_size;
+	    lines * font_size;
     } else
-	pi->ypos -= lines * balsa_app.print_header_size;
-    gtk_object_unref(GTK_OBJECT(font));
+	pi->ypos -= lines * font_size;
 
     pi->print_parts = g_list_append (pi->print_parts, pdata);
 }
@@ -458,7 +438,7 @@ print_header_val(PrintInfo * pi, gint x, float * y,
 	if (eol)
 	    *eol = '\0';
 	gnome_print_moveto(pi->pc, x, *y);
-	gnome_print_show_with_charset(pi, ptr, pi->conv_data);
+	gnome_print_show(pi->pc, ptr);
 	ptr = eol;
 	if (eol)
 	    ptr++;
@@ -476,31 +456,28 @@ static void
 print_header(PrintInfo * pi, gpointer * data)
 {
     HeaderInfo *pdata = (HeaderInfo *)data;
-    GnomeFont *font;
     GList *p;
 
     g_return_if_fail(pdata->id_tag == BALSA_PRINT_TYPE_HEADER);
 
     if (balsa_app.print_highlight_cited)
 	gnome_print_setrgbcolor (pi->pc, 0.0, 0.0, 0.0);
-    font = gnome_font_new(balsa_app.print_header_font, 
-			  balsa_app.print_header_size);
-    gnome_print_setfont(pi->pc, font);
+    gnome_print_setfont(pi->pc, pi->header_font);
     p = g_list_first(pdata->headers);
     while (p) {
 	gchar **pair = p->data;
+        gdouble font_size = gnome_font_get_size(pi->header_font);
 
-	pi->ypos -= balsa_app.print_header_size;
+	pi->ypos -= font_size;
 	if (pi->ypos < pi->margin_bottom)
 	    start_new_page(pi);
 	gnome_print_moveto(pi->pc, pi->margin_left, pi->ypos);
-	gnome_print_show_with_charset(pi, pair[0], pi->conv_data);
+	gnome_print_show(pi->pc, pair[0]);
 	print_header_val(pi, pi->margin_left + pdata->header_label_width,
-			 &pi->ypos, balsa_app.print_header_size, pair[1], font);
+			 &pi->ypos, font_size, pair[1], pi->header_font);
 	g_strfreev(pair);
 	p = g_list_next(p);
     }
-    gtk_object_unref(GTK_OBJECT(font));
 }
 
 /*
@@ -514,16 +491,17 @@ static void
 prepare_separator(PrintInfo * pi, LibBalsaMessageBody * body)
 {
     SeparatorInfo *pdata;
+    gdouble font_size = gnome_font_get_size(pi->header_font);
 
     pdata = g_malloc(sizeof(SeparatorInfo));
     pdata->id_tag = BALSA_PRINT_TYPE_SEPARATOR;
-    pi->ypos -= (balsa_app.print_header_size / 2.0);
+    pi->ypos -= (font_size / 2.0);
     if (pi->ypos < pi->margin_bottom) {
 	pi->pages++;
 	pi->ypos = pi->margin_bottom + pi->printable_height - 
-	    (balsa_app.print_header_size / 2.0);
+	    (font_size / 2.0);
     } else
-	pi->ypos -= (balsa_app.print_header_size / 2.0);
+	pi->ypos -= (font_size / 2.0);
 
     pi->print_parts = g_list_append (pi->print_parts, pdata);
 }
@@ -532,12 +510,13 @@ static void
 print_separator(PrintInfo * pi, gpointer * data)
 {
     SeparatorInfo *pdata = (SeparatorInfo *)data;
+    gdouble font_size = gnome_font_get_size(pi->header_font);
 
     g_return_if_fail(pdata->id_tag == BALSA_PRINT_TYPE_SEPARATOR);
 
     if (balsa_app.print_highlight_cited)
 	gnome_print_setrgbcolor (pi->pc, 0.0, 0.0, 0.0);
-    pi->ypos -= (balsa_app.print_header_size / 2.0);
+    pi->ypos -= (font_size / 2.0);
     if (pi->ypos < pi->margin_bottom)
 	start_new_page(pi);
     gnome_print_setlinewidth(pi->pc, 0.5);
@@ -545,7 +524,7 @@ print_separator(PrintInfo * pi, gpointer * data)
     gnome_print_moveto(pi->pc, pi->margin_left, pi->ypos);
     gnome_print_lineto(pi->pc, pi->printable_width + pi->margin_left, pi->ypos);
     gnome_print_stroke (pi->pc);
-    pi->ypos -= (balsa_app.print_header_size / 2.0);
+    pi->ypos -= (font_size / 2.0);
 }
 
 /*
@@ -559,7 +538,6 @@ typedef struct _lineInfo {
 typedef struct _PlainTextInfo {
     guint id_tag;
     GList *textlines;
-    iconv_t conv;
 } PlainTextInfo;
 
 static GList *
@@ -570,7 +548,7 @@ print_wrap_body(gchar * str, GnomeFont * font, gint width, gint tab_width)
     regex_t rex;
     gboolean checkQuote = balsa_app.print_highlight_cited;
     GList *wrappedLines = NULL;
-    gdouble space_width = gnome_font_get_width_string(font, " ");
+    gdouble space_width = gnome_font_get_width_utf8(font, " ");
  
     if (checkQuote)
 	if (regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED) != 0) {
@@ -610,7 +588,7 @@ print_wrap_body(gchar * str, GnomeFont * font, gint width, gint tab_width)
 		    } else {
 			wrLine = g_string_append_c(wrLine, *ptr);
 			line_width += 
-			    gnome_font_get_width_string_n(font, ptr, 1);
+			    gnome_font_get_width_utf8_sized(font, ptr, 1);
 		    }
 		    pos++;
 		}
@@ -624,7 +602,7 @@ print_wrap_body(gchar * str, GnomeFont * font, gint width, gint tab_width)
 		lineInfo->quoteLevel = lastQLevel;
 		wrLine = g_string_erase(wrLine, 0, last_space + 1);
 		line_width = 
-		    gnome_font_get_width_string(font, wrLine->str);
+		    gnome_font_get_width_utf8(font, wrLine->str);
 		last_space = 0;
 	    }
 	}
@@ -646,8 +624,7 @@ static void
 prepare_plaintext(PrintInfo * pi, LibBalsaMessageBody * body)
 {
     PlainTextInfo *pdata;
-    GnomeFont *font;
-    gchar *charset;
+    gdouble font_size;
     gchar *textbuf;
     guint lines;
 
@@ -669,46 +646,31 @@ prepare_plaintext(PrintInfo * pi, LibBalsaMessageBody * body)
 	    }
     }
 
-    /* get the necessary iconv structure, or use iso-8859-1 */
-    charset = g_strdup(libbalsa_message_body_charset(body));
-    if (charset) {
-	pdata->conv = iconv_open("UTF-8", charset);
-	if (pdata->conv == (iconv_t)(-1)) {
-	    balsa_information(LIBBALSA_INFORMATION_ERROR, NULL,
-			      _("Can not convert %s, falling back to US-ASCII.\nSome characters may be printed incorrectly."),
-			      charset);
-	    pdata->conv = iconv_open("UTF-8", "US-ASCII");
-	}
-	g_free(charset);
-    } else
-	pdata->conv = iconv_open("UTF-8", "ISO-8859-1");
-
     /* fake an empty buffer if textbuf is NULL */
     if (!textbuf)
 	textbuf = g_strdup("");
     
     /* wrap lines (if necessary) */
-    font = gnome_font_new(balsa_app.print_body_font, balsa_app.print_body_size);
     pdata->textlines = 
-	print_wrap_body(textbuf, font, pi->printable_width, pi->tab_width);
+	print_wrap_body(textbuf, pi->body_font, pi->printable_width, pi->tab_width);
     g_free(textbuf);
     lines = g_list_length(pdata->textlines);
-    gtk_object_unref(GTK_OBJECT(font));
 
     /* calculate the y end position */
-    if (pi->ypos - lines * balsa_app.print_body_size < pi->margin_bottom) {
+    font_size = gnome_font_get_size(pi->body_font);
+    if (pi->ypos - lines * font_size < pi->margin_bottom) {
 	int lines_left = lines;
 
-	lines_left -= (pi->ypos - pi->margin_bottom) / balsa_app.print_body_size;
+	lines_left -= (pi->ypos - pi->margin_bottom) / font_size;
 	pi->pages++;
-	while (lines_left * balsa_app.print_body_size > pi->printable_height) {
-	    lines_left -= pi->printable_height / balsa_app.print_body_size;
+	while (lines_left * font_size > pi->printable_height) {
+	    lines_left -= pi->printable_height / font_size;
 	    pi->pages++;
 	}
 	pi->ypos = pi->margin_bottom + pi->printable_height -
-	    lines_left * balsa_app.print_body_size;
+	    lines_left * font_size;
     } else
-	pi->ypos -= lines * balsa_app.print_body_size;
+	pi->ypos -= lines * font_size;
 
     pi->print_parts = g_list_append (pi->print_parts, pdata);
 }
@@ -717,21 +679,19 @@ static void
 print_plaintext(PrintInfo * pi, gpointer * data)
 {
     PlainTextInfo *pdata = (PlainTextInfo *)data;
-    GnomeFont *font;
     GList *l;
 
     g_return_if_fail(pdata->id_tag == BALSA_PRINT_TYPE_PLAINTEXT);
 
-    font = gnome_font_new(balsa_app.print_body_font, balsa_app.print_body_size);
-    gnome_print_setfont(pi->pc, font);
+    gnome_print_setfont(pi->pc, pi->body_font);
     l = pdata->textlines;
     while (l) {
  	lineInfo_T *lineInfo = (lineInfo_T *)l->data;
  	
- 	pi->ypos -= balsa_app.print_body_size;
+ 	pi->ypos -= gnome_font_get_size(pi->body_font);
 	if (pi->ypos < pi->margin_bottom) {
 	    start_new_page(pi);
-	    gnome_print_setfont(pi->pc, font);
+	    gnome_print_setfont(pi->pc, pi->body_font);
 	}
  	if (balsa_app.print_highlight_cited) {
  	    if (lineInfo->quoteLevel != 0) {
@@ -747,15 +707,12 @@ print_plaintext(PrintInfo * pi, gpointer * data)
  		gnome_print_setrgbcolor (pi->pc, 0.0, 0.0, 0.0);
  	}
  	gnome_print_moveto(pi->pc, pi->margin_left, pi->ypos);
- 	gnome_print_show_with_charset(pi, lineInfo->lineData, pdata->conv);
+ 	gnome_print_show(pi->pc, lineInfo->lineData);
  	g_free(lineInfo->lineData);
  	g_free(l->data);
  	l = l->next;
     }
     g_list_free(pdata->textlines);
-    if (pdata->conv != (iconv_t)(-1))
-	iconv_close(pdata->conv);
-    gtk_object_unref(GTK_OBJECT(font));
 }
 
 /*
@@ -774,7 +731,7 @@ prepare_default(PrintInfo * pi, LibBalsaMessageBody * body)
     DefaultInfo *pdata;
     gchar *icon_name, *conttype;
     gint hdr = 0, lines;
-    GnomeFont *font;
+    GError* err = NULL;
 
     pdata = g_malloc(sizeof(DefaultInfo));
     pdata->id_tag = BALSA_PRINT_TYPE_DEFAULT;
@@ -786,7 +743,8 @@ prepare_default(PrintInfo * pi, LibBalsaMessageBody * body)
 
     /* get a pixbuf according to the mime type */
     icon_name = libbalsa_icon_finder(conttype, NULL, NULL);
-    pdata->pixbuf = gdk_pixbuf_new_from_file(icon_name);
+    pdata->pixbuf = gdk_pixbuf_new_from_file(icon_name, &err);
+    if(err) { g_warning("error loading pixbuf."); g_error_free(err); }
     pdata->image_width = gdk_pixbuf_get_width (pdata->pixbuf);
     pdata->image_height = gdk_pixbuf_get_height (pdata->pixbuf);
     g_free(icon_name);
@@ -799,24 +757,22 @@ prepare_default(PrintInfo * pi, LibBalsaMessageBody * body)
 	pdata->labels[hdr++] = g_strdup(_("Filename:"));
 	pdata->labels[hdr++] = g_strdup(body->filename);
     }
-    font = gnome_font_new(balsa_app.print_header_font,
- 			  balsa_app.print_header_size);
-    pdata->label_width = gnome_font_get_width_string(font, pdata->labels[0]);
+    pdata->label_width = gnome_font_get_width_utf8(pi->header_font, pdata->labels[0]);
     if (pdata->labels[2] && 
-	gnome_font_get_width_string(font, pdata->labels[2]) > pdata->label_width)
-	pdata->label_width = gnome_font_get_width_string(font, pdata->labels[2]);
+	gnome_font_get_width_utf8(pi->header_font, pdata->labels[2]) > pdata->label_width)
+	pdata->label_width = gnome_font_get_width_utf8(pi->header_font, pdata->labels[2]);
     pdata->label_width += 6;
 
-    lines = print_wrap_string(&pdata->labels[1], font,
+    lines = print_wrap_string(&pdata->labels[1], pi->header_font,
 			      pi->printable_width - pdata->label_width - 
 			      pdata->image_width - 10, pi->tab_width);
     if (!lines)
 	lines = 1;
     if (pdata->labels[3])
-	lines += print_wrap_string(&pdata->labels[3], font,
+	lines += print_wrap_string(&pdata->labels[3], pi->header_font,
 				   pi->printable_width - pdata->label_width - 
 				   pdata->image_width - 10, pi->tab_width);
-    pdata->text_height = lines * balsa_app.print_header_size;
+    pdata->text_height = lines * gnome_font_get_size(pi->header_font);
 
     pdata->part_height = (pdata->text_height > pdata->image_height) ?
 	pdata->text_height : pdata->image_height;
@@ -826,10 +782,35 @@ prepare_default(PrintInfo * pi, LibBalsaMessageBody * body)
     } else
 	pi->ypos -= pdata->part_height;
     
-    gtk_object_unref(GTK_OBJECT(font));
     g_free(conttype);
 
     pi->print_parts = g_list_append (pi->print_parts, pdata);
+}
+
+/* print_image_from_pixbuf:
+ *
+ * replacement for gnome_print_pixbuf, straight out of
+ * libgnomeprintui/examples/example_02.c
+ */
+static void
+print_image_from_pixbuf(GnomePrintContext * gpc, GdkPixbuf * pixbuf)
+{
+    guchar *raw_image;
+    gboolean has_alpha;
+    gint rowstride, height, width;
+
+    raw_image = gdk_pixbuf_get_pixels(pixbuf);
+    has_alpha = gdk_pixbuf_get_has_alpha(pixbuf);
+    rowstride = gdk_pixbuf_get_rowstride(pixbuf);
+    height    = gdk_pixbuf_get_height(pixbuf);
+    width     = gdk_pixbuf_get_width(pixbuf);
+
+    if (has_alpha)
+        gnome_print_rgbaimage(gpc, (char *) raw_image, width, height,
+                              rowstride);
+    else
+        gnome_print_rgbimage(gpc, (char *) raw_image, width, height,
+                             rowstride);
 }
 
 static void
@@ -837,7 +818,7 @@ print_default(PrintInfo * pi, gpointer data)
 {
     double matrix[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     DefaultInfo *pdata = (DefaultInfo *)data;
-    GnomeFont *font;
+    gdouble font_size;
     gint i, offset;
 
     g_return_if_fail(pdata->id_tag == BALSA_PRINT_TYPE_DEFAULT);
@@ -854,27 +835,25 @@ print_default(PrintInfo * pi, gpointer data)
     matrix[4] = pi->margin_left;
     matrix[5] = pi->ypos - (pdata->part_height + pdata->image_height) / 2.0;
     gnome_print_concat(pi->pc, matrix);
-    gnome_print_pixbuf (pi->pc, pdata->pixbuf);
+    print_image_from_pixbuf(pi->pc, pdata->pixbuf);
     gnome_print_grestore (pi->pc);
-    gdk_pixbuf_unref(pdata->pixbuf);
+    g_object_unref(pdata->pixbuf);
     
     /* print the description */
-    font = gnome_font_new(balsa_app.print_header_font,
- 			  balsa_app.print_header_size);
-    gnome_print_setfont(pi->pc, font);
+    gnome_print_setfont(pi->pc, pi->header_font);
+    font_size = gnome_font_get_size(pi->header_font);
     pi->ypos -= (pdata->part_height - pdata->text_height) / 2.0 + 
-	balsa_app.print_header_size;
+	font_size;
     offset = pi->margin_left + pdata->image_width + 10;
     for (i = 0; pdata->labels[i]; i += 2) {
 	gnome_print_moveto(pi->pc, offset, pi->ypos);
-	gnome_print_show_with_charset(pi, pdata->labels[i], pi->conv_data);
+	gnome_print_show(pi->pc, pdata->labels[i]);
 	print_header_val(pi, offset + pdata->label_width, &pi->ypos,
- 			 balsa_app.print_header_size, pdata->labels[i + 1], font);
- 	pi->ypos -= balsa_app.print_header_size;
+ 			 font_size, pdata->labels[i + 1], pi->header_font);
+ 	pi->ypos -= font_size;
     }
     pi->ypos -= (pdata->part_height - pdata->text_height) / 2.0 -
-	balsa_app.print_header_size;
-    gtk_object_unref(GTK_OBJECT(font));
+	font_size;
     g_strfreev(pdata->labels);
 }
 
@@ -891,13 +870,16 @@ static void
 prepare_image(PrintInfo * pi, LibBalsaMessageBody * body)
 {
     ImageInfo * pdata;
-    
+    GError *err = NULL;
     pdata = g_malloc(sizeof(ImageInfo));
     pdata->id_tag = BALSA_PRINT_TYPE_IMAGE;
 
     libbalsa_message_body_save_temporary(body, NULL);
-    pdata->pixbuf = gdk_pixbuf_new_from_file(body->temp_filename);
-    
+    pdata->pixbuf = gdk_pixbuf_new_from_file(body->temp_filename, &err);
+    if(err) {
+        g_warning("Error loading image from file.");
+        g_error_free(err);
+    }
     /* fall back to default if the pixbuf could no be loaded */
     if (!pdata->pixbuf) {
 	g_free(pdata);
@@ -944,10 +926,10 @@ print_image(PrintInfo * pi, gpointer * data)
 	(pi->printable_width - pdata->print_width) / 2.0;
     matrix[5] = pi->ypos - pdata->print_height;
     gnome_print_concat(pi->pc, matrix);
-    gnome_print_pixbuf (pi->pc, pdata->pixbuf);
+    print_image_from_pixbuf(pi->pc, pdata->pixbuf);
     gnome_print_grestore (pi->pc);
     pi->ypos -= pdata->print_height;
-    gdk_pixbuf_unref(pdata->pixbuf);
+    g_object_unref(pdata->pixbuf);
 }
 
 /*
@@ -978,8 +960,8 @@ scan_body(PrintInfo * pi, LibBalsaMessageBody * body)
 	
 	for (action = mime_actions; 
 	     action->mime_type && 
-		 g_strncasecmp(action->mime_type, conttype, 
-			       strlen(action->mime_type));
+		 g_ascii_strncasecmp(action->mime_type, conttype, 
+			             strlen(action->mime_type));
 	     action++);
 	g_free(conttype);
 
@@ -995,37 +977,80 @@ scan_body(PrintInfo * pi, LibBalsaMessageBody * body)
     }
 }
 
-static PrintInfo *
-print_info_new(const gchar * paper, LibBalsaMessage * msg,
-	       GnomePrintDialog * dlg)
+/*
+ * get the GnomeFont from a name returned by the font picker
+ *
+ * if this looks ugly, it's because it is! 
+ * the font picker returns lower case names, but gnome_font_find uses a
+ * case-sensitive hash table lookup, so we have to find the correct name
+ * for ourselves
+ * also, the name is the face (e.g. "helvetica") with the weight (e.g.
+ * "medium") appended, so we have to progressively strip off such words
+ * and keep checking
+ */
+static GnomeFont *
+find_font(const gchar * name, GHashTable * font_table)
 {
-    gchar *the_charset;
-    GnomeFont *font;
-    GList *papers;
-    PrintInfo *pi = g_new0(PrintInfo, 1);
+    gchar *copy = g_strdup(name);
+    gchar *p;
+    gdouble size;
+    GnomeFont *font = NULL;
+    gchar *found = NULL;
 
-    pi->paper = gnome_paper_with_name(paper);
-    if (pi->paper == NULL) {
-     	papers = gnome_paper_name_list();
-	balsa_information(LIBBALSA_INFORMATION_WARNING, NULL,
-			  _("Balsa could not find paper type \"%s\".\n"), paper);
-	balsa_information(LIBBALSA_INFORMATION_WARNING, NULL,
-			  _("Using paper type \"%s\" from /etc/paper.config instead\n"),
-			  (char *)papers->data);
-	pi->paper = gnome_paper_with_name((char *)papers->data);
+    p = strrchr(copy, ' ');
+    if (p) {
+        size = atof(p + 1);
+        do {
+            *p = 0;
+            found = g_hash_table_lookup(font_table, copy);
+        } while (!found && (p = strrchr(copy, ' ')));
+    } else {
+        size = 12;
+        found = g_hash_table_lookup(font_table, copy);
     }
-    pi->master = gnome_print_master_new_from_dialog(dlg);
-    gnome_print_master_set_paper(pi->master, pi->paper);
-    pi->pc = gnome_print_master_get_context(pi->master);
 
-    pi->page_width = gnome_paper_pswidth(pi->paper);
-    pi->page_height = gnome_paper_psheight(pi->paper);
+    if (found)
+        font = gnome_font_find(found, size);
+    g_free(copy);
 
-    pi->margin_top = 0.75 * 72;
-    pi->margin_bottom = 0.75 * 72;
-    pi->margin_left = 0.75 * 72;
-    pi->margin_right = 0.75 * 72;
-    pi->pgnum_from_top = 0.5 * 72;
+    return font;
+}
+
+static gdouble
+get_length_from_config(GnomePrintConfig * config, const gchar * key)
+{
+    const GnomePrintUnit *unit;
+    gdouble length = 0.0;
+
+    if (gnome_print_config_get_length(config, key, &length, &unit))
+        gnome_print_convert_distance(&length, unit, GNOME_PRINT_PS_UNIT);
+
+    return length;
+}
+
+static PrintInfo *
+print_info_new(CommonInfo * ci)
+{
+    GnomePrintConfig *config;
+    PrintInfo *pi = g_new(PrintInfo, 1);
+
+    config = BALSA_GNOME_PRINT_UI_GET_CONFIG(ci->master);
+    BALSA_GNOME_PRINT_UI_GET_PAGE_SIZE_FROM_CONFIG(config,
+                                                   &pi->page_width,
+                                                   &pi->page_height);
+    pi->margin_top =
+        get_length_from_config(config, GNOME_PRINT_KEY_PAGE_MARGIN_TOP);
+    pi->margin_bottom =
+        get_length_from_config(config, GNOME_PRINT_KEY_PAGE_MARGIN_BOTTOM);
+    pi->margin_left =
+        get_length_from_config(config, GNOME_PRINT_KEY_PAGE_MARGIN_LEFT);
+    pi->margin_right =
+        get_length_from_config(config, GNOME_PRINT_KEY_PAGE_MARGIN_RIGHT);
+    gnome_print_config_unref(config);
+
+    pi->pc = BALSA_GNOME_PRINT_UI_GET_CONTEXT(ci->master);
+    pi->current_page = 0;
+    pi->pgnum_from_top = pi->margin_top - 0.25 * 72;
     pi->printable_width =
 	pi->page_width - pi->margin_left - pi->margin_right;
     pi->printable_height =
@@ -1035,25 +1060,21 @@ print_info_new(const gchar * paper, LibBalsaMessage * msg,
     pi->pages = 1;
     pi->ypos = pi->margin_bottom + pi->printable_height;
 
-    pi->message = msg;
+    /* we don't hold refs to these: */
+    pi->header_font = ci->header_font_info.font;
+    pi->body_font =   ci->body_font_info.font;
+    pi->footer_font = ci->footer_font_info.font;
+
+    pi->message = ci->message;
+    pi->print_parts = NULL;
     prepare_header(pi, NULL);
     
-    the_charset = (gchar *)libbalsa_message_charset(msg);
-    if (the_charset) {
-	pi->conv_data = iconv_open("UTF-8", the_charset);
-	if (pi->conv_data == (iconv_t)(-1)) {
-	    balsa_information(LIBBALSA_INFORMATION_ERROR, NULL,
-			      _("Can not convert %s, falling back to US-ASCII.\nSome characters may be printed incorrectly."),
-			      the_charset);
-	    pi->conv_data = iconv_open("UTF-8", "US-ASCII");
-	}
-    } else
-	pi->conv_data = iconv_open("UTF-8", "ISO-8859-1");
-
     /* now get the message contents... */
-    libbalsa_message_body_ref(msg, TRUE);
-    scan_body(pi, msg->body_list);
-    libbalsa_message_body_unref(msg);
+    if (!pi->message->mailbox 
+        || libbalsa_message_body_ref(pi->message, TRUE)) {
+        scan_body(pi, pi->message->body_list);
+        libbalsa_message_body_unref(pi->message);
+    }
 
     return pi;
 }
@@ -1061,20 +1082,9 @@ print_info_new(const gchar * paper, LibBalsaMessage * msg,
 static void
 print_info_destroy(PrintInfo * pi)
 {
-    GList *part;
-
-    if (pi->conv_data != (iconv_t)(-1))
-	iconv_close(pi->conv_data);
-    part = pi->print_parts;
-    while (part) {
-	if (part->data)
-	    g_free(part->data);
-	part = g_list_next(part);
-    }
+    g_list_foreach(pi->print_parts, (GFunc) g_free, NULL);
     g_list_free(pi->print_parts);
-    pi->print_parts = NULL;
     g_free(pi->footer);
-    pi->footer = NULL;
     g_free(pi);
 }
 
@@ -1118,57 +1128,6 @@ print_message(PrintInfo * pi)
     gnome_print_showpage(pi->pc);
 }
 
-static gboolean
-is_font_ok(const gchar * font_name)
-{
-    GnomeFont *test_font = gnome_font_new(font_name, 10);
-
-    if (!test_font) {
-	balsa_information(LIBBALSA_INFORMATION_ERROR, NULL,
-			  _("Balsa could not find font %s\n"
-			    "Printing is not possible"), font_name);
-	return FALSE;
-    }
-    gtk_object_unref(GTK_OBJECT(test_font));
-    return TRUE;
-}
-
-void
-message_print_cb(GtkWidget * widget, gpointer cbdata)
-{
-    BalsaIndex *index;
-    GList *list;
-    LibBalsaMessage *msg;
-
-    g_return_if_fail(cbdata);
-
-    index = BALSA_INDEX(balsa_window_find_current_index(BALSA_WINDOW(cbdata)));
-    if (!index || (list = GTK_CLIST(index->ctree)->selection) == NULL)
-	return;
-
-    msg =
-	LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data(
-	    GTK_CTREE(index->ctree), list->data));
-    /* print only first selected message */
-
-    message_print(msg);
-}
-
-/* callback to read a comby entry */
-static void 
-entry_changed (GtkEntry *entry, gchar **value)
-{
-    g_free(*value);
-    *value = g_strdup(gtk_entry_get_text(entry));
-}
-
-/* callback to read an adjustment */
-static void 
-adjust_changed (GtkAdjustment *adj, gfloat *value)
-{
-    *value = adj->value;
-}
-
 /* callback to read a toggle button */
 static void 
 togglebut_changed (GtkToggleButton *tbut, gboolean *value)
@@ -1177,170 +1136,91 @@ togglebut_changed (GtkToggleButton *tbut, gboolean *value)
 }
 
 /*
- * changes print dialog to a two-page notebook with a "settings" page
+ * enable/disable the Print and Preview buttons
  */
 static void
-adjust_print_dialog(GtkWidget * dialog)
+set_dialog_buttons_sensitive(CommonInfo * ci)
 {
+    gboolean sensitive = (ci->header_font_info.font
+                          && ci->body_font_info.font
+                          && ci->footer_font_info.font);
+
+    gtk_dialog_set_response_sensitive(GTK_DIALOG(ci->dialog),
+                                      GNOME_PRINT_DIALOG_RESPONSE_PRINT,
+                                      sensitive);
+    gtk_dialog_set_response_sensitive(GTK_DIALOG(ci->dialog),
+                                      GNOME_PRINT_DIALOG_RESPONSE_PREVIEW,
+                                      sensitive);
+}
+
+/*
+ * callback for the font picker's "font-set" signal
+ */
+static void
+font_set_cb(GtkWidget * widget, const gchar * font_name, FontInfo *fi)
+{
+    g_free(*fi->font_name);
+    *fi->font_name = g_strdup(font_name);
+    if (fi->font)
+        g_object_unref(G_OBJECT(fi->font));
+    fi->font = find_font(font_name, fi->common_info->font_table);
+    set_dialog_buttons_sensitive(fi->common_info);
+}
+
+/*
+ * create a frame with a font-picker widget
+ */
+static GtkWidget *
+font_frame(gchar * title, FontInfo * fi)
+{
+    GtkWidget  *frame = gtk_frame_new(title);
+    GtkWidget *widget = gnome_font_picker_new();
+
+    gnome_font_picker_set_font_name(GNOME_FONT_PICKER(widget), *fi->font_name);
+    gnome_font_picker_set_preview_text(GNOME_FONT_PICKER(widget), title);
+    gnome_font_picker_set_mode(GNOME_FONT_PICKER(widget),
+                               GNOME_FONT_PICKER_MODE_FONT_INFO);
+    g_signal_connect(G_OBJECT(widget), "font-set", 
+                     G_CALLBACK(font_set_cb), fi);
+    gtk_container_add(GTK_CONTAINER(frame), widget);
+    gtk_container_set_border_width(GTK_CONTAINER(frame), 3);
+
+    return frame;
+}
+
+/*
+ * creates the print dialog, and adds a page for fonts
+ */
+static GtkWidget *
+print_dialog(CommonInfo * ci)
+{
+    GtkWidget  *dialog;
     GtkWidget  *frame;
-    GtkWidget  *combo;
     GtkWidget  *dlgVbox;
     GtkWidget  *notebook;
     GtkWidget  *vbox;
-    GtkWidget  *oldPrDlg[2];
-    GtkWidget  *table;
     GtkWidget  *label;
-    GtkWidget  *spinbut;
     GtkWidget  *chkbut;
-    GtkObject  *adj;
-    GtkEntry   *entry;
-    const GnomePaper   *gpaper;
     GList      *childList;
-    gint       n, movedElems = 0;
 
-    dlgVbox = GNOME_DIALOG(dialog)->vbox;
+    dialog = BALSA_GNOME_PRINT_DIALOG_NEW(ci->master, _("Print message"),
+				    GNOME_PRINT_DIALOG_COPIES);
+    gtk_window_set_wmclass(GTK_WINDOW(dialog), "print", "Balsa");
+    dlgVbox = GTK_DIALOG(dialog)->vbox;
+    childList = gtk_container_get_children(GTK_CONTAINER(dlgVbox));
+    notebook = childList->data;
+    g_list_free(childList);
 
-    notebook = gtk_notebook_new();
-
-    label = gtk_label_new(_("Print"));
-    vbox = gtk_vbox_new(FALSE, GNOME_PAD);
-    gtk_container_set_border_width (GTK_CONTAINER (vbox),
-				    GNOME_PAD_SMALL);
-
-    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), vbox, label);
-
-    /* move all elements from the gnome dialog vbox to the 1st notebook page */
-    childList = g_list_first(GTK_BOX(dlgVbox)->children);
-    while(childList) {
-	struct _GtkBoxChild *elem = (struct _GtkBoxChild *)childList->data;
-	if (!GTK_IS_HSEPARATOR(elem->widget) &&
-	    !GTK_IS_HBUTTON_BOX(elem->widget))
-	    oldPrDlg[movedElems++] = elem->widget;
-	childList = childList->next;
-    }
-    
-    for (n = 0; n < movedElems; n++) {
-	gtk_object_ref(GTK_OBJECT(oldPrDlg[n]));
-	gtk_container_remove(GTK_CONTAINER(dlgVbox), oldPrDlg[n]);
-	gtk_box_pack_start(GTK_BOX(vbox), oldPrDlg[n], FALSE, FALSE, 3);
-	gtk_object_unref(GTK_OBJECT(oldPrDlg[n]));
-    }
-
-    /* create a 2nd notebook page for the settings */
-    label = gtk_label_new(_("Settings"));
+    /* create a 2nd notebook page for the fonts */
+    label = gtk_label_new(_("Fonts"));
     vbox = gtk_vbox_new(FALSE, 3);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), vbox, label);
-
-    /* paper selection */
-    if ((gpaper = gnome_paper_with_name(balsa_app.paper_size)) == NULL) {
-	balsa_information(LIBBALSA_INFORMATION_WARNING, NULL,
-			  _("Balsa could not find paper type \"%s\", using"
-			    " system default.\n"), balsa_app.paper_size);
-	balsa_information(LIBBALSA_INFORMATION_WARNING, NULL,
-			  _("Check your paper type configuration or balsa preferences\n"));
-	balsa_app.paper_size = g_strdup(gnome_paper_name_default());
-    }
-
-    frame = gtk_frame_new(_("Paper"));
-    gtk_container_set_border_width(GTK_CONTAINER(frame), 3);
-    gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 3);
-    combo = gtk_combo_new();
-    gtk_container_set_border_width(GTK_CONTAINER(combo), 3);
-    entry = GTK_ENTRY(GTK_COMBO(combo)->entry);
-    gtk_combo_set_popdown_strings(GTK_COMBO(combo), 
-				  g_list_copy(gnome_paper_name_list()));
-    gtk_entry_set_text(entry, balsa_app.paper_size);
-    gtk_signal_connect(GTK_OBJECT(entry), "changed",
-		       GTK_SIGNAL_FUNC(entry_changed), 
-		       &balsa_app.paper_size);
-    gtk_container_add (GTK_CONTAINER(frame), combo);
-
-    /* header & footer font */
-    frame = gtk_frame_new(_("Font for header and footer"));
-    gtk_container_set_border_width(GTK_CONTAINER(frame), 3);
-    gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 3);
-    table = gtk_table_new (3, 2, FALSE);
-    gtk_container_set_border_width(GTK_CONTAINER(table), 3);
-    gtk_table_set_row_spacings(GTK_TABLE(table), 5);
-    gtk_table_set_col_spacings(GTK_TABLE(table), 5);
-    gtk_container_add (GTK_CONTAINER (frame), table);
-    combo = gtk_combo_new();
-    entry = GTK_ENTRY(GTK_COMBO(combo)->entry);
-    gtk_combo_set_popdown_strings(GTK_COMBO(combo), 
-				  g_list_copy(gnome_font_list()));
-    gtk_entry_set_text(entry, balsa_app.print_header_font);
-    gtk_signal_connect(GTK_OBJECT(entry), "changed",
-		       GTK_SIGNAL_FUNC(entry_changed), 
-		       &balsa_app.print_header_font);
-    gtk_table_attach (GTK_TABLE (table), combo, 0, 2, 0, 1,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-    label = gtk_label_new (_("header font size"));
-    gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
-		      (GtkAttachOptions) (GTK_FILL),
-		      (GtkAttachOptions) (0), 0, 0);
-    gtk_misc_set_alignment (GTK_MISC (label), 0, 0);
-    adj = 
-	gtk_adjustment_new (balsa_app.print_header_size, 0.1, 255.0, 0.1, 1, 10);
-    gtk_signal_connect(GTK_OBJECT(adj), "value-changed",
-		       GTK_SIGNAL_FUNC(adjust_changed), 
-		       &balsa_app.print_header_size);    
-    spinbut = gtk_spin_button_new (GTK_ADJUSTMENT (adj), 0.1, 1);
-    gtk_spin_button_set_numeric (GTK_SPIN_BUTTON(spinbut), TRUE);
-    gtk_table_attach (GTK_TABLE (table), spinbut, 1, 2, 1, 2,
-		      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-		      (GtkAttachOptions) (0), 0, 0);
-    label = gtk_label_new (_("footer font size"));
-    gtk_table_attach (GTK_TABLE (table), label, 0, 1, 2, 3,
-		      (GtkAttachOptions) (GTK_FILL),
-		      (GtkAttachOptions) (0), 0, 0);
-    gtk_misc_set_alignment (GTK_MISC (label), 0, 0);
-    adj =
-	gtk_adjustment_new (balsa_app.print_footer_size, 0.1, 255.0, 0.1, 1, 10);
-    gtk_signal_connect(GTK_OBJECT(adj), "value-changed",
-		       GTK_SIGNAL_FUNC(adjust_changed), 
-		       &balsa_app.print_footer_size);    
-    spinbut = gtk_spin_button_new (GTK_ADJUSTMENT (adj), 0.1, 1);
-    gtk_spin_button_set_numeric (GTK_SPIN_BUTTON(spinbut), TRUE);
-    gtk_table_attach (GTK_TABLE (table), spinbut, 1, 2, 2, 3,
-		      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-		      (GtkAttachOptions) (0), 0, 0);
-
-    /* body font */
-    frame = gtk_frame_new(_("Font for message body"));
-    gtk_container_set_border_width(GTK_CONTAINER(frame), 3);
-    gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 3);
-    table = gtk_table_new (3, 2, FALSE);
-    gtk_container_set_border_width(GTK_CONTAINER(table), 3);
-    gtk_table_set_row_spacings(GTK_TABLE(table), 5);
-    gtk_table_set_col_spacings(GTK_TABLE(table), 5);
-    gtk_container_add (GTK_CONTAINER (frame), table);
-    combo = gtk_combo_new();
-    gtk_container_set_border_width(GTK_CONTAINER(combo), 3);
-    entry = GTK_ENTRY(GTK_COMBO(combo)->entry);
-    gtk_combo_set_popdown_strings(GTK_COMBO(combo), 
-				  g_list_copy(gnome_font_list()));
-    gtk_entry_set_text(entry, balsa_app.print_body_font);
-    gtk_signal_connect(GTK_OBJECT(entry), "changed",
-		       GTK_SIGNAL_FUNC(entry_changed), 
-		       &balsa_app.print_body_font);
-    gtk_table_attach (GTK_TABLE (table), combo, 0, 2, 0, 1,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-    label = gtk_label_new (_("body font size"));
-    gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
-		      (GtkAttachOptions) (GTK_FILL),
-		      (GtkAttachOptions) (0), 0, 0);
-    gtk_misc_set_alignment (GTK_MISC (label), 0, 0);
-    adj = gtk_adjustment_new (balsa_app.print_body_size, 0.1, 255.0, 0.1, 1, 10);
-    gtk_signal_connect(GTK_OBJECT(adj), "value-changed",
-		       GTK_SIGNAL_FUNC(adjust_changed), 
-		       &balsa_app.print_body_size);    
-    spinbut = gtk_spin_button_new (GTK_ADJUSTMENT (adj), 0.1, 1);
-    gtk_spin_button_set_numeric (GTK_SPIN_BUTTON(spinbut), TRUE);
-    gtk_table_attach (GTK_TABLE (table), spinbut, 1, 2, 1, 2,
-		      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-		      (GtkAttachOptions) (0), 0, 0);
+    frame = font_frame(_("Header font"), &ci->header_font_info);
+    gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 3);    
+    frame = font_frame(_("Body font"), &ci->body_font_info);
+    gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 3);    
+    frame = font_frame(_("Footer font"), &ci->footer_font_info);
+    gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 3);    
 
     /* highlight cited stuff */
     frame = gtk_frame_new(_("Highlight cited text"));
@@ -1348,69 +1228,207 @@ adjust_print_dialog(GtkWidget * dialog)
     gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 3);    
     chkbut = 
 	gtk_check_button_new_with_label ("enable highlighting of cited text");
-    gtk_signal_connect(GTK_OBJECT(chkbut), "toggled",
-		       GTK_SIGNAL_FUNC(togglebut_changed), 
-		       &balsa_app.print_highlight_cited);    
+    g_signal_connect(G_OBJECT(chkbut), "toggled",
+		     G_CALLBACK(togglebut_changed), 
+		     &balsa_app.print_highlight_cited);    
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(chkbut),
 				  balsa_app.print_highlight_cited);
     gtk_container_add (GTK_CONTAINER (frame), chkbut);
 
-    gtk_box_pack_start(GTK_BOX(dlgVbox), notebook, FALSE, FALSE, 3);
-    gtk_widget_show_all(notebook);
+    gtk_widget_show_all(vbox);
+    
+    return dialog;
 }
 
-void
-message_print(LibBalsaMessage * msg)
+/*
+ * functions for a case-insensitive hash table
+ */
+static guint
+strcase_hash(const gchar * key) {
+    gchar *tmp = g_ascii_strdown(key, -1);
+    guint ret_val = g_str_hash(tmp);
+    g_free(tmp);
+    return ret_val;
+}
+
+static gboolean
+strcase_equal(const gchar * a, const gchar * b)
 {
-    GtkWidget *dialog;
+    return g_ascii_strcasecmp(a, b) == 0;
+}
+
+/*
+ * the FontInfo structure contains info used in the "font-set" callback
+ * that's specific to a font, and a pointer to the CommonInfo structure
+ */
+static void
+font_info_setup(FontInfo * fi, gchar ** font_name, CommonInfo * ci)
+{
+    fi->font_name = font_name;
+    fi->common_info = ci;
+    fi->font = find_font(*font_name, ci->font_table);
+    if (!fi->font)
+	balsa_information(LIBBALSA_INFORMATION_ERROR,
+			  _("Balsa could not find font \"%s\".\n"
+			    "Use the \"Fonts\" page on the "
+                            "\"Print message\" dialog to change it."),
+                          *fi->font_name);
+}
+
+static void
+font_info_cleanup(FontInfo * fi)
+{
+    g_object_unref(fi->font);
+}
+
+/*
+ * the CommonInfo structure contains info used in the "font-set" callback
+ * that's common to all fonts
+ */
+static void
+common_info_setup(CommonInfo * ci)
+{
+    GList *list;
+
+    ci->font_table = g_hash_table_new((GHashFunc)  strcase_hash,
+                                      (GEqualFunc) strcase_equal);
+    for (list = gnome_font_list(); list; list = g_list_next(list)) {
+        gchar *name = list->data;
+        g_hash_table_insert(ci->font_table, name, name);
+    }
+
+    font_info_setup(&ci->header_font_info, &balsa_app.print_header_font, ci);
+    font_info_setup(&ci->body_font_info, &balsa_app.print_body_font, ci);
+    font_info_setup(&ci->footer_font_info, &balsa_app.print_footer_font, ci);
+}
+
+#define BALSA_PRINT_COMMON_INFO_KEY "balsa-print-common-info"
+
+/* GWeakNotify callback: destroy non-message-related stuff in
+ * CommonInfo. */
+static void
+common_info_destroy(CommonInfo * ci)
+{
+    g_hash_table_destroy(ci->font_table);
+    font_info_cleanup(&ci->header_font_info);
+    font_info_cleanup(&ci->body_font_info);
+    font_info_cleanup(&ci->footer_font_info);
+
+    gtk_widget_destroy(GTK_WIDGET(ci->dialog));
+    g_object_unref(ci->master);
+
+    g_free(ci);
+}
+
+/* Clean up message-related stuff in CommonInfo, then destroy the rest. */
+static void
+common_info_cleanup(CommonInfo * ci)
+{
+    if (ci->message->mailbox) {
+        /* a message we're reading */
+        g_object_weak_unref(G_OBJECT(ci->message),
+                            (GWeakNotify) common_info_destroy, ci);
+        g_object_set_data(G_OBJECT(ci->message),
+                          BALSA_PRINT_COMMON_INFO_KEY, NULL);
+    } else
+        /* temporary message from the compose window */
+        g_object_unref(ci->message);
+
+    common_info_destroy(ci);
+}
+
+/* Callback for the "response" signal for the print dialog. */
+static void
+print_response_cb(GtkDialog * dialog, gint response, CommonInfo * ci)
+{
+    GnomePrintConfig *config;
     PrintInfo *pi;
-    gboolean preview = FALSE;
+    gboolean preview;
 
-    g_return_if_fail(msg);
-    if (!is_font_ok(balsa_app.print_body_font) || 
-	!is_font_ok(balsa_app.print_header_font))
-	return;
-
-    dialog = gnome_print_dialog_new(_("Print message"),
-				    GNOME_PRINT_DIALOG_COPIES);
-    /*
-     * add paper selection combo to print dialog
-     */
-    adjust_print_dialog(dialog);
-    gnome_dialog_set_parent(GNOME_DIALOG(dialog),
-			    GTK_WINDOW(balsa_app.main_window));
-    gtk_window_set_wmclass(GTK_WINDOW(dialog), "print", "Balsa");
-
-    switch (gnome_dialog_run(GNOME_DIALOG(dialog))) {
-    case GNOME_PRINT_PRINT:
+    switch (response) {
+    case GNOME_PRINT_DIALOG_RESPONSE_PRINT:
+        preview = FALSE;
 	break;
-    case GNOME_PRINT_PREVIEW:
+    case GNOME_PRINT_DIALOG_RESPONSE_PREVIEW:
 	preview = TRUE;
 	break;
-    case GNOME_PRINT_CANCEL:
-	gnome_dialog_close(GNOME_DIALOG(dialog));
     default:
+        common_info_cleanup(ci);
 	return;
     }
-    pi = print_info_new(balsa_app.paper_size, msg, GNOME_PRINT_DIALOG(dialog));
-    gnome_dialog_close(GNOME_DIALOG(dialog));
+
+    config = BALSA_GNOME_PRINT_UI_GET_CONFIG(ci->master);
+    g_free(balsa_app.paper_size);
+    balsa_app.paper_size =
+        gnome_print_config_get(config, GNOME_PRINT_KEY_PAPER_SIZE); 
+    gnome_print_config_unref(config);
+
+    pi = print_info_new(ci);
 
     /* do the Real Job */
     print_message(pi);
-    gnome_print_master_close(pi->master);
+    BALSA_GNOME_PRINT_UI_CLOSE(ci->master);
     if (preview) {
-	GnomePrintMasterPreview *preview_widget =
-	    gnome_print_master_preview_new(pi->master,
+	GtkWidget *preview_widget =
+	    BALSA_GNOME_PRINT_UI_PREVIEW_NEW(ci->master,
 		 			   _("Balsa: message print preview"));
-	gtk_widget_show(GTK_WIDGET(preview_widget));
-    } else {
-	gnome_print_master_print(pi->master);
-	gtk_object_unref(GTK_OBJECT(pi->master));
-    }
+        gtk_window_set_wmclass(GTK_WINDOW(preview_widget), "print-preview",
+                               "Balsa");
+	gtk_widget_show(preview_widget);
+    } else
+	BALSA_GNOME_PRINT_UI_PRINT(ci->master);
 
     print_info_destroy(pi);
+    common_info_cleanup(ci);
 }
-#endif
 
+/*
+ * message_print:
+ *
+ * the public method
+ */
+void
+message_print(LibBalsaMessage * msg)
+{
+    CommonInfo *ci;
+    GnomePrintConfig *config;
 
+    g_return_if_fail(msg != NULL);
 
+    /* Show only one dialog per message. */
+    ci = g_object_get_data(G_OBJECT(msg), BALSA_PRINT_COMMON_INFO_KEY);
+    if (ci) {
+        gdk_window_raise(ci->dialog->window);
+        return;
+    }
+
+    ci = g_new(CommonInfo, 1);
+    common_info_setup(ci);
+
+    ci->message = msg;
+    if (msg->mailbox) {
+        /* a message we're reading */
+        g_object_set_data(G_OBJECT(msg), BALSA_PRINT_COMMON_INFO_KEY, ci);
+        g_object_weak_ref(G_OBJECT(msg), (GWeakNotify) common_info_destroy, ci);
+    } else 
+        /* temporary message from the compose window */
+        g_object_ref(msg);
+    ci->master = BALSA_GNOME_PRINT_UI_NEW;
+
+    /* FIXME: this sets the paper size in the GnomePrintConfig. We can
+     * change it in the Paper page of the GnomePrintDialog, and retrieve
+     * it from the GnomePrintConfig. However, it doesn't get set as the
+     * initial value in the Paper page. Is there some Gnome-2-wide
+     * repository for data like this? */
+    config = BALSA_GNOME_PRINT_UI_GET_CONFIG(ci->master);
+    gnome_print_config_set(config, GNOME_PRINT_KEY_PAPER_SIZE, 
+                           balsa_app.paper_size);
+    gnome_print_config_unref(config);
+    
+    ci->dialog = print_dialog(ci);
+    set_dialog_buttons_sensitive(ci);
+    g_signal_connect(G_OBJECT(ci->dialog), "response",
+                     G_CALLBACK(print_response_cb), ci);
+
+    gtk_widget_show_all(ci->dialog);
+}

@@ -32,6 +32,7 @@
 
 #include "filter.h"
 #include "filter-private.h"
+#include <gtk/gtk.h>
 
 /* Conditions */
 
@@ -45,7 +46,7 @@ LibBalsaCondition* libbalsa_condition_clone(LibBalsaCondition* cnd);
 void libbalsa_condition_regex_free(LibBalsaConditionRegex *, gpointer);
 void regexs_free(GSList *);
 void libbalsa_condition_compile_regexs(LibBalsaCondition* cond);
-gboolean libbalsa_conditions_compare(GSList * cnd1,GSList * cnd2);
+
 /* Filters */
 /* Free a filter
  * free_condition is a gint into a gpointer : if <>0 the function frees filter conditions also
@@ -60,4 +61,11 @@ void libbalsa_filter_delete_regex(LibBalsaFilter*,LibBalsaCondition*,
 gboolean libbalsa_filter_compile_regexs(LibBalsaFilter *);
 
 gboolean libbalsa_filter_export_sieve(LibBalsaFilter* fil, gchar* filename);
+
+/* GtkTreeView helper */
+GtkTreeView *libbalsa_filter_list_new(gboolean with_data,
+                                      const gchar * title,
+                                      GtkSelectionMode mode,
+                                      GCallback selection_changed_cb,
+                                      gboolean sorted);
 #endif				/* __FILTER_FUNCS_H__ */

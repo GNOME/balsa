@@ -36,8 +36,8 @@ enum _LibBalsaInformationType {
 
 typedef enum _LibBalsaInformationType LibBalsaInformationType;
 
-typedef void (*LibBalsaInformationFunc) (LibBalsaInformationType message_type,
-                                         GtkWindow* parent, const gchar * fmt);
+typedef void (*LibBalsaInformationFunc) (LibBalsaInformationType
+					 message_type, const gchar * fmt);
 
 
 extern LibBalsaInformationFunc libbalsa_real_information_func;

@@ -33,15 +33,9 @@
 #include "config.h"
 
 #include <ctype.h>
+
 #include <glib.h>
-#include <unistd.h>
-
-#include <libgnome/gnome-defs.h>
 #include <libgnome/gnome-i18n.h> 
-
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
-#endif
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
@@ -50,15 +44,10 @@
 /* needed for truncate_string */
 #include "misc.h"
 
-/* GTK_CLASS_TYPE for 1.2<->1.3/2.0 GTK+ compatibility */
-#ifndef GTK_CLASS_TYPE
-#define GTK_CLASS_TYPE(x) (GTK_OBJECT_CLASS(x)->type)
-#endif /* GTK_CLASS_TYPE */
-
 static void libbalsa_message_class_init(LibBalsaMessageClass * klass);
 static void libbalsa_message_init(LibBalsaMessage * message);
 
-static void libbalsa_message_destroy(GtkObject * object);
+static void libbalsa_message_finalize(GObject * object);
 
 static gchar *ADDRESS_to_gchar(const ADDRESS * addr);
 
@@ -66,27 +55,29 @@ static gchar *ADDRESS_to_gchar(const ADDRESS * addr);
 static char *mime_content_type2str(int contenttype);
 #endif
 
-static GtkObjectClass *parent_class = NULL;
+static GObjectClass *parent_class = NULL;
 
-GtkType
+GType
 libbalsa_message_get_type()
 {
-    static GtkType libbalsa_message_type = 0;
+    static GType libbalsa_message_type = 0;
 
     if (!libbalsa_message_type) {
-	static const GtkTypeInfo libbalsa_message_info = {
-	    "LibBalsaMessage",
-	    sizeof(LibBalsaMessage),
+	static const GTypeInfo libbalsa_message_info = {
 	    sizeof(LibBalsaMessageClass),
-	    (GtkClassInitFunc) libbalsa_message_class_init,
-	    (GtkObjectInitFunc) libbalsa_message_init,
-	    /* reserved_1 */ NULL,
-	    /* reserved_2 */ NULL,
-	    (GtkClassInitFunc) NULL,
+            NULL,               /* base_init */
+            NULL,               /* base_finalize */
+	    (GClassInitFunc) libbalsa_message_class_init,
+            NULL,               /* class_finalize */
+            NULL,               /* class_data */
+	    sizeof(LibBalsaMessage),
+            0,                  /* n_preallocs */
+	    (GInstanceInitFunc) libbalsa_message_init
 	};
 
 	libbalsa_message_type =
-	    gtk_type_unique(gtk_object_get_type(), &libbalsa_message_info);
+	    g_type_register_static(G_TYPE_OBJECT, "LibBalsaMessage",
+                                   &libbalsa_message_info, 0);
     }
 
     return libbalsa_message_type;
@@ -122,13 +113,11 @@ libbalsa_message_init(LibBalsaMessage * message)
 static void
 libbalsa_message_class_init(LibBalsaMessageClass * klass)
 {
-    GtkObjectClass *object_class;
+    GObjectClass *object_class = G_OBJECT_CLASS(klass);
 
-    object_class = (GtkObjectClass *) klass;
+    parent_class = g_type_class_peek_parent(klass);
 
-    parent_class = gtk_type_class(gtk_object_get_type());
-
-    object_class->destroy = libbalsa_message_destroy;
+    object_class->finalize = libbalsa_message_finalize;
 }
 
 LibBalsaMessage *
@@ -136,17 +125,17 @@ libbalsa_message_new(void)
 {
     LibBalsaMessage *message;
 
-    message = gtk_type_new(LIBBALSA_TYPE_MESSAGE);
+    message = g_object_new(LIBBALSA_TYPE_MESSAGE, NULL);
 
     return message;
 }
 
-/* libbalsa_message_destroy:
-   destroy methods must leave object in 'sane' state. 
+/* libbalsa_message_finalize:
+   finalize methods must leave object in 'sane' state. 
    This means NULLifing released pointers.
 */
 static void
-libbalsa_message_destroy(GtkObject * object)
+libbalsa_message_finalize(GObject * object)
 {
     LibBalsaMessage *message;
 
@@ -159,31 +148,31 @@ libbalsa_message_destroy(GtkObject * object)
     message->remail = NULL;
 
     if (message->from) {
-	gtk_object_unref(GTK_OBJECT(message->from));
+	g_object_unref(message->from);
 	message->from = NULL;
     }
     if (message->sender) {
-	gtk_object_unref(GTK_OBJECT(message->sender));
+	g_object_unref(message->sender);
 	message->sender = NULL;
     }
     if (message->reply_to) {
-	gtk_object_unref(GTK_OBJECT(message->reply_to));
+	g_object_unref(message->reply_to);
 	message->reply_to = NULL;
     }
     if(message->dispnotify_to) {
-	gtk_object_unref(GTK_OBJECT(message->dispnotify_to));
+	g_object_unref(message->dispnotify_to);
 	message->dispnotify_to = NULL;
     }
 
-    g_list_foreach(message->to_list, (GFunc) gtk_object_unref, NULL);
+    g_list_foreach(message->to_list, (GFunc) g_object_unref, NULL);
     g_list_free(message->to_list);
     message->to_list = NULL;
 
-    g_list_foreach(message->cc_list, (GFunc) gtk_object_unref, NULL);
+    g_list_foreach(message->cc_list, (GFunc) g_object_unref, NULL);
     g_list_free(message->cc_list);
     message->cc_list = NULL;
 
-    g_list_foreach(message->bcc_list, (GFunc) gtk_object_unref, NULL);
+    g_list_foreach(message->bcc_list, (GFunc) g_object_unref, NULL);
     g_list_free(message->bcc_list);
     message->bcc_list = NULL;
 
@@ -200,11 +189,6 @@ libbalsa_message_destroy(GtkObject * object)
 
     g_free(message->in_reply_to);
     message->in_reply_to = NULL;
-
-    g_list_foreach(message->user_headers, (GFunc) g_strfreev, NULL);
-    g_list_free(message->user_headers);
-    message->user_headers = NULL;
-
     g_free(message->message_id);
     message->message_id = NULL;
 
@@ -215,8 +199,7 @@ libbalsa_message_destroy(GtkObject * object)
     g_list_free(message->references_for_threading);
     message->references_for_threading=NULL;
 
-    if (GTK_OBJECT_CLASS(parent_class)->destroy)
-	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
+    G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
 const gchar *
@@ -234,7 +217,7 @@ libbalsa_message_body_charset(LibBalsaMessageBody * body)
     gchar *charset = NULL;
 
     while (body) {
-        if(body->mutt_body) {
+	if(body->mutt_body) {
             libbalsa_lock_mutt();
             charset = 
                 mutt_get_parameter("charset", body->mutt_body->parameter);
@@ -255,24 +238,58 @@ libbalsa_message_body_charset(LibBalsaMessageBody * body)
     return charset;
 }
 
-/* Note: libbalsa_message_charset returns a pointer to the charset field or
- * NULL, but does NOT make a copy of an existing string! */
-const gchar *
+/* Note: libbalsa_message_charset returns a pointer to a newly allocated
+ * string containing the canonical form of the charset field, or NULL.
+ * When the pointer is nonNULL, the string must be deallocated with
+ * g_free. */
+gchar *
 libbalsa_message_charset(LibBalsaMessage * message)
 {
     LibBalsaMessageBody *body;
+    const gchar *charset;
+    char tmp[SHORT_STRING];    /* SHORT_STRING = 128 */
 
     g_return_val_if_fail(message != NULL, NULL);
     body = message->body_list;
     g_return_val_if_fail(body != NULL, NULL);
 
-    if (body->charset)
-	return body->charset;
-    else
-	return libbalsa_message_body_charset(body);
+    charset = body->charset;
+    if (!charset) {
+        charset = libbalsa_message_body_charset(body);
+        if (!charset)
+            return NULL;
+    }
+    mutt_canonical_charset(tmp, sizeof tmp, charset);
+    return g_strdup(tmp);
 }
 
+LibBalsaAddress *
+libbalsa_address_new_from_libmutt(ADDRESS * caddr)
+{
+    LibBalsaAddress *address;
+    if (!caddr || (caddr->personal==NULL && caddr->mailbox==NULL))
+	return NULL;
 
+    address = libbalsa_address_new();
+
+    /* it will be owned by the caller */
+
+    address->full_name = g_strdup(caddr->personal);
+    if (caddr->mailbox)
+	address->address_list = g_list_append(address->address_list,
+					      g_strdup(caddr->mailbox));
+
+    return address;
+}
+
+/* message_user_hdrs:
+   returns allocated GList containing (header=>value) ALL headers pairs
+   as generated by g_strsplit.
+   The list has to be freed by the following chunk of code:
+   for(tmp=list; tmp; tmp=g_list_next(tmp)) 
+      g_strfreev(tmp->data);
+   g_list_free(list);
+*/
 gchar **
 libbalsa_create_hdr_pair(const gchar * name, gchar * value)
 {
@@ -283,22 +300,20 @@ libbalsa_create_hdr_pair(const gchar * name, gchar * value)
     return item;
 }
 
-
-
 GList *
 libbalsa_message_find_user_hdr(LibBalsaMessage * message, const gchar * find)
 {
     GList* list;
     gchar** tmp;
-
+    
     
     if (!message->user_headers)
         message->user_headers = libbalsa_message_user_hdrs(message);
-
+    
     for (list = message->user_headers; list; list = g_list_next(list)) {
         tmp = list->data;
         
-        if (g_strncasecmp(tmp[0], find, strlen(find)) == 0) 
+        if (g_ascii_strncasecmp(tmp[0], find, strlen(find)) == 0) 
             return list;
     }
     
@@ -314,6 +329,8 @@ libbalsa_message_find_user_hdr(LibBalsaMessage * message, const gchar * find)
  * g_list_foreach(list, (GFunc) g_strfreev, NULL);
  * g_list_free(list);
 */
+
+
 GList *
 libbalsa_message_user_hdrs(LibBalsaMessage * message)
 {
@@ -335,49 +352,64 @@ libbalsa_message_user_hdrs(LibBalsaMessage * message)
     
     if (env->return_path)
 	res =
-	    g_list_prepend(res,
+	    g_list_append(res,
 			  libbalsa_create_hdr_pair("Return-Path",
-                                                   ADDRESS_to_gchar(env->return_path)));
+					  ADDRESS_to_gchar(env->return_path)));
 
     if (env->sender)
 	res =
-	    g_list_prepend(res,
+	    g_list_append(res,
 			  libbalsa_create_hdr_pair("Sender",
-                                                   ADDRESS_to_gchar(env->sender)));
+						   ADDRESS_to_gchar(env->sender)));
 
     if (env->mail_followup_to)
 	res =
-	    g_list_prepend(res,
+	    g_list_append(res,
 			  libbalsa_create_hdr_pair("Mail-Followup-To",
-                                                   ADDRESS_to_gchar(env->
-                                                                    mail_followup_to)));
+						   ADDRESS_to_gchar(env->
+							   mail_followup_to)));
 
     if (env->message_id)
 	res =
-	    g_list_prepend(res, libbalsa_create_hdr_pair("Message-ID",
-                                                        g_strdup(env->message_id)));
+	    g_list_append(res,
+			  libbalsa_create_hdr_pair("Message-ID",
+						  g_strdup(env->message_id)));
     
     for (tmp = env->references; tmp; tmp = tmp->next) {
 	res =
-	    g_list_prepend(res,
+	    g_list_append(res,
 			  libbalsa_create_hdr_pair("References",
-                                                   g_strdup(tmp->data)));
+						   g_strdup(tmp->data)));
     }
 
     for (tmp = env->in_reply_to; tmp; tmp = tmp->next) {
-        res = g_list_prepend(res, libbalsa_create_hdr_pair("In-Reply-To",
+        res = g_list_append(res, libbalsa_create_hdr_pair("In-Reply-To",
                                                           g_strdup(tmp->data)));
     }
 
     for (tmp = env->userhdrs; tmp; tmp = tmp->next) {
-	pair = g_strsplit(tmp->data, ":", 1);
+	pair = g_strsplit(tmp->data, ":", 2);
 	g_strchug(pair[1]);
-	res = g_list_prepend(res, pair);
+	res = g_list_append(res, pair);
     }
 
-    /* FIXME : Is order relevant here ? */
-    return g_list_reverse(res);
+    return res;
 }
+
+/* libbalsa_message_get_part_by_id:
+   return a message part identified by Content-ID=id
+   message must be referenced. (FIXME?)
+*/
+FILE*
+libbalsa_message_get_part_by_id(LibBalsaMessage* msg, const gchar* id)
+{
+    LibBalsaMessageBody* body = 
+	libbalsa_message_body_get_by_id(msg->body_list,	id);
+    if(!body) return NULL;
+    if(!libbalsa_message_body_save_temporary(body, NULL)) return NULL;
+    return fopen(body->temp_filename, "r");
+}
+
 
 gboolean
 libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
@@ -497,6 +529,7 @@ libbalsa_message_save(LibBalsaMessage * message, const gchar *filename)
 }
 
 /* libbalsa_messages_copy:
+   makes an assumption that all the messages come from the same mailbox.
 */
 gboolean
 libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
@@ -541,9 +574,35 @@ libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
     return r;
 }
 
+void
+libbalsa_message_reply(LibBalsaMessage * message)
+{
+    HEADER *cur;
+    GList * messages;
+
+    g_return_if_fail(message->mailbox);
+    LOCK_MAILBOX(message->mailbox);
+    RETURN_IF_CLIENT_CONTEXT_CLOSED(message->mailbox);
+
+    cur = message->header;
+
+    libbalsa_lock_mutt();
+    mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_REPLIED, TRUE);
+    libbalsa_unlock_mutt();
+
+    message->flags |= LIBBALSA_MESSAGE_FLAG_REPLIED;
+
+    UNLOCK_MAILBOX(message->mailbox);
+    messages = g_list_prepend(NULL, message);
+    libbalsa_mailbox_messages_status_changed(message->mailbox, messages,
+					     LIBBALSA_MESSAGE_FLAG_REPLIED);
+    g_list_free(messages);
+}
+
 /* Assume all messages come from the same mailbox */
 void
-libbalsa_messages_read(GList * messages, gboolean set)
+libbalsa_messages_read(GList * messages,
+		       gboolean set)
 {
     GList * notif_list = NULL;
     LibBalsaMessage * message;
@@ -588,6 +647,7 @@ libbalsa_messages_read(GList * messages, gboolean set)
     }
 }
 
+/* Assume all messages come from the same mailbox */
 void
 libbalsa_messages_flag(GList * messages, gboolean flag)
 {
@@ -635,47 +695,14 @@ libbalsa_messages_flag(GList * messages, gboolean flag)
     }
 }
 
-void
-libbalsa_message_reply(LibBalsaMessage * message)
-{
-    HEADER *cur;
-    GList * messages;
-
-    g_return_if_fail(message != NULL);
-    g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
-
-    if ( (message->flags & LIBBALSA_MESSAGE_FLAG_REPLIED)
- 	 || !message->mailbox)
-        return; /* no status change */
-
-    LOCK_MAILBOX(message->mailbox);
-    RETURN_IF_CLIENT_CONTEXT_CLOSED(message->mailbox);
-    libbalsa_lock_mutt();
-
-    cur = message->header;
-    mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_REPLIED, TRUE);
-
-    libbalsa_unlock_mutt();
-
-    message->flags |= LIBBALSA_MESSAGE_FLAG_REPLIED;
- 
-    UNLOCK_MAILBOX(message->mailbox);
-    messages = g_list_prepend(NULL, message);
-    libbalsa_mailbox_messages_status_changed(message->mailbox, messages,
-					     LIBBALSA_MESSAGE_FLAG_REPLIED);
-    g_list_free(messages);
-}
-
 /* Slightly optimized version for a list of message [un]deletions
    Assume that all messages are in the same mailbox
 */
 void
 libbalsa_messages_delete(GList * messages, gboolean del)
 {
-    LibBalsaMessage * message;
+    LibBalsaMessage * message = NULL;
     GList * notif_list = NULL;
-    g_return_if_fail(messages != NULL);
-    g_return_if_fail(LIBBALSA_IS_MESSAGE(messages->data));
 
     /* Construct the list of messages that actually change state */
     while (messages) {
@@ -742,7 +769,6 @@ mime_content_type2str(int contenttype)
    references the body of given message.
    NO OP for 'loose' messages (i.e not associated with any mailbox).
    returns TRUE for success, FALSE for failure (broken IMAP connection etc).
-   NOTE: all accesses to message->mailbox must lock mailbox first!
 */
 gboolean
 libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
@@ -757,27 +783,27 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
     LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE); 
     if(CLIENT_CONTEXT(message->mailbox)->hdrs==NULL ||
        (cur = message->header) == NULL) {
-        g_warning("Context damaged.");
-        UNLOCK_MAILBOX(message->mailbox); 
+	g_warning("Context damaged.");
+	UNLOCK_MAILBOX(message->mailbox); 
         return FALSE;
     }
 
+
     if (message->body_ref > 0) {
 	message->body_ref++;
-        UNLOCK_MAILBOX(message->mailbox); 
+	UNLOCK_MAILBOX(message->mailbox);
 	return TRUE;
     }
 
     msg = (MESSAGE *)g_malloc (sizeof (MESSAGE));
     msg->fp = libbalsa_mailbox_get_message_stream(message->mailbox, message);
-    
     if(! message->mailbox->disconnected ) {
 	if (!msg->fp) { /*FIXME: crude but necessary error handling */
 	    message->mailbox->disconnected = TRUE;
 	    message->mailbox->readonly = TRUE;
 	    libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-                                 "disconnected mode!");
-            UNLOCK_MAILBOX(message->mailbox);
+				 "disconnected mode!");
+	    UNLOCK_MAILBOX(message->mailbox);
 	    if(CLIENT_CONTEXT_CLOSED(message->mailbox) ||
 	       CLIENT_CONTEXT(message->mailbox)->hdrs == NULL) 
 		libbalsa_mailbox_close(message->mailbox);
@@ -786,8 +812,8 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
 	/* mx_open_message may have downloaded more headers (IMAP): */
 	libbalsa_message_headers_update(message);
 
-	fseek(msg->fp, cur->content->offset, 0);	
-    } else {  /* disconnected mode */
+	fseek(msg->fp, cur->content->offset, 0);
+    } else { /* disconnected mode */
 	if(!msg->fp) {
 	    g_free(msg);
 	    return FALSE;
@@ -796,17 +822,19 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
 	/* ugly ugly ugly */
 	cur->env = mutt_read_rfc822_header (msg->fp, cur, 1, 0); 
 	rewind(msg->fp);
-    }    
+    }
     if (cur->content->type == TYPEMULTIPART) {
 	libbalsa_lock_mutt();
-	cur->content->parts = 
+        cur->content->parts =
             mutt_parse_multipart(msg->fp,
-                                 mutt_get_parameter
-                                 ("boundary",
-                                  cur->content->parameter),
-                                 cur->content->offset + cur->content->length,
-                                 strcasecmp("digest",cur->content->subtype) 
-                                 == 0);
+                                 mutt_get_parameter("boundary",
+                                                    cur->content->
+                                                    parameter),
+                                 cur->content->offset +
+                                 cur->content->length,
+                                 g_ascii_strcasecmp("digest",
+                                                    cur->content->
+                                                    subtype) == 0);
 	libbalsa_unlock_mutt();
     } else
 	if (mutt_is_message_type
@@ -843,7 +871,7 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
      */
     if ((message->flags & LIBBALSA_MESSAGE_FLAG_NEW) && read) {
 	GList * messages = g_list_prepend(NULL, message);
-
+	
 	libbalsa_messages_read(messages, TRUE);
 	g_list_free(messages);
     }
@@ -859,28 +887,13 @@ libbalsa_message_body_unref(LibBalsaMessage * message)
     if (message->body_ref == 0)
 	return;
 
-    if(message->mailbox) { LOCK_MAILBOX(message->mailbox); }
-    if (--message->body_ref == 0) {
+   if(message->mailbox) { LOCK_MAILBOX(message->mailbox); }
+   if (--message->body_ref == 0) {
 	libbalsa_message_body_free(message->body_list);
 	message->body_list = NULL;
-    }
-    if(message->mailbox) { UNLOCK_MAILBOX(message->mailbox); }
+   }
+   if(message->mailbox) { UNLOCK_MAILBOX(message->mailbox); }
 }
-
-/* libbalsa_message_get_part_by_id:
-   return a message part identified by Content-ID=id
-   message must be referenced. (FIXME?)
-*/
-FILE*
-libbalsa_message_get_part_by_id(LibBalsaMessage* msg, const gchar* id)
-{
-    LibBalsaMessageBody* body = 
-	libbalsa_message_body_get_by_id(msg->body_list,	id);
-    if(!body) return NULL;
-    if(!libbalsa_message_body_save_temporary(body, NULL)) return NULL;
-    return fopen(body->temp_filename, "r");
-}
-
 
 gboolean
 libbalsa_message_is_multipart(LibBalsaMessage * message)
@@ -920,7 +933,7 @@ libbalsa_message_has_attachment(LibBalsaMessage * message)
 	      Content-disposition: attachment. Unfortunately, part list may
 	      not be available at this stage. */
     res = (msg_header->content->type==TYPEMULTIPART &&
-	    g_strcasecmp("mixed", msg_header->content->subtype)==0);
+	    g_ascii_strcasecmp("mixed", msg_header->content->subtype)==0);
 
     UNLOCK_MAILBOX(message->mailbox);
     return res;
@@ -1014,10 +1027,10 @@ libbalsa_message_set_dispnotify(LibBalsaMessage *message,
 {
     g_return_if_fail(message);
     if(message->dispnotify_to) 
-	gtk_object_unref(GTK_OBJECT(message->dispnotify_to));
+	g_object_unref(message->dispnotify_to);
     message->dispnotify_to = address;
     if(address)
-	gtk_object_ref(GTK_OBJECT(message->dispnotify_to));
+	g_object_ref(message->dispnotify_to);
 }
 
 #ifndef MESSAGE_COPY_CONTENT
@@ -1136,7 +1149,7 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
     /* Get fcc from message */
     for (tmp = cenv->userhdrs; tmp; tmp = tmp->next) {
         if (!message->fcc_url
-            && g_strncasecmp("X-Mutt-Fcc:", tmp->data, 11) == 0) {
+            && g_ascii_strncasecmp("X-Mutt-Fcc:", tmp->data, 11) == 0) {
             gchar *p = tmp->data + 11;
             SKIPWS(p);
 
@@ -1168,29 +1181,31 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
 	message->references = g_list_reverse(message->references);	
     }
     /* more! */
-    
-    if (!message->references_for_threading) {
-        GList *tmp = g_list_copy(message->references);
+    /* FIXME: message->references_for_threading is just the reverse of
+     * message->references; is there any reason to clutter up the
+     * message structure with it, and allocate memory for another set of
+     * g_strdup's? */
 
-        if (message->in_reply_to) {
-            /* some mailers provide in_reply_to but no references, and
-             * some apparently provide both but with the references in
-             * the wrong order; we'll just make sure it's the first item
-             * of this list (which will be the last after reversing it,
-             * below) */
-            GList *foo =
-                g_list_find_custom(tmp, message->in_reply_to,
-                                   (GCompareFunc) strcmp);
-                
-            if (foo) {
-                tmp = g_list_remove_link(tmp, foo);
-                g_list_free_1(foo);
-            }
+   if (!message->references_for_threading) {
+       GList *tmp = g_list_copy(message->references);
 
-            tmp = g_list_prepend(tmp, message->in_reply_to);
-        }
-
-        message->references_for_threading = g_list_reverse(tmp);
+       if (message->in_reply_to) {
+           /* some mailers provide in_reply_to but no references, and
+            * some apparently provide both but with the references in
+            * the wrong order; we'll just make sure it's the first item
+            * of this list (which will be the last after reversing it,
+            * below) */
+           GList *foo =
+               g_list_find_custom(tmp, message->in_reply_to,
+                                  (GCompareFunc) strcmp);
+               
+           if (foo) {
+               tmp = g_list_remove_link(tmp, foo);
+               g_list_free_1(foo);
+           }
+	   tmp = g_list_prepend(tmp, message->in_reply_to);
+       }
+       message->references_for_threading = g_list_reverse(tmp);
     }
 }
 
@@ -1260,8 +1275,10 @@ libbalsa_message_title(LibBalsaMessage * message, const gchar * format)
 
         tmp1 = libbalsa_truncate_string(tmp, length, dots);
         g_free(tmp);
-        g_string_append(string, tmp1);
-        g_free(tmp1);
+        if (tmp1) {
+            g_string_append(string, tmp1);
+            g_free(tmp1);
+        }
 
         if (c)
             ++format;
@@ -1275,21 +1292,3 @@ libbalsa_message_title(LibBalsaMessage * message, const gchar * format)
     return tmp;
 }
 
-
-LibBalsaMessage *
-libbalsa_message_find_by_message_id(LibBalsaMailbox * mailbox, gchar * msgid)
-{
-    LibBalsaMessage* message;
-    GList *list = NULL;
-    
-
-    for (list = mailbox->message_list; list; list = g_list_next(list)) {
-        message = list->data;
-        
-        if (g_strcasecmp(message->message_id, msgid) == 0) {
-            return message;
-        }
-    }
-
-    return NULL;
-}

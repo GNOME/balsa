@@ -23,6 +23,8 @@
 #ifndef __LIBBALSA_PRIVATE_H__
 #define __LIBBALSA_PRIVATE_H__
 
+#include <unistd.h>
+
 #include "libmutt/mutt.h"
 
 LibBalsaAddress *libbalsa_address_new_from_libmutt(ADDRESS * caddr);

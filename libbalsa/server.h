@@ -23,16 +23,19 @@
 #ifndef __LIBBALSA_SERVER_H__
 #define __LIBBALSA_SERVER_H__
 
-#include <gtk/gtkobject.h>
+#define LIBBALSA_TYPE_SERVER \
+    (libbalsa_server_get_type())
+#define LIBBALSA_SERVER(obj) \
+    (G_TYPE_CHECK_INSTANCE_CAST (obj, LIBBALSA_TYPE_SERVER, LibBalsaServer))
+#define LIBBALSA_SERVER_CLASS(klass) \
+    (G_TYPE_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_SERVER, \
+                              LibBalsaServerClass))
+#define LIBBALSA_IS_SERVER(obj) \
+    (G_TYPE_CHECK_INSTANCE_TYPE (obj, LIBBALSA_TYPE_SERVER))
+#define LIBBALSA_IS_SERVER_CLASS(klass) \
+    (G_TYPE_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_SERVER))
 
-
-#define LIBBALSA_TYPE_SERVER			(libbalsa_server_get_type())
-#define LIBBALSA_SERVER(obj)			(GTK_CHECK_CAST (obj, LIBBALSA_TYPE_SERVER, LibBalsaServer))
-#define LIBBALSA_SERVER_CLASS(klass)		(GTK_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_SERVER, LibBalsaServerClass))
-#define LIBBALSA_IS_SERVER(obj)		(GTK_CHECK_TYPE (obj, LIBBALSA_TYPE_SERVER))
-#define LIBBALSA_IS_SERVER_CLASS(klass)	(GTK_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_SERVER))
-
-GtkType libbalsa_server_get_type(void);
+GType libbalsa_server_get_type(void);
 
 typedef struct _LibBalsaServerClass LibBalsaServerClass;
 
@@ -43,7 +46,7 @@ typedef enum {
 } LibBalsaServerType;
 
 struct _LibBalsaServer {
-    GtkObject object;
+    GObject object;
 
     LibBalsaServerType type;
 
@@ -58,7 +61,7 @@ struct _LibBalsaServer {
 };
 
 struct _LibBalsaServerClass {
-    GtkObjectClass parent_class;
+    GObjectClass parent_class;
 
     void (*set_username) (LibBalsaServer * server, const gchar * name);
     void (*set_password) (LibBalsaServer * server, const gchar * passwd);
@@ -71,7 +74,7 @@ struct _LibBalsaServerClass {
     gchar *(*get_password) (LibBalsaServer * server);
 };
 
-GtkObject *libbalsa_server_new(LibBalsaServerType type);
+GObject *libbalsa_server_new(LibBalsaServerType type);
 
 void libbalsa_server_set_username(LibBalsaServer * server,
 				  const gchar * username);

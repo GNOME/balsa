@@ -23,16 +23,21 @@
 #ifndef __LIBBALSA_MAILBOX_H__
 #define __LIBBALSA_MAILBOX_H__
 
-#include <glib.h>
-#include <gtk/gtk.h>
+#include <gdk/gdk.h>
 
 #include "libbalsa.h"
 
-#define LIBBALSA_TYPE_MAILBOX			(libbalsa_mailbox_get_type())
-#define LIBBALSA_MAILBOX(obj)			(GTK_CHECK_CAST ((obj), LIBBALSA_TYPE_MAILBOX, LibBalsaMailbox))
-#define LIBBALSA_MAILBOX_CLASS(klass)		(GTK_CHECK_CLASS_CAST ((klass), LIBBALSA_TYPE_MAILBOX, LibBalsaMailboxClass))
-#define LIBBALSA_IS_MAILBOX(obj)		(GTK_CHECK_TYPE ((obj), LIBBALSA_TYPE_MAILBOX))
-#define LIBBALSA_IS_MAILBOX_CLASS(klass)	(GTK_CHECK_CLASS_TYPE ((klass), LIBBALSA_TYPE_MAILBOX))
+#define LIBBALSA_TYPE_MAILBOX \
+    (libbalsa_mailbox_get_type())
+#define LIBBALSA_MAILBOX(obj) \
+    (G_TYPE_CHECK_INSTANCE_CAST ((obj), LIBBALSA_TYPE_MAILBOX, LibBalsaMailbox))
+#define LIBBALSA_MAILBOX_CLASS(klass) \
+    (G_TYPE_CHECK_CLASS_CAST ((klass), LIBBALSA_TYPE_MAILBOX, \
+                              LibBalsaMailboxClass))
+#define LIBBALSA_IS_MAILBOX(obj) \
+    (G_TYPE_CHECK_INSTANCE_TYPE ((obj), LIBBALSA_TYPE_MAILBOX))
+#define LIBBALSA_IS_MAILBOX_CLASS(klass) \
+    (G_TYPE_CHECK_CLASS_TYPE ((klass), LIBBALSA_TYPE_MAILBOX))
 
 /*
  * enums
@@ -100,7 +105,7 @@ struct _LibBalsaMailboxAppendHandle {
 typedef struct _LibBalsaMailboxClass LibBalsaMailboxClass;
 
 struct _LibBalsaMailbox {
-    GtkObject object;
+    GObject object;
 
     gchar *config_prefix;       /* unique string identifying mailbox */
                                 /* in the config file                */
@@ -142,7 +147,7 @@ struct _LibBalsaMailbox {
 };
 
 struct _LibBalsaMailboxClass {
-    GtkObjectClass parent_class;
+    GObjectClass parent_class;
 
     /* Signals */
     gboolean (*open_mailbox) (LibBalsaMailbox * mailbox);
@@ -168,12 +173,14 @@ struct _LibBalsaMailboxClass {
     FILE *(*get_message_stream) (LibBalsaMailbox * mailbox,
 				 LibBalsaMessage * message);
     void (*check) (LibBalsaMailbox * mailbox);
+    GHashTable* (*get_matching)(LibBalsaMailbox * mailbox,
+                                int op, GSList* conditions);
     void (*save_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
     void (*load_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
 };
 
 
-GtkType libbalsa_mailbox_get_type(void);
+GType libbalsa_mailbox_get_type(void);
 
 LibBalsaMailbox *libbalsa_mailbox_new_from_config(const gchar * prefix);
 
@@ -193,7 +200,6 @@ void libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox);
 void libbalsa_mailbox_free_messages(LibBalsaMailbox * mailbox);
 void libbalsa_mailbox_remove_messages(LibBalsaMailbox * mbox,
 				      GList * messages);
-
 void libbalsa_mailbox_set_unread_messages_flag(LibBalsaMailbox * mailbox,
 					       gboolean has_unread);
 void libbalsa_mailbox_progress_notify(LibBalsaMailbox * mailbox,
@@ -206,6 +212,9 @@ gint libbalsa_mailbox_sync_backend(LibBalsaMailbox * mailbox, gboolean delete);
 
 void libbalsa_mailbox_check(LibBalsaMailbox * mailbox);
 
+GHashTable*libbalsa_mailbox_get_matching(LibBalsaMailbox * mailbox,
+                                         int op, GSList* conditions);
+
 void libbalsa_mailbox_save_config(LibBalsaMailbox * mailbox,
 				  const gchar * prefix);
 void libbalsa_mailbox_load_config(LibBalsaMailbox * mailbox,
@@ -216,11 +225,10 @@ void libbalsa_mailbox_save_view(LibBalsaMailbox * mailbox);
 /*
  * misc mailbox releated functions
  */
-GtkType libbalsa_mailbox_type_from_path(const gchar * filename);
+GType libbalsa_mailbox_type_from_path(const gchar * filename);
 gboolean libbalsa_mailbox_commit(LibBalsaMailbox* mailbox);
 
 void libbalsa_mailbox_messages_status_changed(LibBalsaMailbox * mbox,
 					      GList * messages,
 					      gint flag);
-
 #endif				/* __LIBBALSA_MAILBOX_H__ */

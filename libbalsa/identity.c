@@ -24,106 +24,57 @@
 #include "config.h"
 #include "identity.h"
 
-#define gnome_stock_button_with_label(p,l) gtk_button_new_with_label(l)
+/*
+ * The class.
+ */
 
 static GtkObjectClass* parent_class;
-static const gchar* default_ident_name = N_("Default");
-static const guint padding = 4;
 
+/* Forward references. */
 static void libbalsa_identity_class_init(LibBalsaIdentityClass* klass);
 static void libbalsa_identity_init(LibBalsaIdentity* ident);
+static void libbalsa_identity_finalize(GObject* object);
 
-static void libbalsa_identity_destroy(GtkObject* object);
-
-static void new_ident_cb(GtkButton* , gpointer);
-static void edit_ident_cb(GtkButton* , gpointer);
-static void set_default_ident_cb(GtkButton* , gpointer);
-static void delete_ident_cb(GtkWidget* , gpointer);
-static void delete_confirm_cb(gint reply, gpointer user_data);
-static void identity_list_update(GtkCList* clist);
-static void config_frame_button_select_cb(GtkCList* clist, 
-                                          gint row, 
-                                          gint column, 
-                                          GdkEventButton* event, 
-                                          gpointer user_data);
-
-static GtkWidget* setup_ident_dialog(GtkWindow* parent, gboolean createp, 
-				     LibBalsaIdentity*, 
-				     GtkSignalFunc, gpointer);
-static void ident_dialog_add_cb(GtkButton*, gpointer);
-static void ident_dialog_edit_cb(GtkButton*, gpointer);
-static void ident_dialog_cancel_cb(GtkButton*, gpointer);
-static int ident_dialog_close_cb(GnomeDialog*, gpointer);
-static void ident_dialog_add_checkbutton(GnomeDialog*, const gchar*, 
-                                         const gchar*, gboolean);
-static GtkWidget* ident_dialog_add_entry(GnomeDialog*, const gchar*,
-					 const gchar*, gchar*);
-static gchar* ident_dialog_get_text(GnomeDialog*, const gchar*);
-static gboolean ident_dialog_get_bool(GnomeDialog*, const gchar*);
-static gboolean ident_dialog_update(GnomeDialog*);
-static void config_dialog_ok_cb(GtkButton* button, gpointer user_data);
-static void config_dialog_select_cb(GtkCList* clist, gint row, gint column,
-                                    GdkEventButton* event, gpointer user_data);
-
-static GtkWidget* libbalsa_identity_display_frame(void);
-static void  display_frame_add_field(GtkFrame* frame, GtkBox* box, 
-                                     const gchar* name, const gchar* key);
-static void display_frame_add_boolean(GtkFrame* frame, GtkBox* box,
-                                      const gchar* name, const gchar* key);
-static void display_frame_update(GtkFrame* frame, LibBalsaIdentity* ident);
-static void display_frame_set_field(GtkFrame* frame, const gchar* key, 
-                                    const gchar* value);
-static void display_frame_set_boolean(GtkFrame* frame, const gchar* key, 
-                                      gboolean value);
-
-
-static void select_dialog_row_cb(GtkCList* clist, 
-                                 gint row, 
-                                 gint column, 
-                                 GdkEventButton* event, 
-                                 gpointer user_data);
-
-
-GtkType
+GType
 libbalsa_identity_get_type()
 {
-    static GtkType libbalsa_identity_type = 0;
-    
+    static GType libbalsa_identity_type = 0;
+
     if (!libbalsa_identity_type) {
-        static const GtkTypeInfo libbalsa_identity_info = 
-            {
-                "LibBalsaIdentity",
-                sizeof(LibBalsaIdentity),
-                sizeof(LibBalsaIdentityClass),
-                (GtkClassInitFunc) libbalsa_identity_class_init,
-                (GtkObjectInitFunc) libbalsa_identity_init,
-                /* reserved_1 */ NULL,
-                /* reserved_2 */ NULL,
-                (GtkClassInitFunc) NULL
-            };
-        
-        libbalsa_identity_type = 
-            gtk_type_unique(gtk_object_get_type(), &libbalsa_identity_info);
+        static const GTypeInfo libbalsa_identity_info = {
+            sizeof(LibBalsaIdentityClass),
+            NULL,               /* base_init */
+            NULL,               /* base_finalize */
+            (GClassInitFunc) libbalsa_identity_class_init,
+            NULL,               /* class_finalize */
+            NULL,               /* class_data */
+            sizeof(LibBalsaIdentity),
+            0,                  /* n_preallocs */
+            (GInstanceInitFunc) libbalsa_identity_init,
+        };
+
+        libbalsa_identity_type =
+            g_type_register_static(G_TYPE_OBJECT,
+                                   "LibBalsaIdentity",
+                                   &libbalsa_identity_info, 0);
     }
     
     return libbalsa_identity_type;
 }
 
-
 static void
 libbalsa_identity_class_init(LibBalsaIdentityClass* klass)
 {
-    GtkObjectClass* object_class;
+    GObjectClass* object_class;
 
-    parent_class = gtk_type_class(gtk_object_get_type());
+    parent_class = g_type_class_peek_parent(klass);
 
-    object_class = GTK_OBJECT_CLASS(klass);
-    object_class->destroy = libbalsa_identity_destroy;
+    object_class = G_OBJECT_CLASS(klass);
+    object_class->finalize = libbalsa_identity_finalize;
 }
 
-
 /* 
- * Class inititialization function, set defaults for new objects
+ * Instance inititialization function: set defaults for new objects.
  */
 static void
 libbalsa_identity_init(LibBalsaIdentity* ident)
@@ -144,50 +95,15 @@ libbalsa_identity_init(LibBalsaIdentity* ident)
     ident->sig_prepend = FALSE;
 }
 
-
-/* 
- * Create a new object with the identity name "Default".  Does not add
- * it to the list of identities for the application.
- */
-GtkObject* 
-libbalsa_identity_new(void) 
-{
-    LibBalsaIdentity* ident;
-    
-    ident = LIBBALSA_IDENTITY(gtk_type_new(LIBBALSA_TYPE_IDENTITY));
-    ident->identity_name = g_strdup(default_ident_name);
-    return GTK_OBJECT(ident);
-}
-
-
-/*
- * Create a new object with the specified identity name.  Does not add
- * it to the list of identities for the application.
- */
-GtkObject*
-libbalsa_identity_new_with_name(const gchar* ident_name)
-{
-    LibBalsaIdentity* ident;
-    
-    ident = LIBBALSA_IDENTITY(gtk_type_new(LIBBALSA_TYPE_IDENTITY));
-    ident->identity_name = g_strdup(ident_name);
-    return GTK_OBJECT(ident);
-}
-
-
 /* 
  * Destroy the object, freeing all the values in the process.
  */
 static void
-libbalsa_identity_destroy(GtkObject* object)
+libbalsa_identity_finalize(GObject * object)
 {
-    LibBalsaIdentity* ident;
-    
-    g_return_if_fail(object != NULL);
-    
-    ident = LIBBALSA_IDENTITY(object);
+    LibBalsaIdentity *ident = LIBBALSA_IDENTITY(object);
 
-    gtk_object_destroy(GTK_OBJECT(ident->address));
+    g_object_unref(ident->address);
     g_free(ident->identity_name);
     g_free(ident->replyto);
     g_free(ident->domain);
@@ -196,9 +112,39 @@ libbalsa_identity_destroy(GtkObject* object)
     g_free(ident->forward_string);
     g_free(ident->signature_path);
 
-    if (GTK_OBJECT_CLASS(parent_class)->destroy)
-	(*GTK_OBJECT_CLASS(parent_class)->destroy) (object);
+    G_OBJECT_CLASS(parent_class)->finalize(object);
 }
+
+/*
+ * Public methods.
+ */
+
+/* 
+ * Create a new object with the default identity name.  Does not add
+ * it to the list of identities for the application.
+ */
+GObject* 
+libbalsa_identity_new(void) 
+{
+    return libbalsa_identity_new_with_name(_("New Identity"));
+}
+
+
+/*
+ * Create a new object with the specified identity name.  Does not add
+ * it to the list of identities for the application.
+ */
+GObject*
+libbalsa_identity_new_with_name(const gchar* ident_name)
+{
+    LibBalsaIdentity* ident;
+    
+    ident = LIBBALSA_IDENTITY(g_object_new(LIBBALSA_TYPE_IDENTITY, NULL));
+    libbalsa_identity_set_identity_name(ident, ident_name);
+
+    return G_OBJECT(ident);
+}
+
 
 void
 libbalsa_identity_set_identity_name(LibBalsaIdentity* ident, const gchar* name)
@@ -215,9 +161,7 @@ libbalsa_identity_set_address(LibBalsaIdentity* ident, LibBalsaAddress* ad)
 {
     g_return_if_fail(ident != NULL);
     
-    gtk_object_unref(GTK_OBJECT(ident->address));
-    gtk_object_ref(GTK_OBJECT(ad));
-    gtk_object_sink(GTK_OBJECT(ad));
+    g_object_unref(ident->address);
     ident->address = ad;
 }
 
@@ -281,6 +225,7 @@ libbalsa_identity_set_signature_path(LibBalsaIdentity* ident, const gchar* path)
     ident->signature_path = g_strdup(path);
 }
 
+
 void
 libbalsa_identity_set_sig_executable(LibBalsaIdentity* ident, gboolean sig_executable)
 {
@@ -328,283 +273,444 @@ libbalsa_identity_set_sig_prepend(LibBalsaIdentity* ident, gboolean prepend)
     ident->sig_prepend = prepend;
 }
 
-struct IdentitySelectDialog {
-    LibBalsaIdentity * ident;
-    gboolean close_ok;
+/* Used by both dialogs: */
+
+/* Widget padding: */
+static const guint padding = 4;
+
+/* Forward references: */
+static void identity_list_update_real(GtkTreeView * tree,
+                                      GList * identities,
+                                      LibBalsaIdentity * default_id);
+static GtkWidget *libbalsa_identity_tree(GCallback toggled_cb,
+                                         gpointer toggled_data,
+                                         gchar * toggled_title);
+
+/*
+ * The Select Identity dialog; called from compose window.
+ */
+
+/* Info passed to callbacks: */
+struct SelectDialogInfo_ {
+    LibBalsaIdentityCallback update;
+    gpointer data;
+    GtkWidget *tree;
+    GtkWidget *dialog;
+    GtkWindow *parent;
+    guint idle_handler_id;
+};
+typedef struct SelectDialogInfo_ SelectDialogInfo;
+
+/* Forward references: */
+static void sd_destroy_notify(SelectDialogInfo * sdi);
+static void sd_response_cb(GtkWidget * dialog, gint response,
+                           SelectDialogInfo * sdi);
+static void sd_idle_add_response_ok(SelectDialogInfo * sdi);
+static gboolean sd_response_ok(SelectDialogInfo * sdi);
+
+/* Tree columns: */
+enum {
+    DEFAULT_COLUMN,
+    NAME_COLUMN,
+    IDENT_COLUMN,
+    N_COLUMNS
 };
 
-LibBalsaIdentity*
-libbalsa_identity_select_dialog(GtkWindow* parent, const gchar* prompt,
-				GList** identities, LibBalsaIdentity** defid)
+/* 
+ * Public method: create and show the dialog.
+ */
+#define LIBBALSA_IDENTITY_SELECT_DIALOG_KEY "libbalsa-identity-select-dialog"
+void
+libbalsa_identity_select_dialog(GtkWindow * parent,
+                                const gchar * prompt,
+                                GList * identities,
+                                LibBalsaIdentity * initial_id,
+                                LibBalsaIdentityCallback update,
+                                gpointer data)
 {
-    struct IdentitySelectDialog isd;
-    GtkWidget* frame1 = gtk_frame_new(NULL);
-    GtkWidget* clist = gtk_clist_new(2);
-    GtkWidget* dialog, *scrolledwindow;
-    gint choice = 1;
+    GtkWidget *dialog;
+    GtkWidget *tree;
+    SelectDialogInfo *sdi;
+    GtkWidget *frame;
 
-    isd.ident = NULL;
-    isd.close_ok = FALSE;
+    /* Show only one dialog at a time. */
+    sdi = g_object_get_data(G_OBJECT(parent),
+                            LIBBALSA_IDENTITY_SELECT_DIALOG_KEY);
+    if (sdi) {
+        gdk_window_raise(sdi->dialog->window);
+        return;
+    }
 
-    gtk_object_set_data(GTK_OBJECT(clist), "parent-window", parent);
-    gtk_object_set_data(GTK_OBJECT(clist), "identities", identities);
-    gtk_object_set_data(GTK_OBJECT(clist), "default-id", defid);
-    dialog = gnome_dialog_new(prompt, 
-                              GNOME_STOCK_BUTTON_OK,
-                              GNOME_STOCK_BUTTON_CANCEL,
-                              NULL);
-    gtk_window_set_wmclass(GTK_WINDOW(dialog), "select-identity", "Balsa");
+    sdi = g_new(SelectDialogInfo, 1);
+    sdi->parent = parent;
+    g_object_set_data_full(G_OBJECT(parent),
+                           LIBBALSA_IDENTITY_SELECT_DIALOG_KEY,
+                           sdi, (GDestroyNotify) sd_destroy_notify);
+    sdi->update = update;
+    sdi->data = data;
+    sdi->idle_handler_id = 0;
+    sdi->dialog = dialog =
+        gtk_dialog_new_with_buttons(prompt, parent,
+                                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                    GTK_STOCK_OK, GTK_RESPONSE_OK,
+                                    NULL);
+    g_signal_connect(G_OBJECT(dialog), "response",
+                     G_CALLBACK(sd_response_cb), sdi);
+    gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
 
-    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(dialog)->vbox), 
-                       frame1, TRUE, TRUE, 0);
-    scrolledwindow = gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledwindow),
-                                   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-    gtk_container_add(GTK_CONTAINER(scrolledwindow), clist);
-    gtk_container_add(GTK_CONTAINER(frame1), scrolledwindow);
-    gtk_container_set_border_width(GTK_CONTAINER(frame1), padding);
-    gtk_widget_show_all(frame1);
+    sdi->tree = tree =
+        libbalsa_identity_tree(G_CALLBACK(sd_idle_add_response_ok), sdi,
+                               _("Current"));
+    g_signal_connect_swapped(G_OBJECT(tree), "row-activated",
+                             G_CALLBACK(sd_idle_add_response_ok), sdi);
+    identity_list_update_real(GTK_TREE_VIEW(tree), identities, initial_id);
 
-    gtk_clist_column_titles_hide(GTK_CLIST(clist));
-    gtk_clist_set_row_height(GTK_CLIST(clist), 0);
-    gtk_clist_set_column_min_width(GTK_CLIST(clist), 0, 20);
-    gtk_clist_set_column_min_width(GTK_CLIST(clist), 1, 200);
-    gtk_clist_set_column_auto_resize(GTK_CLIST(clist), 1, TRUE);
-    gtk_widget_set_usize(GTK_WIDGET(clist), 200, 200);
-    gtk_signal_connect(GTK_OBJECT(clist), "select-row",
-                       GTK_SIGNAL_FUNC(select_dialog_row_cb),
-                       &isd);
-    identity_list_update(GTK_CLIST(clist));
+    frame = gtk_frame_new(NULL);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox),
+                       frame, TRUE, TRUE, 0);
+    gtk_container_add(GTK_CONTAINER(frame), tree);
+    gtk_container_set_border_width(GTK_CONTAINER(frame), padding);
 
-
-    gnome_dialog_set_close(GNOME_DIALOG(dialog), TRUE);
-    gnome_dialog_set_parent(GNOME_DIALOG(dialog), parent);
-    /* default action=Enter is to select the identity */
-    gnome_dialog_set_default(GNOME_DIALOG(dialog), 0);
-
-    choice = gnome_dialog_run(GNOME_DIALOG(dialog));
-    
-    if (choice != 0 && !isd.close_ok)
-        return NULL;
-    
-    return isd.ident;
+    gtk_widget_show_all(dialog);
+    gtk_widget_grab_focus(tree);
 }
 
-
+/* GDestroyNotify for sdi. */
 static void
-select_dialog_row_cb(GtkCList* clist, 
-                     gint row, 
-                     gint column, 
-                     GdkEventButton* event, 
-		     gpointer user_data)
+sd_destroy_notify(SelectDialogInfo * sdi)
 {
-    struct IdentitySelectDialog *isd_p = user_data;
-
-    if (event && event->type == GDK_2BUTTON_PRESS) {
-        /* it's a double-click:
-         * isd->ident was set in the callback from the first click,
-         * so we can set close_ok and close the dialog
-         *
-         * if we wanted to make this dialog single-click
-         * (select-and-close), we'd ignore the GdkEventButton and just
-         * set the identity then close the dialog (we'd also want to
-         * remove the `OK' button from the dialog)
-         * */
-        isd_p->close_ok = TRUE;
-        gnome_dialog_close(GNOME_DIALOG
-                           (gtk_widget_get_ancestor
-                            (GTK_WIDGET(clist), GTK_TYPE_WINDOW)));
-    } else
-        isd_p->ident =
-            LIBBALSA_IDENTITY(gtk_clist_get_row_data(clist, row));
+    if (sdi->idle_handler_id) {
+        gtk_idle_remove(sdi->idle_handler_id);
+        sdi->idle_handler_id = 0;
+    }
+    g_free(sdi);
 }
 
+/* Callback for the dialog's "response" signal. */
+static void
+sd_response_cb(GtkWidget * dialog, gint response, SelectDialogInfo * sdi)
+{
+    if (response == GTK_RESPONSE_OK) {
+        GtkTreeSelection *selection =
+            gtk_tree_view_get_selection(GTK_TREE_VIEW(sdi->tree));
+        GtkTreeModel *model;
+        GtkTreeIter iter;
 
+        if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
+            LibBalsaIdentity *identity;
+
+            gtk_tree_model_get(model, &iter, IDENT_COLUMN, &identity, -1);
+            sdi->update(sdi->data, identity);
+        }
+    }
+
+    /* Clear the data set on the parent window, so we know that the
+     * dialog was destroyed. This will also trigger the GDestroyNotify
+     * function, sd_destroy_notify.
+     */
+    g_object_set_data(G_OBJECT(sdi->parent),
+                      LIBBALSA_IDENTITY_SELECT_DIALOG_KEY,
+                      NULL);
+
+    gtk_widget_destroy(dialog);
+}
+
+/* Helper for adding idles. */
+static void
+sd_idle_add_response_ok(SelectDialogInfo * sdi)
+{
+    if (!sdi->idle_handler_id)
+        sdi->idle_handler_id =
+            gtk_idle_add((GtkFunction) sd_response_ok, sdi);
+}
+
+/* Idle handler for sending the OK response to the dialog. */
+static gboolean
+sd_response_ok(SelectDialogInfo * sdi)
+{
+    gdk_threads_enter();
+    if (sdi->idle_handler_id) {
+        sdi->idle_handler_id = 0;
+        gtk_dialog_response(GTK_DIALOG(sdi->dialog), GTK_RESPONSE_OK);
+    }
+    gdk_threads_leave();
+    return FALSE;
+}
+
+/*
+ * The Manage Identities dialog; called from main window.
+ */
+
+#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
+
+/* button actions */
+static gboolean close_cb(GtkWidget * dialog);
+static void new_ident_cb(GtkTreeView * tree, GtkWidget * dialog);
+static void delete_ident_cb(GtkTreeView * tree, GtkWidget * dialog);
+static void help_ident_cb(void);
+
+static void set_default_ident_cb(GtkTreeView * tree, GtkTreePath * path,
+                                 GtkTreeViewColumn * column,
+                                 gpointer data);
+static void config_frame_button_select_cb(GtkTreeSelection * selection,
+                                          GtkDialog * dialog);
+
+static void ident_dialog_add_checkbutton(GtkWidget *, gint, GtkDialog *,
+                                         const gchar *, const gchar *);
+static void ident_dialog_add_entry(GtkWidget *, gint, GtkDialog *,
+                                   const gchar *, const gchar *);
+static gchar *ident_dialog_get_text(GtkDialog *, const gchar *);
+static gboolean ident_dialog_get_bool(GtkDialog *, const gchar *);
+static gboolean ident_dialog_update(GtkDialog *);
+static void config_dialog_select(GtkTreeSelection * selection,
+                                 GtkDialog * dialog);
+
+static void display_frame_update(GtkDialog * dialog, LibBalsaIdentity* ident);
+static void display_frame_set_field(GtkDialog * dialog, const gchar* key, 
+                                    const gchar* value);
+static void display_frame_set_boolean(GtkDialog * dialog, const gchar* key, 
+                                      gboolean value);
+
+
+static void identity_list_update(GtkTreeView * tree);
+static gboolean select_identity(GtkTreeView * tree,
+                                LibBalsaIdentity * identity);
+static LibBalsaIdentity *get_selected_identity(GtkTreeView * tree);
+static void md_response_cb(GtkWidget * dialog, gint response,
+                           GtkTreeView * tree);
+static void md_sig_path_changed(GtkEntry * sig_path, GObject * dialog);
+
+/* Callback for the "toggled" signal of the "Default" column. */
+static void
+toggle_cb(GtkCellRendererToggle * cellrenderertoggle, gchar * path,
+          GtkTreeView * tree)
+{
+    GtkTreeModel *model = gtk_tree_view_get_model(tree);
+    GtkTreeIter iter;
+
+    if (gtk_tree_model_get_iter_from_string(model, &iter, path)) {
+        LibBalsaIdentity *identity, **default_id;
+
+        gtk_tree_model_get(model, &iter, IDENT_COLUMN, &identity, -1);
+        default_id = g_object_get_data(G_OBJECT(tree), "default-id");
+        *default_id = identity;
+        identity_list_update(tree);
+    }
+}
+
+/*
+ * Common code for making a GtkTreeView list of identities:
+ *
+ * toggled_cb           callback for the "toggled" signal of the boolean
+ *                      column;
+ * toggled_data         user_data for the callback;
+ * toggled_title        title for the boolean column.
+ */
+static GtkWidget *
+libbalsa_identity_tree(GCallback toggled_cb, gpointer toggled_data,
+                       gchar * toggled_title)
+{
+    GtkListStore *store;
+    GtkWidget *tree;
+    GtkCellRenderer *renderer;
+    GtkTreeViewColumn *column;
+
+    store = gtk_list_store_new(N_COLUMNS,
+                               G_TYPE_BOOLEAN,
+                               G_TYPE_STRING,
+                               G_TYPE_POINTER);
+
+    tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+    g_object_unref(store);
+
+    renderer = gtk_cell_renderer_toggle_new();
+    if (toggled_data)
+        g_signal_connect_swapped(G_OBJECT(renderer), "toggled",
+                                 toggled_cb, toggled_data);
+    else
+        g_signal_connect(G_OBJECT(renderer), "toggled",
+                         toggled_cb, tree);
+    column =
+        gtk_tree_view_column_new_with_attributes(toggled_title, renderer,
+                                                 "radio", DEFAULT_COLUMN,
+                                                 NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
+
+    renderer = gtk_cell_renderer_text_new();
+    column = gtk_tree_view_column_new_with_attributes("Name", renderer,
+                                                      "text", NAME_COLUMN,
+                                                      NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
+
+    return tree;
+}
 
 /*
  * Create and return a frame containing a list of the identities in
  * the application and a number of buttons to edit, create, and delete
  * identities.  Also provides a way to set the default identity.
  */
-GtkWidget* 
-libbalsa_identity_config_frame(gboolean with_buttons, GList** identities,
+static GtkWidget* 
+libbalsa_identity_config_frame(GList** identities,
 			       LibBalsaIdentity** defid)
 {
-
     GtkWidget* config_frame = gtk_frame_new(NULL);
-    GtkWidget* hbox = gtk_hbox_new(FALSE, padding);
-    GtkWidget* vbox;
-    GtkWidget* clist = gtk_clist_new(2);
-    GtkWidget* buttons[4];
-    gint i = 0;
+    GtkWidget *tree;
 
     gtk_container_set_border_width(GTK_CONTAINER(config_frame), 0);
-    gtk_container_set_border_width(GTK_CONTAINER(hbox), padding);
-    gtk_container_add(GTK_CONTAINER(config_frame), hbox);
-    gtk_box_pack_start(GTK_BOX(hbox), clist, TRUE, TRUE, 0);
     
-    if (with_buttons) {
-        vbox = gtk_vbox_new(FALSE, padding);
-        gtk_box_pack_end(GTK_BOX(hbox), vbox, FALSE, FALSE, 0);
+    tree = libbalsa_identity_tree(G_CALLBACK(toggle_cb), NULL,
+                                  _("Default"));
+    g_signal_connect(G_OBJECT(tree), "row-activated",
+                     G_CALLBACK(set_default_ident_cb), NULL);
+    g_object_set_data(G_OBJECT(tree), "identities", identities);
+    g_object_set_data(G_OBJECT(tree), "default-id", defid);
 
-        buttons[0] = gnome_stock_button(GNOME_STOCK_PIXMAP_NEW);
-        gtk_signal_connect(GTK_OBJECT(buttons[0]), "clicked",
-                           GTK_SIGNAL_FUNC(new_ident_cb), clist);
-        
-        buttons[1] = 
-	    gnome_stock_button_with_label(GNOME_STOCK_PIXMAP_PROPERTIES, 
-					  _("Edit"));
-        gtk_signal_connect(GTK_OBJECT(buttons[1]), "clicked",
-                           GTK_SIGNAL_FUNC(edit_ident_cb), clist);
-        
-        buttons[2] = gnome_stock_button_with_label(GNOME_STOCK_PIXMAP_ADD, 
-						   _("Set Default"));
-        gtk_signal_connect(GTK_OBJECT(buttons[2]), "clicked",
-                           GTK_SIGNAL_FUNC(set_default_ident_cb), clist);
-        
-        buttons[3] = gnome_stock_button(GNOME_STOCK_PIXMAP_REMOVE);
-        gtk_signal_connect(GTK_OBJECT(buttons[3]), "clicked",
-                           GTK_SIGNAL_FUNC(delete_ident_cb), clist);
-        
-        gtk_box_pack_start(GTK_BOX(vbox), buttons[0], FALSE, FALSE, 0);
-        gtk_box_pack_start(GTK_BOX(vbox), buttons[1], FALSE, FALSE, 0);
-        gtk_box_pack_start(GTK_BOX(vbox), buttons[2], FALSE, FALSE, 0);
-        gtk_box_pack_start(GTK_BOX(vbox), buttons[3], FALSE, FALSE, 0);
-	
-        for (i = 1; i < 4; ++i) {
-            gtk_signal_connect(GTK_OBJECT(clist), "select-row",
-                               GTK_SIGNAL_FUNC(config_frame_button_select_cb),
-                               buttons[i]);
-	}
-    }
+    gtk_container_add(GTK_CONTAINER(config_frame), tree);
 
-    gtk_clist_column_titles_hide(GTK_CLIST(clist));
-    gtk_clist_set_row_height(GTK_CLIST(clist), 0);
-    gtk_clist_set_column_min_width(GTK_CLIST(clist), 0, 20);
-    gtk_clist_set_column_min_width(GTK_CLIST(clist), 1, 200);
-    gtk_clist_set_column_auto_resize(GTK_CLIST(clist), 1, TRUE);
-    gtk_widget_set_usize(GTK_WIDGET(clist), 200, 200);
-    gtk_clist_set_selection_mode(GTK_CLIST(clist), GTK_SELECTION_BROWSE);
-
-    gtk_object_set_data(GTK_OBJECT(clist), "identities", identities);
-    gtk_object_set_data(GTK_OBJECT(clist), "default-id", defid);
-    identity_list_update(GTK_CLIST(clist));
-    gtk_object_set_data(GTK_OBJECT(config_frame), "clist", clist);
+    identity_list_update(GTK_TREE_VIEW(tree));
 
     return config_frame;
 }
 
+static gint
+compare_identities(LibBalsaIdentity *id1, LibBalsaIdentity *id2)
+{
+    return g_ascii_strcasecmp(id1->identity_name, id2->identity_name);
+}
 
 /* identity_list_update:
  * Update the list of identities in the config frame, displaying the
  * available identities in the application, and which is default.
- * We need to tempararily switch to selection mode single to avoid row 
- * autoselection when there is no data attached to it yet (between
- * gtk_clist_append() and gtk_clist_set_row_data()).
  */
 static void
-identity_list_update(GtkCList* clist)
+identity_list_update(GtkTreeView * tree)
 {
-    LibBalsaIdentity* ident;
-    GdkPixmap* pixmap = NULL;
-    GdkPixmap* bitmap = NULL;
-    GList** identities, *list;
-    LibBalsaIdentity* *default_id, *current;
-    gchar* text[2];
-    gint i = 0;
+    GList **identities =
+        g_object_get_data(G_OBJECT(tree), "identities");
+    LibBalsaIdentity **default_id =
+        g_object_get_data(G_OBJECT(tree), "default-id");
 
-    text[0] = NULL;
+    identity_list_update_real(tree, *identities, *default_id);
+}
 
-    identities = gtk_object_get_data(GTK_OBJECT(clist), "identities");
-    default_id = gtk_object_get_data(GTK_OBJECT(clist), "default-id");
+static void
+identity_list_update_real(GtkTreeView * tree,
+                          GList * identities,
+                          LibBalsaIdentity * default_id)
+{
+    GtkListStore *store = GTK_LIST_STORE(gtk_tree_view_get_model(tree));
+    GList *sorted, *list;
+    LibBalsaIdentity *current;
+    GtkTreeIter iter;
 
-    if(clist->selection) {
-	i = GPOINTER_TO_INT(clist->selection->data);
-	current = LIBBALSA_IDENTITY(gtk_clist_get_row_data(clist, i));
-    } else current = *default_id;
-    gtk_clist_set_selection_mode(clist, GTK_SELECTION_SINGLE);
+    current = get_selected_identity(tree);
 
-    gtk_clist_freeze(clist);
-    gtk_clist_clear(clist);
+    gtk_list_store_clear(store);
     
-    for (list = *identities; list; list = g_list_next(list)) {
-        ident = LIBBALSA_IDENTITY(list->data);
-        text[1] = ident->identity_name;
-        i = gtk_clist_append(clist, text);
-        gtk_clist_set_row_data(clist, i, ident);
+    sorted = g_list_sort(g_list_copy(identities),
+                         (GCompareFunc) compare_identities);
+    for (list = sorted; list; list = g_list_next(list)) {
+        LibBalsaIdentity* ident = LIBBALSA_IDENTITY(list->data);
+        gtk_list_store_append(store, &iter);
+        gtk_list_store_set(store, &iter,
+                           DEFAULT_COLUMN, ident == default_id,
+                           NAME_COLUMN, ident->identity_name,
+                           IDENT_COLUMN, ident,
+                           -1);
+    }
+    g_list_free(sorted);
+
+    if (!select_identity(tree, current))
+        select_identity(tree, default_id);
+}
+
+static gboolean
+select_identity(GtkTreeView * tree, LibBalsaIdentity * identity)
+{
+    GtkTreeModel *model = gtk_tree_view_get_model(tree);
+    GtkTreeIter iter;
+    gboolean valid;
+    
+    for (valid = gtk_tree_model_get_iter_first(model, &iter);
+         valid;
+         valid = gtk_tree_model_iter_next(model, &iter)) {
+        LibBalsaIdentity *tmp;
         
-        if (ident == *default_id) {
-            /* do something to indicate it is the active style */
-            gnome_stock_pixmap_gdk(GNOME_STOCK_MENU_FORWARD, 
-                                   GNOME_STOCK_PIXMAP_REGULAR, 
-                                   &pixmap, &bitmap);
-            gtk_clist_set_pixmap(clist, i, 0, pixmap, bitmap);
-        } else {
-            gnome_stock_pixmap_gdk(GNOME_STOCK_MENU_BLANK,
-                                   GNOME_STOCK_PIXMAP_REGULAR,
-                                   &pixmap, &bitmap);
-            gtk_clist_set_pixmap(clist, i, 0, pixmap, bitmap);
+        gtk_tree_model_get(model, &iter, IDENT_COLUMN, &tmp, -1);
+        if (identity == tmp) {
+            GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
+            gtk_tree_view_set_cursor(tree, path, NULL, FALSE);
+            gtk_tree_path_free(path);
+
+            return TRUE;
         }
     }
 
-    gtk_clist_set_selection_mode(clist, GTK_SELECTION_BROWSE);
-    gtk_clist_sort(clist);
-    gtk_clist_thaw(clist);
-    i = gtk_clist_find_row_from_data(clist, current);
-    gtk_clist_select_row(clist, i, -1); 
+    return FALSE;
 }
 
-
-static void
-config_frame_button_select_cb(GtkCList* clist, gint row, gint column,
-                              GdkEventButton* event, gpointer user_data)
+static LibBalsaIdentity *
+get_selected_identity(GtkTreeView * tree)
 {
-    GtkWidget* button = GTK_WIDGET(user_data);
+    GtkTreeSelection *select =
+        gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
+    GtkTreeModel *model = gtk_tree_view_get_model(tree);
+    GtkTreeIter iter;
+    LibBalsaIdentity *identity = NULL;
+
+    if (gtk_tree_selection_get_selected(select, &model, &iter))
+        gtk_tree_model_get(model, &iter, IDENT_COLUMN, &identity, -1);
+
+    return identity;
+}
+
+enum {
+    IDENTITY_RESPONSE_CLOSE,
+    IDENTITY_RESPONSE_NEW,
+    IDENTITY_RESPONSE_REMOVE,
+    IDENTITY_RESPONSE_HELP
+};
     
-    gtk_widget_set_sensitive(button, TRUE);
+/* callback for the "changed" signal */
+static void
+config_frame_button_select_cb(GtkTreeSelection * selection,
+                              GtkDialog * dialog)
+{
+    config_dialog_select(selection, dialog);
 }
 
 /*
- * Create a new identity dialog
+ * Callback for the close button.
+ * Call ident_dialog_update to save any changes, and close the dialog if
+ * OK.
  */
-static void
-new_ident_cb(GtkButton* button, gpointer user_data)
+static gboolean
+close_cb(GtkWidget * dialog)
 {
-    LibBalsaIdentity* ident;
-    GtkWidget* dialog;
-    GtkWindow* parent;
-
-    ident = LIBBALSA_IDENTITY(libbalsa_identity_new());
-    parent = gtk_object_get_data(GTK_OBJECT(user_data), "parent-window");
-    dialog = setup_ident_dialog(parent, TRUE, ident, 
-                                (GtkSignalFunc)ident_dialog_add_cb, 
-                                user_data);
-    gnome_dialog_run(GNOME_DIALOG(dialog));
+    return ident_dialog_update(GTK_DIALOG(dialog));
 }
 
 /*
- * Edit the selected identity in a new dialog.
- * there is always exactly one identity selected - _BROWSE selection mode.
+ * Create a new identity
  */
-static void 
-edit_ident_cb(GtkButton* button, gpointer user_data)
+static void
+new_ident_cb(GtkTreeView * tree, GtkWidget * dialog)
 {
-    GtkWidget* dialog;
-    GtkWindow* parent;
-    LibBalsaIdentity* ident;
-    GtkCList* clist = GTK_CLIST(user_data);
-    GList* list = clist->selection;
-    gint row;
+    LibBalsaIdentity *ident = LIBBALSA_IDENTITY(libbalsa_identity_new());
+    GList **identities =
+        g_object_get_data(G_OBJECT(tree), "identities");
+    GtkWidget * name_entry =
+        g_object_get_data(G_OBJECT(dialog), "identity-name");
 
-    g_return_if_fail(list);
-    
-    row = GPOINTER_TO_INT(list->data);
-    ident = LIBBALSA_IDENTITY(gtk_clist_get_row_data(clist, row));
-    parent = gtk_object_get_data(GTK_OBJECT(clist), "parent-window");
-    dialog = setup_ident_dialog(parent, FALSE, ident, 
-                                (GtkSignalFunc)ident_dialog_edit_cb, 
-				clist);
-    gnome_dialog_run(GNOME_DIALOG(dialog));
+    *identities = g_list_append(*identities, ident);
+
+    identity_list_update(tree);
+    /* select just added identity */
+    select_identity(tree, ident);
+
+    gtk_widget_grab_focus(name_entry);
 }
 
 
@@ -613,113 +719,88 @@ edit_ident_cb(GtkButton* button, gpointer user_data)
  * for creating/editing identities.
  */
 static GtkWidget*
-setup_ident_dialog(GtkWindow* parent, 
-		   gboolean createp, LibBalsaIdentity* ident, 
-		   GtkSignalFunc ok_signal_cb, gpointer clist)
+setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
 {
      
     GtkWidget* frame = gtk_frame_new(NULL);
-    GtkWidget* vbox = gtk_vbox_new(FALSE, padding);
-    GtkWidget* main_box, *w;
-    GnomeDialog* dialog;
-    dialog = GNOME_DIALOG(gnome_dialog_new(createp 
-					   ? _("Create Identity")  
-					   : _("Edit Identity"), 
-					   createp 
-					   ? GNOME_STOCK_BUTTON_OK 
-					   : GNOME_STOCK_BUTTON_APPLY,
-					   GNOME_STOCK_BUTTON_CANCEL,
-					   NULL));
-    main_box = dialog->vbox;
-    gtk_object_set_data(GTK_OBJECT(dialog), "clist", clist);
-    gtk_object_set_data(GTK_OBJECT(dialog), "identity", ident);
-    gtk_object_set_data(GTK_OBJECT(dialog), "identity-edit", 
-			(gpointer)!createp);
-    gnome_dialog_button_connect(dialog, 0, ok_signal_cb, dialog);
-
-    gtk_window_set_modal(GTK_WINDOW(dialog), TRUE);
-    gnome_dialog_set_close(dialog, FALSE);
-    gnome_dialog_set_default(dialog, 1);
-    gnome_dialog_set_parent(dialog, parent);
-    
-    gtk_box_pack_start(GTK_BOX(main_box), frame, TRUE, TRUE, 0);
-    gtk_container_add(GTK_CONTAINER(frame), vbox);
+    GtkWidget *table = gtk_table_new(15, 2, FALSE);
+    gint row = 0;
+    GObject *sig_path;
 
     gtk_container_set_border_width(GTK_CONTAINER(frame), padding);
-    gtk_container_set_border_width(GTK_CONTAINER(vbox), padding);
-    gtk_container_set_border_width(GTK_CONTAINER(main_box), padding);
-    gtk_object_set_data(GTK_OBJECT(dialog), "box", vbox);
+    gtk_container_set_border_width(GTK_CONTAINER(table), padding);
 
-    gnome_dialog_button_connect(dialog, 1, 
-                                GTK_SIGNAL_FUNC(ident_dialog_cancel_cb),
-                                dialog);
+    gtk_container_add(GTK_CONTAINER(frame), table);
+    gtk_table_set_row_spacings(GTK_TABLE(table), padding);
+    gtk_table_set_col_spacings(GTK_TABLE(table), padding);
 
-    gtk_signal_connect(GTK_OBJECT(dialog), "close", 
-                       GTK_SIGNAL_FUNC(ident_dialog_close_cb),
-                       dialog);
-
-    w = ident_dialog_add_entry(dialog, _("Identity Name:"), 
-			       "identity-name",
-			       ident->identity_name);
-    gtk_widget_grab_focus(w);
-
-    ident_dialog_add_entry(dialog, _("Full Name:"), 
-                           "identity-fullname",
-                           ident->address->full_name);
+    ident_dialog_add_entry(table, row++, dialog, _("_Identity Name:"), 
+		           "identity-name");
+    ident_dialog_add_entry(table, row++, dialog, _("_Full Name:"), 
+                           "identity-fullname");
+    ident_dialog_add_entry(table, row++, dialog, _("_Mailing Address:"), 
+                           "identity-address");
+    ident_dialog_add_entry(table, row++, dialog, _("Reply _To:"), 
+                           "identity-replyto");
+    ident_dialog_add_entry(table, row++, dialog, _("_Domain:"), 
+                           "identity-domain");
+    ident_dialog_add_entry(table, row++, dialog, _("_Bcc:"), 
+                           "identity-bcc");
+    ident_dialog_add_entry(table, row++, dialog, _("Reply _String:"), 
+                           "identity-replystring");
+    ident_dialog_add_entry(table, row++, dialog, _("F_orward String:"), 
+                           "identity-forwardstring");
+    ident_dialog_add_entry(table, row++, dialog, _("Signature _Path:"), 
+                           "identity-sigpath");
     
-    if (ident->address->address_list != NULL) {
-        ident_dialog_add_entry(dialog, _("Mailing Address:"), 
-                               "identity-address",
-                               (gchar*) ident->address->address_list->data);
-    } else {
-        ident_dialog_add_entry(dialog, _("Mailing Address:"),
-                               "identity-address",
-                               NULL);
-    }
-    
-    ident_dialog_add_entry(dialog, _("Reply To:"), 
-                           "identity-replyto",
-                           ident->replyto);
-    ident_dialog_add_entry(dialog, _("Domain:"), 
-                           "identity-domain",
-                           ident->domain);
-    ident_dialog_add_entry(dialog, _("Bcc:"), 
-                           "identity-bcc",
-                           ident->bcc);
-    ident_dialog_add_entry(dialog, _("Reply String:"), 
-                           "identity-replystring",
-                           ident->reply_string);
-    ident_dialog_add_entry(dialog, _("Forward String:"), 
-                           "identity-forwardstring",
-                           ident->forward_string);
-    ident_dialog_add_entry(dialog, _("Signature Path:"), 
-                           "identity-sigpath",
-                           ident->signature_path);
-    
-    ident_dialog_add_checkbutton(dialog, _("Execute Signature"),
-				"identity-sigexecutable",
-				ident->sig_executable);
- 
-    ident_dialog_add_checkbutton(dialog, _("Include Signature"), 
-                                 "identity-sigappend", 
-                                 ident->sig_sending);
-    ident_dialog_add_checkbutton(dialog, 
-                                 _("Include Signature When Forwarding"),
-                                 "identity-whenforward", 
-                                 ident->sig_whenforward);
-    ident_dialog_add_checkbutton(dialog, _("Include Signature When Replying"),
-                                 "identity-whenreply", 
-                                 ident->sig_whenreply);
-    ident_dialog_add_checkbutton(dialog, _("Add Signature Separator"),
-                                 "identity-sigseparator", 
-                                 ident->sig_separator);
-    ident_dialog_add_checkbutton(dialog, _("Prepend Signature"),
-                                 "identity-sigprepend",
-                                 ident->sig_prepend);
-    gtk_widget_show_all(main_box);
-    return GTK_WIDGET(dialog);
+    ident_dialog_add_checkbutton(table, row++, dialog,
+                                _("_Execute Signature"),
+				"identity-sigexecutable");
+    ident_dialog_add_checkbutton(table, row++, dialog,
+                                 _("Incl_ude Signature"), 
+                                 "identity-sigappend");
+    ident_dialog_add_checkbutton(table, row++, dialog, 
+                                 _("Include Signature When For_warding"),
+                                 "identity-whenforward");
+    ident_dialog_add_checkbutton(table, row++, dialog,
+                                 _("Include Signature When Rep_lying"),
+                                 "identity-whenreply");
+    ident_dialog_add_checkbutton(table, row++, dialog, 
+                                 _("_Add Signature Separator"),
+                                 "identity-sigseparator");
+    ident_dialog_add_checkbutton(table, row++, dialog,
+                                 _("Prepend Si_gnature"),
+                                 "identity-sigprepend");
+
+    sig_path = g_object_get_data(G_OBJECT(dialog), "identity-sigpath");
+    g_signal_connect(sig_path, "changed",
+                     G_CALLBACK(md_sig_path_changed), dialog);
+
+    return GTK_WIDGET(frame);
 }
 
+/* Callback for the "changed" signal of the signature path entry; sets
+ * sensitivity of the signature-related buttons; checks only for a
+ * non-empty string, not for a valid path. */
+static void
+md_sig_path_changed(GtkEntry * sig_path, GObject * dialog)
+{
+    guint i;
+    static gchar *button_key[] = {
+        "identity-sigexecutable",
+        "identity-sigappend",
+        "identity-whenforward",
+        "identity-whenreply",
+        "identity-sigseparator",
+        "identity-sigprepend"
+    };
+    gboolean has_sig = *gtk_entry_get_text(sig_path);
+
+    for (i = 0; i < ELEMENTS(button_key); i++) {
+        GtkWidget *button = g_object_get_data(dialog, button_key[i]);
+        gtk_widget_set_sensitive(button, has_sig);
+    }
+}
 
 /*
  * Create and add a GtkCheckButton to the given dialog with caption
@@ -727,19 +808,16 @@ setup_ident_dialog(GtkWindow* parent,
  * button is initialized to the given value.
  */
 static void
-ident_dialog_add_checkbutton(GnomeDialog* dialog, const gchar* check_label,
-                             const gchar* check_key, gboolean init_value)
+ident_dialog_add_checkbutton(GtkWidget * table, gint row,
+                             GtkDialog * dialog, const gchar * check_label,
+                             const gchar * check_key)
 {
-    GtkWidget* check;
-    GtkBox* box;
+    GtkWidget *check;
 
-    
-    box = GTK_BOX(gtk_object_get_data(GTK_OBJECT(dialog), "box"));
-    check = gtk_check_button_new_with_label(check_label);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), init_value);
-    gtk_box_pack_start(box, check, FALSE, FALSE, 0);
-    gtk_object_set_data(GTK_OBJECT(dialog), check_key, check);
-    gtk_widget_show(check);
+    check = gtk_check_button_new_with_mnemonic(check_label);
+    gtk_table_attach_defaults(GTK_TABLE(table), check, 0, 2, row, row + 1);
+    g_object_set_data(G_OBJECT(dialog), check_key, check);
+    gtk_widget_set_sensitive(check, FALSE);
 }
 
 
@@ -749,161 +827,110 @@ ident_dialog_add_checkbutton(GnomeDialog* dialog, const gchar* check_label,
  * object data attached to the dialog with the given key.  The entry
  * is initialized to the init_value given.
  */
-static GtkWidget*
-ident_dialog_add_entry(GnomeDialog* dialog, const gchar* label_name, 
-                       const gchar* entry_key, gchar* init_value)
+static void
+ident_dialog_add_entry(GtkWidget * table, gint row, GtkDialog * dialog,
+                       const gchar * label_name, const gchar * entry_key)
 {
-    GtkBox* box;
-    GtkWidget* label;
-    GtkWidget* entry;
-    GtkWidget* hbox;
+    GtkWidget *label;
+    GtkWidget *entry;
 
+    label = gtk_label_new_with_mnemonic(label_name);
+    gtk_misc_set_alignment(GTK_MISC(label), 1, 0.5);
+    gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row + 1);
 
-    box = GTK_BOX(gtk_object_get_data(GTK_OBJECT(dialog), "box"));
-    label = gtk_label_new(label_name);
     entry = gtk_entry_new();
-    hbox = gtk_hbox_new(FALSE, 4);
-    
-    if (init_value != NULL)
-        gtk_entry_set_text(GTK_ENTRY(entry), init_value);
+    gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 2, row, row + 1);
 
-    gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
-    gtk_box_pack_end(GTK_BOX(hbox), entry, TRUE, TRUE, 0);
-    gtk_box_pack_start(box, hbox, FALSE, FALSE, 4);
-    gtk_object_set_data(GTK_OBJECT(dialog), entry_key, entry);
-    gtk_widget_show(label);
-    gtk_widget_show(entry);
-    gtk_widget_show(hbox);
-    return entry;
+    g_object_set_data(G_OBJECT(dialog), entry_key, entry);
+    if (row == 0)
+        gtk_widget_grab_focus(entry);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(label), entry);
 }
 
-
-/*
- * Adds the identity to the application, then closes the edit dialog.
+/* set_identity_name_in_tree:
+ * update the tree to reflect the (possibly) new name of the identity
  */
 static void
-ident_dialog_add_cb(GtkButton* button, gpointer user_data)
+set_identity_name_in_tree(GtkTreeView * tree, LibBalsaIdentity * identity,
+                  const gchar * name)
 {
-    GnomeDialog* dialog = GNOME_DIALOG(user_data);
-    GtkCList* clist;    
-    LibBalsaIdentity* ident, **default_id;
-    GList** identities;
-    gint row;
+    GtkTreeModel *model = gtk_tree_view_get_model(tree);
+    GtkTreeIter iter;
+    gboolean valid;
 
-    if(!ident_dialog_update(dialog))
-        return;
+    for (valid =
+         gtk_tree_model_get_iter_first(model, &iter);
+         valid;
+         valid = gtk_tree_model_iter_next(model, &iter)) {
+        LibBalsaIdentity *tmp;
 
-    ident = gtk_object_get_data(GTK_OBJECT(dialog), "identity");
-    clist = GTK_CLIST(gtk_object_get_data(GTK_OBJECT(dialog), "clist"));
-    default_id = gtk_object_get_data(GTK_OBJECT(clist), "default-id");
-    identities = gtk_object_get_data(GTK_OBJECT(clist), "identities");
-    *identities = g_list_append(*identities, ident);
-    gtk_object_set_data(GTK_OBJECT(dialog), "identity", NULL);
-
-    identity_list_update(clist);
-    /* select just added identity */
-    row = gtk_clist_find_row_from_data(clist, ident);
-    gtk_clist_select_row(clist, row, -1);
-    gnome_dialog_close(dialog);
-}
-
-
-/*
- * Commits the edited changes of the identity to the application
- */
-static void
-ident_dialog_edit_cb(GtkButton* button, gpointer user_data)
-{
-    GnomeDialog* dialog = GNOME_DIALOG(user_data);
-    GtkCList* clist;
-
-    if(!ident_dialog_update(dialog))
-	return;
-
-    clist = GTK_CLIST(gtk_object_get_data(GTK_OBJECT(dialog), "clist"));
-    identity_list_update(clist);
-
-    gnome_dialog_close(dialog);
-}
-
-
-/* 
- * Cancels the creation or editing of an identity, closes the dialog.
- */
-static void
-ident_dialog_cancel_cb(GtkButton* button, gpointer user_data)
-{
-    ident_dialog_close_cb(GNOME_DIALOG(user_data), user_data);
-    gnome_dialog_close(GNOME_DIALOG(user_data));
-}
-
-
-/*
- * The close callback for the editing/creation dialog.
- * if we create new identity and the dialog gets closed, we need to destroy
- * the half-created object.
- */
-static int
-ident_dialog_close_cb(GnomeDialog* dialog, gpointer user_data)
-{
-    gboolean edit;
-    gpointer tmpptr;
-
-    edit = (gboolean) gtk_object_get_data(GTK_OBJECT(dialog), 
-                                          "identity-edit");
-    if (!edit) {
-        tmpptr = gtk_object_get_data(GTK_OBJECT(dialog), "identity");
-        
-        if (tmpptr != NULL) {
-            gtk_object_destroy(GTK_OBJECT(tmpptr));
-	    g_warning("Object destroyed.\n");
-	}
+        gtk_tree_model_get(model, &iter, IDENT_COLUMN, &tmp, -1);
+        if (identity == tmp) {
+            gtk_list_store_set(GTK_LIST_STORE(model), &iter,
+                               NAME_COLUMN, name, -1);
+            break;
+        }
     }
-
-    return FALSE;
 }
-
 
 /* 
  * Update the identity object associated with the edit/new dialog,
  * validating along the way.  Correct validation results in a true
  * return value, otherwise it returns false.
  */
+
 static gboolean
-ident_dialog_update(GnomeDialog* dlg)
+ident_dialog_update(GtkDialog* dlg)
 {
     LibBalsaIdentity* id;
     LibBalsaIdentity* exist_ident;
     LibBalsaAddress* address;
-    GtkWidget* error, *clist;
+    GtkWidget* error, *tree;
     GList **identities, *list;
     gchar* text;
     
-    id = gtk_object_get_data(GTK_OBJECT(dlg), "identity");
-    clist      = gtk_object_get_data(GTK_OBJECT(dlg), "clist");
-    identities = gtk_object_get_data(GTK_OBJECT(clist), "identities");
+    id = g_object_get_data(G_OBJECT(dlg), "identity");
+    if (!id)
+        return TRUE;
+    tree = g_object_get_data(G_OBJECT(dlg), "tree");
+    identities = g_object_get_data(G_OBJECT(tree), "identities");
 
     text = ident_dialog_get_text(dlg, "identity-name");
     g_return_val_if_fail(text != NULL, FALSE);
 
     if (text[0] == '\0') {
-        error = gnome_error_dialog(_("Error: The identity does not have a name"));
-        gnome_dialog_run_and_close(GNOME_DIALOG(error));
+        error =
+            gtk_message_dialog_new(GTK_WINDOW(dlg),
+                                   GTK_DIALOG_DESTROY_WITH_PARENT,
+                                   GTK_MESSAGE_ERROR,
+                                   GTK_BUTTONS_CLOSE,
+                                   _("Error: The identity "
+                                     "does not have a name"));
+        gtk_dialog_run(GTK_DIALOG(error));
+        gtk_widget_destroy(error);
         return FALSE;
     }
 
-    for (list=*identities; list; list = g_list_next(list)) {
+    for (list = *identities; list; list = g_list_next(list)) {
         exist_ident = LIBBALSA_IDENTITY(list->data);
         
-        if (g_strcasecmp(exist_ident->identity_name, text) == 0 && 
-	    id != exist_ident) {
-            error = gnome_error_dialog_parented(_("Error: An identity with that name already exists"), GTK_WINDOW(&dlg->window));
-            gnome_dialog_run_and_close(GNOME_DIALOG(error));
+        if (g_ascii_strcasecmp(exist_ident->identity_name, text) == 0
+            && id != exist_ident) {
+            error = 
+                gtk_message_dialog_new(GTK_WINDOW(dlg),
+                                       GTK_DIALOG_MODAL,
+                                       GTK_MESSAGE_ERROR,
+                                       GTK_BUTTONS_CLOSE,
+                                       _("Error: An identity with that"
+                                         " name already exists"));
+            gtk_dialog_run(GTK_DIALOG(error));
+            gtk_widget_destroy(error);
             return FALSE;
         }
     }
 
     g_free(id->identity_name); id->identity_name = text;
+    set_identity_name_in_tree(GTK_TREE_VIEW(tree), id, text);
 
     text = ident_dialog_get_text(dlg, "identity-fullname");
     g_return_val_if_fail(text != NULL, FALSE);
@@ -943,12 +970,12 @@ ident_dialog_update(GnomeDialog* dlg)
  * given key accesses the entry using object data.
  */
 static gchar*
-ident_dialog_get_text(GnomeDialog* dialog, const gchar* key)
+ident_dialog_get_text(GtkDialog* dialog, const gchar* key)
 {
     GtkEntry* entry;
     gchar* text;
     
-    entry = GTK_ENTRY(gtk_object_get_data(GTK_OBJECT(dialog), key));
+    entry = GTK_ENTRY(g_object_get_data(G_OBJECT(dialog), key));
     text = gtk_editable_get_chars(GTK_EDITABLE(entry), 0, -1);
 
     return text;
@@ -961,12 +988,12 @@ ident_dialog_get_text(GnomeDialog* dialog, const gchar* key)
  * data
  */
 static gboolean
-ident_dialog_get_bool(GnomeDialog* dialog, const gchar* key)
+ident_dialog_get_bool(GtkDialog* dialog, const gchar* key)
 {
     GtkCheckButton* button;
     gboolean value;
     
-    button = GTK_CHECK_BUTTON(gtk_object_get_data(GTK_OBJECT(dialog), key));
+    button = GTK_CHECK_BUTTON(g_object_get_data(G_OBJECT(dialog), key));
     value = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
     
     return value;
@@ -976,56 +1003,17 @@ ident_dialog_get_bool(GnomeDialog* dialog, const gchar* key)
  * Set the default identity to the currently selected.
  */
 static void
-set_default_ident_cb(GtkButton* button, gpointer user_data)
+set_default_ident_cb(GtkTreeView * tree, GtkTreePath * path,
+                     GtkTreeViewColumn * column, gpointer data)
 {
-    LibBalsaIdentity* ident, **default_id;
-    GtkCList* clist = GTK_CLIST(user_data);
-    GList* list = clist->selection;
-    gint row;
-    
-    /* should never be true with the _BROWSE selection mode
-     * as long as there are any elements on the list */
-    g_return_if_fail (list);
+    LibBalsaIdentity *ident, **default_id;
 
-    row = GPOINTER_TO_INT(list->data);
-    default_id = gtk_object_get_data(GTK_OBJECT(clist), "default-id");
-    ident = LIBBALSA_IDENTITY(gtk_clist_get_row_data(clist, row));
-    g_return_if_fail(ident);
+    default_id = g_object_get_data(G_OBJECT(tree), "default-id");
+    ident = get_selected_identity(tree);
+    g_return_if_fail(ident != NULL);
     *default_id = ident;
-    identity_list_update(clist);
-}
 
-
-/* 
- * Delete the currently selected identity after confirming. 
- */
-static void
-delete_ident_cb(GtkWidget* button, gpointer user_data)
-{
-    LibBalsaIdentity* ident, **default_id;
-    GtkCList* clist = GTK_CLIST(user_data);
-    GtkWidget* error;
-    GtkWindow* parent;
-    GList* select = clist->selection;
-    gint row;
-    
-    row = GPOINTER_TO_INT(select->data);
-    ident = LIBBALSA_IDENTITY(gtk_clist_get_row_data(clist, row));
-    default_id = gtk_object_get_data(GTK_OBJECT(clist), "default-id");
-    parent = gtk_object_get_data(GTK_OBJECT(clist), "parent-window");
-    if (ident == *default_id) {
-        error = gnome_ok_dialog_parented(
-            _("Cannot delete default profile, please make another default first."), 
-            parent);
-        gnome_dialog_run_and_close(GNOME_DIALOG(error));
-        return;
-    }
-        
-    gnome_question_dialog_modal_parented(
-        _("Do you really want to delete the selected identity?"), 
-        delete_confirm_cb,
-        user_data,
-	parent);
+    identity_list_update(tree);
 }
 
 
@@ -1034,265 +1022,238 @@ delete_ident_cb(GtkWidget* button, gpointer user_data)
  * and close the dialog.
  */
 static void
-delete_confirm_cb(gint reply, gpointer user_data)
+identity_delete_selected(GtkTreeView * tree, GtkWidget * dialog)
 {
-    if (reply == 0) {
-	LibBalsaIdentity* ident;
-	GList **identities;
-	GtkCList* clist = GTK_CLIST(user_data);
-	GList* select = clist->selection;
-        gint row = GPOINTER_TO_INT(select->data);
+    GtkTreeSelection *selection = gtk_tree_view_get_selection(tree);
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+    GtkTreePath *path;
+    LibBalsaIdentity *ident;
+    GList **identities;
 
-	ident = LIBBALSA_IDENTITY(gtk_clist_get_row_data(clist, row));
-	identities = gtk_object_get_data(GTK_OBJECT(clist), "identities");
-        *identities = g_list_remove(*identities, ident);
-        identity_list_update(clist);
-	gtk_object_destroy(GTK_OBJECT(ident));
-    } 
+    /* Save the path to the current row. */
+    if (!gtk_tree_selection_get_selected(selection, &model, &iter))
+        return;
+    path = gtk_tree_model_get_path(model, &iter);
+
+    ident = get_selected_identity(tree);
+    identities = g_object_get_data(G_OBJECT(tree), "identities");
+    *identities = g_list_remove(*identities, ident);
+    g_object_set_data(G_OBJECT(dialog), "identity", NULL);
+    identity_list_update(tree);
+    g_object_unref(ident);
+
+    /* Select the row at the saved path, or the previous one. */
+    if (gtk_tree_model_get_iter(model, &iter, path)
+        || gtk_tree_path_prev(path)) {
+        gtk_tree_view_set_cursor(tree, path, NULL, FALSE);
+        gtk_tree_view_scroll_to_cell(tree, path, NULL,
+                                     FALSE, 0, 0);
+    }
+    gtk_tree_path_free(path);
+    gtk_widget_grab_focus(GTK_WIDGET(tree));
 }
 
-
-GtkWidget*
-libbalsa_identity_config_dialog(GtkWindow* parent, GList**identities,
-				LibBalsaIdentity**default_id)
-{
-    GtkWidget* dialog;
-    GtkWidget* frame = libbalsa_identity_config_frame(FALSE, identities, 
-						      default_id);
-    GtkWidget* display_frame = libbalsa_identity_display_frame();
-    GtkWidget* hbox = gtk_hbox_new(FALSE, padding);
-    GtkCList* clist;
-    const gchar* button_names[] = {
-	N_("New"),
-	N_("Edit"),
-	N_("Set Default"),
-	N_("Delete"),
-	NULL
-    };
-    const gchar* button_pixmaps[] = {
-	GNOME_STOCK_PIXMAP_NEW,
-	GNOME_STOCK_PIXMAP_PROPERTIES,
-	GNOME_STOCK_PIXMAP_ADD,
-	GNOME_STOCK_PIXMAP_REMOVE,
-	NULL
-    };
-    
-    dialog = gnome_dialog_new(_("Manage Identities"),
-                              GNOME_STOCK_BUTTON_CLOSE,
-                              NULL);
-    gnome_dialog_append_buttons_with_pixmaps(GNOME_DIALOG(dialog),
-                                             button_names,
-                                             button_pixmaps);
-    gnome_dialog_set_accelerator(GNOME_DIALOG(dialog),
-				 1, 'A', GDK_MOD1_MASK);
-    gnome_dialog_set_accelerator(GNOME_DIALOG(dialog),
-				 2, 'E', GDK_MOD1_MASK);
-    gnome_dialog_set_accelerator(GNOME_DIALOG(dialog),
-				 3, 'D', GDK_MOD1_MASK);
-    gtk_window_set_modal(GTK_WINDOW(dialog), FALSE);
-    gnome_dialog_set_default(GNOME_DIALOG(dialog), 0);
-    gnome_dialog_set_close(GNOME_DIALOG(dialog), FALSE);
-    gnome_dialog_set_parent(GNOME_DIALOG(dialog), parent);
-
-    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(dialog)->vbox), 
-                       hbox, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(hbox), frame, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(hbox), display_frame, TRUE, TRUE, 0);
-
-    clist = GTK_CLIST(gtk_object_get_data(GTK_OBJECT(frame), "clist"));
-    gtk_object_set_data(GTK_OBJECT(frame), "clist", NULL);
-    gtk_object_set_data(GTK_OBJECT(clist), "parent-window", parent);
-    gtk_object_set_data(GTK_OBJECT(clist), "frame", display_frame);
-    
-    gtk_signal_connect(GTK_OBJECT(clist), "select-row",
-                       GTK_SIGNAL_FUNC(config_dialog_select_cb),
-                       dialog);
-
-    gnome_dialog_button_connect(GNOME_DIALOG(dialog), 0,
-                                GTK_SIGNAL_FUNC(config_dialog_ok_cb),
-                                dialog);
-    gnome_dialog_button_connect(GNOME_DIALOG(dialog), 1,
-                                GTK_SIGNAL_FUNC(new_ident_cb),
-                                clist);
-    gnome_dialog_button_connect(GNOME_DIALOG(dialog), 2,
-                                GTK_SIGNAL_FUNC(edit_ident_cb),
-                                clist);
-    gnome_dialog_button_connect(GNOME_DIALOG(dialog), 3,
-                                GTK_SIGNAL_FUNC(set_default_ident_cb),
-                                clist);
-    gnome_dialog_button_connect(GNOME_DIALOG(dialog), 4,
-                                GTK_SIGNAL_FUNC(delete_ident_cb),
-                                clist);    
-    gtk_widget_show_all(GTK_WIDGET(GNOME_DIALOG(dialog)->vbox));
-
-    gtk_widget_grab_focus(GTK_WIDGET(clist));
-    /* The identity list has been created prior to the "select-row" signal
-     * connection. We have to update the identity info frame by hand. */
-    g_return_val_if_fail(clist->selection, dialog);
-
-    config_dialog_select_cb(clist, 
-			    GPOINTER_TO_INT(clist->selection->data), 
-			    -1, NULL, dialog);
-
-    return dialog;
-}
-
-
+/* 
+ * Delete the currently selected identity after confirming. 
+ */
 static void
-config_dialog_ok_cb(GtkButton* button, gpointer user_data)
-{
-    gnome_dialog_close(GNOME_DIALOG(user_data));
-}
-
-static void
-config_dialog_select_cb(GtkCList* clist, gint row, gint column,
-                        GdkEventButton* event, gpointer user_data)
+delete_ident_cb(GtkTreeView * tree, GtkWidget * dialog)
 {
     LibBalsaIdentity* ident, **default_id;
-    GnomeDialog* dialog = GNOME_DIALOG(user_data);
-    GtkFrame *frame;
-
-    ident = LIBBALSA_IDENTITY(gtk_clist_get_row_data(clist, row));
+    GtkWidget* confirm;
+    GtkWidget* parent;
     
-    /* disable default identity deletion */
-    default_id = gtk_object_get_data(GTK_OBJECT(clist), "default-id");
-    gnome_dialog_set_sensitive(dialog, 3, ident != *default_id);
-    frame = gtk_object_get_data(GTK_OBJECT(clist), "frame");
-    g_return_if_fail(frame);
-    display_frame_update(frame, ident);
+    ident = get_selected_identity(tree);
+    default_id = g_object_get_data(G_OBJECT(tree), "default-id");
+    g_return_if_fail(ident != *default_id);
+    parent = gtk_widget_get_ancestor(GTK_WIDGET(tree), GTK_TYPE_WINDOW);
+    confirm = gtk_message_dialog_new(GTK_WINDOW(parent),
+                                     GTK_DIALOG_DESTROY_WITH_PARENT,
+                                     GTK_MESSAGE_QUESTION,
+                                     GTK_BUTTONS_OK_CANCEL,
+                                     _("Do you really want to delete"
+                                       " the selected identity?"));
+                      
+    if(gtk_dialog_run(GTK_DIALOG(confirm)) == GTK_RESPONSE_OK)
+        identity_delete_selected(tree, dialog);
+    gtk_widget_destroy(confirm);
 }
 
-static GtkWidget*
-libbalsa_identity_display_frame(void)
-{
-    GtkWidget* frame1 = gtk_frame_new(NULL);
-    GtkWidget* vbox1 = gtk_vbox_new(FALSE, padding/2);
-    
-    gtk_container_add(GTK_CONTAINER(frame1), vbox1);
-    gtk_container_set_border_width(GTK_CONTAINER(vbox1), padding);
-
-    display_frame_add_field(GTK_FRAME(frame1), GTK_BOX(vbox1), 
-                            _("Identity Name:"), "identity-name");
-    display_frame_add_field(GTK_FRAME(frame1), GTK_BOX(vbox1), 
-                            _("Full Name:"), "identity-fullname");
-    display_frame_add_field(GTK_FRAME(frame1), GTK_BOX(vbox1), 
-                            _("Mailing Address:"), "identity-address");
-    display_frame_add_field(GTK_FRAME(frame1), GTK_BOX(vbox1), 
-                            _("Reply To:"), "identity-replyto");
-    display_frame_add_field(GTK_FRAME(frame1), GTK_BOX(vbox1), 
-                            _("Domain:"), "identity-domain");
-    display_frame_add_field(GTK_FRAME(frame1), GTK_BOX(vbox1), 
-                            _("Bcc:"), "identity-bcc");
-    display_frame_add_field(GTK_FRAME(frame1), GTK_BOX(vbox1), 
-                            _("Reply String:"), "identity-replystring");
-    display_frame_add_field(GTK_FRAME(frame1), GTK_BOX(vbox1), 
-                            _("Forward String:"), "identity-forwardstring");
-    display_frame_add_field(GTK_FRAME(frame1), GTK_BOX(vbox1), 
-                            _("Signature Path:"), "identity-sigpath");
-
-    display_frame_add_boolean(GTK_FRAME(frame1), GTK_BOX(vbox1),
-			      _("Execute Signature"), "identity-sigexecutable");
-
-    display_frame_add_boolean(GTK_FRAME(frame1), GTK_BOX(vbox1), 
-                              _("Include Signature"), "identity-sigappend");
-    display_frame_add_boolean(GTK_FRAME(frame1), GTK_BOX(vbox1), 
-                              _("Include Signature When Forwarding"), 
-                              "identity-whenforward");
-    display_frame_add_boolean(GTK_FRAME(frame1), GTK_BOX(vbox1), 
-                              _("Include Signature When Replying"), 
-                              "identity-whenreply");
-    display_frame_add_boolean(GTK_FRAME(frame1), GTK_BOX(vbox1), 
-                              _("Add Signature Separator"), 
-                              "identity-sigseparator");
-    display_frame_add_boolean(GTK_FRAME(frame1), GTK_BOX(vbox1), 
-                              _("Prepend Signature"), 
-                              "identity-sigprepend");
-    
-    gtk_widget_show_all(frame1);
-
-    return frame1;
-}
-
-
-static void 
-display_frame_add_field(GtkFrame* frame, GtkBox* box, 
-                        const gchar* name, const gchar* key)
-{
-    GtkWidget* hbox = gtk_hbox_new(FALSE, 4);
-    GtkWidget* label1 = gtk_label_new(name);
-    GtkWidget* label2 = gtk_label_new(NULL);
-    
-    gtk_box_pack_start(box, hbox, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(hbox), label1, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(hbox), label2, FALSE, FALSE, 0);
-    gtk_object_set_data(GTK_OBJECT(frame), key, label2);
-}
-
-
+/*
+ * Show the help file.
+ */
 static void
-display_frame_add_boolean(GtkFrame* frame, GtkBox* box,
-                        const gchar* name, const gchar* key)
+help_ident_cb(void)
 {
-    GtkWidget* hbox = gtk_hbox_new(FALSE, 4);
-    GtkWidget* label1 = gtk_label_new(NULL);
-    GtkWidget* label2 = gtk_label_new(name);
-    
-    gtk_box_pack_start(box, hbox, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(hbox), label1, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(hbox), label2, FALSE, FALSE, 0);
-    gtk_object_set_data(GTK_OBJECT(frame), key, label1);
+    GError *err = NULL;
+
+    gnome_help_display("balsa", "identities", &err);
+
+    if (err) {
+        g_print(_("Error displaying help for identities: %s\n"),
+                err->message);
+        g_error_free(err);
+    }
 }
 
+void
+libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
+				LibBalsaIdentity **default_id)
+{
+    static GtkWidget *dialog = NULL;
+    GtkWidget* frame;
+    GtkWidget* display_frame;
+    GtkWidget* hbox;
+    GtkTreeView* tree;
+    GtkTreeSelection *select;
+
+    /* Show only one dialog at a time. */
+    if (dialog) {
+        gdk_window_raise(dialog->window);
+        return;
+    }
+
+    frame = libbalsa_identity_config_frame(identities, default_id);
+    tree = GTK_TREE_VIEW(gtk_bin_get_child(GTK_BIN(frame)));
+
+    dialog =
+        gtk_dialog_new_with_buttons(_("Manage Identities"),
+                                    parent,
+                                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                                    GTK_STOCK_CLOSE, IDENTITY_RESPONSE_CLOSE,
+                                    GTK_STOCK_NEW, IDENTITY_RESPONSE_NEW,
+                                    GTK_STOCK_REMOVE, IDENTITY_RESPONSE_REMOVE,
+                                    GTK_STOCK_HELP, IDENTITY_RESPONSE_HELP,
+                                    NULL);
+    g_signal_connect(G_OBJECT(dialog), "response",
+                     G_CALLBACK(md_response_cb), tree);
+    g_object_set_data(G_OBJECT(dialog), "tree", tree);
+    g_object_add_weak_pointer(G_OBJECT(dialog), (gpointer) & dialog);
+    gtk_dialog_set_default_response(GTK_DIALOG(dialog),
+                                    IDENTITY_RESPONSE_CLOSE);
+
+    hbox = gtk_hbox_new(FALSE, padding);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), 
+                       hbox, TRUE, TRUE, 0);
+
+    gtk_box_pack_start(GTK_BOX(hbox), frame, FALSE, FALSE, 0);
+
+    display_frame = setup_ident_frame(GTK_DIALOG(dialog),
+                                      FALSE, tree);
+    gtk_box_pack_start(GTK_BOX(hbox), display_frame, TRUE, TRUE, 0);
+
+    select = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
+    g_signal_connect(G_OBJECT(select), "changed",
+                     G_CALLBACK(config_frame_button_select_cb), dialog);
+    config_dialog_select(select, GTK_DIALOG(dialog));
+
+    gtk_widget_show_all(dialog);
+    gtk_widget_grab_focus(GTK_WIDGET(tree));
+}
+
+/* Callback for the "response" signal of the dialog. */
+static void
+md_response_cb(GtkWidget * dialog, gint response, GtkTreeView * tree)
+{
+    switch (response) {
+    case IDENTITY_RESPONSE_CLOSE:
+        if (close_cb(dialog))
+            break;
+        return;
+    case IDENTITY_RESPONSE_NEW:
+        new_ident_cb(tree, dialog);
+        return;
+    case IDENTITY_RESPONSE_REMOVE:
+        delete_ident_cb(tree, dialog);
+        return;
+    case IDENTITY_RESPONSE_HELP:
+        help_ident_cb();
+        return;
+    default:
+        break;
+    }
+
+    gtk_widget_destroy(dialog);
+}
+
+/* config_dialog_select
+ *
+ * called when the tree's selection changes
+ * manage the button sensitivity, and update the display frame
+ */
+static void
+config_dialog_select(GtkTreeSelection * selection, GtkDialog * dialog)
+{
+    LibBalsaIdentity *ident, **default_id;
+    GtkTreeView *tree = gtk_tree_selection_get_tree_view(selection);
+
+    ident = get_selected_identity(tree);
+    default_id = g_object_get_data(G_OBJECT(tree), "default-id");
+    gtk_dialog_set_response_sensitive(dialog, IDENTITY_RESPONSE_REMOVE,
+                                      ident && ident != *default_id);
+    display_frame_update(dialog, ident);
+    g_object_set_data(G_OBJECT(dialog), "identity", ident);
+}
 
 static void 
-display_frame_update(GtkFrame* frame, LibBalsaIdentity* ident)
+display_frame_update(GtkDialog * dialog, LibBalsaIdentity* ident)
 {
-    display_frame_set_field(frame, "identity-name", ident->identity_name);
-    display_frame_set_field(frame, "identity-fullname", 
+    if (!ident)
+        return;
+
+    ident_dialog_update(dialog);
+    display_frame_set_field(dialog, "identity-name", ident->identity_name);
+    display_frame_set_field(dialog, "identity-fullname", 
                             ident->address->full_name);
     if (ident->address->address_list)
-        display_frame_set_field(frame, "identity-address", 
+        display_frame_set_field(dialog, "identity-address", 
                                 (gchar*)ident->address->address_list->data);
     else
-        display_frame_set_field(frame, "identity-address", NULL);
+        display_frame_set_field(dialog, "identity-address", NULL);
     
-    display_frame_set_field(frame, "identity-replyto", ident->replyto);
-    display_frame_set_field(frame, "identity-domain", ident->domain);
-    display_frame_set_field(frame, "identity-bcc", ident->bcc);
-    display_frame_set_field(frame, "identity-replystring", 
+    display_frame_set_field(dialog, "identity-replyto", ident->replyto);
+    display_frame_set_field(dialog, "identity-domain", ident->domain);
+    display_frame_set_field(dialog, "identity-bcc", ident->bcc);
+    display_frame_set_field(dialog, "identity-replystring", 
                             ident->reply_string);
-    display_frame_set_field(frame, "identity-forwardstring", 
+    display_frame_set_field(dialog, "identity-forwardstring", 
                             ident->forward_string);
-    display_frame_set_field(frame, "identity-sigpath", ident->signature_path);
+    display_frame_set_field(dialog, "identity-sigpath", ident->signature_path);
 
-    display_frame_set_boolean(frame, "identity-sigexecutable", ident->sig_executable);
+    display_frame_set_boolean(dialog, "identity-sigexecutable", ident->sig_executable);
 
-    display_frame_set_boolean(frame, "identity-sigappend", ident->sig_sending);
-    display_frame_set_boolean(frame, "identity-whenforward", 
+    display_frame_set_boolean(dialog, "identity-sigappend", ident->sig_sending);
+    display_frame_set_boolean(dialog, "identity-whenforward", 
                               ident->sig_whenforward);
-    display_frame_set_boolean(frame, "identity-whenreply", 
+    display_frame_set_boolean(dialog, "identity-whenreply", 
                               ident->sig_whenreply);
-    display_frame_set_boolean(frame, "identity-sigseparator", 
+    display_frame_set_boolean(dialog, "identity-sigseparator", 
                               ident->sig_separator);    
-    display_frame_set_boolean(frame, "identity-sigprepend", 
+    display_frame_set_boolean(dialog, "identity-sigprepend", 
                               ident->sig_prepend);    
 }
 
 
 static void
-display_frame_set_field(GtkFrame* frame, const gchar* key, const gchar* value)
+display_frame_set_field(GtkDialog * dialog,
+                        const gchar* key,
+                        const gchar* value)
 {
-    GtkLabel* label = GTK_LABEL(gtk_object_get_data(GTK_OBJECT(frame), key));
+    GtkEntry *entry = GTK_ENTRY(g_object_get_data(G_OBJECT(dialog), key));
     
-    gtk_label_set_text(label, value);
+    gtk_entry_set_text(entry, value ? value : "");
 }
 
 static void
-display_frame_set_boolean(GtkFrame* frame, const gchar* key, gboolean value)
+display_frame_set_boolean(GtkDialog * dialog,
+                          const gchar* key,
+                          gboolean value)
 {
-    GtkLabel* label = GTK_LABEL(gtk_object_get_data(GTK_OBJECT(frame), key));
+    GtkCheckButton *check =
+        GTK_CHECK_BUTTON(g_object_get_data(G_OBJECT(dialog), key));
     
-    gtk_label_set_text(label, value ? _("Do") : _("Do Not"));
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), value);
 }
 
 

@@ -1,0 +1,31 @@
+<?xml version="1.0" standalone="no"?>
+<omf>
+    <resource>
+        <creator>
+	Peter Bloomfield
+        </creator>
+	<maintainer>
+	  Pawel Salek
+        </maintainer>
+        <title>
+            Balsa
+        </title>
+        <date>
+           2002-08-28
+        </date>
+        <version identifier="2.0" date="2002-08-28" description="Updated for GNOME 2.0, program version 2.0.x"/>
+        <subject category="GNOME|Applications"/>
+        <description>
+            This document is the extensive balsa manual.
+        </description>
+        <type>
+            manual
+        </type>
+        <format mime="text/xml" dtd="-//OASIS//DTD DocBook XML V4.1.2//EN"/>
+        <identifier url="balsa.xml"/>
+        <language code="C"/>
+	<relation seriesid="4f1da026-c99e-11d6-95f0-ae2166108028"/>
+	<rights type="GNU FDL" license.version="1.1" holder="Balsa Team"/>
+
+    </resource>
+</omf>

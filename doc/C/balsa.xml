@@ -1,0 +1,3644 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE article PUBLIC "-//OASIS/DTD DocBookXML V4.1.2//EN" "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+<!-- replace with actual application  version number-->
+<!ENTITY mdash ";">
+<!ENTITY version "1.2.3"> 
+<!ENTITY Balsa "<application>Balsa</application>"> 
+<!ENTITY Mutt "<application>Mutt</application>"> 
+<!ENTITY GnomeCard "<application>GnomeCard</application>"> 
+<!ENTITY Pine      "<application>pine</application>">
+<!ENTITY procmail  "<application>procmail</application>">
+<!ENTITY balsalist "http://mail.gnome.org/mailman/listinfo/balsa-list">
+<!ENTITY IMAP 
+'<glossterm linkend="glossary-imap"><acronym>IMAP</acronym></glossterm>'>
+<!ENTITY LDAP
+'<glossterm linkend="glossary-ldap"><acronym>LDAP</acronym></glossterm>'>
+<!ENTITY POP3
+'<glossterm linkend="glossary-pop"><acronym>POP3</acronym></glossterm>'>
+<!ENTITY SMTP
+'<glossterm linkend="glossary-smtp"><acronym>SMTP</acronym></glossterm>'>
+<!ENTITY VCARD
+'<glossterm linkend="glossary-vcard"><acronym>VCARD</acronym></glossterm>'>
+]>
+<!-- the update instructions:
+The usual way the .SGML file is split into .html files is by section
+of the first order (sect1).
+
+The stuff that should always be in separate sections is:
+- main window     (win-main)
+- compose window  (win-composer)
+- message window  (win-message).
+- each page of the preferences. (win-config-{1,2,3,...}
+  (when editing/correcting the source, emphasize the page title).
+- mailbox configuration. (folder-config)
+- toolbar customization (toolbars).
+- identities (identities).
+
+Extra sections of general character are presently:
+- introduction
+- getting started.
+- mbox-formats.
+- common-tasks
+- its-not-working
+- authors
+
+General advices:
+
+* If you use emacs, you will find View /hide all tags menu option very
+  useful.
+
+* Use entities to make the source more readable.
+-->
+
+<article>
+
+<title>Balsa User's Guide</title>
+
+<copyright>
+  <year>1997-2001</year>
+  <holder>Stuart Parmenter and others, see AUTHORS for a list of people
+  </holder>
+</copyright>
+
+<legalnotice id="license">
+  <para>
+    Permission is granted to make and distribute verbatim copies of
+    this manual provided the copyright notice and this permission
+    notice are preserved on all copies.
+  </para>
+
+  <para>
+    Permission is granted to copy and distribute modified versions of
+    this manual under the conditions for verbatim copying, provided
+    that the entire resulting derived work is distributed under the
+    terms of a permission notice identical to this one.
+  </para>
+
+  <para>
+    Permission is granted to copy and distribute translations of this
+    manual into another language, under the above conditions for
+    modified versions, except that this permission notice may be
+    stated in a translation approved by the Free Software Foundation.
+  </para>
+
+  <para> UNIX is a trademark of X/Open Group.</para>
+  <para> Linux is a trademark of Linus Torvalds.</para>
+  <para> X Window System is a trademark of X Consortium, Inc.</para>
+  <para> Windows is a trademark of Microsoft Corp.</para>
+  <para> Macintosh and Apple are trademarks of Apple Computer, Inc.</para>
+  <para> All other trademarks are property of their respective owners.</para>
+</legalnotice>
+
+<releaseinfo> 
+This is version 2.718 of the Balsa manual.
+</releaseinfo>
+
+<pubdate>6 Nov 2001</pubdate>
+
+<abstract>
+
+<para>
+  &Balsa; is a graphical mail client. While it is in active
+  development, &Balsa; has many features such as: &IMAP; and
+  &POP3; support;
+  sendmail or direct &SMTP; support;
+  optional multi-threaded retrieval and sending of messages; support
+  for all configurations of local mail folders; automatic mail
+  checking; mail printing; inline attachment viewing; and the
+  proverbial much, much more.
+</para>
+
+<para>
+  This document will introduce a person who understands mail to using
+  &Balsa;. However, it will not explain email
+  to a confused individual. If you're looking for that, try asking a
+  friend or visiting the <ulink
+  url="http://www.cs.queensu.ca/FAQs/email/" type="http">Email
+  FAQ</ulink>.
+</para>
+</abstract>
+
+<!-- ################################################################# -->
+<!--                   GENERAL STUFF                                   -->
+<!-- ################################################################# -->
+
+<sect1 id="introduction">
+<title>Introduction</title>
+    
+<graphic fileref="figures/balsa_logo" format="PNG" srccredit="tigert"></graphic>
+
+<para>
+  &Balsa; is a graphical mail client similar to Eudora on Windows. It
+  supports the standard features of any good reader and has new
+  features added continually. See the abstract above for a quick
+  feature rundown.
+</para>
+
+<para>
+  &Balsa; is written using <acronym>GTK+</acronym> and
+  <acronym>GNOME</acronym>. It is based on libmutt, the back end code
+  to &Mutt;, but expands far beyond being a
+  graphical Mutt.
+</para>
+
+<para>
+  If you want to learn more about &Balsa;, your best bet is the
+  mailing list <email>balsa-list@gnome.org</email>, which can be
+  subscribed to by going to the website <ulink
+  url="&balsalist;">&balsalist;</ulink> or by sending a message with a
+  subject of <emphasis>subscribe</emphasis> to
+  <email>balsa-list-request@gnome.org</email>. Bugs can be reported
+  via <application>bug-buddy</application>, <application>gnome-bug
+  </application> or to <email>submit@bugs.gnome.org</email>.
+</para>
+</sect1> <!-- id=introduction -->
+
+<!-- ################################################################# -->
+<sect1 id="getting-started">
+<title>Getting Started with &Balsa;</title>
+
+<para>
+  If you're starting &Balsa; for the first time, the first thing
+  you'll see is a <glossterm
+  linkend="glossary-druid">Druid</glossterm> that will set up
+  &Balsa;'s basic settings. &Balsa; can guess most of what it needs to
+  know about you. It will also create five standard local mailboxes:
+  the Inbox, Outbox, Sentbox, Draftbox, and Trash. (These can be
+  changed to be &IMAP; or &POP3; mailboxes later.)
+</para>
+
+<figure>
+  <title>&Balsa; Start Druid</title>
+  <screenshot>
+    <mediaobject> 
+      <imageobject><imagedata
+    	fileref="figures/druid-start.png" format="PNG"/> 
+      </imageobject>
+    </mediaobject>
+  </screenshot>
+</figure>
+
+<para>
+  Don't worry. &Balsa; cooperates with other <glossterm
+  linkend="glossary-mua"><acronym>MUA</acronym></glossterm>'s very
+  well.  They share the same locking semantics for mailboxes. If
+  &Balsa; shares the same mail directory as
+  &Pine; or &Mutt;,
+  it will detect new folders as they are created. So if you have to
+  telnet in to your mail machine, you won't be stuck.
+</para>
+
+<para>
+  There are many more settings in &Balsa;'s <link
+  linkend="preferences">preferences window</link>, but most of them do
+  not need to be changed.
+</para>
+
+<para>
+  Once &Balsa; is configured, you will proceed on to the <link
+  linkend="win-main">main window</link>.
+</para>
+</sect1> <!-- id=getting-started -->
+
+<!-- ################################################################# -->
+<!--                 SECTION: MAIN WINDOW                              -->
+<!-- ################################################################# -->
+<sect1 id="win-main">
+<title>The Main Window</title>
+
+<figure>
+<title>Main Window</title>
+  <screenshot>
+	  <mediaobject> 
+	    <imageobject><imagedata
+		fileref="figures/main-window.png" format="PNG"/> 
+	    </imageobject>
+	  </mediaobject>
+  </screenshot>
+</figure>
+
+<para>
+  &Balsa;'s main window has three major areas. To the left is the
+  <interface>mailbox list</interface>. This displays all the mailboxes
+  &Balsa; knows about; it will scan for ones in your local mail
+  directory. (This means &Balsa; works well with &procmail;.)  It will
+  also list &IMAP; or &POP3; mailboxes that you have configured.  If
+  the <link linkend="preferences-3"><guilabel>Show Mailbox
+  Info</guilabel></link> preference is set, two columns will also be
+  displayed next to the mailbox names containing the number of unread
+  and total messages in each mailbox that has unread messages.  (The
+  other mailboxes will not have their contents probed.) Also, any
+  mailboxes that contain unread messages will be shown in a different
+  font and colour.
+</para>
+
+<para>
+  At the top-right is a view of the currently open mailbox. You can
+  browse messages and manipulate them here.
+</para>
+
+ <para>
+  At the bottom-right of &Balsa;'s main window is the message
+  view. This displays the message selected in the message listing. You
+  can save attachments, view attachments, and read incoming email
+  here.
+</para>
+
+  <sect2 id="menubar">
+  <title>Menu &amp; Toolbar</title>
+
+  <figure>
+  <title>Main Window Toolbar</title>
+  <screenshot>
+	  <mediaobject> 
+	    <imageobject><imagedata
+		fileref="figures/main-window-toolbar.png" format="PNG"/> 
+	    </imageobject>
+	  </mediaobject>
+  </screenshot>
+  </figure>
+
+  <para>
+    The menu bar, located at the top of the <interface>Main
+    Window</interface> provides the following commands:
+  </para>
+
+  <variablelist>
+  <varlistentry>
+  <term><menuchoice><guimenu>File</guimenu></menuchoice></term>
+
+  <listitem>
+    <para>This menu contains basic commands.</para>
+
+    <itemizedlist>
+      <listitem>
+	<variablelist>
+	  <varlistentry>
+
+    <term>
+      <menuchoice>
+        <guimenu>File</guimenu><guisubmenu>New</guisubmenu>
+      </menuchoice>
+    </term>
+		    
+    <listitem>
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    <menuchoice>
+              <shortcut><keysym>M</keysym></shortcut>
+	      <guimenu>File</guimenu>
+ 	      <guisubmenu>New</guisubmenu>
+	      <guimenuitem>Message...</guimenuitem>
+	    </menuchoice> &mdash; 
+			    
+	    Create a new message, and display a new window to type the
+	    message in.
+	  </para>
+	</listitem>
+			
+	<listitem>
+	  <para>
+	    <menuchoice>
+	      <guimenu>File</guimenu>
+	      <guisubmenu>New</guisubmenu>
+	      <guimenuitem>Mailbox...</guimenuitem>
+	    </menuchoice> &mdash; 
+			    
+	    Open a dialog box to create a new mailbox.  There are
+	    various items like this, corresponding to the different
+	    types of mailbox that Balsa supports. See the <link
+	    linkend="mbox-formats">discussion of different mailbox
+	    formats</link> and their advantages and disadvantages.
+	  </para>
+	</listitem>
+			
+	<listitem>
+	  <para>
+	    <menuchoice>
+	      <guimenu>File</guimenu>
+	      <guisubmenu>New</guisubmenu>
+	      <guimenuitem>Remote IMAP folder...</guimenuitem>
+	    </menuchoice> &mdash; 
+		    
+	    Open a dialog box to create a folder for an account on an
+	    IMAP server.  This <link linkend="folder-config">IMAP
+	    folder properties</link> dialog can also be used to change
+	    the details of the account.
+	  </para>
+	</listitem>
+			
+	<listitem>
+	  <para>
+	    <menuchoice>
+	      <guimenu>File</guimenu>
+	      <guisubmenu>New</guisubmenu>
+	      <guimenuitem>Remote IMAP
+	        subfolder...</guimenuitem>
+	    </menuchoice> &mdash; 
+		    
+	    Open a dialog box to create a new subfolder in an existing
+	    IMAP folder tree. This <link
+	    linkend="subfolder-config">IMAP subfolder
+	    properties</link> dialog can also be used to rename or
+	    move a subfolder.
+	  </para>
+	</listitem>
+      </itemizedlist>
+    </listitem>
+
+  </varlistentry>
+</variablelist>
+</listitem>
+
+<listitem>
+  <para>
+    <menuchoice>
+      <shortcut><keysym>C</keysym></shortcut>
+      <guimenu>File</guimenu>
+      <guimenuitem>Continue</guimenuitem>
+    </menuchoice> &mdash; 
+
+    Continue a postponed message.
+  </para>
+</listitem>
+      
+<listitem>
+  <para>
+    <menuchoice>
+    <shortcut>
+              <keycombo><keysym>Ctrl</keysym><keysym>M</keysym></keycombo>
+	    </shortcut>
+	    <guimenu>File</guimenu> 
+	    <guimenuitem>Get New Mail</guimenuitem> 
+	  </menuchoice> &mdash;
+		  
+	  This causes &Balsa; to attempt to retrieve any new messages
+	  from the &POP3; server. </para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut>
+	      <keycombo><keysym>Ctrl</keysym><keysym>A</keysym></keycombo>
+	    </shortcut>
+	    <guimenu>File</guimenu>
+	    <guimenuitem>Send Queued Mail</guimenuitem>
+	  </menuchoice> &mdash; 
+	  Send all mail waiting in the Outbox mailbox to the
+	  mail server now.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>File</guimenu>
+	    <guimenuitem>Print</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Print the currently selected message (displayed in
+	  the preview pane.)
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut><keysym>B</keysym></shortcut>
+	    <guimenu>File</guimenu>
+	    <guimenuitem>Address Book</guimenuitem>
+	  </menuchoice> &mdash; 
+	  Open &Balsa;'s address book.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>File</guimenu>
+	    <guimenuitem>Exit</guimenuitem>
+	  </menuchoice>
+	  &mdash; Exit the program.
+	</para>
+      </listitem>
+    </itemizedlist>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guimenu>Edit</guimenu></term>
+  <listitem>
+    <itemizedlist>
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Edit</guimenu>
+	    <guimenuitem>Copy</guimenuitem>
+	  </menuchoice> &mdash; 
+	  
+	  Copy selected text to the clipboard.
+	</para>
+     </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Edit</guimenu>
+	    <guimenuitem>Select All</guimenuitem>
+	  </menuchoice> &mdash; 
+	  Select all text in the currently displayed message.
+	</para>
+      </listitem>
+
+    </itemizedlist>
+
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guimenu>View</guimenu></term>
+  <listitem>
+    <para>Menu for changing how messages are viewed.</para>
+
+    <itemizedlist>
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>View</guimenu>
+	    <guimenuitem>Show Mailbox Tree</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Toggle the display of the mailbox tree in the main window.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>View</guimenu>
+	    <guimenuitem>Show Mailbox Tabs</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Toggle the display of tabs for all open mailboxes.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>View</guimenu>
+	    <guimenuitem>Wrap</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Toggle the display of messages using word wrap.  The column
+	  to which the message is wrapped is set in the <link
+	  linkend="preferences">Preferences</link> window.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>View</guimenu> <guimenuitem>No
+	    Headers</guimenuitem> </menuchoice>,
+	  <menuchoice>
+	    <guimenuitem>Selected Headers</guimenuitem>
+	  </menuchoice>, 
+	  <menuchoice>
+	    <guimenuitem>All Headers</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Select the headers to display in the message pane.
+	</para>
+      </listitem>
+    </itemizedlist>
+
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guimenu>Message</guimenu></term>
+  
+  <listitem>
+    <para>This menu has commands for manipulating messages.</para>
+    <itemizedlist>
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut><keysym>R</keysym></shortcut>
+	    <guimenu>Message</guimenu>
+	    <guimenuitem>Reply...</guimenuitem>
+	  </menuchoice> &mdash; 
+	  Reply to the currently selected message(s).
+        </para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut><keysym>A</keysym></shortcut>
+	    <guimenu>Message</guimenu>
+	    <guimenuitem>Reply To All...</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Reply to the currently selected message(s), sending the
+	  reply to all senders and recipients of the message.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para><menuchoice>
+	    <shortcut><keysym>F</keysym></shortcut>
+	    <guimenu>Message</guimenu>
+	    <guimenuitem>Forward...</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Forward the currently selected message(s).
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut>
+	      <keycombo><keysym>Ctrl</keysym><keysym>.</keysym></keycombo>
+	    </shortcut>
+	    <guimenu>Message</guimenu>
+	    <guimenuitem>Next Part</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  View the next part of the message (if the message is
+	  multi-part).
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut>
+	      <keycombo><keysym>Ctrl</keysym><keysym>,</keysym></keycombo>
+	    </shortcut>
+	    <guimenu>Message</guimenu>
+	    <guimenuitem>Previous Part</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  View the previous part of the message.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut>
+              <keycombo><keysym>Ctrl</keysym><keysym>S</keysym></keycombo>
+	    </shortcut>
+	    <guimenu>Message</guimenu>
+	    <guimenuitem>Save Current Part...</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Save the currently selected part of the message to disk.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut><keysym>D</keysym></shortcut>
+	    <guimenu>Message</guimenu>
+	    <guimenuitem>Delete</guimenuitem>
+	  </menuchoice> &mdash; 
+	  
+	  Delete the currently selected message(s).
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut><keysym>U</keysym></shortcut>
+	    <guimenu>Message</guimenu>
+	    <guimenuitem>Undelete</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Undelete the currently selected message (currently non-functional).
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut><keysym>X</keysym></shortcut>
+	    <guimenu>Message</guimenu>
+	    <guimenuitem>Toggle Flagged</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Toggle the flag on the currently selected message(s).  This
+	  is shown as an exclamation mark next in the message index.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut><keysym>S</keysym></shortcut>
+	    <guimenu>Message</guimenu>
+	    <guimenuitem>Store Address...</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Add the sender of the currently selected message to
+	  your address book.
+	</para>
+      </listitem>
+	      
+    </itemizedlist>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guimenu>Mailbox</guimenu></term>
+  <listitem>
+    <para>For manipulating mailboxes.</para>
+    <itemizedlist>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut><keysym>N</keysym></shortcut>
+	    <guimenu>Mailbox</guimenu>
+	    <guimenuitem>Next</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Select the next message in the current mailbox.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut><keysym>P</keysym></shortcut>
+	    <guimenu>Mailbox</guimenu>
+	    <guimenuitem>Previous</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Select the previous message in the current mailbox.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut>
+	      <keycombo><keysym>Ctrl</keysym><keysym>N</keysym></keycombo>
+	    </shortcut>
+	    <guimenu>Mailbox</guimenu>
+	    <guimenuitem>Next Unread</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Select the next unread message in the current mailbox.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Mailbox</guimenu>
+	    <guimenuitem>Edit...</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Edit mailbox properties.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Mailbox</guimenu>
+	    <guimenuitem>Delete...</guimenuitem>
+	  </menuchoice> &mdash; 
+	  
+	  Delete the currently selected mailbox.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Mailbox</guimenu>
+	    <guimenuitem>Commit Current</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Synchronize changes between the currently selected mailbox
+	  and the mailbox file on disk.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Mailbox</guimenu>
+	    <guimenuitem>Close</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Close the currently selected mailbox.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Mailbox</guimenu>
+	    <guimenuitem>Empty Trash</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Delete all messages from the <symbol>Trash</symbol> mailbox.
+	</para>
+      </listitem>
+    </itemizedlist>
+
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+<term><guimenu>Settings</guimenu></term>
+
+  <listitem>
+    <para>Menu for changing &Balsa;'s configuration.</para>
+
+    <itemizedlist>
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Settings</guimenu>
+	    <guimenuitem>Preferences...</guimenuitem>
+	  </menuchoice> &mdash; 
+		  
+	  Open the <link linkend="preferences">Preferences</link>
+	  window to change the settings of &Balsa;.
+	</para>
+      </listitem>
+    </itemizedlist>
+  </listitem>
+</varlistentry>
+</variablelist>      
+</sect2>
+
+
+<sect2 id="subwin-mblist">
+<title>The Mailbox List</title>
+
+<para>
+  The mailbox list in the main window lists all of your mailboxes.
+  &Balsa; will automatically detect your local mailboxes by searching
+  for mailboxes under your local mail directory (probably
+  ~/mail). This lets &Balsa; coexist with &Pine; and &procmail;
+  without causing problems.
+</para>
+      
+<para>
+  Your mailboxes will be displayed as a tree view, with mailboxes in
+  subdirectories of your local mail directory initially hidden but
+  accessible by expanding the tree. &IMAP; mailboxes will also be
+  displayed as being at the top level of the tree. &POP3; mailboxes
+  are not displayed.
+</para>
+
+</sect2>
+
+<sect2 id="subwin-msgindex">
+<title>The Message Index</title>
+
+<para>
+  The message index displays the messages in the current folder, and
+  lets you choose which folders messages to view. Click on the
+  notebook tabs, or click on a folder in the <link
+  linkend="subwin-mblist"><interface>mailbox list</interface></link>
+  to bring it to the front.
+</para>
+      
+<para>
+  From the message index you can do a lot. Clicking on a message will
+  cause it to be displayed in the message view. Right-clicking on it
+  will give a pop-up menu letting you reply to the message (or forward
+  it, etc.) and move it to another folder (using the Transfer menu
+  item).  Double-clicking on a message will open it in a separate
+  window.  Also, it is possible to drag and drop messages from the
+  index to other mailboxes in the mailbox list and open mailbox
+  tabs.
+</para>
+
+<para>The pop-up (context) menu contains the following items:</para>
+
+<variablelist>
+  <varlistentry>
+  <term><menuchoice><guimenuitem>Reply</guimenuitem></menuchoice></term>
+  <listitem>
+    <para>Reply to the currently selected message(s).</para>
+  </listitem>
+  </varlistentry>
+
+  <varlistentry>
+  <term><menuchoice><guimenuitem>Reply To All</guimenuitem></menuchoice></term>
+  <listitem>
+    <para>
+      Reply to the currently selected message(s), sending the reply to
+      all the recipients and senders of the message.
+    </para>
+  </listitem>
+  </varlistentry>
+
+  <varlistentry>
+  <term><menuchoice><guimenuitem>Forward</guimenuitem></menuchoice></term>
+  <listitem>
+    <para>Forward the currently selected message(s).</para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><menuchoice><guimenuitem>Move To Trash</guimenuitem></menuchoice></term>
+  <listitem><para>Deletes the currently message(s).</para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term>
+    <menuchoice><guimenuitem>Store Address...</guimenuitem></menuchoice>
+  </term>
+  <listitem>
+    <para>Store the sender of the current address in the
+    address book.</para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term>
+    <menuchoice><guimenuitem>Toggle Flagged</guimenuitem></menuchoice>
+  </term>
+
+  <listitem>
+    <para>
+     Toggle the priority flag on the currently selected message(s).
+     This is shown as an exclamation mark in the message index.</para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><menuchoice><guimenuitem>Transfer</guimenuitem></menuchoice></term>
+  <listitem>
+    <para>
+      Transfer currently selected message(s) to another mailbox.  When
+      this menu item is selected a list of available mailboxes is
+      displayed from which the destination should be selected.
+    </para>
+  </listitem>
+</varlistentry>
+
+</variablelist>
+</sect2>
+
+<sect2 id="subwin-msgview">
+<title>The Message View</title>
+
+<para>
+  The message view displays the message that is selected in mailbox
+  index.  Message headers are displayed above the main text of the
+  message, unless they have been disabled.  The text of the message is
+  shown below the headers.
+</para>
+
+<para>
+  If the message is multipart the different sections will be shown
+  below the main message text.  Each part can be selected and &Balsa;
+  will attempt to display it.  If it is unable to it will display a
+  screen allowing you to save the attachment to a file.
+</para>
+
+<note>
+  <para>
+    Currently &Balsa; only supports viewing <acronym>HTML</acronym>
+    messages when compiled with <application>gtkhtml</application>
+    support. gtkhtml support is fairly stable nowadays and will be
+    compiled in if gtkhtml-devel files is found.
+  </para>
+</note>
+
+<para>
+  You are not restricted to that pane either. Double-clicking on a
+  message in the message index will open it in a <link
+  linkend="win-message">separate window</link>.
+</para>
+</sect2>
+</sect1>
+
+<!-- ################################################################# -->
+<!--                 SECTION: COMPOSE WINDOW                           -->
+<!-- ################################################################# -->
+<sect1 id="win-composer">
+<title>The Message Composer</title>
+
+<figure>
+  <title>Message Composition Window</title>
+  <screenshot>
+	  <mediaobject> 
+	    <imageobject><imagedata
+		fileref="figures/newmsg-window.png" format="PNG"/> 
+	    </imageobject>
+	  </mediaobject>
+  </screenshot>
+</figure>
+    
+<para>
+  When the <guibutton>New Message</guibutton> or
+  <guibutton>Reply</guibutton> or <guibutton>Forward</guibutton>
+  action is selected, the message to be sent is brought up in the
+  <interface>Message Composer</interface>.  This window is where you
+  can type the text of the message, attach files, and specify
+  recipients.  The window also provides an interface to spell check
+  the message.  In the near future, it will be possible to perform
+  signing and encryption of messages using
+  <application>GnuPG</application> or
+  <application><acronym>PGP</acronym></application>.
+</para>
+
+<para>
+  When the message window first opens, you will see the several main
+  sections:
+</para>
+
+<itemizedlist>
+  <listitem><para><interface>The menu bar</interface></para></listitem>
+  <listitem><para><interface>Toolbar</interface></para></listitem>
+  <listitem><para><interface>Mail headers</interface></para></listitem>
+  <listitem><para><interface>The attachment box</interface></para></listitem>
+  <listitem><para><interface>The message body</interface></para></listitem>
+</itemizedlist>
+
+<para>These will each be covered in depth below:</para>
+
+<sect2 id="win-composer-menu">
+<title>Menu Bar</title>
+
+<para>
+  This contains all of the available commands for acting on the
+  message, from selecting the headers to display to changing the
+  character set of the message.  Some of the menu items are not always
+  available, depending on what state the message is currently in.
+</para>
+      
+<variablelist>
+<varlistentry>
+  <term><guimenu>File</guimenu></term>
+  <listitem>
+    <para>
+      The file menu contains commands for manipulating the message as
+      a whole.
+    </para>
+
+    <itemizedlist>
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>File</guimenu>
+	    <guimenuitem>Include File...</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Include a text file in the body of the message; only works
+	  for plain text files.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>File</guimenu>
+	    <guimenuitem>Attach File...</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Attach any kind of file to the message.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>File</guimenu>
+	    <guimenuitem>Send</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Send the message. (does it depend on "Always queue sent mail?").
+	  dialog.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>File</guimenu>
+	    <guimenuitem>Postpone</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Save the message in the <symbol>Draftbox</symbol> for later
+	  revision and sending.  You will be unable to postpone a
+	  message that is not currently valid.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>File</guimenu>
+	    <guimenuitem>Print...</guimenuitem>
+	  </menuchoice> &mdash; 
+	  
+	  Print a hard-copy of the current message out.</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut>
+	      <keycombo><keysym>Ctrl</keysym><keysym>W</keysym></keycombo>
+	    </shortcut>
+	    <guimenu>File</guimenu>
+	    <guimenuitem>Close</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Close and discard the current message.
+	</para>
+      </listitem>
+    </itemizedlist>
+
+    <note>
+      <para>
+         A message is considered valid (ready for sending) if it
+	 contains only legal email addresses in the
+	 <guilabel>To:</guilabel> field.
+      </para>
+    </note>
+
+  </listitem>
+</varlistentry>
+	
+<varlistentry>
+<term><guimenu>Edit</guimenu></term>
+
+  <listitem>
+    <para>The Edit menu contains commands which are used to
+      modify the body of the message.</para>
+    
+    <itemizedlist>
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut>
+              <keycombo><keysym>Ctrl</keysym><keysym>X</keysym></keycombo>
+	    </shortcut>
+	    <guimenu>Edit</guimenu>
+	    <guimenuitem>Cut</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Cut the selected text to the clipboard.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut>
+	      <keycombo><keysym>Ctrl</keysym><keysym>C</keysym></keycombo>
+	    </shortcut>
+	    <guimenu>Edit</guimenu>
+	    <guimenuitem>Copy</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Copy the selected text to the clipboard
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut>
+	      <keycombo><keysym>Ctrl</keysym><keysym>V</keysym></keycombo>
+	    </shortcut>
+	    <guimenu>Edit</guimenu>
+	    <guimenuitem>Paste</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Paste the contents of the clipboard to the current position
+	  of the cursor.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut>
+	      <keycombo><keysym>Ctrl</keysym><keysym>A</keysym></keycombo>
+	    </shortcut>
+	    <guimenu>Edit</guimenu>
+	    <guimenuitem>Select All</guimenuitem>
+	  </menuchoice>
+	</para>
+      </listitem>
+	      
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut>
+	      <keycombo><keysym>Ctrl</keysym><keysym>Z</keysym></keycombo>
+	    </shortcut>
+	    <guimenu>Edit</guimenu>
+	    <guimenuitem>Wrap Body</guimenuitem>
+	  </menuchoice>
+
+	  &mdash; Cause all the lines in the message to be wrapped to
+	  the specified outgoing mail wrap column.
+        </para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut>
+	      <keycombo><keysym>Ctrl</keysym><keysym>R</keysym></keycombo>
+	    </shortcut>
+	    <guimenu>Edit</guimenu>
+	    <guimenuitem>Reflow Paragraph</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Cause all the lines in the paragraph the cursor is
+	  in to be wrapped to the specified outgoing mail wrap
+	  column.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut>
+	      <keycombo>
+                <keysym>Ctrl</keysym><keysym>Shift</keysym><keysym>R</keysym>
+	      </keycombo>
+	    </shortcut>
+	    <guimenu>Edit</guimenu>
+	    <guimenuitem>Reflow Message</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Cause all the lines in the message to be wrapped to the
+	  specified outgoing mail wrap column.
+        </para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut>
+	      <keycombo>
+		<keysym>Ctrl</keysym><keysym>Shift</keysym><keysym>S</keysym>
+	      </keycombo>
+	    </shortcut>
+	    <guimenu>Edit</guimenu>
+	    <guimenuitem>Check Spelling</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Start spell checking the current message.
+	</para>
+      </listitem>
+    </itemizedlist>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guimenu>Show</guimenu></term>
+  <listitem>
+    <para>
+      The Show menu is used to control which headers are displayed in
+      the composer window for editing.
+    </para>
+
+    <itemizedlist>
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Show</guimenu>
+	    <guimenuitem>From</guimenuitem>
+	  </menuchoice>
+	  &mdash; Display the <literal>From</literal> header.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Show</guimenu>
+	    <guimenuitem>To</guimenuitem>
+	  </menuchoice>
+	  &mdash; Display the <literal>To</literal> header.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Show</guimenu>
+	    <guimenuitem>Subject</guimenuitem>
+	  </menuchoice>
+	  &mdash; Display the <literal>Subject</literal> header.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Show</guimenu>
+	    <guimenuitem>Cc</guimenuitem>
+	  </menuchoice>
+	  &mdash; Display the <literal>Cc</literal> header.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Show</guimenu>
+	    <guimenuitem>Bcc</guimenuitem>
+	  </menuchoice>
+	  &mdash; Display the <literal>Bcc</literal> header.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Show</guimenu>
+	    <guimenuitem>Fcc</guimenuitem>
+	  </menuchoice>
+	  &mdash; Display the <literal>Fcc</literal> header.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Show</guimenu>
+	    <guimenuitem>Reply To</guimenuitem>
+	  </menuchoice>
+	  &mdash; Display the <literal>Reply-To</literal> header.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Show</guimenu>
+	    <guimenuitem>Attachments</guimenuitem>
+	  </menuchoice>
+	  &mdash; Display the <literal>Attachments</literal> box.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Show</guimenu>
+	    <guimenuitem>Comments</guimenuitem>
+	  </menuchoice>
+	  &mdash; Display the <literal>Comments</literal> header.
+	</para>
+      </listitem>
+	      
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Show</guimenu>
+	    <guimenuitem>Keywords</guimenuitem>
+	  </menuchoice>
+	  &mdash; Display the <literal>Keywords</literal> header.
+	</para>
+      </listitem>
+
+    </itemizedlist>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guimenu>Language</guimenu></term>
+  <listitem>
+    <para>
+      The Language menu allows you to set the language to use for the
+      composing the message.  Currently, &Balsa; does not support
+      multiple character sets in a single message.  The current
+      language in use is shown at the bottom of the menu, along with
+      the character set in use. 
+    </para>
+
+    <para>The available languages consist of:</para>
+
+    <itemizedlist>
+      <listitem><para>Baltic</para></listitem>
+      <listitem><para>Brazillian</para></listitem>
+      <listitem><para>Catalan</para></listitem>
+      <listitem><para>Danish</para></listitem>
+      <listitem><para>Dutch</para></listitem>
+      <listitem><para>English</para></listitem>
+      <listitem><para>Estonian</para></listitem>
+      <listitem><para>Finnish</para></listitem>
+      <listitem><para>French</para></listitem>
+      <listitem><para>German</para></listitem>
+      <listitem><para>Greek</para></listitem>
+      <listitem><para>Hungarian</para></listitem>
+      <listitem><para>Italian</para></listitem>
+      <listitem><para>Japanese</para></listitem>
+      <listitem><para>Korean</para></listitem>
+      <listitem><para>Norwegian</para></listitem>
+      <listitem><para>Polish</para></listitem>
+      <listitem><para>Portugese</para></listitem>
+      <listitem><para>Russian</para></listitem>
+      <listitem><para>Slovak</para></listitem>
+      <listitem><para>Spanish</para></listitem>
+      <listitem><para>Swedish</para></listitem>
+      <listitem><para>Turkish</para></listitem>
+      <listitem><para>Ukranian</para></listitem>
+    </itemizedlist>
+
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guimenu>Options</guimenu></term>
+
+  <listitem>
+    <itemizedlist>
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Options</guimenu>
+	    <guimenuitem>Request Disposition Notification</guimenuitem>
+	  </menuchoice>
+
+	  &mdash; If checked &Balsa; will include the
+          <literal>Disposition-Notification-To</literal> header line
+          with your <literal>From</literal> address.  Please note that
+          the handling of this request depends on the receiving mail
+          program and that it not guaranteed that this notification
+          will be sent back.
+	</para>
+      </listitem>
+    </itemizedlist>
+  </listitem>
+</varlistentry>
+</variablelist>
+</sect2>
+
+
+<sect2 id="win-composer-toolbar">
+<title>Toolbar</title>
+
+<para>
+  The toolbar contains buttons for the most commonly used functions
+  when sending messages, including Send, Attach File..., and Save.  As
+  with the menu bar, some buttons are disabled if the message is not
+  correctly setup to be sent.
+</para>
+
+<figure>
+  <title>Toolbar</title>
+  <screenshot>
+	  <mediaobject> 
+	    <imageobject><imagedata
+		fileref="figures/newmsg-window-toolbar.png" format="PNG"/> 
+	    </imageobject>
+	  </mediaobject>
+  </screenshot>
+</figure>
+
+<variablelist>
+<varlistentry>
+  <term><guibutton>Send</guibutton></term>
+  <listitem>
+    <para>
+      Send the current message.  Only available if the message is
+      legal to be sent (i.e. proper email addresses).
+    </para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guibutton>Attach</guibutton></term>
+  <listitem>
+    <para>
+      Open a dialog to attach a file to the current message.
+    </para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guibutton>Postpone</guibutton></term>
+  <listitem>
+    <para>
+       Postpone the message to the Draftbox for later revision and
+       sending.
+    </para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guibutton>Check Spelling</guibutton></term>
+  <listitem>
+    <para>
+      Start a spell check on the current message.  Balsa can currently
+      use either the standard ispell or the newer aspell to do the
+      spell checking.  Settings for this can be found in the <link
+      linkend="preferences-4">Preferences</link> dialog.
+    </para>
+  </listitem>
+</varlistentry>
+	
+<varlistentry>
+  <term><guibutton>Print</guibutton></term>
+  <listitem>
+    <para>Print out the draft of the message.</para>
+  </listitem>
+</varlistentry>
+	
+<varlistentry>
+  <term><guibutton>Cancel</guibutton></term>
+  <listitem>
+    <para>
+      Close the composition window without saving or sending the
+      message within.
+    </para>
+  </listitem>
+</varlistentry>
+
+</variablelist>
+</sect2>
+
+<sect2 id="win-composer-headers">
+<title>Headers</title>
+
+<para>
+  The headers area is where the information regarding where the
+  message is being sent to and from, as well as comments and keywords
+  can be entered.  All of the available headers are not shown by
+  default, but they can be turned on and off very quickly using the
+  menu.
+</para>
+
+<variablelist>
+
+<varlistentry>
+  <term><guilabel>From</guilabel></term>
+  <listitem>
+    <para>
+      <literal>From</literal> is used to indicate the origin of the
+      message, Balsa automatically fills this in for you if you have
+      entered your name and email address in the <link
+      linkend="identities">identites</link> window.
+    </para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>To</guilabel></term>
+  <listitem>
+    <para>The <literal>To</literal> header is used to indicate
+      the intended recipient of the message; Balsa automatically
+      fills this in for you if you are replying to a
+      message.
+    </para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>Subject</guilabel></term>
+  <listitem>
+    <para>
+      The <literal>Subject</literal> header is used to summarize the
+      topic of the message.
+     </para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>Cc</guilabel></term>
+  <listitem>
+    <para>
+      The &quot;Carbon Copy&quot; header.  A comma separated list of
+      recipients other than the main recipient should go here.
+    </para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>Bcc</guilabel></term>
+  <listitem>
+    <para>
+      The <literal>Bcc</literal>, or &quot;Blind Carbon Copy&quot;
+      header.  Similar to the Cc header, except that email addresses
+      placed in this header will not appear as recipients to readers
+      of the message.  Also known as a &quot;silent&quot; carbon copy.
+    </para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>Fcc</guilabel></term>
+  <listitem>
+    <para>
+      The <literal>Fcc</literal> header stands for
+      &quot;Folder Carbon Copy&quot;, and it is used to specify
+      any folders that you want the message copied to after
+      being sent.  It is presented as a drop-down combo box with
+      a list of all available mailboxes, simply select the
+      destination.
+    </para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>Reply-To</guilabel></term>
+  <listitem>
+    <para>
+      The <literal>Reply-To</literal> header is for specifying what
+      email address you want any replies to go to.</para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>Comments</guilabel></term>
+  <listitem>
+    <para>
+      Although not widely used, the <literal>Comments</literal> header
+      can be used to specify short comments for email's.
+    </para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>Keywords</guilabel></term>
+  <listitem>
+    <para>
+      Again, not a very widely used header, this can be used to embed
+      general information about the content of the message in the
+      email, to allow for easier searching or filtering at a later
+      date.</para>
+  </listitem>
+</varlistentry>
+
+</variablelist>
+
+<sect3 id="specify-addresses">
+<title>Specifying Addresses</title>
+	
+<para>
+  &Balsa; supports many different methods of selecting email addresss.
+  All of the headers that can contain addresses have a small coloured
+  book to the right of them that will open up &Balsa;'s
+  <interface>address book</interface>. 
+</para>
+
+<para>
+  However, &Balsa; will also attempt to guess what the headers should
+  contain depending on what context the <interface>composition
+  window</interface> is opened in, so it may not be neccessary to fill
+  them in most of the time.
+</para>
+
+<tip>
+  <para>
+    Also, Balsa supports alias expansion.  As you type a name, Balsa
+    will guess the e-mail address from all the entries in the
+    &GnomeCard; application.  To enable this feature, read the section
+    on <link linkend="ct-alias-expansion">Alias Expansion</link>.  In
+    addtion, the composition window supports drag-and-drop of
+    addresses from the &GnomeCard; application.
+  </para>
+</tip>
+</sect3>
+</sect2>
+
+<sect2 id="win-composer-attachments">
+<title>Attachments</title>
+      
+<figure>
+  <title>List of Attachments</title>
+  <screenshot>
+	  <mediaobject> 
+	    <imageobject><imagedata
+		fileref="figures/newmsg-window-attachments" format="PNG"/> 
+	    </imageobject>
+	  </mediaobject>
+  </screenshot>
+</figure>
+
+<para>
+  At the base of the message composer window may be a large box
+  displaying attachments; this view can be toggled in the
+  <guimenu>Show</guimenu> menu.  They show up as small icons that look
+  like a piece of paper, with the name of the file displayed beneath
+  them.
+</para>
+
+<para>
+  When there are attachments displayed, it is possible to right-click
+  on the icon to access a menu to manipulate the menu.  Currently it
+  is only possible to remove it from the message.
+</para>
+
+</sect2>
+
+<sect2 id="win-composer-body">
+<title>Message Body</title>
+      
+<para>
+  Finally, below the attachment list is the main area of the window
+  where the text of the message is displayed.  The text editing
+  capabilities are very basic, but it supports cut, copy, and paste so
+  it is possible to write a message in your favorite editor and simply
+  paste it in.
+</para>
+
+<para>
+  If the message is a reply or forward, the referenced message will be
+  displayed in the body text widget, with the prefix specified in the
+  <link linkend="preferences-2">Preferences</link> dialog.
+</para>
+</sect2>
+
+<sect2 id="win-composer-spellcheck">
+<title>Spell Checker</title>
+
+<para>
+  Once the spell check has been started, it will take a moment to load
+  the text and spell checking module, and then it will automatically
+  begin checking the message.  If it finds any words that are
+  incorrect, the word will be highlighted and a panel will be shown
+  that offers a number of suggestions and available courses of action.
+</para>
+
+<figure>
+  <title>Spell Checking Panel</title>
+  <screenshot>
+	  <mediaobject> 
+	    <imageobject><imagedata
+		fileref="figures/spell-check.png" format="PNG"/> 
+	    </imageobject>
+	  </mediaobject>
+  </screenshot>
+</figure>
+
+<para>
+  As shown above, the panel consists of a list of two panes, one the
+  left containing a list of suggestions and an entry box, while the
+  right contains several buttons to choose your action.  The list on
+  the left is re-generated for each incorrect word, with all the
+  suggestions the spell check program comes up with.  You can choose
+  what program you want to use through loadable modules, selectable in
+  the <link linkend="preferences-4">Preferences</link> dialog.  The
+  entry box above the list is what will be used to replace the current
+  word, and usually reflects the current selection in the list, but
+  can be edited by hand if you wish to make manual changes.
+</para>
+
+<para>
+  The buttons on the left control the actions to take for each
+  incorrect word.  The buttons include:
+</para>
+
+<variablelist>
+<varlistentry>
+  <term><guibutton>Change</guibutton></term>
+  <listitem>
+    <para>
+      Change the incorrect word with the currently selected suggested
+      word or the user's edited word.
+    </para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guibutton>Change All</guibutton></term>
+  <listitem>
+    <para>
+      Change all occurances of the current incorrect word with the
+      currently selected suggestion.
+    </para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guibutton>Ignore</guibutton></term>
+  <listitem>
+    <para>
+       Ignore the current incorrect word and continue to the next one.
+    </para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guibutton>Ignore All</guibutton></term>
+  <listitem>
+    <para>
+      Ignore all occurrances of the current word, and continue to the
+      next incorrect word.
+     </para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guibutton>Learn</guibutton></term>
+  <listitem>
+    <para>
+      Add the current incorrect word to your personal dictionary.
+      This will cause it to be considered correct for all future spell
+      checks.
+    </para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guibutton>Done</guibutton></term>
+  <listitem>
+    <para>
+      Stop the spell check at the current point, keeping all changes
+      so far and returning to the normal message window
+      interface.
+    </para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guibutton>Cancel</guibutton></term>
+  <listitem>
+    <para>
+      Stop the spell check at the current point, reverting all changes
+      so far, including any words added to your personal dictionary.
+    </para>
+  </listitem>
+</varlistentry>
+</variablelist>
+
+</sect2>
+    
+<sect2 id="addr-book-buttons">
+<title>Address Book</title>
+
+<para>
+   When composing a message, clicking on any of the coloured book
+   icons next to a destination field (To, Cc, Bcc) will bring up the
+   &Balsa; address book.  It helps you to select recipients for your
+   messages quickly and easily.
+</para>
+
+<figure>
+  <title>Address Book Window</title>
+  <screenshot>
+	  <mediaobject> 
+	    <imageobject><imagedata
+		fileref="figures/address-book.png" format="PNG"/> 
+	    </imageobject>
+	  </mediaobject>
+  </screenshot>
+</figure>
+
+<para>
+  The address book provides two panes, the one on the left consisting
+  of all available addresses, while the one on the right contains the
+  intended recipients of your message.  Addresses are added to the
+  recipient list by selecting them in the left pane and clicking the
+  arrow button pointing to the right, or by simply double-clicking on
+  the address.  This will remove the address from the left pane, so
+  they cannot be added more than once.  If you decide that you no
+  longer want to send the message to a particular address, simply
+  select it in the right-hand pane and click the left-arrow button, or
+  double-click it again, to move it back.
+</para>
+
+<para>
+  If, while selecting people to send your message to, you decide to
+  add someone new to the address book, it is a simple matter to click
+  on the <guibutton>Run GnomeCard</guibutton> button.  This will bring
+  up the &GnomeCard; application, allowing you to easily manipulate
+  your contact list.  After any changes have been made using the
+  address book, they can be forced to show up in the left hand pane by
+  clicking on the <application>Re-Import</application> button.
+</para>
+</sect2>
+</sect1>
+
+<!-- ################################################################# -->
+<!--                 SECTION: MESSAGE WINDOW                           -->
+<!-- ################################################################# -->
+<sect1 id="win-message">
+<title>The Message Window</title>
+<para>To be filled in.</para>
+</sect1>
+<!-- ################################################################# -->
+<!--                 SECTION: PREFERENCES                              -->
+<!-- ################################################################# -->
+<sect1 id="preferences">
+<title>The Preferences Window</title>
+
+<para>
+  &Balsa; has many more options than the initial <glossterm
+  linkend="glossary-druid">Druid</glossterm> reveals.  To access the
+  configuration window, select <menuchoice><guimenu>Settings</guimenu>
+  <guimenuitem>Preferences</guimenuitem></menuchoice>. You will see a
+  notebook. The tabs and options are explained below.
+</para>
+
+<figure>
+  <title>Preferences Window</title>
+  <screenshot>
+	  <mediaobject> 
+	    <imageobject><imagedata
+		fileref="figures/preferences-window.png" format="PNG"/> 
+	    </imageobject>
+	  </mediaobject>
+  </screenshot>
+</figure>
+</sect1>
+
+<!-- ################################################################# -->
+<!--                 SUBSECTION: PREFERENCES/MAIL SERVERS              -->
+<!-- ################################################################# -->
+<sect1 id="preferences-0">
+<title>Mail Servers</title>
+
+<para>
+  This page lets you specify how you get POP3 mail, send mail, etc.
+</para>
+
+<variablelist>
+  <varlistentry>
+    <term><guilabel>Remote Mailbox Servers</guilabel></term>
+   
+  <listitem>
+    <para>
+      These are &IMAP; and &POP3; servers that you receive email
+      from. The three buttons let you create, modify, and remove
+      records. &POP3; mailboxes will not show up in the mailbox list.
+      You can specify multiple servers, when adding a server you will
+      be asked to give:
+
+      <itemizedlist>
+	<listitem><para>mailbox name that will identify the mailbox
+        </para></listitem>
+
+	<listitem><para>The server you have the POP mailbox on.
+	</para></listitem>
+
+	<listitem><para>The port that will be used to connect to the
+	 server.  The port number is usually 110 but you may change it
+	 if you for example use some kind of connection tunneling,
+	 </para></listitem>
+
+	<listitem><para>The user name on the mailbox server.
+        </para></listitem>
+
+	<listitem><para>Corresponding password.</para></listitem>
+		
+	<listitem><para>What does the check check box mean?</para></listitem>
+
+	<listitem><para>You can select the 'delete from server' button
+          to remove the downoladed messages from the
+          server.</para></listitem>
+      </itemizedlist>
+    </para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>Local Mail Directory</guilabel></term>
+ 
+  <listitem><para> This is the directory that &Balsa; will scan
+      looking for mail folders.</para></listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>Remote SMTP Server</guilabel></term>
+
+  <listitem>
+    <para>
+      Specify the domain name and optionally the port for of the SMTP
+      server you use for submitting mail.  Please note that the
+      default port number is 587.  The syntax is hostname[:port].
+      Port can be a decimal number or the name of the service as
+      specified in <filename>/etc/services</filename>.  Typically you
+      can just set this to <quote>localhost:smtp</quote>.
+    </para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>User</guilabel></term>
+
+  <listitem>
+    <para>
+      If the remote SMTP server requires authentication, enter your
+      user name here.  Note that the exact format depends on the MTA
+      in use.  For example, some systems expect a user name, others
+      may require an email address.
+    </para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>Pass Phrase</guilabel></term>
+
+  <listitem>
+    <para>
+      If the remote SMTP server requires authentication, enter your
+      pass phrase here.  Some systems refer to the pass phrase as a
+      password.  Limitations on the length of the pass phrase depend
+      on the SMTP server.
+    </para>
+  </listitem>
+</varlistentry>
+</variablelist>
+</sect1>
+
+<!-- ################################################################# -->
+<!--                 SUBSECTION: PREFERENCES/ADDRESS BOOKS             -->
+<!-- ################################################################# -->
+<sect1 id="preferences-1">
+<title>Address Books</title>
+
+<para>
+  &Balsa; supports the use of multiple address books, both local
+  <glossterm linkend="glossary-vcard">VCARD</glossterm> and remote
+  &LDAP; address books, both of which can be configured here.
+  &GnomeCard; also uses VCARD address books, so this allows Balsa to
+  share address books with other GNOME applications.
+</para>
+
+<para>
+  The main portion of the preferences page is occupied by the list of
+  current address books for &Balsa;.  The list shows the type of
+  address book, the name, and whether it is included in automatic
+  alias expansion when typing new messages.  There are also several
+  buttons that manipulate the list of address books:
+</para>
+
+<variablelist>
+<varlistentry>
+  <term><guibutton>Add</guibutton></term>
+  <listitem>
+    <para>Using this adds a new address book for &Balsa; to use to
+    find addresses.  It brings up a series of dialog boxes that step
+    through the process of adding a new address book.</para>
+
+    <figure>
+      <title>Add Address Book Dialog (Step 1)</title>
+      <screenshot>
+	  <mediaobject> 
+	    <imageobject><imagedata
+		fileref="figures/address-book-start.png" format="PNG"/> 
+	    </imageobject>
+	  </mediaobject>
+      </screenshot>
+    </figure>
+
+    <para>If &Balsa; was not compiled with <acronym>LDAP</acronym>
+    support it will not let you choose <acronym>LDAP</acronym> as an
+    addressbook type.  Once the type of address book is selected you
+    must specify the name and location of the address book.</para>
+
+    <figure>
+      <title><acronym>VCARD</acronym> Address Book Dialog
+      (Step 2)</title>
+      <screenshot>
+	  <mediaobject> 
+	    <imageobject><imagedata
+		fileref="figures/address-book-vcard.png" format="PNG"/> 
+	    </imageobject>
+	  </mediaobject>
+      </screenshot>
+    </figure>
+
+    <para>With &LDAP; support, the dialog looks somewhat different,
+    offering options to set the location of the directory instead of a
+    file.</para>
+
+    <figure>
+      <title>&LDAP; Address Book Dialog (Step 2)</title>
+      <screenshot>
+	  <mediaobject> 
+	    <imageobject><imagedata
+		fileref="figures/address-book-ldap.png" format="PNG"/> 
+	    </imageobject>
+	  </mediaobject>
+      </screenshot>
+    </figure>
+
+    <para>In order to use a <acronym>LDAP</acronym> address book, you
+    need to know the host name of the <acronym>LDAP</acronym>
+    server. Depending on the server configuration, you may need also
+    so called Base Domain Name which identifies your particular
+    department. You can always try leaving Base Domain Name field
+    empty and a default value will be used (OpenLDAP stores the
+    default Base Domain Name in
+    <filename>/etc/openldap/ldap.conf</filename>). If this does not
+    work, you may need to ask your administrator for the value of
+    this. The usual values are usually similar to:
+    <quote>dc=theochem,dc=KTH,dc=se</quote> or <quote>o=Theoretical
+    Chemistry, c=SE</quote>.</para>
+
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guibutton>Modify</guibutton></term>
+  <listitem>
+    <para>This enables you to change the properties of the selected
+    address book.</para>
+
+    <figure>
+      <title>Modify an Address Book</title>
+      <screenshot>
+	  <mediaobject> 
+	    <imageobject><imagedata
+		fileref="figures/address-book-modify.png" format="PNG"/> 
+	    </imageobject>
+	  </mediaobject>
+      </screenshot>
+    </figure>
+
+    <para>It is possible to modify both the name and location for any
+    address book.  Also, you can change whether the contents of the
+    address book will be used when attempting to auto-complete an
+    address when sending a message.</para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guibutton>Delete</guibutton></term>
+  <listitem>
+    <para>Delete the selected address book.</para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guibutton>Set as Default</guibutton></term>
+  <listitem>
+    <para>Set the selected mailbox as default.</para>
+  </listitem>
+</varlistentry>
+</variablelist>
+</sect1>
+    
+<!-- ################################################################# -->
+<!--                 SUBSECTION: PREFERENCES/MAIL OPTIONS              -->
+<!-- ################################################################# -->
+<sect1 id="preferences-2">
+<title>Mail Options</title>
+
+<para>
+  Use this page to set the &Balsa;'s behaviour regarding incoming and
+  outgoing messages.
+</para>
+
+<sect2>
+<title>Incoming</title>
+	
+  <variablelist>
+  <varlistentry>
+    <term><guilabel>Check Mail Automatically</guilabel></term>
+    <listitem>
+      <para>If selected, &Balsa; will connect to your &POP3; servers
+	at the given interval and check for mail.</para>	      
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guilabel>Check IMAP mailboxes</guilabel></term>
+    <listitem>
+      <para>If selected, <application>Balsa</application> will
+        include your <acronym>IMAP</acronym> mailboxes when
+        checking for mail. You can also specify that INBOX is
+        the only mailbox to be checked.</para>
+      <para>Checking IMAP mailboxes can take some time; these
+        options give you extra control over how long the mailbox
+        check will take.</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>
+      <guilabel>Display message if new mail has arrived</guilabel>
+    </term>
+    <listitem>
+      <para>If selected, <application>Balsa</application> will
+        alert you when mail has arrived.</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guilabel>Do background check quietly</guilabel></term>
+    <listitem>
+      <para>If selected, <application>Balsa</application> will
+        give you no indication that a background mail check is
+        in progress.</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guilabel>Quoted Text Regular Expression</guilabel></term>
+
+    <listitem>
+      <para>The entry box allows you to set a <glossterm
+        linkend="glossary-regular-expression">regular
+        expression</glossterm> you would like to use to identify text
+        that should be considered quoted for incoming messages.  The
+        regular expression should match the beginning of line of
+        quoted text a single level deep, the program will then use
+        this to calculate the depth of quoting and alter the quoted
+        text colours appropriately.  A default <abbrev>regexp</abbrev>
+        is provided that should work in most situations.  </para>
+
+      <para>This regexp affects both highlighting and spell checking,
+	and uses the extended regular expression set.  For more
+	information see the <command>grep</command>(1) manual or info
+	page.</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guilabel>Wrap Incoming Text</guilabel></term>
+    <listitem>
+      <para>If selected, <application>Balsa</application> will
+        wrap text of incoming messages at the specified line
+        length.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>
+      <guilabel>
+        Reflow messages of type `text/plain;format=flowed'
+      </guilabel>
+    </term>
+    <listitem>
+      <para>The `format' parameter distinguishes two ways of
+        representing paragraphs in messages of type `text/plain' (that
+        is, simple text). The value `flowed' indicates that paragraphs
+        have been broken into lines ended with `soft' line breaks: a
+        space is left at the end of the line. A `hard' line break (one
+        that is not preceded by a space) indicates the end of a
+        paragraph.</para>
+      <para><application>Balsa</application> can reflow the paragraphs,
+        quoted or otherwise, in a message of this type.  Reflowing
+        eliminates the line fragments that are left when text is first
+        wrapped at one length and then rewrapped to a shorter length,
+        which are often misquoted.</para>
+      <para>The only other value of `format' is `fixed', which is the
+        value assumed by default when `format' is not specified, as with
+        older mailers. In this case, all line breaks must be respected.
+        If you do not select the `Reflow...' option,
+        <application>Balsa</application> will treat all messages of type
+        `text/plain' as if they were `format=fixed'. Long lines will
+        still be wrapped, if the `Wrap Incoming Messages' option is
+        selected, but this will usually leave unquoted line
+        fragments.</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>
+      <guilabel>Message Disposition Notification request</guilabel>
+    </term>
+    <listitem>
+      <para>You will sometimes receive a message whose sender has asked
+        for notification that you have received or seen the message. You
+        can specify how <application>Balsa</application> responds to
+        these requests.</para>
+    </listitem>
+  </varlistentry>
+
+</variablelist>
+</sect2>
+
+<!-- ################################################################# -->
+<!--             SUBSECTION: PREFERENCES/MAIL OPTIONS/OUTGOING         -->
+<!-- ################################################################# -->
+<sect2 id="mail-options-outgoing">
+<title>Outgoing</title>
+
+<variablelist>
+  <varlistentry>
+    <term><guilabel>Wrap Outgoing Text</guilabel></term>
+    <listitem>
+      <para>Have &Balsa; wrap all outgoing mail at the specified
+	column.</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>
+      <guilabel>
+        Send message as type `text/plain; format=flowed'
+      </guilabel>
+    </term>
+    <listitem>
+      <para>The `format' parameter distinguishes two ways of
+        representing paragraphs in messages of type `text/plain'
+        (that is, simple text). The value `flowed' indicates
+        that paragraphs have been broken into lines ended with
+        `soft' line breaks: a space is left at the end of the
+        line. A `hard' line break (one that is not preceded by a
+        space) indicates the end of a paragraph.</para>
+      <para><application>Balsa</application> can prepare the message
+        using this convention, and a flowed-aware mailer
+        receiving it can then reflow its paragraphs to fit its display
+        without leaving misquoted line fragments. If you do not select
+        this option, <application>Balsa</application> will use
+        hard line breaks to end lines, and no receiving mailer
+        will be able to identify paragraphs.</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guilabel>Reply prefix</guilabel></term>
+    <listitem>
+      <para>The string that <application>Balsa</application>
+        should use as a prefix when quoting a message. Note: if
+        you select `Send message as type text/plain;
+        format=flowed', <application>Balsa</application> is
+        required to use the one-character string ">".
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>
+      <guilabel>Automatically quote original when replying</guilabel>
+    </term>
+    <listitem>
+      <para>Have <application>Balsa</application> include the
+        text of a message in the reply. The text will be
+        prefixed as shown above.</para>
+      <para>You can instead include the original message using an
+        option on the `Edit' menu, or by dragging the message
+        from the message index into the text area of the reply.
+        If you prefer to include text this way, do not select
+        the `Automatically quote...' option.</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>
+      <guilabel>
+        Don't include HTML parts as text when replying or forwarding
+        mail
+      </guilabel>
+    </term>
+    <listitem>
+      <para>Tell <application>Balsa</application> to be sensible.</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>
+      <guilabel>
+        Forward a mail as attachment instead of quoting it
+      </guilabel>
+    </term>
+    <listitem>
+      <para>If this option is selected, messages that are
+        `Automatically quoted' will actually be attached
+        unmodified, instead of included in the text of the reply,
+        prefixed by the reply string.</para>
+      <para>You can also attach any message to a new message 
+        by dragging it from the message index into
+        the attachment area of the new message (or, in fact, any
+        part of the new message window except the text area or
+        the address lines).</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry> 
+    <term>
+      <guilabel>
+        Send button always queues outgoing mail in outbox
+      </guilabel>
+    </term>
+    <listitem>
+      <para>This option gives you control over when
+        <application>Balsa</application> connects to a server to
+        send messages.</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry> 
+    <term><guilabel>Copy outgoing messages to sentbox</guilabel></term>
+    <listitem>
+      <para>Have <application>Balsa</application> save a copy of
+        each message you send in the mailbox marked as the `Sentbox'.</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term><guilabel>Encoding</guilabel></term>
+     <listitem>
+       <para>Set the character encoding method to either 7 bit, 8
+       bit, or what the quoted message is using.</para>
+     </listitem>
+  </varlistentry>
+</variablelist>
+</sect2>
+</sect1>
+
+
+<!-- ################################################################# -->
+<!--                 SUBSECTION: PREFERENCES/DISPLAY                   -->
+<!-- ################################################################# -->
+<sect1 id="preferences-3">
+<title>Display</title>
+      
+<para>This page controls how &Balsa; appears to you.</para>
+      
+<variablelist>
+  <varlistentry>
+    <term><guilabel>Use Preview Pane</guilabel></term>
+    <listitem>
+      <para>Set whether to use the preview pane to display messages,
+      or rely on the separate mail viewing window.</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guilabel>Show Mailbox Info</guilabel></term>
+    <listitem>
+      <para>This will allow the number of total and unread messages
+      for each mailbox to be shown in the left pane of the &Balsa;
+      main window.</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guilabel>Toolbars</guilabel></term>
+    <listitem>
+      <para>Use this to determine whether &Balsa;'s toolbars display
+      only text, only icons, or both text and icons.</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guilabel>Display Progress</guilabel></term>
+    <listitem>
+      <para>
+        This sets the behaviour of the dialog that is shown when
+        &Balsa; retrieves messages from it's specified &POP3; servers.
+        The dialog can be shown only while the messages are being
+        retrieved, automatically closing after &Balsa; is finished.
+        Or it can be set to stay active until manually closed.
+        Finally, the dialog can not be displayed at all.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guilabel>Date Encoding</guilabel></term> 
+    <listitem>
+      <para>
+        Set the format used to display dates in &Balsa;.  This uses
+	the same format string as <function>strftime</function>, a
+	summary which is provided below:
+
+      <itemizedlist>
+
+	<listitem>
+ 	  <para><literal>%a</literal> &mdash; The abbreviated weekday
+	    name.</para>
+	</listitem>
+
+	<listitem>
+	  <para><literal>%A</literal> &mdash; The full weekday
+	    name.</para>
+	</listitem>
+
+	<listitem>
+	  <para><literal>%b</literal> &mdash; The abbreviated month
+	    name.</para>
+	</listitem>
+
+	<listitem>
+	  <para><literal>%B</literal> &mdash; The full month
+	    name.</para>
+	</listitem>
+
+	<listitem>
+	  <para><literal>%d</literal> &mdash; The day of the
+	    month.</para>
+	</listitem>
+
+	<listitem>
+	  <para><literal>%R</literal> &mdash; The time using a 24-hour
+	    clock. (HH:MM)</para>
+	</listitem>
+
+	<listitem>
+	  <para><literal>%r</literal> &mdash; The time using a 12-hour
+	    clock (HH:MM AM/PM).</para>
+	</listitem>
+
+	<listitem>
+	  <para><literal>%T</literal> &mdash; The time using a 24-hour
+	    clock, with seconds (HH:MM:SS).</para>
+	</listitem>
+
+	</itemizedlist>
+
+      <tip>
+	<para>See the <function>strftime</function> manual page for a
+	  full listing of conversion specifiers.</para>
+      </tip>
+
+      </para>
+    </listitem>
+  </varlistentry>
+	
+  <varlistentry>
+    <term><guilabel>Displayed Headers</guilabel></term>
+    <listitem>
+    <para>A space-separated list of the headers to display in the
+      message window.</para>
+    </listitem>
+  </varlistentry>
+	
+</variablelist>
+</sect1>
+
+<!-- ################################################################# -->
+<!--                 SUBSECTION: PREFERENCES/SPELLING                  -->
+<!-- ################################################################# -->
+<sect1 id="preferences-4">
+<title>Spelling</title>
+
+<para>
+  The pane to setup Balsa spell check options.  Balsa uses the
+  Portable Spell Checking library (<ulink
+  url="http://pspell.sourceforge.net">pspell</ulink>) to do provide an
+  interface to the spell checking program of your choice.  Currently
+  there are modules for ispell or aspell, both of which can be found
+  at the pspell website.  For more information visit the Balsa
+  homepage.
+</para>
+
+<variablelist>
+<varlistentry>
+  <term><guilabel>Pspell Module</guilabel></term>
+	
+  <listitem>
+    <para>
+      The Pspell library allows you to use whatever spell checking
+      engine you prefer, though the use of loadable modules.
+      Currently Pspell has support for two modules, the traditional
+      ispell, and the newer and more advanced aspell.
+    </para>
+
+    <para>
+      Ispell is most likely available on your system as it is a Unix
+      standard, however Aspell is more advanced as it uses an advanced
+      phonetics engine and adaptive techniques to learn how you tend
+      to misspell words.  More information is available at the <ulink
+      url="http://aspell.sourceforge.net">Aspell
+      website</ulink>.
+    </para>
+
+    <para>
+      Balsa will attempt to use whatever module you specify here,
+      however if the module is not installed it will not work and
+      generate an error.
+    </para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>Suggestion Mode</guilabel></term>
+
+  <listitem>
+    <para>The suggestion mode determines how hard the computer will
+    search for suggestions for misspelled words.  There are three
+    options:</para>
+
+    <variablelist>
+      <varlistentry>
+	<term><guilabel>Fast</guilabel></term>
+
+	<listitem>
+	  <para>This mode quickly scans for replacements, which means
+	    it might be used by a good speller who occaisonally makes
+	    typographical errors.</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><guilabel>Normal</guilabel></term>
+	<listitem>
+	  <para>The Normal mode is probably good enough for most
+	    people, it should produce the correct suggestion in the
+	    majority of cases.</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><guilabel>Bad Spellers</guilabel></term>
+	<listitem>
+	  <para>The Bad Spellers mode is the most thourough and
+	    accurate mode, however it also takes the longest to find a
+	    list of suggestions.</para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>Ignore Length</guilabel></term>
+
+  <listitem>
+    <para>This provides the ability to ignore words shorter than a
+      certain length.  It may be useful to automatically skip short
+      acronyms that are normally flagged as incorrect.</para>
+  </listitem>
+</varlistentry>
+</variablelist>
+</sect1>
+
+<!-- ################################################################# -->
+<!--                 SUBSECTION: PREFERENCES/MISC                      -->
+<!-- ################################################################# -->
+
+<sect1 id="preferences-5">
+<title>Misc</title>
+      
+<variablelist>
+<varlistentry>
+  <term><guilabel>Debug</guilabel></term>
+  <listitem>
+    <para>Toggle the output of debugging information.  Depending on
+    what notification priority set for it in the <link
+    linkend="preferences-3">Display</link> page, it can show up in
+    list or dialog as the program runs.
+    </para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>Empty Trash on Exit</guilabel></term>
+  <listitem>
+    <para>Set Balsa to delete all messages in the
+      <symbol>Trash</symbol> mailbox when &Balsa; exits.</para>
+  </listitem>
+</varlistentry>
+
+</variablelist>
+</sect1>
+
+<!-- ################################################################# -->
+<!--                 SUBSECTION: PREFERENCES/STARTUP                   -->
+<!-- ################################################################# -->
+<sect1 id="preferences-6">
+<title>Startup</title>
+
+<variablelist>
+<varlistentry>
+  <term><guilabel>Open Inbox upon Startup</guilabel></term>
+  <listitem>
+    <para>If set, &Balsa; will open your system inbox upon startup.</para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>Check Mail at Startup</guilabel></term>
+  <listitem>
+    <para>If set, &Balsa; will automatically attempt to download mail
+      from the &POP3; mail server upon startup, and will check for new
+      mail on an &IMAP; server.</para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>Remember Open Mailboxes Between
+      Sessions</guilabel></term>
+  <listitem>
+    <para>When marked, &Balsa; will remember and reopen mailboxes that
+      were open when &Balsa; was last quit.</para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>IMAP Folder Scan Depth</guilabel></term>
+  <listitem>
+    <para>Opening an &IMAP; folder can be time-consuming, because of the
+    need to explore an entire tree of subfolders. You can defer scanning
+    the tree by setting the scan depth to 1. &Balsa; will then descend
+    into the tree only far enough to discover whether any folders that
+    you can see have subfolders. The first time you expand any subtree,
+    &Balsa; will explore more of the tree.</para> <para>If you prefer
+    to have the whole tree available from startup, choose a depth as
+    great as that of your folder tree. Intermediate settings may also
+    be used.</para>
+  </listitem>
+</varlistentry>
+
+</variablelist>
+</sect1>
+
+<!-- ################################################################# -->
+<!--                 SECTION: CUSTOMIZING TOOLBARS                     -->
+<!-- ################################################################# -->
+<sect1 id="toolbar-prefs">
+<title>Customizing Toolbars</title>
+
+<para>
+  Balsa allows you to change the layout of the toolbars on the three
+  main types of window: the main window, message windows, and compose
+  windows. You open the dialog with the
+  <menuchoice>
+  <guimenu>Settings</guimenu>
+  <guimenuitem>Toolbars...</guimenuitem>
+  </menuchoice>
+  menu item.
+</para>
+<para>
+  The dialog contains a notebook with a page for each type of window. On
+  each page, you'll see a Preview of the toolbar, which changes as you
+  change the layout. The list of <quote>Available buttons</quote> shows
+  buttons that may be used on the toolbar, but aren't currently used,
+  and the <quote>Current toolbar</quote> list shows the current layout,
+  including both buttons and separators. You can add buttons to the
+  current toolbar, remove them, or move them up or down in the list,
+  using the controls in the central button box.
+</para>
+<para>
+  Below the notebook is a checkbox for wrapping the button labels
+  (the text that may accompany the buttons). This option applies to
+  the toolbars on all three types of window. If you choose wrapping,
+  long labels will be shown on two lines.  You control whether and where
+  the labels are shown using the popup (right click) menu for any actual
+  toolbar, not this dialog.
+</para>
+<para>
+  This is an <quote>instant apply</quote> dialog: the changes you make
+  take effect immediately, as shown in the Preview toolbar; actual
+  toolbars are updated when you close the dialog. Immediately below the
+  Preview toolbar you'll find a button that restores the standard layout
+  for that toolbar. <emphasis>Note</emphasis> that the standard layout
+  is the one that you see before the toolbar has been customized. If you
+  use this option, all current <emphasis>and past</emphasis> changes
+  will be undone.
+</para>
+</sect1>
+
+
+<!-- ################################################################# -->
+<!--                 SECTION: FOLDER CONFIGURATION                     -->
+<!-- ################################################################# -->
+<sect1 id="folder-config">
+<title>IMAP Folder configuration</title>
+    
+<para>
+  The folder configuration edit dialog allows you to configure entire
+  mailbox sets on remote IMAP servers.  <emphasis>Note</emphasis> that
+  this IMAP folder support is still experimental and you may
+  experience some difficulties if you have bad luck.
+</para>
+
+<itemizedlist mark="bullet">
+
+  <listitem>
+    <para>Descriptive name is the name of the root node that will be
+    shown in the mailbox tree on the left side.</para>
+  </listitem>
+
+  <listitem><para>Server is the host name or IP number of the 
+  IMAP server.</para></listitem>
+
+  <listitem><para>Port is the port number to be used for the
+  connection. The default value is 143 but you may want to modify it
+  if you use connection forwarding or your IMAP server runs on a
+  nonstandard port number.</para></listitem> 
+
+  <listitem><para>User name is the name used for authorization on the
+  IMAP server.</para></listitem>
+
+  <listitem><para>Password is the password used for authorization on
+  the IMAP server.</para></listitem>
+
+  <listitem><para>Check box allows you to choose all mailboxes on the
+  server, or only those you subscribed to.</para></listitem>
+  
+  <listitem><para>Prefix is the root mailbox on the server. You may
+  leave it empty if you want to show all the folders on your server
+  but if your IMAP server stores also other kind of files you may
+  specify for instance &quot;mail&quot;.</para></listitem>
+</itemizedlist>
+
+<sect2 id="subfolder-config">
+<title>IMAP Subfolder Properties</title>
+    
+<para>
+  The subfolder properties dialog allows you to manage folders on
+  remote IMAP servers. Specifically, you can
+  <emphasis>create</emphasis> a new subfolder,
+  <emphasis>rename</emphasis> an existing subfolder, or
+  <emphasis>move</emphasis> a subfolder within the folder tree.
+</para>
+
+<itemizedlist mark="bullet">
+
+  <listitem><para><quote>Folder name</quote> is how the folder is shown
+  in the mailbox tree on the left side.</para></listitem>
+
+  <listitem><para><quote>Subfolder of</quote> indicates the immediate parent of
+  the folder.</para></listitem>
+</itemizedlist>
+
+<para>
+  When the dialog is opened from
+  <menuchoice>
+  <guimenu>File</guimenu>
+  <guisubmenu>New</guisubmenu>
+  <guimenuitem>Remote IMAP subfolder</guimenuitem>
+  </menuchoice>,
+  you can enter the folder name and browse IMAP
+  trees to find the parent folder. If you had already selected a
+  mailbox in an IMAP tree, only that tree is shown for browsing;
+  otherwise, all IMAP trees will be shown.
+</para>
+
+<para>
+  When the dialog is opened from
+  <menuchoice>
+  <guimenu>Mailbox</guimenu>
+  <guimenuitem>Edit</guimenuitem>
+  </menuchoice>
+  with an IMAP folder selected, or by right-clicking on an IMAP
+  mailbox and selecting
+  <guimenuitem>Properties...</guimenuitem>,
+  the mailbox may be:
+
+  <itemizedlist mark="bullet">
+    <listitem><para>Renamed, by editing the folder name;</para></listitem>
+    <listitem><para>Moved, by browsing for a different parent folder
+  	in the same tree.</para></listitem>
+  </itemizedlist></para>
+</sect2>
+</sect1>
+
+<!-- ################################################################# -->
+<!--                 SECTION: ADDRESS BOOK CONFIGURATION               -->
+<!-- ################################################################# -->
+<sect1 id="ab-conf">
+<title>Address book configuration</title>
+  <para>This is to be filled in.</para>
+
+<sect2 id="CHOICE">
+  <title>Address book type</title>
+  <para>You can choose among several address book types.</para>
+</sect2>
+
+<sect2 id="EXTERN">
+<title>External address book</title>
+<!-- Balsa support for an external query addressbook -->
+<!-- By Jelmer Vernooij <jelmer@nl.linux.org>        -->
+
+<para>The balsa addressbook supports input from programs. Thus, you
+can use (no importing needed!) for example your pine or mutt
+addressbook. The mutt mailer (<ulink
+url="http://www.mutt.org/">www.mutt.org</ulink>) uses an identical
+system to retrieve addresses from programs.</para>
+
+  <sect3 id="extern-existing-programs">
+   <title>Existing programs</title>
+
+<para>The following programs are compatible with the mutt mail reader
+and /should/ be with balsa. Submit links to more programs.</para>
+
+<itemizedlist>
+<listitem><para>
+<ulink url="http://www.spinnaker.de/lbdb/"
+       type="http">http://www.spinnaker.de/lbdb/</ulink> - The little
+brother database. Read emailaddresses and names from: finger,
+/etc/passwd, incoming procmail email, NIS, fido, the abook program,
+mutt addressbook, pine addressbook, palm addressbook, gnomecard
+addressbook, big brother database, ldap database. 
+</para></listitem>
+
+<listitem><para>
+<ulink url="http://www.fiction.net/blong/programs/mutt/"
+       type="http">http://www.fiction.net/blong/programs/mutt/</ulink>
+ - palm address database, ldapsearch wrapper, ph/qi server, UIUC, ph,
+</para></listitem>
+</itemizedlist>
+</sect3>
+
+<sect3 id="extern-load-scripts">
+<title>Writing your own load scripts</title>
+
+<para>Balsa ignores the first line of output from your program. You
+might want to write comments or debug output on this line. The
+remaining lines should have this format:</para>
+<para><computeroutput>
+e-mail address	full name	nickname
+</computeroutput></para>
+
+<para>The three fields should be seperated by tabs. The third field is
+currently not used by balsa, but might be in the future. It is also
+kept to ensure compatibility with mutt. </para>
+
+<para>Balsa executes your script with one argument: the pattern to
+search for. A space (" ") is used as the first argument when creating
+a list of all users.</para>
+
+<para>All characters are allowed, except from the tab(\t), since that
+is the field seperator. 
+</para>
+
+<para>An example output could be:</para>
+<para><computeroutput>
+lbdbq: 3 matches
+</computeroutput></para>
+<para><computeroutput>
+balsa-list@gnome.org	Balsa List	balsa-list
+</computeroutput></para><para><computeroutput>
+jelmer@nl.linux.org	Jelmer Vernooij	jelmer
+</computeroutput></para><para><computeroutput>
+balsa-maintainer@theochem.kth.se	Pawel Salek	balsa-maintainer
+</computeroutput></para>
+
+
+<para>Your script/program should write it's output to stdout and not
+to stderr! 
+</para>
+</sect3>
+
+<sect3 id="extern-save-scripts">
+<title>Writing your own save scripts</title>
+
+<para>Adding addresses is also possible. Your script should receive 3
+arguments. The first is an email address, the second a full name and
+the third is an alias (currently not used and replaced by 'TODO').</para>
+
+<para>Note that mutt does not have support for adding addresses and there is thus no compatibility in this case.</para>
+
+<para>Comments are welcome: <email>jelmer@nl.linux.org</email></para>
+</sect3> 
+</sect2> <!-- EXTERN -->
+</sect1> <!-- ab-conf -->
+
+<!-- ################################################################# -->
+<!--                 SECTION: CUSTOMIZE TOOLBARS                       -->
+<!-- ################################################################# -->
+<sect1 id="toolbars">
+<title>Toolbar customization</title>
+  <para>This is to be filled in.</para>
+</sect1>
+
+<!-- ################################################################# -->
+<!--                 SECTION: IDENTITIES                               -->
+<!-- ################################################################# -->
+<sect1 id="identities">
+<title>Identities</title>
+
+<para>
+  This dialog window lets you specify how you present yourself to the
+  rest of the world through your email.
+</para>
+
+<variablelist>
+  <varlistentry>
+    <term><guilabel>Your Name</guilabel></term>
+    <listitem>
+      <para>
+        This doesn't <emphasis>have</emphasis> to be your name, I
+        guess. But it's the word prefixing your email address in mail
+        you send.
+      </para>
+    </listitem>
+  </varlistentry>
+	
+  <varlistentry>
+    <term><guilabel>E-Mail address</guilabel></term>
+    <listitem>
+      <para>
+        As you wish it to appear in your &quot;From&quot; header.
+      </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guilabel>Reply-To address</guilabel></term>
+    <listitem>
+      <para>
+        The address that you wish people to reply to your email with
+	(if you have a home and a work address, for instance).
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guilabel>Default domain</guilabel></term>
+    <listitem>
+      <para>
+        The domain that you wish to append to all e-mail entries where
+        you did not specify the domain.  Normally you would use your
+        local domain.  You need to enable <link
+        linkend="preferences-1">Alias Expansion</link> for this to
+        work.  
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+  <term><guilabel>Use Signature File When</guilabel></term>
+  <listitem>
+    <variablelist>
+      <varlistentry>
+	<term><guilabel>Sending Mail</guilabel></term>
+	<listitem>
+	  <para>
+            Include the signature file when sending email.
+          </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><guilabel>Replying to Mail</guilabel></term>
+	<listitem>
+	  <para>
+            Include the signature file when replying to mail.
+          </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><guilabel>Forwarding Mail</guilabel></term>
+	<listitem>
+	  <para>
+            Include the signature file when forwarding mail.
+          </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>Signature file</guilabel></term>
+  <listitem>
+    <para>
+      The text to append to all your messages. This text can come from
+      one of three places:
+
+     <itemizedlist>
+       <listitem>
+         <para>
+           From a regular file.  List the path to any regular file,
+           and the text from that file will be appended to your
+           messages.
+         </para>
+       </listitem>
+
+       <listitem>
+         <para>
+           A named pipe or FIFO.  In this case, to Balsa, the file
+           looks normal, but in reality, it is a pipe to a program
+           that is generating the content.  List the path to the pipe.
+         </para>
+       </listitem>
+
+       <listitem>
+         <para>
+           An executable program. Balsa will execute the program and
+           read its output, appending that text to the message.  List
+           the path to the program with a "|" prepended to it.  For
+           example:
+         </para>
+         <para><quote>|/home/user/dynsig.pl</quote></para>
+       </listitem>
+     </itemizedlist>
+   </para>
+
+   <para>
+     You also get to control when the signature is appended.
+   </para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>Reply Prefix</guilabel></term>
+  <listitem>
+    <para>
+      The character sequence to prefix quoted lines in a reply with.
+    </para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>Enable Signature Separator</guilabel></term>
+  <listitem>
+    <para>
+      When checked, this has &Balsa; insert the standard signature
+      separator before your signature.
+    </para>
+  </listitem>
+</varlistentry>
+</variablelist>
+
+</sect1>
+
+<!-- ################################################################# -->
+<!--                 SECTION: OTHER GENERAL STUFF, FAQ etc.            -->
+<!-- ################################################################# -->
+<sect1 id="mbox-formats">
+<title>Available mailbox formats</title>
+<para>
+  Balsa handles several mailbox formats, including mbox.
+</para>
+<para>
+  The further information can be found in the following
+  documents:
+  <itemizedlist>
+    <listitem>
+    <para>
+      Benchmarking mbox versus maildir <ulink type="http"
+      url="http://www.courier-mta.org/mbox-vs-maildir/">http://www.courier-mta.org/mbox-vs-maildir/</ulink>
+    </para>
+    </listitem>
+
+    <listitem>
+      <para>Mailbox Format Characteristics
+       <ulink type="http"
+       url="http://www.washington.edu/imap/documentation/formats.txt.html">http://www.washington.edu/imap/documentation/formats.txt.html</ulink></para>
+    </listitem>
+
+    <listitem>
+      <para>maildir(5) manual page (from qmail)
+<ulink type="http" url="http://www.qmail.org/qmail-manual-html/man5/maildir.html">http://www.qmail.org/qmail-manual-html/man5/maildir.html</ulink></para>
+    </listitem>
+
+    <listitem>
+      <para>Using maildir format
+<ulink type="http" url="http://cr.yp.to/proto/maildir.html">http://cr.yp.to/proto/maildir.html</ulink></para>
+    </listitem>
+
+    <listitem>
+      <para>mbox(5) manual page (from qmail)
+<ulink type="http" url="http://www.qmail.org/qmail-manual-html/man5/mbox.html">http://www.qmail.org/qmail-manual-html/man5/mbox.html</ulink></para>
+    </listitem>
+
+    <listitem>
+      <para>Mailbox formats (from Mail-Administrator HOWTO)
+<ulink type="http" url="http://linuxdocs.org/HOWTOs/Mail-Administrator-HOWTO-3.html#ss3.5">http://linuxdocs.org/HOWTOs/Mail-Administrator-HOWTO-3.html#ss3.5</ulink></para>
+    </listitem>
+  </itemizedlist>
+</para>
+</sect1>
+
+<!-- ################################################################# -->
+<!--                 SECTION: COMMON TASKS                             -->
+<!-- ################################################################# -->
+<sect1 id="common-tasks">
+<title>Common Tasks with &Balsa;</title>
+
+<para>
+  This section explains many of the things you might want to do with
+  &Balsa;.
+</para>
+
+<itemizedlist mark="bullet">
+  <listitem>
+    <para><link linkend="ct-create-new-mb">Creating new
+    mailboxes</link></para>
+  </listitem>
+
+  <listitem>
+    <para><link linkend="ct-move-msg">Moving messages
+    around</link></para>
+  </listitem>
+
+  <listitem>
+    <para><link linkend="ct-main-folder-imap">Making one of the main
+    folders IMAP-based</link></para>
+  </listitem>
+
+  <listitem>
+    <para><link linkend="ct-alias-expansion">Expanding
+    e-mail addresses automatically</link> </para>
+  </listitem>
+
+  <listitem>
+    <para><link linkend="ct-ldap">Setting up LDAP address
+    books</link></para></listitem>
+  </itemizedlist>
+
+  <sect2 id="ct-create-new-mb">
+  <title>Creating New Mailboxes</title>
+
+  <para>
+    You can create new local and IMAP mailboxes by right-clicking in
+    the mailbox list and selecting New Mailbox. This will start a
+    dialog that will let you name the mailbox and specify its
+    location.
+  </para>
+
+  <para>
+    To create a new &POP3; mailbox, go to the configuration dialog,
+    select the Mailboxes section, and click Add in the POP3 area. A
+    dialog will be displayed that will let you set up the new mailbox.
+  </para>
+
+  <note>
+    <para>
+      Under <application>Sawfish</application>, this dialog has been
+      known to become obscured, causing the appearance that &Balsa;
+      has locked up. Move the configuration dialog and see if the new
+      dialog was hidden.
+    </para>
+  </note>
+
+</sect2>
+
+<sect2 id="ct-move-msg">
+  <title>Moving Messages</title>
+
+  <para>
+    There are several methods available for moving or copying messages
+    from one mailbox to another.  The first is via the
+    <guimenuitem>Transfer</guimenuitem> context menu, and the second
+    is using drag and drop.
+  </para>
+
+  <para>To transfer messages using the
+  <guimenuitem>Transfer</guimenuitem> menu, simply select the messages
+  you desire to move from one mailbox, then bring up the context menu
+  and select the <guimenuitem>Transfer</guimenuitem> submenu.  This
+  will display a list of mailboxes similar to the mailbox list in the
+  main window.  The list can be scrolled and trees expanded and
+  collapsed, although these changes will not be reflected in the main
+  list.  Selecting a mailbox will start the transfer.</para>
+
+  <para>The other method of transferring messages is to simply drag
+  and drop the message(s) from the message index to the desired
+  destination.  Select the message(s) you wish to transfer, then drag
+  them using the mouse until they are over the intended mailbox.  The
+  destination can either be in the mailbox list in the main window, or
+  if open mailbox tabs are enabled the messages can be dragged to
+  them.  Messages are copied by default, but holding down the
+  <keysym>Shift</keysym> key when dropping the messages will move them
+  instead.</para>
+
+</sect2>
+
+<sect2 id="ct-main-folder-imap">
+  <title>I want one of the main folders to be IMAP</title>
+
+  <para>First, create the IMAP folder as you want it configured. Then,
+  press right mouse button on the mailbox entry and select <quote>Mark
+  as Inbox</quote>. That is all!</para>
+</sect2>
+	 
+<sect2 id="ct-alias-expansion">
+  <title>I want Balsa to guess my friends</title>
+
+  <para>Balsa can expand the names of your contacts it finds in Balsa
+  addressbooks.  It will do this by both the Card Name (unique alias)
+  and the Full Name.</para>
+
+  <para>As you type a username in any of the To:, Cc:, or Bcc: entry
+  boxes in the <link linkend="win-composer">Compose window</link>, it
+  will do a case insensitive search in the addressbook for a matching
+  username, and fill in the best match.  This is best demonstrated
+  with the following picture:</para>
+ 
+  <figure>
+    <title>Expanding Aliases</title>
+    <screenshot>
+	  <mediaobject> 
+	    <imageobject><imagedata
+		fileref="figures/example-alias.png" format="PNG"/> 
+	    </imageobject>
+	  </mediaobject>
+    </screenshot>
+  </figure>
+
+  <para>The example shows what it looks like if <quote>Balsa Mailing
+  List</quote> is in your address book, and you have typed
+  &quot;ba&quot;</para>
+
+  <para>If the match shown is what you want, simply press Enter to
+  move to the next entry, or press Comma or End to type another e-mail
+  address.</para>
+
+  <para>If the match shown is not the one you want, pressing Tab will
+  cycle through all possible matches.  If there is only one match, it
+  will move to the end of the match.  At any point, you can simply
+  continue typing and ignore the matched entry.  To move to the next
+  entry without accepting the shown entry, press the Down
+  arrow.</para>
+
+  <para>
+    To enable this feature, you must select which address books you
+    wish to be searched for aliases to expand.  This can be done in
+    the <link linkend="preferences-1">Preferences</link> window, under
+    the <guilabel>Address Books</guilabel> tab. Also, some address
+    books are expensive to lookup. You will need then to press
+    <keysym>Ctrl-R</keysym> to explicitly expand the alias.
+  </para>
+</sect2>
+
+<sect2 id="ct-ldap">
+  <title>Setting up LDAP address books</title>
+
+  <para>
+    Only steps crucial for &Balsa; are described here. Some of the
+    steps may be specific to OpenLDAP server. Whenever in doubt,
+    consult the documentation provided with your LDAP server.
+  </para>
+
+  <itemizedlist>
+    <listitem><para>Install the LDAP server software.</para></listitem>
+
+    <listitem><para>Configure. In the case of OpenLDAP, edit
+    <filename>/etc/openldap/ldap.conf</filename> and
+    <filename>/etc/openldap/slapd.conf</filename>. Consult your LDAP
+    configuration and other sources to choose the right Domain Name
+    for your institution and authentication level apriopriate to your
+    environment.</para></listitem>
+
+    <listitem><para>Import data to your LDAP server. OpenLDAP comes
+    with a set of migration tools but they do not create directly
+    objects of standard <classname>inetOrgPerson</classname> class
+    which is an apropriate type for address book entry. You may need
+    to tune them.</para></listitem>
+
+  </itemizedlist>
+      
+  <para>
+    &Balsa; searches for objects having <property>mail</property>
+    attribute. The search is done on the <property>cn</property>
+    attribute and the search filter has a form
+    <quote>(&amp;(mail=*)(cn=John D))</quote>.  &Balsa; uses
+    <property>cn</property> (common name),
+    <property>givenName</property> (given name),
+    <property>sn</property> (surname) and <property>mail</property>
+    (e-mail address) attributes of the found objects.
+  </para>
+</sect2>
+</sect1>
+
+
+<!-- ################################################################# -->
+<sect1 id="its-not-working">
+  <title>It's not Working!!!</title>
+
+  <para>This is a FAQ for when &Balsa; appears to lock up, or other
+   things that you think should be happening aren't. If you can't
+   figure out how to do something but &Balsa; lets you do it, that's a
+   bug. Report it.</para>
+
+  <itemizedlist mark="bullet">
+    <listitem><para><link linkend="inw-main-to-imap">I want one of the
+    main folders to be IMAP </link></para></listitem>
+
+    <listitem><para><link linkend="inw-frozen">&Balsa;'s frozen!
+    </link></para></listitem>
+
+    <listitem><para><link linkend="inw-didnt-delete">I thought I
+    deleted that message!</link></para></listitem>
+
+    <listitem><para><link linkend="inw-spooky-win">What's that window
+    that flashed on the screen?  </link></para></listitem>
+
+    <listitem><para><link linkend="inw-address-book">The address book
+    doesn't import my addresses.  </link></para></listitem>
+    </itemizedlist>
+
+    <sect2 id="inw-main-to-imap">
+      <title>I want a basic mailbox to use IMAP</title> <para>See
+	<link linkend="ct-main-folder-imap">this section</link>.</para>
+    </sect2>
+
+    <sect2 id="inw-frozen">
+      <title>&Balsa;'s frozen!</title>
+      <para>Odds are it isn't. Watch out for:</para>
+      <itemizedlist mark="bullet">
+        <listitem><para>If you don't have threading, &Balsa; will stop
+         responding when it sends and receives email. Use threading,
+         if possible.</para></listitem>
+
+        <listitem><para>&Balsa; is downloading a new message or
+         closing a large mailbox. This could take a while, especially
+         when this file is accessed via
+         <acronym>NFS</acronym>.</para></listitem>
+
+        <listitem><para>A dialog box is being displayed but it is
+         obscured by another one. This seems to happen under
+         Sawfish. Try moving the windows around and see if there's a
+         hidden dialog somewhere.</para></listitem>
+      </itemizedlist>
+    </sect2>
+
+    <sect2 id="inw-didnt-delete">
+      <title>I thought I deleted that message!</title>
+
+      <para>There are some problems with libmutt and deleting
+	messages. We believe them to be solved now, but they may be
+	lingering. Known causes of messages seeming to be deleted but
+	not really are:</para>
+
+      <itemizedlist mark="bullet">
+        <listitem><para>Mail arrives in the folder before the deletion
+         is committed.  This is believed to be
+         solved.</para></listitem>
+
+        <listitem><para>Many messages were deleted and the folder was
+         closed and reopened quickly. This is also believed to be
+         solved.</para></listitem>
+
+      </itemizedlist>
+    </sect2>
+
+    <sect2 id="inw-spooky-win">
+      <title>What's that window that flashed on the screen?</title>
+
+      <para>Were you checking your mail? Probably. This is the window
+	that displays progress for retrieving &POP3;
+	mail. If you don't have any &POP3; accounts,
+	it will still appear -- but it'll disappear almost
+	instantly. You can disable displaying this window in
+	preferences.</para>
+    </sect2>
+
+    <sect2 id="inw-address-book">
+      <title>The address book doesn't import my addresses.</title>
+
+      <para>Balsa attempts to open the file 
+        <filename>~/.gnome/GnomeCard.gcrd</filename>. If
+	you're not using this file, you may need to create a symlink so that
+	Balsa can open it.</para>
+
+    <para>There have been slight changes in &GnomeCard;'s file format
+      between its various versions. &Balsa; is known to work with at
+      least &GnomeCard; version 1.0.10 and probably most other
+      releases.
+    </para>
+  </sect2>
+</sect1>
+
+<!-- ################################################################# -->
+<!--  SECTION: AUTHORS -->
+<sect1 id="authors">
+  <title>Authors</title>
+    
+  <para>
+    &Balsa; is currently developed by (in alphabetical order):
+    <itemizedlist>
+		   
+    <listitem>
+     <para>Carlos Morgado (<email>chbm@chbm.nu</email>)</para>
+    </listitem>	
+
+    <listitem>
+      <para>Pawel Salek (<email>pawsa@theochem.kth.se</email>)</para>
+    </listitem>	
+    </itemizedlist>
+  </para>
+  
+  <para>In the past, numerous people contributed to balsa, including
+    (in alphabetical order):
+
+<itemizedlist>
+ <listitem>
+<para>Hector Garcia Alvarez (<email>hector@scouts-es.org</email>)</para>
+</listitem>	
+
+<listitem>
+<para>Matthew Guenther (<email>guentherm@asme.org</email>)</para>
+</listitem>
+
+<listitem>
+<para>Bruno Pires Marinho (<email>bapm@camoes.rnl.ist.utl.pt</email>)</para>
+</listitem>
+
+<listitem>
+<para>Jay Painter (<email>jpaint@gimp.org</email>)</para>
+</listitem>	
+	
+<listitem>
+<para>Stuart Parmenter (<email>pavlov@pavlov.net</email>)</para>
+</listitem>
+
+<listitem>
+<para>David Pickens (<email>dpickens@iaesthetic.com</email>)</para>
+</listitem>	
+	
+<listitem>
+<para>Peter Williams (<email>peter@newton.cx</email>)</para>
+</listitem>	
+	
+</itemizedlist>
+  To find more information about it, please visit the &Balsa; <ulink
+  url="http://www.balsa.net/" type="http">Web page</ulink>.  Please
+  send all comments, suggestions, and bug reports to the <ulink
+  url="http://bugs.gnome.org/" type="http"><acronym>GNOME</acronym>
+  bug tracking database</ulink>. Instructions for submitting bug
+  reports can be found on-line at <ulink
+  url="http://www.balsa.net/bugs.html" type="http">
+  http://www.balsa.net/bugs.html</ulink>. If you are using
+  <acronym>GNOME</acronym> 1.1 or later, you can also use command
+  <command>bug-buddy</command> for submitting bug reports.
+</para>
+
+<para>
+  Following people contributed to this manual:
+  <itemizedlist>
+  <listitem>
+  <para>Peter Bloomfield (<email>@MindSpring.com</email>)</para>
+  </listitem>
+  <listitem>
+  <para>Matthew Guenther (<email>guentherm@asme.org</email>)</para>
+  </listitem>
+  <listitem>
+  <para>Berend De Schouwer (<email>bds@jhb.ucs.co.za</email>)</para>
+  </listitem>
+  <listitem>
+  <para>Pawel Salek (<email>pawsa@theochem.kth.se</email>)</para>
+  </listitem>
+  <listitem>
+  <para>Peter Williams (<email>peter@newton.cx</email>)</para>
+  </listitem>
+  <listitem>
+  <para>Jelmer Vernooij (<email>jelmer@nl.linux.org</email>)</para>
+  </listitem>
+  </itemizedlist>
+
+  Please send all comments and suggestions regarding the manual to the
+  <acronym>GNOME</acronym> Documentation Project at
+  <email>docs@gnome.org</email> and the Balsa Discussion List
+  <email>balsa-list@gnome.org</email>. You can also add your comments
+  online by using <ulink url="http://www.gnome.org/gdp/doctable/"
+  type="http"><acronym>GNOME</acronym> Documentation Status
+  Table</ulink>.
+  </para>
+</sect1>
+
+  <glossary id="glossary">
+
+    <glossentry id="glossary-pop">
+      <glossterm>POP</glossterm>
+      <glossdef>
+	<para>An acronym for &quot;Post Office Protocol&quot;, a
+	simple method of retrieving mail messages from a remote mail
+	server.  Widely used by mail clients from an Internet Service
+	Provider's mail server to a user's machine for viewing.
+	Currently most people use version three of the protocol,
+	otherwise known as POP3.  A very simple protocol, and not very
+	flexible, but simple to implement and ubiquitous throughout
+	the internet.
+	</para>
+      </glossdef>
+    </glossentry>
+    
+    <glossentry id="glossary-druid">
+      <glossterm>Druid</glossterm>
+      <glossdef>
+	<para>The <acronym>GNOME</acronym> equivalent to Microsoft
+	  Windows Wizards, a step by step dialog to guide the user
+	  through a setup procedure.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="glossary-imap">
+      <glossterm>IMAP</glossterm>
+      <glossdef>
+	<para>An acronym that stands for &quot;Internet Mail Access
+	Protocol&quot;.  It is a newer method of accessing mail over
+	the internet.  It is far more featureful than &POP3;,
+	allowing for remote folders on the mail server, and more
+	control over mail delivery.  However it is not as widely
+	supported.</para>
+      </glossdef>
+    </glossentry>
+    
+    <glossentry id="glossary-ldap">
+      <glossterm>LDAP</glossterm>
+      <glossdef>
+	<para>An acronym for &quot;Lightweight Directory Access
+	Protocol&quot;.  It is a widely-accepted standard for
+	accessing contact information over a network.  This enables
+	organizations to store address information in a central
+	database, but have many people able to access it.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="glossary-libmutt">
+      <glossterm>libmutt</glossterm> <glossdef><para>The library based
+	  on Mutt's code used by &Balsa; to
+	  handle local mail.</para></glossdef>
+    </glossentry>
+    
+    <glossentry id="glossary-mailbox-list">
+      <glossterm>mailbox list</glossterm> <glossdef><para>The list of
+	  mailboxes found in &Balsa;'s left hand
+	  pane.</para></glossdef>
+    </glossentry>
+
+    <glossentry id="glossary-message-index">
+      <glossterm>message index</glossterm> <glossdef><para>The list of
+	  messages in &Balsa;'s upper-right hand
+	  pane.</para></glossdef>
+    </glossentry>
+
+    <glossentry id="glossary-message-view">
+      <glossterm>message view</glossterm> <glossdef><para>The message
+	  display in &Balsa;'s lower-right hand
+	  pane.</para></glossdef>
+    </glossentry>
+
+    <glossentry id="glossary-mda">
+      <glossterm>MDA</glossterm>
+      <glossdef>
+	<para>An acronym for &quot;Mail Delivery Agent&quot;, this
+	type of program is also known as a Local Delivery Agent (LDA).
+	It is responsible for delivering the mail recieved for someone
+	on a machine to the mail folder of that person.
+	&procmail; is an example of this type
+	of program, although many <glossterm
+	linkend="glossary-mta">MTA</glossterm>'s have their own MDA
+	implementations.
+	</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="glossary-mta">
+      <glossterm>MTA</glossterm>
+      <glossdef>
+	<para>An acronym for &quot;Mail Transfer Agent&quot;, this
+	class of program is responsible for moving mail around between
+	people, be they on the same computer, on on completely
+	separate networks.  Examples of this type of program include
+	<application>sendmail</application>,
+	<application>qmail</application>, and
+	<application>postfix</application>.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="glossary-mua">
+      <glossterm>MUA</glossterm>
+      <glossdef>
+	<para>An acronym for &quot;Mail User Agent&quot;, this the
+	program a user would use to read existing mail and create new
+	messages.  MUAs are one of three types of programs that allow
+	internet email to work.  The other two types of programs are
+	<glossterm linkend="glossary-mta">MTA</glossterm>s and
+	<glossterm linkend="glossary-mda">MDA</glossterm>s.
+	&Balsa; is primarily an MUA, but it
+	also functions as an MDA/MTA when retrieving mail from a
+	remote server.</para>
+      </glossdef>
+    </glossentry>
+    
+    <glossentry id="glossary-regular-expression">
+      <glossterm>Regular Expression</glossterm>
+      <glossdef>
+	<para>Often abbreviated as a <abbrev>regexp</abbrev>, this is
+	a method of specifing a pattern to match in text.  Both very
+	simple and very complex patterns can be easily matched using
+	this method.  For information on how to understand and
+	construct regular expressions the best source is the grep
+	manual or info page.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="glossary-smtp">
+      <glossterm>SMTP</glossterm>
+      <glossdef>
+	<para>An acronym that stands for &quot;Simple Mail Transfer
+	Protocol&quot;, it is excatly that.  A standard that defines a
+	simple an reliable way to transfer messages between computers
+	on a network.  It is used by most, if not all, mail programs
+	to transfer mail.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="glossary-vcard">
+      <glossterm>VCARD</glossterm>
+      <glossdef>
+	<para>VCARD is a standard method of storing contact
+	information for easy exchange between programs.  Balsa
+	supports VCARD addressbooks, as does GnomeCard and the
+	upcoming Evolution.  Many other programs are capable of
+	exporting their contact lists in VCARD format as well.</para>
+      </glossdef>
+    </glossentry>
+    
+  </glossary>
+</article>

@@ -1,15 +1,15 @@
 #intl dir needed for tarball --disable-nls build.
-SUBDIRS = m4  macros intl po sounds images help libmutt libbalsa libinit_balsa src
+SUBDIRS = po sounds images doc libmutt libbalsa libinit_balsa src
 
 man_MANS=balsa.1
 
-pixmapdir = $(gnomedatadir)/pixmaps
+pixmapdir = $(datadir)/pixmaps
 pixmap_DATA = gnome-balsa2.png
 
-desktopdir = $(gnomedatadir)/gnome/apps/Internet
+desktopdir = $(datadir)/applications
 desktop_DATA = balsa.desktop
 
-EXTRA_DIST = config.rpath  \
+EXTRA_DIST = \
 	balsa.1.in \
 	balsa.spec.in \
 	balsa.desktop \
@@ -47,12 +47,9 @@ dist-hook: balsa.spec
 
 ## to automatically rebuild aclocal.m4 if any of the macros in
 ## `macros/' change
-@MAINT@include macros/macros.dep
-@MAINT@macros/macros.dep: macros/Makefile.am
-@MAINT@	cd macros && $(MAKE) macros.dep
 bzdist: distdir
 	-chmod -R a+r $(distdir)
-	$(TAR) chojf $(distdir).tar.bz2 $(distdir)
+	$(AMTAR) chojf $(distdir).tar.bz2 $(distdir)
 	-rm -rf $(distdir)
 
-ACLOCAL_AMFLAGS = -I m4
+ACLOCAL_AMFLAGS = -I m4  

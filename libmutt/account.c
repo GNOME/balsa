@@ -148,13 +148,11 @@ int mutt_account_getuser (ACCOUNT* account)
   /* prompt (defaults to unix username), copy into account->user */
   else
   {
-#ifndef LIBMUTT
-    /*  BALSA: No user interaction here, although we could redefine this
-	function ourselves */
+   /*  BALSA: No user interaction here, although we could redefine this
+       function ourselves
     snprintf (prompt, sizeof (prompt), _("Username at %s: "), account->host);
     strfcpy (account->user, NONULL (Username), sizeof (account->user));
-    if (mutt_get_field (prompt, account->user, sizeof (account->user), 0))
-#endif
+    if (mutt_get_field (prompt, account->user, sizeof (account->user), 0)) */
       return -1;
   }
 

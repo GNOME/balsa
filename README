@@ -1,10 +1,13 @@
-Balsa E-Mail Client 1.3.x
+Balsa E-Mail Client 2.0.x
 =========================
 
 See ChangeLog for the list of the recent changes and NEWS for highlights.
 
 Copyright (C) 1997-2002 Stuart Parmenter and others
-See 'COPYING' for licence information.
+
+See 'COPYING' for licence information.  Please note linking against
+OpenSSL libraries is explicitely allowed.
+
 See 'AUTHORS' for a list of contributors
 
 
@@ -34,13 +37,6 @@ complete descriptions are here.
 	Will turn on some features that are less than stable,
 or unfinsished, such as filtering and spell-checking. This
 is really use-at-your-own-risk.
-
---enable-pcre
-	Enable Perl-Compatible Regular Expressions (PCRE). The only
-reason one might to disable them is to reduce the list of
-dependencies. Otherwise, they provide only adventages. The most
-important is locale-awareness (ordinary RE libraries cannot
-distinguish word boundaries for non ISO-8859-1.
 
 --disable-more-warnings
 	Balsa by default is very sensitive to compilation warnings
@@ -75,8 +71,8 @@ function is sometimes troublesome over NFS but is POSIX compatible.
 	This enables GSSAPI Kerberos based authentication scheme. 
 Specify the kerberos directory as the argument.
 
---with-sasl
-	Use Cyrus SASL library for POP/IMAP authentication instead of
+--with-ssl
+	Use OpenSASL library for POP/IMAP authentication instead of
 mutt's native code (in the future, the native code will most likely be
 phased out in favour of SASL library).
 
@@ -86,18 +82,14 @@ Libraries:
 	Balsa uses libESMTP library available at 
 http://www.stafford.uklinux.net/libesmtp/
 The current version is available at
-http://www.stafford.uklinux.net/libesmtp/libesmtp-0.8.4.tar.bz2
-or
-http://www.stafford.uklinux.net/libesmtp/libesmtp-0.8.4.tar.gz
+http://www.stafford.uklinux.net/libesmtp/libesmtp-1.0.tar.bz2
 
-Note, that it the current version requires --enable-require-all-recipents
-option to the configure script. You can grab {i386,src}.rpm that has
-this option enabled from ftp://ftp.chbm.nu/pub/ (built on RH 6.2)
-or from
-http://www.theochem.kth.se/~pawsa/balsa/libesmtp-0.8.4-1.i386.rpm
-http://www.theochem.kth.se/~pawsa/balsa/libesmtp-0.8.4-1.src.rpm
+You can grab {i386,src}.rpm that has this option enabled from
+ftp://ftp.chbm.nu/pub/ (built on RH 6.2) or from
+http://balsa.gnome.org/libesmtp-1.0-1.i386.rpm
+http://balsa.gnome.org/libesmtp-1.0-1.src.rpm
 	
-	The binaries are compiled against gnome-libs-1.2.8, if you use
+	The binaries are compiled against libgnomeui-2.0.1, if you use
 older/newer libraries, you will need to recompile balsa from the
 source.  Balsa also needs the pspell spell checking libraries.
 
@@ -250,8 +242,3 @@ Known issues:
 	spurious warning messages. You have to configure balsa with 
 	--disable-more-warnings option.
 
-*	Older versions of GtkText are buggy and use sometimes wide
-        characters for single byte charsets: some european charsets may
-        be displayed improperly. gtk+-1.2.8 seems to work OK. We had 
-	also some reports that turned out to be a problem with font server
-	configuration. Newer versions have problems of their own (ugrh).

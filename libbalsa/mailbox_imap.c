@@ -51,7 +51,7 @@
 
 static LibBalsaMailboxClass *parent_class = NULL;
 
-static void libbalsa_mailbox_imap_destroy(GtkObject * object);
+static void libbalsa_mailbox_imap_finalize(GObject * object);
 static void libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass *
 					     klass);
 static void libbalsa_mailbox_imap_init(LibBalsaMailboxImap * mailbox);
@@ -64,6 +64,10 @@ static FILE *libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox *
 						      LibBalsaMessage *
 						      message);
 static void libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox);
+static GHashTable* libbalsa_mailbox_imap_get_matching(LibBalsaMailbox* mailbox,
+                                                      int op,
+                                                      GSList* conditions);
+
 static void libbalsa_mailbox_imap_save_config(LibBalsaMailbox * mailbox,
 					      const gchar * prefix);
 static void libbalsa_mailbox_imap_load_config(LibBalsaMailbox * mailbox,
@@ -82,25 +86,28 @@ static void server_host_settings_changed_cb(LibBalsaServer * server,
 					    LibBalsaMailbox * mailbox);
 
 
-GtkType libbalsa_mailbox_imap_get_type(void)
+GType
+libbalsa_mailbox_imap_get_type(void)
 {
-    static GtkType mailbox_type = 0;
+    static GType mailbox_type = 0;
 
     if (!mailbox_type) {
-	static const GtkTypeInfo mailbox_info = {
-	    "LibBalsaMailboxImap",
-	    sizeof(LibBalsaMailboxImap),
+	static const GTypeInfo mailbox_info = {
 	    sizeof(LibBalsaMailboxImapClass),
-	    (GtkClassInitFunc) libbalsa_mailbox_imap_class_init,
-	    (GtkObjectInitFunc) libbalsa_mailbox_imap_init,
-	    /* reserved_1 */ NULL,
-	    /* reserved_2 */ NULL,
-	    (GtkClassInitFunc) NULL,
+            NULL,               /* base_init */
+            NULL,               /* base_finalize */
+	    (GClassInitFunc) libbalsa_mailbox_imap_class_init,
+            NULL,               /* class_finalize */
+            NULL,               /* class_data */
+	    sizeof(LibBalsaMailboxImap),
+            0,                  /* n_preallocs */
+	    (GInstanceInitFunc) libbalsa_mailbox_imap_init
 	};
 
 	mailbox_type =
-	    gtk_type_unique(libbalsa_mailbox_remote_get_type(),
-			    &mailbox_info);
+	    g_type_register_static(LIBBALSA_TYPE_MAILBOX_REMOTE,
+	                           "LibBalsaMailboxImap",
+			           &mailbox_info, 0);
     }
 
     return mailbox_type;
@@ -109,15 +116,15 @@ GtkType libbalsa_mailbox_imap_get_type(void)
 static void
 libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass * klass)
 {
-    GtkObjectClass *object_class;
+    GObjectClass *object_class;
     LibBalsaMailboxClass *libbalsa_mailbox_class;
 
-    object_class = GTK_OBJECT_CLASS(klass);
+    object_class = G_OBJECT_CLASS(klass);
     libbalsa_mailbox_class = LIBBALSA_MAILBOX_CLASS(klass);
 
-    parent_class = gtk_type_class(libbalsa_mailbox_remote_get_type());
+    parent_class = g_type_class_peek_parent(klass);
 
-    object_class->destroy = libbalsa_mailbox_imap_destroy;
+    object_class->finalize = libbalsa_mailbox_imap_finalize;
 
     libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_imap_open;
     libbalsa_mailbox_class->open_mailbox_append = libbalsa_mailbox_imap_append;
@@ -126,6 +133,7 @@ libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass * klass)
 	libbalsa_mailbox_imap_get_message_stream;
 
     libbalsa_mailbox_class->check = libbalsa_mailbox_imap_check;
+    libbalsa_mailbox_class->get_matching = libbalsa_mailbox_imap_get_matching;
 
     libbalsa_mailbox_class->save_config =
 	libbalsa_mailbox_imap_save_config;
@@ -145,27 +153,25 @@ libbalsa_mailbox_imap_init(LibBalsaMailboxImap * mailbox)
     remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
     remote->server =
 	LIBBALSA_SERVER(libbalsa_server_new(LIBBALSA_SERVER_IMAP));
-    gtk_object_ref(GTK_OBJECT(remote->server));
-    gtk_object_sink(GTK_OBJECT(remote->server));
 
-    gtk_signal_connect(GTK_OBJECT(remote->server), "set-username",
-		       GTK_SIGNAL_FUNC(server_user_settings_changed_cb),
-		       (gpointer) mailbox);
-    gtk_signal_connect(GTK_OBJECT(remote->server), "set-password",
-		       GTK_SIGNAL_FUNC(server_user_settings_changed_cb),
-		       (gpointer) mailbox);
-    gtk_signal_connect(GTK_OBJECT(remote->server), "set-host",
-		       GTK_SIGNAL_FUNC(server_host_settings_changed_cb),
-		       (gpointer) mailbox);
+    g_signal_connect(G_OBJECT(remote->server), "set-username",
+		     G_CALLBACK(server_user_settings_changed_cb),
+		     (gpointer) mailbox);
+    g_signal_connect(G_OBJECT(remote->server), "set-password",
+		     G_CALLBACK(server_user_settings_changed_cb),
+		     (gpointer) mailbox);
+    g_signal_connect(G_OBJECT(remote->server), "set-host",
+		     G_CALLBACK(server_host_settings_changed_cb),
+		     (gpointer) mailbox);
 }
 
-/* libbalsa_mailbox_imap_destroy:
+/* libbalsa_mailbox_imap_finalize:
    NOTE: we have to close mailbox ourselves without waiting for
-   LibBalsaMailbox::destroy because we want to destroy server as well,
+   LibBalsaMailbox::finalize because we want to destroy server as well,
    and close requires server for proper operation.  
 */
 static void
-libbalsa_mailbox_imap_destroy(GtkObject * object)
+libbalsa_mailbox_imap_finalize(GObject * object)
 {
     LibBalsaMailboxImap *mailbox;
     LibBalsaMailboxRemote *remote;
@@ -183,21 +189,21 @@ libbalsa_mailbox_imap_destroy(GtkObject * object)
     g_free(mailbox->path); mailbox->path = NULL;
 
     if(remote->server) {
-	gtk_object_unref(GTK_OBJECT(remote->server));
+	g_object_unref(G_OBJECT(remote->server));
 	remote->server = NULL;
     }
 
-    if (GTK_OBJECT_CLASS(parent_class)->destroy)
-	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
+    if (G_OBJECT_CLASS(parent_class)->finalize)
+	G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
-GtkObject *
+GObject *
 libbalsa_mailbox_imap_new(void)
 {
     LibBalsaMailbox *mailbox;
-    mailbox = gtk_type_new(LIBBALSA_TYPE_MAILBOX_IMAP);
+    mailbox = g_object_new(LIBBALSA_TYPE_MAILBOX_IMAP, NULL);
 
-    return GTK_OBJECT(mailbox);
+    return G_OBJECT(mailbox);
 }
 
 /* libbalsa_mailbox_imap_update_url:
@@ -475,6 +481,7 @@ load_cache(LibBalsaMailbox* mailbox)
         nextkey = gdbm_nextkey(dbf, key);
         free(key.dptr); key = nextkey;
     }
+
     gdbm_close(dbf);
     return TRUE;
 }
@@ -513,7 +520,7 @@ save_to_cache(LibBalsaMailbox* mailbox)
     printf("Cache data saved for mailbox %s\n", mailbox->name);
     return TRUE;
 }
-#endif
+#endif /* CACHE_IMAP_HEADERS_TOO */
 
 /* clean_cache:
    removes unused entries from the cache file.
@@ -538,7 +545,6 @@ clean_cache(LibBalsaMailbox* mailbox)
     }
 
     dir = opendir(fname);
-    printf("Attempting to clean IMAP cache for '%s'\n", mailbox->name);
     if(!dir) {
         g_free(fname);
         return FALSE;
@@ -563,7 +569,7 @@ clean_cache(LibBalsaMailbox* mailbox)
     }
     closedir(dir);
     g_hash_table_destroy(present_uids);
-
+    
     for(lst = remove_list; lst; lst = lst->next) {
         unsigned uid = GPOINTER_TO_UINT(lst->data);
         gchar *fn = g_strdup_printf("%s/%u-%u", fname, uid_validity, uid);
@@ -753,6 +759,7 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
    NOTE: mx_check_mailbox can close mailbox(). Be cautious.
    We have to set Timeout to 0 because mutt would not allow checking several
    mailboxes in row.
+   LOCKING : assumes gdk lock HELD, and other (libmutt, mailbox) locks NOT HELD
 */
 static void
 libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
@@ -765,7 +772,9 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 	long newmsg, timeout;
 	gint index_hint;
 	g_return_if_fail(CLIENT_CONTEXT(mailbox));
-	
+
+	/* Release the lock during the backend work */
+	gdk_threads_leave();
 	LOCK_MAILBOX(mailbox);
 	newmsg = CLIENT_CONTEXT(mailbox)->msgcount  
 	    - CLIENT_CONTEXT(mailbox)->deleted - mailbox->messages;
@@ -783,42 +792,25 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 	    if(CLIENT_CONTEXT_CLOSED(mailbox)||
 	       !CLIENT_CONTEXT(mailbox)->id_hash)
 		libbalsa_mailbox_free_messages(mailbox);
-            /* send close signall as well? */
+            /* send close signal as well? */
 	} 
 	if (newmsg || i == M_NEW_MAIL || i == M_REOPENED) {
 	    mailbox->new_messages =
 		CLIENT_CONTEXT(mailbox)->msgcount - mailbox->messages;
 	    
 	    UNLOCK_MAILBOX(mailbox);
+	    /* Reacquire the lock before leaving and calling
+	       libbalsa_mailbox_load_messages which assumes gdk lock held */
+	    gdk_threads_enter();
 	    libbalsa_mailbox_load_messages(mailbox);
 	} else {
             /* update flags here */
 	    UNLOCK_MAILBOX(mailbox);
+	    /* Reacquire the lock before leaving */
+	    gdk_threads_enter();
 	}
     }
 }
-
-typedef void(*ImapSearchFunc)(unsigned, void*);
-
-int imap_uid_search(CONTEXT* ctx, const char* query, ImapSearchFunc, void*,int);
-
-static void
-imap_add_matching_seq_num(unsigned seq_num, GList ** lst)
-{
-    *lst = g_list_prepend(*lst, GINT_TO_POINTER(seq_num));
-}
-
-/* Be careful : for speed reason the list is in reverse order
-   it's up to the caller to reorder it or not */
-void libbalsa_mailbox_imap_search(LibBalsaMailboxImap* mbox,
-				  const gchar * query,
-				  GList ** seq_nums)
-{
-    imap_uid_search(CLIENT_CONTEXT(LIBBALSA_MAILBOX(mbox)), query,
-		    (ImapSearchFunc)imap_add_matching_seq_num, seq_nums, FALSE);
-}
-
-/*
 typedef struct {
     GHashTable * uids;
     GHashTable * res;
@@ -834,7 +826,36 @@ imap_matched(unsigned uid, ImapSearchData* data)
     else
         printf("Could not find UID: %ud in message list\n", uid);
 }
-*/
+
+int imap_uid_search(CONTEXT* ctx, const char* query, 
+                    void(*cb)(unsigned, ImapSearchData*), void*);
+static GHashTable*
+libbalsa_mailbox_imap_get_matching(LibBalsaMailbox* mailbox, 
+                                  int op, GSList* conditions)
+{
+    gchar* query;
+    gboolean match;
+    ImapSearchData cbdata;
+    GList* msgs;
+
+    cbdata.uids = g_hash_table_new(NULL, NULL);
+    cbdata.res  = g_hash_table_new(NULL, NULL);
+    query = libbalsa_filter_build_imap_query(op, conditions);
+    if(query) {
+        for(msgs= mailbox->message_list; msgs; msgs = msgs->next){
+            LibBalsaMessage *m = LIBBALSA_MESSAGE(msgs->data);
+            unsigned uid = ((IMAP_HEADER_DATA*)m->header->data)->uid;
+            g_hash_table_insert(cbdata.uids, GUINT_TO_POINTER(uid), m);
+        }
+        
+        match = imap_uid_search(CLIENT_CONTEXT(mailbox), query,
+                                imap_matched, &cbdata);
+        g_free(query);
+    }
+    g_hash_table_destroy(cbdata.uids);
+    return cbdata.res;
+}
+
 static void
 libbalsa_mailbox_imap_save_config(LibBalsaMailbox * mailbox,
 				  const gchar * prefix)

@@ -31,13 +31,20 @@ extern "C"
 {
 #endif /* __cplusplus */
 
-    GtkType libbalsa_identity_get_type(void);
+    GType libbalsa_identity_get_type(void);
 
-#define LIBBALSA_TYPE_IDENTITY          (libbalsa_identity_get_type ())
-#define LIBBALSA_IDENTITY(obj)          (GTK_CHECK_CAST (obj, libbalsa_identity_get_type (), LibBalsaIdentity))
-#define LIBBALSA_IDENTITY_CLASS(klass)  (GTK_CHECK_CLASS_CAST (klass, libbalsa_identity_get_type (), LibBalsaIdentityClass))
-#define LIBBALSA_IS_IDENTITY(obj)       (GTK_CHECK_TYPE (obj, libbalsa_identity_get_type ()))
-#define LIBBALSA_IS_IDENTITY_CLASS(klass) (GTK_CHECK_CLASS_TYPE (klass, BALSA_TYPE_IDENTITY))
+#define LIBBALSA_TYPE_IDENTITY \
+    (libbalsa_identity_get_type ())
+#define LIBBALSA_IDENTITY(obj) \
+    (G_TYPE_CHECK_INSTANCE_CAST (obj, LIBBALSA_TYPE_IDENTITY, \
+                                 LibBalsaIdentity))
+#define LIBBALSA_IDENTITY_CLASS(klass) \
+    (G_TYPE_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_IDENTITY, \
+                              LibBalsaIdentityClass))
+#define LIBBALSA_IS_IDENTITY(obj) \
+    (G_TYPE_CHECK_INSTANCE_TYPE (obj, LIBBALSA_TYPE_IDENTITY))
+#define LIBBALSA_IS_IDENTITY_CLASS(klass) \
+    (G_TYPE_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_IDENTITY))
 
     typedef struct _LibBalsaIdentity LibBalsaIdentity;
     typedef struct _LibBalsaIdentityClass LibBalsaIdentityClass;
@@ -45,7 +52,7 @@ extern "C"
     
     struct _LibBalsaIdentity 
     {
-        GtkObject object;
+        GObject object;
         
         gchar* identity_name;
         
@@ -67,13 +74,13 @@ extern "C"
 
     struct _LibBalsaIdentityClass 
     {
-        GtkObjectClass parent_class;
+        GObjectClass parent_class;
     };
 
 
 /* Function prototypes */
-    GtkObject* libbalsa_identity_new(void);
-    GtkObject* libbalsa_identity_new_with_name(const gchar* ident_name);
+    GObject* libbalsa_identity_new(void);
+    GObject* libbalsa_identity_new_with_name(const gchar* ident_name);
     
     void libbalsa_identity_set_identity_name(LibBalsaIdentity*, const gchar*);
     void libbalsa_identity_set_address(LibBalsaIdentity*, LibBalsaAddress*);
@@ -90,16 +97,18 @@ extern "C"
     void libbalsa_identity_set_sig_separator(LibBalsaIdentity*, gboolean);
     void libbalsa_identity_set_sig_prepend(LibBalsaIdentity*, gboolean);
 
-    GtkWidget* libbalsa_identity_config_frame(gboolean with_buttons, 
-					      GList** identities,
-					      LibBalsaIdentity** current);
-    GtkWidget* libbalsa_identity_config_dialog(GtkWindow* parent, 
-					       GList **identities,
-					       LibBalsaIdentity **current);
-    LibBalsaIdentity* libbalsa_identity_select_dialog(GtkWindow* parent, 
-						      const gchar* prompt,
-						      GList** identities, 
-						      LibBalsaIdentity**);
+    void libbalsa_identity_config_dialog(GtkWindow * parent,
+                                         GList ** identities,
+                                         LibBalsaIdentity ** current);
+
+    typedef void (*LibBalsaIdentityCallback) (gpointer data,
+                                              LibBalsaIdentity * identity);
+    void libbalsa_identity_select_dialog(GtkWindow * parent,
+                                         const gchar * prompt,
+                                         GList * identities,
+                                         LibBalsaIdentity * initial_id,
+                                         LibBalsaIdentityCallback update,
+                                         gpointer data);
 
     LibBalsaIdentity* libbalsa_identity_new_config(const gchar* prefix,
 						   const gchar* name);

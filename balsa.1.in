@@ -1,4 +1,4 @@
-.TH Balsa 1 "26 February 2002" Version @VERSION@
+.TH Balsa 1 "03 January 2003" Version @VERSION@
 .SH NAME
 Balsa - the GNOME email client.
 
@@ -91,10 +91,10 @@ See the AUTHORS file included with Balsa, probably at
 /usr/share/doc/balsa-@VERSION@/AUTHORS
 
 .SH FILES
-.BR ~/.gnome/balsa
+.BR ~/.gnome2/balsa
 Balsa's preferences file.
 
-.BR ~/.gnome_private/balsa
+.BR ~/.gnome2_private/balsa
 Balsa's POP and IMAP passwords file.
 
 .SH SEE ALSO
@@ -103,7 +103,7 @@ Balsa's POP and IMAP passwords file.
 .BR sendmail (8)
 
 .SH COPYRIGHT
-(c) 1997-2002 Stuart Parmenter and others, see AUTHORS for a list of people.
+(c) 1997-2003 Stuart Parmenter and others, see AUTHORS for a list of people.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted,

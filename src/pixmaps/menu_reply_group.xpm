@@ -1,5 +1,5 @@
 /* XPM */
-static char * menu_reply_group_xpm[] = {
+static const char * menu_reply_group_xpm[] = {
 "16 16 34 1",
 " 	c None",
 ".	c #010101",

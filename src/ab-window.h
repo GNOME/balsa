@@ -22,8 +22,6 @@
 #ifndef __AB_WINDOW_H__
 #define __AB_WINDOW_H__
 
-BEGIN_GNOME_DECLS
-
 #define BALSA_TYPE_AB_WINDOW            (balsa_ab_window_get_type ())
 #define BALSA_AB_WINDOW(obj)            (GTK_CHECK_CAST ((obj), BALSA_TYPE_AB_WINDOW, BalsaAbWindow))
 #define BALSA_AB_WINDOW_CLASS(klass)    (GTK_CHECK_CLASS_CAST ((klass), BALSA_TYPE_AB_WINDOW, BalsaAbWindowClass))
@@ -36,7 +34,7 @@ typedef struct _BalsaAbWindowClass BalsaAbWindowClass;
 
 struct _BalsaAbWindow 
 {
-    GnomeDialog parent;
+    GtkDialog parent;
 
     /* Are we composing? */
     gboolean composing;
@@ -45,42 +43,25 @@ struct _BalsaAbWindow
     LibBalsaAddressBook *current_address_book;
 
     /* The address list */
-    GtkWidget *address_clist;
+    GtkWidget *address_list;
 
     /* The send to list */
-    GtkWidget *recipient_clist;
+    GtkWidget *recipient_list;
 
     /* Radio buttons for dist list mode */
     GtkWidget *single_address_mode_radio;
     GtkWidget *dist_address_mode_radio;
-    guint toggle_handler_id;
+    guint      toggle_handler_id;
 
     /* Stuff to hide when not in compose mode */
     GtkWidget *send_to_box;
     GtkWidget *arrow_box;
 };
 
-struct _BalsaAbWindowClass
-{
-    GnomeDialogClass parent_class;
-};
-
 GtkType balsa_ab_window_get_type(void);
-GtkWidget *balsa_ab_window_new(gboolean composing);
+GtkWidget *balsa_ab_window_new(gboolean composing, GtkWindow* parent);
 
 gchar *balsa_ab_window_get_recipients(BalsaAbWindow *ab);
 
-END_GNOME_DECLS
 
-#endif				/* __AB_WINDOW_H__ */
-
-
-
-
-
-
-
-
-
-
-
+#endif				/* __ADDRESS_BOOK_H__ */

@@ -91,7 +91,7 @@ static gboolean
 libbalsa_message_idle_handler(gchar * msg)
 {
     gdk_threads_enter();
-    libbalsa_real_information_func(LIBBALSA_INFORMATION_MESSAGE, NULL, msg);
+    libbalsa_real_information_func(LIBBALSA_INFORMATION_MESSAGE, msg);
     gdk_threads_leave();
 
     g_free(msg);
@@ -102,7 +102,7 @@ static gboolean
 libbalsa_warning_idle_handler(gchar * msg)
 {
     gdk_threads_enter();
-    libbalsa_real_information_func(LIBBALSA_INFORMATION_WARNING, NULL, msg);
+    libbalsa_real_information_func(LIBBALSA_INFORMATION_WARNING, msg);
     gdk_threads_leave();
 
     g_free(msg);
@@ -113,7 +113,7 @@ static gboolean
 libbalsa_error_idle_handler(gchar * msg)
 {
     gdk_threads_enter();
-    libbalsa_real_information_func(LIBBALSA_INFORMATION_ERROR, NULL, msg);
+    libbalsa_real_information_func(LIBBALSA_INFORMATION_ERROR, msg);
     gdk_threads_leave();
 
     g_free(msg);
@@ -124,7 +124,7 @@ static gboolean
 libbalsa_debug_idle_handler(gchar * msg)
 {
     gdk_threads_enter();
-    libbalsa_real_information_func(LIBBALSA_INFORMATION_DEBUG, NULL, msg);
+    libbalsa_real_information_func(LIBBALSA_INFORMATION_DEBUG, msg);
     gdk_threads_leave();
 
     g_free(msg);

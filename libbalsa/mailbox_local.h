@@ -23,13 +23,20 @@
 #ifndef __LIBBALSA_MAILBOX_LOCAL_H__
 #define __LIBBALSA_MAILBOX_LOCAL_H__
 
-#define LIBBALSA_TYPE_MAILBOX_LOCAL	       (libbalsa_mailbox_local_get_type())
-#define LIBBALSA_MAILBOX_LOCAL(obj)	       (GTK_CHECK_CAST (obj, LIBBALSA_TYPE_MAILBOX_LOCAL, LibBalsaMailboxLocal))
-#define LIBBALSA_MAILBOX_LOCAL_CLASS(klass)    (GTK_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_MAILBOX_LOCAL, LibBalsaMailboxLocalClass))
-#define LIBBALSA_IS_MAILBOX_LOCAL(obj)	       (GTK_CHECK_TYPE (obj, LIBBALSA_TYPE_MAILBOX_LOCAL))
-#define LIBBALSA_IS_MAILBOX_LOCAL_CLASS(klass) (GTK_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_MAILBOX_LOCAL))
+#define LIBBALSA_TYPE_MAILBOX_LOCAL \
+    (libbalsa_mailbox_local_get_type())
+#define LIBBALSA_MAILBOX_LOCAL(obj) \
+    (G_TYPE_CHECK_INSTANCE_CAST ((obj), LIBBALSA_TYPE_MAILBOX_LOCAL, \
+                                 LibBalsaMailboxLocal))
+#define LIBBALSA_MAILBOX_LOCAL_CLASS(klass) \
+    (G_TYPE_CHECK_CLASS_CAST ((klass), LIBBALSA_TYPE_MAILBOX_LOCAL, \
+                              LibBalsaMailboxLocalClass))
+#define LIBBALSA_IS_MAILBOX_LOCAL(obj) \
+    (G_TYPE_CHECK_INSTANCE_TYPE ((obj), LIBBALSA_TYPE_MAILBOX_LOCAL))
+#define LIBBALSA_IS_MAILBOX_LOCAL_CLASS(klass) \
+    (G_TYPE_CHECK_CLASS_TYPE ((klass), LIBBALSA_TYPE_MAILBOX_LOCAL))
 
-GtkType libbalsa_mailbox_local_get_type(void);
+GType libbalsa_mailbox_local_get_type(void);
 
 typedef struct _LibBalsaMailboxLocal LibBalsaMailboxLocal;
 typedef struct _LibBalsaMailboxLocalClass LibBalsaMailboxLocalClass;
@@ -45,7 +52,7 @@ struct _LibBalsaMailboxLocalClass {
     void (*remove_files)(LibBalsaMailboxLocal *mb);
 };
 
-GtkObject *libbalsa_mailbox_local_new(const gchar * path, gboolean create);
+GObject *libbalsa_mailbox_local_new(const gchar * path, gboolean create);
 gint libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 				     const gchar * path);
 

@@ -21,7 +21,10 @@
  */
 
 #include "config.h"
+#include <string.h>
 #include <gnome.h>
+#include <libgnomevfs/gnome-vfs-mime-handlers.h>
+#include <libgnomevfs/gnome-vfs-utils.h>
 
 #include "misc.h"
 #include "files.h"
@@ -65,7 +68,7 @@ balsa_file_finder(const gchar * filename, const gchar * splice,
 	    g_strconcat(permanent_prefixes[i], PATH_SEP_STR, splice,
 			PATH_SEP_STR, filename, NULL);
 
-	if (g_file_exists(cat))
+	if (g_file_test(cat, G_FILE_TEST_IS_REGULAR))
 	    return cat;
 
 	g_free(cat);
@@ -84,7 +87,7 @@ balsa_file_finder(const gchar * filename, const gchar * splice,
 	    g_strconcat(prefixes[i], PATH_SEP_STR, splice, PATH_SEP_STR,
 			filename, NULL);
 
-	if (g_file_exists(cat))
+	if (g_file_test(cat, G_FILE_TEST_IS_REGULAR))
 	    return cat;
 
 	g_free(cat);
@@ -101,7 +104,7 @@ balsa_file_finder(const gchar * filename, const gchar * splice,
  *   locate a suitable icon (pixmap graphic) based on 'mime-type' and/or
  *   'filename', either of which can be NULL.  If both arguments are
  *   non-NULL, 'mime-type' has priority.  If both are NULL, the default
- *   'balsa/attachment.png' icon will be returned.  This function *MUST*
+ *   'attachment.png' icon will be returned.  This function *MUST*
  *   return the complete path to the icon file.
  */
 gchar *
@@ -112,24 +115,22 @@ libbalsa_icon_finder(const char *mime_type, const char *filename,
     const char *icon_file;
     gchar *icon = NULL;
     
-    if(mime_type)
+    if (mime_type)
         content_type = g_strdup(mime_type);
-    else {
-        if(!filename) {
-            if(used_type) *used_type = g_strdup("application/octet-stream");
-            return balsa_pixmap_finder ("balsa/attachment.png");
-        }
+    else if(filename)
         content_type = libbalsa_lookup_mime_type(filename);
+    else {
+        if(used_type) *used_type = g_strdup("application/octet-stream");
+        return balsa_pixmap_finder ("attachment.png");
     }
     /* FIXME:
-       or icon_file = gnome_desktop_item_find_icon(GVMGI(content_Type)?) 
-    icon_file = gnome_vfs_mime_get_icon(content_type); */
-    icon_file = gnome_mime_get_value (content_type, "icon-filename");
+       or icon_file = gnome_desktop_item_find_icon(GVMGI(content_Type)?) */
+    icon_file = gnome_vfs_mime_get_icon(content_type);
     if ( icon_file ) 
 	icon = g_strdup (icon_file);
 
-    if (!icon || !g_file_exists (icon)) {
-	gchar *gnome_icon, *p_gnome_icon;
+    if (!icon || !g_file_test (icon, G_FILE_TEST_IS_REGULAR)) {
+	gchar *gnome_icon, *p_gnome_icon, *tmp;
 	
 	gnome_icon = g_strdup_printf ("gnome-%s.png", content_type);   
 	
@@ -137,18 +138,25 @@ libbalsa_icon_finder(const char *mime_type, const char *filename,
 	if (p_gnome_icon != NULL)
 	    *p_gnome_icon = '-';
 
-	icon = balsa_pixmap_finder_no_warn (gnome_icon);
+        tmp = g_strconcat("document-icons/", gnome_icon, NULL);
+        icon = gnome_vfs_icon_path_from_filename(tmp);
+        g_free(tmp);
+
+	if (icon == NULL)
+            icon = balsa_pixmap_finder_no_warn (gnome_icon);
 
 	/*
 	 * FIXME: Should use a better icon. Since this one is small
 	 * In pratice I don't think we will ever make it this far...
 	 */
 	if ( icon == NULL )
-	    icon = balsa_pixmap_finder ("balsa/attachment.png");
+	    icon = balsa_pixmap_finder ("attachment.png");
 	
 	g_free (gnome_icon);
     }
+
     if(used_type) *used_type = content_type;
     else g_free(content_type);
+
     return (icon);
 }

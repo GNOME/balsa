@@ -22,38 +22,30 @@
 
 #include "config.h"
 
+#include <stdio.h>
+#include <fcntl.h>
+#include <errno.h>
 #include <gtk/gtk.h>
-#include <unistd.h>
-
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 #include "mailbackend.h"
 #include "pop3.h"
 #include "mailbox.h"
-#include <stdio.h>
-#include <fcntl.h>
-#include <errno.h>
 
 #include "mailbox-filter.h"
 #include "filter-file.h"
-#include <libgnome/gnome-defs.h> 
+
 #include <libgnome/gnome-config.h> 
 #include <libgnome/gnome-i18n.h> 
-
-/* GTK_CLASS_TYPE for 1.2<->1.3/2.0 GTK+ compatibility */
-#ifndef GTK_CLASS_TYPE
-#define GTK_CLASS_TYPE(x) (GTK_OBJECT_CLASS(x)->type)
-#endif /* GTK_CLASS_TYPE */
 
 enum {
     CONFIG_CHANGED,
     LAST_SIGNAL
 };
-
 static LibBalsaMailboxClass *parent_class = NULL;
 static guint libbalsa_mailbox_pop3_signals[LAST_SIGNAL];
 
-static void libbalsa_mailbox_pop3_destroy(GtkObject * object);
+static void libbalsa_mailbox_pop3_finalize(GObject * object);
 static void libbalsa_mailbox_pop3_class_init(LibBalsaMailboxPop3Class *
 					     klass);
 static void libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 * mailbox);
@@ -68,25 +60,28 @@ static void libbalsa_mailbox_pop3_load_config(LibBalsaMailbox * mailbox,
 
 static void progress_cb(void* m, char *msg, int prog, int tot);
 
-GtkType libbalsa_mailbox_pop3_get_type(void)
+GType
+libbalsa_mailbox_pop3_get_type(void)
 {
-    static GtkType mailbox_type = 0;
+    static GType mailbox_type = 0;
 
     if (!mailbox_type) {
-	static const GtkTypeInfo mailbox_info = {
-	    "LibBalsaMailboxPOP3",
-	    sizeof(LibBalsaMailboxPop3),
+	static const GTypeInfo mailbox_info = {
 	    sizeof(LibBalsaMailboxPop3Class),
-	    (GtkClassInitFunc) libbalsa_mailbox_pop3_class_init,
-	    (GtkObjectInitFunc) libbalsa_mailbox_pop3_init,
-	    /* reserved_1 */ NULL,
-	    /* reserved_2 */ NULL,
-	    (GtkClassInitFunc) NULL,
+            NULL,               /* base_init */
+            NULL,               /* base_finalize */
+	    (GClassInitFunc) libbalsa_mailbox_pop3_class_init,
+            NULL,               /* class_finalize */
+            NULL,               /* class_data */
+	    sizeof(LibBalsaMailboxPop3),
+            0,                  /* n_preallocs */
+	    (GInstanceInitFunc) libbalsa_mailbox_pop3_init
 	};
 
 	mailbox_type =
-	    gtk_type_unique(libbalsa_mailbox_remote_get_type(),
-			    &mailbox_info);
+	    g_type_register_static(LIBBALSA_TYPE_MAILBOX_REMOTE,
+                                   "LibBalsaMailboxPOP3",
+			           &mailbox_info, 0);
     }
 
     return mailbox_type;
@@ -95,26 +90,23 @@ GtkType libbalsa_mailbox_pop3_get_type(void)
 static void
 libbalsa_mailbox_pop3_class_init(LibBalsaMailboxPop3Class * klass)
 {
-    GtkObjectClass *object_class;
+    GObjectClass *object_class;
     LibBalsaMailboxClass *libbalsa_mailbox_class;
 
-    object_class = GTK_OBJECT_CLASS(klass);
+    object_class = G_OBJECT_CLASS(klass);
     libbalsa_mailbox_class = LIBBALSA_MAILBOX_CLASS(klass);
 
-    parent_class = gtk_type_class(libbalsa_mailbox_remote_get_type());
+    parent_class = g_type_class_peek_parent(klass);
     libbalsa_mailbox_pop3_signals[CONFIG_CHANGED] =
-	gtk_signal_new("config-changed",
-		       GTK_RUN_FIRST,
-		       GTK_CLASS_TYPE(object_class),
-		       GTK_SIGNAL_OFFSET(LibBalsaMailboxPop3Class,
-					 config_changed),
-		       gtk_marshal_NONE__NONE, GTK_TYPE_NONE, 0);
-    gtk_object_class_add_signals(object_class, libbalsa_mailbox_pop3_signals,
-				 LAST_SIGNAL);
+	g_signal_new("config-changed",
+                     G_TYPE_FROM_CLASS(object_class),
+                     G_SIGNAL_RUN_LAST | G_SIGNAL_NO_HOOKS,
+                     G_STRUCT_OFFSET(LibBalsaMailboxPop3Class,
+                                     config_changed),
+                     NULL, NULL,
+                     g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
-    object_class->destroy = libbalsa_mailbox_pop3_destroy;
-
-    klass->config_changed = NULL;
+    object_class->finalize = libbalsa_mailbox_pop3_finalize;
 
     libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_pop3_open;
     libbalsa_mailbox_class->check = libbalsa_mailbox_pop3_check;
@@ -140,7 +132,7 @@ libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 * mailbox)
 }
 
 static void
-libbalsa_mailbox_pop3_destroy(GtkObject * object)
+libbalsa_mailbox_pop3_finalize(GObject * object)
 {
     LibBalsaMailboxPop3 *mailbox = LIBBALSA_MAILBOX_POP3(object);
     LibBalsaMailboxRemote *remote = LIBBALSA_MAILBOX_REMOTE(object);
@@ -150,20 +142,20 @@ libbalsa_mailbox_pop3_destroy(GtkObject * object)
 
     g_free(mailbox->last_popped_uid);
 
-    gtk_object_destroy(GTK_OBJECT(remote->server));
+    g_object_unref(G_OBJECT(remote->server));
 
-    if (GTK_OBJECT_CLASS(parent_class)->destroy)
-	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
+    if (G_OBJECT_CLASS(parent_class)->finalize)
+	G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
-GtkObject *
+GObject *
 libbalsa_mailbox_pop3_new(void)
 {
     LibBalsaMailbox *mailbox;
 
-    mailbox = gtk_type_new(LIBBALSA_TYPE_MAILBOX_POP3);
+    mailbox = g_object_new(LIBBALSA_TYPE_MAILBOX_POP3, NULL);
 
-    return GTK_OBJECT(mailbox);
+    return G_OBJECT(mailbox);
 }
 
 
@@ -173,8 +165,8 @@ libbalsa_mailbox_pop3_config_changed(LibBalsaMailboxPop3* mailbox)
     g_return_if_fail(mailbox != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX_POP3(mailbox));
 
-    gtk_signal_emit(GTK_OBJECT(mailbox), 
-                    libbalsa_mailbox_pop3_signals[CONFIG_CHANGED]);
+    g_signal_emit(G_OBJECT(mailbox), 
+                  libbalsa_mailbox_pop3_signals[CONFIG_CHANGED], 0);
 }
 
 static gboolean
@@ -227,7 +219,8 @@ libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox)
 }
 
 /* libbalsa_mailbox_pop3_check:
-   checks=downloads POP3 mail. 
+   checks=downloads POP3 mail.
+   LOCKING : assumes gdk lock HELD and other locks (libmutt, mailbox) NOT HELD
 */
 static void
 libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
@@ -324,7 +317,8 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 						FILTER_WHEN_INCOMING);
 	if (filters) {
 	    if (filters_prepare_to_run(filters)) {
-		libbalsa_filter_match(filters, tmp_mailbox->message_list, FALSE);
+		libbalsa_filter_match(filters, tmp_mailbox->message_list,
+				      FALSE);
 		libbalsa_filter_apply(filters);
 	    }
 	    g_slist_free(filters);
@@ -337,13 +331,13 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 				 mailbox->name, 
 				 LIBBALSA_MAILBOX(m->inbox)->name,
 				 tmp_path);
-            remove_tmp = FALSE;
+	    remove_tmp = FALSE;
 	}
-    } 
-    libbalsa_mailbox_close(LIBBALSA_MAILBOX(tmp_mailbox));
-    gtk_object_destroy(GTK_OBJECT(tmp_mailbox));	
+    }
+    libbalsa_mailbox_close(tmp_mailbox);
+    g_object_unref(G_OBJECT(tmp_mailbox));	
     if(remove_tmp) 
-        unlink(tmp_path);
+	unlink(tmp_path);
     g_free(tmp_path);
 }
 

@@ -71,24 +71,24 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
                      GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 8, 4);
 
     preset = g_strdup(g_get_real_name());
-    balsa_init_add_table_entry(table, 0, _("Name:"), preset,
+    balsa_init_add_table_entry(table, 0, _("_Name:"), preset,
                                &(user->ed0), druid, &(user->name));
     g_free(preset);
 
     preset = libbalsa_guess_email_address();
-    balsa_init_add_table_entry(table, 1, _("Email address:"), preset,
+    balsa_init_add_table_entry(table, 1, _("_Email address:"), preset,
                                &(user->ed1), druid, &(user->email));
     g_free(preset);
 
     preset = g_strconcat(g_get_home_dir(), "/mail", NULL);
-    balsa_init_add_table_entry(table, 2, _("Local Mail Directory:"),
+    balsa_init_add_table_entry(table, 2, _("_Local Mail Directory:"),
                                preset, &(user->ed2),
                                druid, &(user->localmaildir));
     g_free(preset);
 
 #if ENABLE_ESMTP
     preset = "localhost:25";
-    balsa_init_add_table_entry(table, 3, _("SMTP Server:"), preset,
+    balsa_init_add_table_entry(table, 3, _("_SMTP Server:"), preset,
                                &(user->ed3), druid, &(user->smtp));
 #endif
 
@@ -114,11 +114,19 @@ balsa_druid_page_user(GnomeDruid * druid, GdkPixbuf * default_logo)
     gnome_druid_page_standard_set_logo(page, default_logo);
     balsa_druid_page_user_init(user, page, druid);
     gnome_druid_append_page(druid, GNOME_DRUID_PAGE(page));
+#if BALSA_MAJOR < 2
     gtk_signal_connect(GTK_OBJECT(page), "prepare",
                        GTK_SIGNAL_FUNC(balsa_druid_page_user_prepare),
                        user);
     gtk_signal_connect(GTK_OBJECT(page), "next",
                        GTK_SIGNAL_FUNC(balsa_druid_page_user_next), user);
+#else
+    g_signal_connect(G_OBJECT(page), "prepare",
+                     G_CALLBACK(balsa_druid_page_user_prepare),
+                     user);
+    g_signal_connect(G_OBJECT(page), "next",
+                     G_CALLBACK(balsa_druid_page_user_next), user);
+#endif                          /* BALSA_MAJOR < 2 */
 }
 
 static void
@@ -153,24 +161,20 @@ balsa_druid_page_user_next(GnomeDruidPage * page, GnomeDruid * druid,
 
     if (balsa_app.identities == NULL) {
         ident = LIBBALSA_IDENTITY(libbalsa_identity_new());
-        balsa_app.identities = g_list_append(balsa_app.identities, ident);
+        balsa_app.identities = g_list_append(NULL, ident);
     } else {
         ident = balsa_app.current_ident;
     }
-    if (ident->address->full_name)
-        g_free(ident->address->full_name);
+    g_free(ident->address->full_name);
     ident->address->full_name =
         gtk_editable_get_chars(GTK_EDITABLE(user->name), 0, -1);
 
-    if (ident->address->address_list) {
-        g_list_foreach(ident->address->address_list, (GFunc) g_free, NULL);
-        g_list_free(ident->address->address_list);
-        ident->address->address_list = NULL;
-    }
+    g_list_foreach(ident->address->address_list, (GFunc) g_free, NULL);
+    g_list_free(ident->address->address_list);
     ident->address->address_list =
-        g_list_append(ident->address->address_list,
-                      gtk_editable_get_chars(GTK_EDITABLE(user->email), 0,
-                                             -1));
+        g_list_prepend(NULL,
+                       gtk_editable_get_chars(GTK_EDITABLE(user->email), 0,
+                                              -1));
 
 #if ENABLE_ESMTP
     g_free(balsa_app.smtp_server);
@@ -183,11 +187,17 @@ balsa_druid_page_user_next(GnomeDruidPage * page, GnomeDruid * druid,
 
     if (balsa_init_create_to_directory
         (balsa_app.local_mail_directory, &uhoh)) {
-        gchar *tmp =
-            g_strconcat(_("Local Mail Problem"), "\n", uhoh, NULL);
-        gnome_dialog_run_and_close(GNOME_DIALOG(gnome_error_dialog(tmp)));
+        GtkWidget* err = 
+            gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_ancestor
+                                          (GTK_WIDGET(druid), 
+                                           GTK_TYPE_WINDOW)),
+                                   GTK_DIALOG_MODAL,
+                                   GTK_MESSAGE_ERROR,
+                                   GTK_BUTTONS_OK,
+                                   _("Local Mail Problem\n%s"), uhoh);
+        gtk_dialog_run(GTK_DIALOG(err));
+        gtk_widget_destroy(err);
         g_free(uhoh);
-        g_free(tmp);
         return TRUE;
     }
 

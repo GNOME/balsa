@@ -34,47 +34,42 @@ typedef struct _BalsaMBList BalsaMBList;
 typedef struct _BalsaMBListClass BalsaMBListClass;
 
 struct _BalsaMBList {
-    GtkCTree ctree;
+    GtkTreeView tree_view;
 
-    /* store the style of unread mailboxes */
-    GtkStyle *unread_mailbox_style;
     /* shall the number of messages be displayed ? */
     gboolean display_info;
+    /* signal handler id */
+    gulong toggled_handler_id;
 };
 
 struct _BalsaMBListClass {
-    GtkCTreeClass parent_class;
+    GtkTreeViewClass parent_class;
 };
 
 GtkType balsa_mblist_get_type(void);
 
 GtkWidget *balsa_mblist_new(void);
 
-void balsa_mblist_repopulate(BalsaMBList * bmbl);
-void mblist_default_signal_bindings(BalsaMBList * tree);
+void balsa_mblist_repopulate(GtkTreeStore * store);
+void balsa_mblist_default_signal_bindings(BalsaMBList * tree);
 
-void balsa_mblist_have_new(BalsaMBList * bmbl);
-void balsa_mblist_update_mailbox(BalsaMBList * mblist,
-				 LibBalsaMailbox * mailbox);
-gboolean balsa_mblist_focus_mailbox(BalsaMBList * bmbl,
-				    LibBalsaMailbox * mailbox);
+void balsa_mblist_have_new(GtkTreeStore * store);
+void balsa_mblist_update_mailbox(GtkTreeStore * store,
+                                 LibBalsaMailbox * mailbox);
+gboolean balsa_mblist_focus_mailbox(BalsaMBList * mblist,
+                                    LibBalsaMailbox * mailbox);
 
-GList *mblist_find_all_unread_mboxes(void);
-void mblist_open_mailbox(LibBalsaMailbox * mailbox);
-void mblist_close_mailbox(LibBalsaMailbox * mailbox);
-BalsaMailboxNode* mblist_get_selected_node(BalsaMBList *mblist);
-BalsaMailboxNode* mblist_get_node_by_mailbox(BalsaMBList *mblist,
-					     LibBalsaMailbox * mailbox);
-void mblist_remove_mblist_node(BalsaMBList * mblist,
-			       BalsaMailboxNode * mbnode,
-			       GtkCTreeNode * cnode);
-gboolean mblist_remove_mailbox_node(BalsaMBList *mblist,
-				    BalsaMailboxNode* mbnode);
-void mblist_scan_mailbox_node(BalsaMBList *mblist,
-                                  BalsaMailboxNode* mbnode);
+GList *balsa_mblist_find_all_unread_mboxes(void);
+void balsa_mblist_open_mailbox(LibBalsaMailbox * mailbox);
+void balsa_mblist_close_mailbox(LibBalsaMailbox * mailbox);
+BalsaMailboxNode *balsa_mblist_get_selected_node(BalsaMBList * mblist);
+BalsaMailboxNode *balsa_mblist_get_node_by_mailbox(BalsaMBList * mblist,
+                                                   LibBalsaMailbox *
+                                                   mailbox);
+gboolean balsa_mblist_remove_mailbox_node(GtkTreeStore * store,
+                                          BalsaMailboxNode * mbnode);
 GtkWidget *balsa_mblist_mru_menu(GtkWindow * window, GList ** url_list,
-                                 GtkSignalFunc user_func,
-                                 gpointer user_data);
+                                 GCallback user_func, gpointer user_data);
 void balsa_mblist_mru_add(GList ** url_list, const gchar * url);
 void balsa_mblist_mru_drop(GList ** url_list, const gchar * url);
 GtkWidget *balsa_mblist_mru_option_menu(GtkWindow * window, 
@@ -82,4 +77,5 @@ GtkWidget *balsa_mblist_mru_option_menu(GtkWindow * window,
 void balsa_mblist_mru_option_menu_set(GtkWidget * option_menu,
                                       const gchar * url);
 const gchar *balsa_mblist_mru_option_menu_get(GtkWidget * option_menu);
+void balsa_mblist_set_status_bar(LibBalsaMailbox * mailbox);
 #endif

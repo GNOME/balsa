@@ -85,7 +85,6 @@ struct _SendMessageInfo{
 #else
 static MessageQueueItem *message_queue;
 #endif
-static int total_messages_left;
 static int sending_threads = 0; /* how many sending threads are active? */
 /* end of state variables section */
 
@@ -189,10 +188,16 @@ static gboolean libbalsa_create_msg(LibBalsaMessage * message,
 #ifdef BALSA_USE_THREADS
 void balsa_send_thread(MessageQueueItem * first_message);
 
-// GtkWidget *send_progress = NULL;
 GtkWidget *send_progress_message = NULL;
 GtkWidget *send_dialog = NULL;
 GtkWidget *send_dialog_bar = NULL;
+
+static void
+send_dialog_response_cb(GtkWidget* w, gint response)
+{
+    if(response == GTK_RESPONSE_CLOSE)
+	gtk_widget_destroy(w);
+}
 
 static void
 send_dialog_destroy_cb(GtkWidget* w)
@@ -210,24 +215,30 @@ ensure_send_progress_dialog()
     GtkWidget* label;
     if(send_dialog) return;
 
-    send_dialog = gnome_dialog_new(_("Sending Mail..."), _("Hide"), NULL);
+    send_dialog = gtk_dialog_new_with_buttons(_("Sending Mail..."), 
+                                              NULL,
+                                              GTK_DIALOG_DESTROY_WITH_PARENT,
+                                              _("_Hide"), 
+                                              GTK_RESPONSE_CLOSE,
+                                              NULL);
     gtk_window_set_wmclass(GTK_WINDOW(send_dialog), "send_dialog", "Balsa");
-    gnome_dialog_set_close(GNOME_DIALOG(send_dialog), TRUE);
     label = gtk_label_new(_("Sending Mail..."));
-    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(send_dialog)->vbox),
 		       label, FALSE, FALSE, 0);
 
     send_progress_message = gtk_label_new("");
-    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(send_dialog)->vbox),
 		       send_progress_message, FALSE, FALSE, 0);
 
     send_dialog_bar = gtk_progress_bar_new();
-    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(send_dialog)->vbox),
 		       send_dialog_bar, FALSE, FALSE, 0);
 
     gtk_widget_show_all(send_dialog);
-    gtk_signal_connect(GTK_OBJECT(send_dialog), "destroy", 
-		       send_dialog_destroy_cb, NULL);
+    g_signal_connect(G_OBJECT(send_dialog), "response", 
+		     G_CALLBACK(send_dialog_response_cb), NULL);
+    g_signal_connect(G_OBJECT(send_dialog), "destroy", 
+		     G_CALLBACK(send_dialog_destroy_cb), NULL);
     /* Progress bar done */
 }
 
@@ -354,14 +365,12 @@ write_remote_fcc(LibBalsaMailbox* fccbox, HEADER* m_msg)
         /* balsa was started. This should be safe because we have already */
         /* established that fccbox is in fact an IMAP mailbox */
         if(server == (LibBalsaServer *)NULL) {
-            libbalsa_unlock_mutt();
             libbalsa_information(LIBBALSA_INFORMATION_ERROR, 
                                  _("Unable to open sentbox - could not get IMAP server information"));
             return -1;
         }
         if (!(server->passwd && *server->passwd) &&
             !(server->passwd = libbalsa_server_get_password(server, fccbox))) {
-            libbalsa_unlock_mutt();
             libbalsa_information(LIBBALSA_INFORMATION_ERROR, 
                                  "Unable to open sentbox - could not get passwords for server");
             return -1;
@@ -394,20 +403,17 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 	libbalsa_lock_mutt();
 	mutt_write_fcc(libbalsa_mailbox_local_get_path(outbox),
 		       mqi->message, NULL, 0, NULL);
-	libbalsa_unlock_mutt();
-	if (fccbox && (LIBBALSA_IS_MAILBOX_LOCAL(fccbox)
-		|| LIBBALSA_IS_MAILBOX_IMAP(fccbox))) {
-	    libbalsa_lock_mutt();
+	if (fccbox) {
 	    if (LIBBALSA_IS_MAILBOX_LOCAL(fccbox))
-	    mutt_write_fcc(libbalsa_mailbox_local_get_path(fccbox),
-			   mqi->message, NULL, 0, NULL);
+	        mutt_write_fcc(libbalsa_mailbox_local_get_path(fccbox),
+			       mqi->message, NULL, 0, NULL);
 	    else if (LIBBALSA_IS_MAILBOX_IMAP(fccbox))
                 write_remote_fcc(fccbox, mqi->message);
-
-	    libbalsa_unlock_mutt();
-	    libbalsa_mailbox_check(fccbox);
 	}
+	libbalsa_unlock_mutt();
 	libbalsa_mailbox_check(outbox);
+        if (fccbox)
+	    libbalsa_mailbox_check(fccbox);
     } 
     unset_option(OPTWRITEBCC);
     msg_queue_item_destroy(mqi);
@@ -555,9 +561,11 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
     for (lista = outbox->message_list; lista; lista = lista->next) {
 	msg = LIBBALSA_MESSAGE(lista->data);
 
-	if (msg->flags & (LIBBALSA_MESSAGE_FLAG_FLAGGED |
-                          LIBBALSA_MESSAGE_FLAG_DELETED))
+        if (LIBBALSA_MESSAGE_HAS_FLAG(msg,
+                                      (LIBBALSA_MESSAGE_FLAG_FLAGGED |
+                                       LIBBALSA_MESSAGE_FLAG_DELETED)))
             continue;
+
 	new_message = msg_queue_item_new(msg);
 	if (!libbalsa_create_msg(msg, new_message->message,
 				 new_message->tempfile, encoding, 
@@ -566,7 +574,6 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 	} else {
 	    GList * messages = g_list_prepend(NULL, msg);
 
-	    total_messages_left++;
             libbalsa_messages_flag(messages, TRUE);
 	    g_list_free(messages);
 	    /* If the Bcc: recipient list is present, add a additional
@@ -781,7 +788,6 @@ handle_successful_send (smtp_message_t message, void *be_verbose)
 	    _("Message submission problem, placing it into your outbox.\n" 
 	      "System will attempt to resubmit the message until you delete it."));
     }
-
     if (mqi != NULL && mqi->refcount <= 0)
         msg_queue_item_destroy(mqi);
     send_unlock();
@@ -890,11 +896,18 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
     SendMessageInfo *send_message_info;
     GList *lista;
     LibBalsaMessage *queu;
-    gboolean start_thread;
 
     /* We do messages in queue now only if where are not sending them already */
 
     send_lock();
+
+#ifdef BALSA_USE_THREADS
+    if (sending_threads>0) {
+	send_unlock();
+	return TRUE;
+    }
+    sending_threads++;
+#endif
 
     ensure_send_progress_dialog();
     if (sending_threads==0) {
@@ -917,30 +930,24 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 		    message_queue = new_message;
 
 		mqi = new_message;
-		total_messages_left++;
 	    }
 	    lista = lista->next;
 	}
     }
+    send_message_info=send_message_info_new(outbox);
+
 #ifdef BALSA_USE_THREADS
     
-    start_thread = sending_threads==0;
+    pthread_create(&send_mail, NULL,
+		   (void *) &balsa_send_message_real, send_message_info);
+    /* Detach so we don't need to pthread_join
+     * This means that all resources will be
+     * reclaimed as soon as the thread exits
+     */
+    pthread_detach(send_mail);
 
-    if (start_thread) {
-        sending_threads++;
-	send_message_info=send_message_info_new(outbox);
-
-	pthread_create(&send_mail, NULL,
-		       (void *) &balsa_send_message_real, send_message_info);
-	/* Detach so we don't need to pthread_join
-	 * This means that all resources will be
-	 * reclaimed as soon as the thread exits
-	 */
-	pthread_detach(send_mail);
-    }
 #else				/*non-threaded code */
-    
-    send_message_info=send_message_info_new(outbox);
+
     balsa_send_message_real(send_message_info);
 #endif
     send_unlock();
@@ -1069,7 +1076,6 @@ balsa_send_message_real(SendMessageInfo* info) {
     gdk_threads_leave();
 
     send_lock();
-    total_messages_left = 0;
 #ifdef BALSA_USE_THREADS
     MSGSENDTHREAD(threadmsg, MSGSENDTHREADFINISHED, "", NULL, NULL, 0);
     sending_threads--;
@@ -1114,7 +1120,7 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
     while ( (mqi = get_msg2send()) != NULL) {
 	libbalsa_lock_mutt();
 	i = mutt_invoke_sendmail(mqi->message->env->from,
-                                 mqi->message->env->to,
+				 mqi->message->env->to,
 				 mqi->message->env->cc,
 				 mqi->message->env->bcc,
 				 mqi->tempfile,
@@ -1122,7 +1128,6 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
 				  == ENC8BIT));
 	libbalsa_unlock_mutt();
 	mqi->status = (i==0?MQI_SENT : MQI_FAILED);
-	total_messages_left--; /* whatever the status is, one less to do*/
     }
 
     /* We give back all the resources used and delete the sent messages */
@@ -1143,7 +1148,6 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
     gdk_threads_leave();
 
     message_queue = NULL;
-    total_messages_left = 0;
 #ifdef BALSA_USE_THREADS
     sending_threads--;
     MSGSENDTHREAD(threadmsg, MSGSENDTHREADFINISHED, "", NULL, NULL, 0);
@@ -1220,7 +1224,7 @@ message2HEADER(LibBalsaMessage * message, HEADER * hdr) {
     hdr->env->bcc = rfc822_parse_adrlist(hdr->env->bcc, tmp);
     g_free(tmp);
 
-    for (list = message->user_headers; list; list = g_list_next(list)) {
+     for (list = message->user_headers; list; list = g_list_next(list)) {
         tmp_hdr = mutt_new_list();
         tmp_hdr->next = hdr->env->userhdrs;
         tmp_hdr->data = g_strjoinv(": ", list->data);
@@ -1242,30 +1246,29 @@ message_add_references(LibBalsaMessage* message, HEADER* msg)
         list = message->references;
         libbalsa_lock_mutt();
         msg->env->references = mutt_new_list();
-	references = msg->env->references;
-	references->data = g_strdup(list->data);
-	list = list->next;
+       references = msg->env->references;
+       references->data = g_strdup(list->data);
+       list = list->next;
 
-	while (list != NULL) {
-	    references->next = mutt_new_list();
-	    references = references->next;
-	    references->data = g_strdup(list->data);
-	    references->next = NULL;
-	    list = list->next;
-	}
+       while (list != NULL) {
+           references->next = mutt_new_list();
+           references = references->next;
+           references->data = g_strdup(list->data);
+           references->next = NULL;
+           list = list->next;
+       }
         
 
-	/* There's no specific header for In-Reply-To, just
-	 * add it to the user headers */ 
+       /* There's no specific header for In-Reply-To, just
+        * add it to the user headers */ 
         in_reply_to = mutt_new_list();
-	in_reply_to->next = msg->env->userhdrs;
-	in_reply_to->data =
-	    g_strconcat("In-Reply-To: ", message->in_reply_to, NULL);
-	msg->env->userhdrs = in_reply_to;
+       in_reply_to->next = msg->env->userhdrs;
+       in_reply_to->data =
+           g_strconcat("In-Reply-To: ", message->in_reply_to, NULL);
+       msg->env->userhdrs = in_reply_to;
         libbalsa_unlock_mutt();
     }
 }
-
 
 gboolean
 libbalsa_message_postpone(LibBalsaMessage * message,
@@ -1309,7 +1312,7 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 		/* Do this here because we don't want
 		 * to use libmutt's mime types */
 		if (!body->mime_type) {
-                    gchar* mt = libbalsa_lookup_mime_type(body->filename);
+		    gchar* mt = libbalsa_lookup_mime_type(body->filename);
 		    mime_type = g_strsplit(mt,"/", 2);
                     g_free(mt);
                 } else
@@ -1364,22 +1367,17 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 	body = body->next;
     }
 
-    { /* scope */
-	gchar *cset = g_strdup(libbalsa_message_charset(message));
-	
+    { /* scope CHARSET */
 	libbalsa_lock_mutt();
-	mutt_set_charset(cset);
 	if (msg->content) {
 	    if (msg->content->next)
 		msg->content = mutt_make_multipart(msg->content);
 	}
 	mutt_prepare_envelope(msg->env, FALSE);
 	encode_descriptions(msg->content);
-	mutt_set_charset(NULL);
-	g_free(cset);
 	libbalsa_unlock_mutt();
-    }	
-	
+    } 
+    
     if ((reply_message != NULL) && (reply_message->mailbox != NULL))
 	/* Just saves the message ID, mailbox type and mailbox name. We could
 	 * search all mailboxes for the ID but that would not be too fast. We
@@ -1426,7 +1424,6 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
     gchar **mime_type;
     gboolean res = TRUE;
 
-    
     message2HEADER(message, msg);
     message_add_references(message, msg);
 
@@ -1465,9 +1462,9 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 		    
 		    /* Do this here because we don't want
 		     * to use libmutt's mime types */
-		    if (!body->mime_type) {
-                        gchar* mt = libbalsa_lookup_mime_type(body->filename);
-			mime_type = g_strsplit(mt, "/", 2);
+                    if (!body->mime_type) {
+                        gchar *mt = libbalsa_lookup_mime_type(body->filename);
+                        mime_type = g_strsplit(mt, "/", 2);
                         g_free(mt);
                     } else
 			mime_type = g_strsplit(body->mime_type, "/", 2);
@@ -1512,7 +1509,7 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 	} else {
 	    /* safe_free bug patch: steal it! */
             libbalsa_lock_mutt();
-            msg->content = libmutt_copy_body(body->mutt_body, NULL);
+	    msg->content = libmutt_copy_body(body->mutt_body, NULL);
             libbalsa_unlock_mutt();
 	}
 
@@ -1527,21 +1524,18 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 
 	body = body->next;
     }
+    
     { /* scope */
-	gchar *cset = g_strdup(libbalsa_message_charset(message));
-
 	libbalsa_lock_mutt();
-	mutt_set_charset(cset);
 	if (msg->content && msg->content->next)
 	    msg->content = mutt_make_multipart(msg->content);
 	mutt_prepare_envelope(msg->env, TRUE);
 	encode_descriptions(msg->content);
-	mutt_set_charset(NULL);
-	g_free(cset);
 	libbalsa_unlock_mutt();
     }
-/* We create the message in MIME format here, we use the same format 
- * for local delivery and for SMTP */
+
+    /* We create the message in MIME format here, we use the same format 
+     * for local delivery and for SMTP */
     if (queu == 0) {
         libbalsa_lock_mutt();
 	mutt_mktemp(tmpfile);
@@ -1550,7 +1544,7 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
             return FALSE;
         }
 
-	mutt_write_rfc822_header(tempfp, msg->env, msg->content, -1, 0);
+	mutt_write_rfc822_header(tempfp, msg->env, msg->content, -1,0);
 	fputc('\n', tempfp);	/* tie off the header. */
 
 	if ((mutt_write_mime_body(msg->content, tempfp) == -1)) {

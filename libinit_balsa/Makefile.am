@@ -21,3 +21,7 @@ INCLUDES=-I. -I$(top_srcdir) \
 	-I$(top_srcdir)/libbalsa \
 	-I$(top_srcdir)/src \
         $(BALSA_CFLAGS)
+
+DEFS = -DG_DISABLE_DEPRECATED   \
+       -DGTK_DISABLE_DEPRECATED \
+       -DGNOME_DISABLE_DEPRECATED

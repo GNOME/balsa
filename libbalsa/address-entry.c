@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <ctype.h>
+#include <string.h>
 
 /*
  * LibBalsa includes.
@@ -45,6 +46,7 @@
  * structure is declared here to keep it opaque */
 struct _LibBalsaAddressEntry {
     GtkEntry parent;
+    gpointer dummy;             /* GtkEntry needs more space? */
 
     GList *active;              /* A GList of email addresses.
                                  * Caution! active may not
@@ -199,19 +201,22 @@ GtkType libbalsa_address_entry_get_type(void)
     static GtkType address_entry_type = 0;
 
     if (!address_entry_type) {
-	static const GtkTypeInfo address_entry_info = {
-	    "LibBalsaAddressEntry",
-	    sizeof(LibBalsaAddressEntry),
+	static const GTypeInfo address_entry_info = {
 	    sizeof(LibBalsaAddressEntryClass),
-	    (GtkClassInitFunc) libbalsa_address_entry_class_init,
-	    (GtkObjectInitFunc) libbalsa_address_entry_init,
-	    /* reserved_1 */ NULL,
-	    /* reserved_2 */ NULL,
-	    (GtkClassInitFunc) NULL,
+            NULL,               /* base_init */
+            NULL,               /* base_finalize */
+	    (GClassInitFunc) libbalsa_address_entry_class_init,
+            NULL,               /* class_finalize */
+            NULL,               /* class_data */
+	    sizeof(LibBalsaAddressEntry),
+            0,                  /* n_preallocs */
+	    (GInstanceInitFunc) libbalsa_address_entry_init
 	};
 
 	address_entry_type =
-	    gtk_type_unique(GTK_TYPE_ENTRY, &address_entry_info);
+            g_type_register_static(GTK_TYPE_ENTRY,
+	                           "LibBalsaAddressEntry",
+                                   &address_entry_info, 0);
     }
 
     return address_entry_type;
@@ -986,10 +991,11 @@ libbalsa_delete_backward_character(LibBalsaAddressEntry *address_entry)
      * Normal character needs deleting.
      */
     } else {
-        gchar *p;
-        for (p = addy->user + addy->cursor - 1; *p; ++p)
-            *p = *(p + 1);
-	addy->cursor--;
+        gchar *src= addy->user + addy->cursor, *dest = g_utf8_prev_char(src);
+	int chlen = dest-src;
+        while( (*dest++ = *src++) )
+	    ;
+	addy->cursor += chlen;
 	if (*addy->user == '\0')
 	    libbalsa_force_no_match(addy);
 	else if (address_entry->find_match)
@@ -1062,9 +1068,9 @@ libbalsa_delete_forward_character(LibBalsaAddressEntry *address_entry)
      * Normal character needs deleting.
      */
     } else {
-        gchar *p;
-        for (p = addy->user + addy->cursor; *p; ++p)
-            *p = *(p + 1);
+        gchar *dest= addy->user + addy->cursor, *src = g_utf8_next_char(dest);
+        while( (*dest++ = *src++) )
+	    ;
     }
 }
 
@@ -1219,7 +1225,7 @@ libbalsa_move_backward_character(LibBalsaAddressEntry *address_entry)
 
     addy = address_entry->active->data;
     if (addy->cursor > 0) {
-	addy->cursor--;
+	addy->cursor = g_utf8_prev_char(addy->user + addy->cursor)-addy->user;
 	libbalsa_force_no_match(addy);
     } else if (g_list_previous(address_entry->active)) {
 	address_entry->active = g_list_previous(address_entry->active);
@@ -1248,7 +1254,7 @@ libbalsa_move_forward_character(LibBalsaAddressEntry *address_entry)
 
     addy = address_entry->active->data;
     if (addy->user[addy->cursor]) {
-	addy->cursor++;
+	addy->cursor = g_utf8_next_char(addy->user + addy->cursor)-addy->user;
 	libbalsa_force_no_match(addy);
     } else if ((list = g_list_next(address_entry->active))) {
 	address_entry->active = list;
@@ -1418,7 +1424,7 @@ libbalsa_keystroke_add_key(LibBalsaAddressEntry *address_entry, gchar *add)
      */
     libbalsa_emailData_set_user(addy, g_strconcat(left, add, right, NULL));
     g_free(left);
-    addy->cursor++;
+    addy->cursor += strlen(add);
 
     /*
      * Now search for (any) match.
@@ -1774,9 +1780,14 @@ libbalsa_address_entry_show(LibBalsaAddressEntry *address_entry)
 	 list = g_list_next(list)) {
 	addy = (emailData *)list->data;
 	g_assert(addy != NULL);
-        if (list == address_entry->active)
-            cursor = end = show->len + addy->cursor;
-        g_string_append(show, addy->user);
+        if (list == address_entry->active) {
+	    int curbyte = show->len + addy->cursor;
+	    g_string_append(show, addy->user);
+            cursor = end = 
+		g_utf8_pointer_to_offset(show->str,
+					 show->str + curbyte);
+	} else g_string_append(show, addy->user);
+
 	if (addy->match) {
 	    g_string_append(show, " (");
 	    g_string_append(show, addy->match);
@@ -1866,7 +1877,9 @@ libbalsa_address_entry_new(void)
 {
     LibBalsaAddressEntry *entry;
 
-    entry = gtk_type_new(LIBBALSA_TYPE_ADDRESS_ENTRY);
+    entry =
+        LIBBALSA_ADDRESS_ENTRY(g_object_new
+                               (LIBBALSA_TYPE_ADDRESS_ENTRY, NULL));
     return GTK_WIDGET(entry);
 }
 
@@ -1892,8 +1905,8 @@ libbalsa_address_entry_focus_out(GtkWidget *widget, GdkEventFocus *event)
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(widget), FALSE);
     g_return_val_if_fail(event != NULL, FALSE);
 
-    GTK_WIDGET_UNSET_FLAGS(widget, GTK_HAS_FOCUS);
 #if BALSA_MAJOR == 1
+    GTK_WIDGET_UNSET_FLAGS(widget, GTK_HAS_FOCUS);
     /* not in gtk+-2.0: */
     gtk_widget_draw_focus(widget);
 #endif                          /* BALSA_MAJOR == 1 */
@@ -1907,7 +1920,8 @@ libbalsa_address_entry_focus_out(GtkWidget *widget, GdkEventFocus *event)
 #ifdef USE_XIM
     gdk_im_end ();
 #endif
-    return FALSE;
+    return
+        GTK_WIDGET_CLASS(parent_class)->focus_out_event(widget, event);
 }
 
 

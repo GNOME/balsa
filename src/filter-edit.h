@@ -28,8 +28,6 @@
 #ifndef __FILTER_EDIT_H__
 #define __FILTER_EDIT_H__
 
-#include <gnome.h>
-
 #include "filter.h"
 
 /*
@@ -51,14 +49,18 @@ typedef struct _option_list {
 void fe_destroy_window_cb(GtkWidget *,gpointer);
 
 /* button callbacks */
-void fe_dialog_button_clicked(GtkWidget * widget, gint button,
+void fe_dialog_response(GtkWidget * widget, gint response,
 			      gpointer data);
+
+/* helper */
+GtkWidget *fe_build_option_menu(option_list options[], gint num,
+                                GCallback func);
 
 /*---------------- Left side of hbox ----------------*/
 
-/* clist callbacks */
-void fe_clist_select_row(GtkWidget * widget, gint row, gint column,
-			 GdkEventButton * bevent, gpointer data);
+/* list callbacks */
+void fe_filters_list_selection_changed(GtkTreeSelection * selection,
+                                       gpointer data);
 
 /* button callbacks */
 void fe_new_pressed(GtkWidget * widget, gpointer data);
@@ -75,13 +77,17 @@ void fe_revert_pressed(GtkWidget * widget, gpointer data);
 void fe_op_codes_toggled(GtkWidget * widget, gpointer data);
 
 /* Conditions callbacks */
-void fe_conditions_select_row(GtkWidget * widget, gint row, gint column,
-			      GdkEventButton * bevent, gpointer data);
+void fe_conditions_row_activated(GtkTreeView * treeview,
+                                 GtkTreePath * path,
+                                 GtkTreeViewColumn * column,
+			         gpointer data);
 void fe_edit_condition(GtkWidget * widget, gpointer data);
 void fe_condition_remove_pressed(GtkWidget * widget, gpointer data);
 
 /* action callback */
 void fe_action_selected(GtkWidget * widget, gpointer data);
+void fe_button_toggled(GtkWidget * widget, gpointer data);
+void fe_action_changed(GtkWidget * widget, gpointer data);
 void fe_enable_right_page(gboolean enabled);
 
 void fe_add_new_user_header(const gchar *);

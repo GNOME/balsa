@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,9 +22,9 @@
 
 #include "config.h"
 
+#include <unistd.h>
 #include <string.h>
 #include <glib.h>
-#include <unistd.h>
 
 #include "libbalsa.h"
 #include "mailbackend.h"
@@ -146,10 +146,9 @@ libbalsa_message_body_get_parameter(LibBalsaMessageBody * body,
 */
 gboolean
 libbalsa_message_body_save_temporary(LibBalsaMessageBody * body,
-				     gchar * prefix)
+				     const gchar * prefix)
 {
-    /* FIXME: Role our own mktemp that doesn't need a large array (use
-       g_strdup_printf) */
+    /* FIXME: Role our own mktemp that doesn't need a large array (use g_strdup_printf) */
     if (body->temp_filename == NULL) {
 	gchar tmp_file_name[PATH_MAX + 1];
 
@@ -178,12 +177,12 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body,
    NOTE: has to use safe_fopen to set the file access privileges to safe.
 */
 gboolean
-libbalsa_message_body_save(LibBalsaMessageBody * body, gchar * prefix,
-			   gchar * filename)
+libbalsa_message_body_save(LibBalsaMessageBody * body,
+                           const gchar * prefix,
+			   const gchar * filename)
 {
     FILE *stream;
     STATE s;
-    char *enc;
 
     stream =
 	libbalsa_mailbox_get_message_stream(body->message->mailbox,
@@ -192,18 +191,17 @@ libbalsa_message_body_save(LibBalsaMessageBody * body, gchar * prefix,
     g_return_val_if_fail(stream != NULL, FALSE);
 
     fseek(stream, body->mutt_body->offset, 0);
-    s.fpin = stream;
 
-    s.prefix = prefix;
+    s.fpin = stream;
     s.fpout = safe_fopen(filename, "w");
     if (!s.fpout)
 	return FALSE;
-
-    enc = mutt_get_parameter ("charset", body->mutt_body->parameter);
-    if(enc && !g_strcasecmp(enc,"UTF-8"))
-	s.flags = M_CHARCONV;
-    else
-	s.flags = 0;
+    s.prefix = prefix;
+    /* convert everything but HTML - gtkhtml does conversion on its own. */
+    s.flags = 
+	(body->mutt_body->subtype && 
+	 strcmp(body->mutt_body->subtype, "html")==0) 
+     ? 0 : M_CHARCONV;
 
     libbalsa_lock_mutt();
     mutt_decode_attachment(body->mutt_body, &s);
@@ -222,14 +220,16 @@ libbalsa_message_body_get_content_type(LibBalsaMessageBody * body)
     gchar *res;
 
     libbalsa_lock_mutt();
-    if (body->mutt_body->subtype)
-	res =
+    if (body->mutt_body->subtype) {
+        gchar *tmp =
 	    g_strdup_printf("%s/%s", TYPE(body->mutt_body),
 			    body->mutt_body->subtype);
-    else
-	res = g_strdup(TYPE(body->mutt_body));
+        res = g_ascii_strdown(tmp, -1);
+        g_free(tmp);
+    } else
+	res = g_ascii_strdown(TYPE(body->mutt_body), -1);
     libbalsa_unlock_mutt();
-    g_strdown(res);
+
     return res;
 }
 
@@ -242,7 +242,11 @@ libbalsa_message_body_is_multipart(LibBalsaMessageBody * body)
 gboolean
 libbalsa_message_body_is_inline(LibBalsaMessageBody * body)
 {
-    return body->mutt_body && body->mutt_body->disposition==DISPINLINE;
+    gboolean res;
+    libbalsa_lock_mutt();
+    res = body->mutt_body && body->mutt_body->disposition==DISPINLINE;
+    libbalsa_unlock_mutt();
+    return res;
 }
 
 LibBalsaMessageBody*

@@ -22,7 +22,6 @@
 
 #include "config.h"
 
-#include <errno.h>
 #include <glib.h>
 #include <gnome.h>
 
@@ -31,17 +30,13 @@
 #include <sys/utsname.h>
 #include <stdarg.h>
 
-#ifdef HAVE_GNOME_VFS
-# include <libgnomevfs/gnome-vfs-init.h>
-#endif
-
 #if ENABLE_LDAP
 #include <ldap.h>
 #endif
 
 #include "libbalsa.h"
-#include "mailbackend.h"
 #include "misc.h"
+#include "mailbackend.h"
 
 
 #ifdef BALSA_USE_THREADS
@@ -89,6 +84,7 @@ mutt_perror (const char *s)
   mutt_error ("%s: %s (errno = %d)", s, p ? p : _("unknown error"), errno);
 }
 
+
 int
 mutt_yesorno(const char *msg, int def)
 {
@@ -109,17 +105,10 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
     struct utsname utsname;
     const char *p;
 
-#ifdef	HAVE_GNOME_VFS
-    if (!gnome_vfs_init ()) {
-        fprintf (stderr, "Cannot initialize the GNOME Virtual File System.\n");
-        return;
-    }
-#endif
     Spoolfile = libbalsa_guess_mail_spool();
     MhFlagged = "flagged";
     MhReplied = "replied";
     MhUnseen  = "unseen";
-    
 
 #ifdef BALSA_USE_THREADS
     if (!g_thread_supported()) {
@@ -177,9 +166,9 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
     ReplyRegexp.rx = (regex_t *) safe_malloc (sizeof (regex_t));
     REGCOMP(ReplyRegexp.rx,"^(re([\\[0-9\\]+])*|aw):[ \t]*",0);
 
-    Charset = NULL;
+    Charset = "UTF-8";
     /* more likely to least likely or something */
-    SendCharset = "us-ascii:iso-8859-1:iso-8859-15:iso-8859-2:iso-8859-9:iso-8859-13:euc-kr:euc-jp:KOI8-R";    
+    SendCharset = "us-ascii:iso-8859-1:iso-8859-15:iso-8859-2:iso-8859-9:iso-8859-13:euc-kr:euc-jp:KOI8-R:UTF-8";    
 
     libbalsa_notify_init();
 
@@ -322,7 +311,7 @@ libbalsa_guess_mail_spool(void)
 	for (i = 0; guesses[i] != NULL; i++) {
 	    spool = g_strconcat(guesses[i], env, NULL);
 
-	    if (g_file_exists(spool))
+	    if (g_file_test(spool, G_FILE_TEST_EXISTS))
 		return spool;
 
 	    g_free(spool);
@@ -428,13 +417,14 @@ gchar *libbalsa_guess_ldif_file()
 	".address.ldif",
 	"address-book.ldif",
 	".address-book.ldif",
+	".addressbook.ldif",
 	NULL
     };
 
     for (i = 0; guesses[i] != NULL; i++) {
 	ldif = gnome_util_prepend_user_home(guesses[i]);
 	
-	if (g_file_exists(ldif))
+	if (g_file_test(ldif, G_FILE_TEST_EXISTS))
 	     return ldif;
 	  
 	g_free(ldif);
@@ -480,7 +470,6 @@ libbalsa_mutt_error(const char *fmt, ...)
 	libbalsa_information_varg(LIBBALSA_INFORMATION_WARNING, fmt, va_args);
     va_end(va_args);
 }
-
 /* wraper function */
 void 
 libbalsa_mktemp (char *s) {
@@ -515,7 +504,7 @@ ask_cert_real(X509 *cert)
     unsigned i;
     int ret;
 
-    GString* str = g_string_new(_("This certificate belongs to:\n"));
+    GString* str = g_string_new(_("<b>This certificate belongs to:</b>\n"));
 
     name = X509_NAME_oneline(X509_get_subject_name (cert), buf, sizeof (buf));
     for (i = 0; i < ELEMENTS(part); i++) {
@@ -523,7 +512,7 @@ ask_cert_real(X509 *cert)
         g_string_append_c(str, '\n');
     }
 
-    g_string_append(str, _("\nThis certificate was issued by:\n"));
+    g_string_append(str, _("\n<b>This certificate was issued by:</b>\n"));
     name = X509_NAME_oneline(X509_get_issuer_name(cert), buf, sizeof (buf));
     for (i = 0; i < ELEMENTS(part); i++) {
         g_string_append(str, x509_get_part (name, part[i]));
@@ -532,31 +521,36 @@ ask_cert_real(X509 *cert)
 
     buf[0] = '\0';
     x509_fingerprint (buf, sizeof (buf), cert);
-    c = g_strdup_printf(_("This certificate is valid\n"
+    c = g_strdup_printf(_("<b>This certificate is valid</b>\n"
                           "from %s\n"
                           "to %s\n"
-                          "Fingerprint: %s"),
+                          "<b>Fingerprint:</b> %s"),
                         asn1time_to_string(X509_get_notBefore(cert)),
                         asn1time_to_string(X509_get_notAfter(cert)),
                         buf);
     g_string_append(str, c); g_free(c);
 
-    dialog = gnome_dialog_new(_("IMAP TLS certificate"), 
-                              _("Accept Once"),_("Accept&Save"),
-                              _("Reject"), NULL);
+    dialog = gtk_dialog_new_with_buttons(_("IMAP TLS certificate"), NULL,
+                                         GTK_DIALOG_MODAL,
+                                         _("_Accept Once"), 0,
+                                         _("Accept&_Save"), 1,
+                                         _("_Reject"), GTK_RESPONSE_CANCEL, 
+                                         NULL);
+    gtk_window_set_wmclass(GTK_WINDOW(dialog), "tls_cert_dialog", "Balsa");
     label = gtk_label_new(str->str);
     g_string_free(str, TRUE);
-
-    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(dialog)->vbox),
+    gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox),
                        label, TRUE, TRUE, 1);
     gtk_widget_show(label);
 
-    switch(gnome_dialog_run_and_close(GNOME_DIALOG(dialog))) {
+    switch(gtk_dialog_run(GTK_DIALOG(dialog))) {
     case 0: ret = OP_MAX; break;
     case 1: ret = OP_SAVE; libbalsa_assure_balsa_dir(); break;
-    case 2:
+    case GTK_RESPONSE_CANCEL:
     default: ret = OP_EXIT; break;
     }
+    gtk_widget_destroy(dialog);
     return ret;
 }
 
@@ -582,7 +576,7 @@ ask_cert_idle(gpointer data)
 }
 /* libmutt_ask_for_cert_acceptance:
    executed with GDK UNLOCKED. see mailbox_imap_open() and
-   imap_folder_imap_dir().
+   imap_dir_cb()/imap_folder_imap_dir().
 */
 int
 libmutt_ask_for_cert_acceptance(X509 *cert)
@@ -590,20 +584,20 @@ libmutt_ask_for_cert_acceptance(X509 *cert)
     static pthread_mutex_t ask_cert_lock = PTHREAD_MUTEX_INITIALIZER;
     AskCertData acd;
 
-    if (pthread_self() == libbalsa_get_main_thread()) 
-        return ask_cert_real(cert);
+    if (pthread_self() == libbalsa_get_main_thread())
+	return ask_cert_real(cert);
 
-    libbalsa_unlock_mutt(); gdk_threads_leave();
     pthread_mutex_lock(&ask_cert_lock);
     pthread_cond_init(&acd.cond, NULL);
     acd.cert = cert;
     gtk_idle_add(ask_cert_idle, &acd);
+    libbalsa_unlock_mutt(); 
     pthread_cond_wait(&acd.cond, &ask_cert_lock);
+    libbalsa_lock_mutt();
     
     pthread_cond_destroy(&acd.cond);
     pthread_mutex_unlock(&ask_cert_lock);
     pthread_mutex_destroy(&ask_cert_lock);
-    gdk_threads_enter(); libbalsa_lock_mutt();
     return acd.res;
 }
 #else /* BALSA_USE_THREADS */

@@ -37,6 +37,8 @@ libbalsa_a_SOURCES = 		\
 	information.h		\
 	libbalsa.c		\
 	libbalsa.h		\
+	libbalsa-marshal.c	\
+	libbalsa-marshal.h	\
 	libbalsa_private.h	\
 	mailbackend.h		\
 	mailbox-filter.c	\
@@ -73,9 +75,27 @@ libbalsa_a_SOURCES = 		\
 	server.h		\
 	source-viewer.c
 
-
+EXTRA_DIST = \
+	libbalsa-marshal.list
 
 INCLUDES=-I. -I${top_srcdir} -I${top_builddir}/libmutt \
-	$(PCRE_CFLAGS)
+	$(BALSA_CFLAGS)
 
-DEFS = -DLIBMUTT
+DEFS = -DLIBMUTT                \
+       -DG_DISABLE_DEPRECATED   \
+       -DGTK_DISABLE_DEPRECATED \
+       -DGNOME_DISABLE_DEPRECATED
+
+#Signal marshallers
+marshal_prefix = libbalsa
+libbalsa-marshal.h: libbalsa-marshal.list
+	( @GLIB_GENMARSHAL@ --prefix=$(marshal_prefix) libbalsa-marshal.list --header > libbalsa-marshal.tmp \
+	&& mv libbalsa-marshal.tmp libbalsa-marshal.h ) \
+	|| ( rm -f libbalsa-marshal.tmp && exit 1 )
+libbalsa-marshal.c: libbalsa-marshal.h
+	( echo "#include \"libbalsa-marshal.h\"" > libbalsa-marshal.tmp \
+	&& @GLIB_GENMARSHAL@ --prefix=$(marshal_prefix) libbalsa-marshal.list --body >> libbalsa-marshal.tmp \
+	&& mv libbalsa-marshal.tmp libbalsa-marshal.c ) \
+	|| ( rm -f libbalsa-marshal.tmp && exit 1 )
+
+$(libbalsa_a_OBJECTS): libbalsa-marshal.h

@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2003 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -58,7 +58,7 @@ struct _MailboxConfWindow {
     LibBalsaMailbox *mailbox;
 
 
-    GnomeDialog *window;
+    GtkDialog *window;
 
     void (*ok_handler)(MailboxConfWindow*);
     GtkWidget *mailbox_name;
@@ -68,7 +68,7 @@ struct _MailboxConfWindow {
     union {
 	/* for local mailboxes */
 	struct local { 
-	    GtkWidget *path;
+	    GnomeFileEntry *path;
 	} local;
 	/* for imap mailboxes & directories */
 	struct {
@@ -194,12 +194,17 @@ mailbox_conf_add_imap_cb(GtkWidget * widget, gpointer data)
 void
 mailbox_conf_delete_cb(GtkWidget * widget, gpointer data)
 {
-    BalsaMailboxNode *mbnode = mblist_get_selected_node(balsa_app.mblist);
+    BalsaMailboxNode *mbnode =
+        balsa_mblist_get_selected_node(balsa_app.mblist);
 
     if (mbnode->mailbox == NULL) {
         GtkWidget *err_dialog =
-            gnome_error_dialog(_("No mailbox selected."));
-        gnome_dialog_run_and_close(GNOME_DIALOG(err_dialog));
+            gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
+                                   GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR,
+                                   GTK_BUTTONS_CANCEL,
+                                   _("No mailbox selected."));
+        gtk_dialog_run(GTK_DIALOG(err_dialog));
+        gtk_widget_destroy(err_dialog);
     } else
 	mailbox_conf_delete(mbnode);
 }
@@ -208,7 +213,8 @@ mailbox_conf_delete_cb(GtkWidget * widget, gpointer data)
 void
 mailbox_conf_edit_cb(GtkWidget * widget, gpointer data)
 {
-    BalsaMailboxNode *mbnode = mblist_get_selected_node(balsa_app.mblist);
+    BalsaMailboxNode *mbnode = 
+        balsa_mblist_get_selected_node(balsa_app.mblist);
     balsa_mailbox_node_show_prop_dialog(mbnode);
 }
 
@@ -217,71 +223,85 @@ void
 mailbox_conf_delete(BalsaMailboxNode * mbnode)
 {
     GNode *gnode;
-    gchar *msg;
     gint button;
     GtkWidget *ask;
-    gint cancel_button;
     LibBalsaMailbox* mailbox = mbnode->mailbox;
 
     if(BALSA_IS_MAILBOX_SPECIAL(mailbox)) {
 	balsa_information(
-            LIBBALSA_INFORMATION_ERROR, NULL,
-	    _("Mailbox '%s' is used by balsa and I cannot remove it.\n"
+	    LIBBALSA_INFORMATION_ERROR,
+	    _("Mailbox \"%s\" is used by balsa and I cannot remove it.\n"
 	      "If you really want to remove it, assign its function\n"
 	      "to some other mailbox."), mailbox->name);
 	return;
     }
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
-	msg = g_strdup_printf(
-	    _("This will remove the mailbox %s from the list of mailboxes.\n"
-	      "You may also delete the disk file or files associated with this mailbox.\n"
-	      "If you do not remove the file on disk you may \"Add  Mailbox\" to access the mailbox again.\n"
-	      "What would you like to do?"),
-			      mailbox->name);
-	ask = gnome_message_box_new(msg, GNOME_MESSAGE_BOX_QUESTION,
-				    _("Remove from list"), 
-				    _("Remove from list and disk"),
-				    _("Cancel"), NULL);
-	cancel_button = 2;
-	g_free(msg);
+        ask = gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window), 0,
+                                     GTK_MESSAGE_QUESTION,
+                                     GTK_BUTTONS_NONE,
+                                     _("This will remove the mailbox "
+                                       "\"%s\" from the list "
+                                       "of mailboxes.  "
+                                       "You may also delete the disk "
+                                       "file or files associated with "
+                                       "this mailbox.\n"
+                                       "If you do not remove the file "
+                                       "on disk you may \"Add  Mailbox\" "
+                                       "to access the mailbox again.\n"
+                                       "What would you like to do?"),
+                                     mailbox->name);
+        gtk_dialog_add_buttons(GTK_DIALOG(ask),
+                               _("Remove from _list"), 0,
+                               _("Remove from list and _disk"), 1,
+                               _("_Cancel"), GTK_RESPONSE_CANCEL,
+                               NULL);
     } else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox) && !mailbox->config_prefix) {
 	/* deleting remote IMAP mailbox in a folder set */
-	msg = g_strdup_printf(
-	    _("This will remove the mailbox %s and all its messages from your IMAP server.\n"
-	      "If %s has subfolders, it will still appear as a node in the folder tree.\n"
-	      "You may use \"New IMAP subfolder\" later to add a mailbox with this name.\n"
-	      "What would you like to do?"),
-			      mailbox->name, mailbox->name);
-	ask = gnome_message_box_new(msg, GNOME_MESSAGE_BOX_QUESTION,
-				    _("Remove from server"),
-				    _("Cancel"), NULL);
-	cancel_button = 1;
-	g_free(msg);
+        ask = gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window), 0,
+                                     GTK_MESSAGE_QUESTION,
+                                     GTK_BUTTONS_NONE,
+	                             _("This will remove the mailbox "
+                                       "\"%s\" and all its messages "
+                                       "from your IMAP server.  "
+	                               "If %s has subfolders, it will "
+                                       "still appear as a node in the "
+                                       "folder tree.\n"
+	                               "You may use "
+                                       "\"New IMAP subfolder\" "
+                                       "later to add a mailbox "
+                                       "with this name.\n"
+	                               "What would you like to do?"),
+			             mailbox->name, mailbox->name);
+        gtk_dialog_add_buttons(GTK_DIALOG(ask),
+                               _("_Remove from server"), 0,
+                               _("_Cancel"), GTK_RESPONSE_CANCEL,
+                               NULL);
     } else { /* deleting other remote mailbox */
-	msg = g_strdup_printf(
-            _("This will remove the mailbox %s from the list of mailboxes\n"
-              "You may use \"Add Mailbox\" later to access this mailbox again\n"
-              "What would you like to do?"),
-             mailbox->name);
-	ask = gnome_message_box_new(msg, GNOME_MESSAGE_BOX_QUESTION,
-				    _("Remove from list"),
-				    _("Cancel"),
-				    NULL);
-	cancel_button = 1;
-	g_free(msg);
+        ask = gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window), 0,
+                                     GTK_MESSAGE_QUESTION,
+                                     GTK_BUTTONS_NONE,
+	                             _("This will remove the mailbox "
+                                       "\"%s\" from the list "
+                                       "of mailboxes.\n"
+				       "You may use \"Add Mailbox\" "
+                                       "later to access "
+                                       "this mailbox again.\n"
+			 	       "What would you like to do?"),
+			             mailbox->name);
+        gtk_dialog_add_buttons(GTK_DIALOG(ask),
+                               _("_Remove from list"), 0,
+                               _("_Cancel"), GTK_RESPONSE_CANCEL,
+                               NULL);
     }
     
-    gnome_dialog_set_parent(GNOME_DIALOG(ask), 
-			    GTK_WINDOW(balsa_app.main_window));
-    gtk_window_set_modal(GTK_WINDOW(ask), TRUE);
-
-    button = gnome_dialog_run_and_close(GNOME_DIALOG(ask));
+    button = gtk_dialog_run(GTK_DIALOG(ask));
+    gtk_widget_destroy(ask);
 
     /* button < 0 means that the dialog window was closed without pressing
-       any buttons.
+       any button other than CANCEL.
     */
-    if ( button < 0 || button == cancel_button ) 
+    if ( button < 0)
 	return;
 
     /* Delete it from the config file and internal nodes */
@@ -289,7 +309,7 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 
     /* Close the mailbox, in case it was open */
     if (!LIBBALSA_IS_MAILBOX_POP3(mailbox))
-	mblist_close_mailbox(mailbox);
+	balsa_mblist_close_mailbox(mailbox);
 
     /* Remove mailbox on IMAP server */
     if (LIBBALSA_IS_MAILBOX_IMAP(mailbox) && !mailbox->config_prefix) {
@@ -314,30 +334,36 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 	balsa_app.inbox_input = g_list_remove(balsa_app.inbox_input, 
 					      mbnode);
     } else {
+        /* FIXME: shouldn't we get an exclusive lock on the mailbox
+         * nodes, and hold it until after we've unlinked the gnode ? */
+        balsa_mailbox_nodes_lock(FALSE);
 	gnode = balsa_find_mailbox(balsa_app.mailbox_nodes, mailbox);
+        balsa_mailbox_nodes_unlock(FALSE);
 	if (!gnode) {
 	    fprintf(stderr,
 		    _("Oooop! mailbox not found in balsa_app.mailbox "
 		      "nodes?\n"));
 	    return;
 	} else {
-	    mblist_remove_mailbox_node(balsa_app.mblist, mbnode);
+            balsa_mblist_remove_mailbox_node(balsa_app.mblist_tree_store,
+                                             mbnode);
 	    g_node_unlink(gnode);
 	    g_node_destroy(gnode); /* this will remove mbnode */
  	}
     }
     update_mail_servers();
-    gtk_object_destroy(GTK_OBJECT(mbnode));
+    g_object_unref(G_OBJECT(mbnode));
 }
 
 static void
-conf_clicked_cb(GnomeDialog* dialog, gint buttonno, gpointer data)
+conf_response_cb(GtkDialog* dialog, gint response, gpointer data)
 {
     MailboxConfWindow *mcw =(MailboxConfWindow*)data;
-    switch(buttonno) {
-    case 0: mcw->ok_handler(mcw); 
+    switch(response) {
+    case GTK_RESPONSE_OK: mcw->ok_handler(mcw); 
         /* fall through */
-    default: gnome_dialog_close(dialog);
+    default:
+        gtk_widget_destroy(GTK_WIDGET(dialog));
     }
 }
 
@@ -347,6 +373,8 @@ free_data(GtkWidget* w, gpointer data)
     g_free(data);
 }
 
+#define BALSA_OK_SENSITIVE_KEY "balsa-ok-sensitive"
+
 static void
 run_mailbox_conf(BalsaMailboxNode* mbnode, GtkType mailbox_type, 
 		 void (*ok_handler)(MailboxConfWindow*), 
@@ -355,9 +383,8 @@ run_mailbox_conf(BalsaMailboxNode* mbnode, GtkType mailbox_type,
 {
     MailboxConfWindow* mcw;
     GtkWidget* page;
-    int button;
 
-    g_return_if_fail(gtk_type_is_a(mailbox_type, LIBBALSA_TYPE_MAILBOX));
+    g_return_if_fail(g_type_is_a(mailbox_type, LIBBALSA_TYPE_MAILBOX));
 
     mcw = g_new0(MailboxConfWindow, 1);
 
@@ -365,20 +392,22 @@ run_mailbox_conf(BalsaMailboxNode* mbnode, GtkType mailbox_type,
     mcw->mailbox = mbnode ? mbnode->mailbox : NULL;
     mcw->mailbox_type = mailbox_type;
 
-    mcw->window = GNOME_DIALOG(gnome_dialog_new(_("Mailbox Configurator"),
-						NULL));
+    mcw->window = 
+        GTK_DIALOG(gtk_dialog_new_with_buttons
+                   (_("Mailbox Configurator"),
+                    GTK_WINDOW(balsa_app.main_window),
+                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                    ok_button_name, GTK_RESPONSE_OK,
+                    GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
+                    NULL));
     gtk_window_set_wmclass(GTK_WINDOW(mcw->window), 
                            "mailbox_config_dialog", "Balsa");
 
-    gnome_dialog_append_button_with_pixmap(mcw->window, 
-					   ok_button_name,
-					   ok_pixmap);
-    gnome_dialog_append_button(mcw->window, GNOME_STOCK_BUTTON_CLOSE);
     
-    gnome_dialog_set_sensitive(mcw->window, 0, FALSE);
-    gnome_dialog_set_default(mcw->window, 0);
-
-    gnome_dialog_set_parent(mcw->window, GTK_WINDOW(balsa_app.main_window));
+    gtk_dialog_set_response_sensitive(mcw->window, GTK_RESPONSE_OK, FALSE);
+    g_object_set_data(G_OBJECT(mcw->window), BALSA_OK_SENSITIVE_KEY,
+                      GINT_TO_POINTER(FALSE));
+    gtk_dialog_set_default_response(mcw->window, GTK_RESPONSE_OK);
 
     page = create_page(mcw);
     gtk_widget_show_all(page);    
@@ -389,10 +418,10 @@ run_mailbox_conf(BalsaMailboxNode* mbnode, GtkType mailbox_type,
     if(mbnode)
         mailbox_conf_set_values(mcw);
 
-    gtk_signal_connect(GTK_OBJECT(mcw->window), "clicked", 
-                       conf_clicked_cb, mcw);
-    gtk_signal_connect(GTK_OBJECT(mcw->window), "destroy", 
-                       free_data, mcw);
+    g_signal_connect(G_OBJECT(mcw->window), "response", 
+                     G_CALLBACK(conf_response_cb), mcw);
+    g_signal_connect(G_OBJECT(mcw->window), "destroy", 
+                     G_CALLBACK(free_data), mcw);
     gtk_widget_show_all(GTK_WIDGET(mcw->window));
 }
 /*
@@ -403,7 +432,7 @@ void
 mailbox_conf_new(GtkType mailbox_type)
 {
     run_mailbox_conf(NULL, mailbox_type,
-		     mailbox_conf_add, _("Add"), GNOME_STOCK_PIXMAP_NEW);
+		     mailbox_conf_add, _("_Add"), GTK_STOCK_NEW);
 }
 
 /*
@@ -413,9 +442,9 @@ void
 mailbox_conf_edit(BalsaMailboxNode *mbnode)
 {
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox));
-    run_mailbox_conf(mbnode, GTK_OBJECT_TYPE(GTK_OBJECT(mbnode->mailbox)),
-		     mailbox_conf_update, _("Update"),
-		     GNOME_STOCK_PIXMAP_SAVE);
+    run_mailbox_conf(mbnode, G_OBJECT_TYPE(G_OBJECT(mbnode->mailbox)),
+		     mailbox_conf_update, _("_Update"),
+		     GTK_STOCK_SAVE);
 }
 
 /*
@@ -434,15 +463,15 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 	gtk_entry_set_text(GTK_ENTRY(mcw->mailbox_name),
 			   mailbox->name);
 
-    if(mcw->identity)
+    if(mcw->identity && mailbox->identity_name)
 	gtk_entry_set_text(GTK_ENTRY(mcw->identity), mailbox->identity_name);
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
 	LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(mailbox);
 
 	if (mailbox->url)
-	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.local.path),
-			       libbalsa_mailbox_local_get_path(local));
+	    gnome_file_entry_set_filename(mcw->mb_data.local.path,
+					  libbalsa_mailbox_local_get_path(local));
     } else if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
 	LibBalsaMailboxPop3 *pop3;
 	LibBalsaServer *server;
@@ -526,10 +555,10 @@ check_for_blank_fields(GtkWidget *widget, MailboxConfWindow *mcw)
 
     if (mcw->mailbox_name &&!*gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name)))
 	sensitive = FALSE;
-    else if ( gtk_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_LOCAL) ) {
-	if (!*gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.local.path)))
+    else if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_LOCAL) ) {
+	if (!*gtk_entry_get_text(GTK_ENTRY(gnome_file_entry_gtk_entry(mcw->mb_data.local.path))))
 	    sensitive = FALSE;
-    } else if ( gtk_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_IMAP ) ) {
+    } else if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_IMAP ) ) {
 	if (!strcmp
 	    (gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.imap.folderpath)), ""))
 	    sensitive = FALSE;
@@ -537,14 +566,16 @@ check_for_blank_fields(GtkWidget *widget, MailboxConfWindow *mcw)
 	    sensitive = FALSE;
 	else if (!strcmp(gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.imap.username)), ""))
 	    sensitive = FALSE;
-    } else if ( gtk_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_POP3) ) {
+    } else if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_POP3) ) {
 	if (!strcmp(gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.username)), ""))
 	    sensitive = FALSE;
 	else if (!strcmp(gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.server)), ""))
 	    sensitive = FALSE;
     }
 
-    gnome_dialog_set_sensitive(mcw->window, 0, sensitive);
+    gtk_dialog_set_response_sensitive(mcw->window, GTK_RESPONSE_OK, sensitive);
+    g_object_set_data(G_OBJECT(mcw->window), BALSA_OK_SENSITIVE_KEY,
+                      GINT_TO_POINTER(sensitive));
 }
 
 /*
@@ -553,21 +584,20 @@ check_for_blank_fields(GtkWidget *widget, MailboxConfWindow *mcw)
 static void
 fill_in_imap_data(MailboxConfWindow *mcw, gchar ** name, gchar ** path)
 {
-    gchar *fos;
-    fos =
-	gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.imap.folderpath));
+    *path =
+	gtk_editable_get_chars(GTK_EDITABLE(mcw->mb_data.imap.folderpath),
+                               0, -1);
 
-    if (mcw->mailbox_name && !(*name =
+    if (mcw->mailbox_name && (!(*name =
 	  g_strdup(gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name))))
-	|| *(g_strstrip(*name)) == '\0') {
+	|| *(g_strstrip(*name)) == '\0')) {
 	if (*name)
 	    g_free(*name);
 
-	*name = g_strdup_printf(_("%s on %s"), fos,
+	*name = g_strdup_printf(_("%s on %s"), *path,
 				gtk_entry_get_text(GTK_ENTRY
 						   (mcw->mb_data.imap.server)));
     }
-    *path = g_strdup(fos);
 }
 
 /*
@@ -643,9 +673,8 @@ update_imap_mailbox(MailboxConfWindow *mcw)
 #endif
 );
 
-    gtk_signal_connect(GTK_OBJECT(server),
-		       "get-password", GTK_SIGNAL_FUNC(ask_password),
-		       mailbox);
+    g_signal_connect(G_OBJECT(server), "get-password",
+                     G_CALLBACK(ask_password), mailbox);
 
     libbalsa_mailbox_imap_set_path(mailbox,
 				   (path == NULL || path[0] == '\0') 
@@ -667,39 +696,31 @@ mailbox_conf_update(MailboxConfWindow *mcw)
     mailbox = mcw->mailbox;
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
-	gchar *filename, *name;
+	gchar *filename;
+	const gchar *name;
 
-	filename =
-	    gtk_entry_get_text(GTK_ENTRY((mcw->mb_data.local.path)));
+	filename = gnome_file_entry_get_full_path(mcw->mb_data.local.path,
+						  FALSE);
 	/* rename */
-	if (
-	    (i =
-	     libbalsa_mailbox_local_set_path(LIBBALSA_MAILBOX_LOCAL
-					     (mailbox), filename)) != 0) {
-	    balsa_information(LIBBALSA_INFORMATION_WARNING, 
-                              GTK_WINDOW(mcw->window),
+	i = libbalsa_mailbox_local_set_path(LIBBALSA_MAILBOX_LOCAL
+					    (mailbox), filename);
+	if (i != 0) {
+	    balsa_information(LIBBALSA_INFORMATION_WARNING,
 			      _("Rename of %s to %s failed:\n%s"),
 			      libbalsa_mailbox_local_get_path(mailbox),
 			      filename, strerror(i));
+	    g_free(filename);
 	    return;
 	}
+	g_free(filename);
         if(mcw->mailbox_name) {
- 	    name = gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name));
+	    name = gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name));
             g_free(mailbox->name);
-            mcw->mailbox->name = g_strdup(name);
-        } else { 
-	    /* The mailbox may be located in local mail directory.
-	       If so, just repopulate the tree. If not, must set name.
-	    */
-	    if(strncmp(balsa_app.local_mail_directory, filename,
-		       strlen(balsa_app.local_mail_directory))==0) {
-		balsa_mailbox_local_rescan_parent(mailbox); 
-		balsa_mblist_repopulate(BALSA_MBLIST(balsa_app.mblist));
-		return;
-	    } else {
-		g_free(mailbox->name);
-		mailbox->name = g_strdup(g_basename(filename));
-	    }
+            mailbox->name = g_strdup(name);
+        } else { /* shortcut: this will destroy mailbox */
+            balsa_mailbox_local_rescan_parent(mailbox); 
+            balsa_mblist_repopulate(balsa_app.mblist_tree_store);
+            return;
         }
     } else if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
 	update_pop_mailbox(mcw);
@@ -720,7 +741,7 @@ mailbox_conf_update(MailboxConfWindow *mcw)
 	/* redraw the pop3 server list */
 	update_mail_servers();
     else /* redraw the main mailbox list */
-	balsa_mblist_repopulate(BALSA_MBLIST(balsa_app.mblist));
+	balsa_mblist_repopulate(balsa_app.mblist_tree_store);
 }
 
 /*
@@ -733,16 +754,19 @@ mailbox_conf_add(MailboxConfWindow *mcw)
     BalsaMailboxNode * mbnode;
     gboolean save_to_config = TRUE;
 
-    mcw->mailbox = gtk_type_new(mcw->mailbox_type);
+    mcw->mailbox = g_object_new(mcw->mailbox_type, NULL);
 
     mbnode = balsa_mailbox_node_new_from_mailbox(mcw->mailbox);
     if ( LIBBALSA_IS_MAILBOX_LOCAL(mcw->mailbox) ) {
+	LibBalsaMailboxLocal *ml  = LIBBALSA_MAILBOX_LOCAL(mcw->mailbox);
 	gchar *path;
+	int res;
 
-	path = gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.local.path));
-	if(libbalsa_mailbox_local_set_path(
-					   LIBBALSA_MAILBOX_LOCAL(mcw->mailbox), path) != 0) {
-	    gtk_object_destroy(GTK_OBJECT(mcw->mailbox));
+	path = gnome_file_entry_get_full_path(GNOME_FILE_ENTRY(mcw->mb_data.local.path), FALSE);
+	res = libbalsa_mailbox_local_set_path(ml, path);
+
+	if( res != 0) {
+	    g_object_unref(G_OBJECT(mcw->mailbox));
 	    mcw->mailbox = NULL;
 	    return;
 	}
@@ -750,12 +774,15 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 	save_to_config = balsa_app.local_mail_directory == NULL
 	    || strncmp(balsa_app.local_mail_directory, path,
 		       strlen(balsa_app.local_mail_directory)) != 0;
-
+        printf("Save to config: %d\n", save_to_config);
 	if(save_to_config) {
-	    mcw->mailbox->name = g_strdup(g_basename(path));
+            gchar* fn = strrchr(path, '/');
+            mcw->mailbox->name = g_strdup(fn? fn+1 : path);
 	    node =g_node_new(mbnode);
+            balsa_mailbox_nodes_lock(TRUE);
 	    g_node_append(balsa_app.mailbox_nodes, node);
-	} 
+            balsa_mailbox_nodes_unlock(TRUE);
+	}
     } else if ( LIBBALSA_IS_MAILBOX_POP3(mcw->mailbox) ) {
 	/* POP3 Mailboxes */
 	update_pop_mailbox(mcw);
@@ -765,7 +792,9 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 	update_imap_mailbox(mcw);
 
 	node = g_node_new(mbnode);
+        balsa_mailbox_nodes_lock(TRUE);
 	g_node_append(balsa_app.mailbox_nodes, node);
+        balsa_mailbox_nodes_unlock(TRUE);
 	update_mail_servers();
     } else {
 	g_assert_not_reached();
@@ -780,21 +809,22 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 	/* redraw the pop3 server list */
 	update_mail_servers();
     else /* redraw the main mailbox list */
-	balsa_mblist_repopulate(BALSA_MBLIST(balsa_app.mblist));
+	balsa_mblist_repopulate(balsa_app.mblist_tree_store);
 }
 
 /* Create a page for the type of mailbox... */
 static GtkWidget *
 create_page(MailboxConfWindow *mcw)
 {
-    if ( gtk_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_LOCAL) ) {
+    if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_LOCAL) ) {
 	return create_local_mailbox_page(mcw);
-    } else if ( gtk_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_POP3) ) {
+    } else if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_POP3) ) {
 	return create_pop_mailbox_page(mcw);
-    } else if ( gtk_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_IMAP) ) {
+    } else if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_IMAP) ) {
 	return create_imap_mailbox_page(mcw);
     } else {
-	g_warning("Unknown mailbox type: %s\n", gtk_type_name(mcw->mailbox_type));
+	g_warning("Unknown mailbox type: %s\n",
+                  g_type_name(mcw->mailbox_type));
 	return NULL;
     }
 }
@@ -803,90 +833,81 @@ static GtkWidget *
 create_local_mailbox_page(MailboxConfWindow *mcw)
 {
     GtkWidget *table;
-    GtkWidget *file;
-    guint keyval;
-    LibBalsaMailboxLocal* mloc = (LibBalsaMailboxLocal*)mcw->mailbox;
+    GtkWidget *file, *label;
     table = gtk_table_new(3, 2, FALSE);
 
     /* mailbox name */
-    if(mcw->mailbox && 
-       (BALSA_IS_MAILBOX_SPECIAL(mcw->mailbox) ||
-	strncmp(libbalsa_mailbox_local_get_path(mcw->mailbox), 
-		balsa_app.local_mail_directory,
-		strlen(balsa_app.local_mail_directory)!=0)) ) {
-        create_label(_("Mailbox _Name:"), table, 0, &keyval);
+    if(mcw->mailbox && BALSA_IS_MAILBOX_SPECIAL(mcw->mailbox)) {
+        label = create_label(_("Mailbox _Name:"), table, 0);
         mcw->mailbox_name = 
             create_entry(mcw->window, table,
                          GTK_SIGNAL_FUNC(check_for_blank_fields),
-                         mcw, 0, NULL, keyval);
+                         mcw, 0, NULL, label);
     } else mcw->mailbox_name = NULL;
 
     /* path to file */
-    create_label(_("Mailbox _Path:"), table, 1, &keyval);
+    label = create_label(_("Mailbox _Path:"), table, 1);
 
-    file = gnome_file_entry_new("Mailbox Path", "Mailbox Path");
-    mcw->mb_data.local.path =
-	gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(file));
+    file = gnome_file_entry_new("MailboxPath", _("Mailbox Path"));
+    mcw->mb_data.local.path = GNOME_FILE_ENTRY(file);
 
-    gtk_widget_add_accelerator(mcw->mb_data.local.path, 
-			       "grab_focus",
-			       mcw->window->accelerators,
-			       keyval, GDK_MOD1_MASK, GTK_ACCEL_VISIBLE);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(label), file);
     gnome_file_entry_set_default_path(GNOME_FILE_ENTRY(file),
                                       balsa_app.local_mail_directory);
 
-    gnome_dialog_editable_enters(mcw->window,
-				 GTK_EDITABLE(mcw->mb_data.local.path));
+    g_signal_connect_swapped(G_OBJECT(mcw->mb_data.local.path),
+                             "activate",
+                             G_CALLBACK(gtk_window_activate_default),
+                             mcw->window);
+    g_signal_connect(G_OBJECT(mcw->mb_data.local.path), "changed",
+		     G_CALLBACK(check_for_blank_fields), mcw);
 
-    gtk_signal_connect(GTK_OBJECT(mcw->mb_data.local.path),
-		       "changed",
-		       GTK_SIGNAL_FUNC(check_for_blank_fields),
-		       mcw);
+    /* FIXME: set_dafault_path does not activate unless the entry is
+     * changed */
+    gnome_file_entry_set_filename(GNOME_FILE_ENTRY(file),"filename");
 
     gtk_table_attach(GTK_TABLE(table), file, 1, 2, 1, 2,
 		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
-    create_label(_("Identity:"), table, 2, &keyval);
+    label = create_label(_("_Identity:"), table, 2);
     mcw->identity = create_entry(mcw->window, table,
-				 NULL, mcw, 2, NULL, keyval);
+				 NULL, mcw, 2, NULL, label);
 
-    gtk_widget_grab_focus(mcw->mailbox_name ? 
-                          mcw->mailbox_name : mcw->mb_data.local.path);
+    gtk_widget_grab_focus(mcw->mailbox_name ? mcw->mailbox_name :
+			  GTK_WIDGET(mcw->mb_data.local.path));
     return table;
 }
 
 static GtkWidget *
 create_pop_mailbox_page(MailboxConfWindow *mcw)
 {
-    GtkWidget *table;
-    guint keyval;
+    GtkWidget *table, *label;
 
     table = gtk_table_new(9, 2, FALSE);
 
     /* mailbox name */
-    create_label(_("Mailbox _Name:"), table, 0, &keyval);
+    label = create_label(_("Mailbox _Name:"), table, 0);
     mcw->mailbox_name = create_entry(mcw->window, table,
-                                     GTK_SIGNAL_FUNC(check_for_blank_fields),
-                                     mcw, 0, NULL, keyval);
+				     GTK_SIGNAL_FUNC(check_for_blank_fields),
+				     mcw, 0, NULL, label);
     mcw->identity = NULL;
-
     /* pop server */
-    create_label(_("_Server:"), table, 1, &keyval);
+    label = create_label(_("_Server:"), table, 1);
     mcw->mb_data.pop3.server = create_entry(mcw->window, table,
 				     GTK_SIGNAL_FUNC(check_for_blank_fields),
-				     mcw, 1, "localhost:110", keyval);
+				     mcw, 1, "localhost:110", label);
 
 
     /* username  */
-    create_label(_("_Username:"), table, 3, &keyval);
+    label= create_label(_("Use_r name:"), table, 3);
     mcw->mb_data.pop3.username = create_entry(mcw->window, table,
 				     GTK_SIGNAL_FUNC(check_for_blank_fields),
-				     mcw, 3, g_get_user_name(), keyval);
+				     mcw, 3, g_get_user_name(), label);
 
     /* password field */
-    create_label(_("Pass_word:"), table, 4, &keyval);
+    label = create_label(_("Pass_word:"), table, 4);
     mcw->mb_data.pop3.password = create_entry(mcw->window, table, 
-					      NULL, NULL, 4, NULL, keyval);
+					      NULL, NULL, 4, NULL, label);
     gtk_entry_set_visibility(GTK_ENTRY(mcw->mb_data.pop3.password), FALSE);
 
     /* toggle for apop */
@@ -917,10 +938,10 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
      */
     /* toggle for ssl */
     mcw->mb_data.pop3.use_ssl = 
-	create_check(mcw->window, _("_Use SSL (pop3s)"), 
+	create_check(mcw->window, _("Use SS_L (pop3s)"), 
 		     table, 9, FALSE);
-    gtk_signal_connect(GTK_OBJECT(mcw->mb_data.pop3.use_ssl), "toggled", 
-                       pop3_use_ssl_cb, mcw);
+    g_signal_connect(G_OBJECT(mcw->mb_data.pop3.use_ssl), "toggled", 
+                     G_CALLBACK(pop3_use_ssl_cb), mcw);
 #endif
 
     gtk_widget_grab_focus(mcw->mailbox_name);
@@ -934,66 +955,69 @@ remember_toggle_cb(GtkToggleButton *remember_button, MailboxConfWindow *mcw)
                              gtk_toggle_button_get_active(remember_button));
 }
 
+static void
+entry_activated(GtkEntry * entry, gpointer data)
+{
+    MailboxConfWindow *mcw = data;
+
+    if (GPOINTER_TO_INT(g_object_get_data(G_OBJECT(mcw->window),
+                                          BALSA_OK_SENSITIVE_KEY)))
+        gtk_dialog_response(GTK_DIALOG(mcw->window), GTK_RESPONSE_OK);
+}
+
 static GtkWidget *
 create_imap_mailbox_page(MailboxConfWindow *mcw)
 {
-    GtkWidget *table;
-    guint keyval;
+    GtkWidget *table, *label;
     GtkWidget *entry;
-    /*  GtkWidget *label; */
 
     table = gtk_table_new(8, 2, FALSE);
 
     /* mailbox name */
-    create_label(_("Mailbox _Name:"), table, 0, &keyval);
-    mcw->mailbox_name = create_entry(mcw->window, table,
-                                     GTK_SIGNAL_FUNC(check_for_blank_fields),
-                                     mcw, 0, NULL, keyval);
+    label = create_label(_("Mailbox _Name:"), table, 0);
+    mcw->mailbox_name =  create_entry(mcw->window, table,
+                                      GTK_SIGNAL_FUNC(check_for_blank_fields),
+                                      mcw, 0, NULL, label);
 
     /* imap server */
-    create_label(_("_Server:"), table, 1, &keyval);
+    label = create_label(_("_Server:"), table, 1);
     mcw->mb_data.imap.server = 
 	create_entry(mcw->window, table,
 		     GTK_SIGNAL_FUNC(check_for_blank_fields),
-		     mcw, 1, "localhost", keyval);
+		     mcw, 1, "localhost", label);
 
     /* username  */
-    create_label(_("_Username:"), table, 3, &keyval);
+    label = create_label(_("_Username:"), table, 3);
     mcw->mb_data.imap.username = 
 	create_entry(mcw->window, table,
 		     GTK_SIGNAL_FUNC(check_for_blank_fields),
-		     mcw, 3, g_get_user_name(), keyval);
+		     mcw, 3, g_get_user_name(), label);
 
     /* toggle for remember password */
     mcw->mb_data.imap.remember = 
 	create_check(mcw->window, _("_Remember Password"), table, 4,
 		     FALSE);
-    gtk_signal_connect(GTK_OBJECT(mcw->mb_data.imap.remember),
-		       "toggled", GTK_SIGNAL_FUNC(remember_toggle_cb),
-		       mcw);
+    g_signal_connect(G_OBJECT(mcw->mb_data.imap.remember), "toggled",
+                     G_CALLBACK(remember_toggle_cb), mcw);
 
    /* password field */
-    create_label(_("Pass_word:"), table, 5, &keyval);
+    label = create_label(_("Pass_word:"), table, 5);
     mcw->mb_data.imap.password = 
-	create_entry(mcw->window, table, NULL, NULL, 5, NULL, keyval);
+	create_entry(mcw->window, table, NULL, NULL, 5, NULL, label);
     gtk_entry_set_visibility(GTK_ENTRY(mcw->mb_data.imap.password), FALSE);
 
-    create_label(_("F_older Path:"), table, 6, &keyval);
+    label = create_label(_("F_older Path:"), table, 6);
 
-    entry = gnome_entry_new("IMAP Folder History");
+    entry = gnome_entry_new("IMAPFolderHistory");
     mcw->mb_data.imap.folderpath = gnome_entry_gtk_entry(GNOME_ENTRY(entry));
-    gtk_entry_append_text(GTK_ENTRY(mcw->mb_data.imap.folderpath), "INBOX");
+    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.folderpath), "INBOX");
 
-    gtk_widget_add_accelerator(mcw->mb_data.imap.folderpath, 
-			       "grab_focus",
-			       mcw->window->accelerators,
-			       keyval, GDK_MOD1_MASK, GTK_ACCEL_VISIBLE);
-    gnome_dialog_editable_enters(mcw->window,
-				 GTK_EDITABLE(mcw->mb_data.imap.folderpath));
-
-    gtk_signal_connect(GTK_OBJECT(mcw->mb_data.imap.folderpath),
-		       "changed", GTK_SIGNAL_FUNC(check_for_blank_fields),
-		       mcw);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(label), 
+                                  mcw->mb_data.imap.folderpath);
+    g_signal_connect(G_OBJECT(mcw->mb_data.imap.folderpath), "activate",
+                     G_CALLBACK(entry_activated), mcw);
+    g_signal_connect(G_OBJECT(mcw->mb_data.imap.folderpath), "changed",
+                     G_CALLBACK(check_for_blank_fields), mcw);
 
     gnome_entry_append_history(GNOME_ENTRY(entry), 1, "INBOX");
     gnome_entry_append_history(GNOME_ENTRY(entry), 1, "INBOX.Sent");
@@ -1005,54 +1029,17 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
 #ifdef USE_SSL
     /* toggle for SSL */
     mcw->mb_data.imap.use_ssl = 
-        create_check(mcw->window, _("Use SSL (imaps)"), table, 7, FALSE);
-    gtk_signal_connect(GTK_OBJECT(mcw->mb_data.imap.use_ssl), "toggled", 
-                       imap_use_ssl_cb, mcw);
+        create_check(mcw->window, _("Use SS_L (imaps)"), table, 7, FALSE);
+    g_signal_connect(G_OBJECT(mcw->mb_data.imap.use_ssl), "toggled", 
+                     G_CALLBACK(imap_use_ssl_cb), mcw);
 #endif
 
-    create_label(_("_Identity:"), table, 0, &keyval);
+    label = create_label(_("_Identity:"), table, 0);
     mcw->identity = create_entry(mcw->window, table,
-				 NULL, mcw, 8, NULL, keyval);
+				 NULL, mcw, 8, NULL, label);
 
     gtk_widget_grab_focus(mcw->mailbox_name? 
                           mcw->mailbox_name : mcw->mb_data.imap.server);
     return table;
 }
 
-#if 0
-void
-mailbox_conf_edit_imap_server(GtkWidget * widget, gpointer data)
-{
-    GtkWidget *window;
-    GtkWidget *clist;
-    gchar *titles[2] = { "S", N_("Mailbox") };
-
-    gint clicked_button;
-
-    window = gnome_dialog_new("IMAP", GNOME_STOCK_BUTTON_CLOSE, NULL);
-    gnome_dialog_set_parent(GNOME_DIALOG(window),
-			    GTK_WINDOW(balsa_app.main_window));
-
-#ifdef ENABLE_NLS
-    titles[1] = _(titles[1]);
-#endif
-    clist = gtk_clist_new_with_titles(2, titles);
-    gtk_clist_set_column_width(GTK_CLIST(clist), 1, 16);
-    /*
-       gtk_clist_set_policy (GTK_CLIST (clist), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-     */
-    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(window)->vbox), clist, TRUE,
-		       TRUE, 0);
-    gtk_widget_show(clist);
-
-    titles[0] = NULL;
-    titles[1] = "INBOX";
-    gtk_clist_append(GTK_CLIST(clist), titles);
-
-    gtk_window_set_modal(GTK_WINDOW(window), TRUE);
-    clicked_button = gnome_dialog_run(GNOME_DIALOG(window));
-    if (clicked_button == 0) {
-	return;
-    }
-}
-#endif

@@ -1,5 +1,5 @@
 /* XPM */
-static char * info_read_xpm[] = {
+static const char * info_read_xpm[] = {
 "16 16 51 1",
 " 	c None",
 ".	c #010101",

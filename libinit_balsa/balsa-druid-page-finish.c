@@ -38,26 +38,44 @@ void
 balsa_druid_page_finish(GnomeDruid * druid, GdkPixbuf * default_logo)
 #endif                          /* BALSA_MAJOR < 2 */
 {
-    GnomeDruidPageStandard *page;
+    static const gchar bye[] =
+        N_("You've successfully set up Balsa. Have fun!\n"
+           "   -- The Balsa development team");
+#if BALSA_MAJOR < 2
     GtkWidget *text;
+    GnomeDruidPageStandard *page;
 
     page = GNOME_DRUID_PAGE_STANDARD(gnome_druid_page_standard_new());
     gnome_druid_page_standard_set_title(page, _("All Done!"));
     gnome_druid_page_standard_set_logo(page, default_logo);
-    text = gtk_label_new(_
-                         ("You've successfully set up Balsa. Have fun!\n"
-                          "   -- The Balsa development team"));
+
+    text = gtk_label_new(_(bye));
     gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_CENTER);
     gtk_box_pack_start(GTK_BOX(page->vbox), GTK_WIDGET(text), TRUE, TRUE,
                        8);
-    gnome_druid_append_page(druid, GNOME_DRUID_PAGE(page));
+
     gtk_signal_connect(GTK_OBJECT(page), "prepare",
                        GTK_SIGNAL_FUNC(balsa_druid_page_finish_prepare),
                        NULL);
     gtk_signal_connect(GTK_OBJECT(page), "finish",
                        GTK_SIGNAL_FUNC(balsa_druid_page_finish_finish),
                        NULL);
+#else
+    GnomeDruidPageEdge *page =
+        GNOME_DRUID_PAGE_EDGE(gnome_druid_page_edge_new
+                              (GNOME_EDGE_FINISH));
 
+    gnome_druid_page_edge_set_title(page, _("All Done!"));
+    gnome_druid_page_edge_set_logo(page, default_logo);
+    gnome_druid_page_edge_set_text(page, _(bye));
+
+    g_signal_connect(G_OBJECT(page), "prepare",
+                     G_CALLBACK(balsa_druid_page_finish_prepare), NULL);
+    g_signal_connect(G_OBJECT(page), "finish",
+                     G_CALLBACK(balsa_druid_page_finish_finish), NULL);
+#endif                          /* BALSA_MAJOR < 2 */
+
+    gnome_druid_append_page(druid, GNOME_DRUID_PAGE(page));
 }
 
 static void
@@ -77,7 +95,7 @@ balsa_druid_page_finish_finish(GnomeDruidPage * page, GnomeDruid * druid)
     gchar *address_book;
 
     address_book = gnome_util_home_file("GnomeCard.gcrd");
-    if (g_file_exists(address_book)) {
+    if (g_file_test(address_book, G_FILE_TEST_EXISTS)) {
         LibBalsaAddressBook *ab =
             libbalsa_address_book_vcard_new(_("GnomeCard Address Book"),
                                             address_book);

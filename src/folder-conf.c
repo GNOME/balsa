@@ -21,6 +21,7 @@
 
 #include "config.h"
 #include <gnome.h>
+#include <string.h>
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "folder-conf.h"
@@ -29,7 +30,7 @@
 #include "pref-manager.h"
 
 typedef struct {
-    GnomeDialog *dialog;
+    GtkDialog *dialog;
     GtkWidget * folder_name, *server, *port, *username, *remember,
         *password, *subscribed, *list_inbox, *prefix;
 #ifdef USE_SSL
@@ -37,6 +38,19 @@ typedef struct {
 #endif
     BalsaMailboxNode* mn;
 } FolderDialogData;
+
+/* Destroy notification */
+static void
+folder_conf_destroy_fcw(FolderDialogData * fcw)
+{
+    if (fcw->dialog) {
+        /* The mailbox node was destroyed. Close the dialog, but don't
+         * trigger further calls to folder_conf_destroy_fcw. */
+        fcw->mn = NULL;
+        gtk_dialog_response(fcw->dialog, GTK_RESPONSE_NONE);
+    }
+    g_free(fcw);
+}
 
 /* folder_conf_imap_node:
    show configuration widget for given mailbox node, allow user to 
@@ -51,7 +65,8 @@ validate_folder(GtkWidget *w, FolderDialogData * fcw)
 	sensitive = FALSE;
     else if (!*gtk_entry_get_text(GTK_ENTRY(fcw->server)))
 	sensitive = FALSE;
-    gnome_dialog_set_sensitive(fcw->dialog, 0, sensitive);
+
+    gtk_dialog_set_response_sensitive(fcw->dialog, GTK_RESPONSE_OK, sensitive);
 }
 
 #ifdef USE_SSL
@@ -86,84 +101,106 @@ remember_cb(GtkToggleButton * button, FolderDialogData * fcw)
                              gtk_toggle_button_get_active(button));
 }
 
+#define BALSA_FOLDER_CONF_IMAP_KEY "balsa-folder-conf-imap"
+
 static void
-folder_conf_clicked_cb(GtkObject* dialog, int buttonno, gpointer data)
+folder_conf_clicked_ok(FolderDialogData * fcw)
 {
-    FolderDialogData *fcw = (FolderDialogData*)data;
-    LibBalsaServer * s = fcw->mn ? fcw->mn->server : NULL;
-#if BALSA_MAJOR < 2
-    static GnomeHelpMenuEntry help_entry = { NULL, "folder-config.html" };
-#else
-    static const gchar help_path[] = "folder-config.html";
-    GError *err = NULL;
-#endif                          /* BALSA_MAJOR < 2 */
     gboolean insert;
+    LibBalsaServer *s;
     GNode *gnode;
 
-#if BALSA_MAJOR < 2
-    help_entry.name = gnome_app_id;
+    if (fcw->mn) {
+        insert = FALSE;
+        s = fcw->mn->server;
+    } else {
+        insert = TRUE;
+        s = LIBBALSA_SERVER(libbalsa_server_new(LIBBALSA_SERVER_IMAP));
+    }
 
-#endif                          /* BALSA_MAJOR < 2 */
-    switch(buttonno) {
-    case 0: /* OK */
-	if(!fcw->mn) { 
-	    insert = TRUE; 
-	    s = LIBBALSA_SERVER(libbalsa_server_new(LIBBALSA_SERVER_IMAP));
-	}
-	else insert = FALSE;
-	
-	libbalsa_server_set_host(s, 
-                                 gtk_entry_get_text(GTK_ENTRY(fcw->server))
+    libbalsa_server_set_host(s, gtk_entry_get_text(GTK_ENTRY(fcw->server))
 #ifdef USE_SSL
-				 , gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->use_ssl))
+                             ,
+                             gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+                                                          (fcw->use_ssl))
 #endif
-                                 );
-	libbalsa_server_set_username
-	    (s, gtk_entry_get_text(GTK_ENTRY(fcw->username)));
-        s->remember_passwd = 
-            gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->remember));
-	libbalsa_server_set_password
-	    (s, gtk_entry_get_text(GTK_ENTRY(fcw->password)));
-	
-	if(!fcw->mn)
-	    fcw->mn = balsa_mailbox_node_new_imap_folder(s, NULL);
-        
-	g_free(fcw->mn->dir);  
-	fcw->mn->dir = g_strdup(gtk_entry_get_text(GTK_ENTRY(fcw->prefix)));
-	g_free(fcw->mn->name); 
-	fcw->mn->name = 
-            g_strdup(gtk_entry_get_text(GTK_ENTRY(fcw->folder_name)));
-	fcw->mn->subscribed = 
-	    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->subscribed));
-	fcw->mn->list_inbox = 
-	    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->list_inbox));
-	
-	if(insert) {
-	    g_node_append(balsa_app.mailbox_nodes, 
-                          gnode = g_node_new(fcw->mn));
-	    balsa_mailbox_node_append_subtree(fcw->mn, gnode);
-	    balsa_mblist_repopulate(balsa_app.mblist);
-	    config_folder_add(fcw->mn, NULL);
-	    update_mail_servers();
-	} else {
-	    balsa_mailbox_node_rescan(fcw->mn);
-	    config_folder_update(fcw->mn);
-	}
-        /* Fall over */
-    default: 
-        gnome_dialog_close(GNOME_DIALOG(dialog));
-        break;
-    case 2:
-#if BALSA_MAJOR < 2
-        gnome_help_display(NULL, &help_entry);
-#else
-        gnome_help_display_uri(help_path, &err);
+        );
+    libbalsa_server_set_username(s,
+                                 gtk_entry_get_text(GTK_ENTRY
+                                                    (fcw->username)));
+    s->remember_passwd =
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->remember));
+    libbalsa_server_set_password(s,
+                                 gtk_entry_get_text(GTK_ENTRY
+                                                    (fcw->password)));
+
+    if (!fcw->mn) {
+        fcw->mn = balsa_mailbox_node_new_imap_folder(s, NULL);
+        /* The mailbox node takes over ownership of the
+         * FolderDialogData. */
+        g_object_set_data_full(G_OBJECT(fcw->mn),
+                               BALSA_FOLDER_CONF_IMAP_KEY, fcw,
+                               (GDestroyNotify) folder_conf_destroy_fcw);
+    }
+
+    g_free(fcw->mn->dir);
+    fcw->mn->dir = g_strdup(gtk_entry_get_text(GTK_ENTRY(fcw->prefix)));
+    g_free(fcw->mn->name);
+    fcw->mn->name =
+        g_strdup(gtk_entry_get_text(GTK_ENTRY(fcw->folder_name)));
+    fcw->mn->subscribed =
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->subscribed));
+    fcw->mn->list_inbox =
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->list_inbox));
+
+    if (insert) {
+        balsa_mailbox_nodes_lock(TRUE);
+        g_node_append(balsa_app.mailbox_nodes,
+                      gnode = g_node_new(fcw->mn));
+        balsa_mailbox_node_append_subtree(fcw->mn, gnode);
+        balsa_mailbox_nodes_unlock(TRUE);
+        balsa_mblist_repopulate(balsa_app.mblist_tree_store);
+        config_folder_add(fcw->mn, NULL);
+        update_mail_servers();
+    } else {
+        balsa_mailbox_node_rescan(fcw->mn);
+        config_folder_update(fcw->mn);
+    }
+}
+
+static const gchar folder_config_section[] = "folder-config";
+
+static void
+folder_conf_clicked_cb(GtkDialog * dialog, int response,
+                       FolderDialogData * fcw)
+{
+    GError *err = NULL;
+
+    switch (response) {
+    case GTK_RESPONSE_HELP:
+        gnome_help_display("balsa", folder_config_section, &err);
         if (err) {
-            g_print(_("Error displaying %s: %s\n"), help_path,
+            g_print(_("Error displaying %s: %s\n"), folder_config_section,
                     err->message);
             g_error_free(err);
         }
-#endif                          /* BALSA_MAJOR < 2 */
+        return;
+    case GTK_RESPONSE_OK:
+        folder_conf_clicked_ok(fcw);
+        /* Fall over */
+    default:
+        gtk_widget_destroy(GTK_WIDGET(fcw->dialog));
+        fcw->dialog = NULL;
+        if (fcw->mn)
+            /* Clearing the data signifies that the dialog has been
+             * destroyed. It also triggers a call to
+             * folder_conf_destroy_fcw. */
+            g_object_set_data(G_OBJECT(fcw->mn),
+                              BALSA_FOLDER_CONF_IMAP_KEY, NULL);
+        else
+            /* Cancelling, without creating a mailbox node. Nobody owns
+             * the FolderDialogData, so we'll free it here. */
+            g_free(fcw);
         break;
     }
 }
@@ -175,84 +212,110 @@ folder_conf_clicked_cb(GtkObject* dialog, int buttonno, gpointer data)
 void
 folder_conf_imap_node(BalsaMailboxNode *mn)
 {
-    GtkWidget *frame, *table;
-    FolderDialogData fcw;
-    guint keyval;
-    LibBalsaServer * s = mn ? mn->server : NULL;
-    gchar *default_server = libbalsa_guess_imap_server();
+    GtkWidget *frame, *table, *label;
+    FolderDialogData *fcw;
+    static FolderDialogData *fcw_new;
+    LibBalsaServer *s;
+    gchar *default_server;
 
-    fcw.mn = mn;
-    fcw.dialog = GNOME_DIALOG(gnome_dialog_new(_("Remote IMAP folder"), 
-					       mn ? _("Update") : _("Create"), 
-					       GNOME_STOCK_BUTTON_CANCEL, 
-					       GNOME_STOCK_BUTTON_HELP,
-					       NULL));
-    gnome_dialog_set_parent(fcw.dialog,
-                            GTK_WINDOW(balsa_app.main_window));
-    gtk_window_set_wmclass(GTK_WINDOW(fcw.dialog), 
+    /* Allow only one dialog per mailbox node, and one with mn == NULL
+     * for creating a new folder. */
+    fcw = mn ? g_object_get_data(G_OBJECT(mn), BALSA_FOLDER_CONF_IMAP_KEY)
+             : fcw_new;
+    if (fcw) {
+        gdk_window_raise(GTK_WIDGET(fcw->dialog)->window);
+        return;
+    }
+
+    s = mn ? mn->server : NULL;
+    default_server = libbalsa_guess_imap_server();
+
+    fcw = g_new(FolderDialogData, 1);
+    fcw->mn = mn;
+    fcw->dialog =
+        GTK_DIALOG(gtk_dialog_new_with_buttons
+                   (_("Remote IMAP folder"),
+                    GTK_WINDOW(balsa_app.main_window),
+                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                    mn ? _("_Update") : _("_Create"), GTK_RESPONSE_OK,
+                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                    GTK_STOCK_HELP, GTK_RESPONSE_HELP, NULL));
+    gtk_window_set_wmclass(GTK_WINDOW(fcw->dialog), 
 			   "folder_config_dialog", "Balsa");
+    if (mn)
+        g_object_set_data_full(G_OBJECT(mn),
+                               BALSA_FOLDER_CONF_IMAP_KEY, fcw, 
+                               (GDestroyNotify) folder_conf_destroy_fcw);
+    else {
+        fcw_new = fcw;
+        g_object_add_weak_pointer(G_OBJECT(fcw->dialog),
+                                  (gpointer) &fcw_new);
+    }
 
     frame = gtk_frame_new(_("Remote IMAP folder set"));
-    gtk_box_pack_start(GTK_BOX(fcw.dialog->vbox),
+    gtk_box_pack_start(GTK_BOX(fcw->dialog->vbox),
                        frame, TRUE, TRUE, 0);
     table = gtk_table_new(9, 2, FALSE);
     gtk_container_add(GTK_CONTAINER(frame), table);
  
     /* INPUT FIELD CREATION */
-    create_label(_("Descriptive _Name:"), table, 0, &keyval);
-    fcw.folder_name = create_entry(fcw.dialog, table,
+    label = create_label(_("Descriptive _Name:"), table, 0);
+    fcw->folder_name = create_entry(fcw->dialog, table,
                                    GTK_SIGNAL_FUNC(validate_folder),
-                                   &fcw, 0, mn ? mn->name : NULL, 
-				   keyval);
+                                   fcw, 0, mn ? mn->name : NULL, 
+				   label);
 
-    create_label(_("_Server:"), table, 1, &keyval);
-    fcw.server = create_entry(fcw.dialog, table,
+    label = create_label(_("_Server:"), table, 1);
+    fcw->server = create_entry(fcw->dialog, table,
                               GTK_SIGNAL_FUNC(validate_folder),
-                              &fcw, 1, s ? s->host : default_server,
-			      keyval);
+                              fcw, 1, s ? s->host : default_server,
+			      label);
 
-    create_label(_("_User name:"), table, 3, &keyval);
-    fcw.username = create_entry(fcw.dialog, table,
+    label= create_label(_("Use_r name:"), table, 3);
+    fcw->username = create_entry(fcw->dialog, table,
                                 GTK_SIGNAL_FUNC(validate_folder),
-                                &fcw, 3, s ? s->user : g_get_user_name(), 
-			        keyval);
+                                fcw, 3, s ? s->user : g_get_user_name(), 
+			        label);
 
-    fcw.remember = create_check(fcw.dialog, _("_Remember password"), 
+    fcw->remember = create_check(fcw->dialog, _("_Remember password"), 
                                 table, 4, s ? s->remember_passwd : TRUE);
-    gtk_signal_connect(GTK_OBJECT(fcw.remember), "toggled",
-                       GTK_SIGNAL_FUNC(remember_cb), 
-                       &fcw);
+    g_signal_connect(G_OBJECT(fcw->remember), "toggled",
+                     G_CALLBACK(remember_cb), fcw);
 
-    create_label(_("_Password:"), table, 5, &keyval);
-    fcw.password = create_entry(fcw.dialog, table, NULL, NULL, 5,
-				s ? s->passwd : NULL, keyval);
-    gtk_entry_set_visibility(GTK_ENTRY(fcw.password), FALSE);
+    label = create_label(_("_Password:"), table, 5);
+    fcw->password = create_entry(fcw->dialog, table, NULL, NULL, 5,
+				s ? s->passwd : NULL, label);
+    gtk_entry_set_visibility(GTK_ENTRY(fcw->password), FALSE);
 
-    fcw.subscribed = create_check(fcw.dialog, _("_Subscribed folders only"), 
+    fcw->subscribed = create_check(fcw->dialog, _("Subscribed _folders only"), 
                                   table, 6, mn ? mn->subscribed : FALSE);
-    fcw.list_inbox = create_check(fcw.dialog, _("_Always show INBOX"), 
+    fcw->list_inbox = create_check(fcw->dialog, _("_Always show INBOX"), 
                                   table, 7, mn ? mn->list_inbox : TRUE); 
 
-    create_label(_("_Prefix"), table, 8, &keyval);
-    fcw.prefix = create_entry(fcw.dialog, table, NULL, NULL, 8,
-			      mn ? mn->dir : NULL, keyval);
+    label = create_label(_("_Prefix"), table, 8);
+    fcw->prefix = create_entry(fcw->dialog, table, NULL, NULL, 8,
+			      mn ? mn->dir : NULL, label);
     
 #ifdef USE_SSL
-    fcw.use_ssl = create_check(fcw.dialog,
-			       _("Use SSL (IMAPS)"),
+    fcw->use_ssl = create_check(fcw->dialog,
+			       _("Use SS_L (IMAPS)"),
 			       table, 9, s ? s->use_ssl : FALSE);
-    gtk_signal_connect(GTK_OBJECT(fcw.use_ssl), "toggled",
-                       GTK_SIGNAL_FUNC(imap_use_ssl_cb), &fcw);
+    g_signal_connect(G_OBJECT(fcw->use_ssl), "toggled",
+                     G_CALLBACK(imap_use_ssl_cb), fcw);
 #endif
 
-    gtk_widget_show_all(GTK_WIDGET(fcw.dialog));
+    gtk_widget_show_all(GTK_WIDGET(fcw->dialog));
 
-    validate_folder(NULL, &fcw);
-    gtk_widget_grab_focus(fcw.folder_name);
+    validate_folder(NULL, fcw);
+    gtk_widget_grab_focus(fcw->folder_name);
 
-    gtk_signal_connect(GTK_OBJECT(fcw.dialog), "clicked", 
-                       GTK_SIGNAL_FUNC(folder_conf_clicked_cb), &fcw);
-    gnome_dialog_run(fcw.dialog);
+    gtk_dialog_set_default_response(fcw->dialog, 
+                                    mn ? GTK_RESPONSE_OK 
+                                    : GTK_RESPONSE_CANCEL);
+
+    g_signal_connect(G_OBJECT(fcw->dialog), "response",
+                     G_CALLBACK(folder_conf_clicked_cb), fcw);
+    gtk_widget_show_all(GTK_WIDGET(fcw->dialog));
 }
 
 /* folder_conf_imap_sub_node:
@@ -262,7 +325,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 
 /* data to pass around: */
 typedef struct {
-    GnomeDialog *dialog;
+    GtkDialog *dialog;
     GtkWidget *parent_folder, *folder_name, *identity;
     gchar *old_folder, *old_parent;
     BalsaMailboxNode *parent; /* (new) parent of the mbnode.  */
@@ -286,43 +349,56 @@ validate_sub_folder(GtkWidget * w, SubfolderDialogData * fcw)
      * We'll allow a null parent name, although some IMAP servers
      * will deny permission:
      */
-    gnome_dialog_set_sensitive(fcw->dialog, 0, have_server &&
-                               *gtk_entry_get_text(GTK_ENTRY
-                                                   (fcw->folder_name)));
+    gtk_dialog_set_response_sensitive(fcw->dialog, GTK_RESPONSE_OK, 
+                                      have_server &&
+                                      *gtk_entry_get_text(GTK_ENTRY
+                                                          (fcw->folder_name)));
 }
 
 /* callbacks for a `Browse...' button: */
 static void
-browse_button_select_row_cb(GtkCTree * ctree, GList * node, gint column,
-			    gpointer data)
+browse_button_select_row_cb(GtkTreeSelection * selection, gpointer data)
 {
-    BalsaMailboxNode *mbnode = gtk_ctree_node_get_row_data(ctree,
-							   GTK_CTREE_NODE
-							   (node));
-    if (mbnode) {
-	SubfolderDialogData *fcw = (SubfolderDialogData *) data;
-	gchar *path = mbnode->dir;
-        fcw->parent = mbnode;
-	if (path)
-	    gtk_entry_set_text(GTK_ENTRY(fcw->parent_folder), path);
-	gnome_dialog_close(GNOME_DIALOG
-			   (gtk_widget_get_ancestor
-			    (GTK_WIDGET(ctree), GTK_TYPE_WINDOW)));
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+
+    if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
+        BalsaMailboxNode *mbnode = NULL;
+
+        gtk_tree_model_get(model, &iter, 0, &mbnode, -1);
+
+        if (mbnode) {
+            SubfolderDialogData *fcw = (SubfolderDialogData *) data;
+            GtkTreeView *tree_view =
+                gtk_tree_selection_get_tree_view(selection);
+            gchar *path = mbnode->dir;
+            fcw->parent = mbnode;
+
+            if (path)
+                gtk_entry_set_text(GTK_ENTRY(fcw->parent_folder), path);
+
+            gtk_dialog_response(GTK_DIALOG
+                                (gtk_widget_get_ancestor
+                                 (GTK_WIDGET(tree_view), GTK_TYPE_DIALOG)),
+                                GTK_RESPONSE_OK);
+        }
     }
 }
 
-static void
-fix_ctree(GtkCTree * ctree, GtkCTreeNode * cnode, gpointer data)
+static gboolean
+folder_selection_func(GtkTreeSelection * selection, GtkTreeModel * model,
+                      GtkTreePath * path, gboolean path_currently_selected,
+                      gpointer data)
 {
-    BalsaMailboxNode *mbnode = gtk_ctree_node_get_row_data(ctree, cnode);
-    if (mbnode) {
-	SubfolderDialogData *fcw = (SubfolderDialogData *) data;
-	if (!mbnode->server || mbnode->server->type != LIBBALSA_SERVER_IMAP
-	    || (fcw->mbnode && fcw->mbnode->server != mbnode->server))
-	    mblist_remove_mblist_node(BALSA_MBLIST(ctree), mbnode, cnode);
-	else
-	    gtk_ctree_node_set_selectable(ctree, cnode, TRUE);
-    }
+    GtkTreeIter iter;
+    BalsaMailboxNode *mbnode;
+    SubfolderDialogData *fcw = data;
+
+    gtk_tree_model_get_iter(model, &iter, path);
+    gtk_tree_model_get(model, &iter, 0, &mbnode, -1);
+
+    return (mbnode->server && mbnode->server->type == LIBBALSA_SERVER_IMAP
+            && (fcw->mbnode == NULL || fcw->mbnode->server == mbnode->server));
 }
 
 static void
@@ -330,60 +406,77 @@ browse_button_cb(GtkWidget * widget, gpointer data)
 {
     GtkWidget *scroll, *dialog;
     GtkRequisition req;
-    GtkWidget *ctree = balsa_mblist_new();
+    GtkWidget *tree_view = balsa_mblist_new();
+    GtkTreeSelection *selection =
+        gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
     /*
-     * Customize the ctree:
-     * */
-    gtk_ctree_post_recursive(GTK_CTREE(ctree), NULL, fix_ctree, data);
+     * Make only IMAP nodes selectable:
+     */
+    gtk_tree_selection_set_select_function(gtk_tree_view_get_selection
+                                           (GTK_TREE_VIEW(tree_view)),
+                                           folder_selection_func, data,
+                                           NULL);
 
-    dialog = gnome_dialog_new(_("Select parent folder"),
-			      GNOME_STOCK_BUTTON_CANCEL, NULL);
-    gnome_dialog_set_parent(GNOME_DIALOG(dialog),
-			    GTK_WINDOW(balsa_app.main_window));
+    dialog = gtk_dialog_new_with_buttons(_("Select parent folder"),
+                                         GTK_WINDOW(balsa_app.main_window),
+                                         GTK_DIALOG_MODAL,
+                                         GTK_STOCK_CANCEL,GTK_RESPONSE_CANCEL,
+                                         NULL);
     scroll = gtk_scrolled_window_new (NULL, NULL);
-    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(dialog)->vbox), scroll, 
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), scroll, 
                     TRUE, TRUE, 0);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(scroll),
 				    GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
 
-    gtk_signal_connect(GTK_OBJECT(ctree), "tree-select-row",
-		       (GtkSignalFunc) browse_button_select_row_cb, data);
+    g_signal_connect(G_OBJECT(selection), "changed",
+		     G_CALLBACK(browse_button_select_row_cb), data);
    
     /* Force the mailbox list to be a reasonable size. */
-    gtk_widget_size_request(ctree, &req);
+    gtk_widget_size_request(tree_view, &req);
     /* don't mess with the width, it gets saved! */
     if ( req.height > balsa_app.mw_height )
 	req.height = balsa_app.mw_height;
     else if ( req.height < balsa_app.mw_height/4)
 	req.height = balsa_app.mw_height/4;
-    gtk_widget_set_usize(GTK_WIDGET(ctree), req.width, req.height);
+    gtk_window_set_default_size(GTK_WINDOW(dialog), req.width, req.height);
 
-    gtk_container_add(GTK_CONTAINER(scroll), ctree);
+    gtk_container_add(GTK_CONTAINER(scroll), tree_view);
 
-    gtk_widget_show(ctree);
+    gtk_widget_show(tree_view);
     gtk_widget_show(scroll);
-    gnome_dialog_run_and_close(GNOME_DIALOG(dialog));
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
 }
 
 static void
-subfolder_conf_clicked_cb(GtkObject* dialog, int buttonno, gpointer data)
+subfolder_conf_clicked_cb(gpointer data)
 {
-#if BALSA_MAJOR < 2
-    static GnomeHelpMenuEntry help_entry =
-	{ NULL, "folder-config.html#SUBFOLDER-CONFIG" };
-#else
-    static const gchar help_path[] = "folder-config.html#SUBFOLDER-CONFIG";
-    GError *err = NULL;
-#endif                          /* BALSA_MAJOR < 2 */
     SubfolderDialogData *fcw = (SubfolderDialogData*)data;
+    gint response;
     gchar* parent, *folder, *identity;
 
-#if BALSA_MAJOR < 2
-    help_entry.name = gnome_app_id;
 
+    while ((response = gtk_dialog_run(fcw->dialog)) == GTK_RESPONSE_HELP) {
+#if BALSA_MAJOR < 2
+        static GnomeHelpMenuEntry help_entry =
+	    { NULL, "folder-config.html#SUBFOLDER-CONFIG" };
+
+        help_entry.name = gnome_app_id;
+        gnome_help_display(NULL, &help_entry);
+#else
+        static const gchar link_id[] = "SUBFOLDER-CONFIG";
+        GError *err = NULL;
+
+        gnome_help_display(folder_config_section, link_id, &err);
+        if (err) {
+            g_print(_("Error displaying %s: %s\n"), folder_config_section,
+                    err->message);
+            g_error_free(err);
+        }
 #endif                          /* BALSA_MAJOR < 2 */
-    switch(buttonno) {
-    case 0: /* OK */
+    }
+
+    if (response == GTK_RESPONSE_OK) {
 	parent = 
             gtk_editable_get_chars(GTK_EDITABLE(fcw->parent_folder), 0, -1);
 	folder = 
@@ -397,7 +490,7 @@ subfolder_conf_clicked_cb(GtkObject* dialog, int buttonno, gpointer data)
 	    /* rename */
 	    if ((fcw->old_parent && strcmp(parent, fcw->old_parent)) || 
                  (fcw->old_folder &&strcmp(folder, fcw->old_folder))) {
-		gint button = 0;
+		gint button = GTK_RESPONSE_OK;
 		if (fcw->old_folder && !strcmp(fcw->old_folder, "INBOX") &&
 		    (!fcw->old_parent || !*fcw->old_parent)) {
 		    gchar *msg = g_strdup_printf(
@@ -407,16 +500,20 @@ subfolder_conf_clicked_cb(GtkObject* dialog, int buttonno, gpointer data)
 			  "INBOX and its subfolders will remain.\n"
 			  "What would you like to do?"),
 			folder, parent);
-		    GtkWidget *ask = gnome_message_box_new(msg,
-			GNOME_MESSAGE_BOX_QUESTION,
-			_("Rename INBOX"), _("Cancel"), NULL);
+		    GtkWidget *ask = gtk_dialog_new_with_buttons
+                        (_("Question"),
+                         GTK_WINDOW(fcw->dialog),
+                         GTK_DIALOG_MODAL, 
+                         _("Rename INBOX"), GTK_RESPONSE_OK,
+                         _("Cancel"), GTK_RESPONSE_CANCEL,
+                         NULL);
+                    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(ask)->vbox),
+                                      gtk_label_new(msg));
 		    g_free(msg);
-		    gnome_dialog_set_parent(GNOME_DIALOG(ask),
-                            GTK_WINDOW(balsa_app.main_window));
-		    gtk_window_set_modal(GTK_WINDOW(ask), TRUE);
-		    button = gnome_dialog_run_and_close(GNOME_DIALOG(ask));
+		    button = gtk_dialog_run(GTK_DIALOG(ask));
+                    gtk_widget_destroy(ask);
 		}
-		if (button == 0) {
+		if (button == GTK_RESPONSE_OK) {
 		    /* Close the mailbox before renaming,
 		     * otherwise the rescan will try to close it
 		     * under its old name.
@@ -475,23 +572,9 @@ subfolder_conf_clicked_cb(GtkObject* dialog, int buttonno, gpointer data)
 	}
 	g_free(parent);
 	g_free(folder);
-        /* fall over */
-    default:
-        gnome_dialog_close(GNOME_DIALOG(dialog));
-        break;
-    case 2:
-#if BALSA_MAJOR < 2
-        gnome_help_display(NULL, &help_entry);
-#else
-        gnome_help_display_uri(help_path, &err);
-        if (err) {
-            g_print(_("Error displaying %s: %s\n"), help_path,
-                    err->message);
-            g_error_free(err);
-        }
-#endif                          /* BALSA_MAJOR < 2 */
-        break;
     }
+
+    gtk_widget_destroy(GTK_WIDGET(fcw->dialog));
 }
 
 /* folder_conf_imap_sub_node:
@@ -502,16 +585,20 @@ subfolder_conf_clicked_cb(GtkObject* dialog, int buttonno, gpointer data)
 void
 folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 {
-    GtkWidget *frame, *table, *subtable, *browse_button;
+    GtkWidget *frame, *table, *subtable, *browse_button, *label;
     SubfolderDialogData fcw;
-    guint keyval;
 
     if (mn) {
 	/* update */
 	if (!mn->mailbox) {
-	    gnome_dialog_run_and_close(GNOME_DIALOG(gnome_ok_dialog(_(
-		"An IMAP folder that is not a mailbox\n"
-		"has no properties that can be changed."))));
+            GtkWidget* dlg = 
+                gtk_message_dialog_new
+                (GTK_WINDOW(balsa_app.main_window),
+                 GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR,
+                 GTK_BUTTONS_CLOSE,
+                 _("An IMAP folder that is not a mailbox\n"
+                   "has no properties that can be changed."));
+            gtk_dialog_run(GTK_DIALOG(dlg)); gtk_widget_destroy(dlg);
 	    return;
 	}
 	fcw.mbnode = mn;
@@ -519,7 +606,8 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 	fcw.old_folder = mn->mailbox->name;
     } else {
 	/* create */
-	BalsaMailboxNode *mbnode = mblist_get_selected_node(balsa_app.mblist);
+	BalsaMailboxNode *mbnode =
+            balsa_mblist_get_selected_node(balsa_app.mblist);
 	if (mbnode && mbnode->server &&
 	    mbnode->server->type == LIBBALSA_SERVER_IMAP)
 	    fcw.mbnode = mbnode;
@@ -530,15 +618,17 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     }
     fcw.old_parent = fcw.mbnode ? fcw.mbnode->parent->dir : NULL;
 
-    fcw.dialog = GNOME_DIALOG(gnome_dialog_new(_("Remote IMAP subfolder"), 
-					       mn ? _("Update") : _("Create"), 
-					       GNOME_STOCK_BUTTON_CANCEL, 
-					       GNOME_STOCK_BUTTON_HELP,
-					       NULL));
+    fcw.dialog = 
+        GTK_DIALOG(gtk_dialog_new_with_buttons
+                   (_("Remote IMAP subfolder"), 
+                    GTK_WINDOW(balsa_app.main_window),
+                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                    mn ? _("_Update") : _("_Create"), GTK_RESPONSE_OK,
+                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, 
+                    GTK_STOCK_HELP,   GTK_RESPONSE_HELP,
+                    NULL));
     /* `Enter' key => Create: */
-    gnome_dialog_set_default(GNOME_DIALOG(fcw.dialog), 0);
-    gnome_dialog_set_parent(fcw.dialog,
-                            GTK_WINDOW(balsa_app.main_window));
+    gtk_dialog_set_default_response(GTK_DIALOG(fcw.dialog), GTK_RESPONSE_OK);
     gtk_window_set_wmclass(GTK_WINDOW(fcw.dialog), 
 			   "subfolder_config_dialog", "Balsa");
 
@@ -550,86 +640,91 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     gtk_container_add(GTK_CONTAINER(frame), table);
  
     /* INPUT FIELD CREATION */
-    create_label(_("_Folder name:"), table, 0, &keyval);
+    label= create_label(_("_Folder name:"), table, 0);
     fcw.folder_name = create_entry(fcw.dialog, table,
                                    GTK_SIGNAL_FUNC(validate_sub_folder),
-				   &fcw, 0, fcw.old_folder, keyval);
+				   &fcw, 0, fcw.old_folder, label);
 
     subtable = gtk_table_new(1, 3, FALSE);
-    create_label(_("_Subfolder of:"), table, 1, &keyval);
+    label = create_label(_("_Subfolder of:"), table, 1);
     fcw.parent_folder = create_entry(fcw.dialog, subtable,
                                      GTK_SIGNAL_FUNC(validate_sub_folder),
-				     &fcw, 0, fcw.old_parent, keyval);
+				     &fcw, 0, fcw.old_parent, label);
 
     browse_button = gtk_button_new_with_label(_("Browse..."));
-    gtk_signal_connect(GTK_OBJECT(browse_button), "clicked",
-		       (GtkSignalFunc) browse_button_cb,
-		       (gpointer) &fcw);
+    g_signal_connect(G_OBJECT(browse_button), "clicked",
+		     G_CALLBACK(browse_button_cb), (gpointer) &fcw);
     gtk_table_attach(GTK_TABLE(subtable), browse_button, 2, 3, 0, 1,
 	GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
     gtk_table_attach(GTK_TABLE(table), subtable, 1, 2, 1, 2,
 	GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
 
-    create_label(_("_Identity:"), table, 2, &keyval);
+    label= create_label(_("_Identity:"), table, 2);
     fcw.identity = create_entry(fcw.dialog, table,
 				NULL,
-				&fcw, 2, mn->mailbox->identity_name, keyval);
+				&fcw, 2,
+                                mn ? mn->mailbox->identity_name : NULL,
+                                label);
 
     gtk_widget_show_all(GTK_WIDGET(fcw.dialog));
 
     validate_sub_folder(NULL, &fcw);
     gtk_widget_grab_focus(fcw.folder_name);
 
-    gtk_signal_connect(GTK_OBJECT(fcw.dialog), "clicked", 
-                       GTK_SIGNAL_FUNC(subfolder_conf_clicked_cb), &fcw);
-    gnome_dialog_run(fcw.dialog);
+    subfolder_conf_clicked_cb(&fcw);
 }
 
 void
 folder_conf_delete(BalsaMailboxNode* mbnode)
 {
-    gchar* msg;
     GtkWidget* ask;
     GNode* gnode;
+    gint response;
 
     if(!mbnode->config_prefix) {
-	ask = gnome_warning_dialog_parented(
+	ask = 
+            gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
+                                   GTK_DIALOG_MODAL,
+                                   GTK_MESSAGE_ERROR,
+                                   GTK_BUTTONS_CLOSE,
 	    _("This folder is not stored in configuration."
-	      "I do not yet know how to remove it from remote server."),
-	    GTK_WINDOW(balsa_app.main_window));
-	gnome_dialog_run_and_close(GNOME_DIALOG(ask));
+	      "I do not yet know how to remove it from remote server."));
+	gtk_dialog_run(GTK_DIALOG(ask));
+        gtk_widget_destroy(ask);
 	return;
     }
 	
-    msg = g_strdup_printf
-	(_("This will remove the folder %s from the list.\n"
-	   "You may use \"New IMAP Folder\" later to add this folder again.\n"
-	   "What would you like to do?"),
-	 mbnode->name);
-    ask = gnome_message_box_new(msg, GNOME_MESSAGE_BOX_QUESTION,
-				_("Remove from list"),
-				_("Cancel"),
-				NULL);
-    g_free(msg);
-    
-    gnome_dialog_set_parent(GNOME_DIALOG(ask), 
-			    GTK_WINDOW(balsa_app.main_window));
-    gtk_window_set_modal(GTK_WINDOW(ask), TRUE);
+    ask = gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window), 0,
+                                 GTK_MESSAGE_QUESTION,
+                                 GTK_BUTTONS_OK_CANCEL,
+                                 _("This will remove the folder "
+                                   "\"%s\" from the list.\n"
+                                   "You may use \"New IMAP Folder\" "
+                                   "later to add this folder again.\n"),
+                                 mbnode->name);
+    gtk_window_set_title(GTK_WINDOW(ask), _("Confirm"));
 
-    if(1 == gnome_dialog_run_and_close(GNOME_DIALOG(ask)))
+    response = gtk_dialog_run(GTK_DIALOG(ask));
+    gtk_widget_destroy(ask);
+    if(response != GTK_RESPONSE_OK)
 	return;
 
     /* Delete it from the config file and internal nodes */
     config_folder_delete(mbnode);
 
     /* Remove the node from balsa's mailbox list */
+    balsa_mailbox_nodes_lock(FALSE);
     gnode = balsa_find_mbnode(balsa_app.mailbox_nodes, mbnode);
+    balsa_mailbox_nodes_unlock(FALSE);
     if(gnode) {
+        balsa_mailbox_nodes_lock(TRUE);
 	balsa_remove_children_mailbox_nodes(gnode);
-	mblist_remove_mailbox_node(balsa_app.mblist, mbnode);
+        balsa_mailbox_nodes_unlock(TRUE);
+        balsa_mblist_remove_mailbox_node(balsa_app.mblist_tree_store,
+                                         mbnode);
 	g_node_unlink(gnode);
 	g_node_destroy(gnode);
-	gtk_object_destroy(GTK_OBJECT(mbnode));
+	g_object_unref(G_OBJECT(mbnode));
 	update_mail_servers();
     } else g_warning("folder node %s (%p) not found in hierarchy.\n",
 		     mbnode->name, mbnode);

@@ -30,7 +30,6 @@ enum _BalsaInformationShow {
     BALSA_INFORMATION_SHOW_STDERR,
 };
 
-void balsa_information(LibBalsaInformationType type, GtkWindow* parent,
-                       const char *fmt, ...);
+void balsa_information(LibBalsaInformationType type, const char *fmt, ...);
 
 #endif

@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -30,10 +30,10 @@
 #include "address-book.h"
 
 #define LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN		(libbalsa_address_book_externq_get_type())
-#define LIBBALSA_ADDRESS_BOOK_EXTERN(obj)		(GTK_CHECK_CAST (obj, LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN, LibBalsaAddressBookExtern))
-#define LIBBALSA_ADDRESS_BOOK_EXTERN_CLASS(klass)	(GTK_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN, LibBalsaAddressBookExternClass))
-#define LIBBALSA_IS_ADDRESS_BOOK_EXTERN(obj)		(GTK_CHECK_TYPE (obj, LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN))
-#define LIBBALSA_IS_ADDRESS_BOOK_EXTERN_CLASS(klass)	(GTK_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN))
+#define LIBBALSA_ADDRESS_BOOK_EXTERN(obj)		(G_TYPE_CHECK_INSTANCE_CAST (obj, LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN, LibBalsaAddressBookExtern))
+#define LIBBALSA_ADDRESS_BOOK_EXTERN_CLASS(klass)	(G_TYPE_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN, LibBalsaAddressBookExternClass))
+#define LIBBALSA_IS_ADDRESS_BOOK_EXTERN(obj)		(G_TYPE_CHECK_INSTANCE_TYPE (obj, LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN))
+#define LIBBALSA_IS_ADDRESS_BOOK_EXTERN_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN))
 
 typedef struct _LibBalsaAddressBookExtern LibBalsaAddressBookExtern;
 typedef struct _LibBalsaAddressBookExternClass
@@ -57,10 +57,11 @@ struct _LibBalsaAddressBookExternClass {
     LibBalsaAddressBookClass parent_class;
 };
 
-GtkType libbalsa_address_book_externq_get_type(void);
+GType libbalsa_address_book_externq_get_type(void);
 
 LibBalsaAddressBook *libbalsa_address_book_externq_new(const gchar * name,
-						     const gchar * load, const char * save);
+                                                       const gchar * load,
+                                                       const char * save);
 
 
 #endif

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 1.1.x\n"
 "POT-Creation-Date: 2001-07-28 22:47+0000\n"
-"PO-Revision-Date: 2001-09-13 12:45+0000\n"
+"PO-Revision-Date: 2002-08-06 21:22+0200\n"
 "Last-Translator: Peter Dobrev <p.dobrev@softhome.net>\n"
 "Language-Team: Bulgarian <dict@linux.zonebg.com>\n"
 "MIME-Version: 1.0\n"
@@ -2557,7 +2557,7 @@ msgstr "ОК"
 #: src/main-window.c:2343
 #, c-format
 msgid "Commiting mailbox %s failed."
-msgstr "Грешка при запис в пощенската кутия %s."
+msgstr "Не е избрана пощенска кутия %s."
 
 ##, c-format
 #: src/main-window.c:2553

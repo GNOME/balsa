@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2003 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -26,10 +26,17 @@
 #include "libbalsa.h"
 
 #define BALSA_TYPE_MAILBOX_NODE          (balsa_mailbox_node_get_type ())
-#define BALSA_MAILBOX_NODE(obj)          GTK_CHECK_CAST (obj, BALSA_TYPE_MAILBOX_NODE, BalsaMailboxNode)
-#define BALSA_MAILBOX_NODE_CLASS(klass)  GTK_CHECK_CLASS_CAST (klass, BALSA_TYPE_MAILBOX_NODE, BalsaMailboxNodeClass)
-#define BALSA_IS_MAILBOX_NODE(obj)       GTK_CHECK_TYPE (obj, BALSA_TYPE_MAILBOX_NODE)
-
+#define BALSA_MAILBOX_NODE(obj) \
+    G_TYPE_CHECK_INSTANCE_CAST(obj, BALSA_TYPE_MAILBOX_NODE, \
+                                BalsaMailboxNode)
+#define BALSA_MAILBOX_NODE_CLASS(klass) \
+    G_TYPE_CHECK_CLASS_CAST(klass, BALSA_TYPE_MAILBOX_NODE, \
+                             BalsaMailboxNodeClass)
+#define BALSA_IS_MAILBOX_NODE(obj) \
+    G_TYPE_CHECK_INSTANCE_TYPE(obj, BALSA_TYPE_MAILBOX_NODE)
+#define BALSA_IS_MAILBOX_NODE_CLASS(klass) \
+    G_TYPE_CHECK_CLASS_TYPE(klass, BALSA_TYPE_MAILBOX_NODE)
+    
 typedef struct _BalsaMailboxNode BalsaMailboxNode;
 typedef struct _BalsaMailboxNodeClass BalsaMailboxNodeClass;
 
@@ -53,7 +60,7 @@ typedef enum {
 } BalsaMailboxNodeStyle;
 
 struct _BalsaMailboxNode {
-    GtkObject object;
+    GObject object;
     BalsaMailboxNode *parent; /* NULL for root-level folders & mailboxes */
     LibBalsaMailbox *mailbox; /* != NULL for leaves only */
     gchar *name;       /* used for folders, i.e. when mailbox == NULL */
@@ -72,14 +79,14 @@ struct _BalsaMailboxNode {
 };
 
 struct _BalsaMailboxNodeClass {
-    GtkObjectClass parent_class;
+    GObjectClass parent_class;
     void (*save_config) (BalsaMailboxNode * mn, const gchar * prefix);
     void (*load_config) (BalsaMailboxNode * mn, const gchar * prefix);
     GtkWidget* (*show_prop_dialog) (BalsaMailboxNode * mn);
     void (*append_subtree) (BalsaMailboxNode * mn, GNode* root);
 };
 
-GtkType balsa_mailbox_node_get_type(void);
+GType balsa_mailbox_node_get_type(void);
 
 BalsaMailboxNode *balsa_mailbox_node_new(void);
 BalsaMailboxNode *balsa_mailbox_node_new_from_mailbox(LibBalsaMailbox *m);
@@ -100,5 +107,7 @@ void balsa_mailbox_node_show_prop_dialog_cb(GtkWidget * widget, gpointer data);
 void balsa_mailbox_local_rescan_parent(LibBalsaMailbox* mbx);
 /* applicable only to folders (mailbox collections) */
 void balsa_mailbox_node_rescan(BalsaMailboxNode* mn);
+/* applicable to any mailbox node */
+void balsa_mailbox_node_scan_children(BalsaMailboxNode * mbnode);
 
 #endif

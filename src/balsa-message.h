@@ -30,9 +30,10 @@ extern "C" {
 #endif				/* __cplusplus */
 
 
-#define BALSA_MESSAGE(obj)          GTK_CHECK_CAST (obj, balsa_message_get_type (), BalsaMessage)
-#define BALSA_MESSAGE_CLASS(klass)  GTK_CHECK_CLASS_CAST (klass, balsa_message_get_type (), BalsaMessageClass)
-#define BALSA_IS_MESSAGE(obj)       GTK_CHECK_TYPE (obj, balsa_message_get_type ())
+#define BALSA_TYPE_MESSAGE          (balsa_message_get_type ())
+#define BALSA_MESSAGE(obj)          GTK_CHECK_CAST (obj, BALSA_TYPE_MESSAGE, BalsaMessage)
+#define BALSA_MESSAGE_CLASS(klass)  GTK_CHECK_CLASS_CAST (klass, BALSA_TYPE_MESSAGE, BalsaMessageClass)
+#define BALSA_IS_MESSAGE(obj)       GTK_CHECK_TYPE (obj, BALSA_TYPE_MESSAGE)
 
 
 typedef struct _BalsaMessage BalsaMessage;
@@ -43,9 +44,9 @@ typedef struct _BalsaPartInfo BalsaPartInfo;
 struct _BalsaMessage {
 	GtkViewport parent;
 
-	/* The table widget */
-	GtkWidget *table;
-
+       /* The vbox widget */
+       GtkWidget *vbox;
+ 
 	/* Widget to hold headers */
 	GtkWidget *header_text;
 	ShownHeaders shown_headers;
@@ -56,13 +57,15 @@ struct _BalsaMessage {
 
 	/* Widget to hold icons */
 	GtkWidget *part_list;
-	gint part_count;
 
 	gboolean wrap_text;
 
 	BalsaPartInfo *current_part;
 
 	LibBalsaMessage *message;
+
+        /* signal handler */
+        gulong select_icon_handler;
 };
 
 struct _BalsaMessageClass {
@@ -71,10 +74,9 @@ struct _BalsaMessageClass {
 	void (*select_part) (BalsaMessage * message);
 };
 
-guint balsa_message_get_type(void);
+GtkType balsa_message_get_type(void);
 GtkWidget *balsa_message_new(void);
 
-void balsa_message_clear(BalsaMessage * bmessage);
 gboolean balsa_message_set(BalsaMessage * bmessage,
 			   LibBalsaMessage * message);
 
@@ -91,9 +93,6 @@ void balsa_message_copy_clipboard(BalsaMessage * bmessage);
 void balsa_message_select_all(BalsaMessage * bmessage);
 
 void reflow_string(gchar * str, gint mode, gint * cur_pos, int width);
-
-/* a helper functions; FIXME: find more proper location for them.  */
-    GdkFont* balsa_get_font_by_charset(const gchar* base, const gchar*charset);
 
 #ifdef __cplusplus
 }

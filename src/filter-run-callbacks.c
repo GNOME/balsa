@@ -25,16 +25,12 @@
 
 #include "config.h"
 
-#include <gnome.h>
-
 #include <string.h>
-
 #include "mailbox-filter.h"
 #include "filter-private.h"
 #include "filter-funcs.h"
 #include "filter-run.h"
 #include "balsa-app.h"
-#include "balsa-icons.h"
 #include "save-restore.h"
 
 /* Global vars */
@@ -45,31 +41,42 @@ extern GList * fr_dialogs_opened;
 /* FIXME : implement error reporting */
 
 void
-fr_clean_associated_mailbox_filters(GtkCList * clist)
+fr_clean_associated_mailbox_filters(GtkTreeView * filter_list)
 {
-    gint row;
+    GtkTreeModel *model = gtk_tree_view_get_model(filter_list);
+    GtkTreeIter iter;
+    gboolean valid;
 
-    for(row=0;row<clist->rows;row++)
-	g_free((LibBalsaMailboxFilter*)gtk_clist_get_row_data(clist,row));
+    for (valid = gtk_tree_model_get_iter_first(model, &iter); valid;
+         valid = gtk_tree_model_iter_next(model, &iter)) {
+        LibBalsaMailboxFilter *fil;
+
+        gtk_tree_model_get(model, &iter, DATA_COLUMN, &fil, -1);
+        g_free(fil);
+    }
 }
 
-static GSList * build_selected_filters_list(GtkCList * clist,gboolean to_run)
+static GSList *
+build_selected_filters_list(GtkTreeView * filter_list, gboolean to_run)
 {
-    GSList * filters=NULL;
-    gint row;
+    GtkTreeModel *model = gtk_tree_view_get_model(filter_list);
+    GtkTreeIter iter;
+    gboolean valid;
+    GSList *filters = NULL;
 
     /* Construct list of selected filters */
-    for(row=0;row<clist->rows;row++)
-	if (to_run)
-	    filters=g_slist_prepend(filters,
-				    ((LibBalsaMailboxFilter*)
-                                     gtk_clist_get_row_data(clist,row))->actual_filter);
-	else
-	    filters=g_slist_prepend(filters,gtk_clist_get_row_data(clist,row));
-    
-    filters=g_slist_reverse(filters);
+    for (valid = gtk_tree_model_get_iter_first(model, &iter); valid;
+         valid = gtk_tree_model_iter_next(model, &iter)) {
+        LibBalsaMailboxFilter *fil;
 
-    return filters;
+        gtk_tree_model_get(model, &iter, DATA_COLUMN, &fil, -1);
+        filters =
+            g_slist_prepend(filters,
+                            to_run ? (gpointer) fil->actual_filter
+                                   : (gpointer) fil);
+    }
+
+    return g_slist_reverse(filters);
 }
 
 /*
@@ -77,14 +84,14 @@ static GSList * build_selected_filters_list(GtkCList * clist,gboolean to_run)
  * Returns TRUE if OK, or FALSE if errors occured
  */
 static gboolean
-run_filters_on_mailbox(GtkCList * clist,LibBalsaMailbox *mbox)
+run_filters_on_mailbox(GtkTreeView * filter_list, LibBalsaMailbox * mbox)
 {
-    GSList * filters=build_selected_filters_list(clist,TRUE),* lst;
+    GSList *filters = build_selected_filters_list(filter_list, TRUE);
+    GSList *lst;
 
     if (!filters) return TRUE;
     if (!filters_prepare_to_run(filters))
 	return FALSE;
-    gtk_clist_freeze(GTK_CLIST(balsa_app.mblist));
     libbalsa_filter_match_mailbox(filters,mbox);
     for (lst=filters;lst;lst = g_slist_next(lst))
 	if (((LibBalsaFilter*) lst->data)->matching_messages)
@@ -93,9 +100,7 @@ run_filters_on_mailbox(GtkCList * clist,LibBalsaMailbox *mbox)
     if (lst) {
 	if (libbalsa_filter_apply(filters))
 	    enable_empty_trash(TRASH_FULL);
-	balsa_index_sync_backend(mbox);
     }
-    gtk_clist_thaw(GTK_CLIST(balsa_app.mblist));
     g_slist_free(filters);
     return TRUE;
 }
@@ -120,177 +125,229 @@ void save_filters(BalsaFilterRunDialog * p)
 }
 
 /* Dialog box button callbacks */
-void fr_dialog_button_clicked(GtkWidget * widget, gint button,
-			      gpointer throwaway)
+void fr_dialog_response(GtkWidget * widget, gint response,
+			gpointer throwaway)
 {
-    gint row;
     BalsaFilterRunDialog * p;
-    static GnomeHelpMenuEntry help_entry = { NULL, "x1722.html" };
 
     p=BALSA_FILTER_RUN_DIALOG(widget);
-    switch (button) {
-    case 0:			/* Apply button */
+    switch (response) {
+    case GTK_RESPONSE_APPLY:    /* Apply button */
 	if (!run_filters_on_mailbox(p->selected_filters,p->mbox))
-	    balsa_information(LIBBALSA_INFORMATION_ERROR,
-                              GTK_WINDOW(gtk_widget_get_ancestor
-                                         (widget, GTK_TYPE_WINDOW)),
-                              _("Error when applying filters"));
+	    balsa_information(LIBBALSA_INFORMATION_ERROR,_("Error when applying filters"));
 	return;
-    case 1:                     /* OK button */
+    case GTK_RESPONSE_OK:       /* OK button */
 	save_filters(p);
 	break;
 
-    case 2:			/* Cancel button */
+    case GTK_RESPONSE_CANCEL:   /* Cancel button */
+    case GTK_RESPONSE_NONE:     /* Close window */
 	/* We free the mailbox_filter datas, they are useless now */
 	fr_clean_associated_mailbox_filters(p->selected_filters);
 	
 	break;
-    case 3:			/* Help button */
-	help_entry.name = gnome_app_id;
-	gnome_help_display(NULL, &help_entry);
+    case GTK_RESPONSE_HELP:     /* Help button */
+	/* more of something here */
 	return;
 
     default:
 	/* we should NEVER get here */
 	break;
     }
-    gnome_dialog_close(GNOME_DIALOG(p));
+    gtk_widget_destroy(GTK_WIDGET(p));
 }
 
 /* 
  *Callbacks for left/right buttons
  */
 
+static void
+fr_add_pressed_func(GtkTreeModel * model, GtkTreePath * path,
+                    GtkTreeIter * iter, gpointer data)
+{
+    BalsaFilterRunDialog *p = data;
+    LibBalsaFilter *fil;
+
+    gtk_tree_model_get(model, iter, DATA_COLUMN, &fil, -1);
+    if (fil->action == FILTER_RUN || fil->action == FILTER_TRASH ||
+        strcmp(fil->action_string, p->mbox->url) != 0) {
+        /* Ok we can add the filter to this mailbox, there is no recursion problem */
+        LibBalsaMailboxFilter *mf = g_new(LibBalsaMailboxFilter, 1);
+        GtkTreeModel *sel_model =
+            gtk_tree_view_get_model(p->selected_filters);
+        GtkTreeSelection *sel_selection =
+            gtk_tree_view_get_selection(p->selected_filters);
+        GtkTreeIter sel_iter;
+
+        mf->actual_filter = fil;
+        mf->when = FILTER_WHEN_NEVER;
+        gtk_list_store_append(GTK_LIST_STORE(sel_model), &sel_iter);
+        gtk_list_store_set(GTK_LIST_STORE(sel_model), &sel_iter,
+                           NAME_COLUMN, fil->name,
+                           DATA_COLUMN, mf, -1);
+        gtk_tree_selection_select_iter(sel_selection, &sel_iter);
+        /* Mark for later deletion */
+        gtk_list_store_set(GTK_LIST_STORE(model), iter,
+                           DATA_COLUMN, NULL, -1);
+    } else
+        balsa_information(LIBBALSA_INFORMATION_ERROR,
+                          _("The destination mailbox of "
+                            "the filter \"%s\" is \"%s\"\n"
+                            "You can't associate it with the same "
+                            "mailbox (that causes recursion)."),
+                          fil->name, p->mbox->name);
+}
+
 void
 fr_add_pressed(BalsaFilterRunDialog* p)
 {
-    LibBalsaFilter* fil;
-    GList * lst;
-    GSList *tmp;
-    gint row,rows;
-    gchar *col[FILTER_WHEN_NB+1];
+    GtkTreeSelection *selection =
+        gtk_tree_view_get_selection(p->available_filters);
+    GtkTreeModel *model =
+        gtk_tree_view_get_model(p->available_filters);
+    GtkTreeIter iter;
+    gboolean valid;
+    gboolean modified = FALSE;
 
     /* We check possibility of recursion here: we do not allow a filter 
        to be applied on a mailbox if its action rule modify this mailbox
     */
-    for (row=1;row<=FILTER_WHEN_NB;row++) col[row]=NULL;
-    for(lst=p->available_filters->selection; lst; lst=g_list_next(lst)) {
-	fil=(LibBalsaFilter*)
-            gtk_clist_get_row_data(p->available_filters,
-                                   GPOINTER_TO_INT(lst->data));
-	if (fil->action==FILTER_RUN || fil->action==FILTER_TRASH || 
-            strcmp(fil->action_string,p->mbox->url)!=0) {
-	    /* Ok we can add the filter to this mailbox, there is no recursion problem */
-	    LibBalsaMailboxFilter* mf = g_new(LibBalsaMailboxFilter,1);
-	    mf->actual_filter=fil;
-	    mf->when=FILTER_WHEN_NEVER;
-	    col[0]=fil->name;
-	    row =gtk_clist_append(p->selected_filters,col);
-	    gtk_clist_set_row_data(p->selected_filters,row, mf);
-	    /* Mark for later deletion */
-	    gtk_clist_set_row_data(p->available_filters,
-                                   GPOINTER_TO_INT(lst->data),NULL);
-	}
-	else
-	    balsa_information(LIBBALSA_INFORMATION_ERROR,
-                              GTK_WINDOW(p),
-			      _("The destination mailbox of the filter %s is %s\n"
-			      "you can't associate it with the same mailbox (that causes recursion)"),
-			      fil->name,p->mbox->name);
+    gtk_tree_selection_selected_foreach(selection, fr_add_pressed_func, p);
+
+    valid = gtk_tree_model_get_iter_first(model, &iter);
+    while (valid) {
+        LibBalsaFilter *fil;
+
+        gtk_tree_model_get(model, &iter, DATA_COLUMN, &fil, -1);
+        if (!fil) {
+            GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
+
+            gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
+            modified = TRUE;
+            valid = gtk_tree_model_get_iter(model, &iter, path);
+            if (valid)
+                gtk_tree_selection_select_path(selection, path);
+            else if (gtk_tree_path_prev(path))
+                gtk_tree_selection_select_path(selection, path);
+            gtk_tree_path_free(path);
+        } else
+            valid = gtk_tree_model_iter_next(model, &iter);
     }
 
-    gtk_clist_freeze(p->available_filters);
-    rows=p->available_filters->rows;
-    for (row=0;row<p->available_filters->rows;) {
-	if (!gtk_clist_get_row_data(p->available_filters,row))
-	    gtk_clist_remove(p->available_filters,row);
-	else row++;
-    }
-    p->filters_modified=p->available_filters->rows<rows;
-    gtk_clist_thaw(p->available_filters);
+    p->filters_modified = modified;
+}
+
+static void
+fr_remove_pressed_func(GtkTreeModel * model, GtkTreePath * path, 
+                       GtkTreeIter * iter, gpointer data)
+{
+    BalsaFilterRunDialog *p = data;
+    LibBalsaMailboxFilter *fil;
+    GtkTreeModel *avl_model =
+        gtk_tree_view_get_model(p->available_filters);
+    GtkTreeIter avl_iter;
+    GtkTreeSelection *selection =
+        gtk_tree_view_get_selection(p->available_filters);
+
+    p->filters_modified = TRUE;
+    gtk_tree_model_get(model, iter, DATA_COLUMN, &fil, -1);
+    /* mark for later deletion */
+    gtk_list_store_set(GTK_LIST_STORE(model), iter,
+                       DATA_COLUMN, NULL, -1);
+    gtk_list_store_append(GTK_LIST_STORE(avl_model), &avl_iter);
+    gtk_list_store_set(GTK_LIST_STORE(avl_model), &avl_iter,
+                       NAME_COLUMN, fil->actual_filter->name,
+                       DATA_COLUMN, fil->actual_filter, -1);
+    gtk_tree_selection_unselect_all(selection);
+    gtk_tree_selection_select_iter(selection, &avl_iter);
+    g_free(fil);
 }
 
 void
 fr_remove_pressed(BalsaFilterRunDialog * p)
 {
-    LibBalsaMailboxFilter* fil;
-    gint new_row;
+    GtkTreeSelection *selection =
+        gtk_tree_view_get_selection(p->selected_filters);
+    gboolean valid;
+    GtkTreeModel *model =
+        gtk_tree_view_get_model(p->selected_filters);
+    GtkTreeIter iter;
 
-    if (p->selected_filters->selection) {
-	p->filters_modified=TRUE;
-	while (p->selected_filters->selection) {
-	    fil=(LibBalsaMailboxFilter*)
-                gtk_clist_get_row_data(p->selected_filters,
-                                       GPOINTER_TO_INT(p->selected_filters->selection->data));
-	    new_row=gtk_clist_append(p->available_filters,
-                                     &(fil->actual_filter->name));
-	    gtk_clist_set_row_data(p->available_filters,new_row,
-                                   fil->actual_filter);
-	    gtk_clist_remove(p->selected_filters,
-                             GPOINTER_TO_INT(p->selected_filters->selection->data));
-	    g_free(fil);
-	}
+    gtk_tree_selection_selected_foreach(selection, fr_remove_pressed_func, p);
+
+    valid = gtk_tree_model_get_iter_first(model, &iter);
+    while (valid) {
+        LibBalsaMailboxFilter *fil;
+
+        gtk_tree_model_get(model, &iter, DATA_COLUMN, &fil, -1);
+        if (!fil) {
+            GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
+
+            gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
+            valid = gtk_tree_model_get_iter(model, &iter, path);
+            if (valid)
+                gtk_tree_selection_select_path(selection, path);
+            else if (gtk_tree_path_prev(path))
+                gtk_tree_selection_select_path(selection, path);
+            gtk_tree_path_free(path);
+        } else
+            valid = gtk_tree_model_iter_next(model, &iter);
     }
 }
 
-/* Double click handling for clists */
-void available_list_select_row_cb(GtkWidget *widget, gint row, gint column,
-				  GdkEventButton *event, gpointer data)
+/* Callbacks for filter lists */
+
+void
+available_list_activated(GtkTreeView * treeview, GtkTreePath * path,
+                         GtkTreeViewColumn * column, gpointer data)
 {
-    if (event && event->type == GDK_2BUTTON_PRESS)
-	fr_add_pressed(BALSA_FILTER_RUN_DIALOG(data));
+    fr_add_pressed(BALSA_FILTER_RUN_DIALOG(data));
 }
 
-void selected_list_select_row_event_cb(GtkWidget *widget,
-				       GdkEventButton *bevent, gpointer data)
+void
+selected_list_toggled(GtkCellRendererToggle * renderer,
+                      const gchar * path_string, gpointer data)
 {
-    GtkCellType type;
-    gint res,row,column;
-    GdkPixmap *pixmap;
-    GdkBitmap *mask;
-    BalsaFilterRunDialog * p;
+    gint column = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(renderer),
+                                                    BALSA_FILTER_KEY));
+    BalsaFilterRunDialog *p = data;
+    GtkTreeModel *model = gtk_tree_view_get_model(p->selected_filters);
+    GtkTreeIter iter;
+    LibBalsaMailboxFilter *fil;
+    gboolean active;
+    gint mask;
 
-    if ( bevent == NULL )
-	return;
+    gtk_tree_model_get_iter_from_string(model, &iter, path_string);
+    gtk_tree_model_get(model, &iter, DATA_COLUMN, &fil,
+                       column, &active, -1);
+    gtk_list_store_set(GTK_LIST_STORE(model), &iter, column, !active, -1);
 
-    p=BALSA_FILTER_RUN_DIALOG(data);
-    res = gtk_clist_get_selection_info(p->selected_filters,
-                                       bevent->x,
-                                       bevent->y, &row, &column);
-    if ((bevent->button != 1) || !res || (column == 0))
-        return;
-    
-    type = gtk_clist_get_cell_type(p->selected_filters, row, column);
-    
-    if (type == GTK_CELL_PIXMAP) {
-	gtk_clist_set_text(p->selected_filters, row, column, NULL);
-	FILTER_WHEN_CLRFLAG((LibBalsaMailboxFilter*)
-                            gtk_clist_get_row_data(p->selected_filters,row),
-                            1 << (column-1));
-    } else {
-	/* now for the pixmap from gdk */
-	gnome_stock_pixmap_gdk(BALSA_PIXMAP_OTHER_ENABLED,
-			       GNOME_STOCK_PIXMAP_REGULAR,
-			       &pixmap,
-			       &mask);
-	gtk_clist_set_pixmap(p->selected_filters, row, column, pixmap, mask);
-	gdk_pixmap_unref(pixmap);
-	gdk_bitmap_unref(mask);
-	FILTER_WHEN_SETFLAG((LibBalsaMailboxFilter*)
-                            gtk_clist_get_row_data(p->selected_filters,row),
-                            1 << (column-1));
+    switch (column) {
+        case INCOMING_COLUMN:
+            mask = FILTER_WHEN_INCOMING;
+            break;
+        case CLOSING_COLUMN:
+            mask = FILTER_WHEN_CLOSING;
+            break;
+        default:
+            mask = FILTER_WHEN_NEVER;
+            break;
     }
-    gtk_signal_emit_stop_by_name(GTK_OBJECT(p->selected_filters),
-				 "button_press_event");
-    p->filters_modified=TRUE;
+    if (active)
+        FILTER_WHEN_CLRFLAG(fil, mask);
+    else
+        FILTER_WHEN_SETFLAG(fil, mask);
+
+    p->filters_modified = TRUE;
 }
 
-void selected_list_select_row_cb(GtkWidget *widget,gint row,gint column,
-				 GdkEventButton *event, gpointer data)
+void
+selected_list_activated(GtkTreeView * treeview, GtkTreePath * path,
+                        GtkTreeViewColumn * column, gpointer data)
 {
-    if (event && event->type == GDK_2BUTTON_PRESS)
-	fr_remove_pressed(BALSA_FILTER_RUN_DIALOG(data));
+    fr_remove_pressed(BALSA_FILTER_RUN_DIALOG(data));
 }
+
 /* 
  *Callbacks for up/down buttons
  */
@@ -300,39 +357,108 @@ void selected_list_select_row_cb(GtkWidget *widget,gint row,gint column,
  *
  * Callback for the "Down" button
  */ 
+static void
+fr_pressed_func(GtkTreeModel * model, GtkTreePath * path,
+                GtkTreeIter * iter, gpointer data)
+{
+    GtkTreeIter *new_iter = data;
+    *new_iter = *iter;
+}
+
 void
 fr_down_pressed(GtkWidget * widget, gpointer data)
 {
-    BalsaFilterRunDialog * p;
-    gint row;
+    BalsaFilterRunDialog *p = data;
+    GtkTreeModel *model =
+        gtk_tree_view_get_model(p->selected_filters);
+    GtkTreeSelection *selection =
+        gtk_tree_view_get_selection(p->selected_filters);
+    GtkTreeIter iter1, iter2;
+    LibBalsaMailboxFilter *fil1, *fil2;
+    gboolean incoming1, closing1;
+    gboolean incoming2, closing2;
 
-    p=BALSA_FILTER_RUN_DIALOG(data);
-
-    if (!p->selected_filters->selection)
-	return;
-
-    p->filters_modified=TRUE;   
-    row = GPOINTER_TO_INT(p->selected_filters->selection->data);
-    gtk_clist_swap_rows(p->selected_filters, row, row + 1);
-}			/* end fe_down_pressed */
+    iter1.stamp = 0;
+    gtk_tree_selection_selected_foreach(selection, fr_pressed_func, &iter1);
+    if (iter1.stamp) {
+        iter2 = iter1;
+        if (gtk_tree_model_iter_next(model, &iter2)) {
+            gtk_tree_model_get(model, &iter1,
+                               DATA_COLUMN, &fil1,
+                               INCOMING_COLUMN, &incoming1,
+                               CLOSING_COLUMN, &closing1,
+                               -1);
+            gtk_tree_model_get(model, &iter2,
+                               DATA_COLUMN, &fil2,
+                               INCOMING_COLUMN, &incoming2,
+                               CLOSING_COLUMN, &closing2,
+                               -1);
+            gtk_list_store_set(GTK_LIST_STORE(model), &iter1,
+                               NAME_COLUMN, fil2->actual_filter->name,
+                               DATA_COLUMN, fil2,
+                               INCOMING_COLUMN, incoming2,
+                               CLOSING_COLUMN, closing2,
+                               -1);
+            gtk_list_store_set(GTK_LIST_STORE(model), &iter2,
+                               NAME_COLUMN, fil1->actual_filter->name,
+                               DATA_COLUMN, fil1,
+                               INCOMING_COLUMN, incoming1,
+                               CLOSING_COLUMN, closing1,
+                               -1);
+            p->filters_modified = TRUE;
+        }
+    }
+}                               /* end fe_down_pressed */
 
 /*
- * fe_up_pressed()
+ * fr_up_pressed()
  *
  * Callback for the "Up" button
  */
 void
 fr_up_pressed(GtkWidget * widget, gpointer data)
 {
-    BalsaFilterRunDialog * p;
-    gint row;
+    BalsaFilterRunDialog *p = data;
+    GtkTreeModel *model =
+        gtk_tree_view_get_model(p->selected_filters);
+    GtkTreeSelection *selection =
+        gtk_tree_view_get_selection(p->selected_filters);
+    GtkTreeIter iter1, iter2;
+    LibBalsaMailboxFilter *fil1, *fil2;
+    gboolean incoming1, closing1;
+    gboolean incoming2, closing2;
 
-    p=BALSA_FILTER_RUN_DIALOG(data);
+    iter1.stamp = 0;
+    gtk_tree_selection_selected_foreach(selection, fr_pressed_func, &iter1);
+    if (iter1.stamp) {
+        GtkTreePath *path = gtk_tree_model_get_path(model, &iter1);
 
-    if (!p->selected_filters->selection)
-	return;
-
-    p->filters_modified=TRUE;       
-    row = GPOINTER_TO_INT(p->selected_filters->selection->data);
-    gtk_clist_swap_rows(p->selected_filters, row - 1, row);
-}			/* end fe_up_pressed */
+        if (gtk_tree_path_prev(path)) {
+            gtk_tree_model_get_iter(model, &iter2, path);
+            gtk_tree_model_get(model, &iter1,
+                               DATA_COLUMN, &fil1,
+                               INCOMING_COLUMN, &incoming1,
+                               CLOSING_COLUMN, &closing1,
+                               -1);
+            gtk_tree_model_get(model, &iter2,
+                               DATA_COLUMN, &fil2,
+                               INCOMING_COLUMN, &incoming2,
+                               CLOSING_COLUMN, &closing2,
+                               -1);
+            gtk_list_store_set(GTK_LIST_STORE(model), &iter1,
+                               NAME_COLUMN, fil2->actual_filter->name,
+                               DATA_COLUMN, fil2,
+                               INCOMING_COLUMN, incoming2,
+                               CLOSING_COLUMN, closing2,
+                               -1);
+            gtk_list_store_set(GTK_LIST_STORE(model), &iter2,
+                               NAME_COLUMN, fil1->actual_filter->name,
+                               DATA_COLUMN, fil1,
+                               INCOMING_COLUMN, incoming1,
+                               CLOSING_COLUMN, closing1,
+                               -1);
+            p->filters_modified = TRUE;
+        }
+        gtk_tree_path_free(path);
+    }
+}                               /* end fe_up_pressed */

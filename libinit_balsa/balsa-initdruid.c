@@ -55,11 +55,17 @@ balsa_initdruid(GtkWindow * window)
     g_return_if_fail(window != NULL);
     g_return_if_fail(GTK_IS_WINDOW(window));
 
-    gtk_object_ref(GTK_OBJECT(window));
     druid = GNOME_DRUID(gnome_druid_new());
     gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(druid));
+#if BALSA_MAJOR < 2
     gtk_signal_connect(GTK_OBJECT(druid), "cancel",
                        GTK_SIGNAL_FUNC(balsa_initdruid_cancel), NULL);
+    gtk_object_ref(GTK_OBJECT(window));
+#else
+    g_signal_connect(G_OBJECT(druid), "cancel",
+                     G_CALLBACK(balsa_initdruid_cancel), NULL);
+    g_object_ref(G_OBJECT(window));
+#endif /* BALSA_MAJOR < 2 */
 
     balsa_initdruid_init(druid);
 }
@@ -68,13 +74,20 @@ static void
 balsa_initdruid_cancel(GnomeDruid * druid)
 {
     GtkWidget *dialog =
-        gnome_question_dialog_modal(_("This will exit Balsa.\n"
-                                      "Do you really want to do this?"),
-                                    NULL, NULL);
-    gint reply = gnome_dialog_run_and_close(GNOME_DIALOG(dialog));
+        gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_ancestor
+                                          (GTK_WIDGET(druid), 
+                                           GTK_TYPE_WINDOW)),
+                               GTK_DIALOG_MODAL,
+                               GTK_MESSAGE_QUESTION,
+                               GTK_BUTTONS_YES_NO,
+                               _("This will exit Balsa.\n"
+                                 "Do you really want to do this?"));
+    GtkResponseType reply = 
+        gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
 
-    if (reply == GNOME_YES) {
+    if (reply == GTK_RESPONSE_YES) {
         gnome_config_drop_all();
-        gtk_exit(0);
+        exit(0);
     }
 }

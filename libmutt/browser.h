@@ -58,6 +58,7 @@ struct browser_state
   void (*mailbox_handler)();
   void (*folder_handler)();
   void* subfolders;    /* points to a GList */
+  void* cb_data;       /* data passed to {mailbox,folder}_handlers */
   /* BALSA data end */
 #endif
 };

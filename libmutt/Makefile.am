@@ -50,7 +50,6 @@ libmutt_a_SOURCES = \
 	signal.c 	\
 	sort.c 		\
 	url.c		\
-	acconfig.h	\
 	account.h	\
 	ascii.h		\
 	attach.h	\

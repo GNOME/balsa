@@ -33,6 +33,8 @@
 
 /* define _XOPEN_SOURCE to make strptime visible */
 #define _XOPEN_SOURCE
+/* extensions  needed additonally on Solaris for strptime */
+#define __EXTENSIONS__
 #include <stdio.h>
 #include <time.h>
 #include <sys/types.h>
@@ -75,10 +77,10 @@ libbalsa_condition_new_from_config()
 
     switch(newc->type) {
     case CONDITION_SIMPLE:
-	newc->match.string = gnome_config_get_string("Match-string");
+	newc->match.string=gnome_config_get_string("Match-string");
 	break;
     case CONDITION_REGEX:
-	gnome_config_get_vector("Reg-exps", &nbregexs, &regexs);
+	gnome_config_get_vector("Reg-exps",&nbregexs,&regexs);
 	for (i=0;i<nbregexs && (filter_errno==FILTER_NOERR);i++) {
 	    newreg = g_new(LibBalsaConditionRegex,1);
 	    newreg->string   = regexs[i];
@@ -90,34 +92,34 @@ libbalsa_condition_new_from_config()
 	g_free(regexs);
 	break;
     case CONDITION_DATE:
-	str = gnome_config_get_string("Low-date");
+	str=gnome_config_get_string("Low-date");
 	if (str[0]=='\0')
-	    newc->match.interval.date_low = 0;
+	    newc->match.interval.date_low=0;
 	else {
-	    (void) strptime("00:00:00", "%T", &date);
-	    p = (gchar*)strptime(str, "%Y-%m-%d", &date);
+	    (void) strptime("00:00:00","%T",&date);
+	    p=(gchar*)strptime(str,"%Y-%m-%d",&date);
 	    if (!p || *p!='\0')
-		filter_errno = FILTER_EFILESYN;
-	    else newc->match.interval.date_low = mktime(&date);
+		filter_errno=FILTER_EFILESYN;
+	    else newc->match.interval.date_low=mktime(&date);
 	}
 	g_free(str);
-	str = gnome_config_get_string("High-date");
+	str=gnome_config_get_string("High-date");
 	if (str[0]=='\0')
-	    newc->match.interval.date_high = 0;
+	    newc->match.interval.date_high=0;
 	else {
-	    (void) strptime("23:59:59", "%T", &date);
-	    p=(gchar *)strptime(str, "%Y-%m-%d", &date);
+	    (void) strptime("23:59:59","%T",&date);
+	    p=(gchar *)strptime(str,"%Y-%m-%d",&date);
 	    if (!p || *p!='\0')
-		filter_errno = FILTER_EFILESYN;
-	    else newc->match.interval.date_high = mktime(&date);
+		filter_errno=FILTER_EFILESYN;
+	    else newc->match.interval.date_high=mktime(&date);
 	}
 	g_free(str);
 	break;
     case CONDITION_FLAG:
-	newc->match.flags = gnome_config_get_int("Flags");
+	newc->match.flags=gnome_config_get_int("Flags");
 	break;
     default:
-	filter_errno = FILTER_EFILESYN;
+	filter_errno=FILTER_EFILESYN;
     }
 
     return newc;
@@ -155,46 +157,45 @@ libbalsa_conditions_new_from_config(gchar * prefix,
                                     gchar * filter_section_name,
                                     LibBalsaFilter* fil)
 {
-    LibBalsaCondition * cond;
+    LibBalsaCondition* cond;
     void *iterator;
-    gchar *tmp,*condprefix,*key;
-    gint pref_len =
-	strlen(CONDITION_SECTION_PREFIX)+strlen(filter_section_name)+1;
-    gint err = FILTER_NOERR;
-    GList * tmp_list = NULL;
+    gchar *tmp,* condprefix,*key;
+    gint pref_len=strlen(CONDITION_SECTION_PREFIX)+strlen(filter_section_name)+1;
+    gint err=FILTER_NOERR;
+    GList * tmp_list=NULL;
     GList *l;
 
     FILTER_SETFLAG(fil,FILTER_VALID);
     FILTER_SETFLAG(fil,FILTER_COMPILED);
 
-    tmp = g_strconcat(CONDITION_SECTION_PREFIX, filter_section_name, ":", NULL);
+    tmp=g_strconcat(CONDITION_SECTION_PREFIX,filter_section_name,":",NULL);
     iterator = gnome_config_init_iterator_sections(prefix);
-    filter_errno = FILTER_NOERR;
+    filter_errno=FILTER_NOERR;
 
     while ((filter_errno==FILTER_NOERR) &&
 	   (iterator = gnome_config_iterator_next(iterator, &key, NULL))) {
 	
-	if (strncmp(key, tmp, pref_len)==0) {
-	    condprefix = g_strconcat(prefix, key, "/", NULL);
+	if (strncmp(key,tmp,pref_len)==0) {
+	    condprefix=g_strconcat(prefix,key,"/",NULL);
 	    gnome_config_push_prefix(condprefix);
 	    g_free(condprefix);
-	    cond = libbalsa_condition_new_from_config();
+	    cond=libbalsa_condition_new_from_config();
 	    if (cond) {
 		if (filter_errno==FILTER_EFILESYN) {
 		    /* We don't stop the process for syntax error, we
 		     * just discard the malformed condition we also
 		     * remember (with err) that a syntax error occurs
 		     */
-		    err = FILTER_EFILESYN;
-		    filter_errno = FILTER_NOERR;
+		    err=FILTER_EFILESYN;
+		    filter_errno=FILTER_NOERR;
 		    libbalsa_condition_free(cond);
 		}
 		else {
-		    LibBalsaTempCondition * tmp = g_new(LibBalsaTempCondition,1);
+		    LibBalsaTempCondition * tmp=g_new(LibBalsaTempCondition,1);
 		    
-		    tmp->cnd = cond;
-		    tmp->order = atoi(strrchr(key,':')+1);
-		    tmp_list = g_list_prepend(tmp_list, tmp);
+		    tmp->cnd=cond;
+		    tmp->order=atoi(strrchr(key,':')+1);
+		    tmp_list=g_list_prepend(tmp_list,tmp);
 		}
 	    }
 	    else FILTER_CLRFLAG(fil,FILTER_VALID);
@@ -203,22 +204,23 @@ libbalsa_conditions_new_from_config(gchar * prefix,
 	g_free(key);
     }
     g_free(tmp);
+    /* We position filter_errno to the last non-critical error */
     if (filter_errno==FILTER_NOERR) {
 	LibBalsaTempCondition * tmp;
 
-	/* We position filter_errno to the last non-critical error */
 	filter_errno=err;
 	/* We sort the list of temp conditions, then
 	   we populate the conditions list of the filter */
 	tmp_list=g_list_sort(tmp_list,compare_conditions_order);
-	for (l = tmp_list;l;l = g_list_next(l)) {
-	    tmp = (LibBalsaTempCondition *)(l->data);
+        l = tmp_list;
+	for (;tmp_list; tmp_list = g_list_next(tmp_list)) {
+	    tmp=(LibBalsaTempCondition *)(tmp_list->data);
 	    libbalsa_filter_prepend_condition(fil,tmp->cnd);
 	    g_free(tmp);
 	}
-        g_list_free(tmp_list);
+        g_list_free(l);
 	/* We don't do a g_list_reverse because the comparison func
-	   which dictates the order of the list after the sort is already
+	   which dictate the order of the list after the sort is already
 	   reversed */
     }
 }
@@ -266,8 +268,8 @@ libbalsa_condition_save_config(LibBalsaCondition * cond)
     gchar str[20];
 
     gnome_config_set_int("Type", cond->type);
-    gnome_config_set_bool("Condition-not", cond->condition_not);
-    gnome_config_set_int("Match-fields", cond->match_fields);
+    gnome_config_set_bool("Condition-not",cond->condition_not);
+    gnome_config_set_int("Match-fields",cond->match_fields);
 
     /* We clean all other keys, to have a clean config file */
     if (cond->type!=CONDITION_SIMPLE) gnome_config_clean_key("Match-string");
@@ -277,32 +279,33 @@ libbalsa_condition_save_config(LibBalsaCondition * cond)
 	gnome_config_clean_key("High-date");
     }
     if (cond->type!=CONDITION_FLAG) gnome_config_clean_key("Flags");
-    if (!CONDITION_CHKMATCH(cond, CONDITION_MATCH_US_HEAD))
+    if (!CONDITION_CHKMATCH(cond,CONDITION_MATCH_US_HEAD))
 	gnome_config_clean_key("User-header");
     else
-	gnome_config_set_string("User-header", cond->user_header);
+	gnome_config_set_string("User-header",cond->user_header);
 
     switch(cond->type) {
     case CONDITION_SIMPLE:
-	gnome_config_set_string("Match-string", cond->match.string);
+	gnome_config_set_string("Match-string",cond->match.string);
 	break;
     case CONDITION_REGEX:
-	reg = cond->match.regexs;
-	nbregexs = g_slist_length(reg);
-	regexs = g_new(const char *, nbregexs);
-	for (i = 0;reg;reg = g_slist_next(reg), i++)
-	    regexs[i] = ((LibBalsaConditionRegex*)reg->data)->string;
+	reg=cond->match.regexs;
+	nbregexs=g_slist_length(reg);
+	/* FIXME : g_new could fail (rarely because it's only a small alloc)*/
+	regexs=g_new(const char *,nbregexs);
+	for (i=0;reg;reg=g_slist_next(reg),i++)
+	    regexs[i]=((LibBalsaConditionRegex*)reg->data)->string;
 	gnome_config_set_vector("Reg-exps", nbregexs, regexs);
 	g_free(regexs);
 	break;
     case CONDITION_DATE:
 	if (cond->match.interval.date_low)
-	    strftime(str, sizeof(str), "%Y-%m-%d",
+	    strftime(str,sizeof(str),"%Y-%m-%d",
                      localtime(&cond->match.interval.date_low));
-	else str[0] = '\0';
-	gnome_config_set_string("Low-date", str);
+	else str[0]='\0';
+	gnome_config_set_string("Low-date",str);
 	if (cond->match.interval.date_high)
-	    strftime(str, sizeof(str), "%Y-%m-%d",
+	    strftime(str,sizeof(str),"%Y-%m-%d",
                      localtime(&cond->match.interval.date_high));
 	else str[0]='\0';
 	gnome_config_set_string("High-date",str);
@@ -320,9 +323,11 @@ libbalsa_real_clean_condition_sections(gchar * buffer,gchar * num_pointer,
 				       gint begin)
 {
     while (TRUE) {
-	sprintf(num_pointer, "%d/", begin++);
-	if (gnome_config_has_section(buffer))
+	sprintf(num_pointer,"%d/",begin++);
+	if (gnome_config_has_section(buffer)) {
+	    g_print("Cleaning section %s\n",buffer);
 	    gnome_config_clean_section(buffer);
+	}
 	else break;
     }
 }
@@ -341,8 +346,8 @@ libbalsa_clean_condition_sections(const gchar * prefix,
     buffer = g_strdup_printf("%s"  CONDITION_SECTION_PREFIX 
 			     "%s:" CONDITION_SECTION_MAX "/",
 			     prefix, filter_section_name);
-    tmp = strrchr(buffer,':')+1;
-    libbalsa_real_clean_condition_sections(buffer, tmp, 0);
+    tmp=strrchr(buffer,':')+1;
+    libbalsa_real_clean_condition_sections(buffer,tmp,0);
     g_free(buffer);
 }
 
@@ -358,16 +363,17 @@ void
 libbalsa_conditions_save_config(GSList * conds, const gchar * prefix,
 				const gchar * filter_section_name)
 {
-    gint nb = 0;
+    gint nb=0;
     gchar * buffer,* tmp;
 
     /* We allocate once for all a buffer to store conditions sections names */
     buffer = g_strdup_printf("%s"  CONDITION_SECTION_PREFIX 
 			     "%s:" CONDITION_SECTION_MAX "/",
 			     prefix,filter_section_name);
-    tmp = strrchr(buffer,':')+1;
-    for (;conds;conds = g_slist_next(conds), nb++) {
+    tmp=strrchr(buffer,':')+1;
+    for (;conds;conds=g_slist_next(conds),nb++) {
 	sprintf(tmp, "%d/", nb);
+	g_print("Saving condition : %s in %s\n", buffer, filter_section_name);
 	gnome_config_push_prefix(buffer);
 	libbalsa_condition_save_config((LibBalsaCondition*) conds->data);
 	gnome_config_pop_prefix();
@@ -405,17 +411,17 @@ libbalsa_filter_save_config(LibBalsaFilter * fil)
 void
 libbalsa_mailbox_filters_load_config(LibBalsaMailbox* mbox)
 {
-    gint i, nb_filters;
-    gchar **filters_names = NULL;
+    gint i,nb_filters;
+    gchar **filters_names=NULL;
     LibBalsaFilter* fil;
     gboolean def;
     GSList * lst;
 
     /* We load the associated filters */
-    gnome_config_get_vector_with_default(MAILBOX_FILTERS_KEY, &nb_filters,
-					 &filters_names, &def);
+    gnome_config_get_vector_with_default(MAILBOX_FILTERS_KEY,&nb_filters,
+					 &filters_names,&def);
     if (!def) {
-	for(i=0; i<nb_filters; i++) {
+	for(i=0;i<nb_filters;i++) {
 	    fil = libbalsa_filter_get_by_name(filters_names[i]);
 	    if (fil) {
 		LibBalsaMailboxFilter* mf = g_new(LibBalsaMailboxFilter,1);
@@ -423,33 +429,32 @@ libbalsa_mailbox_filters_load_config(LibBalsaMailbox* mbox)
 		mf->actual_filter = fil;
 		mbox->filters=g_slist_prepend(mbox->filters, mf);
 	    }
-	    else {
- 		libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+	    else
+		libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 				     _("Invalid filters %s for mailbox %s"),
                                      filters_names[i], mbox->name);
-		filter_errno = FILTER_EFILESYN;
-	    }
 	}
-	mbox->filters = g_slist_reverse(mbox->filters);
+	mbox->filters=g_slist_reverse(mbox->filters);
     }
     g_strfreev(filters_names);
     if (!def) {
 	gnome_config_get_vector_with_default(MAILBOX_FILTERS_WHEN_KEY,
-                                             &nb_filters, &filters_names, &def);
+                                             &nb_filters,&filters_names,&def);
 	if (def)
-	    for(lst=mbox->filters; lst; lst=g_slist_next(lst))
-		FILTER_WHEN_SETFLAG(((LibBalsaMailboxFilter*)lst->data),
+	    for(lst=mbox->filters;lst;lst=g_slist_next(lst))
+		FILTER_WHEN_SETFLAG((LibBalsaMailboxFilter*)lst->data,
 				    FILTER_WHEN_NEVER);
 	else {
-	    lst = mbox->filters;
-	    for (i = 0;i<nb_filters && lst;i++) {
+	    lst=mbox->filters;
+	    for (i=0;i<nb_filters && lst;i++) {
 		((LibBalsaMailboxFilter*)lst->data)->when = 
                     atoi(filters_names[i]);
-		lst = g_slist_next(lst);
+		lst=g_slist_next(lst);
 	    }
 	}
 	g_strfreev(filters_names);
     }
+    filter_errno=FILTER_NOERR;
 }
 
 /* Saves the filters associated to the mailbox
@@ -457,42 +462,41 @@ libbalsa_mailbox_filters_load_config(LibBalsaMailbox* mbox)
 
 void libbalsa_mailbox_filters_save_config(LibBalsaMailbox * mbox)
 {
-    gint i,nb_filters = 0;
+    gint i,nb_filters=0;
     gchar ** filters_names;
-    GSList * fil,* names = NULL,* lst;
+    GSList * fil,* names=NULL,* lst;
 
     /* First we construct a list containing the names of associated filters
-       Note : in all the following we never copy the filters name, so we don't
-       have to (and me must not!) free any gchar *
-       That's why we only free g_slist and gchar **
-    */
-    for(fil = mbox->filters; fil; fil = g_slist_next(fil)) {
+     * Note : in all the following we never copy the filters name, so we don't have to (and me must not!) free any gchar *
+     * That's why we only free g_slist and gchar **
+     */
+    for(fil=mbox->filters;fil;fil=g_slist_next(fil)) {
 	names=g_slist_prepend(names,
                               ((LibBalsaMailboxFilter*)fil->data)->actual_filter->name);
 	nb_filters++;
     }
-    names = g_slist_reverse(names);
+    names=g_slist_reverse(names);
     /* Second we construct the vector of gchar * */
-    filters_names = g_new(gchar *, nb_filters);
-    lst = names;
-    for(i = 0; i<nb_filters; i++) {
-	filters_names[i] = (gchar*)lst->data;
-	lst = g_slist_next(lst);
+    filters_names=g_new(gchar *,nb_filters);
+    lst=names;
+    for(i=0; i<nb_filters; i++) {
+	filters_names[i]=(gchar*)lst->data;
+	lst=g_slist_next(lst);
     }
     g_slist_free(names);
-    gnome_config_set_vector(MAILBOX_FILTERS_KEY, nb_filters,
+    gnome_config_set_vector(MAILBOX_FILTERS_KEY,nb_filters,
                             (const gchar**)filters_names);
 
-    fil = mbox->filters;
-    for (i = 0;i<nb_filters;i++) {
+    fil=mbox->filters;
+    for (i=0;i<nb_filters;i++) {
 	filters_names[i]=
             g_strdup_printf("%d",
                             ((LibBalsaMailboxFilter*)fil->data)->when);
-	fil = g_slist_next(fil);
+	fil=g_slist_next(fil);
     }
-    gnome_config_set_vector(MAILBOX_FILTERS_WHEN_KEY, nb_filters,
+    gnome_config_set_vector(MAILBOX_FILTERS_WHEN_KEY,nb_filters,
                             (const gchar**)filters_names);
-    for (i = 0;i<nb_filters;i++)
+    for (i=0;i<nb_filters;i++)
 	g_free(filters_names[i]);
     g_free(filters_names);
 }

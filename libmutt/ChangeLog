@@ -1,9 +1,12 @@
-2003-01-03  Carlos Morgado  <chbm@chbm.nu>
+2003-01-10  Pawel Salek  <pawsa@theochem.kth.se>
 
-	* imap/message.c: 
-	* imap/imap.h: 
-	pull imap_update_header info() out of
-        imap_fetch_message() (from pawel on BALSA_2)
+	* parse.c: follow rfc2045 closer.
+	restore parsing dispnotify_to (Albrecht Dreﬂ).
+
+2003-01-03  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* imap/message.c,imap/imap.h: pull imap_update_header info() out of
+	imap_fetch_message().
 
 2003-01-02  Pawel Salek  <pawsa@theochem.kth.se>
 
@@ -13,37 +16,48 @@
 
 	* imap/message.c (imap_append_message): read last line
 
-2002-10-01  Emmanuel <e.allaud@wanadoo.fr>
-
-	* imap/imap.c (imap_uid_search): add search type (seq no/UID) param.
-
-2002-09-18  Carlos Morgado  <chbm@chbm.nu>
-
-	* account.c (mutt_account_getuser): cosmetic
-
 2002-09-14  Carlos Morgado  <chbm@chbm.nu>
 
-	* handler.c: we live in a MIME world, non MIME is us-ascii (PB)
+	* handler.c:  we live in a MIME world, non MIME is us-ascii (PB)
 
 2002-08-29  Carlos Morgado  <chbm@chbm.nu>
 
-	* rx/: removed. it wasn't used
+        * rx/: removed. it wasn't used
+
+2002-08-28  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* Makefile.am: remove acconfig.h - fix dist target.
+
+2002-08-26  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* browser.h: add cb_state field to browser.
 
 2002-08-06  Pawel Salek  <pawsa@theochem.kth.se>
 
-	* configure.in, Makefile.am: build with autoconf-2.53
+	* configure.in: use AC_LIBOBJ, add missing AC_DEFINE templates.
+
+2002-06-23  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* mutt_ssl.c: support for storing SSL certificates.
 
 2002-06-09  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* imap/browse.c: imap_mailbox_rename() return status.
 	* imap/imap.[ch]: imap_subscribe accepts const char* argument.
+
+2002-05-31  Carlos Morgado  <chbm@chbm.nu>
+
+	* Makefile.am:
+	* rfc1524.c:
+	* rfc2231.c:
+	* rfc2231.h
+	sync with HEAD
 	
-2002-05-31  Carlos Morgado  <chbm@cprm.net>
-
-	* configure.in: one more stab at detecting iconv correctly
-
 2002-05-30  Carlos Morgado  <chbm@chbm.nu>
 
+	copied libmutt from HEAD to BALSA2, there were some changes
+	on HEAD uncommited to 2
+	
 	* send.c: unused, removed  
 
 	* sendlib.c: 

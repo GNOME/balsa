@@ -26,19 +26,12 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <unistd.h>
-
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
-#endif
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 #include "mailbackend.h"
-
 #include "mailbox-filter.h"
-#include "filter-file.h"
-#include <libgnome/gnome-defs.h> 
+
 #include <libgnome/gnome-config.h> 
 #include <libgnome/gnome-i18n.h> 
 
@@ -52,7 +45,7 @@ static LibBalsaMailboxClass *parent_class = NULL;
 
 static void libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass *klass);
 static void libbalsa_mailbox_local_init(LibBalsaMailboxLocal * mailbox);
-static void libbalsa_mailbox_local_destroy(GtkObject * object);
+static void libbalsa_mailbox_local_finalize(GObject * object);
 
 static gboolean libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox);
 static LibBalsaMailboxAppendHandle*
@@ -63,28 +56,30 @@ static void libbalsa_mailbox_local_save_config(LibBalsaMailbox * mailbox,
 					       const gchar * prefix);
 static void libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
 					       const gchar * prefix);
+static void run_filters_on_reception(LibBalsaMailbox * mailbox);
 
-static void
-run_filters_on_reception(LibBalsaMailbox * mailbox);
-
-GtkType libbalsa_mailbox_local_get_type(void)
+GType
+libbalsa_mailbox_local_get_type(void)
 {
-    static GtkType mailbox_type = 0;
+    static GType mailbox_type = 0;
 
     if (!mailbox_type) {
-	static const GtkTypeInfo mailbox_info = {
-	    "LibBalsaMailboxLocal",
-	    sizeof(LibBalsaMailboxLocal),
+	static const GTypeInfo mailbox_info = {
 	    sizeof(LibBalsaMailboxLocalClass),
-	    (GtkClassInitFunc) libbalsa_mailbox_local_class_init,
-	    (GtkObjectInitFunc) libbalsa_mailbox_local_init,
-	    /* reserved_1 */ NULL,
-	    /* reserved_2 */ NULL,
-	    (GtkClassInitFunc) NULL,
+            NULL,               /* base_init */
+            NULL,               /* base_finalize */
+	    (GClassInitFunc) libbalsa_mailbox_local_class_init,
+            NULL,               /* class_finalize */
+            NULL,               /* class_data */
+	    sizeof(LibBalsaMailboxLocal),
+            0,                  /* n_preallocs */
+	    (GInstanceInitFunc) libbalsa_mailbox_local_init
 	};
 
 	mailbox_type =
-	    gtk_type_unique(libbalsa_mailbox_get_type(), &mailbox_info);
+	    g_type_register_static(LIBBALSA_TYPE_MAILBOX,
+	                           "LibBalsaMailboxLocal",
+                                   &mailbox_info, 0);
     }
 
     return mailbox_type;
@@ -93,27 +88,24 @@ GtkType libbalsa_mailbox_local_get_type(void)
 static void
 libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
 {
-    GtkObjectClass *object_class;
+    GObjectClass *object_class;
     LibBalsaMailboxClass *libbalsa_mailbox_class;
 
-    object_class = GTK_OBJECT_CLASS(klass);
+    object_class = G_OBJECT_CLASS(klass);
     libbalsa_mailbox_class = LIBBALSA_MAILBOX_CLASS(klass);
 
-    parent_class = gtk_type_class(libbalsa_mailbox_get_type());
+    parent_class = g_type_class_peek_parent(klass);
 
     libbalsa_mailbox_local_signals[REMOVE_FILES] =
-	gtk_signal_new("remove-files",
-		       GTK_RUN_LAST,
-		       object_class->type,
-		       GTK_SIGNAL_OFFSET(LibBalsaMailboxLocalClass,
-					 remove_files),
-		       gtk_marshal_NONE__NONE, GTK_TYPE_NONE, 0);
+	g_signal_new("remove-files",
+                     G_TYPE_FROM_CLASS(object_class),
+		     G_SIGNAL_RUN_LAST,
+		     G_STRUCT_OFFSET(LibBalsaMailboxLocalClass,
+				     remove_files),
+                     NULL, NULL,
+		     g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
-    gtk_object_class_add_signals(object_class, libbalsa_mailbox_local_signals,
-				 LAST_SIGNAL);
-
-
-    object_class->destroy = libbalsa_mailbox_local_destroy;
+    object_class->finalize = libbalsa_mailbox_local_finalize;
 
     libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_local_open;
     libbalsa_mailbox_class->open_mailbox_append 
@@ -133,10 +125,10 @@ libbalsa_mailbox_local_init(LibBalsaMailboxLocal * mailbox)
 {
 }
 
-GtkObject *
+GObject *
 libbalsa_mailbox_local_new(const gchar * path, gboolean create)
 {
-    GtkType magic_type = libbalsa_mailbox_type_from_path(path);
+    GType magic_type = libbalsa_mailbox_type_from_path(path);
 
     if(magic_type == LIBBALSA_TYPE_MAILBOX_MBOX)
 	return libbalsa_mailbox_mbox_new(path, create);
@@ -173,7 +165,7 @@ libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 
     if ( LIBBALSA_MAILBOX(mailbox)->url != NULL ) {
 	const gchar* cur_path = libbalsa_mailbox_local_get_path(mailbox);
-	if (g_strcasecmp(path, cur_path) == 0)
+	if (g_ascii_strcasecmp(path, cur_path) == 0)
 	    return 0;
 	else 
 	    i = rename(cur_path, path);
@@ -202,13 +194,13 @@ libbalsa_mailbox_local_remove_files(LibBalsaMailboxLocal *mailbox)
 {
     g_return_if_fail (LIBBALSA_IS_MAILBOX_LOCAL(mailbox));
 
-    gtk_signal_emit(GTK_OBJECT(mailbox),
-		    libbalsa_mailbox_local_signals[REMOVE_FILES]);
+    g_signal_emit(G_OBJECT(mailbox),
+		  libbalsa_mailbox_local_signals[REMOVE_FILES], 0);
 
 }
 
 static void
-libbalsa_mailbox_local_destroy(GtkObject * object)
+libbalsa_mailbox_local_finalize(GObject * object)
 {
     LibBalsaMailbox *mailbox;
 
@@ -217,39 +209,8 @@ libbalsa_mailbox_local_destroy(GtkObject * object)
     mailbox = LIBBALSA_MAILBOX(object);
     libbalsa_notify_unregister_mailbox(mailbox);
 
-    if (GTK_OBJECT_CLASS(parent_class)->destroy)
-	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
-}
-
-/* Helper function to run the "on reception" filters on a mailbox */
-
-static void
-run_filters_on_reception(LibBalsaMailbox * mailbox)
-{
-    GSList * filters;
-    GList * new_messages;
-
-    if (!mailbox->filters)                                
-        config_mailbox_filters_load(mailbox);
-
-    filters = libbalsa_mailbox_filters_when(mailbox->filters,
-                                            FILTER_WHEN_INCOMING);
-    /* We apply filter if needed */
-    if (filters) {
-	LOCK_MAILBOX(mailbox);
-	new_messages=libbalsa_extract_new_messages(mailbox->message_list);
-	if (new_messages) {
-	    if (filters_prepare_to_run(filters)) {
-		libbalsa_filter_match(filters, new_messages, TRUE);
-		UNLOCK_MAILBOX(mailbox);
-		libbalsa_filter_apply(filters);
-	    }
-	    else UNLOCK_MAILBOX(mailbox);
-	    g_list_free(new_messages);
-	}
-	else UNLOCK_MAILBOX(mailbox);
-	g_slist_free(filters);
-    }
+    if (G_OBJECT_CLASS(parent_class)->finalize)
+	G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
 /* libbalsa_mailbox_local_open:
@@ -267,7 +228,9 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox)
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox), FALSE);
 
+#ifdef BALSA_USE_THREADS
     gdk_threads_leave();
+#endif
 
     LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
     local = LIBBALSA_MAILBOX_LOCAL(mailbox);
@@ -277,13 +240,17 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox)
 	/* incriment the reference count */
 	mailbox->open_ref++;
 	UNLOCK_MAILBOX(mailbox);
+#ifdef BALSA_USE_THREADS
 	gdk_threads_enter();
+#endif
 	return TRUE;
     }
 
     if (stat(path, &st) == -1) {
 	UNLOCK_MAILBOX(mailbox);
+#ifdef BALSA_USE_THREADS
 	gdk_threads_enter();
+#endif
 	return FALSE;
     }
     
@@ -293,7 +260,9 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox)
     
     if (!CLIENT_CONTEXT_OPEN(mailbox)) {
 	UNLOCK_MAILBOX(mailbox);
+#ifdef BALSA_USE_THREADS
 	gdk_threads_enter();
+#endif
 	return FALSE;
     }
     mailbox->readonly = CLIENT_CONTEXT(mailbox)->readonly;
@@ -303,11 +272,11 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox)
     mailbox->new_messages = CLIENT_CONTEXT(mailbox)->msgcount;
     mailbox->open_ref++;
     UNLOCK_MAILBOX(mailbox);
+#ifdef BALSA_USE_THREADS
     gdk_threads_enter();
+#endif
     libbalsa_mailbox_load_messages(mailbox);
     
-    run_filters_on_reception(mailbox);
-
     /* increment the reference count */
 #ifdef DEBUG
     g_print(_("LibBalsaMailboxLocal: Opening %s Refcount: %d\n"),
@@ -340,6 +309,40 @@ libbalsa_mailbox_local_append(LibBalsaMailbox * mailbox)
     return res;
 }
 
+/* Helper function to run the "on reception" filters on a mailbox */
+
+static void
+run_filters_on_reception(LibBalsaMailbox * mailbox)
+{
+    GSList * filters;
+    GList * new_messages;
+
+    if (!mailbox->filters)                                
+        config_mailbox_filters_load(mailbox);
+
+    filters = libbalsa_mailbox_filters_when(mailbox->filters,
+                                            FILTER_WHEN_INCOMING);
+    /* We apply filter if needed */
+    if (filters) {
+	LOCK_MAILBOX(mailbox);
+	new_messages = libbalsa_extract_new_messages(mailbox->message_list);
+	if (new_messages) {
+	    if (filters_prepare_to_run(filters)) {
+		libbalsa_filter_match(filters, new_messages, TRUE);
+		UNLOCK_MAILBOX(mailbox);
+		libbalsa_filter_apply(filters);
+	    }
+	    else UNLOCK_MAILBOX(mailbox);
+	    g_list_free(new_messages);
+	}
+	else UNLOCK_MAILBOX(mailbox);
+	g_slist_free(filters);
+    }
+}
+
+/* As all check functions, this one assumes gdk lock HELD
+   and other locks NOT HELD.
+*/
 static void
 libbalsa_mailbox_local_check(LibBalsaMailbox * mailbox)
 {
@@ -349,6 +352,9 @@ libbalsa_mailbox_local_check(LibBalsaMailbox * mailbox)
     } else {
 	gint i = 0;
 	gint index_hint;
+
+	/* Release lock before doing the backend work */
+	gdk_threads_leave();
 
 	LOCK_MAILBOX(mailbox);
 
@@ -371,11 +377,15 @@ libbalsa_mailbox_local_check(LibBalsaMailbox * mailbox)
 	    mailbox->new_messages =
 		CLIENT_CONTEXT(mailbox)->msgcount - mailbox->messages;
 	    UNLOCK_MAILBOX(mailbox);
+	    /* Reacquire the lock before leaving and calling
+	       libbalsa_mailbox_load_messages which assumes gdk lock held */
+	    gdk_threads_enter();
 	    libbalsa_mailbox_load_messages(mailbox);
 	    run_filters_on_reception(mailbox);
-
 	} else {
 	    UNLOCK_MAILBOX(mailbox);
+	    /* Reacquire the lock before leaving */
+	    gdk_threads_enter();
 	}
     }
 }

@@ -23,7 +23,6 @@
 #define __LIBBALSA_MESSAGE_H__
 
 #include <glib.h>
-#include <gtk/gtk.h>
 
 #include <stdio.h>
 #include <time.h>
@@ -32,18 +31,18 @@
 #include <auth-client.h>
 #endif
 
-/* do copy content, otherwise we get too many races conditions.
-   Most common was to grab subject and then see libmutt delete its data
-   under us (get_subject errors). The solution would be to 
-   lock data harder seem to require a major reengineering.
-*/
-#define MESSAGE_COPY_CONTENT 1
-
-#define LIBBALSA_TYPE_MESSAGE                      (libbalsa_message_get_type())
-#define LIBBALSA_MESSAGE(obj)                      (GTK_CHECK_CAST(obj, LIBBALSA_TYPE_MESSAGE, LibBalsaMessage))
-#define LIBBALSA_MESSAGE_CLASS(klass)              (GTK_CHECK_CLASS_CAST(klass, LIBBALSA_TYPE_MESSAGE, LibBalsaMessageClass))
-#define LIBBALSA_IS_MESSAGE(obj)                   (GTK_CHECK_TYPE(obj, LIBBALSA_TYPE_MESSAGE))
-#define LIBBALSA_IS_MESSAGE_CLASS(klass)           (GTK_CHECK_CLASS_TYPE(klass, LIBBALSA_TYPE_MESSAGE))
+/* #define MESSAGE_COPY_CONTENT 1 */
+#define LIBBALSA_TYPE_MESSAGE \
+    (libbalsa_message_get_type())
+#define LIBBALSA_MESSAGE(obj) \
+    (G_TYPE_CHECK_INSTANCE_CAST(obj, LIBBALSA_TYPE_MESSAGE, LibBalsaMessage))
+#define LIBBALSA_MESSAGE_CLASS(klass) \
+    (G_TYPE_CHECK_CLASS_CAST(klass, LIBBALSA_TYPE_MESSAGE, \
+                             LibBalsaMessageClass))
+#define LIBBALSA_IS_MESSAGE(obj) \
+    (G_TYPE_CHECK_INSTANCE_TYPE(obj, LIBBALSA_TYPE_MESSAGE))
+#define LIBBALSA_IS_MESSAGE_CLASS(klass) \
+    (G_TYPE_CHECK_CLASS_TYPE(klass, LIBBALSA_TYPE_MESSAGE))
 
 typedef struct _LibBalsaMessageClass LibBalsaMessageClass;
 typedef enum _LibBalsaMessageFlag LibBalsaMessageFlag;
@@ -56,7 +55,7 @@ enum _LibBalsaMessageFlag {
 };
 
 struct _LibBalsaMessage {
-    GtkObject object;
+    GObject object;
 
     /* the mailbox this message belongs to */
     LibBalsaMailbox *mailbox;
@@ -106,7 +105,7 @@ struct _LibBalsaMessage {
 
     /* miscellaneous headers */
     GList *user_headers;
-    
+
     /* message ID */
     gchar *message_id;
 
@@ -128,21 +127,29 @@ struct _LibBalsaMessage {
 #define LIBBALSA_MESSAGE_GET_NO(m)  libbalsa_message_get_no(m)
 #endif
 };
-#define LIBBALSA_MESSAGE_IS_FLAGGED(m)\
- ((m)->flags&LIBBALSA_MESSAGE_FLAG_FLAGGED)
+
+#define LIBBALSA_MESSAGE_HAS_FLAG(message, mask) \
+    ((LIBBALSA_MESSAGE(message)->flags & mask) != 0)
+#define LIBBALSA_MESSAGE_IS_UNREAD(message) \
+    LIBBALSA_MESSAGE_HAS_FLAG(message, LIBBALSA_MESSAGE_FLAG_NEW)
+#define LIBBALSA_MESSAGE_IS_DELETED(message) \
+    LIBBALSA_MESSAGE_HAS_FLAG(message, LIBBALSA_MESSAGE_FLAG_DELETED)
+#define LIBBALSA_MESSAGE_IS_REPLIED(message) \
+    LIBBALSA_MESSAGE_HAS_FLAG(message, LIBBALSA_MESSAGE_FLAG_REPLIED)
+#define LIBBALSA_MESSAGE_IS_FLAGGED(message) \
+    LIBBALSA_MESSAGE_HAS_FLAG(message, LIBBALSA_MESSAGE_FLAG_FLAGGED)
 
 struct _LibBalsaMessageClass {
-    GtkObjectClass parent_class;
+    GObjectClass parent_class;
 
     /* deal with flags being set/unset */
     /* Signal: */
     void (*status_changed) (LibBalsaMessage * message,
 			    LibBalsaMessageFlag flag, gboolean);
-
 };
 
 
-GtkType libbalsa_message_get_type(void);
+GType libbalsa_message_get_type(void);
 
 /*
  * messages
@@ -211,7 +218,7 @@ gchar *libbalsa_message_title(LibBalsaMessage * message,
 gchar **libbalsa_create_hdr_pair(const gchar * name, gchar * value);
 
 const gchar *libbalsa_message_pathname(LibBalsaMessage * message);
-const gchar *libbalsa_message_charset(LibBalsaMessage * message);
+gchar *libbalsa_message_charset(LibBalsaMessage * message);
 const gchar *libbalsa_message_body_charset(LibBalsaMessageBody * body);
 gboolean libbalsa_message_is_multipart(LibBalsaMessage * message);
 gboolean libbalsa_message_has_attachment(LibBalsaMessage * message);
@@ -219,8 +226,6 @@ gboolean libbalsa_message_has_attachment(LibBalsaMessage * message);
 GList *libbalsa_message_user_hdrs(LibBalsaMessage * message);
 GList *libbalsa_message_find_user_hdr(LibBalsaMessage * message, 
                                       const gchar * find);
-LibBalsaMessage *libbalsa_message_find_by_message_id(LibBalsaMailbox * mailbox,
-						     gchar * msgid);
 FILE* libbalsa_message_get_part_by_id(LibBalsaMessage* msg, const gchar* id);
 
 void libbalsa_message_set_dispnotify(LibBalsaMessage *message, 

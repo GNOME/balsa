@@ -23,7 +23,10 @@
 
 #include "libbalsa.h"
 
-LibBalsaAddressBook *balsa_address_book_config_new(LibBalsaAddressBook *
-						   address_book);
+void balsa_address_book_config_new(LibBalsaAddressBook * address_book,
+                                   void (*cb) (LibBalsaAddressBook *
+                                               address_book,
+                                               gboolean append),
+                                   GtkWindow * parent);
 
 #endif				/* __ADDRESS_BOOK_CONFIG_H__ */

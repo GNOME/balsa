@@ -28,8 +28,6 @@
 #ifndef __FILTER_EXPORT_H__
 #define __FILTER_EXPORT_H__
 
-#include <gnome.h>
-
 #include "filter.h"
 #include "filter-funcs.h"
 
@@ -40,7 +38,6 @@
 void fex_destroy_window_cb(GtkWidget * widget,gpointer throwaway);
 
 /* button callbacks */
-void fex_dialog_buttons_cb(GtkWidget * widget, gint button,
-			   gpointer data);
+void fex_dialog_response(GtkWidget * widget, gint response, gpointer data);
 
 #endif /*__FILTER_EXPORT_H__ */

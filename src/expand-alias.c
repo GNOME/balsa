@@ -24,6 +24,7 @@
 #include "libbalsa.h"
 
 #include <gnome.h>
+#include <string.h>
 
 
 #include "balsa-app.h"
@@ -81,9 +82,10 @@ expand_alias_find_match(emailData *addy, gboolean fastp)
 	return;
     }
     
-    str = g_strdup(input);
 #ifdef CASE_INSENSITIVE_NAME
-    g_strup(str);
+    str = g_ascii_strup(input, -1);
+#else
+    str = g_strdup(input);
 #endif
     
     /*
@@ -157,7 +159,7 @@ expand_alias_find_match(emailData *addy, gboolean fastp)
 	if(balsa_app.debug)
             g_message("expand_alias_find_match(): Found [%s]", 
                       addr->full_name);
-	g_list_foreach(match, (GFunc)gtk_object_unref, NULL);
+	g_list_foreach(match, (GFunc)g_object_unref, NULL);
 	
 	/*
 	 * And now we handle the case of "No matches found."

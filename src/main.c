@@ -30,9 +30,6 @@
 # include <gconf/gconf.h>
 #endif
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <signal.h>
 
 #ifdef BALSA_USE_THREADS
@@ -71,11 +68,6 @@ GIOChannel *mail_thread_msg_send;
 GIOChannel *mail_thread_msg_receive;
 GIOChannel *send_thread_msg_send;
 GIOChannel *send_thread_msg_receive;
-
-/* Thread for updating mblist */
-pthread_t mblist_thread;
-/* we use the mailbox_lock pthread_mutex */
-int updating_mblist;
 
 /* Semaphore to prevent dual use of appbar progressbar */
 int updating_progressbar;
@@ -138,7 +130,11 @@ balsa_init(int argc, char **argv)
 	{NULL, '\0', 0, NULL, 0}	/* end the list */
     };
 
+#if BALSA_MAJOR < 2
     context = poptGetContext(PACKAGE, argc, argv, options, 0);
+#else
+    context = poptGetContext(PACKAGE, argc, (const char **)argv, options, 0);
+#endif                          /* BALSA_MAJOR < 2 */
     while((opt = poptGetNextOpt(context)) > 0) {
         switch (opt) {
 	    case 'a':
@@ -148,7 +144,12 @@ balsa_init(int argc, char **argv)
 	}
     }
     /* Process remaining options,  */
-    gnome_init_with_popt_table(PACKAGE, VERSION, argc, argv, options, 0, NULL);
+    
+    gnome_program_init(PACKAGE, VERSION, LIBGNOMEUI_MODULE, argc, argv,
+                       GNOME_PARAM_POPT_TABLE, options,
+                       GNOME_PARAM_APP_PREFIX, BALSA_STD_PREFIX,
+                       GNOME_PARAM_APP_DATADIR, BALSA_STD_PREFIX "/share",
+                       NULL);
 }
 
 /* check_special_mailboxes: 
@@ -216,10 +217,10 @@ static void
 threads_init(void)
 {
     g_thread_init(NULL);
+    gdk_threads_init();
     pthread_mutex_init(&mailbox_lock, NULL);
     pthread_mutex_init(&send_messages_lock, NULL);
     checking_mail = 0;
-    updating_mblist = 0;
     updating_progressbar = 0;
     if (pipe(mail_thread_pipes) < 0) {
 	g_log("BALSA Init", G_LOG_LEVEL_DEBUG,
@@ -259,14 +260,14 @@ static gboolean
 initial_open_unread_mailboxes()
 {
     GList *i, *gl;
-    
     gdk_threads_enter();
-    gl = mblist_find_all_unread_mboxes();
+    gl = balsa_mblist_find_all_unread_mboxes();
 
     if (gl) {
         for (i = g_list_first(gl); i; i = g_list_next(i)) {
             printf("opening %s..\n", (LIBBALSA_MAILBOX(i->data))->name);
-            mblist_open_mailbox(LIBBALSA_MAILBOX(i->data));
+            if(0)
+                balsa_mblist_open_mailbox(LIBBALSA_MAILBOX(i->data));
         }
         g_list_free(gl);
     }
@@ -278,14 +279,12 @@ initial_open_unread_mailboxes()
 static gboolean
 initial_open_inbox()
 {
-    GList *i;
-    
     if (!balsa_app.inbox)
 	return FALSE;
 
     printf("opening %s..\n", (LIBBALSA_MAILBOX(balsa_app.inbox))->name);
     gdk_threads_enter();
-    mblist_open_mailbox(LIBBALSA_MAILBOX(balsa_app.inbox));
+    balsa_mblist_open_mailbox(LIBBALSA_MAILBOX(balsa_app.inbox));
     gdk_threads_leave();
     
     return FALSE;
@@ -301,16 +300,32 @@ append_subtree_f(GNode* gn, gpointer data)
 }
 
 /* scan_mailboxes:
-   this is an idle handler. Expands subtrees
+   this is an idle handler. Expands subtrees.
+   FIXME: make sure that append_subtree_f does not use gtk.
 */
 static gboolean
 scan_mailboxes_idle_cb()
 {
     gdk_threads_enter();
+    balsa_mailbox_nodes_lock(TRUE);
     g_node_traverse(balsa_app.mailbox_nodes, G_POST_ORDER, G_TRAVERSE_ALL, -1,
                     append_subtree_f, NULL);
-    balsa_mblist_repopulate(balsa_app.mblist);
+    balsa_mailbox_nodes_unlock(TRUE);
     gdk_threads_leave();
+
+    if (cmd_open_unread_mailbox || balsa_app.open_unread_mailbox)
+	gtk_idle_add((GtkFunction) initial_open_unread_mailboxes, NULL);
+
+    if (cmd_line_open_mailboxes) {
+	gchar **urls = g_strsplit(cmd_line_open_mailboxes, ";", 20);
+	gtk_idle_add((GtkFunction) open_mailboxes_idle_cb, urls);
+    }
+
+    if (balsa_app.open_mailbox_vector) {
+	gtk_idle_add((GtkFunction) open_mailboxes_idle_cb,
+		     balsa_app.open_mailbox_vector);
+	balsa_app.open_mailbox_vector = NULL;
+    }
     return FALSE; 
 }
 /* -------------------------- main --------------------------------- */
@@ -323,15 +338,16 @@ main(int argc, char *argv[])
 #ifdef GTKHTML_HAVE_GCONF
     GError *gconf_error;
 #endif
-#ifdef BALSA_USE_THREADS
-    pthread_t scan_thread;
-#endif
 
 #ifdef ENABLE_NLS
     /* Initialize the i18n stuff */
     bindtextdomain(PACKAGE, GNOMELOCALEDIR);
+    bind_textdomain_codeset(PACKAGE, "UTF-8");
     textdomain(PACKAGE);
-    setlocale(LC_CTYPE, gnome_i18n_get_language());
+    /* FIXME: gnome_i18n_get_language seems to have gone away; 
+     * is this a reasonable replacement? */
+    setlocale(LC_CTYPE,
+              (const char *) gnome_i18n_get_language_list(LC_CTYPE)->data);
 #endif
 
 #ifdef BALSA_USE_THREADS
@@ -339,6 +355,8 @@ main(int argc, char *argv[])
     threads_init();
 #endif
 
+    /* FIXME: do we need to allow a non-GUI mode? */
+    gtk_init_check(&argc, &argv);
     balsa_init(argc, argv);
 
 #ifdef GTKHTML_HAVE_GCONF
@@ -351,26 +369,15 @@ main(int argc, char *argv[])
 
     /* Initialize libbalsa */
     libbalsa_init((LibBalsaInformationFunc) balsa_information);
-
-    gtk_widget_set_default_colormap(gdk_rgb_get_cmap());
-    gtk_widget_set_default_visual(gdk_rgb_get_visual());
-
-    /* Allocate the best colormap we can get */
-    balsa_app.visual = gdk_visual_get_best();
-    balsa_app.colormap = gdk_colormap_new(balsa_app.visual, TRUE);
-
-    /* checking for valid config files */
-    config_init();
     libbalsa_filters_set_url_mapper(balsa_find_mailbox_by_url);
     libbalsa_filters_set_filter_list(&balsa_app.filters);
-
+    
+    /* checking for valid config files */
+    config_init();
     /* load mailboxes */
     mailboxes_init();
 
-    /* create all the pretty icons that balsa uses that
-     * arn't part of gnome-libs */
-    balsa_icons_init();
-    default_icon = balsa_pixmap_finder("balsa/balsa_icon.png");
+    default_icon = balsa_pixmap_finder("balsa_icon.png");
 #ifdef HAVE_LIBGNOMEUI_GNOME_WINDOW_ICON_H
     gnome_window_icon_set_default_from_file(default_icon);
 #endif
@@ -380,29 +387,31 @@ main(int argc, char *argv[])
 
     window = balsa_window_new();
     balsa_app.main_window = BALSA_WINDOW(window);
-    gtk_signal_connect(GTK_OBJECT(window), "destroy", balsa_cleanup, NULL);
+    g_signal_connect(G_OBJECT(window), "destroy",
+                     G_CALLBACK(balsa_cleanup), NULL);
 
     /* session management */
     client = gnome_master_client();
-    gtk_signal_connect(GTK_OBJECT(client), "save_yourself",
-		       GTK_SIGNAL_FUNC(balsa_save_session), argv[0]);
-    gtk_signal_connect(GTK_OBJECT(client), "die",
-		       GTK_SIGNAL_FUNC(balsa_kill_session), NULL);
-
-    gdk_rgb_init();
+    g_signal_connect(G_OBJECT(client), "save_yourself",
+		     G_CALLBACK(balsa_save_session), argv[0]);
+    g_signal_connect(G_OBJECT(client), "die",
+		     G_CALLBACK(balsa_kill_session), NULL);
 
     if (opt_compose_email || opt_attach_list) {
 	BalsaSendmsg *snd;
 	GSList *lst;
+        gdk_threads_enter();
 	snd = sendmsg_window_new(window, NULL, SEND_NORMAL);
+        gdk_threads_leave();
 	if(opt_compose_email) {
-	    if(strncmp(opt_compose_email, "mailto:", 7) == 0)
+	    if(g_ascii_strncasecmp(opt_compose_email, "mailto:", 7) == 0)
 	        sendmsg_window_process_url(opt_compose_email+7, 
 		    	sendmsg_window_set_field, snd);
 	    else sendmsg_window_set_field(snd,"to", opt_compose_email);
 	}
 	for(lst = opt_attach_list; lst; lst = g_slist_next(lst))
-	    add_attachment(snd, lst->data, FALSE, NULL);
+	    add_attachment(GNOME_ICON_LIST(snd->attachments[1]), 
+			   lst->data, FALSE, NULL);
 	SENDMSG_WINDOW_QUIT_ON_CLOSE(snd);
     } else
 	gtk_widget_show(window);
@@ -410,31 +419,16 @@ main(int argc, char *argv[])
     if (cmd_check_mail_on_startup || balsa_app.check_mail_upon_startup)
 	check_new_messages_cb(NULL, NULL);
 
-    if (cmd_open_unread_mailbox || balsa_app.open_unread_mailbox)
-	gtk_idle_add((GtkFunction) initial_open_unread_mailboxes, NULL);
-
     if (cmd_open_inbox || balsa_app.open_inbox_upon_startup)
 	gtk_idle_add((GtkFunction) initial_open_inbox, NULL);
 
-    if (cmd_line_open_mailboxes) {
-	gchar **urls = g_strsplit(cmd_line_open_mailboxes, ";", 20);
-	gtk_idle_add((GtkFunction) open_mailboxes_idle_cb, urls);
-    }
     signal( SIGPIPE, SIG_IGN );
-
-#ifdef BALSA_USE_THREADS
-    pthread_create(&scan_thread, NULL, 
-                   (void*(*)(void*))scan_mailboxes_idle_cb, NULL);
-    pthread_detach(scan_thread);
-#else
     gtk_idle_add((GtkFunction) scan_mailboxes_idle_cb, NULL);
-#endif
+
     gdk_threads_enter();
     gtk_main();
     gdk_threads_leave();
     
-    gdk_colormap_unref(balsa_app.colormap);
-
 #ifdef BALSA_USE_THREADS
     threads_destroy();
 #endif
@@ -444,6 +438,7 @@ main(int argc, char *argv[])
 
 
 
+#if 0
 static void
 force_close_mailbox(LibBalsaMailbox * mailbox)
 {
@@ -454,40 +449,12 @@ force_close_mailbox(LibBalsaMailbox * mailbox)
     while (mailbox->open_ref > 0)
 	libbalsa_mailbox_close(mailbox);
 }
+#endif /* 0 */
 
-/* Word of comment: previous definition of this function used access()
-function before attempting creat/unlink operation. In PS opinion, the
-speed gain is negligible or negative: the number of called system
-functions in present case is constant and equal to 1; the previous
-version called system function either once or twice per directory. */
-static gboolean
-destroy_mbnode(GNode * node, gpointer data)
-{
-    BalsaMailboxNode *mbnode = (BalsaMailboxNode *) node->data;
-
-    if(mbnode == NULL) /* true for root node only */
-	return FALSE;
-    
-    if (!mbnode->mailbox) {
-	gchar *tmpfile = g_strdup_printf("%s/.expanded", mbnode->name);
-	if (mbnode->expanded)
-	    close(creat(tmpfile, S_IRUSR | S_IWUSR));
-	else
-	    unlink(tmpfile);
-	g_free(tmpfile);
-    }
-    gtk_object_destroy(GTK_OBJECT(mbnode));
-    return FALSE;
-}
 
 static void
 balsa_cleanup(void)
 {
-    if (balsa_app.empty_trash_on_exit)
-	empty_trash();
-
-    config_save();
-
 #ifdef BALSA_USE_THREADS
     /* move threads shutdown to separate routine?
        There are actually many things to do, e.g. threads should not
@@ -508,27 +475,9 @@ balsa_cleanup(void)
     }
     pthread_mutex_unlock(&mailbox_lock);
 #endif
+    balsa_app_destroy();
 
-    /* FIXME: stop switching notebook pages in a more elegant way.
-       Probably, the cleanest solution is to call enable_menus_xxx
-       functions from an idle function connected to balsa_message_set. */
-    gtk_signal_disconnect_by_data(GTK_OBJECT(balsa_app.notebook), NULL);
-
-    /* close all mailboxes */
-    g_node_traverse(balsa_app.mailbox_nodes,
-		    G_LEVEL_ORDER,
-		    G_TRAVERSE_ALL, 10, destroy_mbnode, NULL);
-    gtk_object_unref(GTK_OBJECT(balsa_app.inbox));
-    gtk_object_unref(GTK_OBJECT(balsa_app.outbox));
-    gtk_object_unref(GTK_OBJECT(balsa_app.sentbox));
-    gtk_object_unref(GTK_OBJECT(balsa_app.draftbox));
-    gtk_object_unref(GTK_OBJECT(balsa_app.trash));
-    g_node_destroy(balsa_app.mailbox_nodes);
-    balsa_app.mailbox_nodes = NULL;
     gnome_sound_shutdown();
-    libbalsa_imap_close_all_connections();
-    /* g_slist_free(opt_attach_list); */
-    if(balsa_app.debug) g_print("Finished cleaning up.\n");
 }
 
 static gint

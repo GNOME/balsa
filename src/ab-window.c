@@ -19,46 +19,28 @@
  * 02111-1307, USA.
  */
 
-#include "config.h"
-
 #include <gnome.h>
+#include <string.h>
 #include "balsa-app.h"
 #include "sendmsg-window.h"
 #include "ab-window.h"
 
-#define LIST_COLUMN_NAME        0
-#define LIST_COLUMN_ADDRESS     1
-
-/*
-  This struct holds the information associated with each row of a clist:
-
-  The LibBalsaAddress object, and which address within that the row contains.
-
-  I wish there was a better way to do this, but a CListRow can only
-  have a single data reference attached.
- */
-typedef struct _AddressBookEntry AddressBookEntry;
-
-struct _AddressBookEntry
-{
-    gint ref_count;
-    LibBalsaAddress *address;
-    gint which_multiple;
+enum {
+    LIST_COLUMN_NAME,
+    LIST_COLUMN_ADDRESS_STRING,
+    LIST_COLUMN_ADDRESS,
+    LIST_COLUMN_WHICH,
+    N_COLUMNS
 };
 
 /* Object system functions ... */
 static void balsa_ab_window_init(BalsaAbWindow *ab);
 static void balsa_ab_window_class_init(BalsaAbWindowClass *klass);
 
-/* CListRow data ... */
-static AddressBookEntry *ab_window_entry_new(LibBalsaAddress *address, 
-						gint which_multiple);
-static void ab_window_entry_unref(AddressBookEntry *entry);
-
 /* Loading ... */
 static void balsa_ab_window_load_cb(LibBalsaAddressBook *libbalsa_ab, 
-                                    LibBalsaAddress *address, 
-                                    BalsaAbWindow *ab);
+				       LibBalsaAddress *address, 
+				       BalsaAbWindow *ab);
 static void balsa_ab_window_load(BalsaAbWindow *ab);
 static void balsa_ab_window_reload(GtkWidget *w, BalsaAbWindow *av);
 
@@ -67,31 +49,38 @@ static void balsa_ab_window_dist_mode_toggled(GtkWidget * w,
 						 BalsaAbWindow *ab);
 static void balsa_ab_window_menu_changed(GtkWidget * widget, 
 					    BalsaAbWindow *ab);
-static void balsa_ab_window_run_gnomecard(GtkWidget * widget, gpointer data);
-static void balsa_ab_window_find(GtkWidget * group_entry, BalsaAbWindow *ab);
-static void balsa_ab_window_button_clicked (BalsaAbWindow *ab, 
-					       gint button_number, 
-					       gpointer data);
+static void balsa_ab_window_run_gnomecard(GtkWidget * widget,
+                                             gpointer data);
+static void balsa_ab_window_response_cb(BalsaAbWindow *ab, gint resp);
+static void balsa_ab_window_find(GtkWidget * group_entry,
+                                    BalsaAbWindow *ab);
 
 /* address and recipient list management ... */
-static void balsa_ab_window_swap_clist_entry(GtkCList * src, GtkCList * dst);
-static void balsa_ab_window_select_address(GtkWidget *widget, 
-					      gint row, gint column,
-					      GdkEventButton *event, 
-					      BalsaAbWindow *ab);
-static void balsa_ab_window_select_recipient(GtkWidget *widget, 
-						gint row, gint column,
-						GdkEventButton *event, 
-						BalsaAbWindow *ab);
+static void balsa_ab_window_swap_list_entry(GtkTreeView * src,
+                                               GtkTreeView * dst);
+static void balsa_ab_window_activate_address(GtkTreeView * view,
+                                                GtkTreePath * path,
+                                                GtkTreeViewColumn * column,
+                                                gpointer data);
+static void balsa_ab_window_select_recipient(GtkTreeView * view,
+                                                GtkTreePath * path,
+                                                GtkTreeViewColumn * column,
+                                                gpointer data);
 static void balsa_ab_window_move_to_recipient_list(GtkWidget *widget,
 						      BalsaAbWindow *ab);
 static void balsa_ab_window_remove_from_recipient_list(GtkWidget *widget, 
 							  BalsaAbWindow *ab);
 
 /* Utility ... */
-static gint balsa_ab_window_compare_entries(GtkCList * clist, 
-					       gconstpointer a, 
-					       gconstpointer b);
+static gint balsa_ab_window_compare_entries(GtkTreeModel * model,
+                                               GtkTreeIter * iter1,
+                                               GtkTreeIter * iter2,
+                                               gpointer data);
+
+struct _BalsaAbWindowClass
+{
+    GtkDialogClass parent_class;
+};
 
 GtkType
 balsa_ab_window_get_type(void)
@@ -99,47 +88,102 @@ balsa_ab_window_get_type(void)
     static GtkType ab_type = 0;
 
     if ( !ab_type ) {
-	GtkTypeInfo ab_info = {
-	    "BalsaAbWindow",
-	    sizeof(BalsaAbWindow),
+	static const GTypeInfo ab_info = {
 	    sizeof(BalsaAbWindowClass),
-	    (GtkClassInitFunc) balsa_ab_window_class_init,
-	    (GtkObjectInitFunc) balsa_ab_window_init,
-	    NULL, /*reserved*/
-	    NULL, /*reserved*/
+            NULL,               /* base_init */
+            NULL,               /* base_finalize */
+	    (GClassInitFunc) balsa_ab_window_class_init,
+            NULL,               /* class_finalize */
+            NULL,               /* class_data */
+	    sizeof(BalsaAbWindow),
+            0,                  /* n_preallocs */
+	    (GInstanceInitFunc) balsa_ab_window_init
 	};
-	ab_type = gtk_type_unique(GNOME_TYPE_DIALOG, &ab_info);
+        ab_type =
+            g_type_register_static(GTK_TYPE_DIALOG, "BalsaAbWindow",
+                                   &ab_info, 0);
     }
     return ab_type;
 }
 
+
 GtkWidget *
-balsa_ab_window_new(gboolean composing)
+balsa_ab_window_new(gboolean composing, GtkWindow* parent)
 {
     GtkWidget *ret;
 
-    ret = gtk_type_new(BALSA_TYPE_AB_WINDOW);
+    ret = g_object_new(BALSA_TYPE_AB_WINDOW, NULL);
     g_return_val_if_fail(ret, NULL);
 
     BALSA_AB_WINDOW(ret)->composing = composing;
 
     if ( composing ) { 
-	gnome_dialog_append_buttons(GNOME_DIALOG(ret), 
-				    GNOME_STOCK_BUTTON_OK,
-				    GNOME_STOCK_BUTTON_CANCEL,
-				    NULL);
+	gtk_dialog_add_buttons(GTK_DIALOG(ret), 
+                               GTK_STOCK_OK,     GTK_RESPONSE_OK,
+                               GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                               NULL);
 	gtk_widget_show(GTK_WIDGET(BALSA_AB_WINDOW(ret)->send_to_box));
 	gtk_widget_show(GTK_WIDGET(BALSA_AB_WINDOW(ret)->arrow_box));
     } else {
-	gnome_dialog_append_buttons(GNOME_DIALOG(ret),
-				    GNOME_STOCK_BUTTON_CLOSE,
-				    NULL);
+	gtk_dialog_add_buttons(GTK_DIALOG(ret),
+                               GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
+                               NULL);
 	gtk_widget_hide(GTK_WIDGET(BALSA_AB_WINDOW(ret)->send_to_box));
 	gtk_widget_hide(GTK_WIDGET(BALSA_AB_WINDOW(ret)->arrow_box));
     }
-
+    if(parent) gtk_window_set_transient_for(GTK_WINDOW(ret), parent);
     return ret;
 
+}
+
+static GtkWidget *
+balsa_ab_window_list(BalsaAbWindow * ab, GCallback row_activated_cb)
+{
+    GtkListStore *store;
+    GtkWidget *tree;
+    GtkCellRenderer *renderer;
+    GtkTreeViewColumn *column;
+    GtkTreeSelection *selection;
+
+    store =
+        gtk_list_store_new(N_COLUMNS,
+                           G_TYPE_STRING,   /* LIST_COLUMN_NAME           */
+                           G_TYPE_STRING,   /* LIST_COLUMN_ADDRESS_STRING */
+                           G_TYPE_OBJECT,   /* LIST_COLUMN_ADDRESS        */
+                           G_TYPE_INT);     /* LIST_COLUMN_WHICH          */
+    gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(store), 0,
+                                    balsa_ab_window_compare_entries,
+                                    GINT_TO_POINTER(0), NULL);
+    gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(store), 0,
+                                         GTK_SORT_ASCENDING);
+
+    tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+    g_object_unref(store);
+
+    renderer = gtk_cell_renderer_text_new();
+    column =
+        gtk_tree_view_column_new_with_attributes(_("Name"),
+                                                 renderer,
+                                                 "text",
+                                                 LIST_COLUMN_NAME, NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
+
+    renderer = gtk_cell_renderer_text_new();
+    column =
+        gtk_tree_view_column_new_with_attributes(_("E-Mail Address"),
+                                                 renderer,
+                                                 "text",
+                                                 LIST_COLUMN_ADDRESS_STRING,
+                                                 NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
+
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
+    gtk_tree_selection_set_mode(selection, GTK_SELECTION_MULTIPLE);
+
+    gtk_widget_show(tree);
+    g_signal_connect(G_OBJECT(tree), "row-activated", row_activated_cb,
+                     ab);
+    return tree;
 }
 
 static void
@@ -153,56 +197,32 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 	*box2,
 	*scrolled_window,
 	*ab_option, *ab_menu, *menu_item,
-	*stock_widget, *frame, *label;
+	*frame, *label;
     GList *ab_list;
     LibBalsaAddressBook *address_book;
     guint default_offset = 0;
 
-    static gchar *titles[2] = { N_("Name"), N_("E-Mail Address") };
-    
     ab->current_address_book = NULL;
     gtk_window_set_title(GTK_WINDOW(ab), _("Address Book"));
 
-#ifdef ENABLE_NLS
-    titles[0] = _(titles[0]);
-    titles[1] = _(titles[1]);
-#endif
+    g_signal_connect(G_OBJECT(ab), "response",
+		     G_CALLBACK(balsa_ab_window_response_cb), NULL);
 
-    gtk_signal_connect(GTK_OBJECT(ab), "clicked",
-		       GTK_SIGNAL_FUNC(balsa_ab_window_button_clicked), NULL);
-		     
-    vbox = GNOME_DIALOG(ab)->vbox;
+    vbox = GTK_DIALOG(ab)->vbox;
 
     gtk_window_set_wmclass(GTK_WINDOW(ab), "addressbook", "Balsa");
 
     /* The main address list */
-    ab->address_clist = gtk_clist_new_with_titles(2, titles);
-    gtk_clist_set_selection_mode(GTK_CLIST(ab->address_clist),
-				 GTK_SELECTION_MULTIPLE);
-    gtk_clist_column_titles_passive(GTK_CLIST(ab->address_clist));
-    gtk_clist_set_compare_func(GTK_CLIST(ab->address_clist), balsa_ab_window_compare_entries);
-    gtk_clist_set_sort_type(GTK_CLIST(ab->address_clist), GTK_SORT_ASCENDING);
-    gtk_clist_set_auto_sort(GTK_CLIST(ab->address_clist), TRUE);
-    gtk_clist_set_column_auto_resize(GTK_CLIST(ab->address_clist), 0, TRUE);
-    gtk_clist_set_column_auto_resize(GTK_CLIST(ab->address_clist), 1, TRUE);
-    gtk_widget_show(ab->address_clist);
-    gtk_signal_connect(GTK_OBJECT(ab->address_clist), "select_row",
-		       GTK_SIGNAL_FUNC(balsa_ab_window_select_address), ab);
+    ab->address_list =
+        balsa_ab_window_list(ab,
+                                G_CALLBACK
+                                (balsa_ab_window_activate_address));
     
     /* The clist for selected addresses in compose mode */
-    ab->recipient_clist = gtk_clist_new_with_titles(2, titles);
-    gtk_clist_set_selection_mode(GTK_CLIST(ab->recipient_clist),
-				 GTK_SELECTION_MULTIPLE);
-    gtk_clist_column_titles_passive(GTK_CLIST(ab->recipient_clist));
-    gtk_clist_set_compare_func(GTK_CLIST(ab->recipient_clist), balsa_ab_window_compare_entries);
-    gtk_clist_set_sort_type(GTK_CLIST(ab->recipient_clist), GTK_SORT_ASCENDING);
-    gtk_clist_set_auto_sort(GTK_CLIST(ab->recipient_clist), TRUE);
-    gtk_clist_set_column_auto_resize(GTK_CLIST(ab->recipient_clist), 0, TRUE);
-    gtk_clist_set_column_auto_resize(GTK_CLIST(ab->recipient_clist), 1, TRUE);
-    gtk_widget_show(ab->recipient_clist);
-    gtk_signal_connect(GTK_OBJECT(ab->recipient_clist), "select_row",
-		       GTK_SIGNAL_FUNC(balsa_ab_window_select_recipient),
-		       (gpointer) ab);
+    ab->recipient_list =
+        balsa_ab_window_list(ab,
+                                G_CALLBACK
+                                (balsa_ab_window_select_recipient));
 
     /* The address book selection menu */
     ab_menu = gtk_menu_new();
@@ -217,12 +237,12 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 	
 	menu_item = gtk_menu_item_new_with_label(address_book->name);
 	gtk_widget_show(menu_item);
-	gtk_menu_append(GTK_MENU(ab_menu), menu_item);
+	gtk_menu_shell_append(GTK_MENU_SHELL(ab_menu), menu_item);
 	
-	gtk_object_set_data(GTK_OBJECT(menu_item), "address-book",
-			    address_book);
-	gtk_signal_connect(GTK_OBJECT(menu_item), "activate",
-			   balsa_ab_window_menu_changed, ab);
+	g_object_set_data(G_OBJECT(menu_item), "address-book",
+			  address_book);
+	g_signal_connect(G_OBJECT(menu_item), "activate",
+			 G_CALLBACK(balsa_ab_window_menu_changed), ab);
 	
 	if (address_book == balsa_app.default_address_book)
 	    gtk_menu_set_active(GTK_MENU(ab_menu), default_offset);
@@ -245,8 +265,8 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 
     find_entry = gtk_entry_new();
     gtk_widget_show(find_entry);
-    gtk_signal_connect(GTK_OBJECT(find_entry), "changed",
-		       GTK_SIGNAL_FUNC(balsa_ab_window_find), ab);
+    g_signal_connect(G_OBJECT(find_entry), "changed",
+		     G_CALLBACK(balsa_ab_window_find), ab);
     
     /* Horizontal layout */
     hbox = gtk_hbox_new(FALSE, 1);
@@ -273,35 +293,26 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 				   GTK_POLICY_AUTOMATIC);
     gtk_box_pack_start(GTK_BOX(vbox2), scrolled_window, TRUE, TRUE, 0);
     gtk_widget_show(scrolled_window);
-    gtk_container_add(GTK_CONTAINER(scrolled_window), ab->address_clist);
-    gtk_widget_set_usize(scrolled_window, 300, 250);
+    gtk_container_add(GTK_CONTAINER(scrolled_window), ab->address_list);
+    gtk_widget_set_size_request(scrolled_window, 300, 250);
 
     /* Column for arrows in compose mode */
     ab->arrow_box = gtk_vbox_new(FALSE, 5);
     gtk_box_pack_start(GTK_BOX(hbox), ab->arrow_box, FALSE, FALSE, 1);
     gtk_widget_show(ab->arrow_box);
     
-    /* FIXME: Can make a stock button in one call... */
-    w = gtk_button_new();
-    stock_widget = gnome_stock_pixmap_widget(GTK_WIDGET(ab),
-					     GNOME_STOCK_PIXMAP_FORWARD);
-    gtk_container_add(GTK_CONTAINER(w), stock_widget);
+    w = balsa_stock_button_with_label(GTK_STOCK_GO_FORWARD, "");
     gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
-    gtk_widget_show(stock_widget);
     gtk_widget_show(w);
-    gtk_signal_connect(GTK_OBJECT(w), "clicked",
-		       GTK_SIGNAL_FUNC(balsa_ab_window_move_to_recipient_list),
+    g_signal_connect(G_OBJECT(w), "clicked",
+		     G_CALLBACK(balsa_ab_window_move_to_recipient_list),
 		       ab);
     
-    w = gtk_button_new();
+    w = balsa_stock_button_with_label(GTK_STOCK_GO_BACK, "");
     gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
-    stock_widget = gnome_stock_pixmap_widget(GTK_WIDGET(ab),
-					     GNOME_STOCK_PIXMAP_BACK);
-    gtk_container_add(GTK_CONTAINER(w), stock_widget);
-    gtk_widget_show(stock_widget);
     gtk_widget_show(w);
-    gtk_signal_connect(GTK_OBJECT(w), "clicked",
-		       GTK_SIGNAL_FUNC(balsa_ab_window_remove_from_recipient_list),
+    g_signal_connect(G_OBJECT(w), "clicked",
+		     G_CALLBACK(balsa_ab_window_remove_from_recipient_list),
 		       ab);
     
     /* Column for selected addresses in compose mode */
@@ -318,25 +329,27 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),
 				   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_box_pack_start(GTK_BOX(ab->send_to_box), scrolled_window, FALSE, FALSE, 0);
-    gtk_container_add(GTK_CONTAINER(scrolled_window), ab->recipient_clist);
-    gtk_widget_set_usize(scrolled_window, 300, 250);
+    gtk_container_add(GTK_CONTAINER(scrolled_window), ab->recipient_list);
+    gtk_widget_set_size_request(scrolled_window, 300, 250);
 
     /* Buttons ... */
     hbox = gtk_hbutton_box_new();
-    gtk_hbutton_box_set_layout_default(GTK_BUTTONBOX_START);
+    gtk_button_box_set_layout(GTK_BUTTON_BOX(hbox), GTK_BUTTONBOX_START);
     gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
     gtk_widget_show(GTK_WIDGET(hbox));
-    stock_widget = gnome_stock_pixmap_widget(GTK_WIDGET(ab), GNOME_STOCK_PIXMAP_OPEN);
-    w = gnome_pixmap_button(stock_widget, _("Run GnomeCard"));
-    gtk_signal_connect(GTK_OBJECT(w), "clicked",
-		       GTK_SIGNAL_FUNC(balsa_ab_window_run_gnomecard), NULL);
+
+    w = balsa_stock_button_with_label(GTK_STOCK_OPEN,
+                                      _("Run GnomeCard"));
+    g_signal_connect(G_OBJECT(w), "clicked",
+		     G_CALLBACK(balsa_ab_window_run_gnomecard),
+                       NULL);
     gtk_container_add(GTK_CONTAINER(hbox), w);
     gtk_widget_show(GTK_WIDGET(w));
 
-    /* FIXME: Should strive to not need this?? */
-    stock_widget = gnome_stock_pixmap_widget(GTK_WIDGET(ab), GNOME_STOCK_PIXMAP_ADD);
-    w =	gnome_pixmap_button(stock_widget, _("Re-Import"));
-    gtk_signal_connect(GTK_OBJECT(w), "clicked", GTK_SIGNAL_FUNC(balsa_ab_window_reload),
+    w = balsa_stock_button_with_label(GTK_STOCK_ADD, 
+                                      _("Re-Import"));
+    g_signal_connect(G_OBJECT(w), "clicked",
+                     G_CALLBACK(balsa_ab_window_reload),
 		       ab);
     gtk_container_add(GTK_CONTAINER(hbox), w);
     gtk_widget_show(w);
@@ -355,8 +368,11 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 	(GTK_RADIO_BUTTON(ab->single_address_mode_radio),
 	 _("a distribution list"));
     gtk_widget_show(ab->dist_address_mode_radio);
-    ab->toggle_handler_id = gtk_signal_connect(GTK_OBJECT(ab->single_address_mode_radio), "toggled",
-					       GTK_SIGNAL_FUNC(balsa_ab_window_dist_mode_toggled), ab);
+    ab->toggle_handler_id =
+        g_signal_connect(G_OBJECT(ab->single_address_mode_radio),
+                         "toggled",
+                         G_CALLBACK(balsa_ab_window_dist_mode_toggled),
+                         ab);
 
     if(ab->current_address_book)
 	gtk_toggle_button_set_active(
@@ -396,37 +412,38 @@ balsa_ab_window_run_gnomecard(GtkWidget * widget, gpointer data)
   Returns a string of all the selected recipients.
  */
 gchar *
-balsa_ab_window_get_recipients(BalsaAbWindow *ab)
+balsa_ab_window_get_recipients(BalsaAbWindow * ab)
 {
-    GString *str = NULL;
-    AddressBookEntry *entry;
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+    gboolean valid;
+    GString *str = g_string_new(NULL);
     gchar *text;
-    gint i;
 
     g_return_val_if_fail(ab->composing, NULL);
 
-    for(i = 0; i < GTK_CLIST(ab->recipient_clist)->rows; i++) {
-	entry = (AddressBookEntry*)(gtk_clist_get_row_data(GTK_CLIST(ab->recipient_clist), i));
+    model = gtk_tree_view_get_model(GTK_TREE_VIEW(ab->recipient_list));
+    for (valid = gtk_tree_model_get_iter_first(model, &iter); valid;
+         valid = gtk_tree_model_iter_next(model, &iter)) {
+        LibBalsaAddress *address = NULL;
+        gint which_multiple = 0;
 
-	g_assert (entry != NULL);
-
-	text = libbalsa_address_to_gchar(entry->address, entry->which_multiple);
-	if ( text == NULL )
-	    continue;
-
-	if ( str )
-	    g_string_sprintfa(str, ", %s", text);
-	else
-	    str = g_string_new(text);
-	g_free(text);
+        gtk_tree_model_get(model, &iter,
+                           LIST_COLUMN_ADDRESS, &address,
+                           LIST_COLUMN_WHICH, &which_multiple, -1);
+        text = libbalsa_address_to_gchar(address, which_multiple);
+	g_object_unref(G_OBJECT(address));
+        if (text) {
+            if (str->len > 0)
+                g_string_append(str, ", ");
+            g_string_append(str, text);
+            g_free(text);
+        }
     }
-    if ( str != NULL ) {
-	text = str->str;
-	g_string_free(str, FALSE);
-	return text;
-    } else {
-	return NULL;
-    }
+
+    text = str->str;
+    g_string_free(str, FALSE);
+    return text;
 }
 
 /*
@@ -435,38 +452,96 @@ balsa_ab_window_get_recipients(BalsaAbWindow *ab)
 /*
   FIXME: Need to only move it back if it belongs in current address book?? 
 */
+/*
+ * balsa_ab_window_swap_list_entry is the method.
+ * 
+ * balsa_ab_window_swap_make_gslist, balsa_ab_window_swap_real,
+ * and balsa_ab_window_swap_do_swap are callbacks/helpers.
+ */
+
 static void
-balsa_ab_window_swap_clist_entry(GtkCList * src, GtkCList * dst)
+balsa_ab_window_swap_make_gslist(GtkTreeModel * model,
+                                    GtkTreePath * path,
+                                    GtkTreeIter * iter,
+                                    gpointer data)
 {
-    gint num;
-    gint row;
-    gchar *listdata[2];
-    AddressBookEntry *entry;
+    GtkTreeRowReference *reference =
+        gtk_tree_row_reference_new(model, path);
+    GSList **selected = data;
+
+    *selected = g_slist_prepend(*selected, reference);
+}
+
+static void
+balsa_ab_window_swap_real(GtkTreeModel * model, GtkTreePath * path,
+                             GtkTreeModel * dst_model)
+{
+    GtkTreeIter iter;
+    GtkTreeIter dst_iter;
+    gchar *name;
     gchar *address_string;
+    LibBalsaAddress *address;
+    gint which_multiple;
 
-    g_return_if_fail(GTK_IS_CLIST(src));
-    g_return_if_fail(GTK_IS_CLIST(dst));
+    gtk_tree_model_get_iter(model, &iter, path);
+    gtk_tree_model_get(model, &iter,
+                       LIST_COLUMN_NAME, &name,
+                       LIST_COLUMN_ADDRESS_STRING, &address_string,
+                       LIST_COLUMN_ADDRESS, &address,
+                       LIST_COLUMN_WHICH, &which_multiple, -1);
 
-    while ( src->selection ) {
-	row = GPOINTER_TO_INT(src->selection->data);
-	entry = (AddressBookEntry*)(gtk_clist_get_row_data(src, row));
-	
-	g_return_if_fail(gtk_clist_get_cell_type (src, row, LIST_COLUMN_ADDRESS) == GTK_CELL_TEXT);
+    gtk_list_store_prepend(GTK_LIST_STORE(dst_model), &dst_iter);
+    gtk_list_store_set(GTK_LIST_STORE(dst_model), &dst_iter,
+                       LIST_COLUMN_NAME, name,
+                       LIST_COLUMN_ADDRESS_STRING, address_string,
+                       LIST_COLUMN_ADDRESS, address,
+                       LIST_COLUMN_WHICH, which_multiple, -1);
 
- 	gtk_clist_get_text (src, row, LIST_COLUMN_ADDRESS, &address_string);
+    /* gtk_list_store_remove unrefs address, but gtk_list_store_set has
+     * already reffed it, so it won't be finalized, even if there
+     * were no other outstanding refs. */
+    gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
+    g_object_unref(G_OBJECT(address));
+    g_free(name);
+    g_free(address_string);
+}
 
-	listdata[LIST_COLUMN_NAME] = entry->address->full_name;
-	listdata[LIST_COLUMN_ADDRESS]= address_string;
+#define BALSA_TREE_VIEW "balsa-tree-view"
+static void
+balsa_ab_window_swap_do_swap(gpointer data, gpointer user_data)
+{
+    GtkTreeRowReference *reference = data;
+    GtkTreePath *path = gtk_tree_row_reference_get_path(reference);
 
-	num = gtk_clist_append(dst, listdata);
+    if (path) {
+        GtkTreeView *tree_view = 
+            g_object_get_data(G_OBJECT(user_data), BALSA_TREE_VIEW);
+        GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
+        GtkTreeModel *dst_model = gtk_tree_view_get_model(user_data);
 
-	/* Will be unref'd on remove from source... */
-	entry->ref_count++;
-	gtk_clist_set_row_data_full(dst, num, entry, 
-				    (GtkDestroyNotify)ab_window_entry_unref);
-
-	gtk_clist_remove(src, row);
+        balsa_ab_window_swap_real(model, path, dst_model);
+        gtk_tree_path_free(path);
     }
+
+    gtk_tree_row_reference_free(reference);
+}
+
+static void
+balsa_ab_window_swap_list_entry(GtkTreeView * src, GtkTreeView * dst)
+{
+    GtkTreeSelection *selection;
+    GSList *selected;
+
+    g_return_if_fail(GTK_IS_TREE_VIEW(src));
+    g_return_if_fail(GTK_IS_TREE_VIEW(dst));
+
+    selection = gtk_tree_view_get_selection(src);
+    selected = NULL;
+    gtk_tree_selection_selected_foreach(selection,
+                                        balsa_ab_window_swap_make_gslist,
+                                        &selected);
+    g_object_set_data(G_OBJECT(dst), BALSA_TREE_VIEW, src);
+    g_slist_foreach(selected, balsa_ab_window_swap_do_swap, dst);
 }
 
 /*
@@ -477,34 +552,40 @@ balsa_ab_window_swap_clist_entry(GtkCList * src, GtkCList * dst)
 
 */
 static void
-balsa_ab_window_select_address(GtkWidget *widget, gint row, gint column,
-				  GdkEventButton *event, BalsaAbWindow *ab)
+balsa_ab_window_activate_address(GtkTreeView * view,
+                                    GtkTreePath * path,
+                                    GtkTreeViewColumn * column,
+                                    gpointer data)
 {
-    g_return_if_fail ( BALSA_IS_AB_WINDOW(ab) );
+    BalsaAbWindow *ab = data;
 
-    if ( event == NULL )
-	return;
+    g_return_if_fail(BALSA_IS_AB_WINDOW(ab));
 
+    if (ab->composing) {
+        balsa_ab_window_swap_list_entry(GTK_TREE_VIEW(ab->address_list),
+                                           GTK_TREE_VIEW(ab->
+                                                         recipient_list));
+    } else {
+        BalsaSendmsg *snd;
+        GtkTreeModel *model =
+            gtk_tree_view_get_model(GTK_TREE_VIEW(ab->address_list));
+        GtkTreeIter iter;
+        LibBalsaAddress *address;
+        gint which_multiple;
+        gchar *addr;
 
-    if (event->type == GDK_2BUTTON_PRESS || event->type == GDK_3BUTTON_PRESS) {
-	if ( ab->composing ) {
-	    balsa_ab_window_swap_clist_entry(GTK_CLIST(ab->address_clist),
-						GTK_CLIST(ab->recipient_clist));
-	} else {
-	    BalsaSendmsg *snd;
-	    gchar *addr;
-	    AddressBookEntry *entry;
+        snd = sendmsg_window_new(GTK_WIDGET(balsa_app.main_window), NULL,
+                                 SEND_NORMAL);
+        gtk_tree_model_get_iter(model, &iter, path);
+        gtk_tree_model_get(model, &iter,
+                           LIST_COLUMN_ADDRESS, &address,
+                           LIST_COLUMN_WHICH, &which_multiple, -1);
+        addr = libbalsa_address_to_gchar(address, which_multiple);
+	g_object_unref(G_OBJECT(address));
+        gtk_entry_set_text(GTK_ENTRY(snd->to[1]), addr);
+        g_free(addr);
 
-	    snd = sendmsg_window_new(GTK_WIDGET(balsa_app.main_window), NULL, 
-				     SEND_NORMAL);
-	    entry = (AddressBookEntry*)gtk_clist_get_row_data(GTK_CLIST(ab->address_clist), row);
-	    
-	    addr = libbalsa_address_to_gchar(entry->address, entry->which_multiple);
-	    gtk_entry_set_text(GTK_ENTRY(snd->to[1]), addr);
-	    g_free(addr);
-
-	    gtk_widget_grab_focus(snd->subject[1]);
-	}
+        gtk_widget_grab_focus(snd->subject[1]);
     }
 }
 
@@ -513,20 +594,19 @@ balsa_ab_window_select_address(GtkWidget *widget, gint row, gint column,
 
   Only sane if composing. Move to address list.
  */
-static void balsa_ab_window_select_recipient(GtkWidget *widget, 
-						gint row, gint column,
-						GdkEventButton *event, 
-						BalsaAbWindow *ab)
+static void
+balsa_ab_window_select_recipient(GtkTreeView * view,
+                                    GtkTreePath * path,
+                                    GtkTreeViewColumn * column,
+                                    gpointer data)
 {
+    BalsaAbWindow *ab = data;
+
     g_return_if_fail( BALSA_IS_AB_WINDOW(ab) );
     g_return_if_fail( ab->composing );
 
-    if ( event == NULL )
-	return;
-
-    if (event->type == GDK_2BUTTON_PRESS || event->type == GDK_3BUTTON_PRESS)
-	    balsa_ab_window_swap_clist_entry(GTK_CLIST(ab->recipient_clist),
-						GTK_CLIST(ab->address_clist));
+    balsa_ab_window_swap_list_entry(GTK_TREE_VIEW(ab->recipient_list),
+                                       GTK_TREE_VIEW(ab->address_list));
 }
 
 /*
@@ -538,8 +618,8 @@ balsa_ab_window_move_to_recipient_list(GtkWidget *widget, BalsaAbWindow *ab)
     g_return_if_fail( BALSA_IS_AB_WINDOW(ab) );
     g_return_if_fail( ab->composing );
 
-    balsa_ab_window_swap_clist_entry(GTK_CLIST(ab->address_clist), 
-					GTK_CLIST(ab->recipient_clist));
+    balsa_ab_window_swap_list_entry(GTK_TREE_VIEW(ab->address_list), 
+				       GTK_TREE_VIEW(ab->recipient_list));
 }
 
 /*
@@ -551,8 +631,8 @@ balsa_ab_window_remove_from_recipient_list(GtkWidget *widget, BalsaAbWindow *ab)
     g_return_if_fail( BALSA_IS_AB_WINDOW(ab) );
     g_return_if_fail( ab->composing );
 
-    balsa_ab_window_swap_clist_entry(GTK_CLIST(ab->recipient_clist), 
-					GTK_CLIST(ab->address_clist));
+    balsa_ab_window_swap_list_entry(GTK_TREE_VIEW(ab->recipient_list), 
+				       GTK_TREE_VIEW(ab->address_list));
 }
 
 /*
@@ -571,18 +651,25 @@ balsa_ab_window_reload(GtkWidget *w, BalsaAbWindow *ab)
 static void
 balsa_ab_window_load(BalsaAbWindow *ab)
 {
+    GtkTreeModel *model;
+    LibBalsaABErr err;
     g_return_if_fail(BALSA_IS_AB_WINDOW(ab));
-    ab = BALSA_AB_WINDOW(ab);
 
-    gtk_clist_clear(GTK_CLIST(ab->address_clist));
+    model = gtk_tree_view_get_model(GTK_TREE_VIEW(ab->address_list));
+    gtk_list_store_clear(GTK_LIST_STORE(model));
 
     if (ab->current_address_book == NULL)
 	return;
 
-    libbalsa_address_book_load(ab->current_address_book, 
-			       (LibBalsaAddressBookLoadFunc)
-			       balsa_ab_window_load_cb,
-			       ab);
+    if( (err=libbalsa_address_book_load(ab->current_address_book, 
+                                        (LibBalsaAddressBookLoadFunc)
+                                        balsa_ab_window_load_cb,
+                                        ab)) != LBABERR_OK) {
+        balsa_information(LIBBALSA_INFORMATION_ERROR,
+                          _("Error opening address book '%s'\n%s"),
+                          ab->current_address_book->name,
+                          libbalsa_address_book_strerror(err));
+    }
 }
 
 /*
@@ -592,12 +679,12 @@ balsa_ab_window_load(BalsaAbWindow *ab)
   single entry, or else create an entry for each address in the book.
  */
 static void
-balsa_ab_window_load_cb(LibBalsaAddressBook *libbalsa_ab, LibBalsaAddress *address, BalsaAbWindow *ab)
+balsa_ab_window_load_cb(LibBalsaAddressBook *libbalsa_ab,
+                        LibBalsaAddress *address, BalsaAbWindow *ab)
 {
-    gchar *listdata[2];
-    gint rownum;
+    GtkTreeModel *model;
+    GtkTreeIter iter;
     GList *address_list;
-    AddressBookEntry *entry;
     gint count;
 
     g_return_if_fail ( BALSA_IS_AB_WINDOW(ab));
@@ -606,30 +693,35 @@ balsa_ab_window_load_cb(LibBalsaAddressBook *libbalsa_ab, LibBalsaAddress *addre
     if ( address == NULL )
 	return;
 
+    model = gtk_tree_view_get_model(GTK_TREE_VIEW(ab->address_list));
     if ( libbalsa_address_is_dist_list(libbalsa_ab, address) ) {
+        gchar *address_string = libbalsa_address_to_gchar(address, -1);
 
-	listdata[LIST_COLUMN_NAME] = address->full_name;
-	listdata[LIST_COLUMN_ADDRESS] = libbalsa_address_to_gchar(address, -1);
-	
-	rownum = gtk_clist_append(GTK_CLIST(ab->address_clist), listdata);
+        gtk_list_store_prepend(GTK_LIST_STORE(model), &iter);
+        /* GtkListStore refs address, and unrefs it when cleared  */
+        gtk_list_store_set(GTK_LIST_STORE(model), &iter,
+                           LIST_COLUMN_NAME, address->full_name,
+                           LIST_COLUMN_ADDRESS_STRING, address_string,
+                           LIST_COLUMN_ADDRESS, address,
+                           LIST_COLUMN_WHICH, -1,
+                           -1);
 
-	entry = ab_window_entry_new(address, -1);
-	gtk_clist_set_row_data_full(GTK_CLIST(ab->address_clist), rownum, entry,
-				    (GtkDestroyNotify)ab_window_entry_unref);
-	g_free(listdata[LIST_COLUMN_ADDRESS]);
-
+	g_free(address_string);
     } else {
 	address_list = address->address_list;
 	count = 0;
 	while ( address_list ) {
-	    listdata[LIST_COLUMN_NAME] = address->full_name;
-	    listdata[LIST_COLUMN_ADDRESS] = (gchar *) address_list->data;
-	    
-	    rownum = gtk_clist_append(GTK_CLIST(ab->address_clist), listdata);
-	    
-	    entry = ab_window_entry_new(address, count);
-	    gtk_clist_set_row_data_full(GTK_CLIST(ab->address_clist), rownum, entry,
-					(GtkDestroyNotify)ab_window_entry_unref);
+            gtk_list_store_prepend(GTK_LIST_STORE(model), &iter);
+            /* GtkListStore refs address once for each address in
+             * the list, and unrefs it the same number of times when
+             * cleared */
+            gtk_list_store_set(GTK_LIST_STORE(model), &iter,
+                               LIST_COLUMN_NAME, address->full_name,
+                               LIST_COLUMN_ADDRESS_STRING,
+                               address_list->data,
+                               LIST_COLUMN_ADDRESS, address,
+                               LIST_COLUMN_WHICH, count,
+                               -1);
 
 	    address_list = g_list_next(address_list);
 	    count++;
@@ -642,40 +734,48 @@ balsa_ab_window_load_cb(LibBalsaAddressBook *libbalsa_ab, LibBalsaAddress *addre
   Attached to the changed signal of the find entry.
 */
 static void
-balsa_ab_window_find(GtkWidget * group_entry, BalsaAbWindow *ab)
+balsa_ab_window_find(GtkWidget * group_entry, BalsaAbWindow * ab)
 {
-    gchar *entry_text;
-    gpointer row;
-    gchar *new;
-    gint num;
+    const gchar *entry_text;
+    GtkTreeSelection *selection;
+    GtkTreeView *tree_view;
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+    gboolean valid;
+    gboolean first_path;
 
     g_return_if_fail(BALSA_IS_AB_WINDOW(ab));
 
     entry_text = gtk_entry_get_text(GTK_ENTRY(group_entry));
 
     if (*entry_text == '\0')
-	return;
+        return;
 
-    gtk_clist_unselect_all(GTK_CLIST(ab->address_clist));
-    gtk_clist_freeze(GTK_CLIST(ab->address_clist));
+    tree_view = GTK_TREE_VIEW(ab->address_list);
+    selection = gtk_tree_view_get_selection(tree_view);
+    gtk_tree_selection_unselect_all(selection);
 
-    num = 0;
-    while ((row = gtk_clist_get_row_data(GTK_CLIST(ab->address_clist), num)) != NULL) {
-	gtk_clist_get_text(GTK_CLIST(ab->address_clist), num, 
-			   LIST_COLUMN_NAME, &new);
+    model = gtk_tree_view_get_model(tree_view);
+    first_path = TRUE;
+    for (valid = gtk_tree_model_get_iter_first(model, &iter); valid;
+         valid = gtk_tree_model_iter_next(model, &iter)) {
+        gchar *new;
 
-	if (strncasecmp(new, entry_text, strlen(entry_text)) == 0) {
-	    gtk_clist_moveto(GTK_CLIST(ab->address_clist), 
-			     num, LIST_COLUMN_NAME, 
-			     0, 0);
-	    break;
-	}
-	num++;
+        gtk_tree_model_get(model, &iter, LIST_COLUMN_NAME, &new, -1);
+        if (g_ascii_strncasecmp(new, entry_text,
+                                strlen(entry_text)) == 0) {
+            GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
+
+            gtk_tree_selection_select_path(selection, path);
+            if (first_path) {
+                gtk_tree_view_scroll_to_cell(tree_view, path, NULL,
+                                             TRUE, 0.5, 0);
+                first_path = FALSE;
+            }
+            gtk_tree_path_free(path);
+        }
+        g_free(new);
     }
-    gtk_clist_thaw(GTK_CLIST(ab->address_clist));
-    gtk_clist_select_row(GTK_CLIST(ab->address_clist), num, 
-			 LIST_COLUMN_NAME);
-    return;
 }
 
 /*
@@ -705,21 +805,22 @@ balsa_ab_window_menu_changed(GtkWidget * widget, BalsaAbWindow *ab)
 {
     LibBalsaAddressBook *addr;
 
-    addr = LIBBALSA_ADDRESS_BOOK(gtk_object_get_data(GTK_OBJECT(widget), "address-book"));
+    addr = LIBBALSA_ADDRESS_BOOK(g_object_get_data
+                                 (G_OBJECT(widget), "address-book"));
     g_assert(addr != NULL);
 
     ab->current_address_book = addr;
 
-    gtk_signal_handler_block(GTK_OBJECT(ab->single_address_mode_radio), 
-			     ab->toggle_handler_id);
+    g_signal_handler_block(G_OBJECT(ab->single_address_mode_radio), 
+			   ab->toggle_handler_id);
     if ( ab->current_address_book->dist_list_mode )
 	gtk_toggle_button_set_active(
 	    GTK_TOGGLE_BUTTON(ab->dist_address_mode_radio), TRUE);
     else 
 	gtk_toggle_button_set_active(
 	    GTK_TOGGLE_BUTTON(ab->single_address_mode_radio), TRUE);
-    gtk_signal_handler_unblock(GTK_OBJECT(ab->single_address_mode_radio), 
-			       ab->toggle_handler_id);
+    g_signal_handler_unblock(G_OBJECT(ab->single_address_mode_radio), 
+			     ab->toggle_handler_id);
 
     balsa_ab_window_load(ab);
 }
@@ -728,63 +829,38 @@ balsa_ab_window_menu_changed(GtkWidget * widget, BalsaAbWindow *ab)
   Compare two rows in a clist.
 */
 static gint
-balsa_ab_window_compare_entries(GtkCList * clist, gconstpointer a, gconstpointer b)
+balsa_ab_window_compare_entries(GtkTreeModel * model,
+                                   GtkTreeIter * iter1,
+                                   GtkTreeIter * iter2,
+                                   gpointer data)
 {
-    gchar *c1, *c2;
+    gchar *c1 = NULL;
+    gchar *c2 = NULL;
 
-    GtkCListRow *row1 = (GtkCListRow *) a;
-    GtkCListRow *row2 = (GtkCListRow *) b;
-
-    g_assert(row1->cell->type == GTK_CELL_TEXT);
-    g_assert(row2->cell->type == GTK_CELL_TEXT);
-
-    c1 = GTK_CELL_TEXT(*row1->cell)->text;
-    c2 = GTK_CELL_TEXT(*row2->cell)->text;
+    gtk_tree_model_get(model, iter1, LIST_COLUMN_NAME, &c1, -1);
+    gtk_tree_model_get(model, iter2, LIST_COLUMN_NAME, &c2, -1);
 
     if (c1 == NULL || c2 == NULL)
 	return 0;
 
-    return g_strcasecmp(c1, c2);
+    return g_ascii_strcasecmp(c1, c2);
 }
 
-/*
-  Create the data attached to a clist row
+/* balsa_ab_window_response_cb:
+   Normally, we should not destroy the window in the response callback.
+   This time, we can make an exception - nobody is waiting for the result
+   anyway.
 */
-
-static AddressBookEntry *
-ab_window_entry_new(LibBalsaAddress *address, gint which_multiple)
-{
-    AddressBookEntry *abe;
-
-    abe = g_new(AddressBookEntry, 1);
-
-    gtk_object_ref(GTK_OBJECT(address));
-
-    abe->ref_count = 1;
-    abe->address = address;
-    abe->which_multiple = which_multiple;
-    
-    return abe;
-}
-
-/*
-  Unref a row data struct and free if needed.
- */
 static void
-ab_window_entry_unref(AddressBookEntry *entry)
+balsa_ab_window_response_cb(BalsaAbWindow *ab, gint response)
 {
-    entry->ref_count--;
-
-    if ( entry->ref_count > 0 ) 
-	return;
-
-    gtk_object_unref(GTK_OBJECT(entry->address));
-    g_free(entry);
+    switch(response) {
+    case GTK_RESPONSE_CLOSE:
+        if ( !ab->composing )
+            gtk_widget_destroy(GTK_WIDGET(ab));
+        break;
+    default: /* nothing */
+	break;
+    }
 }
 
-static void
-balsa_ab_window_button_clicked (BalsaAbWindow *ab, gint button_number, gpointer data)
-{
-    if ( !ab->composing )
-	gtk_widget_destroy(GTK_WIDGET(ab));
-}

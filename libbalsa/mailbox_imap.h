@@ -22,13 +22,20 @@
 #ifndef __LIBBALSA_MAILBOX_IMAP_H__
 #define __LIBBALSA_MAILBOX_IMAP_H__
 
-#define LIBBALSA_TYPE_MAILBOX_IMAP			(libbalsa_mailbox_imap_get_type())
-#define LIBBALSA_MAILBOX_IMAP(obj)			(GTK_CHECK_CAST (obj, LIBBALSA_TYPE_MAILBOX_IMAP, LibBalsaMailboxImap))
-#define LIBBALSA_MAILBOX_IMAP_CLASS(klass)		(GTK_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_MAILBOX_IMAP, LibBalsaMailboxImapClass))
-#define LIBBALSA_IS_MAILBOX_IMAP(obj)		(GTK_CHECK_TYPE (obj, LIBBALSA_TYPE_MAILBOX_IMAP))
-#define LIBBALSA_IS_MAILBOX_IMAP_CLASS(klass)	(GTK_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_MAILBOX_IMAP))
+#define LIBBALSA_TYPE_MAILBOX_IMAP \
+    (libbalsa_mailbox_imap_get_type())
+#define LIBBALSA_MAILBOX_IMAP(obj) \
+    (G_TYPE_CHECK_INSTANCE_CAST ((obj), LIBBALSA_TYPE_MAILBOX_IMAP, \
+                                 LibBalsaMailboxImap))
+#define LIBBALSA_MAILBOX_IMAP_CLASS(klass) \
+    (G_TYPE_CHECK_CLASS_CAST ((klass), LIBBALSA_TYPE_MAILBOX_IMAP, \
+                              LibBalsaMailboxImapClass))
+#define LIBBALSA_IS_MAILBOX_IMAP(obj) \
+    (G_TYPE_CHECK_INSTANCE_TYPE ((obj), LIBBALSA_TYPE_MAILBOX_IMAP))
+#define LIBBALSA_IS_MAILBOX_IMAP_CLASS(klass) \
+    (G_TYPE_CHECK_CLASS_TYPE ((klass), LIBBALSA_TYPE_MAILBOX_IMAP))
 
-GtkType libbalsa_mailbox_imap_get_type(void);
+GType libbalsa_mailbox_imap_get_type(void);
 
 typedef struct _LibBalsaMailboxImap LibBalsaMailboxImap;
 typedef struct _LibBalsaMailboxImapClass LibBalsaMailboxImapClass;
@@ -55,7 +62,7 @@ struct _LibBalsaMailboxImapClass {
     LibBalsaMailboxRemoteClass klass;
 };
 
-GtkObject *libbalsa_mailbox_imap_new(void);
+GObject *libbalsa_mailbox_imap_new(void);
 
 void libbalsa_mailbox_imap_update_url(LibBalsaMailboxImap* mailbox);
 void libbalsa_mailbox_imap_set_path(LibBalsaMailboxImap * mailbox,
@@ -76,9 +83,5 @@ gboolean libbalsa_imap_rename_subfolder(LibBalsaMailboxImap* mbox,
 void libbalsa_imap_delete_folder(LibBalsaMailboxImap * mailbox);
 
 void reset_mutt_passwords(LibBalsaServer *);
-
-void libbalsa_mailbox_imap_search(LibBalsaMailboxImap* mbox,
-				  const gchar * query,
-				  GList ** seq_nums);
 
 #endif				/* __LIBBALSA_MAILBOX_IMAP_H__ */

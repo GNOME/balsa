@@ -35,13 +35,21 @@
      all mailboxes....  which arguably we might want eventually,
      and claim that a directory is a "server", but until then...
  */
-#define LIBBALSA_TYPE_MAILBOX_REMOTE	        (libbalsa_mailbox_remote_get_type())
-#define LIBBALSA_MAILBOX_REMOTE(obj)		(GTK_CHECK_CAST ((obj), LIBBALSA_TYPE_MAILBOX_REMOTE, LibBalsaMailboxRemote))
-#define LIBBALSA_MAILBOX_REMOTE_CLASS(klass)	(GTK_CHECK_CLASS_CAST ((klass), LIBBALSA_TYPE_MAILBOX, LibBalsaMailboxRemoteClass))
-#define LIBBALSA_IS_MAILBOX_REMOTE(obj)		(GTK_CHECK_TYPE ((obj), LIBBALSA_TYPE_MAILBOX_REMOTE))
-#define LIBBALSA_IS_MAILBOX_REMOTE_CLASS(klass)	(GTK_CHECK_CLASS_TYPE ((klass), LIBBALSA_TYPE_MAILBOX_REMOTE))
+#define LIBBALSA_TYPE_MAILBOX_REMOTE \
+    (libbalsa_mailbox_remote_get_type())
+#define LIBBALSA_MAILBOX_REMOTE(obj) \
+    (G_TYPE_CHECK_INSTANCE_CAST ((obj), LIBBALSA_TYPE_MAILBOX_REMOTE, \
+                                 LibBalsaMailboxRemote))
+#define LIBBALSA_MAILBOX_REMOTE_CLASS(klass) \
+    (G_TYPE_CHECK_CLASS_CAST ((klass), LIBBALSA_TYPE_MAILBOX, \
+                              LibBalsaMailboxRemoteClass))
+#define LIBBALSA_IS_MAILBOX_REMOTE(obj) \
+    (G_TYPE_CHECK_INSTANCE_TYPE ((obj), LIBBALSA_TYPE_MAILBOX_REMOTE))
+#define LIBBALSA_IS_MAILBOX_REMOTE_CLASS(klass) \
+    (G_TYPE_CHECK_CLASS_TYPE ((klass), LIBBALSA_TYPE_MAILBOX_REMOTE))
 
-#define LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox) (LIBBALSA_SERVER(LIBBALSA_MAILBOX_REMOTE(mailbox)->server))
+#define LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox) \
+    (LIBBALSA_SERVER(LIBBALSA_MAILBOX_REMOTE(mailbox)->server))
 
 typedef struct _LibBalsaMailboxRemoteClass LibBalsaMailboxRemoteClass;
 
@@ -55,7 +63,7 @@ struct _LibBalsaMailboxRemoteClass {
     LibBalsaMailboxClass parent_class;
 };
 
-GtkType libbalsa_mailbox_remote_get_type(void);
+GType libbalsa_mailbox_remote_get_type(void);
 
 void libbalsa_mailbox_remote_set_server(LibBalsaMailboxRemote* m, 
 					LibBalsaServer* s);

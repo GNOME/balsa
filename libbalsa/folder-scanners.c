@@ -91,7 +91,6 @@ libbalsa_scanner_local_dir(GNode *rnode, const gchar * prefix,
 {
     DIR *dpc;
     struct dirent *de;
-    const gchar * name;
     char filename[PATH_MAX];
     struct stat st;
     GtkType mailbox_type;
@@ -120,10 +119,12 @@ libbalsa_scanner_local_dir(GNode *rnode, const gchar * prefix,
 	    } else if (mailbox_type == LIBBALSA_TYPE_MAILBOX_MAILDIR) {
 		mailbox_handler(rnode, de->d_name, filename);
 	    } else {
-		name = g_basename(prefix);
+                gchar *name = g_path_get_basename(prefix);
+
 		current_node = folder_handler(rnode, name, filename);
 		libbalsa_scanner_local_dir(current_node, filename, 
 					   folder_handler, mailbox_handler);
+                g_free(name);
 	    }
 	} else {
 	    mailbox_type = libbalsa_mailbox_type_from_path(filename);
@@ -147,7 +148,8 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
 			  const gchar* path, gboolean subscribed, 
                           gboolean list_inbox, int depth,
 			  ImapHandler folder_handler, 
-			  ImapHandler mailbox_handler)
+			  ImapHandler mailbox_handler,
+			  gpointer cb_data)
 {
     gchar* imap_path;
     GList* list = NULL, *el;
@@ -158,7 +160,8 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     state.imap_browse = 1;
     state.rnode = rnode;
     state.mailbox_handler = (void(*)())mailbox_handler;
-    state.folder_handler = (void(*)())folder_handler;
+    state.folder_handler  = (void(*)())folder_handler;
+    state.cb_data         = cb_data;
     if(!FileMask.rx) { /* allocate it once, on the first run */
        FileMask.rx = (regex_t *) safe_malloc (sizeof (regex_t));
        if( (i=REGCOMP(FileMask.rx,"!^\\.[^.]",0)) != 0) {
@@ -170,21 +173,19 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     }
     /* try getting password, quit on cancel */
     if (!server->passwd) {
-        gdk_threads_enter();
         server->passwd = libbalsa_server_get_password(server, NULL);
-        gdk_threads_leave();
         if(!server->passwd)
             return;
     }
-	
-    gdk_threads_enter(); libbalsa_lock_mutt();
+
+    libbalsa_lock_mutt();
 
     if (list_inbox)
         /* force INBOX into the mailbox list
          * delim doesn't matter, so we'll give it '/'
          * and we'll mark it as not scanned, in case it
          * has any subfolders */
-        mailbox_handler(rnode, "INBOX", '/', FALSE);
+        mailbox_handler("INBOX", '/', FALSE, cb_data);
 
     safe_free((void **)&ImapUser);   ImapUser = safe_strdup(server->user);
     safe_free((void **)&ImapPass);   ImapPass = safe_strdup(server->passwd);
@@ -194,7 +195,6 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     else
 	unset_option(OPTIMAPLSUB);
 
-
     state.subfolders = g_list_append(NULL, g_strdup(path));
     state.folder = NULL;
 
@@ -202,8 +202,8 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
 	state.scanned = (i < depth - 1);
 	list = state.subfolders;
 	state.subfolders = NULL;
-	for(el= g_list_first(list); el; el = g_list_next(el)) {
-	    if(*(char*)el->data)
+	for(el = list; el; el = g_list_next(el)) {
+	    if(el->data && *((char *) el->data))
 		imap_path = g_strdup_printf("imap%s://%s/%s/", 
 #ifdef USE_SSL
 					    server->use_ssl ? "s" : "",
@@ -229,13 +229,12 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     g_list_foreach((GList*)state.subfolders, (GFunc)g_free, NULL);
     g_list_free((GList*)state.subfolders);
     state_free (&state);
-    libbalsa_unlock_mutt(); gdk_threads_leave();
+    libbalsa_unlock_mutt(); 
 }
 
 /* this function ovverrides mutt's one.
- * called with GDK unlocked via sequence:
+ * The calling sequence is:
  * libbalsa_scanner_imap_dir->libmutt::imap_browse-> imap_add_folder.
- * See HACKING file for proper locking order description.
  */
 void imap_add_folder (char delim, char *folder, int noselect,
   int noinferiors, struct browser_state *state, short isparent)
@@ -243,19 +242,17 @@ void imap_add_folder (char delim, char *folder, int noselect,
     int isFolder = 0;
     int isMailbox = 0;
 
-    imap_unmunge_mbox_name (folder);
-    /* printf("imap_add_folder. delim: '%c', folder: '%s', noselect: %d\n"
-	   "noinferiors: %d, isparent: %d\n", delim, folder, noselect,
-	   noinferiors, isparent);  */
     if(isparent) return;
-    libbalsa_unlock_mutt();
+
+    imap_unmunge_mbox_name (folder);
+
     if(!noselect) {
 	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
                              "ADDING MAILBOX %s\n", folder);
 	++isMailbox;
     }
     /* this extra check is needed for subscribed folder handling. 
-	   Read RFC when in doubt. */
+     * Read RFC when in doubt. */
     if(!g_list_find_custom(state->subfolders, folder,
 			   (GCompareFunc)strcmp)) {
 	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
@@ -266,8 +263,7 @@ void imap_add_folder (char delim, char *folder, int noselect,
 	++isFolder;
     }
     if (isMailbox)
-	state->mailbox_handler(state->rnode, folder, delim, state->scanned);
+	state->mailbox_handler(folder, delim, state->scanned, state->cb_data);
     else if (isFolder)
-	state->folder_handler(state->rnode, folder, delim, state->scanned);
-    libbalsa_lock_mutt();
+	state->folder_handler(folder, delim, state->scanned, state->cb_data);
 }

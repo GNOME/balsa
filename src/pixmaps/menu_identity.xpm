@@ -1,5 +1,5 @@
 /* XPM */
-static char * menu_identity_xpm[] = {
+static const char * menu_identity_xpm[] = {
 "16 16 50 1",
 " 	c None",
 ".	c #000000",

@@ -1,5 +1,4 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
-/* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2002 Stuart Parmenter and others,
@@ -29,31 +28,24 @@
 #include <errno.h>
 #include <dirent.h>
 
-#include <gnome.h>
+#include <libgnomevfs/gnome-vfs-file-info.h>
+#include <libgnomevfs/gnome-vfs-ops.h>
+#include <libgnome/gnome-i18n.h>
 
-#ifdef HAVE_GNOME_VFS
-# include <libgnomevfs/gnome-vfs-file-info.h>
-# include <libgnomevfs/gnome-vfs-ops.h>
-#else
-# define GNOME_MIME_BUG_WORKAROUND 1
-#endif
-
-#include "misc.h"
+#include "libbalsa.h"
 #include "libbalsa_private.h"
+#include "misc.h"
+
 
 /* libbalsa_lookup_mime_type:
-   returns an allocated mime-type.
-   gnome_vfs_file_info_get_mime_type() theoretically returns a const value,
-   but that string is const only until gnome_vfs_file_info_unref();
-   Must work for both absolute and relative file names.
+   find out mime type of a file. Must work for both relative and absolute
+   paths.
 */
 gchar*
 libbalsa_lookup_mime_type(const gchar * path)
 {
-#ifdef HAVE_GNOME_VFS
-    gchar *mime_type;
     GnomeVFSFileInfo* vi = gnome_vfs_file_info_new();
-    gchar* uri;
+    gchar* uri, *mime_type;
 
     if(g_path_is_absolute(path))
         uri = g_strconcat("file://", path, NULL);
@@ -69,22 +61,6 @@ libbalsa_lookup_mime_type(const gchar * path)
     mime_type = g_strdup(gnome_vfs_file_info_get_mime_type(vi));
     gnome_vfs_file_info_unref(vi);
     return mime_type;
-#else
-    const gchar *mime_type;
-    mime_type =
-	gnome_mime_type_or_default_of_file(path, "application/octet-stream");
-# ifdef GNOME_MIME_BUG_WORKAROUND
-    /* the function above returns for certain files a string which is
-       not a proper MIME type, e.g. "PDF document". Surprizingly,
-       gnome_mime_type() does not fail in this case. This bug has been
-       filed in bugzilla. Still not fixed.
-    */
-    if(strchr(mime_type, '/') == NULL)
-	mime_type =
-            gnome_mime_type_or_default(path, "application/octet-stream");
-# endif
-    return g_strdup(mime_type);
-#endif
 }
 
 gchar *
@@ -189,7 +165,7 @@ libbalsa_make_string_from_list(const GList * the_list)
 gchar *
 libbalsa_make_string_from_list_p(const GList * the_list)
 {
-    gchar *retc, *str;
+    gchar *str;
     GList *list;
     GString *gs = g_string_new(NULL);
     LibBalsaAddress *addy;
@@ -210,10 +186,7 @@ libbalsa_make_string_from_list_p(const GList * the_list)
 	list = list->next;
     }
 
-    retc = g_strdup(gs->str);
-    g_string_free(gs, 1);
-
-    return retc;
+    return g_string_free(gs, FALSE);
 }
 
 
@@ -310,16 +283,7 @@ size_t libbalsa_readfile_nostat(FILE * fp, char **buf)
     } while( r != 0 );
 
     size = gstr->len;
-    *buf = (char *) g_malloc(size + 1);
-    if (*buf == NULL) {
-	g_string_free(gstr, TRUE);
-	return -1;
-    }
-
-    strncpy(*buf, gstr->str, size);
-    (*buf)[size] = '\0';
-
-    g_string_free(gstr, TRUE);
+    *buf = g_string_free(gstr, FALSE);
 
     return size;
 }
@@ -335,7 +299,7 @@ gboolean libbalsa_find_word(const gchar * word, const gchar * str)
     int len = strlen(word);
 
     while (*ptr) {
-	if (g_strncasecmp(word, ptr, len) == 0)
+	if (g_ascii_strncasecmp(word, ptr, len) == 0)
 	    return TRUE;
 	/* skip one word */
 	while (*ptr && !isspace((int)*ptr))
@@ -411,95 +375,77 @@ libbalsa_wrap_string(gchar * str, int width)
  * if the text is coming off the wire, use the RFC specs
  * if it's coming off the screen, don't destuff unquoted lines
  * */
-static void
-unwrap_rfc2646(gchar * par, gboolean from_screen, GString * result)
+
+typedef struct {
+    gint quote_depth;
+    gchar *str;
+} rfc2646text;
+
+static GList *
+unwrap_rfc2646(gchar * str, gboolean from_screen)
 {
-    gchar *str = NULL;
-    gchar **lines, **l;
-    gint ql = 0;
+    GList *list = NULL;
 
-    lines = l = g_strsplit(par, "\n", -1);
+    while (*str) {
+        /* make a line of output */
+        rfc2646text *text = g_new(rfc2646text, 1);
+        GString *string = g_string_new(NULL);
+        gboolean chomp = TRUE;
 
-    while (*lines) {
-        gint quote_level;
-        gboolean flowed = FALSE;
-        gchar *pending = NULL;
-        gboolean tagged = FALSE;
-        gint tmp;
-        gboolean is_sig;
+        text->quote_depth = -1;
 
-        if (!str) {
-            str = *lines++;
-            ql = strspn(str, QUOTE_STRING);
+        while (*str) {
+            /* process a line of input */
+            gboolean sig_sep;
+            gchar *p;
+            gint len;
+
+            for (p = str; *p == '>'; p++)
+                /* nothing */;
+            len = p - str;
+            sig_sep = (strncmp(p, "-- \n", 4) == 0);
+            if (text->quote_depth < 0)
+                text->quote_depth = len;
+            else if (len != text->quote_depth || sig_sep)
+                /* broken! a flowed line was followed by either a line
+                 * with different quote depth, or a sig separator
+                 *
+                 * we'll break before updating str, so we pick up this
+                 * line again on the next pass through this loop */
+                break;
+
+            if (*p == ' ' && (!from_screen || len > 0))
+                /* space stuffed */
+                p++;
+
+            /* move str to the start of the next line, if any */
+            for (str = p; *str && *str != '\n'; str++)
+                /* nothing */;
+            len = str - p;
+            if (*str)
+                str++;
+
+            g_string_append_len(string, p, len);
+            if (len == 0 || p[--len] != ' ' || sig_sep) {
+                chomp = FALSE;
+                break;
+            }
         }
-        quote_level = ql;
-        tmp = str[ql];
-        str[ql] = '\0';
-        g_string_append(result, str);
-        str[ql] = tmp;
-
-        do {
-            gchar *dq = &str[ql];
-
-            is_sig = (strcmp(dq, "-- ") == 0);
-            if (is_sig && pending)
-                break;
-            /* destuff if coming off the wire or quoted: */
-            if (*dq == ' ' && (!from_screen || quote_level > 0))
-                ++dq;
-            /* flush any pending line */
-            if (pending) {
-                if (!tagged) {
-                    /* 
-                     * insert a tagging character to show whether this
-                     * object is a paragraph or a fixed line
-                     *
-                     * we don't currently use this information, but we
-                     * might want to later
-                     *
-                     * it also serves to separate the quote string from
-                     * the text, which might begin with '>'
-                     * */
-                    g_string_append_c(result, flowed ? 'p' : 'f');
-                    tagged = TRUE;
-                }
-                g_string_append(result, pending);
-            }
-            /* hold this line as pending */
-            pending = dq;
-            flowed = (!is_sig) && *dq && dq[strlen(dq) - 1] == ' ';
-            if (!flowed || !*lines) {
-                str = NULL;
-                break;
-            }
-            str = *lines++;
-            ql = strspn(str, QUOTE_STRING);
-        } while (ql == quote_level);
-        /* 
-         * end of paragraph; either:
-         * - str is a sig-separator; or
-         * - str has a new quote level; or
-         * - the last line was fixed, not flowed; or
-         * - we ran out of data.
-         *
-         * if it's a new quote level, we must trim trailing spaces from
-         * any pending line
-         * */
-        if (flowed && (is_sig || ql != quote_level)) {
-            gchar *p = pending;
+        text->str = g_string_free(string, FALSE);
+        if (chomp) {
+            gchar *p = text->str;
             while (*p)
                 p++;
-            while (--p >= pending && *p == ' ');
+            while (--p >= text->str && *p == ' ')
+                /* nothing */ ;
             *++p = '\0';
         }
-        if (!tagged)
-            g_string_append_c(result, flowed ? 'p' : 'f');
-        g_string_append(result, pending);
-        g_string_append_c(result, '\n');
+        list = g_list_append(list, text);
     }
 
-    g_strfreev(l);
+    return list;
 }
+
 /*
  * we'll use one routine to wrap the paragraphs
  *
@@ -507,43 +453,30 @@ unwrap_rfc2646(gchar * par, gboolean from_screen, GString * result)
  * if it's going to the screen, don't space-stuff unquoted lines
  * */
 static void
-dowrap_rfc2646(gchar * par, gint width, gboolean to_screen,
+dowrap_rfc2646(GList * list, gint width, gboolean to_screen,
                gboolean quote, GString * result)
 {
-    gchar **lines, **l;
-
-    lines = l = g_strsplit(par, "\n", -1);
-
     /* outer loop over paragraphs */
-    while (*lines) {
-        gchar *str, *quote_string;
-        size_t ql;
+    while (list) {
+        rfc2646text *text = list->data;
+        gchar *str;
+        gint qd;
 
-        str = *lines++;
-        ql = strspn(str, QUOTE_STRING);
-        if (quote || ql) {
-            if (quote) {
-                gint tmp = str[ql];
-                str[ql] = '\0';
-                quote_string = g_strconcat(QUOTE_STRING, str, NULL);
-                str[ql] = tmp;
-            } else
-                quote_string = g_strndup(str, ql);
-        } else
-            quote_string = "";
-        /* skip over quote string and tag character: */
-        str += ql + 1;
+        str = text->str;
+        qd = text->quote_depth;
+        if (quote)
+            qd++;
         /* one output line per middle loop */
         do {                    /* ... while (*str); */
             gboolean first_word = TRUE;
             gchar *start = str;
             gchar *line_break = start;
-            gint len = ql;
+            gint len = qd;
+            gint i;
 
             /* start of line: emit quote string */
-            g_string_append(result, quote_string);
-            if (quote)
-                ++len;
+            for (i = 0; i < qd; i++)
+                g_string_append_c(result, '>');
             /* space-stuffing:
              * - for the wire, stuffing is required for lines beginning
              *   with ` ', `>', or `From '
@@ -592,15 +525,11 @@ dowrap_rfc2646(gchar * par, gint width, gboolean to_screen,
                     continue;
 
                 if (!*str || len > width) {
-                    gint tmp;
                     /* allow an overlong first word, otherwise back up
                      * str */
                     if (len > width && !first_word)
                         str = line_break;
-                    tmp = *str;
-                    *str = '\0';
-                    g_string_append(result, start);
-                    *str = tmp;
+                    g_string_append_len(result, start, str - start);
                     break;
                 }
                 first_word = FALSE;
@@ -612,14 +541,16 @@ dowrap_rfc2646(gchar * par, gint width, gboolean to_screen,
              * */
             if (str > start && isspace((int)str[-1]) && str[-1] != ' ')
                 g_string_append_c(result, ' ');
-            g_string_append_c(result, '\n');
+            if (*str)           /* line separator */
+                g_string_append_c(result, '\n');
         } while (*str);         /* end of loop over output lines */
 
-        if (*quote_string)
-            g_free(quote_string);
+        g_free(text->str);
+        g_free(text);
+        list = g_list_next(list);
+        if (list)               /* paragraph separator */
+            g_string_append_c(result, '\n');
     }                           /* end of paragraph */
-
-    g_strfreev(l);
 }
 
 /* GString *libbalsa_process_text_rfc2646:
@@ -642,16 +573,11 @@ libbalsa_process_text_rfc2646(gchar * par, gint width,
 {
     gint len = strlen(par);
     GString *result = g_string_sized_new(len);
-    gchar *str;
+    GList *list;
 
-    unwrap_rfc2646(par, from_screen, result);
-    str = result->str;
-    len = result->len;
-    g_string_free(result, FALSE);
-
-    result = g_string_sized_new(len);
-    dowrap_rfc2646(str, width, to_screen, quote, result);
-    g_free(str);
+    list = unwrap_rfc2646(par, from_screen);
+    dowrap_rfc2646(list, width, to_screen, quote, result);
+    g_list_free(list);
 
     return result;
 }
@@ -666,15 +592,12 @@ libbalsa_wrap_rfc2646(gchar * par, gint width, gboolean from_screen,
                       gboolean to_screen)
 {
     GString *result;
-    gchar *str;
 
     result = libbalsa_process_text_rfc2646(par, width, from_screen,
                                            to_screen, FALSE);
     g_free(par);
-    str = result->str;
-    g_string_free(result, FALSE);
 
-    return str;
+    return g_string_free(result, FALSE);
 }
 
 /* libbalsa_flowed_rfc2646:
@@ -688,125 +611,16 @@ libbalsa_flowed_rfc2646(LibBalsaMessageBody * body)
     gboolean flowed;
 
     content_type = libbalsa_message_body_get_content_type(body);
-    if (g_strcasecmp(content_type, "text/plain"))
+    if (g_ascii_strcasecmp(content_type, "text/plain"))
         flowed = FALSE;
     else {
         format = libbalsa_message_body_get_parameter(body, "format");
-        flowed = format && (g_strcasecmp(format, "flowed") == 0);
+        flowed = format && (g_ascii_strcasecmp(format, "flowed") == 0);
         g_free(format);
     }
     g_free(content_type);
 
     return flowed;
-}
-
-/* libbalsa_set_charset:
-   is a thin wrapper around mutt_set_charset() to get rid of mutt dependices
-   in balsa.
-*/
-void mutt_set_charset (char *charset);
-const char*
-libbalsa_set_charset(const gchar * charset)
-{
-    const char * old_charset = Charset;
-    mutt_set_charset(g_strdup(charset)); /*small leak*/
-    return old_charset;
-}
-
-/* libbalsa_marshal_POINTER__NONE:
-   Marshalling function
-*/
-typedef gpointer(*GtkSignal_POINTER__NONE) (GtkObject *object, 
-					    gpointer user_data);
-void
-libbalsa_marshal_POINTER__NONE(GtkObject *object, GtkSignalFunc func,
-				gpointer func_data, GtkArg *args)
-{
-    GtkSignal_POINTER__NONE rfunc = (GtkSignal_POINTER__NONE) func;
-    gpointer *return_val = GTK_RETLOC_POINTER(args[0]);
-
-    *return_val = (*rfunc) (object, func_data);
-}
-
-/* libbalsa_marshal_POINTER__OBJECT:
-   Marshalling function 
-*/
-typedef gpointer(*GtkSignal_POINTER__OBJECT) (GtkObject * object,
-					      GtkObject * parm,
-					      gpointer user_data);
-
-void
-libbalsa_marshal_POINTER__OBJECT(GtkObject * object, GtkSignalFunc func,
-				 gpointer func_data, GtkArg * args)
-{
-    GtkSignal_POINTER__OBJECT rfunc;
-    gpointer *return_val;
-
-    return_val = GTK_RETLOC_POINTER(args[1]);
-    rfunc = (GtkSignal_POINTER__OBJECT) func;
-    *return_val = (*rfunc) (object, GTK_VALUE_OBJECT(args[0]), func_data);
-}
-
-/* libbalsa_marshall_POINTER__POINTER_POINTER:
-   Marshalling function
-*/
-typedef gpointer(*GtkSignal_POINTER__POINTER_POINTER) (GtkObject *object,
-						       gpointer param1,
-						       gpointer param2,
-						       gpointer user_data);
-void
-libbalsa_marshall_POINTER__POINTER_POINTER(GtkObject *object, 
-                                           GtkSignalFunc func,
-					   gpointer func_data, GtkArg *args)
-{
-    GtkSignal_POINTER__POINTER_POINTER rfunc;
-    gpointer *return_val;
-
-    return_val = GTK_RETLOC_POINTER(args[2]);
-    rfunc = (GtkSignal_POINTER__POINTER_POINTER) func;
-    *return_val = (*rfunc) (object, GTK_VALUE_POINTER(args[0]), 
-                            GTK_VALUE_POINTER(args[1]), func_data);
-}
-
-/* libbalsa_marshall_POINTER__INT_POINTER:
-   Marshalling function
-*/
-typedef gpointer(*GtkSignal_POINTER__INT_POINTER) (GtkObject *object,
-                                                   int param1,
-                                                   gpointer param2,
-                                                   gpointer user_data);
-void
-libbalsa_marshal_POINTER__INT_POINTER(GtkObject *object, 
-                                      GtkSignalFunc func,
-                                      gpointer func_data, GtkArg *args)
-{
-    GtkSignal_POINTER__INT_POINTER rfunc;
-    gpointer *return_val;
-
-    return_val = GTK_RETLOC_POINTER(args[2]);
-    rfunc = (GtkSignal_POINTER__INT_POINTER) func;
-    *return_val = (*rfunc) (object, GTK_VALUE_INT(args[0]), 
-                            GTK_VALUE_POINTER(args[1]), func_data);
-}
-
-
-typedef gpointer(*GtkSignal_NONE__INT_INT_INT_STRING) (GtkObject *object,
-                                                       int param1,
-                                                       int param2,
-                                                       int param3,
-                                                       const gchar* param4,
-                                                       gpointer user_data);
-void
-libbalsa_marshal_NONE__INT_INT_INT_STRING(GtkObject *object, 
-                                          GtkSignalFunc func,
-                                          gpointer func_data, GtkArg *args)
-{
-    GtkSignal_NONE__INT_INT_INT_STRING rfunc;
-
-    rfunc = (GtkSignal_NONE__INT_INT_INT_STRING) func;
-    (*rfunc) (object, GTK_VALUE_INT(args[0]), 
-              GTK_VALUE_INT(args[1]), GTK_VALUE_INT(args[2]),
-              GTK_VALUE_STRING(args[3]), func_data);
 }
 
 /* Delete the contents of a directory (not the directory itself).
@@ -825,8 +639,8 @@ libbalsa_delete_directory_contents(const gchar *path)
     g_return_val_if_fail(d, FALSE);
 
     for (de = readdir(d); de; de = readdir(d)) {
-	if (g_strcasecmp(de->d_name, ".") == 0 ||
-	    g_strcasecmp(de->d_name, "..") == 0)
+	if (strcmp(de->d_name, ".") == 0 ||
+	    strcmp(de->d_name, "..") == 0)
 	    continue;
 	new_path = g_strdup_printf("%s/%s", path, de->d_name);
 
@@ -912,3 +726,25 @@ libbalsa_contract_path(gchar *path)
     libbalsa_unlock_mutt();
 }
 
+/* libbalsa_utf8_sanitize
+ *
+ * Validate utf-8 text, and if validation fails, replace each offending
+ * byte with '?'.
+ *
+ * Argument:
+ *   text   The text to be sanitized; NULL is OK.
+ *
+ * Return value:
+ *   none
+ *
+ * NOTE:    The text is modified in place.
+ */
+void
+libbalsa_utf8_sanitize(gchar * text)
+{
+    if (!text)
+        return;
+
+    while (!g_utf8_validate(text, -1, (const gchar **) &text))
+        *text = '?';
+}

@@ -21,6 +21,6 @@ INCLUDES = -I$(top_srcdir) -I../intl
 noinst_LIBRARIES = libimap.a
 noinst_HEADERS = auth.h imap_private.h message.h
 
-libimap_a_SOURCES = auth.c auth_login.c browse.c  command.c imap.c imap.h \
+libimap_a_SOURCES = auth.c auth_login.c browse.c command.c imap.c imap.h \
         message.c utf7.c util.c $(AUTHENTICATORS) $(GSSSOURCES)
 

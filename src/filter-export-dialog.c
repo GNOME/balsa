@@ -29,7 +29,6 @@
 
 #include "config.h"
 
-#include <gnome.h>
 #include "balsa-app.h"
 #include "filter-export.h"
 
@@ -40,7 +39,7 @@ extern GList * fr_dialogs_opened;
 
 gboolean fex_already_open=FALSE;
 
-GnomeDialog * fex_window;
+GtkWidget * fex_window;
 
 /*
  * filters_export_dialog()
@@ -50,69 +49,69 @@ GnomeDialog * fex_window;
 void
 filters_export_dialog(void)
 {
-    static gchar *titles[] = { N_("Name") };
-    GtkCList * clist;
-    GtkWidget * sw;
-    gint row;
-    LibBalsaFilter * fil;
-    GSList * filter_list;
+    GtkTreeView *list;
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+    GtkWidget *sw;
+    LibBalsaFilter *fil;
+    GSList *filter_list;
 
     if (fr_dialogs_opened) {
-	balsa_information(LIBBALSA_INFORMATION_ERROR, NULL,
+	balsa_information(LIBBALSA_INFORMATION_ERROR,
                           _("There are opened filter run dialogs, "
                             "close them before you can modify filters."));
 	return;
     }
     if (fex_already_open) {
-	gdk_window_raise(GTK_WIDGET(fex_window)->window);
+	gdk_window_raise(fex_window->window);
 	return;
     }
-    
-    fex_already_open=TRUE;
 
-    fex_window = GNOME_DIALOG(gnome_dialog_new(_("Balsa Filters Export"),
-					       GNOME_STOCK_BUTTON_OK,
-					       GNOME_STOCK_BUTTON_CANCEL,
-					       GNOME_STOCK_BUTTON_HELP, NULL));
+    fex_already_open = TRUE;
+
+    fex_window =
+        gtk_dialog_new_with_buttons(_("Balsa Filters Export"),
+                                    NULL, 0, /* FIXME */
+                                    GTK_STOCK_OK,     GTK_RESPONSE_OK,
+                                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                    GTK_STOCK_HELP,   GTK_RESPONSE_HELP,
+                                    NULL);
+    gtk_window_set_wmclass(GTK_WINDOW(fex_window), "filter-export",
+                           "Balsa");
 
     sw = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
 				   GTK_POLICY_AUTOMATIC,
 				   GTK_POLICY_AUTOMATIC);
 
-#ifdef ENABLE_NLS
-    titles[0] = _(titles[0]);
-#endif
-    clist = GTK_CLIST(gtk_clist_new_with_titles(1, titles));
+    list =
+        libbalsa_filter_list_new(TRUE, _("Name"), GTK_SELECTION_MULTIPLE,
+                                 NULL, TRUE);
 
-    gtk_clist_set_selection_mode(clist, GTK_SELECTION_MULTIPLE);
-    gtk_clist_set_row_height(clist, 0);
-    gtk_clist_column_titles_passive(clist);
-    gtk_clist_set_sort_column(clist,0);
-    gtk_clist_set_sort_type(clist,GTK_SORT_ASCENDING);
-    gtk_clist_set_auto_sort(clist,TRUE);
+    gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(list));
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(fex_window)->vbox),
+                       sw, TRUE, TRUE, 2);
 
-    gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(clist));
-    gtk_box_pack_start(GTK_BOX(fex_window->vbox), sw, TRUE, TRUE, 2);
+    /* Populate the list of filters */
 
-    /* Populate the clist of filters */
-
-    for(filter_list=balsa_app.filters;filter_list;
-        filter_list=g_slist_next(filter_list)) {
-
-	fil=(LibBalsaFilter*)filter_list->data;
-	row=gtk_clist_append(clist,&(fil->name));
-	
-	/* We associate the data with the newly appended row */
-	gtk_clist_set_row_data(clist,row,(gpointer)fil);
+    model = gtk_tree_view_get_model(list);
+    for (filter_list = balsa_app.filters; filter_list;
+         filter_list = g_slist_next(filter_list)) {
+        fil = (LibBalsaFilter *) filter_list->data;
+        gtk_list_store_prepend(GTK_LIST_STORE(model), &iter);
+        gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, fil->name, 1,
+                           fil, -1);
+    }
+    if (gtk_tree_model_get_iter_first(model, &iter)) {
+        GtkTreeSelection *selection =
+            gtk_tree_view_get_selection(list);
+        gtk_tree_selection_select_iter(selection, &iter);
     }
 
-    gtk_widget_set_usize(GTK_WIDGET(clist),-1,200);
-
-    gtk_signal_connect(GTK_OBJECT(fex_window),
-		       "clicked", fex_dialog_buttons_cb, clist);
-    gtk_signal_connect(GTK_OBJECT(fex_window), "destroy",
-		       GTK_SIGNAL_FUNC(fex_destroy_window_cb), NULL);
+    g_signal_connect(G_OBJECT(fex_window), "response",
+                     G_CALLBACK(fex_dialog_response), list);
+    g_signal_connect(G_OBJECT(fex_window), "destroy",
+		     G_CALLBACK(fex_destroy_window_cb), NULL);
 
     gtk_widget_show_all(GTK_WIDGET(fex_window));
 }

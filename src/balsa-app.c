@@ -1,7 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
-/* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,17 +20,22 @@
  */
 
 #include "config.h"
-
-#include "balsa-app.h"
-#include "misc.h"
-#include "libbalsa.h"
-#include "spell-check.h"
-#include "main-window.h"
-#include "information.h"
-
+#include <string.h>
 #ifdef BALSA_USE_THREADS
+/* _XOPEN_SOURCE is needed for rwlocks */
+#define _XOPEN_SOURCE 500
 #include <pthread.h>
 #endif
+
+/* for creat(2) */
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+#include "filter-funcs.h"
+#include "misc.h"
+#include "balsa-app.h"
+#include "save-restore.h"
 
 /* Global application structure */
 struct BalsaApplication balsa_app;
@@ -50,16 +54,10 @@ const gchar *pspell_suggest_modes[] = {
 /* ask_password:
    asks the user for the password to the mailbox on given remote server.
 */
-static void
-handle_password(gchar * string, gchar ** target)
-{
-    *target = string;
-}
-
 static gchar *
 ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
 {
-    GtkWidget *dialog;
+    GtkWidget *dialog, *entry;
     gchar *prompt, *passwd = NULL;
 
     g_return_val_if_fail(server != NULL, NULL);
@@ -73,14 +71,28 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
 	    g_strdup_printf(_("Mailbox password for %s@%s:"), server->user,
 			    server->host);
 
-    dialog = gnome_request_dialog(TRUE, prompt, NULL,
-				  0,
-				  (GnomeStringCallback) handle_password,
-				  (gpointer) & passwd,
-				  GTK_WINDOW(balsa_app.main_window));
+    dialog = gtk_dialog_new_with_buttons(_("Password needed"),
+                                         GTK_WINDOW(balsa_app.main_window),
+                                         GTK_DIALOG_DESTROY_WITH_PARENT,
+                                         GTK_STOCK_OK, GTK_RESPONSE_OK,
+                                         GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                         NULL); 
+    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),
+                      gtk_label_new(prompt));
     g_free(prompt);
-    gnome_dialog_run_and_close(GNOME_DIALOG(dialog));
-    
+    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),
+                      entry = gtk_entry_new());
+    gtk_widget_show_all(GTK_WIDGET(GTK_DIALOG(dialog)->vbox));
+    gtk_entry_set_width_chars(GTK_ENTRY(entry), 20);
+    gtk_entry_set_visibility(GTK_ENTRY(entry), FALSE);
+
+    gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
+    gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
+    gtk_widget_grab_focus (entry);
+
+    if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK)
+        passwd = g_strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
+    gtk_widget_destroy(dialog);
     return passwd;
 }
 
@@ -106,6 +118,9 @@ ask_passwd_idle(gpointer data)
     return FALSE;
 }
 
+/* ask_password_mt:
+   GDK lock must not be held.
+*/
 static gchar *
 ask_password_mt(LibBalsaServer * server, LibBalsaMailbox * mbox)
 {
@@ -170,7 +185,9 @@ set_passwd_from_matching_server(GNode *nd, gpointer data)
     
     return FALSE;
 }
-
+/* ask_password:
+   when called from thread, gdk lock must not be held.
+*/
 gchar *
 ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
 {
@@ -180,8 +197,10 @@ ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
 
     password = NULL;
     if (mbox) {
+        balsa_mailbox_nodes_lock(FALSE);
         g_node_traverse(balsa_app.mailbox_nodes, G_IN_ORDER, G_TRAVERSE_LEAFS,
 		-1, set_passwd_from_matching_server, server);
+        balsa_mailbox_nodes_unlock(FALSE);
 	if (server->passwd != NULL) {
 	    password = server->passwd;
 	    server->passwd = NULL;
@@ -307,7 +326,7 @@ balsa_app_init(void)
     balsa_app.mw_height = MW_DEFAULT_HEIGHT;
     balsa_app.sw_width = 0;
     balsa_app.sw_height = 0;
-    balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
+    balsa_app.toolbar_wrap_button_text = TRUE;
     balsa_app.pwindow_option = WHILERETR;
     balsa_app.wordwrap = TRUE;
     balsa_app.wraplength = 72;
@@ -342,8 +361,10 @@ balsa_app_init(void)
     balsa_app.mblist_newmsg_width = NEWMSGCOUNT_DEFAULT_WIDTH;
     balsa_app.mblist_totalmsg_width = TOTALMSGCOUNT_DEFAULT_WIDTH;
 
-    balsa_app.visual = NULL;
-    balsa_app.colormap = NULL;
+    /* Allocate the best colormap we can get */
+    gtk_widget_set_default_colormap(gdk_rgb_get_colormap());
+    balsa_app.visual = gdk_visual_get_best();
+    balsa_app.colormap = gdk_colormap_new(balsa_app.visual, TRUE);
 
     gdk_color_parse(MBLIST_UNREAD_COLOR, &balsa_app.mblist_unread_color);
 
@@ -352,6 +373,9 @@ balsa_app_init(void)
 
     /* quote regex */
     balsa_app.quote_regex = g_strdup(DEFAULT_QUOTE_REGEX);
+
+    /* command line options */
+    balsa_app.open_mailbox_vector = NULL;
 
     /* font */
     balsa_app.message_font = NULL;
@@ -368,6 +392,11 @@ balsa_app_init(void)
 
     /* printing */
     balsa_app.paper_size = g_strdup(DEFAULT_PAPER_SIZE);
+
+    balsa_app.print_header_font = g_strdup(DEFAULT_PRINT_HEADER_FONT);
+    balsa_app.print_footer_font = g_strdup(DEFAULT_PRINT_FOOTER_FONT);
+    balsa_app.print_body_font   = g_strdup(DEFAULT_PRINT_BODY_FONT);
+    balsa_app.print_highlight_cited = FALSE;
 
     /* address book */
     balsa_app.address_book_list = NULL;
@@ -409,7 +438,65 @@ balsa_app_init(void)
     /* Message filing */
     balsa_app.folder_mru=NULL;
     balsa_app.fcc_mru=NULL;
-    balsa_app.drag_default_is_move=0;
+    balsa_app.drag_default_is_move=TRUE;
+}
+
+/* Word of comment: previous definition of this function used access()
+function before attempting creat/unlink operation. In PS opinion, the
+speed gain is negligible or negative: the number of called system
+functions in present case is constant and equal to 1; the previous
+version called system function either once or twice per directory. */
+static gboolean
+destroy_mbnode(GNode * node, gpointer data)
+{
+    BalsaMailboxNode *mbnode = (BalsaMailboxNode *) node->data;
+
+    if(mbnode == NULL) /* true for root node only */
+	return FALSE;
+    
+    if (!mbnode->mailbox) {
+	gchar *tmpfile = g_strdup_printf("%s/.expanded", mbnode->name);
+	if (mbnode->expanded)
+	    close(creat(tmpfile, S_IRUSR | S_IWUSR));
+	else
+	    unlink(tmpfile);
+	g_free(tmpfile);
+    }
+    g_object_unref(G_OBJECT(mbnode));
+    return FALSE;
+}
+
+void
+balsa_app_destroy(void)
+{
+    config_views_save();
+    if (balsa_app.empty_trash_on_exit)
+	empty_trash();
+
+    config_save();
+
+    g_list_foreach(balsa_app.address_book_list, (GFunc)g_object_unref, NULL);
+    g_slist_foreach(balsa_app.filters,          (GFunc)libbalsa_filter_free, 
+		    GINT_TO_POINTER(TRUE));
+
+    /* close all mailboxes */
+    gtk_widget_destroy(balsa_app.notebook);
+    balsa_mailbox_nodes_lock(TRUE);
+    g_node_traverse(balsa_app.mailbox_nodes,
+		    G_LEVEL_ORDER,
+		    G_TRAVERSE_ALL, -1, destroy_mbnode, NULL);
+    g_node_destroy(balsa_app.mailbox_nodes);
+    balsa_app.mailbox_nodes = NULL;
+    balsa_mailbox_nodes_unlock(TRUE);
+    g_object_unref(G_OBJECT(balsa_app.inbox));
+    g_object_unref(G_OBJECT(balsa_app.outbox));
+    g_object_unref(G_OBJECT(balsa_app.sentbox));
+    g_object_unref(G_OBJECT(balsa_app.draftbox));
+    g_object_unref(G_OBJECT(balsa_app.trash));
+    libbalsa_imap_close_all_connections();
+    /* g_slist_free(opt_attach_list); */
+    g_object_unref(balsa_app.colormap);
+    if(balsa_app.debug) g_print("balsa_app: Finished cleaning up.\n");
 }
 
 gboolean
@@ -471,21 +558,46 @@ open_mailboxes_idle_cb(gchar ** urls)
 	    fprintf(stderr, "open_mailboxes_idle_cb: opening %s => %p..\n",
 		    *tmp, mbox);
 	if (mbox)
-	    mblist_open_mailbox(mbox);
+	    balsa_mblist_open_mailbox(mbox);
     }
     g_strfreev(urls);
 
     if (gtk_notebook_get_current_page(GTK_NOTEBOOK(balsa_app.notebook)) >=
-	0) gtk_notebook_set_page(GTK_NOTEBOOK(balsa_app.notebook), 0);
+        0)
+        gtk_notebook_set_current_page(GTK_NOTEBOOK(balsa_app.notebook), 0);
     gdk_threads_leave();
 
     return FALSE;
 }
 
 GtkWidget *
-gnome_stock_button_with_label(const char *icon, const char *label)
+balsa_stock_button_with_label(const char *icon, const char *text)
 {
-    return gnome_pixmap_button(gnome_stock_new_with_icon(icon), label);
+    GtkWidget *button;
+#if BALSA_MAJOR < 2
+    GtkWidget *pixmap;
+
+    pixmap = gnome_stock_new_with_icon(icon);
+    button = gnome_pixmap_button(pixmap, label);
+#else
+    GtkWidget *pixmap = gtk_image_new_from_stock(icon, GTK_ICON_SIZE_BUTTON);
+    GtkWidget *align = gtk_alignment_new(0.5, 0.5, 0, 0);
+    GtkWidget *hbox = gtk_hbox_new(FALSE, 0);
+
+    button = gtk_button_new();
+    gtk_container_add(GTK_CONTAINER(button), align);
+    gtk_container_add(GTK_CONTAINER(align), hbox);
+
+    gtk_box_pack_start(GTK_BOX(hbox), pixmap, FALSE, FALSE, 0);
+    if (text && *text) {
+        GtkWidget *label = gtk_label_new_with_mnemonic(text);
+        gtk_label_set_mnemonic_widget(GTK_LABEL(label), button);
+        gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 2);
+    }
+
+    gtk_widget_show_all(button);
+#endif                          /* BALSA_MAJOR < 2 */
+    return button;
 }
 
 /* 
@@ -655,8 +767,15 @@ balsa_find_mailbox_by_url(const gchar * url)
     GNode *gnode;
     LibBalsaMailbox *mailbox;
 
+    /* drop the gdk lock, to avoid threadlock (another thread may be
+     * holding the mailbox_nodes lock, and have a pending request for
+     * the gdk lock) */
+    gdk_threads_leave();
+    balsa_mailbox_nodes_lock(FALSE);
     gnode = balsa_find_url(balsa_app.mailbox_nodes, url);
     mailbox = gnode ? ((BalsaMailboxNode *) gnode->data)->mailbox : NULL;
+    balsa_mailbox_nodes_unlock(FALSE);
+    gdk_threads_enter();
 
     return mailbox;
 }
@@ -715,8 +834,12 @@ balsa_find_mailbox_by_name(const gchar * name)
     GNode *gnode;
     LibBalsaMailbox *mailbox;
 
+    gdk_threads_leave();
+    balsa_mailbox_nodes_lock(FALSE);
     gnode = balsa_find_name(balsa_app.mailbox_nodes, name);
     mailbox = gnode ? ((BalsaMailboxNode *) gnode->data)->mailbox : NULL;
+    balsa_mailbox_nodes_unlock(FALSE);
+    gdk_threads_enter();
 
     return mailbox;
 }
@@ -733,18 +856,22 @@ destroy_mailbox_node(GNode* node, GNode* root)
 
     g_return_val_if_fail(mbnode, FALSE);
 		     
-    if (mbnode->mailbox)
+    if (mbnode->mailbox) {
 	balsa_window_close_mbnode(balsa_app.main_window, mbnode);
-    mblist_remove_mailbox_node(balsa_app.mblist, 
-			       mbnode);
-    gtk_object_unref((GtkObject*)mbnode); 
+        mbnode->mailbox = NULL;
+    }
+    balsa_mblist_remove_mailbox_node(balsa_app.mblist_tree_store, 
+                                     mbnode);
+    g_object_unref(G_OBJECT(mbnode)); 
     return FALSE;
 }
 
+#if 0
 static void 
 destroy_mailbox_tree(GNode* node, GNode* root)
 { 
 }
+#endif
 
 void
 balsa_remove_children_mailbox_nodes(GNode* gnode)
@@ -756,7 +883,6 @@ balsa_remove_children_mailbox_nodes(GNode* gnode)
 	printf("Destroying children of %p %s\n",
 	       gnode->data, BALSA_MAILBOX_NODE(gnode->data)->name
 	       ? BALSA_MAILBOX_NODE(gnode->data)->name : "");
-    gtk_clist_freeze(GTK_CLIST(balsa_app.mblist));
     for(walk = g_node_first_child(gnode); walk; walk = next_sibling) {
         BalsaMailboxNode *mbnode = BALSA_MAILBOX_NODE(walk->data);
         next_sibling = g_node_next_sibling(walk);
@@ -772,7 +898,6 @@ balsa_remove_children_mailbox_nodes(GNode* gnode)
 	g_node_unlink(walk);
 	g_node_destroy(walk);
     }
-    gtk_clist_thaw(GTK_CLIST(balsa_app.mblist));
 }
 
 /* create_label:
@@ -781,20 +906,13 @@ balsa_remove_children_mailbox_nodes(GNode* gnode)
    in create_entry.
 */
 GtkWidget *
-create_label(const gchar * label, GtkWidget * table, gint row, guint *keyval)
+create_label(const gchar * label, GtkWidget * table, gint row)
 {
-    guint kv;
-
-    GtkWidget *w = gtk_label_new("");
-    kv = gtk_label_parse_uline(GTK_LABEL(w), label);
-    if ( keyval ) 
-	*keyval = kv;
+    GtkWidget *w = gtk_label_new_with_mnemonic(label);
 
     gtk_misc_set_alignment(GTK_MISC(w), 1.0, 0.5);
-
     gtk_table_attach(GTK_TABLE(table), w, 0, 1, row, row + 1,
 		     GTK_FILL, GTK_FILL, 5, 5);
-
     gtk_widget_show(w);
     return w;
 }
@@ -803,24 +921,19 @@ create_label(const gchar * label, GtkWidget * table, gint row, guint *keyval)
    creates a checkbox with a given label and places them in given array.
 */
 GtkWidget *
-create_check(GnomeDialog *mcw, const gchar *label, GtkWidget *table, gint row,
-	     gboolean initval)
+create_check(GtkDialog *mcw, const gchar *label, GtkWidget *table, gint row,
+             gboolean initval)
 {
-    guint kv;
     GtkWidget *cb, *l;
     
     cb = gtk_check_button_new();
 
-    l = gtk_label_new("");
-    kv = gtk_label_parse_uline(GTK_LABEL(l), label);
+    l = gtk_label_new_with_mnemonic(label);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(l), cb);
     gtk_misc_set_alignment(GTK_MISC(l), 0.0, 0.5);
     gtk_widget_show(l);
 
     gtk_container_add(GTK_CONTAINER(cb), l);
-
-    gtk_widget_add_accelerator(cb, "grab_focus",
-			       mcw->accelerators,
-			       kv, GDK_MOD1_MASK, GTK_ACCEL_VISIBLE);
 
     gtk_table_attach(GTK_TABLE(table), cb, 1, 2, row, row+1,
 		     GTK_FILL, GTK_FILL, 5, 5);
@@ -833,26 +946,27 @@ create_check(GnomeDialog *mcw, const gchar *label, GtkWidget *table, gint row,
 
 /* Create a text entry and add it to the table */
 GtkWidget *
-create_entry(GnomeDialog *mcw, GtkWidget * table, 
+create_entry(GtkDialog *mcw, GtkWidget * table, 
 	     GtkSignalFunc changed_func, gpointer data, gint row, 
-	     const gchar * initval, const guint keyval)
+	     const gchar * initval, GtkWidget* hotlabel)
 {
     GtkWidget *entry = gtk_entry_new();
     gtk_table_attach(GTK_TABLE(table), entry, 1, 2, row, row + 1,
 		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
-    if (initval)
-	gtk_entry_append_text(GTK_ENTRY(entry), initval);
+    if (initval) {
+        gint zero = 0;
+        
+        gtk_editable_insert_text(GTK_EDITABLE(entry), initval, -1, &zero);
+    }
 
-    gtk_widget_add_accelerator(entry, "grab_focus",
-			       mcw->accelerators,
-			       keyval, GDK_MOD1_MASK, GTK_ACCEL_VISIBLE);
-
-    gnome_dialog_editable_enters(mcw, GTK_EDITABLE(entry));
-
+    gtk_label_set_mnemonic_widget(GTK_LABEL(hotlabel), entry);
+    g_signal_connect_swapped(G_OBJECT(entry), "activate",
+                             G_CALLBACK(gtk_window_activate_default),
+                             mcw);
     /* Watch for changes... */
     if(changed_func)
-	gtk_signal_connect(GTK_OBJECT(entry), "changed", 
-			   changed_func, data);
+	g_signal_connect(G_OBJECT(entry), "changed", 
+			 G_CALLBACK(changed_func), data);
 
     gtk_widget_show(entry);
     return entry;
@@ -865,16 +979,18 @@ create_entry(GnomeDialog *mcw, GtkWidget * table,
 BalsaIndex*
 balsa_find_index_by_mailbox(LibBalsaMailbox * mailbox)
 {
+    GtkWidget *page;
     GtkWidget *index;
     guint i;
     g_return_val_if_fail(balsa_app.notebook, NULL);
 
     for (i = 0;
-	 (index =
+	 (page =
 	  gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), i));
 	 i++) {
-        
-	if (BALSA_INDEX(index)->mailbox_node->mailbox == mailbox)
+        index = gtk_bin_get_child(GTK_BIN(page));
+	if (BALSA_INDEX(index)->mailbox_node != NULL
+            && BALSA_INDEX(index)->mailbox_node->mailbox == mailbox)
 	    return BALSA_INDEX(index);
     }
 
@@ -882,24 +998,94 @@ balsa_find_index_by_mailbox(LibBalsaMailbox * mailbox)
     return NULL;
 }
 
-/*
- * parse the font name to find the encoding. i feel so dirty.
- * -*-fixed-bold-r-normal-*-*-*-*-*-c-*-iso8859-1
- */
-gchar *
-balsa_charset_from_message_font(void) {
-    gchar *s = balsa_app.message_font;
-    gint i = 0;
+#ifdef BALSA_USE_THREADS
+/* balsa_mailbox_nodes_(un)lock:
+   locks/unlocks balsa_app.mailbox_nodes structure so we can modify it
+   from a thread.
+   exclusive asks for exclusive access.
+   NO-OPs in the non-MT build.
+*/
+static pthread_mutex_t mailbox_nodes_lock = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t  mailbox_nodes_cond = PTHREAD_COND_INITIALIZER;
 
+/* a list of outstanding locks */
+static GList *nodes_lock_list;
+
+/* what we need to know about a lock */
+struct _NodesLockItem {
+    gboolean exclusive;
+    pthread_t id;
+};
+typedef struct _NodesLockItem NodesLockItem;
+
+/*
+ * balsa_mailbox_nodes_lock
+ *
+ * requests a lock
+ */
+void
+balsa_mailbox_nodes_lock(gboolean exclusive)
+{
+    GList *list;
+    NodesLockItem *nli;
+    pthread_t id = pthread_self();
+
+    pthread_mutex_lock(&mailbox_nodes_lock);
     do {
-	if(*s == '\0')
-	    break;
-	if(*s == '-')
-	    i++;
-	s++;
-    } while(i < 13); 
-    
-    if(i<13)
-	return NULL;
-    return s;
+        /* if anyone else has a lock, and either we're asking for an
+         * exclusive lock or they hold an exclusive lock, we need to
+         * wait until someone gives up a lock, and then recheck all the
+         * outstanding locks */
+        for (list = nodes_lock_list; list; list = g_list_next(list)) {
+            nli = list->data;
+            if (nli->id != id && (exclusive || nli->exclusive)) {
+                pthread_cond_wait(&mailbox_nodes_cond, &mailbox_nodes_lock);
+                break; /* with list != NULL */
+            }
+	}               /* end of for loop, with list == NULL */
+    } while (list != NULL);
+    /* we're the only thread with locks, so we'll just add this one
+     * to the list */
+    nli = g_new(NodesLockItem, 1);
+    nli->id = id;
+    nli->exclusive = exclusive;
+    nodes_lock_list = g_list_prepend(nodes_lock_list, nli);
+    pthread_mutex_unlock(&mailbox_nodes_lock);
 }
+
+/*
+ * balsa_mailbox_nodes_unlock
+ *
+ * give up a lock
+ */
+void
+balsa_mailbox_nodes_unlock(gboolean exclusive)
+{
+    GList *list;
+    NodesLockItem *nli = NULL;
+    pthread_t id = pthread_self();
+
+    pthread_mutex_lock(&mailbox_nodes_lock);
+    for (list = nodes_lock_list; list; list = g_list_next(list)) {
+        nli = list->data;
+        if (nli->id == id) {
+            if (nli->exclusive == exclusive)
+                break;
+            else
+                g_warning("Unlocking an incorrectly nested mailbox_nodes lock");
+        }
+    }
+
+    if (nli) {
+        nodes_lock_list = g_list_remove(nodes_lock_list, nli);
+        g_free(nli);
+        pthread_cond_signal(&mailbox_nodes_cond);
+    } else         g_warning("No mailbox_nodes lock to unlock");
+    pthread_mutex_unlock(&mailbox_nodes_lock);
+}
+#else
+void
+balsa_mailbox_nodes_lock(gboolean exclusive) {}
+void
+balsa_mailbox_nodes_unlock(gboolean exclusive) {}
+#endif

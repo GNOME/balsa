@@ -1,4 +1,4 @@
-bin_PROGRAMS = balsa
+bin_PROGRAMS = balsa balsa-ab
 
 balsa_BASE_SRCLIST =	\
 	address-book-config.c	\
@@ -10,7 +10,6 @@ balsa_BASE_SRCLIST =	\
 	balsa-icons.c		\
 	balsa-icons.h		\
 	balsa-index-threading.c	\
-	balsa-index-threading.h	\
 	balsa-index.c		\
 	balsa-index.h		\
 	balsa-mblist.c		\
@@ -28,8 +27,6 @@ balsa_BASE_SRCLIST =	\
 	filter-run-callbacks.c	\
 	filter-run-dialog.c	\
 	filter-run.h		\
-	find-search.c		\
-	find-search.h		\
 	folder-conf.c		\
 	folder-conf.h		\
 	information-dialog.c	\
@@ -71,18 +68,25 @@ balsa_SOURCES = $(balsa_BASE_SRCLIST) $(balsa_IDL_SRCLIST)
 INCLUDES = \
 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\" \
 	-I$(top_srcdir) \
-	-I$(top_srcdir)/libbalsa
+	-I$(top_srcdir)/libbalsa \
+	$(BALSA_CFLAGS)
 
 balsa_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a	\
 	$(top_builddir)/libmutt/imap/libimap.a	\
 	$(top_builddir)/libmutt/libmutt.a	\
 	$(top_builddir)/libinit_balsa/libinit_balsa.a \
-	-lpspell \
 	-lltdl	\
 	$(INTLLIBS) \
-	$(PCRE_LIBS) \
-	$(PTHREAD_LIB)
+        $(BALSA_LIBS)
+
+balsa_ab_SOURCES =	ab-main.c
+
+balsa_ab_LDADD = \
+	$(top_builddir)/libmutt/imap/libimap.a	\
+	$(top_builddir)/libmutt/libmutt.a	\
+	$(top_builddir)/libbalsa/libbalsa.a	\
+	$(BALSA_LIBS)
 
 dist-hook:
 	mkdir $(distdir)/pixmaps
@@ -100,3 +104,7 @@ BALSA_ORB_SRCLIST = orbit-glue.c
 
 $(CORBA_SRCLIST): $(idl_DATA)
 		$(ORBIT_IDL) $(idl_DATA)
+
+DEFS = -DG_DISABLE_DEPRECATED   \
+       -DGTK_DISABLE_DEPRECATED \
+       -DGNOME_DISABLE_DEPRECATED

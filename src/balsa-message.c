@@ -3665,7 +3665,9 @@ select_part(BalsaMessage * bm, BalsaPartInfo *info)
 {
     hide_all_parts(bm);
 
-    if (bm->message) {
+    g_assert(!info || (info && bm->message && bm->message->mailbox));
+
+    if (info && bm->message) {
 	LibBalsaMailbox *mailbox = bm->message->mailbox;
 	/* Make sure message still exists. */
 	libbalsa_mailbox_check(mailbox);

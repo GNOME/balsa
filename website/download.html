@@ -39,15 +39,22 @@
 <dl>
 <dt>Official Packages (released on 2001-10-31)</dt>
 <dd>
-<a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.2.2-1.i386.rpm">balsa-1.2.2-1.i386.rpm</a> (1.24MB)
+<a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.2.2-1.i386.rpm">balsa-1.2.2-1.i386.rpm</a> (1.24MB) built on RH7.2.
+<br>
+<a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.2.2-rh71.i386.rpm">balsa-1.2.2-rh71.i386.rpm</a> (1.24MB) built on RH7.1.
 <br>
 <a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.2.2-1.src.rpm">balsa-1.2.2-1.src.rpm</a> (1.77MB)
 </dd>
 </dl>
 
-<p>The binary RPM is compiled on Redhat 7.2 with update packages.  You may 
-want to recompile Balsa to enable LDAP, SSL, GSS, which are 
-disabled by default.  Packages for Redhat 7.2 (courtesy of 
+<p>The binary RPM is compiled on Redhat 7.2 with update packages.
+Separate binary rpm is provided for RH7.1 because RH7.2 comes with
+updated <tt>libtool</tt> library. Note that rpm build on RH7.1 should
+work on RH7.2 if the compatibility <tt>libtdl</tt> library distributed
+with RH7.2 is installed (this is not recommended, though).  You may
+want to recompile Balsa to enable LDAP, SSL, GSS, which are disabled
+by default.  Packages for Redhat 7.2 with many of these features
+enabled (courtesy of
 <a href="mailto:balsa@t-data.com">Melanie Thielker</a>) are also available 
 at <a href="http://fw.t-data.com/balsa/">http://fw.t-data.com/balsa/</a>.</p>
 

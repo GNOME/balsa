@@ -2214,30 +2214,47 @@ lbae_name_in_model(const gchar * name, GtkTreeModel * model,
 static void
 lbae_parse_entry(GtkEntry * entry, LibBalsaAddressEntryInfo * info)
 {
-    const gchar *string, *p;
+    const gchar *string, *p, *q;
     gint position;
     gboolean quoted;
+    gboolean in_group;
 
     g_slist_foreach(info->list, (GFunc) g_free, NULL);
     g_slist_free(info->list);
     info->list = NULL;
 
-    p = string = gtk_entry_get_text(entry);
+    string = gtk_entry_get_text(entry);
     position = gtk_editable_get_position(GTK_EDITABLE(entry));
 
     info->active = NULL;
-    quoted = FALSE;
-    while (*p) {
+    in_group = quoted = FALSE;
+    for (p = string; *p; p = q) {
         gunichar c;
-        const gchar *q;
 
         c = g_utf8_get_char(p);
         q = g_utf8_next_char(p);
         --position;
         /* position is the number of characters between c and the cursor. */
-        if (c == '"')
+
+        if (c == '"') {
             quoted = !quoted;
-        else if (!quoted && c == ',') {
+            continue;
+        }
+        if (quoted)
+            continue;
+
+        if (in_group && c == ';') {
+            in_group = FALSE;
+            continue;
+        }
+        if (c == ':') {
+            in_group = TRUE;
+            continue;
+        }
+        if (in_group)
+            continue;
+
+        if (c == ',') {
             info->list =
                 g_slist_prepend(info->list,
                                 g_strstrip(g_strndup(string, p - string)));
@@ -2246,7 +2263,6 @@ lbae_parse_entry(GtkEntry * entry, LibBalsaAddressEntryInfo * info)
                 info->active = info->list;
             string = q;
         }
-        p = q;
     }
     info->list =
         g_slist_prepend(info->list,
@@ -2309,15 +2325,12 @@ lbae_append_addresses(GtkEntryCompletion * completion, GList * match,
 
     for (; match; match = match->next) {
         LibBalsaAddress *address = match->data;
-        gint i, n = g_list_length(address->address_list);
 
-        for (i = 0; i < n; i++) {
-            name = libbalsa_address_to_gchar(address, i);
-            gtk_list_store_append(store, &iter);
-            gtk_list_store_set(store, &iter, NAME_COL, name,
-                               ADDRESS_COL, address, -1);
-            g_free(name);
-        }
+	name = libbalsa_address_to_gchar(address, -1);
+        gtk_list_store_append(store, &iter);
+        gtk_list_store_set(store, &iter, NAME_COL, name, ADDRESS_COL,
+                           address, -1);
+        g_free(name);
     }
 
     info = g_object_get_data(G_OBJECT(completion),
@@ -2507,10 +2520,11 @@ libbalsa_address_entry_get_list(GtkEntry * address_entry)
     model = gtk_entry_completion_get_model(completion);
 
     for (list = info->list, res = NULL; list; list = list->next) {
+	const gchar *name = list->data;
         LibBalsaAddress *address;
 
-        if (!lbae_name_in_model(list->data, model, &address) || !address)
-            address = libbalsa_address_new_from_string(list->data);
+        if (!lbae_name_in_model(name, model, &address) || !address)
+            address = libbalsa_address_new_from_string(name);
         if (address)
             res = g_list_prepend(res, address);
     }

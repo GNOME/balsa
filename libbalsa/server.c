@@ -116,10 +116,10 @@ libbalsa_server_class_init(LibBalsaServerClass * klass)
 		       GTK_SIGNAL_OFFSET(LibBalsaServerClass, set_host),
 #ifdef USE_SSL
 		       gtk_marshal_NONE__POINTER_INT, GTK_TYPE_NONE, 2,
-		       GTK_TYPE_STRING, GTK_TYPE_BOOL);
+		       GTK_TYPE_POINTER, GTK_TYPE_INT);
 #else
                        gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 1,
-	               GTK_TYPE_STRING);
+	               GTK_TYPE_POINTER);
 #endif
 
 

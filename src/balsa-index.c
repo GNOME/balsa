@@ -136,8 +136,9 @@ static void mailbox_messages_delete_cb(BalsaIndex * bindex,
 				       GList  * message);
 
 /* clist callbacks */
-static void button_event_press_cb(GtkWidget * clist, GdkEventButton * event,
-				  gpointer data);
+static gboolean button_event_press_cb(GtkWidget * clist,
+                                      GdkEventButton * event,
+                                      gpointer data);
 static void select_message(GtkWidget * widget, GtkCTreeNode *row, gint column,
 			   gpointer data);
 static void unselect_message(GtkWidget * widget, GtkCTreeNode *row, 
@@ -1337,7 +1338,7 @@ balsa_index_set_parent_style(BalsaIndex * bindex, GtkCTreeNode *node)
 
 /* CLIST callbacks */
 
-static void
+static gboolean
 button_event_press_cb(GtkWidget * ctree, GdkEventButton * event,
                       gpointer data)
 {
@@ -1346,9 +1347,9 @@ button_event_press_cb(GtkWidget * ctree, GdkEventButton * event,
     BalsaIndex *bindex;
     GtkCList *clist = GTK_CLIST(ctree);
 
-    g_return_if_fail(event);
+    g_return_val_if_fail(event, FALSE);
     if (clist->rows <= 0)
-        return;
+        return FALSE;
 
     bindex = BALSA_INDEX(data);
     if (gtk_clist_get_selection_info(clist, event->x, event->y,
@@ -1375,6 +1376,7 @@ button_event_press_cb(GtkWidget * ctree, GdkEventButton * event,
                                (sendmsg_window_destroy_cb), NULL);
         } else
             message_window_new(message);
+        return TRUE;
     } else if (event->button == 3) {
         /* pop up the context menu:
          * - if the clicked-on message is already selected, don't change
@@ -1397,7 +1399,9 @@ button_event_press_cb(GtkWidget * ctree, GdkEventButton * event,
                            NULL, NULL, NULL, NULL,
                            event->button, event->time);
         }
+        return TRUE;
     }
+    return FALSE;
 }
 
 /* tree_expand_cb:

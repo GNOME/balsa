@@ -1,3 +1,12 @@
+2002-03-21  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* libbalsa/server.c: make types in gtk_signal_new consistent with
+	each other.
+	* src/balsa-index.c: button_event_press_cb should return boolean.
+	* src/balsa-mblist.c: don't try to change colors yet.
+	* src/main-window.c: revert a lot of recent changes--not needed.
+	* src/main.c: initialize threads and gtk.
+
 2002-03-20  Pawel Salek <pawsa@theochem.kth.se>
 
 	* configure.in, acconfig.h: isblank portability test (Steve Wall).

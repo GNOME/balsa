@@ -220,6 +220,7 @@ static void
 threads_init(void)
 {
     g_thread_init(NULL);
+    gdk_threads_init();
     pthread_mutex_init(&mailbox_lock, NULL);
     pthread_mutex_init(&send_messages_lock, NULL);
     checking_mail = 0;
@@ -316,6 +317,8 @@ main(int argc, char *argv[])
     threads_init();
 #endif
 
+    /* FIXME: do we need to allow a non-GUI mode? */
+    gtk_init_check(&argc, &argv);
     balsa_init(argc, argv);
 
 #ifdef GTKHTML_HAVE_GCONF

@@ -1288,23 +1288,6 @@ real_open_mbnode(BalsaMailboxNode* mbnode)
 
     gdk_threads_enter();
     index = BALSA_INDEX(balsa_index_new());
-    /* Append the index to the notebook before calling
-     * balsa_index_load_mailbox_node, because there's a chain of signals
-     * that ends up accessing the current page.
-     * We must block the callback to notebook_switch_page_cb while we do
-     * this, to avoid referring to an unprepared index. Ughh! */
-    gtk_signal_handler_block_by_func(GTK_OBJECT
-                                     (balsa_app.main_window->notebook),
-                                     GTK_SIGNAL_FUNC
-                                     (notebook_switch_page_cb), NULL);
-    label = balsa_notebook_label_new(mbnode);
-    gtk_notebook_append_page(GTK_NOTEBOOK(balsa_app.main_window->notebook),
-                             GTK_WIDGET(index), label);
-    gtk_signal_handler_unblock_by_func(GTK_OBJECT
-                                       (balsa_app.main_window->notebook),
-                                       GTK_SIGNAL_FUNC
-                                       (notebook_switch_page_cb), NULL);
-
     index->window = GTK_WIDGET(balsa_app.main_window);
 
     balsa_window_increase_activity(balsa_app.main_window);
@@ -1333,9 +1316,17 @@ real_open_mbnode(BalsaMailboxNode* mbnode)
                        GTK_SIGNAL_FUNC(balsa_window_unselect_all_messages_cb),
                        balsa_app.main_window);
 
+    /* if(config_short_label) label = gtk_label_new(mbnode->mailbox->name);
+       else */
+    label = balsa_notebook_label_new(mbnode);
+
     /* for updating date when settings change */
     index->date_string = g_strdup (balsa_app.date_string);
     index->line_length = balsa_app.line_length;
+
+    /* store for easy access */
+    gtk_notebook_append_page(GTK_NOTEBOOK(balsa_app.main_window->notebook),
+                             GTK_WIDGET(index), label);
 
     /* change the page to the newly selected notebook item */
     page_num = gtk_notebook_page_num

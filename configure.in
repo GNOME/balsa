@@ -115,7 +115,7 @@ if test x$enable_deprecated_pspell = xyes ; then
 	AC_MSG_ERROR([*** pspell(-devel) not found. Please check http://www.balsa.net for information on the required files.])
   ], -lstdc++ -lpspell-modules)
 else
-  AC_CHECK_LIB(pspell, new_aspell_speller,,[
+  AC_CHECK_LIB(aspell, new_aspell_speller,,[
 	AC_MSG_ERROR([*** aspell library not found.
 If You have deprecated pspell, please try to use --enable-deprecated-pspell
 configure switch. Upgrade to aspell>=0.50 is strongly recommended.])

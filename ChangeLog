@@ -1,3 +1,8 @@
+1999-11-25   Ragnar Henriksen <ragnar@juniks.org>
+	
+	Added config parameter: 
+	* The users may now select when to include signature.
+
 1999-11-23   Ragnar Henriksen <ragnar@juniks.org>
 
 	* new file: address-book.h

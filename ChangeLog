@@ -1,3 +1,12 @@
+2001-06-17  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/main-window.c (check_messages_thread): check mboxes
+	after fetching pop
+	* src/balsa-mblist.c: make drag messages only copy not
+	move
+	* libinit_balsa/balsa-druid-page-directory.gob: tell the user
+	about /var/spool/mail
+
 2001-06-16  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalse/send.c: fix -m option when using with libESMTP:

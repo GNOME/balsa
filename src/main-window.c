@@ -1544,12 +1544,12 @@ check_messages_thread(gpointer data)
      */
     MailThreadMessage *threadmessage;
 
-    libbalsa_notify_start_check();
     MSGMAILTHREAD(threadmessage, MSGMAILTHREAD_SOURCE, NULL, "POP3", 0, 0);
     check_mailbox_list(balsa_app.inbox_input);
 
     MSGMAILTHREAD(threadmessage, MSGMAILTHREAD_SOURCE, NULL, "Local Mail",
 		  0, 0);
+    libbalsa_notify_start_check();
 
     gtk_ctree_post_recursive(GTK_CTREE(balsa_app.mblist), NULL, 
 			     mailbox_check_func, NULL);

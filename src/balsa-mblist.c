@@ -552,7 +552,7 @@ balsa_mblist_init(BalsaMBList * tree)
     gtk_drag_dest_set (GTK_WIDGET (tree), GTK_DEST_DEFAULT_ALL,
                        mblist_drop_types,
                        ELEMENTS(mblist_drop_types),
-                       GDK_ACTION_DEFAULT | GDK_ACTION_COPY | GDK_ACTION_MOVE);
+                       GDK_ACTION_COPY );
     gtk_signal_connect (GTK_OBJECT (tree),"drag-data-received",
                         GTK_SIGNAL_FUNC (mblist_drag_cb), NULL);
     gtk_signal_connect (GTK_OBJECT (tree), "drag-motion", 
@@ -1129,8 +1129,7 @@ balsa_mblist_update_node_style(GtkCTree * ctree, GtkCTreeNode * node,
     }
     /* We only want to do this if the mailbox is open, otherwise leave
      * the message numbers untouched in the display */
-    if (mblist->display_info && mailbox->open_ref
-        && mailbox->total_messages >= 0) {
+    if (mblist->display_info && mailbox->total_messages >= 0) {
             if (mailbox->total_messages > 0) {
                 text = g_strdup_printf("%ld", mailbox->total_messages);
                 gtk_ctree_node_set_text(ctree, node, 2, text);

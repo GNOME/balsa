@@ -98,9 +98,18 @@ static void unconditional_mailbox(const gchar *path, const gchar *prettyname,
 	*box = (LibBalsaMailbox*)libbalsa_mailbox_local_new(path, TRUE);
 
 	if( *box == NULL ) {
-	  (*error) = g_strdup_printf( _("The mailbox \"%s\" does not appear to be valid."),
-				      path );
-		return;
+	  if(strcmp( "/var/spool/mail/", path )) {
+	    (*error) = g_strdup_printf( _("The mailbox \"%s\" does not appear to be valid.\n"
+					  "Your system does not allow for creation of mailboxes\n"
+					  "in /var/spool/mail. Balsa wouldn't function properly\n"
+					  "until the system created the mailboxes. Please change\n"
+					  "the mailbox path or check your system configuration."),
+					path );
+	  } else {
+	    (*error) = g_strdup_printf( _("The mailbox \"%s\" does not appear to be valid."),
+					path );
+	  }
+	  return;
 	}
 
 	(*box)->name = g_strdup( gettext( prettyname ) );

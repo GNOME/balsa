@@ -1350,7 +1350,7 @@ libbalsa_message_title(LibBalsaMessage * message, const gchar * format)
     return tmp;
 }
 
-/* set a header, if it's needed all the time:
+/* set a header, if (all) or if it's needed all the time:
  *   headers->from
  *   headers->date
  *   headers->to_list
@@ -1365,7 +1365,7 @@ libbalsa_message_title(LibBalsaMessage * message, const gchar * format)
  */
 static gboolean
 lbmsg_set_header(LibBalsaMessage *message, const gchar *name,
-                 const gchar* value)
+                 const gchar* value, gboolean all)
 {
     if (g_ascii_strcasecmp(name, "Subject") == 0) {
 	if (!strcmp(value, "DON'T DELETE THIS MESSAGE -- FOLDER INTERNAL DATA"))
@@ -1404,14 +1404,18 @@ lbmsg_set_header(LibBalsaMessage *message, const gchar *name,
 	    message->length = atoi(value);
     } else
 #endif
-	/* nothing */;
+    if (all)
+	message->headers->user_hdrs =
+	    g_list_append(message->headers->user_hdrs,
+			  libbalsa_create_hdr_pair(g_strdup(name),
+						   g_strdup(value)));
 
     return TRUE;
 }
 
-gboolean
-libbalsa_message_set_headers_from_string(LibBalsaMessage *message,
-                                         const gchar *lines)
+static gboolean
+lb_message_set_headers_from_string(LibBalsaMessage *message,
+				   const gchar *lines, gboolean all)
 {
     gchar *header, *value;
     const gchar *val, *eoh;
@@ -1429,12 +1433,19 @@ libbalsa_message_set_headers_from_string(LibBalsaMessage *message,
         while(eoh>val && isspace(*eoh)) eoh--; /* .. and at the end */
         value  = g_strndup(val, eoh-val+1);
         
-        lbmsg_set_header(message, header, value);
+        lbmsg_set_header(message, header, value, all);
         g_free(header); g_free(value);
         if(!*lines) break;
         lines++;
     } while(1);
     return TRUE;
+}
+
+gboolean
+libbalsa_message_set_headers_from_string(LibBalsaMessage *message,
+                                         const gchar *lines)
+{
+    return lb_message_set_headers_from_string(message, lines, TRUE);
 }
 
 gboolean
@@ -1471,8 +1482,7 @@ libbalsa_message_load_envelope_from_file(LibBalsaMessage *message,
 	    break;
 	}
 	line->data[line->len-1]='\0'; /* terminate line by overwriting '\n' */
-	if (libbalsa_message_set_headers_from_string(message,
-                                                     line->data) == FALSE) {
+	if (!lb_message_set_headers_from_string(message, line->data, FALSE)) {
 	    ret = FALSE;
 	    break;
 	}

@@ -294,7 +294,6 @@ ab_load(GtkWidget * widget, gpointer data)
 				  GNOME_MESSAGE_BOX_ERROR, _("OK"), NULL );
       gtk_window_set_modal( GTK_WINDOW( box ), TRUE );
       gnome_dialog_run( GNOME_DIALOG( box ) );
-      gtk_widget_destroy( GTK_WIDGET( box ) );
       g_free(msg);
       return; 
    } 

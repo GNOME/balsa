@@ -1,3 +1,7 @@
+2000-05-30  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/address-book.c: bug #12535 fix.
+	
 2000-05-28  Matthew Guenther <mguenthe@netcom.ca>
 
 	* src/balsa-index-page.[ch]: patch to add "Store Address" menu

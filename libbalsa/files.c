@@ -105,7 +105,8 @@ balsa_file_finder(const gchar * filename, const gchar * splice,
  *   return the complete path to the icon file.
  */
 gchar *
-libbalsa_icon_finder(const char *mime_type, const char *filename)
+libbalsa_icon_finder(const char *mime_type, const char *filename, 
+                     gchar** used_type)
 {
     char *content_type;
     const char *icon_file;
@@ -116,7 +117,7 @@ libbalsa_icon_finder(const char *mime_type, const char *filename)
     else {
         if(!filename)
             return balsa_pixmap_finder ("balsa/attachment.png");
-        content_type = g_strdup(libbalsa_lookup_mime_type(mime_type));
+        content_type = libbalsa_lookup_mime_type(filename);
     }
     /* FIXME:
        or icon_file = gnome_desktop_item_find_icon(GVMGI(content_Type)?) 
@@ -145,6 +146,7 @@ libbalsa_icon_finder(const char *mime_type, const char *filename)
 	
 	g_free (gnome_icon);
     }
-    g_free(content_type);
+    if(used_type) *used_type = content_type;
+    else g_free(content_type);
     return (icon);
 }

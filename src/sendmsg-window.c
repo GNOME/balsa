@@ -1172,7 +1172,7 @@ add_extbody_attachment(GnomeIconList *ilist,
     attach->as_extbody = TRUE;
     attach->disposition = DISPATTACH;
 
-    pix = libbalsa_icon_finder("message/external-body", attach->filename);
+    pix = libbalsa_icon_finder("message/external-body", attach->filename,NULL);
     label = g_strdup_printf ("%s (%s)", attach->filename, 
 			     "message/external-body");
     pos = gnome_icon_list_append(ilist, pix, label);
@@ -1289,8 +1289,7 @@ file_attachment(GtkWidget * widget, GnomeIconList * ilist)
     gint num = GPOINTER_TO_INT(gtk_object_get_data(GTK_OBJECT(ilist),
 						   "selectednumbertofile"));
     attachment_t *attach, *oldattach;
-    gchar *pix, *label;
-    const gchar *content_type;
+    gchar *pix, *label, *content_type;
 
     oldattach = 
 	(attachment_t *)gnome_icon_list_get_icon_data(ilist, num);
@@ -1310,11 +1309,10 @@ file_attachment(GtkWidget * widget, GnomeIconList * ilist)
     gnome_icon_list_remove(ilist, num);
     
     /* as this worked before, don't do too much (==any) error checking... */
-    content_type = attach->force_mime_type ? attach->force_mime_type 
-	: libbalsa_lookup_mime_type(attach->filename);
-    pix = libbalsa_icon_finder(content_type, attach->filename);
+    pix = libbalsa_icon_finder(content_type, attach->filename, &content_type);
     label = g_strdup_printf ("%s (%s)", g_basename(attach->filename), 
 			     content_type);
+    g_free(content_type);
     gnome_icon_list_insert(ilist, num, pix, label);
     gnome_icon_list_set_icon_data_full(ilist, num, attach, destroy_attachment);
     g_free(label);
@@ -1406,20 +1404,16 @@ destroy_attachment (gpointer data)
 }
 
 /* add_attachment:
+   Check whether file can be attached, and if so, determines its content-type.
    adds given filename to the list.
    takes over the ownership of filename.
 */
-void
+gboolean
 add_attachment(GnomeIconList * iconlist, char *filename, 
                gboolean is_a_temp_file, const gchar *forced_mime_type)
 {
     GtkWidget *msgbox;
-    const gchar *content_type;
-    gchar *pix, *err_msg;
-
-    content_type = forced_mime_type ? forced_mime_type 
-	: libbalsa_lookup_mime_type(filename);
-    pix = libbalsa_icon_finder(content_type, filename);
+    gchar *pix, *err_msg, *content_type;
 
     if (balsa_app.debug)
 	fprintf(stderr, "Trying to attach '%s'\n", filename);
@@ -1429,8 +1423,10 @@ add_attachment(GnomeIconList * iconlist, char *filename,
 	gtk_window_set_modal(GTK_WINDOW(msgbox), TRUE);
 	gnome_dialog_run(GNOME_DIALOG(msgbox));
 	g_free(err_msg);
-	return;
+	return FALSE;
     }
+
+    pix = libbalsa_icon_finder(forced_mime_type, filename, &content_type);
 
     if (pix && (err_msg=check_if_regular_file(pix)) == NULL) {
 	gint pos;
@@ -1451,10 +1447,9 @@ add_attachment(GnomeIconList * iconlist, char *filename,
 	    attach_data->disposition = DISPINLINE;
 	else
 	    attach_data->disposition = DISPATTACH;
-	gnome_icon_list_set_icon_data_full(iconlist, pos, attach_data, destroy_attachment);
-
+	gnome_icon_list_set_icon_data_full(iconlist, pos, attach_data, 
+                                           destroy_attachment);
 	g_free(label);
-
     } else { 
 	if(pix) {
 	    balsa_information
@@ -1468,7 +1463,9 @@ add_attachment(GnomeIconList * iconlist, char *filename,
 		 _("Default attachment pixmap (balsa/attachment.png) cannot be found:\n"
 		   "Your balsa installation is corrupted."));
     }
-    g_free ( pix ) ;
+    g_free(pix);
+    g_free(content_type);
+    return TRUE;
 }
 
 static gchar* 
@@ -1503,6 +1500,7 @@ attach_dialog_ok(GtkWidget * widget, gpointer data)
     BalsaSendmsg *bsmsg;
     gchar *filename, *dir, *p, *sel_file;
     GList *node;
+    gboolean do_close;
 
     fs = GTK_FILE_SELECTION(data);
     bsmsg = gtk_object_get_user_data(GTK_OBJECT(fs));
@@ -1514,7 +1512,7 @@ attach_dialog_ok(GtkWidget * widget, gpointer data)
     if (p)
 	*(p + 1) = '\0';
 
-    add_attachment(iconlist, g_strdup(sel_file), FALSE, NULL);
+    do_close = add_attachment(iconlist, g_strdup(sel_file), FALSE, NULL);
     for (node = GTK_CLIST(fs->file_list)->selection; node;
 	 node = g_list_next(node)) {
 	gtk_clist_get_text(GTK_CLIST(fs->file_list),
@@ -1530,7 +1528,8 @@ attach_dialog_ok(GtkWidget * widget, gpointer data)
 	bsmsg->view_checkitems[MENU_TOGGLE_ATTACHMENTS_POS]), TRUE);
     bsmsg->update_config = TRUE;
 
-    gtk_widget_destroy(GTK_WIDGET(fs));
+    if(do_close) 
+        gtk_widget_destroy(GTK_WIDGET(fs));
     if (balsa_app.attach_dir)
 	g_free(balsa_app.attach_dir);
 

@@ -1303,11 +1303,11 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 
 		/* Do this here because we don't want
 		 * to use libmutt's mime types */
-		if (!body->mime_type)
-		    mime_type =
-			g_strsplit(libbalsa_lookup_mime_type(body->filename),
-				   "/", 2);
-		else
+		if (!body->mime_type) {
+                    gchar* mt = libbalsa_lookup_mime_type(body->filename);
+		    mime_type = g_strsplit(mt,"/", 2);
+                    g_free(mt);
+                } else
 		    mime_type = g_strsplit(body->mime_type, "/", 2);
 		/* use BASE64 encoding for non-text mime types 
 		   use 8BIT for message */
@@ -1440,10 +1440,14 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 
 	if (body->filename) {
 	    if (body->attach_as_extbody) {
-		newbdy = 
-		    add_mutt_body_as_extbody(body->filename, 
-					     body->mime_type ? body->mime_type :
-					     libbalsa_lookup_mime_type(body->filename));
+                if(body->mime_type)
+                    newbdy = add_mutt_body_as_extbody(body->filename, 
+                                                      body->mime_type);
+                else {
+                    gchar* mt = libbalsa_lookup_mime_type(body->filename);
+                    newbdy = add_mutt_body_as_extbody(body->filename, mt);
+                    g_free(mt);
+                }
 	    } else {
 		libbalsa_lock_mutt();
 		newbdy = mutt_make_file_attach(body->filename);
@@ -1456,11 +1460,11 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 		    
 		    /* Do this here because we don't want
 		     * to use libmutt's mime types */
-		    if (!body->mime_type)
-			mime_type =
-			    g_strsplit(libbalsa_lookup_mime_type(body->filename),
-				       "/", 2);
-		    else
+		    if (!body->mime_type) {
+                        gchar* mt = libbalsa_lookup_mime_type(body->filename);
+			mime_type = g_strsplit(mt, "/", 2);
+                        g_free(mt);
+                    } else
 			mime_type = g_strsplit(body->mime_type, "/", 2);
 		    /* use BASE64 encoding for non-text mime types 
 		       use 8BIT for message */

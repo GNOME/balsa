@@ -695,11 +695,10 @@ prepare_default(PrintInfo * pi, LibBalsaMessageBody * body)
     if (body->mutt_body)
 	conttype = libbalsa_message_body_get_content_type(body);
     else
-	conttype = 
-	    g_strdup(libbalsa_lookup_mime_type(body->filename));
+	conttype = libbalsa_lookup_mime_type(body->filename);
 
     /* get a pixbuf according to the mime type */
-    icon_name = libbalsa_icon_finder(conttype, NULL);
+    icon_name = libbalsa_icon_finder(conttype, NULL, NULL);
     pdata->pixbuf = gdk_pixbuf_new_from_file(icon_name);
     pdata->image_width = gdk_pixbuf_get_width (pdata->pixbuf);
     pdata->image_height = gdk_pixbuf_get_height (pdata->pixbuf);

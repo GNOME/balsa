@@ -91,8 +91,9 @@ extern "C" {
     void sendmsg_window_set_field(BalsaSendmsg *bsmsg, const gchar* key,
                                   const gchar* val);
 
-    void add_attachment(GnomeIconList * iconlist, char *filename, 
-			gboolean is_a_tmp_file, const gchar *forced_mime_type);
+    gboolean add_attachment(GnomeIconList * iconlist, char *filename, 
+                            gboolean is_a_tmp_file, 
+                            const gchar *forced_mime_type);
 
     typedef void (*field_setter)(BalsaSendmsg *d, const gchar*, const gchar*);
 

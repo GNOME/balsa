@@ -167,8 +167,9 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
     REGCOMP(FileMask.rx,"!^\\.[^.]",0);
     ReplyRegexp.rx = (regex_t *) safe_malloc (sizeof (regex_t));
     REGCOMP(ReplyRegexp.rx,"^(re([\\[0-9\\]+])*|aw):[ \t]*",0);
-
-    SendCharset = "us-ascii:iso-8859-1:utf-8";    
+    
+    /* more likely to least likely or something */
+    SendCharset = "us-ascii:iso-8859-1:iso-8859-15:iso-8859-2:iso-8859-9:iso-8859-13:euc-kr:euc-jp:KOI8-R";    
 
     libbalsa_notify_init();
 

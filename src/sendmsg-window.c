@@ -466,6 +466,7 @@ static GnomeUIInfo main_menu[] = {
 
 /* the array of locale names and charset names included in the MIME
    type information.  
+   if you add a new encoding here add to SendCharset in libbalsa.c 
 */
 struct {
     const gchar *locale, *charset, *lang_name;

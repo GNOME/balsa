@@ -1,3 +1,11 @@
+2002-04-30  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/sendmsg-window.c: 
+	* libbalsa/libbalsa.c: update sendcharset 
+	* libbalsa/send.c: really fix #79661. set Charset per message, 
+	move lock_mutt from encode_descriptions to the outer block - 
+	encode_desc needs Charset
+
 2002-04-28  Carlos Morgado  <chbm@chbm.nu>
 
 	* libbalsa/libbalsa.c (libbalsa_init): add SendCharset default

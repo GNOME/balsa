@@ -122,11 +122,12 @@ balsa_index_page_class_init(BalsaIndexPageClass *class)
 
   object_class = (GtkObjectClass *) class;
 
+  parent_class = gtk_type_class(GTK_TYPE_OBJECT);
+
   //  object_class->destroy = index_child_destroy;
   /*PKGW*/
   object_class->destroy = balsa_index_page_close_and_destroy;
 
-  parent_class = gtk_type_class(GTK_TYPE_OBJECT);
 }
 
 static void
@@ -366,6 +367,10 @@ void balsa_index_page_close_and_destroy( GtkObject *obj )
     mailbox_open_unref( page->mailbox );
     page->mailbox = NULL;
   }
+
+  if (parent_class->destroy)
+    (*parent_class->destroy) (obj);
+
 }
 
 static gint handler = 0;

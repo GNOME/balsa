@@ -1,4 +1,12 @@
-2000-06-12  Pawel Salek <pawsa@theochem.kth.se>
+2000-06-15  Pawel Salek <pawsa@theochem.kth.se>
+
+	New era approaching: large patch from Ian Campbell <ijc25@cam.ac.uk>
+	* src/balsa-app.h: some defs.
+	* src/balsa-index-page.c: chaining destructors.
+	* src/balsa-message.[hc]: rewritten.
+	* src/main-window.c, src/message-window.c: extra menu options.
+	
+2000-06-14  Pawel Salek <pawsa@theochem.kth.se>
 
 	Contributed by Thomas Fitzsimmons  <fitzsim@ecf.utoronto.ca>
 	* libbalsa/{mailbox.c, contact.h}: Contact data structure handling.

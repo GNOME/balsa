@@ -35,10 +35,30 @@ static void replyto_message_cb(GtkWidget * widget, gpointer data);
 static void replytoall_message_cb(GtkWidget * widget, gpointer data);
 static void forward_message_cb(GtkWidget * widget, gpointer data);
 
+static void next_part_cb(GtkWidget * widget, gpointer data);
+static void previous_part_cb(GtkWidget * widget, gpointer data);
+static void save_current_part_cb (GtkWidget *widget, gpointer data);
+
+static void show_no_headers_cb(GtkWidget * widget, gpointer data);
+static void show_selected_cb(GtkWidget * widget, gpointer data);
+static void show_all_headers_cb(GtkWidget * widget, gpointer data);
+static void wrap_message_cb(GtkWidget *widget, gpointer data);
+
 /*
  * The list of messages which are being displayed.
  */
 static GHashTable * displayed_messages = NULL;
+
+static GnomeUIInfo shown_hdrs_menu[] =
+{
+   GNOMEUIINFO_RADIOITEM( N_ ("N_o headers"), NULL, 
+			  show_no_headers_cb, NULL),
+   GNOMEUIINFO_RADIOITEM( N_ ("_Selected headers"),NULL,
+			  show_selected_cb, NULL),
+   GNOMEUIINFO_RADIOITEM( N_ ("All _headers"), NULL, 
+			  show_all_headers_cb, NULL),
+   GNOMEUIINFO_END
+};
 
 static GnomeUIInfo file_menu[] =
 {
@@ -68,7 +88,28 @@ static GnomeUIInfo message_menu[] =
     forward_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_MAIL_FWD, 'F', 0, NULL
   },
-
+  GNOMEUIINFO_SEPARATOR,
+  {
+    GNOME_APP_UI_ITEM, N_ ("Next Part"), N_ ("Next Part in Message"),
+    next_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_FORWARD, '.', GDK_CONTROL_MASK, NULL
+  },
+  {
+    GNOME_APP_UI_ITEM, N_ ("Previous Part"), N_ ("Previous Part in Message"),
+    previous_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_BACK, ',', GDK_CONTROL_MASK, NULL
+  },
+  {
+    GNOME_APP_UI_ITEM, N_ ("Save Current Part"), 
+    N_ ("Save Current Part in Message"),
+    save_current_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_SAVE, 's', GDK_CONTROL_MASK, NULL
+  },
+  GNOMEUIINFO_SEPARATOR,
+#define MENU_MESSAGE_WRAP_POS 8
+  GNOMEUIINFO_TOGGLEITEM( N_ ("_Wrap"), NULL, wrap_message_cb, NULL),
+  GNOMEUIINFO_SEPARATOR,
+  GNOMEUIINFO_RADIOLIST(shown_hdrs_menu),
   GNOMEUIINFO_END
 };
 
@@ -94,7 +135,6 @@ void
 message_window_new (Message * message)
 {
   MessageWindow *mw;
-  GtkWidget *sw;
 
   if (!message)
     return;
@@ -142,17 +182,20 @@ message_window_new (Message * message)
   gnome_app_create_menus_with_data (GNOME_APP (mw->window),
 		  main_menu, mw->window);
 
-
-  sw = gtk_scrolled_window_new (NULL, NULL);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw),
-                                   GTK_POLICY_AUTOMATIC,
-                                   GTK_POLICY_AUTOMATIC);
   mw->bmessage = balsa_message_create ();
-  gtk_container_add(GTK_CONTAINER(sw), mw->bmessage);
 
   balsa_message_set (BALSA_MESSAGE (mw->bmessage), message);
+  if(balsa_app.shown_headers>= HEADERS_NONE && 
+     balsa_app.shown_headers<= HEADERS_ALL)
+    gtk_check_menu_item_set_active(
+      GTK_CHECK_MENU_ITEM(shown_hdrs_menu[balsa_app.shown_headers].widget),
+      TRUE);
 
-  gnome_app_set_contents (GNOME_APP (mw->window), sw);
+  gtk_check_menu_item_set_active
+    (GTK_CHECK_MENU_ITEM(message_menu[MENU_MESSAGE_WRAP_POS].widget), 
+     balsa_app.browse_wrap);
+  
+  gnome_app_set_contents (GNOME_APP (mw->window), mw->bmessage);
 
   /* FIXME: set it to the size of the canvas, unless it is
    * bigger than the desktop, in which case it should be at about a
@@ -162,7 +205,8 @@ message_window_new (Message * message)
 
   gtk_window_set_default_size(GTK_WINDOW(mw->window), 400, 500);
 
-  gtk_widget_show_all (mw->window);
+  gtk_widget_show(mw->bmessage);
+  gtk_widget_show(mw->window);
 }
 
 static void
@@ -214,6 +258,33 @@ forward_message_cb(GtkWidget * widget, gpointer data)
   sendmsg_window_new (widget, mw->message, SEND_FORWARD);
 }
 
+static void 
+next_part_cb(GtkWidget * widget, gpointer data)
+{
+  MessageWindow *mw = (MessageWindow *) gtk_object_get_data (GTK_OBJECT (data),
+							     "msgwin");
+  balsa_message_next_part(BALSA_MESSAGE(mw->bmessage));
+  
+}
+
+static void 
+previous_part_cb(GtkWidget * widget, gpointer data)
+{
+  MessageWindow *mw = (MessageWindow *) gtk_object_get_data (GTK_OBJECT (data),
+							     "msgwin");
+
+  balsa_message_previous_part(BALSA_MESSAGE(mw->bmessage));
+}
+
+static void 
+save_current_part_cb(GtkWidget *widget, gpointer data)
+{
+  MessageWindow *mw = (MessageWindow *) gtk_object_get_data (GTK_OBJECT (data),
+							     "msgwin");
+
+  balsa_message_save_current_part(BALSA_MESSAGE(mw->bmessage));
+}
+
 static void
 close_message_window(GtkWidget * widget, gpointer data)
 {
@@ -221,3 +292,45 @@ close_message_window(GtkWidget * widget, gpointer data)
 }
 
 
+static void 
+show_no_headers_cb(GtkWidget * widget, gpointer data)
+{
+  MessageWindow *mw = (MessageWindow *) gtk_object_get_data (GTK_OBJECT (data),
+							     "msgwin");
+  
+  balsa_message_set_displayed_headers(BALSA_MESSAGE(mw->bmessage), 
+				      HEADERS_NONE);
+
+}
+
+static void 
+show_selected_cb(GtkWidget * widget, gpointer data)
+{
+  MessageWindow *mw = (MessageWindow *) gtk_object_get_data (GTK_OBJECT (data),
+							     "msgwin");
+  
+  balsa_message_set_displayed_headers(BALSA_MESSAGE(mw->bmessage), 
+				      HEADERS_SELECTED);
+
+}
+
+static void 
+show_all_headers_cb(GtkWidget * widget, gpointer data)
+{
+  MessageWindow *mw = (MessageWindow *) gtk_object_get_data (GTK_OBJECT (data),
+							     "msgwin");
+  
+  balsa_message_set_displayed_headers(BALSA_MESSAGE(mw->bmessage), 
+				      HEADERS_ALL);
+
+}
+
+static void 
+wrap_message_cb(GtkWidget *widget, gpointer data)
+{
+  MessageWindow *mw = (MessageWindow *) gtk_object_get_data (GTK_OBJECT (data),
+							     "msgwin");
+
+  balsa_message_set_wrap(BALSA_MESSAGE(mw->bmessage), 
+			 GTK_CHECK_MENU_ITEM(widget)->active);
+}

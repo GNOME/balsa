@@ -37,30 +37,64 @@ extern "C"
   typedef struct _BalsaMessage BalsaMessage;
   typedef struct _BalsaMessageClass BalsaMessageClass;
 
+  typedef struct _BalsaPartInfo BalsaPartInfo;
+
   struct _BalsaMessage
     {
-      GnomeCanvas canvas;
-      GnomeCanvasGroup *headers;
-      GnomeCanvasGroup *body;
+      GtkViewport parent;
 
+      /* The table widget */
+      GtkWidget *table;
+
+      /* Widget to hold headers */
+/*        GtkWidget *header_list; */
+/*        gint header_count; */
+      GtkWidget *header_text;
+      ShownHeaders shown_headers;
+
+      /* Widget to hold content */
+      GtkWidget *content;
+      gboolean content_has_focus;
+
+      /* Widget to hold icons */
+      GtkWidget *part_list;
+      gint part_count;
+
+      gboolean wrap_text;
+
+      BalsaPartInfo *current_part;
+      
       Message *message;
     };
 
   struct _BalsaMessageClass
     {
-      GnomeCanvasClass parent_class;
+      GtkViewportClass parent_class;
     };
 
   guint balsa_message_get_type (void);
   GtkWidget *balsa_message_create (void);
+
   void balsa_message_clear (BalsaMessage * bmessage);
   void balsa_message_set (BalsaMessage * bmessage, Message * message);
+
+  void balsa_message_next_part (BalsaMessage *bmessage);
+  void balsa_message_previous_part (BalsaMessage *bmessage);
+  void balsa_message_save_current_part (BalsaMessage *bmessage);
+
+  void balsa_message_set_displayed_headers(BalsaMessage *bmessage, 
+					   ShownHeaders sh);
+  void balsa_message_set_wrap(BalsaMessage *bmessage, gboolean wrap);
+
+  /* a helper functions; FIXME: find more proper location for them.  */
+  gchar* get_font_name(const gchar* base, int code);
+
+  void reflow_string(gchar* str, gint mode, gint *cur_pos, int width);
 
    /* a helper functions; FIXME: find more proper location for them.  */
    gchar* get_font_name(const gchar* base, int code);
    gchar* get_koi_font_name(const gchar* base, const gchar* code);
 
-   void reflow_string(gchar* str, gint mode, gint *cur_pos, int width);
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

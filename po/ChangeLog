@@ -1,3 +1,8 @@
+2003-09-26  Christian Neumair  <chris@gnome-de.org>
+
+	* POTFILES.in: Removed non-existant libmutt cruft. Finally!
+	* de.po: Updated German translation.
+
 2003-09-10  Miloslav Trmac  <mitr@volny.cz>
 
 	* cs.po: Updated Czech translation.

@@ -1,3 +1,7 @@
+2002-03-23  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox_imap.c: fix a build without gdbm.h
+
 2002-03-20  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/{message,body}.c: add missing MT-locks. Hopefully fix other.

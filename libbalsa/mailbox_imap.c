@@ -749,9 +749,9 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
                                 message->header->msgno))
             stream = msg->fp;
         FREE(&msg);
+#ifdef HAVE_GDBM_H
         data.dsize = libbalsa_readfile(stream, &data.dptr);
         rewind(stream);
-#ifdef HAVE_GDBM_H
         if(dbf) gdbm_close(dbf);
         assure_balsa_dir();
         dbf = gdbm_open(fname, 0, GDBM_WRITER, S_IRUSR|S_IWUSR, NULL);

@@ -110,7 +110,11 @@ mm_exists (MAILSTREAM * stream,
 {
   if (number > 0 && balsa_app.current_index)
     {
-      balsa_index_append_new_messages (BALSA_INDEX (balsa_app.current_index));
+      balsa_app.new_messages = number;
+    }
+  else
+    {
+      balsa_app.new_messages = 0;
     }
 }
 

@@ -29,7 +29,7 @@
 #include "mailbox.h"
 #include "save-restore.h"
 #include "balsa-init.h"
-
+#include "balsa-index.h"
 
 /* Global application structure */
 struct BalsaApplication balsa_app;
@@ -42,6 +42,7 @@ static void setup_local_mailboxes ();
 static void my_special_mailbox ();
 
 
+static gint check_for_new_messages ();
 
 void
 init_balsa_app (int argc, char *argv[])
@@ -63,6 +64,7 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.current_index = NULL;
   balsa_app.addressbook_list = NULL;
   balsa_app.timer = 0;
+  balsa_app.new_messages = 0;
 
   /* GUI settings */
   balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
@@ -73,9 +75,24 @@ init_balsa_app (int argc, char *argv[])
   my_special_mailbox ();
 
   /* create main window */
-/*  balsa_app.timer = gtk_timeout_add (5 * 60 * 1000, current_mailbox_check, NULL); */
+  balsa_app.timer = gtk_timeout_add (5, check_for_new_messages, NULL);
 }
 
+static gint
+check_for_new_messages ()
+{
+  if (balsa_app.current_mailbox->stream->lock)
+    {
+      if (balsa_app.debug)
+	fprintf (stderr, "Lock exists, waiting\n");
+    }
+  else if (balsa_app.new_messages > 0 && balsa_app.current_index)
+    {
+      balsa_index_append_new_messages (BALSA_INDEX (balsa_app.current_index));
+      balsa_app.new_messages = 0;
+    }
+  return TRUE;
+}
 
 
 static gint
@@ -89,8 +106,8 @@ mailboxes_init (void)
 
   for (i = 0; num > i; i++)
     {
-	    if (balsa_app.debug)
-      printf ("Loaded mailbox: %s\n", mailboxes[i]);
+      if (balsa_app.debug)
+	fprintf (stderr, "Loaded mailbox: %s\n", mailboxes[i]);
       load_mailboxes (mailboxes[i]);
     }
 

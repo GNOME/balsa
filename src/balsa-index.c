@@ -1048,31 +1048,6 @@ bndx_expand_to_row_and_select(BalsaIndex * index, GtkTreeIter * iter)
 
 /* End of select message interfaces. */
 
-static gboolean
-thread_has_unread(BalsaIndex * index, GtkTreeIter * iter)
-{
-    GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(index));
-    GtkTreeIter child_iter;
-    gboolean res = FALSE;
-    if (!gtk_tree_model_iter_children(model, &child_iter, iter))
-        return FALSE;
-
-    do {
-        LibBalsaMessage *message;
-
-        gtk_tree_model_get(model, &child_iter,
-                           LB_MBOX_MESSAGE_COL, &message, -1);
-
-        if ((!LIBBALSA_MESSAGE_IS_DELETED(message) &&
-	     LIBBALSA_MESSAGE_IS_UNREAD(message)) ||
-            thread_has_unread(index, &child_iter))
-            res = TRUE;
-	g_object_unref(message);
-    } while (gtk_tree_model_iter_next(model, &child_iter) && !res);
-
-    return res;
-}
-
 void
 balsa_index_set_column_widths(BalsaIndex * index)
 {

@@ -369,7 +369,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     }
     
     mhs = g_strdup_printf ( "%s/.mh_sequences", tmp_path );
-    creat( mhs, 0600);
+    if( (tmp_file=creat( mhs, 0600)) != -1) close(tmp_file);
     /* we fake a real mh box - it's good enough */
     
     PopHandle * pop = pop_new();

@@ -1,3 +1,11 @@
+2004-03-28  Pawel Salek
+
+	* libbalsa/mailbox_local.c: remove the idle sync handler on finalize.
+	Wait for three idle seconds before running.
+	* libbalsa/mailbox_mh.c: do not leak descriptors.
+	* libbalsa/mailbox_pop3.c: creat() returns a descriptor that has
+	to be closed.
+
 2004-03-27 23:24  PeterB
 
 	* src/: main-window.c, balsa-mblist.c: manage notebook-tab

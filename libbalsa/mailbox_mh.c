@@ -181,13 +181,14 @@ libbalsa_mailbox_mh_create(const gchar * path, gboolean create)
 		return (-1);
 	    } 
 	    snprintf (tmp, sizeof (tmp), "%s/.mh_sequences", path);
-	    if ((i = creat (tmp, S_IRWXU)) == -1)
-		{
-		    libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
-					 _("Could not create MH structure at %s (%s)"), path, strerror(errno) );
-		    rmdir (path);
-		    return (-1);
-		}	    	    
+	    if ((i = creat (tmp, S_IRWXU)) == -1) {
+		libbalsa_information
+		    (LIBBALSA_INFORMATION_WARNING, 
+		     _("Could not create MH structure at %s (%s)"),
+		     path, strerror(errno));
+		rmdir (path);
+		return (-1);
+	    } else close(i);   	    
 	} else 
 	    return(-1);
     }

@@ -260,12 +260,16 @@ libbalsa_mailbox_local_load_message(LibBalsaMailbox * mailbox, guint msgno)
 static void
 libbalsa_mailbox_local_finalize(GObject * object)
 {
-    LibBalsaMailbox *mailbox;
+    LibBalsaMailboxLocal *ml;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(object));
 
-    mailbox = LIBBALSA_MAILBOX(object);
-    libbalsa_notify_unregister_mailbox(mailbox);
+    ml = LIBBALSA_MAILBOX_LOCAL(object);
+    libbalsa_notify_unregister_mailbox(LIBBALSA_MAILBOX(object));
+    if(ml->sync_id) {
+        g_source_remove(ml->sync_id);
+        ml->sync_id = 0;
+    }
 
     if (G_OBJECT_CLASS(parent_class)->finalize)
 	G_OBJECT_CLASS(parent_class)->finalize(object);
@@ -414,12 +418,10 @@ lbm_local_update_view_filter(LibBalsaMailbox * mailbox,
 	if (g_node_find(mailbox->msg_tree, G_PRE_ORDER,
 	                  G_TRAVERSE_ALL, GUINT_TO_POINTER(msgno))) {
 	    if (!match) {
-		printf("removing %d (%ld) from view\n", msgno, msg->msgno);
 		libbalsa_mailbox_msgno_filt_out(mailbox, msgno);
 	    }
 	} else {
 	    if (match) {
-		printf("adding %d (%ld) to the view\n", msgno, msg->msgno);
 		libbalsa_mailbox_msgno_filt_in(mailbox, msgno);
 	    }
 	}
@@ -1181,8 +1183,10 @@ lbml_sync_idle(LibBalsaMailboxLocal * local)
 void
 libbalsa_mailbox_local_queue_sync(LibBalsaMailboxLocal * local)
 {
-    if (!local->sync_id) {
+    if (!local->sync_id)
 	g_object_ref(local);
-	local->sync_id = g_idle_add((GSourceFunc) lbml_sync_idle, local);
-    }
+    else
+        g_source_remove(local->sync_id);
+    local->sync_id = g_timeout_add(3000, (GSourceFunc) lbml_sync_idle,
+				   local);
 }

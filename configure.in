@@ -78,7 +78,7 @@ dnl ##########################################################################
 
 AC_MSG_CHECKING(whether to use GtkHTML)
 AC_ARG_ENABLE([gtkhtml],
-              AS_HELP_STRING([--enable-gtkhtml],
+              AC_HELP_STRING([--enable-gtkhtml],
                              [Use GtkHTML if available (default=yes)]),[
 	use_gtkhtml=$enableval
 ],[
@@ -139,7 +139,7 @@ dnl Configure locking
 dnl ###########################################################################
 
 AC_ARG_ENABLE(flock,
-        AS_HELP_STRING([--enable-flock],
+        AC_HELP_STRING([--enable-flock],
                        [Do NOT use flock() to lock files (default=no)]),
 	[if test x$enableval = xno; then balsa_cv_flock=no; fi])
 
@@ -149,7 +149,7 @@ fi
 
 balsa_cv_fcntl=yes
 AC_ARG_ENABLE(fcntl,
-        AS_HELP_STRING([--disable-fcntl],
+        AC_HELP_STRING([--disable-fcntl],
                        [Use fcntl() to lock files (default=yes)]),
 	[if test x$enableval = no; then balsa_cv_fcntl=no; fi])
 if test x$balsa_cv_fcntl = xyes; then
@@ -204,7 +204,7 @@ dnl Use threading?
 dnl ###########################################################################
 
 AC_ARG_ENABLE(threads,
-        AS_HELP_STRING([--enable-threads],
+        AC_HELP_STRING([--enable-threads],
                        [Use threading for mail retrieval (default=yes)]),[
 	use_threads=$enableval
 ],[
@@ -221,11 +221,11 @@ dnl (we don't use the std macro AM_PATH_GPGME here to avoid dependencies...)
 dnl ##########################################################################
 AC_MSG_CHECKING(whether to build with gpgme/GnuPG support)
 AC_ARG_WITH([gpgme],
-        AS_HELP_STRING([--with-gpgme=[gpgme-config]],
+        AC_HELP_STRING([--with-gpgme=[gpgme-config]],
                        [build with experimental gpgme/GnuPG support (default=no)]),
 	[ gpgmecfg=$withval ], [ gpgmecfg=no ])
 AC_ARG_ENABLE([smime],
-	AS_HELP_STRING([--enable-smime],
+	AC_HELP_STRING([--enable-smime],
                        [include S/MIME support (needs gpgme and gpgsm, experimental) (default=no)]),
 	[ have_smime=$withval ], [ have_smime=no ])
 
@@ -315,7 +315,7 @@ dnl  For now, only look for OpenLDAP?
 dnl #########################################################################
 
 AC_ARG_WITH([ldap],
-        AS_HELP_STRING([--with-ldap=DIR],
+        AC_HELP_STRING([--with-ldap=DIR],
                 [Use OpenLDAP if available (default=no)]),[
 	with_ldap=$withval
 ],[
@@ -343,7 +343,7 @@ dnl Have ESMTP ?
 dnl ##########################################################################
 
 AC_ARG_WITH(esmtp,
-        AS_HELP_STRING([--with-esmtp=DIR],
+        AC_HELP_STRING([--with-esmtp=DIR],
                 [Enable libESMTP (default=yes)]),[
 	with_esmtp=$withval
 ],[
@@ -412,7 +412,7 @@ dnl Some systems have extra libiconv replacing iconv functions from
 dnl libc. Use this library if requested.
 dnl #############################################################
 AC_ARG_WITH(iconv,      
-        AS_HELP_STRING([--with-iconv=DIR],
+        AC_HELP_STRING([--with-iconv=DIR],
                 [Where libiconv is installed]),
            [if test "$with_iconv" != yes -a "$with_iconv" != no ; then
                    CPPFLAGS="-I${with_iconv}/include $CPPFLAGS"
@@ -429,7 +429,7 @@ dnl Check for PCRE if available
 dnl ##########################################################################
 
 AC_ARG_ENABLE([pcre], 
-        AS_HELP_STRING([--enable-pcre],
+        AC_HELP_STRING([--enable-pcre],
                 [Use Perl-compatible regular expressions if available (default=yes)]),[
 	check_pcre=$enableval],[
 	check_pcre=yes
@@ -471,7 +471,7 @@ dnl Enable SSL?
 dnl ##########################################################################
 
 AC_ARG_WITH(ssl,
-        AS_HELP_STRING([--with-ssl],
+        AC_HELP_STRING([--with-ssl],
                 [Enable SSL (default=no)]),[
 	with_ssl=$withval
 ],[
@@ -526,7 +526,7 @@ dnl Enable GSS?
 dnl ##########################################################################
 
 AC_ARG_WITH(gss,
-        AS_HELP_STRING([--with-gss],
+        AC_HELP_STRING([--with-gss],
                 [Enable GSS (default=no)]),
     [with_gss=$withval],[with_gss=no])
 if test "x$with_gss" != xno  ; then
@@ -541,7 +541,7 @@ dnl Enable touchscreen optimized UI?
 dnl ##########################################################################
 
 AC_ARG_ENABLE(touch-ui,
-        AS_HELP_STRING([--enable-touch-ui],
+        AC_HELP_STRING([--enable-touch-ui],
                 [Enable Touchscreen UI mode (default=no)]),
     [AC_DEFINE(ENABLE_TOUCH_UI,1,[Defined when touchscreen optimized UI is to be enabled.])])
 
@@ -559,7 +559,7 @@ dnl ###########################################################################
 
 
 AC_ARG_ENABLE(more-warnings,
-        AS_HELP_STRING([--enable-more-warnings],
+        AC_HELP_STRING([--enable-more-warnings],
         [Enable maximum compiler warnings (default=yes)]),
 set_more_warnings="$enableval", set_more_warnings=yes)
 

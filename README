@@ -147,10 +147,12 @@ TLS extension in SMTP mail submission:
     If you have libESMTP 0.8.5{preX} there will be a box for entry of
     the client certificate's password.  The client certificate should
     be stored in PEM format in the file
-    $HOME/.authenticate/private/smtp-starttls.pem Both the certificate and
-    the private key are stored in the same file.  The permissions on
-    the certificate file *must* be 0600 or 0400 otherwise libESMTP
-    will ignore it.
+
+    $HOME/.authenticate/$HOSTNAME/private/smtp-starttls.pem
+    
+    Both the certificate and the private key are stored in the same
+    file.  The permissions on the certificate file *must* be 0600 or 0400
+    otherwise libESMTP will ignore it.
 
     libESMTP 0.8.4 will establish an encrypted connection with servers
     supporting STARTTLS but there is no certificate support.  If the

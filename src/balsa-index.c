@@ -36,8 +36,8 @@ static void balsa_index_size_allocate (GtkWidget * widget, GtkAllocation * alloc
 
 
 /* clist callbacks */
-static void select_message (GtkWidget * widget, 
-			    gint row, 
+static void select_message (GtkWidget * widget,
+			    gint row,
 			    gint column,
 			    GdkEventButton * bevent,
 			    gpointer * data);
@@ -50,10 +50,10 @@ static void unselect_message (GtkWidget * widget,
 
 /* signals */
 enum
-{
-  SELECT_MESSAGE,
-  LAST_SIGNAL
-};
+  {
+    SELECT_MESSAGE,
+    LAST_SIGNAL
+  };
 
 
 /* marshallers */
@@ -66,7 +66,8 @@ static void balsa_index_marshal_signal_1 (GtkObject * object,
 					  gpointer func_data,
 					  GtkArg * args);
 
-static gint balsa_index_signals[LAST_SIGNAL] = {0};
+static gint balsa_index_signals[LAST_SIGNAL] =
+{0};
 static GtkBinClass *parent_class = NULL;
 
 
@@ -301,10 +302,11 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
 
 
 void
-balsa_index_add (BalsaIndex * bindex, 
+balsa_index_add (BalsaIndex * bindex,
 		 Message * message)
 {
   gchar *text[5];
+  gchar *tmp;
   gint row;
 
   g_return_if_fail (bindex != NULL);
@@ -315,7 +317,13 @@ balsa_index_add (BalsaIndex * bindex,
 
   text[0] = NULL;
   text[1] = NULL;
-  text[2] = message->from->personal;
+  if (message->from->personal)
+    text[2] = message->from->personal;
+  else
+  {
+    text[2] = g_malloc(strlen(message->from->user)+1+strlen(message->from->host)+1);
+    sprintf (text[2], "%s@%s", message->from->user, message->from->host);
+    }
   text[3] = message->subject;
   text[4] = message->date;
 
@@ -367,7 +375,7 @@ balsa_index_select_previous (BalsaIndex * bindex)
     gtk_clist_moveto (clist, row, 0, 0.0, 0.0);
 }
 
-void 
+void
 balsa_index_set_flag (BalsaIndex * bindex, Message * message, gchar * flag)
 {
 #if 0
@@ -380,8 +388,8 @@ balsa_index_set_flag (BalsaIndex * bindex, Message * message, gchar * flag)
     case 'D':
       gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), msgno - 1, 0, flag);
       break;
- 
-   case ' ':
+
+    case ' ':
       gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), msgno - 1, 0, NULL);
       break;
     }

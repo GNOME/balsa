@@ -300,7 +300,6 @@ close_window (GtkWidget * widget, gpointer data)
 static gint
 delete_event_cb (GtkWidget * widget, GdkEvent *e, gpointer data)
 {
-  g_message ("delete_event_cb(): Start.\n");
   g_message ("delete_event_cb(): Calling balsa_sendmsg_destroy().\n");
   balsa_sendmsg_destroy ((BalsaSendmsg*)data);
   g_message ("delete_event_cb(): Calling alias_free_addressbook().\n");
@@ -394,6 +393,10 @@ select_attachment (GnomeIconList * ilist, gint num, GdkEventButton * event,
 		      event->button, event->time);
 }
 
+/* add_attachment:
+   adds given filename to the list.
+   takes over the ownership of filename.
+*/
 static void
 add_attachment (GnomeIconList * iconlist, char *filename)
 {
@@ -401,6 +404,8 @@ add_attachment (GnomeIconList * iconlist, char *filename)
 	/* gchar *pix = gnome_pixmap_file ("balsa/attachment.png"); */
     gchar *pix = balsa_pixmap_finder( "balsa/attachment.png" );
 	
+    if(balsa_app.debug) 
+      fprintf(stderr,"Trying to attach '%s'\n", filename);
    if( !check_if_regular_file( filename ) ) {
       /*c_i_r_f() will pop up an error dialog for us, so we need do nothing.*/
       return;
@@ -482,6 +487,8 @@ attach_dialog_ok (GtkWidget * widget, gpointer data)
 
   gtk_widget_destroy (GTK_WIDGET (fs));
   g_free(dir);
+
+  /* FIXME: show attachment list */
 }
 
 /* attach_clicked - menu and toolbar callback */
@@ -530,13 +537,12 @@ attachments_add (GtkWidget * widget,
 {
   GList *names, *l;
 
-  names = gnome_uri_list_extract_uris (selection_data->data);
+  names = gnome_uri_list_extract_filenames (selection_data->data);
+
   for (l = names; l; l = l->next)
-    {
-      char *name = l->data;
-      if(g_strncasecmp(name , "file:",5) == 0)
-	 add_attachment (GNOME_ICON_LIST (bsmsg->attachments[1]), name+5);
-    }
+      add_attachment (GNOME_ICON_LIST (bsmsg->attachments[1]), 
+		      g_strdup((char*)l->data));
+
   gnome_uri_list_free_strings (names);
 
   /* show attachment list */

@@ -1,6 +1,8 @@
 2002-04-04  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox_{local,pop3}.c: filtering fixes by Emmanuel.
+	* libbalsa/message.[hc]: make libbalsa_message_body_charset() public.
+	* src/print.c: print composed messages without crashing.
 
 2002-03-31  Carlos Morgado  <chbm@chbm.nu>
 

@@ -296,15 +296,18 @@ libbalsa_message_pathname(LibBalsaMessage * message)
     return message->header->path;
 }
 
-static const gchar *
+const gchar *
 libbalsa_message_body_charset(LibBalsaMessageBody * body)
 {
     gchar *charset = NULL;
 
     while (body) {
-	libbalsa_lock_mutt();
-	charset = mutt_get_parameter("charset", body->mutt_body->parameter);
-	libbalsa_unlock_mutt();
+        if(body->mutt_body) {
+            libbalsa_lock_mutt();
+            charset = 
+                mutt_get_parameter("charset", body->mutt_body->parameter);
+            libbalsa_unlock_mutt();
+        } else charset = body->charset;
 
 	if (charset)
 	    break;
@@ -363,7 +366,9 @@ libbalsa_message_user_hdrs(LibBalsaMessage * message)
     gchar **pair;
     ENVELOPE *env;
 
-    g_return_val_if_fail(message->mailbox, NULL);
+    /* message not attached to an mailbox -> no extra headers */
+    if(message->mailbox ==NULL) return NULL;
+
     if(CLIENT_CONTEXT(message->mailbox)->hdrs == NULL) 
 	/* oops, mutt closed the mailbox on error, we should do the same */
 	return NULL;

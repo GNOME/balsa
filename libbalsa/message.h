@@ -214,6 +214,7 @@ gchar *libbalsa_message_title(LibBalsaMessage * message,
 
 const gchar *libbalsa_message_pathname(LibBalsaMessage * message);
 const gchar *libbalsa_message_charset(LibBalsaMessage * message);
+const gchar *libbalsa_message_body_charset(LibBalsaMessageBody * body);
 gboolean libbalsa_message_is_multipart(LibBalsaMessage * message);
 gboolean libbalsa_message_has_attachment(LibBalsaMessage * message);
 

@@ -604,8 +604,7 @@ prepare_plaintext(PrintInfo * pi, LibBalsaMessageBody * body)
     }
 
     /* get the necessary iconv structure, or use iso-8859-1 */
-    charset = libbalsa_message_body_get_parameter(body, "charset");
-
+    charset = g_strdup(libbalsa_message_body_charset(body));
     if (charset) {
 	pdata->conv = iconv_open("UTF-8", charset);
 	if (pdata->conv == (iconv_t)(-1)) {

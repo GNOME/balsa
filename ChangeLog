@@ -1,3 +1,7 @@
+2001-08-28  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/mailbox_pop3.c: fix descriptor leak
+
 2001-08-28  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Brian Stafford <brian@stafford.uklinux.net> ESMTP TLS patch extended.

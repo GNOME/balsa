@@ -296,9 +296,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     /* chbm: fixme - make this more linear */
     if((m->inbox) && (tmp_mailbox->messages)) {
 	if(libbalsa_messages_move(tmp_mailbox->message_list, m->inbox)) {    
-	    libbalsa_mailbox_close(tmp_mailbox);
 	    unlink((const char*)tmp_path);
-	    gtk_object_destroy(GTK_OBJECT(tmp_mailbox));
 	} else {
 	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 				 _("Error placing messages from %s on %s\n"
@@ -306,12 +304,12 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 				 mailbox->name, 
 				 LIBBALSA_MAILBOX(m->inbox)->name,
 				 tmp_path);
-	    libbalsa_mailbox_close(tmp_mailbox);
-	    gtk_object_destroy(GTK_OBJECT(tmp_mailbox));
 	}
     } else {
 	unlink((const char*)tmp_path);
     }
+    libbalsa_mailbox_close(LIBBALSA_MAILBOX(tmp_mailbox));
+    gtk_object_destroy(GTK_OBJECT(tmp_mailbox));	
     g_free(tmp_path);
 }
 

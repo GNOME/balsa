@@ -56,15 +56,21 @@ typedef gpgme_key_t(*GMimeGpgmeKeySelectCB) (const gchar * name,
 					     gboolean is_secret,
 					     GMimeGpgmeContext * ctx,
 					     GList * keys);
+/* callback handler to verify low-trust keys */
+typedef gboolean(*GMimeGpgmeKeyTrustCB) (const gchar * name,
+					 gpgme_user_id_t uid,
+					 GMimeGpgmeContext * ctx);
 
 struct _GMimeGpgmeContext {
     GMimeCipherContext parent_object;
 
     gpgme_ctx_t gpgme_ctx;	/* gpgme context */
     gboolean singlepart_mode;	/* set context to single-part mode (RFC 2440, 2633) */
+    gboolean always_trust_uid;  /* always trust uid when encrypting */
     gchar *micalg;		/* hash algorithm (signing only) */
     GMimeGpgmeSigstat *sig_state;	/* signature status */
     GMimeGpgmeKeySelectCB key_select_cb;	/* key selection callback */
+    GMimeGpgmeKeyTrustCB key_trust_cb;          /* low trust key cb */
     gpgme_passphrase_cb_t passphrase_cb;	/* passphrase callback */
 };
 

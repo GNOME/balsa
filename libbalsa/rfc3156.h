@@ -33,18 +33,21 @@
 
 
 /* bits to define the protection mode: signed or encrypted */
-#define LIBBALSA_PROTECT_SIGN      (1 << 0)
-#define LIBBALSA_PROTECT_ENCRYPT   (1 << 1)
-#define LIBBALSA_PROTECT_MODE      (3 << 0)
+#define LIBBALSA_PROTECT_SIGN          (1 << 0)
+#define LIBBALSA_PROTECT_ENCRYPT       (1 << 1)
+#define LIBBALSA_PROTECT_MODE          (3 << 0)
 
 /* bits to define the protection method */
-#define LIBBALSA_PROTECT_OPENPGP   (1 << 2)	/* RFC 2440 (OpenPGP) */
-#define LIBBALSA_PROTECT_SMIMEV3   (1 << 3)	/* RFC 2633 (S/MIME v3) */
-#define LIBBALSA_PROTECT_RFC3156   (1 << 4)	/* RFC 3156 (PGP/MIME) */
-#define LIBBALSA_PROTECT_PROTOCOL  (7 << 2)
+#define LIBBALSA_PROTECT_OPENPGP       (1 << 2)	/* RFC 2440 (OpenPGP) */
+#define LIBBALSA_PROTECT_SMIMEV3       (1 << 3)	/* RFC 2633 (S/MIME v3) */
+#define LIBBALSA_PROTECT_RFC3156       (1 << 4)	/* RFC 3156 (PGP/MIME) */
+#define LIBBALSA_PROTECT_PROTOCOL      (7 << 2)
 
 /* indicate broken structure */
-#define LIBBALSA_PROTECT_ERROR     (1 << 5)
+#define LIBBALSA_PROTECT_ERROR         (1 << 5)
+
+/* indicate that uid's should always be trusted */
+#define LIBBALSA_PROTECT_ALWAYS_TRUST  (1 << 6)
 
 
 /* some custom error messages */
@@ -64,11 +67,13 @@ gboolean libbalsa_sign_mime_object(GMimeObject ** content,
 gboolean libbalsa_encrypt_mime_object(GMimeObject ** content,
 				      GList * rfc822_for,
 				      gpgme_protocol_t protocol,
+				      gboolean always_trust,
 				      GtkWindow * parent);
 gboolean libbalsa_sign_encrypt_mime_object(GMimeObject ** content,
 					   const gchar * rfc822_signer,
 					   GList * rfc822_for,
 					   gpgme_protocol_t protocol,
+					   gboolean always_trust,
 					   GtkWindow * parent);
 gboolean libbalsa_body_check_signature(LibBalsaMessageBody * body,
 				       gpgme_protocol_t protocol);
@@ -80,6 +85,7 @@ LibBalsaMessageBody *libbalsa_body_decrypt(LibBalsaMessageBody * body,
 gboolean libbalsa_rfc2440_sign_encrypt(GMimePart * part,
 				       const gchar * sign_for,
 				       GList * encrypt_for,
+				       gboolean always_trust,
 				       GtkWindow * parent);
 gpgme_error_t libbalsa_rfc2440_verify(GMimePart * part,
 				      GMimeGpgmeSigstat ** sig_info);

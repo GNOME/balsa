@@ -190,9 +190,11 @@ send_message_info_destroy(SendMessageInfo *smi)
 
 #if HAVE_GPGME
 static gint
-libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part);
+libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part,
+			       GtkWindow * parent);
 static LibBalsaMsgCreateResult
-do_multipart_crypto(LibBalsaMessage * message, GMimeObject ** mime_root);
+do_multipart_crypto(LibBalsaMessage * message, GMimeObject ** mime_root,
+		    GtkWindow * parent);
 #endif
 
 static guint balsa_send_message_real(SendMessageInfo* info);
@@ -1398,11 +1400,13 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
     LibBalsaMessageBody *body;
     gchar *tmp;
     GList *list;
+    GtkWindow * parent;
 
     body = message->body_list;
     if (body && body->next)
 	mime_root=GMIME_OBJECT(g_mime_multipart_new_with_subtype(message->subtype));
 
+    parent = g_object_get_data(G_OBJECT(message), "parent-window");
     while (body) {
 	GMimeObject *mime_part;
 	mime_part=NULL;
@@ -1520,7 +1524,8 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
 		(message->gpg_mode & LIBBALSA_PROTECT_OPENPGP) != 0) {
 		gint result = 
 		    libbalsa_create_rfc2440_buffer(body,
-			                           GMIME_PART(mime_part));
+			                           GMIME_PART(mime_part),
+						   parent);
 
 		if (result != LIBBALSA_MESSAGE_CREATE_OK) {
 		    g_object_unref(G_OBJECT(mime_part));
@@ -1547,7 +1552,8 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
 
 #ifdef HAVE_GPGME
     if (message->body_list != NULL && !postponing) {
-	LibBalsaMsgCreateResult crypt_res = do_multipart_crypto(message, &mime_root);
+	LibBalsaMsgCreateResult crypt_res =
+	    do_multipart_crypto(message, &mime_root, parent);
 	if (crypt_res != LIBBALSA_MESSAGE_CREATE_OK)
 	    return crypt_res;
     }
@@ -1762,17 +1768,20 @@ lb_send_from(LibBalsaMessage *message)
 }
 
 static gint
-libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part)
+libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part,
+			       GtkWindow * parent)
 {
     LibBalsaMessage *message = body->message;
     gint mode = message->gpg_mode;
+    gboolean always_trust = (mode & LIBBALSA_PROTECT_ALWAYS_TRUST) != 0;
 
     switch (mode & LIBBALSA_PROTECT_MODE)
 	{
 	case LIBBALSA_PROTECT_SIGN:   /* sign only */
 	    if (!libbalsa_rfc2440_sign_encrypt(mime_part, 
 					       lb_send_from(message),
-					       NULL, NULL))
+					       NULL, FALSE,
+					       parent))
 		return LIBBALSA_MESSAGE_SIGN_ERROR;
 	    break;
 	case LIBBALSA_PROTECT_ENCRYPT:
@@ -1799,13 +1808,15 @@ libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part)
 			libbalsa_rfc2440_sign_encrypt(mime_part, 
 					              lb_send_from(message),
 						      encrypt_for,
-						      NULL);
+						      always_trust,
+						      parent);
 		else
 		    result = 
 			libbalsa_rfc2440_sign_encrypt(mime_part, 
 						      NULL,
 						      encrypt_for,
-						      NULL);
+						      always_trust,
+						      parent);
 		g_list_foreach(encrypt_for, (GFunc) g_free, NULL);
 		g_list_free(encrypt_for);
 		if (!result)
@@ -1823,9 +1834,11 @@ libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part)
   
 /* handle rfc2633 and rfc3156 signing and/or encryption of a message */
 static LibBalsaMsgCreateResult
-do_multipart_crypto(LibBalsaMessage * message, GMimeObject ** mime_root)
+do_multipart_crypto(LibBalsaMessage * message, GMimeObject ** mime_root,
+		    GtkWindow * parent)
 {
     gpgme_protocol_t protocol;
+    gboolean always_trust;
 
     /* check if we shall do any protection */
     if (!(message->gpg_mode & LIBBALSA_PROTECT_MODE))
@@ -1843,13 +1856,14 @@ do_multipart_crypto(LibBalsaMessage * message, GMimeObject ** mime_root)
     else
 	return LIBBALSA_MESSAGE_ENCRYPT_ERROR;  /* hmmm.... */
 
+    always_trust = (message->gpg_mode & LIBBALSA_PROTECT_ALWAYS_TRUST) != 0;
     /* sign and/or encrypt */
     switch (message->gpg_mode & LIBBALSA_PROTECT_MODE)
 	{
 	case LIBBALSA_PROTECT_SIGN:   /* sign message */
 	    if (!libbalsa_sign_mime_object(mime_root,
 					   lb_send_from(message),
-					   protocol, NULL))
+					   protocol, parent))
 		return LIBBALSA_MESSAGE_SIGN_ERROR;
 	    break;
 	case LIBBALSA_PROTECT_ENCRYPT:
@@ -1876,11 +1890,12 @@ do_multipart_crypto(LibBalsaMessage * message, GMimeObject ** mime_root)
 			libbalsa_sign_encrypt_mime_object(mime_root,
 							  lb_send_from(message),
 							  encrypt_for, protocol,
-							  NULL);
+							  always_trust, parent);
 		else
 		    success = 
 			libbalsa_encrypt_mime_object(mime_root, encrypt_for,
-						     protocol, NULL);
+						     protocol, always_trust,
+						     parent);
 		g_list_free(encrypt_for);
 		
 		if (!success)

@@ -159,9 +159,11 @@ g_mime_gpgme_context_init(GMimeGpgmeContext * ctx,
 			  GMimeGpgmeContextClass * klass)
 {
     ctx->singlepart_mode = FALSE;
+    ctx->always_trust_uid = FALSE;
     ctx->micalg = NULL;
     ctx->sig_state = NULL;
     ctx->key_select_cb = NULL;
+    ctx->key_trust_cb = NULL;
     ctx->passphrase_cb = NULL;
 }
 
@@ -172,10 +174,8 @@ g_mime_gpgme_context_finalize(GObject * object)
     GMimeGpgmeContext *ctx = (GMimeGpgmeContext *) object;
 
     gpgme_release(ctx->gpgme_ctx);
-    if (ctx->micalg) {
-	g_free(ctx->micalg);
-	ctx->micalg = NULL;
-    }
+    g_free(ctx->micalg);
+    ctx->micalg = NULL;
     if (ctx->sig_state) {
 	g_object_unref(G_OBJECT(ctx->sig_state));
 	ctx->sig_state = NULL;
@@ -623,12 +623,13 @@ g_mime_gpgme_encrypt(GMimeCipherContext * context, gboolean sign,
 	return -1;
     }
 
-    /* do the encrypt or sign and encrypt operation */
+    /* do the encrypt or sign and encrypt operation
+     * Note: we set "always trust" here, as if we detected an untrusted key
+     * earlier, the user already accepted it */
     if (sign)
-	err =
-	    gpgme_op_encrypt_sign(gpgme_ctx, rcpt,
-				  GPGME_ENCRYPT_ALWAYS_TRUST, plain,
-				  crypt);
+	err = 
+	    gpgme_op_encrypt_sign(gpgme_ctx, rcpt, GPGME_ENCRYPT_ALWAYS_TRUST,
+				  plain, crypt);
     else
 	err =
 	    gpgme_op_encrypt(gpgme_ctx, rcpt, GPGME_ENCRYPT_ALWAYS_TRUST,
@@ -835,8 +836,9 @@ g_mime_gpgme_context_check_protocol(GMimeGpgmeContextClass * klass,
 
 /*
  * Get a key for name. If secret_only is set, choose only secret (private)
- * keys. If multiple keys would match, call the key selection CB (if present).
- * If no matching key could be found or if any error occurs, return NULL and
+ * keys (signing). Otherwise, choose only public keys (encryption).
+ * If multiple keys would match, call the key selection CB (if present). If
+ * no matching key could be found or if any error occurs, return NULL and
  * set error.
  */
 #define KEY_IS_OK(k)   (!((k)->expired || (k)->revoked || \
@@ -850,6 +852,7 @@ get_key_from_name(GMimeGpgmeContext * ctx, const gchar * name,
     gpgme_key_t key;
     gpgme_error_t err;
 
+    /* let gpgme list keys */
     if ((err = gpgme_op_keylist_start(gpgme_ctx, name,
 				      secret_only)) != GPG_ERR_NO_ERROR) {
 	if (error)
@@ -858,10 +861,21 @@ get_key_from_name(GMimeGpgmeContext * ctx, const gchar * name,
 			gpgme_strsource(err), name, gpgme_strerror(err));
 	return NULL;
     }
+
     while ((err =
 	    gpgme_op_keylist_next(gpgme_ctx, &key)) == GPG_ERR_NO_ERROR)
-	if (KEY_IS_OK(key) && key->subkeys && KEY_IS_OK(key->subkeys))
-	    keys = g_list_append(keys, key);
+	/* check if this key and the relevant subkey are usable */
+	if (KEY_IS_OK(key)) {
+	    gpgme_subkey_t subkey = key->subkeys;
+
+	    while (subkey && ((secret_only && !subkey->can_sign) ||
+			      (!secret_only && !subkey->can_encrypt)))
+		subkey = subkey->next;
+
+	    if (subkey && KEY_IS_OK(subkey))
+		keys = g_list_append(keys, key);
+	}
+
     if (gpg_err_code(err) != GPG_ERR_EOF) {
 	if (error)
 	    g_set_error(error, GPGME_ERROR_QUARK, err,
@@ -898,8 +912,47 @@ get_key_from_name(GMimeGpgmeContext * ctx, const gchar * name,
 	g_list_foreach(keys, (GFunc) gpgme_key_unref, NULL);
     } else
 	key = (gpgme_key_t) keys->data;
-
     g_list_free(keys);
+
+    /* OpenPGP: ask the user if a low-validity key should be trusted for
+     * encryption */
+    if (key && !secret_only && !ctx->always_trust_uid &&
+	gpgme_get_protocol(gpgme_ctx) == GPGME_PROTOCOL_OpenPGP) {
+	gpgme_user_id_t uid = key->uids;
+	gchar * upcase_name = g_ascii_strup(name, -1);
+	gboolean found = FALSE;
+
+	while (!found && uid) {
+	    /* check the email field which may or may not be present */
+	    if (uid->email && !g_ascii_strcasecmp(uid->email, name))
+		found = TRUE;
+	    else {
+		/* no email or no match, check the uid */
+		gchar * upcase_uid = g_ascii_strup(uid->uid, -1);
+		
+		if (strstr(upcase_uid, upcase_name))
+		    found = TRUE;
+		else
+		    uid = uid->next;
+		g_free(upcase_uid);
+	    }
+	}
+	g_free(upcase_name);
+
+	/* ask the user if a low-validity key shall be used */
+	if (uid && uid->validity < GPGME_VALIDITY_FULL)
+	    if (!ctx->key_trust_cb ||
+		!ctx->key_trust_cb(name, uid, ctx)) {
+		gpgme_key_unref(key);
+		key = NULL;
+		if (error)
+		    g_set_error(error, GPGME_ERROR_QUARK,
+				GPG_ERR_KEY_SELECTION,
+				_("%s: insufficient validity for uid %s"),
+				"gmime-gpgme", name);
+	    }
+    }
+
     return key;
 }
 

@@ -105,6 +105,7 @@ libbalsa_identity_init(LibBalsaIdentity* ident)
 #ifdef HAVE_GPGME
     ident->gpg_sign = FALSE;
     ident->gpg_encrypt = FALSE;
+    ident->always_trust = FALSE;
     ident->crypt_protocol = LIBBALSA_PROTECT_OPENPGP;
 #endif
 }
@@ -476,7 +477,8 @@ static void config_frame_button_select_cb(GtkTreeSelection * selection,
                                           GtkDialog * dialog);
 
 static void ident_dialog_add_checkbutton(GtkWidget *, gint, GtkDialog *,
-                                         const gchar *, const gchar *);
+                                         const gchar *, const gchar *,
+					 gboolean sensitive);
 static void ident_dialog_add_entry(GtkWidget *, gint, GtkDialog *,
                                    const gchar *, const gchar *);
 static gchar *ident_dialog_get_text(GtkDialog *, const gchar *);
@@ -762,30 +764,44 @@ new_ident_cb(GtkTreeView * tree, GtkWidget * dialog)
 
 
 /*
+ * Helper: append a notebook page containing a table with the requested
+ * number of rows
+ */
+static GtkWidget*
+append_ident_notebook_page(GtkNotebook *notebook, guint rows,
+			   const gchar * tab_label)
+{
+    GtkWidget *vbox;
+    GtkWidget *table;
+
+    vbox = gtk_vbox_new(FALSE, 0);
+    table = gtk_table_new(rows, 2, FALSE);
+    gtk_table_set_row_spacings(GTK_TABLE(table), padding);
+    gtk_table_set_col_spacings(GTK_TABLE(table), padding);
+    gtk_container_set_border_width(GTK_CONTAINER(table), padding);
+    gtk_box_pack_start(GTK_BOX(vbox), table, FALSE, FALSE, 0);
+    gtk_notebook_append_page(notebook, vbox, gtk_label_new(tab_label));
+    
+    return table;
+}
+
+
+/*
  * Put the required GtkEntries, Labels, and Checkbuttons in the dialog
  * for creating/editing identities.
  */
 static GtkWidget*
 setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
 {
-     
-    GtkWidget* frame = gtk_frame_new(NULL);
-#ifdef HAVE_GPGME
-    GtkWidget *table = gtk_table_new(18, 2, FALSE);
-#else
-    GtkWidget *table = gtk_table_new(15, 2, FALSE);
-#endif
-    gint row = 0;
+    GtkNotebook *notebook = GTK_NOTEBOOK(gtk_notebook_new());
+    GtkWidget *table;
+    gint row;
     GObject *name;
     GObject *sig_path;
 
-    gtk_container_set_border_width(GTK_CONTAINER(frame), padding);
-    gtk_container_set_border_width(GTK_CONTAINER(table), padding);
-
-    gtk_container_add(GTK_CONTAINER(frame), table);
-    gtk_table_set_row_spacings(GTK_TABLE(table), padding);
-    gtk_table_set_col_spacings(GTK_TABLE(table), padding);
-
+    /* create the "General" tab */
+    table = append_ident_notebook_page(notebook, 8, _("General"));
+    row = 0;
     ident_dialog_add_entry(table, row++, dialog, _("_Identity Name:"), 
 		           "identity-name");
     ident_dialog_add_entry(table, row++, dialog, _("_Full Name:"), 
@@ -802,47 +818,47 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
                            "identity-replystring");
     ident_dialog_add_entry(table, row++, dialog, _("F_orward String:"), 
                            "identity-forwardstring");
+
+    /* create the "Signature" tab */
+    table = append_ident_notebook_page(notebook, 7, _("Signature"));
+    row = 0;
     ident_dialog_add_entry(table, row++, dialog, _("Signature _Path:"), 
-                           "identity-sigpath");
-    
+			   "identity-sigpath");
     ident_dialog_add_checkbutton(table, row++, dialog,
                                 _("_Execute Signature"),
-				"identity-sigexecutable");
+				 "identity-sigexecutable", FALSE);
     ident_dialog_add_checkbutton(table, row++, dialog,
                                  _("Incl_ude Signature"), 
-                                 "identity-sigappend");
+                                 "identity-sigappend", FALSE);
     ident_dialog_add_checkbutton(table, row++, dialog, 
                                  _("Include Signature When For_warding"),
-                                 "identity-whenforward");
+                                 "identity-whenforward", FALSE);
     ident_dialog_add_checkbutton(table, row++, dialog,
                                  _("Include Signature When Rep_lying"),
-                                 "identity-whenreply");
+                                 "identity-whenreply", FALSE);
     ident_dialog_add_checkbutton(table, row++, dialog, 
                                  _("_Add Signature Separator"),
-                                 "identity-sigseparator");
+                                 "identity-sigseparator", FALSE);
     ident_dialog_add_checkbutton(table, row++, dialog,
                                  _("Prepend Si_gnature"),
-                                 "identity-sigprepend");
+                                 "identity-sigprepend", FALSE);
 
 #ifdef HAVE_GPGME
+    /* create the "Security" tab */
+    table = append_ident_notebook_page(notebook, 4, _("Security"));
+    row = 0;
     ident_dialog_add_checkbutton(table, row++, dialog, 
                                  _("sign messages by default"),
-                                 "identity-gpgsign");
-    gtk_widget_set_sensitive(GTK_WIDGET(g_object_get_data(G_OBJECT(dialog),
-							  "identity-gpgsign")),
-			     TRUE);
+                                 "identity-gpgsign", TRUE);
     ident_dialog_add_checkbutton(table, row++, dialog,
                                  _("encrypt messages by default"),
-                                 "identity-gpgencrypt");
-    gtk_widget_set_sensitive(GTK_WIDGET(g_object_get_data(G_OBJECT(dialog),
-							  "identity-gpgencrypt")),
-			     TRUE);
+                                 "identity-gpgencrypt", TRUE);
     ident_dialog_add_option_menu(table, row++, dialog,
-				 _("default crypto protocol"),
+				 _("default protocol"),
 				 "identity-crypt-protocol");
-    gtk_widget_set_sensitive(GTK_WIDGET(g_object_get_data(G_OBJECT(dialog),
-							  "identity-crypt-protocol")),
-			     TRUE);
+    ident_dialog_add_checkbutton(table, row++, dialog,
+                                 _("always trust GnuPG keys when encrypting"),
+                                 "identity-trust-always", TRUE);
 #endif
 
     name = g_object_get_data(G_OBJECT(dialog), "identity-name");
@@ -852,7 +868,9 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
     g_signal_connect(sig_path, "changed",
                      G_CALLBACK(md_sig_path_changed), dialog);
 
-    return GTK_WIDGET(frame);
+    gtk_notebook_set_current_page(notebook, 0);
+
+    return GTK_WIDGET(notebook);
 }
 
 /* Callback for the "changed" signal of the name entry; updates the name
@@ -895,14 +913,14 @@ md_sig_path_changed(GtkEntry * sig_path, GObject * dialog)
 static void
 ident_dialog_add_checkbutton(GtkWidget * table, gint row,
                              GtkDialog * dialog, const gchar * check_label,
-                             const gchar * check_key)
+                             const gchar * check_key, gboolean sensitive)
 {
     GtkWidget *check;
 
     check = gtk_check_button_new_with_mnemonic(check_label);
     gtk_table_attach_defaults(GTK_TABLE(table), check, 0, 2, row, row + 1);
     g_object_set_data(G_OBJECT(dialog), check_key, check);
-    gtk_widget_set_sensitive(check, FALSE);
+    gtk_widget_set_sensitive(check, sensitive);
 }
 
 
@@ -1038,6 +1056,7 @@ ident_dialog_update(GtkDialog* dlg)
 #ifdef HAVE_GPGME
     id->gpg_sign        = ident_dialog_get_bool(dlg, "identity-gpgsign");
     id->gpg_encrypt     = ident_dialog_get_bool(dlg, "identity-gpgencrypt");
+    id->always_trust    = ident_dialog_get_bool(dlg, "identity-trust-always");
     id->crypt_protocol  = ident_dialog_get_menu(dlg, "identity-crypt-protocol");
 #endif
    
@@ -1347,6 +1366,8 @@ display_frame_update(GtkDialog * dialog, LibBalsaIdentity* ident)
                               ident->gpg_sign);    
     display_frame_set_boolean(dialog, "identity-gpgencrypt", 
                               ident->gpg_encrypt);    
+    display_frame_set_boolean(dialog, "identity-trust-always", 
+                              ident->always_trust);    
     display_frame_set_menu(dialog, "identity-crypt-protocol",
 			   &ident->crypt_protocol);
 #endif
@@ -1428,6 +1449,7 @@ libbalsa_identity_new_config(const gchar* group, const gchar* name)
 #ifdef HAVE_GPGME
     ident->gpg_sign = libbalsa_conf_get_bool("GpgSign");
     ident->gpg_encrypt = libbalsa_conf_get_bool("GpgEncrypt");
+    ident->always_trust = libbalsa_conf_get_bool("GpgTrustAlways");
     ident->crypt_protocol = libbalsa_conf_get_int("CryptProtocol=16");
 #endif
 
@@ -1464,6 +1486,7 @@ libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* group)
 #ifdef HAVE_GPGME
     libbalsa_conf_set_bool("GpgSign", ident->gpg_sign);
     libbalsa_conf_set_bool("GpgEncrypt", ident->gpg_encrypt);
+    libbalsa_conf_set_bool("GpgTrustAlways", ident->always_trust);
     libbalsa_conf_set_int("CryptProtocol", ident->crypt_protocol);
 #endif
 
@@ -1537,12 +1560,12 @@ ident_dialog_add_option_menu(GtkWidget * table, gint row, GtkDialog * dialog,
     gtk_table_attach_defaults(GTK_TABLE(table), opt_menu, 1, 2, row, row + 1);
     g_object_set_data(G_OBJECT(dialog), menu_key, opt_menu);
 
-    add_show_menu(_("GnuPG using MIME mode"), LIBBALSA_PROTECT_RFC3156,
+    add_show_menu(_("GnuPG MIME mode"), LIBBALSA_PROTECT_RFC3156,
                   opt_menu);
-    add_show_menu(_("GnuPG using OpenPGP mode"), LIBBALSA_PROTECT_OPENPGP,
+    add_show_menu(_("GnuPG OpenPGP mode"), LIBBALSA_PROTECT_OPENPGP,
                   opt_menu);
 #ifdef HAVE_SMIME
-    add_show_menu(_("S/MIME mode"), LIBBALSA_PROTECT_SMIMEV3, opt_menu);
+    add_show_menu(_("GpgSM S/MIME mode"), LIBBALSA_PROTECT_SMIMEV3, opt_menu);
 #endif
 }
 

@@ -61,6 +61,9 @@ static gpgme_key_t select_key_from_list(const gchar * name,
 					gboolean is_secret,
 					GMimeGpgmeContext * ctx,
 					GList * keys);
+static gboolean accept_low_trust_key(const gchar * name,
+				     gpgme_user_id_t uid,
+				     GMimeGpgmeContext * ctx);
 static gboolean gpg_updates_trustdb(void);
 static gchar *fix_EMail_info(gchar * str);
 
@@ -269,9 +272,9 @@ libbalsa_sign_mime_object(GMimeObject ** content, const gchar * rfc822_for,
 	g_object_set_data(G_OBJECT(ctx), "passphrase-info",
 			  _
 			  ("Enter passphrase to unlock the secret key for signing"));
-	ctx->key_select_cb = select_key_from_list;
-	g_object_set_data(G_OBJECT(ctx), "parent-window", parent);
     }
+    ctx->key_select_cb = select_key_from_list;
+    g_object_set_data(G_OBJECT(ctx), "parent-window", parent);
 
     /* call gpgme to create the signature */
     if (!(mps = g_mime_multipart_signed_new())) {
@@ -314,7 +317,8 @@ libbalsa_sign_mime_object(GMimeObject ** content, const gchar * rfc822_for,
  */
 gboolean
 libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
-			     gpgme_protocol_t protocol, GtkWindow * parent)
+			     gpgme_protocol_t protocol, gboolean always_trust,
+			     GtkWindow * parent)
 {
     GMimeSession *session;
     GMimeGpgmeContext *ctx;
@@ -353,6 +357,9 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
 
     /* set the callback for the key selection (no secret needed here) */
     ctx->key_select_cb = select_key_from_list;
+    if (!always_trust)
+	ctx->key_trust_cb = accept_low_trust_key;
+    ctx->always_trust_uid = always_trust;
     g_object_set_data(G_OBJECT(ctx), "parent-window", parent);
 
     /* convert the key list to a GPtrArray */
@@ -426,6 +433,7 @@ libbalsa_sign_encrypt_mime_object(GMimeObject ** content,
 				  const gchar * rfc822_signer,
 				  GList * rfc822_for,
 				  gpgme_protocol_t protocol,
+				  gboolean always_trust,
 				  GtkWindow * parent)
 {
     GMimeObject *signed_object;
@@ -451,7 +459,7 @@ libbalsa_sign_encrypt_mime_object(GMimeObject ** content,
 	return FALSE;
 
     if (!libbalsa_encrypt_mime_object(&signed_object, rfc822_for, protocol,
-				      parent)) {
+				      always_trust, parent)) {
 	g_object_unref(G_OBJECT(signed_object));
 	return FALSE;
     }
@@ -697,7 +705,8 @@ libbalsa_body_decrypt(LibBalsaMessageBody * body,
 /* routines dealing with RFC2440 */
 gboolean
 libbalsa_rfc2440_sign_encrypt(GMimePart * part, const gchar * sign_for,
-			      GList * encrypt_for, GtkWindow * parent)
+			      GList * encrypt_for, gboolean always_trust,
+			      GtkWindow * parent)
 {
     GMimeSession *session;
     GMimeGpgmeContext *ctx;
@@ -743,6 +752,9 @@ libbalsa_rfc2440_sign_encrypt(GMimePart * part, const gchar * sign_for,
 	}
     }
     ctx->key_select_cb = select_key_from_list;
+    if (!always_trust)
+	ctx->key_trust_cb = accept_low_trust_key;
+    ctx->always_trust_uid = always_trust;
     g_object_set_data(G_OBJECT(ctx), "parent-window", parent);
 
     /* convert the key list to a GPtrArray */
@@ -1269,40 +1281,44 @@ libbalsa_gpgme_validity_to_gchar_short(gpgme_validity_t validity)
 }
 
 
+#define OID_EMAIL       "1.2.840.113549.1.9.1=#"
+#define OID_EMAIL_LEN   22
 static gchar *
 fix_EMail_info(gchar * str)
 {
-    gchar *p = strstr(str, "1.2.840.113549.1.9.1=#");
+    gchar *p;
     GString *result;
+
+    /* check for any EMail info */
+    p = strstr(str, OID_EMAIL);
     if (!p)
 	return str;
 
     *p = '\0';
-    p += 22;
+    p += OID_EMAIL_LEN;
     result = g_string_new(str);
-    result = g_string_append(result, "EMail=");
-    while (*p != '\0' && *p != ',') {
-	gchar x = 0;
+    while (p) {
+	gchar *next;
 
-	if (*p >= 'A' && *p <= 'F')
-	    x = (*p - 'A' + 10) << 4;
-	else if (*p >= 'a' && *p <= 'f')
-	    x = (*p - 'a' + 10) << 4;
-	else if (*p >= '0' && *p <= '9')
-	    x = (*p - '0') << 4;
-	p++;
-	if (*p != '\0' && *p != ',') {
-	    if (*p >= 'A' && *p <= 'F')
-		x += *p - 'A' + 10;
-	    else if (*p >= 'a' && *p <= 'f')
-		x += *p - 'a' + 10;
-	    else if (*p >= '0' && *p <= '9')
-		x += *p - '0';
-	    p++;
+	result = g_string_append(result, "EMail=");
+	/* convert the info from hex until we reach some other char */
+	while (g_ascii_isxdigit(*p)) {
+	    gchar c = g_ascii_xdigit_value(*p++) << 4;
+
+	    if (g_ascii_isxdigit(*p))
+		result =
+		    g_string_append_c(result, c + g_ascii_xdigit_value(*p++));
 	}
-	result = g_string_append_c(result, x);
+	
+	/* find more */
+	next = strstr(p, OID_EMAIL);
+	if (next) {
+	    *next = '\0';
+	    next += OID_EMAIL_LEN;
+	}
+	result = g_string_append(result, p);
+	p = next;
     }
-    result = g_string_append(result, p);
     g_free(str);
     p = result->str;
     g_string_free(result, FALSE);
@@ -1312,19 +1328,16 @@ fix_EMail_info(gchar * str)
 
 /* stuff to get a key fingerprint from a selection list */
 enum {
-    GPG_KEY_PTR_COLUMN = 0,
-    GPG_KEY_USER_ID_COLUMN,
+    GPG_KEY_USER_ID_COLUMN = 0,
     GPG_KEY_ID_COLUMN,
     GPG_KEY_LENGTH_COLUMN,
     GPG_KEY_VALIDITY_COLUMN,
-    GPG_KEY_TRUST_COLUMN,
+    GPG_KEY_PTR_COLUMN,
     GPG_KEY_NUM_COLUMNS
 };
 
 static gchar *col_titles[] =
-    { NULL, N_("User ID"), N_("Key ID"), N_("Length"), N_("Validity"),
-    N_("Owner trust")
-};
+    { N_("User ID"), N_("Key ID"), N_("Length"), N_("Validity") };
 
 /* callback function if a new row is selected in the list */
 static void
@@ -1357,6 +1370,7 @@ select_key_from_list(const gchar * name, gboolean is_secret,
     GtkTreeIter iter;
     gint i, last_col;
     gchar *prompt;
+    gchar *upcase_name;
     gpgme_protocol_t protocol;
     GtkWindow *parent;
     gpgme_key_t use_key = NULL;
@@ -1398,9 +1412,12 @@ select_key_from_list(const gchar * name, gboolean is_secret,
     gtk_box_pack_start(GTK_BOX(vbox), scrolled_window, TRUE, TRUE, 0);
 
     model =
-	gtk_tree_store_new(GPG_KEY_NUM_COLUMNS, G_TYPE_POINTER,
-			   G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT,
-			   G_TYPE_STRING, G_TYPE_STRING);
+	gtk_tree_store_new(GPG_KEY_NUM_COLUMNS,
+			   G_TYPE_STRING,   /* user ID */
+			   G_TYPE_STRING,   /* key ID */
+			   G_TYPE_INT,      /* length */
+			   G_TYPE_STRING,   /* validity (gpg encrypt only) */
+			   G_TYPE_POINTER); /* key */
 
     tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
@@ -1409,36 +1426,63 @@ select_key_from_list(const gchar * name, gboolean is_secret,
 		     G_CALLBACK(key_selection_changed_cb), &use_key);
 
     /* add the keys */
+    upcase_name = g_ascii_strup(name, -1);
     while (keys) {
 	gpgme_key_t key = (gpgme_key_t) keys->data;
-	if (key->subkeys) {
-	    gchar *uid_info;
-	    if (key->uids && key->uids->uid)
-		uid_info = fix_EMail_info(g_strdup(key->uids->uid));
-	    else
-		uid_info = g_strdup("");
+	gpgme_subkey_t subkey = key->subkeys;
+	gpgme_user_id_t uid = key->uids;
+	gchar *uid_info = NULL;
+	gboolean uid_found;
+
+	/* find the relevant subkey */
+	while (subkey && ((is_secret && !subkey->can_sign) ||
+			  (!is_secret && !subkey->can_encrypt)))
+	    subkey = subkey->next;
+
+	/* find the relevant uid */
+	uid_found = FALSE;
+	while (uid && !uid_found) {
+	    g_free(uid_info);
+	    uid_info = fix_EMail_info(g_strdup(uid->uid));
+
+	    /* check the email field which may or may not be present */
+	    if (uid->email && !g_ascii_strcasecmp(uid->email, name))
+		uid_found = TRUE;
+	    else {
+		/* no email or no match, check the uid */
+		gchar * upcase_uid = g_ascii_strup(uid_info, -1);
+		
+		if (strstr(upcase_uid, upcase_name))
+		    uid_found = TRUE;
+		else
+		    uid = uid->next;
+		g_free(upcase_uid);
+	    }
+	}
+
+	/* append the element */
+	if (subkey && uid) {
 	    gtk_tree_store_append(GTK_TREE_STORE(model), &iter, NULL);
 	    gtk_tree_store_set(GTK_TREE_STORE(model), &iter,
-			       GPG_KEY_PTR_COLUMN, key,
 			       GPG_KEY_USER_ID_COLUMN, uid_info,
-			       GPG_KEY_ID_COLUMN, key->subkeys->keyid,
-			       GPG_KEY_LENGTH_COLUMN,
-			       key->subkeys->length,
+			       GPG_KEY_ID_COLUMN, subkey->keyid,
+			       GPG_KEY_LENGTH_COLUMN, subkey->length,
 			       GPG_KEY_VALIDITY_COLUMN,
 			       libbalsa_gpgme_validity_to_gchar_short
-			       (key->uids->validity),
-			       GPG_KEY_TRUST_COLUMN,
-			       libbalsa_gpgme_validity_to_gchar_short
-			       (key->owner_trust), -1);
-	    g_free(uid_info);
+			       (uid->validity),
+			       GPG_KEY_PTR_COLUMN, key,
+			       -1);
 	}
+	g_free(uid_info);
 	keys = g_list_next(keys);
     }
+    g_free(upcase_name);
 
     g_object_unref(G_OBJECT(model));
-    last_col = (protocol == GPGME_PROTOCOL_CMS) ? GPG_KEY_LENGTH_COLUMN :
-	GPG_KEY_TRUST_COLUMN;
-    for (i = 1; i <= last_col; i++) {
+    /* show the validity only if we are asking for a gpg public key */
+    last_col = (protocol == GPGME_PROTOCOL_CMS || is_secret) ?
+	GPG_KEY_LENGTH_COLUMN :	GPG_KEY_VALIDITY_COLUMN;
+    for (i = 0; i <= last_col; i++) {
 	GtkCellRenderer *renderer;
 	GtkTreeViewColumn *column;
 
@@ -1460,6 +1504,49 @@ select_key_from_list(const gchar * name, gboolean is_secret,
     gtk_widget_destroy(dialog);
 
     return use_key;
+}
+
+
+/*
+ * Display a dialog to select whether a key with a low trust level shall be accepted
+ */
+static gboolean
+accept_low_trust_key(const gchar * name, gpgme_user_id_t uid,
+		     GMimeGpgmeContext * ctx)
+{
+    GtkWidget *dialog;
+    GtkWindow *parent;
+    gint result;
+    gchar *message1;
+    gchar *message2;
+
+    /* paranoia checks */
+    g_return_val_if_fail(ctx != NULL, FALSE);
+    g_return_val_if_fail(uid != NULL, FALSE);
+    parent = GTK_WINDOW(g_object_get_data(G_OBJECT(ctx), "parent-window"));
+    
+    /* build the message */
+    message1 =
+	g_strdup_printf(_("Insufficient trust for recipient %s"), name);
+    message2 =
+	g_strdup_printf(_("The validity of the key with user ID \"%s\" is \"%s\"."),
+			uid->uid,
+			libbalsa_gpgme_validity_to_gchar_short(uid->validity));
+    dialog = 
+	gtk_message_dialog_new_with_markup(parent,
+					   GTK_DIALOG_DESTROY_WITH_PARENT,
+					   GTK_MESSAGE_WARNING,
+					   GTK_BUTTONS_YES_NO,
+					   "<b>%s</b>\n\n%s\n%s",
+					   message1,
+					   message2,
+					   _("Use this key nevertheless?"));
+			      
+    /* ask the user */
+    result = gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+
+    return result == GTK_RESPONSE_YES;
 }
 
 

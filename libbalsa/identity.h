@@ -76,6 +76,7 @@ extern "C"
 #ifdef HAVE_GPGME
 	gboolean gpg_sign;
 	gboolean gpg_encrypt;
+	gboolean always_trust;
 	gint crypt_protocol;
 #endif
     };

@@ -4745,6 +4745,12 @@ libbalsa_msg_part_2440(LibBalsaMessage * message, LibBalsaMessageBody * body,
 				     &body->sig_info,
 				     NULL);
 	body->was_encrypted = (body->sig_info || sig_res == GPG_ERR_NO_ERROR);
+	if (sig_res == GPG_ERR_NO_ERROR) {
+	    /* decrypting may change the charset, so be sure to use the one
+	       GMimePart reports */
+	    g_free(body->charset);
+	    body->charset = NULL;
+	}
     }
         
     if (sig_res == GPG_ERR_NO_ERROR) {

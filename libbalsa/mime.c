@@ -255,6 +255,7 @@ other2html (BODY * bdy, FILE * fp, struct obstack *bfr)
   mutt_mktemp (tmp_file_name);
 
   s.fpout = fopen (tmp_file_name, "r+");
+  s.prefix = '\0';
   mutt_decode_attachment (bdy, &s);
   fflush (s.fpout);
   alloced = readfile (s.fpout, &ptr);
@@ -330,6 +331,7 @@ mimetext2html (BODY * bdy, FILE * fp, struct obstack *bfr)
 
   fseek (fp, bdy->offset, 0);
   s.fpin = fp;
+  s.prefix = '\0';
   mutt_mktemp (tmp_file_name);
   s.prefix = 0;
   s.fpout = fopen (tmp_file_name, "w+");

@@ -1,5 +1,6 @@
-2004-01-31 16:07  PeterB
+2004-02-01 10:06  PeterB
 
+	* libbalsa/: address-entry.c, address-entry.h: streamline includes.
 	* libbalsa/address-entry.c: replace control characters with spaces;
 	fill input after button press event (should fix vanishing
 	addresses); don't add null addresses to list.

@@ -30,10 +30,10 @@
 #define TOOLBAR_BUTTON_TYPE_RADIO 2
 
 typedef struct t_button_data {
-	char *pixmap_id;
-	char *button_text;
-	char *help_text;
-	int type;
+    char *pixmap_id;   /* not translatable */
+    char *button_text; /* translatable */
+    char *help_text;   /* translatable */
+    int type;
 } button_data;
 
 extern button_data toolbar_buttons[];

@@ -427,12 +427,14 @@ int imap_append_message (CONTEXT *ctx, MESSAGE *msg)
   IMAP_DATA* idata;
   FILE *fp;
   char buf[LONG_STRING];
+  char flags[64];
   char mbox[LONG_STRING];
   char mailbox[LONG_STRING]; 
   size_t len;
-  int c, last;
+  int c, last, nl;
   IMAP_MBOX mx;
   int rc;
+  int old=0, answered=0, flagged=0;
 
   idata = (IMAP_DATA*) ctx->data;
 
@@ -447,6 +449,48 @@ int imap_append_message (CONTEXT *ctx, MESSAGE *msg)
     goto fail;
   }
 
+#ifdef LIBMUTT
+  /* This used to read the email one char at a time to determine the number */
+  /* of chars in the message. Now it reads by buffers and checks the headers */
+  /* while doing so to preserve the flags */
+  /* This really doesn't take care of bare CR's in the body of the email */
+  /* but neither did the old code and they're illegal anyway.... */
+
+  /* The feof() below is used because the return value of fgets is broken on */
+  /* some platforms, it sometimes returns non-NULL at EOF */
+  len=0;
+  nl=1;
+  while(fgets(buf, sizeof(buf), fp) && !feof(fp))
+  {
+    if(nl && !strncmp(buf, "Status: ", 8))
+    {
+      if(strchr(buf+8, 'R') != NULL)
+        old=1;
+    }
+    if(nl && !strncmp(buf, "X-Status: ", 10))
+    {
+      if(strchr(buf+10, 'F') != NULL)
+        flagged=1;
+      if(strchr(buf+10, 'A') != NULL)
+        answered=1;
+    }
+
+    len+=last=strlen(buf);
+    if(last && buf[last-1] == '\n')
+    {
+      nl=1;
+      if(last > 1)
+      {
+        if(buf[last-2] != '\r')
+    len++;
+  }
+      else
+        len++;
+    }
+    else
+      nl=0;
+  }
+#else
   for (last = EOF, len = 0; (c = fgetc(fp)) != EOF; last = c)
   {
     if(c == '\n' && last != '\r')
@@ -454,11 +498,30 @@ int imap_append_message (CONTEXT *ctx, MESSAGE *msg)
 
     len++;
   }
+#endif
   rewind (fp);
   
+#ifdef LIBMUTT
+  strcpy(flags, " ");
+  if(old || answered || flagged)
+  {
+    strcpy(flags, " (");
+    if(old)
+      strcat(flags, "\\Seen ");
+    if(answered)
+      strcat(flags, "\\Answered ");
+    if(flagged)
+      strcat(flags, "\\Flagged ");
+    flags[strlen(flags)-1]='\0';
+    strcat(flags, ") ");
+  }
+
+  imap_munge_mbox_name (mbox, sizeof (mbox), mailbox);
+  snprintf (buf, sizeof (buf), "APPEND %s%s{%d}", mbox, flags, len);
+#else
   imap_munge_mbox_name (mbox, sizeof (mbox), mailbox);
   snprintf (buf, sizeof (buf), "APPEND %s {%d}", mbox, len);
-
+#endif
   imap_cmd_start (idata, buf);
 
   do

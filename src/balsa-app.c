@@ -311,8 +311,15 @@ balsa_app_init(void)
     balsa_app.error_message = 0;
     balsa_app.debug_message = 0;
 
+    balsa_app.notify_new_mail_sound = 1;
+    balsa_app.notify_new_mail_dialog = 0;
+
     /* Tooltips */
     balsa_app.tooltips = gtk_tooltips_new();
+
+    /* IMAP */
+    balsa_app.check_imap = 1;
+    balsa_app.check_imap_inbox = 0;
 }
 
 static gint

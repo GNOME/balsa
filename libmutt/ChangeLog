@@ -1,3 +1,21 @@
+2001-07-16  Pawel Salek  <pawsa@theochem.kth.se>
+
+        IMAP flag handling and new mail notification
+	(balsa-imapflags.patch) by M. Thielker <balsa@t-data.com>
+	with some changes.
+
+	* imap/message.c (imap_append_message): append message preserving
+	the message flags.
+
+	
+2001-07-15  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Peter Bloomfield's <bloomfld@eos.ncsu.edu> IMAP mailbox rename
+	patch.
+	* imap/browse.c: add imap_mailbox_rename().
+	* imap/imap.c: add imap_rename_mailbox().
+	* imap/imap.h: add prototypes.
+
 2001-07-11  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Peter Bloomfield's <bloomfld@eos.ncsu.edu> patch for

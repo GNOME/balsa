@@ -70,47 +70,47 @@ GtkWidget *customize_widget;
 static int word_wrap;
 
 button_data toolbar_buttons[]={
-    {"", "Separator", "", 0},
-    {GNOME_STOCK_PIXMAP_MAIL_RCV, "Check",
-     "Check for new email", TOOLBAR_BUTTON_TYPE_BUTTON},
-    {GNOME_STOCK_PIXMAP_MAIL_NEW, "Compose", 
-     "Compose message", TOOLBAR_BUTTON_TYPE_BUTTON},
-    {GNOME_STOCK_PIXMAP_MAIL, "Continue", 
-     "Continue message", TOOLBAR_BUTTON_TYPE_BUTTON},
-    {GNOME_STOCK_PIXMAP_MAIL_RPL, "Reply", 
-     "Reply to the current message", TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_MAIL_RPL_ALL, "Reply\nto all",
-     "Reply to all recipients", TOOLBAR_BUTTON_TYPE_BUTTON},
-    {GNOME_STOCK_PIXMAP_MAIL_FWD, "Forward", 
-     "Forward the current message", TOOLBAR_BUTTON_TYPE_BUTTON},
-    {GNOME_STOCK_PIXMAP_BACK, "Previous", 
-     "Open previous", TOOLBAR_BUTTON_TYPE_BUTTON},
-    {GNOME_STOCK_PIXMAP_FORWARD, "Next", 
-     "Open next", TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_NEXT_UNREAD, "Next\nunread", 
-     "Open next unread message", TOOLBAR_BUTTON_TYPE_BUTTON},
-    {GNOME_STOCK_PIXMAP_TRASH, "Trash /\nDelete", 
-     "Move the current message to trash", TOOLBAR_BUTTON_TYPE_BUTTON},
-    {GNOME_STOCK_PIXMAP_PRINT, "Print", 
-     "Print current message", TOOLBAR_BUTTON_TYPE_BUTTON},
-    {GNOME_STOCK_PIXMAP_MAIL_SND, "Send", 
-     "Send this message", TOOLBAR_BUTTON_TYPE_BUTTON},
-    {GNOME_STOCK_PIXMAP_ATTACH, "Attach", 
-     "Add attachments to this message", TOOLBAR_BUTTON_TYPE_BUTTON},
-    {GNOME_STOCK_PIXMAP_SAVE, "Save", 
-     "Save the current item", TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_IDENTITY, "Select Identity",
-     "Set identity to use for this message", TOOLBAR_BUTTON_TYPE_BUTTON},
-    {GNOME_STOCK_PIXMAP_SPELLCHECK, "Spelling",
-     "Run a spell check", TOOLBAR_BUTTON_TYPE_BUTTON},
-    {GNOME_STOCK_PIXMAP_CLOSE, "Cancel", 
-     "Cancel this message", TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_FLAG_UNREAD, "Toggle\nnew", 
-     "Toggle new message flag", TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_MARK_ALL_MSGS, "Mark all",
-     "Mark all messages in current mailbox", TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_SHOW_ALL_HEADERS, "All\nheaders",
-     "Show all headers", TOOLBAR_BUTTON_TYPE_TOGGLE}
+    {"", N_("Separator"), "", 0},
+    {GNOME_STOCK_PIXMAP_MAIL_RCV, N_("Check"),
+     N_("Check for new email"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    {GNOME_STOCK_PIXMAP_MAIL_NEW, N_("Compose"), 
+     N_("Compose message"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    {GNOME_STOCK_PIXMAP_MAIL, N_("Continue"), 
+     N_("Continue message"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    {GNOME_STOCK_PIXMAP_MAIL_RPL, N_("Reply"), 
+     N_("Reply to the current message"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    {BALSA_PIXMAP_MAIL_RPL_ALL, N_("Reply\nto all"),
+     N_("Reply to all recipients"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    {GNOME_STOCK_PIXMAP_MAIL_FWD, N_("Forward"), 
+     N_("Forward the current message"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    {GNOME_STOCK_PIXMAP_BACK, N_("Previous"), 
+     N_("Open previous"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    {GNOME_STOCK_PIXMAP_FORWARD, N_("Next"), 
+     N_("Open next"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    {BALSA_PIXMAP_NEXT_UNREAD, N_("Next\nunread"), 
+     N_("Open next unread message"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    {GNOME_STOCK_PIXMAP_TRASH, N_("Trash /\nDelete"), 
+     N_("Move the current message to trash"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    {GNOME_STOCK_PIXMAP_PRINT, N_("Print"), 
+     N_("Print current message"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    {GNOME_STOCK_PIXMAP_MAIL_SND, N_("Send"), 
+     N_("Send this message"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    {GNOME_STOCK_PIXMAP_ATTACH, N_("Attach"), 
+     N_("Add attachments to this message"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    {GNOME_STOCK_PIXMAP_SAVE, N_("Save"), 
+     N_("Save the current item"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    {BALSA_PIXMAP_IDENTITY, N_("Select Identity"),
+     N_("Set identity to use for this message"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    {GNOME_STOCK_PIXMAP_SPELLCHECK, N_("Spelling"),
+     N_("Run a spell check"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    {GNOME_STOCK_PIXMAP_CLOSE, N_("Cancel"), 
+     N_("Cancel this message"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    {BALSA_PIXMAP_FLAG_UNREAD, N_("Toggle\nnew"), 
+     N_("Toggle new message flag"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    {BALSA_PIXMAP_MARK_ALL_MSGS, N_("Mark all"),
+     N_("Mark all messages in current mailbox"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    {BALSA_PIXMAP_SHOW_ALL_HEADERS, N_("All\nheaders"),
+     N_("Show all headers"), TOOLBAR_BUTTON_TYPE_TOGGLE}
 };
 
 int toolbar_button_count=sizeof(toolbar_buttons)/sizeof(button_data);
@@ -292,6 +292,15 @@ remove_all_buttons(GtkToolbar *bar)
 }
 
 static void
+replace_nl_with_space(char* str)
+{
+    while(*str) {
+	if(*str == '\n')
+	    *str=' ';
+	str++;
+    }
+}
+static void
 recreate_preview(int toolbar, int preview_only)
 {
     GtkToolbar *bar;
@@ -321,29 +330,21 @@ recreate_preview(int toolbar, int preview_only)
 	    index=toolbar_items[toolbar][i].id;
 	    if(index == -1)
 		continue;
-	    text=wrap=g_strdup(toolbar_buttons[index].button_text);
-	    if(!word_wrap) {
-		while(*wrap) {
-		    if(*wrap == '\n')
-			*wrap=' ';
-		    wrap++;
-		}
-	    }
+	    text=wrap=g_strdup(_(toolbar_buttons[index].button_text));
+	    if(!word_wrap)
+		replace_nl_with_space(wrap);
+
 	    btn=gtk_toolbar_append_item(
 		bar, text,
-		toolbar_buttons[index].help_text,
-		toolbar_buttons[index].help_text,
+		_(toolbar_buttons[index].help_text),
+		_(toolbar_buttons[index].help_text),
 		gnome_stock_pixmap_widget(GTK_WIDGET(balsa_app.main_window),
 					  toolbar_buttons[index].pixmap_id),
 		NULL,
 		NULL);
-	    if(word_wrap)  {
-		while(*wrap) {
-		    if(*wrap == '\n')
-			*wrap=' ';
-		    ++wrap;
-		}
-	    }
+	    if(word_wrap) 
+		replace_nl_with_space(wrap);
+
 	    toolbar_items[toolbar][i].widget=btn;
 	    if(!preview_only) {
 		row=gtk_clist_append(
@@ -369,7 +370,7 @@ recreate_preview(int toolbar, int preview_only)
 		    list_data);
 		gtk_clist_set_text(
 		    GTK_CLIST(toolbar_pages[toolbar].destination),
-		    row, 1, "Separator");
+		    row, 1, _("Separator"));
 	    }
 	}
     }
@@ -451,7 +452,7 @@ remove_toolbar_item(int toolbar, int item)
     int i;
     
     for(i=item+1;i<toolbar_item_count[toolbar];i++)
-		toolbar_items[toolbar][i-1]=toolbar_items[toolbar][i];
+	toolbar_items[toolbar][i-1]=toolbar_items[toolbar][i];
     
     toolbar_item_count[toolbar]--;
 }
@@ -524,9 +525,9 @@ add_button_cb(GtkWidget *widget, gpointer data)
     if(!toolbar_item_count[toolbar] && !toolbar_pages[toolbar].selected_source)
 	return;
 
-    add_item=(int)gtk_clist_get_row_data(
-	GTK_CLIST(toolbar_pages[toolbar].list),
-	toolbar_pages[toolbar].selected_source);
+    add_item=GPOINTER_TO_INT(
+	gtk_clist_get_row_data(GTK_CLIST(toolbar_pages[toolbar].list),
+			       toolbar_pages[toolbar].selected_source));
 
     if(add_item) {
 	gtk_clist_get_pixmap(
@@ -551,7 +552,7 @@ add_button_cb(GtkWidget *widget, gpointer data)
 	toolbar_items[toolbar][row].id=add_item;
     }
 
-    text=wrap=g_strdup(toolbar_buttons[add_item].button_text);
+    text=wrap=g_strdup(_(toolbar_buttons[add_item].button_text));
     while(*wrap) {
 	if(*wrap == '\n')
 	    *wrap=' ';
@@ -614,7 +615,7 @@ populate_list(GtkWidget *list, int toolbar)
 				   &pixmap, &mask);
 	    gtk_clist_set_pixmap(GTK_CLIST(list), row, 0, pixmap, mask);
 	}
-	text = wrap = g_strdup(toolbar_buttons[i].button_text);
+	text = wrap = g_strdup(_(toolbar_buttons[i].button_text));
 	while(*wrap) {
 	    if(*wrap == '\n')
 		*wrap=' ';

@@ -28,6 +28,11 @@
 #define BALSA_IS_WINDOW(obj)		       (GTK_CHECK_TYPE (obj, BALSA_TYPE_WINDOW))
 #define BALSA_IS_WINDOW_CLASS(klass)	       (GTK_CHECK_CLASS_TYPE (klass, BALSA_TYPE_WINDOW))
 
+/* Type values for mailbox checking */
+enum MailboxCheckType {
+    TYPE_BACKGROUND,
+    TYPE_CALLBACK
+};
 
 typedef struct _BalsaWindow BalsaWindow;
 typedef struct _BalsaWindowClass BalsaWindowClass;
@@ -63,6 +68,7 @@ gboolean mail_progress_notify_cb(void);
 gboolean send_progress_notify_cb(void);
 gint check_new_messages_auto_cb(gpointer data);
 void check_new_messages_cb(GtkWidget *, gpointer data);
+void check_new_messages_real(GtkWidget *, gpointer data, int type);
 void empty_trash(void);
 
 /* functions to manipulate the progress bars of the window */

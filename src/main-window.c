@@ -134,6 +134,8 @@ static void balsa_window_unselect_all_messages_cb (GtkWidget* widget,
 static void check_mailbox_list(GList * list);
 static void mailbox_check_func(GtkCTree * ctree, GtkCTreeNode * node,
 			       gpointer data);
+static void count_unread_msgs_func(GtkCTree * ctree, GtkCTreeNode * node,
+				   gpointer data);
 
 static void enable_mailbox_menus(BalsaMailboxNode * mbnode);
 static void enable_message_menus(LibBalsaMessage * message);
@@ -143,9 +145,15 @@ static void unregister_open_mailbox(LibBalsaMailbox *m);
 static gboolean is_open_mailbox(LibBalsaMailbox *m);
 
 static gint about_box_visible = FALSE;
+static gint new_mail_dialog_visible = FALSE;
 
 /* dialogs */
 static void show_about_box(void);
+static void display_new_mail_notification(int);
+static void new_mail_dialog_destroy_cb(GtkWidget *widget, gpointer data);
+static void new_mail_dialog_ok_button_cb(void *widget, gpointer data);
+
+static int quiet_background_check=0;
 
 /* callbacks */
 static void send_outbox_messages_cb(GtkWidget *, gpointer data);
@@ -1440,13 +1448,31 @@ check_mailbox_list(GList * mailbox_list)
 static void
 mailbox_check_func(GtkCTree * ctree, GtkCTreeNode * node, gpointer data)
 {
+    char *tmp;
+    
     BalsaMailboxNode *mbnode = gtk_ctree_node_get_row_data(ctree, node);
     g_return_if_fail(mbnode);
+    
+    if(mbnode->mailbox) { /* mailbox, not a folder */
+	if(balsa_app.check_imap || 
+	   !LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox)) {
+	    if(LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox)) {
+		tmp=LIBBALSA_MAILBOX_IMAP(mbnode->mailbox)->path;
 
-    if(mbnode->mailbox) {/* mailbox, not a folder */
-	gdk_threads_enter();
-	libbalsa_mailbox_check(mbnode->mailbox);
-	gdk_threads_leave();
+		/* Specs say there may be a {host:port} prefix */
+		/* Set the pointer to point past that to the real path */
+		if(strchr(tmp, '}'))
+		    tmp=strchr(tmp, '}')+1;
+
+		/* Melanie's Cyrus IMAP server uses UPPERCASE for INBOX */
+		/* FIXME: Check if that's true for all IMAP servers     */
+		if(balsa_app.check_imap_inbox && strcmp(tmp, "INBOX"))
+		    return;
+	    }
+	    gdk_threads_enter();
+	    libbalsa_mailbox_check(mbnode->mailbox);
+	    gdk_threads_leave();
+	}
     }
 }
 
@@ -1457,7 +1483,7 @@ mailbox_check_func(GtkCTree * ctree, GtkCTreeNode * node, gpointer data)
 gint
 check_new_messages_auto_cb(gpointer data)
 {
-    check_new_messages_cb((GtkWidget *) NULL, data);
+    check_new_messages_real((GtkWidget *) NULL, data, TYPE_BACKGROUND);
 
     if (balsa_app.debug)
 	fprintf(stderr, "Auto-checked for new messages...\n");
@@ -1471,9 +1497,8 @@ check_new_messages_auto_cb(gpointer data)
    or NULL.
 */
 void
-check_new_messages_cb(GtkWidget * widget, gpointer data)
+check_new_messages_real(GtkWidget *widget, gpointer data, int type)
 {
-
 #ifdef BALSA_USE_THREADS
     /*  Only Run once -- If already checking mail, return.  */
     pthread_mutex_lock(&mailbox_lock);
@@ -1483,52 +1508,58 @@ check_new_messages_cb(GtkWidget * widget, gpointer data)
 	return;
     }
     checking_mail = 1;
+
+    quiet_background_check = (type == TYPE_CALLBACK) 
+	? 0 : balsa_app.quiet_background_check;
+
     pthread_mutex_unlock(&mailbox_lock);
 
     fill_mailbox_passwords(balsa_app.inbox_input);
-    if (balsa_app.pwindow_option == WHILERETR ||
-	(balsa_app.pwindow_option == UNTILCLOSED &&
-	 !(progress_dialog && GTK_IS_WIDGET(progress_dialog)))) {
+    if (type == TYPE_CALLBACK && 
+	(balsa_app.pwindow_option == WHILERETR ||
+	 (balsa_app.pwindow_option == UNTILCLOSED &&
+	  !(progress_dialog && GTK_IS_WIDGET(progress_dialog))))) {
 	if (progress_dialog && GTK_IS_WIDGET(progress_dialog))
 	    gtk_widget_destroy(GTK_WIDGET(progress_dialog));
-
+	
 	progress_dialog =
 	    gnome_dialog_new("Checking Mail...", "Hide", NULL);
-	gtk_window_set_wmclass(GTK_WINDOW(progress_dialog), "progress_dialog", "Balsa");
-
+	gtk_window_set_wmclass(GTK_WINDOW(progress_dialog), 
+			       "progress_dialog", "Balsa");
+	
 	if (balsa_app.main_window)
 	    gnome_dialog_set_parent(GNOME_DIALOG(progress_dialog),
 				    GTK_WINDOW(balsa_app.main_window));
 	gtk_signal_connect(GTK_OBJECT(progress_dialog), "destroy",
 			   GTK_SIGNAL_FUNC(progress_dialog_destroy_cb),
 			   NULL);
-
+	
 	gnome_dialog_set_close(GNOME_DIALOG(progress_dialog), TRUE);
-
+	
 	progress_dialog_source = gtk_label_new("Checking Mail....");
 	gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(progress_dialog)->vbox),
 			   progress_dialog_source, FALSE, FALSE, 0);
-
+	
 	progress_dialog_message = gtk_label_new("");
 	gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(progress_dialog)->vbox),
 			   progress_dialog_message, FALSE, FALSE, 0);
-
+	
 	progress_dialog_bar = gtk_progress_bar_new();
 	gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(progress_dialog)->vbox),
 			   progress_dialog_bar, FALSE, FALSE, 0);
-
+	
 	gtk_widget_show_all(progress_dialog);
     }
 
     /* initiate threads */
     pthread_create(&get_mail_thread,
-		   NULL, (void *) &check_messages_thread, NULL);
+		   NULL, (void *) &check_messages_thread, (void *)0);
+    
     /* Detach so we don't need to pthread_join
      * This means that all resources will be
      * reclaimed as soon as the thread exits
      */
     pthread_detach(get_mail_thread);
-
 #else
     fill_mailbox_passwords(balsa_app.inbox_input);
     libbalsa_notify_start_check();
@@ -1538,6 +1569,12 @@ check_new_messages_cb(GtkWidget * widget, gpointer data)
 			     mailbox_check_func, NULL);
     balsa_mblist_have_new(balsa_app.mblist);
 #endif
+}
+
+void
+check_new_messages_cb(GtkWidget * widget, gpointer data)
+{
+    check_new_messages_real(widget, data, TYPE_CALLBACK);
 }
 
 /* send_outbox_messages_cb:
@@ -1567,24 +1604,44 @@ check_messages_thread(gpointer data)
      *  and set checking_mail to true before calling.
      */
     MailThreadMessage *threadmessage;
+    
+    /* For recognizing new mail it is assumed, that new mail is */
+    /* _always_ unread and that nothing else will increase the */
+    /* number of unread messages except for actual new mail arriving */
+    /* It should be safe to assume that an upwards change of the */
+    /* total of all new messages in all mailboxes will be caused by new */
+    /* and nothing else */
+    
+    int new_msgs_before=0, new_msgs_after=0;
+    gtk_ctree_post_recursive(GTK_CTREE(balsa_app.mblist), NULL, 
+			     count_unread_msgs_func, 
+			     (gpointer)&new_msgs_before);
 
     MSGMAILTHREAD(threadmessage, MSGMAILTHREAD_SOURCE, NULL, "POP3", 0, 0);
+	
     check_mailbox_list(balsa_app.inbox_input);
 
-    MSGMAILTHREAD(threadmessage, MSGMAILTHREAD_SOURCE, NULL, "Local Mail",
-		  0, 0);
+    MSGMAILTHREAD(threadmessage, MSGMAILTHREAD_SOURCE, NULL,
+		  "Local Mail", 0, 0);
     libbalsa_notify_start_check();
 
     gtk_ctree_post_recursive(GTK_CTREE(balsa_app.mblist), NULL, 
 			     mailbox_check_func, NULL);
 
-    MSGMAILTHREAD(threadmessage, MSGMAILTHREAD_FINISHED, NULL, "Finished",
-		  0, 0);
+    gtk_ctree_post_recursive(GTK_CTREE(balsa_app.mblist), NULL, 
+			     count_unread_msgs_func, 
+			     (gpointer)&new_msgs_after);
 
+    new_msgs_after-=new_msgs_before;
+    if(new_msgs_after < 0)
+	new_msgs_after=0;
+    MSGMAILTHREAD(threadmessage, MSGMAILTHREAD_FINISHED, NULL, "Finished",
+		  new_msgs_after, 0);
+    
     pthread_mutex_lock(&mailbox_lock);
     checking_mail = 0;
     pthread_mutex_unlock(&mailbox_lock);
-
+    
     pthread_exit(0);
 }
 
@@ -1616,6 +1673,22 @@ mail_progress_notify_cb()
 
     currentpos = (MailThreadMessage **) msgbuffer;
 
+    if(quiet_background_check) {
+	/* Eat messages */
+	while (count) {
+	    threadmessage = *currentpos;
+	    if(threadmessage->message_type == MSGMAILTHREAD_FINISHED) {
+		balsa_mblist_have_new(balsa_app.mblist);
+		display_new_mail_notification(threadmessage->num_bytes);
+	    }
+	    g_free(threadmessage);
+	    currentpos++;
+	    count -= sizeof(void *);
+	}
+	g_free(msgbuffer);
+	return TRUE;
+    }
+    
     gdk_threads_enter();
 
     while (count) {
@@ -1684,6 +1757,7 @@ mail_progress_notify_cb()
 		gnome_appbar_set_progress(balsa_app.appbar, 0.0);
 	    }
 	    balsa_mblist_have_new(balsa_app.mblist);
+	    display_new_mail_notification(threadmessage->num_bytes);
 	    break;
 
 	case MSGMAILTHREAD_ERROR:
@@ -2871,7 +2945,75 @@ ident_manage_dialog_cb(GtkWidget* widget, gpointer user_data)
     }
 }
 
+/* display_new_mail_notification:
+   num_new is the number of the recently arrived messsages.
+*/
+static void
+display_new_mail_notification(int num_new)
+{
+    GtkDialog *dlg;
+    GtkWidget *label, *ok_button, *vbox;
+    
+    if(num_new == 0)
+	return;
+    
+    if(balsa_app.notify_new_mail_dialog && new_mail_dialog_visible)
+	return;
+    
+    if(balsa_app.notify_new_mail_sound)
+	gnome_triggers_do("New mail has arrived", "email",
+			  "email", "newmail", NULL);
+    
+    if(!balsa_app.notify_new_mail_dialog)
+	return;
+    
+    new_mail_dialog_visible = TRUE;
+    
+    dlg=GTK_DIALOG(gtk_dialog_new());
+    gtk_window_set_wmclass(GTK_WINDOW(dlg), "new_mail_dialog", "Balsa");
+    
+    vbox=gtk_vbox_new(FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(dlg->vbox), vbox, TRUE, TRUE, 0);
+    gtk_container_set_border_width(GTK_CONTAINER(vbox), 30);
+    
+    label=gtk_label_new(_("You have new mail waiting"));
+    gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
+    
+    ok_button=gtk_button_new_with_label(_("OK"));
+    gtk_box_pack_start(GTK_BOX(dlg->action_area), ok_button, FALSE, FALSE, 0);
+    
+    gtk_signal_connect(GTK_OBJECT(ok_button), "clicked",
+		       new_mail_dialog_ok_button_cb, (gpointer)dlg);
 
+    gtk_signal_connect(GTK_OBJECT(dlg), "destroy",
+		       new_mail_dialog_destroy_cb, NULL);
+
+    gtk_widget_show_all(GTK_WIDGET(dlg));
+}
+ 
+static void
+new_mail_dialog_destroy_cb(GtkWidget *widget, gpointer data)
+{
+    new_mail_dialog_visible = FALSE;
+}
+
+static void
+new_mail_dialog_ok_button_cb(void *widget, gpointer data)
+{
+    gtk_widget_destroy(GTK_WIDGET(data));
+}
+
+static void
+count_unread_msgs_func(GtkCTree * ctree, GtkCTreeNode * node, gpointer data)
+{
+    int *val=(int *)data;
+
+    BalsaMailboxNode *mbnode = gtk_ctree_node_get_row_data(ctree, node);
+    g_return_if_fail(mbnode);
+    
+    if(mbnode->mailbox)
+	*val+=LIBBALSA_MAILBOX(mbnode->mailbox)->unread_messages;
+}
 
 static void
 mark_all_cb(GtkWidget * widget, gpointer data)

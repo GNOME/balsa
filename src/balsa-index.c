@@ -1202,7 +1202,6 @@ mailbox_message_changed_status_cb(LibBalsaMailbox * mb,
 static void
 mailbox_message_new_cb(BalsaIndex * bindex, LibBalsaMessage * message)
 {
-    gnome_triggers_do("You have new mail!", "email", "newmail", NULL);
     gtk_clist_freeze(GTK_CLIST (bindex->ctree));
     balsa_index_add(bindex, message);
     if(bindex->mailbox_node->mailbox->new_messages==0){
@@ -1220,7 +1219,6 @@ mailbox_messages_new_cb(BalsaIndex * bindex, GList *messages)
 {
     LibBalsaMessage * message;
 
-    gnome_triggers_do("You have new mail!", "email", "newmail", NULL);
     gtk_clist_freeze(GTK_CLIST (bindex->ctree));
     while(messages){
 	message=(LibBalsaMessage *)(messages->data);

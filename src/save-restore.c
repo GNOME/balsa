@@ -583,6 +583,10 @@ config_global_load(void)
     /* Maibox checking options ... */
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "MailboxChecking/");
 
+    balsa_app.notify_new_mail_dialog =
+	d_get_gint("NewMailNotificationDialog", 0);
+    balsa_app.notify_new_mail_sound =
+	d_get_gint("NewMailNotificationSound", 1);
     balsa_app.check_mail_upon_startup =
 	gnome_config_get_bool("OnStartup=false");
     balsa_app.check_mail_auto = gnome_config_get_bool("Auto=false");
@@ -591,7 +595,9 @@ config_global_load(void)
 	balsa_app.check_mail_timer = 10;
     if (balsa_app.check_mail_auto)
 	update_timer(TRUE, balsa_app.check_mail_timer);
-
+    balsa_app.check_imap=d_get_gint("CheckIMAP", 1);
+    balsa_app.check_imap_inbox=d_get_gint("CheckIMAPInbox", 0);
+    balsa_app.quiet_background_check=d_get_gint("QuietBackgroundCheck", 0);
     gnome_config_pop_prefix();
 
 #ifdef BALSA_MDN_REPLY
@@ -816,9 +822,17 @@ gint config_save(void)
     /* Maibox checking options ... */
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "MailboxChecking/");
 
+	gnome_config_set_int("NewMailNotificationDialog",
+				balsa_app.notify_new_mail_dialog);
+	gnome_config_set_int("NewMailNotificationSound",
+				balsa_app.notify_new_mail_sound);
     gnome_config_set_bool("OnStartup", balsa_app.check_mail_upon_startup);
     gnome_config_set_bool("Auto", balsa_app.check_mail_auto);
     gnome_config_set_int("AutoDelay", balsa_app.check_mail_timer);
+    gnome_config_set_int("CheckIMAP", balsa_app.check_imap);
+    gnome_config_set_int("CheckIMAPInbox", balsa_app.check_imap_inbox);
+    gnome_config_set_int("QuietBackgroundCheck",
+			 balsa_app.quiet_background_check);
 
     gnome_config_pop_prefix();
 

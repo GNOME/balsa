@@ -1,3 +1,20 @@
+2001-07-16  Pawel Salek  <pawsa@theochem.kth.se>
+
+        IMAP flag handling and new mail notification
+	(balsa-imapflags.patch) by M. Thielker <balsa@t-data.com>
+	with minor some changes.
+	* sounds/balsa.soundlist, sounds/email.soundlist:
+	add German descriptions.
+	* src/balsa-app.[hc]: add notify_new_mail_sound,
+	notify_new_mail_dialog, check_imap, check_imap_inbox fields.
+	* src/balsa-index.c: implement new message notification scheme.
+	* src/main-window.[hc]: second part.
+	* src/pref-manager.c: configure new mail notification scheme.
+	* src/save-restore.c: save its data and restore it.
+
+	* src/toolbar-prefs.[hc]: fix translating strings.
+	* src/balsa-message.c: set wmclass of "Save MIME Part" dialog.
+	
 2001-07-16  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/toolbar-prefs.c: fix make with pedantic options

@@ -349,7 +349,7 @@ save_part(BalsaPartInfo * info)
 
     save_dialog = 
 	GTK_FILE_SELECTION(gtk_file_selection_new(_("Save MIME Part")));
-    // gtk_window_set_wmclass(GTK_WINDOW(save_dialog), "save", "Balsa");
+    gtk_window_set_wmclass(GTK_WINDOW(save_dialog), "save_part", "Balsa");
 
     if (balsa_app.save_dir)
 	filename = g_strdup_printf("%s/%s", balsa_app.save_dir,

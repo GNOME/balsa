@@ -53,6 +53,10 @@ typedef struct _PropertyUI {
     GtkRadioButton *encoding_type[NUM_ENCODING_MODES];
     GtkWidget *check_mail_auto;
     GtkWidget *check_mail_minutes;
+    GtkWidget *quiet_background_check;
+    GtkWidget *check_imap;
+    GtkWidget *check_imap_inbox;
+    GtkWidget *notify_new_mail_dialog;
 #ifdef BALSA_MDN_REPLY
     GtkWidget *mdn_reply_clean_menu, *mdn_reply_notclean_menu;
 #endif
@@ -154,6 +158,7 @@ static void mailbox_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void wrap_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void spelling_optionmenu_cb(GtkItem * menuitem, gpointer data);
 static void set_default_address_book_cb(GtkWidget * button, gpointer data);
+static void imap_toggled_cb(GtkWidget * widget, GtkWidget * pbox);
 
 guint toolbar_type[NUM_TOOLBAR_MODES] = {
     GTK_TOOLBAR_TEXT,
@@ -320,6 +325,18 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
     gtk_signal_connect(GTK_OBJECT(pui->check_mail_minutes), "changed",
 		       GTK_SIGNAL_FUNC(timer_modified_cb), property_box);
+
+    gtk_signal_connect(GTK_OBJECT(pui->quiet_background_check), "toggled",
+		       GTK_SIGNAL_FUNC(properties_modified_cb), property_box);
+
+    gtk_signal_connect(GTK_OBJECT(pui->check_imap), "toggled",
+		       GTK_SIGNAL_FUNC(imap_toggled_cb), property_box);
+
+    gtk_signal_connect(GTK_OBJECT(pui->check_imap_inbox), "toggled",
+		       GTK_SIGNAL_FUNC(properties_modified_cb), property_box);
+
+    gtk_signal_connect(GTK_OBJECT(pui->notify_new_mail_dialog), "toggled",
+		       GTK_SIGNAL_FUNC(properties_modified_cb), property_box);
 
     gtk_signal_connect(GTK_OBJECT(pui->close_mailbox_auto), "toggled",
 		       GTK_SIGNAL_FUNC(mailbox_timer_modified_cb), property_box);
@@ -508,6 +525,14 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     balsa_app.check_mail_timer =
 	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
 					 (pui->check_mail_minutes));
+    balsa_app.quiet_background_check =
+	GTK_TOGGLE_BUTTON(pui->quiet_background_check)->active;
+    balsa_app.check_imap =
+	GTK_TOGGLE_BUTTON(pui->check_imap)->active;
+    balsa_app.check_imap_inbox =
+	GTK_TOGGLE_BUTTON(pui->check_imap_inbox)->active;
+    balsa_app.notify_new_mail_dialog =
+	GTK_TOGGLE_BUTTON(pui->notify_new_mail_dialog)->active;
 #ifdef BALSA_MDN_REPLY
     menu_item = gtk_menu_get_active(GTK_MENU(pui->mdn_reply_clean_menu));
     balsa_app.mdn_reply_clean =
@@ -525,8 +550,8 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     balsa_app.wordwrap = GTK_TOGGLE_BUTTON(pui->wordwrap)->active;
     balsa_app.wraplength =
 	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(pui->wraplength));
-	balsa_app.always_queue_sent_mail =
-				GTK_TOGGLE_BUTTON(pui->always_queue_sent_mail)->active;
+    balsa_app.always_queue_sent_mail =
+	GTK_TOGGLE_BUTTON(pui->always_queue_sent_mail)->active;
 
     balsa_app.close_mailbox_auto =
 	GTK_TOGGLE_BUTTON(pui->close_mailbox_auto)->active;
@@ -700,6 +725,20 @@ set_prefs(void)
 				 balsa_app.check_mail_auto);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->check_mail_minutes),
 			      (float) balsa_app.check_mail_timer);
+    gtk_toggle_button_set_active(
+	GTK_TOGGLE_BUTTON(pui->quiet_background_check),
+	balsa_app.quiet_background_check);
+    gtk_toggle_button_set_active(
+	GTK_TOGGLE_BUTTON(pui->check_imap),
+	balsa_app.check_imap);
+    gtk_toggle_button_set_active(
+	GTK_TOGGLE_BUTTON(pui->check_imap_inbox),
+	balsa_app.check_imap_inbox);
+    gtk_toggle_button_set_active(
+	GTK_TOGGLE_BUTTON(pui->notify_new_mail_dialog),
+	balsa_app.notify_new_mail_dialog);
+    if(!balsa_app.check_imap)
+	gtk_widget_set_sensitive(GTK_WIDGET(pui->check_imap_inbox), FALSE);
 
 #ifdef BALSA_MDN_REPLY
     gtk_menu_set_active(GTK_MENU(pui->mdn_reply_clean_menu),
@@ -1125,6 +1164,8 @@ static GtkWidget *
 incoming_page(gpointer data)
 {
     GtkWidget *vbox1;
+    GtkWidget *vbox2;
+    GtkWidget *hbox1;
     GtkWidget *frame15;
     GtkWidget *table7;
     GtkWidget *label33;
@@ -1146,9 +1187,11 @@ incoming_page(gpointer data)
     gtk_container_set_border_width(GTK_CONTAINER(frame15), 5);
     gtk_box_pack_start(GTK_BOX(vbox1), frame15, FALSE, FALSE, 0);
 
+	vbox2 = vbox_in_container(frame15);
+
     table7 = gtk_table_new(2, 3, FALSE);
-    gtk_container_add(GTK_CONTAINER(frame15), table7);
-    gtk_container_set_border_width(GTK_CONTAINER(table7), 5);
+    gtk_container_add(GTK_CONTAINER(vbox2), table7);
+    gtk_container_set_border_width(GTK_CONTAINER(table7), 0);
 
     label33 = gtk_label_new(_("minutes"));
     gtk_table_attach(GTK_TABLE(table7), label33, 2, 3, 0, 1,
@@ -1167,6 +1210,29 @@ incoming_page(gpointer data)
 		     (GtkAttachOptions) (GTK_FILL),
 		     (GtkAttachOptions) (0), 0, 0);
 
+    hbox1 = gtk_hbox_new(FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(vbox2), hbox1,
+		       TRUE, FALSE, 0);
+    pui->check_imap = gtk_check_button_new_with_label(
+	_("Check IMAP mailboxes"));
+    gtk_box_pack_start(GTK_BOX(hbox1), pui->check_imap,
+		       FALSE, FALSE, 0);
+    
+    pui->check_imap_inbox = gtk_check_button_new_with_label(
+	_("Check INBOX only"));
+    gtk_box_pack_start(GTK_BOX(hbox1), pui->check_imap_inbox,
+		       FALSE, FALSE, 0);
+    
+    pui->notify_new_mail_dialog = gtk_check_button_new_with_label(
+	_("Display message if new mail has arrived"));
+    gtk_box_pack_start(GTK_BOX(vbox2), pui->notify_new_mail_dialog,
+		       FALSE, FALSE, 0);
+    
+    pui->quiet_background_check = gtk_check_button_new_with_label(
+	_("Do background check quietly (no messages in status bar)"));
+    gtk_box_pack_start(GTK_BOX(vbox2), pui->quiet_background_check,
+		       TRUE, FALSE, 0);
+    
     /* Quoted text regular expression */
     regex_frame = gtk_frame_new(_("Quoted Text"));
     gtk_container_set_border_width(GTK_CONTAINER(regex_frame), 5);
@@ -2066,4 +2132,17 @@ mailbox_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 			     newstate);
 
     properties_modified_cb(widget, pbox);
+}
+
+static void imap_toggled_cb(GtkWidget * widget, GtkWidget * pbox)
+{
+    properties_modified_cb(widget, pbox);
+
+    if(GTK_TOGGLE_BUTTON(pui->check_imap)->active) 
+	gtk_widget_set_sensitive(GTK_WIDGET(pui->check_imap_inbox), TRUE);
+    else {
+	gtk_toggle_button_set_active(
+	    GTK_TOGGLE_BUTTON(pui->check_imap_inbox), FALSE);
+	gtk_widget_set_sensitive(GTK_WIDGET(pui->check_imap_inbox), FALSE);
+    }
 }

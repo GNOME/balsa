@@ -242,7 +242,7 @@ mru_menu_cb(gchar * url, gpointer data)
 static void
 message_window_move_message(MessageWindow * mw, LibBalsaMailbox * mailbox)
 {
-    GList *list;
+    GArray *messages;
 
     g_return_if_fail(mailbox != NULL);
 
@@ -250,9 +250,10 @@ message_window_move_message(MessageWindow * mw, LibBalsaMailbox * mailbox)
     if (mw->message->mailbox == mailbox)
 	return;
 
-    list = g_list_append(NULL, mw->message);
-    balsa_index_transfer(mw->bindex, list, mailbox, FALSE);
-    g_list_free_1(list);
+    messages = g_array_new(FALSE, FALSE, sizeof(guint));
+    g_array_append_val(messages, mw->message->msgno);
+    balsa_index_transfer(mw->bindex, messages, mailbox, FALSE);
+    g_array_free(messages, TRUE);
     
     close_message_window(NULL, (gpointer) mw);
 }

@@ -1,3 +1,8 @@
+2003-01-03  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* imap/message.c,imap/imap.h: pull imap_update_header info() out of
+	imap_fetch_message().
+
 2003-01-02  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* parse.c: add id body parameter if Content-ID found.

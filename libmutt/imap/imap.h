@@ -68,6 +68,7 @@ int imap_mailbox_delete (const char* path);
 int imap_append_message (CONTEXT* ctx, MESSAGE* msg);
 int imap_copy_messages (CONTEXT* ctx, HEADER* h, char* dest, int delete);
 int imap_fetch_message (MESSAGE* msg, CONTEXT* ctx, int msgno);
+void imap_update_header_info(MESSAGE*msg, CONTEXT*ctx, int msgno);
 
 /* socket.c */
 void imap_logout_all (void);

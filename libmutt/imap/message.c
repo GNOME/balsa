@@ -218,7 +218,6 @@ int imap_fetch_message (MESSAGE *msg, CONTEXT *ctx, int msgno)
   int uid;
   int cacheno;
   IMAP_CACHE *cache;
-  int read;
   int rc;
   /* Sam's weird courier server returns an OK response even when FETCH
    * fails. Thanks Sam. */
@@ -341,6 +340,27 @@ int imap_fetch_message (MESSAGE *msg, CONTEXT *ctx, int msgno)
   if (!fetched || !imap_code (idata->cmd.buf))
     goto bail;
     
+  imap_update_header_info(msg, ctx, msgno);
+  return 0;
+
+bail:
+  safe_fclose (&msg->fp);
+  if (cache->path)
+  {
+    unlink (cache->path);
+    FREE (&cache->path);
+  }
+
+  return -1;
+}
+
+/* LIBMUTT: this is pulled out of imap_fetch_message */
+void imap_update_header_info (MESSAGE*msg, CONTEXT*ctx, int msgno)
+{
+  int read;
+  char buf[LONG_STRING];
+  HEADER* h = ctx->hdrs[msgno];
+
   /* Update the header information.  Previously, we only downloaded a
    * portion of the headers, those required for the main display.
    */
@@ -359,11 +379,7 @@ int imap_fetch_message (MESSAGE *msg, CONTEXT *ctx, int msgno)
   if (ctx->id_hash && h->env->message_id)
     hash_delete (ctx->id_hash, h->env->message_id, h, NULL);
   mutt_free_envelope (&h->env);
-#ifdef LIBMUTT
   h->env = mutt_read_rfc822_header (msg->fp, h, 1, 0);
-#else
-  h->env = mutt_read_rfc822_header (msg->fp, h, 0, 0);
-#endif
   if (ctx->id_hash && h->env->message_id)
     hash_insert (ctx->id_hash, h->env->message_id, h, 0);
 
@@ -392,18 +408,6 @@ int imap_fetch_message (MESSAGE *msg, CONTEXT *ctx, int msgno)
 
   mutt_clear_error();
   rewind (msg->fp);
-
-  return 0;
-
-bail:
-  safe_fclose (&msg->fp);
-  if (cache->path)
-  {
-    unlink (cache->path);
-    FREE (&cache->path);
-  }
-
-  return -1;
 }
 
 int imap_append_message (CONTEXT *ctx, MESSAGE *msg)

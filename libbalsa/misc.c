@@ -741,14 +741,13 @@ static gchar *
 get_line(GtkTextBuffer * buffer, GtkTextIter * iter)
 {
     GtkTextIter end;
-    gchar *line;
 
     gtk_text_iter_set_line_offset(iter, 0);
     end = *iter;
-    gtk_text_iter_forward_to_line_end(&end);
-    line = gtk_text_buffer_get_slice(buffer, iter, &end, TRUE);
+    if (!gtk_text_iter_ends_line(&end))
+        gtk_text_iter_forward_to_line_end(&end);
 
-    return line;
+    return gtk_text_buffer_get_slice(buffer, iter, &end, TRUE);
 }
 
 static void

@@ -1,3 +1,7 @@
+2002-05-05  Emmanuel <e.allaud@wanadoo.fr>
+
+	* src/address.c: fix #80502
+
 2002-04-30  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/send.c: be more verbose on most common SMTP configuration 

@@ -5,15 +5,15 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 1.0.0\n"
-"POT-Creation-Date: 2000-12-05 12:11+0100\n"
-"PO-Revision-Date: 2000-12-05 12:12+01:00\n"
+"POT-Creation-Date: 2000-12-12 12:03+0100\n"
+"PO-Revision-Date: 2000-12-12 12:03+01:00\n"
 "Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
 "Language-Team: Norwegian <no@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8-bit\n"
 
-#: libbalsa/address-book-ldap.c:195
+#: libbalsa/address-book-ldap.c:203
 msgid ""
 "Failed to initialise LDAP server.\n"
 "Check that the servername is valid."
@@ -21,7 +21,7 @@ msgstr ""
 "Kunne ikke initiere LDAP-tjeneren.\n"
 "Sjekk om tjenernavnet er gyldig."
 
-#: libbalsa/address-book-ldap.c:205
+#: libbalsa/address-book-ldap.c:213
 #, c-format
 msgid ""
 "Failed to bind to server: %s\n"
@@ -30,17 +30,17 @@ msgstr ""
 "Klarte ikke å binde til tjener: %s\n"
 "Sjekk at tjenernavnet er gyldig."
 
-#: libbalsa/address-book-ldap.c:253 libbalsa/address-book-ldap.c:426
+#: libbalsa/address-book-ldap.c:261 libbalsa/address-book-ldap.c:449
 #, c-format
 msgid "Failed to do a search: %sCheck that the base name is valid."
 msgstr ""
 "Feilet under forsøk på å gjøre et søk: %sSjekk at basisnavnet er gyldig."
 
-#: libbalsa/address-book-ldap.c:320 libbalsa/address-book-vcard.c:274
+#: libbalsa/address-book-ldap.c:328 libbalsa/address-book-vcard.c:274
 msgid "No-Id"
 msgstr "Ingen id"
 
-#: libbalsa/address-book-ldap.c:324 libbalsa/address-book-vcard.c:283
+#: libbalsa/address-book-ldap.c:332 libbalsa/address-book-vcard.c:283
 msgid "No-Name"
 msgstr "Uten navn"
 
@@ -885,8 +885,8 @@ msgstr "Lagre MIME-del"
 msgid "Save"
 msgstr "Lagre"
 
-#: src/balsa-message.c:288 src/sendmsg-window.c:158 src/sendmsg-window.c:649
-#: src/sendmsg-window.c:1788 src/sendmsg-window.c:1811
+#: src/balsa-message.c:288 src/sendmsg-window.c:158 src/sendmsg-window.c:653
+#: src/sendmsg-window.c:1792 src/sendmsg-window.c:1815
 msgid "Cancel"
 msgstr "Avbryt"
 
@@ -901,7 +901,7 @@ msgid " Could not save %s:%s "
 msgstr " Kunne ikke lagre %s:%s "
 
 #. Subject:
-#: src/balsa-message.c:625 src/print.c:358 src/sendmsg-window.c:909
+#: src/balsa-message.c:625 src/print.c:358 src/sendmsg-window.c:913
 msgid "Subject:"
 msgstr "Emne:"
 
@@ -911,13 +911,13 @@ msgstr "Dato:"
 
 #. From:
 #: src/balsa-message.c:633 src/filter-edit-dialog.c:316 src/print.c:348
-#: src/sendmsg-window.c:900
+#: src/sendmsg-window.c:904
 msgid "From:"
 msgstr "Fra:"
 
 #. To:
 #: src/balsa-message.c:637 src/filter-edit-dialog.c:306 src/print.c:353
-#: src/sendmsg-window.c:903
+#: src/sendmsg-window.c:907
 msgid "To:"
 msgstr "Til:"
 
@@ -1071,7 +1071,7 @@ msgstr "Kropp"
 msgid "Match string:"
 msgstr "Finn streng:"
 
-#: src/filter-edit-dialog.c:384 src/sendmsg-window.c:558
+#: src/filter-edit-dialog.c:384 src/sendmsg-window.c:562
 msgid "Remove"
 msgstr "Fjern"
 
@@ -2346,127 +2346,131 @@ msgstr "_Kommentarer"
 msgid "_Keywords"
 msgstr "_Nøkkelord"
 
-#: src/sendmsg-window.c:291 src/sendmsg-window.c:372
+#: src/sendmsg-window.c:292 src/sendmsg-window.c:374
 msgid "Brazilian"
 msgstr "Brasiliensk"
 
-#: src/sendmsg-window.c:292 src/sendmsg-window.c:374
+#: src/sendmsg-window.c:293 src/sendmsg-window.c:376
 msgid "Catalan"
 msgstr "Katalansk"
 
-#: src/sendmsg-window.c:293 src/sendmsg-window.c:376
+#: src/sendmsg-window.c:294 src/sendmsg-window.c:378
 msgid "Danish"
 msgstr "Dansk"
 
-#: src/sendmsg-window.c:294 src/sendmsg-window.c:380
+#: src/sendmsg-window.c:295 src/sendmsg-window.c:382
 msgid "Dutch"
 msgstr "Nederlandsk"
 
-#: src/sendmsg-window.c:295 src/sendmsg-window.c:382
+#: src/sendmsg-window.c:296 src/sendmsg-window.c:384
 msgid "English"
 msgstr "Engelsk"
 
-#: src/sendmsg-window.c:296 src/sendmsg-window.c:384
+#: src/sendmsg-window.c:297 src/sendmsg-window.c:386
 msgid "Estonian"
 msgstr "Estisk"
 
-#: src/sendmsg-window.c:297 src/sendmsg-window.c:386
+#: src/sendmsg-window.c:298 src/sendmsg-window.c:388
 msgid "Finnish"
 msgstr "Finsk"
 
-#: src/sendmsg-window.c:298 src/sendmsg-window.c:388
+#: src/sendmsg-window.c:299 src/sendmsg-window.c:390
 msgid "French"
 msgstr "Fransk"
 
-#: src/sendmsg-window.c:299 src/sendmsg-window.c:378
+#: src/sendmsg-window.c:300 src/sendmsg-window.c:380
 msgid "German"
 msgstr "Tysk"
 
-#: src/sendmsg-window.c:300 src/sendmsg-window.c:390
+#: src/sendmsg-window.c:301 src/sendmsg-window.c:392
 msgid "Greek"
 msgstr "Gresk"
 
-#: src/sendmsg-window.c:301 src/sendmsg-window.c:392
+#: src/sendmsg-window.c:302 src/sendmsg-window.c:394
 msgid "Hungarian"
 msgstr "Ungarsk"
 
-#: src/sendmsg-window.c:302 src/sendmsg-window.c:394
+#: src/sendmsg-window.c:303 src/sendmsg-window.c:396
 msgid "Italian"
 msgstr "Italiensk"
 
-#: src/sendmsg-window.c:303 src/sendmsg-window.c:396
+#: src/sendmsg-window.c:304 src/sendmsg-window.c:398
 msgid "Japanese"
 msgstr "Japansk"
 
-#: src/sendmsg-window.c:308 src/sendmsg-window.c:398
+#: src/sendmsg-window.c:309 src/sendmsg-window.c:400
 msgid "Korean"
 msgstr "Koreansk"
 
-#: src/sendmsg-window.c:309 src/sendmsg-window.c:400
+#: src/sendmsg-window.c:310 src/sendmsg-window.c:402
 msgid "Latvian"
 msgstr "Latvisk"
 
-#: src/sendmsg-window.c:310 src/sendmsg-window.c:402
+#: src/sendmsg-window.c:311 src/sendmsg-window.c:404
 msgid "Lithuanian"
 msgstr "Lithuensk"
 
-#: src/sendmsg-window.c:311 src/sendmsg-window.c:404
+#: src/sendmsg-window.c:312 src/sendmsg-window.c:406
 msgid "Norwegian"
 msgstr "Norsk"
 
-#: src/sendmsg-window.c:312 src/sendmsg-window.c:406
+#: src/sendmsg-window.c:313 src/sendmsg-window.c:408
 msgid "Polish"
 msgstr "Polsk"
 
-#: src/sendmsg-window.c:313 src/sendmsg-window.c:408
+#: src/sendmsg-window.c:314 src/sendmsg-window.c:410
 msgid "Portugese"
 msgstr "Portugisisk"
 
-#: src/sendmsg-window.c:314 src/sendmsg-window.c:410
+#: src/sendmsg-window.c:315 src/sendmsg-window.c:412
+msgid "Romanian"
+msgstr "Rumensk"
+
+#: src/sendmsg-window.c:316 src/sendmsg-window.c:414
 msgid "Russian (ISO)"
 msgstr "Russisk (ISO)"
 
-#: src/sendmsg-window.c:315 src/sendmsg-window.c:412
+#: src/sendmsg-window.c:317 src/sendmsg-window.c:416
 msgid "Russian (KOI)"
 msgstr "Russisk (KOI)"
 
-#: src/sendmsg-window.c:316 src/sendmsg-window.c:414
+#: src/sendmsg-window.c:318 src/sendmsg-window.c:418
 msgid "Slovak"
 msgstr "Slovensk"
 
-#: src/sendmsg-window.c:317 src/sendmsg-window.c:416
+#: src/sendmsg-window.c:319 src/sendmsg-window.c:420
 msgid "Spanish"
 msgstr "Spansk"
 
-#: src/sendmsg-window.c:318 src/sendmsg-window.c:418
+#: src/sendmsg-window.c:320 src/sendmsg-window.c:422
 msgid "Swedish"
 msgstr "Svensk"
 
-#: src/sendmsg-window.c:319 src/sendmsg-window.c:420
+#: src/sendmsg-window.c:321 src/sendmsg-window.c:424
 msgid "Turkish"
 msgstr "Tyrkisk"
 
-#: src/sendmsg-window.c:320 src/sendmsg-window.c:422
+#: src/sendmsg-window.c:322 src/sendmsg-window.c:426
 msgid "Ukrainian"
 msgstr "Ukrainsk"
 
-#: src/sendmsg-window.c:327
+#: src/sendmsg-window.c:329
 msgid "_A-J"
 msgstr "_A-J"
 
-#: src/sendmsg-window.c:328
+#: src/sendmsg-window.c:330
 msgid "_K-Z"
 msgstr "_K-Z"
 
-#: src/sendmsg-window.c:359
+#: src/sendmsg-window.c:361
 msgid "_Show"
 msgstr "Vi_s"
 
-#: src/sendmsg-window.c:361
+#: src/sendmsg-window.c:363
 msgid "_Language"
 msgstr "_Språk"
 
-#: src/sendmsg-window.c:622
+#: src/sendmsg-window.c:626
 msgid ""
 "The attachment pixmap (balsa/attachment.png) cannot be found.\n"
 "This means you cannot attach any files.\n"
@@ -2474,60 +2478,60 @@ msgstr ""
 "Finner ikke bildet for vedlegg (balsa/attachment.png).\n"
 "Dette medfører at du ikke kan legge ved filer.\n"
 
-#: src/sendmsg-window.c:637
+#: src/sendmsg-window.c:641
 #, c-format
 msgid "Cannot get info on file '%s': %s\n"
 msgstr "Kan ikke hente informasjon om filen '%s': %s\n"
 
-#: src/sendmsg-window.c:643
+#: src/sendmsg-window.c:647
 #, c-format
 msgid "Attachment is not a regular file or cannot be read: '%s'\n"
 msgstr "Vedlegget er ikke en vanlig fil eller kan ikke leses: '%s'\n"
 
-#: src/sendmsg-window.c:719
+#: src/sendmsg-window.c:723
 msgid "Attach file"
 msgstr "Legg ved fil"
 
 #. cc:
-#: src/sendmsg-window.c:914
+#: src/sendmsg-window.c:918
 msgid "cc:"
 msgstr "cc:"
 
 #. bcc:
-#: src/sendmsg-window.c:920
+#: src/sendmsg-window.c:924
 msgid "bcc:"
 msgstr "bcc:"
 
 #. fcc:
-#: src/sendmsg-window.c:926
+#: src/sendmsg-window.c:930
 msgid "fcc:"
 msgstr "fcc:"
 
 #. Reply To:
-#: src/sendmsg-window.c:961
+#: src/sendmsg-window.c:965
 msgid "Reply To:"
 msgstr "Svar til:"
 
 #. Attachment list
-#: src/sendmsg-window.c:967
+#: src/sendmsg-window.c:971
 msgid "Attachments:"
 msgstr "Vedlegg:"
 
 #. Comments:
-#: src/sendmsg-window.c:1012
+#: src/sendmsg-window.c:1016
 msgid "Comments:"
 msgstr "Kommentarer:"
 
 #. Keywords:
-#: src/sendmsg-window.c:1015
+#: src/sendmsg-window.c:1019
 msgid "Keywords:"
 msgstr "Nøkkelord:"
 
-#: src/sendmsg-window.c:1112
+#: src/sendmsg-window.c:1116
 msgid "you"
 msgstr "deg"
 
-#: src/sendmsg-window.c:1117
+#: src/sendmsg-window.c:1121
 #, c-format
 msgid ""
 "\n"
@@ -2536,7 +2540,7 @@ msgstr ""
 "\n"
 "%s skrev %s:\n"
 
-#: src/sendmsg-window.c:1120
+#: src/sendmsg-window.c:1124
 #, c-format
 msgid ""
 "\n"
@@ -2545,40 +2549,40 @@ msgstr ""
 "\n"
 "%s skrev:\n"
 
-#: src/sendmsg-window.c:1198
+#: src/sendmsg-window.c:1202
 msgid "Reply to "
 msgstr "Svar til "
 
-#: src/sendmsg-window.c:1203
+#: src/sendmsg-window.c:1207
 msgid "Forward message"
 msgstr "Videresend melding"
 
-#: src/sendmsg-window.c:1208
+#: src/sendmsg-window.c:1212
 msgid "Continue message"
 msgstr "Fortsett på en melding"
 
-#: src/sendmsg-window.c:1213
+#: src/sendmsg-window.c:1217
 msgid "New message"
 msgstr "Ny melding"
 
-#: src/sendmsg-window.c:1487
+#: src/sendmsg-window.c:1491
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Kunne ikke åpne filen %s.\n"
 
-#: src/sendmsg-window.c:1489
+#: src/sendmsg-window.c:1493
 msgid "Loading..."
 msgstr "Laster..."
 
-#: src/sendmsg-window.c:1516
+#: src/sendmsg-window.c:1520
 msgid "Include file"
 msgstr "Inkluder fil"
 
-#: src/sendmsg-window.c:1786
+#: src/sendmsg-window.c:1790
 msgid "Cannot execute print command."
 msgstr "Kan ikke utføre utskriftskommando."
 
-#: src/sendmsg-window.c:1809
+#: src/sendmsg-window.c:1813
 msgid "Error executing lpr"
 msgstr "Feil under kjøring av lpr"
 

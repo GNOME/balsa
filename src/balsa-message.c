@@ -22,7 +22,7 @@
 #include <string.h>
 #include "balsa-message.h"
 
-#define HTML_HEAD "<html><body><pre>"
+#define HTML_HEAD "<html><body bgcolor=#ffffff><pre>"
 #define HTML_FOOT "</pre></body></html>"
 
 

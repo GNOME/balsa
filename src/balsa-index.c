@@ -434,6 +434,16 @@ struct BndxSelectionChangedInfo {
     GSList **selected;
 };
 
+#if !GTK_CHECK_VERSION(2, 2, 0)
+static void
+bndx_selection_any(GtkTreeModel * model, GtkTreePath * path,
+		   GtkTreeIter * iter, gpointer data)
+{
+    gboolean *have_selected = data;
+    *have_selected = TRUE;
+}
+#endif				/* !GTK_CHECK_VERSION(2, 2, 0) */
+
 static void
 bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
 {
@@ -444,8 +454,15 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
     GSList *list;
     GSList *next;
     LibBalsaMailboxSearchIter *iter_view;
+#if GTK_CHECK_VERSION(2, 2, 0)
     gboolean have_selected =
 	gtk_tree_selection_count_selected_rows(selection) > 0;
+#else
+    gboolean have_selected = FALSE;
+
+    gtk_tree_selection_selected_foreach(selection, bndx_selection_any,
+					&have_selected);
+#endif /* GTK_CHECK_VERSION(2, 2, 0) */
 
     /* Search results may be cached in iter_view. */
     iter_view =

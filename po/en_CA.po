@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-10-23 19:30-0400\n"
-"PO-Revision-Date: 2004-10-23 14:48-0400\n"
+"POT-Creation-Date: 2004-10-25 12:52-0400\n"
+"PO-Revision-Date: 2004-10-25 14:48-0400\n"
 "Last-Translator: Adam Weinberger <adamw@gnome.org>\n"
 "Language-Team: en_CA <adamw@FreeBSD.org>\n"
 "MIME-Version: 1.0\n"
@@ -152,6 +152,11 @@ msgstr "Error when trashing messages: %s"
 #, c-format
 msgid "Error when moving messages: %s"
 msgstr "Error when moving messages: %s"
+
+#: libbalsa/gmime-application-pkcs7.c:246
+#: libbalsa/gmime-application-pkcs7.c:389
+msgid "Failed to decrypt MIME part: parse error"
+msgstr "Failed to decrypt MIME part: parse error"
 
 #: libbalsa/gmime-gpgme-context.c:288 libbalsa/rfc3156.c:1501
 #, c-format
@@ -475,22 +480,22 @@ msgstr "Accept&_Save"
 msgid "_Reject"
 msgstr "_Reject"
 
-#: libbalsa/mailbox.c:409
+#: libbalsa/mailbox.c:413
 #, c-format
 msgid "Cannot load mailbox %s"
 msgstr "Cannot load mailbox %s"
 
-#: libbalsa/mailbox.c:416
+#: libbalsa/mailbox.c:420
 #, c-format
 msgid "No such mailbox type: %s"
 msgstr "No such mailbox type: %s"
 
-#: libbalsa/mailbox.c:433
+#: libbalsa/mailbox.c:437
 #, c-format
 msgid "Bad local mailbox path \"%s\""
 msgstr "Bad local mailbox path \"%s\""
 
-#: libbalsa/mailbox.c:438
+#: libbalsa/mailbox.c:442
 #, c-format
 msgid "Could not create a mailbox of type %s"
 msgstr "Could not create a mailbox of type %s"
@@ -1560,7 +1565,7 @@ msgstr "E-mail"
 msgid "New mail notification"
 msgstr "New mail notification"
 
-#: src/ab-main.c:338 src/ab-window.c:167 src/filter-edit-dialog.c:193
+#: src/ab-main.c:338 src/ab-window.c:167 src/filter-edit-dialog.c:251
 #: src/filter-export-dialog.c:88 src/filter-run-dialog.c:220
 #: src/filter-run-dialog.c:292
 msgid "Name"
@@ -1715,7 +1720,7 @@ msgstr "Enable _TLS"
 msgid "Error displaying %s: %s\n"
 msgstr "Error displaying %s: %s\n"
 
-#: src/address-book-config.c:623 src/mailbox-conf.c:564
+#: src/address-book-config.c:623 src/mailbox-conf.c:622
 #: src/pref-manager.c:1555 src/pref-manager.c:2699
 msgid "_Add"
 msgstr "_Add"
@@ -1819,7 +1824,7 @@ msgstr "Forward _Inline..."
 msgid "_Store Address..."
 msgstr "_Store Address..."
 
-#: src/balsa-index.c:1784 src/filter-edit-dialog.c:216 src/mailbox-node.c:970
+#: src/balsa-index.c:1784 src/filter-edit-dialog.c:274 src/mailbox-node.c:970
 #: src/pref-manager.c:1557 src/pref-manager.c:2703
 msgid "_Delete"
 msgstr "_Delete"
@@ -2278,320 +2283,321 @@ msgstr ""
 "Checking the signature of the message sent by %s with subject \"%s\" failed "
 "with an error!"
 
-#: src/filter-edit-callbacks.c:286
+#: src/filter-edit-callbacks.c:313
 msgid "One of the specified fields contains:"
 msgstr "One of the specified fields contains:"
 
-#: src/filter-edit-callbacks.c:287
+#: src/filter-edit-callbacks.c:314
 msgid "None of the specified fields contains:"
 msgstr "None of the specified fields contains:"
 
-#: src/filter-edit-callbacks.c:289
+#: src/filter-edit-callbacks.c:316
 msgid "One of the regular expressions matches"
 msgstr "One of the regular expressions matches"
 
-#: src/filter-edit-callbacks.c:290
+#: src/filter-edit-callbacks.c:317
 msgid "None of the regular expressions matches"
 msgstr "None of the regular expressions matches"
 
-#: src/filter-edit-callbacks.c:292 src/filter-edit-callbacks.c:897
+#: src/filter-edit-callbacks.c:319 src/filter-edit-callbacks.c:1000
 msgid "Match when date is in the interval:"
 msgstr "Match when date is in the interval:"
 
-#: src/filter-edit-callbacks.c:293
+#: src/filter-edit-callbacks.c:320
 msgid "Match when date is outside the interval:"
 msgstr "Match when date is outside the interval:"
 
-#: src/filter-edit-callbacks.c:295 src/filter-edit-callbacks.c:935
+#: src/filter-edit-callbacks.c:322 src/filter-edit-callbacks.c:1038
 msgid "Match when one of these flags is set:"
 msgstr "Match when one of these flags is set:"
 
-#: src/filter-edit-callbacks.c:296
+#: src/filter-edit-callbacks.c:323
 msgid "Match when none of these flags is set:"
 msgstr "Match when none of these flags is set:"
 
-#: src/filter-edit-callbacks.c:449
+#: src/filter-edit-callbacks.c:519
 msgid "You must specify the name of the user header to match on"
 msgstr "You must specify the name of the user header to match on"
 
-#: src/filter-edit-callbacks.c:464
+#: src/filter-edit-callbacks.c:538
 msgid "You must specify at least one field for matching"
 msgstr "You must specify at least one field for matching"
 
-#: src/filter-edit-callbacks.c:474
+#: src/filter-edit-callbacks.c:548
 msgid "You must provide a string"
 msgstr "You must provide a string"
 
-#: src/filter-edit-callbacks.c:481
+#: src/filter-edit-callbacks.c:555
 msgid "You must provide at least one regular expression"
 msgstr "You must provide at least one regular expression"
 
-#: src/filter-edit-callbacks.c:493
+#: src/filter-edit-callbacks.c:567
 msgid "Low date is incorrect"
 msgstr "Low date is incorrect"
 
-#: src/filter-edit-callbacks.c:504
+#: src/filter-edit-callbacks.c:578
 msgid "High date is incorrect"
 msgstr "High date is incorrect"
 
-#: src/filter-edit-callbacks.c:512
+#: src/filter-edit-callbacks.c:586
 msgid "Low date is greater than high date"
 msgstr "Low date is greater than high date"
 
-#: src/filter-edit-callbacks.c:782
+#: src/filter-edit-callbacks.c:885
 #, c-format
 msgid "Error displaying condition help: %s\n"
 msgstr "Error displaying condition help: %s\n"
 
-#: src/filter-edit-callbacks.c:802
+#: src/filter-edit-callbacks.c:905
 msgid "Unread"
 msgstr "Unread"
 
-#: src/filter-edit-callbacks.c:802
+#: src/filter-edit-callbacks.c:905
 msgid "Deleted"
 msgstr "Deleted"
 
-#: src/filter-edit-callbacks.c:802
+#: src/filter-edit-callbacks.c:905
 msgid "Replied"
 msgstr "Replied"
 
-#: src/filter-edit-callbacks.c:802
+#: src/filter-edit-callbacks.c:905
 msgid "Flagged"
 msgstr "Flagged"
 
-#: src/filter-edit-callbacks.c:816
+#: src/filter-edit-callbacks.c:919
 msgid "One of the specified f_ields contains"
 msgstr "One of the specified f_ields contains"
 
-#: src/filter-edit-callbacks.c:831
+#: src/filter-edit-callbacks.c:934
 msgid "Contain/Does _Not Contain"
 msgstr "Contain/Does _Not Contain"
 
-#: src/filter-edit-callbacks.c:845
+#: src/filter-edit-callbacks.c:948
 msgid "_One of the regular expressions matches"
 msgstr "_One of the regular expressions matches"
 
 #. FIXME : I saw a lot of different ways to create button with
 #. pixmaps, hope this one is correct
 #. Right/Add button
-#: src/filter-edit-callbacks.c:872 src/filter-run-dialog.c:313
+#: src/filter-edit-callbacks.c:975 src/filter-run-dialog.c:313
 msgid "A_dd"
 msgstr "A_dd"
 
 #. Left/Remove button
-#: src/filter-edit-callbacks.c:876 src/filter-edit-dialog.c:310
+#: src/filter-edit-callbacks.c:979 src/filter-edit-dialog.c:368
 #: src/filter-run-dialog.c:318
 msgid "_Remove"
 msgstr "_Remove"
 
-#: src/filter-edit-callbacks.c:880
+#: src/filter-edit-callbacks.c:983
 msgid "One _Matches/None Matches"
 msgstr "One _Matches/None Matches"
 
-#: src/filter-edit-callbacks.c:917
+#: src/filter-edit-callbacks.c:1020
 msgid "Inside/outside the date interval"
 msgstr "Inside/outside the date interval"
 
-#: src/filter-edit-callbacks.c:964
+#: src/filter-edit-callbacks.c:1067
 msgid "Match when one flag is set/when no flag is set"
 msgstr "Match when one flag is set/when no flag is set"
 
 #. builds the toggle buttons to specify fields concerned by the conditions of
 #. * the filter
-#: src/filter-edit-callbacks.c:982
+#: src/filter-edit-callbacks.c:1088
 msgid "Match In"
 msgstr "Match In"
 
-#: src/filter-edit-callbacks.c:994
+#: src/filter-edit-callbacks.c:1100
 msgid "_All"
 msgstr "_All"
 
-#: src/filter-edit-callbacks.c:1002
+#: src/filter-edit-callbacks.c:1108
 msgid "C_lear"
 msgstr "C_lear"
 
-#: src/filter-edit-callbacks.c:1011 src/main-window.c:3789
+#: src/filter-edit-callbacks.c:1117 src/main-window.c:3789
 msgid "_Body"
 msgstr "_Body"
 
 #. To:
-#: src/filter-edit-callbacks.c:1018 src/main-window.c:3790
+#: src/filter-edit-callbacks.c:1124 src/main-window.c:3790
 #: src/sendmsg-window.c:2200
 msgid "_To:"
 msgstr "_To:"
 
-#: src/filter-edit-callbacks.c:1025 src/main-window.c:3791
+#: src/filter-edit-callbacks.c:1131 src/main-window.c:3791
 msgid "_From:"
 msgstr "_From:"
 
-#: src/filter-edit-callbacks.c:1033
+#: src/filter-edit-callbacks.c:1139
 msgid "_Subject"
 msgstr "_Subject"
 
-#: src/filter-edit-callbacks.c:1040 src/main-window.c:3793
+#: src/filter-edit-callbacks.c:1146 src/main-window.c:3793
 msgid "_Cc:"
 msgstr "_Cc:"
 
-#: src/filter-edit-callbacks.c:1047
+#: src/filter-edit-callbacks.c:1153
 msgid "_User header:"
 msgstr "_User header:"
 
-#: src/filter-edit-callbacks.c:1071
+#: src/filter-edit-callbacks.c:1190
 msgid "Search T_ype:"
 msgstr "Search T_ype:"
 
-#: src/filter-edit-callbacks.c:1145
+#: src/filter-edit-callbacks.c:1264
 msgid "Edit condition for filter: "
 msgstr "Edit condition for filter: "
 
-#: src/filter-edit-callbacks.c:1384
+#: src/filter-edit-callbacks.c:1504
 #, c-format
 msgid "Error displaying filter help: %s\n"
 msgstr "Error displaying filter help: %s\n"
 
-#: src/filter-edit-callbacks.c:1572
+#: src/filter-edit-callbacks.c:1699
 msgid "New filter"
 msgstr "New filter"
 
-#: src/filter-edit-callbacks.c:1701
+#: src/filter-edit-callbacks.c:1830
 msgid "No filter name specified."
 msgstr "No filter name specified."
 
-#: src/filter-edit-callbacks.c:1706
+#: src/filter-edit-callbacks.c:1835
 #, c-format
 msgid "Filter \"%s\" already exists."
 msgstr "Filter \"%s\" already exists."
 
-#: src/filter-edit-callbacks.c:1719
+#: src/filter-edit-callbacks.c:1854
 msgid "Filter must have conditions."
 msgstr "Filter must have conditions."
 
-#: src/filter-edit-callbacks.c:1781
+#: src/filter-edit-callbacks.c:1923
 msgid "Filter has matched"
 msgstr "Filter has matched"
 
-#: src/filter-edit-callbacks.c:1799
+#: src/filter-edit-callbacks.c:1941
 msgid "You must provide a sound to play"
 msgstr "You must provide a sound to play"
 
-#: src/filter-edit-callbacks.c:1948
+#: src/filter-edit-callbacks.c:2098
 #, c-format
 msgid "(Example: write December 31, 2000, as %s)"
 msgstr "(Example: write December 31, 2000, as %s)"
 
-#: src/filter-edit-dialog.c:88 src/pref-manager.c:361
+#: src/filter-edit-dialog.c:89 src/filter-edit-dialog.c:109
+#: src/pref-manager.c:361
 msgid "Simple"
 msgstr "Simple"
 
-#: src/filter-edit-dialog.c:89
+#: src/filter-edit-dialog.c:90 src/filter-edit-dialog.c:110
 msgid "Regular Expression"
 msgstr "Regular Expression"
 
-#: src/filter-edit-dialog.c:90
+#: src/filter-edit-dialog.c:91 src/filter-edit-dialog.c:111
 msgid "Date interval"
 msgstr "Date interval"
 
-#: src/filter-edit-dialog.c:91
+#: src/filter-edit-dialog.c:92 src/filter-edit-dialog.c:112
 msgid "Flag condition"
 msgstr "Flag condition"
 
-#: src/filter-edit-dialog.c:95
+#: src/filter-edit-dialog.c:96 src/filter-edit-dialog.c:116
 msgid "Copy to folder:"
 msgstr "Copy to folder:"
 
-#: src/filter-edit-dialog.c:96
+#: src/filter-edit-dialog.c:97 src/filter-edit-dialog.c:117
 msgid "Move to folder:"
 msgstr "Move to folder:"
 
-#: src/filter-edit-dialog.c:97
+#: src/filter-edit-dialog.c:98 src/filter-edit-dialog.c:118
 msgid "Print on printer:"
 msgstr "Print on printer:"
 
-#: src/filter-edit-dialog.c:98
+#: src/filter-edit-dialog.c:99 src/filter-edit-dialog.c:119
 msgid "Run program:"
 msgstr "Run program:"
 
-#: src/filter-edit-dialog.c:99
+#: src/filter-edit-dialog.c:100 src/filter-edit-dialog.c:120
 msgid "Send to Trash"
 msgstr "Send to Trash"
 
-#: src/filter-edit-dialog.c:103
+#: src/filter-edit-dialog.c:104 src/filter-edit-dialog.c:124
 msgid "OR"
 msgstr "OR"
 
-#: src/filter-edit-dialog.c:104
+#: src/filter-edit-dialog.c:105 src/filter-edit-dialog.c:125
 msgid "AND"
 msgstr "AND"
 
 #. new button
 #. #define MENU_FILE_NEW_POS 0
-#: src/filter-edit-dialog.c:210 src/mailbox-node.c:942 src/main-window.c:368
+#: src/filter-edit-dialog.c:268 src/mailbox-node.c:942 src/main-window.c:368
 #: src/main-window.c:427
 msgid "_New"
 msgstr "_New"
 
 #. The name entry
-#: src/filter-edit-dialog.c:242
+#: src/filter-edit-dialog.c:300
 msgid "_Filter name:"
 msgstr "_Filter name:"
 
 #. The filter op-code : "OR" or "AND" all the conditions
-#: src/filter-edit-dialog.c:258
+#: src/filter-edit-dialog.c:316
 msgid "Operation between conditions"
 msgstr "Operation between conditions"
 
-#: src/filter-edit-dialog.c:301
+#: src/filter-edit-dialog.c:359
 msgid "_Edit"
 msgstr "_Edit"
 
-#: src/filter-edit-dialog.c:306
+#: src/filter-edit-dialog.c:364
 msgid "Ne_w"
 msgstr "Ne_w"
 
 #. The notification area
-#: src/filter-edit-dialog.c:336
+#: src/filter-edit-dialog.c:394
 msgid "Notification:"
 msgstr "Notification:"
 
 #. Notification buttons
-#: src/filter-edit-dialog.c:346
+#: src/filter-edit-dialog.c:404
 msgid "Play sound:"
 msgstr "Play sound:"
 
-#: src/filter-edit-dialog.c:352
+#: src/filter-edit-dialog.c:410
 msgid "Use Sound..."
 msgstr "Use Sound..."
 
-#: src/filter-edit-dialog.c:365
+#: src/filter-edit-dialog.c:423
 msgid "Popup text:"
 msgstr "Popup text:"
 
 #. The action area
-#: src/filter-edit-dialog.c:386
+#: src/filter-edit-dialog.c:444
 msgid "Action to perform:"
 msgstr "Action to perform:"
 
-#: src/filter-edit-dialog.c:437
+#: src/filter-edit-dialog.c:495
 msgid "Match"
 msgstr "Match"
 
-#: src/filter-edit-dialog.c:440
+#: src/filter-edit-dialog.c:498
 msgid "Action"
 msgstr "Action"
 
-#: src/filter-edit-dialog.c:452
+#: src/filter-edit-dialog.c:510
 msgid "Revert"
 msgstr "Revert"
 
-#: src/filter-edit-dialog.c:481
+#: src/filter-edit-dialog.c:539
 msgid "A filter run dialog is open.Close it before you can modify filters."
 msgstr "A filter run dialogue is open.Close it before you can modify filters."
 
-#: src/filter-edit-dialog.c:494
+#: src/filter-edit-dialog.c:552
 msgid "Balsa Filters"
 msgstr "Balsa Filters"
 
-#: src/filter-edit-dialog.c:560
+#: src/filter-edit-dialog.c:618
 #, c-format
 msgid "Filter \"%s\" has no condition."
 msgstr "Filter \"%s\" has no condition."
@@ -2613,16 +2619,16 @@ msgstr ""
 msgid "Balsa Filters Export"
 msgstr "Balsa Filters Export"
 
-#: src/filter-run-callbacks.c:173
+#: src/filter-run-callbacks.c:174
 msgid "Error when applying filters"
 msgstr "Error when applying filters"
 
-#: src/filter-run-callbacks.c:191
+#: src/filter-run-callbacks.c:192
 #, c-format
 msgid "Error displaying run filters help: %s\n"
 msgstr "Error displaying run filters help: %s\n"
 
-#: src/filter-run-callbacks.c:238
+#: src/filter-run-callbacks.c:239
 #, c-format
 msgid ""
 "The destination mailbox of the filter \"%s\" is \"%s\".\n"
@@ -2631,7 +2637,7 @@ msgstr ""
 "The destination mailbox of the filter \"%s\" is \"%s\".\n"
 "You can't associate it with the same mailbox (that causes recursion)."
 
-#: src/filter-run-callbacks.c:246
+#: src/filter-run-callbacks.c:247
 #, c-format
 msgid ""
 "The filter \"%s\" is not compatible with the mailbox type of \"%s\".\n"
@@ -2679,7 +2685,7 @@ msgid "Remote IMAP folder"
 msgstr "Remote IMAP folder"
 
 #. must NOT be modal
-#: src/folder-conf.c:272 src/folder-conf.c:704 src/mailbox-conf.c:575
+#: src/folder-conf.c:272 src/folder-conf.c:704 src/mailbox-conf.c:633
 msgid "_Update"
 msgstr "_Update"
 
@@ -2687,7 +2693,7 @@ msgstr "_Update"
 msgid "_Create"
 msgstr "_Create"
 
-#: src/folder-conf.c:294 src/mailbox-conf.c:1073 src/mailbox-conf.c:1164
+#: src/folder-conf.c:294 src/mailbox-conf.c:1131 src/mailbox-conf.c:1222
 msgid "_Basic"
 msgstr "_Basic"
 
@@ -2695,15 +2701,15 @@ msgstr "_Basic"
 msgid "_Max number of connections"
 msgstr "_Maximum number of connections"
 
-#: src/folder-conf.c:306 src/mailbox-conf.c:1234
+#: src/folder-conf.c:306 src/mailbox-conf.c:1292
 msgid "Enable _persistent cache"
 msgstr "Enable _persistent cache"
 
-#: src/folder-conf.c:314 src/mailbox-conf.c:1238
+#: src/folder-conf.c:314 src/mailbox-conf.c:1296
 msgid "Enable _bug workarounds"
 msgstr "Enable _bug workarounds"
 
-#: src/folder-conf.c:320 src/mailbox-conf.c:1127 src/mailbox-conf.c:1240
+#: src/folder-conf.c:320 src/mailbox-conf.c:1185 src/mailbox-conf.c:1298
 msgid "_Advanced"
 msgstr "_Advanced"
 
@@ -2714,12 +2720,12 @@ msgstr "Descriptive _Name:"
 
 #. pop server
 #. imap server
-#: src/folder-conf.c:330 src/mailbox-conf.c:1081 src/mailbox-conf.c:1173
+#: src/folder-conf.c:330 src/mailbox-conf.c:1139 src/mailbox-conf.c:1231
 msgid "_Server:"
 msgstr "_Server:"
 
 #. username
-#: src/folder-conf.c:338 src/mailbox-conf.c:1089
+#: src/folder-conf.c:338 src/mailbox-conf.c:1147
 msgid "Use_r name:"
 msgstr "Use_r name:"
 
@@ -2843,32 +2849,32 @@ msgstr "ERROR: "
 msgid "FATAL: "
 msgstr "FATAL: "
 
-#: src/mailbox-conf.c:178 src/mailbox-conf.c:1327 src/pref-manager.c:341
+#: src/mailbox-conf.c:213 src/mailbox-conf.c:1385 src/pref-manager.c:341
 #: src/pref-manager.c:3021 src/pref-manager.c:3111
 msgid "Never"
 msgstr "Never"
 
-#: src/mailbox-conf.c:179 src/mailbox-conf.c:1328 src/pref-manager.c:3112
+#: src/mailbox-conf.c:214 src/mailbox-conf.c:1386 src/pref-manager.c:3112
 msgid "If Possible"
 msgstr "If Possible"
 
-#: src/mailbox-conf.c:180 src/pref-manager.c:3113
+#: src/mailbox-conf.c:215 src/pref-manager.c:3113
 msgid "Required"
 msgstr "Required"
 
-#: src/mailbox-conf.c:188
+#: src/mailbox-conf.c:223
 msgid "Use _SSL"
 msgstr "Use _SSL"
 
-#: src/mailbox-conf.c:192
+#: src/mailbox-conf.c:227
 msgid "Use _TLS"
 msgstr "Use _TLS"
 
-#: src/mailbox-conf.c:329
+#: src/mailbox-conf.c:387
 msgid "No mailbox selected."
 msgstr "No mailbox selected."
 
-#: src/mailbox-conf.c:356
+#: src/mailbox-conf.c:414
 #, c-format
 msgid ""
 "Mailbox \"%s\" is used by Balsa and I cannot remove it.\n"
@@ -2879,7 +2885,7 @@ msgstr ""
 "If you really want to remove it, assign its function\n"
 "to some other mailbox."
 
-#: src/mailbox-conf.c:366
+#: src/mailbox-conf.c:424
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.  You may "
@@ -2894,15 +2900,15 @@ msgstr ""
 "mailbox again.\n"
 "What would you like to do?"
 
-#: src/mailbox-conf.c:378
+#: src/mailbox-conf.c:436
 msgid "Remove from _list"
 msgstr "Remove from _list"
 
-#: src/mailbox-conf.c:379
+#: src/mailbox-conf.c:437
 msgid "Remove from list and _disk"
 msgstr "Remove from list and _disk"
 
-#: src/mailbox-conf.c:387
+#: src/mailbox-conf.c:445
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" and all its messages from your IMAP "
@@ -2917,11 +2923,11 @@ msgstr ""
 "You may use \"New IMAP subfolder\" later to add a mailbox with this name.\n"
 "What would you like to do?"
 
-#: src/mailbox-conf.c:400
+#: src/mailbox-conf.c:458
 msgid "_Remove from server"
 msgstr "_Remove from server"
 
-#: src/mailbox-conf.c:407
+#: src/mailbox-conf.c:465
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.\n"
@@ -2932,24 +2938,24 @@ msgstr ""
 "You may use \"Add Mailbox\" later to access this mailbox again.\n"
 "What would you like to do?"
 
-#: src/mailbox-conf.c:416
+#: src/mailbox-conf.c:474
 msgid "_Remove from list"
 msgstr "_Remove from list"
 
-#: src/mailbox-conf.c:504 src/sendmsg-window.c:1040
+#: src/mailbox-conf.c:562 src/sendmsg-window.c:1040
 msgid "Select Identity"
 msgstr "Select Identity"
 
-#: src/mailbox-conf.c:531
+#: src/mailbox-conf.c:589
 msgid "Mailbox Configurator"
 msgstr "Mailbox Configurator"
 
-#: src/mailbox-conf.c:726
+#: src/mailbox-conf.c:784
 #, c-format
 msgid "%s on %s"
 msgstr "%s on %s"
 
-#: src/mailbox-conf.c:864
+#: src/mailbox-conf.c:922
 #, c-format
 msgid ""
 "Rename of %s to %s failed:\n"
@@ -2959,86 +2965,86 @@ msgstr ""
 "%s"
 
 #. mailbox name
-#: src/mailbox-conf.c:1029 src/mailbox-conf.c:1076 src/mailbox-conf.c:1167
+#: src/mailbox-conf.c:1087 src/mailbox-conf.c:1134 src/mailbox-conf.c:1225
 msgid "Mailbox _Name:"
 msgstr "Mailbox _Name:"
 
 #. path to file
-#: src/mailbox-conf.c:1037
+#: src/mailbox-conf.c:1095
 msgid "Mailbox _Path:"
 msgstr "Mailbox _Path:"
 
-#: src/mailbox-conf.c:1039
+#: src/mailbox-conf.c:1097
 msgid "Mailbox Path"
 msgstr "Mailbox Path"
 
 #. password field
-#: src/mailbox-conf.c:1095 src/mailbox-conf.c:1195
+#: src/mailbox-conf.c:1153 src/mailbox-conf.c:1253
 msgid "Pass_word:"
 msgstr "Pass_word:"
 
-#: src/mailbox-conf.c:1103
+#: src/mailbox-conf.c:1161
 msgid "_Delete messages from server after download"
 msgstr "_Delete messages from server after download"
 
-#: src/mailbox-conf.c:1108
+#: src/mailbox-conf.c:1166
 msgid "_Filter messages through procmail"
 msgstr "_Filter messages through procmail"
 
-#: src/mailbox-conf.c:1112
+#: src/mailbox-conf.c:1170
 msgid "Fi_lter Command:"
 msgstr "Fi_lter Command:"
 
-#: src/mailbox-conf.c:1120
+#: src/mailbox-conf.c:1178
 msgid "_Enable check for new mail"
 msgstr "_Enable check for new mail"
 
-#: src/mailbox-conf.c:1131
+#: src/mailbox-conf.c:1189
 msgid "Disable _APOP"
 msgstr "Disable _APOP"
 
 #. username
-#: src/mailbox-conf.c:1181
+#: src/mailbox-conf.c:1239
 msgid "_Username:"
 msgstr "_Username:"
 
-#: src/mailbox-conf.c:1189
+#: src/mailbox-conf.c:1247
 msgid "_Remember Password"
 msgstr "_Remember Password"
 
-#: src/mailbox-conf.c:1200
+#: src/mailbox-conf.c:1258
 msgid "F_older Path:"
 msgstr "F_older Path:"
 
-#: src/mailbox-conf.c:1288
+#: src/mailbox-conf.c:1346
 msgid "Identity:"
 msgstr "Identity:"
 
-#: src/mailbox-conf.c:1294
+#: src/mailbox-conf.c:1352
 msgid "(No identity set)"
 msgstr "(No identity set)"
 
-#: src/mailbox-conf.c:1298
+#: src/mailbox-conf.c:1356
 msgid "C_hange..."
 msgstr "C_hange..."
 
-#: src/mailbox-conf.c:1305
+#: src/mailbox-conf.c:1363
 msgid "Show address:"
 msgstr "Show address:"
 
-#: src/mailbox-conf.c:1308
+#: src/mailbox-conf.c:1366
 msgid "_From"
 msgstr "_From"
 
-#: src/mailbox-conf.c:1314
+#: src/mailbox-conf.c:1372
 msgid "_To"
 msgstr "_To"
 
-#: src/mailbox-conf.c:1329 src/pref-manager.c:3023
+#: src/mailbox-conf.c:1387 src/pref-manager.c:3023
 msgid "Always"
 msgstr "Always"
 
-#: src/mailbox-conf.c:1333
+#: src/mailbox-conf.c:1393
 msgid ""
 "decrypt and check\n"
 "signatures automatically"

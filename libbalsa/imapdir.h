@@ -1,0 +1,39 @@
+/* Balsa E-Mail Client
+ * Copyright (C) 2000 balsa development team.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option) 
+ * any later version.
+ *  
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * GNU General Public License for more details.
+ *  
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
+ * 02111-1307, USA.
+ */
+
+#ifndef __IMAPDIR_H__
+#define __IMAPDIR_H__
+
+
+struct _ImapDir
+{
+    gchar *name;
+    gchar *path;
+    gchar *user;
+    gchar *passwd;
+    gchar *host;
+    gint port;
+    GNode* file_tree; /* GNode strucuture representing the IMAP directory */
+};
+
+ImapDir *imapdir_new(void);
+void imapdir_destroy(ImapDir *imap_dir);
+void imapdir_scan(ImapDir * id);
+
+#endif /* __IMAPDIR_H__ */

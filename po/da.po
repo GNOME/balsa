@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.5\n"
 "POT-Creation-Date: 2000-05-07 04:58+0200\n"
-"PO-Revision-Date: 2000-05-07 16:30+02:00\n"
+"PO-Revision-Date: 2000-05-07 19:30+02:00\n"
 "Last-Translator: Keld Simonsen <keld@dkuug.dk>\n"
 "Language-Team: Danish <dansk@klid.dk>\n"
 "MIME-Version: 1.0\n"
@@ -1361,11 +1361,11 @@ msgstr "Ombryd linier i brevet"
 
 #: src/sendmsg-window.c:176
 msgid "_Reflow paragraph"
-msgstr "_Genombryd afsnit"
+msgstr "_Gen-ombryd afsnit"
 
 #: src/sendmsg-window.c:179
 msgid "R_eflow message"
-msgstr "G_enomflyd brev"
+msgstr "G_en-ombryd brev"
 
 #: src/sendmsg-window.c:188
 msgid "Fr_om"
@@ -1413,7 +1413,7 @@ msgstr "_Vesteuropa (ISO-8859-1)"
 
 #: src/sendmsg-window.c:219
 msgid "W_estern (ISO-8859-15)"
-msgstr "V_esteuropa (m. euro) (ISO-8859-15)"
+msgstr "Vesteuropa (m. _Euro) (ISO-8859-15)"
 
 #: src/sendmsg-window.c:221
 msgid "_Central European (ISO-8859-2)"

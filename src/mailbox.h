@@ -24,13 +24,17 @@
 
 typedef enum
   {
-    MAILBOX_MBOX,
-    MAILBOX_MBX,
-    MAILBOX_MH,
+    MAILBOX_MBX,		/* fastest preformance */
+    MAILBOX_MTX,		/* good  (pine default mailbox format) */
+    MAILBOX_TENEX,		/* good */
+    MAILBOX_MBOX,		/* fair */
+    MAILBOX_MMDF,		/* fair */
+    MAILBOX_UNIX,		/* fair */
+    MAILBOX_MH,			/* very poor */
     MAILBOX_POP3,
     MAILBOX_IMAP,
     MAILBOX_NNTP
-  } 
+  }
 MailboxType;
 
 
@@ -40,6 +44,36 @@ struct _Mailbox
     MailboxType type;
     gchar *name;
     MAILSTREAM *stream;
+  };
+
+typedef struct _MailboxMBX MailboxMBX;
+struct _MailboxMBX
+  {
+    MailboxType type;
+    gchar *name;
+    MAILSTREAM *stream;
+
+    gchar *path;
+  };
+
+typedef struct _MailboxMTX MailboxMTX;
+struct _MailboxMTX
+  {
+    MailboxType type;
+    gchar *name;
+    MAILSTREAM *stream;
+
+    gchar *path;
+  };
+
+typedef struct _MailboxTENEX MailboxTENEX;
+struct _MailboxTENEX
+  {
+    MailboxType type;
+    gchar *name;
+    MAILSTREAM *stream;
+
+    gchar *path;
   };
 
 typedef struct _MailboxMBox MailboxMBox;
@@ -52,8 +86,18 @@ struct _MailboxMBox
     gchar *path;
   };
 
-typedef struct _MailboxMBX MailboxMBX;
-struct _MailboxMBX
+typedef struct _MailboxMMDF MailboxMMDF;
+struct _MailboxMMDF
+  {
+    MailboxType type;
+    gchar *name;
+    MAILSTREAM *stream;
+
+    gchar *path;
+  };
+
+typedef struct _MailboxUNIX MailboxUNIX;
+struct _MailboxUNIX
   {
     MailboxType type;
     gchar *name;
@@ -115,8 +159,12 @@ union _MailboxUnion
   {
     MailboxType type;
     Mailbox mailbox;
-    MailboxMBox mbox;
     MailboxMBX mbx;
+    MailboxMTX mtx;
+    MailboxTENEX tenex;
+    MailboxMBox mbox;
+    MailboxMMDF mmdf;
+    MailboxUNIX unix;
     MailboxMH mh;
     MailboxPOP3 pop3;
     MailboxIMAP imap;
@@ -124,9 +172,9 @@ union _MailboxUnion
   };
 
 
-gchar * mailbox_type_description (MailboxType type);
+gchar *mailbox_type_description (MailboxType type);
 
-Mailbox * mailbox_new (MailboxType type);
+Mailbox *mailbox_new (MailboxType type);
 void mailbox_free (Mailbox * mailbox);
 
 int mailbox_open (Mailbox * mailbox);

@@ -143,7 +143,6 @@ my_special_mailbox ()
 */
 }
 
-
 static gchar *
 get_string_set_default (const char *path, 
 			const char *value)

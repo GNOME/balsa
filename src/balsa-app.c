@@ -89,6 +89,15 @@ init_balsa_app (int argc, char *argv[])
       return;
     }
 
+  /* Load all the global settings.  If there's an error, then some crucial
+     piece of the global settings was not available, and we need to run
+     balsa-init. */
+  if (restore_global_settings() == FALSE)
+    {
+      initialize_balsa (argc, argv);
+      return;
+    }
+
   /* initalize our mailbox access crap */
   do_load_mailboxes ();
 
@@ -105,8 +114,6 @@ void
 do_load_mailboxes ()
 {
   read_signature ();
-
-  restore_global_settings ();
 
   switch (balsa_app.inbox->type)
     {
@@ -178,15 +185,22 @@ mailboxes_init (void)
   proplist_t accts, elem;
 
   accts = PLGetDictionaryEntry (balsa_app.proplist, PLMakeString ("accounts"));
-
-  num = PLGetNumberOfElements (accts);
+  if (accts == NULL)
+    num = 0;
+  else
+    num = PLGetNumberOfElements (accts);
 
   for (i = 0; i < num; i++)
     {
       elem = PLGetArrayElement (accts, i);
+      if (load_mailboxes (PLGetString (elem)) == FALSE)
+	{
+	  fprintf(stderr, "*** An error occurred while loading the "
+		  "mailbox: %s\n", PLGetString(elem));
+	  return 0;
+	}
       if (balsa_app.debug)
 	fprintf (stderr, "Loaded mailbox: %s\n", PLGetString (elem));
-      load_mailboxes (PLGetString (elem));
     }
 
   return 1;

@@ -181,26 +181,60 @@ update_mailbox_config (Mailbox * mailbox, gchar * old_mbox_name)
 gint
 load_mailboxes (gchar * name)
 {
-  proplist_t dict, accts, mb;
+  proplist_t dict, accts, mb, temp_str, temp_elem;
   int num_elements, i;
 
+  GString *gstring = g_string_new (NULL);
   MailboxType mailbox_type;
   Mailbox *mailbox;
-  gint type;
-  GString *gstring = g_string_new (NULL);
   gchar *path;
   GNode *node;
+  gint type;
 
-  accts = PLGetDictionaryEntry (balsa_app.proplist, PLMakeString ("accounts"));
-  mb = PLGetDictionaryEntry (accts, PLMakeString (name));
+  temp_str = PLMakeString("accounts");
+  accts = PLGetDictionaryEntry (balsa_app.proplist, temp_str);
+  PLRelease (temp_str);
 
-  num_elements = PLGetNumberOfElements (mb);
+  if (accts == NULL)
+    return FALSE;
+  
+  temp_str = PLMakeString(name);
+  mb = PLGetDictionaryEntry (accts, temp_str);
+  PLRelease (temp_str);
+
+  if (mb == NULL)
+    num_elements = 0;
+  else
+    num_elements = PLGetNumberOfElements (mb);
 
   for (i = 0; i < num_elements; i++)
     {
-      type = atoi (PLGetString (PLGetDictionaryEntry (mb, PLMakeString ("Type"))));
+      /*
+       * Grab the mailbox type
+       */
+      temp_str = PLMakeString("Type");
+      temp_elem = PLGetDictionaryEntry (mb, temp_str);
+      PLRelease(temp_str);
+      if (temp_elem == NULL)
+	{
+	  /* Default to 0 if, for some strange reason, it isn't set. */
+	  type = 0;
+	}
+      else
+	type = atoi (PLGetString (temp_elem));
 
-      path = g_strdup (PLGetString (PLGetDictionaryEntry (mb, PLMakeString ("Name"))));
+      /*
+       * Grab the mailbox name
+       */
+      temp_str = PLMakeString("Name");
+      temp_elem = PLGetDictionaryEntry (mb, temp_str);
+      PLRelease(temp_str);
+
+      /* If it isn't set, return an error */
+      if (temp_elem == NULL)
+	return FALSE;
+      else
+	path = g_strdup (PLGetString(temp_elem));
 
       switch (type)
 	{
@@ -213,6 +247,7 @@ load_mailboxes (gchar * name)
 	      mailbox = mailbox_new (mailbox_type);
 	      mailbox->name = g_strdup (name);
 	      MAILBOX_LOCAL (mailbox)->path = g_strdup (path);
+	      g_free(path);
 
 	      if (strcmp ("Inbox", name) == 0)
 		{
@@ -241,21 +276,105 @@ load_mailboxes (gchar * name)
 	case 1:
 	  mailbox = mailbox_new (MAILBOX_POP3);
 	  mailbox->name = g_strdup (name);
-	  MAILBOX_POP3 (mailbox)->user = PLGetString (PLGetDictionaryEntry (mb, PLMakeString ("Username")));
-	  MAILBOX_POP3 (mailbox)->passwd = PLGetString (PLGetDictionaryEntry (mb, PLMakeString ("Password")));
-	  MAILBOX_POP3 (mailbox)->server = PLGetString (PLGetDictionaryEntry (mb, PLMakeString ("Server")));
-	  balsa_app.inbox_input = g_list_append (balsa_app.inbox_input, mailbox);
+
+	  /* Grab the Username */
+	  temp_str = PLMakeString("Username");
+	  temp_elem = PLGetDictionaryEntry(mb, temp_str);
+	  PLRelease(temp_str);
+	  if (temp_elem == NULL)
+	    {
+	      fprintf(stderr, "*** Username isn't set in POP3 mailbox!\n");
+	      return FALSE;
+	    }
+	  MAILBOX_POP3 (mailbox)->user = PLGetString (temp_elem);
+
+	  /* Grab the Password */
+	  temp_str = PLMakeString("Password");
+	  temp_elem = PLGetDictionaryEntry (mb, temp_str);
+	  PLRelease(temp_str);
+	  if (temp_elem == NULL)
+	    {
+	      fprintf(stderr, "*** Password isn't set in POP3 mailbox!\n");
+	      return FALSE;
+	    }
+	  MAILBOX_POP3 (mailbox)->passwd = PLGetString (temp_elem);
+
+	  /* Grab the Server */
+	  temp_str = PLMakeString("Server");
+	  temp_elem = PLGetDictionaryEntry (mb, temp_str);
+	  PLRelease(temp_str);
+	  if (temp_elem == NULL)
+	    {
+	      fprintf(stderr, "*** Server isn't set in POP3 mailbox!\n");
+	      return FALSE;
+	    }
+	  MAILBOX_POP3 (mailbox)->server = PLGetString (temp_elem);
+
+
+	  balsa_app.inbox_input =
+	    g_list_append (balsa_app.inbox_input, mailbox);
 	  break;
 
 	  /*  IMAP  */
 	case 2:
 	  mailbox = mailbox_new (MAILBOX_IMAP);
 	  mailbox->name = g_strdup (name);
-	  MAILBOX_IMAP (mailbox)->user = PLGetString (PLGetDictionaryEntry (mb, PLMakeString ("Username")));
-	  MAILBOX_IMAP (mailbox)->passwd = PLGetString (PLGetDictionaryEntry (mb, PLMakeString ("Password")));
-	  MAILBOX_IMAP (mailbox)->server = PLGetString (PLGetDictionaryEntry (mb, PLMakeString ("Server")));
-	  MAILBOX_IMAP (mailbox)->port = atoi (PLGetString (PLGetDictionaryEntry (mb, PLMakeString ("Port"))));
-	  MAILBOX_IMAP (mailbox)->path = PLGetString (PLGetDictionaryEntry (mb, PLMakeString ("Path")));
+
+	  /* Grab the Username */
+	  temp_str = PLMakeString("Username");
+	  temp_elem = PLGetDictionaryEntry(mb, temp_str);
+	  PLRelease(temp_str);
+	  if (temp_elem == NULL)
+	    {
+	      fprintf(stderr, "*** Username isn't set in IMAP mailbox!\n");
+	      return FALSE;
+	    }
+	  MAILBOX_IMAP (mailbox)->user = PLGetString (temp_elem);
+
+	  /* Grab the password */
+	  temp_str = PLMakeString("Password");
+	  temp_elem = PLGetDictionaryEntry(mb, temp_str);
+	  PLRelease(temp_str);
+	  if (temp_elem == NULL)
+	    {
+	      fprintf(stderr, "*** Password isn't set in IMAP mailbox!\n");
+	      return FALSE;
+	    }
+	  MAILBOX_IMAP (mailbox)->passwd = PLGetString (temp_elem);
+
+	  /* Grab the Server */
+	  temp_str = PLMakeString("Server");
+	  temp_elem = PLGetDictionaryEntry (mb, temp_str);
+	  PLRelease(temp_str);
+	  if (temp_elem == NULL)
+	    {
+	      fprintf(stderr, "*** Server isn't set in IMAP mailbox!\n");
+	      return FALSE;
+	    }
+	  MAILBOX_IMAP (mailbox)->server = PLGetString (temp_elem);
+
+	  /* Grab the port */
+	  temp_str = PLMakeString("Port");
+	  temp_elem = PLGetDictionaryEntry (mb, temp_str);
+	  PLRelease(temp_str);
+	  if (temp_elem == NULL)
+	    {
+	      fprintf(stderr, "*** Port isn't set in IMAP mailbox!\n");
+	      return FALSE;
+	    }
+	  MAILBOX_IMAP (mailbox)->port = atoi (PLGetString (temp_elem));
+
+	  /* Grab the path */
+	  temp_str = PLMakeString("Path");
+	  temp_elem = PLGetDictionaryEntry (mb, temp_str);
+	  PLRelease(temp_str);
+	  if (temp_elem == NULL)
+	    {
+	      fprintf(stderr, "*** Path isn't set in IMAP mailbox!\n");
+	      return FALSE;
+	    }
+	  MAILBOX_IMAP (mailbox)->path = g_strdup (PLGetString (temp_elem));
+
 	  node = g_node_new (mailbox_node_new (mailbox->name, mailbox, FALSE));
 	  g_node_append (balsa_app.mailbox_nodes, node);
 	  break;
@@ -270,32 +389,92 @@ load_mailboxes (gchar * name)
 /*
  * global settings
  */
-void
-restore_global_settings ()
+gint
+restore_global_settings (void)
 {
   GString *path;
   gchar tmp[PATH_MAX];
-  proplist_t dict;
-  dict = PLGetDictionaryEntry (balsa_app.proplist, PLMakeString ("global"));
+  proplist_t dict, temp_str, temp_elem;
+
+  temp_str = PLMakeString("global");
+  dict = PLGetDictionaryEntry (balsa_app.proplist, temp_str);
+  PLRelease(temp_str);
+  if (dict == NULL)
+    {
+      fprintf(stderr, "Global settings not present in config file!\n");
+      return FALSE;
+    }
 
   /* user's real name */
-  balsa_app.real_name = g_strdup (PLGetString (PLGetDictionaryEntry (dict, PLMakeString ("RealName"))));
+  temp_str = PLMakeString("RealName");
+  temp_elem = PLGetDictionaryEntry (dict, temp_str);
+  PLRelease (temp_str);
+  if (temp_elem == NULL)
+    {
+      fprintf(stderr, "RealName not present in config file!\n");
+      return FALSE;
+    }
+  balsa_app.real_name = g_strdup (PLGetString (temp_elem));
 
   /* user name */
-  balsa_app.username = g_strdup (PLGetString (PLGetDictionaryEntry (dict, PLMakeString ("UserName"))));
+  temp_str = PLMakeString("UserName");
+  temp_elem = PLGetDictionaryEntry(dict, temp_str);
+  PLRelease (temp_str);
+  if (temp_elem == NULL)
+    {
+      fprintf(stderr, "UserName not present in config file!\n");
+      return FALSE;
+    }
+  balsa_app.username = g_strdup (PLGetString (temp_elem));
 
   /* hostname */
-  balsa_app.hostname = g_strdup (PLGetString (PLGetDictionaryEntry (dict, PLMakeString ("HostName"))));
+  temp_str = PLMakeString("HostName");
+  temp_elem = PLGetDictionaryEntry(dict, temp_str);
+  PLRelease (temp_str);
+  if (temp_elem == NULL)
+    {
+      fprintf(stderr, "HostName not present in config file!\n");
+      return FALSE;
+    }
+  balsa_app.hostname = g_strdup (PLGetString (temp_elem));
 
   /* directory */
-  balsa_app.local_mail_directory = g_strdup (PLGetString (PLGetDictionaryEntry (dict, PLMakeString ("LocalMailDir"))));
+  temp_str = PLMakeString("LocalMailDir");
+  temp_elem = PLGetDictionaryEntry(dict, temp_str);
+  PLRelease (temp_str);
+  if (temp_elem == NULL)
+    {
+      fprintf(stderr, "LocalMailDir not present in config file!\n");
+      return FALSE;
+    }
+  balsa_app.local_mail_directory = g_strdup (PLGetString (temp_elem));
 
-  load_mailboxes ("Inbox");
-  load_mailboxes ("Outbox");
-  load_mailboxes ("Trash");
+  if (load_mailboxes ("Inbox") == FALSE)
+    {
+      fprintf(stderr, "*** Could not load Inbox\n");
+      return FALSE;
+    }
+  if (load_mailboxes ("Outbox") == FALSE)
+    {
+      fprintf(stderr, "*** Could not load Outbox\n");
+      return FALSE;
+    }
+  if (load_mailboxes ("Trash") == FALSE)
+    {
+      fprintf(stderr, "*** Could not load trash\n");
+      return FALSE;
+    }
 
   /* smtp server */
-  balsa_app.smtp_server = g_strdup (PLGetString (PLGetDictionaryEntry (dict, PLMakeString ("SMTPServer"))));
+  temp_str = PLMakeString("SMTPServer");
+  temp_elem = PLGetDictionaryEntry(dict, temp_str);
+  PLRelease (temp_str);
+  if (temp_elem == NULL)
+    {
+      fprintf(stderr, "SMTPServer not present in config file!\n");
+      return FALSE;
+    }
+  balsa_app.smtp_server = g_strdup (PLGetString (temp_elem));
 
 #if 0
   /* toolbar style */
@@ -313,7 +492,7 @@ restore_global_settings ()
 
 
 void
-save_global_settings ()
+save_global_settings (void)
 {
 #if 0
   gnome_config_push_prefix ("/balsa/Global/");

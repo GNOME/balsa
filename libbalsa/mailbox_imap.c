@@ -582,11 +582,12 @@ clean_cache(LibBalsaMailbox* mailbox)
     present_uids = g_hash_table_new(g_direct_hash, g_direct_equal);
     remove_list  = NULL;
 
+#ifdef UID_CACHE_PRESENT
     for(lst = mailbox->message_list; lst; lst = lst->next) {
         ImapUID u = IMAP_MESSAGE_UID(LIBBALSA_MESSAGE(lst->data));
         g_hash_table_insert(present_uids, UID_TO_POINTER(u), &present_uids);
     }
-                            
+#endif
     while ( (key=readdir(dir)) != NULL) {
         if(sscanf(key->d_name,"%u-%u", &uid[0], &uid[1])!=2)
             continue;
@@ -763,7 +764,10 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
 
     RELEASE_HANDLE(mimap, handle);
     UNLOCK_MAILBOX(mailbox);
+#if 0
+    we read messages on request, not earlier
     libbalsa_mailbox_load_messages(mailbox);
+#endif
     run_filters_on_reception(mimap);
 
 #ifdef DEBUG
@@ -916,13 +920,16 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
     cbdata->res  = g_hash_table_new(NULL, NULL);
     query = libbalsa_filter_build_imap_query(op, conditions, only_recent);
     if (query) {
+#ifdef UID_SEARCH_IMPLEMENTED
 	for(msgs= LIBBALSA_MAILBOX(mbox)->message_list; msgs;
 	    msgs = msgs->next){
 	    LibBalsaMessage *m = LIBBALSA_MESSAGE(msgs->data);
 	    ImapUID uid = IMAP_MESSAGE_UID(m);
 	    g_hash_table_insert(cbdata->uids, GUINT_TO_POINTER(uid), m);
 	}
-	
+#else	
+        g_warning("Search results ignored. Fixme!");
+#endif
 	handle = libbalsa_mailbox_imap_get_handle(mbox);
 	if (handle) {
 	    rc = imap_mbox_uid_search(handle, query, 
@@ -1072,11 +1079,12 @@ void libbalsa_mailbox_imap_mbox_match(LibBalsaMailbox * mbox,
 					  filters_list,
 					  FALSE)) {
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("IMAP SEARCH command failed for mailbox %s\n"
-			       "or query was incompatible with IMAP (perhaps you use regular expressions)\n"
-			       "falling back to default searching method"),
+			     _("IMAP SEARCH command failed for mailbox %s\n"),
 			     LIBBALSA_MAILBOX(mbox)->url);	
+#if 0 
+        /* could fall back to standard algorithms but will not */
 	libbalsa_mailbox_real_mbox_match(mbox, filters_list);
+#endif
     }
 }
 
@@ -1200,7 +1208,9 @@ libbalsa_mailbox_imap_noop(LibBalsaMailboxImap* mimap)
 	}
 
 	UNLOCK_MAILBOX(mailbox);
+#if 0
 	libbalsa_mailbox_load_messages(mailbox);
+#endif
     } else {
 	/* update flags here */
 	UNLOCK_MAILBOX(mailbox);
@@ -1494,7 +1504,8 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
     return TRUE;
 }
 
-LibBalsaMessage *libbalsa_mailbox_imap_load_message(LibBalsaMailbox * mailbox, guint msgno)
+static LibBalsaMessage*
+libbalsa_mailbox_imap_load_message(LibBalsaMailbox * mailbox, guint msgno)
 {
     LibBalsaMessage *message;
     struct message_info *msg_info;

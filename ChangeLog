@@ -1,5 +1,19 @@
 2003-09-25  Pawel Salek  <pawsa theochem.kth.se>
 
+	* libbalsa/mailbox.[hc]: implement GtkTreeModel interface
+	* libbalsa/mailbox_imap.c: adapt.
+	* libbalsa/mailbox_local.[hc]: methods and fields specific for
+	local mailboxes moved here. Rename functions apriopriately.
+	* libbalsa/mailbox_{maildir,mbox,mh,pop3}.c: adapt to rename.
+	* libbalsa/send.c: outbox can be only local
+
+	* src/balsa-index-threading.c: disable obsolete calls.
+	* src/balsa-index.c: use GtkTreeModel interface of LibBalsaMailbox.
+	* src/main-window.c: trash can be only local for now.
+	* src/sendmsg-window.c: disabled "sunny day" code.
+
+2003-09-25  Pawel Salek  <pawsa theochem.kth.se>
+
 	* libbalsa/Makefile.am: remove -DLIBMUTT
 	* libbalsa/gmime-gpgme-context.c: respect HAVE_GPGME
 

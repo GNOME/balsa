@@ -350,7 +350,11 @@ check_parent(struct ThreadingInfo *ti, LibBalsaMessage * parent,
         || (parent_path && (!gtk_tree_path_up(test)
                             || gtk_tree_path_get_depth(test) <= 0
                             || gtk_tree_path_compare(test, parent_path))))
+#if 1
+        g_warning("move subtree has to be done differently in %s", __func__);
+#else
         balsa_index_move_subtree(ti->index, child_path, parent_path);
+#endif
 
     gtk_tree_path_free(test);
     gtk_tree_path_free(child_path);

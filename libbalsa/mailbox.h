@@ -146,6 +146,8 @@ struct _LibBalsaMailboxView {
 
 struct _LibBalsaMailbox {
     GObject object;
+    gint stamp; /* used to determine iterators' validity. Increased on each
+                 * modification of mailbox. */
     
     gchar *config_prefix;       /* unique string identifying mailbox */
                                 /* in the config file                */
@@ -162,7 +164,7 @@ struct _LibBalsaMailbox {
     glong messages; /* NOTE: this is used for internal msg counting;
 		     * it is often different from g_list_count(messages) */  
     glong new_messages;
-    GList *message_list;
+    GNode *msg_tree; /* the possibly filtered tree of messages */
 
     /* info fields */
     gboolean has_unread_messages;
@@ -215,8 +217,8 @@ struct _LibBalsaMailboxClass {
     int (*add_message) (LibBalsaMailbox * mailbox, GMimeStream *stream,
 			LibBalsaMessageFlag flags);
     void (*change_message_flags) (LibBalsaMailbox * mailbox, guint msgno,
-					   LibBalsaMessageFlag set,
-					   LibBalsaMessageFlag clear);
+                                  LibBalsaMessageFlag set,
+                                  LibBalsaMessageFlag clear);
     gboolean (*close_backend)(LibBalsaMailbox * mailbox);
 };
 
@@ -232,10 +234,8 @@ gboolean libbalsa_mailbox_open(LibBalsaMailbox * mailbox);
 gboolean libbalsa_mailbox_is_valid(LibBalsaMailbox * mailbox);
 gboolean libbalsa_mailbox_is_open(LibBalsaMailbox *mailbox);
 void libbalsa_mailbox_close(LibBalsaMailbox * mailbox);
-void libbalsa_mailbox_link_message(LibBalsaMailbox * mbx, LibBalsaMessage*msg);
-void libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox);
 
-void libbalsa_mailbox_free_messages(LibBalsaMailbox * mailbox);
+void libbalsa_mailbox_check(LibBalsaMailbox * mailbox);
 void libbalsa_mailbox_remove_messages(LibBalsaMailbox * mbox,
 				      GList * messages);
 void libbalsa_mailbox_set_unread_messages_flag(LibBalsaMailbox * mailbox,
@@ -247,8 +247,6 @@ void libbalsa_mailbox_progress_notify(LibBalsaMailbox * mailbox,
 GMimeStream *libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox,
 					  LibBalsaMessage * message);
 gint libbalsa_mailbox_sync_backend(LibBalsaMailbox * mailbox, gboolean delete);
-
-void libbalsa_mailbox_check(LibBalsaMailbox * mailbox);
 
 /* This function returns TRUE if the mailbox can be matched
    against the given filters (eg : IMAP mailbox can't
@@ -264,13 +262,6 @@ gboolean libbalsa_mailbox_message_match(LibBalsaMailbox * mailbox,
 /* Virtual function (this function is different for IMAP
  */
 void libbalsa_mailbox_match(LibBalsaMailbox * mbox, GSList * filter_list );
-
-/* Default filtering function : this is exported because it is used
-   as a fallback for IMAP mailboxes when SEARCH command can not be
-   used.
-   It is ONLY FOR INTERNAL USE (use libbalsa_mailbox_match instead)
-*/
-void libbalsa_mailbox_real_mbox_match(LibBalsaMailbox * mbox, GSList * filter_list);
 
 /* Default filtering function (on reception) : this is exported
    because it is used as a fallback for IMAP mailboxes when SEARCH
@@ -297,6 +288,7 @@ void libbalsa_mailbox_change_message_flags(LibBalsaMailbox * mailbox, guint msgn
 					   LibBalsaMessageFlag set,
 					   LibBalsaMessageFlag clear);
 
+                               
 /*
  * misc mailbox releated functions
  */
@@ -308,9 +300,28 @@ void libbalsa_mailbox_messages_status_changed(LibBalsaMailbox * mbox,
 					      gint flag);
 
 /*
- * Mailbox views
+ * Mailbox views-related functions.
  */
+/* provide only those messages that have set flags set, and clear flags
+ * cleared. */
+void libbalsa_mailbox_set_view(LibBalsaMailbox *mailbox,
+                               LibBalsaMessageFlag set,
+                               LibBalsaMessageFlag clear);
+
 LibBalsaMailboxView *libbalsa_mailbox_view_new(void);
 void libbalsa_mailbox_view_free(LibBalsaMailboxView * view);
+
+/* columns ids */
+enum {
+    LB_MBOX_MSGNO_COL,
+    LB_MBOX_MARKED_COL,
+    LB_MBOX_ATTACH_COL,
+    LB_MBOX_FROM_COL,
+    LB_MBOX_SUBJECT_COL,
+    LB_MBOX_DATE_COL,
+    LB_MBOX_SIZE_COL,
+    LB_MBOX_MESSAGE_COL,
+    LB_MBOX_N_COLS
+};
 
 #endif				/* __LIBBALSA_MAILBOX_H__ */

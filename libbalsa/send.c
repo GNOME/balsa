@@ -530,7 +530,7 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
     send_lock();
 
     libbalsa_mailbox_open(outbox);
-    if (!outbox->message_list) {
+    if (!outbox->total_messages) {
 	libbalsa_mailbox_close(outbox);
 	send_unlock();
 	return TRUE;
@@ -557,7 +557,8 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
        succeed before transferring a message.  */
     smtp_option_require_all_recipients (session, 1);
 
-    for (lista = outbox->message_list; lista; lista = lista->next) {
+    for (lista = LIBBALSA_MAILBOX_LOCAL(outbox)->msg_list; 
+         lista; lista = lista->next) {
         LibBalsaMsgCreateResult created;
 
 	msg = LIBBALSA_MESSAGE(lista->data);

@@ -456,7 +456,7 @@ libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox)
     parse_mailbox(mailbox, "new");
     mailbox->open_ref++;
     UNLOCK_MAILBOX(mailbox);
-    libbalsa_mailbox_load_messages(mailbox);
+    libbalsa_mailbox_local_load_messages(mailbox);
 
     /* We run the filters here also because new could have been put
        in the mailbox with another mechanism than Balsa */
@@ -524,7 +524,7 @@ static void libbalsa_mailbox_maildir_check(LibBalsaMailbox * mailbox)
 	parse_mailbox(mailbox, "new");
 
 	UNLOCK_MAILBOX(mailbox);
-	libbalsa_mailbox_load_messages(mailbox);
+	libbalsa_mailbox_local_load_messages(mailbox);
 	libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
     }
 }

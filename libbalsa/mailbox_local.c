@@ -51,6 +51,9 @@ static void libbalsa_mailbox_local_save_config(LibBalsaMailbox * mailbox,
 static void libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
 					       const gchar * prefix);
 
+static void libbalsa_mailbox_local_real_mbox_match(LibBalsaMailbox *mbox,
+                                                   GSList * filter_list);
+
 GType
 libbalsa_mailbox_local_get_type(void)
 {
@@ -105,6 +108,8 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
     libbalsa_mailbox_class->load_config =
 	libbalsa_mailbox_local_load_config;
 
+    libbalsa_mailbox_class->mailbox_match = 
+        libbalsa_mailbox_local_real_mbox_match;
     klass->remove_files = NULL;
 }
 
@@ -239,3 +244,199 @@ libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
     libbalsa_notify_register_mailbox(mailbox);
 }
 
+static void
+libbalsa_mailbox_local_real_mbox_match(LibBalsaMailbox *mbox,
+                                       GSList * filter_list)
+{
+    g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mbox));
+    LOCK_MAILBOX(mbox);
+    libbalsa_filter_match(filter_list, 
+                          LIBBALSA_MAILBOX_LOCAL(mbox)->msg_list, TRUE);
+    UNLOCK_MAILBOX(mbox);
+}
+
+/* libbalsa_mailbox_free_messages:
+   removes all the messages from the mailbox.
+   Messages are unref'ed and not directly destroyed because they migt
+   be ref'ed from somewhere else.
+   Mailbox lock MUST BE HELD before calling this function.
+*/
+static void
+libbalsa_mailbox_free_messages(LibBalsaMailboxLocal *mailbox)
+{
+    GList *list;
+    LibBalsaMessage *message;
+    LibBalsaMailbox *mbox = LIBBALSA_MAILBOX(mailbox);
+
+    list = g_list_first(mailbox->msg_list);
+
+    if(list){
+	g_signal_emit_by_name(G_OBJECT(mailbox),
+                              "messages_removed", list);
+    }
+
+    while (list) {
+	message = list->data;
+	list = list->next;
+
+	message->mailbox = NULL;
+	g_object_unref(G_OBJECT(message));
+    }
+
+    g_list_free(mailbox->msg_list);
+    mailbox->msg_list = NULL;
+    mbox->messages = 0;
+    mbox->total_messages = 0;
+    mbox->unread_messages = 0;
+}
+
+
+/* libbalsa_mailbox_sync_backend_real
+ * synchronize the frontend and libbalsa: build a list of messages
+ * marked as deleted, and:
+ * 1. emit the "messages-removed" signal, so the frontend can drop them
+ *    from the BalsaIndex;
+ * 2. if delete == TRUE, delete them from the LibBalsaMailbox.
+ *
+ * NOTE: current backend should be informed as soon as possible about
+ * the changes. The question, whether the changes are to be saved to a
+ * permanent storage is storage-dependent and decision is left for the
+ * backend to make.
+ */
+static void
+libbalsa_mailbox_local_sync_backend_real(LibBalsaMailboxLocal *mailbox,
+                                         gboolean delete)
+{
+    GList *list;
+    GList *message_list;
+    LibBalsaMessage *current_message;
+    GList *p=NULL;
+    GList *q = NULL;
+
+    for (message_list = mailbox->msg_list; message_list;
+         message_list = g_list_next(message_list)) {
+	current_message = LIBBALSA_MESSAGE(message_list->data);
+	if (LIBBALSA_MESSAGE_IS_DELETED(current_message)) {
+	    p=g_list_prepend(p, current_message);
+            if (delete)
+                q = g_list_prepend(q, message_list);
+	}
+    }
+
+    if (p) {
+	UNLOCK_MAILBOX(LIBBALSA_MAILBOX(mailbox));
+	g_signal_emit_by_name(G_OBJECT(mailbox), "messages-removed",p);
+	LOCK_MAILBOX(LIBBALSA_MAILBOX(mailbox));
+	g_list_free(p);
+    }
+
+    if (delete) {
+        for (list = q; list; list = g_list_next(list)) {
+            message_list = list->data;
+            current_message =
+                LIBBALSA_MESSAGE(message_list->data);
+            current_message->mailbox = NULL;
+            g_object_unref(G_OBJECT(current_message));
+	    mailbox->msg_list =
+		g_list_remove_link(mailbox->msg_list, message_list);
+            g_list_free_1(message_list);
+	}
+        g_list_free(q);
+    }
+}
+
+/* libbalsa_mailbox_link_message:
+   MAKE sure the mailbox is LOCKed before entering this routine.
+*/ 
+static void
+libbalsa_mailbox_link_message(LibBalsaMailboxLocal *mailbox,
+                              LibBalsaMessage*msg)
+{
+    LibBalsaMailbox *mbx = LIBBALSA_MAILBOX(mailbox);
+    msg->mailbox = mbx;
+    mailbox->msg_list = g_list_prepend(mailbox->msg_list, msg);
+
+    if (LIBBALSA_MESSAGE_IS_DELETED(msg))
+        return;
+    if (LIBBALSA_MESSAGE_IS_UNREAD(msg))
+        mbx->unread_messages++;
+    mbx->total_messages++;
+}
+
+/*
+ * private 
+ * PS: called by mail_progress_notify_cb:
+ * loads incrementally new messages, if any.
+ *  Mailbox lock MUST NOT BE HELD before calling this function.
+ *  gdk_lock MUST BE HELD before calling this function because it is called
+ *  from both threading and not threading code and we want to be on the safe
+ *  side.
+ * 
+ *    FIXME: create the msg-tree in a correct way
+ */
+void
+libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox)
+{
+    glong msgno;
+    LibBalsaMessage *message;
+    GList *messages=NULL;
+
+    if (MAILBOX_CLOSED(mailbox))
+	return;
+
+    LOCK_MAILBOX(mailbox);
+    for (msgno = mailbox->messages; mailbox->new_messages > 0; msgno++) {
+	message = libbalsa_mailbox_load_message(mailbox, msgno);
+	if (!message)
+		continue;
+	libbalsa_message_headers_update(message);
+	libbalsa_mailbox_link_message(LIBBALSA_MAILBOX_LOCAL(mailbox),
+                                      message);
+	g_node_append_data(mailbox->msg_tree, GINT_TO_POINTER(msgno));
+	messages=g_list_prepend(messages, message);
+    }
+    UNLOCK_MAILBOX(mailbox);
+
+    if(messages!=NULL){
+	messages = g_list_reverse(messages);
+	g_signal_emit_by_name(G_OBJECT(mailbox), "messages-added", messages);
+	g_list_free(messages);
+    }
+
+    libbalsa_mailbox_set_unread_messages_flag(mailbox,
+					      mailbox->unread_messages > 0);
+
+    
+}
+
+/* libbalsa_mailbox_commit:
+   commits the data to storage.
+
+
+   Returns TRUE on success, FALSE on failure.  */
+gboolean
+libbalsa_mailbox_commit(LibBalsaMailbox *mailbox)
+{
+    gboolean rc = TRUE;
+
+    if (MAILBOX_CLOSED(mailbox))
+	return FALSE;
+
+    LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
+    /* remove messages flagged for deleting, before committing: */
+    libbalsa_mailbox_local_sync_backend_real
+        (LIBBALSA_MAILBOX_LOCAL(mailbox), TRUE);
+    rc = libbalsa_mailbox_sync_storage(mailbox);
+
+    if (rc == TRUE) {
+	    UNLOCK_MAILBOX(mailbox);
+	    if (mailbox->new_messages) {
+		    libbalsa_mailbox_local_load_messages(mailbox);
+		    rc = 0;
+	    }
+    } else {
+        UNLOCK_MAILBOX(mailbox);
+    }
+
+    return rc;
+}

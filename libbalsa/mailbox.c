@@ -65,9 +65,6 @@ static void messages_status_changed_cb(LibBalsaMailbox * mb,
 				       GList * messages,
 				       gint changed_flag);
 
-static void libbalsa_mailbox_sync_backend_real(LibBalsaMailbox * mailbox,
-					       gboolean delete);
-
 /* SIGNALS MEANINGS :
    - OPEN_MAILBOX, CLOSE_MAILBOX, SAVE/LOAD_CONFIG, CHECK,
    SET_UNREAD_MESSAGES_FLAG : tell the mailbox to change its properties.
@@ -92,6 +89,9 @@ enum {
 static GObjectClass *parent_class = NULL;
 static guint libbalsa_mailbox_signals[LAST_SIGNAL];
 
+/* GtkTreeModel function prototypes */
+static void  mbox_model_init(GtkTreeModelIface *iface);
+
 GType
 libbalsa_mailbox_get_type(void)
 {
@@ -109,10 +109,18 @@ libbalsa_mailbox_get_type(void)
             0,                  /* n_preallocs */
 	    (GInstanceInitFunc) libbalsa_mailbox_init
 	};
-
+	static const GInterfaceInfo mbox_model_info = {
+	    (GInterfaceInitFunc) mbox_model_init,
+	    NULL,
+	    NULL
+	};
+    
         mailbox_type =
             g_type_register_static(G_TYPE_OBJECT, "LibBalsaMailbox",
                                    &mailbox_info, 0);
+	g_type_add_interface_static(mailbox_type,
+				    GTK_TYPE_TREE_MODEL,
+				    &mbox_model_info);
     }
 
     return mailbox_type;
@@ -203,8 +211,8 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
 
     klass->get_message_stream = NULL;
     klass->check = NULL;
-    klass->message_match = libbalsa_mailbox_real_message_match;
-    klass->mailbox_match = libbalsa_mailbox_real_mbox_match;
+    klass->message_match = NULL;
+    klass->mailbox_match = NULL;
     klass->can_match = libbalsa_mailbox_real_can_match;
     klass->save_config  = libbalsa_mailbox_real_save_config;
     klass->load_config  = libbalsa_mailbox_real_load_config;
@@ -226,13 +234,13 @@ libbalsa_mailbox_init(LibBalsaMailbox * mailbox)
     mailbox->has_unread_messages = FALSE;
     mailbox->unread_messages = 0;
     mailbox->total_messages = 0;
-    mailbox->message_list = NULL;
 
     mailbox->readonly = FALSE;
     mailbox->disconnected = FALSE;
 
     mailbox->filters=NULL;
     mailbox->view=NULL;
+    mailbox->msg_tree = g_node_new(NULL);
 }
 
 /*
@@ -349,10 +357,6 @@ libbalsa_mailbox_is_valid(LibBalsaMailbox * mailbox)
 {
     if(mailbox->open_ref == 0) return TRUE;
     if(MAILBOX_CLOSED(mailbox)) return FALSE;
-#if NOTUSED
-    /* be cautious: implement second line of defence */
-    g_return_val_if_fail(mailbox->message_list != NULL, FALSE);
-#endif
     return TRUE;
 }
 
@@ -389,8 +393,6 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox)
     g_return_if_fail(mailbox != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-    /* remove messages flagged for deleting, before closing: */
-    libbalsa_mailbox_sync_backend(mailbox, TRUE);
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->close_mailbox(mailbox);
 }
 
@@ -465,14 +467,6 @@ libbalsa_mailbox_match(LibBalsaMailbox * mailbox, GSList * filters_list)
 						       filters_list);
 }
 
-void libbalsa_mailbox_real_mbox_match(LibBalsaMailbox * mbox,
-				      GSList * filter_list)
-{
-    LOCK_MAILBOX(mbox);
-    libbalsa_filter_match(filter_list, mbox->message_list, TRUE);
-    UNLOCK_MAILBOX(mbox);
-}
-
 gboolean libbalsa_mailbox_real_can_match(LibBalsaMailbox* mailbox,
 					 GSList * conditions)
 {
@@ -493,8 +487,11 @@ libbalsa_mailbox_can_match(LibBalsaMailbox * mailbox, GSList * conditions)
 /* Helper function to run the "on reception" filters on a mailbox */
 
 void
-libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox, GSList * filters)
+libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox,
+                                          GSList * filters)
 {
+    g_warning(" %s accesses list of messages directly, reimplement", __func__);
+#if 0
     GList * new_messages;
     gboolean free_filters = FALSE;
 
@@ -526,6 +523,7 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox, GSList * fi
 	if (free_filters)
 	    g_slist_free(filters);
     }
+#endif
 }
 
 void
@@ -575,7 +573,7 @@ libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox,
 static void
 libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox)
 {
-    static const int RETRIES_COUNT = 100;
+    static const int RETRIES_COUNT = 50;
     int check, cnt;
 #ifdef DEBUG
     g_print("LibBalsaMailbox: Closing %s Refcount: %d\n", mailbox->name,
@@ -599,7 +597,7 @@ libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox)
 	       (check = libbalsa_mailbox_close_backend(mailbox)) == FALSE) {
 	    UNLOCK_MAILBOX(mailbox);
 	    g_print("libbalsa_mailbox_real_close: %d trial failed.\n", cnt);
-//	    usleep(100000); /* wait tenth second */
+            usleep(10000); /* wait tenth second */
 	    libbalsa_mailbox_check(mailbox);
 	    LOCK_MAILBOX(mailbox);
 	    cnt++;
@@ -607,9 +605,10 @@ libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox)
 	if(cnt>=RETRIES_COUNT)
 	    g_print("libbalsa_mailbox_real_close: changes to %s lost.\n",
 		    mailbox->name);
-
+#if 0
 	libbalsa_mailbox_free_messages(mailbox);
-    } else libbalsa_mailbox_sync_backend_real(mailbox, TRUE);
+#endif
+    }
 
     UNLOCK_MAILBOX(mailbox);
 }
@@ -655,136 +654,6 @@ libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
 
     g_free(mailbox->name);
     mailbox->name = gnome_config_get_string("Name=Mailbox");
-}
-
-/* libbalsa_mailbox_link_message:
-   MAKE sure the mailbox is LOCKed before entering this routine.
-*/ 
-void
-libbalsa_mailbox_link_message(LibBalsaMailbox * mailbox, LibBalsaMessage*msg)
-{
-    msg->mailbox = mailbox;
-    mailbox->message_list = g_list_prepend(mailbox->message_list, msg);
-    
-    if (LIBBALSA_MESSAGE_IS_DELETED(msg))
-        return;
-    if (LIBBALSA_MESSAGE_IS_UNREAD(msg))
-        mailbox->unread_messages++;
-    mailbox->total_messages++;
-}
-
-/*
- * private 
- * PS: called by mail_progress_notify_cb:
- * loads incrementally new messages, if any.
- *  Mailbox lock MUST NOT BE HELD before calling this function.
- *  gdk_lock MUST BE HELD before calling this function because it is called
- *  from both threading and not threading code and we want to be on the safe
- *  side.
- */
-void
-libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
-{
-    glong msgno;
-    LibBalsaMessage *message;
-    GList *messages=NULL;
-
-    if (MAILBOX_CLOSED(mailbox))
-	return;
-
-    LOCK_MAILBOX(mailbox);
-    for (msgno = mailbox->messages; mailbox->new_messages > 0; msgno++) {
-	message = libbalsa_mailbox_load_message(mailbox, msgno);
-	if (!message)
-		continue;
-	libbalsa_message_headers_update(message);
-	libbalsa_mailbox_link_message(mailbox, message);
-	messages=g_list_prepend(messages, message);
-    }
-    UNLOCK_MAILBOX(mailbox);
-
-    if(messages!=NULL){
-	messages = g_list_reverse(messages);
-	g_signal_emit(G_OBJECT(mailbox),
-		      libbalsa_mailbox_signals[MESSAGES_ADDED], 0, messages);
-	g_list_free(messages);
-    }
-
-    libbalsa_mailbox_set_unread_messages_flag(mailbox,
-					      mailbox->unread_messages > 0);
-}
-
-/* libbalsa_mailbox_free_messages:
-   removes all the messages from the mailbox.
-   Messages are unref'ed and not directly destroyed because they migt
-   be ref'ed from somewhere else.
-   Mailbox lock MUST BE HELD before calling this function.
-*/
-void
-libbalsa_mailbox_free_messages(LibBalsaMailbox * mailbox)
-{
-    GList *list;
-    LibBalsaMessage *message;
-
-    list = g_list_first(mailbox->message_list);
-
-    if(list){
-	g_signal_emit(G_OBJECT(mailbox),
-		      libbalsa_mailbox_signals[MESSAGES_REMOVED], 0, list);
-    }
-
-    while (list) {
-	message = list->data;
-	list = list->next;
-
-	message->mailbox = NULL;
-	g_object_unref(G_OBJECT(message));
-    }
-
-    g_list_free(mailbox->message_list);
-    mailbox->message_list = NULL;
-    mailbox->messages = 0;
-    mailbox->total_messages = 0;
-    mailbox->unread_messages = 0;
-}
-
-/* libbalsa_mailbox_commit:
-   commits the data to storage (file, IMAP server, etc).
-
-   While the connection via pointers to mutt's HEADERs may seem
-   fragile, it is sufficient to notice that the only situation when
-   HEADERs are destroyed are mx_sync_mailbox or mx_close_mailbox(). In
-   first case, only deleted messages are destroyed, in the second --
-   all of them.
-
-   This simple picture is somewhat blurred by the fact that mutt
-   sometimes recovers from errors by mx_fastclose_mailbox(). Hm...
-
-   Returns TRUE on success, FALSE on failure.  */
-gboolean
-libbalsa_mailbox_commit(LibBalsaMailbox* mailbox)
-{
-    int rc;
-
-    if (MAILBOX_CLOSED(mailbox))
-	return FALSE;
-
-    LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
-    /* remove messages flagged for deleting, before committing: */
-    libbalsa_mailbox_sync_backend_real(mailbox, TRUE);
-    rc = libbalsa_mailbox_sync_storage(mailbox);
-
-    if (rc == TRUE) {
-	    UNLOCK_MAILBOX(mailbox);
-	    if (mailbox->new_messages) {
-		    libbalsa_mailbox_load_messages(mailbox);
-		    rc = 0;
-	    }
-    } else {
-        UNLOCK_MAILBOX(mailbox);
-    }
-
-    return rc;
 }
 
 GType
@@ -858,56 +727,6 @@ libbalsa_mailbox_remove_messages(LibBalsaMailbox * mbox, GList * messages)
     }
     UNLOCK_MAILBOX(mbox);
 }
-#endif
-/* libbalsa_mailbox_sync_backend_real
- * synchronize the frontend and libbalsa: build a list of messages
- * marked as deleted, and:
- * 1. emit the "messages-removed" signal, so the frontend can drop them
- *    from the BalsaIndex;
- * 2. if delete == TRUE, delete them from the LibBalsaMailbox.
- */
-static void
-libbalsa_mailbox_sync_backend_real(LibBalsaMailbox * mailbox,
-                                   gboolean delete)
-{
-    GList *list;
-    GList *message_list;
-    LibBalsaMessage *current_message;
-    GList *p=NULL;
-    GList *q = NULL;
-
-    for (message_list = mailbox->message_list; message_list;
-         message_list = g_list_next(message_list)) {
-	current_message = LIBBALSA_MESSAGE(message_list->data);
-	if (LIBBALSA_MESSAGE_IS_DELETED(current_message)) {
-	    p=g_list_prepend(p, current_message);
-            if (delete)
-                q = g_list_prepend(q, message_list);
-	}
-    }
-
-    if (p) {
-	UNLOCK_MAILBOX(mailbox);
-	g_signal_emit(G_OBJECT(mailbox),
-	              libbalsa_mailbox_signals[MESSAGES_REMOVED],0,p);
-	LOCK_MAILBOX(mailbox);
-	g_list_free(p);
-    }
-
-    if (delete) {
-        for (list = q; list; list = g_list_next(list)) {
-            message_list = list->data;
-            current_message =
-                LIBBALSA_MESSAGE(message_list->data);
-            current_message->mailbox = NULL;
-            g_object_unref(G_OBJECT(current_message));
-	    mailbox->message_list =
-		g_list_remove_link(mailbox->message_list, message_list);
-            g_list_free_1(message_list);
-	}
-        g_list_free(q);
-    }
-}
 
 /* libbalsa_mailbox_sync_backend:
  * use libbalsa_mailbox_sync_backend_real to synchronize the frontend and
@@ -925,6 +744,8 @@ libbalsa_mailbox_sync_backend(LibBalsaMailbox * mailbox, gboolean delete)
     UNLOCK_MAILBOX(mailbox);
     return res;
 }
+#endif
+
 
 /* Callback for the "messages-status-changed" signal.
  * mb:          the mailbox--must not be NULL;
@@ -1089,6 +910,14 @@ libbalsa_mailbox_change_message_flags(LibBalsaMailbox * mailbox,
 /*
  * Mailbox views
  */
+void
+libbalsa_mailbox_set_view(LibBalsaMailbox *mailbox,
+                          LibBalsaMessageFlag set,
+                          LibBalsaMessageFlag clear)
+{
+    g_warning("Implement me!");
+}
+
 LibBalsaMailboxView *
 libbalsa_mailbox_view_new(void)
 {
@@ -1114,3 +943,327 @@ libbalsa_mailbox_view_free(LibBalsaMailboxView * view)
     g_free(view->identity_name);
     g_free(view);
 }
+
+
+/* =================================================================== *
+ * GtkTreeModel implementation functions.                              *
+ * Important:
+ * do not forget to modify LibBalsaMailbox::stamp on each modification
+ * of the message list.
+ * =================================================================== */
+#define VALID_ITER(iter, tree_store) (iter!= NULL && iter->user_data != NULL\
+                                      && tree_store->stamp == iter->stamp)
+
+static GtkTreeModelFlags mbox_model_get_flags  (GtkTreeModel      *tree_model);
+static gint         mbox_model_get_n_columns   (GtkTreeModel      *tree_model);
+static GType        mbox_model_get_column_type (GtkTreeModel      *tree_model,
+						gint               index);
+static gboolean     mbox_model_get_iter        (GtkTreeModel      *tree_model,
+						GtkTreeIter       *iter,
+						GtkTreePath       *path);
+static GtkTreePath *mbox_model_get_path        (GtkTreeModel      *tree_model,
+						GtkTreeIter       *iter);
+static void         mbox_model_get_value       (GtkTreeModel      *tree_model,
+						GtkTreeIter       *iter,
+						guint              column,
+						GValue            *value);
+static gboolean     mbox_model_iter_next       (GtkTreeModel      *tree_model,
+						GtkTreeIter       *iter);
+static gboolean     mbox_model_iter_children   (GtkTreeModel      *tree_model,
+						GtkTreeIter       *iter,
+						GtkTreeIter       *parent);
+static gboolean     mbox_model_iter_has_child  (GtkTreeModel      *tree_model,
+						GtkTreeIter       *iter);
+static gint         mbox_model_iter_n_children (GtkTreeModel      *tree_model,
+						GtkTreeIter       *iter);
+static gboolean     mbox_model_iter_nth_child  (GtkTreeModel      *tree_model,
+						GtkTreeIter       *iter,
+						GtkTreeIter       *parent,
+						gint               n);
+static gboolean     mbox_model_iter_parent     (GtkTreeModel      *tree_model,
+						GtkTreeIter       *iter,
+						GtkTreeIter       *child);
+
+
+static const GType mbox_model_col_type[] = {
+    G_TYPE_UINT,      /* msg no   */
+    G_TYPE_STRING,   /* flagged   */
+    G_TYPE_STRING,   /* A: has attachments */
+    G_TYPE_STRING,   /* From     */
+    G_TYPE_STRING,   /* Subject  */
+    G_TYPE_STRING,   /* Date     */
+    G_TYPE_STRING,   /* size     */
+    G_TYPE_POINTER   /* message itself */
+};
+
+static void
+mbox_model_init(GtkTreeModelIface *iface)
+{
+    iface->get_flags       = mbox_model_get_flags;
+    iface->get_n_columns   = mbox_model_get_n_columns;
+    iface->get_column_type = mbox_model_get_column_type;
+    iface->get_iter        = mbox_model_get_iter;
+    iface->get_path        = mbox_model_get_path;
+    iface->get_value       = mbox_model_get_value;
+    iface->iter_next       = mbox_model_iter_next;
+    iface->iter_children   = mbox_model_iter_children;
+    iface->iter_has_child  = mbox_model_iter_has_child;
+    iface->iter_n_children = mbox_model_iter_n_children;
+    iface->iter_nth_child  = mbox_model_iter_nth_child;
+    iface->iter_parent     = mbox_model_iter_parent;
+}
+
+static GtkTreeModelFlags
+mbox_model_get_flags(GtkTreeModel *tree_model)
+{
+    return 0;
+}
+
+static gint
+mbox_model_get_n_columns(GtkTreeModel *tree_model)
+{
+    return LB_MBOX_N_COLS;
+}
+
+static GType
+mbox_model_get_column_type(GtkTreeModel *tree_model, gint index)
+{
+    g_return_val_if_fail(index>=0 && index <LB_MBOX_N_COLS, G_TYPE_BOOLEAN);
+    return mbox_model_col_type[index];
+}
+
+static gboolean
+mbox_model_get_iter(GtkTreeModel *tree_model,
+		    GtkTreeIter  *iter,
+		    GtkTreePath  *path)
+{
+    LibBalsaMailbox* mbox = (LibBalsaMailbox*)tree_model;
+    GtkTreeIter parent;
+    gint *indices;
+    gint depth, i;
+
+    g_return_val_if_fail (LIBBALSA_IS_MAILBOX(tree_model), FALSE);
+
+    indices = gtk_tree_path_get_indices (path);
+    depth = gtk_tree_path_get_depth (path);
+
+    parent.stamp     = mbox->stamp;
+    parent.user_data = mbox->msg_tree;
+
+    if (! gtk_tree_model_iter_nth_child (tree_model, iter, 
+					 &parent, indices[0]))
+	return FALSE;
+    
+    for (i = 1; i < depth; i++) {
+	parent = *iter;
+	if (! gtk_tree_model_iter_nth_child (tree_model, iter,
+					     &parent, indices[i]))
+	    return FALSE;
+    }
+
+    return TRUE;
+}
+
+static GtkTreePath*
+mbox_model_get_path(GtkTreeModel *tree_model, GtkTreeIter  *iter)
+{
+    GtkTreePath *retval;
+    GNode *tmp_node;
+    gint i = 0;
+
+    g_return_val_if_fail (iter != NULL, NULL);
+    g_return_val_if_fail (iter->user_data != NULL, NULL);
+    g_return_val_if_fail (iter->stamp == LIBBALSA_MAILBOX(tree_model)->stamp,
+                          NULL);
+
+    if (((GNode*)iter->user_data)->parent == NULL &&
+        ((GNode*)iter->user_data) == LIBBALSA_MAILBOX(tree_model)->msg_tree)
+        return gtk_tree_path_new ();
+    g_assert ( ((GNode*)iter->user_data)->parent != NULL);
+
+    if ( ((GNode*)iter->user_data)->parent == 
+         LIBBALSA_MAILBOX(tree_model)->msg_tree) {
+        retval = gtk_tree_path_new ();
+        tmp_node = LIBBALSA_MAILBOX(tree_model)->msg_tree->children;
+    } else {
+        GtkTreeIter tmp_iter = *iter;
+        tmp_iter.user_data = ((GNode*)iter->user_data)->parent;
+        
+        retval = mbox_model_get_path(tree_model, &tmp_iter);
+	tmp_node = ((GNode*)iter->user_data)->parent->children;
+    }
+    
+    if (retval == NULL)
+        return NULL;
+    
+    if (tmp_node == NULL) {
+        gtk_tree_path_free (retval);
+        return NULL;
+    }
+    
+    for (; tmp_node; tmp_node = tmp_node->next)  {
+        if (tmp_node == iter->user_data)
+            break;
+        i++;
+    }
+    
+    if (tmp_node == NULL) {
+        /* We couldn't find node, meaning it's prolly not ours */
+        /* Perhaps I should do a g_return_if_fail here. */
+        gtk_tree_path_free (retval);
+        return NULL;
+    }
+    
+    gtk_tree_path_append_index (retval, i);
+    
+    return retval;
+}
+
+static void
+mbox_model_get_value(GtkTreeModel *tree_model,
+		     GtkTreeIter  *iter,
+		     guint column,
+		     GValue *value)
+{
+    LibBalsaMailbox* lmm = LIBBALSA_MAILBOX(tree_model);
+    GMimeMessage* msg;
+    guint msgno;
+    
+    g_return_if_fail (iter != NULL);
+    g_return_if_fail (iter->stamp == LIBBALSA_MAILBOX(tree_model)->stamp);
+    g_return_if_fail(column<ELEMENTS(mbox_model_col_type));
+ 
+    msgno = GPOINTER_TO_UINT( ((GNode*)iter->user_data)->data );
+    msg = libbalsa_mailbox_get_message(lmm, msgno);
+    g_value_init (value, mbox_model_col_type[column]);
+    switch(column) {
+    case LB_MBOX_MSGNO_COL:
+	g_value_set_uint(value, msgno+1);  break;
+    case LB_MBOX_MARKED_COL:
+	g_value_set_string(value, "M");  break;
+    case LB_MBOX_ATTACH_COL:
+	g_value_set_string(value, "A");  break;
+    case LB_MBOX_FROM_COL:
+	g_value_set_string(value,g_mime_message_get_header(msg, "from"));
+        break;
+    case LB_MBOX_SUBJECT_COL:
+	g_value_set_string(value, g_mime_message_get_header(msg, "subject"));
+	break;
+    case LB_MBOX_DATE_COL:
+	g_value_set_string(value, g_mime_message_get_header(msg, "date"));
+	break;
+    case LB_MBOX_SIZE_COL:
+	g_value_set_string(value, "unknown");
+	break;
+    case LB_MBOX_MESSAGE_COL:
+	g_value_set_pointer(value, msg); break;
+    }
+}
+
+static gboolean
+mbox_model_iter_next(GtkTreeModel      *tree_model,
+		     GtkTreeIter       *iter)
+{
+    GList* lst;
+    g_return_val_if_fail(iter != NULL, FALSE);
+    g_return_val_if_fail(iter->stamp==LIBBALSA_MAILBOX(tree_model)->stamp,
+                         FALSE);
+
+    lst = (GList*)iter->user_data;
+    if(lst && lst->next) {
+	iter->user_data = lst->next;
+	return TRUE;
+    } else return FALSE;
+}
+
+static gboolean
+mbox_model_iter_children(GtkTreeModel      *tree_model,
+			 GtkTreeIter       *iter,
+			 GtkTreeIter       *parent)
+{
+    GNode *children;
+    
+    g_return_val_if_fail(parent->stamp==LIBBALSA_MAILBOX(tree_model)->stamp,
+                         FALSE);
+
+    if (parent)
+        children = ((GNode*)parent->user_data)->children;
+    else
+        children = LIBBALSA_MAILBOX(tree_model)->msg_tree->children;
+    
+    if (children) {
+        iter->stamp = LIBBALSA_MAILBOX(tree_model)->stamp;
+        iter->user_data = children;
+        return TRUE;
+    } else
+        return FALSE;
+}
+
+static gboolean
+mbox_model_iter_has_child(GtkTreeModel      *tree_model,
+			  GtkTreeIter       *iter)
+{
+    g_return_val_if_fail (iter != NULL, FALSE);
+    g_return_val_if_fail (iter->stamp == LIBBALSA_MAILBOX(tree_model)->stamp,
+                          FALSE);
+    return (!iter  || iter->user_data==NULL);
+}
+
+static gint
+mbox_model_iter_n_children(GtkTreeModel      *tree_model,
+			   GtkTreeIter       *iter)
+{
+    GNode *node;
+    int i = 0;
+    g_return_val_if_fail (iter == NULL || iter->user_data != NULL, FALSE);
+
+    if (iter == NULL)
+        node = LIBBALSA_MAILBOX(tree_model)->msg_tree->children;
+    else
+        node = ((GNode*)iter->user_data)->children;
+    
+    while (node) {
+        i++;
+        node = node->next;
+    }
+    return i;
+}
+
+static gboolean
+mbox_model_iter_nth_child(GtkTreeModel      *tree_model,
+			  GtkTreeIter       *iter,
+			  GtkTreeIter       *parent,
+			  gint               n)
+{
+    GNode *parent_node;
+    GNode *child;
+
+    if (parent == NULL)
+        parent_node = LIBBALSA_MAILBOX(tree_model)->msg_tree;
+    else
+        parent_node = parent->user_data;
+    
+    child = g_node_nth_child (parent_node, n);
+    
+    if (child) {
+        iter->user_data = child;
+        iter->stamp = LIBBALSA_MAILBOX(tree_model)->stamp;
+        return TRUE;
+    } else
+        return FALSE;
+}
+
+static gboolean
+mbox_model_iter_parent(GtkTreeModel      *tree_model,
+		       GtkTreeIter       *iter,
+		       GtkTreeIter       *child)
+{
+
+    g_return_val_if_fail(iter != NULL, FALSE);
+    g_return_val_if_fail(child != NULL, FALSE);
+    g_return_val_if_fail(child->stamp==LIBBALSA_MAILBOX(tree_model)->stamp,
+			 FALSE);
+
+    return FALSE;
+}
+

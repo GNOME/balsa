@@ -1412,7 +1412,7 @@ real_open_mbnode(BalsaMailboxNode * mbnode)
 #endif
         return;
     }
-
+    g_assert(index->mailbox_node);
     g_signal_connect(G_OBJECT (index), "index-changed",
                      G_CALLBACK (balsa_window_index_changed_cb),
                      window);
@@ -2940,9 +2940,11 @@ mailbox_commit_all(GtkWidget * widget, gpointer data)
 void
 empty_trash(void)
 {
+    g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.trash));
     if(!libbalsa_mailbox_open(balsa_app.trash)) return;
 
-    libbalsa_messages_delete(balsa_app.trash->message_list, TRUE);
+    libbalsa_messages_delete(LIBBALSA_MAILBOX_LOCAL(balsa_app.trash)->msg_list,
+                             TRUE);
     libbalsa_mailbox_close(balsa_app.trash);
     balsa_mblist_update_mailbox(balsa_app.mblist_tree_store,
                                 balsa_app.trash);

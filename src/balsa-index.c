@@ -189,7 +189,7 @@ balsa_index_init (BalsaIndex * bindex)
 
   /* create the clist */
   GTK_BIN (bindex)->child =
-    (GtkWidget *) clist = gtk_clist_new_with_titles (6, titles);
+    (GtkWidget *) clist = gtk_clist_new_with_titles (5, titles);
 
   gtk_widget_set_parent (GTK_WIDGET (clist), GTK_WIDGET (bindex));
   gtk_clist_set_policy (clist, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);

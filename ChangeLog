@@ -1,3 +1,14 @@
+2003-10-18  Carlos Morgado  <chbm gnome.org>
+
+	* libbalsa/imap/imap.h: make ImapBodyEncoding match 
+	GMime to make things smother
+	
+	* libbalsa/mailbox_imap.c (libbalsa_mailbox_imap_get_msg_part):
+	return decoded part and add mime_part
+
+	* libbalsa/imap/imap-handle.c:
+	set body->media_basic_name
+
 2003-10-15 14:24  PeterB
 
 	* libbalsa/imap/imap-handle.c: Implement ir_check_crlf() and use it

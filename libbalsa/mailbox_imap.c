@@ -1441,10 +1441,13 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
                                    LibBalsaMessageBody *part,
                                    ssize_t *sz)
 {
+    struct part_data dt;
+    const char *foo;
+    size_t len;  
+
     LOCK_MAILBOX_RETURN_VAL(msg->mailbox,NULL);
     if(!part->buffer) {
-        struct part_data dt;
-        LibBalsaMailboxImap* mimap = LIBBALSA_MAILBOX_IMAP(msg->mailbox);
+	LibBalsaMailboxImap* mimap = LIBBALSA_MAILBOX_IMAP(msg->mailbox);
         gchar *section = get_section_for(msg, part);
         ImapMessage *im = imap_mbox_handle_get_msg(mimap->handle, msg->msgno);
         ImapResponse rc;
@@ -1455,13 +1458,23 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
                                          append_str, &dt);
         if(rc != IMR_OK)
             g_error("FIXME: error handling here!\n");
-        part->buffer = dt.block;
-        part->buflen = dt.body->octets;
         g_free(section);
     }
-    *sz = part->buflen;
+
+    part->mime_part = GMIME_OBJECT(g_mime_part_new_with_type 
+				   (dt.body->media_basic_name,
+				    dt.body->media_subtype ));
+    g_mime_part_set_pre_encoded_content ( GMIME_PART(part->mime_part),
+					  dt.block,
+					  dt.body->octets,
+					  (GMimePartEncodingType)dt.body->encoding );
+    g_free(dt.block);
+    
+    foo = g_mime_part_get_content (GMIME_PART(part->mime_part), &len);    
+    
+    *sz = len;
     UNLOCK_MAILBOX(msg->mailbox);
-    return part->buffer;
+    return foo;
 }
 
 /* libbalsa_mailbox_imap_add_message: 

@@ -714,7 +714,7 @@ imap_body_new(void)
 void
 imap_body_free(ImapBody* body)
 {
-  g_free(body->media_basic_other);
+  g_free(body->media_basic_name);
   g_free(body->media_subtype);
   g_free(body->desc);
   g_hash_table_destroy(body->params);
@@ -747,6 +747,9 @@ gchar*
 imap_body_get_mime_type(ImapBody *body)
 {
   const gchar* type = NULL;
+
+  /* chbm: why not just return media_basic_name always here ? cause we 
+     canonize the common names ... */
   switch(body->media_basic) {
   case IMBMEDIA_MULTIPART:      type = "multipart"; break;
   case IMBMEDIA_APPLICATION:    type = "application"; break;
@@ -755,7 +758,7 @@ imap_body_get_mime_type(ImapBody *body)
   case IMBMEDIA_MESSAGE_RFC822: return g_strdup("message/rfc822"); break;
   case IMBMEDIA_MESSAGE_OTHER:  type = "message_other"; break;
   case IMBMEDIA_TEXT:           type = "text"; break;
-  case IMBMEDIA_OTHER:          return g_strdup(body->media_basic_other);break;
+  case IMBMEDIA_OTHER:          return g_strdup(body->media_basic_name);break;
   }
   return g_strconcat(type, "/", body->media_subtype, NULL);
 }
@@ -1608,7 +1611,11 @@ ir_media(struct siobuf* sio, ImapMediaBasic *imb, ImapBody *body)
       *imb = IMBMEDIA_MESSAGE_OTHER;
   }
   else if(g_ascii_strcasecmp(type, "TEXT") ==0)        *imb = IMBMEDIA_TEXT;
-  else *imb = IMBMEDIA_OTHER;
+  else 
+    *imb = IMBMEDIA_OTHER;
+
+  body->media_basic_name = g_strdup (type);
+
   g_free(type);
   if(body) {
     body->media_basic = *imb;

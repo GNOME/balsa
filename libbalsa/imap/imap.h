@@ -105,14 +105,15 @@ typedef enum { IMBMEDIA_MULTIPART,
                IMBMEDIA_TEXT, 
                IMBMEDIA_OTHER } ImapMediaBasic;
 
-typedef enum { IMBENC_7BIT, IMBENC_8BIT, IMBENC_BINARY, IMBENC_BASE64,
-         IMBENC_QUOTED, IMBENC_OTHER } ImapBodyEncoding;
+typedef enum { IMBENC_UNUSED,
+  IMBENC_7BIT, IMBENC_8BIT, IMBENC_BINARY, IMBENC_BASE64, 
+  IMBENC_QUOTED, IMBENC_OTHER } ImapBodyEncoding;
 
 struct ImapBody_ {
   ImapBodyEncoding encoding;
   ImapMediaBasic media_basic;
-  gchar *media_basic_other;
-  gchar* media_subtype;
+  gchar *media_basic_name;
+  gchar *media_subtype;
   GHashTable *params;
   unsigned octets;
   unsigned lines;

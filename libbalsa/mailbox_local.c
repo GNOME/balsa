@@ -36,10 +36,6 @@
 #include "libbalsa_private.h"
 #include "mailbackend.h"
 
-#ifdef BALSA_USE_THREADS
-#include "threads.h"
-#endif
-
 #include "mailbox-filter.h"
 #include "filter-file.h"
 #include <libgnome/gnome-defs.h> 

@@ -35,10 +35,6 @@
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 
-#ifdef BALSA_USE_THREADS
-#include "threads.h"
-#endif
-
 #include "filter.h"
 #include "filter-funcs.h"
 #include "filter-private.h"

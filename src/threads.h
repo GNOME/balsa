@@ -21,18 +21,13 @@
 
 #ifndef __THREADS_H__
 #define __THREADS_H__
+/* FIXME: mailbox_lock is really an internal libbalsa mutex. */
+extern pthread_mutex_t mailbox_lock;
 
 /*  define thread globals */
 extern pthread_t get_mail_thread;
-extern pthread_t mblist_thread;
-extern pthread_t send_mail;
-extern pthread_mutex_t mailbox_lock;
-extern pthread_mutex_t send_messages_lock;
 extern int checking_mail;
-extern int updating_mblist;
-extern int updating_progressbar;
 extern int mail_thread_pipes[2];
-extern int send_thread_pipes[2];
 extern GIOChannel *mail_thread_msg_send;
 extern GIOChannel *mail_thread_msg_receive;
 extern GIOChannel *send_thread_msg_send;
@@ -43,11 +38,10 @@ extern GtkWidget *send_dialog;
 extern GtkWidget *send_dialog_bar;
 
 typedef struct {
-    int message_type;
+    LibBalsaMailboxNotify message_type;
     char message_string[160];
     LibBalsaMailbox *mailbox;
-    int num_bytes;
-    int tot_bytes;
+    int num_bytes, tot_bytes;
 } MailThreadMessage;
 
 /*
@@ -66,39 +60,5 @@ typedef struct {
   message->num_bytes=num;\
   message->tot_bytes=tot;\
   write( mail_thread_pipes[1], (void *) &message, sizeof(void *) );
-
-enum {
-    MSGMAILTHREAD_SOURCE,
-    MSGMAILTHREAD_MSGINFO,
-    MSGMAILTHREAD_UPDATECONFIG,
-    MSGMAILTHREAD_ERROR,
-    MSGMAILTHREAD_FINISHED,
-    MSGMAILTHREAD_PROGRESS
-};
-
-typedef struct {
-    int message_type;
-    char message_string[256];
-    LibBalsaMessage *msg;
-    LibBalsaMailbox *mbox;
-    float of_total;
-} SendThreadMessage;
-
-#define  MSGSENDTHREAD(t_message, type, string, s_msg, s_mbox, messof) \
-  t_message = malloc( sizeof( SendThreadMessage )); \
-  t_message->message_type = type; \
-  strncpy(t_message->message_string, string, sizeof(t_message->message_string)); \
-  t_message->msg = s_msg; \
-  t_message->mbox = s_mbox; \
-  t_message->of_total = messof; \
-  write( send_thread_pipes[1], (void *) &t_message, sizeof(void *) );
-
-enum {
-    MSGSENDTHREADERROR,
-    MSGSENDTHREADPROGRESS,
-    MSGSENDTHREADPOSTPONE,
-    MSGSENDTHREADDELETE,
-    MSGSENDTHREADFINISHED
-};
 
 #endif				/* __THREADS_H__ */

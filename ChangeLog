@@ -1,3 +1,16 @@
+2002-12-05  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/Makefile.am: remove threads.h
+	* libbalsa/{filter,message,send}.c:
+	* libbalsa/mailbox{_imap,_local,_pop3}.c: remove threads.h
+	* libbalsa/libbalsa_private.h: add extern mailbox_lock.
+	* libbalsa/mailbox.h: add notification types.
+	* libbalsa/send.h: add send progress procedures.
+	* src/{main-window,save-restore}.c: change notification constants'
+	names.
+	* src/threads.h: remove libbalsa specific code.
+	* src/toolbar-{factory,prefs}.c: remove threads.h
+	
 2002-12-02  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-app.h: simplify QuoteRegex so even simple regex libs

@@ -45,10 +45,6 @@
 #include "store-address.h"
 #include "save-restore.h"
 
-#ifdef BALSA_USE_THREADS
-#include "threads.h"
-#endif
-
 #include "libinit_balsa/init_balsa.h"
 
 #include "toolbar-prefs.h"

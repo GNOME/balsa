@@ -54,6 +54,14 @@ typedef enum {
     MAILBOX_SORT_LAST = (1 << 5)
 } LibBalsaMailboxSort;
 
+typedef enum {
+    LIBBALSA_NTFY_SOURCE,
+    LIBBALSA_NTFY_FINISHED,
+    LIBBALSA_NTFY_MSGINFO,
+    LIBBALSA_NTFY_PROGRESS,
+    LIBBALSA_NTFY_UPDATECONFIG,
+    LIBBALSA_NTFY_ERROR
+} LibBalsaMailboxNotify;
 /*
  * structures
  */

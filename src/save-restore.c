@@ -440,7 +440,7 @@ pop3_config_updated(LibBalsaMailboxPop3* mailbox)
 #ifdef BALSA_USE_THREADS
     MailThreadMessage *threadmsg;
     threadmsg = g_new(MailThreadMessage, 1);
-    threadmsg->message_type = MSGMAILTHREAD_UPDATECONFIG;
+    threadmsg->message_type = LIBBALSA_NTFY_UPDATECONFIG;
     threadmsg->mailbox = (void *) mailbox;
     write(mail_thread_pipes[1], (void *) &threadmsg,
           sizeof(void *));

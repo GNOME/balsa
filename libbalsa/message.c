@@ -50,10 +50,6 @@
 /* needed for truncate_string */
 #include "misc.h"
 
-#ifdef BALSA_USE_THREADS
-#include "threads.h"
-#endif
-
 /* GTK_CLASS_TYPE for 1.2<->1.3/2.0 GTK+ compatibility */
 #ifndef GTK_CLASS_TYPE
 #define GTK_CLASS_TYPE(x) (GTK_OBJECT_CLASS(x)->type)

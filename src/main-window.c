@@ -1828,11 +1828,11 @@ check_messages_thread(gpointer data)
                              count_unread_msgs_func, 
                              (gpointer)&new_msgs_before);
 
-    MSGMAILTHREAD(threadmessage, MSGMAILTHREAD_SOURCE, NULL, "POP3", 0, 0);
+    MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_SOURCE, NULL, "POP3", 0, 0);
         
     check_mailbox_list(balsa_app.inbox_input);
 
-    MSGMAILTHREAD(threadmessage, MSGMAILTHREAD_SOURCE, NULL,
+    MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_SOURCE, NULL,
                   "Local Mail", 0, 0);
     libbalsa_notify_start_check(imap_check_test);
 
@@ -1846,7 +1846,7 @@ check_messages_thread(gpointer data)
     new_msgs_after-=new_msgs_before;
     if(new_msgs_after < 0)
         new_msgs_after=0;
-    MSGMAILTHREAD(threadmessage, MSGMAILTHREAD_FINISHED, NULL, "Finished",
+    MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_FINISHED, NULL, "Finished",
                   new_msgs_after, 0);
     
     pthread_mutex_lock(&mailbox_lock);
@@ -1888,7 +1888,7 @@ mail_progress_notify_cb()
         /* Eat messages */
         while (count) {
             threadmessage = *currentpos;
-            if(threadmessage->message_type == MSGMAILTHREAD_FINISHED) {
+            if(threadmessage->message_type == LIBBALSA_NTFY_FINISHED) {
 		gdk_threads_enter();
                 balsa_mblist_have_new(balsa_app.mblist);
                 display_new_mail_notification(threadmessage->num_bytes);
@@ -1913,7 +1913,7 @@ mail_progress_notify_cb()
                     threadmessage->message_type,
                     threadmessage->message_string);
         switch (threadmessage->message_type) {
-        case MSGMAILTHREAD_SOURCE:
+        case LIBBALSA_NTFY_SOURCE:
             if (progress_dialog) {
                 gtk_label_set_text(GTK_LABEL(progress_dialog_source),
                                    threadmessage->message_string);
@@ -1924,7 +1924,7 @@ mail_progress_notify_cb()
                                         threadmessage->message_string);
             }
             break;
-        case MSGMAILTHREAD_MSGINFO:
+        case LIBBALSA_NTFY_MSGINFO:
             if (progress_dialog) {
                 gtk_label_set_text(GTK_LABEL(progress_dialog_message),
                                    threadmessage->message_string);
@@ -1934,11 +1934,7 @@ mail_progress_notify_cb()
                                         threadmessage->message_string);
             }
             break;
-        case MSGMAILTHREAD_UPDATECONFIG:
-            config_mailbox_update(threadmessage->mailbox);
-            break;
-
-        case MSGMAILTHREAD_PROGRESS:
+        case LIBBALSA_NTFY_PROGRESS:
             percent = (gfloat) threadmessage->num_bytes /
                 (gfloat) threadmessage->tot_bytes;
             if (percent > 1.0 || percent < 0.0) {
@@ -1954,7 +1950,7 @@ mail_progress_notify_cb()
             else
                 gnome_appbar_set_progress(balsa_app.appbar, percent);
             break;
-        case MSGMAILTHREAD_FINISHED:
+        case LIBBALSA_NTFY_FINISHED:
 
             if (balsa_app.pwindow_option == WHILERETR && progress_dialog) {
                 gtk_widget_destroy(progress_dialog);
@@ -1971,7 +1967,7 @@ mail_progress_notify_cb()
             display_new_mail_notification(threadmessage->num_bytes);
             break;
 
-        case MSGMAILTHREAD_ERROR:
+        case LIBBALSA_NTFY_ERROR:
             errorbox = gnome_message_box_new(threadmessage->message_string,
                                              GNOME_MESSAGE_BOX_ERROR,
                                              GNOME_STOCK_BUTTON_OK, NULL);

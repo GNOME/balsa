@@ -47,11 +47,11 @@ static void append_messages (BalsaIndex * bindex,
 			     glong first,
 			     glong last);
 /*
-static void update_new_message_pixmap (BalsaIndex * bindex,
-				       glong mesgno);
-*/
-static void update_new_message_flag (BalsaIndex * bindex,
-			  	     glong mesgno);
+   static void update_new_message_pixmap (BalsaIndex * bindex,
+   glong mesgno);
+ */
+static void update_message_flag (BalsaIndex * bindex,
+				 glong mesgno, gchar *flag);
 
 
 /* clist callbacks */
@@ -438,7 +438,7 @@ balsa_index_delete_message (BalsaIndex * bindex)
 
   row = (glong) clist->selection->data;
 
-  gtk_clist_set_text (clist, row, 0, "D");
+  update_message_flag (bindex, row + 1, "D");
 
   sprintf (tmp, "%ld", row + 1);
   mail_setflag (bindex->stream, tmp, "\\DELETED");
@@ -460,7 +460,7 @@ balsa_index_undelete_message (BalsaIndex * bindex)
 
   row = (glong) clist->selection->data;
 
-  gtk_clist_set_text (clist, row, 0, NULL);
+  update_message_flag (bindex, row + 1, " ");
 
   sprintf (tmp, "%ld", row + 1);
   mail_clearflag (bindex->stream, tmp, "\\DELETED");
@@ -504,11 +504,11 @@ append_messages (BalsaIndex * bindex,
       mail_date (text[4], cache);
 
       gtk_clist_append (GTK_CLIST (GTK_BIN (bindex)->child), text);
-      update_new_message_flag (bindex, i);
+      update_message_flag (bindex, i, "N");
 
       /* give time to gtk so the GUI isn't blocked */
-      while (gtk_events_pending())
-	gtk_main_iteration();
+      while (gtk_events_pending ())
+	gtk_main_iteration ();
     }
 
   gtk_clist_thaw (GTK_CLIST (GTK_BIN (bindex)->child));
@@ -551,23 +551,32 @@ update_new_message_pixmap (BalsaIndex * bindex,
 
 
 static void
-update_new_message_flag (BalsaIndex * bindex,
-			   glong mesgno)
+update_message_flag (BalsaIndex * bindex,
+		     glong mesgno, gchar * flag)
 {
   MESSAGECACHE *elt;
-
-  elt = mail_elt (bindex->stream, mesgno);
-
-  if (!elt->seen)
+  switch (*flag)
     {
-      gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), mesgno-1, 0, "N");
-      if (first_new_mesgno == 0)
-	first_new_mesgno = mesgno;
+    case 'N':
+      elt = mail_elt (bindex->stream, mesgno);
+      if (!elt->seen)
+	{
+	  gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), mesgno - 1, 0, flag);
+	  if (first_new_mesgno == 0)
+	    first_new_mesgno = mesgno;
+	}
+      else
+      {
+          gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), mesgno - 1, 0, NULL);
+      }
+      break;
+    case 'D':
+      gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), mesgno - 1, 0, flag);
+      break;
+    case ' ':
+      gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), mesgno - 1, 0, NULL);
+      break;
     }
-  else
-    gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child),
-			mesgno - 1, 0,
-			NULL);
 }
 
 
@@ -719,5 +728,5 @@ unselect_message (GtkWidget * widget,
 
   /* update the index to show any changes in the message
    * state */
-  update_new_message_flag (bindex, mesgno);
+  update_message_flag (bindex, mesgno, "N");
 }

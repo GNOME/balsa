@@ -69,6 +69,7 @@ struct _MailboxConfWindow
     GtkWidget *imap_port;
     GtkWidget *imap_username;
     GtkWidget *imap_password;
+    GtkWidget *imap_folderpath;
 
     /* for pop3 mailboxes */
     GtkWidget *pop_mailbox_name;
@@ -454,9 +455,10 @@ conf_add_mailbox ()
   Mailbox *mailbox = NULL;
   MailboxType type;
   GNode *node;
+  GString *fos;
+  GString *idstr;
 
   MailboxConfPageType cur_page;
-
   cur_page = gtk_notebook_current_page (GTK_NOTEBOOK (mcw->notebook));
 
   switch (cur_page)		/* see what page we are on */
@@ -513,12 +515,19 @@ conf_add_mailbox ()
 
 /* IMAP Mailboxes */
     case MC_PAGE_IMAP:
-#if 0
       mailbox = mailbox_new (MAILBOX_IMAP);
-      mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->imap_mailbox_name)));
+      
+      fos=(GString *) gtk_entry_get_text(GTK_ENTRY(gnome_entry_gtk_entry(GNOME_ENTRY (mcw->imap_folderpath))));
+      idstr=(GString *) g_string_new((const gchar *)fos);
+      g_string_append((GString *)idstr, _(" on "));
+      g_string_append((GString *)idstr, (gchar *) gtk_entry_get_text(GTK_ENTRY(mcw->imap_server)));
+     
+      MAILBOX_IMAP (mailbox)->path = g_strdup ((const gchar*)fos);
+      mailbox->name = g_strdup (idstr->str);
       MAILBOX_IMAP (mailbox)->user = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->imap_username)));
       MAILBOX_IMAP (mailbox)->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->imap_password)));
-      MAILBOX_IMAP (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->imap_mailbox_path)));
+      
+      
       if (!MAILBOX_IMAP (mailbox)->path[0])
 	{
 	  g_free (MAILBOX_IMAP (mailbox)->path);
@@ -532,7 +541,6 @@ conf_add_mailbox ()
 
       config_mailbox_add (mailbox, NULL);
       add_mailboxes_for_checking (mailbox);
-#endif
       break;
     }
 
@@ -767,11 +775,11 @@ create_imap_mailbox_page (void)
   GtkWidget *return_widget;
   GtkWidget *table;
   GtkWidget *label;
-  GtkWidget *button;
+  char history_id[100];	/* how big? */
 
   return_widget = gtk_vbox_new (0, FALSE);
 
-  table = gtk_table_new (4, 2, FALSE);
+  table = gtk_table_new (5, 2, FALSE);
   gtk_box_pack_start (GTK_BOX (return_widget), table, FALSE, FALSE, 0);
 
   /* imap server */
@@ -832,10 +840,24 @@ create_imap_mailbox_page (void)
 
   gtk_entry_set_visibility (GTK_ENTRY (mcw->imap_password), FALSE);
 
-  button = gtk_button_new_with_label ("Mailboxes");
-  gtk_box_pack_start (GTK_BOX (return_widget), button, FALSE, FALSE, 0);
-  gtk_signal_connect (GTK_OBJECT (button), "clicked",
-		      (GtkSignalFunc) mailbox_conf_edit_imap_server, NULL);
+  label = gtk_label_new ("Folder path:");
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 4, 5,
+                    GTK_FILL, GTK_FILL,
+                    10, 10);
+
+  mcw->imap_folderpath= gnome_entry_new((char *)history_id);
+  gtk_entry_append_text(GTK_ENTRY(gnome_entry_gtk_entry(GNOME_ENTRY(mcw->imap_folderpath))), "INBOX");
+
+  gnome_entry_append_history(GNOME_ENTRY(mcw->imap_folderpath), 1, "INBOX");
+  gnome_entry_append_history(GNOME_ENTRY(mcw->imap_folderpath), 1, "INBOX.Sent");
+  gnome_entry_append_history(GNOME_ENTRY(mcw->imap_folderpath), 1, "INBOX.Draft");
+  gnome_entry_append_history(GNOME_ENTRY(mcw->imap_folderpath), 1, "INBOX.outbox");
+
+  gtk_table_attach (GTK_TABLE (table), mcw->imap_folderpath, 1, 2, 4, 5,
+                    GTK_EXPAND | GTK_FILL, GTK_FILL,
+                    0, 10);
 
   return return_widget;
 }
@@ -853,7 +875,6 @@ next_cb (GtkWidget * widget)
   gtk_container_remove (GTK_CONTAINER (bbox), mcw->ok);
 
   gtk_widget_destroy (mcw->ok);
-
   if (mcw->mailbox)
     {
       mcw->ok = gtk_button_new_with_label ("Update");

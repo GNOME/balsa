@@ -542,22 +542,23 @@ static void
 libbalsa_mailbox_maildir_close_mailbox(LibBalsaMailbox * mailbox)
 {
     LibBalsaMailboxMaildir *mdir;
-    guint len;
+    guint len = 0;
 
     g_return_if_fail (LIBBALSA_IS_MAILBOX_MAILDIR(mailbox));
 
     mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
 
-    len = mdir->msgno_2_msg_info->len;
+    if (mdir->msgno_2_msg_info)
+	len = mdir->msgno_2_msg_info->len;
     lbm_maildir_sync_real(mdir, TRUE);
-    if (mdir->msgno_2_msg_info->len != len)
-	g_signal_emit_by_name(mailbox, "changed");
 
     if (mdir->messages_info) {
 	g_hash_table_destroy(mdir->messages_info);
 	mdir->messages_info = NULL;
     }
     if (mdir->msgno_2_msg_info) {
+	if (mdir->msgno_2_msg_info->len != len)
+	    g_signal_emit_by_name(mailbox, "changed");
 	g_ptr_array_free(mdir->msgno_2_msg_info, TRUE);
 	mdir->msgno_2_msg_info = NULL;
     }

@@ -1,3 +1,7 @@
+2003-07-31 16:28  PeterB
+
+	* src/print.c: Add missing "break" in a switch.
+
 2003-07-29  Pawel Salek  <pawsa theochem.kth.se>
 
 	* src/balsa-index.c: try addressing #118620: reorder menu entries.

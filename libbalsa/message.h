@@ -300,8 +300,7 @@ void libbalsa_message_body_unref(LibBalsaMessage * message);
 gboolean libbalsa_message_postpone(LibBalsaMessage * message,
 				   LibBalsaMailbox * draftbox,
 				   LibBalsaMessage * reply_message,
-				   gchar * fcc, gint encoding, 
-				   gboolean flow);
+				   gchar * fcc, gboolean flow);
 
 /*
  * misc message releated functions

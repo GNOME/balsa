@@ -4567,13 +4567,12 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 
     if(queue_only)
 	result = libbalsa_message_queue(message, balsa_app.outbox, fcc,
-					balsa_app.encoding_style,
 					bsmsg->flow);
     else 
 #if ENABLE_ESMTP
 	result = libbalsa_message_send
             (message, balsa_app.outbox, fcc,
-             balsa_app.encoding_style, balsa_find_sentbox_by_url,
+             balsa_find_sentbox_by_url,
              balsa_app.smtp_server,
              (balsa_app.smtp_user && *balsa_app.smtp_user)
              ? balsa_app.smtp_authctx : NULL,
@@ -4582,7 +4581,6 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 #else
         result = libbalsa_message_send(message, balsa_app.outbox, fcc,
                                        balsa_find_sentbox_by_url,
-				       balsa_app.encoding_style,
 				       bsmsg->flow, balsa_app.debug); 
 #endif
     if (result == LIBBALSA_MESSAGE_CREATE_OK && bsmsg->orig_message
@@ -4664,13 +4662,11 @@ message_postpone(BalsaSendmsg * bsmsg)
 	successp = libbalsa_message_postpone(message, balsa_app.draftbox,
                                              bsmsg->orig_message,
                                              bsmsg->fcc_url,
-                                             balsa_app.encoding_style,
                                              bsmsg->flow);
     else
 	successp = libbalsa_message_postpone(message, balsa_app.draftbox, 
                                              NULL,
                                              bsmsg->fcc_url,
-                                             balsa_app.encoding_style,
                                              bsmsg->flow);
     if(successp) {
 	if (bsmsg->type == SEND_CONTINUE && bsmsg->orig_message

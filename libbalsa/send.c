@@ -197,10 +197,10 @@ do_multipart_crypto(LibBalsaMessage * message, GMimeObject ** mime_root);
 
 static guint balsa_send_message_real(SendMessageInfo* info);
 static LibBalsaMsgCreateResult
-libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
+libbalsa_message_create_mime_message(LibBalsaMessage* message,
 				     gboolean flow, gboolean postponing);
 static LibBalsaMsgCreateResult libbalsa_create_msg(LibBalsaMessage * message,
-				    gint encoding, gboolean flow);
+				    gboolean flow);
 static LibBalsaMsgCreateResult
 libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage * message,
                                        MessageQueueItem *mqi);
@@ -292,8 +292,7 @@ lbs_set_content(GMimePart * mime_part, gchar * content)
 }
 
 static GMimeObject *
-add_mime_body_plain(LibBalsaMessageBody *body, gint encoding_style, 
-		    gboolean flow)
+add_mime_body_plain(LibBalsaMessageBody *body, gboolean flow)
 {
     GMimePart *mime_part;
     const gchar * charset;
@@ -321,7 +320,7 @@ add_mime_body_plain(LibBalsaMessageBody *body, gint encoding_style,
     }
 
     g_mime_part_set_content_disposition(mime_part, GMIME_DISPOSITION_INLINE);
-    g_mime_part_set_encoding(mime_part, encoding_style);
+    g_mime_part_set_encoding(mime_part, GMIME_PART_ENCODING_QUOTEDPRINTABLE);
     g_mime_object_set_content_type_parameter(GMIME_OBJECT(mime_part),
                                              "charset",
                                              charset ? charset :
@@ -381,14 +380,14 @@ static void dump_queue(const char*msg)
 */
 LibBalsaMsgCreateResult
 libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
-		       LibBalsaMailbox * fccbox, gint encoding,
+		       LibBalsaMailbox * fccbox,
 		       gboolean flow)
 {
     LibBalsaMsgCreateResult result;
 
     g_return_val_if_fail(message, LIBBALSA_MESSAGE_CREATE_ERROR);
 
-    if ((result = libbalsa_create_msg(message, encoding, flow)) !=
+    if ((result = libbalsa_create_msg(message, flow)) !=
 	LIBBALSA_MESSAGE_CREATE_OK)
         return result;
 
@@ -407,7 +406,7 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 #if ENABLE_ESMTP
 LibBalsaMsgCreateResult
 libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
-                      LibBalsaMailbox *fccbox, gint encoding,
+                      LibBalsaMailbox *fccbox,
                       LibBalsaFccboxFinder finder,
                       gchar * smtp_server, auth_context_t smtp_authctx,
                       gint tls_mode, gboolean flow, gboolean debug)
@@ -415,8 +414,7 @@ libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
     LibBalsaMsgCreateResult result = LIBBALSA_MESSAGE_CREATE_OK;
 
     if (message != NULL)
-        result = libbalsa_message_queue(message, outbox, fccbox, encoding,
-					flow);
+        result = libbalsa_message_queue(message, outbox, fccbox, flow);
      if (result == LIBBALSA_MESSAGE_CREATE_OK)
 	 if (!libbalsa_process_queue(outbox, finder, smtp_server,
 				     smtp_authctx, tls_mode, debug))
@@ -428,13 +426,12 @@ libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 LibBalsaMsgCreateResult
 libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
 		      LibBalsaMailbox* fccbox, LibBalsaFccboxFinder finder,
-                      gint encoding, gboolean flow, gboolean debug)
+                      gboolean flow, gboolean debug)
 {
     LibBalsaMsgCreateResult result = LIBBALSA_MESSAGE_CREATE_OK;
 
     if (message != NULL)
- 	result = libbalsa_message_queue(message, outbox, fccbox,
-                                        encoding, flow);
+ 	result = libbalsa_message_queue(message, outbox, fccbox, flow);
     if (result == LIBBALSA_MESSAGE_CREATE_OK)
  	if (!libbalsa_process_queue(outbox, finder, debug))
  	    return LIBBALSA_MESSAGE_SEND_ERROR;
@@ -1392,8 +1389,8 @@ parse_content_type(const char* content_type)
 }
 
 static LibBalsaMsgCreateResult
-libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
-				     gboolean flow, gboolean postponing)
+libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
+				     gboolean postponing)
 {
     gchar **mime_type;
     GMimeObject *mime_root = NULL;
@@ -1516,12 +1513,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 	    g_strfreev(mime_type);
 	} else if (body->buffer) {
 #ifdef HAVE_GPGME
-	    /* force quoted printable encoding if only signing is requested */
-	    mime_part =
-		add_mime_body_plain(body,
-				    (message->gpg_mode & LIBBALSA_PROTECT_MODE) == LIBBALSA_PROTECT_SIGN ?
-				    GMIME_PART_ENCODING_QUOTEDPRINTABLE :
-				    encoding, flow);
+	    mime_part = add_mime_body_plain(body, flow);
 	    /* in '2440 mode, touch *only* the first body! */
 	    if (!postponing && body == body->message->body_list &&
 		message->gpg_mode > 0 &&
@@ -1537,7 +1529,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 		}
 	    }
 #else
-	    mime_part = add_mime_body_plain(body, encoding, flow);
+	    mime_part = add_mime_body_plain(body, flow);
 #endif /* HAVE_GPGME */
 	}
 
@@ -1652,13 +1644,12 @@ gboolean
 libbalsa_message_postpone(LibBalsaMessage * message,
 			  LibBalsaMailbox * draftbox,
 			  LibBalsaMessage * reply_message,
-			  gchar * fcc, gint encoding,
-			  gboolean flow)
+			  gchar * fcc, gboolean flow)
 {
     int thereturn; 
 
     if (!message->mime_msg
-	&& libbalsa_message_create_mime_message(message, encoding, flow,
+	&& libbalsa_message_create_mime_message(message, flow,
 						TRUE) !=
 	LIBBALSA_MESSAGE_CREATE_OK)
 	return FALSE;
@@ -1709,12 +1700,11 @@ libbalsa_set_message_id(GMimeMessage * mime_message)
    copies message to msg.
 */ 
 static LibBalsaMsgCreateResult
-libbalsa_create_msg(LibBalsaMessage * message,
-		    gint encoding, gboolean flow)
+libbalsa_create_msg(LibBalsaMessage * message, gboolean flow)
 {
     if (!message->mime_msg) {
 	LibBalsaMsgCreateResult res =
-	    libbalsa_message_create_mime_message(message, encoding, flow,
+	    libbalsa_message_create_mime_message(message, flow,
 						 FALSE);
 	if (res != LIBBALSA_MESSAGE_CREATE_OK)
 	    return res;

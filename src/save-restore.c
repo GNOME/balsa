@@ -975,10 +975,6 @@ config_global_load(void)
 #endif
 #endif
     /* ... outgoing mail */
-    balsa_app.encoding_style = libbalsa_conf_get_int("EncodingStyle=2");
-    /* convert libmutt Quoted Printable to GMime type, for compatible */
-    if (balsa_app.encoding_style==3)
-        balsa_app.encoding_style = GMIME_PART_ENCODING_QUOTEDPRINTABLE;
     balsa_app.wordwrap = libbalsa_conf_get_bool("WordWrap=true");
     balsa_app.wraplength = libbalsa_conf_get_int("WrapLength=72");
     if (balsa_app.wraplength < 40)
@@ -1310,7 +1306,6 @@ config_save(void)
     }
 #endif 
 #endif 
-    libbalsa_conf_set_int("EncodingStyle", balsa_app.encoding_style);
     libbalsa_conf_set_bool("WordWrap", balsa_app.wordwrap);
     libbalsa_conf_set_int("WrapLength", balsa_app.wraplength);
     libbalsa_conf_set_bool("AutoQuote", balsa_app.autoquote);

@@ -201,7 +201,6 @@ typedef struct _PropertyUI {
     static GtkWidget *outgoing_subpage(gpointer);
     static GtkWidget *word_wrap_group(GtkWidget * page);
     static GtkWidget *other_options_group(GtkWidget * page);
-    static GtkWidget *encoding_group(GtkWidget * page);
 
     /* Display page */
     static GtkWidget *create_display_page(gpointer);
@@ -284,7 +283,6 @@ typedef struct _PropertyUI {
     /* special helpers */
     static GtkWidget *create_action_after_move_menu(void);
     static GtkWidget *create_information_message_menu(void);
-    static GtkWidget *create_encoding_menu(void);
     static GtkWidget *create_mdn_reply_menu(void);
 #if ENABLE_ESMTP
     static GtkWidget *create_tls_mode_menu(void);
@@ -326,18 +324,6 @@ typedef struct _PropertyUI {
     static void filter_modified_cb(GtkWidget * widget, GtkWidget * pbox);
     static void expunge_on_close_cb(GtkWidget * widget, GtkWidget * pbox);
     static void expunge_auto_cb(GtkWidget * widget, GtkWidget * pbox);
-
-    guint encoding_type[NUM_ENCODING_MODES] = {
-	GMIME_PART_ENCODING_7BIT,
-	GMIME_PART_ENCODING_8BIT,
-	GMIME_PART_ENCODING_QUOTEDPRINTABLE
-    };
-
-    gchar *encoding_type_label[NUM_ENCODING_MODES] = {
-	N_("7 Bits"),
-	N_("8 Bits"),
-	N_("Quoted")
-    };
 
     guint pwindow_type[NUM_PWINDOW_MODES] = {
 	WHILERETR,
@@ -748,8 +734,6 @@ typedef struct _PropertyUI {
 	/* if (balsa_app.alt_layout_is_active != balsa_app.alternative_layout)  */
 	    balsa_change_window_layout(balsa_app.main_window);
 
-	balsa_app.encoding_style = pm_combo_box_get_level(pui->encoding_menu);
-
 	if (balsa_app.mblist_show_mb_content_info !=
 	    GTK_TOGGLE_BUTTON(pui->mblist_show_mb_content_info)->active) {
 	    balsa_app.mblist_show_mb_content_info =
@@ -997,8 +981,6 @@ typedef struct _PropertyUI {
 				 GTK_TOGGLE_BUTTON(pui->pgdownmod)->active);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->debug),
 				     balsa_app.debug);
-
-	pm_combo_box_set_level(pui->encoding_menu, balsa_app.encoding_style);
 
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
 				     (pui->mblist_show_mb_content_info),
@@ -1841,7 +1823,6 @@ outgoing_subpage(gpointer data)
 
     pm_page_add(page, word_wrap_group(page));
     pm_page_add(page, other_options_group(page));
-    pm_page_add(page, encoding_group(page));
 
     return page;
 }
@@ -1910,23 +1891,6 @@ other_options_group(GtkWidget * page)
                                     "outgoing mail in outbox"));
     pui->copy_to_sentbox =
         pm_group_add_check(group, _("Copy outgoing messages to sentbox"));
-
-    return group;
-}
-
-static GtkWidget *
-encoding_group(GtkWidget * page)
-{
-    GtkWidget *group;
-    GtkWidget *hbox;
-
-    group = pm_group_new(_("Encoding"));
-    hbox = gtk_hbox_new(FALSE, 0);
-    pm_group_add(group, hbox);
-
-    pui->encoding_menu = create_encoding_menu();
-    gtk_box_pack_start(GTK_BOX(hbox), pui->encoding_menu, FALSE, FALSE, 0);
-    pm_combo_box_set_level(pui->encoding_menu, balsa_app.encoding_style);
 
     return group;
 }
@@ -2910,18 +2874,6 @@ create_information_message_menu(void)
     add_show_menu(_("Print to console"),   BALSA_INFORMATION_SHOW_STDERR,
                   combo_box);
 
-    return combo_box;
-}
-
-static GtkWidget *
-create_encoding_menu(void)
-{
-    gint i;
-
-    GtkWidget *combo_box = pm_combo_box_new();
-    for (i = 0; i < NUM_ENCODING_MODES; i++)
-        add_show_menu(_(encoding_type_label[i]), encoding_type[i],
-                      combo_box);
     return combo_box;
 }
 

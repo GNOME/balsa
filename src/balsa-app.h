@@ -332,7 +332,6 @@ extern struct BalsaApplication {
     gchar *subject_font;
 
     /* encoding stuff */
-    guint encoding_style;
     gchar *date_string;
 
     /* printing */

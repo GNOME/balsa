@@ -41,14 +41,13 @@ enum _LibBalsaMsgCreateResult {
 LibBalsaMsgCreateResult libbalsa_message_queue(LibBalsaMessage* message, 
 					       LibBalsaMailbox* outbox,
                                                LibBalsaMailbox* fccbox,
-					       gint encoding, gboolean flow);
+					       gboolean flow);
 #if ENABLE_ESMTP
 #include <libesmtp.h>
 
 LibBalsaMsgCreateResult libbalsa_message_send(LibBalsaMessage* message,
 					      LibBalsaMailbox* outbox,  
 					      LibBalsaMailbox* fccbox,
-					      gint encoding,
                                               LibBalsaFccboxFinder finder, 
                                               gchar* smtp_server,
 					      auth_context_t smtp_authctx,
@@ -65,8 +64,7 @@ LibBalsaMsgCreateResult libbalsa_message_send(LibBalsaMessage* message,
 					      LibBalsaMailbox* outbox,  
 					      LibBalsaMailbox* fccbox,
                                               LibBalsaFccboxFinder finder, 
-					      gint encoding, gboolean flow,
-                                              gboolean debug);
+					      gboolean flow, gboolean debug);
 gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, 
                                 LibBalsaFccboxFinder finder,
                                 gboolean debug);

@@ -3082,7 +3082,6 @@ part_context_menu_mail(GtkWidget * menu_item, BalsaPartInfo * info)
     libbalsa_message_append_part(message, body);
 #if ENABLE_ESMTP
     libbalsa_message_send(message, balsa_app.outbox, NULL,
-                          balsa_app.encoding_style,  
                           balsa_find_sentbox_by_url, balsa_app.smtp_server,
                           (balsa_app.smtp_user && *balsa_app.smtp_user)
                           ? balsa_app.smtp_authctx : NULL,
@@ -3091,7 +3090,7 @@ part_context_menu_mail(GtkWidget * menu_item, BalsaPartInfo * info)
 #else
     libbalsa_message_send(message, balsa_app.outbox, NULL,
                           balsa_find_sentbox_by_url,
-                          balsa_app.encoding_style, FALSE, balsa_app.debug);
+                          FALSE, balsa_app.debug);
 #endif
     g_object_unref(G_OBJECT(message));    
 }
@@ -3919,7 +3918,6 @@ handle_mdn_request(LibBalsaMessage *message)
     } else {
 #if ENABLE_ESMTP
         libbalsa_message_send(mdn, balsa_app.outbox, NULL,
-                              balsa_app.encoding_style,  
                               balsa_find_sentbox_by_url,
                               balsa_app.smtp_server,
                               (balsa_app.smtp_user && *balsa_app.smtp_user)
@@ -3928,7 +3926,6 @@ handle_mdn_request(LibBalsaMessage *message)
 #else
         libbalsa_message_send(mdn, balsa_app.outbox, NULL,
                               balsa_find_sentbox_by_url,
-                              balsa_app.encoding_style,
                               TRUE, balsa_app.debug);
 #endif
         g_object_unref(G_OBJECT(mdn));
@@ -4050,7 +4047,6 @@ mdn_dialog_response(GtkWidget * dialog, gint response, gpointer user_data)
     if (response == GTK_RESPONSE_YES) {
 #if ENABLE_ESMTP
         libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
-                              balsa_app.encoding_style,
                               balsa_find_sentbox_by_url,
                               balsa_app.smtp_server,
                               (balsa_app.smtp_user && *balsa_app.smtp_user)
@@ -4059,7 +4055,6 @@ mdn_dialog_response(GtkWidget * dialog, gint response, gpointer user_data)
 #else
         libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
                               balsa_find_sentbox_by_url,
-                              balsa_app.encoding_style,
                               TRUE, balsa_app.debug);
 #endif
     }

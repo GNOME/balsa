@@ -400,9 +400,6 @@ balsa_app_init(void)
     balsa_app.message_font = NULL;
     balsa_app.subject_font = NULL;
 
-    /*encoding */
-    balsa_app.encoding_style = 0;
-
     /* compose: shown headers */
     balsa_app.compose_headers = NULL;
 

@@ -610,7 +610,8 @@ static void
 headers2canvas (BalsaMessage * bmessage, Message * message)
 {
   double x1, x2, y1, y2;
-
+  GList *p, * lst;
+  gchar **pair;
   GnomeCanvasGroup *bm_root;
   GnomeCanvasGroup *row[2];
 
@@ -636,7 +637,6 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
 						      "x", (double) 0.0,
 						      "y", (double) 0.0,
 						      NULL));
-
   add_header_gchar("date", _("Date:"), message->date, row); 
 
   if (message->from) {
@@ -653,24 +653,16 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
      add_header_gchar("fcc" , _("Fcc:"),     message->fcc_mailbox->name, row);
   add_header_gchar("subject", _("Subject:"), message->subject,           row);
 
-
-  if(balsa_app.shown_headers == HEADERS_ALL) {
-     GList *p, * lst = message_user_hdrs(message);
-     gchar * hdr, *ptr, *val;
-     for(p = g_list_first(lst); p; p = g_list_next(p) ) {
-	ptr = strchr((char*)p->data, ':');
-	if(ptr) {
-	   hdr = g_strndup((gchar*)p->data, ptr -((char*)p->data) +1);
-	   val = g_strdup(ptr+1);
-	   if(balsa_app.browse_wrap)
-	      wrap_string(val, balsa_app.wraplength-(ptr -((char*)p->data)+1));
-	   add_header_gchar("user", hdr, val,  row);
-	   g_free(val);
-	   g_free(hdr);
-	}
-     }
-     g_list_free(lst);
+  /* remaining user headers */
+  lst = message_user_hdrs(message);
+  for(p = g_list_first(lst); p; p = g_list_next(p) ) {
+      pair = p->data;
+      if(balsa_app.browse_wrap)
+	  wrap_string(pair[1], balsa_app.wraplength-strlen(pair[0])-1);
+      add_header_gchar(pair[0], pair[0], pair[1],  row);
+      g_strfreev(pair);
   }
+  g_list_free(lst);
 
   gnome_canvas_item_get_bounds (GNOME_CANVAS_ITEM (row[0]), &x1, &y1, &x2, &y2);
   gnome_canvas_item_move (GNOME_CANVAS_ITEM (row[1]), x2 - x1 + 25, 0.0);

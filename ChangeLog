@@ -1,4 +1,9 @@
-2000-04-06  Peter Williams  <peter@beta.newton.cx>
+2000-04-07 Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/message.c,libbalsa/misc.[hc],src/balsa-message.c:
+	showing all and selected headers completed.
+	
+2000-04-06  Peter Williams  <peter@newton.cx>
 
 	* help/C/Makefile.am: better target for index.html;
 	help now works with readonly srcdir.

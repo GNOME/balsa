@@ -24,6 +24,7 @@
 
 gchar *address_to_gchar (const Address * addr);
 gchar *make_string_from_list (GList *);
+gchar *ADDRESS_to_gchar (const ADDRESS * addr);
 
 size_t readfile (FILE * fp, char **buf);
 

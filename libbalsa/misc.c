@@ -83,6 +83,19 @@ address_to_gchar (const Address * addr)
 }
 
 gchar *
+ADDRESS_to_gchar (const ADDRESS * addr)
+{
+  gchar buf[1024]; /* assume no single address is longer than this */
+
+  buf[0] = '\0';
+  rfc822_write_address(buf, sizeof(buf), (ADDRESS*)addr);
+  if(strlen(buf)>=sizeof(buf)-1)
+    fprintf(stderr,
+	    "ADDRESS_to_gchar: the max allowed address length exceeded.\n");
+  return g_strdup(buf);
+}
+
+gchar *
 make_string_from_list (GList * the_list)
 {
   gchar *retc, *str;
@@ -161,33 +174,26 @@ readfile (FILE * fp, char **buf)
   return size;
 }
 
-/* find_word
+/* find_word:
    searches given word delimited by blanks or string boundaries in given
-   string. IS case-sensitive (but probably should not). 
+   string. IS NOT case-sensitive.
    Returns TRUE if the word is found.
 */
 gboolean
 find_word(const gchar * word, const gchar* str) {
-	char *hit;
-	int len = strlen( word );
-
-	/* Look for a hit. */
-	hit = strstr( str, word );
-
-	/* Nope */
-	if( hit == NULL )
-		return FALSE;
-
-	/* Check for false in-the-middle-of-a-word hits -- before beginning. */
-	if( hit != str && ( ! isspace( *(hit - 1) ) ) )
-		return FALSE;
-
-	/* After end */
-	if( *(hit + len) != '\0' && ( ! isspace( *(hit + len) ) ) )
-		return FALSE;
-
-	/* Seems ok */
-	return TRUE;
+    const gchar *ptr = str;
+    int  len = strlen(word);
+    
+    while(*ptr) {
+	if(g_strncasecmp(word, ptr, len) == 0)
+	    return TRUE;
+	/* skip one word */
+	while(*ptr && !isspace( (unsigned char)*ptr) )
+	    ptr++;
+	while(*ptr && isspace( (unsigned char)*ptr) )
+	    ptr++;
+    }
+    return FALSE;
 }
 
 /* wrap_string
@@ -208,9 +214,9 @@ wrap_string(gchar* str, int width)
    while(*ptr) {
       if(*ptr=='\t') te += 7;
       if(*ptr==' ') sppos = ptr;
-      if(ptr-lnbeg>width-te && sppos>=lnbeg+minl) {
+      if(ptr-lnbeg+1>width-te && sppos>=lnbeg+minl) {
 	 *sppos = '\n';
-	 lnbeg = ptr;te = 0;
+	 lnbeg = ptr; te = 0;
       }
       if(*ptr=='\n') {
 	 lnbeg = ptr; te = 0;

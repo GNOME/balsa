@@ -1,3 +1,8 @@
+2005-02-11 19:38  PeterB
+
+	* src/sendmsg-window.c, libbalsa/misc.c: use
+	"application/octet-stream" as a last resort.
+
 2005-02-09 20:33  PeterB
 
 	* libbalsa/mailbox.c: don't lock mailbox to change a pseudo-flag.

@@ -32,6 +32,7 @@
 #include <string.h>
 #include <errno.h>
 
+#ifndef LIBMUTT
 /* return 1 if require full screen redraw, 0 otherwise */
 int mutt_compose_attachment (BODY *a)
 {
@@ -211,7 +212,7 @@ int mutt_edit_attachment (BODY *a, int opt)
   rfc1524_free_entry (&entry);
   return 1;
 }
-
+#endif
 int mutt_is_autoview (char *type)
 {
   LIST *t = AutoViewList;
@@ -229,7 +230,7 @@ int mutt_is_autoview (char *type)
 
   return 0;
 }
-
+#ifndef LIBMUTT
 /* returns -1 on error, 0 or the return code from mutt_do_pager() on success */
 int mutt_view_attachment (FILE *fp, BODY *a, int flag)
 {
@@ -770,3 +771,4 @@ int mutt_print_attachment (FILE *fp, BODY *a)
     return 0;
   }
 }
+#endif

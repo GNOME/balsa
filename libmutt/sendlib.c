@@ -1301,7 +1301,9 @@ send_msg (const char *path, char **args, const char *msg, char **tempfile)
   if (SendmailWait < 0 || ((Signals & S_ALARM) && w < 0 && err == EINTR))
   {
     /* add to list of children pids to reap */
+#ifndef LIBMUTT
     mutt_add_child_pid (pid);
+#endif
     /* since there is no way for the user to be notified of error in this case,
        remove the temp file now */
     unlink (*tempfile);
@@ -1417,9 +1419,10 @@ invoke_sendmail (ADDRESS *to, ADDRESS *cc, ADDRESS *bcc, /* recips */
     safe_realloc ((void **) &args, sizeof (char *) * (++argsmax));
   
   args[argslen++] = NULL;
-
+#ifndef LIBMUTT
   if (!option (OPTNOCURSES))
     endwin ();
+#endif
   if ((i = send_msg (path, args, msg, &childout)) != (EX_OK & 0xff))
   {
     char *e = strerror (errno);

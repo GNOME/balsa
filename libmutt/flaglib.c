@@ -188,9 +188,9 @@ void mutt_set_flag (CONTEXT *ctx, HEADER *h, int flag, int bf)
       }
       break;
   }
-
+#ifndef LIBMUTT
   mutt_set_header_color(ctx, h);
-
+#endif
   /* if the message status has changed, we need to invalidate the cached
    * search results so that any future search will match the current status
    * of this message and not what it was at the time it was last searched.

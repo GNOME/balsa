@@ -32,5 +32,14 @@ void mutt_exit (int code)
 
 int mutt_yesorno (const char *msg, int def)
 {
-  return 0;
+ return 1;
+}
+
+int mutt_any_key_to_continue (const char *s)
+{
+ return 1;
+}
+
+void mutt_clear_error (void)
+{
 }

@@ -926,6 +926,7 @@ void mutt_FormatString (char *dest,		/* output buffer */
 	ch = *src++; /* pad char */
 	/* calculate space left on line.  if we've already written more data
 	   than will fit on the line, ignore the rest of the line */
+#ifndef LIBMUTT
 	count = (COLS < destlen ? COLS : destlen);
 	if (count > wlen)
 	{
@@ -945,12 +946,14 @@ void mutt_FormatString (char *dest,		/* output buffer */
 	  wptr += len;
 	  wlen += len;
 	}
+#endif
 	break; /* skip rest of input */
       }
       else if (ch == '|')
       {
 	/* pad to EOL */
 	ch = *src++;
+#ifndef LIBMUTT
 	if (destlen > COLS)
 	  destlen = COLS;
 	if (destlen > wlen)
@@ -959,6 +962,7 @@ void mutt_FormatString (char *dest,		/* output buffer */
 	  memset (wptr, ch, count);
 	  wptr += count;
 	}
+#endif
 	break; /* skip rest of input */
       }
       else

@@ -64,7 +64,9 @@ int query_quadoption (int opt, const char *prompt)
 
     default:
       v = mutt_yesorno (prompt, (v == M_ASKYES));
+#ifndef LIBMUTT
       CLEARLINE (LINES - 1);
+#endif
       return (v);
   }
 

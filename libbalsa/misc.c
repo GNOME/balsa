@@ -83,7 +83,7 @@ address_to_gchar (Address * addr)
 gchar *
 make_string_from_list (GList * the_list)
 {
-  gchar *retc;
+  gchar *retc, *str;
   GList *list;
   GString *gs = g_string_new (NULL);
   Address *addy;
@@ -93,7 +93,9 @@ make_string_from_list (GList * the_list)
   while (list)
     {
       addy = list->data;
-      gs = g_string_append (gs, address_to_gchar (addy));
+      str = address_to_gchar (addy);
+      gs = g_string_append (gs, str);
+      g_free (str);
 
       if (list->next)
 	gs = g_string_append (gs, ", ");

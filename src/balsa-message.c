@@ -22,6 +22,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "balsa-app.h"
 #include "mailbackend.h"
@@ -983,7 +984,7 @@ reflow_string(gchar* str, gint mode, gint *cur_pos, int width)
 	 *iidx++ = '\n';
 	 lspace = 1;
 	 lnbeg = sppos = iidx;
-      } else if(isspace(*l)) {
+      } else if(isspace((unsigned char)*l)) {
 	 lnl = *l == '\n';
 	 if(!lspace) {
 	    sppos = iidx; 
@@ -1019,6 +1020,9 @@ mimetext2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * gr
 	s.fpin = fp;
 	s.prefix = '\0';
 
+	fprintf (stderr, "Someone please verify the following assignment.\n");
+	s.flags = 0;
+
 	mutt_mktemp( tmp_file_name );
 	s.fpout = fopen( tmp_file_name, "w+" );
 
@@ -1046,6 +1050,7 @@ mimetext2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * gr
 		if( bdy->filename == NULL )
 		   bdy->filename = g_strdup( "textfile" );
 
+		/* FIXME: this is leaked.  */
 		info = balsa_save_file_info_new( NULL, message, bdy );
 		
 		/* create text and info, set them up */

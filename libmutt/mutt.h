@@ -148,6 +148,14 @@ typedef enum
 #define M_THREAD_UNREAD		(1<<3)
 #define M_THREAD_NEXT_UNREAD	(1<<4)
 
+
+#ifdef M_READ
+/* FIXME: On Solaris (and probably others), M_READ is defined by the
+   streams headers (<sys/streams.h>).  We need to use a better
+   prefix.  */
+#undef M_READ
+#endif
+
 enum
 {
   /* modes for mutt_view_attachment() */

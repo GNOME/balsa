@@ -575,11 +575,7 @@ message_body_unref (Message * message)
 	{
 	  body = (Body *) list->data;
 	  list = list->next;
-
-	  if (body->htmlized)
-	    g_free (body->htmlized);
-	  if (body->buffer)
-	    g_free (body->buffer);
+	  body_free (body);
 	}
 
       g_list_free (message->body_list);

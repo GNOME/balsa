@@ -1,3 +1,17 @@
+2000-03-05  Morten Welinder  <terra@diku.dk>
+
+	* libbalsa/misc.c (make_string_from_list): Plug leak.
+
+	* libbalsa/message.c (message_body_unref): Use body_free.
+
+	* src/balsa-mblist.c (mailbox_nodes_to_ctree): Plug leak.
+
+	* src/balsa-message.c: Include <ctype.h> for isspace.
+	(reflow_string): Use isspace properly.
+	(mimetext2canvas): Initialise flags.
+
+	* src/local-mailbox.c (is_mh_message): Use isdigit properly.
+
 2000-03-03  Peter Williams  <peter@beta.newton.cx>
 
 	* libbalsa/mailbox.c (translate_message): Uses user's

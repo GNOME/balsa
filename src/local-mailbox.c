@@ -176,7 +176,7 @@ is_mh_message (gchar * str)
 
   for (i = 0; i < len; i++)
     {
-      if (!isdigit (str[i]))
+      if (!isdigit ((unsigned char)(str[i])))
 	{
 	  return 0;
 	}

@@ -455,6 +455,7 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 				   NULL, NULL,
 				   FALSE,
 				   FALSE);
+	  gtk_style_unref (style);
 	}
 	else
 	{

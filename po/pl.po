@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-09-07 11:53+0200\n"
+"POT-Creation-Date: 2003-09-07 16:44+0200\n"
 "PO-Revision-Date: 2003-07-27 23:38+0100\n"
 "Last-Translator: Gnome PL Team <translators@gnome.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
@@ -89,7 +89,7 @@ msgstr "O_rganizacja:"
 msgid "_Email Address:"
 msgstr "Adres _e-mail:"
 
-#: libbalsa/body.c:112 libbalsa/message.c:1023
+#: libbalsa/body.c:112 libbalsa/message.c:1017
 msgid "(No subject)"
 msgstr "(Brak tematu)"
 
@@ -447,7 +447,7 @@ msgstr "Błędna ścieżka lokalnej skrzynki \"%s\""
 msgid "Could not create a mailbox of type %s"
 msgstr "Nie można utworzyć skrzynki typu %s"
 
-#: libbalsa/mailbox_imap.c:664 libbalsa/mailbox_imap.c:1150
+#: libbalsa/mailbox_imap.c:664 libbalsa/mailbox_imap.c:1154
 #, c-format
 msgid ""
 "IMAP SEARCH command failed for mailbox %s\n"
@@ -459,12 +459,12 @@ msgstr ""
 "regularnych).\n"
 "Nastąpił powrót do domyślnej metody wyszukiwania"
 
-#: libbalsa/mailbox_imap.c:819
+#: libbalsa/mailbox_imap.c:820
 #, c-format
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxImap: Otwieranie %s Licznik odwołań: %d\n"
 
-#: libbalsa/mailbox_imap.c:1017
+#: libbalsa/mailbox_imap.c:1021
 #, c-format
 msgid ""
 "IMAP SEARCH command failed for mailbox %s\n"
@@ -489,12 +489,12 @@ msgstr "Nie można utworzyć katalogu Maildir w %s (%s)"
 msgid "Could not create a MailDir at %s (%s)"
 msgstr "Nie można utworzyć skrzynki Maildir w %s (%s)"
 
-#: libbalsa/mailbox_maildir.c:272 libbalsa/mailbox_mh.c:248
+#: libbalsa/mailbox_maildir.c:282 libbalsa/mailbox_mh.c:248
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Nie można otworzyć %s. Kod błędu: %d, "
 
-#: libbalsa/mailbox_maildir.c:291 libbalsa/mailbox_mh.c:267
+#: libbalsa/mailbox_maildir.c:301 libbalsa/mailbox_mh.c:267
 #, c-format
 msgid ""
 "Could not remove contents of %s:\n"
@@ -503,7 +503,7 @@ msgstr ""
 "Nie można usunąć zawartości %s:\n"
 "%s"
 
-#: libbalsa/mailbox_maildir.c:297 libbalsa/mailbox_mbox.c:235
+#: libbalsa/mailbox_maildir.c:307 libbalsa/mailbox_mbox.c:235
 #: libbalsa/mailbox_mh.c:273
 #, c-format
 msgid ""
@@ -513,15 +513,20 @@ msgstr ""
 "Nie można usunąć %s:\n"
 "%s"
 
-#: libbalsa/mailbox_maildir.c:459 libbalsa/mailbox_mbox.c:381
+#: libbalsa/mailbox_maildir.c:467
 #, c-format
-msgid "LibBalsaMailboxMbox: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxMbox: Otwieranie %s Licznik odwołań: %d\n"
+msgid "LibBalsaMailboxMaildir: Opening %s Refcount: %d\n"
+msgstr "LibBalsaMailboxMaildir: Otwieranie %s Licznik odwołań: %d\n"
 
 #: libbalsa/mailbox_mbox.c:158
 #, c-format
 msgid "Mailbox %s does not appear to be an Mbox mailbox."
 msgstr "Skrzynka %s nie wydaje się być skrzynką typu Mbox."
+
+#: libbalsa/mailbox_mbox.c:381
+#, c-format
+msgid "LibBalsaMailboxMbox: Opening %s Refcount: %d\n"
+msgstr "LibBalsaMailboxMbox: Otwieranie %s Licznik odwołań: %d\n"
 
 #: libbalsa/mailbox_mh.c:156
 #, c-format

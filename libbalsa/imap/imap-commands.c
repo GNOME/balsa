@@ -705,8 +705,8 @@ imap_mbox_store_flag(ImapMboxHandle *h, unsigned msgcnt, unsigned*seqno,
       else
         msg->flags &= ~flg;
     }
-    /* should we emit signals here on flag change?
-     * What if Store fails below? The flags won't be set. */
+    if(h->flags_cb)
+      h->flags_cb(seqno[i], h->flags_arg);
   }
   cmd = g_strdup_printf("Store %s %cFlags.Silent (%s)", seq,
                         state ? '+' : '-', str);

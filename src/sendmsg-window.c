@@ -40,6 +40,9 @@ static void close_window (GtkWidget *, gpointer);
 static GtkWidget *create_menu (GtkWidget * window, BalsaSendmsg *);
 static GtkWidget *create_toolbar (GtkWidget * window, BalsaSendmsg *);
 
+static void attach_clicked (GtkWidget *, gpointer);
+
+
 static void balsa_sendmsg_destroy (BalsaSendmsg * bsm);
 
 static GtkWidget *menu_items[7];
@@ -146,6 +149,10 @@ create_menu (GtkWidget * window, BalsaSendmsg * bmsg)
   gtk_widget_show (w);
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
+  gtk_signal_connect (GTK_OBJECT (w),
+		      "activate",
+		      GTK_SIGNAL_FUNC (attach_clicked),
+		      bmsg->attachments);
 
   w = gtk_menu_item_new ();
   gtk_widget_show (w);
@@ -214,13 +221,66 @@ create_menu (GtkWidget * window, BalsaSendmsg * bmsg)
   return menubar;
 }
 
+
+static void
+attach_dialog_ok (GtkWidget * widget, gpointer data)
+{
+  GtkFileSelection *fs;
+  GnomeIconList *iconlist;
+  gchar *filename;
+  gint pos;
+
+  fs = GTK_FILE_SELECTION (data);
+  iconlist = GNOME_ICON_LIST(gtk_object_get_user_data (GTK_OBJECT (fs)));
+
+  filename = gtk_file_selection_get_filename(fs);
+
+  pos = gnome_icon_list_append(iconlist, gnome_pixmap_file("attachment.png"), filename);
+  gnome_icon_list_set_icon_data(iconlist, pos, filename);
+  
+  /* FIXME */
+  /* g_free(filename); */
+  
+  gtk_widget_destroy (GTK_WIDGET (fs));
+}
+
+static void
+attach_dialog_cancel (GtkWidget * widget, gpointer data)
+{
+  gtk_widget_destroy (GTK_WIDGET (data));
+}
+
+static void
+attach_clicked (GtkWidget * widget, gpointer data)
+{
+  GtkWidget *fsw;
+  GnomeIconList *iconlist;
+  GtkFileSelection *fs;
+
+  iconlist = GNOME_ICON_LIST(data);
+
+  fsw = gtk_file_selection_new (_ ("Attach file"));
+  gtk_object_set_user_data(GTK_OBJECT(fsw), iconlist);
+
+  fs = GTK_FILE_SELECTION (fsw);
+
+  gtk_signal_connect (GTK_OBJECT (fs->ok_button), "clicked",
+		      (GtkSignalFunc) attach_dialog_ok,
+		      fs);
+  gtk_signal_connect (GTK_OBJECT (fs->cancel_button), "clicked",
+		      (GtkSignalFunc) attach_dialog_cancel,
+		      fs);
+
+  gtk_widget_show (fsw);
+}
+
 static GtkWidget *
 create_info_pane (BalsaSendmsg * msg, SendType type)
 {
   GtkWidget *table;
   GtkWidget *label;
 
-  table = gtk_table_new (5, 2, FALSE);
+  table = gtk_table_new (6, 2, FALSE);
   gtk_table_set_row_spacings (GTK_TABLE (table), 2);
   gtk_table_set_col_spacings (GTK_TABLE (table), 2);
 
@@ -274,6 +334,10 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
 
   msg->bcc = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), msg->bcc, 1, 2, 4, 5,
+		    GTK_FILL | GTK_EXPAND, GTK_FILL, 0, 0);
+
+  msg->attachments = gnome_icon_list_new ();
+  gtk_table_attach (GTK_TABLE (table), msg->attachments, 0, 2, 5, 6,
 		    GTK_FILL | GTK_EXPAND, GTK_FILL, 0, 0);
 
   return table;

@@ -1,5 +1,8 @@
-2004-01-19 16:39  PeterB
+2004-01-19 22:41  PeterB
 
+	* src/: balsa-message.c, balsa-message.h: make BalsaMessage
+	subclass GtkVbox instead of GtkViewport--no need for scrollbars
+	since it became a notebook, and the frame is just visual clutter.
 	* src/balsa-message.c: use macros to access header text and message
 	content widgets; set border and background colors of header widget
 	from theme colors; set background of message to base of message

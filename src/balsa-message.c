@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -416,12 +416,16 @@ balsa_message_clear(BalsaMessage * bm)
 
 }
 
-void
+/* balsa_message_set:
+   returns TRUE on success, FALSE on failure (message content could not be
+   accessed).
+*/
+gboolean
 balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 {
     gboolean had_focus;
 
-    g_return_if_fail(bm != NULL);
+    g_return_val_if_fail(bm != NULL, FALSE);
 
     /* Leave this out. When settings (eg wrap) are changed it is OK to 
        call message_set with the same messagr */
@@ -444,13 +448,14 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 
     if (message == NULL) {
 	gtk_widget_hide(bm->header_text);
-	return;
+	return TRUE;
     }
 
     /* mark message as read; no-op if it was read so don't worry.
        and this is the right place to do the marking.
+       body_ref marks the message as read.
+       libbalsa_message_read(message);
      */
-    libbalsa_message_read(message);
 
     bm->message = message;
 
@@ -460,7 +465,8 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 
     display_headers(bm);
 
-    libbalsa_message_body_ref(bm->message);
+    if(!libbalsa_message_body_ref(bm->message)) 
+	return FALSE;
 
     display_content(bm);
 
@@ -476,7 +482,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 
 	/* This is really annoying if you are browsing, since you keep getting a dialog... */
 	/* balsa_information(LIBBALSA_INFORMATION_WARNING, _("Message contains no parts!")); */
-	return;
+	return TRUE;
     }
 
     gnome_icon_list_select_icon(GNOME_ICON_LIST(bm->part_list), 0);
@@ -503,6 +509,8 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 	else
 	    gtk_widget_show(bm->part_list);
     }
+
+    return TRUE;
 }
 
 void

@@ -1,3 +1,20 @@
+2001-02-04  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* help/C/balsa.sgml: add description of IMAP folder configuration.
+	* libbalsa/folder-scanners.c: be less verbose.
+	* libbalsa/mailbox.c: don't retry for ever on error.
+	* libbalsa/mailbox_imap.[hc]: implement 
+	libbalsa_imap_close_all_connections()
+	* libbalsa/message.[ch]: more robust on mailbox accessing
+	errors. Return operation status from libbalsa_message_body_ref()
+	* src/balsa-index.c: be more robust on errors and provide feedback
+	to the user.
+	* src/balsa-message.[hc] (balsa_message_set): return
+	operation status.
+	* src/folder-conf.[hc]: plug in  IMAP folders configuration.
+	* src/mailbox-node.c: second part of configuration.
+	* src/main.c: shutdown nicely all imap connsection on exit.
+	
 2001-02-03  Matthew Guenther  <guentherm@asme.org>
 
 	* src/balsa-app.[ch]: Add option to automatically view message

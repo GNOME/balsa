@@ -256,6 +256,8 @@ balsa_mailbox_node_new_from_config(const gchar* prefix)
   
     printf("Server loaded, host: %s, port %d\n", folder->server->host,
 	   folder->server->port);
+    gtk_signal_connect(GTK_OBJECT(folder), "show-prop-dialog", 
+		       folder_conf_imap_node, NULL);
     gtk_signal_connect(GTK_OBJECT(folder), "append-subtree", 
 		       imap_dir_cb, NULL);
     folder->name = gnome_config_get_string("Name");
@@ -293,7 +295,7 @@ balsa_mailbox_node_new_imap_folder(LibBalsaServer* s, const char*p)
     folder->dir = g_strdup(p);
 
     gtk_signal_connect(GTK_OBJECT(folder), "show-prop-dialog", 
-		       folder_conf_edit_imap_cb, NULL);
+		        folder_conf_imap_node, NULL);
     gtk_signal_connect(GTK_OBJECT(folder), "append-subtree", 
 		       imap_dir_cb, NULL);
     return folder;
@@ -633,7 +635,6 @@ static GNode* add_imap_entry(GNode*root, const char* fn,
     BalsaMailboxNode* mbnode;
     gchar * parent_name = get_parent_folder_name(fn, delim);
 
-    printf("Looking for parent of name %s\n", parent_name);
     parent = get_parent_by_name(root, parent_name);
     g_return_val_if_fail(parent, NULL);
     if(mailbox)

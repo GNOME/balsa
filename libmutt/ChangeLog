@@ -1,3 +1,11 @@
+2001-02-03  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* imap/imap.c: handle mailbox selection errors; it fixes broken
+	connection caching.
+	* imap/imap_socket.h: add mutt_socket_close_all_connections() to 
+	quit cleanly.
+	* libmutt/imap/socket.c: implement it.
+
 2001-01-19  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libmutt/mutt.h: add dispnotify_to field.

@@ -1,7 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -34,6 +33,7 @@
 #endif
 
 #include "imap/imap.h"
+#include "imap/imap_socket.h"
 
 static LibBalsaMailboxClass *parent_class = NULL;
 
@@ -205,7 +205,7 @@ server_host_settings_changed_cb(LibBalsaServer * server, gchar * host,
 }
 
 /* libbalsa_mailbox_imap_open:
-   opens IMAP mailbox.
+   opens IMAP mailbox. On failure leaves the object in sane state.
    FIXME:
    should intelligently use auth_type field to set ImapPass (for AuthLogin),
    ImapCRAMKey (for AuthCram) or do not set anything (for AuthGSS)
@@ -389,4 +389,13 @@ libbalsa_mailbox_imap_load_config(LibBalsaMailbox * mailbox,
 
     server_settings_changed(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
 			    mailbox);
+}
+
+/* imap_close_all_connections:
+   close all connections to leave the place cleanly.
+*/
+void
+libbalsa_imap_close_all_connections(void)
+{
+    mutt_socket_close_all_connections();
 }

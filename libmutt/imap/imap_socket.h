@@ -47,6 +47,7 @@ int mutt_socket_write (CONNECTION *conn, const char *buf);
 CONNECTION *mutt_socket_select_connection (const IMAP_MBOX *mx, int newconn);
 int mutt_socket_open_connection (CONNECTION *conn);
 int mutt_socket_close_connection (CONNECTION *conn);
+void mutt_socket_close_all_connections(void);
 
 int raw_socket_read (CONNECTION *conn);
 int raw_socket_write (CONNECTION *conn, const char *buf);

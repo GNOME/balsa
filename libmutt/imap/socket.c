@@ -241,3 +241,30 @@ int raw_socket_open (CONNECTION *conn)
   verbose = MUTT_TRUE;
   return try_socket_and_connect (conn, sin, verbose);
 }
+
+/* BALSA: shutdown nicely all connections; ignore errors */
+void mutt_socket_close_all_connections(void)
+{
+  char buf[LONG_STRING];
+  char seq[8];
+  CONNECTION* conn, *c;
+
+  signal( SIGPIPE, SIG_IGN );
+  conn = Connections;
+  while (conn) {
+    imap_make_sequence (seq, sizeof (seq));
+    snprintf (buf, sizeof (buf), "%s LOGOUT\r\n", seq);
+    mutt_socket_write (conn, buf);
+    do  {
+      if (mutt_socket_read_line_d (buf, sizeof (buf), conn) < 0)
+	break;
+    }
+    while (mutt_strncmp (seq, buf, SEQLEN) != 0);
+    mutt_clear_error ();
+    mutt_socket_close_connection (conn);
+    c = conn; 
+    conn = conn->next;
+    safe_free((void**)&c);
+  }
+  Connections = NULL;
+}

@@ -1,7 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -788,25 +787,26 @@ mime_content_type2str(int contenttype)
 /* libbalsa_message_body_ref:
    references the body of given message.
    NO OP for 'loose' messages (i.e not associated with any mailbox).
+   returns TRUE for success, FALSE for failure (broken IMAP connection etc).
 */
-void
+gboolean
 libbalsa_message_body_ref(LibBalsaMessage * message)
 {
     LibBalsaMessageBody *body;
     HEADER *cur;
     MESSAGE *msg;
 
-    g_return_if_fail(message);
-    if (!message->mailbox) return;
+    g_return_val_if_fail(message, FALSE);
+    if (!message->mailbox) return FALSE;
 
     if (message->body_ref > 0) {
 	message->body_ref++;
-	return;
+	return TRUE;
     }
-
+    g_return_val_if_fail(CLIENT_CONTEXT(message->mailbox)->hdrs, FALSE);
     cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
     if (cur == NULL)
-	return;
+	return FALSE;
 
     /*
      * load message body
@@ -817,7 +817,7 @@ libbalsa_message_body_ref(LibBalsaMessage * message)
 
     if (!msg) {
 	message->body_ref--;
-	return;
+	return FALSE;
     }
 
     fseek(msg->fp, cur->content->offset, 0);
@@ -872,6 +872,7 @@ libbalsa_message_body_ref(LibBalsaMessage * message)
      */
     if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)
 	libbalsa_message_read(message);
+    return TRUE;
 }
 
 

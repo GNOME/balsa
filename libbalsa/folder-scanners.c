@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -172,7 +172,6 @@ scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
 	for(el= g_list_first(list); el; el = g_list_next(el)) {
 	    imap_path = g_strdup_printf("{%s:%i}%s", server->host, 
 					server->port, (char*)el->data);
-	    printf("calling imap_init_browse with path='%s'\n", imap_path);
 	    imap_init_browse ((char*)imap_path,  &state);
 	    g_free(imap_path);
 	}
@@ -187,9 +186,9 @@ scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
 void imap_add_folder (char delim, char *folder, int noselect,
   int noinferiors, struct browser_state *state, short isparent)
 {
-    printf("imap_add_folder. delim: '%c', folder: '%s', noselect: %d\n"
+    /* printf("imap_add_folder. delim: '%c', folder: '%s', noselect: %d\n"
 	   "noinferiors: %d, isparent: %d\n", delim, folder, noselect,
-	   noinferiors, isparent);
+	   noinferiors, isparent); */
     if(isparent) return;
     if(noinferiors)
 	state->mailbox_handler(state->rnode, folder, delim);

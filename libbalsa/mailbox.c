@@ -1,7 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -427,7 +426,8 @@ libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox,
 static void
 libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox)
 {
-    int check;
+    static const int RETRIES_COUNT = 100;
+    int check, cnt;
 #ifdef DEBUG
     g_print("LibBalsaMailbox: Closing %s Refcount: %d\n", mailbox->name,
 	    mailbox->open_ref);
@@ -449,16 +449,23 @@ libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox)
 	if (CLIENT_CONTEXT_OPEN(mailbox)) {
 	    /* We are careful to take/release locks in the correct order here */
 	    libbalsa_lock_mutt();
-	    while ( (check = mx_close_mailbox(CLIENT_CONTEXT(mailbox), NULL))) {
+	    cnt = 0;
+	    while( cnt < RETRIES_COUNT &&
+		   (check = mx_close_mailbox(CLIENT_CONTEXT(mailbox), NULL))) {
 		libbalsa_unlock_mutt();
 		UNLOCK_MAILBOX(mailbox);
 		g_print
-		    ("libbalsa_mailbox_real_close: close failed, retrying...\n");
+		    ("libbalsa_mailbox_real_close: %d trial failed.\n", cnt);
+		usleep(1000);
 		libbalsa_mailbox_check(mailbox);
 		LOCK_MAILBOX(mailbox);
 		libbalsa_lock_mutt();
+		cnt++;
 	    }
 	    libbalsa_unlock_mutt();
+	    if(cnt>=RETRIES_COUNT)
+		g_print("libbalsa_mailbox_real_close: changes to %s lost.\n",
+			mailbox->name);
 	    
 	    free(CLIENT_CONTEXT(mailbox));
 	    CLIENT_CONTEXT(mailbox) = NULL;

@@ -609,8 +609,13 @@ int imap_open_mailbox (CONTEXT *ctx)
   imap_make_sequence (seq, sizeof (seq));
   snprintf (bufout, sizeof (bufout), "%s %s %s\r\n", seq,
     ctx->readonly ? "EXAMINE" : "SELECT", buf);
-  mutt_socket_write (conn, bufout);
-
+  /* BALSA: handle broken cached connections: check the return code */
+  if(mutt_socket_write (conn, bufout) == -1) { 
+      mutt_socket_close_connection (conn);
+      idata->state = IMAP_DISCONNECTED;
+      return -1;
+  }
+  /* BALSA: end of patch */
   idata->state = IMAP_SELECTED;
 
   do

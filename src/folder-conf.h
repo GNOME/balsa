@@ -24,6 +24,7 @@
 
 #include "mailbox-node.h"
 
+void folder_conf_imap_node(BalsaMailboxNode *mn);
 /* callbacks used also by the main window menu */
 void folder_conf_add_imap_cb(GtkWidget * widget, gpointer data);
 void folder_conf_edit_imap_cb(GtkWidget * widget, gpointer data);

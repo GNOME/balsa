@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -35,12 +35,12 @@ extern "C" {
 #define BALSA_IS_MESSAGE(obj)       GTK_CHECK_TYPE (obj, balsa_message_get_type ())
 
 
-    typedef struct _BalsaMessage BalsaMessage;
-    typedef struct _BalsaMessageClass BalsaMessageClass;
+typedef struct _BalsaMessage BalsaMessage;
+typedef struct _BalsaMessageClass BalsaMessageClass;
 
-    typedef struct _BalsaPartInfo BalsaPartInfo;
+typedef struct _BalsaPartInfo BalsaPartInfo;
 
-    struct _BalsaMessage {
+struct _BalsaMessage {
 	GtkViewport parent;
 
 	/* The table widget */
@@ -63,34 +63,34 @@ extern "C" {
 	BalsaPartInfo *current_part;
 
 	LibBalsaMessage *message;
-    };
+};
 
-    struct _BalsaMessageClass {
+struct _BalsaMessageClass {
 	GtkViewportClass parent_class;
 
 	void (*select_part) (BalsaMessage * message);
-    };
+};
 
-    guint balsa_message_get_type(void);
-    GtkWidget *balsa_message_new(void);
+guint balsa_message_get_type(void);
+GtkWidget *balsa_message_new(void);
 
-    void balsa_message_clear(BalsaMessage * bmessage);
-    void balsa_message_set(BalsaMessage * bmessage,
+void balsa_message_clear(BalsaMessage * bmessage);
+gboolean balsa_message_set(BalsaMessage * bmessage,
 			   LibBalsaMessage * message);
 
-    void balsa_message_next_part(BalsaMessage * bmessage);
-    void balsa_message_previous_part(BalsaMessage * bmessage);
-    void balsa_message_save_current_part(BalsaMessage * bmessage);
+void balsa_message_next_part(BalsaMessage * bmessage);
+void balsa_message_previous_part(BalsaMessage * bmessage);
+void balsa_message_save_current_part(BalsaMessage * bmessage);
 
-    void balsa_message_set_displayed_headers(BalsaMessage * bmessage,
+void balsa_message_set_displayed_headers(BalsaMessage * bmessage,
 					     ShownHeaders sh);
-    void balsa_message_set_wrap(BalsaMessage * bmessage, gboolean wrap);
+void balsa_message_set_wrap(BalsaMessage * bmessage, gboolean wrap);
 
-    gboolean balsa_message_can_select(BalsaMessage * bmessage);
-    void balsa_message_copy_clipboard(BalsaMessage * bmessage);
-    void balsa_message_select_all(BalsaMessage * bmessage);
+gboolean balsa_message_can_select(BalsaMessage * bmessage);
+void balsa_message_copy_clipboard(BalsaMessage * bmessage);
+void balsa_message_select_all(BalsaMessage * bmessage);
 
-    void reflow_string(gchar * str, gint mode, gint * cur_pos, int width);
+void reflow_string(gchar * str, gint mode, gint * cur_pos, int width);
 
 /* a helper functions; FIXME: find more proper location for them.  */
     GdkFont* balsa_get_font_by_charset(const gchar* base, const gchar*charset);

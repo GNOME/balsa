@@ -1,7 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -56,5 +55,7 @@ GtkObject *libbalsa_mailbox_imap_new(void);
 
 void libbalsa_mailbox_imap_set_path(LibBalsaMailboxImap * mailbox,
 				    const gchar * path);
+
+void libbalsa_imap_close_all_connections(void);
 
 #endif				/* __LIBBALSA_MAILBOX_IMAP_H__ */

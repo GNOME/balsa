@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -974,10 +974,6 @@ balsa_index_set_col_images(BalsaIndex * bindex, gint row,
 	gtk_clist_set_pixmap(clist, row, 1, pixmap, bitmap);
     }
     
-    /*
-       if (message->flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)
-       gtk_clist_set_pixmap (GTK_CLIST (bindex), row, 1, , mailbox_mask);
-     */
     else if (message->flags & LIBBALSA_MESSAGE_FLAG_REPLIED)
 	gtk_clist_set_pixmap(clist, row, 1,
 			     balsa_icon_get_pixmap(BALSA_ICON_REPLIED),
@@ -1019,8 +1015,6 @@ button_event_press_cb(GtkWidget * widget, GdkEventButton * event,
     clist = GTK_CLIST (bindex->ctree);
     on_message = gtk_clist_get_selection_info(clist, event->x, event->y, 
                                               &row, &column);
-    message = LIBBALSA_MESSAGE(gtk_clist_get_row_data(clist, row));
-
     if (event && event->button == 3) {
         if (handler != 0)
             gtk_idle_remove(handler);
@@ -1031,10 +1025,9 @@ button_event_press_cb(GtkWidget * widget, GdkEventButton * event,
         return;
     } 
 
-    if (on_message && message) {
-        /* gtk_clist_select_row(clist, row, -1); */
-        
-        if (event && event->button == 1 && event->type == GDK_2BUTTON_PRESS) {
+    if (on_message && 
+	(message = LIBBALSA_MESSAGE(gtk_clist_get_row_data(clist, row))) ) {
+	if (event && event->button == 1 && event->type == GDK_2BUTTON_PRESS) {
             message_window_new (message);
         }
     }
@@ -1800,8 +1793,12 @@ idle_handler_cb(GtkWidget * widget)
     bmsg = BALSA_MESSAGE (BALSA_WINDOW (index->window)->preview);
 
     if (bmsg && BALSA_MESSAGE (bmsg)) {
-	if (message)
-	    balsa_message_set(BALSA_MESSAGE (bmsg), message);
+	if (message) {
+	    if(!balsa_message_set(BALSA_MESSAGE (bmsg), message))
+		balsa_information
+		    (LIBBALSA_INFORMATION_ERROR,
+		     _("Cannot access the message's body\n"));
+	}
 	else
 	    balsa_message_clear(BALSA_MESSAGE (bmsg));
     }

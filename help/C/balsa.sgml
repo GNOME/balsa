@@ -2703,6 +2703,33 @@
     </sect2>
   </sect1>
 
+  <sect1 id="folder-config">
+    <title>IMAP Folder configuration</title>
+    
+    <para>The folder configuration edit dialog allows you to configure
+      entire mailbox sets on remote IMAP servers.</para>
+
+    <itemizedlist mark="bullet">
+      <listitem><para>Descriptive name is the name of the root node
+        that will be shown in the mailbox tree on the left
+        side.</para></listitem>
+      <listitem><para>Server is the host name or IP number of the 
+        IMAP server.</para></listitem>
+      <listitem><para>Port is the port number to be used for the
+        connection. The default value is 143 but you may want to
+        modify it if you use connection forwarding or your IMAP server
+        runs on a nonstandard port number.</para></listitem>
+      <listitem><para>User name is the name used for authorization on
+        the IMAP server.</para></listitem>
+      <listitem><para>Password is the password used for authorization
+        on the IMAP server.</para></listitem>
+      <listitem><para>Prefix is the root mailbox on the server. You
+        may leave it empty if you want to show all the folders on your
+        server but if your IMAP server stores also other kind of files
+        you may specify for instance &quot;mail&quot;.</para></listitem>
+    </itemizedlist>
+  </sect1>
+
   <sect1 id="its-not-working">
     <title>It's not Working!!!</title>
 

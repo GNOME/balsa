@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -73,11 +73,15 @@ create_entry(GnomeDialog *fcw, GtkWidget * table, gint row,
     return entry;
 }
 
-/* should it be global? */
-static void
+/* folder_conf_imap_node:
+   show configuration widget for given mailbox node, allow user to 
+   modify it and update mailbox node accordingly.
+   Creates the node when mn == NULL.
+*/
+void
 folder_conf_imap_node(BalsaMailboxNode *mn)
 {
-    static GnomeHelpMenuEntry help_entry = { NULL, "folder-config" };
+    static GnomeHelpMenuEntry help_entry = { NULL, "folder-config.html" };
     GnomeDialog *dialog;
     GtkWidget *frame, *table;
     GtkWidget * folder_name, *server, *port, *username, *password, *prefix;

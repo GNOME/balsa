@@ -3847,31 +3847,28 @@ add_header_sigstate(BalsaMessage * bm, GtkTextView *view,
 {
     GtkTextBuffer *buffer;
     GtkTextIter insert;
-    GtkTextTag *color_tag;
-    GdkColor sigStateCol;
+    GtkTextTag *status_tag;
     
     buffer = gtk_text_view_get_buffer(view);
     gtk_text_buffer_get_iter_at_mark(buffer, &insert,
                                      gtk_text_buffer_get_insert(buffer));
     if (gtk_text_buffer_get_char_count(buffer))
         gtk_text_buffer_insert(buffer, &insert, "\n", 1);
-    /* FIXME: do we want to have these colors selectable by the user? */
-    if (siginfo->status == GPG_ERR_NO_ERROR) {
-        sigStateCol.red = 0x0;
-        sigStateCol.green = 0x8000;
-        sigStateCol.blue = 0x0;
-    } else {
-        sigStateCol.red = 0xf000;
-        sigStateCol.green = 0x0;
-        sigStateCol.blue = 0x0;
-    }
-    color_tag = gtk_text_buffer_create_tag(buffer, NULL,
+
+    if (siginfo->status == GPG_ERR_NO_ERROR)
+	status_tag = gtk_text_buffer_create_tag(buffer, NULL,
+						"style", PANGO_STYLE_ITALIC,
+						NULL);
+    else
+	status_tag = gtk_text_buffer_create_tag(buffer, NULL,
+						"style", PANGO_STYLE_ITALIC,
+						"weight", PANGO_WEIGHT_BOLD,
                                            "foreground-gdk", 
-                                           &sigStateCol,
+						&balsa_app.bad_address_color,
                                            NULL);
     gtk_text_buffer_insert_with_tags(buffer, &insert,
                                      libbalsa_gpgme_sig_stat_to_gchar(siginfo->status),
-                                     -1, color_tag, NULL);
+				     -1, status_tag, NULL);
 }
 
 

@@ -85,7 +85,8 @@ EXTRA_DIST = \
 	libbalsa-marshal.list \
 	padlock-keyhole.xpm
 
-INCLUDES= -I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \
+INCLUDES= -I${top_builddir} -I${top_srcdir}\
+	-I$(srcdir) -I${top_srcdir}/libbalsa \
 	-I${top_srcdir}/libmutt -I${top_builddir}/libmutt \
 	$(BALSA_CFLAGS)
 

@@ -2923,8 +2923,10 @@ guess_identity(BalsaSendmsg* bsmsg)
  	* field, and look for an identity that matches one of them.
  	*/
  	for (alist = message->headers->to_list; alist; alist = g_list_next(alist)) {
- 	    addy = alist->data;
- 	    address_string = addy->address_list->data;
+	    if (!(addy = alist->data)
+		|| !addy->address_list
+		|| !(address_string = addy->address_list->data))
+		continue;
  	    for (ilist = balsa_app.identities; ilist;
  		 ilist = g_list_next(ilist)) {
  		ident = LIBBALSA_IDENTITY(ilist->data);

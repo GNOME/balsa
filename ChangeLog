@@ -1,5 +1,11 @@
-2005-02-15 20:41  PeterB
+2005-02-15 21:48  Craig Routledge <webstuff@craigroutledge.com>
 
+	* src/balsa-message.c: better handling of
+	"application/octet-stream".
+
+2005-02-15 21:48  PeterB
+
+	* src/balsa-message.c: don't allocate unnecessary address strings.
 	* libbalsa/: body.c, mailbox_mbox.c: let GMimeStreams work
 	end-to-end when possible.
 

@@ -180,7 +180,8 @@ struct _LibBalsaMessage {
     LibBalsaMessageBody *body_list;
     /*  GList *body_list; */
 
-    glong msgno;     /* message no; always copy for faster sorting. */
+    glong msgno;     /* message no; always copy for faster sorting;
+		      * counting starts at 1. */
 #if MESSAGE_COPY_CONTENT
 #define LIBBALSA_MESSAGE_GET_NO(m)      ((m)->msgno)
     glong length;   /* byte len */

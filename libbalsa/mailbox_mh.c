@@ -874,12 +874,12 @@ static struct message_info *message_info_from_msgno( LibBalsaMailboxMh * mailbox
     struct message_info *msg_info = NULL;
     guint index;
 
-    if (msgno < mailbox->last_msgno) {
-	index = g_array_index(mailbox->msgno_2_index, int, msgno);
+    if (msgno <= mailbox->last_msgno) {
+	index = g_array_index(mailbox->msgno_2_index, int, msgno - 1);
 	msg_info = &g_array_index(mailbox->messages_info,
 				  struct message_info, index);
     } else
-    while (msgno >= mailbox->last_msgno) {
+    while (msgno > mailbox->last_msgno) {
 	for (index = mailbox->last_index;
 	     index < mailbox->messages_info->len;
 	     index++) {
@@ -907,6 +907,7 @@ libbalsa_mailbox_mh_get_message(LibBalsaMailbox * mailbox, guint msgno)
 
     g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MH(mailbox), NULL);
     g_return_val_if_fail (MAILBOX_OPEN(mailbox), NULL);
+    g_return_val_if_fail (msgno > 0, NULL);
 
     msg_info = message_info_from_msgno(LIBBALSA_MAILBOX_MH(mailbox), msgno);
 
@@ -946,6 +947,7 @@ libbalsa_mailbox_mh_load_message(LibBalsaMailbox * mailbox, guint msgno)
 
     g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MH(mailbox), NULL);
     g_return_val_if_fail (MAILBOX_OPEN(mailbox), NULL);
+    g_return_val_if_fail (msgno > 0, NULL);
 
     mailbox->new_messages--;
 
@@ -1075,6 +1077,7 @@ libbalsa_mailbox_mh_change_message_flags(LibBalsaMailbox * mailbox, guint msgno,
 
     g_return_if_fail (LIBBALSA_IS_MAILBOX_MH(mailbox));
     g_return_if_fail (MAILBOX_OPEN(mailbox));
+    g_return_if_fail (msgno > 0);
 
     msg_info = message_info_from_msgno(LIBBALSA_MAILBOX_MH(mailbox), msgno);
 

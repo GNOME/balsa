@@ -867,6 +867,7 @@ libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
 {
     g_return_val_if_fail(mailbox != NULL, NULL);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
+    g_return_val_if_fail(msgno > 0, NULL);
 
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->get_message(mailbox, msgno);
 }
@@ -876,6 +877,7 @@ libbalsa_mailbox_load_message(LibBalsaMailbox * mailbox, guint msgno)
 {
     g_return_val_if_fail(mailbox != NULL, NULL);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
+    g_return_val_if_fail(msgno > 0, NULL);
 
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->load_message(mailbox,
 							     msgno);
@@ -888,6 +890,7 @@ libbalsa_mailbox_change_message_flags(LibBalsaMailbox * mailbox,
 {
     g_return_if_fail(mailbox != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+    g_return_if_fail(msgno > 0);
 
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->change_message_flags(mailbox,
 							      msgno, set,
@@ -1194,7 +1197,7 @@ mbox_model_get_value(GtkTreeModel *tree_model,
     g_value_init (value, mbox_model_col_type[column]);
     switch(column) {
     case LB_MBOX_MSGNO_COL:
-	g_value_set_uint(value, msgno+1);  break;
+	g_value_set_uint(value, msgno);  break;
     case LB_MBOX_MARKED_COL:
 	g_value_set_string(value, "M");  break;
     case LB_MBOX_ATTACH_COL:

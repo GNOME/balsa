@@ -124,8 +124,7 @@ static struct message_info *message_info_from_msgno(
 						  guint msgno)
 {
     struct message_info *msg_info = 
-	msg_info = &g_array_index(mimap->messages_info,
-				  struct message_info, msgno);
+	&g_array_index(mimap->messages_info, struct message_info, msgno - 1);
     return msg_info;
 }
 
@@ -1163,6 +1162,7 @@ libbalsa_mailbox_imap_get_message(LibBalsaMailbox * mailbox, guint msgno)
     LibBalsaMailboxImap *mimap;
 
     g_return_val_if_fail (LIBBALSA_IS_MAILBOX_IMAP(mailbox), NULL);
+    g_return_val_if_fail (msgno > 0, NULL);
 
     mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     msg_info = message_info_from_msgno(mimap, msgno);
@@ -1188,11 +1188,11 @@ libbalsa_mailbox_imap_get_message(LibBalsaMailbox * mailbox, guint msgno)
 					     IMFETCH_ENV);
 	    if(rc != IMR_OK)
 		g_warning("%s: rc=%u\n", __func__, rc);
-	    imsg = msg_info->msg = imap_mbox_handle_get_msg(handle, msgno+1);
+	    imsg = msg_info->msg = imap_mbox_handle_get_msg(handle, msgno);
 	    RELEASE_HANDLE(mimap, handle);
 	}
 	printf("loading data from cache for message %u imsg=%p\n",
-	       msgno+1, imsg);
+	       msgno, imsg);
         cache = get_cache_stream(mailbox, imsg->uid);
 	g_assert(msg_info->msg);
         
@@ -1267,7 +1267,7 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
     msg_info = message_info_from_msgno(mimap, message->msgno);
     handle = libbalsa_mailbox_imap_get_selected_handle(mimap);
     g_return_val_if_fail(handle, FALSE);
-    msgno = message->msgno + 1;
+    msgno = message->msgno;
     lo = msgno>30 ? msgno-30 : 1; /* extra care when treating unsigned */
     hi = msgno + 30;
     rc = imap_mbox_handle_fetch_range(handle, lo, hi, IMFETCH_ENV);
@@ -1276,7 +1276,7 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
 	return FALSE;
     }
 
-    msg_info->msg = imap_mbox_handle_get_msg(handle, message->msgno+1);
+    msg_info->msg = imap_mbox_handle_get_msg(handle, message->msgno);
 
     if (!IMSG_FLAG_SEEN(msg_info->msg->flags))
         message->flags |= LIBBALSA_MESSAGE_FLAG_NEW;
@@ -1409,7 +1409,6 @@ void libbalsa_mailbox_imap_change_message_flags(LibBalsaMailbox * mailbox, guint
 					   LibBalsaMessageFlag set,
 					   LibBalsaMessageFlag clear)
 {
-    int seq = msgno + 1;
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     ImapMboxHandle *handle;
 
@@ -1418,42 +1417,34 @@ void libbalsa_mailbox_imap_change_message_flags(LibBalsaMailbox * mailbox, guint
 	    return;
 
     if (set & LIBBALSA_MESSAGE_FLAG_REPLIED)
-	imap_mbox_store_flag(handle, seq, IMSGF_ANSWERED, 1);
+	imap_mbox_store_flag(handle, msgno, IMSGF_ANSWERED, 1);
     if (clear & LIBBALSA_MESSAGE_FLAG_REPLIED)
-	imap_mbox_store_flag(handle, seq, IMSGF_ANSWERED, 0);
+	imap_mbox_store_flag(handle, msgno, IMSGF_ANSWERED, 0);
 
     if (set & LIBBALSA_MESSAGE_FLAG_NEW)
-	imap_mbox_store_flag(handle, seq, IMSGF_SEEN, 1);
+	imap_mbox_store_flag(handle, msgno, IMSGF_SEEN, 1);
     if (clear & LIBBALSA_MESSAGE_FLAG_NEW)
-	imap_mbox_store_flag(handle, seq, IMSGF_SEEN, 0);
+	imap_mbox_store_flag(handle, msgno, IMSGF_SEEN, 0);
 
     if (set & LIBBALSA_MESSAGE_FLAG_FLAGGED)
-	imap_mbox_store_flag(handle, seq, IMSGF_FLAGGED, 1);
+	imap_mbox_store_flag(handle, msgno, IMSGF_FLAGGED, 1);
     if (clear & LIBBALSA_MESSAGE_FLAG_FLAGGED)
-	imap_mbox_store_flag(handle, seq, IMSGF_FLAGGED, 0);
+	imap_mbox_store_flag(handle, msgno, IMSGF_FLAGGED, 0);
 
     if (set & LIBBALSA_MESSAGE_FLAG_DELETED)
-	imap_mbox_store_flag(handle, seq, IMSGF_DELETED, 1);
+	imap_mbox_store_flag(handle, msgno, IMSGF_DELETED, 1);
     if (clear & LIBBALSA_MESSAGE_FLAG_DELETED)
-	imap_mbox_store_flag(handle, seq, IMSGF_DELETED, 0);
+	imap_mbox_store_flag(handle, msgno, IMSGF_DELETED, 0);
 
 #if 0
     /* This flag can't be turned on again. */
     if (set & LIBBALSA_MESSAGE_FLAG_RECENT)
-	imap_mbox_store_flag(handle, seq, IMSGF_RECENT, 1);
+	imap_mbox_store_flag(handle, msgno, IMSGF_RECENT, 1);
     /* ...or turned off. */
     if (clear & LIBBALSA_MESSAGE_FLAG_RECENT)
-	imap_mbox_store_flag(handle, seq, IMSGF_RECENT, 0);
+	imap_mbox_store_flag(handle, msgno, IMSGF_RECENT, 0);
 #endif
     RELEASE_HANDLE(mailbox, handle);
-}
-
-static gboolean
-decrement_cb(GNode *r, gpointer data)
-{
-    guint i = GPOINTER_TO_UINT(r->data);
-    r->data = GUINT_TO_POINTER(i-1);
-    return FALSE;
 }
 
 static void
@@ -1478,8 +1469,6 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
 	    return;
 	imap_mbox_thread(handle, "REFERENCES");
 	new_tree = g_node_copy(imap_mbox_handle_get_thread_root(handle));
-	g_node_traverse(new_tree, G_IN_ORDER, G_TRAVERSE_ALL, -1,
-			decrement_cb, NULL);
 	RELEASE_HANDLE(mailbox, handle);
 	break;
     default:

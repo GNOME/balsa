@@ -651,7 +651,7 @@ static struct message_info *message_info_from_msgno(
     struct message_info *msg_info = NULL;
 
     msg_info = g_ptr_array_index(LIBBALSA_MAILBOX_MAILDIR(mailbox)->msgno_2_msg_info,
-			      msgno);
+			      msgno - 1);
     return msg_info;
 }
 
@@ -661,6 +661,7 @@ libbalsa_mailbox_maildir_get_message(LibBalsaMailbox * mailbox, guint msgno)
     struct message_info *msg_info;
 
     g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MAILDIR(mailbox), NULL);
+    g_return_val_if_fail (msgno > 0, NULL);
 
     msg_info = message_info_from_msgno(mailbox, msgno);
 
@@ -703,6 +704,7 @@ libbalsa_mailbox_maildir_load_message(LibBalsaMailbox * mailbox, guint msgno)
     gchar *filename;
 
     g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MAILDIR(mailbox), NULL);
+    g_return_val_if_fail (msgno > 0, NULL);
 
     mailbox->new_messages--;
 
@@ -807,6 +809,7 @@ libbalsa_mailbox_maildir_change_message_flags(LibBalsaMailbox * mailbox, guint m
     struct message_info *msg_info;
 
     g_return_if_fail (LIBBALSA_IS_MAILBOX_MAILDIR(mailbox));
+    g_return_if_fail (msgno > 0);
 
     msg_info = message_info_from_msgno(mailbox, msgno);
 

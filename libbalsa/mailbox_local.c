@@ -58,6 +58,7 @@ static void libbalsa_mailbox_local_real_mbox_match(LibBalsaMailbox *mbox,
 static void libbalsa_mailbox_local_set_threading(LibBalsaMailbox *mailbox,
 						 LibBalsaMailboxThreadingType
 						 thread_type);
+static void libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox);
 
 GType
 libbalsa_mailbox_local_get_type(void)
@@ -117,6 +118,8 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
         libbalsa_mailbox_local_real_mbox_match;
     libbalsa_mailbox_class->set_threading =
 	libbalsa_mailbox_local_set_threading;
+    libbalsa_mailbox_class->close_mailbox =
+	libbalsa_mailbox_local_close_mailbox;
     klass->remove_files = NULL;
 }
 
@@ -393,7 +396,7 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox)
 	return;
 
     LOCK_MAILBOX(mailbox);
-    for (msgno = mailbox->messages; mailbox->new_messages > 0; msgno++) {
+    for (msgno = mailbox->messages + 1; mailbox->new_messages > 0; msgno++) {
 	message = libbalsa_mailbox_load_message(mailbox, msgno);
 	if (!message)
 		continue;
@@ -448,6 +451,18 @@ libbalsa_mailbox_commit(LibBalsaMailbox *mailbox)
     return rc;
 }
 
+static void
+libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxLocal *mbox = LIBBALSA_MAILBOX_LOCAL(mailbox);
+
+    g_list_free(mbox->msg_list);
+    mbox->msg_list = NULL;
+
+    if (LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox)
+	LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox);
+}
+
 /*
  * Threading
  */
@@ -464,8 +479,8 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
     int i;
     if (mailbox->msg_tree)
 	g_node_destroy(mailbox->msg_tree);
-    mailbox->msg_tree = g_node_new(GINT_TO_POINTER(-1));
-    for (i = 0; i < mailbox->total_messages; i++)
+    mailbox->msg_tree = g_node_new(NULL);
+    for (i = 1; i <= mailbox->total_messages; i++)
 	g_node_append_data(mailbox->msg_tree, GINT_TO_POINTER(i));
     mailbox->stamp++;
 
@@ -495,7 +510,7 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
 struct _ThreadingInfo {
     LibBalsaMailbox *mailbox;
     LibBalsaMessage **msg_array;
-    guint msg_array_len;
+    gint msg_array_len;
     GHashTable *id_table;
     GHashTable *subject_table;
     GSList *message_list;
@@ -521,16 +536,16 @@ static void
 lbml_threading_jwz(LibBalsaMailbox * mailbox)
 {
     ThreadingInfo ti;
-    guint i;
+    gint i;
 
     ti.mailbox = mailbox;
     ti.id_table = g_hash_table_new(g_str_hash, g_str_equal);
     lbml_make_msg_array(&ti);
 
-    for (i = 0; i < ti.msg_array_len; i++) {
+    for (i = 1; i <= ti.msg_array_len; i++) {
 	GNode *node =
 	    g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
-			GUINT_TO_POINTER(i));
+			GINT_TO_POINTER(i));
 	if (node)
 	    lbml_set_parent(node, &ti);
 	else
@@ -577,9 +592,9 @@ lbml_get_message(GNode * node, ThreadingInfo * ti)
 
     msgno = GPOINTER_TO_INT(node->data);
 
-    g_return_val_if_fail(msgno < (int) ti->msg_array_len, NULL);
+    g_return_val_if_fail(msgno <= ti->msg_array_len, NULL);
 
-    return msgno < 0 ? NULL : ti->msg_array[msgno];
+    return msgno <= 0 ? NULL : ti->msg_array[msgno - 1];
 }
 
 static void
@@ -665,7 +680,7 @@ lbml_find_parent(LibBalsaMessage * message, ThreadingInfo * ti)
 	GNode *foo = g_hash_table_lookup(ti->id_table, id);
 
 	if (foo == NULL) {
-	    foo = g_node_new(GINT_TO_POINTER(-1));
+	    foo = g_node_new(NULL);
 	    g_hash_table_insert(ti->id_table, id, foo);
 	}
 
@@ -743,7 +758,7 @@ lbml_prune(GNode * node, GNode * root)
      * the root set -- unless there is only one child, in which case, do. 
      */
 
-    if (node->data != GINT_TO_POINTER(-1) || node == root)
+    if (node->data != NULL || node == root)
 	return FALSE;
 
 #ifdef MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT
@@ -858,8 +873,7 @@ lbml_subject_gather(GNode * node, ThreadingInfo * ti)
 
     old = g_hash_table_lookup(ti->subject_table, chopped_subject);
 #ifdef MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT
-    if (old == NULL || (node->data == GINT_TO_POINTER(-1)
-			&& old->data != GINT_TO_POINTER(-1))) {
+    if (old == NULL || (node->data == NULL && old->data != NULL)) {
 #else				/* MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT */
     if (old == NULL) {
 #endif				/* MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT */
@@ -930,21 +944,20 @@ lbml_subject_merge(GNode * node, ThreadingInfo * ti)
 	return;
 
 #ifdef MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT
-    if (node->data == GINT_TO_POINTER(-1)
-	&& node2->data == GINT_TO_POINTER(-1)) {
+    if (node->data == NULL && node2->data == NULL) {
 	while (node->children)
 	    g_node_prepend(node2, lbml_unlink(node->children));
 	g_node_destroy(node);
 	return;
     }
 
-    if (node->data == GINT_TO_POINTER(-1))
+    if (node->data == NULL)
 	/* node2 should be made a child of node, but unlinking node2
 	 * could mess up the foreach, so we'll swap them and fall
 	 * through to the next case. */
 	lbml_swap(node, node2);
 
-    if (node2->data == GINT_TO_POINTER(-1)) {
+    if (node2->data == NULL) {
 	g_node_prepend(node2, lbml_unlink(node));
 	return;
     }
@@ -968,12 +981,12 @@ lbml_subject_merge(GNode * node, ThreadingInfo * ti)
 	/* Make both node and node2 children of a new empty node; as
 	 * above, swap node2 and the new node to avoid unlinking node2.
 	 */
-	GNode *new_node = g_node_new(GINT_TO_POINTER(-1));
+	GNode *new_node = g_node_new(NULL);
 
 	while (node2->children)
 	    g_node_prepend(new_node, lbml_unlink(node2->children));
 	new_node->data = node2->data;
-	node2->data = GINT_TO_POINTER(-1);
+	node2->data = NULL;
 	g_node_prepend(node2, lbml_unlink(node));
 	g_node_prepend(node2, new_node);
 #endif				/* MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT */
@@ -1012,7 +1025,7 @@ lbml_clear_empty(LibBalsaMailbox * mailbox)
     GNode *node = mailbox->msg_tree->children;
     while (node) {
 	GNode *next = node->next;
-	if (GPOINTER_TO_INT(node->data) == -1 && !node->children)
+	if (!node->data && !node->children)
 	    g_node_destroy(node);
 	node = next;
     }

@@ -216,7 +216,7 @@ libbalsa_mailbox_mbox_get_message_stream(LibBalsaMailbox *mailbox, LibBalsaMessa
 	mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
 
 	msg_info = &g_array_index(mbox->messages_info,
-				  struct message_info, message->msgno);
+				  struct message_info, message->msgno - 1);
 	if (!msg_info)
 	    return NULL;
 
@@ -714,7 +714,7 @@ static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox)
 	if ((msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED) == 0)
 	{
 	    LibBalsaMessageBody *body;
-	    msg_info->message->msgno = j;
+	    msg_info->message->msgno = j + 1;
 	    msg_info->start = g_mime_parser_tell(gmime_parser);
 	    msg_info->mime_message =
 		g_mime_parser_construct_message(gmime_parser);
@@ -752,6 +752,7 @@ libbalsa_mailbox_mbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
     struct message_info *msg_info;
 
     g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MBOX(mailbox), NULL);
+    g_return_val_if_fail (msgno > 0, NULL);
 
     msg_info = &g_array_index(LIBBALSA_MAILBOX_MBOX(mailbox)->messages_info,
 			      struct message_info, msgno);
@@ -776,11 +777,12 @@ libbalsa_mailbox_mbox_load_message(LibBalsaMailbox *mailbox,
     LibBalsaMailboxMbox *mbox;
 
     g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MBOX(mailbox), NULL);
+    g_return_val_if_fail (msgno > 0, NULL);
 
     mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
 
     msg_info = &g_array_index(mbox->messages_info,
-			      struct message_info, msgno);
+			      struct message_info, msgno - 1);
 
     mailbox->new_messages--;
 
@@ -970,9 +972,10 @@ libbalsa_mailbox_mbox_change_message_flags(LibBalsaMailbox * mailbox,
     struct message_info *msg_info;
 
     g_return_if_fail (LIBBALSA_IS_MAILBOX_MBOX(mailbox));
+    g_return_if_fail (msgno > 0);
 
     msg_info = &g_array_index(LIBBALSA_MAILBOX_MBOX(mailbox)->messages_info,
-			      struct message_info, msgno);
+			      struct message_info, msgno - 1);
 
     msg_info->flags |= set;
     msg_info->flags &= ~clear;

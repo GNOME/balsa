@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	27 July 1988
- * Last Edited:	30 March 1998
+ * Last Edited:	16 April 1998
  *
  * Sponsorship:	The original version of this work was developed in the
  *		Symbolic Systems Resources Group of the Knowledge Systems
@@ -1075,7 +1075,7 @@ ADDRESS *rfc822_parse_mailbox (char **string,char *defaulthost)
       adr->personal = rfc822_cpy (s);
     }
 				/* call external phraseparser if phrase only */
-    else if (pp && rfc822_phraseonly (s,end) &&
+    else if (pp && rfc822_phraseonly (end) &&
 	     (adr = (*pp) (s,end,defaulthost))) {
       *string = end;		/* update parse pointer */
       rfc822_skipws (string);	/* skip WS in the normal way */
@@ -1087,12 +1087,11 @@ ADDRESS *rfc822_parse_mailbox (char **string,char *defaulthost)
 
 
 /* Check if address is a phrase only
- * Accepts: pointer to start of phrase
- *	    pointer to end of phrase
+ * Accepts: pointer to end of phrase
  * Returns: T if phrase only, else NIL;
  */
 
-long rfc822_phraseonly (char *phrase,char *end)
+long rfc822_phraseonly (char *end)
 {
   while (*end == ' ') ++end;	/* call rfc822_skipws() instead?? */
   switch (*end) {

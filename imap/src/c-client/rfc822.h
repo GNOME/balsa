@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	27 July 1988
- * Last Edited:	25 March 1998
+ * Last Edited:	16 April 1998
  *
  * Sponsorship:	The original version of this work was developed in the
  *		Symbolic Systems Resources Group of the Knowledge Systems
@@ -62,7 +62,7 @@ ADDRESS *rfc822_parse_address (ADDRESS **lst,ADDRESS *last,char **string,
 ADDRESS *rfc822_parse_group (ADDRESS **lst,ADDRESS *last,char **string,
 			     char *defaulthost);
 ADDRESS *rfc822_parse_mailbox (char **string,char *defaulthost);
-long rfc822_phraseonly (char *phrase,char *end);
+long rfc822_phraseonly (char *end);
 ADDRESS *rfc822_parse_routeaddr (char *string,char **ret,char *defaulthost);
 ADDRESS *rfc822_parse_addrspec (char *string,char **ret,char *defaulthost);
 char *rfc822_parse_phrase (char *string);

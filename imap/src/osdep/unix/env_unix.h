@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	1 August 1988
- * Last Edited:	3 February 1998
+ * Last Edited:	28 April 1998
  *
  * Copyright 1998 by the University of Washington
  *
@@ -67,3 +67,4 @@ long safe_write (int fd,char *buf,long nbytes);
 void *arm_signal (int sig,void *action);
 struct passwd *checkpw (struct passwd *pw,char *pass,int argc,char *argv[]);
 long loginpw (struct passwd *pw,int argc,char *argv[]);
+long pw_login (struct passwd *pw,char *user,char *home,int argc,char *argv[]);

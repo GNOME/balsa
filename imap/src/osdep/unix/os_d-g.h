@@ -10,9 +10,9 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	1 August 1988
- * Last Edited:	30 December 1997
+ * Last Edited:	19 April 1998
  *
- * Copyright 1997 by the University of Washington
+ * Copyright 1998 by the University of Washington
  *
  *  Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -47,9 +47,11 @@
 #include <sys/file.h>
 
 
-#define flock safe_flock
+/* D-G gets this wrong */
 
 #define setpgrp setpgrp2
+
+#define flock safe_flock
 
 #define utime portable_utime
 int portable_utime (char *file,time_t timep[2]);

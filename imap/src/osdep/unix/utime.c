@@ -10,9 +10,9 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	10 October 1996
- * Last Edited:	25 October 1996
+ * Last Edited:	20 April 1998
  *
- * Copyright 1996 by the University of Washington
+ * Copyright 1998 by the University of Washington
  *
  *  Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -48,5 +48,5 @@ int portable_utime (char *file,time_t timep[2])
   memset (&times,0,sizeof (struct utimbuf));
   times.actime = timep[0];	/* copy the portable values */
   times.modtime = timep[1];
-  return utime (file,&times);	/* now call D-G's routine */
+  return utime (file,&times);	/* now call the SVR4 routine */
 }

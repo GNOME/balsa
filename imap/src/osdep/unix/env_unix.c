@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	1 August 1988
- * Last Edited:	10 April 1998
+ * Last Edited:	28 April 1998
  *
  * Copyright 1998 by the University of Washington
  *
@@ -337,20 +337,29 @@ long server_login (char *user,char *pwd,int argc,char *argv[])
 	    tcp_clienthost ());
 				/* validate with case-independence */
   else if ((logtry > 0) && ((pw = getpwnam (strcpy (usr,user))) ||
-			    (pw = getpwnam (lcase (usr)))) && pw->pw_uid &&
+			    (pw = getpwnam (lcase (usr)))) &&
 	   ((pw = checkpw (pw,pwd,argc,argv)) ||
 	    ((*pwd == ' ') && (pw = getpwnam (usr)) &&
-	     (pw = checkpw (pw,pwd + 1,argc,argv)))) &&
-	   ((pw->pw_uid == geteuid ()) || loginpw (pw,argc,argv)) &&
-	   env_init (pw->pw_name,pw->pw_dir)) {
-    chdir (myhomedir ());	/* placate those who would be upset */
-    return LONGT;
-  }
+	     (pw = checkpw (pw,pwd + 1,argc,argv)))))
+    return pw_login (pw,pw->pw_name,pw->pw_dir,argc,argv);
   s = (logtry-- > 0) ? "Login failure" : "Excessive login attempts";
 				/* note the failure in the syslog */
   syslog (LOG_INFO,"%s user=%.80s host=%.80s",s,user,tcp_clienthost ());
   sleep (3);			/* slow down possible cracker */
   return NIL;
+}
+
+/* Authenticated server log in
+ * Accepts: user name string
+ *	    argument count
+ *	    argument vector
+ * Returns: T if password validated, NIL otherwise
+ */
+
+long authserver_login (char *user,int argc,char *argv[])
+{
+  struct passwd *pw = getpwnam (user);
+  return pw ? pw_login (pw,pw->pw_name,pw->pw_dir,argc,argv) : NIL;
 }
 
 
@@ -364,7 +373,23 @@ long anonymous_login (int argc,char *argv[])
 {
   struct passwd *pw = getpwnam (anonymous_user);
 				/* log in Mr. A. N. Onymous */
-  if (pw && pw->pw_uid && loginpw (pw,argc,argv) && env_init (NIL,NIL)) {
+  return pw ? pw_login (pw,NIL,NIL,argc,argv) : NIL;
+}
+
+
+/* Finish log in and environment initialization
+ * Accepts: passwd struct for loginpw()
+ *	    user name (NIL for anonymous)
+ *	    home directory (NIL for anonymous)
+ *	    argument count
+ *	    argument vector
+ * Returns: T if successful, NIL if error
+ */
+
+long pw_login (struct passwd *pw,char *user,char *home,int argc,char *argv[])
+{
+  if (pw->pw_uid && ((pw->pw_uid == geteuid ()) || loginpw (pw,argc,argv)) &&
+      env_init (user,home)) {
     chdir (myhomedir ());	/* placate those who would be upset */
     return LONGT;
   }

@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	15 June 1988
- * Last Edited:	13 April 1998
+ * Last Edited:	20 April 1998
  *
  * Sponsorship:	The original version of this work was developed in the
  *		Symbolic Systems Resources Group of the Knowledge Systems
@@ -2420,7 +2420,7 @@ void imap_parse_unsolicited (MAILSTREAM *stream,IMAPPARSEDREPLY *reply)
 	else if (!strcmp (t,"IMAP4REV1")) LOCAL->imap4rev1 = T;
 	else if (!strcmp (t,"NAMESPACE")) LOCAL->use_namespace = T;
 	else if (!strcmp (t,"SCAN")) LOCAL->use_scan = T;
-	else if (!strcmp (t,"SORT")) LOCAL->use_sort = T;
+	else if (!strncmp (t,"SORT",4)) LOCAL->use_sort = T;
 	else if (!strncmp (t,"THREAD",6) && ((t[6] == '=') || !t[6])) {
 	  if (t[6]) {
 	    THREADER *thread = (THREADER *) fs_get (sizeof (THREADER));

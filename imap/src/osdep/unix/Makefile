@@ -9,7 +9,7 @@
 #		Internet: MRC@CAC.Washington.EDU
 #
 # Date:		11 May 1989
-# Last Edited:	14 April 1998
+# Last Edited:	30 April 1998
 #
 # Copyright 1998 by the University of Washington
 #
@@ -205,17 +205,8 @@ d-g:	# Data General DG/UX
 	 BASELDFLAGS="-lnsl -lsocket" \
 	 RANLIB=true
 
-d41:	# Data General DG/UX 4.11
-	$(BUILD) OS=$@ SIGTYPE=sv4 \
-	 MAILSPOOL=/var/mail NEWSSPOOL=/var/spool/news \
-	 ACTIVEFILE=/local/news/active \
-	 RSHPATH=/usr/bin/remsh \
-	 BASECFLAGS="-g -Dconst= -DNFSKLUDGE" \
-	 BASELDFLAGS="-lnsl -lsocket" \
-	 RANLIB=true
-
 d54:	# Data General DG/UX 5.4
-	$(BUILD) OS=d41 SIGTYPE=sv4 \
+	$(BUILD) OS=d-g SIGTYPE=sv4 \
 	 MAILSPOOL=/var/mail NEWSSPOOL=/var/spool/news \
 	 ACTIVEFILE=/local/news/active \
 	 RSHPATH=/usr/bin/remsh \
@@ -321,6 +312,9 @@ isc:	# Interactive
 	 RANLIB=true
 
 lnx:	# Linux non-shadow passwords
+	@echo You are building for Linux *without* shadow passwords.
+	@echo If your system has shadow passwords you must use slx
+	@echo or sl5 instead!
 	$(BUILD) OS=$@ SIGTYPE=psx \
 	 SPOOLDIR=/var/spool \
 	 RSHPATH=/usr/bin/rsh \

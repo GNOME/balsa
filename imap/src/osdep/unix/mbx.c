@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	3 October 1995
- * Last Edited:	20 March 1998
+ * Last Edited:	27 April 1998
  *
  * Copyright 1998 by the University of Washington
  *
@@ -361,6 +361,7 @@ long mbx_status (MAILSTREAM *stream,char *mbx,long flags)
 MAILSTREAM *mbx_open (MAILSTREAM *stream)
 {
   int fd,ld,i;
+  short silent;
   char tmp[MAILTMPLEN];
 				/* return prototype for OP_PROTOTYPE call */
   if (!stream) return user_flags (&mbxproto);
@@ -409,8 +410,13 @@ MAILSTREAM *mbx_open (MAILSTREAM *stream)
   stream->sequence++;		/* bump sequence number */
 				/* parse mailbox */
   stream->nmsgs = stream->recent = 0;
+  silent = stream->silent;	/* defer events */
+  stream->silent = T;
   if (mbx_ping (stream) && !stream->nmsgs)
     mm_log ("Mailbox is empty",(long) NIL);
+  stream->silent = silent;	/* now notify upper level */
+  mail_exists (stream,stream->nmsgs);
+  mail_recent (stream,stream->recent);
   if (!LOCAL) return NIL;	/* failure if stream died */
   stream->perm_seen = stream->perm_deleted = stream->perm_flagged =
     stream->perm_answered = stream->perm_draft = stream->rdonly ? NIL : T;

@@ -10,9 +10,9 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	1 August 1988
- * Last Edited:	31 December 1997
+ * Last Edited:	28 April 1998
  *
- * Copyright 1997 by the University of Washington
+ * Copyright 1998 by the University of Washington
  *
  *  Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -41,6 +41,7 @@ void rfc822_timezone (char *s,void *t);
 void internal_date (char *date);
 void server_traps (void *clkint,void *kodint,void *hupint,void *trmint);
 long server_login (char *user,char *pass,int argc,char *argv[]);
+long authserver_login (char *user,int argc,char *argv[]);
 long anonymous_login (int argc,char *argv[]);
 char *mylocalhost (void);
 char *myhomedir (void);

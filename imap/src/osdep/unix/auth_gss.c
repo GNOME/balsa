@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	12 January 1998
- * Last Edited:	2 April 1998
+ * Last Edited:	28 April 1998
  *
  * Copyright 1998 by the University of Washington
  *
@@ -238,7 +238,6 @@ char *auth_gssapi_server (authresponse_t responder,int argc,char *argv[])
   char *ret = NIL;
   char tmp[MAILTMPLEN];
   unsigned long maxsize = htonl (AUTH_GSSAPI_C_MAXSIZE);
-  struct passwd *pw;
   int conf;
   OM_uint32 maj,min,mmaj,mmin,flags;
   OM_uint32 mctx = 0;
@@ -290,8 +289,8 @@ char *auth_gssapi_server (authresponse_t responder,int argc,char *argv[])
 				       (unsigned long *) &resp.length);
 	    gss_release_buffer (&min,&chal);
 	    if (gss_unwrap (&min,ctx,&resp,&chal,&conf,&qop)==GSS_S_COMPLETE) {
-	      if (chal.value && (chal.length > 4) &&
-		  (*((char *) chal.value) & AUTH_GSSAPI_P_NONE) &&
+	      if (chal.value && (chal.length > 4) && (chal.length < MAILTMPLEN)
+		  && (*((char *) chal.value) & AUTH_GSSAPI_P_NONE) &&
 		  !krb5_init_context (&ktx)) {
 				/* parse name as principal */
 		if (!krb5_parse_name (ktx,buf.value,&prnc)) {
@@ -300,12 +299,10 @@ char *auth_gssapi_server (authresponse_t responder,int argc,char *argv[])
 				/* make sure user name tied off */
 		  tmp[chal.length] = '\0';
 				/* OK for this principal to log in as user? */
-		  if (((pw = getpwnam (tmp+4)) ||
-		       (pw = getpwnam (lcase (tmp+4)))) && pw->pw_uid &&
-		      krb5_kuserok (ktx,prnc,tmp+4) &&
-		      (pw = getpwnam (tmp+4)) &&
-		      ((pw->pw_uid == geteuid ()) || loginpw (pw,argc,argv)) &&
-		      env_init (pw->pw_name,pw->pw_dir)) ret = myusername ();
+		  if ((krb5_kuserok (ktx,prnc,tmp+4) &&
+		       authserver_login (tmp+4,argc,argv)) ||
+		      (krb5_kuserok (ktx,prnc,lcase (tmp+4)) &&
+		       authserver_login (tmp+4,argc,argv))) ret = myusername();
 				/* done with principal */
 		  krb5_free_principal (ktx,prnc);
 		}

@@ -747,8 +747,7 @@ part_info_init_unknown(BalsaMessage * bm, BalsaPartInfo * info)
 	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 2);
     } else {
 	gtk_box_pack_start(GTK_BOX(vbox),
-			   gtk_label_new(_
-					 ("No open or view action defined in GNOME MIME for this content type")),
+			   gtk_label_new(_("No open or view action defined in GNOME MIME for this content type")),
 			   FALSE, FALSE, 1);
     }
 
@@ -1403,7 +1402,7 @@ part_create_menu (BalsaPartInfo* info)
         list = g_list_next (list);
     }
 
-    menu_item = gtk_menu_item_new_with_label ("Save...");
+    menu_item = gtk_menu_item_new_with_label (_("Save..."));
     gtk_signal_connect (GTK_OBJECT (menu_item), "activate",
                         GTK_SIGNAL_FUNC (part_context_menu_save),
                         (gpointer) info);

@@ -1,3 +1,24 @@
+2001-10-20  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/libbalsa.h: libbalsa_wait_for_sending_thread().
+
+	* libbalsa/message.[hc]: add arguments to message_{delete,flag}
+	and remove un{delete,flag}.
+
+	* libbalsa/send.c: fix occasional multiple mail sending (#62653).
+	* src/balsa-index.c: 
+	* src/message-window.c:
+	* src/sendmsg-window.c: use updated LibBalsaMessage API.
+	* src/main-window.c: do not quit before sending is finished (the
+	alternative solution would be to ask the user if he/she wants to
+	proceed).
+	* src/{main.c,threads.h}: remove globals sending_mail variable.
+	
+2001-10-19  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* libbalsa/address-entry.c: cleanup.
+	* src/message-window.c: do not abort on unexpected MRU entry (#62625)
+
 2001-10-18  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/send.c: fix libmutt locking (Emmanuel).

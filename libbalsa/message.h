@@ -118,6 +118,8 @@ struct _LibBalsaMessage {
 #endif
 };
 #define LIBBALSA_MESSAGE_GET_NO(m)  libbalsa_message_get_no(m)
+#define LIBBALSA_MESSAGE_IS_FLAGGED(m)\
+ ((m)->flags&LIBBALSA_MESSAGE_FLAG_FLAGGED)
 
 struct _LibBalsaMessageClass {
     GtkObjectClass parent_class;
@@ -155,14 +157,11 @@ gboolean libbalsa_messages_copy(GList * messages,
                                 LibBalsaMailbox * dest);
 void libbalsa_message_clear_flags(LibBalsaMessage * message);
 
-void libbalsa_message_read(LibBalsaMessage * message);
-void libbalsa_message_unread(LibBalsaMessage * message);
-void libbalsa_message_delete(LibBalsaMessage * message);
+void libbalsa_message_delete(LibBalsaMessage * message, gboolean del);
 void libbalsa_messages_delete(GList * messages);
-void libbalsa_message_undelete(LibBalsaMessage * message);
 
-void libbalsa_message_flag(LibBalsaMessage * message);
-void libbalsa_message_unflag(LibBalsaMessage * message);
+void libbalsa_message_read(LibBalsaMessage * message, gboolean read);
+void libbalsa_message_flag(LibBalsaMessage * message, gboolean flag);
 
 void libbalsa_message_answer(LibBalsaMessage * message);
 void libbalsa_message_reply(LibBalsaMessage * message);

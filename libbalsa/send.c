@@ -88,8 +88,34 @@ struct _SendMessageInfo{
 static MessageQueueItem *message_queue;
 #endif
 static int total_messages_left;
-
+static int sending_threads = 0; /* how many sending threads are active? */
 /* end of state variables section */
+
+gboolean
+libbalsa_is_sending_mail(void)
+{
+    return sending_threads>0;
+}
+
+/* libbalsa_wait_for_sending_thread:
+   wait for the sending thread but not longer than max_time seconds.
+   -1 means wait indefinetely (almost).
+*/
+void
+libbalsa_wait_for_sending_thread(gint max_time)
+{
+    gint sleep_time = 0;
+    static const int DOZE_LENGTH = 20*1000; /* microseconds */
+
+    if(max_time<0) max_time = G_MAXINT;
+    else max_time *= 1000000; /* convert to microseconds */
+    while(sending_threads>0 && sleep_time<max_time) {
+        while(gtk_events_pending())
+            gtk_main_iteration_do(FALSE);
+        usleep(DOZE_LENGTH);
+        sleep_time += DOZE_LENGTH;
+    }
+}
 
 
 static MessageQueueItem *
@@ -212,6 +238,15 @@ ensure_send_progress_dialog()
     /* Progress bar done */
 }
 
+/* define commands for locking and unlocking: it makes deadlock debugging
+ * easier. */
+#define send_lock()   pthread_mutex_lock(&send_messages_lock); 
+#define send_unlock() pthread_mutex_unlock(&send_messages_lock);
+
+#else
+#define ensure_send_progress_dialog()
+#define send_lock()   
+#define send_unlock() 
 #endif
 
 
@@ -482,7 +517,8 @@ libbalsa_message_cb (void **buf, int *len, void *arg)
    NOTE that we do not close outbox after reading. send_real/thread message 
    handler does that.
 */
-/* This version uses libESMTP
+/* This version uses libESMTP. It has slightly different semantics than
+   sendmail version so don't get fooled by similar variable names.
  */
 gboolean 
 libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding, 
@@ -492,7 +528,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
     MessageQueueItem *new_message;
     SendMessageInfo *send_message_info;
     GList *lista, *recip, *bcc_recip;
-    LibBalsaMessage *queu;
+    LibBalsaMessage *msg;
     LibBalsaAddress *addy; 
     smtp_session_t session;
     smtp_message_t message, bcc_message;
@@ -500,13 +536,11 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
     const gchar *phrase, *mailbox, *subject;
     struct stat st;
     long estimate;
-#ifdef BALSA_USE_THREADS
-    pthread_mutex_lock(&send_messages_lock);
+
+    send_lock();
+
     /* We create here the progress bar */
     ensure_send_progress_dialog();
-#endif
-
-    /* We do messages in queue now only if where are not sending them already */
 
     /* Create the libESMTP session.  Loop over the out box and add the
        messages to the session. */
@@ -528,18 +562,18 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
     smtp_option_require_all_recipients (session, 1);
 
     libbalsa_mailbox_open(outbox);
-    lista = outbox->message_list;
-    while (lista != NULL) {
-	queu = LIBBALSA_MESSAGE(lista->data);
+    for (lista = outbox->message_list; lista; lista = lista->next) {
+	msg = LIBBALSA_MESSAGE(lista->data);
 
-	new_message = msg_queue_item_new(queu);
-	if (!libbalsa_create_msg(queu, new_message->message,
+        if(LIBBALSA_MESSAGE_IS_FLAGGED(msg)) continue;
+	new_message = msg_queue_item_new(msg);
+	if (!libbalsa_create_msg(msg, new_message->message,
 				 new_message->tempfile, encoding, 
 				 flow, 1)) {
 	    msg_queue_item_destroy(new_message);
 	} else {
 	    total_messages_left++;
-
+            libbalsa_message_flag(msg, TRUE);
 	    /* If the Bcc: recipient list is present, add a additional
 	       copy of the message to the session.  The recipient list
 	       for the main copy of the message is generated from the
@@ -547,7 +581,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 	       the Bcc: header.  The BCC copy of the message recipient
 	       list is taken from the Bcc recipient list and the Bcc:
 	       header is preserved in the message. */
-	    bcc_recip = g_list_first((GList *) queu->bcc_list);
+	    bcc_recip = g_list_first((GList *) msg->bcc_list);
 	    if (!bcc_recip)
 		bcc_message = NULL;
 	    else
@@ -573,13 +607,13 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 		     aren't necessary since they should already be in the
 		     message. */
 
-	    smtp_set_header (message, "Date", &queu->date);
+	    smtp_set_header (message, "Date", &msg->date);
 	    if (bcc_message)
-		smtp_set_header (bcc_message, "Date", &queu->date);
+		smtp_set_header (bcc_message, "Date", &msg->date);
 
 	    /* RFC 2822 does not require a message to have a subject.
 	               I assume this is NULL if not present */
-	    subject = LIBBALSA_MESSAGE_GET_SUBJECT(queu);
+	    subject = LIBBALSA_MESSAGE_GET_SUBJECT(msg);
 	    if (subject) {
 	    	smtp_set_header (message, "Subject", subject);
 		if (bcc_message)
@@ -587,8 +621,8 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 	    }
 
 	    /* Add the sender info */
-	    phrase = libbalsa_address_get_phrase(queu->from);
-	    mailbox = libbalsa_address_get_mailbox(queu->from, 0);
+	    phrase = libbalsa_address_get_phrase(msg->from);
+	    mailbox = libbalsa_address_get_mailbox(msg->from, 0);
 	    smtp_set_reverse_path (message, mailbox);
 	    smtp_set_header (message, "From", phrase, mailbox);
 	    if (bcc_message) {
@@ -596,17 +630,17 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 	        smtp_set_header (bcc_message, "From", phrase, mailbox);
 	    }
 
-	    if (queu->reply_to) {
-		phrase = libbalsa_address_get_phrase(queu->reply_to);
-		mailbox = libbalsa_address_get_mailbox(queu->reply_to, 0);
+	    if (msg->reply_to) {
+		phrase = libbalsa_address_get_phrase(msg->reply_to);
+		mailbox = libbalsa_address_get_mailbox(msg->reply_to, 0);
 		smtp_set_header (message, "Reply-To", phrase, mailbox);
 		if (bcc_message)
 		    smtp_set_header (bcc_message, "Reply-To", phrase, mailbox);
 	    }
 
-	    if (queu->dispnotify_to) {
-		phrase = libbalsa_address_get_phrase(queu->dispnotify_to);
-		mailbox = libbalsa_address_get_mailbox(queu->dispnotify_to, 0);
+	    if (msg->dispnotify_to) {
+		phrase = libbalsa_address_get_phrase(msg->dispnotify_to);
+		mailbox = libbalsa_address_get_mailbox(msg->dispnotify_to, 0);
 		smtp_set_header (message, "Disposition-Notification-To",
 				 phrase, mailbox);
 		if (bcc_message)
@@ -619,7 +653,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 	       copy of the message gets the To and Cc recipient list.
 	       The bcc copy gets the Bcc recipients.  */
 
-	    recip = g_list_first((GList *) queu->to_list);
+	    recip = g_list_first((GList *) msg->to_list);
 	    while (recip) {
         	addy = recip->data;
 		phrase = libbalsa_address_get_phrase(addy);
@@ -636,7 +670,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 	    	recip = recip->next;
 	    }
 
-	    recip = g_list_first((GList *) queu->cc_list);
+	    recip = g_list_first((GList *) msg->cc_list);
 	    while (recip) {
         	addy = recip->data;
 		phrase = libbalsa_address_get_phrase(addy);
@@ -692,7 +726,6 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 	    new_message->sent = 0;
 	    new_message->acc = 0;
 	}
-	lista = lista->next;
     }
 
    /* At this point the session is ready to be sent.  As I've written the
@@ -702,9 +735,8 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 
     send_message_info=send_message_info_new(outbox, session);
 
-
 #ifdef BALSA_USE_THREADS
-    sending_mail = TRUE;
+    sending_threads++;
     pthread_create(&send_mail, NULL,
 		   (void *) &balsa_send_message_real, send_message_info);
     /* Detach so we don't need to pthread_join
@@ -712,7 +744,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
      * reclaimed as soon as the thread exits
      */
     pthread_detach(send_mail);
-    pthread_mutex_unlock(&send_messages_lock);
+    send_unlock();
 #else				/*non-threaded code */
     balsa_send_message_real(send_message_info);
 #endif
@@ -726,6 +758,7 @@ handle_successful_send (smtp_message_t message, void *arg)
     MessageQueueItem *mqi;
     const smtp_status_t *status;
 
+    send_lock();
     /* Get the app data and decrement the reference count.  Only delete
        structures if refcount reaches zero */
     mqi = smtp_message_get_application_data (message);
@@ -736,9 +769,10 @@ handle_successful_send (smtp_message_t message, void *arg)
     if (status->code / 100 == 2) {
 	if (mqi != NULL && mqi->orig != NULL && mqi->refcount <= 0) {
 	    if (mqi->orig->mailbox)
-		libbalsa_message_delete(mqi->orig);
+		libbalsa_message_delete(mqi->orig, TRUE);
 	}
     } else {
+        libbalsa_message_flag(mqi->orig, FALSE);
 	/* XXX - Show the poor user the status codes and message. */
 	libbalsa_information(
 	    LIBBALSA_INFORMATION_WARNING, 
@@ -748,6 +782,7 @@ handle_successful_send (smtp_message_t message, void *arg)
 
     if (mqi != NULL && mqi->refcount <= 0)
         msg_queue_item_destroy(mqi);
+    send_unlock();
 }
 
 #ifdef BALSA_USE_THREADS
@@ -853,14 +888,14 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
     SendMessageInfo *send_message_info;
     GList *lista;
     LibBalsaMessage *queu;
+    gboolean start_thread;
+
     /* We do messages in queue now only if where are not sending them already */
 
-#ifdef BALSA_USE_THREADS
-    gboolean start_thread;
-    pthread_mutex_lock(&send_messages_lock);
-    if (sending_mail == FALSE) {
-	ensure_send_progress_dialog();
-#endif
+    send_lock();
+
+    ensure_send_progress_dialog();
+    if (sending_threads==0) {
 	libbalsa_mailbox_open(outbox);
 	lista = outbox->message_list;
 	
@@ -887,11 +922,10 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 #ifdef BALSA_USE_THREADS
     }
     
-    start_thread = !sending_mail;
-    sending_mail = TRUE;
+    start_thread = sending_threads==0;
 
     if (start_thread) {
-
+        sending_threads++;
 	send_message_info=send_message_info_new(outbox);
 
 	pthread_create(&send_mail, NULL,
@@ -902,12 +936,12 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 	 */
 	pthread_detach(send_mail);
     }
-    pthread_mutex_unlock(&send_messages_lock);
 #else				/*non-threaded code */
     
     send_message_info=send_message_info_new(outbox);
     balsa_send_message_real(send_message_info);
 #endif
+    send_unlock();
     return TRUE;
 }
 
@@ -915,7 +949,7 @@ static void
 handle_successful_send(MessageQueueItem *mqi)
 {
     if (mqi->orig->mailbox)
-	libbalsa_message_delete(mqi->orig);
+	libbalsa_message_delete(mqi->orig, TRUE);
     mqi->status = MQI_SENT;
 }
 
@@ -925,15 +959,12 @@ handle_successful_send(MessageQueueItem *mqi)
 static MessageQueueItem* get_msg2send()
 {
     MessageQueueItem* res = message_queue;
-#ifdef BALSA_USE_THREADS
-    pthread_mutex_lock(&send_messages_lock);
-#endif
+    send_lock();
+
     while(res && res->status != MQI_WAITING)
 	res = res->next_message;
 
-#ifdef BALSA_USE_THREADS
-    pthread_mutex_unlock(&send_messages_lock);
-#endif
+    send_unlock();
     return res;
 }
 
@@ -962,7 +993,7 @@ monitor_cb (const char *buf, int buflen, int writing, void *arg)
 #endif
 
 /* balsa_send_message_real:
-   does the acutal message sending. 
+   does the actual message sending. 
    This function may be called as a thread and should therefore do
    proper gdk_threads_{enter/leave} stuff around GTK,libbalsa or
    libmutt calls. Also, structure info should be freed before exiting.
@@ -1001,17 +1032,9 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
 	                      smtp_strerror (smtp_errno (), buf, sizeof buf));
       }
 
-#ifdef BALSA_USE_THREADS
-    sending_mail = FALSE;
-#endif
-	
 
     /* We give back all the resources used and delete the sent messages */
     
-#ifdef BALSA_USE_THREADS
-    pthread_mutex_lock(&send_messages_lock);
-#endif
-
     /* Quite a bit of status info has been gathered about messages and
        their recipients.  The following will do a libbalsa_message_delete()
        on the messages with a 2xx status recorded against them.  However
@@ -1023,11 +1046,13 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
     libbalsa_mailbox_close(info->outbox);
     gdk_threads_leave();
 
+    send_lock();
     total_messages_left = 0;
 #ifdef BALSA_USE_THREADS
-    pthread_mutex_unlock(&send_messages_lock);
     MSGSENDTHREAD(threadmsg, MSGSENDTHREADFINISHED, "", NULL, NULL, 0);
+    sending_threads--;
 #endif
+    send_unlock();
     smtp_destroy_session (info->session);
     send_message_info_destroy(info);	
     return TRUE;
@@ -1036,7 +1061,7 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
 #else /* ESMTP */
 
 /* balsa_send_message_real:
-   does the acutal message sending. 
+   does the actual message sending. 
    This function may be called as a thread and should therefore do
    proper gdk_threads_{enter/leave} stuff around GTK,libbalsa or
    libmutt calls. Also, structure info should be freed before exiting.
@@ -1047,15 +1072,15 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
     int i;
 #ifdef BALSA_USE_THREADS
     SendThreadMessage *threadmsg;
-    pthread_mutex_lock(&send_messages_lock);
+    send_lock();
     if (!message_queue) {
-	sending_mail = FALSE;
-	pthread_mutex_unlock(&send_messages_lock);
+	sending_threads--;
+	send_unlock();
 	MSGSENDTHREAD(threadmsg, MSGSENDTHREADFINISHED, "", NULL, NULL, 0);
 	send_message_info_destroy(info);	
 	return TRUE;
     }
-    pthread_mutex_unlock(&send_messages_lock);
+    send_unlock();
 #else
     if(!message_queue){
 	send_message_info_destroy(info);	
@@ -1078,9 +1103,7 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
 
     /* We give back all the resources used and delete the sent messages */
     
-#ifdef BALSA_USE_THREADS
-    pthread_mutex_lock(&send_messages_lock);
-#endif
+    send_lock();
     mqi = message_queue;
     
     while (mqi != NULL) {
@@ -1098,11 +1121,11 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
     message_queue = NULL;
     total_messages_left = 0;
 #ifdef BALSA_USE_THREADS
-    sending_mail = FALSE;
-    pthread_mutex_unlock(&send_messages_lock);
+    sending_threads--;
     MSGSENDTHREAD(threadmsg, MSGSENDTHREADFINISHED, "", NULL, NULL, 0);
 #endif
     send_message_info_destroy(info);	
+    send_unlock();
     return TRUE;
 }
 

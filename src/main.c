@@ -65,7 +65,6 @@ pthread_t send_mail;
 pthread_mutex_t mailbox_lock;
 pthread_mutex_t send_messages_lock;
 int checking_mail;
-int sending_mail;
 int mail_thread_pipes[2];
 int send_thread_pipes[2];
 GIOChannel *mail_thread_msg_send;
@@ -198,7 +197,6 @@ threads_init(void)
     pthread_mutex_init(&send_messages_lock, NULL);
     checking_mail = 0;
     updating_mblist = 0;
-    sending_mail = 0;
     updating_progressbar = 0;
     if (pipe(mail_thread_pipes) < 0) {
 	g_log("BALSA Init", G_LOG_LEVEL_DEBUG,

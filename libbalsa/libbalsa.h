@@ -74,6 +74,8 @@ void libbalsa_set_spool(gchar * spool);
 void libbalsa_show_message_source(LibBalsaMessage* msg);
 
 gchar *libbalsa_guess_mail_spool(void);
+gboolean libbalsa_is_sending_mail(void);
+void libbalsa_wait_for_sending_thread(gint max_seconds);
 
 void libbalsa_lock_mutt(void);
 void libbalsa_unlock_mutt(void);

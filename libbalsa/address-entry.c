@@ -632,21 +632,22 @@ libbalsa_make_address_string(emailData *addy)
 static void
 libbalsa_move_forward_word(LibBalsaAddressEntry *address_entry)
 {
-    GList *active;
+    inputData *input;
     emailData *addy;
     size_t tmp;
 
     g_return_if_fail(address_entry != NULL);
     g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry));
 
-    active = address_entry->input->active;
-    addy = active->data;
+    input = address_entry->input;
+    addy = input->active->data;
     if (addy->cursor < (tmp = strlen(addy->user))) {
 	addy->cursor = tmp;
     } else {
 	libbalsa_force_no_match(addy);
-	if ((active = g_list_next(active))) {
-	    addy = active->data;
+	if (g_list_next(input->active)) {
+	    input->active = g_list_next(input->active);
+	    addy = input->active->data;
 	    addy->cursor = strlen(addy->user);
 	}
     }
@@ -814,7 +815,9 @@ libbalsa_address_entry_set_text(LibBalsaAddressEntry *address,
 
     tmp_pos = 0;
     gtk_editable_insert_text(editable, text, strlen(text), &tmp_pos);
-    gtk_editable_select_region(editable, 0, 0);
+
+    editable->selection_start_pos = 0;
+    editable->selection_end_pos = 0;
 }
 
 
@@ -2938,7 +2941,8 @@ libbalsa_address_entry_show(LibBalsaAddressEntry *address_entry)
     libbalsa_address_entry_delete_text(editable, 0, -1);
     gtk_editable_insert_text(editable, show->str, show->len, &tmp_pos);
     gtk_editable_set_position(GTK_EDITABLE(address_entry), cursor);
-    gtk_editable_select_region(editable, start, end);
+    editable->selection_start_pos = start;
+    editable->selection_end_pos = end;
     libbalsa_address_entry_draw_text(address_entry);
     g_string_free(show, TRUE);
 }

@@ -654,7 +654,7 @@ static void trash_cb(GtkWidget * widget, gpointer data)
     if(msg->mailbox != balsa_app.trash)
 	libbalsa_message_move(msg, balsa_app.trash);
     else
-	libbalsa_message_delete(msg);
+	libbalsa_message_delete(msg, TRUE);
 
     gtk_widget_destroy(GTK_WIDGET(mw->window));
 }

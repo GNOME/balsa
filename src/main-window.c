@@ -701,6 +701,15 @@ balsa_window_init(BalsaWindow * window)
 {
 }
 
+static gboolean
+delete_cb(GtkWidget* main_window)
+{
+#ifdef BALSA_USE_THREADS
+    gtk_widget_set_sensitive(main_window, FALSE);
+    libbalsa_wait_for_sending_thread(-1);
+#endif
+    return FALSE; /* allow delete */
+}
 GtkWidget *
 balsa_window_new()
 {
@@ -888,8 +897,8 @@ balsa_window_new()
                        GTK_SIGNAL_FUNC(mw_size_alloc_cb), NULL);
     gtk_signal_connect (GTK_OBJECT (window), "destroy",
                         GTK_SIGNAL_FUNC (gtk_main_quit), NULL);
-    /* gtk_signal_connect(GTK_OBJECT(window), "delete-event",
-       GTK_SIGNAL_FUNC(delete_event_cb), NULL);*/
+    gtk_signal_connect(GTK_OBJECT(window), "delete-event",
+       GTK_SIGNAL_FUNC(delete_cb), NULL);
 
     return GTK_WIDGET(window);
 }
@@ -2527,7 +2536,7 @@ empty_trash(void)
     message = balsa_app.trash->message_list;
 
     while (message) {
-        libbalsa_message_delete(message->data);
+        libbalsa_message_delete(message->data, TRUE);
         message = message->next;
     }
     libbalsa_mailbox_close(balsa_app.trash);

@@ -587,11 +587,7 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsm)
 
 #ifdef BALSA_USE_THREADS
     if (balsa_app.compose_email) {
-	while(sending_mail) {
-	    while(gtk_events_pending())
-		gtk_main_iteration_do(FALSE);
-	    usleep(2000);
-	}
+        libbalsa_wait_for_sending_thread(-1);
 	gtk_main_quit();
     }
 #else
@@ -2724,7 +2720,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 		libbalsa_message_reply(bsmsg->orig_message);
 	} else if (bsmsg->type == SEND_CONTINUE) {
 	    if (bsmsg->orig_message) {
-		libbalsa_message_delete(bsmsg->orig_message);
+		libbalsa_message_delete(bsmsg->orig_message, TRUE);
 		libbalsa_mailbox_sync_backend(bsmsg->orig_message->mailbox);
 	    }
 	}
@@ -2790,7 +2786,7 @@ message_postpone(BalsaSendmsg * bsmsg)
                                              bsmsg->flow);
     if(successp) {
 	if (bsmsg->type == SEND_CONTINUE && bsmsg->orig_message) {
-	    libbalsa_message_delete(bsmsg->orig_message);
+	    libbalsa_message_delete(bsmsg->orig_message, TRUE);
 	    libbalsa_mailbox_sync_backend(bsmsg->orig_message->mailbox);
 	}
     }

@@ -952,7 +952,7 @@ balsa_index_select_next_flagged(BalsaIndex * bindex)
     
     while (h < clist->rows) {
 	message = LIBBALSA_MESSAGE(gtk_clist_get_row_data(clist, h));
-	if (message->flags & LIBBALSA_MESSAGE_FLAG_FLAGGED) {
+	if (LIBBALSA_MESSAGE_IS_FLAGGED(message)) {
 	    balsa_index_select_row(bindex, h);
 	    return;
 	}
@@ -967,7 +967,7 @@ balsa_index_select_next_flagged(BalsaIndex * bindex)
     while (h < start_row) {
 	message = LIBBALSA_MESSAGE(gtk_clist_get_row_data(clist, h));
 	
-	if (message->flags & LIBBALSA_MESSAGE_FLAG_FLAGGED) {
+	if (LIBBALSA_MESSAGE_IS_FLAGGED(message)) {
 	    balsa_index_select_row(bindex, h);
 	    return;
 	}
@@ -1070,7 +1070,7 @@ balsa_index_set_col_images(BalsaIndex * bindex, GtkCTreeNode *node,
 	gtk_ctree_node_set_pixmap(ctree, node, 1,
 				  balsa_icon_get_pixmap(BALSA_ICON_MBOX_TRASH),
 				  balsa_icon_get_bitmap(BALSA_ICON_MBOX_TRASH));
-    else if (message->flags & LIBBALSA_MESSAGE_FLAG_FLAGGED) {
+    else if (LIBBALSA_MESSAGE_IS_FLAGGED(message)) {
 	gtk_ctree_node_set_pixmap(ctree, node, 1,
 				  balsa_icon_get_pixmap(BALSA_ICON_INFO_FLAGGED),
 				  balsa_icon_get_bitmap(BALSA_ICON_INFO_FLAGGED));
@@ -1771,7 +1771,7 @@ balsa_message_undelete(GtkWidget * widget, gpointer user_data)
 
     while (list) {
 	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
-	libbalsa_message_undelete(message);
+	libbalsa_message_delete(message, FALSE);
 	list = list->next;
     }
 
@@ -1824,7 +1824,7 @@ balsa_message_toggle_flagged(GtkWidget * widget, gpointer user_data)
     while (list) {
 	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
 
-	if (!(message->flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)) {
+	if (!LIBBALSA_MESSAGE_IS_FLAGGED(message)) {
 	    is_all_flagged = FALSE;
 	    break;
 	}
@@ -1832,18 +1832,10 @@ balsa_message_toggle_flagged(GtkWidget * widget, gpointer user_data)
     }
 
     /* If they are all flagged, then unflag them. Otherwise, flag them all */
-    list = GTK_CLIST(index->ctree)->selection;
 
-    while (list) {
+    for (list=GTK_CLIST(index->ctree)->selection; list; list=list->next) {
 	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
-
-	if (is_all_flagged) {
-	    libbalsa_message_unflag(message);
-	} else {
-	    libbalsa_message_flag(message);
-	}
-
-	list = list->next;
+        libbalsa_message_flag(message, !is_all_flagged);
     }
     libbalsa_mailbox_sync_backend(index->mailbox_node->mailbox);
 }
@@ -1877,18 +1869,9 @@ balsa_message_toggle_new(GtkWidget * widget, gpointer user_data)
     }
 
     /* if all read mark as new, otherwise mark as read */
-    list = GTK_CLIST(index->ctree)->selection;
-
-    while (list) {
+    for(list=GTK_CLIST(index->ctree)->selection; list; list=list->next) {
 	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
-
-	if (is_all_read) {
-	    libbalsa_message_unread(message);
-	} else {
-	    libbalsa_message_read(message);
-	}
-
-	list = list->next;
+        libbalsa_message_read(message, !is_all_read);
     }
     libbalsa_mailbox_sync_backend(index->mailbox_node->mailbox);
 }

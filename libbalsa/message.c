@@ -426,7 +426,7 @@ libbalsa_message_move(LibBalsaMessage * message, LibBalsaMailbox * dest)
     }
 
     if (libbalsa_message_copy (message, dest)) {
-        libbalsa_message_delete (message);
+        libbalsa_message_delete (message, TRUE);
         return TRUE;
     } else
         return FALSE;
@@ -691,24 +691,15 @@ libbalsa_message_real_set_deleted_flag(LibBalsaMessage * message,
 }
 
 void
-libbalsa_message_flag(LibBalsaMessage * message)
+libbalsa_message_flag(LibBalsaMessage * message, gboolean flag)
 {
     g_return_if_fail(message != NULL);
     g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
 
     gtk_signal_emit(GTK_OBJECT(message),
-		    libbalsa_message_signals[SET_FLAGGED], TRUE);
+		    libbalsa_message_signals[SET_FLAGGED], flag);
 }
 
-void
-libbalsa_message_unflag(LibBalsaMessage * message)
-{
-    g_return_if_fail(message != NULL);
-    g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
-
-    gtk_signal_emit(GTK_OBJECT(message),
-		    libbalsa_message_signals[SET_FLAGGED], FALSE);
-}
 
 void
 libbalsa_message_clear_flags(LibBalsaMessage * message)
@@ -731,36 +722,25 @@ libbalsa_message_reply(LibBalsaMessage * message)
 		    libbalsa_message_signals[SET_ANSWERED], TRUE);
 }
 
-
 void
-libbalsa_message_read(LibBalsaMessage * message)
+libbalsa_message_read(LibBalsaMessage * message, gboolean read)
 {
     g_return_if_fail(message != NULL);
     g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
 
     gtk_signal_emit(GTK_OBJECT(message),
-		    libbalsa_message_signals[SET_READ], TRUE);
+		    libbalsa_message_signals[SET_READ], read);
 }
 
 void
-libbalsa_message_unread(LibBalsaMessage * message)
-{
-    g_return_if_fail(message != NULL);
-    g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
-
-    gtk_signal_emit(GTK_OBJECT(message),
-		    libbalsa_message_signals[SET_READ], FALSE);
-}
-
-void
-libbalsa_message_delete(LibBalsaMessage * message)
+libbalsa_message_delete(LibBalsaMessage * message, gboolean del)
 {
     g_return_if_fail(message != NULL);
     g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
     g_return_if_fail(message->mailbox != NULL);
 
     gtk_signal_emit(GTK_OBJECT(message),
-		    libbalsa_message_signals[SET_DELETED], TRUE);
+		    libbalsa_message_signals[SET_DELETED], del);
 }
 
 void
@@ -777,15 +757,6 @@ libbalsa_messages_delete(GList * messages)
     }
 }
 
-void
-libbalsa_message_undelete(LibBalsaMessage * message)
-{
-    g_return_if_fail(message != NULL);
-    g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
-
-    gtk_signal_emit(GTK_OBJECT(message),
-		    libbalsa_message_signals[SET_DELETED], FALSE);
-}
 
 #ifdef DEBUG
 static char *
@@ -891,7 +862,7 @@ libbalsa_message_body_ref(LibBalsaMessage * message)
      * emit read message
      */
     if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)
-	libbalsa_message_read(message);
+	libbalsa_message_read(message, TRUE);
     return TRUE;
 }
 

@@ -42,13 +42,12 @@ typedef struct _LibBalsaMailboxMhClass LibBalsaMailboxMhClass;
 struct _LibBalsaMailboxMh {
     LibBalsaMailboxLocal parent;
 
-    GArray* messages_info;
-    GArray* msgno_2_index;
+    GHashTable* messages_info;
+    GPtrArray* msgno_2_msg_info;
     gchar* sequences_filename;
     time_t mtime;
     time_t mtime_sequences;
-    guint last_msgno;
-    guint last_index;
+    guint last_fileno;
 };
 
 struct _LibBalsaMailboxMhClass {

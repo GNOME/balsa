@@ -908,16 +908,57 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
    checks imap mailbox for new messages.
    Called with the mailbox locked.
 */
+struct mark_info {
+    const gchar *path;
+    gboolean marked;
+};
+
+static void
+lbm_imap_list_cb(ImapMboxHandle * handle, int delim, ImapMboxFlags * flags,
+                 char *folder, gpointer data)
+{
+    struct mark_info *info = data;
+
+    if (strcmp(folder, info->path) == 0
+        && IMAP_MBOX_HAS_FLAG(*flags, IMLIST_MARKED))
+        info->marked = TRUE;
+}
+
+static gboolean
+lbm_imap_check(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
+    ImapMboxHandle *handle;
+    gulong id;
+    struct mark_info info;
+
+    handle = libbalsa_mailbox_imap_get_handle(mimap, NULL);
+    if (!handle)
+	return FALSE;
+
+    info.path = mimap->path;
+    info.marked = FALSE;
+
+    id = g_signal_connect(G_OBJECT(handle), "list-response",
+                          G_CALLBACK(lbm_imap_list_cb), &info);
+
+    if (imap_mbox_list(handle, mimap->path) != IMR_OK)
+        info.marked = FALSE;
+
+    g_signal_handler_disconnect(G_OBJECT(handle), id);
+    libbalsa_mailbox_imap_release_handle(mimap);
+
+    return info.marked;
+}
+
 static void
 libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 {
     g_assert(LIBBALSA_IS_MAILBOX_IMAP(mailbox));
 
     if (!MAILBOX_OPEN(mailbox)) {
-#if BALSA_ENABLE_DEPRECATED
-	if (libbalsa_notify_check_mailbox(mailbox))
-	    libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
-#endif
+        libbalsa_mailbox_set_unread_messages_flag(mailbox,
+                                                  lbm_imap_check(mailbox));
 	return;
 
     }

@@ -19,6 +19,13 @@
 #ifndef __MISC_H__
 #define __MISC_H__
 
+
+GtkWidget * append_menuitem_connect (GtkMenu * menu,
+				     gchar * text,
+				     GtkSignalFunc func,
+				     gpointer data,
+				     gpointer user_data);
+
 gchar * get_string_set_default (const char * path,
 				const char * value);
 

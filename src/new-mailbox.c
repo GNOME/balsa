@@ -30,6 +30,9 @@ struct _NewMailboxWindow
 
   GtkWidget *window;
   GtkWidget *notebook;
+
+  /* first page */
+  GtkWidget *mailbox_type_menu;
 };
 
 static GList *open_mailbox_list = NULL;
@@ -50,6 +53,7 @@ static void refresh_new_mailbox (NewMailboxWindow * nmw);
 static void back_cb (GtkWidget * widget);
 static void forward_cb (GtkWidget * widget);
 
+static void menu_item_cb (GtkWidget * widget);
 
 
 /* misc */
@@ -202,6 +206,8 @@ static void
 refresh_new_mailbox (NewMailboxWindow * nmw)
 {
   GString *str = g_string_new (NULL);
+  GtkWidget *menu;
+  GtkWidget *menuitem;
   
 
   /* set the window title */
@@ -214,6 +220,78 @@ refresh_new_mailbox (NewMailboxWindow * nmw)
 
       gtk_window_set_title (GTK_WINDOW (nmw->window), str->str);
     }
+
+
+
+  /* first notebook page */
+  gtk_option_menu_remove_menu (GTK_OPTION_MENU (nmw->mailbox_type_menu));
+  menu = gtk_menu_new ();
+
+  menuitem = 
+    append_menuitem_connect (GTK_MENU (menu), 
+			     mailbox_type_description (MAILBOX_MBX),
+			     (GtkSignalFunc) menu_item_cb,
+			     NULL,
+			     (gpointer) MAILBOX_MBX);
+
+    menuitem = 
+    append_menuitem_connect (GTK_MENU (menu), 
+			     mailbox_type_description (MAILBOX_MTX),
+			     (GtkSignalFunc) menu_item_cb,
+			     NULL,
+			     (gpointer) MAILBOX_MTX);
+
+  menuitem = 
+    append_menuitem_connect (GTK_MENU (menu), 
+			     mailbox_type_description (MAILBOX_TENEX),
+			     (GtkSignalFunc) menu_item_cb,
+			     NULL,
+			     (gpointer) MAILBOX_TENEX);
+  menuitem = 
+    append_menuitem_connect (GTK_MENU (menu), 
+			     mailbox_type_description (MAILBOX_MBOX),
+			     (GtkSignalFunc) menu_item_cb,
+			     NULL,
+			     (gpointer) MAILBOX_MBOX);
+  menuitem = 
+    append_menuitem_connect (GTK_MENU (menu), 
+			     mailbox_type_description (MAILBOX_MMDF),
+			     (GtkSignalFunc) menu_item_cb,
+			     NULL,
+			     (gpointer) MAILBOX_MMDF);
+  menuitem = 
+    append_menuitem_connect (GTK_MENU (menu), 
+			     mailbox_type_description (MAILBOX_UNIX),
+			     (GtkSignalFunc) menu_item_cb,
+			     NULL,
+			     (gpointer) MAILBOX_UNIX);
+  menuitem = 
+    append_menuitem_connect (GTK_MENU (menu), 
+			     mailbox_type_description (MAILBOX_MH),
+			     (GtkSignalFunc) menu_item_cb,
+			     NULL,
+			     (gpointer) MAILBOX_MH);
+  menuitem = 
+    append_menuitem_connect (GTK_MENU (menu), 
+			     mailbox_type_description (MAILBOX_POP3),
+			     (GtkSignalFunc) menu_item_cb,
+			     NULL,
+			     (gpointer) MAILBOX_POP3);
+  menuitem = 
+    append_menuitem_connect (GTK_MENU (menu), 
+			     mailbox_type_description (MAILBOX_IMAP),
+			     (GtkSignalFunc) menu_item_cb,
+			     NULL,
+			     (gpointer) MAILBOX_IMAP);
+  menuitem = 
+    append_menuitem_connect (GTK_MENU (menu), 
+			     mailbox_type_description (MAILBOX_NNTP),
+			     (GtkSignalFunc) menu_item_cb,
+			     NULL,
+			     (gpointer) MAILBOX_NNTP);
+
+
+  gtk_option_menu_set_menu (GTK_OPTION_MENU (nmw->mailbox_type_menu), menu);
 
 
 
@@ -233,7 +311,6 @@ create_first_page (NewMailboxWindow * nmw)
   GtkWidget *table;
   GtkWidget *label;
   GtkWidget *button;
-  GtkWidget *optionmenu;
 
 
   table = gtk_table_new (5, 2, FALSE);
@@ -249,12 +326,12 @@ create_first_page (NewMailboxWindow * nmw)
   gtk_widget_show (label);
 
 
-  optionmenu = gtk_option_menu_new ();
-  gtk_widget_set_usize (optionmenu, 0, BALSA_BUTTON_HEIGHT);
-  gtk_table_attach (GTK_TABLE (table), optionmenu, 1, 2, 0, 1,
+  nmw->mailbox_type_menu = gtk_option_menu_new ();
+  gtk_widget_set_usize (nmw->mailbox_type_menu, 0, BALSA_BUTTON_HEIGHT);
+  gtk_table_attach (GTK_TABLE (table), nmw->mailbox_type_menu, 1, 2, 0, 1,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL,
 		    0, 10);
-  gtk_widget_show (optionmenu);
+  gtk_widget_show (nmw->mailbox_type_menu);
 
 
   return table;
@@ -353,6 +430,47 @@ forward_cb (GtkWidget * widget)
   gtk_notebook_next_page (GTK_NOTEBOOK (nmw->notebook));
 }
 
+
+static void
+menu_item_cb (GtkWidget * widget)
+{
+  NewMailboxWindow *nmw = get_new_mailbox_data (GTK_OBJECT (widget));
+  MailboxType type = (MailboxType) gtk_object_get_user_data (GTK_OBJECT (widget));
+
+
+  switch (type)
+    {
+    case MAILBOX_MBX:
+      break;
+
+    case MAILBOX_MTX:
+      break;
+
+    case MAILBOX_TENEX:
+      break;
+
+    case MAILBOX_MBOX:
+      break;
+
+    case MAILBOX_MMDF:
+      break;
+
+    case MAILBOX_UNIX:
+      break;
+
+    case MAILBOX_MH:
+      break;
+
+    case MAILBOX_POP3:
+      break;
+
+    case MAILBOX_IMAP:
+      break;
+
+    case MAILBOX_NNTP:
+      break;
+    }
+}
 
 
 /*

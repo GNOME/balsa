@@ -172,7 +172,7 @@ union _MailboxUnion
   };
 
 
-gchar *mailbox_type_description (MailboxType type);
+gchar * mailbox_type_description (MailboxType type);
 
 Mailbox *mailbox_new (MailboxType type);
 void mailbox_free (Mailbox * mailbox);

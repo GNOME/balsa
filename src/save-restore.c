@@ -41,8 +41,7 @@ static proplist_t pl_dict_add_str_str (proplist_t dict_arg, gchar * string1,
 				       gchar * string2);
 static gchar *pl_dict_get_str (proplist_t dict, gchar * str);
 static gchar* config_get_pkey(proplist_t mbox);
-static proplist_t config_mailbox_get_by_pkey (const gchar * pkey);
-static proplist_t config_mailbox_get_key (proplist_t mailbox);
+static proplist_t config_mailbox_get_key_by_pkey (const gchar * pkey);
 static gint config_mailbox_init (proplist_t mbox, gchar * key);
 static gint config_mailbox_get_highest_number (proplist_t accounts);
 static gchar *rot (gchar * pass);
@@ -188,7 +187,7 @@ config_save (gchar * user_filename)
 
 
 static void
-add_prop_mailbox(proplist_t mbox_dict, char *key_arg)
+add_prop_mailbox(proplist_t mbox_dict, const char *key_arg)
 {
   proplist_t accounts, temp_str;
   char key[MAX_PROPLIST_KEY_LEN];
@@ -255,15 +254,15 @@ add_prop_mailbox(proplist_t mbox_dict, char *key_arg)
  * configurations.  The mailbox is specified by 'mailbox', and 'key'
  * actually refers to whether this is a special mailbox, such as
  * "Inbox", "Outbox", or "Trash", or whether it is a "generic"
- * mailbox.  If key is NULL, the mailbox's key is determine
+ * mailbox.  If key is NULL, the mailbox's key is determined
  * automatically.  The function returns TRUE on success and FALSE on
  * failure.
  */
 gint
-config_mailbox_add (Mailbox * mailbox, char *key_arg)
+config_mailbox_add (Mailbox * mailbox, const char *key_arg)
 {
   proplist_t mbox_dict;
-
+  
   /* Each mailbox is stored as a Proplist dictionary of mailbox settings.
      First create the dictionary, then add it to the "accounts" section
      of the global configuration. */
@@ -379,7 +378,7 @@ config_mailbox_add (Mailbox * mailbox, char *key_arg)
 gint
 config_mailbox_delete (const Mailbox * mailbox)
 {
-  proplist_t accounts, mbox, mbox_key, temp_str;
+  proplist_t accounts, mbox_key, temp_str;
   gchar * pkey;
 
   if (balsa_app.proplist == NULL)
@@ -395,16 +394,11 @@ config_mailbox_delete (const Mailbox * mailbox)
   if (accounts == NULL)
     return FALSE;
 
-  /* Grab the specified mailbox */
+  /* Grab the specified mailbox's key */
   pkey = mailbox_get_pkey(mailbox);
-  mbox = config_mailbox_get_by_pkey (pkey);
+  mbox_key = config_mailbox_get_key_by_pkey (pkey);
   g_free( pkey );
 
-  if (mbox == NULL)
-    return FALSE;
-
-  /* Now grab the associated key */
-  mbox_key = config_mailbox_get_key (mbox);
   if (mbox_key == NULL)
     return FALSE;
 
@@ -418,15 +412,16 @@ config_mailbox_delete (const Mailbox * mailbox)
 gint
 config_mailbox_update (Mailbox * mailbox, const gchar * old_pkey)
 {
-  proplist_t mbox, mbox_key;
+  proplist_t prop_key;
+  gchar * mbox_key;
 
-  mbox = config_mailbox_get_by_pkey (old_pkey);
+  prop_key = config_mailbox_get_key_by_pkey (old_pkey);
 
-  mbox_key = mbox ? PLGetString (config_mailbox_get_key (mbox)) : NULL;
-
+  g_assert(PLIsString(prop_key));
+  mbox_key = prop_key ? g_strdup(PLGetString(prop_key)) : NULL;
   config_mailbox_delete (mailbox);
   config_mailbox_add (mailbox, mbox_key);
-
+  g_free(mbox_key);
   return config_save (BALSA_CONFIG_FILE);
 }				/* config_mailbox_update */
 
@@ -1387,7 +1382,7 @@ config_get_pkey(proplist_t mbox)
 }
 
 static proplist_t
-config_mailbox_get_by_pkey (const gchar * pkey)
+config_mailbox_get_key_by_pkey (const gchar * pkey)
 {
   proplist_t temp_str, accounts, mbox, mbox_key;
   int num_elements, i;
@@ -1420,7 +1415,7 @@ config_mailbox_get_by_pkey (const gchar * pkey)
 
       if (key && strcmp (key, pkey) == 0) {
 	      g_free( key );
-	  return mbox;
+	  return mbox_key;
       }
 
       g_free( key );
@@ -1428,7 +1423,7 @@ config_mailbox_get_by_pkey (const gchar * pkey)
     }
 
   return NULL;
-}				/* config_mailbox_get_by_pkey */
+}				/* config_mailbox_get_key_by_pkey */
 
 #if 0
 /* section disabled on 2000.05.05 */
@@ -1481,41 +1476,6 @@ config_mailbox_get_by_name (const gchar * name)
   return NULL;
 }				/* config_mailbox_get_by_name */
 #endif
-
-static proplist_t
-config_mailbox_get_key (proplist_t mailbox)
-{
-  proplist_t temp_str, accounts, mbox, mbox_key;
-  int num_elements, i;
-
-  g_return_val_if_fail (mailbox != NULL, NULL);
-  g_assert (balsa_app.proplist != NULL);
-
-  /* Grab the list of accounts */
-  temp_str = PLMakeString ("Accounts");
-  accounts = PLGetDictionaryEntry (balsa_app.proplist, temp_str);
-  PLRelease (temp_str);
-
-  if (accounts == NULL)
-    return NULL;
-
-  /* Walk the list of all mailboxes until the matching mailbox is found */
-  num_elements = PLGetNumberOfElements (accounts);
-  for (i = 0; i < num_elements; i++)
-    {
-      mbox_key = PLGetArrayElement (accounts, i);
-      if (mbox_key == NULL)
-	continue;
-
-      mbox = PLGetDictionaryEntry (accounts, mbox_key);
-
-      if ( PLIsEqual( mbox, mailbox ) )
-	return mbox_key;
-
-    }
-
-  return NULL;
-}				/* config_mailbox_get_key */
 
 static gint
 config_mailbox_get_highest_number (proplist_t accounts)

@@ -1,3 +1,8 @@
+2000-07-04  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/save-restore.c: renaming 'special' mboxes fixed 
+	(PLGetString() value of later PLRelease'd Dict was used)
+	
 2000-07-03  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/{contact.h,mailbox.c}(contact_store): pass address book 

@@ -1875,7 +1875,7 @@ GHashTable *libbalsa_mailbox_view_table;
 static LibBalsaMailboxView libbalsa_mailbox_view_default = {
     NULL,			/* mailing_list_address */
     NULL,			/* identity_name        */
-    LB_MAILBOX_THREADING_JWZ,	/* threading_type       */
+    LB_MAILBOX_THREADING_FLAT,	/* threading_type       */
     0,				/* filter               */
     LB_MAILBOX_SORT_TYPE_ASC,	/* sort_type            */
     LB_MAILBOX_SORT_DATE,	/* sort_field           */

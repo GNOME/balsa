@@ -651,14 +651,15 @@ libbalsa_fetch_pop_mail_direct (LibBalsaMailboxPop3* mailbox,
 }
 PopStatus
 libbalsa_fetch_pop_mail_filter (LibBalsaMailboxPop3* mailbox, 
-				gchar* uid, 
+				gchar* uid, const gchar* cmd,
                                 ProgressCallback prog_cb, void* data)
 {
     LibBalsaServer *s;
     g_return_val_if_fail(mailbox, POP_OK);
     
+    if(!cmd) cmd = "procmail -f -";
     s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
     return fetch_pop_mail(s->host, s->user,s->passwd, 
 			  mailbox->use_apop, mailbox->delete_from_server,
-			  uid, fetch_procmail, "procmail -f -", prog_cb, data);
+			  uid, fetch_procmail, cmd, prog_cb, data);
 }

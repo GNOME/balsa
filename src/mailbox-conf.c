@@ -92,6 +92,7 @@ struct _MailboxConfWindow {
 	    GtkWidget *delete_from_server;
 	    GtkWidget *use_apop;
 	    GtkWidget *filter;
+	    GtkWidget *filter_cmd;
 #ifdef USE_SSL
 #ifdef USE_SSL_FOR_POP3_IF_WE_EVER_DECIDE_WE_NEED_TO
 	    GtkWidget *use_ssl;
@@ -164,6 +165,14 @@ pop3_use_ssl_cb(GtkWidget * w, MailboxConfWindow * mcw)
 }
 #endif
 #endif
+
+static void
+pop3_enable_filter_cb(GtkWidget * w, MailboxConfWindow * mcw)
+{
+    GtkToggleButton *button = GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.filter);
+    gtk_widget_set_sensitive(mcw->mb_data.pop3.filter_cmd,
+                             gtk_toggle_button_get_active(button));
+}
 
 /* BEGIN OF COMMONLY USED CALLBACKS SECTION ---------------------- */
 
@@ -542,6 +551,10 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 	gtk_toggle_button_set_active
 	    (GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.filter),
 	     pop3->filter);
+        gtk_widget_set_sensitive(mcw->mb_data.pop3.filter_cmd, pop3->filter);
+	if (pop3->filter_cmd)
+	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.filter_cmd),
+			       pop3->filter_cmd);
 
     } else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
 	LibBalsaMailboxImap *imap;
@@ -642,6 +655,7 @@ static void
 update_pop_mailbox(MailboxConfWindow *mcw)
 {
     LibBalsaMailboxPop3 * mailbox;
+    const gchar *cmd;
 
     mailbox = LIBBALSA_MAILBOX_POP3(mcw->mailbox);
 
@@ -675,6 +689,9 @@ update_pop_mailbox(MailboxConfWindow *mcw)
 				     (mcw->mb_data.pop3.delete_from_server));
     mailbox->filter =
 	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.filter));
+    cmd = gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.filter_cmd));
+    g_free(mailbox->filter_cmd);
+    mailbox->filter_cmd = cmd ? g_strdup(cmd) : NULL;
 }
 
 /*
@@ -969,6 +986,13 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
     mcw->mb_data.pop3.filter = 
 	create_check(mcw->window, _("_Filter messages through procmail"),
 		     table, 7, FALSE);
+    g_signal_connect(G_OBJECT(mcw->mb_data.pop3.filter), "toggled", 
+                     G_CALLBACK(pop3_enable_filter_cb), mcw);
+    label = create_label(_("Fi_lter Command:"), table, 8);
+    mcw->mb_data.pop3.filter_cmd =
+	create_entry(mcw->window, table,
+		     GTK_SIGNAL_FUNC(check_for_blank_fields),
+		     mcw, 8, "procmail -f -", label);
 
     /* toggle for check */
     mcw->mb_data.pop3.check = 

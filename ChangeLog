@@ -1,3 +1,9 @@
+2003-01-05  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox_pop3.[hc]: Add filter_cmd field.
+	* libbalsa/pop3.[ch]: configurable filter command.
+	* src/mailbox-conf.c: configure filter command.
+
 2003-02-03 22:24  PeterB
 
 	* src/sendmsg-window.c: Check for orig_message->mailbox before

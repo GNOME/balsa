@@ -351,7 +351,7 @@ AC_ARG_WITH(ssl, [  --with-ssl              Enable SSL [default=no]],[
 AC_MSG_CHECKING([whether to build SSL support])
 if test "x$with_ssl" != xno  ; then
 # openssl >=0.9.7 is pkg-config compatible.
-   if pkg-config openssl >&/dev/null; then
+   if pkg-config openssl >/dev/null 2>&1; then
       LIBS="$LIBS `pkg-config --libs openssl`"
       CPPFLAGS="`pkg-config --cflags-only-I openssl` $CPPFLAGS"
       AC_MSG_RESULT(yes)

@@ -41,12 +41,15 @@ void mblist_remove_mailbox (Mailbox * mailbox);
 /* callbacks */
 static void destroy_mblist_window (GtkWidget * widget);
 static void close_mblist_window (GtkWidget * widget);
+static void mailbox_select_cb (GtkTree * tree);
 
 void
 mblist_open_window (void)
 {
   GtkWidget *vbox;
   GtkWidget *scrolled_win;
+  GtkWidget *tree;
+  GtkWidget *tree_item;
 
   if (mblw)
     return;
@@ -73,12 +76,25 @@ mblist_open_window (void)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_win),
 				GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_box_pack_start (GTK_BOX (vbox), scrolled_win, TRUE, TRUE, 3);
-  gtk_widget_set_usize (scrolled_win, 200, 200);
   gtk_widget_show (scrolled_win);
 
+  tree = gtk_tree_new ();
+  gtk_signal_connect (GTK_OBJECT (tree), "selection_changed",
+		      (GtkSignalFunc) mailbox_select_cb,
+		      (gpointer) NULL);
+  gtk_container_add (GTK_CONTAINER (scrolled_win), tree);
+  gtk_widget_show (tree);
+
+  tree_item = gtk_tree_item_new_with_label ("Balsa");
+  gtk_tree_append (GTK_TREE (tree), tree_item);
+  gtk_widget_show (tree_item);
 
   mblw->tree = gtk_tree_new ();
-  gtk_container_add (GTK_CONTAINER (scrolled_win), mblw->tree);
+  gtk_tree_item_set_subtree (GTK_TREE_ITEM (tree_item), mblw->tree);
+  gtk_signal_connect (GTK_OBJECT (mblw->tree), "selection_changed",
+		      (GtkSignalFunc) mailbox_select_cb,
+		      (gpointer) NULL);
+
   gtk_widget_show (mblw->tree);
 
   gtk_widget_show (mblw->window);
@@ -91,7 +107,7 @@ mblist_add_mailbox (Mailbox * mailbox)
   GtkWidget *tree_item;
   tree_item = gtk_tree_item_new_with_label (mailbox->name);
   gtk_tree_append (GTK_TREE (mblw->tree), tree_item);
-  gtk_widget_show(tree_item);
+  gtk_widget_show (tree_item);
   gtk_object_set_user_data (GTK_OBJECT (tree_item), mailbox);
 }
 
@@ -114,4 +130,30 @@ destroy_mblist_window (GtkWidget * widget)
   close_mblist_window (widget);
   g_free (mblw);
   mblw = NULL;
+}
+
+static void
+mailbox_select_cb (GtkTree * tree)
+{
+  Mailbox *mailbox;
+  GList *selected;
+  GtkTreeItem *selected_item;
+  gint nb_selected;
+
+  selected = tree->selection;
+  nb_selected = g_list_length (selected);
+  g_print ("should be opening new mailbox index\n");
+  if (nb_selected != 1)
+    return;
+
+
+  selected_item = GTK_TREE_ITEM (selected->data);
+  mailbox = gtk_object_get_user_data (GTK_OBJECT (selected_item));
+
+  /* bail now if the we've been called without a valid
+   * mailbox */
+  if (!mailbox)
+    return;
+
+  create_new_index (mailbox);
 }

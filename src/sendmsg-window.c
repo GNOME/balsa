@@ -236,6 +236,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   gchar *c;
 
   Message *message;
+  Body *body;
 
   msg = g_malloc (sizeof (BalsaSendmsg));
   switch (type)
@@ -293,7 +294,12 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   if (type == 1)
     {
       if (message->reply_to->personal)
-	gtk_entry_set_text (GTK_ENTRY (msg->to), message->reply_to->personal);
+	{
+	  tmp = g_malloc (strlen (message->from->personal) + 1 + 1 + strlen (message->from->user) + 1 + strlen (message->from->host) + 1 + 1);
+	  sprintf (tmp, "%s <%s@%s>", message->from->personal, message->from->user, message->from->host);
+	  gtk_entry_set_text (GTK_ENTRY (msg->to), tmp);
+	  g_free (tmp);
+	}
       else
 	{
 	  tmp = g_malloc (strlen (message->from->user) + 1 + strlen (message->from->host) + 1);
@@ -435,14 +441,15 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
       c = message->date;
       gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
       gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, " wrote:\n", 8);
-#if 0
-      c = mail_fetchtext (bindex->stream, row);
+
+      body = (Body *) message->body_list->data;
+      c = body->buffer;
+
       c = gt_replys (c);
 
       gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
 
       gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "\n\n", 2);
-#endif
     }
   if (balsa_app.signature)
     gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, balsa_app.signature, strlen (balsa_app.signature));
@@ -513,9 +520,9 @@ send_message (Message * message)
 			make_string_from_list (message->to_list),
 			message->from->host);
   if (message->cc_list)
-      rfc822_parse_adrlist (&envelope->cc,
-			    make_string_from_list (message->cc_list),
-			    message->from->host);
+    rfc822_parse_adrlist (&envelope->cc,
+			  make_string_from_list (message->cc_list),
+			  message->from->host);
   envelope->subject = g_strdup (message->subject);
   body->type = TYPETEXT;
 

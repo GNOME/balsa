@@ -81,19 +81,15 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
   balsa_app.mdi_style = GNOME_MDI_DEFAULT_MODE;
 
-  /* initalize our mailbox access crap */
-  restore_global_settings ();
-
-  read_signature ();
-
-  /* Check to see if this is the first time we've run balsa */
-
-  if (!balsa_app.inbox)
+  balsa_app.proplist = PLGetProplistWithPath("~/.balsarc");
+  
+  if (!balsa_app.proplist)
     {
       initialize_balsa (argc, argv);
       return;
     }
 
+  /* initalize our mailbox access crap */
   do_load_mailboxes ();
 
   open_main_window ();
@@ -108,8 +104,9 @@ init_balsa_app (int argc, char *argv[])
 void
 do_load_mailboxes ()
 {
-  if (!balsa_app.inbox)
-    restore_global_settings ();
+  read_signature ();
+
+  restore_global_settings ();
 
   switch (balsa_app.inbox->type)
     {
@@ -176,18 +173,20 @@ check_for_new_messages ()
 static gint
 mailboxes_init (void)
 {
-  gchar **mailboxes;
   gint num = 0;
   gint i = 0;
+  proplist_t accts, elem;
 
-  if (gnome_config_get_string ("/balsa/Global/Accounts"))
-    gnome_config_get_vector ("/balsa/Global/Accounts", &num, &mailboxes);
+  accts = PLGetDictionaryEntry (balsa_app.proplist, PLMakeString ("accounts"));
 
-  for (i = 0; num > i; i++)
+  num = PLGetNumberOfElements (accts);
+
+  for (i = 0; i < num; i++)
     {
+      elem = PLGetArrayElement (accts, i);
       if (balsa_app.debug)
-	fprintf (stderr, "Loaded mailbox: %s\n", mailboxes[i]);
-      load_mailboxes (mailboxes[i]);
+	fprintf (stderr, "Loaded mailbox: %s\n", PLGetString (elem));
+      load_mailboxes (PLGetString (elem));
     }
 
   return 1;

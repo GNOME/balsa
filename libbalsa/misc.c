@@ -21,6 +21,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/utsname.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -113,6 +114,14 @@ get_int_set_default (const char *path,
 
   g_string_free (buffer, 1);
   return result;
+}
+
+gchar *
+g_get_host_name (void)
+{
+  struct utsname utsname;
+  uname (&utsname);
+  return g_strdup (utsname.nodename);
 }
 
 gchar *

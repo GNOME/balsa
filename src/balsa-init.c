@@ -280,14 +280,15 @@ create_general_page ()
 		    0, 10);
   gtk_widget_show (prefs->smtp_server);
 
-  str = g_string_new (balsa_app.username);
+  str = g_string_new (g_get_user_name());
   g_string_append_c (str, '@');
+  /* FIXME */
   g_string_append (str, balsa_app.hostname);
   gtk_entry_set_text (GTK_ENTRY (prefs->email), str->str);
   g_string_free (str, TRUE);
 
-  gtk_entry_set_text (GTK_ENTRY (prefs->real_name), balsa_app.real_name);
-  gtk_entry_set_text (GTK_ENTRY (prefs->smtp_server), balsa_app.smtp_server);
+  gtk_entry_set_text (GTK_ENTRY (prefs->real_name), g_get_real_name());
+  gtk_entry_set_text (GTK_ENTRY (prefs->smtp_server), "localhost");
 
   return vbox;
 }

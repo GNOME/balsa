@@ -20,6 +20,7 @@
 #include "config.h"
 
 #include <gnome.h>
+#include <proplist.h>
 
 #include "balsa-app.h"
 #include "mailbox.h"
@@ -34,130 +35,111 @@
 void
 add_mailbox_config (Mailbox * mailbox)
 {
-  GString *gstring;
-  gchar **mblist;
-  gint    nboxes;
   GNode *node;
-  
-  GList *list = NULL;
-  Mailbox *mb;
+  proplist_t dict, new;
 
-  gint i = 0;
-
-  gstring = g_string_new (NULL);
-  
-  gnome_config_get_vector ("/balsa/Global/Accounts", &nboxes, &mblist);
-  mblist = g_realloc(mblist, sizeof (char*) * (nboxes + 1));
-  mblist[nboxes] = mailbox->name;
-  gnome_config_set_vector ("/balsa/Global/Accounts", nboxes + 1, mblist);
-    
-  g_string_truncate (gstring, 0);
-  g_string_sprintf (gstring, "/balsa/%s/", mailbox->name);
-  gnome_config_push_prefix (gstring->str);
+  dict = PLGetDictionaryEntry (balsa_app.proplist, PLMakeString ("accounts"));
 
   switch (mailbox->type)
     {
     case MAILBOX_MBOX:
     case MAILBOX_MH:
     case MAILBOX_MAILDIR:
-      gnome_config_set_int ("Type", 0);
-      gnome_config_set_string ("Path", MAILBOX_LOCAL (mailbox)->path);
+      new = PLMakeDictionaryFromEntries (
+					  PLMakeString ("Type"),
+					  PLMakeString ("0"),
+					  PLMakeString ("Path"),
+			       PLMakeString (MAILBOX_LOCAL (mailbox)->path),
+					  NULL);
+      dict = PLInsertDictionaryEntry (balsa_app.proplist, PLMakeString (mailbox->name), new);
+
       node = g_node_new (mailbox_node_new (mailbox->name, mailbox,
 					   mailbox->type != MAILBOX_MBOX));
       break;
     case MAILBOX_POP3:
-      gnome_config_set_int ("Type", 1);
-      gnome_config_set_string ("username", MAILBOX_POP3 (mailbox)->user);
-      gnome_config_set_string ("password", MAILBOX_POP3 (mailbox)->passwd);
-      gnome_config_set_string ("server", MAILBOX_POP3 (mailbox)->server);
+      new = PLMakeDictionaryFromEntries (
+					  PLMakeString ("Type"),
+					  PLMakeString ("1"),
+					  PLMakeString ("Usename"),
+				PLMakeString (MAILBOX_POP3 (mailbox)->user),
+					  PLMakeString ("Password"),
+			      PLMakeString (MAILBOX_POP3 (mailbox)->passwd),
+					  PLMakeString ("Server"),
+			      PLMakeString (MAILBOX_POP3 (mailbox)->server),
+					  NULL);
+      dict = PLInsertDictionaryEntry (balsa_app.proplist, PLMakeString (mailbox->name), new);
       break;
     case MAILBOX_IMAP:
-      gnome_config_set_int ("Type", 2);
-      gnome_config_set_string ("username", MAILBOX_IMAP (mailbox)->user);
-      gnome_config_set_string ("password", MAILBOX_IMAP (mailbox)->passwd);
-      gnome_config_set_string ("server", MAILBOX_IMAP (mailbox)->server);
-      gnome_config_set_int ("port", MAILBOX_IMAP (mailbox)->port);
-      gnome_config_set_string ("Path", MAILBOX_IMAP (mailbox)->path);
+      new = PLMakeDictionaryFromEntries (
+				  PLMakeString ("Type"), PLMakeString ("2"),
+					  PLMakeString ("Server"),
+			      PLMakeString (MAILBOX_IMAP (mailbox)->server),
+					  PLMakeString ("Port"),
+				PLMakeString (MAILBOX_IMAP (mailbox)->port),
+					  PLMakeString ("Path"),
+				PLMakeString (MAILBOX_IMAP (mailbox)->path),
+					  PLMakeString ("Username"),
+				PLMakeString (MAILBOX_IMAP (mailbox)->user),
+					  PLMakeString ("Password"),
+			      PLMakeString (MAILBOX_IMAP (mailbox)->passwd),
+					  NULL);
+      dict = PLInsertDictionaryEntry (balsa_app.proplist, PLMakeString (mailbox->name), new);
+
+      node = g_node_new (mailbox_node_new (mailbox->name, mailbox, FALSE));
+      g_node_append (balsa_app.mailbox_nodes, node);
       break;
     }
-
-  gnome_config_pop_prefix ();
-
-  gnome_config_sync ();
-  g_string_free (gstring, TRUE);
 }
 
 
 void
 delete_mailbox_config (gchar * name)
 {
-  GString *gstring;
-  gchar **mblist;
-  gint i;
-  GList *list;
+  proplist_t dict, accts;
   Mailbox *mailbox;
 
-  gstring = g_string_new (NULL);
-  g_string_sprintf (gstring, "/balsa/%s", name);
-  gnome_config_clean_section (gstring->str);
+  accts = PLGetDictionaryEntry (balsa_app.proplist, PLMakeString ("accounts"));
+  dict = PLGetDictionaryEntry (accts, PLMakeString (name));
 
-  /* TODO we should prolly lower this by one here, so save on some memory... */
-  mblist = g_new (gchar *, g_node_n_children (balsa_app.mailbox_nodes));
-#if 0
-  list = g_list_first (balsa_app.mailbox_list);
-  for (i = 0; list; list = list->next, i++, mailbox = list->data)
-    {
-      if (!strcmp (name, mailbox->name))
-	{
-	  balsa_app.mailbox_list = g_list_remove (balsa_app.mailbox_list, list->data);
-	  i--;			/* lets move this back down one */
-	}
-      else
-	{
-	  mblist[i] = g_strdup (mailbox->name);
-	}
-    }
-#endif
-  gnome_config_sync ();
-  g_string_free (gstring, 1);
+  accts = PLRemoveDictionaryEntry (accts, dict);
 }
 
 
 void
-update_mailbox_config (Mailbox * mailbox, gchar* old_mbox_name)
+update_mailbox_config (Mailbox * mailbox, gchar * old_mbox_name)
 {
   GString *gstring;
   gchar **mblist;
-  gchar  *mbox_name;
+  gchar *mbox_name;
   GList *list = NULL;
   Mailbox *mb;
-  gint    nboxes;
-  
-  gint i = 0;
+  gint nboxes;
 
+  gint i = 0;
+#if 0
   gstring = g_string_new (NULL);
 
   gnome_config_get_vector ("/balsa/Global/Accounts", &nboxes, &mblist);
   for (i = 0, mbox_name = mblist[0]; i < nboxes; mbox_name++)
     {
-      if (strcmp(mbox_name, old_mbox_name) == 0)
+      if (strcmp (mbox_name, old_mbox_name) == 0)
 	break;
       i++;
     }
   if (i == nboxes)
     {
-      g_warning("mailbox not found in `Accounts' resource");
+      g_warning ("mailbox not found in `Accounts' resource");
       /*
-	@mla@ FIXME this is definitly wrong. Could be a `normal'
-	mbox, which the user wants to rename. Have to look into this
-	later.
-      */
-      mblist = g_realloc(mblist, (nboxes+1) * sizeof (gchar*));
+         @mla@ FIXME this is definitly wrong. Could be a `normal'
+         mbox, which the user wants to rename. Have to look into this
+         later.
+       */
+      mblist = g_realloc (mblist, (nboxes + 1) * sizeof (gchar *));
       mblist[nboxes++] = mailbox->name;
     }
   else
     {
-      mblist[i]      = mailbox->name;
+      mblist[i] = mailbox->name;
     }
   gnome_config_set_vector ("/balsa/Global/Accounts", nboxes, mblist);
   i = 0;
@@ -193,11 +175,15 @@ update_mailbox_config (Mailbox * mailbox, gchar* old_mbox_name)
 
   gnome_config_sync ();
   g_string_free (gstring, TRUE);
+#endif
 }
 
 gint
-load_mailboxes (gchar * name)
+load_mailboxes (gchar *name)
 {
+  proplist_t dict, accts, mb;
+  int num_elements, i;
+
   MailboxType mailbox_type;
   Mailbox *mailbox;
   gint type;
@@ -205,86 +191,78 @@ load_mailboxes (gchar * name)
   gchar *path;
   GNode *node;
 
-  g_string_truncate (gstring, 0);
-  g_string_sprintf (gstring, "/balsa/%s", name);
+  accts = PLGetDictionaryEntry (balsa_app.proplist, PLMakeString ("accounts"));
+  mb = PLGetDictionaryEntry (accts, PLMakeString (name));
 
+  num_elements = PLGetNumberOfElements (mb);
 
-  if (!gnome_config_has_section (gstring->str))
-    return FALSE;
-
-
-  g_string_truncate (gstring, 0);
-  g_string_sprintf (gstring, "/balsa/%s/", name);
-  gnome_config_pop_prefix ();
-  gnome_config_push_prefix (gstring->str);
-  type = gnome_config_get_int ("Type=0");
-  path = gnome_config_get_string ("Path");
-
-
-  switch (type)
+  for (i = 0; i < num_elements; i++)
     {
+      type = atoi (PLGetString (PLGetDictionaryEntry (mb, PLMakeString ("Type"))));
 
-      /* Local mailbox */
-    case 0:
-      mailbox_type = mailbox_valid (path);
-      if (mailbox_type != MAILBOX_UNKNOWN)
+      path = g_strdup (PLGetString (PLGetDictionaryEntry (mb, PLMakeString ("Name"))));
+
+      switch (type)
 	{
-	  mailbox = mailbox_new (mailbox_type);
+
+	  /* Local mailbox */
+	case 0:
+	  mailbox_type = mailbox_valid (path);
+	  if (mailbox_type != MAILBOX_UNKNOWN)
+	    {
+	      mailbox = mailbox_new (mailbox_type);
+	      mailbox->name = g_strdup (name);
+	      MAILBOX_LOCAL (mailbox)->path = g_strdup (path);
+
+	      if (strcmp ("Inbox", name) == 0)
+		{
+		  balsa_app.inbox = mailbox;
+		}
+	      else if (strcmp ("Outbox", name) == 0)
+		{
+		  balsa_app.outbox = mailbox;
+		}
+	      else if (strcmp ("Trash", name) == 0)
+		{
+		  balsa_app.trash = mailbox;
+		}
+	      else
+		{
+		  if (mailbox_type == MAILBOX_MH)
+		    node = g_node_new (mailbox_node_new (g_strdup (mailbox->name), mailbox, TRUE));
+		  else
+		    node = g_node_new (mailbox_node_new (g_strdup (mailbox->name), mailbox, FALSE));
+		  g_node_append (balsa_app.mailbox_nodes, node);
+		}
+	    }
+	  break;
+
+	  /*  POP3  */
+	case 1:
+	  mailbox = mailbox_new (MAILBOX_POP3);
 	  mailbox->name = g_strdup (name);
-	  MAILBOX_LOCAL (mailbox)->path = g_strdup (path);
+	  MAILBOX_POP3 (mailbox)->user = PLGetString (PLGetDictionaryEntry (mb, PLMakeString ("Username")));
+	  MAILBOX_POP3 (mailbox)->passwd = PLGetString (PLGetDictionaryEntry (mb, PLMakeString ("Password")));
+	  MAILBOX_POP3 (mailbox)->server = PLGetString (PLGetDictionaryEntry (mb, PLMakeString ("Server")));
+	  balsa_app.inbox_input = g_list_append (balsa_app.inbox_input, mailbox);
+	  break;
 
-	  if (strcmp ("Inbox", name) == 0)
-	    {
-	      balsa_app.inbox = mailbox;
-	    }
-	  else if (strcmp ("Outbox", name) == 0)
-	    {
-	      balsa_app.outbox = mailbox;
-	    }
-	  else if (strcmp ("Trash", name) == 0)
-	  {
-	    balsa_app.trash = mailbox;
-	  }
-	  else
-	  {
-	    if (mailbox_type == MAILBOX_MH)
-	      node = g_node_new (mailbox_node_new (g_strdup (mailbox->name), mailbox, TRUE));
-	    else
-	      node = g_node_new (mailbox_node_new (g_strdup (mailbox->name), mailbox, FALSE));
-	    g_node_append (balsa_app.mailbox_nodes, node);
-	  }
+	  /*  IMAP  */
+	case 2:
+	  mailbox = mailbox_new (MAILBOX_IMAP);
+	  mailbox->name = g_strdup (name);
+	  MAILBOX_IMAP (mailbox)->user = PLGetString (PLGetDictionaryEntry (mb, PLMakeString ("Username")));
+	  MAILBOX_IMAP (mailbox)->passwd = PLGetString (PLGetDictionaryEntry (mb, PLMakeString ("Password")));
+	  MAILBOX_IMAP (mailbox)->server = PLGetString (PLGetDictionaryEntry (mb, PLMakeString ("Server")));
+	  MAILBOX_IMAP (mailbox)->port = atoi (PLGetString (PLGetDictionaryEntry (mb, PLMakeString ("Port"))));
+	  MAILBOX_IMAP (mailbox)->path = PLGetString (PLGetDictionaryEntry (mb, PLMakeString ("Path")));
+	  node = g_node_new (mailbox_node_new (mailbox->name, mailbox, FALSE));
+	  g_node_append (balsa_app.mailbox_nodes, node);
+	  break;
 	}
-      break;
 
-      /*  POP3  */
-    case 1:
-      mailbox = mailbox_new (MAILBOX_POP3);
-      mailbox->name = g_strdup (name);
-      MAILBOX_POP3 (mailbox)->user = gnome_config_get_string ("username");
-      MAILBOX_POP3 (mailbox)->passwd = gnome_config_get_string ("password");
-      MAILBOX_POP3 (mailbox)->server = gnome_config_get_string ("server");
-      balsa_app.inbox_input = g_list_append (balsa_app.inbox_input, mailbox);
-      break;
-
-      /*  IMAP  */
-    case 2:
-      mailbox = mailbox_new (MAILBOX_IMAP);
-      mailbox->name = g_strdup (name);
-      MAILBOX_IMAP (mailbox)->user = gnome_config_get_string ("username");
-      MAILBOX_IMAP (mailbox)->passwd = gnome_config_get_string ("password");
-      MAILBOX_IMAP (mailbox)->server = gnome_config_get_string ("server");
-      MAILBOX_IMAP (mailbox)->port = get_int_set_default ("port", 143);
-      MAILBOX_IMAP (mailbox)->path = gnome_config_get_string ("Path");
-      node = g_node_new (mailbox_node_new (mailbox->name, mailbox, FALSE));
-      g_node_append (balsa_app.mailbox_nodes, node);
-      break;
     }
 
-
-  gnome_config_pop_prefix ();
-  gnome_config_sync ();
-  g_string_free (gstring, 1);
-  g_free (path);
   return TRUE;
 }
 
@@ -297,35 +275,29 @@ restore_global_settings ()
 {
   GString *path;
   gchar tmp[PATH_MAX];
-
-  /* set to Global configure section */
-  gnome_config_push_prefix ("/balsa/Global/");
+  proplist_t dict;
+  dict = PLGetDictionaryEntry (balsa_app.proplist, PLMakeString ("global"));
 
   /* user's real name */
-  balsa_app.real_name = get_string_set_default ("real name", g_get_real_name ());
+  balsa_app.real_name = g_strdup (PLGetString (PLGetDictionaryEntry (dict, PLMakeString ("RealName"))));
 
   /* user name */
-  balsa_app.username = get_string_set_default ("user name", g_get_user_name ());
+  balsa_app.username = g_strdup (PLGetString (PLGetDictionaryEntry (dict, PLMakeString ("UserName"))));
 
   /* hostname */
-  balsa_app.hostname = get_string_set_default ("host name", "localhost");
+  balsa_app.hostname = g_strdup (PLGetString (PLGetDictionaryEntry (dict, PLMakeString ("HostName"))));
 
   /* directory */
-  path = g_string_new (NULL);
-  g_string_sprintf (path, "%s/Mail", g_get_home_dir ());
-  balsa_app.local_mail_directory = get_string_set_default ("local mail directory", path->str);
+  balsa_app.local_mail_directory = g_strdup (PLGetString (PLGetDictionaryEntry (dict, PLMakeString ("LocalMailDir"))));
 
   load_mailboxes ("Inbox");
   load_mailboxes ("Outbox");
   load_mailboxes ("Trash");
 
   /* smtp server */
-  balsa_app.smtp_server = get_string_set_default ("smtp server", "localhost");
+  balsa_app.smtp_server = g_strdup (PLGetString (PLGetDictionaryEntry (dict, PLMakeString ("SMTPServer"))));
 
-  /* main window width & height */
-  balsa_app.mw_width = get_int_set_default ("main window width", balsa_app.mw_width);
-  balsa_app.mw_height = get_int_set_default ("main window height", balsa_app.mw_height);
-
+#if 0
   /* toolbar style */
   balsa_app.toolbar_style = get_int_set_default ("toolbar style", (gint) balsa_app.toolbar_style);
 
@@ -334,17 +306,16 @@ restore_global_settings ()
 
   /* mdi style */
   balsa_app.mdi_style = get_int_set_default ("mdi style", (gint) balsa_app.mdi_style);
-
+#endif
 
   /* save changes */
-  gnome_config_pop_prefix ();
-  gnome_config_sync ();
 }
 
 
 void
 save_global_settings ()
 {
+#if 0
   gnome_config_push_prefix ("/balsa/Global/");
 
   gnome_config_set_string ("real name", balsa_app.real_name);
@@ -361,4 +332,5 @@ save_global_settings ()
 
   gnome_config_pop_prefix ();
   gnome_config_sync ();
+#endif
 }

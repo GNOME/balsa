@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1998-08-21 12:55-0400\n"
+"POT-Creation-Date: 1998-08-22 12:02-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -65,47 +65,47 @@ msgid ""
 msgstr ""
 
 #. your name
-#: src/balsa-init.c:239 src/pref-manager.c:316
+#: src/balsa-init.c:240 src/pref-manager.c:316
 msgid "Your name:"
 msgstr ""
 
 #. email address
-#: src/balsa-init.c:253 src/pref-manager.c:326
+#: src/balsa-init.c:254 src/pref-manager.c:326
 msgid "E-Mail address:"
 msgstr ""
 
 #. smtp server
-#: src/balsa-init.c:268 src/pref-manager.c:336
+#: src/balsa-init.c:269 src/pref-manager.c:336
 msgid "SMTP server:"
 msgstr ""
 
-#: src/balsa-init.c:308
+#: src/balsa-init.c:310
 msgid "Inbox Path:"
 msgstr ""
 
-#: src/balsa-init.c:316
+#: src/balsa-init.c:318
 msgid "Outbox Path:"
 msgstr ""
 
-#: src/balsa-init.c:324
+#: src/balsa-init.c:326
 msgid "Trash Path:"
 msgstr ""
 
-#: src/balsa-init.c:332
+#: src/balsa-init.c:334
 msgid ""
 "If you wish to use IMAP for these\n"
 "please change them inside Balsa\n"
 msgstr ""
 
-#: src/balsa-init.c:350
+#: src/balsa-init.c:352
 msgid "Balsa is now ready to run.  Click finish to save your settings"
 msgstr ""
 
-#: src/balsa-init.c:354
+#: src/balsa-init.c:356
 msgid "Finish"
 msgstr ""
 
-#: src/balsa-init.c:406
+#: src/balsa-init.c:408
 msgid "Invalid Mailbox!"
 msgstr ""
 
@@ -113,35 +113,35 @@ msgstr ""
 msgid "Unable to Open Mailbox!"
 msgstr ""
 
-#: src/index-child.c:192
+#: src/index-child.c:220
 msgid "Transfer"
 msgstr ""
 
-#: src/index-child.c:210
+#: src/index-child.c:238
 msgid "Change Status"
 msgstr ""
 
-#: src/index-child.c:213
+#: src/index-child.c:241
 msgid "Unread"
 msgstr ""
 
-#: src/index-child.c:219
+#: src/index-child.c:247
 msgid "Read"
 msgstr ""
 
-#: src/index-child.c:225
+#: src/index-child.c:253
 msgid "Replied"
 msgstr ""
 
-#: src/index-child.c:231
+#: src/index-child.c:259
 msgid "Forwarded"
 msgstr ""
 
-#: src/index-child.c:241 src/main-window.c:262
+#: src/index-child.c:269 src/main-window.c:262
 msgid "Undelete"
 msgstr ""
 
-#: src/index-child.c:249 src/main-window.c:248 src/main-window.c:411
+#: src/index-child.c:277 src/main-window.c:248 src/main-window.c:411
 msgid "Delete"
 msgstr ""
 
@@ -150,16 +150,16 @@ msgstr ""
 msgid "Local Mailbox Loaded as: %s\n"
 msgstr ""
 
-#: src/mailbox-conf.c:118
+#: src/mailbox-conf.c:119
 msgid "Mailbox Configurator"
 msgstr ""
 
-#: src/mailbox-conf.c:321
+#: src/mailbox-conf.c:330
 #, c-format
 msgid "Cannot create mailbox '%s': %s\n"
 msgstr ""
 
-#: src/mailbox-conf.c:322
+#: src/mailbox-conf.c:331
 msgid "Cancel"
 msgstr ""
 
@@ -316,11 +316,11 @@ msgid ""
 "http://www.gnome.org/cgi-bin/bugs"
 msgstr ""
 
-#: src/mblist-window.c:425
+#: src/mblist-window.c:474
 msgid "Add Mailbox"
 msgstr ""
 
-#: src/mblist-window.c:430
+#: src/mblist-window.c:479
 msgid "Edit Mailbox"
 msgstr ""
 
@@ -392,17 +392,17 @@ msgstr ""
 msgid "Forward message"
 msgstr ""
 
-#: libbalsa/mailbox.c:469
+#: libbalsa/mailbox.c:473
 #, c-format
 msgid "Mailbox: Opening %s Refcount: %d\n"
 msgstr ""
 
-#: libbalsa/mailbox.c:494
+#: libbalsa/mailbox.c:498
 #, c-format
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr ""
 
-#: libbalsa/mailbox.c:1352
+#: libbalsa/mailbox.c:1356
 #, c-format
 msgid "Loading message: %s/%s\n"
 msgstr ""

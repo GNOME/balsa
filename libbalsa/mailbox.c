@@ -156,6 +156,8 @@ mailbox_init (gchar * inbox_path)
 
   Realname = g_get_real_name ();
 
+  Hostname = g_get_host_name();
+#if 0
   /* some systems report the FQDN instead of just the hostname */
   if ((p = strchr (utsname.nodename, '.')))
     {
@@ -180,6 +182,8 @@ mailbox_init (gchar * inbox_path)
       sprintf (Fqdn, "%s.%s", Hostname, DOMAIN);
 #endif /* HIDDEN_HOST */
     }
+#endif
+  Fqdn = g_strdup(Hostname);
 
   Sendmail = SENDMAIL;
 

@@ -22,6 +22,7 @@ balsa_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a \
 	$(top_builddir)/libmutt/libmutt.a \
 	$(top_builddir)/libbalsa/libbalsa.a \
+	-lPropList	\
 	$(GNOME_LIBDIR) \
 	$(GNOMEUI_LIBS) \
 	$(GTKXMHTML_LIBS) \

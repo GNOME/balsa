@@ -602,7 +602,9 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 
     mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
     path = libbalsa_mailbox_local_get_path(mailbox);
-    if (stat(path, &st) != 0) {
+    if (mbox->gmime_stream ?
+        fstat(GMIME_STREAM_FS(mbox->gmime_stream)->fd, &st) :
+        stat(path, &st)) {
 	perror(path);
 	return;
     }
@@ -983,8 +985,8 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	return FALSE;
 
     /* Check to make sure that the file hasn't changed on disk */
-    if (stat(path, &st) != 0 || st.st_size != mbox->size)
-    {
+    if (fstat(GMIME_STREAM_FS(mbox_stream)->fd, &st) != 0
+        || st.st_size != mbox->size) {
 	mbox_unlock(mailbox, mbox_stream);
 	return FALSE;
     }
@@ -1024,12 +1026,12 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    utimebuf.modtime = st.st_mtime;
 	    utime(path, &utimebuf);
 	}
-	if (g_mime_stream_flush(mbox_stream) == -1)
+	if (g_mime_stream_flush(mbox_stream) < 0)
 	    g_warning("can't flush mailbox stream\n");
-	if (!stat(path, &st))
-	    mbox->mtime = st.st_mtime;
+	if (fstat(GMIME_STREAM_FS(mbox_stream)->fd, &st))
+	    g_warning("can't stat \"%s\"", path);
 	else
-	    g_warning("failed to stat \"%s\"", path);
+	    mbox->mtime = st.st_mtime;
 	mbox_unlock(mailbox, mbox_stream);
 	return TRUE;
     }

@@ -393,7 +393,8 @@ struct {
 #define LOC_DUTCH_POS     4
     {"nl_NL", "ISO-8859-1", N_("Dutch")},
 #define LOC_ENGLISH_POS   5
-    {"en_GB", "ISO-8859-1", N_("English")},
+    /* English -> American English, argh... */
+    {"en_US", "ISO-8859-1", N_("English")}, 
 #define LOC_ESTONIAN_POS  6
     {"et_EE", "ISO-8859-15", N_("Estonian")},
 #define LOC_FINNISH_POS   7

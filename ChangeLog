@@ -1,3 +1,9 @@
+2001-08-31  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* README, NEWS, configure.in: release balsa-1.2.pre3
+	* src/sendmsg-window.c: some people believe English means American
+	English.
+	
 2001-08-31  Carlos Morgado  <chbm@chbm.nu>
 
 	* libbalsa/send.c: not trigger #59671. fix in 1.3

@@ -1,3 +1,10 @@
+* Balsa-1.2.pre3 release. Release date 2001-08-31
+
+- POP3 code armoured (hopefully)
+- selective IMAP check fixed.
+- ESMTP TLS support.
+- fix some nasty bugs, including gnome_exec_async() and gnome_show_url() ones.
+
 * Balsa-1.2.pre2 release. Release date 2001-08-23
 
 - download pop3 mail to arbirary box.

@@ -54,6 +54,8 @@ struct _ImapMboxHandleClass {
   void (*fetch_response)(ImapMboxHandle* handle);
   void (*list_response)(ImapMboxHandle* handle, int delim,
                         ImapMboxFlags flags, const gchar* mbox);
+  void (*lsub_response)(ImapMboxHandle* handle, int delim,
+                        ImapMboxFlags flags, const gchar* mbox);
   void (*expunge_notify)(ImapMboxHandle* handle, int seqno);
   void (*exists_notify)(ImapMboxHandle* handle);
 };
@@ -63,9 +65,11 @@ struct _ImapMboxHandleClass {
 #define IMAP_MBOX_IS_AUTHENTICATED(h) ((h)->state == IMHS_AUTHENTICATED)
 #define IMAP_MBOX_IS_SELECTED(h)      ((h)->state == IMHS_SELECTED)
 
-enum {
+typedef enum _ImapHandleSignal ImapHandleSignal;
+enum _ImapHandleSignal {
   FETCH_RESPONSE,
   LIST_RESPONSE,
+  LSUB_RESPONSE,
   EXPUNGE_NOTIFY,
   EXISTS_NOTIFY,
   LAST_SIGNAL
@@ -138,6 +142,7 @@ imap_mbox_handle_class_init(ImapMboxHandleClass * klass)
                  G_STRUCT_OFFSET(ImapMboxHandleClass, fetch_response),
                  NULL, NULL,
                  g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+
   imap_mbox_handle_signals[LIST_RESPONSE] = 
     g_signal_new("list-response",
                  G_TYPE_FROM_CLASS(object_class),
@@ -147,6 +152,14 @@ imap_mbox_handle_class_init(ImapMboxHandleClass * klass)
                  libimap_VOID__INT_STRING_POINTER, G_TYPE_NONE, 3,
                  G_TYPE_INT, G_TYPE_STRING, G_TYPE_POINTER);
 
+  imap_mbox_handle_signals[LSUB_RESPONSE] = 
+    g_signal_new("lsub-response",
+                 G_TYPE_FROM_CLASS(object_class),
+                 G_SIGNAL_RUN_FIRST,
+                 G_STRUCT_OFFSET(ImapMboxHandleClass, lsub_response),
+                 NULL, NULL,
+                 libimap_VOID__INT_STRING_POINTER, G_TYPE_NONE, 3,
+                 G_TYPE_INT, G_TYPE_STRING, G_TYPE_POINTER);
 
   imap_mbox_handle_signals[EXPUNGE_NOTIFY] = 
     g_signal_new("expunge-notify",
@@ -1158,7 +1171,7 @@ ir_capability(ImapMboxHandle *handle)
 }
 /* follow mailbox-list syntax (See rfc) */
 static ImapResponse
-ir_list(ImapMboxHandle *h)
+ir_list_lsub(ImapMboxHandle *h, ImapHandleSignal signal)
 {
   const char* mbx_flags[] = {
     "Marked", "Unmarked", "Noselect", "Noinferiors",
@@ -1196,7 +1209,7 @@ ir_list(ImapMboxHandle *h)
   if(sio_getc(h->sio) != ' ') return IMR_PROTOCOL;
   /* mailbox */
   s = imap_get_astring(h->sio, &c);
-  g_signal_emit(G_OBJECT(h), imap_mbox_handle_signals[LIST_RESPONSE],
+  g_signal_emit(G_OBJECT(h), imap_mbox_handle_signals[signal],
                 0, delim, &flags, s);
   g_free(s);
   if( c != 0x0d) {printf("CR:%d\n",c); return IMR_PROTOCOL;}
@@ -1205,12 +1218,15 @@ ir_list(ImapMboxHandle *h)
 }
 
 static ImapResponse
+ir_list(ImapMboxHandle *h)
+{
+  return ir_list_lsub(h, LIST_RESPONSE);
+}
+
+static ImapResponse
 ir_lsub(ImapMboxHandle *h)
 {
-  /* FIXME: implement! */
-  int c; while( (c=sio_getc(h->sio))!=EOF && c != 0x0a);
-
-  return IMR_OK;
+  return ir_list_lsub(h, LSUB_RESPONSE);
 }
 
 static ImapResponse

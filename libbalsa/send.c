@@ -693,8 +693,9 @@ int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
   total = (int)st.st_size;
 #endif  
 
-  while ((left = (int)read (fp, message, sizeof(message)))!=0)
+  while ((left = (int)read(fp, message, 499)) > 0)
   {
+    message[left] = '\0';
     tmpbuffer = message;
     while ((tmp = strstr(tmpbuffer,"\n"))!=NULL)
     {

@@ -71,8 +71,6 @@ static void bndx_expand_to_row_and_select(BalsaIndex * index,
 static void bndx_changed_find_row(BalsaIndex * index);
 
 /* mailbox callbacks */
-static void bndx_row_changed_cb(GtkTreeModel *model, GtkTreePath *path,
-				GtkTreeIter *iter, BalsaIndex *bindex);
 static void bndx_mailbox_changed_cb(BalsaIndex * index);
 
 /* GtkTree* callbacks */
@@ -736,10 +734,6 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
         gtk_tree_view_column_set_title(column, _("To"));
     }
 
-    g_signal_connect(G_OBJECT(mailbox), "row-changed",
-		     G_CALLBACK(bndx_row_changed_cb),
-		     (gpointer) index);
-
     g_signal_connect_swapped(G_OBJECT(mailbox), "changed",
 			     G_CALLBACK(bndx_mailbox_changed_cb),
 			     (gpointer) index);
@@ -1062,23 +1056,6 @@ balsa_index_set_column_widths(BalsaIndex * index)
 }
 
 /* Mailbox Callbacks... */
-/* "row-changed" is a GtkTreeModel signal, but is emitted by
- * LibBalsaMailbox.
- */
-static void
-bndx_row_changed_cb(GtkTreeModel *model, GtkTreePath *path,
-		    GtkTreeIter *iter, BalsaIndex *bindex)
-{
-    if (bindex->current_message) {
-	glong msgno;
-
-	gtk_tree_model_get(model, iter, LB_MBOX_MSGNO_COL, &msgno, -1);
-	if (bindex->current_message->msgno == msgno
-	    && LIBBALSA_MESSAGE_IS_DELETED(bindex->current_message))
-	    bndx_select_next_threaded(bindex);
-    }
-    g_get_current_time (&bindex->last_use);
-}
 
 /* bndx_mailbox_changed_cb : callback for sync with backend; the signal
    is emitted by the mailbox when new messages has been retrieved (either
@@ -1090,10 +1067,10 @@ bndx_mailbox_changed_func(BalsaIndex * bindex)
 {
     GtkTreePath *path;
 
-    balsa_mblist_update_mailbox(balsa_app.mblist_tree_store, 
-				bindex->mailbox_node->mailbox);
-
-    if (bndx_find_message(bindex, &path, NULL, bindex->current_message)) {
+    if (bindex->current_message
+	&& LIBBALSA_MESSAGE_IS_DELETED(bindex->current_message))
+	bndx_select_next_threaded(bindex);
+    else if (bndx_find_message(bindex, &path, NULL, bindex->current_message)) {
 	bndx_expand_to_row(bindex, path);
 	gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(bindex), path, NULL,
 				     FALSE, 0, 0);

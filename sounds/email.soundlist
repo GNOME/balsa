@@ -1,6 +1,7 @@
 [__section_info__]
 description=E-mail
 description[ca]=Correu electrςnic
+description[da]=E-post
 description[el]=Ηλεκτρονική Αλληλογραφία
 description[es]=Correo-E
 description[et]=Elektronpost
@@ -11,6 +12,7 @@ description[wa]=Emilaedje
 file=balsa/newmail.wav
 description=New mail notification
 description[ca]=Notificaciσ de nous missatges
+description[da]=Besked om nye meddeleser
 description[el]=Γνωστοποίηση νέας αλληλογραφίας
 description[es]=Llegada de un nuevo mensaje
 description[et]=Teade uute kirjade saabumisest

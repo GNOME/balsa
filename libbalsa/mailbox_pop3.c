@@ -87,7 +87,7 @@ libbalsa_mailbox_pop3_class_init (LibBalsaMailboxPop3Class *klass)
 
 	libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_pop3_open;
 	libbalsa_mailbox_class->check = libbalsa_mailbox_pop3_check;
-	libbalsa_mailbox_class->check = libbalsa_mailbox_pop3_save_conf;
+	libbalsa_mailbox_class->save_config = libbalsa_mailbox_pop3_save_conf;
 
 }
 

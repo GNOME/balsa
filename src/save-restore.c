@@ -65,7 +65,7 @@ static gchar* d_get_string (const gchar * key, const gchar * def_val)
 
 #define d_set_gint(key, val) gnome_config_private_set_int((key), (val))
 #define mailbox_section_path(mbox)\
-    g_strconcat("/balsa/", MboxSectionPrefix, (mbox)->pkey, "/",NULL);
+    g_strconcat("balsa/", MboxSectionPrefix, (mbox)->pkey, "/",NULL);
 
 /* config_mailbox_set_as_special:
    allows to set given mailboxe as one of the special mailboxes
@@ -181,7 +181,7 @@ config_mailboxes_init (void)
   return TRUE; /* hm... check_basic_mailboxes? */
 }				/* config_mailboxes_init */
 
-
+#if 0
 static gboolean
 get_raw_imap_data(gchar ** username, gchar **passwd, 
                   gchar ** server,  gint * port, gchar **path)
@@ -205,6 +205,7 @@ get_raw_imap_data(gchar ** username, gchar **passwd,
 
     return TRUE;
 }
+#endif
 
 /* Initialize the specified mailbox, creating the internal data
    structures which represent the mailbox. */
@@ -258,25 +259,8 @@ config_mailbox_init (const gchar * key)
       gtk_signal_connect(GTK_OBJECT(server), "get-password", 
 			 GTK_SIGNAL_FUNC(ask_password), mailbox);
 
-      if ((field =  gnome_config_private_get_string("Username")) == NULL)
+      if(!libbalsa_server_load_conf(server, 110))
 	return FALSE;
-      libbalsa_server_set_username(server, field);
-
-      field = gnome_config_private_get_string("Password");
-      if ( field != NULL ) {
-	gchar *buff;
-	buff =  field; /* rot (field); */
-	libbalsa_server_set_password (server, buff);
-	g_free (buff);
-      }
-      else
-	libbalsa_server_set_password (server, NULL);
-
-      field =  gnome_config_private_get_string("Server");
-      if (field == NULL) 
-	return FALSE;
-      else
-	libbalsa_server_set_host (server, field,  d_get_gint ("Port", 110));
 
       LIBBALSA_MAILBOX_POP3 (mailbox)->check = d_get_gint ("Check",FALSE);
       LIBBALSA_MAILBOX_POP3 (mailbox)->delete_from_server =
@@ -292,36 +276,30 @@ config_mailbox_init (const gchar * key)
       balsa_app.inbox_input =
 	g_list_append (balsa_app.inbox_input, mailbox);
 
+      mailbox->pkey = g_strdup(key);
       return TRUE; /* Don't put POP mailbox in mailbox nodes */
     }
   else if (!strcasecmp (type, "IMAP"))	/* IMAP Mailbox */
     {
       LibBalsaMailboxImap * m;
       LibBalsaServer *s;
-      gchar *user, *passwd, *host, *path;
-      gint port;
+      gchar *path;
 
       mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_imap_new());
       mailbox->name = mailbox_name;
 
 
       m = LIBBALSA_MAILBOX_IMAP(mailbox);
-      if( !get_raw_imap_data(&user, &passwd, &host, &port, &path) ){
+      s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+      if( !libbalsa_server_load_conf(s, 143) ){
 	gtk_object_destroy( GTK_OBJECT(mailbox) );
 	return FALSE;
       }
 
-      s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+      path = d_get_string("Path", "INBOX");
+      libbalsa_mailbox_imap_set_path(m, path);
       gtk_signal_connect(GTK_OBJECT(s), "get-password", 
 			 GTK_SIGNAL_FUNC(ask_password), m);
-      libbalsa_server_set_username (s, user);
-      libbalsa_server_set_password (s, passwd);
-      libbalsa_server_set_host (s, host, port);
-      libbalsa_mailbox_imap_set_path(m, path);
-      
-      g_free(user);
-      g_free(passwd);
-      g_free(host);
       g_free(path);
     }
 #if 0
@@ -780,12 +758,13 @@ config_mailbox_get_free_pkey ()
 
   max = 0;
   while( (iterator = gnome_config_iterator_next(iterator, &key, &val)) ) {
+    printf("Trying %s\n", key);
     if(strncmp(key, MboxSectionPrefix, pref_len) == 0) {
       if(strlen(key+pref_len)>1 && (curr = atoi(key+pref_len+1)) && curr>max)
 	max = curr;
     }
   }
-  name =  g_strdup_printf("m%d", max);
+  name =  g_strdup_printf("m%d", max+1);
   if(balsa_app.debug)
     g_print("config_mailbox_get_highest_number: name='%s'\n", name);
   return name;

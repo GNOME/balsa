@@ -1,5 +1,10 @@
 2000-09-09  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* libbalsa/server.[hc]: load configuration on its own.
+	* src/save-restore.c: changed apriopriately.
+	
+2000-09-09  Pawel Salek  <pawsa@theochem.kth.se>
+
 	* libbalsa/mailbox.[hc]: implement save-config signal and
 	libbalsa_mailbox_save_config() method. add pkey configuration field.
 	* libbalsa/mailbox_imap.c: implement save-config signal.
@@ -18,6 +23,7 @@
 	* src/main.c: new configuration hooked in.
 	* src/pref-manager.c:  new configuration hooked in.
 	* src/save-restore.[ch]:  new configuration code implemented.
+
 2000-09-07  Matthew Guenther  <guentherm@asme.org>
 
 	* README: Added comment about pspell dependency

@@ -250,6 +250,26 @@ static gchar * rot (gchar * pass)
   return buff;
 }
 
+gboolean libbalsa_server_load_conf(LibBalsaServer *server, gint port)
+{
+	gboolean d;
+	server->host   = gnome_config_private_get_string ("server");
+	server->port   = gnome_config_private_get_int_with_default("port",&d);
+	if(d) server->port = port;
+	server->user   = gnome_config_private_get_string ("username");
+	server->passwd = gnome_config_private_get_string ("password");
+
+	if(!(server->host && server->port && server->user) ) return FALSE;
+	
+	if (server->passwd != NULL) {
+		gchar *buff;
+		buff = rot (server->passwd);
+		g_free (server->passwd);
+		server->passwd = buff;
+	}
+	return TRUE;
+}
+
 void libbalsa_server_save_conf(LibBalsaServer *server)
 {
 	gnome_config_private_set_string ("server",   server->host);

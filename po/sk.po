@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2003-08-08 08:46+0200\n"
-"PO-Revision-Date: 2003-08-08 08:48+0200\n"
+"POT-Creation-Date: 2003-08-11 07:30+0200\n"
+"PO-Revision-Date: 2003-08-11 07:31+0200\n"
 "Last-Translator: Marcel Telka <marcel@telka.sk>\n"
 "Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
 "MIME-Version: 1.0\n"
@@ -14,19 +14,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. The externq database doesn't support Id's, sorry!
-#: libbalsa/address-book-extern.c:253 libbalsa/address-book-ldap.c:390
-#: libbalsa/address-book-ldif.c:417 libbalsa/address-book-vcard.c:281
+#: libbalsa/address-book-extern.c:255 libbalsa/address-book-ldap.c:403
+#: libbalsa/address-book-ldif.c:419 libbalsa/address-book-vcard.c:283
 msgid "No-Id"
 msgstr "Bez identifikátora"
 
-#: libbalsa/address-book-extern.c:257 libbalsa/address-book-ldap.c:394
-#: libbalsa/address-book-ldif.c:420 libbalsa/address-book-ldif.c:652
-#: libbalsa/address-book-ldif.c:689 libbalsa/address-book-ldif.c:693
-#: libbalsa/address-book-vcard.c:299
+#: libbalsa/address-book-extern.c:259 libbalsa/address-book-ldap.c:409
+#: libbalsa/address-book-ldif.c:422 libbalsa/address-book-ldif.c:654
+#: libbalsa/address-book-ldif.c:691 libbalsa/address-book-ldif.c:695
+#: libbalsa/address-book-vcard.c:301
 msgid "No-Name"
 msgstr "Bez mena"
 
-#: libbalsa/address-book-ldap.c:238
+#: libbalsa/address-book-ldap.c:240
 msgid ""
 "Failed to initialise LDAP server.\n"
 "Check that the servername is valid."
@@ -34,16 +34,16 @@ msgstr ""
 "Inicializácia servera LDAP zlyhala.\n"
 "Skontrolujte či je správne meno servera."
 
-#: libbalsa/address-book-ldap.c:255
+#: libbalsa/address-book-ldap.c:257
 #, c-format
 msgid "Couldn't enable TLS on the LDAP connection: %s"
 msgstr "Nepodarilo sa povoliť TLS na LDAP spojení: %s"
 
-#: libbalsa/address-book-ldap.c:264
+#: libbalsa/address-book-ldap.c:266
 msgid "TLS requested but TLS support not compiled in."
 msgstr "Je požadované TLS, ale podpora TLS nebola zahrnutá pri kompilácii."
 
-#: libbalsa/address-book-ldap.c:275
+#: libbalsa/address-book-ldap.c:277
 #, c-format
 msgid ""
 "Failed to bind to server: %s\n"
@@ -52,36 +52,36 @@ msgstr ""
 "Zlyhalo pripojenie k serveru: %s\n"
 "Skontrolujte či je platné meno servera."
 
-#: libbalsa/address-book-ldap.c:639
+#: libbalsa/address-book-ldap.c:862
 #, c-format
 msgid "Failed to do a search: %s.Check that the base name is valid."
 msgstr "Hľadanie zlyhalo: %s.Skontrolujte, či je základné meno platné."
 
-#: libbalsa/address-book.c:384 libbalsa/filter-error.c:45
+#: libbalsa/address-book.c:385 libbalsa/filter-error.c:45
 msgid "No error"
 msgstr "Bez chyby"
 
-#: libbalsa/address-book.c:385
+#: libbalsa/address-book.c:386
 msgid "Cannot read from address book"
 msgstr "Nemôžem čítať z adresára"
 
-#: libbalsa/address-book.c:386
+#: libbalsa/address-book.c:387
 msgid "Cannot write to address book"
 msgstr "Nemôžem zapísať do adresára"
 
-#: libbalsa/address-book.c:387
+#: libbalsa/address-book.c:388
 msgid "Cannot connect to server"
 msgstr "Nemôžem sa spojiť so serverom"
 
-#: libbalsa/address-book.c:388
+#: libbalsa/address-book.c:389
 msgid "Cannot search in the address book"
 msgstr "Nemôžem vyhľadávať v adresári"
 
-#: libbalsa/address-book.c:390
+#: libbalsa/address-book.c:391
 msgid "Cannot add duplicate entry"
 msgstr "Nemôžem pridať duplikátnu položku"
 
-#: libbalsa/address-book.c:391
+#: libbalsa/address-book.c:392
 msgid "Unknown error"
 msgstr "Neznáma chyba"
 
@@ -332,7 +332,7 @@ msgstr "_Odmietnuť"
 msgid "*** ERROR: Mailbox Lock Exists: %s ***\n"
 msgstr "*** CHYBA: Zámok poštovej schránky existuje: %s ***\n"
 
-#: libbalsa/libbalsa_private.h:135 libbalsa/libbalsa_private.h:144
+#: libbalsa/libbalsa_private.h:136 libbalsa/libbalsa_private.h:145
 #, c-format
 msgid "*** ERROR: Mailbox Stream Closed: %s ***\n"
 msgstr "*** CHYBA: Prúd poštovej schránky zatvorený: %s ***\n"
@@ -982,7 +982,7 @@ msgid "Connected to MTA"
 msgstr "Pripojený k MTA"
 
 #: libbalsa/send.c:888 src/balsa-message.c:1232 src/print.c:349
-#: src/sendmsg-window.c:667 src/sendmsg-window.c:2138 src/store-address.c:341
+#: src/sendmsg-window.c:667 src/sendmsg-window.c:2138 src/store-address.c:297
 msgid "From:"
 msgstr "Od:"
 
@@ -991,7 +991,7 @@ msgid "From"
 msgstr "Od"
 
 #: libbalsa/send.c:899 src/balsa-message.c:1241 src/print.c:353
-#: src/sendmsg-window.c:666 src/sendmsg-window.c:2145 src/store-address.c:342
+#: src/sendmsg-window.c:666 src/sendmsg-window.c:2145 src/store-address.c:298
 msgid "To:"
 msgstr "Pre:"
 
@@ -2052,55 +2052,55 @@ msgstr "Cesta \"%s\" je nesprávna. %s"
 msgid "Do you want to correct the path?"
 msgstr "Chcete opraviť cestu?"
 
-#: src/ab-main.c:169 src/ab-window.c:167 src/filter-edit-dialog.c:193
+#: src/ab-main.c:304 src/ab-window.c:167 src/filter-edit-dialog.c:193
 #: src/filter-export-dialog.c:88 src/filter-run-dialog.c:220
 #: src/filter-run-dialog.c:292
 msgid "Name"
 msgstr "Meno"
 
-#: src/ab-main.c:299
-msgid "_Search for Name:"
-msgstr "_Vyhľadávať podľa mena:"
+#: src/ab-main.c:389
+msgid "F_ilter:"
+msgstr "F_ilter:"
 
 #: src/ab-window.c:175
 msgid "E-Mail Address"
 msgstr "Adresa elektronickej pošty"
 
-#: src/ab-window.c:208
+#: src/ab-window.c:207
 msgid "Address Book"
 msgstr "Adresár"
 
 #. Entry widget for finding an address
-#: src/ab-window.c:265
+#: src/ab-window.c:264
 msgid "Search for Name:"
 msgstr "Vyhľadávať podľa mena:"
 
-#: src/ab-window.c:324
+#: src/ab-window.c:323
 msgid "Send-To"
 msgstr "Príjemca"
 
-#: src/ab-window.c:344
+#: src/ab-window.c:343
 msgid "Run GnomeCard"
 msgstr "Spustiť Adresár Gnome"
 
-#: src/ab-window.c:352
-msgid "Re-Import"
-msgstr "Znova importovať"
+#: src/ab-window.c:351
+msgid "_Re-Import"
+msgstr "_Znova importovať"
 
 #. mode switching stuff
-#: src/ab-window.c:362
+#: src/ab-window.c:361
 msgid "Treat multiple addresses as:"
 msgstr "Viacnásobné adresy považovať za:"
 
-#: src/ab-window.c:366
+#: src/ab-window.c:365
 msgid "alternative addresses for the same person"
 msgstr "alternatívne adresy pre jednu osobu"
 
-#: src/ab-window.c:371
+#: src/ab-window.c:370
 msgid "a distribution list"
 msgstr "distribučný zoznam"
 
-#: src/ab-window.c:671
+#: src/ab-window.c:673
 #, c-format
 msgid ""
 "Error opening address book '%s'\n"
@@ -2333,13 +2333,13 @@ msgstr "Odpoveď-pre:"
 
 #. cc:
 #: src/balsa-message.c:1242 src/print.c:354 src/sendmsg-window.c:670
-#: src/sendmsg-window.c:1852 src/sendmsg-window.c:2152 src/store-address.c:343
+#: src/sendmsg-window.c:1852 src/sendmsg-window.c:2152 src/store-address.c:299
 msgid "Cc:"
 msgstr "Kópia:"
 
 #. bcc:
 #: src/balsa-message.c:1243 src/print.c:355 src/sendmsg-window.c:669
-#: src/sendmsg-window.c:1857 src/store-address.c:344
+#: src/sendmsg-window.c:1857 src/store-address.c:300
 msgid "Bcc:"
 msgstr "Skrytá kópia:"
 
@@ -5245,47 +5245,43 @@ msgstr "Všetky zmeny obnoviť do pôvodneho stavu a ukončiť kontrolu preklepo
 msgid "Spell check"
 msgstr "Kontrola preklepov"
 
-#: src/store-address.c:102
+#: src/store-address.c:101
 msgid "Store address: no addresses"
 msgstr "Uložiť adresu: nie su adresy"
 
-#: src/store-address.c:179
+#: src/store-address.c:178
 msgid "Store Address"
 msgstr "Uložiť adresu"
 
-#: src/store-address.c:194
+#: src/store-address.c:193
 msgid "Save this address and close the dialog?"
 msgstr "Uložiť túto adresu a zatvoriť dialógové okno?"
 
-#: src/store-address.c:213
+#: src/store-address.c:211
 msgid "No address book selected...."
 msgstr "Nebol vybraný adresár..."
 
-#: src/store-address.c:226
-msgid "Sorry, no semicolons are allowed in the name!\n"
-msgstr "Prepáčte, ale v mene nemôžete použiť bodkočiarku!\n"
-
-#: src/store-address.c:267
+#: src/store-address.c:221
 msgid "Address could not be written to this address book."
 msgstr "Adresu sa nepodarilo zapísať do tohoto adresára."
 
-#: src/store-address.c:269
+#: src/store-address.c:223
 msgid "Address book could not be accessed."
 msgstr "S adresárom sa nepodarilo pracovať."
 
-#: src/store-address.c:271
+#: src/store-address.c:225
 msgid "This mail address is already in this address book."
 msgstr "Táto poštová adresa je už v tomto adresári."
 
-#: src/store-address.c:273
+#: src/store-address.c:227
 msgid "Unexpected address book error. Report it."
 msgstr "Neočakávaná chyba adresára. Oznámte ju prosím autorom."
 
-#: src/store-address.c:287
+#: src/store-address.c:241
 msgid "Choose Address Book"
 msgstr "Vybrať adresár"
 
-#: src/store-address.c:328
+#: src/store-address.c:284
 msgid "Choose Address"
 msgstr "Vybrať adresu"
 

@@ -1,3 +1,10 @@
+2004-08-02 12:18  Darko Obradovic
+
+	* libbalsa/message.c, libbalsa/message.h, src/balsa-app.h,
+	src/message-window.c, src/save-restore.c: make message title
+	localizable, not configurable.
+	* src/pref-manager.c: ditto; realign codeset option-menu.
+
 2004-08-02 01:27  PeterB
 
 	* src/: balsa-mblist.c, mailbox-node.c, mailbox-node.h: use

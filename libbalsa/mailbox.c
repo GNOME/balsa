@@ -731,7 +731,6 @@ libbalsa_mailbox_commit(LibBalsaMailbox* mailbox)
     int rc;
     int index_hint;
 
-    printf("libbalsa_mailbox_commit: enter\n");
     if (CLIENT_CONTEXT_CLOSED(mailbox))
 	return FALSE;
 
@@ -740,10 +739,21 @@ libbalsa_mailbox_commit(LibBalsaMailbox* mailbox)
     index_hint = CLIENT_CONTEXT(mailbox)->vcount;
     rc = mx_sync_mailbox(CLIENT_CONTEXT(mailbox), &index_hint);
     libbalsa_unlock_mutt();
-    mailbox->messages = CLIENT_CONTEXT(mailbox)->msgcount;
-    UNLOCK_MAILBOX(mailbox);
+    if(rc==0) 
+        mailbox->messages = CLIENT_CONTEXT(mailbox)->msgcount;
+    
+    if(rc == M_NEW_MAIL || rc == M_REOPENED) {
+        mailbox->new_messages =
+            CLIENT_CONTEXT(mailbox)->msgcount - mailbox->messages;
+        
+	    UNLOCK_MAILBOX(mailbox);
+	    libbalsa_mailbox_load_messages(mailbox);
+            rc = 0;
+    } else {
+        UNLOCK_MAILBOX(mailbox);
+    }
 
-    printf("libbalsa_mailbox_commit: synced\n");
+    printf("libbalsa_mailbox_commit: rc=%d\n", rc);
     return rc ==0;
 }
 

@@ -615,14 +615,12 @@ destroy_mailbox_node(GNode* node, GNode* root)
 static void 
 destroy_mailbox_tree(GNode* node, GNode* root)
 { 
-    g_node_traverse(node, G_IN_ORDER, G_TRAVERSE_ALL, -1,
-		    (GNodeTraverseFunc)destroy_mailbox_node, root);
 }
 
 void
 balsa_remove_children_mailbox_nodes(GNode* gnode)
 {
-    GNode* walk;
+    GNode* walk, *next_sibling;
     g_return_if_fail(gnode);
 
     if(balsa_app.debug)
@@ -630,14 +628,22 @@ balsa_remove_children_mailbox_nodes(GNode* gnode)
 	       gnode->data, BALSA_MAILBOX_NODE(gnode->data)->name
 	       ? BALSA_MAILBOX_NODE(gnode->data)->name : "");
     gtk_clist_freeze(GTK_CLIST(balsa_app.mblist));
-    g_node_children_foreach(gnode, G_TRAVERSE_ALL,
-                    (GNodeForeachFunc)destroy_mailbox_tree, gnode);
-    gtk_clist_thaw(GTK_CLIST(balsa_app.mblist));
-
-    while( (walk = gnode->children) ) {
+    for(walk = g_node_first_child(gnode); walk; walk = next_sibling) {
+        BalsaMailboxNode *mbnode = BALSA_MAILBOX_NODE(walk->data);
+        next_sibling = g_node_next_sibling(walk);
+        if(mbnode==NULL) continue;
+        if(mbnode->parent == NULL) {
+            printf("sparing %s %s\n", 
+                   mbnode->mailbox ? "mailbox" : "folder ",
+                   mbnode->mailbox ? mbnode->mailbox->name : mbnode->name);
+            continue;
+        }
+        g_node_traverse(walk, G_IN_ORDER, G_TRAVERSE_ALL, -1,
+                        (GNodeTraverseFunc)destroy_mailbox_node, gnode);
 	g_node_unlink(walk);
 	g_node_destroy(walk);
     }
+    gtk_clist_thaw(GTK_CLIST(balsa_app.mblist));
 }
 
 /* create_label:

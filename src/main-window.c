@@ -2150,7 +2150,7 @@ send_progress_notify_cb()
     msgbuffer = malloc(2049);
     count = read(send_thread_pipes[0], msgbuffer, 2048);
 
-    if (count < sizeof(void *)) {
+    if (count < (ssize_t) sizeof(void *)) {
         free(msgbuffer);
         return TRUE;
     }

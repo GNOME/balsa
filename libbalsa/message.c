@@ -1404,10 +1404,8 @@ lbmsg_set_header(LibBalsaMessage *message, const gchar *name,
 	    message->length = atoi(value);
     } else
 #endif
-    message->headers->user_hdrs =
-        g_list_append(message->headers->user_hdrs,
-                      libbalsa_create_hdr_pair(g_strdup(name),
-                                               g_strdup(value)));
+	/* nothing */;
+
     return TRUE;
 }
 

@@ -69,7 +69,7 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.trash = NULL;
   balsa_app.trash_path = NULL;
 
-  balsa_app.mailbox_nodes = g_node_new(NULL);
+  balsa_app.mailbox_nodes = g_node_new (NULL);
   balsa_app.current_index_child = NULL;
 
   balsa_app.new_messages_timer = 0;
@@ -86,15 +86,13 @@ init_balsa_app (int argc, char *argv[])
   /* initalize our mailbox access crap */
   restore_global_settings ();
 
-  mailbox_init(balsa_app.inbox_path);
+  mailbox_init (balsa_app.inbox_path);
 
   read_signature ();
 
-  restore_global_settings ();
-
   /* Check to see if this is the first time we've run balsa */
 
-  if (!gnome_config_get_string ("/balsa/Global/real name"))
+  if (strcmp(gnome_config_get_string ("/balsa/Global/inbox"), "") == 0)
     {
       initialize_balsa (argc, argv);
       return;

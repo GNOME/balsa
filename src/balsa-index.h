@@ -66,10 +66,6 @@ extern "C" {
 	gchar *date_string;
 	gboolean line_length;
 
-        /* idle handler data */
-        guint idle_handler_id;
-        GSList *update_flag_list;
-
         /* signal handler ids */
         gulong selection_changed_id;
         gulong row_expanded_id;

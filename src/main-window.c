@@ -720,8 +720,7 @@ balsa_window_class_init(BalsaWindowClass * klass)
     klass->open_mbnode = balsa_window_real_open_mbnode;
     klass->close_mbnode = balsa_window_real_close_mbnode;
 
-    gtk_timeout_add(30000, (GtkFunction) balsa_close_mailbox_on_timer,
-                    NULL);
+    g_timeout_add(30000, (GSourceFunc) balsa_close_mailbox_on_timer, NULL);
 
 }
 
@@ -3120,7 +3119,7 @@ balsa_window_idle_replace(BalsaWindow * window, LibBalsaMessage * message)
 
             balsa_window_idle_remove(window);
             set_message_id =
-                gtk_idle_add((GtkFunction) balsa_window_idle_cb, window);
+                g_idle_add((GSourceFunc) balsa_window_idle_cb, window);
             g_object_set_data(G_OBJECT(window), BALSA_SET_MESSAGE_ID,
                               GUINT_TO_POINTER(set_message_id));
         }
@@ -3135,7 +3134,7 @@ balsa_window_idle_remove(BalsaWindow * window)
                                            BALSA_SET_MESSAGE_ID));
 
     if (set_message_id) {
-        gtk_idle_remove(set_message_id);
+        g_source_remove(set_message_id);
         g_object_set_data(G_OBJECT(window), BALSA_SET_MESSAGE_ID, 
                           GUINT_TO_POINTER(0));
     }
@@ -3321,8 +3320,8 @@ balsa_window_increase_activity(BalsaWindow* window)
                           GINT_TO_POINTER(BALSA_PROGRESS_ACTIVITY));
 
         /* add a timeout to make the activity bar move */
-        activity_handler = gtk_timeout_add(100, balsa_window_progress_timeout,
-                                           progress_bar);
+        activity_handler = g_timeout_add(100, balsa_window_progress_timeout,
+                                         progress_bar);
         g_object_set_data(G_OBJECT(progress_bar), "activity_handler", 
                           GINT_TO_POINTER(activity_handler));
     } else if (in_use != BALSA_PROGRESS_ACTIVITY) {
@@ -3380,7 +3379,7 @@ balsa_window_decrease_activity(BalsaWindow* window)
                 GPOINTER_TO_INT(g_object_get_data
                                 (G_OBJECT(progress_bar),
                                  "activity_handler"));
-            gtk_timeout_remove(activity_handler);
+            g_source_remove(activity_handler);
             activity_handler = 0;
             
             g_object_set_data(G_OBJECT(progress_bar), "activity_handler",

@@ -441,7 +441,7 @@ message_window_new(LibBalsaMessage * message)
 
     g_object_set_data(G_OBJECT(mw->bmessage), "message", message);
     g_object_ref(G_OBJECT(message)); /* protect from destroying */
-    gtk_idle_add((GtkFunction)message_window_idle_handler, mw);
+    g_idle_add((GSourceFunc) message_window_idle_handler, mw);
 }
 
 static void

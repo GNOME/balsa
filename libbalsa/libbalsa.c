@@ -590,7 +590,7 @@ libmutt_ask_for_cert_acceptance(X509 *cert)
     pthread_mutex_lock(&ask_cert_lock);
     pthread_cond_init(&acd.cond, NULL);
     acd.cert = cert;
-    gtk_idle_add(ask_cert_idle, &acd);
+    g_idle_add(ask_cert_idle, &acd);
     libbalsa_unlock_mutt(); 
     pthread_cond_wait(&acd.cond, &ask_cert_lock);
     libbalsa_lock_mutt();

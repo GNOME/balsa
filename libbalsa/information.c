@@ -58,16 +58,16 @@ libbalsa_information_varg(LibBalsaInformationType type, const char *fmt,
 
     switch (type) {
     case LIBBALSA_INFORMATION_MESSAGE:
-	gtk_idle_add((GtkFunction) libbalsa_message_idle_handler, msg);
+	g_idle_add((GSourceFunc) libbalsa_message_idle_handler, msg);
 	break;
     case LIBBALSA_INFORMATION_WARNING:
-	gtk_idle_add((GtkFunction) libbalsa_warning_idle_handler, msg);
+	g_idle_add((GSourceFunc) libbalsa_warning_idle_handler, msg);
 	break;
     case LIBBALSA_INFORMATION_ERROR:
-	gtk_idle_add((GtkFunction) libbalsa_error_idle_handler, msg);
+	g_idle_add((GSourceFunc) libbalsa_error_idle_handler, msg);
 	break;
     case LIBBALSA_INFORMATION_DEBUG:
-	gtk_idle_add((GtkFunction) libbalsa_debug_idle_handler, msg);
+	g_idle_add((GSourceFunc) libbalsa_debug_idle_handler, msg);
 	break;
     default:
 	g_assert_not_reached();

@@ -318,15 +318,15 @@ scan_mailboxes_idle_cb()
     gdk_threads_leave();
 
     if (cmd_open_unread_mailbox || balsa_app.open_unread_mailbox)
-	gtk_idle_add((GtkFunction) initial_open_unread_mailboxes, NULL);
+	g_idle_add((GSourceFunc) initial_open_unread_mailboxes, NULL);
 
     if (cmd_line_open_mailboxes) {
 	gchar **urls = g_strsplit(cmd_line_open_mailboxes, ";", 20);
-	gtk_idle_add((GtkFunction) open_mailboxes_idle_cb, urls);
+	g_idle_add((GSourceFunc) open_mailboxes_idle_cb, urls);
     }
 
     if (balsa_app.open_mailbox_vector) {
-	gtk_idle_add((GtkFunction) open_mailboxes_idle_cb,
+	g_idle_add((GSourceFunc) open_mailboxes_idle_cb,
 		     balsa_app.open_mailbox_vector);
 	balsa_app.open_mailbox_vector = NULL;
     }
@@ -424,10 +424,10 @@ main(int argc, char *argv[])
 	check_new_messages_cb(NULL, NULL);
 
     if (cmd_open_inbox || balsa_app.open_inbox_upon_startup)
-	gtk_idle_add((GtkFunction) initial_open_inbox, NULL);
+	g_idle_add((GSourceFunc) initial_open_inbox, NULL);
 
     signal( SIGPIPE, SIG_IGN );
-    gtk_idle_add((GtkFunction) scan_mailboxes_idle_cb, NULL);
+    g_idle_add((GSourceFunc) scan_mailboxes_idle_cb, NULL);
 
     gdk_threads_enter();
     gtk_main();

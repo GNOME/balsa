@@ -275,16 +275,6 @@ bndx_destroy(GtkObject * obj)
     g_return_if_fail(obj != NULL);
     index = BALSA_INDEX(obj);
 
-    /* remove idle callbacks and attached data */
-    if (index->idle_handler_id) {
-        gtk_idle_remove(index->idle_handler_id);
-        index->idle_handler_id = 0;
-    }
-    if (index->update_flag_list) {
-        g_slist_free(index->update_flag_list);
-        index->update_flag_list = NULL;
-    }
-
     /*page->window references our owner */
     if (index->mailbox_node && (mailbox = index->mailbox_node->mailbox) ) {
         g_signal_handlers_disconnect_matched(G_OBJECT(mailbox),

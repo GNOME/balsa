@@ -275,15 +275,6 @@ libbalsa_address_entry_destroy(GtkObject * object)
     entry = GTK_ENTRY(object);
     address_entry = LIBBALSA_ADDRESS_ENTRY(object);
 
-    /* FIXME: the timer is removed by gtk_entry's finalize method--do we
-     * need to do it as well? 
-     * pawsa: no. They are not ours. */
-    /*
-     * Remove timers.
-     if (entry->timer) gtk_timeout_remove (entry->timer);
-     entry->timer = 0;
-    */
-
     /*
      * Free the address list.
      */

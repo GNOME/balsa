@@ -837,7 +837,7 @@ edit_with_gnome(GtkWidget* widget, BalsaSendmsg* msg)
     data->pid_editor = pid;
     data->filename = g_strdup(filename);
     data->msg = msg;
-    gtk_idle_add((GtkFunction) edit_with_gnome_check, data);
+    g_idle_add((GSourceFunc) edit_with_gnome_check, data);
 }
 
 static void 

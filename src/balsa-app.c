@@ -132,7 +132,7 @@ ask_password_mt(LibBalsaServer * server, LibBalsaMailbox * mbox)
     pthread_cond_init(&apd.cond, NULL);
     apd.server = server;
     apd.mbox   = mbox;
-    gtk_idle_add(ask_passwd_idle, &apd);
+    g_idle_add(ask_passwd_idle, &apd);
     pthread_cond_wait(&apd.cond, &ask_passwd_lock);
     
     pthread_cond_destroy(&apd.cond);
@@ -533,7 +533,7 @@ do_load_mailboxes(void)
 	fprintf(stderr, "do_load_mailboxes: Unknown inbox mailbox type\n");
 	return FALSE;
     }
-    gtk_timeout_add(20*60*1000,(GtkFunction) ping_imap_cb, NULL);
+    g_timeout_add(20*60*1000, (GSourceFunc) ping_imap_cb, NULL);
     return TRUE;
 }
 
@@ -558,15 +558,14 @@ update_timer(gboolean update, guint minutes)
 
     if (update) {
 	if (balsa_app.check_mail_timer_id)
-	    gtk_timeout_remove(balsa_app.check_mail_timer_id);
+	    g_source_remove(balsa_app.check_mail_timer_id);
 
-	balsa_app.check_mail_timer_id = gtk_timeout_add(timeout,
-							(GtkFunction)
-							check_new_messages_auto_cb,
-							NULL);
+        balsa_app.check_mail_timer_id =
+            g_timeout_add(timeout,
+                          (GSourceFunc) check_new_messages_auto_cb, NULL);
     } else {
 	if (balsa_app.check_mail_timer_id)
-	    gtk_timeout_remove(balsa_app.check_mail_timer_id);
+	    g_source_remove(balsa_app.check_mail_timer_id);
 	balsa_app.check_mail_timer_id = 0;
     }
 }

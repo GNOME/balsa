@@ -381,7 +381,7 @@ static void
 sd_destroy_notify(SelectDialogInfo * sdi)
 {
     if (sdi->idle_handler_id) {
-        gtk_idle_remove(sdi->idle_handler_id);
+        g_source_remove(sdi->idle_handler_id);
         sdi->idle_handler_id = 0;
     }
     g_free(sdi);
@@ -422,7 +422,7 @@ sd_idle_add_response_ok(SelectDialogInfo * sdi)
 {
     if (!sdi->idle_handler_id)
         sdi->idle_handler_id =
-            gtk_idle_add((GtkFunction) sd_response_ok, sdi);
+            g_idle_add((GSourceFunc) sd_response_ok, sdi);
 }
 
 /* Idle handler for sending the OK response to the dialog. */

@@ -1536,7 +1536,7 @@ status_bar_refresh(gpointer data)
     gnome_appbar_refresh(balsa_app.appbar);
     return FALSE;
 }
-#define SCHEDULE_BAR_REFRESH()	gtk_timeout_add(5000, status_bar_refresh, NULL);
+#define SCHEDULE_BAR_REFRESH()	g_timeout_add(5000, status_bar_refresh, NULL);
 
 static void
 handle_url(const message_url_t* url)
@@ -1708,7 +1708,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         info->can_display = TRUE;
         /* size allocation may not be correct, so we'll check back later
          */
-        gtk_idle_add((GtkFunction) resize_idle, item);
+        g_idle_add((GSourceFunc) resize_idle, item);
     }
 
     fclose(fp);
@@ -2388,8 +2388,8 @@ vadj_change_cb(GtkAdjustment *vadj, GtkWidget *widget)
     new_widget = widget;
     new_upper = upper;
     if (resize_idle_id) 
-        gtk_idle_remove(resize_idle_id);
-    resize_idle_id = gtk_idle_add((GtkFunction) resize_idle, widget);
+        g_source_remove(resize_idle_id);
+    resize_idle_id = g_idle_add((GSourceFunc) resize_idle, widget);
 }
 
 static BalsaPartInfo *add_part(BalsaMessage *bm, gint part)

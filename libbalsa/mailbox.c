@@ -745,16 +745,53 @@ libbalsa_mailbox_type_from_path(const gchar * path)
     return G_TYPE_OBJECT;
 }
 
+/* Each of the next three methods emits a signal that will be caught by
+ * a GtkTreeView, so the emission must be made holding the gdk lock.
+ *
+ * We assume that a main-thread call is already locked, but that a
+ * subthread call is unlocked and needs to be locked; we try to check
+ * those assumptions, to help track down instances when they fail.
+ */
+
+static void
+lbm_emit(LibBalsaMailbox * mailbox, const gchar * signal,
+	 GtkTreePath * path, GtkTreeIter * iter)
+{
+    gboolean unlock = g_mutex_trylock(gdk_threads_mutex);
+    gboolean is_main_thread =
+	(pthread_self() == libbalsa_get_main_thread());
+
+    if (is_main_thread) {
+	if (unlock)
+	    g_warning("Main thread was unlocked");
+    } else {
+	if (!unlock) {
+	    g_print("Sub thread must wait for lock\n");
+	    gdk_threads_enter();
+	    unlock = TRUE;
+	}
+    }
+
+    g_signal_emit_by_name(mailbox, signal, path, iter);
+
+    if (unlock)
+	gdk_threads_leave();
+}
+
 void
 libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
 {
     GtkTreeIter iter;
+    GtkTreePath *path;
 
     iter.user_data = g_node_find(mailbox->msg_tree, G_PRE_ORDER,
 				 G_TRAVERSE_ALL, GUINT_TO_POINTER(seqno));
     g_assert(iter.user_data != NULL);
     iter.stamp = mailbox->stamp;
-    g_signal_emit_by_name(mailbox, "row-changed", NULL, &iter);
+    path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
+
+    lbm_emit(mailbox, "row-changed", path, &iter);
+    gtk_tree_path_free(path);
 }
 
 void
@@ -771,7 +808,7 @@ libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno)
     g_node_append(mailbox->msg_tree, iter.user_data);
     path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
 
-    g_signal_emit_by_name(mailbox, "row-inserted", path, &iter);
+    lbm_emit(mailbox, "row-inserted", path, &iter);
     gtk_tree_path_free(path);
 }
 
@@ -810,7 +847,8 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
 
     /* Prune msg_tree before emitting the signal. */
     g_node_destroy(dt.node);
-    g_signal_emit_by_name(mailbox, "row-deleted", path);
+
+    lbm_emit(mailbox, "row-deleted", path, NULL);
     gtk_tree_path_free(path);
 }
 

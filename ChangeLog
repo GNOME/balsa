@@ -1,5 +1,6 @@
-2004-07-29 13:35  PeterB
+2004-07-29 17:03  PeterB
 
+	* src/folder-conf.c: non-modal folder properties dialog.
 	* src/main-window.c: set sensitivity of next/previous/next-unread
 	message menu items.
 	* src/main-window.c: remove weak pointer when clearing

@@ -7,6 +7,7 @@
 	* libbalsa/filter.[hc]: ditto.
 	* src/filter-{run,edit}-callbacks.c: use cleaner API.
 	* src/balsa-message.c: display more message/* type message parts.
+	* src/filter-run-callbacks.c, src/save-restore.c: compile on phoebe3.
 
 2003-02-23  Pawel Salek  <pawsa@theochem.kth.se>
 

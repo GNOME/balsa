@@ -21,6 +21,7 @@
 
 #include "config.h"
 
+#include <string.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
 #include "balsa-app.h"

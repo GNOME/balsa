@@ -194,11 +194,11 @@ balsa_mblist_init (BalsaMBList * tree)
   char *titles[3]={"mailbox", "unread", "total"};
   gtk_widget_push_visual (gdk_imlib_get_visual ());
   gtk_widget_push_colormap (gdk_imlib_get_colormap ());
-  
-  if ( tree->display_content_info )
-    gtk_ctree_construct (GTK_CTREE (tree), 3, 0, titles);
+  gtk_ctree_construct (GTK_CTREE (tree), 3, 0, titles);
+  if ( tree->display_content_info )    
+    gtk_clist_column_titles_show(GTK_CLIST (tree)); 
   else
-    gtk_ctree_construct (GTK_CTREE (tree), 3, 0, NULL);
+    gtk_clist_column_titles_hide(GTK_CLIST (tree));
 
   gtk_widget_pop_colormap ();
   gtk_widget_pop_visual ();
@@ -305,6 +305,11 @@ balsa_mblist_redraw (BalsaMBList * bmbl)
   balsa_mblist_release_watchers (bmbl);
 
   gtk_clist_freeze (GTK_CLIST (ctree));
+  if ( bmbl->display_content_info )    
+    gtk_clist_column_titles_show(GTK_CLIST (ctree)); 
+  else
+    gtk_clist_column_titles_hide(GTK_CLIST (ctree));
+
 
   text[1] = NULL;
   text[2] = NULL;

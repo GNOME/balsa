@@ -628,6 +628,12 @@ config_global_load (void)
   else
     balsa_app.previewpane = atoi (field);
 
+  /* show mailbox content info */
+  if ((field = pl_dict_get_str (globals, "ShowMailboxContentInfo")) == NULL)
+    balsa_app.mblist_show_mb_content_info = TRUE;
+  else
+    balsa_app.mblist_show_mb_content_info = atoi (field);
+
   /* debugging enabled */
   if ((field = pl_dict_get_str (globals, "Debug")) == NULL)
     balsa_app.debug = FALSE;
@@ -716,6 +722,9 @@ config_global_save (void)
 
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.previewpane);
     pl_dict_add_str_str (globals, "UsePreviewPane", tmp);
+
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.mblist_show_mb_content_info);
+    pl_dict_add_str_str (globals, "ShowMailboxContentInfo", tmp);
 
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.mw_width);
     pl_dict_add_str_str (globals, "MainWindowWidth", tmp);

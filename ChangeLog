@@ -1,5 +1,16 @@
 1999-01-18  bertrand <Bertrand.Guiheneuf@inria.fr>
 
+	* src/save-restore.c: add a new property key
+	("ShowMailboxContentInfo")
+
+	* src/pref-manager.c: add a preference item
+	(show/hide mailbox content information)
+
+	* src/balsa-mblist.c (balsa_mblist_redraw): 
+	(balsa_mblist_init): 
+	show/hide the clist colums titles depending on the pref 
+	setting.
+	
 	* src/balsa-mblist.c (balsa_mblist_class_init): cntent
 	information disabled for the moment. 
 	New argument ("show_content_info") to th emblist 

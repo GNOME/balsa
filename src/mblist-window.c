@@ -129,7 +129,9 @@ mblist_open_window (GnomeMDI * mdi)
   gtk_widget_show (GTK_WIDGET (mblw->ctree));
   gtk_widget_show (dock_item);
 
-  balsa_mblist_redraw (BALSA_MBLIST (balsa_app.mblist));
+  /* set the "show_content_info" property and redraw the mailbox list */
+  gtk_object_set(GTK_OBJECT (mblw->ctree), "show_content_info", balsa_app.mblist_show_mb_content_info, NULL);
+  
 
   height = GTK_CLIST (mblw->ctree)->rows * GTK_CLIST (mblw->ctree)->row_height;
 

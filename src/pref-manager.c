@@ -41,6 +41,8 @@ typedef struct _PropertyUI
     GtkWidget *previewpane;
     GtkWidget *debug;		/* enable/disable debugging */
 
+    
+    GtkWidget *mblist_show_mb_content_info;
     /* arp */
     GtkWidget *quote_str;
   }
@@ -163,6 +165,9 @@ open_preferences_manager (void)
 		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
   gtk_signal_connect (GTK_OBJECT (pui->debug), "toggled",
 		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+  gtk_signal_connect (GTK_OBJECT (pui->mblist_show_mb_content_info), "toggled",
+		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+  
 
   gtk_signal_connect (GTK_OBJECT (pui->real_name), "changed",
 		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
@@ -205,7 +210,7 @@ static void
 apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
 {
   gint i;
-
+  
   /*
    * identity page
    */
@@ -227,6 +232,9 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
   g_free (balsa_app.local_mail_directory);
   balsa_app.local_mail_directory = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->mail_directory)));
 
+  /* 
+   * display page 
+   */
   for (i = 0; i < NUM_TOOLBAR_MODES; i++)
     if (GTK_TOGGLE_BUTTON (pui->toolbar_type[i])->active)
       {
@@ -235,6 +243,11 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
       }
   balsa_app.debug = GTK_TOGGLE_BUTTON (pui->debug)->active;
   balsa_app.previewpane = GTK_TOGGLE_BUTTON (pui->previewpane)->active;
+  if (balsa_app.mblist_show_mb_content_info != GTK_TOGGLE_BUTTON (pui->mblist_show_mb_content_info)->active)
+   {
+     balsa_app.mblist_show_mb_content_info = !balsa_app.mblist_show_mb_content_info;
+     gtk_object_set ( GTK_OBJECT (balsa_app.mblist),"show_content_info", balsa_app.mblist_show_mb_content_info, NULL  );
+   }
 
   /* arp */
   g_free (balsa_app.quote_str);
@@ -278,6 +291,7 @@ set_prefs (void)
 
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->previewpane), balsa_app.previewpane);
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->debug), balsa_app.debug);
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->mblist_show_mb_content_info), balsa_app.mblist_show_mb_content_info);
 
   /* arp */
   gtk_entry_set_text (GTK_ENTRY (pui->quote_str), balsa_app.quote_str);
@@ -534,6 +548,13 @@ create_display_page ()
   pui->previewpane = gtk_check_button_new_with_label (_ ("Use preview pane"));
   gtk_container_add (GTK_CONTAINER (frame), GTK_WIDGET (pui->previewpane));
 
+  /* mailbox list window */
+  frame = gtk_frame_new ("Mailbox list window");
+  gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
+
+  pui->mblist_show_mb_content_info = gtk_check_button_new_with_label (_ ("View mailbox content informations "));
+  gtk_container_add (GTK_CONTAINER (frame), GTK_WIDGET (pui->mblist_show_mb_content_info));
+ 
   return vbox;
 }
 

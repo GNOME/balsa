@@ -1,3 +1,7 @@
+2004-12-26 11:28  PeterB
+
+	* libbalsa/files.c: look for themed mime-type icon.
+
 2004-12-24  Pawel Salek
 
 	* libbalsa/body.c: always call gdk_pixbuf_loader_close().

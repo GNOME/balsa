@@ -1,13 +1,13 @@
 # Norwegian (bokmål dialect) translation of balsa.
-# Copyright (C) 1998, 1999 Free Software Foundation, Inc.
-# Kjartan Maraas <kmaraas@online.no>, 1998, 1999.
+# Copyright (C) 1998,1999,2000 Free Software Foundation, Inc.
+# Kjartan Maraas <kmaraas@gnome.org>, 1998,1999,2000.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.8.0\n"
 "POT-Creation-Date: 2000-07-18 13:35+0200\n"
 "PO-Revision-Date: 2000-07-16 00:15+02:00\n"
-"Last-Translator: Kjartan Maraas <kmaraas@online.no>\n"
+"Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
 "Language-Team: Norwegian <no@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"

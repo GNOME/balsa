@@ -462,6 +462,8 @@ check_for_blank_fields(MailboxConfPageType mbox_type)
     case MC_PAGE_LOCAL:
 	if( !*gtk_entry_get_text (GTK_ENTRY (mcw->local_mailbox_name)) )
 	    msg = _("You need to fill in the Mailbox Name field.");
+	if( !*gtk_entry_get_text (GTK_ENTRY (mcw->local_mailbox_path)) )
+	    msg = _("You need to fill in the Mailbox Path field.");
 	break;
 
     case MC_PAGE_IMAP:
@@ -475,8 +477,6 @@ check_for_blank_fields(MailboxConfPageType mbox_type)
 	    msg = _("You need to fill in the IMAP Server field");
 	if(!strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->imap_username)), ""))
 	    msg = _("You need to fill in the username field");
-/*  	if(!strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->imap_password)), "")) */
-/*  	    msg = _("You need to fill in the password field"); */
 	if(!strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->imap_port)), "")) 
 	    msg = _("You need to fill in the port field");
 	break;
@@ -484,7 +484,6 @@ check_for_blank_fields(MailboxConfPageType mbox_type)
   case MC_PAGE_POP3:
     if(!strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_mailbox_name)), "") ||
        !strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_username)), "") ||
-       /*  !strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_password)), "") || */
        !strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_port)), "") ||
        !strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_server)), ""))  {
       
@@ -497,10 +496,6 @@ check_for_blank_fields(MailboxConfPageType mbox_type)
 	{
 	  msg = _("You need to fill in the user field.");
 	}
-/*        else if(!strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_password)),"")) */
-/*  	{ */
-/*  	  msg = _("You need to fill in the password field."); */
-/*  	} */
       else if(!strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_server)), ""))
 	{
 	  msg = _("You need to fill in the server field.");

@@ -1,5 +1,9 @@
 2000-09-07  Ian Campbell  <ijc25@cam.ac.uk>
 
+	* src/mailbox-conf.c: Make sure that the path has ben filled in for
+	a local mailbox. Remove some commented out checks on the password
+	fields, which aren't needed now.
+
 	* src/information-dialog.c: Fix stupid mistake by me.
 
 2000-09-07  Pawel Salek  <pawsa@theochem.kth.se>

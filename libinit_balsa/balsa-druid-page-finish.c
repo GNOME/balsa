@@ -98,6 +98,8 @@ balsa_druid_page_finish_finish(GnomeDruidPage * page, GnomeDruid * druid)
         g_list_prepend(balsa_app.address_book_list, ab);
     balsa_app.default_address_book = ab;
 
+    g_signal_handlers_disconnect_by_func(G_OBJECT(druid),
+                                         G_CALLBACK(exit), NULL);
     config_save();
     gtk_main_quit();
 }

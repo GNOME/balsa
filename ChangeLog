@@ -5,6 +5,8 @@
 	* src/balsa-index.c: ditto. Do not overwrite error msg.
 	* libbalsa/send.c: fix mispelling.
 	* libbalsa/imap/imap-handle.[hc], imap_private.h: timeout setup.
+	* libinit_balsa/balsa-druid-page-finish.c: fix regression
+	introduced yesterday.
 
 2004-09-03  Pawel Salek
 

@@ -1216,10 +1216,12 @@ libbalsa_address_new_from_imap_address(ImapAddress *addr)
 
     /* it will be owned by the caller */
 
-    address->full_name = g_strdup(addr->name);
+    address->full_name = g_mime_utils_header_decode_text(addr->name);
     if (addr->addr_spec)
-       address->address_list = g_list_append(address->address_list,
-                                             g_strdup(addr->addr_spec));
+	address->address_list =
+	    g_list_append(address->address_list,
+			  g_mime_utils_header_decode_text(addr->
+							  addr_spec));
 
     return address;
 }

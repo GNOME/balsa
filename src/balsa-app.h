@@ -43,6 +43,13 @@
 #define DEFAULT_ENCODING ENC8BIT
 #define DEFAULT_LINESIZE 78
 
+enum
+{
+  WHILERETR,
+  UNTILCLOSED,
+  NEVER
+};
+
 typedef struct stPrinting Printing_t;
 struct stPrinting{
     gint  breakline;
@@ -86,7 +93,9 @@ extern struct BalsaApplication
   gint new_messages;
   
   /* timer for checking mail every xx minutes */
+  gboolean check_mail_auto;
   gint check_mail_timer;
+  gint check_mail_timer_id;
   
   /* GUI settings */
   gint mw_width;
@@ -128,5 +137,6 @@ balsa_app;
 
 void balsa_app_init (void);
 gint do_load_mailboxes (void);
+void update_timer( gboolean update, guint minutes );
 
 #endif /* __BALSA_APP_H__ */

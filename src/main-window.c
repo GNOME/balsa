@@ -703,6 +703,15 @@ show_about_box (void)
  * Callbacks
  */
 
+gint
+check_new_messages_auto_cb (gpointer data)
+{
+  check_new_messages_cb( (GtkWidget *) NULL, data);
+
+  /*  preserver timer */
+  return TRUE;
+}
+
 static void
 check_new_messages_cb (GtkWidget * widget, gpointer data)
 {
@@ -741,11 +750,16 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
   gtk_widget_show_all( progress_dialog );
 #endif BALSA_USE_THREADS
 
-  index = balsa_window_find_current_index(BALSA_WINDOW(data));
-  if (index)
-    mbox = BALSA_INDEX(index)->mailbox;
+  if(data)
+    {
+      index = balsa_window_find_current_index(BALSA_WINDOW(data));
+      if (index)
+	mbox = BALSA_INDEX(index)->mailbox;
+      else
+	mbox = balsa_app.inbox;
+    }
   else
-    mbox = NULL;
+    mbox = balsa_app.inbox;
 
 #ifdef BALSA_USE_THREADS
 /* initiate threads */

@@ -31,6 +31,7 @@
 #define NUM_TOOLBAR_MODES 3
 #define NUM_MDI_MODES 4
 #define NUM_ENCODING_MODES 3
+#define NUM_PWINDOW_MODES 3
 
 typedef struct _PropertyUI
   {
@@ -41,6 +42,9 @@ typedef struct _PropertyUI
 
     GtkWidget *pop3servers, *smtp_server, *mail_directory;
     GtkWidget *rb_local_mua, *rb_smtp_server;
+    GtkWidget *pwindow_display[NUM_PWINDOW_MODES];
+    GtkWidget *check_mail_auto;
+    GtkWidget *check_mail_minutes;
 
     GtkWidget *previewpane;
     GtkWidget *debug;		/* enable/disable debugging */
@@ -101,6 +105,21 @@ gchar *encoding_type_label[NUM_ENCODING_MODES] =
     N_("quoted")
 };
 
+guint pwindow_type[NUM_PWINDOW_MODES] =
+{
+  WHILERETR,
+  UNTILCLOSED,
+  NEVER
+};
+
+gchar *pwindow_type_label[NUM_PWINDOW_MODES] =
+{
+  N_("While Retrieving Messages"),
+  N_("Until Closed"),
+  N_("Never")
+};
+
+
 /* notebook pages */
 static GtkWidget *create_identity_page (void);
 static GtkWidget *create_mailservers_page (void);
@@ -123,6 +142,7 @@ void update_pop3_servers (void);
 /* callbacks */
 static void properties_modified_cb (GtkWidget *, GnomePropertyBox *);
 static void font_changed (GtkWidget * widget, GnomePropertyBox * pbox);
+void timer_modified_cb (GtkWidget * widget,  GnomePropertyBox * pbox);
 
 static void pop3_add_cb (GtkWidget * widget, gpointer data);
 static void pop3_edit_cb (GtkWidget * widget, gpointer data);
@@ -248,6 +268,10 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
   gtk_signal_connect (GTK_OBJECT (pui->signature), "changed",
 		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+  gtk_signal_connect (GTK_OBJECT (pui->check_mail_auto), "toggled",
+		      GTK_SIGNAL_FUNC (timer_modified_cb), pui->pbox);
+  gtk_signal_connect (GTK_OBJECT (pui->check_mail_minutes), "changed",
+		      GTK_SIGNAL_FUNC (timer_modified_cb), pui->pbox);
 
   /* arp */
   gtk_signal_connect (GTK_OBJECT (pui->quote_str), "changed",
@@ -357,6 +381,9 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
      gtk_object_set ( GTK_OBJECT (balsa_app.mblist),"show_content_info", balsa_app.mblist_show_mb_content_info, NULL  );
    }
 #endif
+  balsa_app.check_mail_auto = GTK_TOGGLE_BUTTON(pui->check_mail_auto)->active;
+  balsa_app.check_mail_timer = atoi( gtk_entry_get_text (GTK_ENTRY(pui->check_mail_minutes)));
+
   /* arp */
   g_free (balsa_app.quote_str);
   balsa_app.quote_str =
@@ -437,6 +464,13 @@ set_prefs (void)
 #ifdef BALSA_SHOW_INFO
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->mblist_show_mb_content_info), balsa_app.mblist_show_mb_content_info);
 #endif
+
+  sprintf( tmp, "%d", balsa_app.check_mail_timer );
+
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->check_mail_auto),
+				balsa_app.check_mail_auto);
+  gtk_entry_set_text (GTK_ENTRY (pui->check_mail_minutes), tmp );
+
   /* arp */
   gtk_entry_set_text (GTK_ENTRY (pui->quote_str), balsa_app.quote_str);
 
@@ -604,8 +638,10 @@ create_mailservers_page ()
   GtkWidget *sw;
   GtkWidget *vbox;
   GtkWidget *label;
+  GtkWidget *label_minutes;
   GtkWidget *frame;
   GtkWidget *hbox;
+  GtkWidget *hbox2;
   GtkWidget *table1;
   GtkWidget *bbox;
   GtkWidget *button;
@@ -705,7 +741,19 @@ create_mailservers_page ()
                     (GtkAttachOptions) GTK_EXPAND | GTK_FILL,
 		    (GtkAttachOptions) GTK_EXPAND | GTK_FILL, 0, 0);
   gtk_widget_set_sensitive (pui->smtp_server, balsa_app.smtp);
-  
+
+  pui->check_mail_auto = gtk_check_button_new_with_label( "Check mail automatically every:" );
+  pui->check_mail_minutes = gtk_entry_new();
+  gtk_entry_set_max_length( GTK_ENTRY(pui->check_mail_minutes), 2);
+  gtk_box_pack_start( GTK_BOX(vbox), pui->check_mail_auto, FALSE, FALSE, 5);
+
+  hbox2 = gtk_hbox_new( FALSE, 0 );
+  label_minutes = gtk_label_new( "Minutes" );
+  gtk_box_pack_start( GTK_BOX(hbox2), pui->check_mail_minutes, 
+		      FALSE, FALSE, 5);
+  gtk_box_pack_start( GTK_BOX(hbox2), label_minutes, FALSE, FALSE, 0);
+  gtk_box_pack_start( GTK_BOX(vbox), hbox2, FALSE, FALSE, 5);
+
   return vbox;
 }
 
@@ -1022,3 +1070,23 @@ pop3_del_cb (GtkWidget * widget, gpointer data)
 
   mailbox_conf_delete (mailbox);
 }
+
+void timer_modified_cb( GtkWidget *widget, GnomePropertyBox *pbox)
+{
+  if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->check_mail_auto)))
+    {
+      gtk_editable_set_editable( GTK_EDITABLE(pui->check_mail_minutes),
+				 TRUE );
+      update_timer( TRUE, atoi( gtk_entry_get_text( GTK_ENTRY(pui->check_mail_minutes))));
+    }
+  else
+    {
+      gtk_editable_set_editable( GTK_EDITABLE(pui->check_mail_minutes),
+				 FALSE );
+      update_timer( FALSE, 0 );
+    }
+
+  properties_modified_cb( widget, pbox );
+
+}
+

@@ -1,6 +1,21 @@
+199-12-04  David Pickens  <dsp@iAesthetic.com>
+	* Added mail check every x minutes option
+
+1999-12-02  David Pickens  <dsp@iAesthetic.com>
+	* added ability to compile w/out threads (see 11-29)
+	* src/main-window.c: fixed progress window
+
 1999-12-01  Peter Williams  <peter@wgwill.ne.mediaone.net>
 
 	* src/address-book.c: Fixed stray reference to MDI
+
+1999-11-29  David Pickens <dsp@iAesthetic.com>
+
+	*src/main.c, main-window.c, main-window.h:  
+	added multi-threaded mail checking, progress window.
+	*libbalsa/mailbox.c, mailbox.h, libbalsa-priv.h:
+	same
+	*libmutt/pop.c:  same
 
 1999-11-29  Peter Williams  <peter@wgwill.ne.mediaone.net>
 

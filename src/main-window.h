@@ -62,6 +62,7 @@ void balsa_window_refresh(BalsaWindow *window);
 void balsa_window_open_mailbox();
 void balsa_window_close_mailbox();
 gboolean mail_progress_notify_cb( );
+gint check_new_messages_auto_cb( gpointer data );
 
 /*
 void close_main_window (void);

@@ -110,6 +110,7 @@ balsa_app_init (void)
   balsa_app.new_messages_timer = 0;
   balsa_app.new_messages = 0;
 
+  balsa_app.check_mail_auto = FALSE;
   balsa_app.check_mail_timer = 0;
 
   balsa_app.debug = FALSE;
@@ -197,4 +198,26 @@ read_signature (void)
 static void
 special_mailboxes (void)
 {
+}
+
+void 
+update_timer( gboolean update, guint minutes )
+{
+  guint32 timeout;
+  timeout = minutes * 60 * 1000;
+
+  if( update )
+    {
+      if( balsa_app.check_mail_timer_id )
+	gtk_timeout_remove( balsa_app.check_mail_timer_id );
+      balsa_app.check_mail_timer_id = gtk_timeout_add( timeout, 
+	       &check_new_messages_auto_cb, NULL);
+    }
+  else
+    {
+      if( balsa_app.check_mail_timer_id )
+	gtk_timeout_remove( balsa_app.check_mail_timer_id );
+      balsa_app.check_mail_timer_id = 0;
+    }
+
 }

@@ -682,6 +682,21 @@ config_global_load (void)
        if (balsa_app.smtp_server==NULL)
 	       balsa_app.smtp = FALSE;
    }
+
+  /* Check mail timer */
+  if ((field = pl_dict_get_str (globals, "CheckMailAuto")) == NULL)
+    balsa_app.check_mail_auto = FALSE;
+  else
+    balsa_app.check_mail_auto = atoi (field);
+
+  if ((field = pl_dict_get_str (globals, "CheckMailMinutes")) == NULL)
+    balsa_app.check_mail_timer = 10;
+  else
+    balsa_app.check_mail_timer = atoi (field);
+
+  if( balsa_app.check_mail_auto )
+    update_timer( TRUE, balsa_app.check_mail_timer );
+
   /* toolbar style */
   if ((field = pl_dict_get_str (globals, "ToolbarStyle")) == NULL)
     balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
@@ -786,6 +801,8 @@ gint
 config_global_save (void)
 {
   proplist_t globals, temp_str;
+  char tmp[MAX_PROPLIST_KEY_LEN];
+
 
   g_assert (balsa_app.proplist != NULL);
 
@@ -818,8 +835,6 @@ config_global_save (void)
 
 
   {
-    char tmp[MAX_PROPLIST_KEY_LEN];
-
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.sig_sending);
     pl_dict_add_str_str (globals, "SigSending", tmp);
 
@@ -865,6 +880,11 @@ config_global_save (void)
     pl_dict_add_str_str (globals, "EncodingStyle", tmp);
   }
 
+  snprintf (tmp, sizeof (tmp), "%d", balsa_app.check_mail_auto );
+  pl_dict_add_str_str (globals, "CheckMailAuto", tmp);
+
+  snprintf (tmp, sizeof (tmp), "%d", balsa_app.check_mail_timer);
+  pl_dict_add_str_str (globals, "CheckMailMinutes", tmp);
 
   /* arp --- "LeadinStr" into cfg. */
   if (balsa_app.quote_str != NULL)
@@ -1068,3 +1088,4 @@ config_mailbox_get_highest_number (proplist_t accounts)
 
   return max;
 }				/* config_mailbox_get_highest_number */
+

@@ -55,6 +55,7 @@ libmutt/mx.c
 libmutt/parse.c
 libmutt/sendlib.c
 src/address-book-config.c
+src/ab-main.c
 src/ab-window.c
 src/balsa-app.c
 src/balsa-index-threading.c

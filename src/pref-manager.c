@@ -1134,7 +1134,7 @@ outgoing_page ( )
 	gtk_container_add (GTK_CONTAINER (frame1), table);
 	gtk_container_set_border_width (GTK_CONTAINER (table), 5);
 	
-	pui->wordwrap = gtk_check_button_new_with_label( "Wrap Outgoing Text at:" );
+	pui->wordwrap = gtk_check_button_new_with_label(_("Wrap Outgoing Text at:"));
 	gtk_widget_show (  pui->wordwrap);
 	gtk_table_attach (GTK_TABLE (table),   pui->wordwrap, 0, 1, 0, 1,
 			  (GtkAttachOptions) (GTK_FILL),

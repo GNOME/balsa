@@ -1,6 +1,6 @@
 SUBDIRS = macros po intl libmutt libbalsa src
 
-EXTRA_DIST = balsa.1
+EXTRA_DIST = balsa.1 configure
 
 man_MANS=balsa.1
 

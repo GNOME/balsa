@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa E-Mail Client 0.2.0\n"
-"POT-Creation-Date: 1998-04-29 18:34-0400\n"
+"POT-Creation-Date: 1998-08-24 18:09-0400\n"
 "PO-Revision-Date: 1998-04-30 17:07 MEST\n"
 "Last-Translator: Sven Neumann <sven@gimp.org>\n"
 "Language-Team: German <FILL_IN_EMAIL>\n"
@@ -14,139 +14,436 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: none\n"
 
-#: src/sendmsg-window.c:129
-msgid "Send"
-msgstr "Senden"
+#: src/balsa-index.c:184
+msgid "From"
+msgstr ""
 
-#: src/sendmsg-window.c:134
-msgid "Attach File"
-msgstr "Datei hinzufügen"
+#: src/balsa-index.c:185
+msgid "Subject"
+msgstr ""
 
-#: src/addrbook-manager.c:179 src/sendmsg-window.c:143
-msgid "Close"
-msgstr "Schließen"
-
-#: src/main-window.c:453 src/sendmsg-window.c:151
-msgid "Message"
-msgstr "Nachricht"
-
-#: src/sendmsg-window.c:158
-msgid "Cut"
-msgstr "Ausschneiden"
-
-#: src/sendmsg-window.c:165
-msgid "Copy"
-msgstr "Kopieren"
-
-#: src/sendmsg-window.c:172
-msgid "Paste"
+#: src/balsa-index.c:186
+#, fuzzy
+msgid "Date"
 msgstr "Einfügen"
 
-#: src/sendmsg-window.c:179
-msgid "Edit"
-msgstr "Ändern"
+#: src/balsa-init.c:101
+msgid "Welcome To Balsa!"
+msgstr ""
 
-#: src/addrbook-manager.c:194 src/sendmsg-window.c:187
-msgid "Contents"
-msgstr "Inhalt"
+#: src/balsa-init.c:151
+msgid "Previous..."
+msgstr ""
 
-#: src/addrbook-manager.c:199 src/main-window.c:546 src/sendmsg-window.c:192
-msgid "Help"
-msgstr "Hilfe"
+#: src/balsa-init.c:162
+msgid "Next..."
+msgstr ""
 
-#: src/addrbook-manager.c:187 src/main-window.c:377
-msgid "File"
-msgstr "Datei"
+#: src/balsa-init.c:179
+msgid ""
+"Welcome to Balsa!\n"
+"\n"
+msgstr ""
 
-#: src/main-window.c:334
-msgid "Get New Mail"
-msgstr "Neue Nachrichten holen"
+#: src/balsa-init.c:181
+msgid "You seem to be running Balsa for the first time.\n"
+msgstr ""
 
-#.
-#. w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Save mailbox..."));
-#. gtk_widget_show (w);
-#. gtk_menu_append (GTK_MENU (menu), w);
-#. menu_items[i++] = w;
-#.
-#. w = gtk_menu_item_new ();
-#. gtk_widget_show (w);
-#. gtk_menu_append (GTK_MENU (menu), w);
-#.
-#. w = gnome_stock_menu_item (GNOME_STOCK_MENU_PRINT, _ ("Print..."));
-#. gtk_widget_show (w);
-#. gtk_menu_append (GTK_MENU (menu), w);
-#. menu_items[i++] = w;
-#.
-#. w = gtk_menu_item_new ();
-#. gtk_widget_show (w);
-#. gtk_menu_append (GTK_MENU (menu), w);
-#.
-#: src/main-window.c:367
-msgid "Exit"
-msgstr "Beenden"
+#: src/balsa-init.c:182
+msgid ""
+"The following steps will setup Balsa by asking a few simple questions.  "
+msgstr ""
 
-#: src/main-window.c:385
-msgid "New"
-msgstr "Neu"
+#: src/balsa-init.c:183
+msgid ""
+"Once you have completed these steps, you can always change them at a later "
+"time through Balsa's preferences.  "
+msgstr ""
 
-#: src/main-window.c:395
-msgid "Reply"
+#: src/balsa-init.c:184
+msgid ""
+"Please check the about box in Balsa's main window for more information on "
+"contacting the authors or reporting bugs."
+msgstr ""
+
+#. your name
+#: src/balsa-init.c:232 src/pref-manager.c:315
+msgid "Your name:"
+msgstr ""
+
+#. email address
+#: src/balsa-init.c:246 src/pref-manager.c:325
+msgid "E-Mail address:"
+msgstr ""
+
+#. smtp server
+#: src/balsa-init.c:261 src/pref-manager.c:335
+msgid "SMTP server:"
+msgstr ""
+
+#: src/balsa-init.c:303
+msgid "Inbox Path:"
+msgstr ""
+
+#: src/balsa-init.c:315
+msgid "Outbox Path:"
+msgstr ""
+
+#: src/balsa-init.c:327
+msgid "Trash Path:"
+msgstr ""
+
+#: src/balsa-init.c:338
+msgid ""
+"If you wish to use IMAP for these\n"
+"please change them inside Balsa\n"
+msgstr ""
+
+#: src/balsa-init.c:365
+msgid "Inbox path is invalid."
+msgstr ""
+
+#: src/balsa-init.c:370
+msgid "Outbox path is invalid."
+msgstr ""
+
+#: src/balsa-init.c:375
+msgid "Trash path is invalid."
+msgstr ""
+
+#: src/index-child.c:95
+msgid "Unable to Open Mailbox!"
+msgstr ""
+
+#: src/index-child.c:218
+msgid "Transfer"
+msgstr ""
+
+#: src/index-child.c:234
+msgid "Change Status"
+msgstr ""
+
+#: src/index-child.c:237
+msgid "Unread"
+msgstr ""
+
+#: src/index-child.c:243
+msgid "Read"
+msgstr ""
+
+#: src/index-child.c:249
+#, fuzzy
+msgid "Replied"
 msgstr "Beantworten"
 
-#.
-#. w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Reply to All"));
-#. gtk_widget_show (w);
-#. gtk_menu_append (GTK_MENU (menu), w);
-#. menu_items[i++] = w;
-#.
-#: src/main-window.c:410
-msgid "Foward"
+#: src/index-child.c:255
+#, fuzzy
+msgid "Forwarded"
 msgstr "Weitersenden"
 
-#: src/main-window.c:433
+#: src/index-child.c:264 src/main-window.c:245 src/main-window.c:408
 msgid "Delete"
 msgstr "Löschen"
 
-#: src/main-window.c:443
+#: src/index-child.c:272 src/main-window.c:259
 msgid "Undelete"
 msgstr "Wiederherstellen"
 
-#: src/main-window.c:463
+#: src/local-mailbox.c:125
+#, c-format
+msgid "Local Mailbox Loaded as: %s\n"
+msgstr ""
+
+#: src/mailbox-conf.c:160
+msgid ""
+"This will remove the mailbox and it's files permanently from your system.\n"
+"Are you sure you want to remove this mailbox?"
+msgstr ""
+
+#: src/mailbox-conf.c:165
+msgid ""
+"This will remove the mailbox from the list of mailboxes\n"
+"You may use \"Add Mailbox\" later to access this mailbox again\n"
+"Are you sure you want to remove this mailbox?"
+msgstr ""
+
+#: src/mailbox-conf.c:227
+msgid "Mailbox Configurator"
+msgstr ""
+
+#: src/mailbox-conf.c:449
+#, c-format
+msgid "Cannot create mailbox '%s': %s\n"
+msgstr ""
+
+#: src/mailbox-conf.c:450
+msgid "Cancel"
+msgstr ""
+
+#: src/mailbox-manager.c:69
+#, fuzzy
+msgid "Account"
+msgstr "Über"
+
+#: src/mailbox-manager.c:70
+msgid "Type"
+msgstr ""
+
+#: src/mailbox-manager.c:71
+msgid "Server"
+msgstr ""
+
+#: src/mailbox-manager.c:86
+#, fuzzy
+msgid "Mailbox Manager"
+msgstr "Mailbox Verwalter..."
+
+#. edit account button
+#: src/mailbox-manager.c:140
+#, fuzzy
+msgid "Edit..."
+msgstr "Ändern"
+
+#. edit account button
+#: src/mailbox-manager.c:153
+#, fuzzy
+msgid "New..."
+msgstr "Neu"
+
+#. delete account button
+#: src/mailbox-manager.c:166
+#, fuzzy
+msgid "Delete..."
+msgstr "Löschen"
+
+#: src/main-window.c:88
+msgid "Mailboxes/<Separator>"
+msgstr ""
+
+#: src/main-window.c:149
+msgid "Get New Mail"
+msgstr "Neue Nachrichten holen"
+
+#: src/main-window.c:166
+msgid "Check POP3"
+msgstr ""
+
+#: src/main-window.c:181
+msgid "Exit"
+msgstr "Beenden"
+
+#: src/main-window.c:193
+msgid "File"
+msgstr "Datei"
+
+#: src/main-window.c:203
+msgid "New"
+msgstr "Neu"
+
+#: src/main-window.c:216 src/main-window.c:433 src/main-window.c:434
+msgid "Reply"
+msgstr "Beantworten"
+
+#: src/main-window.c:229 src/main-window.c:444 src/main-window.c:445
+#, fuzzy
+msgid "Forward"
+msgstr "Weitersenden"
+
+#: src/main-window.c:272 src/sendmsg-window.c:166
+msgid "Message"
+msgstr "Nachricht"
+
+#: src/main-window.c:280
+msgid "Mailbox List"
+msgstr ""
+
+#: src/main-window.c:291 src/sendmsg-window.c:158
+msgid "Close"
+msgstr "Schließen"
+
+#. mailboxes page
+#: src/main-window.c:306 src/pref-manager.c:130
+msgid "Mailboxes"
+msgstr ""
+
+#: src/main-window.c:315
 msgid "Preferences..."
 msgstr "Einstellungen..."
 
-#: src/main-window.c:473
-msgid "Mailbox Manager..."
-msgstr "Mailbox Verwalter..."
-
-#: src/main-window.c:483
+#.
+#. w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Mailbox Manager..."));
+#. gtk_widget_show (w);
+#.
+#. gtk_signal_connect (GTK_OBJECT (w),
+#. "activate",
+#. (GtkSignalFunc) open_mailbox_manager,
+#. NULL);
+#.
+#. gtk_menu_append (GTK_MENU (menu), w);
+#. menu_items[i++] = w;
+#.
+#: src/main-window.c:338
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: src/main-window.c:494
-msgid "Toolbar"
-msgstr "Menüleiste"
-
-#: src/main-window.c:500
-msgid "Icons"
-msgstr "Symbole"
-
-#: src/main-window.c:509
-msgid "Text"
-msgstr "Text"
-
-#: src/main-window.c:518
-msgid "Both"
-msgstr "Beides"
-
-#: src/main-window.c:527
-msgid "View"
-msgstr "Anschauen"
-
-#: src/main-window.c:537
+#: src/main-window.c:346
 msgid "About"
 msgstr "Über"
 
+#: src/main-window.c:359 src/sendmsg-window.c:207
+msgid "Help"
+msgstr "Hilfe"
 
+#: src/main-window.c:394
+msgid "Check"
+msgstr ""
 
+#: src/main-window.c:395
+msgid "Check Email"
+msgstr ""
 
+#: src/main-window.c:409
+#, fuzzy
+msgid "Delete Message"
+msgstr "Nachricht"
+
+#: src/main-window.c:422
+#, fuzzy
+msgid "Compose"
+msgstr "Schließen"
+
+#: src/main-window.c:423
+#, fuzzy
+msgid "Compose Message"
+msgstr "Nachricht"
+
+#: src/main-window.c:458
+msgid "Previous"
+msgstr ""
+
+#: src/main-window.c:459
+msgid "Open Previous Message"
+msgstr ""
+
+#: src/main-window.c:469
+#, fuzzy
+msgid "Next"
+msgstr "Text"
+
+#: src/main-window.c:470
+msgid "Open Next Message"
+msgstr ""
+
+#: src/main-window.c:507
+msgid ""
+"The Balsa email client is part of the GNOME desktop environment.  "
+"Information on Balsa can be found at http://www.balsa.net/\n"
+"\n"
+"If you need to report bugs, please do so at: "
+"http://www.gnome.org/cgi-bin/bugs"
+msgstr ""
+
+#: src/mblist-window.c:488
+msgid "Add Mailbox"
+msgstr ""
+
+#: src/mblist-window.c:494
+msgid "Edit Mailbox"
+msgstr ""
+
+#: src/mblist-window.c:500
+#, fuzzy
+msgid "Delete Mailbox"
+msgstr "Neue Nachrichten holen"
+
+#. identity page
+#: src/pref-manager.c:123
+msgid "Identity"
+msgstr ""
+
+#. view page
+#: src/pref-manager.c:137
+msgid "View"
+msgstr "Anschauen"
+
+#. MDI page
+#: src/pref-manager.c:144 src/pref-manager.c:434
+msgid "MDI"
+msgstr ""
+
+#: src/pref-manager.c:364
+msgid "Local mail directory:"
+msgstr ""
+
+#. Toolbars
+#: src/pref-manager.c:393
+#, fuzzy
+msgid "Toolbars"
+msgstr "Menüleiste"
+
+#: src/pref-manager.c:413
+msgid "Debug"
+msgstr ""
+
+#: src/sendmsg-window.c:71 src/sendmsg-window.c:136
+msgid "Send"
+msgstr "Senden"
+
+#: src/sendmsg-window.c:147
+msgid "Attach File"
+msgstr "Datei hinzufügen"
+
+#: src/sendmsg-window.c:173
+msgid "Cut"
+msgstr "Ausschneiden"
+
+#: src/sendmsg-window.c:180
+msgid "Copy"
+msgstr "Kopieren"
+
+#: src/sendmsg-window.c:187
+msgid "Paste"
+msgstr "Einfügen"
+
+#: src/sendmsg-window.c:194
+msgid "Edit"
+msgstr "Ändern"
+
+#: src/sendmsg-window.c:202
+msgid "Contents"
+msgstr "Inhalt"
+
+#: src/sendmsg-window.c:253
+#, fuzzy
+msgid "New message"
+msgstr "Nachricht"
+
+#: src/sendmsg-window.c:266
+#, fuzzy
+msgid "Reply to "
+msgstr "Beantworten"
+
+#: src/sendmsg-window.c:279
+msgid "Forward message"
+msgstr ""
+
+#: libbalsa/mailbox.c:452
+#, c-format
+msgid "Mailbox: Opening %s Refcount: %d\n"
+msgstr ""
+
+#: libbalsa/mailbox.c:478
+#, c-format
+msgid "Mailbox: Closing %s Refcount: %d\n"
+msgstr ""
+
+#: libbalsa/mailbox.c:1340
+#, c-format
+msgid "Loading message: %s/%s\n"
+msgstr ""
+
+#~ msgid "Icons"
+#~ msgstr "Symbole"
+
+#~ msgid "Both"
+#~ msgstr "Beides"

@@ -1,3 +1,23 @@
+1999-12-12  Peter Williams  <peter@wgwill.ne.mediaone.net>
+
+	* libbalsa/filter-file.c: Removed compile warnings
+	  libbalsa/libbalsa.c: Ditto
+	  libbalsa/mailbox.[ch]: Ditto
+	  libbalsa/message.c: Ditto
+	  src/balsa-index-page.[ch]: Ditto
+	  src/balsa-mblist.c: Ditto
+	  src/filter-edit.h: Ditto (moved static definitions)
+	  src/filter-edit-dialog.c: Ditto
+	  src/mailbox-conf.c: Ditto
+	  src/main-window.[ch]: Ditto
+	  src/main.c: Ditto (added evil ugly uncalled hack function)
+	  src/mblist-window.c: Ditto
+	  src/pref-manager.c: Ditto
+	  src/print.c: Ditto
+	  libinit_balsa/balsa-druid-page-finish.gob: Ditto
+	  libinit_balsa/balsa-initdruid.gob: Fixed absentminded 
+	      coredump on cancel
+
 1999-12-09  Peter Williams  <peter@wgwill.ne.mediaone.net>
 
 	* src/save-restore.h: Added necessary #include libbalsa.h

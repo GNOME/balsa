@@ -71,7 +71,7 @@ create_toolbar (BalsaSendmsg * bsmw)
   toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
 					   "Send", "Send", NULL,
 	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_SND),
-					GTK_SIGNAL_FUNC (send_message_cb),
+					   GTK_SIGNAL_FUNC (send_message_cb),
 					   bsmw);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
@@ -456,11 +456,12 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
  * C-client stuff below! LOOK OUT! :)
  */
 
-static GString *
+static gchar *
 gtk_text_to_email (char *buff)
 {
   int i = 0, len = strlen (buff);
   GString *gs = g_string_new (NULL);
+  gchar *str;
 
   for (i = 0; i < len; i++)
     {
@@ -474,7 +475,9 @@ gtk_text_to_email (char *buff)
 	  break;
 	}
     }
-  return gs;
+  str = g_strdup (gs->str);
+  g_string_free (gs, 1);
+  return str;
 }
 
 
@@ -497,20 +500,21 @@ make_string_from_list (GList * the_list)
 	gs = g_string_append (gs, ",");
     }
   str = g_strdup (gs->str);
-  g_free (gs);
+  g_string_free (gs, 1);
   return str;
 }
 
 static GList *
-make_list_from_string (gchar * the_string)
+make_list_from_string (gchar * the_str)
 {
   GList *list;
   gchar *str;
   char *token;
-  str = g_strdup (the_string);
 
+  if (!the_str) return NULL;
+
+  str = g_strdup(the_str);
   token = strtok (str, ",");
-
   while (token)
     {
       list = g_list_append (list, token);
@@ -530,8 +534,7 @@ send_message (Message * message)
   ENVELOPE *envelope = mail_newenvelope ();
   BODY *body = mail_newbody ();
 
-  GString *text;
-  gchar *textbuf;
+  gchar *text;
 
   char *hostlist[] =
   {				/* SMTP server host list */
@@ -560,17 +563,14 @@ send_message (Message * message)
     }
   envelope->subject = g_strdup (message->subject);
   body->type = TYPETEXT;
-#if 0
-  textbuf = gtk_editable_get_chars (GTK_EDITABLE (bsmsg->text),
-				    0,
-			      gtk_text_get_length (GTK_TEXT (bsmsg->text)));
 
-  text = gtk_text_to_email (textbuf);
-  text = g_string_append (text, "\015\012");
+  text = ((Body *)(g_list_first(message->body_list)->data))->buffer;
 
-  body->contents.text.data = g_strdup (text->str);
-  body->contents.text.size = strlen (text->str);
-#endif
+  text = gtk_text_to_email (text);
+
+  body->contents.text.data = g_strdup (text);
+  body->contents.text.size = strlen (body->contents.text.data);
+
   rfc822_date (line);
   envelope->date = (char *) fs_get (1 + strlen (line));
   strcpy (envelope->date, line);
@@ -591,14 +591,13 @@ send_message (Message * message)
     fprintf (stderr, "[Can't open connection to any server]\n");
   mail_free_envelope (&envelope);
   mail_free_body (&body);
-  g_string_free (text, 1);
 }
 
 static void
 send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
   Message *message;
-
+  Body *body;
   message = message_new ();
 
   message->from = address_new ();
@@ -610,15 +609,22 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 
   message->to_list = make_list_from_string (gtk_entry_get_text (GTK_ENTRY (bsmsg->to)));
   message->cc_list = make_list_from_string (gtk_entry_get_text (GTK_ENTRY (bsmsg->cc)));
-#if 0
-  textbuf = gtk_editable_get_chars (GTK_EDITABLE (bsmsg->text),
-			   0, gtk_text_get_length (GTK_TEXT (bsmsg->text)));
-#endif
 
+  body = body_new ();
+
+  body->buffer = gtk_editable_get_chars (GTK_EDITABLE (bsmsg->text), 0,
+			      gtk_text_get_length (GTK_TEXT (bsmsg->text)));
+
+  message->body_list = g_list_append (message->body_list, body);
+
+  send_message (message);
+
+  body_free (body);
+  message->body_list->data = NULL;
+  g_list_free (message->body_list);
   message_free (message);
   balsa_sendmsg_destroy (bsmsg);
 }
-
 
 static gchar *
 gt_replys (char *buff)

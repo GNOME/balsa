@@ -45,22 +45,12 @@ struct _MainWindow
     GtkWidget *window;
     GtkWidget *menubar;
     GtkWidget *toolbar;
-    GtkWidget *mailbox_option_menu;
     GtkWidget *mailbox_menu;
     GtkWidget *move_menu;
-    GtkWidget *index;
-    GtkWidget *message_area;
-    GtkWidget *status_bar;
-
-    /* non-widgets */
-    Mailbox *mailbox;
-    guint watcher_id;
   };
 static MainWindow *mw = NULL;
 
 static gint about_box_visible = FALSE;
-
-
 
 /* external decs */
 extern void balsa_exit ();
@@ -78,25 +68,19 @@ static void show_about_box ();
 /* callbacks */
 static void move_resize_cb ();
 
-static void index_select_cb (GtkWidget * widget, Message * message);
-static void next_message_cb (GtkWidget * widget);
-static void previous_message_cb (GtkWidget * widget);
-
 static void new_message_cb (GtkWidget * widget);
 static void replyto_message_cb (GtkWidget * widget);
 static void forward_message_cb (GtkWidget * widget);
 
+static void next_message_cb(GtkWidget *widget);
+static void previous_message_cb(GtkWidget *widget);
+
 static void delete_message_cb (GtkWidget * widget);
 static void undelete_message_cb (GtkWidget * widget);
-
-static void mailbox_select_cb (GtkWidget * widget);
 
 static void mblist_window_cb (GtkWidget * widget);
 
 static void about_box_destroy_cb ();
-
-static void mailbox_listener (MailboxWatcherMessage * mw_message);
-
 
 void
 open_main_window ()
@@ -116,7 +100,6 @@ open_main_window ()
   /* structure initalizations */
   mw->mailbox_menu = NULL;
   mw->move_menu = NULL;
-  mw->mailbox = NULL;
 
 
   /* main window */
@@ -143,70 +126,6 @@ open_main_window ()
   /* meubar and toolbar */
   create_menu ();
   create_toolbar ();
-
-
-  /* contents widget */
-  vbox = gtk_vbox_new (FALSE, 0);
-
-  gtk_widget_show (vbox);
-
-
-
-  /* panned widget */
-  vpane = gtk_vpaned_new ();
-  gtk_box_pack_start (GTK_BOX (vbox), vpane, TRUE, TRUE, 0);
-  gtk_widget_show (vpane);
-
-
-
-  /* message index */
-  hbox = gtk_hbox_new (TRUE, 0);
-  mw->index = balsa_index_new ();
-
-  if (gdk_screen_width () > 640 && gdk_screen_height () > 480)
-    gtk_widget_set_usize (mw->index, 1, 200);
-  else
-    gtk_widget_set_usize (mw->index, 1, 133);
-
-  gtk_container_border_width (GTK_CONTAINER (mw->index), 2);
-  gtk_box_pack_start (GTK_BOX (hbox), mw->index, TRUE, TRUE, 2);
-
-  gtk_object_set_user_data (GTK_OBJECT (mw->index), (gpointer) mw);
-
-  gtk_signal_connect (GTK_OBJECT (mw->index),
-		      "select_message",
-		      (GtkSignalFunc) index_select_cb,
-		      NULL);
-
-  gtk_paned_add1 (GTK_PANED (vpane), hbox);
-  gtk_widget_show (hbox);
-  gtk_widget_show (mw->index);
-
-
-
-  /* message body */
-  hbox = gtk_hbox_new (FALSE, 0);
-
-  mw->message_area = balsa_message_new ();
-  gtk_container_border_width (GTK_CONTAINER (mw->message_area), 1);
-  gtk_box_pack_start (GTK_BOX (hbox), mw->message_area, TRUE, TRUE, 2);
-  gtk_widget_show (mw->message_area);
-
-  gtk_paned_add2 (GTK_PANED (vpane), hbox);
-  gtk_widget_show (hbox);
-
-
-
-  /* status bar */
-  mw->status_bar = gtk_statusbar_new ();
-  gtk_box_pack_start (GTK_BOX (vbox), mw->status_bar, FALSE, FALSE, 3);
-  gtk_widget_show (mw->status_bar);
-
-  progress_bar = gtk_progress_bar_new ();
-  gtk_box_pack_start (GTK_BOX (mw->status_bar), progress_bar, FALSE, FALSE, 0);
-  gtk_widget_show (progress_bar);
-
-
 
   refresh_main_window ();
   gtk_widget_show (mw->window);
@@ -629,21 +548,6 @@ move_resize_cb ()
 }
 
 static void
-index_select_cb (GtkWidget * widget,
-		 Message * message)
-{
-  MainWindow *mainwindow;
-
-  g_return_if_fail (widget != NULL);
-  g_return_if_fail (BALSA_IS_INDEX (widget));
-  g_return_if_fail (message != NULL);
-
-  mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
-  balsa_message_set (BALSA_MESSAGE (mainwindow->message_area), message);
-}
-
-
-static void
 new_message_cb (GtkWidget * widget)
 {
   g_return_if_fail (widget != NULL);
@@ -682,7 +586,9 @@ next_message_cb (GtkWidget * widget)
   g_return_if_fail (widget != NULL);
 
   mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
+#if 0
   balsa_index_select_next (BALSA_INDEX (mainwindow->index));
+#endif
 }
 
 
@@ -692,15 +598,17 @@ previous_message_cb (GtkWidget * widget)
   MainWindow *mainwindow;
 
   g_return_if_fail (widget != NULL);
-
+#if 0
   mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
   balsa_index_select_previous (BALSA_INDEX (mainwindow->index));
+#endif
 }
 
 
 static void
 delete_message_cb (GtkWidget * widget)
 {
+#if 0
   GList *list;
   MainWindow *mainwindow;
 
@@ -716,6 +624,7 @@ delete_message_cb (GtkWidget * widget)
     }
 
   balsa_index_select_next (BALSA_INDEX (mainwindow->index));
+#endif
 }
 
 
@@ -726,9 +635,10 @@ undelete_message_cb (GtkWidget * widget)
   MainWindow *mainwindow;
 
   g_return_if_fail (widget != NULL);
-
+#if 0
   mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
   balsa_index_select_next (BALSA_INDEX (mainwindow->index));
+#endif
 }
 
 
@@ -751,45 +661,7 @@ mblist_window_cb (GtkWidget * widget)
 }
 
 static void
-mailbox_select_cb (GtkWidget * widget)
-{
-  MainWindow *mainwindow;
-  Mailbox *mailbox;
-  GtkWidget *messagebox;
-  guint watcher_id;
-
-  g_return_if_fail (widget != NULL);
-  g_return_if_fail (GTK_IS_MENU_ITEM (widget));
-
-  mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
-  mailbox = (Mailbox *) gtk_object_get_data (GTK_OBJECT (widget), MAILBOX_DATA);
-
-
-  /* 
-   * bail now if the we've been called without a valid mailbox
-   */
-  if (!mailbox)
-    return;
-
-  create_new_index (mailbox);
-}
-
-
-static void
 about_box_destroy_cb ()
 {
   about_box_visible = FALSE;
-}
-
-
-static void
-mailbox_listener (MailboxWatcherMessage * mw_message)
-{
-  MainWindow *mainwindow = (MainWindow *) mw_message->data;
-
-  switch (mw_message->type)
-    {
-    default:
-      break;
-    }
 }

@@ -1,5 +1,6 @@
-2004-12-02 04:07  PeterB
+2004-12-02 11:19  PeterB
 
+	* libbalsa/address-entry.c: connect to detailed signal.
 	* libbalsa/mailbox_imap.c: return error from
 	libbalsa_mailbox_imap_fetch_structure() on protocol error in
 	imap_mbox_handle_fetch_range().

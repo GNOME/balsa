@@ -25,7 +25,7 @@
 gint config_load(gchar * user_filename);
 gint config_save(gchar * user_filename);
 
-gint config_mailbox_add (Mailbox * mailbox, char * name);
+gint config_mailbox_add (Mailbox * mailbox, char * key_arg);
 gint config_mailbox_delete(gchar * name);
 gint config_mailbox_update (Mailbox * mailbox, gchar * old_mbox_name);
 gint config_mailboxes_init(void);

@@ -40,6 +40,7 @@ static gchar *pl_dict_get_str (proplist_t dict, gchar * str);
 static proplist_t config_mailbox_get_by_name (gchar * name);
 static proplist_t config_mailbox_get_key (proplist_t mailbox);
 static gint config_mailbox_init (proplist_t mbox, gchar * key);
+static gint config_mailbox_get_highest_number(proplist_t accounts);
 
 /* Load the configuration from the specified file. The filename is
    taken to be relative to the user's home directory, as if "~/" had
@@ -90,7 +91,8 @@ config_save (gchar * user_filename)
 
   /* Construct the filename by appending 'user_filename' to the user's
      home directory. */
-  filename = g_malloc (strlen (user_filename) + strlen (g_get_home_dir ()) + 2);
+  filename = g_malloc (strlen (user_filename) +
+		       strlen (g_get_home_dir ()) + 2);
   strcpy (filename, g_get_home_dir ());
   strcat (filename, "/");
   strcat (filename, user_filename);
@@ -135,9 +137,13 @@ config_save (gchar * user_filename)
  * failure.
  */
 gint
-config_mailbox_add (Mailbox * mailbox, char *key)
+config_mailbox_add (Mailbox * mailbox, char * key_arg)
 {
   proplist_t mbox_dict, accounts, temp_str;
+  char key[32];
+
+  /* Initialize the key in case it is accidentally used uninitialized */
+  strcpy(key, "AnErrorOccurred");
 
   /* Each mailbox is stored as a Proplist dictionary of mailbox settings.
      First create the dictionary, then add it to the "accounts" section
@@ -172,7 +178,8 @@ config_mailbox_add (Mailbox * mailbox, char *key)
 			   MAILBOX_POP3 (mailbox)->user);
       pl_dict_add_str_str (mbox_dict, "Password",
 			   MAILBOX_POP3 (mailbox)->passwd);
-      pl_dict_add_str_str (mbox_dict, "Server", MAILBOX_POP3 (mailbox)->server);
+      pl_dict_add_str_str (mbox_dict, "Server",
+			   MAILBOX_POP3 (mailbox)->server);
 
       break;
 
@@ -188,7 +195,8 @@ config_mailbox_add (Mailbox * mailbox, char *key)
        */
       mbox_dict = pl_dict_add_str_str (NULL, "Type", "IMAP");
       pl_dict_add_str_str (mbox_dict, "Name", mailbox->name);
-      pl_dict_add_str_str (mbox_dict, "Server", MAILBOX_IMAP (mailbox)->server);
+      pl_dict_add_str_str (mbox_dict, "Server",
+			   MAILBOX_IMAP (mailbox)->server);
 
       /* Add the Port entry */
       {
@@ -223,8 +231,11 @@ config_mailbox_add (Mailbox * mailbox, char *key)
   temp_str = PLMakeString ("Accounts");
   accounts = PLGetDictionaryEntry (balsa_app.proplist, temp_str);
   PLRelease (temp_str);
+
   if (accounts == NULL)
     {
+      strcpy(key, "M1");
+
       /* If there is no Accounts list in the global proplist, create
          one and add it to the global configuration dictionary. */
       temp_str = PLMakeString (key);
@@ -237,6 +248,19 @@ config_mailbox_add (Mailbox * mailbox, char *key)
     }
   else
     {
+      /* Before we can add the mailbox to the configuration, we need
+	 to pick a unique key for it.  "Inbox", "Outbox" and "Trash"
+	 all have unique keys, but for all other mailboxes, we are
+	 simply passed "generic" which we must replace with a unique
+	 key. */
+      if (!strcmp(key_arg, "generic"))
+	{
+	  int mbox_max;
+
+	  mbox_max = config_mailbox_get_highest_number(accounts);
+	  snprintf(key, sizeof(key), "m%d", mbox_max + 1);
+	}
+
       /* If there is already an Accounts list, just add this new mailbox */
       temp_str = PLMakeString (key);
       PLInsertDictionaryEntry (accounts, temp_str, mbox_dict);
@@ -680,4 +704,37 @@ config_mailbox_get_key (proplist_t mailbox)
     }
 
   return NULL;
-}				/* pl_dict_get_key */
+}				/* config_mailbox_get_key */
+
+static gint
+config_mailbox_get_highest_number(proplist_t accounts)
+{
+  int num_elements, i , max = 0, curr;
+  proplist_t mbox_name;
+  char * name;
+
+  num_elements = PLGetNumberOfElements(accounts);
+  for ( i = 0 ; i < num_elements ; i ++)
+    {
+      mbox_name = PLGetArrayElement(accounts, i);
+
+      if (mbox_name == NULL)
+	{
+	  fprintf (stderr, "config_mailbox_get_highest_number: "
+		   "error getting mailbox key!\n");
+	  abort();
+	}
+	
+      name = PLGetString(mbox_name);
+
+      curr = 0;
+
+      if (strlen(name) > 1)
+	curr = atoi(name + 1);
+
+      if (curr > max)
+	max = curr;
+    }
+
+  return max;
+} /* config_mailbox_get_highest_number */

@@ -1,3 +1,8 @@
+2004-09-02 05:15  PeterB
+
+	* src/: balsa-message.c, balsa-message.h: leave room for vertical
+	scrollbar when rendering html widget.
+
 2004-09-01 08:35  PeterB
 
 	* src/save-restore.c: change only hide-deleted bit in GUI filter.

@@ -1,5 +1,8 @@
-2003-10-25 10:35  PeterB
+2003-10-25 14:15  PeterB
 
+	* src/balsa-index.c: Restore initial sort.
+	* libbalsa/mailbox_imap.c: Imap `seen' flag has opposite sense to
+	Balsa's `new' flag.
 	* libbalsa/: mailbox.c, mailbox.h: Implement release_message
 	method.
 	* libbalsa/: mailbox_maildir.c, mailbox_mh.c: Add

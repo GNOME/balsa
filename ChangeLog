@@ -1,3 +1,15 @@
+2002-11-17  Emmanuel <e.allaud@wanadoo.fr>
+
+	* libbalsa/message.[ch]: clean up message signal scheme.
+	* libbalsa/mailbox.[hc]: same + add lock parameter to
+	libbalsa_message_body_ref(). 
+
+	* libbalsa/filter.c, send.c: use new API and signals.
+	* src/balsa-{index,mblist,message}.c: ditto.
+	* src/{sendmsg,main}-window.c, print.c, : ditto.
+	* src/balsa-index.c: fix balsa_index_find_node() that 
+	finds first_new (PS).
+	
 2002-11-10  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/save-restore.c: 

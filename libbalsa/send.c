@@ -568,8 +568,11 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 				 flow, 1)) {
 	    msg_queue_item_destroy(new_message);
 	} else {
+	    GList * messages = g_list_prepend(NULL, msg);
+
 	    total_messages_left++;
-            libbalsa_message_flag(msg, TRUE);
+            libbalsa_messages_flag(messages, TRUE);
+	    g_list_free(messages);
 	    /* If the Bcc: recipient list is present, add a additional
 	       copy of the message to the session.  The recipient list
 	       for the main copy of the message is generated from the
@@ -753,6 +756,7 @@ handle_successful_send (smtp_message_t message, void *be_verbose)
 {
     MessageQueueItem *mqi;
     const smtp_status_t *status;
+    GList * messages;
 
     send_lock();
     /* Get the app data and decrement the reference count.  Only delete
@@ -764,11 +768,16 @@ handle_successful_send (smtp_message_t message, void *be_verbose)
     status = smtp_message_transfer_status (message);
     if (status->code / 100 == 2) {
 	if (mqi != NULL && mqi->orig != NULL && mqi->refcount <= 0) {
-	    if (mqi->orig->mailbox)
-		libbalsa_message_delete(mqi->orig, TRUE);
+	    if (mqi->orig->mailbox) {
+		messages = g_list_prepend(NULL, mqi->orig);
+		libbalsa_messages_delete(messages, TRUE);
+		g_list_free(messages);
+	    }
 	}
     } else {
-        libbalsa_message_flag(mqi->orig, FALSE);
+	messages = g_list_prepend(NULL, mqi->orig);
+        libbalsa_messages_flag(messages, FALSE);
+	g_list_free(messages);
 	/* XXX - Show the poor user the status codes and message. */
         if(*(gboolean*)be_verbose)
             libbalsa_information(
@@ -1052,10 +1061,10 @@ balsa_send_message_real(SendMessageInfo* info) {
        on the messages with a 2xx status recorded against them.  However
        its possible for individual recipients to fail too.  Need a way to
        report it all.  */
+    gdk_threads_enter();
     smtp_enumerate_messages (info->session, handle_successful_send, 
                              &session_started);
 
-    gdk_threads_enter();
     libbalsa_mailbox_close(info->outbox);
     gdk_threads_leave();
 
@@ -1422,7 +1431,7 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
     message_add_references(message, msg);
 
     if (message->mailbox)
-	libbalsa_message_body_ref(message);
+	libbalsa_message_body_ref(message, TRUE);
 
     body = message->body_list;
 

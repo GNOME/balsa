@@ -114,18 +114,15 @@ struct _LibBalsaMailboxClass {
 	(LibBalsaMailbox * mailbox);
     void (*close_mailbox) (LibBalsaMailbox * mailbox);
 
-    void (*message_new) (LibBalsaMailbox * mailbox,
-			 LibBalsaMessage * message);
-    void (*messages_new) (LibBalsaMailbox * mailbox,
-			  GList * messages);
-    void (*message_delete) (LibBalsaMailbox * mailbox,
-			    LibBalsaMessage * message);
-    void (*messages_delete) (LibBalsaMailbox * mailbox,
-			     GList * messages);
+    void (*messages_added) (LibBalsaMailbox * mailbox,
+			    GList * messages);
+    void (*messages_removed) (LibBalsaMailbox * mailbox,
+			      GList * messages);
     void (*message_append) (LibBalsaMailbox * mailbox,
 			    LibBalsaMessage * message);
-    void (*message_status_changed) (LibBalsaMailbox * mailbox,
-				    LibBalsaMessage * message);
+    void (*messages_status_changed) (LibBalsaMailbox * mailbox,
+				     GList * messages,
+				     gint flag);
     void (*set_unread_messages_flag) (LibBalsaMailbox * mailbox,
 				      gboolean flag);
 
@@ -156,6 +153,8 @@ void libbalsa_mailbox_link_message(LibBalsaMailbox * mbx, LibBalsaMessage*msg);
 void libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox);
 
 void libbalsa_mailbox_free_messages(LibBalsaMailbox * mailbox);
+void libbalsa_mailbox_remove_messages(LibBalsaMailbox * mbox,
+				      GList * messages);
 
 void libbalsa_mailbox_set_unread_messages_flag(LibBalsaMailbox * mailbox,
 					       gboolean has_unread);
@@ -176,5 +175,8 @@ void libbalsa_mailbox_load_config(LibBalsaMailbox * mailbox,
 GtkType libbalsa_mailbox_type_from_path(const gchar * filename);
 gboolean libbalsa_mailbox_commit(LibBalsaMailbox* mailbox);
 
+void libbalsa_mailbox_messages_status_changed(LibBalsaMailbox * mbox,
+					      GList * messages,
+					      gint flag);
 
 #endif				/* __LIBBALSA_MAILBOX_H__ */

@@ -2133,7 +2133,7 @@ continueBody(BalsaSendmsg * msg, LibBalsaMessage * message)
 {
     LibBalsaMessageBody *body;
 
-    libbalsa_message_body_ref(message);
+    libbalsa_message_body_ref(message, TRUE);
     body = message->body_list;
     if (body) {
 	if (libbalsa_message_body_type(body) == LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART)
@@ -2192,7 +2192,7 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
     gchar *str, *date = NULL;
     const gchar *personStr;
 
-    libbalsa_message_body_ref(message);
+    libbalsa_message_body_ref(message, TRUE);
 
     personStr = libbalsa_address_get_name(message->from);
     if (!personStr)
@@ -3387,6 +3387,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 		libbalsa_message_reply(bsmsg->orig_message);
 	} else if (bsmsg->type == SEND_CONTINUE) {
 	    if (bsmsg->orig_message) {
+		GList * messages = g_list_prepend(NULL, bsmsg->orig_message);
                 /* use user header info to find if the continued
                  * message is a reply, then search for the original
                  * message to set the replied icon 
@@ -3396,8 +3397,8 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
                 if (is_reply(orig_type)) 
                     reply_postponed_message(bsmsg);
 
-		libbalsa_message_delete(bsmsg->orig_message, TRUE);
-		balsa_index_sync_backend(bsmsg->orig_message->mailbox);
+		libbalsa_messages_delete(messages, TRUE);
+		g_list_free(messages);
 	    }
 	}
     }
@@ -3508,8 +3509,10 @@ message_postpone(BalsaSendmsg * bsmsg)
                                              bsmsg->flow);
     if(successp) {
 	if (bsmsg->type == SEND_CONTINUE && bsmsg->orig_message) {
-	    libbalsa_message_delete(bsmsg->orig_message, TRUE);
-	    balsa_index_sync_backend(bsmsg->orig_message->mailbox);
+	    GList * messages = g_list_prepend(NULL, bsmsg->orig_message);
+
+	    libbalsa_messages_delete(messages, TRUE);
+	    g_list_free(messages);
 	}
     }
     gtk_object_unref(GTK_OBJECT(message));

@@ -64,34 +64,13 @@ static void libbalsa_message_init(LibBalsaMessage * message);
 
 static void libbalsa_message_destroy(GtkObject * object);
 
-/* Signal Hanlders */
-static void libbalsa_message_real_clear_flags(LibBalsaMessage * message);
-static void libbalsa_message_real_set_answered_flag(LibBalsaMessage *
-						    message, gboolean set);
-static void libbalsa_message_real_set_read_flag(LibBalsaMessage * message,
-						gboolean set);
-static void libbalsa_message_real_set_deleted_flag(LibBalsaMessage *
-						   message, gboolean set);
-static void libbalsa_message_real_set_flagged(LibBalsaMessage * message,
-					      gboolean set);
-
 static gchar *ADDRESS_to_gchar(const ADDRESS * addr);
 
 #ifdef DEBUG
 static char *mime_content_type2str(int contenttype);
 #endif
 
-enum {
-    CLEAR_FLAGS,
-    SET_ANSWERED,
-    SET_READ,
-    SET_DELETED,
-    SET_FLAGGED,
-    LAST_SIGNAL
-};
-
 static GtkObjectClass *parent_class = NULL;
-static guint libbalsa_message_signals[LAST_SIGNAL] = { 0 };
 
 GtkType
 libbalsa_message_get_type()
@@ -153,59 +132,7 @@ libbalsa_message_class_init(LibBalsaMessageClass * klass)
 
     parent_class = gtk_type_class(gtk_object_get_type());
 
-    libbalsa_message_signals[CLEAR_FLAGS] =
-	gtk_signal_new("clear-flags",
-		       GTK_RUN_FIRST,
-		       GTK_CLASS_TYPE(object_class),
-		       GTK_SIGNAL_OFFSET(LibBalsaMessageClass,
-					 clear_flags),
-		       gtk_marshal_NONE__NONE, GTK_TYPE_NONE, 0);
-
-    libbalsa_message_signals[SET_ANSWERED] =
-	gtk_signal_new("set-answered",
-		       GTK_RUN_FIRST,
-		       GTK_CLASS_TYPE(object_class),
-		       GTK_SIGNAL_OFFSET(LibBalsaMessageClass,
-					 set_answered),
-		       gtk_marshal_NONE__BOOL, GTK_TYPE_NONE, 1,
-		       GTK_TYPE_BOOL);
-
-    libbalsa_message_signals[SET_READ] =
-	gtk_signal_new("set-read",
-		       GTK_RUN_FIRST,
-		       GTK_CLASS_TYPE(object_class),
-		       GTK_SIGNAL_OFFSET(LibBalsaMessageClass, set_read),
-		       gtk_marshal_NONE__BOOL,
-		       GTK_TYPE_NONE, 1, GTK_TYPE_BOOL);
-
-    libbalsa_message_signals[SET_DELETED] =
-	gtk_signal_new("set-deleted",
-		       GTK_RUN_LAST,
-		       GTK_CLASS_TYPE(object_class),
-		       GTK_SIGNAL_OFFSET(LibBalsaMessageClass,
-					 set_deleted),
-		       gtk_marshal_NONE__BOOL, GTK_TYPE_NONE, 1,
-		       GTK_TYPE_BOOL);
-
-    libbalsa_message_signals[SET_FLAGGED] =
-	gtk_signal_new("set-flagged",
-		       GTK_RUN_FIRST,
-		       object_class->type,
-		       GTK_SIGNAL_OFFSET(LibBalsaMessageClass,
-					 set_flagged),
-		       gtk_marshal_NONE__BOOL, GTK_TYPE_NONE, 1,
-		       GTK_TYPE_BOOL);
-
-    gtk_object_class_add_signals(object_class, libbalsa_message_signals,
-				 LAST_SIGNAL);
-
     object_class->destroy = libbalsa_message_destroy;
-
-    klass->clear_flags = libbalsa_message_real_clear_flags;
-    klass->set_answered = libbalsa_message_real_set_answered_flag;
-    klass->set_read = libbalsa_message_real_set_read_flag;
-    klass->set_deleted = libbalsa_message_real_set_deleted_flag;
-    klass->set_flagged = libbalsa_message_real_set_flagged;
 }
 
 LibBalsaMessage *
@@ -456,25 +383,6 @@ libbalsa_message_user_hdrs(LibBalsaMessage * message)
     return g_list_reverse(res);
 }
 
-
-gboolean
-libbalsa_message_move(LibBalsaMessage * message, LibBalsaMailbox * dest)
-{
-    if (message->mailbox->readonly) {
-	libbalsa_information(
-	    LIBBALSA_INFORMATION_ERROR,
-	    _("Source mailbox (%s) is readonly. Cannot move message"),
-	    message->mailbox->name);
-	return FALSE;
-    }
-
-    if (libbalsa_message_copy (message, dest)) {
-        libbalsa_message_delete (message, TRUE);
-        return TRUE;
-    } else
-        return FALSE;
-}
-
 gboolean
 libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
 {
@@ -523,11 +431,9 @@ libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
     }
     libbalsa_unlock_mutt();
 
-    /* it would be faster to inline real_set_deleted_flag but this is
-       cleaner */
     /* FIXME : once more is order relevant here ? */
     d = g_list_reverse(d);
-    libbalsa_messages_delete(d);
+    libbalsa_messages_delete(d, TRUE);
     g_list_free(d);
 
     libbalsa_mailbox_close_append(handle);
@@ -639,209 +545,175 @@ libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
     return r;
 }
 
-static void
-libbalsa_message_real_clear_flags(LibBalsaMessage * message)
+/* Assume all messages come from the same mailbox */
+void
+libbalsa_messages_read(GList * messages, gboolean set)
 {
-    g_return_if_fail(message->mailbox);
-    LOCK_MAILBOX(message->mailbox);
-    message->flags = 0;
-    UNLOCK_MAILBOX(message->mailbox);
-}
+    GList * notif_list = NULL;
+    LibBalsaMessage * message;
 
-static void
-libbalsa_message_real_set_answered_flag(LibBalsaMessage * message,
-					gboolean set)
-{
-    HEADER *cur;
-
-    g_return_if_fail(message->mailbox);
-    LOCK_MAILBOX(message->mailbox);
-    RETURN_IF_CLIENT_CONTEXT_CLOSED(message->mailbox);
-
-    cur = message->header;
-
-    libbalsa_lock_mutt();
-    mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_REPLIED, TRUE);
-    libbalsa_unlock_mutt();
-
-    message->flags |= LIBBALSA_MESSAGE_FLAG_REPLIED;
-
-    UNLOCK_MAILBOX(message->mailbox);
-}
-
-static void
-libbalsa_message_real_set_read_flag(LibBalsaMessage * message,
-				    gboolean set)
-{
-    HEADER *cur;
-
-    g_return_if_fail(message->mailbox);
-
-    LOCK_MAILBOX(message->mailbox);
-    RETURN_IF_CLIENT_CONTEXT_CLOSED(message->mailbox);
-    
-    cur = message->header;
-    if (set && (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)) {
-	libbalsa_lock_mutt();
-	mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_READ, TRUE);
-	mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_OLD, FALSE);
-	libbalsa_unlock_mutt();
-
-	message->flags &= ~LIBBALSA_MESSAGE_FLAG_NEW;
-	message->mailbox->unread_messages--;
-
-	if (message->mailbox->unread_messages <= 0)
-	    libbalsa_mailbox_set_unread_messages_flag(message->mailbox,
-						      FALSE);
-
-    } else if (!set && !(message->flags & LIBBALSA_MESSAGE_FLAG_NEW)) {
-	libbalsa_lock_mutt();
-	mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_READ, FALSE);
-	mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_OLD, FALSE);
-	libbalsa_unlock_mutt();
-
-	message->flags |= LIBBALSA_MESSAGE_FLAG_NEW;
-	message->mailbox->unread_messages++;
-	libbalsa_mailbox_set_unread_messages_flag(message->mailbox, TRUE);
+    /* Construct the list of messages that actually change state */
+    while (messages) {
+	message = LIBBALSA_MESSAGE(messages->data);
+	if ( (set && (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)) ||
+	     (!set && !(message->flags & LIBBALSA_MESSAGE_FLAG_NEW)) )
+	    notif_list = g_list_prepend(notif_list, message);
+	messages = g_list_next(messages);
     }
-
-    UNLOCK_MAILBOX(message->mailbox);
-}
-
-static void
-libbalsa_message_real_set_flagged(LibBalsaMessage * message, gboolean set)
-{
-    HEADER *cur;
-
-    g_return_if_fail(message->mailbox);
-    LOCK_MAILBOX(message->mailbox);
-    RETURN_IF_CLIENT_CONTEXT_CLOSED(message->mailbox);
-
-    cur = message->header;
-    if (!set && (message->flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)) {
-	libbalsa_lock_mutt();
-	mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_FLAG,
-		      FALSE);
-	libbalsa_unlock_mutt();
-
-	message->flags &= ~LIBBALSA_MESSAGE_FLAG_FLAGGED;
-    } else if (set) {
-	libbalsa_lock_mutt();
-	mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_FLAG, TRUE);
-	libbalsa_unlock_mutt();
-
-	message->flags |= LIBBALSA_MESSAGE_FLAG_FLAGGED;
-    }
-
-    UNLOCK_MAILBOX(message->mailbox);
-}
-
-static void
-libbalsa_message_real_set_deleted_flag(LibBalsaMessage * message,
-				       gboolean set)
-{
-    HEADER *cur;
-
-    g_return_if_fail(message->mailbox);
     
-    if ( (set && (message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)) ||
-         (!set && !(message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)))
-        return; /* no status change */
- 
-    LOCK_MAILBOX(message->mailbox);
-    RETURN_IF_CLIENT_CONTEXT_CLOSED(message->mailbox);
-    cur = message->header;
+    if (notif_list) {
+	HEADER * cur;
+	LibBalsaMailbox * mbox = LIBBALSA_MESSAGE(notif_list->data)->mailbox;
+	GList * lst = notif_list;
 
-    libbalsa_lock_mutt();
-    mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_DELETE, set);
-    libbalsa_unlock_mutt();
+	LOCK_MAILBOX(mbox);
+	RETURN_IF_CLIENT_CONTEXT_CLOSED(mbox);
+	libbalsa_lock_mutt();
 
-    if (set) {
-	message->flags |= LIBBALSA_MESSAGE_FLAG_DELETED;
-	message->mailbox->total_messages--;
+	while (lst) {
+	    message = LIBBALSA_MESSAGE(lst->data);	    
+	    cur = message->header;
+	    mutt_set_flag(CLIENT_CONTEXT(mbox), cur, M_READ, set);
+	    mutt_set_flag(CLIENT_CONTEXT(mbox), cur, M_OLD, FALSE);
 
-	if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW) {
-	    message->mailbox->unread_messages--;
-
-	    if (message->mailbox->unread_messages <= 0)
-		libbalsa_mailbox_set_unread_messages_flag(message->mailbox,
-							  FALSE);
+	    if (set)
+		message->flags &= ~LIBBALSA_MESSAGE_FLAG_NEW;
+	    else
+		message->flags |= LIBBALSA_MESSAGE_FLAG_NEW;
+	    lst = g_list_next(lst);
 	}
-    } else {
-	message->flags &= ~LIBBALSA_MESSAGE_FLAG_DELETED;
-	message->mailbox->total_messages++;
-	if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)
-	    message->mailbox->unread_messages++;
+	libbalsa_unlock_mutt();
+
+	UNLOCK_MAILBOX(mbox);
+	/* Emission of notification to the owning mailbox */
+	libbalsa_mailbox_messages_status_changed(mbox, notif_list,
+						 LIBBALSA_MESSAGE_FLAG_NEW);
+	g_list_free(notif_list);
     }
-
-    UNLOCK_MAILBOX(message->mailbox);
 }
 
 void
-libbalsa_message_flag(LibBalsaMessage * message, gboolean flag)
+libbalsa_messages_flag(GList * messages, gboolean flag)
 {
-    g_return_if_fail(message != NULL);
-    g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
+    GList * notif_list = NULL;
+    LibBalsaMessage * message;
 
-    gtk_signal_emit(GTK_OBJECT(message),
-		    libbalsa_message_signals[SET_FLAGGED], flag);
+    g_return_if_fail(messages != NULL);
+    g_return_if_fail( LIBBALSA_MESSAGE(messages->data)->mailbox);
+
+    /* Construct the list of messages that actually change state */
+    while (messages) {
+	message = LIBBALSA_MESSAGE(messages->data);
+	if ( (flag && !(message->flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)) ||
+	     (!flag && (message->flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)) )
+	    notif_list = g_list_prepend(notif_list, message);
+	messages = g_list_next(messages);
+    }
+    
+    if (notif_list) {
+	HEADER * cur;
+	LibBalsaMailbox * mbox = LIBBALSA_MESSAGE(notif_list->data)->mailbox;
+	GList * lst = notif_list;
+
+	LOCK_MAILBOX(mbox);
+	RETURN_IF_CLIENT_CONTEXT_CLOSED(mbox);
+	libbalsa_lock_mutt();
+
+	while (lst) {
+	    message = LIBBALSA_MESSAGE(lst->data);
+	    cur = message->header;
+	    mutt_set_flag(CLIENT_CONTEXT(mbox), cur, M_FLAG, flag);
+	    if (!flag)
+		message->flags &= ~LIBBALSA_MESSAGE_FLAG_FLAGGED;
+	    else
+		message->flags |= LIBBALSA_MESSAGE_FLAG_FLAGGED;
+	    lst = g_list_next(lst);
+	}
+	libbalsa_unlock_mutt();
+
+	UNLOCK_MAILBOX(mbox);
+	/* Emission of notification to the owning mailbox */
+	libbalsa_mailbox_messages_status_changed(mbox, notif_list,
+						 LIBBALSA_MESSAGE_FLAG_FLAGGED);    
+	g_list_free(notif_list);
+    }
 }
-
-
-void
-libbalsa_message_clear_flags(LibBalsaMessage * message)
-{
-    g_return_if_fail(message != NULL);
-    g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
-
-    gtk_signal_emit(GTK_OBJECT(message),
-		    libbalsa_message_signals[CLEAR_FLAGS]);
-}
-
 
 void
 libbalsa_message_reply(LibBalsaMessage * message)
 {
+    HEADER *cur;
+    GList * messages;
+
     g_return_if_fail(message != NULL);
     g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
 
-    gtk_signal_emit(GTK_OBJECT(message),
-		    libbalsa_message_signals[SET_ANSWERED], TRUE);
+    if ( (message->flags & LIBBALSA_MESSAGE_FLAG_REPLIED)
+ 	 || !message->mailbox)
+        return; /* no status change */
+
+    LOCK_MAILBOX(message->mailbox);
+    RETURN_IF_CLIENT_CONTEXT_CLOSED(message->mailbox);
+    libbalsa_lock_mutt();
+
+    cur = message->header;
+    mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_REPLIED, TRUE);
+
+    libbalsa_unlock_mutt();
+
+    message->flags |= LIBBALSA_MESSAGE_FLAG_REPLIED;
+ 
+    UNLOCK_MAILBOX(message->mailbox);
+    messages = g_list_prepend(NULL, message);
+    libbalsa_mailbox_messages_status_changed(message->mailbox, messages,
+					     LIBBALSA_MESSAGE_FLAG_REPLIED);
+    g_list_free(messages);
 }
 
+/* Slightly optimized version for a list of message [un]deletions
+   Assume that all messages are in the same mailbox
+*/
 void
-libbalsa_message_read(LibBalsaMessage * message, gboolean read)
-{
-    g_return_if_fail(message != NULL);
-    g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
-
-    gtk_signal_emit(GTK_OBJECT(message),
-		    libbalsa_message_signals[SET_READ], read);
-}
-
-void
-libbalsa_message_delete(LibBalsaMessage * message, gboolean del)
-{
-    g_return_if_fail(message != NULL);
-    g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
-    g_return_if_fail(message->mailbox != NULL);
-
-    gtk_signal_emit(GTK_OBJECT(message),
-		    libbalsa_message_signals[SET_DELETED], del);
-}
-
-void
-libbalsa_messages_delete(GList * messages)
+libbalsa_messages_delete(GList * messages, gboolean del)
 {
     LibBalsaMessage * message;
+    GList * notif_list = NULL;
     g_return_if_fail(messages != NULL);
     g_return_if_fail(LIBBALSA_IS_MESSAGE(messages->data));
 
-    while(messages){
-      message=LIBBALSA_MESSAGE(messages->data);
-      gtk_signal_emit(GTK_OBJECT(message),
-  	  	      libbalsa_message_signals[SET_DELETED], TRUE);
-      messages=g_list_next(messages);
+    /* Construct the list of messages that actually change state */
+    while (messages) {
+      message = LIBBALSA_MESSAGE(messages->data);
+      if ( (del && !(message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)) ||
+	   (!del && (message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)) )
+	  notif_list = g_list_prepend(notif_list, message);
+      messages = g_list_next(messages);
+    }
+    if (notif_list) {
+	HEADER * cur;
+	LibBalsaMailbox * mbox = LIBBALSA_MESSAGE(notif_list->data)->mailbox;
+	GList * lst = notif_list;
+
+	LOCK_MAILBOX(mbox);
+	RETURN_IF_CLIENT_CONTEXT_CLOSED(mbox);
+	libbalsa_lock_mutt();
+
+	while (lst) {
+	    message = LIBBALSA_MESSAGE(lst->data);
+	    cur = message->header;
+	    mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_DELETE, del);
+	    if (del)
+		message->flags |= LIBBALSA_MESSAGE_FLAG_DELETED;
+	    else message->flags &= ~LIBBALSA_MESSAGE_FLAG_DELETED;
+	    lst = g_list_next(lst);
+	}
+	libbalsa_unlock_mutt();
+	UNLOCK_MAILBOX(message->mailbox);
+	
+	/* Emission of notification to the owning mailbox */
+	libbalsa_mailbox_messages_status_changed(mbox, notif_list,
+						 LIBBALSA_MESSAGE_FLAG_DELETED);
+	g_list_free(notif_list);
     }
 }
 
@@ -877,7 +749,7 @@ mime_content_type2str(int contenttype)
    NOTE: all accesses to message->mailbox must lock mailbox first!
 */
 gboolean
-libbalsa_message_body_ref(LibBalsaMessage * message)
+libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
 {
     LibBalsaMessageBody *body;
     HEADER *cur;
@@ -988,8 +860,12 @@ libbalsa_message_body_ref(LibBalsaMessage * message)
     /*
      * emit read message
      */
-    if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)
-	libbalsa_message_read(message, TRUE);
+    if ((message->flags & LIBBALSA_MESSAGE_FLAG_NEW) && read) {
+	GList * messages = g_list_prepend(NULL, message);
+
+	libbalsa_messages_read(messages, TRUE);
+	g_list_free(messages);
+    }
     return TRUE;
 }
 

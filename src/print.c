@@ -1051,7 +1051,7 @@ print_info_new(const gchar * paper, LibBalsaMessage * msg,
 	pi->conv_data = iconv_open("UTF-8", "ISO-8859-1");
 
     /* now get the message contents... */
-    libbalsa_message_body_ref(msg);
+    libbalsa_message_body_ref(msg, TRUE);
     scan_body(pi, msg->body_list);
     libbalsa_message_body_unref(msg);
 

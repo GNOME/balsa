@@ -54,15 +54,15 @@ static GtkTargetEntry mblist_drop_types[] = {
     {"x-application/x-message-list", GTK_TARGET_SAME_APP, TARGET_MESSAGES}
 };
 
-#if 0
-static gint balsa_mblist_signals[LAST_SIGNAL] = { 0 };
-#endif
-
 static BalsaMBListClass *parent_class = NULL;
 
 static void balsa_mblist_unread_messages_changed_cb(LibBalsaMailbox *
 						    mailbox, gboolean flag,
 						    BalsaMBList * mblist);
+static void bmbl_mailbox_messages_changed_cb(LibBalsaMailbox * mailbox,
+					     GList * messages,
+					     gint flag,
+					     BalsaMBList * mblist);
 
 static void balsa_mblist_disconnect_mailbox_signals(GtkCTree * tree,
 						    GtkCTreeNode * node,
@@ -520,48 +520,6 @@ mblist_default_signal_bindings(BalsaMBList * mblist)
                         (gpointer) NULL);
 }
 
-#if 0
-/* balsa_mblist_insert_mailbox 
- *   
- * mblist:  The mailbox list where the mailbox is to be inserted
- * mailbox:  The mailbox to be inserted
- * icon:  The icon to be shown next to the mailbox name
- *
- * Description: This function is for inserting one of the several main
- * mailboxes.  It gets inserted under the main node.
- * */
-static void
-balsa_mblist_insert_mailbox(BalsaMBList * mblist,
-			    LibBalsaMailbox * mailbox, BalsaIconName icon)
-{
-    GtkCTreeNode *ctnode;
-    BalsaMailboxNode *mbnode;
-    gchar *text[3];
-
-    g_return_if_fail(mblist  != NULL);
-    g_return_if_fail(mailbox != NULL);
-
-    text[0] = mailbox->name;
-    text[1] = "";
-    text[2] = "";
-
-    gtk_signal_connect(GTK_OBJECT(mailbox), "set-unread-messages-flag",
-		       GTK_SIGNAL_FUNC
-		       (balsa_mblist_unread_messages_changed_cb),
-		       (gpointer) mblist);
-
-    ctnode = gtk_ctree_insert_node(GTK_CTREE(mblist),
-				   NULL, NULL, text, 4,
-				   balsa_icon_get_pixmap(icon),
-				   balsa_icon_get_bitmap(icon),
-				   NULL, NULL, TRUE, FALSE);
-    mbnode = BALSA_MAILBOX_NODE(balsa_mailbox_node_new_from_mailbox(mailbox));
-    /* don't destroy mailbox nodes: they are owned by 
-       balsa_app.mailbox_nodes */
-    gtk_ctree_node_set_row_data(GTK_CTREE(mblist), ctnode, mbnode);
-}
-#endif
-
 /* balsa_mblist_disconnect_mailbox_signals
  *
  * Remove the signals we attached to the mailboxes.
@@ -572,11 +530,9 @@ balsa_mblist_disconnect_mailbox_signals(GtkCTree * tree,
 {
     BalsaMailboxNode *mbnode = gtk_ctree_node_get_row_data(tree, node);
 
-    if (mbnode->mailbox) {
-	gtk_signal_disconnect_by_func(GTK_OBJECT(mbnode->mailbox),
-				      balsa_mblist_unread_messages_changed_cb,
+    if (mbnode->mailbox)
+	gtk_signal_disconnect_by_data(GTK_OBJECT(mbnode->mailbox),
 				      (gpointer) tree);
-    }
 }
 
 /* balsa_mblist_repopulate 
@@ -666,10 +622,16 @@ mailbox_nodes_to_ctree(GtkCTree * ctree, guint depth, GNode * gnode,
 				    balsa_icon_get_bitmap(in),
 				    FALSE, mbnode->expanded);
 	}
+	/* ctree is the balsa mailbox list */
 	gtk_signal_connect(GTK_OBJECT(mbnode->mailbox),
 			   "set-unread-messages-flag",
 			   GTK_SIGNAL_FUNC
 			   (balsa_mblist_unread_messages_changed_cb),
+			   (gpointer) ctree);
+	gtk_signal_connect(GTK_OBJECT(mbnode->mailbox),
+			   "messages-status-changed",
+			   GTK_SIGNAL_FUNC
+			   (bmbl_mailbox_messages_changed_cb),
 			   (gpointer) ctree);
     } else {
 	/* new directory, but not a mailbox */
@@ -978,7 +940,6 @@ balsa_mblist_update_node_style(GtkCTree * ctree, GtkCTreeNode * node,
 	    /* update the notebook label */
 	    __mbnode_set_tab_style(mbnode, mblist->unread_mailbox_style, 1);
 	    
-	    
 	    tmp_is_leaf = GTK_CTREE_ROW(node)->is_leaf;
 	    tmp_expanded = GTK_CTREE_ROW(node)->expanded;
 	    
@@ -992,7 +953,7 @@ balsa_mblist_update_node_style(GtkCTree * ctree, GtkCTreeNode * node,
 				    balsa_icon_get_bitmap(icon),
 				    tmp_is_leaf, tmp_expanded);
 	    mbnode->style |= MBNODE_STYLE_NEW_MAIL;
-	    
+ 
 	    /* If we have a count of the unread messages, and we are showing
 	     * columns, put the number in the unread column */
 	    if (mblist->display_info && mailbox->has_unread_messages
@@ -1321,12 +1282,11 @@ balsa_mblist_focus_mailbox(BalsaMBList * bmbl, LibBalsaMailbox * mailbox)
 */
 void
 mblist_remove_mblist_node(BalsaMBList *mblist, BalsaMailboxNode *mbnode,
-		GtkCTreeNode *node)
+			  GtkCTreeNode *node)
 {
     if (mbnode->mailbox)
-	gtk_signal_disconnect_by_func(GTK_OBJECT(mbnode->mailbox),
-				      balsa_mblist_unread_messages_changed_cb,
-				      (gpointer) GTK_CTREE(mblist));
+	balsa_mblist_disconnect_mailbox_signals(GTK_CTREE(mblist), node,
+						NULL);
     gtk_ctree_remove_node(GTK_CTREE(mblist), node);
 }
 
@@ -1417,13 +1377,29 @@ balsa_mblist_unread_messages_changed_cb(LibBalsaMailbox * mailbox,
 
     /* freeze here to speed things up and prevent ugly flickering */
     gtk_clist_freeze(GTK_CLIST(mblist));
-    balsa_mblist_update_node_style(
-	GTK_CTREE(mblist),
-	node,
-	gtk_ctree_node_get_row_data(GTK_CTREE(mblist), node));
+    balsa_mblist_update_node_style(GTK_CTREE(mblist),
+				   node,
+				   gtk_ctree_node_get_row_data(GTK_CTREE(mblist),
+							       node));
     gtk_clist_thaw(GTK_CLIST(mblist));
 }
 
+static void
+bmbl_mailbox_messages_changed_cb(LibBalsaMailbox * mailbox,
+				 GList * messages,
+				 gint flag,
+				 BalsaMBList * mblist)
+{
+    g_return_if_fail(mblist);
+    g_return_if_fail(mailbox);
+    /* We update the mailbox infos only if the flag changed was the DELETED flag
+       or the NEW flag, because they are the only ones that change the numbers
+       displayed
+     */
+    if ((flag == LIBBALSA_MESSAGE_FLAG_DELETED) ||
+	(flag == LIBBALSA_MESSAGE_FLAG_NEW))
+	balsa_mblist_update_mailbox(mblist, mailbox);
+}
 
 /* mblist_drag_cb
  * 

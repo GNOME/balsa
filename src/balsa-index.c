@@ -113,15 +113,17 @@ static void refresh_date(GtkCTree * ctree,
 
 /* mailbox callbacks */
 static void balsa_index_del (BalsaIndex * bindex, LibBalsaMessage * message);
-static void mailbox_message_changed_status_cb(LibBalsaMailbox * mb,
-					      LibBalsaMessage * message,
-					      BalsaIndex * bindex);
-static void mailbox_message_new_cb(BalsaIndex * bindex,
-				   LibBalsaMessage * message);
-static void mailbox_messages_new_cb(BalsaIndex * bindex, GList* messages);
+static void mailbox_messages_changed_status_cb(LibBalsaMailbox * mb,
+					       GList * messages,
+					       gint flag,
+					       BalsaIndex * bindex);
+static void mailbox_messages_added(BalsaIndex * bindex, GList* messages);
+static void mailbox_messages_added_cb(BalsaIndex * bindex, GList* messages);
 static void mailbox_message_delete_cb(BalsaIndex * bindex, 
 				      LibBalsaMessage * message);
-static void mailbox_messages_delete_cb(BalsaIndex * bindex, 
+static void mailbox_messages_removed(BalsaIndex * bindex, 
+				    GList  * message);
+static void mailbox_messages_removed_cb(BalsaIndex * bindex, 
 				       GList  * message);
 
 /* clist callbacks */
@@ -518,6 +520,7 @@ balsa_index_set_first_new_message(BalsaIndex * bindex)
     GtkCTreeNode *node =
         balsa_index_find_node(bindex, FALSE, LIBBALSA_MESSAGE_FLAG_NEW,
 			      FILTER_NOOP, NULL);
+
     if (node)
         bindex->first_new_message =
             LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data
@@ -648,20 +651,14 @@ balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
 	gtk_clist_set_column_title(GTK_CLIST(bindex->ctree), 3, _("To"));
     }
 
-    gtk_signal_connect(GTK_OBJECT(mailbox), "message-status-changed",
-		       GTK_SIGNAL_FUNC(mailbox_message_changed_status_cb),
+    gtk_signal_connect(GTK_OBJECT(mailbox), "messages-status-changed",
+		       GTK_SIGNAL_FUNC(mailbox_messages_changed_status_cb),
 		       (gpointer) bindex);
-    gtk_signal_connect_object(GTK_OBJECT(mailbox), "message-new",
-		       GTK_SIGNAL_FUNC(mailbox_message_new_cb),
+    gtk_signal_connect_object(GTK_OBJECT(mailbox), "messages-added",
+		       GTK_SIGNAL_FUNC(mailbox_messages_added_cb),
 		       (gpointer) bindex);
-    gtk_signal_connect_object(GTK_OBJECT(mailbox), "messages-new",
-		       GTK_SIGNAL_FUNC(mailbox_messages_new_cb),
-		       (gpointer) bindex);
-    gtk_signal_connect_object(GTK_OBJECT(mailbox), "message-delete",
-		       GTK_SIGNAL_FUNC(mailbox_message_delete_cb),
-		       (gpointer) bindex);
-    gtk_signal_connect_object(GTK_OBJECT(mailbox), "messages-delete",
-		       GTK_SIGNAL_FUNC(mailbox_messages_delete_cb),
+    gtk_signal_connect_object(GTK_OBJECT(mailbox), "messages-removed",
+		       GTK_SIGNAL_FUNC(mailbox_messages_removed_cb),
 		       (gpointer) bindex);
 
     /* do threading */
@@ -989,9 +986,6 @@ bndx_in_messages_list(BalsaIndex * index, gint msgno)
 	    match->msgno_end = new_end;	
 	}
     }
-    for (lst = match->matching_messages;lst;lst = g_list_next(lst))
-	g_print("%d ",GPOINTER_TO_INT(lst->data));
-    g_print("\n");
 
     /* The list is in reverse order : seq numbers of matching messages are
        ordered in decreasing order, so we can do the lookup quicker (we stop
@@ -1174,7 +1168,7 @@ bndx_next(GtkCTree * ctree, GtkCTreeNode * node, gboolean only_viewable)
  * common search code--look for next or previous, with or without flag
  */
 static GtkCTreeNode *
-balsa_index_find_node(BalsaIndex * bindex, gboolean previous,
+balsa_index_find_node(BalsaIndex * bindex, gboolean search_backward,
                       LibBalsaMessageFlag flag, gint op, GSList* conditions)
 {
     GtkCTreeNode *node;
@@ -1182,25 +1176,37 @@ balsa_index_find_node(BalsaIndex * bindex, gboolean previous,
     gboolean one_turn_done = FALSE;
     
     g_return_val_if_fail(bindex != NULL, NULL);
+    if(GTK_CLIST(bindex->ctree)->row_list == NULL)
+	return NULL;
 
     bi = g_new0(struct BalsaIndexScanInfo, 1);
     bi->index = bindex;
-    node =
-        GTK_CLIST(bindex->ctree)->selection
-        ? g_list_last(GTK_CLIST(bindex->ctree)->selection)->data : NULL;
-    if (!node)
-	return NULL;
 
+    /* find the node the search will start from */
+    if(search_backward) {
+	node =
+	    GTK_CLIST(bindex->ctree)->selection
+	    ? g_list_first(GTK_CLIST(bindex->ctree)->selection)->data 
+	    : gtk_ctree_node_nth(bindex->ctree, 
+				 GTK_CLIST(bindex->ctree)->rows-1);
+    } else {
+	node =
+	    GTK_CLIST(bindex->ctree)->selection
+	    ? g_list_last(GTK_CLIST(bindex->ctree)->selection)->data 
+	    : gtk_ctree_node_nth(bindex->ctree, 0);
+    }
+
+    g_return_val_if_fail(node, node);
     bi->flag = flag;
     bi->op = op;
     bi->conditions = conditions;
     do
-	if (previous) 
+	if (search_backward)
 	    node = bndx_prev(bindex->ctree, node, flag==0);
 	else {
 	    node = bndx_next(bindex->ctree, node, flag==0);
-	    /* When we search using flag, we wrap the research from the
-	       beginning. Do that once, no more (else -> infinite loop)
+	    /* When we search using flag, we wrap the search. Do that
+	       once, no more (else -> infinite loop)
 	    */
 	    if (!node && flag!=0 && !one_turn_done) {
 		node = gtk_ctree_node_nth(bindex->ctree, 0);
@@ -1371,9 +1377,8 @@ balsa_index_update_flag(BalsaIndex * bindex, LibBalsaMessage * message)
     g_return_if_fail(message != NULL);
 
     if( (node=gtk_ctree_find_by_row_data(GTK_CTREE(bindex->ctree), 
-					 NULL, message)) ) {
+					 NULL, message)) )
 	balsa_index_set_col_images(bindex, node, message);
-    }
 }
 
 static void
@@ -1706,71 +1711,88 @@ resize_column_event_cb(GtkCList * clist, gint column, gint width,
    became invalid. See for example #70807.
 
 */
-static void
-mailbox_message_changed_status_cb(LibBalsaMailbox * mb,
-				  LibBalsaMessage * message,
-				  BalsaIndex * bindex)
-{
-    if(libbalsa_mailbox_is_valid(mb))
-        balsa_index_update_flag(bindex, message);
-}
 
 static void
-mailbox_message_new_cb(BalsaIndex * bindex, LibBalsaMessage * message)
+mailbox_messages_changed_status_cb(LibBalsaMailbox * mb,
+				   GList * messages,
+				   gint flag,
+				   BalsaIndex * bindex)
 {
-    gtk_clist_freeze(GTK_CLIST (bindex->ctree));
-    balsa_index_add(bindex, message);
-    if(bindex->mailbox_node->mailbox->new_messages==0){
-	balsa_index_threading(bindex);
-	gtk_clist_sort (GTK_CLIST (bindex->ctree));
-	DO_CLIST_WORKAROUND(GTK_CLIST (bindex->ctree));
+    if (!libbalsa_mailbox_is_valid(mb)) return;
+
+    if (flag == LIBBALSA_MESSAGE_FLAG_DELETED &&
+	(balsa_app.hide_deleted || balsa_app.delete_immediately)) {
+	/* These messages are flagged as deleted, but we must remove them from
+	   the index because of the prefs
+	 */
+	gtk_clist_freeze(GTK_CLIST(bindex->ctree));
+	for(;messages;messages = g_list_next(messages))
+	    balsa_index_del(bindex, LIBBALSA_MESSAGE(messages->data));
+	balsa_index_check_visibility(GTK_CLIST(bindex->ctree), NULL, 0.5);
+	gtk_clist_thaw(GTK_CLIST(bindex->ctree));
     }
-    gtk_clist_thaw (GTK_CLIST (bindex->ctree));
-    balsa_mblist_update_mailbox(balsa_app.mblist, 
-                                bindex->mailbox_node->mailbox);
+    else 
+	for(;messages;messages = g_list_next(messages))
+	    balsa_index_update_flag(bindex, LIBBALSA_MESSAGE(messages->data));
 }
 
+/* mailbox_messages_added_cb : callback for sync with backend; the signal
+   is emitted by the mailbox when new messages has been retrieved (either
+   after opening the mailbox, or after "check new messages").
+*/
+/* Helper of the callback (also used directly) */
 static void
-mailbox_messages_new_cb(BalsaIndex * bindex, GList *messages)
+mailbox_messages_added(BalsaIndex * bindex, GList *messages)
 {
     LibBalsaMessage * message;
 
     gtk_clist_freeze(GTK_CLIST (bindex->ctree));
-    while(messages){
-	message=(LibBalsaMessage *)(messages->data);
+    while (messages) {
+	message = LIBBALSA_MESSAGE(messages->data);
 	balsa_index_add(bindex, message);
-	messages=g_list_next(messages);
+	messages = g_list_next(messages);
     }
     balsa_index_threading(bindex);
-    gtk_clist_sort (GTK_CLIST (bindex->ctree));
+    gtk_clist_sort(GTK_CLIST (bindex->ctree));
     DO_CLIST_WORKAROUND(GTK_CLIST (bindex->ctree));
-    gtk_clist_thaw (GTK_CLIST (bindex->ctree));
+    gtk_clist_thaw(GTK_CLIST (bindex->ctree));
 
     balsa_mblist_update_mailbox(balsa_app.mblist, 
-                                bindex->mailbox_node->mailbox);
+				bindex->mailbox_node->mailbox);
 }
 
 static void
-mailbox_message_delete_cb(BalsaIndex * bindex, LibBalsaMessage * message)
+mailbox_messages_added_cb(BalsaIndex * bindex, GList *messages)
 {
-    balsa_index_del(bindex, message);
-    balsa_index_check_visibility(GTK_CLIST(bindex->ctree), NULL, 0.5);
+    mailbox_messages_added(bindex, messages);
 }
 
+/* mailbox_messages_remove_cb : callback to sync with backend; the signal is
+   emitted by the mailbox to tell the frontend that it has removed mails
+   (this is in general when the mailbox is committed because it then removes
+   all mails flagged as deleted; the other case is when prefs about how to handle
+   deletions are changed : "hide deleted messages/delete immediately")
+ */
+/* Helper of the callback (also used directly) */
 static void
-mailbox_messages_delete_cb(BalsaIndex * bindex, GList * messages)
+mailbox_messages_removed(BalsaIndex * bindex, GList * messages)
 {
     LibBalsaMessage * message;
     gtk_clist_freeze(GTK_CLIST(bindex->ctree));
 
-    while(messages){
-	message=(LibBalsaMessage *)(messages->data);
+    while (messages) {
+	message = LIBBALSA_MESSAGE(messages->data);
 	balsa_index_del(bindex, message);
-	messages=g_list_next(messages);
+	messages = g_list_next(messages);
     }
 
     balsa_index_check_visibility(GTK_CLIST(bindex->ctree), NULL, 0.5);
     gtk_clist_thaw(GTK_CLIST(bindex->ctree));
+}
+static void
+mailbox_messages_removed_cb(BalsaIndex * bindex, GList * messages)
+{
+    mailbox_messages_removed(bindex, messages);
 }
 
 /* 
@@ -1960,28 +1982,18 @@ do_delete(BalsaIndex* index, gboolean move_to_trash)
 	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
 	messages= g_list_prepend(messages, message);
     }
+    balsa_index_select_next_threaded(index);
     messages = g_list_reverse(messages);
     if(messages) {
 	if (move_to_trash && (index != trash)) {
 	    libbalsa_messages_move(messages, balsa_app.trash);
 	    enable_empty_trash(TRASH_FULL);
 	} else {
-	    libbalsa_messages_delete(messages);
+	    libbalsa_messages_delete(messages, TRUE);
 	    if (index == trash)
 		enable_empty_trash(TRASH_CHECK);
 	}
 	g_list_free(messages);
-
-        /* select another message depending on where we are in the list
-         */
-        balsa_index_select_next_threaded(index);
-
-        /* sync with backend AFTER adjacent message is selected.
-         * Update the style and message counts in the mailbox list */
-        balsa_index_sync_backend(index->mailbox_node->mailbox);
-        balsa_mblist_update_mailbox(balsa_app.mblist,
-                                    index->mailbox_node->mailbox);
-        /* balsa_index_redraw_current(index); */
     }
 }
 
@@ -2005,6 +2017,7 @@ balsa_message_undelete(GtkWidget * widget, gpointer user_data)
 {
     GList *list;
     LibBalsaMessage *message;
+    GList * messages = NULL;
     BalsaIndex* index;
 
 
@@ -2016,9 +2029,11 @@ balsa_message_undelete(GtkWidget * widget, gpointer user_data)
 
     while (list) {
 	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
-	libbalsa_message_delete(message, FALSE);
-	list = list->next;
+	messages = g_list_prepend(messages, message);
+	list = g_list_next(list);
     }
+    libbalsa_messages_delete(messages, FALSE);
+    g_list_free(messages);
 }
 
 gint
@@ -2047,20 +2062,20 @@ balsa_find_notebook_page_num(LibBalsaMailbox * mailbox)
  */
 static void
 balsa_message_toggle_flag(BalsaIndex* index, LibBalsaMessageFlag flag,
-                          void(*cb)(LibBalsaMessage*, gboolean))
+                          void(*cb)(GList*, gboolean))
 {
     GList *list;
-    LibBalsaMessage *message;
+    LibBalsaMessage * message;
+    GList * messages  = NULL;
     int is_all_flagged = TRUE;
     gboolean new_flag;
 
     /* First see if we should set given flag or unset */
-    for(list=GTK_CLIST(index->ctree)->selection; list; list=list->next) {
+    for(list=GTK_CLIST(index->ctree)->selection; list; list = g_list_next(list)) {
 	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
-	if (!(message->flags & flag)) {
+	if (!(message->flags & flag))
 	    is_all_flagged = FALSE;
-	    break;
-	}
+	messages = g_list_prepend(messages, message);
     }
 
     /* If they all have the flag set, then unset them. Otherwise, set
@@ -2074,12 +2089,9 @@ balsa_message_toggle_flag(BalsaIndex* index, LibBalsaMessageFlag flag,
          LIBBALSA_MESSAGE_FLAG_NEW ? is_all_flagged : !is_all_flagged);
 
     gtk_clist_freeze(GTK_CLIST(balsa_app.mblist));
-    for (list=GTK_CLIST(index->ctree)->selection; list; list=list->next) {
-	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
-        (*cb) (message, new_flag);
-    }
+    (*cb) (messages, new_flag);
     gtk_clist_thaw(GTK_CLIST(balsa_app.mblist));
-    balsa_index_sync_backend(index->mailbox_node->mailbox);
+    g_list_free(messages);
 }
 
 /* This function toggles the FLAGGED attribute of a list of messages
@@ -2091,7 +2103,7 @@ balsa_message_toggle_flagged(GtkWidget * widget, gpointer user_data)
 
     balsa_message_toggle_flag(BALSA_INDEX(user_data), 
                               LIBBALSA_MESSAGE_FLAG_FLAGGED,
-                              libbalsa_message_flag);
+                              libbalsa_messages_flag);
 }
 
 
@@ -2104,7 +2116,7 @@ balsa_message_toggle_new(GtkWidget * widget, gpointer user_data)
 
     balsa_message_toggle_flag(BALSA_INDEX(user_data), 
                               LIBBALSA_MESSAGE_FLAG_NEW,
-                              libbalsa_message_read);
+                              libbalsa_messages_read);
 }
 
 
@@ -2213,9 +2225,9 @@ idle_handler_cb(GtkWidget * widget)
     }
     
     /* Update the style and message counts in the mailbox list */
-    if(index->mailbox_node)
+    /*    if(index->mailbox_node)
 	balsa_mblist_update_mailbox(balsa_app.mblist, 
-				    index->mailbox_node->mailbox);
+	index->mailbox_node->mailbox);*/
 
     gdk_threads_leave();
     return FALSE;
@@ -2706,9 +2718,9 @@ hide_deleted(BalsaIndex * bindex, gboolean hide)
     }
 
     if (hide)
-        mailbox_messages_delete_cb(bindex, messages);
+        mailbox_messages_removed(bindex, messages);
     else
-        mailbox_messages_new_cb(bindex, messages);
+        mailbox_messages_added(bindex, messages);
 
     g_list_free(messages);
 }
@@ -2735,12 +2747,9 @@ balsa_index_transfer(GList * messages, LibBalsaMailbox * from_mailbox,
     if (copy)
         libbalsa_messages_copy(messages, to_mailbox);
     else {
-        libbalsa_messages_move(messages, to_mailbox);
         balsa_index_select_next_threaded(bindex);
-        balsa_index_sync_backend(from_mailbox);
+        libbalsa_messages_move(messages, to_mailbox);
     }
-
-    balsa_mblist_update_mailbox(balsa_app.mblist, to_mailbox);
 
     if (from_mailbox == balsa_app.trash && !copy)
         enable_empty_trash(TRASH_CHECK);

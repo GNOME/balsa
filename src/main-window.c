@@ -1414,6 +1414,7 @@ balsa_close_commit_mailbox_on_timer(GtkWidget * widget, gpointer * data)
     if (! (balsa_app.close_mailbox_auto || balsa_app.commit_mailbox_auto) )
         return TRUE;
 
+    gdk_threads_enter();
     g_get_current_time(&current_time);
 
     c = gtk_notebook_get_current_page(GTK_NOTEBOOK(balsa_app.notebook));
@@ -1449,6 +1450,7 @@ balsa_close_commit_mailbox_on_timer(GtkWidget * widget, gpointer * data)
             i--;
         };
     }
+    gdk_threads_leave();
     return TRUE;
 }
 
@@ -2623,15 +2625,9 @@ empty_trash(void)
     GList *message;
 
     if(!libbalsa_mailbox_open(balsa_app.trash)) return;
-
-    message = balsa_app.trash->message_list;
-
-    while (message) {
-        libbalsa_message_delete(message->data, TRUE);
-        message = message->next;
-    }
+    
+    libbalsa_messages_delete( balsa_app.trash->message_list, TRUE);
     libbalsa_mailbox_close(balsa_app.trash);
-    balsa_mblist_update_mailbox(balsa_app.mblist, balsa_app.trash);
     enable_empty_trash(TRASH_EMPTY);
 }
 

@@ -671,7 +671,6 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
 
     mimap->opened         = TRUE;
     mailbox->disconnected = FALSE;
-    mailbox->messages = 0;
     mailbox->unread_messages = 0;
     mailbox->total_messages = imap_mbox_handle_get_exists(mimap->handle);
     mimap->messages_info = g_array_sized_new(FALSE, TRUE, 
@@ -1812,30 +1811,19 @@ lbmi_get_imap_sort_key(LibBalsaMailbox *mbox)
 {
     ImapSortKey key = LB_MBOX_FROM_COL;
 
-    switch (mbox->sort_column_id) {
+    switch (mbox->view->sort_field) {
     default:
-    case LB_MBOX_MSGNO_COL:   key = IMSO_MSGNO;   break;
-    case LB_MBOX_FROM_COL:    
+    case LB_MAILBOX_SORT_NO:	  key = IMSO_MSGNO;   break;
+    case LB_MAILBOX_SORT_SENDER:    
         key = mbox->view->show == LB_MAILBOX_SHOW_TO
-            ? IMSO_TO : IMSO_FROM;                break;
-    case LB_MBOX_SUBJECT_COL: key = IMSO_SUBJECT; break;
-    case LB_MBOX_DATE_COL:    key = IMSO_DATE;    break;
-    case LB_MBOX_SIZE_COL:    key = IMSO_SIZE;    break;
+            ? IMSO_TO : IMSO_FROM;		      break;
+    case LB_MAILBOX_SORT_SUBJECT: key = IMSO_SUBJECT; break;
+    case LB_MAILBOX_SORT_DATE:    key = IMSO_DATE;    break;
+    case LB_MAILBOX_SORT_SIZE:    key = IMSO_SIZE;    break;
     }
+
     return key;
 }
-static gboolean
-insert_in_data(GNode *node, gpointer data)
-{
-    LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(data);
-    if(!g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
-                    node->data)) {
-        libbalsa_mailbox_msgno_filt_in(mailbox,
-                                       GPOINTER_TO_UINT(node->data));
-    }
-    return FALSE;
-}
-    
      
 static void
 libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
@@ -1852,7 +1840,8 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
         if(filter) {
             imap_sort_filter(mimap->handle,
                              lbmi_get_imap_sort_key(mailbox),
-                             mailbox->order == GTK_SORT_ASCENDING,
+                             mailbox->view->sort_type ==
+			     LB_MAILBOX_SORT_TYPE_ASC,
                              filter);
             new_tree =
                 g_node_copy(imap_mbox_handle_get_thread_root(mimap->handle));
@@ -1872,12 +1861,7 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
 	g_assert_not_reached();
 	new_tree = NULL;
     }
-    /* FIXME: remove msgs from the old tree if they do not exist in
-       the new one. */
-    
-    /* add messages that do exist in the new tree but not in the old one. */
-    g_node_traverse(new_tree, G_PRE_ORDER, G_TRAVERSE_ALL, -1,
-                    insert_in_data, mailbox);
+
     if (new_tree)
 	libbalsa_mailbox_set_msg_tree(mailbox, new_tree);
 }
@@ -1911,10 +1895,11 @@ libbalsa_mailbox_imap_sort(LibBalsaMailbox *mbox, GArray *array)
     GArray *tmp;
     len = array->len;
 
-    if(mbox->sort_column_id == LB_MBOX_MSGNO_COL) {
+    if(mbox->view->sort_field == LB_MAILBOX_SORT_NO
+	|| mbox->view->sort_field == LB_MAILBOX_SORT_NATURAL) {
         g_array_sort_with_data(array, (GCompareDataFunc)lbmi_compare_func,
-                               GINT_TO_POINTER(mbox->order ==
-                                               GTK_SORT_ASCENDING));
+                               GINT_TO_POINTER(mbox->view->sort_type ==
+                                               LB_MAILBOX_SORT_TYPE_ASC));
         return;
     }
     if(mbox->view->threading_type != LB_MAILBOX_THREADING_FLAT)
@@ -1936,7 +1921,7 @@ libbalsa_mailbox_imap_sort(LibBalsaMailbox *mbox, GArray *array)
     qsort(msgno_arr, len, sizeof(msgno_arr[0]), cmp_msgno);
     imap_sort_msgno(LIBBALSA_MAILBOX_IMAP(mbox)->handle,
                     lbmi_get_imap_sort_key(mbox),
-                    mbox->order == GTK_SORT_ASCENDING,
+                    mbox->view->sort_type == LB_MAILBOX_SORT_TYPE_ASC,
                     msgno_arr, len); /* ignore errors */
     
     tmp = g_array_new(FALSE,FALSE, sizeof(SortTuple));

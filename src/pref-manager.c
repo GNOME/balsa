@@ -819,7 +819,7 @@ create_mailserver_page ( )
 	table3 = gtk_table_new (3, 1, FALSE);
 	gtk_widget_show (table3);
 
-	frame3 = gtk_frame_new (_("Remote Malibox Servers"));
+	frame3 = gtk_frame_new (_("Remote Mailbox Servers"));
 	gtk_widget_show (frame3);
 	gtk_table_attach (GTK_TABLE (table3), frame3, 0, 1, 0, 1,
 			  (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),

@@ -1,3 +1,7 @@
+2000-04-23  Andreas Hyden  <a.hyden@cyberpoint.se>
+
+	* src/pref-manager.c: Fixed a litte spellerror.
+
 2000-04-21  Peter Williams  <peter@beta.newton.cx>
 
 	* src/Makefile.am (INCLUDES): Include $(top_builddir)/idl

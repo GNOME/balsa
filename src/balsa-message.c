@@ -1631,6 +1631,8 @@ handle_url(const message_url_t* url)
 
 /* END OF HELPER FUNCTIONS ----------------------------------------------- */
 
+static gint resize_idle_id;
+
 static void
 part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 {
@@ -1824,7 +1826,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         info->can_display = TRUE;
         /* size allocation may not be correct, so we'll check back later
          */
-        g_idle_add((GSourceFunc) resize_idle, item);
+        resize_idle_id = g_idle_add((GSourceFunc) resize_idle, item);
     }
 
     fclose(fp);
@@ -2473,7 +2475,6 @@ static void add_multipart(BalsaMessage *bm, LibBalsaMessageBody *parent)
 
 static GtkWidget *old_widget, *new_widget;
 static gdouble old_upper, new_upper;
-static gint resize_idle_id;
 
 static gboolean
 resize_idle(GtkWidget * widget)

@@ -1,3 +1,7 @@
+2000-06-23  Peter Williams <peter@newton.cx>
+
+	* main.html.in: Add a "Balsa Reviewed" section.
+	
 2000-06-20  Pawel Salek <pawsa@theochem.kth.se>
 
 	* main.html.in, download.html.in: 0.8.1 announcement.

@@ -1,0 +1,11 @@
+Source: balsa
+Section: x11
+Priority: optional
+Maintainer:  <pavlov@innerx.net>
+Standards-Version: 2.4.0.0
+
+Package: balsa
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: Missing
+ Missing

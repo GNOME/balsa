@@ -1,3 +1,7 @@
+2003-03-01 16:23  PeterB
+
+	* src/ab-window.c: Fix packing options.
+
 2003-02-28  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/libbalsa.c: recignize 8-bit charsets before euc-xx etc.

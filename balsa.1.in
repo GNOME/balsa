@@ -1,16 +1,46 @@
-.TH Balsa 1 "21 Dec 1999" Version @VERSION@
+.TH Balsa 1 "4 Mar 2000" Version @VERSION@
 .SH NAME
 Balsa - the GNOME email client.
 
 .SH SYNOPSIS
 .B balsa
-[\-h] [\-\-help] [-v] [\-\-version]
+.RB [ \-h ] 
+.RB [ \-\^\-help ] 
+.RB [ \-v ] 
+.RB [ \-\^\-version ] 
+.RB [ \-c ] 
+.RB [ \-\^\-checkmail ] 
+.RB [ \-m 
+.IR USER@HOST.TLD ] 
+.RB [ \-\^\-compose=\fIUSER@HOST.TLD\fP ] 
+.RB [ \-o 
+.IR MAILBOX ]  
+.RB [ \-\^\-open\-mailbox=\fIMAILBOX\fP ] 
+.RB [ \-u ] 
+.RB [ \-\^\-open\-unread\-mailbox ]
 
 
 .SH DESCRIPTION
 .PP
 \fIBalsa\fP is a e-mail reader.  This client is part of the GNOME desktop
-environment.  It supports local mailboxes, POP3 and IMAP.
+environment.  It supports local mailboxes, POP3 and IMAP.  For help on using Balsa, see the program documentation in the help menu.
+
+.SH OPTIONS
+.TP 
+.BR \-c ", " \-\^\-checkmail
+Balsa will immediately check for new mail when the program is launched
+
+.TP
+.BI \-m " USER@HOST.TLD" "\fR,\fP \-\^\-compose=" USER@HOST.TLD
+When invoked with this option, balsa will open a new message with the specified address in the To: field.
+
+.TP
+.BI \-o " MAILBOX" "\fR,\fP \-\^\-open-mailbox=" MAILBOX
+Balsa will open automatically at startup the mailbox or mailboxes specified on the command line with this option.  Multiple mailboxes are delimited by semicolons.
+
+.TP
+.BR \-u ", " \-\^\-open-unread-mailbox
+Open the first unread mailbox when balsa is launched.
 
 .SH WEBSITE
 http://www.balsa.net/
@@ -21,7 +51,7 @@ http://www.balsa.net/
 .BR sendmail (8)
 
 .SH COPYRIGHT
-Copyright \(co 1997-99 Stuart Parmenter and Jay Painter
+Copyright \(co 1997-2000 Stuart Parmenter and Jay Painter
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted,
@@ -52,7 +82,7 @@ better.
 Stuart Parmenter and Jay Painter.
 
 .SH MAJOR CONTRIBUTORS
-Without these people, 0.6.0 would not be happening:
+Without these people, @VERSION@ would not be happening:
 Peter Williams
 David Pickens
 Héctor García Álvarez

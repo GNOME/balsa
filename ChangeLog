@@ -3,6 +3,7 @@
 	* libbalsa/misc.[hc]: add libbalsa_{expand,contract}_path wrappers.
 	* src/sendmsg-window.c: add Czech language and ~ sig path support
 	(#102472, #102470).
+	* src/balsa-app.[hc]: change default action for D&D (#102140).
 
 2003-01-03 PeterB
 

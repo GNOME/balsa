@@ -262,8 +262,9 @@ balsa_message_init(BalsaMessage * bm)
     bm->part_list = gnome_icon_list_new(100, NULL, FALSE);
     gnome_icon_list_set_selection_mode(GNOME_ICON_LIST(bm->part_list),
 				       GTK_SELECTION_MULTIPLE);
-    g_signal_connect(G_OBJECT(bm->part_list), "select_icon",
-		     G_CALLBACK(select_icon_cb), bm);
+    bm->select_icon_handler =
+        g_signal_connect(G_OBJECT(bm->part_list), "select_icon",
+		         G_CALLBACK(select_icon_cb), bm);
     g_signal_connect(G_OBJECT(bm->part_list), "popup-menu",
                      G_CALLBACK(bm_popup_menu_cb), NULL);
     g_signal_connect(G_OBJECT(bm->part_list), "size_request",
@@ -419,14 +420,10 @@ static void
 select_icon_cb(GnomeIconList * ilist, gint num, GdkEventButton * event,
 	       BalsaMessage * bm)
 {
-    if (event == NULL)
-	return;
+    select_part(bm, num);
 
-    if (event->button == 1) {
-	select_part(bm, num);
-    } else if (event->button == 3) {
+    if (event && event->type == GDK_BUTTON_PRESS && event->button == 3)
         bm_do_popup(ilist, event);
-    }
 }
 
 /* bm_popup_menu_cb:
@@ -564,8 +561,6 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
     }
 
     gnome_icon_list_select_icon(GNOME_ICON_LIST(bm->part_list), 0);
-
-    select_part(bm, 0);
 
     /* We show the part list if:
      *    there is > 1 part
@@ -2180,7 +2175,6 @@ balsa_message_next_part(BalsaMessage * bmessage)
     }
 
     gnome_icon_list_select_icon(gil, index);
-    select_part(bmessage, index);
 }
 
 void
@@ -2206,7 +2200,6 @@ balsa_message_previous_part(BalsaMessage * bmessage)
     }
 
     gnome_icon_list_select_icon(gil, index);
-    select_part(bmessage, index);
 }
 
 static LibBalsaMessageBody*
@@ -2343,15 +2336,17 @@ vadj_change_cb(GtkAdjustment *vadj, GtkWidget *widget)
 
 static BalsaPartInfo *add_part(BalsaMessage *bm, gint part)
 {
+    GnomeIconList *gil = GNOME_ICON_LIST(bm->part_list);
     BalsaPartInfo *info=NULL;
 
     if (part != -1) {
-	info = (BalsaPartInfo *) gnome_icon_list_get_icon_data
-	    (GNOME_ICON_LIST(bm->part_list), part);
+	info = (BalsaPartInfo *) gnome_icon_list_get_icon_data(gil, part);
 
 	g_assert(info != NULL);
 
-	gnome_icon_list_select_icon(GNOME_ICON_LIST(bm->part_list), part);
+        g_signal_handler_block(G_OBJECT(gil), bm->select_icon_handler);
+	gnome_icon_list_select_icon(gil, part);
+        g_signal_handler_unblock(G_OBJECT(gil), bm->select_icon_handler);
 
 	if (info->widget == NULL)
 	    part_info_init(bm, info);

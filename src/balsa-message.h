@@ -65,6 +65,9 @@ struct _BalsaMessage {
 	BalsaPartInfo *current_part;
 
 	LibBalsaMessage *message;
+
+        /* signal handler */
+        gulong select_icon_handler;
 };
 
 struct _BalsaMessageClass {

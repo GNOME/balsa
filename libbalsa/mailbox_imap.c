@@ -1546,6 +1546,7 @@ libbalsa_imap_rename_subfolder(LibBalsaMailboxImap* imap,
     ImapResult rc;
     ImapMboxHandle* handle;
     gchar *new_path;
+    char delim[2];
 
     handle = libbalsa_mailbox_imap_get_handle(imap, NULL);
     if (!handle) {
@@ -1557,8 +1558,9 @@ libbalsa_imap_rename_subfolder(LibBalsaMailboxImap* imap,
 
     II(rc,handle,
        imap_mbox_subscribe(handle, imap->path, FALSE));
-    /* FIXME: should use imap server folder separator */ 
-    new_path = g_strjoin("/", new_parent, folder, NULL);
+    delim[0] = imap_mbox_handle_get_delim(handle, new_parent);
+    delim[1] = '\0';
+    new_path = g_build_path(delim, new_parent, folder, NULL);
     rc = imap_mbox_rename(handle, imap->path, new_path);
     if (subscribe && rc == IMR_OK)
 	rc = imap_mbox_subscribe(handle, new_path, TRUE);
@@ -1594,14 +1596,11 @@ libbalsa_imap_new_subfolder(const gchar *parent, const gchar *folder,
                     _("Cannot get IMAP handle"));
 	return FALSE;
     }
-    if(parent && *parent) {
+    if (parent) {
         char delim[2];
         delim[0] = imap_mbox_handle_get_delim(handle, parent);
         delim[1] = '\0';
-        if(parent[strlen(parent)-1] == delim[0])
-            new_path = g_strconcat(parent, folder, NULL);
-        else
-            new_path = g_strjoin(delim, parent, folder, NULL);
+        new_path = g_build_path(delim, parent, folder, NULL);
     } else
         new_path = g_strdup(folder);
     II(rc,handle,

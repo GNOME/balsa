@@ -143,8 +143,7 @@ libbalsa_condition_prepend_regex(LibBalsaCondition* cond,
 
 gboolean
 libbalsa_condition_matches(LibBalsaCondition* cond,
-			   LibBalsaMessage * message,
-			   gboolean mbox_locked)
+			   LibBalsaMessage * message)
 {
     gboolean match = FALSE;
     gchar * str;
@@ -202,11 +201,7 @@ libbalsa_condition_matches(LibBalsaCondition* cond,
 	    
 	    if (!message->mailbox)
 		return FALSE; /* We don't want to match if an error occured */
-	    if (mbox_locked)
-		UNLOCK_MAILBOX(message->mailbox);
 	    is_refed = libbalsa_message_body_ref(message, FALSE, FALSE);
- 	    if (mbox_locked)
- 		LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
 	    if (!is_refed) {
 		libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                      _("Unable to load message body to "
@@ -214,11 +209,7 @@ libbalsa_condition_matches(LibBalsaCondition* cond,
                 return FALSE;  /* We don't want to match if an error occured */
 	    }
 	    body = content2reply(message,NULL,0,FALSE,FALSE);
-	    if (mbox_locked)
-		UNLOCK_MAILBOX(message->mailbox);
 	    libbalsa_message_body_unref(message);
-	    if (mbox_locked)
-		LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
 	    if (body) {
 		if (body->str)
                     match = in_string_utf8(body->str,
@@ -315,16 +306,14 @@ libbalsa_condition_matches(LibBalsaCondition* cond,
         match = LIBBALSA_MESSAGE_HAS_FLAG(message, cond->match.flags);
         break;
     case CONDITION_AND:
-        match = libbalsa_condition_matches(cond->match.andor.left,
-					   message, mbox_locked)
-            &&  libbalsa_condition_matches(cond->match.andor.right,
-					   message, mbox_locked);
+        match =
+	    libbalsa_condition_matches(cond->match.andor.left, message) &&
+	    libbalsa_condition_matches(cond->match.andor.right, message);
         break;
     case CONDITION_OR:
-        match = libbalsa_condition_matches(cond->match.andor.left,
-					   message, mbox_locked)
-            ||  libbalsa_condition_matches(cond->match.andor.right,
-					   message, mbox_locked);
+        match =
+	    libbalsa_condition_matches(cond->match.andor.left, message) ||
+	    libbalsa_condition_matches(cond->match.andor.right, message);
         break;
     case CONDITION_NONE:
         break;
@@ -375,7 +364,7 @@ libbalsa_filter_mailbox_messages(LibBalsaFilter * filt,
 	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
 			     filt->popup_text);
 
-    LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
+    libbalsa_lock_mailbox(mailbox);
 
     switch (filt->action) {
     case FILTER_COPY:
@@ -433,7 +422,7 @@ libbalsa_filter_mailbox_messages(LibBalsaFilter * filt,
 	libbalsa_mailbox_search_iter_free(iter_view);
     }
 
-    UNLOCK_MAILBOX(mailbox);
+    libbalsa_unlock_mailbox(mailbox);
 
     return result;
 }

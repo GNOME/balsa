@@ -38,44 +38,9 @@ gchar *libbalsa_make_string_from_list_p(const GList * the_list);
 extern pthread_mutex_t mailbox_lock;
 void libbalsa_lock_mailbox(LibBalsaMailbox * mailbox);
 void libbalsa_unlock_mailbox(LibBalsaMailbox * mailbox);
-
-#define LOCK_MAILBOX(mailbox) libbalsa_lock_mailbox(mailbox)
-#define LOCK_MAILBOX_RETURN_VAL(mailbox, val) libbalsa_lock_mailbox(mailbox)
-#define UNLOCK_MAILBOX(mailbox) libbalsa_unlock_mailbox(mailbox)
-
-#define HAVE_MAILBOX_LOCKED(mailbox) ((mailbox)->lock > 0 && (mailbox)->thread_id == pthread_self())
-
 #else
-
-/* Non-threaded locking mechanism */
-#define LOCK_MAILBOX(mailbox)\
-do {\
-  if (mailbox->lock)\
-    {\
-      g_print (_("*** ERROR: Mailbox Lock Exists: %s ***\n"), __PRETTY_FUNCTION__);\
-      return;\
-    }\
-  else\
-    mailbox->lock++;\
-} while (0)
-
-
-#define LOCK_MAILBOX_RETURN_VAL(mailbox, val)\
-do {\
-  if (mailbox->lock)\
-    {\
-      g_print (_("*** ERROR: Mailbox Lock Exists: %s ***\n"), __PRETTY_FUNCTION__);\
-      return (val);\
-    }\
-  else\
-    mailbox->lock++;\
-} while (0)
-
-#define UNLOCK_MAILBOX(mailbox)          ((mailbox)->lock--)
-
-#define HAVE_MAILBOX_LOCKED(mailbox) ((mailbox)->lock > 0)
-
+# define libbalsa_lock_mailbox(m)
+# define libbalsa_unlock_mailbox(m)
 #endif
-
 
 #endif				/* __LIBBALSA_PRIVATE_H__ */

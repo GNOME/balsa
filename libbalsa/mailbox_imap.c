@@ -517,12 +517,8 @@ imap_flags_cb(unsigned cnt, const unsigned seqno[], LibBalsaMailboxImap *mimap)
 {
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
     unsigned i;
-    gboolean locked;
-    /* We don't know if the mailbox is locked,
-     * ...so we check. */
-    locked = HAVE_MAILBOX_LOCKED(mailbox);
-    if (!locked)
-        LOCK_MAILBOX(mailbox);
+
+    libbalsa_lock_mailbox(mailbox);
     for(i=0; i<cnt; i++) {
         struct message_info *msg_info = 
             message_info_from_msgno(mimap, seqno[i]);
@@ -546,8 +542,7 @@ imap_flags_cb(unsigned cnt, const unsigned seqno[], LibBalsaMailboxImap *mimap)
             g_list_free_1(list);
         }
     }
-    if (!locked)
-        UNLOCK_MAILBOX(mailbox);
+    libbalsa_unlock_mailbox(mailbox);
 }
 
 /* Forward reference. */
@@ -559,10 +554,10 @@ update_counters_and_filter(void *data)
     LibBalsaMailbox *mailbox= (LibBalsaMailbox*)data;
 
     gdk_threads_enter();
-    LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE); /* or retry? */
+    libbalsa_lock_mailbox(mailbox);
     libbalsa_mailbox_run_filters_on_reception(mailbox);
     lbm_imap_get_unseen(LIBBALSA_MAILBOX_IMAP(mailbox));
-    UNLOCK_MAILBOX(mailbox);
+    libbalsa_unlock_mailbox(mailbox);
     gdk_threads_leave();
     g_object_unref(G_OBJECT(mailbox));
     return FALSE;
@@ -579,12 +574,9 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
     } else if (cnt > mimap->messages_info->len) { /* new messages arrived */
         unsigned i;
 	struct message_info a = {0};
-	gboolean locked;
 
 	/* EXISTS response may result from any IMAP action. */
-	locked = HAVE_MAILBOX_LOCKED(mailbox);
-	if (!locked)
-	    LOCK_MAILBOX(mailbox);
+	libbalsa_lock_mailbox(mailbox);
 
 	i=mimap->messages_info->len+1;
         do {
@@ -602,8 +594,7 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
         g_object_ref(G_OBJECT(mailbox));
         g_idle_add(update_counters_and_filter, mailbox);
 
-	if (!locked)
-	    UNLOCK_MAILBOX(mailbox);
+	libbalsa_unlock_mailbox(mailbox);
     }
 }
 
@@ -612,14 +603,11 @@ imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
                 LibBalsaMailboxImap *mimap)
 {
     guint i;
-    gboolean locked;
 
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
     struct message_info *msg_info = message_info_from_msgno(mimap, seqno);
 
-    locked = HAVE_MAILBOX_LOCKED(mailbox);
-    if (!locked)
-	LOCK_MAILBOX(mailbox);
+    libbalsa_lock_mailbox(mailbox);
 
     libbalsa_mailbox_msgno_removed(mailbox, seqno);
     ++mimap->search_stamp;
@@ -640,8 +628,7 @@ imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
 	    msg_info->message->msgno = i + 1;
     }
 
-    if (!locked)
-	UNLOCK_MAILBOX(mailbox);
+    libbalsa_unlock_mailbox(mailbox);
 }
 
 static void
@@ -866,19 +853,18 @@ static GMimeStream *
 libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
 					 LibBalsaMessage * message)
 {
-    FILE *stream = NULL;
-    GMimeStream *gmime_stream = NULL;
-    LibBalsaMailboxImap *mimap;
+    FILE *stream;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox), NULL);
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), NULL);
+
+    libbalsa_lock_mailbox(mailbox);
     RETURN_VAL_IF_CONTEXT_CLOSED(message->mailbox, NULL);
 
-    mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
-
     stream = get_cache_stream(mailbox, IMAP_MESSAGE_UID(message));
-    gmime_stream = g_mime_stream_file_new(stream);
-    return gmime_stream;
+    libbalsa_unlock_mailbox(mailbox);
+
+    return g_mime_stream_file_new(stream);
 }
 
 /* libbalsa_mailbox_imap_check:
@@ -925,7 +911,7 @@ libbalsa_mailbox_imap_message_match(LibBalsaMailbox* mailbox, guint msgno,
     if (libbalsa_condition_can_match(search_iter->condition,
 				     msg_info->message))
 	return libbalsa_condition_matches(search_iter->condition,
-					  msg_info->message, TRUE);
+					  msg_info->message);
 
     if (search_iter->stamp != mimap->search_stamp && search_iter->mailbox
 	&& LIBBALSA_MAILBOX_GET_CLASS(search_iter->mailbox)->
@@ -1781,7 +1767,7 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
 	    ImapMessage *im;
 	    ImapResponse rc;
 
-	    LOCK_MAILBOX_RETURN_VAL(msg->mailbox,NULL);
+	    libbalsa_lock_mailbox(msg->mailbox);
 	    mimap = LIBBALSA_MAILBOX_IMAP(msg->mailbox);
 	    im = imap_mbox_handle_get_msg(mimap->handle, msg->msgno);
 
@@ -1793,7 +1779,7 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
 	    if(rc != IMR_OK)
 		g_error("FIXME: error handling here!\n");
 	    
-	    UNLOCK_MAILBOX(msg->mailbox);
+	    libbalsa_unlock_mailbox(msg->mailbox);
 		
 	    prefilt = g_mime_part_new_with_type (dt.body->media_basic_name,
 						 dt.body->media_subtype);

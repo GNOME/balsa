@@ -215,8 +215,7 @@ void libbalsa_condition_prepend_regex(LibBalsaCondition* cond,
 /** libbalsa_condition_matches() checks whether given message matches the 
  * condition. */
 gboolean libbalsa_condition_matches(LibBalsaCondition* cond,
-                                    LibBalsaMessage* message,
-                                    gboolean mbox_locked);
+                                    LibBalsaMessage* message);
 
 /* Filtering functions */
 /* FIXME : perhaps I should try to use multithreading -> but we must

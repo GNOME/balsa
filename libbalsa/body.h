@@ -59,6 +59,7 @@ struct _LibBalsaMessageBody {
                                  * the body including mime type with
                                  * optional parameters. NULL, if text/plain. */
     const gchar *content_dsp;	/* content-disposition */ 
+    const gchar *content_id;    /* content-id */
     gchar *filename;		/* holds filename for attachments and such (used mostly for sending) */
     gboolean attach_as_extbody; /* if an attachment shall be appended as external-body (sending) */
     gchar *temp_filename;	/* Holds the filename of a the temporary file where this part is saved */

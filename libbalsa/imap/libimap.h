@@ -188,6 +188,7 @@ struct ImapBody_ {
   GHashTable *params;
   unsigned octets;
   unsigned lines;
+  char *content_id;
   char *desc;
   ImapEnvelope *envelope;/* used only if media/basic == MESSAGE */
   ImapBodyDisposition content_dsp;

@@ -510,6 +510,9 @@ libbalsa_message_body_get_by_id(LibBalsaMessageBody * body,
 
 	if (bodyid && strcmp(id, bodyid) == 0)
 	    return body;
+    } else {
+        if(body->content_id && strcmp(id, body->content_id) == 0)
+            return body;
     }
 
     if ((res = libbalsa_message_body_get_by_id(body->parts, id)) != NULL)

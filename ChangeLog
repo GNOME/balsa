@@ -1,3 +1,12 @@
+2004-09-02  Pawel Salek
+
+	Handle parts' content-id for imap mailboxes.
+	* libbalsa/body.[hc]: add content-id field and use it.
+	* libbalsa/mailbox_imap.c: set it.
+	* libbalsa/imap/imap-handle.c: store received content id.
+	* libbalsa/imap/libimap.h: ... in ImapBody field.
+	* src/balsa-index.c: gtk-2.4.9 has FIXED_HEIGHT bugs fixed. Uff.
+
 2004-09-02 05:15  PeterB
 
 	* src/: balsa-message.c, balsa-message.h: leave room for vertical

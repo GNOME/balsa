@@ -30,13 +30,6 @@
    key and replace the key on every change of the sort method.  
 */
 
-/* TREE_VIEW_FIXED_HEIGHT enables hight-performance mode of GtkTreeView
- * very useful for large mailboxes (#msg >5000) but: a. is available only
- * in gtk2>=2.3.5 b. may expose some bugs in gtk.
- */
-#define TREE_VIEW_FIXED_HEIGHT 1
-#undef TREE_VIEW_FIXED_HEIGHT
-
 #include "config.h"
 
 #include <stdio.h>
@@ -56,6 +49,16 @@
 
 #include "filter-funcs.h"
 #include "misc.h"
+
+/* TREE_VIEW_FIXED_HEIGHT enables hight-performance mode of GtkTreeView
+ * very useful for large mailboxes (#msg >5000) but: a. is available only
+ * in gtk2>=2.3.5 b. may expose some bugs in gtk.
+ * gtk-2.4.9 has been tested with a positive result.
+ */
+#if GTK_CHECK_VERSION(2,4,9)
+#define TREE_VIEW_FIXED_HEIGHT 1
+#endif
+
 
 /* gtk widget */
 static void bndx_class_init(BalsaIndexClass * klass);

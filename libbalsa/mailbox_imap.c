@@ -1736,6 +1736,7 @@ lbm_imap_construct_body(LibBalsaMessageBody *lbbody, ImapBody *imap_body)
     case IMBDISP_OTHER:
 	lbbody->content_dsp = imap_body->content_dsp_other; break;
     }
+    lbbody->content_id = imap_body->content_id;
     lbbody->content_type = imap_body_get_content_type(imap_body);
     /* get the name in the same way as g_mime_part_get_filename() does */
     str = imap_body_get_dsp_param(imap_body, "filename");

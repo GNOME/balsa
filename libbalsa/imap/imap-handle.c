@@ -835,6 +835,7 @@ imap_body_free(ImapBody* body)
   g_free(body->media_basic_name);
   g_free(body->media_subtype);
   g_free(body->desc);
+  g_free(body->content_id);
   g_free(body->content_dsp_other);
   g_free(body->content_uri);
   g_hash_table_destroy(body->params);
@@ -995,7 +996,7 @@ void
 imap_body_set_id(ImapBody *body, char *id)
 {
   if(id) printf("part ID='%s'\n", id);
-  g_free(id);
+  body->content_id = id;
 }
 /* ================ END OF BODY STRUCTURE FUNCTIONS ==================== */
 

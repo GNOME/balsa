@@ -75,14 +75,14 @@ guint balsa_send_message_real(MessageQueueItem *first_message);
 static void encode_descriptions (BODY * b);
 int balsa_smtp_send  (MessageQueueItem *first_message, char *server);
 int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg);
-gboolean balsa_create_msg (Message * message, HEADER *msg, char *tempfile, int queu);
+static gboolean balsa_create_msg (Message * message, HEADER *msg, 
+				  char *tempfile, int queu);
 gchar** balsa_lookup_mime_type (const gchar* path);
 
 #ifdef BALSA_USE_THREADS
 void balsa_send_thread(MessageQueueItem *first_message);
 #endif
 
-BODY *add_mutt_body_plain (void);
 
 /* from mutt's send.c */
 static void
@@ -106,7 +106,7 @@ encode_descriptions (BODY * b)
 }
 
 
-BODY *
+static BODY *
 add_mutt_body_plain (void)
 {
   BODY *body;
@@ -204,17 +204,13 @@ balsa_send_message (Message * message)
 /* Progress bar done */
 #endif
 
-	 last_message = first_message;
-         balsa_mailbox_open (balsa_app.outbox);
-  
-         if (balsa_app.outbox->message_list != NULL)
-             lista = balsa_app.outbox->message_list ;
-         else
-             lista = NULL ;
-  
-         while (lista != NULL)
-         {
- 
+	last_message = first_message;
+	balsa_mailbox_open (balsa_app.outbox);
+	
+	lista = balsa_app.outbox->message_list;
+	
+	while (lista != NULL)
+	{
                 queu = LIBBALSA_MESSAGE(lista->data);
 
                 new_message = malloc( sizeof( MessageQueueItem ) );
@@ -243,17 +239,8 @@ balsa_send_message (Message * message)
 	 balsa_mailbox_close (balsa_app.outbox);
 	 
 #ifdef BALSA_USE_THREADS	
-   }
+  }
 
-      pthread_mutex_unlock( &send_messages_lock );
-#endif
-
-
-  
-#ifdef BALSA_USE_THREADS
-  
-  
-  pthread_mutex_lock( &send_messages_lock );
   total_messages_left =  total_messages_left + message_number;
     
   if( sending_mail == TRUE )
@@ -279,6 +266,12 @@ balsa_send_message (Message * message)
   return TRUE;
 }
 
+/* balsa_send_message_real:
+   does the acutal message sending. Suffers from severe memory leaks.
+   One of them: local MDA mode, more than one messages to send (some of
+   them loaded from outbox). Only first one will be send and memory released.
+   FIXME ...
+*/
 guint
 balsa_send_message_real(MessageQueueItem *first_message)
 {
@@ -291,31 +284,12 @@ balsa_send_message_real(MessageQueueItem *first_message)
   if( !first_message )
     return TRUE;
   
-  if (balsa_app.smtp) 
-  {
-      i = balsa_smtp_send (first_message,balsa_app.smtp_server);
-  
-#ifdef BALSA_USE_THREADS
-
-      if (i == -1)
-      {
-            pthread_mutex_lock( &send_messages_lock );
-            sending_mail = FALSE;
-	    total_messages_left = 0;
-            pthread_mutex_unlock( &send_messages_lock );
-            
-	    MSGSENDTHREAD (threadmsg, MSGSENDTHREADFINISHED,"",NULL,NULL,0); 
-	    
-	    
-      }
-#endif
-  
-  }
-  else
+  /* the local MDA code is so simple that we handle it in short-circuit
+     fashion.
+  */
+  if (!balsa_app.smtp) 
   {	 
-
 #ifdef BALSA_USE_THREADS
-
         pthread_mutex_lock( &send_messages_lock );
         sending_mail = FALSE;
         total_messages_left = 0;
@@ -345,10 +319,7 @@ balsa_send_message_real(MessageQueueItem *first_message)
      }
      else
      {	     
-     	if ((balsa_app.sentbox->type == MAILBOX_MAILDIR ||
-                balsa_app.sentbox->type == MAILBOX_MH ||
-             	balsa_app.sentbox->type == MAILBOX_MBOX) &&
-                first_message->fcc != NULL) 
+     	if (first_message->fcc!=NULL && MAILBOX_IS_LOCAL(first_message->fcc) )
      	{
             mutt_write_fcc (MAILBOX_LOCAL (first_message->fcc)->path, 
 			    first_message->message, NULL, 0, NULL);
@@ -371,21 +342,33 @@ balsa_send_message_real(MessageQueueItem *first_message)
      free( first_message );
 
 #ifdef BALSA_USE_THREADS
-
        MSGSENDTHREAD (threadmsg, MSGSENDTHREADFINISHED,"",NULL,NULL,0);
-
        pthread_exit(0);
 #endif
      
      return TRUE;
-
   }
+
+  /* The hell of SMTP only code follows below... */
+  i = balsa_smtp_send (first_message,balsa_app.smtp_server);
+  
+#ifdef BALSA_USE_THREADS
+  if (i == -1)
+  {
+      pthread_mutex_lock( &send_messages_lock );
+      sending_mail = FALSE;
+      total_messages_left = 0;
+      pthread_mutex_unlock( &send_messages_lock );
+      
+      MSGSENDTHREAD (threadmsg, MSGSENDTHREADFINISHED,"",NULL,NULL,0); 
+  }
+#endif
 
   /* We give a message to the user because an error has ocurred in the protocol
    * A mistyped address? A server not allowing relay? We can pop a window to ask */
        
-   if (i==-2)
-        fprintf(stderr,"Something has happened in the SMTP protocol\n");
+  if (i==-2)
+      fprintf(stderr,"SMTP protocol error (wrong address, relaying denied)\n");
        
 //   return TRUE;
 
@@ -440,7 +423,53 @@ balsa_send_message_real(MessageQueueItem *first_message)
    return TRUE;
 }
 
+static void
+message2HEADER(Message * message, HEADER * hdr)
+{
+    gchar * tmp;
 
+    if (!hdr->env)
+	hdr->env = mutt_new_envelope ();
+    
+    hdr->env->userhdrs = mutt_new_list ();
+    {
+	LIST *sptr = UserHeader;
+	LIST *dptr = hdr->env->userhdrs;
+	LIST *delptr = 0;
+	while (sptr)
+	{
+	    dptr->data = g_strdup (sptr->data);
+	    sptr = sptr->next;
+	    delptr = dptr;
+	    dptr->next = mutt_new_list ();
+	    dptr = dptr->next;
+	}
+	g_free (delptr->next);
+	delptr->next = 0;
+    }
+    
+    tmp = address_to_gchar (message->from);
+    hdr->env->from = rfc822_parse_adrlist (hdr->env->from, tmp);
+    g_free (tmp);
+    
+    if(message->reply_to) {
+	tmp = address_to_gchar (message->reply_to);
+	hdr->env->reply_to = rfc822_parse_adrlist (hdr->env->reply_to, tmp);
+	g_free (tmp);
+    }
+    
+    hdr->env->subject = g_strdup (message->subject);
+    
+    tmp = make_string_from_list (message->to_list);
+    hdr->env->to = rfc822_parse_adrlist (hdr->env->to, tmp);
+    g_free(tmp);
+    tmp = make_string_from_list (message->cc_list);
+    hdr->env->cc = rfc822_parse_adrlist (hdr->env->cc, tmp);
+    g_free(tmp);
+    tmp = make_string_from_list (message->bcc_list);
+    hdr->env->bcc = rfc822_parse_adrlist (hdr->env->bcc, tmp);
+    g_free(tmp);
+}
 
 gboolean
 balsa_postpone_message (Message * message, Message * reply_message, 
@@ -452,42 +481,7 @@ balsa_postpone_message (Message * message, Message * reply_message,
   GList *list;
 
   msg = mutt_new_header ();
-
-  if (!msg->env)
-    msg->env = mutt_new_envelope ();
-
-  msg->env->userhdrs = mutt_new_list ();
-  {
-    LIST *sptr = UserHeader;
-    LIST *dptr = msg->env->userhdrs;
-    LIST *delptr = 0;
-    while (sptr)
-      {
-	dptr->data = g_strdup (sptr->data);
-	sptr = sptr->next;
-	delptr = dptr;
-	dptr->next = mutt_new_list ();
-	dptr = dptr->next;
-      }
-    g_free (delptr->next);
-    delptr->next = 0;
-  }
-
-  tmp = address_to_gchar (message->from);
-  msg->env->from = rfc822_parse_adrlist (msg->env->from, tmp);
-  g_free (tmp);
-
-  if(message->reply_to) {
-     tmp = address_to_gchar (message->reply_to);
-     msg->env->reply_to = rfc822_parse_adrlist (msg->env->reply_to, tmp);
-     g_free (tmp);
-  }
-
-  msg->env->subject = g_strdup (message->subject);
-
-  msg->env->to = rfc822_parse_adrlist (msg->env->to, make_string_from_list (message->to_list));
-  msg->env->cc = rfc822_parse_adrlist (msg->env->cc, make_string_from_list (message->cc_list));
-  msg->env->bcc = rfc822_parse_adrlist (msg->env->bcc, make_string_from_list (message->bcc_list));
+  message2HEADER(message, msg);
 
   list = message->body_list;
 
@@ -550,6 +544,7 @@ balsa_postpone_message (Message * message, Message * reply_message,
   else
     tmp = NULL;
   mutt_write_fcc (MAILBOX_LOCAL (balsa_app.draftbox)->path, msg, tmp, 1, fcc);
+  g_free(tmp);
 
   if (balsa_app.draftbox->open_ref > 0)
     mailbox_check_new_messages (balsa_app.draftbox);
@@ -902,11 +897,15 @@ gchar** balsa_lookup_mime_type (const gchar* path)
         return tmp;
 }
 
-
-gboolean balsa_create_msg (Message *message, HEADER *msg, char *tmpfile, int queu)
+/* balsa_create_msg:
+   copies message to msg.
+   PS: seems to be broken when queu == 1 - further execution of
+   mutt_free_header(mgs) leads to crash.
+*/
+static gboolean 
+balsa_create_msg (Message *message, HEADER *msg, char *tmpfile, int queu)
 {
   BODY *last, *newbdy;
-  gchar *tmp;
   GList *list;
   FILE *tempfp;
   HEADER *msg_tmp;
@@ -915,42 +914,7 @@ gboolean balsa_create_msg (Message *message, HEADER *msg, char *tmpfile, int que
 
   gchar** mime_type;
 
-  if (!msg->env)
-    msg->env = mutt_new_envelope ();
-
-  msg->env->userhdrs = mutt_new_list ();
-  {
-    LIST *sptr = UserHeader;
-    LIST *dptr = msg->env->userhdrs;
-    LIST *delptr = 0;
-
-    while (sptr)
-      {
-	dptr->data = g_strdup (sptr->data);
-	sptr = sptr->next;
-	delptr = dptr;
-	dptr->next = mutt_new_list ();
-	dptr = dptr->next;
-      }
-    g_free (delptr->next);
-    delptr->next = 0;
-  }
-
-  tmp = address_to_gchar (message->from);
-  msg->env->from = rfc822_parse_adrlist (msg->env->from, tmp);
-  g_free (tmp);
-
-  if(message->reply_to) {
-     tmp = address_to_gchar (message->reply_to);
-     msg->env->reply_to = rfc822_parse_adrlist (msg->env->reply_to, tmp);
-     g_free (tmp);
-  }
-
-  msg->env->subject = g_strdup (message->subject);
-
-  msg->env->to = rfc822_parse_adrlist (msg->env->to, make_string_from_list (message->to_list));
-  msg->env->cc = rfc822_parse_adrlist (msg->env->cc, make_string_from_list (message->cc_list));
-  msg->env->bcc = rfc822_parse_adrlist (msg->env->bcc, make_string_from_list (message->bcc_list));
+  message2HEADER(message, msg);
 
   /* If the message has references set, add them to he envelope */
   if (message->references != NULL) {        
@@ -1080,6 +1044,5 @@ gboolean balsa_create_msg (Message *message, HEADER *msg, char *tmpfile, int que
   }	 
 
  return TRUE;
-        
 }
 

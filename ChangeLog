@@ -1,6 +1,7 @@
 2000-05-16  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/sendmsg-window.c: Celtic language support fixed.
+	* libbalsa/send.c: code cleanup on the way to fix the safe_free bug.
 	
 2000-05-15  Pawel Salek <pawsa@theochem.kth.se>
 

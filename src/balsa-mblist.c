@@ -175,8 +175,7 @@ balsa_mblist_redraw (BalsaMBList * bmbl)
   ctnode = gtk_ctree_insert_node (ctree, NULL, NULL, text, 5,
 				  balsa_icon_get_pixmap (BALSA_ICON_INBOX),
 				  balsa_icon_get_bitmap (BALSA_ICON_INBOX),
-				  balsa_icon_get_pixmap (BALSA_ICON_INBOX),
-				  balsa_icon_get_bitmap (BALSA_ICON_INBOX),
+				  NULL, NULL,
 				  FALSE, FALSE);
   gtk_ctree_node_set_row_data (ctree, ctnode, balsa_app.inbox);
 
@@ -185,8 +184,7 @@ balsa_mblist_redraw (BalsaMBList * bmbl)
   ctnode = gtk_ctree_insert_node (ctree, NULL, NULL, text, 5,
 				  balsa_icon_get_pixmap (BALSA_ICON_OUTBOX),
 				  balsa_icon_get_bitmap (BALSA_ICON_OUTBOX),
-				  balsa_icon_get_pixmap (BALSA_ICON_OUTBOX),
-				  balsa_icon_get_bitmap (BALSA_ICON_OUTBOX),
+				  NULL, NULL,
 				  FALSE, FALSE);
   gtk_ctree_node_set_row_data (ctree, ctnode, balsa_app.outbox);
 
@@ -195,8 +193,7 @@ balsa_mblist_redraw (BalsaMBList * bmbl)
   ctnode = gtk_ctree_insert_node (ctree, NULL, NULL, text, 5,
 				  balsa_icon_get_pixmap (BALSA_ICON_TRASH),
 				  balsa_icon_get_bitmap (BALSA_ICON_TRASH),
-				  balsa_icon_get_pixmap (BALSA_ICON_TRASH),
-				  balsa_icon_get_bitmap (BALSA_ICON_TRASH),
+				  NULL, NULL,
 				  FALSE, FALSE);
   gtk_ctree_node_set_row_data (ctree, ctnode, balsa_app.trash);
 

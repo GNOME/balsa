@@ -1,3 +1,8 @@
+2002-04-12  Abel Cheung  <maddog@linux.org.hk>
+
+	* TRANSLATORS: Added zh_TW translator.
+	* zh_TW.po: Merged with newest pot file.
+
 2002-04-04  Hasbullah Bin Pit <sebol@ikhlas.com>
 
 	* ms.po: Updated Malay Translation by

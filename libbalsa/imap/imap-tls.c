@@ -31,6 +31,7 @@
 #include <string.h>
 #include <openssl/ssl.h>
 #include <openssl/x509v3.h>
+#include <openssl/err.h>
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
@@ -190,7 +191,6 @@ create_ssl(void)
 static int
 host_matches_domain(const char* host, const char*domain, int host_len)
 { 
-  printf("host: %s domain: %s\n", host, domain);
   if(!domain || !host)
     return 0;
   if(domain[0] == '*') { /* RFC2595, section 2.4 */
@@ -202,7 +202,7 @@ host_matches_domain(const char* host, const char*domain, int host_len)
     return g_ascii_strcasecmp(host + host_len - domain_len+2, 
                               domain+2) == 0;
   } else 
-    return g_ascii_strcasecmp(host, domain) == 0;
+    return g_ascii_strncasecmp(host, domain, host_len) == 0;
 }
 
 static int
@@ -263,7 +263,7 @@ check_server_identity(ImapMboxHandle *handle, SSL *ssl)
     if( (subj = X509_get_subject_name(cert)) &&
         X509_NAME_get_text_by_NID(subj, NID_commonName, data, sizeof(data))>0){
       data[sizeof(data)-1] = 0;
-      if(g_ascii_strncasecmp(handle->host, data, host_len) == 0)
+      if(host_matches_domain(handle->host, data, host_len))
         ok =1;
     }
   }
@@ -282,7 +282,6 @@ check_server_identity(ImapMboxHandle *handle, SSL *ssl)
   if(handle->user_cb)
     handle->user_cb(handle, IME_TLS_VERIFY_ERROR, handle->user_arg, &ok, 
                     vfy_result, ssl);
-  printf("%s returns %d\n", __FUNCTION__, ok);
   return ok;
 }
 
@@ -338,7 +337,7 @@ imap_handle_starttls(ImapMboxHandle *handle)
     }
 
   }
-  printf("%s returning %d\n", __FUNCTION__, rc);
+
   return rc;
 }
 #endif /* USE_TLS */

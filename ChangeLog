@@ -1,3 +1,8 @@
+2004-02-18  Pawel Salek
+
+	* libbalsa/imap-server.c: compare agains a number of certificates.
+	* libbalsa/imap/imap-tls.c: correctly check wildcard certificates.
+
 2004-02-15 13:16  PeterB
 
 	* src/main-window.c: get balsa_app.mblist_width and

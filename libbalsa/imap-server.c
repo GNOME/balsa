@@ -16,6 +16,10 @@
 #include <gnome.h>
 #include <libgnome/gnome-config.h>
 
+#ifdef USE_TLS
+#include <openssl/err.h>
+#endif
+
 static LibBalsaServerClass *parent_class = NULL;
 
 struct LibBalsaImapServer_ {
@@ -295,40 +299,42 @@ is_info_cb(ImapMboxHandle *h, ImapResponse rc, const gchar* str, void *arg)
 static gboolean
 libbalsa_is_cert_known(LibBalsaImapServer *is, X509* cert)
 {
-    X509_STORE     *store;
-    X509_STORE_CTX  verify_ctx;
+    char buf[256];
+    X509 *tmpcert = NULL;
+    FILE *fp;
     gchar *cert_name;
     gboolean res = FALSE;
     GList *lst;
 
     for(lst = is->accepted_certs; lst; lst = lst->next) {
         int res = X509_cmp(cert, lst->data);
-        printf("res=%d\n", res);
         if(res == 0)
             return TRUE;
     }
     
     cert_name = gnome_util_prepend_user_home(".balsa/certificates");
-    if (access (cert_name, F_OK) != 0) {
-        g_free(cert_name);
-        return FALSE;
-    }
 
-    if( !(store = X509_STORE_new())) {
-        g_free(cert_name);
-        return FALSE;
-    }
-    res = X509_STORE_load_locations(store, cert_name, NULL);
+    fp = fopen(cert_name, "rt");
     g_free(cert_name);
-    if(!res) {
-        X509_STORE_free(store);
+    if(!fp) {
         return FALSE;
     }
-    X509_STORE_CTX_init(&verify_ctx, store, cert, NULL);
+    printf("Looking for cert: %s\n", 
+               X509_NAME_oneline(X509_get_subject_name (cert),
+                                 buf, sizeof (buf)));
 
-    res = X509_verify_cert(&verify_ctx);
-    X509_STORE_CTX_cleanup(&verify_ctx);
-    X509_STORE_free(store);
+    res = FALSE;
+    while ((tmpcert = PEM_read_X509(fp, NULL, NULL, NULL)) != NULL) {
+        printf("comparing with cert: %s\n", 
+               X509_NAME_oneline(X509_get_subject_name (tmpcert),
+                                 buf, sizeof (buf)));
+        res = X509_cmp(cert, tmpcert)==0;
+        X509_free(tmpcert);
+        if(res) break;
+    }
+    ERR_clear_error();
+    fclose(fp);
+    
     return res;
 }
 
@@ -408,7 +414,6 @@ is_user_cb(ImapMboxHandle *h, ImapUserEventType ue, void *arg, ...)
 #else
         g_warning("TLS error with TLS disabled!?");
 #endif
-        printf("OK in %s is %d\n", __FUNCTION__, *ok);
         break;
     }
     case IME_TLS_NO_PEER_CERT: {
@@ -465,7 +470,11 @@ lb_imap_server_cleanup(LibBalsaImapServer * imap_server)
     time_t idle_marker;
     GList *list;
 
-    g_mutex_lock(imap_server->lock);
+    /* Quit if there is an action going on, eg. an connection is being
+     * opened and the user is asked to confirm the certificate or
+     * provide password, etc. */
+    if(!g_mutex_trylock(imap_server->lock))
+        return; 
 
     idle_marker = time(NULL) - CONNECTION_CLEANUP_IDLE_TIME;
 

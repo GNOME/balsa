@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-99 Jay Painter and Stuart Parmenter
  *
@@ -137,6 +138,7 @@ static void save_current_part_cb (GtkWidget *widget, gpointer data);
 
 static void delete_message_cb (GtkWidget * widget, gpointer data);
 static void undelete_message_cb (GtkWidget * widget, gpointer data);
+static void toggle_flagged_message_cb (GtkWidget *widget, gpointer data);
 static void store_address_cb(GtkWidget * widget, gpointer data);
 static void wrap_message_cb (GtkWidget * widget, gpointer data);
 static void show_no_headers_cb(GtkWidget * widget, gpointer data);
@@ -305,8 +307,15 @@ static GnomeUIInfo message_menu[] =
     undelete_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_UNDELETE, 'U', 0, NULL
   },
+#define MENU_MESSAGE_TOGGLE_FLAGGED_POS 16
+  /* ! */
+  {
+      GNOME_APP_UI_ITEM, N_("_Toggle flagged"), N_("Toggle flagged"),
+      toggle_flagged_message_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
+      NULL, 'X', 0, NULL
+  },
   GNOMEUIINFO_SEPARATOR,
-#define MENU_MESSAGE_STORE_ADDRESS_POS 17
+#define MENU_MESSAGE_STORE_ADDRESS_POS 18
       /* S */
   {
     GNOME_APP_UI_ITEM, N_ ("_Store Address"), N_("Store address of sender in addressbook"),
@@ -314,7 +323,7 @@ static GnomeUIInfo message_menu[] =
     GNOME_STOCK_MENU_BOOK_RED, 'S', 0, NULL
   },
   GNOMEUIINFO_SEPARATOR,
-#define MENU_MESSAGE_WRAP_POS 19
+#define MENU_MESSAGE_WRAP_POS 20
   GNOMEUIINFO_TOGGLEITEM( N_ ("_Wrap"), NULL, wrap_message_cb, NULL),
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_RADIOLIST(shown_hdrs_menu),
@@ -683,17 +692,22 @@ static void balsa_window_real_open_mailbox(BalsaWindow *window, Mailbox *mailbox
 	gtk_notebook_append_page(GTK_NOTEBOOK(window->notebook), GTK_WIDGET(BALSA_INDEX_PAGE(page)->sw), label);
 	
 	/* change the page to the newly selected notebook item */
-	gtk_notebook_set_page(GTK_NOTEBOOK(window->notebook),
-			      gtk_notebook_page_num(GTK_NOTEBOOK(window->notebook), GTK_WIDGET(BALSA_INDEX_PAGE(page)->sw)));
+	gtk_notebook_set_page(
+	    GTK_NOTEBOOK(window->notebook),
+	    gtk_notebook_page_num(GTK_NOTEBOOK(window->notebook), 
+				  GTK_WIDGET(BALSA_INDEX_PAGE(page)->sw)));
 
+	if( g_slist_find( balsa_state.mbs_to_open, mailbox ) == NULL )
+	  balsa_state.mbs_to_open = g_slist_prepend( balsa_state.mbs_to_open, mailbox );	
 }
+
 
 static void balsa_window_real_close_mailbox(BalsaWindow *window, Mailbox *mailbox)
 {
-/*  printf("FIXME: Can't close mailboxes.\n"); 
-    Sadly, we don't get the IndexPage pointer given to us. Ah well. */
+  /* Sadly, we don't get the IndexPage pointer given to us. Ah well. */
     GtkWidget *page;
     gint i;
+    GSList *item;
 
     i=balsa_find_notebook_page_num(mailbox);
 
@@ -714,6 +728,9 @@ static void balsa_window_real_close_mailbox(BalsaWindow *window, Mailbox *mailbo
 	  balsa_message_clear (BALSA_MESSAGE( window->preview ));
 	  gnome_appbar_set_default (balsa_app.appbar, "Mailbox closed");
 	}
+
+	if( (item = g_slist_find( balsa_state.mbs_to_open, mailbox )) != NULL )
+	  balsa_state.mbs_to_open = g_slist_remove_link( balsa_state.mbs_to_open, item );
       }
 }
 
@@ -1419,6 +1436,12 @@ delete_message_cb (GtkWidget * widget, gpointer data)
   balsa_message_delete (widget, balsa_window_find_current_index (BALSA_WINDOW (data)));
 }
 
+
+static void
+toggle_flagged_message_cb (GtkWidget *widget, gpointer data)
+{
+	balsa_message_toggle_flagged (widget, balsa_window_find_current_index (BALSA_WINDOW (data)));
+}
 
 static void
 undelete_message_cb (GtkWidget * widget, gpointer data)

@@ -40,6 +40,8 @@
 #include "pixmaps/arrow.xpm"
 #include "pixmaps/multipart.xpm"
 
+#include "pixmaps/flagged.xpm"
+
 typedef struct _BalsaIcon BalsaIcon;
 struct _BalsaIcon
   {
@@ -64,6 +66,8 @@ static BalsaIcon envelope;
 
 static BalsaIcon arrow;
 static BalsaIcon multipart;
+
+static BalsaIcon flagged;
 
 static void
 create_icon (gchar ** data, GdkPixmap ** pmap, GdkBitmap ** bmap)
@@ -95,6 +99,8 @@ balsa_icons_init (void)
 
   create_icon (arrow_xpm, &arrow.p, &arrow.b);
   create_icon (multipart_xpm, &multipart.p, &multipart.b);
+
+  create_icon (flagged_xpm, &flagged.p, &flagged.b);
 }
 
 GdkPixmap *
@@ -131,6 +137,9 @@ balsa_icon_get_pixmap (BalsaIconName name)
       return arrow.p;
     case BALSA_ICON_MULTIPART:
       return multipart.p;
+
+    case BALSA_ICON_FLAGGED:
+      return flagged.p;
     }
   return NULL;
 }
@@ -169,6 +178,9 @@ balsa_icon_get_bitmap (BalsaIconName name)
       return arrow.b;
     case BALSA_ICON_MULTIPART:
       return multipart.b;
+
+    case BALSA_ICON_FLAGGED:
+      return flagged.b;
     }
   return NULL;
 }

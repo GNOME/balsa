@@ -1,4 +1,4 @@
-
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -40,16 +40,16 @@ struct _BalsaPartInfo
   {
     BODY *body;
     Message *message;
-
+    
     /* The widget to add to the container */
     GtkWidget *widget;
-
+    
     /* The widget to give focus to */
     GtkWidget *focus_widget;
-
+    
     /* The contect menu */
     GtkWidget *popup_menu;
-
+    
     /* True if balsa knows how to display this part */
     gboolean can_display;
   };
@@ -168,6 +168,7 @@ balsa_message_init (BalsaMessage * bm)
   bm->message = NULL;
 
   bm->wrap_text = balsa_app.browse_wrap;
+  bm->shown_headers = balsa_app.shown_headers;
 
 }
 
@@ -235,6 +236,7 @@ save_part (BalsaPartInfo *info)
 
   /* button 0 == OK */
   if ( button == 0 ) {
+
     switch (info->message->mailbox->type)
     {
     case MAILBOX_MH:
@@ -259,17 +261,22 @@ save_part (BalsaPartInfo *info)
     {
       gchar *msg;
       GtkWidget *msgbox;
+
       
       msg = g_strdup_printf ( _ (" Open of %s failed:%s "),
 			      msg_filename, strerror(errno));
+
+      gtk_object_destroy(GTK_OBJECT(save_dialog));
       
       msgbox = gnome_message_box_new (msg, _ ("Error"), _ ("Ok"), NULL);
-      
+
+      gnome_dialog_set_parent(GNOME_DIALOG(msgbox), GTK_WINDOW(balsa_app.main_window));
       gtk_window_set_modal (GTK_WINDOW (msgbox), TRUE);
       gnome_dialog_run (GNOME_DIALOG (msgbox));
       
       g_free(msg);
       g_free(msg_filename);
+
       return;
     }
     filename = gtk_entry_get_text (GTK_ENTRY (gnome_file_entry_gtk_entry (GNOME_FILE_ENTRY (file_entry))));
@@ -282,11 +289,16 @@ save_part (BalsaPartInfo *info)
       
       msg = g_strdup_printf ( _ (" Open of %s failed:%s "), filename, strerror (errno));
 
+      gtk_object_destroy(GTK_OBJECT(save_dialog));
+
       msgbox = gnome_message_box_new (msg, "Error", _ ("Ok"), NULL);
+
+      gnome_dialog_set_parent(GNOME_DIALOG(msgbox), GTK_WINDOW(balsa_app.main_window));
       gtk_window_set_modal (GTK_WINDOW (msgbox), TRUE);
       gnome_dialog_run (GNOME_DIALOG (msgbox));
       
       g_free(msg);
+      
       return;
     }
     fseek (s.fpin, info->body->offset, 0);
@@ -294,6 +306,9 @@ save_part (BalsaPartInfo *info)
     fclose (s.fpin);
     fclose (s.fpout);
   }
+
+  gtk_object_destroy(GTK_OBJECT(save_dialog));
+
 }
 
 GtkWidget *
@@ -419,7 +434,6 @@ balsa_message_set_displayed_headers(BalsaMessage *bmessage, ShownHeaders sh)
   if ( bmessage->message )
     display_headers(bmessage);
 
-  gtk_widget_queue_resize(GTK_WIDGET(bmessage));
 }
 
 void
@@ -556,6 +570,9 @@ display_headers (BalsaMessage * bm)
   g_list_free(lst);
 
   gtk_text_thaw(GTK_TEXT(bm->header_text));
+
+  gtk_widget_queue_resize(GTK_WIDGET(bm->header_text));
+
 }
 
 static void
@@ -647,7 +664,8 @@ part_info_init_unknown (BalsaMessage *bm, BalsaPartInfo *info)
   gchar *msg;
 
   vbox = gtk_vbox_new ( FALSE, 1 );
-
+  gtk_container_set_border_width ( GTK_CONTAINER(vbox), 10 );
+  
   label = gtk_label_new ( _("Balsa does not know how to display this message part") );
   gtk_box_pack_start ( GTK_BOX(vbox), label, FALSE, FALSE, 1 );
   gtk_widget_show (label);
@@ -670,7 +688,7 @@ part_info_init_unknown (BalsaMessage *bm, BalsaPartInfo *info)
   }
 
   button = gtk_button_new_with_label (_("Save part"));
-  gtk_box_pack_start ( GTK_BOX(vbox), button, FALSE, FALSE, 1 );
+  gtk_box_pack_start ( GTK_BOX(vbox), button, FALSE, FALSE, 20 );
   gtk_signal_connect(GTK_OBJECT(button), "clicked", 
 		     (GtkSignalFunc)part_context_menu_save, (gpointer)info);
   gtk_widget_show (button);

@@ -245,7 +245,6 @@ static void
 balsa_index_init (BalsaIndex * bindex)
 {
   GtkCList *clist;
-  cfg_location_t *uiroot;
 
 /*
  * status
@@ -387,6 +386,7 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
 			 MESSAGE_MARK_CLEAR_MASK |
 			 MESSAGE_MARK_UNDELETE_MASK |
 			 MESSAGE_MARK_ANSWER_MASK |
+			 MESSAGE_MARK_FLAGGED_MASK |
 			 MESSAGE_REPLIED_MASK |
 			 MESSAGE_APPEND_MASK,
 			 (gpointer) bindex);
@@ -661,6 +661,10 @@ clist_set_col_img_from_flag (BalsaIndex * bindex, gint row, Message * message)
     gtk_clist_set_pixmap (GTK_CLIST (bindex), row, 1,
 			  balsa_icon_get_pixmap (BALSA_ICON_TRASH),
 			  balsa_icon_get_bitmap (BALSA_ICON_TRASH));
+  else if (message->flags & MESSAGE_FLAG_FLAGGED)
+    gtk_clist_set_pixmap (GTK_CLIST (bindex), row, 1,
+        balsa_icon_get_pixmap (BALSA_ICON_FLAGGED),
+        balsa_icon_get_bitmap (BALSA_ICON_FLAGGED));
 /*
    if (message->flags & MESSAGE_FLAG_FLAGGED)
    gtk_clist_set_pixmap (GTK_CLIST (bindex), row, 1, , mailbox_mask);

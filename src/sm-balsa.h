@@ -33,6 +33,7 @@ typedef struct sm_state_s {
 	gboolean checkmail;
 	gboolean compose_mode;
 	gchar *compose_to;
+	gboolean remember_mbs_to_open;
 	GSList *mbs_to_open;
 } sm_state_t;
 

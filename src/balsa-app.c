@@ -198,3 +198,49 @@ void balsa_error_toggle_fatality( gboolean are_fatal )
 {
 	errors_are_fatal = are_fatal;
 }
+
+/* searching mailbox tree code, see balsa_find_mbox_by_name below */
+static gboolean
+mbox_by_name (gconstpointer a, gconstpointer b)
+{
+  MailboxNode *mbnode = (MailboxNode *) a;
+  const gchar *name = (const gchar *) b;
+  g_assert(mbnode != NULL);
+
+  if(mbnode->mailbox == NULL) 
+    return TRUE;
+  return strcmp(mbnode->mailbox->name, name) != 0;
+}
+
+/* mblist_find_mbox_by_name:
+   search the mailboxes tree for given name.
+*/
+Mailbox *
+balsa_find_mbox_by_name (const gchar *name) {
+  GtkCTreeNode *node;
+  Mailbox *res = NULL;
+
+  
+  if (balsa_app.mailbox_nodes && name) {
+      if (!strcmp (name, balsa_app.sentbox->name))
+	  res = balsa_app.sentbox;
+      else if (!strcmp (name, balsa_app.draftbox->name))
+	  res = balsa_app.draftbox;
+      else if (!strcmp (name, balsa_app.outbox->name))
+	  res = balsa_app.outbox;
+      else if (!strcmp (name, balsa_app.trash->name))
+	  res = balsa_app.trash;
+      else {
+	  node = gtk_ctree_find_by_row_data_custom (
+	      GTK_CTREE(balsa_app.mblist), NULL,
+	      (gchar*)name, mbox_by_name);
+	  if(node) {
+	      MailboxNode * mbnode = gtk_ctree_node_get_row_data(
+		  GTK_CTREE(balsa_app.mblist),node);
+	      res = mbnode->mailbox;
+	  } else
+	      g_print("balsa_find_mbox_by_name: Mailbox %s not found\n",name);
+      }
+  }
+  return res;
+}

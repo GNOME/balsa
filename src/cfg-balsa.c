@@ -717,6 +717,7 @@ static const cfg_parm_t parms_sm_state_t[] = {
 	{ "OpenFirstUnreadMailbox", BALSA_OFFSET_sm_state_t_ELEM_open_unread_mailbox, CPT_BOOL, NULL, cfg_type_const_init_bool( TRUE ) },
 	{ "CheckMailOnStartup", BALSA_OFFSET_sm_state_t_ELEM_checkmail, CPT_BOOL, NULL, cfg_type_const_init_bool( FALSE ) },
 	{ "StartAsComposer", BALSA_OFFSET_sm_state_t_ELEM_compose_mode, CPT_BOOL, NULL, cfg_type_const_init_bool( FALSE ) },
+	{ "RememberMailboxes", BALSA_OFFSET_sm_state_t_ELEM_remember_mbs_to_open, CPT_BOOL, NULL, cfg_type_const_init_bool( TRUE ) },
 	{ "MailboxesToOpen", BALSA_OFFSET_sm_state_t_ELEM_mbs_to_open, CPT_META, NULL, cfg_type_const_init_meta( &spec_mblist, NULL, FALSE ) },
 	cfg_parm_null
 };

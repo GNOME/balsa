@@ -349,14 +349,17 @@ ab_load(GtkWidget * widget, gpointer data)
 	 continue;
       }
 
-      /* fetch all internet e-mail fields */
-      if (g_strncasecmp (string, "EMAIL;INTERNET:",15) == 0) {
-	  if(email) {
-	      gchar * new = g_strconcat(email,", ", string+15, NULL);
-	      g_free(email); 
-	      email = new;
-	  } else 
-	      email = g_strdup(string+15);
+      /* fetch all e-mail fields */
+      if (g_strncasecmp (string, "EMAIL;",6) == 0) {
+	  gchar * ptr = strchr(string,':');
+	  if(ptr) {
+	      if(email) {
+		  gchar * new = g_strconcat(email,", ", ptr+1, NULL);
+		  g_free(email); 
+		  email = new;
+	      } else 
+		  email = g_strdup(ptr+1);
+	  }
       }
    }	 
 

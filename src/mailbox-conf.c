@@ -59,13 +59,13 @@ struct _MailboxConfWindow
     GtkWidget *window;
     GtkWidget *notebook;
 
-    MailboxConfPageType next_page;
+    MailboxConfPageType the_page;
 
     /* for local mailboxes */
     GtkWidget *local_mailbox_name;
     GtkWidget *local_mailbox_path;
 
-    /* for imap mailboxes */
+    /* for imap mailboxes & directories */
     GtkWidget *imap_mailbox_name;
     GtkWidget *imap_server;
     GtkWidget *imap_port;
@@ -232,7 +232,7 @@ mailbox_conf_new (Mailbox * mailbox, gint add_mbox, MailboxType type)
 
   mcw = g_malloc (sizeof (MailboxConfWindow));
   mcw->mailbox = mcw->current = 0;
-  mcw->next_page = MC_PAGE_LOCAL;	/* default next page to LOCAL */
+  mcw->the_page = MC_PAGE_LOCAL;	/* default next page to LOCAL */
   if (add_mbox)
     mcw->current = mailbox;
   else
@@ -423,19 +423,19 @@ mailbox_conf_set_values (Mailbox * mailbox)
  */
 
 static int
-check_for_blank_fields(Mailbox *mailbox)
+check_for_blank_fields(MailboxConfPageType mbox_type)
 {
     gchar *msg = NULL;
     GtkWidget *ask;
     gint clicked_button;
     
-    switch(mailbox->type) {
-    case MAILBOX_MH:
-    case MAILBOX_MAILDIR:
-    case MAILBOX_UNKNOWN:
-	return 1;
+    switch(mbox_type) {
+    case MC_PAGE_LOCAL:
+	if( !*gtk_entry_get_text (GTK_ENTRY (mcw->local_mailbox_name)) )
+	    msg = _("You need to fill in the Mailbox Name field.");
 	break;
-    case MAILBOX_IMAP:
+
+    case MC_PAGE_IMAP:
 	if(!strcmp(gtk_entry_get_text(GTK_ENTRY(mcw->imap_mailbox_name)), "")) 
 	    msg = _("You need to fill in the Mailbox Name field.");
 	if(!strcmp(gtk_entry_get_text(GTK_ENTRY(
@@ -451,12 +451,7 @@ check_for_blank_fields(Mailbox *mailbox)
 	    msg = _("You need to fill in the port field");
 	break;
 
-  case MAILBOX_MBOX:
-    if(!strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->local_mailbox_name)), "")) 
-      msg = _("You need to fill in the Mailbox Name field.");
-    
-    break;
-  case MAILBOX_POP3:
+  case MC_PAGE_POP3:
     if(!strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_mailbox_name)), "") ||
        !strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_username)), "") ||
        !strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_password)), "") ||
@@ -490,6 +485,8 @@ check_for_blank_fields(Mailbox *mailbox)
 	}
     }
     break;
+    case MC_PAGE_NEW:
+	    g_assert_not_reached();
     
   }
   
@@ -527,12 +524,6 @@ conf_update_mailbox (Mailbox * mailbox )
     case MAILBOX_MBOX:
       {
 	gchar *filename;
-	field_check = check_for_blank_fields(mailbox);
-	
-	if(field_check == -1) 
-	  return -1;
-	else if(field_check == -2)
-	  return -2;
 	
 	filename =
 	  gtk_entry_get_text (GTK_ENTRY ((mcw->local_mailbox_path)));
@@ -638,22 +629,46 @@ conf_update_mailbox (Mailbox * mailbox )
 }
 #endif
 
-static Mailbox *
-conf_add_mailbox ()
+static void
+fill_in_imap_data(gchar **name, gchar **path, gchar **user, gchar **passwd,
+		  gchar **host, gint *port)
+{
+    gchar * fos;
+    fos= gtk_entry_get_text(GTK_ENTRY(gnome_entry_gtk_entry(
+	GNOME_ENTRY (mcw->imap_folderpath))));
+
+    if( !( *name = 
+	   g_strdup(gtk_entry_get_text(GTK_ENTRY(mcw->imap_mailbox_name))) )
+	|| strlen(g_strstrip(*name)) == 0) {
+	if(*name) g_free(*name);
+
+	*name = g_strdup_printf( 
+	    _("%s on %s"), fos, 
+	    gtk_entry_get_text(GTK_ENTRY(mcw->imap_server)));
+    }
+    *path   = g_strdup ( fos);
+    *user   = g_strdup ( gtk_entry_get_text (GTK_ENTRY (mcw->imap_username)));
+    *passwd = g_strdup ( gtk_entry_get_text (GTK_ENTRY (mcw->imap_password)));
+    *host   = g_strdup ( gtk_entry_get_text (GTK_ENTRY (mcw->imap_server)));
+    *port   = atol     ( gtk_entry_get_text (GTK_ENTRY (mcw->imap_port)) );
+}
+
+static gboolean
+conf_add_mailbox (Mailbox **mbox)
 {
   Mailbox *mailbox = NULL;
   MailboxType type;
   GNode *node;
-  GString *fos;
-  GString *idstr;
   int field_check;
 
-  MailboxConfPageType cur_page;
-  cur_page = gtk_notebook_get_current_page (GTK_NOTEBOOK (mcw->notebook));
+  *mbox = NULL;
 
-  switch (cur_page)		/* see what page we are on */
+  field_check = check_for_blank_fields(mcw->the_page);
+  if(field_check == -1)
+      return FALSE;
+  
+  switch (mcw->the_page)		/* see what page we are on */
     {
-
 
 /* Local Mailboxes */
     case MC_PAGE_LOCAL:
@@ -672,20 +687,14 @@ conf_add_mailbox ()
 		msgbox = gnome_message_box_new (ptr, GNOME_MESSAGE_BOX_ERROR, _("Cancel"), NULL);
 		free (ptr);
 		gtk_window_set_modal (GTK_WINDOW (msgbox), TRUE);
-		gnome_dialog_run (GNOME_DIALOG (msgbox));
-		return NULL;
+		gnome_dialog_run_and_close (GNOME_DIALOG (msgbox));
+		return FALSE;
 	      }
 	    close (fd);
 	    type = MAILBOX_MBOX;
 	  }
 	mailbox = BALSA_MAILBOX(mailbox_new (type));
 
-	field_check = check_for_blank_fields(mailbox);
-	if(field_check == -2)
-	  break;
-	else if(field_check == -1)
-	  return NULL;
-	
 	mailbox->name = g_strdup (gtk_entry_get_text (
 	    GTK_ENTRY (mcw->local_mailbox_name)));
 	MAILBOX_LOCAL (mailbox)->path = g_strdup (filename);
@@ -698,14 +707,6 @@ conf_add_mailbox ()
 /* POP3 Mailboxes */
     case MC_PAGE_POP3:
       mailbox = BALSA_MAILBOX(mailbox_new (MAILBOX_POP3));
-
-      field_check = check_for_blank_fields(mailbox);
-      if(field_check == -2)
-	break;
-      else if(field_check == -1) {
-	  gtk_object_destroy(GTK_OBJECT(mailbox));
-	  return NULL;
-      }
 
       mailbox->name = g_strdup (gtk_entry_get_text (
 	  GTK_ENTRY (mcw->pop_mailbox_name)));
@@ -722,47 +723,39 @@ conf_add_mailbox ()
 
 /* IMAP Mailboxes */
     case MC_PAGE_IMAP:
-      mailbox = BALSA_MAILBOX(mailbox_new (MAILBOX_IMAP));
-
-      field_check = check_for_blank_fields(mailbox);
-      if(field_check == -2)
-	break;
-      else if(field_check == -1)
-	return NULL;
-
-      fos=(GString *) gtk_entry_get_text(GTK_ENTRY(gnome_entry_gtk_entry(GNOME_ENTRY (mcw->imap_folderpath))));
-      idstr=(GString *) g_string_new((const gchar *)fos);
-      /* used to build a string: MAILBOXNAME " on " SERVERNAME */
-      g_string_append((GString *)idstr, _(" on "));
-      g_string_append((GString *)idstr, (gchar *) gtk_entry_get_text(GTK_ENTRY(mcw->imap_server)));
-     
-      MAILBOX_IMAP (mailbox)->path = g_strdup ((const gchar*)fos);
-      mailbox->name = g_strdup (idstr->str);
-      MAILBOX_IMAP (mailbox)->server->user = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->imap_username)));
-      MAILBOX_IMAP (mailbox)->server->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->imap_password)));
+    {
+	MailboxIMAP * m;
+	g_print("Creating MC_PAGE_IMAP\n");
+	mailbox = BALSA_MAILBOX(mailbox_new (MAILBOX_IMAP));
+	m = BALSA_MAILBOX_IMAP(mailbox);
+	fill_in_imap_data(&mailbox->name, &m->path, &m->server->user, 
+			  &m->server->passwd, &m->server->host, 
+			  &m->server->port);
       
-      
-      if (!MAILBOX_IMAP (mailbox)->path[0])
+	if (!MAILBOX_IMAP (mailbox)->path[0]) 
+	    /* FIXME: disable when IMAPDir stuff becomes functional */
 	{
-	  g_free (MAILBOX_IMAP (mailbox)->path);
-	  MAILBOX_IMAP (mailbox)->path = g_strdup ("INBOX");
+	    g_free (MAILBOX_IMAP (mailbox)->path);
+	    MAILBOX_IMAP (mailbox)->path = g_strdup ("INBOX");
 	}
-      MAILBOX_IMAP (mailbox)->server->host = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->imap_server)));
-      MAILBOX_IMAP (mailbox)->server->port = strtol (gtk_entry_get_text (GTK_ENTRY (mcw->imap_port)), (char **) NULL, 10);
+	
+	node = g_node_new (mailbox_node_new (mailbox->name, mailbox, FALSE));
+	g_node_append (balsa_app.mailbox_nodes, node);
 
-      node = g_node_new (mailbox_node_new (mailbox->name, mailbox, FALSE));
-      g_node_append (balsa_app.mailbox_nodes, node);
-
-      break;
+	break;
+    }
 
     case MC_PAGE_NEW:
-	    g_warning( "An unimportant can\'t-happen has occurred. mailbox-conf.c:712" );
+	    g_assert_not_reached();
 	    break;
     }
 
+  /*config_mailbox_add (mailbox, NULL);*/
   cfg_mailbox_write_simple( mailbox );
+
   mailbox_add_for_checking (mailbox);
-  return mailbox;
+  *mbox = mailbox;
+  return TRUE;
 }
 
 
@@ -790,7 +783,8 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 
   if (save)
     {
-      mailbox = conf_add_mailbox ();
+      /* mailbox = conf_add_mailbox (); */
+      conf_add_mailbox( &mailbox );
       if (!mailbox)
 	return;
     }
@@ -810,9 +804,9 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 }
 
 static void
-set_next_page (GtkWidget * widget, MailboxConfPageType type)
+set_the_page (GtkWidget * widget, MailboxConfPageType type)
 {
-  mcw->next_page = type;
+  mcw->the_page = type;
 }
 
 /*
@@ -845,15 +839,18 @@ create_new_page (void)
   /* local mailbox */
   radio_button = gtk_radio_button_new_with_label (NULL, _("Local mailbox"));
   gtk_box_pack_start (GTK_BOX (vbox), radio_button, FALSE, FALSE, 0);
-  gtk_signal_connect (GTK_OBJECT (radio_button), "clicked", GTK_SIGNAL_FUNC (set_next_page), (gpointer) MC_PAGE_LOCAL);
+  gtk_signal_connect (GTK_OBJECT (radio_button), "clicked", 
+		      GTK_SIGNAL_FUNC(set_the_page), (gpointer) MC_PAGE_LOCAL);
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (radio_button), TRUE);
   gtk_widget_show (radio_button);
 
   /* imap mailbox */
   radio_button = gtk_radio_button_new_with_label
-    (gtk_radio_button_group (GTK_RADIO_BUTTON (radio_button)), _("IMAP server"));
+    (gtk_radio_button_group (GTK_RADIO_BUTTON (radio_button)), 
+     _("Single IMAP folder"));
   gtk_box_pack_start (GTK_BOX (vbox), radio_button, FALSE, FALSE, 0);
-  gtk_signal_connect (GTK_OBJECT (radio_button), "clicked", GTK_SIGNAL_FUNC (set_next_page), (gpointer) MC_PAGE_IMAP);
+  gtk_signal_connect (GTK_OBJECT (radio_button), "clicked", 
+		      GTK_SIGNAL_FUNC (set_the_page), (gpointer) MC_PAGE_IMAP);
   gtk_widget_show (radio_button);
 
   return vbox;
@@ -1119,7 +1116,6 @@ create_imap_mailbox_page (void)
   return return_widget;
 }
 
-
 /*
  * callbacks
  */
@@ -1149,14 +1145,13 @@ next_cb (GtkWidget * widget)
   gtk_container_add (GTK_CONTAINER (bbox), mcw->ok);
   gtk_box_reorder_child (GTK_BOX (bbox), mcw->ok, 0);
 
-  switch (mcw->next_page)
+  switch (mcw->the_page)
     {
     case MC_PAGE_LOCAL:
       gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_LOCAL);
       break;
 
     case MC_PAGE_POP3:
-      set_next_page (NULL, MC_PAGE_POP3);
       gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_POP3);
       break;
 

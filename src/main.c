@@ -237,11 +237,11 @@ main (int argc, char *argv[])
 	  g_list_free( gl );
   }
 
-  if( balsa_state.mbs_to_open ) {
+  if( balsa_state.mbs_to_open && balsa_state.remember_mbs_to_open ) {
 	  GSList *iter;
 
 	  for( iter = balsa_state.mbs_to_open; iter; iter = iter->next ) {
-		  Mailbox *mbox = mblist_find_mbox_by_name( (gchar *) iter->data );
+		  Mailbox *mbox = balsa_find_mbox_by_name( (gchar *) iter->data );
 
 		  if( mbox ) {
 			  if( balsa_app.debug )

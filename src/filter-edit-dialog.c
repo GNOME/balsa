@@ -29,7 +29,7 @@ static option_list fe_run_on[] =
 {
     { N_("Inbound"), 1, NULL },
     { N_("Outbound"), 2, NULL },
-    { N_("Pre-send"), 3, NULL },
+    { N_("Before Sending"), 3, NULL },
     { N_("Demand"), 4, NULL }
 };
 

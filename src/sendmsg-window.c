@@ -82,7 +82,6 @@ static gint iso_15_cb(GtkWidget* , BalsaSendmsg *);
 static gint koi8_r_cb(GtkWidget* , BalsaSendmsg *);
 static gint koi8_u_cb(GtkWidget* , BalsaSendmsg *);
 
-
 /* Standard DnD types */
 enum
   {
@@ -382,9 +381,9 @@ select_attachment (GnomeIconList * ilist, gint num, GdkEventButton * event,
 static void
 add_attachment (GnomeIconList * iconlist, char *filename)
 {
-	/* FIXME: the path to the file must not be hardcoded */ 
+   /* FIXME: the path to the file must not be hardcoded */ 
 	/* gchar *pix = gnome_pixmap_file ("balsa/attachment.png"); */
-	gchar *pix = balsa_pixmap_finder( "balsa/attachment.png" );
+    gchar *pix = balsa_pixmap_finder( "balsa/attachment.png" );
 	
    if( !check_if_regular_file( filename ) ) {
       /*c_i_r_f() will pop up an error dialog for us, so we need do nothing.*/
@@ -464,8 +463,6 @@ attach_dialog_ok (GtkWidget * widget, gpointer data)
       /* do not g_free(filename) - the add_attachment arg is not const */
       /* g_free(filename); */
   }
-
-
 
   gtk_widget_destroy (GTK_WIDGET (fs));
   g_free(dir);
@@ -874,13 +871,14 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
       window = gnome_app_new ("balsa", _ ("New message"));
       msg->orig_message = NULL;
       break;
-
     }
-
-  if( message && message->mailbox )
-	  /* Ref the box so that we don't lose the mail */
-	  mailbox_open_ref( message->mailbox );
-
+  if(message) { /* ref message so we don't loose it ieven if it is deleted */
+      gtk_object_ref( GTK_OBJECT(message) );
+                /* reference the original mailbox so we don't loose the
+		   mail even if the mailbox is closed */
+      if(message->mailbox)
+	  mailbox_open_ref(message->mailbox);
+  }
   msg->window  = window;
   msg->type    = type;
 
@@ -1201,6 +1199,7 @@ strip_chars(gchar *str, const gchar * char2strip)
    creates Message struct based on given BalsaMessage
    stripping EOL chars is necessary - the GtkEntry fields can in principle 
    contain them. Such characters might screw up message formatting
+   (consider moving this code to mutt part).
 */
 static Message *
 bsmsg2message(BalsaSendmsg *bsmsg)
@@ -1233,7 +1232,8 @@ bsmsg2message(BalsaSendmsg *bsmsg)
       strlen(tmp)>0) 
      message->reply_to = make_address_from_string(tmp);
 
-  if (bsmsg->orig_message != NULL) {
+  if (bsmsg->orig_message != NULL && 
+      !GTK_OBJECT_DESTROYED(bsmsg->orig_message) ) {
     message->references = g_strdup (bsmsg->orig_message->message_id);
     
     footime = localtime (&bsmsg->orig_message->datet);
@@ -1287,29 +1287,9 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   message = bsmsg2message (bsmsg);
 
   tmp = gtk_entry_get_text (GTK_ENTRY(GTK_COMBO(bsmsg->fcc[1])->entry));
-  message->fcc_mailbox = NULL;
-  if (balsa_app.mailbox_nodes && tmp != NULL) {
-    if (!strcmp (tmp, balsa_app.sentbox->name))
-       message->fcc_mailbox = balsa_app.sentbox;
-    else if (!strcmp (tmp, balsa_app.draftbox->name))
-       message->fcc_mailbox = balsa_app.draftbox;
-    else if (!strcmp (tmp, balsa_app.outbox->name))
-       message->fcc_mailbox = balsa_app.outbox;
-    else if (!strcmp (tmp, balsa_app.trash->name))
-       message->fcc_mailbox = balsa_app.trash;
-    else {
-      GNode *walk;
-    
-      walk = g_node_last_child (balsa_app.mailbox_nodes);
-      while (walk) {
-        if (!strcmp (tmp, ((MailboxNode *)((walk)->data))->name)) {
-          message->fcc_mailbox = ((MailboxNode *)((walk)->data))->mailbox;
-          break;
-        } else
-          walk = walk->prev;
-      }
-    }
-  }
+  message->fcc_mailbox = tmp != NULL ? 
+      balsa_find_mbox_by_name(tmp) : NULL;
+  
 
   /* not a really nice way of setting and restoring charset..  */
   def_charset =  balsa_app.charset;
@@ -1716,3 +1696,4 @@ static gint koi8_r_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
 {return set_koi8_charset(bsmsg, "r", KOI8_R_POS); }
 static gint koi8_u_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
 {return set_koi8_charset(bsmsg, "u", KOI8_U_POS); }
+

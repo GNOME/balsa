@@ -54,6 +54,7 @@ typedef struct _PropertyUI {
 	GtkWidget *wraplength;
 	GtkWidget *bcc;	  
 	GtkWidget *check_mail_upon_startup;
+	GtkWidget *remember_open_mboxes;
 #ifdef BALSA_SHOW_INFO
 	GtkWidget *mblist_show_mb_content_info;
 #endif
@@ -305,6 +306,8 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 			    property_box);
 
 	gtk_signal_connect (GTK_OBJECT (pui->check_mail_upon_startup), "toggled",
+			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
+	gtk_signal_connect (GTK_OBJECT (pui->remember_open_mboxes), "toggled",
 			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 
 	gtk_signal_connect (GTK_OBJECT (pui->empty_trash), "toggled",
@@ -572,10 +575,15 @@ set_prefs (void)
 	gtk_entry_set_text(GTK_ENTRY(pui->PrintCommand), balsa_app.PrintCommand.PrintCommand);
 	sprintf(tmp, "%d", balsa_app.PrintCommand.linesize);
 	gtk_entry_set_text(GTK_ENTRY(pui->PrintLinesize), tmp);
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->PrintBreakline), balsa_app.PrintCommand.breakline);
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->PrintBreakline),
+				      balsa_app.PrintCommand.breakline);
 
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->check_mail_upon_startup), balsa_state.checkmail );
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->empty_trash), balsa_app.empty_trash_on_exit);
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (
+	    pui->check_mail_upon_startup), balsa_state.checkmail );
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (
+	    pui->remember_open_mboxes), balsa_state.remember_mbs_to_open);
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (
+	    pui->empty_trash), balsa_app.empty_trash_on_exit);
 
 	/* date format */
 	if(balsa_app.date_string) 
@@ -821,7 +829,7 @@ create_mailserver_page ( )
 	table3 = gtk_table_new (3, 1, FALSE);
 	gtk_widget_show (table3);
 
-	frame3 = gtk_frame_new (_("Remote Malibox Servers"));
+	frame3 = gtk_frame_new (_("Remote Mailbox Servers"));
 	gtk_widget_show (frame3);
 	gtk_table_attach (GTK_TABLE (table3), frame3, 0, 1, 0, 1,
 			  (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
@@ -1479,11 +1487,17 @@ create_startup_page ( )
 	gtk_container_add (GTK_CONTAINER (frame), vb1);
 	gtk_container_set_border_width (GTK_CONTAINER (vb1), 5);	
 
-	pui->check_mail_upon_startup = gtk_check_button_new_with_label (_("Check mail upon startup"));
+	pui->check_mail_upon_startup = gtk_check_button_new_with_label (
+	    _("Check mail upon startup"));
 	gtk_widget_show (pui->check_mail_upon_startup);
-	gtk_box_pack_start (GTK_BOX (vb1), pui->check_mail_upon_startup, FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX (vb1), pui->check_mail_upon_startup, 
+			    FALSE, FALSE, 0);
+	pui->remember_open_mboxes = gtk_check_button_new_with_label (
+	    _("Remember open mailboxes between sessions"));
+	gtk_widget_show (pui->remember_open_mboxes);
+	gtk_box_pack_start (GTK_BOX (vb1), pui->remember_open_mboxes, 
+			    FALSE, FALSE, 0);
 	
-
 	return vbox1;
 
 }

@@ -80,6 +80,7 @@ create_menu (GtkWidget * window)
 void addressbook_window_new(GtkWidget *widget, gpointer data)
 {
   GtkWidget *window;
+  GtkWidget *hbox;
   GtkWidget *vbox1;
   GtkWidget *hbox1;
   GtkWidget *label;
@@ -108,7 +109,7 @@ void addressbook_window_new(GtkWidget *widget, gpointer data)
 /* address book list (show nicknames in this list) */
   titles[0] =  "Names";
 
-  vbox1 = gtk_vbox_new (FALSE, 0);
+  vbox1 = gtk_vbox_new (FALSE, 3);
   gtk_widget_show (vbox1);
 
   addyb_list = gtk_clist_new_with_titles (1, titles);
@@ -151,7 +152,7 @@ void addressbook_window_new(GtkWidget *widget, gpointer data)
   gtk_widget_show (vpane);
 
 /* email address list for the currently selected nick in the list above */
-  vbox1 = gtk_vbox_new (FALSE, 0);
+  vbox1 = gtk_vbox_new (FALSE, 3);
   gtk_widget_show (vbox1);
 
   titles[0] =  "Email address";
@@ -208,7 +209,7 @@ void addressbook_window_new(GtkWidget *widget, gpointer data)
 
 /* other stuff... */
 
-  gnome_app_set_contents (GNOME_APP (window), vpane);
+  gnome_app_set_contents (GNOME_APP (window), hpane);
 
   gnome_app_set_menus (GNOME_APP (window),
 		       GTK_MENU_BAR (create_menu (window)));

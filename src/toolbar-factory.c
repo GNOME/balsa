@@ -165,26 +165,17 @@ void
 balsa_toolbar_remove_all(GtkWidget * widget)
 {
     GtkToolbar *toolbar = GTK_TOOLBAR(widget);
-    GList *children;
     
     /* we must be extremely careful here. unparenting used in original
      * code modifies the children list with gtk+2.4 so we have to
      * do toolbar cleanup differently. */
-    for (children = toolbar->children; children; children = children->next) {
-	GtkToolbarChild *child = children->data;
-	/* child can be null if the child was removed */
-	if (child->type != GTK_TOOLBAR_CHILD_SPACE) {
+    while (toolbar->children) {
+	GtkToolbarChild *child = toolbar->children->data;
+	if (child->type == GTK_TOOLBAR_CHILD_SPACE)
+	    gtk_toolbar_remove_space(toolbar, 0);
+	else
 	    gtk_container_remove(GTK_CONTAINER(widget), child->widget);
-	    children = toolbar->children; /* restart loop */
-	}
     }
-    while(toolbar->children &&
-	  ((GtkToolbarChild*)toolbar->children->data)->type ==
-	  GTK_TOOLBAR_CHILD_SPACE)
-	gtk_toolbar_remove_space(toolbar, 0);
-    /* g_list_foreach(toolbar->children, (GFunc)g_free, NULL); */
-    g_list_free(toolbar->children);
-    toolbar->children = NULL;
 }
 
 /* update_all_toolbars:
@@ -354,6 +345,8 @@ balsa_toolbar_refresh(GtkWidget * toolbar)
                                            GTK_ICON_SIZE_LARGE_TOOLBAR),
                                        GTK_SIGNAL_FUNC(bti->callback),
                                        bti->user_data);
+	g_object_add_weak_pointer(G_OBJECT(bti->widget),
+				  (gpointer) &bti->widget);
         g_free(text);
         gtk_widget_set_sensitive(bti->widget, bti->sensitive);
         if (type == GTK_TOOLBAR_CHILD_TOGGLEBUTTON) {
@@ -465,6 +458,16 @@ bt_destroy(GtkWidget * toolbar, BalsaToolbarData * btd)
 /* Create and initialize a BalsaToolbarData structure with the given
  * BalsaToolbarModel.
  */
+static void
+bt_free_icon(gpointer data)
+{
+    BalsaToolbarIcon *bti = data;
+    if (bti->widget)
+	g_object_remove_weak_pointer(G_OBJECT(bti->widget),
+				     (gpointer) &bti->widget);
+    g_free(bti);
+}
+
 static BalsaToolbarData *
 bt_data_new(BalsaToolbarModel * model)
 {
@@ -472,7 +475,7 @@ bt_data_new(BalsaToolbarModel * model)
 
     btd->model = model;
     btd->table =
-        g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+        g_hash_table_new_full(g_str_hash, g_str_equal, g_free, bt_free_icon);
 
     return btd;
 }

@@ -238,7 +238,9 @@ balsa_message_init(BalsaMessage * bm)
 
     gtk_widget_show(bm->table);
 
-    bm->content = gtk_vbox_new(FALSE, 0);
+    bm->content = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(bm->content),
+                                   GTK_POLICY_NEVER, GTK_POLICY_NEVER);
 
     gtk_table_attach(GTK_TABLE(bm->table), bm->content, 0, 1, 1,
 		     2, GTK_EXPAND | GTK_FILL,
@@ -1234,9 +1236,10 @@ typedef struct _message_url_t {
 } message_url_t;
 
 static void handle_url(const message_url_t* url);
-
-#define LINE_WRAP_ROOM           8      /* from gtk_text... */
-#define DEFAULT_TAB_STOP_WIDTH   8      /* chars per tab */
+static void emphasize_url(GtkWidget * widget, message_url_t * url,
+                          gboolean set);
+static message_url_t *find_url(GtkWidget * widget, gint x, gint y,
+                               GList * url_list);
 
 #ifdef HAVE_PCRE
 static const char *url_str = "\\b(((https?|ftps?|nntp)://)|(mailto:|news:))(%[0-9A-F]{2}|[-_.!~*';/?:@&=+$,#\\w])+\\b";
@@ -1316,7 +1319,7 @@ prescanner(const gchar *s)
     return FALSE;
 }
 
-/* do a gtk_text_insert, but mark URL's with balsa_app.url_color */
+/* do a gtk_text_buffer_insert, but mark URL's with balsa_app.url_color */
 static void
 insert_with_url(GtkTextBuffer * buffer, GtkTextIter * insert,
                 GtkTextTag * quote_tag, const char *chars,
@@ -1328,34 +1331,13 @@ insert_with_url(GtkTextBuffer * buffer, GtkTextIter * insert,
     regmatch_t url_match;
     gchar *p, *buf;
 
-    if (!url_tag) {
-        GdkColor color = balsa_app.url_color;
-        gdk_colormap_alloc_color(balsa_app.colormap, &color, FALSE, TRUE);
+    if (!url_tag)
         url_tag = gtk_text_buffer_create_tag(buffer, "url",
                                              "foreground-gdk", 
-                                             &color,
+                                             &balsa_app.url_color,
                                              NULL);
-    }
 
-    /* replace tabs with the correct number of spaces */
-    if (strchr(chars,'\t')) { 
-	gchar *src, *dst;
-	gint n = 0;
-	
-	buf = p = dst = 
-	    g_strnfill(DEFAULT_TAB_STOP_WIDTH * strlen(chars), ' ');
-	for (src = (gchar *)chars; *src; src++, n++) {
-	    if (*src == '\t') {
-		gint newpos = 
-		    ((n / DEFAULT_TAB_STOP_WIDTH) + 1) * DEFAULT_TAB_STOP_WIDTH;
-		dst += newpos - n;
-		n = newpos - 1;
-	    } else
-		*dst++ = *src;
-	}
-	*dst = 0;
-    } else
-	buf = p = g_strdup(chars);
+    buf = p = g_strdup(chars);
 
     if (prescanner(p)) {
 	match = regexec(url_reg, p, 1, &url_match, 0);
@@ -1420,92 +1402,69 @@ fix_text_widget(GtkWidget *widget, gpointer data)
 
 /* check if we are over an url and change the cursor in this case */
 static gboolean
-check_over_url(GtkWidget *widget, GdkEventMotion *event, gpointer data)
+check_over_url(GtkWidget * widget, GdkEventMotion * event,
+               GList * url_list)
 {
-    GList *url_list = 
-	(GList *)gtk_object_get_data(GTK_OBJECT(widget), "url-list");
     gint x, y;
     GdkModifierType mask;
     static gboolean was_over_url = FALSE;
     static message_url_t *current_url = NULL;
     GdkWindow *window;
-    GtkTextIter iter;
-    gint offset;
-
-    if (!url_list)
-	return FALSE;
+    message_url_t *url;
 
     window = gtk_text_view_get_window(GTK_TEXT_VIEW(widget),
                                       GTK_TEXT_WINDOW_TEXT);
+    /* FIXME: why can't we just use
+     * x = event->x;
+     * y = event->y;
+     * ??? */
     gdk_window_get_pointer(window, &x, &y, &mask);
-    gtk_text_view_get_iter_at_location(GTK_TEXT_VIEW(widget), &iter, x, y);
-    offset = gtk_text_iter_get_offset(&iter);
+    url = find_url(widget, x, y, url_list);
 
-    while (url_list) {
-	message_url_t *url_data = (message_url_t *)url_list->data;
-
-	if (url_data->start <= offset && offset < url_data->end) {
-	    if (!url_cursor_normal || !url_cursor_over_url) {
-		url_cursor_normal = gdk_cursor_new(GDK_LEFT_PTR);
-		url_cursor_over_url = gdk_cursor_new(GDK_HAND2);
-	    }
-	    if (!was_over_url) {
-		gdk_window_set_cursor(window, 
-				      url_cursor_over_url);
-		was_over_url = TRUE;
-	    }
-	    if (url_data != current_url) {
-		if (current_url)
-		    balsa_gtk_html_on_url(NULL, NULL);
-		balsa_gtk_html_on_url(NULL, url_data->url);
-		current_url = url_data;
-	    }
-	    return FALSE;
-	}
-	url_list = g_list_next(url_list);
+    if (url) {
+        if (!url_cursor_normal || !url_cursor_over_url) {
+            url_cursor_normal = gdk_cursor_new(GDK_LEFT_PTR);
+            url_cursor_over_url = gdk_cursor_new(GDK_HAND2);
+        }
+        if (!was_over_url) {
+            gdk_window_set_cursor(window, url_cursor_over_url);
+            was_over_url = TRUE;
+        }
+        if (url != current_url) {
+            if (current_url) {
+                emphasize_url(widget, current_url, FALSE);
+                balsa_gtk_html_on_url(NULL, NULL);
+            }
+            balsa_gtk_html_on_url(NULL, url->url);
+            emphasize_url(widget, url, TRUE);
+        }
+    } else if (was_over_url) {
+        gdk_window_set_cursor(window, url_cursor_normal);
+        emphasize_url(widget, current_url, FALSE);
+        balsa_gtk_html_on_url(NULL, NULL);
+        was_over_url = FALSE;
     }
 
-    if (was_over_url) {
-	gdk_window_set_cursor(window, url_cursor_normal);
-	balsa_gtk_html_on_url(NULL, NULL);
-	was_over_url = FALSE;
-	current_url = NULL;
-    }
-
+    current_url = url;
     return FALSE;
 }
 
 /* if the mouse button was released over an url, try to call it */
-static gboolean 
-check_call_url(GtkWidget *widget, GdkEventButton *event, gpointer data)
+static gboolean
+check_call_url(GtkWidget * widget, GdkEventButton * event,
+               GList * url_list)
 {
-    GList *url_list = 
-	(GList *)gtk_object_get_data(GTK_OBJECT(widget), "url-list");
-    
-    if (!url_list)
-	return FALSE;
+    gint x, y;
+    message_url_t *url;
 
-    if (event->type == GDK_BUTTON_RELEASE && event->button == 1) {
-	gint x;
-	gint y;
-        GtkTextIter iter;
-        gint offset;
-	
-        x = event->x;
-        y = event->y;
-        gtk_text_view_get_iter_at_location(GTK_TEXT_VIEW(widget), &iter, x, y);
-        offset = gtk_text_iter_get_offset(&iter);
+    if (event->type != GDK_BUTTON_RELEASE || event->button != 1)
+        return FALSE;
 
-	while (url_list) {
-	    message_url_t *url_data = (message_url_t *)url_list->data;
-
-	    if (url_data->start <= offset && offset < url_data->end) {
-		handle_url(url_data);
-		break;
-	    }
-	    url_list = g_list_next(url_list);
-	}
-    }
+    x = event->x;
+    y = event->y;
+    url = find_url(widget, x, y, url_list);
+    if (url)
+        handle_url(url);
 
     return FALSE;
 }
@@ -1696,13 +1655,11 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
                                  (GtkSignalFunc) fix_text_widget,
                                  url_list);
         if (url_list) {
-            gtk_object_set_data(GTK_OBJECT(item), "url-list",
-                                (gpointer) url_list);
             gtk_signal_connect(GTK_OBJECT(item),
                                "button_release_event",
-                               (GtkSignalFunc) check_call_url, NULL);
+                               (GtkSignalFunc) check_call_url, url_list);
             gtk_signal_connect(GTK_OBJECT(item), "motion-notify-event",
-                               (GtkSignalFunc) check_over_url, NULL);
+                               (GtkSignalFunc) check_over_url, url_list);
         }
 
         g_free(obufp);
@@ -1727,12 +1684,8 @@ static void
 part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info, gchar * ptr,
 		    size_t len)
 {
-    GtkWidget *html, *scroll;
+    GtkWidget *html;
     HtmlDocument *document;
-
-    scroll = gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
-				   GTK_POLICY_NEVER, GTK_POLICY_NEVER);
 
     html = html_view_new();
     document = html_document_new();
@@ -1753,13 +1706,10 @@ part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info, gchar * ptr,
 		       GTK_SIGNAL_FUNC(balsa_gtk_html_on_url),
 		       bm);
 
-    gtk_container_add(GTK_CONTAINER(scroll), html);
-
     gtk_widget_show(html);
-    gtk_widget_show(scroll);
 
     info->focus_widget = html;
-    info->widget = scroll;
+    info->widget = html;
     info->can_display = TRUE;
 }
 #endif
@@ -1960,9 +1910,10 @@ part_create_menu (BalsaPartInfo* info)
     
     content_type = libbalsa_message_body_get_content_type (info->body);
     key_list = list = gnome_vfs_mime_get_key_list(content_type);
-    gdk_threads_leave(); /*FIXME: this hangs balsa */
+    /* gdk_threads_leave(); releasing GDK lock was necessary for broken
+     * gnome-vfs versions */
     app_list = gnome_vfs_mime_get_short_list_applications(content_type);
-    gdk_threads_enter(); /* FIXME: this hangs balsa */
+    /* gdk_threads_enter(); */
 
     if((def_app=gnome_vfs_mime_get_default_application(content_type))) {
 	add_vfs_menu_item(info, def_app);
@@ -2367,7 +2318,38 @@ static void add_multipart(BalsaMessage *bm, LibBalsaMessageBody *parent)
     }
 }
 
+static gdouble old_upper, new_upper;
+static gint resize_idle_id;
 
+static gboolean
+resize_idle(GtkWidget * widget)
+{
+    gdk_threads_enter();
+    resize_idle_id = 0;
+    if (GTK_IS_WIDGET(widget))
+        gtk_widget_queue_resize(widget);
+    old_upper = new_upper;
+    gdk_threads_leave();
+
+    return FALSE;
+}
+
+static void 
+vadj_change_cb(GtkAdjustment *vadj, GtkWidget *widget)
+{
+    gdouble upper = vadj->upper;
+
+    /* do nothing if the height hasn't changed
+     *
+     * an HtmlView widget seems to grow by 4 pixels each time we resize
+     * it, whence the following unobvious test: */
+    if (upper >= old_upper && upper <= old_upper + 4)
+        return;
+    new_upper = upper;
+    if (resize_idle_id) 
+        gtk_idle_remove(resize_idle_id);
+    resize_idle_id = gtk_idle_add((GtkFunction) resize_idle, widget);
+}
 
 static BalsaPartInfo *add_part(BalsaMessage *bm, gint part)
 {
@@ -2385,8 +2367,14 @@ static BalsaPartInfo *add_part(BalsaMessage *bm, gint part)
 	    part_info_init(bm, info);
 
 	if (info->widget) {
+            GtkAdjustment *vadj = NULL;
+
 	    gtk_container_add(GTK_CONTAINER(bm->content), info->widget);
 	    gtk_widget_show(info->widget);
+            vadj = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW
+                                                       (bm->content));
+            gtk_signal_connect(GTK_OBJECT(vadj), "changed",
+                               (GtkSignalFunc) vadj_change_cb, info->widget);
 	}
 	add_multipart(bm, info->body);
     }
@@ -2534,23 +2522,6 @@ balsa_message_key_press_event(GtkWidget * widget, GdkEventKey * event,
 /* balsa_gtk_html_size_request:
    report the requested size of the HTML widget.
 */
-
-static gboolean
-html_size_request_timeout(GtkWidget * widget)
-{
-    gboolean retval = TRUE;
-    
-    gdk_threads_enter();
-    if (!(HTML_VIEW(widget)->relayout_idle_id
-          || HTML_VIEW(widget)->relayout_timeout_id)) {
-        gtk_widget_queue_resize(widget);
-        retval = FALSE;
-    }
-    gdk_threads_leave();
-
-    return retval;
-}
-
 static void
 balsa_gtk_html_size_request(GtkWidget * widget,
 			    GtkRequisition * requisition, gpointer data)
@@ -2563,15 +2534,6 @@ balsa_gtk_html_size_request(GtkWidget * widget,
         widget->style->xthickness * 2;
     requisition->height = GTK_LAYOUT(widget)->vadjustment->upper +
         widget->style->ythickness * 2;
-
-    if (HTML_VIEW(widget)->relayout_idle_id
-        || HTML_VIEW(widget)->relayout_timeout_id) {
-        /* Relayout is pending; this layout is bogus, so we'll wait
-         * until the relayout is carried out, then queue another
-         * size_request. */
-        gtk_timeout_add(1000, (GtkFunction) html_size_request_timeout,
-                        widget);
-    }
 }
 
 static void
@@ -3015,4 +2977,58 @@ quote_tag(GtkTextBuffer * buffer, gint level)
     }
 
     return tag;
+}
+
+/* emphasize_url:
+ * change underlining of a url.
+ */
+static void
+emphasize_url(GtkWidget * widget, message_url_t * url, gboolean set)
+{
+    GtkTextBuffer *buffer =
+        gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
+    GtkTextTagTable *table = gtk_text_buffer_get_tag_table(buffer);
+    static const gchar name[] = "emphasize";
+    GtkTextTag *tag = gtk_text_tag_table_lookup(table, name);
+    GtkTextIter start, end;
+
+    if (!tag)
+        tag = gtk_text_buffer_create_tag(buffer, name, 
+                                         "underline",
+                                         PANGO_UNDERLINE_SINGLE,
+                                         "foreground", "red",
+                                         NULL);
+
+    gtk_text_buffer_get_iter_at_offset(buffer, &start, url->start);
+    gtk_text_buffer_get_iter_at_offset(buffer, &end, url->end);
+    
+    if (set)
+        gtk_text_buffer_apply_tag(buffer, tag, &start, &end);
+    else
+        gtk_text_buffer_remove_tag(buffer, tag, &start, &end);
+}
+
+/* find_url:
+ * look in widget at coordinates x, y for a URL in url_list. */
+static message_url_t *
+find_url(GtkWidget * widget, gint x, gint y, GList * url_list)
+{
+    GtkTextIter iter;
+    gint offset;
+    message_url_t *url;
+
+    gtk_text_view_window_to_buffer_coords(GTK_TEXT_VIEW(widget),
+                                          GTK_TEXT_WINDOW_TEXT,
+                                          x, y, &x, &y);
+    gtk_text_view_get_iter_at_location(GTK_TEXT_VIEW(widget), &iter, x, y);
+    offset = gtk_text_iter_get_offset(&iter);
+
+    while (url_list) {
+        url = (message_url_t *) url_list->data;
+        if (url->start <= offset && offset < url->end)
+            return url;
+        url_list = g_list_next(url_list);
+    }
+
+    return NULL;
 }

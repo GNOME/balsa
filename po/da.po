@@ -2,13 +2,14 @@
 # Copyright (C) 1999 Free Software Foundation, Inc.
 # Birger Langkjer <birger.langkjer@image.dk>, 1999.
 # Kenneth Christiansen - kenneth@ripen.dk
+# Keld Simonsen <keld@dkuug.dk>, 2000
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.5\n"
 "POT-Creation-Date: 2000-04-18 21:23-0400\n"
-"PO-Revision-Date: 2000-04-25 13:30+02:00\n"
-"Last-Translator: Birger Langkjer <birger.langkjer@image.dk>\n"
+"PO-Revision-Date: 2000-04-26 13:30+02:00\n"
+"Last-Translator: Keld Simonsen <keld@dkuug.dk>\n"
 "Language-Team: Danish <dansk@klid.dk>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
@@ -224,6 +225,31 @@ msgstr "Kør GnomeCard"
 #: src/address-book.c:484
 msgid "Re-Import"
 msgstr "Genimportér"
+
+#: src/balsa-app.c:217
+#, c-format
+msgid "Balsa cannot open your \"%s\" mailbox."
+msgstr "Balsa kan ikke åbne din '%s' postbakke."
+
+#: src/balsa-app.c:230
+msgid "Inbox"
+msgstr "Indbakke"
+
+#: src/balsa-app.c:235
+msgid "Outbox"
+msgstr "Udbakke"
+
+#: src/balsa-app.c:240
+msgid "Sentbox"
+msgstr "Sendt_post"
+
+#: src/balsa-app.c:245
+msgid "Draftbox"
+msgstr "Kladder"
+
+#: src/balsa-app.c:250
+msgid "Trash"
+msgstr "Affald"
 
 #: src/balsa-index-page.c:287
 msgid "Mailbox password:"
@@ -1509,6 +1535,10 @@ msgstr "Kan ikke udføre printerkommando."
 msgid "Error executing lpr"
 msgstr "Fejl under køring af lpr"
 
+#: src/spell-check.c:136
+msgid "Spell Check"
+msgstr "Stavekontrol"
+
 #~ msgid "Unable to Open Mailbox!"
 #~ msgstr "Kunne ikke åbne postkasse!"
 
@@ -1517,9 +1547,6 @@ msgstr "Fejl under køring af lpr"
 
 #~ msgid "EMAIL;INTERNET:%s\n"
 #~ msgstr "EMAIL;INTERNET:%s\n"
-
-#~ msgid "Spell Check"
-#~ msgstr "Stavekontrol"
 
 #~ msgid "Local Mailbox Loaded as: %s\n"
 #~ msgstr "Lokal postkasse indlæst som: %s\n"

@@ -33,6 +33,9 @@
 #include "libbalsa.h"
 #include "url.h"
 
+#if GTK_CHECK_VERSION(2,4,0)
+#define USE_COMBO_BOX 1
+#endif
 /*
  * #ifdef BALSA_LOCAL_INSTALL
  * #define gnome_pixmap_file(s) g_strconcat(BALSA_RESOURCE_PREFIX, "/pixmaps/", s, NULL)
@@ -77,9 +80,6 @@ balsa_init_add_table_entry(GtkTable * table, guint num, gchar * ltext,
 {
     GtkWidget *l, *e;
 
-    ed->num = num;
-    ed->druid = druid;
-
     l = gtk_label_new_with_mnemonic(ltext);
     gtk_label_set_justify(GTK_LABEL(l), GTK_JUSTIFY_RIGHT);
     gtk_misc_set_alignment(GTK_MISC(l), 1.0, 0.5);
@@ -87,19 +87,21 @@ balsa_init_add_table_entry(GtkTable * table, guint num, gchar * ltext,
                      GTK_FILL, GTK_FILL, 8, 4);
 
     e = gtk_entry_new();
-    gtk_entry_set_text(GTK_ENTRY(e), etext);
-    g_signal_connect(G_OBJECT(e), "changed",
-                     G_CALLBACK(entry_changed_cb), ed);
     gtk_label_set_mnemonic_widget(GTK_LABEL(l), e);
     gtk_table_attach(table, GTK_WIDGET(e), 1, 2, num + 1, num + 2,
                      GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 8, 4);
-
-    if (etext && etext[0] != '\0')
-        ed->master->setbits |= (1 << num);
-
     (*dest) = e;
-    ed->master->numentries++;
-    ed->master->donemask = (ed->master->donemask << 1) | 1;
+    if(ed) {
+        g_signal_connect(G_OBJECT(e), "changed",
+                         G_CALLBACK(entry_changed_cb), ed);
+        ed->num = ed->master->numentries++;
+        ed->druid = druid;
+        if (etext && etext[0] != '\0')
+            ed->master->setbits |= (1 << num);
+        
+        ed->master->donemask = (ed->master->donemask << 1) | 1;
+    }
+    gtk_entry_set_text(GTK_ENTRY(e), etext);
 }
 
 static void
@@ -129,6 +131,78 @@ entry_changed_cb(GtkEntry * entry, EntryData * ed)
                                               FALSE);
         }
     }
+}
+
+
+void
+balsa_init_add_table_option(GtkTable *table, guint num,
+                            const gchar *ltext, const gchar **optns,
+                            GnomeDruid *druid, GtkWidget **dest)
+{
+    GtkWidget *l, *om;
+    int i;
+    l = gtk_label_new_with_mnemonic(ltext);
+    gtk_label_set_justify(GTK_LABEL(l), GTK_JUSTIFY_RIGHT);
+    gtk_misc_set_alignment(GTK_MISC(l), 1.0, 0.5);
+    gtk_table_attach(table, l, 0, 1, num + 1, num + 2,
+                     GTK_FILL, GTK_FILL, 8, 4);
+
+#ifdef USE_COMBO_BOX
+    *dest = om = gtk_combo_box_new_text();
+    for(i=0; optns[i]; i++)
+        gtk_combo_box_append_text(GTK_COMBO_BOX(om), _(optns[i]));
+    gtk_label_set_mnemonic_widget(GTK_LABEL(l), om);
+    gtk_combo_box_set_active(GTK_COMBO_BOX(om), 0);
+    gtk_table_attach(table, om, 1, 2, num + 1, num + 2,
+                     GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 8, 4);
+#else
+    *dest = gtk_menu_new();
+    for(i=0; optns[i]; i++) {
+        GtkWidget *menu_item = gtk_menu_item_new_with_label(_(optns[i]));
+        g_object_set_data(G_OBJECT(menu_item), "balsa-data",
+                          GINT_TO_POINTER(i));
+        gtk_menu_shell_append(GTK_MENU_SHELL(*dest), menu_item);
+    }
+    om = gtk_option_menu_new();
+    gtk_option_menu_set_menu (GTK_OPTION_MENU(om), *dest);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(l), om);
+    gtk_table_attach(table, om, 1, 2, num + 1, num + 2,
+                     GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 8, 4);
+
+#endif /* USE_COMBO_BOX */
+}
+
+gint
+balsa_option_get_active(GtkWidget *option_widget)
+{
+#ifdef USE_COMBO_BOX
+    return gtk_combo_box_get_active(GTK_COMBO_BOX(option_widget));
+#else
+    GtkWidget *menu_item = gtk_menu_get_active(GTK_MENU(option_widget));
+    return GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menu_item),
+                                             "balsa-data"));
+#endif
+}
+
+void
+balsa_init_add_table_checkbox(GtkTable *table, guint num,
+                              const gchar *ltext, gboolean defval,
+                              GnomeDruid *druid, GtkWidget **dest)
+{
+    GtkWidget *l;
+
+    l = gtk_label_new_with_mnemonic(ltext);
+    gtk_label_set_justify(GTK_LABEL(l), GTK_JUSTIFY_RIGHT);
+    gtk_misc_set_alignment(GTK_MISC(l), 1.0, 0.5);
+    gtk_table_attach(table, l, 0, 1, num + 1, num + 2,
+                     GTK_FILL, GTK_FILL, 8, 4);
+
+    *dest = gtk_check_button_new();
+    gtk_table_attach(table, *dest, 1, 2, num + 1, num + 2,
+                     GTK_FILL, GTK_FILL, 8, 4);
+    if(defval)
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(*dest), TRUE);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(l), *dest);
 }
 
 gboolean

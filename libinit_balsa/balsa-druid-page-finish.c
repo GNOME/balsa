@@ -19,6 +19,9 @@
  * 02111-1307, USA.
  */
 
+#include "config.h"
+
+#include "balsa-druid-page-directory.h"
 #include "balsa-druid-page-finish.h"
 
 #include "save-restore.h"
@@ -65,6 +68,9 @@ balsa_druid_page_finish_finish(GnomeDruidPage * page, GnomeDruid * druid)
     gchar *address_book;
     LibBalsaAddressBook *ab = NULL;
 
+#if defined(ENABLE_TOUCH_UI)
+    balsa_druid_page_directory_later(GTK_WIDGET(druid));
+#endif
     address_book = gnome_util_home_file("GnomeCard.gcrd");
     if (g_file_test(address_book, G_FILE_TEST_EXISTS))
         ab = libbalsa_address_book_vcard_new(_("GnomeCard Address Book"),

@@ -149,14 +149,14 @@ libbalsa_mailbox_pop3_finalize(GObject * object)
 	G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
-GObject *
+LibBalsaMailboxPop3*
 libbalsa_mailbox_pop3_new(void)
 {
-    LibBalsaMailbox *mailbox;
+    LibBalsaMailboxPop3 *mailbox;
 
     mailbox = g_object_new(LIBBALSA_TYPE_MAILBOX_POP3, NULL);
 
-    return G_OBJECT(mailbox);
+    return mailbox;
 }
 
 

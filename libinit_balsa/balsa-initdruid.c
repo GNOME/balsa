@@ -40,8 +40,10 @@ balsa_initdruid_init(GnomeDruid * druid)
 
     balsa_druid_page_welcome(druid, default_logo);
     balsa_druid_page_user(druid, default_logo);
+#if !defined(ENABLE_TOUCH_UI)
     balsa_druid_page_directory(druid, default_logo);
     balsa_druid_page_defclient(druid, default_logo);
+#endif
     balsa_druid_page_finish(druid, default_logo);
 }
 

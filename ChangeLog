@@ -1,3 +1,14 @@
+2004-08-27  Pawel Salek
+
+	* libbalsa/address-book-gpe.c: port fixes.
+	* libbalsa/imap-server.h: remove dependency on libimap.h
+	* libbalsa/mailbox_{imap,pop3}.[hc]: simplify API slightly.
+	* libbalsa/send.c: send via smtp service by default.
+	* libinit_balsa/balsa-druid-page-{directory,finish,user,welcome}.[hc]:
+	new wizard.
+	* libinit_balsa/helper.[hc]: implement add_table_option and checkbox.
+	* src/print.c: set the parent of the warning window.
+
 2004-08-27 08:22  PeterB
 
 	* libbalsa/mailbox_mbox.c: clear unread message count when clearing

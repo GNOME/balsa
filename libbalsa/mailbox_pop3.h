@@ -60,7 +60,7 @@ struct _LibBalsaMailboxPop3Class {
     void (*config_changed) (LibBalsaMailboxPop3* mailbox);
 };
 
-GObject *libbalsa_mailbox_pop3_new(void);
+LibBalsaMailboxPop3 *libbalsa_mailbox_pop3_new(void);
 void libbalsa_mailbox_pop3_set_inbox(LibBalsaMailbox *mailbox,
                                      LibBalsaMailbox *inbox);
 void libbalsa_mailbox_pop3_set_msg_size_limit(LibBalsaMailboxPop3 *mailbox,

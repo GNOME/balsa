@@ -509,7 +509,7 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
     const gchar *phrase, *mailbox, *subject;
     long estimate;
     guint msgno;
-
+    gchar *host_with_port;
     send_lock();
 
     if (!libbalsa_mailbox_open(outbox, NULL)) {
@@ -529,9 +529,11 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
        messages to the session. */
 
     /* FIXME - check for failure returns in the smtp_xxx() calls */
-
+    host_with_port = strchr(smtp_server, ':') 
+        ? g_strdup(smtp_server) : g_strconcat(smtp_server, ":smtp", NULL);
     session = smtp_create_session ();
-    smtp_set_server (session, smtp_server);
+    smtp_set_server (session, host_with_port);
+    g_free(host_with_port);
 
     /* Tell libESMTP how to use the SMTP STARTTLS extension.  */
     smtp_starttls_enable (session, tls_mode);

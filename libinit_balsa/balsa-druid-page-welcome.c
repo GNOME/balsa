@@ -31,15 +31,14 @@ balsa_druid_page_welcome(GnomeDruid * druid, GdkPixbuf * default_logo)
     static const gchar title[] = N_("Welcome to Balsa!");
     static const gchar text[] =
         N_
-        ("You seem to be running Balsa for the first time. "
-         "The following steps will set up Balsa by asking "
-         "a few simple questions. Once you have completed "
-         "these steps, you can always change them later in "
-         "Balsa's preferences. If any files or directories "
-         "need to be created, it will be done so automatically.\n"
-         "  Please check the about box in Balsa's main window "
-         "for more information about contacting the authors "
-         "or reporting bugs.");
+        ("Before you can send or receive email:\n\n"
+         "-- either you should already have Internet access and an "
+         "email account, provided by an Internet Service Provider, "
+         "and you should have made that Internet connection on your "
+         "computer\n\n"
+         "-- or your Network Administrator at your place of "
+         "work/study/similar may have set up your computer to "
+         "connect to the network.");
 
     page =
         GNOME_DRUID_PAGE_EDGE(gnome_druid_page_edge_new

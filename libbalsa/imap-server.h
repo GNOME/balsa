@@ -42,13 +42,13 @@ LibBalsaImapServer* libbalsa_imap_server_new(const gchar *username,
                                              const gchar *host);
 LibBalsaImapServer* libbalsa_imap_server_new_from_config(void);
 void libbalsa_imap_server_save_config(LibBalsaImapServer *server);
-ImapMboxHandle* libbalsa_imap_server_get_handle(LibBalsaImapServer *server,
-                                                GError **err);
-ImapMboxHandle* libbalsa_imap_server_get_handle_with_user(
-                                LibBalsaImapServer *imap_server,
-                                gpointer user, GError **err);
+struct _ImapMboxHandle* libbalsa_imap_server_get_handle
+                          (LibBalsaImapServer *server, GError **err);
+struct _ImapMboxHandle* libbalsa_imap_server_get_handle_with_user
+                          (LibBalsaImapServer *imap_server,
+                           gpointer user, GError **err);
 void libbalsa_imap_server_release_handle(LibBalsaImapServer *server,
-                                         ImapMboxHandle* handle);
+                                         struct _ImapMboxHandle* handle);
 void libbalsa_imap_server_set_max_connections(LibBalsaImapServer *server,
                                               int max);
 int  libbalsa_imap_server_get_max_connections(LibBalsaImapServer *server);

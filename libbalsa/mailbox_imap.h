@@ -43,7 +43,7 @@ typedef struct _LibBalsaMailboxImapClass LibBalsaMailboxImapClass;
 #define POINTER_TO_UID(p) GPOINTER_TO_UINT(p)
 #define UID_TO_POINTER(p) GUINT_TO_POINTER(p)
 
-GObject *libbalsa_mailbox_imap_new(void);
+LibBalsaMailboxImap *libbalsa_mailbox_imap_new(void);
 
 void libbalsa_mailbox_imap_update_url(LibBalsaMailboxImap* mailbox);
 void libbalsa_mailbox_imap_set_path(LibBalsaMailboxImap * mailbox,

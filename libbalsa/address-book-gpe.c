@@ -223,17 +223,21 @@ gpe_read_attr(void *arg, int argc, char **argv, char **names)
     LibBalsaAddress * a= arg;
 
     /* follow read_entry_data/db_set_multi_data */
-    if(g_ascii_strcasecmp(argv[0], "GIVEN_NAME") == 0 &&
-       !a->first_name) a->first_name = g_strdup(argv[1]);
-    if(g_ascii_strcasecmp(argv[0], "FAMILY_NAME") == 0 &&
-       !a->last_name) a->last_name = g_strdup(argv[1]);
-    if(g_ascii_strcasecmp(argv[0], "NICKNAME") == 0 &&
-       !a->nick_name) a->nick_name = g_strdup(argv[1]);
-    if(g_ascii_strcasecmp(argv[0], "WORK_ORGANIZATION") == 0 &&
-       !a->organization) a->organization = g_strdup(argv[1]);
-    if(g_ascii_strcasecmp(argv[0], "HOME_EMAIL") == 0)
+    if(g_ascii_strcasecmp(argv[0], "NAME") == 0 &&
+       !a->full_name) a->full_name = g_strdup(argv[1]);
+    else if(g_ascii_strcasecmp(argv[0], "GIVEN_NAME") == 0 &&
+            !a->first_name) a->first_name = g_strdup(argv[1]);
+    else if(g_ascii_strcasecmp(argv[0], "FAMILY_NAME") == 0 &&
+            !a->last_name) a->last_name = g_strdup(argv[1]);
+    else if(g_ascii_strcasecmp(argv[0], "NICKNAME") == 0 &&
+            !a->nick_name) a->nick_name = g_strdup(argv[1]);
+    else if(g_ascii_strcasecmp(argv[0], "WORK.ORGANIZATION") == 0 &&
+            !a->organization) a->organization = g_strdup(argv[1]);
+    else if(g_ascii_strcasecmp(argv[0], "HOME.EMAIL") == 0 &&
+            !a->address_list)
         a->address_list = g_list_prepend(a->address_list, g_strdup(argv[1]));
-    if(g_ascii_strcasecmp(argv[0], "WORK_EMAIL") == 0)
+    else if(g_ascii_strcasecmp(argv[0], "WORK.EMAIL") == 0 &&
+            !a->address_list)
         a->address_list = g_list_prepend(a->address_list, g_strdup(argv[1]));
     return 0;
 }
@@ -277,7 +281,8 @@ gpe_read_address(void *arg, int argc, char **argv, char **names)
     sqlite_exec_printf (gc->gpe->db,
                         "select tag,value from contacts where urn=%d",
                         gpe_read_attr, a, NULL, uid);
-    a->full_name = create_name(a->first_name, a->last_name);
+    if(!a->full_name)
+        a->full_name = create_name(a->first_name, a->last_name);
     g_object_set_data(G_OBJECT(a), "urn", GUINT_TO_POINTER(uid));
     gc->callback(LIBBALSA_ADDRESS_BOOK(gc->gpe), a, gc->closure);
     return 0;
@@ -319,11 +324,11 @@ libbalsa_address_book_gpe_load(LibBalsaAddressBook * ab,
         r = sqlite_exec_printf
             (gpe_ab->db, 
              "select distinct urn from contacts where "
-             "upper(tag)='FAMILY_NAME' and value LIKE '%q%%' or "
-             "upper(tag)='GIVEN_NAME' and value LIKE '%q%%' or "
-             "upper(tag)='WORK_EMAIL' and value LIKE '%q%%' or "
-             "upper(tag)='HOME_EMAIL' and value LIKE '%q%%'",
-             gpe_read_address, &gc, &err, filter, filter, filter, filter);
+             "(upper(tag)='FAMILY_NAME' or upper(tag)='GIVEN_NAME' or "
+             "upper(tag)='NAME' or "
+             "upper(tag)=WORK.EMAIL' or upper(tag)='HOME.EMAIL') "
+             "and value LIKE '%q%%'",
+             gpe_read_address, &gc, &err, filter);
     } else {
         r = sqlite_exec(gpe_ab->db, "select distinct urn from contacts_urn",
                         gpe_read_address, &gc, &err);
@@ -374,11 +379,12 @@ libbalsa_address_book_gpe_add_address(LibBalsaAddressBook *ab,
     /* FIXME: duplicate detection! */
 
     id = sqlite_last_insert_rowid(gpe_ab->db);
+    INSERT_ATTR(gpe_ab->db,id, "NAME",  address->full_name);
     INSERT_ATTR(gpe_ab->db,id, "GIVEN_NAME",  address->first_name);
     INSERT_ATTR(gpe_ab->db,id, "FAMILY_NAME", address->last_name);
     INSERT_ATTR(gpe_ab->db,id, "NICKNAME",    address->nick_name);
-    INSERT_ATTR(gpe_ab->db,id, "WORK_ORGANIZATION", address->organization);
-    INSERT_ATTR(gpe_ab->db,id, "WORK_EMAIL",
+    INSERT_ATTR(gpe_ab->db,id, "WORK.ORGANIZATION", address->organization);
+    INSERT_ATTR(gpe_ab->db,id, "WORK.EMAIL",
                 (char*)address->address_list->data);
 
     return LBABERR_OK;
@@ -474,7 +480,8 @@ gpe_read_completion(void *arg, int argc, char **argv, char **names)
     sqlite_exec_printf (gc->db,
                         "select tag,value from contacts where urn=%d",
                         gpe_read_attr, a, NULL, uid);
-    a->full_name = create_name(a->first_name, a->last_name);
+    if(!a->full_name)
+        a->full_name = create_name(a->first_name, a->last_name);
     g_object_set_data(G_OBJECT(a), "urn", GUINT_TO_POINTER(uid));
     if(!*gc->new_prefix) 
         *gc->new_prefix = libbalsa_address_to_gchar(a, 0);
@@ -491,7 +498,8 @@ libbalsa_address_book_gpe_alias_complete(LibBalsaAddressBook * ab,
     static const char *query = 
         "select distinct urn from contacts where "
         "(upper(tag)='FAMILY_NAME' or upper(tag)='FIRST_NAME' or "
-        "upper(tag)='WORK_EMAIL' or upper(tag)='HOME_EMAIL') "
+        "upper(tag)='NAME' or "
+        "upper(tag)='WORK.EMAIL' or upper(tag)='HOME.EMAIL') "
         "and upper(value) LIKE '%q%%'";
     struct gpe_completion_closure gcc;
     LibBalsaAddressBookGpe *gpe_ab;

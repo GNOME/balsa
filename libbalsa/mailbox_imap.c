@@ -297,13 +297,13 @@ libbalsa_mailbox_imap_finalize(GObject * object)
 	G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
-GObject *
+LibBalsaMailboxImap*
 libbalsa_mailbox_imap_new(void)
 {
-    LibBalsaMailbox *mailbox;
+    LibBalsaMailboxImap *mailbox;
     mailbox = g_object_new(LIBBALSA_TYPE_MAILBOX_IMAP, NULL);
 
-    return G_OBJECT(mailbox);
+    return mailbox;
 }
 
 /* libbalsa_mailbox_imap_update_url:

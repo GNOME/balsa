@@ -44,28 +44,36 @@ extern "C" {
 #endif
 #define BALSA_DRUID_PAGE_USER(obj) ((BalsaDruidPageUser *) obj)
     struct _BalsaDruidPageUser {
+        GtkWidget *incoming_srv;
+        GtkWidget *incoming_type;
+        GtkWidget *using_ssl;
+        GtkWidget *login;
+        GtkWidget *passwd;
+        GtkWidget *remember_passwd;
+#if ENABLE_ESMTP
+        GtkWidget *smtp;
+#endif
         GtkWidget *name;
         GtkWidget *email;
-        GtkWidget *smtp;
+#if !defined(ENABLE_TOUCH_UI)
         GtkWidget *localmaildir;
+#endif /* ENABLE_TOUCH_UI */
         EntryMaster emaster;
         EntryData ed0;
         EntryData ed1;
         EntryData ed2;
         EntryData ed3;
-
+        EntryData ed4;
+        EntryData ed5;
+        EntryData ed6;
+        EntryData ed7;
     };
 
 /*
  * Public methods
  */
-#if BALSA_MAJOR < 2
-    void balsa_druid_page_user(GnomeDruid * druid, 
-                               GdkImlibImage * default_logo);
-#else
     void balsa_druid_page_user(GnomeDruid * druid, 
                                GdkPixbuf * default_logo);
-#endif                          /* BALSA_MAJOR < 2 */
 
 #ifdef __cplusplus
 }

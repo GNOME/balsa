@@ -54,6 +54,14 @@ GdkPixbuf *balsa_init_get_png(const gchar * fname);
 void balsa_init_add_table_entry(GtkTable * table, guint num, gchar * ltext,
                                 const gchar * etext, EntryData * ed,
                                 GnomeDruid * druid, GtkWidget ** dest);
+void balsa_init_add_table_option(GtkTable *table, guint num,
+                                 const gchar *ltext, const gchar **optns,
+                                 GnomeDruid *druid, GtkWidget **dest);
+void balsa_init_add_table_checkbox(GtkTable *table, guint num,
+                                   const gchar *ltext, gboolean defval,
+                                   GnomeDruid *druid, GtkWidget **dest);
+gint balsa_option_get_active(GtkWidget *option_widget);
+
 gboolean balsa_init_create_to_directory(const gchar * dir,
                                         gchar ** complaint);
 

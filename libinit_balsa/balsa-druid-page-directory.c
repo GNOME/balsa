@@ -220,7 +220,7 @@ balsa_druid_page_directory_init(BalsaDruidPageDirectory * dir,
         g_free(preset);
     }
 
-    gtk_box_pack_start(GTK_BOX(page->vbox), GTK_WIDGET(table), TRUE, TRUE,
+    gtk_box_pack_start(GTK_BOX(page->vbox), GTK_WIDGET(table), FALSE, TRUE,
                        8);
     gtk_widget_show_all(GTK_WIDGET(table));
 
@@ -282,6 +282,7 @@ balsa_druid_page_directory_prepare(GnomeDruidPage * page,
         gtk_entry_set_text(GTK_ENTRY(dir->trash), buf);
         g_free(buf);
     }
+
 
     /* Don't let them continue unless all entries have something. */
     if (ENTRY_MASTER_DONE(dir->emaster)) {
@@ -347,6 +348,37 @@ balsa_druid_page_directory_next(GnomeDruidPage * page, GtkWidget * druid,
     }
 
     return FALSE;
+}
+
+#define SET_MAILBOX(fname, config, mbx) \
+do { gchar *t=g_strconcat(balsa_app.local_mail_directory,"/",(fname),NULL);\
+ unconditional_mailbox(t, config, (mbx), &error); g_free(t);}while(0)
+
+void
+balsa_druid_page_directory_later(GtkWidget *druid)
+{
+    gchar *error = NULL;
+    gchar *spool = libbalsa_guess_mail_spool();
+    unconditional_mailbox(spool, INBOX_NAME, &balsa_app.inbox, &error);
+    g_free(spool);
+    SET_MAILBOX("trash",    TRASH_NAME,    &balsa_app.trash);
+    SET_MAILBOX("outbox",   OUTBOX_NAME,   &balsa_app.outbox);
+    SET_MAILBOX("sentbox",  SENTBOX_NAME,  &balsa_app.sentbox);
+    SET_MAILBOX("draftbox", DRAFTBOX_NAME, &balsa_app.draftbox);
+    if (error) {
+        GtkWidget *dlg =
+            gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_ancestor
+                                          (GTK_WIDGET(druid), 
+                                           GTK_TYPE_WINDOW)),
+                                   GTK_DIALOG_MODAL,
+                                   GTK_MESSAGE_ERROR,
+                                   GTK_BUTTONS_OK,
+                                   _("Problem Creating Mailboxes\n%s"),
+                                   error);
+        g_free(error);
+        gtk_dialog_run(GTK_DIALOG(dlg));
+        gtk_widget_destroy(dlg);
+    }
 }
 
 static gboolean

@@ -1623,6 +1623,7 @@ font_frame(gchar * title, FontInfo * fi)
 /*
  * creates the print dialog, and adds a page for fonts
  */
+static void common_info_setup(CommonInfo * ci);
 static GtkWidget *
 print_dialog(CommonInfo * ci)
 {
@@ -1637,6 +1638,8 @@ print_dialog(CommonInfo * ci)
 
     dialog = BALSA_GNOME_PRINT_DIALOG_NEW(ci->master, _("Print message"),
 				    GNOME_PRINT_DIALOG_COPIES);
+    ci->dialog = dialog;
+    common_info_setup(ci);
     gtk_window_set_wmclass(GTK_WINDOW(dialog), "print", "Balsa");
     dlgVbox = GTK_DIALOG(dialog)->vbox;
     childList = gtk_container_get_children(GTK_CONTAINER(dlgVbox));
@@ -1683,11 +1686,12 @@ font_info_setup(FontInfo * fi, gchar ** font_name, CommonInfo * ci)
     fi->common_info = ci;
     fi->font = find_font(*font_name);
     if (!fi->font)
-	balsa_information(LIBBALSA_INFORMATION_WARNING,
-			  _("Balsa could not find font \"%s\".\n"
-			    "Use the \"Fonts\" page on the "
-                            "\"Print message\" dialog to change it."),
-                          *fi->font_name);
+	balsa_information_parented
+            (GTK_WINDOW(ci->dialog), LIBBALSA_INFORMATION_WARNING,
+             _("Balsa could not find font \"%s\".\n"
+               "Use the \"Fonts\" page on the "
+               "\"Print message\" dialog to change it."),
+             *fi->font_name);
 }
 
 static void
@@ -1837,7 +1841,6 @@ message_print(LibBalsaMessage * msg, GtkWindow * parent)
                            (GDestroyNotify) common_info_destroy);
     ci->parent_object = parent_object;
 
-    common_info_setup(ci);
     ci->message = msg;
     if (!msg->mailbox) {
         /* temporary message from the compose window */

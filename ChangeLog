@@ -1,5 +1,8 @@
-2004-10-27 08:26  PeterB
+2004-10-27 20:14  PeterB
 
+	* src/Makefile.am: define lots of *_DISABLE_DEPRECATED symbols.
+	* src/ab-main.c: migrate from deprecated GtkItemFactory to
+	GtkUIManager.
 	* src/toolbar-factory.c: do not use deprecated parts of the
 	GtkToolbar api.
 	* src/toolbar-prefs.c: plug leak.

@@ -1,4 +1,8 @@
-2001-12-03  Pawel Salek  <pawsa@theochem.kth.se>
+2001-12-15  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/sendmsg-window.c: format=flowed - de-stuff leading space.
+
+2001-12-13  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Require gdk-pixbuf.
 	* acconfig.h: remove USE_PIXBUF

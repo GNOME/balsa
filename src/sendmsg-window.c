@@ -1693,9 +1693,12 @@ continueBody(BalsaSendmsg * msg, LibBalsaMessage * message)
 	if (body && !body->filename) {
 	    GString *rbdy;
 	    gchar *body_type = libbalsa_message_body_get_content_type(body);
+            gint llen = -1;
 
+            if (msg->flow && libbalsa_flowed_rfc2646(body))
+                llen = balsa_app.wraplength;
 	    if (!strcmp(body_type, "text/plain") &&
-		(rbdy = process_mime_part(message, body, NULL, -1, FALSE,
+		(rbdy = process_mime_part(message, body, NULL, llen, FALSE,
                                           msg->flow))) {
 		gtk_text_insert(GTK_TEXT(msg->text), NULL, NULL, NULL, 
 				rbdy->str, rbdy->len);

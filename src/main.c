@@ -53,12 +53,15 @@ pthread_mutex_t                 send_messages_lock;
 int				checking_mail;
 int                             sending_mail;
 int				mail_thread_pipes[2];
+int                             send_thread_pipes[2];
 GIOChannel 		*mail_thread_msg_send;
 GIOChannel 		*mail_thread_msg_receive;
+GIOChannel              *send_thread_msg_send;
+GIOChannel              *send_thread_msg_receive;
 
 
 static void threads_init( gboolean init );
-#endif
+#endif /* BALSA_USE_THREADS */
 
 #ifdef BALSA_USE_EXPERIMENTAL_INIT
 #if 0  /*Don't use it for real init until it is "finished"*/
@@ -199,6 +202,16 @@ threads_init( gboolean init )
 	g_io_add_watch ( mail_thread_msg_receive, G_IO_IN,
 					mail_progress_notify_cb,
 					NULL );
+
+	if( pipe( send_thread_pipes) < 0 )
+	{
+	   g_log ("BALSA Init", G_LOG_LEVEL_DEBUG, "Error opening pipes.\n" );
+	}
+	send_thread_msg_send = g_io_channel_unix_new ( send_thread_pipes[1] );
+	send_thread_msg_receive = g_io_channel_unix_new ( send_thread_pipes[0] );
+	g_io_add_watch ( send_thread_msg_receive, G_IO_IN,
+					send_progress_notify_cb,
+					NULL );
 					
   }
   else
@@ -207,7 +220,7 @@ threads_init( gboolean init )
     pthread_mutex_destroy( &send_messages_lock );
   }
 }
-#endif
+#endif /* BALSA_USE_THREADS */
 
 
 

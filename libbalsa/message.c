@@ -26,15 +26,20 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <time.h>
+#ifdef BALSA_USE_THREADS
 #include <pthread.h>
+#endif
 
 #include "mailbackend.h"
 
-#include "threads.h"
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 
 #include "misc.h"
+
+#ifdef BALSA_USE_THREADS
+#include "threads.h"
+#endif
 
 static void libbalsa_message_class_init (MessageClass *klass);
 static void libbalsa_message_init (Message *message);

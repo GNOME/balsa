@@ -236,6 +236,7 @@ void check_all_imap_hosts (Mailbox *, GList *);
 void add_mailboxes_for_checking (Mailbox *);
 gint mailbox_have_new_messages (gchar * path);
 GList *make_list_from_string (gchar *);
+gint mailbox_check_new_sent (Mailbox * mailbox);
 
 /* 
  * open and close a mailbox 

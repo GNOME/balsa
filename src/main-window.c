@@ -76,8 +76,6 @@ enum {
 extern void load_messages (Mailbox * mailbox, gint emit);
 
 void progress_dialog_destroy_cb ( GtkWidget *, gpointer data);
-gboolean mail_progress_notify_cb( );
-
 #endif
 
 static void balsa_window_class_init(BalsaWindowClass *klass);
@@ -919,6 +917,62 @@ void progress_dialog_destroy_cb( GtkWidget *widget, gpointer data )
 {
   gtk_widget_destroy( widget );
   widget = NULL;
+}
+
+gboolean
+send_progress_notify_cb( )
+{
+    SendThreadMessage *threadmessage;
+    SendThreadMessage **currentpos;
+    char *msgbuffer;
+    uint count;
+
+    msgbuffer = malloc( 2049 );
+
+    g_io_channel_read( send_thread_msg_receive, msgbuffer, 
+          2048, &count );
+
+    if( count < sizeof( void *) )
+      {
+	free( msgbuffer );
+	return TRUE;
+      }
+
+    currentpos = msgbuffer;
+
+    while( count ) 
+      {
+	threadmessage = *currentpos;
+
+	if( balsa_app.debug )
+	  fprintf( stderr, "Send_Message: %lu, %d, %s\n", 
+		   (unsigned long) threadmessage, threadmessage->message_type,
+		   threadmessage->message_string );
+	switch( threadmessage->message_type )  
+	  {
+	  case MSGSENDTHREADERROR:
+	    fprintf(stderr, "Send Error %s\n", threadmessage->message_string);
+	    break;
+	  case MSGSENDTHREADLOAD:
+	    LOCK_MAILBOX (threadmessage->mbox);
+	    load_messages (threadmessage->mbox, 1);
+	    UNLOCK_MAILBOX (threadmessage->mbox);
+	    break;
+	  case MSGSENDTHREADPOSTPONE:
+	    fprintf(stderr, "Send Postpone %s\n", 
+		    threadmessage->message_string);
+	    break;
+	  default:
+	    fprintf ( stderr, " Unknown: %s \n", 
+		      threadmessage->message_string );
+	  }
+	free( threadmessage );
+	currentpos++;
+	count -= sizeof(void *);
+      }
+    free( msgbuffer );
+	
+    return TRUE;
 }
 #endif USE_BALSA_THREADS
 

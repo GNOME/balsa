@@ -230,16 +230,16 @@ balsa_send_message_real(HEADER *msg, char *tempfile, Mailbox *fcc )
   if (balsa_app.smtp) 
      i = balsa_smtp_send (msg,tempfile,balsa_app.smtp_server);
   else	        
-     i = mutt_invoke_sendmail (msg->env->to, msg->env->cc, msg->env->bcc,tempfile,(msg->content->encoding == ENC8BIT));
+     i = mutt_invoke_sendmail (msg->env->to, msg->env->cc, msg->env->bcc,
+			       tempfile,(msg->content->encoding == ENC8BIT));
   
   if (i==-1)
   {
     mutt_write_fcc (MAILBOX_LOCAL (balsa_app.outbox)->path, msg, NULL, 1);
-    /* todo:  enable w/ message to main thread */
-#ifndef BALSA_USE_THREADS
+
     if (balsa_app.outbox->open_ref > 0)
-       mailbox_check_new_messages (balsa_app.outbox);
-#endif
+	mailbox_check_new_sent(balsa_app.outbox);
+
     mutt_free_header (&msg);
 
  /* Since we didn´t send the mail we don´t save it at send_mailbox */
@@ -249,14 +249,13 @@ balsa_send_message_real(HEADER *msg, char *tempfile, Mailbox *fcc )
   if ((balsa_app.sentbox->type == MAILBOX_MAILDIR ||
        balsa_app.sentbox->type == MAILBOX_MH ||
        balsa_app.sentbox->type == MAILBOX_MBOX) &&
-       fcc != NULL) {
-    mutt_write_fcc (MAILBOX_LOCAL (fcc)->path, msg, NULL, 0);
-    /* todo:  enable from message to main thread via pipe */
-#ifndef BALSA_USE_THREADS
-    if (fcc->open_ref > 0)
-        mailbox_check_new_messages (fcc);
-#endif
-  }
+       fcc != NULL) 
+    {
+      mutt_write_fcc (MAILBOX_LOCAL (fcc)->path, msg, NULL, 0);
+
+      if (fcc->open_ref > 0)
+	mailbox_check_new_sent( fcc );
+    }
   mutt_free_header (&msg);
 
   return TRUE;

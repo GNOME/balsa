@@ -1,3 +1,9 @@
+1999-12-08  David Pickens <dsp@iAesthetic.com>
+	* libbalsa/mailbox.c, mailbox.h, message.c, send.c, threads.h, 
+	  src/main-window.c, main-window.h, main.c, threads.h
+	Added messaging system for sending thread to communicate
+	w/ main thread.  Outbox/Sentbox now update on send.
+
 1999-12-07  Peter Williams <peter@newton.cx>
 	* libinit_balsa/balsa-druid-page-error.gob: Added nice
 	  error page

@@ -761,8 +761,7 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     g_assert(iter.user_data != NULL);
     iter.stamp = mailbox->stamp;
     path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
-    g_signal_emit(mailbox, libbalsa_mailbox_signals[MESSAGES_REMOVED],
-		  (GQuark) 0, path, &iter);
+    g_signal_emit_by_name(mailbox, "row-deleted", path, &iter);
     mailbox->total_messages--;
     gtk_tree_path_free(path);
     g_node_destroy(dt.node);

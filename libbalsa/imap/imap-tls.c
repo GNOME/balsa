@@ -46,7 +46,9 @@ create_ssl(void)
 {
   SSL *ssl;
 
+#ifdef BALSA_USE_THREADS
   pthread_mutex_lock(&global_tls_lock);
+#endif
   if(!global_ssl_context) {
     SSL_load_error_strings();
     SSL_library_init();
@@ -57,7 +59,9 @@ create_ssl(void)
      */
     /* Load the trusted CAs here */
   }
+#ifdef BALSA_USE_THREADS
   pthread_mutex_unlock(&global_tls_lock);
+#endif
 
   ssl = SSL_new(global_ssl_context);
 

@@ -1,3 +1,8 @@
+2000-05-30  Matthew Guenther <mguenthe@netcom.ca>
+
+	* help/C/Makefile.am:  Use stylesheet images directory.
+	* help/C/balsa.sgml:  Correct copyright dates.
+
 2000-05-30  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/address-book.c: bug #12535 fix.

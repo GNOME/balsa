@@ -1481,7 +1481,7 @@ static void
 do_delete(BalsaIndex* index, gboolean move_to_trash)
 {
     GList *list;
-    BalsaIndex *trash = NULL;
+    BalsaIndex *trash = balsa_find_index_by_mailbox(balsa_app.trash);
     LibBalsaMessage *message;
     gboolean select_next = TRUE;
     GList *messages=NULL;
@@ -1497,7 +1497,7 @@ do_delete(BalsaIndex* index, gboolean move_to_trash)
 	messages= g_list_append(messages, message);
     }
     if(messages) {
-	if (move_to_trash)
+	if (move_to_trash && (index != trash))
 	    libbalsa_messages_move(messages, balsa_app.trash);
 	else
 	    libbalsa_messages_delete(messages);
@@ -1522,8 +1522,7 @@ do_delete(BalsaIndex* index, gboolean move_to_trash)
      * If messages moved to trash mailbox and it's open in the
      * notebook, reset the contents.
      */
-    if (move_to_trash && 
-	(trash = balsa_find_index_by_mailbox(balsa_app.trash)))
+    if (move_to_trash && trash)
 	balsa_index_reset(trash);
 
     balsa_index_redraw_current(index);

@@ -552,8 +552,8 @@ static GnomeUIInfo main_toolbar[] = {
 			   GNOME_STOCK_PIXMAP_MAIL_RCV),
     GNOMEUIINFO_SEPARATOR,
 #define TOOLBAR_DELETE_POS 2
-    GNOMEUIINFO_ITEM_STOCK(N_("Delete"), N_("Delete message"),
-			   delete_message_cb,
+    GNOMEUIINFO_ITEM_STOCK(N_("Trash/\nDelete"), N_("Move to Trash or Delete the current message"),
+			   trash_message_cb,
 			   GNOME_STOCK_PIXMAP_TRASH),
     GNOMEUIINFO_SEPARATOR,
 #define TOOLBAR_COMPOSE_POS 4

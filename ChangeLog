@@ -1,3 +1,8 @@
+2001-05-28  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/balsa-index.c (do_delete): fix segfault when deleting from Trash
+	* src/main-window.c: make the trash button move to trash again
+
 2001-05-28  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/send.c: display a clear message on message sending failure:

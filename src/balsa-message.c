@@ -2007,6 +2007,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
                              G_CALLBACK(check_over_url), url_list);
             g_signal_connect(G_OBJECT(item), "leave-notify-event",
                              G_CALLBACK(check_over_url), url_list);
+	    g_object_set_data(G_OBJECT(item), "url-list", url_list);
         }
 
         g_free(ptr);

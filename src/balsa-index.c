@@ -57,11 +57,6 @@ static gboolean bndx_popup_menu(GtkWidget * widget);
 
 /* statics */
 
-/* Setting style */
-static void bndx_set_style(BalsaIndex * index, GtkTreePath * path,
-                           GtkTreeIter * iter);
-static void bndx_set_parent_style(BalsaIndex * index, GtkTreeIter * iter);
-
 /* Manage the tree view */
 static void bndx_check_visibility(BalsaIndex * index);
 static void bndx_scroll_to_row(BalsaIndex * index, GtkTreePath * path);
@@ -97,7 +92,7 @@ static void bndx_hide_deleted(BalsaIndex * index, gboolean hide);
 /* mailbox callbacks */
 static void bndx_row_changed_cb(GtkTreeModel *model, GtkTreePath *path,
 				GtkTreeIter *iter, BalsaIndex *bindex);
-static void mailbox_messages_added_cb  (BalsaIndex * index, GList * messages);
+static void bndx_mailbox_changed_cb(BalsaIndex * index);
 
 /* GtkTree* callbacks */
 static void bndx_selection_changed(GtkTreeSelection * selection,
@@ -620,14 +615,14 @@ bndx_tree_expand_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
                     GtkTreePath * path, gpointer user_data)
 {
     BalsaIndex *index = BALSA_INDEX(tree_view);
-    GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
-    GtkTreePath *current_path = NULL;
-    GtkTreeIter child_iter;
-    GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
+    GtkTreePath *current_path;
 
     /* if current message has become viewable, reselect it */
     if (bndx_find_message(index, &current_path, NULL,
                           index->current_message)) {
+	GtkTreeSelection *selection =
+	    gtk_tree_view_get_selection(tree_view);
+
         if (!gtk_tree_selection_path_is_selected(selection, current_path)
             && bndx_row_is_viewable(index, current_path)) {
             gtk_tree_view_set_cursor(GTK_TREE_VIEW(index), current_path,
@@ -637,17 +632,6 @@ bndx_tree_expand_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
         gtk_tree_path_free(current_path);
     }
 
-    /* Reset the style of this row... */
-    bndx_set_style(index, path, iter);
-    /* ...and check the styles of its newly viewable children. */
-    if (gtk_tree_model_iter_children(model, &child_iter, iter)) {
-        gtk_tree_path_down(path);
-        do {
-            bndx_set_style(index, path, &child_iter);
-            gtk_tree_path_next(path);
-        } while (gtk_tree_model_iter_next(model, &child_iter));
-        gtk_tree_path_up(path);
-    }
     bndx_changed_find_row(index);
 }
 
@@ -660,7 +644,6 @@ bndx_tree_collapse_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
 {
     BalsaIndex *index = BALSA_INDEX(tree_view);
 
-    bndx_set_style(index, path, iter);
     bndx_changed_find_row(index);
 }
 
@@ -798,8 +781,8 @@ balsa_index_load_mailbox_node (BalsaIndex * index, BalsaMailboxNode* mbnode)
 		     G_CALLBACK(bndx_row_changed_cb),
 		     (gpointer) index);
 
-    g_signal_connect_swapped(G_OBJECT(mailbox), "messages-added",
-			     G_CALLBACK(mailbox_messages_added_cb),
+    g_signal_connect_swapped(G_OBJECT(mailbox), "changed",
+			     G_CALLBACK(bndx_mailbox_changed_cb),
 			     (gpointer) index);
 
     /* Set the tree store, load messages, and do threading. */
@@ -1177,42 +1160,6 @@ thread_has_unread(BalsaIndex * index, GtkTreeIter * iter)
     return FALSE;
 }
 
-/* Helper for bndx_set_style; also a gtk_tree_model_foreach callback. */
-static gboolean
-bndx_set_style_func(GtkTreeModel * model, GtkTreePath * path,
-                    GtkTreeIter * iter, BalsaIndex * index)
-{
-    return FALSE;
-}
-
-static void
-bndx_set_style(BalsaIndex * index, GtkTreePath * path, GtkTreeIter * iter)
-{
-    bndx_set_style_func(gtk_tree_view_get_model(GTK_TREE_VIEW(index)),
-                        path, iter, index);
-}
-
-static void
-bndx_set_parent_style(BalsaIndex * index, GtkTreeIter * iter)
-{
-    GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(index));
-    GtkTreeIter parent_iter;
-    GtkTreePath *path = gtk_tree_model_get_path(model, iter);
-    gboolean first_parent = TRUE;
-
-    while (gtk_tree_model_iter_parent(model, &parent_iter, iter)) {
-        gtk_tree_path_up(path);
-	if (first_parent) {
-	    if (balsa_app.expand_tree)
-		gtk_tree_view_expand_row(GTK_TREE_VIEW(index), path, FALSE);
-	    first_parent = FALSE;
-	}
-	bndx_set_style(index, path, &parent_iter);
-        *iter = parent_iter;
-    }
-    gtk_tree_path_free(path);
-}
-
 void
 balsa_index_set_column_widths(BalsaIndex * index)
 {
@@ -1249,36 +1196,14 @@ bndx_row_changed_cb(GtkTreeModel *model, GtkTreePath *path,
     bndx_changed_find_row(bindex);
 }
 
-/* mailbox_messages_added_cb : callback for sync with backend; the signal
+/* bndx_mailbox_changed_cb : callback for sync with backend; the signal
    is emitted by the mailbox when new messages has been retrieved (either
    after opening the mailbox, or after "check new messages").
 */
-/* Helper of the callback (also used directly) */
+/* Helper of the callback */
 static void
-bndx_messages_add(BalsaIndex * bindex, GList *messages)
+bndx_mailbox_changed_func(BalsaIndex * bindex)
 {
-    GList *list;
-
-#if 0
-#if 1
-    g_warning("%s called but not finished.\n", __func__);
-#else
-    for (list = messages; list; list = g_list_next(list)) {
-        LibBalsaMessage *msg = (LibBalsaMessage *) list->data;
-	if (msg->mailbox)
-	    bndx_add_message(bindex, msg);
-    }
-    balsa_index_threading(bindex, 
-			  bindex->mailbox_node->mailbox->view->threading_type);
-#endif
-#endif
-    for (list = messages; list; list = g_list_next(list)) {
-        LibBalsaMessage *msg = (LibBalsaMessage *) list->data;
-        GtkTreeIter iter;
-        if(!msg->mailbox) continue;
-        if (bndx_find_message(bindex, NULL, &iter, msg))
-            bndx_set_parent_style(bindex, &iter);
-    }
     bndx_select_message(bindex, bindex->current_message);
 
     balsa_mblist_update_mailbox(balsa_app.mblist_tree_store, 
@@ -1288,42 +1213,34 @@ bndx_messages_add(BalsaIndex * bindex, GList *messages)
 }
 
 
-/* mailbox_messages_added_cb:
+/* bndx_mailbox_changed_cb:
    may be called from a thread. Use idle callback to update the view.
-   We must ref messages so they do not get destroyed between
-   filing the callback and actually calling it.
 */
-struct index_list_pair {
-    void (*func)(BalsaIndex*, GList*);
+struct index_info {
     BalsaIndex * bindex;
-    GList* messages;
 };
 
 static gboolean
-mailbox_messages_func_idle(struct index_list_pair* arg)
+bndx_mailbox_changed_idle(struct index_info* arg)
 {
     gdk_threads_enter();
     if(arg->bindex) {
         g_object_remove_weak_pointer(G_OBJECT(arg->bindex),
                                      (gpointer) &arg->bindex);
-	(arg->func)(arg->bindex, arg->messages);
+	bndx_mailbox_changed_func(arg->bindex);
     }
-    g_list_foreach(arg->messages, (GFunc)g_object_unref, NULL);
     gdk_threads_leave();
-    g_list_free(arg->messages);
     g_free(arg);
     return FALSE;
 }
     
 static void
-mailbox_messages_added_cb(BalsaIndex * bindex, GList *messages)
+bndx_mailbox_changed_cb(BalsaIndex * bindex)
 {
-    struct index_list_pair *arg = g_new(struct index_list_pair,1);
-    arg->func = bndx_messages_add; 
-    arg->bindex  = bindex; arg->messages = g_list_copy(messages);
+    struct index_info *arg = g_new(struct index_info,1);
+    arg->bindex  = bindex;
     g_object_add_weak_pointer(G_OBJECT(bindex), (gpointer) &arg->bindex);
-    g_list_foreach(arg->messages, (GFunc)g_object_ref, NULL);
-    g_idle_add((GSourceFunc)mailbox_messages_func_idle, arg);
+    g_idle_add((GSourceFunc) bndx_mailbox_changed_idle, arg);
 }
 
 static void
@@ -1793,10 +1710,6 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
         gtk_tree_view_expand_all(tree_view);
     else
         gtk_tree_view_collapse_all(tree_view);
-
-    gtk_tree_model_foreach(gtk_tree_view_get_model(tree_view),
-                           (GtkTreeModelForeachFunc) bndx_set_style_func,
-                           index);
 
     /* Re-expand msg_node's thread; cf. Remarks */
     /* expand_to_row is redundant in the expand_all case, but the

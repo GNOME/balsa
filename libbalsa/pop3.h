@@ -49,4 +49,6 @@ PopStatus libbalsa_fetch_pop_mail_filter (LibBalsaMailboxPop3 * mailbox,
 
 const gchar *pop_get_errstr(PopStatus status);
 
+extern gint PopDebug;
+
 #endif				/* __LIBBALSA_NOTIFY_H__ */

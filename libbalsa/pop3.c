@@ -44,6 +44,9 @@
 #include "libbalsa.h"
 #include "pop3.h"
 
+gint PopDebug = 0;
+#define BALSA_TEST_POP3
+
 const gchar*
 pop_get_errstr(PopStatus status)
 {
@@ -67,7 +70,7 @@ pop_get_errstr(PopStatus status)
 
 
 #ifdef BALSA_TEST_POP3
-#define DM( fmt, args... ) G_STMT_START { fprintf( stderr, "POP3 D: " ); fprintf( stderr, fmt, ##args ); fprintf( stderr, "\n" ); } G_STMT_END
+#define DM( fmt, args... ) G_STMT_START { if(PopDebug) { fprintf(stderr, fmt, ##args ); fprintf(stderr, "\n" );} } G_STMT_END
 #else
 #define DM( fmt, args... ) 
 #endif
@@ -106,21 +109,20 @@ static int getLine (int fd, char *s, int len)
     int bytes = 0;
     
     while (safe_read_char (fd, &ch) > 0) {
-	*s++ = ch;
-	bytes++;
+	s[bytes++] = ch;
 	if (ch == '\n') {
-	    *s = 0;
-	    DM("POP3 L: \"%s\"\n", (char *) (s - bytes) );
+	    s[bytes] = 0;
+	    DM("POP3 S: \"%s\" (%d bytes)\n", s, bytes);
 	    return bytes;
 	}
       /* make sure not to overwrite the buffer */
 	if (bytes == len - 1) {
-	    *s = 0;
-	    DM("POP3 L: \"%s\"\n", (char *) (s - bytes) );
+	    s[bytes] = 0;
+	    DM("POP3 S: \"%s\" (%d bytes)\n", s, bytes);
 	    return bytes;
 	}
     }
-    *s = 0;
+    s[bytes] = 0;
     return -1;
 }
 
@@ -262,30 +264,29 @@ pop_auth(int s, const gchar * pop_user,  const gchar * pop_pass,
     char authHash[BUFSIZ];
     char buffer[2048];
     
-    DM("pop_auth %s %s %d", pop_user, pop_pass, use_apop);
     if (getLine (s, buffer, sizeof (buffer)) == -1) return POP_CONN_ERR;
-    DM("response: %s", buffer);
     if (strncmp (buffer, "+OK", 3) != 0)            return POP_COMMAND_ERR;
     
+    DM("pop_auth %s %s %d", pop_user, "(password hidden)", use_apop);
     /* handle apop secret transmission, if needed -kabir */
     if(use_apop) {
 	memset( stamp, '\0', sizeof(stamp) );
 	if( !getApopStamp(buffer, stamp) ) return POP_AUTH_FAILED;
 	computeAuthHash(stamp, authHash, pop_pass);
 	snprintf(buffer, sizeof(buffer), "apop %s %s\r\n", pop_user, authHash);
+	DM("POP3 C: '%s'", buffer);
 	write (s, buffer, strlen (buffer));
     } else {
-	DM( "hellod; user" );
 	
 	snprintf (buffer, sizeof(buffer), "user %s\r\n", pop_user);
+	DM("POP3 C: '%s'", buffer);
 	write (s, buffer, strlen (buffer));
 	
 	if (getLine (s, buffer, sizeof (buffer)) == -1) return POP_CONN_ERR;
 	if (strncmp (buffer, "+OK", 3) != 0)            return POP_COMMAND_ERR;
 	
-	DM( "usered; password" );
-	
 	snprintf (buffer, sizeof(buffer), "pass %s\r\n", pop_pass);
+	DM("POP3 C: 'pass (password hidden)'");
 	write (s, buffer, strlen (buffer));
     } 
   
@@ -303,8 +304,8 @@ pop_get_stats(int s, gint *first_msg, gint *msgs, gint *tot_bytes,
     char uid[80];
 
     /* find out how many messages are in the mailbox. */
-    DM( "get stat" );
-    write (s, "stat\r\n", 6);
+    DM( "POP3 C: stat" );
+    write(s, "stat\r\n", 6);
     
     if (getLine (s, buffer, sizeof (buffer)) == -1) return POP_CONN_ERR;
     if (strncmp (buffer, "+OK", 3) != 0)            return POP_COMMAND_ERR;
@@ -313,7 +314,6 @@ pop_get_stats(int s, gint *first_msg, gint *msgs, gint *tot_bytes,
 	
     }
     
-    DM( "Stat retrieved" );
     *first_msg = 1;
     
     if (*msgs == 0) return POP_OK;
@@ -325,10 +325,9 @@ pop_get_stats(int s, gint *first_msg, gint *msgs, gint *tot_bytes,
  */
  
     if (last_uid)  {
-	DM( "Checking for seen UIDLs" );
-	
 	for(i = *msgs; i>0; i--) {
 	    snprintf(buffer, sizeof(buffer), "uidl %d\r\n", i);
+	    DM( "POP3 C: '%s'", buffer);
 	    write(s, buffer, strlen(buffer));
 	    
 	    if(getLine (s, buffer, sizeof (buffer)) == -1) return POP_CONN_ERR;
@@ -366,12 +365,13 @@ pop_get_stats(int s, gint *first_msg, gint *msgs, gint *tot_bytes,
 	}
     }
 
-    DM("Status: messages %d, first_msg %d", *msgs, *first_msg );
+    DM("POP3 status summary: messages %d, first_msg %d", *msgs, *first_msg );
     
     /*  Check for the total amount of bytes mail to be received */
     *tot_bytes=0;
     for (i=*first_msg; i <= *msgs ; i++) {
 	snprintf(buffer, sizeof(buffer), "list %d\r\n", i);
+	DM( "POP3 C: '%s'", buffer);
 	write (s, buffer, strlen(buffer));
 	if ( getLine (s, buffer, sizeof(buffer)) == -1) return POP_CONN_ERR;
     
@@ -382,16 +382,15 @@ pop_get_stats(int s, gint *first_msg, gint *msgs, gint *tot_bytes,
 	}
 	*tot_bytes += num_bytes;
 
-	DM( "Message info: total %d, this %d", *tot_bytes, num_bytes );
+	DM("POP3 Message info: total %7d, this %6d", *tot_bytes, num_bytes );
     }
     return POP_OK;
 }
 
 static PopStatus send_fetch_req(int s, int msgno, char* buffer, size_t bufsz)
 {
-    DM("Retrieving message %d", msgno);
-    
     snprintf (buffer, bufsz, "retr %d\r\n", msgno);
+    DM("POP3 C: '%s'", buffer);
     if(write (s, buffer, strlen (buffer)) == -1) return POP_CONN_ERR;
     if (getLine (s, buffer, bufsz) == -1)        return POP_CONN_ERR;
     if (strncmp (buffer, "+OK", 3) != 0)         return POP_COMMAND_ERR;
@@ -411,12 +410,12 @@ fetch_single_msg(int s, FILE *msg, int msgno, int first_msg, int msgs,
     prog_cb ( threadbuf, 0, 0);
 #endif
 
+    DM("POP3: fetching message %d", msgno);
     /* Now read the actual message. */
     while(1) {
 	char *p;
 	int chunk;
 	
-	DM( "Message %d reading loop: %d", msgno, *num_bytes );
 	if ((chunk = getLine (s, buffer, sizeof (buffer))) == -1) 
 	    return POP_CONN_ERR;
 #ifdef BALSA_USE_THREADS
@@ -429,10 +428,8 @@ fetch_single_msg(int s, FILE *msg, int msgno, int first_msg, int msgs,
 #endif
 	/* check to see if we got a full line */
 	if (buffer[chunk-2] == '\r' && buffer[chunk-1] == '\n') {
-	    DM( "Line completed" );
-	    
 	    if (strcmp(".\r\n", buffer) == 0) {
-		DM( "Line finished" );
+		DM( "Message %d finished", msgno);
 		/* end of message */
 		break; /* while look */
 	    }
@@ -455,12 +452,11 @@ fetch_single_msg(int s, FILE *msg, int msgno, int first_msg, int msgs,
 	else
 	    p = buffer;
 	
-	DM( "Writing message" );
 	/* fwrite(p, 1, chunk, stdout); */
 	if(fwrite (p, 1, chunk, msg) != chunk) return POP_WRITE_ERR;
     } /* end of while */
     
-    DM("Message retrieved");
+    DM("POP3: Message %d retrieved", msgno);
     return POP_OK;
 }
 
@@ -468,10 +464,10 @@ static PopStatus
 delete_msg(int s, int msgno)
 {
     char buffer[256];
-    DM( "Nuking message %i",msgno );
 	    
     /* delete the message on the server */
     snprintf (buffer, sizeof(buffer), "dele %d\r\n", msgno);
+    DM( "POP3 C: '%s'", buffer);
     write (s, buffer, strlen (buffer));
 	    
     /* eat the server response */
@@ -482,8 +478,8 @@ delete_msg(int s, int msgno)
 
 static PopStatus reset_server(int s, char* buffer, size_t bufsz)
 {
-    DM( "Reset server" );
     /* make sure no messages get deleted */
+    DM("POP3: rset");
     write (s, "rset\r\n", 6);
     getLine (s, buffer, bufsz); /* snarf the response */
     return POP_OK;
@@ -549,7 +545,7 @@ fetch_direct(int s, gint first_msg, gint msgs, gint tot_bytes,
 	msg = mx_open_new_message (&ctx, NULL, M_ADD_FROM);
 	libbalsa_unlock_mutt(); gdk_threads_leave(); 
 	if (msg == NULL)  {
-	    DM( "Error while creating new message %d", i );
+	    DM("POP3: Error while creating new message %d", i );
 	    err = POP_MSG_APPEND;
 	    break;
 	}
@@ -597,24 +593,24 @@ fetch_pop_mail (const gchar *pop_host, const gchar *pop_user,
     g_return_val_if_fail(pop_user, POP_AUTH_FAILED);
 
 
-    DM("Begin connection");
+    DM("POP3 - begin connection");
     status = pop_connect(&s, pop_host, pop_port);
-    DM("Connected; hello");
+    DM("POP3 Connected; hello");
 
     if(status == POP_OK)
 	status = pop_auth(s, pop_user, pop_pass, use_apop);
 
-    DM( "authenticated: %s; stat", (status ==POP_OK ? "yes" : "no"));
+    DM("POP3 authentication %s successful", (status ==POP_OK ? "" : "NOT"));
     if(status == POP_OK)
 	status = pop_get_stats(s, &first_msg, &msgs, &bytes,  
 			       delete_on_server ? NULL : uid, last_uid);
-    DM(" status after get stats: %d", status);
+    DM("POP3 status after get stats: %d", status);
     if(status == POP_OK)
 	status = proccb(s, first_msg, msgs, bytes, delete_on_server, 
 			data, prog_cb);
     
     if(status != POP_CONN_ERR) {
-	DM( "Logout from server" );
+	DM("POP3 C: quit");
 	/* exit gracefully */
 	write (s, "quit\r\n", 6);
 	getLine (s, buffer, sizeof (buffer)); /* snarf the response */

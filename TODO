@@ -19,14 +19,24 @@ Stuart
  * lockfile so that Balsa can only be run once.  c-client
    doesn't like like two programms accessing the same
    mailboxes at the same time.
-
-
+ 
 sendmsg-window TODO:
  * look at smtp code crashing if gtk_text is empty
+
+
 
 Jay
 ---------------------------------------------------------
  * clear xmhtml widget when changing mailboxes
  * delete messages
  * more stuff goes here...
+
+
+
+Someone
+---------------------------------------------------------
+ * Look into recursing directories upon local mail reading.
+   This this should create submenus under the mailbox menu.
+   Not sure how to do this right now without chaning lots
+   of code, so we will address this later.
 

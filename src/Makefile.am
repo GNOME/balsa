@@ -62,7 +62,7 @@ balsa_LDADD = \
 	-lPropList	\
 	@LIBESD_LIB@	\
 	$(GNOME_LIBDIR) \
-	$(GNOMEGNORBA_LIBS)  \
+	$(GNOMEUI_LIBS)  \
 	$(INTLLIBS)
 
 balsa_DEPENDENCIES = \

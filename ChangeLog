@@ -12,6 +12,7 @@
 	
 	* libbalsa/mailbox.[hc]: per-mailbox identity by
 	* src/sendmsg-window.c:  Brian Stafford <brian@stafford.uklinux.net>
+	fix crash on body wrap after spell check (me).
 
 2002-04-12  Matthew Guenther <guentherm@asme.org>
 

@@ -2761,9 +2761,11 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	    list = g_list_append(list, (gpointer) file_menu[i].widget);
     }
 
-    for(i=0; i<ELEMENTS(main_toolbar_spell_disable); i++)
-	list = g_list_prepend(
-	    list, get_tool_widget(window, 1, main_toolbar_spell_disable[i]));
+    for(i=0; i<ELEMENTS(main_toolbar_spell_disable); i++) {
+        GtkWidget* w = get_tool_widget(window, 1, 
+                                       main_toolbar_spell_disable[i]);
+        if(w) list = g_list_prepend(list, w);
+    }
     msg->spell_check_disable_list = list;
 
     /* Set up the default identity */
@@ -3839,6 +3841,9 @@ spell_check_done_cb(BalsaSpellCheck * spell_check, BalsaSendmsg * msg)
 
     if (balsa_app.debug)
 	g_print("BalsaSendmsg: switching page to %d\n", mail_headers_page);
+    /* reset position: the values after spell-check leads to crashes
+     * in GtkText code. */
+    gtk_editable_set_position(GTK_EDITABLE(msg->text), 0);
 }
 
 

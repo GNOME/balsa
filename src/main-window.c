@@ -4221,12 +4221,17 @@ notebook_switch_page_cb(GtkWidget * notebook,
 
     mailbox = index->mailbox_node->mailbox;
     window = BALSA_WINDOW(index->window);
-    if (window->current_index)
+    if (window->current_index) {
 	g_object_remove_weak_pointer(G_OBJECT(window->current_index),
 				     (gpointer) &window->current_index);
+	/* Note when this mailbox was hidden, for use in auto-closing. */
+	time(&BALSA_INDEX(window->current_index)->mailbox_node->last_use);
+    }
     window->current_index = GTK_WIDGET(index);
     g_object_add_weak_pointer(G_OBJECT(window->current_index),
 			      (gpointer) &window->current_index);
+    /* Note when this mailbox was exposed, for use in auto-expunge. */
+    time(&BALSA_INDEX(window->current_index)->mailbox_node->last_use);
 
     if (mailbox->name) {
         if (mailbox->readonly) {

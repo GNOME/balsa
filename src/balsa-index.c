@@ -1024,6 +1024,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
 
     /* Create a search-iter for SEARCH UNDELETED. */
     index->search_iter = libbalsa_mailbox_search_iter_new(&cond_undeleted);
+    /* Note when this mailbox was opened, for use in auto-closing. */
     time(&index->mailbox_node->last_use);
 
     return FALSE;
@@ -1350,7 +1351,6 @@ bndx_mailbox_changed_func(BalsaIndex * bindex)
         gtk_tree_path_free(path);
     }
 
-    time(&bindex->mailbox_node->last_use);
     bndx_changed_find_row(bindex);
 }
 
@@ -1584,8 +1584,14 @@ bndx_do_delete(BalsaIndex* index, gboolean move_to_trash)
 void
 balsa_message_move_to_trash(GtkWidget * widget, gpointer user_data)
 {
+    BalsaIndex *index;
+
     g_return_if_fail(user_data != NULL);
-    bndx_do_delete(BALSA_INDEX(user_data), TRUE);
+    index = BALSA_INDEX(user_data);
+    bndx_do_delete(index, TRUE);
+    /* Note when message was flagged as deleted, for use in
+     * auto-expunge. */
+    time(&index->mailbox_node->last_use);
 }
 
 gint
@@ -1633,6 +1639,10 @@ balsa_index_toggle_flag(BalsaIndex* index, LibBalsaMessageFlag flag)
 
     g_list_foreach(l, (GFunc)g_object_unref, NULL);
     g_list_free(l);
+    if (flag == LIBBALSA_MESSAGE_FLAG_DELETED)
+	/* Note when deleted flag was changed, for use in
+	 * auto-expunge. */
+	time(&index->mailbox_node->last_use);
 }
 
 static void
@@ -2045,6 +2055,10 @@ balsa_index_transfer(BalsaIndex *index, GList * messages,
     balsa_information(LIBBALSA_INFORMATION_MESSAGE,
                       copy ? _("Copied to \"%s\".") 
                       : _("Moved to \"%s\"."), to_mailbox->name);
+    if (!copy)
+	/* Note when message was flagged as deleted, for use in
+	 * auto-expunge. */
+	time(&index->mailbox_node->last_use);
 }
 
 /* General helpers. */

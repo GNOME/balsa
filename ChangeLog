@@ -1,3 +1,18 @@
+2004-03-02  Pawel Salek
+
+	* libbalsa/imap/imap-commands.c: handle 8-bit characters in
+	mailbox names correctly (no UTF-7 support though).
+	* libbalsa/imap/imap-handle.c: move imap_write_string() here.
+	* libbalsa/imap/imap-search.c: remove from here.
+	* libbalsa/imap/imap_private.h: Add the prototype.
+
+2004-02-30  Pawel Salek
+
+	* configure.in, NEWS: release 2.1.1
+	* libbalsa/mailbox.c: do not die when an unvisible message is
+	modified.
+	* src/main-window.c: improve filtering support.
+
 2004-02-29 11:22  PeterB
 
 	* src/balsa-index.c: emit "changed" signal even when no message is

@@ -205,45 +205,7 @@ imap_write_key_string(ImapMboxHandle *handle, ImapSearchKey *k,
     sio_write(handle->sio, k->d.string.usr, strlen(k->d.string.usr));
     sio_write(handle->sio, " ", 1);
   }
-  /* Here comes the difficult part: writing the string. If the server
-     does not support LITERAL+, we have to either use quoting or use
-     synchronizing literals which are somewhat painful. That's the
-     life! */
-  if(use_literal)
-    sio_printf(handle->sio, "{%u+}\r\n%s",
-               strlen(k->d.string.s), k->d.string.s);
-  else { /* No literal+ suppport, do it the old way */
-    for (s = k->d.string.s; *s && (*s & 0x80) == 0; s++)
-      ;
-    if(*s & 0x80) { /* use synchronising literals */
-      int c;
-      ImapResponse rc;
-      unsigned len = strlen(k->d.string.s);
-      sio_printf(handle->sio, "{%u}\r\n", len);
-      imap_handle_flush(handle);
-      do
-        rc = imap_cmd_step(handle, cmdno);
-      while(rc == IMR_UNTAGGED);
-      if (rc != IMR_RESPOND) {
-        fprintf(stderr, "%s(): unexpected response:\n", __FUNCTION__);
-        return rc;
-      }
-      /* consume to the end of line */
-      while( (c=sio_getc(handle->sio)) != -1 && c != '\n')
-        ;
-      if(c == -1) return IMR_SEVERED;
-      sio_write(handle->sio, k->d.string.s, len);
-    } else { /* quoting is sufficient */
-      sio_write(handle->sio, "\"", 1);
-      for(s=k->d.string.s; *s; s++) {
-        if(*s == '"') sio_write(handle->sio, "\\\"", 2);
-        else if(*s == '"') sio_write(handle->sio, "\\\\", 2);
-        else sio_write(handle->sio, s, 1);
-      }
-      sio_write(handle->sio, "\"", 1);
-    }
-  }
-  return IMR_OK;
+  return imap_write_string(handle, k->d.string.s, cmdno, use_literal);
 }
 
 static void

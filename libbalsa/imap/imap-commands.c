@@ -199,11 +199,29 @@ imap_mbox_handle_noop(ImapMboxHandle *handle)
 
 
 /* 6.3.1 SELECT Command */
+static ImapResponse
+imap_mbox_op_helper(ImapMboxHandle* handle, const char *cmd, const char *mbox)
+{
+  int use_literal =  imap_mbox_handle_can_do(handle, IMCAP_LITERAL);
+  ImapCmdTag tag;
+  unsigned cmdno = imap_make_tag(tag);
+  ImapResponse rc;
+
+  sio_printf(handle->sio, "%s %s ", tag, cmd);
+  if( (rc=imap_write_string(handle, mbox, cmdno, use_literal)) != IMR_OK)
+    return rc;
+  sio_write(handle->sio, "\r\n", 2);
+  imap_handle_flush(handle);
+  do
+    rc = imap_cmd_step(handle, cmdno);
+  while(rc == IMR_UNTAGGED);
+  return rc;
+}
+
 ImapResponse
 imap_mbox_select(ImapMboxHandle* handle, const char *mbox,
                  gboolean *readonly_mbox)
 {
-  gchar* cmd;
   ImapResponse rc;
 
   if (handle->state == IMHS_SELECTED && strcmp(handle->mbox, mbox) == 0)
@@ -213,9 +231,7 @@ imap_mbox_select(ImapMboxHandle* handle, const char *mbox,
   mbox_view_dispose(&handle->mbox_view);
   handle->unseen = 0;
 
-  cmd = g_strdup_printf("SELECT \"%s\"", mbox);
-  rc= imap_cmd_exec(handle, cmd);
-  g_free(cmd);
+  rc = imap_mbox_op_helper(handle, "Select", mbox);
   if(rc == IMR_OK) {
     g_free(handle->mbox);
     handle->mbox = g_strdup(mbox);
@@ -234,9 +250,7 @@ imap_mbox_select(ImapMboxHandle* handle, const char *mbox,
 ImapResponse
 imap_mbox_examine(ImapMboxHandle* handle, const char* mbox)
 {
-  gchar* cmd = g_strdup_printf("EXAMINE %s", mbox);
-  ImapResponse rc = imap_cmd_exec(handle, cmd);
-  g_free(cmd);
+  ImapResponse rc = imap_mbox_op_helper(handle, "Examine", mbox);
   if(rc == IMR_OK) {
     g_free(handle->mbox);
     handle->mbox = g_strdup(mbox);
@@ -250,10 +264,7 @@ imap_mbox_examine(ImapMboxHandle* handle, const char* mbox)
 ImapResponse
 imap_mbox_create(ImapMboxHandle* handle, const char* new_mbox)
 {
-  gchar* cmd = g_strdup_printf("CREATE \"%s\"", new_mbox);
-  ImapResponse rc = imap_cmd_exec(handle, cmd);
-  g_free(cmd);
-  return rc;
+  return imap_mbox_op_helper(handle, "Create", new_mbox);
 }
 
 
@@ -261,10 +272,7 @@ imap_mbox_create(ImapMboxHandle* handle, const char* new_mbox)
 ImapResponse
 imap_mbox_delete(ImapMboxHandle* handle, const char* mbox)
 {
-  gchar* cmd = g_strdup_printf("DELETE \"%s\"", mbox);
-  ImapResponse rc = imap_cmd_exec(handle, cmd);
-  g_free(cmd);
-  return rc;
+  return imap_mbox_op_helper(handle, "Delete", mbox);
 }
 
 
@@ -274,9 +282,22 @@ imap_mbox_rename(ImapMboxHandle* handle,
 		 const char* old_mbox,
 		 const char* new_mbox)
 {
-  gchar* cmd = g_strdup_printf("RENAME \"%s\" \"%s\"", old_mbox, new_mbox);
-  ImapResponse rc = imap_cmd_exec(handle, cmd);
-  g_free(cmd);
+  int use_literal =  imap_mbox_handle_can_do(handle, IMCAP_LITERAL);
+  ImapCmdTag tag;
+  unsigned cmdno = imap_make_tag(tag);
+  ImapResponse rc;
+
+  sio_printf(handle->sio, "%s Rename ", tag);
+  if( (rc=imap_write_string(handle, old_mbox, cmdno, use_literal)) != IMR_OK)
+    return rc;
+  sio_write(handle->sio, " ", 1);
+  if( (rc=imap_write_string(handle, new_mbox, cmdno, use_literal)) != IMR_OK)
+    return rc;
+  sio_write(handle->sio, "\r\n", 2);
+  imap_handle_flush(handle);
+  do
+    rc = imap_cmd_step(handle, cmdno);
+  while(rc == IMR_UNTAGGED);
   return rc;
 }
 
@@ -287,12 +308,9 @@ ImapResponse
 imap_mbox_subscribe(ImapMboxHandle* handle,
 		    const char* mbox, gboolean subscribe)
 {
-  gchar* cmd = g_strdup_printf("%s \"%s\"",
-			       subscribe ? "SUBSCRIBE" : "UNSUBSCRIBE",
-			       mbox);
-  ImapResponse rc = imap_cmd_exec(handle, cmd);
-  g_free(cmd);
-  return rc;
+  return imap_mbox_op_helper(handle,
+                             subscribe ? "SUBSCRIBE" : "UNSUBSCRIBE",
+                             mbox);
 }
 
 
@@ -343,28 +361,31 @@ imap_mbox_append(ImapMboxHandle *handle, const char *mbox,
                  ImapMsgFlags flags, size_t sz,
                  ImapAppendFunc dump_cb, void *arg)
 {
-  unsigned cmdno;
+  int use_literal =  imap_mbox_handle_can_do(handle, IMCAP_LITERAL);
+  ImapCmdTag tag;
   ImapResponse rc;
-  /* FIXME: quoting */
-  gchar *cmd;
+  unsigned cmdno;
+
+  cmdno = imap_make_tag(tag);
+  sio_printf(handle->sio, "%s Append ", tag);
+  if( (rc=imap_write_string(handle, mbox, cmdno, use_literal)) != IMR_OK)
+    return rc;
 
   if(flags) {
     gchar *str = enum_flag_to_str(flags);
-    cmd = g_strdup_printf("APPEND \"%s\" (%s) {%d}", mbox, str, sz);
+    sio_printf(handle->sio, " (%s)", str);
     g_free(str);
-  } else 
-    cmd = g_strdup_printf("APPEND \"%s\" {%d}", mbox, sz);
-
-  rc = imap_cmd_start(handle, cmd, &cmdno);
-  g_free(cmd);
-  if (rc<0) /* irrecoverable connection error. */
-    return IMR_SEVERED;
-
-  sio_flush(handle->sio);
-  do {
-    rc = imap_cmd_step (handle, cmdno);
-  } while (rc == IMR_UNTAGGED);
-  
+  }
+  if(use_literal) {
+    sio_printf(handle->sio, " {%d+}\r\n", sz);
+    rc = IMR_RESPOND;
+  }  else {
+    sio_printf(handle->sio, " {%d}\r\n", sz);
+    sio_flush(handle->sio);
+    do
+      rc = imap_cmd_step(handle, cmdno);
+    while(rc == IMR_UNTAGGED);
+  }
   if (rc == IMR_RESPOND) {
     char buf[4096];
     size_t s, delta;
@@ -461,40 +482,6 @@ imap_mbox_handle_first_unseen(ImapMboxHandle* handle)
   return handle->unseen;
 }
 
-static void
-find_next_cb(ImapMboxHandle* handle, unsigned seqno, unsigned *res)
-{
-  if(!*res)
-    *res = seqno;
-}
-
-
-/* should chain up the callbacks */
-unsigned
-imap_mbox_find_next(ImapMboxHandle* handle, unsigned start, 
-                    const char *search_str)
-{
-  ImapResponse rc;
-  unsigned seqno = 0;
-  void *arg;
-  ImapSearchCb cb;
-  const char *filter_str = mbox_view_get_str(&handle->mbox_view);
-
-  cb  = handle->search_cb;  handle->search_cb  = (ImapSearchCb)find_next_cb;
-  arg = handle->search_arg; handle->search_arg = &seqno;
-  while(seqno==0 && start<=handle->exists) {
-    unsigned top = start+3000>handle->exists ? handle->exists : start+3000;
-    gchar * cmd = g_strdup_printf("SEARCH %d:%d (FROM \"%s\"%s%s)",
-                                  start, top, search_str,
-                                  *filter_str?" ":"", filter_str);
-    rc = imap_cmd_exec(handle, cmd);
-    g_free(cmd);
-    start = top+1;
-  }
-  handle->search_cb = cb; handle->search_arg = arg;
-  return seqno;
-}
-
 struct find_all_data {
   unsigned *seqno;
   unsigned msgcnt, allocated;
@@ -529,25 +516,6 @@ imap_mbox_find_helper(ImapMboxHandle * h,
   rc = imap_cmd_exec(h, cmd);
   h->search_cb = cb; h->search_arg = arg;
   *msgcnt = fad.msgcnt; *msgs = fad.seqno;
-  return rc;
-}
-
-ImapResponse
-imap_mbox_find_all(ImapMboxHandle * h,
-		   const char     * search_str,
-		   unsigned       * msgcnt,
-		   unsigned      ** msgs)
-{
-  const char *filter_str;
-  gchar *cmd;
-  ImapResponse rc;
-
-  filter_str = mbox_view_get_str(&h->mbox_view);
-  cmd = g_strdup_printf("SEARCH ALL (SUBJECT \"%s\"%s%s)", search_str,
-			*filter_str ? " " : "", filter_str);
-  rc = imap_mbox_find_helper(h, cmd, msgcnt, msgs);
-  g_free(cmd);
-
   return rc;
 }
 
@@ -743,8 +711,8 @@ ImapResponse
 imap_mbox_handle_copy(ImapMboxHandle* handle, unsigned seqno,
                       const gchar *dest)
 {
-  gchar *cmd = g_strdup_printf("COPY %u \"%s\"", seqno, dest);
-  ImapResponse rc = imap_cmd_exec(handle, cmd);
+  gchar *cmd = g_strdup_printf("COPY %u", seqno);
+  ImapResponse rc = imap_mbox_op_helper(handle, cmd, dest);
   g_free(cmd);
   return rc;
 }

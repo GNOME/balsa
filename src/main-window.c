@@ -40,10 +40,14 @@
 #define MAILBOX_DATA "mailbox_data"
 
 static GnomeMDI *mdi = NULL;
+static GtkWidget *pbar;
+static guint pbar_timeout;
 
 static gint about_box_visible = FALSE;
 
 /* main window widget components */
+static gint progress_timeout (gpointer data);
+
 static void app_created (GnomeMDI *, GnomeApp * app);
 static GtkMenuBar *create_menu (GnomeMDI *, GtkWidget * app);
 static GtkToolbar *create_toolbar (GnomeMDI *, GtkWidget * app);
@@ -87,13 +91,23 @@ main_window_set_cursor (gint type)
   if (mdi->windows == NULL)
     return;
 
+
   for (list = mdi->windows; list; list = list->next)
     {
       widget = GTK_WIDGET (GNOME_APP (list->data));
       if (type == -1)
-	gdk_window_set_cursor (widget->window, NULL);
+	{
+	  gtk_widget_set_sensitive (pbar, FALSE);
+	  gtk_progress_set_activity_mode (GTK_PROGRESS (pbar), FALSE);
+	  gtk_timeout_remove (pbar_timeout);
+	  gtk_progress_set_value (GTK_PROGRESS (pbar), 0.0);
+	  gdk_window_set_cursor (widget->window, NULL);
+	}
       else
 	{
+	  gtk_widget_set_sensitive (pbar, TRUE);
+	  gtk_progress_set_activity_mode (GTK_PROGRESS (pbar), TRUE);
+	  pbar_timeout = gtk_timeout_add (50, progress_timeout, pbar);
 	  cursor = gdk_cursor_new (type);
 	  gdk_window_set_cursor (widget->window, cursor);
 	  gdk_cursor_destroy (cursor);
@@ -132,12 +146,47 @@ main_window_init (void)
   refresh_main_window ();
 }
 
+static gint
+progress_timeout (gpointer data)
+{
+  gfloat new_val;
+  GtkAdjustment *adj;
+
+  adj = GTK_PROGRESS (data)->adjustment;
+
+  new_val = adj->value + 1;
+  if (new_val > adj->upper)
+    new_val = adj->lower;
+
+  gtk_progress_set_value (GTK_PROGRESS (data), new_val);
+
+  return TRUE;
+}
+
+
 static void
 app_created (GnomeMDI * mdi, GnomeApp * app)
 {
+  GtkWidget *statusbar;
+
   set_icon (GTK_WIDGET (app)->window);
+  statusbar = gtk_statusbar_new ();
+  pbar = gtk_progress_bar_new ();
+  gtk_progress_bar_set_activity_step (GTK_PROGRESS_BAR (pbar), 5);
+  gtk_progress_bar_set_activity_blocks (GTK_PROGRESS_BAR (pbar), 5);
+
+  gtk_progress_set_activity_mode (GTK_PROGRESS (pbar), FALSE);
+  gtk_progress_set_value (GTK_PROGRESS (pbar), 0.0);
+
+  gtk_widget_set_usize (pbar, 100, -1);
+  gtk_box_pack_start (GTK_BOX (statusbar), pbar, FALSE, FALSE, 5);
+  gtk_widget_show (pbar);
+
+  gnome_app_set_statusbar (app, statusbar);
+
   gtk_window_set_policy (GTK_WINDOW (app), TRUE, TRUE, FALSE);
   gtk_widget_set_usize (GTK_WIDGET (app), balsa_app.mw_width, balsa_app.mw_height);
+
 }
 
 /*

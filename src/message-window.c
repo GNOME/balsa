@@ -42,9 +42,6 @@ static GnomeUIInfo main_menu[] =
   GNOMEUIINFO_END
 };
 
-
-
-
 typedef struct _MessageWindow MessageWindow;
 struct _MessageWindow
   {
@@ -56,16 +53,13 @@ struct _MessageWindow
 void message_window_new (Message * message);
 
 /* callbacks */
-static void destroy_message_window (GtkWidget * widget);
+static void destroy_message_window (GtkWidget * widget, gpointer data);
 
 void
 message_window_new (Message * message)
 {
   MessageWindow *mw;
-  GtkWidget *vbox;
-  GtkWidget *table;
-  GtkWidget *hscrollbar;
-  GtkWidget *vscrollbar;
+  GtkWidget *sw;
 
   if (!message)
     return;
@@ -77,47 +71,31 @@ message_window_new (Message * message)
 
   gtk_signal_connect (GTK_OBJECT (mw->window),
 		      "destroy",
-		      (GtkSignalFunc) destroy_message_window,
-		      NULL);
+		      GTK_SIGNAL_FUNC(destroy_message_window),
+		      mw);
 
-  gtk_signal_connect (GTK_OBJECT (mw->window),
-		      "delete_event",
-		      (GtkSignalFunc) gtk_false,
-		      NULL);
+  gnome_app_create_menus_with_data (GNOME_APP (mw->window),
+		  main_menu, mw->window);
 
-  gnome_app_create_menus_with_data (GNOME_APP (mw->window), main_menu, mw);
 
-  vbox = gtk_vbox_new (TRUE, 0);
-  gnome_app_set_contents (GNOME_APP (mw->window), vbox);
-
-  table = gtk_table_new (2, 2, FALSE);
-
+  sw = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw),
+                                   GTK_POLICY_AUTOMATIC,
+                                   GTK_POLICY_AUTOMATIC);
   mw->bmessage = balsa_message_new ();
+  gtk_container_add(GTK_CONTAINER(sw), mw->bmessage);
 
-  gtk_table_attach_defaults (GTK_TABLE (table), mw->bmessage, 0, 1, 0, 1);
-
-  hscrollbar = gtk_hscrollbar_new (GTK_LAYOUT (mw->bmessage)->hadjustment);
-  GTK_WIDGET_UNSET_FLAGS (hscrollbar, GTK_CAN_FOCUS);
-  gtk_table_attach (GTK_TABLE (table), hscrollbar, 0, 1, 1, 2,
-		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
-
-  vscrollbar = gtk_vscrollbar_new (GTK_LAYOUT (mw->bmessage)->vadjustment);
-  GTK_WIDGET_UNSET_FLAGS (vscrollbar, GTK_CAN_FOCUS);
-  gtk_table_attach (GTK_TABLE (table), vscrollbar, 1, 2, 0, 1,
-		    GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
-
-
-  gtk_box_pack_start (GTK_BOX (vbox), table, TRUE, TRUE, 0);
   balsa_message_set (BALSA_MESSAGE (mw->bmessage), message);
+
+  gnome_app_set_contents (GNOME_APP (mw->window), sw);
 
   gtk_widget_show_all (mw->window);
 }
 
 static void
-destroy_message_window (GtkWidget * widget)
+destroy_message_window (GtkWidget * widget, gpointer data)
 {
-  MessageWindow *mw = gtk_object_get_data (GTK_OBJECT (widget), "msgwin");
-  gtk_object_remove_data (GTK_OBJECT (widget), "msgwin");
+  MessageWindow *mw = data;
 
   gtk_widget_destroy (mw->window);
   gtk_widget_destroy (mw->bmessage);
@@ -128,7 +106,7 @@ destroy_message_window (GtkWidget * widget)
 static void
 close_message_window(GtkWidget * widget, gpointer data)
 {
-  gtk_signal_emit_by_name (GTK_OBJECT (data), "destroy");
+  gtk_widget_destroy(GTK_WIDGET(data));
 }
 
 

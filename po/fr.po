@@ -212,7 +212,7 @@ msgstr ""
 #: src/address-book.c:224
 #, c-format
 msgid "EMAIL;INTERNET:%s\n"
-msgstr "EMAIL;INTERNET:%\n"
+msgstr "EMAIL;INTERNET:%s\n"
 
 #: src/address-book.c:228
 msgid "No-Name"

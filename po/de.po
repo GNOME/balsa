@@ -29,7 +29,7 @@ msgstr "Mailfach: Schließe %s Referenzzähler: %d\n"
 msgid ""
 "The pathname \"%s\" must be specified canonically -- it must start with a "
 "'/'."
-msgstr "Der Pfadname \"%s\" muss korrekt angegeben werden -- er muss mit einem `%' anfangen."
+msgstr "Der Pfadname \"%s\" muss korrekt angegeben werden -- er muss mit einem `/' anfangen."
 
 #: balsa-druid-page-directory.gob:76
 #: libinit_balsa/balsa-druid-page-directory.gob:76

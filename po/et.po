@@ -139,7 +139,7 @@ msgstr "Vabandust"
 #: src/balsa-message.c:235 src/balsa-message.c:250
 #, c-format
 msgid " Open of %s failed:%s "
-msgstr "%s avamine ebaõnnestus"
+msgstr "%s avamine ebaõnnestus: %s"
 
 #: src/balsa-message.c:236 src/balsa-message.c:251
 msgid "Ok"

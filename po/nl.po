@@ -319,7 +319,7 @@ msgid "Some of the fields are blank."
 msgstr ""
 
 #: src/mailbox-conf.c:623
-#, c-format
+#, fuzzy, c-format
 msgid "Cannot create mailbox '%s': %s\n"
 msgstr "Postvak '%s' kan niet gecreeerd worden\n"
 
@@ -921,7 +921,7 @@ msgstr ""
 #: src/sendmsg-window.c:212
 #, c-format
 msgid "Cannot get info on file '%s': %s\n"
-msgstr "Info over bestand '%s' kan niet verkregen worden\n"
+msgstr "Info over bestand '%s' kan niet verkregen worden: %s\n"
 
 #: src/sendmsg-window.c:215
 #, c-format

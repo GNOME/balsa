@@ -1,6 +1,6 @@
 #
-# Pablo Saratxaga <pablo@mandrakesoft.com>, 1999-2000
-# Héctor García Álvarez <hector@scouts-es.org>, 1999
+# Pablo Saratxaga <pablo@mandrakesoft.com>, 1998-2000
+# Héctor García Álvarez <hector@scouts-es.org>, 1999-2000
 #
 msgid ""
 msgstr ""
@@ -12,8 +12,6 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Date: 1998-11-18 00:47:24+0100\n"
-"From: Pablo Saratxaga <srtxg@chanae.alphanet.ch>\n"
 
 #: libbalsa/mailbox.c:593
 #, c-format

@@ -19,6 +19,7 @@
 #include <gnome.h>
 #include "balsa-app.h"
 #include "new-mailbox.h"
+#include "misc.h"
 
 
 
@@ -144,6 +145,7 @@ open_new_mailbox (Mailbox * mailbox)
   bbox = gtk_hbutton_box_new ();
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG (nmw->window)->action_area), bbox, TRUE, TRUE, 0);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (bbox), GTK_BUTTONBOX_END);
+  gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 5);
   gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox), BALSA_BUTTON_WIDTH, BALSA_BUTTON_HEIGHT);
   gtk_widget_show (bbox);
 
@@ -221,6 +223,7 @@ static void
 refresh_new_mailbox (NewMailboxWindow * nmw)
 {
   GString *str = g_string_new (NULL);
+  GList *children;
   GtkWidget *menu;
   GtkWidget *menuitem;
   
@@ -237,9 +240,85 @@ refresh_new_mailbox (NewMailboxWindow * nmw)
     }
 
 
+  /* set the mailbox type */
+  if (nmw->mailbox)
+    {
+      MailboxType type;
 
-  /* first notebook page */
-  gtk_option_menu_remove_menu (GTK_OPTION_MENU (nmw->mailbox_type_menu));
+      menu = gtk_option_menu_get_menu (GTK_OPTION_MENU (nmw->mailbox_type_menu));
+      children = GTK_MENU_SHELL (menu)->children;
+      while (children)
+	{
+	  menuitem = children->data;
+	  children = children->next;
+
+	  type = (MailboxType) gtk_object_get_user_data (GTK_OBJECT (menuitem));
+	  
+	  if (type == nmw->mailbox->type)
+	      {
+		gtk_option_menu_set_history (GTK_OPTION_MENU (nmw->mailbox_type_menu),
+					     g_list_index (GTK_MENU_SHELL (menu)->children, menuitem));
+		gtk_menu_item_activate (GTK_MENU_ITEM (menuitem));
+		break;
+	      }
+	}
+    }
+
+
+
+  /* cleanup */
+  g_string_free (str, TRUE);
+}
+
+
+static void
+refresh_button_state (NewMailboxWindow * nmw)
+{
+  switch (gtk_notebook_current_page (GTK_NOTEBOOK (nmw->notebook)))
+    {
+    case 0:
+      gtk_widget_set_sensitive (nmw->back, FALSE);
+      gtk_widget_set_sensitive (nmw->forward, TRUE);
+      break;
+
+    case 1:
+      gtk_widget_set_sensitive (nmw->back, TRUE);
+      gtk_widget_set_sensitive (nmw->forward, FALSE);
+      break;
+
+    default:
+      break;
+    }
+}
+
+
+/*
+ * create notebook pages
+ */
+static GtkWidget *
+create_first_page (NewMailboxWindow * nmw)
+{
+  GtkWidget *vbox;
+  GtkWidget *table;
+  GtkWidget *label;
+  GtkWidget *button;
+  GtkWidget *menuitem;
+  GtkWidget *menu;
+
+  table = gtk_table_new (5, 2, FALSE);
+  gtk_widget_show (table);
+
+
+  /* your name */
+  label = gtk_label_new ("Mailbox Type");
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
+		    GTK_FILL, GTK_FILL,
+		    10, 10);
+  gtk_widget_show (label);
+
+
+
   menu = gtk_menu_new ();
 
   menuitem = 
@@ -306,65 +385,11 @@ refresh_new_mailbox (NewMailboxWindow * nmw)
 			     (gpointer) MAILBOX_NNTP);
 
 
-  gtk_option_menu_set_menu (GTK_OPTION_MENU (nmw->mailbox_type_menu), menu);
-
-
-
-  /* cleanup */
-  g_string_free (str, TRUE);
-}
-
-
-static void
-refresh_button_state (NewMailboxWindow * nmw)
-{
-  switch (gtk_notebook_current_page (GTK_NOTEBOOK (nmw->notebook)))
-    {
-    case 0:
-      gtk_widget_set_sensitive (nmw->back, FALSE);
-      gtk_widget_set_sensitive (nmw->forward, TRUE);
-      break;
-
-    case 1:
-      gtk_widget_set_sensitive (nmw->back, TRUE);
-      gtk_widget_set_sensitive (nmw->forward, FALSE);
-      break;
-
-    default:
-      break;
-    }
-}
-
-
-/*
- * create notebook pages
- */
-static GtkWidget *
-create_first_page (NewMailboxWindow * nmw)
-{
-  GtkWidget *vbox;
-  GtkWidget *table;
-  GtkWidget *label;
-  GtkWidget *button;
-
-
-  table = gtk_table_new (5, 2, FALSE);
-  gtk_widget_show (table);
-
-
-  /* your name */
-  label = gtk_label_new ("Mailbox Type");
-  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
-  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
-		    GTK_FILL, GTK_FILL,
-		    10, 10);
-  gtk_widget_show (label);
-
-
   nmw->mailbox_type_menu = gtk_option_menu_new ();
   gtk_widget_set_usize (nmw->mailbox_type_menu, 0, BALSA_BUTTON_HEIGHT);
+  gtk_option_menu_set_menu (GTK_OPTION_MENU (nmw->mailbox_type_menu), menu);
   gtk_table_attach (GTK_TABLE (table), nmw->mailbox_type_menu, 1, 2, 0, 1,
-		    GTK_EXPAND | GTK_FILL, GTK_FILL,
+		    GTK_FILL | GTK_EXPAND, GTK_FILL,
 		    0, 10);
   gtk_widget_show (nmw->mailbox_type_menu);
 

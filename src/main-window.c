@@ -294,18 +294,14 @@ main_window_set_mailbox (Mailbox * mailbox)
       children = children->next;
 
       if (gtk_object_get_data (GTK_OBJECT (menuitem), MAILBOX_DATA) == mailbox)
-	break;
-
-      menuitem = NULL;
+	{
+	  gtk_option_menu_set_history
+	    (GTK_OPTION_MENU (mw->mailbox_option_menu),
+	     g_list_index (GTK_MENU_SHELL (mw->mailbox_menu)->children, menuitem));
+	  gtk_menu_item_activate (GTK_MENU_ITEM (menuitem));
+	  break;
+	}
     }
-
-  if (!menuitem)
-    {
-      g_print ("Error: Could not find menuitem for mailbox.\n");
-      return;
-    }
-
-  gtk_menu_item_activate (GTK_MENU_ITEM (menuitem));
 }
 
 

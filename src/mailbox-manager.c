@@ -175,6 +175,7 @@ open_mailbox_manager ()
   bbox = gtk_hbutton_box_new ();
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG (mmw->window)->action_area), bbox, TRUE, TRUE, 0);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (bbox), GTK_BUTTONBOX_END);
+  gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 5);
   gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox),
 				 BALSA_BUTTON_WIDTH,
 				 BALSA_BUTTON_HEIGHT);

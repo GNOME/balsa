@@ -20,9 +20,6 @@
 #include "misc.h"
 
 
-
-
-
 /* creates one label (text) menuitem, connects the callback,
  * and adds it to the menu */
 GtkWidget *

@@ -24,6 +24,7 @@
 #include <sys/stat.h>
 
 #include "mutt.h"
+
 #include "mutt_curses.h"
 #include "rfc1524.h"
 #include "keymap.h"
@@ -1011,7 +1012,7 @@ void autoview_handler (BODY *a, STATE *s)
   FILE *fpin = NULL;
   FILE *fpout = NULL;
   FILE *fperr = NULL;
-  int piped = FALSE;
+  int piped = MUTT_FALSE;
   pid_t thepid;
 
   snprintf (type, sizeof (type), "%s/%s", TYPE (a->type), a->subtype);

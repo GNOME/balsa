@@ -149,8 +149,6 @@ balsa_message_set (BalsaMessage * bmessage,
   /* look into the parts of the message */
   mail_fetchstructure (stream, mesgno, &body);
 
-  debug_mime_content (body);
-
   /* HTML header */
   buff = g_malloc (strlen (HTML_HEAD) + 1);
   strcpy (buff, HTML_HEAD);
@@ -251,18 +249,22 @@ balsa_message_set (BalsaMessage * bmessage,
   gs = text2html (c);
   buff = g_realloc (buff, strlen (buff) + strlen (gs->str) + 1);
 
-/* buff = g_realloc (buff, strlen (buff) + strlen (c) + 1);
-   strcat (buff, c); */
+  /* buff = g_realloc (buff, strlen (buff) + strlen (c) + 1);
+     strcat (buff, c); */
 
   strcat (buff, gs->str);
   g_string_free (gs, 1);
 
+
   /* HTML footer */
   buff = g_realloc (buff, strlen (buff) + strlen (HTML_FOOT) + 1);
   strcat (buff, HTML_FOOT);
+
 #ifdef DEBUG
   fprintf (stderr, buff);
 #endif
+
+
   /* set message contents */
   gtk_xmhtml_source (GTK_XMHTML (GTK_BIN (bmessage)->child), buff);
   g_free (buff);

@@ -19,6 +19,7 @@
 #include <gnome.h>
 #include "pref-manager.h"
 #include "balsa-app.h"
+#include "save-restore.h"
 
 
 
@@ -169,33 +170,26 @@ cancel_preferences_manager ()
 void
 ok_preferences_manager ()
 {
-  gnome_config_push_prefix ("/balsa/Global/");
-
-  gnome_config_set_string ("real name", gtk_entry_get_text (GTK_ENTRY (pmw->real_name)));
+  g_free (balsa_app.real_name);
   balsa_app.real_name = g_strdup(gtk_entry_get_text (GTK_ENTRY (pmw->real_name)));
 
-  /* we're gonna display this as  USERNAME @ HOSTNAME 
-   * for the From: header */
-  gnome_config_set_string ("user name", gtk_entry_get_text (GTK_ENTRY (pmw->username)));
+  g_free (balsa_app.username);
   balsa_app.username = g_strdup(gtk_entry_get_text (GTK_ENTRY (pmw->username)));
-  gnome_config_set_string ("host name", gtk_entry_get_text (GTK_ENTRY (pmw->hostname)));
+
+  g_free (balsa_app.hostname);
   balsa_app.hostname = g_strdup(gtk_entry_get_text (GTK_ENTRY (pmw->hostname)));
 
-  gnome_config_set_string ("organization", gtk_entry_get_text (GTK_ENTRY (pmw->organization)));
+  g_free (balsa_app.organization);
   balsa_app.organization = g_strdup(gtk_entry_get_text (GTK_ENTRY (pmw->organization)));
 
-  gnome_config_set_string ("smtp server", gtk_entry_get_text (GTK_ENTRY (pmw->smtp_server)));
+  g_free (balsa_app.smtp_server);
   balsa_app.smtp_server = g_strdup(gtk_entry_get_text (GTK_ENTRY (pmw->smtp_server)));
 
-  gnome_config_set_string ("local mail directory", gtk_entry_get_text (GTK_ENTRY (pmw->mail_directory)));
+  g_free (balsa_app.local_mail_directory);
   balsa_app.local_mail_directory = g_strdup(gtk_entry_get_text (GTK_ENTRY (pmw->mail_directory)));
 
   gtk_widget_destroy (pmw->window);
-  g_free (pmw);
-  pmw = NULL;
-
-  gnome_config_pop_prefix ();
-  gnome_config_sync ();
+  save_global_settings ();
 }
 
 
@@ -211,11 +205,8 @@ refresh_preferences_manager ()
    * for the From: header */
   gtk_entry_set_text (GTK_ENTRY (pmw->username), balsa_app.username);
   gtk_entry_set_text (GTK_ENTRY (pmw->hostname), balsa_app.hostname);
-
   gtk_entry_set_text (GTK_ENTRY (pmw->organization), balsa_app.organization);
-
   gtk_entry_set_text (GTK_ENTRY (pmw->smtp_server), balsa_app.smtp_server);
-
   gtk_entry_set_text (GTK_ENTRY (pmw->mail_directory), balsa_app.local_mail_directory);
 }
 

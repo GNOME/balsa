@@ -10,7 +10,9 @@ balsa_SOURCES =	\
 	mailbox-manager.c	\
 	main-window.c		\
 	main.c			\
+	misc.c			\
 	pref-manager.c		\
+	save-restore.c		\
 	sendmsg-window.c	\
 	addrbook-manager.c
 

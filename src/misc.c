@@ -1,0 +1,41 @@
+/* Balsa E-Mail Client
+ * Copyright (C) 1997-98 Jay Painter and Stuart Parmenter
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307, USA.
+ */
+#include <gnome.h>
+#include "misc.h"
+
+
+gchar *
+get_string_set_default (const char *path,
+			const char *value)
+{
+  GString *buffer;
+  gboolean unset;
+  gchar *result;
+
+  result = NULL;
+  buffer = g_string_new (NULL);
+
+  g_string_sprintf (buffer, "%s=%s", path, value);
+  result = gnome_config_get_string_with_default (buffer->str, &unset);
+  if (unset)
+    gnome_config_set_string (path, value);
+
+  g_string_free (buffer, 1);
+  return result;
+}

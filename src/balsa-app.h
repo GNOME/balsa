@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
-
 #ifndef __BALSA_APP_H__
 #define __BALSA_APP_H__
 
@@ -35,29 +34,28 @@
 
 
 /* global balsa application structure */
-struct
-  {
-    gchar *real_name;
-
-    gchar *username;
-    gchar *hostname;
-
- /*   gchar *email; */
-    gchar *organization;
-    gchar *local_mail_directory;
-
-    gchar *smtp_server;
-
-    Mailbox *auth_mailbox;
-    Mailbox *current_mailbox;
-    GList *mailbox_list;
-
-    MainWindow *main_window;
-
-    GList *addressbook_list;
-
-    gint timer;
-  }
+extern struct BalsaApplication
+{
+  gchar *real_name;
+  gchar *username;
+  gchar *hostname;
+  gchar *email;
+  gchar *organization;
+  gchar *local_mail_directory;
+  
+  gchar *smtp_server;
+  
+  Mailbox *auth_mailbox;
+  Mailbox *current_mailbox;
+  
+  GList *mailbox_list;
+  
+  MainWindow *main_window;
+  
+  GList *addressbook_list;
+  
+  gint timer;
+}
 balsa_app;
 
 void init_balsa_app (int argc, char *argv[]);

@@ -25,9 +25,17 @@
 #include <dirent.h>
 #include <pwd.h>
 #include "balsa-app.h"
+#include "misc.h"
 #include "mailbox.h"
+#include "save-restore.h"
 
 
+
+/* Global application structure */
+struct BalsaApplication balsa_app;
+
+
+/* prototypes */
 static void load_global_settings ();
 static int options_init ();
 static void setup_local_mailboxes ();
@@ -54,13 +62,13 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.mailbox_list = NULL;
   balsa_app.main_window = NULL;
   balsa_app.addressbook_list = NULL;
-
   balsa_app.timer = 0;
 
-  load_global_settings ();
+  restore_global_settings ();
   options_init ();
   setup_local_mailboxes ();
   my_special_mailbox ();
+
 
   /* create main window */
   balsa_app.main_window = create_main_window ();
@@ -259,21 +267,6 @@ setup_local_mailboxes ()
   gint i = 0;
 
 
-/*
- * check the MAIL environment variable for a spool directory 
- * We'll make this the default if no other mailboxes are loaded...
- */
-
-/*
-   if (getenv ("MAIL"))
-   {
-   mbox = (MailboxMBox *) mailbox_new (MAILBOX_MBOX);
-   mbox->name = g_strdup ("INBOX");
-   mbox->path = g_strdup (getenv ("MAIL"));
-
-   balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbox);
-   }
- */
   if (dp = opendir (balsa_app.local_mail_directory))
     {
       while ((d = readdir (dp)) != NULL)
@@ -365,62 +358,4 @@ my_special_mailbox ()
    balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mh);
 
 #endif
-}
-
-static gchar *
-get_string_set_default (const char *path,
-			const char *value)
-{
-  GString *buffer;
-  gboolean unset;
-  gchar *result;
-
-  result = NULL;
-  buffer = g_string_new (NULL);
-
-  g_string_sprintf (buffer, "%s=%s", path, value);
-  result = gnome_config_get_string_with_default (buffer->str, &unset);
-  if (unset)
-    gnome_config_set_string (path, value);
-
-  g_string_free (buffer, 1);
-  return result;
-}
-
-
-static void
-load_global_settings ()
-{
-  GString *path;
-  struct passwd *pw;
-
-  pw = getpwuid (getuid ());
-
-  /* set to Global configure section */
-  gnome_config_push_prefix ("/balsa/Global/");
-
-  /* user's real name */
-  balsa_app.real_name = get_string_set_default ("real name", pw->pw_gecos);
-
-  /* user name */
-  balsa_app.username = get_string_set_default ("user name", pw->pw_name);
-
-  /* hostname */
-  balsa_app.hostname = get_string_set_default ("host name", mylocalhost ());
-
-  /* organization */
-  balsa_app.organization = get_string_set_default ("organization", "None");
-
-  /* directory */
-  path = g_string_new (NULL);
-  g_string_sprintf (path, "%s/Mail", pw->pw_dir);
-  balsa_app.local_mail_directory = get_string_set_default ("local mail directory", path->str);
-  g_string_free (path, 1);
-
-  /* smtp server */
-  balsa_app.smtp_server = get_string_set_default ("smtp server", "localhost");
-
-  /* save changes */
-  gnome_config_pop_prefix ();
-  gnome_config_sync ();
 }

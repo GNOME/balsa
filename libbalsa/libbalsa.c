@@ -89,7 +89,7 @@ void
 libbalsa_init(LibBalsaInformationFunc information_callback)
 {
     struct utsname utsname;
-    char *p;
+    const char *p;
 
     Spoolfile = libbalsa_guess_mail_spool();
 
@@ -102,14 +102,12 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
 
     uname(&utsname);
 
-    Username = g_get_user_name();
-
-    Homedir = g_get_home_dir();
-
-    Realname = g_get_real_name();
-
-    Hostname = libbalsa_get_hostname();
-    Domainname = libbalsa_get_domainname();
+    /* Username, Homedir etc. are really const char* */
+    Username   = (char*)g_get_user_name();
+    Homedir    = (char*)g_get_home_dir();
+    Realname   = (char*)g_get_real_name();
+    Hostname   = (char*)libbalsa_get_hostname();
+    Domainname = (char*)libbalsa_get_domainname();
 
     libbalsa_real_information_func = information_callback;
 
@@ -122,8 +120,8 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
 
     Sendmail = SENDMAIL;
 
-    Shell = g_strdup((p = g_getenv("SHELL")) ? p : "/bin/sh");
-    Tempdir = g_get_tmp_dir();
+    Shell   = g_strdup((p = g_getenv("SHELL")) ? p : "/bin/sh");
+    Tempdir = (char*)g_get_tmp_dir();
 
     if (UserHeader)
 	UserHeader = UserHeader->next;
@@ -325,7 +323,6 @@ gchar *libbalsa_guess_imap_inbox()
 gchar *libbalsa_guess_ldap_base()
 {
     gchar *server = libbalsa_guess_ldap_server();
-    char *domain;
 
     /* Note: Assumes base dn is "o=<domain name>". Somewhat speculative... */
     if(server) {

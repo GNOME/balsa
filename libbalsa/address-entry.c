@@ -52,8 +52,6 @@ struct _LibBalsaAddressEntry {
     gint focus;			/* Used to keep track of the validity of
 				   the 'input' variable. */
     gchar *domain;		/* The domain to add if the user omits one. */
-    gint alias_start_pos,       /* Used with selection_start/stop_pos to */
-         alias_end_pos;         /* colorise text */
 
     /*
      * Function to find matches.  User defined.
@@ -73,8 +71,6 @@ static GtkWidgetClass *parent_class = NULL;
 static void libbalsa_address_entry_class_init(LibBalsaAddressEntryClass *klass);
 static void libbalsa_address_entry_init(LibBalsaAddressEntry *ab);
 static void libbalsa_address_entry_destroy(GtkObject * object);
-static void libbalsa_address_entry_draw(GtkWidget * widget,
-                                        GdkRectangle * area);
 
 /*
  * Other function prototypes.
@@ -95,6 +91,10 @@ static void libbalsa_address_entry_clear_match(LibBalsaAddressEntry *);
 static GList *libbalsa_strsplit(const gchar *, gchar);
 static gint libbalsa_address_entry_focus_out(GtkWidget * widget,
                                              GdkEventFocus * event);
+static gboolean libbalsa_get_selection_bounds(GtkEditable * editable,
+                                              gint * start, gint * end);
+static gboolean libbalsa_get_editable(GtkEditable * editable);
+static GList * libbalsa_delete_link(GList *list, GList *link);
 
 
 /*
@@ -119,32 +119,34 @@ static void libbalsa_cut_clipboard		(LibBalsaAddressEntry *);
 /*
  * Map the Control keys to relevant functions.
  */
-static const GtkTextFunction control_keys[26] =
+typedef void (*LibBalsaTextFun) (GtkEditable * editable,
+                                                  guint32 time);
+static const LibBalsaTextFun control_keys[26] =
 {
-    (GtkTextFunction)libbalsa_keystroke_home,		/* a */
-    (GtkTextFunction)libbalsa_move_backward_character,	/* b */
-    (GtkTextFunction)gtk_editable_copy_clipboard,	/* c */
-    (GtkTextFunction)libbalsa_delete_forward_character,	/* d */
-    (GtkTextFunction)libbalsa_keystroke_end,		/* e */
-    (GtkTextFunction)libbalsa_move_forward_character,	/* f */
+    (LibBalsaTextFun)libbalsa_keystroke_home,		/* a */
+    (LibBalsaTextFun)libbalsa_move_backward_character,	/* b */
+    (LibBalsaTextFun)gtk_editable_copy_clipboard,	/* c */
+    (LibBalsaTextFun)libbalsa_delete_forward_character,	/* d */
+    (LibBalsaTextFun)libbalsa_keystroke_end,		/* e */
+    (LibBalsaTextFun)libbalsa_move_forward_character,	/* f */
     NULL,						/* g */
-    (GtkTextFunction)libbalsa_delete_backward_character,/* h */
+    (LibBalsaTextFun)libbalsa_delete_backward_character,/* h */
     NULL,						/* i */
     NULL,						/* j */
-    (GtkTextFunction)libbalsa_delete_to_line_end,	/* k */
+    (LibBalsaTextFun)libbalsa_delete_to_line_end,	/* k */
     NULL,						/* l */
     NULL,						/* m */
     NULL,						/* n */
     NULL,						/* o */
     NULL,						/* p */
     NULL,						/* q */
-    (GtkTextFunction)libbalsa_force_expand,		/* r */
+    (LibBalsaTextFun)libbalsa_force_expand,		/* r */
     NULL,						/* s */
     NULL,						/* t */
-    (GtkTextFunction)libbalsa_delete_line,		/* u */
-    (GtkTextFunction)libbalsa_paste_clipboard,		/* v */
-    (GtkTextFunction)libbalsa_delete_backward_word,	/* w */
-    (GtkTextFunction)libbalsa_cut_clipboard,		/* x */
+    (LibBalsaTextFun)libbalsa_delete_line,		/* u */
+    (LibBalsaTextFun)libbalsa_paste_clipboard,		/* v */
+    (LibBalsaTextFun)libbalsa_delete_backward_word,	/* w */
+    (LibBalsaTextFun)libbalsa_cut_clipboard,		/* x */
     NULL,						/* y */
     NULL,						/* z */
 };
@@ -153,14 +155,14 @@ static const GtkTextFunction control_keys[26] =
 /*
  * Map the Alt keys to relevant functions.
  */
-static const GtkTextFunction alt_keys[26] =
+static const LibBalsaTextFun alt_keys[26] =
 {
     NULL,						/* a */
-    (GtkTextFunction)libbalsa_move_backward_word,	/* b */
+    (LibBalsaTextFun)libbalsa_move_backward_word,	/* b */
     NULL,						/* c */
-    (GtkTextFunction)libbalsa_delete_forward_word,	/* d */
+    (LibBalsaTextFun)libbalsa_delete_forward_word,	/* d */
     NULL,						/* e */
-    (GtkTextFunction)libbalsa_move_forward_word,	/* f */
+    (LibBalsaTextFun)libbalsa_move_forward_word,	/* f */
     NULL,						/* g */
     NULL,						/* h */
     NULL,						/* i */
@@ -227,7 +229,6 @@ libbalsa_address_entry_class_init(LibBalsaAddressEntryClass *klass)
 
     object_class->destroy = libbalsa_address_entry_destroy;
 
-    gtk_widget_class->draw = libbalsa_address_entry_draw;
     gtk_widget_class->button_press_event = libbalsa_address_entry_button_press;
     gtk_widget_class->key_press_event = libbalsa_address_entry_key_press;
     gtk_widget_class->focus_out_event = libbalsa_address_entry_focus_out;
@@ -240,23 +241,9 @@ libbalsa_address_entry_init(LibBalsaAddressEntry *address_entry)
     address_entry->active = NULL;
     address_entry->domain = NULL;
     address_entry->find_match = NULL;
-    address_entry->alias_start_pos = 0;
-    address_entry->alias_end_pos = 0;
     address_entry->focus = FOCUS_LOST;
 
     return;
-}
-
-/*************************************************************
- * libbalsa_delete_link:
- *     Replace with g_list_delete_link when it's around.
- *************************************************************/
-static GList *
-libbalsa_delete_link(GList *list, GList *link)
-{
-    list = g_list_remove_link(list, link);
-    g_list_free_1(link);
-    return list;
 }
 
 
@@ -303,7 +290,6 @@ libbalsa_address_entry_destroy(GtkObject * object)
     /*
      * Make sure the data makes sense.
      */
-    address_entry->alias_start_pos = address_entry->alias_end_pos = 0;
     address_entry->focus = FOCUS_LOST;
 
     /*
@@ -863,48 +849,6 @@ libbalsa_delete_to_line_end(LibBalsaAddressEntry *address_entry)
 }
 
 /*************************************************************
- * libbalsa_address_entry_draw:
- *     Draws the entire widget.
- *
- *   credits:
- *     hands over all the work to GTK_WIDGET_CLASS(parent_class)->draw
- *
- *   arguments:
- *     widget: the widget.
- *     area:   ignored.
- *
- *   results:
- *     None?  Changes the appearance of the widget.
- *************************************************************/
-static void
-libbalsa_address_entry_draw(GtkWidget * widget, GdkRectangle * area)
-{
-    GtkEditable *editable = GTK_EDITABLE(widget);
-
-    if (editable->has_selection || !GTK_WIDGET_HAS_FOCUS(widget))
-        (*GTK_WIDGET_CLASS(parent_class)->draw) (widget, area);
-    else {
-        /* highlight the expansion text by faking a selection */
-        gint start = editable->selection_start_pos;
-        gint end = editable->selection_end_pos;
-        LibBalsaAddressEntry *address_entry =
-            LIBBALSA_ADDRESS_ENTRY(widget);
-
-        editable->selection_start_pos = address_entry->alias_start_pos;
-        editable->selection_end_pos = address_entry->alias_end_pos;
-
-        (*GTK_WIDGET_CLASS(parent_class)->draw) (widget, area);
-
-        editable->selection_start_pos = start;
-        editable->selection_end_pos = end;
-
-        /* now draw the cursor (there's no method specifically for that,
-         * but draw_focus includes the cursor) */
-        gtk_widget_draw_focus(widget);
-    }
-}
-
-/*************************************************************
  * libbalsa_address_entry_button_press:
  *     This gets called when the user clicks a mouse button.
  *
@@ -1000,7 +944,7 @@ libbalsa_delete_backward_character(LibBalsaAddressEntry *address_entry)
     /*
      * First: Cut the clipboard.
      */
-    if (editable->selection_start_pos != editable->selection_end_pos) {
+    if (libbalsa_get_selection_bounds(editable, NULL, NULL) && !addy->match) {
 	libbalsa_cut_clipboard(address_entry);
 	return;
     }
@@ -1081,7 +1025,7 @@ libbalsa_delete_forward_character(LibBalsaAddressEntry *address_entry)
     
     addy = address_entry->active->data;
     editable = GTK_EDITABLE(address_entry);
-    if (editable->selection_start_pos != editable->selection_end_pos) {
+    if (libbalsa_get_selection_bounds(editable, NULL, NULL) && !addy->match) {
 	libbalsa_cut_clipboard(address_entry);
 	return;
     }
@@ -1446,7 +1390,8 @@ libbalsa_keystroke_add_key(LibBalsaAddressEntry *address_entry, gchar *add)
     g_return_if_fail(add != NULL);
 
     editable = GTK_EDITABLE(address_entry);
-    if (editable->selection_start_pos != editable->selection_end_pos) {
+    addy = address_entry->active->data;
+    if (libbalsa_get_selection_bounds(editable, NULL, NULL) && !addy->match) {
 	libbalsa_cut_clipboard(address_entry);
     }
 
@@ -1622,12 +1567,8 @@ libbalsa_address_entry_key_press(GtkWidget *widget, GdkEventKey *event)
     GtkEditable *editable;
     GtkEntry *entry;
     LibBalsaAddressEntry *address_entry;
-    GList * lst;
 
     gboolean return_val;
-    guint initial_pos;
-    gint extend_selection;
-    gint extend_start;
     gint key;
 
     g_return_val_if_fail(widget != NULL, FALSE);
@@ -1641,22 +1582,12 @@ libbalsa_address_entry_key_press(GtkWidget *widget, GdkEventKey *event)
     /*
      * Skip it if its not editable...
      */
-    if (!editable->editable) return FALSE;
+    if (!libbalsa_get_editable(editable)) return FALSE;
 
     /*
-     * Setup variables, and see if we need to select text.
+     * Setup variables.
      */
     return_val = FALSE;
-    initial_pos = editable->current_pos;
-    extend_selection = event->state & GDK_SHIFT_MASK;
-    extend_start = FALSE;
-    if (extend_selection) {
-	if (editable->selection_start_pos == editable->selection_end_pos) {
-	    editable->selection_start_pos = editable->current_pos;
-	    editable->selection_end_pos = editable->current_pos;
-	}
-	extend_start = (editable->current_pos == editable->selection_start_pos);
-    }
 
     /*
      * Check if we have lost focus.
@@ -1691,7 +1622,6 @@ libbalsa_address_entry_key_press(GtkWidget *widget, GdkEventKey *event)
     case GDK_Insert:	/* done */
 	return_val = TRUE;
 	if (event->state & GDK_SHIFT_MASK) {
-	    extend_selection = FALSE;
 	    libbalsa_paste_clipboard(address_entry);
 	} else if (event->state & GDK_CONTROL_MASK)
 	    gtk_editable_copy_clipboard(editable);
@@ -1701,7 +1631,6 @@ libbalsa_address_entry_key_press(GtkWidget *widget, GdkEventKey *event)
 	if (event->state & GDK_CONTROL_MASK) /* done */
 	    libbalsa_delete_forward_word(address_entry);
 	else if (event->state & GDK_SHIFT_MASK) {
-	    extend_selection = FALSE;
 	    libbalsa_cut_clipboard(address_entry);
 	} else
 	    libbalsa_delete_forward_character(address_entry);
@@ -1792,39 +1721,10 @@ libbalsa_address_entry_key_press(GtkWidget *widget, GdkEventKey *event)
 	 * Its not Alt, and its not Ctrl, so add the key.
 	 */
 	if (event->length > 0) {
-	    extend_selection = FALSE;
-	    editable->has_selection = FALSE;
 	    return_val = TRUE;
 	    libbalsa_keystroke_add_key(address_entry, event->string);
 	}
 	break;
-    }
-
-    /*
-     * Since we emit signals from within the above code,
-     * the widget might already be destroyed or at least
-     * unrealized.
-     */
-    if (GTK_WIDGET_REALIZED(editable) && return_val &&
-	    (editable->current_pos != initial_pos)) {
-	if (extend_selection) {
-	    if (editable->current_pos < editable->selection_start_pos)
-	        editable->selection_start_pos = editable->current_pos;
-	    else if (editable->current_pos > editable->selection_end_pos)
-	        editable->selection_end_pos = editable->current_pos;
-	    else {
-	        if (extend_start)
-		    editable->selection_start_pos = editable->current_pos;
-	        else
-		    editable->selection_end_pos = editable->current_pos;
-	    }
-	} else {
-	    editable->selection_start_pos = 0;
-	    editable->selection_end_pos = 0;
-	}
-	gtk_editable_claim_selection(editable,
-		editable->selection_start_pos != editable->selection_end_pos,
-		event->time);
     }
 
     /*
@@ -1837,9 +1737,7 @@ libbalsa_address_entry_key_press(GtkWidget *widget, GdkEventKey *event)
 /*************************************************************
  * libbalsa_address_entry_show:
  *     Shows the widget.  This will work out the aliases,
- *     and set the widget text to that, and then call
- *     libbalsa_address_entry_draw_text() to draw the
- *     widget.
+ *     and set the widget text to that.
  *
  *   arguments:
  *     address_entry: the widget.
@@ -1860,9 +1758,7 @@ libbalsa_address_entry_show(LibBalsaAddressEntry *address_entry)
     GString *show;
     GList *list;
     emailData *addy;
-    gchar *out;
-    gint cursor, start, end;
-    gboolean found;
+    gint cursor, end;
 
     g_return_if_fail(address_entry != NULL);
     g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry));
@@ -1872,60 +1768,34 @@ libbalsa_address_entry_show(LibBalsaAddressEntry *address_entry)
     editable = GTK_EDITABLE(address_entry);
 
     show = g_string_new("");
-    cursor = start = end = 0;
-    found = FALSE;
+    cursor = end = 0;
     for (list = g_list_first(address_entry->active);
 	 list;
 	 list = g_list_next(list)) {
-	/*
-	 * Is it a normal string, or is it a match that requires ()
-	 */
 	addy = (emailData *)list->data;
 	g_assert(addy != NULL);
+        if (list == address_entry->active)
+            cursor = end = show->len + addy->cursor;
+        g_string_append(show, addy->user);
 	if (addy->match) {
-	    out = g_strconcat(addy->user, " (", addy->match, ")", NULL);
-	} else {
-	    out = g_strdup(addy->user);
+	    g_string_append(show, " (");
+	    g_string_append(show, addy->match);
+	    g_string_append(show, ") ");
+            end = show->len;
 	}
-	/*
-	 * Copy the string, adding a delimiter if need be.
-	 */
-	show = g_string_append(show, out);
 	if (g_list_next(list))
-	    show = g_string_append(show, ", ");
-
-	/*
-	 * Check for the cursor position.
-	 */
-	if (!found) {
-	    if (list != address_entry->active) {
-		cursor += strlen(out);
-	    	if (g_list_next(list)) cursor += 2;
-	    } else {
-		found = TRUE;
-		cursor += addy->cursor;
-		if (addy->match) {
-		    start = cursor - addy->cursor;
-		    start += strlen(addy->user) + 1;
-		    end = start + strlen(addy->match) + 2;
-		}
-	    }
-	}
-	g_free(out);
+	    g_string_append(show, ", ");
     }
 
-    /*
-     * Show it...
-     */
-    address_entry->alias_start_pos = start;
-    address_entry->alias_end_pos = end;
-    start = editable->selection_start_pos;
-    end = editable->selection_end_pos;
-    gtk_entry_set_text(GTK_ENTRY(address_entry), show->str);
+    /* has the text changed? */
+    if (strcmp(gtk_entry_get_text(GTK_ENTRY(address_entry)), show->str))
+        gtk_entry_set_text(GTK_ENTRY(address_entry), show->str);
+    gtk_editable_select_region(editable, end, cursor);
+#if BALSA_MAJOR == 1
+    /* this shouldn't be needed with gtk+-2.0 */
     gtk_editable_set_position(editable, cursor);
+#endif                          /* BALSA_MAJOR == 1 */
     g_string_free(show, TRUE);
-    editable->selection_start_pos = start;
-    editable->selection_end_pos = end;
 }
 
 
@@ -2023,7 +1893,10 @@ libbalsa_address_entry_focus_out(GtkWidget *widget, GdkEventFocus *event)
     g_return_val_if_fail(event != NULL, FALSE);
 
     GTK_WIDGET_UNSET_FLAGS(widget, GTK_HAS_FOCUS);
+#if BALSA_MAJOR == 1
+    /* not in gtk+-2.0: */
     gtk_widget_draw_focus(widget);
+#endif                          /* BALSA_MAJOR == 1 */
 
     address_entry = LIBBALSA_ADDRESS_ENTRY(widget);
     if (address_entry->focus == FOCUS_CACHED) {
@@ -2167,4 +2040,44 @@ libbalsa_address_entry_matching(LibBalsaAddressEntry * address_entry)
             return TRUE;
     }
     return FALSE;
+}
+
+/*
+ * Compatibility:
+ */
+static gboolean
+libbalsa_get_selection_bounds(GtkEditable * editable, gint * start,
+                              gint * end)
+{
+#if BALSA_MAJOR == 1
+    if (start)
+        *start = editable->selection_start_pos;
+    if (end)
+        *end = editable->selection_end_pos;
+    return editable->has_selection;
+#else
+    return gtk_editable_get_selection_bounds(editable, start, end);
+#endif                          /* BALSA_MAJOR == 1 */
+}
+
+static gboolean
+libbalsa_get_editable(GtkEditable * editable)
+{
+#if BALSA_MAJOR == 1
+    return editable->editable;
+#else
+    return gtk_editable_get_editable(editable);
+#endif                          /* BALSA_MAJOR == 1 */
+}
+
+static GList *
+libbalsa_delete_link(GList * list, GList * link)
+{
+#if BALSA_MAJOR == 1
+    list = g_list_remove_link(list, link);
+    g_list_free_1(link);
+    return list;
+#else
+    return g_list_delete_link(list, link);
+#endif                          /* BALSA_MAJOR == 1 */
 }

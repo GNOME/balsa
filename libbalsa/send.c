@@ -325,8 +325,7 @@ add_mutt_body_as_extbody(const gchar *filename, const gchar *mime_type)
     mutt_mktemp(buffer);
     body->filename = g_strdup(buffer);
     tempfp = safe_fopen(body->filename, "w+");
-    fprintf(tempfp, "Note: this is _not_ the real body!\n",
-	    mime_type);
+    fprintf(tempfp, "Note: this is _not_ the real body!\n");
     fclose(tempfp);
 
     libbalsa_unlock_mutt();
@@ -391,8 +390,6 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 		       gboolean flow)
 {
     MessageQueueItem *mqi;
-    LibBalsaServer *server;
-
 
     g_return_if_fail(message);
 
@@ -1206,7 +1203,6 @@ libbalsa_message_postpone(LibBalsaMessage * message,
     BODY *last, *newbdy;
     gchar *tmp;
     LibBalsaMessageBody *body;
-    LibBalsaServer *server;
     int thereturn; 
 
     libbalsa_lock_mutt();

@@ -28,8 +28,9 @@
 #include <string.h>
 #include <errno.h>
 #include <dirent.h>
-/* for gnome mime functions ... */
-#include <gnome.h>
+
+#include <libgnomevfs/gnome-vfs-file-info.h>
+#include <libgnomevfs/gnome-vfs-ops.h>
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
@@ -37,31 +38,17 @@
 
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
-#define GNOME_MIME_BUG_WORKAROUND 1
-
-/* balsa_lookup_mime_type:
- *
- * Description: This is a function to use the gnome mime functions to
- * get the type and subtype for later use. 
- * it includes a workaround for notorious gnome-mime bug.
- * */
 const gchar*
-libbalsa_lookup_mime_type(const gchar * path) {
-    const gchar *mime_type;
-
-    mime_type =
-	gnome_mime_type_or_default_of_file(path, "application/octet-stream");
-#ifdef GNOME_MIME_BUG_WORKAROUND
-    /* the function above returns for certains files a string which is
-       not a proper MIME type, e.g. "PDF document". Surprizingly, 
-       gnome_mime_type() does not fail in this case. This bug has been 
-       filed in bugzilla. Still not fixed.
-    */
-    if(strchr(mime_type, '/') == NULL)
-	mime_type = 
-	    gnome_mime_type_or_default(path, "application/octet-stream");
-#endif
-    return mime_type;
+libbalsa_lookup_mime_type(const gchar * path)
+{
+    GnomeVFSFileInfo* vi = gnome_vfs_file_info_new();
+    const gchar* res;
+    gnome_vfs_get_file_info (path, vi,
+                             GNOME_VFS_FILE_INFO_GET_MIME_TYPE
+                             | GNOME_VFS_FILE_INFO_FOLLOW_LINKS);
+    res = gnome_vfs_file_info_get_mime_type (vi);
+    gnome_vfs_file_info_unref(vi);
+    return res;
 }
 
 gchar *
@@ -687,57 +674,122 @@ libbalsa_set_charset(const gchar * charset)
     return old_charset;
 }
 
-/* libbalsa_marshal_POINTER__NONE:
+/* libbalsa_marshal_POINTER__VOID:
    Marshalling function
 */
-typedef gpointer(*GtkSignal_POINTER__NONE) (GtkObject *object, 
-					    gpointer user_data);
+/* POINTER:NONE (/dev/stdin:1) */
 void
-libbalsa_marshal_POINTER__NONE(GtkObject *object, GtkSignalFunc func,
-				gpointer func_data, GtkArg *args)
+libbalsa_marshal_POINTER__VOID (GClosure     *closure,
+                                GValue       *return_value,
+                                guint         n_param_values,
+                                const GValue *param_values,
+                                gpointer      invocation_hint,
+                                gpointer      marshal_data)
 {
-    GtkSignal_POINTER__NONE rfunc = (GtkSignal_POINTER__NONE) func;
-    gpointer *return_val = GTK_RETLOC_POINTER(args[0]);
+    typedef gpointer (*GMarshalFunc_POINTER__VOID) (gpointer     data1,
+                                                    gpointer     data2);
+    register GMarshalFunc_POINTER__VOID callback;
+    register GCClosure *cc = (GCClosure*) closure;
+    register gpointer data1, data2;
+    gpointer v_return;
 
-    *return_val = (*rfunc) (object, func_data);
+    g_return_if_fail (return_value != NULL);
+    g_return_if_fail (n_param_values == 1);
+    
+    if (G_CCLOSURE_SWAP_DATA (closure)) {
+        data1 = closure->data;
+        data2 = g_value_peek_pointer (param_values + 0);
+    }
+    else {
+        data1 = g_value_peek_pointer (param_values + 0);
+        data2 = closure->data;
+    }
+    callback = (GMarshalFunc_POINTER__VOID) 
+        (marshal_data ? marshal_data : cc->callback);
+    
+    v_return = callback (data1, data2);
+    
+    g_value_set_pointer (return_value, v_return);
 }
+
 
 /* libbalsa_marshal_POINTER__OBJECT:
    Marshalling function 
 */
-typedef gpointer(*GtkSignal_POINTER__OBJECT) (GtkObject * object,
-					      GtkObject * parm,
-					      gpointer user_data);
-
+/* POINTER:OBJECT (/dev/stdin:1) */
 void
-libbalsa_marshal_POINTER__OBJECT(GtkObject * object, GtkSignalFunc func,
-				 gpointer func_data, GtkArg * args)
+libbalsa_marshal_POINTER__OBJECT (GClosure     *closure,
+                                  GValue       *return_value,
+                                  guint         n_param_values,
+                                  const GValue *param_values,
+                                  gpointer      invocation_hint,
+                                  gpointer      marshal_data)
 {
-    GtkSignal_POINTER__OBJECT rfunc;
-    gpointer *return_val;
+    typedef gpointer (*GMarshalFunc_POINTER__OBJECT) (gpointer     data1,
+                                                      gpointer     arg_1,
+                                                      gpointer     data2);
+    register GMarshalFunc_POINTER__OBJECT callback;
+    register GCClosure *cc = (GCClosure*) closure;
+    register gpointer data1, data2;
+    gpointer v_return;
+    
+    g_return_if_fail (return_value != NULL);
+    g_return_if_fail (n_param_values == 2);
+    
+    if (G_CCLOSURE_SWAP_DATA (closure)) {
+        data1 = closure->data;
+        data2 = g_value_peek_pointer (param_values + 0);
+    } else {
+        data1 = g_value_peek_pointer (param_values + 0);
+        data2 = closure->data;
+    }
+    callback = (GMarshalFunc_POINTER__OBJECT)
+        (marshal_data ? marshal_data : cc->callback);
 
-    return_val = GTK_RETLOC_POINTER(args[1]);
-    rfunc = (GtkSignal_POINTER__OBJECT) func;
-    *return_val = (*rfunc) (object, GTK_VALUE_OBJECT(args[0]), func_data);
+    v_return = callback (data1,
+                         g_value_get_object (param_values + 1),
+                         data2);
+    
+    g_value_set_pointer (return_value, v_return);
 }
-
 /* libbalsa_marshall_POINTER__POINTER_POINTER:
    Marshalling function
 */
-typedef gpointer(*GtkSignal_POINTER__POINTER_POINTER) (GtkObject *object,
-						       gpointer *param1,
-						       gpointer *param2,
-						       gpointer user_data);
+/* POINTER:POINTER,POINTER (/dev/stdin:2) */
 void
-libbalsa_marshall_POINTER__POINTER_POINTER(GtkObject *object, GtkSignalFunc func,
-					   gpointer func_data, GtkArg *args)
+libbalsa_marshal_POINTER__POINTER_POINTER (GClosure     *closure,
+                                           GValue       *return_value,
+                                           guint         n_param_values,
+                                           const GValue *param_values,
+                                           gpointer      invocation_hint,
+                                           gpointer      marshal_data)
 {
-    GtkSignal_POINTER__POINTER_POINTER rfunc;
-    gpointer *return_val;
+    typedef gpointer (*GMarshalFunc_POINTER__POINTER_POINTER) 
+        (gpointer data1, gpointer arg_1, gpointer arg_2, gpointer data2);
+    register GMarshalFunc_POINTER__POINTER_POINTER callback;
+    register GCClosure *cc = (GCClosure*) closure;
+    register gpointer data1, data2;
+    gpointer v_return;
 
-    return_val = GTK_RETLOC_POINTER(args[2]);
-    rfunc = (GtkSignal_POINTER__POINTER_POINTER) func;
-    *return_val = (*rfunc) (object, GTK_VALUE_POINTER(args[0]), GTK_VALUE_POINTER(args[1]), func_data);
+    g_return_if_fail (return_value != NULL);
+    g_return_if_fail (n_param_values == 3);
+    
+    if (G_CCLOSURE_SWAP_DATA (closure)) {
+        data1 = closure->data;
+        data2 = g_value_peek_pointer (param_values + 0);
+    } else {
+        data1 = g_value_peek_pointer (param_values + 0);
+        data2 = closure->data;
+    }
+    callback = (GMarshalFunc_POINTER__POINTER_POINTER) 
+        (marshal_data ? marshal_data : cc->callback);
+    
+    v_return = callback (data1,
+                         g_value_get_pointer (param_values + 1),
+                         g_value_get_pointer (param_values + 2),
+                         data2);
+    
+    g_value_set_pointer (return_value, v_return);
 }
 
 

@@ -89,19 +89,21 @@ libbalsa_server_class_init(LibBalsaServerClass * klass)
     libbalsa_server_signals[SET_USERNAME] =
 	gtk_signal_new("set-username",
 		       GTK_RUN_FIRST,
-		       object_class->type,
+		       GTK_CLASS_TYPE(object_class),
 		       GTK_SIGNAL_OFFSET(LibBalsaServerClass,
 					 set_username),
 		       gtk_marshal_NONE__STRING, GTK_TYPE_NONE, 1,
 		       GTK_TYPE_STRING);
     libbalsa_server_signals[SET_PASSWORD] =
-	gtk_signal_new("set-password", GTK_RUN_FIRST, object_class->type,
+	gtk_signal_new("set-password", GTK_RUN_FIRST,
+                       GTK_CLASS_TYPE(object_class),
 		       GTK_SIGNAL_OFFSET(LibBalsaServerClass,
 					 set_password),
 		       gtk_marshal_NONE__STRING, GTK_TYPE_NONE, 1,
 		       GTK_TYPE_STRING);
     libbalsa_server_signals[SET_HOST] =
-	gtk_signal_new("set-host", GTK_RUN_FIRST, object_class->type,
+	gtk_signal_new("set-host", GTK_RUN_FIRST,
+                       GTK_CLASS_TYPE(object_class),
 		       GTK_SIGNAL_OFFSET(LibBalsaServerClass, set_host),
 #ifdef USE_SSL
 		       gtk_marshal_NONE__POINTER_INT, GTK_TYPE_NONE, 2,
@@ -115,14 +117,11 @@ libbalsa_server_class_init(LibBalsaServerClass * klass)
     libbalsa_server_signals[GET_PASSWORD] =
 	gtk_signal_new("get-password",
 		       GTK_RUN_LAST,
-		       object_class->type,
+		       GTK_CLASS_TYPE(object_class),
 		       GTK_SIGNAL_OFFSET(LibBalsaServerClass,
 					 get_password),
 		       libbalsa_marshal_POINTER__OBJECT, GTK_TYPE_POINTER,
 		       1, LIBBALSA_TYPE_MAILBOX);
-
-    gtk_object_class_add_signals(object_class, libbalsa_server_signals,
-				 LAST_SIGNAL);
 
     klass->set_username = libbalsa_server_real_set_username;
     klass->set_password = libbalsa_server_real_set_password;

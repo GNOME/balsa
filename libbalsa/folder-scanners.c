@@ -91,7 +91,7 @@ libbalsa_scanner_local_dir(GNode *rnode, const gchar * prefix,
 {
     DIR *dpc;
     struct dirent *de;
-    gchar * name;
+    const gchar * name;
     char filename[PATH_MAX];
     struct stat st;
     GtkType mailbox_type;

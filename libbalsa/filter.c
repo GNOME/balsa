@@ -29,6 +29,7 @@
  * Author:  Emmanuel ALLAUD
  */
 
+#include <ctype.h>
 #include "src/balsa-app.h"
 #include "libbalsa.h"
 #include "libbalsa_private.h"
@@ -61,7 +62,7 @@ in_string(const gchar * s1,const gchar * s2)
 
     while (*s1) {
 	/* We look for the first char of s2*/
-	for (;*s1 && toupper(*s2)!=toupper(*s1);s1++);
+	for (;*s1 && toupper((int)*s2)!=toupper((int)*s1); s1++);
 	if (*s1) {
 	    /* We found the first char let see if this potential match is an actual one */
 	    q=++s1;

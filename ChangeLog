@@ -2,6 +2,19 @@
 
 	* autogen.sh, configure.in: previouse updates were not universal.
 
+	* libbalsa/address-book-extern.c, libbalsa/address-book-ldif.c,
+	libbalsa/address-book.c, libbalsa/address-entry.c,
+	libbalsa/address.c, libbalsa/files.c, libbalsa/filter-file.c,
+	libbalsa/filter-funcs.c, libbalsa/filter.c,
+	libbalsa/folder-scanners.c, libbalsa/identity.c,
+	libbalsa/libbalsa.c, libbalsa/mailbox.c, libbalsa/mailbox_imap.c,
+	libbalsa/mailbox_local.c, libbalsa/message.c, libbalsa/misc.[hc],
+	libbalsa/pop3.c, libbalsa/send.c, libbalsa/server.c,
+	libbalsa/source-viewer.c:
+	Make libbalsa.a compile against GNOME2. The only major changes
+	were related to MIME handling and GtkText (gnome-mime and GtkText
+	are deprecated). Some extra cleanup (unused variables).
+
 2002-02-20  Pawel Salek <pawsa@theochem.kth.se>
 
 	Start port to GNOME2. Based on Jelmer Vernooij's work.

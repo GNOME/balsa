@@ -84,19 +84,21 @@ static void
 libbalsa_show_file(FILE* f, long length)
 {
     GtkWidget*window, *interior;
-    GtkEditable* text;
+    GtkWidget* text;
+    GtkTextBuffer* buffer;
     char buf[1024];
-    int linelen, pos = 0;
+    int linelen;
 
     window = gnome_app_new("balsa", _("Message Source"));
     gtk_window_set_wmclass(GTK_WINDOW(window), "message-source", "Balsa");
-    text = GTK_EDITABLE(gtk_text_new(NULL, NULL));
+    buffer = gtk_text_buffer_new (NULL);
+    text   = gtk_text_view_new_with_buffer(buffer);
     gtk_object_set_data(GTK_OBJECT(window), "text", text);
     gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, window);
     
-    gtk_text_set_word_wrap(GTK_TEXT(text), TRUE);
-    interior = gtk_scrolled_window_new(GTK_TEXT(text)->hadj,
-				       GTK_TEXT(text)->vadj);
+    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text), GTK_WRAP_WORD);
+    interior = gtk_scrolled_window_new(GTK_TEXT_VIEW(text)->hadjustment,
+				       GTK_TEXT_VIEW(text)->vadjustment);
     gtk_container_add(GTK_CONTAINER(interior), GTK_WIDGET(text));
 
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(interior),
@@ -107,9 +109,8 @@ libbalsa_show_file(FILE* f, long length)
 					* not likely to be used */
     while(length>0 && fgets(buf, sizeof(buf), f)) {
 	linelen = strlen(buf);
-	gtk_editable_insert_text(text, buf,
-				 length>linelen ? linelen : length, 
-				 &pos);
+	gtk_text_buffer_insert_at_cursor(buffer, buf,
+                                         length>linelen ? linelen : length);
 	length -= linelen;
     }
 

@@ -98,14 +98,10 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
     libbalsa_mailbox_local_signals[REMOVE_FILES] =
 	gtk_signal_new("remove-files",
 		       GTK_RUN_LAST,
-		       object_class->type,
+		       GTK_CLASS_TYPE(object_class),
 		       GTK_SIGNAL_OFFSET(LibBalsaMailboxLocalClass,
 					 remove_files),
 		       gtk_marshal_NONE__NONE, GTK_TYPE_NONE, 0);
-
-    gtk_object_class_add_signals(object_class, libbalsa_mailbox_local_signals,
-				 LAST_SIGNAL);
-
 
     object_class->destroy = libbalsa_mailbox_local_destroy;
 

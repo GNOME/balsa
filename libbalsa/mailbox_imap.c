@@ -530,8 +530,7 @@ static gboolean
 clean_cache(LibBalsaMailbox* mailbox)
 {
     GDBM_FILE dbf;
-    datum key, nextkey, header;
-    LibBalsaMessage* message;
+    datum key, nextkey;
     gchar* fname =  get_cache_name(LIBBALSA_MAILBOX_IMAP(mailbox), "body");
     ImapUID uid[2];
     GHashTable *present_uids;

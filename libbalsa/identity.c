@@ -97,8 +97,9 @@ libbalsa_identity_get_type()
                 sizeof(LibBalsaIdentityClass),
                 (GtkClassInitFunc) libbalsa_identity_class_init,
                 (GtkObjectInitFunc) libbalsa_identity_init,
-                (GtkArgSetFunc) NULL,
-                (GtkArgGetFunc) NULL
+                /* reserved_1 */ NULL,
+                /* reserved_2 */ NULL,
+                (GtkClassInitFunc) NULL
             };
         
         libbalsa_identity_type = 
@@ -441,22 +442,21 @@ libbalsa_identity_config_frame(gboolean with_buttons, GList** identities,
         vbox = gtk_vbox_new(FALSE, padding);
         gtk_box_pack_end(GTK_BOX(hbox), vbox, FALSE, FALSE, 0);
 
-        buttons[0] = gnome_stock_button(GNOME_STOCK_PIXMAP_NEW);
+        buttons[0] = gtk_button_new_from_stock (GNOME_STOCK_PIXMAP_NEW);
         gtk_signal_connect(GTK_OBJECT(buttons[0]), "clicked",
                            GTK_SIGNAL_FUNC(new_ident_cb), clist);
         
-        buttons[1] = 
-	    gnome_stock_button_with_label(GNOME_STOCK_PIXMAP_PROPERTIES, 
-					  _("Edit"));
+        buttons[1] = gtk_button_new_from_stock(GNOME_STOCK_PIXMAP_PROPERTIES);
+        gtk_button_set_label(GTK_BUTTON(buttons[1]), _("Edit"));
         gtk_signal_connect(GTK_OBJECT(buttons[1]), "clicked",
                            GTK_SIGNAL_FUNC(edit_ident_cb), clist);
         
-        buttons[2] = gnome_stock_button_with_label(GNOME_STOCK_PIXMAP_ADD, 
-						   _("Set Default"));
+        buttons[2] = gtk_button_new_from_stock(GNOME_STOCK_PIXMAP_ADD);
+        gtk_button_set_label(GTK_BUTTON(buttons[2]), _("Set Default"));
         gtk_signal_connect(GTK_OBJECT(buttons[2]), "clicked",
                            GTK_SIGNAL_FUNC(set_default_ident_cb), clist);
         
-        buttons[3] = gnome_stock_button(GNOME_STOCK_PIXMAP_REMOVE);
+        buttons[3] = gtk_button_new_from_stock(GNOME_STOCK_PIXMAP_REMOVE);
         gtk_signal_connect(GTK_OBJECT(buttons[3]), "clicked",
                            GTK_SIGNAL_FUNC(delete_ident_cb), clist);
         
@@ -500,8 +500,8 @@ static void
 identity_list_update(GtkCList* clist)
 {
     LibBalsaIdentity* ident;
-    GdkPixmap* pixmap = NULL;
-    GdkPixmap* bitmap = NULL;
+    /*GdkPixmap* pixmap = NULL;
+      GdkPixmap* bitmap = NULL;*/
     GList** identities, *list;
     LibBalsaIdentity* *default_id, *current;
     gchar* text[2];
@@ -527,8 +527,9 @@ identity_list_update(GtkCList* clist)
         i = gtk_clist_append(clist, text);
         gtk_clist_set_row_data(clist, i, ident);
         
+        /* do something to indicate it is the active style */
+        /* FIXME: port it to gnome2:
         if (ident == *default_id) {
-            /* do something to indicate it is the active style */
             gnome_stock_pixmap_gdk(GNOME_STOCK_MENU_FORWARD, 
                                    GNOME_STOCK_PIXMAP_REGULAR, 
                                    &pixmap, &bitmap);
@@ -539,6 +540,7 @@ identity_list_update(GtkCList* clist)
                                    &pixmap, &bitmap);
             gtk_clist_set_pixmap(clist, i, 0, pixmap, bitmap);
         }
+        */
     }
 
     gtk_clist_set_selection_mode(clist, GTK_SELECTION_BROWSE);
@@ -570,8 +572,9 @@ new_ident_cb(GtkButton* button, gpointer user_data)
 
     ident = LIBBALSA_IDENTITY(libbalsa_identity_new());
     parent = gtk_object_get_data(GTK_OBJECT(user_data), "parent-window");
-    dialog = setup_ident_dialog(parent, TRUE, ident, ident_dialog_add_cb, 
-				user_data);
+    dialog = setup_ident_dialog(parent, TRUE, ident, 
+                                (GtkSignalFunc)ident_dialog_add_cb, 
+                                user_data);
     gnome_dialog_run(GNOME_DIALOG(dialog));
 }
 
@@ -594,7 +597,8 @@ edit_ident_cb(GtkButton* button, gpointer user_data)
     row = GPOINTER_TO_INT(list->data);
     ident = LIBBALSA_IDENTITY(gtk_clist_get_row_data(clist, row));
     parent = gtk_object_get_data(GTK_OBJECT(clist), "parent-window");
-    dialog = setup_ident_dialog(parent, FALSE, ident, ident_dialog_edit_cb, 
+    dialog = setup_ident_dialog(parent, FALSE, ident, 
+                                (GtkSignalFunc)ident_dialog_edit_cb, 
 				clist);
     gnome_dialog_run(GNOME_DIALOG(dialog));
 }

@@ -32,6 +32,7 @@
    
 #include "config.h"
 
+#include <ctype.h>
 #include <glib.h>
 
 #ifdef BALSA_USE_THREADS
@@ -143,7 +144,7 @@ libbalsa_message_class_init(LibBalsaMessageClass * klass)
     libbalsa_message_signals[CLEAR_FLAGS] =
 	gtk_signal_new("clear-flags",
 		       GTK_RUN_FIRST,
-		       object_class->type,
+		       GTK_CLASS_TYPE(object_class),
 		       GTK_SIGNAL_OFFSET(LibBalsaMessageClass,
 					 clear_flags),
 		       gtk_marshal_NONE__NONE, GTK_TYPE_NONE, 0);
@@ -151,7 +152,7 @@ libbalsa_message_class_init(LibBalsaMessageClass * klass)
     libbalsa_message_signals[SET_ANSWERED] =
 	gtk_signal_new("set-answered",
 		       GTK_RUN_FIRST,
-		       object_class->type,
+		       GTK_CLASS_TYPE(object_class),
 		       GTK_SIGNAL_OFFSET(LibBalsaMessageClass,
 					 set_answered),
 		       gtk_marshal_NONE__BOOL, GTK_TYPE_NONE, 1,
@@ -160,7 +161,7 @@ libbalsa_message_class_init(LibBalsaMessageClass * klass)
     libbalsa_message_signals[SET_READ] =
 	gtk_signal_new("set-read",
 		       GTK_RUN_FIRST,
-		       object_class->type,
+		       GTK_CLASS_TYPE(object_class),
 		       GTK_SIGNAL_OFFSET(LibBalsaMessageClass, set_read),
 		       gtk_marshal_NONE__BOOL,
 		       GTK_TYPE_NONE, 1, GTK_TYPE_BOOL);
@@ -168,7 +169,7 @@ libbalsa_message_class_init(LibBalsaMessageClass * klass)
     libbalsa_message_signals[SET_DELETED] =
 	gtk_signal_new("set-deleted",
 		       GTK_RUN_LAST,
-		       object_class->type,
+		       GTK_CLASS_TYPE(object_class),
 		       GTK_SIGNAL_OFFSET(LibBalsaMessageClass,
 					 set_deleted),
 		       gtk_marshal_NONE__BOOL, GTK_TYPE_NONE, 1,
@@ -177,14 +178,11 @@ libbalsa_message_class_init(LibBalsaMessageClass * klass)
     libbalsa_message_signals[SET_FLAGGED] =
 	gtk_signal_new("set-flagged",
 		       GTK_RUN_FIRST,
-		       object_class->type,
+		       GTK_CLASS_TYPE(object_class),
 		       GTK_SIGNAL_OFFSET(LibBalsaMessageClass,
 					 set_flagged),
 		       gtk_marshal_NONE__BOOL, GTK_TYPE_NONE, 1,
 		       GTK_TYPE_BOOL);
-
-    gtk_object_class_add_signals(object_class, libbalsa_message_signals,
-				 LAST_SIGNAL);
 
     object_class->destroy = libbalsa_message_destroy;
 
@@ -213,7 +211,6 @@ static void
 libbalsa_message_destroy(GtkObject * object)
 {
     LibBalsaMessage *message;
-    GList *list;
 
     g_return_if_fail(object != NULL);
     g_return_if_fail(LIBBALSA_IS_MESSAGE(object));
@@ -892,7 +889,6 @@ gboolean
 libbalsa_message_has_attachment(LibBalsaMessage * message)
 {
     HEADER *msg_header;
-    LibBalsaMessageBody *body;
     gboolean res;
 
     g_return_val_if_fail(message, FALSE);

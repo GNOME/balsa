@@ -119,13 +119,9 @@ libbalsa_address_book_class_init(LibBalsaAddressBookClass * klass)
                        GTK_CLASS_TYPE(object_class),
 		       GTK_SIGNAL_OFFSET(LibBalsaAddressBookClass,
 					 alias_complete),
-		       libbalsa_marshall_POINTER__POINTER_POINTER, 
+		       libbalsa_marshal_POINTER__POINTER_POINTER, 
                        GTK_TYPE_POINTER, 2,
 		       GTK_TYPE_POINTER, GTK_TYPE_POINTER);
-
-    gtk_object_class_add_signals(object_class,
-				 libbalsa_address_book_signals,
-				 LAST_SIGNAL);
 
     klass->load = NULL;
     klass->store_address = NULL;
@@ -271,7 +267,7 @@ gboolean libbalsa_address_is_dist_list(const LibBalsaAddressBook *ab,
 				       const LibBalsaAddress *address)
 {
     return (address->member_list!=NULL || 
-	    ab->dist_list_mode && g_list_length(address->address_list)>1);
+	    (ab->dist_list_mode && g_list_length(address->address_list)>1));
 }
 
 

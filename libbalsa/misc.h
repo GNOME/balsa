@@ -100,6 +100,7 @@ void libbalsa_insert_with_url(GtkTextBuffer * buffer,
                                                 const gchar *,
                                                 gpointer),
                               gpointer callback_data);
+void libbalsa_window_select_all(GtkWindow * window);
 
 
 #endif				/* __LIBBALSA_MISC_H__ */

@@ -68,6 +68,10 @@ enum {
     LAST_SIGNAL
 };
 
+static guint activity_counter = 0;
+static guint activity_started = FALSE;
+gint balsa_window_progress_timeout(gpointer user_data);
+
 enum {
     TARGET_MESSAGES
 };
@@ -2368,3 +2372,60 @@ notebook_drag_received_cb (GtkWidget* widget, GdkDragContext* context,
 
     g_list_free (messages);
 }
+
+
+gint
+balsa_window_progress_timeout(gpointer user_data) 
+{
+    gfloat new_val;
+    GtkAdjustment* adj;
+    
+    
+    /* calculate the new value of the progressbar */
+    new_val = gtk_progress_get_value(GTK_PROGRESS(user_data)) + 1;
+    adj = GTK_PROGRESS(user_data)->adjustment;
+    if (new_val > adj->upper) {
+        new_val = adj->lower;
+    }
+    gtk_progress_set_value(GTK_PROGRESS(user_data), new_val);
+
+    /* return true so it continues to be called */
+    return TRUE;
+}
+
+
+
+void 
+balsa_window_increase_activity(BalsaWindow* window)
+{
+    GtkProgress* progress_bar;
+
+    if (!activity_counter) {
+        progress_bar = gnome_appbar_get_progress(balsa_app.appbar);
+        gtk_progress_set_activity_mode(progress_bar, 1);
+        activity_started = gtk_timeout_add(100, balsa_window_progress_timeout,
+                                           progress_bar);
+    }
+    
+    ++activity_counter;
+}
+
+void 
+balsa_window_decrease_activity(BalsaWindow* window)
+{
+    GtkProgress* progress_bar;
+    
+    if (activity_counter) {
+        --activity_counter;
+        
+        if (!activity_counter) {
+            gtk_timeout_remove(activity_started);
+            activity_started = FALSE;
+            progress_bar = gnome_appbar_get_progress(balsa_app.appbar);
+            gtk_progress_set_activity_mode(progress_bar, 
+                                           activity_counter);
+            gtk_adjustment_set_value(progress_bar->adjustment, 0);
+        }
+    }
+}
+

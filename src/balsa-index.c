@@ -563,6 +563,7 @@ balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
     g_free(msg);
 #ifdef BALSA_USE_THREADS
     is_opening = TRUE;
+    balsa_window_increase_activity(BALSA_WINDOW(bindex->window));
     pthread_create(&open_thread, NULL, open_in_thread, mailbox);
     while(is_opening) {
         while(is_opening && gtk_events_pending())
@@ -571,6 +572,7 @@ balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
     }
     pthread_join(open_thread, &data);
     pthread_mutex_unlock(&open_lock);
+    balsa_window_decrease_activity(BALSA_WINDOW(bindex->window));
 #else
     libbalsa_mailbox_open(mailbox, FALSE);
 #endif

@@ -1,3 +1,11 @@
+2001-02-18  Matthew Guenther  <guentherm@asme.org>
+
+	* src/balsa-index.c: start progress bar in activity mode when
+	loading a mailbox.
+	* src/main-window.[ch]: add
+	balsa_window_increase_activity/balsa_window_decrease_activity to
+	public interface to start status bar into activity mode.
+	
 2001-02-16  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-index.c: make it compile with -Werror with and without

@@ -63,6 +63,10 @@ gboolean send_progress_notify_cb(void);
 gint check_new_messages_auto_cb(gpointer data);
 void check_new_messages_cb(GtkWidget *, gpointer data);
 
+void balsa_window_increase_activity(BalsaWindow* window);
+void balsa_window_decrease_activity(BalsaWindow* window);
+
+
 #if defined(__FILE__) && defined(__LINE__)
 # ifdef __FUNCTION__
 #  define BALSA_DEBUG_MSG(message)  if (balsa_app.debug)  fprintf(stderr, "[%lu] %12s | %4d | %30s: %s\n", (unsigned long) time(NULL), __FILE__, __LINE__, __FUNCTION__, message)

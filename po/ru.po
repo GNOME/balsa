@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 0.4\n"
-"POT-Creation-Date: 2000-06-01 20:26-0400\n"
-"PO-Revision-Date: 2000-06-01 21:58+00:00\n"
+"POT-Creation-Date: 2000-06-04 14:10+0000\n"
+"PO-Revision-Date: 2000-06-04 14:12+00:00\n"
 "Last-Translator: Valek Filippov <frob@df.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -20,12 +20,12 @@ msgstr "Ошибка: "
 #: libbalsa/mailbox.c:631
 #, c-format
 msgid "Mailbox: Opening %s Refcount: %d\n"
-msgstr ""
+msgstr "Почтовый ящик: Открыто: %s  Число ссылок: %d\n"
 
 #: libbalsa/mailbox.c:651
 #, c-format
 msgid "Mailbox: Closing %s Refcount: %d\n"
-msgstr ""
+msgstr "Почтовый ящик: Закрыто %s  Число ссылок: %d\n"
 
 #.
 #. ISPRIME(9)
@@ -184,7 +184,7 @@ msgstr "Добавить новый адрес"
 msgid "E-Mail Address:"
 msgstr "Электронный адрес:"
 
-#: src/address-book.c:291 src/balsa-index-page.c:1046
+#: src/address-book.c:291 src/balsa-index-page.c:1043
 #, c-format
 msgid ""
 "Unable to open ~/.gnome/GnomeCard.gcrd for read.\n"
@@ -193,8 +193,8 @@ msgstr ""
 "Не удалось открыть ~/.gnome/GnomeCard.gcrd для чтения.\n"
 "- %s\n"
 
-#: src/address-book.c:294 src/balsa-index-page.c:1028
-#: src/balsa-index-page.c:1049 src/balsa-index-page.c:1085
+#: src/address-book.c:294 src/balsa-index-page.c:1029
+#: src/balsa-index-page.c:1046 src/balsa-index-page.c:1083
 #: src/sendmsg-window.c:393
 msgid "OK"
 msgstr "OK"
@@ -298,19 +298,19 @@ msgstr "Удалить"
 msgid "Undelete"
 msgstr "Восстановить"
 
-#: src/balsa-index-page.c:638
+#: src/balsa-index-page.c:639
 msgid "Store Address"
 msgstr "Сохранить адрес"
 
-#: src/balsa-index-page.c:646
+#: src/balsa-index-page.c:647
 msgid "Transfer"
 msgstr "Передать"
 
-#: src/balsa-index-page.c:1026
+#: src/balsa-index-page.c:1028
 msgid "You may only store one address at a time.\n"
 msgstr "Вы можете сохранить только один адрес за раз.\n"
 
-#: src/balsa-index-page.c:1082
+#: src/balsa-index-page.c:1080
 #, c-format
 msgid ""
 "There is already an address book entry for %s.\n"
@@ -318,28 +318,6 @@ msgid ""
 msgstr ""
 "Для %s уже есть запись в адресной книге.\n"
 "Запустить GnomeCard если хотите отредактировать записи в адресной книге.\n"
-
-#: src/balsa-index-page.c:1100
-msgid ""
-"\n"
-"BEGIN:VCARD\n"
-msgstr ""
-"\n"
-"НАЧАЛО:VCARD\n"
-
-#: src/balsa-index-page.c:1101
-#, c-format
-msgid "FN:%s\n"
-msgstr "FN:%s\n"
-
-#: src/balsa-index-page.c:1102
-#, c-format
-msgid "EMAIL;INTERNET:%s\n"
-msgstr "ЭЛ.АДРЕС;ИНТЕРНЕТ:%s\n"
-
-#: src/balsa-index-page.c:1103
-msgid "END:VCARD\n"
-msgstr "КОНЕЦ:VCARD\n"
 
 #: src/balsa-index.c:252
 msgid "From"
@@ -352,6 +330,10 @@ msgstr "Тема"
 #: src/balsa-index.c:254
 msgid "Date"
 msgstr "Дата"
+
+#: src/balsa-index.c:362
+msgid "To"
+msgstr "Кому"
 
 #: src/balsa-mblist.c:221 src/mailbox-conf.c:1186
 msgid "Mailbox"

@@ -1,3 +1,9 @@
+2003-01-11  PeterB
+
+	* libbalsa/filter.c, libbalsa/message.h, libbalsa/send.c,
+	src/balsa-index.c, src/balsa-message.c: Use macros to examine
+	LibBalsaMessage flags.
+
 2003-01-11  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-app.[hc]: Add open_mailbox_vector.

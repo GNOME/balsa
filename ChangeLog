@@ -1,3 +1,7 @@
+2003-09-12  Pawel Salek  <pawsa theochem.kth.se>
+
+	* src/main.c: fix bug 121867.
+
 2003-09-12 09:29  PeterB
 
 	* src/balsa-mblist.c: Do balsa_mblist_update_mailbox() in an idle

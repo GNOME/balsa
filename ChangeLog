@@ -1,3 +1,8 @@
+2003-11-24 18:11  PeterB
+
+	* libbalsa/body.c: Content of message/rfc822 is next part, not
+	child part.
+
 2003-11-24  Carlos Morgado  <chbm gnome.org>
 
 	* src/main.c: remove Balsa.h dep for now

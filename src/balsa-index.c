@@ -444,6 +444,8 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
     GSList *list;
     GSList *next;
     LibBalsaMailboxSearchIter *iter_view;
+    gboolean have_selected =
+	gtk_tree_selection_count_selected_rows(selection) > 0;
 
     /* Search results may be cached in iter_view. */
     iter_view =
@@ -462,8 +464,10 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
 	    index->selected = g_slist_delete_link(index->selected, list);
 	    continue;
 	}
+	/* Remove a deselected message from the list, unless it's not
+	 * viewable and no rows are currently selected. */
 	if (!gtk_tree_selection_path_is_selected(selection, path)
-	    && bndx_row_is_viewable(index, path)) {
+	    && (bndx_row_is_viewable(index, path) || have_selected)) {
 	    /* The message has been deselected, and not by collapsing a
 	     * thread; we'll notify the mailbox, so it can check whether
 	     * the message still matches the view filter. */
@@ -1798,13 +1802,21 @@ static void
 bndx_expand_to_row(BalsaIndex * index, GtkTreePath * path)
 {
     GtkTreePath *tmp = gtk_tree_path_copy(path);
+    gint i, j;
 
-    if (gtk_tree_path_up(tmp) && gtk_tree_path_get_depth(tmp) > 0
-        && !gtk_tree_view_row_expanded(GTK_TREE_VIEW(index), tmp)) {
-        bndx_expand_to_row(index, tmp);
-        gtk_tree_view_expand_row(GTK_TREE_VIEW(index), tmp, FALSE);
+    while (gtk_tree_path_up(tmp) && gtk_tree_path_get_depth(tmp) > 0
+	   && !gtk_tree_view_row_expanded(GTK_TREE_VIEW(index), tmp));
+    /* Now we go from the deepest unexpanded ancestor up to full path */
+
+    if ((i = gtk_tree_path_get_depth(tmp))
+	< (j = gtk_tree_path_get_depth(path) - 1)) {
+	gint *indices = gtk_tree_path_get_indices(path);
+
+	do {
+	    gtk_tree_path_append_index(tmp, indices[i]);
+	    gtk_tree_view_expand_row(GTK_TREE_VIEW(index), tmp, FALSE);
+	} while (++i < j);
     }
-
     gtk_tree_path_free(tmp);
 }
 

@@ -516,6 +516,7 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
 	send_unlock();
 	return FALSE;
     }
+    libbalsa_mailbox_check(outbox);
     if (!libbalsa_mailbox_total_messages(outbox)) {
 	libbalsa_mailbox_close(outbox);
 	send_unlock();
@@ -983,6 +984,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gboolean debug)
 	send_unlock();
 	return FALSE;
     }
+    libbalsa_mailbox_check(outbox);
     for (msgno = libbalsa_mailbox_total_messages(outbox);
 	 msgno > 0; msgno--) {
         LibBalsaMsgCreateResult created;

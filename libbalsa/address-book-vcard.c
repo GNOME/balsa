@@ -448,20 +448,21 @@ libbalsa_address_book_vcard_add_address(LibBalsaAddressBook * ab,
         return LBABERR_CANNOT_WRITE;
 
     fprintf(fp, "BEGIN:VCARD\n");
-    if (*new_address->full_name != '\0')
+    if (new_address->full_name && *new_address->full_name != '\0')
 	fprintf(fp, "FN:%s\n", new_address->full_name);
-    if (*new_address->last_name != '\0' && 
-	*new_address->first_name != '\0' && 
-	*new_address->middle_name != '\0')
-	fprintf(fp, "N:%s;%s;%s\n", new_address->last_name,
-		new_address->first_name, new_address->middle_name);
-    else if (*new_address->last_name != '\0' && 
-	     *new_address->first_name != '\0')
-	fprintf(fp, "N:%s;%s\n", new_address->last_name,
-		new_address->first_name);
-    else if (*new_address->first_name != '\0')
-	fprintf(fp, "N:;%s\n", new_address->first_name);
-    if (*new_address->organization != '\0')
+    if (new_address->first_name && *new_address->first_name != '\0') {
+	if (new_address->last_name && *new_address->last_name != '\0') {
+	    if (new_address->middle_name
+		&& *new_address->middle_name != '\0')
+		fprintf(fp, "N:%s;%s;%s\n", new_address->last_name,
+			new_address->first_name, new_address->middle_name);
+	    else
+		fprintf(fp, "N:%s;%s\n", new_address->last_name,
+			new_address->first_name);
+	} else
+	    fprintf(fp, "N:;%s\n", new_address->first_name);
+    }
+    if (new_address->organization && *new_address->organization != '\0')
 	fprintf(fp, "ORG:%s\n", new_address->organization);
 
     for (list = new_address->address_list; list; list = g_list_next(list))

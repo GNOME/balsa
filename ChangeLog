@@ -1,3 +1,7 @@
+2005-03-15 Albrecht Dreß <albrecht dot dress at arcor dot de>
+
+	* libbalsa/send.c: don't unref NULL GObject.
+
 2005-03-15 13:03  PeterB
 
 	* libbalsa/mailbox_imap.c: use delim to build path when renaming;

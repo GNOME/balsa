@@ -197,6 +197,9 @@ static GtkWidget *
 index_child_create_view (GnomeMDIChild * child)
 {
   GtkWidget *vpane;
+  GtkWidget *table;
+  GtkWidget *hscrollbar;
+  GtkWidget *vscrollbar;
   IndexChild *ic;
 
   ic = INDEX_CHILD (child);
@@ -206,8 +209,23 @@ index_child_create_view (GnomeMDIChild * child)
   ic->index = balsa_index_new ();
   gtk_paned_add1 (GTK_PANED (vpane), ic->index);
 
+  table = gtk_table_new (2, 2, FALSE);
+
   ic->message = balsa_message_new ();
-  gtk_paned_add2 (GTK_PANED (vpane), ic->message);
+
+  gtk_table_attach_defaults (GTK_TABLE (table), ic->message, 0, 1, 0, 1);
+
+  hscrollbar = gtk_hscrollbar_new (GTK_LAYOUT (ic->message)->hadjustment);
+  GTK_WIDGET_UNSET_FLAGS (hscrollbar, GTK_CAN_FOCUS);
+  gtk_table_attach (GTK_TABLE (table), hscrollbar, 0, 1, 1, 2,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+
+  vscrollbar = gtk_vscrollbar_new (GTK_LAYOUT (ic->message)->vadjustment);
+  GTK_WIDGET_UNSET_FLAGS (vscrollbar, GTK_CAN_FOCUS);
+  gtk_table_attach (GTK_TABLE (table), vscrollbar, 1, 2, 0, 1,
+		    GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
+
+  gtk_paned_add2 (GTK_PANED (vpane), table);
   gtk_widget_set_usize (vpane, 1, 250);
 
   gtk_widget_show_all (vpane);
@@ -282,15 +300,15 @@ create_menu (BalsaIndex * bindex)
 
   submenu = gtk_menu_new ();
   smenuitem = gtk_menu_item_new ();
-  bmbl = balsa_mblist_new();
+  bmbl = balsa_mblist_new ();
   gtk_signal_connect (GTK_OBJECT (bmbl), "select_mailbox",
-                         (GtkSignalFunc) transfer_messages_cb,
-		                        (gpointer) bindex);
+		      (GtkSignalFunc) transfer_messages_cb,
+		      (gpointer) bindex);
 
   gtk_widget_set_usize (GTK_WIDGET (bmbl), balsa_app.mblist_width, balsa_app.mblist_height);
-  gtk_container_add(GTK_CONTAINER(smenuitem), bmbl);
+  gtk_container_add (GTK_CONTAINER (smenuitem), bmbl);
   gtk_menu_append (GTK_MENU (submenu), smenuitem);
-  gtk_widget_show(bmbl);
+  gtk_widget_show (bmbl);
   gtk_widget_show (smenuitem);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), submenu);
@@ -375,7 +393,7 @@ message_status_set_answered_cb (GtkWidget * widget, Message * message)
 }
 
 static void
-transfer_messages_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode *row, GdkEventButton * event, BalsaIndex *bindex)
+transfer_messages_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row, GdkEventButton * event, BalsaIndex * bindex)
 {
   GtkCList *clist;
   GList *list;

@@ -8,7 +8,6 @@ balsa_SOURCES =	\
 	balsa-init.c		\
 	balsa-mblist.c		\
 	balsa-message.c		\
-	balsa-message-item.c	\
 	filter-edit-callbacks.c	\
 	filter-edit-dialog.c	\
 	index-child.c		\

@@ -1,5 +1,9 @@
 2004-02-25  Pawel Salek
 
+	* libbalsa/imap/imap-commands.[hc]: add imap_mbox_filter_msgnos().
+
+2004-02-25  Pawel Salek
+
 	* libbalsa/filter-funcs.c: add libbalsa_condition_new_string().
 	* libbalsa/filter.[hc]: remove IMAP stuff which does not belong there.
 	* libbalsa/mailbox_imap.c: build imap queries here - adapt to

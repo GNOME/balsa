@@ -83,5 +83,8 @@ ImapResponse imap_mbox_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
                                   int ascending, int *msgno, unsigned cnt);
 ImapResponse imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key,
                                    int ascending, ImapSearchKey *filter);
+ImapResponse imap_mbox_filter_msgnos(ImapMboxHandle * handle,
+                                     ImapSearchKey *filter,
+                                     GHashTable * msgnos);
 
 #endif /* __IMAP_COMMANDS_H__ */

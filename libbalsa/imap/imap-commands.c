@@ -780,7 +780,7 @@ imap_mbox_thread(ImapMboxHandle *h, const char *how, ImapSearchKey *filter)
 
     cmdno = imap_make_tag(tag);
     
-    sio_printf(h->sio, "THREAD %s UTF-8", how);
+    sio_printf(h->sio, "%s THREAD %s UTF-8", tag, how);
     if(!filter)
       sio_write(h->sio, " ALL", 4);
     else
@@ -933,4 +933,18 @@ imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
                          GUINT_TO_POINTER(handle->mbox_view.arr[i]));
   }
   return rc;
+}
+
+static void
+make_msgno_table(ImapMboxHandle*handle, unsigned seqno, GHashTable *msgnos)
+{
+  g_hash_table_insert(msgnos, (void *) seqno, (void *) seqno);
+}
+
+ImapResponse
+imap_mbox_filter_msgnos(ImapMboxHandle *handle, ImapSearchKey *filter,
+			GHashTable *msgnos)
+{
+  return imap_search_exec(handle, filter, (ImapSearchCb)make_msgno_table,
+                          msgnos);
 }

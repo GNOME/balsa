@@ -651,67 +651,102 @@ find_by_path(GNode * root, GTraverseType order, GTraverseFlags flags,
     return d[1];
 }
 
+static gboolean
+traverse_find_url(GNode * node, gpointer * d)
+{
+    LibBalsaMailbox * mailbox;
+    if(node->data == NULL) /* true for root node only */
+	return FALSE;
+    
+    mailbox = ((BalsaMailboxNode *) node->data)->mailbox;
+    if (mailbox == NULL || strcmp(mailbox->url, (gchar *) d[0]))
+	return FALSE;
+
+    d[1] = node;
+    return TRUE;
+}
+
+static GNode *
+find_by_url(GNode * root, GTraverseType order, GTraverseFlags flags,
+	     const gchar * path)
+{
+    gpointer d[2];
+
+    d[0] = (gchar *) path;
+    d[1] = NULL;
+    g_node_traverse(root, order, flags, -1,
+		    (GNodeTraverseFunc) traverse_find_url, d);
+
+    return d[1];
+}
+
+
+static GNode*
+remove_mailbox_from_nodes(LibBalsaMailbox* mailbox)
+{
+    GNode* gnode = find_by_url(balsa_app.mailbox_nodes, G_LEVEL_ORDER, 
+			       G_TRAVERSE_ALL, mailbox->url);
+    g_return_val_if_fail(gnode, NULL);
+    g_node_unlink(gnode);
+    return gnode;
+}
+    
+static GNode* 
+remove_special_mailbox_by_url(const gchar* url)
+{
+    if (strcmp(url, balsa_app.trash->url) == 0)
+	return remove_mailbox_from_nodes(balsa_app.trash);
+    else if (strcmp(url, balsa_app.inbox->url) == 0)
+	return remove_mailbox_from_nodes(balsa_app.inbox);
+    else if (strcmp(url, balsa_app.outbox->url) == 0)
+	return remove_mailbox_from_nodes(balsa_app.outbox);
+    if (strcmp(url, balsa_app.sentbox->url) == 0)
+	return remove_mailbox_from_nodes(balsa_app.sentbox);
+    else if (strcmp(url, balsa_app.draftbox->url) == 0)
+	return remove_mailbox_from_nodes(balsa_app.draftbox);
+    else return NULL;
+	
+}
+
 static GNode*
 add_local_mailbox(GNode *root, const gchar * name, const gchar * path)
 {
     LibBalsaMailbox *mailbox;
     GNode *node;
     GtkType type;
+    gchar* url;
 
-    if(!root)
-	return NULL;
-
-    if (LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.inbox))
-	if (strcmp(path, libbalsa_mailbox_local_get_path(balsa_app.inbox)) ==
-	    0) return NULL;
-    if (LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.outbox))
-	if (strcmp(path, libbalsa_mailbox_local_get_path(balsa_app.outbox)) ==
-	    0) return NULL;
-
-    if (LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.sentbox))
-	if (strcmp(path, libbalsa_mailbox_local_get_path(balsa_app.sentbox))
-	    == 0)
-	    return NULL;
-
-    if (LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.draftbox))
-	if (strcmp(path, libbalsa_mailbox_local_get_path(balsa_app.draftbox))
-	    == 0)
-	    return NULL;
-
-    if (LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.trash))
-	if (strcmp(path, libbalsa_mailbox_local_get_path(balsa_app.trash)) ==
-	    0) return NULL;
-
-    /* don't add if the mailbox is already in the configuration */
-    if (find_by_path(balsa_app.mailbox_nodes, G_LEVEL_ORDER, 
-		     G_TRAVERSE_ALL, path))
-	return NULL;
-
-    type = libbalsa_mailbox_type_from_path(path);
-
-    if ( type == LIBBALSA_TYPE_MAILBOX_MH ) {
-	mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_mh_new(path, FALSE));
-    } else if ( type == LIBBALSA_TYPE_MAILBOX_MBOX ) {
-	mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_mbox_new(path, FALSE));
-    } else if ( type == LIBBALSA_TYPE_MAILBOX_MAILDIR ) {
-	mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_maildir_new(path, FALSE));
-    } else {
-	/* type is not a valid local mailbox type. */
-	g_assert_not_reached(); mailbox = NULL;
-    }
-    if(!mailbox) {/* local mailbox could not be created; privileges? */
-	printf("Not accessible mailbox %s\n", path);
-	return NULL;
-    }
-    mailbox->name = g_strdup(name);
+    if(root == NULL) return NULL;
+    url = g_strconcat("file://", path, NULL);
     
-    node = g_node_new(balsa_mailbox_node_new_from_mailbox(mailbox));
-
-    if (balsa_app.debug)
-	g_print(_("Local mailbox %s loaded as: %s\n"),
-		mailbox->name,
-		gtk_type_name(GTK_OBJECT_TYPE(mailbox)));
-    
+    if( (node = remove_special_mailbox_by_url(url)) == NULL) {
+	type = libbalsa_mailbox_type_from_path(path);
+	
+	if ( type == LIBBALSA_TYPE_MAILBOX_MH ) {
+	    mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_mh_new(path, FALSE));
+	} else if ( type == LIBBALSA_TYPE_MAILBOX_MBOX ) {
+	    mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_mbox_new(path, FALSE));
+	} else if ( type == LIBBALSA_TYPE_MAILBOX_MAILDIR ) {
+	    mailbox =
+		LIBBALSA_MAILBOX(libbalsa_mailbox_maildir_new(path, FALSE));
+	} else {
+	    /* type is not a valid local mailbox type. */
+	    g_assert_not_reached(); mailbox = NULL;
+	}
+	if(!mailbox) {/* local mailbox could not be created; privileges? */
+	    printf("Not accessible mailbox %s\n", path);
+	    return NULL;
+	}
+	mailbox->name = g_strdup(name);
+	
+	node = g_node_new(balsa_mailbox_node_new_from_mailbox(mailbox));
+	
+	if (balsa_app.debug)
+	    g_print(_("Local mailbox %s loaded as: %s\n"),
+		    mailbox->name,
+		    gtk_type_name(GTK_OBJECT_TYPE(mailbox)));
+    }
+    g_free(url);
     /* no type checking, parent is NULL for root */
     BALSA_MAILBOX_NODE(node->data)->parent = (BalsaMailboxNode*)root->data;
     g_node_append(root, node);
@@ -787,7 +822,8 @@ find_by_dir(GNode* root, const gchar* path)
  * Returns a node for the path `fn'.
  * Finds the node if it exists, and creates one if it doesn't.
  */
-static GNode* add_imap_entry(GNode*root, const char* fn, char delim)
+static GNode* 
+add_imap_entry(GNode*root, const char* fn, char delim)
 { 
     GNode* node;
     gchar * parent_name;
@@ -822,6 +858,11 @@ static GNode* add_imap_entry(GNode*root, const char* fn, char delim)
    to call libmutt again. In particular, it CANNOT call
    libbalsa_mailbox_imap_set_path because ut would call in turn 
    mailbox_notify_register, which calls in turn libmutt code.
+
+   FIXME: this needs some cleanup. Moving existing node (as found by
+   remove_special_mailbox) to another branch of the tree should be
+   easier/cleaner. A function like: add_gnode_to_its_parent() would do 
+   the job.
    
 */
 static GNode*
@@ -831,6 +872,7 @@ add_imap_mailbox(GNode*root, const char* fn, char delim)
     const gchar *basename;
     GNode *node;
     BalsaMailboxNode* mbnode;
+    gchar* url;
 
     basename = strrchr(fn, delim);
     if(!basename) basename = fn;
@@ -840,25 +882,42 @@ add_imap_mailbox(GNode*root, const char* fn, char delim)
 	    return NULL; 
     }
 
-    node = add_imap_entry(root, fn, delim);
-    mbnode = BALSA_MAILBOX_NODE(node->data);
-    if (LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox))
-	/* it already has a mailbox */
-	return node;
-    gtk_signal_connect(GTK_OBJECT(mbnode), "show-prop-dialog",
-		       folder_conf_imap_sub_node, NULL);
-    m = LIBBALSA_MAILBOX_IMAP(libbalsa_mailbox_imap_new());
-    libbalsa_mailbox_remote_set_server(
-	LIBBALSA_MAILBOX_REMOTE(m), BALSA_MAILBOX_NODE(root->data)->server);
-    m->path = g_strdup(fn);
-    libbalsa_mailbox_imap_update_url(m);
-    if(balsa_app.debug) 
-	printf("add_imap_mailbox: Adding mailbox of name %s (full path %s)\n", 
-	       basename, fn);
-    /* avoid allocating the name again: */
-    LIBBALSA_MAILBOX(m)->name = mbnode->name;
-    mbnode->name = NULL;
-    mbnode->mailbox = LIBBALSA_MAILBOX(m);
+    url = g_strdup_printf("imap://%s:%i/%s", 
+			  BALSA_MAILBOX_NODE(root->data)->server->host,
+			  BALSA_MAILBOX_NODE(root->data)->server->port,
+			  fn);
+
+    if( (node = remove_special_mailbox_by_url(url)) != NULL) {
+	gchar* parent_name = get_parent_folder_name(fn, delim);
+	GNode* parent = find_by_dir(root, parent_name);
+	g_free(parent_name);
+	g_free(BALSA_MAILBOX_NODE(node->data)->dir);
+	BALSA_MAILBOX_NODE(node->data)->dir = g_strdup(fn);
+	g_node_append(parent, node);
+    } else {
+	node = add_imap_entry(root, fn, delim);
+	mbnode = BALSA_MAILBOX_NODE(node->data);
+	if (LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox))
+	    /* it already has a mailbox */
+	    return node;
+	gtk_signal_connect(GTK_OBJECT(mbnode), "show-prop-dialog",
+			   folder_conf_imap_sub_node, NULL);
+	m = LIBBALSA_MAILBOX_IMAP(libbalsa_mailbox_imap_new());
+	libbalsa_mailbox_remote_set_server(
+	    LIBBALSA_MAILBOX_REMOTE(m), 
+	    BALSA_MAILBOX_NODE(root->data)->server);
+	m->path = g_strdup(fn);
+	libbalsa_mailbox_imap_update_url(m);
+	if(balsa_app.debug) 
+	    printf("add_imap_mailbox: add mbox of name %s (full path %s)\n", 
+		   basename, fn);
+	/* avoid allocating the name again: */
+	LIBBALSA_MAILBOX(m)->name = mbnode->name;
+	mbnode->name = NULL;
+	mbnode->mailbox = LIBBALSA_MAILBOX(m);
+    }
+    g_free(url);
+
     return node;
 }
 

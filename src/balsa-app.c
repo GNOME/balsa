@@ -350,10 +350,7 @@ do_load_mailboxes(void)
     /* expand subtrees; move later to an idle callback or a separate 
        thread to construct folders that are expensive to build (IMAP over
        dialup).
-       Expanding is a two step process: first, one expands the local
-       directory, later: all other folders.  
     */
-    append_subtree_f(balsa_app.mailbox_nodes, NULL); 
     g_node_traverse(balsa_app.mailbox_nodes, G_IN_ORDER, G_TRAVERSE_ALL, -1,
                     append_subtree_f, NULL);
     

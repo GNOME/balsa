@@ -2137,6 +2137,7 @@ static void
 add_show_menu(const char* label, gint level, GtkWidget* menu)
 {
     GtkWidget *menu_item = gtk_menu_item_new_with_label(label);
+    gtk_widget_show(menu_item);
     gtk_object_set_user_data(GTK_OBJECT(menu_item),  GINT_TO_POINTER(level));
     gtk_signal_connect(GTK_OBJECT(menu_item), "activate",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),

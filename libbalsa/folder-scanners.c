@@ -210,9 +210,9 @@ void imap_add_folder (char delim, char *folder, int noselect,
     int isMailbox = 0;
 
     imap_unmunge_mbox_name (folder);
-    printf("imap_add_folder. delim: '%c', folder: '%s', noselect: %d\n"
+    /* printf("imap_add_folder. delim: '%c', folder: '%s', noselect: %d\n"
 	   "noinferiors: %d, isparent: %d\n", delim, folder, noselect,
-	   noinferiors, isparent); 
+	   noinferiors, isparent);  */
     if(isparent) return;
     if(!noselect) {
 	printf("ADDING MAILBOX %s\n", folder);
@@ -222,7 +222,7 @@ void imap_add_folder (char delim, char *folder, int noselect,
 	   Read RFC when iin doubt. */
     if(!g_list_find_custom(state->subfolders, folder,
 			   (GCompareFunc)strcmp)) {
-	printf("ADDING FOLDER %s\n", folder);
+	printf("ADDING FOLDER  %s\n", folder);
 	    
 	state->subfolders = g_list_append(state->subfolders,
 					  g_strdup(folder));

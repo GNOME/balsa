@@ -1,3 +1,12 @@
+2000-10-08  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/balsa-app.h: define DEFAULT_SUBJECT_FONT as the bold verison
+	of DEFAULT_MESSAGE_FONT.
+	* src/save-restore.c: Use DEFAULT_SUBJECT_FONT.
+	* src/pref-manager.c: Fix subject font selection to actually
+	work. Also fixup both font selectors so they get initialized
+	with the correct values.
+
 2000-10-06  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* docs/vconvert.awk, docs/pine2vcard: the contributed address book

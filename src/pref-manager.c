@@ -596,6 +596,9 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     g_free(balsa_app.message_font);
     balsa_app.message_font =
 	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->message_font)));
+    g_free(balsa_app.subject_font);
+    balsa_app.subject_font = 
+	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->subject_font)));
 
     g_free(balsa_app.quote_regex);
     entry_widget = gnome_entry_gtk_entry(GNOME_ENTRY(pui->quote_pattern));
@@ -1983,9 +1986,7 @@ create_misc_page()
     gtk_container_set_border_width(GTK_CONTAINER(pui->font_picker), 5);
 
     gnome_font_picker_set_font_name(GNOME_FONT_PICKER(pui->font_picker),
-				    gtk_entry_get_text(GTK_ENTRY
-						       (pui->
-							message_font)));
+				    balsa_app.message_font);
     gnome_font_picker_set_preview_text(GNOME_FONT_PICKER(pui->font_picker),
 				       _("Select a font to use"));
     gnome_font_picker_set_mode(GNOME_FONT_PICKER(pui->font_picker),
@@ -2033,9 +2034,7 @@ create_misc_page()
     gtk_container_set_border_width(GTK_CONTAINER(pui->font_picker2), 5);
 
     gnome_font_picker_set_font_name(GNOME_FONT_PICKER(pui->font_picker2),
-				    gtk_entry_get_text(GTK_ENTRY
-						       (pui->
-							subject_font)));
+				    balsa_app.subject_font);
     gnome_font_picker_set_preview_text(GNOME_FONT_PICKER
 				       (pui->font_picker2),
 				       _("Select a font to use"));

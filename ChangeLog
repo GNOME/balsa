@@ -1,5 +1,6 @@
-2004-06-04 08:28  PeterB
+2004-06-04 11:56  PeterB
 
+	* src/main-window.c: document, and fix typo.
 	* src/: balsa-app.c, balsa-index.c, filter-run-callbacks.c,
 	main-window.c, main-window.h, pref-manager.c: don't refer to
 	balsa_app.main_window in src/main-window.c.

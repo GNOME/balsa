@@ -101,9 +101,9 @@ GSList *list = NULL;
 static int quiet_check=0;
 
 static void check_messages_thread(gpointer data);
-static void display_new_mail_notification(int num_new, int has_new);
 
 #endif
+static void display_new_mail_notification(int num_new, int has_new);
 
 static void balsa_window_class_init(BalsaWindowClass * klass);
 static void balsa_window_init(BalsaWindow * window);
@@ -2644,6 +2644,8 @@ send_progress_notify_cb()
 
     return TRUE;
 }
+ 
+#endif
 
 /* display_new_mail_notification:
    num_new is the number of the recently arrived messsages.
@@ -2696,8 +2698,6 @@ display_new_mail_notification(int num_new, int has_new)
     gtk_label_set_text(GTK_LABEL(GTK_MESSAGE_DIALOG(dlg)->label), msg);
     g_free(msg);
 }
- 
-#endif
 
 GtkWidget *
 balsa_window_find_current_index(BalsaWindow * window)

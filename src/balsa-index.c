@@ -301,7 +301,7 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
   if (bindex->mailbox == NULL)
     return;
 
-  bindex->last_message = mailbox->new_messages;
+  bindex->last_message = mailbox->messages;
 
 
   /* here we play a little trick on clist; in GTK_SELECTION_BROWSE mode

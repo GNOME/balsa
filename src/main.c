@@ -54,6 +54,8 @@ balsa_exit ()
       mailbox = list->data;
       list = list->next;
 
+      g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
+
       while (mailbox->open_ref > 0)
 	mailbox_open_unref (mailbox);
     }

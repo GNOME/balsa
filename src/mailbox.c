@@ -110,6 +110,12 @@ typedef struct
 static Mailbox *client_mailbox = NULL;
 
 
+/*
+ * the number of new messages as returned by the c-client
+ */
+static glong new_messages = 0;
+
+
 /* 
  * prototypes
  */
@@ -187,7 +193,9 @@ mailbox_new (MailboxType type)
   mailbox->private = (void *) g_malloc (sizeof (MailboxPrivate));
   CLIENT_STREAM (mailbox) = NIL;
   WATCHER_LIST (mailbox) = NULL;
-  mailbox->new_messages = 0;
+  mailbox->open_ref = 0;
+  mailbox->messages = 0;
+  mailbox->message_list = NULL;
 
   return mailbox;
 }
@@ -343,7 +351,7 @@ mailbox_check_new_messages (Mailbox * mailbox)
 
   UNLOCK_MAILBOX ();
 
-  if (mailbox->new_messages)
+  if (new_messages)
     return TRUE;
   else
     return FALSE;
@@ -459,9 +467,7 @@ load_messages (Mailbox * mailbox)
   Message *message;
   ENVELOPE *envelope;
 
-  g_print ("Loading Messages %d\n", mailbox->messages);
-
-  for (msgno = mailbox->messages + 1; msgno <= CLIENT_STREAM (mailbox)->nmsgs; msgno++)
+  for (msgno = mailbox->messages - new_messages + 1; msgno <= CLIENT_STREAM (mailbox)->nmsgs; msgno++)
     {
       envelope = mail_fetchenvelope (CLIENT_STREAM (mailbox), msgno);
       message = translate_message (envelope);
@@ -510,15 +516,11 @@ send_watcher_new_message (Mailbox * mailbox, Message * message)
   mw_message.mailbox = mailbox;
   mw_message.message = message;
 
-  g_print ("Sending new message\n");
-
   list = WATCHER_LIST (mailbox);
   while (list)
     {
       watcher = list->data;
       list = list->next;
-
-      (*watcher->func) (&mw_message);
 
       if (watcher->mask & MESSAGE_NEW_MASK)
 	(*watcher->func) (&mw_message);
@@ -865,14 +867,14 @@ mm_exists (MAILSTREAM * stream, unsigned long number)
    * messages
    */
   client_mailbox->messages = stream->nmsgs;
-  client_mailbox->new_messages += number;
+  new_messages = number;
 
   if (balsa_app.debug)
     {
       g_print ("mm_exists: %s %d messages %d new_messages\n", 
 	       client_mailbox->name,
 	       client_mailbox->messages,
-	       client_mailbox->new_messages);
+	       new_messages);
     }
 }
 

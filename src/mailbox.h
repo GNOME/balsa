@@ -209,8 +209,6 @@ struct _Body
 typedef void (*MailboxWatcherFunc) (MailboxWatcherMessage * arg1);
 
 
-
-
 /*
  * call before using any mailbox functions
  */
@@ -251,7 +249,6 @@ void message_delete (Message * message);
 void message_undelete (Message * message);
 
 
-
 /*
  * addresses
  */
@@ -264,8 +261,6 @@ void address_free (Address * address);
  */
 Body *body_new ();
 void body_free (Body * body);
-
-
 
 
 /*

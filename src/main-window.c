@@ -840,7 +840,7 @@ mailbox_select_cb (GtkWidget * widget)
   watcher_id = mailbox_watcher_set (mailbox, 
 				    (MailboxWatcherFunc) mailbox_listener, 
 				    MESSAGE_NEW_MASK, 
-				    (gpointer)mainwindow);
+				    (gpointer) mainwindow);
 
   /* try to open the new mailbox */
   if (mailbox_open_ref (mailbox))
@@ -884,8 +884,8 @@ about_box_destroy_cb ()
 
 
 
-static void 
+void 
 mailbox_listener (MailboxWatcherMessage *mw_message)
 {
-  g_print ("I heard it!\n");
+  g_print ("%s\n", mw_message->message->subject);
 }

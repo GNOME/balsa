@@ -1,5 +1,11 @@
-2004-06-04 17:26  PeterB
+2004-06-04 17:47  PeterB
 
+	* libbalsa/mailbox.c, libbalsa/mailbox.h, libbalsa/mailbox_imap.c,
+	libbalsa/mailbox_local.c, libbalsa/mailbox_maildir.c,
+	libbalsa/mailbox_mbox.c, libbalsa/mailbox_mh.c, libbalsa/message.c,
+	libbalsa/message.h, src/balsa-message.c: drop
+	message->{status,attach}_icon.
+	* src/filter-edit-callbacks.c: don't crash on new filter.
 	* src/filter-edit-callbacks.c: allow editing of compound
 	conditions.
 	* libbalsa/filter-funcs.c: eat space between left and right

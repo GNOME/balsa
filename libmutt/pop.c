@@ -476,9 +476,6 @@ void mutt_fetchPopMail (void)
     mx_close_message (&msg);
   }
 
-  DM( "mailbox close" );
-  mx_close_mailbox (&ctx, NULL);
-
   if (err)
   {
 	  DM( "Reset server" );
@@ -488,6 +485,9 @@ void mutt_fetchPopMail (void)
   }
 
 finish:
+
+  DM( "mailbox close" );
+  mx_close_mailbox (&ctx, NULL);
 
   DM( "Logout from server" );
   /* exit gracefully */

@@ -1,3 +1,7 @@
+2003-03-13  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/{ab-window.c,address-book-config.c}: enable NLS again.
+
 2003-03-12 16:44  PeterB
 
 	* src/balsa-index.c: Don't clear the index when there's one message

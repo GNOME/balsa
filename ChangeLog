@@ -1,7 +1,12 @@
 2000-06-16  Peter Williams  <peter@beta.newton.cx>
 
+	* src/pref-manager.c (apply_prefs): Changed cfg_save
+	to balsa_sm_save_global.
+
 	* src/cfg-balsa.c: Add balsa_app.shown_headers to the
-	metatype spec.
+	metatype spec. Same with toolbar_style. Where weren't
+	these there?
+	
 
 2000-09-15  Peter Williams <peter@newton.cx>
 	Another new era: big bad session management

@@ -598,6 +598,8 @@ static const cfg_parm_t parms_BalsaApp[] = {
 	{ "HeadersToShow", BALSA_OFFSET_BalsaApp_ELEM_selected_headers, CPT_STR, NULL, cfg_type_const_init_str( DEFAULT_SELECTED_HDRS, NULL, NULL ) },
 	{ "HeaderShowMode", BALSA_OFFSET_BalsaApp_ELEM_shown_headers, CPT_NUM, NULL, 
 	  cfg_type_const_init_num( HEADERS_SELECTED, HEADERS_NONE, HEADERS_ALL, CPNF_USEMIN | CPNF_USEMAX ) },
+	{ "ToolbarStyle", BALSA_OFFSET_BalsaApp_ELEM_toolbar_style, CPT_NUM, NULL,
+	  cfg_type_const_init_num( GTK_TOOLBAR_BOTH, GTK_TOOLBAR_ICONS, GTK_TOOLBAR_BOTH, CPNF_USEMIN | CPNF_USEMAX ) },
 	{ "ShowMBList", BALSA_OFFSET_BalsaApp_ELEM_show_mblist, CPT_BOOL, NULL, cfg_type_const_init_bool( TRUE ) },
 	{ "ShowTabs", BALSA_OFFSET_BalsaApp_ELEM_show_notebook_tabs, CPT_BOOL, NULL, cfg_type_const_init_bool( FALSE ) },
 	{ "EmptyTrashOnExit", BALSA_OFFSET_BalsaApp_ELEM_empty_trash_on_exit, CPT_BOOL, NULL, cfg_type_const_init_bool( TRUE ) },

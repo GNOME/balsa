@@ -514,12 +514,16 @@ static void trigger_funcs( GSList *head, cfg_location_t *root, gboolean save )
 		for( iter = head; iter; iter = iter->next ) {
 			pi = (pairinfo *) iter->data;
 			
+			DM( "trigger_funcs: save %p %p", pi->saver, pi->user_data );
+
 			if( pi->saver && pi->saver( root, pi->user_data ) )
 				g_warning( "Error while running saver callback at %p (userdata: %p).", pi->saver, pi->user_data );
 		}
 	} else {
 		for( iter = head; iter; iter = iter->next ) {
 			pi = (pairinfo *) iter->data;
+
+			DM( "trigger_funcs: load %p %p", pi->loader, pi->user_data );
 			
 			if( pi->loader && pi->loader( root, pi->user_data ) )
 				g_warning( "Error while running loader callback at %p (userdata: %p).", pi->saver, pi->user_data );

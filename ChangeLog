@@ -1,3 +1,19 @@
+2003-07-28 14:52  PeterB
+
+	* src/sendmsg-window.c: Prepare message for "DelSp=Yes" before
+	sending; this uses the `undo' buffer, which necessitated cleaning
+	up buffer handling.
+	* src/balsa-message.c: Check for "DelSp=Yes" on a "format=flowed"
+	message body.
+	* libbalsa/send.c: Set "DelSp=Yes" on "format=flowed" bodies.
+	* libbalsa/: misc.c, misc.h: Implement "DelSp=Yes" wrapping; clean up
+	wrapping code; use pango_get_log_attrs() instead of our own code.
+	* libbalsa/mime.c: If body is "DelSp=Yes", pass that info to
+	libbalsa_process_text_rfc2646().
+	* libbalsa/: body.c, body.h: Implement
+	libbalsa_message_body_is_delsp()--looks for "DelSp=Yes" on a
+	"text/plain" message body.
+
 2003-07-27  Pawel Salek  <pawsa theochem.kth.se>
 
 	* NEWS, configure.in: release balsa-2.0.13

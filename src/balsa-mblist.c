@@ -1217,7 +1217,7 @@ bmbl_store_add_mbnode(GtkTreeStore * store, GtkTreeIter * iter,
 	    else if(mailbox == balsa_app.trash)
 		in = BALSA_PIXMAP_MBOX_TRASH;
 	    else
-		in = (mailbox->new_messages > 0)
+		in = (mailbox->total_messages > 0)
 		? BALSA_PIXMAP_MBOX_TRAY_FULL
                 : BALSA_PIXMAP_MBOX_TRAY_EMPTY;
 

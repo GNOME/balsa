@@ -417,6 +417,8 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
       c = gt_replys (c);
 
       gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
+
+      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "\n\n", 2);
     }
   if (balsa_app.signature)
     gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, balsa_app.signature, strlen (balsa_app.signature));

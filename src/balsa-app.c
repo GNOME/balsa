@@ -97,11 +97,21 @@ read_signature ()
   gchar path[PATH_MAX];
   sprintf (path, "%s/.signature", getenv ("HOME"));
   fd = open (path, O_RDONLY);
+  if (fd == -1)
+    {
+      perror ("error opening signature file:");
+      return FALSE;
+    }
   ret = fstat (fd, &stats);
   if (ret != 0)
-    perror ("error doing fstat on signature:");
+    {
+      perror ("error doing fstat on signature:");
+      return FALSE;
+    }
   balsa_app.signature = g_new (gchar, stats.st_size);
-  read (fd, balsa_app.signature, stats.st_size);
+  ret = read (fd, balsa_app.signature, stats.st_size);
+  if (ret > 0)
+    balsa_app.signature[ret - 1] = '\0';
   close (fd);
   return TRUE;
 }

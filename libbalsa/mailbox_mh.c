@@ -218,6 +218,10 @@ libbalsa_mailbox_mh_new(const gchar * path, gboolean create)
     return G_OBJECT(mailbox);
 }
 
+#define MH_BASENAME(msgno) \
+    g_strdup_printf((msgno->orig_flags & LIBBALSA_MESSAGE_FLAG_DELETED) ? \
+		    ",%d" : "%d", msg_info->fileno)
+
 static GMimeStream *
 libbalsa_mailbox_mh_get_message_stream(LibBalsaMailbox * mailbox,
 				       LibBalsaMessage * message)
@@ -237,7 +241,7 @@ libbalsa_mailbox_mh_get_message_stream(LibBalsaMailbox * mailbox,
 					      message->msgno);
 
     path = libbalsa_mailbox_local_get_path(mailbox);
-    tmp = g_strdup_printf("%d", msg_info->fileno);
+    tmp = MH_BASENAME(msg_info);
     filename = g_build_filename(path, tmp, NULL);
     g_free(tmp);
 
@@ -308,8 +312,13 @@ lbm_mh_parse_mailbox(LibBalsaMailboxMh * mh)
 	return;
 
     while ((filename = g_dir_read_name(dir)) != NULL) {
+	LibBalsaMessageFlag delete_flag = 0;
 	guint fileno;
 
+	if (filename[0] == ',') {
+	    filename++;
+	    delete_flag = LIBBALSA_MESSAGE_FLAG_DELETED;
+	}
 	if (lbm_mh_check_filename(filename) == FALSE)
 	    continue;
 
@@ -329,6 +338,7 @@ lbm_mh_parse_mailbox(LibBalsaMailboxMh * mh)
 		msg_info->fileno = fileno;
 		LIBBALSA_MAILBOX(mh)->new_messages++;
 	    }
+	    msg_info->orig_flags = delete_flag;
 	}
     }
     g_dir_close(dir);
@@ -713,11 +723,13 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     while (msgno <= mh->msgno_2_msg_info->len) {
 	msg_info = lbm_mh_message_info_from_msgno(mh, msgno);
 
-	if (msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED) {
+	if (expunge && (msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED)) {
 	    /* MH just moves files out of the way when you delete them */
 	    /* chbm: not quite, however this is probably a good move for
 	       flag deleted */
- 	    char *orig = g_strdup_printf("%s/%d", path, msg_info->fileno);
+	    char *tmp = MH_BASENAME(msg_info);
+	    char *orig = g_build_filename(path, tmp, NULL);
+	    g_free(tmp);
 	    unlink(orig);
 	    g_free(orig);
 	    /* free old information */
@@ -736,6 +748,30 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    lbm_mh_flag_line(msg_info, LIBBALSA_MESSAGE_FLAG_NEW, &unseen);
 	    lbm_mh_flag_line(msg_info, LIBBALSA_MESSAGE_FLAG_FLAGGED, &flagged);
 	    lbm_mh_flag_line(msg_info, LIBBALSA_MESSAGE_FLAG_REPLIED, &replied);
+	    if ((msg_info->flags ^ msg_info->orig_flags) &
+		LIBBALSA_MESSAGE_FLAG_DELETED) {
+		gchar *tmp;
+		gchar *old_file;
+		gchar *new_file;
+
+		tmp = MH_BASENAME(msg_info);
+		old_file = g_build_filename(path, tmp, NULL);
+		g_free(tmp);
+
+		msg_info->orig_flags = msg_info->flags;
+
+		tmp = MH_BASENAME(msg_info);
+		new_file = g_build_filename(path, tmp, NULL);
+		g_free(tmp);
+
+		if (libbalsa_safe_rename(old_file, new_file) == -1)
+		    /* FIXME: report error ... */
+		    ;
+
+		g_free(old_file);
+		g_free(new_file);
+	    } else
+		msg_info->orig_flags = msg_info->flags;
 	    msgno++;
 	}
     }
@@ -856,13 +892,20 @@ libbalsa_mailbox_mh_fetch_message_structure(LibBalsaMailbox * mailbox,
 					   message->msgno);
 
 	if (!msg_info->mime_message) {
-	  gchar *tmp = g_strdup_printf("%d", msg_info->fileno);
+	    gchar *tmp;
+
+	    tmp = MH_BASENAME(msg_info);
 	    msg_info->mime_message =
 		_libbalsa_mailbox_local_get_mime_message(mailbox, tmp,
 							 NULL);
 	    g_free(tmp);
 	    g_object_add_weak_pointer(G_OBJECT(msg_info->mime_message),
 				      (gpointer) & msg_info->mime_message);
+
+	    g_mime_object_remove_header(GMIME_OBJECT(msg_info->mime_message),
+		    "Status");
+	    g_mime_object_remove_header(GMIME_OBJECT(msg_info->mime_message),
+		    "X-Status");
 	}
 	message->mime_msg = msg_info->mime_message;
     }
@@ -899,7 +942,7 @@ libbalsa_mailbox_mh_load_message(LibBalsaMailbox * mailbox, guint msgno)
 
     msg_info->message = message = libbalsa_message_new();
     path = libbalsa_mailbox_local_get_path(mailbox);
-    tmp = g_strdup_printf("%d", msg_info->fileno);
+    tmp = MH_BASENAME(msg_info);
     filename = g_build_filename(path, tmp, NULL);
     g_free(tmp);
     if (libbalsa_message_load_envelope_from_file(message, filename) == FALSE) {

@@ -468,6 +468,7 @@ static void libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 }
 
 static gboolean lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
+				   gboolean expunge,
 				   gboolean closing);
 
 static void
@@ -484,7 +485,7 @@ libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox)
     mbox = (LibBalsaMailboxMbox *) mailbox;
 
     if (mbox->messages_info) {
-	lbm_mbox_sync_real(mailbox, TRUE);
+	lbm_mbox_sync_real(mailbox, TRUE, TRUE);
 	free_messages_info(mbox->messages_info);
 	g_array_free(mbox->messages_info, TRUE);
 	mbox->messages_info = NULL;
@@ -496,7 +497,9 @@ libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox)
 }
 
 static gboolean
-lbm_mbox_sync_real(LibBalsaMailbox * mailbox, gboolean closing)
+lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
+		   gboolean expunge,
+		   gboolean closing)
 {
     int fd;
     const gchar *path;
@@ -585,7 +588,7 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox, gboolean closing)
     {
 	msg_info = &g_array_index(mbox->messages_info,
 				  struct message_info, i);
-	if ((msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED))
+	if (expunge && (msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED))
 	    continue;
 
 	j++;
@@ -713,7 +716,8 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox, gboolean closing)
 	    g_assert(msg_info->message);
 	    g_free(msg_info->from);
 	    g_mime_object_unref(GMIME_OBJECT(msg_info->mime_message));
-	    if ((msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED) == 0) {
+	    if (!expunge || 
+		(msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED) == 0) {
 		LibBalsaMessageBody *body;
 		msg_info->message->msgno = j + 1;
 		msg_info->start = g_mime_parser_tell(gmime_parser);
@@ -760,7 +764,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 {
     g_assert(LIBBALSA_IS_MAILBOX_MBOX(mailbox));
 
-    return lbm_mbox_sync_real(mailbox, FALSE);
+    return lbm_mbox_sync_real(mailbox, expunge, FALSE);
 }
 
 static LibBalsaMessage*
@@ -880,6 +884,8 @@ static void update_message_status_headers(GMimeMessage *message,
 	new_header[len++] = 'A';
     if ((flags & LIBBALSA_MESSAGE_FLAG_FLAGGED) != 0)
 	new_header[len++] = 'F';
+    if ((flags & LIBBALSA_MESSAGE_FLAG_DELETED) != 0)
+	new_header[len++] = 'D';
     if (len) {
 	new_header[len++] = '\0';
 	g_mime_message_set_header(message, "X-Status", new_header);

@@ -164,7 +164,7 @@ union _MailboxUnion
     MailboxTENEX tenex;
     MailboxMBox mbox;
     MailboxMMDF mmdf;
-    MailboxUNIX unix;
+    MailboxUNIX unixmb;
     MailboxMH mh;
     MailboxPOP3 pop3;
     MailboxIMAP imap;

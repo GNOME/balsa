@@ -85,8 +85,7 @@ mailbox_new (MailboxType type)
   MailboxTENEX *tenex;
   MailboxMBox *mbox;
   MailboxMMDF *mmdf;
-  MailboxUNIX *unix;
-  MailboxMBX *mbx;
+  MailboxUNIX *mbunix;
   MailboxMH *mh;
   MailboxPOP3 *pop3;
   MailboxIMAP *imap;
@@ -137,11 +136,11 @@ mailbox_new (MailboxType type)
       break;
 
     case MAILBOX_UNIX:
-      unix = (MailboxUNIX *) mailbox;
-      unix->type = MAILBOX_UNIX;
-      unix->name = NULL;
-      unix->stream = NIL;
-      unix->path = NULL;
+      mbunix = (MailboxUNIX *) mailbox;
+      mbunix->type = MAILBOX_UNIX;
+      mbunix->name = NULL;
+      mbunix->stream = NIL;
+      mbunix->path = NULL;
       break;
 
     case MAILBOX_MH:
@@ -197,8 +196,7 @@ mailbox_free (Mailbox * mailbox)
   MailboxTENEX *tenex;
   MailboxMBox *mbox;
   MailboxMMDF *mmdf;
-  MailboxUNIX *unix;
-  MailboxMBX *mbx;
+  MailboxUNIX *mbunix;
   MailboxMH *mh;
 
   MailboxPOP3 *pop3;
@@ -247,9 +245,9 @@ mailbox_free (Mailbox * mailbox)
       break;
 
     case MAILBOX_UNIX:
-      unix = (MailboxUNIX *) mailbox;
-      if (unix->path)
-	g_free(unix->path);
+      mbunix = (MailboxUNIX *) mailbox;
+      if (mbunix->path)
+	g_free(mbunix->path);
       break;
 
     case MAILBOX_MH:
@@ -309,8 +307,7 @@ mailbox_open (Mailbox * mailbox)
   MailboxTENEX *tenex;
   MailboxMBox *mbox;
   MailboxMMDF *mmdf;
-  MailboxUNIX *unix;
-  MailboxMBX *mbx;
+  MailboxUNIX *mbunix;
   MailboxMH *mh;
 
   MailboxPOP3 *pop3;
@@ -387,10 +384,10 @@ mailbox_open (Mailbox * mailbox)
       break;
 
     case MAILBOX_UNIX:
-      unix = (MailboxUNIX *) mailbox;
+      mbunix = (MailboxUNIX *) mailbox;
 
-      unix->stream = mail_open (NIL, unix->path, NIL);
-      if (unix->stream == NIL)
+      mbunix->stream = mail_open (NIL, mbunix->path, NIL);
+      if (mbunix->stream == NIL)
 	{
 	  balsa_app.current_mailbox = old_mailbox;
 	  return FALSE;

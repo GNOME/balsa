@@ -1,3 +1,9 @@
+2003-09-21 07:59  PeterB
+
+	* configure.in: Look for libgnomeprint-2.2 before 2.0 (see
+	http://mail.gnome.org/archives/balsa-list/2003-September/msg00109.h
+	tml)
+
 2003-09-21  Pawel Salek  <pawsa theochem.kth.se>
 
 	* libbalsa/folder-scanners.c: call mark_imap_path() for NOCHILDREN

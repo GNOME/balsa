@@ -1,5 +1,7 @@
-2003-11-10 08:52  PeterB
+2003-11-10 11:57  PeterB
 
+	* libbalsa/: mailbox_maildir.c, mailbox_mbox.c, mailbox_mh.c: Don't
+	expunge when _sync is called with expunge == FALSE.
 	* src/balsa-index.c: Unset mailbox as the index's tree-model before
 	closing the mailbox.
 	* libbalsa/mailbox_imap.c: Ping mailbox only if it's connected.

@@ -1461,7 +1461,7 @@ print_message(PrintInfo * pi)
 	    print_image(pi, print_task->data);
 	    break;
 #ifdef HAVE_GPGME
-	case BALSA_PRINT_TYPE_GPG_SIGN:
+	case BALSA_PRINT_TYPE_CRYPT_SIGN:
 	    print_crypto_signature(pi, print_task->data);
 #endif
 	default:

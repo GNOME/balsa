@@ -377,23 +377,13 @@ gint
 config_mailbox_update (Mailbox * mailbox, const gchar * old_pkey)
 {
   proplist_t mbox, mbox_key;
-  gchar key[MAX_PROPLIST_KEY_LEN];
-
 
   mbox = config_mailbox_get_by_pkey (old_pkey);
-  mbox_key = config_mailbox_get_key (mbox);
 
-  if (mbox_key == NULL)
-    {
-      strcpy (key, "generic");
-    }
-  else
-    {
-      strcpy (key, PLGetString (mbox_key));
-    }
+  mbox_key = mbox ? PLGetString (config_mailbox_get_key (mbox)) : NULL;
 
   config_mailbox_delete (mailbox);
-  config_mailbox_add (mailbox, key);
+  config_mailbox_add (mailbox, mbox_key);
 
   return config_save (BALSA_CONFIG_FILE);
 }				/* config_mailbox_update */
@@ -1413,6 +1403,7 @@ config_mailbox_get_key (proplist_t mailbox)
   proplist_t temp_str, accounts, mbox, mbox_key;
   int num_elements, i;
 
+  g_return_val_if_fail (mailbox != NULL, NULL);
   g_assert (balsa_app.proplist != NULL);
 
   /* Grab the list of accounts */

@@ -1,3 +1,8 @@
+2000-05-07  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/save-restore.c (config_mailbox_update): safe local mailbox
+	properties update.
+
 2000-05-07  Pablo Saratxaga <pablo@mandrakesoft.com>
 
 	* src/balsa-mblist.c: small i18n fix

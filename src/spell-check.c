@@ -808,6 +808,9 @@ balsa_spell_check_start(BalsaSpellCheck * spell_check)
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
 			  pspell_error_message(spell_error));
 
+	/* Generate a response signal. */
+	gtk_dialog_response(GTK_DIALOG(spell_check), 0);
+
 	return;
     }
 

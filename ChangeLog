@@ -1,3 +1,13 @@
+2004-01-27 22:48  PeterB
+
+	* libbalsa/pop3.c: copy uid to caller's buffer only if it's valid.
+	* libbalsa/imap/: imap-commands.c, imap-handle.h: implement
+	imap_mbox_find_unseen(): gets the list and count of unseen
+	messages.
+	* libbalsa/mailbox_imap.c: implement lbm_imap_get_unseen(): gets
+	unread messages and sets mailbox->unread_messages and
+	mailbox->has_unread_messages.
+
 2004-01-25 20:25  PeterB
 
 	* libbalsa/imap/imap-tls.c: compile with threads disabled.

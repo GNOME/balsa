@@ -1,3 +1,11 @@
+* Balsa-2.2.4 release. Release date 2004-08-28
+
+- periodic expunge configurable.
+- cleanup IMAP password quering code.
+- GPE address book support -
+  http://gpe.handhelds.org/projects/GPE-address.shtml
+- new configuration druid.
+
 * Balsa-2.2.3 release. Release date 2004-08-15
 
 - periodic expunge code crash fixed.

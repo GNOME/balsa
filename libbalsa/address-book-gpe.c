@@ -281,6 +281,10 @@ gpe_read_address(void *arg, int argc, char **argv, char **names)
     sqlite_exec_printf (gc->gpe->db,
                         "select tag,value from contacts where urn=%d",
                         gpe_read_attr, a, NULL, uid);
+    if(!a->address_list) { /* entry without address: ignore! */
+        g_object_unref(a);
+        return 0;
+    }
     if(!a->full_name)
         a->full_name = create_name(a->first_name, a->last_name);
     g_object_set_data(G_OBJECT(a), "urn", GUINT_TO_POINTER(uid));
@@ -480,10 +484,14 @@ gpe_read_completion(void *arg, int argc, char **argv, char **names)
     sqlite_exec_printf (gc->db,
                         "select tag,value from contacts where urn=%d",
                         gpe_read_attr, a, NULL, uid);
+    if(!a->address_list) { /* entry without address: ignore! */
+        g_object_unref(a);
+        return 0;
+    }
     if(!a->full_name)
         a->full_name = create_name(a->first_name, a->last_name);
     g_object_set_data(G_OBJECT(a), "urn", GUINT_TO_POINTER(uid));
-    if(!*gc->new_prefix) 
+    if(!*gc->new_prefix)
         *gc->new_prefix = libbalsa_address_to_gchar(a, 0);
     gc->res = g_list_prepend(gc->res, a);
 

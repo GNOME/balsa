@@ -1098,8 +1098,7 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
     if(rc == IMR_BYE) {
       return handle->doing_logout ? IMR_UNTAGGED : IMR_BYE;
     }
-    if( rc!=IMR_OK)
-      puts("cmd_step protocol error");
+
     p = g_hash_table_lookup(handle->cmd_queue,
                             GUINT_TO_POINTER(lastcmd));
     if(p==NULL) /* True for initial response only: no command has been
@@ -1417,7 +1416,7 @@ static ImapResponse
 ir_no(ImapMboxHandle *h)
 {
   char line[LONG_STRING];
-  puts("ir_no");
+
   sio_gets(h->sio, line, sizeof(line));
   /* look for information response codes here: section 7.1 of the draft */
   if( strlen(line)>2) {

@@ -1,3 +1,9 @@
+2004-08-28  Pawel Salek
+
+	* NEWS, configure.in: release 2.2.4
+	* libbalsa/address-book-gpe.c: handle entries without addresses.
+	* libbalsa/imap/imap-handle.c: cleanup.
+
 2004-08-27  Pawel Salek
 
 	* libbalsa/address-book-gpe.c: port fixes.

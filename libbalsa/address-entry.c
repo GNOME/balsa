@@ -27,18 +27,11 @@
 #include "config.h"
 
 #include <gnome.h>
-#include <gdk/gdkkeysyms.h>
-#include <gdk/gdki18n.h>
-
-#include <stdio.h>
-#include <sys/stat.h>
-#include <ctype.h>
 #include <string.h>
 
 /*
  * LibBalsa includes.
  */
-#include "libbalsa.h"
 #include "address-entry.h"
 
 
@@ -586,6 +579,24 @@ libbalsa_move_backward_word(LibBalsaAddressEntry *address_entry)
     libbalsa_address_entry_show(address_entry);
 }
 
+static void
+lbae_filter(gchar * p)
+{
+    gchar *q = p;
+    g_assert(g_utf8_validate(p, -1, NULL));
+    while (*p) {
+	gunichar c = g_utf8_get_char(p);
+	gchar *r = g_utf8_next_char(p);
+	if (g_unichar_iscntrl(c)) {
+	    *q++ = ' ';
+	    p = r;
+	} else if (q < p) {
+	    while (p < r)
+		*q++ = *p++;
+	} else
+	    p = q = r;
+    }
+}
 
 /*************************************************************
  * libbalsa_fill_input:
@@ -622,6 +633,8 @@ libbalsa_fill_input(LibBalsaAddressEntry *address_entry)
     typed = gtk_editable_get_chars(GTK_EDITABLE(address_entry), 0, -1);
     if (!typed)
 	typed = g_strdup("");
+
+    lbae_filter(typed);
 
     /*
      * Split the input string by comma.
@@ -872,6 +885,7 @@ static gint
 libbalsa_address_entry_button_press(GtkWidget * widget, GdkEventButton * event)
 {
     LibBalsaAddressEntry *address_entry;
+    gint retval;
 
     g_return_val_if_fail(widget != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(widget), FALSE);
@@ -887,8 +901,15 @@ libbalsa_address_entry_button_press(GtkWidget * widget, GdkEventButton * event)
      * Now that we have done the ONE LINE that we needed to do,
      * let's hand over to the parent method.
      */
-    return
+    retval =
         GTK_WIDGET_CLASS(parent_class)->button_press_event(widget, event);
+
+    /*
+     * Process the text in case it changed (e.g. paste).
+     */
+    libbalsa_fill_input(address_entry);
+
+    return retval;
 }
 
 /*************************************************************
@@ -2082,8 +2103,10 @@ libbalsa_address_entry_get_list(LibBalsaAddressEntry *address_entry)
             g_object_ref(ed->address);
             res = g_list_append(res, ed->address);
         } else {
-            res = g_list_append(res, 
-                                libbalsa_address_new_from_string(ed->user));
+	    LibBalsaAddress *addr =
+		libbalsa_address_new_from_string(ed->user);
+	    if (addr)
+		res = g_list_append(res, addr);
         }
     }
     return res;

@@ -38,7 +38,7 @@ static void close_window (GtkWidget *, gpointer);
 static void balsa_sendmsg_free (BalsaSendmsg *);
 static GtkWidget *create_menu (GtkWidget *);
 
-static GtkWidget *menu_items[9];
+static GtkWidget *menu_items[6];
 GtkTooltips *tooltips;
 
 
@@ -130,12 +130,12 @@ create_menu (GtkWidget * window)
   gtk_widget_show (w);
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
-
+/*
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_OPEN, _ ("Attach File"));
   gtk_widget_show (w);
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
-
+*/
   w = gtk_menu_item_new ();
   gtk_widget_show (w);
   gtk_menu_append (GTK_MENU (menu), w);
@@ -198,7 +198,7 @@ create_menu (GtkWidget * window)
   menu_items[i] = NULL;
 /*
    g_print ("%d menu items\n", i);
- */
+*/
   gtk_window_add_accelerator_table (GTK_WINDOW (window), accel);
   return menubar;
 }

@@ -594,15 +594,18 @@ static void
 lbml_make_msg_array(ThreadingInfo * ti)
 {
     GList *list;
-    LibBalsaMessage **msg;
 
     ti->msg_array_len =
 	g_list_length(LIBBALSA_MAILBOX_LOCAL(ti->mailbox)->msg_list);
-    msg = ti->msg_array = g_new(LibBalsaMessage *, ti->msg_array_len);
+    ti->msg_array = g_new(LibBalsaMessage *, ti->msg_array_len);
 
     for (list = LIBBALSA_MAILBOX_LOCAL(ti->mailbox)->msg_list; list;
-	 list = list->next)
-	*msg++ = list->data;
+	 list = list->next) {
+	LibBalsaMessage *message = list->data;
+	gint msgno = message->msgno;
+	g_assert(msgno > 0 && msgno <= ti->msg_array_len);
+	ti->msg_array[msgno - 1] = message;
+    }
 }
 
 static LibBalsaMessage *
@@ -691,7 +694,9 @@ lbml_set_parent(GNode * node, ThreadingInfo * ti)
 	/* This message listed itself as its parent! Oh well... */
 	return FALSE;
 
-    for (child = node->children; child; child = child->next)
+    child = node->children;
+    while (child) {
+	GNode *next = child->next;
 	if (child == parent || g_node_is_ancestor(child, parent)) {
 	    /* Prepending node to parent would create a
 	     * loop; in lbml_find_parent, we just omit making
@@ -700,8 +705,9 @@ lbml_set_parent(GNode * node, ThreadingInfo * ti)
 	     * the tree: unlink the offending child and prepend it
 	     * to the node's parent. */
 	    g_node_prepend(node->parent, lbml_unlink(child));
-	    break;
 	}
+	child = next;
+    }
 
     g_node_prepend(parent, lbml_unlink(node));
 

@@ -302,11 +302,6 @@ create_menu (GtkWidget * window)
   /* FILE Menu */
   menu = gtk_menu_new ();
 
-#define GNOME_STOCK_PIXMAP_MAIL        "Mail"
-#define GNOME_STOCK_PIXMAP_MAIL_SND    "Send Mail"
-
-
-
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_RCV, _ ("Get New Mail"));
   gtk_menu_append (GTK_MENU (menu), w);
   gtk_widget_install_accelerator (w, accel, "activate", 'M', GDK_CONTROL_MASK);
@@ -321,11 +316,6 @@ create_menu (GtkWidget * window)
   w = gtk_menu_item_new ();
   gtk_widget_show (w);
   gtk_menu_append (GTK_MENU (menu), w);
-
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("New mailbox..."));
-  gtk_widget_show (w);
-  gtk_menu_append (GTK_MENU (menu), w);
-  menu_items[i++] = w;
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Save mailbox..."));
   gtk_widget_show (w);
@@ -362,6 +352,7 @@ create_menu (GtkWidget * window)
 
 
   /* EDIT Menu */
+/*
   menu = gtk_menu_new ();
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_CUT, _ ("Cut"));
@@ -387,7 +378,7 @@ create_menu (GtkWidget * window)
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), menu);
   gtk_menu_item_right_justify (GTK_MENU_ITEM (w));
   gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
-
+*/
 
   /* MESSAGE Menu */
   menu = gtk_menu_new ();

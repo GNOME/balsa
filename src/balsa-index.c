@@ -19,8 +19,10 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <gnome.h>
+#include "balsa-app.h"
 #include "balsa-index.h"
-
+#include "mailbox.h"
 
 /* pixmaps */
 #include "pixmaps/gball.xpm"
@@ -40,37 +42,37 @@ static void balsa_index_size_allocate (GtkWidget * widget,
 
 
 /* internal functions */
-static void append_messages (BalsaIndex *bindex,
+static void append_messages (BalsaIndex * bindex,
 			     glong first,
 			     glong last);
 
-static void update_new_message_pixmap (BalsaIndex *bindex,
+static void update_new_message_pixmap (BalsaIndex * bindex,
 				       glong mesgno);
 
 
 /* clist callbacks */
 static void realize_clist (GtkWidget * widget,
 			   gpointer * data);
-static void select_message (GtkWidget * widget, 
+static void select_message (GtkWidget * widget,
 			    gint row,
 			    gint column,
 			    GdkEventButton * bevent,
 			    gpointer * data);
-static void unselect_message (GtkWidget * widget, 
+static void unselect_message (GtkWidget * widget,
 			      gint row,
 			      gint column,
 			      GdkEventButton * bevent,
 			      gpointer * data);
-			   
+
 
 
 
 /* signals */
 enum
-{
-  SELECT_MESSAGE,
-  LAST_SIGNAL
-};
+  {
+    SELECT_MESSAGE,
+    LAST_SIGNAL
+  };
 
 typedef void (*BalsaIndexSignal1) (GtkObject * object,
 				   MAILSTREAM * arg1,
@@ -83,7 +85,8 @@ static void balsa_index_marshal_signal_1 (GtkObject * object,
 					  GtkArg * args);
 
 
-static gint balsa_index_signals[LAST_SIGNAL] = {0};
+static gint balsa_index_signals[LAST_SIGNAL] =
+{0};
 static GtkBinClass *parent_class = NULL;
 
 guint
@@ -125,10 +128,10 @@ balsa_index_class_init (BalsaIndexClass * klass)
 
   balsa_index_signals[SELECT_MESSAGE] =
     gtk_signal_new ("select_message",
-                    GTK_RUN_LAST,
-                    object_class->type,
-                    GTK_SIGNAL_OFFSET (BalsaIndexClass, select_message),
-                    balsa_index_marshal_signal_1,
+		    GTK_RUN_LAST,
+		    object_class->type,
+		    GTK_SIGNAL_OFFSET (BalsaIndexClass, select_message),
+		    balsa_index_marshal_signal_1,
 		    GTK_TYPE_NONE, 2, GTK_TYPE_POINTER, GTK_TYPE_LONG);
 
   gtk_object_class_add_signals (object_class, balsa_index_signals, LAST_SIGNAL);
@@ -152,10 +155,10 @@ balsa_index_marshal_signal_1 (GtkObject * object,
 
   rfunc = (BalsaIndexSignal1) func;
 
-  (*rfunc) (object, 
+  (*rfunc) (object,
 	    GTK_VALUE_POINTER (args[0]),
 	    GTK_VALUE_LONG (args[1]),
-            func_data);
+	    func_data);
 }
 
 static void
@@ -181,9 +184,9 @@ balsa_index_init (BalsaIndex * bindex)
 
 
   /* create the clist */
-  GTK_BIN (bindex)->child = 
+  GTK_BIN (bindex)->child =
     (GtkWidget *) clist = gtk_clist_new_with_titles (5, titles);
- 
+
   gtk_widget_set_parent (GTK_WIDGET (clist), GTK_WIDGET (bindex));
   gtk_clist_set_policy (clist, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_clist_set_selection_mode (clist, GTK_SELECTION_BROWSE);
@@ -201,14 +204,14 @@ balsa_index_init (BalsaIndex * bindex)
 			    (gpointer) bindex);
 
   gtk_signal_connect (GTK_OBJECT (clist),
-                      "select_row",
-                      (GtkSignalFunc) select_message,
-                      (gpointer) bindex);
+		      "select_row",
+		      (GtkSignalFunc) select_message,
+		      (gpointer) bindex);
 
   gtk_signal_connect (GTK_OBJECT (clist),
-                      "unselect_row",
-                      (GtkSignalFunc) unselect_message,
-                      (gpointer) bindex);
+		      "unselect_row",
+		      (GtkSignalFunc) unselect_message,
+		      (gpointer) bindex);
 
 
   gtk_widget_show (GTK_WIDGET (clist));
@@ -249,15 +252,15 @@ balsa_index_set_stream (BalsaIndex * bindex,
    * the clist selection mode to a mode that doesn't automagicly select, select
    * manually, then switch back */
 
-  gtk_clist_set_selection_mode (GTK_CLIST (GTK_BIN (bindex)->child), 
+  gtk_clist_set_selection_mode (GTK_CLIST (GTK_BIN (bindex)->child),
 				GTK_SELECTION_SINGLE);
 
   append_messages (bindex, 1, bindex->last_message);
-  
+
   if (GTK_CLIST (GTK_BIN (bindex)->child)->rows > 0)
     gtk_clist_select_row (GTK_CLIST (GTK_BIN (bindex)->child), 0, -1);
 
-  gtk_clist_set_selection_mode (GTK_CLIST (GTK_BIN (bindex)->child), 
+  gtk_clist_set_selection_mode (GTK_CLIST (GTK_BIN (bindex)->child),
 				GTK_SELECTION_BROWSE);
 }
 
@@ -295,7 +298,7 @@ balsa_index_select_next (BalsaIndex * bindex)
     return;
 
   row = (gint) clist->selection->data + 1;
-  
+
   gtk_clist_select_row (clist, row, -1);
 
   if (gtk_clist_row_is_visible (clist, row) != GTK_VISIBILITY_FULL)
@@ -317,7 +320,7 @@ balsa_index_select_previous (BalsaIndex * bindex)
     return;
 
   row = (gint) clist->selection->data - 1;
-  
+
   gtk_clist_select_row (clist, row, -1);
 
   if (gtk_clist_row_is_visible (clist, row) != GTK_VISIBILITY_FULL)
@@ -325,7 +328,7 @@ balsa_index_select_previous (BalsaIndex * bindex)
 }
 
 
-void 
+void
 balsa_index_set_progress_bar (BalsaIndex * bindex,
 			      GtkProgressBar * progress_bar)
 {
@@ -340,7 +343,7 @@ balsa_index_set_progress_bar (BalsaIndex * bindex,
 }
 
 
-GtkProgressBar * 
+GtkProgressBar *
 balsa_index_get_progress_bar (BalsaIndex * bindex)
 {
   g_return_if_fail (bindex != NULL);
@@ -397,9 +400,9 @@ balsa_index_size_allocate (GtkWidget * widget,
 
       child_allocation.x = allocation->x + GTK_CONTAINER (widget)->border_width;
       child_allocation.y = allocation->y + GTK_CONTAINER (widget)->border_width;
-      child_allocation.width = allocation->width - 
+      child_allocation.width = allocation->width -
 	2 * GTK_CONTAINER (widget)->border_width;
-      child_allocation.height = allocation->height - 
+      child_allocation.height = allocation->height -
 	2 * GTK_CONTAINER (widget)->border_width;
 
       gtk_widget_size_allocate (child, &child_allocation);
@@ -410,7 +413,7 @@ balsa_index_size_allocate (GtkWidget * widget,
 
 
 static void
-append_messages (BalsaIndex *bindex,
+append_messages (BalsaIndex * bindex,
 		 glong first,
 		 glong last)
 {
@@ -435,7 +438,7 @@ append_messages (BalsaIndex *bindex,
 
       if (bindex->progress_bar)
 	{
-	  gtk_progress_bar_update (bindex->progress_bar, (gfloat)i/last);
+	  gtk_progress_bar_update (bindex->progress_bar, (gfloat) i / last);
 	  gtk_widget_draw (GTK_WIDGET (bindex->progress_bar), NULL);
 	}
 
@@ -462,7 +465,7 @@ append_messages (BalsaIndex *bindex,
 
 
 static void
-update_new_message_pixmap (BalsaIndex *bindex,
+update_new_message_pixmap (BalsaIndex * bindex,
 			   glong mesgno)
 {
   MESSAGECACHE *elt;
@@ -492,18 +495,48 @@ realize_clist (GtkWidget * widget,
   BalsaIndex *bindex;
 
   bindex = BALSA_INDEX (data);
-  
+
   if (!bindex->new_xpm)
     bindex->new_xpm =
-      gdk_pixmap_create_from_xpm_d (GTK_CLIST (widget)->clist_window, 
-				    &bindex->new_xpm_mask, 
+      gdk_pixmap_create_from_xpm_d (GTK_CLIST (widget)->clist_window,
+				    &bindex->new_xpm_mask,
 				    &widget->style->white,
 				    gball_xpm);
 }
 
 
+static GtkWidget *
+create_menu (BalsaIndex * bindex)
+{
+  GtkWidget *menu, *menuitem, *submenu, *smenuitem;
+  Mailbox *mailbox;
+  GList *list;
+  
+  menu = gtk_menu_new ();
+  menuitem = gtk_menu_item_new_with_label ("Transfer to");
+
+
+  list = g_list_first (balsa_app.mailbox_list);
+  submenu = gtk_menu_new ();
+  while (list)
+    {
+      mailbox = list->data;
+      smenuitem = gtk_menu_item_new_with_label (mailbox->name);
+      gtk_menu_append(GTK_MENU(submenu), smenuitem);
+      gtk_widget_show (smenuitem);
+      list = list->next;
+    }
+
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), submenu);
+  gtk_menu_append (GTK_MENU (menu), menuitem);
+  gtk_widget_show (menuitem);
+
+  return menu;
+}
+
+
 static void
-select_message (GtkWidget * widget, 
+select_message (GtkWidget * widget,
 		gint row,
 		gint column,
 		GdkEventButton * bevent,
@@ -519,15 +552,23 @@ select_message (GtkWidget * widget,
    * starts getting sorted! */
   mesgno = row + 1;
 
-  gtk_signal_emit (GTK_OBJECT (bindex), 
+  gtk_signal_emit (GTK_OBJECT (bindex),
 		   balsa_index_signals[SELECT_MESSAGE],
 		   bindex->stream,
 		   mesgno,
 		   NULL);
+  if (bevent)
+    {
+      if (bevent->button == 3)
+	{
+	  gtk_menu_popup (GTK_MENU (create_menu (bindex)), NULL, NULL, NULL,
+			  NULL, 3, bevent->time);
+	}
+    }
 }
 
 static void
-unselect_message (GtkWidget * widget, 
+unselect_message (GtkWidget * widget,
 		  gint row,
 		  gint column,
 		  GdkEventButton * bevent,

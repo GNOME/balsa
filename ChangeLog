@@ -1,3 +1,9 @@
+2004-04-20 00:30  PeterB
+
+	* libbalsa/message.c: clear message->has_all_headers when extra
+	headers are destroyed.
+	* libbalsa/message.c: don't add standard headers to user_hdrs.
+
 2004-04-19  Pawel Salek
 
 	* libbalsa/filter.c: update argument list of message_body_ref().
@@ -12,7 +18,6 @@
 
 2004-04-19 09:17  PeterB
 
-	* libbalsa/message.c: don't add standard headers to user_hdrs.
 	* src/balsa-message.c: emit "row-changed" signal after updating the
 	attach icon.
 

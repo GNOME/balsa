@@ -1,3 +1,12 @@
+2002-01-15  Pawel Salek  <pawsa@theochem.kth.se>
+
+	W. Michael Petullo <mike@flyn.org> attachment patch + some cleanup.
+	* src/balsa-app.h: remove command line options from balsa_app.
+	* src/main.c: handle multiple attachment options.
+	* src/sendmsg-window.c: wait with exiting also when only
+	attachments were specified.
+	* src/sendmsg-window.h: add quit_on_close field.
+	
 2002-01-15  Emmanuel <e.allaud@wanadoo.fr>
 
 	* src/balsa-index.c: update properly size and date columns on format

@@ -618,12 +618,12 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsm)
 
 
 #ifdef BALSA_USE_THREADS
-    if (balsa_app.compose_email) {
+    if (bsm->quit_on_close) {
         libbalsa_wait_for_sending_thread(-1);
 	gtk_main_quit();
     }
 #else
-    if (balsa_app.compose_email)
+    if (bsm->quit_on_close)
 	gtk_main_quit();
 #endif
     if(balsa_app.debug) g_message("balsa_sendmsg_destroy(): Stop.");
@@ -1233,13 +1233,13 @@ attach_dialog_ok(GtkWidget * widget, gpointer data)
     bsmsg = gtk_object_get_user_data(GTK_OBJECT(fs));
 
     iconlist = GNOME_ICON_LIST(bsmsg->attachments[1]);
-    sel_file = g_strdup(gtk_file_selection_get_filename(fs));
+    sel_file = gtk_file_selection_get_filename(fs);
     dir = g_strdup(sel_file);
     p = strrchr(dir, '/');
     if (p)
 	*(p + 1) = '\0';
 
-    add_attachment(iconlist, sel_file, FALSE, NULL);
+    add_attachment(iconlist, g_strdup(sel_file), FALSE, NULL);
     for (node = GTK_CLIST(fs->file_list)->selection; node;
 	 node = g_list_next(node)) {
 	gtk_clist_get_text(GTK_CLIST(fs->file_list),
@@ -1247,8 +1247,7 @@ attach_dialog_ok(GtkWidget * widget, gpointer data)
 	filename = g_strconcat(dir, p, NULL);
 	if (strcmp(filename, sel_file) != 0)
 	    add_attachment(iconlist, filename, FALSE, NULL);
-	/* do not g_free(filename) - the add_attachment arg is not const */
-	/* g_free(filename); */
+	else g_free(filename);
     }
     
     bsmsg->update_config = FALSE;
@@ -2301,6 +2300,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     msg->update_config = FALSE;
     msg->modified = FALSE; 
     msg->flow = balsa_app.wordwrap && balsa_app.send_rfc2646_format_flowed;
+    msg->quit_on_close = FALSE;
 
     switch (type) {
     case SEND_REPLY:

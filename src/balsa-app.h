@@ -298,8 +298,6 @@ extern struct BalsaApplication {
     gint remember_open_mboxes;
     gint open_unread_mailbox;
     GList *open_mailbox_list;	/* data is a pointer to the mailbox */
-    gchar *compose_email;
-    gchar *attach_file;
 
     /* font used to display messages */
     gchar *message_font;

@@ -78,18 +78,20 @@ extern "C" {
 	guint delete_sig_id;
 	gboolean modified;
 	gboolean flow;          /* send format=flowed */ 
+	gboolean quit_on_close; /* quit balsa after the compose window */
+	                        /* is closed.                          */
         /* style for changing the color of address labels when the
          * address isn't valid: */
         GtkStyle *bad_address_style;  
     };
 
     BalsaSendmsg *sendmsg_window_new(GtkWidget *, LibBalsaMessage *,
-				     SendType);
+                                     SendType);
     void sendmsg_window_set_field(BalsaSendmsg *bsmsg, const gchar* key,
-				  const gchar* val);
+                                  const gchar* val);
 
-    void add_attachment(GnomeIconList * iconlist, char *filename, gboolean is_a_temp_file,
-			gchar *forced_mime_type);
+    void add_attachment(GnomeIconList * iconlist, char *filename, 
+			gboolean is_a_temp_file, gchar *forced_mime_type);
 
     typedef void (*field_setter)(BalsaSendmsg *d, const gchar*, const gchar*);
 
@@ -98,6 +100,7 @@ extern "C" {
     BalsaSendmsg *sendmsg_window_new_from_list(GtkWidget * w,
                                                GList * message_list,
                                                SendType type);
+#define SENDMSG_WINDOW_QUIT_ON_CLOSE(bsmsg) ((bsmsg)->quit_on_close=TRUE)
 
 #ifdef __cplusplus
 }

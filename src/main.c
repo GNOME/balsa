@@ -102,18 +102,29 @@ static gchar *cmd_line_open_mailboxes;
 static gboolean cmd_check_mail_on_startup,
     cmd_open_unread_mailbox, cmd_open_inbox;
 
+/* opt_attach_list: list of attachments */
+static GSList* opt_attach_list = NULL;
+/* opt_compose_email: To: field for the compose window */
+static gchar *opt_compose_email = NULL;
+
+/* balsa_init:
+   FIXME - check for memory leaks.
+*/
 static void
 balsa_init(int argc, char **argv)
 {
+    poptContext context;
+    int opt;
+    static char *attachment = NULL;
     static struct poptOption options[] = {
 
 	{"checkmail", 'c', POPT_ARG_NONE,
 	 &(cmd_check_mail_on_startup), 0,
 	 N_("Get new mail on startup"), NULL},
-	{"compose", 'm', POPT_ARG_STRING, &(balsa_app.compose_email),
+	{"compose", 'm', POPT_ARG_STRING, &(opt_compose_email),
 	 0, N_("Compose a new email to EMAIL@ADDRESS"), "EMAIL@ADDRESS"},
-	{"attach", 'a', POPT_ARG_STRING, &(balsa_app.attach_file),
-	 0, N_("Attach file at PATH"), "PATH"},
+	{"attach", 'a', POPT_ARG_STRING, &(attachment),
+	 'a', N_("Attach file at PATH"), "PATH"},
 	{"open-mailbox", 'o', POPT_ARG_STRING, &(cmd_line_open_mailboxes),
 	 0, N_("Opens MAILBOXNAME"), N_("MAILBOXNAME")},
 	{"open-unread-mailbox", 'u', POPT_ARG_NONE,
@@ -127,8 +138,17 @@ balsa_init(int argc, char **argv)
 	{NULL, '\0', 0, NULL, 0}	/* end the list */
     };
 
-    gnome_init_with_popt_table(PACKAGE, VERSION, argc, argv, options, 0,
-			       NULL);
+    context = poptGetContext(PACKAGE, argc, argv, options, 0);
+    while((opt = poptGetNextOpt(context)) > 0) {
+        switch (opt) {
+	    case 'a':
+	        opt_attach_list = g_slist_append(opt_attach_list, 
+						 g_strdup(attachment));
+		break;
+	}
+    }
+    /* Process remaining options,  */
+    gnome_init_with_popt_table(PACKAGE, VERSION, argc, argv, options, 0, NULL);
 }
 
 /* check_special_mailboxes: 
@@ -340,30 +360,20 @@ main(int argc, char *argv[])
 
     gdk_rgb_init();
 
-    if (balsa_app.compose_email || balsa_app.attach_file) {
+    if (opt_compose_email || opt_attach_list) {
 	BalsaSendmsg *snd;
+	GSList *lst;
 	snd = sendmsg_window_new(window, NULL, SEND_NORMAL);
-	if(balsa_app.compose_email) {
-	    if(strncmp(balsa_app.compose_email, "mailto:", 7) == 0)
-	        sendmsg_window_process_url(balsa_app.compose_email+7, 
+	if(opt_compose_email) {
+	    if(strncmp(opt_compose_email, "mailto:", 7) == 0)
+	        sendmsg_window_process_url(opt_compose_email+7, 
 		    	sendmsg_window_set_field, snd);
-	    else sendmsg_window_set_field(snd,"to", balsa_app.compose_email);
+	    else sendmsg_window_set_field(snd,"to", opt_compose_email);
 	}
-	if (balsa_app.attach_file) {
-	    gchar *ptr = balsa_app.attach_file;
-	    gchar *delim;
-	    gchar *attachment;
-	    while ((delim = strchr (ptr, ','))) {
-		    *delim = '\0';
-		    attachment = g_strdup(ptr);
-		    add_attachment(GNOME_ICON_LIST(snd->attachments[1]),
-				   attachment, FALSE, NULL);
-		    ptr = delim + 1;
-            }
-	    attachment = g_strdup(ptr);
-	    add_attachment(GNOME_ICON_LIST(snd->attachments[1]), attachment,
-			   FALSE, NULL);
-	}
+	for(lst = opt_attach_list; lst; lst = g_slist_next(lst))
+	    add_attachment(GNOME_ICON_LIST(snd->attachments[1]), 
+			   lst->data, FALSE, NULL);
+	SENDMSG_WINDOW_QUIT_ON_CLOSE(snd);
     } else
 	gtk_widget_show(window);
 
@@ -460,6 +470,7 @@ balsa_cleanup(void)
     balsa_app.mailbox_nodes = NULL;
     gnome_sound_shutdown();
     libbalsa_imap_close_all_connections();
+    /* g_slist_free(opt_attach_list); */
     if(balsa_app.debug) g_print("Finished cleaning up.\n");
 }
 
@@ -511,11 +522,11 @@ balsa_save_session(GnomeClient * client, gint phase,
     }
 #endif
 
-    if (balsa_app.compose_email) {
+    if (opt_compose_email) {
 	argv[argc] = g_strdup("--compose");
 	argc++;
 
-	argv[argc] = g_strdup(balsa_app.compose_email);
+	argv[argc] = g_strdup(opt_compose_email);
 	argc++;
     }
 

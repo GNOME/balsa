@@ -79,6 +79,7 @@ extern "C" {
     gboolean balsa_index_load_mailbox_node(BalsaIndex * bindex,
                                            BalsaMailboxNode * mbnode);
     void balsa_index_refresh(BalsaIndex * bindex);
+    void balsa_index_update_tree(BalsaIndex *bindex, gboolean expand);
     void balsa_index_set_threading_type(BalsaIndex * bindex, int thtype);
     void balsa_index_set_sort_order(BalsaIndex * bindex, int column, 
 				    GtkSortType order);

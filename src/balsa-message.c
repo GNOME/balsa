@@ -132,6 +132,7 @@ static void balsa_gtk_html_size_request(GtkWidget * widget,
 static void balsa_gtk_html_link_clicked(GtkWidget *html, 
 					const gchar *url);
 #endif
+static void balsa_gtk_html_on_url(GtkWidget *html, const gchar *url);
 static void balsa_icon_list_size_request(GtkWidget * widget,
 					 GtkRequisition * requisition,
 					 gpointer data);
@@ -1474,6 +1475,7 @@ check_over_url(GtkWidget *widget, GdkEvent *event, gpointer data)
 	    if (!was_over_url) {
 		gdk_window_set_cursor(GTK_TEXT(widget)->text_area, 
 				      url_cursor_over_url);
+		balsa_gtk_html_on_url(NULL, hotarea_data->url->url);
 		was_over_url = TRUE;
 	    }
 	    return FALSE;
@@ -1483,6 +1485,7 @@ check_over_url(GtkWidget *widget, GdkEvent *event, gpointer data)
 
     if (was_over_url) {
 	gdk_window_set_cursor(GTK_TEXT(widget)->text_area, url_cursor_normal);
+	balsa_gtk_html_on_url(NULL, NULL);
 	was_over_url = FALSE;
     }
 
@@ -1716,6 +1719,9 @@ part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info, gchar * ptr,
 		       (gpointer) bm);
     gtk_signal_connect(GTK_OBJECT(html), "link_clicked",
 		       GTK_SIGNAL_FUNC(balsa_gtk_html_link_clicked),
+		       bm);
+    gtk_signal_connect(GTK_OBJECT(html), "on_url",
+		       GTK_SIGNAL_FUNC(balsa_gtk_html_on_url),
 		       bm);
 
     gtk_container_add(GTK_CONTAINER(scroll), html);
@@ -2228,6 +2234,27 @@ balsa_gtk_html_link_clicked(GtkWidget *html, const gchar *url)
     gnome_url_show(url);
 }
 #endif
+static void
+balsa_gtk_html_on_url(GtkWidget *html, const gchar *url)
+{
+    static url_pushed = FALSE;
+
+    if( url ) {
+	if (url_pushed) {
+	    gnome_appbar_set_status(balsa_app.appbar, url);
+	} else {
+	    gnome_appbar_push(balsa_app.appbar, url);
+	    url_pushed = TRUE;
+	}
+    } else {
+	if (url_pushed) {
+	    gnome_appbar_pop(balsa_app.appbar);
+	    url_pushed = FALSE;
+	} else {
+	    gnome_appbar_set_status(balsa_app.appbar, "");
+	}
+    }
+}
 
 static void
 balsa_icon_list_size_request(GtkWidget * widget,

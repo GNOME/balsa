@@ -1,5 +1,16 @@
 2001-09-18  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* src/balsa-message.c: preview url in the status bar (hitched97
+	<hitched97@myrealbox.com> + Albrecht Dreﬂ
+	<albrecht.dress@arcormail.de>).
+
+	Toralf Lund <toralf@kscanners.no>:
+	* src/balsa-index.[hc]: thread expansion and collapsing (#60002).
+	* src/main-window.c: menus for thread e&c (#57659).
+	* src/sendmsg-window.c: message save when composing (#60176).
+	
+2001-09-18  Pawel Salek  <pawsa@theochem.kth.se>
+
 	* README, NEWS, configure.in: well deserved 1.2.0 release.
 	* src/sendmsg-window.c: hush gtk_file_selection warnings whenever
 	possible (fixed for gtk+-1.2.9, remains for gtk+-1.2.10). 

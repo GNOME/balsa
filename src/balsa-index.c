@@ -88,6 +88,9 @@ static void clist_click_column(GtkCList * clist, gint column,
 /* statics */
 static void balsa_index_set_col_images(BalsaIndex *, GtkCTreeNode*,
 				       LibBalsaMessage *);
+static void balsa_index_set_style(BalsaIndex * bindex, GtkCTreeNode *node);
+static void balsa_index_set_style_recursive(BalsaIndex * bindex, GtkCTreeNode *node);
+static void balsa_index_set_parent_style(BalsaIndex *bindex, GtkCTreeNode *node);
 static void populate_mru(GtkWidget *menu, BalsaIndex *bindex);
 
 /* mailbox callbacks */
@@ -750,6 +753,7 @@ balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message)
                                  (gpointer) message);
 
     balsa_index_set_col_images(bindex, node, message);
+    balsa_index_set_parent_style(bindex, node);
 }
 
 /*
@@ -1031,9 +1035,11 @@ balsa_index_update_flag(BalsaIndex * bindex, LibBalsaMessage * message)
     g_return_if_fail(message != NULL);
 
     if( (node=gtk_ctree_find_by_row_data(GTK_CTREE(bindex->ctree), 
-					 NULL, message)) )
+					 NULL, message)) ) {
 	balsa_index_set_col_images(bindex, node, message);
+    }
 }
+
 
 
 static void
@@ -1078,6 +1084,70 @@ balsa_index_set_col_images(BalsaIndex * bindex, GtkCTreeNode *node,
     }
 }
 
+static gboolean thread_has_unread(GtkCTree *ctree, GtkCTreeNode *node)
+{
+    GtkCTreeNode *child;
+
+    for(child=GTK_CTREE_ROW(node)->children; child; 
+	child=GTK_CTREE_ROW(child)->sibling) {
+	LibBalsaMessage *message=
+	    LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data(ctree, child));
+
+	if(message && message->flags & LIBBALSA_MESSAGE_FLAG_NEW ||
+	   thread_has_unread(ctree, child))
+	    return TRUE;
+    }
+    return FALSE;
+} 
+
+
+static void balsa_index_set_style(BalsaIndex * bindex, 
+					  GtkCTreeNode *node)
+{
+    GtkCTree *ctree;
+    GtkStyle *style;
+    
+    ctree = bindex->ctree;
+
+    /* FIXME: Improve style handling;
+              - Consider storing styles locally, with or config setting
+	        separate from the "mailbox" one.
+	      - Find better way of obtaining default style. Note that ctree
+	        style can't be use as it isn't initialised yet the first time
+		we call this. */
+    
+    if(!GTK_CTREE_ROW(node)->expanded && thread_has_unread(ctree, node)) {
+	style = balsa_app.mblist->unread_mailbox_style;
+    } else
+	style = gtk_widget_get_style(GTK_WIDGET(balsa_app.mblist));
+
+    gtk_ctree_node_set_row_style(ctree, node, style);
+}
+
+static void balsa_index_set_style_recursive(BalsaIndex * bindex, 
+						   GtkCTreeNode *node)
+{
+    GtkCTreeNode *child;
+
+    balsa_index_set_style(bindex, node);
+
+    for(child=GTK_CTREE_ROW(node)->children; child; 
+	child=GTK_CTREE_ROW(child)->sibling) {
+	balsa_index_set_style_recursive(bindex, child);
+    }
+}
+
+
+static void balsa_index_set_parent_style(BalsaIndex * bindex, 
+						 GtkCTreeNode *node)
+{
+    GtkCTreeNode *parent;
+
+    for(parent=GTK_CTREE_ROW(node)->parent; parent; 
+	parent=GTK_CTREE_ROW(parent)->parent) {
+	balsa_index_set_style(bindex, parent);
+    }
+}
 
 /* CLIST callbacks */
 
@@ -1094,10 +1164,12 @@ button_event_press_cb(GtkWidget * widget, GdkEventButton * event,
     if (!event)
 	return;
     
+
     bindex = BALSA_INDEX(data);
     clist = GTK_CLIST (bindex->ctree);
     on_message = gtk_clist_get_selection_info(clist, event->x, event->y, 
                                               &row, &column);
+
     if (event && event->button == 3) {
         if (handler != 0)
             gtk_idle_remove(handler);
@@ -1121,8 +1193,18 @@ static void
 button_event_release_cb(GtkWidget * clist, GdkEventButton * event,
 			gpointer data)
 {
+    gint row, column;
+    BalsaIndex *bindex;
+    
     gtk_grab_remove(clist);
     gdk_pointer_ungrab(event->time);
+
+    bindex = BALSA_INDEX(data);
+
+    if(gtk_clist_get_selection_info(GTK_CLIST(bindex->ctree), 
+				    event->x, event->y, &row, &column))
+	balsa_index_set_style_recursive(bindex, gtk_ctree_node_nth (bindex->ctree, row));
+    
 }
 
 
@@ -2142,6 +2224,47 @@ replace_attached_data(GtkObject * obj, const gchar * key, GtkObject * data)
 	gtk_object_ref(data);
 }
 
+void
+balsa_index_update_tree(BalsaIndex *bindex, gboolean expand)
+/* Remarks: In the "collapse" case, we still expand current thread to the
+	    extent where viewed message is visible. An alternative
+	    approach would be to change preview, e.g. to top of thread. */
+{
+    GtkCTree *tree=GTK_CTREE(bindex->ctree);
+    GtkCList *clist=GTK_CLIST(bindex->ctree);
+    BalsaMessage *msg=BALSA_MESSAGE(balsa_app.main_window->preview);
+    GtkCTreeNode *node, *msg_node=NULL;
+
+    gtk_clist_freeze(clist);
+    for(node=gtk_ctree_node_nth(tree, 0); node; node=GTK_CTREE_NODE_NEXT(node)) {
+	if(expand)
+	    gtk_ctree_expand_recursive(tree, node);
+	else
+	    gtk_ctree_collapse_recursive(tree, node);
+	if(!msg_node && msg && msg->message)
+	    msg_node=gtk_ctree_find_by_row_data(tree, node, msg->message);
+    }
+    
+    if ( msg_node ) {
+	guint i;
+	
+	if(!expand) {		/* Re-expand msg_node's thread; cf. Remarks */
+	    for(node=GTK_CTREE_ROW(msg_node)->parent; node;
+		node=GTK_CTREE_ROW(node)->parent) {
+		gtk_ctree_expand(tree, node);
+	    }
+	}
+	gtk_clist_thaw(clist);
+	
+	if( (i=gtk_clist_find_row_from_data(clist, msg->message))>=0 &&
+	    gtk_clist_row_is_visible(clist, i) != GTK_VISIBILITY_FULL) {
+	    gtk_clist_moveto(clist, i, 0, 1.0, 0.0);
+	    gtk_clist_select_row(clist, i, 0);
+	}
+    } else
+	gtk_clist_thaw(clist);
+}
+
 /* balsa_index_set_threading_type:
    FIXME: balsa_index_threading() requires that the index has been freshly
    recreated. This should not be necessary.
@@ -2153,7 +2276,6 @@ balsa_index_set_threading_type(BalsaIndex * bindex, int thtype)
     LibBalsaMailbox* mailbox = NULL;
     gint i=0;
     GtkCList *clist;
-    BalsaMessage *msg;
 
     g_return_if_fail (bindex);
     g_return_if_fail (GTK_IS_CLIST(bindex->ctree));
@@ -2177,13 +2299,8 @@ balsa_index_set_threading_type(BalsaIndex * bindex, int thtype)
     DO_CLIST_WORKAROUND(clist);
     gtk_clist_thaw(clist);
 
-    msg = BALSA_MESSAGE(balsa_app.main_window->preview);
-    if ( msg && msg->message &&
-	(i=gtk_clist_find_row_from_data(clist, msg->message))>=0
-	&& gtk_clist_row_is_visible(clist, i) != GTK_VISIBILITY_FULL) {
-	gtk_clist_moveto(clist, i, 0, 1.0, 0.0);
-	gtk_clist_select_row(clist, i, 0);
-    }
+    balsa_index_update_tree(bindex, FALSE /* *** Config: "Expand tree by default" */);
+
 
     /* set the menu apriopriately */
     balsa_window_set_threading_menu(thtype);

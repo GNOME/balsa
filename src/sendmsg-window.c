@@ -82,6 +82,7 @@ static gint send_message_toolbar_cb(GtkWidget *, BalsaSendmsg *);
 static gint queue_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint message_postpone(BalsaSendmsg * bsmsg);
 static gint postpone_message_cb(GtkWidget *, BalsaSendmsg *);
+static gint save_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint print_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint attach_clicked(GtkWidget *, gpointer);
 static gint close_window_cb(GtkWidget *, gpointer);
@@ -166,14 +167,16 @@ static GnomeUIInfo file_menu[] = {
 #define MENU_FILE_POSTPONE_POS 5
     GNOMEUIINFO_ITEM_STOCK(N_("_Postpone"), NULL,
 			   postpone_message_cb, GNOME_STOCK_MENU_SAVE),
-
-#define MENU_FILE_PRINT_POS 6
+#define MENU_FILE_SAVE_POS 6
+    GNOMEUIINFO_ITEM_STOCK(N_("_Save"), NULL,
+			   save_message_cb, GNOME_STOCK_MENU_SAVE),
+#define MENU_FILE_PRINT_POS 7
     GNOMEUIINFO_ITEM_STOCK(N_("Print..."), N_("Print the edited message"),
 			   print_message_cb, GNOME_STOCK_MENU_PRINT),
-#define MENU_FILE_SEPARATOR2_POS 7
+#define MENU_FILE_SEPARATOR2_POS 8
     GNOMEUIINFO_SEPARATOR,
 
-#define MENU_FILE_CLOSE_POS 8
+#define MENU_FILE_CLOSE_POS 9
     GNOMEUIINFO_MENU_CLOSE_ITEM(close_window_cb, NULL),
 
     GNOMEUIINFO_END
@@ -1113,7 +1116,7 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
 		     GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_SHRINK, 0, 0);
 
     /* Reply To: */
-    create_email_entry(table, _("Reply To:"), 6, GNOME_STOCK_MENU_BOOK_RED,
+    create_email_entry(table, _("Reply To:"), 6, GNOME_STOCK_MENU_BOOK_BLUE,
 		       msg, msg->reply_to);
 
 
@@ -1531,7 +1534,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     set_toolbar_button_callback(1, GNOME_STOCK_PIXMAP_ATTACH,
 				GTK_SIGNAL_FUNC(attach_clicked), msg);
     set_toolbar_button_callback(1, GNOME_STOCK_PIXMAP_SAVE,
-				GTK_SIGNAL_FUNC(postpone_message_cb), msg);
+				GTK_SIGNAL_FUNC(save_message_cb), msg);
     set_toolbar_button_callback(1, BALSA_PIXMAP_IDENTITY,
 				GTK_SIGNAL_FUNC(change_identity_dialog_cb), 
 				msg);
@@ -2204,7 +2207,7 @@ message_postpone(BalsaSendmsg * bsmsg)
 	    libbalsa_mailbox_sync_backend(bsmsg->orig_message->mailbox);
 	}
     }
-    gtk_object_destroy(GTK_OBJECT(message));
+    gtk_object_unref(GTK_OBJECT(message));
     return successp;
 }
 
@@ -2220,6 +2223,42 @@ postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     thereturn = message_postpone(bsmsg);
 
     gtk_widget_destroy(bsmsg->window);
+    return TRUE;
+}
+
+
+static gint
+save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+{
+    gboolean thereturn;
+    LibBalsaMessage *message;
+    
+    if (!is_ready_to_send(bsmsg)) 
+        return FALSE;
+
+    message = bsmsg2message(bsmsg, FALSE);
+    gtk_object_ref(GTK_OBJECT(message));
+
+    thereturn = message_postpone(bsmsg);
+
+    if(thereturn) {
+	GList *draft_entry;
+
+	libbalsa_mailbox_open(balsa_app.draftbox);
+	draft_entry=g_list_last(balsa_app.draftbox->message_list);
+
+	if(bsmsg->orig_message) {
+	    if(bsmsg->orig_message->mailbox)
+		libbalsa_mailbox_close(bsmsg->orig_message->mailbox);
+	    gtk_object_unref(GTK_OBJECT(bsmsg->orig_message));
+	}
+	bsmsg->type=SEND_CONTINUE;
+	bsmsg->orig_message=LIBBALSA_MESSAGE(draft_entry->data);
+	bsmsg->orig_message->mailbox=balsa_app.draftbox;
+	gtk_object_ref(GTK_OBJECT(bsmsg->orig_message));
+    
+    }
+
     return TRUE;
 }
 

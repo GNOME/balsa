@@ -181,6 +181,8 @@ static void reset_show_all_headers(void);
 static void threading_flat_cb(GtkWidget * widget, gpointer data);
 static void threading_simple_cb(GtkWidget * widget, gpointer data);
 static void threading_jwz_cb(GtkWidget * widget, gpointer data);
+static void expand_all_cb(GtkWidget * widget, gpointer data);
+static void collapse_all_cb(GtkWidget * widget, gpointer data);
 
 static void address_book_cb(GtkWindow *widget, gpointer data);
 
@@ -373,6 +375,7 @@ static GnomeUIInfo threading_menu[] = {
     GNOMEUIINFO_END
 };
 
+
 static GnomeUIInfo view_menu[] = {
 #define MENU_VIEW_MAILBOX_LIST_POS 0
     GNOMEUIINFO_TOGGLEITEM(N_("_Show Mailbox Tree"),
@@ -390,6 +393,15 @@ static GnomeUIInfo view_menu[] = {
     GNOMEUIINFO_RADIOLIST(shown_hdrs_menu),
     GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_RADIOLIST(threading_menu),
+    GNOMEUIINFO_SEPARATOR,
+    { GNOME_APP_UI_ITEM, N_("_Expand All"),
+     N_("Expand all threads"),
+     expand_all_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
+     NULL, 'E', GDK_CONTROL_MASK, NULL},
+    { GNOME_APP_UI_ITEM, N_("_Collapse All"),
+     N_("Collapse all expanded threads"),
+     collapse_all_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
+     NULL, 'C', GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_END
 };
 
@@ -2308,6 +2320,27 @@ threading_jwz_cb(GtkWidget * widget, gpointer data)
     balsa_index_set_threading_type(BALSA_INDEX(index),
 				   	BALSA_INDEX_THREADING_JWZ);
 }
+
+static void
+expand_all_cb(GtkWidget * widget, gpointer data)
+{
+    GtkWidget *index;
+
+    index = balsa_window_find_current_index(balsa_app.main_window);
+    g_return_if_fail(index);
+    balsa_index_update_tree(BALSA_INDEX(index), TRUE);
+}
+
+static void
+collapse_all_cb(GtkWidget * widget, gpointer data)
+{
+    GtkWidget *index;
+
+    index = balsa_window_find_current_index(balsa_app.main_window);
+    g_return_if_fail(index);
+    balsa_index_update_tree(BALSA_INDEX(index), FALSE);
+}
+
 
 static void
 address_book_cb(GtkWindow *widget, gpointer data)

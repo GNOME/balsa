@@ -143,6 +143,7 @@ static void address_changed_cb(LibBalsaAddressEntry * address_entry,
                                BalsaSendmsgAddress *sma);
 static void set_ready(LibBalsaAddressEntry * address_entry,
                       BalsaSendmsgAddress *sma);
+static void sendmsg_window_set_title(BalsaSendmsg * msg);
 
 /* dialog callback */
 static void response_cb(GtkDialog * dialog, gint response, gpointer data);
@@ -1830,9 +1831,13 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     create_email_entry(table, _("_To:"), 1, GNOME_STOCK_BOOK_RED,
                        msg, msg->to,
                        &msg->to_info, 1, -1);
+    g_signal_connect_swapped(G_OBJECT(msg->to[1]), "changed",
+                             G_CALLBACK(sendmsg_window_set_title), msg);
 
     /* Subject: */
     create_string_entry(table, _("S_ubject:"), 2, msg->subject);
+    g_signal_connect_swapped(G_OBJECT(msg->subject[1]), "changed",
+                             G_CALLBACK(sendmsg_window_set_title), msg);
     /* cc: */
     create_email_entry(table, _("Cc:"), 3, GNOME_STOCK_BOOK_YELLOW,
                        msg, msg->cc,
@@ -2567,6 +2572,9 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     unsigned i;
     gchar* tmp;
 
+    g_assert((type == SEND_NORMAL && message == NULL)
+             || (type != SEND_NORMAL && message != NULL));
+
     msg = g_malloc(sizeof(BalsaSendmsg));
     msg->charset  = NULL;
     msg->locale   = NULL;
@@ -2576,32 +2584,11 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     msg->modified = FALSE; 
     msg->flow = balsa_app.wordwrap && balsa_app.send_rfc2646_format_flowed;
     msg->quit_on_close = FALSE;
+    msg->orig_message = message;
+    msg->window = window = gnome_app_new("balsa", NULL);
+    msg->type = type;
 
-    switch (type) {
-    case SEND_REPLY:
-    case SEND_REPLY_ALL:
-    case SEND_REPLY_GROUP:
-	window = gnome_app_new("balsa", _("Reply to "));
-	msg->orig_message = message;
-	break;
-
-    case SEND_FORWARD_ATTACH:
-    case SEND_FORWARD_INLINE:
-	window = gnome_app_new("balsa", _("Forward message"));
-	msg->orig_message = message;
-	break;
-
-    case SEND_CONTINUE:
-	window = gnome_app_new("balsa", _("Continue message"));
-	msg->orig_message = message;
-	break;
-
-    default:
-	window = gnome_app_new("balsa", _("New message"));
-	msg->orig_message = NULL;
-	break;
-    }
-    if (msg->orig_message) {
+    if (message) {
         /* ref message so we don't lose it even if it is deleted */
 	g_object_ref(G_OBJECT(message));
 	/* reference the original mailbox so we don't loose the
@@ -2619,8 +2606,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
             g_object_ref(G_OBJECT(message->mailbox));
         }
     }
-    msg->window = window;
-    msg->type = type;
 
     g_signal_connect(G_OBJECT(msg->window), "delete-event",
 		     G_CALLBACK(delete_event_cb), msg);
@@ -2718,6 +2703,9 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
        forth which is sub-optimal.
      */
     init_menus(msg);
+
+    /* set the initial window title */
+    sendmsg_window_set_title(msg);
 
     /*
      * restore the SendMsg window size
@@ -3805,4 +3793,48 @@ rfc2822_skip_comments(gchar * str)
         ++str;
     }
     return str;
+}
+
+/* Set the title for the compose window;
+ *
+ * handler for the "changed" signals of the "To:" address and the
+ * "Subject:" field;
+ *
+ * also called directly from sendmsg_window_new.
+ */
+static void
+sendmsg_window_set_title(BalsaSendmsg * msg)
+{
+    gchar *title_format;
+    gchar *title;
+
+    if (libbalsa_address_entry_matching(LIBBALSA_ADDRESS_ENTRY(msg->to[1])))
+        return;
+
+    switch (msg->type) {
+    case SEND_REPLY:
+    case SEND_REPLY_ALL:
+    case SEND_REPLY_GROUP:
+        title_format = _("Reply to %s: %s");
+        break;
+
+    case SEND_FORWARD_ATTACH:
+    case SEND_FORWARD_INLINE:
+        title_format = _("Forward message to %s: %s");
+        break;
+
+    case SEND_CONTINUE:
+        title_format = _("Continue message to %s: %s");
+        break;
+
+    default:
+        title_format = _("New message to %s: %s");
+        break;
+    }
+
+    title = g_strdup_printf(title_format,
+                            gtk_entry_get_text(GTK_ENTRY(msg->to[1])),
+                            gtk_entry_get_text(GTK_ENTRY(msg->subject[1])));
+    gtk_window_set_title(GTK_WINDOW(msg->window), title);
+    g_free(title);
 }

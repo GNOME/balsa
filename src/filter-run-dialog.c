@@ -38,7 +38,7 @@
  * Defined in filter-edit-dialog.c
  */
 
-extern fe_already_open;
+extern gboolean fe_already_open;
 
 /* BalsaFilterRunDialog signals */
 

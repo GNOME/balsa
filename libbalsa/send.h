@@ -1,6 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,28 +20,21 @@
  * 02111-1307, USA.
  */
 
-/*
- * filter-edit.h
- *
- * Variables and definitions for the filter edit dialog
- */
 
-#ifndef __FILTER_EXPORT_H__
-#define __FILTER_EXPORT_H__
+#ifndef __SEND_H__
+#define __SEND_H__
 
-#include <gnome.h>
+#if ENABLE_ESMTP
+#include <libesmtp.h>
 
-#include "filter.h"
-#include "filter-funcs.h"
+gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding, 
+				gchar* smtp_server, auth_context_t smtp_authctx,
+				gint tls_mode, gboolean flow);
+#else
 
-/*
- * fex = filter export
- */
+gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding, 
+				gboolean flow);
 
-void fex_destroy_window_cb(GtkWidget * widget,gpointer throwaway);
+#endif
 
-/* button callbacks */
-void fex_dialog_buttons_cb(GtkWidget * widget, gint button,
-			   gpointer data);
-
-#endif /*__FILTER_EXPORT_H__ */
+#endif /* __SEND_H__ */

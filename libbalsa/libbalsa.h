@@ -92,4 +92,6 @@ gboolean libbalsa_ldap_exists(const gchar *server);
 void libbalsa_lock_mutt(void);
 void libbalsa_unlock_mutt(void);
 
+void libbalsa_mktemp (char *);
+
 #endif				/* __LIBBALSA_H__ */

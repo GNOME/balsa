@@ -33,6 +33,7 @@
 #endif
 
 #include "libbalsa.h"
+#include "send.h"
 
 #include "address-book.h"
 #include "balsa-app.h"

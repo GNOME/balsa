@@ -41,7 +41,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <gnome.h>
-#include <ctype.h>
+#ifndef __USE_ISOC99 
+  #define __USE_ISOC99 1 /* chbm: i need this on rh7.2, messy messy messy */
+  #include <ctype.h>
+  #undef  __USE_ISOC99
+#else
+  #include <ctype.h>
+#endif
 
 #ifdef HAVE_LOCALE_H
 #include <locale.h>
@@ -1607,7 +1613,7 @@ attach_message(BalsaSendmsg *msg, LibBalsaMessage *message)
     gchar *name, tmp_file_name[PATH_MAX + 1];
 	
     libbalsa_lock_mutt();
-    mutt_mktemp(tmp_file_name);
+    libbalsa_mktemp(tmp_file_name);
     libbalsa_unlock_mutt();
     mkdir(tmp_file_name, 0700);
     name = g_strdup_printf("%s/forwarded-message", tmp_file_name);
@@ -2178,7 +2184,7 @@ continueBody(BalsaSendmsg * msg, LibBalsaMessage * message)
 	    gchar *name, *body_type, tmp_file_name[PATH_MAX + 1];
 
 	    libbalsa_lock_mutt();
-	    mutt_mktemp(tmp_file_name);
+	    libbalsa_mktemp(tmp_file_name);
 	    libbalsa_unlock_mutt();
 	    if (body->filename) {
 		mkdir(tmp_file_name, 0700);

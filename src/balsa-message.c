@@ -2846,7 +2846,7 @@ balsa_gtk_html_link_clicked(GtkWidget *html, const gchar *url)
 static void
 balsa_gtk_html_on_url(GtkWidget *html, const gchar *url)
 {
-    static url_pushed = FALSE;
+    static gboolean url_pushed = FALSE;
 
     if( url ) {
 	if (url_pushed) {

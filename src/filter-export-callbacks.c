@@ -34,7 +34,7 @@
 #include "filter-export.h"
 
 /* To prevent user from silmultaneously edit/export filters */
-extern fex_already_open;
+extern gboolean fex_already_open;
 
 void 
 fex_destroy_window_cb(GtkWidget * widget,gpointer throwaway)

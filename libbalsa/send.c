@@ -33,6 +33,7 @@
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 
+#include "send.h"
 #include "mailbackend.h"
 #include "mailbox_imap.h"
 #include "misc.h"
@@ -44,7 +45,6 @@
 
 #if ENABLE_ESMTP
 #include <stdarg.h>
-#include <libesmtp.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>

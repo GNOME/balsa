@@ -450,7 +450,7 @@ balsa_index_select_next (BalsaIndex * bindex)
       list = list->next;
     }
 
-  gtk_clist_unselect_all(clist);
+  gtk_clist_unselect_all (clist);
 
   gtk_clist_select_row (clist, h + 1, -1);
 
@@ -485,7 +485,12 @@ balsa_index_select_previous (BalsaIndex * bindex)
       list = list->next;
     }
 
-  gtk_clist_unselect_all(clist);
+  /* avoid unselecting everything, and then not selecting a valid row */
+  if (h < 1)
+    h = 1;
+
+  /* FIXME, if it is already on row 1, we shouldn't unselect all/reselect */
+  gtk_clist_unselect_all (clist);
 
   gtk_clist_select_row (clist, h - 1, -1);
 

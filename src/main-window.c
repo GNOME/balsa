@@ -2479,7 +2479,6 @@ static gboolean is_open_mailbox(LibBalsaMailbox *m)
 static void
 show_about_box(void)
 {
-    static GtkWidget *about = NULL;
     const gchar *authors[] = {
         "Balsa Maintainers <balsa-maintainer@theochem.kth.se>:",
         "Peter Bloomfield <PeterBloomfield@bellsouth.net>",
@@ -2500,6 +2499,30 @@ show_about_box(void)
         gdk_pixbuf_new_from_file(BALSA_DATA_PREFIX
                                  "/pixmaps/balsa_logo.png", NULL);
 
+#if GTK_CHECK_VERSION(2, 6, 0)
+    gtk_show_about_dialog(GTK_WINDOW(balsa_app.main_window),
+                          "name", "Balsa",
+                          "version", BALSA_VERSION,
+                          "copyright",
+                          "Copyright \xc2\xa9 1997-2003 The Balsa Developers",
+                          "comments",
+                          _("The Balsa email client is part of "
+                            "the GNOME desktop environment.  "
+                            "Information on Balsa can be found at "
+                            "http://balsa.gnome.org/\n\n"
+                            "If you need to report bugs, "
+                            "please do so at: "
+                            "http://bugzilla.gnome.org/"),
+                          "authors", authors,
+                          "documenters", documenters,
+                          "translator-credits",
+                          strcmp(translator_credits, "translator-credits") ?
+			  translator_credits : NULL,
+			  "logo", balsa_logo,
+                          NULL);
+    g_object_unref(balsa_logo);
+#else /* GTK_CHECK_VERSION(2, 6, 0) */
+    static GtkWidget *about = NULL;
 
     /* only show one about box at a time */
     if (about) {
@@ -2507,29 +2530,6 @@ show_about_box(void)
         return;
     }
 
-#if GTK_CHECK_VERSION(2, 6, 0)
-    about = g_object_new(GTK_TYPE_ABOUT_DIALOG,
-                         "name", "Balsa",
-                         "version", BALSA_VERSION,
-                         "copyright",
-                         "Copyright \xc2\xa9 1997-2003 The Balsa Developers",
-                         "comments",
-                         _("The Balsa email client is part of "
-                           "the GNOME desktop environment.  "
-                           "Information on Balsa can be found at "
-                           "http://balsa.gnome.org/\n\n"
-                           "If you need to report bugs, "
-                           "please do so at: "
-                           "http://bugzilla.gnome.org/"),
-                         "authors", authors,
-                         "documenters", documenters,
-                         "translator-credits",
-                         strcmp(translator_credits, "translator-credits") ?
-			 translator_credits : NULL,
-			 "logo", balsa_logo,
-                         NULL);
-    g_object_unref(balsa_logo);
-#else /* GTK_CHECK_VERSION(2, 6, 0) */
     about = gnome_about_new("Balsa",
                             BALSA_VERSION,
                             "Copyright \xc2\xa9 1997-2003 The Balsa Developers",
@@ -2545,11 +2545,11 @@ show_about_box(void)
                             strcmp(translator_credits, "translator-credits") != 0 ? translator_credits : NULL,
                             balsa_logo
                             );
-#endif /* GTK_CHECK_VERSION(2, 6, 0) */
 
     g_object_add_weak_pointer(G_OBJECT(about), (gpointer) &about);
 
     gtk_widget_show(about);
+#endif /* GTK_CHECK_VERSION(2, 6, 0) */
 }
 
 /* Check all mailboxes in a list

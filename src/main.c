@@ -388,6 +388,9 @@ threads_destroy(void)
 {
     pthread_mutex_destroy(&mailbox_lock);
     pthread_mutex_destroy(&send_messages_lock);
+#if GTK_CHECK_VERSION(2, 4, 0)
+    pthread_mutex_destroy(&balsa_threads_mutex);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 
 #endif				/* BALSA_USE_THREADS */

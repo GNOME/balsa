@@ -63,7 +63,6 @@ extern "C" {
 
         GTimeVal last_use;
 
-	gchar *date_string;
 	gboolean line_length;
 
         /* signal handler ids */

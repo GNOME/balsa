@@ -1429,7 +1429,6 @@ real_open_mbnode(BalsaMailboxNode * mbnode)
     label = balsa_notebook_label_new(mbnode);
 
     /* for updating date when settings change */
-    index->date_string = g_strdup (balsa_app.date_string);
     index->line_length = balsa_app.line_length;
 
     /* store for easy access */

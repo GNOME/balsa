@@ -252,7 +252,7 @@ bndx_destroy(GtkObject * obj)
     }
 
     if (index->popup_menu) {
-        gtk_widget_destroy(index->popup_menu);
+        g_object_unref(index->popup_menu);
         index->popup_menu = NULL;
     }
 
@@ -388,6 +388,8 @@ bndx_instance_init(BalsaIndex * index)
     /* Initialize some other members */
     index->mailbox_node = NULL;
     index->popup_menu = bndx_popup_menu_create(index);
+    g_object_ref(index->popup_menu);
+    gtk_object_sink(GTK_OBJECT(index->popup_menu));
     /* The ref table will be populated in the initial threading. */
     index->ref_table =
         g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL,

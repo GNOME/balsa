@@ -1250,10 +1250,7 @@ libbalsa_message_get_no(LibBalsaMessage* msg)
 #endif
 
 
-LibBalsaAddress *
-libbalsa_address_new_from_gmime(const gchar *addr);
-
-LibBalsaAddress *
+static LibBalsaAddress *
 libbalsa_address_new_from_gmime(const gchar *addr)
 {
     LibBalsaAddress *address;
@@ -1577,7 +1574,10 @@ libbalsa_message_set_header_from_string(LibBalsaMessage *message, gchar *line)
     if (g_ascii_strcasecmp(name, "Subject") == 0) {
 	if (!strcmp(value, "DON'T DELETE THIS MESSAGE -- FOLDER INTERNAL DATA"))
 	    return FALSE;
+#if MESSAGE_COPY_CONTENT
+	g_free(message->subj);
         message->subj = g_mime_utils_8bit_header_decode(value);
+#endif
     } else
     if (g_ascii_strcasecmp(name, "Date") == 0) {
 	message->headers->date = g_mime_utils_header_decode_date(value, NULL);
@@ -1586,6 +1586,8 @@ libbalsa_message_set_header_from_string(LibBalsaMessage *message, gchar *line)
         message->headers->from = libbalsa_address_new_from_string(value);
     } else
     if (g_ascii_strcasecmp(name, "Reply-To") == 0) {
+	if (message->headers->reply_to)
+	    g_object_unref(message->headers->reply_to);
         message->headers->reply_to = libbalsa_address_new_from_string(value);
     } else
     if (g_ascii_strcasecmp(name, "To") == 0) {

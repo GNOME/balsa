@@ -139,6 +139,7 @@ libbalsa_icon_finder(const char *mime_type, const char *filename,
 	    *p_gnome_icon = '-';
 
         tmp = g_strconcat("document-icons/", gnome_icon, NULL);
+	g_free(icon);
         icon = gnome_vfs_icon_path_from_filename(tmp);
         g_free(tmp);
 

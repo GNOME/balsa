@@ -1538,6 +1538,15 @@ display_embedded_headers(BalsaMessage * bm, LibBalsaMessageBody *body,
 }
 
 static void
+bm_modify_font_from_string(GtkWidget * widget, const char *font)
+{
+    PangoFontDescription *desc =
+	pango_font_description_from_string(balsa_app.message_font);
+    gtk_widget_modify_font(widget, desc);
+    pango_font_description_free(desc);
+}
+
+static void
 part_info_init_message(BalsaMessage * bm, BalsaPartInfo * info)
 {
     gchar* body_type;
@@ -1580,9 +1589,7 @@ part_info_init_message(BalsaMessage * bm, BalsaPartInfo * info)
 	gtk_text_view_set_editable(GTK_TEXT_VIEW(emb_hdrs), FALSE);
 	gtk_text_view_set_left_margin(GTK_TEXT_VIEW(emb_hdrs), 2);
 	gtk_text_view_set_right_margin(GTK_TEXT_VIEW(emb_hdrs), 2);
-	gtk_widget_modify_font(emb_hdrs,
-			       pango_font_description_from_string
-			       (balsa_app.message_font));
+	bm_modify_font_from_string(emb_hdrs, balsa_app.message_font);
 	display_embedded_headers(bm, info->body, emb_hdrs);
 	
 	info->focus_widget = emb_hdrs;
@@ -1689,8 +1696,8 @@ part_info_mime_button_vfs (BalsaPartInfo* info, const gchar* content_type)
 	cmd = app->command;
 	msg = g_strdup_printf(_("View part with %s"), app->name);
 	button = gtk_button_new_with_label(msg);
-	g_object_set_data (G_OBJECT (button), "mime_action", 
-			     (gpointer) g_strdup(app->id)); /* *** */
+	g_object_set_data_full(G_OBJECT (button), "mime_action", 
+			     (gpointer) g_strdup(app->id), g_free); /* *** */
 	g_free(msg);
 
 	g_signal_connect(G_OBJECT(button), "clicked",
@@ -2177,9 +2184,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(item), GTK_WRAP_WORD);
 
         /* set the message font */
-        gtk_widget_modify_font(item,
-                               pango_font_description_from_string
-                               (balsa_app.message_font));
+	bm_modify_font_from_string(item, balsa_app.message_font);
 
         g_signal_connect(G_OBJECT(item), "key_press_event",
                          G_CALLBACK(balsa_message_key_press_event),
@@ -2551,8 +2556,8 @@ static void add_vfs_menu_item(BalsaPartInfo *info,
     gchar *menu_label = g_strdup_printf(_("Open with %s"), app->name);
     GtkWidget *menu_item = gtk_menu_item_new_with_label (menu_label);
     
-    g_object_set_data (G_OBJECT (menu_item), "mime_action", 
-			 g_strdup(app->id));
+    g_object_set_data_full(G_OBJECT (menu_item), "mime_action", 
+			 g_strdup(app->id), g_free);
     g_signal_connect (G_OBJECT (menu_item), "activate",
 			GTK_SIGNAL_FUNC (part_context_menu_vfs_cb),
 			(gpointer) info);
@@ -2617,6 +2622,8 @@ part_create_menu (BalsaPartInfo* info)
     GnomeVFSMimeApplication *def_app, *app;
     
     info->popup_menu = gtk_menu_new ();
+    g_object_ref(info->popup_menu);
+    gtk_object_sink(GTK_OBJECT(info->popup_menu));
     
     content_type = libbalsa_message_body_get_content_type (info->body);
     key_list = list = gnome_vfs_mime_get_key_list(content_type);
@@ -2736,11 +2743,10 @@ balsa_part_info_free(GObject * object)
 	widget_list = 
 	    g_object_get_data(G_OBJECT(info->widget), "url-list");
  	free_url_list(widget_list);
-        /* FIXME: Why unref will not do? */
-	gtk_widget_destroy(info->widget);
+	g_object_unref(info->widget);
     }
     if (info->popup_menu)
-	gtk_widget_destroy(info->popup_menu);
+	g_object_unref(info->popup_menu);
 
     gtk_tree_path_free(info->path);
 
@@ -3109,7 +3115,7 @@ static void add_body(BalsaMessage *bm,
 static void add_multipart(BalsaMessage *bm, LibBalsaMessageBody *parent)
 /* This function handles multiparts as specified by RFC2046 5.1 */
 {
-    const GMimeContentType *type;
+    GMimeContentType *type;
     type=g_mime_content_type_new_from_string(parent->mime_type);
     if (g_mime_content_type_is_type(type, "multipart", "*")) {
         if (g_mime_content_type_is_type(type, "*", "related")) {
@@ -3133,6 +3139,7 @@ static void add_multipart(BalsaMessage *bm, LibBalsaMessageBody *parent)
 	    }
 	}
     }
+    g_mime_content_type_destroy(type);
 }
 
 static GtkWidget *old_widget, *new_widget;
@@ -3237,13 +3244,9 @@ hide_all_parts(BalsaMessage * bm)
 static void
 select_part(BalsaMessage * bm, BalsaPartInfo *info)
 {
-    PangoFontDescription *desc;
-
     hide_all_parts(bm);
 
-    desc = pango_font_description_from_string(balsa_app.message_font);
-    gtk_widget_modify_font(bm->header_text, desc);
-    pango_font_description_free(desc);
+    bm_modify_font_from_string(bm->header_text, balsa_app.message_font);
 
     bm->current_part = add_part(bm, info);
 

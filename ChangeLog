@@ -1,3 +1,8 @@
+2004-10-04  Pawel Salek
+
+	* libbalsa/imap/imap-handle.c: fix bug in flag cache update on
+	expunge.
+
 2004-10-03  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: use cached flags.

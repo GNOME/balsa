@@ -1647,13 +1647,13 @@ ir_expunge(ImapMboxHandle *h, unsigned seqno)
   g_signal_emit(G_OBJECT(h), imap_mbox_handle_signals[EXPUNGE_NOTIFY],
 		0, seqno);
   
+  g_array_remove_index(h->flag_cache, seqno-1);
   if(h->msg_cache[seqno-1] != NULL)
     imap_message_free(h->msg_cache[seqno-1]);
   while(seqno<h->exists) {
     h->msg_cache[seqno-1] = h->msg_cache[seqno];
     seqno++;
   }
-  g_array_remove_index(h->flag_cache, seqno-1);
   h->exists--;
   mbox_view_expunge(&h->mbox_view, seqno);
   return rc;

@@ -1715,6 +1715,9 @@
 
       <listitem><para><link linkend="inw-spooky-win">What's that
       window that flashed on the screen?  </></></>
+
+      <listitem><para><link linkend="inw-address-book">The address
+      book doesn't import my addresses.  </></></>
     </itemizedlist>
 
     <sect2 id="inw-main-to-imap">
@@ -1780,6 +1783,21 @@
       mail. If you don't have any <acronym>POP3</acronym> accounts, it
       will still appear -- but it'll disappear almost instantly.</>
     </>
+
+    <sect2 id="inw-address-book">
+      <title>The address book doesn't import my addresses.</>
+
+      <para>Balsa attempts to open the file ~/.gnome/GnomeCard.gcrd. If
+      you're not using this file, you may need to create a symlink so that
+      Balsa can open it.</para>
+
+      <para>There have been slight changes in <application>GnomeCard</>'s
+      file format between its various versions. <application>Balsa</> is
+      known to work with at least <application>GnomeCard</> version 1.0.10
+      and probably most other releases.</para>
+    </sect2>
+
+
   </sect1>
 
   <sect1 id="authours">

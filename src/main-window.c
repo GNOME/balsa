@@ -3300,7 +3300,7 @@ copy_cb(GtkWidget * widget, BalsaWindow * bw)
 static void
 select_all_cb(GtkWidget * widget, gpointer data)
 {
-    libbalsa_window_select_all(data);
+    balsa_window_select_all(data);
 }
 
 /* Message menu callbacks. */
@@ -3322,7 +3322,7 @@ message_select_all_cb(GtkWidget * widget, gpointer data)
 
     if (bw->preview
         && balsa_message_grab_focus(BALSA_MESSAGE(bw->preview)))
-	libbalsa_window_select_all(data);
+	balsa_window_select_all(data);
 }
 #endif /* ENABLE_TOUCH_UI */
 
@@ -4787,7 +4787,7 @@ mark_all_cb(GtkWidget * widget, gpointer data)
     g_return_if_fail(index != NULL);
 
     gtk_widget_grab_focus(index);
-    libbalsa_window_select_all(data);
+    balsa_window_select_all(data);
 }
 
 static void
@@ -4875,4 +4875,48 @@ balsa_window_set_filter_label(BalsaWindow * window,
 				     to_field ? 
 				     _("Subject or Receiver _Contains:") :
 				     _("Subject or Sender _Contains:"));
+}
+
+/* Helper for "Select All" callbacks: if the currently focused widget
+ * supports any concept of "select-all", do it.
+ *
+ * It would be nice if all such widgets had a "select-all" signal, but
+ * they don't; in fact, the only one that does (GtkTreeView) is
+ * broken--if we emit it when the tree is not in multiple selection
+ * mode, bad stuff happens.
+ */
+void
+balsa_window_select_all(GtkWindow * window)
+{
+    GtkWidget *focus_widget = gtk_window_get_focus(window);
+
+    if (!focus_widget)
+	return;
+
+    if (GTK_IS_TEXT_VIEW(focus_widget)) {
+        GtkTextBuffer *buffer =
+            gtk_text_view_get_buffer((GtkTextView *) focus_widget);
+        GtkTextIter start, end;
+
+        gtk_text_buffer_get_bounds(buffer, &start, &end);
+        gtk_text_buffer_place_cursor(buffer, &start);
+        gtk_text_buffer_move_mark_by_name(buffer, "selection_bound", &end);
+    } else if (GTK_IS_EDITABLE(focus_widget)) {
+        gtk_editable_select_region((GtkEditable *) focus_widget, 0, -1);
+    } else if (GTK_IS_TREE_VIEW(focus_widget)) {
+        GtkTreeSelection *selection =
+            gtk_tree_view_get_selection((GtkTreeView *) focus_widget);
+        if (gtk_tree_selection_get_mode(selection) ==
+            GTK_SELECTION_MULTIPLE) {
+	    if (BALSA_IS_INDEX(focus_widget))
+		balsa_index_update_tree((BalsaIndex *) focus_widget, TRUE);
+	    else
+		gtk_tree_view_expand_all((GtkTreeView *) focus_widget);
+            gtk_tree_selection_select_all(selection);
+	}
+#ifdef    HAVE_GTKHTML
+    } else if (libbalsa_html_can_select(focus_widget)) {
+	libbalsa_html_select_all(focus_widget);
+#endif /* HAVE_GTKHTML */
+    }
 }

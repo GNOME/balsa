@@ -137,7 +137,6 @@ void libbalsa_insert_with_url(GtkTextBuffer * buffer,
                                                 const gchar *,
                                                 gpointer),
                               gpointer callback_data);
-void libbalsa_window_select_all(GtkWindow * window);
 void libbalsa_unwrap_selection(GtkTextBuffer * buffer, regex_t * rex);
 gboolean libbalsa_match_regex(const gchar * line, regex_t * rex,
 			      guint * count, guint * index);

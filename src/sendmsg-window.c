@@ -4533,7 +4533,7 @@ paste_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static void
 select_all_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    libbalsa_window_select_all(GTK_WINDOW(bsmsg->window));
+    balsa_window_select_all(GTK_WINDOW(bsmsg->window));
 }
 
 static void

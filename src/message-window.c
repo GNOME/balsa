@@ -843,7 +843,7 @@ select_all_cb(GtkWidget * widget, gpointer data)
 {
     MessageWindow *mw = (MessageWindow *) (data);
 
-    libbalsa_window_select_all(GTK_WINDOW(mw->window));
+    balsa_window_select_all(GTK_WINDOW(mw->window));
 }
 
 static void

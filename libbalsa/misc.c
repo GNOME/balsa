@@ -1561,47 +1561,6 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
     g_free(buf);
 }
 
-/* Helper for "Select All" callbacks: if the currently focused widget
- * supports any concept of "select-all", do it.
- *
- * It would be nice if all such widgets had a "select-all" signal, but
- * they don't; in fact, the only one that does (GtkTreeView) is
- * broken--if we emit it when the tree is not in multiple selection
- * mode, bad stuff happens.
- */
-void
-libbalsa_window_select_all(GtkWindow * window)
-{
-    GtkWidget *focus_widget = gtk_window_get_focus(window);
-
-    if (!focus_widget)
-	return;
-
-    if (GTK_IS_TEXT_VIEW(focus_widget)) {
-        GtkTextBuffer *buffer =
-            gtk_text_view_get_buffer(GTK_TEXT_VIEW(focus_widget));
-        GtkTextIter start, end;
-
-        gtk_text_buffer_get_bounds(buffer, &start, &end);
-        gtk_text_buffer_place_cursor(buffer, &start);
-        gtk_text_buffer_move_mark_by_name(buffer, "selection_bound", &end);
-    } else if (GTK_IS_EDITABLE(focus_widget)) {
-        gtk_editable_select_region(GTK_EDITABLE(focus_widget), 0, -1);
-    } else if (GTK_IS_TREE_VIEW(focus_widget)) {
-        GtkTreeSelection *selection =
-            gtk_tree_view_get_selection(GTK_TREE_VIEW(focus_widget));
-        if (gtk_tree_selection_get_mode(selection) ==
-            GTK_SELECTION_MULTIPLE) {
-            gtk_tree_view_expand_all(GTK_TREE_VIEW(focus_widget));
-            gtk_tree_selection_select_all(selection);
-	}
-#ifdef    HAVE_GTKHTML
-    } else if (libbalsa_html_can_select(focus_widget)) {
-	libbalsa_html_select_all(focus_widget);
-#endif /* HAVE_GTKHTML */
-    }
-}
-
 void
 libbalsa_unwrap_selection(GtkTextBuffer * buffer, regex_t * rex)
 {

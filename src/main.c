@@ -78,7 +78,8 @@ int updating_mblist;
 /* Semaphore to prevent dual use of appbar progressbar */
 int updating_progressbar;
 
-static void threads_init(gboolean init);
+static void threads_init(void);
+static void threads_destroy(void);
 #endif				/* BALSA_USE_THREADS */
 
 static void balsa_init(int argc, char **argv);
@@ -181,43 +182,46 @@ mailboxes_init(void)
 
 
 #ifdef BALSA_USE_THREADS
-void
-threads_init(gboolean init)
+static void
+threads_init(void)
 {
-    if (init) {
-	g_thread_init(NULL);
-	pthread_mutex_init(&mailbox_lock, NULL);
-	pthread_mutex_init(&send_messages_lock, NULL);
-	pthread_mutex_init(&appbar_lock, NULL);
-	checking_mail = 0;
-	updating_mblist = 0;
-	sending_mail = 0;
-	updating_progressbar = 0;
-	if (pipe(mail_thread_pipes) < 0) {
-	    g_log("BALSA Init", G_LOG_LEVEL_DEBUG,
-		  "Error opening pipes.\n");
-	}
-	mail_thread_msg_send = g_io_channel_unix_new(mail_thread_pipes[1]);
-	mail_thread_msg_receive =
-	    g_io_channel_unix_new(mail_thread_pipes[0]);
-	g_io_add_watch(mail_thread_msg_receive, G_IO_IN,
-		       (GIOFunc) mail_progress_notify_cb, NULL);
-
-	if (pipe(send_thread_pipes) < 0) {
-	    g_log("BALSA Init", G_LOG_LEVEL_DEBUG,
-		  "Error opening pipes.\n");
-	}
-	send_thread_msg_send = g_io_channel_unix_new(send_thread_pipes[1]);
-	send_thread_msg_receive =
-	    g_io_channel_unix_new(send_thread_pipes[0]);
-	g_io_add_watch(send_thread_msg_receive, G_IO_IN,
-		       (GIOFunc) send_progress_notify_cb, NULL);
-    } else {
-	pthread_mutex_destroy(&mailbox_lock);
-	pthread_mutex_destroy(&send_messages_lock);
-	pthread_mutex_destroy(&appbar_lock);
+    g_thread_init(NULL);
+    pthread_mutex_init(&mailbox_lock, NULL);
+    pthread_mutex_init(&send_messages_lock, NULL);
+    pthread_mutex_init(&appbar_lock, NULL);
+    checking_mail = 0;
+    updating_mblist = 0;
+    sending_mail = 0;
+    updating_progressbar = 0;
+    if (pipe(mail_thread_pipes) < 0) {
+	g_log("BALSA Init", G_LOG_LEVEL_DEBUG,
+	      "Error opening pipes.\n");
     }
+    mail_thread_msg_send = g_io_channel_unix_new(mail_thread_pipes[1]);
+    mail_thread_msg_receive =
+	g_io_channel_unix_new(mail_thread_pipes[0]);
+    g_io_add_watch(mail_thread_msg_receive, G_IO_IN,
+		   (GIOFunc) mail_progress_notify_cb, NULL);
+    
+    if (pipe(send_thread_pipes) < 0) {
+	g_log("BALSA Init", G_LOG_LEVEL_DEBUG,
+	      "Error opening pipes.\n");
+    }
+    send_thread_msg_send = g_io_channel_unix_new(send_thread_pipes[1]);
+    send_thread_msg_receive =
+	g_io_channel_unix_new(send_thread_pipes[0]);
+    g_io_add_watch(send_thread_msg_receive, G_IO_IN,
+		   (GIOFunc) send_progress_notify_cb, NULL);
 }
+
+static void
+threads_destroy(void)
+{
+    pthread_mutex_destroy(&mailbox_lock);
+    pthread_mutex_destroy(&send_messages_lock);
+    pthread_mutex_destroy(&appbar_lock);
+}
+
 #endif				/* BALSA_USE_THREADS */
 
 /* initial_open_mailboxes:
@@ -316,7 +320,7 @@ main(int argc, char *argv[])
 
 #ifdef BALSA_USE_THREADS
     /* initiate thread mutexs, variables */
-    threads_init(TRUE);
+    threads_init();
 #endif
 
     balsa_init(argc, argv);
@@ -404,7 +408,7 @@ main(int argc, char *argv[])
     gdk_colormap_unref(balsa_app.colormap);
 
 #ifdef BALSA_USE_THREADS
-    threads_init(FALSE);
+    threads_destroy();
 #endif
 
     return 0;
@@ -472,12 +476,6 @@ balsa_exit(void)
     libbalsa_imap_close_all_connections();
     gtk_main_quit();
 }
-
-/* balsa_window_destroy
-   It may be called from balsa_window_destroy or balsa_exit; this is why
-   it should not make assumptions about the presence of the like
-   the notebook and so on.
-*/
 
 
 static gint

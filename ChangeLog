@@ -1,3 +1,9 @@
+2001-05-26  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-message.c: clean BalsaPartInfo (de)allocation.
+	* src/main.c: clean thread initialization/destroying.
+	* libbalsa/address.c: KISS, just a bit.
+
 2001-05-25  Carlos Morgado  <chbm@chbm.nu>
 
 	* libinit_balsa/balsa-druid-page-user.gob: fix 1st page with

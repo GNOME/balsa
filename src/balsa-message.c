@@ -54,13 +54,13 @@ struct _BalsaPartInfo {
     LibBalsaMessage *message;
     LibBalsaMessageBody *body;
 
-    /* The widget to add to the container */
+    /* The widget to add to the container; referenced */
     GtkWidget *widget;
 
-    /* The widget to give focus to */
+    /* The widget to give focus to; just an pointer */
     GtkWidget *focus_widget;
 
-    /* The contect menu */
+    /* The contect menu; referenced */
     GtkWidget *popup_menu;
 
     /* True if balsa knows how to display this part */
@@ -101,7 +101,6 @@ static void save_part(BalsaPartInfo * info);
 static void select_icon_cb(GnomeIconList * ilist, gint num,
 			   GdkEventButton * event, BalsaMessage * bm);
 static void select_part(BalsaMessage * bm, gint part);
-static void free_icon_data(gpointer data);
 static void part_context_menu_save(GtkWidget * menu_item,
 				   BalsaPartInfo * info);
 /* static void part_context_menu_view(GtkWidget * menu_item, */
@@ -165,6 +164,9 @@ static void no_mdn_reply (GtkWidget *widget, gpointer user_data);
 static void send_mdn_reply (GtkWidget *widget, gpointer user_data);
 #endif
 
+static BalsaPartInfo* part_info_new(LibBalsaMessageBody* body,
+				    LibBalsaMessage* msg);
+static void part_info_free(BalsaPartInfo* info);
 
 guint balsa_message_get_type()
 {
@@ -257,7 +259,12 @@ balsa_message_init(BalsaMessage * bm)
 static void
 balsa_message_destroy(GtkObject * object)
 {
-    balsa_message_set(BALSA_MESSAGE(object), NULL);
+    BalsaMessage* bm = BALSA_MESSAGE(object);
+    balsa_message_set(bm, NULL);
+    gtk_widget_destroy(bm->part_list);
+
+    if (GTK_OBJECT_CLASS(parent_class)->destroy)
+	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
 }
 
 static gint
@@ -387,7 +394,6 @@ select_icon_cb(GnomeIconList * ilist, gint num, GdkEventButton * event,
 {
 
     BalsaPartInfo *info;
-
 
     if (event == NULL)
 	return;
@@ -1369,6 +1375,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 		g_free(line);
 	    }
 	    g_strfreev(l);
+	    regfree(&url_reg);
 	    regfree(&rex);
 	}
 	
@@ -1493,7 +1500,7 @@ part_info_init(BalsaMessage * bm, BalsaPartInfo * info)
 	break;
     }
 
-    /* The widget is unref'd in free_icon_data */
+    /* The widget is unref'd in part_info_free */
     if (info->widget)
 	gtk_object_ref(GTK_OBJECT(info->widget));
 
@@ -1520,12 +1527,7 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body)
     }
 
     bm->part_count++;
-
-    info = (BalsaPartInfo *) g_new0(BalsaPartInfo, 1);
-    info->body = body;
-    info->message = bm->message;
-    info->can_display = FALSE;
-
+    info = part_info_new(body, bm->message);
     content_type = libbalsa_message_body_get_content_type(body);
 
     if (body->filename)
@@ -1541,7 +1543,7 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body)
 				 pix, icon_title);
 
     gnome_icon_list_set_icon_data_full(GNOME_ICON_LIST(bm->part_list), pos,
-				       info, free_icon_data);
+				       info, (GtkDestroyNotify)part_info_free);
 
     g_free(content_type);
     g_free(icon_title);
@@ -1553,11 +1555,8 @@ display_content(BalsaMessage * bm)
 {
     LibBalsaMessageBody *body;
 
-    body = bm->message->body_list;
-    while (body) {
+    for (body = bm->message->body_list; body; body = body->next)
 	display_part(bm, body);
-	body = body->next;
-    }
 }
 
 
@@ -1631,44 +1630,41 @@ part_create_menu (BalsaPartInfo* info)
 }
 
 
-static void
-free_icon_data(gpointer data)
+static BalsaPartInfo*
+part_info_new(LibBalsaMessageBody* body, LibBalsaMessage* msg) 
 {
-    BalsaPartInfo *info = (BalsaPartInfo *) data;
+    BalsaPartInfo* info = (BalsaPartInfo *) g_new0(BalsaPartInfo, 1);
+    info->body = body;
+    info->message = msg;
+    info->can_display = FALSE;
+    return info;
+}
 
-    if (info == NULL)
-	return;
+static void
+part_info_free(BalsaPartInfo* info)
+{
+    g_return_if_fail(info);
 
     if (info->widget) {
 	GList *url_list = 
 	    gtk_object_get_data(GTK_OBJECT(info->widget), "url-list");
 
 	if (url_list) {
-	    GList *p = url_list;
-	    
-	    while (p) {
+	    GList *p;
+	    for (p = url_list; p; p = g_list_next(p)) {
 		message_url_t *url_data = (message_url_t *)p->data;
-
 		g_free(url_data->url);
 		g_free(url_data);
-		p = g_list_next(p);
 	    }
-	    
 	    g_list_free(url_list);
 	}
 
 	gtk_object_unref(GTK_OBJECT(info->widget));
     }
-
     if (info->popup_menu)
 	gtk_object_unref(GTK_OBJECT(info->popup_menu));
 
-    /*    if ( info->hadj )  */
-    /*      gtk_object_unref(GTK_OBJECT(info->hadj)); */
-    /*    if ( info->vadj ) */
-    /*      gtk_object_unref(GTK_OBJECT(info->vadj)); */
-
-    g_free(data);
+    g_free(info);
 }
 
 static void
@@ -1687,7 +1683,6 @@ part_context_menu_cb(GtkWidget * menu_item, BalsaPartInfo * info)
 
 
     content_type = libbalsa_message_body_get_content_type(info->body);
-
     key = gtk_object_get_data (GTK_OBJECT (menu_item), "mime_action");
 
     if (key != NULL && (cmd = gnome_mime_get_value(content_type, key)) != NULL) {

@@ -87,19 +87,11 @@ libbalsa_address_destroy(GtkObject * object)
 
     addr = LIBBALSA_ADDRESS(object);
 
-    g_free(addr->id);
-    addr->id = NULL;
-
-    g_free(addr->full_name);
-    addr->full_name = NULL;
-
-    g_free(addr->first_name);
-    addr->first_name = NULL;
-    g_free(addr->last_name);
-    addr->last_name = NULL;
-
-    g_free(addr->organization);
-    addr->organization = NULL;
+    g_free(addr->id);           addr->id = NULL;
+    g_free(addr->full_name);    addr->full_name = NULL;
+    g_free(addr->first_name);   addr->first_name = NULL;
+    g_free(addr->last_name);    addr->last_name = NULL;
+    g_free(addr->organization); addr->organization = NULL;
 
     g_list_foreach(addr->address_list, (GFunc) g_free, NULL);
     g_list_free(addr->address_list);
@@ -112,11 +104,7 @@ libbalsa_address_destroy(GtkObject * object)
 LibBalsaAddress *
 libbalsa_address_new(void)
 {
-    LibBalsaAddress *address;
-
-    address = gtk_type_new(LIBBALSA_TYPE_ADDRESS);
-
-    return address;
+    return gtk_type_new(LIBBALSA_TYPE_ADDRESS);
 }
 
 /* returns only first address on the list; ignores remaining ones */

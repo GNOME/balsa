@@ -553,6 +553,8 @@ void mutt_free_envelope (ENVELOPE **p)
   rfc822_free_address (&(*p)->sender);
   rfc822_free_address (&(*p)->from);
   rfc822_free_address (&(*p)->reply_to);
+  /* BALSA: freep dispnotify_to field */
+  rfc822_free_address (&(*p)->dispnotify_to);
   rfc822_free_address (&(*p)->mail_followup_to);
   safe_free ((void **) &(*p)->subject);
   safe_free ((void **) &(*p)->message_id);

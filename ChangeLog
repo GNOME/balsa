@@ -1,5 +1,11 @@
 2000-05-20  Peter Williams  <peter@beta.newton.cx>
 
+	* AUTHORS README TODO INSTALL NEWS balsa.1.in
+	help/C/balsa.sgml: Documentation updates to
+	make this the official 0.8.0
+	
+	* configure.in (BALSA_RELEASE): No longer pre1!
+
 	* Makefile.am: RPM target updated to be just peachy.
 	
 	* Makefile.am: New balsa-dcheck target to not forget
@@ -133,7 +139,6 @@
 	* libbalsa/send.c (balsa_lookup_mime_type): fixed GNOME mime 
 	type lookup 
 
->>>>>>> 1.218
 2000-04-27  Pawel Salek <pawsa@theochem.kth.se>
 	* src/sendmsg-window.c: one g_free() too much.
 	* src/main.c: code cleanup.

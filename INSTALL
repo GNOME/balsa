@@ -1,32 +1,35 @@
-Balsa E-Mail Client 0.8.0-pre1
+Balsa E-Mail Client 0.8.0
 
-Copyright (C) 1997-2000 Jay Painter and Stuart Parmenter
-See 'COPYING' for licence information.
-
+Copyright (C) 1997-2000 Jay Painter, Stuart Parmenter, and others
+See 'COPYING' for license information.
+See 'AUTHORS' for a list of contributors.
 
 Please make sure you have the following things:
 
-Glib       >= 1.2.1
-GTK        >= 1.2.1
-Imlib      >= 1.9.2
-gnome-libs >= 1.0.8
+	Glib        >= 1.2.1
+	GTK         >= 1.2.1
+	Imlib       >= 1.9.2
+	gnome-libs  >= 1.0.8
+	libPropList >= 0.9.1
 
-If you do not have these, please check http://www.balsa.net/download.html for
-links to these packages. Or try http://www.gnome.org, http://www.gtk.org,
-and http://www.enlightenment.org.
+	If you do not have these, please check http://www.balsa.net/download.html
+	for links to these packages. Or try http://www.gnome.org, 
+	http://www.gtk.org, and http://www.enlightenment.org.
 
 Build Instructions:
 
-For more information see 'README'.
+	For more information see 'README'.
 
-# ./configure
-# make
+	# ./configure
+	# make
 
 Installation:
 
-Do the above then
+	Do the above then
 
-# make install
+	# make install
 
-You may need to remove old ~/.balsarc file: balsa sometimes gets confused 
-when it cannot parse the configuration file.
+Notes:
+
+	You may need to remove your ~/.balsarc file: balsa sometimes gets confused 
+	when it cannot parse the configuration file. Sorry for the inconvenience.

@@ -1,7 +1,7 @@
 <!doctype article PUBLIC "-//GNOME//DTD DocBook PNG Variant V1.0//EN" [<!-- if not using PNG graphic, replace reference above with 
              .....PUBLIC "-//OASIS//DTD DocBook V3.1//EN"[
          --> 
-<!ENTITY version "0.7.0"> 
+<!ENTITY version "0.8.0"> 
         <!-- replace with actual application  version number-->]>
 
 <article id="index">
@@ -61,15 +61,15 @@
       <para> Linux is a trademark of Linus Torvalds.</para>
       <para> X Window System is a trademark of X Consortium, Inc.</para>
       <para> Windows is a trademark of Microsoft Corp.</para>
-      <para> Macintosh and Apple are  trademarks of Apple Computer, Inc.</para>
+      <para> Macintosh and Apple are trademarks of Apple Computer, Inc.</para>
       <para> All other trademarks are property of their respective owners.</para>
     </legalnotice>
 
     <releaseinfo> 
-      This is version 1.0 of the Balsa manual.
+      This is version 1.1 of the Balsa manual.
     </releaseinfo>
 
-    <pubdate>19 March 2000</pubdate>
+    <pubdate>20 May 2000</pubdate>
 
     <abstract>
       <para><application>Balsa</application> is a graphical mail
@@ -170,13 +170,13 @@
     linkend="cfgtab-display"><guilabel>Show Mailbox
     Info</guilabel></link> preference is set, two columns will also be
     displayed next to the mailbox names containing the number of
-    unread and total messages for each.  Also, any mailboxes that
-    contain unread messages will be shown in a different font and
-    colour.</para>
+    unread and total messages in each mailbox that has unread messages.
+    (The other mailboxes will not have their contents probed.) Also, 
+    any mailboxes that contain unread messages will be shown in a 
+    different font and colour.</para>
 
-    <para>At the top-right is a notebook view of all the currently
-    open mailboxes. You can browse messages, manipulate them, and
-    switch between open mailboxes here.</para>
+    <para>At the top-right is a view of the currently
+    open mailbox. You can browse messages and manipulate them here.</para>
 
     <para>At the bottom-right of <application>Balsa</application>'s
     main window is the message view. This displays the message
@@ -201,7 +201,7 @@
 	<varlistentry>
 	  <term><guimenu>File</guimenu></term>
 	  <listitem>
-	    <para>This menu contains commands</para>
+	    <para>This menu contains basic commands</para>
 
 	    <itemizedlist>
 	      <listitem>
@@ -526,9 +526,9 @@
       <para>Your mailboxes will be displayed as a tree view, with
       mailboxes in subdirectories of your local mail directory
       initially hidden but accessible by expanding the
-      tree. <acronym>POP3</acronym> and <acronym>IMAP</acronym>
-      mailboxes will also be displayed as being at the top level of
-      the tree.</para>
+      tree. <acronym>IMAP</acronym> mailboxes will also be displayed
+      as being at the top level of the tree. <acronym>POP3</acronym>
+      mailboxes are not displayed.</para>
 
     </sect2>
 
@@ -642,7 +642,8 @@
       message. <application>Balsa</application> does not understand
       HTML. (Someday, maybe.)  Attachments will be shown as blue links
       that look like &quot;--APPLICATION--&quot;.  Clicking on the
-      link will let you save (but not view) it.</para>
+      link will let you save (but not view) it. Right-click on a body 
+      of text to save it.</para>
 
       <para>You are not restricted to that pane. Double-click on a
       message in the message index to open it in a separate
@@ -726,7 +727,7 @@
 		    <guimenuitem>Include File...</guimenuitem>
 		  </menuchoice>
 		  &mdash Include a text file in the body of the
-		  message; Only works for plain text files.</para>
+		  message; only works for plain text files.</para>
 	      </listitem>
 
 	      <listitem>
@@ -998,7 +999,7 @@
 	  <term><guibutton>Spelling</guibutton></term>
 	  <listitem>
 	    <para>Run the message through a spell-checker, not
-	    implemented in the current version (0.7.0)</para>
+	    implemented in the current version (0.8.0)</para>
 	  </listitem>
 	</varlistentry>
 	
@@ -1161,9 +1162,10 @@
 	</screenshot>
       </figure>
 
-      <para>Immediately below the headers area is a large box that
-      displays any files included as attachments to the message.  They
-      show up as small icons that look like a piece of paper, with the
+      <para>At the base of the message composer window may be a large
+      box displaying attachments; this view can be toggled in the 
+      <guimenu>Show</guimenu> menu.  They show up as small icons 
+      that look like a piece of paper, with the
       name of the file displayed beneath them.</para>
 
       <para>When there are attachments displayed, it is possible to
@@ -1635,8 +1637,8 @@
       Add in the POP3 area. A dialog will be displayed that will let
       you set up the new mailbox.</para>
 
-      <note><para>Under <application>Sawmill</application>, this
-      dialog may be obscured, causing the appearance that
+      <note><para>Under <application>Sawfish</application>, this
+      dialog has been known to become obscured, causing the appearance that
       <application>Balsa</application> has locked up. Move the
       configuration dialog and see if the new dialog was
       hidden.</para></note>
@@ -1695,7 +1697,7 @@
     appears to lock up, or other things that you think should be
     happening aren't. If you can't figure out how to do something but
     <application>Balsa</application> lets you do it, that's a
-    bug. Report it</para>
+    bug. Report it.</para>
 
     <itemizedlist mark="bullet">
       <listitem><para><link linkend="inw-main-to-imap">I want one of
@@ -1708,7 +1710,7 @@
       <listitem><para><link linkend="inw-no-print">It won't print!
       </link></para></listitem>
 
-      <listitem><para><link linkend="inw-didnt-delete">I though I
+      <listitem><para><link linkend="inw-didnt-delete">I thought I
       deleted that message!  </link></para></listitem>
 
       <listitem><para><link linkend="inw-spooky-win">What's that
@@ -1736,7 +1738,7 @@
 
         <listitem><para>A dialog box is being displayed but it is
         obscured by another one. This seems to happen under
-        Sawmill. Try moving the windows around and see if there's a
+        Sawfish. Try moving the windows around and see if there's a
         hidden dialog somewhere.</para></listitem>
       </itemizedlist>
     </sect2>
@@ -1821,8 +1823,8 @@
       url="http://bugs.gnome.org" type="http">GNOME bug tracking
       database</ulink>. Instructions for submitting bug reports can be
       found on-line at <ulink
-      url="http://bugs.gnome.org/Reporting.html" type="http">
-      http://bugs.gnome.org/Reporting.html</ulink>. If you are using
+      url="http://www.balsa.net/bugs.html" type="http">
+      http://www.balsa.net/bugs.html</ulink>. If you are using
       GNOME 1.1 or later, you can also use command
       <command>bug-buddy</command> for submitting bug reports.
     </para>

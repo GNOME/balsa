@@ -1,12 +1,10 @@
-.TH Balsa 1 "4 Mar 2000" Version @VERSION@
+.TH Balsa 1 "20 May 2000" Version @VERSION@
 .SH NAME
 Balsa - the GNOME email client.
 
 .SH SYNOPSIS
 .B balsa
-.RB [ \-h ] 
 .RB [ \-\^\-help ] 
-.RB [ \-v ] 
 .RB [ \-\^\-version ] 
 .RB [ \-c ] 
 .RB [ \-\^\-checkmail ] 
@@ -22,7 +20,7 @@ Balsa - the GNOME email client.
 
 .SH DESCRIPTION
 .PP
-\fIBalsa\fP is a e-mail reader.  This client is part of the GNOME desktop
+\fIBalsa\fP is an e-mail reader.  This client is part of the GNOME desktop
 environment.  It supports local mailboxes, POP3 and IMAP.  For help on using Balsa, see the program documentation in the help menu.
 
 .SH OPTIONS
@@ -45,25 +43,12 @@ Open the first unread mailbox when balsa is launched.
 .SH WEBSITE
 http://www.balsa.net/
 
-.SH SEE ALSO
-.BR mailcap (5)
-.BR metamail (1)
-.BR sendmail (8)
-
-.SH COPYRIGHT
-Copyright \(co 1997-2000 Stuart Parmenter and Jay Painter
-
-Permission to use, copy, modify, and distribute this software and its
-documentation for any purpose and without fee is hereby granted,
-provided that the above copyright notice appear in all copies and that
-both that copyright notice and this permission notice appear in
-supporting documentation. 
-
 .SH SUGGESTIONS AND BUG REPORTS
 Any bugs found should be reported to the Balsa Developer mailing list
-at balsadev@gtk.org or you may want to make use of the online
+at balsa-list@gnome.org or you may want to make use of the online
 bug-tracking system available on the web at
-http://www.gnome.org/cgi-bin/bugs.
+http://www.gnome.org/cgi-bin/bugs. See http://www.balsa.net/bugs.html
+for more information on reporting bugs.
 
 Before reporting bugs, please check to see if the bug is mentioned 
 in the FAQ's or the mailing list archive. See the section on Other 
@@ -79,12 +64,23 @@ can be provided. And of course, patches to rectify the bug are even
 better.
 
 .SH AUTHORS
-Stuart Parmenter and Jay Painter.
+See the AUTHORS file included with Balsa, probably at
+/usr/doc/balsa-@VERSION@/AUTHORS
 
-.SH MAJOR CONTRIBUTORS
-Without these people, @VERSION@ would not be happening:
-Peter Williams
-David Pickens
-Héctor García Álvarez
-Bruno Pires Marinho
+.SH FILES
+.BR ~/.balsarc
+Balsa's preferences file.
 
+.SH SEE ALSO
+.BR mailcap (5)
+.BR metamail (1)
+.BR sendmail (8)
+
+.SH COPYRIGHT
+Copyright \(co 1997-2000 Stuart Parmenter and Jay Painter
+
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted,
+provided that the above copyright notice appear in all copies and that
+both that copyright notice and this permission notice appear in
+supporting documentation. 

@@ -15,7 +15,7 @@ dnl ############################################################################
 BALSA_MAJOR=0
 BALSA_REVISION=8
 BALSA_PATCHLEVEL=0
-BALSA_RELEASE="pre1"
+BALSA_RELEASE=
 
 dnl It's okay to set BALSA_RELEASE= ; this handles it
 

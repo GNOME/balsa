@@ -1,18 +1,18 @@
-Balsa E-Mail Client 0.8.0-pre1
+Balsa E-Mail Client 0.8.0
 
-Copyright (C) 1997-1998 Jay Painter and Stuart Parmenter
+Copyright (C) 1997-2000 Jay Painter, Stuart Parmenter and others
 See 'COPYING' for licence information.
+See 'AUTHORS' for a list of contributors
 
 Authors:
-  * See AUTHORS
+	See AUTHORS
 
 Website:
-  * http://www.balsa.net/
+	http://www.balsa.net/
 
 Description:
-  * Balsa is an e-mail reader.  This client is part of the GNOME
-    desktop environment.  It supports local mailboxes, POP3 and
-    IMAP.
+ 	Balsa is an e-mail reader.  This client is part of the GNOME
+desktop environment.  It supports local mailboxes, POP3 and IMAP.
 
 Configuration:
 	Balsa has a lot of options to its configure script; you
@@ -21,7 +21,8 @@ complete descriptions are here.
 
 --enable-all
 	Will turn on some features that are less than stable,
-or unfinsished, such as filtering.
+or unfinsished, such as filtering and spell-checking. This
+is really use-at-your-own-risk.
 
 --enable-info
 	Enable an information pane displaying the status of
@@ -64,3 +65,6 @@ Mailbox locking:
 use fcntl (although it can be enabled) since this locking method is
 very fragile and often not portable (see for example
 http://www.washington.edu/pine/tech-notes/low-level.html#locking).
+
+Reporting Bugs:
+	See http://www.balsa.net/bugs.html for instructions.

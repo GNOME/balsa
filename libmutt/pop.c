@@ -90,11 +90,12 @@ void mutt_fetchPopMail (void)
   char msgbuf[SHORT_STRING];
 #ifdef BALSA_USE_THREADS
   MailThreadMessage *threadmsg;
-  char uid[80], last_uid[80];
   char threadbuf[160];
 #endif
-  int s, i, last = 0, msgs, bytes, err = 0;
+  char uid[80], last_uid[80];
+  int s, i, last = 0, tmp, total, msgs, bytes, err = 0;
   int num_bytes, tot_bytes;
+  int first_msg;
 
   CONTEXT ctx;
   MESSAGE *msg = NULL;
@@ -204,32 +205,92 @@ void mutt_fetchPopMail (void)
   if (mx_open_mailbox (NONULL(Spoolfile), M_APPEND, &ctx) == NULL)
     goto finish;
 
-  /* only get unread messages */
-  if(option(OPTPOPLAST))
-  {
-    write (s, "last\r\n", 6);
-    if (getLine (s, buffer, sizeof (buffer)) == -1)
-      goto fail;
-    
-    if (mutt_strncmp (buffer, "+OK", 3) == 0)
-      sscanf (buffer, "+OK %d", &last);
-    else
-      /* ignore an error here and assume all messages are new */
-      last = 0;
-  }
-  
-  snprintf (msgbuf, sizeof (msgbuf),
-	    msgs > 1 ? "Reading %d new message (%d bytes)..." :
-		    "Reading %d new messages (%d bytes)...", msgs - last, bytes);
-  mutt_message (msgbuf);
+ first_msg = 1;
 
-  for (i = last + 1 ; i <= msgs ; i++)
+
+/*  
+ *  If Messages are left on the server, be sure that we don't retrieve
+ *  them a second time.  Do this by checking Unique IDs backward from the
+ *  last message, until a previously downloaded message is found.
+ */
+ 
+ if ( !option (OPTPOPDELETE) )
+ {
+
+  for( i = msgs; i > 0 ; i--) 
+  {
+  	snprintf( buffer, sizeof(buffer), "uidl %d\r\n", i);
+  	write( s, buffer, strlen(buffer) );
+
+  	getLine (s, buffer, sizeof (buffer));
+  	
+  	if (strncmp (buffer, "+OK", 3) != 0)
+  	{
+  		mutt_remove_trailing_ws( buffer);
+  		mutt_error (buffer);
+  		goto finish; 
+          /* I'm following the convention of libmutt, not my coding style */
+  	}
+  	sscanf( buffer, "+OK %d %s", &tmp, uid );
+
+	if( i == msgs )  
+	{
+	   strcpy( last_uid, uid ); // save uid of the last message for exit
+	   if( PopUID[0] == 0 )
+	     break;  /* no previous UID set */
+	 }
+
+    if( *PopUID && strcmp( uid, PopUID ) == 0 )  
+	{
+	  /* 
+	   * this message seen, so start w/ next in queue           *
+	   * This will be larger than 'msgs' if no new messages     *
+	   * forcing the for loop below to skip retrieving messages *
+	   */
+	    
+      first_msg = i + 1; 
+      break;
+    }
+
+   }
+  } 
+    	 
+
+  total = msgs - first_msg + 1; /* will be used for display later */
+ 
+
+  /*  Check for the total amount of bytes mail to be received */
+  tot_bytes=0;
+  for (i = first_msg ; i <= msgs ; i++)
+  {
+    snprintf(buffer, sizeof(buffer), "list %d\r\n", i);
+    write (s, buffer, strlen(buffer));
+    if ( getLine (s, buffer, sizeof(buffer)) == -1) 
+    {
+      mx_fastclose_mailbox (&ctx);
+      goto fail;
+    }
+    
+    if (sscanf (buffer,"+OK %d %d",&i,&num_bytes) != 2) 
+    {
+      tot_bytes=-1;
+      break;
+    }
+    tot_bytes += num_bytes;
+  }
+
+
+  num_bytes=0;  
+  for (i = first_msg ; i <= msgs ; i++)
   {
     snprintf (buffer, sizeof(buffer), "retr %d\r\n", i);
+    write (s, buffer, strlen (buffer));
+
+    sprintf( threadbuf, "Retrieving Message %d of %d", 
+	     i - first_msg + 1, total );
 #ifdef BALSA_USE_THREADS
     MSGMAILTHREAD( threadmsg, MSGMAILTHREAD_MSGINFO, threadbuf,0,0 );
 #endif
-    write (s, buffer, mutt_strlen (buffer));
 
     if (getLine (s, buffer, sizeof (buffer)) == -1)
     {
@@ -262,10 +323,11 @@ void mutt_fetchPopMail (void)
 	err = 1;
 	break;
       }
+      
+      sprintf( threadbuf,"Received %d bytes of %d",num_bytes,tot_bytes);
 #ifdef BALSA_USE_THREADS
       MSGMAILTHREAD(threadmsg, MSGMAILTHREAD_PROGRESS, threadbuf, num_bytes,tot_bytes); 
 #endif
-
       /* check to see if we got a full line */
       if (buffer[chunk-2] == '\r' && buffer[chunk-1] == '\n')
       {
@@ -274,6 +336,8 @@ void mutt_fetchPopMail (void)
 	  /* end of message */
 	  break;
 	}
+
+	num_bytes += chunk;
 
 	/* change CRLF to just LF */
 	buffer[chunk-2] = '\n';
@@ -346,6 +410,7 @@ finish:
   write (s, "quit\r\n", 6);
   getLine (s, buffer, sizeof (buffer)); /* snarf the response */
   close (s);
+  strcpy( PopUID, last_uid );
   return;
 
   /* not reached */

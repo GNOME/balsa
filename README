@@ -1,28 +1,17 @@
 Balsa E-Mail Client 0.3.5
+
 Copyright (C) 1997-1998 Jay Painter and Stuart Parmenter
 See 'COPYING' for licence information.
 
-Jay Painter      -- jpaint@serv.net   -- jpaint@gimp.org
-Stuart Parmenter -- pavlov@innerx.net -- pavlov@gimp.org
-http://www.pavlov.net/balsa/
+Authors:
+  * Stuart Parmenter <pavlov@pavlov.net>
+  * Jay Painter      <jpaint@serv.net>
 
-BUILD INSTRUCTIONS:
+Website:
+  * http://www.balsa.net/
 
-******************************
-****** STEPS TO COMPILE ******
-******************************
+Description:
+  * Balsa is a e-mail reader.  This client is part of the GNOME
+    desktop environment.  It supports local mailboxes, POP3 and
+    IMAP.
 
-STEP 1:
-
-# ./autogen.sh
-# make
-
-******************************
-******************************
-******************************
-
-FEATURES:
-  * Lots and lots! :)
-
-That's all for now,
-Stuart

@@ -3,6 +3,11 @@ TODO LIST:
  * Look into recursing directories upon local mail reading.
    This this should create submenus under the mailbox ctree.
 
+   * Update (07/27/98)
+     It now does recursion, but we will need to complete
+     gforest to replace the glist that the mailboxes are
+     currently stored in.
+
  * Make an inbox which all external mail sources route mail
    through, which filters then move around as needed.  It
    needs to be possible to set a default folder for external

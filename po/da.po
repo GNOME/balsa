@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.5\n"
 "POT-Creation-Date: 2000-03-05 21:22+0100\n"
-"PO-Revision-Date: 2000-03-05 01:21+01:00\n"
+"PO-Revision-Date: 2000-03-06 04:48+01:00\n"
 "Last-Translator: Birger Langkjer <birger.langkjer@image.dk>\n"
 "Language-Team: Danish <sslug-locale@sslug.dk>\n"
 "MIME-Version: 1.0\n"
@@ -1221,7 +1221,7 @@ msgstr "du"
 #: src/sendmsg-window.c:712
 #, c-format
 msgid "On %s %s wrote:\n"
-msgstr "Den %s skrev %s:\n"
+msgstr "En %s skrev %s:\n"
 
 #: src/sendmsg-window.c:714
 #, c-format

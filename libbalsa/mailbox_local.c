@@ -213,7 +213,9 @@ libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 	    i = rename(cur_path, path);
     } else {
 	if(LIBBALSA_IS_MAILBOX_MAILDIR(mailbox))
-	    i = libbalsa_mailbox_maildir_create(path, TRUE);
+	    i = libbalsa_mailbox_maildir_create(path, TRUE,
+                                                LIBBALSA_MAILBOX_MAILDIR
+						(mailbox));
 	else if(LIBBALSA_IS_MAILBOX_MH(mailbox))
 	    i = libbalsa_mailbox_mh_create(path, TRUE);
 	else if(LIBBALSA_IS_MAILBOX_MBOX(mailbox))

@@ -167,8 +167,12 @@ libbalsa_mailbox_maildir_init(LibBalsaMailboxMaildir * mailbox)
 {
 }
 
+static void lbm_maildir_set_subdirs(LibBalsaMailboxMaildir * mdir,
+                                    const gchar * path);
+
 gint
-libbalsa_mailbox_maildir_create(const gchar * path, gboolean create)
+libbalsa_mailbox_maildir_create(const gchar * path, gboolean create,
+                                LibBalsaMailboxMaildir * mdir)
 {
     gint exists;
     GType magic_type;
@@ -227,6 +231,7 @@ libbalsa_mailbox_maildir_create(const gchar * path, gboolean create)
 	} else 
 	    return(-1);
     }
+    lbm_maildir_set_subdirs(mdir, path);
     return(0);
 }
 
@@ -251,13 +256,11 @@ libbalsa_mailbox_maildir_new(const gchar * path, gboolean create)
     LIBBALSA_MAILBOX(mailbox)->url = g_strconcat("file://", path, NULL);
 
 
-    if(libbalsa_mailbox_maildir_create(path, create) < 0) {
+    mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
+    if(libbalsa_mailbox_maildir_create(path, create, mdir) < 0) {
 	g_object_unref(G_OBJECT(mailbox));
 	return NULL;
     }
-
-    mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
-    lbm_maildir_set_subdirs(mdir, path);
 
     return G_OBJECT(mailbox);
 }

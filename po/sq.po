@@ -1083,9 +1083,10 @@ msgstr ""
 msgid "From:"
 msgstr "Nga:"
 
+#. GRUT modified this item
 #: libbalsa/send.c:855 src/balsa-index.c:318
 msgid "From"
-msgstr ""
+msgstr "Nga"
 
 #. GRUT modified this item
 #: libbalsa/send.c:863 src/balsa-message.c:1256 src/print.c:371

@@ -72,6 +72,9 @@ expand_alias_find_match(emailData *addy, gboolean fastp)
     gchar *partial_prefix;
     gchar *str;
     gchar *input;
+#ifdef CASE_INSENSITIVE_NAME
+    gchar *string_n;
+#endif
     gint tab;
     LibBalsaAddressBook* ab;
 
@@ -86,7 +89,9 @@ expand_alias_find_match(emailData *addy, gboolean fastp)
     }
     
 #ifdef CASE_INSENSITIVE_NAME
-    str = g_ascii_strup(input, -1);
+    string_n = g_utf8_normalize(input, -1, G_NORMALIZE_ALL);
+    str = g_utf8_casefold(string_n, -1);
+    g_free(string_n);
 #else
     str = g_strdup(input);
 #endif

@@ -1,5 +1,6 @@
-2004-07-29 09:40  PeterB
+2004-07-29 11:03  PeterB
 
+	* src/balsa-message.c: fetch all headers, all the time.
 	* libbalsa/: message.c, send.c: remove calls to
 	libbalsa_mailbox_check--now handled by mailbox.c
 	* libbalsa/mailbox.c: signal mailbox changed only when

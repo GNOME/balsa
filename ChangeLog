@@ -1,3 +1,10 @@
+2005-04-01 09:27  PeterB
+
+	* src/balsa-message.c, src/print.c, libbalsa/body.c,
+	libbalsa/html.c, libbalsa/html.h: move charset conversion for html
+	parts to libbalsa/html.c, as it's handled differently by the two
+	widgets.
+
 2005-03-31 19:58  PeterB
 
 	* src/sendmsg-window.c: remember folder when including file in

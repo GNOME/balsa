@@ -100,8 +100,9 @@ static void mailbox_close_child (GtkWidget * widget, gpointer data);
 static void mailbox_commit_changes (GtkWidget * widget, gpointer data);
 static void about_box_destroy_cb (void);
 
-
 static void set_icon (GnomeApp * app);
+
+static void notebook_size_alloc_cb( GtkWidget *notebook, GtkAllocation *alloc );
 
 static GnomeUIInfo file_menu[] =
 {
@@ -408,6 +409,8 @@ balsa_window_new ()
   hpaned = gtk_hpaned_new();
   window->notebook = gtk_notebook_new();
   gtk_notebook_set_show_border(GTK_NOTEBOOK(window->notebook), FALSE);
+  gtk_signal_connect( GTK_OBJECT(window->notebook), "size_allocate", 
+		      GTK_SIGNAL_FUNC(notebook_size_alloc_cb), NULL );
   /* this call will set window->preview */
   preview = balsa_window_create_preview_pane(window);
 
@@ -422,6 +425,8 @@ balsa_window_new ()
 
   gtk_paned_pack1(GTK_PANED(vpaned), window->notebook, TRUE, TRUE);
   gtk_paned_pack2(GTK_PANED(vpaned), preview, TRUE, TRUE);
+  /*PKGW: do it this way, without the usizes.*/
+  gtk_paned_set_position( GTK_PANED(vpaned), balsa_app.notebook_height );
 
   gtk_widget_show(vpaned);
   gtk_widget_show(hpaned);
@@ -985,5 +990,8 @@ set_icon (GnomeApp * app)
   gdk_imlib_destroy_image (im);
 }
 
-
-
+/* PKGW: remember when they change the position of the vpaned. */
+static void notebook_size_alloc_cb( GtkWidget *notebook, GtkAllocation *alloc )
+{
+    balsa_app.notebook_height = alloc->height;
+}

@@ -270,7 +270,7 @@ mblist_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer data)
 /*PKGW*/
 static void size_allocate_cb( GtkWidget *widget, GtkAllocation *alloc )
 {
-    printf( "size_allocate_cb()\n" );
+/*    printf( "size_allocate_cb()\n" ); */
     balsa_app.mblist_width = alloc->width;
 }
 

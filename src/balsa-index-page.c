@@ -375,10 +375,8 @@ create_menu (BalsaIndex * bindex)
 		      (GtkSignalFunc) transfer_messages_cb,
 		      (gpointer) bindex);
 
-  /* PKGW TEST: what happens if we do this? No longer way too wide?
-   * gtk_widget_set_usize (GTK_WIDGET (bmbl), balsa_app.mblist_width, -1);
-   */
-
+  gtk_widget_set_usize (GTK_WIDGET (bmbl), balsa_app.mblist_width, -1);
+  
   gtk_container_add (GTK_CONTAINER (smenuitem), bmbl);
   gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (bmbl);

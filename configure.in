@@ -87,8 +87,9 @@ ORB_CFLAGS="$ORBIT_CFLAGS"
 AC_SUBST(ORB_LIBS)
 AC_SUBST(ORB_CFLAGS)
 
-
-
+dnl PKGW: where to install pixmaps
+gnomedatadir=`$GNOME_CONFIG --datadir`
+AC_SUBST(gnomedatadir)
 
 dnl Automake @VARIABLE@ exports.
 AC_SUBST(BALSA_MAJOR)

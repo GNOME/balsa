@@ -1,3 +1,22 @@
+1999-11-15  Peter Williams  <peter@wgwill.ne.mediaone.net>
+
+	* src/balsa-index-page.c (create_menu): Fixed size
+	of Transfer mblist; now that balsa_app.mblist_width
+	means something, we use it for the usize.
+
+	* src/sendmsg-window.c (add_attachment): Clean up
+	attachment code a little bit.
+
+	* configure.in, images/Makefile.am: Fixed to install pixmaps
+	in the correct location.
+
+	* src/main-window.c (balsa_window_new): Added callback
+	to record changes in 'notebook_height' and set the
+	default position.
+
+	* src/balsa-app.h, src/save-restore.c (config_global_load):
+	Changed from deprecated 'mblist_height' to shiny new 'notebook_height'.
+
 1999-11-14  Peter Williams  <peter@wgwill.ne.mediaone.net>
 
 	* src/main-window.c (balsa_window_new), src/balsa-index-page.c,

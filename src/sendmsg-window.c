@@ -177,14 +177,27 @@ add_attachment (GnomeIconList * iconlist, char *filename)
 {
   /* Why use unconditional? */ 
   gchar *pix = gnome_pixmap_file ("balsa/attachment.png");
-  
-  if (pix && check_if_regular_file(pix)) {
+
+  if( !check_if_regular_file( filename ) ) {
+      /*c_i_r_f() will pop up an error dialog for us, so we need do nothing.*/
+      return;
+  }
+
+  if( pix && check_if_regular_file( pix ) ) {
     gint pos;
     pos = gnome_icon_list_append (
 				 iconlist,
 				 pix,
 				 g_basename (filename));
     gnome_icon_list_set_icon_data (iconlist, pos, filename);
+  } else {
+      /*PKGW*/
+      GtkWidget *box = gnome_message_box_new( _("The attachment pixmap (balsa/attachment.png) cannot be found.\n"
+						"Sadly, this means you cannot attach any files.\n"), 
+					      GNOME_MESSAGE_BOX_ERROR, _("OK"), NULL );
+      gtk_window_set_modal( GTK_WINDOW( box ), TRUE );
+      gnome_dialog_run( GNOME_DIALOG( box ) );
+      gtk_widget_destroy( GTK_WIDGET( box ) );
   }
 }
 
@@ -222,8 +235,7 @@ attach_dialog_ok (GtkWidget * widget, gpointer data)
   iconlist = GNOME_ICON_LIST (gtk_object_get_user_data (GTK_OBJECT (fs)));
 
   filename = g_strdup (gtk_file_selection_get_filename (fs));
-  if (check_if_regular_file (filename))
-    add_attachment (iconlist, filename);
+  add_attachment (iconlist, filename);
 
   /* FIXME */
   /* g_free(filename); */
@@ -880,10 +892,13 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   {				/* handle attachments */
     gint i;
     Body *abody;
+
     for (i = 0; i < GNOME_ICON_LIST (bsmsg->attachments)->icons; i++)
       {
 	abody = body_new ();
-	abody->filename = g_strdup ((gchar *) gnome_icon_list_get_icon_data (GNOME_ICON_LIST (bsmsg->attachments), i));
+	/* PKGW: This used to be g_strdup'ed. However, the original pointer was strduped and never freed, so
+	   we'll take it. */
+	abody->filename = (gchar *) gnome_icon_list_get_icon_data (GNOME_ICON_LIST (bsmsg->attachments), i);
 	message->body_list = g_list_append (message->body_list, abody);
       }
   }
@@ -967,7 +982,8 @@ postpone_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
     for (i = 0; i < GNOME_ICON_LIST (bsmsg->attachments)->icons; i++)
       {
 	abody = body_new ();
-	abody->filename = g_strdup ((gchar *) gnome_icon_list_get_icon_data (GNOME_ICON_LIST (bsmsg->attachments), i));
+	/* PKGW: see above about why this isn't strduped. */
+	abody->filename = (gchar *) gnome_icon_list_get_icon_data (GNOME_ICON_LIST (bsmsg->attachments), i);
 	message->body_list = g_list_append (message->body_list, abody);
       }
   }

@@ -79,7 +79,9 @@ extern struct BalsaApplication
   gint mw_width;
   gint mw_height;
   gint mblist_width;
-  gint mblist_height;
+/*  gint mblist_height; PKGW: unused */
+    gint notebook_height; /* PKGW: used :-) */
+
 #ifdef BALSA_SHOW_INFO
   gboolean mblist_show_mb_content_info;
 #endif

@@ -699,14 +699,14 @@ config_global_load (void)
   if (balsa_app.mblist_width < 100)
       balsa_app.mblist_width = 170;
 
-  if ((field = pl_dict_get_str (globals, "MailboxListHeight")) == NULL)
-    balsa_app.mblist_height = 170;
+  if ((field = pl_dict_get_str (globals, "NotebookHeight")) == NULL)
+    balsa_app.notebook_height = 170;
   else
-    balsa_app.mblist_height = atoi (field);
+    balsa_app.notebook_height = atoi (field);
   /* FIXME this can be removed later */
   /* PKGW see above */
-  if (balsa_app.mblist_height < 100)
-      balsa_app.mblist_height = 200;
+  if (balsa_app.notebook_height < 100)
+      balsa_app.notebook_height = 200;
 
 
 
@@ -797,8 +797,8 @@ config_global_save (void)
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.mblist_width);
     pl_dict_add_str_str (globals, "MailboxListWidth", tmp);
 
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.mblist_height);
-    pl_dict_add_str_str (globals, "MailboxListHeight", tmp);
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.notebook_height);
+    pl_dict_add_str_str (globals, "NotebookHeight", tmp);
 
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.encoding_style);
     pl_dict_add_str_str (globals, "EncodingStyle", tmp);

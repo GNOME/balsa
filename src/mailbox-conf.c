@@ -220,7 +220,7 @@ mailbox_conf_delete (Mailbox * mailbox)
 
 
 void
-mailbox_conf_new (Mailbox * mailbox, gint add_mbox)
+mailbox_conf_new (Mailbox * mailbox, gint add_mbox, MailboxType type)
 {
   GtkWidget *label;
 
@@ -307,6 +307,23 @@ mailbox_conf_new (Mailbox * mailbox, gint add_mbox)
 		      (GtkSignalFunc) mailbox_conf_close, FALSE);
 
   mailbox_conf_set_values (mcw->mailbox);
+
+  switch (type)
+    {
+    case MAILBOX_MAILDIR:
+    case MAILBOX_MBOX:
+    case MAILBOX_MH:
+      gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_LOCAL);
+      break;
+    case MAILBOX_POP3:
+      gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_POP3);
+      break;
+    case MAILBOX_IMAP:
+      gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_IMAP);
+      break;
+    default:
+      break;
+    }
 
   gtk_widget_show_all (mcw->window);
 }
@@ -514,10 +531,14 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 	g_warning ("mailbox_conf_close: Invalid mcw->next_page value\n");
 	break;
       }
-  if (mailbox->type == MAILBOX_POP3)
-    update_pop3_servers ();
-  else
-    mblist_redraw ();
+
+  if (mailbox)
+    {
+      if (mailbox->type == MAILBOX_POP3)
+	update_pop3_servers ();
+      else
+	mblist_redraw ();
+    }
 
   /* close the new mailbox window */
   gtk_widget_destroy (mcw->window);

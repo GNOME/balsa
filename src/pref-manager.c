@@ -445,7 +445,7 @@ create_mailservers_page ()
   gtk_container_add (GTK_CONTAINER (frame), hbox);
 
   label = gtk_label_new (_ ("Local mail directory:"));
-  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 2);
+  gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, TRUE, 2);
   mail_dir = gnome_file_entry_new ("LocalMailDir", "LocalMailDir");
   pui->mail_directory = gnome_file_entry_gtk_entry (GNOME_FILE_ENTRY (mail_dir));
   gtk_box_pack_start (GTK_BOX (hbox), mail_dir, TRUE, TRUE, 2);
@@ -568,13 +568,13 @@ pop3_edit_cb (GtkWidget * widget, gpointer data)
   if (!mailbox)
     return;
 
-  mailbox_conf_new (mailbox, FALSE);
+  mailbox_conf_new (mailbox, FALSE, MAILBOX_UNKNOWN);
 }
 
 static void
 pop3_add_cb (GtkWidget * widget, gpointer data)
 {
-  mailbox_conf_new (NULL, FALSE);
+  mailbox_conf_new (NULL, FALSE, MAILBOX_POP3);
 }
 
 static void

@@ -508,13 +508,13 @@ button_event_press_cb (GtkCList * clist, GdkEventButton * event, gpointer data)
 static void
 mb_conf_cb (GtkWidget * widget, Mailbox * mailbox)
 {
-  mailbox_conf_new (mailbox, FALSE);
+  mailbox_conf_new (mailbox, FALSE, MAILBOX_UNKNOWN);
 }
 
 static void
 mb_add_cb (GtkWidget * widget, Mailbox * mailbox)
 {
-  mailbox_conf_new (mailbox, TRUE);
+  mailbox_conf_new (mailbox, TRUE, MAILBOX_UNKNOWN);
 }
 
 static void

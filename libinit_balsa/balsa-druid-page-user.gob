@@ -51,8 +51,8 @@ class Balsa:Druid:Page:User from Balsa:Druid:Page {
 	{ 
 		GtkObject *self = GTK_OBJECT( GET_NEW );
 		(BALSA_DRUID_PAGE( self ))->druid = GNOME_DRUID( druid );
-		if( BALSA_DRUID_PAGE_CLASS(self)->construct )
-			BALSA_DRUID_PAGE_CLASS(self)->construct( BALSA_DRUID_PAGE( self ) );
+		if( BALSA_DRUID_PAGE_CLASS(parent_class)->construct )
+			BALSA_DRUID_PAGE_CLASS(parent_class)->construct( BALSA_DRUID_PAGE( self ) );
 		return self;
 	}
 

@@ -1,3 +1,8 @@
+2000-06-10  Peter Williams  <peter@beta.newton.cx>
+
+	* libinit_balsa/balsa-druid-page-{user,finish,error}.gob:
+	Fix nasty crash-causing typo (can't class an object to its class....)
+
 2000-06-10  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox.[hc]: handling IMAP mboxes.

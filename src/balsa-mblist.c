@@ -234,6 +234,8 @@ balsa_mblist_redraw (BalsaMBList * bmbl)
 
   ctree = GTK_CTREE (bmbl);
 
+  gtk_clist_clear (GTK_CLIST (ctree));
+
   gtk_clist_freeze (GTK_CLIST (ctree));
 
   /* inbox */

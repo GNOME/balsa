@@ -318,8 +318,7 @@ fetch_single_msg(int s, FILE *msg, int msgno, int first_msg, int msgs,
 #ifdef BALSA_USE_THREADS
     char threadbuf[160];
     
-    sprintf(threadbuf, "Retrieving Message %d of %d", 
-	    msgno, msgs);
+    sprintf(threadbuf, _("Retrieving Message %d of %d"), msgno, msgs);
     prog_cb ( threadbuf, 0, 0);
 #endif
 
@@ -332,7 +331,7 @@ fetch_single_msg(int s, FILE *msg, int msgno, int first_msg, int msgs,
 	if ((chunk = getLine (s, buffer, sizeof (buffer))) == -1) 
 	    return POP_CONN_ERR;
 #ifdef BALSA_USE_THREADS
-	sprintf(threadbuf,"Received %d bytes of %d", *num_bytes, tot_bytes);
+	sprintf(threadbuf,_("Received %d bytes of %d"), *num_bytes, tot_bytes);
 	prog_cb (threadbuf, *num_bytes, tot_bytes);
 #endif
 	/* check to see if we got a full line */
@@ -522,9 +521,10 @@ fetch_pop_mail (const gchar *pop_host, const gchar *pop_user,
 	/* exit gracefully */
 	write (s, "quit\r\n", 6);
 	getLine (s, buffer, sizeof (buffer)); /* snarf the response */
-	strcpy(last_uid, uid);
+	strcpy(last_uid, uid);/* FIXME: overflow error on hideous reply? */
     }
     close (s);
+
     return status;
 }
 
@@ -540,12 +540,11 @@ libbalsa_fetch_pop_mail_direct (LibBalsaMailboxPop3* mailbox,
     s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
     return fetch_pop_mail(s->host, s->user,s->passwd, s->port,
 			  mailbox->use_apop, mailbox->delete_from_server,
-			  mailbox->last_popped_uid, prog_cb,
-			  fetch_direct, spoolfile);
+			  uid, prog_cb, fetch_direct, spoolfile);
 }
 PopStatus
 libbalsa_fetch_pop_mail_filter (LibBalsaMailboxPop3* mailbox, 
-				ProgressCallback prog_cb, char* uid)
+				ProgressCallback prog_cb, gchar* uid)
 {
     LibBalsaServer *s;
     g_return_val_if_fail(mailbox, POP_OK);

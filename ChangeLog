@@ -1,3 +1,11 @@
+2000-11-14  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox_pop3.c: pass last_uid to libbalsa_fetch_pop()
+	* libbalsa/pop3.c: use uid.
+	* libbalsa/send.c: be more verbose on relaying error.
+	* src/sendmsg-window.[ch]: fix #31938:
+	Show attachments when one is added to an outgoing message.
+	
 2000-11-13  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/Makefile.am: plug in new pop3.[hc] files

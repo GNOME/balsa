@@ -234,12 +234,11 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     MSGMAILTHREAD(threadmsg, MSGMAILTHREAD_SOURCE, msgbuf);
     g_free(msgbuf);
 #endif
-    
-    if (LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid == NULL)
-	uid[0] = 0;
-    else
-	strcpy(uid, LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid);
-    
+
+    if(m->last_popped_uid) 
+	strncpy(uid, m->last_popped_uid, sizeof(uid));
+    else uid[0] = '\0';
+
     status =  LIBBALSA_MAILBOX_POP3(mailbox)->filter 
 	? libbalsa_fetch_pop_mail_filter (m, progress_cb, uid)
 	: libbalsa_fetch_pop_mail_direct (m, Spoolfile, progress_cb, uid);
@@ -268,8 +267,8 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 #else
 	config_mailbox_update(mailbox);
 #endif
-    }
-    
+    } 
+
     /* Regrab the gdk lock before leaving */
     gdk_threads_enter();
 }

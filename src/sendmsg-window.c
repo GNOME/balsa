@@ -449,23 +449,9 @@ delete_event_cb(GtkWidget * widget, GdkEvent * e, gpointer data)
 static void
 balsa_sendmsg_destroy(BalsaSendmsg * bsm)
 {
-    int i;
-    gchar newStr[ELEMENTS(headerDescs) * 20];	/* assumes that longest header ID
-						   has no more than 19 characters */
-
     g_assert(bsm != NULL);
     g_assert(ELEMENTS(headerDescs) == ELEMENTS(bsm->view_checkitems));
 
-    newStr[0] = '\0';
-
-    for (i = 0; i < ELEMENTS(headerDescs); i++)
-	if (GTK_CHECK_MENU_ITEM(bsm->view_checkitems[i])->active) {
-	    strcat(newStr, headerDescs[i].name);
-	    strcat(newStr, " ");
-	}
-    g_free(balsa_app.compose_headers);
-
-    balsa_app.compose_headers = g_strdup(newStr);
 
     if (bsm->orig_message) {
 	if (bsm->orig_message->mailbox)
@@ -647,17 +633,23 @@ check_if_regular_file(const gchar * filename)
     return result;
 }
 
+/* attach_dialog_ok:
+   processes the attachment file selection. Adds them to the list,
+   showing the attachment list, if was hidden.
+*/
 static void
 attach_dialog_ok(GtkWidget * widget, gpointer data)
 {
     GtkFileSelection *fs;
     GnomeIconList *iconlist;
+    BalsaSendmsg *bsmsg;
     gchar *filename, *dir, *p, *sel_file;
     GList *node;
 
     fs = GTK_FILE_SELECTION(data);
-    iconlist = GNOME_ICON_LIST(gtk_object_get_user_data(GTK_OBJECT(fs)));
+    bsmsg = gtk_object_get_user_data(GTK_OBJECT(fs));
 
+    iconlist = GNOME_ICON_LIST(bsmsg->attachments[1]);
     sel_file = g_strdup(gtk_file_selection_get_filename(fs));
     dir = g_strdup(sel_file);
     p = strrchr(dir, '/');
@@ -675,6 +667,11 @@ attach_dialog_ok(GtkWidget * widget, gpointer data)
 	/* do not g_free(filename) - the add_attachment arg is not const */
 	/* g_free(filename); */
     }
+    
+    bsmsg->update_config = FALSE;
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
+	bsmsg->view_checkitems[MENU_TOGGLE_ATTACHMENTS_POS]), TRUE);
+    bsmsg->update_config = TRUE;
 
     gtk_widget_destroy(GTK_WIDGET(fs));
     if (balsa_app.attach_dir)
@@ -699,7 +696,7 @@ attach_clicked(GtkWidget * widget, gpointer data)
     iconlist = GNOME_ICON_LIST(bsm->attachments[1]);
 
     fsw = gtk_file_selection_new(_("Attach file"));
-    gtk_object_set_user_data(GTK_OBJECT(fsw), iconlist);
+    gtk_object_set_user_data(GTK_OBJECT(fsw), bsm);
 
     fs = GTK_FILE_SELECTION(fsw);
     gtk_clist_set_selection_mode(GTK_CLIST(fs->file_list),
@@ -741,8 +738,10 @@ attachments_add(GtkWidget * widget,
     gnome_uri_list_free_strings(names);
 
     /* show attachment list */
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->view_checkitems[MENU_TOGGLE_ATTACHMENTS_POS]), 
-				   TRUE);
+    bsmsg->update_config = FALSE;
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
+	bsmsg->view_checkitems[MENU_TOGGLE_ATTACHMENTS_POS]), TRUE);
+    bsmsg->update_config = TRUE;
 }
 
 /* to_add - e-mail (To, From, Cc, Bcc) field D&D callback */
@@ -1162,9 +1161,10 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     gint i;
 
     msg = g_malloc(sizeof(BalsaSendmsg));
-    msg->font = NULL;
-    msg->charset = NULL;
-    msg->locale = NULL;
+    msg->font     = NULL;
+    msg->charset  = NULL;
+    msg->locale   = NULL;
+    msg->update_config = FALSE;
 
     alias_load_addressbook();
 
@@ -1400,6 +1400,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     else
 	gtk_widget_grab_focus(msg->text);
 
+    msg->update_config = TRUE;
     return msg;
 }
 
@@ -1881,12 +1882,17 @@ check_readiness(GtkEditable * w, BalsaSendmsg * msg)
 	gtk_widget_set_sensitive(msg->ready_widgets[i], state);
 }
 
-/* toggle_entry auxiliary function for "header show/hide" toggle menu entries.
+/* toggle_entry:
+   auxiliary function for "header show/hide" toggle menu entries.
+   saves the show header configuration.
  */
 static gint
 toggle_entry(BalsaSendmsg * bmsg, GtkWidget * entry[], int pos, int cnt)
 {
+    int i;
     GtkWidget *parent;
+    gchar str[ELEMENTS(headerDescs) * 20]; /* assumes that longest header ID
+					      has no more than 19 chars   */
 
     if (GTK_CHECK_MENU_ITEM(bmsg->view_checkitems[pos])->active) {
 	while (cnt--)
@@ -1900,6 +1906,18 @@ toggle_entry(BalsaSendmsg * bmsg, GtkWidget * entry[], int pos, int cnt)
 	if (parent)
 	    gtk_paned_set_position(GTK_PANED(parent), -1);
     }
+
+    if(bmsg->update_config) { /* then save the config */
+	str[0] = '\0';
+	for (i = 0; i < ELEMENTS(headerDescs); i++)
+	    if (GTK_CHECK_MENU_ITEM(bmsg->view_checkitems[i])->active) {
+		strcat(str, headerDescs[i].name);
+		strcat(str, " ");
+	    }
+	g_free(balsa_app.compose_headers);
+	balsa_app.compose_headers = g_strdup(str);
+    }
+
     return TRUE;
 }
 
@@ -1979,15 +1997,14 @@ init_menus(BalsaSendmsg * msg)
 
     for (i = 0; i < ELEMENTS(headerDescs); i++) {
 	msg->view_checkitems[i] = view_menu[i].widget;
-	if (libbalsa_find_word
-	    (headerDescs[i].name, balsa_app.compose_headers)) {
+	if (libbalsa_find_word(headerDescs[i].name, 
+			       balsa_app.compose_headers)) {
 	    /* show... (well, it has already been shown). */
 	    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
 					   (view_menu[i].widget), TRUE);
 	} else {
 	    /* or hide... */
-	    GTK_SIGNAL_FUNC(view_menu[i].moreinfo) (view_menu[i].widget,
-						    msg);
+	    GTK_SIGNAL_FUNC(view_menu[i].moreinfo) (view_menu[i].widget, msg);
 	}
     }
 

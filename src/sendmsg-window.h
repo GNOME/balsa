@@ -59,6 +59,9 @@ extern "C" {
 	GtkWidget *ready_widgets[3];
 	GtkWidget *view_checkitems[VIEW_MENU_LENGTH];
 	GList *spell_check_disable_list;
+	gboolean update_config; /* is the window being set up or in normal  */
+	                        /* operation and user actions should update */
+	                        /* the config */
     };
 
     BalsaSendmsg *sendmsg_window_new(GtkWidget *, LibBalsaMessage *,

@@ -376,11 +376,14 @@ static guint balsa_send_message_real(LibBalsaMailbox* outbox) {
  */
 	if (i == -2) {
 #if 0
-	    MSGSENDTHREAD(threadmsg, MSGSENDTHREADERROR, 
-			  "SMTP protocol error. Cannot relay", NULL, NULL, 0);
+	    MSGSENDTHREAD(
+		threadmsg, MSGSENDTHREADERROR, 
+		_("SMTP protocol error. Cannot relay.\n"
+		  "Your message is left in Outbox."), NULL, NULL, 0);
 #else
 	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-				 "SMTP protocol error. Cannot relay.");
+				 _("SMTP protocol error. Cannot relay.\n"
+				   "Your message is left in Outbox."));
 #endif
 	}
     }

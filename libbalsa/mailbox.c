@@ -670,6 +670,9 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
     if (CLIENT_CONTEXT_CLOSED(mailbox))
 	return;
 
+    /* drop the lock while we do the grunt work */
+    gdk_threads_leave();
+
     LOCK_MAILBOX(mailbox);
     for (msgno = mailbox->messages; mailbox->new_messages > 0; msgno++) {
 	cur = CLIENT_CONTEXT(mailbox)->hdrs[msgno];
@@ -698,6 +701,9 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
         mailbox->messages++;
     }
     UNLOCK_MAILBOX(mailbox);
+
+    /* reaquire the lock, after releasing mailbox and before doing stuff */
+    gdk_threads_enter();
 
     if(messages!=NULL){
       gtk_signal_emit(GTK_OBJECT(mailbox),

@@ -1,3 +1,8 @@
+2002-03-26  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_load_messages): be more liberal 
+	with the thread lock
+
 2002-03-26  Pawel Salek <pawsa@theochem.kth.se>
 
 	* NEWS: release balsa-1.3.4

@@ -181,6 +181,7 @@ sort_t *mutt_get_sort_func (int method)
 
 void mutt_sort_headers (CONTEXT *ctx, int init)
 {
+#ifndef LIBMUTT
   int i;
   HEADER *h;
   THREAD *thread, *top;
@@ -206,7 +207,6 @@ void mutt_sort_headers (CONTEXT *ctx, int init)
   if (!ctx->quiet)
     mutt_message ("Sorting mailbox...");
 
-#ifndef LIBMUTT
   /* threads may be bogus, so clear the links */
   if (init)
     mutt_clear_threads (ctx);
@@ -217,7 +217,6 @@ void mutt_sort_headers (CONTEXT *ctx, int init)
       mutt_score_message (ctx, ctx->hdrs[i], 1);
     unset_option (OPTNEEDRESCORE);
   }
-#endif 
 
   if (option (OPTRESORTINIT))
   {
@@ -225,14 +224,11 @@ void mutt_sort_headers (CONTEXT *ctx, int init)
     init = 1;
   }
 
-#ifndef LIBMUTT
   if (init && ctx->tree)
     mutt_clear_threads (ctx);
-#endif
 
   if ((Sort & SORT_MASK) == SORT_THREADS)
   {
-#ifndef LIBMUTT
     AuxSort = NULL;
     /* if $sort_aux changed after the mailbox is sorted, then all the
        subthreads need to be resorted */
@@ -243,7 +239,6 @@ void mutt_sort_headers (CONTEXT *ctx, int init)
       unset_option (OPTSORTSUBTHREADS);
     }
     mutt_sort_threads (ctx, init);
-#endif 
   }
   else if ((sortfunc = mutt_get_sort_func (Sort)) == NULL ||
 	   (AuxSort = mutt_get_sort_func (SortAux)) == NULL)
@@ -267,12 +262,9 @@ void mutt_sort_headers (CONTEXT *ctx, int init)
       ctx->vcount++;
     }
     cur->msgno = i;
-#ifndef LIBMUTT
   mutt_cache_index_colors(ctx);
-#endif
   }
 
-#ifndef LIBMUTT
   /* re-collapse threads marked as collapsed */
   if ((Sort & SORT_MASK) == SORT_THREADS)
   {
@@ -289,8 +281,8 @@ void mutt_sort_headers (CONTEXT *ctx, int init)
     }
     mutt_set_virtual (ctx);
   }
-#endif
 
   if (!ctx->quiet)
     mutt_clear_error ();
+#endif
 }

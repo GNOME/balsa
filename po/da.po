@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.5\n"
 "POT-Creation-Date: 2000-03-02 21:13+0100\n"
-"PO-Revision-Date: 2000-03-02 22:11+01:00\n"
+"PO-Revision-Date: 2000-03-03 14:30+01:00\n"
 "Last-Translator: Birger Langkjer <birger.langkjer@image.dk>\n"
 "Language-Team: Danish <sslug-locale@sslug.dk>\n"
 "MIME-Version: 1.0\n"
@@ -464,7 +464,7 @@ msgstr "Brugernavn:"
 #. toggle for check
 #: src/mailbox-conf.c:967 src/main-window.c:300
 msgid "Check"
-msgstr "Tjek"
+msgstr "Hent"
 
 #. toggle for deletion from server
 #: src/mailbox-conf.c:975
@@ -613,7 +613,7 @@ msgstr "_Postkasser"
 
 #: src/main-window.c:300
 msgid "Check Email"
-msgstr "Se efter ny epost"
+msgstr "Hent ny epost"
 
 #: src/main-window.c:304
 msgid "Delete Message"
@@ -895,7 +895,7 @@ msgstr "Udgående"
 
 #: src/pref-manager.c:1079
 msgid "Checking"
-msgstr "Tjek"
+msgstr "Hentning af epost"
 
 #: src/pref-manager.c:1089
 msgid "Minutes"
@@ -1001,7 +1001,7 @@ msgstr "Indstillinger"
 
 #: src/pref-manager.c:1516
 msgid "Check mail upon startup"
-msgstr "Se efter ny post ved opstart"
+msgstr "Hent ny post ved opstart"
 
 #: src/print.c:95
 #, c-format

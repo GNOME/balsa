@@ -830,6 +830,7 @@ add_imap_entry(GNode*root, const char* fn, char delim)
     GNode* parent;
     BalsaMailboxNode* mbnode;
     const gchar *basename;
+    gchar* url;
 
     node = find_by_dir(root, fn);
     if (node != root)
@@ -840,16 +841,29 @@ add_imap_entry(GNode*root, const char* fn, char delim)
     g_free(parent_name);
 
     g_return_val_if_fail(parent, NULL);
-    mbnode = balsa_mailbox_node_new_imap_node(BALSA_MAILBOX_NODE
-					 (root->data)->server, fn);
 
-    basename = strrchr(fn, delim);
-    if(!basename) basename = fn;
-    else basename++;
-    mbnode->name = g_strdup(basename);
-    mbnode->parent = BALSA_MAILBOX_NODE(parent->data);
-    mbnode->subscribed = mbnode->parent->subscribed;
-    return g_node_append(parent, g_node_new(mbnode));
+    url = g_strdup_printf("imap://%s:%i/%s", 
+			  BALSA_MAILBOX_NODE(root->data)->server->host,
+			  BALSA_MAILBOX_NODE(root->data)->server->port,
+			  fn);
+    node = remove_special_mailbox_by_url(url);
+    g_free(url);
+    if(node != NULL) {
+	g_free(BALSA_MAILBOX_NODE(node->data)->dir);
+	BALSA_MAILBOX_NODE(node->data)->dir = g_strdup(fn);
+    } else {
+	mbnode = balsa_mailbox_node_new_imap_node(BALSA_MAILBOX_NODE
+						  (root->data)->server, fn);
+	basename = strrchr(fn, delim);
+	if(!basename) basename = fn;
+	else basename++;
+	mbnode->name = g_strdup(basename);
+	mbnode->parent = BALSA_MAILBOX_NODE(parent->data);
+	mbnode->subscribed = mbnode->parent->subscribed;
+	node = g_node_new(mbnode);
+    }
+
+    return g_node_append(parent, node);
 }
 
 /* add_imap_mailbox:
@@ -872,7 +886,6 @@ add_imap_mailbox(GNode*root, const char* fn, char delim)
     const gchar *basename;
     GNode *node;
     BalsaMailboxNode* mbnode;
-    gchar* url;
 
     basename = strrchr(fn, delim);
     if(!basename) basename = fn;
@@ -882,42 +895,27 @@ add_imap_mailbox(GNode*root, const char* fn, char delim)
 	    return NULL; 
     }
 
-    url = g_strdup_printf("imap://%s:%i/%s", 
-			  BALSA_MAILBOX_NODE(root->data)->server->host,
-			  BALSA_MAILBOX_NODE(root->data)->server->port,
-			  fn);
-
-    if( (node = remove_special_mailbox_by_url(url)) != NULL) {
-	gchar* parent_name = get_parent_folder_name(fn, delim);
-	GNode* parent = find_by_dir(root, parent_name);
-	g_free(parent_name);
-	g_free(BALSA_MAILBOX_NODE(node->data)->dir);
-	BALSA_MAILBOX_NODE(node->data)->dir = g_strdup(fn);
-	g_node_append(parent, node);
-    } else {
-	node = add_imap_entry(root, fn, delim);
-	mbnode = BALSA_MAILBOX_NODE(node->data);
-	if (LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox))
-	    /* it already has a mailbox */
-	    return node;
-	gtk_signal_connect(GTK_OBJECT(mbnode), "show-prop-dialog",
-			   folder_conf_imap_sub_node, NULL);
-	m = LIBBALSA_MAILBOX_IMAP(libbalsa_mailbox_imap_new());
-	libbalsa_mailbox_remote_set_server(
-	    LIBBALSA_MAILBOX_REMOTE(m), 
-	    BALSA_MAILBOX_NODE(root->data)->server);
-	m->path = g_strdup(fn);
-	libbalsa_mailbox_imap_update_url(m);
-	if(balsa_app.debug) 
-	    printf("add_imap_mailbox: add mbox of name %s (full path %s)\n", 
-		   basename, fn);
-	/* avoid allocating the name again: */
-	LIBBALSA_MAILBOX(m)->name = mbnode->name;
-	mbnode->name = NULL;
-	mbnode->mailbox = LIBBALSA_MAILBOX(m);
-    }
-    g_free(url);
-
+    node = add_imap_entry(root, fn, delim);
+    mbnode = BALSA_MAILBOX_NODE(node->data);
+    if (LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox))
+	/* it already has a mailbox */
+	return node;
+    gtk_signal_connect(GTK_OBJECT(mbnode), "show-prop-dialog",
+		       folder_conf_imap_sub_node, NULL);
+    m = LIBBALSA_MAILBOX_IMAP(libbalsa_mailbox_imap_new());
+    libbalsa_mailbox_remote_set_server(
+	LIBBALSA_MAILBOX_REMOTE(m), 
+	BALSA_MAILBOX_NODE(root->data)->server);
+    m->path = g_strdup(fn);
+    libbalsa_mailbox_imap_update_url(m);
+    if(balsa_app.debug) 
+	printf("add_imap_mailbox: add mbox of name %s (full path %s)\n", 
+	       basename, fn);
+    /* avoid allocating the name again: */
+    LIBBALSA_MAILBOX(m)->name = mbnode->name;
+    mbnode->name = NULL;
+    mbnode->mailbox = LIBBALSA_MAILBOX(m);
+    
     return node;
 }
 

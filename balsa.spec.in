@@ -2,10 +2,10 @@
 %define redhat 1
 %define mdk    0
 %if %redhat
-%define config_opts --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --mandir=%{_mandir} --libdir=%{_libdir} --bindir=%{_bindir} --includedir=%{_includedir} --datadir=%{_datadir} --enable-threads --disable-system-install --disable-more-warnings
+%define config_opts --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --mandir=%{_mandir} --libdir=%{_libdir} --bindir=%{_bindir} --includedir=%{_includedir} --datadir=%{_datadir} --enable-threads --disable-system-install --disable-more-warnings --enable-deprecated-pspell
 %endif
 %if %mdk || 1
-%define config_opts --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --mandir=%{_mandir} --libdir=%{_libdir} --bindir=%{_bindir} --includedir=%{_includedir} --datadir=%{_datadir} --enable-threads --disable-more-warnings --enable-gtkhtml --with-ssl
+%define config_opts --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --mandir=%{_mandir} --libdir=%{_libdir} --bindir=%{_bindir} --includedir=%{_includedir} --datadir=%{_datadir} --enable-threads --disable-more-warnings --enable-gtkhtml --with-ssl --enable-deprecated-pspell
 %endif
 
 Summary:   Balsa Mail Client
@@ -96,7 +96,7 @@ which scrollkeeper-update>/dev/null 2>&1 && scrollkeeper-update
 %{_bindir}/balsa
 %{_datadir}/applications/balsa.desktop
 %{_datadir}/pixmaps/gnome-balsa2.png
-%{_datadir}/gnome/help/balsa-manual/*
+%{_datadir}/gnome/help/balsa/*
 %{_datadir}/omf/balsa/*
 %{_datadir}/balsa/pixmaps/*
 %{_datadir}/sounds/balsa/*

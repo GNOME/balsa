@@ -230,7 +230,7 @@ create_choice_page(AddressBookConfig * abc)
      * I intend to add Pine support though...*/
 #if ENABLE_LDAP
     radio_button = gtk_radio_button_new_with_label
-	(gtk_radio_button_group(GTK_RADIO_BUTTON(radio_button)),
+	(gtk_radio_button_get_group(GTK_RADIO_BUTTON(radio_button)),
 	 _("LDAP Address Book"));
     gtk_box_pack_start(GTK_BOX(vbox), radio_button, FALSE, FALSE, 0);
     g_signal_connect(G_OBJECT(radio_button), "clicked",

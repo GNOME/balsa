@@ -340,11 +340,11 @@ lb_imap_server_cleanup(LibBalsaImapServer * imap_server)
         struct handle_info *info = list->data;
 
         if (info->last_used < idle_marker) {
-            if (imap_mbox_handle_noop(info->handle) != IMR_OK)
-                libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                                     _("Could not send \"%s\" to \"%s\""),
-                                     "NOOP",
-                                     LIBBALSA_SERVER(imap_server)->host);
+            /* ignore errors here - the point is to keep the
+               connection alive and if there is no connection, noop
+               will be, well, no-op. Other operations may possibly
+               reconnect. */
+            imap_mbox_handle_noop(info->handle);
         }
     }
 

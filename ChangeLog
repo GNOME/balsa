@@ -1,3 +1,10 @@
+2004-08-08  Pawel Salek
+
+	* libbalsa/imap-server.c: failed keep-alives are uninteresting.
+	* libbalsa/imap/imap-commands.c: re-select message correctly.
+	* src/Makefile.am: mark built sources correctly.
+	* src/main.c: fix periodic expunge code.
+
 2004-08-08  Carlos Morgado  <chbm gnome.org>
 
 	* src/main-window.c (show_about_box): update my email

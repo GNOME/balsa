@@ -260,8 +260,10 @@ imap_mbox_select(ImapMboxHandle* handle, const char *mbox,
   rc= imap_cmd_exec(handle, cmd);
   g_free(cmd);
   if(rc == IMR_OK) {
-    g_free(handle->mbox);
-    handle->mbox = g_strdup(mbox);
+    if(handle->mbox != mbox) { /* we do not "reselect" */
+      g_free(handle->mbox);
+      handle->mbox = g_strdup(mbox);
+    }
     handle->state = IMHS_SELECTED;
     if(readonly_mbox)
       *readonly_mbox = handle->readonly_mbox;

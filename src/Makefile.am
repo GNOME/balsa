@@ -66,6 +66,10 @@ balsa_IDL_OBJS    = Balsa-common.o Balsa-skels.o Balsa-stubs.o
 
 balsa_SOURCES = $(balsa_BASE_SRCLIST)
 
+# see http://sources.redhat.com/automake/dependencies.html
+BUILT_SOURCES = Balsa.h
+
+
 EXTRA_DIST = \
 	Balsa.idl
 

@@ -61,12 +61,12 @@
 #include <gpgme.h>
 #endif
 
-#ifdef BALSA_USE_THREADS
-#include "threads.h"
-
 /* we force expunge now and then so that mailboxes do not grow too
  * large. This is overriden by "do not expunge on close" setting. */
-#define EXPUNGE_PERIOD_HOURS 26
+#define EXPUNGE_UNUSED_MIN 120
+
+#ifdef BALSA_USE_THREADS
+#include "threads.h"
 
 /* Globals for Thread creation, messaging, pipe I/O */
 pthread_t get_mail_thread;
@@ -452,9 +452,11 @@ mbnode_expunge_func(GtkTreeModel *model, GtkTreePath *path,
     g_return_val_if_fail(mbnode, FALSE);
 
     gtk_tree_model_get(model, iter, 0, &mbnode, -1);
-    if (mbnode->mailbox && libbalsa_mailbox_is_open(mbnode->mailbox))
-        libbalsa_mailbox_sync_storage(mbnode->mailbox, TRUE);
-
+    if (mbnode->mailbox && libbalsa_mailbox_is_open(mbnode->mailbox)) {
+        time_t tm = time(NULL);
+        if(tm-mbnode->last_use > EXPUNGE_UNUSED_MIN*60)
+            libbalsa_mailbox_sync_storage(mbnode->mailbox, TRUE);
+    }
     g_object_unref(mbnode);
 
     return FALSE;
@@ -468,8 +470,8 @@ periodic_expunge_cb(void)
     if(!balsa_app.expunge_on_close) return TRUE;
 #endif
 
-    libbalsa_message(LIBBALSA_INFORMATION_MESSAGE,
-                     _("Compressing mail folders..."));
+    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+                         _("Compressing mail folders..."));
     /* make sure it is shown before we continue */
     gdk_threads_enter();
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
@@ -604,8 +606,7 @@ main(int argc, char *argv[])
 
 
     g_idle_add((GSourceFunc) scan_mailboxes_idle_cb, NULL);
-    g_timeout_add(EXPUNGE_PERIOD_HOURS*3600*1000,
-                  (GSourceFunc) periodic_expunge_cb, NULL);
+    g_timeout_add(3600*1000, (GSourceFunc) periodic_expunge_cb, NULL);
 
     gdk_threads_enter();
     gtk_main();

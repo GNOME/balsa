@@ -538,11 +538,17 @@ compare_filters(GtkTreeModel * model, GtkTreeIter * a, GtkTreeIter * b,
                 gpointer user_data)
 {
     gchar *stra, *strb;
+    gint ret_val;
 
     gtk_tree_model_get(model, a, 0, &stra, -1);
     gtk_tree_model_get(model, b, 0, &strb, -1);
 
-    return g_ascii_strcasecmp(stra, strb);
+    ret_val = g_ascii_strcasecmp(stra, strb);
+
+    g_free(stra);
+    g_free(strb);
+
+    return ret_val;
 }
 
 /*

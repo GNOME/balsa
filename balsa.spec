@@ -10,24 +10,22 @@ Release:   %rel
 Copyright: GPL
 Group:     Shells
 Source0:   balsa-%{PACKAGE_VERSION}.tar.gz
-URL:       http://www.serv.net/~jpaint/balsa/
+URL:       http://www.balsa.net/
 BuildRoot: /tmp/balsa-%{PACKAGE_VERSION}-root
 Packager: Michael Fulbright <msf@redhat.com>
-Requires: gtk+ >= 0.99.5
+Requires: gtk+ >= 1.1.0
 Requires: gnome-libs
 Docdir: %{prefix}/doc
 
 %description
-Balsa is a e-mail reader. It uses the GTK toolkit, and a
-C mail reading library (called the c-client library) written by Mark
-Crispin. It is being integrated into the GNOME desktop environment.
+Balsa is a e-mail reader.  This client is part of the GNOME
+desktop environment.  It supports local mailboxes, POP3 and
+IMAP.
  
 %prep
 %setup
 
 %build
-(cd imap; make lnx)
-
 CFLAGS="$RPM_OPT_FLAGS" LDFLAGS="-s" ./autogen.sh \
 	--prefix=%{prefix} 
 
@@ -55,6 +53,11 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sun Jul 26 1998 Stuart Parmenter <pavlov@pavlov.net>
+
+- Updated RPM file to reflect recent changes with the
+  removal of c-client.
+
 * Thu Apr 02 1998 Michael Fulbright <msf@redhat.com>
 
 - First try at an RPM

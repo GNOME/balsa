@@ -140,7 +140,7 @@ static Address *translate_address (ADDRESS * caddr);
 
 /* We're gonna set Mutt global vars here */
 void
-mailbox_init (gchar * inbox_path, void (*error_func)(const char* fmt, ...))
+mailbox_init (gchar * inbox_path, void (*error_func) (const char *fmt,...))
 {
   struct utsname utsname;
   char *p;
@@ -428,6 +428,7 @@ mailbox_open_ref (Mailbox * mailbox)
       tmp = g_string_new (NULL);
       g_string_append_c (tmp, '{');
       g_string_append (tmp, MAILBOX_IMAP (mailbox)->server);
+      g_string_sprintfa (tmp, ":%i", MAILBOX_IMAP (mailbox)->port);
       g_string_append_c (tmp, '}');
       g_string_append (tmp, MAILBOX_IMAP (mailbox)->path);
       set_imap_username (mailbox);

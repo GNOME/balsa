@@ -1,5 +1,5 @@
 # Note that this is NOT a relocatable package
-%define ver      0.4.0
+%define ver      0.4.5
 %define rel      SNAP
 %define prefix   /usr
 
@@ -54,6 +54,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sun Aug 23 1998 Stuart Parmenter <pavlov@pavlov.net>
+
+- Updated to version 0.4.5.
+
 * Mon Aug  3 1998 Stuart Parmenter <pavlov@pavlov.net>
 
 - Updated to version 0.4.0.

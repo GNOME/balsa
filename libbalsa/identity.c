@@ -405,7 +405,7 @@ libbalsa_identity_select_dialog(GtkWindow* parent, const gchar* prompt,
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
 
     choice = gtk_dialog_run(GTK_DIALOG(dialog));
-    
+    gtk_widget_destroy(dialog);
     if (choice != GTK_RESPONSE_OK && !isd.close_ok)
         return NULL;
     
@@ -433,8 +433,9 @@ select_dialog_row_cb(GtkCList* clist,
          * remove the `OK' button from the dialog)
          * */
         isd_p->close_ok = TRUE;
-        gtk_widget_destroy(gtk_widget_get_ancestor
-                           (GTK_WIDGET(clist), GTK_TYPE_WINDOW));
+        gtk_dialog_response(GTK_DIALOG(gtk_widget_get_ancestor
+                                       (GTK_WIDGET(clist), GTK_TYPE_DIALOG)),
+                            GTK_RESPONSE_OK);
     } else
         isd_p->ident =
             LIBBALSA_IDENTITY(gtk_clist_get_row_data(clist, row));

@@ -300,11 +300,13 @@ append_subtree_f(GNode* gn, gpointer data)
 }
 
 /* scan_mailboxes:
-   this is an idle handler. Expands subtrees
+   this is an idle handler. Expands subtrees.
+   FIXME: make sure that append_subtree_f does not use gtk.
 */
 static gboolean
 scan_mailboxes_idle_cb()
 {
+    gdk_threads_enter();
     balsa_mailbox_nodes_lock(FALSE);
     g_node_traverse(balsa_app.mailbox_nodes, G_POST_ORDER, G_TRAVERSE_ALL, -1,
                     append_subtree_f, NULL);

@@ -1,3 +1,15 @@
+2002-04-21  Pawel Salek <pawsa@theochem.kth.se>
+
+	* Makefile.am: omf-install is a created dir, remove from SUBDIRS.
+	* configure.in: do not create Makefile in omf-install.
+	* libbalsa/identity.c: do not destroy on double click: response.
+	* src/balsa-app.c: scan locking fixed.
+	* src/balsa-message.c: fix "mixed parts" support (Peter Bloomfield).
+	* src/mailbox-node.c, src/main.c: proper locking on scanning.
+	Scan threading is not perfect (it locks too much) but further
+	improvements require too many changes to be accepted for the
+	moments.
+
 2002-04-19  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/mailbox-nodes.c: make mailbox node locks upgradeable ro->rw.

@@ -1,5 +1,5 @@
 #intl dir needed for tarball --disable-nls build.
-SUBDIRS = po sounds images help libmutt libbalsa libinit_balsa src omf-install
+SUBDIRS = po sounds images help libmutt libbalsa libinit_balsa src
 
 man_MANS=balsa.1
 

@@ -436,8 +436,8 @@ balsa_mailbox_node_rescan(BalsaMailboxNode* mn)
 	gboolean expanded = mn->expanded;
         balsa_mailbox_nodes_lock(TRUE);
 	balsa_remove_children_mailbox_nodes(gnode);
-	balsa_mailbox_node_append_subtree(mn, gnode);
         balsa_mailbox_nodes_unlock(TRUE);
+       balsa_mailbox_node_append_subtree(mn, gnode);
 	mn->expanded = expanded;
 	balsa_mblist_repopulate(balsa_app.mblist);
         if (expanded)
@@ -445,7 +445,6 @@ balsa_mailbox_node_rescan(BalsaMailboxNode* mn)
 	    mblist_scan_mailbox_node(balsa_app.mblist, mn);
     } else g_warning("folder node %s (%p) not found in hierarchy.\n",
 		     mn->name, mn);
-    balsa_mailbox_nodes_unlock(FALSE);
 }
 
 static void

@@ -768,7 +768,7 @@ balsa_find_index_by_mailbox(LibBalsaMailbox * mailbox)
    locks/unlocks balsa_app.mailbox_nodes structure so we can modify it
    from a thread.
    exclusive asks for exclusive access.
-   obviously NO-OPs in the non-MT build.
+   NO-OPs in the non-MT build.
 */
 static pthread_mutex_t mailbox_nodes_lock = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t  mailbox_nodes_cond = PTHREAD_COND_INITIALIZER;
@@ -784,6 +784,9 @@ balsa_mailbox_nodes_lock(gboolean exclusive)
            (nodes_lock_count == 1 && nodes_last_threadid != pthread_self()))
             pthread_cond_wait(&mailbox_nodes_cond, &mailbox_nodes_lock);
         nodes_exclusive = 1;
+    } else { /* RO requested */
+        if (nodes_exclusive)
+            pthread_cond_wait(&mailbox_nodes_cond, &mailbox_nodes_lock);
     }
     nodes_lock_count++;
     nodes_last_threadid = pthread_self();
@@ -796,7 +799,7 @@ void balsa_mailbox_nodes_unlock(gboolean exclusive)
     pthread_mutex_lock(&mailbox_nodes_lock);
     nodes_lock_count--;
     if(nodes_lock_count==0) {
-        exclusive = 0;
+        nodes_exclusive = 0;
         pthread_cond_signal(&mailbox_nodes_cond);
     }
     pthread_mutex_unlock(&mailbox_nodes_lock);

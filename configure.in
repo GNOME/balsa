@@ -479,7 +479,6 @@ help/Makefile
 help/C/Makefile
 libbalsa/Makefile
 libinit_balsa/Makefile
-omf-install/Makefile
 src/Makefile
 ])
 

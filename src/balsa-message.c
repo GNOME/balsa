@@ -249,7 +249,7 @@ balsa_message_init(BalsaMessage * bm)
     gtk_box_pack_start(GTK_BOX(bm->vbox), bm->header_text, FALSE, FALSE, 0);
 
     /* Widget to hold content */
-    bm->content = gtk_viewport_new(NULL, NULL);
+    bm->content = gtk_vbox_new(FALSE, 1);
     gtk_box_pack_start(GTK_BOX(bm->vbox), bm->content, TRUE, TRUE, 0);
     gtk_widget_show(bm->content);
 
@@ -1551,7 +1551,8 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         part_info_init_unknown(bm, info);
 #endif
     } else {
-        GtkWidget *item = NULL;
+        GtkWidget *item;
+        GtkWidget *viewport;
         GtkTextBuffer *buffer;
         regex_t rex;
         GList *url_list = NULL;
@@ -1568,6 +1569,8 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         }
 
         item = gtk_text_view_new();
+        viewport = gtk_viewport_new(NULL, NULL);
+        gtk_container_add(GTK_CONTAINER(viewport), item);
         buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(item));
 
         gtk_text_view_set_left_margin(GTK_TEXT_VIEW(item), 2);
@@ -1633,7 +1636,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 
         gtk_widget_show(item);
         info->focus_widget = item;
-        info->widget = item;
+        info->widget = viewport;
         info->can_display = TRUE;
         /* size allocation may not be correct, so we'll check back later
          */
@@ -1648,10 +1651,14 @@ static void
 part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info, gchar * ptr,
 		    size_t len)
 {
+    GtkWidget *viewport;
     GtkWidget *html;
     HtmlDocument *document;
 
     html = html_view_new();
+    viewport = gtk_viewport_new(NULL, NULL);
+    gtk_container_add(GTK_CONTAINER(viewport), html);
+
     document = html_document_new();
     html_view_set_document(HTML_VIEW(html), document);
 
@@ -1673,7 +1680,7 @@ part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info, gchar * ptr,
     gtk_widget_show(html);
 
     info->focus_widget = html;
-    info->widget = html;
+    info->widget = viewport;
     info->can_display = TRUE;
 }
 #endif
@@ -2331,13 +2338,15 @@ static BalsaPartInfo *add_part(BalsaMessage *bm, gint part)
 	    part_info_init(bm, info);
 
 	if (info->widget) {
-            GtkAdjustment *vadj = NULL;
-
 	    gtk_container_add(GTK_CONTAINER(bm->content), info->widget);
 	    gtk_widget_show(info->widget);
-            vadj = gtk_viewport_get_vadjustment(GTK_VIEWPORT(bm->content));
-            gtk_signal_connect(GTK_OBJECT(vadj), "changed",
-                               (GtkSignalFunc) vadj_change_cb, info->widget);
+            if (GTK_IS_VIEWPORT(info->widget)) {
+                GtkAdjustment *vadj =
+                    gtk_viewport_get_vadjustment(GTK_VIEWPORT(info->widget));
+                gtk_signal_connect(GTK_OBJECT(vadj), "changed",
+                                   (GtkSignalFunc) vadj_change_cb,
+                                   info->widget);
+            }
 	}
 	add_multipart(bm, info->body);
     }

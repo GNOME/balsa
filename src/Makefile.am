@@ -72,8 +72,6 @@ balsa_DEPENDENCIES = \
 	$(top_builddir)/libmutt/libmutt.a \
 	$(top_builddir)/libinit_balsa/libinit_balsa.a
 
-EXTRA_DIST = arrow.xpm
-
 dist-hook:
 	mkdir $(distdir)/pixmaps
 	cp $(srcdir)/pixmaps/*.xpm $(distdir)/pixmaps

@@ -35,7 +35,9 @@ typedef enum
     BALSA_ICON_REPLIED,
     BALSA_ICON_FORWARDED,
 
-    BALSA_ICON_ENVELOPE
+    BALSA_ICON_ENVELOPE,
+
+    BALSA_ICON_ARROW
   }
 BalsaIconName;
 

@@ -28,10 +28,6 @@
 #include "../libmutt/mime.h"
 #include "../libmutt/mutt.h"
 
-#if 0
-#include "arrow.xpm"
-#endif
-
 #define NUM_TOOLBAR_MODES 3
 #define NUM_MDI_MODES 4
 #define NUM_ENCODING_MODES 3

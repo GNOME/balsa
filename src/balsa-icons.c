@@ -37,6 +37,8 @@
 
 #include "pixmaps/envelope.xpm"
 
+#include "pixmaps/arrow.xpm"
+
 typedef struct _BalsaIcon BalsaIcon;
 struct _BalsaIcon
   {
@@ -58,6 +60,8 @@ static BalsaIcon replied;
 static BalsaIcon forwarded;
 
 static BalsaIcon envelope;
+
+static BalsaIcon arrow;
 
 static void
 create_icon (gchar ** data, GdkPixmap ** pmap, GdkBitmap ** bmap)
@@ -86,6 +90,8 @@ balsa_icons_init (void)
   create_icon (forwarded_xpm, &forwarded.p, &forwarded.b);
 
   create_icon (envelope_xpm, &envelope.p, &envelope.b);
+
+  create_icon (arrow_xpm, &arrow.p, &arrow.b);
 }
 
 GdkPixmap *
@@ -117,6 +123,9 @@ balsa_icon_get_pixmap (BalsaIconName name)
 
     case BALSA_ICON_ENVELOPE:
       return envelope.p;
+
+    case BALSA_ICON_ARROW:
+	    return arrow.p;
     }
   return NULL;
 }
@@ -150,6 +159,9 @@ balsa_icon_get_bitmap (BalsaIconName name)
 
     case BALSA_ICON_ENVELOPE:
       return envelope.b;
+
+    case BALSA_ICON_ARROW:
+	    return arrow.b;
     }
   return NULL;
 }

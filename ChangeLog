@@ -1,3 +1,10 @@
+2000-03-30  Peter Williams <peter@newton.cx>
+	* src/arrow.xpm: moved to src/pixmaps/
+	* src/balsa-icons.{c,h}: added new arrow
+	  pixmap; but pointless because it's currently
+	  unused!
+	* src/Makefile.am: arrow.xpm from EXTRA_DIST
+	
 2000-03-28  Peter Williams <peter@newton.cx>
 	* libbalsa/files.{c,h}: created balsa_file_finder,
 	  a *working* version of gnome_xxxx_file()

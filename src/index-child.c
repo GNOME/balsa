@@ -170,10 +170,9 @@ idle_handler_cb (GtkWidget * widget)
   if (bevent && bevent->button == 1 && bevent->type == GDK_2BUTTON_PRESS)
     message_window_new (message);
 
-/*  FIXME  this is commented out because it doesn't really work right (below)
    else if (bevent && bevent->button == 3)
    gtk_menu_popup (GTK_MENU (create_menu (BALSA_INDEX (widget), message)), NULL, NULL, NULL, NULL, bevent->button, bevent->time);
- */
+
   else
     balsa_message_set (BALSA_MESSAGE (((IndexChild *) data)->message), message);
   handler = 0;
@@ -215,8 +214,8 @@ create_menu (BalsaIndex * bindex, Message * message)
   GtkWidget *menu, *menuitem, *submenu, *smenuitem;
 
   menu = gtk_menu_new ();
-  menuitem = gtk_menu_item_new_with_label (_ ("Transfer"));
 #if 0				/* FIXME */
+  menuitem = gtk_menu_item_new_with_label (_ ("Transfer"));
   list = g_list_first (balsa_app.mailbox_list);
   submenu = gtk_menu_new ();
   while (list)
@@ -231,7 +230,6 @@ create_menu (BalsaIndex * bindex, Message * message)
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), submenu);
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
-#endif
 
   menuitem = gtk_menu_item_new_with_label (_ ("Change Status"));
 
@@ -262,9 +260,10 @@ create_menu (BalsaIndex * bindex, Message * message)
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
 
+#endif
   if (message->flags & MESSAGE_FLAG_DELETED)
     {
-      menuitem = gtk_menu_item_new_with_label (_ ("Undelete"));
+      menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_UNDELETE, _ ("Undelete"));
       gtk_signal_connect (GTK_OBJECT (menuitem),
 			  "activate",
 			  (GtkSignalFunc) undelete_message_cb,
@@ -272,7 +271,7 @@ create_menu (BalsaIndex * bindex, Message * message)
     }
   else
     {
-      menuitem = gtk_menu_item_new_with_label (_ ("Delete"));
+      menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_TRASH, _ ("Delete"));
       gtk_signal_connect (GTK_OBJECT (menuitem),
 			  "activate",
 			  (GtkSignalFunc) delete_message_cb,

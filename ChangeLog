@@ -1,3 +1,13 @@
+2003-01-18  PeterB
+
+	* src/balsa-index.c: Use gtk_tree_model_get_iter_first to test for
+	any messages, instead of gtk_tree_model_iter_n_children, which
+	could be time-consuming (Manu).
+
+2003-01-17  PeterB
+
+	* src/balsa-index.c: Remove a redundant test (Manu).
+
 2003-01-17  PeterB
 
 	* libbalsa/address-book-vcard.c: Silently return TRUE from

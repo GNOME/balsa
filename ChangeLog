@@ -1,3 +1,7 @@
+2003-07-29 09:51  PeterB
+
+	* libbalsa/address-book-extern.c: Fix #118574, #118576, #113371.
+
 2003-07-28 14:52  PeterB
 
 	* src/sendmsg-window.c: Prepare message for "DelSp=Yes" before

@@ -379,7 +379,7 @@ next_cb (GtkWidget * widget)
 {
   GtkWidget *messagebox;
 
-  switch (gtk_notebook_current_page (GTK_NOTEBOOK (iw->notebook)))
+  switch (gtk_notebook_current_page (GTK_NOTEBOOK (iw->notebook))+1)
     {
     case IW_PAGE_FINISHED:
       if (mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->inbox))))

@@ -97,15 +97,12 @@ static void balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg);
 static void check_readiness(BalsaSendmsg * bsmsg);
 static void init_menus(BalsaSendmsg *);
 static gint toggle_from_cb(GtkWidget *, BalsaSendmsg *);
-static gint toggle_to_cb(GtkWidget *, BalsaSendmsg *);
-static gint toggle_subject_cb(GtkWidget *, BalsaSendmsg *);
 static gint toggle_cc_cb(GtkWidget *, BalsaSendmsg *);
 static gint toggle_bcc_cb(GtkWidget *, BalsaSendmsg *);
 static gint toggle_fcc_cb(GtkWidget *, BalsaSendmsg *);
+#if !defined(ENABLE_TOUCH_UI)
 static gint toggle_reply_cb(GtkWidget *, BalsaSendmsg *);
-static gint toggle_attachments_cb(GtkWidget *, BalsaSendmsg *);
-static gint toggle_comments_cb(GtkWidget *, BalsaSendmsg *);
-static gint toggle_keywords_cb(GtkWidget *, BalsaSendmsg *);
+#endif
 static void toggle_reqdispnotify_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void toggle_format_cb(GtkCheckMenuItem * check_menu_item,
                              BalsaSendmsg * bsmsg);
@@ -135,7 +132,9 @@ static void address_book_response(GtkWidget * ab, gint response,
 
 static gint set_locale(BalsaSendmsg *, gint);
 
+#if !defined(ENABLE_TOUCH_UI)
 static void edit_with_gnome(GtkWidget* widget, BalsaSendmsg* bsmsg);
+#endif
 static void change_identity_dialog_cb(GtkWidget*, BalsaSendmsg*);
 static void repl_identity_signature(BalsaSendmsg* bsmsg, 
                                     LibBalsaIdentity* new_ident,
@@ -204,10 +203,103 @@ static void wrap_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void reflow_selected_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static gint insert_signature_cb(GtkWidget *, BalsaSendmsg *);
 static gint quote_messages_cb(GtkWidget *, BalsaSendmsg *);
+static void lang_set_cb(GtkWidget *widget, BalsaSendmsg *bsmsg);
+
 static void set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message,
-			SendType type, LibBalsaIdentity* ident);
+                                 SendType type, LibBalsaIdentity* ident);
+
+/* the array of locale names and charset names included in the MIME
+   type information.  
+   if you add a new encoding here add to SendCharset in libbalsa.c 
+*/
+struct SendLocales {
+    const gchar *locale, *charset, *lang_name;
+} locales[] = {
+    {"pt_BR", "ISO-8859-1",    N_("_Brazilian")},
+    {"ca_ES", "ISO-8859-15",   N_("_Catalan")},
+    {"zh_CN.GB2312", "gb2312", N_("_Chinese Simplified")},
+    {"zh_TW.Big5", "big5",     N_("_Chinese Traditional")},
+    {"cs_CZ", "ISO-8859-2",    N_("_Czech")},
+    {"da_DK", "ISO-8859-1",    N_("_Danish")},
+    {"nl_NL", "ISO-8859-15",   N_("_Dutch")},
+    {"en_US", "ISO-8859-1",    N_("_English (American)")}, 
+    {"en_GB", "ISO-8859-1",    N_("_English (British)")}, 
+    {"eo_XX", "UTF-8",         N_("_Esperanto")},
+    {"et_EE", "ISO-8859-15",   N_("_Estonian")},
+    {"fi_FI", "ISO-8859-15",   N_("_Finnish")},
+    {"fr_FR", "ISO-8859-15",   N_("_French")},
+    {"de_DE", "ISO-8859-15",   N_("_German")},
+    {"el_GR", "ISO-8859-7",    N_("_Greek")},
+    {"he_IL", "UTF-8",         N_("_Hebrew")},
+    {"hu_HU", "ISO-8859-2",    N_("_Hungarian")},
+    {"it_IT", "ISO-8859-15",   N_("_Italian")},
+    {"ja_JP", "euc-jp",        N_("_Japanese")},
+    {"ko_KR", "euc-kr",        N_("_Korean")},
+    {"lv_LV", "ISO-8859-13",   N_("_Latvian")},
+    {"lt_LT", "ISO-8859-13",   N_("_Lithuanian")},
+    {"no_NO", "ISO-8859-1",    N_("_Norwegian")},
+    {"pl_PL", "ISO-8859-2",    N_("_Polish")},
+    {"pt_PT", "ISO-8859-15",   N_("_Portugese")},
+    {"ro_RO", "ISO-8859-2",    N_("_Romanian")},
+    {"ru_SU", "ISO-8859-5",    N_("_Russian (ISO)")},
+    {"ru_RU", "KOI8-R",        N_("_Russian (KOI)")},
+    {"sr_Cyrl", "ISO-8859-5",  N_("_Serbian")},
+    {"sr_Latn", "ISO-8859-2",  N_("_Serbian (Latin)")},
+    {"sk_SK", "ISO-8859-2",    N_("_Slovak")},
+    {"es_ES", "ISO-8859-15",   N_("_Spanish")},
+    {"sv_SE", "ISO-8859-1",    N_("_Swedish")},
+    {"tr_TR", "ISO-8859-9",    N_("_Turkish")},
+    {"uk_UK", "KOI8-U",        N_("_Ukrainian")},
+    {"", "UTF-8",              N_("_Generic UTF-8")}
+};
+
+/* ===================================================================
+   Balsa menus. Touchpad has some simplified menus which do not
+   overlap very much with the default balsa menus. They are here
+   because they represent an alternative probably appealing to the all
+   proponents of GNOME2 dumbify approach (OK, I am bit unfair here).
+   We first put shared menu items, next we define default balsa
+   stuff we put touchpad optimized menus at the end.
+*/
+typedef struct {
+    gchar *name;
+    guint length;
+} headerMenuDesc;
+
+static GnomeUIInfo lang_menu[] = {
+    GNOMEUIINFO_END
+};
 
 
+#ifdef HAVE_GPGME
+static GnomeUIInfo gpg_mode_list[] = {
+#define OPTS_MENU_GPG_3156_POS 0
+    GNOMEUIINFO_RADIOITEM_DATA(N_("_GnuPG uses MIME mode"),
+                               NULL,
+                               toggle_gpg_mode_cb,
+                               GINT_TO_POINTER(LIBBALSA_PROTECT_RFC3156),
+                               NULL),
+#define OPTS_MENU_GPG_2440_POS 1
+    GNOMEUIINFO_RADIOITEM_DATA(N_("_GnuPG uses old OpenPGP mode"),
+                               NULL,
+                               toggle_gpg_mode_cb,
+                               GINT_TO_POINTER(LIBBALSA_PROTECT_OPENPGP),
+                               NULL),
+#ifdef HAVE_SMIME
+#define OPTS_MENU_SMIME_POS 2
+    GNOMEUIINFO_RADIOITEM_DATA(N_("_S/MIME mode (GpgSM)"),
+                               NULL,
+                               toggle_gpg_mode_cb,
+                               GINT_TO_POINTER(LIBBALSA_PROTECT_SMIMEV3),
+                               NULL),
+#endif
+    GNOMEUIINFO_END
+};
+#endif
+
+
+#if !defined(ENABLE_TOUCH_UI)
+/* default balsa menu */
 static GnomeUIInfo file_menu[] = {
 #define MENU_FILE_INCLUDE_POS 0
     GNOMEUIINFO_ITEM_STOCK(N_("_Include File..."), NULL,
@@ -225,7 +317,7 @@ static GnomeUIInfo file_menu[] = {
     GNOMEUIINFO_SEPARATOR,
 
 #define MENU_FILE_SEND_POS 5
-    { GNOME_APP_UI_ITEM, N_("_Send"),
+    { GNOME_APP_UI_ITEM, N_("Sen_d"),
       N_("Send this message"),
       send_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
       BALSA_PIXMAP_MENU_SEND, GDK_Return, GDK_CONTROL_MASK, NULL },
@@ -238,7 +330,7 @@ static GnomeUIInfo file_menu[] = {
     GNOMEUIINFO_ITEM_STOCK(N_("_Postpone"), NULL,
 			   postpone_message_cb, BALSA_PIXMAP_MENU_POSTPONE),
 #define MENU_FILE_SAVE_POS 8
-    { GNOME_APP_UI_ITEM, N_("Sa_ve"),
+    { GNOME_APP_UI_ITEM, N_("_Save"),
       N_("Save this message"),
       save_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
       BALSA_PIXMAP_MENU_SAVE, 'S', GDK_CONTROL_MASK, NULL },
@@ -316,110 +408,16 @@ typedef gint (*ViewMenuFunc)(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static GnomeUIInfo view_menu[] = {
 #define MENU_TOGGLE_FROM_POS 0
     GNOMEUIINFO_TOGGLEITEM(N_("Fr_om"), NULL, toggle_from_cb, NULL),
-#define MENU_TOGGLE_TO_POS 1
-    GNOMEUIINFO_TOGGLEITEM(N_("_To"), NULL, toggle_to_cb, NULL),
-#define MENU_TOGGLE_SUBJECT_POS 2
-    GNOMEUIINFO_TOGGLEITEM(N_("_Subject"), NULL, toggle_subject_cb, NULL),
-#define MENU_TOGGLE_CC_POS 3
+#define MENU_TOGGLE_CC_POS 1
     GNOMEUIINFO_TOGGLEITEM(N_("_Cc"), NULL, toggle_cc_cb, NULL),
-#define MENU_TOGGLE_BCC_POS 4
+#define MENU_TOGGLE_BCC_POS 2
     GNOMEUIINFO_TOGGLEITEM(N_("_Bcc"), NULL, toggle_bcc_cb, NULL),
-#define MENU_TOGGLE_FCC_POS 5
+#define MENU_TOGGLE_FCC_POS 3
     GNOMEUIINFO_TOGGLEITEM(N_("_Fcc"), NULL, toggle_fcc_cb, NULL),
-#define MENU_TOGGLE_REPLY_POS 6
+#define MENU_TOGGLE_REPLY_POS 4
     GNOMEUIINFO_TOGGLEITEM(N_("_Reply To"), NULL, toggle_reply_cb, NULL),
-#define MENU_TOGGLE_ATTACHMENTS_POS 7
-    GNOMEUIINFO_TOGGLEITEM(N_("_Attachments"), NULL, toggle_attachments_cb,
-			   NULL),
-#define MENU_TOGGLE_COMMENTS_POS 8
-    GNOMEUIINFO_TOGGLEITEM(N_("Co_mments"), NULL, toggle_comments_cb,
-			   NULL),
-#define MENU_TOGGLE_KEYWORDS_POS 9
-    GNOMEUIINFO_TOGGLEITEM(N_("_Keywords"), NULL, toggle_keywords_cb,
-			   NULL),
     GNOMEUIINFO_END
 };
-
-#if MENU_TOGGLE_KEYWORDS_POS+1 != VIEW_MENU_LENGTH
-#error Inconsistency in defined lengths.
-#endif
-
-/* the array of locale names and charset names included in the MIME
-   type information.  
-   if you add a new encoding here add to SendCharset in libbalsa.c 
-*/
-struct SendLocales {
-    const gchar *locale, *charset, *lang_name;
-} locales[] = {
-    {"pt_BR", "ISO-8859-1",    N_("_Brazilian")},
-    {"ca_ES", "ISO-8859-15",   N_("_Catalan")},
-    {"zh_CN.GB2312", "gb2312", N_("_Chinese Simplified")},
-    {"zh_TW.Big5", "big5",     N_("_Chinese Traditional")},
-    {"cs_CZ", "ISO-8859-2",    N_("_Czech")},
-    {"da_DK", "ISO-8859-1",    N_("_Danish")},
-    {"nl_NL", "ISO-8859-15",   N_("_Dutch")},
-    {"en_US", "ISO-8859-1",    N_("_English (American)")}, 
-    {"en_GB", "ISO-8859-1",    N_("_English (British)")}, 
-    {"eo_XX", "UTF-8",         N_("_Esperanto")},
-    {"et_EE", "ISO-8859-15",   N_("_Estonian")},
-    {"fi_FI", "ISO-8859-15",   N_("_Finnish")},
-    {"fr_FR", "ISO-8859-15",   N_("_French")},
-    {"de_DE", "ISO-8859-15",   N_("_German")},
-    {"el_GR", "ISO-8859-7",    N_("_Greek")},
-    {"he_IL", "UTF-8",         N_("_Hebrew")},
-    {"hu_HU", "ISO-8859-2",    N_("_Hungarian")},
-    {"it_IT", "ISO-8859-15",   N_("_Italian")},
-    {"ja_JP", "euc-jp",        N_("_Japanese")},
-    {"ko_KR", "euc-kr",        N_("_Korean")},
-    {"lv_LV", "ISO-8859-13",   N_("_Latvian")},
-    {"lt_LT", "ISO-8859-13",   N_("_Lithuanian")},
-    {"no_NO", "ISO-8859-1",    N_("_Norwegian")},
-    {"pl_PL", "ISO-8859-2",    N_("_Polish")},
-    {"pt_PT", "ISO-8859-15",   N_("_Portugese")},
-    {"ro_RO", "ISO-8859-2",    N_("_Romanian")},
-    {"ru_SU", "ISO-8859-5",    N_("_Russian (ISO)")},
-    {"ru_RU", "KOI8-R",        N_("_Russian (KOI)")},
-    {"sr_Cyrl", "ISO-8859-5",  N_("_Serbian")},
-    {"sr_Latn", "ISO-8859-2",  N_("_Serbian (Latin)")},
-    {"sk_SK", "ISO-8859-2",    N_("_Slovak")},
-    {"es_ES", "ISO-8859-15",   N_("_Spanish")},
-    {"sv_SE", "ISO-8859-1",    N_("_Swedish")},
-    {"tr_TR", "ISO-8859-9",    N_("_Turkish")},
-    {"uk_UK", "KOI8-U",        N_("_Ukrainian")},
-    {"", "UTF-8",              N_("_Generic UTF-8")}
-};
-
-static void lang_set_cb(GtkWidget *widget, BalsaSendmsg *bsmsg);
-
-static GnomeUIInfo lang_menu[] = {
-    GNOMEUIINFO_END
-};
-
-#ifdef HAVE_GPGME
-static GnomeUIInfo gpg_mode_list[] = {
-#define OPTS_MENU_GPG_3156_POS 0
-    GNOMEUIINFO_RADIOITEM_DATA(N_("_GnuPG uses MIME mode"),
-                               NULL,
-                               toggle_gpg_mode_cb,
-                               GINT_TO_POINTER(LIBBALSA_PROTECT_RFC3156),
-                               NULL),
-#define OPTS_MENU_GPG_2440_POS 1
-    GNOMEUIINFO_RADIOITEM_DATA(N_("_GnuPG uses old OpenPGP mode"),
-                               NULL,
-                               toggle_gpg_mode_cb,
-                               GINT_TO_POINTER(LIBBALSA_PROTECT_OPENPGP),
-                               NULL),
-#ifdef HAVE_SMIME
-#define OPTS_MENU_SMIME_POS 2
-    GNOMEUIINFO_RADIOITEM_DATA(N_("_S/MIME mode (GpgSM)"),
-                               NULL,
-                               toggle_gpg_mode_cb,
-                               GINT_TO_POINTER(LIBBALSA_PROTECT_SMIMEV3),
-                               NULL),
-#endif
-    GNOMEUIINFO_END
-};
-#endif
 
 static GnomeUIInfo opts_menu[] = {
 #define OPTS_MENU_DISPNOTIFY_POS 0
@@ -442,29 +440,13 @@ static GnomeUIInfo opts_menu[] = {
 #endif
     GNOMEUIINFO_END
 };
+#define DISPNOTIFY_WIDGET opts_menu[OPTS_MENU_DISPNOTIFY_POS].widget
 
-#define CASE_INSENSITIVE_NAME
-#define PRESERVE_CASE TRUE
-#define OVERWRITE_CASE FALSE
 
-typedef struct {
-    gchar *name;
-    guint length;
-} headerMenuDesc;
-
-headerMenuDesc headerDescs[] = { {"from", 3}, {"to", 3}, {"subject", 2},
-{"cc", 3}, {"bcc", 3}, {"fcc", 2},
-{"replyto", 3}, {"attachments", 4},
-{"comments", 2}, {"keywords", 2}
+headerMenuDesc headerDescs[] =  {
+    {"from", 3}, {"to", 3}, {"subject", 2},
+    {"cc", 3}, {"bcc", 3}, {"fcc", 2}, {"replyto", 3}
 };
-
-/* i'm sure there's a subtle and nice way of making it visible here */
-typedef struct {
-    gchar *filename;
-    gchar *force_mime_type;
-    gboolean delete_on_destroy;
-    gboolean as_extbody;
-} attachment_t;
 
 #define MAIN_MENUS_COUNT 5
 static GnomeUIInfo main_menu[] = {
@@ -480,6 +462,194 @@ static GnomeUIInfo main_menu[] = {
     GNOMEUIINFO_SUBTREE(N_("_Options"), opts_menu),
     GNOMEUIINFO_END
 };
+#define LANG_MENU_WIDGET main_menu[MAIN_CHARSET_MENU].widget
+
+#if MENU_TOGGLE_REPLY_POS+1 != VIEW_MENU_LENGTH
+#error Inconsistency in defined lengths.
+#endif
+
+
+#else /* ENABLE_TOUCH_UI */
+/* ===================================================================
+ * End of default balsa menus and begin touchpad-optimized menus.
+ * =================================================================== */
+/* touchpad-optimized menu */
+static GnomeUIInfo tu_file_more_menu[] = {
+    GNOMEUIINFO_ITEM_STOCK(N_("_Include File..."), NULL,
+			   include_file_cb, GTK_STOCK_OPEN),
+    GNOMEUIINFO_ITEM_STOCK(N_("I_nclude Message(s)"), NULL,
+			   include_message_cb, BALSA_PIXMAP_MENU_NEW),
+#define MENU_FILE_ATTACH_MSG_POS 3
+    GNOMEUIINFO_ITEM_STOCK(N_("Attach _Message(s)"), NULL,
+			   attach_message_cb, BALSA_PIXMAP_MENU_FORWARD),
+    GNOMEUIINFO_END
+};
+
+/* touchpad optimized version of the menu */
+static GnomeUIInfo file_menu[] = {
+#define MENU_FILE_ATTACH_POS 0
+    GNOMEUIINFO_ITEM_STOCK(N_("_Attach File..."), NULL,
+			   attach_clicked, BALSA_PIXMAP_MENU_ATTACHMENT),
+    GNOMEUIINFO_SEPARATOR,
+#define MENU_FILE_SAVE_POS 2
+    { GNOME_APP_UI_ITEM, N_("_Save"),
+      N_("Save this message"),
+      save_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+      BALSA_PIXMAP_MENU_SAVE, 'S', GDK_CONTROL_MASK, NULL },
+#define MENU_FILE_PRINT_POS 3
+    GNOMEUIINFO_ITEM_STOCK(N_("_Print..."), N_("Print the edited message"),
+			   print_message_cb, BALSA_PIXMAP_MENU_PRINT),
+    GNOMEUIINFO_SUBTREE(N_("_More"), tu_file_more_menu),
+#define MENU_FILE_POSTPONE_POS 5
+    GNOMEUIINFO_ITEM_STOCK(N_("Sa_ve and Close"), NULL,
+			   postpone_message_cb, BALSA_PIXMAP_MENU_POSTPONE),
+    GNOMEUIINFO_SEPARATOR,
+#define MENU_FILE_SEND_POS 7
+    { GNOME_APP_UI_ITEM, N_("Sen_d"),
+      N_("Send this message"),
+      send_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+      BALSA_PIXMAP_MENU_SEND, GDK_Return, GDK_CONTROL_MASK, NULL },
+#define MENU_FILE_QUEUE_POS 8
+    { GNOME_APP_UI_ITEM, N_("Send _Later"),
+      N_("Queue this message in Outbox for sending"),
+      queue_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+      BALSA_PIXMAP_MENU_SEND, 'Q', GDK_CONTROL_MASK, NULL },
+    GNOMEUIINFO_SEPARATOR,
+#define MENU_FILE_CLOSE_POS 10
+    GNOMEUIINFO_MENU_CLOSE_ITEM(close_window_cb, NULL),
+    GNOMEUIINFO_END
+};
+
+static GnomeUIInfo tu_edit_more_menu[] = {
+#define EDIT_MENU_WRAP_BODY EDIT_MENU_SELECT_ALL + 2
+    {GNOME_APP_UI_ITEM, N_("_Wrap Body"), N_("Wrap message lines"),
+     (gpointer) wrap_body_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
+     GDK_b, GDK_CONTROL_MASK, NULL},
+#define EDIT_MENU_REFLOW_SELECTED EDIT_MENU_WRAP_BODY + 1
+    {GNOME_APP_UI_ITEM, N_("_Reflow Selected Text"), NULL,
+     (gpointer) reflow_selected_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
+     GDK_r, GDK_CONTROL_MASK, NULL},
+    GNOMEUIINFO_SEPARATOR,
+    {GNOME_APP_UI_ITEM, N_("_Quote Message(s)"), NULL,
+     (gpointer) quote_messages_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
+     0, 0, NULL},
+    GNOMEUIINFO_END
+};
+
+/* Cut, Copy&Paste are in our case just a placeholders because they work
+   anyway */
+static GnomeUIInfo edit_menu[] = {
+#define EDIT_MENU_UNDO 0
+    GNOMEUIINFO_MENU_UNDO_ITEM(sw_undo_cb, NULL),
+#define EDIT_MENU_REDO EDIT_MENU_UNDO + 1
+    GNOMEUIINFO_MENU_REDO_ITEM(sw_redo_cb, NULL),
+    GNOMEUIINFO_SEPARATOR,
+#define EDIT_MENU_CUT EDIT_MENU_REDO + 2
+    GNOMEUIINFO_MENU_CUT_ITEM(cut_cb, NULL),
+#define EDIT_MENU_COPY EDIT_MENU_CUT + 1
+    GNOMEUIINFO_MENU_COPY_ITEM(copy_cb, NULL),
+#define EDIT_MENU_PASTE EDIT_MENU_COPY + 1
+    GNOMEUIINFO_MENU_PASTE_ITEM(paste_cb, NULL),
+#define EDIT_MENU_SELECT_ALL EDIT_MENU_PASTE + 1
+    GNOMEUIINFO_MENU_SELECT_ALL_ITEM(select_all_cb, NULL),
+    GNOMEUIINFO_SEPARATOR,
+#define EDIT_MENU_ADD_SIGNATURE EDIT_MENU_SELECT_ALL + 2
+    {GNOME_APP_UI_ITEM, N_("Insert Si_gnature"), NULL,
+     (gpointer) insert_signature_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
+     GDK_g, GDK_CONTROL_MASK, NULL},
+    GNOMEUIINFO_SUBTREE(N_("_More"), tu_edit_more_menu),
+    GNOMEUIINFO_END
+};
+
+typedef gint (*ViewMenuFunc)(GtkWidget * widget, BalsaSendmsg * bsmsg);
+#define VIEW_MENU_FUNC(f) ((ViewMenuFunc) (f))
+
+/* touchscreen-optimized version of the menu */
+static GnomeUIInfo view_menu[] = {
+#define MENU_TOGGLE_FROM_POS 0
+    GNOMEUIINFO_TOGGLEITEM(N_("Fr_om"),NULL, toggle_from_cb, NULL),
+#define MENU_TOGGLE_CC_POS 1
+    GNOMEUIINFO_TOGGLEITEM(N_("_Cc"),  NULL, toggle_cc_cb, NULL),
+#define MENU_TOGGLE_BCC_POS 2
+    GNOMEUIINFO_TOGGLEITEM(N_("_Bcc"), NULL, toggle_bcc_cb, NULL),
+#define MENU_TOGGLE_FCC_POS 3
+    GNOMEUIINFO_TOGGLEITEM(N_("_Fcc"), NULL, toggle_fcc_cb, NULL),
+    GNOMEUIINFO_END
+};
+
+headerMenuDesc headerDescs[] =
+    { {"from", 3}, {"cc", 3}, {"bcc", 3}, {"fcc", 2} };
+#if MENU_TOGGLE_FCC_POS+1 != VIEW_MENU_LENGTH
+#error Inconsistency in defined lengths.
+#endif
+
+static GnomeUIInfo opts_menu[] = {
+#define OPTS_MENU_FORMAT_POS 0
+    GNOMEUIINFO_TOGGLEITEM(N_("_Format = Flowed"), NULL, 
+			   toggle_format_cb, NULL),
+#ifdef HAVE_GPGME
+    GNOMEUIINFO_SEPARATOR,
+#define OPTS_MENU_SIGN_POS 2
+    GNOMEUIINFO_TOGGLEITEM(N_("_Sign Message"), 
+			   N_("signs the message using GnuPG"),
+			   toggle_sign_cb, NULL),
+#define OPTS_MENU_ENCRYPT_POS 3
+    GNOMEUIINFO_TOGGLEITEM(N_("_Encrypt Message"), 
+			   N_("signs the message using GnuPG for all To: and CC: recipients"),
+			   toggle_encrypt_cb, NULL),
+    GNOMEUIINFO_RADIOLIST(gpg_mode_list),
+#endif
+    GNOMEUIINFO_END
+};
+
+static GnomeUIInfo tu_tools_menu[] = {
+    GNOMEUIINFO_ITEM_STOCK(N_("C_heck Spelling"), 
+                           N_("Check the spelling of the message"),
+                           spell_check_cb,
+                           GTK_STOCK_SPELL_CHECK),
+#define MAIN_CHARSET_MENU_POS 1
+    GNOMEUIINFO_SUBTREE(N_("_Language"), lang_menu),
+    GNOMEUIINFO_SEPARATOR,
+    GNOMEUIINFO_ITEM_STOCK(N_("Select _Identity..."), 
+                           N_("Select the Identity to use for the message"),
+                           change_identity_dialog_cb,
+                           BALSA_PIXMAP_MENU_IDENTITY),
+#define OPTS_MENU_DISPNOTIFY_POS 4
+    GNOMEUIINFO_TOGGLEITEM(N_("_Request Disposition Notification"), NULL, 
+			   toggle_reqdispnotify_cb, NULL),
+    GNOMEUIINFO_SUBTREE(N_("_More"), opts_menu),
+    GNOMEUIINFO_END
+};
+#define DISPNOTIFY_WIDGET tu_tools_menu[OPTS_MENU_DISPNOTIFY_POS].widget
+#define LANG_MENU_WIDGET tu_tools_menu[MAIN_CHARSET_MENU_POS].widget
+
+
+#define MAIN_MENUS_COUNT 5
+static GnomeUIInfo main_menu[] = {
+#define MAIN_FILE_MENU 0
+    GNOMEUIINFO_MENU_FILE_TREE(file_menu),
+#define MAIN_EDIT_MENU 1
+    GNOMEUIINFO_MENU_EDIT_TREE(edit_menu),
+#define MAIN_VIEW_MENU 2
+    GNOMEUIINFO_SUBTREE(N_("_Show"), view_menu),
+#define MAIN_OPTION_MENU 4
+    GNOMEUIINFO_SUBTREE(N_("_Tools"), tu_tools_menu),
+    GNOMEUIINFO_END
+};
+
+#endif /* ENABLE_TOUCH_UI */
+/* ===================================================================
+ *                End of touchpad-optimized menus.
+ * =================================================================== */
+
+
+/* i'm sure there's a subtle and nice way of making it visible here */
+typedef struct {
+    gchar *filename;
+    gchar *force_mime_type;
+    gboolean delete_on_destroy;
+    gboolean as_extbody;
+} attachment_t;
 
 
 static void
@@ -677,6 +847,7 @@ find_locale_index_by_locale(const gchar * locale)
     return maxpos;
 }
 
+#if !defined(ENABLE_TOUCH_UI)
 static struct {
     gchar *label;
     glong struct_offset;
@@ -686,7 +857,6 @@ static struct {
     { N_("Reply-To:"), G_STRUCT_OFFSET(BalsaSendmsg, reply_to[1])},
     { N_("Bcc:"),      G_STRUCT_OFFSET(BalsaSendmsg, bcc[1])},
     { N_("Cc:"),       G_STRUCT_OFFSET(BalsaSendmsg, cc[1])},
-    { N_("Comments:"), G_STRUCT_OFFSET(BalsaSendmsg, comments[1])},
     { N_("Subject:"),  G_STRUCT_OFFSET(BalsaSendmsg, subject[1])}
 };
 
@@ -858,6 +1028,8 @@ edit_with_gnome(GtkWidget* widget, BalsaSendmsg* bsmsg)
     g_timeout_add(200, (GSourceFunc)edit_with_gnome_check, data);
 }
 
+#endif /* ENABLE_TOUCH_UI */
+
 static void 
 change_identity_dialog_cb(GtkWidget* widget, BalsaSendmsg* bsmsg)
 {
@@ -981,7 +1153,9 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
     gtk_entry_set_text(GTK_ENTRY(bsmsg->from[1]), tmpstr);
     g_free(tmpstr);
 
+#if !defined(ENABLE_TOUCH_UI)
     gtk_entry_set_text(GTK_ENTRY(bsmsg->reply_to[1]), ident->replyto);
+#endif
 
     /* We'll add the auto-bcc for the new identity, but we don't clear
      * any current bcc entries unless it's exactly the auto-bcc for the
@@ -1407,6 +1581,22 @@ sw_do_popup(GnomeIconList * ilist, GdkEventButton * event)
 */
 
 static void
+show_attachment_widget(BalsaSendmsg *bsmsg)
+{
+    int pos;
+    for(pos=0; pos<4; pos++)
+        gtk_widget_show_all(GTK_WIDGET(bsmsg->attachments[pos]));
+}
+
+static void
+hide_attachment_widget(BalsaSendmsg *bsmsg)
+{
+    int pos;
+    for(pos=0; pos<4; pos++)
+        gtk_widget_hide(GTK_WIDGET(bsmsg->attachments[pos]));
+}
+
+static void
 select_attachment(GnomeIconList * ilist, gint num, GdkEventButton * event,
 		  gpointer data)
 {
@@ -1514,13 +1704,9 @@ add_attachment(BalsaSendmsg * bsmsg, char *filename,
         g_free(utf8name);
 	g_free(label);
     }
+    show_attachment_widget(bsmsg);
 
-    bsmsg->update_config = FALSE;
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
-	    bsmsg->view_checkitems[MENU_TOGGLE_ATTACHMENTS_POS]), TRUE);
-    bsmsg->update_config = TRUE;
-
-    g_free(pix) ;
+    g_free(pix);
     g_free(content_type);
     return TRUE;
 }
@@ -1992,11 +2178,12 @@ create_info_pane(BalsaSendmsg * bsmsg, SendType type)
     gtk_table_attach(GTK_TABLE(table), align, 1, 3, 5, 6,
 		     GTK_FILL, GTK_FILL, 0, 0);
 
+#if !defined(ENABLE_TOUCH_UI)
     /* Reply To: */
     create_email_entry(table, _("_Reply To:"), 6, GNOME_STOCK_BOOK_BLUE,
                        bsmsg, bsmsg->reply_to,
                        &bsmsg->reply_to_info, 0, -1);
-
+#endif /* ENABLE_TOUCH_UI */
     /* Attachment list */
     bsmsg->attachments[0] = gtk_label_new_with_mnemonic(_("_Attachments:"));
     gtk_misc_set_alignment(GTK_MISC(bsmsg->attachments[0]), 0.0, 0.5);
@@ -2043,14 +2230,8 @@ create_info_pane(BalsaSendmsg * bsmsg, SendType type)
     bsmsg->attachments[2] = sw;
     bsmsg->attachments[3] = frame;
 
-
-    /* Comments: */
-    create_string_entry(table, _("Comments:"), 8, bsmsg->comments);
-
-    /* Keywords: */
-    create_string_entry(table, _("Keywords:"), 9, bsmsg->keywords);
-
     gtk_widget_show_all(table);
+    hide_attachment_widget(bsmsg);
     return table;
 }
 
@@ -2670,8 +2851,10 @@ setup_headers_from_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity *ident)
     gchar* str = libbalsa_address_to_gchar(ident->address, 0);
     gtk_entry_set_text(GTK_ENTRY(bsmsg->from[1]), str);
     g_free(str); 
+#if !defined(ENABLE_TOUCH_UI)
     if(ident->replyto)
         gtk_entry_set_text(GTK_ENTRY(bsmsg->reply_to[1]), ident->replyto);
+#endif
     if(ident->bcc)
 	gtk_entry_set_text(GTK_ENTRY(bsmsg->bcc[1]), ident->bcc);
 }
@@ -2919,9 +3102,8 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 
     /* set options */
     bsmsg->req_dispnotify = FALSE;
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
-                                   (opts_menu[OPTS_MENU_DISPNOTIFY_POS].
-                                    widget), FALSE);
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(DISPNOTIFY_WIDGET),
+                                   FALSE);
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
                                    (opts_menu[OPTS_MENU_FORMAT_POS].
                                     widget), balsa_app.wordwrap);
@@ -2978,9 +3160,11 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	if (message->headers->from != NULL)
 	    gtk_entry_set_text(GTK_ENTRY(bsmsg->from[1]),
 			       libbalsa_address_to_gchar(message->headers->from, 0));
+#if !defined(ENABLE_TOUCH_UI)
 	if (message->headers->reply_to != NULL)
 	    gtk_entry_set_text(GTK_ENTRY(bsmsg->reply_to[1]),
 			       libbalsa_address_to_gchar(message->headers->reply_to, 0));
+#endif
     }
 
     if (type == SEND_REPLY_ALL) {
@@ -3126,7 +3310,9 @@ sendmsg_window_set_field(BalsaSendmsg * bsmsg, const gchar * key,
     else if(g_ascii_strcasecmp(key, "subject")==0) entry = bsmsg->subject[1];
     else if(g_ascii_strcasecmp(key, "cc")     ==0) entry = bsmsg->cc[1];
     else if(g_ascii_strcasecmp(key, "bcc")    ==0) entry = bsmsg->bcc[1];
+#if !defined(ENABLE_TOUCH_UI)
     else if(g_ascii_strcasecmp(key, "replyto")==0) entry = bsmsg->reply_to[1];
+#endif
     else return;
 
     append_comma_separated(GTK_EDITABLE(entry), val);
@@ -3318,8 +3504,10 @@ is_ready_to_send(BalsaSendmsg * bsmsg)
 {
     gboolean ready;
     ready = bsmsg->from_info.ready && bsmsg->to_info.ready
-        && bsmsg->cc_info.ready && bsmsg->bcc_info.ready
-        && bsmsg->reply_to_info.ready;
+        && bsmsg->cc_info.ready && bsmsg->bcc_info.ready;
+#if !defined(ENABLE_TOUCH_UI)
+    ready = ready && bsmsg->reply_to_info.ready;
+#endif
     return ready;
 }
 
@@ -3459,9 +3647,11 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     bsmsg->fcc_url =
         g_strdup(balsa_mblist_mru_option_menu_get(bsmsg->fcc[1]));
 
+#if !defined(ENABLE_TOUCH_UI)
     ctmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->reply_to[1]));
     if (*ctmp)
 	message->headers->reply_to = libbalsa_address_new_from_string(ctmp);
+#endif
 
     if (bsmsg->req_dispnotify)
 	libbalsa_message_set_dispnotify(message, bsmsg->ident->address);
@@ -4053,21 +4243,9 @@ toggle_entry(BalsaSendmsg * bbsmsg, GtkWidget * entry[], int pos, int cnt)
 }
 
 static gint
-toggle_to_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
-{
-    return toggle_entry(bsmsg, bsmsg->to, MENU_TOGGLE_TO_POS, 3);
-}
-
-static gint
 toggle_from_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
     return toggle_entry(bsmsg, bsmsg->from, MENU_TOGGLE_FROM_POS, 3);
-}
-
-static gint
-toggle_subject_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
-{
-    return toggle_entry(bsmsg, bsmsg->subject, MENU_TOGGLE_SUBJECT_POS, 2);
 }
 
 static gint
@@ -4088,31 +4266,13 @@ toggle_fcc_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     return toggle_entry(bsmsg, bsmsg->fcc, MENU_TOGGLE_FCC_POS, 2);
 }
 
+#if !defined(ENABLE_TOUCH_UI)
 static gint
 toggle_reply_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
     return toggle_entry(bsmsg, bsmsg->reply_to, MENU_TOGGLE_REPLY_POS, 3);
 }
-
-static gint
-toggle_attachments_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
-{
-    return toggle_entry(bsmsg, bsmsg->attachments,
-			MENU_TOGGLE_ATTACHMENTS_POS, 4);
-}
-
-static gint
-toggle_comments_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
-{
-    return toggle_entry(bsmsg, bsmsg->comments, MENU_TOGGLE_COMMENTS_POS,
-			2);}
-
-static gint
-toggle_keywords_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
-{
-    return toggle_entry(bsmsg, bsmsg->keywords, MENU_TOGGLE_KEYWORDS_POS,
-			2);
-}
+#endif /* ENABLE_TOUCH_UI */
 
 static void
 toggle_reqdispnotify_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
@@ -4245,7 +4405,7 @@ init_menus(BalsaSendmsg * bsmsg)
 	}
     }
 
-    create_lang_menu(main_menu[MAIN_CHARSET_MENU].widget, bsmsg);
+    create_lang_menu(LANG_MENU_WIDGET, bsmsg);
 
     /* gray 'send' and 'postpone' */
     check_readiness(bsmsg);

@@ -4,6 +4,7 @@
 	* libbalsa/mailbox_imap.[hc]: simplify slightly cache maintainance.
 	* libbalsa/send.c: cancel authentication if no user.
 	* src/main.c: do _very_rarely_ expunge after all :-/.
+	* src/sendmsg-window.[hc]: cleanup + touchscreen menus.
 
 2004-08-05  Pawel Salek
 

@@ -37,7 +37,11 @@ extern "C" {
     } SendType;
 
 
-#define VIEW_MENU_LENGTH 10
+#if defined(ENABLE_TOUCH_UI)
+#define VIEW_MENU_LENGTH 4
+#else
+#define VIEW_MENU_LENGTH 5
+#endif
     typedef struct _BalsaSendmsg BalsaSendmsg;
     typedef struct _BalsaSendmsgAddress BalsaSendmsgAddress;
 
@@ -50,11 +54,12 @@ extern "C" {
 
     struct _BalsaSendmsg {
 	GtkWidget *window;
-	GtkWidget *to[3], *from[3], *subject[2], *cc[3], *bcc[3], *fcc[3],
-	    *reply_to[3];
-        BalsaSendmsgAddress to_info, from_info, cc_info, bcc_info,
-            reply_to_info;
-	GtkWidget *comments[2], *keywords[2];
+	GtkWidget *to[3], *from[3], *subject[2], *cc[3], *bcc[3], *fcc[3];
+        BalsaSendmsgAddress to_info, from_info, cc_info, bcc_info;
+#if !defined(ENABLE_TOUCH_UI)        
+        GtkWidget *reply_to[3];
+        BalsaSendmsgAddress reply_to_info;
+#endif
 	GtkWidget *attachments[4];
 	GtkWidget *text;
 	GtkWidget *spell_checker;

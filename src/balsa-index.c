@@ -2311,7 +2311,8 @@ bndx_expand_to_row(BalsaIndex * index, GtkTreePath * path)
 {
     GtkTreePath *tmp = gtk_tree_path_copy(path);
 
-    if (gtk_tree_path_up(tmp) && gtk_tree_path_get_depth(tmp) > 0) {
+    if (gtk_tree_path_up(tmp) && gtk_tree_path_get_depth(tmp) > 0
+        && !gtk_tree_view_row_expanded(GTK_TREE_VIEW(index), tmp)) {
         bndx_expand_to_row(index, tmp);
         gtk_tree_view_expand_row(GTK_TREE_VIEW(index), tmp, FALSE);
     }

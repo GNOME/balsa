@@ -577,6 +577,8 @@ update_timer(gboolean update, guint minutes)
    This is an idle handler. Be sure to use gdk_threads_{enter/leave}
    Release the passed argument when done.
  */
+static gboolean balsa_app_descend(const gchar * url);
+
 gboolean
 open_mailboxes_idle_cb(gchar ** urls)
 {
@@ -588,7 +590,9 @@ open_mailboxes_idle_cb(gchar ** urls)
     gdk_threads_enter();
 
     for (tmp = urls; *tmp; ++tmp) {
-        mbox = balsa_find_mailbox_by_url(*tmp);
+        while (!(mbox = balsa_find_mailbox_by_url(*tmp)))
+            if (!balsa_app_descend(*tmp))
+                break;
 	if (balsa_app.debug)
 	    fprintf(stderr, "open_mailboxes_idle_cb: opening %s => %p..\n",
 		    *tmp, mbox);
@@ -1014,3 +1018,60 @@ balsa_mailbox_nodes_lock(gboolean exclusive) {}
 void
 balsa_mailbox_nodes_unlock(gboolean exclusive) {}
 #endif
+
+/* Find the nearest ancestor of url in the mailbox nodes, and expand it.
+ */
+struct _BalsaAppDescendInfo {
+    guint len;
+    const gchar *url;
+    GNode *node;
+};
+typedef struct _BalsaAppDescendInfo BalsaAppDescendInfo;
+
+static gboolean
+balsa_app_descend_func(GNode * node, BalsaAppDescendInfo * badi)
+{
+    BalsaMailboxNode *mbnode;
+    LibBalsaMailbox *mailbox;
+    gchar *url;
+    guint len;
+
+    if (   !(mbnode = node->data)
+        || !(mailbox = mbnode->mailbox)
+        || !(url = mailbox->url))
+        return FALSE;
+
+    len = strlen(url);
+    if (len > badi->len && !strncmp(url, badi->url, len)) {
+        badi->len = len;
+        badi->node = node;
+    }
+
+    return FALSE;
+}
+
+static gboolean
+balsa_app_descend(const gchar * url)
+{
+    BalsaAppDescendInfo badi;
+    BalsaMailboxNode *mbnode;
+
+    badi.len = 0;
+    badi.url = url;
+    badi.node = NULL;
+    balsa_mailbox_nodes_lock(FALSE);
+    g_node_traverse(balsa_app.mailbox_nodes, G_PRE_ORDER, G_TRAVERSE_LEAFS,
+                    -1, (GNodeTraverseFunc) balsa_app_descend_func, &badi);
+    balsa_mailbox_nodes_unlock(FALSE);
+
+    if (!badi.node)
+        return FALSE;
+
+    mbnode = badi.node->data;
+    if (mbnode->expanded)
+        return FALSE;
+
+    balsa_mailbox_node_rescan(mbnode);
+
+    return TRUE;
+}

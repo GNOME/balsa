@@ -161,6 +161,7 @@ static void bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter);
 static gint bmbl_core_mailbox(LibBalsaMailbox * mailbox);
 static void bmbl_do_popup(GtkTreeView * tree_view, GtkTreePath * path,
                           GdkEventButton * event);
+static void bmbl_expand_to_row(BalsaMBList * mblist, GtkTreePath * path);
 /* end of prototypes */
 
 /* class methods */
@@ -1584,13 +1585,11 @@ balsa_mblist_focus_mailbox(BalsaMBList * mblist, LibBalsaMailbox * mailbox)
              */
             GtkTreePath *path;
 
-            gtk_tree_selection_select_iter(selection, &iter);
             path = gtk_tree_model_get_path(model, &iter);
-            /* We'd like to scroll only enough to get the mailbox into
-             * the scrolled window, but that's not currently implemented
-             * in GtkTreeView */
+            bmbl_expand_to_row(mblist, path);
+            gtk_tree_selection_select_path(selection, path);
             gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(mblist), path, NULL,
-                                         TRUE, 0.5, 0);
+                                         FALSE, 0, 0);
             gtk_tree_path_free(path);
         }
         return TRUE;
@@ -2114,4 +2113,18 @@ balsa_mblist_set_status_bar(LibBalsaMailbox * mailbox)
 
     gnome_appbar_set_default(balsa_app.appbar, desc);
     g_free(desc);
+}
+
+static void
+bmbl_expand_to_row(BalsaMBList * mblist, GtkTreePath * path)
+{
+    GtkTreePath *tmp = gtk_tree_path_copy(path);
+
+    if (gtk_tree_path_up(tmp) && gtk_tree_path_get_depth(tmp) > 0
+        && !gtk_tree_view_row_expanded(GTK_TREE_VIEW(mblist), tmp)) {
+        bmbl_expand_to_row(mblist, tmp);
+        gtk_tree_view_expand_row(GTK_TREE_VIEW(mblist), tmp, FALSE);
+    }
+
+    gtk_tree_path_free(tmp);
 }

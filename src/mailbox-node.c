@@ -580,6 +580,9 @@ balsa_mailbox_node_rescan(BalsaMailboxNode * mn)
 #if defined(BALSA_USE_THREADS) && defined(THREADED_IMAP_SCAN_FIXED)
     GNode *gnode;
 
+    if (!balsa_app.mailbox_nodes)
+        return;
+
     balsa_mailbox_nodes_lock(TRUE);
     gnode = balsa_find_mbnode(balsa_app.mailbox_nodes, mn);
 
@@ -590,6 +593,7 @@ balsa_mailbox_node_rescan(BalsaMailboxNode * mn)
 	balsa_remove_children_mailbox_nodes(gnode);
 	balsa_mailbox_node_append_subtree(mn, gnode);
 	mn->expanded = expanded;
+        mn->scanned = TRUE;
 	balsa_mblist_repopulate(balsa_app.mblist);
         balsa_mailbox_nodes_unlock(TRUE);
         if (expanded)
@@ -603,6 +607,9 @@ balsa_mailbox_node_rescan(BalsaMailboxNode * mn)
 #else
     GNode *gnode;
     GNode *tmp_node;
+
+    if (!balsa_app.mailbox_nodes)
+        return;
 
     tmp_node = g_node_new(mn);
     balsa_mailbox_node_append_subtree(mn, tmp_node);
@@ -619,6 +626,7 @@ balsa_mailbox_node_rescan(BalsaMailboxNode * mn)
             g_node_prepend(gnode, child);
         }
         balsa_mailbox_nodes_unlock(TRUE);
+        mn->scanned = TRUE;
 	if (expanded)
             /* if this is an IMAP node, we must scan the children */
 	    balsa_mailbox_node_scan_children(mn);

@@ -22,7 +22,7 @@ C mail reading library (called the c-client library) written by Mark
 Crispin. It is being integrated into the GNOME desktop environment.
  
 %prep
-%setup -n balsa
+%setup -n 
 
 %build
 (cd imap; make lnx)

@@ -202,7 +202,7 @@ void build_left_side()
 /*
  * build_type_notebook()
  *
- * builds the "Searc Type" notebook on the "Action" page
+ * builds the "Search Type" notebook on the "Match" page
  */
 void build_type_notebook()
 {
@@ -254,6 +254,10 @@ void build_type_notebook()
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     GTK_SHRINK,
 		     2, 2);
+    gtk_signal_connect(GTK_OBJECT(fe_type_simple_all),
+		       "toggled",
+		       GTK_SIGNAL_FUNC(fe_type_simple_toggled),
+		       (gpointer)1);
     gtk_widget_show(fe_type_simple_all);
     fe_type_simple_header = gtk_check_button_new_with_label("Header");
     gtk_table_attach(GTK_TABLE(fe_type_simple_table),
@@ -262,6 +266,10 @@ void build_type_notebook()
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     GTK_SHRINK,
 		     2, 2);
+    gtk_signal_connect(GTK_OBJECT(fe_type_simple_header),
+		       "toggled",
+		       GTK_SIGNAL_FUNC(fe_type_simple_toggled),
+		       (gpointer)2);
     gtk_widget_show(fe_type_simple_header);
     fe_type_simple_body = gtk_check_button_new_with_label("Body");
     gtk_table_attach(GTK_TABLE(fe_type_simple_table),
@@ -270,6 +278,10 @@ void build_type_notebook()
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     GTK_SHRINK,
 		     2, 2);
+    gtk_signal_connect(GTK_OBJECT(fe_type_simple_body),
+		       "toggled",
+		       GTK_SIGNAL_FUNC(fe_type_simple_toggled),
+		       (gpointer)3);
     gtk_widget_show(fe_type_simple_body);
     fe_type_simple_to = gtk_check_button_new_with_label("To:");
     gtk_table_attach(GTK_TABLE(fe_type_simple_table),
@@ -278,6 +290,10 @@ void build_type_notebook()
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     GTK_SHRINK,
 		     2, 2);
+    gtk_signal_connect(GTK_OBJECT(fe_type_simple_to),
+		       "toggled",
+		       GTK_SIGNAL_FUNC(fe_type_simple_toggled),
+		       (gpointer)4);
     gtk_widget_show(fe_type_simple_to);
     fe_type_simple_from = gtk_check_button_new_with_label("From:");
     gtk_table_attach(GTK_TABLE(fe_type_simple_table),
@@ -286,6 +302,10 @@ void build_type_notebook()
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     GTK_SHRINK,
 		     2, 2);
+    gtk_signal_connect(GTK_OBJECT(fe_type_simple_from),
+		       "toggled",
+		       GTK_SIGNAL_FUNC(fe_type_simple_toggled),
+		       (gpointer)5);
     gtk_widget_show(fe_type_simple_from);
     fe_type_simple_subject = gtk_check_button_new_with_label("Subject");
     gtk_table_attach(GTK_TABLE(fe_type_simple_table),
@@ -294,6 +314,10 @@ void build_type_notebook()
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     GTK_SHRINK,
 		     2, 2);
+    gtk_signal_connect(GTK_OBJECT(fe_type_simple_subject),
+		       "toggled",
+		       GTK_SIGNAL_FUNC(fe_type_simple_toggled),
+		       (gpointer)6);
     gtk_widget_show(fe_type_simple_subject);
 
     fe_type_simple_label = gtk_label_new("Match string:");
@@ -556,6 +580,69 @@ void build_action_page()
     gtk_widget_show(fe_notebook_action_page);
     gtk_widget_show(fe_action_label);
 
+    /* The notification area */
+
+    fe_notification_frame = gtk_frame_new("Notification:");
+    gtk_frame_set_label_align(GTK_FRAME(fe_notification_frame),
+			      GTK_POS_LEFT,
+			      GTK_POS_TOP);
+    gtk_frame_set_shadow_type(GTK_FRAME(fe_notification_frame),
+			      GTK_SHADOW_ETCHED_IN);
+    gtk_table_attach(GTK_TABLE(fe_notebook_action_page),
+		     fe_notification_frame,
+		     0, 10, 0, 3,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_notification_frame);
+    fe_notification_table = gtk_table_new(5, 6, FALSE);
+    gtk_container_add(GTK_CONTAINER(fe_notification_frame),
+		      fe_notification_table);
+    gtk_widget_show(fe_notification_table);
+
+    /* Notification buttons */
+
+    fe_sound_button = gtk_check_button_new_with_label("Play sound:");
+    gtk_table_attach(GTK_TABLE(fe_notification_table),
+		     fe_sound_button,
+		     0, 2, 0, 1,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_sound_button);
+    fe_sound_entry = gtk_entry_new_with_max_length(255);
+    gtk_table_attach(GTK_TABLE(fe_notification_table),
+		     fe_sound_entry,
+		     2, 8, 0, 1,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_sound_entry);
+    fe_sound_browse = gtk_button_new_with_label("Browse...");
+    gtk_table_attach(GTK_TABLE(fe_notification_table),
+		     fe_sound_browse,
+		     8, 10, 0, 1,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_sound_browse);
+    fe_popup_button = gtk_check_button_new_with_label("Popup text:");
+    gtk_table_attach(GTK_TABLE(fe_notification_table),
+		     fe_popup_button,
+		     0, 2, 1, 2,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_popup_button);
+    fe_popup_entry = gtk_entry_new_with_max_length(255);
+    gtk_table_attach(GTK_TABLE(fe_notification_table),
+		     fe_popup_entry,
+		     2, 10, 1, 2,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_popup_entry);
+
     /* The action area */
     
     fe_action_frame = gtk_frame_new("Action to perform:");
@@ -566,7 +653,7 @@ void build_action_page()
 			      GTK_SHADOW_ETCHED_IN);
     gtk_table_attach(GTK_TABLE(fe_notebook_action_page),
 		     fe_action_frame,
-		     0, 10, 0, 7,
+		     0, 10, 3, 7,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     5, 5);
@@ -576,6 +663,8 @@ void build_action_page()
 		      fe_action_table);
     gtk_widget_show(fe_action_table);
 
+
+/*** cut for testing **
     fe_copy_button = gtk_radio_button_new_with_label(NULL,
 						     "Copy to folder:");
     gtk_table_attach(GTK_TABLE(fe_action_table),
@@ -676,6 +765,8 @@ void build_action_page()
 		     5, 5);
     gtk_widget_show(fe_delete_label);
 
+    *** end testing cut ***/
+
     /* The disposition area */
 
     fe_disp_frame = gtk_frame_new("Disposition");
@@ -691,7 +782,7 @@ void build_action_page()
 		     GTK_SHRINK,
 		     5, 5);
     gtk_widget_show(fe_disp_frame);
-    fe_disp_box = gtk_vbox_new(TRUE, 5);
+    fe_disp_box = gtk_vbox_new(TRUE, 2);
     gtk_container_add(GTK_CONTAINER(fe_disp_frame),
 		      fe_disp_box);
     gtk_widget_show(fe_disp_box);
@@ -703,7 +794,7 @@ void build_action_page()
 		       fe_disp_place,
 		       TRUE,
 		       FALSE,
-		       2);
+		       1);
     gtk_widget_show(fe_disp_place);
     fe_disp_continue = gtk_radio_button_new_with_label(
 	gtk_radio_button_group(GTK_RADIO_BUTTON(fe_disp_place)),
@@ -712,7 +803,7 @@ void build_action_page()
 		       fe_disp_continue,
 		       TRUE,
 		       FALSE,
-		       2);
+		       1);
     gtk_widget_show(fe_disp_continue);
     fe_disp_stop = gtk_radio_button_new_with_label(
 	gtk_radio_button_group(GTK_RADIO_BUTTON(fe_disp_continue)),
@@ -721,7 +812,7 @@ void build_action_page()
 		       fe_disp_stop,
 		       TRUE,
 		       FALSE,
-		       2);
+		       1);
     gtk_widget_show(fe_disp_stop);
 } /* end build_action_page() */
 

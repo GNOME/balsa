@@ -108,3 +108,83 @@ void fe_remove_pressed(GtkWidget *widget,
     gtk_list_remove_items(GTK_LIST(fe_type_regex_list),
 			  selected);
 } /* end fe_remove_pressed() */
+
+
+/*
+ * fe_type_simple_toggled()
+ *
+ * Callback for the checkbuttons in the "Simple" type
+ */
+void fe_type_simple_toggled(GtkWidget *widget,
+			    gpointer data)
+{
+    if (GTK_TOGGLE_BUTTON(widget)->active)
+    {
+	switch((gint)data)
+	{
+	case 1: /* ALL */
+	    gtk_toggle_button_set_state(
+		GTK_TOGGLE_BUTTON(fe_type_simple_header),
+		FALSE);
+	    gtk_widget_set_sensitive(
+		GTK_WIDGET(fe_type_simple_header),
+		FALSE);
+	    gtk_toggle_button_set_state(
+		GTK_TOGGLE_BUTTON(fe_type_simple_body),
+		FALSE);
+	    gtk_widget_set_sensitive(
+		GTK_WIDGET(fe_type_simple_body),
+		FALSE);
+ 
+	case 2: /* header */
+	    gtk_toggle_button_set_state(
+		GTK_TOGGLE_BUTTON(fe_type_simple_to),
+		FALSE);
+	    gtk_widget_set_sensitive(
+		GTK_WIDGET(fe_type_simple_to),
+		FALSE);
+	    gtk_toggle_button_set_state(
+		GTK_TOGGLE_BUTTON(fe_type_simple_from),
+		FALSE);
+	    gtk_widget_set_sensitive(
+		GTK_WIDGET(fe_type_simple_from),
+		FALSE);
+	    gtk_toggle_button_set_state(
+		GTK_TOGGLE_BUTTON(fe_type_simple_subject),
+		FALSE);
+	    gtk_widget_set_sensitive(
+		GTK_WIDGET(fe_type_simple_subject),
+		FALSE);
+ 
+	default:
+	    break;
+	}
+    }
+    else
+    {
+	switch((gint)data)
+	{
+	case 1: /* ALL */
+	    gtk_widget_set_sensitive(
+		GTK_WIDGET(fe_type_simple_header),
+		TRUE);
+	    gtk_widget_set_sensitive(
+		GTK_WIDGET(fe_type_simple_body),
+		TRUE);
+
+	case 2: /* header */
+	    gtk_widget_set_sensitive(
+		GTK_WIDGET(fe_type_simple_to),
+		TRUE);
+	    gtk_widget_set_sensitive(
+		GTK_WIDGET(fe_type_simple_from),
+		TRUE);
+	    gtk_widget_set_sensitive(
+		GTK_WIDGET(fe_type_simple_subject),
+		TRUE);
+
+	default:
+	    break;
+	}
+    }
+} /* end fe_type_simple_toggled() */

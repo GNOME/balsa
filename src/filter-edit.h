@@ -172,6 +172,9 @@ GtkWidget *fe_type_simple_from;
 GtkWidget *fe_type_simple_subject;
 GtkWidget *fe_type_simple_label;
 GtkWidget *fe_type_simple_entry;
+/* And callback */
+void fe_type_simple_toggled(GtkWidget *widget,
+		     gpointer data);
 
 /* widgets for the type notebook regex page */
 GtkWidget *fe_type_regex_scroll;
@@ -193,8 +196,15 @@ GtkWidget *fe_type_exec_entry;
 /* widgets for the Action page */
 
 /* action field */
+GtkWidget *fe_notification_frame;
+GtkWidget *fe_notification_table;
 GtkWidget *fe_action_frame;
 GtkWidget *fe_action_table;
+GtkWidget *fe_sound_button;
+GtkWidget *fe_sound_entry;
+GtkWidget *fe_sound_browse;
+GtkWidget *fe_popup_button;
+GtkWidget *fe_popup_entry;
 GtkWidget *fe_copy_button;
 GtkWidget *fe_copy_entry;
 GtkWidget *fe_move_button;

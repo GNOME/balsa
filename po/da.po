@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.9.2\n"
 "POT-Creation-Date: 2000-09-10 19:57+0200\n"
-"PO-Revision-Date: 2000-09-27 20:30+02:00\n"
+"PO-Revision-Date: 2000-09-30 20:30+02:00\n"
 "Last-Translator: Keld Simonsen <keld@dkuug.dk>\n"
 "Language-Team: Danish <dansk@klid.dk>\n"
 "MIME-Version: 1.0\n"
@@ -101,12 +101,12 @@ msgstr "LibBalsaMailboxLocal: Åbner %s referenceantal: %d\n"
 msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxPop3: Åbner %s referenceantal: %d\n"
 
-#: libbalsa/send.c:785
+#: libbalsa/send.c:784
 #, c-format
 msgid "Could not find address for host %s."
 msgstr "Kunne ikke finde adresse for vært %s."
 
-#: libbalsa/send.c:788
+#: libbalsa/send.c:787
 #, c-format
 msgid "Error: Could not find address for host %s."
 msgstr "Fejl: Kunne ikke finde adresse for vært %s."
@@ -617,46 +617,46 @@ msgstr "Konfiguration af adressebog"
 msgid "Update"
 msgstr "Opdatér"
 
-#: src/address-book-config.c:234
+#: src/address-book-config.c:233
 msgid "New Address Book type:"
 msgstr "Ny adressebogstype:"
 
 #. radio buttons ...
 #. ... vCard Address Book
-#: src/address-book-config.c:241
+#: src/address-book-config.c:240
 msgid "VCard Address Book (GnomeCard)"
 msgstr "VCard adressebog (GnomeCard)"
 
-#: src/address-book-config.c:257
+#: src/address-book-config.c:256
 msgid "LDAP Address Book"
 msgstr "LDAP adressebog"
 
-#: src/address-book-config.c:264
+#: src/address-book-config.c:263
 msgid "Balsa is not compiled with LDAP support"
 msgstr "Balsa er ikke kompileret med støtte for LDAP"
 
 #. mailbox name
-#: src/address-book-config.c:284 src/address-book-config.c:343
+#: src/address-book-config.c:283 src/address-book-config.c:338
 msgid "Address Book Name:"
 msgstr "Navn på adressebog:"
 
-#: src/address-book-config.c:297
+#: src/address-book-config.c:294
 msgid "Path"
 msgstr "Sti"
 
-#: src/address-book-config.c:310 src/address-book-config.c:382
+#: src/address-book-config.c:305 src/address-book-config.c:377
 msgid "Expand aliases as you type"
 msgstr "Udvid aliaser under indtastning"
 
-#: src/address-book-config.c:356
+#: src/address-book-config.c:351
 msgid "Host name"
 msgstr "Værtsnavn"
 
-#: src/address-book-config.c:369
+#: src/address-book-config.c:364
 msgid "Base Domain Name"
 msgstr "Basis domænenavn"
 
-#: src/address-book-config.c:432 src/filter-edit-dialog.c:414
+#: src/address-book-config.c:427 src/filter-edit-dialog.c:414
 #: src/mailbox-conf.c:292 src/mailbox-conf.c:931 src/pref-manager.c:1099
 #: src/pref-manager.c:2015
 msgid "Add"
@@ -763,9 +763,8 @@ msgstr "Gem MIME-del"
 msgid "Save"
 msgstr "Gem"
 
-#: src/balsa-message.c:264 src/sendmsg-window.c:149 src/sendmsg-window.c:599
-#: src/sendmsg-window.c:1404 src/sendmsg-window.c:1672
-#: src/sendmsg-window.c:1695
+#: src/balsa-message.c:264 src/sendmsg-window.c:149 src/sendmsg-window.c:596
+#: src/sendmsg-window.c:1665 src/sendmsg-window.c:1688
 msgid "Cancel"
 msgstr "Annullér"
 
@@ -784,13 +783,13 @@ msgstr "Dato:"
 
 #. From:
 #: src/balsa-message.c:569 src/filter-edit-dialog.c:337 src/print.c:336
-#: src/sendmsg-window.c:835
+#: src/sendmsg-window.c:832
 msgid "From:"
 msgstr "Fra:"
 
 #. To:
 #: src/balsa-message.c:573 src/filter-edit-dialog.c:325 src/print.c:341
-#: src/sendmsg-window.c:837
+#: src/sendmsg-window.c:834
 msgid "To:"
 msgstr "Til:"
 
@@ -807,7 +806,7 @@ msgid "Fcc:"
 msgstr "Fcc:"
 
 #. Subject:
-#: src/balsa-message.c:580 src/print.c:345 src/sendmsg-window.c:842
+#: src/balsa-message.c:580 src/print.c:345 src/sendmsg-window.c:839
 msgid "Subject:"
 msgstr "Emne:"
 
@@ -947,7 +946,7 @@ msgstr "Krop"
 msgid "Match string:"
 msgstr "Find tekst:"
 
-#: src/filter-edit-dialog.c:425 src/sendmsg-window.c:514
+#: src/filter-edit-dialog.c:425 src/sendmsg-window.c:516
 msgid "Remove"
 msgstr "Fjern"
 
@@ -1494,22 +1493,22 @@ msgstr ""
 "\n"
 "Rapportér venligst om fejl på: http://bugs.gnome.org/"
 
-#: src/main-window.c:1415
+#: src/main-window.c:1417
 #, c-format
 msgid "Sending error: %s"
 msgstr "Afsendelsesfejl: %s"
 
-#: src/main-window.c:1760
+#: src/main-window.c:1762
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Ændring af postboks %s mislykkedes."
 
-#: src/main-window.c:1946
+#: src/main-window.c:1948
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (skrivebeskyttet)"
 
-#: src/main-window.c:1948
+#: src/main-window.c:1950
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
@@ -2010,15 +2009,15 @@ msgstr "Udvid aliaser"
 msgid "Set as default"
 msgstr "Sæt som standard"
 
-#: src/pref-manager.c:2295
+#: src/pref-manager.c:2297
 msgid "Show Nothing"
 msgstr "Vis ikke noget"
 
-#: src/pref-manager.c:2301
+#: src/pref-manager.c:2303
 msgid "Show Dialog"
 msgstr "Vis dialog"
 
-#: src/pref-manager.c:2307
+#: src/pref-manager.c:2309
 msgid "Show In List"
 msgstr "Vis i liste"
 
@@ -2289,7 +2288,7 @@ msgstr "_Vis"
 msgid "_Language"
 msgstr "_Sprog"
 
-#: src/sendmsg-window.c:571
+#: src/sendmsg-window.c:573
 msgid ""
 "The attachment pixmap (balsa/attachment.png) cannot be found.\n"
 "This means you cannot attach any files.\n"
@@ -2297,64 +2296,60 @@ msgstr ""
 "Vedhæftningsikonen (balsa/attachment.png) kunne ikke findes.\n"
 "Det betyder desværre at du ikke kan vedhæfte filer.\n"
 
-#: src/sendmsg-window.c:573
-msgid "OK"
-msgstr "Ok"
-
-#: src/sendmsg-window.c:589
+#: src/sendmsg-window.c:586
 #, c-format
 msgid "Cannot get info on file '%s': %s\n"
 msgstr "Kan ikke få oplysninger om filen '%s': %s\n"
 
-#: src/sendmsg-window.c:593
+#: src/sendmsg-window.c:590
 #, c-format
 msgid "Attachment is not a regular file: '%s'\n"
 msgstr "Bilaget er ikke en almindelig fil: '%s'\n"
 
-#: src/sendmsg-window.c:658
+#: src/sendmsg-window.c:655
 msgid "Attach file"
 msgstr "Vedhæft bilag"
 
 #. cc:
-#: src/sendmsg-window.c:846
+#: src/sendmsg-window.c:843
 msgid "cc:"
 msgstr "cc:"
 
 #. bcc:
-#: src/sendmsg-window.c:851
+#: src/sendmsg-window.c:848
 msgid "bcc:"
 msgstr "bcc:"
 
 #. fcc:
-#: src/sendmsg-window.c:855
+#: src/sendmsg-window.c:852
 msgid "fcc:"
 msgstr "fcc:"
 
 #. Reply To:
-#: src/sendmsg-window.c:885
+#: src/sendmsg-window.c:882
 msgid "Reply To:"
 msgstr "Svar til:"
 
 #. Attachment list
-#: src/sendmsg-window.c:891
+#: src/sendmsg-window.c:888
 msgid "Attachments:"
 msgstr "Bilag:"
 
 #. Comments:
-#: src/sendmsg-window.c:934
+#: src/sendmsg-window.c:931
 msgid "Comments:"
 msgstr "Kommentarer:"
 
 #. Keywords:
-#: src/sendmsg-window.c:937
+#: src/sendmsg-window.c:934
 msgid "Keywords:"
 msgstr "Nøgleord:"
 
-#: src/sendmsg-window.c:1045
+#: src/sendmsg-window.c:1042
 msgid "you"
 msgstr "dig"
 
-#: src/sendmsg-window.c:1049
+#: src/sendmsg-window.c:1046
 #, c-format
 msgid ""
 "\n"
@@ -2363,7 +2358,7 @@ msgstr ""
 "\n"
 "%s skrev %s:\n"
 
-#: src/sendmsg-window.c:1052
+#: src/sendmsg-window.c:1049
 #, c-format
 msgid ""
 "\n"
@@ -2372,39 +2367,40 @@ msgstr ""
 "\n"
 "%s skrev:\n"
 
-#: src/sendmsg-window.c:1129
+#: src/sendmsg-window.c:1126
 msgid "Reply to "
 msgstr "Svar "
 
-#: src/sendmsg-window.c:1134
+#: src/sendmsg-window.c:1131
 msgid "Forward message"
 msgstr "Videresend brev"
 
-#: src/sendmsg-window.c:1139
+#: src/sendmsg-window.c:1136
 msgid "Continue message"
 msgstr "Fortsæt brev"
 
-#: src/sendmsg-window.c:1144
+#: src/sendmsg-window.c:1141
 msgid "New message"
 msgstr "Nyt brev"
 
-#: src/sendmsg-window.c:1403
-msgid "Could not open the file.\n"
-msgstr "Kunne ikke åbne filen.\n"
+#: src/sendmsg-window.c:1400
+#, c-format
+msgid "Could not open the file %s.\n"
+msgstr "Kunne ikke åbne filen %s.\n"
 
-#: src/sendmsg-window.c:1409
+#: src/sendmsg-window.c:1402
 msgid "Loading..."
 msgstr "Indlæser..."
 
-#: src/sendmsg-window.c:1434
+#: src/sendmsg-window.c:1427
 msgid "Include file"
 msgstr "Inkludér fil"
 
-#: src/sendmsg-window.c:1670
+#: src/sendmsg-window.c:1663
 msgid "Cannot execute print command."
 msgstr "Kan ikke udføre printerkommando."
 
-#: src/sendmsg-window.c:1694
+#: src/sendmsg-window.c:1687
 msgid "Error executing lpr"
 msgstr "Fejl under kørsel af lpr"
 
@@ -2483,6 +2479,3 @@ msgstr "Ingen adressebog valgt..."
 #: src/store-address.c:238
 msgid "Sorry, no semicolons are allowed in the name!\n"
 msgstr "Beklager, semikolon er ikke tilladt i navnet!\n"
-
-msgid "Locale %s (%s) is not available on this computer."
-msgstr "Locale %s (%s) er ikke tilgængelig på denne datamaskine."

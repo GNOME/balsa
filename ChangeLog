@@ -1,3 +1,13 @@
+2003-09-20  Pawel Salek  <pawsa theochem.kth.se>
+
+	* libbalsa/address-entry.c: initalize emailData::address and fix
+	dangling references introduced yesterday.
+	* src/expand-alias.c: ditto.
+
+	* libbalsa/folder-scanners.c: do not scan \NoInferiors and
+	\HasNoChildren folders.
+	* src/mailbox-node.c: ditto.
+
 2003-09-19  Pawel Salek  <pawsa theochem.kth.se>
 
 	* libbalsa/address-entry.[hc]: add libbalsa_address_entry_get_list().

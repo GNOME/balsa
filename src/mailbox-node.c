@@ -1181,12 +1181,13 @@ imap_scan_create_mbnode(GNode * root, imap_scan_item * isi, char delim)
    add given mailbox unless its base name begins on dot.
 */
 static void
-add_imap_entry(const char* fn, char delim, gboolean selectable, void* data)
+add_imap_entry(const char* fn, char delim, 
+               gboolean noinferiors, gboolean selectable, void* data)
 {
     imap_scan_tree *tree = (imap_scan_tree *) data;
     imap_scan_item *item = g_new0(imap_scan_item, 1);
     item->fn = g_strdup(fn);
-    item->scanned = FALSE;
+    item->scanned = noinferiors;
     item->selectable = selectable;
 
     tree->list = g_slist_prepend(tree->list, item);
@@ -1220,7 +1221,7 @@ add_imap_mailbox(const char* fn, char delim, void* data)
     }
     if(balsa_app.debug) 
 	printf("add_imap_mailbox: Adding mailbox of path %s\n", fn);
-    add_imap_entry(fn, delim, TRUE, data);
+    add_imap_entry(fn, delim, TRUE, TRUE, data);
 }
 
 static void
@@ -1228,7 +1229,7 @@ add_imap_folder(const char* fn, char delim, void* data)
 { 
     if(balsa_app.debug) 
 	printf("add_imap_folder: Adding folder of path %s\n", fn);
-    add_imap_entry(fn, delim, FALSE, data); 
+    add_imap_entry(fn, delim, FALSE, FALSE, data); 
 }
 
 /*

@@ -235,6 +235,7 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
          * using this option is to pickup an INBOX that isn't in the
          * tree specified by the prefix */
         mailbox_handler("INBOX", '/', cb_data);
+        folder_handler("INBOX", '/', cb_data);
         mark_imap_path("INBOX", cb_data);
     }
 
@@ -276,7 +277,7 @@ void imap_add_folder (char delim, char *folder, int noselect,
     /* this extra check is needed for subscribed folder handling. 
      * Read RFC when in doubt. */
     if(!g_list_find_custom(state->subfolders, folder,
-			   (GCompareFunc)strcmp)) {
+			   (GCompareFunc)strcmp) && !noinferiors) {
 	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
                              "ADDING FOLDER  %s\n", folder);
 	    

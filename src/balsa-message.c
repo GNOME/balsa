@@ -739,7 +739,8 @@ mimetext2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * gr
   STATE s;
   gchar *ptr = 0;
   size_t alloced;
-
+  GnomeCanvasItem *item;
+  BalsaSaveFileInfo *info;
 
   fseek (fp, bdy->offset, 0);
   s.fpin = fp;
@@ -760,10 +761,27 @@ mimetext2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * gr
 	  balsa_message_text_item_set_bg (item, group, BGLINKCOLOR);
 	  goto END;
 	}
+
+      /* add an hook for saving the file */
+      if ( bdy->filename != NULL ) {
+	      /* create text */
+	      item = balsa_message_text_item ("--TEXTFILE--", group, 0.0,
+					      next_part_height (group));
+	      /* create item's background under text as created above */
+	      balsa_message_text_item_set_bg (item, group, BGLINKCOLOR);
+	      
+	      info = balsa_save_file_info_new (NULL, message, bdy);
+	      /* attach a signal to the background we created, so that we can change it
+	       * when the mouse is moved over it */
+	      gtk_signal_connect (GTK_OBJECT (item), "event",
+				  GTK_SIGNAL_FUNC (item_event), info);
+      }
       /* add the text item to the canvas */
       balsa_message_text_item (ptr, group, 0.0, next_part_height (group));
       g_free (ptr);
+     
     }
+
 END:
   fclose (s.fpout);
   unlink (tmp_file_name);

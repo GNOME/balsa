@@ -51,15 +51,18 @@ balsa_store_address(GtkWidget * widget, gpointer user_data)
     GtkWidget *label = NULL;
     GtkWidget **entries = NULL;
     gint cnt = 0;
+    gint cnt2 = 0;
     gchar *labels[NUM_FIELDS] = { N_("Card Name:"), N_("First Name:"),
-	N_("Last Name:"), N_("Organization:"),
+	N_("Middle Name:"), N_("Last Name:"), N_("Organization:"),
 	N_("Email Address:")
     };
     gchar **names;
 
     gchar *new_name = NULL;
     gchar *new_email = NULL;
+    gchar *new_organization = NULL;
     gchar *first_name = NULL;
+    gchar *middle_name = NULL;
     gchar *last_name = NULL;
     GtkWidget *ab_option, *menu_item, *ab_menu;
     GList *ab_list;
@@ -113,6 +116,12 @@ balsa_store_address(GtkWidget * widget, gpointer user_data)
     /* FIXME: Handle more than just the one address... */
     new_email = g_strdup(message->from->address_list->data);
 
+    /* initialize the organization... */
+    if (message->from->organization == NULL)
+	new_organization = g_strdup("");
+    else
+	new_organization = g_strdup(message->from->organization);
+
     if (message->from->full_name == NULL) {
 	/* if the message only contains an e-mail address */
 	new_name = g_strdup(new_email);
@@ -122,9 +131,10 @@ balsa_store_address(GtkWidget * widget, gpointer user_data)
 
 	if (strlen(new_name) == 0) {
 	    first_name = g_strdup("");
+	    middle_name = g_strdup("");
 	    last_name = g_strdup("");
 	} else {
-	    /* guess the first name and last name */
+	    /* guess the first name, middle name and last name */
 	    names = g_strsplit(new_name, " ", 0);
 	    first_name = g_strdup(names[0]);
 	    /* get last name */
@@ -137,14 +147,22 @@ balsa_store_address(GtkWidget * widget, gpointer user_data)
 	    else
 		last_name = g_strdup(names[cnt - 1]);
 
+	    /* get middle name */
+	    cnt2 = 1;
+	    if (cnt > 2) {
+		middle_name = g_strdup("");
+
+		while (cnt2 != cnt - 1) {
+		    middle_name = g_strconcat(middle_name, names[cnt2++], NULL);
+
+		    if (cnt2 != cnt - 1)
+			middle_name = g_strconcat(middle_name, " ", NULL);
+		}
+	    }
+
 	    g_strfreev(names);
 	}
     }
-
-    if (!first_name)
-	first_name = g_strdup("");
-    if (!last_name)
-	last_name = g_strdup("");
 
     entries = g_new(GtkWidget *, NUM_FIELDS);
 
@@ -207,8 +225,10 @@ balsa_store_address(GtkWidget * widget, gpointer user_data)
 
     gtk_entry_set_text(GTK_ENTRY(entries[FULL_NAME]), new_name);
     gtk_entry_set_text(GTK_ENTRY(entries[FIRST_NAME]), first_name);
+    gtk_entry_set_text(GTK_ENTRY(entries[MIDDLE_NAME]), middle_name);
     gtk_entry_set_text(GTK_ENTRY(entries[LAST_NAME]), last_name);
     gtk_entry_set_text(GTK_ENTRY(entries[EMAIL_ADDRESS]), new_email);
+    gtk_entry_set_text(GTK_ENTRY(entries[ORGANIZATION]), new_organization);
 
     gtk_editable_select_region(GTK_EDITABLE(entries[FULL_NAME]), 0, -1);
 
@@ -223,8 +243,10 @@ balsa_store_address(GtkWidget * widget, gpointer user_data)
 
     g_free(new_name);
     g_free(first_name);
+    g_free(middle_name);
     g_free(last_name);
     g_free(new_email);
+    g_free(new_organization);
 }
 
 static void
@@ -282,6 +304,9 @@ store_address_dialog_button_clicked_cb(GtkWidget * widget, gint which,
 	address->first_name =
 	    g_strstrip(gtk_editable_get_chars
 		       (GTK_EDITABLE(entries[FIRST_NAME]), 0, -1));
+	address->middle_name =
+	    g_strstrip(gtk_editable_get_chars
+		       (GTK_EDITABLE(entries[MIDDLE_NAME]), 0, -1));
 	address->last_name =
 	    g_strstrip(gtk_editable_get_chars
 		       (GTK_EDITABLE(entries[LAST_NAME]), 0, -1));

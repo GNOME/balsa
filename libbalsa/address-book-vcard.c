@@ -283,7 +283,7 @@ static void load_vcard_file(LibBalsaAddressBook *ab)
 		    address->full_name = g_strdup(_("No-Name"));
 
 
-		/* FIXME: Split into Firstname and Lastname... */
+		/* FIXME: Split into Firstname, Middlename and Lastname... */
 
 		list = g_list_prepend(list, address);
 		address_list = NULL;
@@ -373,19 +373,19 @@ extract_name(const gchar * string)
     name_arr = g_malloc((cpt + 1) * sizeof(gchar *));
 
     j = 0;
-    if (cpt > PREFIX && strlen(fld[PREFIX]) != 0)
+    if (cpt > PREFIX && *fld[PREFIX] != '\0')
 	name_arr[j++] = g_strdup(fld[PREFIX]);
 
-    if (cpt > FIRST && strlen(fld[FIRST]) != 0)
+    if (cpt > FIRST && *fld[FIRST] != '\0')
 	name_arr[j++] = g_strdup(fld[FIRST]);
 
-    if (cpt > MIDDLE && strlen(fld[MIDDLE]) != 0)
+    if (cpt > MIDDLE && *fld[MIDDLE] != '\0')
 	name_arr[j++] = g_strdup(fld[MIDDLE]);
 
-    if (cpt > LAST && strlen(fld[LAST]) != 0)
+    if (cpt > LAST && *fld[LAST] != '\0')
 	name_arr[j++] = g_strdup(fld[LAST]);
 
-    if (cpt > SUFFIX && strlen(fld[SUFFIX]) != 0)
+    if (cpt > SUFFIX && *fld[SUFFIX] != '\0')
 	name_arr[j++] = g_strdup(fld[SUFFIX]);
 
     name_arr[j] = NULL;
@@ -433,20 +433,27 @@ libbalsa_address_book_vcard_store_address(LibBalsaAddressBook * ab,
 	return;
     }
 
-    fprintf(fp, "\nBEGIN:VCARD\n");
-    if (new_address->full_name) 
+    fprintf(fp, "BEGIN:VCARD\n");
+    if (*new_address->full_name != '\0')
 	fprintf(fp, "FN:%s\n", new_address->full_name);
-    if (new_address->first_name && new_address->last_name)
+    if (*new_address->last_name != '\0' && 
+	*new_address->first_name != '\0' && 
+	*new_address->middle_name != '\0')
+	fprintf(fp, "N:%s;%s;%s\n", new_address->last_name,
+		new_address->first_name, new_address->middle_name);
+    else if (*new_address->last_name != '\0' && 
+	     *new_address->first_name != '\0')
 	fprintf(fp, "N:%s;%s\n", new_address->last_name,
 		new_address->first_name);
-    if (new_address->organization)
+    else if (*new_address->first_name != '\0')
+	fprintf(fp, "N:;%s\n", new_address->first_name);
+    if (*new_address->organization != '\0')
 	fprintf(fp, "ORG:%s\n", new_address->organization);
-    list = new_address->address_list;
-    while (list) {
+
+    for (list = new_address->address_list; list; list = g_list_next(list))
 	fprintf(fp, "EMAIL;INTERNET:%s\n", (gchar *) list->data);
-	list = g_list_next(list);
-    }
-    fprintf(fp, "END:VCARD\n");
+
+    fprintf(fp, "END:VCARD\n\n");
     fclose(fp);
 }
 

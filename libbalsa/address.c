@@ -73,6 +73,7 @@ libbalsa_address_init(LibBalsaAddress * addr)
     addr->id = NULL;
     addr->full_name = NULL;
     addr->first_name = NULL;
+    addr->middle_name = NULL;
     addr->last_name = NULL;
     addr->organization = NULL;
     addr->address_list = NULL;
@@ -90,6 +91,7 @@ libbalsa_address_destroy(GtkObject * object)
     g_free(addr->id);           addr->id = NULL;
     g_free(addr->full_name);    addr->full_name = NULL;
     g_free(addr->first_name);   addr->first_name = NULL;
+    g_free(addr->middle_name);  addr->middle_name = NULL;
     g_free(addr->last_name);    addr->last_name = NULL;
     g_free(addr->organization); addr->organization = NULL;
 

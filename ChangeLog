@@ -1,3 +1,11 @@
+2001-08-15  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Ali Akcaagac <ali.akcaagac@stud.fh-wilhelmshaven.de> - fix some
+	address book issues, including organization handling.
+	* libbalsa/address-book-vcard.c: don't save empty fields.
+	* libbalsa/address.[hc]: add middle-name.
+	* src/store-address.c: parse for middle name.
+
 2001-08-14  Pawel Salek  <pawsa@theochem.kth.se>
 
 	PeterBloomfield@MindSpring.com>:

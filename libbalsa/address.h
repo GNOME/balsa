@@ -39,6 +39,7 @@ typedef enum _LibBalsaAddressField LibBalsaAddressField;
 enum _LibBalsaAddressField {
     FULL_NAME,
     FIRST_NAME,
+    MIDDLE_NAME,
     LAST_NAME,
     ORGANIZATION,
     EMAIL_ADDRESS,
@@ -61,6 +62,7 @@ struct _LibBalsaAddress {
      */
     gchar *full_name;
     gchar *first_name;
+    gchar *middle_name;
     gchar *last_name;
 
     /* Organisation

@@ -14,7 +14,7 @@ dnl ###########################################################################
 
 BALSA_MAJOR=1
 BALSA_REVISION=1
-BALSA_PATCHLEVEL=1
+BALSA_PATCHLEVEL=2
 BALSA_RELEASE=1
 use_release=no
 

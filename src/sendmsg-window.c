@@ -179,7 +179,7 @@ static GnomeUIInfo edit_menu[] =
 static GnomeUIInfo view_menu[] =
 {
 #define MENU_TOGGLE_FROM_POS 0
-  GNOMEUIINFO_TOGGLEITEM( N_ ("_From"), NULL, toggle_from_cb, NULL),
+  GNOMEUIINFO_TOGGLEITEM( N_ ("Fr_om"), NULL, toggle_from_cb, NULL),
 #define MENU_TOGGLE_TO_POS 1
   GNOMEUIINFO_TOGGLEITEM( N_ ("_To"), NULL, toggle_to_cb, NULL),
 #define MENU_TOGGLE_SUBJECT_POS 2

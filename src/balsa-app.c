@@ -169,6 +169,10 @@ gint
 do_load_mailboxes (void)
 {
   special_mailboxes ();
+
+  /* load_local_mailboxes does not work well without trash */
+  if (!balsa_app.trash) 
+    return FALSE;
   load_local_mailboxes ();
 
   if (!balsa_app.inbox)

@@ -111,26 +111,23 @@ find_mailbox_func (GNode * g1, gpointer data)
 {
   MailboxNode *n1 = (MailboxNode *) g1->data;
   gpointer *d = data;
-  gchar *name = *(gchar **) data;
+  Mailbox *mb = *(Mailbox**) data;
 
-  if (!n1)
-    return FALSE;
-  if (strcmp (n1->name, name) != 0)
-    {
-      return FALSE;
-    }
+  if (!n1 || n1->mailbox != mb)
+     return FALSE;
+
   *(++d) = g1;
   return TRUE;
 }
 
 
 static GNode *
-find_gnode_in_mbox_list (GNode * gnode_list, gchar * mbox_name)
+find_gnode_in_mbox_list (GNode * gnode_list, Mailbox * mailbox)
 {
   gpointer d[2];
   GNode *retval;
 
-  d[0] = mbox_name;
+  d[0] = mailbox;
   d[1] = NULL;
 
   g_node_traverse (gnode_list, G_IN_ORDER, G_TRAVERSE_LEAFS, -1, find_mailbox_func, d);
@@ -188,7 +185,7 @@ mailbox_conf_delete (Mailbox * mailbox)
     }
   else
     {
-      gnode = find_gnode_in_mbox_list (balsa_app.mailbox_nodes, mailbox->name);
+      gnode = find_gnode_in_mbox_list (balsa_app.mailbox_nodes, mailbox);
       if (!gnode)
 	{
 	  fprintf (stderr, _("Oooop! mailbox not found in balsa_app.mailbox "

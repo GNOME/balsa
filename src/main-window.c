@@ -138,7 +138,7 @@ static void filter_dlg_cb (GtkWidget * widget, gpointer data);
 
 gboolean balsa_close_mailbox_on_timer(GtkWidget *widget, gpointer *data);
 
-/* static void mailbox_close_child (GtkWidget * widget, gpointer data); */
+static void mailbox_close_cb (GtkWidget * widget, gpointer data);
 static void mailbox_commit_changes (GtkWidget * widget, gpointer data);
 static void mailbox_empty_trash(GtkWidget * widget, gpointer data);
 
@@ -194,7 +194,7 @@ static GnomeUIInfo file_menu[] =
 
 static GnomeUIInfo shown_hdrs_menu[] =
 {
-   GNOMEUIINFO_RADIOITEM( N_ ("_No headers"), NULL, 
+   GNOMEUIINFO_RADIOITEM( N_ ("N_o headers"), NULL, 
 			  show_no_headers_cb, NULL),
    GNOMEUIINFO_RADIOITEM( N_ ("_Selected headers"),NULL,
 			  show_selected_cb, NULL),
@@ -279,6 +279,8 @@ static GnomeUIInfo mailbox_menu[] =
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_ITEM_STOCK (N_ ("Co_mmit current"), N_("Commit the changes in the currently opened mailbox"),
 			  mailbox_commit_changes, GNOME_STOCK_MENU_REFRESH),
+  GNOMEUIINFO_ITEM_STOCK (N_ ("_Close"), N_("Close mailbox"),
+			  mailbox_close_cb, GNOME_STOCK_MENU_CLOSE),
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_ITEM_STOCK (N_ ("Empty _Trash"), N_("Delete Messages from the trash mailbox"), mailbox_empty_trash, GNOME_STOCK_PIXMAP_REMOVE),
   GNOMEUIINFO_END
@@ -707,6 +709,8 @@ static void balsa_window_destroy (GtkObject     *object)
   if (GTK_OBJECT_CLASS(parent_class)->destroy)
     (*GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(object));
 
+  /* don't try to use notebook later in empty_trash */
+  balsa_app.notebook = NULL;
   balsa_exit();
 }
 
@@ -1358,19 +1362,16 @@ mblist_window_cb (GtkWidget * widget, gpointer data)
 }
 */
 
-/* FIXME not used at least since 2000.03.06
+/* closes the mailbox on the notebook's active page */
 static void
-mailbox_close_child (GtkWidget * widget, gpointer data)
+mailbox_close_cb (GtkWidget * widget, gpointer data)
 {
-  GtkWidget *index;
+  GtkWidget *index = balsa_window_find_current_index(BALSA_WINDOW(data));
 
-  index = balsa_window_find_current_index(BALSA_WINDOW(data));
-
-  g_return_if_fail(index != NULL);
-
-  balsa_window_close_mailbox(BALSA_WINDOW(data), BALSA_INDEX(index)->mailbox);
+  if(index)
+   balsa_window_close_mailbox(BALSA_WINDOW(data), BALSA_INDEX(index)->mailbox);
 }
-*/
+
 
 static void
 mailbox_commit_changes (GtkWidget * widget, gpointer data)

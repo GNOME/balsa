@@ -1,13 +1,22 @@
 2000-03-14  Pawel Salek <pawsa@theochem.kth.se>
+	* src/balsa-app.c: handles lack of trash nicely
+	* src/mailbox-conf.c: ultimate solution of the mailbox 
+	deletion command. Should work for any combination.
+	* src/main-window.c: close mailbox command restored
+	* src/sendmsg-window.c: fixed some shortcuts
+	
+2000-03-14  Pawel Salek <pawsa@theochem.kth.se>
 	
 	* src/balsa-message.c, libbalsa/filter-file.c:
 	* libbalsa/misc.c, libbalsa/mime.c: 
 	readfile() allocates place for ending '\0' character - 
 	last character of a text body in multipart message used to be eaten.
 	* src/main.c: used to assume that balsa_app.notebook exists 
-	when emping trash.
+	when empting trash.
 	* src/main-window.c: status bar message removed when closing last 
 	mailbox.
+	* src/sendmsg-window.c: major code clean up (uff!), finished 
+	function documentation.
 	
 2000-03-13  Alastair McKinstry <mckinstry@computer.org>
 

@@ -299,6 +299,7 @@ balsa_mblist_insert_mailbox (BalsaMBList * mblist,
   MailboxNode *mbnode;
   gchar *text[1];
   
+  g_assert(mailbox!=NULL);
   text[0] = mailbox->name;
 
 #ifdef BALSA_SHOW_INFO

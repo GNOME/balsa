@@ -71,6 +71,10 @@ rm -rf "$RPM_BUILD_ROOT"
 
 make DESTDIR="$RPM_BUILD_ROOT" install
 
+#desktop-file-install --vendor gnome --delete-original       \
+#  --dir $RPM_BUILD_ROOT%{_datadir}/applications             \
+#  $RPM_BUILD_ROOT%{_datadir}/applications/*
+
 %find_lang %{name}
 
 
@@ -79,11 +83,11 @@ make DESTDIR="$RPM_BUILD_ROOT" install
 
 %post
 if which scrollkeeper-update>/dev/null 2>&1; then
-    scrollkeeper-update -q -o %{_datadir}/omf/balsa
+    scrollkeeper-update
 fi
 
 %postun
-which scrollkeeper-update>/dev/null 2>&1 && scrollkeeper-update -q
+which scrollkeeper-update>/dev/null 2>&1 && scrollkeeper-update
 
 %files -f %{name}.lang
 %defattr(-, root, root)
@@ -91,7 +95,8 @@ which scrollkeeper-update>/dev/null 2>&1 && scrollkeeper-update -q
 %doc docs/vconvert.awk docs/pine2vcard
 %{_bindir}/balsa
 %{_datadir}/applications/balsa.desktop
-%{_datadir}/balsa/doc/balsa-manual/*
+%{_datadir}/pixmaps/gnome-balsa2.png
+%{_datadir}/gnome/help/balsa-manual/*
 %{_datadir}/omf/balsa/*
 %{_datadir}/balsa/pixmaps/*
 %{_datadir}/sounds/balsa/*
@@ -100,6 +105,9 @@ which scrollkeeper-update>/dev/null 2>&1 && scrollkeeper-update -q
 
 
 %changelog
+* Mon Sep 16 2002 Pawel Salek <pawsa@theochem.kth.se>
+- adapt to GNOME2 requirements.
+
 * Sun Jun 24 2001 Spider <spider@darkmere.wanfear.com>
 - remove all defined paths to user-specified. 
 - update configures, locales, update esmtp as a requires/buildrequires 

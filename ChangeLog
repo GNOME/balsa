@@ -1,3 +1,10 @@
+2002-11-05  Pawel Salek <pawsa@theochem.kth.se>
+
+	* Makefile.am: remove intl from SUBDIRS.
+	* autogen.sh: run glib-gettextize "manually".
+	* balsa.spec.in: change help file location.
+	* configure.in: AM_GNU_GETTEXT -> AM_GLIB_GNU_GETTEXT and cleanup.
+
 2002-11-05  Peter Bloomfield <PeterB@cvs.gnome.org>
 
         * libbalsa/files.c, src/sendmsg-window.c: move tests for icon

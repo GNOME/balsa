@@ -1,6 +1,6 @@
 dnl -*- mode: m4 -*-
-AC_INIT(src/balsa-app.h)
 AC_PREREQ(2.52)
+AC_INIT(src/balsa-app.h)
 dnl ###########################################################################
 dnl Versioning
 dnl ###########################################################################
@@ -26,7 +26,6 @@ AC_ISC_POSIX
 AC_PROG_CC
 AC_STDC_HEADERS
 AM_PROG_LIBTOOL
-AC_PROG_INTLTOOL
 
 AC_DEFINE_UNQUOTED(BALSA_MAJOR, $BALSA_MAJOR,
                    [Define to the Balsa major version])
@@ -106,12 +105,10 @@ ALL_LINGUAS="az bg ca cs da de en_GB el es et fi fr ga he hu it ja ko lt ms nl n
 GETTEXT_PACKAGE=balsa
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
-                   [The gettext package.])
-AM_GNU_GETTEXT
-# AM_GNOME_GETTEXT above substs $DATADIRNAME
-# this is the directory where the *.{mo,gmo} files are installed
-gnomelocaledir='${prefix}/${DATADIRNAME}/locale'
-AC_SUBST(gnomelocaledir)
+                   [The gettext package name.])
+
+AM_GLIB_GNU_GETTEXT
+AC_PROG_INTLTOOL
 
 dnl ###########################################################################
 dnl More checks
@@ -129,24 +126,6 @@ AC_TRY_LINK( [#include <ctype.h>], [return isblank('a');],
 	      AC_DEFINE(isblank,isspace,
                         [Redefined to isspace if isblank is not available.])] )
 
-dnl ###########################################################################
-dnl ORBit support
-dnl Use 'failure' instead of 'dontfail' to make us bomb if no orbit. 
-dnl Probably should use 'failure'.
-dnl ###########################################################################
-dnl
-dnl # No more IDL
-dnl
-dnl GNOME_ORBIT_HOOK([],dontfail)
-dnl AM_CONDITIONAL(ORBIT_INSTALLED, test -n "$ORBIT_LIBS")
-
-
-dnl ###########################################################################
-dnl Enable all? (=broken stuff)
-dnl ###########################################################################
-
-AC_DEFINE(BALSA_SHOW_ALL, true, [true if all the features should be exposed.])
-AM_CONDITIONAL(BALSA_SHOW_ALL, true)
 
 dnl ###########################################################################
 dnl Use threading?
@@ -168,7 +147,6 @@ dnl   The way prefix et al are defined makes us jump through some hoops.
 dnl ###########################################################################
 
 dnl datadir='${prefix}/share', so we must eval it or something. This works
-echo "prefix=$prefix"
 BALSA_STD_PREFIX=`eval "echo ${prefix}"`
 BALSA_DATA_PREFIX=`eval "echo ${datadir}/balsa"`
 
@@ -381,18 +359,6 @@ AC_ARG_WITH(gss, [  --with-gss              Enable GSS [default=no]],
     [with_gss=$withval],[with_gss=no])
 
 dnl ###########################################################################
-dnl Test whether jw is installed
-dnl ###########################################################################
-AC_PATH_PROG(JW,jw,no)
-if test x$JW = xno; then
-  HAVE_JW="no"
-else
-  HAVE_JW="yes"
-fi
-AM_CONDITIONAL(HAVE_JW, test "x$HAVE_JW" = "xyes")
-AC_SUBST(HAVE_JW)
-
-dnl ###########################################################################
 dnl turn warnings into errors to enforce clean code
 dnl ###########################################################################
 
@@ -443,10 +409,8 @@ Makefile
 balsa.1
 balsa.spec
 po/Makefile.in
-po/Makefile
 sounds/Makefile
 images/Makefile
-intl/Makefile
 doc/Makefile
 doc/C/Makefile
 libbalsa/Makefile

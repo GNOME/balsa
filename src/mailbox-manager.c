@@ -48,6 +48,8 @@ static GtkWidget *notebook_create (void);
 static GtkWidget *new_mailbox (void);
 static GtkWidget *edit_local_mailbox (void);
 static GtkWidget *edit_pop3_mailbox (void);
+static GtkWidget *edit_imap_mailbox (void);
+static GtkWidget *edit_nntp_mailbox (void);
 static GtkWidget *delete_yesno (void);
 
 
@@ -81,7 +83,6 @@ open_mailbox_manager ()
   gtk_container_border_width (GTK_CONTAINER (mmw->window), 3);
   gtk_window_set_title (GTK_WINDOW (mmw->window), "Mailbox Manager");
   gtk_window_set_wmclass (GTK_WINDOW (mmw->window), "mailbox_manager", "Balsa");
-  gtk_widget_set_usize (mmw->window, 400, 300);
   gtk_window_position (GTK_WINDOW (mmw->window), GTK_WIN_POS_CENTER);
 
   gtk_signal_connect (GTK_OBJECT (mmw->window),
@@ -183,17 +184,13 @@ open_mailbox_manager ()
 
   gtk_widget_show (button);
 
-
   hbox = gtk_hbox_new (FALSE, 0);
   gtk_box_pack_start (GTK_BOX (vboxm), hbox, FALSE, TRUE, 0);
   gtk_widget_show (hbox);
 
-
-  /* close button */
   button = gtk_button_new_with_label ("Close");
-  GTK_WIDGET_SET_FLAGS (button, GTK_CAN_DEFAULT);
-  gtk_widget_grab_default (button);
   gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
+  gtk_widget_show(button);
 
   gtk_signal_connect (GTK_OBJECT (button),
 		      "clicked",
@@ -205,9 +202,8 @@ open_mailbox_manager ()
 			     GTK_SIGNAL_FUNC (gtk_widget_destroy),
 			     GTK_OBJECT (mmw->window));
 
-  gtk_widget_show (button);
-
   gtk_paned_add2 (GTK_PANED (vpane), notebook);
+
 
   /* show the whole thing */
   gtk_widget_show (mmw->window);
@@ -221,12 +217,12 @@ notebook_create ()
   notebook = gtk_notebook_new ();
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), FALSE);
   gtk_widget_show (notebook);
-  gtk_notebook_append_page_menu (GTK_NOTEBOOK (notebook), new_mailbox (), NULL, NULL);         /* 0 */
-  gtk_notebook_append_page_menu (GTK_NOTEBOOK (notebook), edit_local_mailbox (), NULL, NULL);  /* 1 */
-  gtk_notebook_append_page_menu (GTK_NOTEBOOK (notebook), edit_pop3_mailbox (), NULL, NULL);   /* 2 */
-  gtk_notebook_append_page_menu (GTK_NOTEBOOK (notebook), edit_pop3_mailbox (), NULL, NULL);   /* 3 */
-  gtk_notebook_append_page_menu (GTK_NOTEBOOK (notebook), edit_pop3_mailbox (), NULL, NULL);   /* 4 */
-  gtk_notebook_append_page_menu (GTK_NOTEBOOK (notebook), delete_yesno (), NULL, NULL);        /* 5 */
+  gtk_notebook_append_page_menu (GTK_NOTEBOOK (notebook), new_mailbox (), NULL, NULL);	/* 0 */
+  gtk_notebook_append_page_menu (GTK_NOTEBOOK (notebook), edit_local_mailbox (), NULL, NULL);	/* 1 */
+  gtk_notebook_append_page_menu (GTK_NOTEBOOK (notebook), edit_pop3_mailbox (), NULL, NULL);	/* 2 */
+  gtk_notebook_append_page_menu (GTK_NOTEBOOK (notebook), edit_imap_mailbox (), NULL, NULL);	/* 3 */
+  gtk_notebook_append_page_menu (GTK_NOTEBOOK (notebook), edit_nntp_mailbox (), NULL, NULL);	/* 4 */
+  gtk_notebook_append_page_menu (GTK_NOTEBOOK (notebook), delete_yesno (), NULL, NULL);		/* 5 */
   return notebook;
 }
 
@@ -250,7 +246,7 @@ update_mailbox_list ()
   gtk_clist_freeze (GTK_CLIST (mmw->list));
   gtk_clist_clear (GTK_CLIST (mmw->list));
 
-  list = g_list_first(balsa_app.mailbox_list);
+  list = g_list_first (balsa_app.mailbox_list);
   while (list)
     {
       mailbox = list->data;
@@ -288,7 +284,7 @@ static void
 edit_cb (GtkWidget * widget, GtkWidget * notebook)
 {
   Mailbox *mailbox;
-  mailbox = gtk_clist_get_row_data(GTK_CLIST(mmw->list),((gint) GTK_CLIST (mmw->list)->selection->data));
+  mailbox = gtk_clist_get_row_data (GTK_CLIST (mmw->list), ((gint) GTK_CLIST (mmw->list)->selection->data));
   switch (mailbox->type)
     {
     case MAILBOX_MBX:
@@ -341,7 +337,6 @@ delete_cb (GtkWidget * widget, GtkWidget * notebook)
 }
 
 
-/* АБВлллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллВБА */
 /* New mailbox */
 
 static GtkWidget *
@@ -353,12 +348,13 @@ new_mailbox (void)
   GtkWidget *entry;
   GtkWidget *label;
   GtkWidget *button;
+  GtkWidget *mailboxtype;
 
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox);
 
-  table = gtk_table_new (4, 2, FALSE);
-  gtk_box_pack_start (GTK_BOX (vbox), table, TRUE, TRUE, 1);
+  table = gtk_table_new (2, 2, FALSE);
+  gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 1);
   gtk_widget_show (table);
 
   label = gtk_label_new ("Name:");
@@ -375,32 +371,24 @@ new_mailbox (void)
 		    0, 0);
   gtk_widget_show (entry);
 
-  label = gtk_label_new ("Path:");
+  label = gtk_label_new("Type:");
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
 		    GTK_EXPAND | GTK_FILL,
 		    GTK_EXPAND | GTK_FILL,
 		    0, 0);
-  gtk_widget_show (label);
+  gtk_widget_show(label);
 
-  entry = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), entry, 1, 2, 1, 2,
+  mailboxtype=gtk_option_menu_new();
+  gtk_table_attach (GTK_TABLE (table), mailboxtype, 1, 2, 1, 2,
 		    GTK_EXPAND | GTK_FILL,
 		    GTK_EXPAND | GTK_FILL,
 		    0, 0);
-  gtk_widget_show (entry);
-
-  button = gtk_button_new_with_label ("Update");
-  gtk_table_attach (GTK_TABLE (table), button, 0, 2, 2, 3,
-		    GTK_EXPAND | GTK_FILL,
-		    GTK_EXPAND | GTK_FILL,
-		    0, 0);
-  gtk_widget_show (button);
-
+  gtk_widget_show(mailboxtype);
+ 
   return vbox;
 }
 
 
-/* АБВлллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллВБА */
 /* Edit - Local mailboxes */
 
 static GtkWidget *
@@ -460,7 +448,6 @@ edit_local_mailbox (void)
 }
 
 
-/* АБВлллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллВБА */
 /* Edit - POP3 */
 
 static GtkWidget *
@@ -552,7 +539,219 @@ edit_pop3_mailbox (void)
 }
 
 
-/* АБВлллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллВБА */
+/* Edit - IMAP */
+
+static GtkWidget *
+edit_imap_mailbox (void)
+{
+  GtkWidget *vbox;
+  GtkWidget *hbox;
+  GtkWidget *table;
+  GtkWidget *entry;
+  GtkWidget *label;
+  GtkWidget *button;
+
+  vbox = gtk_vbox_new (FALSE, 0);
+  gtk_widget_show (vbox);
+
+  table = gtk_table_new (5, 2, FALSE);
+  gtk_box_pack_start (GTK_BOX (vbox), table, TRUE, TRUE, 1);
+  gtk_widget_show (table);
+
+
+  /* name of the mailbox */
+  label = gtk_label_new ("Mailbox Name:");
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (label);
+
+
+  entry = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), entry, 1, 2, 0, 1,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (entry);
+
+
+  /* IMAP server name */
+  label = gtk_label_new ("IMAP server:");
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (label);
+
+
+  entry = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), entry, 1, 2, 1, 2,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (entry);
+
+
+  /* username on IMAP server */
+  label = gtk_label_new ("Username:");
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 2, 3,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (label);
+
+
+  entry = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), entry, 1, 2, 2, 3,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (entry);
+
+
+  /* password on IMAP server */
+  label = gtk_label_new ("Password:");
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 3, 4,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (label);
+
+
+  entry = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), entry, 1, 2, 3, 4,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (entry);
+
+  /* Mailbox on IMAP server */
+  label = gtk_label_new ("Mailbox:");
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 4, 5,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (label);
+
+
+  entry = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), entry, 1, 2, 4, 5,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (entry);
+
+  return vbox;
+}
+
+
+/* Edit - NNTP */
+
+static GtkWidget *
+edit_nntp_mailbox (void)
+{
+  GtkWidget *vbox;
+  GtkWidget *hbox;
+  GtkWidget *table;
+  GtkWidget *entry;
+  GtkWidget *label;
+  GtkWidget *button;
+
+  vbox = gtk_vbox_new (FALSE, 0);
+  gtk_widget_show (vbox);
+
+  table = gtk_table_new (5, 2, FALSE);
+  gtk_box_pack_start (GTK_BOX (vbox), table, TRUE, TRUE, 1);
+  gtk_widget_show (table);
+
+
+  /* name of the mailbox */
+  label = gtk_label_new ("Mailbox Name:");
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (label);
+
+
+  entry = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), entry, 1, 2, 0, 1,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (entry);
+
+
+  /* NNTP server name */
+  label = gtk_label_new ("NNTP server:");
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (label);
+
+
+  entry = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), entry, 1, 2, 1, 2,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (entry);
+
+
+  /* username on NNTP server */
+  label = gtk_label_new ("Username:");
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 2, 3,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (label);
+
+
+  entry = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), entry, 1, 2, 2, 3,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (entry);
+
+
+  /* password on NNTP server */
+  label = gtk_label_new ("Password:");
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 3, 4,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (label);
+
+
+  entry = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), entry, 1, 2, 3, 4,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (entry);
+
+  /* Newsgroup on NNTP server */
+  label = gtk_label_new ("Newsgroup:");
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 4, 5,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (label);
+
+
+  entry = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), entry, 1, 2, 4, 5,
+		    GTK_EXPAND | GTK_FILL,
+		    GTK_EXPAND | GTK_FILL,
+		    0, 0);
+  gtk_widget_show (entry);
+
+  return vbox;
+}
+
 /* Confirm delete */
 static GtkWidget *
 delete_yesno (void)
@@ -567,19 +766,25 @@ delete_yesno (void)
 
   label = gtk_label_new ("Are you sure you wish to delete this mailbox?");
   gtk_box_pack_start (GTK_BOX (vbox), label, TRUE, TRUE, 0);
+  gtk_widget_show(label);
 
   hbox = gtk_hbox_new (FALSE, 0);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
   gtk_widget_show (hbox);
 
-  button = gtk_button_new_with_label ("Delete");
+  button = gtk_button_new_with_label ("Yes");
   gtk_widget_set_usize (button, 60, 25);
   gtk_box_pack_start (GTK_BOX (hbox), button, FALSE, FALSE, 0);
   gtk_widget_show (button);
 
-  button = gtk_button_new_with_label ("Cancel");
+  button = gtk_button_new_with_label ("No");
   gtk_widget_set_usize (button, 60, 25);
   gtk_box_pack_start (GTK_BOX (hbox), button, FALSE, FALSE, 0);
+  gtk_widget_show (button);
+
+  button = gtk_button_new_with_label ("Unsure, ask me later");
+  gtk_widget_set_usize (button, 150, 25);
+  gtk_box_pack_end (GTK_BOX (hbox), button, FALSE, FALSE, 0);
   gtk_widget_show (button);
 
   return vbox;

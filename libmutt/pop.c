@@ -24,6 +24,7 @@
 #include "mutt.h"
 #include "mailbox.h"
 #include "mx.h"
+#include "md5.h"
 
 #ifdef BALSA_USE_THREADS
 #include "thread_msgs.h"
@@ -36,6 +37,11 @@
 #include <netdb.h>
 #include <string.h>
 #include <unistd.h>
+
+#ifdef LIBMUTT
+#define _(a) (a)
+#define sleep(a) 
+#endif
 
 /* XXXXX */
 #define BALSA_TEST_POP3 1
@@ -99,6 +105,70 @@ static int getPass (void)
 #define DM( fmt, args... ) 
 #endif
 
+#ifndef LIBMUTT
+static int getApopSecret (void) {
+  if (!PopApopPass || (PopApopPass[0] == '\0')) {
+    char tmp[SHORT_STRING];
+    memset(tmp, '\0', sizeof (tmp));
+    if (mutt_get_password ("APOP Shared Secret: ", tmp, sizeof (tmp)) != 0)
+      return 0;
+
+    PopApopPass = safe_strdup (tmp);
+  }
+  return 1;
+}
+#endif
+
+/* Get the Server Timestamp for APOP authentication -kabir */
+
+static int getApopStamp (char *buff, char *stamp) {
+  char *start;
+  char *finish;
+  size_t len;
+
+  start = strchr(buff, '<');
+  finish = strchr(buff, '>');
+
+  if( buff && stamp && start && finish ) {
+	len = strlen( start ) - strlen( finish ) + 1;
+
+	strncpy( stamp, start, len );
+
+	return 1;
+  }
+  else {
+	mutt_message (_("Unable to get APOP seed from server"));
+	return 0;
+  }
+}
+
+
+/* Compute the authentication hash to send to the server - kabir */
+
+static void computeAuthHash( char *stamp, char *hash ) {
+  MD5_CTX mdContext;
+  register unsigned char *dp;
+  register char *cp;
+  unsigned char *ep;
+  unsigned char digest[16];
+
+  MD5Init( &mdContext );
+  MD5Update( &mdContext, (unsigned char *)stamp, strlen( stamp ) );
+  /* BALSA: we just use PopPass, not PopAPass - the 2 fields are redundant*/
+  MD5Update( &mdContext, (unsigned char *)PopPass, strlen( PopPass ) );
+  MD5Final( digest, &mdContext );
+ 
+  cp = hash;
+  dp = digest;
+  for(ep = (dp = digest) + sizeof digest / sizeof digest[0];dp < ep;cp += 2) {
+    (void) sprintf (cp, "%02x", *dp);
+    dp++;
+  }
+
+  *cp = '\0';
+}
+
+
 void mutt_fetchPopMail (void)
 {
   struct sockaddr_in sin;
@@ -110,6 +180,8 @@ void mutt_fetchPopMail (void)
   struct hostent *he;
   char buffer[2048];
   char msgbuf[SHORT_STRING];
+  char stamp[2048];
+  char authHash[BUFSIZ];
 #ifdef BALSA_USE_THREADS
   MailThreadMessage *threadmsg;
   char threadbuf[160];
@@ -145,7 +217,13 @@ void mutt_fetchPopMail (void)
 
 
 #ifndef LIBMUTT   
-  if (!getPass ()) return;
+  /* handle apop secret fetching if APOP is turned on */
+  if( !option(OPTPOPAPOP) ) {
+      if (!getPass ()) return;
+  }
+  else {
+      if (!getApopSecret()) return;
+  }
 #endif
 
   DM( "Begin connection" );
@@ -196,32 +274,49 @@ void mutt_fetchPopMail (void)
     goto finish;
   }
 
-  DM( "hellod; user" );
-
-  snprintf (buffer, sizeof(buffer), "user %s\r\n", PopUser);
-  write (s, buffer, mutt_strlen (buffer));
-
-  if (getLine (s, buffer, sizeof (buffer)) == -1) {
+  /* handle apop secret transmission, if needed -kabir */
+  if( option( OPTPOPAPOP ) ) {
+    
+    memset( stamp, '\0', sizeof( stamp ) );
+    if( !getApopStamp( buffer, stamp ) ) {
+      /* BALSA */ mx_fastclose_mailbox (&ctx);
+      goto fail;
+    }
+    
+    computeAuthHash( stamp, authHash );
+    
+    snprintf (buffer, sizeof(buffer), "apop %s %s\r\n", PopUser, authHash);
+    write (s, buffer, mutt_strlen (buffer));
+  } 
+  else {
+    DM( "hellod; user" );
+    
+    snprintf (buffer, sizeof(buffer), "user %s\r\n", PopUser);
+    write (s, buffer, mutt_strlen (buffer));
+    
+    if (getLine (s, buffer, sizeof (buffer)) == -1) {
       mx_fastclose_mailbox (&ctx);
       goto fail;
-  }
-
-  if (mutt_strncmp (buffer, "+OK", 3) != 0)
-  {
-    mutt_remove_trailing_ws (buffer);
-    mutt_error (buffer);
-    goto finish;
-  }
-
-  DM( "usered; password" );
-
-  snprintf (buffer, sizeof(buffer), "pass %s\r\n", NONULL(PopPass));
-  write (s, buffer, mutt_strlen (buffer));
+    }
+    
+    if (mutt_strncmp (buffer, "+OK", 3) != 0)
+      {
+	mutt_remove_trailing_ws (buffer);
+	mutt_error (buffer);
+	goto finish;
+      }
+    
+    DM( "usered; password" );
+    
+    snprintf (buffer, sizeof(buffer), "pass %s\r\n", NONULL(PopPass));
+    write (s, buffer, mutt_strlen (buffer));
+  } 
   
   if (getLine (s, buffer, sizeof (buffer)) == -1) {
-	  mx_fastclose_mailbox (&ctx);
-	  goto fail;
+    mx_fastclose_mailbox (&ctx);
+    goto fail;
   }
+  
 
   if (mutt_strncmp (buffer, "+OK", 3) != 0)
   {
@@ -233,9 +328,8 @@ void mutt_fetchPopMail (void)
     mutt_error (buffer[0] ? buffer : "Server closed connection!");
     goto finish;
   }
-
   DM( "passworded; stat" );
-
+  
   /* find out how many messages are in the mailbox. */
   write (s, "stat\r\n", 6);
   

@@ -20,6 +20,7 @@ libmutt_a_SOURCES = \
 	init.c 		\
 	lib.c 		\
 	mbox.c		\
+	md5c.c		\
 	mh.c 		\
 	mx.c 		\
 	parse.c 	\
@@ -50,6 +51,7 @@ libmutt_a_SOURCES = \
 	keymap.h	\
 	mailbox.h	\
 	mapping.h	\
+	md5.h		\
 	mime.h		\
 	mutt.h		\
 	mutt_curses.h	\

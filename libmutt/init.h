@@ -230,6 +230,7 @@ struct option_t MuttVars[] = {
   { "pop_port",		DT_NUM,	 R_NONE, UL &PopPort, 110 },
   { "pop_pass",		DT_STR,	 R_NONE, UL &PopPass, UL "" },
   { "pop_user",		DT_STR,	 R_NONE, UL &PopUser, UL "" },
+  { "pop_use_apop",     DT_BOOL, R_NONE, OPTPOPAPOP, 0 },
 #endif /* USE_POP */
   { "post_indent_string",DT_STR, R_NONE, UL &PostIndentString, UL "" },
   { "post_indent_str",  DT_SYN,  R_NONE, UL "post_indent_string", 0 },

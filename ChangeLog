@@ -1,3 +1,12 @@
+2003-04-02 09:13  PeterB
+
+	* libbalsa/mime.c, libbalsa/misc.c, libbalsa/misc.h,
+	src/balsa-message.c, src/sendmsg-window.c, src/sendmsg-window.h:
+	Wrap text in the message window and the compose window using Pango
+	to find potential line breaks.
+	* src/: spell-check.c, spell-check.h: Use marks to remember current
+	word between events.
+
 2003-04-02  Emmanuel <e.allaud@wanadoo.fr>
 
 	* libbalsa/mailbox.[hc],mailbox_{local,imap}.[hc]: define new

@@ -713,7 +713,6 @@ part_info_init_unknown (BalsaMessage *bm, BalsaPartInfo *info)
 static void
 display_multipart (BalsaMessage *bm, LibBalsaMessageBody * body)
 {
-  /* FIXME: mutt dependency */
   LibBalsaMessageBody *part;
   
   for (part = body->parts; part; part = part->next)

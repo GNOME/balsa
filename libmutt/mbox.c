@@ -300,7 +300,8 @@ int mbox_parse_mailbox (CONTEXT *ctx)
       curhdr->offset = loc;
       curhdr->index = ctx->msgcount;
 	
-      curhdr->env = mutt_read_rfc822_header (ctx->fp, curhdr, 0, 0);
+      /* BALSA: pass user_hdrs as 1 - we want them */
+      curhdr->env = mutt_read_rfc822_header (ctx->fp, curhdr, 1, 0);
 
       /* if we know how long this message is, either just skip over the body,
        * or if we don't know how many lines there are, count them now (this will

@@ -26,8 +26,8 @@
 #include "mailbox-conf.h"
 #include "main-window.h"
 #include "save-restore.h"
-#include "../libmutt/mime.h"
-#include "../libmutt/mutt.h"
+/* FIXME: Mutt dependency */
+#include "../libmutt/mime.h" 
 
 #define NUM_TOOLBAR_MODES 3
 #define NUM_MDI_MODES 4
@@ -457,7 +457,7 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
 	/* charset*/
 	g_free (balsa_app.charset);
 	balsa_app.charset = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->charset)));
-	mutt_set_charset (balsa_app.charset);
+	libbalsa_set_charset (balsa_app.charset);
 
 	for (i = 0; i < NUM_ENCODING_MODES; i++)
 		if (GTK_TOGGLE_BUTTON (pui->encoding_type[i])->active) {

@@ -24,7 +24,7 @@
 				<li>Supports both SMTP and the use of a local MTA</li>
 				<li>Address Book that integrates with GnomeCard</li>
 				<li>Great configurability</li>
-				<li>Active, open development (list at <a href="mailto:balsa-list-request@gnome.org">balsa-list-request@gnome.org</a>)</li>
+				<li>Active, open development (Mailing list info at <a href="http://mail.gnome.org/mailman/listinfo/balsa-list/">http://mail.gnome.org/mailman/listinfo/balsa-list/</a>)</li>
 				<li>Multiple character sets for composing and reading messages</li>
 				<li>Attach files</li>
 			</ul>

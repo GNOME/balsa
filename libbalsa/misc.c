@@ -52,8 +52,8 @@
 gchar*
 libbalsa_lookup_mime_type(const gchar * path)
 {
-    const gchar *mime_type;
 #ifdef HAVE_GNOME_VFS
+    gchar *mime_type;
     GnomeVFSFileInfo* vi = gnome_vfs_file_info_new();
     gchar* uri;
 
@@ -72,6 +72,7 @@ libbalsa_lookup_mime_type(const gchar * path)
     gnome_vfs_file_info_unref(vi);
     return mime_type;
 #else
+    const gchar *mime_type;
     mime_type =
 	gnome_mime_type_or_default_of_file(path, "application/octet-stream");
 # ifdef GNOME_MIME_BUG_WORKAROUND
@@ -81,8 +82,8 @@ libbalsa_lookup_mime_type(const gchar * path)
        filed in bugzilla. Still not fixed.
     */
     if(strchr(mime_type, '/') == NULL)
-	mime_type = 
-	    gnome_mime_type_or_default(path, "application/octet-stream");
+	mime_type =
+            gnome_mime_type_or_default(path, "application/octet-stream");
 # endif
     return g_strdup(mime_type);
 #endif

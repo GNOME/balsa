@@ -1,6 +1,6 @@
 2002-05-15  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
-	* libbalsa/misc.c: gchar* -> const gchar*
+	* libbalsa/misc.c: gchar* -> const gchar*. Properly (PS).
 
 2002-05-15  Pawel Salek <pawsa@theochem.kth.se>
 

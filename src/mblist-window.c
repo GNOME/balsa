@@ -239,7 +239,7 @@ destroy_mblist_window (GtkWidget * widget)
 }
 
 static void
-mailbox_select_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode *row, GdkEventButton * event)
+mailbox_select_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row, GdkEventButton * event)
 {
   IndexChild *index_child;
 

@@ -126,6 +126,9 @@ static Mailbox *client_mailbox = NULL;
 static void load_messages (Mailbox * mailbox, gint emit);
 static void free_messages (Mailbox * mailbox);
 
+
+static gint _mailbox_open_ref (Mailbox * mailbox, gint flag);
+
 static void send_watcher_mark_clear_message (Mailbox * mailbox, Message * message);
 static void send_watcher_mark_answer_message (Mailbox * mailbox, Message * message);
 static void send_watcher_mark_read_message (Mailbox * mailbox, Message * message);
@@ -358,9 +361,20 @@ mailbox_free (Mailbox * mailbox)
   g_free (mailbox);
 }
 
-
 gint
 mailbox_open_ref (Mailbox * mailbox)
+{
+  return _mailbox_open_ref (mailbox, 0);
+}
+
+gint
+mailbox_open_append (Mailbox * mailbox)
+{
+  return _mailbox_open_ref (mailbox, M_APPEND);
+}
+
+static gint
+_mailbox_open_ref (Mailbox * mailbox, gint flag)
 {
   GString *tmp;
   struct stat st;
@@ -369,6 +383,9 @@ mailbox_open_ref (Mailbox * mailbox)
 
   if (CLIENT_CONTEXT_OPEN (mailbox))
     {
+      if (flag == M_APPEND)
+	return FALSE;		/* we need the mailbox to be opened fresh i think */
+
       /* incriment the reference count */
       mailbox->open_ref++;
 
@@ -391,11 +408,11 @@ mailbox_open_ref (Mailbox * mailbox)
     case MAILBOX_MBOX:
     case MAILBOX_MH:
     case MAILBOX_MAILDIR:
-      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (MAILBOX_LOCAL (mailbox)->path, 0, NULL);
+      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (MAILBOX_LOCAL (mailbox)->path, flag, NULL);
       break;
 
     case MAILBOX_POP3:
-      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (MAILBOX_POP3 (mailbox)->server, 0, NULL);
+      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (MAILBOX_POP3 (mailbox)->server, flag, NULL);
       break;
 
     case MAILBOX_IMAP:
@@ -406,7 +423,7 @@ mailbox_open_ref (Mailbox * mailbox)
       g_string_append_c (tmp, '}');
       g_string_append (tmp, MAILBOX_IMAP (mailbox)->path);
       set_imap_username (mailbox);
-      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (tmp->str, 0, NULL);
+      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (tmp->str, flag, NULL);
       g_string_free (tmp, TRUE);
       break;
 
@@ -1053,7 +1070,6 @@ message_copy (Message * message, Mailbox * dest)
 {
   HEADER *cur;
 
-  LOCK_MAILBOX (message->mailbox);
   RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
 
   cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
@@ -1065,8 +1081,6 @@ message_copy (Message * message, Mailbox * dest)
 		       cur, 0, 0);
 
   mailbox_open_unref (dest);
-
-  UNLOCK_MAILBOX ();
 }
 
 void
@@ -1074,20 +1088,19 @@ message_move (Message * message, Mailbox * dest)
 {
   HEADER *cur;
 
-  LOCK_MAILBOX (message->mailbox);
   RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
 
   cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
 
-  mailbox_open_ref (dest);
+  mailbox_open_append (dest);
+
+  mutt_parse_mime_message (CLIENT_CONTEXT (message->mailbox), cur);
 
   mutt_append_message (CLIENT_CONTEXT (dest),
 		       CLIENT_CONTEXT (message->mailbox),
-		       cur, 0, 0);
+		       cur, 0, CH_UPDATE_LEN);
 
   mailbox_open_unref (dest);
-
-  UNLOCK_MAILBOX ();
 
   message_delete (message);
 }

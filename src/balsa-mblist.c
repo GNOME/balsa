@@ -60,7 +60,7 @@ enum
 /* marshallers */
 typedef void (*BalsaMBListSignal1) (GtkObject * object,
 				    Message * message,
-				    GtkCTreeNode *row,
+				    GtkCTreeNode * row,
 				    GdkEventButton * bevent,
 				    gpointer data);
 
@@ -310,14 +310,15 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 	      /* normal mailbox */
 	      if (mailbox_have_new_messages (MAILBOX_LOCAL (mbnode->mailbox)->path))
 		{
-		  GdkFont *font;
-		  GtkStyle *style;
-		  style = gtk_style_new ();
-		  font = gdk_font_load ("-adobe-courier-medium-r-*-*-*-120-*-*-*-*-iso8859-1");
-		  style->font = font;
+/*
+   GdkFont *font;
+   GtkStyle *style;
+   style = gtk_style_new ();
+   font = gdk_font_load ("-adobe-courier-medium-r-*-*-*-120-*-*-*-*-iso8859-1");
+   style->font = font;
 
-		  gtk_widget_set_style (GTK_CELL_WIDGET ((GTK_CTREE_ROW (cnode)->row).cell)->widget, style);
-
+   gtk_widget_set_style (GTK_CELL_WIDGET ((GTK_CTREE_ROW (cnode)->row).cell)->widget, style);
+ */
 		  gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
 					   NULL, NULL,
 					   tray_full, tray_full_mask,
@@ -352,7 +353,7 @@ button_event_press_cb (GtkCList * clist, GdkEventButton * event, gpointer data)
   gint row, column;
   Mailbox *mailbox;
   GtkCTreeNode *ctrow;
-  
+
   if (event->window != clist->clist_window)
     return;
 
@@ -364,8 +365,8 @@ button_event_press_cb (GtkCList * clist, GdkEventButton * event, gpointer data)
 
   gtk_clist_select_row (clist, row, -1);
 
-  ctrow = gtk_ctree_find_by_row_data(GTK_CTREE(clist), NULL, mailbox);
-  
+  ctrow = gtk_ctree_find_by_row_data (GTK_CTREE (clist), NULL, mailbox);
+
   if (mailbox)
     gtk_signal_emit (GTK_OBJECT (clist),
 		     balsa_mblist_signals[SELECT_MAILBOX],
@@ -384,9 +385,9 @@ select_mailbox (GtkCTree * ctree, GtkCTreeNode * row, gint column)
 
   bmbl = BALSA_MBLIST (ctree);
 
-  mailbox = gtk_ctree_node_get_row_data(ctree, row);
-  
-  if (bevent && bevent->button == 1 && bevent->type == GDK_2BUTTON_PRESS)
+  mailbox = gtk_ctree_node_get_row_data (ctree, row);
+
+  if (bevent && bevent->button == 1)
     {
 
       if (mailbox)

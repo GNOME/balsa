@@ -67,6 +67,7 @@ static void message_status_set_read_cb (GtkWidget *, Message *);
 static void message_status_set_answered_cb (GtkWidget *, Message *);
 static void delete_message_cb (GtkWidget *, BalsaIndex *);
 static void undelete_message_cb (GtkWidget *, BalsaIndex *);
+static void transfer_messages_cb (BalsaMBList *, Mailbox *, GtkCTreeNode *, GdkEventButton *, BalsaIndex *);
 
 void
 index_child_changed (GnomeMDI * mdi, GnomeMDIChild * mdi_child)
@@ -274,25 +275,29 @@ static GtkWidget *
 create_menu (BalsaIndex * bindex)
 {
   GtkWidget *menu, *menuitem, *submenu, *smenuitem;
+  GtkWidget *bmbl;
 
   menu = gtk_menu_new ();
-#if 0				/* FIXME */
   menuitem = gtk_menu_item_new_with_label (_ ("Transfer"));
-  list = g_list_first (balsa_app.mailbox_list);
+
   submenu = gtk_menu_new ();
-  while (list)
-    {
-      mailbox = list->data;
-      smenuitem = gtk_menu_item_new_with_label (mailbox->name);
-      gtk_menu_append (GTK_MENU (submenu), smenuitem);
-      gtk_widget_show (smenuitem);
-      list = list->next;
-    }
+  smenuitem = gtk_menu_item_new ();
+  bmbl = balsa_mblist_new();
+  gtk_signal_connect (GTK_OBJECT (bmbl), "select_mailbox",
+                         (GtkSignalFunc) transfer_messages_cb,
+		                        (gpointer) bindex);
+
+  gtk_widget_set_usize (GTK_WIDGET (bmbl), balsa_app.mblist_width, balsa_app.mblist_height);
+  gtk_container_add(GTK_CONTAINER(smenuitem), bmbl);
+  gtk_menu_append (GTK_MENU (submenu), smenuitem);
+  gtk_widget_show(bmbl);
+  gtk_widget_show (smenuitem);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), submenu);
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
 
+#if 0				/* FIXME */
   menuitem = gtk_menu_item_new_with_label (_ ("Change Status"));
 
   submenu = gtk_menu_new ();
@@ -367,6 +372,26 @@ message_status_set_answered_cb (GtkWidget * widget, Message * message)
   g_return_if_fail (widget != NULL);
 
   message_reply (message);
+}
+
+static void
+transfer_messages_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode *row, GdkEventButton * event, BalsaIndex *bindex)
+{
+  GtkCList *clist;
+  GList *list;
+  Message *message;
+
+  g_return_if_fail (bmbl != NULL);
+  g_return_if_fail (bindex != NULL);
+
+  clist = GTK_CLIST (GTK_BIN (bindex)->child);
+  list = clist->selection;
+  while (list)
+    {
+      message = gtk_clist_get_row_data (clist, (gint) list->data);
+      message_move (message, mailbox);
+      list = list->next;
+    }
 }
 
 

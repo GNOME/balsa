@@ -58,8 +58,8 @@ typedef enum
     MAILBOX_SORT_ALIAS = 10,
     MAILBOX_SORT_ADDRESS = 11,
     MAILBOX_SORT_MASK = 0xf,
-    MAILBOX_SORT_REVERSE = (1<<4),
-    MAILBOX_SORT_LAST = (1<<5)
+    MAILBOX_SORT_REVERSE = (1 << 4),
+    MAILBOX_SORT_LAST = (1 << 5)
   }
 MailboxSort;
 
@@ -265,12 +265,13 @@ GList *make_list_from_string (gchar *);
  * open and close a mailbox 
  */
 int mailbox_open_ref (Mailbox * mailbox);
+int mailbox_open_append (Mailbox * mailbox);
 void mailbox_open_unref (Mailbox * mailbox);
 
 /*
  * sorting mailbox
  */
-void mailbox_sort(Mailbox *mailbox, MailboxSort sort);
+void mailbox_sort (Mailbox * mailbox, MailboxSort sort);
 
 /*
  * create and destroy a mailbox structure

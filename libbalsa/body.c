@@ -42,6 +42,7 @@ libbalsa_message_body_new(LibBalsaMessage * message)
     body->filename = NULL;
     body->temp_filename = NULL;
     body->charset = NULL;
+    body->disposition = DISPINLINE; /* reasonable ? */
 
     body->next = NULL;
     body->parts = NULL;

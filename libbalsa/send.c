@@ -285,6 +285,7 @@ add_mutt_body_plain(const gchar * charset, gint encoding_style,
     body->unlink = 1;
     body->use_disp = 0;
     body->force_charset = 1;
+    body->disposition = DISPINLINE;
 
     body->encoding = encoding_style;
 
@@ -1259,6 +1260,7 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 	    }
 	} else if (body->buffer) {
 	    newbdy = add_mutt_body_plain(body->charset, encoding, flow);
+	    newbdy->disposition = DISPINLINE;
 	    if (body->mime_type) {
 		/* change the type and subtype within the mutt body */
 		gchar *type, *subtype;

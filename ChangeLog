@@ -1,3 +1,10 @@
+2002-03-01  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/sendmsg-window.c: attach->disposition, tag attachs
+	* libbalsa/send.c:
+	* libbalsa/body.c:
+	* libbalsa/body.h: added body->disposition, propagate attach->
+
 2002-02-27  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/send.c: force charset (#72739).

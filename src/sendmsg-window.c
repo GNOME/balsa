@@ -421,11 +421,20 @@ headerMenuDesc headerDescs[] = { {"from", 3}, {"to", 3}, {"subject", 2},
 {"comments", 2}, {"keywords", 2}
 };
 
+/* from libmutt/mime.h - Content-Disposition values */
+enum
+{
+  DISPINLINE,
+  DISPATTACH,
+  DISPFORMDATA
+};
+/* i'm sure there's a subtle and nice way of making it visible here */
 typedef struct {
     gchar *filename;
     gchar *force_mime_type;
     gboolean delete_on_destroy;
     gboolean as_extbody;
+    guint disposition;
 } attachment_t;
 
 #define MAIN_MENUS_COUNT 5
@@ -1140,6 +1149,7 @@ add_extbody_attachment(GnomeIconList *ilist,
     attach->force_mime_type = mime_type != NULL ? g_strdup(mime_type) : NULL;
     attach->delete_on_destroy = delete_on_destroy;
     attach->as_extbody = TRUE;
+    attach->disposition = DISPATTACH;
 
     pix = libbalsa_icon_finder("message/external-body", attach->filename);
     label = g_strdup_printf ("%s (%s)", attach->filename, 
@@ -1275,6 +1285,7 @@ file_attachment(GtkWidget * widget, GnomeIconList * ilist)
 	g_strdup(attach->force_mime_type) : NULL;
     attach->delete_on_destroy = oldattach->delete_on_destroy;
     attach->as_extbody = FALSE;
+    attach->disposition = DISPATTACH; /* sounds reasonable */
     gnome_icon_list_remove(ilist, num);
     
     /* as this worked before, don't do too much (==any) error checking... */
@@ -1414,6 +1425,11 @@ add_attachment(GnomeIconList * iconlist, char *filename,
 
 	attach_data->delete_on_destroy = is_a_temp_file;
 	attach_data->as_extbody = FALSE;
+	/* we should be smarter about this .. */
+	if(forced_mime_type && !strcmp(forced_mime_type, "message/rfc822"))
+	    attach_data->disposition = DISPINLINE;
+	else
+	    attach_data->disposition = DISPATTACH;
 	gnome_icon_list_set_icon_data_full(iconlist, pos, attach_data, destroy_attachment);
 
 	g_free(label);
@@ -3103,6 +3119,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     }
 
     body = libbalsa_message_body_new(message);
+    body->disposition = DISPINLINE; /* this is the main body */
     body->buffer = gtk_editable_get_chars(GTK_EDITABLE(bsmsg->text), 0,
 					  gtk_text_get_length(GTK_TEXT
 							      (bsmsg->text)));
@@ -3136,6 +3153,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 	    if (attach->force_mime_type)
 		body->mime_type = g_strdup(attach->force_mime_type);
 	    body->attach_as_extbody = attach->as_extbody;
+	    body->disposition = attach->disposition;
 	    libbalsa_message_append_part(message, body);
 	}
     }

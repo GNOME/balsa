@@ -1,3 +1,8 @@
+2003-11-23 14:40  PeterB
+
+	* libbalsa/mailbox.c: Mark mailbox as unsorted and invalidate iters
+	when really closing.
+
 2003-11-23  Pawel Salek
 
 	* libbalsa/libbalsa.c: make the mailbox_lock recursive.

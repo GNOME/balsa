@@ -44,7 +44,6 @@
 #include "folder-conf.h"
 #include "mailbox-conf.h"
 #include "main-window.h"
-#include "main.h"
 #include "message-window.h"
 #include "pref-manager.h"
 #include "print.h"
@@ -113,8 +112,6 @@ static void balsa_window_real_open_mbnode(BalsaWindow *window,
 static void balsa_window_real_close_mbnode(BalsaWindow *window,
 					   BalsaMailboxNode *mbnode);
 static void balsa_window_destroy(GtkObject * object);
-static void balsa_window_delete_cb (GtkWidget* widget, GdkEvent* event, 
-                                    gpointer user_data);
 
 GtkWidget *balsa_window_find_current_index(BalsaWindow * window);
 static gboolean balsa_close_mailbox_on_timer(GtkWidget * widget, 
@@ -230,6 +227,14 @@ static GtkWidget *balsa_notebook_label_new (BalsaMailboxNode* mbnode);
 static void ident_manage_dialog_cb(GtkWidget*, gpointer);
 
 
+static void
+balsa_quit_nicely(void)
+{
+    GdkEventAny e = { GDK_DELETE, NULL, 0 };
+    e.window = GTK_WIDGET(balsa_app.main_window)->window;
+    gdk_event_put((GdkEvent*)&e);
+}
+
 static GnomeUIInfo file_new_menu[] = {
 #define MENU_FILE_NEW_MESSAGE_POS 0
     {
@@ -309,7 +314,7 @@ static GnomeUIInfo file_menu[] = {
      address_book_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
      GNOME_STOCK_MENU_BOOK_RED, 'B', 0, NULL},
     GNOMEUIINFO_SEPARATOR,
-    GNOMEUIINFO_MENU_EXIT_ITEM(balsa_exit, NULL),
+    GNOMEUIINFO_MENU_EXIT_ITEM(balsa_quit_nicely, NULL),
 
     GNOMEUIINFO_END
 };
@@ -720,8 +725,6 @@ balsa_window_new()
 			       balsa_app.show_notebook_tabs);
     gtk_notebook_set_show_border (GTK_NOTEBOOK(window->notebook), FALSE);
     gtk_notebook_set_scrollable (GTK_NOTEBOOK (window->notebook), TRUE);
-    gtk_signal_connect(GTK_OBJECT(window), "delete_event",
-		       GTK_SIGNAL_FUNC(balsa_exit), NULL);
     gtk_signal_connect(GTK_OBJECT(window->notebook), "size_allocate",
 		       GTK_SIGNAL_FUNC(notebook_size_alloc_cb), NULL);
     gtk_signal_connect(GTK_OBJECT(window->notebook), "switch_page",
@@ -826,9 +829,10 @@ balsa_window_new()
 		       GTK_SIGNAL_FUNC(set_icon), NULL);
     gtk_signal_connect(GTK_OBJECT(window), "size_allocate",
 		       GTK_SIGNAL_FUNC(mw_size_alloc_cb), NULL);
-    gtk_signal_connect (GTK_OBJECT (window), "delete-event",
-                        GTK_SIGNAL_FUNC (balsa_window_delete_cb), NULL);
-
+    gtk_signal_connect (GTK_OBJECT (window), "destroy",
+                        GTK_SIGNAL_FUNC (gtk_main_quit), NULL);
+    /* gtk_signal_connect(GTK_OBJECT(window), "delete-event",
+       GTK_SIGNAL_FUNC(delete_event_cb), NULL);*/
 
     return GTK_WIDGET(window);
 }
@@ -1276,15 +1280,6 @@ balsa_window_destroy(GtkObject * object)
 
     /* don't try to use notebook later in empty_trash */
     balsa_app.notebook = NULL;
-    balsa_exit();
-}
-
-
-static void 
-balsa_window_delete_cb (GtkWidget* widget, GdkEvent* event, 
-                        gpointer user_data)
-{
-    balsa_exit();
 }
 
 
@@ -1883,8 +1878,6 @@ send_progress_notify_cb()
 	    /* closes progress dialog */
 	    if (send_dialog)
 		gtk_widget_destroy(send_dialog);
-	    if (balsa_app.compose_email)
-		balsa_exit();
 	    break;
 
 	default:

@@ -169,6 +169,7 @@ dnl ###########################################################################
 
 if test -d "${srcdir}/CVS" ; then
 	BALSA_FROM_CVS=yes
+	CFLAGS="$CFLAGS -Werror"
 else
 	BALSA_FROM_CVS=no
 fi

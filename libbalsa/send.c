@@ -1148,7 +1148,8 @@ libbalsa_message_postpone(LibBalsaMessage * message,
     gchar *tmp;
     LibBalsaMessageBody *body;
     LibBalsaServer *server;
-    int thereturn;
+    int thereturn = 0; 
+    /* or -1, because not resetting it means the mailbox is not supported? */
 
     libbalsa_lock_mutt();
     msg = mutt_new_header();

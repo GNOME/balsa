@@ -64,7 +64,8 @@ extern "C" {
 	gboolean update_config; /* is the window being set up or in normal  */
 	                        /* operation and user actions should update */
 	                        /* the config */
-	guint quituid; /* id of the gtk_quit callback */
+	guint delete_sig_id;
+	gboolean modified;
     };
 
     BalsaSendmsg *sendmsg_window_new(GtkWidget *, LibBalsaMessage *,

@@ -1,3 +1,15 @@
+2001-09-06  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in: add -Werror for CVS users.
+	* libbalsa/mailbox_pop3.c: Melanie's fix for ugly problem.
+	* libbalsa/send.c: do not use unintialized vars.
+	* src/main-window.c: send delete signal when quit requested.
+	* src/Makefile.am: remove empty main.h from the file list.
+	* src/sendmsg-window.[ch]: message saving-on-quit support.
+	* src/expand-alias.c, src/information-dialog.c:
+	* src/toolbar-factory.c, src/toolbar-prefs.c: don't include main.h
+	* src/main.c: clean up the cleanup on exit code.
+
 2001-09-05  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/sendmsg-window.c (postpone_message_cb): don't destroy the

@@ -51,7 +51,6 @@
 #include "mailbox-node.h"
 #include "save-restore.h"
 #include "sendmsg-window.h"
-#include "main.h"
 #include "information.h"
 #include "pop3.h"
 
@@ -89,6 +88,7 @@ static void threads_destroy(void);
 static void balsa_init(int argc, char **argv);
 static void config_init(void);
 static void mailboxes_init(void);
+static void balsa_cleanup(void);
 static gint balsa_kill_session(GnomeClient * client, gpointer client_data);
 static gint balsa_save_session(GnomeClient * client, gint phase,
 			       GnomeSaveStyle save_style, gint is_shutdown,
@@ -370,7 +370,8 @@ main(int argc, char *argv[])
     gdk_threads_enter();
     gtk_main();
     gdk_threads_leave();
-
+    
+    balsa_cleanup();
     gdk_colormap_unref(balsa_app.colormap);
 
 #ifdef BALSA_USE_THREADS
@@ -420,9 +421,10 @@ close_all_mailboxes(GNode * node, gpointer data)
     return FALSE;
 }
 
-void
-balsa_exit(void)
+static void
+balsa_cleanup(void)
 {
+
     g_node_traverse(balsa_app.mailbox_nodes,
 		    G_LEVEL_ORDER,
 		    G_TRAVERSE_ALL, 10, close_all_mailboxes, NULL);
@@ -440,14 +442,13 @@ balsa_exit(void)
 
     gnome_sound_shutdown();
     libbalsa_imap_close_all_connections();
-    gtk_main_quit();
 }
-
 
 static gint
 balsa_kill_session(GnomeClient * client, gpointer client_data)
 {
-    balsa_exit();
+    gtk_main_quit(); /* FIXME: this won't save composed messages; 
+			but it never did. */
     return TRUE;
 }
 

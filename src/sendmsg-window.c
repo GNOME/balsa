@@ -69,7 +69,6 @@
 #include "address-book.h"
 #include "address-entry.h"
 #include "expand-alias.h"
-#include "main.h"
 #include "print.h"
 #include "spell-check.h"
 #include "toolbar-factory.h"
@@ -85,9 +84,9 @@ static gint autopostpone_message( gpointer bsmsg );
 static gint postpone_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint print_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint attach_clicked(GtkWidget *, gpointer);
-static gint close_window(GtkWidget *, gpointer);
+static gint close_window_cb(GtkWidget *, gpointer);
 static gchar* check_if_regular_file(const gchar *);
-static void balsa_sendmsg_destroy(BalsaSendmsg * bsm);
+static void balsa_sendmsg_destroy_handler(BalsaSendmsg * bsm);
 
 static void check_readiness(GtkEditable * w, BalsaSendmsg * bsmsg);
 static void init_menus(BalsaSendmsg *);
@@ -175,7 +174,7 @@ static GnomeUIInfo file_menu[] = {
     GNOMEUIINFO_SEPARATOR,
 
 #define MENU_FILE_CLOSE_POS 8
-    GNOMEUIINFO_MENU_CLOSE_ITEM(close_window, NULL),
+    GNOMEUIINFO_MENU_CLOSE_ITEM(close_window_cb, NULL),
 
     GNOMEUIINFO_END
 };
@@ -444,13 +443,6 @@ static gint spell_check_page;
 
 
 /* the callback handlers */
-static gint
-close_window(GtkWidget * widget, gpointer data)
-{
-    balsa_sendmsg_destroy((BalsaSendmsg *) data);
-    return TRUE;
-}
-
 static void
 address_book_cb(GtkWidget *widget, BalsaSendmsg *snd_msg_wind)
 {
@@ -477,9 +469,55 @@ address_book_cb(GtkWidget *widget, BalsaSendmsg *snd_msg_wind)
 }
 
 static gint
+delete_handler(BalsaSendmsg* bsmsg)
+{
+    gint reply;
+    if(balsa_app.debug) printf("delete_event_cb\n");
+    if(bsmsg->modified) {
+	gchar* str = 
+	    g_strdup_printf(_("The message to '%s' is modified.\n"
+			      "Save message to Draftbox?"),
+			    gtk_entry_get_text(GTK_ENTRY(bsmsg->to[1])));
+	GtkWidget* l = gtk_label_new(str);
+	GnomeDialog* d =
+	    GNOME_DIALOG(gnome_dialog_new(_("Closing the Compose Window"),
+					  GNOME_STOCK_BUTTON_YES,
+					  GNOME_STOCK_BUTTON_NO,
+					  GNOME_STOCK_BUTTON_CANCEL,
+					  NULL));
+	g_free(str);
+	gnome_dialog_set_parent(d, GTK_WINDOW(bsmsg->window));
+	gtk_widget_show(l);
+	gtk_box_pack_start_defaults(GTK_BOX(d->vbox), l);
+	reply = gnome_dialog_run_and_close(GNOME_DIALOG(d));
+	if(reply == 0)
+	    postpone_message_cb(NULL, bsmsg);
+	/* cancel action  when reply = "yes" or "no" */
+	return (reply != 0) && (reply != 1);
+    }
+    return FALSE;
+}
+static gint
 delete_event_cb(GtkWidget * widget, GdkEvent * e, gpointer data)
 {
-    balsa_sendmsg_destroy((BalsaSendmsg *) data);
+    BalsaSendmsg* bsmsg = (BalsaSendmsg *) data;
+    return delete_handler(bsmsg);
+}
+
+static gint
+close_window_cb(GtkWidget * widget, gpointer data)
+{
+    BalsaSendmsg* bsmsg = (BalsaSendmsg *) data;
+    if(balsa_app.debug) printf("close_window_cb: start\n");
+    if(!delete_handler(bsmsg))
+	gtk_widget_destroy(bsmsg->window);
+    if(balsa_app.debug) printf("close_window_cb: end\n");
+}
+
+static gint
+destroy_event_cb(GtkWidget * widget, gpointer data)
+{
+    balsa_sendmsg_destroy_handler((BalsaSendmsg *) data);
     return TRUE;
 }
 
@@ -487,14 +525,14 @@ delete_event_cb(GtkWidget * widget, GdkEvent * e, gpointer data)
    to the balsa_app structure.
 */
 static void
-balsa_sendmsg_destroy(BalsaSendmsg * bsm)
+balsa_sendmsg_destroy_handler(BalsaSendmsg * bsm)
 {
     g_assert(bsm != NULL);
     g_assert(ELEMENTS(headerDescs) == ELEMENTS(bsm->view_checkitems));
 
-    if(balsa_app.debug) g_message("balsa_sendmsg_destroy(): Start.");
-
-    gtk_quit_remove (bsm->quituid);
+    gtk_signal_disconnect(GTK_OBJECT(balsa_app.main_window), 
+			  bsm->delete_sig_id);
+    if(balsa_app.debug) g_message("balsa_sendmsg_destroy()_handler: Start.");
 
     if (bsm->orig_message) {
 	if (bsm->orig_message->mailbox)
@@ -503,7 +541,7 @@ balsa_sendmsg_destroy(BalsaSendmsg * bsm)
     }
 
     if (balsa_app.debug)
-	printf("balsa_sendmsg_destroy: Freeing bsm\n");
+	printf("balsa_sendmsg_destroy_handler: Freeing bsm\n");
     release_toolbars(bsm->window);
     gtk_widget_destroy(bsm->window);
     g_list_free(bsm->spell_check_disable_list);
@@ -513,6 +551,7 @@ balsa_sendmsg_destroy(BalsaSendmsg * bsm)
     }
     g_free(bsm);
 
+
 #ifdef BALSA_USE_THREADS
     if (balsa_app.compose_email) {
 	while(sending_mail) {
@@ -520,11 +559,11 @@ balsa_sendmsg_destroy(BalsaSendmsg * bsm)
 		gtk_main_iteration_do(FALSE);
 	    usleep(2000);
 	}
-	balsa_exit();
+	gtk_main_quit();
     }
 #else
     if (balsa_app.compose_email)
-	balsa_exit();
+	gtk_main_quit();
 #endif
     if(balsa_app.debug) g_message("balsa_sendmsg_destroy(): Stop.");
 }
@@ -1158,7 +1197,6 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     return nb;
 }
 
-
 /* create_text_area 
    Creates the text entry part of the compose window.
 */
@@ -1414,6 +1452,12 @@ set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message, SendType type)
     g_free(newsubject);
 }
 
+static void
+text_changed(GtkWidget* w, BalsaSendmsg* msg)
+{
+    msg->modified = TRUE;
+}
+
 BalsaSendmsg *
 sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 		   SendType type)
@@ -1431,6 +1475,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     msg->locale   = NULL;
     msg->ident = balsa_app.current_ident;
     msg->update_config = FALSE;
+    msg->modified = FALSE; 
 
     switch (type) {
     case SEND_REPLY:
@@ -1469,10 +1514,10 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     msg->window = window;
     msg->type = type;
 
-    gtk_signal_connect(GTK_OBJECT(msg->window), "delete_event",
+    gtk_signal_connect(GTK_OBJECT(msg->window), "delete-event",
 		       GTK_SIGNAL_FUNC(delete_event_cb), msg);
-    gtk_signal_connect(GTK_OBJECT(msg->window), "destroy_event",
-		       GTK_SIGNAL_FUNC(delete_event_cb), msg);
+    gtk_signal_connect(GTK_OBJECT(msg->window), "destroy",
+		       GTK_SIGNAL_FUNC(destroy_event_cb), msg);
 
 	 gtk_signal_connect(GTK_OBJECT(msg->window), "size_allocate",
 		       GTK_SIGNAL_FUNC(sw_size_alloc_cb), msg);
@@ -1495,7 +1540,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     set_toolbar_button_callback(1, GNOME_STOCK_PIXMAP_PRINT,
 				GTK_SIGNAL_FUNC(print_message_cb), msg);
     set_toolbar_button_callback(1, GNOME_STOCK_PIXMAP_CLOSE,
-				GTK_SIGNAL_FUNC(close_window), msg);
+				GTK_SIGNAL_FUNC(close_window_cb), msg);
 
     gnome_app_set_toolbar(GNOME_APP(window),
 			  get_toolbar(GTK_WIDGET(window), TOOLBAR_COMPOSE));
@@ -1675,9 +1720,13 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     else
 	gtk_widget_grab_focus(msg->text);
 
-    msg->quituid = gtk_quit_add( 1, autopostpone_message, msg );
-
     msg->update_config = TRUE;
+
+    msg->delete_sig_id = 
+	gtk_signal_connect(GTK_OBJECT(balsa_app.main_window), "delete-event",
+			   (GtkSignalFunc)delete_event_cb, msg);
+    gtk_signal_connect(GTK_OBJECT(msg->text), "changed",
+		       (GtkSignalFunc)text_changed, msg);
     return msg;
 }
 
@@ -2092,7 +2141,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
     }
 
     gtk_object_destroy(GTK_OBJECT(message));
-    balsa_sendmsg_destroy(bsmsg);
+    gtk_widget_destroy(bsmsg->window);
 
     return TRUE;
 }
@@ -2167,7 +2216,7 @@ postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     }
 
     gtk_object_destroy(GTK_OBJECT(message));
-    balsa_sendmsg_destroy(bsmsg);
+    gtk_widget_destroy(bsmsg->window);
 
     return TRUE;
 }

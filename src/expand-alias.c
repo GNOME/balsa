@@ -34,7 +34,6 @@
 #include "sendmsg-window.h"
 #include "address-book.h"
 #include "address-entry.h"
-#include "main.h"
 #include "expand-alias.h"
 
 #define CASE_INSENSITIVE_NAME

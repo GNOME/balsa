@@ -44,7 +44,6 @@
 #include "folder-conf.h"
 #include "mailbox-conf.h"
 #include "main-window.h"
-#include "main.h"
 #include "message-window.h"
 #include "pref-manager.h"
 #include "print.h"

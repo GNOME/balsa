@@ -31,7 +31,6 @@
 #include "libbalsa.h"
 #include "balsa-app.h"
 #include "information-dialog.h"
-#include "main.h"
 
 static GtkWidget *information_list = NULL;
 
@@ -111,7 +110,7 @@ balsa_information(LibBalsaInformationType type, const char *fmt, ...)
     g_free(msg);
 
     if (type == LIBBALSA_INFORMATION_FATAL)
-	balsa_exit();
+	gtk_main_quit();
 
 
 }

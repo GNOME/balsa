@@ -250,6 +250,10 @@ static gchar * rot (gchar * pass)
   return buff;
 }
 
+/* libbalsa_server_load_config:
+   load the server configuration using gnome-config.
+   Try to use sensible defaults.
+*/
 void
 libbalsa_server_load_config(LibBalsaServer *server, gint default_port)
 {
@@ -260,8 +264,7 @@ libbalsa_server_load_config(LibBalsaServer *server, gint default_port)
 	server->user   = gnome_config_private_get_string ("Username");
 	server->passwd = gnome_config_private_get_string ("Password");
 
-	if(!(server->host && server->port && server->user) ) 
-		return;
+	if(!server->user) server->user = g_strdup(getenv("USER"));
 	
 	if (server->passwd != NULL) {
 		gchar *buff;

@@ -27,13 +27,10 @@
 #include <stdio.h>
 
 #include "balsa-app.h"
-#include "balsa-index.h"
-#include "local-mailbox.h"
+#include "local-mailbox.h" 
 #include "misc.h"
-#include "main.h"
 #include "libbalsa.h"
-#include "save-restore.h"
-#include "balsa-index-page.h"
+#include "src/mblist-window.h"
 #include "spell-check.h"
 #include "main-window.h"
 #include "information.h"
@@ -289,6 +286,38 @@ balsa_find_mbox_by_name (const gchar *name) {
   return res;
 }
 
+
+
+/* open_mailboxes_idle_cb:
+   open mailboxes on startup if requested so.
+   This is an idle handler. Be sure to use gdk_threads_{enter/leave}
+   Release the passed argument when done.
+ */
+gboolean
+open_mailboxes_idle_cb(gchar* names[]) {
+  gint i =0;
+  
+  g_return_val_if_fail(names, FALSE);
+
+  gdk_threads_enter();
+
+  while(names[i]) {
+    LibBalsaMailbox *mbox = balsa_find_mbox_by_name(names[i]);
+    if(balsa_app.debug)
+      fprintf(stderr,"open_mailboxes_idle_cb: opening %s => %p..\n", 
+	      names[i], mbox);
+    if(mbox)
+      mblist_open_mailbox(mbox);
+    i++;
+  }
+  g_strfreev(names);
+  
+  if(gtk_notebook_get_current_page( GTK_NOTEBOOK(balsa_app.notebook) ) >=0 ) 
+    gtk_notebook_set_page( GTK_NOTEBOOK(balsa_app.notebook), 0);
+  gdk_threads_leave();
+  
+  return FALSE;
+}
 
 GtkWidget* 
 gnome_stock_button_with_label (const char* icon, const char* label)

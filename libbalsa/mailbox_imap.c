@@ -216,11 +216,6 @@ libbalsa_mailbox_imap_open (LibBalsaMailbox *mailbox, gboolean append)
 	imap = LIBBALSA_MAILBOX_IMAP(mailbox);
 	server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
 
-	tmp = g_strdup_printf("{%s:%i}%s", 
-			      server->host,
-			      server->port,
-			      imap->path);
-	
 	libbalsa_lock_mutt();
 
 	/* try getting password, quit on cancel */
@@ -239,6 +234,10 @@ libbalsa_mailbox_imap_open (LibBalsaMailbox *mailbox, gboolean append)
 	if(ImapCRAMKey) safe_free((void**)&ImapCRAMKey); 
 	ImapCRAMKey = strdup(server->passwd);
 
+	tmp = g_strdup_printf("{%s:%i}%s", 
+			      server->host,
+			      server->port,
+			      imap->path);
 	CLIENT_CONTEXT (mailbox) = mx_open_mailbox (tmp, 
 						    append ? M_APPEND : 0,
 						    NULL);

@@ -547,13 +547,21 @@ libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd,
     stream = libbalsa_message_body_get_stream(body);
     stream_fs = g_mime_stream_fs_new(fd);
 
-    if(filter_crlf) {
+    if (filter_crlf) {
         GMimeFilter *filter;
+
+        if (!GMIME_IS_STREAM_FILTER(stream)) {
+            GMimeStream *stream_filter =
+                g_mime_stream_filter_new_with_stream(stream);
+            g_object_unref(stream);
+            stream = stream_filter;
+        }
         filter = g_mime_filter_crlf_new(GMIME_FILTER_CRLF_DECODE,
                                         GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
         g_mime_stream_filter_add(GMIME_STREAM_FILTER(stream), filter);
         g_object_unref(filter);
     }
+
     if (g_mime_stream_write_to_stream(stream, stream_fs) < 0)
 	retval = FALSE;
     g_object_unref(stream);

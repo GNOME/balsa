@@ -64,12 +64,16 @@ static void
 balsa_error (char *fmt,...)
 {
   GtkWidget *messagebox;
+  gchar outstr[522];
   va_list ap;
 
   va_start (ap, fmt);
-  g_warning (fmt, ap);
+  vsprintf (outstr, fmt, ap);
+  va_end (ap);
 
-  messagebox = gnome_message_box_new (fmt,
+  g_warning (outstr);
+
+  messagebox = gnome_message_box_new (outstr,
 				      GNOME_MESSAGE_BOX_ERROR,
 				      GNOME_STOCK_BUTTON_OK,
 				      NULL);
@@ -79,8 +83,6 @@ balsa_error (char *fmt,...)
 
   gtk_signal_connect (GTK_OBJECT (messagebox), "clicked",
 		      GTK_SIGNAL_FUNC (error_exit_cb), NULL);
-
-  va_end (ap);
 }
 
 
@@ -126,7 +128,7 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.esound_host = g_strdup ("localhost");
   balsa_app.esound = esd_open_sound (balsa_app.esound_host);
 
-  play_sound(gnome_datadir_file("sounds/estart.wav"));
+  play_sound (gnome_datadir_file ("sounds/estart.wav"));
 #endif
 
   if (config_load (BALSA_CONFIG_FILE) == FALSE)

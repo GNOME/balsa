@@ -52,10 +52,16 @@ balsa_store_address(GtkWidget * widget, gpointer user_data)
     GtkWidget **entries = NULL;
     gint cnt = 0;
     gint cnt2 = 0;
-    gchar *labels[NUM_FIELDS] = { N_("Card Name:"), N_("First Name:"),
-	N_("Middle Name:"), N_("Last Name:"), N_("Organization:"),
+
+    gchar *labels[NUM_FIELDS] = {
+	N_("Card Name:"),
+	N_("First Name:"),
+	N_("Middle Name:"),
+	N_("Last Name:"),
+	N_("Organization:"),
 	N_("Email Address:")
     };
+
     gchar **names;
 
     gchar *new_name = NULL;
@@ -122,47 +128,52 @@ balsa_store_address(GtkWidget * widget, gpointer user_data)
     else
 	new_organization = g_strdup(message->from->organization);
 
-    if (message->from->full_name == NULL) {
-	/* if the message only contains an e-mail address */
+    /* if the message only contains an e-mail address */
+    if (message->from->full_name == NULL)
 	new_name = g_strdup(new_email);
-    } else {
+    else {
 	/* make sure message->from->personal is not all whitespace */
 	new_name = g_strstrip(g_strdup(message->from->full_name));
 
-	if (strlen(new_name) == 0) {
-	    first_name = g_strdup("");
-	    middle_name = g_strdup("");
-	    last_name = g_strdup("");
-	} else {
-	    /* guess the first name, middle name and last name */
+	/* guess the first name, middle name and last name */
+	if (*new_name != '\0') {
 	    names = g_strsplit(new_name, " ", 0);
-	    first_name = g_strdup(names[0]);
-	    /* get last name */
+
 	    cnt = 0;
 	    while (names[cnt])
 		cnt++;
 
+	    /* get first name */
+	    first_name = g_strdup(names[0]);
+
+	    /* get last name */
 	    if (cnt == 1)
 		last_name = g_strdup("");
 	    else
 		last_name = g_strdup(names[cnt - 1]);
 
 	    /* get middle name */
-	    cnt2 = 1;
-	    if (cnt > 2) {
-		middle_name = g_strdup("");
+	    middle_name = g_strdup("");
 
+	    cnt2 = 1;
+	    if (cnt > 2)
 		while (cnt2 != cnt - 1) {
 		    middle_name = g_strconcat(middle_name, names[cnt2++], NULL);
 
 		    if (cnt2 != cnt - 1)
 			middle_name = g_strconcat(middle_name, " ", NULL);
 		}
-	    }
 
 	    g_strfreev(names);
 	}
     }
+
+    if (first_name == NULL)
+	first_name = g_strdup("");
+    if (middle_name == NULL)
+	middle_name = g_strdup("");
+    if (last_name == NULL)
+	last_name = g_strdup("");
 
     entries = g_new(GtkWidget *, NUM_FIELDS);
 

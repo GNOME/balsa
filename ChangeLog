@@ -1,3 +1,8 @@
+2001-08-16  Carlos Morgado  <chbm@cprm.net>
+
+	* src/store-address.c: fix from Ali Akcaagac to yesterday's
+	patch
+
 2001-08-15  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Ali Akcaagac <ali.akcaagac@stud.fh-wilhelmshaven.de> - fix some

@@ -1,5 +1,10 @@
 2000-08-22  Ian Campbell  <ijc25@cam.ac.uk>
 
+	* src/main-window.c: Add gdk_threads_enter() to calls to LibBalsa
+	within the thread.
+	* src/main.c: call g_thread_init before calling gtk_init so the
+	GTK sets up its threading stuff correctly.
+	
 	* libbalsa/mailbox.c(libbalsa_mailbox_set_unread_messages_flag):
 	Always emit the signal, since it allows balsa-mblist to update
 	when a second new message arrives.

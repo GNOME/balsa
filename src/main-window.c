@@ -896,15 +896,25 @@ check_mailbox_list (GList *mailbox_list)
 {
   GList *list;
   LibBalsaMailbox *mailbox;
-
+  
   list = g_list_first(mailbox_list);
   while(list)
   {
     mailbox = LIBBALSA_MAILBOX(list->data);
+    
+#ifdef BALSA_USE_THREADS
+    gdk_threads_enter();
+#endif
+    
     libbalsa_mailbox_check(mailbox);
     
-    list = g_list_next (list);
+#ifdef BALSA_USE_THREADS
+    gdk_threads_leave();
+#endif
+    
   }
+  
+  list = g_list_next (list);
 }
 
 /*Callback to check a mailbox in a balsa-mblist */
@@ -916,8 +926,15 @@ mailbox_check_func ( GNode *node, gpointer data )
   if ( !mbnode || mbnode->IsDir)
     return FALSE;
 
+#ifdef BALSA_USE_THREADS
+    gdk_threads_enter();
+#endif
+
   libbalsa_mailbox_check ( mbnode->mailbox );
 
+#ifdef BALSA_USE_THREADS
+    gdk_threads_leave();
+#endif
   return FALSE;
 }
 
@@ -1003,7 +1020,7 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
   libbalsa_mailbox_check ( balsa_app.outbox );
   libbalsa_mailbox_check ( balsa_app.trash );
   
-  g_node_traverse (balsa_app.mailbox_nodes, G_LEVEL_ORDER, G_TRAVERSE_ALL, -1, mailbox_check_func, NULL );
+  g_node_traverse (balsa_app.mailbox_nodes, G_LEVEL_ORDER, G_TRAVERSE_ALL, -1, (GNodeTraverseFunc)mailbox_check_func, NULL );
 
   balsa_mblist_have_new (balsa_app.mblist);
 #endif
@@ -1036,13 +1053,15 @@ check_messages_thread( gpointer data )
 
   MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, NULL, "Local Mail", 0,0);
 
+  gdk_threads_enter();
   libbalsa_mailbox_check ( balsa_app.inbox );
   libbalsa_mailbox_check ( balsa_app.sentbox );
   libbalsa_mailbox_check ( balsa_app.draftbox );
   libbalsa_mailbox_check ( balsa_app.outbox );
   libbalsa_mailbox_check ( balsa_app.trash );
-  
-  g_node_traverse (balsa_app.mailbox_nodes, G_LEVEL_ORDER, G_TRAVERSE_ALL, -1, mailbox_check_func, NULL );
+  gdk_threads_leave();
+
+  g_node_traverse (balsa_app.mailbox_nodes, G_LEVEL_ORDER, G_TRAVERSE_ALL, -1, (GNodeTraverseFunc)mailbox_check_func, NULL );
 
   MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_FINISHED, NULL, "Finished", 0,0);
 
@@ -1080,6 +1099,8 @@ mail_progress_notify_cb( )
       }
 
     currentpos = (MailThreadMessage **) msgbuffer;
+
+    gdk_threads_enter();
 
     while( count ) 
       {
@@ -1181,6 +1202,8 @@ mail_progress_notify_cb( )
       }
     free( msgbuffer );
 	
+    gdk_threads_leave();
+
     return TRUE;
 }
 
@@ -1217,6 +1240,8 @@ send_progress_notify_cb( )
       }
 
     currentpos = (SendThreadMessage **) msgbuffer;
+
+    gdk_threads_enter();
 
     while( count ) 
       {
@@ -1316,7 +1341,8 @@ send_progress_notify_cb( )
 	count -= sizeof(void *);
       }
       
-  
+    gdk_threads_leave();
+
     free( msgbuffer );
 	
     return TRUE;

@@ -195,8 +195,13 @@ main (int argc, char *argv[])
 
   /* Initialize the i18n stuff */
   bindtextdomain (PACKAGE, GNOMELOCALEDIR);
-  textdomain (PACKAGE);
- 
+  textdomain (PACKAGE); 
+
+#ifdef BALSA_USE_THREADS
+  /* initiate thread mutexs, variables */
+  threads_init( TRUE );
+#endif  
+
   balsa_init (argc, argv);
 
 #ifdef GTKHTML_HAVE_GCONF
@@ -228,11 +233,6 @@ main (int argc, char *argv[])
   /* load mailboxes */
   config_mailboxes_init ();
   mailboxes_init ();
-
-#ifdef BALSA_USE_THREADS
-  /* initiate thread mutexs, variables */
-  threads_init( TRUE );
-#endif  
 
   /* create all the pretty icons that balsa uses that
    * arn't part of gnome-libs */

@@ -1601,7 +1601,7 @@ balsa_message_toggle_flagged(GtkWidget * widget, gpointer user_data)
     BalsaIndex* index;
 
     g_return_if_fail(widget != NULL);
-    g_return_if_fail(index != NULL);
+    g_return_if_fail(user_data != NULL);
 
     index = BALSA_INDEX (user_data);
     list = GTK_CLIST(index->ctree)->selection;
@@ -1646,7 +1646,7 @@ balsa_message_toggle_new(GtkWidget * widget, gpointer user_data)
     BalsaIndex* index;
 
     g_return_if_fail(widget != NULL);
-    g_return_if_fail(index != NULL);
+    g_return_if_fail(user_data != NULL);
 
     index = BALSA_INDEX (user_data);
     list = GTK_CLIST(index->ctree)->selection;

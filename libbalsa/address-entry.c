@@ -608,7 +608,7 @@ libbalsa_make_address_string(emailData *addy)
     gchar *str;
 
     if (addy->match)
-        str = g_strconcat(str, addy->user, " (", addy->match, ")", NULL);
+        str = g_strconcat(addy->user, " (", addy->match, ")", NULL);
     else
 	str = g_strdup(addy->user);
     return str;
@@ -1959,7 +1959,7 @@ libbalsa_keystroke_comma(LibBalsaAddressEntry *address_entry)
     
     g_return_if_fail(address_entry != NULL);
     g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry));
-    g_return_if_fail(input != NULL);
+    g_return_if_fail(address_entry->input != NULL);
 
     /*
      * First, check if it expanded, and accept it.

@@ -1,3 +1,15 @@
+2001-06-19  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Peter Bloomfield <bloomfld@eos.ncsu.edu>
+	* libbalsa/address-entry.c:
+	* src/balsa-app.c: 
+	* src/balsa-index.c: fix mispellings and uninitialized variables.
+	* src/mailbox-node.c: revert to more memory-friendly version.
+
+	Emmanuel <e.allaud@wanadoo.fr>:
+	* src/expand-alias.c: end the loop earlier when possible.
+	* src/balsa-mblist.c: remove some crap.
+	
 2001-06-18  Matthew Guenther  <guentherm@asme.org>
 
 	* src/balsa-identity.c (identity_list_update): Properly initialize

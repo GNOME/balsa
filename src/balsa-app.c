@@ -98,7 +98,7 @@ check_mailbox_password(GNode *nd, gpointer data)
      *
      * I probably overdid it, but this way the code worked first time...
      */
-    g_return_val_if_fail(node != NULL, FALSE);
+    g_return_val_if_fail(nd != NULL, FALSE);
     node = (BalsaMailboxNode *)nd->data;
     g_return_val_if_fail(BALSA_IS_MAILBOX_NODE(node), FALSE);
     mbox = node->mailbox;
@@ -644,11 +644,12 @@ gboolean balsa_messages_move(GList * messages,
     gpointer *ptr = g_list_nth_data( messages, 0); 
     gboolean ret;
     
-    if(ptr)
-	orig = ((LibBalsaMessage *)ptr)->mailbox;
     ret = libbalsa_messages_move( messages, dest );
-    gtk_signal_emit_by_name( GTK_OBJECT(orig), "set-unread-messages-flag", 
+    if(ptr) {
+	orig = ((LibBalsaMessage *)ptr)->mailbox;
+        gtk_signal_emit_by_name( GTK_OBJECT(orig), "set-unread-messages-flag", 
 			     0, balsa_app.mblist);	
+    }
     gtk_signal_emit_by_name( GTK_OBJECT(dest), "set-unread-messages-flag", 
 			     0, balsa_app.mblist);	
     return(ret);

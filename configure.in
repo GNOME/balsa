@@ -85,8 +85,8 @@ AC_SUBST(HAVE_LIBGNOMEUI_GNOME_WINDOW_ICON_H)
 dnl ###########################################################################
 dnl Check for gnome database manager header
 dnl ###########################################################################
-AC_CHECK_HEADERS(gdbm.h, GDBM_LIBS="-lgdbm", GDBM_LIBS="")
-AC_SUBST(GDBM_LIBS)
+dnl AC_CHECK_HEADERS(gdbm.h, GDBM_LIBS="-lgdbm", GDBM_LIBS="")
+dnl AC_SUBST(GDBM_LIBS)
 
 dnl ###########################################################################
 dnl Check for gnome-print

@@ -20,17 +20,15 @@
  */
 
 /* NOTES:
-   persistent cache is implemented using GDBM store. At the moment,
+   persistent cache is implemented using a directory. At the moment,
    only message bodies are cached, mailbox scanning is not because it
    requires quite extensive messing with entire libmutt/libbalsa connection
    - some code is present (load_cache/save_to_cache) but not fully
    functional - yet.
 */
 #include "config.h"
+#include <dirent.h>
 
-#ifdef HAVE_GDBM_H
-#include <gdbm.h>
-#endif
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
 #endif
@@ -285,7 +283,6 @@ reset_mutt_passwords(LibBalsaServer* server)
     ImapPass = strdup(server->passwd);
 }
 
-#ifdef HAVE_GDBM_H
 static void
 assure_balsa_dir(void)
 {
@@ -301,7 +298,7 @@ get_cache_name(LibBalsaMailboxImap* mailbox, const gchar* type)
     LibBalsaServer *s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
     gchar* postfix = g_strconcat(".balsa/", s->host, "-",
                                  (mailbox->path ? mailbox->path : "INBOX"),
-                                 "-", type, ".db", NULL);
+                                 "-", type, ".dir", NULL);
     for(start=strchr(postfix+7, '/'); start; start = strchr(start,'/'))
         *start='-';
 
@@ -537,8 +534,8 @@ save_to_cache(LibBalsaMailbox* mailbox)
 static gboolean
 clean_cache(LibBalsaMailbox* mailbox)
 {
-    GDBM_FILE dbf;
-    datum key, nextkey;
+    DIR* dir;
+    struct dirent* key;
     gchar* fname =  get_cache_name(LIBBALSA_MAILBOX_IMAP(mailbox), "body");
     ImapUID uid[2];
     GHashTable *present_uids;
@@ -553,10 +550,12 @@ clean_cache(LibBalsaMailbox* mailbox)
         return FALSE;
     }
 
-    dbf = gdbm_open(fname, 0, GDBM_WRITER, S_IRUSR|S_IWUSR, NULL);
-    g_free(fname);
+    dir = opendir(fname);
     printf("Attempting to clean IMAP cache for '%s'\n", mailbox->name);
-    if(!dbf) return FALSE;
+    if(!dir) {
+        g_free(fname);
+        return FALSE;
+    }
 
     present_uids = g_hash_table_new(g_direct_hash, g_direct_equal);
     remove_list  = NULL;
@@ -566,34 +565,29 @@ clean_cache(LibBalsaMailbox* mailbox)
         g_hash_table_insert(present_uids, UID_TO_POINTER(u), &present_uids);
     }
                             
-    key = gdbm_firstkey(dbf);
-    while (key.dptr) {
-        ImapUID u = ((ImapUID*)key.dptr)[1];
-        if( ((ImapUID*)key.dptr)[0] != uid_validity 
-            || !g_hash_table_lookup(present_uids, UID_TO_POINTER(u))) {
+    while ( (key=readdir(dir)) != NULL) {
+        if(sscanf(key->d_name,"%u-%u", &uid[0], &uid[1])!=2)
+            continue;
+        if( uid[0] != uid_validity 
+            || !g_hash_table_lookup(present_uids, UID_TO_POINTER(uid[1]))) {
             remove_list = 
-                g_list_prepend(remove_list, 
-                               UID_TO_POINTER(((ImapUID*)key.dptr)[1]));
+                g_list_prepend(remove_list, UID_TO_POINTER(uid[1]));
         }
-        
-        nextkey = gdbm_nextkey(dbf, key);
-        free(key.dptr); key = nextkey;
     }
+    closedir(dir);
     g_hash_table_destroy(present_uids);
 
-    key.dptr  = (char*)uid;
-    key.dsize = sizeof(ImapUID)*2;
-    uid[0]    = uid_validity;    
     for(lst = remove_list; lst; lst = lst->next) {
-        uid[1] = POINTER_TO_UID(lst->data);
-        gdbm_delete(dbf, key);
-        printf("Removed %d/%05d msg from cache\n", uid[0], uid[1]);
+        unsigned uid = GPOINTER_TO_UINT(lst->data);
+        gchar *fn = g_strdup_printf("%s/%u-%u", fname, uid_validity, uid);
+        unlink(fn);
+        printf("Unlinked %s\n", fn);
+        g_free(fn);
     }
     g_list_free(remove_list);
-    gdbm_close(dbf);
+    g_free(fname);
     return TRUE;
 }
-#endif
 
 /* libbalsa_mailbox_imap_open:
    opens IMAP mailbox. On failure leaves the object in sane state.
@@ -698,12 +692,10 @@ libbalsa_mailbox_imap_append(LibBalsaMailbox * mailbox)
 static void
 libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox)
 {
-#ifdef HAVE_GDBM_H
     if(mailbox->open_ref == 1) { /* about to close */
         /* FIXME: save headers differently: save_to_cache(mailbox); */
         clean_cache(mailbox);
     }
-#endif
     if (LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox)
 	(*LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox) 
 	    (LIBBALSA_MAILBOX(mailbox));
@@ -722,65 +714,38 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
 					 LibBalsaMessage * message)
 {
     FILE *stream = NULL;
-#ifdef HAVE_GDBM_H
-    ImapUID uid[2];
-    datum key, data;
-    gchar* fname;
-    GDBM_FILE dbf;
-#endif
+    gchar* msg_name, *cache_name;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox), NULL);
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), NULL);
     RETURN_VAL_IF_CONTEXT_CLOSED(message->mailbox, FALSE);
 
-#ifdef HAVE_GDBM_H
-    fname = get_cache_name(LIBBALSA_MAILBOX_IMAP(mailbox), "body");
-    dbf = gdbm_open(fname, 0, GDBM_READER, S_IRUSR|S_IWUSR, NULL);
-    uid[0] = LIBBALSA_MAILBOX_IMAP(mailbox)->uid_validity;
-    uid[1] = IMAP_MESSAGE_UID(message);
-    key.dptr  = (char*)uid;
-    key.dsize = sizeof(ImapUID)*2;
-    if(dbf && gdbm_exists(dbf, key)) {
-	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-	                     "imap cache: found %d/%d", uid[0], uid[1]);
-        data = gdbm_fetch(dbf, key);
-        stream = tmpfile();
-        fwrite(data.dptr, data.dsize, sizeof(char), stream);
-        rewind(stream);
-        gdbm_close(dbf);
-        free(data.dptr); /* allocated by gdbm_fetch */
-    } else 
-#endif
-    {
+    cache_name = get_cache_name(LIBBALSA_MAILBOX_IMAP(mailbox), "body");
+    msg_name   = g_strdup_printf("%s/%u-%u", cache_name, 
+                                 LIBBALSA_MAILBOX_IMAP(mailbox)->uid_validity,
+                                 IMAP_MESSAGE_UID(message));
+    stream = fopen(msg_name,"rt");
+    if(!stream) {
         MESSAGE *msg = safe_calloc(1, sizeof(MESSAGE));
         msg->magic = CLIENT_CONTEXT(mailbox)->magic;
+        libbalsa_lock_mutt();
         if (!imap_fetch_message(msg, CLIENT_CONTEXT(mailbox), 
                                 message->header->msgno)) 
             stream = msg->fp;
 	FREE(&msg);
-#ifdef HAVE_GDBM_H
 	if(stream) { /* don't cache negatives */
-	    data.dsize = libbalsa_readfile(stream, &data.dptr);
+            FILE * cache;
+            mkdir(cache_name, S_IRUSR|S_IWUSR|S_IXUSR); /* ignore errors */
+            cache = fopen(msg_name,"wt");
+            if(! (cache && mutt_copy_stream(stream, cache) ==0) ) 
+		g_warning("Writing to cache file '%s' failed.", msg_name);
+            fclose(cache);
 	    rewind(stream);
-	    if(dbf) gdbm_close(dbf);
-	    assure_balsa_dir();
-	    dbf = gdbm_open(fname, 0, GDBM_WRITER, S_IRUSR|S_IWUSR, NULL);
-	    if(dbf) {
-		libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-		                     "imap cache: pushing %d/%d",
-			              uid[0], uid[1] );
-		gdbm_store(dbf, key, data, GDBM_REPLACE);
-		gdbm_close(dbf);
-	    
-	    } else
-		g_warning("Writing to cache file '%s' failed.", fname);
-	    g_free(data.dptr); /* allocated by libbalsa_readfile */
 	}
-#endif
+        libbalsa_unlock_mutt();
     }
-#ifdef HAVE_GDBM_H
-    g_free(fname);
-#endif
+    g_free(msg_name);
+    g_free(cache_name); 
     return stream;
 }
 
@@ -821,6 +786,7 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 	    if(CLIENT_CONTEXT_CLOSED(mailbox)||
 	       !CLIENT_CONTEXT(mailbox)->id_hash)
 		libbalsa_mailbox_free_messages(mailbox);
+            /* send close signall as well? */
 	} 
 	if (newmsg || i == M_NEW_MAIL || i == M_REOPENED) {
 	    mailbox->new_messages =
@@ -829,6 +795,7 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 	    UNLOCK_MAILBOX(mailbox);
 	    libbalsa_mailbox_load_messages(mailbox);
 	} else {
+            /* update flags here */
 	    UNLOCK_MAILBOX(mailbox);
 	}
     }

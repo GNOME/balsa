@@ -78,7 +78,6 @@ balsa_LDADD = \
 	$(top_builddir)/libinit_balsa/libinit_balsa.a \
 	-lpspell \
 	-lltdl	\
-	$(GDBM_LIBS) \
 	$(INTLLIBS) \
 	$(PCRE_LIBS) \
 	$(PTHREAD_LIB)

@@ -1,3 +1,9 @@
+2002-05-19  Pawel Salek <pawsa@theochem.kth.se>
+
+	* configure.in, src/Makefile.am: remove GDBM_LIBS.
+	* libbalsa/mailbox_imap.c: get rid of gdbm message cache - too
+	resource-hungry. One could disable mutt's cache now.
+
 2002-05-18  Emmanuel <e.allaud@wanadoo.fr>
 
 	* libbalsa/mailbox.[ch]: remove unused code.

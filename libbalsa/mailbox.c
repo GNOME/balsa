@@ -90,6 +90,7 @@ void send_watcher_mark_clear_message (Mailbox * mailbox, Message * message);
 void send_watcher_mark_answer_message (Mailbox * mailbox, Message * message);
 void send_watcher_mark_read_message (Mailbox * mailbox, Message * message);
 void send_watcher_mark_unread_message (Mailbox * mailbox, Message * message);
+void send_watcher_mark_flag_message (Mailbox * mailbox, Message * message);
 void send_watcher_mark_delete_message (Mailbox * mailbox, Message * message);
 void send_watcher_mark_undelete_message (Mailbox * mailbox, Message * message);
 void send_watcher_new_message (Mailbox * mailbox, Message * message, gint remaining);
@@ -1010,6 +1011,31 @@ send_watcher_mark_read_message (Mailbox * mailbox, Message * message)
 	}
     }
 }
+ 
+void
+send_watcher_mark_flag_message (Mailbox * mailbox, Message * message)
+{
+	GList *list;
+	MailboxWatcherMessage mw_message;
+	MailboxWatcher *watcher;
+
+	mw_message.type = MESSAGE_MARK_FLAGGED;
+	mw_message.mailbox = mailbox;
+	mw_message.message = message;
+
+	list = WATCHER_LIST (mailbox);
+	while (list)
+	{
+		watcher = list->data;
+		list = list->next;
+
+		if (watcher->mask & MESSAGE_MARK_FLAGGED_MASK)
+		{
+			mw_message.data = watcher->data;
+			(*watcher->func) (&mw_message);
+		}
+	}
+}
 
 void
 send_watcher_mark_unread_message (Mailbox * mailbox, Message * message)
@@ -1385,30 +1411,8 @@ translate_message (HEADER * cur)
           p = tmp->data + 11;
           SKIPWS (p);
 
-          message->fcc_mailbox = NULL;
-          if (balsa_app.mailbox_nodes && p != NULL) {
-            if (!strcmp (p, balsa_app.sentbox->name))
-              message->fcc_mailbox = balsa_app.sentbox;
-            else if (!strcmp (p, balsa_app.draftbox->name))
-              message->fcc_mailbox = balsa_app.draftbox;
-            else if (!strcmp (p, balsa_app.outbox->name))
-              message->fcc_mailbox = balsa_app.outbox;
-            else if (!strcmp (p, balsa_app.trash->name))
-              message->fcc_mailbox = balsa_app.trash;
-            else {
-                GNode *walk;
-    
-                walk = g_node_last_child (balsa_app.mailbox_nodes);
-                while (walk) {
-                  if (!strcmp (p, ((MailboxNode *)((walk)->data))->name)) {
-                    message->fcc_mailbox =
-                        ((MailboxNode *)((walk)->data))->mailbox;
-                    break;
-                  } else
-                    walk = walk->prev;
-                }
-            }
-          }
+          message->fcc_mailbox = p != NULL ?
+	      balsa_find_mbox_by_name(p) : NULL;
         }
       else if (mutt_strncasecmp ("X-Mutt-Fcc:", tmp->data, 18) == 0)
         {

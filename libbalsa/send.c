@@ -882,8 +882,7 @@ gchar** balsa_lookup_mime_type (const gchar* path)
         gchar** tmp;
         const gchar* mime_type;
         
-
-        mime_type = gnome_mime_type_or_default_of_file (path, "application/octet-stream");
+        mime_type = gnome_mime_type_or_default (path, "application/octet-stream");
         tmp = g_strsplit (mime_type , "/", 2 );
 
         return tmp;

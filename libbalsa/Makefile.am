@@ -16,6 +16,7 @@ libbalsa_a_SOURCES = 		\
 	message.h		\
 	body.h			\
 	address.h		\
+	contact.h		\
 	mime.h			\
 	misc.h			\
 	send.h			\
@@ -24,6 +25,7 @@ libbalsa_a_SOURCES = 		\
 	filter-error.c		\
 	filter-file.c		\
 	filter-funcs.c		\
+	imapdir.h		\
 	libbalsa.c		\
 	libbalsa.h		\
 	libbalsa_private.h	\

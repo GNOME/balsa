@@ -1,5 +1,5 @@
 /* Balsa E-Mail Client
- * Copyright (C) 1999 Stuart Parmenter
+ * Copyright (C) 2000 balsa development team.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,24 @@
  * 02111-1307, USA.
  */
 
-#ifndef __LIBBALSA_H__
-#define __LIBBALSA_H__
+#ifndef __IMAPDIR_H__
+#define __IMAPDIR_H__
 
-typedef struct _Mailbox Mailbox;
-typedef struct _Message Message;
-typedef struct _Address Address;
-typedef struct _Contact Contact;
-typedef struct _ImapDir ImapDir;
-typedef struct _Body Body;
-typedef struct _Server Server;
 
-#include "mailbox.h"
-#include "message.h"
-#include "address.h"
-#include "contact.h"
-#include "imapdir.h"
-#include "body.h"
-#include "files.h"
+struct _ImapDir
+{
+    gchar *name;
+    gchar *path;
+    gchar *user;
+    gchar *passwd;
+    gchar *host;
+    gint port;
+    GNode* file_tree; /* GNode structure representing the IMAP directory */
+    int ignore_hidden:1;
+};
 
-void load_messages (Mailbox * mailbox, gint emit);
+ImapDir *imapdir_new(void);
+void imapdir_destroy(ImapDir *imap_dir);
+const gchar* imapdir_scan(ImapDir * id);
 
-#endif /* __LIBBALSA_H__ */
+#endif /* __IMAPDIR_H__ */

@@ -3062,7 +3062,8 @@ do_insert_string_select_ch(BalsaSendmsg* bsmsg, GtkTextBuffer *buffer,
                                     NULL);
     GtkWidget* info = 
         gtk_label_new(_("This file is not encoded in US-ASCII or UTF-8.\n"
-                        "Please choose the charset used to encode the file."));
+                        "Please choose the charset used to encode the file.\n"
+			"(if unsure chose Generic UTF-8)"));
     GtkListStore* store = gtk_list_store_new(N_COLUMNS,
                                              G_TYPE_STRING);
     GtkWidget* tree = 

@@ -1,3 +1,13 @@
+2004-07-19  Pawel Salek
+
+	* libbalsa/body.[hc]: rename libbalsa_message_body_get_content_type()
+	to libbalsa_message_body_get_mime_type() to match the implementation.
+	* src, libbalsa: associated changes.
+	* libbalsa/mailbox_imap.c: handle imap servers without server-side
+	threading.
+	* src/information-dialog.c: loose no info messages.
+	* src/main.c: shutdown nicely imap connections.
+
 2004-07-18  Pawel Salek
 
 	* libbalsa/body.[hc]: rename ::mime_type to ::content_type

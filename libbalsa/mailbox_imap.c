@@ -1613,8 +1613,10 @@ lbm_imap_construct_body(LibBalsaMessageBody *lbbody, ImapBody *imap_body)
     /* get the name in the same way as g_mime_part_get_filename() does */
     str = imap_body_get_dsp_param(imap_body, "filename");
     if(!str) str = imap_body_get_param(imap_body, "name");
-    lbbody->filename  = g_mime_utils_8bit_header_decode(str);
-    libbalsa_utf8_sanitize(&lbbody->filename, TRUE, NULL);
+    if(str) {
+        lbbody->filename  = g_mime_utils_8bit_header_decode(str);
+        libbalsa_utf8_sanitize(&lbbody->filename, TRUE, NULL);
+    }
     lbbody->charset   = g_strdup(imap_body_get_param(imap_body, "charset"));
     if(imap_body->envelope) {
         lbbody->embhdrs = g_new0(LibBalsaMessageHeaders, 1);
@@ -2052,6 +2054,16 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
     
     mailbox->view->threading_type = thread_type;
     switch(thread_type) {
+    case LB_MAILBOX_THREADING_SIMPLE:
+    case LB_MAILBOX_THREADING_JWZ:
+	if(imap_mbox_thread(mimap->handle, "REFERENCES", filter) == IMR_OK) {
+            new_tree =
+                g_node_copy(imap_mbox_handle_get_thread_root(mimap->handle));
+            break;
+        } else 
+            libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+			     _("Server-side threading not supported."));
+        /* fall through */
     case LB_MAILBOX_THREADING_FLAT:
         if(filter) {
             imap_mbox_sort_filter(mimap->handle,
@@ -2067,12 +2079,6 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
                 g_node_append_data(new_tree, GUINT_TO_POINTER(msgno));
         }
         break;
-    case LB_MAILBOX_THREADING_SIMPLE:
-    case LB_MAILBOX_THREADING_JWZ:
-	imap_mbox_thread(mimap->handle, "REFERENCES", filter);
-	new_tree =
-            g_node_copy(imap_mbox_handle_get_thread_root(mimap->handle));
-	break;
     default:
 	g_assert_not_reached();
 	new_tree = NULL;

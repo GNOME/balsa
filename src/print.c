@@ -652,7 +652,7 @@ prepare_html(PrintInfo * pi, LibBalsaMessageBody * body)
     gchar *conttype;
     LibBalsaHTMLType html_type;
 
-    conttype = libbalsa_message_body_get_content_type(body);
+    conttype = libbalsa_message_body_get_mime_type(body);
     html_type = libbalsa_html_type(conttype);
     g_free(conttype);
 
@@ -992,7 +992,7 @@ prepare_default(PrintInfo * pi, LibBalsaMessageBody * body)
     pdata = g_malloc(sizeof(DefaultInfo));
     pdata->id_tag = BALSA_PRINT_TYPE_DEFAULT;
 
-    conttype = libbalsa_message_body_get_content_type(body);
+    conttype = libbalsa_message_body_get_mime_type(body);
 
     /* get a pixbuf according to the mime type */
     icon_name = libbalsa_icon_finder(conttype, NULL, NULL);
@@ -1296,7 +1296,7 @@ scan_body(PrintInfo * pi, LibBalsaMessageBody * body)
     while (body) {
 	gchar *conttype;
 
-	conttype = libbalsa_message_body_get_content_type(body);
+	conttype = libbalsa_message_body_get_mime_type(body);
 	
 	for (action = mime_actions; 
 	     action->mime_type && 

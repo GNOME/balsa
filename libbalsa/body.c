@@ -373,7 +373,7 @@ libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd)
     stream = g_mime_stream_fs_new(fd);
     /* convert text bodies but HTML - gtkhtml does conversion on its own. */
     if (libbalsa_message_body_type(body) == LIBBALSA_MESSAGE_BODY_TYPE_TEXT
-	&& strcmp(mime_type = libbalsa_message_body_get_content_type(body),
+	&& strcmp(mime_type = libbalsa_message_body_get_mime_type(body),
 			                  "text/html") != 0
 	&& (charset = libbalsa_message_body_charset(body))
 	&& g_ascii_strcasecmp(charset, "unknown-8bit") != 0
@@ -404,19 +404,12 @@ libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd)
 }
 
 gchar *
-libbalsa_message_body_get_content_type(LibBalsaMessageBody * body)
+libbalsa_message_body_get_mime_type(LibBalsaMessageBody * body)
 {
-    gchar *res;
-#ifdef OLD_CODE
-    gchar *tmp;
-    const GMimeContentType *type=g_mime_object_get_content_type(body->mime_part);
-    tmp=g_mime_content_type_to_string(type);
-
-    res = g_ascii_strdown(tmp, -1);
-    g_free(tmp);
-#else
-    res = g_ascii_strdown(body->content_type, -1);
-#endif
+    gchar *res, *tmp;
+    tmp = strchr(body->content_type, ';');
+    res = g_ascii_strdown(body->content_type,
+                          tmp ? tmp-body->content_type : -1);
     return res;
 }
 
@@ -456,7 +449,7 @@ libbalsa_message_body_is_flowed(LibBalsaMessageBody * body)
     gchar *content_type;
     gboolean flowed = FALSE;
 
-    content_type = libbalsa_message_body_get_content_type(body);
+    content_type = libbalsa_message_body_get_mime_type(body);
     if (g_ascii_strcasecmp(content_type, "text/plain") == 0) {
 	gchar *format =
 	    libbalsa_message_body_get_parameter(body, "format");

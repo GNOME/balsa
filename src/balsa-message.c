@@ -748,7 +748,7 @@ save_part(BalsaPartInfo * info)
     
     g_return_if_fail(info != 0);
 
-    cont_type = libbalsa_message_body_get_content_type(info->body);
+    cont_type = libbalsa_message_body_get_mime_type(info->body);
     title = g_strdup_printf(_("Save %s MIME Part"), cont_type);
     save_dialog = gtk_file_selection_new(title);
     g_free(title);
@@ -1437,7 +1437,7 @@ static void
 part_info_init_application(BalsaMessage * bm, BalsaPartInfo * info)
 {
 #ifdef HAVE_GPGME
-    gchar *body_type = libbalsa_message_body_get_content_type(info->body);
+    gchar *body_type = libbalsa_message_body_get_mime_type(info->body);
 
     if (!g_ascii_strcasecmp("application/pgp-signature", body_type) ||
 	(balsa_app.has_smime &&
@@ -1744,7 +1744,7 @@ part_info_init_message(BalsaMessage * bm, BalsaPartInfo * info)
     gchar* body_type;
     g_return_if_fail(info->body);
 
-    body_type = libbalsa_message_body_get_content_type(info->body);
+    body_type = libbalsa_message_body_get_mime_type(info->body);
     if (!g_ascii_strcasecmp("message/external-body", body_type)) {
         gchar *access_type;
         rfc_extbody_id *extbody_type = rfc_extbodys;
@@ -1811,7 +1811,7 @@ part_info_init_unknown(BalsaMessage * bm, BalsaPartInfo * info)
         g_free(msg);
     }
 
-    content_type = libbalsa_message_body_get_content_type(info->body);
+    content_type = libbalsa_message_body_get_mime_type(info->body);
     if ((content_desc = gnome_vfs_mime_get_description(content_type)))
         msg = g_strdup_printf(_("Type: %s (%s)"), content_desc,
                               content_type);
@@ -2243,7 +2243,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
     if (!ptr)
         return;
 
-    content_type = libbalsa_message_body_get_content_type(info->body);
+    content_type = libbalsa_message_body_get_mime_type(info->body);
     html_type = libbalsa_html_type(content_type);
     g_free(content_type);
 
@@ -2632,7 +2632,7 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
 {
     BalsaPartInfo *info = NULL;
     gchar *pix = NULL;
-    gchar *content_type = libbalsa_message_body_get_content_type(body);
+    gchar *content_type = libbalsa_message_body_get_mime_type(body);
     gchar *icon_title = NULL;
     gboolean is_multipart=libbalsa_message_body_is_multipart(body);
     GdkPixbuf *content_icon;
@@ -2933,7 +2933,7 @@ part_create_menu (BalsaPartInfo* info)
     g_object_ref(info->popup_menu);
     gtk_object_sink(GTK_OBJECT(info->popup_menu));
     
-    content_type = libbalsa_message_body_get_content_type (info->body);
+    content_type = libbalsa_message_body_get_mime_type (info->body);
     fill_part_menu_by_content_type(info, GTK_MENU(info->popup_menu),
                                    content_type);
     gtk_widget_show_all (info->popup_menu);
@@ -3090,7 +3090,7 @@ part_context_menu_cb(GtkWidget * menu_item, BalsaPartInfo * info)
     gchar* key;
 
 
-    content_type = libbalsa_message_body_get_content_type(info->body);
+    content_type = libbalsa_message_body_get_mime_type(info->body);
     key = g_object_get_data (G_OBJECT (menu_item), "mime_action");
 
     if (key != NULL
@@ -3267,7 +3267,7 @@ preferred_part(LibBalsaMessageBody *parts)
 
 #ifdef HAVE_GTKHTML
     for(body=parts; body; body=body->next) {
-        content_type = libbalsa_message_body_get_content_type(body);
+        content_type = libbalsa_message_body_get_mime_type(body);
 
         if(g_ascii_strcasecmp(content_type, "text/html")==0) {
             if (balsa_app.display_alt_plain)
@@ -3282,7 +3282,7 @@ preferred_part(LibBalsaMessageBody *parts)
 #endif /* HAVE_GTKHTML */
 
     for(body=parts; body; body=body->next) {
-        content_type = libbalsa_message_body_get_content_type(body);
+        content_type = libbalsa_message_body_get_mime_type(body);
 
         if(g_ascii_strcasecmp(content_type, "text/plain")==0) {
             g_free(content_type);
@@ -3301,7 +3301,7 @@ preferred_part(LibBalsaMessageBody *parts)
     for (body = parts; body; body = body->next) {
         gchar *content_type;
 
-        content_type = libbalsa_message_body_get_content_type(body);
+        content_type = libbalsa_message_body_get_mime_type(body);
 
         if (g_ascii_strcasecmp(content_type, "text/plain") == 0)
             preferred = body;
@@ -3490,7 +3490,7 @@ add_part(BalsaMessage * bm, BalsaPartInfo * info)
 
     if (info->widget) {
 	gchar *content_type =
-	    libbalsa_message_body_get_content_type(info->body);
+	    libbalsa_message_body_get_mime_type(info->body);
 	if (strcmp(content_type, "message/rfc822") == 0) {
 	    GtkWidget *message_widget =
 		bm_message_widget_new(info->widget, TRUE);

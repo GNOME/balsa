@@ -68,7 +68,7 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	break;
     case LIBBALSA_MESSAGE_BODY_TYPE_TEXT:
 	/* don't return text/html stuff... */
-	mime_type = libbalsa_message_body_get_content_type(body);
+	mime_type = libbalsa_message_body_get_mime_type(body);
 	html_type = libbalsa_html_type(mime_type);
 	g_free(mime_type);
 

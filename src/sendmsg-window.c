@@ -2161,7 +2161,7 @@ continueBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message)
 	   was the message... */
 	if (body && !body->filename) {
 	    GString *rbdy;
-	    gchar *body_type = libbalsa_message_body_get_content_type(body);
+	    gchar *body_type = libbalsa_message_body_get_mime_type(body);
             gint llen = -1;
             GtkTextBuffer *buffer =
                 gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
@@ -2190,7 +2190,7 @@ continueBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message)
 		fd = g_file_open_tmp("balsa-continue-XXXXXX", &name, NULL);
 		libbalsa_message_body_save_fd(body, fd);
 	    }
-	    body_type = libbalsa_message_body_get_content_type(body);
+	    body_type = libbalsa_message_body_get_mime_type(body);
 	    add_attachment(bsmsg, name,
 			   body->filename != NULL, body_type);
 	    g_free(body_type);

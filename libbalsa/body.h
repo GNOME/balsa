@@ -89,7 +89,7 @@ gboolean libbalsa_message_body_save_temporary(LibBalsaMessageBody * body);
 
 gchar *libbalsa_message_body_get_parameter(LibBalsaMessageBody * body,
 					   const gchar * param);
-gchar *libbalsa_message_body_get_content_type(LibBalsaMessageBody * body);
+gchar *libbalsa_message_body_get_mime_type(LibBalsaMessageBody * body);
 
 gboolean libbalsa_message_body_is_multipart(LibBalsaMessageBody * body);
 gboolean libbalsa_message_body_is_inline(LibBalsaMessageBody* body);

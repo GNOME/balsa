@@ -565,7 +565,7 @@ main(int argc, char *argv[])
 #ifdef BALSA_USE_THREADS
     threads_destroy();
 #endif
-
+    libbalsa_imap_server_close_all_connections();
     return 0;
 }
 

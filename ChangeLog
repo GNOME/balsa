@@ -1,5 +1,6 @@
-2004-09-01 08:26  PeterB
+2004-09-01 08:35  PeterB
 
+	* src/save-restore.c: change only hide-deleted bit in GUI filter.
 	* src/: balsa-app.h, balsa-index.c, pref-manager.c, save-restore.c:
 	drop balsa_app.hide_deleted; add_pref_menu and attach_pref_menu
 	always use the same callback; implement default sort-field; update

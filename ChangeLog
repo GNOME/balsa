@@ -6,6 +6,7 @@
 	* libinit_balsa/Makefile.am: automake-1.5 compatibility.
 	* libbalsa/address.c (rfc2822_mailbox): return a value.
 	* src/sendmsg-window.c, src/balsa-mblist.[hc]: fix return type.
+	* src/main-window.c: add missing gdk_threads_{enter,leave}. Clean up.
 
 2001-10-05  Pawel Salek  <pawsa@theochem.kth.se>
 

@@ -98,7 +98,6 @@ GSList *list = NULL;
 static gint new_mail_dialog_visible = FALSE;
 static int quiet_check=0;
 
-void progress_dialog_destroy_cb(GtkWidget *, gpointer data);
 static void check_messages_thread(gpointer data);
 static void count_unread_msgs_func(GtkCTree * ctree, GtkCTreeNode * node,
 				   gpointer data);
@@ -1577,6 +1576,53 @@ imap_check_test(const gchar * path)
         return balsa_app.check_imap;
 }
 
+#if BALSA_USE_THREADS
+static void
+progress_dialog_destroy_cb(GtkWidget * widget, gpointer data)
+{
+    progress_dialog = NULL;
+    progress_dialog_source = NULL;
+    progress_dialog_message = NULL;
+    progress_dialog_bar = NULL;
+}
+/* ensure_check_mail_dialog:
+   make sure that mail checking dialog exists.
+*/
+static void
+ensure_check_mail_dialog(void)
+{
+    if (progress_dialog && GTK_IS_WIDGET(progress_dialog))
+	gtk_widget_destroy(GTK_WIDGET(progress_dialog));
+    
+    progress_dialog =
+	gnome_dialog_new("Checking Mail...", "Hide", NULL);
+    gtk_window_set_wmclass(GTK_WINDOW(progress_dialog), 
+			   "progress_dialog", "Balsa");
+        
+    if (balsa_app.main_window)
+	gnome_dialog_set_parent(GNOME_DIALOG(progress_dialog),
+				GTK_WINDOW(balsa_app.main_window));
+    gtk_signal_connect(GTK_OBJECT(progress_dialog), "destroy",
+		       GTK_SIGNAL_FUNC(progress_dialog_destroy_cb),
+		       NULL);
+    
+    gnome_dialog_set_close(GNOME_DIALOG(progress_dialog), TRUE);
+    
+    progress_dialog_source = gtk_label_new("Checking Mail....");
+    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(progress_dialog)->vbox),
+		       progress_dialog_source, FALSE, FALSE, 0);
+    
+    progress_dialog_message = gtk_label_new("");
+    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(progress_dialog)->vbox),
+		       progress_dialog_message, FALSE, FALSE, 0);
+    
+    progress_dialog_bar = gtk_progress_bar_new();
+    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(progress_dialog)->vbox),
+		       progress_dialog_bar, FALSE, FALSE, 0);
+    gtk_widget_show_all(progress_dialog);
+}
+#endif
+
 /*
  * Callbacks
  */
@@ -1618,39 +1664,8 @@ check_new_messages_real(GtkWidget *widget, gpointer data, int type)
     fill_mailbox_passwords(balsa_app.inbox_input);
     if (type == TYPE_CALLBACK && 
         (balsa_app.pwindow_option == WHILERETR ||
-         (balsa_app.pwindow_option == UNTILCLOSED &&
-          !(progress_dialog && GTK_IS_WIDGET(progress_dialog))))) {
-        if (progress_dialog && GTK_IS_WIDGET(progress_dialog))
-            gtk_widget_destroy(GTK_WIDGET(progress_dialog));
-        
-        progress_dialog =
-            gnome_dialog_new("Checking Mail...", "Hide", NULL);
-        gtk_window_set_wmclass(GTK_WINDOW(progress_dialog), 
-                               "progress_dialog", "Balsa");
-        
-        if (balsa_app.main_window)
-            gnome_dialog_set_parent(GNOME_DIALOG(progress_dialog),
-                                    GTK_WINDOW(balsa_app.main_window));
-        gtk_signal_connect(GTK_OBJECT(progress_dialog), "destroy",
-                           GTK_SIGNAL_FUNC(progress_dialog_destroy_cb),
-                           NULL);
-        
-        gnome_dialog_set_close(GNOME_DIALOG(progress_dialog), TRUE);
-        
-        progress_dialog_source = gtk_label_new("Checking Mail....");
-        gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(progress_dialog)->vbox),
-                           progress_dialog_source, FALSE, FALSE, 0);
-        
-        progress_dialog_message = gtk_label_new("");
-        gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(progress_dialog)->vbox),
-                           progress_dialog_message, FALSE, FALSE, 0);
-        
-        progress_dialog_bar = gtk_progress_bar_new();
-        gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(progress_dialog)->vbox),
-                           progress_dialog_bar, FALSE, FALSE, 0);
-        
-        gtk_widget_show_all(progress_dialog);
-    }
+         (balsa_app.pwindow_option == UNTILCLOSED && progress_dialog)))
+	ensure_check_mail_dialog();
 
     /* initiate threads */
     pthread_create(&get_mail_thread,
@@ -1782,8 +1797,10 @@ mail_progress_notify_cb()
         while (count) {
             threadmessage = *currentpos;
             if(threadmessage->message_type == MSGMAILTHREAD_FINISHED) {
+		gdk_threads_enter();
                 balsa_mblist_have_new(balsa_app.mblist);
                 display_new_mail_notification(threadmessage->num_bytes);
+		gdk_threads_leave();
             }
             g_free(threadmessage);
             currentpos++;
@@ -1805,7 +1822,7 @@ mail_progress_notify_cb()
                     threadmessage->message_string);
         switch (threadmessage->message_type) {
         case MSGMAILTHREAD_SOURCE:
-            if (progress_dialog && GTK_IS_WIDGET(progress_dialog)) {
+            if (progress_dialog) {
                 gtk_label_set_text(GTK_LABEL(progress_dialog_source),
                                    threadmessage->message_string);
                 gtk_label_set_text(GTK_LABEL(progress_dialog_message), "");
@@ -1816,7 +1833,7 @@ mail_progress_notify_cb()
             }
             break;
         case MSGMAILTHREAD_MSGINFO:
-            if (progress_dialog && GTK_IS_WIDGET(progress_dialog)) {
+            if (progress_dialog) {
                 gtk_label_set_text(GTK_LABEL(progress_dialog_message),
                                    threadmessage->message_string);
                 gtk_widget_show_all(progress_dialog);
@@ -1839,21 +1856,19 @@ mail_progress_notify_cb()
                             percent);
                 percent = 1.0;
             }
-            if (progress_dialog && GTK_IS_WIDGET(progress_dialog))
-                gtk_progress_bar_update(GTK_PROGRESS_BAR
-                                        (progress_dialog_bar), percent);
+            if (progress_dialog)
+                gtk_progress_bar_update(GTK_PROGRESS_BAR(progress_dialog_bar),
+					percent);
             else
                 gnome_appbar_set_progress(balsa_app.appbar, percent);
             break;
         case MSGMAILTHREAD_FINISHED:
 
-            if (balsa_app.pwindow_option == WHILERETR && progress_dialog
-                && GTK_IS_WIDGET(progress_dialog)) {
+            if (balsa_app.pwindow_option == WHILERETR && progress_dialog) {
                 gtk_widget_destroy(progress_dialog);
-                progress_dialog = NULL;
-            } else if (progress_dialog && GTK_IS_WIDGET(progress_dialog)) {
+            } else if (progress_dialog) {
                 gtk_label_set_text(GTK_LABEL(progress_dialog_source),
-                                   "Finished Checking.");
+                                   _("Finished Checking."));
                 gtk_progress_bar_update(GTK_PROGRESS_BAR
                                         (progress_dialog_bar), 0.0);
             } else {
@@ -1872,33 +1887,19 @@ mail_progress_notify_cb()
             break;
 
         default:
-            fprintf(stderr, " Unknown (%d): %s \n",
+            fprintf(stderr, " Unknown check mail message(%d): %s\n",
                     threadmessage->message_type,
                     threadmessage->message_string);
-
         }
         g_free(threadmessage);
         currentpos++;
         count -= sizeof(void *);
     }
     g_free(msgbuffer);
-
     gdk_threads_leave();
 
     return TRUE;
 }
-
-
-void
-progress_dialog_destroy_cb(GtkWidget * widget, gpointer data)
-{
-    gtk_widget_destroy(widget);
-    progress_dialog = NULL;
-    progress_dialog_source = NULL;
-    progress_dialog_message = NULL;
-    progress_dialog_bar = NULL;
-}
-
 
 gboolean
 send_progress_notify_cb()

@@ -2999,12 +2999,11 @@ find_real(BalsaIndex * bindex, gboolean again)
 		     * must provide a non-empty string")); */
                     ok = GTK_RESPONSE_CANCEL; 
                 break;
-            default: /* cancel or just close */
-                return;
+            default: break;/* cancel or just close */
             } /* end of switch */
 	} while (ok==GTK_RESPONSE_HELP);
 	gtk_widget_destroy(dia);
-
+	if(ok ==GTK_RESPONSE_CANCEL) return;
 	cnd->type = CONDITION_STRING;
 
 	libbalsa_mailbox_search_iter_free(search_iter);

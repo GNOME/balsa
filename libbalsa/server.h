@@ -53,10 +53,6 @@ struct _LibBalsaServer {
     LibBalsaServerType type;
 
     gchar *host;
-#ifdef USE_TLS
-    GList *accepted_certs; /* certs accepted for this session */
-#endif
-
     gchar *user;
     gchar *passwd; /* NULL means "ask for it". Empty ("") is a legal one */
     unsigned remember_passwd:1;

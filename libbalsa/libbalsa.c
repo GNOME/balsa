@@ -47,6 +47,8 @@ static pthread_t main_thread_id;
 
 
 static gchar *qualified_hostname(const char *name);
+static int libbalsa_ask_for_cert_acceptance(X509 *cert,
+					    const char *explanation);
 
 void
 libbalsa_message(const char *fmt, ...)
@@ -371,6 +373,94 @@ x509_fingerprint (char *s, int l, X509 * cert)
     s[0] = '\0';
 }
 
+static GList *accepted_certs = NULL; /* certs accepted for this session */
+
+#ifdef BALSA_USE_THREADS
+static pthread_mutex_t certificate_lock = PTHREAD_MUTEX_INITIALIZER;
+#define LOCK_CERTIFICATES   pthread_mutex_lock(&certificate_lock)
+#define UNLOCK_CERTIFICATES pthread_mutex_unlock(&certificate_lock)
+#else
+#define LOCK_CERTIFICATES
+#define UNLOCK_CERTIFICATES
+#endif
+
+void
+libbalsa_certs_destroy(void)
+{
+    LOCK_CERTIFICATES;
+    g_list_foreach(accepted_certs, (GFunc)X509_free, NULL);
+    g_list_free(accepted_certs);
+    accepted_certs = NULL;
+    UNLOCK_CERTIFICATES;
+}
+
+/* compare Example 10-7 in the OpenSSL book */
+gboolean
+libbalsa_is_cert_known(X509* cert, long vfy_result)
+{
+    char buf[256];
+    X509 *tmpcert = NULL;
+    FILE *fp;
+    gchar *cert_name;
+    gboolean res = FALSE;
+    GList *lst;
+
+    LOCK_CERTIFICATES;
+    for(lst = accepted_certs; lst; lst = lst->next) {
+        int res = X509_cmp(cert, lst->data);
+        if(res == 0) {
+	    UNLOCK_CERTIFICATES;
+            return TRUE;
+	}
+    }
+    
+    cert_name = g_strconcat(g_get_home_dir(), "/.balsa/certificates", NULL);
+
+    fp = fopen(cert_name, "rt");
+    g_free(cert_name);
+    if(fp) {
+        printf("Looking for cert: %s\n", 
+               X509_NAME_oneline(X509_get_subject_name (cert),
+                                 buf, sizeof (buf)));
+        
+        res = FALSE;
+        while ((tmpcert = PEM_read_X509(fp, NULL, NULL, NULL)) != NULL) {
+            printf("comparing with cert: %s\n", 
+                   X509_NAME_oneline(X509_get_subject_name (tmpcert),
+                                     buf, sizeof (buf)));
+            res = X509_cmp(cert, tmpcert)==0;
+            X509_free(tmpcert);
+            if(res) break;
+        }
+        ERR_clear_error();
+        fclose(fp);
+    }
+    UNLOCK_CERTIFICATES;
+    
+    if(!res) {
+	const char *reason = X509_verify_cert_error_string(vfy_result);
+	res = libbalsa_ask_for_cert_acceptance(cert, reason);
+	LOCK_CERTIFICATES;
+	if(res == 2) {
+	    cert_name = g_strconcat(g_get_home_dir(),
+				    "/.balsa/certificates", NULL);
+            libbalsa_assure_balsa_dir();
+	    fp = fopen(cert_name, "a");
+	    if (fp) {
+		if(PEM_write_X509 (fp, cert))
+		    res = TRUE;
+		fclose(fp);
+	    }
+	    g_free(cert_name);
+	}
+	if(res == 1)
+	    accepted_certs = 
+		g_list_prepend(accepted_certs, X509_dup(cert));
+	UNLOCK_CERTIFICATES;
+    }
+
+    return res;
+}
 
 /* libbalsa_ask_for_cert_acceptance():
    returns:
@@ -425,7 +515,7 @@ ask_cert_real(X509 *cert, const char *explanation)
     g_string_append(str, c); g_free(c);
     g_free(valid_from);
 
-    dialog = gtk_dialog_new_with_buttons(_("IMAP TLS certificate"), NULL,
+    dialog = gtk_dialog_new_with_buttons(_("SSL/TLS certificate"), NULL,
                                          GTK_DIALOG_MODAL,
                                          _("_Accept Once"), 0,
                                          _("Accept&_Save"), 1,
@@ -479,7 +569,7 @@ ask_cert_idle(gpointer data)
    executed with GDK UNLOCKED. see mailbox_imap_open() and
    imap_dir_cb()/imap_folder_imap_dir().
 */
-int
+static int
 libbalsa_ask_for_cert_acceptance(X509 *cert, const char *explanation)
 {
     static pthread_mutex_t ask_cert_lock = PTHREAD_MUTEX_INITIALIZER;
@@ -501,7 +591,7 @@ libbalsa_ask_for_cert_acceptance(X509 *cert, const char *explanation)
     return acd.res;
 }
 #else /* BALSA_USE_THREADS */
-int
+static int
 libbalsa_ask_for_cert_acceptance(X509 *cert, const char *explanation)
 {
     return ask_cert_real(cert, explanation);

@@ -164,7 +164,6 @@ libbalsa_server_init(LibBalsaServer * server)
     server->remember_passwd = TRUE;
 #ifdef USE_SSL
     server->use_ssl        = FALSE;
-    server->accepted_certs = NULL;
 #endif
 }
 
@@ -181,11 +180,6 @@ libbalsa_server_finalize(GObject * object)
     g_free(server->host);   server->host = NULL;
     g_free(server->user);   server->user = NULL;
     g_free(server->passwd); server->passwd = NULL;
-#ifdef USE_TLS
-    g_list_foreach(server->accepted_certs, (GFunc)X509_free, NULL);
-    g_list_free(server->accepted_certs);
-    server->accepted_certs = NULL;
-#endif
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -375,69 +369,6 @@ libbalsa_server_save_config(LibBalsaServer * server)
 #endif
 }
 
-#ifdef USE_TLS
-/* compare Example 10-7 in the OpenSSL book */
-static gboolean
-libbalsa_is_cert_known(LibBalsaServer *is, X509* cert)
-{
-    char buf[256];
-    X509 *tmpcert = NULL;
-    FILE *fp;
-    gchar *cert_name;
-    gboolean res = FALSE;
-    GList *lst;
-
-    for(lst = is->accepted_certs; lst; lst = lst->next) {
-        int res = X509_cmp(cert, lst->data);
-        if(res == 0)
-            return TRUE;
-    }
-    
-    cert_name = g_strconcat(g_get_home_dir(), "/.balsa/certificates", NULL);
-
-    fp = fopen(cert_name, "rt");
-    g_free(cert_name);
-    if(!fp) {
-        return FALSE;
-    }
-    printf("Looking for cert: %s\n", 
-               X509_NAME_oneline(X509_get_subject_name (cert),
-                                 buf, sizeof (buf)));
-
-    res = FALSE;
-    while ((tmpcert = PEM_read_X509(fp, NULL, NULL, NULL)) != NULL) {
-        printf("comparing with cert: %s\n", 
-               X509_NAME_oneline(X509_get_subject_name (tmpcert),
-                                 buf, sizeof (buf)));
-        res = X509_cmp(cert, tmpcert)==0;
-        X509_free(tmpcert);
-        if(res) break;
-    }
-    ERR_clear_error();
-    fclose(fp);
-    
-    return res;
-}
-
-static gboolean
-libbalsa_save_cert(X509 *cert)
-{
-    gboolean res = FALSE;
-    FILE *cert_file;
-    gchar *cert_name = g_strconcat(g_get_home_dir(),
-                                   "/.balsa/certificates", NULL);
-
-    cert_file = fopen(cert_name, "a");
-     if (cert_file) {
-        if(PEM_write_X509 (cert_file, cert))
-            res = TRUE;
-        fclose(cert_file);
-     }
-     g_free(cert_name);
-     return res;
-}
-#endif
-
 void
 libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...)
 {
@@ -483,16 +414,10 @@ libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...)
                "%ld : %s.\n", vfy_result, reason);
         ssl = va_arg(alist, SSL*);
         cert = SSL_get_peer_certificate(ssl);
-        *ok = libbalsa_is_cert_known(is, cert);
-        if(!*ok) {
-            *ok = libbalsa_ask_for_cert_acceptance(cert, reason);
-            if(*ok == 2)
-                libbalsa_save_cert(cert);
-            if(*ok == 1)
-                is->accepted_certs = g_list_prepend(is->accepted_certs,
-                                                    X509_dup(cert));
-        }
-        X509_free(cert);
+	if(cert) {
+	    *ok = libbalsa_is_cert_known(cert, vfy_result);
+	    X509_free(cert);
+	}
 #else
         g_warning("TLS error with TLS disabled!?");
 #endif

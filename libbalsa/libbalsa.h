@@ -112,7 +112,8 @@ void libbalsa_assure_balsa_dir(void);
 
 #ifdef USE_TLS
 #include <openssl/ssl.h>
-int libbalsa_ask_for_cert_acceptance(X509 *cert, const gchar *explanation);
+gboolean libbalsa_is_cert_known(X509* cert, long vfy_result);
+void libbalsa_certs_destroy(void);
 #endif
 
 void libbalsa_message(const char *fmt, ...);

@@ -927,7 +927,7 @@ get_key_from_name(GMimeGpgmeContext * ctx, const gchar * name,
     gpgme_key_t key;
     gpgme_error_t err;
 
-    if ((err = gpgme_op_keylist_start(gpgme_ctx, NULL /* name */ ,/* FIXME!!*/
+    if ((err = gpgme_op_keylist_start(gpgme_ctx, name,
 				      secret_only)) != GPG_ERR_NO_ERROR) {
 	if (error)
 	    g_set_error(error, GPGME_ERROR_QUARK, err,

@@ -894,6 +894,32 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
 		      _("Disconnected"),
 		      NULL, NULL, 0);
         break;
+
+        /* SMTP_TLS related things */
+    case SMTP_EV_INVALID_PEER_CERTIFICATE: {
+        long vfy_result;
+	SSL  *ssl;
+	X509 *cert;
+        int *ok;
+        vfy_result = va_arg(ap, long); ok = va_arg(ap, int*);
+	ssl = va_arg(ap, SSL*);
+	cert = SSL_get_peer_certificate(ssl);
+	if(cert) {
+	    *ok = libbalsa_is_cert_known(cert, vfy_result);
+	    X509_free(cert);
+	}
+	printf("vfy_result: %ld ok=%d\n", vfy_result, *ok);
+        break;
+    }
+    case SMTP_EV_NO_PEER_CERTIFICATE:
+    case SMTP_EV_WRONG_PEER_CERTIFICATE:
+    case SMTP_EV_NO_CLIENT_CERTIFICATE: {
+	int *ok;
+	printf("SMTP-TLS event_no=%d\n", event_no);
+	ok = va_arg(ap, int*);
+	*ok = 1;
+	break;
+    }
     }
     va_end (ap);
 }

@@ -1,3 +1,11 @@
+2004-04-20  Pawel Salek
+
+	* libbalsa/libbalsa.[hc]: unify SMTP/IMAP/POP certificate management.
+	* libbalsa/send.c: support better SMTP TLS (requires libesmtp-1.0.3).
+	* libbalsa/server.[hc]: simplify.
+	* src/main-window.c: respect "Cancel" button.
+	* libbalsa/gmime-gpgme-context.c: pass name (Albrecht Dress).
+
 2004-04-20 15:44  PeterB
 
 	* libbalsa/message.c: don't add to user_hdrs when processing basic

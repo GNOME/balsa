@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.5\n"
-"POT-Creation-Date: 1999-12-22 03:23+0100\n"
+"POT-Creation-Date: 1999-12-22 03:53+0100\n"
 "PO-Revision-Date: 1999-12-22 03:38+01:00\n"
 "Last-Translator: Birger Langkjer <birger.langkjer@image.dk>\n"
 "Language-Team: Danish <sslug-locale@sslug.dk>\n"
@@ -973,7 +973,8 @@ msgstr "Postkasse: Lukker %s referencetal: %d\n"
 msgid ""
 "The pathname \"%s\" must be specified canonically -- it must start with a "
 "'/'."
-msgstr "Stinavnet \"%s\" skal angives kanonisk -- dvs. det skal starte med '/'."
+msgstr ""
+"Stinavnet \"%s\" skal angives kanonisk -- dvs. det skal starte med '/'."
 
 #: balsa-druid-page-directory.gob:76
 #, c-format

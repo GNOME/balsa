@@ -101,7 +101,7 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message)
             if(match) break;
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_FROM)) {
-	    str=libbalsa_address_to_gchar(message->from, 0);
+	    str=libbalsa_address_to_gchar(message->from,0);
 	    match=in_string(str,cond->match.string);
 	    g_free(str);
 	    if (match) break;
@@ -147,7 +147,7 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message)
 		if (match) break;
 	    }
 	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_FROM)) {
-		str=libbalsa_address_to_gchar(message->from,-1);
+		str=libbalsa_address_to_gchar(message->from,0);
 		if (str) match=REGEXEC(*(regex->compiled),str)==0;
 		g_free(str);
 		if (match) break;
@@ -222,7 +222,7 @@ filters_prepare_to_run(GSList * filters)
 	fil=(LibBalsaFilter*) filters->data;
 	if (!FILTER_CHKFLAG(fil,FILTER_VALID)) {
 		libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-                                     "Invalid filter : %s",fil->name);
+                                     _("Invalid filter : %s"),fil->name);
 	    ok=FALSE;
 	}
 	else if (!FILTER_CHKFLAG(fil,FILTER_COMPILED))
@@ -250,7 +250,7 @@ filters_run_on_messages(GSList * filter_list, GList * messages)
     LibBalsaMailbox * source_mbox;
     gboolean result=FALSE;
 
-    g_return_val_if_fail(filter_list && messages, FALSE);
+    if (!filter_list || ! messages) return FALSE;
 
     source_mbox=LIBBALSA_MESSAGE(messages->data)->mailbox;
     for (;messages;messages=g_list_next(messages)) {
@@ -284,21 +284,21 @@ filters_run_on_messages(GSList * filter_list, GList * messages)
 	    case FILTER_COPY:
 		mbox = mblist_find_mbox_by_name(balsa_app.mblist,filt->action_string);
 		if (!mbox)
-		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,"Bad mailbox name for filter : %s",filt->name);
+		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,_("Bad mailbox name for filter : %s"),filt->name);
 		else if (!libbalsa_messages_copy(filt->matching_messages,mbox))
-		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,"Error when copying messages");
+		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,_("Error when copying messages"));
 		break;
 	    case FILTER_TRASH:
 		if (!balsa_app.trash || !libbalsa_messages_move(filt->matching_messages,balsa_app.trash))
-		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,"Error when trashing messages");
+		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,_("Error when trashing messages"));
 		else result=TRUE;
 		break;
 	    case FILTER_MOVE:
 		mbox = mblist_find_mbox_by_name(balsa_app.mblist,filt->action_string);
 		if (!mbox)
-		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,"Bad mailbox name for filter : %s",filt->name);
+		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,_("Bad mailbox name for filter : %s"),filt->name);
 		else if (!libbalsa_messages_move(filt->matching_messages,mbox))
-		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,"Error when moving messages");
+		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,_("Error when moving messages"));
 		break;
 	    case FILTER_PRINT:
 		/* FIXME : to be implemented */

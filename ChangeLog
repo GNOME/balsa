@@ -1,4 +1,14 @@
-2001-12-08  Carlos Morgado  <chbm@chbm.nu>
+2001-12-03  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/filter.c: search for real names, too (Emmanuel).
+
+	Jelmer Vernooij <jelmer@lintux.cx>
+	* libbalsa/address-book-extern.c: remove fixme.
+	* libbalsa/libbalsa.[hc]: implement libbalsa_guess_email_address().
+	* libinit_balsa/balsa-druid-page-user.gob: use it (Debian's #75101)
+	* src/filter-edit-callbacks.c: auto-number filters.
+
+	2001-12-08  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/pref-manager.c: patch from peter to fix the 
 	imap startup prefs box
@@ -25,7 +35,7 @@
 	
 	* src/balsa-message.c: use more apriopriate charset (Albrecht, #65934)
 	
-	2001-12-03  Pawel Salek  <pawsa@theochem.kth.se>
+2001-12-03  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* help/C/balsa.sgml: & ->&amp; (Jelmer)
 	* libbalsa/libbalsa.c: check system SSL certificates (TL, #66032).

@@ -1282,15 +1282,20 @@ change_filter_name(gchar * old_name,gchar * new_name)
 void
 fe_new_pressed(GtkWidget * widget, gpointer data)
 {
-    gint new_row;
+    const static char FLT_NAME_TEMPLATE[] = N_("New filter");
+    gint new_row, filter_number;
     LibBalsaFilter* fil;
-    gchar * new_item[] = { N_("New filter") };
 
-    if (!unique_filter_name(new_item[0],-1)) {
-        balsa_information(LIBBALSA_INFORMATION_ERROR,
-                          _("There is yet a ""New Filter"" in the list, "
-                            "rename it first"));
-        return;
+    /* Put a number behind 'New filter' */
+    gchar *new_item[] = { g_malloc(strlen(FLT_NAME_TEMPLATE)+4) };
+    for(filter_number=0; filter_number<1000; filter_number++){
+        if(filter_number == 0)
+            strcpy(new_item[0], _(FLT_NAME_TEMPLATE));
+        else
+            g_snprintf(new_item[0], 
+                       strlen(_(FLT_NAME_TEMPLATE))+4, "%s%d",
+                       FLT_NAME_TEMPLATE, filter_number);
+        if (unique_filter_name(new_item[0],-1)) break;
     }
 
     fil = libbalsa_filter_new();

@@ -36,8 +36,6 @@
 #include "information.h"
 #include "abook-completion.h"
 
-/* FIXME: Perhaps the whole thing could be rewritten to use a g_scanner ?? */
-
 /* FIXME: Arbitrary constant */
 #define LINE_LEN 256
 

@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -192,6 +192,46 @@ libbalsa_unlock_mutt(void)
 #ifdef BALSA_USE_THREADS
     g_mutex_unlock(mutt_lock);
 #endif
+}
+
+
+/* libbalsa_guess_email_address:
+   Email address can be determined in four ways:
+   1. Using the environment variable 'EMAIL'
+
+   2. The file '/etc/mailname' should contain the external host
+      address for the host. Prepend the username (`username`@`cat
+      /etc/mailname`).
+
+   3. Append the domainname to the user name.
+   4. Append the hostname to the user name.
+
+*/
+gchar*
+libbalsa_guess_email_address(void)
+{
+    /* Q: Find this location with configure? or at run-time? */
+    static const gchar* MAILNAME_FILE = "/etc/mailname";
+    char hostbuf[512];
+
+    gchar* preset, *domain;
+    if(g_getenv("EMAIL") != NULL){                  /* 1. */
+        preset = g_strdup(g_getenv("EMAIL"));
+    } else if(access(MAILNAME_FILE, F_OK) == 0){    /* 2. */
+        FILE *mailname_in = fopen(MAILNAME_FILE, "r");
+        fgets(hostbuf, 511, mailname_in);
+        hostbuf[strlen(hostbuf)-1] = '\0';
+        fclose(mailname_in);
+        preset = g_strconcat(g_get_user_name(), "@", hostbuf, NULL);
+        
+    }else if((domain = libbalsa_get_domainname())){ /* 3. */
+        preset = g_strconcat(g_get_user_name(), "@", domain, NULL);
+        g_free(domain);    
+    } else {                                        /* 4. */
+        gethostname(hostbuf, 511);
+        preset = g_strconcat(g_get_user_name(), "@", hostbuf, NULL);
+    }
+    return preset;
 }
 
 /* libbalsa_guess_mail_spool

@@ -46,7 +46,9 @@ mm_exists (MAILSTREAM * stream,
   if (number > 0)
   {
     balsa_index_append_new_messages (BALSA_INDEX (balsa_app.main_window->index));
-    system("cat /home/pavlov/balsa/src/sounds/yougotmail.wav>/dev/dsp &");
+/*
+ * system("cat /home/pavlov/balsa/src/sounds/yougotmail.wav>/dev/dsp &");
+*/
   }
 }
 

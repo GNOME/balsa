@@ -390,7 +390,7 @@ create_menu (GtkWidget * window)
   gtk_widget_install_accelerator (w, accel, "activate", 'N', GDK_CONTROL_MASK);
   gtk_signal_connect_object (GTK_OBJECT (w), 
 			     "activate",
-			     (GtkSignalFunc) sendmsg_window_new,
+			     GTK_SIGNAL_FUNC (new_message),
 			     NULL);
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
@@ -398,6 +398,10 @@ create_menu (GtkWidget * window)
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Reply"));
   gtk_widget_show (w);
   gtk_widget_install_accelerator (w, accel, "activate",'R', GDK_CONTROL_MASK);
+  gtk_signal_connect_object (GTK_OBJECT (w), 
+			     "activate",
+			     GTK_SIGNAL_FUNC (replyto_message),
+			     NULL);
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
 
@@ -408,6 +412,10 @@ create_menu (GtkWidget * window)
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Foward"));
   gtk_widget_show (w);
+  gtk_signal_connect_object (GTK_OBJECT (w), 
+			     "activate",
+			     GTK_SIGNAL_FUNC (forward_message),
+			     NULL);
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
 

@@ -246,8 +246,18 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   gchar *from;
 
   msg = g_malloc (sizeof (BalsaSendmsg));
-
-  msg->window = gnome_app_new ("balsa_sendmsg_window", "New message");
+  switch(type)
+  {
+	  case 0:
+		  msg->window = gnome_app_new ("balsa", "New message");
+		  break;
+	  case 1:
+		  msg->window = gnome_app_new ("balsa", "Reply to ");
+		  break;
+	  case 2:
+		  msg->window = gnome_app_new ("balsa", "Forward message");
+		  break;
+  }
   gtk_signal_connect (GTK_OBJECT (msg->window), "destroy",
 		      GTK_SIGNAL_FUNC (delete_event), NULL);
   gtk_signal_connect (GTK_OBJECT (msg->window), "delete_event",

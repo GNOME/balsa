@@ -1732,6 +1732,7 @@ balsa_window_destroy(GtkObject * object)
 	g_print("balsa_window_destroy remove weak pointer\n");
 	g_object_remove_weak_pointer(G_OBJECT(window->current_message),
 				     (gpointer) &window->current_message);
+	window->current_message = NULL;
     }
 
     if (GTK_OBJECT_CLASS(parent_class)->destroy)

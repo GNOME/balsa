@@ -400,10 +400,12 @@ static GnomeUIInfo view_menu[] = {
     GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_RADIOLIST(threading_menu),
     GNOMEUIINFO_SEPARATOR,
+#define MENU_VIEW_EXPAND_ALL_POS 9
     { GNOME_APP_UI_ITEM, N_("_Expand All"),
      N_("Expand all threads"),
      expand_all_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
      NULL, 'E', GDK_CONTROL_MASK, NULL},
+#define MENU_VIEW_COLLAPSE_ALL_POS 10
     { GNOME_APP_UI_ITEM, N_("_Collapse All"),
      N_("Collapse all expanded threads"),
      collapse_all_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
@@ -554,7 +556,6 @@ static GnomeUIInfo mailbox_menu[] = {
         next_unread_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
         BALSA_PIXMAP_NEXT_UNREAD_MENU, 'N', GDK_CONTROL_MASK, NULL
     },
-    GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_NEXT_FLAGGED_POS 3
     {
         GNOME_APP_UI_ITEM, N_("Next Flagged Message"),
@@ -563,27 +564,35 @@ static GnomeUIInfo mailbox_menu[] = {
         BALSA_PIXMAP_NEXT_FLAGGED_MENU, 'F',GDK_MOD1_MASK|GDK_CONTROL_MASK,NULL
     },
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_EDIT_POS 5
+#define MENU_MAILBOX_MARK_ALL_POS 5
+    {
+	GNOME_APP_UI_ITEM, N_("Mark all"),
+        N_("Mark all messages in current mailbox"),
+        mark_all_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+        BALSA_PIXMAP_MARK_ALL_MSGS, 'A',GDK_MOD1_MASK|GDK_CONTROL_MASK,NULL
+    },	
+    GNOMEUIINFO_SEPARATOR,
+#define MENU_MAILBOX_EDIT_POS 7
     GNOMEUIINFO_ITEM_STOCK(N_("_Edit..."), N_("Edit the selected mailbox"),
                            mailbox_conf_edit_cb,
                            GNOME_STOCK_MENU_PREF),
-#define MENU_MAILBOX_DELETE_POS 6
+#define MENU_MAILBOX_DELETE_POS 8
     GNOMEUIINFO_ITEM_STOCK(N_("_Delete..."),
                            N_("Delete the selected mailbox"),
                            mailbox_conf_delete_cb,
                            GNOME_STOCK_PIXMAP_REMOVE),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_COMMIT_POS 8
+#define MENU_MAILBOX_COMMIT_POS 10
     GNOMEUIINFO_ITEM_STOCK(
         N_("Co_mmit Current"),
         N_("Commit the changes in the currently opened mailbox"),
         mailbox_commit_changes,
         GNOME_STOCK_MENU_REFRESH),
-#define MENU_MAILBOX_CLOSE_POS 9
+#define MENU_MAILBOX_CLOSE_POS 11
     GNOMEUIINFO_ITEM_STOCK(N_("_Close"), N_("Close mailbox"),
                            mailbox_close_cb, GNOME_STOCK_MENU_CLOSE),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_EMPTY_TRASH_POS 11
+#define MENU_MAILBOX_EMPTY_TRASH_POS 13
     GNOMEUIINFO_ITEM_STOCK(N_("Empty _Trash"),
                            N_("Delete messages from the Trash mailbox"),
                            empty_trash, GNOME_STOCK_PIXMAP_REMOVE),
@@ -894,10 +903,18 @@ enable_mailbox_menus(BalsaMailboxNode * mbnode)
 {
     const static int mailbox_menu_entries[] = {
         MENU_MAILBOX_NEXT_POS,        MENU_MAILBOX_PREV_POS,
-        MENU_MAILBOX_NEXT_UNREAD_POS, MENU_MAILBOX_CLOSE_POS,
-        MENU_MAILBOX_DELETE_POS,      MENU_MAILBOX_EDIT_POS,
+        MENU_MAILBOX_NEXT_UNREAD_POS, MENU_MAILBOX_NEXT_FLAGGED_POS,
+	MENU_MAILBOX_MARK_ALL_POS,    MENU_MAILBOX_DELETE_POS,      
+        MENU_MAILBOX_EDIT_POS,
+	MENU_MAILBOX_COMMIT_POS, MENU_MAILBOX_CLOSE_POS };
+    
+    const static int threading_menu_entries[] = {
         MENU_THREADING_FLAT_POS,      MENU_THREADING_SIMPLE_POS,
-        MENU_THREADING_JWZ_POS 
+        MENU_THREADING_JWZ_POS
+    };
+
+    const static int view_menu_entries[] = {
+	MENU_VIEW_EXPAND_ALL_POS,     MENU_VIEW_COLLAPSE_ALL_POS
     };
 
     LibBalsaMailbox *mailbox = NULL;
@@ -925,10 +942,16 @@ enable_mailbox_menus(BalsaMailboxNode * mbnode)
                                  0, BALSA_PIXMAP_NEXT_FLAGGED, enable);
     set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
                                  0, BALSA_PIXMAP_MAIL_CLOSE_MBOX, enable);
+    set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
+                                 0, BALSA_PIXMAP_MARK_ALL_MSGS, enable);
 
     /* Menu entries */
     for(i=0; i < ELEMENTS(mailbox_menu_entries); i++)
-        gtk_widget_set_sensitive(mailbox_menu[i].widget, enable);
+        gtk_widget_set_sensitive(mailbox_menu[mailbox_menu_entries[i]].widget, enable);
+    for(i=0; i < ELEMENTS(threading_menu_entries); i++)
+        gtk_widget_set_sensitive(threading_menu[threading_menu_entries[i]].widget, enable);
+    for(i=0; i < ELEMENTS(view_menu_entries); i++)
+        gtk_widget_set_sensitive(view_menu[view_menu_entries[i]].widget, enable);
 
     if(mbnode)
         balsa_window_set_threading_menu(mbnode->threading_type);

@@ -1,3 +1,8 @@
+2001-10-08  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/main-window.c: 'mark all' menu entry, clean up 
+	enable_message_menus()
+
 2001-10-07  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/pop3.c: fix misspelling in error msg. Remove redundant test.

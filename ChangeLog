@@ -3,8 +3,10 @@
 	* libbalsa/: address-book-vcard.c, address-entry.c: small patch to
 	address two utf8 related problems.
 
-2004-11-04 08:12  PeterB
+2004-11-04 17:07  PeterB
 
+	* libbalsa/address-entry.c: do not pop down completions on
+	receiving focus--it can be annoying.
 	* libbalsa/address-entry.c: do not dequote address phrase.
 
 2004-11-03 21:46  PeterB

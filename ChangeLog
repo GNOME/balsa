@@ -1,5 +1,6 @@
-2004-11-05 14:40  PeterB
+2004-11-05 20:31  PeterB
 
+	* libbalsa/identity.c: build with GTK_VERSION < 2.4.0.
 	* src/sendmsg-window.c: toggle button is now a GtkToggleToolButton.
 	* libbalsa/address-entry.c: store only the current matches.
 	* libbalsa/address-entry.c: copy address from src to dest(!).

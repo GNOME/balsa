@@ -601,6 +601,8 @@ add_local_mailbox(GNode *root, const gchar * name, const gchar * path)
 	/* type is not a valid local mailbox type. */
 	g_assert_not_reached();
     }
+    if(!mailbox) /* local mailbox could not be created; privileges? */
+	return NULL;
     mailbox->name = g_strdup(name);
     
     node = g_node_new(balsa_mailbox_node_new_from_mailbox(mailbox));

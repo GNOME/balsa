@@ -403,6 +403,72 @@ libbalsa_address_book_ldap_load_config(LibBalsaAddressBook * ab,
 	LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->load_config(ab, prefix);
 }
 
+
+/*
+ * Format a string according to RFC 2254, which states:
+ *
+ * If a value should contain any of the following characters
+ *
+ *          Character       ASCII value
+ *          ---------------------------
+ *          *               0x2a
+ *          (               0x28
+ *          )               0x29
+ *          \               0x5c
+ *          NUL             0x00
+ *
+ * the character must be encoded as the backslash '\' character (ASCII
+ * 0x5c) followed by the two hexadecimal digits representing the ASCII
+ * value of the encoded character. The case of the two hexadecimal
+ * digits is not significant.
+ *
+ * NOTE: This function does not escape embedded NUL, as the input
+ * function is NUL terminated.
+ */
+static gchar *rfc_2254_escape(const gchar *raw)
+{
+    gchar *new;
+    gchar *str;
+    gchar *step;
+
+    new = (gchar *)malloc((strlen(raw) * 3) + 1);
+    str = new;
+    for (step = (gchar *)raw;
+         step[0] != '\0';
+         step++) {
+        g_message("rfc_2254_escape: Found a [%c]", step[0]);
+        switch (step[0]) {
+            case '*':
+                str[0] = '\\'; str++;
+                str[0] = '2'; str++;
+                str[0] = 'a'; str++;
+                break;
+            case '(':
+                str[0] = '\\'; str++;
+                str[0] = '2'; str++;
+                str[0] = '8'; str++;
+                break;
+            case ')':
+                str[0] = '\\'; str++;
+                str[0] = '2'; str++;
+                str[0] = '9'; str++;
+                break;
+            case '\\':
+                str[0] = '\\'; str++;
+                str[0] = '5'; str++;
+                str[0] = 'c'; str++;
+                break;
+            default:
+                str[0] = step[0]; str++;
+        }
+    }
+    str[0] = '\0';
+    str = g_strdup(new);
+    free(new);
+    return str;
+}
+
+
 static GList *libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
 							 const gchar * prefix, 
 							 gchar ** new_prefix)
@@ -411,6 +477,7 @@ static GList *libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab
     LibBalsaAddress *addr;
     GList *res = NULL;
     gchar* filter;
+    gchar* escaped;
     int rc, num_entries;
     LDAPMessage * e, *result;
 
@@ -427,7 +494,9 @@ static GList *libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab
      * or failure, but not all the matches.
      */
     *new_prefix = NULL;
-    filter = g_strdup_printf("(&(mail=*)(cn=%s*))", prefix);
+    escaped = rfc_2254_escape(prefix);
+    filter = g_strdup_printf("(&(mail=*)(cn=%s*))", escaped);
+    g_free(escaped);
     rc = ldap_search_s(ldap_ab->directory, ldap_ab->base_dn,
 	   LDAP_SCOPE_SUBTREE, filter, attrs, 0, &result);
     g_free(filter);

@@ -2736,11 +2736,16 @@ balsa_window_increment_progress(BalsaWindow* window)
     if (new_val > adj->upper) {
         new_val = adj->upper;
     }
-    gtk_adjustment_set_value(adj, new_val);
     
+    gtk_adjustment_set_value(adj, new_val);
+#ifdef BALSA_USE_THREADS
     /* run some gui events to make sure the progress bar gets drawn to
-     * screen */
+     * screen; it's not needed when we compile in MT-enabled mode because
+     * the events will be processed by the main thread as soon as it gets
+     * the gdk_lock. Or so I believed. */
+#else
     while (gtk_events_pending()) {
         gtk_main_iteration_do(FALSE);
     }
+#endif
 }

@@ -92,7 +92,7 @@ void filter_edit_dialog(GList *filter_list)
     gtk_widget_show(fe_delete);
     gtk_table_attach(GTK_TABLE(fe_table),
 		     fe_box_newdelete,
-		     0, 4, 19, 20,
+		     0, 6, 19, 20,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     GTK_SHRINK,
 		     10, 10);
@@ -115,7 +115,7 @@ void filter_edit_dialog(GList *filter_list)
     gtk_widget_show(fe_down);
     gtk_table_attach(GTK_TABLE(fe_table),
 		     fe_box_updown,
-		     0, 4, 18, 19,
+		     0, 6, 18, 19,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     GTK_SHRINK,
 		     10, 0);
@@ -135,7 +135,7 @@ void filter_edit_dialog(GList *filter_list)
     gtk_clist_set_row_height(GTK_CLIST(fe_clist), 16);
     gtk_table_attach(GTK_TABLE(fe_table),
 		     fe_clist,
-		     0, 4, 0, 18,
+		     0, 6, 0, 18,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     10,10);
@@ -148,7 +148,7 @@ void filter_edit_dialog(GList *filter_list)
     fe_vseparator = gtk_vseparator_new();
     gtk_table_attach(GTK_TABLE(fe_table),
 		     fe_vseparator,
-		     4, 5, 0, 20,
+		     6, 7, 0, 20,
 		     GTK_FILL | GTK_SHRINK,
 		     GTK_FILL | GTK_SHRINK,
 		     0, 0);
@@ -161,7 +161,7 @@ void filter_edit_dialog(GList *filter_list)
     fe_box_applyrevert = gtk_hbox_new(TRUE, 0);
     gtk_table_attach(GTK_TABLE(fe_table),
 		     fe_box_applyrevert,
-		     6, 19, 19, 20,
+		     8, 19, 19, 20,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     GTK_SHRINK,
 		     10, 10);
@@ -186,7 +186,7 @@ void filter_edit_dialog(GList *filter_list)
     gtk_notebook_set_tab_pos(GTK_NOTEBOOK(fe_notebook), GTK_POS_TOP);
     gtk_table_attach(GTK_TABLE(fe_table),
 		     fe_notebook,
-		     5, 20, 0, 19,
+		     7, 20, 0, 19,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     10, 10);

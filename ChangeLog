@@ -1,3 +1,15 @@
+2003-11-17  Carlos Morgado  <chbm gnome.org>
+
+	* src/balsa-bonobo.h (Repository): 
+	* src/balsa-bonobo.c (Repository): 
+	* src/Balsa.idl (Repository):
+	new interface, Evo style doesn't fit us
+
+	* idl/balsa.idl (Repository): 
+	* idl/balsa-composer.idl (Repository): 
+	made no sense being here
+	
+
 2003-11-17 08:23  PeterB
 
 	* src/balsa-index.c: Rename message_status_changed_cb as

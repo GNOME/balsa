@@ -650,8 +650,8 @@ static GnomeUIInfo mailbox_menu[] = {
 #define MENU_MAILBOX_HIDE_POS (MENU_MAILBOX_NEXT_FLAGGED_POS+2)
     GNOMEUIINFO_SUBTREE(N_("_Hide messages"), mailbox_hide_menu),
     /* the next one is for testing only */
-    GNOMEUIINFO_TOGGLEITEM_DATA(N_("Show from _name"),  "",
-     show_name_cb, GINT_TO_POINTER(0), NULL),
+    GNOMEUIINFO_ITEM_STOCK(N_("Show from _name"),  "",
+                           show_name_cb, GTK_STOCK_FIND),
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_MARK_ALL_POS (MENU_MAILBOX_HIDE_POS+2)
     {
@@ -3141,8 +3141,8 @@ show_name_cb(GtkWidget * widget, gpointer data)
     LibBalsaMailbox *mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
     LibBalsaCondition *filter, *name;
     filter = balsa_window_get_view_filter(balsa_app.main_window);
-    name = libbalsa_condition_new_string(FALSE,CONDITION_MATCH_FROM,
-                                         "balsa",NULL);
+    name = libbalsa_condition_new_string(FALSE,CONDITION_MATCH_BODY,
+                                         "Dreß",NULL);
     if(filter)
         filter = libbalsa_condition_new_bool_ptr
             (FALSE, CONDITION_AND, name, filter);

@@ -2,9 +2,14 @@
 
 	* balsa.desktop: Fix badly encoded strings.
 
-2004-02-25  Pawel Salek
+2004-02-26  Pawel Salek
 
 	* libbalsa/imap/imap-commands.[hc]: add imap_mbox_filter_msgnos().
+	* libbalsa/imap/imap-commands.c: 1. send 8-bit strings to servers
+	without LITERAL+. 2. Send long queries right.
+	* libbalsa/imap/imap-handle.c: Part two of 2.
+	* libbalsa/imap/imap-search.c: Part two of 1.
+	* src/main-window.c: Modify the search stress-tester.
 
 2004-02-25  Pawel Salek
 

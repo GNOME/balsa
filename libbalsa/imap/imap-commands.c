@@ -784,7 +784,7 @@ imap_mbox_thread(ImapMboxHandle *h, const char *how, ImapSearchKey *filter)
     if(!filter)
       sio_write(h->sio, " ALL", 4);
     else
-      imap_write_key(h, filter, can_do_literals);
+      imap_write_key(h, filter, cmdno, can_do_literals);
 
     sio_write(h->sio, "\r\n", 2);
     imap_handle_flush(h);
@@ -835,24 +835,27 @@ imap_mbox_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
 {
   ImapResponse rc;
   const char *keystr;
-  char *seq, *cmd;
+  char *seq, *cmd, *cmd1;
   unsigned i;
 
   if(!imap_mbox_handle_can_do(handle, IMCAP_SORT)) 
     return IMR_NO;
 
+  /* seq can be pretty long and g_strdup_printf has a limit on
+   * string length so we create the command string in two steps. */
   keystr = sort_code_to_string(key);
   seq = coalesce_seq_range(0, cnt-1,(CoalesceFunc)sort_coealesce_func, msgno);
-  cmd= g_strdup_printf("SORT (%s%s) UTF-8 %s", 
+  cmd= g_strdup_printf("SORT (%s%s) UTF-8 ", 
                        ascending ? "" : "REVERSE ",
-                       keystr, seq);
+                       keystr);
+  cmd1 = g_strconcat(cmd, seq, NULL);
   g_free(seq);
-
+  g_free(cmd);
   handle->mbox_view.entries = 0; /* FIXME: I do not like this! 
                                   * we should not be doing such 
                                   * low level manipulations here */
-  rc = imap_cmd_exec(handle, cmd);
-  g_free(cmd);
+  rc = imap_cmd_exec(handle, cmd1);
+  g_free(cmd1);
 
   if(rc == IMR_OK)
     for(i=0; i<cnt; i++)
@@ -916,7 +919,7 @@ imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
     if(!filter)
       sio_write(handle->sio, " ALL", 4);
     else
-      imap_write_key(handle, filter, can_do_literals);
+      imap_write_key(handle, filter, cmdno, can_do_literals);
     sio_write(handle->sio, "\r\n", 2);
     imap_handle_flush(handle);
     do

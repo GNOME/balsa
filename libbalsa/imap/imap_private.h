@@ -76,7 +76,7 @@ ImapResponse imap_cmd_exec(ImapMboxHandle* handle, const char* cmd);
 char* imap_mbox_gets(ImapMboxHandle *h, char* buf, size_t sz);
 
 ImapResponse imap_write_key(ImapMboxHandle *handle, ImapSearchKey *s,
-                            int use_literal);
+                            unsigned cmdno, int use_literal);
 
 #ifdef USE_TLS
 #include <openssl/ssl.h>

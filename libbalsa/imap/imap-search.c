@@ -108,10 +108,10 @@ imap_write_key_flag(ImapMboxHandle *handle, unsigned negated,
   sio_write(handle->sio, s, strlen(s));
 }
 
-static void
+static ImapResponse
 imap_write_key_string(ImapMboxHandle *handle, unsigned negated,
                       ImapSearchHeader hdr, const char* str,
-                      int use_literal)
+                      unsigned cmdno, int use_literal)
 {
   const char *s;
   if(negated) sio_write(handle->sio, " Not", 4);
@@ -130,42 +130,68 @@ imap_write_key_string(ImapMboxHandle *handle, unsigned negated,
   /* Here comes the difficult part: writing the string. If the server
      does not support LITERAL+, we have to either use quoting or use
      synchronizing literals which are somewhat painful. That's the
-     life! For the moment, we replace non US-ASCII characters with
-     spaces. */
+     life! */
   if(use_literal)
     sio_printf(handle->sio, "{%u+}\r\n%s", strlen(str), str);
-  else {
-    sio_write(handle->sio, "\"", 1);
-    while(*str) {
-      if(*str & 0x80) sio_write(handle->sio, " ", 1);
-      else if(*str == '"') sio_write(handle->sio, "\\\"", 2);
-      else if(*str == '"') sio_write(handle->sio, "\\\\", 2);
-      else sio_write(handle->sio, str, 1);
-      str++;
+  else { /* No literal+ suppport, do it the old way */
+    for (s = str; *s && (*s & 0x80) == 0; s++)
+      ;
+    if(*s & 0x80) { /* use synchronising literals */
+      int c;
+      ImapResponse rc;
+      unsigned len = strlen(str);
+      sio_printf(handle->sio, "{%u}\r\n", len);
+      imap_handle_flush(handle);
+      do
+        rc = imap_cmd_step(handle, cmdno);
+      while(rc == IMR_UNTAGGED);
+      if (rc != IMR_RESPOND) {
+        fprintf(stderr, "%s(): unexpected response:\n", __FUNCTION__);
+        return rc;
+      }
+      /* consume to the end of line */
+      while( (c=sio_getc(handle->sio)) != -1 && c != '\n')
+        ;
+      if(c == -1) return IMR_SEVERED;
+      sio_write(handle->sio, str, len);
+    } else { /* quoting is sufficient */
+      sio_write(handle->sio, "\"", 1);
+      for(s=str; *s; s++) {
+        if(*s == '"') sio_write(handle->sio, "\\\"", 2);
+        else if(*s == '"') sio_write(handle->sio, "\\\\", 2);
+        else sio_write(handle->sio, s, 1);
+      }
+      sio_write(handle->sio, "\"", 1);
     }
-    sio_write(handle->sio, "\"", 1);
   }
+  return IMR_OK;
 }
+ 
 
 /* private */
 ImapResponse
-imap_write_key(ImapMboxHandle *handle, ImapSearchKey *s,
+imap_write_key(ImapMboxHandle *handle, ImapSearchKey *s, unsigned cmdno,
                int use_literal)
 {
+  ImapResponse rc;
   while(s) {
     switch(s->type) {
     case IMSE_OR:
       if(s->negated) sio_write(handle->sio, " Not Or", 7);
       else sio_write(handle->sio, " Or", 3);
-      imap_write_key(handle, s->d.or.l, use_literal); /* FIXME check result */
-      imap_write_key(handle, s->d.or.r, use_literal);
+      rc = imap_write_key(handle, s->d.or.l, cmdno, use_literal);
+      if(rc != IMR_OK) return rc;      
+      rc = imap_write_key(handle, s->d.or.r, cmdno, use_literal);
+      if(rc != IMR_OK) return rc;      
       break;
     case IMSE_FLAG: 
       imap_write_key_flag(handle, s->negated, s->d.flag.sys_flag);
       break;
     case IMSE_STRING:
-      imap_write_key_string(handle, s->negated, s->d.string.hdr,
-                            s->d.string.s, use_literal); break;
+      rc = imap_write_key_string(handle, s->negated, s->d.string.hdr,
+                                 s->d.string.s, cmdno, use_literal);
+      if(rc != IMR_OK) return rc;
+      break;
     case IMSE_DATE: /* FIXME */
     case IMSE_SIZE:  /* FIXME */ break;
     }
@@ -195,7 +221,7 @@ imap_search_exec(ImapMboxHandle *h, ImapSearchKey *s,
   
   cmdno = imap_make_tag(tag);
   sio_printf(h->sio, "%s Search", tag);
-  if( (ir=imap_write_key(h, s, can_do_literals)) == IMR_OK) {
+  if( (ir=imap_write_key(h, s, cmdno, can_do_literals)) == IMR_OK) {
     sio_write(h->sio, "\r\n", 2);
     imap_handle_flush(h);
     do

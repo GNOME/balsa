@@ -974,10 +974,12 @@ imap_code(const gchar* resp)
 }
 #endif
 
+/* imap_cmd_start sends the command to the server. We do it carefully
+ * without using printf because our cmds can be pretty long.
+ */
 int
 imap_cmd_start(ImapMboxHandle* handle, const char* cmd, unsigned *cmdno)
 {
-  int rc;
   ImapCmdTag tag;
   g_return_val_if_fail(handle, -1);
   
@@ -985,12 +987,11 @@ imap_cmd_start(ImapMboxHandle* handle, const char* cmd, unsigned *cmdno)
     return -1;
 
   *cmdno = imap_make_tag(tag);
-  rc = sio_printf(handle->sio, "%s %s\r\n", tag, cmd);
-  if(rc<0) {
-    sio_detach(handle->sio); close(handle->sd);
-    handle->state = IMHS_DISCONNECTED;
-  }
-  return rc;
+  sio_write(handle->sio, tag, strlen(tag));
+  sio_write(handle->sio, " ", 1);
+  sio_write(handle->sio, cmd, strlen(cmd));
+  sio_write(handle->sio, "\r\n", 2);
+  return 1;
 }
 
 /* imap_cmd_step:

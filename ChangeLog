@@ -1,6 +1,7 @@
 2002-12-27  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/address.c: wrong location of a bracket ->infinite loop.
+	* src/mailbox-conf.c: fix #101993.
 
 2002-12-26  Pawel Salek  <pawsa@theochem.kth.se>
 

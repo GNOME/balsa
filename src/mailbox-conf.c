@@ -67,7 +67,7 @@ struct _MailboxConfWindow {
     union {
 	/* for local mailboxes */
 	struct local { 
-	    GtkWidget *path;
+	    GnomeFileEntry *path;
 	} local;
 	/* for imap mailboxes & directories */
 	struct {
@@ -466,8 +466,8 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 	LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(mailbox);
 
 	if (mailbox->url)
-	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.local.path),
-			       libbalsa_mailbox_local_get_path(local));
+	    gnome_file_entry_set_filename(mcw->mb_data.local.path,
+					  libbalsa_mailbox_local_get_path(local));
     } else if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
 	LibBalsaMailboxPop3 *pop3;
 	LibBalsaServer *server;
@@ -552,7 +552,7 @@ check_for_blank_fields(GtkWidget *widget, MailboxConfWindow *mcw)
     if (mcw->mailbox_name &&!*gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name)))
 	sensitive = FALSE;
     else if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_LOCAL) ) {
-	if (!*gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.local.path)))
+	if (!*gtk_entry_get_text(GTK_ENTRY(gnome_file_entry_gtk_entry(mcw->mb_data.local.path))))
 	    sensitive = FALSE;
     } else if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_IMAP ) ) {
 	if (!strcmp
@@ -692,21 +692,23 @@ mailbox_conf_update(MailboxConfWindow *mcw)
     mailbox = mcw->mailbox;
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
-	const gchar *filename, *name;
+	gchar *filename;
+	const gchar *name;
 
-	filename =
-	    gtk_entry_get_text(GTK_ENTRY((mcw->mb_data.local.path)));
+	filename = gnome_file_entry_get_full_path(mcw->mb_data.local.path,
+						  FALSE);
 	/* rename */
-	if (
-	    (i =
-	     libbalsa_mailbox_local_set_path(LIBBALSA_MAILBOX_LOCAL
-					     (mailbox), filename)) != 0) {
+	i = libbalsa_mailbox_local_set_path(LIBBALSA_MAILBOX_LOCAL
+					    (mailbox), filename);
+	if (i != 0) {
 	    balsa_information(LIBBALSA_INFORMATION_WARNING,
 			      _("Rename of %s to %s failed:\n%s"),
 			      libbalsa_mailbox_local_get_path(mailbox),
 			      filename, strerror(i));
+	    g_free(filename);
 	    return;
 	}
+	g_free(filename);
         if(mcw->mailbox_name) {
 	    name = gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name));
             g_free(mailbox->name);
@@ -746,11 +748,14 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 
     mbnode = balsa_mailbox_node_new_from_mailbox(mcw->mailbox);
     if ( LIBBALSA_IS_MAILBOX_LOCAL(mcw->mailbox) ) {
-	const gchar *path;
+	LibBalsaMailboxLocal *ml  = LIBBALSA_MAILBOX_LOCAL(mcw->mailbox);
+	gchar *path;
+	int res;
 
-	path = gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.local.path));
-	if(libbalsa_mailbox_local_set_path(
-					   LIBBALSA_MAILBOX_LOCAL(mcw->mailbox), path) != 0) {
+	path = gnome_file_entry_get_full_path(GNOME_FILE_ENTRY(mcw->mb_data.local.path), FALSE);
+	res = libbalsa_mailbox_local_set_path(ml, path);
+
+	if( res != 0) {
 	    g_object_unref(G_OBJECT(mcw->mailbox));
 	    mcw->mailbox = NULL;
 	    return;
@@ -759,7 +764,6 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 	save_to_config = balsa_app.local_mail_directory == NULL
 	    || strncmp(balsa_app.local_mail_directory, path,
 		       strlen(balsa_app.local_mail_directory)) != 0;
-
 	if(save_to_config) {
 	    node =g_node_new(mbnode);
             balsa_mailbox_nodes_lock(TRUE);
@@ -831,8 +835,7 @@ create_local_mailbox_page(MailboxConfWindow *mcw)
     label = create_label(_("Mailbox _Path:"), table, 1);
 
     file = gnome_file_entry_new("MailboxPath", _("Mailbox Path"));
-    mcw->mb_data.local.path =
-	gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(file));
+    mcw->mb_data.local.path = GNOME_FILE_ENTRY(file);
 
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), file);
     gnome_file_entry_set_default_path(GNOME_FILE_ENTRY(file),
@@ -845,11 +848,15 @@ create_local_mailbox_page(MailboxConfWindow *mcw)
     g_signal_connect(G_OBJECT(mcw->mb_data.local.path), "changed",
 		     G_CALLBACK(check_for_blank_fields), mcw);
 
+    /* FIXME: set_dafault_path does not activate unless the entry is
+     * changed */
+    gnome_file_entry_set_filename(GNOME_FILE_ENTRY(file),"filename");
+
     gtk_table_attach(GTK_TABLE(table), file, 1, 2, 1, 2,
 		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
-    gtk_widget_grab_focus(mcw->mailbox_name ? 
-                          mcw->mailbox_name : mcw->mb_data.local.path);
+    gtk_widget_grab_focus(mcw->mailbox_name ? mcw->mailbox_name :
+			  GTK_WIDGET(mcw->mb_data.local.path));
     return table;
 }
 

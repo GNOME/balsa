@@ -1,5 +1,11 @@
-2004-08-22 10:57  PeterB
+2004-08-22 13:27  PeterB
 
+	* src/mailbox-node.c: steal the mailbox when moving a special
+	mailbox from the top level to a newly scanned folder tree, and make
+	sure its mailbox-node is connected to the "show-prop-dialog"
+	signal.
+	* src/balsa-app.c: steal the mailbox instead of the mailbox-node
+	when removing a special mailbox.
 	* src/: folder-conf.c, mailbox-conf.c, mailbox-conf.h: pass a list
 	of default ports to be stripped from host string when use_ssl is
 	toggled.

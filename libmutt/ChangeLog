@@ -1,6 +1,7 @@
 2002-05-15  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* imap/imap.c: add imap_uid_search()
+	* configure.in: AM_WITH_NLS redundant (and deprecated in gettext).
 	
 2002-05-10  Pawel Salek  <pawsa@theochem.kth.se>
 

@@ -319,6 +319,8 @@ lbm_mh_parse_mailbox(LibBalsaMailboxMh * mh)
 		g_hash_table_insert(mh->messages_info,
 				    GINT_TO_POINTER(fileno), msg_info);
 		g_ptr_array_add(mh->msgno_2_msg_info, msg_info);
+                /* dummy entry in mindex for now */
+                g_ptr_array_add(LIBBALSA_MAILBOX(mh)->mindex, NULL);
 		msg_info->fileno = fileno;
 	    }
 	    msg_info->orig_flags = delete_flag;
@@ -820,7 +822,7 @@ libbalsa_mailbox_mh_get_message(LibBalsaMailbox * mailbox, guint msgno)
 
     if (!msg_info->message)
 	libbalsa_mailbox_local_load_message(mailbox, msgno);
-
+    g_object_ref(msg_info->message);
     return msg_info->message;
 }
 
@@ -971,6 +973,7 @@ libbalsa_mailbox_mh_change_message_flags(LibBalsaMailbox * mailbox, guint msgno,
     msg_info->flags |= set;
     msg_info->flags &= ~clear;
 
+    libbalsa_mailbox_index_set_flags(mailbox, msgno, msg_info->flags);
     libbalsa_mailbox_local_queue_sync(LIBBALSA_MAILBOX_LOCAL(mailbox));
 }
 

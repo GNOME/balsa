@@ -944,6 +944,8 @@ libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
 {
     GString *msg;
     gchar *retval;
+    struct tm date;
+    char buf[128];
     g_return_val_if_fail(info != NULL, NULL);
     g_return_val_if_fail(date_string != NULL, NULL);
     msg = g_string_new(libbalsa_gpgme_sig_protocol_name(info->protocol));
@@ -961,8 +963,8 @@ libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
 	g_string_append_printf(msg, _("\nMail address: %s"),
 			       info->sign_email);
     if (info->sign_time) {
-	gchar buf[128];
-	strftime(buf, 127, date_string, localtime(&info->sign_time));
+	localtime_r(&info->sign_time, &date);
+	strftime(buf, sizeof(buf), date_string, &date);
 	g_string_append_printf(msg, _("\nSigned on: %s"), buf);
     }
     g_string_append_printf(msg, _("\nValidity: %s"),
@@ -976,8 +978,8 @@ libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
 	g_string_append_printf(msg, _("\nKey fingerprint: %s"),
 			       info->fingerprint);
     if (info->key_created) {
-	gchar buf[128];
-	strftime(buf, 127, date_string, localtime(&info->key_created));
+	localtime_r(&info->key_created, &date);
+	strftime(buf, sizeof(buf), date_string, &date);
 	g_string_append_printf(msg, _("\nKey created on: %s"), buf);
     }
     if (info->issuer_name)

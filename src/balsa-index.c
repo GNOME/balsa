@@ -258,7 +258,7 @@ bndx_instance_init(BalsaIndex * index)
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
 
-#if defined(HAVE_GTK24) && defined(TREE_VIEW_FIXED_HEIGHT)
+#if GTK_CHECK_VERSION(2,4,0) && defined(TREE_VIEW_FIXED_HEIGHT)
     {
         GValue val = {0};
         g_value_init (&val, G_TYPE_BOOLEAN);
@@ -450,6 +450,7 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
 	    /* The message is no longer in the view--it must have been
 	     * either expunged or filtered out--in either case, we just
 	     * drop it from the list. */
+	    g_object_unref(message);
 	    index->selected = g_slist_delete_link(index->selected, list);
 	    continue;
 	}
@@ -458,6 +459,7 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
 	    /* The message has been deselected, and not by collapsing a
 	     * thread; we'll notify the mailbox, so it can check whether
 	     * the message still matches the view filter. */
+	    g_object_unref(message);
 	    index->selected = g_slist_delete_link(index->selected, list);
 	    if (iter_view)
 		libbalsa_mailbox_msgno_filt_check(message->mailbox,
@@ -500,6 +502,9 @@ bndx_selection_changed_func(GtkTreeModel * model, GtkTreePath * path,
                        -1);
     if (!g_slist_find(*sci->selected, sci->message))
 	*sci->selected = g_slist_prepend(*sci->selected, sci->message);
+    else {
+	g_object_unref(sci->message);
+    }
 }
 
 static gboolean
@@ -562,6 +567,7 @@ bndx_row_activated(GtkTreeView * tree_view, GtkTreePath * path,
                          G_CALLBACK(sendmsg_window_destroy_cb), NULL);
     } else
         message_window_new(message);
+    g_object_unref(message);
 }
 
 /* bndx_tree_expand_cb:
@@ -656,6 +662,7 @@ bndx_drag_cb (GtkWidget* widget, GdkDragContext* drag_context,
         message = list->data;
         g_ptr_array_add (message_array, message);
     }
+    g_list_foreach(l, (GFunc)g_object_unref, NULL); /* FIXME: too early? */
     g_list_free(l);
     
     if (message_array) {
@@ -1046,7 +1053,7 @@ thread_has_unread(BalsaIndex * index, GtkTreeIter * iter)
 {
     GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(index));
     GtkTreeIter child_iter;
-
+    gboolean res = FALSE;
     if (!gtk_tree_model_iter_children(model, &child_iter, iter))
         return FALSE;
 
@@ -1059,10 +1066,11 @@ thread_has_unread(BalsaIndex * index, GtkTreeIter * iter)
         if ((!LIBBALSA_MESSAGE_IS_DELETED(message) &&
 	     LIBBALSA_MESSAGE_IS_UNREAD(message)) ||
             thread_has_unread(index, &child_iter))
-            return TRUE;
-    } while (gtk_tree_model_iter_next(model, &child_iter));
+            res = TRUE;
+	g_object_unref(message);
+    } while (gtk_tree_model_iter_next(model, &child_iter) && !res);
 
-    return FALSE;
+    return res;
 }
 
 void
@@ -1070,7 +1078,7 @@ balsa_index_set_column_widths(BalsaIndex * index)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
 
-#if defined(HAVE_GTK24) && defined(TREE_VIEW_FIXED_HEIGHT)
+#if GTK_CHECK_VERSION(2,4,0) && defined(TREE_VIEW_FIXED_HEIGHT)
     /* so that fixed width works properly */
     gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
                                          (tree_view, LB_MBOX_MSGNO_COL),
@@ -1186,7 +1194,7 @@ bndx_view_source(GtkWidget * widget, gpointer data)
 	libbalsa_show_message_source(message, balsa_app.message_font,
 				     &balsa_app.source_escape_specials);
     }
-
+    g_list_foreach(messages, (GFunc)g_object_unref, NULL);
     g_list_free(messages);
 }
 
@@ -1196,6 +1204,7 @@ bndx_store_address(GtkWidget * widget, gpointer data)
     GList *messages = balsa_index_selected_list(BALSA_INDEX(data));
 
     balsa_store_address(messages);
+    g_list_foreach(messages, (GFunc)g_object_unref, NULL);
     g_list_free(messages);
 }
 
@@ -1228,7 +1237,7 @@ balsa_index_selected_list(BalsaIndex * index)
     if (index->current_message
         && !g_list_find(list, index->current_message))
         list = g_list_prepend(list, index->current_message);
-
+ 
     return list;
 }
 
@@ -1249,6 +1258,7 @@ bndx_compose_foreach(GtkWidget * w, BalsaIndex * index,
         g_signal_connect(G_OBJECT(sm->window), "destroy",
                          G_CALLBACK(sendmsg_window_destroy_cb), NULL);
     }
+    g_list_foreach(l, (GFunc)g_object_unref, NULL);
     g_list_free(l);
 }
 
@@ -1295,6 +1305,7 @@ bndx_compose_from_list(GtkWidget * w, BalsaIndex * index,
         g_signal_connect(G_OBJECT(sm->window), "destroy",
                          G_CALLBACK(sendmsg_window_destroy_cb), NULL);
 
+	g_list_foreach(list, (GFunc)g_object_unref, NULL);
         g_list_free(list);
     }
 }
@@ -1338,8 +1349,10 @@ bndx_do_delete(BalsaIndex* index, gboolean move_to_trash)
         GList *next = g_list_next(list);
         LibBalsaMessage * message = list->data;
 
-        if (LIBBALSA_MESSAGE_IS_DELETED(message))
+        if (LIBBALSA_MESSAGE_IS_DELETED(message)) {
             messages = g_list_delete_link(messages, list);
+	    g_object_unref(message);
+	}
 
         list = next;
     }
@@ -1355,6 +1368,7 @@ bndx_do_delete(BalsaIndex* index, gboolean move_to_trash)
 	    if (index == trash)
 		enable_empty_trash(TRASH_CHECK);
 	}
+	g_list_foreach(messages, (GFunc)g_object_unref, NULL);
 	g_list_free(messages);
     }
 }
@@ -1409,6 +1423,7 @@ balsa_index_toggle_flag(BalsaIndex* index, LibBalsaMessageFlag flag)
 
     libbalsa_messages_change_flag(l, flag, !is_all_flagged);
 
+    g_list_foreach(l, (GFunc)g_object_unref, NULL);
     g_list_free(l);
 }
 
@@ -1451,6 +1466,7 @@ mru_menu_cb(gchar * url, BalsaIndex * index)
     if (index->mailbox_node->mailbox != mailbox) {
         GList *messages = balsa_index_selected_list(index);
         balsa_index_transfer(index, messages, mailbox, FALSE);
+	g_list_foreach(messages, (GFunc)g_object_unref, NULL);
         g_list_free(messages);
     }
 }
@@ -1563,6 +1579,7 @@ bndx_do_popup(BalsaIndex * index, GdkEventButton * event)
         else
             any_not_deleted = TRUE;
     }
+    g_list_foreach(l, (GFunc)g_object_unref, NULL);
     g_list_free(l);
     any = (l != NULL);
 

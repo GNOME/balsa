@@ -343,8 +343,10 @@ libbalsa_mailbox_local_message_match(LibBalsaMailbox * mailbox,
 {
     LibBalsaMessage *message =
 	libbalsa_mailbox_get_message(mailbox, msgno);
-
-    return libbalsa_condition_matches(iter->condition, message, TRUE);
+    gboolean res =
+	libbalsa_condition_matches(iter->condition, message, TRUE);
+    g_object_unref(message);
+    return res;
 }
 
 /* libbalsa_mailbox_link_message:
@@ -387,10 +389,15 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox, guint msgno)
 	/* Mailbox is closed, or no view has been created. */
 	return;
 
-    while (++msgno <= libbalsa_mailbox_total_messages(mailbox))
-	if (libbalsa_mailbox_local_load_message(mailbox, msgno))
+    /* FIXME: do not create and destroy messages in vain! */
+    while (++msgno <= libbalsa_mailbox_total_messages(mailbox)) {
+	LibBalsaMessage *msg =
+	    libbalsa_mailbox_local_load_message(mailbox, msgno);
+	if (msg) {
 	    ++new_messages;
-
+	    g_object_unref(msg);
+	}
+    }
     if (new_messages) {
 	libbalsa_mailbox_set_unread_messages_flag(mailbox,
 						  mailbox->
@@ -572,7 +579,10 @@ lbml_info_setup(LibBalsaMailbox * mailbox, GNode * msg_tree,
 static void
 lbml_info_free(ThreadingInfo * ti)
 {
+    unsigned i;
     g_hash_table_destroy(ti->id_table);
+    for(i=0; i<ti->msg_array_len; i++)
+	g_object_unref(G_OBJECT(ti->msg_array[i]));
     g_free(ti->msg_array);
     if (ti->subject_table)
 	g_hash_table_destroy(ti->subject_table);
@@ -583,6 +593,8 @@ lbml_threading_jwz(LibBalsaMailbox * mailbox, GNode * msg_tree)
 {
     ThreadingInfo ti;
 
+    /*FIXME - do the work */
+    return;
     lbml_info_setup(mailbox, msg_tree, &ti);
 
     g_node_traverse(msg_tree, G_POST_ORDER, G_TRAVERSE_ALL, -1,
@@ -1063,6 +1075,8 @@ lbml_threading_simple(LibBalsaMailbox * mailbox,
 {
     ThreadingInfo ti;
 
+    /*FIXME: do the work */
+    return;
     lbml_info_setup(mailbox, msg_tree, &ti);
 
     if (type == LB_MAILBOX_THREADING_SIMPLE)
@@ -1237,7 +1251,6 @@ libbalsa_mailbox_local_queue_sync(LibBalsaMailboxLocal * local)
      * than the syncing time. Otherwise large mailbox owners will be
      * annnoyed. */
     schedule_delay = (local->sync_time*5000)/local->sync_cnt;
-    printf("sync job scheduled with delay %u ms.\n", schedule_delay);
     local->sync_id = g_timeout_add_full(G_PRIORITY_LOW, schedule_delay,
                                         (GSourceFunc)lbml_sync_idle,
                                         local, NULL);

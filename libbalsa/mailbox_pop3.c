@@ -613,10 +613,9 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 				 tmp_path);
 	    remove_tmp = FALSE;
 	}
+	g_list_foreach(msg_list, (GFunc)g_object_unref, NULL);
 	g_list_free(msg_list);
-#if 1
         libbalsa_mailbox_close(tmp_mailbox);
-#endif
     }
     libbalsa_mailbox_pop3_config_changed(m);
     

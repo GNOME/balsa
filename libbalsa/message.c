@@ -85,6 +85,7 @@ libbalsa_message_get_type()
     return libbalsa_message_type;
 }
 
+int message_cnt = 0;
 static void
 libbalsa_message_init(LibBalsaMessage * message)
 {
@@ -104,6 +105,7 @@ libbalsa_message_init(LibBalsaMessage * message)
 #ifdef HAVE_GPGME
     message->prot_state = LIBBALSA_MSG_PROTECT_NONE;
 #endif
+    /* printf("%p message created.\n", message); */ message_cnt++;
 }
 
 
@@ -179,8 +181,8 @@ libbalsa_message_finalize(GObject * object)
 	g_mime_object_unref(GMIME_OBJECT(message->mime_msg));
 	message->mime_msg = NULL;
     }
-
     G_OBJECT_CLASS(parent_class)->finalize(object);
+    /* printf("%p message finalized.\n", message); */  message_cnt--;
 }
 
 static void libbalsa_message_find_charset(GMimeObject *mime_part, gpointer data)
@@ -566,21 +568,6 @@ libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
 }
 
 static void
-libbalsa_message_set_status_icons(LibBalsaMessage * message)
-{
-    if (LIBBALSA_MESSAGE_IS_DELETED(message))
-	message->status_icon = LIBBALSA_MESSAGE_STATUS_DELETED;
-    else if (LIBBALSA_MESSAGE_IS_UNREAD(message))
-	message->status_icon = LIBBALSA_MESSAGE_STATUS_UNREAD;
-    else if (LIBBALSA_MESSAGE_IS_FLAGGED(message))
-	message->status_icon = LIBBALSA_MESSAGE_STATUS_FLAGGED;
-    else if (LIBBALSA_MESSAGE_IS_REPLIED(message))
-	message->status_icon = LIBBALSA_MESSAGE_STATUS_REPLIED;
-    else
-	message->status_icon = LIBBALSA_MESSAGE_STATUS_ICONS_NUM;
-}
-
-static void
 libbalsa_message_set_attach_icons(LibBalsaMessage * message)
 {
 #ifdef HAVE_GPGME
@@ -628,7 +615,8 @@ libbalsa_message_set_msg_flags(LibBalsaMessage * message,
 	changed = TRUE;
     }
     if (changed)
-	libbalsa_message_set_status_icons(message);
+	message->status_icon = 
+	    libbalsa_get_icon_from_flags(message->flags);
 
     return changed;
 }
@@ -900,47 +888,6 @@ libbalsa_message_is_pgp_encrypted(LibBalsaMessage * message)
 				    "multipart", "encrypted") : FALSE;
 }
 #endif
-
-gchar *
-libbalsa_message_headers_date_to_gchar(LibBalsaMessageHeaders * headers,
-				       const gchar * date_string)
-{
-    struct tm *footime;
-    gchar rettime[128];
-
-    g_return_val_if_fail(headers != NULL, NULL);
-    g_return_val_if_fail(date_string != NULL, NULL);
-
-    footime = localtime(&headers->date);
-
-    strftime(rettime, sizeof(rettime), date_string, footime);
-
-    return g_strdup(rettime);
-}
-
-gchar *
-libbalsa_message_size_to_gchar (LibBalsaMessage * message, gboolean lines)
-{
-    gchar retsize[32];
-    glong length;   /* byte len */
-
-    g_return_val_if_fail(message != NULL, NULL);
-    length    = LIBBALSA_MESSAGE_GET_LENGTH(message);
-    /* length is long */
-    if (length <= 32768) {
-        g_snprintf (retsize, sizeof(retsize), "%ld", length);
-    } else if (length <= (100*1024)) {
-        float tmp = (float)length/1024.0;
-        g_snprintf (retsize, sizeof(retsize), "%.1fK", tmp);
-    } else if (length <= (1024*1024)) {
-        g_snprintf (retsize, sizeof(retsize), "%ldK", length/1024);
-    } else {
-        float tmp = (float)length/(1024.0*1024.0);
-        g_snprintf (retsize, sizeof(retsize), "%.1fM", tmp);
-    }
-
-    return g_strdup(retsize);
-}
 
 void
 libbalsa_message_append_part(LibBalsaMessage * message,
@@ -1506,6 +1453,7 @@ libbalsa_message_set_icons(LibBalsaMessage * message)
     g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
     g_return_if_fail(message->mailbox != NULL);
 
-    libbalsa_message_set_status_icons(message);
+    message->status_icon = 
+	libbalsa_get_icon_from_flags(message->flags);
     libbalsa_message_set_attach_icons(message);
 }

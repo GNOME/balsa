@@ -532,7 +532,8 @@ imap_flags_cb(unsigned cnt, const unsigned seqno[], LibBalsaMailboxImap *mimap)
             GList *list;
             
             lbimap_update_flags(msg_info->message, imsg);
-            libbalsa_message_set_icons(msg_info->message);
+	    libbalsa_mailbox_index_set_flags(mailbox, seqno[i],
+					     msg_info->message->flags);
             libbalsa_mailbox_msgno_changed(mailbox, seqno[i]);
 	    ++mimap->search_stamp;
             
@@ -587,6 +588,8 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
 	i=mimap->messages_info->len+1;
         do {
             g_array_append_val(mimap->messages_info, a);
+	    /* dummy entry in mindex for now */
+	    g_ptr_array_add(mailbox->mindex, NULL);
             libbalsa_mailbox_msgno_inserted(mailbox, i);
         } while (++i <= cnt);
 	++mimap->search_stamp;
@@ -764,6 +767,8 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
     for(i=0; i < total_messages; i++) {
 	struct message_info a = {0};
 	g_array_append_val(mimap->messages_info, a);
+        /* dummy entry in mindex for now */
+        g_ptr_array_add(mailbox->mindex, NULL);
     }
 
     mailbox->first_unread = imap_mbox_handle_first_unseen(mimap->handle);
@@ -1560,6 +1565,7 @@ libbalsa_mailbox_imap_get_message(LibBalsaMailbox * mailbox, guint msgno)
 	} else 
             g_object_unref(G_OBJECT(msg));
     }
+    g_object_ref(msg_info->message); /* we want to keep one copy */
     return msg_info->message;
 }
 
@@ -2007,6 +2013,8 @@ lbm_imap_messages_change_flags(LibBalsaMailbox * mailbox, GArray * seqno,
 
 	    if (msg_info->message) {
 		libbalsa_message_set_msg_flags(msg_info->message, set, clear);
+		libbalsa_mailbox_index_set_flags(mailbox, msgno,
+						 msg_info->message->flags);
 		libbalsa_mailbox_msgno_changed(mailbox, msgno);
 	    }
 	}

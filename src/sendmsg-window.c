@@ -1655,6 +1655,7 @@ insert_selected_messages(BalsaSendmsg *bsmsg, SendType type)
             libbalsa_insert_with_url(buffer, body->str, NULL, NULL, NULL);
 	    g_string_free(body, TRUE);
 	}
+	g_list_foreach(l, (GFunc)g_object_unref, NULL);
         g_list_free(l);
     }
 
@@ -1686,6 +1687,7 @@ attach_message_cb(GtkWidget * widget, BalsaSendmsg *bsmsg)
                 break;
             }
 	}
+	g_list_foreach(l, (GFunc)g_object_unref, NULL);
         g_list_free(l);
     }
     
@@ -3471,7 +3473,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     gchar *tmp;
     const gchar *ctmp;
     gchar recvtime[50];
-    struct tm *footime;
+    struct tm footime;
     GtkTextIter start, end;
 
     g_assert(bsmsg != NULL);
@@ -3516,9 +3518,9 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 	    }
 	    message->references = g_list_reverse(message->references);
 	}
-	footime = localtime(&bsmsg->orig_message->headers->date);
+	localtime_r(&bsmsg->orig_message->headers->date, &footime);
 	strftime(recvtime, sizeof(recvtime),
-		 "%a, %b %d, %Y at %H:%M:%S %z", footime);
+		 "%a, %b %d, %Y at %H:%M:%S %z", &footime);
 
 	if (bsmsg->orig_message->message_id) {
 	    message->references =
@@ -3833,7 +3835,6 @@ save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 	libbalsa_mailbox_get_message(balsa_app.draftbox,
 				     libbalsa_mailbox_total_messages
 				     (balsa_app.draftbox));
-    g_object_ref(G_OBJECT(bsmsg->orig_message));
 }
 
 static void

@@ -279,9 +279,95 @@ libbalsa_mailbox_dispose(GObject * object)
     G_OBJECT_CLASS(parent_class)->dispose(object);
 }
 
+/* LibBalsaMailboxEntry handling code which is to be used for message
+ * intex caching.  Mailbox index entry used for caching (almost) all
+ * columns provided by GtkTreeModel interface. Size matters. */
+struct LibBalsaMailboxIndexEntry_ {
+    gchar *from;
+    gchar *subject;
+    time_t msg_date;
+    time_t internal_date;
+    unsigned msgno;
+    unsigned short status_icon;
+    unsigned short attach_icon;
+    unsigned long size;
+    unsigned unseen:1;
+    unsigned has_unseen_child:1;
+} ;
+
+static gchar*
+get_from_field(LibBalsaMessage *message)
+{
+    gboolean append_dots = FALSE;
+    const gchar *name_str = NULL;
+    gchar *from;
+    LibBalsaAddress *addy = NULL;
+
+    g_return_val_if_fail(message->mailbox, NULL);
+    if (message->mailbox->view->show == LB_MAILBOX_SHOW_TO) {
+	if (message->headers && message->headers->to_list) {
+	    GList *list = g_list_first(message->headers->to_list);
+	    addy = list->data;
+	    append_dots = list->next != NULL;
+	}
+    } else {
+ 	if (message->headers && message->headers->from)
+	    addy = message->headers->from;
+    }
+    if (addy)
+	name_str = libbalsa_address_get_name(addy);
+    if(!name_str)           /* !addy, or addy contained no name/address */
+	name_str = "";
+    
+    from = append_dots ? g_strconcat(name_str, ",...", NULL)
+                       : g_strdup(name_str);
+    libbalsa_utf8_sanitize(&from, TRUE, NULL);
+    return from;
+}
+LibBalsaMailboxIndexEntry*
+libbalsa_mailbox_index_entry_new_from_msg(LibBalsaMessage *msg)
+{
+    LibBalsaMailboxIndexEntry *entry = g_new0(LibBalsaMailboxIndexEntry,1);
+    entry->from          = get_from_field(msg);
+    entry->subject       = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(msg));
+    entry->msg_date      = msg->headers->date;
+    entry->internal_date = 0; /* FIXME */
+    entry->msgno         = msg->msgno;
+    entry->status_icon   = msg->status_icon;
+    entry->attach_icon   = msg->attach_icon;
+    entry->size          = msg->length;
+    entry->unseen        = LIBBALSA_MESSAGE_IS_UNREAD(msg);
+    entry->has_unseen_child = 0; /* FIXME: use iterator to find out */
+    return entry;
+}
+
+void
+libbalsa_mailbox_index_entry_free(LibBalsaMailboxIndexEntry *entry)
+{
+    if(entry) {
+        g_free(entry->from);
+        g_free(entry->subject);
+        g_free(entry);
+    }
+}
+
+void
+libbalsa_mailbox_index_set_flags(LibBalsaMailbox *mailbox,
+				 unsigned msgno, LibBalsaMessageFlag f)
+{
+    LibBalsaMailboxIndexEntry *entry =
+	g_ptr_array_index(mailbox->mindex, msgno-1);
+    if(entry) {
+	entry->status_icon = 
+	    libbalsa_get_icon_from_flags(f);
+	entry->unseen = f & LIBBALSA_MESSAGE_FLAG_NEW;
+    }
+}
+
 /* libbalsa_mailbox_finalize:
    destroys mailbox. Must leave it in sane state.
 */
+
 static void
 libbalsa_mailbox_finalize(GObject * object)
 {
@@ -300,7 +386,6 @@ libbalsa_mailbox_finalize(GObject * object)
 
     /* The LibBalsaMailboxView is owned by balsa_app.mailbox_views. */
     mailbox->view = NULL;
-
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
@@ -375,6 +460,8 @@ libbalsa_mailbox_open(LibBalsaMailbox * mailbox)
 	retval = TRUE;
     } else {
 	mailbox->stamp++;
+        if(mailbox->mindex) g_warning("mindex set - I leak memory");
+        mailbox->mindex = g_ptr_array_new();
 	retval =
 	    LIBBALSA_MAILBOX_GET_CLASS(mailbox)->open_mailbox(mailbox);
         if(retval)
@@ -422,6 +509,15 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox)
         if(mailbox->msg_tree) {
             g_node_destroy(mailbox->msg_tree);
             mailbox->msg_tree = NULL;
+        }
+        if(mailbox->mindex) {
+            unsigned i;
+            /* we could have used g_ptr_array_foreach but it is >=2.4.0 */
+            for(i=0; i<mailbox->mindex->len; i++)
+                libbalsa_mailbox_index_entry_free
+                    (g_ptr_array_index(mailbox->mindex, i));
+            g_ptr_array_free(mailbox->mindex, TRUE);
+            mailbox->mindex = NULL;
         }
 	mailbox->stamp++;
     }
@@ -663,11 +759,12 @@ libbalsa_mailbox_real_messages_change_flags(LibBalsaMailbox * mailbox,
 		change_message_flags(mailbox, msgno, set, clr);
 	    libbalsa_mailbox_msgno_changed(mailbox, msgno);
 	    list = g_list_prepend(list, msg);
-	}
+	} else g_object_unref(msg);
     }
 
     if (list) {
 	libbalsa_mailbox_messages_status_changed(mailbox, list, set | clr);
+	g_list_foreach(list, (GFunc)g_object_unref, NULL);
 	g_list_free(list);
     }
 
@@ -692,6 +789,7 @@ libbalsa_mailbox_real_messages_copy(LibBalsaMailbox * mailbox,
 
 	if (libbalsa_mailbox_copy_message(message, dest) < 0)
 	    retval = FALSE;
+	g_object_unref(message);
     }
 
     return retval;
@@ -979,6 +1077,10 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
 
     g_node_traverse(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL, -1,
                     decrease_post, &dt);
+    libbalsa_mailbox_index_entry_free(g_ptr_array_index(mailbox->mindex,
+                                                        seqno-1));
+    g_ptr_array_remove_index(mailbox->mindex, seqno-1);
+
     if (!dt.node) {
         /* It's ok, apparently the view did not include this message */
 	lbm_threads_leave(unlock);
@@ -1635,6 +1737,8 @@ libbalsa_mailbox_view_free(LibBalsaMailboxView * view)
  * do not forget to modify LibBalsaMailbox::stamp on each modification
  * of the message list.
  * =================================================================== */
+
+/* Iterator invalidation macros. */
 #define VALID_ITER(iter, tree_model) \
     ((iter)!= NULL && \
      (iter)->user_data != NULL && \
@@ -1815,35 +1919,6 @@ mbox_model_get_path(GtkTreeModel * tree_model, GtkTreeIter * iter)
   FIXME: still includes some debugging code in case fetching the
   message failed.
 */
-static gchar*
-get_from_field(LibBalsaMessage *message)
-{
-    gboolean append_dots = FALSE;
-    const gchar *name_str = NULL;
-    gchar *from;
-    LibBalsaAddress *addy = NULL;
-
-    g_return_val_if_fail(message->mailbox, NULL);
-    if (message->mailbox->view->show == LB_MAILBOX_SHOW_TO) {
-	if (message->headers && message->headers->to_list) {
-	    GList *list = g_list_first(message->headers->to_list);
-	    addy = list->data;
-	    append_dots = list->next != NULL;
-	}
-    } else {
- 	if (message->headers && message->headers->from)
-	    addy = message->headers->from;
-    }
-    if (addy)
-	name_str = libbalsa_address_get_name(addy);
-    if(!name_str)           /* !addy, or addy contained no name/address */
-	name_str = "";
-    
-    from = append_dots ? g_strconcat(name_str, ",...", NULL)
-                       : g_strdup(name_str);
-    libbalsa_utf8_sanitize(&from, TRUE, NULL);
-    return from;
-}
 
 static GdkPixbuf *status_icons[LIBBALSA_MESSAGE_STATUS_ICONS_NUM];
 static GdkPixbuf *attach_icons[LIBBALSA_MESSAGE_ATTACH_ICONS_NUM];
@@ -1851,18 +1926,56 @@ static GdkPixbuf *attach_icons[LIBBALSA_MESSAGE_ATTACH_ICONS_NUM];
 static gboolean
 lbm_node_has_unread_child(LibBalsaMailbox * lmm, GNode * node)
 {
-    for (node = node->children; node; node = node->next) {
+    gboolean retval = FALSE;
+    /* FIXME: get_message is too expensive for this, use IndexEntry */
+    for (node = node->children; node && !retval; node = node->next) {
 	LibBalsaMessage *msg =
 	    libbalsa_mailbox_get_message(lmm,
 					 GPOINTER_TO_UINT(node->data));
-	if (LIBBALSA_MESSAGE_IS_UNREAD(msg)
-	    || lbm_node_has_unread_child(lmm, node))
-	    return TRUE;
+	retval = (LIBBALSA_MESSAGE_IS_UNREAD(msg) ||
+		  lbm_node_has_unread_child(lmm, node));
+	g_object_unref(msg);
     }
-    return FALSE;
+    return retval;
 }
 
-#ifndef HAVE_GTK24
+static gchar *
+libbalsa_size_to_gchar(glong length)
+{
+    gchar retsize[32];
+
+    /* length is long */
+    if (length <= 32768) {
+        g_snprintf (retsize, sizeof(retsize), "%ld", length);
+    } else if (length <= (100*1024)) {
+        float tmp = (float)length/1024.0;
+        g_snprintf (retsize, sizeof(retsize), "%.1fK", tmp);
+    } else if (length <= (1024*1024)) {
+        g_snprintf (retsize, sizeof(retsize), "%ldK", length/1024);
+    } else {
+        float tmp = (float)length/(1024.0*1024.0);
+        g_snprintf (retsize, sizeof(retsize), "%.1fM", tmp);
+    }
+
+    return g_strdup(retsize);
+}
+
+static LibBalsaMailboxIndexEntry *
+lbm_get_index_entry(LibBalsaMailbox *lmm, unsigned msgno)
+{
+    /* We use brute force for now and go via LibBalsaMessage. */
+    LibBalsaMailboxIndexEntry *entry =
+        g_ptr_array_index(lmm->mindex, msgno-1);
+    if(entry == NULL) {
+        LibBalsaMessage *msg = libbalsa_mailbox_get_message(lmm, msgno);
+        entry = libbalsa_mailbox_index_entry_new_from_msg(msg);
+        g_ptr_array_index(lmm->mindex, msgno-1) = entry;
+        g_object_unref(msg);
+    }
+    return entry;
+}
+
+#if !GTK_CHECK_VERSION(2,4,0)
 #define g_value_take_string g_value_set_string_take_ownership
 #endif
 static void
@@ -1872,7 +1985,7 @@ mbox_model_get_value(GtkTreeModel *tree_model,
 		     GValue *value)
 {
     LibBalsaMailbox* lmm = LIBBALSA_MAILBOX(tree_model);
-    LibBalsaMessage* msg = NULL;
+    LibBalsaMailboxIndexEntry* msg = NULL;
     guint msgno;
     gchar *tmp;
     
@@ -1882,10 +1995,16 @@ mbox_model_get_value(GtkTreeModel *tree_model,
  
     g_value_init (value, mbox_model_col_type[column]);
     msgno = GPOINTER_TO_UINT( ((GNode*)iter->user_data)->data );
+
+    if(column == LB_MBOX_MSGNO_COL) {
+	g_value_set_uint(value, msgno);
+	return;
+    }
     /* gtk2-2.3.5 can in principle do it  but we want to be sure.
      */
-#if defined(HAVE_GTK24) && defined(GTK2_FETCHES_ONLY_VISIBLE_CELLS)
-    msg = libbalsa_mailbox_get_message(lmm, msgno);
+    g_return_if_fail(msgno<=libbalsa_mailbox_total_messages(lmm));
+#if GTK_CHECK_VERSION(2,4,0) && defined(GTK2_FETCHES_ONLY_VISIBLE_CELLS)
+    msg = lbm_get_index_entry(lmm, msgno);
 #else 
     { GdkRectangle a, b, c, d; 
     /* assumed that only one view is showing the mailbox */
@@ -1908,14 +2027,13 @@ mbox_model_get_value(GtkTreeModel *tree_model,
 	c.width -= c.x; c.height -= c.y;
 	if (gdk_rectangle_intersect(&a, &c, &d)
 	    || column == LB_MBOX_MESSAGE_COL)
-	    msg = libbalsa_mailbox_get_message(lmm, msgno);
+	    msg = lbm_get_index_entry(lmm, msgno);
 	gtk_tree_path_free(path);
     }
     }
 #endif
     switch(column) {
-    case LB_MBOX_MSGNO_COL:
-	g_value_set_uint(value, msgno);  break;
+	/* case LB_MBOX_MSGNO_COL: handled above */
     case LB_MBOX_MARKED_COL:
 	if (!msg || msg->status_icon >= LIBBALSA_MESSAGE_STATUS_ICONS_NUM)
 	    g_value_set_object(value, NULL);
@@ -1930,39 +2048,36 @@ mbox_model_get_value(GtkTreeModel *tree_model,
 	break;
     case LB_MBOX_FROM_COL:
 	if(msg) {
-	    tmp = get_from_field(msg);
-	    g_value_take_string(value, tmp);
+	    g_value_set_string(value, msg->from);
 	} else g_value_set_static_string(value, "from unknown");
         break;
     case LB_MBOX_SUBJECT_COL:
-	if(msg) g_value_set_string(value, LIBBALSA_MESSAGE_GET_SUBJECT(msg));
+	if(msg) g_value_set_string(value, msg->subject);
         else g_value_set_static_string(value, "unknown subject");
 	    
 	break;
     case LB_MBOX_DATE_COL:
 	if(msg) {
-	    tmp = libbalsa_message_date_to_gchar(msg, "%x %X");
+	    tmp = libbalsa_date_to_gchar(&msg->msg_date, "%x %X");
 	    g_value_take_string(value, tmp);
 	} else g_value_set_static_string(value, "unknown");
 	break;
     case LB_MBOX_SIZE_COL:
 	if(msg) {
-	    tmp = libbalsa_message_size_to_gchar(msg, FALSE);
+	    tmp = libbalsa_size_to_gchar(msg->size);
 	    g_value_take_string(value, tmp);
 	} else g_value_set_static_string(value, "unknown");
 	break;
     case LB_MBOX_MESSAGE_COL:
-	g_value_set_pointer(value, msg); break;
+	g_value_set_pointer(value, 
+			    libbalsa_mailbox_get_message(lmm, msgno)); break;
     case LB_MBOX_WEIGHT_COL:
-	g_value_set_uint(value,
-			 (msg && LIBBALSA_MESSAGE_IS_UNREAD(msg)) ?
-			 PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
+	g_value_set_uint(value, msg && msg->unseen
+			 ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
 	break;
     case LB_MBOX_STYLE_COL:
-	g_value_set_uint(value,
-			 (msg && lbm_node_has_unread_child(lmm, iter->
-							   user_data)) ?
-			 PANGO_STYLE_OBLIQUE : PANGO_STYLE_NORMAL);
+	g_value_set_uint(value, msg && msg->has_unseen_child
+			 ? PANGO_STYLE_OBLIQUE : PANGO_STYLE_NORMAL);
 	break;
     }
 }
@@ -2255,63 +2370,42 @@ mbox_sortable_init(GtkTreeSortableIface * iface)
 
 
 static gint
-mbox_compare_msgno(LibBalsaMessage * message_a,
-		   LibBalsaMessage * message_b)
+mbox_compare_msgno(LibBalsaMailboxIndexEntry * message_a,
+		   LibBalsaMailboxIndexEntry * message_b)
 {
-    glong msgno_a, msgno_b;
-
     g_return_val_if_fail(message_a && message_b, 0);
 
-    msgno_a = LIBBALSA_MESSAGE_GET_NO(message_a);
-    msgno_b = LIBBALSA_MESSAGE_GET_NO(message_b);
-
-    return msgno_a-msgno_b;
+    return message_a->msgno - message_b->msgno;
 }
 
 static gint
-mbox_compare_from(LibBalsaMessage * message_a,
-		  LibBalsaMessage * message_b)
+mbox_compare_from(LibBalsaMailboxIndexEntry * message_a,
+		  LibBalsaMailboxIndexEntry * message_b)
 {
-    gchar *from_a = get_from_field(message_a);
-    gchar *from_b = get_from_field(message_b);
-    gboolean retval = g_ascii_strcasecmp(from_a, from_b);
-
-    g_free(from_a);
-    g_free(from_b);
-
-    return retval;
+    return g_ascii_strcasecmp(message_a->from, message_b->from);
 }
 
 static gint
-mbox_compare_subject(LibBalsaMessage * message_a,
-		     LibBalsaMessage * message_b)
+mbox_compare_subject(LibBalsaMailboxIndexEntry * message_a,
+		     LibBalsaMailboxIndexEntry * message_b)
 {
-    const gchar *subject_a = LIBBALSA_MESSAGE_GET_SUBJECT(message_a);
-    const gchar *subject_b = LIBBALSA_MESSAGE_GET_SUBJECT(message_b);
-
-    return g_ascii_strcasecmp(subject_a, subject_b);
+    return g_ascii_strcasecmp(message_a->subject, message_b->subject);
 }
 
 static gint
-mbox_compare_date(LibBalsaMessage * message_a,
-		  LibBalsaMessage * message_b)
+mbox_compare_date(LibBalsaMailboxIndexEntry * message_a,
+		  LibBalsaMailboxIndexEntry * message_b)
 {
-    g_return_val_if_fail(message_a && message_b && message_a->headers
-			 && message_b->headers, 0);
-    return message_a->headers->date - message_b->headers->date;
+    return message_a->msg_date - message_b->msg_date;
 }
 
 static gint
-mbox_compare_size(LibBalsaMessage * message_a,
-		  LibBalsaMessage * message_b)
+mbox_compare_size(LibBalsaMailboxIndexEntry * message_a,
+		  LibBalsaMailboxIndexEntry * message_b)
 {
-    glong size_a, size_b;
-
     g_return_val_if_fail(message_a && message_b, 0);
 
-    size_a = LIBBALSA_MESSAGE_GET_LENGTH(message_a);
-    size_b = LIBBALSA_MESSAGE_GET_LENGTH(message_b);
-    return size_a - size_b;
+    return message_a->size - message_b->size;
 }
 
 static gint
@@ -2319,16 +2413,14 @@ mbox_compare_func(const SortTuple * a,
 		  const SortTuple * b,
 		  LibBalsaMailbox * mbox)
 {
-    LibBalsaMessage *message_a;
-    LibBalsaMessage *message_b;
+    LibBalsaMailboxIndexEntry *message_a;
+    LibBalsaMailboxIndexEntry *message_b;
     gint retval;
 
     message_a =
-	libbalsa_mailbox_get_message(mbox,
-				     GPOINTER_TO_UINT(a->node->data));
+	lbm_get_index_entry(mbox, GPOINTER_TO_UINT(a->node->data));
     message_b =
-	libbalsa_mailbox_get_message(mbox,
-				     GPOINTER_TO_UINT(b->node->data));
+	lbm_get_index_entry(mbox, GPOINTER_TO_UINT(b->node->data));
 
     switch (mbox->view->sort_field) {
     case LB_MAILBOX_SORT_NO:
@@ -2806,8 +2898,10 @@ libbalsa_mailbox_try_reassemble(LibBalsaMailbox * mailbox,
 	message = libbalsa_mailbox_get_message(mailbox, msgno);
 
 	if (!libbalsa_message_is_partial(message, &tmp_id)
-	    || LIBBALSA_MESSAGE_IS_FLAGGED(message))
+	    || LIBBALSA_MESSAGE_IS_FLAGGED(message)) {
+	    g_object_unref(message);
 	    continue;
+	}
 
 	if (strcmp(tmp_id, id) == 0) {
 	    GMimeMessagePartial *partial;
@@ -2820,8 +2914,8 @@ libbalsa_mailbox_try_reassemble(LibBalsaMailbox * mailbox,
 	    g_mime_object_unref(GMIME_OBJECT(mime_message));
 
 	    messages = g_list_prepend(messages, message);
-	}
-
+	} else g_object_unref(message);
+	
 	g_free(tmp_id);
     }
 
@@ -2841,6 +2935,7 @@ libbalsa_mailbox_try_reassemble(LibBalsaMailbox * mailbox,
     }
 
     g_ptr_array_free(partials, TRUE);
+    g_list_foreach(messages, (GFunc)g_object_unref, NULL);
     g_list_free(messages);
 }
 

@@ -1,3 +1,18 @@
+2004-05-03  Pawel Salek
+
+	* configure.in: use GTK_CHECK_VERSION instead of HAVE_GTK24.
+	* libbalsa/filter-funcs.c: use reentrant localtime_r().
+	* libbalsa/rfc3156.c: ditto.
+	* src/filter-edit-callbacks.c: ditto.
+	* libbalsa/libbalsa.[ch]: move libbalsa_date_to_gchar() and
+	libbalsa_get_icon_from_flags() here.
+	* libbalsa/mailbox.[hc]: implement LibBalsaMailboxEntry to reduce
+	memory usage.
+	* libbalsa/mailbox_{imap,local,maildir,mbox,mh,pop3}.c: use it.
+	* libbalsa/message.[ch]: add code to aid Message reference debugging.
+	* libbalsa/send.c: ref and unref correctly.
+	* src/{balsa-index,main-window,sendmsg-window}.c: ditto.
+
 2004-04-29  Pawel Salek
 
 	* configure.in: INTLTOOL needed for FC2.

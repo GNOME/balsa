@@ -166,6 +166,9 @@ struct _LibBalsaMailbox {
     gboolean readonly;
     gboolean disconnected;
 
+    GPtrArray *mindex;  /* the basic message index used for index
+                         * displaying/columns of GtkTreeModel interface
+                         * and NOTHING else. */
     GNode *msg_tree; /* the possibly filtered tree of messages */
     LibBalsaCondition *view_filter; /* to choose a subset of messages
                                      * to be displayed, e.g., only
@@ -393,6 +396,12 @@ guint libbalsa_mailbox_total_messages(LibBalsaMailbox * mailbox);
 /*
  * Mailbox views-related functions.
  */
+typedef struct LibBalsaMailboxIndexEntry_ LibBalsaMailboxIndexEntry;
+LibBalsaMailboxIndexEntry* libbalsa_mailbox_index_entry_new_from_msg
+                           (LibBalsaMessage *msg);
+void libbalsa_mailbox_index_entry_free(LibBalsaMailboxIndexEntry *entry);
+void libbalsa_mailbox_index_set_flags(LibBalsaMailbox *mailbox,
+				      unsigned msgno, LibBalsaMessageFlag f);
 void libbalsa_mailbox_set_view_filter(LibBalsaMailbox   *mailbox,
                                       LibBalsaCondition *filter_condition,
                                       gboolean update_immediately);

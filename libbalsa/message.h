@@ -237,7 +237,7 @@ struct _LibBalsaMessage {
 #define LIBBALSA_MESSAGE_GET_NO(m)  libbalsa_message_get_no(m)
 #endif
 
-    /* Indices into the arrays of rendered icons. */
+    /* Indices into the arrays of rendered icons. FIXME: remove! */
     LibBalsaMessageStatus status_icon;
     LibBalsaMessageAttach attach_icon;
     unsigned has_all_headers:1;
@@ -335,12 +335,6 @@ gboolean libbalsa_message_postpone(LibBalsaMessage * message,
 /*
  * misc message releated functions
  */
-gchar *libbalsa_message_headers_date_to_gchar(LibBalsaMessageHeaders * headers,
-					      const gchar * date_string);
-#define libbalsa_message_date_to_gchar(m,s) \
-        libbalsa_message_headers_date_to_gchar((m)->headers,s)
-gchar *libbalsa_message_size_to_gchar(LibBalsaMessage * message,
-                                      gboolean lines);
 gchar *libbalsa_message_title(LibBalsaMessage * message,
                               const gchar * format);
 gchar **libbalsa_create_hdr_pair(const gchar * name, gchar * value);
@@ -373,6 +367,8 @@ guint libbalsa_message_get_lines(LibBalsaMessage* msg);
 glong libbalsa_message_get_length(LibBalsaMessage* msg);
 #endif
 glong libbalsa_message_get_no(LibBalsaMessage* msg);
+#define libbalsa_message_date_to_gchar(m, f) libbalsa_date_to_gchar(&(m)->headers->date, (f))
+#define libbalsa_message_headers_date_to_gchar(h, f) libbalsa_date_to_gchar(&(h)->date, (f))
 
 GList *libbalsa_message_refs_for_threading(LibBalsaMessage* msg);
 

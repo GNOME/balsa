@@ -609,7 +609,7 @@ fill_condition_widgets(LibBalsaCondition* cnd)
     GtkTreeModel *model =
         gtk_tree_view_get_model(fe_type_regex_list);
     gchar str[20];
-    struct tm * date;
+    struct tm date;
     gint row,col;
     gboolean andmask;
     static gchar xformat[] = "%x"; /* to suppress error in strftime */
@@ -685,14 +685,14 @@ fill_condition_widgets(LibBalsaCondition* cnd)
     case CONDITION_DATE:
         if (cnd->match.date.date_low==0) str[0]='\0';
         else {
-            date=localtime(&cnd->match.date.date_low);
-            strftime(str, sizeof(str), xformat, date);
+            localtime_r(&cnd->match.date.date_low, &date);
+            strftime(str, sizeof(str), xformat, &date);
         }
         gtk_entry_set_text(GTK_ENTRY(fe_type_date_low_entry),str);
         if (cnd->match.date.date_high==0) str[0]='\0';
         else {
-            date=localtime(&cnd->match.date.date_high);
-            strftime(str,sizeof(str), xformat, date);
+            localtime_r(&cnd->match.date.date_high, &date);
+            strftime(str,sizeof(str), xformat, &date);
         }
         gtk_entry_set_text(GTK_ENTRY(fe_type_date_high_entry),str);
         fe_update_label(fe_type_date_label, &date_label);

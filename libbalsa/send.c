@@ -142,6 +142,8 @@ msg_queue_item_destroy(MessageQueueItem * mqi)
 	unlink(mqi->tempfile);
     if (mqi->stream)
 	g_mime_stream_unref(mqi->stream);
+    if (mqi->orig)
+	g_object_unref(mqi->orig);
     g_free(mqi);
 }
 
@@ -544,8 +546,10 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
 	msg = libbalsa_mailbox_get_message(outbox, msgno);
         if (LIBBALSA_MESSAGE_HAS_FLAG(msg,
                                       (LIBBALSA_MESSAGE_FLAG_FLAGGED |
-                                       LIBBALSA_MESSAGE_FLAG_DELETED)))
+                                       LIBBALSA_MESSAGE_FLAG_DELETED))) {
+	    g_object_unref(msg);
             continue;
+	}
 
         libbalsa_message_body_ref(msg, TRUE, TRUE); /* FIXME: do we need 
                                                      * all headers? */
@@ -718,6 +722,7 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
 	    new_message->sent = 0;
 	    new_message->acc = 0;
 	}
+	g_object_unref(msg);
     }
 
    /* At this point the session is ready to be sent.  As I've written the
@@ -1690,6 +1695,7 @@ libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage * message,
 				 MessageQueueItem *mqi)
 {
     mqi->orig = message;
+    g_object_ref(mqi->orig);
     mqi->stream = libbalsa_mailbox_get_message_stream(message->mailbox,
 						      message);
     if (mqi->stream == NULL)

@@ -1764,7 +1764,6 @@ balsa_window_destroy(GtkObject * object)
 
     balsa_window_idle_remove(window);
     if (window->current_message) {
-	g_print("balsa_window_destroy remove weak pointer\n");
 	g_object_remove_weak_pointer(G_OBJECT(window->current_message),
 				     (gpointer) &window->current_message);
 	window->current_message = NULL;
@@ -2669,6 +2668,7 @@ view_msg_source_cb(GtkWidget * widget, gpointer data)
 				     &balsa_app.source_escape_specials);
     }
 
+    g_list_foreach(messages, (GFunc)g_object_unref, NULL);
     g_list_free(messages);
 }
 
@@ -2724,6 +2724,7 @@ store_address_cb(GtkWidget * widget, gpointer data)
 
     messages = balsa_index_selected_list(BALSA_INDEX(index));
     balsa_store_address(messages);
+    g_list_foreach(messages, (GFunc)g_object_unref, NULL);
     g_list_free(messages);
 }
 
@@ -3377,6 +3378,7 @@ empty_trash(void)
 							msgno));
     libbalsa_messages_change_flag(msg_list, LIBBALSA_MESSAGE_FLAG_DELETED,
 				  TRUE);
+    g_list_foreach(msg_list, (GFunc)g_object_unref, NULL);
     g_list_free(msg_list);
     libbalsa_mailbox_close(balsa_app.trash);
     balsa_mblist_update_mailbox(balsa_app.mblist_tree_store,

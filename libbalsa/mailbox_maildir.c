@@ -40,9 +40,9 @@ struct message_info {
     char *key;
     const char *subdir;
     char *filename;
+    unsigned msgno; /* FIXME: get rid of this field, it is redundant */
     LibBalsaMessageFlag flags;
     LibBalsaMessageFlag orig_flags;
-    LibBalsaMessage *message;
 };
 
 static LibBalsaMailboxLocalClass *parent_class = NULL;
@@ -73,9 +73,6 @@ static void
 libbalsa_mailbox_maildir_fetch_message_structure(LibBalsaMailbox * mailbox,
 						 LibBalsaMessage * message,
 						 LibBalsaFetchFlag flags);
-static LibBalsaMessage
-    *libbalsa_mailbox_maildir_load_message(LibBalsaMailbox * mailbox,
-					   guint msgno);
 static int libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
 						LibBalsaMessage * message );
 static void libbalsa_mailbox_maildir_change_message_flags(LibBalsaMailbox * mailbox,
@@ -158,7 +155,7 @@ libbalsa_mailbox_maildir_class_init(LibBalsaMailboxMaildirClass * klass)
     libbalsa_mailbox_local_class->remove_files = 
 	libbalsa_mailbox_maildir_remove_files;
     libbalsa_mailbox_local_class->load_message =
-        libbalsa_mailbox_maildir_load_message;
+        libbalsa_mailbox_maildir_get_message;
 }
 
 static void
@@ -411,6 +408,8 @@ static void parse_mailbox(LibBalsaMailbox * mailbox, const gchar *subdir)
 	    msg_info = g_new0(struct message_info, 1);
 	    g_hash_table_insert(messages_info, key, msg_info);
 	    g_ptr_array_add(msgno_2_msg_info, msg_info);
+            /* dummy entry in mindex for now */
+            g_ptr_array_add(mailbox->mindex, NULL);
 	    msg_info->key=key;
 	    msg_info->filename=g_strdup(filename);
 	    msg_info->orig_flags = flags;
@@ -535,10 +534,6 @@ free_message_info(struct message_info *msg_info)
 	return;
     g_free(msg_info->key);
     g_free(msg_info->filename);
-    if (msg_info->message) {
-	msg_info->message->mailbox = NULL;
-	g_object_unref(msg_info->message);
-    }
     g_free(msg_info);
 }
 
@@ -662,8 +657,8 @@ static void
 maildir_renumber(gchar * key, struct message_info *msg_info,
 		      struct message_info *removed)
 {
-    if (msg_info->message->msgno > removed->message->msgno)
-	msg_info->message->msgno--;
+    if (msg_info->msgno > removed->msgno)
+	msg_info->msgno--;
 }
 
 static gboolean
@@ -693,7 +688,7 @@ lbm_maildir_sync_real(LibBalsaMailboxMaildir * mdir, gboolean expunge)
 			     (GHFunc) maildir_renumber, removed);
 	g_ptr_array_remove(mdir->msgno_2_msg_info, removed);
 	libbalsa_mailbox_msgno_removed(LIBBALSA_MAILBOX(mdir),
-				       removed->message->msgno);
+				       removed->msgno);
 	/* This will free removed: */
 	g_hash_table_remove(mdir->messages_info, removed->key);
     }
@@ -724,18 +719,6 @@ static struct message_info *message_info_from_msgno(
     return msg_info;
 }
 
-static LibBalsaMessage*
-libbalsa_mailbox_maildir_get_message(LibBalsaMailbox * mailbox, guint msgno)
-{
-    struct message_info *msg_info;
-
-    msg_info = message_info_from_msgno(mailbox, msgno);
-
-    if (!msg_info->message)
-	libbalsa_mailbox_local_load_message(mailbox, msgno);
-
-    return msg_info->message;
-}
 
 static void
 libbalsa_mailbox_maildir_fetch_message_structure(LibBalsaMailbox * mailbox,
@@ -757,8 +740,8 @@ libbalsa_mailbox_maildir_fetch_message_structure(LibBalsaMailbox * mailbox,
 }
 
 static LibBalsaMessage *
-libbalsa_mailbox_maildir_load_message(LibBalsaMailbox * mailbox,
-				      guint msgno)
+libbalsa_mailbox_maildir_get_message(LibBalsaMailbox * mailbox,
+                                     guint msgno)
 {
     struct message_info *msg_info;
     LibBalsaMessage *message;
@@ -770,7 +753,7 @@ libbalsa_mailbox_maildir_load_message(LibBalsaMailbox * mailbox,
     if (!msg_info)
 	return NULL;
 
-    msg_info->message = message = libbalsa_message_new();
+    message = libbalsa_message_new();
     path = libbalsa_mailbox_local_get_path(mailbox);
     filename = g_build_filename(path, msg_info->subdir,
 				msg_info->filename, NULL);
@@ -856,6 +839,7 @@ libbalsa_mailbox_maildir_change_message_flags(LibBalsaMailbox * mailbox, guint m
     msg_info->flags |= set;
     msg_info->flags &= ~clear;
 
+    libbalsa_mailbox_index_set_flags(mailbox, msgno, msg_info->flags);
     libbalsa_mailbox_local_queue_sync(LIBBALSA_MAILBOX_LOCAL(mailbox));
 }
 

@@ -333,6 +333,39 @@ libbalsa_assure_balsa_dir(void)
     g_free(dir);
 }
 
+gchar*
+libbalsa_date_to_gchar(const time_t *date, const gchar *date_string)
+{
+    struct tm footime;
+    gchar rettime[128];
+
+    g_return_val_if_fail(date != NULL, NULL);
+    g_return_val_if_fail(date_string != NULL, NULL);
+
+    localtime_r(date, &footime);
+
+    strftime(rettime, sizeof(rettime), date_string, &footime);
+
+    return g_strdup(rettime);
+}
+
+LibBalsaMessageStatus
+libbalsa_get_icon_from_flags(LibBalsaMessageFlag flags)
+{
+    LibBalsaMessageStatus icon;
+    if (flags & LIBBALSA_MESSAGE_FLAG_DELETED)
+	icon = LIBBALSA_MESSAGE_STATUS_DELETED;
+    else if (flags & LIBBALSA_MESSAGE_FLAG_NEW)
+	icon = LIBBALSA_MESSAGE_STATUS_UNREAD;
+    else if (flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)
+	icon = LIBBALSA_MESSAGE_STATUS_FLAGGED;
+    else if (flags & LIBBALSA_MESSAGE_FLAG_REPLIED)
+	icon = LIBBALSA_MESSAGE_STATUS_REPLIED;
+    else
+	icon = LIBBALSA_MESSAGE_STATUS_ICONS_NUM;
+    return icon;
+}
+
 
 #if defined(USE_SSL)
 #include <openssl/ssl.h>

@@ -286,6 +286,7 @@ static void
 cond_to_string(LibBalsaCondition * cond, GString *res)
 {
     char str[80];
+    struct tm date;
 
     if(cond->negate)
         g_string_append(res, "NOT ");
@@ -306,16 +307,16 @@ cond_to_string(LibBalsaCondition * cond, GString *res)
 	break;
     case CONDITION_DATE:
         g_string_append(res, "DATE ");
-	if (cond->match.date.date_low)
-	    strftime(str,sizeof(str),"%Y-%m-%d",
-                     localtime(&cond->match.date.date_low));
-	else str[0]='\0';
+	if (cond->match.date.date_low) {
+	    localtime_r(&cond->match.date.date_low, &date);
+	    strftime(str,sizeof(str),"%Y-%m-%d", &date);
+	} else str[0]='\0';
         append_quoted_string(res, str);
         g_string_append_c(res, ' ');
-	if (cond->match.date.date_high)
-	    strftime(str,sizeof(str),"%Y-%m-%d",
-                     localtime(&cond->match.date.date_high));
-	else str[0]='\0';
+	if (cond->match.date.date_high) {
+	    localtime_r(&cond->match.date.date_high, &date);
+	    strftime(str,sizeof(str),"%Y-%m-%d", &date);
+	} else str[0]='\0';
         append_quoted_string(res, str);
 	break;
     case CONDITION_FLAG:

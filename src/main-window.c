@@ -402,6 +402,21 @@ create_toolbar (GnomeMDI * mdi, GtkWidget * app)
 			     NULL);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
+
+
+  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+
+
+  toolbarbutton =
+    gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+			     _ ("Print"),
+			     _ ("Print current message"),
+			     NULL,
+	     gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_PRINT),
+			     (GtkSignalFunc) NULL,
+			     NULL);
+  GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
+
   gtk_toolbar_set_style (GTK_TOOLBAR (toolbar), balsa_app.toolbar_style);
 
   return GTK_TOOLBAR (toolbar);

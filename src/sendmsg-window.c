@@ -98,14 +98,6 @@ create_toolbar (GtkWidget * window, BalsaSendmsg * bsmw)
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
   toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-			 _ ("Addresses"), _ ("Open the address book"), NULL,
-	   gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_BOOK_BLUE),
-					   NULL,
-					   bsmw);
-
-  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
-
-  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
 					   _ ("Print"), _ ("Print"), NULL,
 	       gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_PRINT),
 					   NULL,
@@ -214,6 +206,8 @@ create_menu (GtkWidget * window, BalsaSendmsg * bmsg)
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_CLOSE, _ ("Cancel"));
   gtk_widget_show (w);
+  gtk_widget_add_accelerator (w, "activate", accel,
+			      'A', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
   gtk_menu_append (GTK_MENU (menu), w);
   gtk_signal_connect_object (GTK_OBJECT (w), "activate",
 			     GTK_SIGNAL_FUNC (close_window),
@@ -335,8 +329,9 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
 {
   GtkWidget *table;
   GtkWidget *label;
+  GtkWidget *button;
 
-  table = gtk_table_new (6, 2, FALSE);
+  table = gtk_table_new (6, 3, FALSE);
   gtk_table_set_row_spacings (GTK_TABLE (table), 2);
   gtk_table_set_col_spacings (GTK_TABLE (table), 2);
 
@@ -349,6 +344,14 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   msg->to = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), msg->to, 1, 2, 0, 1,
 		    GTK_FILL | GTK_EXPAND, GTK_FILL, 0, 0);
+
+  button = gtk_button_new ();
+  gtk_button_set_relief (GTK_BUTTON (button), GTK_RELIEF_NONE);
+  gtk_container_add (GTK_CONTAINER (button),
+	      gnome_stock_pixmap_widget (NULL, GNOME_STOCK_MENU_BOOK_BLUE));
+  gtk_table_attach (GTK_TABLE (table), button, 2, 3, 0, 1,
+		    0, 0, 0, 0);
+
 
   /* From: */
   label = gtk_label_new ("From:");
@@ -382,6 +385,13 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   gtk_table_attach (GTK_TABLE (table), msg->cc, 1, 2, 3, 4,
 		    GTK_FILL | GTK_EXPAND, GTK_FILL, 0, 0);
 
+  button = gtk_button_new ();
+  gtk_button_set_relief (GTK_BUTTON (button), GTK_RELIEF_NONE);
+  gtk_container_add (GTK_CONTAINER (button),
+	      gnome_stock_pixmap_widget (NULL, GNOME_STOCK_MENU_BOOK_BLUE));
+  gtk_table_attach (GTK_TABLE (table), button, 2, 3, 3, 4,
+		    0, 0, 0, 0);
+
   /* bcc: */
   label = gtk_label_new ("bcc:");
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
@@ -392,6 +402,13 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   gtk_table_attach (GTK_TABLE (table), msg->bcc, 1, 2, 4, 5,
 		    GTK_FILL | GTK_EXPAND, GTK_FILL, 0, 0);
 
+  button = gtk_button_new ();
+  gtk_button_set_relief (GTK_BUTTON (button), GTK_RELIEF_NONE);
+  gtk_container_add (GTK_CONTAINER (button),
+	      gnome_stock_pixmap_widget (NULL, GNOME_STOCK_MENU_BOOK_BLUE));
+  gtk_table_attach (GTK_TABLE (table), button, 2, 3, 4, 5,
+		    0, 0, 0, 0);
+
   /* Attachment list */
   label = gtk_label_new ("Attachments:");
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
@@ -399,7 +416,7 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
 		    GTK_FILL, GTK_FILL, 0, 0);
 
   msg->attachments = gnome_icon_list_new ();
-  gtk_table_attach (GTK_TABLE (table), msg->attachments, 1, 2, 5, 6,
+  gtk_table_attach (GTK_TABLE (table), msg->attachments, 1, 3, 5, 6,
 		    GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_EXPAND, 0, 0);
   gnome_icon_list_set_policy (GNOME_ICON_LIST (msg->attachments),
 			      GTK_POLICY_AUTOMATIC,

@@ -6,6 +6,7 @@
 	* libbalsa/filter-{funcs.[hc],private.h}: cleanup API.
 	* libbalsa/filter.[hc]: ditto.
 	* src/filter-{run,edit}-callbacks.c: use cleaner API.
+	* src/balsa-message.c: display more message/* type message parts.
 
 2003-02-23  Pawel Salek  <pawsa@theochem.kth.se>
 

@@ -1063,7 +1063,7 @@ part_info_init_message(BalsaMessage * bm, BalsaPartInfo * info)
 	g_free(access_type);
     } else {
 	g_print("TODO: part_info_init_message\n");
-	part_info_init_unknown(bm, info);
+	part_info_init_mimetext(bm, info);
     }
     g_free(body_type);
 }

@@ -1,3 +1,11 @@
+2003-12-20 08:04  PeterB
+
+	* libbalsa/mailbox_mbox.c: Reuse LibBalsaMessageBody when reparsing
+	during sync.
+	* libbalsa/body.c: Use existing LibBalsaMessageBody, if any, when
+	setting mime-body; do libbalsa_message_body_set_mime_body() in
+	steps.
+
 2003-12-16 19:47  PeterB
 
 	* src/balsa-index.c: Use LibBalsaMailbox's "changed" signal; remove

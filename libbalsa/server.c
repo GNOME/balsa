@@ -418,6 +418,10 @@ libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...)
     va_end(alist);
 }
 
+/* Connect the server's "get-password" signal to the callback; if the
+ * ask-password callback is connected more than once, the dialog is
+ * popped up the corresponding number of times, so we'll ignore the
+ * request if a callback is already connected. */
 void
 libbalsa_server_connect_signals(LibBalsaServer * server, GCallback cb,
                                 gpointer cb_data)

@@ -227,6 +227,7 @@ mblist_redraw ()
 #endif
 
   gtk_clist_freeze (GTK_CLIST (mblw->ctree));
+
 #ifndef GTK_HAVE_FEATURES_1_1_2
   mblw->parent = gtk_ctree_insert (mblw->ctree, NULL, NULL, text, 0, NULL,
 				   NULL, NULL, NULL, FALSE, TRUE);
@@ -335,6 +336,14 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 	      /* normal mailbox */
 	      if (mailbox_have_new_messages (MAILBOX_LOCAL (mbnode->mailbox)->path))
 		{
+		  GdkFont *font;
+		  GtkStyle *style;
+		  style = gtk_style_new ();
+		  font = gdk_font_load ("-adobe-courier-medium-r-*-*-*-120-*-*-*-*-iso8859-1");
+		  style->font = font;
+
+		  gtk_widget_set_style (GTK_CELL_WIDGET((GTK_CTREE_ROW(cnode)->row).cell)->widget, style);
+
 		  gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
 					   NULL, NULL,
 					   tray_full, tray_full_mask,

@@ -28,6 +28,8 @@ balsa_BASE_SRCLIST =	\
 	filter-run-callbacks.c	\
 	filter-run-dialog.c	\
 	filter-run.h		\
+	find-search.c		\
+	find-search.h		\
 	folder-conf.c		\
 	folder-conf.h		\
 	information-dialog.c	\

@@ -12,7 +12,14 @@
 	* libbalsa/mailbox_imap.c(mailbox_check): allow_reopen. disable
 	checking closing mailboxes before buffy code gets fixed.
 	* libbalsa/notify.c: disable registering imap mailboxes.
-	* 
+	* libmutt/Makefile.am: use DEFS for defining compilation constants.
+	* libmutt/flags.c: sync with mutt 1.2.5.
+	* libmutt/mutt.h: add M_NEW_SSL_SOCKET constant as in mutt-1.2.5.
+	* libmutt/imap/Makefile.am: use DEFS instaed of CPPFLAGS.
+	* libmutt/imap/imap_ssl.c: first approach. It requires more work
+	because the code includes user interface.
+	* src/main-window.c: check commit_changes return value.
+
 2000-09-02  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* README: added a comment on GSS
@@ -26,13 +33,6 @@
 	* libmutt/imap/auth_gss.c: compile it.
 	* libmutt/imap/message.c: include <string.h>
 	* src/save-restore.c: major code cleanup.
-	* libmutt/Makefile.am: use DEFS for defining compilation constants.
-	* libmutt/flags.c: sync with mutt 1.2.5.
-	* libmutt/mutt.h: add M_NEW_SSL_SOCKET constant as in mutt-1.2.5.
-	* libmutt/imap/Makefile.am: use DEFS instaed of CPPFLAGS.
-	* libmutt/imap/imap_ssl.c: first approach. It require more work
-	because it includes user interface.
-	* src/main-window.c: check commit_changes return value.
 	
 2000-09-01  Pawel Salek  <pawsa@theochem.kth.se>
 

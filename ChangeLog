@@ -1,5 +1,7 @@
-2004-03-06 10:11  PeterB
+2004-03-06 10:32  PeterB
 
+	* libbalsa/: libbalsa_private.h, mailbox_imap.c: define and use
+	HAVE_MAILBOX_LOCKED(mailbox) to check locking.
 	* libbalsa/body.c, libbalsa/mailbox-filter.c,
 	libbalsa/mailbox_imap.c, libbalsa/imap/imap-commands.c,
 	src/balsa-index.c, src/balsa-message.c: plug memory leaks.

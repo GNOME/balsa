@@ -1,3 +1,8 @@
+2004-05-09  Albrecht Dreß
+
+	* src/balsa-message.[hc]: The patch as in
+	http://mail.gnome.org/archives/balsa-list/2004-July/msg00002.html
+
 2004-06-27  Carlos Morgado  <chbm gnome.org>
 
 	* libbalsa/imap/imap-handle.c (imap_mbox_connect): 

@@ -63,6 +63,7 @@ struct _BalsaMessage {
 	gboolean wrap_text;
 
 	BalsaPartInfo *current_part;
+        GtkWidget *parts_popup;
 
 	LibBalsaMessage *message;
 

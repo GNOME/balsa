@@ -60,6 +60,7 @@ enum {
 
 enum {
     PART_INFO_COLUMN = 0,
+    PART_NUM_COLUMN,
     MIME_ICON_COLUMN,
     MIME_TYPE_COLUMN,
     NUM_COLUMNS
@@ -199,6 +200,8 @@ static void fill_part_menu_by_content_type(BalsaPartInfo *info,
                                            GtkMenu * menu, 
 					   const gchar * content_type);
 
+static gboolean img_check_size(GtkImage *widget);
+
 static GtkNotebookClass *parent_class = NULL;
 
 /* stuff needed for sending Message Disposition Notifications */
@@ -329,6 +332,9 @@ balsa_message_class_init(BalsaMessageClass * klass)
 #define BALSA_MESSAGE_TEXT_VIEW "balsa-message-text-view"
 #define bm_header_widget_get_text_view(header_widget) \
     g_object_get_data(G_OBJECT(header_widget), BALSA_MESSAGE_TEXT_VIEW)
+#define BALSA_MESSAGE_ATTACHMENTS "balsa-message-attachments"
+#define bm_header_widget_att_button(header_widget) \
+    g_object_get_data(G_OBJECT(header_widget), BALSA_MESSAGE_ATTACHMENTS)
 
 /* Callback for the "realized" signal; set header frame and text base
  * color when first realized. */
@@ -340,6 +346,14 @@ bm_header_widget_realized(GtkWidget * widget, BalsaMessage * bm)
     gtk_widget_modify_base(bm_header_widget_get_text_view(widget),
 			   GTK_STATE_NORMAL,
 			   &GTK_WIDGET(bm)->style->mid[GTK_STATE_NORMAL]);
+    if (bm_header_widget_att_button(widget)) {
+	/* use a fresh style here to deal with pixmap themes correctly */
+	GtkStyle * new_style = gtk_style_new();
+	new_style->bg[GTK_STATE_NORMAL] =
+	    GTK_WIDGET(bm)->style->mid[GTK_STATE_NORMAL];
+	gtk_widget_set_style(GTK_WIDGET(bm_header_widget_att_button(widget)),
+			     new_style);
+    }
 }
 
 /* Callback for the "style-set" signal; reset colors when theme is
@@ -359,21 +373,33 @@ bm_header_widget_set_style(GtkWidget * widget,
 static void bm_modify_font_from_string(GtkWidget * widget,
 				       const char *font);
 
+
+static void
+balsa_headers_attachments_popup(GtkButton * button, BalsaMessage * bm)
+{
+    if (bm->parts_popup)
+	gtk_menu_popup(GTK_MENU(bm->parts_popup), NULL, NULL, NULL, NULL, 0,
+		       gtk_get_current_event_time());
+}
+
+
 static GtkWidget *
-bm_header_widget_new(BalsaMessage * bm)
+bm_header_widget_new(BalsaMessage * bm, gboolean add_attachments_btn)
 {
     GtkWidget *widget;
     GtkWidget *text_view;
+    GtkWidget *hbox;
 
-    widget = gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),
-				   GTK_POLICY_NEVER, GTK_POLICY_NEVER);
-    gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(widget),
-					GTK_SHADOW_IN);
+    widget = gtk_frame_new(NULL);
+    gtk_frame_set_shadow_type(GTK_FRAME(widget),
+			      GTK_SHADOW_IN);
     g_signal_connect_after(widget, "realize",
 			   G_CALLBACK(bm_header_widget_realized), bm);
     g_signal_connect_after(widget, "style-set",
 			   G_CALLBACK(bm_header_widget_set_style), bm);
+
+    hbox = gtk_hbox_new(FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(widget), hbox);
 
     text_view = gtk_text_view_new();
     bm_modify_font_from_string(text_view, balsa_app.message_font);
@@ -384,11 +410,35 @@ bm_header_widget_new(BalsaMessage * bm)
 
     g_signal_connect(text_view, "key_press_event",
 		     G_CALLBACK(balsa_message_key_press_event), bm);
-    gtk_container_add(GTK_CONTAINER(widget), text_view);
+    gtk_box_pack_start(GTK_BOX(hbox), text_view, TRUE, TRUE, 0);
+
+    if (add_attachments_btn) {
+	GtkWidget *ebox;
+	GtkWidget *vbox;
+	GtkWidget *button;
+
+	/* the event box is needed to set the background correctly */
+	ebox = gtk_event_box_new();
+	gtk_box_pack_start(GTK_BOX(hbox), ebox, FALSE, FALSE, 0);
+
+	vbox = gtk_vbox_new(FALSE, 0);
+	gtk_container_set_border_width(GTK_CONTAINER(vbox), 6);
+	gtk_container_add(GTK_CONTAINER(ebox), vbox);
+
+	button = gtk_button_new();
+	gtk_button_set_relief(GTK_BUTTON(button), GTK_RELIEF_NONE);
+	gtk_container_add(GTK_CONTAINER(button), 
+			  gtk_image_new_from_stock("gnome-stock-attach", 
+						   GTK_ICON_SIZE_LARGE_TOOLBAR));
+	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
+	g_signal_connect(button, "pressed", 
+			 G_CALLBACK(balsa_headers_attachments_popup), bm);
+	g_object_set_data(G_OBJECT(widget), BALSA_MESSAGE_ATTACHMENTS,
+			  ebox);
+    }
 
     g_object_set_data(G_OBJECT(widget), BALSA_MESSAGE_TEXT_VIEW,
 		      text_view);
-    gtk_widget_show_all(widget);
 
     return widget;
 }
@@ -460,6 +510,29 @@ bm_on_set_style(GtkWidget * widget,
 }
 
 static void
+check_images_resize(GtkWidget * widget, gpointer user_data)
+{
+    if (GTK_IS_CONTAINER(widget))
+	gtk_container_foreach (GTK_CONTAINER(widget), check_images_resize,
+			       NULL);
+    else if (GTK_IS_IMAGE(widget) &&
+	     g_object_get_data(G_OBJECT(widget), "orig-width") &&
+	     g_object_get_data(G_OBJECT(widget), "part-info") &&
+	     !g_object_get_data(G_OBJECT(widget), "check_size_sched")) {
+	g_object_set_data(G_OBJECT(widget), "check_size_sched",
+			  (gpointer)TRUE);
+	g_idle_add((GSourceFunc)img_check_size, widget);
+    }
+}
+
+static void
+on_content_size_alloc(GtkWidget * widget, GtkAllocation * allocation,
+		      gpointer user_data)
+{
+    gtk_container_foreach (GTK_CONTAINER(widget), check_images_resize, NULL);
+}
+
+static void
 balsa_message_init(BalsaMessage * bm)
 {
     GtkWidget *scroll;
@@ -486,9 +559,11 @@ balsa_message_init(BalsaMessage * bm)
     gtk_container_add(GTK_CONTAINER(scroll), bm->cont_viewport);
     g_signal_connect_after(bm, "style-set",
 			   G_CALLBACK(bm_on_set_style), bm);
+    g_signal_connect(bm->cont_viewport, "size-allocate",
+		     G_CALLBACK(on_content_size_alloc), NULL);
 
     /* Widget to hold headers */
-    bm->header_container = bm_header_widget_new(bm);
+    bm->header_container = bm_header_widget_new(bm, TRUE);
 
     /* Widget to hold message */
     message_widget = bm_message_widget_new(bm->header_container, FALSE);
@@ -498,6 +573,7 @@ balsa_message_init(BalsaMessage * bm)
     /* structure view */
     model = gtk_tree_store_new (NUM_COLUMNS,
                                 TYPE_BALSA_PART_INFO,
+				G_TYPE_STRING,
                                 GDK_TYPE_PIXBUF,
                                 G_TYPE_STRING);
     bm->treeview = gtk_tree_view_new_with_model (GTK_TREE_MODEL(model));
@@ -513,6 +589,15 @@ balsa_message_init(BalsaMessage * bm)
     gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (bm->treeview), TRUE);
     gtk_tree_selection_set_mode (selection, GTK_SELECTION_MULTIPLE);
     gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (bm->treeview), FALSE);
+    
+    /* column for the part number */
+    renderer = gtk_cell_renderer_text_new ();
+    g_object_set (G_OBJECT (renderer), "xalign", 0.0, NULL);
+    gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (bm->treeview),
+                                                 -1, NULL,
+                                                 renderer, "text",
+                                                 PART_NUM_COLUMN,
+                                                 NULL);
 
     /* column for type icon */
     renderer = gtk_cell_renderer_pixbuf_new ();
@@ -522,7 +607,7 @@ balsa_message_init(BalsaMessage * bm)
                                                  renderer, "pixbuf",
                                                  MIME_ICON_COLUMN,
                                                  NULL);
-    
+
     /* column for mime type */
     renderer = gtk_cell_renderer_text_new ();
     g_object_set (G_OBJECT (renderer), "xalign", 0.0, NULL);
@@ -537,6 +622,11 @@ balsa_message_init(BalsaMessage * bm)
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
                                    GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_AUTOMATIC);
+
+    gtk_tree_view_set_expander_column
+	(GTK_TREE_VIEW (bm->treeview), gtk_tree_view_get_column 
+	 (GTK_TREE_VIEW (bm->treeview), MIME_ICON_COLUMN - 1));
+    
     label = gtk_label_new(_("Message parts"));
     gtk_widget_show(label);
     gtk_notebook_append_page(GTK_NOTEBOOK(bm), scroll, label);
@@ -569,6 +659,9 @@ balsa_message_destroy(GtkObject * object)
     g_list_free(bm->save_all_list);
     if (bm->save_all_popup)
         gtk_widget_destroy(bm->save_all_popup);
+
+    if (bm->parts_popup)
+	gtk_widget_destroy(bm->parts_popup);
 
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
         (*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
@@ -1112,6 +1205,11 @@ balsa_message_set_displayed_headers(BalsaMessage * bmessage,
         gtk_tree_model_foreach
             (gtk_tree_view_get_model(GTK_TREE_VIEW(bmessage->treeview)),
              balsa_message_set_embedded_hdr, bmessage);
+ 	if (bmessage->info_count > 1 && 
+ 	    bm_header_widget_att_button(bmessage->header_container))
+ 	    gtk_widget_show_all
+		(GTK_WIDGET(bm_header_widget_att_button
+			    (bmessage->header_container)));
     }
 }
 
@@ -1233,7 +1331,9 @@ display_headers_real(BalsaMessage * bm, LibBalsaMessageHeaders * headers,
         return;
     } else {
         gtk_widget_show_all(GTK_WIDGET(bm->header_container));
-        }
+ 	if (bm_header_widget_att_button(widget))
+ 	    gtk_widget_hide(GTK_WIDGET(bm_header_widget_att_button(widget)));
+    }
 
     add_header_gchar(bm, view, "subject", _("Subject:"), subject);
 
@@ -1352,15 +1452,76 @@ balsa_image_button_press_cb(GtkWidget * widget, GdkEventButton * event,
 	return FALSE;
 }
 
+static gboolean
+img_check_size(GtkImage *widget)
+{
+    GtkWidget * viewport =
+	gtk_widget_get_ancestor(GTK_WIDGET(widget), GTK_TYPE_VIEWPORT);
+    gint orig_width = (gint)g_object_get_data(G_OBJECT(widget), "orig-width");
+    BalsaPartInfo * info =
+	(BalsaPartInfo *)g_object_get_data(G_OBJECT(widget), "part-info");
+    gint curr_w, dst_w;
+
+    g_object_set_data(G_OBJECT(widget), "check_size_sched", (gpointer)FALSE);
+    g_return_val_if_fail(viewport && info && orig_width > 0, FALSE);
+
+    if (gtk_image_get_storage_type(widget) == GTK_IMAGE_PIXBUF)
+	curr_w = gdk_pixbuf_get_width(gtk_image_get_pixbuf(widget));
+    else
+	curr_w = 0;
+    dst_w = viewport->allocation.width - 
+	(gtk_bin_get_child(GTK_BIN(viewport))->allocation.width - 
+	 GTK_WIDGET(widget)->parent->allocation.width) - 4;
+    if (dst_w < 32)
+	dst_w = 32;
+    if (dst_w > orig_width)
+	dst_w = orig_width;
+    if (dst_w != curr_w) {
+	GdkPixbuf *pixbuf, *scaled_pixbuf;
+	gint dst_h;
+
+	libbalsa_message_body_save_temporary(info->body);
+	if (!(pixbuf = gdk_pixbuf_new_from_file (info->body->temp_filename, NULL)))
+	    return FALSE;
+	dst_h = (gfloat)dst_w /
+	    (gfloat)orig_width * gdk_pixbuf_get_height(pixbuf);
+	scaled_pixbuf = gdk_pixbuf_scale_simple(pixbuf, dst_w, dst_h,
+						GDK_INTERP_BILINEAR);
+	g_object_unref(pixbuf);
+	gtk_image_set_from_pixbuf(widget, scaled_pixbuf);
+	g_object_unref(scaled_pixbuf);
+	
+    }
+
+    return FALSE;
+}
+
 static void
 part_info_init_image(BalsaMessage * bm, BalsaPartInfo * info)
 {
+    GdkPixbuf *pixbuf;
     GtkWidget *image;
     GtkWidget *evbox;
+    GError * load_err = NULL;
 
     libbalsa_message_body_save_temporary(info->body);
+    pixbuf = gdk_pixbuf_new_from_file (info->body->temp_filename, &load_err);
+    if (!pixbuf) {
+	if (load_err) {
+            balsa_information(LIBBALSA_INFORMATION_ERROR,
+			      _("Error loading attached image: %s\n"),
+			      load_err->message);
+	    g_error_free(load_err);
+	}
+	part_info_init_unknown(bm, info);
+	return;
+    }
     evbox = gtk_event_box_new();
-    image = gtk_image_new_from_file(info->body->temp_filename);
+    image = gtk_image_new_from_stock(GTK_STOCK_MISSING_IMAGE, GTK_ICON_SIZE_BUTTON);
+    g_object_set_data(G_OBJECT(image), "orig-width",
+		      (gpointer)gdk_pixbuf_get_width(pixbuf));
+    g_object_set_data(G_OBJECT(image), "part-info", info);
+    g_object_unref(pixbuf);
     gtk_widget_show(image);
     gtk_container_add(GTK_CONTAINER(evbox), image);
     info->widget = evbox;
@@ -1601,7 +1762,7 @@ part_info_init_message(BalsaMessage * bm, BalsaPartInfo * info)
         }
         g_free(access_type);
     } else if (!g_ascii_strcasecmp("message/rfc822", body_type)) {
-        GtkWidget *emb_hdrs = bm_header_widget_new(bm);
+        GtkWidget *emb_hdrs = bm_header_widget_new(bm, FALSE);
         
         display_embedded_headers(bm, info->body, emb_hdrs);
         
@@ -2008,18 +2169,27 @@ handle_url(const message_url_t* url)
 static gint resize_idle_id;
 
 static void
+gtk_widget_destroy_insensitive(GtkWidget * widget)
+{
+    if (!GTK_WIDGET_SENSITIVE(widget) ||
+	GTK_IS_SEPARATOR_MENU_ITEM(widget))
+	gtk_widget_destroy(widget);
+}
+
+static void
 text_view_populate_popup(GtkTextView *textview, GtkMenu *menu,
                          BalsaPartInfo * info)
 {
     gtk_widget_hide_all(GTK_WIDGET(menu));
 
     gtk_container_foreach(GTK_CONTAINER(menu),
-                          (GtkCallback)gtk_widget_destroy, NULL);
+                          (GtkCallback)gtk_widget_destroy_insensitive, NULL);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu),
+			  gtk_separator_menu_item_new ());
     fill_part_menu_by_content_type(info, GTK_MENU(menu), "text/plain");
 
     gtk_widget_show_all(GTK_WIDGET(menu));
 }
-
 
 static void
 part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
@@ -2418,8 +2588,33 @@ mpart_content_name(const gchar *content_type)
 }
 
 static void
+atattchments_menu_cb(GtkWidget * widget, BalsaPartInfo *info)
+{
+    BalsaMessage * bm = g_object_get_data(G_OBJECT(widget), "balsa-message");
+
+    g_return_if_fail(bm);
+    g_return_if_fail(info);
+    
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(bm), 0);
+    select_part(bm, info);
+}
+
+static void
+add_to_attachments_popup(GtkMenuShell * menu, const gchar * item,
+			 BalsaMessage * bm, BalsaPartInfo *info)
+{
+    GtkWidget * menuitem = gtk_menu_item_new_with_label (item);
+    
+    g_object_set_data(G_OBJECT(menuitem), "balsa-message", bm);
+    g_signal_connect(G_OBJECT (menuitem), "activate",
+		     GTK_SIGNAL_FUNC (atattchments_menu_cb),
+		     (gpointer) info);
+    gtk_menu_shell_append(menu, menuitem);
+}
+
+static void
 display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
-             GtkTreeModel * model, GtkTreeIter * iter)
+             GtkTreeModel * model, GtkTreeIter * iter, gchar * part_id)
 {
     BalsaPartInfo *info = NULL;
     gchar *pix = NULL;
@@ -2429,7 +2624,7 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
     GdkPixbuf *content_icon;
 
     pix = libbalsa_icon_finder(content_type, body->filename, NULL);
-        
+    
     if(!is_multipart ||
        g_ascii_strcasecmp(content_type, "message/rfc822")==0 ||
        g_ascii_strcasecmp(content_type, "multipart/signed")==0 ||
@@ -2447,17 +2642,43 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
                 g_strdup_printf(_("rfc822 message (from %s, subject \"%s\")"),
                                 from, body->embhdrs->subject);
             g_free(from);
-        } else if (is_multipart)
+        } else if (is_multipart) {
             icon_title = mpart_content_name(content_type);
-        else if (body->filename) {
+	    if (!strcmp(part_id, "1")) {
+		add_to_attachments_popup(GTK_MENU_SHELL(bm->parts_popup), 
+					 _("complete message"),
+					 bm, info);
+		gtk_menu_shell_append(GTK_MENU_SHELL(bm->parts_popup), 
+				      gtk_separator_menu_item_new ());
+	    }
+        } else if (body->filename) {
             gchar * filename = g_strdup(body->filename);
+	    gchar * menu_label;
+
             libbalsa_utf8_sanitize(&filename, balsa_app.convert_unknown_8bit, 
                                    NULL);
             icon_title =
                 g_strdup_printf("%s (%s)", filename, content_type);
+	    
+	    /* this should neither be a message nor multipart, so add it to the
+	       attachments popup */
+	    menu_label =
+		g_strdup_printf(_("part %s: %s (file %s)"), part_id,
+				content_type, filename);
+	    add_to_attachments_popup(GTK_MENU_SHELL(bm->parts_popup),
+				     menu_label, bm, info);
+	    g_free(menu_label);
             g_free(filename);
-        } else
-            icon_title = g_strdup_printf("(%s)", content_type);
+        } else {
+	    gchar * menu_label;
+
+            icon_title = g_strdup_printf("%s", content_type);
+	    menu_label =
+		g_strdup_printf(_("part %s: %s"), part_id, content_type);
+	    add_to_attachments_popup(GTK_MENU_SHELL(bm->parts_popup),
+				     menu_label, bm, info);
+	    g_free(menu_label);
+	}
         
         part_create_menu (info);
         info->path = gtk_tree_model_get_path(model, iter);
@@ -2474,6 +2695,7 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
                                                 GDK_INTERP_BILINEAR, NULL);
         gtk_tree_store_set (GTK_TREE_STORE(model), iter, 
                             PART_INFO_COLUMN, info,
+			    PART_NUM_COLUMN, part_id,
                             MIME_ICON_COLUMN, content_icon,
                             MIME_TYPE_COLUMN, icon_title, -1);
         
@@ -2485,6 +2707,7 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
                                             GDK_INTERP_BILINEAR, NULL);
         gtk_tree_store_set (GTK_TREE_STORE(model), iter, 
                             PART_INFO_COLUMN, NULL,
+			    PART_NUM_COLUMN, part_id,
                             MIME_ICON_COLUMN, content_icon,
                             MIME_TYPE_COLUMN, content_type, -1);
     }
@@ -2496,17 +2719,26 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
 
 static void
 display_parts(BalsaMessage * bm, LibBalsaMessageBody * body,
-              GtkTreeIter * parent)
+              GtkTreeIter * parent, gchar * prefix)
 {
     GtkTreeModel *model =
         gtk_tree_view_get_model(GTK_TREE_VIEW(bm->treeview));
     GtkTreeIter iter;
+    gint part_in_level = 1;
 
     while (body) {
+	gchar * part_id;
+
+	if (prefix)
+	    part_id = g_strdup_printf("%s.%d", prefix, part_in_level);
+	else
+	    part_id = g_strdup_printf("%d", part_in_level);
         gtk_tree_store_append(GTK_TREE_STORE(model), &iter, parent);
-        display_part(bm, body, model, &iter);
-        display_parts(bm, body->parts, &iter);
+        display_part(bm, body, model, &iter, part_id);
+        display_parts(bm, body->parts, &iter, part_id);
         body = body->next;
+	part_in_level++;
+	g_free(part_id);
     }
 }
 
@@ -2514,7 +2746,13 @@ static void
 display_content(BalsaMessage * bm)
 {
     balsa_message_clear_tree(bm);
-    display_parts(bm, bm->message->body_list, NULL);
+    bm->parts_popup = gtk_menu_new();
+    display_parts(bm, bm->message->body_list, NULL, NULL);
+    if (bm->info_count > 1) {
+ 	gtk_widget_show_all(bm->parts_popup);
+ 	gtk_widget_show_all
+	    (GTK_WIDGET(bm_header_widget_att_button(bm->header_container)));
+    }
     gtk_tree_view_columns_autosize(GTK_TREE_VIEW(bm->treeview));
     gtk_tree_view_expand_all(GTK_TREE_VIEW(bm->treeview));
 }
@@ -2601,6 +2839,7 @@ fill_part_menu_by_content_type(BalsaPartInfo *info, GtkMenu * menu,
 
         if (key && g_ascii_strcasecmp (key, "icon-filename") 
             && g_ascii_strncasecmp (key, "fm-", 3)
+	    && g_ascii_strncasecmp (key, "category", 8)
             /* Get rid of additional GnomeVFS entries: */
             && (!strstr(key, "_") || strstr(key, "."))
             && g_ascii_strncasecmp(key, "description", 11)) {
@@ -3636,6 +3875,7 @@ static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
     message = libbalsa_message_new();
     dummy = libbalsa_address_to_gchar(balsa_app.current_ident->address, 0);
     message->headers->from = libbalsa_address_new_from_string(dummy);
+    g_message("%s: from: %s", __FUNCTION__, dummy);
     g_free (dummy);
     LIBBALSA_MESSAGE_SET_SUBJECT(message,
                                  g_strdup("Message Disposition Notification"));

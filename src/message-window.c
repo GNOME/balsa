@@ -64,8 +64,6 @@ static void size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
 static void copy_cb(GtkWidget * widget, MessageWindow * mw);
 static void select_all_cb(GtkWidget * widget, gpointer);
 
-static void select_part_cb(BalsaMessage * bm, gpointer data);
-
 static void next_unread_cb(GtkWidget * widget, gpointer);
 static void next_flagged_cb(GtkWidget * widget, gpointer);
 static void print_cb(GtkWidget * widget, gpointer);
@@ -386,9 +384,6 @@ message_window_new(LibBalsaMessage * message)
 	gtk_widget_set_sensitive(move_menu, FALSE);
     mw->bmessage = balsa_message_new();
     
-    g_signal_connect(G_OBJECT(mw->bmessage), "select-part",
-		     G_CALLBACK(select_part_cb), mw);
-
     gnome_app_set_contents(GNOME_APP(mw->window), mw->bmessage);
 
     if (balsa_app.shown_headers >= HEADERS_NONE &&
@@ -600,14 +595,6 @@ size_alloc_cb(GtkWidget * window, GtkAllocation * alloc)
 }
 
 static void
-select_part_cb(BalsaMessage * bm, gpointer data)
-{
-    gtk_widget_set_sensitive(edit_menu[MENU_EDIT_COPY_POS].widget, TRUE);
-    gtk_widget_set_sensitive(edit_menu[MENU_EDIT_SELECT_ALL_POS].widget,
-                             balsa_message_can_select(bm));
-}
-
-static void
 copy_cb(GtkWidget * widget, MessageWindow * mw)
 {
     guint signal_id;
@@ -624,8 +611,7 @@ select_all_cb(GtkWidget * widget, gpointer data)
 {
     MessageWindow *mw = (MessageWindow *) (data);
 
-    if (mw->bmessage)
-	balsa_message_select_all(BALSA_MESSAGE(mw->bmessage));
+    libbalsa_window_select_all(GTK_WINDOW(mw->window));
 }
 
 static void next_unread_cb(GtkWidget * widget, gpointer data)

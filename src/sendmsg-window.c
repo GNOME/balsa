@@ -3744,14 +3744,7 @@ paste_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static void
 select_all_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    GtkTextBuffer *buffer =
-        gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
-    GtkTextIter start, end;
-
-    gtk_text_buffer_get_bounds(buffer, &start, &end);
-    gtk_text_buffer_move_mark_by_name(buffer, "insert", &start);
-    gtk_text_buffer_move_mark_by_name(buffer, "selection_bound", &end);
-    gtk_widget_grab_focus(bsmsg->text);
+    libbalsa_window_select_all(GTK_WINDOW(bsmsg->window));
 }
 
 static void

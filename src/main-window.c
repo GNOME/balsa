@@ -178,8 +178,9 @@ static void collapse_all_cb(GtkWidget * widget, gpointer data);
 static void address_book_cb(GtkWindow *widget, gpointer data);
 
 static void copy_cb(GtkWidget * widget, BalsaWindow *bw);
-static void ctrl_a_cb(GtkWidget * widget, gpointer data);
 static void select_all_cb(GtkWidget * widget, gpointer);
+static void message_copy_cb(GtkWidget * widget, gpointer data);
+static void message_select_all_cb(GtkWidget * widget, gpointer data);
 static void mark_all_cb(GtkWidget * widget, gpointer);
 
 static void select_part_cb(BalsaMessage * bm, gpointer data);
@@ -338,7 +339,7 @@ static GnomeUIInfo edit_menu[] = {
 #define MENU_EDIT_COPY_POS 0
     GNOMEUIINFO_MENU_COPY_ITEM(copy_cb, NULL),
 #define MENU_EDIT_SELECT_ALL_POS 1
-    GNOMEUIINFO_MENU_SELECT_ALL_ITEM(ctrl_a_cb, NULL),
+    GNOMEUIINFO_MENU_SELECT_ALL_ITEM(select_all_cb, NULL),
     GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_MENU_FIND_ITEM(find_cb, NULL),
     GNOMEUIINFO_MENU_FIND_AGAIN_ITEM(find_again_cb, NULL),
@@ -507,12 +508,12 @@ static GnomeUIInfo message_menu[] = {
     },
 	GNOMEUIINFO_SEPARATOR,   
 #define MENU_MESSAGE_COPY_POS 11
-	GNOMEUIINFO_MENU_COPY_ITEM(copy_cb, NULL),
+	GNOMEUIINFO_MENU_COPY_ITEM(message_copy_cb, NULL),
 #define MENU_MESSAGE_SELECT_ALL_POS 12
 	{
 		GNOME_APP_UI_ITEM, N_("_Select Text"),
 		N_("Select entire mail"),
-		select_all_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
+		message_select_all_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
 		NULL, 0, (GdkModifierType) 0, NULL
     },  
     GNOMEUIINFO_SEPARATOR,
@@ -1152,7 +1153,7 @@ enable_edit_menus(BalsaMessage * bm)
                              NULL);
 
     gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_COPY_POS].widget,
-                             bm != NULL);
+                             enable);
     gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_SELECT_ALL_POS].
                              widget, enable);
 }
@@ -2395,6 +2396,7 @@ previous_part_cb(GtkWidget * widget, gpointer data)
     }
 }
 
+/* Edit menu callbacks. */
 static void
 copy_cb(GtkWidget * widget, BalsaWindow * bw)
 {
@@ -2407,33 +2409,31 @@ copy_cb(GtkWidget * widget, BalsaWindow * bw)
         g_signal_emit(focus_widget, signal_id, (GQuark) 0);
 }
 
-/* Callback for the `Edit => Select All' menu item; if the keyboard
- * focus is in the index, or if there's no message displayed, select all
- * messages; otherwise, select all text in the displayed message. */
-static void
-ctrl_a_cb(GtkWidget * widget, gpointer data)
-{
-    GtkWidget *index;
-    BalsaWindow *bw = BALSA_WINDOW(data);
-
-    index = balsa_window_find_current_index(balsa_app.main_window);
-    g_return_if_fail(index != NULL);
-
-    if (GTK_WIDGET_HAS_FOCUS(index)
-        || !(bw->preview && BALSA_MESSAGE(bw->preview)->current_part))
-        mark_all_cb(widget, data);
-    else
-        select_all_cb(widget, data);
-}
-
 static void
 select_all_cb(GtkWidget * widget, gpointer data)
 {
-    BalsaWindow *bw;
-    bw = BALSA_WINDOW(data);
+    libbalsa_window_select_all(data);
+}
 
-    if (bw->preview)
-        balsa_message_select_all(BALSA_MESSAGE(bw->preview));
+/* Message menu callbacks. */
+static void
+message_copy_cb(GtkWidget * widget, gpointer data)
+{
+    BalsaWindow *bw = BALSA_WINDOW(data);
+
+    if (bw->preview
+        && balsa_message_grab_focus(BALSA_MESSAGE(bw->preview)))
+        copy_cb(widget, data);
+}
+
+static void
+message_select_all_cb(GtkWidget * widget, gpointer data)
+{
+    BalsaWindow *bw = BALSA_WINDOW(data);
+
+    if (bw->preview
+        && balsa_message_grab_focus(BALSA_MESSAGE(bw->preview)))
+	libbalsa_window_select_all(data);
 }
 
 static void
@@ -3529,13 +3529,12 @@ static void
 mark_all_cb(GtkWidget * widget, gpointer data)
 {
     GtkWidget *index;
-    GtkTreeSelection *selection;
 
     index = balsa_window_find_current_index(BALSA_WINDOW(data));
     g_return_if_fail(index != NULL);
 
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(index));
-    gtk_tree_selection_select_all(selection);
+    gtk_widget_grab_focus(index);
+    libbalsa_window_select_all(data);
 }
 
 static void

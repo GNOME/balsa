@@ -1,5 +1,8 @@
-2004-01-19 00:02  PeterB
+2004-01-19 10:38  PeterB
 
+	* src/balsa-index.c: disable experimental code.
+	* libbalsa/mailbox.c: move declarations to start of block; check
+	that tree-view widget is realized.
 	* src/sendmsg-window.c: show window before setting `From:' address,
 	so its text doesn't get selected.
 
